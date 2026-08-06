@@ -68,10 +68,25 @@ const wring = (t) => t
    de destructurering (`const { a, b } = kern`) en de losse toegang (`kern.a`).
    De contextnamen tctx/ctx horen erbij: submodules van techniek en de kantoren
    krijgen de kern onder die naam doorgegeven, en dat is dezelfde zak. */
+/* WELKE NAAM DRAAGT DE KERN IN DIT BESTAND? Eerst stonden hier drie namen
+   (kern, tctx, ctx) en dat leek genoeg. Het was het niet: server/routes/member/
+   betalen-munt.js destructureert uit `mctx`, en dat bestand was daarmee VOLLEDIG
+   onzichtbaar voor deze meting -- bereikVan gaf er nul namen voor terug. Toen de
+   domeingrens aanging zakte test/munten.test.js op een undefined, en de oorzaak
+   lag niet in de code maar hier.
+
+   Geteld over server/routes komen er minstens tien voor: kern (252x), horeca,
+   ctx, tctx, vctx, octx, actx, sctx, kctx, wctx, hctx, mctx en r. Een vaste lijst
+   loopt dus per definitie achter op de volgende submodule.
+
+   Daarom: ELKE destructurering uit een enkele naam telt mee. Dat verzamelt te
+   RUIM -- `const { a, b } = eenGewoonObject` komt er ook in -- en die kant is de
+   goede. Wat een domein te veel opschrijft maakt zijn grens iets ruimer; wat het
+   te weinig opschrijft laat een route stil op undefined vallen. */
 function bereikVan(bron) {
   const s = wring(bron);
   const uit = new Set();
-  for (const m of s.matchAll(/\{([^{}]*)\}\s*=\s*(?:kern|tctx|ctx)\b/g)) {
+  for (const m of s.matchAll(/\{([^{}]*)\}\s*=\s*[a-zA-Z_$][\w$]*\s*[;)]/g)) {
     for (const stuk of m[1].split(',')) {
       const n = stuk.includes(':') ? stuk.split(':')[0] : stuk;
       const naam = (n || '').trim().split('=')[0].trim();

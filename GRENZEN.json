@@ -24,7 +24,8 @@
       "pinZet"
     ],
     "alpine": [
-      "alpine"
+      "alpine",
+      "status"
     ],
     "atelierweb": [
       "antivirus",
@@ -32,6 +33,9 @@
       "media"
     ],
     "auth": [
+      "DEMO",
+      "DEV_VELDEN",
+      "PAS_FOUT",
       "PERSONAS",
       "PRODUCTION",
       "antivirus",
@@ -46,6 +50,8 @@
       "mail",
       "memberTemplate",
       "noteFailedTry",
+      "pasAppOk",
+      "pasAppVan",
       "rememberSession",
       "sessions",
       "stateFor",
@@ -73,7 +79,9 @@
       "regelwacht"
     ],
     "bedrijf": [
+      "agenda",
       "bedrijf",
+      "bestanden",
       "eigenaar",
       "rtmailTeam",
       "rtmailVak"
@@ -85,7 +93,8 @@
       "bestanden"
     ],
     "bieb": [
-      "bibliothecaris"
+      "bibliothecaris",
+      "status"
     ],
     "bijles": [
       "bijles",
@@ -113,7 +122,8 @@
     ],
     "clubs": [
       "fitclub",
-      "golfclub"
+      "golfclub",
+      "status"
     ],
     "code": [
       "dyncode",
@@ -141,11 +151,13 @@
       "galerij"
     ],
     "gebouw": [
-      "gebouw"
+      "gebouw",
+      "status"
     ],
     "geloofbieb": [
       "bibliothecaris",
-      "geloofbieb"
+      "geloofbieb",
+      "status"
     ],
     "gemeente": [
       "gemeente"
@@ -159,7 +171,8 @@
     ],
     "home": [
       "homeMerken",
-      "homekit"
+      "homekit",
+      "status"
     ],
     "huis": [
       "huis"
@@ -256,7 +269,8 @@
       "appbieb",
       "lesmaker",
       "reisbieb",
-      "schoolbieb"
+      "schoolbieb",
+      "status"
     ],
     "luchthaven": [
       "lucht"
@@ -272,7 +286,8 @@
       "kmar"
     ],
     "marina": [
-      "marina"
+      "marina",
+      "status"
     ],
     "markt": [
       "markt"
@@ -436,6 +451,7 @@
       "lbObjectWeg",
       "lbRegel",
       "lbRegelWeg",
+      "ledenStaat",
       "leeftijdVan",
       "lidBoard",
       "lidBoardHerstel",
@@ -486,6 +502,7 @@
       "mijnStyling",
       "mijnVerblijven",
       "mijnWachtlijst",
+      "munten",
       "myApplications",
       "nalatenschap",
       "nlContact",
@@ -507,6 +524,7 @@
       "ontmoetStop",
       "ontmoetTeken",
       "ontmoetZet",
+      "openLijn",
       "openVacatures",
       "optieAan",
       "orderMetRef",
@@ -676,6 +694,7 @@
       "noteFailedTry",
       "notify",
       "notifySupplier",
+      "officeQueryMag",
       "officeState",
       "ontmoetKantoorState",
       "ontmoetSignaalLid",
@@ -689,7 +708,8 @@
       "sessionFor",
       "totpOk",
       "trChat",
-      "veiligGelijk"
+      "veiligGelijk",
+      "wieKijkt"
     ],
     "onboarding": [
       "eigenaar",
@@ -729,6 +749,7 @@
     "planners": [
       "advies",
       "polis",
+      "status",
       "weddings"
     ],
     "podium": [
@@ -761,7 +782,8 @@
     ],
     "rtfbieb": [
       "bibliothecaris",
-      "rtfbieb"
+      "rtfbieb",
+      "status"
     ],
     "rtfkantoor": [
       "lab",
@@ -777,11 +799,13 @@
       "schoolbieb"
     ],
     "rtgid": [
-      "rtgid"
+      "rtgid",
+      "status"
     ],
     "rtgkantoor": [
       "onderzoeker",
-      "rtgai"
+      "rtgai",
+      "status"
     ],
     "rtmail": [
       "automatisering"
@@ -821,6 +845,7 @@
       "deblokkeer",
       "dmSleutel",
       "isGeblokkeerd",
+      "isKindVanGezin",
       "kindContacten",
       "kindVerwijder",
       "kletsAan",
@@ -837,6 +862,8 @@
       "naamlaag",
       "onboarding",
       "ouderVerbind",
+      "rtfOnbSess",
+      "rtfSociaal",
       "snapOpenen",
       "snapSturen",
       "snapsVoor",
@@ -918,13 +945,17 @@
       "BEVEILIGING_ERNST",
       "BEVEILIGING_SHIFTS",
       "BOEK_KETEN",
+      "BOOT_TYPES",
       "DEMO",
       "DEMO_SUPPLIER",
       "GROOTHANDEL_CATEGORIEEN",
+      "H",
       "HK_STATUSES",
+      "KANALEN",
       "LANDEN",
       "PASPOORT_NIVEAUS",
       "POS_METHODS",
+      "REGELSTANDEN",
       "RETAIL_MATEN",
       "RETAIL_SEIZOENEN",
       "RIT_KETEN",
@@ -940,12 +971,14 @@
       "aiFindDoor",
       "aiFindRoom",
       "alcoholGrensVan",
+      "alpine",
       "applyChatVertaald",
       "avBeslis",
       "avDealerInbox",
       "avVerwijderAuto",
       "avZetAan",
       "avZetAuto",
+      "beauty",
       "beslisReservering",
       "bevAanvraag",
       "bevAanvraagLijst",
@@ -975,15 +1008,20 @@
       "boekingenVanZaak",
       "boekingenVoegToe",
       "boerderij",
+      "bonBoek",
+      "bonMaak",
       "broadcastSync",
       "cannedBoekhouder",
       "careAfronden",
       "careAgenda",
       "cateringDishes",
+      "centen",
+      "charterVan",
       "chatStuur",
       "checkCred",
       "coachCache",
       "coachRules",
+      "controleerSom",
       "creator",
       "dagrapport",
       "defensie",
@@ -1007,10 +1045,14 @@
       "fallbackRunsheet",
       "financeVoor",
       "findSupplier",
+      "findSupplierByName",
+      "fitclub",
       "fluisterZeg",
+      "fotosVan",
       "gcCode",
       "geborenVan",
       "gemeente",
+      "getal",
       "ghAnnuleer",
       "ghBijbestelVoorstel",
       "ghDefaults",
@@ -1024,7 +1066,9 @@
       "ghZetFunctie",
       "ghZetProduct",
       "ghZetVoorraad",
+      "golfclub",
       "guestsFor",
+      "happyKorting",
       "hasCred",
       "haversine",
       "horeca",
@@ -1034,14 +1078,22 @@
       "horecaPubliek",
       "horecaRekVan",
       "hulpdienst",
+      "huurVan",
       "i18n",
+      "id",
+      "invitesVan",
+      "isCharter",
       "isFavoriet",
+      "isVastgoed",
+      "isVerhuur",
       "kamerplanning",
       "kassaRetourGrens",
       "ketenchat",
       "keuken",
+      "keylessCode",
       "klantProfiel",
       "klantSalon",
+      "kortingCenten",
       "ledenPrijs",
       "leeftijdVan",
       "legApart",
@@ -1049,8 +1101,11 @@
       "locVoorZaak",
       "logInlog",
       "loginFails",
+      "maakInvite",
+      "maakKassacode",
       "magBezorgen",
       "magWerken",
+      "marina",
       "mbGps",
       "mbNeem",
       "mbOverhandig",
@@ -1059,14 +1114,21 @@
       "mbSetup",
       "mbWinkelOverzicht",
       "media",
+      "netLink",
+      "netPaar",
+      "netState",
       "noteFailedTry",
       "notify",
       "notifyApplicant",
       "notifySupplier",
+      "nu",
+      "openstaand",
+      "opvang",
       "orderMetRef",
       "ordersVanZaak",
       "ordersVoegToe",
       "overheid",
+      "pandVan",
       "parseRunsheetText",
       "pasVoorraad",
       "paskamerBreng",
@@ -1075,6 +1137,7 @@
       "paspoortPartner",
       "paspoortVraag",
       "pay",
+      "petcare",
       "pickupCode",
       "pinSlot",
       "poortBeeld",
@@ -1119,7 +1182,9 @@
       "temperatuurC",
       "thuis",
       "ticketsVoorSlot",
+      "totaal",
       "trChat",
+      "uitEuro",
       "unlockDoor",
       "vakwerk",
       "verblijfBeslis",
@@ -1128,7 +1193,9 @@
       "verblijfNoShow",
       "voegKlantnotitie",
       "voorraadZoek",
+      "waarde",
       "walkIn",
+      "weddings",
       "weekdagFactor",
       "werkAdvies",
       "werkvensterVan",
@@ -1154,14 +1221,21 @@
       "bankregieOverzicht",
       "betaal",
       "beveilig",
+      "bewaren",
+      "boardroomTelling",
       "ctx",
+      "eigenaar",
       "eigenaarAlleen",
       "eigenaarUser",
       "foutmelder",
+      "functies",
       "geldCommissieZet",
       "geldKortingZet",
       "geldPasprijsZet",
+      "herleidPersoon",
+      "inzagelog",
       "isEigenaar",
+      "log",
       "loginFails",
       "magInzien",
       "mail",
@@ -1172,6 +1246,7 @@
       "sessions",
       "staat",
       "stad",
+      "techniek",
       "wacht",
       "zekeringMag"
     ],
@@ -1234,7 +1309,8 @@
     "verzorging": [
       "beauty",
       "opvang",
-      "petcare"
+      "petcare",
+      "status"
     ],
     "vonk": [
       "vonkBericht",
@@ -1250,6 +1326,7 @@
       "voorspel"
     ],
     "vracht": [
+      "status",
       "vracht"
     ],
     "wbw": [
@@ -1269,6 +1346,7 @@
       "welzijn"
     ],
     "werkbeleid": [
+      "status",
       "werkbeleidOverzicht",
       "werkbeleidZet"
     ],
@@ -1276,7 +1354,19 @@
       "werkmail"
     ],
     "werkplek": [
+      "architect",
+      "architectRtf",
+      "atelier",
+      "atelierRtf",
       "boardroomBaas",
+      "hardware",
+      "hardwareRtf",
+      "ideeen",
+      "ideeenRtf",
+      "redactie",
+      "redactieRtf",
+      "studio",
+      "studioRtf",
       "werkplek"
     ],
     "werkplek-bureaus": [],
@@ -1286,15 +1376,26 @@
       "tafelwensen"
     ],
     "zakelijk": [
+      "PRO",
+      "Z",
       "connectieTussen",
+      "connectiesVan",
+      "gedeeldeConnecties",
       "gidsHaal",
+      "mijnProfiel",
+      "nu",
       "openVacatures",
+      "pasVan",
+      "pro",
+      "publiek",
+      "rid",
       "socialVerbind",
       "statusVan",
       "verbActief",
       "zijnVrienden"
     ],
     "zorgwallet": [
+      "status",
       "wallet",
       "zorgpolis"
     ]

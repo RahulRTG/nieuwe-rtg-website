@@ -61,7 +61,23 @@ const DOORGEEF = ['kern', 'fs', 'path', 'DATA_DIR', 'UPLOAD_DIR'];
 /* Een fout die zegt WAT er miste en WAAR, want daar gaat de hele grens over.
    De tekst noemt ook waar je het oplost: in GRENZEN.json en niet door de grens
    te verwijderen. */
+/* ELKE OVERSCHRIJDING WORDT OOK GELOGD, en niet alleen gegooid. Die regel komt
+   uit de eerste volle suite met de grens aan: achttien toetsen zakten op
+   "Cannot read properties of undefined" zonder dat er ergens een grensfout in de
+   uitvoer stond. Reden: routes/supplier/genrepuls.js gooit op `kern[m[0]]` en
+   verderop wordt die fout ingeslikt (`catch (e) {}`). Zonder deze log is de
+   grens dan even stil als de zak die hij moest vervangen -- en dan weet je wel
+   DAT het stuk is, maar niet dat de grens het deed of welke naam het was.
+
+   Een keer per paar, want anders vult een lus in een verzoek het log. */
+const gelogd = new Set();
 function grensFout(domein, naam) {
+  const sleutel = domein + ' ' + naam;
+  if (!gelogd.has(sleutel)) {
+    gelogd.add(sleutel);
+    console.warn('[grens] ' + domein + ' reikt naar kern.' + naam +
+      ' -- niet in GRENZEN.json. Hoort hij daar? Zet hem erbij. Zo niet: dit is de grens die werkt.');
+  }
   const e = new Error('domeingrens: het domein "' + domein + '" vraagt kern.' + naam +
     ' maar heeft die naam niet opgeschreven.\n' +
     '  Hoort hij daar? Zet hem in GRENZEN.json bij "' + domein + '".\n' +

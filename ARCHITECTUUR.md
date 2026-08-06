@@ -92,18 +92,18 @@ luister
 Acht domeinen, uit `server/opzet/routes.js`. Met `RTG_DOMAINS=member,social` draait
 een proces alleen die domeinen; een gateway (`server/poort.js`) stuurt de
 padvoorvoegsels dan naar het juiste proces. **Die belofte is nog niet waargemaakt:**
-zie §5 -- er zijn nog 142 kern-namen die meer dan één domein aanraakt.
+zie §5 -- er zijn nog 146 kern-namen die meer dan één domein aanraakt.
 
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
-| `auth` | 19 | 5 | 8 | 36 |
-| `member` | 391 | 47 | 9 | 351 |
-| `supplier` | 481 | 87 | 6 | 249 |
-| `office` | 31 | 7 | 3 | 49 |
+| `auth` | 19 | 5 | 8 | 41 |
+| `member` | 391 | 47 | 9 | 357 |
+| `supplier` | 481 | 87 | 6 | 282 |
+| `office` | 31 | 7 | 3 | 52 |
 | `staff` | 25 | 5 | 1 | 37 |
-| `social` | 55 | 6 | 31 | 52 |
-| `techniek` | 42 | 11 | 1 | 41 |
-| `zakelijk` | 13 | 2 | 0 | 0 |
+| `social` | 55 | 6 | 31 | 56 |
+| `techniek` | 42 | 11 | 1 | 49 |
+| `zakelijk` | 13 | 2 | 0 | 27 |
 
 "Zonder bewaker" betekent: geen `auth`/`supplierAuth`/`officeAuth`-achtige middleware
 op de regel zelf. Dat is niet hetzelfde als onbeveiligd -- regel 28 van de keuring eist
@@ -118,13 +118,13 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 947 |
-| daarvan door **meer dan één** domein (de echte koppeling) | 142 |
-| daarvan door precies één domein | 805 |
+| kern-namen die routes aanraken | 1007 |
+| daarvan door **meer dan één** domein (de echte koppeling) | 146 |
+| daarvan door precies één domein | 861 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 
-Dat derde getal is de opening: 85% van wat er in de gedeelde zak zit, wordt door
+Dat derde getal is de opening: 86% van wat er in de gedeelde zak zit, wordt door
 precies één domein gebruikt. Dat hoort geen gedeelde kern te zijn maar bezit van dat
 domein. Alle vijf getallen staan in `NORM.json` aan een ratel en mogen alleen zakken.
 
@@ -132,10 +132,11 @@ domein. Alle vijf getallen staan in `NORM.json` aan een ratel en mogen alleen za
 domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 
 ```
-app(111) auth(66) supplierAuth(44) db(30) officeAuth(21) liveCodename(17) accounts(12)
-managerOnly(11) save(11) rtf(11) crypto(9) express(9) anthropic(9) rtmail(9)
-codenaamVan(9) schoon(8) logActivity(7) sseToOffice(7) keyVanCodenaam(7) tooManyTries(6)
-geenGast(6) talen(6) boardroomWie(5) sseToSupplier(5) gegevensStop(5)
+app(111) auth(66) supplierAuth(44) db(30) officeAuth(21) liveCodename(17) status(16)
+accounts(12) managerOnly(11) save(11) rtf(11) crypto(9) express(9) anthropic(9)
+rtmail(9) codenaamVan(9) schoon(8) tooManyTries(7) logActivity(7) sseToOffice(7)
+keyVanCodenaam(7) geenGast(6) talen(6) boardroomWie(5) noteFailedTry(5) sseToSupplier(5)
+kern(5) gegevensStop(5)
 ```
 
 **De breedste routebestanden** -- hier zou je beginnen:
@@ -143,15 +144,15 @@ geenGast(6) talen(6) boardroomWie(5) sseToSupplier(5) gegevensStop(5)
 | Namen uit kern | Bestand |
 |---|---|
 | 71 | `server/routes/member/rechterhand.js` |
+| 41 | `server/routes/member/voertuigen/huur.js` |
+| 40 | `server/routes/member/voertuigen/charter.js` |
+| 40 | `server/routes/member/voertuigen/verkoop.js` |
 | 40 | `server/routes/member/voertuigen.js` |
+| 39 | `server/routes/member/voertuigen/ontmoeten.js` |
 | 37 | `server/routes/staff.js` |
 | 36 | `server/routes/auth.js` |
-| 33 | `server/routes/techniek.js` |
-| 32 | `server/routes/member/boeken.js` |
-| 32 | `server/routes/member/handel/uitjes.js` |
-| 32 | `server/routes/member/persoonlijk.js` |
-| 29 | `server/routes/supplier/beveiliging.js` |
-| 25 | `server/routes/social/leden.js` |
+| 34 | `server/routes/member/handel/uitjes.js` |
+| 33 | `server/routes/auth/account.js` |
 
 ## 6. Waar de waarheid staat
 

@@ -366,3 +366,101 @@ test('het lid toont zijn kaartje als QR en de conducteur keurt hem op de PDA',
     child.kill();
   }
 });
+
+/* De werkgeverskant op het scherm. Waarom dit een EIGEN toets is: de API-toets
+   (test/zakelijkvervoer.test.js) bewijst dat een rit boven de drempel wacht en
+   dat een besluit hem loslaat. Wat hij NIET bewijst is dat er ooit een mens bij
+   kan -- en een goedkeuring die alleen via curl te geven is, betekent dat de
+   rit blijft liggen tot de medewerker belt. Dat is precies de situatie die een
+   drempel had moeten voorkomen. */
+test('de werkgever zet zijn beleid, ziet de aanvraag en geeft akkoord',
+  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  const { child, base } = await startServer({ env: { SMTP_URL: '' } });
+  let browser;
+  try {
+    // een lid dat ECHT bij het hotel werkt: uitnodiging + aanmelden met eigen account
+    const u = Date.now().toString().slice(-8) + Math.floor(Math.random() * 90 + 10);
+    const mail = 'zw' + u + '@x.nl';
+    const reg = await post(base, '/api/auth/register', { name: 'Medewerker', email: mail,
+      phone: '06' + u.slice(0, 8), password: 'geheim123', geboortedatum: '1990-01-01',
+      geslacht: 'v', tier: 'rtg', pasApp: 'rtg' });
+    assert.ok(reg.token, 'het lid is aangemeld');
+
+    const roster = await post(base, '/api/supplier/roster', { code: 'HOSHI' });
+    const m = (roster.staff || []).find(x => x.role === 'manager');
+    const baas = (await post(base, '/api/supplier/login', { code: 'HOSHI', staffId: m.id, pin: '1234' })).token;
+    assert.ok(baas, 'de manager van het hotel logt in');
+    const inv = await post(base, '/api/supplier/staff/invite', { name: 'Nora Vermeer', role: 'staff' }, baas);
+    const join = await post(base, '/api/supplier/staff/join', { bedrijf: 'Aguamarina Ibiza',
+      kassacode: inv.invite.kassacode, login: mail, password: 'geheim123' });
+    assert.ok(join.ok, 'de medewerker is in dienst: ' + JSON.stringify(join).slice(0, 120));
+
+    const s = await open(base, '/apps/zakelijk.html', 'rtg_pda_token', baas);
+    browser = s.browser;
+    const page = s.page;
+
+    // het beleid op het scherm zetten: een drempel van vijf euro
+    await page.evaluate(() => { document.querySelector('#tabs button[data-tab="beleid"]').click(); });
+    await page.waitForFunction(() => !document.querySelector('#tBeleid').classList.contains('weg'),
+      null, { timeout: 20000 });
+    await page.fill('#bDrempel', '5');
+    await page.evaluate(() => { document.querySelector('#bBewaar').click(); });
+    /* De spiegel is de bewering die telt: de werkgever ziet in dezelfde
+       beweging welke ZIN zijn medewerker straks leest. */
+    await page.waitForFunction(() => /drempel|gaat de rit eerst langs u/i.test(
+      document.querySelector('#beleidSpiegel').textContent), null, { timeout: 20000 });
+    const spiegel = await page.textContent('#beleidSpiegel');
+    assert.match(spiegel, /wordt niet geweigerd/, 'de spiegel zegt dat een drempel geen verbod is, kreeg: ' + spiegel.slice(0, 140));
+
+    /* Een gekozen dag moet je ZIEN, en dat is niet hetzelfde als een class die
+       er staat: de huisregel `.aan` hangt aan `.tabs > button` en deed buiten
+       die rij niets. Er stonden zeven identieke pillen boven een beleid dat op
+       werkdagen stond. Deze toets rekent daarom af op de KLEUR. */
+    await page.evaluate(() => { [...document.querySelectorAll('#bDagen button')][2].click(); });
+    const dagKleur = await page.evaluate(() => {
+      const knoppen = [...document.querySelectorAll('#bDagen button')];
+      const kleur = b => getComputedStyle(b).backgroundColor;
+      return { aan: kleur(knoppen[2]), uit: kleur(knoppen[0]) };
+    });
+    assert.notEqual(dagKleur.aan, dagKleur.uit,
+      'de gekozen dag ziet er anders uit dan een niet-gekozen dag, kreeg: ' + JSON.stringify(dagKleur));
+
+    // en de naam van het bedrijf staat in beeld, niet zijn partnercode
+    assert.match(await page.textContent('#zaakNaam'), /Aguamarina/,
+      'de werkgever ziet zijn eigen naam, geen code');
+
+    // de medewerker vraagt een rit op rekening van het hotel
+    const rit = await post(base, '/api/mob/vraag', { ritsoort: 'direct', categorie: 'taxi',
+      van: { lat: 38.908, lng: 1.432, label: 'Hotel' }, naar: { lat: 38.978, lng: 1.536, label: 'Luchthaven' },
+      stad: 'Ibiza', namensOrganisatie: 'HOSHI', betaler: 'organisatie' }, reg.token);
+    assert.equal(rit.opdracht.goedkeuring.status, 'wacht', 'de rit wacht op akkoord');
+
+    // en die staat op het scherm van de werkgever, met de naam die hij kent
+    await page.evaluate(() => { document.querySelector('#tabs button[data-tab="akkoord"]').click(); });
+    await page.waitForFunction(() => /Nora Vermeer/.test(document.querySelector('#lijstWacht').textContent),
+      null, { timeout: 20000 });
+    const wacht = await page.textContent('#lijstWacht');
+    assert.match(wacht, /Luchthaven/, 'met de bestemming erbij');
+    assert.match(wacht, /€/, 'en het bedrag waar het om gaat, kreeg: ' + wacht.slice(0, 140));
+
+    await page.evaluate(() => {
+      const knop = [...document.querySelectorAll('#lijstWacht button')].find(b => b.textContent === 'Akkoord');
+      knop.click();
+    });
+    await page.waitForFunction(() => /wacht niets|Er wacht niets/.test(
+      document.querySelector('#lijstWacht').textContent), null, { timeout: 20000 });
+
+    // de server is het ermee eens, en de rit is nu wel te zien op een planbord
+    const mijn = await post(base, '/api/mob/mijn', {}, reg.token);
+    assert.equal(mijn.lopend.goedkeuring.status, 'akkoord', 'de rit is goedgekeurd');
+    const taxi = await zaakToken(base);
+    const bord = await post(base, '/api/supplier/mob/dispatch', {}, taxi);
+    assert.ok((bord.open || []).some(o => o.ref === rit.opdracht.ref),
+      'en pas nu ligt hij op de markt van de vervoerder');
+
+    assert.deepEqual(s.fouten, [], 'paginafouten: ' + s.fouten.join(' | '));
+  } finally {
+    if (browser) await browser.close();
+    child.kill();
+  }
+});

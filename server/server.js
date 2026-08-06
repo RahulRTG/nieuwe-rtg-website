@@ -2379,7 +2379,9 @@ Object.assign(kern, require('./kern/mobiliteit').maakMobiliteit({
   notify, findSupplier, logActivity, sseToOffice, sseToCustomer,
   // de kaartverkoop rekent af via dezelfde betaalkern en met dezelfde
   // OV-prijsformule als het uitchecken; geen tweede som, geen tweede grootboek
-  pay: kern.pay, ovPrijsVan: kern.ovPrijsVan
+  pay: kern.pay, ovPrijsVan: kern.ovPrijsVan,
+  // voor de dienstverbandcontrole bij zakelijke ritten
+  accounts
 }));
 /* RTG Navigatie (kern/navigatie.js): het huiseigen navigatiesysteem. Een eigen
    wegennet met A*-route, bocht-voor-bocht en ETA per vervoerwijze; bestemmingen

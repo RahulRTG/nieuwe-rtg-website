@@ -25,7 +25,8 @@ module.exports = (kern) => {
     mobAanbod, mobMijn, mobVraag, mobAnnuleer,
     plekLijst, favZet, favLijst,
     opdrachtMet, opdrachtBeeld, opdrachtNaar, opdrachtPositie,
-    dispatchBeeld, pendelReserveer, pendelVoorMedewerker } = kern;
+    dispatchBeeld, pendelReserveer, pendelVoorMedewerker,
+    beleidLees, besteedDezeMaand } = kern;
 
   const stuur = (res, r) => r && r.error ? res.status(r.status || 400).json({ error: r.error, ...r }) : res.json(r);
   const geenGast = (req, res) => {
@@ -103,6 +104,17 @@ module.exports = (kern) => {
     if (geenGast(req, res)) return;
     const code = werktDaar(req, res); if (!code) return;
     stuur(res, pendelReserveer(req.session, req.body || {}));
+  });
+
+  /* Het reisbeleid van je werkgever, met wat je deze maand al hebt besteed.
+     Bewust VOOR het boeken op te vragen: een medewerker die pas bij het
+     afwijzen hoort dat hij over zijn budget is, heeft al een rit gepland die
+     niet doorgaat. Dezelfde dienstverbandcontrole als de pendel. */
+  app.post('/api/mob/beleid', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    const code = werktDaar(req, res); if (!code) return;
+    const r = beleidLees(code);
+    stuur(res, Object.assign({}, r, { werkgever: code, besteed: besteedDezeMaand(code, req.session.key) }));
   });
 
   /* ---------------- de chauffeur en de bemanning (PDA) ---------------- */

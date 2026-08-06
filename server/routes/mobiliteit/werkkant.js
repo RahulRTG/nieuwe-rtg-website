@@ -11,7 +11,8 @@ module.exports = (kern, hulp) => {
     assetZet, assetLijst,
     matchGewichten, matchGewichtenZet,
     dispatchBeeld, dispatchVoorstel, dispatchWijsToe, dispatchOverboek, dispatchTelefoonboeking, dispatchSpoor,
-    pendelZet, pendelLijst, pendelRooster, pendelPlan, pendelNoShow } = kern;
+    pendelZet, pendelLijst, pendelRooster, pendelPlan, pendelNoShow,
+    beleidZet, beleidLees, zakelijkWacht, zakelijkBesluit, zakelijkOverzicht } = kern;
   const { stuur } = hulp;
 
   /* ---------------- de vervoerder en de dispatcher ---------------- */
@@ -75,6 +76,32 @@ module.exports = (kern, hulp) => {
   });
   app.post('/api/supplier/mob/pendel/noshow', supplierAuth, (req, res) => {
     stuur(res, pendelNoShow(req.supplier.code, req.body || {}));
+  });
+
+  /* ---------------- de werkgever: reisbeleid, akkoord, overzicht ----------------
+     Het beleid ZETTEN mag alleen de manager, het LEZEN mag iedereen met een
+     bedrijfsinlog. Dat is geen halfslachtigheid: een medewerker die niet mag
+     weten wat de grenzen zijn, loopt er de hele dag tegenaan zonder te weten
+     waarom, en dat is precies hoe een reisbeleid wordt omzeild in plaats van
+     gevolgd. Wie het beleid mag WIJZIGEN is een andere vraag -- wie zijn eigen
+     maximum kan zetten, heeft geen maximum. */
+  app.post('/api/supplier/mob/beleid', supplierAuth, (req, res) => {
+    if (!req.body || !req.body.zet)
+      return stuur(res, Object.assign(beleidLees(req.supplier.code), { naam: req.supplier.name }));
+    if (!managerOnly(req, res)) return;
+    stuur(res, beleidZet(req.supplier.code, req.body || {}, req.actor && req.actor.name));
+  });
+  /* De ritten die op akkoord wachten, en het besluit. Ook dit alleen de
+     manager: een goedkeuring die de aanvrager zelf kan geven is geen
+     goedkeuring. Het besluit draagt de naam van wie het nam. */
+  app.post('/api/supplier/mob/akkoord', supplierAuth, (req, res) => {
+    if (!managerOnly(req, res)) return;
+    if (!req.body || !req.body.ref) return stuur(res, zakelijkWacht(req.supplier.code));
+    stuur(res, zakelijkBesluit(req.supplier.code, req.actor && req.actor.name, req.body || {}));
+  });
+  app.post('/api/supplier/mob/zakelijk', supplierAuth, (req, res) => {
+    if (!managerOnly(req, res)) return;
+    stuur(res, zakelijkOverzicht(req.supplier.code, req.body || {}));
   });
 
   /* ---------------- RTG zelf: het moduleregister ---------------- */

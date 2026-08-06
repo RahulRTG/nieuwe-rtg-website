@@ -23,7 +23,7 @@
 module.exports = (ctx) => {
   const { db, save, nu, schoon, assetsVan, assetBeeld, assetMet, matchRangschik,
     opdrachtMet, opdrachtBeeld, opdrachtMaak, opdrachtNaar, opdrachtenVanVervoerder, opdrachtenOpen,
-    logActivity, sseToOffice } = ctx;
+    wachtOpAkkoord, logActivity, sseToOffice } = ctx;
 
   /* De pool die de matcher krijgt. Hier -- en niet in matching.js -- wordt
      bepaald wie er uberhaupt meedoet: alleen voertuigen van deze vervoerder
@@ -68,7 +68,8 @@ module.exports = (ctx) => {
       ['aangevraagd', 'geprijsd', 'aangeboden'].includes(o.status) &&
       (!o.stad || !stad || o.stad === stad));
     const opdrachten = eigen;
-    const open = eigen.filter(o => ['aangevraagd', 'geprijsd', 'aangeboden'].includes(o.status)).concat(markt);
+    // ook een rit MET vervoerder verdwijnt van het bord zolang hij op akkoord wacht
+    const open = eigen.filter(o => ['aangevraagd', 'geprijsd', 'aangeboden'].includes(o.status) && !wachtOpAkkoord(o)).concat(markt);
     const lopend = opdrachten.filter(o => ['geaccepteerd', 'onderweg', 'aangekomen', 'ingestapt', 'rijdt', 'incident', 'vervangend-voertuig'].includes(o.status));
     const klaar = opdrachten.filter(o => ['voltooid', 'afgerekend'].includes(o.status)).slice(0, 25);
     const vloot = assetsVan(vervoerder).map(a => assetBeeld(a, waar));

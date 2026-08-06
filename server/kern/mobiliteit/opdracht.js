@@ -123,6 +123,14 @@ module.exports = (ctx) => {
        reden dat de module bestaat -- zie modulecatalogus.js. */
     const boeking = cat ? cat.boeking : 'direct';
 
+    /* Op rekening van een bedrijf? Dan langs de zakelijke poort (./zakelijk):
+       werkt deze reiziger daar, past de rit in het beleid, moet er iemand
+       naar kijken. Hier, want ELKE zakelijke rit komt hierlangs. */
+    const prijs = prijsUit(tarief, km, minuten);
+    const zk = ctx.zakelijkePoort(actor, { prijs, ritsoort, stad: waar.stad,
+      kostenplaats: body.kostenplaats, wanneer: body.vertrek });
+    if (zk.error) return zk;
+
     const o = {
       ref: 'RTG-M-' + ctx.crypto.randomBytes(3).toString('hex').toUpperCase(),
       ritsoort, module: modId, categorie, boeking,
@@ -141,10 +149,11 @@ module.exports = (ctx) => {
       reizigerCodenaam: actor.key ? codenaamVan(actor.key) : (schoon(body.naamOpDeRit, 40) || 'Telefonische boeking'),
       betaler: body.betaler === 'organisatie' && actor.org ? { soort: 'organisatie', code: actor.org } : { soort: 'reiziger', key: actor.key || null },
       organisatie: actor.org || null,
+      medewerkerNaam: zk.medewerker || null, goedkeuring: zk.goedkeuring || null,
       kostenplaats: schoon(body.kostenplaats, 40) || null,
       geboektDoor: actor.soort || 'lid',
       vervoerder: waar.vervoerder, voertuig: null, chauffeur: null,
-      km, minuten, tarief, prijs: prijsUit(tarief, km, minuten),
+      km, minuten, tarief, prijs,
       annulering: { gratisTotMin: 5, kostenDeel: 0.5 },
       veiligheid: { deelCode: ctx.crypto.randomBytes(4).toString('hex'), noodcontact: !!body.noodcontact },
       notitie: schoon(body.notitie, 200) || null,
@@ -165,6 +174,7 @@ module.exports = (ctx) => {
       vertrekWens: o.vertrekWens, aankomstWens: o.aankomstWens,
       reizigers: o.reizigers, bagage: o.bagage, eisen: o.eisen,
       reizigerCodenaam: o.reizigerCodenaam, betaler: o.betaler, organisatie: o.organisatie,
+      medewerker: o.medewerkerNaam || null, goedkeuring: o.goedkeuring || null,
       kostenplaats: o.kostenplaats, geboektDoor: o.geboektDoor,
       vervoerder: o.vervoerder, voertuig: o.voertuig, chauffeur: o.chauffeur,
       km: o.km, minuten: o.minuten, prijs: o.prijs, tarief: o.tarief,
@@ -176,8 +186,12 @@ module.exports = (ctx) => {
 
   const opdrachtenVan = key => { ensureOpdrachten(); return db.data.mobOpdrachten.filter(o => o.reiziger === key); };
   const opdrachtenVanVervoerder = code => { ensureOpdrachten(); return db.data.mobOpdrachten.filter(o => o.vervoerder === code); };
-  const opdrachtenOpen = () => { ensureOpdrachten(); return db.data.mobOpdrachten.filter(o => !['afgerekend', 'geannuleerd'].includes(o.status)); };
+  // een rit die op akkoord van de werkgever wacht, hoort op geen enkel planbord
+  const wachtOpAkkoord = o => !!(o.goedkeuring && o.goedkeuring.status === 'wacht');
+  const opdrachtenOpen = () => { ensureOpdrachten();
+    return db.data.mobOpdrachten.filter(o => !['afgerekend', 'geannuleerd'].includes(o.status) && !wachtOpAkkoord(o)); };
 
   return { RITSOORTEN, RITSOORT_MODULE, STANDAARD_TARIEF, ensureOpdrachten, opdrachtMet, opdrachtMaak,
-    opdrachtBeeld, opdrachtenVan, opdrachtenVanVervoerder, opdrachtenOpen, moduleVoor, tariefVan, prijsUit };
+    opdrachtBeeld, opdrachtenVan, opdrachtenVanVervoerder, opdrachtenOpen, wachtOpAkkoord,
+    moduleVoor, tariefVan, prijsUit };
 };

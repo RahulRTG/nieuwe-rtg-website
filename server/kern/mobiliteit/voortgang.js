@@ -43,6 +43,13 @@ module.exports = (ctx) => {
     if (!o) return { status: 404, error: 'Opdracht niet gevonden.' };
     const check = magNaar(o.status, status);
     if (!check.mag) return { status: 409, error: check.reden, van: o.status };
+    /* Wacht deze rit op akkoord van de werkgever, dan beweegt hij niet --
+       behalve naar 'geannuleerd', want afzeggen mag altijd. De grendel staat
+       HIER, op de enige weg naar een andere status, en niet bij het planbord:
+       een filter op een scherm wordt door de volgende ingang omzeild en dan
+       rijdt de wagen voordat de leidinggevende ja heeft gezegd. */
+    if (o.goedkeuring && o.goedkeuring.status === 'wacht' && status !== 'geannuleerd')
+      return { status: 409, error: 'Deze rit wacht op akkoord van de werkgever.', van: o.status };
 
     const vorige = o.status;
     o.status = status;

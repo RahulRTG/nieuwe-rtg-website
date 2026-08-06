@@ -42,8 +42,14 @@ module.exports = (ctx) => {
       return { status: 404, error: 'Die reisoptie bestaat niet (meer); plan de reis opnieuw.',
         opties: (plan.opties || []).map(o => o.id) };
 
+    /* Op rekening van de werkgever? Dan gaan de RITTEN op die rekening en
+       blijven de VERVOERBEWIJZEN persoonlijk. Een rit wordt achteraf
+       afgerekend en kan dus naar een zakelijke rekening; een kaartje wordt hier
+       en nu uit de portemonnee van de reiziger betaald. Het staat erbij. */
+    const org = schoon(body.namensOrganisatie, 20) || null;
     const r = { id: id('rs'), key: session.key, codenaam: codenaamVan(session.key),
       van: plan.van, naar: plan.naar, optie: keuze.id, optieNaam: keuze.naam,
+      organisatie: org ? org.toUpperCase() : null,
       etappes: [], totaal: keuze.totaal, gemaakt: nu(), status: 'geboekt' };
 
     // ---- stap 1: de ritten. Hier beweegt nog geen geld ----
@@ -51,8 +57,9 @@ module.exports = (ctx) => {
     for (const e of keuze.etappes) {
       if (e.wijze !== 'taxi') continue;
       const uit = opdrachtMaak({ soort: 'lid', key: session.key, session, groep: session.tier,
-        stad: schoon(body.stad, 40) || null },
+        org, stad: schoon(body.stad, 40) || null },
         { ritsoort: 'direct', categorie: 'taxi',
+          betaler: org ? 'organisatie' : 'reiziger', kostenplaats: body.kostenplaats,
           van: { lat: e.van.lat, lng: e.van.lng, label: e.van.label || e.van.naam || 'Vertrek' },
           naar: { lat: e.naar.lat, lng: e.naar.lng, label: e.naar.label || e.naar.naam || 'Bestemming' },
           reizigers: Math.max(1, Math.round(Number(body.reizigers) || 1)),
@@ -111,14 +118,17 @@ module.exports = (ctx) => {
   function reisBeeld(r) {
     const nuBetaald = r.etappes.filter(e => e.betaald).reduce((n, e) => n + (e.prijs || 0), 0);
     const later = r.etappes.filter(e => e.wijze === 'taxi').reduce((n, e) => n + (e.prijs || 0), 0);
+    const wacht = r.etappes.some(e => { const o = e.ref ? opdrachtMet(e.ref) : null;
+      return o && o.goedkeuring && o.goedkeuring.status === 'wacht'; });
     return { id: r.id, van: r.van, naar: r.naar, optieNaam: r.optieNaam, status: r.status,
-      gemaakt: r.gemaakt, totaal: r.totaal,
+      gemaakt: r.gemaakt, totaal: r.totaal, organisatie: r.organisatie || null,
       etappes: r.etappes.map(e => {
         const b = Object.assign({}, e);
         if (e.wijze === 'taxi' && e.ref) {
           const o = opdrachtMet(e.ref);
           b.ritStatus = o ? o.status : 'onbekend';
           b.voertuig = o ? o.voertuig : null;
+          b.goedkeuring = o ? (o.goedkeuring || null) : null;
         }
         if (e.wijze === 'ov' && e.kaartje) {
           const k = kaartMet(e.kaartje);
@@ -139,7 +149,10 @@ module.exports = (ctx) => {
         nuBetaald ? 'De vervoerbewijzen zijn betaald.' : null,
         later ? 'De rit wordt afgerekend als hij gereden is; tot dan is die prijs een schatting.' : null,
         r.etappes.some(e => e.wijze === 'ov' && !e.kaartje)
-          ? 'Voor het openbaar vervoer checkt u in met uw RTG-app; u betaalt bij het uitchecken.' : null
+          ? 'Voor het openbaar vervoer checkt u in met uw RTG-app; u betaalt bij het uitchecken.' : null,
+        r.organisatie && nuBetaald
+          ? 'De rit gaat op rekening van ' + r.organisatie + '; uw vervoerbewijzen blijven persoonlijk.' : null,
+        wacht ? 'De rit wacht nog op akkoord van uw werkgever; tot dan wordt er geen wagen gezocht.' : null
       ].filter(Boolean).join(' ') || 'Alles is betaald.' };
   }
 

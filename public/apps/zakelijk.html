@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<script src="/shared/id.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Zakelijk vervoer</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<style>
+  :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--card2:var(--rtg-card2);--line:var(--rtg-line);--txt:var(--rtg-txt);
+    --soft:var(--rtg-soft);--gold:#C9A24B;--groen:#69B891;--rood:#DE6E92;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;min-height:100dvh;}
+  .kop{display:flex;align-items:center;gap:0.7rem;padding:calc(env(safe-area-inset-top,0px) + 0.9rem) 1.1rem 0.6rem;}
+  .kop h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.35rem;}
+  .kop .rek{flex:1;}
+  .kop a{color:var(--txt);text-decoration:none;font-size:1.1rem;}
+  .badge{font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);
+    border:1px solid var(--line);border-radius:999px;padding:0.25rem 0.6rem;white-space:nowrap;}
+  main{padding:0 1.1rem calc(env(safe-area-inset-bottom,0px) + 3rem);max-width:1100px;margin:0 auto;}
+  h2{font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);margin:1.2rem 0 0.6rem;}
+  .stil{color:var(--soft);font-size:0.82rem;line-height:1.55;}
+  button{font:inherit;cursor:pointer;}
+  .knop{background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--txt);
+    font-size:0.8rem;padding:0.45rem 0.8rem;}
+  .knop.vol{background:var(--gold);border-color:var(--gold);color:#0C0C0B;font-weight:600;}
+  .knop.nee{border-color:var(--rood);color:var(--rood);}
+  .knop:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem;margin:0.6rem 0;}
+  .vlakken{display:grid;grid-template-columns:1fr;gap:0.8rem;}
+  @media (min-width:900px){ .vlakken{grid-template-columns:1fr 1fr;} }
+  .rij{display:flex;align-items:flex-start;gap:0.7rem;border-top:1px solid var(--line);padding:0.6rem 0;font-size:0.85rem;}
+  .rij:first-child{border-top:none;}
+  .rij .rek{flex:1;}
+  .rij .sub{display:block;font-size:0.72rem;color:var(--soft);margin-top:0.15rem;}
+  .tabs{display:flex;gap:0.4rem;flex-wrap:wrap;margin:0.9rem 0 0.2rem;}
+  .vorm{display:grid;gap:0.55rem;margin-top:0.6rem;}
+  .vorm label{font-size:0.72rem;color:var(--soft);display:block;margin-bottom:0.2rem;}
+  .vorm input,.vorm select{background:var(--card2);border:1px solid var(--line);border-radius:10px;
+    color:var(--txt);padding:0.5rem 0.7rem;font:inherit;width:100%;}
+  .paar{display:grid;grid-template-columns:1fr 1fr;gap:0.55rem;}
+  .dagen{display:flex;gap:0.35rem;flex-wrap:wrap;}
+  .dagen button{border-radius:999px;}
+  /* De gekozen dag moet je ZIEN. De huisregel `.aan` is gebonden aan `.tabs >
+     button`; buiten die rij deed hij niets, en dan stonden hier zeven identieke
+     pillen terwijl het beleid op ma t/m vr stond. Een keuze die niet te zien is,
+     is geen keuze. */
+  .dagen button.aan{background:var(--gold);border-color:var(--gold);color:#0C0C0B;font-weight:600;}
+  .uitleg{font-size:0.72rem;color:var(--soft);margin-top:0.3rem;}
+  table{width:100%;border-collapse:collapse;font-size:0.8rem;}
+  th,td{text-align:left;padding:0.4rem 0.3rem;border-top:1px solid var(--line);}
+  th{font-size:0.68rem;letter-spacing:0.1em;text-transform:uppercase;color:var(--soft);border-top:none;}
+  td.getal,th.getal{text-align:right;font-variant-numeric:tabular-nums;}
+  .melding{position:fixed;left:50%;bottom:1rem;transform:translateX(-50%);background:var(--card2);
+    border:1px solid var(--line);border-radius:999px;padding:0.55rem 1rem;font-size:0.8rem;max-width:88vw;
+    opacity:0;pointer-events:none;transition:opacity 0.25s;z-index:60;}
+  .melding.zien{opacity:1;}
+  .weg{display:none !important;}
+  @media (prefers-reduced-motion: reduce){ *{transition:none !important;animation:none !important;} }
+</style>
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<script src="/shared/glyf.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/seizoen.js" defer></script>
+</head>
+<body class="rtg-stijl">
+<header class="kop">
+  <a href="/apps/leverancier.html" aria-label="Terug naar de zaak-app">&#8592;</a>
+  <h1>Zakelijk vervoer</h1>
+  <span class="rek"></span>
+  <span class="badge" id="zaakNaam">&mdash;</span>
+</header>
+<main>
+  <section id="vPoort" class="weg">
+    <div class="kaart"><p class="stil">Zakelijk vervoer hoort bij uw zaak-inlog. Meld u eerst aan in de
+      leverancier- of personeels-app.</p></div>
+  </section>
+
+  <section id="vBeeld" class="weg">
+    <div class="tabs" role="tablist" id="tabs">
+      <button class="knop aan" type="button" data-tab="akkoord" role="tab">Op akkoord</button>
+      <button class="knop" type="button" data-tab="beleid" role="tab">Reisbeleid</button>
+      <button class="knop" type="button" data-tab="overzicht" role="tab">Maandoverzicht</button>
+    </div>
+
+    <!-- ---------------- wat op akkoord wacht ---------------- -->
+    <div id="tAkkoord">
+      <h2>Wacht op uw akkoord</h2>
+      <div class="kaart">
+        <p class="stil">Deze ritten staan op geen enkel planbord tot u ja zegt. Wie niets doet, keurt niets
+          goed &mdash; er gaat hier niets vanzelf door.</p>
+        <div id="lijstWacht" style="margin-top:0.6rem;"><p class="stil">Even kijken&hellip;</p></div>
+      </div>
+    </div>
+
+    <!-- ---------------- het reisbeleid ---------------- -->
+    <div id="tBeleid" class="weg">
+      <h2>Het reisbeleid</h2>
+      <div class="vlakken">
+        <div class="kaart">
+          <p class="stil">Een leeg veld betekent geen grens. Het beleid geldt alleen als <em>u</em> betaalt;
+            een medewerker mag altijd op eigen rekening reizen.</p>
+          <div class="vorm">
+            <div class="paar">
+              <div><label for="bMax">Maximum per rit (&euro;)</label><input id="bMax" type="number" min="0" step="0.5"></div>
+              <div><label for="bDrempel">Akkoord nodig vanaf (&euro;)</label><input id="bDrempel" type="number" min="0" step="0.5"></div>
+            </div>
+            <div><label for="bBudget">Budget per medewerker per maand (&euro;)</label><input id="bBudget" type="number" min="0" step="1"></div>
+            <div class="paar">
+              <div><label for="bVan">Niet voor</label><input id="bVan" type="time"></div>
+              <div><label for="bTot">Niet na</label><input id="bTot" type="time"></div>
+            </div>
+            <div>
+              <label>Op welke dagen</label>
+              <div class="dagen" id="bDagen"></div>
+            </div>
+            <div><label for="bSteden">Steden (komma&#39;s)</label><input id="bSteden" type="text" placeholder="Ibiza, Amsterdam"></div>
+            <div><label for="bKp">Kostenplaatsen (komma&#39;s)</label><input id="bKp" type="text" placeholder="Sales, Inkoop"></div>
+            <div>
+              <label for="bKpVerplicht">Kostenplaats verplicht</label>
+              <select id="bKpVerplicht"><option value="0">Nee</option><option value="1">Ja</option></select>
+            </div>
+            <button class="knop vol" id="bBewaar" type="button">Beleid bewaren</button>
+            <p class="uitleg" id="bStand"></p>
+          </div>
+        </div>
+        <div class="kaart">
+          <h2 style="margin-top:0">Wat uw medewerker ziet</h2>
+          <p class="stil">Elke afwijzing noemt de regel en het getal, en zegt erbij dat de rit op eigen
+            rekening w&eacute;l kan. Een medewerker die alleen &ldquo;niet toegestaan&rdquo; leest, belt zijn
+            manager &mdash; precies wat een reisbeleid hoort te voorkomen.</p>
+          <div id="beleidSpiegel" class="uitleg"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ---------------- het maandoverzicht ---------------- -->
+    <div id="tOverzicht" class="weg">
+      <h2>Maandoverzicht</h2>
+      <div class="kaart">
+        <div style="display:flex;gap:0.5rem;align-items:center;flex-wrap:wrap;">
+          <input id="oMaand" type="month" style="background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--txt);padding:0.45rem 0.7rem;font:inherit;">
+          <button class="knop" id="oHaal" type="button">Toon</button>
+          <span class="rek"></span>
+          <span class="badge" id="oTotaal">&mdash;</span>
+        </div>
+        <p class="uitleg" id="oCo2"></p>
+      </div>
+      <div class="vlakken">
+        <div class="kaart"><h2 style="margin-top:0">Per kostenplaats</h2><div id="oKp"></div></div>
+        <div class="kaart"><h2 style="margin-top:0">Per medewerker</h2><div id="oMw"></div></div>
+      </div>
+      <div class="kaart"><h2 style="margin-top:0">De ritten</h2><div id="oRitten"></div></div>
+    </div>
+  </section>
+</main>
+<div class="melding" id="melding" role="status"></div>
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const token = (() => { try { return localStorage.getItem('rtg_pda_token'); } catch (e) { return null; } })();
+  const api = (pad, body) => fetch('/api/supplier/mob/' + pad, { method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+    body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
+  let meldT;
+  const zeg = t => { const m = $('#melding'); m.textContent = t; m.classList.add('zien');
+    clearTimeout(meldT); meldT = setTimeout(() => m.classList.remove('zien'), 4600); };
+  const eur = c => '€ ' + (c / 100).toLocaleString('nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  const leeg = el => { while (el.firstChild) el.removeChild(el.firstChild); };
+  const p = (waar, tekst, klas) => { const e = document.createElement('p'); e.className = klas || 'stil';
+    e.textContent = tekst; waar.appendChild(e); return e; };
+  const DAGNAMEN = ['zo', 'ma', 'di', 'wo', 'do', 'vr', 'za'];
+
+  /* ---------------- de tabs ---------------- */
+  const VLAKKEN = { akkoord: '#tAkkoord', beleid: '#tBeleid', overzicht: '#tOverzicht' };
+  document.querySelectorAll('#tabs button').forEach(b => b.addEventListener('click', () => {
+    document.querySelectorAll('#tabs button').forEach(x => x.classList.toggle('aan', x === b));
+    for (const [k, sel] of Object.entries(VLAKKEN)) $(sel).classList.toggle('weg', k !== b.dataset.tab);
+    /* Bij het openen van een tab meteen verse cijfers halen. Alleen de klok
+       van 30 seconden laten werken betekent dat een werkgever die terugklikt
+       naar "Op akkoord" een halve minuut naar een oude lijst kijkt -- en de
+       aanvraag waarvoor hij net gebeld werd, staat er dan nog niet in. */
+    if (b.dataset.tab === 'overzicht') haalOverzicht();
+    if (b.dataset.tab === 'akkoord') haalWacht();
+    if (b.dataset.tab === 'beleid') haalBeleid();
+  }));
+
+  /* ---------------- wat op akkoord wacht ---------------- */
+  async function haalWacht() {
+    const r = await api('akkoord', {});
+    const waar = $('#lijstWacht'); leeg(waar);
+    if (r.status !== 200) { p(waar, r.body.error || 'Geen toegang tot de goedkeuringen.'); return; }
+    if (!(r.body.wachtend || []).length) { p(waar, r.body.uitleg || 'Er wacht niets op uw akkoord.'); return; }
+    for (const w of r.body.wachtend) {
+      const d = document.createElement('div'); d.className = 'rij';
+      const l = document.createElement('span'); l.className = 'rek';
+      const st = document.createElement('strong');
+      st.textContent = w.van.label + ' → ' + w.naar.label;
+      const s = document.createElement('span'); s.className = 'sub';
+      s.textContent = w.medewerker + ' · ' + eur(w.prijs) + ' · ' + w.km + ' km · ' + w.ritsoort +
+        (w.kostenplaats ? ' · ' + w.kostenplaats : ' · zonder kostenplaats') +
+        (w.drempel ? ' · drempel ' + eur(w.drempel) : '');
+      l.appendChild(st); l.appendChild(s); d.appendChild(l);
+      const ja = document.createElement('button'); ja.className = 'knop vol'; ja.textContent = 'Akkoord';
+      const nee = document.createElement('button'); nee.className = 'knop nee'; nee.textContent = 'Weiger';
+      ja.addEventListener('click', () => besluit(w.ref, true));
+      nee.addEventListener('click', () => besluit(w.ref, false));
+      d.appendChild(ja); d.appendChild(nee);
+      waar.appendChild(d);
+    }
+  }
+  async function besluit(ref, akkoord) {
+    const r = await api('akkoord', { ref, akkoord });
+    zeg(r.body.error || r.body.uitleg || 'Besluit genomen.');
+    haalWacht();
+  }
+
+  /* ---------------- het reisbeleid ---------------- */
+  let dagen = [];
+  function tekenDagen() {
+    const waar = $('#bDagen'); leeg(waar);
+    DAGNAMEN.forEach((naam, i) => {
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'knop';
+      b.textContent = naam;
+      b.classList.toggle('aan', dagen.includes(i));
+      b.addEventListener('click', () => {
+        dagen = dagen.includes(i) ? dagen.filter(d => d !== i) : dagen.concat([i]).sort();
+        tekenDagen();
+      });
+      waar.appendChild(b);
+    });
+  }
+  const centen = el => Math.round((Number(el.value) || 0) * 100);
+  const naarEuro = c => (c ? (c / 100) : '');
+
+  function vulBeleid(b) {
+    $('#bMax').value = naarEuro(b && b.maxPrijs);
+    $('#bDrempel').value = naarEuro(b && b.goedkeuringVanaf);
+    $('#bBudget').value = naarEuro(b && b.budgetPerMaand);
+    $('#bVan').value = (b && b.van) || '';
+    $('#bTot').value = (b && b.tot) || '';
+    dagen = (b && b.dagen) || []; tekenDagen();
+    $('#bSteden').value = ((b && b.steden) || []).join(', ');
+    $('#bKp').value = ((b && b.kostenplaatsen) || []).join(', ');
+    $('#bKpVerplicht').value = b && b.kostenplaatsVerplicht ? '1' : '0';
+    spiegel(b);
+  }
+  /* De spiegel: dezelfde zinnen die een medewerker te lezen krijgt, hier naast
+     de knoppen. Een werkgever die niet ziet hoe zijn beleid klinkt, zet een
+     grens die niemand begrijpt. */
+  function spiegel(b) {
+    const waar = $('#beleidSpiegel'); leeg(waar);
+    if (!b) { p(waar, 'Er is nog geen reisbeleid; dan gelden er geen grenzen behalve die van de vervoerder.', 'uitleg'); return; }
+    const zinnen = [];
+    if (b.maxPrijs) zinnen.push('Boven ' + eur(b.maxPrijs) + ' per rit: "Deze rit kost … ; het maximum per rit is ' + eur(b.maxPrijs) + '."');
+    if (b.budgetPerMaand) zinnen.push('Over het budget: "… uw budget is ' + eur(b.budgetPerMaand) + ' (nu besteed: …)."');
+    if (b.goedkeuringVanaf) zinnen.push('Vanaf ' + eur(b.goedkeuringVanaf) + ' gaat de rit eerst langs u; hij wordt niet geweigerd.');
+    if (b.van && b.tot) zinnen.push('Buiten ' + b.van + ' tot ' + b.tot + ': "Zakelijk reizen mag tussen ' + b.van + ' en ' + b.tot + '."');
+    if ((b.dagen || []).length) zinnen.push('Alleen op ' + b.dagnamen.join(', ') + '.');
+    if ((b.steden || []).length) zinnen.push('Alleen in ' + b.steden.join(', ') + '.');
+    if (b.kostenplaatsVerplicht) zinnen.push('Zonder kostenplaats gaat de rit niet door.');
+    if (!zinnen.length) { p(waar, 'Er staan geen grenzen ingesteld: elke zakelijke rit gaat gewoon door.', 'uitleg'); return; }
+    for (const z of zinnen) p(waar, z, 'uitleg');
+  }
+
+  async function haalBeleid() {
+    const r = await api('beleid', {});
+    if (r.status !== 200) { $('#bStand').textContent = r.body.error || 'Geen toegang.'; return; }
+    vulBeleid(r.body.beleid);
+    $('#bStand').textContent = r.body.beleid && r.body.beleid.gewijzigd
+      ? 'Laatst gewijzigd op ' + r.body.beleid.gewijzigd.slice(0, 10) + ' door ' + (r.body.beleid.door || 'de werkgever') + '.'
+      : (r.body.reden || '');
+  }
+  $('#bBewaar').addEventListener('click', async () => {
+    const lijst = s => s.split(',').map(x => x.trim()).filter(Boolean);
+    const r = await api('beleid', { zet: true,
+      maxPrijs: centen($('#bMax')), goedkeuringVanaf: centen($('#bDrempel')),
+      budgetPerMaand: centen($('#bBudget')),
+      van: $('#bVan').value || null, tot: $('#bTot').value || null,
+      dagen, steden: lijst($('#bSteden').value), kostenplaatsen: lijst($('#bKp').value),
+      kostenplaatsVerplicht: $('#bKpVerplicht').value === '1' });
+    if (r.body.error) { zeg(r.body.error); return; }
+    zeg('Het reisbeleid is bewaard.');
+    vulBeleid(r.body.beleid);
+    haalBeleid();
+  });
+
+  /* ---------------- het maandoverzicht ---------------- */
+  function tabel(waar, kop, rijen) {
+    leeg(waar);
+    if (!rijen.length) { p(waar, 'Niets in deze maand.'); return; }
+    const t = document.createElement('table');
+    const tr = document.createElement('tr');
+    kop.forEach((k, i) => { const th = document.createElement('th');
+      if (i) th.className = 'getal'; th.textContent = k; tr.appendChild(th); });
+    t.appendChild(tr);
+    for (const r of rijen) {
+      const x = document.createElement('tr');
+      r.forEach((v, i) => { const td = document.createElement('td');
+        if (i) td.className = 'getal'; td.textContent = v; x.appendChild(td); });
+      t.appendChild(x);
+    }
+    waar.appendChild(t);
+  }
+  async function haalOverzicht() {
+    const r = await api('zakelijk', { maand: $('#oMaand').value || undefined });
+    if (r.status !== 200) { $('#oTotaal').textContent = r.body.error || 'geen toegang'; return; }
+    const b = r.body;
+    $('#oMaand').value = b.maand;
+    $('#oTotaal').textContent = b.totaal.aantal + ' ritten · ' + eur(b.totaal.centen);
+    $('#oCo2').textContent = Math.round(b.totaal.co2Gram / 1000) + ' kg CO₂ · ' + b.co2Uitleg +
+      (b.wachtend ? ' · ' + b.wachtend + ' wacht(en) nog op akkoord' : '') +
+      (b.geweigerd ? ' · ' + b.geweigerd + ' geweigerd' : '');
+    tabel($('#oKp'), ['Kostenplaats', 'Ritten', 'Km', 'Bedrag'],
+      b.perKostenplaats.map(k => [k.kostenplaats, k.aantal, k.km, eur(k.centen)]));
+    tabel($('#oMw'), ['Medewerker', 'Ritten', 'Km', 'Bedrag'],
+      b.perMedewerker.map(m => [m.medewerker, m.aantal, m.km, eur(m.centen)]));
+    tabel($('#oRitten'), ['Rit', 'Km', 'Bedrag'],
+      b.ritten.map(o => [o.gemaakt.slice(0, 10) + ' · ' + o.van + ' → ' + o.naar +
+        ' · ' + (o.medewerker || '') + (o.kostenplaats ? ' · ' + o.kostenplaats : ''), o.km, eur(o.prijs)]));
+  }
+  $('#oHaal').addEventListener('click', haalOverzicht);
+
+  /* ---------------- opstarten ---------------- */
+  (async () => {
+    if (!token) { $('#vPoort').classList.remove('weg'); return; }
+    const r = await api('beleid', {});
+    if (r.status !== 200) { $('#vPoort').classList.remove('weg'); return; }
+    $('#vBeeld').classList.remove('weg');
+    // de naam die de werkgever van zichzelf kent, niet zijn partnercode
+    $('#zaakNaam').textContent = r.body.naam || (r.body.beleid && r.body.beleid.org) || 'uw bedrijf';
+    tekenDagen();
+    vulBeleid(r.body.beleid);
+    haalBeleid();
+    haalWacht();
+    setInterval(haalWacht, 30000);
+  })();
+})();
+</script>
+</body>
+</html>

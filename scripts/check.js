@@ -558,7 +558,8 @@ console.log('\n16) elk leden-pad met een derde partij gaat langs de gegevenspoor
     ['/api/mob/reis/plan', 'reisopties naast elkaar zetten; er wordt niets geboekt'],
     ['/api/mob/reis/mijn', 'je eigen reizen bekijken'],
     ['/api/mob/abo/aanbod', 'kijken of er een abonnement te koop is; er gebeurt nog niets'],
-    ['/api/mob/abo/mijn', 'je eigen abonnementen bekijken']
+    ['/api/mob/abo/mijn', 'je eigen abonnementen bekijken'],
+    ['/api/mob/beleid', 'het reisbeleid van je eigen werkgever lezen; er gebeurt niets']
   ]);
   let gaten = 0, poorten = 0;
   loop(path.join(ROOT, 'server/routes'), /\.js$/, f => {

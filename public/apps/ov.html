@@ -138,6 +138,17 @@
           <div><label for="velReizigers">Reizigers</label><input id="velReizigers" type="number" min="1" max="60" value="1"></div>
           <div><label for="velBagage">Koffers</label><input id="velBagage" type="number" min="0" max="99" value="0"></div>
         </div>
+        <!-- Zakelijk. Bewust in het boekformulier en niet in een aparte app:
+             wie voor zijn werk reist, reist met dezelfde knop als thuis. Wat
+             erbij komt is een rekening en een reisbeleid, geen tweede product. -->
+        <label for="velZakOrg">Op rekening van (code van uw werkgever)</label>
+        <div class="duo">
+          <input id="velZakOrg" type="text" placeholder="Laat leeg voor prive" autocomplete="off">
+          <input id="velKostenplaats" type="text" placeholder="Kostenplaats" autocomplete="off">
+        </div>
+        <div id="beleidKaart" class="weg" style="margin-top:0.6rem;border-top:1px solid var(--line);padding-top:0.6rem;">
+          <p class="stil" id="beleidUit"></p>
+        </div>
         <div style="margin-top:0.9rem;">
           <button class="knop vol" id="velPlan" type="button">Plan mijn reis</button>
         </div>
@@ -383,17 +394,53 @@
     const naar = plekUit($('#velNaar').value);
     if (!naar) return zeg('Kies eerst een bestemming.');
     $('#velPlan').disabled = true;
-    const r = await mob('reis/plan', {
+    const r = await mob('reis/plan', Object.assign({
       van: plekUit($('#velVan').value) || { hier: true }, naar,
       reizigers: Number($('#velReizigers').value) || 1,
       bagage: Number($('#velBagage').value) || 0
-    });
+    }, zakelijk()));
     $('#velPlan').disabled = false;
     if (r.body.error) return zeg(r.body.error);
     laatstePlan = r.body;
     toonOpties(r.body);
   }
   $('#velPlan').addEventListener('click', plan);
+
+  /* ---- zakelijk: de rekening en het reisbeleid ---- */
+  const zakelijk = () => {
+    const code = $('#velZakOrg').value.trim().toUpperCase();
+    if (!code) return {};
+    return { namensOrganisatie: code, kostenplaats: $('#velKostenplaats').value.trim() || undefined };
+  };
+  /* Het beleid VOORAF tonen. Een medewerker die pas bij het boeken hoort dat
+     hij over zijn budget is, heeft al een reis gepland die niet doorgaat --
+     en dat is precies het moment waarop mensen om een reisbeleid heen gaan
+     werken. */
+  async function toonBeleid() {
+    const code = $('#velZakOrg').value.trim().toUpperCase();
+    const kaart = $('#beleidKaart'), uit = $('#beleidUit');
+    if (!code) { kaart.classList.add('weg'); return; }
+    const r = await mob('beleid', { werkgever: code });
+    kaart.classList.remove('weg');
+    if (r.status !== 200) { uit.textContent = r.body.error || 'Dit bedrijf kennen we niet als uw werkgever.'; return; }
+    const b = r.body.beleid;
+    if (!b) { uit.textContent = r.body.reden || 'Er is geen reisbeleid ingesteld.'; return; }
+    const eur = c => '€ ' + (c / 100).toLocaleString('nl-NL', { minimumFractionDigits: 2 });
+    const d = [];
+    if (b.maxPrijs) d.push('maximaal ' + eur(b.maxPrijs) + ' per rit');
+    if (b.budgetPerMaand) d.push('deze maand nog ' + eur(Math.max(0, b.budgetPerMaand - (r.body.besteed || 0))) +
+      ' van ' + eur(b.budgetPerMaand));
+    if (b.goedkeuringVanaf) d.push('boven ' + eur(b.goedkeuringVanaf) + ' kijkt uw leidinggevende mee');
+    if (b.van && b.tot) d.push('tussen ' + b.van + ' en ' + b.tot);
+    if ((b.dagnamen || []).length) d.push('op ' + b.dagnamen.join(', '));
+    if ((b.steden || []).length) d.push('in ' + b.steden.join(', '));
+    if (b.kostenplaatsVerplicht) d.push('kostenplaats verplicht' +
+      ((b.kostenplaatsen || []).length ? ' (' + b.kostenplaatsen.join(', ') + ')' : ''));
+    uit.textContent = d.length
+      ? 'Het reisbeleid van dit bedrijf: ' + d.join(' · ') + '. Wat er niet in past, kunt u altijd op eigen rekening boeken.'
+      : 'Er staan geen grenzen in het reisbeleid van dit bedrijf.';
+  }
+  $('#velZakOrg').addEventListener('change', toonBeleid);
 
   function toonOpties(p) {
     const bak = $('#opties'); bak.innerHTML = '';
@@ -464,12 +511,12 @@
   async function boekReis(optie, knop) {
     if (!laatstePlan) return;
     knop.disabled = true;
-    const r = await mob('reis/boek', {
+    const r = await mob('reis/boek', Object.assign({
       van: plekUit($('#velVan').value) || { hier: true },
       naar: plekUit($('#velNaar').value),
       optie, reizigers: Number($('#velReizigers').value) || 1,
       bagage: Number($('#velBagage').value) || 0, idem: RTGIdem('reis')
-    });
+    }, zakelijk()));
     knop.disabled = false;
     if (r.body.error) return zeg(r.body.error);
     zeg(r.body.reis.uitleg);
@@ -504,7 +551,10 @@
         l.textContent = e.wijze === 'ov' ? (e.lijnNaam + ': ' + e.van.naam + ' → ' + e.naar.naam)
           : (e.wijze === 'lopen' ? 'Lopen · ' + e.meters + ' m' : 'Taxi · ' + (e.km || 0) + ' km');
         const st = document.createElement('span'); st.className = 'stil';
-        st.textContent = e.ritStatus || e.kaartStand || (e.instructie ? 'inchecken' : '');
+        /* Een rit die op akkoord wacht staat op 'aangevraagd', en dat leest als
+           "er wordt aan gewerkt". Er wordt niet aan gewerkt: er wordt gewacht. */
+        st.textContent = (e.goedkeuring && e.goedkeuring.status === 'wacht') ? 'wacht op akkoord'
+          : (e.ritStatus || e.kaartStand || (e.instructie ? 'inchecken' : ''));
         rij.appendChild(l); rij.appendChild(st); et.appendChild(rij);
       }
       $('#lopendVoertuig').textContent = reis.uitleg;
@@ -520,9 +570,12 @@
         if (tot >= 0 && i <= tot) sp.className = 'af';
         k.appendChild(sp);
       }
-      $('#lopendVoertuig').textContent = lopend.voertuig
-        ? 'Voertuig toegewezen.' + (lopend.chauffeur ? ' Uw chauffeur staat klaar.' : '')
-        : 'Nog geen voertuig toegewezen.';
+      $('#lopendVoertuig').textContent = (lopend.goedkeuring && lopend.goedkeuring.status === 'wacht')
+        ? 'Deze rit staat op rekening van ' + lopend.organisatie + ' en wacht op akkoord van uw werkgever; ' +
+          'tot dan wordt er geen wagen gezocht.'
+        : (lopend.voertuig
+          ? 'Voertuig toegewezen.' + (lopend.chauffeur ? ' Uw chauffeur staat klaar.' : '')
+          : 'Nog geen voertuig toegewezen.');
       delete $('#lopendAnnuleer').dataset.reis;
     }
 

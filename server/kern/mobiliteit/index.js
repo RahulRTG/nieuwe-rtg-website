@@ -26,6 +26,8 @@
      cdt + cdt-tijden/-export    de Nederlandse taxiverplichting: diensten,
                                  arbeids-, rij- en rusttijden, en een export
      reisplan + reis             taxi en OV in EEN reis, met EEN overzicht
+     reisbeleid + zakelijk       het reisbeleid van een werkgever: grenzen,
+                                 goedkeuring en het maandoverzicht
 
    DE BOUWVOLGORDE ZIT IN HET REGISTER, NIET IN DE CODE. Taxi (ride_hailing)
    en de OV-planner staan standaard aan; charters, boten en OV-kaartverkoop
@@ -43,7 +45,7 @@
 
 function maakMobiliteit(state) {
   const { db, save, crypto, schoon, codenaamVan, haversine, etaMinutes, notify,
-    findSupplier, logActivity, sseToOffice, sseToCustomer, pay, ovPrijsVan } = state;
+    findSupplier, logActivity, sseToOffice, sseToCustomer, pay, ovPrijsVan, accounts } = state;
 
   const nu = () => new Date().toISOString();
   const id = p => (p || 'mb') + crypto.randomBytes(4).toString('hex');
@@ -54,7 +56,7 @@ function maakMobiliteit(state) {
      gedrag: assets leunt op het register, de opdracht op plekken en het
      register, matching op assets, dispatch op alledrie. */
   const ctx = { db, save, crypto, schoon, nu, id, codenaamVan, haversine, etaMinutes,
-    notify, findSupplier, logActivity, sseToOffice, sseToCustomer, pay, ovPrijsVan };
+    notify, findSupplier, logActivity, sseToOffice, sseToCustomer, pay, ovPrijsVan, accounts };
 
   Object.assign(ctx, require('./register')(ctx));
   Object.assign(ctx, require('./plekken')(ctx));
@@ -78,6 +80,9 @@ function maakMobiliteit(state) {
   Object.assign(ctx, require('./reisplan-etappe')(ctx));
   Object.assign(ctx, require('./reisplan')(ctx));
   Object.assign(ctx, require('./reis')(ctx));
+  // de zakelijke laag: het beleid eerst, want de rittenmotor toetst eraan
+  Object.assign(ctx, require('./reisbeleid')(ctx));
+  Object.assign(ctx, require('./zakelijk')(ctx));
   // de CDT-laag: de registratie eerst, de uitvoer daarna (die leest de diensten)
   Object.assign(ctx, require('./cdt')(ctx));
   Object.assign(ctx, require('./cdt-export')(ctx));
@@ -93,6 +98,7 @@ function maakMobiliteit(state) {
   ctx.ensureCdt();
   ctx.ensureExport();
   ctx.ensureReizen();
+  ctx.ensureBeleid();
 
   /* Wat een reiziger te kiezen heeft, hier, nu. Dit is het antwoord waarmee de
      app zichzelf opbouwt: welke vervoersvormen staan aan, met welke voertuigen

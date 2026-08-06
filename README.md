@@ -654,7 +654,8 @@ terecht.
 
 `server/kern/mobiliteit/` + `/api/mob/...`, `/api/staff/mob/...`,
 `/api/supplier/mob/...`, `/api/office/mob/...` + `/apps/ov.html` (reiziger) en
-`/apps/dispatch.html` (planner). Geen losse taxi-app naast RTG OV, maar **een
+`/apps/dispatch.html` (planner) en `/apps/zakelijk.html` (werkgever). Geen losse
+taxi-app naast RTG OV, maar **een
 kern waarop elk vervoerstype een aan- of uitzetbare module is**: taxi, pendel,
 OV, rolstoelvervoer, boot, charter en bijzonder vervoer delen dezelfde ritten-,
 voertuig-, locatie- en betaallaag.
@@ -668,6 +669,7 @@ voertuig-, locatie- en betaallaag.
 | `matching.js` | toewijzing met instelbare wegingen per stad en vervoerder, en een natrekbare rekensom per kandidaat |
 | `dispatch.js` | het planscherm: openstaand, onderweg, de vloot, toewijzen, overboeken naar een partner, telefonische boekingen |
 | `pendel.js` + `pendel-rooster.js` | bedrijfspendels: een regel wordt een dienstregeling wordt een echte rit |
+| `reisbeleid.js` + `zakelijk.js` | de zakelijke laag: dienstverband, reisbeleid, goedkeuring en het maandoverzicht van de werkgever |
 
 **De zes regels die deze laag anders maken dan een Uber-kloon.** Ze staan in
 code, en `test/mobiliteit.test.js` (14 toetsen) laat ze zakken zodra ze niet
@@ -834,6 +836,61 @@ En de fout die dit het duidelijkst maakt: de eerste versie schreef
 Stond je precies op de halte, dan werd die als verste gesorteerd en viel de hele
 OV-optie af als omweg. De planner was het slechtst op het moment dat hij het
 makkelijkst had moeten hebben.
+
+#### De zakelijke laag: een product, geen knop "zakelijke rit"
+
+`reisbeleid.js` + `zakelijk.js` + `/apps/zakelijk.html` (de werkgever) en de
+velden *Op rekening van* / *Kostenplaats* in `/apps/ov.html` (de medewerker).
+Een vinkje "zakelijk" op een rit is een regel op een factuur. Wat een werkgever
+werkelijk wil is een grens, een goedkeuring en een overzicht -- en dat is wat
+hier staat.
+
+**Het gat dat hier zat, en hoe het gedicht is.** De rittenmotor nam de
+organisatiecode aan uit het verzoek. Elk lid dat de code van een bedrijf kende,
+kon op diens rekening rijden; de dienstverbandcontrole stond alleen bij de
+bedrijfspendel. Die controle staat nu op **een** plek -- in `opdrachtMaak`, waar
+elke weg naar een zakelijke rit langskomt (de app, de reisplanner, de
+dispatcher) -- en wordt op het moment zelf nagevraagd bij de
+personeelsadministratie, nooit uit iets wat de client meestuurt. Een controle
+per ingang is een controle die de volgende ingang vergeet.
+
+Het beleid kent een maximum per rit, een budget per medewerker per maand,
+toegestane tijden, dagen, steden, ritsoorten, een (verplichte) kostenplaats en
+een goedkeuringsdrempel. Vijf dingen die daarbij in code staan:
+
+1. **Elke afwijzing noemt de regel en het getal.** Niet "niet toegestaan", maar
+   *"Deze rit kost € 40,48; het maximum per rit is € 5,00."* Wie moet raden of
+   het aan het bedrag, het tijdstip of de kostenplaats lag, belt zijn manager --
+   precies wat een reisbeleid hoort te voorkomen. De werkgever ziet die zinnen
+   naast zijn eigen knoppen staan, zodat hij weet hoe zijn beleid klinkt.
+2. **Een drempel is geen verbod.** Boven het bedrag mag de rit best; er kijkt
+   eerst een mens naar. Die twee door elkaar halen is waarom mensen om een
+   beleid heen gaan werken. En wie buiten de regels valt, hoort dat hij de rit
+   op eigen rekening kan boeken -- dat is het verschil tussen een werkgever en
+   een voogd.
+3. **Een rit die op akkoord wacht, rijdt niet.** Hij staat op geen enkel
+   planbord en is niet in beweging te krijgen; de grendel zit op `opdrachtNaar`,
+   de enige weg naar een andere status, en niet op een scherm. Zou de wagen
+   alvast rijden, dan is de goedkeuring een formaliteit achteraf. Er is ook geen
+   stilzwijgende goedkeuring na verloop van tijd: wie niets doet, keurt niets
+   goed, en het besluit draagt de naam van wie het nam. Weigeren annuleert de
+   rit, want een geweigerde rit die blijft staan wordt alsnog gereden.
+4. **Bij een reis gaan de ritten naar de werkgever en blijven de
+   vervoerbewijzen persoonlijk.** Een rit wordt achteraf afgerekend en kan dus
+   naar een zakelijke rekening; een kaartje is hier en nu uit de portemonnee van
+   de reiziger betaald. Het overzicht zegt dat er met zoveel woorden bij.
+5. **Het maandoverzicht telt de rittenmotor**, per kostenplaats en per
+   medewerker, met de uitstoot erbij als schatting -- geen tweede administratie
+   die er binnen een kwartaal naast zit. De werkgever ziet de personeelsnaam die
+   hij al kent; de vervoerder ziet de codenaam. Dat is dezelfde scheiding als
+   overal: de chauffeur hoeft niet te weten wie hij ophaalt.
+
+`test/zakelijkvervoer.test.js` (14 toetsen) bewaakt dit, met mutaties
+nagetrokken: de poort die niet meer weigert, de grendel die eraf gaat, de
+wachtende rit die toch op het planbord komt, het budget dat geannuleerde ritten
+meetelt, de drempel die een verbod wordt, en een `werktBij` die niet meer naar
+het bedrijf kijkt -- elk daarvan laat een andere toets zakken. Het scherm van de
+werkgever loopt de weg af in `test/mobiliteitscherm.e2e.js`.
 
 ### RTG Werk OS (de werkplek van een organisatie)
 

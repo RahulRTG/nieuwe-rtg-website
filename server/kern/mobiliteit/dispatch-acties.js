@@ -51,11 +51,17 @@ module.exports = (ctx) => {
     const pad = PAD[o.status];
     if (!pad) return { status: 409, error: 'Een opdracht met status "' + o.status + '" is niet toe te wijzen.' };
 
-    o.vervoerder = vervoerder;
     for (const stap of pad) {
       const r = opdrachtNaar(o.ref, stap, actor, { voertuig: a.id, chauffeur: a.bestuurder || null });
       if (r.error) return r;
     }
+    /* Pas NU de vervoerder erop. Stond dit boven de lus, dan hield een
+       vervoerder een rit vast die hij niet kreeg: een weigering halverwege
+       (de keten, of een rit die op akkoord van de werkgever wacht) liet zijn
+       code achter op andermans opdracht, en daarna zag geen enkele andere
+       planner die rit nog op de markt. */
+    o.vervoerder = vervoerder;
+    save();
     logActivity(vervoerder, actor, 'wees ' + o.ref + ' toe aan ' + (a.naam || a.id));
     sseToOffice('sync', { scope: 'mobiliteit' });
     return { ok: true, opdracht: opdrachtBeeld(opdrachtMet(o.ref), true), gekozen: uitleg, automatisch: !body.assetId };

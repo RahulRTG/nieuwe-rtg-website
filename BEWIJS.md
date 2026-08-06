@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 613 bestanden en 3347 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 614 bestanden en 3354 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 613 |
-| losse beweringen (`test(...)`) | 3347 |
+| toetsbestanden | 614 |
+| losse beweringen (`test(...)`) | 3354 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 3 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 187 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 210 |
 | **overleefd**: geen mutatie kreeg hem rood | 10 |
-| niet te meten (al rood, geen module gevonden, ...) | 19 |
-| alleen in de kop *genoemd*, nog niet gemeten | 15 |
-| niets van beide | 382 |
+| niet te meten (al rood, geen module gevonden, ...) | 21 |
+| alleen in de kop *genoemd*, nog niet gemeten | 16 |
+| niets van beide | 357 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-545 bestanden, 3244 beweringen.
+546 bestanden, 3251 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -137,38 +137,38 @@ toets omvalt.
 | `dealkans.test.js` | 2 | gezakt op `liegpoort /api/` | De dealvinder: de voorspeller herkent combinatiegedrag (twee zaken binnen een dagdeel door dezelfde leden) en zet er een kant-en-klaar Synergie-voorstel van klaar; de aandelen tellen exact op tot de prijs. |
 | `deavond.test.js` | 5 | gezakt op `liegpoort /api/` | EEN AVOND IN HET HUIS -- de keuken, een event, het hotel en de gasten. WAAROM DIT ER IS De vorige toetsen volgen een mens (levensloop) of een bestelling (bezorging). |
 | `defensie.test.js` | 7 | gezakt op `liegpoort /api/` | De defensie-toren: paraatheid, materieel en onderhoud, bevoorrading, de oefenagenda en de staf-AI. Uitdrukkelijk logistiek en organisatie: de AI weigert alles wat richting wapeninzet of doelbestrijding gaat. |
-| `directpay.test.js` | 7 | -- | Rechtstreeks betalen van klant naar leverancier, met Face ID, via de AI en de Salon. Het lid betaalt zelf of rekent een betaalverzoek van de partner af; het geld gaat rechtstreeks naar de leverancier (ontvangst-teller). |
+| `directpay.test.js` | 7 | gezakt op `liegpoort /api/` | Rechtstreeks betalen van klant naar leverancier, met Face ID, via de AI en de Salon. Het lid betaalt zelf of rekent een betaalverzoek van de partner af; het geld gaat rechtstreeks naar de leverancier (ontvangst-teller). |
 | `doos-journaal.test.js` | 3 | gezakt op `true->false` | Zaakdoos-journaal, beveiliging: het journaal wordt na herstel nagespeeld naar de cloud met de inlog van de doos. Daarom is het gezegeld (HMAC), genummerd (seq) en padgebonden. |
-| `doos-regie.test.js` | 5 | -- | De doos-regie: het beheer op afstand van de Zaakdoos-vloot. Het kantoor zet een doelversie en per doos een netwerkrol (accesspoint, versterker, gastwifi); de doos haalt beide zelf op bij zijn eigen melding en meldt... |
+| `doos-regie.test.js` | 5 | gezakt op `liegpoort /api/` | De doos-regie: het beheer op afstand van de Zaakdoos-vloot. Het kantoor zet een doelversie en per doos een netwerkrol (accesspoint, versterker, gastwifi); de doos haalt beide zelf op bij zijn eigen melding en meldt... |
 | `drie.test.js` | 9 | gezakt op `!==->===` | Drie (public/shared/drie.js): de pure kern van de 3D-laag -- mat4/vec3 en de meshbouwers -- draait ook in Node en is hier los getoetst (geen canvas nodig). De WebGL-renderer zelf leeft alleen in de browser en valt... |
-| `drm.test.js` | 5 | -- | RTG contentbescherming, de DRM-route (kern/drm.js): Encrypted Media Extensions met een Clear Key-licentie die RTG zelf bedient. Draai: npm test |
-| `duels2.test.js` | 2 | -- | Integratietests voor de tweede duelronde: het Geheugenduel van De Arena (vijf reeksen, 4 tot en met 8 lang, foutloos natikken) en het Rangschikduel van De Societeit (vier dingen in de enige juiste volgorde; de... |
-| `duurzaamheid-kill.test.js` | 2 | -- | Duurzaamheid onder een HARDE crash (SIGKILL), niet een nette afsluiting. De beproeving toetst een DUURZAAMHEID-fase met SIGTERM (de server flusht zijn write-behind netjes); dit is strenger: we schieten het proces... |
-| `duurzaamheid-pg.test.js` | 2 | -- | DE OPSLAGLAAG, HARD GEMAAKT -- wat een HERSTART moet overleven. Deze toets legt twee reparaties vast die op 100 miljoen leden zijn gevonden en tot nu toe alleen met de hand waren nagelopen. |
-| `dyncode-e2e.test.js` | 5 | -- | Dynamische RTG-code, end-to-end via de routes: alleen een app-sessie kan een code maken (/api/code/dyn) of verifieren (/api/code/scan); een generieke lezer zonder inlog komt er niet langs. npm test |
+| `drm.test.js` | 5 | gezakt op `liegpoort /api/` | RTG contentbescherming, de DRM-route (kern/drm.js): Encrypted Media Extensions met een Clear Key-licentie die RTG zelf bedient. Draai: npm test |
+| `duels2.test.js` | 2 | gezakt op `liegpoort /api/` | Integratietests voor de tweede duelronde: het Geheugenduel van De Arena (vijf reeksen, 4 tot en met 8 lang, foutloos natikken) en het Rangschikduel van De Societeit (vier dingen in de enige juiste volgorde; de... |
+| `duurzaamheid-kill.test.js` | 2 | vastgelopen | Duurzaamheid onder een HARDE crash (SIGKILL), niet een nette afsluiting. De beproeving toetst een DUURZAAMHEID-fase met SIGTERM (de server flusht zijn write-behind netjes); dit is strenger: we schieten het proces... |
+| `duurzaamheid-pg.test.js` | 2 | slaat zichzelf over | DE OPSLAGLAAG, HARD GEMAAKT -- wat een HERSTART moet overleven. Deze toets legt twee reparaties vast die op 100 miljoen leden zijn gevonden en tot nu toe alleen met de hand waren nagelopen. |
+| `dyncode-e2e.test.js` | 5 | gezakt op `liegpoort /api/` | Dynamische RTG-code, end-to-end via de routes: alleen een app-sessie kan een code maken (/api/code/dyn) of verifieren (/api/code/scan); een generieke lezer zonder inlog komt er niet langs. npm test |
 | `dyncode.test.js` | 6 | gezakt op `!==->===` | Dynamische gesloten RTG-code (kern/dyncode.js): kort houdbare, HMAC-onder- tekende tokens die alleen ons systeem maakt en verifieert. npm test |
-| `eenaccount.test.js` | 8 | -- | Een account voor alles: mensen registreren zich EEN keer; personeel, zaak en kantoor zijn daarna koppelingen aan dat ene account (na bewijs van de bestaande werk-inlog) en accStart munt exact dezelfde sessies als de... |
-| `eigen-website.test.js` | 6 | -- | DE EIGEN WEBSITE VAN EEN LID -- 5 endpoints van de Website-maker. Deze vijf wees de waargenomen dekkingsmeting aan als nooit aangeroepen: site/haal, site/publiceer, site/offline, site/fotos en site/foto-weg. |
-| `eigenaar.test.js` | 4 | -- | De eigenaar (Roellie) heeft overal toegang tot de BEHEER-omgevingen met zijn eigen accountlogin, maar de juridische grenzen (kinderdata, privé tussen personen, ruwe identiteitsbewijzen, platte wachtwoorden) blijven... |
-| `eigenaarschap.test.js` | 8 | -- | Het eigenaarschap van het platform: wie het is, en hoe het overgaat. Dit is de zwaarste bevoegdheid die het systeem kent. |
-| `ervaring.test.js` | 9 | -- | End-to-end tests voor de ervaring-laag (kern/ervaring.js): tafelreserveringen, annuleren, reviews, favorieten, fooi, de reisagenda, rekening splitsen, wachtlijsten, RTG-punten en meldingsvoorkeuren. Tegen een echte... |
+| `eenaccount.test.js` | 8 | gezakt op `liegpoort /api/` | Een account voor alles: mensen registreren zich EEN keer; personeel, zaak en kantoor zijn daarna koppelingen aan dat ene account (na bewijs van de bestaande werk-inlog) en accStart munt exact dezelfde sessies als de... |
+| `eigen-website.test.js` | 6 | gezakt op `liegpoort /api/` | DE EIGEN WEBSITE VAN EEN LID -- 5 endpoints van de Website-maker. Deze vijf wees de waargenomen dekkingsmeting aan als nooit aangeroepen: site/haal, site/publiceer, site/offline, site/fotos en site/foto-weg. |
+| `eigenaar.test.js` | 4 | gezakt op `liegpoort /api/` | De eigenaar (Roellie) heeft overal toegang tot de BEHEER-omgevingen met zijn eigen accountlogin, maar de juridische grenzen (kinderdata, privé tussen personen, ruwe identiteitsbewijzen, platte wachtwoorden) blijven... |
+| `eigenaarschap.test.js` | 8 | gezakt op `liegpoort /api/` | Het eigenaarschap van het platform: wie het is, en hoe het overgaat. Dit is de zwaarste bevoegdheid die het systeem kent. |
+| `ervaring.test.js` | 9 | gezakt op `liegpoort /api/` | End-to-end tests voor de ervaring-laag (kern/ervaring.js): tafelreserveringen, annuleren, reviews, favorieten, fooi, de reisagenda, rekening splitsen, wachtlijsten, RTG-punten en meldingsvoorkeuren. Tegen een echte... |
 | `eu-naleving.test.js` | 6 | geen module gevonden | De pinnen onder EU.md: elke "dit staat in de code"-bewering uit dat document staat hier als toets. Niet omdat een tekstcontrole diepgang heeft, maar omdat een nalevingsdocument dat naar de code wijst gaat LIEGEN... |
-| `eventkeuken.test.js` | 7 | -- | DE EVENTKEUKEN -- 8 endpoints achter de leverancier-inlog. Deze acht wees de waargenomen dekkingsmeting aan als nooit aangeroepen: catering, allergy, allergy/alt, mep, checkin, runsheet, runsheet/done en runsheet/ai. |
+| `eventkeuken.test.js` | 7 | gezakt op `liegpoort /api/` | DE EVENTKEUKEN -- 8 endpoints achter de leverancier-inlog. Deze acht wees de waargenomen dekkingsmeting aan als nooit aangeroepen: catering, allergy, allergy/alt, mep, checkin, runsheet, runsheet/done en runsheet/ai. |
 | `eventloop.test.js` | 4 | overleefd | DE EVENT-LOOP-VERTRAGING, EN OF DE METER HEM ECHT ZIET. Node draait alles op een lus. |
-| `excursie.test.js` | 2 | -- | DE EXCURSIE -- waar kinderen zijn, en wie dat mag weten. WAAROM DIT DE ZWAARSTE VAN DE SCHOOL IS Van alle 199 school- en RTF-routes zonder toets is dit de enige waar het over de LOCATIE VAN EEN KIND gaat. |
-| `facturatie.test.js` | 5 | -- | De centrale facturatielaag (kern/facturatie.js): bij elke verkoop krijgt zowel de verkoper als de koper automatisch dezelfde factuur in de app; de PDF is te downloaden; en de AI-factuurtool maakt in gewone taal een... |
-| `factuur.test.js` | 5 | -- | Facturen downloaden. Zelfgebouwde PDF-schrijver (geen pakketten) + de leden-endpoints om een factuur en een jaaroverzicht op te halen. |
-| `fases.test.js` | 3 | -- | Uitrolfases: de gefaseerde uitrol als voorinstelling. Alles is gebouwd; lanceren is een fase kiezen in plaats van tientallen schakelaars omzetten. |
-| `flits.test.js` | 6 | -- | RTG Flits: de rijhulp van het netwerk. Meldingen op codenaam met houdbaarheid; een tweede melding dichtbij telt als bevestiging; drie keer "weg" haalt een melding eraf; landregels zetten flitsermeldingen uit waar ze... |
-| `fluister.test.js` | 19 | -- | Fluister, de persoonlijke assistent met geheugen: onthoudt wat je hem vertelt, leert van je schermgebruik (alleen tellers), is volledig transparant ("wat weet je over mij") en wisbaar. Voor leden en voor het... |
-| `fonds.test.js` | 5 | -- | RTFoundation-afdracht: van elke bevestigde maandbetaling gaat 30% (ex btw) automatisch naar de foundation. We toetsen drie lagen: 1. |
-| `foodcourt.test.js` | 3 | -- | De RTG Food Court (kern/foodcourt.js): alle restaurants op een rij, in de stijl van een reserveerplatform. Overzicht met keuken/prijs/ledenvoordeel, vrije tijdsloten per datum en gezelschap, en reserveren via... |
-| `foundation-markt.test.js` | 5 | -- | DE MARKTPLAATS VAN DE FOUNDATION -- 4 endpoints. detail, verwijder, chat en blokkeer stonden als nooit aangeroepen in de waargenomen dekkingsmeting. |
-| `foundation-rest.test.js` | 4 | -- | DE LAATSTE FOUNDATION-ROUTES -- 5 endpoints, twee heel verschillende kanten. Hiermee is de foundation-groep uit de dekkingsmeting afgewerkt. |
-| `foundation.test.js` | 28 | -- | Integratietests voor de RTFoundation-lesapp (gratis onderwijs): de live-les, het bord, het schrift, opgaven en de AI-bijles. Draait tegen een echte RTG-server in een tijdelijke datamap. |
+| `excursie.test.js` | 2 | gezakt op `liegpoort /api/` | DE EXCURSIE -- waar kinderen zijn, en wie dat mag weten. WAAROM DIT DE ZWAARSTE VAN DE SCHOOL IS Van alle 199 school- en RTF-routes zonder toets is dit de enige waar het over de LOCATIE VAN EEN KIND gaat. |
+| `facturatie.test.js` | 5 | gezakt op `liegpoort /api/` | De centrale facturatielaag (kern/facturatie.js): bij elke verkoop krijgt zowel de verkoper als de koper automatisch dezelfde factuur in de app; de PDF is te downloaden; en de AI-factuurtool maakt in gewone taal een... |
+| `factuur.test.js` | 5 | gezakt op `liegpoort /api/` | Facturen downloaden. Zelfgebouwde PDF-schrijver (geen pakketten) + de leden-endpoints om een factuur en een jaaroverzicht op te halen. |
+| `fases.test.js` | 3 | gezakt op `liegpoort /api/` | Uitrolfases: de gefaseerde uitrol als voorinstelling. Alles is gebouwd; lanceren is een fase kiezen in plaats van tientallen schakelaars omzetten. |
+| `flits.test.js` | 6 | gezakt op `liegpoort /api/` | RTG Flits: de rijhulp van het netwerk. Meldingen op codenaam met houdbaarheid; een tweede melding dichtbij telt als bevestiging; drie keer "weg" haalt een melding eraf; landregels zetten flitsermeldingen uit waar ze... |
+| `fluister.test.js` | 19 | gezakt op `liegpoort /api/` | Fluister, de persoonlijke assistent met geheugen: onthoudt wat je hem vertelt, leert van je schermgebruik (alleen tellers), is volledig transparant ("wat weet je over mij") en wisbaar. Voor leden en voor het... |
+| `fonds.test.js` | 5 | gezakt op `liegpoort /api/` | RTFoundation-afdracht: van elke bevestigde maandbetaling gaat 30% (ex btw) automatisch naar de foundation. We toetsen drie lagen: 1. |
+| `foodcourt.test.js` | 3 | gezakt op `liegpoort /api/` | De RTG Food Court (kern/foodcourt.js): alle restaurants op een rij, in de stijl van een reserveerplatform. Overzicht met keuken/prijs/ledenvoordeel, vrije tijdsloten per datum en gezelschap, en reserveren via... |
+| `foundation-markt.test.js` | 5 | gezakt op `liegpoort /api/` | DE MARKTPLAATS VAN DE FOUNDATION -- 4 endpoints. detail, verwijder, chat en blokkeer stonden als nooit aangeroepen in de waargenomen dekkingsmeting. |
+| `foundation-rest.test.js` | 4 | gezakt op `liegpoort /api/` | DE LAATSTE FOUNDATION-ROUTES -- 5 endpoints, twee heel verschillende kanten. Hiermee is de foundation-groep uit de dekkingsmeting afgewerkt. |
+| `foundation.test.js` | 28 | gezakt op `liegpoort /api/` | Integratietests voor de RTFoundation-lesapp (gratis onderwijs): de live-les, het bord, het schrift, opgaven en de AI-bijles. Draait tegen een echte RTG-server in een tijdelijke datamap. |
 | `fout-aggregatie.test.js` | 5 | gezakt op `&&->||` | Test voor de eigen in-memory fout-aggregatie in server/log.js. Storingen worden gegroepeerd op een vingerafdruk (bericht met cijfers weggenormaliseerd + plaats), met een teller; foutenSamenvatting() geeft de... |
 | `foutmelder.test.js` | 4 | gezakt op `===->!==` | Eigen externe fout-melder (server/foutmelder.js), die @sentry/node verving. We draaien tegen een lokale nep-webhook en controleren: er gaat een nette JSON-POST uit met de fout + context, dezelfde fout wordt binnen... |
-| `functieplaats.test.js` | 4 | -- | De plaats-as van de schakelkast: een functie per STAD of DORP dicht. Fijner dan het land, grover dan de persoon. |
+| `functieplaats.test.js` | 4 | gezakt op `liegpoort /api/` | De plaats-as van de schakelkast: een functie per STAD of DORP dicht. Fijner dan het land, grover dan de persoon. |
 | `functies.test.js` | 13 | -- | Tests voor de functieschakelaars (server/functies.js): de pad-matching (langste prefix wint), de standaard (alles aan) en de catalogus. Zuiver, geen server nodig. |
 | `galerij.test.js` | 3 | -- | RTG Galerij: de tijdlijn leest De Salon en RTG Bestanden (geen dubbele opslag), albums zijn verwijzingen en favorieten blijven van het lid. |
 | `gastregels.test.js` | 5 | -- | De gast-regels bij eten bestellen: een gratis account mag thuisbezorgd bestellen (met EUR 2,50 ex btw servicekosten; leden betalen die nooit), mag pas een restaurant reserveren als het ID geverifieerd is, telt tot... |
@@ -266,6 +266,7 @@ toets omvalt.
 | `levensloop.test.js` | 1 | genoemd | DE LEVENSLOOP -- een mens van aanmelding tot tweede baan. WAAROM DIT ER IS De andere twee toetsen kijken in de breedte: 157 mensen kunnen bij hun werk (menselijkebanen) en mensen doen dingen met elkaar... |
 | `lib.test.js` | 7 | gezakt op `===->!==#0` | Unit-tests voor de zuivere hulplibs (server/lib). Geen server nodig. |
 | `lidboard.test.js` | 21 | -- | De eigen boardroom van elk lid (kern/lidboard/ + routes): 1. een lid ziet zijn bord met vier groepen en zet er functies aan/uit; de stand blijft server-side bewaard. |
+| `liegpoort.test.js` | 7 | genoemd | DE LIEGPOORT: liegt hij precies waar hij moet, en zwijgt hij waar het telt? WAAROM DIT ER IS. |
 | `lifestyle.test.js` | 7 | -- | Integratietests voor De Rechterhand: de premium Lifestyle Pass-suite. Het Concierge-bureau (verzoeken + voorkeuren), het Bezittingenregister met attentiepunten, en Gezondheid & welzijn (afspraken + prive-dossier). |
 | `livegang.test.js` | 3 | -- | De livegang: in productie start het platform schoon en op slot. - geen demozaken in de catalogus, geen demopersoneel, geen voorbeeldposts - de demo-inlog is dicht (leden en zaken) - de rate-limiter staat aan |
 | `loghygiene.test.js` | 5 | -- | LOGHYGIENE -- lekt er een naam, e-mailadres of token via de logs? Een systeem kan zijn database keurig versleutelen en toch alle identiteiten weggeven, omdat ze in platte tekst in de logs staan. |

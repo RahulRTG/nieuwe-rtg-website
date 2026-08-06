@@ -618,12 +618,24 @@
       "operator": "liegpoort /api/",
       "gezakt": 7
     },
+    "directpay.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 7
+    },
     "doos-journaal.test.js": {
       "soort": "puur",
       "staat": "gezakt",
       "module": "server/kern/zaakdoos/index.js",
       "operator": "true->false",
       "gezakt": 2
+    },
+    "doos-regie.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5
     },
     "drie.test.js": {
       "soort": "puur",
@@ -632,6 +644,34 @@
       "operator": "!==->===",
       "gezakt": 9
     },
+    "drm.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4
+    },
+    "duels2.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2
+    },
+    "duurzaamheid-kill.test.js": {
+      "soort": "server",
+      "staat": "vastgelopen",
+      "operator": "liegpoort /api/"
+    },
+    "duurzaamheid-pg.test.js": {
+      "soort": "server",
+      "staat": "slaat zichzelf over",
+      "overgeslagen": 2
+    },
+    "dyncode-e2e.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5
+    },
     "dyncode.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -639,9 +679,45 @@
       "operator": "!==->===",
       "gezakt": 2
     },
+    "eenaccount.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 8
+    },
+    "eigen-website.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6
+    },
+    "eigenaar.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4
+    },
+    "eigenaarschap.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 8
+    },
+    "ervaring.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 9
+    },
     "eu-naleving.test.js": {
       "soort": "puur",
       "staat": "geen module gevonden"
+    },
+    "eventkeuken.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 7
     },
     "eventloop.test.js": {
       "soort": "puur",
@@ -652,6 +728,72 @@
       ],
       "geprobeerd": 5,
       "posities": 8
+    },
+    "excursie.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2
+    },
+    "facturatie.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5
+    },
+    "factuur.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2
+    },
+    "fases.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3
+    },
+    "flits.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6
+    },
+    "fluister.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 19
+    },
+    "fonds.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1
+    },
+    "foodcourt.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3
+    },
+    "foundation-markt.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5
+    },
+    "foundation-rest.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4
+    },
+    "foundation.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 28
     },
     "fout-aggregatie.test.js": {
       "soort": "puur",
@@ -666,6 +808,12 @@
       "module": "server/foutmelder.js",
       "operator": "===->!==",
       "gezakt": 3
+    },
+    "functieplaats.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4
     },
     "geheugen.test.js": {
       "soort": "puur",

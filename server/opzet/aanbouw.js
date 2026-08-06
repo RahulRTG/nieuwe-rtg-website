@@ -97,6 +97,8 @@ module.exports = function bouwKernAan(kern) {
   require('../routes/theater')(kern);
   require('../routes/wbw')(kern);
   require('../routes/ov')(kern);
+  // het Mobility OS staat na ov: het leunt op dezelfde lijnen en haltes
+  require('../routes/mobiliteit')(kern);
   require('../routes/navigatie')(kern);
   require('../routes/clips')(kern);
   require('../routes/kantoorpakket')(kern);

@@ -1,0 +1,279 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<script src="/shared/id.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Dispatch</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<style>
+  :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--card2:var(--rtg-card2);--line:var(--rtg-line);--txt:var(--rtg-txt);
+    --soft:var(--rtg-soft);--gold:#C9A24B;--groen:#69B891;--rood:#DE6E92;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;min-height:100dvh;}
+  .kop{display:flex;align-items:center;gap:0.7rem;padding:calc(env(safe-area-inset-top,0px) + 0.9rem) 1.1rem 0.6rem;}
+  .kop h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.35rem;}
+  .kop .rek{flex:1;}
+  .kop a{color:var(--txt);text-decoration:none;font-size:1.1rem;}
+  .badge{font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);
+    border:1px solid var(--line);border-radius:999px;padding:0.25rem 0.6rem;white-space:nowrap;}
+  main{padding:0 1.1rem calc(env(safe-area-inset-bottom,0px) + 3rem);max-width:1100px;margin:0 auto;}
+  h2{font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);margin:1.2rem 0 0.6rem;}
+  .stil{color:var(--soft);font-size:0.82rem;line-height:1.55;}
+  button{font:inherit;cursor:pointer;}
+  .knop{background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--txt);
+    font-size:0.8rem;padding:0.45rem 0.8rem;}
+  .knop.vol{background:var(--gold);border-color:var(--gold);color:#0C0C0B;font-weight:600;}
+  .knop:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem;margin:0.6rem 0;}
+  .vlakken{display:grid;grid-template-columns:1fr;gap:0.8rem;}
+  @media (min-width:900px){ .vlakken{grid-template-columns:1fr 1fr;} }
+  .rij{display:flex;align-items:flex-start;gap:0.7rem;border-top:1px solid var(--line);padding:0.6rem 0;font-size:0.85rem;}
+  .rij:first-child{border-top:none;}
+  .rij .rek{flex:1;}
+  .rij .sub{display:block;font-size:0.72rem;color:var(--soft);margin-top:0.15rem;}
+  .stip{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--soft);margin-right:0.4rem;}
+  .stip.ok{background:var(--groen);} .stip.let{background:var(--gold);} .stip.uit{background:var(--rood);}
+  .uitleg{font-size:0.72rem;color:var(--soft);margin-top:0.3rem;}
+  .balk{display:flex;align-items:center;gap:0.4rem;font-size:0.7rem;color:var(--soft);margin:0.15rem 0;}
+  .balk .meter{flex:1;height:4px;background:var(--line);border-radius:2px;overflow:hidden;}
+  .balk .meter i{display:block;height:100%;background:var(--gold);}
+  .melding{position:fixed;left:50%;bottom:1rem;transform:translateX(-50%);background:var(--card2);
+    border:1px solid var(--line);border-radius:999px;padding:0.55rem 1rem;font-size:0.8rem;max-width:88vw;
+    opacity:0;pointer-events:none;transition:opacity 0.25s;z-index:60;}
+  .melding.zien{opacity:1;}
+  .weg{display:none !important;}
+  @media (prefers-reduced-motion: reduce){ *{transition:none !important;animation:none !important;} }
+</style>
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<script src="/shared/glyf.js" defer></script>
+<script src="/shared/seizoen.js" defer></script>
+</head>
+<body class="rtg-stijl">
+<header class="kop">
+  <a href="/apps/leverancier.html" aria-label="Terug naar de zaak-app">&#8592;</a>
+  <h1>RTG Dispatch</h1>
+  <span class="rek"></span>
+  <span class="badge" id="zaakNaam">&mdash;</span>
+</header>
+<main>
+  <section id="vPoort" class="weg">
+    <div class="kaart"><p class="stil">Het dispatchcentrum hoort bij uw zaak-inlog. Meld u eerst aan in de leverancier- of
+      personeels-app.</p></div>
+  </section>
+
+  <section id="vBord" class="weg">
+    <div class="vlakken">
+      <!-- links: wat er open staat -->
+      <div>
+        <h2>Openstaande opdrachten</h2>
+        <div class="kaart"><div id="lijstOpen"><p class="stil">Even kijken&hellip;</p></div></div>
+
+        <h2>Onderweg</h2>
+        <div class="kaart"><div id="lijstLopend"><p class="stil">Niets onderweg.</p></div></div>
+      </div>
+
+      <!-- rechts: de vloot en de papieren -->
+      <div>
+        <h2>De vloot</h2>
+        <div class="kaart"><div id="lijstVloot"><p class="stil">Nog geen voertuigen.</p></div></div>
+
+        <h2>Papieren die aandacht vragen</h2>
+        <div class="kaart">
+          <p class="stil" id="papierenLeeg">Alle papieren zijn in orde.</p>
+          <div id="lijstPapieren"></div>
+        </div>
+
+        <h2>Boeking voor iemand zonder app</h2>
+        <div class="kaart">
+          <p class="stil">Wie belt krijgt dezelfde rit als wie tikt: dezelfde keten, dezelfde meldingen,
+            dezelfde afrekening.</p>
+          <div style="margin-top:0.6rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
+            <button class="knop" id="knopTelefoon" type="button">Telefonische boeking invoeren</button>
+          </div>
+          <div id="telefoonVorm" class="weg" style="margin-top:0.7rem;">
+            <p class="stil">Vul de naam en de bestemming in; het vertrekpunt is de standplaats van de zaak.</p>
+            <div style="display:grid;gap:0.5rem;margin-top:0.5rem;">
+              <input id="telNaam" type="text" placeholder="Naam waaronder de rit staat"
+                style="background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--txt);padding:0.5rem 0.7rem;font:inherit;">
+              <select id="telNaar" style="background:var(--card2);border:1px solid var(--line);border-radius:10px;color:var(--txt);padding:0.5rem 0.7rem;font:inherit;">
+                <option value="">Kies een bestemming</option>
+              </select>
+              <button class="knop vol" id="telBoek" type="button">Opdracht aanmaken</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+<div class="melding" id="melding" role="status"></div>
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const token = (() => { try { return localStorage.getItem('rtg_pda_token'); } catch (e) { return null; } })();
+  const api = (pad, body) => fetch('/api/supplier/mob/' + pad, { method: 'POST',
+    headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+    body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
+  let meldT;
+  const zeg = t => { const m = $('#melding'); m.textContent = t; m.classList.add('zien');
+    clearTimeout(meldT); meldT = setTimeout(() => m.classList.remove('zien'), 4200); };
+  const eur = c => '€ ' + (c / 100).toLocaleString('nl-NL', { minimumFractionDigits: 2 });
+  const leeg = el => { while (el.firstChild) el.removeChild(el.firstChild); };
+  const rij = (titel, sub) => {
+    const d = document.createElement('div'); d.className = 'rij';
+    const l = document.createElement('span'); l.className = 'rek';
+    const st = document.createElement('strong'); st.textContent = titel;
+    const s = document.createElement('span'); s.className = 'sub'; s.textContent = sub || '';
+    l.appendChild(st); l.appendChild(s); d.appendChild(l);
+    return d;
+  };
+
+  /* Het voorstel van de matcher, met de rekensom zichtbaar. Dat is hier geen
+     luxe: een dispatcher die niet ziet waarom de motor wagen 4 koos, gaat
+     handmatig toewijzen en dan doet de motor niets meer. */
+  async function toonVoorstel(ref, waar) {
+    const r = await api('voorstel', { ref });
+    leeg(waar);
+    if (r.body.error) { const p = document.createElement('p'); p.className = 'stil'; p.textContent = r.body.error; waar.appendChild(p); return; }
+    for (const k of (r.body.kandidaten || [])) {
+      const d = document.createElement('div'); d.style.margin = '0.5rem 0 0.7rem';
+      const kop = document.createElement('div');
+      kop.style.display = 'flex'; kop.style.justifyContent = 'space-between'; kop.style.gap = '0.6rem';
+      const naam = document.createElement('strong'); naam.textContent = k.naam + ' · score ' + k.score;
+      const knop = document.createElement('button'); knop.className = 'knop vol'; knop.textContent = 'Wijs toe';
+      knop.addEventListener('click', async () => {
+        const t = await api('toewijzen', { ref, assetId: k.assetId });
+        zeg(t.body.error || ('Toegewezen aan ' + k.naam + '.'));
+        ververs();
+      });
+      kop.appendChild(naam); kop.appendChild(knop); d.appendChild(kop);
+      for (const f of k.factoren) {
+        const b = document.createElement('div'); b.className = 'balk';
+        const n = document.createElement('span'); n.style.minWidth = '7rem'; n.textContent = f.naam;
+        const m = document.createElement('span'); m.className = 'meter';
+        const i = document.createElement('i'); i.style.width = (f.max ? Math.round(f.punten / f.max * 100) : 0) + '%';
+        m.appendChild(i);
+        const u = document.createElement('span'); u.style.minWidth = '13rem'; u.textContent = f.uitleg;
+        b.appendChild(n); b.appendChild(m); b.appendChild(u); d.appendChild(b);
+      }
+      waar.appendChild(d);
+    }
+    // ook wie NIET meedeed, en waarom; anders lijkt een lege lijst een storing
+    for (const a of (r.body.afgewezen || [])) {
+      const p = document.createElement('p'); p.className = 'uitleg';
+      p.textContent = 'niet ingezet: ' + a.naam + ' - ' + a.redenen.join('; ');
+      waar.appendChild(p);
+    }
+    if (!(r.body.kandidaten || []).length && !(r.body.afgewezen || []).length) {
+      const p = document.createElement('p'); p.className = 'stil'; p.textContent = 'Geen voertuigen in de vloot.';
+      waar.appendChild(p);
+    }
+  }
+
+  let zaakCode = null;
+  async function ververs() {
+    const r = await api('dispatch');
+    if (r.status !== 200) { $('#vPoort').classList.remove('weg'); $('#vBord').classList.add('weg'); return; }
+    $('#vBord').classList.remove('weg');
+    zaakCode = r.body.vervoerder;
+    $('#zaakNaam').textContent = r.body.inzetbaar + ' van ' + r.body.vloot.length + ' inzetbaar';
+
+    // openstaand, met het voorstel eronder
+    const open = $('#lijstOpen'); leeg(open);
+    if (!r.body.open.length) { const p = document.createElement('p'); p.className = 'stil'; p.textContent = 'Niets open.'; open.appendChild(p); }
+    for (const o of r.body.open) {
+      const d = rij(o.van.label + ' → ' + o.naar.label,
+        o.ref + ' · ' + o.ritsoort + ' · ' + o.reizigers + 'p · ' + o.km + ' km · ' + eur(o.prijs));
+      const auto = document.createElement('button'); auto.className = 'knop';
+      auto.textContent = 'Automatisch';
+      auto.addEventListener('click', async () => {
+        const t = await api('toewijzen', { ref: o.ref });
+        zeg(t.body.error || ('Toegewezen aan ' + (t.body.gekozen ? t.body.gekozen.naam : 'een wagen') + '.'));
+        ververs();
+      });
+      d.appendChild(auto);
+      open.appendChild(d);
+      const bak = document.createElement('div'); open.appendChild(bak);
+      toonVoorstel(o.ref, bak);
+    }
+
+    // onderweg
+    const lop = $('#lijstLopend'); leeg(lop);
+    if (!r.body.lopend.length) { const p = document.createElement('p'); p.className = 'stil'; p.textContent = 'Niets onderweg.'; lop.appendChild(p); }
+    for (const o of r.body.lopend) {
+      lop.appendChild(rij(o.van.label + ' → ' + o.naar.label,
+        o.ref + ' · ' + o.status + (o.chauffeur ? ' · ' + o.chauffeur : '') + (o.positie ? ' · live' : '')));
+    }
+
+    // de vloot
+    const vl = $('#lijstVloot'); leeg(vl);
+    if (!r.body.vloot.length) { const p = document.createElement('p'); p.className = 'stil'; p.textContent = 'Nog geen voertuigen.'; vl.appendChild(p); }
+    for (const a of r.body.vloot) {
+      const d = rij(a.naam, a.categorieNaam + ' · ' + a.plaatsen + 'p' +
+        (a.energieNiveau != null ? ' · ' + a.energieNiveau + '%' : '') +
+        (a.inzetbaar ? '' : ' · ' + a.redenen.join('; ')));
+      const s = document.createElement('span'); s.className = 'stip ' + (a.inzetbaar ? 'ok' : 'uit');
+      d.insertBefore(s, d.firstChild);
+      vl.appendChild(d);
+    }
+
+    // papieren die aandacht vragen
+    const pa = $('#lijstPapieren'); leeg(pa);
+    $('#papierenLeeg').classList.toggle('weg', r.body.papierenLet.length > 0);
+    for (const a of r.body.papierenLet) {
+      const tekst = (a.redenen || []).concat((a.bijnaOp || []).map(b => b.papier + ' verloopt over ' + b.dagen + ' dagen'));
+      pa.appendChild(rij(a.naam, tekst.join('; ')));
+    }
+  }
+
+  /* De telefoonboeking. De bestemmingslijst komt uit de plekken van RTG zelf,
+     dus de dispatcher kiest "Sal de Mar" en niet een adres dat hij intikt. */
+  $('#knopTelefoon').addEventListener('click', async () => {
+    const v = $('#telefoonVorm');
+    v.classList.toggle('weg');
+    if (v.classList.contains('weg') || $('#telNaar').options.length > 1) return;
+    const r = await api('plekken', {});
+    if (r.body.error) return zeg(r.body.error);
+    const sel = $('#telNaar');
+    for (const p of (r.body.plekken || [])) {
+      const o = document.createElement('option');
+      o.value = p.soort + ':' + p.code;
+      o.textContent = p.naam + (p.genre ? ' (' + p.genre + ')' : '');
+      sel.appendChild(o);
+    }
+  });
+  const plekUit = w => {
+    const [soort, code] = String(w || '').split(':');
+    if (soort === 'zaak') return { zaak: code };
+    if (soort === 'halte') return { halte: code };
+    return null;
+  };
+  $('#telBoek').addEventListener('click', async () => {
+    const naam = $('#telNaam').value.trim();
+    const naar = plekUit($('#telNaar').value);
+    if (!naam) return zeg('Noteer de naam waaronder de rit staat.');
+    if (!naar) return zeg('Kies een bestemming.');
+    const r = await api('telefoon', { naamOpDeRit: naam, ritsoort: 'direct', categorie: 'taxi',
+      van: { zaak: zaakCode }, naar });
+    zeg(r.body.error || ('Opdracht ' + r.body.opdracht.ref + ' staat klaar.'));
+    ververs();
+  });
+
+  if (!token) { $('#vPoort').classList.remove('weg'); return; }
+  ververs();
+  setInterval(ververs, 12000);
+})();
+</script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+</body>
+</html>

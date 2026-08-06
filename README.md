@@ -650,6 +650,58 @@ staat de allergie erbij), wat is uitgegeven verdwijnt van de pas, en roomservice
 die op de kamer wordt geboekt komt op de gastrekening van diezelfde kamer
 terecht.
 
+### RTG Mobility OS (de vervoerskern)
+
+`server/kern/mobiliteit/` + `/api/mob/...`, `/api/staff/mob/...`,
+`/api/supplier/mob/...`, `/api/office/mob/...` + `/apps/ov.html` (reiziger) en
+`/apps/dispatch.html` (planner). Geen losse taxi-app naast RTG OV, maar **een
+kern waarop elk vervoerstype een aan- of uitzetbare module is**: taxi, pendel,
+OV, rolstoelvervoer, boot, charter en bijzonder vervoer delen dezelfde ritten-,
+voertuig-, locatie- en betaallaag.
+
+| Module | Wat erin zit |
+| --- | --- |
+| `modulecatalogus.js` + `register.js` | 25 vervoersmodules met **afhankelijkheden** en niveaus (wereld, land, stad, organisatie, vervoerder, doelgroep, testers, percentage), plus een storingsknop |
+| `voertuigcatalogus.js` + `assets.js` | een `mobility_asset` voor alles wat rijdt, vaart of vliegt (27 categorieen), met documentgeldigheid en geschiktheidstoets |
+| `keten.js` + `opdracht.js` + `voortgang.js` | de rittenmotor: een opdrachtvorm voor alle vervoersvormen, met de statusketen `aangevraagd → … → afgerekend`, de uitzonderingen ernaast, en de gebeurtenissen (`ride.accepted`, `driver.arrived`, `trip.completed`) |
+| `plekken.js` | vertrek en bestemming uit RTG zelf: onze horeca, hotels, zorgzaken en OV-haltes, plus de favoriete plekken van het lid |
+| `matching.js` | toewijzing met instelbare wegingen per stad en vervoerder, en een natrekbare rekensom per kandidaat |
+| `dispatch.js` | het planscherm: openstaand, onderweg, de vloot, toewijzen, overboeken naar een partner, telefonische boekingen |
+| `pendel.js` + `pendel-rooster.js` | bedrijfspendels: een regel wordt een dienstregeling wordt een echte rit |
+
+**De zes regels die deze laag anders maken dan een Uber-kloon.** Ze staan in
+code, en `test/mobiliteit.test.js` (14 toetsen) laat ze zakken zodra ze niet
+meer waar zijn -- alle zes zijn met een mutatie nagetrokken:
+
+1. **Een product is nooit meer aan dan waar het op leunt.** Helikoptercharter
+   vereist identiteitscontrole, een partnercontract, menselijke bevestiging, een
+   weertoets en charterafrekening. Staat er een uit, dan staat het charter uit --
+   ook als iemand hem net heeft aangezet, en aanzetten weigert met de NAAM van
+   wat ontbreekt. Zo is een half afgemaakte functie niet per ongeluk te
+   activeren.
+2. **Papieren zijn fail-closed.** Geen geldigheidsdatum telt als ONGELDIG, niet
+   als "vast wel in orde". Er is geen veld `geblokkeerd` dat kan verjaren; er is
+   een lijst redenen die leeg is of niet. Een taxi met een verlopen vergunning
+   komt niet in de rangschikking -- niet met minpunten, maar helemaal niet.
+3. **De statusketen kent maar een weg.** Een rit kan niet 'voltooid' worden
+   zonder ooit ingestapt te zijn, want daar hangt de afrekening aan. Chauffeur,
+   dispatcher, reiziger en het AI-stuur lopen allemaal over dezelfde functie.
+4. **De matcher legt zijn keuze uit.** Elke kandidaat draagt zijn rekensom mee
+   (welke factor hoeveel punten gaf en waarom), en de AFGEWEZEN voertuigen staan
+   er met hun reden bij. Een dispatcher die niet snapt waarom de motor wagen 4
+   koos, gaat handmatig toewijzen -- en dan is de motor een dure decoratie.
+5. **Werk wordt eerlijk verdeeld.** "Wie had vandaag het minste" is een factor
+   met gewicht, per stad en vervoerder in te stellen. En `surge_pricing` staat in
+   het register maar staat UIT: RTG rekent geen schaarstepremie.
+6. **Geen tweede adresboek en geen tweede grootboek.** Bestemmingen zijn onze
+   eigen zaken en haltes; afrekenen loopt via `kern/pay` zoals elke andere
+   RTG-betaling. Het woonadres uit de identiteitskluis wordt NIET aangesproken --
+   een lid bewaart zijn vertrekpunten zelf, als favoriet op codenaam.
+
+RTG voert zelf geen commerciele luchtvaart of zeevaart uit. Die producten zijn
+een marktplaats voor gecertificeerde exploitanten, en dat zit in de code als de
+boekingsvorm `aanvraag`: daar komt altijd een mens tussen.
+
 ### RTG Werk OS (de werkplek van een organisatie)
 
 `server/bedrijf/` + `/api/bedrijf/...` + `/apps/werk.html`. Een **werkruimte**

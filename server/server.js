@@ -2368,6 +2368,16 @@ Object.assign(kern, require('./kern/flits').maakFlits({
 Object.assign(kern, require('./kern/ov').maakOv({
   db, save, crypto, schoon, codenaamVan: kern.codenaamVan, haversine, etaMinutes, pay: kern.pay, notify
 }));
+/* Het Mobility OS (kern/mobiliteit/): de vervoerskern onder alles wat rijdt,
+   vaart of vliegt. Een moduleregister met afhankelijkheden (welk vervoer
+   bestaat waar), een voertuigmodel voor alle categorieen, een rittenmotor die
+   alle vervoersvormen deelt, instelbare toewijzing, dispatch en bedrijfspendel.
+   Vertrek en bestemming komen uit RTG zelf -- onze horeca, hotels en OV-haltes
+   -- dus na ov gemount, dat de lijnen en haltes neerzet. */
+Object.assign(kern, require('./kern/mobiliteit').maakMobiliteit({
+  db, save, crypto, schoon, codenaamVan: kern.codenaamVan, haversine, etaMinutes,
+  notify, findSupplier, logActivity, sseToOffice, sseToCustomer
+}));
 /* RTG Navigatie (kern/navigatie.js): het huiseigen navigatiesysteem. Een eigen
    wegennet met A*-route, bocht-voor-bocht en ETA per vervoerwijze; bestemmingen
    uit onze leveranciers, het OV, de loketten en de POI-lagen (tank/laad), en RTG

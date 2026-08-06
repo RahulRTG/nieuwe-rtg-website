@@ -521,7 +521,13 @@ console.log('\n15) id\'s in de client uit de CSPRNG, niet uit de klok of Math.ra
    nadenken. */
 console.log('\n16) elk leden-pad met een derde partij gaat langs de gegevenspoort');
 {
-  const DERDE = /bestel|order|reserve|boek|booking|bezorg|leveri|koerier|courier|afhaal|ophaal|verblijf|proefrit|koop|huur|ticket|vervoer|taxi|\brit\b/i;
+  /* `\/mob\/` staat er sinds het Mobility OS, en om een reden die het noteren
+     waard is: de hoofdroute daar heet /api/mob/vraag, en die glipte langs elk
+     woord in deze lijst. Een taxi bestellen bij een ANDER bedrijf is precies
+     waar deze regel over gaat, en hij zag hem niet -- niet omdat de route veilig
+     was, maar omdat hij toevallig geen van deze woorden in zijn pad had. Een
+     regel die op woordkeus afgaat, mist alles wat anders heet. */
+  const DERDE = /bestel|order|reserve|boek|booking|bezorg|leveri|koerier|courier|afhaal|ophaal|verblijf|proefrit|koop|huur|ticket|vervoer|taxi|\brit\b|\/mob\//i;
   // alleen kijken/opvragen: geen handeling, dus niets te vragen
   const KIJKEN = /\/(mijn|mine|status|volg|slots|annuleer|betaal|pay|partners|overzicht|lijst|list|historie|history|zoek|markt|advies|check|info)\b/i;
   /* Hele domeinen waar het woord toevallig valt maar geen derde partij staat:
@@ -541,7 +547,12 @@ console.log('\n16) elk leden-pad met een derde partij gaat langs de gegevenspoor
     ['/api/huur/locatie', 'vervolgstap in een lopende huur (vrijwillige positie)'],
     ['/api/huur/sos', 'noodknop tijdens een lopende huur -- hier NOOIT iets vragen'],
     ['/api/verkoop/teken', 'het contract van een deal die al loopt tekenen'],
-    ['/api/asset/koop', 'RTG Shared Assets is van RTG zelf; er staat geen derde tegenover']
+    ['/api/asset/koop', 'RTG Shared Assets is van RTG zelf; er staat geen derde tegenover'],
+    ['/api/mob/aanbod', 'welk vervoer hier bestaat opvragen; er gebeurt nog niets'],
+    ['/api/mob/plekken', 'de bestemmingenlijst opvragen; er gebeurt nog niets'],
+    ['/api/mob/favoriet', 'je eigen bewaarde plekken; er staat geen derde tegenover'],
+    ['/api/mob/pendel', 'de dienstregeling van je eigen werkgever bekijken'],
+    ['/api/mob/pendel/reserveer', 'een stoel in de bus van je eigen werkgever; de werkgever is de klant van de vervoerder, niet het lid, en er gaat op dit moment niets naar een derde']
   ]);
   let gaten = 0, poorten = 0;
   loop(path.join(ROOT, 'server/routes'), /\.js$/, f => {

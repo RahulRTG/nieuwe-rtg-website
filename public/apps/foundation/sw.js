@@ -2,7 +2,7 @@
    offline openen. Pagina's en scripts zijn network-first (een update komt direct
    door), de cache is het vangnet zonder verbinding. API-verkeer en de live-stream
    gaan altijd naar het netwerk. */
-const CACHE = 'rtf-hulp-7b8c798e';
+const CACHE = 'rtf-hulp-36bc2504';
 const SHELL = [
   '/apps/foundation/', '/apps/foundation/index.html',
   '/apps/foundation/leren.html', '/apps/foundation/bord.html', '/apps/foundation/schrift.html',
@@ -21,6 +21,15 @@ const SHELL = [
   '/apps/foundation/mediawijs.html',
   '/apps/foundation/contact.html', '/apps/foundation/gezin-rt.js', '/apps/foundation/werk.html', '/apps/foundation/vrienden.html', '/apps/foundation/markt.html',
   '/apps/foundation/beheer.html', '/apps/foundation/privacy.html', '/apps/foundation/sessie.js',
+  /* De drie schermen van het Foundation OS. Ze staan in dezelfde schil omdat ze
+     in dezelfde scope liggen: een tweede service worker op /apps/foundation/
+     zou deze eerste vervangen, en dan is de gezinsapp zijn cache kwijt. Ze
+     draaien op een POST-API en die gaat nooit uit de cache -- wat hier offline
+     komt is de pagina zelf, zodat de vrijwilliger in een buurthuis met slecht
+     bereik niet naar een wit scherm kijkt. */
+  '/apps/foundation/os-vrijwilliger.html', '/apps/foundation/os-deelnemer.html', '/apps/foundation/os-publiek.html',
+  '/apps/foundation/os-bestuur.html',
+  '/apps/foundation/os-veld.html', '/apps/foundation/os-donateur.html',
   '/apps/foundation/tekenen.js', '/apps/foundation/realtime.js', '/apps/foundation/stijl.css', '/apps/foundation/palet.js', '/shared/seizoen.js', '/shared/dagkleur.css', '/shared/verbinding.js', '/apps/geo.js', '/apps/translate.js', '/apps/util.js',
   '/manifests/foundation.webmanifest', '/icons/foundation.svg'
 ];

@@ -17,7 +17,7 @@
    een partij die zijn eigen overeenkomst kan schrijven, heeft geen overeenkomst
    maar een vinkje. */
 module.exports = (kern, hulp) => {
-  const { app, auth, supplierAuth, managerOnly, officeAuth, schoon, gegevensStop,
+  const { app, auth, supplierAuth, managerOnly, officeAuth, gegevensStop,
     kaartKoop, kaartMijn, kaartAanbod, kaartControle,
     aboKoop, aboMijn, aboAanbod,
     storingMeld, storingLijst, storingTeruggave,

@@ -3112,6 +3112,41 @@ else uitgelogd();
    computer, niet van een telefoon, en het OS is nu iOS: één scherm tegelijk,
    vol, en je wisselt met de home-indicator. De schermen die hier in vlakken
    naast elkaar lagen zijn gewoon losse apps op de homescreen. */
+/* ---------- het werkblad: meerdere schermen op een scherm ----------
+
+   Een kantoor is geen pagina waar je doorheen scrolt maar een bureau waar
+   dingen naast elkaar liggen. Wie de personeelsplanning naast de weekcijfers
+   wil, hoort niet te hoeven wisselen van tabblad.
+
+   De indelingsknoppen komen in de kopbalk van deze pagina; shared/werkblad.js
+   doet de rest: vlakken, verslepen van de scheiding, en onthouden. Alleen op
+   een bureaublad; op een telefoon verandert er niets. */
+(function(){
+  const SCHERMEN = [
+    { naam: 'RTG Office', url: '/apps/office.html?werk=kantoor' },
+    { naam: 'RTF-kantoor', url: '/apps/foundation/kantoor.html' },
+    { naam: 'Foundation OS', url: '/apps/foundation/os.html' },
+    { naam: 'Onderzoekslab', url: '/apps/lab.html' },
+    { naam: 'Backoffice', url: '/apps/backoffice.html' },
+    { naam: 'Boardroom', url: '/apps/boardroom.html' }
+  ];
+  const balk = document.createElement('div');
+  balk.className = 'wb-balk';
+  /* De knoppen staan in de KOPBALK van de pagina en niet in de console van
+     Rahul. Dat was de eerste opzet, en die was fout: de console klapt dicht
+     zodra je antwoordt, en dan is de indeling van je eigen scherm onbereikbaar
+     tot je hem weer opent. Iets wat over de pagina gaat, hoort op de pagina te
+     staan; de console is voor Rahul. */
+  function start(){
+    const nav = document.querySelector('header nav');
+    if (nav) nav.insertBefore(balk, nav.firstChild);
+    else document.body.insertBefore(balk, document.body.firstChild);
+    if (window.RTGWerkblad) RTGWerkblad.start({ schermen: SCHERMEN, balk });
+  }
+  // shared/werkblad.js laadt met defer; even wachten tot hij er is
+  let n = 0;
+  const t = setInterval(() => { if (window.RTGWerkblad || ++n > 25) { clearInterval(t); start(); } }, 120);
+})();
 </script>
 <script src="/shared/drie.js"></script>
 <script src="/apps/kantoren-atelier3d.js"></script>

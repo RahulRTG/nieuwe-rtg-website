@@ -1,0 +1,1066 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Foundation OS · RTFoundation</title>
+<link rel="icon" href="/icons/foundation.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<style>
+  :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--line:var(--rtg-line);--txt:var(--rtg-txt);--muted:var(--rtg-muted);--soft:var(--rtg-soft);--burgundy:#C23A5E;--gold:#A98F1C;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3rem;}
+  h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;}
+  header{position:sticky;top:0;z-index:5;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.86));backdrop-filter:blur(8px);padding:.9rem 1rem .6rem;border-bottom:1px solid var(--line);display:flex;align-items:end;gap:.8rem;flex-wrap:wrap;}
+  header .ey{font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--burgundy);}
+  header h1{font-size:1.25rem;margin-top:.1rem;}
+  header a{margin-left:auto;color:var(--muted);font-size:.78rem;text-decoration:none;}
+  main{padding:1rem;max-width:860px;margin:0 auto;display:flex;flex-direction:column;gap:.9rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:.85rem .95rem;}
+  .kaart + .kaart{margin-top:.7rem;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(13.5rem,1fr));gap:.7rem;}
+  .deel{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:1.4rem 0 .4rem;}
+  .sec{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin:.2rem 0 .45rem;}
+  .rij{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;}
+  .rij.tussen{justify-content:space-between;}
+  .veld{flex:1;min-width:7rem;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.88rem;padding:.55rem .7rem;}
+  select.veld{min-width:9rem;}
+  .knop{background:var(--txt);color:#000;border:none;border-radius:11px;padding:.55rem .9rem;font:inherit;font-weight:600;font-size:.84rem;cursor:pointer;}
+  .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
+  .knop.aan{background:var(--burgundy);color:#fff;}
+  .stad{cursor:pointer;}
+  .stad h2{font-size:1rem;}
+  .mi{font-size:.74rem;color:var(--muted);margin:.25rem 0 .4rem;line-height:1.45;}
+  .pil{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:.15rem .55rem;color:var(--muted);}
+  .pil.goed{color:#7FC79B;border-color:#2F5E42;}
+  .pil.let{color:var(--gold);border-color:#5C4E10;}
+  .pil.fout{color:var(--burgundy);border-color:#5C1B2C;}
+  .tabs{display:flex;gap:.35rem;flex-wrap:wrap;margin:.2rem 0 .3rem;}
+  .tabs button{background:transparent;border:1px solid var(--line);border-radius:999px;color:var(--muted);font:inherit;font-size:.76rem;padding:.35rem .75rem;cursor:pointer;}
+  .tabs button.aan{color:var(--txt);border-color:var(--burgundy);}
+  .lijnrij{display:flex;gap:.5rem;align-items:baseline;padding:.45rem 0;border-bottom:1px solid var(--line);font-size:.85rem;flex-wrap:wrap;}
+  .lijnrij:last-child{border-bottom:none;}
+  .lijnrij .naam{flex:1;min-width:9rem;}
+  .lijnrij .sub{font-size:.74rem;color:var(--muted);width:100%;}
+  .leeg{color:var(--muted);font-size:.85rem;padding:.5rem 0;}
+  .stat{flex:1;min-width:6.5rem;text-align:center;padding:.3rem 0;}
+  .stat b{font-size:1.2rem;display:block;}
+  .stat i{font-style:normal;font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);}
+  .melder{font-size:.82rem;border-radius:10px;padding:.5rem .7rem;margin-top:.5rem;border:1px solid var(--line);}
+  .melder.fout{color:#F0A9BB;border-color:#5C1B2C;}
+  .melder.goed{color:#9FD6B4;border-color:#2F5E42;}
+  .verborgen{display:none;}
+  .modules{display:grid;grid-template-columns:repeat(auto-fill,minmax(11rem,1fr));gap:.35rem;}
+  .modules button{text-align:left;}
+  .uitleg{font-size:.78rem;color:var(--muted);line-height:1.55;}
+  .breed{width:100%;}
+</style>
+</head>
+<body class="rtg-stijl">
+<header>
+  <div><div class="ey">RTFoundation</div><h1>Foundation OS</h1></div>
+  <a href="kantoor.html">RTF-kantoor</a>
+  <a href="os-portaal.html">Portalen</a>
+  <a href="os-bestuur.html">Governance</a>
+  <a href="os-veld.html">Veld</a>
+  <a href="os-publiek.html">Buurtpagina</a>
+</header>
+<main id="main">
+  <div class="kaart">
+    <div class="sec">Wie bent u in dit systeem</div>
+    <div id="ik" class="uitleg">Laden...</div>
+    <div id="meldingTop"></div>
+  </div>
+
+  <div class="deel">Stadsafdelingen</div>
+  <div class="kaart" id="landelijkKaart">
+    <div class="sec">Landelijk beeld</div>
+    <div class="rij" id="landelijk"><div class="leeg">Laden...</div></div>
+  </div>
+  <div class="grid" id="steden"></div>
+  <div class="kaart verborgen" id="nieuweStad">
+    <div class="sec">Nieuwe stadsafdeling openen (landelijk)</div>
+    <div class="rij">
+      <input class="veld" id="nsNaam" placeholder="Stad, bijvoorbeeld IJmuiden" maxlength="60" aria-label="Naam van de stad">
+      <input class="veld" id="nsLand" placeholder="Land" value="Nederland" maxlength="40" aria-label="Land">
+      <button class="knop" id="nsMaak">Openen</button>
+    </div>
+    <div class="uitleg">Een nieuwe afdeling start op &quot;verkend&quot;. Pas na activeren kan er in die stad gewerkt worden.</div>
+  </div>
+
+  <div id="stadPaneel" class="verborgen">
+    <div class="deel" id="stadKop">Stad</div>
+    <div class="kaart">
+      <div class="rij tussen">
+        <h2 id="stadNaam"></h2>
+        <button class="knop stil" id="terug">← Alle steden</button>
+      </div>
+      <div class="rij" id="stadMeta"></div>
+    </div>
+    <div class="tabs" id="tabs"></div>
+    <div id="tabIn"></div>
+  </div>
+</main>
+
+<script>
+/* Het Foundation OS in een scherm.
+
+   EEN PAGINA, DRIE HOOGTEN. Landelijk toezicht, een stadsafdeling, en het werk
+   in die stad. Dat zijn geen drie apps: het is dezelfde organisatie op drie
+   afstanden, en wie ze uit elkaar trekt, laat het stadsbestuur elke dag tussen
+   twee tabbladen heen en weer lopen.
+
+   HET SCHERM VERZINT GEEN RECHTEN. Alles wat hier verschijnt komt uit
+   /api/rtfos/ik en /api/rtfos/boom; wat u niet mag, komt niet terug van de
+   server. De knoppen die de server toch zou weigeren, worden verborgen -- maar
+   dat is beleefdheid, geen beveiliging. De poort staat in kern/rtfos/basis.js.
+
+   FOUTEN WORDEN GETOOND, NIET GESLIKT. Elke afgewezen handeling zet de zin van
+   de server in beeld. Juist die zinnen dragen dit systeem: "dit geld is
+   geoormerkt voor X", "u heeft deze uitgave zelf aangevraagd", "voor dit
+   project is een geldige VOG verplicht". Ze wegvangen zou van een grendel een
+   raadsel maken. */
+const $ = s => document.querySelector(s);
+const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const eur = n => (Number(n) || 0).toLocaleString('nl-NL', { style: 'currency', currency: 'EUR' });
+
+let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_office_token'); } catch (e) {}
+function uitgelogd() {
+  var naar = '/apps/personeel.html?kantoor=1&terug=' + encodeURIComponent(location.pathname);
+  if (!window.RTGDeur) { location.replace(naar); return; }
+  setTimeout(function () {
+    RTGDeur.toon(document.getElementById('main') || document.body, { soort: 'personeel', naar: naar });
+  }, 0);
+}
+if (!TOKEN) uitgelogd();
+
+const api = (pad, body) => fetch('/api/rtfos/' + pad, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
+  body: JSON.stringify(body || {})
+}).then(async r => {
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) { if (r.status === 401) uitgelogd(); throw new Error(d.error || 'Er ging iets mis.'); }
+  return d;
+});
+
+let IK = null, STAD = null, TAB = 'overzicht';
+
+/* De meldplek: binnen een geopende stad staat hij boven het tabblad, daarbuiten
+   bovenaan de pagina. Een gedeelde functie en geen twee, want een foutzin die
+   in een element belandt dat net is overschreven, is een foutzin die niemand
+   ziet -- en dat is precies waar dit scherm het van moet hebben. */
+function melding(tekst, goed) {
+  const el = document.getElementById('melding') || document.getElementById('meldingTop');
+  if (!el) return;
+  el.innerHTML = '<div class="melder ' + (goed ? 'goed' : 'fout') + '">' + esc(tekst) + '</div>';
+  el.scrollIntoView({ block: 'nearest' });
+}
+// Elke handeling langs een plek: fout in beeld, daarna opnieuw tekenen.
+function doe(pad, body, na) {
+  return api(pad, body).then(r => { if (na) na(r); }).catch(e => melding(e.message, false));
+}
+
+/* ---------- het bovenste beeld ---------- */
+async function laad() {
+  IK = await api('ik');
+  const zetels = (IK.zetels || []).map(z => z.stadNaam + ' (' + z.rol + ')').join(', ');
+  $('#ik').innerHTML = IK.landelijk
+    ? 'U spreekt namens het <b>landelijke RTF-bestuur</b>. U ziet alle steden, keurt partners en grote uitgaven goed, zet modules aan of uit en leest het auditspoor.'
+    : (zetels
+      ? 'U heeft een zetel in: <b>' + esc(zetels) + '</b>. U ziet alleen die stad; het landelijke bestuur houdt toezicht.'
+      : 'U heeft nog geen zetel in een stadsafdeling. Het landelijke bestuur kent die toe.');
+  $('#nieuweStad').classList.toggle('verborgen', !IK.landelijk);
+  await tekenSteden();
+  if (IK.landelijk) tekenLandelijk(); else $('#landelijkKaart').classList.add('verborgen');
+}
+
+async function tekenSteden() {
+  const b = await api('boom');
+  const el = $('#steden');
+  if (!b.steden.length) {
+    el.innerHTML = '<div class="kaart"><div class="leeg">Er is nog geen stadsafdeling. ' +
+      (IK.landelijk ? 'Open er hieronder een.' : 'Het landelijke bestuur opent ze.') + '</div></div>';
+    return;
+  }
+  el.innerHTML = b.steden.map(s => {
+    const t = s.tellers || {};
+    const pil = s.status === 'actief' ? 'goed' : (s.status === 'geblokkeerd' ? 'fout' : 'let');
+    return '<div class="kaart stad" data-stad="' + esc(s.id) + '">' +
+      '<div class="rij tussen"><h2>RTF ' + esc(s.naam) + '</h2><span class="pil ' + pil + '">' + esc(s.status) + '</span></div>' +
+      '<div class="mi">' + (s.rol ? 'Uw rol: ' + esc(s.rol) : 'Toezicht') + ' &middot; ' + (s.vlaggen || []).length + ' modules aan</div>' +
+      '<div class="rij"><span class="pil">' + (t.projecten || 0) + ' projecten</span>' +
+      '<span class="pil">' + (t.partners || 0) + ' partners</span>' +
+      '<span class="pil">' + (t.vrijwilligers || 0) + ' vrijwilligers</span>' +
+      (t.casussen ? '<span class="pil let">' + t.casussen + ' open hulpvragen</span>' : '') + '</div></div>';
+  }).join('');
+  el.querySelectorAll('[data-stad]').forEach(k => k.addEventListener('click', () => openStad(k.dataset.stad)));
+}
+
+async function tekenLandelijk() {
+  try {
+    const r = await api('rapport/landelijk');
+    const t = r.totaal;
+    $('#landelijk').innerHTML =
+      stat(t.steden, 'steden') + stat(t.projectenActief, 'projecten actief') +
+      stat(t.uniekGeholpen, 'mensen geholpen') + stat(t.vrijwilligers, 'vrijwilligers') +
+      stat(Math.round(t.vrijwilligersuren), 'uren') + stat(eur(t.besteed), 'besteed') +
+      stat(t.openMeldingen, 'open meldingen') + stat(t.kritiekeMeldingen, 'kritiek') +
+      (t.stedenZonderIndicatoren ? stat(t.stedenZonderIndicatoren, 'steden meten niets') : '');
+  } catch (e) { $('#landelijk').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; }
+}
+const stat = (waarde, label) => '<div class="stat"><b>' + esc(waarde) + '</b><i>' + esc(label) + '</i></div>';
+
+/* ---------- een stad open ---------- */
+const TABS = [
+  ['overzicht', 'Impact'], ['projecten', 'Projecten'], ['partners', 'Partners'],
+  ['vrijwilligers', 'Vrijwilligers'], ['geld', 'Geld'], ['casussen', 'Hulpvragen'],
+  ['meldingen', 'Integriteit'], ['gemeente', 'Gemeente'], ['ondernemers', 'Ondernemers'],
+  ['subsidies', 'Subsidies'], ['voorraad', 'Voorraad'], ['activiteiten', 'Activiteiten'],
+  ['berichten', 'Communicatie'], ['netwerk', 'Netwerk'], ['bestuur', 'Bestuur']
+];
+
+async function openStad(id) {
+  const r = await api('stad', { id }).catch(e => { melding(e.message, false); return null; });
+  if (!r) return;
+  STAD = r.stad;
+  STAD.rol = r.rol;
+  $('#stadPaneel').classList.remove('verborgen');
+  $('#stadKop').textContent = 'RTF ' + STAD.naam;
+  $('#stadNaam').textContent = 'RTF ' + STAD.naam;
+  $('#stadMeta').innerHTML =
+    '<span class="pil">' + esc(STAD.status) + '</span>' +
+    '<span class="pil">rol: ' + esc(STAD.rol || 'toezicht') + '</span>' +
+    '<span class="pil">projectleider tot ' + eur(STAD.limieten.projectleider) + '</span>' +
+    '<span class="pil">stadsbestuur tot ' + eur(STAD.limieten.stadsbestuur) + '</span>';
+  $('#tabs').innerHTML = TABS.map(([k, n]) => '<button data-tab="' + k + '" class="' + (k === TAB ? 'aan' : '') + '">' + esc(n) + '</button>').join('');
+  $('#tabs').querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => { TAB = b.dataset.tab; openStad(STAD.id); }));
+  window.scrollTo({ top: $('#stadPaneel').offsetTop - 60, behavior: 'smooth' });
+  tekenTab();
+}
+
+$('#terug').addEventListener('click', () => { $('#stadPaneel').classList.add('verborgen'); STAD = null; });
+
+function raam(binnen) { $('#tabIn').innerHTML = '<div id="melding"></div>' + binnen; }
+
+async function tekenTab() {
+  try {
+    if (TAB === 'overzicht') return await tabImpact();
+    if (TAB === 'projecten') return await tabProjecten();
+    if (TAB === 'partners') return await tabPartners();
+    if (TAB === 'vrijwilligers') return await tabVrijwilligers();
+    if (TAB === 'geld') return await tabGeld();
+    if (TAB === 'casussen') return await tabCasussen();
+    if (TAB === 'meldingen') return await tabMeldingen();
+    if (TAB === 'gemeente') return await tabGemeente();
+    if (TAB === 'ondernemers') return await tabOndernemers();
+    if (TAB === 'subsidies') return await tabSubsidies();
+    if (TAB === 'voorraad') return await tabVoorraad();
+    if (TAB === 'activiteiten') return await tabActiviteiten();
+    if (TAB === 'berichten') return await tabBerichten();
+    if (TAB === 'netwerk') return await tabNetwerk();
+    if (TAB === 'bestuur') return await tabBestuur();
+  } catch (e) { raam('<div class="kaart"><div class="melder fout">' + esc(e.message) + '</div></div>'); }
+}
+
+/* ---------- impact ---------- */
+async function tabImpact() {
+  const r = await api('rapport', { stad: STAD.id });
+  const c = r.cijfers;
+  raam('<div class="kaart"><div class="sec">Mensen</div><div class="rij">' +
+    (c.mensen.gemeten
+      ? stat(c.mensen.uniekGeholpen, 'uniek geholpen') + stat(c.mensen.herhaaldGeholpen, 'herhaald')
+      : '<div class="leeg">Er is nog niet ingevuld hoeveel mensen er zijn geholpen. Dat is geen nul: het is niet gemeten.</div>') +
+    stat(c.mensen.vrijwilligers, 'vrijwilligers') + stat(Math.round(c.mensen.vrijwilligersuren), 'uren') +
+    stat(c.mensen.vogGeldig, 'met geldige VOG') + '</div></div>' +
+  '<div class="kaart"><div class="sec">Doelen</div>' +
+    (c.doelen.gemeten
+      ? '<div class="rij">' + stat(c.doelen.doel, 'doel') + stat(c.doelen.bereikt, 'bereikt') +
+        stat(c.doelen.doorgestroomd, 'doorgestroomd') + stat(c.doelen.inTraject, 'in traject') +
+        stat(c.doelen.uitgevallen, 'uitgevallen') + '</div>'
+      : '<div class="leeg">Nog geen indicatoren ingevuld. Zet ze per project onder Projecten.</div>') + '</div>' +
+  '<div class="kaart"><div class="sec">Geld</div><div class="rij">' +
+    stat(eur(c.geld.binnen), 'binnen') + stat(eur(c.geld.besteed), 'besteed') +
+    stat(eur(c.geld.geoormerkt), 'geoormerkt') +
+    stat(c.geld.kostenPerPersoon === null ? '--' : eur(c.geld.kostenPerPersoon), 'per geholpen persoon') +
+    stat(c.geld.openAanvragen, 'open aanvragen') + '</div>' +
+    (c.geld.kostenPerPersoon === null ? '<div class="uitleg">Kosten per geholpen persoon staat er pas als er zowel besteed geld als geholpen mensen zijn. Een deling zonder beide kanten is geen cijfer.</div>' : '') +
+    '</div>' +
+  '<div class="kaart"><div class="sec">Hulpvragen en meldingen</div><div class="rij">' +
+    stat(c.hulpvragen.totaal, 'hulpvragen') + stat(c.hulpvragen.open, 'open') +
+    stat(c.hulpvragen.afgerond, 'afgerond') + stat(c.meldingen.open, 'open meldingen') +
+    stat(c.meldingen.kritiek, 'kritiek') + '</div></div>');
+}
+
+/* ---------- projecten ---------- */
+async function tabProjecten() {
+  const r = await api('projecten', { stad: STAD.id });
+  const soorten = r.soorten.map(s => '<option value="' + esc(s) + '">' + esc(s) + '</option>').join('');
+  raam('<div class="kaart"><div class="sec">Nieuw project</div>' +
+    '<div class="rij"><input class="veld" id="pNaam" placeholder="Naam van het project" maxlength="120" aria-label="Naam">' +
+    '<select class="veld" id="pSoort" aria-label="Soort">' + soorten + '</select></div>' +
+    '<div class="rij"><input class="veld" id="pDoelgroep" placeholder="Doelgroep" maxlength="120" aria-label="Doelgroep">' +
+    '<input class="veld" id="pBudget" type="number" min="0" step="0.01" placeholder="Budget in euro" aria-label="Budget">' +
+    '<button class="knop" id="pMaak">Toevoegen</button></div>' +
+    '<div class="uitleg">Een project begint als idee. De keten is: idee → aanvraag → beoordeling → goedgekeurd → actief. Goedkeuren doet een ander dan aanvragen, en boven uw limiet beslist het landelijke bestuur.</div></div>' +
+  '<div class="kaart"><div class="sec">' + r.projecten.length + ' projecten</div>' +
+    (r.projecten.length ? r.projecten.map(projectRij).join('') : '<div class="leeg">Nog geen projecten.</div>') + '</div>');
+
+  $('#pMaak').addEventListener('click', () => doe('project/maak', {
+    stad: STAD.id, naam: $('#pNaam').value, soort: $('#pSoort').value,
+    doelgroep: $('#pDoelgroep').value, budget: $('#pBudget').value || 0
+  }, tekenTab));
+  $('#tabIn').querySelectorAll('[data-status]').forEach(b => b.addEventListener('click', () =>
+    doe('project/status', { id: b.dataset.id, status: b.dataset.status }, tekenTab)));
+  $('#tabIn').querySelectorAll('[data-ind]').forEach(b => b.addEventListener('click', () => {
+    const w = document.getElementById('ind-' + b.dataset.ind);
+    doe('project/indicator', { id: b.dataset.ind, naam: w.querySelector('.iNaam').value,
+      doel: w.querySelector('.iDoel').value, bereikt: w.querySelector('.iBereikt').value,
+      doorgestroomd: w.querySelector('.iDoor').value, uitgevallen: w.querySelector('.iUit').value }, tekenTab);
+  }));
+}
+
+function projectRij(p) {
+  const volgende = { idee: 'aanvraag', aanvraag: 'beoordeling', beoordeling: 'goedgekeurd', goedgekeurd: 'actief', actief: 'afgerond' }[p.status];
+  const ind = (p.indicatoren || []).map(i =>
+    '<div class="sub">' + esc(i.naam) + ': ' + i.bereikt + ' van ' + i.doel + ' bereikt, ' +
+    i.doorgestroomd + ' doorgestroomd, ' + i.uitgevallen + ' uitgevallen, ' + i.actief + ' in traject</div>').join('');
+  return '<div class="lijnrij"><span class="naam"><b>' + esc(p.naam) + '</b> &middot; ' + esc(p.soort) + '</span>' +
+    '<span class="pil">' + esc(p.status) + '</span><span class="pil">' + eur(p.budget) + '</span>' +
+    (volgende ? '<button class="knop stil" data-status="' + esc(volgende) + '" data-id="' + esc(p.id) + '">→ ' + esc(volgende) + '</button>' : '') +
+    '<div class="sub">' + esc(p.doelgroep || 'geen doelgroep ingevuld') + ' &middot; ' + p.vrijwilligers + ' vrijwilligers &middot; ' + p.deelnemersUniek + ' geholpen' +
+    (p.besluit ? ' &middot; goedgekeurd door ' + esc(p.besluit.rol) : '') + '</div>' + ind +
+    '<div class="rij breed" id="ind-' + esc(p.id) + '">' +
+      '<input class="veld iNaam" placeholder="Indicator" maxlength="120" aria-label="Indicator">' +
+      '<input class="veld iDoel" type="number" min="0" placeholder="doel" aria-label="Doel">' +
+      '<input class="veld iBereikt" type="number" min="0" placeholder="bereikt" aria-label="Bereikt">' +
+      '<input class="veld iDoor" type="number" min="0" placeholder="doorgestroomd" aria-label="Doorgestroomd">' +
+      '<input class="veld iUit" type="number" min="0" placeholder="uitgevallen" aria-label="Uitgevallen">' +
+      '<button class="knop stil" data-ind="' + esc(p.id) + '">Meten</button></div></div>';
+}
+
+/* ---------- partners ---------- */
+async function tabPartners() {
+  const r = await api('partners', { stad: STAD.id });
+  raam('<div class="kaart"><div class="sec">Nieuwe partnerstichting</div>' +
+    '<div class="rij"><input class="veld" id="paNaam" placeholder="Juridische naam" maxlength="120" aria-label="Naam">' +
+    '<input class="veld" id="paKvk" placeholder="KvK" maxlength="20" aria-label="KvK-nummer">' +
+    '<input class="veld" id="paRsin" placeholder="RSIN" maxlength="20" aria-label="RSIN"></div>' +
+    '<div class="rij"><input class="veld" id="paDoel" placeholder="Doelstelling" maxlength="300" aria-label="Doelstelling">' +
+    '<button class="knop" id="paMaak">Toevoegen</button></div>' +
+    '<div class="uitleg">Een partner wordt landelijk goedgekeurd en gaat pas op &quot;actief&quot; als de samenwerkingsovereenkomst in het dossier staat.</div></div>' +
+  '<div class="kaart"><div class="sec">' + r.partners.length + ' partners</div>' +
+    (r.partners.length ? r.partners.map(partnerRij).join('') : '<div class="leeg">Nog geen partnerstichtingen.</div>') + '</div>');
+
+  $('#paMaak').addEventListener('click', () => doe('partner/maak', {
+    stad: STAD.id, naam: $('#paNaam').value, kvk: $('#paKvk').value, rsin: $('#paRsin').value, doel: $('#paDoel').value
+  }, tekenTab));
+  $('#tabIn').querySelectorAll('[data-pstatus]').forEach(b => b.addEventListener('click', () =>
+    doe('partner/status', { id: b.dataset.id, status: b.dataset.pstatus }, tekenTab)));
+  $('#tabIn').querySelectorAll('[data-doc]').forEach(b => b.addEventListener('click', () =>
+    doe('partner/document', { id: b.dataset.doc, soort: 'overeenkomst', naam: 'Samenwerkingsovereenkomst' }, tekenTab)));
+}
+
+function partnerRij(p) {
+  const volgende = { aangemeld: 'in_toetsing', in_toetsing: 'goedgekeurd', goedgekeurd: 'actief' }[p.status];
+  const afspraken = p.afspraken || {};
+  return '<div class="lijnrij"><span class="naam"><b>' + esc(p.naam) + '</b></span>' +
+    '<span class="pil">' + esc(p.status) + '</span>' + (p.anbi ? '<span class="pil goed">ANBI</span>' : '') +
+    (volgende ? '<button class="knop stil" data-pstatus="' + esc(volgende) + '" data-id="' + esc(p.id) + '">→ ' + esc(volgende) + '</button>' : '') +
+    '<button class="knop stil" data-doc="' + esc(p.id) + '">+ overeenkomst</button>' +
+    '<div class="sub">code ' + esc(p.code) + ' &middot; KvK ' + esc(p.kvk || '--') + ' &middot; RSIN ' + esc(p.rsin || '--') +
+    ' &middot; looptijd ' + esc(p.van || '?') + ' tot ' + esc(p.tot || '?') + (p.verlopen ? ' (verlopen)' : '') + '</div>' +
+    '<div class="sub">geld: ' + esc(afspraken.geld || '?') + ' &middot; vrijwilligers: ' + esc(afspraken.vrijwilligers || '?') +
+    ' &middot; persoonsgegevens: ' + esc(afspraken.persoonsgegevens || '?') + ' &middot; aansprakelijk: ' + esc(afspraken.aansprakelijk || '?') + '</div>' +
+    '<div class="sub">' + (p.documenten || []).length + ' documenten &middot; ' + (p.beoordelingen || []).length + ' beoordelingen</div></div>';
+}
+
+/* ---------- vrijwilligers ---------- */
+async function tabVrijwilligers() {
+  const r = await api('vrijwilligers', { stad: STAD.id });
+  raam('<div class="kaart"><div class="sec">Nieuwe vrijwilliger</div>' +
+    '<div class="rij"><input class="veld" id="vNaam" placeholder="Naam" maxlength="80" aria-label="Naam">' +
+    '<input class="veld" id="vContact" placeholder="Contact" maxlength="120" aria-label="Contact">' +
+    '<button class="knop" id="vMaak">Toevoegen</button></div>' +
+    '<div class="uitleg">Voor werk met jongeren, huiswerk, sport en ouderen is een geldige VOG verplicht; zonder die datum weigert het systeem de koppeling aan zo&#39;n project.</div></div>' +
+  '<div class="kaart"><div class="sec">' + r.aantal + ' vrijwilligers</div>' +
+    (r.vrijwilligers.length ? r.vrijwilligers.map(vrijwilligerRij).join('') : '<div class="leeg">Nog geen vrijwilligers.</div>') + '</div>');
+
+  $('#vMaak').addEventListener('click', () => doe('vrijwilliger/maak', { stad: STAD.id, naam: $('#vNaam').value, contact: $('#vContact').value }, tekenTab));
+  $('#tabIn').querySelectorAll('[data-vzet]').forEach(b => b.addEventListener('click', () => {
+    const w = document.getElementById('v-' + b.dataset.vzet);
+    doe('vrijwilliger/zet', { id: b.dataset.vzet, status: w.querySelector('.vStatus').value,
+      vogGeldigTot: w.querySelector('.vVog').value, gedragscode: w.querySelector('.vCode').checked }, tekenTab);
+  }));
+  $('#tabIn').querySelectorAll('[data-vcode]').forEach(b => b.addEventListener('click', () =>
+    api('vrijwilliger/code', { id: b.dataset.vcode })
+      .then(r => melding('Code ' + r.code + ' -- ' + r.melding + ' De app is /apps/foundation/os-vrijwilliger.html', true))
+      .catch(e => melding(e.message, false))));
+  $('#tabIn').querySelectorAll('[data-vuren]').forEach(b => b.addEventListener('click', () =>
+    doe('vrijwilliger/uren-bevestig', { id: b.dataset.vuren, meldingId: b.dataset.melding }, tekenTab)));
+}
+
+function vrijwilligerRij(v) {
+  const opties = ['aangemeld', 'kennismaking', 'actief', 'inactief', 'gestopt']
+    .map(s => '<option value="' + s + '"' + (v.status === s ? ' selected' : '') + '>' + s + '</option>').join('');
+  return '<div class="lijnrij" id="v-' + esc(v.id) + '"><span class="naam"><b>' + esc(v.naam) + '</b></span>' +
+    '<span class="pil ' + (v.vogGeldig ? 'goed' : 'let') + '">VOG ' + (v.vogGeldig ? 'geldig' : 'ontbreekt') + '</span>' +
+    '<span class="pil">' + v.urenTotaal + ' uur</span>' +
+    '<div class="rij breed"><select class="veld vStatus" aria-label="Status">' + opties + '</select>' +
+    '<input class="veld vVog" type="date" value="' + esc(v.vogGeldigTot || '') + '" aria-label="VOG geldig tot">' +
+    '<label class="uitleg"><input type="checkbox" class="vCode"' + (v.gedragscode ? ' checked' : '') + '> gedragscode getekend</label>' +
+    '<button class="knop stil" data-vzet="' + esc(v.id) + '">Opslaan</button>' +
+    '<button class="knop stil" data-vcode="' + esc(v.id) + '">Code voor de app</button></div>' +
+    urenMeldingen(v) + '</div>';
+}
+
+/* De uren die de vrijwilliger zelf heeft doorgegeven in os-vrijwilliger.html.
+   Ze staan met opzet in de rij van die vrijwilliger en niet op een aparte
+   stapel "te bevestigen": een lijst die je apart moet openen, open je niet.
+   Bevestigen is een besluit -- uren dragen het jaarverslag en de
+   subsidieverantwoording, en dan is "hij typte het zelf in" geen bron. */
+function urenMeldingen(v) {
+  const m = v.gemeldeUren || [];
+  if (!m.length) return '';
+  return '<div class="rij breed">' + m.map(u =>
+    '<button class="knop stil" data-vuren="' + esc(v.id) + '" data-melding="' + esc(u.id) + '">' +
+      'Bevestig ' + esc(u.uren) + ' uur op ' + esc(String(u.datum || '').slice(0, 10)) +
+      (u.km ? ' (' + esc(u.km) + ' km)' : '') + '</button>').join('') +
+    '<span class="uitleg">' + m.length + ' door de vrijwilliger gemeld; telt pas mee na uw bevestiging.</span></div>';
+}
+
+/* ---------- geld ---------- */
+async function tabGeld() {
+  const [g, pr] = await Promise.all([api('geld', { stad: STAD.id }), api('projecten', { stad: STAD.id })]);
+  const projOpties = pr.projecten.map(p => '<option value="' + esc(p.id) + '">' + esc(p.naam) + '</option>').join('');
+  const bronOpties = g.bronnen.map(b => '<option value="' + esc(b.id) + '">' + esc(b.gever) + ' -- ' + eur(b.vrij) + ' vrij' + (b.geoormerkt ? ' (geoormerkt)' : '') + '</option>').join('');
+  raam('<div class="kaart"><div class="rij">' +
+      stat(eur(g.totalen.binnen), 'binnen') + stat(eur(g.totalen.besteed), 'besteed') +
+      stat(eur(g.totalen.geoormerkt), 'geoormerkt') + stat(eur(g.totalen.vrij), 'vrij') +
+      stat(g.totalen.openAanvragen, 'open aanvragen') + '</div></div>' +
+    '<div class="kaart"><div class="sec">Bron toevoegen (donatie, subsidie, sponsoring)</div>' +
+      '<div class="rij"><input class="veld" id="bGever" placeholder="Van wie" maxlength="120" aria-label="Gever">' +
+      '<select class="veld" id="bSoort" aria-label="Soort">' + g.soorten.map(s => '<option>' + esc(s) + '</option>').join('') + '</select>' +
+      '<input class="veld" id="bBedrag" type="number" min="0" step="0.01" placeholder="Bedrag" aria-label="Bedrag"></div>' +
+      '<div class="rij"><select class="veld" id="bProject" aria-label="Geoormerkt voor"><option value="">niet geoormerkt (stadsbreed)</option>' + projOpties + '</select>' +
+      '<select class="veld" id="bHerb" aria-label="Herbestemming">' + g.herbestemmingen.map(h => '<option value="' + esc(h) + '"' + (h === 'met_toestemming' ? ' selected' : '') + '>herbestemmen: ' + esc(h) + '</option>').join('') + '</select>' +
+      '<button class="knop" id="bMaak">Vastleggen</button></div>' +
+      '<div class="uitleg">Geoormerkt geld gaat nooit naar een ander project. Herbestemmen kan alleen landelijk, met een reden, en nooit als de gever het heeft uitgesloten.</div></div>' +
+    '<div class="kaart"><div class="sec">Uitgave aanvragen</div>' +
+      '<div class="rij"><input class="veld" id="uOms" placeholder="Waarvoor" maxlength="200" aria-label="Omschrijving">' +
+      '<input class="veld" id="uBedrag" type="number" min="0" step="0.01" placeholder="Bedrag" aria-label="Bedrag"></div>' +
+      '<div class="rij"><select class="veld" id="uProject" aria-label="Project">' + projOpties + '</select>' +
+      '<select class="veld" id="uBron" aria-label="Bron">' + bronOpties + '</select>' +
+      '<button class="knop" id="uMaak">Aanvragen</button></div>' +
+      '<div class="uitleg">Wie aanvraagt, besluit niet. Projectleider tot ' + eur(STAD.limieten.projectleider) + ', stadsbestuur tot ' + eur(STAD.limieten.stadsbestuur) + ', daarboven landelijk.</div></div>' +
+    '<div class="kaart"><div class="sec">Bronnen</div>' +
+      (g.bronnen.length ? g.bronnen.map(b => '<div class="lijnrij"><span class="naam">' + esc(b.gever) + ' &middot; ' + esc(b.soort) + '</span>' +
+        '<span class="pil">' + eur(b.binnen) + '</span><span class="pil">' + eur(b.vrij) + ' vrij</span>' +
+        (b.geoormerkt ? '<span class="pil let">geoormerkt</span>' : '') + '</div>').join('') : '<div class="leeg">Nog geen bronnen.</div>') + '</div>' +
+    '<div class="kaart"><div class="sec">Uitgaven</div>' +
+      (g.uitgaven.length ? g.uitgaven.map(u => '<div class="lijnrij"><span class="naam">' + esc(u.omschrijving) + '</span>' +
+        '<span class="pil">' + eur(u.bedrag) + '</span><span class="pil ' + (u.status === 'goedgekeurd' ? 'goed' : (u.status === 'afgewezen' ? 'fout' : 'let')) + '">' + esc(u.status) + '</span>' +
+        (u.status === 'aangevraagd'
+          ? '<button class="knop stil" data-besluit="' + esc(u.id) + '" data-akkoord="1">Goedkeuren</button>' +
+            '<button class="knop stil" data-besluit="' + esc(u.id) + '" data-akkoord="">Afwijzen</button>'
+          : '') + '</div>').join('') : '<div class="leeg">Nog geen uitgaven.</div>') + '</div>');
+
+  $('#bMaak').addEventListener('click', () => doe('bron/maak', {
+    stad: STAD.id, gever: $('#bGever').value, soort: $('#bSoort').value, bedrag: $('#bBedrag').value,
+    projectId: $('#bProject').value || null, herbestemming: $('#bHerb').value
+  }, tekenTab));
+  $('#uMaak').addEventListener('click', () => doe('uitgave/aanvraag', {
+    projectId: $('#uProject').value, bronId: $('#uBron').value,
+    omschrijving: $('#uOms').value, bedrag: $('#uBedrag').value
+  }, tekenTab));
+  $('#tabIn').querySelectorAll('[data-besluit]').forEach(b => b.addEventListener('click', () =>
+    doe('uitgave/besluit', { id: b.dataset.besluit, akkoord: b.dataset.akkoord === '1', reden: '' }, tekenTab)));
+}
+
+/* ---------- hulpvragen ---------- */
+async function tabCasussen() {
+  const r = await api('casussen', { stad: STAD.id });
+  raam('<div class="kaart"><div class="sec">Nieuwe hulpvraag</div>' +
+    '<div class="rij"><select class="veld" id="cSoort" aria-label="Soort">' + r.soorten.map(s => '<option>' + esc(s) + '</option>').join('') + '</select>' +
+    '<select class="veld" id="cUrg" aria-label="Urgentie">' + r.urgenties.map(u => '<option>' + esc(u) + '</option>').join('') + '</select>' +
+    '<input class="veld" id="cWijk" placeholder="Buurt" maxlength="60" aria-label="Buurt"></div>' +
+    '<div class="rij"><input class="veld" id="cVraag" placeholder="Waar gaat het over (kort en zakelijk)" maxlength="300" aria-label="Vraag">' +
+    '<input class="veld" id="cContact" placeholder="Naam en telefoon" maxlength="200" aria-label="Contact">' +
+    '<button class="knop" id="cMaak">Aanmelden</button></div>' +
+    '<div class="uitleg">De hulpvraag draait op een codenaam. Naam en telefoon gaan versleuteld de opslag in en worden alleen zichtbaar als u er apart om vraagt -- dat wordt genoteerd. Geen medische, financiële of gezinsdetails invullen.</div></div>' +
+  '<div class="kaart"><div class="sec">' + r.aantal + ' hulpvragen</div>' +
+    (r.casussen.length ? r.casussen.map(casusRij).join('') : '<div class="leeg">Nog geen hulpvragen.</div>') + '</div>');
+
+  $('#cMaak').addEventListener('click', () => doe('casus/maak', {
+    stad: STAD.id, soort: $('#cSoort').value, urgentie: $('#cUrg').value, wijk: $('#cWijk').value,
+    vraag: $('#cVraag').value, contact: $('#cContact').value
+  }, tekenTab));
+  $('#tabIn').querySelectorAll('[data-contact]').forEach(b => b.addEventListener('click', () =>
+    api('casus/contact', { id: b.dataset.contact })
+      .then(r => melding(r.contact ? 'Contact: ' + r.contact : 'Er is geen contact vastgelegd bij deze hulpvraag.', true))
+      .catch(e => melding(e.message, false))));
+  /* De code voor os-deelnemer.html. Hij wordt getoond en niet gemaild: een
+     code die je opstuurt komt in een inbox te liggen die iemand anders ook
+     opent. Persoonlijk overhandigen is hier de veiligste route. */
+  $('#tabIn').querySelectorAll('[data-ccode]').forEach(b => b.addEventListener('click', () =>
+    api('casus/code', { id: b.dataset.ccode })
+      .then(r => melding('Code ' + r.code + ' -- ' + r.melding + ' De pagina is /apps/foundation/os-deelnemer.html', true))
+      .catch(e => melding(e.message, false))));
+  $('#tabIn').querySelectorAll('[data-cstap]').forEach(b => b.addEventListener('click', () => {
+    const w = document.getElementById('c-' + b.dataset.cstap);
+    doe('casus/stap', { id: b.dataset.cstap, soort: w.querySelector('.cSoort').value, tekst: w.querySelector('.cTekst').value }, tekenTab);
+  }));
+}
+
+function casusRij(c) {
+  return '<div class="lijnrij" id="c-' + esc(c.id) + '"><span class="naam"><b>' + esc(c.codenaam) + '</b> &middot; ' + esc(c.soort) + '</span>' +
+    '<span class="pil ' + (c.urgentie === 'acuut' ? 'fout' : 'let') + '">' + esc(c.urgentie) + '</span>' +
+    '<span class="pil">' + esc(c.status) + '</span>' +
+    '<button class="knop stil" data-contact="' + esc(c.id) + '">Contact tonen</button>' +
+    '<button class="knop stil" data-ccode="' + esc(c.id) + '">Code voor de hulpvrager</button>' +
+    '<div class="sub">' + esc(c.vraag) + (c.wijk ? ' &middot; ' + esc(c.wijk) : '') +
+    (c.toestemming ? ' &middot; toestemming vastgelegd' : ' &middot; nog geen toestemming') + '</div>' +
+    '<div class="rij breed"><select class="veld cSoort" aria-label="Soort stap">' +
+      ['contact', 'hulpactie', 'doorverwijzing', 'nazorg', 'notitie'].map(s => '<option>' + s + '</option>').join('') + '</select>' +
+    '<input class="veld cTekst" placeholder="Wat is er gedaan" maxlength="300" aria-label="Stap">' +
+    '<button class="knop stil" data-cstap="' + esc(c.id) + '">Noteren</button></div></div>';
+}
+
+/* ---------- integriteit ---------- */
+async function tabMeldingen() {
+  const r = await api('meldingen', { stad: STAD.id });
+  raam('<div class="kaart"><div class="sec">Melding doen</div>' +
+    '<div class="rij"><select class="veld" id="mSoort" aria-label="Soort">' + r.soorten.map(s => '<option>' + esc(s) + '</option>').join('') + '</select>' +
+    '<select class="veld" id="mZwaarte" aria-label="Zwaarte">' + r.zwaartes.map(s => '<option>' + esc(s) + '</option>').join('') + '</select>' +
+    '<label class="uitleg"><input type="checkbox" id="mAnoniem"> anoniem</label></div>' +
+    '<div class="rij"><input class="veld" id="mTekst" placeholder="Wat is er gebeurd" maxlength="1000" aria-label="Melding">' +
+    '<button class="knop" id="mMaak">Melden</button></div>' +
+    '<div class="uitleg">Hoog en kritiek gaan direct naar het landelijke bestuur. Klokkenluidersmeldingen en belangenverstrengeling gaan buiten de stad om. Niemand kan een melding verwijderen -- sluiten kan, met een uitkomst erbij. Anoniem betekent dat we uw sleutel niet bewaren; u ziet de melding daarna zelf ook niet terug.</div></div>' +
+  '<div class="kaart"><div class="sec">Meldingen</div>' +
+    (r.meldingen.length ? r.meldingen.map(m => '<div class="lijnrij"><span class="naam">' + esc(m.soort) + ' &middot; ' + esc(m.melder) + '</span>' +
+      '<span class="pil ' + (m.zwaarte === 'kritiek' || m.zwaarte === 'hoog' ? 'fout' : 'let') + '">' + esc(m.zwaarte) + '</span>' +
+      '<span class="pil">' + esc(m.status) + '</span>' + (m.escalatie ? '<span class="pil fout">landelijk</span>' : '') +
+      '<div class="sub">' + esc(m.tekst) + '</div></div>').join('') : '<div class="leeg">Geen meldingen. Dat is goed nieuws en geen bewijs.</div>') + '</div>');
+
+  $('#mMaak').addEventListener('click', () => doe('melding/maak', {
+    stad: STAD.id, soort: $('#mSoort').value, zwaarte: $('#mZwaarte').value,
+    tekst: $('#mTekst').value, anoniem: $('#mAnoniem').checked
+  }, tekenTab));
+}
+
+/* ---------- gemeente ---------- */
+async function tabGemeente() {
+  const r = await api('gemeenten', { stad: STAD.id });
+  raam('<div class="kaart"><div class="sec">Gemeente toevoegen</div>' +
+    '<div class="rij"><input class="veld" id="gNaam" placeholder="Gemeente" maxlength="80" aria-label="Gemeente">' +
+    '<input class="veld" id="gContact" placeholder="Contactpersoon" maxlength="120" aria-label="Contact">' +
+    '<button class="knop" id="gMaak">Toevoegen</button></div>' +
+    '<div class="uitleg">De gemeente krijgt een eigen code voor het gemeentenportaal. Daar staan uitsluitend getelde cijfers: bereik, buurten, besteding en resultaten -- nooit een dossier of een naam. Buurten met minder dan vijf hulpvragen worden samengevoegd.</div></div>' +
+  '<div class="kaart"><div class="sec">Gemeenten</div>' +
+    (r.gemeenten.length ? r.gemeenten.map(g => '<div class="lijnrij" id="g-' + esc(g.id) + '"><span class="naam"><b>' + esc(g.naam) + '</b></span>' +
+      '<span class="pil">code ' + esc(g.code) + '</span><span class="pil">' + g.opdrachten.length + ' opdrachten</span>' +
+      g.opdrachten.map(o => '<div class="sub">' + esc(o.omschrijving) + ' &middot; ' + eur(o.bedrag) + ' &middot; ' + esc(o.status) +
+        (o.deadline ? ' &middot; verantwoorden voor ' + esc(o.deadline) : '') + '</div>').join('') +
+      '<div class="rij breed"><input class="veld oOms" placeholder="Opdracht" maxlength="300" aria-label="Opdracht">' +
+      '<input class="veld oKpi" placeholder="Prestatieafspraak" maxlength="300" aria-label="KPI">' +
+      '<input class="veld oBedrag" type="number" min="0" step="0.01" placeholder="Subsidie" aria-label="Bedrag">' +
+      '<input class="veld oDeadline" type="date" aria-label="Verantwoordingsdatum">' +
+      '<button class="knop stil" data-opdracht="' + esc(g.id) + '">Vastleggen</button></div></div>').join('')
+      : '<div class="leeg">Nog geen gemeenten.</div>') + '</div>');
+
+  $('#gMaak').addEventListener('click', () => doe('gemeente/maak', { stad: STAD.id, naam: $('#gNaam').value, contact: $('#gContact').value }, tekenTab));
+  $('#tabIn').querySelectorAll('[data-opdracht]').forEach(b => b.addEventListener('click', () => {
+    const w = document.getElementById('g-' + b.dataset.opdracht);
+    doe('gemeente/opdracht', { id: b.dataset.opdracht, omschrijving: w.querySelector('.oOms').value,
+      kpi: w.querySelector('.oKpi').value, bedrag: w.querySelector('.oBedrag').value || 0,
+      deadline: w.querySelector('.oDeadline').value }, tekenTab);
+  }));
+}
+
+/* ---------- ondernemers ---------- */
+async function tabOndernemers() {
+  const [r, pr] = await Promise.all([api('ondernemers', { stad: STAD.id }), api('projecten', { stad: STAD.id })]);
+  const projOpties = '<option value="">nog niet gekoppeld</option>' + pr.projecten.map(p => '<option value="' + esc(p.id) + '">' + esc(p.naam) + '</option>').join('');
+  raam('<div class="kaart"><div class="sec">Bedrijf toevoegen</div>' +
+    '<div class="rij"><input class="veld" id="oNaam" placeholder="Bedrijfsnaam" maxlength="120" aria-label="Naam">' +
+    '<input class="veld" id="oBranche" placeholder="Branche" maxlength="60" aria-label="Branche">' +
+    '<button class="knop" id="oMaak">Toevoegen</button></div>' +
+    '<div class="uitleg">Niet alle steun is geld. Een restaurant dat elke dinsdag vijftig maaltijden vrijmaakt, is een aanbod met een ritme -- en dat koppelt u aan een project.</div></div>' +
+  '<div class="kaart"><div class="sec">' + r.ondernemers.length + ' bedrijven &middot; ' + r.openstaand.length + ' openstaand aanbod</div>' +
+    (r.ondernemers.length ? r.ondernemers.map(o => '<div class="lijnrij" id="o-' + esc(o.id) + '"><span class="naam"><b>' + esc(o.naam) + '</b> &middot; ' + esc(o.branche || '--') + '</span>' +
+      '<span class="pil">code ' + esc(o.code) + '</span>' +
+      o.aanbod.map(a => '<div class="sub">' + esc(a.soort) + ': ' + esc(a.wat) + ' (' + a.aantal + ', ' + esc(a.ritme) + ') &middot; ' + esc(a.status) +
+        ' &middot; geschat ' + eur(a.waardeGeschat) +
+        ' <button class="knop stil" data-koppel="' + esc(o.id) + '" data-aanbod="' + esc(a.id) + '">koppelen</button></div>').join('') +
+      '<div class="rij breed"><select class="veld aSoort" aria-label="Soort">' + r.soorten.map(s => '<option>' + esc(s) + '</option>').join('') + '</select>' +
+      '<input class="veld aWat" placeholder="Wat wordt aangeboden" maxlength="200" aria-label="Aanbod">' +
+      '<input class="veld aAantal" type="number" min="0" placeholder="aantal" aria-label="Aantal">' +
+      '<select class="veld aRitme" aria-label="Ritme">' + r.ritmes.map(s => '<option>' + esc(s) + '</option>').join('') + '</select>' +
+      '<input class="veld aWaarde" type="number" min="0" step="0.01" placeholder="geschatte waarde" aria-label="Waarde">' +
+      '<button class="knop stil" data-aanbodmaak="' + esc(o.id) + '">Vastleggen</button></div>' +
+      '<div class="rij breed"><select class="veld aProject" aria-label="Project">' + projOpties + '</select></div></div>').join('')
+      : '<div class="leeg">Nog geen bedrijven.</div>') + '</div>');
+
+  $('#oMaak').addEventListener('click', () => doe('ondernemer/maak', { stad: STAD.id, naam: $('#oNaam').value, branche: $('#oBranche').value }, tekenTab));
+  $('#tabIn').querySelectorAll('[data-aanbodmaak]').forEach(b => b.addEventListener('click', () => {
+    const w = document.getElementById('o-' + b.dataset.aanbodmaak);
+    doe('ondernemer/aanbod', { id: b.dataset.aanbodmaak, soort: w.querySelector('.aSoort').value,
+      wat: w.querySelector('.aWat').value, aantal: w.querySelector('.aAantal').value,
+      ritme: w.querySelector('.aRitme').value, waarde: w.querySelector('.aWaarde').value || 0 }, tekenTab);
+  }));
+  $('#tabIn').querySelectorAll('[data-koppel]').forEach(b => b.addEventListener('click', () => {
+    const w = document.getElementById('o-' + b.dataset.koppel);
+    doe('ondernemer/koppel', { id: b.dataset.koppel, aanbodId: b.dataset.aanbod, projectId: w.querySelector('.aProject').value || null }, tekenTab);
+  }));
+}
+
+/* ---------- subsidies ---------- */
+async function tabSubsidies() {
+  const [r, pr] = await Promise.all([api('subsidies', { stad: STAD.id }), api('projecten', { stad: STAD.id })]);
+  const projOpties = '<option value="">stadsbreed (niet geoormerkt)</option>' +
+    pr.projecten.map(p => '<option value="' + esc(p.id) + '">' + esc(p.naam) + '</option>').join('');
+  const t = r.totalen;
+  raam('<div class="kaart"><div class="rij">' +
+      stat(eur(t.aangevraagd), 'aangevraagd') + stat(eur(t.toegekend), 'toegekend') +
+      stat(t.openMomenten, 'open rapportages') + stat(t.gemist, 'deadline gemist') +
+      stat(t.risicoHoog, 'hoog risico') + '</div>' +
+      (t.gemist ? '<div class="melder fout">' + t.gemist + ' kans(en) waarvan de deadline is verstreken. Wat u niet ziet, vraagt u niet aan.</div>' : '') + '</div>' +
+    '<div class="kaart"><div class="sec">Subsidie of fonds toevoegen</div>' +
+      '<div class="rij"><input class="veld" id="sNaam" placeholder="Naam van de regeling" maxlength="120" aria-label="Naam">' +
+      '<input class="veld" id="sVerstrekker" placeholder="Verstrekker" maxlength="120" aria-label="Verstrekker">' +
+      '<select class="veld" id="sSoort" aria-label="Soort">' + r.soorten.map(x => '<option>' + esc(x) + '</option>').join('') + '</select></div>' +
+      '<div class="rij"><input class="veld" id="sBedrag" type="number" min="0" step="0.01" placeholder="Bedrag" aria-label="Bedrag">' +
+      '<input class="veld" id="sDeadline" type="date" aria-label="Deadline">' +
+      '<select class="veld" id="sProject" aria-label="Voor welk project">' + projOpties + '</select>' +
+      '<select class="veld" id="sRisico" aria-label="Terugbetaalrisico">' + r.risicos.map(x => '<option value="' + esc(x) + '"' + (x === 'middel' ? ' selected' : '') + '>risico ' + esc(x) + '</option>').join('') + '</select>' +
+      '<button class="knop" id="sMaak">Toevoegen</button></div>' +
+      '<div class="uitleg">Zodra een subsidie wordt toegekend, maakt het systeem zelf de geoormerkte bron in het geldoverzicht. Dat gebeurt niet met de hand: twee plekken die hetzelfde bedrag vasthouden, lopen uiteen.</div></div>' +
+    '<div class="kaart"><div class="sec">' + r.subsidies.length + ' subsidies</div>' +
+      (r.subsidies.length ? r.subsidies.map(subsidieRij).join('') : '<div class="leeg">Nog geen subsidies of fondsen in beeld.</div>') + '</div>');
+
+  $('#sMaak').addEventListener('click', () => doe('subsidie/maak', {
+    stad: STAD.id, naam: $('#sNaam').value, verstrekker: $('#sVerstrekker').value, soort: $('#sSoort').value,
+    bedrag: $('#sBedrag').value || 0, deadline: $('#sDeadline').value,
+    projectId: $('#sProject').value || null, risico: $('#sRisico').value
+  }, tekenTab));
+  $('#tabIn').querySelectorAll('[data-sstatus]').forEach(b => b.addEventListener('click', () =>
+    doe('subsidie/status', { id: b.dataset.id, status: b.dataset.sstatus }, tekenTab)));
+  $('#tabIn').querySelectorAll('[data-smoment]').forEach(b => b.addEventListener('click', () => {
+    const w = document.getElementById('s-' + b.dataset.smoment);
+    doe('subsidie/moment', { id: b.dataset.smoment, wat: w.querySelector('.mWat').value, datum: w.querySelector('.mDatum').value }, tekenTab);
+  }));
+  $('#tabIn').querySelectorAll('[data-momentaf]').forEach(b => b.addEventListener('click', () =>
+    doe('subsidie/moment', { id: b.dataset.id, momentId: b.dataset.momentaf, af: true }, tekenTab)));
+  $('#tabIn').querySelectorAll('[data-sbewijs]').forEach(b => b.addEventListener('click', () => {
+    const w = document.getElementById('s-' + b.dataset.sbewijs);
+    doe('subsidie/bewijs', { id: b.dataset.sbewijs, naam: w.querySelector('.bNaam').value }, tekenTab);
+  }));
+}
+
+function subsidieRij(s) {
+  const volgende = { kans: 'in_voorbereiding', in_voorbereiding: 'aangevraagd', aangevraagd: 'toegekend', toegekend: 'verantwoord' }[s.status];
+  return '<div class="lijnrij" id="s-' + esc(s.id) + '"><span class="naam"><b>' + esc(s.naam) + '</b> &middot; ' + esc(s.verstrekker || s.soort) + '</span>' +
+    '<span class="pil">' + esc(s.status) + '</span>' +
+    '<span class="pil">' + eur(s.toegekend || s.aangevraagd) + '</span>' +
+    (s.gemist ? '<span class="pil fout">deadline gemist</span>' : '') +
+    (s.risico === 'hoog' ? '<span class="pil let">terugbetaalrisico hoog</span>' : '') +
+    (volgende ? '<button class="knop stil" data-sstatus="' + esc(volgende) + '" data-id="' + esc(s.id) + '">→ ' + esc(volgende) + '</button>' : '') +
+    '<div class="sub">' + (s.deadline ? 'deadline ' + esc(s.deadline) + ' &middot; ' : '') +
+      s.openMomenten + ' open rapportagemomenten &middot; ' + (s.bewijs || []).length + ' bewijsstukken' +
+      (s.bronId ? ' &middot; geoormerkte bron aangemaakt' : '') + '</div>' +
+    (s.momenten || []).map(m => '<div class="sub">' + (m.af ? '&check; ' : '&#9675; ') + esc(m.wat) +
+      (m.datum ? ' (' + esc(m.datum) + ')' : '') +
+      (m.af ? '' : ' <button class="knop stil" data-momentaf="' + esc(m.id) + '" data-id="' + esc(s.id) + '">afvinken</button>') + '</div>').join('') +
+    '<div class="rij breed"><input class="veld mWat" placeholder="Rapportagemoment" maxlength="200" aria-label="Rapportagemoment">' +
+    '<input class="veld mDatum" type="date" aria-label="Datum">' +
+    '<button class="knop stil" data-smoment="' + esc(s.id) + '">+ moment</button>' +
+    '<input class="veld bNaam" placeholder="Bewijsstuk" maxlength="120" aria-label="Bewijsstuk">' +
+    '<button class="knop stil" data-sbewijs="' + esc(s.id) + '">+ bewijs</button></div></div>';
+}
+
+/* ---------- voorraad ---------- */
+async function tabVoorraad() {
+  const [r, pr] = await Promise.all([api('voorraad', { stad: STAD.id }), api('projecten', { stad: STAD.id })]);
+  const projOpties = '<option value="">geen project</option>' +
+    pr.projecten.map(p => '<option value="' + esc(p.id) + '">' + esc(p.naam) + '</option>').join('');
+  const t = r.totalen;
+  raam('<div class="kaart"><div class="rij">' +
+      stat(t.batches, 'partijen') + stat(t.opVoorraad, 'op voorraad') + stat(t.uitgegeven, 'uitgegeven') +
+      stat(t.afgeschreven, 'afgeschreven') + stat(eur(t.waardeGeschat), 'geschatte waarde') + '</div>' +
+      (r.aandacht.overDatum.length ? '<div class="melder fout">' + r.aandacht.overDatum.length +
+        ' partij(en) over de datum met restant. Die gaan niet meer de deur uit; schrijf ze af.</div>' : '') +
+      (r.aandacht.bijnaOver.length ? '<div class="melder">' + r.aandacht.bijnaOver.length +
+        ' partij(en) binnen een week over de datum.</div>' : '') + '</div>' +
+    '<div class="kaart"><div class="sec">Partij binnen</div>' +
+      '<div class="rij"><select class="veld" id="grSoort" aria-label="Soort">' + r.soorten.map(x => '<option>' + esc(x) + '</option>').join('') + '</select>' +
+      '<input class="veld" id="grWat" placeholder="Wat komt er binnen" maxlength="120" aria-label="Wat">' +
+      '<input class="veld" id="grAantal" type="number" min="1" placeholder="aantal" aria-label="Aantal">' +
+      '<input class="veld" id="grEenheid" placeholder="eenheid" maxlength="20" aria-label="Eenheid"></div>' +
+      '<div class="rij"><input class="veld" id="grHoudbaar" type="date" aria-label="Houdbaar tot">' +
+      '<input class="veld" id="grGever" placeholder="Van wie" maxlength="120" aria-label="Gever">' +
+      '<input class="veld" id="grLocatie" placeholder="Opslaglocatie" maxlength="80" aria-label="Locatie">' +
+      '<input class="veld" id="grWaarde" type="number" min="0" step="0.01" placeholder="geschatte waarde" aria-label="Waarde">' +
+      '<button class="knop" id="grMaak">Inboeken</button></div>' +
+      '<div class="uitleg">Bij voedsel, hygiëne en babyspullen is een houdbaarheidsdatum verplicht: zonder die datum kan het systeem niet tegenhouden dat het te laat de deur uit gaat.</div></div>' +
+    '<div class="kaart"><div class="sec">Partijen</div>' +
+      (r.batches.length ? r.batches.map(b => batchRij(b, projOpties)).join('') : '<div class="leeg">Nog niets op voorraad.</div>') + '</div>');
+
+  $('#grMaak').addEventListener('click', () => doe('voorraad/binnen', {
+    stad: STAD.id, soort: $('#grSoort').value, wat: $('#grWat').value, aantal: $('#grAantal').value,
+    eenheid: $('#grEenheid').value, houdbaarTot: $('#grHoudbaar').value, gever: $('#grGever').value,
+    locatie: $('#grLocatie').value, waarde: $('#grWaarde').value || 0
+  }, tekenTab));
+  $('#tabIn').querySelectorAll('[data-uit]').forEach(b => b.addEventListener('click', () => {
+    const w = document.getElementById('b-' + b.dataset.uit);
+    doe('voorraad/uit', { id: b.dataset.uit, aantal: w.querySelector('.uAantal').value,
+      projectId: w.querySelector('.uProject').value || null, codenaam: w.querySelector('.uCode').value || null }, tekenTab);
+  }));
+  $('#tabIn').querySelectorAll('[data-af]').forEach(b => b.addEventListener('click', () => {
+    const w = document.getElementById('b-' + b.dataset.af);
+    doe('voorraad/afschrijven', { id: b.dataset.af, aantal: w.querySelector('.uAantal').value,
+      reden: w.querySelector('.uReden').value }, tekenTab);
+  }));
+}
+
+function batchRij(b, projOpties) {
+  return '<div class="lijnrij" id="b-' + esc(b.id) + '"><span class="naam"><b>' + esc(b.wat) + '</b> &middot; ' + esc(b.soort) + '</span>' +
+    '<span class="pil">' + b.restant + ' van ' + b.aantal + ' ' + esc(b.eenheid) + '</span>' +
+    (b.overDatum ? '<span class="pil fout">over de datum</span>' : (b.houdbaarTot ? '<span class="pil">tot ' + esc(b.houdbaarTot) + '</span>' : '')) +
+    '<div class="sub">' + esc(b.locatie) + ' &middot; van ' + esc(b.gever) + ' &middot; ' + b.uitgegeven + ' uitgegeven, ' + b.afgeschreven + ' afgeschreven</div>' +
+    '<div class="rij breed"><input class="veld uAantal" type="number" min="1" placeholder="aantal" aria-label="Aantal">' +
+    '<select class="veld uProject" aria-label="Naar project">' + projOpties + '</select>' +
+    '<input class="veld uCode" placeholder="of codenaam hulpvraag" maxlength="20" aria-label="Codenaam">' +
+    '<button class="knop stil" data-uit="' + esc(b.id) + '">Uitgeven</button>' +
+    '<input class="veld uReden" placeholder="reden afschrijven" maxlength="200" aria-label="Reden">' +
+    '<button class="knop stil" data-af="' + esc(b.id) + '">Afschrijven</button></div></div>';
+}
+
+/* ---------- activiteiten ---------- */
+async function tabActiviteiten() {
+  const [r, vr] = await Promise.all([api('activiteiten', { stad: STAD.id }), api('vrijwilligers', { stad: STAD.id })]);
+  const vrijOpties = vr.vrijwilligers.map(v => '<option value="' + esc(v.id) + '">' + esc(v.naam) +
+    (v.vogGeldig ? ' (VOG geldig)' : ' (geen geldige VOG)') + '</option>').join('');
+  raam('<div class="kaart"><div class="sec">Activiteit plannen</div>' +
+      '<div class="rij"><input class="veld" id="acNaam" placeholder="Naam" maxlength="120" aria-label="Naam">' +
+      '<select class="veld" id="acSoort" aria-label="Soort">' + r.soorten.map(x => '<option>' + esc(x) + '</option>').join('') + '</select>' +
+      '<input class="veld" id="acCap" type="number" min="1" placeholder="capaciteit" aria-label="Capaciteit"></div>' +
+      '<div class="rij"><input class="veld" id="acWanneer" type="date" aria-label="Wanneer">' +
+      '<input class="veld" id="acTijd" placeholder="tijd" maxlength="20" aria-label="Tijd">' +
+      '<input class="veld" id="acLocatie" placeholder="locatie" maxlength="120" aria-label="Locatie">' +
+      '<button class="knop" id="acMaak">Plannen</button></div>' +
+      '<div class="uitleg">Bij een sportdag, workshop of jongerenavond gaat de inschrijving pas open met minstens één begeleider met geldige VOG én een veiligheidsplan. Vol is geen nee maar een wachtlijst.</div></div>' +
+    '<div class="kaart"><div class="sec">' + r.activiteiten.length + ' activiteiten</div>' +
+      (r.activiteiten.length ? r.activiteiten.map(a => activiteitRij(a, vrijOpties)).join('') : '<div class="leeg">Nog niets gepland.</div>') + '</div>');
+
+  $('#acMaak').addEventListener('click', () => doe('activiteit/maak', {
+    stad: STAD.id, naam: $('#acNaam').value, soort: $('#acSoort').value, capaciteit: $('#acCap').value,
+    wanneer: $('#acWanneer').value, tijd: $('#acTijd').value, locatie: $('#acLocatie').value
+  }, tekenTab));
+  $('#tabIn').querySelectorAll('[data-begeleiders]').forEach(b => b.addEventListener('click', () => {
+    const w = document.getElementById('a-' + b.dataset.begeleiders);
+    const gekozen = Array.from(w.querySelector('.aBegeleiders').selectedOptions).map(o => o.value);
+    doe('activiteit/begeleiders', { id: b.dataset.begeleiders, ids: gekozen }, tekenTab);
+  }));
+  $('#tabIn').querySelectorAll('[data-plan]').forEach(b => b.addEventListener('click', () => {
+    const w = document.getElementById('a-' + b.dataset.plan);
+    doe('activiteit/zet', { id: b.dataset.plan, veiligheidsplan: w.querySelector('.aPlan').value }, tekenTab);
+  }));
+  $('#tabIn').querySelectorAll('[data-acopen]').forEach(b => b.addEventListener('click', () =>
+    doe('activiteit/open', { id: b.dataset.acopen }, tekenTab)));
+  $('#tabIn').querySelectorAll('[data-inschrijf]').forEach(b => b.addEventListener('click', () => {
+    const w = document.getElementById('a-' + b.dataset.inschrijf);
+    api('activiteit/inschrijven', { id: b.dataset.inschrijf, codenaam: w.querySelector('.aCode').value,
+      minderjarig: w.querySelector('.aMinderjarig').checked, oudertoestemming: w.querySelector('.aOuder').checked,
+      fototoestemming: w.querySelector('.aFoto').checked })
+      .then(res => { melding(res.bericht + ' Incheckcode: ' + res.inschrijving.checkinCode, true); tekenTab(); })
+      .catch(e => melding(e.message, false));
+  }));
+  $('#tabIn').querySelectorAll('[data-incheck]').forEach(b => b.addEventListener('click', () => {
+    const w = document.getElementById('a-' + b.dataset.incheck);
+    api('activiteit/incheck', { id: b.dataset.incheck, checkinCode: w.querySelector('.aIncheck').value })
+      .then(res => { melding(res.bericht, true); tekenTab(); })
+      .catch(e => melding(e.message, false));
+  }));
+  $('#tabIn').querySelectorAll('[data-afmeld]').forEach(b => b.addEventListener('click', () =>
+    api('activiteit/afmelden', { id: b.dataset.afmeld, inschrijvingId: b.dataset.inschrijving })
+      .then(res => { melding(res.bericht, true); tekenTab(); })
+      .catch(e => melding(e.message, false))));
+}
+
+function activiteitRij(a, vrijOpties) {
+  return '<div class="lijnrij" id="a-' + esc(a.id) + '"><span class="naam"><b>' + esc(a.naam) + '</b> &middot; ' + esc(a.soort) + '</span>' +
+    '<span class="pil">' + esc(a.status) + '</span>' +
+    '<span class="pil">' + a.ingeschreven + '/' + a.capaciteit + '</span>' +
+    (a.wachtlijst ? '<span class="pil let">' + a.wachtlijst + ' op de wachtlijst</span>' : '') +
+    (a.jeugd ? '<span class="pil">jeugd: VOG vereist</span>' : '') +
+    (a.status === 'gepland' ? '<button class="knop stil" data-acopen="' + esc(a.id) + '">Openzetten</button>' : '') +
+    '<div class="sub">' + esc(a.wanneer || 'datum volgt') + ' ' + esc(a.tijd || '') + ' &middot; ' + esc(a.locatie || 'locatie volgt') +
+      ' &middot; ' + a.begeleiders + ' begeleiders &middot; ' + a.aanwezig + ' aanwezig' +
+      (a.veiligheidsplan ? ' &middot; veiligheidsplan aanwezig' : ' &middot; geen veiligheidsplan') + '</div>' +
+    '<div class="rij breed"><select class="veld aBegeleiders" multiple size="2" aria-label="Begeleiders">' + vrijOpties + '</select>' +
+      '<button class="knop stil" data-begeleiders="' + esc(a.id) + '">Begeleiders</button>' +
+      '<input class="veld aPlan" placeholder="Veiligheidsplan: wie doet wat als er iets gebeurt" maxlength="600" aria-label="Veiligheidsplan">' +
+      '<button class="knop stil" data-plan="' + esc(a.id) + '">Vastleggen</button></div>' +
+    '<div class="rij breed"><input class="veld aCode" placeholder="codenaam deelnemer" maxlength="30" aria-label="Codenaam">' +
+      '<label class="uitleg"><input type="checkbox" class="aMinderjarig"> minderjarig</label>' +
+      '<label class="uitleg"><input type="checkbox" class="aOuder"> toestemming ouders</label>' +
+      '<label class="uitleg"><input type="checkbox" class="aFoto"> toestemming foto</label>' +
+      '<button class="knop stil" data-inschrijf="' + esc(a.id) + '">Inschrijven</button>' +
+      '<input class="veld aIncheck" placeholder="incheckcode" maxlength="20" aria-label="Incheckcode">' +
+      '<button class="knop stil" data-incheck="' + esc(a.id) + '">Inchecken</button></div>' +
+    (a.inschrijvingen || []).map(i => '<div class="sub">' + esc(i.codenaam) + ' &middot; ' + esc(i.status) +
+      (i.minderjarig ? (i.oudertoestemming ? ' &middot; oudertoestemming' : ' &middot; GEEN oudertoestemming') : '') +
+      (i.fototoestemming ? '' : ' &middot; geen foto') +
+      ' <button class="knop stil" data-afmeld="' + esc(a.id) + '" data-inschrijving="' + esc(i.id) + '">afmelden</button></div>').join('') +
+    '</div>';
+}
+
+/* ---------- communicatie ---------- */
+async function tabBerichten() {
+  const r = await api('berichten', { stad: STAD.id });
+  raam('<div class="kaart"><div class="sec">Bericht opstellen</div>' +
+      '<div class="rij"><select class="veld" id="brDoel" aria-label="Doelgroep">' + r.doelgroepen.map(x => '<option>' + esc(x) + '</option>').join('') + '</select>' +
+      '<select class="veld" id="brKanaal" aria-label="Kanaal">' + r.kanalen.map(x => '<option>' + esc(x) + '</option>').join('') + '</select>' +
+      '<label class="uitleg"><input type="checkbox" id="brSpoed"> spoed</label></div>' +
+      '<div class="rij"><input class="veld" id="brOnderwerp" placeholder="Onderwerp" maxlength="120" aria-label="Onderwerp"></div>' +
+      '<div class="rij"><input class="veld" id="brTekst" placeholder="De tekst" maxlength="4000" aria-label="Tekst">' +
+      '<button class="knop" id="brMaak">Opslaan als concept</button></div>' +
+      '<div class="uitleg">Naar vrijwilligers, partners, deelnemers en ondernemers stuurt u zelf. Een bericht aan het <b>publiek</b> draagt de naam van de hele stichting en gaat eerst langs het landelijke bestuur; met spoed staat het bovenaan hun lijst. Wijzigt u de tekst na goedkeuring, dan vervalt die goedkeuring.</div></div>' +
+    (r.teBeoordelen.length ? '<div class="kaart"><div class="sec">Ligt bij het landelijke bestuur</div>' +
+      r.teBeoordelen.map(b => '<div class="lijnrij"><span class="naam"><b>' + esc(b.onderwerp) + '</b></span>' +
+        (b.spoed ? '<span class="pil fout">spoed</span>' : '') +
+        (IK.landelijk ? '<button class="knop stil" data-bja="' + esc(b.id) + '">Goedkeuren</button>' +
+          '<input class="veld bReden" id="rd-' + esc(b.id) + '" placeholder="reden bij afkeuren" maxlength="300" aria-label="Reden">' +
+          '<button class="knop stil" data-bnee="' + esc(b.id) + '">Afkeuren</button>' : '') +
+        '<div class="sub">' + esc(b.tekst) + '</div></div>').join('') + '</div>' : '') +
+    '<div class="kaart"><div class="sec">Berichten</div>' +
+      (r.berichten.length ? r.berichten.map(b => '<div class="lijnrij"><span class="naam">' + esc(b.onderwerp) + '</span>' +
+        '<span class="pil">' + esc(b.doelgroep) + '</span><span class="pil">' + esc(b.status) + '</span>' +
+        (b.naarBuiten ? '<span class="pil let">naar buiten</span>' : '') +
+        (['concept', 'goedgekeurd'].includes(b.status) ? '<button class="knop stil" data-bverzend="' + esc(b.id) + '">Verzenden</button>' : '') +
+        '<div class="sub">' + esc(b.tekst) +
+          (b.besluit && b.besluit.reden ? ' &middot; landelijk: ' + esc(b.besluit.reden) : '') + '</div></div>').join('')
+        : '<div class="leeg">Nog geen berichten.</div>') + '</div>');
+
+  $('#brMaak').addEventListener('click', () => doe('bericht/maak', {
+    stad: STAD.id, doelgroep: $('#brDoel').value, kanaal: $('#brKanaal').value,
+    onderwerp: $('#brOnderwerp').value, tekst: $('#brTekst').value, spoed: $('#brSpoed').checked
+  }, tekenTab));
+  $('#tabIn').querySelectorAll('[data-bverzend]').forEach(b => b.addEventListener('click', () =>
+    api('bericht/verzend', { id: b.dataset.bverzend })
+      .then(res => { melding(res.melding, !res.voorgelegd ? true : false); tekenTab(); })
+      .catch(e => melding(e.message, false))));
+  $('#tabIn').querySelectorAll('[data-bja]').forEach(b => b.addEventListener('click', () =>
+    doe('bericht/besluit', { id: b.dataset.bja, akkoord: true, reden: 'akkoord' }, tekenTab)));
+  $('#tabIn').querySelectorAll('[data-bnee]').forEach(b => b.addEventListener('click', () => {
+    const veld = document.getElementById('rd-' + b.dataset.bnee);
+    doe('bericht/besluit', { id: b.dataset.bnee, akkoord: false, reden: veld ? veld.value : '' }, tekenTab);
+  }));
+}
+
+/* ---------- netwerk: delen, samen kopen, uitlenen, campagnes ---------- */
+async function tabNetwerk() {
+  const [bd, ink, uit, camp, bord, bench] = await Promise.all([
+    api('blauwdrukken', {}), api('inkoop', {}), api('uitleen', { stad: STAD.id }),
+    api('campagnes', {}), api('koppelbord', {}), api('benchmark', {})
+  ]);
+  const pr = await api('projecten', { stad: STAD.id });
+  const projOpties = pr.projecten.map(p => '<option value="' + esc(p.id) + '">' + esc(p.naam) + '</option>').join('');
+
+  raam('<div class="kaart"><div class="sec">Blauwdrukken: wat elders werkte</div>' +
+      (bd.blauwdrukken.length ? bd.blauwdrukken.map(b => '<div class="lijnrij"><span class="naam"><b>' + esc(b.naam) + '</b> &middot; ' + esc(b.soort) + '</span>' +
+        '<span class="pil">uit ' + esc(b.vanStad || '?') + '</span>' +
+        (b.overgenomen ? '<span class="pil">' + b.overgenomen + 'x overgenomen</span>' : '') +
+        (b.eigen ? '' : '<button class="knop stil" data-overnemen="' + esc(b.id) + '">Overnemen in ' + esc(STAD.naam) + '</button>') +
+        '<div class="sub">' + esc(b.aanpak) + '</div>' +
+        '<div class="sub">Geleerd: ' + esc(b.geleerd) + (b.doorlooptijd ? ' &middot; ' + esc(b.doorlooptijd) : '') + '</div></div>').join('')
+        : '<div class="leeg">Nog geen blauwdrukken. Deel er een vanuit een project dat draait en gemeten is.</div>') +
+      '<div class="rij breed"><select class="veld" id="bdProject" aria-label="Project">' + projOpties + '</select>' +
+      '<input class="veld" id="bdAanpak" placeholder="De aanpak: wat doet een andere stad maandag als eerste?" maxlength="1500" aria-label="Aanpak">' +
+      '<input class="veld" id="bdGeleerd" placeholder="Wat ging er mis of anders dan verwacht?" maxlength="1000" aria-label="Geleerd">' +
+      '<input class="veld" id="bdDuur" placeholder="doorlooptijd" maxlength="60" aria-label="Doorlooptijd">' +
+      '<button class="knop" id="bdDeel">Delen</button></div>' +
+      '<div class="uitleg">Wie een blauwdruk overneemt, begint bij &quot;idee&quot; en loopt zijn eigen goedkeuring. Het budget en de resultaten van de andere stad reizen niet mee: dat zijn feiten van daar.</div></div>' +
+
+    '<div class="kaart"><div class="sec">Gezamenlijke inkoop</div>' +
+      (ink.inkoop.length ? ink.inkoop.map(i => '<div class="lijnrij" id="i-' + esc(i.id) + '"><span class="naam"><b>' + esc(i.wat) + '</b></span>' +
+        '<span class="pil">' + esc(i.status) + '</span><span class="pil">' + i.stuks + ' ' + esc(i.eenheid) + '</span>' +
+        '<span class="pil">' + i.deelnames.length + ' steden</span>' +
+        (i.totaal ? '<span class="pil">' + eur(i.totaal) + '</span>' : '') +
+        '<div class="sub">geopend door ' + esc(i.openerStad || '?') + ' &middot; indicatie ' + eur(i.indicatiePerStuk) + ' per stuk' +
+          (i.sluitDatum ? ' &middot; sluit ' + esc(i.sluitDatum) : '') + '</div>' +
+        i.deelnames.map(d => '<div class="sub">' + esc(d.stad) + ': ' + d.aantal + ' &middot; ' + eur(d.deel) +
+          (d.uitgaveId ? ' (aanvraag klaar)' : '') + '</div>').join('') +
+        (i.status === 'open' ? '<div class="rij breed">' +
+          '<select class="veld iProject" aria-label="Project">' + projOpties + '</select>' +
+          '<input class="veld iAantal" type="number" min="1" placeholder="aantal" aria-label="Aantal">' +
+          '<input class="veld iBron" placeholder="bron-id" maxlength="20" aria-label="Bron">' +
+          '<button class="knop stil" data-inschrijf-inkoop="' + esc(i.id) + '">Meedoen</button>' +
+          '<input class="veld iPrijs" type="number" min="0" step="0.01" placeholder="definitieve prijs" aria-label="Prijs">' +
+          '<input class="veld iExtra" type="number" min="0" step="0.01" placeholder="bijkomende kosten" aria-label="Bijkomende kosten">' +
+          '<button class="knop stil" data-sluit-inkoop="' + esc(i.id) + '">Sluiten</button></div>' : '') +
+        '</div>').join('') : '<div class="leeg">Nog geen gezamenlijke inkoop.</div>') +
+      '<div class="rij breed"><input class="veld" id="ikWat" placeholder="Wat kopen we samen" maxlength="120" aria-label="Wat">' +
+      '<input class="veld" id="ikEenheid" placeholder="eenheid" maxlength="20" aria-label="Eenheid">' +
+      '<input class="veld" id="ikPrijs" type="number" min="0" step="0.01" placeholder="indicatie per stuk" aria-label="Indicatie">' +
+      '<input class="veld" id="ikLev" placeholder="leverancier" maxlength="120" aria-label="Leverancier">' +
+      '<button class="knop" id="ikMaak">Openen</button></div>' +
+      '<div class="uitleg">Elke stad betaalt uit eigen bronnen; sluiten maakt per stad een gewone uitgave-aanvraag die daar nog door de vier ogen moet. Een gezamenlijke order is een bestelling, geen betaling.</div></div>' +
+
+    '<div class="kaart"><div class="sec">Vrijwilligers tussen steden</div>' +
+      (uit.uitgeleend.length || uit.geleend.length
+        ? uit.uitgeleend.concat(uit.geleend).map(u => '<div class="lijnrij"><span class="naam">' + esc(u.naam) + '</span>' +
+          '<span class="pil">' + esc(u.vanStad || '?') + ' &rarr; ' + esc(u.naarStad || '?') + '</span>' +
+          '<span class="pil">' + esc(u.status) + (u.loopt ? ', loopt' : '') + '</span>' +
+          '<span class="pil">tot ' + esc(u.tot || '?') + '</span>' +
+          (u.status === 'gevraagd' ? '<input class="veld uTekst" id="ut-' + esc(u.id) + '" placeholder="wat zegt de vrijwilliger?" maxlength="300" aria-label="Toestemming">' +
+            '<button class="knop stil" data-uja="' + esc(u.id) + '">Akkoord</button>' +
+            '<button class="knop stil" data-unee="' + esc(u.id) + '">Niet akkoord</button>' : '') +
+          (u.status === 'lopend' ? '<button class="knop stil" data-ustop="' + esc(u.id) + '">Beeindigen</button>' : '') +
+          '<div class="sub">' + esc(u.reden) + '</div></div>').join('')
+        : '<div class="leeg">Geen uitleen in of uit deze stad.</div>') +
+      (uit.gasten.length ? '<div class="sub">Nu hier aan het werk vanuit een andere stad: ' +
+        uit.gasten.map(g => esc(g.naam) + ' (' + esc(g.eigenStad || '?') + ')').join(', ') + '</div>' : '') +
+      '<div class="uitleg">Een vrijwilliger wordt gevraagd, niet verplaatst. Zonder vastgelegde toestemming loopt de uitleen niet, en de ontvangende stad ziet vaardigheden en beschikbaarheid &mdash; geen evaluaties en geen urenhistorie.</div></div>' +
+
+    '<div class="kaart"><div class="sec">Landelijke campagnes</div>' +
+      (camp.campagnes.length ? camp.campagnes.map(c => '<div class="lijnrij"><span class="naam"><b>' + esc(c.naam) + '</b></span>' +
+        '<span class="pil">' + esc(c.status) + '</span><span class="pil">' + eur(c.opgehaald) + ' opgehaald</span>' +
+        '<span class="pil ' + (c.sluitend ? 'goed' : 'fout') + '">sleutel ' + (c.sluitend ? 'sluit' : 'sluit NIET') + '</span>' +
+        '<div class="sub">' + c.sleutel.map(s => esc(s.stadNaam) + ' ' + s.procent + '%').join(' &middot; ') + '</div></div>').join('')
+        : '<div class="leeg">Nog geen landelijke campagne.</div>') +
+      '<div class="uitleg">De verdeelsleutel telt op tot exact 100% en de verdeling verliest geen cent. Campagnegeld landt als bron in de stad zelf, niet vastgeklonken aan een project.</div></div>' +
+
+    '<div class="kaart"><div class="sec">Benchmark</div>' +
+      (bench.landelijk
+        ? '<div class="sub">' + esc(bench.uitleg) + '</div>' +
+          bench.steden.map(s => '<div class="lijnrij"><span class="naam">' + esc(s.naam) + '</span>' +
+            (s.gemeten
+              ? '<span class="pil">' + s.geholpen + ' geholpen</span>' +
+                '<span class="pil">' + (s.geholpenPerProject === null ? '--' : s.geholpenPerProject) + ' per actief project</span>' +
+                '<span class="pil">' + (s.urenPerVrijwilliger === null ? '--' : s.urenPerVrijwilliger) + ' uur per vrijwilliger</span>'
+              : '<span class="pil let">niet gemeten</span>') + '</div>').join('') +
+          (bench.signalen.length ? bench.signalen.map(x => '<div class="sub">' + esc(x.stad) + ': ' + esc(x.wat) + ' &mdash; ' + esc(x.vraag) + '</div>').join('') : '')
+        : '<div class="rij">' + stat(bench.eigen.geholpen, 'geholpen') +
+          stat(bench.eigen.geholpenPerProject === null ? '--' : bench.eigen.geholpenPerProject, 'per actief project') +
+          stat(bench.mediaan.geholpenPerProject === null ? '--' : bench.mediaan.geholpenPerProject, 'landelijke mediaan') + '</div>' +
+          '<div class="uitleg">' + esc(bench.uitleg) + '</div>') + '</div>' +
+
+    '<div class="kaart"><div class="sec">Koppelingen met RTG</div>' +
+      bord.koppelingen.map(k => '<div class="lijnrij"><span class="naam">' + esc(k.naam) + '</span>' +
+        '<span class="pil ' + (k.werkt ? 'goed' : 'let') + '">' + (k.werkt ? 'werkt' : 'nog niet') + '</span>' +
+        '<div class="sub">' + esc(k.wat) + (k.nodig ? ' &mdash; ' + esc(k.nodig) : '') + '</div></div>').join('') +
+      '<div class="uitleg">Wat hier op &quot;nog niet&quot; staat, doet ook echt niets: een knop die stilletjes niets doet is erger dan geen knop. Een activiteit in uw eigen RTG-agenda zetten kan wel, vanaf het tabblad Activiteiten.</div></div>');
+
+  $('#bdDeel').addEventListener('click', () => doe('blauwdruk/deel', {
+    projectId: $('#bdProject').value, aanpak: $('#bdAanpak').value,
+    geleerd: $('#bdGeleerd').value, doorlooptijd: $('#bdDuur').value
+  }, tekenTab));
+  $('#tabIn').querySelectorAll('[data-overnemen]').forEach(b => b.addEventListener('click', () =>
+    api('blauwdruk/overnemen', { id: b.dataset.overnemen, stad: STAD.id })
+      .then(r => { melding(r.melding, true); tekenTab(); })
+      .catch(e => melding(e.message, false))));
+  $('#ikMaak').addEventListener('click', () => doe('inkoop/maak', {
+    stad: STAD.id, wat: $('#ikWat').value, eenheid: $('#ikEenheid').value,
+    indicatie: $('#ikPrijs').value, leverancier: $('#ikLev').value
+  }, tekenTab));
+  $('#tabIn').querySelectorAll('[data-inschrijf-inkoop]').forEach(b => b.addEventListener('click', () => {
+    const w = document.getElementById('i-' + b.dataset.inschrijfInkoop);
+    doe('inkoop/inschrijven', { id: b.dataset.inschrijfInkoop, projectId: w.querySelector('.iProject').value,
+      aantal: w.querySelector('.iAantal').value, bronId: w.querySelector('.iBron').value }, tekenTab);
+  }));
+  $('#tabIn').querySelectorAll('[data-sluit-inkoop]').forEach(b => b.addEventListener('click', () => {
+    const w = document.getElementById('i-' + b.dataset.sluitInkoop);
+    api('inkoop/sluit', { id: b.dataset.sluitInkoop, perStuk: w.querySelector('.iPrijs').value,
+      extra: w.querySelector('.iExtra').value || 0 })
+      .then(r => { melding(r.melding, true); tekenTab(); })
+      .catch(e => melding(e.message, false));
+  }));
+  $('#tabIn').querySelectorAll('[data-uja]').forEach(b => b.addEventListener('click', () => {
+    const veld = document.getElementById('ut-' + b.dataset.uja);
+    doe('uitleen/toestemming', { id: b.dataset.uja, akkoord: true, tekst: veld ? veld.value : '' }, tekenTab);
+  }));
+  $('#tabIn').querySelectorAll('[data-unee]').forEach(b => b.addEventListener('click', () =>
+    doe('uitleen/toestemming', { id: b.dataset.unee, akkoord: false }, tekenTab)));
+  $('#tabIn').querySelectorAll('[data-ustop]').forEach(b => b.addEventListener('click', () =>
+    doe('uitleen/beeindig', { id: b.dataset.ustop }, tekenTab)));
+}
+
+/* ---------- bestuur: modules, limieten, zetels ---------- */
+async function tabBestuur() {
+  const landelijk = IK.landelijk;
+  const modules = (IK.vlaggen || []).map(v => {
+    const aan = (STAD.vlaggen || []).includes(v);
+    return '<button class="knop stil ' + (aan ? 'aan' : '') + '" data-module="' + esc(v) + '" data-aan="' + (aan ? '' : '1') + '"' +
+      (landelijk ? '' : ' disabled') + '>' + (aan ? '● ' : '○ ') + esc(v) + '</button>';
+  }).join('');
+  raam('<div class="kaart"><div class="sec">Modules in deze stad</div>' +
+    '<div class="modules">' + modules + '</div>' +
+    '<div class="uitleg">' + (landelijk
+      ? 'Wat hier uit staat, kan in deze stad niet worden aangemaakt of gewijzigd -- dat is wat een module-schakelaar hoort te betekenen.'
+      : 'Modules zet het landelijke bestuur aan of uit.') + '</div></div>' +
+  '<div class="kaart"><div class="sec">Status van de afdeling</div>' +
+    '<div class="rij">' + ['verkend', 'in_oprichting', 'actief', 'geblokkeerd', 'beeindigd']
+      .map(s => '<button class="knop stil ' + (STAD.status === s ? 'aan' : '') + '" data-stadstatus="' + s + '"' + (landelijk ? '' : ' disabled') + '>' + s + '</button>').join('') + '</div>' +
+    '<div class="uitleg">Een geblokkeerde stad blijft leesbaar maar is niet meer schrijfbaar: toezicht stopt de uitvoering en wist de geschiedenis niet.</div></div>' +
+  '<div class="kaart"><div class="sec">Goedkeuringslimieten</div>' +
+    '<div class="rij"><input class="veld" id="lProj" type="number" min="0" step="0.01" value="' + STAD.limieten.projectleider + '" aria-label="Limiet projectleider">' +
+    '<button class="knop stil" data-limiet="projectleider"' + (landelijk ? '' : ' disabled') + '>Projectleider</button>' +
+    '<input class="veld" id="lStad" type="number" min="0" step="0.01" value="' + STAD.limieten.stadsbestuur + '" aria-label="Limiet stadsbestuur">' +
+    '<button class="knop stil" data-limiet="stadsbestuur"' + (landelijk ? '' : ' disabled') + '>Stadsbestuur</button></div>' +
+    '<div class="uitleg">Een stad kan zijn limiet verlagen, nooit verhogen. Boven de hoogste trede beslist het landelijke bestuur.</div></div>' +
+  '<div class="kaart"><div class="sec">Zetels</div>' +
+    (STAD.zetels.length ? STAD.zetels.map(z => '<div class="lijnrij"><span class="naam">' + esc(z.naam) + '</span>' +
+      '<span class="pil">' + esc(z.rol) + '</span><button class="knop stil" data-zetelweg="' + esc(z.id) + '">Intrekken</button></div>').join('')
+      : '<div class="leeg">Nog geen zetels in deze stad.</div>') +
+    '<div class="rij"><input class="veld" id="zKey" placeholder="Accountsleutel (user-123)" maxlength="80" aria-label="Sleutel">' +
+    '<input class="veld" id="zNaam" placeholder="Naam" maxlength="60" aria-label="Naam">' +
+    '<select class="veld" id="zRol" aria-label="Rol">' + (IK.rollen || []).map(r => '<option>' + esc(r) + '</option>').join('') + '</select>' +
+    '<button class="knop" id="zZet">Toekennen</button></div>' +
+    '<div class="uitleg">Een zetel hangt aan een echte inlog. De gedeelde kantoorcode krijgt er nooit een: een stad besturen en geld goedkeuren horen herleidbaar te zijn tot een mens.</div></div>' +
+  (landelijk ? '<div class="kaart"><div class="sec">Auditspoor (landelijk)</div><div id="auditIn"><div class="leeg">Laden...</div></div></div>' : ''));
+
+  $('#tabIn').querySelectorAll('[data-module]').forEach(b => b.addEventListener('click', () =>
+    doe('stad/module', { id: STAD.id, vlag: b.dataset.module, aan: b.dataset.aan === '1' }, () => openStad(STAD.id))));
+  $('#tabIn').querySelectorAll('[data-stadstatus]').forEach(b => b.addEventListener('click', () =>
+    doe('stad/status', { id: STAD.id, status: b.dataset.stadstatus }, () => openStad(STAD.id))));
+  $('#tabIn').querySelectorAll('[data-limiet]').forEach(b => b.addEventListener('click', () =>
+    doe('stad/limiet', { id: STAD.id, rol: b.dataset.limiet, bedrag: (b.dataset.limiet === 'projectleider' ? $('#lProj') : $('#lStad')).value }, () => openStad(STAD.id))));
+  $('#tabIn').querySelectorAll('[data-zetelweg]').forEach(b => b.addEventListener('click', () =>
+    doe('zetel/weg', { id: b.dataset.zetelweg }, () => openStad(STAD.id))));
+  $('#zZet').addEventListener('click', () =>
+    doe('zetel', { stad: STAD.id, key: $('#zKey').value, naam: $('#zNaam').value, rol: $('#zRol').value }, () => openStad(STAD.id)));
+  if (landelijk) {
+    api('audit').then(r => {
+      $('#auditIn').innerHTML = (r.regels.length
+        ? r.regels.slice(0, 40).map(a => '<div class="lijnrij"><span class="naam">' + esc(a.wat) + ' &middot; ' + esc(a.doel) + '</span>' +
+          '<span class="pil">' + esc(a.wie) + '</span><div class="sub">' + esc(a.extra) + ' &middot; ' + esc(a.at) + '</div></div>').join('')
+        : '<div class="leeg">Nog niets geregistreerd.</div>') +
+        (r.afgekapt ? '<div class="uitleg">' + r.afgekapt + ' oudere regels zijn uit het geheugen gelopen; dat aantal staat hier zodat &quot;er staat niets meer&quot; nooit leest als &quot;er is nooit iets geweest&quot;.</div>' : '');
+    }).catch(e => { $('#auditIn').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; });
+  }
+}
+
+/* ---------- starten ---------- */
+$('#nsMaak').addEventListener('click', () => doe('stad/maak', { naam: $('#nsNaam').value, land: $('#nsLand').value }, () => {
+  $('#nsNaam').value = '';
+  tekenSteden();
+}));
+
+if (TOKEN) {
+  laad().catch(e => { $('#ik').innerHTML = '<div class="melder fout">' + esc(e.message) + '</div>'; });
+}
+</script>
+<script src="/shared/deur.js"></script>
+<script src="/shared/deelmenu.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/levendekleur.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
+</body>
+</html>

@@ -1434,6 +1434,33 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
     ['/api/rtf/club/bericht', 'idem: schrijft alleen in het logboek van die ene clubcode'],
     ['/api/rtf/partner/raad', 'de raadcode is de geloofsbrief (vindCode); alleen de eigen partnerkant'],
 
+    /* Dezelfde familie, in het Foundation OS (routes/rtfos/portalen.js). Een
+       lokale stichting, een gemeente en een lokale ondernemer hebben geen
+       RTG-account: hun code bepaalt het dossier, niet de vraagsteller. Ze
+       dragen dezelfde twee remmen (20/min per bron, 60/min per code) en de
+       gemeentekant geeft per constructie alleen getelde cijfers terug, nooit
+       een casus of een naam (kern/rtfos/gemeente.js). */
+    ['/api/rtfos/portaal/partner', 'de partnercode is de geloofsbrief (vindCode); alleen het eigen partnerdossier'],
+    ['/api/rtfos/portaal/gemeente', 'de gemeentecode is de geloofsbrief; uitsluitend geaggregeerde cijfers van die ene stad'],
+    ['/api/rtfos/portaal/ondernemer', 'de bedrijfscode is de geloofsbrief; alleen het eigen aanbod en waar het heen ging'],
+
+    /* De drie doelgroepen zonder RTG-account (routes/rtfos/doelgroepen.js).
+       De eerste twee dragen dezelfde twee remmen als de codes hierboven; de
+       derde heeft geen code omdat er niets achter zit wat een code verdient --
+       zie kern/rtfos/publiek.js, waar de maat letterlijk is: wat zou je op een
+       poster in het buurthuis hangen? */
+    ['/api/rtfos/portaal/vrijwilliger', 'de vrijwilligerscode is de geloofsbrief; alleen zijn eigen planning en uren, geen contactgegevens en geen evaluaties'],
+    ['/api/rtfos/portaal/vrijwilliger/zet', 'idem: hij werkt zijn eigen beschikbaarheid bij; zijn VOG en status zet de afdeling'],
+    ['/api/rtfos/portaal/vrijwilliger/uren', 'idem: uren die hij opgeeft komen binnen als MELDING en tellen pas na bevestiging'],
+    ['/api/rtfos/portaal/deelnemer', 'de deelnemerscode is de geloofsbrief; uitsluitend de stand van die ene hulpvraag'],
+    ['/api/rtfos/portaal/deelnemer/intrekken', 'wie ja zei mag nee zeggen; een recht waarvoor je moet bellen naar de organisatie die je wilde stoppen, is geen recht'],
+    ['/api/rtfos/publiek/steden', 'de buurt-app: alleen wat op een poster in het buurthuis zou hangen, geen enkel getal over hulpvragen'],
+    ['/api/rtfos/publiek/stad', 'idem, per stad: lopende projecten en open activiteiten'],
+    ['/api/rtfos/publiek/campagnes', 'idem: welke landelijke campagnes lopen, zonder opgehaalde bedragen'],
+    ['/api/rtfos/portaal/donateur', 'de gever op zijn eigen code (RTFS-): alleen zijn eigen giften en waar ze heen gingen, nooit wie er nog meer gaf. Twee remmen, per bron en per code'],
+    ['/api/rtfos/portaal/donateur/bewijs', 'idem: het giftbewijs voor een van zijn eigen giften'],
+    ['/api/rtfos/publiek/jaarverslagen', 'de ANBI-publicatieplicht: een jaarstuk achter een inlog is niet gepubliceerd. Alleen wat het bestuur heeft vastgesteld EN gepubliceerd, met bevroren cijfers'],
+
     // ---- publieke informatie: staat ook gewoon op de site ----
     ['/api/pasprijzen', 'de prijslijst is publieke informatie'],
     ['/api/rtf/vacatures', 'openstaande vacatures zijn openbaar'],

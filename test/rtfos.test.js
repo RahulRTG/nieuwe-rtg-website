@@ -150,8 +150,12 @@ test.after(() => { stop(srv && srv.child); try { fs.rmSync(TMP, { recursive: tru
    anders staat de lezer met een verbod zonder uitleg.
    ------------------------------------------------------------------------- */
 test('geoormerkt geld gaat niet naar een ander project', async () => {
+  /* Het bedrag staat onder de herkomstdrempel (kern/rtfos/herkomst.js). Deze
+     toets gaat over het OORMERK; een gift van twintigduizend zou eerst blijven
+     staan voor de herkomstcontrole, en dan toetst hij twee dingen tegelijk. Dat
+     die tweede grendel werkt, staat in test/rtfos-governance.test.js. */
   const bron = await os_('bron/maak', { stad: HAARLEM, soort: 'donatie', gever: 'Fonds Kennemerland',
-    bedrag: 20000, projectId: JONGEREN, herbestemming: 'nooit' }, BESTUUR);
+    bedrag: 2000, projectId: JONGEREN, herbestemming: 'nooit' }, BESTUUR);
   assert.equal(bron.status, 200, JSON.stringify(bron.body).slice(0, 150));
   const bronId = bron.body.bron.id;
   assert.equal(bron.body.bron.geoormerkt, true);

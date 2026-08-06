@@ -36,6 +36,12 @@
      vrijwilligerportaal  de vrijwilliger zelf: planning, uren, VOG-datum
      deelnemerportaal     de hulpvrager zelf: de stand, en toestemming intrekken
      publiek          de app voor de buurt: geen inlog, dus de strengste grens
+     bestuur          vergaderingen, quorum, besluiten en vastgestelde notulen
+     beleid           landelijke regels; een nieuwe versie wist alle bevestigingen
+     jaarverslag      het ANBI-jaarstuk, met bevroren cijfers en een besluit eronder
+     risico           het risicoregister: beheerst is een bewering, niet een vinkje
+     herkomst         grote en contante giften: het geld staat stil tot er gekeken is
+     meldcode         de vijf wettelijke stappen bij zorg om een kind
 
    WAT DIT NIET IS. Geen tweede ledenadministratie en geen tweede boekhouding.
    De 30%-afdracht van RTG naar de stichting blijft in kern/fonds.js; dit OS
@@ -54,6 +60,12 @@ module.exports = (state) => {
   const partners = require('./partners')(ctx);
   const projecten = require('./projecten')(ctx);
   const vrijwilligers = require('./vrijwilligers')(ctx);
+  /* De herkomstcontrole staat VOOR het geld in deze lijst, en dat is geen
+     smaak: geld.js markeert een grote of contante gift al bij het aanmaken van
+     de bron. Een controle die pas ontstaat als iemand een scherm opent,
+     ontstaat niet. */
+  const herkomst = require('./herkomst')(ctx);
+  ctx.herkomstBepaal = herkomst.bepaal;
   const geld = require('./geld')(ctx);
   const casus = require('./casus')(ctx);
   const integriteit = require('./integriteit')(ctx);
@@ -87,6 +99,21 @@ module.exports = (state) => {
   /* De drie doelgroepen die tot nu toe wel in het systeem stonden maar er niet
      in konden: de vrijwilliger, de hulpvrager en de buurt. Alle drie op een
      eigen ingang met een eigen, engere blik -- zie de kop van elke module. */
+  /* Fase drie: de governance-laag. Het bestuur zelf (vergaderingen, quorum,
+     besluiten), de regels die het stelt, de verantwoording achteraf en de
+     dingen die mis kunnen gaan. Het jaarverslag leunt op twee andere delen --
+     de cijfers uit rapport.js en de besluitcontrole uit bestuur-notulen.js --
+     en maakt geen van beide na (LAT.md regel 4). */
+  const bestuur = require('./bestuur')(ctx);
+  const notulen = require('./bestuur-notulen')(ctx, { vind: bestuur.vind, beeld: bestuur.beeld,
+    mag: bestuur.mag, quorumVan: bestuur.quorumVan });
+  Object.assign(bestuur, notulen);
+  const beleid = require('./beleid')(ctx);
+  const jaarverslag = require('./jaarverslag')(ctx, { cijfersVan: rapport.cijfersVan,
+    besluitVindbaar: notulen.besluitVindbaar });
+  const risico = require('./risico')(ctx);
+  const meldcode = require('./meldcode')(ctx);
+
   const vrijwilligerportaal = require('./vrijwilligerportaal')(ctx);
   const deelnemerportaal = require('./deelnemerportaal')(ctx, { toestemmingWegDirect: casus.toestemmingWegDirect });
   const publiek = require('./publiek')(ctx);
@@ -123,6 +150,7 @@ module.exports = (state) => {
     partners, projecten, vrijwilligers, geld, casus, integriteit, rapport, gemeente, ondernemers,
     subsidies, voorraad, activiteiten, berichten,
     netwerk, inkoop, uitwisseling, campagnes, koppeling,
+    bestuur, beleid, jaarverslag, risico, herkomst, meldcode,
     vrijwilligerportaal, deelnemerportaal, publiek,
     VLAGGEN: ctx.VLAGGEN, ROLLEN: ctx.ROLLEN
   } };

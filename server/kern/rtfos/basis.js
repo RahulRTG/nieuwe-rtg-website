@@ -64,7 +64,11 @@ module.exports = ({ db, save, crypto, boardroomWie, magBoardroom }) => {
   const LEEG = { steden: [], zetels: [], partners: [], projecten: [], vrijwilligers: [],
     casussen: [], bronnen: [], uitgaven: [], subsidies: [], incidenten: [],
     gemeenten: [], ondernemers: [], voorraad: [], activiteiten: [], berichten: [],
-    blauwdrukken: [], inkoop: [], uitleen: [], campagnes: [], audit: [] };
+    blauwdrukken: [], inkoop: [], uitleen: [], campagnes: [],
+    // fase drie, de governance-laag: het bestuur zelf, de regels die het stelt,
+    // de verantwoording achteraf en de dingen die mis kunnen gaan
+    vergaderingen: [], beleid: [], jaarverslagen: [], risicos: [], meldcodes: [],
+    audit: [] };
   function S() {
     if (!db.data.rtfos || typeof db.data.rtfos !== 'object') db.data.rtfos = {};
     for (const k of Object.keys(LEEG)) if (!Array.isArray(db.data.rtfos[k])) db.data.rtfos[k] = [];

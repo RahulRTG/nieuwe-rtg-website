@@ -76,6 +76,18 @@ module.exports = (ctx, eigen) => {
       return { status: 403, error: 'Dit geld is geoormerkt voor "' + ((ander && ander.naam) || bron.projectId) +
         '" en kan niet naar "' + p.naam + '". Het landelijke bestuur kan een bron herbestemmen, met toestemming van de gever.' };
     }
+    /* De herkomstgrendel. Hij zit op de BRON en niet op de aanvrager (LAT.md
+       regel 7): wie het geld ook wil aanspreken, uit welke stad en met welke
+       rol, hij stuit op hetzelfde. Een grote gift waarvan niemand weet waar hij
+       vandaan komt, beweegt niet -- dat is het verschil met een waarschuwing. */
+    if (bron.herkomst && bron.herkomst.status === 'open') {
+      return { status: 403, error: 'Deze bron is een ' + bron.herkomst.reden + ' en wacht op de herkomstcontrole van het ' +
+        'landelijke bestuur. Tot die af is, kan er niets uit worden uitgegeven.' };
+    }
+    if (bron.herkomst && bron.herkomst.status === 'geweigerd') {
+      return { status: 403, error: 'Het landelijke bestuur heeft deze gift geweigerd. Er wordt niets uit besteed; ' +
+        'teruggeven loopt via de penningmeester.' };
+    }
     const beschikbaar = vrij(bron);
     if (c > beschikbaar) {
       return { status: 400, error: 'Er is nog ' + euro(beschikbaar) + ' euro vrij in deze bron (het niet-besloten deel telt mee).' };

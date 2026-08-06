@@ -85,11 +85,20 @@ module.exports = (ctx) => {
       gever: schoon(b.gever, 120) || 'onbekend', anoniem: b.anoniem === true,
       centen: c, besteed: 0, herbestemming: herb, kenmerk: schoon(b.kenmerk, 60),
       door: w.key, at: nu() };
+    /* De herkomstcontrole op grote en contante giften. Hij wordt HIER gezet en
+       niet in een apart scherm dat iemand moet openen: een controle die pas
+       ontstaat als er iemand aan denkt, ontstaat niet. Wat er dan gebeurt staat
+       in herkomst.js -- die ene plek beslist of er gekeken moet worden. */
+    const gemarkeerd = ctx.herkomstBepaal ? ctx.herkomstBepaal(bron) : null;
     S().bronnen.push(bron);
     audit(w.key, 'bron.maak', soort + ' ' + euro(c) + ' euro',
       projectId ? 'geoormerkt voor project ' + projectId : 'niet geoormerkt, stad ' + g.stad.naam);
     save();
-    return { ok: true, bron: bronBeeld(bron) };
+    return { ok: true, bron: bronBeeld(bron),
+      melding: gemarkeerd
+        ? 'Dit is een ' + gemarkeerd.reden + '. Het geld staat stil tot het landelijke bestuur de herkomst heeft ' +
+          'beoordeeld; tot dan kan er niets uit worden uitgegeven.'
+        : undefined };
   }
 
   /* Herbestemmen en de bron-uit-subsidie staan in ./geld-bron.js: dat zijn de

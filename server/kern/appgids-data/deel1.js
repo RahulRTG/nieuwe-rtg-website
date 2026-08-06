@@ -5,15 +5,18 @@ const G = (wat, doe, tip) => ({ wat, doe, tip });
 
 module.exports = {
   /* ---- het leden-OS en de leden-apps (RTG-toon: ingetogen, je/jij) ---- */
-  '/apps/index.html': G('Het RTG OS-bureaublad: alle apps van het platform als iconen, met de klok en je accounts.',
-    ['Meld je eerst aan; zonder aanmelding zie je alleen de welkomstkaart, het gratis RTG-abonnement is de minimale ingang', 'Tik een tegel; de app opent schermvullend en de terug-knop brengt je hier terug', 'Je ziet alleen de tegels van jouw wereld; met Toon alles zie je alles'],
-    'Dit is ook de voordeur van de website; op telefoon en groot scherm hetzelfde, passend geschaald.'),
-  '/apps/app.html': G('Jouw leden-app als besturingssysteem: mappen boven de klok, bellen en je wallet eronder, Rahul in de balk.',
-    ['Open een map en tik een app; sluiten brengt je terug op het beginscherm', 'Typ in de balk onderaan: het OS doet het zelf of Rahul pakt het op', 'Je ledenpas ligt in je wallet, de tegel rechts onder de klok'],
+  /* Er is nog maar EEN beginscherm. /apps/index.html (het scrollende
+     bureaublad) en /apps/bureau.html brengen je allebei hier; ze houden een
+     entry omdat de gids op pad zoekt en een oude link niets mag opleveren. */
+  '/apps/app.html': G('Je homescreen: mappen boven de klok, bellen en je wallet eronder, Rahul in de balk.',
+    ['Tik een app; omhoog vegen op het streepje onderin brengt je terug op de homescreen', 'Typ in de balk onderaan: het OS doet het zelf of Rahul pakt het op', 'Je ledenpas ligt in je wallet, de tegel rechts onder de klok'],
     'Je echte naam blijft in de kluis; partners zien alleen je codenaam. Dat is bewust ons ontwerp.'),
-  '/apps/bureau.html': G('Het RTG OS-bureaublad (zelfde als de voordeur): alle apps als iconen op elk scherm.',
-    ['Tik een tegel; de app opent schermvullend', 'Wissel rechtsboven tussen je accounts', 'Deze oude ingang toont hetzelfde bureaublad als de voordeur'],
-    'Handig op een tablet of tweede scherm: alles van RTG op één werkblad.'),
+  '/apps/index.html': G('De homescreen (dit pad brengt je daarheen).',
+    ['Tik een app; omhoog vegen op het streepje onderin brengt je terug'],
+    'Het scrollende bureaublad met alle apps in secties bestaat niet meer: een OS heeft een beginscherm, geen tweede.'),
+  '/apps/bureau.html': G('De homescreen (dit pad brengt je daarheen).',
+    ['Tik een app; omhoog vegen op het streepje onderin brengt je terug'],
+    'Een oude ingang uit de tijd dat er nog een apart bureaublad was.'),
   '/apps/berichten.html': G('Je berichten met vrienden en partners, automatisch vertaald als dat nodig is.',
     ['Stuur een bericht op codenaam', 'Bel of videobel vanuit het gesprek', 'Deel een snap of verhaal met wie jij kiest'],
     'Berichten in een andere taal worden voor je vertaald; jij leest en schrijft gewoon in je eigen taal.'),
@@ -62,6 +65,10 @@ module.exports = {
   '/apps/balans.html': G('RTG Balans: je financiële overzicht en de boekhoudhulp.',
     ['Bekijk inkomsten en uitgaven per maand', 'Laat de AI-boekhouder meedenken', 'Exporteer voor je administratie'],
     'Tien minuten per week naar je balans kijken voorkomt de meeste geldverrassingen.'),
+  '/apps/loonstrook.html': G('Mijn loon: je loonstroken van alle bedrijven waar je werkt, in gewone taal.',
+    ['Zie per periode wat er bruto binnenkwam en wat er afging', 'Lees waarom het bedrag zo uitkwam, stap voor stap',
+      'Kijk wie je identiteitsgegevens opvroeg, en waarom'],
+    'Alleen afgeronde loonruns komen hier; een proefberekening van je werkgever is nog geen loonstrook.'),
   '/apps/sport.html': G('RTG Sport: kampen, lessen en sportieve activiteiten van partners.',
     ['Bekijk het aanbod en de data', 'Meld je aan voor een kamp of les', 'Stel een vraag aan de organisatie'],
     'Begin klein: één vast uur per week houd je langer vol dan een groots plan.'),

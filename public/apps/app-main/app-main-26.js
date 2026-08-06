@@ -36,12 +36,10 @@
     else {
       const l = LINKS[item.slice(5)];
       if (!l) return;
-      // op een breed scherm opent een app als venster op het bureaublad
-      // (meerdere naast elkaar); op de telefoon gewoon schermvullend.
-      const openen = () => {
-        if (window.RTGVensters && RTGVensters.actief()) RTGVensters.open(l.url, l.app || l.naam || 'App');
-        else location.href = l.url;
-      };
+      // een app opent overal hetzelfde: schermvullend. Op een breed scherm
+      // werd hier een zwevend venster geopend; die vensterlaag is weg, want
+      // een app op iOS heeft geen kader, geen titelbalk en geen dock.
+      const openen = () => { location.href = l.url; };
       // prive-apps openen pas na de algemene pin (25-os-01a.js)
       if (l.prive) return metAlgPin(openen);
       openen();

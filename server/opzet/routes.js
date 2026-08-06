@@ -116,6 +116,9 @@ module.exports = function hangRoutesOp(kern) {
   require('../routes/borden')(grens('borden'));
   require('../routes/spellen')(grens('spellen'));
   require('../routes/leren')(grens('leren'));
+  /* Payroll OS: de routes van de nieuwe loonlaag (kern/payroll/), naast de
+     oude payroll-routes en met dezelfde poorten. */
+  require('../routes/payroll-os')(grens('payroll-os'));
   /* De RTF-bieb-routes (de kern staat al bij de Mall-bibliotheken). */
   require('../routes/rtfbieb')(grens('rtfbieb'));
   /* De Geloof & Wijsheid-Bibliotheek-routes (kern staat al hierboven). */
@@ -131,6 +134,10 @@ module.exports = function hangRoutesOp(kern) {
   require('../routes/labfonds')(grens('labfonds'));
   require('../routes/aanmeldingen')(grens('aanmeldingen'));
   require('../routes/ledenregister')(grens('ledenregister'));
+  /* De wervingslink /werken/<code>: een werkgever nodigt iemand uit die nog
+     geen RTG-account heeft, langs dezelfde uitnodiging als de kassacode van
+     routes/supplier/werving. */
+  Object.assign(kern, require('../routes/werving')(grens('werving')));
 
   /* De rest -- de kern-aanbouw met de routers die erbij horen -- staat in
      ./aanbouw.js. Daar wordt de kern nog VERDER gevuld (Object.assign) en

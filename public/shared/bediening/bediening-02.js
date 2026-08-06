@@ -87,12 +87,12 @@
     doe.appendChild(k);
   }
 
-  /* Widgets op het bureaublad: hier stond een losse plus-knop voor te zweven. */
-  function vulWidgets() {
-    if (!w.RTGBureau || !w.RTGBureau.mogelijk || !w.RTGBureau.mogelijk()) return;
-    var doe = rij(T('bdn.widgets', 'Widgets'), T('bdn.widgets.sub', 'Kaarten naast het scherm neerzetten of terugleggen.'));
-    doe.appendChild(knopje(T('bdn.kiezen', 'Kiezen'), false, function () { sluit(); w.RTGBureau.kiezer(); }));
-  }
+  /* Hier zat "Widgets": kaarten uit de app naast het scherm neerzetten, op de
+     lege ruimte links en rechts van het venster. Dat is een bureaublad met
+     losse widgets eromheen, en dat kent een telefoon niet -- daar staat de app
+     schermvullend en verder niets. De laag (shared/bureau.js) is weg, dus deze
+     rij ook. */
+  function vulWidgets() { /* niets meer: het bureaublad bestaat niet meer */ }
 
   function vulUitleg() {
     if (!w.RTGGids || !w.RTGGids.open) return;

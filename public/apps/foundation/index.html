@@ -122,6 +122,7 @@
 <link href="/shared/vensters.css" rel="stylesheet">
 <!-- niet defer: dit script draait voor elke inline-body-script en voor elk kader -->
 <script src="/shared/media.js"></script>
+<link href="/shared/ios.css" rel="stylesheet">
 </head>
 <body class="rtg-stijl">
 <a class="skip" href="#hoofd">Naar de inhoud</a>
@@ -756,20 +757,10 @@ window.addEventListener('hashchange', start);
 start();
 if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
 
-/* Op de desktop openen de tegels als vensters (net als in het RTG-OS): meerdere
-   apps naast elkaar, verplaatsbaar en schaalbaar. Op de telefoon navigeert een
-   tegel gewoon zoals altijd. */
-document.addEventListener('click', function(e){
-  if(!window.RTGVensters || !RTGVensters.actief()) return;
-  var a = e.target.closest ? e.target.closest('a.tile') : null;
-  if(!a) return;
-  var href = a.getAttribute('href'); if(!href || href.charAt(0) === '#') return;
-  e.preventDefault();
-  var h2 = a.querySelector('h2'); var titel = (h2 ? h2.textContent : a.textContent || 'App').trim();
-  RTGVensters.open(href, titel);
-}, false);
+/* Hier opende een tegel op de desktop als een zwevend VENSTER, met een dock en
+   stoplichtknopjes. Die vensterlaag is weg: een tegel navigeert nu overal
+   hetzelfde, want een app opent op iOS schermvullend en niet in een kader. */
 </script>
-<script src="/shared/vensters.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="samen.js" defer></script>
 <script src="/shared/basis.js" defer></script>
@@ -780,5 +771,6 @@ document.addEventListener('click', function(e){
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/sneltoets.js" defer></script>
+<script src="/shared/ios.js" defer></script>
 </body>
 </html>

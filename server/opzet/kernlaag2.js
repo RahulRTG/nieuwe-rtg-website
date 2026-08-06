@@ -69,6 +69,38 @@ Object.assign(kern, require('../kern/stadsraad')({ db, save, crypto }));
 /* RTG Payroll (kern/payroll.js): het loonkantoor draait op wat het platform
    al weet -- de klok, de rollen en de fiscale landtabellen. */
 Object.assign(kern, require('../kern/payroll')({ db, save, crypto, accounts, LANDEN, klokVan, openVacatures, findSupplier }));
+/* Payroll OS (kern/payroll/): de laag eronder -- regelpakketten met versies,
+   het componentenregister, contracten als ingangsdatum-versies, de herhaalbare
+   motor, de loonrun met vier ogen, het journaal en het betaalbestand.
+
+   Let op het pad: `./kern/payroll` hierboven wijst naar payroll.js (Node kiest
+   een bestand voor een map), `./kern/payroll/index.js` hier naar de nieuwe
+   laag. Ze staan bewust naast elkaar; zie de kop van index.js voor waarom de
+   oude nog niet weg kan. */
+Object.assign(kern, require('../kern/payroll/index.js').maakPayrollOS({ db, save, crypto, accounts,
+  inzagelog: require('../inzagelog'), notify: (k, m) => { try { kern.notify(k, m); } catch (e) {} },
+  logActivity: (c, a, t) => { try { kern.logActivity(c, a, t); } catch (e) {} } }));
+/* De meegeleverde jaargang komt langs dezelfde keuring als elk ander pakket en
+   staat daarna als ONGECONTROLEERD klaar: er mag geen definitieve loonrun op
+   tot iemand hem tegen het Handboek Loonheffingen heeft gelegd. */
+try { kern.payrollOS.laadMeegeleverd(); } catch (e) { console.error('[payrollOS] jaargang laden:', e.message); }
+/* DE BIJWERKKLOK GAAT HIER AAN. In kern/payroll/index.js staat met zoveel
+   woorden "het opstarten roept start() aan" -- en dat deed niemand. De laag die
+   is gebouwd om tarieven vanzelf binnen te halen, keek dus nooit. Dat is erger
+   dan geen automatische bijwerking hebben: het scherm zei "automatisch
+   bijwerken" en er gebeurde niets.
+
+   Eens per dag, wereldwijd: elke bron die per land is geregistreerd
+   (kern/payroll/dekking.js) wordt opgehaald, gekeurd en klaargezet als
+   ONGECONTROLEERD -- er gaat nooit vanzelf een definitieve loonrun op. Dezelfde
+   ronde kijkt vooruit naar jaargangen die aflopen zonder opvolger.
+
+   Niet in een testproces: RTG_PAYROLL_BIJWERKEN=0 zet hem uit, en de timer is
+   ge-unref'd zodat hij een proces nooit openhoudt. */
+if (process.env.RTG_PAYROLL_BIJWERKEN !== '0') {
+  try { kern.payrollOS.bijwerken.start(); } catch (e) { console.error('[payrollOS] bijwerkklok:', e.message); }
+}
+
 Object.assign(kern, require('../kern/labfonds')({ db, save, crypto, anthropic }));
 /* De werkplek (kern/werkplek.js): RTG en RTF als twee aparte huizen om in te
    werken. Ze delen het platform, maar niet hun cijfers, hun bezetting of hun

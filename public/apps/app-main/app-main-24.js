@@ -8,10 +8,22 @@
     stad:        { naam: 'Mijn Stad',    url: '/apps/stad.html' },
     clips:       { naam: 'Clips',        url: '/apps/clips.html' },
     office:      { naam: 'RTG Office',   url: '/apps/office.html' },
+    /* Hier stond een losse "Werk OS"-tegel naast "Mijn werkplekken": twee
+       tegels met hetzelfde koffertje, en erger, twee INLOGS. De ene ging via
+       het ene RTG-account, de andere vroeg opnieuw om een werkruimtecode en
+       een lid-token. Dat is precies wat "een account voor alles" niet mag
+       betekenen. De werkruimte is nu een sleutel aan diezelfde bos, dus er is
+       nog een deur: Mijn werkplekken. Wie er voor het eerst in moet, vindt de
+       werkruimte-inlog onderaan diezelfde kiezer. */
     sitemaker:   { naam: 'Website-maker', url: '/apps/sitemaker.html' },
     browser:     { naam: 'RTG Browser',  url: '/apps/browser.html' },
     vonk:        { naam: 'Vonk',         url: '/apps/vonk.html' },
     balans:      { naam: 'Balans',       url: '/apps/balans.html' },
+    /* Mijn loon staat bij Geld en niet bij Werk: het is uw geld, niet iets van
+       uw werkgever. Wie nergens werkt vindt een lege lijst met de zin die dat
+       uitlegt -- dat is beter dan een tegel die verdwijnt zodra u van baan
+       wisselt. Prive: dit scherm draagt uw loon en uw inzagespoor. */
+    loonstrook:  { naam: 'Mijn loon',    url: '/apps/loonstrook.html' },
     rechterhand: { naam: 'De Rechterhand', url: '/apps/lifestyle.html' },
     reisboek:    { naam: 'Reisboek',      url: '/apps/reisboek.html' },
     cellier:     { naam: 'Cellier',       url: '/apps/cellier.html' },
@@ -75,7 +87,8 @@
       'link:flits', 'link:stad', 'link:reisboek', 'link:hangar', 'link:residentie', 'link:maison'] },
     { sleutel: 'map-geld', naam: 'Geld', items: [
       'tab:betalen', 'tab:bestellen', 'link:wallet', 'link:bank', 'link:wbw', 'link:rtgcode',
-      'link:balans', 'tab:assets', 'link:labfonds', 'link:mecenaat', 'link:nalatenschap', 'link:logboek'] },
+      'link:balans', 'link:loonstrook', 'tab:assets', 'link:labfonds', 'link:mecenaat',
+      'link:nalatenschap', 'link:logboek'] },
     { sleutel: 'map-salon', naam: 'De Salon', items: [
       'tab:salon', 'link:pulse', 'link:vrienden', 'os:snaps', 'link:camera', 'link:clips',
       'link:muziek', 'link:podium', 'link:theater', 'link:spelen', 'link:vonk', 'link:nieuws',
@@ -94,34 +107,3 @@
     'mecenaat', 'nalatenschap', 'logboek', 'cercle', 'hangar', 'entourage', 'attenties', 'rendezvous']);
   const premiumPas = pas === 'lifestyle' || pas === 'business';
 
-  /* ---------- Werk op het OS + de algemene pin ----------
-     De werk-apps zijn gewone apps op het RTG-OS: een tik op "Werk" toont de
-     werkplekken die aan het ene RTG-account gekoppeld zijn (bevoegdheid), en
-     openen gaat met de algemene pin (het bewijs), dezelfde pin die de
-     privacygevoelige apps op dit OS beschermt. Onder water munt
-     /api/account/start de werksessie, dus alle regels (zoals het werkvenster
-     van de werkgever) blijven gewoon gelden. Deelt de OS-IIFE-scope:
-     OSAPPS/MAPPEN/LINKS komen uit 25-os-01.js, de kiezer-scrim uit 01b. */
-  OSAPPS.werk = { naam: 'Werk' };
-  // Werk staat in de map "Het Huis" en opent met de algemene pin.
-  // deze apps zijn prive: openen kan pas na de algemene pin (5 min geldig)
-  for (const pk of ['berichten', 'vonk', 'rendezvous', 'wbw']) { if (LINKS[pk]) LINKS[pk].prive = true; }
-
-  let pinOkTot = 0; // de pin blijft vijf minuten geldig, zoals op een telefoon
-  // de werkplek-zone kan om een positie vragen: dan een keer ophalen en
-  // opnieuw proberen; de server vergelijkt en bewaart er niets van
-  const vraagPositie = () => new Promise(af => {
-    if (!navigator.geolocation) return af(null);
-    navigator.geolocation.getCurrentPosition(
-      p => af({ lat: p.coords.latitude, lng: p.coords.longitude }),
-      () => af(null), { enableHighAccuracy: true, timeout: 8000 });
-  });
-  const WERKDOEL = {
-    personeel: { glyf: 'navigatie', app: 'Personeel (PDA)', url: '/apps/personeel.html', bewaar: (t, r) => { localStorage.setItem('rtg_pda_token', t); localStorage.setItem('rtg_pda_code', r.code || ''); } },
-    zaak:      { glyf: 'maison', app: 'Leverancier',    url: '/apps/leverancier.html', bewaar: (t) => { localStorage.setItem('rtg_sup_token', t); } },
-    kantoor:   { glyf: 'office', app: 'Backoffice',     url: '/apps/backoffice.html', bewaar: (t) => { localStorage.setItem('rtg_office_token', t); } }
-  };
-
-  /* vraag de algemene pin (of zet hem eerst) en geef hem door aan af(pin) */
-  function metAlgPin(af) {
-    if (Date.now() < pinOkTot) return af(null);

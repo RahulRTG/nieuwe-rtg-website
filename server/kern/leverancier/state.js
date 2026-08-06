@@ -100,8 +100,16 @@ module.exports = (ctx) => {
         ritOmzet: klaarAll.reduce((s2, r) => s2 + (r.quote || 0), 0),
         boekingen: alleBoekingen.length
       },
-      // personeelszaken voor het kantoor: verlofaanvragen en wie er nu binnen is
-      verlof: (db.data.verlof[s.code] || []).slice(0, 30),
+      /* personeelszaken voor het kantoor: verlofaanvragen en wie er nu binnen is.
+
+         EEN ZIEKMELDING GAAT HIER ZONDER OMSCHRIJVING DE DEUR UIT. De route
+         weigert er tegenwoordig een (routes/staff/dienst.js), maar dit is de
+         plek waar het gegeven de werkgever BEREIKT, en dat is de plek waar je
+         het tegenhoudt: oudere meldingen kunnen er nog een dragen, en een
+         scherm dat hem morgen wel toont is een regel opmaak. Wat iemand heeft
+         hoort bij de arbodienst; hier gaat alleen mee DAT hij er niet is. */
+      verlof: (db.data.verlof[s.code] || []).slice(0, 30).map(v =>
+        v.soort === 'ziek' && v.reden ? Object.assign({}, v, { reden: '' }) : v),
       klok: (() => {
         const entries = (db.data.klok[s.code] || []).filter(e => e.in.slice(0, 10) === vandaag).slice(0, 60);
         return { vandaag: entries, binnen: [...new Set(entries.filter(e => !e.out).map(e => e.name))] };

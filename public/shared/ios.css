@@ -1,0 +1,227 @@
+/* ============================ De iOS-laag ============================
+   Eén blad voor het hele OS. Hiervoor droeg elke app-pagina een stapel
+   metaforen van een ander apparaat: een sleepbaar bureaublad-venster
+   (desktopframe), een vensterbeheerder met dock en stoplichtknopjes
+   (vensters), een tegel-werkblad, widget-bureaubladen (bureau/flagship),
+   een bovenbalk met woordmerk en accountchip (osbar) en een uitschuivende
+   hamburger (osmenu). Dat is een computer, geen telefoon.
+
+   Wat een telefoon wél heeft, en verder niets:
+
+     - een NAVIGATIEBALK van 44 punten, en alleen als er iets te navigeren
+       of te bedienen valt. Een balk die alleen de naam van de app herhaalt
+       is geen navigatie; die is hier weg.
+     - een GROTE TITEL die bij het scrollen in die balk terugzakt.
+     - een HOME-INDICATOR onderin: omhoog vegen brengt je thuis.
+     - een RANDVEEG van links terug in de geschiedenis.
+     - BLADEN (sheets) die van onder komen, in plaats van vensters.
+
+   De kleuren blijven van het huis: de grond is de diepe zwarte motorkap,
+   het accent is de levende dagkleur uit shared/dagkleur.css met bordeaux
+   als terugval, en de letters zijn Inter (functioneel) en Bodoni Moda
+   (grote titels). iOS levert de VORM, RTG levert de KLEUR.
+
+   Insluiten NA de eigen stijl van de pagina; shared/ios.js zet de laag aan. */
+
+:root{
+  --ios-grond:#0C0C0B;
+  --ios-inkt:#F4F1EC;
+  --ios-grijs:rgba(244,241,236,0.60);
+  --ios-lijn:rgba(255,255,255,0.10);
+  --ios-accent:var(--dag-kleur,#C23A5E);
+  --ios-materiaal:rgba(12,12,11,0.72);
+
+  --ios-balk:44px;                                  /* de vaste hoogte van iOS */
+  --ios-boven:env(safe-area-inset-top,0px);
+  --ios-onder:env(safe-area-inset-bottom,0px);
+  /* de ruimte die de home-indicator onderaan opeist */
+  --ios-thuis-ruimte:calc(var(--ios-onder) + 26px);
+}
+
+/* ---------------------------------------------------------------- de balk */
+/* De balk wordt TER PLEKKE omgebouwd: hetzelfde <header>-element, zodat geen
+   knop en geen id verloren gaat (zie shared/ios.js). Daar hangt een prijs aan:
+   de pagina heeft voor datzelfde element vaak al een eigen regel staan --
+   `header{padding:1rem 1.1rem .7rem; border-bottom:...; display:flex; gap:...}`
+   -- en die telt gewoon door. Dan is de balk geen 44 punten meer maar 70, met
+   twee achtergronden over elkaar. Deze regels zetten de kop terug op nul; wat
+   de balk nodig heeft, zet hij daarna zelf. */
+.ios-nav{
+  display:block !important;
+  padding:var(--ios-boven) 0 0 !important;
+  margin:0 !important;
+  gap:0 !important;
+  min-height:0 !important;
+  border:0 !important;
+  border-bottom:0.5px solid var(--ios-lijn) !important;
+  border-radius:0 !important;
+  box-shadow:none !important;
+  position:sticky; top:0; z-index:40;
+  background:var(--ios-materiaal) !important;
+  -webkit-backdrop-filter:saturate(180%) blur(20px);
+  backdrop-filter:saturate(180%) blur(20px);
+}
+/* Links en rechts krijgen precies wat ze nodig hebben, de titel krijgt de rest
+   en mag krimpen (minmax(0,1fr), anders weigert een grid-kolom smaller te
+   worden dan zijn inhoud). Met 1fr aan de zijkanten liep "Exporteer +
+   Afspraak" de balk uit en raakte de laatste knop de schermrand. */
+.ios-nav-rij{
+  display:grid; grid-template-columns:auto minmax(0,1fr) auto; align-items:center;
+  gap:0.4rem; min-height:var(--ios-balk);
+  padding-inline:max(0.6rem, env(safe-area-inset-left,0px)) max(0.6rem, env(safe-area-inset-right,0px));
+}
+
+/* de terugknop: chevron plus het label van waar je vandaan komt */
+.ios-terug{
+  justify-self:start;
+  display:inline-flex; align-items:center; gap:0.12rem;
+  background:none; border:none; padding:0.3rem 0.4rem 0.3rem 0.1rem;
+  font:400 17px/1 'Inter',system-ui,sans-serif;
+  color:var(--ios-accent); cursor:pointer; text-decoration:none;
+  max-width:9rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+}
+.ios-terug svg{width:17px; height:22px; flex:none; stroke-width:2.4;}
+.ios-terug:active{opacity:0.4;}
+
+/* de titel: 17 punten halfvet, altijd gecentreerd, nooit een woordmerk */
+.ios-nav-titel{
+  grid-column:2;
+  font:600 17px/1.2 'Inter',system-ui,sans-serif;
+  color:var(--ios-inkt);
+  text-align:center; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  max-width:min(60vw,22rem);
+  /* zolang de grote titel boven in beeld staat, is de kleine titel weg */
+  opacity:0; transition:opacity 0.2s ease;
+}
+.ios-nav[data-titel-vast] .ios-nav-titel,
+.ios-nav:not([data-groot]) .ios-nav-titel{opacity:1;}
+
+/* de acties rechts: iOS zet ze op 17 punten in de accentkleur, geen knopvlak */
+.ios-nav-acties{
+  grid-column:3; justify-self:end;
+  display:flex; align-items:center; gap:0.25rem;
+}
+.ios-nav-acties > *{
+  font:400 17px/1 'Inter',system-ui,sans-serif !important;
+  color:var(--ios-accent) !important;
+  background:none !important; border:none !important;
+  padding:0.3rem 0.45rem !important; border-radius:8px;
+  cursor:pointer; white-space:nowrap;
+}
+.ios-nav-acties > *:active{opacity:0.4;}
+/* één actie mag nadruk krijgen (Gereed/Bewaar): halfvet, verder niets */
+.ios-nav-acties > .ios-nadruk{font-weight:600 !important;}
+
+/* de tweede rij: zoekveld, filters, segmenten -- zoals Berichten en Mail */
+.ios-nav-extra{
+  padding:0 max(0.75rem, env(safe-area-inset-left,0px)) 0.5rem;
+  display:flex; flex-direction:column; gap:0.5rem;
+}
+.ios-nav-extra input[type=search],
+.ios-nav-extra input[type=text]{
+  width:100%; border:none; border-radius:10px;
+  background:rgba(244,241,236,0.09); color:var(--ios-inkt);
+  font:400 17px/1 'Inter',system-ui,sans-serif; padding:0.5rem 0.7rem;
+}
+.ios-nav-extra input::placeholder{color:var(--ios-grijs);}
+
+/* Een balk waar niets zichtbaars in staat, is precies het behang dat hier weg
+   moest. Bij Berichten zijn het zoekveld, de taalkiezer en de filterrij
+   `hidden` tot je bent ingelogd; dan stond er een lege balk van 44 punten
+   boven de grote titel. Dat kan niet in JavaScript beslist worden -- op het
+   moment dat de laag draait weet niemand of de app die dingen straks
+   zichtbaar maakt. Met :has() weegt de browser het zelf, elke frame opnieuw:
+   de balk zakt weg zodra hij leeg is, en komt terug zodra de app zijn knoppen
+   toont of je ver genoeg scrolt om de kleine titel nodig te hebben. */
+.ios-nav:not([data-titel-vast]):not(:has(.ios-terug)):not(:has(.ios-nav-acties > *:not([hidden]))):not(:has(.ios-nav-extra > *:not([hidden]))){
+  display:none !important;
+}
+
+/* ------------------------------------------------------ de grote titel */
+.ios-groot{
+  font-family:'Bodoni Moda',serif; font-weight:500;
+  font-size:34px; line-height:1.15; letter-spacing:-0.01em;
+  color:var(--ios-inkt);
+  padding:0.3rem max(1rem, env(safe-area-inset-left,0px)) 0.6rem;
+  margin:0;
+}
+
+/* ------------------------------------------------- de home-indicator */
+.ios-thuis{
+  position:fixed; left:50%; transform:translateX(-50%);
+  bottom:calc(var(--ios-onder) + 6px);
+  z-index:60; width:150px; height:22px;
+  background:none; border:none; padding:0; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  touch-action:none;
+}
+.ios-thuis::after{
+  content:""; width:134px; height:5px; border-radius:2.5px;   /* de maat van iOS */
+  background:color-mix(in srgb, var(--ios-inkt) 60%, transparent);
+}
+.ios-thuis:focus-visible{outline:2px solid var(--ios-accent); outline-offset:3px;}
+/* de pil ligt over de inhoud: die houdt onderaan ruimte vrij */
+body[data-ios]{padding-bottom:var(--ios-thuis-ruimte);}
+
+/* ----------------------------------------- openen, sluiten, terugveren */
+@media (prefers-reduced-motion: no-preference){
+  body[data-ios]{
+    animation:ios-lanceer 0.35s cubic-bezier(0.32,0.72,0.36,1);
+    transform-origin:50% 82%;
+  }
+  @keyframes ios-lanceer{
+    from{transform:scale(0.90) translateY(14px); opacity:0.3;}
+    to{transform:none; opacity:1;}
+  }
+}
+body[data-ios].ios-veert{
+  transition:transform 0.24s cubic-bezier(0.32,0.72,0.36,1), opacity 0.24s ease;
+}
+body[data-ios].ios-weg{
+  transition:transform 0.22s ease-in, opacity 0.22s ease-in;
+  transform:scale(0.84) translateY(-10vh) !important; opacity:0 !important;
+}
+
+/* -------------------------------------------------------------- bladen */
+/* Wat vroeger een venster was, komt nu van onder: een blad met een greep,
+   afgeronde bovenhoeken en een donkere laag erachter. Sluiten gaat met een
+   veeg omlaag of een tik naast het blad. */
+.ios-waas{
+  position:fixed; inset:0; z-index:70;
+  background:rgba(0,0,0,0.45);
+  opacity:0; transition:opacity 0.3s ease;
+}
+.ios-waas.ios-aan{opacity:1;}
+.ios-blad{
+  position:fixed; left:0; right:0; bottom:0; z-index:71;
+  max-height:92dvh; overflow:auto; -webkit-overflow-scrolling:touch;
+  background:#151312; color:var(--ios-inkt);
+  border-radius:12px 12px 0 0;
+  padding:0 0 calc(var(--ios-onder) + 1.2rem);
+  transform:translateY(100%);
+  transition:transform 0.34s cubic-bezier(0.32,0.72,0.36,1);
+  box-shadow:0 -1px 0 var(--ios-lijn);
+}
+.ios-blad.ios-aan{transform:none;}
+.ios-blad .ios-greep{
+  position:sticky; top:0; display:flex; justify-content:center;
+  padding:0.55rem 0 0.45rem; background:inherit; cursor:grab;
+}
+.ios-blad .ios-greep::after{
+  content:""; width:36px; height:5px; border-radius:2.5px;
+  background:rgba(244,241,236,0.30);
+}
+
+/* --------------------------------------------------------- wat weg is */
+/* Blijft staan voor het geval een pagina de oude klassen nog in zijn eigen
+   stijl noemt: het merkteken van RTG hoort niet in de chrome van een app.
+   Het icoon op de homescreen is het merk; binnen de app niet nog een keer. */
+body[data-ios] .os-merk,
+body[data-ios] .os-merk-logo,
+body[data-ios] .osbar,
+body[data-ios] .os-chip{display:none !important;}
+
+@media (prefers-reduced-motion: reduce){
+  body[data-ios]{animation:none;}
+  .ios-blad{transition:none;}
+}

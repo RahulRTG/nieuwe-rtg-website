@@ -44,6 +44,7 @@
   .kpi{font-size:.74rem;color:var(--soft);}
   .noot{font-size:.72rem;color:var(--soft);line-height:1.55;}
 </style>
+<link href="/shared/ios.css" rel="stylesheet">
 </head>
 <body class="rtg-stijl">
 <header>
@@ -52,6 +53,8 @@
     <button data-tab="overzicht" class="aan">Wie werkt waar</button>
     <button data-tab="loonrun">Loonrun</button>
     <button data-tab="match">Matching</button>
+    <button data-tab="os">Loonrun (OS)</button>
+    <button data-tab="wereld">Wereldwijd</button>
   </nav>
 </header>
 <main>
@@ -80,6 +83,98 @@
       <div class="sec">De matchtafel -- vacatures en mensen die bij elkaar passen</div>
       <div class="noot" style="margin-bottom:.5rem;">Alleen medewerkers die zichzelf "open voor werk" hebben gezet, staan op deze tafel; wie de schakelaar uit laat is voor werkgevers onvindbaar.</div>
       <div id="matchIn"><div class="leeg">Laden...</div></div>
+    </div>
+  </section>
+
+  <!-- ================= de loonrun van Payroll OS =================
+       Bewust een eigen tab naast de bestaande loonrun en niet eroverheen: die
+       draait de demo-berekening waar schermen aan hangen. Deze draait op de
+       nieuwe laag (kern/payroll/) met regelversies, bevindingen en vier ogen. -->
+  <section id="tabOs" hidden>
+    <div class="kaart">
+      <div class="sec">Regelpakketten</div>
+      <div class="noot" style="margin-bottom:.5rem;">Tarieven zijn geen constanten maar jaargangen met een versie. Een binnengehaald pakket staat <b>ongecontroleerd</b> tot iemand het aanmerkt; op zo'n pakket mag geen definitieve loonrun draaien.</div>
+      <div class="rij" style="margin-bottom:.5rem;">
+        <button class="knop" id="osHaal">Nu bijwerken</button>
+      </div>
+      <div id="osRegels"><div class="leeg">Laden...</div></div>
+    </div>
+
+    <div class="kaart">
+      <div class="sec">Looncomponenten</div>
+      <div class="noot" style="margin-bottom:.5rem;">Een looncomponent is een <b>regel</b>, geen veld: fooien voor de horeca, wachttijd voor een vervoerder, een eindejaarsuitkering voor een school. Wat je hier vastlegt bepaalt welke grondslagen een bedrag raakt -- telt hij mee voor de loonheffing, de premies, het vakantiegeld. Een component vervalt wel, maar verdwijnt nooit: oude stroken moeten leesbaar blijven.</div>
+      <div class="rij" style="margin-bottom:.5rem;">
+        <button class="knop" id="cpLaad">Toon het register</button>
+        <button class="knop" id="cpNieuw">Voeg een component toe</button>
+      </div>
+      <div id="cpLijst"></div>
+    </div>
+
+    <div class="kaart">
+      <div class="sec">Contracten</div>
+      <div class="noot" style="margin-bottom:.5rem;">Zonder contract staat iemand niet op de loonrun -- er wordt geen uurloon geraden. Een wijziging <b>overschrijft niet</b>: er komt een versie bij met een ingangsdatum, zodat een oude periode blijft rekenen met wat er toen gold.</div>
+      <div class="rij">
+        <select class="veld" id="ctZaak" style="flex:2;min-width:12rem;"></select>
+        <input class="veld" id="ctDatum" style="flex:1;min-width:8rem;" placeholder="peildatum 2026-07-01">
+        <button class="knop" id="ctLaad">Toon personeel</button>
+      </div>
+      <div id="ctLijst" style="margin-top:.6rem;"></div>
+    </div>
+
+    <div class="kaart">
+      <div class="sec">Loonrun openen</div>
+      <div class="rij">
+        <select class="veld" id="osZaak" style="flex:2;min-width:12rem;"></select>
+        <input class="veld" id="osPeriode" style="flex:1;min-width:7rem;" placeholder="2026-07">
+        <button class="knop" id="osOpen">Open concept</button>
+      </div>
+      <div class="noot" style="margin-top:.45rem;">De uren komen uit de klok van de zaak zelf; ze worden niet meegestuurd. Een ontbrekende uitklok wordt niet geschat maar gemeld.</div>
+      <div id="osUit" style="margin-top:.6rem;"></div>
+    </div>
+
+    <div class="kaart" id="osRunKaart" hidden>
+      <div class="sec" id="osRunTitel">Loonrun</div>
+      <div id="osBevindingen"></div>
+      <div id="osStroken" style="margin-top:.6rem;"></div>
+      <div class="rij" style="margin-top:.6rem;">
+        <button class="knop" id="osKeur">Goedkeuren als administrateur</button>
+        <button class="knop" id="osDef">Definitief maken</button>
+        <button class="knop" id="osJournaal">Loonjournaal</button>
+        <button class="knop" id="osAangifte">Loonaangifte</button>
+        <button class="knop" id="osDossier">Dossier (vier vragen)</button>
+      </div>
+      <div class="noot" style="margin-top:.45rem;">Definitief kan pas als de manager van de zaak ook heeft getekend, de bevindingen met ernst <b>hoog</b> zijn afgehandeld, en het regelpakket is aangemerkt.</div>
+      <div id="osNaRun" style="margin-top:.6rem;"></div>
+    </div>
+  </section>
+
+  <!-- ================= wereldwijd =================
+       Het overzicht waar de hele loonlaag op staat of valt. De motor is
+       landneutraal; wat een land tegenhoudt is het ONTBREKEN van een tabel, en
+       dat hoort een lijst te zijn en geen stilte. -->
+  <section id="tabWereld" hidden>
+    <div class="kaart">
+      <div class="sec">Dekking per land</div>
+      <div class="noot" style="margin-bottom:.5rem;">Elk land waar RTG zaken heeft, met de vraag die telt: kan hier een loonrun draaien? Er wordt niets geschat -- ligt er geen tabel, dan staat er wat er nog moet komen.</div>
+      <div class="rij" style="margin-bottom:.5rem;">
+        <input class="veld" id="wlPeil" style="flex:1;min-width:9rem;" placeholder="peildatum (leeg = vandaag)">
+        <button class="knop" id="wlLaad">Toon de wereld</button>
+        <button class="knop" id="wlRonde">Nu overal bijwerken</button>
+      </div>
+      <div id="wlTelling"></div>
+      <div id="wlVerval" style="margin-top:.5rem;"></div>
+      <div id="wlLanden" style="margin-top:.6rem;"><div class="leeg">Nog niet geladen.</div></div>
+    </div>
+
+    <div class="kaart">
+      <div class="sec">Een bron toevoegen</div>
+      <div class="noot" style="margin-bottom:.5rem;">Een https-adres dat een regelpakket als JSON teruggeeft. De dagelijkse ronde haalt hem op, keurt hem en zet hem klaar als <b>ongecontroleerd</b>; er gaat nooit vanzelf een definitieve loonrun op iets wat geen mens heeft aangemerkt.</div>
+      <div class="rij">
+        <input class="veld" id="brLand" style="width:6rem;" placeholder="NL" maxlength="2">
+        <input class="veld" id="brNaam" style="flex:1;min-width:9rem;" placeholder="Naam van de bron">
+        <input class="veld" id="brUrl" style="flex:2;min-width:14rem;" placeholder="https://...">
+        <button class="knop" id="brZet">Voeg toe</button>
+      </div>
     </div>
   </section>
 </main>
@@ -114,7 +209,13 @@ function uitgelogd(){
 if (!TOKEN) uitgelogd();
 const api = (pad, body) => fetch('/api/office/payroll/' + pad, { method: 'POST',
   headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN }, body: JSON.stringify(body || {}) })
-  .then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) { if (r.status === 401) uitgelogd(); throw new Error(d.error || 'Er ging iets mis.'); } return d; });
+  /* De bezwaren gaan MEE in de melding. De keuringslagen hieronder geven een
+     lijst terug ("uurloonCenten ontbreekt", "een tijdelijk contract heeft een
+     einddatum") en die viel er hier af: dan las het scherm alleen "afgekeurd"
+     en stond je te raden welk veld het was. */
+  .then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) { if (r.status === 401) uitgelogd();
+    const bez = Array.isArray(d.bezwaren) && d.bezwaren.length ? ' ' + d.bezwaren.join(' ') : '';
+    throw new Error((d.error || 'Er ging iets mis.') + bez); } return d; });
 const pastPil = p => '<span class="pil' + (p === 'overbelast' ? ' rood' : p === 'rustig' ? ' goud' : '') + '">' + esc(p) + '</span>';
 
 /* Meenemen (shared/uitvoer.js): dit loonkantoor houdt twee registers vast. Wat
@@ -187,8 +288,482 @@ document.querySelectorAll('nav [data-tab]').forEach(b => b.addEventListener('cli
   $('#tabOverzicht').hidden = b.dataset.tab !== 'overzicht';
   $('#tabLoonrun').hidden = b.dataset.tab !== 'loonrun';
   $('#tabMatch').hidden = b.dataset.tab !== 'match';
+  $('#tabOs').hidden = b.dataset.tab !== 'os';
+  $('#tabWereld').hidden = b.dataset.tab !== 'wereld';
   if (b.dataset.tab === 'match') laadMatch();
+  if (b.dataset.tab === 'os') laadOs().catch(e => meld(e.message));
+  if (b.dataset.tab === 'wereld') laadWereld().catch(e => meld(e.message));
 }));
+
+/* ================= Payroll OS =================
+   De nieuwe loonlaag. Drie dingen die dit scherm anders maken dan de tab
+   ernaast, en het zijn precies de drie waar het bij loon om gaat:
+
+   1. ELKE RUN DRAAGT ZIJN REGELVERSIE. Die staat in beeld, want "welke regel
+      en versie zijn gebruikt" is een van de vier vragen die elk bedrag moet
+      kunnen beantwoorden.
+   2. DE BEVINDINGEN STAAN VOOR DE BEDRAGEN. Niet eronder weggestopt: een
+      lijst die je moet zoeken, wordt niet gelezen. Hoog blokkeert het
+      definitief maken tot iemand het verklaart, met een reden.
+   3. VIER OGEN IS ZICHTBAAR. Je ziet wie er al heeft getekend en wie nog
+      niet, zodat niemand zich afvraagt waarom de knop niet werkt. */
+let OSRUN = null;
+
+/* Een eigen melder: dit scherm had er geen, en een fout die alleen in de
+   console staat is voor de gebruiker geen fout maar een knop die niets doet. */
+function meld(tekst){
+  let m = document.getElementById('osMelding');
+  if (!m) { m = document.createElement('div'); m.id = 'osMelding'; m.className = 'noot';
+    m.style.cssText = 'margin-top:.5rem;'; ($('#tabOs') || document.body).prepend(m); }
+  m.textContent = tekst;
+}
+
+const bevPil = e => '<span class="pil' + (e === 'hoog' ? ' rood' : e === 'midden' ? ' goud' : '') + '">' + esc(e) + '</span>';
+/* eurC en niet eur: dit scherm had al een eur() die EURO's krijgt; deze
+   krijgt CENTEN, want de nieuwe loonlaag rekent in centen. Twee keer const eur
+   in hetzelfde scriptblok is bovendien een SyntaxError -- dan draait er van dit
+   scherm niets meer. */
+/* BEDRAGEN IN HUN EIGEN MUNT. Dit heette eurC en zette overal een euroteken,
+   ook op een Japanse loonstrook -- en erger: het deelde altijd door honderd,
+   terwijl de yen geen onderverdeling heeft. Dat is een factor honderd in een
+   bedrag dat naar iemands rekening gaat.
+
+   Een bedrag is hier altijd een geheel getal in de KLEINSTE EENHEID van zijn
+   munt; de munt komt van de strook of de run. Zonder munt is EUR de terugval,
+   want dat is wat dit kantoor draait -- maar de strook zelf zegt dan ook dat er
+   is aangenomen (zie server/kern/payroll/valuta.js).
+
+   De KOMMA hoort bij de Nederlandse schrijfwijze en de MUNT bij het land van de
+   loonrun; dat zijn twee vragen. Een Nederlandse administrateur die een Japanse
+   strook bekijkt, leest Nederlandse cijfers met een Japanse munt. */
+const GEEN_DECIMALEN = ['BIF','CLP','DJF','GNF','ISK','JPY','KMF','KRW','PYG','RWF','UGX','VND','VUV','XAF','XOF','XPF'];
+const DRIE_DECIMALEN = ['BHD','IQD','JOD','KWD','LYD','OMR','TND'];
+const SYMBOOL = { EUR: '€', GBP: '£', JPY: '¥', USD: 'US$', CHF: 'CHF' };
+function bedrag(minor, code) {
+  const c = String(code || 'EUR').toUpperCase();
+  const d = GEEN_DECIMALEN.includes(c) ? 0 : DRIE_DECIMALEN.includes(c) ? 3 : 2;
+  const neg = minor < 0, abs = Math.abs(Math.round(Number(minor) || 0)), schaal = Math.pow(10, d);
+  const heel = Math.floor(abs / schaal), rest = abs - heel * schaal;
+  return (neg ? '-' : '') + (SYMBOOL[c] || c) + ' ' +
+    String(heel).replace(/\B(?=(\d{3})+(?!\d))/g, '.') + (d ? ',' + String(rest).padStart(d, '0') : '');
+}
+// de munt van de run die op dit moment op het scherm staat
+const runMunt = () => ((OSRUN && OSRUN.valuta) || 'EUR');
+const eurC = (c, code) => bedrag(c, code || runMunt());
+
+async function laadOs(){
+  const d = await api('regels', { land: 'NL' });
+  $('#osRegels').innerHTML = (d.pakketten || []).map(p =>
+    '<div class="regel"><b>' + esc(p.versie) + '</b>' +
+    '<span class="kpi">geldig ' + esc(p.geldigVan) + (p.geldigTot ? ' t/m ' + esc(p.geldigTot) : '') +
+    ' · bron ' + esc((p.bron || {}).naam || (p.bron || {}).soort || 'onbekend') + '</span>' +
+    '<span class="r">' + (p.stand === 'goedgekeurd'
+      ? '<span class="pil">aangemerkt door ' + esc(p.goedgekeurdDoor || '') + '</span>'
+      : '<span class="pil rood">ongecontroleerd</span> <button class="knop" data-keur="' + esc(p.versie) + '">Aanmerken</button>') +
+    '</span></div>').join('') || '<div class="leeg">Nog geen regelpakketten. Werk bij of laad een jaargang.</div>';
+  $('#osRegels').querySelectorAll('[data-keur]').forEach(b => b.addEventListener('click', async () => {
+    /* Aanmerken is een handeling met een naam eraan: hierna mag er echt geld
+       op deze tarieven worden overgemaakt. Daarom eerst bevestigen. */
+    if (!confirm('Zijn de tarieven van ' + b.dataset.keur + ' gecontroleerd tegen het Handboek Loonheffingen?\n\nNa aanmerken kan er een definitieve loonrun op draaien.')) return;
+    try { await api('regels/keur', { land: 'NL', versie: b.dataset.keur }); await laadOs(); }
+    catch (e) { meld(e.message); }
+  }));
+  // dezelfde zakenlijst als de andere tab; STAND is al geladen
+  if (STAND) {
+    const opties = STAND.zaken.map(z =>
+      '<option value="' + esc(z.code) + '">' + esc(z.naam) + '</option>').join('');
+    $('#osZaak').innerHTML = opties;
+    $('#ctZaak').innerHTML = opties;
+  }
+}
+
+/* ---------- het looncomponentenregister ----------
+   HIER ZAT DEZELFDE SOORT GAT als bij de contracten: de laag bestond, de
+   belofte stond in de kop van componenten.js ("een component is een regel, geen
+   veld"), en er was geen route en geen scherm. De elf uit de basisset waren
+   alles wat er ooit zou zijn. */
+const SOORTUITLEG = { bruto: 'verhoogt het brutoloon', inhouding: 'gaat er bruto af',
+  netto: 'raakt alleen het nettoloon', werkgever: 'kost de werkgever geld, staat niet op het nettoloon' };
+
+async function laadComponenten(){
+  const d = await api('componenten', {});
+  $('#cpLijst').innerHTML = (d.componenten || []).map(c =>
+    '<div class="regel"><b>' + esc(c.naam) + '</b>' +
+    '<span class="kpi">' + esc(c.sleutel) + ' · ' + esc(c.soort) + ' (' + esc(SOORTUITLEG[c.soort] || '') + ')' +
+    ' · ' + (c.belast ? 'belast' : 'onbelast') + (c.bijzonder ? ' · bijzonder tarief' : '') +
+    (c.grondslagen && c.grondslagen.length ? ' · grondslagen: ' + c.grondslagen.map(esc).join(', ') : '') +
+    (c.vakantiegeldgevend ? ' · vakantiegeldgevend' : '') +
+    (c.grootboek ? ' · grootboek ' + esc(c.grootboek) : ' · <b>geen grootboek</b>') +
+    ' · uit ' + esc(c.invoerbron) +
+    (c.geldigTot ? ' · vervalt ' + esc(c.geldigTot) : '') +
+    (c.basis ? '' : ' · toegevoegd door ' + esc(c.door || '?')) +
+    '</span><span class="r"><button class="knop" data-cp="' + esc(c.sleutel) + '">Wijzig</button></span></div>').join('')
+    || '<div class="leeg">Nog geen componenten.</div>';
+  $('#cpLijst').querySelectorAll('[data-cp]').forEach(b =>
+    b.addEventListener('click', () => componentForm((d.componenten || []).find(c => c.sleutel === b.dataset.cp))));
+}
+
+/* Bewust met prompts: dit is het kantoorscherm en de keuring aan de serverkant
+   zegt precies wat er mis is (belast zonder grondslagen, onbelast mét, een
+   sleutel met een spatie). Die bezwaren komen hieronder in beeld -- een half
+   formulier bouwen dat er als een echt formulier uitziet, is erger. */
+async function componentForm(bestaand){
+  const b = bestaand || {};
+  const sleutel = b.sleutel || prompt('Sleutel (kleine letters, cijfers en _; blijft voor altijd staan):');
+  if (!sleutel) return;
+  const naam = prompt('Naam zoals hij op de loonstrook komt:', b.naam || '');
+  if (!naam) return;
+  const soort = prompt('Soort?\nbruto = verhoogt het brutoloon\ninhouding = gaat er bruto af\nnetto = raakt alleen het nettoloon\nwerkgever = kost de werkgever geld', b.soort || 'bruto');
+  if (!soort) return;
+  const belast = confirm('Telt deze component mee voor de loonheffing?\n\nOK = belast, Annuleren = onbelast');
+  const grondslagen = belast
+    ? (prompt('Welke grondslagen precies? (komma\'s)\nloonheffing, premies, zvw',
+        (b.grondslagen || ['loonheffing', 'premies', 'zvw']).join(', ')) || '')
+      .split(',').map(x => x.trim()).filter(Boolean)
+    : [];
+  const bijzonder = belast && confirm('Is dit BIJZONDER loon (vakantiegeld, bonus, dertiende maand)?\n\nDan gaat het tegen het bijzondere tarief en wordt het niet meegeherleid naar een jaarloon.\n\nOK = bijzonder, Annuleren = gewoon periodeloon');
+  const vakantiegeldgevend = confirm('Bouwt hij vakantiegeld op?\n\nOK = ja, Annuleren = nee');
+  const grootboek = prompt('Grootboekrekening (zonder deze kan het loonjournaal niet zeggen waar het bedrag heen gaat):', b.grootboek || '');
+  const invoerbron = prompt('Waar mag de waarde vandaan komen?\nklok, contract, rooster, handmatig, motor, koppeling', b.invoerbron || 'handmatig');
+  const goedkeuring = prompt('Wie moet hem aftekenen?\ngeen, manager, administrateur', b.goedkeuring || 'manager');
+  const geldigTot = prompt('Vervalt hij op een datum? (JJJJ-MM-DD, leeg = blijft gelden)', b.geldigTot || '') || null;
+  try {
+    await api('component', { sleutel, naam, soort, belast, bijzonder, grondslagen,
+      pensioengevend: !!b.pensioengevend, vakantiegeldgevend, grootboek, invoerbron, goedkeuring,
+      geldigVan: b.geldigVan || null, geldigTot });
+    meld('Component vastgelegd.');
+    await laadComponenten();
+  } catch (e) { meld(e.message); }
+}
+$('#cpLaad').addEventListener('click', () => laadComponenten().catch(e => meld(e.message)));
+$('#cpNieuw').addEventListener('click', () => componentForm(null));
+
+/* ---------- contracten ----------
+   HIER ZAT HET GAT. De loonrun slaat iedereen zonder contract over, en er was
+   geen scherm en geen route om er een vast te leggen -- dus elke run was leeg,
+   terwijl elk onderdeel eronder groen stond. Dit blok is het ontbrekende begin
+   van de keten: pas hierna heeft "160 uur maal het uurloon" een uurloon. */
+async function laadContracten(){
+  const code = $('#ctZaak').value;
+  const opDatum = $('#ctDatum').value.trim();
+  const d = await api('personeel', { code, opDatum });
+  $('#ctLijst').innerHTML = (d.staff || []).map(m => {
+    const c = m.contract;
+    return '<div class="regel"><b>' + esc(m.naam) + '</b>' +
+      '<span class="kpi">' + esc(m.func || (m.manager ? 'Manager' : 'Medewerker')) + ' · ' +
+      (c ? esc(c.soort) + ' · ' + eurC(c.uurloonCenten) + ' per uur · vanaf ' + esc(c.vanaf) +
+           (c.urenPerWeek != null ? ' · ' + c.urenPerWeek + ' u/week' : '') +
+           (c.terugwerkend ? ' · <b>terugwerkend vastgelegd</b>' : '')
+         : (opDatum ? '<b>geen contract op ' + esc(opDatum) + '</b>' : 'vul een peildatum in om het contract te zien')) +
+      '</span><span class="r"><button class="knop" data-ct="' + m.id + '" data-naam="' + esc(m.naam) + '">' +
+      (c ? 'Wijzig' : 'Leg vast') + '</button></span></div>';
+  }).join('') || '<div class="leeg">Deze zaak heeft geen personeel.</div>';
+
+  $('#ctLijst').querySelectorAll('[data-ct]').forEach(b => b.addEventListener('click', async () => {
+    /* Bewust met prompts en niet met een formulier in een blad: dit is het
+       kantoorscherm en het gaat om vier velden. Een half formulier bouwen dat
+       er als een echt formulier uitziet, is erger dan dit. */
+    const vanaf = prompt('Vanaf welke datum geldt dit contract voor ' + b.dataset.naam + '? (JJJJ-MM-DD)\n\nEen bestaand contract wordt NIET overschreven; dit wordt een nieuwe versie.');
+    if (!vanaf) return;
+    const soort = prompt('Soort contract?\nvast, tijdelijk, oproep, nuluren, minmax, stage, uitzend of freelance', 'vast');
+    if (!soort) return;
+    const tot = soort === 'tijdelijk' ? prompt('Einddatum (JJJJ-MM-DD) -- een tijdelijk contract heeft er een:') : null;
+    const loon = prompt('Uurloon in euro\'s (bijv. 18,00):');
+    if (!loon) return;
+    const uren = prompt('Contracturen per week (leeg = geen vaste omvang):', '32');
+    const centen = Math.round(Number(String(loon).replace(',', '.')) * 100);
+    if (!Number.isFinite(centen) || centen <= 0) return meld('Dat uurloon kon ik niet lezen.');
+    try {
+      const r = await api('contract', { code: $('#ctZaak').value, staffId: Number(b.dataset.ct),
+        vanaf, tot: tot || null, soort, uurloonCenten: centen,
+        urenPerWeek: uren ? Number(String(uren).replace(',', '.')) : null });
+      meld(r.let || 'Contractversie vastgelegd.');
+      await laadContracten();
+    } catch (e) { meld(e.message); }
+  }));
+}
+$('#ctLaad').addEventListener('click', () => laadContracten().catch(e => meld(e.message)));
+
+$('#osHaal').addEventListener('click', async () => {
+  try { const d = await api('regels/haal'); meld('Bijwerkronde: ' + d.uitslag.nieuw.length + ' nieuw, ' +
+    d.uitslag.afgekeurd.length + ' afgekeurd.'); await laadOs(); } catch (e) { meld(e.message); }
+});
+
+$('#osOpen').addEventListener('click', async () => {
+  try {
+    const d = await api('run/open', { code: $('#osZaak').value, periode: $('#osPeriode').value.trim() });
+    OSRUN = d.run;
+    toonOsRun(d.run, d.bevindingen || []);
+    $('#osUit').innerHTML = '<div class="noot">Concept geopend op regelpakket <b>' + esc(d.run.regelversie) + '</b>.</div>';
+  } catch (e) { $('#osUit').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; }
+});
+
+function toonOsRun(run, bevindingen){
+  $('#osRunKaart').hidden = false;
+  const tekens = (run.goedkeuringen || []).map(g => g.rol).join(' + ') || 'nog niemand';
+  $('#osRunTitel').textContent = 'Loonrun ' + run.periode + ' · ' + run.zaak + ' · ' + run.stand +
+    ' · getekend door: ' + tekens;
+
+  const hoogOpen = bevindingen.filter(b => b.ernst === 'hoog' && b.status === 'open');
+  $('#osBevindingen').innerHTML = bevindingen.length
+    ? '<div class="sec">Bevindingen' + (hoogOpen.length ? ' - ' + hoogOpen.length + ' met ernst hoog open' : '') + '</div>' +
+      bevindingen.map(b =>
+        '<div class="regel"><b>' + bevPil(b.ernst) + ' ' + esc(b.uitleg) + '</b>' +
+        '<span class="kpi">' + esc(b.soort) + ' · afhandelen: ' + esc(b.eigenaar || '?') +
+        (b.status !== 'open' ? ' · <b>' + esc(b.status) + '</b>: ' + esc(b.verklaring || '') : '') + '</span>' +
+        (b.status === 'open'
+          ? '<span class="r"><button class="knop" data-verklaar="' + esc(b.soort) + '" data-staff="' + (b.staffId != null ? b.staffId : '') + '">Verklaren</button></span>'
+          : '') + '</div>').join('')
+    : '<div class="noot">Geen bevindingen.</div>';
+
+  $('#osBevindingen').querySelectorAll('[data-verklaar]').forEach(b => b.addEventListener('click', async () => {
+    const reden = prompt('Waarom is dit in orde? (blijft bij de loonrun staan)');
+    if (reden == null) return;
+    try {
+      await api('run/verklaar', { runId: run.id, soort: b.dataset.verklaar,
+        staffId: b.dataset.staff === '' ? null : Number(b.dataset.staff), verklaring: reden });
+      const d = await api('run/een', { runId: run.id });
+      toonOsRun(d.run, d.bevindingen);
+    } catch (e) { meld(e.message); }
+  }));
+
+  const stroken = run.stroken || [];
+  $('#osStroken').innerHTML = stroken.length ? '<div class="sec">Stroken</div>' + stroken.map(s =>
+    '<div class="regel"><b>' + esc(s.naam || ('#' + s.staffId)) + '</b>' +
+    '<span class="kpi">' + (s.strook.regels || []).map(r =>
+      esc(r.naam) + (r.aantal != null ? ' ' + r.aantal + '×' : '') + ' ' +
+      bedrag(r.centen, s.strook.valuta && s.strook.valuta.code)).join(' · ') + '</span>' +
+    '<span class="r">netto ' + bedrag(s.strook.nettoCenten, s.strook.valuta && s.strook.valuta.code) +
+    (s.strook.valuta && s.strook.valuta.aangenomen ? ' <span class="pil goud">munt aangenomen</span>' : '') +
+    '</span></div>').join('') : '';
+}
+
+$('#osKeur').addEventListener('click', async () => {
+  if (!OSRUN) return;
+  try { await api('run/keur', { runId: OSRUN.id }); const d = await api('run/een', { runId: OSRUN.id });
+    OSRUN = d.run; toonOsRun(d.run, d.bevindingen); meld('Getekend als administrateur.'); }
+  catch (e) { meld(e.message); }
+});
+
+$('#osDef').addEventListener('click', async () => {
+  if (!OSRUN) return;
+  try { await api('run/definitief', { runId: OSRUN.id }); const d = await api('run/een', { runId: OSRUN.id });
+    OSRUN = d.run; toonOsRun(d.run, d.bevindingen); meld('Definitief. Hierna kan alleen nog een correctierun.'); }
+  catch (e) { meld(e.message); }
+});
+
+$('#osJournaal').addEventListener('click', async () => {
+  if (!OSRUN) return;
+  try {
+    const d = await api('journaal', { runId: OSRUN.id });
+    $('#osNaRun').innerHTML = '<div class="sec">Loonjournaal</div>' + (d.regels || []).map(r =>
+      '<div class="regel"><b>' + esc(r.rekening) + '</b><span class="kpi">' + esc(r.wat || 'kosten') + '</span>' +
+      '<span class="r">' + (r.debetCenten ? 'debet ' + eurC(r.debetCenten) : 'credit ' + eurC(r.creditCenten)) + '</span></div>').join('') +
+      '<div class="noot">Debet ' + eur(d.somDebet) + ' tegenover credit ' + eur(d.somCredit) + ' - de boeking telt op tot nul.</div>';
+  } catch (e) { $('#osNaRun').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; }
+});
+
+/* ---------- de loonaangifte ----------
+   De derde uitgang uit dezelfde run. Het scherm doet twee dingen die niet
+   losgekoppeld mogen raken: het toont de aangifte EN de aansluiting op het
+   loonjournaal. Twee wegen naar dezelfde loonheffing; lopen ze uiteen, dan
+   staat dat hier, voor het indienen -- en niet bij een controle over drie jaar.
+
+   Indienen vraagt om het kenmerk van de Belastingdienst. Dat is geen formulier
+   dat om een veld zeurt: zonder kenmerk is "ingediend" een bewering zonder
+   bewijs, en juist dat bewijs heb je bij een controle nodig. */
+async function toonAangifte(a){
+  let aansluiting = '';
+  try {
+    const s = await api('aangifte/aansluiting', { id: a.id });
+    aansluiting = '<div class="noot">Aangifte en loonjournaal sluiten aan: ' + eurC(s.loonheffingCenten) + ' loonheffing.</div>';
+  } catch (e) {
+    aansluiting = '<div class="regel"><b>' + bevPil('hoog') + ' ' + esc(e.message) + '</b></div>';
+  }
+  const rubriek = (naam, c) => '<div class="regel"><b>' + esc(naam) + '</b><span class="r">' + eurC(c) + '</span></div>';
+  $('#osNaRun').innerHTML = '<div class="sec">Loonaangifte ' + esc(a.periode) + ' · ' + esc(a.soort) +
+    ' · ' + esc(a.stand) + '</div>' +
+    (a.corrigeert ? '<div class="noot">Correctie op een eerdere aangifte; die blijft staan.</div>' : '') +
+    (a.let ? '<div class="regel"><b>' + bevPil('midden') + ' ' + esc(a.let) + '</b></div>' : '') +
+    rubriek('Loon voor de loonheffing', a.totalen.loonLoonheffing) +
+    rubriek('Ingehouden loonheffing', a.totalen.ingehoudenLoonheffing) +
+    rubriek('Premies werkgever', a.totalen.premiesWerkgever) +
+    rubriek('Zvw werkgever', a.totalen.zvwWerkgever) +
+    '<div class="regel"><b>Te betalen aan de Belastingdienst</b><span class="r"><b>' +
+      eurC(a.teBetalenCenten) + '</b></span></div>' +
+    '<div class="noot" style="margin-top:.4rem;">' + a.nominatief.length +
+      ' werknemer(s) in het nominatieve deel; de optelling daarvan IS het bedrag hierboven.</div>' +
+    aansluiting +
+    (a.stand === 'ingediend'
+      ? '<div class="noot">Ingediend door ' + esc(a.ingediendDoor) + ' op ' + esc(String(a.ingediendOp).slice(0, 10)) +
+        ', kenmerk ' + esc(a.kenmerk) + '.</div>'
+      : '<button class="knop" id="osDienIn" style="margin-top:.5rem;">Vastleggen als ingediend</button>' +
+        '<div class="noot" style="margin-top:.35rem;">RTG verstuurt de aangifte niet zelf; dit legt vast DAT hij is ingediend, met het kenmerk van de Belastingdienst erbij.</div>');
+
+  const d = document.getElementById('osDienIn');
+  if (d) d.addEventListener('click', async () => {
+    const kenmerk = prompt('Welk kenmerk gaf de Belastingdienst terug?\n\nZonder kenmerk is "ingediend" een bewering zonder bewijs.');
+    if (!kenmerk) return;
+    try { const r = await api('aangifte/indienen', { id: a.id, kenmerk }); meld(r.let); toonAangifte(r.aangifte); }
+    catch (e) { meld(e.message); }
+  });
+}
+
+/* ---------- het dossier: de vier vragen ----------
+   De maatstaf die is afgesproken, op een scherm. Elk antwoord stond er al,
+   verspreid over vier plekken -- en verspreid is niet hetzelfde als
+   beschikbaar: wie bij een controle zelf moet optellen, verzint op een gegeven
+   moment een antwoord.
+
+   Wat hier NIET gebeurt is een gat opvullen. "Nog niet aangegeven" staat er als
+   OPEN, en `volledig` wordt pas groen als het echt waar is. */
+const DSTAND = { beantwoord: ['beantwoord', ''], open: ['nog te doen', ' goud'],
+  onbekend: ['ontbreekt', ' rood'] };
+const dPil = s => '<span class="pil' + (DSTAND[s] || ['', ''])[1] + '">' + esc((DSTAND[s] || [s])[0]) + '</span>';
+
+function toonDossier(d){
+  const a = d.antwoorden, m = d.medewerker, v = (d.bedrag && d.bedrag.valuta && d.bedrag.valuta.code) || runMunt();
+  const w = a.waarheen;
+  $('#osNaRun').innerHTML =
+    '<div class="sec">Dossier · ' + esc(m.naam) + ' · ' + esc(d.run.periode) + ' · ' +
+      (d.volledig ? '<span class="pil">volledig</span>' : '<span class="pil rood">' + d.open + ' vraag/vragen open</span>') + '</div>' +
+
+    '<div class="regel"><b>' + dPil(a.waarom.stand) + ' 1. Waarom is dit bedrag berekend?</b>' +
+    '<span class="kpi">' + a.waarom.invoer.map(i => esc(i.component) + (i.aantal != null ? ' ' + i.aantal : '')).join(' · ') +
+      ' → netto ' + bedrag(a.waarom.totalen.nettoCenten, v) + '</span>' +
+    '<span class="r"><button class="knop" id="dsStappen">Rekenstappen</button></span></div>' +
+
+    '<div class="regel"><b>' + dPil(a.welkeRegel.stand) + ' 2. Welke regel en versie?</b>' +
+    '<span class="kpi">' + esc(a.welkeRegel.versie || '?') + ' · ' + esc(a.welkeRegel.land || '') +
+      (a.welkeRegel.bron ? ' · bron ' + esc(a.welkeRegel.bron.naam || a.welkeRegel.bron.soort || 'onbekend') : '') +
+      (a.welkeRegel.goedgekeurdDoor ? ' · aangemerkt door ' + esc(a.welkeRegel.goedgekeurdDoor) : '') +
+      (a.welkeRegel.let ? '<br><b>' + esc(a.welkeRegel.let) + '</b>' : '') + '</span></div>' +
+
+    '<div class="regel"><b>' + dPil(a.wieKeurde.stand) + ' 3. Wie heeft goedgekeurd?</b>' +
+    '<span class="kpi">' + (a.wieKeurde.goedkeuringen || []).map(g =>
+      esc(g.rol) + ': ' + esc(g.door)).join(' · ') +
+      (a.wieKeurde.contractVastgelegdDoor ? ' · contract: ' + esc(a.wieKeurde.contractVastgelegdDoor) : '') +
+      (a.wieKeurde.definitiefDoor ? ' · definitief: ' + esc(a.wieKeurde.definitiefDoor) : '') +
+      (a.wieKeurde.ontbreekt.length ? '<br>ontbreekt: <b>' + a.wieKeurde.ontbreekt.map(esc).join(', ') + '</b>' : '') +
+      '</span></div>' +
+
+    '<div class="regel"><b>' + dPil(w.stand) + ' 4. Waar geboekt, aangegeven, betaald?</b>' +
+    '<span class="kpi">' +
+      'geboekt: ' + (w.geboekt.stand === 'beantwoord'
+        ? (w.geboekt.sluitAan ? 'ja, sluit op nul' : 'ja, maar sluit NIET') : esc(w.geboekt.uitleg)) + '<br>' +
+      'aangegeven: ' + (w.aangegeven.stand === 'beantwoord'
+        ? 'kenmerk ' + esc(w.aangegeven.kenmerk) + ' door ' + esc(w.aangegeven.ingediendDoor)
+        : esc(w.aangegeven.uitleg)) + '<br>' +
+      'betaald: ' + (w.betaald.stand === 'beantwoord'
+        ? w.betaald.bestanden.map(x => bedrag(x.totaalCenten, v) + ' (' + x.aantal + ' post(en))').join(', ')
+        : esc(w.betaald.uitleg)) +
+      '</span></div>';
+
+  const knop = document.getElementById('dsStappen');
+  if (knop) knop.addEventListener('click', () => {
+    knop.disabled = true;
+    knop.insertAdjacentHTML('afterend', '<div class="kpi" style="width:100%;margin-top:.4rem;">' +
+      a.waarom.stappen.map(s => esc(s.stap) +
+        (s.uitleg ? ' · ' + esc(s.uitleg) : '') +
+        (s.tarief != null ? ' · tarief ' + esc(s.tarief) : '') +
+        (s.centen != null ? ' → ' + bedrag(s.centen, v) : '')).join('<br>') + '</div>');
+  });
+}
+
+$('#osDossier').addEventListener('click', async () => {
+  if (!OSRUN) return;
+  try {
+    const kort = await api('dossier', { runId: OSRUN.id });
+    /* Eerst de run, dan de mens: het dossier gaat over EEN bedrag, en niemand
+       vraagt "waarom is deze loonrun 84.000 euro" -- ze vragen "waarom kreeg
+       ik dit". Staat er maar een medewerker in, dan slaan we de keuze over. */
+    const mensen = kort.medewerkers || [];
+    if (!mensen.length) return meld('Deze loonrun heeft geen stroken.');
+    let staffId = mensen[0].staffId;
+    if (mensen.length > 1) {
+      const keuze = prompt('Van wie wilt u het dossier?\n\n' +
+        mensen.map(m => m.staffId + ' = ' + m.naam + (m.volledig ? '' : ' (' + m.open + ' open)')).join('\n'),
+        String(staffId));
+      if (!keuze) return;
+      staffId = Number(keuze);
+    }
+    toonDossier(await api('dossier', { runId: OSRUN.id, staffId }));
+  } catch (e) { $('#osNaRun').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; }
+});
+
+/* ================= wereldwijd =================
+   HET SCHERM DAT DE STILTE WEGHAALT. Zonder dit overzicht merkt niemand dat er
+   in tweeenzeventig zaken personeel werkt waarvoor geen enkele loontabel ligt;
+   je ontdekt het op de dag dat iemand vraagt waar zijn loonstrook blijft.
+
+   Drie standen, en ze zeggen alle drie iets anders: draait (goedgekeurd pakket),
+   wacht op een mens (er ligt iets, niemand tekende), geen tabel (hier kan geen
+   loon draaien). Die laatste staat bovenaan, want dat is het werk. */
+const WSTAND = { draait: ['draait', ''], wacht_op_mens: ['wacht op een mens', ' goud'],
+  geen_tabel: ['geen tabel', ' rood'] };
+const wPil = s => '<span class="pil' + (WSTAND[s] || ['', ''])[1] + '">' + esc((WSTAND[s] || [s])[0]) + '</span>';
+
+async function laadWereld(){
+  const d = await api('dekking', { peildatum: $('#wlPeil').value.trim() || null });
+  const t = d.telling;
+  $('#wlTelling').innerHTML =
+    '<div class="rij">' +
+    '<div class="stat"><b>' + t.draait + '</b><i>landen draaien</i></div>' +
+    '<div class="stat"><b>' + t.wacht_op_mens + '</b><i>wacht op keuring</i></div>' +
+    '<div class="stat"><b>' + t.geen_tabel + '</b><i>zonder tabel</i></div>' +
+    '<div class="stat"><b>' + t.personeelZonderTabel + '</b><i>mensen zonder loonrun</i></div>' +
+    '</div>';
+
+  const v = (await api('verval', { dagen: 60 })).verloopt || [];
+  $('#wlVerval').innerHTML = v.length
+    ? '<div class="sec">Loopt binnenkort af</div>' + v.map(x =>
+        '<div class="regel"><b>' + bevPil('hoog') + ' ' + esc(x.uitleg) + '</b></div>').join('')
+    : '<div class="noot">Geen jaargang die binnen zestig dagen afloopt zonder opvolger.</div>';
+
+  /* Zonder tabel eerst: dat is waar het werk ligt. Daarna wachtend op een mens,
+     en pas onderaan wat gewoon draait -- een lijst waarin het goede nieuws
+     bovenaan staat, laat je het slechte nieuws missen. */
+  const orde = { geen_tabel: 0, wacht_op_mens: 1, draait: 2 };
+  const rijen = d.landen.slice().sort((a, b) =>
+    (orde[a.stand] - orde[b.stand]) || (b.personeel - a.personeel));
+  $('#wlLanden').innerHTML = rijen.map(r =>
+    '<div class="regel"><b>' + wPil(r.stand) + ' ' + esc(r.naam) + ' (' + esc(r.land) + ')</b>' +
+    '<span class="kpi">' + r.zaken + ' zaak/zaken · ' + r.personeel + ' medewerker(s)' +
+    (r.pakket ? ' · pakket ' + esc(r.pakket.versie) + ' t/m ' + esc(r.pakket.geldigTot || 'onbepaald') : '') +
+    (r.bronnen.length ? ' · ' + r.bronnen.length + ' bron(nen)' : ' · geen bron') +
+    (r.ontbreekt.length ? '<br>nog nodig: <b>' + r.ontbreekt.map(esc).join(', ') + '</b>' : '') +
+    (r.fiscaal ? '<br>wel bekend uit de fiscaal-tabel (richtgetallen, omgerekend in euro\'s -- geen wettelijke waarden in de eigen munt): ' +
+      (r.fiscaal.minimumUurloonCenten != null ? 'minimumuurloon ' + bedrag(r.fiscaal.minimumUurloonCenten, 'EUR') : 'geen minimumuurloon') +
+      (r.fiscaal.vakantiegeld != null ? ' · vakantiegeld ' + Math.round(r.fiscaal.vakantiegeld * 1000) / 10 + '%' : '') +
+      (r.fiscaal.werkgeverslasten != null ? ' · werkgeverslasten ' + Math.round(r.fiscaal.werkgeverslasten * 1000) / 10 + '%' : '') : '') +
+    '</span></div>').join('') || '<div class="leeg">Geen zaken gevonden.</div>';
+}
+
+$('#wlLaad').addEventListener('click', () => laadWereld().catch(e => meld(e.message)));
+$('#wlRonde').addEventListener('click', async () => {
+  try {
+    const d = await api('regels/haal');
+    const u = d.uitslag;
+    meld('Bijwerkronde: ' + u.gekeken + ' bron(nen) bekeken, ' + u.nieuw.length + ' nieuw, ' +
+      u.afgekeurd.length + ' afgekeurd, ' + u.fouten.length + ' fout(en).');
+    await laadWereld();
+  } catch (e) { meld(e.message); }
+});
+$('#brZet').addEventListener('click', async () => {
+  try {
+    await api('bron', { land: $('#brLand').value.trim().toUpperCase(),
+      naam: $('#brNaam').value.trim(), url: $('#brUrl').value.trim() });
+    $('#brUrl').value = ''; $('#brNaam').value = '';
+    meld('Bron toegevoegd. De eerstvolgende ronde haalt hem op.');
+    await laadWereld();
+  } catch (e) { meld(e.message); }
+});
+
+$('#osAangifte').addEventListener('click', async () => {
+  if (!OSRUN) return;
+  try { const d = await api('aangifte', { runId: OSRUN.id }); await toonAangifte(d.aangifte); }
+  catch (e) { $('#osNaRun').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; }
+});
 /* Pas beginnen als er een kantoorsessie is. Zonder token stuurt uitgelogd()
    hierboven al door, maar de navigatie is niet meteen klaar en intussen liep
    deze aanroep gewoon door -- die kwam terug met "Geen backoffice-sessie" en
@@ -208,5 +783,6 @@ if (TOKEN) {
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/sneltoets.js" defer></script>
+<script src="/shared/ios.js" defer></script>
 </body>
 </html>

@@ -20,7 +20,6 @@ const STRICT = process.env.A11Y_STRICT === '1';
 
 // vlaggenschip-schermen: de eerste render (uitgelogd) van de belangrijkste apps
 const PAGINAS = [
-  '/apps/index.html',
   '/apps/foundation/index.html',
   '/apps/foundation/vrienden.html',
   '/apps/foundation/school.html',

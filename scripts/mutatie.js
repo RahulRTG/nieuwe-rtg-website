@@ -403,6 +403,29 @@ function isServerToets(naam) {
 /* DE SERVERTOETSEN in EEN ronde: de liegpoort aan voor alle /api/-paden. Per
    bestand kijken we of hij dan omvalt. Dat is honderdvijfenveertig keer een
    server starten in plaats van honderdvijfenveertig ronden van de hele suite. */
+/* DE DEUREN DIE IN DE SCHERPE RONDE OPEN BLIJVEN. Uit de toetsen zelf geteld:
+   /api/auth/register (246 keer), /api/supplier/login (245), /api/login (88),
+   /api/office/login (78), /api/auth/login (70). Dat zijn de paden waarlangs een
+   toets binnenkomt; laat je die ook liegen, dan struikelt hij bij de voorbereiding
+   en meet je niet of hij naar de INHOUD kijkt. Met de hand en niet afgeleid: een
+   lijst die meeschuift met de code verandert stilletjes wat het getal betekent. */
+const DEUREN = ['/api/auth/', '/api/login', '/api/supplier/login',
+  '/api/supplier/mijn/login', '/api/office/login', '/api/webauthn/'].join(',');
+
+/* DE SCHERPE RONDE (fase C). Zelfde liegpoort, maar de deuren blijven open. Een
+   toets die HIER zakt, zakt omdat zijn eigen domein loog en niet omdat hij niet
+   meer binnenkwam. Dat is het sterkere bewijs; fase B is de ondergrens.
+
+   Alleen zinvol voor toetsen die in fase B zijn gezakt: wie daar al overleefde,
+   overleeft dit ook. */
+function proefServerScherp(naam) {
+  const bestand = path.join(TEST, naam);
+  const na = draaiToets(bestand, { RTG_LIEG: '/api/', RTG_LIEG_NIET: DEUREN }, WACHT_MUTATIE);
+  if (na.tijdout) return { staat: 'vastgelopen' };
+  if (na.alGeslagen) return { staat: 'slaat zichzelf over' };
+  return { staat: na.gezakt > 0 ? 'gezakt' : 'overleefd', gezakt: na.gezakt };
+}
+
 function proefServer(naam) {
   if (NIET_MUTEREN.has(naam)) return { soort: 'server', staat: 'muteert zelf', reden: NIET_MUTEREN.get(naam) };
   const bestand = path.join(TEST, naam);
@@ -518,12 +541,47 @@ if (require.main === module) {
     console.log('  --- B: servertoetsen, liegpoort ---');
     doe(server, proefServer);
     vastleggen();
+
+    /* FASE C, DE SCHERPE RONDE. Fase B laat ALLES liegen, ook de deur waardoor
+       een toets binnenkomt -- dan struikelt hij bij de voorbereiding en zakt de
+       rest vanzelf. Dat telt als afhankelijkheid van echt gedrag, maar bij "399
+       van de 399 gezakt" weet je niet meer of het de INHOUD was of de inlog.
+
+       Hier blijven de deuren open (RTG_LIEG_NIET) en liegt alleen het domein
+       zelf. Zakt hij dan nog, dan kijkt er echt iemand naar de inhoud. Alleen
+       zinvol voor wie in fase B zakte: een overlever daar overleeft dit ook.
+
+       De uitslag komt ERBIJ als `scherp` en vervangt de staat NIET. Zou hij de
+       staat overschrijven, dan verdwijnt het onderscheid tussen "hangt niet af
+       van echte antwoorden" en "hangt er wel van af, maar niet van zijn eigen
+       domein" -- en dat onderscheid is precies waar deze ronde voor is. */
+    const scherpKandidaten = server.filter(n => uitslag[n] && uitslag[n].staat === 'gezakt' && !uitslag[n].scherp);
+    if (scherpKandidaten.length && !args.includes('--geen-scherp')) {
+      console.log('\n  --- C: scherpe ronde, ' + scherpKandidaten.length + ' toetsen, deuren blijven open ---');
+      let m = 0;
+      for (const naam of scherpKandidaten) {
+        const r = proefServerScherp(naam);
+        uitslag[naam] = Object.assign({}, uitslag[naam], { scherp: r.staat });
+        bewaar();
+        if (++m % OM_DE === 0) vastleggen();
+        console.log('  ' + String(m).padStart(4) + '/' + scherpKandidaten.length + '  ' +
+          naam.padEnd(42) + 'scherp: ' + r.staat);
+      }
+      vastleggen();
+    }
   }
 
   const per = (s) => Object.values(uitslag).filter(x => x.staat === s).length;
+  const perScherp = (s) => Object.values(uitslag).filter(x => x.scherp === s).length;
   console.log('\n  gezakt (bewezen gevoelig)  ' + per('gezakt'));
   console.log('  overleefd                  ' + per('overleefd'));
   console.log('  niet te meten              ' + (Object.keys(uitslag).length - per('gezakt') - per('overleefd')));
+  const scherpGemeten = perScherp('gezakt') + perScherp('overleefd');
+  if (scherpGemeten) {
+    console.log('\n  SCHERP (alleen het eigen domein loog, de deuren bleven open)');
+    console.log('    zakt op de inhoud        ' + perScherp('gezakt'));
+    console.log('    zakte alleen op de inlog ' + perScherp('overleefd'));
+  }
   console.log('\n  Uitslag in MUTATIES.json; npm run bewijs zet hem in BEWIJS.md.\n');
 }
 

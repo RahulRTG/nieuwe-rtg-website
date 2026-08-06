@@ -1954,13 +1954,15 @@
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 8
+      "gezakt": 8,
+      "scherp": "gezakt"
     },
     "ondernemerpoort-e2e.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 4
+      "gezakt": 4,
+      "scherp": "gezakt"
     },
     "ondernemerpoort.test.js": {
       "soort": "puur",
@@ -1974,49 +1976,57 @@
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 3
+      "gezakt": 3,
+      "scherp": "gezakt"
     },
     "onderwijsstuur.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 3
+      "gezakt": 3,
+      "scherp": "gezakt"
     },
     "onderzoeker.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 4
+      "gezakt": 4,
+      "scherp": "gezakt"
     },
     "onderzoekslab.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 4
+      "gezakt": 4,
+      "scherp": "gezakt"
     },
     "onnozel.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 11
+      "gezakt": 11,
+      "scherp": "gezakt"
     },
     "ontmoeting-leeg.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 1
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "ontmoeting.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 8
+      "gezakt": 8,
+      "scherp": "gezakt"
     },
     "oog.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 4
+      "gezakt": 4,
+      "scherp": "gezakt"
     },
     "opslag-voorcheck.test.js": {
       "soort": "puur",
@@ -2042,13 +2052,15 @@
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 7
+      "gezakt": 7,
+      "scherp": "gezakt"
     },
     "overheid.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 18
+      "gezakt": 18,
+      "scherp": "gezakt"
     },
     "pakket.test.js": {
       "soort": "puur",
@@ -2062,43 +2074,50 @@
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 8
+      "gezakt": 8,
+      "scherp": "gezakt"
     },
     "papieren.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 1
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "partner.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 8
+      "gezakt": 8,
+      "scherp": "gezakt"
     },
     "partnerpas.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 2
+      "gezakt": 2,
+      "scherp": "gezakt"
     },
     "pas-apps.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 3
+      "gezakt": 3,
+      "scherp": "gezakt"
     },
     "pas-escalatie.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 5
+      "gezakt": 5,
+      "scherp": "gezakt"
     },
     "paspoort.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 9
+      "gezakt": 9,
+      "scherp": "gezakt"
     },
     "pasprijs.test.js": {
       "soort": "puur",
@@ -2112,31 +2131,36 @@
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 10
+      "gezakt": 10,
+      "scherp": "gezakt"
     },
     "payroll.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 3
+      "gezakt": 3,
+      "scherp": "gezakt"
     },
     "pda-aanmelden.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 5
+      "gezakt": 5,
+      "scherp": "gezakt"
     },
     "pda-netwerk.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 3
+      "gezakt": 3,
+      "scherp": "gezakt"
     },
     "pdf.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 1
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "pestgrens.test.js": {
       "soort": "puur",
@@ -2186,7 +2210,8 @@
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 6
+      "gezakt": 6,
+      "scherp": "gezakt"
     },
     "podium.test.js": {
       "soort": "server",

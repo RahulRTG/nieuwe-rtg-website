@@ -25,8 +25,13 @@ module.exports = (ctx) => {
     return b;
   }
 
+  /* De losse kaartjes. Abonnementen liggen in DEZELFDE voorraad (zodat de
+     conducteur langs een weg controleert), maar ze horen hier niet in de lijst:
+     ze hebben hun eigen blok met hun eigen looptijd, en anders staat hetzelfde
+     ding twee keer op het scherm. */
   const kaartMijn = session => ({ ok: true,
-    kaartjes: kaartenVan(session.key).slice(-25).reverse().map(k => kaartBeeld(k, true)) });
+    kaartjes: kaartenVan(session.key).filter(k => k.product !== 'abonnement')
+      .slice(-25).reverse().map(k => kaartBeeld(k, true)) });
 
   /* Wat er te koop is op een lijn, met de reden erbij als er niets te koop is.
      Dit voedt het scherm: een lege lijst zonder uitleg leest als een storing. */

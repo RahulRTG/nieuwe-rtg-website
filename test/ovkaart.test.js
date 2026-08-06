@@ -372,6 +372,14 @@ test('11. een abonnement: prijs uit het contract, onbeperkt reizen, een per verv
   assert.equal(mijn.body.abonnementen[0].ritten, 3, 'de ritten worden geteld');
   assert.equal(mijn.body.abonnementen[0].stand, 'geldig', 'maar er hangt geen limiet aan');
 
+  /* Het abonnement ligt in dezelfde voorraad als de losse kaartjes -- daar
+     controleert de conducteur op -- maar het hoort niet in de KAARTJESLIJST:
+     het heeft zijn eigen blok met zijn eigen looptijd, en anders staat hetzelfde
+     ding twee keer op het scherm van de reiziger. */
+  const kaartjes = await api('/api/mob/kaart/mijn', {}, lidD);
+  assert.ok(!kaartjes.body.kaartjes.some(k => k.product === 'abonnement'),
+    'het abonnement staat niet ook nog eens bij de losse kaartjes');
+
   // en niet op een lijn die de overeenkomst niet dekt
   const ferry = await api('/api/staff/mob/kaart/controle', { code: ab.code, lijnId: 'F1' }, pda);
   assert.equal(ferry.status, 409, 'de ferry staat niet in de overeenkomst');

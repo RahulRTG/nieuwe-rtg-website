@@ -1477,6 +1477,84 @@
       "gezakt": 1,
       "geprobeerd": 2
     },
+    "mailbijlage.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5
+    },
+    "mailpost-kantoor.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 9
+    },
+    "mailpost.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 11
+    },
+    "mall.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 8
+    },
+    "marechaussee.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5
+    },
+    "marina.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 7
+    },
+    "markt-zaak.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 7
+    },
+    "markt.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 11
+    },
+    "media.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1
+    },
+    "meet.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3
+    },
+    "memo.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3
+    },
+    "menselijkebanen.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4
+    },
+    "menselijkverkeer.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5
+    },
     "merge3.property.test.js": {
       "soort": "puur",
       "staat": "overleefd",
@@ -1491,6 +1569,12 @@
       "staat": "muteert zelf",
       "reden": "muteert zelf echte bestanden (waaronder MUTATIES.json) om meters te ijken"
     },
+    "metier.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 11
+    },
     "meting.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -1498,6 +1582,12 @@
       "operator": ">=->>#0",
       "gezakt": 2,
       "geprobeerd": 1
+    },
+    "metingpoort.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4
     },
     "middleware.test.js": {
       "soort": "puur",
@@ -1523,6 +1613,18 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "modebezorg.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 7
+    },
+    "moedertaal.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5
+    },
     "mond.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -1547,10 +1649,52 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "multi-instance-sqlite.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1
+    },
+    "munten.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2
+    },
     "mutatiewacht.test.js": {
       "soort": "puur",
       "staat": "muteert zelf",
       "reden": "toetst de opruimwacht van deze motor; die twee om elkaar heen draaien zegt niets"
+    },
+    "muziek-lied.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6
+    },
+    "muziek-uitgave.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 9
+    },
+    "muziek.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 9
+    },
+    "naamlaag.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2
+    },
+    "naarkassa.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1
     },
     "navigatie.test.js": {
       "soort": "puur",
@@ -1559,6 +1703,12 @@
       "operator": "+->-#0",
       "gezakt": 4,
       "geprobeerd": 2
+    },
+    "negenplus.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4
     },
     "office-blad.test.js": {
       "soort": "puur",

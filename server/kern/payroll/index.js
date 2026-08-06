@@ -9,6 +9,9 @@
      motor        de herhaalbare berekening
      run          concept -> vier ogen -> definitief -> correctie
      journaal     de boeking en het betaalbestand
+     uren         de klok vertaald naar meetbare feiten, en die gewogen tot
+                  componenten (meten en wegen apart, zie ./uren.js)
+     controles    de automatische controles; hoog blokkeert tot het verklaard is
      verzuim      verlof en ziekte, met de scheiding die de AP eist
      identiteit   ja/nee voor de werkgever, opvragen met reden en journaal
 
@@ -33,6 +36,8 @@ const { maakJournaal } = require('./journaal');
 const { maakVerzuim } = require('./verzuim');
 const { maakIdentiteit } = require('./identiteit');
 const { maakBijwerken, urlBron } = require('./bijwerken');
+const { maakUren } = require('./uren');
+const { maakControles } = require('./controles');
 const motor = require('./motor');
 
 function maakPayrollOS({ db, save, crypto, accounts, nu, inzagelog, notify, logActivity, log }) {
@@ -44,6 +49,8 @@ function maakPayrollOS({ db, save, crypto, accounts, nu, inzagelog, notify, logA
   const verzuim = maakVerzuim({ db, save, nu });
   const identiteit = maakIdentiteit({ accounts, db, save, nu, inzagelog, notify, logActivity });
   const bijwerken = maakBijwerken({ regelpakket: regels, db, save, nu, log });
+  const uren = maakUren({ db });
+  const controles = maakControles({ db, save, nu });
 
   /* De meegeleverde jaargang een keer binnenhalen. Hij komt binnen langs
      dezelfde keuring als elk ander pakket -- geen achterdeur voor "onze eigen"
@@ -63,7 +70,7 @@ function maakPayrollOS({ db, save, crypto, accounts, nu, inzagelog, notify, logA
 
   return {
     payrollOS: {
-      regels, componenten, contracten, motor, run, journaal, verzuim, identiteit,
+      regels, componenten, contracten, motor, run, journaal, verzuim, identiteit, uren, controles,
       bijwerken, urlBron, laadMeegeleverd
     }
   };

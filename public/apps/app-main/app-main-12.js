@@ -35,7 +35,56 @@
   // het OS-beginscherm in je wallet, niet meer op de home
   $('#codeChip').addEventListener('click', () => { location.href = '/apps/wallet.html'; });
 
+  /* EEN TABBLAD HAALT ZIJN GEGEVENS OP ALS JE HEM OPENT, NIET EERDER.
+
+     Gemeten, niet gegokt: een keer de app openen kostte 66 API-verzoeken. De
+     rem op de deur (server/middleware/remmen.js) laat er 300 per minuut door,
+     dus wie de app drie keer achter elkaar opende kreeg "te veel verzoeken"
+     terug van zijn eigen app. Dat is precies wat er gemeld werd, en het is
+     onze fout: drie keer openen is doodgewoon gedrag.
+
+     Waar die 66 vandaan kwamen: renderAll() vulde alle vijftien tabbladen bij
+     het opstarten. Een eerdere ingreep zette dat na het eerste beeld en met
+     adempauzes ertussen (naBeeld in ./app-main-12a.js). Dat hielp voor hoe snel
+     het VOELT, maar het aantal verzoeken bleef gelijk: uitstellen is niet
+     hetzelfde als niet doen. De oorzaak is dat we gegevens ophalen voor
+     schermen die op dat moment niemand ziet.
+
+     De indeling hieronder is afgeleid en niet bedacht: per lader is opgezocht
+     welke element-ids hij vult, en in welke .view die in apps/app.html staan.
+     Drie laders (laadCare, laadBestellen, loadCv) schrijven nergens zo'n id;
+     die blijven bij het openen laden, want stil iets NIET tonen is erger dan
+     een verzoek te veel. Na de eerste keer blijft een tabblad gevuld, en de
+     live-verbinding (syncScope) houdt bij wat er verandert. */
+  const LADERS_PER_TAB = {
+    reizen:     [['renderTrip', () => renderTrip()], ['laadShowroom', () => laadShowroom()]],
+    betalen:    [['renderPay', () => renderPay()]],
+    ai:         [['renderAI', () => renderAI()], ['renderFluister', () => renderFluister()]],
+    assets:     [['renderAssets', () => renderAssets()]],
+    salon:      [['renderSalon', () => renderSalon()], ['loadVacatures', () => loadVacatures()],
+                 ['laadOntmoet', () => laadOntmoet()]],
+    bestellen:  [['laadBoodschappen', () => laadBoodschappen()]],
+    terplaatse: [['renderTerPlaatse', () => renderTerPlaatse()], ['laadTickets', () => laadTickets()],
+                 ['laadVerhuur', () => laadVerhuur()], ['laadCharter', () => laadCharter()],
+                 ['laadContracten', () => laadContracten()], ['laadVastgoed', () => laadVastgoed()]]
+  };
+  const gevuldeTabs = {};
+
+  /* Vullen loopt via stap() uit ./app-main-12a.js, om dezelfde reden als daar:
+     valt er een lader om, dan staat de rest van het tabblad er gewoon en zegt
+     de console welke het was. */
+  function vulTab(tab){
+    const lijst = LADERS_PER_TAB[tab];
+    if (!lijst || gevuldeTabs[tab]) return;
+    gevuldeTabs[tab] = true;
+    // een gratis gebruiker heeft geen reizen, betalen, AI, assets of zorg: die
+    // tabbladen staan voor hem verborgen, dus halen we er ook niets voor op
+    if (user.tier === 'guest' && ['reizen','betalen','ai','assets','zorg'].includes(tab)) return;
+    for (const [naam, fn] of lijst) stap(naam, fn);
+  }
+
   function openTab(tab, focusView){
+    vulTab(tab);   // nu pas de gegevens van dit tabblad, en alleen de eerste keer
     document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.dataset.view === tab));
     document.querySelectorAll('.tabbar button').forEach(b => {
       const on = b.dataset.tab === tab;

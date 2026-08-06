@@ -107,17 +107,13 @@
         if (knop && knop.style.display !== 'none') beginTab = b.tab;
       }
     } catch(e){}
-    /* De tabbladen achter het beginscherm: na het eerste beeld, een voor een. */
+    /* De tabbladen achter het beginscherm halen hun gegevens nu pas op als je
+       ze opent -- zie LADERS_PER_TAB in ./app-main-12c.js voor waarom, en wat
+       er gemeten is. Hier blijven alleen de drie laders staan die aan geen
+       enkel tabblad vastzitten; die gaan na het eerste beeld, een voor een. */
     naBeeld([
-      ...(guest ? [] : [['renderTrip', renderTrip], ['renderPay', renderPay], ['renderAI', renderAI],
-                        ['renderAssets', renderAssets], ['renderFluister', renderFluister],
-                        ['laadCare', laadCare]]),
-      ['renderSalon', renderSalon], ['renderTerPlaatse', renderTerPlaatse],
-      ['laadBestellen', laadBestellen], ['laadBoodschappen', laadBoodschappen],
-      ['laadShowroom', laadShowroom], ['laadTickets', laadTickets],
-      ['laadVerhuur', laadVerhuur], ['laadCharter', laadCharter],
-      ['laadContracten', laadContracten], ['laadVastgoed', laadVastgoed],
-      ['loadCv', loadCv], ['loadVacatures', loadVacatures], ['laadOntmoet', laadOntmoet]
+      ...(guest ? [] : [['laadCare', laadCare]]),
+      ['laadBestellen', laadBestellen], ['loadCv', loadCv]
     ]);
 
     openTab(beginTab);

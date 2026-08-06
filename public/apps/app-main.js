@@ -12,7 +12,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = 'c2cfc539';
+var RTG_BOUW = 'e966f39a';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -1643,7 +1643,56 @@ var RTG_BOUW = 'c2cfc539';
   // het OS-beginscherm in je wallet, niet meer op de home
   $('#codeChip').addEventListener('click', () => { location.href = '/apps/wallet.html'; });
 
+  /* EEN TABBLAD HAALT ZIJN GEGEVENS OP ALS JE HEM OPENT, NIET EERDER.
+
+     Gemeten, niet gegokt: een keer de app openen kostte 66 API-verzoeken. De
+     rem op de deur (server/middleware/remmen.js) laat er 300 per minuut door,
+     dus wie de app drie keer achter elkaar opende kreeg "te veel verzoeken"
+     terug van zijn eigen app. Dat is precies wat er gemeld werd, en het is
+     onze fout: drie keer openen is doodgewoon gedrag.
+
+     Waar die 66 vandaan kwamen: renderAll() vulde alle vijftien tabbladen bij
+     het opstarten. Een eerdere ingreep zette dat na het eerste beeld en met
+     adempauzes ertussen (naBeeld in ./app-main-12a.js). Dat hielp voor hoe snel
+     het VOELT, maar het aantal verzoeken bleef gelijk: uitstellen is niet
+     hetzelfde als niet doen. De oorzaak is dat we gegevens ophalen voor
+     schermen die op dat moment niemand ziet.
+
+     De indeling hieronder is afgeleid en niet bedacht: per lader is opgezocht
+     welke element-ids hij vult, en in welke .view die in apps/app.html staan.
+     Drie laders (laadCare, laadBestellen, loadCv) schrijven nergens zo'n id;
+     die blijven bij het openen laden, want stil iets NIET tonen is erger dan
+     een verzoek te veel. Na de eerste keer blijft een tabblad gevuld, en de
+     live-verbinding (syncScope) houdt bij wat er verandert. */
+  const LADERS_PER_TAB = {
+    reizen:     [['renderTrip', () => renderTrip()], ['laadShowroom', () => laadShowroom()]],
+    betalen:    [['renderPay', () => renderPay()]],
+    ai:         [['renderAI', () => renderAI()], ['renderFluister', () => renderFluister()]],
+    assets:     [['renderAssets', () => renderAssets()]],
+    salon:      [['renderSalon', () => renderSalon()], ['loadVacatures', () => loadVacatures()],
+                 ['laadOntmoet', () => laadOntmoet()]],
+    bestellen:  [['laadBoodschappen', () => laadBoodschappen()]],
+    terplaatse: [['renderTerPlaatse', () => renderTerPlaatse()], ['laadTickets', () => laadTickets()],
+                 ['laadVerhuur', () => laadVerhuur()], ['laadCharter', () => laadCharter()],
+                 ['laadContracten', () => laadContracten()], ['laadVastgoed', () => laadVastgoed()]]
+  };
+  const gevuldeTabs = {};
+
+  /* Vullen loopt via stap() uit ./app-main-12a.js, om dezelfde reden als daar:
+     valt er een lader om, dan staat de rest van het tabblad er gewoon en zegt
+     de console welke het was. */
+  function vulTab(tab){
+    const lijst = LADERS_PER_TAB[tab];
+    if (!lijst || gevuldeTabs[tab]) return;
+    gevuldeTabs[tab] = true;
+    // een gratis gebruiker heeft geen reizen, betalen, AI, assets of zorg: die
+    // tabbladen staan voor hem verborgen, dus halen we er ook niets voor op
+    if (user.tier === 'guest' && ['reizen','betalen','ai','assets','zorg'].includes(tab)) return;
+    for (const [naam, fn] of lijst) stap(naam, fn);
+  }
+
   function openTab(tab, focusView){
+    vulTab(tab);   // nu pas de gegevens van dit tabblad, en alleen de eerste keer
     document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.dataset.view === tab));
     document.querySelectorAll('.tabbar button').forEach(b => {
       const on = b.dataset.tab === tab;
@@ -1787,17 +1836,13 @@ var RTG_BOUW = 'c2cfc539';
         if (knop && knop.style.display !== 'none') beginTab = b.tab;
       }
     } catch(e){}
-    /* De tabbladen achter het beginscherm: na het eerste beeld, een voor een. */
+    /* De tabbladen achter het beginscherm halen hun gegevens nu pas op als je
+       ze opent -- zie LADERS_PER_TAB in ./app-main-12c.js voor waarom, en wat
+       er gemeten is. Hier blijven alleen de drie laders staan die aan geen
+       enkel tabblad vastzitten; die gaan na het eerste beeld, een voor een. */
     naBeeld([
-      ...(guest ? [] : [['renderTrip', renderTrip], ['renderPay', renderPay], ['renderAI', renderAI],
-                        ['renderAssets', renderAssets], ['renderFluister', renderFluister],
-                        ['laadCare', laadCare]]),
-      ['renderSalon', renderSalon], ['renderTerPlaatse', renderTerPlaatse],
-      ['laadBestellen', laadBestellen], ['laadBoodschappen', laadBoodschappen],
-      ['laadShowroom', laadShowroom], ['laadTickets', laadTickets],
-      ['laadVerhuur', laadVerhuur], ['laadCharter', laadCharter],
-      ['laadContracten', laadContracten], ['laadVastgoed', laadVastgoed],
-      ['loadCv', loadCv], ['loadVacatures', loadVacatures], ['laadOntmoet', laadOntmoet]
+      ...(guest ? [] : [['laadCare', laadCare]]),
+      ['laadBestellen', laadBestellen], ['loadCv', loadCv]
     ]);
 
     openTab(beginTab);

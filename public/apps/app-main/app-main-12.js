@@ -70,24 +70,58 @@
      gewoon door en zegt de console WELKE het was. Dat is geen doekje voor het
      bloeden: een lid dat zijn tegels, klok en wallet ziet terwijl een van de
      twintig kaarten ontbreekt, heeft een werkende app -- en wij een spoor. */
+  /* WAT ER MISGING, OP HET SCHERM ZELF.
+
+     Een gebruiker met een half leeg beginscherm hoort niet de console te
+     hoeven openen om te weten wat er speelt -- en wij horen niet te moeten
+     raden. Deze regel verschijnt alleen als er echt iets omviel: een rustige
+     mededeling onderaan met de naam van het onderdeel, en verder niets. Geen
+     stacktrace, geen alarm; wie het niet interesseert leest er gewoon
+     overheen, en wie het meldt kan het letterlijk overtypen. */
+  let leegGemeld = false;
+  function meldLeegScherm(wat) {
+    if (leegGemeld) return;
+    leegGemeld = true;
+    try {
+      const el = document.createElement('div');
+      el.id = 'rtgOnderdeelStuk';
+      el.setAttribute('role', 'status');
+      el.style.cssText = 'position:fixed;left:50%;transform:translateX(-50%);z-index:9970;' +
+        'bottom:calc(env(safe-area-inset-bottom,0px) + 8.5rem);width:min(26rem,calc(100vw - 2rem));' +
+        'background:var(--card,#151312);border:1px solid var(--line,#2A2724);border-radius:12px;' +
+        'padding:.7rem .9rem;color:var(--muted,#8A8680);font-family:Inter,system-ui,sans-serif;' +
+        'font-size:.76rem;line-height:1.5;text-align:center;';
+      el.textContent = 'Een onderdeel van dit scherm laadde niet: ' + wat + '. De rest werkt gewoon.';
+      document.body.appendChild(el);
+    } catch (e) { /* zelfs de melding mag niets breken */ }
+  }
+  // de tegelbouw (app-main-26b.js) meldt hier ook, dus hij moet daar bereikbaar zijn
+  window.RTGMeldStuk = meldLeegScherm;
+
   function stap(naam, fn) {
     try { fn(); } catch (e) {
       console.error('[rtg] onderdeel "' + naam + '" van het beginscherm ging mis:', e);
-      try { if (window.RTGMeldFout) RTGMeldFout(naam, e); } catch (x) {}
+      meldLeegScherm(naam);
     }
   }
 
   function renderAll(){
-    $('#codeChipTxt').textContent = user.codename;
+    /* Ook deze aanloop liep zonder vangnet, en juist hier staan de regels die
+       aannemen dat een element bestaat. Viel er een om, dan kwam de rest van
+       renderAll niet eens op gang en hielp het afschermen van de stappen
+       hieronder niets. */
     // gratis gebruiker (zonder pas): reizen, betalen en AI zijn voor leden
     const guest = user.tier === 'guest';
+    stap('scherm-aanloop', () => {
+    $('#codeChipTxt').textContent = user.codename;
     ['reizen','betalen','ai','assets','zorg'].forEach(t => { const b = document.querySelector('.tabbar button[data-tab="'+t+'"]'); if (b) b.style.display = guest ? 'none' : ''; });
     // het OS-beginscherm leest dit: zonder pas geen wallet-tegel en geen balk
     // van Rahul, want allebei zijn ze voor leden
     document.getElementById('app').classList.toggle('os-gast', guest);
+    });
     stap('renderHome', renderHome);
     // Rahul opent het gesprek op het beginscherm zelf, met wat hij nu ziet
-    if (!guest && window.RTGThuisRahul) RTGThuisRahul.opent();
+    stap('rahul-thuis', () => { if (!guest && window.RTGThuisRahul) RTGThuisRahul.opent(); });
     if (!guest){
       stap('renderTrip', renderTrip); stap('renderPay', renderPay); stap('renderAI', renderAI);
       stap('renderAssets', renderAssets); stap('renderFluister', renderFluister);

@@ -75,14 +75,33 @@
       : (it.items.some(itemZichtbaar) ? it.sleutel + ':' + mapNaam(it) + ':' + it.items.filter(itemZichtbaar).slice(0, 9).join('+') : '')
   ).join(',')).join('|');
 
+  /* EEN KAPOTTE TEGEL MAG NIET HET HELE BEGINSCHERM KOSTEN.
+
+     Dit is de plek waar de tegels ontstaan, en hij stond buiten elk vangnet:
+     gooide een van de iconen (of een van de regels die bepaalt of hij zichtbaar
+     is), dan brak de hele lus af en bleef er geen enkele tegel over. Wat je dan
+     ziet is een leeg beginscherm met alleen de vaste onderdelen -- precies de
+     melding "ik zie alleen de Rahul-balk".
+
+     Nu valt per tegel te falen: de rest van de rij wordt gewoon gebouwd, en de
+     console noemt de tegel bij naam. Een scherm met negentien van de twintig
+     tegels is een werkende app; een leeg scherm is dat niet. */
   function bouw() {
+    const stuk = [];
     rijen.forEach((rij, p) => {
       rij.textContent = '';
       for (const it of gesorteerd(p)) {
-        if (typeof it === 'string') { if (itemZichtbaar(it)) rij.appendChild(maakAppIcoon(it)); }
-        else if (it.items.some(itemZichtbaar)) rij.appendChild(maakMapIcoon(it));
+        try {
+          if (typeof it === 'string') {  if (itemZichtbaar(it)) rij.appendChild(maakAppIcoon(it)); }
+          else if (it.items.some(itemZichtbaar)) rij.appendChild(maakMapIcoon(it));
+        } catch (e) {
+          const naam = typeof it === 'string' ? it : (it && it.sleutel) || 'onbekend';
+          stuk.push(naam);
+          console.error('[rtg] tegel "' + naam + '" kon niet gebouwd worden:', e);
+        }
       }
     });
+    if (stuk.length) meldLeegScherm('tegels: ' + stuk.join(', '));
     // wat er nu staat is per definitie bij; de waarnemer hoeft er niet overheen
     vorigeAfdruk = afdruk();
     sync();

@@ -12,7 +12,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '9ad1898a';
+var RTG_BOUW = 'fdbff009';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -1667,24 +1667,58 @@ var RTG_BOUW = '9ad1898a';
      gewoon door en zegt de console WELKE het was. Dat is geen doekje voor het
      bloeden: een lid dat zijn tegels, klok en wallet ziet terwijl een van de
      twintig kaarten ontbreekt, heeft een werkende app -- en wij een spoor. */
+  /* WAT ER MISGING, OP HET SCHERM ZELF.
+
+     Een gebruiker met een half leeg beginscherm hoort niet de console te
+     hoeven openen om te weten wat er speelt -- en wij horen niet te moeten
+     raden. Deze regel verschijnt alleen als er echt iets omviel: een rustige
+     mededeling onderaan met de naam van het onderdeel, en verder niets. Geen
+     stacktrace, geen alarm; wie het niet interesseert leest er gewoon
+     overheen, en wie het meldt kan het letterlijk overtypen. */
+  let leegGemeld = false;
+  function meldLeegScherm(wat) {
+    if (leegGemeld) return;
+    leegGemeld = true;
+    try {
+      const el = document.createElement('div');
+      el.id = 'rtgOnderdeelStuk';
+      el.setAttribute('role', 'status');
+      el.style.cssText = 'position:fixed;left:50%;transform:translateX(-50%);z-index:9970;' +
+        'bottom:calc(env(safe-area-inset-bottom,0px) + 8.5rem);width:min(26rem,calc(100vw - 2rem));' +
+        'background:var(--card,#151312);border:1px solid var(--line,#2A2724);border-radius:12px;' +
+        'padding:.7rem .9rem;color:var(--muted,#8A8680);font-family:Inter,system-ui,sans-serif;' +
+        'font-size:.76rem;line-height:1.5;text-align:center;';
+      el.textContent = 'Een onderdeel van dit scherm laadde niet: ' + wat + '. De rest werkt gewoon.';
+      document.body.appendChild(el);
+    } catch (e) { /* zelfs de melding mag niets breken */ }
+  }
+  // de tegelbouw (app-main-26b.js) meldt hier ook, dus hij moet daar bereikbaar zijn
+  window.RTGMeldStuk = meldLeegScherm;
+
   function stap(naam, fn) {
     try { fn(); } catch (e) {
       console.error('[rtg] onderdeel "' + naam + '" van het beginscherm ging mis:', e);
-      try { if (window.RTGMeldFout) RTGMeldFout(naam, e); } catch (x) {}
+      meldLeegScherm(naam);
     }
   }
 
   function renderAll(){
-    $('#codeChipTxt').textContent = user.codename;
+    /* Ook deze aanloop liep zonder vangnet, en juist hier staan de regels die
+       aannemen dat een element bestaat. Viel er een om, dan kwam de rest van
+       renderAll niet eens op gang en hielp het afschermen van de stappen
+       hieronder niets. */
     // gratis gebruiker (zonder pas): reizen, betalen en AI zijn voor leden
     const guest = user.tier === 'guest';
+    stap('scherm-aanloop', () => {
+    $('#codeChipTxt').textContent = user.codename;
     ['reizen','betalen','ai','assets','zorg'].forEach(t => { const b = document.querySelector('.tabbar button[data-tab="'+t+'"]'); if (b) b.style.display = guest ? 'none' : ''; });
     // het OS-beginscherm leest dit: zonder pas geen wallet-tegel en geen balk
     // van Rahul, want allebei zijn ze voor leden
     document.getElementById('app').classList.toggle('os-gast', guest);
+    });
     stap('renderHome', renderHome);
     // Rahul opent het gesprek op het beginscherm zelf, met wat hij nu ziet
-    if (!guest && window.RTGThuisRahul) RTGThuisRahul.opent();
+    stap('rahul-thuis', () => { if (!guest && window.RTGThuisRahul) RTGThuisRahul.opent(); });
     if (!guest){
       stap('renderTrip', renderTrip); stap('renderPay', renderPay); stap('renderAI', renderAI);
       stap('renderAssets', renderAssets); stap('renderFluister', renderFluister);
@@ -3377,14 +3411,33 @@ var RTG_BOUW = '9ad1898a';
       : (it.items.some(itemZichtbaar) ? it.sleutel + ':' + mapNaam(it) + ':' + it.items.filter(itemZichtbaar).slice(0, 9).join('+') : '')
   ).join(',')).join('|');
 
+  /* EEN KAPOTTE TEGEL MAG NIET HET HELE BEGINSCHERM KOSTEN.
+
+     Dit is de plek waar de tegels ontstaan, en hij stond buiten elk vangnet:
+     gooide een van de iconen (of een van de regels die bepaalt of hij zichtbaar
+     is), dan brak de hele lus af en bleef er geen enkele tegel over. Wat je dan
+     ziet is een leeg beginscherm met alleen de vaste onderdelen -- precies de
+     melding "ik zie alleen de Rahul-balk".
+
+     Nu valt per tegel te falen: de rest van de rij wordt gewoon gebouwd, en de
+     console noemt de tegel bij naam. Een scherm met negentien van de twintig
+     tegels is een werkende app; een leeg scherm is dat niet. */
   function bouw() {
+    const stuk = [];
     rijen.forEach((rij, p) => {
       rij.textContent = '';
       for (const it of gesorteerd(p)) {
-        if (typeof it === 'string') { if (itemZichtbaar(it)) rij.appendChild(maakAppIcoon(it)); }
-        else if (it.items.some(itemZichtbaar)) rij.appendChild(maakMapIcoon(it));
+        try {
+          if (typeof it === 'string') {  if (itemZichtbaar(it)) rij.appendChild(maakAppIcoon(it)); }
+          else if (it.items.some(itemZichtbaar)) rij.appendChild(maakMapIcoon(it));
+        } catch (e) {
+          const naam = typeof it === 'string' ? it : (it && it.sleutel) || 'onbekend';
+          stuk.push(naam);
+          console.error('[rtg] tegel "' + naam + '" kon niet gebouwd worden:', e);
+        }
       }
     });
+    if (stuk.length) meldLeegScherm('tegels: ' + stuk.join(', '));
     // wat er nu staat is per definitie bij; de waarnemer hoeft er niet overheen
     vorigeAfdruk = afdruk();
     sync();

@@ -169,4 +169,13 @@ test('een kapotte kaart maakt het beginscherm niet zwart', () => {
   }
   assert.ok(!/\n\s+renderHome\(\);/.test(bron),
     'en niet meer kaal, want dan neemt hij de rest weer mee');
+
+  /* De tegels komen NIET uit renderAll maar uit bouw() in de OS-laag, en die
+     stond buiten elk vangnet: gooide een icoon, dan brak de lus af en bleef er
+     geen enkele tegel over. Dat is het beeld dat gemeld werd, en het is de
+     reden dat het afschermen van renderAll alleen niet hielp. */
+  assert.match(bron, /catch \(e\) \{\s*const naam = typeof it === 'string'/,
+    'een kapotte tegel kost niet de hele rij');
+  assert.match(bron, /Een onderdeel van dit scherm laadde niet: /,
+    'en wat er misging staat op het scherm, niet alleen in de console');
 });

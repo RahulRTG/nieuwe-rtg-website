@@ -166,3 +166,46 @@ test('een app-pagina draagt geen woordmerk meer in zijn chrome',
     fs.rmSync(TMP, { recursive: true, force: true });
   }
 });
+
+test('een knoppengroep in de kop blijft een groep',
+  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-ios-'));
+  const CODE = 'KANTOOR-IOSGROEP-1';
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE: CODE } });
+  let browser;
+  try {
+    /* payroll.html stuurt zonder kantoorsessie naar de inlogdeur, en dan meet je
+       de kop van een andere pagina. Dus eerst een sessie. */
+    const tok = (await (await fetch(base + '/api/office/login', { method: 'POST',
+      headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code: CODE }) })).json()).token;
+    assert.ok(tok, 'kantoorsessie');
+    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    const ctx = await browser.newContext({ viewport: { width: 1100, height: 900 } });
+    await ctx.addInitScript((t) => { try { localStorage.setItem('rtg_office_token', t); } catch (e) {} }, tok);
+    const page = await ctx.newPage();
+
+    /* WAAROM DEZE TOETS APART BESTAAT. De andere hierboven kijkt of elementen
+       met een ID blijven bestaan, en dat was niet genoeg: de tabs van
+       apps/payroll.html staan in een <nav> en worden gezocht met
+       `nav [data-tab]`. Ze hebben geen id. Toen de laag knoppen LOS naar de
+       actiebalk verhuisde, bestonden ze nog wel maar stond de <nav> er niet
+       meer -- en de tabwissel deed niets, zonder foutmelding, want
+       querySelectorAll geeft gewoon een lege lijst terug.
+
+       Een groep verhuist daarom als geheel. Deze toets bewaakt dat via de
+       kiezer die de pagina zelf gebruikt, niet via het bestaan van de knop. */
+    await page.goto(base + '/apps/payroll.html', { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(500);
+    const r = await page.evaluate(() => ({
+      losseKnoppen: document.querySelectorAll('[data-tab]').length,
+      viaDeNav: document.querySelectorAll('nav [data-tab]').length
+    }));
+    assert.ok(r.losseKnoppen > 0, 'de tabknoppen bestaan');
+    assert.equal(r.viaDeNav, r.losseKnoppen,
+      'en ze zijn nog te vinden via de kiezer die het scherm gebruikt (nav [data-tab])');
+  } finally {
+    if (browser) await browser.close();
+    await stop(child);
+    fs.rmSync(TMP, { recursive: true, force: true });
+  }
+});

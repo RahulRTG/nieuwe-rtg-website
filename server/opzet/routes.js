@@ -89,6 +89,9 @@ module.exports = function hangRoutesOp(kern) {
   require('../routes/werkmail')(kern);
   require('../routes/mailpost')(kern);
   require('../routes/payroll')(kern);
+  /* Payroll OS: de routes van de nieuwe loonlaag (kern/payroll/). Naast de
+     oude payroll-routes, met dezelfde poorten -- zie de kop van dat bestand. */
+  require('../routes/payroll-os')(kern);
   require('../routes/huis')(kern);
   require('../routes/muziek')(kern);
   require('../routes/muziek-samen')(kern);

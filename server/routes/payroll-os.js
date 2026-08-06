@@ -1,0 +1,138 @@
+/* Routes van Payroll OS: de nieuwe loonlaag (server/kern/payroll/).
+
+   DE POORTEN VOLGEN DE ROLLEN, NIET ANDERSOM. Wie wat mag, ligt vast in wie
+   welk token heeft, en dat was al zo voordat deze laag bestond:
+
+     officeAuth    het RTG-kantoor draait de loonadministratie VOOR de zaken:
+                   regelpakketten aanmerken, runs openen, definitief maken,
+                   journaal en betaalbestand.
+     supplierAuth  de werkgever keurt goed en handelt de bevindingen af over
+                   ZIJN eigen mensen. Een manager ziet zijn zaak en niet die
+                   van de buurman -- dat komt uit req.supplier en niet uit een
+                   parameter die de client meestuurt.
+     auth          de medewerker ziet zijn eigen loonstroken. Niet die van een
+                   ander, ook niet met een gok naar een ander personeelsnummer.
+
+   Er is BEWUST geen route die een run definitief maakt vanaf de werkgeverskant.
+   Vier ogen betekent dat de tweede handtekening bij de administratie ligt; een
+   knop die beide zet, is een formulier. */
+'use strict';
+
+module.exports = (kern) => {
+  const { app, officeAuth, supplierAuth, auth, payrollOS, findSupplier, accounts, schoon } = kern;
+  if (!payrollOS) return; // de laag is niet gemount (bijv. in een kaal testproces)
+
+  const antwoord = (res, r) => (r && r.error) ? res.status(r.status || 400).json(r) : res.json(r);
+  const wie = (req) => (req.actor && req.actor.name) || 'onbekend';
+
+  /* ---------- regelpakketten (kantoor) ---------- */
+  app.post('/api/office/payroll/regels', officeAuth, (req, res) => {
+    const land = String((req.body || {}).land || 'NL').toUpperCase();
+    res.json({ ok: true, land, pakketten: payrollOS.regels.alle(land),
+      tekenen: payrollOS.bijwerken.tekenen(land) });
+  });
+
+  /* Aanmerken: hierna mag er een definitieve run op. Dat is de enige plek waar
+     een mens zegt "deze tarieven kloppen", en de naam blijft eraan hangen. */
+  app.post('/api/office/payroll/regels/keur', officeAuth, (req, res) => {
+    const b = req.body || {};
+    antwoord(res, payrollOS.regels.merkAan(String(b.land || 'NL'), String(b.versie || ''), wie(req)));
+  });
+
+  app.post('/api/office/payroll/regels/haal', officeAuth, async (req, res) => {
+    try { res.json({ ok: true, uitslag: await payrollOS.bijwerken.ronde() }); }
+    catch (e) { res.status(500).json({ error: 'De bijwerkronde liep vast: ' + e.message }); }
+  });
+
+  /* ---------- de loonrun ---------- */
+  /* Openen doet het kantoor: het draait de administratie. De uren komen uit de
+     klok van de zaak zelf, dus de client levert ze NIET aan -- anders is de
+     invoer van een loonrun iets wat je kunt meesturen. */
+  app.post('/api/office/payroll/run/open', officeAuth, (req, res) => {
+    const b = req.body || {};
+    const s = findSupplier(b.code);
+    if (!s) return res.status(404).json({ error: 'Zaak niet gevonden.' });
+    const periode = String(b.periode || '');
+
+    const meting = payrollOS.uren.meet(s.code, periode);
+    const regels = [];
+    for (const feit of meting.feiten) {
+      const dag = periode + '-01';
+      const contract = payrollOS.contracten.opDatum(s.code, feit.staffId, dag);
+      if (!contract) continue; // de controlelaag meldt het; hier niets verzinnen
+      const gewogen = payrollOS.uren.weeg(feit, contract, b.toeslagen);
+      regels.push({ staffId: feit.staffId, naam: feit.naam, contract,
+        invoer: gewogen.invoer, gewerkteUren: gewogen.gewerkteUren, leeftijdsgroep: b.leeftijdsgroep || '21+' });
+    }
+    const r = payrollOS.run.open({ code: s.code, zaak: s.name, periode,
+      land: (s.settings && s.settings.land) || 'NL', regels, door: wie(req) });
+    if (r.error) return res.status(r.status || 400).json(r);
+
+    /* Meteen nalopen: een run zonder bevindingenlijst nodigt uit om hem over te
+       slaan. De contracten gaan mee, zodat "loon zonder contract" echt gemeten
+       wordt en niet als vals alarm afgaat (zie kern/payroll/controles.js). */
+    const contracten = {};
+    for (const feit of meting.feiten) contracten[feit.staffId] =
+      payrollOS.contracten.opDatum(s.code, feit.staffId, periode + '-01');
+    const vorige = payrollOS.run.lijst(s.code).find(x => x.periode !== periode && x.stand === 'definitief');
+    const bev = payrollOS.controles.loop(payrollOS.run.haal(r.run.id), {
+      urenBevindingen: meting.bevindingen, contracten,
+      vorigeRun: vorige ? payrollOS.run.haal(vorige.id) : null });
+    res.json(Object.assign(r, { bevindingen: bev.bevindingen, hoogOpen: bev.hoogOpen }));
+  });
+
+  app.post('/api/office/payroll/run/lijst', officeAuth, (req, res) =>
+    res.json({ ok: true, runs: payrollOS.run.lijst((req.body || {}).code) }));
+
+  app.post('/api/office/payroll/run/een', officeAuth, (req, res) => {
+    const r = payrollOS.run.haal(String((req.body || {}).runId || ''));
+    if (!r) return res.status(404).json({ error: 'Deze loonrun kennen we niet.' });
+    res.json({ ok: true, run: r, bevindingen: payrollOS.controles.van(r.id) });
+  });
+
+  /* Goedkeuren: de administrateur tekent hier, de manager aan de zaakkant. */
+  app.post('/api/office/payroll/run/keur', officeAuth, (req, res) => {
+    const b = req.body || {};
+    antwoord(res, payrollOS.run.keurGoed(String(b.runId || ''), 'administrateur', wie(req), null));
+  });
+
+  /* Definitief: pas als de bevindingen zijn afgehandeld EN beide handtekeningen
+     staan. De controle op de bevindingen staat hier en niet in run.js, omdat
+     run.js niets van de controlelaag hoort te weten -- maar hij hoort wel te
+     gelden, dus staat hij op de enige plek waar definitief wordt gemaakt. */
+  app.post('/api/office/payroll/run/definitief', officeAuth, (req, res) => {
+    const runId = String((req.body || {}).runId || '');
+    const mag = payrollOS.controles.magDefinitief(runId);
+    if (mag.error) return res.status(mag.status).json(mag);
+    antwoord(res, payrollOS.run.maakDefinitief(runId, wie(req)));
+  });
+
+  app.post('/api/office/payroll/run/verklaar', officeAuth, (req, res) => {
+    const b = req.body || {};
+    antwoord(res, payrollOS.controles.verklaar(String(b.runId || ''), String(b.soort || ''),
+      b.staffId != null ? Number(b.staffId) : null, schoon(b.verklaring, 400), wie(req)));
+  });
+
+  app.post('/api/office/payroll/run/corrigeer', officeAuth, (req, res) => {
+    const b = req.body || {};
+    antwoord(res, payrollOS.run.corrigeer({ runId: String(b.runId || ''), regels: b.regels,
+      door: wie(req), reden: schoon(b.reden, 300) }));
+  });
+
+  /* ---------- journaal en betaalbestand ---------- */
+  app.post('/api/office/payroll/journaal', officeAuth, (req, res) => {
+    const r = payrollOS.run.haal(String((req.body || {}).runId || ''));
+    antwoord(res, payrollOS.journaal.boeking(r));
+  });
+
+  app.post('/api/office/payroll/betaalbestand', officeAuth, (req, res) => {
+    const b = req.body || {};
+    const r = payrollOS.run.haal(String(b.runId || ''));
+    antwoord(res, payrollOS.journaal.betaalbestand(r, b.rekeningen || {}));
+  });
+
+  /* De werkgevers- en medewerkerskant staat in ./payroll-os-zaak.js: een
+     eigen onderwerp (wie keurt goed, wie ziet zijn eigen strook) en dit
+     bestand ging over de 10 KB-lat. */
+  require('./payroll-os-zaak')(kern);
+};

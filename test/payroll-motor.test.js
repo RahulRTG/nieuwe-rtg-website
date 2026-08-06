@@ -194,3 +194,25 @@ test('een component die belast is moet zeggen WELKE grondslagen', () => {
     grondslagen: [], invoerbron: 'handmatig', goedkeuring: 'manager' });
   assert.ok(bez.some(b => /grondslagen/.test(b)), 'anders moet de motor gokken: ' + JSON.stringify(bez));
 });
+
+test('de meegeleverde jaargang komt door de eigen keuring, en staat ongecontroleerd klaar', () => {
+  /* Dit ging mis en het is precies waar de keuring voor is: de ondergrens voor
+     het minimumuurloon stond op 500 cent, terwijl het minimumJEUGDloon voor een
+     vijftienjarige rond de 450 ligt. De eigen jaargang werd dus afgewezen en er
+     stond helemaal geen regelpakket -- zichtbaar pas toen het scherm "nog geen
+     regelpakketten" zei.
+
+     Twee dingen worden hier vastgehouden. Dat de meegeleverde jaargang door de
+     keuring komt (anders is er niets om mee te rekenen), en dat hij daarna
+     ONGECONTROLEERD is: er mag geen definitieve loonrun op tot iemand hem
+     tegen het Handboek Loonheffingen heeft gelegd. */
+  const { maakPayrollOS } = require('../server/kern/payroll/index.js');
+  const db = { data: {} };
+  const os = maakPayrollOS({ db, save: () => {}, crypto: require('node:crypto'), accounts: {} }).payrollOS;
+
+  const uit = os.laadMeegeleverd();
+  assert.ok(uit.every(x => x.ok), 'de eigen jaargang hoort door de eigen keuring te komen: ' + JSON.stringify(uit));
+  const pakketten = os.regels.alle('NL');
+  assert.equal(pakketten.length, 1);
+  assert.equal(pakketten[0].stand, 'ongecontroleerd', 'en niet zomaar in gebruik');
+});

@@ -184,7 +184,23 @@
   function naarTweedeRij(node) {
     if (node.matches('input[type=search], input[type=text], input:not([type])')) return true;
     var p = node.parentElement;
-    return !!(p && p.matches('.filters, .tabs, [role="group"], [role="tablist"]'));
+    return !!(p && p.matches('.filters, .tabs, [role="group"], [role="tablist"], nav'));
+  }
+
+  /* HOUD DE WIKKEL BIJ EEN GROEP. Knoppen worden los verplaatst, en dat gaat
+     goed tot een pagina ze via hun OUDER selecteert. Precies dat gebeurde op
+     apps/payroll.html: de tabs stonden in een <nav> en het scherm zocht ze met
+     `nav [data-tab]`. Na het omvormen stonden de knoppen in .ios-nav-acties, de
+     <nav> was weg, en de tabwissel deed niets meer -- zonder foutmelding, want
+     querySelectorAll levert gewoon een lege lijst.
+
+     Mijn eerdere controle keek naar id's en zag dit dus niet: deze knoppen
+     hebben er geen, ze worden via hun container gevonden. Vandaar deze regel:
+     hoort een knop bij een GROEP (nav, tablist, filterrij), dan verhuist de
+     groep als geheel en blijft de kiezer van de pagina werken. */
+  function groepVan(node) {
+    var p = node.parentElement;
+    return (p && p.matches('.filters, .tabs, [role="group"], [role="tablist"], nav')) ? p : null;
   }
 
   function bouwBalk(kop) {
@@ -229,9 +245,13 @@
 
     for (var j = 0; j < acties.length; j++) {
       var a = acties[j];
+      var groep = groepVan(a);
       if (naarTweedeRij(a)) {
-        var blok = (a.parentElement && a.parentElement !== kop) ? a.parentElement : a;
+        var blok = groep || a;
         if (blok.parentElement !== extra) extra.appendChild(blok);
+      } else if (groep) {
+        // de groep als geheel, zodat een kiezer als `nav [data-tab]` blijft werken
+        if (groep.parentElement !== actieVak) actieVak.appendChild(groep);
       } else {
         actieVak.appendChild(a);
       }

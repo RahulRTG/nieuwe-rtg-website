@@ -50,7 +50,16 @@ const VEREIST = [
    het onmogelijke tegen te houden: een loonheffing van 370% of een minimumloon
    van 3 cent is geen tarief maar een fout in de bron of in het inlezen. */
 const AANNEMELIJK = {
-  minimumUurloonCenten: [500, 10000],
+  /* De ondergrens stond op 500 cent, en dat was fout -- gevonden doordat de
+     keuring de eigen meegeleverde jaargang afwees. Het minimumJEUGDloon ligt
+     veel lager: een vijftienjarige zit rond de 30% van het volwassen tarief,
+     dus rond de 450 cent. Een grens die echte tarieven tegenhoudt is geen
+     controle maar een blokkade, en dan zet de eerste de beste hem uit.
+
+     200 cent laat elk werkelijk jeugdloon door en houdt nog steeds tegen wat
+     een fout in de bron of in het inlezen is (een tarief van 3 cent, of een
+     bedrag dat per ongeluk in euro's in plaats van centen staat). */
+  minimumUurloonCenten: [200, 10000],
   percentage: [0, 0.75]
 };
 

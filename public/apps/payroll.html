@@ -53,6 +53,7 @@
     <button data-tab="overzicht" class="aan">Wie werkt waar</button>
     <button data-tab="loonrun">Loonrun</button>
     <button data-tab="match">Matching</button>
+    <button data-tab="os">Loonrun (OS)</button>
   </nav>
 </header>
 <main>
@@ -81,6 +82,45 @@
       <div class="sec">De matchtafel -- vacatures en mensen die bij elkaar passen</div>
       <div class="noot" style="margin-bottom:.5rem;">Alleen medewerkers die zichzelf "open voor werk" hebben gezet, staan op deze tafel; wie de schakelaar uit laat is voor werkgevers onvindbaar.</div>
       <div id="matchIn"><div class="leeg">Laden...</div></div>
+    </div>
+  </section>
+
+  <!-- ================= de loonrun van Payroll OS =================
+       Bewust een eigen tab naast de bestaande loonrun en niet eroverheen: die
+       draait de demo-berekening waar schermen aan hangen. Deze draait op de
+       nieuwe laag (kern/payroll/) met regelversies, bevindingen en vier ogen. -->
+  <section id="tabOs" hidden>
+    <div class="kaart">
+      <div class="sec">Regelpakketten</div>
+      <div class="noot" style="margin-bottom:.5rem;">Tarieven zijn geen constanten maar jaargangen met een versie. Een binnengehaald pakket staat <b>ongecontroleerd</b> tot iemand het aanmerkt; op zo'n pakket mag geen definitieve loonrun draaien.</div>
+      <div class="rij" style="margin-bottom:.5rem;">
+        <button class="knop" id="osHaal">Nu bijwerken</button>
+      </div>
+      <div id="osRegels"><div class="leeg">Laden...</div></div>
+    </div>
+
+    <div class="kaart">
+      <div class="sec">Loonrun openen</div>
+      <div class="rij">
+        <select class="veld" id="osZaak" style="flex:2;min-width:12rem;"></select>
+        <input class="veld" id="osPeriode" style="flex:1;min-width:7rem;" placeholder="2026-07">
+        <button class="knop" id="osOpen">Open concept</button>
+      </div>
+      <div class="noot" style="margin-top:.45rem;">De uren komen uit de klok van de zaak zelf; ze worden niet meegestuurd. Een ontbrekende uitklok wordt niet geschat maar gemeld.</div>
+      <div id="osUit" style="margin-top:.6rem;"></div>
+    </div>
+
+    <div class="kaart" id="osRunKaart" hidden>
+      <div class="sec" id="osRunTitel">Loonrun</div>
+      <div id="osBevindingen"></div>
+      <div id="osStroken" style="margin-top:.6rem;"></div>
+      <div class="rij" style="margin-top:.6rem;">
+        <button class="knop" id="osKeur">Goedkeuren als administrateur</button>
+        <button class="knop" id="osDef">Definitief maken</button>
+        <button class="knop" id="osJournaal">Loonjournaal</button>
+      </div>
+      <div class="noot" style="margin-top:.45rem;">Definitief kan pas als de manager van de zaak ook heeft getekend, de bevindingen met ernst <b>hoog</b> zijn afgehandeld, en het regelpakket is aangemerkt.</div>
+      <div id="osNaRun" style="margin-top:.6rem;"></div>
     </div>
   </section>
 </main>
@@ -188,8 +228,138 @@ document.querySelectorAll('nav [data-tab]').forEach(b => b.addEventListener('cli
   $('#tabOverzicht').hidden = b.dataset.tab !== 'overzicht';
   $('#tabLoonrun').hidden = b.dataset.tab !== 'loonrun';
   $('#tabMatch').hidden = b.dataset.tab !== 'match';
+  $('#tabOs').hidden = b.dataset.tab !== 'os';
   if (b.dataset.tab === 'match') laadMatch();
+  if (b.dataset.tab === 'os') laadOs().catch(e => meld(e.message));
 }));
+
+/* ================= Payroll OS =================
+   De nieuwe loonlaag. Drie dingen die dit scherm anders maken dan de tab
+   ernaast, en het zijn precies de drie waar het bij loon om gaat:
+
+   1. ELKE RUN DRAAGT ZIJN REGELVERSIE. Die staat in beeld, want "welke regel
+      en versie zijn gebruikt" is een van de vier vragen die elk bedrag moet
+      kunnen beantwoorden.
+   2. DE BEVINDINGEN STAAN VOOR DE BEDRAGEN. Niet eronder weggestopt: een
+      lijst die je moet zoeken, wordt niet gelezen. Hoog blokkeert het
+      definitief maken tot iemand het verklaart, met een reden.
+   3. VIER OGEN IS ZICHTBAAR. Je ziet wie er al heeft getekend en wie nog
+      niet, zodat niemand zich afvraagt waarom de knop niet werkt. */
+let OSRUN = null;
+
+/* Een eigen melder: dit scherm had er geen, en een fout die alleen in de
+   console staat is voor de gebruiker geen fout maar een knop die niets doet. */
+function meld(tekst){
+  let m = document.getElementById('osMelding');
+  if (!m) { m = document.createElement('div'); m.id = 'osMelding'; m.className = 'noot';
+    m.style.cssText = 'margin-top:.5rem;'; ($('#tabOs') || document.body).prepend(m); }
+  m.textContent = tekst;
+}
+
+const bevPil = e => '<span class="pil' + (e === 'hoog' ? ' rood' : e === 'midden' ? ' goud' : '') + '">' + esc(e) + '</span>';
+/* eurC en niet eur: dit scherm had al een eur() die EURO's krijgt; deze
+   krijgt CENTEN, want de nieuwe loonlaag rekent in centen. Twee keer const eur
+   in hetzelfde scriptblok is bovendien een SyntaxError -- dan draait er van dit
+   scherm niets meer. */
+const eurC = c => '€ ' + (c / 100).toFixed(2);
+
+async function laadOs(){
+  const d = await api('regels', { land: 'NL' });
+  $('#osRegels').innerHTML = (d.pakketten || []).map(p =>
+    '<div class="regel"><b>' + esc(p.versie) + '</b>' +
+    '<span class="kpi">geldig ' + esc(p.geldigVan) + (p.geldigTot ? ' t/m ' + esc(p.geldigTot) : '') +
+    ' · bron ' + esc((p.bron || {}).naam || (p.bron || {}).soort || 'onbekend') + '</span>' +
+    '<span class="r">' + (p.stand === 'goedgekeurd'
+      ? '<span class="pil">aangemerkt door ' + esc(p.goedgekeurdDoor || '') + '</span>'
+      : '<span class="pil rood">ongecontroleerd</span> <button class="knop" data-keur="' + esc(p.versie) + '">Aanmerken</button>') +
+    '</span></div>').join('') || '<div class="leeg">Nog geen regelpakketten. Werk bij of laad een jaargang.</div>';
+  $('#osRegels').querySelectorAll('[data-keur]').forEach(b => b.addEventListener('click', async () => {
+    /* Aanmerken is een handeling met een naam eraan: hierna mag er echt geld
+       op deze tarieven worden overgemaakt. Daarom eerst bevestigen. */
+    if (!confirm('Zijn de tarieven van ' + b.dataset.keur + ' gecontroleerd tegen het Handboek Loonheffingen?\n\nNa aanmerken kan er een definitieve loonrun op draaien.')) return;
+    try { await api('regels/keur', { land: 'NL', versie: b.dataset.keur }); await laadOs(); }
+    catch (e) { meld(e.message); }
+  }));
+  // dezelfde zakenlijst als de andere tab; STAND is al geladen
+  if (STAND) $('#osZaak').innerHTML = STAND.zaken.map(z =>
+    '<option value="' + esc(z.code) + '">' + esc(z.naam) + '</option>').join('');
+}
+
+$('#osHaal').addEventListener('click', async () => {
+  try { const d = await api('regels/haal'); meld('Bijwerkronde: ' + d.uitslag.nieuw.length + ' nieuw, ' +
+    d.uitslag.afgekeurd.length + ' afgekeurd.'); await laadOs(); } catch (e) { meld(e.message); }
+});
+
+$('#osOpen').addEventListener('click', async () => {
+  try {
+    const d = await api('run/open', { code: $('#osZaak').value, periode: $('#osPeriode').value.trim() });
+    OSRUN = d.run;
+    toonOsRun(d.run, d.bevindingen || []);
+    $('#osUit').innerHTML = '<div class="noot">Concept geopend op regelpakket <b>' + esc(d.run.regelversie) + '</b>.</div>';
+  } catch (e) { $('#osUit').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; }
+});
+
+function toonOsRun(run, bevindingen){
+  $('#osRunKaart').hidden = false;
+  const tekens = (run.goedkeuringen || []).map(g => g.rol).join(' + ') || 'nog niemand';
+  $('#osRunTitel').textContent = 'Loonrun ' + run.periode + ' · ' + run.zaak + ' · ' + run.stand +
+    ' · getekend door: ' + tekens;
+
+  const hoogOpen = bevindingen.filter(b => b.ernst === 'hoog' && b.status === 'open');
+  $('#osBevindingen').innerHTML = bevindingen.length
+    ? '<div class="sec">Bevindingen' + (hoogOpen.length ? ' - ' + hoogOpen.length + ' met ernst hoog open' : '') + '</div>' +
+      bevindingen.map(b =>
+        '<div class="regel"><b>' + bevPil(b.ernst) + ' ' + esc(b.uitleg) + '</b>' +
+        '<span class="kpi">' + esc(b.soort) + ' · afhandelen: ' + esc(b.eigenaar || '?') +
+        (b.status !== 'open' ? ' · <b>' + esc(b.status) + '</b>: ' + esc(b.verklaring || '') : '') + '</span>' +
+        (b.status === 'open'
+          ? '<span class="r"><button class="knop" data-verklaar="' + esc(b.soort) + '" data-staff="' + (b.staffId != null ? b.staffId : '') + '">Verklaren</button></span>'
+          : '') + '</div>').join('')
+    : '<div class="noot">Geen bevindingen.</div>';
+
+  $('#osBevindingen').querySelectorAll('[data-verklaar]').forEach(b => b.addEventListener('click', async () => {
+    const reden = prompt('Waarom is dit in orde? (blijft bij de loonrun staan)');
+    if (reden == null) return;
+    try {
+      await api('run/verklaar', { runId: run.id, soort: b.dataset.verklaar,
+        staffId: b.dataset.staff === '' ? null : Number(b.dataset.staff), verklaring: reden });
+      const d = await api('run/een', { runId: run.id });
+      toonOsRun(d.run, d.bevindingen);
+    } catch (e) { meld(e.message); }
+  }));
+
+  const stroken = run.stroken || [];
+  $('#osStroken').innerHTML = stroken.length ? '<div class="sec">Stroken</div>' + stroken.map(s =>
+    '<div class="regel"><b>' + esc(s.naam || ('#' + s.staffId)) + '</b>' +
+    '<span class="kpi">' + (s.strook.regels || []).map(r =>
+      esc(r.naam) + (r.aantal != null ? ' ' + r.aantal + '×' : '') + ' ' + eurC(r.centen)).join(' · ') + '</span>' +
+    '<span class="r">netto ' + eurC(s.strook.nettoCenten) + '</span></div>').join('') : '';
+}
+
+$('#osKeur').addEventListener('click', async () => {
+  if (!OSRUN) return;
+  try { await api('run/keur', { runId: OSRUN.id }); const d = await api('run/een', { runId: OSRUN.id });
+    OSRUN = d.run; toonOsRun(d.run, d.bevindingen); meld('Getekend als administrateur.'); }
+  catch (e) { meld(e.message); }
+});
+
+$('#osDef').addEventListener('click', async () => {
+  if (!OSRUN) return;
+  try { await api('run/definitief', { runId: OSRUN.id }); const d = await api('run/een', { runId: OSRUN.id });
+    OSRUN = d.run; toonOsRun(d.run, d.bevindingen); meld('Definitief. Hierna kan alleen nog een correctierun.'); }
+  catch (e) { meld(e.message); }
+});
+
+$('#osJournaal').addEventListener('click', async () => {
+  if (!OSRUN) return;
+  try {
+    const d = await api('journaal', { runId: OSRUN.id });
+    $('#osNaRun').innerHTML = '<div class="sec">Loonjournaal</div>' + (d.regels || []).map(r =>
+      '<div class="regel"><b>' + esc(r.rekening) + '</b><span class="kpi">' + esc(r.wat || 'kosten') + '</span>' +
+      '<span class="r">' + (r.debetCenten ? 'debet ' + eurC(r.debetCenten) : 'credit ' + eurC(r.creditCenten)) + '</span></div>').join('') +
+      '<div class="noot">Debet ' + eur(d.somDebet) + ' tegenover credit ' + eur(d.somCredit) + ' - de boeking telt op tot nul.</div>';
+  } catch (e) { $('#osNaRun').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; }
+});
 /* Pas beginnen als er een kantoorsessie is. Zonder token stuurt uitgelogd()
    hierboven al door, maar de navigatie is niet meteen klaar en intussen liep
    deze aanroep gewoon door -- die kwam terug met "Geen backoffice-sessie" en

@@ -28,10 +28,9 @@ const DAGDELEN = ['ma-o', 'ma-m', 'ma-a', 'di-o', 'di-m', 'di-a', 'wo-o', 'wo-m'
 const VOG_VERPLICHT = ['jongeren', 'huiswerk', 'sport', 'ouderen'];
 
 module.exports = (ctx) => {
-  const { nu, rid, schoon, S, audit, wie, poort, save } = ctx;
+  const { nu, rid, schoon, S, audit, wie, poort, save, vogGeldig } = ctx;
 
   const vind = id => S().vrijwilligers.find(v => v.id === String(id || '')) || null;
-  const vogGeldig = v => !!v.vogGeldigTot && Date.parse(v.vogGeldigTot) > Date.now();
   const uren = v => (v.uren || []).reduce((s, u) => s + u.uren, 0);
   const beeld = v => ({ id: v.id, stad: v.stad, naam: v.naam, contact: v.contact, status: v.status,
     beschikbaar: v.beschikbaar || [], talen: v.talen || [], vaardigheden: v.vaardigheden || [],

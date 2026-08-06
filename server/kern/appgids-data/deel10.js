@@ -49,6 +49,7 @@ module.exports = {
     ['Kies een stadsafdeling; u ziet alleen de steden waar u een zetel heeft, het landelijke bestuur ziet ze alle',
       'Werk per tabblad: impact, projecten, partners, vrijwilligers, geld, hulpvragen, integriteit, gemeente en ondernemers',
       'Werk per tabblad verder: subsidies met hun rapportagemomenten, voorraad per batch, activiteiten met wachtlijst en incheck, en communicatie',
+      'Onder Netwerk deelt u een blauwdruk met andere steden, koopt u samen in, leent u vrijwilligers uit en ziet u het koppelbord met RTG',
       'Onder Bestuur staan de knoppen van het toezicht: modules per stad, de status van de afdeling, de goedkeuringslimieten en de zetels'],
     'Geoormerkt geld gaat hier nooit naar een ander project, wie een uitgave aanvraagt keurt hem niet zelf goed, en een melding kan niemand verwijderen -- ook het landelijke bestuur niet.'),
   '/apps/foundation/os-portaal.html': G('Het portaal voor partnerstichtingen, gemeenten en lokale ondernemers: uw eigen dossier, op uw eigen code.',

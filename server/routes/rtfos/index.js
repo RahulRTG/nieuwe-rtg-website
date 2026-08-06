@@ -39,8 +39,10 @@
 
    De uitvoeringslaag (vrijwilligers, geld, casussen, meldingen, rapportages,
    gemeenten, ondernemers, subsidies, voorraad, activiteiten en communicatie)
-   staat in ./uitvoering.js; dit bestand houdt de organisatie: de boom, de
-   steden, de zetels, de partners en de projecten. */
+   staat in ./uitvoering.js, en het netwerk tussen steden (blauwdrukken,
+   gezamenlijke inkoop, uitleen, campagnes, koppelbord) in ./netwerk.js. Dit
+   bestand houdt de organisatie: de boom, de steden, de zetels, de partners en
+   de projecten. */
 module.exports = (kern) => {
   const { app, officeAuth, rtfos } = kern;
 
@@ -93,5 +95,6 @@ module.exports = (kern) => {
   app.post('/api/rtfos/audit', officeAuth, H((req, b) => rtfos.auditlog(req, b)));
 
   require('./uitvoering')({ app, officeAuth, rtfos, H });
+  require('./netwerk')({ app, officeAuth, rtfos, H });
   require('./portalen')({ app, rtfos, veilig });
 };

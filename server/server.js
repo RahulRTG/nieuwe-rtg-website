@@ -1950,7 +1950,7 @@ Object.assign(kern, require('./kern/stadsraad')({ db, save, crypto }));
    verantwoording aan gemeenten. Krijgt boardroomWie/magBoardroom mee: het
    landelijke bestuur IS de boardroom, en de zetels per stad hangen aan dezelfde
    sleutel uit een echte inlog (zie kern/rtfos/basis.js). */
-Object.assign(kern, require('./kern/rtfos')({ db, save, crypto, boardroomWie, magBoardroom }));
+Object.assign(kern, require('./kern/rtfos')({ db, save, crypto, boardroomWie, magBoardroom, agenda }));
 /* RTG Payroll (kern/payroll.js): het loonkantoor draait op wat het platform
    al weet -- de klok, de rollen en de fiscale landtabellen. */
 Object.assign(kern, require('./kern/payroll')({ db, save, crypto, accounts, LANDEN, klokVan, openVacatures, findSupplier }));

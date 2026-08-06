@@ -100,8 +100,10 @@ module.exports = (ctx) => {
   const uitgaven = require('./geld-uitgaven')(ctx, { vindBron, vrij, bronBeeld });
 
   return { lijst, bronMaak, verplaats: bron.verplaats, bronUitSubsidie: bron.bronUitSubsidie,
+    bronUitCampagne: bron.bronUitCampagne,
     vindBron, vrij, bronBeeld,
     uitgaveAanvraag: uitgaven.aanvraag, uitgaveBesluit: uitgaven.besluit,
+    boekAanvraag: uitgaven.boekAanvraag,
     SOORTEN, HERBESTEMMING };
 };
 module.exports.SOORTEN = SOORTEN;

@@ -92,5 +92,22 @@ module.exports = (ctx, eigen) => {
     return bron;
   }
 
-  return { verplaats, bronUitSubsidie };
+  /* De bron die uit een landelijke campagneronde ontstaat (campagnes.js). Net
+     als bij de subsidie: dezelfde lijst, dezelfde vorm, en de herkomst erbij.
+     Stadsbreed en niet op een project -- de gever gaf aan de campagne, en welk
+     project het wordt, beslist de stad zelf. Herbestemmen kan alleen met
+     toestemming, want de campagne was de belofte. */
+  function bronUitCampagne(b) {
+    const bron = { id: rid(), stad: b.stad, projectId: null, soort: 'donatie',
+      gever: schoon(b.gever, 120) || 'landelijke campagne', anoniem: false,
+      centen: Math.max(0, Math.round(Number(b.centen) || 0)), besteed: 0,
+      herbestemming: 'met_toestemming', kenmerk: schoon('campagne ' + (b.campagne || ''), 60),
+      uitCampagne: true, door: b.door || null, at: nu() };
+    S().bronnen.push(bron);
+    audit(b.door, 'bron.uit-campagne', bron.kenmerk, euro(bron.centen) + ' euro');
+    save();
+    return bron;
+  }
+
+  return { verplaats, bronUitSubsidie, bronUitCampagne };
 };

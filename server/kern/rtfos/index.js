@@ -28,6 +28,11 @@
      voorraad         goederen als batch: houdbaarheid, restant, bestemming
      activiteiten     inschrijven, wachtlijst, toestemming, incheck aan de deur
      berichten        communicatie per stad, publiek pas na landelijk akkoord
+     netwerk          blauwdrukken delen tussen steden, en eerlijk vergelijken
+     inkoop           samen kopen zonder de goedkeuring van een stad te omzeilen
+     uitwisseling     vrijwilligers tussen steden, met toestemming en einddatum
+     campagnes        landelijk werven, centnauwkeurig verdelen over steden
+     koppeling        wat er naar RTG loopt, en wat er eerlijk NIET loopt
 
    WAT DIT NIET IS. Geen tweede ledenadministratie en geen tweede boekhouding.
    De 30%-afdracht van RTG naar de stichting blijft in kern/fonds.js; dit OS
@@ -35,7 +40,8 @@
 
 const kluis = require('../../kluis');
 
-module.exports = ({ db, save, crypto, boardroomWie, magBoardroom }) => {
+module.exports = (state) => {
+  const { db, save, crypto, boardroomWie, magBoardroom } = state;
   const ctx = require('./basis')({ db, save, crypto, boardroomWie, magBoardroom });
   // De schrijflaag en de kluis gaan mee op dezelfde context: elk deel schrijft
   // via dezelfde save() en versleutelt via dezelfde sleutel.
@@ -51,15 +57,30 @@ module.exports = ({ db, save, crypto, boardroomWie, magBoardroom }) => {
   const rapport = require('./rapport')(ctx);
   const gemeente = require('./gemeente')(ctx, { cijfersVan: rapport.cijfersVan });
   const ondernemers = require('./ondernemers')(ctx);
+  /* De uitwisseling wordt hier opgebouwd omdat het vrijwilligersregister hem
+     nodig heeft: die laatste vraagt bij het
+     koppelen of een vrijwilliger uit een andere stad hier is uitgeleend, en die
+     vraag hoort thuis bij de uitwisseling zelf (een tweede oordeel zou uiteen
+     gaan lopen -- LAT.md regel 4). De verwijzing gaat via de context, want
+     twee modules die elkaar over en weer laden is een kring die alleen werkt
+     zolang niemand de volgorde aanraakt. */
+  const uitwisseling = require('./uitwisseling')(ctx);
+  ctx.magInStad = uitwisseling.magInStad;
+
   /* Fase twee: de uitvoering op straat. Subsidies leunen op geld.js (een
      toegekende subsidie MAAKT zijn geoormerkte bron, en maakt hem niet na);
-     activiteiten leunen op de VOG-toets uit het vrijwilligersregister. Beide
-     krijgen die functie mee in plaats van hem opnieuw te bedenken -- twee
-     plekken die hetzelfde oordeel vellen, lopen uiteen (LAT.md regel 4). */
+     activiteiten leunen op de VOG-toets. Beide krijgen die functie mee in
+     plaats van hem opnieuw te bedenken (LAT.md regel 4). */
   const subsidies = require('./subsidies')(ctx, { bronUitSubsidie: geld.bronUitSubsidie });
   const voorraad = require('./voorraad')(ctx);
   const activiteiten = require('./activiteiten')(ctx, { vogGeldig: vrijwilligers.vogGeldig });
   const berichten = require('./berichten')(ctx);
+  /* Fase vier: het netwerkeffect. Delen, samen kopen, mensen uitwisselen en
+     landelijk werven -- allemaal met de stadsgrenzen intact. */
+  const netwerk = require('./netwerk')(ctx);
+  const inkoop = require('./inkoop')(ctx, { boekAanvraag: geld.boekAanvraag });
+  const campagnes = require('./campagnes')(ctx, { bronUitCampagne: geld.bronUitCampagne });
+  const koppeling = require('./koppeling')(ctx, { agenda: state.agenda });
 
   /* Het auditspoor uitlezen. Alleen landelijk, en alleen lezen -- er is nergens
      een functie die erin schrijft behalve ctx.audit zelf, en nergens een die
@@ -92,6 +113,7 @@ module.exports = ({ db, save, crypto, boardroomWie, magBoardroom }) => {
     zetelWeg: steden.zetelWeg, kernteamZet: steden.kernteamZet,
     partners, projecten, vrijwilligers, geld, casus, integriteit, rapport, gemeente, ondernemers,
     subsidies, voorraad, activiteiten, berichten,
+    netwerk, inkoop, uitwisseling, campagnes, koppeling,
     VLAGGEN: ctx.VLAGGEN, ROLLEN: ctx.ROLLEN
   } };
 };

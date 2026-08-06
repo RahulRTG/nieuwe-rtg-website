@@ -36,20 +36,40 @@ module.exports = (ctx, eigen) => {
     return { ok: true, v, w };
   }
 
+  /* De koppeling wordt gepoort op de stad van het PROJECT en niet op die van de
+     vrijwilliger. Dat is waar het werk gebeurt, en het is wat een uitleen
+     tussen steden mogelijk maakt: de ontvangende stad plant zijn eigen
+     projecten in. Voor een vrijwilliger uit de eigen stad verandert er niets --
+     dan zijn het dezelfde stad.
+
+     De uitleen zelf is de tweede voorwaarde: zonder LOPENDE uitleen
+     (uitwisseling.js) staat een vrijwilliger uit een andere stad hier niet
+     zomaar op een project. Die grendel hangt aan het moment van koppelen en
+     niet aan het register -- LAT.md regel 7: de grendel hoort bij het doel. */
   function koppel(req, id, projectId, los) {
-    const o = open(req, id);
-    if (!o.ok) return o;
-    const v = o.v;
+    const v = vind(id);
+    if (!v) return { status: 404, error: 'Deze vrijwilliger staat niet in het register.' };
     const p = S().projecten.find(x => x.id === String(projectId || ''));
     if (!p) return { status: 404, error: 'Dit project bestaat niet.' };
-    if (p.stad !== v.stad) return { status: 400, error: 'Deze vrijwilliger hoort bij een andere stad.' };
+    const w = wie(req);
+    const g = poort(w, p.stad, 'vrijwilliger.beheren', 'volunteer_management');
+    if (!g.ok) return g;
+    const o = { ok: true, v, w };
     if (!Array.isArray(v.projecten)) v.projecten = [];
+    /* LOSKOPPELEN KAN ALTIJD, en dat staat VOOR de uitleen-controle. Anders zit
+       een vrijwilliger na afloop van een uitleen vast op een project in de
+       andere stad: die stad mag hem er dan niet meer af halen omdat de uitleen
+       net is verlopen. Een grendel die het opruimen tegenhoudt, houdt precies
+       het verkeerde tegen. */
     if (los === true) {
       v.projecten = v.projecten.filter(x => x !== p.id);
       if (Array.isArray(p.vrijwilligers)) p.vrijwilligers = p.vrijwilligers.filter(x => x !== v.id);
       audit(o.w.key, 'vrijwilliger.los', v.naam, p.naam);
       save();
       return { ok: true, vrijwilliger: beeld(v) };
+    }
+    if (p.stad !== v.stad && !ctx.magInStad(v.id, p.stad)) {
+      return { status: 400, error: v.naam + ' hoort bij een andere stad en is hier niet aan uitgeleend. Vraag de eigen afdeling om een uitleen, en vraag het ' + v.naam + ' zelf.' };
     }
     if (VOG_VERPLICHT.includes(p.soort) && !vogGeldig(v)) {
       return { status: 403, error: 'Voor "' + p.naam + '" (' + p.soort + ') is een geldige VOG verplicht. ' +

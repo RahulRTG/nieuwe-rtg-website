@@ -122,7 +122,8 @@ test('het Foundation OS-bestuursscherm toont de stad, de tabbladen en de zin van
        precies zo uitziet als een tabblad dat werkt. Elk tabblad moet zijn eigen
        formulier tonen -- dat is het bewijs dat de API erachter antwoordde. */
     for (const [tab, merk] of [['subsidies', '#sMaak'], ['voorraad', '#grMaak'],
-      ['activiteiten', '#acMaak'], ['berichten', '#brMaak']]) {
+      ['activiteiten', '#acMaak'], ['berichten', '#brMaak'],
+      ['netwerk', '#bdDeel']]) {
       await page.click('[data-tab="' + tab + '"]');
       await page.waitForSelector(merk, { timeout: 15000 });
     }

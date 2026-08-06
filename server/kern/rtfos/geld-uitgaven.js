@@ -43,6 +43,23 @@ module.exports = (ctx, eigen) => {
     if (!['goedgekeurd', 'actief'].includes(p.status)) {
       return { status: 400, error: 'Dit project staat op "' + p.status + '". Er wordt pas geld uitgegeven als het is goedgekeurd.' };
     }
+    const r = boekAanvraag(w, p, b);
+    if (!r.ok) return r;
+    return { ok: true, uitgave: r.uitgave, nodig: nodigVoor(g.stad, r.centen) };
+  }
+
+  /* De aanvraag zelf, zonder poort en zonder req. Hier staan de controles die
+     ALTIJD gelden -- het bedrag, het oormerk, het vrije saldo -- en niet de
+     vraag of deze persoon hier mag zijn; die is een verdieping hoger al
+     beantwoord.
+
+     WAAROM DIT APART STAAT: de gezamenlijke inkoop (netwerk/inkoop.js) zet bij
+     het sluiten per deelnemende stad een aanvraag klaar. Die zou anders zijn
+     eigen kopie van deze controles krijgen, en dan is er een tweede weg naar
+     het uitgavenregister met een eigen mening over oormerken (LAT.md regel 4).
+     Nu is er een weg, en loopt ook inkoop gewoon door de vier ogen en de
+     limiet van de ontvangende stad. */
+  function boekAanvraag(w, p, b) {
     const c = centen(b.bedrag);
     if (c === null || c === 0) return { status: 400, error: 'Wat is het bedrag?' };
     const oms = schoon(b.omschrijving, 200);
@@ -66,11 +83,12 @@ module.exports = (ctx, eigen) => {
     if (S().uitgaven.length >= 200000) return { status: 400, error: 'Het uitgavenregister zit vol.' };
     const u = { id: rid(), stad: p.stad, projectId: p.id, bronId: bron.id, omschrijving: oms,
       centen: c, status: 'aangevraagd', door: w.key, doorNaam: schoon(b.naam, 60) || w.key,
-      leverancier: schoon(b.leverancier, 120), factuur: schoon(b.factuur, 80), at: nu() };
+      leverancier: schoon(b.leverancier, 120), factuur: schoon(b.factuur, 80),
+      uitInkoop: b.uitInkoop || null, at: nu() };
     S().uitgaven.push(u);
     audit(w.key, 'uitgave.aanvraag', p.naam, euro(c) + ' euro: ' + oms);
     save();
-    return { ok: true, uitgave: uitgaveBeeld(u), nodig: nodigVoor(g.stad, c) };
+    return { ok: true, uitgave: uitgaveBeeld(u), centen: c };
   }
 
   // Welke rol dit bedrag zelfstandig kan goedkeuren. Voor het scherm, zodat een
@@ -129,5 +147,5 @@ module.exports = (ctx, eigen) => {
     return { ok: true, uitgave: uitgaveBeeld(u) };
   }
 
-  return { aanvraag, besluit, nodigVoor, uitgaveBeeld };
+  return { aanvraag, besluit, nodigVoor, uitgaveBeeld, boekAanvraag };
 };

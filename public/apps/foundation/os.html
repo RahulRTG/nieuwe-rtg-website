@@ -215,7 +215,7 @@ const TABS = [
   ['vrijwilligers', 'Vrijwilligers'], ['geld', 'Geld'], ['casussen', 'Hulpvragen'],
   ['meldingen', 'Integriteit'], ['gemeente', 'Gemeente'], ['ondernemers', 'Ondernemers'],
   ['subsidies', 'Subsidies'], ['voorraad', 'Voorraad'], ['activiteiten', 'Activiteiten'],
-  ['berichten', 'Communicatie'], ['bestuur', 'Bestuur']
+  ['berichten', 'Communicatie'], ['netwerk', 'Netwerk'], ['bestuur', 'Bestuur']
 ];
 
 async function openStad(id) {
@@ -256,6 +256,7 @@ async function tekenTab() {
     if (TAB === 'voorraad') return await tabVoorraad();
     if (TAB === 'activiteiten') return await tabActiviteiten();
     if (TAB === 'berichten') return await tabBerichten();
+    if (TAB === 'netwerk') return await tabNetwerk();
     if (TAB === 'bestuur') return await tabBestuur();
   } catch (e) { raam('<div class="kaart"><div class="melder fout">' + esc(e.message) + '</div></div>'); }
 }
@@ -822,6 +823,134 @@ async function tabBerichten() {
     const veld = document.getElementById('rd-' + b.dataset.bnee);
     doe('bericht/besluit', { id: b.dataset.bnee, akkoord: false, reden: veld ? veld.value : '' }, tekenTab);
   }));
+}
+
+/* ---------- netwerk: delen, samen kopen, uitlenen, campagnes ---------- */
+async function tabNetwerk() {
+  const [bd, ink, uit, camp, bord, bench] = await Promise.all([
+    api('blauwdrukken', {}), api('inkoop', {}), api('uitleen', { stad: STAD.id }),
+    api('campagnes', {}), api('koppelbord', {}), api('benchmark', {})
+  ]);
+  const pr = await api('projecten', { stad: STAD.id });
+  const projOpties = pr.projecten.map(p => '<option value="' + esc(p.id) + '">' + esc(p.naam) + '</option>').join('');
+
+  raam('<div class="kaart"><div class="sec">Blauwdrukken: wat elders werkte</div>' +
+      (bd.blauwdrukken.length ? bd.blauwdrukken.map(b => '<div class="lijnrij"><span class="naam"><b>' + esc(b.naam) + '</b> &middot; ' + esc(b.soort) + '</span>' +
+        '<span class="pil">uit ' + esc(b.vanStad || '?') + '</span>' +
+        (b.overgenomen ? '<span class="pil">' + b.overgenomen + 'x overgenomen</span>' : '') +
+        (b.eigen ? '' : '<button class="knop stil" data-overnemen="' + esc(b.id) + '">Overnemen in ' + esc(STAD.naam) + '</button>') +
+        '<div class="sub">' + esc(b.aanpak) + '</div>' +
+        '<div class="sub">Geleerd: ' + esc(b.geleerd) + (b.doorlooptijd ? ' &middot; ' + esc(b.doorlooptijd) : '') + '</div></div>').join('')
+        : '<div class="leeg">Nog geen blauwdrukken. Deel er een vanuit een project dat draait en gemeten is.</div>') +
+      '<div class="rij breed"><select class="veld" id="bdProject" aria-label="Project">' + projOpties + '</select>' +
+      '<input class="veld" id="bdAanpak" placeholder="De aanpak: wat doet een andere stad maandag als eerste?" maxlength="1500" aria-label="Aanpak">' +
+      '<input class="veld" id="bdGeleerd" placeholder="Wat ging er mis of anders dan verwacht?" maxlength="1000" aria-label="Geleerd">' +
+      '<input class="veld" id="bdDuur" placeholder="doorlooptijd" maxlength="60" aria-label="Doorlooptijd">' +
+      '<button class="knop" id="bdDeel">Delen</button></div>' +
+      '<div class="uitleg">Wie een blauwdruk overneemt, begint bij &quot;idee&quot; en loopt zijn eigen goedkeuring. Het budget en de resultaten van de andere stad reizen niet mee: dat zijn feiten van daar.</div></div>' +
+
+    '<div class="kaart"><div class="sec">Gezamenlijke inkoop</div>' +
+      (ink.inkoop.length ? ink.inkoop.map(i => '<div class="lijnrij" id="i-' + esc(i.id) + '"><span class="naam"><b>' + esc(i.wat) + '</b></span>' +
+        '<span class="pil">' + esc(i.status) + '</span><span class="pil">' + i.stuks + ' ' + esc(i.eenheid) + '</span>' +
+        '<span class="pil">' + i.deelnames.length + ' steden</span>' +
+        (i.totaal ? '<span class="pil">' + eur(i.totaal) + '</span>' : '') +
+        '<div class="sub">geopend door ' + esc(i.openerStad || '?') + ' &middot; indicatie ' + eur(i.indicatiePerStuk) + ' per stuk' +
+          (i.sluitDatum ? ' &middot; sluit ' + esc(i.sluitDatum) : '') + '</div>' +
+        i.deelnames.map(d => '<div class="sub">' + esc(d.stad) + ': ' + d.aantal + ' &middot; ' + eur(d.deel) +
+          (d.uitgaveId ? ' (aanvraag klaar)' : '') + '</div>').join('') +
+        (i.status === 'open' ? '<div class="rij breed">' +
+          '<select class="veld iProject" aria-label="Project">' + projOpties + '</select>' +
+          '<input class="veld iAantal" type="number" min="1" placeholder="aantal" aria-label="Aantal">' +
+          '<input class="veld iBron" placeholder="bron-id" maxlength="20" aria-label="Bron">' +
+          '<button class="knop stil" data-inschrijf-inkoop="' + esc(i.id) + '">Meedoen</button>' +
+          '<input class="veld iPrijs" type="number" min="0" step="0.01" placeholder="definitieve prijs" aria-label="Prijs">' +
+          '<input class="veld iExtra" type="number" min="0" step="0.01" placeholder="bijkomende kosten" aria-label="Bijkomende kosten">' +
+          '<button class="knop stil" data-sluit-inkoop="' + esc(i.id) + '">Sluiten</button></div>' : '') +
+        '</div>').join('') : '<div class="leeg">Nog geen gezamenlijke inkoop.</div>') +
+      '<div class="rij breed"><input class="veld" id="ikWat" placeholder="Wat kopen we samen" maxlength="120" aria-label="Wat">' +
+      '<input class="veld" id="ikEenheid" placeholder="eenheid" maxlength="20" aria-label="Eenheid">' +
+      '<input class="veld" id="ikPrijs" type="number" min="0" step="0.01" placeholder="indicatie per stuk" aria-label="Indicatie">' +
+      '<input class="veld" id="ikLev" placeholder="leverancier" maxlength="120" aria-label="Leverancier">' +
+      '<button class="knop" id="ikMaak">Openen</button></div>' +
+      '<div class="uitleg">Elke stad betaalt uit eigen bronnen; sluiten maakt per stad een gewone uitgave-aanvraag die daar nog door de vier ogen moet. Een gezamenlijke order is een bestelling, geen betaling.</div></div>' +
+
+    '<div class="kaart"><div class="sec">Vrijwilligers tussen steden</div>' +
+      (uit.uitgeleend.length || uit.geleend.length
+        ? uit.uitgeleend.concat(uit.geleend).map(u => '<div class="lijnrij"><span class="naam">' + esc(u.naam) + '</span>' +
+          '<span class="pil">' + esc(u.vanStad || '?') + ' &rarr; ' + esc(u.naarStad || '?') + '</span>' +
+          '<span class="pil">' + esc(u.status) + (u.loopt ? ', loopt' : '') + '</span>' +
+          '<span class="pil">tot ' + esc(u.tot || '?') + '</span>' +
+          (u.status === 'gevraagd' ? '<input class="veld uTekst" id="ut-' + esc(u.id) + '" placeholder="wat zegt de vrijwilliger?" maxlength="300" aria-label="Toestemming">' +
+            '<button class="knop stil" data-uja="' + esc(u.id) + '">Akkoord</button>' +
+            '<button class="knop stil" data-unee="' + esc(u.id) + '">Niet akkoord</button>' : '') +
+          (u.status === 'lopend' ? '<button class="knop stil" data-ustop="' + esc(u.id) + '">Beeindigen</button>' : '') +
+          '<div class="sub">' + esc(u.reden) + '</div></div>').join('')
+        : '<div class="leeg">Geen uitleen in of uit deze stad.</div>') +
+      (uit.gasten.length ? '<div class="sub">Nu hier aan het werk vanuit een andere stad: ' +
+        uit.gasten.map(g => esc(g.naam) + ' (' + esc(g.eigenStad || '?') + ')').join(', ') + '</div>' : '') +
+      '<div class="uitleg">Een vrijwilliger wordt gevraagd, niet verplaatst. Zonder vastgelegde toestemming loopt de uitleen niet, en de ontvangende stad ziet vaardigheden en beschikbaarheid &mdash; geen evaluaties en geen urenhistorie.</div></div>' +
+
+    '<div class="kaart"><div class="sec">Landelijke campagnes</div>' +
+      (camp.campagnes.length ? camp.campagnes.map(c => '<div class="lijnrij"><span class="naam"><b>' + esc(c.naam) + '</b></span>' +
+        '<span class="pil">' + esc(c.status) + '</span><span class="pil">' + eur(c.opgehaald) + ' opgehaald</span>' +
+        '<span class="pil ' + (c.sluitend ? 'goed' : 'fout') + '">sleutel ' + (c.sluitend ? 'sluit' : 'sluit NIET') + '</span>' +
+        '<div class="sub">' + c.sleutel.map(s => esc(s.stadNaam) + ' ' + s.procent + '%').join(' &middot; ') + '</div></div>').join('')
+        : '<div class="leeg">Nog geen landelijke campagne.</div>') +
+      '<div class="uitleg">De verdeelsleutel telt op tot exact 100% en de verdeling verliest geen cent. Campagnegeld landt als bron in de stad zelf, niet vastgeklonken aan een project.</div></div>' +
+
+    '<div class="kaart"><div class="sec">Benchmark</div>' +
+      (bench.landelijk
+        ? '<div class="sub">' + esc(bench.uitleg) + '</div>' +
+          bench.steden.map(s => '<div class="lijnrij"><span class="naam">' + esc(s.naam) + '</span>' +
+            (s.gemeten
+              ? '<span class="pil">' + s.geholpen + ' geholpen</span>' +
+                '<span class="pil">' + (s.geholpenPerProject === null ? '--' : s.geholpenPerProject) + ' per actief project</span>' +
+                '<span class="pil">' + (s.urenPerVrijwilliger === null ? '--' : s.urenPerVrijwilliger) + ' uur per vrijwilliger</span>'
+              : '<span class="pil let">niet gemeten</span>') + '</div>').join('') +
+          (bench.signalen.length ? bench.signalen.map(x => '<div class="sub">' + esc(x.stad) + ': ' + esc(x.wat) + ' &mdash; ' + esc(x.vraag) + '</div>').join('') : '')
+        : '<div class="rij">' + stat(bench.eigen.geholpen, 'geholpen') +
+          stat(bench.eigen.geholpenPerProject === null ? '--' : bench.eigen.geholpenPerProject, 'per actief project') +
+          stat(bench.mediaan.geholpenPerProject === null ? '--' : bench.mediaan.geholpenPerProject, 'landelijke mediaan') + '</div>' +
+          '<div class="uitleg">' + esc(bench.uitleg) + '</div>') + '</div>' +
+
+    '<div class="kaart"><div class="sec">Koppelingen met RTG</div>' +
+      bord.koppelingen.map(k => '<div class="lijnrij"><span class="naam">' + esc(k.naam) + '</span>' +
+        '<span class="pil ' + (k.werkt ? 'goed' : 'let') + '">' + (k.werkt ? 'werkt' : 'nog niet') + '</span>' +
+        '<div class="sub">' + esc(k.wat) + (k.nodig ? ' &mdash; ' + esc(k.nodig) : '') + '</div></div>').join('') +
+      '<div class="uitleg">Wat hier op &quot;nog niet&quot; staat, doet ook echt niets: een knop die stilletjes niets doet is erger dan geen knop. Een activiteit in uw eigen RTG-agenda zetten kan wel, vanaf het tabblad Activiteiten.</div></div>');
+
+  $('#bdDeel').addEventListener('click', () => doe('blauwdruk/deel', {
+    projectId: $('#bdProject').value, aanpak: $('#bdAanpak').value,
+    geleerd: $('#bdGeleerd').value, doorlooptijd: $('#bdDuur').value
+  }, tekenTab));
+  $('#tabIn').querySelectorAll('[data-overnemen]').forEach(b => b.addEventListener('click', () =>
+    api('blauwdruk/overnemen', { id: b.dataset.overnemen, stad: STAD.id })
+      .then(r => { melding(r.melding, true); tekenTab(); })
+      .catch(e => melding(e.message, false))));
+  $('#ikMaak').addEventListener('click', () => doe('inkoop/maak', {
+    stad: STAD.id, wat: $('#ikWat').value, eenheid: $('#ikEenheid').value,
+    indicatie: $('#ikPrijs').value, leverancier: $('#ikLev').value
+  }, tekenTab));
+  $('#tabIn').querySelectorAll('[data-inschrijf-inkoop]').forEach(b => b.addEventListener('click', () => {
+    const w = document.getElementById('i-' + b.dataset.inschrijfInkoop);
+    doe('inkoop/inschrijven', { id: b.dataset.inschrijfInkoop, projectId: w.querySelector('.iProject').value,
+      aantal: w.querySelector('.iAantal').value, bronId: w.querySelector('.iBron').value }, tekenTab);
+  }));
+  $('#tabIn').querySelectorAll('[data-sluit-inkoop]').forEach(b => b.addEventListener('click', () => {
+    const w = document.getElementById('i-' + b.dataset.sluitInkoop);
+    api('inkoop/sluit', { id: b.dataset.sluitInkoop, perStuk: w.querySelector('.iPrijs').value,
+      extra: w.querySelector('.iExtra').value || 0 })
+      .then(r => { melding(r.melding, true); tekenTab(); })
+      .catch(e => melding(e.message, false));
+  }));
+  $('#tabIn').querySelectorAll('[data-uja]').forEach(b => b.addEventListener('click', () => {
+    const veld = document.getElementById('ut-' + b.dataset.uja);
+    doe('uitleen/toestemming', { id: b.dataset.uja, akkoord: true, tekst: veld ? veld.value : '' }, tekenTab);
+  }));
+  $('#tabIn').querySelectorAll('[data-unee]').forEach(b => b.addEventListener('click', () =>
+    doe('uitleen/toestemming', { id: b.dataset.unee, akkoord: false }, tekenTab)));
+  $('#tabIn').querySelectorAll('[data-ustop]').forEach(b => b.addEventListener('click', () =>
+    doe('uitleen/beeindig', { id: b.dataset.ustop }, tekenTab)));
 }
 
 /* ---------- bestuur: modules, limieten, zetels ---------- */

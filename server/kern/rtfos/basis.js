@@ -18,7 +18,7 @@
 
    Opslag: db.data.rtfos.{steden,zetels,partners,projecten,vrijwilligers,casussen,
    bronnen,uitgaven,subsidies,incidenten,gemeenten,ondernemers,voorraad,
-   activiteiten,berichten,audit}. */
+   activiteiten,berichten,blauwdrukken,inkoop,uitleen,campagnes,audit}. */
 
 /* De modules per stad. Elke stad zet ze zelf aan of uit; staat een module uit,
    dan geeft zijn ingang 403 met de reden, niet stilzwijgend een lege lijst
@@ -63,7 +63,8 @@ module.exports = ({ db, save, crypto, boardroomWie, magBoardroom }) => {
 
   const LEEG = { steden: [], zetels: [], partners: [], projecten: [], vrijwilligers: [],
     casussen: [], bronnen: [], uitgaven: [], subsidies: [], incidenten: [],
-    gemeenten: [], ondernemers: [], voorraad: [], activiteiten: [], berichten: [], audit: [] };
+    gemeenten: [], ondernemers: [], voorraad: [], activiteiten: [], berichten: [],
+    blauwdrukken: [], inkoop: [], uitleen: [], campagnes: [], audit: [] };
   function S() {
     if (!db.data.rtfos || typeof db.data.rtfos !== 'object') db.data.rtfos = {};
     for (const k of Object.keys(LEEG)) if (!Array.isArray(db.data.rtfos[k])) db.data.rtfos[k] = [];
@@ -143,6 +144,13 @@ module.exports = ({ db, save, crypto, boardroomWie, magBoardroom }) => {
     return { ok: true, stad };
   }
 
+  /* DE VOG IS EEN DATUM, GEEN VINKJE, en die regel staat hier omdat inmiddels
+     drie modules hem stellen: het vrijwilligersregister, de activiteiten (geen
+     jeugdactiviteit zonder begeleider met geldige VOG) en de uitwisseling
+     tussen steden. Drie kopieen van dezelfde datumvergelijking is drie kansen
+     om er een te vergeten bij te werken (LAT.md regel 4). */
+  const vogGeldig = v => !!(v && v.vogGeldigTot) && Date.parse(v.vogGeldigTot) > Date.now();
+
   // De hoogste trede die deze rol zelfstandig mag goedkeuren, in centen.
   function limietVan(stad, rol) {
     if (rol === 'landelijk') return Infinity;
@@ -154,7 +162,7 @@ module.exports = ({ db, save, crypto, boardroomWie, magBoardroom }) => {
   }
 
   return { nu, rid, schoon, code, centen, euro, S, audit, wie, rolIn, magRecht, bereik,
-    stadVan, poort, limietVan, VLAGGEN, ROLLEN, RECHTEN, LIMIET };
+    stadVan, poort, limietVan, vogGeldig, VLAGGEN, ROLLEN, RECHTEN, LIMIET };
 };
 module.exports.VLAGGEN = VLAGGEN;
 module.exports.ROLLEN = ROLLEN;

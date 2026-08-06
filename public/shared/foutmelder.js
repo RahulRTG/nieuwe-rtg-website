@@ -92,7 +92,26 @@
            iemand zegt dat hij niets ziet. */
         ' | midden=' + (function () { var m = document.elementFromPoint(Math.round(innerWidth / 2), Math.round(innerHeight / 2));
           return m ? (m.tagName + (m.className ? '.' + String(m.className).split(' ')[0] : '')) : 'niets'; })() +
-        ' | tegelbreed ' + (function () { var t = document.querySelector('.os-app'); return t ? Math.round(t.getBoundingClientRect().width) : -1; })() +
+        /* DE HELE KETEN IN DE BREEDTE, en de UITGEREKENDE eenheid.
+
+           De vorige meting gaf "tegelbreed 0" en de rekeneenheid als BRONTEKST.
+           Daarop repareerde ik de eenheid -- en de tegels bleven nul breed. De
+           brontekst zegt namelijk niets over wat de browser er werkelijk van
+           maakt, en een breedte van nul kan net zo goed van een ouder komen die
+           zelf is dichtgeklapt. Daarom nu: elke schakel van shell tot tegel in
+           de breedte, en de eenheid zoals de browser hem heeft uitgerekend. */
+        ' | breedtes shell=' + (function () { var e = document.querySelector('#shell'); return e ? Math.round(e.getBoundingClientRect().width) : -1; })() +
+        ' content=' + (function () { var e = document.querySelector('#content'); return e ? Math.round(e.getBoundingClientRect().width) : -1; })() +
+        ' thuis=' + (function () { var e = document.querySelector('.os-thuisscherm'); return e ? Math.round(e.getBoundingClientRect().width) : -1; })() +
+        ' rij=' + (function () { var e = document.querySelector('.os-grid'); return e ? Math.round(e.getBoundingClientRect().width) : -1; })() +
+        ' tegel=' + (function () { var t = document.querySelector('.os-app'); return t ? Math.round(t.getBoundingClientRect().width) : -1; })() +
+        ' | e-uitgerekend=' + (function () {
+          var a = document.getElementById('app'); if (!a) return '(geen app)';
+          var p = document.createElement('div');
+          p.style.cssText = 'position:absolute;visibility:hidden;width:calc(var(--e) * 100);';
+          a.appendChild(p); var w = p.getBoundingClientRect().width; p.remove();
+          return (w / 100).toFixed(2) + 'px';
+        })() +
         ' | e=' + (css.getPropertyValue('--e') || '(leeg)').trim() +
         ' | dvh=' + (CSS && CSS.supports && CSS.supports('height', '100dvh')) +
         ' | cq=' + (CSS && CSS.supports && CSS.supports('container-type', 'size')),

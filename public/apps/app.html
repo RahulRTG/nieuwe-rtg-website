@@ -1096,12 +1096,30 @@
      (container-type:size i.p.v. inline-size). Dat is wat --e nodig heeft om
      te weten hoeveel ruimte er is. Op de inlogpoort doen we dat niet: daar
      heeft de shell geen vaste hoogte en zou size-containment hem platslaan. */
-  body.os-vast #shell{container-type:size;}
+  /* EN DAAR MOET EEN EIGEN BREEDTE BIJ, anders klapt hij dicht.
+
+     container-type:size zet containment op BEIDE assen: de browser meet het
+     element alsof het geen inhoud heeft. De hoogte kan dat hebben (die staat
+     hieronder vast op 100dvh), maar de breedte stond op width:100% -- en die
+     100% moet ergens vandaan komen. Safari rekent dat onder containment
+     strenger uit dan Chrome en kwam op NUL.
+
+     Gemeten op de iPhone van een gebruiker die "ik zie niks meer na het
+     inloggen" meldde: venster 375 breed, shell 0, content 0, tegelrij 0, tegel
+     0 -- terwijl de hoogtes klopten (669 en 603) en de rekeneenheid netjes op
+     10px uitkwam. Alles stond er dus, nul pixels breed. Op deze machine viel
+     het niet op; in Chrome gebeurt het niet.
+
+     Een breedte die van het VENSTER komt en niet van de ouder of de inhoud kan
+     niet dichtklappen: containment gaat over wat er IN het element zit, niet
+     over de viewport. Daarom min(430px, 100vw) -- dezelfde maat die de shell
+     buiten deze stand ook aanhoudt (width:100% met max-width:430px). */
+  body.os-vast #shell{container-type:size;width:min(430px, 100vw);}
   body.os-vast{overflow:hidden;}
   /* op de telefoon vult de actieve app exact de viewport; op de computer laten
      we het gecentreerde tablet-venster (media-query hierboven) staan i.p.v.
      schermvullend, zodat de desktop eruitziet als de app in een tablet-kader. */
-  @media (max-width:519px){ body.os-vast #shell{height:100dvh;min-height:0;} }
+  @media (max-width:519px){ body.os-vast #shell{height:100dvh;min-height:0;width:100vw;max-width:100vw;} }
 
   /* app-modus: fullscreen met home-indicator */
   .os-pill{

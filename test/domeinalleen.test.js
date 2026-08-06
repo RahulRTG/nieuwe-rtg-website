@@ -29,9 +29,12 @@
    in routes/member.js en hangt wel aan de keuze.
 
    Dat is meteen de eerlijke maat van deze toets: RTG_DOMAINS schakelt de ACHT
-   domeinen, niet de routers die er los naast hangen. Een member-proces sleept die
-   veertig vandaag nog mee. Dat staat als schuld in TAKEN.md 5.14; hier staat het
-   omdat een lezer anders meer uit deze groene toets zou lezen dan er is.
+   domeinen, niet de 103 routers die er los naast hangen -- 49 in routes.js zelf
+   en 54 via opzet/aanbouw.js en aanbouw2.js. Een member-proces sleept die vandaag
+   nog mee. Ze zitten sinds deze ronde wel allemaal achter een doorkijk, dus ze
+   kunnen niet meer bij elkaars werk, maar ze zijn nog niet UIT te zetten. Dat
+   staat als schuld in TAKEN.md 5.14; hier staat het omdat een lezer anders meer
+   uit deze groene toets zou lezen dan er is.
 
    En een vierde die er niet uitziet als een bewering maar het wel is: de
    infra-endpoints (/api/health) blijven ook met EEN domein 200 geven. Die

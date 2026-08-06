@@ -129,7 +129,7 @@ module.exports = function hangRoutesOp(kern) {
      hangen de routers die op die aanvulling leunen. Twee bestanden en niet een,
      omdat een van 14 kB weer over dezelfde grens gaat die dit hele werk in gang
      zette. */
-  require('./aanbouw')(kern);
+  require('./aanbouw')(kern, grens);
   console.log('[start] domeinen actief:', gekozenDomeinen.join(', '));
 
   return gekozenDomeinen;

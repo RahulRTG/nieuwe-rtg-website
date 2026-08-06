@@ -14,6 +14,7 @@
                   componenten (meten en wegen apart, zie ./uren.js)
      controles    de automatische controles; hoog blokkeert tot het verklaard is
      verzuim      verlof en ziekte, met de scheiding die de AP eist
+     dekking      per land: kan hier loon draaien, en zo nee wat ontbreekt er
      identiteit   ja/nee voor de werkgever, opvragen met reden en journaal
 
    NAAST DE OUDE kern/payroll.js EN NIET ERIN. Die draait de bestaande
@@ -38,6 +39,8 @@ const { maakAangifte } = require('./aangifte');
 const { maakVerzuim } = require('./verzuim');
 const { maakIdentiteit } = require('./identiteit');
 const { maakBijwerken, urlBron } = require('./bijwerken');
+const { maakDekking } = require('./dekking');
+const { LANDEN } = require('../fiscaal/landen');
 const { maakUren } = require('./uren');
 const { maakControles } = require('./controles');
 const motor = require('./motor');
@@ -51,7 +54,10 @@ function maakPayrollOS({ db, save, crypto, accounts, nu, inzagelog, notify, logA
   const aangifte = maakAangifte({ db, save, nu, crypto, run });
   const verzuim = maakVerzuim({ db, save, nu });
   const identiteit = maakIdentiteit({ accounts, db, save, nu, inzagelog, notify, logActivity });
-  const bijwerken = maakBijwerken({ regelpakket: regels, db, save, nu, log });
+  /* De dekking eerst: de bijwerklaag leest er zijn bronnen uit, per land. Zo is
+     een land erbij een adres neerzetten en geen uitrol. */
+  const dekking = maakDekking({ db, save, nu, regelpakket: regels, LANDEN, accounts });
+  const bijwerken = maakBijwerken({ regelpakket: regels, db, save, nu, log, dekking });
   const uren = maakUren({ db });
   const controles = maakControles({ db, save, nu });
 
@@ -73,7 +79,7 @@ function maakPayrollOS({ db, save, crypto, accounts, nu, inzagelog, notify, logA
 
   return {
     payrollOS: {
-      regels, componenten, contracten, motor, run, journaal, aangifte, verzuim, identiteit, uren, controles,
+      regels, componenten, contracten, motor, run, journaal, aangifte, verzuim, identiteit, uren, controles, dekking,
       bijwerken, urlBron, laadMeegeleverd
     }
   };

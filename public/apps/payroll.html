@@ -54,6 +54,7 @@
     <button data-tab="loonrun">Loonrun</button>
     <button data-tab="match">Matching</button>
     <button data-tab="os">Loonrun (OS)</button>
+    <button data-tab="wereld">Wereldwijd</button>
   </nav>
 </header>
 <main>
@@ -133,6 +134,36 @@
       </div>
       <div class="noot" style="margin-top:.45rem;">Definitief kan pas als de manager van de zaak ook heeft getekend, de bevindingen met ernst <b>hoog</b> zijn afgehandeld, en het regelpakket is aangemerkt.</div>
       <div id="osNaRun" style="margin-top:.6rem;"></div>
+    </div>
+  </section>
+
+  <!-- ================= wereldwijd =================
+       Het overzicht waar de hele loonlaag op staat of valt. De motor is
+       landneutraal; wat een land tegenhoudt is het ONTBREKEN van een tabel, en
+       dat hoort een lijst te zijn en geen stilte. -->
+  <section id="tabWereld" hidden>
+    <div class="kaart">
+      <div class="sec">Dekking per land</div>
+      <div class="noot" style="margin-bottom:.5rem;">Elk land waar RTG zaken heeft, met de vraag die telt: kan hier een loonrun draaien? Er wordt niets geschat -- ligt er geen tabel, dan staat er wat er nog moet komen.</div>
+      <div class="rij" style="margin-bottom:.5rem;">
+        <input class="veld" id="wlPeil" style="flex:1;min-width:9rem;" placeholder="peildatum (leeg = vandaag)">
+        <button class="knop" id="wlLaad">Toon de wereld</button>
+        <button class="knop" id="wlRonde">Nu overal bijwerken</button>
+      </div>
+      <div id="wlTelling"></div>
+      <div id="wlVerval" style="margin-top:.5rem;"></div>
+      <div id="wlLanden" style="margin-top:.6rem;"><div class="leeg">Nog niet geladen.</div></div>
+    </div>
+
+    <div class="kaart">
+      <div class="sec">Een bron toevoegen</div>
+      <div class="noot" style="margin-bottom:.5rem;">Een https-adres dat een regelpakket als JSON teruggeeft. De dagelijkse ronde haalt hem op, keurt hem en zet hem klaar als <b>ongecontroleerd</b>; er gaat nooit vanzelf een definitieve loonrun op iets wat geen mens heeft aangemerkt.</div>
+      <div class="rij">
+        <input class="veld" id="brLand" style="width:6rem;" placeholder="NL" maxlength="2">
+        <input class="veld" id="brNaam" style="flex:1;min-width:9rem;" placeholder="Naam van de bron">
+        <input class="veld" id="brUrl" style="flex:2;min-width:14rem;" placeholder="https://...">
+        <button class="knop" id="brZet">Voeg toe</button>
+      </div>
     </div>
   </section>
 </main>
@@ -247,8 +278,10 @@ document.querySelectorAll('nav [data-tab]').forEach(b => b.addEventListener('cli
   $('#tabLoonrun').hidden = b.dataset.tab !== 'loonrun';
   $('#tabMatch').hidden = b.dataset.tab !== 'match';
   $('#tabOs').hidden = b.dataset.tab !== 'os';
+  $('#tabWereld').hidden = b.dataset.tab !== 'wereld';
   if (b.dataset.tab === 'match') laadMatch();
   if (b.dataset.tab === 'os') laadOs().catch(e => meld(e.message));
+  if (b.dataset.tab === 'wereld') laadWereld().catch(e => meld(e.message));
 }));
 
 /* ================= Payroll OS =================
@@ -279,7 +312,10 @@ const bevPil = e => '<span class="pil' + (e === 'hoog' ? ' rood' : e === 'midden
    krijgt CENTEN, want de nieuwe loonlaag rekent in centen. Twee keer const eur
    in hetzelfde scriptblok is bovendien een SyntaxError -- dan draait er van dit
    scherm niets meer. */
-const eurC = c => '€ ' + (c / 100).toFixed(2);
+// met een KOMMA, net als eur() hierboven: "8,87" leest als een bedrag en
+// "8.87" als een meetwaarde. Dat verschil stond er niet en viel pas op toen het
+// minimumuurloon van Spanje als "€ 8.87" op het dekkingsscherm stond.
+const eurC = c => '€ ' + (c / 100).toFixed(2).replace('.', ',');
 
 async function laadOs(){
   const d = await api('regels', { land: 'NL' });
@@ -474,6 +510,74 @@ async function toonAangifte(a){
     catch (e) { meld(e.message); }
   });
 }
+
+/* ================= wereldwijd =================
+   HET SCHERM DAT DE STILTE WEGHAALT. Zonder dit overzicht merkt niemand dat er
+   in tweeenzeventig zaken personeel werkt waarvoor geen enkele loontabel ligt;
+   je ontdekt het op de dag dat iemand vraagt waar zijn loonstrook blijft.
+
+   Drie standen, en ze zeggen alle drie iets anders: draait (goedgekeurd pakket),
+   wacht op een mens (er ligt iets, niemand tekende), geen tabel (hier kan geen
+   loon draaien). Die laatste staat bovenaan, want dat is het werk. */
+const WSTAND = { draait: ['draait', ''], wacht_op_mens: ['wacht op een mens', ' goud'],
+  geen_tabel: ['geen tabel', ' rood'] };
+const wPil = s => '<span class="pil' + (WSTAND[s] || ['', ''])[1] + '">' + esc((WSTAND[s] || [s])[0]) + '</span>';
+
+async function laadWereld(){
+  const d = await api('dekking', { peildatum: $('#wlPeil').value.trim() || null });
+  const t = d.telling;
+  $('#wlTelling').innerHTML =
+    '<div class="rij">' +
+    '<div class="stat"><b>' + t.draait + '</b><i>landen draaien</i></div>' +
+    '<div class="stat"><b>' + t.wacht_op_mens + '</b><i>wacht op keuring</i></div>' +
+    '<div class="stat"><b>' + t.geen_tabel + '</b><i>zonder tabel</i></div>' +
+    '<div class="stat"><b>' + t.personeelZonderTabel + '</b><i>mensen zonder loonrun</i></div>' +
+    '</div>';
+
+  const v = (await api('verval', { dagen: 60 })).verloopt || [];
+  $('#wlVerval').innerHTML = v.length
+    ? '<div class="sec">Loopt binnenkort af</div>' + v.map(x =>
+        '<div class="regel"><b>' + bevPil('hoog') + ' ' + esc(x.uitleg) + '</b></div>').join('')
+    : '<div class="noot">Geen jaargang die binnen zestig dagen afloopt zonder opvolger.</div>';
+
+  /* Zonder tabel eerst: dat is waar het werk ligt. Daarna wachtend op een mens,
+     en pas onderaan wat gewoon draait -- een lijst waarin het goede nieuws
+     bovenaan staat, laat je het slechte nieuws missen. */
+  const orde = { geen_tabel: 0, wacht_op_mens: 1, draait: 2 };
+  const rijen = d.landen.slice().sort((a, b) =>
+    (orde[a.stand] - orde[b.stand]) || (b.personeel - a.personeel));
+  $('#wlLanden').innerHTML = rijen.map(r =>
+    '<div class="regel"><b>' + wPil(r.stand) + ' ' + esc(r.naam) + ' (' + esc(r.land) + ')</b>' +
+    '<span class="kpi">' + r.zaken + ' zaak/zaken · ' + r.personeel + ' medewerker(s)' +
+    (r.pakket ? ' · pakket ' + esc(r.pakket.versie) + ' t/m ' + esc(r.pakket.geldigTot || 'onbepaald') : '') +
+    (r.bronnen.length ? ' · ' + r.bronnen.length + ' bron(nen)' : ' · geen bron') +
+    (r.ontbreekt.length ? '<br>nog nodig: <b>' + r.ontbreekt.map(esc).join(', ') + '</b>' : '') +
+    (r.fiscaal ? '<br>wel bekend uit de fiscaal-tabel: ' +
+      (r.fiscaal.minimumUurloonCenten != null ? 'minimumuurloon ' + eurC(r.fiscaal.minimumUurloonCenten) : 'geen minimumuurloon') +
+      (r.fiscaal.vakantiegeld != null ? ' · vakantiegeld ' + Math.round(r.fiscaal.vakantiegeld * 1000) / 10 + '%' : '') +
+      (r.fiscaal.werkgeverslasten != null ? ' · werkgeverslasten ' + Math.round(r.fiscaal.werkgeverslasten * 1000) / 10 + '%' : '') : '') +
+    '</span></div>').join('') || '<div class="leeg">Geen zaken gevonden.</div>';
+}
+
+$('#wlLaad').addEventListener('click', () => laadWereld().catch(e => meld(e.message)));
+$('#wlRonde').addEventListener('click', async () => {
+  try {
+    const d = await api('regels/haal');
+    const u = d.uitslag;
+    meld('Bijwerkronde: ' + u.gekeken + ' bron(nen) bekeken, ' + u.nieuw.length + ' nieuw, ' +
+      u.afgekeurd.length + ' afgekeurd, ' + u.fouten.length + ' fout(en).');
+    await laadWereld();
+  } catch (e) { meld(e.message); }
+});
+$('#brZet').addEventListener('click', async () => {
+  try {
+    await api('bron', { land: $('#brLand').value.trim().toUpperCase(),
+      naam: $('#brNaam').value.trim(), url: $('#brUrl').value.trim() });
+    $('#brUrl').value = ''; $('#brNaam').value = '';
+    meld('Bron toegevoegd. De eerstvolgende ronde haalt hem op.');
+    await laadWereld();
+  } catch (e) { meld(e.message); }
+});
 
 $('#osAangifte').addEventListener('click', async () => {
   if (!OSRUN) return;

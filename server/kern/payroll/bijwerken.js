@@ -31,7 +31,7 @@
    niets nieuws is (zie `ongewijzigd` in regelpakket.neemOp). */
 const RONDE_MS = 24 * 60 * 60 * 1000;
 
-function maakBijwerken({ regelpakket, db, save, nu, log }) {
+function maakBijwerken({ regelpakket, db, save, nu, log, dekking, fetchImpl }) {
   const tijd = nu || (() => new Date().toISOString());
   const meld = log || (() => {});
 
@@ -62,16 +62,37 @@ function maakBijwerken({ regelpakket, db, save, nu, log }) {
   /* Een ronde: alle bronnen langs, alles wat binnenkomt door de keuring, en het
      resultaat in het journaal. Faalt een bron, dan gaan de andere gewoon door --
      een kapotte koppeling hoort de rest niet stil te zetten. */
+  /* DE BRONNEN VAN DE HELE WERELD, en niet alleen die in de code staan.
+     Een land erbij hoort geen uitrol te zijn: het kantoor zet een https-adres
+     per land neer (kern/payroll/dekking.js) en de eerstvolgende ronde haalt het
+     op. Zonder deze regel werkte de bijwerklaag alleen voor bronnen die iemand
+     bij het opstarten had aangemeld -- en dat waren er nul, dus elke ronde keek
+     naar niets en meldde opgewekt dat er niets nieuws was. */
+  function alleBronnen() {
+    const uit = bronnen.slice();
+    if (!dekking) return uit;
+    for (const b of dekking.alleBronnen()) {
+      if (uit.some(x => x.url === b.url)) continue;
+      uit.push(Object.assign(urlBron({ naam: b.naam, url: b.url, fetchImpl }),
+        { soort: 'koppeling', land: b.land }));
+    }
+    return uit;
+  }
+
   async function ronde() {
+    const bronnen = alleBronnen();
     const uitslag = { at: tijd(), gekeken: bronnen.length, nieuw: [], afgekeurd: [], fouten: [] };
     for (const bron of bronnen) {
       let geleverd;
       try {
         geleverd = await bron.haal();
       } catch (e) {
-        uitslag.fouten.push({ bron: bron.naam, fout: String(e && e.message || e).slice(0, 200) });
+        const fout = String(e && e.message || e).slice(0, 200);
+        uitslag.fouten.push({ bron: bron.naam, land: bron.land || null, fout });
+        if (dekking && bron.land && bron.url) dekking.noteerBron(bron.land, bron.url, { fout });
         continue;
       }
+      if (dekking && bron.land && bron.url) dekking.noteerBron(bron.land, bron.url, { fout: null });
       const pakketten = Array.isArray(geleverd) ? geleverd : (geleverd ? [geleverd] : []);
       for (const p of pakketten) {
         const r = regelpakket.neemOp(p, { soort: bron.soort || 'koppeling', naam: bron.naam, url: bron.url });
@@ -79,8 +100,21 @@ function maakBijwerken({ regelpakket, db, save, nu, log }) {
         else if (!r.ongewijzigd) uitslag.nieuw.push({ bron: bron.naam, land: p.land, versie: r.versie, geldigVan: r.geldigVan });
       }
     }
+    /* VOORUITKIJKEN HOORT BIJ DE RONDE. Een jaargang die afloopt zonder
+       opvolger is de klassieke januarifout: op 31 december draait alles, op 1
+       januari kan er geen enkele loonrun meer -- precies de week waarin er
+       gedraaid moet worden. De ronde die tarieven ophaalt is de enige plek die
+       hier sowieso elke dag langskomt, dus hij kijkt meteen vooruit. */
+    if (dekking) {
+      uitslag.verloopt = dekking.verlooptBinnen(60);
+      for (const v of uitslag.verloopt)
+        meld('[payroll] ' + v.land + ': het regelpakket loopt af op ' + v.geldigTot +
+          ' en er is geen opvolger. ' + v.personeel + ' medewerker(s) in ' + v.zaken + ' zaak/zaken.');
+    }
+
     noteer({ soort: 'ronde', gekeken: uitslag.gekeken, nieuw: uitslag.nieuw.length,
-      afgekeurd: uitslag.afgekeurd.length, fouten: uitslag.fouten.length, details: uitslag });
+      afgekeurd: uitslag.afgekeurd.length, fouten: uitslag.fouten.length,
+      verloopt: (uitslag.verloopt || []).length, details: uitslag });
     if (uitslag.nieuw.length) meld('[payroll] ' + uitslag.nieuw.length + ' nieuw regelpakket(ten) binnengekomen; ze staan als ongecontroleerd klaar.');
     if (uitslag.afgekeurd.length) meld('[payroll] ' + uitslag.afgekeurd.length + ' regelpakket(ten) afgekeurd bij binnenkomst.');
     return uitslag;

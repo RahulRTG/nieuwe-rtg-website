@@ -44,6 +44,11 @@ module.exports = (kern) => {
     catch (e) { res.status(500).json({ error: 'De bijwerkronde liep vast: ' + e.message }); }
   });
 
+  /* De DEKKING (waar kan er wereldwijd loon draaien, en welke bron levert het
+     regelpakket van welk land) staat in ./payroll-os-dekking.js -- een eigen
+     onderwerp, en dit bestand ging over de 10 KB. */
+  require('./payroll-os-dekking')(kern);
+
   /* ---------- contracten (kantoor) ----------
      Het kantoor voert de loonadministratie voor de zaken; daar hoort het
      overtypen van een arbeidscontract bij. De zaakcode staat hier WEL in het

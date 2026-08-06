@@ -1962,6 +1962,22 @@ Object.assign(kern, require('./kern/payroll/index.js').maakPayrollOS({ db, save,
    staat daarna als ONGECONTROLEERD klaar: er mag geen definitieve loonrun op
    tot iemand hem tegen het Handboek Loonheffingen heeft gelegd. */
 try { kern.payrollOS.laadMeegeleverd(); } catch (e) { console.error('[payrollOS] jaargang laden:', e.message); }
+/* DE BIJWERKKLOK GAAT HIER AAN. In kern/payroll/index.js staat met zoveel
+   woorden "het opstarten roept start() aan" -- en dat deed niemand. De laag die
+   is gebouwd om tarieven vanzelf binnen te halen, keek dus nooit. Dat is erger
+   dan geen automatische bijwerking hebben: het scherm zei "automatisch
+   bijwerken" en er gebeurde niets.
+
+   Eens per dag, wereldwijd: elke bron die per land is geregistreerd
+   (kern/payroll/dekking.js) wordt opgehaald, gekeurd en klaargezet als
+   ONGECONTROLEERD -- er gaat nooit vanzelf een definitieve loonrun op. Dezelfde
+   ronde kijkt vooruit naar jaargangen die aflopen zonder opvolger.
+
+   Niet in een testproces: RTG_PAYROLL_BIJWERKEN=0 zet hem uit, en de timer is
+   ge-unref'd zodat hij een proces nooit openhoudt. */
+if (process.env.RTG_PAYROLL_BIJWERKEN !== '0') {
+  try { kern.payrollOS.bijwerken.start(); } catch (e) { console.error('[payrollOS] bijwerkklok:', e.message); }
+}
 Object.assign(kern, require('./kern/labfonds')({ db, save, crypto, anthropic }));
 /* De werkplek (kern/werkplek.js): RTG en RTF als twee aparte huizen om in te
    werken. Ze delen het platform, maar niet hun cijfers, hun bezetting of hun

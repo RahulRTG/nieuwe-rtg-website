@@ -73,7 +73,10 @@
       "regelwacht"
     ],
     "bedrijf": [
-      "bedrijf"
+      "bedrijf",
+      "eigenaar",
+      "rtmailTeam",
+      "rtmailVak"
     ],
     "bestanden": [
       "bestanden"
@@ -314,6 +317,7 @@
       "avTeken",
       "balans",
       "berichten",
+      "bestanden",
       "betaal",
       "betaalBoekingVoor",
       "betaalOrderVoor",
@@ -388,6 +392,7 @@
       "fluisterZeg",
       "fonds",
       "foodcourt",
+      "forgetSession",
       "garderobe",
       "gastDeur",
       "gcCode",
@@ -407,6 +412,7 @@
       "ghMarkt",
       "ghMijnBestellingen",
       "ghPlaatsBestelling",
+      "gidsWeg",
       "gwStuk",
       "gwStukWeg",
       "gwVakman",
@@ -434,6 +440,7 @@
       "lidBoard",
       "lidBoardHerstel",
       "lidBoardLog",
+      "lidBoardLogWis",
       "lidBoardZet",
       "lidBoardZetVeel",
       "lifestyleAI",
@@ -487,6 +494,7 @@
       "nlDocWeg",
       "nlWens",
       "nlWensWeg",
+      "noteFailedTry",
       "noteerBeurt",
       "notify",
       "notifySupplier",
@@ -564,6 +572,7 @@
       "salonProfiel",
       "salonReacties",
       "salonZichtbaar",
+      "sessions",
       "socialConnecties",
       "sparLijst",
       "sparParkeer",

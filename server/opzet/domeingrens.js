@@ -76,6 +76,10 @@ function grensFout(domein, naam) {
    Schrijven mag: routers hangen zelf dingen op (kern.zaakBoard = ...) en dat is
    hoe de lagen elkaar voeden. Een schrijfactie landt op de echte kern en wordt
    daarmee automatisch toegestaan -- wie iets neerzet, mag het ook lezen. */
+/* Wat de meldstand heeft gezien, over alle domeinen samen. Buiten maakDoorkijk
+   zodat een dumper er in een keer bij kan. */
+const gemeld = new Set();
+
 function maakDoorkijk(kern, domein, toegestaan) {
   const mag = new Set([].concat(INTERFACE, DOORGEEF, toegestaan || []));
   return new Proxy(kern, {
@@ -87,6 +91,21 @@ function maakDoorkijk(kern, domein, toegestaan) {
          undefined te krijgen zoals altijd. De grens gaat over reiken naar iets
          van een ander, niet over iets wat niet bestaat. */
       if (!(naam in doel)) return undefined;
+      /* DE MELDSTAND, en die bestaat om de LIJST te kunnen maken. Met
+         RTG_GRENS_MELD=1 gooit de grens niet maar schrijft hij het overtreden
+         paar weg en laat hij door. Zo vind je in EEN opstart alle gaten in
+         GRENZEN.json in plaats van er een per keer, en dat is het verschil
+         tussen een middag en een minuut.
+
+         Dezelfde vorm als server/opzet/liegpoort.js: uit tenzij iemand hem
+         aanzet, in de gewone keten en niet in een tweede opstartpad -- een pad
+         dat je niet draait is een pad dat niet werkt. Hij hoort NOOIT in
+         productie aan te staan, en daarom staat er ook een waarschuwing in de
+         log zodra hij iets doorlaat. */
+      if (process.env.RTG_GRENS_MELD === '1') {
+        gemeld.add(domein + ' ' + naam);
+        return doel[naam];
+      }
       throw grensFout(domein, naam);
     },
     set(doel, naam, waarde) {
@@ -94,10 +113,54 @@ function maakDoorkijk(kern, domein, toegestaan) {
       if (typeof naam === 'string') mag.add(naam);
       return true;
     },
-    has(doel, naam) { return naam in doel; },
-    ownKeys(doel) { return Reflect.ownKeys(doel); },
-    getOwnPropertyDescriptor(doel, naam) { return Reflect.getOwnPropertyDescriptor(doel, naam); }
+    /* DE DOORKIJK MOET ZICH OOK VOORDOEN als een object dat alleen het
+       toegestane bevat, en die eis komt uit een echte breuk bij het opstarten.
+
+       server/routes/member/betalen.js doet `Object.assign({}, kern, {...})` om
+       een submodule een aangevulde kern te geven. Object.assign LOOPT ALLE
+       SLEUTELS LANGS en leest ze allemaal -- dus gooide de grens op
+       `ordersVanZaak` (een supplier-naam) terwijl member die nergens gebruikt.
+       De server kwam niet meer op.
+
+       Met ownKeys en getOwnPropertyDescriptor eronder ziet zo'n kopie alleen wat
+       dit domein mag, en dan is de kopie ook meteen correct begrensd in plaats
+       van een gat in de grens. Enumereren is dus geen overtreding; RIJKEN naar
+       een naam is dat wel. */
+    has(doel, naam) { return typeof naam === 'string' ? (mag.has(naam) && naam in doel) : naam in doel; },
+    ownKeys(doel) { return Reflect.ownKeys(doel).filter(n => typeof n !== 'string' || mag.has(n)); },
+    getOwnPropertyDescriptor(doel, naam) {
+      if (typeof naam === 'string' && !mag.has(naam)) return undefined;
+      return Reflect.getOwnPropertyDescriptor(doel, naam);
+    }
   });
 }
 
-module.exports = { maakDoorkijk, INTERFACE, DOORGEEF, grensFout };
+module.exports = { maakDoorkijk, INTERFACE, DOORGEEF, grensFout,
+  /* Voor scripts/grensmeld.js: wat de meldstand heeft opgevangen. */
+  gemeld: () => [...gemeld].sort() };
+
+/* De praktische ingang voor opzet/routes.js: laadt GRENZEN.json een keer en
+   geeft een functie die per domein een doorkijk maakt.
+
+   ONTBREEKT GRENZEN.json, dan gaat de grens NIET stilletjes open. Dan is de
+   invoer van deze bewaker weg, en een bewaker zonder invoer die alles doorlaat
+   is erger dan geen bewaker: hij staat er nog en niemand kijkt meer (LAT.md
+   regel 3). Hij gooit bij het opstarten, met het commando erbij. */
+module.exports.maakVoor = function maakVoor(kern, lezer) {
+  const path2 = require('path');
+  const fs2 = require('fs');
+  const bestand = path2.join(__dirname, '..', '..', 'GRENZEN.json');
+  let lijst;
+  try { lijst = JSON.parse((lezer || fs2.readFileSync)(bestand, 'utf8')).domeinen; }
+  catch (e) {
+    throw new Error('domeingrens: GRENZEN.json is er niet of onleesbaar (' + e.message +
+      '). Draai: npm run grenslijst. Zonder die lijst zou elke grens openstaan.');
+  }
+  if (!lijst || !Object.keys(lijst).length) {
+    throw new Error('domeingrens: GRENZEN.json bevat geen enkel domein; dan houdt de grens niets tegen.');
+  }
+  /* Een domein dat niet in de lijst staat krijgt een LEGE eigen lijst en dus
+     alleen de interface. Niet stilzwijgend alles: een nieuw routebestand hoort
+     te knellen tot iemand opschrijft wat het nodig heeft. */
+  return (domein) => maakDoorkijk(kern, domein, lijst[domein] || []);
+};

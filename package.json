@@ -51,6 +51,7 @@
     "bewijs": "node scripts/bewijs.js",
     "grenzen": "node scripts/grenzen.js",
     "leugens": "node --experimental-sqlite scripts/leugendetector.js",
-    "mutatie": "node --experimental-sqlite scripts/mutatie.js"
+    "mutatie": "node --experimental-sqlite scripts/mutatie.js",
+    "grenslijst": "node scripts/grenslijst.js"
   }
 }

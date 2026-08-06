@@ -18,15 +18,12 @@
      vergunningen.js aanvragen + beoordelen (inwoner en onderneming)
      info.js         afval, grofvuil, aanslagen, bekendmakingen, regie */
 
-const CATS = {
-  verlichting: 'Straatverlichting', afval: 'Afval & vuil', wegdek: 'Wegdek & stoep',
-  groen: 'Groen & bomen', riool: 'Riool & water', overlast: 'Overlast', speeltuin: 'Speeltuin', overig: 'Overig'
-};
-// welke ploeg een categorie standaard oppakt
-const PLOEG = {
-  verlichting: 'openbare werken', afval: 'reiniging', wegdek: 'openbare werken', groen: 'groenbeheer',
-  riool: 'openbare werken', overlast: 'handhaving', speeltuin: 'openbare werken', overig: 'openbare werken'
-};
+/* De categorieen en de ploegen stonden hier als eigen consts. Ze horen bij de
+   STAD en niet bij deze ene app: kern/stad sprak over dezelfde dingen met
+   andere woorden, en daardoor konden twee meldingen over dezelfde lantaarnpaal
+   elkaar nooit herkennen. De lijst staat nu op een plek
+   (kern/stadsweefsel/categorien.js) en de gemeente is er lezer van. */
+const { CATS, PLOEG } = require('../stadsweefsel/categorien');
 const MELD_STATUS = ['nieuw', 'in behandeling', 'gepland', 'opgelost', 'afgewezen'];
 const BURGERZAKEN = {
   paspoort: { label: 'Paspoort', duurMin: 15, balie: true },
@@ -44,7 +41,7 @@ const VERG_STATUS = ['ingediend', 'in behandeling', 'verleend', 'geweigerd'];
 const FRACTIES = { rest: 'Restafval', gft: 'GFT & etensresten', papier: 'Papier & karton', pmd: 'PMD (plastic/blik/pak)' };
 const BALIE_SLOTS = ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '13:30', '14:00', '14:30', '15:00', '15:30'];
 
-function maakGemeente({ db, save, crypto, anthropic, findSupplier, notify, notifySupplier, sseToSupplier }) {
+function maakGemeente({ db, save, crypto, anthropic, findSupplier, notify, notifySupplier, sseToSupplier, weefsel }) {
   const nu = () => new Date().toISOString();
   const vandaag = () => new Date().toISOString().slice(0, 10);
   const isDatum = x => /^\d{4}-\d{2}-\d{2}$/.test(String(x || ''));
@@ -88,12 +85,14 @@ function maakGemeente({ db, save, crypto, anthropic, findSupplier, notify, notif
     return {
       ref: m.ref, categorie: m.categorie, categorieLabel: m.categorieLabel, tekst: m.tekst,
       locatie: m.locatie, status: m.status, ploeg: m.ploeg,
+      // de stadszaak waar deze melding bij hoort (en of hij daar is samengevoegd)
+      zaak: m.zaak || null, samengevoegd: !!m.samengevoegd,
       updates: (m.updates || []).map(u => ({ tekst: u.tekst, at: u.at })), at: m.at
     };
   }
 
   const ctx = {
-    db, save, crypto, anthropic, findSupplier, notify, notifySupplier, sseToSupplier,
+    db, save, crypto, anthropic, findSupplier, notify, notifySupplier, sseToSupplier, weefsel,
     nu, vandaag, isDatum, id, ref, schoon, seed, isGemeente, deGemeente, publiekeMelding,
     CATS, PLOEG, MELD_STATUS, BURGERZAKEN, VERGUNNINGEN, VERG_STATUS, FRACTIES, BALIE_SLOTS
   };

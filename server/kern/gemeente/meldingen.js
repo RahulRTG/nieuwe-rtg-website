@@ -7,7 +7,7 @@
 const { coord } = require('../util');
 module.exports = (ctx) => {
   const { db, save, anthropic, nu, id, ref, schoon, seed, deGemeente, publiekeMelding,
-    notify, notifySupplier, sseToSupplier, CATS, PLOEG, MELD_STATUS } = ctx;
+    notify, notifySupplier, sseToSupplier, weefsel, CATS, PLOEG, MELD_STATUS } = ctx;
 
   function meld(sess, codenaam, data) {
     seed();
@@ -26,6 +26,24 @@ module.exports = (ctx) => {
     };
     db.data.gemeenteMeldingen.unshift(m);
     db.data.gemeenteMeldingen = db.data.gemeenteMeldingen.slice(0, 20000);
+    /* En dezelfde melding gaat als WAARNEMING naar het stadsweefsel. Twee
+       waarheden zijn dat niet: dit dossier is de BEHANDELING van de gemeente
+       (ploeg, updates, status naar de melder), de zaak in het weefsel is het
+       PROBLEEM in de stad -- en die kan er een zijn terwijl er vier mensen
+       over belden via vier kanalen. De zaakverwijzing gaat mee terug, zodat
+       een ambtenaar kan zien dat zijn melding bij een grotere zaak hoort.
+       Faalt het weefsel, dan gaat de melding gewoon door: het meldrecht van
+       een inwoner mag niet afhangen van een zijtak. */
+    if (weefsel) {
+      const w = weefsel.weefselMeld({ kanaal: 'gemeente', categorie: m.categorie, tekst: m.tekst,
+        lat: m.lat, lng: m.lng, gebied: m.locatie, melder: codenaam, bronRef: m.ref });
+      if (w && w.ok) { m.zaak = w.zaak.ref; m.zaakId = w.zaak.id; m.samengevoegd = w.duplicaat; }
+      /* Lukt het niet -- meestal omdat er geen positie meegestuurd is en de
+         vrije tekst "bij de brug" geen gebied is -- dan staat DAT op de
+         melding. Stil overslaan zou betekenen dat een melding zonder GPS
+         onzichtbaar buiten de stadszaken valt en niemand weet waarom. */
+      else if (w && w.error) m.zaakFout = w.error;
+    }
     save();
     if (g && notifySupplier) notifySupplier(g.code, { icon: '\u{1F6A7}', title: 'Nieuwe melding: ' + CATS[categorie], body: codenaam + ': ' + tekst.slice(0, 80) });
     if (g && sseToSupplier) sseToSupplier(g.code, 'sync', { scope: 'gemeente' });

@@ -16,14 +16,25 @@
    scenario-knop in ./scenario en de AI in ./advies. */
 
 module.exports = (deps) => {
-  const { db, save, crypto, schoon, anthropic, sseToOffice, beveilig, keyVanCodenaam, sseToCustomer } = deps;
+  const { db, save, crypto, schoon, anthropic, sseToOffice, beveilig, weefsel } = deps;
+  /* Het stadsweefsel is geen optie maar een voorwaarde: de zones, de plaats van
+     elke Stadsdoos, het geheugen achter de metingen en de zaken achter de
+     bewonersmeldingen wonen daar. Een stille terugval op een eigen zonelijstje
+     zou precies de dubbele waarheid terugbrengen die deze laag wegnam, dus dit
+     valt hard om bij het opstarten in plaats van scheef te gaan lopen. */
+  if (!weefsel || typeof weefsel.weefselZones !== 'function')
+    throw new Error('kern/stad heeft kern/stadsweefsel nodig (mount het weefsel eerder in server.js)');
   const nu = () => Date.now();
   const d = () => db.data;
 
   const ONLINE_MS = 10 * 60 * 1000;   // een doos die 10 min niets liet horen is offline
   const MAX_METINGEN = 20000;         // begrensd venster; het beeld leeft op het heden
 
-  function zones() { if (!Array.isArray(d().stadZones)) d().stadZones = []; return d().stadZones; }
+  /* De zones komen uit de geografie van het weefsel. Ze stonden hier als een
+     eigen lijstje in db.data.stadZones; dat was dezelfde waarheid op twee
+     plekken, en die lopen uiteen zodra iemand een zone toevoegt -- dan meldt
+     een bewoner iets in een zone die de veldploeg niet kent. */
+  function zones() { return weefsel.weefselZones(); }
   function nodes() { if (!d().stadNodes || typeof d().stadNodes !== 'object') d().stadNodes = {}; return d().stadNodes; }
   function metingen() { if (!Array.isArray(d().stadMetingen)) d().stadMetingen = []; return d().stadMetingen; }
   function regie() {
@@ -43,7 +54,7 @@ module.exports = (deps) => {
   function koppelVerkeer(fn) { if (typeof fn === 'function') verkeerBron = fn; }
 
   // de gedeelde context voor de deelbestanden
-  const ctx = { db, save, crypto, schoon, anthropic, beveilig, nu, d,
+  const ctx = { db, save, crypto, schoon, anthropic, beveilig, nu, d, weefsel,
     ONLINE_MS, MAX_METINGEN, zones, nodes, metingen, regie, seintje };
 
   // de OV-telling ook voor de deelbestanden (o.a. het bewonersbeeld)
@@ -54,13 +65,13 @@ module.exports = (deps) => {
   ctx.zorgBasis = vloot.zorgBasis; ctx.simuleer = vloot.simuleer;
   const sce = require('./scenario')(ctx);
   ctx.SCENARIOS = sce.SCENARIOS;
-  // een live seintje naar een bewoner (bijv. "je melding is opgepakt")
-  ctx.bewonerSeintje = (codenaam) => {
-    try { Promise.resolve(keyVanCodenaam(codenaam)).then(t => { if (t && t.key) sseToCustomer(t.key, 'sync', { scope: 'stad' }); }).catch(() => {}); } catch (e) {}
-  };
+  /* Het live seintje naar een melder ("je melding is opgepakt") hangt nu aan de
+     zaakmotor van het weefsel: die weet wanneer een zaak verandert, en bedient
+     elk kanaal in plaats van alleen dit scherm. server.js geeft dezelfde
+     codenaam->sessie-vertaling daar mee, dus de bewoner ziet hetzelfde. */
   const adv = require('./advies')(ctx);
-  const bew = require('./bewoner')(ctx);   // zet ctx.meldingKlaar + ctx.openMeldingKlussen
-  const veld = require('./veldwerk')(ctx); // en veldwerk neemt die klussen op
+  const bew = require('./bewoner')(ctx);   // meldingen -> de zaakmotor van het weefsel
+  const veld = require('./veldwerk')(ctx); // en de werkorders daarvan komen hier op de lijst
 
   /* Het stadsbeeld: alles wat de boardroom in een oogopslag nodig heeft.
      De demovloot leeft mee (simuleer): zolang er geen echte hardware hangt,

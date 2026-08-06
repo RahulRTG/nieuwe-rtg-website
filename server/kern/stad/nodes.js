@@ -19,12 +19,31 @@ module.exports = (ctx) => {
 
   const hash = s => crypto.createHash('sha256').update(String(s)).digest('hex');
 
-  /* De demoseed: zes zones en acht Stadsdozen, alleen als de stad nog leeg is.
-     De demodozen dragen demo:true; hun sleutels bestaan niet (niemand kan
-     namens ze insturen), hun waarden komen uit de simulator hieronder. */
+  /* Elke doos krijgt een plaats in het objectregister van het weefsel: een
+     Stadsdoos is een asset als elke andere (hij hangt ergens, hij heeft een
+     beheerder, hij gaat kapot) en zijn metingen horen bij een gebied. Zonder
+     deze stap weet het bord wel dat "Stadsdoos Haven" iets meet, maar niet
+     waar dat is -- en dan kan niets in het weefsel er iets mee.
+     Dit loopt ook over BESTAANDE dozen, zodat een installatie die er al stond
+     alsnog op de kaart komt in plaats van onzichtbaar te blijven. */
+  function zorgPlaats() {
+    let geraakt = false;
+    for (const n of Object.values(nodes())) {
+      if (!n.actief || n.objectId) continue;
+      const plek = ctx.weefsel.weefselDoosPlaats(n);
+      if (!plek) continue;
+      n.objectId = plek.objectId; n.gebied = plek.gebied;
+      geraakt = true;
+    }
+    if (geraakt) save();
+  }
+
+  /* De demoseed: acht Stadsdozen over de zes zones van het weefsel, alleen als
+     de stad nog leeg is. De demodozen dragen demo:true; hun sleutels bestaan
+     niet (niemand kan namens ze insturen), hun waarden komen uit de simulator
+     hieronder. */
   function zorgBasis() {
-    if (zones().length) return;
-    d().stadZones = ['Centrum', 'Marina', 'Oud-West', 'Bedrijvenkwartier', 'Groenzone', 'Boulevard'];
+    if (Object.keys(nodes()).length) { zorgPlaats(); return; }
     const demo = [
       ['Stadsdoos Plein',      'Centrum',          ['verkeer', 'lucht', 'geluid', 'licht']],
       ['Stadsdoos Haven',      'Marina',           ['verkeer', 'water', 'parkeer']],
@@ -42,6 +61,21 @@ module.exports = (ctx) => {
         sleutelHash: null, laatsteContact: nu(), waarden: Object.fromEntries(sens.map(s => [s, START[s]])) };
     }
     save();
+    zorgPlaats();
+  }
+
+  /* Een meting het geheugen in. Elke meting -- van de demovloot en van echte
+     hardware -- rolt op in de uur- en dagemmers van het weefsel, zodat de stad
+     morgen nog weet wat er vandaag gebeurde.
+
+     Een doos ZONDER plaats wordt hier niet stil overgeslagen. Dat was mijn
+     eerste versie (`if (!n.gebied) return;`) en dat is precies de vorm waar de
+     lat regel 5 over gaat: een doos die door een misconfiguratie nooit op de
+     kaart kwam, zou dan maandenlang meten zonder dat er iets in het geheugen
+     landt, en niets zou klagen. Nu gaat hij mee als gemiste meting en staat de
+     teller op het weefselbord. */
+  function boekReeks(n, sens, waarde, at) {
+    ctx.weefsel.weefselBoek({ sens, gebied: n.gebied || null, waarde, at });
   }
 
   // De demovloot leeft: hooguit elke vijf minuten een nieuwe, licht verschoven
@@ -58,6 +92,7 @@ module.exports = (ctx) => {
         const v = Math.min(hi, Math.max(lo, (n.waarden[s] || lo) + (Math.random() * 2 - 1) * stap));
         n.waarden[s] = Math.round(v * 10) / 10;
         metingen().unshift({ node: n.serial, zone: n.zone, sens: s, waarde: n.waarden[s], at: nu() });
+        boekReeks(n, s, n.waarden[s], nu());
       }
       n.laatsteMeting = nu(); n.laatsteContact = nu();
       geraakt = true;
@@ -80,6 +115,7 @@ module.exports = (ctx) => {
     const sleutel = crypto.randomBytes(16).toString('hex');
     nodes()[serial] = { serial, naam: schoon(naam, 60) || serial, zone: z, sensoren: sens, demo: false,
       actief: true, sleutelHash: hash(sleutel), laatsteContact: null, waarden: {}, door: wie || 'boardroom', at: nu() };
+    zorgPlaats();   // ook een echte doos staat meteen op de kaart
     save(); seintje();
     return { ok: true, serial, sleutel, let_op: 'Bewaar de sleutel nu; hij wordt niet nog eens getoond.' };
   }
@@ -124,6 +160,7 @@ module.exports = (ctx) => {
       const waarde = Math.round(w * 10) / 10;
       n.waarden[s] = waarde;
       metingen().unshift({ node: n.serial, zone: n.zone, sens: s, waarde, at: nu() });
+      boekReeks(n, s, waarde, nu());
       geboekt++;
     }
     if (metingen().length > MAX_METINGEN) metingen().length = MAX_METINGEN;

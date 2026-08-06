@@ -81,6 +81,7 @@ module.exports = (kern) => {
   require('./salon')(ctx);
   require('./bank')(ctx);
   require('./stad')(ctx);
+  require('./weefsel')(ctx);
   require('./techniek')(ctx);
   require('./zelfzorg')(ctx);
 };

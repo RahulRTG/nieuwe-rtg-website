@@ -7,17 +7,38 @@
       overlast). De melding wordt METEEN een klus op de werklijst van de
       veld-app; wordt hij daar klaargemeld, dan ziet de melder dat live terug.
 
+   DE MELDING IS EEN WAARNEMING, GEEN EIGEN LIJSTJE MEER. Dit deel hield vroeger
+   db.data.stadMeldingen bij. Dat was precies het gat: dezelfde kapotte lantaarn,
+   gemeld via Mijn Stad en via het gemeenteloket, werd twee losse klussen en
+   niets kon zien dat het om dezelfde paal ging. Nu biedt dit deel de melding
+   aan bij de zaakmotor van het stadsweefsel (kern/stadsweefsel/zaken.js), net
+   als elk ander kanaal. Wat de bewoner ziet blijft gelijk; wat de stad ermee
+   kan is een orde groter -- de melding hangt aan een OBJECT, een tweede melder
+   wordt herkend in plaats van verdubbeld, en drie donkere palen op dezelfde
+   voedingsgroep wijzen naar hun gedeelde oorzaak.
+
    Privacy zoals overal: meldingen hangen aan de codenaam (pseudoniem), de
    melder ziet alleen zijn eigen meldingen, en de vrije tekst gaat NIET mee in
-   de AI-dataset (geen vrije tekst van derden). Begrensd tegen misbruik:
-   hooguit vijf open meldingen per bewoner. Krijgt de gedeelde ctx. */
+   de AI-dataset (kern/aidata leest de zakentak met opzet niet). Begrensd tegen
+   misbruik: hooguit vijf open meldingen per bewoner -- die grens staat nu in de
+   motor, want hij hoort voor elk kanaal te gelden en niet alleen voor dit
+   scherm. Krijgt de gedeelde ctx. */
 module.exports = (ctx) => {
-  const { d, save, crypto, schoon, nu, zones, regie, DOMEINEN, standVan, alerts, SCENARIOS, zorgBasis, simuleer, seintje } = ctx;
+  const { zones, regie, DOMEINEN, standVan, alerts, SCENARIOS, zorgBasis, simuleer, weefsel } = ctx;
 
+  // de vijf woorden waarin de app met bewoners praat; de vertaling naar de acht
+  // stedelijke categorieen staat in kern/stadsweefsel/categorien.js
   const SOORTEN = { licht: 'kapotte verlichting', afval: 'volle of kapotte container', water: 'water op straat', geluid: 'geluidsoverlast', anders: 'iets anders' };
-  const MAX_OPEN_PER_BEWONER = 5;
 
-  function meldingen() { if (!Array.isArray(d().stadMeldingen)) d().stadMeldingen = []; return d().stadMeldingen; }
+  /* Een zaak zoals de melder hem ziet. De weefsel-motor levert al de
+     melderweergave (zijn EIGEN tekst, niet die van de buren die dezelfde paal
+     meldden); hier komt alleen de woordkeuze van dit scherm overheen: "in
+     behandeling" heet voor de melder gewoon open, want hij wacht nog. */
+  const alsMelding = (z) => ({
+    id: z.id, ref: z.ref, zone: z.plaats, soort: z.categorie, soortLabel: z.categorieLabel,
+    tekst: z.tekst, status: z.status === 'in-behandeling' ? 'open' : z.status,
+    melders: z.melders, at: z.at, klaarAt: z.klaarAt || null
+  });
 
   // het beeld voor de bewoner: wat de stad doet, niet hoe hij bestuurd wordt
   function bewonerBeeld(codenaam) {
@@ -31,11 +52,14 @@ module.exports = (ctx) => {
         return rij;
       }),
       alerts: alerts(), zones: zones().slice(), soorten: SOORTEN,
-      mijnMeldingen: meldingen().filter(m => m.codenaam === codenaam).slice(0, 20)
-        .map(m => ({ id: m.id, zone: m.zone, soort: m.soort, tekst: m.tekst, status: m.status, at: m.at, klaarAt: m.klaarAt || null })),
+      mijnMeldingen: weefsel.weefselZakenVanMelder(codenaam).slice(0, 20).map(alsMelding),
       privacy: 'de stad meet dingen, geen mensen; je melding hangt aan je codenaam en is alleen voor jou en de veldploeg zichtbaar' };
   }
 
+  /* Melden. De zone-controle blijft hier: de app biedt een keuzelijst met zones
+     aan, en een onbekende zone hoort een nette 400 te geven in plaats van een
+     zaak op een gegokte plek. De overige regels (tekstlengte, het aantal open
+     meldingen, de duplicaatvraag) staan in de motor. */
   function meld({ codenaam, zone, soort, tekst }) {
     zorgBasis();
     const cn = String(codenaam || '').trim();
@@ -43,37 +67,12 @@ module.exports = (ctx) => {
     const z = String(zone || '').trim();
     if (!zones().includes(z)) return { status: 400, error: 'Kies een bestaande zone: ' + zones().join(', ') + '.' };
     if (!SOORTEN[String(soort || '')]) return { status: 400, error: 'Kies wat er speelt: ' + Object.keys(SOORTEN).join(', ') + '.' };
-    const t = schoon(tekst, 200);
-    if (!t || t.length < 5) return { status: 400, error: 'Vertel in een paar woorden wat je ziet (minstens 5 tekens).' };
-    if (meldingen().filter(m => m.codenaam === cn && m.status === 'open').length >= MAX_OPEN_PER_BEWONER)
-      return { status: 429, error: 'Je hebt al ' + MAX_OPEN_PER_BEWONER + ' open meldingen; de veldploeg is ermee bezig.' };
-    const m = { id: 'SM-' + crypto.randomBytes(3).toString('hex').toUpperCase(), codenaam: cn,
-      zone: z, soort: String(soort), tekst: t, status: 'open', at: nu() };
-    meldingen().unshift(m);
-    if (meldingen().length > 5000) meldingen().length = 5000;
-    save(); seintje(); // de veld-app en de boardroom zien de nieuwe klus meteen
-    return { ok: true, melding: { id: m.id, zone: m.zone, soort: m.soort, status: m.status } };
+    const r = weefsel.weefselMeld({ kanaal: 'bewonersapp', soort: String(soort), tekst, gebied: z, melder: cn });
+    if (!r.ok) return r;
+    return { ok: true, samengevoegd: r.duplicaat,
+      melding: { id: r.zaak.id, ref: r.zaak.ref, zone: z, soort: r.zaak.categorie, status: r.zaak.status },
+      ...(r.duplicaat ? { let_op: 'Dit was al bij ons bekend; je melding is bij die zaak gevoegd.' } : {}) };
   }
 
-  /* De veldwerk-laag roept dit aan als een melding-klus wordt klaargemeld:
-     de melding gaat op "klaar" en de melder krijgt een live seintje. */
-  function meldingKlaar(id, wie) {
-    const m = meldingen().find(x => x.id === id && x.status === 'open');
-    if (!m) return null;
-    m.status = 'klaar'; m.klaarDoor = schoon(wie, 60) || 'veld'; m.klaarAt = nu();
-    save();
-    if (ctx.bewonerSeintje) { try { ctx.bewonerSeintje(m.codenaam); } catch (e) {} }
-    return m;
-  }
-
-  // de open meldingen als klussen voor de werklijst van de veld-app
-  function openMeldingKlussen() {
-    return meldingen().filter(m => m.status === 'open').slice(0, 50).map(m => ({
-      sleutel: 'melding:' + m.id, soort: m.soort === 'anders' ? 'onderhoud' : m.soort, zone: m.zone,
-      omschrijving: 'Bewonersmelding (' + (SOORTEN[m.soort] || m.soort) + ', ' + m.zone + '): ' + m.tekst }));
-  }
-
-  ctx.meldingKlaar = meldingKlaar;
-  ctx.openMeldingKlussen = openMeldingKlussen;
   return { api: { stadBewonerBeeld: bewonerBeeld, stadBewonerMeld: meld } };
 };

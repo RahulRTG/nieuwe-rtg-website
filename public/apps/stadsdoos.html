@@ -150,7 +150,12 @@ async function laad(){
     $('#wTel').textContent = w.klussen.length + ' open';
     $('#wLijst').innerHTML = w.klussen.length ? w.klussen.map(k =>
       '<div class="klus"><span style="font-size:1.05rem;">' + (KLUS_IC[k.soort] || '') + '</span>' +
-      '<span style="flex:1;font-size:.86rem;line-height:1.45;">' + esc(k.omschrijving) + (k.zone ? '<br><span style="color:var(--soft);font-size:.75rem;">' + esc(k.zone) + '</span>' : '') + '</span>' +
+      '<span style="flex:1;font-size:.86rem;line-height:1.45;">' +
+      // urgent en hoog krijgen een woord, de rest niets: een lijst waarin alles
+      // een merkje draagt zegt niets meer over wat er eerst moet
+      (k.prioriteit === 'urgent' || k.prioriteit === 'hoog'
+        ? '<span style="color:var(--gold);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;">' + esc(k.prioriteit) + '</span> ' : '') +
+      esc(k.omschrijving) + (k.zone ? '<br><span style="color:var(--soft);font-size:.75rem;">' + esc(k.zone) + '</span>' : '') + '</span>' +
       '<button class="knop stil" data-klaar="' + esc(k.sleutel) + '" style="font-size:.78rem;">✓ Klaar</button></div>').join('')
       : '<div class="leeg">Niets open. De stad draait.</div>';
     $('#wKlaar').innerHTML = w.klaargemeld.length ? w.klaargemeld.map(k =>

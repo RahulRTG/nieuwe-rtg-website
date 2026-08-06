@@ -1978,11 +1978,28 @@ Object.assign(kern, require('./kern/logies').maakLogies({ db }));
 /* De losse uitgaan-pagina (kern/uitgaan.js): bars, clubs en beachclubs met hun
    avonden; aanmelden loopt via /api/event/rsvp. */
 Object.assign(kern, require('./kern/uitgaan').maakUitgaan({ db, save, crypto }));
+/* HET STADSWEEFSEL (kern/stadsweefsel): de laag die de losse stadssystemen tot
+   EEN stad maakt -- geografie (stad/wijk/buurt/zone/straatsegment), het
+   objectregister met onderhoudshistorie, de relaties en de
+   afhankelijkheidsgraaf, het tijdreeksgeheugen, en EEN zaak- en werkordermotor
+   waar elk kanaal zijn waarnemingen aanbiedt.
+
+   DE VOLGORDE IS HIER GEDRAG. Het weefsel staat VOOR zijn lezers: de gemeente
+   biedt zijn meldingen bij de zaakmotor aan, en kern/stad leest zijn zones uit
+   de geografie en boekt zijn metingen in de tijdreeksen. Wie dit blok naar
+   beneden schuift, start een stad zonder ondergrond. */
+const melderSeintje = (codenaam) => {
+  try { Promise.resolve(keyVanCodenaam(codenaam)).then(t => { if (t && t.key) sseToCustomer(t.key, 'sync', { scope: 'stad' }); }).catch(() => {}); }
+  catch (e) { log.uitzondering(e, { bron: 'weefsel', waar: 'melderSeintje' }); }
+};
+Object.assign(kern, require('./kern/stadsweefsel')({ db, save, crypto, sseToOffice, melderSeintje, log }));
 /* RTG Gemeente (kern/gemeente.js): het civiele systeem als partner-genre.
    Vier pijlers (meldingen openbare ruimte, burgerzaken/afspraken, vergunningen,
-   afval/belasting/bestuur) voor inwoners, gemeente-medewerkers en partners. */
+   afval/belasting/bestuur) voor inwoners, gemeente-medewerkers en partners.
+   Zijn meldingen gaan ook langs het stadsweefsel, zodat dezelfde kapotte
+   lantaarn uit twee kanalen een zaak is en geen twee klussen. */
 Object.assign(kern, require('./kern/gemeente').maakGemeente({ db, save, crypto, anthropic,
-  findSupplier, notify, notifySupplier, sseToSupplier }));
+  findSupplier, notify, notifySupplier, sseToSupplier, weefsel: kern.weefsel }));
 // de gemeente-partner en zijn config bestaan meteen bij het opstarten, zodat een
 // medewerker kan inloggen ook zonder dat er eerst een inwoner iets deed
 kern.gemeente.seed();
@@ -2262,7 +2279,7 @@ fonds.koppelBank(async ({ centen, referentie, oms }) => {
    Stadsdoos-vloot, dezelfde familie als de Zaakdoos) en eigen software --
    domeinen met regimes, een scenario-knop in de boardroom en een
    AI-stadsregisseur. Privacy by design: de stad meet dingen, geen mensen. */
-Object.assign(kern, require('./kern/stad')({ db, save, crypto, schoon, anthropic, sseToOffice, beveilig, keyVanCodenaam, sseToCustomer }));
+Object.assign(kern, require('./kern/stad')({ db, save, crypto, schoon, anthropic, sseToOffice, beveilig, weefsel: kern.weefsel }));
 /* De stad in het gezamenlijke rampbeeld: tijdens een calamiteit ziet de hele
    keten (korpsen, zorg, defensie, boardroom) ook het stadsscenario, de
    bord-waarschuwingen en de vloot -- operationele toestand, geen

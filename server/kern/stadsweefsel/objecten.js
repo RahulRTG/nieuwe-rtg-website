@@ -53,7 +53,12 @@ module.exports = (ctx) => {
       bouwjaar: Number.isFinite(bouwjaar) && bouwjaar > 1800 && bouwjaar <= jaarNu() ? Math.round(bouwjaar) : jaarNu() - 3,
       levensduurJaar: S.jaar,
       waarde: { vervanging: Number(inv.waarde) > 0 ? Math.round(Number(inv.waarde)) : S.waarde },
-      laatsteInspectie: null, onderhoud: [], bron: schoon(inv.bron, 40) || null, at: nu()
+      /* Wanneer is hij voor het laatst nagekeken? Een register dat hier overal
+         null zet, laat de hele stad als achterstallig zien -- en een
+         onderhoudslijst waar alles op staat, leest niemand meer. Vandaar dat
+         een object zijn inspectiedatum kan meekrijgen (in maanden geleden). */
+      laatsteInspectie: Number(inv.inspectieGeleden) > 0 ? nu() - Math.round(Number(inv.inspectieGeleden)) * 2592000000 : null,
+      onderhoud: [], bron: schoon(inv.bron, 40) || null, at: nu()
     };
     objecten()[o.id] = o;
     save();
@@ -113,7 +118,13 @@ module.exports = (ctx) => {
      geeft ook alles in de zones en straten daaronder, want anders moet elke
      beller zelf de hierarchie nalopen en doet de helft dat verkeerd. */
   function zoek(f) {
-    geo.zorgGeografie();
+    /* Zaaien gebeurt HIER, op de leesweg, en niet in elke beller apart. Dat is
+       met schade geleerd: de onderhoudslijst was de eerste ingang die het
+       register nooit had aangeraakt, gaf keurig "0 objecten" terug, en zag er
+       precies zo uit als een stad zonder achterstallig onderhoud. Een lege
+       lijst die eigenlijk "nog niet gekeken" betekent, is de gevaarlijkste
+       vorm van niets. */
+    zorgObjecten();
     f = f || {};
     let rij = Object.values(objecten());
     if (f.soort) rij = rij.filter(o => o.soort === String(f.soort));

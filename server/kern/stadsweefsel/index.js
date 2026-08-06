@@ -55,6 +55,9 @@ module.exports = (deps) => {
     catch (x) { console.error('[weefsel]', waar, e && e.message, x && x.message); }
   };
 
+  /* De volgorde is gedrag, geen smaak: elk deel leunt op de vorige, en de
+     delen die een HAAK zetten (contracten zet de SLA-klok van werkorders,
+     werkorders zet de werkhaak van zaken) staan na wat ze aanhaken. */
   const ctx = { db, save, crypto, nu, d, bak, stil };
   const geo = require('./geografie')(ctx); ctx.geo = geo;
   const obj = require('./objecten')(ctx); ctx.obj = obj;
@@ -63,6 +66,14 @@ module.exports = (deps) => {
   const tr = require('./tijdreeksen')(ctx); ctx.tr = tr;
   const zkn = require('./zaken')(ctx); ctx.zkn = zkn;
   const werk = require('./werkorders')(ctx); ctx.werk = werk;
+  const con = require('./contracten')(ctx); ctx.con = con;      // zet ctx.slaVoorWerk
+  const ond = require('./onderhoud')(ctx); ctx.ond = ond;
+  const ind = require('./indicatoren')(ctx); ctx.ind = ind;
+  const beg = require('./begroting')(ctx); ctx.beg = beg;
+  const ene = require('./energie')(ctx); ctx.ene = ene;
+  const kli = require('./klimaat')(ctx); ctx.kli = kli;
+  const sim = require('./simulatie')(ctx); ctx.sim = sim;
+  const alg = require('./algoritmeregister')(ctx); ctx.alg = alg;
 
   const seintje = () => { try { if (sseToOffice) sseToOffice('sync', { scope: 'weefsel' }); } catch (e) { stil('sse', e); } };
   ctx.zaakSeintje = (z) => {
@@ -76,48 +87,12 @@ module.exports = (deps) => {
   // metingen die het geheugen niet haalden; zichtbaar op het bord (zie weefselBoek)
   let boekMis = 0;
 
-  /* Het weefselbeeld voor de boardroom: hoe groot is de stad, wat staat er
-     open, en wat vraagt zonder dat iemand belde om aandacht. Bewust een
-     samenvatting -- de losse lijsten hebben hun eigen poorten. */
-  function beeld() {
-    zorgWeefsel();
-    const objecten = obj.zoek({});
-    const zaken = zkn.lijst({});
-    const orders = werk.werklijst({});
-    const perCategorie = {};
-    for (const z of zaken) perCategorie[z.categorie] = (perCategorie[z.categorie] || 0) + 1;
-    const waarde = objecten.reduce((s, o) => s + (o.waarde.vervanging || 0), 0);
-    return {
-      status: 200,
-      gebieden: geo.NIVEAUS.map(n => ({ niveau: n, aantal: geo.opNiveau(n).length })),
-      objecten: { totaal: objecten.length, vervangingswaarde: waarde,
-        perSoort: objecten.reduce((m, o) => { m[o.soort] = (m[o.soort] || 0) + 1; return m; }, {}),
-        storing: objecten.filter(o => o.status === 'storing').length },
-      relaties: rel.relaties().length,
-      zaken: { open: zaken.length, perCategorie, urgent: zaken.filter(z => z.prioriteit === 'urgent').length },
-      werk: { open: orders.length, perPloeg: orders.reduce((m, w) => { m[w.ploeg] = (m[w.ploeg] || 0) + 1; return m; }, {}) },
-      aandacht: obj.api.weefselAandacht().objecten.slice(0, 8),
-      oorzaken: Object.keys(zkn.CATS).map(c => zkn.oorzaakZoek(c)).filter(Boolean),
-      reeksen: { emmers: Object.keys(bak().reeksen).length, bewaartermijnDagen: tr.BEWAAR, nietGeboekt: boekMis },
-      privacy: 'het weefsel kent objecten, plaatsen en codenamen -- geen inwoners; metingen zijn dingen, geen mensen'
-    };
-  }
-
-  /* De kaart: alles met een positie in EEN antwoord, zodat een scherm de stad
-     kan tekenen zonder vier vragen te stellen. Begrensd, want een kaart met
-     tienduizend punten is geen kaart meer. */
-  function kaart({ gebied } = {}) {
-    zorgWeefsel();
-    const grens = gebied ? String(gebied) : null;
-    const objecten = obj.zoek(grens ? { gebied: grens } : {}).slice(0, 1500);
-    const zaken = zkn.lijst(grens ? { gebied: grens } : {}).slice(0, 500);
-    return {
-      status: 200,
-      grenzen: geo.api.weefselGebieden({ niveau: 'zone' }).gebieden.map(g => ({ id: g.id, naam: g.naam, geometrie: g.geometrie })),
-      objecten: objecten.map(o => ({ id: o.id, soort: o.soort, naam: o.naam, lat: o.lat, lng: o.lng, status: o.status, risico: o.risico })),
-      zaken: zaken.map(z => ({ id: z.id, ref: z.ref, categorie: z.categorie, prioriteit: z.prioriteit, lat: z.lat, lng: z.lng, status: z.status }))
-    };
-  }
+  /* Het overzicht en de kaart staan in ./bord.js: die kijken over alle delen
+     heen en horen daarom bij geen enkel deel. Ze krijgen het zaaien en de
+     gemiste-metingen-teller via de ctx, want die twee wonen hier. */
+  ctx.zorgWeefsel = zorgWeefsel;
+  ctx.gemisteMetingen = () => boekMis;
+  const { beeld, kaart } = require('./bord')(ctx);
 
   /* ---- de naden naar de rest van het huis (worden door server.js gekoppeld) ----
      Deze vier zijn met opzet klein: kern/stad blijft de baas over zijn eigen
@@ -166,8 +141,16 @@ module.exports = (deps) => {
        stand, niet de vrije tekst van de buren die dezelfde paal meldden. */
     weefselZakenVanMelder: (codenaam) => zkn.vanMelder(codenaam).map(z => zkn.voorMelder(z, codenaam)).filter(Boolean),
     weefselWerkVoorZaak: (zaakId) => werk.voorZaak(zaakId),
-    weefselZaakKlaar: (zaakId, wie, notitie) => zkn.zaakKlaar(zaakId, wie, notitie)
+    weefselZaakKlaar: (zaakId, wie, notitie) => zkn.zaakKlaar(zaakId, wie, notitie),
+    /* De klimaatmeters die een Stadsdoos mag insturen, met hun bereik. kern/stad
+       kende alleen zijn eigen acht domeinen; zonder deze lijst zou een doos met
+       een regenmeter zijn metingen geweigerd zien en zou de klimaatlaag leeg
+       blijven -- twee lijsten die hetzelfde bedoelen, en een gat ertussen. */
+    weefselKlimaatMeters: () => ({ regen: [0, 120], grondwater: [0, 400], riool: [0, 100], waterstand: [-100, 600], hitte: [-20, 60] }),
+    // wat het gezamenlijke rampbeeld van de klimaatkant hoort te zien
+    weefselKlimaatBeeld: () => kli.voorRampbeeld()
   };
-  Object.assign(api, geo.api, obj.api, rel.api, afh.api, tr.api, zkn.api, werk.api);
+  Object.assign(api, geo.api, obj.api, rel.api, afh.api, tr.api, zkn.api, werk.api,
+    con.api, ond.api, ind.api, beg.api, ene.api, kli.api, sim.api, alg.api);
   return { weefsel: api };
 };

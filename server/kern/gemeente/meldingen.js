@@ -67,7 +67,20 @@ module.exports = (ctx) => {
     patch = patch || {};
     const m = (db.data.gemeenteMeldingen || []).find(x => x.ref === String(r || ''));
     if (!m) return { status: 404, error: 'Melding niet gevonden.' };
-    if (typeof patch.status === 'string' && MELD_STATUS.includes(patch.status)) m.status = patch.status;
+    if (typeof patch.status === 'string' && MELD_STATUS.includes(patch.status)) {
+      m.status = patch.status;
+      /* Opgelost bij de gemeente is ook opgelost in de stad. Dit was de laatste
+         halve naad: een ambtenaar kon een melding afhandelen terwijl de zaak in
+         het weefsel open bleef staan -- en dan blijft er werk op de veldlijst
+         staan voor iets wat al gedaan is, en ziet een tweede melder zijn
+         melding eeuwig als "open". Andersom sluit het weefsel de zaak bij het
+         klaarmelden van de laatste werkorder; nu is de keten aan beide kanten
+         dicht. */
+      if (m.zaakId && weefsel && ['opgelost', 'afgewezen'].includes(m.status)) {
+        try { weefsel.weefselZaakKlaar(m.zaakId, actor || 'gemeente', 'afgehandeld door de gemeente (' + m.ref + ')'); }
+        catch (e) { console.error('[gemeente] zaak sluiten', e && e.message); }
+      }
+    }
     if (typeof patch.ploeg === 'string' && patch.ploeg) m.ploeg = schoon(patch.ploeg, 40);
     const note = schoon(patch.update, 300);
     if (note) m.updates.unshift({ tekst: note, at: nu(), door: actor || 'gemeente' });

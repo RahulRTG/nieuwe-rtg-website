@@ -50,8 +50,13 @@ module.exports = (ctx) => {
       organisatie: schoon(inv.organisatie, 60) || (o ? o.beheerder : 'RTG Stadsbeheer'),
       prioriteit: z ? z.prioriteit : (['laag', 'normaal', 'hoog', 'urgent'].includes(inv.prioriteit) ? inv.prioriteit : 'normaal'),
       status: 'open', uitvoerder: null, kosten: 0, uren: 0, notitie: null,
+      contractId: null, slaReactieVoor: null, slaHerstelVoor: null, reactieAt: null,
       door: schoon(inv.wie, 60) || 'weefsel', at: nu(), klaarAt: null
     };
+    // de SLA-klok van het contract dat bij dit werk hoort (kern/stadsweefsel/
+    // contracten.js, laat gebonden); zonder contract loopt er geen klok en dat
+    // staat dan ook zo op de order in plaats van als een stilzwijgende nul
+    if (ctx.slaVoorWerk) { try { ctx.slaVoorWerk(w); } catch (e) { ctx.stil('sla', e); } }
     orders().unshift(w);
     if (z && !z.werkorders.includes(w.id)) z.werkorders.push(w.id);
     if (o && w.soort === 'storing' && o.status === 'in-dienst') o.status = 'storing';
@@ -76,7 +81,13 @@ module.exports = (ctx) => {
       w.status = status;
       if (status === 'geannuleerd') { w.klaarAt = nu(); w.notitie = schoon(wie, 60) || w.notitie; }
     }
-    if (uitvoerder !== undefined) { w.uitvoerder = schoon(uitvoerder, 60) || null; if (w.status === 'open' && w.uitvoerder) w.status = 'toegewezen'; }
+    /* Iemand pakt de order op: dat is het moment waarop de REACTIEklok stopt.
+       Niet de status, want die kun je zetten zonder dat er iets gebeurt. */
+    if (uitvoerder !== undefined) {
+      w.uitvoerder = schoon(uitvoerder, 60) || null;
+      if (w.status === 'open' && w.uitvoerder) w.status = 'toegewezen';
+      if (w.uitvoerder && ctx.slaReactie) { try { ctx.slaReactie(w); } catch (e) { ctx.stil('sla', e); } }
+    }
     if (ploeg !== undefined) w.ploeg = schoon(ploeg, 40) || w.ploeg;
     save();
     return { ok: true, werkorder: publiek(w) };
@@ -91,6 +102,11 @@ module.exports = (ctx) => {
     if (!w) return { status: 404, error: 'Onbekende werkorder.' };
     if (!isOpen(w)) return { status: 400, error: 'Deze werkorder is al afgerond.' };
     const naam = schoon(wie, 60) || 'veld';
+    // wie klaarmeldt zonder ooit te zijn toegewezen, heeft ook GEREAGEERD:
+    // anders zou een snelle klus zijn reactieklok nooit stoppen en eeuwig als
+    // "niet gemeten" tellen
+    if (!w.uitvoerder) { w.uitvoerder = naam; if (ctx.slaReactie) { try { ctx.slaReactie(w); } catch (e) { ctx.stil('sla', e); } } }
+    if (ctx.slaHerstel) { try { ctx.slaHerstel(w); } catch (e) { ctx.stil('sla', e); } }
     w.status = 'klaar'; w.klaarAt = nu(); w.uitvoerder = w.uitvoerder || naam;
     w.notitie = schoon(notitie, 200) || null;
     w.kosten = Number(kosten) > 0 ? Math.round(Number(kosten) * 100) / 100 : 0;

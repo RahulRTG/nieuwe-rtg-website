@@ -13,9 +13,17 @@ module.exports = (ctx) => {
   const MAX_PER_POST = 50;
   // een doos die vaker instuurt dan dit is stuk of kwaadwillend: de poort remt
   const MIN_TUSSEN_MS = Number(process.env.STAD_DOOS_MIN_MS || 2000);
-  const SENSOREN = Object.fromEntries(DOMEINEN.map(x => [x.sens, x]));
+  /* De sensorsoorten die een Stadsdoos mag insturen. De acht domeinen van het
+     BORD, plus de klimaatmeters van het weefsel (regen, grondwater, riool,
+     waterstand, hitte). Die vijf horen niet op het bord -- daar staan standen
+     en regimes -- maar wel op de doos, want het is dezelfde hardware met
+     dezelfde sleutel. Zonder deze regel zou een doos met een regenmeter zijn
+     metingen geweigerd zien en bleef de klimaatlaag leeg. */
+  const KLIMAAT = ctx.weefsel.weefselKlimaatMeters();
+  const SENSOREN = Object.fromEntries([...DOMEINEN.map(x => [x.sens, x]),
+    ...Object.keys(KLIMAAT).map(s => [s, { sens: s, klimaat: true }])]);
   const BEREIK = { verkeer: [0, 20000], licht: [0, 100], lucht: [0, 500], geluid: [20, 130],
-    energie: [0, 5000], water: [0, 1000], afval: [0, 100], parkeer: [0, 5000] };
+    energie: [0, 5000], water: [0, 1000], afval: [0, 100], parkeer: [0, 5000], ...KLIMAAT };
 
   const hash = s => crypto.createHash('sha256').update(String(s)).digest('hex');
 
@@ -49,12 +57,15 @@ module.exports = (ctx) => {
       ['Stadsdoos Haven',      'Marina',           ['verkeer', 'water', 'parkeer']],
       ['Stadsdoos Molenstraat','Oud-West',         ['verkeer', 'geluid', 'afval', 'licht']],
       ['Stadsdoos Fabriek',    'Bedrijvenkwartier',['energie', 'lucht', 'afval']],
-      ['Stadsdoos Park',       'Groenzone',        ['lucht', 'geluid', 'water']],
-      ['Stadsdoos Strand',     'Boulevard',        ['verkeer', 'parkeer', 'licht']],
-      ['Stadsdoos Markt',      'Centrum',          ['afval', 'parkeer', 'energie']],
-      ['Stadsdoos Sluis',      'Marina',           ['water', 'energie', 'licht']]
+      ['Stadsdoos Park',       'Groenzone',        ['lucht', 'geluid', 'water', 'grondwater']],
+      ['Stadsdoos Strand',     'Boulevard',        ['verkeer', 'parkeer', 'licht', 'waterstand']],
+      ['Stadsdoos Markt',      'Centrum',          ['afval', 'parkeer', 'energie', 'hitte']],
+      ['Stadsdoos Sluis',      'Marina',           ['water', 'energie', 'licht', 'waterstand', 'riool']],
+      // de klimaatdoos: dezelfde hardware, andere sensoren (kern/stadsweefsel/klimaat.js)
+      ['Stadsdoos Weerpaal',   'Oud-West',         ['regen', 'hitte', 'riool', 'grondwater']]
     ];
-    const START = { verkeer: 420, licht: 62, lucht: 38, geluid: 52, energie: 120, water: 22, afval: 35, parkeer: 90 };
+    const START = { verkeer: 420, licht: 62, lucht: 38, geluid: 52, energie: 120, water: 22, afval: 35, parkeer: 90,
+      regen: 1.5, grondwater: 120, riool: 35, waterstand: 45, hitte: 24 };
     for (const [naam, zone, sens] of demo) {
       const serial = 'SD-' + crypto.randomBytes(3).toString('hex').toUpperCase();
       nodes()[serial] = { serial, naam, zone, sensoren: sens, demo: true, actief: true,

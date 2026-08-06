@@ -51,14 +51,20 @@ module.exports = (ctx) => {
      zaak terug op het midden van de opgegeven zone. Wat er NIET gebeurt is een
      positie verzinnen die er niet is: zonder zone en zonder punt is er geen
      plaats, en dat zegt het antwoord dan ook. */
-  function plaatsBepaal({ lat, lng, gebied }) {
+  function plaatsBepaal({ lat, lng, gebied, tekst }) {
     const p = coordPaar(lat, lng);
     if (p) {
       const plek = geo.plaats(p.lat, p.lng);
       if (plek.binnenStad) return { lat: p.lat, lng: p.lng, gebied: plek.gebiedId, zone: plek.zone.id };
       return null;
     }
-    const g = String(gebied || '') ? (geo.gebied(gebied) || geo.opNaam(gebied)) : null;
+    /* Geen positie? Dan de vrije tekst. Een gemeentemelding komt binnen met
+       "bij de brug op de Marinalaan" en zonder GPS, en die viel eerst buiten de
+       stad omdat "Marinalaan" geen gebied-ID is. De straatzoeker hieronder
+       vindt hem alsnog: eerst een exacte gebiedsnaam, daarna een straat- of
+       zonenaam DIE IN DE TEKST VOORKOMT. Vindt hij niets, dan is er geen
+       plaats -- en dan wordt er geen plek gegokt. */
+    const g = (String(gebied || '') ? (geo.gebied(gebied) || geo.opNaam(gebied) || geo.uitTekst(gebied)) : null) || geo.uitTekst(tekst);
     if (!g) return null;
     const zone = geo.pad(g.id).find(x => x.niveau === 'zone') || (g.niveau === 'zone' ? g : null);
     return { lat: g.centrum.lat, lng: g.centrum.lng, gebied: g.id, zone: zone ? zone.id : null };
@@ -101,7 +107,7 @@ module.exports = (ctx) => {
     if (!categorie) return { status: 400, error: 'Kies waar het over gaat: ' + Object.keys(CATS).join(', ') + '.' };
     const tekst = schoon(inv.tekst, 200);
     if (!tekst || tekst.length < 5) return { status: 400, error: 'Vertel in een paar woorden wat je ziet (minstens 5 tekens).' };
-    const plek = plaatsBepaal(inv);
+    const plek = plaatsBepaal({ ...inv, tekst });
     if (!plek) return { status: 400, error: 'Waar is het? Geef een gebied of een positie binnen de stad.' };
     const melder = schoon(inv.melder, 60) || null;
     if (melder && zaken().filter(z => open(z) && z.waarnemingen.some(w => w.melder === melder)).length >= MAX_OPEN_PER_MELDER)

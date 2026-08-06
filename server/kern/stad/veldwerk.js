@@ -41,9 +41,30 @@ module.exports = (ctx) => {
     }));
   }
 
+  /* Een doos die AANHOUDEND offline is, is geen toestandsklus meer maar echt
+     werk. De toestandsklus verdwijnt zodra de doos terugkomt -- prima voor een
+     haperende verbinding, maar een kastje dat al een etmaal zwijgt heeft
+     waarschijnlijk geen stroom meer, en dan hoort er een werkorder te liggen
+     met kosten, een uitvoerder en een historie. Er komt er maar EEN per doos:
+     de werkorder hangt aan het sensor-object, en de werkvoorraad weet zelf al
+     of daar iets voor openstaat. */
+  const STUK_MS = 24 * 60 * 60 * 1000;
+  function zorgWerkVoorStilleDozen() {
+    const bezet = new Set(weefsel.weefselWerklijst({}).werkorders.map(w => w.objectId).filter(Boolean));
+    for (const n of Object.values(nodes())) {
+      if (!n.actief || !n.objectId || bezet.has(n.objectId)) continue;
+      if (nu() - (n.laatsteContact || 0) < STUK_MS) continue;
+      weefsel.weefselWerkorderMaak({ objectId: n.objectId, soort: 'storing', ploeg: 'techniek',
+        omschrijving: n.naam + ' (' + n.serial + ') is al meer dan 24 uur offline; controleer stroom, netwerk en de doos zelf.',
+        prioriteit: 'normaal', wie: 'stad' });
+      bezet.add(n.objectId);
+    }
+  }
+
   // de klussen zoals de stad ze NU voorschrijft (nog zonder de demper)
   function ruweKlussen() {
     const uit = [];
+    zorgWerkVoorStilleDozen();
     for (const n of Object.values(nodes())) {
       if (!n.actief || nu() - (n.laatsteContact || 0) < ONLINE_MS) continue;
       uit.push({ sleutel: 'doos:' + n.serial, soort: 'onderhoud', zone: n.zone,

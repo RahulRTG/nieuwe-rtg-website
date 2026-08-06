@@ -16,4 +16,18 @@ module.exports = (kern) => {
     if (req.session.tier === 'guest') return res.status(403).json({ error: 'Melden kan met een RTG-profiel; meekijken mag altijd.' });
     stuur(res, stad.stadBewonerMeld({ codenaam: cn(req), zone: req.body.zone, soort: req.body.soort, tekst: req.body.tekst }));
   });
+
+  /* HET ALGORITMEREGISTER, EN HET IS MET OPZET OPENBAAR.
+
+     Welke rekenregels er in de stad meedraaien, wat ze mogen beslissen, welke
+     gegevens ze gebruiken en waar ze de mist in gaan -- dat is precies de
+     informatie waar een inwoner recht op heeft, en een register dat alleen
+     achter de kantoorinlog staat geeft hem niets. Vandaar geen `auth`: dit is
+     een publieke pagina zoals het privacybeleid dat ook is.
+
+     Er staat niets persoonlijks in en niets dat over een individu gaat: het
+     register beschrijft regels, geen mensen. Dat het niet achter een poort
+     staat, is dus geen versoepeling maar de bedoeling. */
+  app.post('/api/stad/algoritmes', (req, res) => stuur(res, kern.weefsel.weefselAlgoritmes()));
+  app.get('/api/stad/algoritmes', (req, res) => stuur(res, kern.weefsel.weefselAlgoritmes()));
 };

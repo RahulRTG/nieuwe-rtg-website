@@ -1420,6 +1420,12 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
     ['/api/vertaal/ui', 'de knopteksten van datzelfde inlogscherm'],
     ['/api/translate', 'het woordenboek is publiek; de AI-tak zit achter kern/aipoort.js'],
     ['/api/push/key', 'de VAPID-sleutel is per definitie de PUBLIEKE helft'],
+    /* Het algoritmeregister van de stad. Een register dat alleen achter een
+       kantoorinlog te lezen is, geeft een inwoner precies niets -- en dat is
+       de enige groep voor wie het bedoeld is. Er staan regels in, geen mensen:
+       geen persoonsgegevens, geen bedrijfsgevoelige data, alleen wat er
+       meerekent en wat het mag beslissen. */
+    ['/api/stad/algoritmes', 'het openbare algoritmeregister: beschrijft regels, geen personen'],
     ['/api/fout/client', 'een fout uit de browser: JUIST zonder poort, want een fout die het ' +
       'inloggen zelf sloopt komt nooit binnen achter een poort die inloggen vereist. Er wordt ' +
       'niets bewaard en niets uitgevoerd, alleen gelogd, met een rem per IP en afgekapte velden ' +

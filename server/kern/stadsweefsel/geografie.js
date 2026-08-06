@@ -151,6 +151,24 @@ module.exports = (ctx) => {
     return p.length ? p.map(g => g.naam).slice(1).join(' · ') : '';
   }
 
+  /* De straatzoeker: welk straatsegment of welke zone staat er in deze zin?
+     Bewust simpel en streng: hij zoekt de naam als heel woord, neemt de
+     LANGSTE treffer (zodat "Marinalaan" wint van "Marina") en geeft niets
+     terug bij twijfel. Een adreszoeker die gokt, hangt meldingen aan de
+     verkeerde straat en dat is erger dan geen plaats: dan gaat er iemand
+     kijken op een plek waar niets aan de hand is. */
+  function uitTekst(tekst) {
+    const t = String(tekst || '').toLowerCase();
+    if (t.length < 3) return null;
+    let beste = null;
+    for (const g of [...opNiveau('straatsegment'), ...opNiveau('zone')]) {
+      const naam = g.naam.toLowerCase();
+      if (!new RegExp('(^|[^a-z])' + naam.replace(/[.*+?^${}()|[\]\\]/g, '\\  function gebiedMaak({') + '([^a-z]|$)').test(t)) continue;
+      if (!beste || naam.length > beste.naam.length) beste = g;
+    }
+    return beste;
+  }
+
   function gebiedMaak({ niveau, naam, ouder, punten, soort }) {
     zorgGeografie();
     if (!NIVEAUS.includes(String(niveau || ''))) return { status: 400, error: 'Kies een niveau: ' + NIVEAUS.join(', ') + '.' };
@@ -173,7 +191,7 @@ module.exports = (ctx) => {
   }
 
   return {
-    NIVEAUS, zorgGeografie, gebied, kinderen, opNiveau, namen, opNaam, pad, binnen, plaats, label,
+    NIVEAUS, zorgGeografie, gebied, kinderen, opNiveau, namen, opNaam, uitTekst, pad, binnen, plaats, label,
     afstand: haversine, totGeometrie, inVlak, middenVan,
     api: {
       weefselGebieden: ({ niveau } = {}) => {

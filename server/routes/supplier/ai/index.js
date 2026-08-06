@@ -7,8 +7,8 @@
 module.exports = (kern) => {
   // alleen wat deze AI-module echt gebruikt (de rest van de gedeelde kern hoort
   // hier niet thuis; opgeruimd om dode destructuring te vermijden)
-  const { addTicket, aiFindDoor, aiFindRoom, app, db, guestsFor, logActivity, posDay,
-    save, scheduleFor, setRoomHk, sseToSupplier, supplierAuth, unlockDoor, fluisterZeg, ordersVanZaak } = kern;
+  const { addTicket, aiFindDoor, aiFindRoom, app, db, guestsFor, logActivity, posDay, save, scheduleFor, setRoomHk, sseToSupplier, supplierAuth, unlockDoor, ordersVanZaak } = kern;
+  const { fluisterZeg } = kern.fluister;
   const ambtenaar = require('./ambtenaar')(kern);
 
 app.post('/api/supplier/ai', supplierAuth, async (req, res) => {

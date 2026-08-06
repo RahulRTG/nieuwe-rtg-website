@@ -1308,10 +1308,26 @@ const { ZAAK_CAPS, zaakFunctieAan, zaakFunctieLijst, zaakZet, zaakHr, zaakMarket
 /* De eigen boardroom per lid (kern/lidboard.js): elk lid zet zijn eigen
    functies aan/uit; een ouder/beheerder stuurt via dezelfde motor de boardroom
    van zijn beschermde kind bij (de route bewaakt het gezinsverband). */
-const { LIDBOARD_CAPS, lidBoard, lidBoardZet, lidBoardZetVeel, lidBoardHerstel, lidBoardAan,
-  lidBoardVersie, lidPadFunctie, lidBoardUit, lidBoardLog, lidBoardLogWis,
+/* HET LIDBOARD ALS EEN NAAM OP DE KERN, en de werkbeleid-namen apart.
+
+   Dat onderscheid is geen opmaak. Negen lidBoard-namen gaan over EEN onderwerp --
+   de eigen boardroom van een lid -- en vijf daarvan werden door zowel member als
+   social aangeraakt; in de gedeelde kern stonden dus vijf losse namen waar
+   "member en social hangen beide van het lidboard af" uit moest blijken. Het
+   werkbeleid komt uit dezelfde motor maar is een ander onderwerp (een werkgever
+   die tijdens de dienst iets dichtzet), en die namen blijven daarom los.
+
+   lidPadFunctie en lidBoardUit blijven ook los: die worden hier in server.js zelf
+   gebruikt en gaan niet naar een domein. */
+const _lidboard = maakLidboard({ db, save });
+const { lidPadFunctie, lidBoardUit,
   werkbeleid, werkbeleidZet, werkbeleidOverzicht, werkgeversVan,
-  werkbeleidPauzeStand, WERKBELEID_PAUZE_MINUTEN } = maakLidboard({ db, save });
+  werkbeleidPauzeStand, WERKBELEID_PAUZE_MINUTEN } = _lidboard;
+const lidboard = { LIDBOARD_CAPS: _lidboard.LIDBOARD_CAPS, lidBoard: _lidboard.lidBoard,
+  lidBoardZet: _lidboard.lidBoardZet, lidBoardZetVeel: _lidboard.lidBoardZetVeel,
+  lidBoardHerstel: _lidboard.lidBoardHerstel, lidBoardAan: _lidboard.lidBoardAan,
+  lidBoardVersie: _lidboard.lidBoardVersie, lidBoardLog: _lidboard.lidBoardLog,
+  lidBoardLogWis: _lidboard.lidBoardLogWis };
 
 /* De autoverkoop-laag (kern/autoverkoop.js): een 5-sterren, exclusieve
    autoverkoop bovenop het verhuurbedrijf. Showroom, proefrit, kopen met bod,
@@ -1754,17 +1770,24 @@ const kern = {
   klantProfiel, zetKlantMaten, voegKlantnotitie, wishlistToggle, legApart, mijnApart,
   vraagPaskamer, paskamerBreng, stuurStyling, mijnStyling, retailVerkoop, retailVerkoopTerug, voorraadZoek,
   retailStats, retailState, retailCatalogus,
-  // de groothandel-/marktlaag (kern/groothandel.js)
-  GROOTHANDEL_FUNCTIES, GROOTHANDEL_CATEGORIEEN, ghIsGroothandel, ghDefaults, ghFunctieAan,
-  ghFunctieLijst, ghZetFunctie, ghZetProduct, ghZetVoorraad, ghMarkt, ghPlaatsBestelling,
-  ghOrderVerder, ghAnnuleer, ghMijnBestellingen, ghInkomend, ghBijbestelVoorstel,
+  /* DE GROOTHANDEL ALS EEN NAAM. Vier van deze zestien werden door zowel member
+     als supplier aangeraakt (ghMarkt, ghPlaatsBestelling, ghAnnuleer,
+     ghMijnBestellingen), en dat delen is ECHT: een lid bestelt en een zaak levert.
+     Precies daarom hoort er een naam te staan waar dat aan te zien is, in plaats
+     van vier losse namen in een zak.
+     De destructurering hierboven blijft: server.js gebruikt sommige van deze
+     namen zelf en geeft ghPlaatsBestelling door aan kern/agent.js. Alleen wat de
+     DOMEINEN te zien krijgen, gaat onder een naam. */
+  groothandel: { GROOTHANDEL_FUNCTIES, GROOTHANDEL_CATEGORIEEN, ghIsGroothandel, ghDefaults,
+    ghFunctieAan, ghFunctieLijst, ghZetFunctie, ghZetProduct, ghZetVoorraad, ghMarkt,
+    ghPlaatsBestelling, ghOrderVerder, ghAnnuleer, ghMijnBestellingen, ghInkomend,
+    ghBijbestelVoorstel },
   agentKoppel, agentPubliek, agentVoorstel, agentBeslis, roosterVoorstel, roosterBeslis,
   // de mode-bezorging (kern/modebezorg.js)
   mbSetup, mbInstel, mbMagLeveren, mbAanvraag, mbWinkelOverzicht, mbRoute, mbNeem, mbGps, mbOverhandig, mbRetour, mbMijn,
   // de eigen mini-boardroom per zaak (kern/zaak.js)
   ZAAK_CAPS, zaakFunctieAan, zaakFunctieLijst, zaakZet, zaakHr, zaakMarketing, zaakBoard,
-  LIDBOARD_CAPS, lidBoard, lidBoardZet, lidBoardZetVeel, lidBoardHerstel, lidBoardAan,
-  lidBoardVersie, lidBoardLog, lidBoardLogWis,
+  lidboard,
   // het werkgeversbeleid op de boardroom van het lid (alleen dichtzetten,
   // alleen tijdens de dienst, en niet in de pauze-armslag)
   werkbeleid, werkbeleidZet, werkbeleidOverzicht, werkgeversVan,

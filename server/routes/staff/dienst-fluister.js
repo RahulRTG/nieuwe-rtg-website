@@ -9,7 +9,8 @@
 
    Afgesplitst uit dienst.js toen die de 10 KB passeerde. */
 module.exports = (fctx) => {
-  const { app, accounts, supplierAuth, fluisterZeg, fluisterVergeet, fluisterFocus, fluisterProfiel, stuurLus } = fctx;
+  const { app, accounts, supplierAuth, stuurLus } = fctx;
+  const { fluisterZeg, fluisterVergeet, fluisterFocus, fluisterProfiel } = fctx.fluister;
 
 /* Fluister voor de vloer: dezelfde persoonlijke assistent, met een eigen
    geheugen per personeelslid (nooit gedeeld met de werkgever). */

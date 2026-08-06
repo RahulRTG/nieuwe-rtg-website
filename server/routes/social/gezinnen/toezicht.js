@@ -3,9 +3,8 @@
    Gemount vanuit routes/social/gezinnen.js op de gedeelde context. */
 module.exports = (sctx) => {
   const { kern, isKindVanGezin, rtfOnbSess, rtfSociaal } = sctx;
-  const { app, auth, geenGast, rtf, connectieTussen, verbActief, sseToCustomer, sseClients, sseSend,
-          speelOpnieuw, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, kindContacten, kindVerwijder,
-          lidBoard, lidBoardZet, lidBoardZetVeel, lidBoardHerstel, lidBoardLog } = kern;
+  const { app, auth, geenGast, rtf, connectieTussen, verbActief, sseToCustomer, sseClients, sseSend, speelOpnieuw, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, kindContacten, kindVerwijder } = kern;
+  const { lidBoard, lidBoardZet, lidBoardZetVeel, lidBoardHerstel, lidBoardLog } = kern.lidboard;
 /* Live-kanaal voor de RTF-vriendenlaag: net als /api/stream, maar op gezin-token.
    De verbinding staat in dezelfde sseClients-lijst, met de handle als sleutel, zodat
    dm-, snap-, verzoek- en belsignalen de RTF-app net zo bereiken als de RTG-app.

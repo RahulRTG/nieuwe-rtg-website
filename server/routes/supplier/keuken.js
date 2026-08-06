@@ -3,8 +3,8 @@
    telling, verspilling en levering. Recepten en leveringen zijn management;
    tellen en derving melden mag iedereen (de vloer weet wat er staat). */
 module.exports = (kern) => {
-  const { app, supplierAuth, managerOnly, keuken, sseToSupplier, ghMarkt, ghPlaatsBestelling, dagrapport,
-          shiftSamenvatting } = kern;
+  const { app, supplierAuth, managerOnly, keuken, sseToSupplier, dagrapport, shiftSamenvatting } = kern;
+  const { ghMarkt, ghPlaatsBestelling } = kern.groothandel;
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const sein = code => sseToSupplier(code, 'sync', { scope: 'voorraad' });
 

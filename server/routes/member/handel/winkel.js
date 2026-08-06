@@ -2,9 +2,8 @@
    Gemount vanuit routes/member/handel.js op de gedeelde kern. */
 module.exports = (hctx) => {
   const { kern, openLijn } = hctx;
-  const { app, auth, db, express, findSupplier, liveCodename, notifySupplier, save, schoon,
-          sseToSupplier, ghMarkt, ghPlaatsBestelling, ghMijnBestellingen, ghAnnuleer, mbAanvraag, mbMijn,
-          gegevensStop } = kern;
+  const { app, auth, db, express, findSupplier, liveCodename, notifySupplier, save, schoon, sseToSupplier, mbAanvraag, mbMijn, gegevensStop } = kern;
+  const { ghMarkt, ghPlaatsBestelling, ghMijnBestellingen, ghAnnuleer } = kern.groothandel;
 /* ================== veilig laten bezorgen door een modewinkel ==================
    Een lid laat gekochte/apart-gelegde mode-artikelen thuisbezorgen. Veilig: een
    bezorgcode die je alleen aan de echte koerier geeft, live volgen, en bij dure

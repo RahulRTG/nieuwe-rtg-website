@@ -61,7 +61,20 @@ kern.rahulActies = {
   careOverzicht: kern.careOverzicht, careBoek: kern.careBoek,
   boekBehandeling: (session, body) => kern.boekBehandelingActie(session, body, verdienPunten)
 };
-Object.assign(kern, require('../kern/fluister')({
+/* DE FLUISTERLAAG KRIJGT EEN EIGEN NAAM OP DE KERN in plaats van vijftien losse.
+   Drie van die vijftien werden door zowel member als staff aangeraakt, en dan
+   staat er in de gedeelde kern niet "deze twee domeinen hangen van de
+   fluisterlaag af" maar vijftien namen waar je dat uit moet opmaken. Nu zegt een
+   domein het: `= ctx.fluister`.
+
+   De namen zelf blijven fluisterZeg, sparLijst en de rest -- dus kern.fluister
+   .fluisterZeg leest dubbelop. Dat is de prijs van een kleine ingreep: alleen de
+   BRON van elke destructurering verandert, de lokale namen en de hele body van
+   elk bestand blijven zoals ze waren. De vorige keer dat hier honderden
+   aanroepplekken mechanisch zijn aangeraakt, brak /api/supplier/menu/get
+   (eerlijkheidspunt 6.9). Omdopen naar kern.fluister.zeg kan later, per plek, met
+   de toetsen ernaast. */
+kern.fluister = require('../kern/fluister')({
   db, save, schoon, anthropic, notify,
   reserveerTafel, annuleerReservering, assetGebruik: kern.assetGebruik, zorgVoor: kern.zorgVoor, pay: kern.pay,
   acties: kern.rahulActies,
@@ -75,11 +88,11 @@ Object.assign(kern, require('../kern/fluister')({
      gesprek als de app, want de vraag hoort niet af te hangen van het kanaal. */
   gegevensStart: (sessie, soort) => (kern.gegevensStart ? kern.gegevensStart(sessie, soort) : null),
   gegevensZeg: (sessie, id, tekst) => (kern.gegevensZeg ? kern.gegevensZeg(sessie, id, tekst) : { status: 404, error: 'Dat gesprek ken ik niet meer.' })
-}));
+});
 // nieuwe seintjes worden vanzelf een melding op het toestel; de sweep loopt
 // elk half uur, bouwt een index (een datapass voor alle gebruikers) en
 // fluisterPush zelf zorgt dat niets twee keer piept
-setInterval(() => { try { kern.fluisterPushAlle(); } catch (e) {} try { kern.sparSweepAlle && kern.sparSweepAlle(); } catch (e) {} }, 30 * 60 * 1000).unref();
+setInterval(() => { try { kern.fluister.fluisterPushAlle(); } catch (e) {} try { kern.fluister.sparSweepAlle && kern.fluister.sparSweepAlle(); } catch (e) {} }, 30 * 60 * 1000).unref();
 /* De tiener-tools (kern/tiener.js): toetsplanner met leerplan en het
    zakgeldpotje met spaardoelen; eigen spullen van het profiel. */
 Object.assign(kern, require('../kern/tiener')({ save, crypto }));

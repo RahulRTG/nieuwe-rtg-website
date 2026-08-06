@@ -3,13 +3,13 @@
    ziekmelden en de vertrouwenspersoon. Krijgt de gedeelde context een keer
    bij het opstarten vanuit routes/staff.js. */
 module.exports = (actx) => {
-  const { DEMO, accounts, app, checkCred, crypto, db, findStaffPartner, hasCred, klokVan, logActivity, managerOnly, notifySupplier, publicPartner, save, schoon, sseClients, sseSend, sseToOffice, sseToSupplier, supplierAuth, trustVan,
-    fluisterZeg, fluisterVergeet, fluisterFocus, fluisterProfiel, stuurLus,
-    werkbeleidPauzeStand, WERKBELEID_PAUZE_MINUTEN } = actx;
+  const { DEMO, accounts, app, checkCred, crypto, db, findStaffPartner, hasCred, klokVan, logActivity, managerOnly, notifySupplier, publicPartner, save, schoon, sseClients, sseSend, sseToOffice, sseToSupplier, supplierAuth, trustVan, stuurLus, werkbeleidPauzeStand, WERKBELEID_PAUZE_MINUTEN } = actx;
+  const fluister = actx.fluister;
+  const { fluisterZeg, fluisterVergeet, fluisterFocus, fluisterProfiel } = fluister;
 /* Fluister voor de vloer staat in ./dienst-fluister.js: dat stuk praat met een
    modelaanbieder en de rest van deze laag niet, dus de vraag wat er naar buiten
    gaat hoort daar bij elkaar. */
-require('./dienst-fluister')({ app, accounts, supplierAuth, fluisterZeg, fluisterVergeet, fluisterFocus, fluisterProfiel, stuurLus });
+require('./dienst-fluister')({ app, accounts, supplierAuth, fluister, stuurLus });
 
 app.post('/api/staff/clock', supplierAuth, (req, res) => {
   if (!req.actor.staffId) return res.status(403).json({ error: 'Alleen met een persoonlijke login.' });

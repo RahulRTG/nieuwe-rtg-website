@@ -3,8 +3,8 @@
    overige leden-routes wonen in behapbare submodules onder routes/member/.
    De helpers blijven in de kern (server.js) en komen via het kern-object binnen. */
 module.exports = (kern) => {
-  const { app, auth, db, stateFor, geenGast, lidBoard, lidBoardZet, lidBoardZetVeel,
-    lidBoardHerstel, lidBoardLog, werkgeversVan } = kern;
+  const { app, auth, db, stateFor, geenGast, werkgeversVan } = kern;
+  const { lidBoard, lidBoardZet, lidBoardZetVeel, lidBoardHerstel, lidBoardLog } = kern.lidboard;
   const functies = require('../functies');
 
   app.post('/api/state', auth, (req, res) => res.json({ state: stateFor(req.session, req.body.lang) }));

@@ -48,7 +48,6 @@
         leeg.className = 'os-bel-leeg';
         leeg.textContent = T('werk.leeg', 'Nog geen werkplek gekoppeld. Bewijs eenmalig uw werk-inlog (bijvoorbeeld uw personeels-PIN in de leverancier-app); daarna opent uw werk hier met uw algemene pin.');
         belLijst.appendChild(leeg);
-        return;
       }
       for (const r of rollen) {
         const doel = WERKDOEL[r.rol];
@@ -80,6 +79,21 @@
         }));
         belLijst.appendChild(b);
       }
+      /* De eerste keer. Een werkruimte heeft zijn eigen inlog (code +
+         lid-token) en hoort dat te houden: hij moet ook werken voor iemand
+         zonder RTG-pas. Maar dan moet die deur hier wel te vinden zijn --
+         anders is "een inlog" alleen waar voor wie al binnen was. Deze rij
+         staat er dus altijd, ook als de lijst leeg is. */
+      const nieuw = document.createElement('button');
+      const nzi = document.createElement('span'); nzi.className = 'zi';
+      const nzg = window.RTGGlyf && RTGGlyf.svg('werk'); if (nzg) nzi.appendChild(nzg);
+      nieuw.appendChild(nzi);
+      nieuw.appendChild(document.createTextNode(T('werk.nieuw', 'Werkruimte openen')));
+      const nm = document.createElement('span'); nm.className = 'zm';
+      nm.textContent = T('werk.nieuw.sub', 'Eerste keer: met uw werkruimtecode en lid-token. Koppelt u daar uw RTG-account, dan staat hij hierboven.');
+      nieuw.appendChild(nm);
+      nieuw.addEventListener('click', () => { location.href = '/apps/werk.html'; });
+      belLijst.appendChild(nieuw);
     }).catch(() => {
       const leeg = document.createElement('div');
       leeg.className = 'os-bel-leeg';

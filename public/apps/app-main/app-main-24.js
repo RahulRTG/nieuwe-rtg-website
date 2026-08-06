@@ -8,14 +8,13 @@
     stad:        { naam: 'Mijn Stad',    url: '/apps/stad.html' },
     clips:       { naam: 'Clips',        url: '/apps/clips.html' },
     office:      { naam: 'RTG Office',   url: '/apps/office.html' },
-    /* De werkplek zelf. Deze stond alleen op het oude bureaublad
-       (/apps/index.html) en werd daarmee onbereikbaar: geen enkele pagina
-       linkte er nog naartoe. Een app die alleen bestaat als je het adres kent,
-       bestaat voor een gebruiker niet. De naam is die van het bureaublad.
-       Let op het verschil met 'os:werk' hiernaast: dat is de KIEZER die je
-       gekoppelde werkplekken toont (personeel, leverancier, backoffice); dit
-       is de Werk OS-app zelf. */
-    werk:        { naam: 'Werk OS',      url: '/apps/werk.html' },
+    /* Hier stond een losse "Werk OS"-tegel naast "Mijn werkplekken": twee
+       tegels met hetzelfde koffertje, en erger, twee INLOGS. De ene ging via
+       het ene RTG-account, de andere vroeg opnieuw om een werkruimtecode en
+       een lid-token. Dat is precies wat "een account voor alles" niet mag
+       betekenen. De werkruimte is nu een sleutel aan diezelfde bos, dus er is
+       nog een deur: Mijn werkplekken. Wie er voor het eerst in moet, vindt de
+       werkruimte-inlog onderaan diezelfde kiezer. */
     sitemaker:   { naam: 'Website-maker', url: '/apps/sitemaker.html' },
     browser:     { naam: 'RTG Browser',  url: '/apps/browser.html' },
     vonk:        { naam: 'Vonk',         url: '/apps/vonk.html' },
@@ -91,7 +90,7 @@
       'link:attenties', 'link:table', 'link:cellier', 'link:garderobe'] },
     { sleutel: 'map-huis', naam: 'Het Huis', items: [
       'link:ontdek', 'os:rtf', 'link:school', 'tab:zorg', 'tab:gezin', 'link:rechterhand',
-      'link:office', 'link:werk', 'link:browser', 'link:sitemaker', 'link:juridisch', 'link:passkeys',
+      'link:office', 'link:browser', 'link:sitemaker', 'link:juridisch', 'link:passkeys',
       'link:ik', 'link:thuiswacht', 'link:codewoord', 'link:vitaal', 'link:thuisrust', 'os:werk'] }
   ];
 
@@ -134,7 +133,15 @@
   const WERKDOEL = {
     personeel: { glyf: 'navigatie', app: 'Personeel (PDA)', url: '/apps/personeel.html', bewaar: (t, r) => { localStorage.setItem('rtg_pda_token', t); localStorage.setItem('rtg_pda_code', r.code || ''); } },
     zaak:      { glyf: 'maison', app: 'Leverancier',    url: '/apps/leverancier.html', bewaar: (t) => { localStorage.setItem('rtg_sup_token', t); } },
-    kantoor:   { glyf: 'office', app: 'Backoffice',     url: '/apps/backoffice.html', bewaar: (t) => { localStorage.setItem('rtg_office_token', t); } }
+    kantoor:   { glyf: 'office', app: 'Backoffice',     url: '/apps/backoffice.html', bewaar: (t) => { localStorage.setItem('rtg_office_token', t); } },
+    /* De werkruimte van het RTG Werk OS. Die had zijn eigen tweede inlog
+       (werkruimtecode + lid-token); wie zijn RTG-account er een keer aan
+       koppelde, moest daarna alsnog opnieuw inloggen om binnen te komen. De
+       server leest die koppeling nu ook de andere kant op, dus hier is het
+       gewoon een sleutel als alle andere. Wat we bewaren is precies wat de
+       losse inlog bewaart: de code en het lid-token. */
+    werkruimte: { glyf: 'werk', app: 'Werk OS', url: '/apps/werk.html',
+      bewaar: (t, r) => { localStorage.setItem('rtg_werk_sessie', JSON.stringify({ werkruimte: r.code, lidToken: t })); } }
   };
 
   /* vraag de algemene pin (of zet hem eerst) en geef hem door aan af(pin) */

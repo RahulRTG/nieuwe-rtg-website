@@ -1,0 +1,35 @@
+{
+  "_let_op": "ONGECONTROLEERD. Deze cijfers zijn NIET tegen het Handboek Loonheffingen gelegd en zijn niet geschikt voor een definitieve loonrun. Ze staan hier om de motor te kunnen draaien en toetsen. Wie ze in gebruik neemt, controleert ze eerst tegen de bron en merkt het pakket daarna aan (payroll.regels.merkAan) -- dat is de enige manier waarop een definitieve run erop mag draaien.",
+  "_bronnen": [
+    "Handboek Loonheffingen (Belastingdienst) -- tabellen, premies en Zvw-bijdrage",
+    "Rijksoverheid -- wettelijk minimumuurloon, halfjaarlijks bijgesteld",
+    "Sinds 2024 kent Nederland geen vast minimumloon per maand/week/dag meer: de controle gaat uit van het minimumUURloon maal de arbeidsduur."
+  ],
+  "_vlak_tarief": "loonheffing.tarief is hier EEN vlak percentage. Dat is niet hoe de Nederlandse loonbelasting werkt (schijven, heffingskortingen, bijzonder tarief, tabelkeuze). De motor is er wel op gebouwd: hij vraagt het tarief aan het regelpakket en rekent niet zelf. Een echte jaargang vervangt dit veld door de tabellen, zonder dat de motor verandert.",
+
+  "land": "NL",
+  "versie": "nl-2026.0-ongecontroleerd",
+  "geldigVan": "2026-01-01",
+  "geldigTot": "2026-12-31",
+  "regels": {
+    "minimumUurloon": {
+      "21+": 1499,
+      "20": 1199,
+      "19": 899,
+      "18": 750,
+      "17": 592,
+      "16": 517,
+      "15": 450
+    },
+    "loonheffing": {
+      "tarief": 0.3697,
+      "_toelichting": "plaatshouder: een vlak percentage waar de echte jaargang schijven en heffingskortingen neerzet"
+    },
+    "premies": {
+      "tarief": 0.2,
+      "_toelichting": "plaatshouder voor de werknemersverzekeringen (AWf, Aof, Whk); werkgeverslast"
+    },
+    "zvw": 0.0657,
+    "vakantiegeld": 0.08
+  }
+}

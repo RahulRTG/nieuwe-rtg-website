@@ -699,6 +699,248 @@ staat de allergie erbij), wat is uitgegeven verdwijnt van de pas, en roomservice
 die op de kamer wordt geboekt komt op de gastrekening van diezelfde kamer
 terecht.
 
+### RTG Mobility OS (de vervoerskern)
+
+`server/kern/mobiliteit/` + `/api/mob/...`, `/api/staff/mob/...`,
+`/api/supplier/mob/...`, `/api/office/mob/...` + `/apps/ov.html` (reiziger) en
+`/apps/dispatch.html` (planner) en `/apps/zakelijk.html` (werkgever). Geen losse
+taxi-app naast RTG OV, maar **een
+kern waarop elk vervoerstype een aan- of uitzetbare module is**: taxi, pendel,
+OV, rolstoelvervoer, boot, charter en bijzonder vervoer delen dezelfde ritten-,
+voertuig-, locatie- en betaallaag.
+
+| Module | Wat erin zit |
+| --- | --- |
+| `modulecatalogus.js` + `register.js` | 25 vervoersmodules met **afhankelijkheden** en niveaus (wereld, land, stad, organisatie, vervoerder, doelgroep, testers, percentage), plus een storingsknop |
+| `voertuigcatalogus.js` + `assets.js` | een `mobility_asset` voor alles wat rijdt, vaart of vliegt (27 categorieen), met documentgeldigheid en geschiktheidstoets |
+| `keten.js` + `opdracht.js` + `voortgang.js` | de rittenmotor: een opdrachtvorm voor alle vervoersvormen, met de statusketen `aangevraagd → … → afgerekend`, de uitzonderingen ernaast, en de gebeurtenissen (`ride.accepted`, `driver.arrived`, `trip.completed`) |
+| `plekken.js` | vertrek en bestemming uit RTG zelf: onze horeca, hotels, zorgzaken en OV-haltes, plus de favoriete plekken van het lid |
+| `matching.js` | toewijzing met instelbare wegingen per stad en vervoerder, en een natrekbare rekensom per kandidaat |
+| `dispatch.js` | het planscherm: openstaand, onderweg, de vloot, toewijzen, overboeken naar een partner, telefonische boekingen |
+| `pendel.js` + `pendel-rooster.js` | bedrijfspendels: een regel wordt een dienstregeling wordt een echte rit |
+| `reisbeleid.js` + `zakelijk.js` | de zakelijke laag: dienstverband, reisbeleid, goedkeuring en het maandoverzicht van de werkgever |
+
+**De zes regels die deze laag anders maken dan een Uber-kloon.** Ze staan in
+code, en `test/mobiliteit.test.js` (14 toetsen) laat ze zakken zodra ze niet
+meer waar zijn -- alle zes zijn met een mutatie nagetrokken:
+
+1. **Een product is nooit meer aan dan waar het op leunt.** Helikoptercharter
+   vereist identiteitscontrole, een partnercontract, menselijke bevestiging, een
+   weertoets en charterafrekening. Staat er een uit, dan staat het charter uit --
+   ook als iemand hem net heeft aangezet, en aanzetten weigert met de NAAM van
+   wat ontbreekt. Zo is een half afgemaakte functie niet per ongeluk te
+   activeren.
+2. **Papieren zijn fail-closed.** Geen geldigheidsdatum telt als ONGELDIG, niet
+   als "vast wel in orde". Er is geen veld `geblokkeerd` dat kan verjaren; er is
+   een lijst redenen die leeg is of niet. Een taxi met een verlopen vergunning
+   komt niet in de rangschikking -- niet met minpunten, maar helemaal niet.
+3. **De statusketen kent maar een weg.** Een rit kan niet 'voltooid' worden
+   zonder ooit ingestapt te zijn, want daar hangt de afrekening aan. Chauffeur,
+   dispatcher, reiziger en het AI-stuur lopen allemaal over dezelfde functie.
+4. **De matcher legt zijn keuze uit.** Elke kandidaat draagt zijn rekensom mee
+   (welke factor hoeveel punten gaf en waarom), en de AFGEWEZEN voertuigen staan
+   er met hun reden bij. Een dispatcher die niet snapt waarom de motor wagen 4
+   koos, gaat handmatig toewijzen -- en dan is de motor een dure decoratie.
+5. **Werk wordt eerlijk verdeeld.** "Wie had vandaag het minste" is een factor
+   met gewicht, per stad en vervoerder in te stellen. En `surge_pricing` staat in
+   het register maar staat UIT: RTG rekent geen schaarstepremie.
+6. **Geen tweede adresboek en geen tweede grootboek.** Bestemmingen zijn onze
+   eigen zaken en haltes; afrekenen loopt via `kern/pay` zoals elke andere
+   RTG-betaling. Het woonadres uit de identiteitskluis wordt NIET aangesproken --
+   een lid bewaart zijn vertrekpunten zelf, als favoriet op codenaam.
+
+RTG voert zelf geen commerciele luchtvaart of zeevaart uit. Die producten zijn
+een marktplaats voor gecertificeerde exploitanten, en dat zit in de code als de
+boekingsvorm `aanvraag`: daar komt altijd een mens tussen.
+
+#### De OV-kaartverkoop: drie poorten voor er een vervoerbewijs uit komt
+
+`overeenkomst.js` + `kaartje(-beeld/-gebruik).js` + `storing.js`. Een kaartje is
+een afspraak tussen de reiziger en de **vervoerder** -- die rijdt, die
+controleert, die draagt het risico. RTG verkoopt hooguit namens hem. Daarom
+komen er drie poorten voor een kaartje uit, en alle drie worden ze op het moment
+zelf uitgerekend:
+
+1. de module `public_transport_ticketing` staat aan in dit gebied;
+2. er is een **geldige overeenkomst** met die vervoerder -- een dossier met
+   looptijd, handtekening en afdracht, alleen door RTG zelf vast te leggen (een
+   partij die zijn eigen overeenkomst schrijft, heeft geen overeenkomst maar een
+   vinkje);
+3. die overeenkomst dekt **deze lijn en dit product**. Een lege lijnenlijst
+   betekent geen enkele lijn, niet alle.
+
+De prijs komt uit `ovPrijsVan` -- dezelfde formule die afrekent bij het
+uitchecken, zodat de balie en de bus niet uiteenlopen. De controle door de
+conducteur is de enige plek waar een kaartje opgaat, en hij ziet het bewijs en
+niet de persoon: product, lijn, geldigheid en de codenaam, geen e-mailadres en
+geen wallet.
+
+**Abonnementen** zijn hetzelfde ding met een ander product: een periodekaart
+wordt bewaard als een kaartje met product `abonnement`, in dezelfde voorraad en
+met dezelfde code, zodat de conducteur langs precies één weg controleert. Wat er
+anders aan is staat in code: onbeperkt reizen binnen de looptijd (het aantal
+ritten wordt geteld maar niet begrensd, en dat staat er ook bij), een prijs die
+uit de **overeenkomst** komt en niet uit een formule -- wat een maandkaart kost
+is een commerciële afspraak, geen som -- en bij een storing een teruggave op
+**dagbasis**. Een maandkaarthouder de helft van zijn maand teruggeven omdat de
+bus een uur uitviel, is geen compensatie maar een weggevertje, en het komt van
+de vervoerder af.
+
+Het kaartje is te **tonen als scanbare QR** (`shared/qr.js` + `qrteken.js`, onze
+eigen codec) met de code in leesbare tekens eronder voor als de camera niet
+meewerkt; de conducteur scant hem op de dienst-PDA met dezelfde overlay als de
+kassa en de pas. Hij ziet het bewijs en niet de persoon.
+
+**Vertraging komt van de vervoerder, niet van ons.** Wij hebben live posities
+maar geen dienstregeling per halte, dus "hoeveel te laat" kunnen wij niet
+berekenen -- en een teruggave op een geraden getal is erger dan geen teruggave.
+De vervoerder meldt de storing zelf; iedereen met een kaartje in dat venster
+krijgt automatisch geld terug (vertraging 50%, uitval 100%). Twee dingen die
+daar in code staan omdat ze in de eerste versie fout gingen: nooit meer dan de
+kaartprijs terug (wie 50% kreeg en daarna uitval, kreeg anders 150%), en een
+vergoeding voor vertraging kost je je rit **niet** -- alleen bij uitval vervalt
+het kaartje.
+
+#### De CDT: klaar voor 2028, en eerlijk over wat er nog niet is
+
+`cdt.js` + `cdt-tijden.js` + `cdt-export.js`. Vanaf 1 januari 2028 gaat het
+Nederlandse taxivervoer van de boordcomputer over op de Centrale Database
+Taxivervoer. Wat hier staat:
+
+- **De dienst van een chauffeur**: aanmelden op de chauffeurskaart (zonder kaart
+  geen registratie -- fail-closed), overschakelen tussen rijden, andere
+  werkzaamheden, beschikbaarheid, pauze en rust, en afmelden. De tijdlijn heeft
+  altijd precies één open blok, zodat er geen gaten of overlappingen ontstaan.
+- **De grenzen** uit de Arbeidstijdenwet en het Arbeidstijdenbesluit vervoer
+  (12 uur arbeid, 10 uur rijden, 30 minuten pauze na 4,5 uur rijden, 10 uur
+  dagrust) staan als data op één plek en zijn per onderneming bij te stellen op
+  het eigen regime. Elk signaal noemt zijn eigen rekensom; een dienst binnen de
+  grenzen levert er géén op.
+- **De ritten worden niet overgeschreven** maar per dienst opgezocht in de
+  rittenmotor. Een tweede rittenlijst voor de inspectie zou binnen een maand
+  uiteenlopen met de eerste, en daarvan gaat er één naar de overheid.
+- **De export** is herhaalbaar en draagt een sha256 over een vaste ordening,
+  zodat later na te gaan is of het aangeleverde bestand hetzelfde was. Er staan
+  geen prijzen, codenamen of bestemmingen in: wat je niet uitlevert, kan ook niet
+  uitlekken.
+
+**En wat er bewust niet is: een knop "verzenden naar de CDT".** Aanleveren loopt
+via een ICT-dienstverlener die aan de eisen van de ILT voldoet, en RTG is dat
+niet. Zo'n knop zou een leugen zijn met een groen vinkje eronder, en bij een
+wettelijke verplichting is dat gevaarlijk in plaats van slordig: een ondernemer
+die denkt dat hij heeft aangeleverd, controleert het niet meer. Wat er wel is,
+is een **overdracht-journaal**: wie gaf welk bestand wanneer aan welke
+dienstverlener. Dat legt vast wat er echt gebeurde, en het antwoord zegt erbij
+dat RTG niet kan zien of de CDT het heeft aanvaard.
+
+#### De multimodale reisplanner: taxi en OV als EEN reis
+
+`reisplan(-etappe).js` + `reisfactoren.js` + `reis.js` + het tabblad *Reizen* in
+`/apps/ov.html`. Dit is de functie die andere vervoersapps niet kunnen bouwen,
+en niet omdat het algoritme moeilijk is: het is dat de bestemmingen, de lijnen,
+de taxi's en de betaling hier van hetzelfde huis zijn. "Taxi naar het station,
+trein, lopen naar Sal de Mar" is bij ons **een** reis met **een** overzicht, en
+geen drie apps met drie bonnetjes.
+
+De planner zet de manieren om er te komen naast elkaar, met per optie de tijd,
+de prijs, de overstappen, de loopafstand en de uitstoot -- en wijst *snelst*,
+*goedkoopst* en *schoonst* aan zonder een "beste" te kiezen, want dat is een
+oordeel over andermans afweging. Voor Ibiza-stad naar Santa Eularia:
+
+| optie | tijd | prijs | uitstoot |
+| --- | --- | --- | --- |
+| Rechtstreeks met de taxi | 29 min | € 42,39 | 1861 g |
+| Kustlijn 1 + taxi | 35 min | € 38,35 | 1738 g |
+| Eilandexpres + 206 m lopen | 42 min | € 3,98 | 432 g |
+
+**Wat de planner bewust niet doet** is een kortste pad zoeken door een netwerk
+met overstappen. Dat vraagt een dienstregeling per halte die wij niet hebben, en
+een planner die overstappen verzint op tijden die hij niet kent, stuurt mensen
+naar een perron waar niets komt. Hij doet wat hij wel kan onderbouwen, en wat
+afvalt valt af **met reden** ("de haltes liggen zo dat je er een omweg voor
+maakt") -- een lege lijst zonder uitleg leest als een storing.
+
+Vier dingen die in code staan omdat ze anders niet waar zouden zijn:
+
+1. **Uitstoot heet een schatting**, ook op het scherm, met het gehanteerde
+   getal per kilometer erbij. Het zijn indicatieve gemiddelden om opties mee te
+   vergelijken, geen meting aan het voertuig waar u in stapt.
+2. **Betrouwbaarheid komt uit onze eigen storingsmeldingen**, met het venster
+   erbij. Geen gegevens is "niet bekend" en niet "100%".
+3. **Comfort is geen score** maar een rij feiten: hoe vaak overstappen, hoeveel
+   meter lopen, zit u zeker.
+4. **Het plan wordt bij het boeken opnieuw gerekend.** De app stuurt alleen
+   welke optie het werd; wie de prijs meestuurt, bepaalt hem anders zelf.
+
+Boeken maakt de etappes echt: de taxi wordt een opdracht in de rittenmotor, de
+OV-etappe een vervoerbewijs (of een instructie om in te checken als er op die
+lijn geen kaartverkoop is). De geldregels staan apart en eerlijk: **het kaartje
+is betaald, de rit wordt afgerekend als hij gereden is** -- tot dan is die prijs
+een schatting. Mislukt er halverwege iets, dan worden de al aangemaakte ritten
+teruggedraaid, zodat er nooit een betaald kaartje achterblijft voor een reis die
+niet doorgaat.
+
+En de fout die dit het duidelijkst maakt: de eerste versie schreef
+`haversine(a, b) || 9e9`, en dat maakt van een afstand van **nul** een oneindige.
+Stond je precies op de halte, dan werd die als verste gesorteerd en viel de hele
+OV-optie af als omweg. De planner was het slechtst op het moment dat hij het
+makkelijkst had moeten hebben.
+
+#### De zakelijke laag: een product, geen knop "zakelijke rit"
+
+`reisbeleid.js` + `zakelijk.js` + `/apps/zakelijk.html` (de werkgever) en de
+velden *Op rekening van* / *Kostenplaats* in `/apps/ov.html` (de medewerker).
+Een vinkje "zakelijk" op een rit is een regel op een factuur. Wat een werkgever
+werkelijk wil is een grens, een goedkeuring en een overzicht -- en dat is wat
+hier staat.
+
+**Het gat dat hier zat, en hoe het gedicht is.** De rittenmotor nam de
+organisatiecode aan uit het verzoek. Elk lid dat de code van een bedrijf kende,
+kon op diens rekening rijden; de dienstverbandcontrole stond alleen bij de
+bedrijfspendel. Die controle staat nu op **een** plek -- in `opdrachtMaak`, waar
+elke weg naar een zakelijke rit langskomt (de app, de reisplanner, de
+dispatcher) -- en wordt op het moment zelf nagevraagd bij de
+personeelsadministratie, nooit uit iets wat de client meestuurt. Een controle
+per ingang is een controle die de volgende ingang vergeet.
+
+Het beleid kent een maximum per rit, een budget per medewerker per maand,
+toegestane tijden, dagen, steden, ritsoorten, een (verplichte) kostenplaats en
+een goedkeuringsdrempel. Vijf dingen die daarbij in code staan:
+
+1. **Elke afwijzing noemt de regel en het getal.** Niet "niet toegestaan", maar
+   *"Deze rit kost € 40,48; het maximum per rit is € 5,00."* Wie moet raden of
+   het aan het bedrag, het tijdstip of de kostenplaats lag, belt zijn manager --
+   precies wat een reisbeleid hoort te voorkomen. De werkgever ziet die zinnen
+   naast zijn eigen knoppen staan, zodat hij weet hoe zijn beleid klinkt.
+2. **Een drempel is geen verbod.** Boven het bedrag mag de rit best; er kijkt
+   eerst een mens naar. Die twee door elkaar halen is waarom mensen om een
+   beleid heen gaan werken. En wie buiten de regels valt, hoort dat hij de rit
+   op eigen rekening kan boeken -- dat is het verschil tussen een werkgever en
+   een voogd.
+3. **Een rit die op akkoord wacht, rijdt niet.** Hij staat op geen enkel
+   planbord en is niet in beweging te krijgen; de grendel zit op `opdrachtNaar`,
+   de enige weg naar een andere status, en niet op een scherm. Zou de wagen
+   alvast rijden, dan is de goedkeuring een formaliteit achteraf. Er is ook geen
+   stilzwijgende goedkeuring na verloop van tijd: wie niets doet, keurt niets
+   goed, en het besluit draagt de naam van wie het nam. Weigeren annuleert de
+   rit, want een geweigerde rit die blijft staan wordt alsnog gereden.
+4. **Bij een reis gaan de ritten naar de werkgever en blijven de
+   vervoerbewijzen persoonlijk.** Een rit wordt achteraf afgerekend en kan dus
+   naar een zakelijke rekening; een kaartje is hier en nu uit de portemonnee van
+   de reiziger betaald. Het overzicht zegt dat er met zoveel woorden bij.
+5. **Het maandoverzicht telt de rittenmotor**, per kostenplaats en per
+   medewerker, met de uitstoot erbij als schatting -- geen tweede administratie
+   die er binnen een kwartaal naast zit. De werkgever ziet de personeelsnaam die
+   hij al kent; de vervoerder ziet de codenaam. Dat is dezelfde scheiding als
+   overal: de chauffeur hoeft niet te weten wie hij ophaalt.
+
+`test/zakelijkvervoer.test.js` (14 toetsen) bewaakt dit, met mutaties
+nagetrokken: de poort die niet meer weigert, de grendel die eraf gaat, de
+wachtende rit die toch op het planbord komt, het budget dat geannuleerde ritten
+meetelt, de drempel die een verbod wordt, en een `werktBij` die niet meer naar
+het bedrijf kijkt -- elk daarvan laat een andere toets zakken. Het scherm van de
+werkgever loopt de weg af in `test/mobiliteitscherm.e2e.js`.
+
 ### RTG Werk OS (de werkplek van een organisatie)
 
 `server/bedrijf/` + `/api/bedrijf/...` + `/apps/werk.html`. Een **werkruimte**

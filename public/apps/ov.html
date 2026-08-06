@@ -5,7 +5,7 @@
 <!-- id.js zonder defer en vooraan: RTGId levert id's die al tijdens het parsen nodig zijn -->
 <script src="/shared/id.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>RTG OV</title>
+<title>RTG Vervoer</title>
 <meta name="theme-color" content="#0C0C0B">
 <meta name="robots" content="noindex,nofollow">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
@@ -31,18 +31,33 @@
     font-size:0.85rem;padding:0.6rem 0.95rem;}
   .knop.vol{background:var(--gold);border-color:var(--gold);color:#0C0C0B;font-weight:600;}
   .knop:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  .knop[disabled]{opacity:0.45;cursor:default;}
   .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem;margin:0.7rem 0;}
+  select,input{font:inherit;background:var(--card2);border:1px solid var(--line);border-radius:10px;
+    color:var(--txt);padding:0.55rem 0.7rem;width:100%;}
+  select:focus-visible,input:focus-visible{outline:2px solid var(--gold);outline-offset:1px;}
+  label{display:block;font-size:0.7rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--soft);margin:0.75rem 0 0.3rem;}
+  .duo{display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;}
+  /* de tabbladen: rit, ov, pendel */
+  /* GEEN eigen tabvormgeving hier. De UI-kit (shared/rtg-ui.css) maakt van een
+     `.tabs`-rij met kale knoppen een pilrij, en van `.aan` de actieve pil --
+     dat is de vormtaal van het huis en die wint ook op specificiteit
+     (`body.rtg-stijl .tabs > button`). Er een tweede tabstijl naast zetten
+     levert alleen een rij op die er net anders uitziet dan elke andere rij in
+     het OS. Wat hier overblijft is de plaatsing. */
+  .tabs{padding:0 1.1rem;max-width:640px;margin:0 auto 0.3rem;}
+  .tabs > button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   /* de twee snelle check-ins: twee grote rustige vlakken */
   .snel{display:grid;grid-template-columns:1fr 1fr;gap:0.7rem;margin-top:0.8rem;}
   .snel button{display:flex;flex-direction:column;align-items:center;gap:0.4rem;background:var(--card);
     border:1px solid var(--line);border-radius:16px;color:var(--txt);padding:1.2rem 0.6rem;font-size:0.85rem;}
-  .snel button .i{font-size:1.9rem;}
+  .snel button .i{display:block;width:1.9rem;height:1.9rem;}
   .snel button .sub{font-size:0.68rem;color:var(--soft);}
   .snel button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   /* lijnen dichtbij */
   .lijn{display:flex;align-items:baseline;gap:0.7rem;border-top:1px solid var(--line);padding:0.6rem 0;font-size:0.88rem;}
   .lijn:first-child{border-top:none;}
-  .lijn .icoon{font-size:1.2rem;}
+  .lijn .icoon{width:1.2rem;height:1.2rem;flex:none;}
   .lijn .sub{display:block;font-size:0.7rem;color:var(--soft);margin-top:0.15rem;}
   .lijn .rek{flex:1;}
   .lijn .over{font-variant-numeric:tabular-nums;font-weight:600;white-space:nowrap;}
@@ -51,6 +66,14 @@
   @keyframes puls{0%,100%{opacity:0.35;}50%{opacity:1;}}
   /* de actieve rit en de oplichtende code */
   .rit{border-left:3px solid var(--groen);}
+  /* de statusketen van een lopende rit */
+  .keten{display:flex;gap:0.3rem;margin:0.7rem 0 0.2rem;}
+  .keten span{flex:1;height:3px;border-radius:2px;background:var(--line);}
+  .keten span.af{background:var(--gold);}
+  .prijs{font-family:'Bodoni Moda',serif;font-size:1.6rem;}
+  .rijtje{display:flex;justify-content:space-between;gap:0.7rem;border-top:1px solid var(--line);
+    padding:0.5rem 0;font-size:0.85rem;}
+  .rijtje:first-child{border-top:none;}
   .codeScherm{position:fixed;inset:0;background:#0C0C0B;display:none;flex-direction:column;align-items:center;
     justify-content:center;gap:1.2rem;z-index:50;}
   .codeScherm.zien{display:flex;}
@@ -65,23 +88,102 @@
   @media (prefers-reduced-motion: reduce){ *{transition:none !important;animation:none !important;} }
 </style>
 <link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/desktopframe.css" rel="stylesheet">
+<script src="/shared/glyf.js" defer></script>
 <script src="/shared/seizoen.js" defer></script>
 <link href="/shared/ios.css" rel="stylesheet">
 </head>
 <body class="rtg-stijl">
 <header class="kop">
-  <a href="/apps/app.html" aria-label="Terug naar de app">←</a>
-  <h1>RTG OV</h1>
+  <a href="/apps/app.html" aria-label="Terug naar de app">&#8592;</a>
+  <h1>RTG Vervoer</h1>
   <span class="rek"></span>
-  <span class="badge">Alles in één · live gps</span>
+  <span class="badge">Alles in &eacute;&eacute;n &middot; live gps</span>
 </header>
+<nav class="tabs" role="tablist" aria-label="Soort vervoer">
+  <button id="tabRit" class="aan" type="button" role="tab" aria-selected="true" aria-controls="vRit">Reizen</button>
+  <button id="tabOv" type="button" role="tab" aria-selected="false" aria-controls="vOv">Openbaar vervoer</button>
+  <button id="tabPendel" type="button" role="tab" aria-selected="false" aria-controls="vPendel">Bedrijfspendel</button>
+</nav>
 <main>
   <section id="vPoort" class="weg">
-    <div class="kaart"><p class="stil">RTG OV hoort bij uw lidmaatschap; log eerst in via de app.</p></div>
+    <div class="kaart"><p class="stil">RTG Vervoer hoort bij uw lidmaatschap; log eerst in via de app.</p></div>
   </section>
 
-  <section id="vOv" class="weg">
-    <!-- de actieve rit -->
+  <!-- ================= een rit ================= -->
+  <section id="vRit" role="tabpanel" aria-labelledby="tabRit">
+    <!-- de lopende rit; vervangt het boekformulier zolang hij loopt -->
+    <div class="kaart rit weg" id="lopendKaart">
+      <p style="font-size:0.95rem;"><strong id="lopendStatus">Uw rit</strong></p>
+      <p class="stil" id="lopendSub"></p>
+      <div class="keten" id="lopendKeten" aria-hidden="true"></div>
+      <div id="lopendEtappes"></div>
+      <p class="stil" id="lopendVoertuig"></p>
+      <div style="margin-top:0.7rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
+        <button class="knop" id="lopendAnnuleer" type="button">Annuleren</button>
+        <button class="knop" id="lopendDeel" type="button">Deel deze rit</button>
+      </div>
+    </div>
+
+    <div id="boekBlok">
+      <h2>Waar gaat het heen?</h2>
+      <div class="kaart">
+        <label for="velVan">Vertrek</label>
+        <select id="velVan"><option value="hier">Huidige locatie</option></select>
+        <label for="velZoek">Bestemming</label>
+        <input id="velZoek" type="search" placeholder="Zoek een zaak, hotel of halte" autocomplete="off">
+        <select id="velNaar" style="margin-top:0.4rem;"><option value="">Kies een plek</option></select>
+        <p class="stil" id="velMeer"></p>
+        <div class="duo">
+          <div><label for="velReizigers">Reizigers</label><input id="velReizigers" type="number" min="1" max="60" value="1"></div>
+          <div><label for="velBagage">Koffers</label><input id="velBagage" type="number" min="0" max="99" value="0"></div>
+        </div>
+        <!-- Zakelijk. Bewust in het boekformulier en niet in een aparte app:
+             wie voor zijn werk reist, reist met dezelfde knop als thuis. Wat
+             erbij komt is een rekening en een reisbeleid, geen tweede product. -->
+        <label for="velZakOrg">Op rekening van (code van uw werkgever)</label>
+        <div class="duo">
+          <input id="velZakOrg" type="text" placeholder="Laat leeg voor prive" autocomplete="off">
+          <input id="velKostenplaats" type="text" placeholder="Kostenplaats" autocomplete="off">
+        </div>
+        <div id="beleidKaart" class="weg" style="margin-top:0.6rem;border-top:1px solid var(--line);padding-top:0.6rem;">
+          <p class="stil" id="beleidUit"></p>
+        </div>
+        <div style="margin-top:0.9rem;">
+          <button class="knop vol" id="velPlan" type="button">Plan mijn reis</button>
+        </div>
+        <p class="stil" style="margin-top:0.5rem;">U ziet alle manieren om er te komen naast elkaar: taxi, openbaar
+          vervoer, of een combinatie. Met de tijd, de prijs, wat u loopt en wat het uitstoot.</p>
+      </div>
+
+      <div id="optieBlok" class="weg">
+        <h2>Hoe wilt u reizen?</h2>
+        <div id="opties"></div>
+        <div class="kaart weg" id="afvalKaart">
+          <p class="stil" style="margin-bottom:0.4rem;">Wat er niet bij staat, en waarom:</p>
+          <div id="afgevallen"></div>
+        </div>
+      </div>
+
+      <h2>Op aanvraag</h2>
+      <div class="kaart">
+        <p class="stil" id="aanvraagUitleg">Helikopter, vliegtuig, boot: die boekt u niet met een tik. Daar komt altijd een mens
+          tussen, met een exploitant die de vergunning heeft en een weerscontrole. Staat er hieronder niets, dan is dat
+          vervoer hier (nog) niet beschikbaar.</p>
+        <div id="aanvraagLijst"></div>
+      </div>
+    </div>
+
+    <!-- De geschiedenis staat BUITEN het boekblok, want die verdwijnt niet als
+         er een rit loopt. Anders staart iemand tijdens het wachten naar een
+         leeg scherm met een kaartje bovenin. -->
+    <h2>Uw ritten</h2>
+    <div class="kaart"><div id="ritHistorie"><p class="stil">Nog geen ritten.</p></div></div>
+  </section>
+
+  <!-- ================= openbaar vervoer ================= -->
+  <section id="vOv" role="tabpanel" aria-labelledby="tabOv" class="weg">
+    <!-- de actieve OV-rit -->
     <div class="kaart rit weg" id="ritKaart">
       <p style="font-size:0.95rem;"><span id="ritIcoon"></span> <strong>U bent ingecheckt</strong></p>
       <p class="stil" id="ritSub"></p>
@@ -93,26 +195,62 @@
       <h2>Inchecken, twee snelle opties</h2>
       <div class="snel">
         <button id="knopCode" type="button">
-          <span class="i" aria-hidden="true"></span>Oplichtende code
+          <span class="i" id="icoonCode" aria-hidden="true"></span>Oplichtende code
           <span class="sub">Tonen; het personeel tikt hem in</span>
         </button>
         <button id="knopGps" type="button">
-          <span class="i" aria-hidden="true"></span>Eén tik
+          <span class="i" id="icoonGps" aria-hidden="true"></span>E&eacute;n tik
           <span class="sub">U staat bij het voertuig, klaar</span>
         </button>
       </div>
     </div>
 
     <h2>In de buurt</h2>
-    <div class="kaart"><div id="lijnen"><p class="stil">Even kijken wat er rijdt…</p></div></div>
-
-    <h2>Privéchauffeur</h2>
-    <div class="kaart">
-      <p class="stil">Liever een eigen wagen met chauffeur? Dezelfde app, dezelfde wallet.</p>
-      <div style="margin-top:0.6rem;"><a class="knop" href="/apps/app.html" style="text-decoration:none;display:inline-block;">Boek een privéchauffeur</a></div>
-    </div>
+    <div class="kaart"><div id="lijnen"><p class="stil">Even kijken wat er rijdt&hellip;</p></div></div>
     <p class="stil" id="uitleg">Uitchecken rekent eerlijk af: basistarief plus de gereden kilometers, direct uit uw
       RTG Pay-wallet (die zichzelf bijlaadt als dat nodig is).</p>
+
+    <h2>Een kaartje kopen</h2>
+    <div class="kaart">
+      <div id="kaartVorm" class="weg">
+        <label for="kaartAanbod">Wat wilt u kopen?</label>
+        <select id="kaartAanbod"></select>
+        <div class="duo" id="kaartHaltes">
+          <div><label for="kaartVan">Instappen</label><select id="kaartVan"></select></div>
+          <div><label for="kaartNaar">Uitstappen</label><select id="kaartNaar"></select></div>
+        </div>
+        <div style="margin-top:0.8rem;"><button class="knop vol" id="kaartKoop" type="button">Kopen</button></div>
+      </div>
+      <p class="stil" id="kaartReden">Even kijken wat er te koop is&hellip;</p>
+    </div>
+
+    <h2>Abonnement</h2>
+    <div class="kaart">
+      <div id="aboVorm" class="weg">
+        <p class="stil" id="aboUitleg"></p>
+        <div style="margin-top:0.7rem;"><button class="knop vol" id="aboKoop" type="button">Abonnement nemen</button></div>
+      </div>
+      <p class="stil" id="aboReden">Even kijken of er een abonnement is&hellip;</p>
+      <div id="aboLijst"></div>
+    </div>
+
+    <h2>Uw vervoerbewijzen</h2>
+    <div class="kaart"><div id="kaartLijst"><p class="stil">U heeft nog geen kaartjes.</p></div></div>
+  </section>
+
+  <!-- ================= bedrijfspendel ================= -->
+  <section id="vPendel" role="tabpanel" aria-labelledby="tabPendel" class="weg">
+    <h2>De pendel van uw werkgever</h2>
+    <div class="kaart">
+      <label for="velWerkgever">Bedrijfscode</label>
+      <div style="display:flex;gap:0.5rem;">
+        <input id="velWerkgever" type="text" placeholder="Bijv. MKKX" autocomplete="off">
+        <button class="knop" id="pendelHaal" type="button">Toon</button>
+      </div>
+      <p class="stil" style="margin-top:0.5rem;">U ziet alleen de pendels van een bedrijf waar u ook echt staat ingeschreven
+        als medewerker.</p>
+    </div>
+    <div id="pendelLijst"></div>
   </section>
 </main>
 
@@ -122,6 +260,12 @@
   <p class="stil" id="codeTijd"></p>
   <button class="knop" id="codeDicht" type="button">Sluiten</button>
 </div>
+<div class="codeScherm" id="qrScherm" role="dialog" aria-label="Uw vervoerbewijs">
+  <p class="stil" id="qrTitel"></p>
+  <img id="qrBeeld" alt="QR-code van uw vervoerbewijs" style="width:min(70vw,300px);height:auto;border-radius:12px;background:#fff;padding:0.6rem;">
+  <p class="stil" id="qrCode" style="font-family:'Bodoni Moda',serif;letter-spacing:0.2em;"></p>
+  <button class="knop" id="qrDicht" type="button">Sluiten</button>
+</div>
 <div class="melding" id="melding" role="status"></div>
 <!-- uitvoer.js zonder defer en voor het eigen script: dat script meldt hieronder
      zijn model aan met RTGUitvoer.bron() en die moet er dan al zijn -->
@@ -130,13 +274,16 @@
 (() => {
   const $ = s => document.querySelector(s);
   const token = (() => { try { return localStorage.getItem('rtg_member_token'); } catch (e) { return null; } })();
-  const api = (pad, body) => fetch('/api/ov/' + pad, { method: 'POST',
+  const post = (pad, body) => fetch(pad, { method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
     body: JSON.stringify(body || {}) }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
+  const api = (pad, body) => post('/api/ov/' + pad, body);
+  const mob = (pad, body) => post('/api/mob/' + pad, body);
   let meldT;
   const zeg = t => { const m = $('#melding'); m.textContent = t; m.classList.add('zien');
     clearTimeout(meldT); meldT = setTimeout(() => m.classList.remove('zien'), 3600); };
   const eur = c => '€ ' + (c / 100).toLocaleString('nl-NL', { minimumFractionDigits: 2 });
+  const glyf = n => (window.RTGGlyf && RTGGlyf.heeft(n)) ? RTGGlyf.svgHTML(n, { klasse: 'gl-inline' }) : '';
 
   let hier = { lat: 38.908, lng: 1.432 };   // demo-startpunt tot de gps spreekt
   // start ongevraagd bij het openen, dus de GPS-schakelaar in het OS-menu
@@ -156,7 +303,315 @@
   if (!gpsUit && 'geolocation' in navigator)
     navigator.geolocation.watchPosition(p => { hier = { lat: p.coords.latitude, lng: p.coords.longitude }; }, () => {}, { enableHighAccuracy: true });
 
-  // wat er in de buurt rijdt, zoals het hieronder op het scherm komt
+  /* ---- de tabbladen ---- */
+  const TABS = [['#tabRit', '#vRit'], ['#tabOv', '#vOv'], ['#tabPendel', '#vPendel']];
+  function toon(welke) {
+    for (const [t, v] of TABS) {
+      const aan = t === welke;
+      $(t).setAttribute('aria-selected', aan ? 'true' : 'false');
+      $(t).classList.toggle('aan', aan);   // de UI-kit tekent de actieve pil op .aan
+      $(v).classList.toggle('weg', !aan);
+    }
+    if (welke === '#tabOv') { verversOv(); verversKaart(); }
+  }
+  for (const [t] of TABS) $(t).addEventListener('click', () => toon(t));
+
+  /* ================= een rit ================= */
+  let aanbod = null, plekken = [], plekTotaal = 0, plekAfgekapt = 0;
+
+  /* Zoeken gaat naar de server en niet door de lijst die we toevallig hebben:
+     die lijst is de eerste pagina, en juist wat er NIET in staat zoek je op.
+     Even wachten na de laatste toetsaanslag, anders is elke letter een verzoek. */
+  let zoekT;
+  $('#velZoek').addEventListener('input', () => {
+    clearTimeout(zoekT);
+    zoekT = setTimeout(async () => {
+      const r = await mob('plekken', { bij: hier, zoek: $('#velZoek').value.trim() });
+      if (r.body.error) return;
+      plekken = r.body.plekken || [];
+      plekTotaal = r.body.totaal || 0; plekAfgekapt = r.body.afgekapt || 0;
+      vulKiezers();
+    }, 250);
+  });
+
+  function vulKiezers() {
+    const naar = $('#velNaar'), van = $('#velVan');
+    naar.innerHTML = '<option value="">Kies een plek</option>';
+    van.innerHTML = '<option value="hier">Huidige locatie</option>';
+    for (const p of plekken) {
+      const w = p.soort + ':' + p.code;
+      const afst = p.afstandM != null ? ' · ' + (p.afstandM < 1000 ? Math.round(p.afstandM) + ' m' : (Math.round(p.afstandM / 100) / 10) + ' km') : '';
+      for (const sel of [naar, van]) {
+        const o = document.createElement('option');
+        o.value = w;
+        o.textContent = p.naam + (p.genre ? ' (' + p.genre + ')' : '') + afst;
+        sel.appendChild(o);
+      }
+    }
+    $('#velMeer').textContent = plekAfgekapt
+      ? 'Nog ' + plekAfgekapt + ' andere plekken; zoek op naam om ze te vinden.'
+      : (plekTotaal ? plekTotaal + ' plekken' : '');
+    /* Soort rit en voertuig kiest de reiziger niet meer met de hand: de planner
+       zet de manieren om er te komen naast elkaar en de gekozen optie bepaalt
+       wat er nodig is. De velden zijn daarom uit het scherm, en dit is de plek
+       waar het script ze nog vulde -- een verwijzing naar een veld dat niet meer
+       bestaat gooit de hele opbouw om, en dan blijft ook de bestemmingslijst
+       leeg. Precies dat is hier gebeurd. */
+    // wat je niet met een tik boekt, staat apart en met de reden erbij
+    const lijst = $('#aanvraagLijst'); lijst.innerHTML = '';
+    const opAanvraag = (aanbod.opAanvraag || []).concat(aanbod.ervaringen || []);
+    if (!opAanvraag.length) lijst.innerHTML = '<p class="stil">Op dit moment niets op aanvraag beschikbaar.</p>';
+    for (const c of opAanvraag) {
+      const d = document.createElement('div'); d.className = 'rijtje';
+      const naam = document.createElement('span'); naam.textContent = c.naam;
+      const merk = document.createElement('span'); merk.className = 'stil';
+      merk.textContent = c.boeking === 'ervaring' ? 'ervaring' : 'op aanvraag';
+      d.appendChild(naam); d.appendChild(merk); lijst.appendChild(d);
+    }
+  }
+
+  const plekUit = w => {
+    if (!w) return null;
+    /* "Huidige locatie" gaat als COORDINAAT mee, niet als het symbool {hier}.
+       Dat symbool laat de server de laatst gedeelde positie opzoeken, en die is
+       er niet zolang iemand geen GPS heeft aangezet -- dan mislukt elke boeking
+       met "zet GPS aan", terwijl deze app al lang een punt heeft waarmee hij de
+       haltes in de buurt ophaalt. En het klopt ook beter: de reiziger zegt waar
+       hij opgehaald wil worden; dat is niet de server zijn oordeel. */
+    if (w === 'hier') return { lat: hier.lat, lng: hier.lng, label: 'Huidige locatie' };
+    const [soort, code] = w.split(':');
+    if (soort === 'zaak') return { zaak: code };
+    if (soort === 'halte') return { halte: code };
+    if (soort === 'favoriet') return { favoriet: code };
+    return null;
+  };
+
+  /* ---- de planner: alle manieren om er te komen, naast elkaar ---- */
+  let laatstePlan = null;
+  const min = m => m >= 60 ? Math.floor(m / 60) + ' u ' + (m % 60) + ' min' : m + ' min';
+
+  async function plan() {
+    const naar = plekUit($('#velNaar').value);
+    if (!naar) return zeg('Kies eerst een bestemming.');
+    $('#velPlan').disabled = true;
+    const r = await mob('reis/plan', Object.assign({
+      van: plekUit($('#velVan').value) || { hier: true }, naar,
+      reizigers: Number($('#velReizigers').value) || 1,
+      bagage: Number($('#velBagage').value) || 0
+    }, zakelijk()));
+    $('#velPlan').disabled = false;
+    if (r.body.error) return zeg(r.body.error);
+    laatstePlan = r.body;
+    toonOpties(r.body);
+  }
+  $('#velPlan').addEventListener('click', plan);
+
+  /* ---- zakelijk: de rekening en het reisbeleid ---- */
+  const zakelijk = () => {
+    const code = $('#velZakOrg').value.trim().toUpperCase();
+    if (!code) return {};
+    return { namensOrganisatie: code, kostenplaats: $('#velKostenplaats').value.trim() || undefined };
+  };
+  /* Het beleid VOORAF tonen. Een medewerker die pas bij het boeken hoort dat
+     hij over zijn budget is, heeft al een reis gepland die niet doorgaat --
+     en dat is precies het moment waarop mensen om een reisbeleid heen gaan
+     werken. */
+  async function toonBeleid() {
+    const code = $('#velZakOrg').value.trim().toUpperCase();
+    const kaart = $('#beleidKaart'), uit = $('#beleidUit');
+    if (!code) { kaart.classList.add('weg'); return; }
+    const r = await mob('beleid', { werkgever: code });
+    kaart.classList.remove('weg');
+    if (r.status !== 200) { uit.textContent = r.body.error || 'Dit bedrijf kennen we niet als uw werkgever.'; return; }
+    const b = r.body.beleid;
+    if (!b) { uit.textContent = r.body.reden || 'Er is geen reisbeleid ingesteld.'; return; }
+    const eur = c => '€ ' + (c / 100).toLocaleString('nl-NL', { minimumFractionDigits: 2 });
+    const d = [];
+    if (b.maxPrijs) d.push('maximaal ' + eur(b.maxPrijs) + ' per rit');
+    if (b.budgetPerMaand) d.push('deze maand nog ' + eur(Math.max(0, b.budgetPerMaand - (r.body.besteed || 0))) +
+      ' van ' + eur(b.budgetPerMaand));
+    if (b.goedkeuringVanaf) d.push('boven ' + eur(b.goedkeuringVanaf) + ' kijkt uw leidinggevende mee');
+    if (b.van && b.tot) d.push('tussen ' + b.van + ' en ' + b.tot);
+    if ((b.dagnamen || []).length) d.push('op ' + b.dagnamen.join(', '));
+    if ((b.steden || []).length) d.push('in ' + b.steden.join(', '));
+    if (b.kostenplaatsVerplicht) d.push('kostenplaats verplicht' +
+      ((b.kostenplaatsen || []).length ? ' (' + b.kostenplaatsen.join(', ') + ')' : ''));
+    uit.textContent = d.length
+      ? 'Het reisbeleid van dit bedrijf: ' + d.join(' · ') + '. Wat er niet in past, kunt u altijd op eigen rekening boeken.'
+      : 'Er staan geen grenzen in het reisbeleid van dit bedrijf.';
+  }
+  $('#velZakOrg').addEventListener('change', toonBeleid);
+
+  function toonOpties(p) {
+    const bak = $('#opties'); bak.innerHTML = '';
+    $('#optieBlok').classList.remove('weg');
+    if (!p.opties.length) {
+      const k = document.createElement('div'); k.className = 'kaart';
+      const t = document.createElement('p'); t.className = 'stil';
+      t.textContent = p.reden || 'Geen reis gevonden.';
+      k.appendChild(t); bak.appendChild(k);
+    }
+    for (const o of p.opties) {
+      const kaart = document.createElement('div'); kaart.className = 'kaart';
+      // de kop: naam en de merken (snelst / goedkoopst / schoonst)
+      const kop = document.createElement('p'); kop.style.fontSize = '0.95rem';
+      const nm = document.createElement('strong'); nm.textContent = o.naam;
+      kop.appendChild(nm);
+      for (const [vlag, woord] of [['snelst', 'snelst'], ['goedkoopst', 'goedkoopst'], ['schoonst', 'schoonst']]) {
+        if (!o[vlag]) continue;
+        const b = document.createElement('span'); b.className = 'badge';
+        b.style.marginLeft = '0.4rem'; b.textContent = woord; kop.appendChild(b);
+      }
+      kaart.appendChild(kop);
+
+      const cijfers = document.createElement('p'); cijfers.className = 'stil';
+      cijfers.textContent = min(o.totaal.minuten) + ' · ' + eur(o.totaal.prijs) +
+        ' · ' + Math.round(o.totaal.co2Gram) + ' g CO₂ (schatting)' +
+        (o.totaal.loopM ? ' · ' + o.totaal.loopM + ' m lopen' : '');
+      kaart.appendChild(cijfers);
+
+      // de etappes onder elkaar: dit is wat iemand straks echt doet
+      for (const e of o.etappes) {
+        const rij = document.createElement('div'); rij.className = 'rijtje';
+        const l = document.createElement('span');
+        l.textContent = e.wijze === 'ov' ? e.lijnNaam + ': ' + e.van.naam + ' → ' + e.naar.naam
+          : (e.wijze === 'lopen' ? 'Lopen · ' + e.meters + ' m' : 'Taxi · ' + e.km + ' km');
+        const p2 = document.createElement('span'); p2.className = 'stil';
+        p2.textContent = min(e.minuten) + (e.prijs ? ' · ' + eur(e.prijs) : '');
+        rij.appendChild(l); rij.appendChild(p2); kaart.appendChild(rij);
+        if (e.wijze === 'ov') {
+          const sub = document.createElement('p'); sub.className = 'stil';
+          sub.style.fontSize = '0.72rem';
+          sub.textContent = 'Wachttijd ' + e.wachtMin + ' min (' + e.wachtUitleg + ')' +
+            (e.kaartTeKoop ? ' · kaartje inbegrepen' : ' · inchecken in het voertuig');
+          kaart.appendChild(sub);
+        }
+      }
+      const comf = document.createElement('p'); comf.className = 'stil';
+      comf.style.fontSize = '0.72rem'; comf.textContent = o.comfort.punten.join(' · ');
+      kaart.appendChild(comf);
+
+      const knop = document.createElement('button');
+      knop.className = 'knop vol'; knop.style.marginTop = '0.7rem';
+      knop.textContent = 'Deze reis boeken';
+      knop.addEventListener('click', () => boekReis(o.id, knop));
+      kaart.appendChild(knop);
+      bak.appendChild(kaart);
+    }
+    // wat er afviel en waarom; een lege lijst mag nooit als storing lezen
+    const af = $('#afgevallen'); af.innerHTML = '';
+    $('#afvalKaart').classList.toggle('weg', !(p.afgevallen || []).length);
+    for (const a of (p.afgevallen || [])) {
+      const r = document.createElement('p'); r.className = 'stil';
+      r.style.fontSize = '0.72rem'; r.textContent = a.naam + ': ' + a.reden;
+      af.appendChild(r);
+    }
+  }
+
+  async function boekReis(optie, knop) {
+    if (!laatstePlan) return;
+    knop.disabled = true;
+    const r = await mob('reis/boek', Object.assign({
+      van: plekUit($('#velVan').value) || { hier: true },
+      naar: plekUit($('#velNaar').value),
+      optie, reizigers: Number($('#velReizigers').value) || 1,
+      bagage: Number($('#velBagage').value) || 0, idem: RTGIdem('reis')
+    }, zakelijk()));
+    knop.disabled = false;
+    if (r.body.error) return zeg(r.body.error);
+    zeg(r.body.reis.uitleg);
+    $('#optieBlok').classList.add('weg');
+    verversRit();
+  }
+
+  const KETEN = ['aangevraagd', 'geprijsd', 'aangeboden', 'geaccepteerd', 'onderweg', 'aangekomen', 'ingestapt', 'rijdt', 'voltooid', 'afgerekend'];
+  let lopendRef = null;
+
+  async function verversRit() {
+    const [m, reizen] = await Promise.all([mob('mijn'), mob('reis/mijn')]);
+    if (m.status !== 200) { $('#vPoort').classList.remove('weg'); return; }
+    const lopend = m.body.lopend;
+    const reis = (reizen.body.reizen || []).find(x => x.status === 'geboekt');
+    lopendRef = lopend ? lopend.ref : null;
+
+    const iets = !!(lopend || reis);
+    $('#lopendKaart').classList.toggle('weg', !iets);
+    $('#boekBlok').classList.toggle('weg', !!iets);
+    const et = $('#lopendEtappes'); et.innerHTML = '';
+
+    if (reis) {
+      /* Een geboekte reis: de etappes onder elkaar, want dat is wat iemand
+         onderweg wil zien -- niet een statusbalk van een van de ritten. */
+      $('#lopendStatus').textContent = 'Uw reis: ' + reis.optieNaam;
+      $('#lopendSub').textContent = (reis.van.label || 'vertrek') + ' → ' + (reis.naar.label || 'bestemming');
+      $('#lopendKeten').classList.add('weg');
+      for (const e of reis.etappes) {
+        const rij = document.createElement('div'); rij.className = 'rijtje';
+        const l = document.createElement('span');
+        l.textContent = e.wijze === 'ov' ? (e.lijnNaam + ': ' + e.van.naam + ' → ' + e.naar.naam)
+          : (e.wijze === 'lopen' ? 'Lopen · ' + e.meters + ' m' : 'Taxi · ' + (e.km || 0) + ' km');
+        const st = document.createElement('span'); st.className = 'stil';
+        /* Een rit die op akkoord wacht staat op 'aangevraagd', en dat leest als
+           "er wordt aan gewerkt". Er wordt niet aan gewerkt: er wordt gewacht. */
+        st.textContent = (e.goedkeuring && e.goedkeuring.status === 'wacht') ? 'wacht op akkoord'
+          : (e.ritStatus || e.kaartStand || (e.instructie ? 'inchecken' : ''));
+        rij.appendChild(l); rij.appendChild(st); et.appendChild(rij);
+      }
+      $('#lopendVoertuig').textContent = reis.uitleg;
+      $('#lopendAnnuleer').dataset.reis = reis.id;
+    } else if (lopend) {
+      $('#lopendStatus').textContent = 'Uw rit: ' + lopend.status;
+      $('#lopendSub').textContent = lopend.van.label + ' → ' + lopend.naar.label +
+        ' · ' + lopend.km + ' km · ' + eur(lopend.prijs);
+      const k = $('#lopendKeten'); k.classList.remove('weg'); k.innerHTML = '';
+      const tot = KETEN.indexOf(lopend.status);
+      for (let i = 0; i < KETEN.length; i++) {
+        const sp = document.createElement('span');
+        if (tot >= 0 && i <= tot) sp.className = 'af';
+        k.appendChild(sp);
+      }
+      $('#lopendVoertuig').textContent = (lopend.goedkeuring && lopend.goedkeuring.status === 'wacht')
+        ? 'Deze rit staat op rekening van ' + lopend.organisatie + ' en wacht op akkoord van uw werkgever; ' +
+          'tot dan wordt er geen wagen gezocht.'
+        : (lopend.voertuig
+          ? 'Voertuig toegewezen.' + (lopend.chauffeur ? ' Uw chauffeur staat klaar.' : '')
+          : 'Nog geen voertuig toegewezen.');
+      delete $('#lopendAnnuleer').dataset.reis;
+    }
+
+    // de geschiedenis
+    const h = $('#ritHistorie'); h.innerHTML = '';
+    const klaar = (m.body.ritten || []).filter(o => ['afgerekend', 'voltooid', 'geannuleerd'].includes(o.status));
+    if (!klaar.length) h.innerHTML = '<p class="stil">Nog geen ritten.</p>';
+    for (const o of klaar.slice(0, 10)) {
+      const d = document.createElement('div'); d.className = 'rijtje';
+      const l = document.createElement('span'); l.textContent = o.naar.label + ' · ' + o.status;
+      const p = document.createElement('span'); p.className = 'stil'; p.textContent = eur(o.prijs);
+      d.appendChild(l); d.appendChild(p); h.appendChild(d);
+    }
+  }
+
+  $('#lopendAnnuleer').addEventListener('click', async () => {
+    const reisId = $('#lopendAnnuleer').dataset.reis;
+    const r = reisId ? await mob('reis/annuleer', { id: reisId })
+      : (lopendRef ? await mob('annuleer', { ref: lopendRef }) : null);
+    if (!r) return;
+    if (r.body.error) return zeg(r.body.error);
+    zeg(r.body.uitleg || r.body.kostenUitleg || 'Geannuleerd.');
+    verversRit();
+  });
+  /* Ritstatus delen: de deelcode komt van de server en gaat naar het
+     deelvenster van het toestel. Wij plaatsen zelf niets ergens. */
+  $('#lopendDeel').addEventListener('click', async () => {
+    if (!lopendRef) return zeg('Deel werkt zodra er een rit onderweg is.');
+    const r = await mob('volg', { ref: lopendRef });
+    if (r.body.error) return zeg(r.body.error);
+    const tekst = 'Ik ben onderweg naar ' + r.body.opdracht.naar.label + '. Ritcode ' + r.body.opdracht.ref + '.';
+    if (navigator.share) navigator.share({ text: tekst }).catch(() => {});
+    else zeg(tekst);
+  });
+
+  /* ================= openbaar vervoer ================= */
   let nabij = null;
   /* Meenemen: de app kent de velden van een lijn (halte, afstand, wachttijd),
      dus geeft hij die door in plaats van de gedeelde laag de rijen te laten
@@ -170,16 +625,15 @@
         l.overMin, l.frequentieMin]) };
   });
 
-  async function ververs() {
+  async function verversOv() {
     const r = await api('kaart', hier);
-    if (r.status !== 200) { $('#vPoort').classList.remove('weg'); $('#vOv').classList.add('weg'); return; }
-    $('#vOv').classList.remove('weg');
+    if (r.status !== 200) { $('#vPoort').classList.remove('weg'); return; }
     // de actieve rit
     const rit = r.body.rit;
     $('#ritKaart').classList.toggle('weg', !rit);
     $('#inBlok').classList.toggle('weg', !!rit);
     if (rit) {
-      $('#ritIcoon').textContent = rit.icoon;
+      $('#ritIcoon').innerHTML = glyf('ov');
       $('#ritSub').textContent = 'Sinds ' + String(rit.inAt).slice(11, 16) + ' · uitchecken rekent eerlijk af per kilometer.';
     }
     // de lijnen dichtbij
@@ -190,7 +644,7 @@
       const d = document.createElement('div'); d.className = 'lijn';
       const afst = l.halte && l.halte.afstandM != null
         ? (l.halte.afstandM < 1000 ? Math.round(l.halte.afstandM) + ' m' : (Math.round(l.halte.afstandM / 100) / 10) + ' km') : '';
-      d.innerHTML = '<span class="icoon" aria-hidden="true">' + l.icoon + '</span>' +
+      d.innerHTML = '<span class="icoon" aria-hidden="true">' + glyf('ov') + '</span>' +
         '<span><strong></strong><span class="sub"></span></span><span class="rek"></span>' +
         '<span class="over">' + (l.live ? '<span class="puls" aria-hidden="true"></span>' : '') + 'over ~' + l.overMin + ' min</span>';
       d.querySelector('strong').textContent = l.naam;
@@ -214,7 +668,7 @@
       $('#codeTijd').textContent = 'Nog ' + Math.floor(over / 60) + ':' + String(over % 60).padStart(2, '0') + ' geldig';
       if (over <= 0) { clearInterval(codeTimer); $('#codeScherm').classList.remove('zien'); }
       // ingecheckt door het personeel? Dan sluit het scherm vanzelf
-      if (over % 3 === 0) api('mijn').then(m => { if (m.body.rit) { clearInterval(codeTimer); $('#codeScherm').classList.remove('zien'); zeg('Ingecheckt. Goede reis.'); ververs(); } });
+      if (over % 3 === 0) api('mijn').then(m => { if (m.body.rit) { clearInterval(codeTimer); $('#codeScherm').classList.remove('zien'); zeg('Ingecheckt. Goede reis.'); verversOv(); } });
     }, 1000);
   });
   $('#codeDicht').addEventListener('click', () => { clearInterval(codeTimer); $('#codeScherm').classList.remove('zien'); });
@@ -224,7 +678,7 @@
     const r = await api('hier', hier);
     if (r.body.error) return zeg(r.body.error);
     zeg('Ingecheckt met één tik. Goede reis.');
-    ververs();
+    verversOv();
   });
 
   /* ---- uitchecken ---- */
@@ -232,15 +686,191 @@
     const r = await api('uit', { ...hier, idem: RTGIdem('ov') });
     if (r.body.error) return zeg(r.body.error);
     zeg('Uitgecheckt: ' + r.body.km + ' km · ' + eur(r.body.prijs) + ' · saldo ' + eur(r.body.saldo) + '.');
-    ververs();
+    verversOv();
+  });
+
+  /* ================= vervoerbewijzen ================= */
+  let aanbodLijst = [];
+
+  async function verversKaart() {
+    // de kaartverkoop hangt aan een overeenkomst met de vervoerder; zonder
+    // die overeenkomst is er niets te koop, en dan staat de reden er
+    const a = await mob('kaart/aanbod', { vervoerder: 'TRANSIT' });
+    aanbodLijst = (a.body && a.body.aanbod) || [];
+    $('#kaartVorm').classList.toggle('weg', !aanbodLijst.length);
+    $('#kaartReden').textContent = aanbodLijst.length
+      ? 'De vervoerder verkoopt deze bewijzen via RTG.'
+      : ((a.body && a.body.reden) || 'Er is hier niets te koop.');
+    const sel = $('#kaartAanbod'); sel.innerHTML = '';
+    aanbodLijst.forEach((x, i) => {
+      const o = document.createElement('option');
+      o.value = String(i);
+      o.textContent = x.productNaam + ' · ' + x.lijnNaam + ' (' + x.urenGeldig + ' uur geldig)';
+      sel.appendChild(o);
+    });
+    vulHaltes();
+
+    const mijn = await mob('kaart/mijn');
+    const lijst = $('#kaartLijst'); lijst.innerHTML = '';
+    const kaartjes = (mijn.body && mijn.body.kaartjes) || [];
+    if (!kaartjes.length) lijst.innerHTML = '<p class="stil">U heeft nog geen kaartjes.</p>';
+    for (const k of kaartjes.slice(0, 8)) {
+      const d = document.createElement('div'); d.className = 'rijtje';
+      const l = document.createElement('span');
+      l.innerHTML = '<strong></strong><span class="sub" style="display:block;font-size:0.72rem;color:var(--soft);"></span>';
+      l.querySelector('strong').textContent = k.productNaam + ' · ' + k.lijnNaam;
+      l.querySelector('.sub').textContent = k.reden + (k.stand === 'geldig' ? ' · code ' + k.code : '');
+      d.appendChild(l);
+      /* Een geldig kaartje kun je TONEN. De QR is de code zelf; de conducteur
+         scant hem met dezelfde overlay als de kassa. Zonder de tekenmodule
+         blijft de code als tekst staan -- tonen mag nooit een doodlopende weg
+         zijn omdat een script niet laadde. */
+      if (k.stand === 'geldig') {
+        const b = document.createElement('button'); b.className = 'knop';
+        b.textContent = 'Toon';
+        b.addEventListener('click', () => toonQr(k.productNaam + ' · ' + k.lijnNaam, k.code));
+        d.appendChild(b);
+      } else {
+        const st = document.createElement('span'); st.className = 'stil'; st.textContent = k.stand;
+        d.appendChild(st);
+      }
+      lijst.appendChild(d);
+    }
+    await verversAbo();
+  }
+
+  /* Het toonscherm: de code als echte, scanbare QR (shared/qr.js + qrteken.js),
+     met de code er in cijfers onder voor het geval de camera niet meewerkt. */
+  function toonQr(titel, code) {
+    $('#qrTitel').textContent = titel;
+    $('#qrCode').textContent = code;
+    const img = $('#qrBeeld');
+    try {
+      if (window.RTGQRteken) { img.src = RTGQRteken.dataURL(code, { schaal: 6, quiet: 3 }); img.hidden = false; }
+      else img.hidden = true;
+    } catch (e) { img.hidden = true; }
+    $('#qrScherm').classList.add('zien');
+  }
+  $('#qrDicht').addEventListener('click', () => $('#qrScherm').classList.remove('zien'));
+
+  /* ---- het abonnement ---- */
+  async function verversAbo() {
+    const a = await mob('abo/aanbod', { vervoerder: 'TRANSIT' });
+    const aanbod = a.body && a.body.aanbod;
+    $('#aboVorm').classList.toggle('weg', !aanbod);
+    $('#aboReden').textContent = aanbod ? '' : ((a.body && a.body.reden) || 'Er is hier geen abonnement.');
+    if (aanbod) $('#aboUitleg').textContent = 'Onbeperkt reizen op ' + aanbod.lijnen.length +
+      ' lijn(en) van ' + aanbod.vervoerderNaam + ' voor ' + eur(aanbod.prijs) + ' per ' + aanbod.dagen + ' dagen.';
+
+    const mijn = await mob('abo/mijn');
+    const lijst = $('#aboLijst'); lijst.innerHTML = '';
+    for (const ab of ((mijn.body && mijn.body.abonnementen) || []).slice(0, 4)) {
+      const d = document.createElement('div'); d.className = 'rijtje';
+      const l = document.createElement('span');
+      l.innerHTML = '<strong></strong><span class="sub" style="display:block;font-size:0.72rem;color:var(--soft);"></span>';
+      l.querySelector('strong').textContent = 'Abonnement ' + ab.vervoerderNaam;
+      l.querySelector('.sub').textContent = ab.reden + ' · ' + ab.ritten + ' ritten (' + ab.rittenUitleg + ')';
+      d.appendChild(l);
+      if (ab.stand === 'geldig') {
+        const b = document.createElement('button'); b.className = 'knop'; b.textContent = 'Toon';
+        b.addEventListener('click', () => toonQr('Abonnement ' + ab.vervoerderNaam, ab.code));
+        d.appendChild(b);
+      } else {
+        const st = document.createElement('span'); st.className = 'stil'; st.textContent = ab.stand;
+        d.appendChild(st);
+      }
+      lijst.appendChild(d);
+    }
+  }
+  $('#aboKoop').addEventListener('click', async () => {
+    $('#aboKoop').disabled = true;
+    const r = await mob('abo/koop', { vervoerder: 'TRANSIT', idem: RTGIdem('abo') });
+    $('#aboKoop').disabled = false;
+    if (r.body.error) return zeg(r.body.error);
+    zeg('Abonnement genomen tot ' + r.body.abonnement.geldigTot.slice(0, 10) + '.');
+    verversKaart();
+  });
+
+  function vulHaltes() {
+    const x = aanbodLijst[Number($('#kaartAanbod').value) || 0];
+    // een dagkaart geldt op de hele lijn en heeft dus geen traject
+    const traject = x && x.product !== 'dagkaart';
+    $('#kaartHaltes').classList.toggle('weg', !traject);
+    if (!traject || !x) return;
+    for (const [sel, kies] of [['#kaartVan', 0], ['#kaartNaar', 1]]) {
+      const el = $(sel); el.innerHTML = '';
+      x.haltes.forEach((h, i) => {
+        const o = document.createElement('option'); o.value = h.id; o.textContent = h.naam;
+        if (i === (kies ? x.haltes.length - 1 : 0)) o.selected = true;
+        el.appendChild(o);
+      });
+    }
+  }
+  $('#kaartAanbod').addEventListener('change', vulHaltes);
+
+  $('#kaartKoop').addEventListener('click', async () => {
+    const x = aanbodLijst[Number($('#kaartAanbod').value) || 0];
+    if (!x) return zeg('Er is niets te koop.');
+    $('#kaartKoop').disabled = true;
+    const r = await mob('kaart/koop', { vervoerder: 'TRANSIT', lijnId: x.lijnId,
+      product: x.product, van: $('#kaartVan').value, naar: $('#kaartNaar').value, idem: RTGIdem('kaart') });
+    $('#kaartKoop').disabled = false;
+    if (r.body.error) return zeg(r.body.error);
+    zeg(r.body.kaartje.productNaam + ' gekocht voor ' + eur(r.body.kaartje.prijs) + '.');
+    verversKaart();
+  });
+
+  /* ================= bedrijfspendel ================= */
+  $('#pendelHaal').addEventListener('click', async () => {
+    const code = $('#velWerkgever').value.trim().toUpperCase();
+    if (!code) return zeg('Vul de code van uw werkgever in.');
+    const r = await mob('pendel', { werkgever: code });
+    const uit = $('#pendelLijst'); uit.innerHTML = '';
+    if (r.body.error) { uit.innerHTML = '<div class="kaart"><p class="stil"></p></div>'; uit.querySelector('p').textContent = r.body.error; return; }
+    if (!(r.body.pendels || []).length) { uit.innerHTML = '<div class="kaart"><p class="stil">Dit bedrijf heeft geen pendeldienst.</p></div>'; return; }
+    for (const p of r.body.pendels) {
+      const kaart = document.createElement('div'); kaart.className = 'kaart';
+      const t = document.createElement('p'); t.style.fontSize = '0.95rem';
+      t.textContent = p.pendel.naam + ': ' + p.pendel.van.label + ' → ' + p.pendel.naar.label;
+      kaart.appendChild(t);
+      if (p.reden) { const s = document.createElement('p'); s.className = 'stil'; s.textContent = p.reden; kaart.appendChild(s); }
+      for (const v of p.vertrekken) {
+        const rij = document.createElement('div'); rij.className = 'rijtje';
+        const l = document.createElement('span');
+        l.textContent = v.tijd + ' · ' + (v.vrij ? v.vrij + ' plaatsen vrij' : 'vol, wachtlijst ' + v.wachtlijst);
+        const b = document.createElement('button'); b.className = 'knop';
+        b.textContent = v.mijn ? 'Afzeggen' : 'Reserveer';
+        b.addEventListener('click', async () => {
+          const rr = await mob('pendel/reserveer', { werkgever: code, id: p.pendel.id, vertrek: v.vertrek, weg: v.mijn });
+          zeg(rr.body.error || rr.body.uitleg || 'Afgezegd.');
+          $('#pendelHaal').click();
+        });
+        rij.appendChild(l); rij.appendChild(b); kaart.appendChild(rij);
+      }
+      uit.appendChild(kaart);
+    }
   });
 
   /* ---- start ---- */
   if (!token) { $('#vPoort').classList.remove('weg'); return; }
-  ververs();
-  setInterval(ververs, 15000);
+  document.addEventListener('DOMContentLoaded', () => {
+    $('#icoonCode').innerHTML = glyf('pas');
+    $('#icoonGps').innerHTML = glyf('gps');
+  });
+  (async () => {
+    const [a, p] = await Promise.all([mob('aanbod'), mob('plekken', { bij: hier })]);
+    if (a.body.error || p.body.error) { $('#vPoort').classList.remove('weg'); return; }
+    aanbod = a.body; plekken = p.body.plekken || [];
+    plekTotaal = p.body.totaal || 0; plekAfgekapt = p.body.afgekapt || 0;
+    vulKiezers();
+    verversRit();
+  })();
+  setInterval(() => { if ($('#tabRit').getAttribute('aria-selected') === 'true') verversRit(); else verversOv(); }, 15000);
 })();
 </script>
+<script src="/shared/qr.js" defer></script>
+<script src="/shared/qrteken.js" defer></script>
+<script src="/shared/poortgesprek.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 <script src="/shared/bediening.js" defer></script>

@@ -5,7 +5,7 @@
    de gedeelde ctx van kern/ov/index.js. */
 module.exports = (ctx) => {
   const { db, save, crypto, nu, codenaamVan, haversine, etaMinutes, pay, codes,
-    ensureOv, ovZaak, lijnVan, versVoertuig, actieveRit, ritStart, ritBeeld,
+    ensureOv, ovZaak, lijnVan, ovPrijsVan, versVoertuig, actieveRit, ritStart, ritBeeld,
     SOORTEN, CODE_TTL_MS, GPS_CHECKIN_M } = ctx;
 
   function kaart(key, hier) {
@@ -65,7 +65,7 @@ module.exports = (ctx) => {
     const uitPunt = Number.isFinite(lat) ? { lat, lng } :
       (db.data.ovVoertuigen.find(v => v.id === rit.voertuigId) || rit.in);
     const km = Math.max(0, (haversine(rit.in, uitPunt) || 0) / 1000);
-    const prijs = Math.max(100, Math.round((lijn ? lijn.tarief.basis : 180) + km * (lijn ? lijn.tarief.perKm : 20)));
+    const prijs = ovPrijsVan(lijn, km);   // een formule, ook gebruikt door de kaartverkoop
     // betalen met autolaad: de wallet laadt zelf bij als het saldo tekortschiet
     const codenaam = codenaamVan(key);
     const rek = 'lid:' + codenaam;

@@ -96,6 +96,21 @@
   ovKnop.innerHTML = '<svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="14" rx="2"/><path d="M4 10h16"/><circle cx="8" cy="19" r="1.6"/><circle cx="16" cy="19" r="1.6"/></svg>OV-dienst';
   ovKnop.addEventListener('click', () => { location.href = '/apps/ovdienst.html'; });
   extraHouder.appendChild(ovKnop);
+  // het dispatchcentrum: de openstaande ritten, de vloot en het toewijzen
+  const dispKnop = document.createElement('button');
+  dispKnop.type = 'button'; dispKnop.className = 'pda-app';
+  dispKnop.innerHTML = '<svg viewBox="0 0 24 24"><path d="M3 6l6-3 6 3 6-3v15l-6 3-6-3-6 3z"/><path d="M9 3v15"/><path d="M15 6v15"/></svg>Dispatch';
+  dispKnop.addEventListener('click', () => { location.href = '/apps/dispatch.html'; });
+  extraHouder.appendChild(dispKnop);
+  /* Zakelijk vervoer: het reisbeleid, de goedkeuringen en het maandoverzicht.
+     Bewust een eigen app en geen tab in Dispatch -- de werkgever die zijn
+     medewerkers laat rijden is een andere rol dan de planner die wagens
+     verdeelt, en het overgrote deel van de bedrijven hier heeft geen vloot. */
+  const zakKnop = document.createElement('button');
+  zakKnop.type = 'button'; zakKnop.className = 'pda-app';
+  zakKnop.innerHTML = '<svg viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2"/><path d="M3 12h18"/></svg>Zakelijk vervoer';
+  zakKnop.addEventListener('click', () => { location.href = '/apps/zakelijk.html'; });
+  extraHouder.appendChild(zakKnop);
   document.body.appendChild(extraHouder);
   if (window.WerkOS) WerkOS.koppel({ thuisTab: 'vandaag', dock: ['rooster', 'taken', 'team', 'hulp'],
     extra: { houder: '#pdaExtra', knop: '.pda-app' } });

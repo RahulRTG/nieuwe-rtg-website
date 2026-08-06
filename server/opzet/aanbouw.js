@@ -100,6 +100,7 @@ module.exports = function bouwKernAan(kern, grens) {
   require('../routes/navigatie')(grens('navigatie'));
   require('../routes/clips')(grens('clips'));
   require('../routes/kantoorpakket')(grens('kantoorpakket'));
+  require('../routes/mobiliteit')(grens('mobiliteit'));
 
   /* Deel twee -- identiteit, wonen, vervoer en clubs -- staat in ./aanbouw2.js.
      Gesplitst omdat een bestand van 9,5 kB in de waarschuwingsband van de

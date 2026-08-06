@@ -12,10 +12,14 @@ function haversine(a, b) {
   return Math.round(2 * R * Math.asin(Math.sqrt(s)));
 }
 
-// Reistijd in minuten voor een afstand, per vervoerswijze (lopen/vliegen/rijden).
+/* Reistijd in minuten voor een afstand, per vervoerswijze. 'sailing' staat er
+   apart bij en niet omdat 30 zo ver van 26 ligt: zonder eigen tak kreeg een
+   watertaxi STIL de rijsnelheid, en dan is een verkeerd doorgegeven wijze niet
+   van een goede te onderscheiden. Onbekende wijzen vallen bewust terug op
+   rijden -- dat is de veruit meest voorkomende. */
 function etaMinutes(meters, mode) {
   if (meters == null) return null;
-  const kmh = mode === 'walking' ? 4.8 : mode === 'flying' ? 700 : 26;
+  const kmh = mode === 'walking' ? 4.8 : mode === 'flying' ? 700 : mode === 'sailing' ? 30 : 26;
   return Math.max(1, Math.round((meters / 1000) / kmh * 60));
 }
 

@@ -42,5 +42,10 @@ module.exports = {
     ['Lees de omzet per kanaal en per betaalwijze, met fooi en oninbaar apart',
       'Verdeel de fooienpot over gewerkte uren; de som van de delen is exact de pot',
       'Zet het loon tegenover de omzet zonder fooi en bekijk de signalen'],
-    'Er staat geen omzetprognose op dit scherm: wat er staat is wat er nu open staat en wat er vandaag is binnengekomen.')
+    'Er staat geen omzetprognose op dit scherm: wat er staat is wat er nu open staat en wat er vandaag is binnengekomen.'),
+  '/apps/zakelijk.html': G('Zakelijk vervoer: het reisbeleid van uw bedrijf, de ritten die op uw akkoord wachten en het maandoverzicht.',
+    ['Zet de grenzen: maximum per rit, budget per medewerker, tijden, steden en kostenplaatsen',
+      'Geef akkoord op de ritten boven uw drempel; tot dat moment staan ze op geen enkel planbord',
+      'Lees per maand wat er is gereden, per kostenplaats en per medewerker'],
+    'Een leeg veld is geen grens. En elke afwijzing die uw medewerker leest, noemt de regel en het getal -- daarom staat naast de knoppen wat hij ziet.')
 };

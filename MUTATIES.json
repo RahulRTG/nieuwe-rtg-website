@@ -65,11 +65,10 @@
     },
     "anthropic.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/anthropic.js"
-      ],
-      "operatoren": 9
+      "staat": "vastgelopen",
+      "module": "server/anthropic.js",
+      "operator": "return-weg#3",
+      "geprobeerd": 18
     },
     "antivirus.test.js": {
       "soort": "puur",
@@ -101,11 +100,11 @@
     },
     "bestand-binding.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/kluis.js"
-      ],
-      "operatoren": 9
+      "staat": "gezakt",
+      "module": "server/kluis.js",
+      "operator": "+->-#1",
+      "gezakt": 1,
+      "geprobeerd": 4
     },
     "betaalstore.test.js": {
       "soort": "puur",
@@ -166,13 +165,8 @@
     },
     "chaos.pg.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/db/index.js",
-        "server/pg/index.js",
-        "server/kluis.js"
-      ],
-      "operatoren": 9
+      "staat": "slaat zichzelf over",
+      "overgeslagen": 1
     },
     "doos-journaal.test.js": {
       "soort": "puur",
@@ -206,7 +200,8 @@
         "server/meting.js",
         "server/meting-lus.js"
       ],
-      "operatoren": 9
+      "geprobeerd": 5,
+      "posities": 8
     },
     "fout-aggregatie.test.js": {
       "soort": "puur",
@@ -221,14 +216,6 @@
       "module": "server/foutmelder.js",
       "operator": "===->!==",
       "gezakt": 3
-    },
-    "functies.test.js": {
-      "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/functies.js"
-      ],
-      "operatoren": 9
     },
     "geheugen.test.js": {
       "soort": "puur",
@@ -303,14 +290,6 @@
       "module": "server/kern/afgeleid.js",
       "operator": "===->!==",
       "gezakt": 1
-    },
-    "kern-events.test.js": {
-      "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/kern/events.js"
-      ],
-      "operatoren": 9
     },
     "kern-fiscaal.test.js": {
       "soort": "puur",
@@ -404,7 +383,7 @@
         "server/db/gidsen.js"
       ],
       "geprobeerd": 1,
-      "posities": 1
+      "posities": 8
     },
     "ledenregister.test.js": {
       "soort": "puur",
@@ -460,8 +439,8 @@
       "modules": [
         "server/db/index.js"
       ],
-      "geprobeerd": 6,
-      "posities": 1
+      "geprobeerd": 17,
+      "posities": 8
     },
     "meterijk.test.js": {
       "soort": "puur",
@@ -536,15 +515,6 @@
       "operator": "+->-#0",
       "gezakt": 4,
       "geprobeerd": 2
-    },
-    "normprestatie.test.js": {
-      "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "scripts/norm.js"
-      ],
-      "geprobeerd": 0,
-      "posities": 1
     },
     "office-blad.test.js": {
       "soort": "puur",
@@ -674,14 +644,11 @@
     },
     "rahul-eerlijk.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/kern/rahul.js",
-        "server/kern/ai/prompt.js",
-        "server/kern/stuur.js"
-      ],
-      "geprobeerd": 9,
-      "posities": 1
+      "staat": "gezakt",
+      "module": "server/kern/rahul.js",
+      "operator": "+->-#1",
+      "gezakt": 5,
+      "geprobeerd": 4
     },
     "rahul-hart.test.js": {
       "soort": "puur",
@@ -689,8 +656,8 @@
       "modules": [
         "server/kern/rahul.js"
       ],
-      "geprobeerd": 2,
-      "posities": 1
+      "geprobeerd": 4,
+      "posities": 8
     },
     "rahul-mens.test.js": {
       "soort": "puur",
@@ -702,12 +669,11 @@
     },
     "rahul-omgang.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/kern/rahul.js"
-      ],
-      "geprobeerd": 2,
-      "posities": 1
+      "staat": "gezakt",
+      "module": "server/kern/rahul.js",
+      "operator": "&&->||#1",
+      "gezakt": 1,
+      "geprobeerd": 3
     },
     "randen.test.js": {
       "soort": "puur",
@@ -818,12 +784,11 @@
     },
     "sessies.test.js": {
       "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/kern/sessies.js"
-      ],
-      "geprobeerd": 2,
-      "posities": 1
+      "staat": "gezakt",
+      "module": "server/kern/sessies.js",
+      "operator": "return-weg#2",
+      "gezakt": 1,
+      "geprobeerd": 4
     },
     "sleutelwoorden.test.js": {
       "soort": "puur",
@@ -846,8 +811,8 @@
       "modules": [
         "server/kern/spellen.js"
       ],
-      "geprobeerd": 5,
-      "posities": 1
+      "geprobeerd": 18,
+      "posities": 8
     },
     "sso.test.js": {
       "soort": "puur",
@@ -864,15 +829,6 @@
       "operator": "true->false#0",
       "gezakt": 3,
       "geprobeerd": 1
-    },
-    "stijlbundel.test.js": {
-      "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/middleware/stijlbundel.js"
-      ],
-      "geprobeerd": 0,
-      "posities": 1
     },
     "stripe-eigen.test.js": {
       "soort": "puur",
@@ -953,8 +909,8 @@
         "server/db/index.js",
         "server/db/tx/collecties.js"
       ],
-      "geprobeerd": 6,
-      "posities": 1
+      "geprobeerd": 17,
+      "posities": 8
     },
     "txindex.test.js": {
       "soort": "puur",
@@ -962,8 +918,8 @@
       "modules": [
         "server/db/index.js"
       ],
-      "geprobeerd": 6,
-      "posities": 1
+      "geprobeerd": 17,
+      "posities": 8
     },
     "txkap.test.js": {
       "soort": "puur",
@@ -971,8 +927,8 @@
       "modules": [
         "server/db/index.js"
       ],
-      "geprobeerd": 6,
-      "posities": 1
+      "geprobeerd": 17,
+      "posities": 8
     },
     "txledger-sqlite.test.js": {
       "soort": "puur",
@@ -1002,15 +958,6 @@
     "vloot.test.js": {
       "soort": "puur",
       "staat": "geen module gevonden"
-    },
-    "vuurplan.test.js": {
-      "soort": "puur",
-      "staat": "overleefd",
-      "modules": [
-        "server/kern/events.js"
-      ],
-      "geprobeerd": 0,
-      "posities": 1
     },
     "wacht.test.js": {
       "soort": "puur",
@@ -1060,8 +1007,8 @@
         "server/translate/woordenboek/wereld.js",
         "server/translate.js"
       ],
-      "geprobeerd": 7,
-      "posities": 1
+      "geprobeerd": 10,
+      "posities": 8
     },
     "wiring-contract.test.js": {
       "soort": "puur",
@@ -1069,8 +1016,8 @@
       "modules": [
         "server/accounts/index.js"
       ],
-      "geprobeerd": 3,
-      "posities": 1
+      "geprobeerd": 8,
+      "posities": 8
     },
     "zegel.test.js": {
       "soort": "puur",

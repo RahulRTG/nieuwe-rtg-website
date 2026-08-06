@@ -25,7 +25,7 @@
     "kernGedeeld": 142,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 484
+    "toetsenNietGemeten": 491
   },
   "notities": [
     {
@@ -263,6 +263,12 @@
       "meter": "toetsenOngevoeligPct: GEEN grondwaarde zolang de meting loopt",
       "reden": "Vastgelegd op 13,3% bij 60 gemeten toetsen; bij 86 gemeten stond hij op 14,0% en was de ratel rood -- terwijl er niets slechter was geworden. Ook als AANDEEL wandelt hij zolang de steekproef groeit: elke nieuwe partij toetsen verschuift hem. De grondwaarde is dus weggehaald tot toetsenNietGemeten op nul staat; tot die tijd is DAT de meter die iets betekent.",
       "eerlijkheidshalve": "Dit is de DERDE keer op deze twee dagen dat ik een grondwaarde te vroeg heb vastgelegd: eerst kernBreedte/kernGedeeld uit een kapotte meting, toen deze meter als absoluut aantal, en nu dezelfde meter als percentage. Drie keer dezelfde fout in een andere vermomming, en de algemene regel is pas nu scherp: je kunt geen getal rattelen dat je nog aan het VERZAMELEN bent. Een ratel hoort op een stand die af is. Wie hier een grondwaarde zet voordat npm run mutatie een keer helemaal is doorgelopen, herhaalt dit."
+    },
+    {
+      "datum": "2026-08-06",
+      "meter": "toetsenNietGemeten 484 -> 491 (met de hand VERHOOGD)",
+      "reden": "Vijf pure toetsen stonden als 'overleefd' terwijl de motor voor hun module GEEN ENKELE bruikbare mutatie kon maken -- geen operator die past, of elke poging brak de syntaxis en viel af bij node --check. De uitslag zei letterlijk 'overleefd (0 mutaties geprobeerd)'. Zo'n toets is niet ongevoelig gebleken; hij is nooit uitgedaagd. Ze heten nu 'geen bruikbare mutatie' en tellen bij niet-gemeten, en daarmee klopt de dekking zeven hoger uit dan de norm van tien minuten eerder.",
+      "eerlijkheidshalve": "De 484 was dus geen stand maar een telfout: vijf toetsen kregen krediet voor een proef die niet is gedaan. Dat is dezelfde soort fout als de drie eerdere grondwaarde-correcties van vandaag, alleen niet in de VORM van de meter maar in de DEFINITIE eronder. En het is precies wat deze motor moet voorkomen in plaats van maken: een toets de schuld geven van iets wat niemand geprobeerd heeft. Het ongevoelig-aandeel zakte er ook van 11,8% naar 8,2% door -- lager, maar nu over 122 toetsen die echt zijn uitgedaagd."
     }
   ],
   "prestatie": {

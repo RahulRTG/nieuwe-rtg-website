@@ -380,6 +380,15 @@ function proefPuur(naam, posities) {
       }
     }
   }
+  /* NUL POGINGEN IS GEEN OVERLEVER. Vijf bestanden kwamen uit de diepe ronde als
+     "overleefd (0 mutaties geprobeerd)": functies, kern-events, normprestatie,
+     stijlbundel en vuurplan. Er was voor hun module geen enkele bruikbare mutatie
+     te maken -- geen operator die past, of elke poging brak de syntaxis en viel
+     af bij node --check. Zo'n toets is NIET ongevoelig gebleken; hij is nooit
+     uitgedaagd. Dat als overlever noteren beschuldigt hem van iets wat de motor
+     niet heeft geprobeerd, en dat is precies de fout die deze motor moet
+     voorkomen in plaats van maken. Hij telt nu bij niet-gemeten. */
+  if (!geprobeerd) return { soort: 'puur', staat: 'geen bruikbare mutatie', modules, posities: diep };
   return { soort: 'puur', staat: 'overleefd', modules, geprobeerd, posities: diep };
 }
 

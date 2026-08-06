@@ -13,10 +13,21 @@
    toezicht in die stad niets meer voorstelt. Die ene uitzondering is het hele
    verschil tussen federatief en los.
 
-   DE LAATSTE ZETEL BLIJFT STAAN. Een stadsbestuur dat het eigen stadsbestuur
-   intrekt, laat een stad achter zonder bestuur; dan kan alleen het landelijke
-   bestuur er nog bij, en dat is precies het scenario waarin niemand merkt dat
-   er iets stilvalt. */
+   DE LAATSTE ZETEL WORDT GEMELD, NIET GEBLOKKEERD -- EN DAT IS EEN REPARATIE.
+
+   Hier stond een grendel: "het laatste stadsbestuur kan er niet uit". Hij zag
+   er verstandig uit en hij deed niets. Een stadsbestuur kan namelijk sowieso
+   geen stadsbestuur-zetel intrekken (de regel hierboven), en voor het
+   landelijke bestuur werd de grendel expliciet overgeslagen -- want dat is het
+   vangnet dat er altijd bij moet kunnen. De grendel zat dus in een tak waar
+   niemand kwam. Gevonden doordat een mutatie hem weghaalde en GEEN enkele
+   toets zakte (LAT.md regel 2, uitkomst AFGESLAGEN).
+
+   Wat er nu staat is wat er hoort te staan: een stad zonder stadsbestuur is
+   geen fout maar wel een feit dat iemand moet weten. Het gaat in het
+   auditspoor en komt terug in het antwoord (`zonderBestuur`). Blokkeren zou
+   het landelijke bestuur buiten zijn eigen vangnet zetten; zwijgen zou een
+   afdeling stil laten stilvallen (LAT.md regel 5). */
 
 module.exports = (ctx) => {
   const { nu, rid, schoon, S, audit, wie, rolIn, stadVan, save, ROLLEN } = ctx;
@@ -61,16 +72,21 @@ module.exports = (ctx) => {
     if (!(w.landelijk || (eigen === 'stadsbestuur' && z.rol !== 'stadsbestuur'))) {
       return { status: 403, error: 'Een zetel in het stadsbestuur trekt het landelijke bestuur in.' };
     }
-    if (z.rol === 'stadsbestuur') {
-      const over = S().zetels.filter(x => x.stad === z.stad && x.rol === 'stadsbestuur' && x.id !== z.id).length;
-      if (!over && !w.landelijk) {
-        return { status: 400, error: 'Dit is het laatste stadsbestuur van deze afdeling. Stel eerst een opvolger aan.' };
-      }
-    }
     S().zetels = S().zetels.filter(x => x.id !== z.id);
     audit(w.key, 'zetel.weg', z.key, z.rol + ' in stad ' + z.stad);
+    /* Blijft er geen stadsbestuur over, dan valt de dagelijkse leiding van die
+       afdeling stil. Dat mag -- een afdeling kan tussen twee besturen in staan
+       -- maar het hoort luid te gebeuren en niet als bijvangst van een klik. */
+    const bestuurOver = S().zetels.filter(x => x.stad === z.stad && x.rol === 'stadsbestuur').length;
+    const stad = stadVan(z.stad);
+    if (!bestuurOver) {
+      audit(w.key, 'zetel.zonder-bestuur', (stad && stad.naam) || z.stad,
+        'deze afdeling heeft geen stadsbestuur meer');
+    }
     save();
-    return { ok: true, zetels: vanStad(z.stad) };
+    return { ok: true, zetels: vanStad(z.stad), zonderBestuur: !bestuurOver,
+      melding: bestuurOver ? null : 'Let op: ' + ((stad && ('RTF ' + stad.naam)) || 'deze afdeling') +
+        ' heeft nu geen stadsbestuur meer. Tot er een opvolger is, kan alleen het landelijke bestuur hier nog iets wijzigen.' };
   }
 
   return { zetelZet, zetelWeg, vanStad };

@@ -117,6 +117,16 @@ test('het Foundation OS-bestuursscherm toont de stad, de tabbladen en de zin van
     const projecten = await page.evaluate(() => document.body.innerText);
     assert.match(projecten, /Huiswerkklas Zeewijk/, 'het project staat niet op het scherm');
 
+    /* DE VIER TABBLADEN VAN FASE TWEE. Ze staan hier niet om "het werkt" te
+       zeggen maar omdat een tabblad dat een lege dop is, er op een schermfoto
+       precies zo uitziet als een tabblad dat werkt. Elk tabblad moet zijn eigen
+       formulier tonen -- dat is het bewijs dat de API erachter antwoordde. */
+    for (const [tab, merk] of [['subsidies', '#sMaak'], ['voorraad', '#grMaak'],
+      ['activiteiten', '#acMaak'], ['berichten', '#brMaak']]) {
+      await page.click('[data-tab="' + tab + '"]');
+      await page.waitForSelector(merk, { timeout: 15000 });
+    }
+
     /* EEN ECHTE GRENDEL, EN DE ZIN ERBIJ. De landelijke bovengrens voor een
        stadsbestuur is 2.500 euro; een stad kan hem verlagen, niet verhogen. Het
        scherm hoort die zin te tonen en niet weg te vangen. */

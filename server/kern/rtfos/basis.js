@@ -17,7 +17,8 @@
    moeten zijn tot een mens.
 
    Opslag: db.data.rtfos.{steden,zetels,partners,projecten,vrijwilligers,casussen,
-   bronnen,uitgaven,subsidies,incidenten,gemeenten,ondernemers,audit}. */
+   bronnen,uitgaven,subsidies,incidenten,gemeenten,ondernemers,voorraad,
+   activiteiten,berichten,audit}. */
 
 /* De modules per stad. Elke stad zet ze zelf aan of uit; staat een module uit,
    dan geeft zijn ingang 403 met de reden, niet stilzwijgend een lege lijst
@@ -62,7 +63,7 @@ module.exports = ({ db, save, crypto, boardroomWie, magBoardroom }) => {
 
   const LEEG = { steden: [], zetels: [], partners: [], projecten: [], vrijwilligers: [],
     casussen: [], bronnen: [], uitgaven: [], subsidies: [], incidenten: [],
-    gemeenten: [], ondernemers: [], audit: [] };
+    gemeenten: [], ondernemers: [], voorraad: [], activiteiten: [], berichten: [], audit: [] };
   function S() {
     if (!db.data.rtfos || typeof db.data.rtfos !== 'object') db.data.rtfos = {};
     for (const k of Object.keys(LEEG)) if (!Array.isArray(db.data.rtfos[k])) db.data.rtfos[k] = [];

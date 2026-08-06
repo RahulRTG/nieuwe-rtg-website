@@ -48,6 +48,7 @@ module.exports = {
   '/apps/foundation/os.html': G('Foundation OS: het bestuurssysteem van de RTFoundation -- landelijk toezicht, zelfstandige stadsafdelingen, partnerstichtingen, projecten, vrijwilligers, geld en hulpvragen.',
     ['Kies een stadsafdeling; u ziet alleen de steden waar u een zetel heeft, het landelijke bestuur ziet ze alle',
       'Werk per tabblad: impact, projecten, partners, vrijwilligers, geld, hulpvragen, integriteit, gemeente en ondernemers',
+      'Werk per tabblad verder: subsidies met hun rapportagemomenten, voorraad per batch, activiteiten met wachtlijst en incheck, en communicatie',
       'Onder Bestuur staan de knoppen van het toezicht: modules per stad, de status van de afdeling, de goedkeuringslimieten en de zetels'],
     'Geoormerkt geld gaat hier nooit naar een ander project, wie een uitgave aanvraagt keurt hem niet zelf goed, en een melding kan niemand verwijderen -- ook het landelijke bestuur niet.'),
   '/apps/foundation/os-portaal.html': G('Het portaal voor partnerstichtingen, gemeenten en lokale ondernemers: uw eigen dossier, op uw eigen code.',

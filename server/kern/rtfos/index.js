@@ -24,6 +24,10 @@
      rapport          impact per stad en landelijk
      gemeente         de verantwoording aan de gemeente (geteld, nooit gelezen)
      ondernemers      het lokale maatschappelijke ondernemersnetwerk
+     subsidies        aanvragen, voorwaarden, rapportagemomenten, terugvordering
+     voorraad         goederen als batch: houdbaarheid, restant, bestemming
+     activiteiten     inschrijven, wachtlijst, toestemming, incheck aan de deur
+     berichten        communicatie per stad, publiek pas na landelijk akkoord
 
    WAT DIT NIET IS. Geen tweede ledenadministratie en geen tweede boekhouding.
    De 30%-afdracht van RTG naar de stichting blijft in kern/fonds.js; dit OS
@@ -47,6 +51,15 @@ module.exports = ({ db, save, crypto, boardroomWie, magBoardroom }) => {
   const rapport = require('./rapport')(ctx);
   const gemeente = require('./gemeente')(ctx, { cijfersVan: rapport.cijfersVan });
   const ondernemers = require('./ondernemers')(ctx);
+  /* Fase twee: de uitvoering op straat. Subsidies leunen op geld.js (een
+     toegekende subsidie MAAKT zijn geoormerkte bron, en maakt hem niet na);
+     activiteiten leunen op de VOG-toets uit het vrijwilligersregister. Beide
+     krijgen die functie mee in plaats van hem opnieuw te bedenken -- twee
+     plekken die hetzelfde oordeel vellen, lopen uiteen (LAT.md regel 4). */
+  const subsidies = require('./subsidies')(ctx, { bronUitSubsidie: geld.bronUitSubsidie });
+  const voorraad = require('./voorraad')(ctx);
+  const activiteiten = require('./activiteiten')(ctx, { vogGeldig: vrijwilligers.vogGeldig });
+  const berichten = require('./berichten')(ctx);
 
   /* Het auditspoor uitlezen. Alleen landelijk, en alleen lezen -- er is nergens
      een functie die erin schrijft behalve ctx.audit zelf, en nergens een die
@@ -78,6 +91,7 @@ module.exports = ({ db, save, crypto, boardroomWie, magBoardroom }) => {
     vlagZet: steden.vlagZet, limietZet: steden.limietZet, zetelZet: steden.zetelZet,
     zetelWeg: steden.zetelWeg, kernteamZet: steden.kernteamZet,
     partners, projecten, vrijwilligers, geld, casus, integriteit, rapport, gemeente, ondernemers,
+    subsidies, voorraad, activiteiten, berichten,
     VLAGGEN: ctx.VLAGGEN, ROLLEN: ctx.ROLLEN
   } };
 };

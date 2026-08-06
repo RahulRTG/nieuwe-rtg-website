@@ -92,58 +92,15 @@ module.exports = (ctx) => {
     return { ok: true, bron: bronBeeld(bron) };
   }
 
-  /* Herbestemmen: de enige weg waarlangs geoormerkt geld van bestemming
-     verandert. Drie sloten, en ze doen alle drie iets anders.
-
-     1. LANDELIJK. Een stad die zijn eigen oormerken kan losmaken, heeft geen
-        oormerken maar een suggestie.
-     2. DE BELOFTE AAN DE GEVER. Stond de bron op "nooit", dan houdt het hier
-        op -- ook voor het landelijke bestuur. Dat is geen bevoegdheidsvraag
-        maar een afspraak met iemand buiten de organisatie.
-     3. WAT AL BESTEED IS, VERHUIST NIET. Alleen het vrije deel kan mee; het
-        besteedde deel is al verantwoord onder de oude bestemming. */
-  function verplaats(req, bronId, naarProject, b) {
-    b = b || {};
-    const w = wie(req);
-    const bron = vindBron(bronId);
-    if (!bron) return { status: 404, error: 'Deze bron bestaat niet.' };
-    if (!w.landelijk) return { status: 403, error: 'Geoormerkt geld herbestemmen doet uitsluitend het landelijke RTF-bestuur.' };
-    if (bron.herbestemming === 'nooit') {
-      return { status: 403, error: 'Deze gever heeft herbestemming uitgesloten. Dit geld gaat naar de afgesproken bestemming of terug naar de gever.' };
-    }
-    if (bron.herbestemming === 'met_toestemming' && b.toestemming !== true) {
-      return { status: 400, error: 'Deze bron mag alleen verschuiven met toestemming van de gever. Leg die eerst vast (toestemming: true, met het bewijsstuk erbij).' };
-    }
-    const reden = schoon(b.reden, 300);
-    if (reden.length < 5) return { status: 400, error: 'Waarom verschuift dit geld? Schrijf het op; het komt in het jaarverslag terug.' };
-    const naar = naarProject ? String(naarProject) : null;
-    if (naar) {
-      const p = S().projecten.find(x => x.id === naar);
-      if (!p) return { status: 404, error: 'Dat project bestaat niet.' };
-      if (p.stad !== bron.stad) return { status: 400, error: 'Dit geld hoort bij een andere stad. Tussen steden verschuiven gaat via een nieuwe bron met de gever erbij.' };
-    }
-    const besteed = bron.besteed;
-    if (besteed > 0) {
-      // Het besteedde deel blijft achter als eigen, afgesloten bron: zo blijft
-      // de verantwoording over de oude bestemming compleet.
-      S().bronnen.push({ id: rid(), stad: bron.stad, projectId: bron.projectId, soort: bron.soort,
-        gever: bron.gever, anoniem: bron.anoniem, centen: besteed, besteed,
-        herbestemming: 'nooit', kenmerk: (bron.kenmerk || '') + ' (afgesloten deel)',
-        door: w.key, at: nu() });
-      bron.centen -= besteed;
-      bron.besteed = 0;
-    }
-    const oud = bron.projectId;
-    bron.projectId = naar;
-    bron.herbestemd = { van: oud, naar, door: w.key, reden, at: nu() };
-    audit(w.key, 'bron.herbestemd', bron.id, (oud || 'stadsbreed') + ' -> ' + (naar || 'stadsbreed') + ': ' + reden);
-    save();
-    return { ok: true, bron: bronBeeld(bron) };
-  }
+  /* Herbestemmen en de bron-uit-subsidie staan in ./geld-bron.js: dat zijn de
+     twee wegen waarlangs een bron ANDERS ontstaat of van bestemming verandert,
+     en dit bestand liep tegen de 10 KB van keuringsregel 13. */
+  const bron = require('./geld-bron')(ctx, { vindBron, bronBeeld });
 
   const uitgaven = require('./geld-uitgaven')(ctx, { vindBron, vrij, bronBeeld });
 
-  return { lijst, bronMaak, verplaats, vindBron, vrij, bronBeeld,
+  return { lijst, bronMaak, verplaats: bron.verplaats, bronUitSubsidie: bron.bronUitSubsidie,
+    vindBron, vrij, bronBeeld,
     uitgaveAanvraag: uitgaven.aanvraag, uitgaveBesluit: uitgaven.besluit,
     SOORTEN, HERBESTEMMING };
 };

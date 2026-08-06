@@ -288,8 +288,13 @@ process.on('exit', zetTerug);
 const WACHT_NUL = 240000;
 const WACHT_MUTATIE = 90000;
 
-function draaiToets(bestand, env, wacht) {
-  const r = spawnSync('node', ['--experimental-sqlite', '--test', bestand], {
+/* `forceer` zet --test-force-exit erbij: de draaier stopt zodra de toetsen klaar
+   zijn, ook als er nog een handle openstaat. Alleen gebruikt om NA een time-out te
+   achterhalen wat de asserties zeiden -- zie tijdoutMaarMeetbaar(). */
+function draaiToets(bestand, env, wacht, forceer) {
+  const vlaggen = ['--experimental-sqlite', '--test'];
+  if (forceer) vlaggen.push('--test-force-exit');
+  const r = spawnSync('node', vlaggen.concat([bestand]), {
     cwd: WORTEL, encoding: 'utf8', timeout: wacht || WACHT_NUL, maxBuffer: 64 * 1024 * 1024,
     /* SIGKILL EN NIET HET STANDAARD SIGTERM, en dat is geen ruwheid maar een
        lek dat ik heb zien ontstaan. Bij een time-out stuurt spawnSync SIGTERM,
@@ -354,6 +359,31 @@ const EIGEN_MODULE = new Map([
      de poortwachter (trio.js). web/index.js staat vooraan omdat die de zwaarste
      bewering draagt -- praat hij echt https. */
   ['tls-boot.test.js', ['server/web/index.js', 'server/opzet/luister.js', 'server/trio.js']],
+  /* SCHERMTOETSEN, en dat is nieuw. De motor haalde altijd alleen *.test.js op,
+     dus de 85 *.e2e.js-bestanden waren structureel onmeetbaar -- en dat maakte
+     toetsenNietGemeten een meter die het SCHRIJVEN van een schermtoets bestrafte.
+     Er is geen motorwijziging voor nodig: een los meegegeven bestand wordt al
+     aangenomen (zie de regel bij `losse` verderop), het ontbrak alleen aan een
+     module om te muteren -- een e2e-toets requiret zijn pagina niet, hij opent
+     hem als URL.
+
+     Wat hier staat is per toets de browsermodule die hij echt op de proef stelt,
+     en alleen de regels die ik ook door de motor heb laten BEVESTIGEN. Een
+     geraden module levert een 'overleefd' en dan krijgt de toets de schuld van
+     wat de lijst fout heeft; dat is bij de servertoetsen al een keer gebeurd.
+
+     Het is geen standaardronde: een browsertoets kost minuten per operator, dus
+     alle 85 meten is een kwestie van looptijd en niet van ontbrekend gereedschap.
+     De weg staat open, per bestand, met de bevestiging als voorwaarde. */
+  /* camerascherm toetst wat de PAGINA doet met de camera, niet wat de server
+     antwoordt -- hij overleefde de liegpoort, en dat zei niets over de toets. Met
+     deze regel gaat hij door de bronmutatie op de mediapoort. Bevestigd.
+
+     deur.e2e.js staat hier BEWUST NIET: die leest echt van /api/ en zakt gewoon op
+     de liegpoort (gemeten). Een regel toevoegen die niets toevoegt, zou de lijst
+     onbetrouwbaar maken -- elke regel hier hoort een uitspraak te zijn die de
+     standaardweg niet al doet. */
+  ['camerascherm.e2e.js', ['public/shared/media.js']],
   /* Het grootboek op sqlite. De toets draait een rit-bestand als kindproces,
      en dat requiret server/db -- vandaar dat de scanner niets zag. */
   ['txledger-sqlite.test.js', ['server/db/tx/index.js', 'server/db/index.js']],
@@ -449,8 +479,12 @@ function proefPuur(naam, posities) {
              mutatie het gedrag echt veranderd -- maar de toets heeft niets GEMELD,
              en dat is geen bewijs dat een assertie het zag. Hij krijgt zijn eigen
              uitslag en telt bij "niet gemeten", niet bij gezakt. */
-          if (na.tijdout) return { soort: 'puur', staat: 'vastgelopen', module: rel,
-            operator: op.naam + '#' + i, geprobeerd };
+          /* NA EEN TIME-OUT NOG EEN KEER MET --test-force-exit, want "hij komt er
+             niet uit" en "geen assertie zag het" zijn twee verschillende dingen en
+             de eerste mag de tweede niet verbergen. Zie tijdoutMaarMeetbaar(). */
+          if (na.tijdout) return Object.assign(
+            tijdoutMaarMeetbaar(bestand, null, 'puur'),
+            { module: rel, operator: op.naam + '#' + i, geprobeerd });
           return na.gezakt > 0 ? { soort: 'puur', staat: 'gezakt', module: rel,
             operator: op.naam + '#' + i, gezakt: na.gezakt, geprobeerd } : null;
         });
@@ -471,6 +505,20 @@ function proefPuur(naam, posities) {
 }
 
 function isServerToets(naam) {
+  /* EEN EIGEN MODULE WINT VAN DE LIEGPOORT, en dat is gemeten en geen smaak.
+
+     Een schermtoets start ook een server (hij heeft er een nodig om de pagina te
+     serveren), dus viel hij hier in het servervak en werd hij met de liegpoort
+     beproefd. Voor test/deur.e2e.js is dat precies goed -- die leest echt van
+     /api/ en zakt netjes. Voor test/camerascherm.e2e.js is het zinloos: die toetst
+     wat de pagina DOET met de camera, niet wat de server antwoordt, en overleefde
+     de liegpoort dan ook. Overleven zegt daar niets over de toets en alles over de
+     verkeerde proef.
+
+     Staat er in EIGEN_MODULE een module bij deze toets, dan is dat een expliciete
+     uitspraak over wat hij op de proef stelt, en die hoort voor te gaan op het
+     vermoeden dat een require van de helper oplevert. */
+  if (EIGEN_MODULE.has(path.basename(naam))) return false;
   /* De zoekterm opgeknipt, precies zoals de patronen in regel 36 van
      scripts/check.js: voluit gespeld leest een andere keuringsregel dit als een
      require van scripts/helper.js, die niet bestaat. */
@@ -496,10 +544,49 @@ const DEUREN = ['/api/auth/', '/api/login', '/api/supplier/login',
 
    Alleen zinvol voor toetsen die in fase B zijn gezakt: wie daar al overleefde,
    overleeft dit ook. */
+/* EEN TIME-OUT IS TWEE FEITEN, EN 'vastgelopen' VERSTOPTE ZE IN EEN WOORD.
+
+   Zeven toetsen kwamen hier terug als `vastgelopen`. Bij zes daarvan bleek na
+   handmatig kijken dat de ASSERTIES hun werk deden -- er stonden twee, drie, vijf,
+   acht, negen roden in de uitvoer -- en dat alleen het AFSLUITEN niet lukte: een
+   server die niet gestopt werd, een socket die openbleef, een nepserver die in zijn
+   verzoekbehandelaar omviel. Die zes zijn gerepareerd, en dat was de goede weg:
+   een toets die hangt is erger dan een toets die zakt, want een time-out kost een
+   schouderophalen en niemand leest daarna nog welke bewering het was.
+
+   Maar de uitslag `vastgelopen` zei niets over de gevoeligheid, en dat is precies
+   wat deze motor moet meten. Node heeft daar gereedschap voor: met
+   --test-force-exit stopt de draaier zodra de toetsen klaar zijn, ook met een
+   openstaande handle. Na een time-out draaien we dus EEN keer opnieuw met die vlag
+   en noteren we beide feiten: wat de asserties zeiden EN dat er iets lekt.
+
+   Het is bewust geen standaardvlag. Zou hij altijd meedraaien, dan waren die zes
+   lekken nooit gevonden -- de motor was juist de enige die ze zag. Hij hoort dus
+   alleen te helpen NADAT een time-out is vastgesteld, en het lek blijft als feit
+   in de uitslag staan in plaats van te verdwijnen. */
+function tijdoutMaarMeetbaar(bestand, env, soort) {
+  /* RUIM DE TIJD, want deze ronde is een DIAGNOSE en geen meting op tempo. De
+     eerste versie gaf hem hetzelfde budget als de gewone ronde, en toen kwam
+     zaakdoos terug als "ook met force-exit niet af" -- terwijl hij het met de hand
+     in ruim vier minuten wel haalt. Dat was dus geen vastloper maar een te LANGZAME
+     toets, en die twee door elkaar halen is precies waar deze functie voor is
+     gemaakt. Vier keer het gewone budget: het draait een keer per vastloper. */
+  const RUIM = WACHT_MUTATIE * 4;
+  const na = draaiToets(bestand, env, RUIM, true);
+  if (na.tijdout) return { soort, staat: 'te langzaam', lekt: true,
+    reden: 'ook met --test-force-exit niet af binnen ' + Math.round(RUIM / 1000) + 's; ' +
+      'de toetsen zelf komen niet klaar, dus dit is traagheid en niet alleen een handle' };
+  if (na.alGeslagen) return { soort, staat: 'slaat zichzelf over', lekt: true };
+  return { soort, staat: na.gezakt > 0 ? 'gezakt' : 'overleefd', gezakt: na.gezakt, lekt: true,
+    reden: 'de asserties deden hun werk, maar het proces sloot niet af: deze toets LEKT een handle. ' +
+      'Uitslag gemeten met --test-force-exit; het lek is een eigen gebrek en hoort gerepareerd.' };
+}
+
 function proefServerScherp(naam) {
   const bestand = path.join(TEST, naam);
   const na = draaiToets(bestand, { RTG_LIEG: '/api/', RTG_LIEG_NIET: DEUREN }, WACHT_MUTATIE);
-  if (na.tijdout) return { staat: 'vastgelopen' };
+  if (na.tijdout) { const t = tijdoutMaarMeetbaar(bestand, { RTG_LIEG: '/api/', RTG_LIEG_NIET: DEUREN }, 'server');
+    return { staat: t.staat, lekt: true, reden: t.reden }; }
   if (na.alGeslagen) return { staat: 'slaat zichzelf over' };
   return { staat: na.gezakt > 0 ? 'gezakt' : 'overleefd', gezakt: na.gezakt };
 }
@@ -513,7 +600,8 @@ function proefServer(naam) {
   if (!nul.toetsen) return { soort: 'server', staat: 'geen toetsen gedraaid' };
   if (nul.alGeslagen) return { soort: 'server', staat: 'slaat zichzelf over', overgeslagen: nul.overgeslagen };
   const na = draaiToets(bestand, { RTG_LIEG: '/api/' }, WACHT_MUTATIE);
-  if (na.tijdout) return { soort: 'server', staat: 'vastgelopen', operator: 'liegpoort /api/' };
+  if (na.tijdout) return Object.assign(tijdoutMaarMeetbaar(bestand, { RTG_LIEG: '/api/' }, 'server'),
+    { operator: 'liegpoort /api/' });
   return na.gezakt > 0
     ? { soort: 'server', staat: 'gezakt', operator: 'liegpoort /api/', gezakt: na.gezakt }
     : { soort: 'server', staat: 'overleefd', operator: 'liegpoort /api/' };

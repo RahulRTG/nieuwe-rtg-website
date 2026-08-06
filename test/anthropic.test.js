@@ -47,11 +47,34 @@ function metDeadline(belofte, wat) {
   return Promise.race([belofte, klok]).finally(() => clearTimeout(t));
 }
 
+/* DE NEPSERVER MAG NIET CRASHEN OP ONVERWACHTE INVOER, en dat was de laatste
+   vastloper in dit bestand.
+
+   Gemeten: onder de mutatie die `return uit` uit verrijkMetCache haalt, gaat er
+   geen body meer mee. De handler hieronder doet dan JSON.parse op een lege
+   tekenreeks, en die fout viel BUITEN de belofteketen -- node meldde
+   `uncaughtException: Unexpected end of JSON input` na 19 ms. Gevolg: de toets
+   werd wel rood, maar het antwoord werd nooit afgemaakt, de socket bleef hangen en
+   het proces sloot niet af (exit 124). De motor noteert dat als `vastgelopen` en
+   dus NIET als gezakt, terwijl er wel een toets zakte.
+
+   Een testdubbel die op onverwachte invoer omvalt, verandert een nette rode regel
+   in een time-out. Hij hoort te antwoorden met een fout die de toets kan LEZEN.
+   Dat is geen verzachting van de toets: de assertie over wat de server ontving
+   zakt nog steeds, alleen nu met een naam en zonder te blijven staan. */
 function nepApi(handler) {
   const srv = http.createServer((req, res) => {
     const brok = [];
     req.on('data', c => brok.push(c));
-    req.on('end', () => handler(req, Buffer.concat(brok).toString(), res));
+    req.on('end', () => {
+      try { handler(req, Buffer.concat(brok).toString(), res); }
+      catch (e) {
+        try {
+          if (!res.headersSent) res.writeHead(500, { 'Content-Type': 'application/json' });
+          res.end(JSON.stringify({ error: 'nepserver viel om op deze invoer: ' + e.message }));
+        } catch (e2) { try { res.destroy(); } catch (e3) { /* al weg */ } }
+      }
+    });
   });
   return new Promise(resolve => srv.listen(0, '127.0.0.1', () => resolve({ srv, poort: srv.address().port })));
 }

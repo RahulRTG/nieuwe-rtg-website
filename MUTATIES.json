@@ -156,9 +156,10 @@
     },
     "anthropic.test.js": {
       "soort": "puur",
-      "staat": "vastgelopen",
+      "staat": "gezakt",
       "module": "server/anthropic.js",
       "operator": "return-weg#3",
+      "gezakt": 1,
       "geprobeerd": 18
     },
     "antivirus.test.js": {
@@ -581,6 +582,14 @@
       "operator": "===->!==",
       "gezakt": 2
     },
+    "camerascherm.e2e.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/media.js",
+      "operator": "&&->||#7",
+      "gezakt": 1,
+      "geprobeerd": 26
+    },
     "care.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -696,6 +705,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "scherp": "gezakt"
+    },
+    "deur.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
       "scherp": "gezakt"
     },
     "directpay.test.js": {
@@ -3811,8 +3827,12 @@
     },
     "zaakdoos.test.js": {
       "soort": "server",
-      "staat": "vastgelopen",
-      "operator": "liegpoort /api/"
+      "staat": "gezakt",
+      "gezakt": 9,
+      "lekt": true,
+      "reden": "de asserties deden hun werk, maar het proces sloot niet af: deze toets LEKT een handle. Uitslag gemeten met --test-force-exit; het lek is een eigen gebrek en hoort gerepareerd.",
+      "operator": "liegpoort /api/",
+      "scherp": "gezakt"
     },
     "zaaktools.test.js": {
       "soort": "server",

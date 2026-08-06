@@ -130,4 +130,8 @@ module.exports = (kern) => {
      en krijgt dezelfde kern plus het gedeelde `stuur`-hulpje. Gesplitst om de
      omvangregel, niet om de samenhang: het is een motor. */
   require('./mobiliteit/werkkant')(kern, { stuur });
+  /* De kaartverkoop en de CDT staan in ./mobiliteit/vervoerbewijs.js. Ze horen
+     bij dezelfde motor maar hebben allebei een grond BUITEN de code: een
+     overeenkomst met de vervoerder, en de Nederlandse taxiwet. */
+  require('./mobiliteit/vervoerbewijs')(kern, { stuur });
 };

@@ -21,6 +21,10 @@
      matching                    toewijzing met instelbare wegingen en uitleg
      dispatch + dispatch-acties  het scherm van de planner: eerst kijken, dan doen
      pendel + pendel-rooster     bedrijfsvervoer met een dienstregeling
+     overeenkomst + kaartje      OV-kaartverkoop: een vervoerbewijs mag alleen
+                                 uit een geldige overeenkomst met de vervoerder
+     cdt + cdt-tijden/-export    de Nederlandse taxiverplichting: diensten,
+                                 arbeids-, rij- en rusttijden, en een export
 
    DE BOUWVOLGORDE ZIT IN HET REGISTER, NIET IN DE CODE. Taxi (ride_hailing)
    en de OV-planner staan standaard aan; charters, boten en OV-kaartverkoop
@@ -38,7 +42,7 @@
 
 function maakMobiliteit(state) {
   const { db, save, crypto, schoon, codenaamVan, haversine, etaMinutes, notify,
-    findSupplier, logActivity, sseToOffice, sseToCustomer } = state;
+    findSupplier, logActivity, sseToOffice, sseToCustomer, pay, ovPrijsVan } = state;
 
   const nu = () => new Date().toISOString();
   const id = p => (p || 'mb') + crypto.randomBytes(4).toString('hex');
@@ -49,7 +53,7 @@ function maakMobiliteit(state) {
      gedrag: assets leunt op het register, de opdracht op plekken en het
      register, matching op assets, dispatch op alledrie. */
   const ctx = { db, save, crypto, schoon, nu, id, codenaamVan, haversine, etaMinutes,
-    notify, findSupplier, logActivity, sseToOffice, sseToCustomer };
+    notify, findSupplier, logActivity, sseToOffice, sseToCustomer, pay, ovPrijsVan };
 
   Object.assign(ctx, require('./register')(ctx));
   Object.assign(ctx, require('./plekken')(ctx));
@@ -61,12 +65,26 @@ function maakMobiliteit(state) {
   Object.assign(ctx, require('./dispatch-acties')(ctx));   // leunt op poolVan uit ./dispatch
   Object.assign(ctx, require('./pendel')(ctx));
   Object.assign(ctx, require('./pendel-rooster')(ctx));
+  // de kaartverkoop: de overeenkomst eerst, want de uitgifte leunt op magVerkopen
+  Object.assign(ctx, require('./overeenkomst')(ctx));
+  Object.assign(ctx, require('./kaartje')(ctx));
+  Object.assign(ctx, require('./kaartje-beeld')(ctx));
+  Object.assign(ctx, require('./kaartje-gebruik')(ctx));
+  Object.assign(ctx, require('./storing')(ctx));
+  // de CDT-laag: de registratie eerst, de uitvoer daarna (die leest de diensten)
+  Object.assign(ctx, require('./cdt')(ctx));
+  Object.assign(ctx, require('./cdt-export')(ctx));
 
   ctx.ensureRegister();
   ctx.ensureAssets();
   ctx.ensureOpdrachten();
   ctx.ensurePendel();
   ctx.ensureMatching();
+  ctx.ensureOvereenkomsten();
+  ctx.ensureKaartjes();
+  ctx.ensureStoringen();
+  ctx.ensureCdt();
+  ctx.ensureExport();
 
   /* Wat een reiziger te kiezen heeft, hier, nu. Dit is het antwoord waarmee de
      app zichzelf opbouwt: welke vervoersvormen staan aan, met welke voertuigen

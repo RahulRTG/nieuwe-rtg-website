@@ -702,6 +702,70 @@ RTG voert zelf geen commerciele luchtvaart of zeevaart uit. Die producten zijn
 een marktplaats voor gecertificeerde exploitanten, en dat zit in de code als de
 boekingsvorm `aanvraag`: daar komt altijd een mens tussen.
 
+#### De OV-kaartverkoop: drie poorten voor er een vervoerbewijs uit komt
+
+`overeenkomst.js` + `kaartje(-beeld/-gebruik).js` + `storing.js`. Een kaartje is
+een afspraak tussen de reiziger en de **vervoerder** -- die rijdt, die
+controleert, die draagt het risico. RTG verkoopt hooguit namens hem. Daarom
+komen er drie poorten voor een kaartje uit, en alle drie worden ze op het moment
+zelf uitgerekend:
+
+1. de module `public_transport_ticketing` staat aan in dit gebied;
+2. er is een **geldige overeenkomst** met die vervoerder -- een dossier met
+   looptijd, handtekening en afdracht, alleen door RTG zelf vast te leggen (een
+   partij die zijn eigen overeenkomst schrijft, heeft geen overeenkomst maar een
+   vinkje);
+3. die overeenkomst dekt **deze lijn en dit product**. Een lege lijnenlijst
+   betekent geen enkele lijn, niet alle.
+
+De prijs komt uit `ovPrijsVan` -- dezelfde formule die afrekent bij het
+uitchecken, zodat de balie en de bus niet uiteenlopen. De controle door de
+conducteur is de enige plek waar een kaartje opgaat, en hij ziet het bewijs en
+niet de persoon: product, lijn, geldigheid en de codenaam, geen e-mailadres en
+geen wallet.
+
+**Vertraging komt van de vervoerder, niet van ons.** Wij hebben live posities
+maar geen dienstregeling per halte, dus "hoeveel te laat" kunnen wij niet
+berekenen -- en een teruggave op een geraden getal is erger dan geen teruggave.
+De vervoerder meldt de storing zelf; iedereen met een kaartje in dat venster
+krijgt automatisch geld terug (vertraging 50%, uitval 100%). Twee dingen die
+daar in code staan omdat ze in de eerste versie fout gingen: nooit meer dan de
+kaartprijs terug (wie 50% kreeg en daarna uitval, kreeg anders 150%), en een
+vergoeding voor vertraging kost je je rit **niet** -- alleen bij uitval vervalt
+het kaartje.
+
+#### De CDT: klaar voor 2028, en eerlijk over wat er nog niet is
+
+`cdt.js` + `cdt-tijden.js` + `cdt-export.js`. Vanaf 1 januari 2028 gaat het
+Nederlandse taxivervoer van de boordcomputer over op de Centrale Database
+Taxivervoer. Wat hier staat:
+
+- **De dienst van een chauffeur**: aanmelden op de chauffeurskaart (zonder kaart
+  geen registratie -- fail-closed), overschakelen tussen rijden, andere
+  werkzaamheden, beschikbaarheid, pauze en rust, en afmelden. De tijdlijn heeft
+  altijd precies één open blok, zodat er geen gaten of overlappingen ontstaan.
+- **De grenzen** uit de Arbeidstijdenwet en het Arbeidstijdenbesluit vervoer
+  (12 uur arbeid, 10 uur rijden, 30 minuten pauze na 4,5 uur rijden, 10 uur
+  dagrust) staan als data op één plek en zijn per onderneming bij te stellen op
+  het eigen regime. Elk signaal noemt zijn eigen rekensom; een dienst binnen de
+  grenzen levert er géén op.
+- **De ritten worden niet overgeschreven** maar per dienst opgezocht in de
+  rittenmotor. Een tweede rittenlijst voor de inspectie zou binnen een maand
+  uiteenlopen met de eerste, en daarvan gaat er één naar de overheid.
+- **De export** is herhaalbaar en draagt een sha256 over een vaste ordening,
+  zodat later na te gaan is of het aangeleverde bestand hetzelfde was. Er staan
+  geen prijzen, codenamen of bestemmingen in: wat je niet uitlevert, kan ook niet
+  uitlekken.
+
+**En wat er bewust niet is: een knop "verzenden naar de CDT".** Aanleveren loopt
+via een ICT-dienstverlener die aan de eisen van de ILT voldoet, en RTG is dat
+niet. Zo'n knop zou een leugen zijn met een groen vinkje eronder, en bij een
+wettelijke verplichting is dat gevaarlijk in plaats van slordig: een ondernemer
+die denkt dat hij heeft aangeleverd, controleert het niet meer. Wat er wel is,
+is een **overdracht-journaal**: wie gaf welk bestand wanneer aan welke
+dienstverlener. Dat legt vast wat er echt gebeurde, en het antwoord zegt erbij
+dat RTG niet kan zien of de CDT het heeft aanvaard.
+
 ### RTG Werk OS (de werkplek van een organisatie)
 
 `server/bedrijf/` + `/api/bedrijf/...` + `/apps/werk.html`. Een **werkruimte**

@@ -2376,7 +2376,10 @@ Object.assign(kern, require('./kern/ov').maakOv({
    -- dus na ov gemount, dat de lijnen en haltes neerzet. */
 Object.assign(kern, require('./kern/mobiliteit').maakMobiliteit({
   db, save, crypto, schoon, codenaamVan: kern.codenaamVan, haversine, etaMinutes,
-  notify, findSupplier, logActivity, sseToOffice, sseToCustomer
+  notify, findSupplier, logActivity, sseToOffice, sseToCustomer,
+  // de kaartverkoop rekent af via dezelfde betaalkern en met dezelfde
+  // OV-prijsformule als het uitchecken; geen tweede som, geen tweede grootboek
+  pay: kern.pay, ovPrijsVan: kern.ovPrijsVan
 }));
 /* RTG Navigatie (kern/navigatie.js): het huiseigen navigatiesysteem. Een eigen
    wegennet met A*-route, bocht-voor-bocht en ETA per vervoerwijze; bestemmingen

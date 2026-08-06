@@ -51,11 +51,36 @@ const TMP_DOOS = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-doos-box-'));
 let cloudPort, cloudChild, doos;
 const cloudBase = () => 'http://127.0.0.1:' + cloudPort;
 
+/* ELKE GESTARTE CLOUD WORDT ONTHOUDEN, en dat is de reparatie waar dit bestand
+   als vastloper voor bekend stond.
+
+   Wat er gebeurde, en het is een fout die je alleen ziet als een toets ZAKT. De
+   toets "de lijn valt weg" haalt de cloud neer met `cloudChild.kill()`. Zakt hij
+   daarvoor -- en onder de liegpoort zakt hij -- dan blijft die cloud draaien. Een
+   latere toets roept startCloud() opnieuw aan, de variabele wordt OVERSCHREVEN, en
+   het eerste kind is voorgoed onbereikbaar: ook `test.after` kent het niet meer.
+   Resultaat: alle tien toetsen melden zich, negen zakken, en het proces sluit toch
+   niet af. Node zei het uiteindelijk zelf -- getActiveResourcesInfo() gaf precies
+   een ProcessWrap, en via /proc bleek dat de cloud te zijn (OFFICE_CODE=
+   DOOS-KANTOOR-1).
+
+   Twee sloten, want een van de twee is precies wat hier ontbrak:
+   1. startCloud() ruimt de VORIGE op voor hij een nieuwe start. Een starter die
+      zijn eigen handvat overschrijft, hoort niet eerst iets kwijt te raken.
+   2. alle gestarte clouds staan in een lijst, en test.after loopt die af. Dan
+      hangt het opruimen niet aan een variabele die iemand kan overschrijven. */
+const alleClouds = [];
+function stopCloud(kind) {
+  if (!kind) return;
+  try { kind.kill('SIGKILL'); } catch (e) { /* al weg: prima */ }
+}
 function startCloud() {
+  stopCloud(cloudChild);
   cloudChild = spawn(process.execPath, ['--experimental-sqlite', path.join(__dirname, '..', 'server', 'server.js')], {
     env: { ...process.env, NODE_ENV: 'test', PORT: String(cloudPort), RTG_DATA_DIR: TMP_CLOUD, SMTP_URL: '', RTG_DOOS_SLEUTEL: SLEUTEL, OFFICE_CODE: 'DOOS-KANTOOR-1' },
     stdio: ['ignore', 'ignore', 'inherit']
   });
+  alleClouds.push(cloudChild);
 }
 async function wachtOp(pad, base, keur, pogingen = 100) {
   for (let i = 0; i < pogingen; i++) {
@@ -88,7 +113,8 @@ test.before(async () => {
 });
 test.after(() => {
   stop(doos && doos.child);
-  if (cloudChild) try { cloudChild.kill('SIGKILL'); } catch (e) {}
+  /* ALLE clouds, niet alleen de laatste: zie de uitleg bij startCloud(). */
+  for (const c of alleClouds) stopCloud(c);
   for (const t of [TMP_CLOUD, TMP_DOOS]) try { fs.rmSync(t, { recursive: true, force: true }); } catch (e) {}
 });
 

@@ -572,6 +572,27 @@ function tijdoutMaarMeetbaar(bestand, env, soort) {
      toets, en die twee door elkaar halen is precies waar deze functie voor is
      gemaakt. Vier keer het gewone budget: het draait een keer per vastloper. */
   const RUIM = WACHT_MUTATIE * 4;
+
+  /* EERST ZONDER DE VLAG, want TRAAG en LEK zijn niet hetzelfde en het etiket
+     `lekt` mag niet op een toets die alleen meer tijd nodig had.
+
+     Dat is geen theorie: test/zaakdoos.test.js lekte een cloud-kindproces EN
+     duurt onder de liegpoort ruim vier minuten. Toen het lek was gerepareerd,
+     bleef hij door het budget van 90s heen gaan -- en met alleen de force-exit-weg
+     zou hij voor altijd als lekkend genoteerd staan terwijl er niets meer lekt.
+     Een uitslag die een opgelost gebrek blijft melden, is net zo fout als een die
+     een bestaand gebrek verzwijgt.
+
+     Dus: eerst nog eens draaien met RUIM budget en ZONDER vlag. Komt hij er dan
+     uit, dan was het traagheid en niets anders. */
+  const ruimZonder = draaiToets(bestand, env, RUIM);
+  if (!ruimZonder.tijdout) {
+    if (ruimZonder.alGeslagen) return { soort, staat: 'slaat zichzelf over', traag: true };
+    return { soort, staat: ruimZonder.gezakt > 0 ? 'gezakt' : 'overleefd', gezakt: ruimZonder.gezakt, traag: true,
+      reden: 'kwam er niet uit binnen het gewone budget van ' + Math.round(WACHT_MUTATIE / 1000) +
+        's maar wel binnen ' + Math.round(RUIM / 1000) + 's: deze toets is TRAAG, hij lekt niets' };
+  }
+
   const na = draaiToets(bestand, env, RUIM, true);
   if (na.tijdout) return { soort, staat: 'te langzaam', lekt: true,
     reden: 'ook met --test-force-exit niet af binnen ' + Math.round(RUIM / 1000) + 's; ' +

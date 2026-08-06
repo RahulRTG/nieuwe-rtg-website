@@ -3829,8 +3829,8 @@
       "soort": "server",
       "staat": "gezakt",
       "gezakt": 9,
-      "lekt": true,
-      "reden": "de asserties deden hun werk, maar het proces sloot niet af: deze toets LEKT een handle. Uitslag gemeten met --test-force-exit; het lek is een eigen gebrek en hoort gerepareerd.",
+      "traag": true,
+      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
       "operator": "liegpoort /api/",
       "scherp": "gezakt"
     },

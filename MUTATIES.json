@@ -2719,31 +2719,36 @@
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 3
+      "gezakt": 3,
+      "scherp": "gezakt"
     },
     "salon-app.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 14
+      "gezakt": 14,
+      "scherp": "gezakt"
     },
     "salon-curatie.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 8
+      "gezakt": 8,
+      "scherp": "gezakt"
     },
     "salon-verplicht.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 6
+      "gezakt": 6,
+      "scherp": "gezakt"
     },
     "salonbron-fotobank.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 6
+      "gezakt": 6,
+      "scherp": "gezakt"
     },
     "salonviraal.test.js": {
       "soort": "puur",
@@ -2757,25 +2762,29 @@
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 7
+      "gezakt": 7,
+      "scherp": "gezakt"
     },
     "samendelen.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 3
+      "gezakt": 3,
+      "scherp": "gezakt"
     },
     "samenwerking.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 5
+      "gezakt": 5,
+      "scherp": "gezakt"
     },
     "satelliet.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 2
+      "gezakt": 2,
+      "scherp": "gezakt"
     },
     "scanner.test.js": {
       "soort": "puur",
@@ -2797,97 +2806,113 @@
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 1
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "scheiding.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 4
+      "gezakt": 4,
+      "scherp": "gezakt"
     },
     "schild.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 1
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "school.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 13
+      "gezakt": 13,
+      "scherp": "gezakt"
     },
     "schoolaanwezig.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 5
+      "gezakt": 5,
+      "scherp": "gezakt"
     },
     "schoolbeeld.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 7
+      "gezakt": 7,
+      "scherp": "gezakt"
     },
     "schoolbel.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 3
+      "gezakt": 3,
+      "scherp": "gezakt"
     },
     "schooldirectie.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 1
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "schoolenterprise.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 7
+      "gezakt": 7,
+      "scherp": "gezakt"
     },
     "schoolexcursie.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 3
+      "gezakt": 3,
+      "scherp": "gezakt"
     },
     "schoolgeld.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 9
+      "gezakt": 9,
+      "scherp": "gezakt"
     },
     "schoolhulplijn.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 3
+      "gezakt": 3,
+      "scherp": "gezakt"
     },
     "schoolkoppel.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 9
+      "gezakt": 9,
+      "scherp": "gezakt"
     },
     "schoolniveau.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 3
+      "gezakt": 3,
+      "scherp": "gezakt"
     },
     "schoolrest.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 10
+      "gezakt": 10,
+      "scherp": "gezakt"
     },
     "schooltaal.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 3
+      "gezakt": 3,
+      "scherp": "gezakt"
     },
     "schooltoets.test.js": {
       "soort": "server",

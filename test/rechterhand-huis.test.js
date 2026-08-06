@@ -32,7 +32,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop, elevateTier } = require('./helper');
+const { startServer, stop, elevateTier, binnenEenDag } = require('./helper');
 
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-rh-huis-'));
 let srv, base, lid, office;
@@ -148,6 +148,11 @@ test('attenties: de teller loopt over de jaargrens, en telt de eerstvolgende gel
     return (await rh('attenties', {})).body.relaties.find(r => r.naam === naam).id;
   };
 
+  /* dagmaand() rekent vanaf vandaag en de server telt de dagen vanaf ZIJN
+     vandaag. Loopt de suite over middernacht, dan schuift alles een dag op en
+     zakt de telling zonder dat er iets stuk is; binnenEenDag() doet de meting
+     dan een keer over. */
+  await binnenEenDag(async () => {
   const bijna = await zet('Wouter Sluis', { band: 'vriend', verjaardag: dagmaand(9) });
   const net = await zet('Hanne Bos', { band: 'familie', verjaardag: dagmaand(-3) });
   const beide = await zet('Otto Prins', { band: 'mentor', verjaardag: dagmaand(200), jubileum: dagmaand(15) });
@@ -207,6 +212,7 @@ test('attenties: de teller loopt over de jaargrens, en telt de eerstvolgende gel
     JSON.stringify(na.giften.map(g => g.wat)));
   assert.equal(na.giften[0].relatie, 'Hanne Bos', 'de overgebleven gift hangt aan Hanne');
   assert.equal(beide && na.relaties.some(x => x.id === beide), true, 'en Otto staat er gewoon nog');
+  });
 });
 
 /* ============================================================================

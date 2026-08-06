@@ -67,8 +67,21 @@ test('interesse (bezichtiging) kan alleen op een aan jou aangeboden pand', async
 });
 
 test('bezichtiging bevestigen met keyless: toegang werkt alleen in het venster', async () => {
-  // een moment in het verleden zodat het keyless-venster NU actief is (van = -30 min, tot = +120 min)
-  const moment = new Date(Date.now() - 5 * 60000).toISOString().slice(0, 16);
+  /* Een moment vlak in het verleden, zodat het keyless-venster NU actief is
+     (van = -30 min, tot = +120 min).
+
+     LET OP DE TIJDZONE, want hier ging het mis. Dit stond als
+     toISOString().slice(0,16): een UTC-tijd zonder de Z eraan. De server leest
+     zo'n string zonder tijdzone als LOKALE tijd, en dat is juist -- het veld dat
+     een makelaar invult (datetime-local) geeft precies die vorm in zijn eigen
+     tijd. Op een machine in zomertijd schoof het venster daardoor twee uur het
+     verleden in en was het bij aankomst net verlopen; in CI, dat op UTC draait,
+     is het verschil nul en viel het nooit op. Daarom bouwen we de string hier
+     in LOKALE tijd op, net zoals de browser dat doet. */
+  const d = new Date(Date.now() - 5 * 60000);
+  const tw = (n) => String(n).padStart(2, '0');
+  const moment = d.getFullYear() + '-' + tw(d.getMonth() + 1) + '-' + tw(d.getDate()) +
+    'T' + tw(d.getHours()) + ':' + tw(d.getMinutes());
   const bev = await api('/api/supplier/bezichtiging/beslis', { ref: global.__bez, actie: 'bevestigen', moment }, bezToken);
   assert.equal(bev.status, 200);
   // het lid ziet de bevestigde bezichtiging met actief keyless-venster

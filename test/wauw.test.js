@@ -7,7 +7,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer } = require('./helper');
+const { startServer, binnenEenDag } = require('./helper');
 
 let BASE, child;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-wauw-'));
@@ -49,15 +49,21 @@ test('de stemming: alleen uit de vaste 9+-lijst, en hij reist mee in de Pulse-fe
 });
 
 test('de verjaardagsglans: wie vandaag jarig is, krijgt overal een taartje', async () => {
-  const nu = new Date();
-  const jarigDatum = '1995-' + String(nu.getMonth() + 1).padStart(2, '0') + '-' + String(nu.getDate()).padStart(2, '0');
-  const jarig = await lid(jarigDatum);
-  const niet = await lid('1995-01-15' === jarigDatum.slice(0, 10) ? '1995-06-20' : '1995-01-15');
-  await raw('/member/pulse/post', { tekst: 'Vandaag is een mooie dag!' }, jarig);
-  const f = await json(await raw('/member/pulse/feed', { soort: 'ontdek' }, niet));
-  const post = f.feed.find(p => /mooie dag/.test(p.tekst));
-  assert.equal(post.jarig, true, 'de jarige krijgt de glans');
-  assert.ok(!f.feed.filter(p => p.eigen).some(p => p.jarig), 'wie niet jarig is, niet');
+  /* De jarige wordt hier gemaakt met de datum van NU, en de server beslist even
+     later of dat vandaag is. Loopt de suite over middernacht, dan zijn dat twee
+     verschillende dagen en zakt de toets zonder dat er iets stuk is;
+     binnenEenDag() doet hem dan een keer over. */
+  await binnenEenDag(async () => {
+    const nu = new Date();
+    const jarigDatum = '1995-' + String(nu.getMonth() + 1).padStart(2, '0') + '-' + String(nu.getDate()).padStart(2, '0');
+    const jarig = await lid(jarigDatum);
+    const niet = await lid('1995-01-15' === jarigDatum.slice(0, 10) ? '1995-06-20' : '1995-01-15');
+    await raw('/member/pulse/post', { tekst: 'Vandaag is een mooie dag!' }, jarig);
+    const f = await json(await raw('/member/pulse/feed', { soort: 'ontdek' }, niet));
+    const post = f.feed.find(p => /mooie dag/.test(p.tekst));
+    assert.equal(post.jarig, true, 'de jarige krijgt de glans');
+    assert.ok(!f.feed.filter(p => p.eigen).some(p => p.jarig), 'wie niet jarig is, niet');
+  });
 });
 
 test('het Moment van de week: het meest gewaardeerde bericht wordt gevierd', async () => {

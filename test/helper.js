@@ -331,6 +331,31 @@ function letOpFouten(page, bak) {
    zelfs als een geslaagde weigering. Spawn dan wel met stderr op 'pipe'. */
 function bewaakKind(kind) { if (kind && kind.stderr) luisterOpFouten(kind); return kind; }
 
+
+/* EEN BEWERING OVER "VANDAAG" GELDT MAAR BINNEN EEN KALENDERDAG.
+
+   Drie toetsen rekenden een datum uit (morgen, een verjaardag, "over negen
+   dagen") en lieten de server daarna hetzelfde uitrekenen. Loopt de run over
+   middernacht heen -- en een volle suite duurt twintig minuten, dus dat gebeurt
+   een keer per etmaal -- dan rekent de toets vanaf de oude dag en de server
+   vanaf de nieuwe. De uitslag was dan rood zonder dat er iets stuk was, en
+   precies dat maakt een rode uitslag waardeloos: je went eraan.
+
+   binnenEenDag() draait het werk en kijkt of de kalenderdag onderweg is
+   omgeslagen. Zo ja, dan draait hij het EEN keer over -- de tweede poging valt
+   niet nog eens op dezelfde grens, want die komt pas over vierentwintig uur
+   terug. Zo blijft de bewering net zo streng als hij was, zonder de dagelijkse
+   valse alarmbel. Slaat hij twee keer om, dan is er iets anders aan de hand en
+   hoort de toets gewoon te zakken. */
+async function binnenEenDag(werk) {
+  const dag = () => new Date().toISOString().slice(0, 10);
+  const voor = dag();
+  const uit = await werk();
+  if (dag() === voor) return uit;
+  return werk();   // de dag sloeg om tijdens de eerste poging: een keer overdoen
+}
+
 module.exports = { vrijePoort, startServer, stop, stopNet, elevateTier, kantoorAlsPersoon, letOpFouten, bewaakKind,
+  binnenEenDag,
   // testhaken om de strenge poort zelf te kunnen verifiëren
   _poort: { luisterOpFouten, serverUitzonderingen, isFataal: (r) => FATAAL.test(r) } };

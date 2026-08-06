@@ -28,32 +28,11 @@
 'use strict';
 
 const loonheffing = require('./loonheffing');
+const valuta = require('./valuta');
 
-const rondCenten = (x) => Math.round(x);
-
-/* De grondslag: de som van alle brutocomponenten die voor DEZE grondslag
-   meetellen. Niet "alles wat belast is" -- zie componenten.js: een component
-   kan wel voor de loonheffing tellen en niet voor de premies. */
-function grondslagVan(regels, componenten, welke, alleen) {
-  let som = 0;
-  for (const r of regels) {
-    const c = componenten[r.component];
-    if (!c || c.soort !== 'bruto') continue;
-    if (alleen && !alleen(c)) continue;
-    if ((c.grondslagen || []).includes(welke)) som += r.centen;
-  }
-  return som;
-}
-
-/* Een percentage uit het regelpakket toepassen, met de herkomst erbij. Het
-   pakket levert het getal; de motor levert alleen de vermenigvuldiging. Zo is
-   bij elk bedrag terug te zien welke regel eraan ten grondslag lag. */
-function pas(regelpakket, pad, grondslag) {
-  const deel = pad.split('.').reduce((o, k) => (o == null ? o : o[k]), regelpakket.regels);
-  if (typeof deel !== 'number' || !Number.isFinite(deel)) return null;
-  return { centen: rondCenten(grondslag * deel), tarief: deel, regel: pad,
-    versie: regelpakket.versie, grondslag };
-}
+/* De grondslagen en de tarieftoepassing staan in ./motor-grondslag.js -- zie
+   daar waarom ze bij elkaar horen. */
+const { grondslagVan, pas, rondCenten } = require('./motor-grondslag');
 
 /* ---------------------------------------------------------------------------
    bereken({ contract, periode, invoer, regelpakket, componenten })
@@ -161,6 +140,17 @@ function bereken({ contract, periode, invoer, regelpakket, componenten }) {
 
   return {
     periode: periode || null,
+    /* DE VALUTA STAAT OP DE STROOK. Elk bedrag hieronder is een geheel getal in
+       de KLEINSTE EENHEID van deze munt -- honderdsten in Nederland, hele yen
+       in Japan, duizendsten in Koeweit. De veldnamen zeggen "Centen" en dat is
+       een historische naam, geen natuurwet; zie ./valuta.js.
+
+       Zonder valuta op het pakket wordt EUR aangenomen, en dat staat er dan
+       ook bij (`aangenomen: true`). Een aanname die je kunt lezen is een
+       aanname die iemand kan tegenspreken; een stille aanname niet. */
+    valuta: { code: (regelpakket.valuta || 'EUR').toUpperCase(),
+      decimalen: valuta.decimalenVan(regelpakket.valuta || 'EUR'),
+      aangenomen: !regelpakket.valuta },
     regelpakket: { versie: regelpakket.versie, land: regelpakket.land, stand: regelpakket.stand },
     contract: { uurloonCenten: contract.uurloonCenten, soort: contract.soort || null,
       urenPerWeek: contract.urenPerWeek != null ? contract.urenPerWeek : null },

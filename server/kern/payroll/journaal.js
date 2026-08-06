@@ -28,6 +28,8 @@
    module waar per ongeluk geld uit komt. */
 'use strict';
 
+const valuta = require('./valuta');
+
 /* Waar de tegenrekeningen staan. Bewust met namen: een grootboekschema per
    land of per bedrijf hoort configureerbaar te zijn, maar de ROLLEN liggen
    vast, anders weet de boeking niet wat waar tegenover staat. */
@@ -108,6 +110,20 @@ function maakJournaal({ db, save, nu, crypto }) {
     if (!run) return { status: 404, error: 'Deze loonrun kennen we niet.' };
     if (run.stand !== 'definitief')
       return { status: 409, error: 'Een betaalbestand komt alleen uit een definitieve loonrun.' };
+
+    /* SEPA IS EURO, EN DAT IS GEEN DETAIL. Dit bestand draagt IBANs en bedragen
+       zonder muntaanduiding, want in SEPA is de munt de euro. Er yen in zetten
+       levert geen foutmelding op bij de bank maar een BETALING: de getallen
+       worden als euro's gelezen, en 300.000 yen wordt dan 300.000 euro.
+
+       Daarom stopt het hier. Een betaalbestand voor een andere munt is een
+       ander formaat (SWIFT, een lokale koppeling) en dat bouwen we als het er
+       is -- niet door dit bestand te laten alsof het klopt. */
+    const munt = ((run.stroken[0] || {}).strook || {}).valuta;
+    if (munt && !valuta.isSepa(munt.code))
+      return { status: 422, error: 'Deze loonrun staat in ' + munt.code +
+        ' en een SEPA-betaalbestand kent alleen euro\'s. Er is nog geen betaalweg voor ' + munt.code +
+        '; maak de betaling buiten RTG om en leg het bewijs vast.', valuta: munt.code };
 
     const posten = [];
     const zonderRekening = [];

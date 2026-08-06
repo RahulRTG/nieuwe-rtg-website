@@ -312,10 +312,33 @@ const bevPil = e => '<span class="pil' + (e === 'hoog' ? ' rood' : e === 'midden
    krijgt CENTEN, want de nieuwe loonlaag rekent in centen. Twee keer const eur
    in hetzelfde scriptblok is bovendien een SyntaxError -- dan draait er van dit
    scherm niets meer. */
-// met een KOMMA, net als eur() hierboven: "8,87" leest als een bedrag en
-// "8.87" als een meetwaarde. Dat verschil stond er niet en viel pas op toen het
-// minimumuurloon van Spanje als "€ 8.87" op het dekkingsscherm stond.
-const eurC = c => '€ ' + (c / 100).toFixed(2).replace('.', ',');
+/* BEDRAGEN IN HUN EIGEN MUNT. Dit heette eurC en zette overal een euroteken,
+   ook op een Japanse loonstrook -- en erger: het deelde altijd door honderd,
+   terwijl de yen geen onderverdeling heeft. Dat is een factor honderd in een
+   bedrag dat naar iemands rekening gaat.
+
+   Een bedrag is hier altijd een geheel getal in de KLEINSTE EENHEID van zijn
+   munt; de munt komt van de strook of de run. Zonder munt is EUR de terugval,
+   want dat is wat dit kantoor draait -- maar de strook zelf zegt dan ook dat er
+   is aangenomen (zie server/kern/payroll/valuta.js).
+
+   De KOMMA hoort bij de Nederlandse schrijfwijze en de MUNT bij het land van de
+   loonrun; dat zijn twee vragen. Een Nederlandse administrateur die een Japanse
+   strook bekijkt, leest Nederlandse cijfers met een Japanse munt. */
+const GEEN_DECIMALEN = ['BIF','CLP','DJF','GNF','ISK','JPY','KMF','KRW','PYG','RWF','UGX','VND','VUV','XAF','XOF','XPF'];
+const DRIE_DECIMALEN = ['BHD','IQD','JOD','KWD','LYD','OMR','TND'];
+const SYMBOOL = { EUR: '€', GBP: '£', JPY: '¥', USD: 'US$', CHF: 'CHF' };
+function bedrag(minor, code) {
+  const c = String(code || 'EUR').toUpperCase();
+  const d = GEEN_DECIMALEN.includes(c) ? 0 : DRIE_DECIMALEN.includes(c) ? 3 : 2;
+  const neg = minor < 0, abs = Math.abs(Math.round(Number(minor) || 0)), schaal = Math.pow(10, d);
+  const heel = Math.floor(abs / schaal), rest = abs - heel * schaal;
+  return (neg ? '-' : '') + (SYMBOOL[c] || c) + ' ' +
+    String(heel).replace(/\B(?=(\d{3})+(?!\d))/g, '.') + (d ? ',' + String(rest).padStart(d, '0') : '');
+}
+// de munt van de run die op dit moment op het scherm staat
+const runMunt = () => ((OSRUN && OSRUN.valuta) || 'EUR');
+const eurC = (c, code) => bedrag(c, code || runMunt());
 
 async function laadOs(){
   const d = await api('regels', { land: 'NL' });
@@ -436,8 +459,11 @@ function toonOsRun(run, bevindingen){
   $('#osStroken').innerHTML = stroken.length ? '<div class="sec">Stroken</div>' + stroken.map(s =>
     '<div class="regel"><b>' + esc(s.naam || ('#' + s.staffId)) + '</b>' +
     '<span class="kpi">' + (s.strook.regels || []).map(r =>
-      esc(r.naam) + (r.aantal != null ? ' ' + r.aantal + '×' : '') + ' ' + eurC(r.centen)).join(' · ') + '</span>' +
-    '<span class="r">netto ' + eurC(s.strook.nettoCenten) + '</span></div>').join('') : '';
+      esc(r.naam) + (r.aantal != null ? ' ' + r.aantal + '×' : '') + ' ' +
+      bedrag(r.centen, s.strook.valuta && s.strook.valuta.code)).join(' · ') + '</span>' +
+    '<span class="r">netto ' + bedrag(s.strook.nettoCenten, s.strook.valuta && s.strook.valuta.code) +
+    (s.strook.valuta && s.strook.valuta.aangenomen ? ' <span class="pil goud">munt aangenomen</span>' : '') +
+    '</span></div>').join('') : '';
 }
 
 $('#osKeur').addEventListener('click', async () => {
@@ -552,8 +578,8 @@ async function laadWereld(){
     (r.pakket ? ' · pakket ' + esc(r.pakket.versie) + ' t/m ' + esc(r.pakket.geldigTot || 'onbepaald') : '') +
     (r.bronnen.length ? ' · ' + r.bronnen.length + ' bron(nen)' : ' · geen bron') +
     (r.ontbreekt.length ? '<br>nog nodig: <b>' + r.ontbreekt.map(esc).join(', ') + '</b>' : '') +
-    (r.fiscaal ? '<br>wel bekend uit de fiscaal-tabel: ' +
-      (r.fiscaal.minimumUurloonCenten != null ? 'minimumuurloon ' + eurC(r.fiscaal.minimumUurloonCenten) : 'geen minimumuurloon') +
+    (r.fiscaal ? '<br>wel bekend uit de fiscaal-tabel (richtgetallen, omgerekend in euro\'s -- geen wettelijke waarden in de eigen munt): ' +
+      (r.fiscaal.minimumUurloonCenten != null ? 'minimumuurloon ' + bedrag(r.fiscaal.minimumUurloonCenten, 'EUR') : 'geen minimumuurloon') +
       (r.fiscaal.vakantiegeld != null ? ' · vakantiegeld ' + Math.round(r.fiscaal.vakantiegeld * 1000) / 10 + '%' : '') +
       (r.fiscaal.werkgeverslasten != null ? ' · werkgeverslasten ' + Math.round(r.fiscaal.werkgeverslasten * 1000) / 10 + '%' : '') : '') +
     '</span></div>').join('') || '<div class="leeg">Geen zaken gevonden.</div>';

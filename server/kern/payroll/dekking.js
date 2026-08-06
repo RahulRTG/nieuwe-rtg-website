@@ -56,55 +56,11 @@ function maakDekking({ db, save, nu, regelpakket, LANDEN, accounts }) {
     return [...per.values()].sort((a, b) => b.personeel - a.personeel || b.zaken - a.zaken);
   }
 
-  /* ---------- bronnen per land ----------
-     Een bron is een adres waar een regelpakket vandaan komt. Ze staan in de
-     opslag en niet in de code, want een land erbij hoort geen uitrol te zijn.
-     De bijwerkronde leest ze hier op (zie ./bijwerken.js). */
-  function bronbak() {
-    if (!db.data.payrollBronnen || typeof db.data.payrollBronnen !== 'object') db.data.payrollBronnen = {};
-    return db.data.payrollBronnen;
-  }
-  const bronnenVan = (land) => (bronbak()[norm(land)] || []).slice();
-  const alleBronnen = () => Object.keys(bronbak())
-    .flatMap(l => bronbak()[l].map(b => Object.assign({ land: l }, b)));
-
-  function zetBron(land, bron, door) {
-    const l = norm(land);
-    const url = String((bron && bron.url) || '').trim();
-    if (!/^https:\/\/[^\s]+$/i.test(url))
-      return { status: 400, error: 'Een bron is een https-adres dat een regelpakket als JSON teruggeeft.' };
-    if (!door) return { status: 400, error: 'Noteer wie deze bron toevoegt.' };
-    const rij = bronbak()[l] = bronbak()[l] || [];
-    const bestaand = rij.find(b => b.url === url);
-    if (bestaand) return { ok: true, ongewijzigd: true, bron: bestaand };
-    const b = { naam: String((bron && bron.naam) || url).slice(0, 80), url, door, at: tijd(),
-      laatst: null, laatsteFout: null };
-    rij.push(b);
-    save();
-    return { ok: true, bron: b };
-  }
-
-  function haalBronWeg(land, url) {
-    const l = norm(land);
-    const rij = bronbak()[l] || [];
-    const i = rij.findIndex(b => b.url === url);
-    if (i < 0) return { status: 404, error: 'Deze bron kennen we niet.' };
-    rij.splice(i, 1);
-    save();
-    return { ok: true };
-  }
-
-  /* De uitslag van een ronde terugschrijven, zodat op het scherm te zien is
-     wanneer een bron voor het laatst iets deed. Een bron die al drie maanden
-     zwijgt is zelf een bevinding. */
-  function noteerBron(land, url, uitslag) {
-    const rij = bronbak()[norm(land)] || [];
-    const b = rij.find(x => x.url === url);
-    if (!b) return;
-    b.laatst = tijd();
-    b.laatsteFout = (uitslag && uitslag.fout) || null;
-    save();
-  }
+  /* Het BRONNENREGISTER (welk adres levert het regelpakket van welk land) staat
+     in ./dekking-bronnen.js: een eigen onderwerp naast de vraag of een land kan
+     draaien, en dit bestand ging over de 10 KB. */
+  const bronnen = require('./dekking-bronnen')({ db, save, tijd });
+  const { bronnenVan, alleBronnen, zetBron, haalBronWeg, noteerBron } = bronnen;
 
   /* ---------- de dekking ---------- */
   /* Wat de fiscaal-tabel van dit land weet. Echte kennis, maar met een
@@ -115,6 +71,14 @@ function maakDekking({ db, save, nu, regelpakket, LANDEN, accounts }) {
     return {
       naam: f.naam || norm(land),
       minimumUurloonCenten: Number.isFinite(f.uurloonMin) ? Math.round(f.uurloonMin * 100) : null,
+      /* IN EURO'S, EN DAT MOET ERBIJ. De fiscaal-tabel noteert het minimumloon
+         van elk land omgerekend naar euro's -- Japan staat er op 6,70 terwijl
+         de wet daar in yen spreekt. Als richtgetal is dat bruikbaar; als
+         loonregel is het onbruikbaar, want het beweegt met de wisselkoers mee
+         en een loonstrook mag dat niet. Zonder dit veld leest een scherm het
+         als de wettelijke waarde, en dan gaat iemand ermee rekenen. */
+      valutaVanBedragen: 'EUR',
+      let: 'De bedragen hieronder staan omgerekend in euro\'s en zijn richtgetallen, geen wettelijke waarden in de eigen munt. Een loonrun draait er niet op.',
       vakantiegeld: Number.isFinite(f.vakantiegeld) ? f.vakantiegeld : null,
       werkgeverslasten: Number.isFinite(f.lasten) ? f.lasten : null,
       aangifte: f.aangifte || null

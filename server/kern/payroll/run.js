@@ -128,7 +128,12 @@ function maakRun({ db, save, nu, crypto, motor, regelpakket, componenten }) {
     return { ok: true, stand: run.stand };
   }
 
+  /* De VALUTA gaat mee in de samenvatting. Zonder haar zet een scherm er een
+     euroteken voor -- ook op een Japanse loonrun -- en deelt het door honderd
+     terwijl de yen geen onderverdeling heeft. Dat is een factor honderd in een
+     bedrag dat naar iemands rekening gaat. */
   const kort = (r) => ({ id: r.id, code: r.code, zaak: r.zaak, periode: r.periode, stand: r.stand,
+    valuta: ((r.stroken[0] || {}).strook || {}).valuta ? r.stroken[0].strook.valuta.code : null,
     regelversie: r.regelversie, regelstand: r.regelstand, correctieVan: r.correctieVan || null,
     reden: r.reden || null, aantal: r.stroken.length, totaalNettoCenten: r.totaalNettoCenten,
     totaalVerschilCenten: r.totaalVerschilCenten, goedkeuringen: r.goedkeuringen, at: r.at });

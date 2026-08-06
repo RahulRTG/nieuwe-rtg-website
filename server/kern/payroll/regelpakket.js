@@ -35,35 +35,8 @@
    ./jaargangen/ voor de meegeleverde pakketten en hun stand. */
 'use strict';
 
-const loonheffing = require('./loonheffing');
-
-/* De velden die een pakket moet dragen om bruikbaar te zijn. Bewust met NAMEN
-   en niet "alles wat er in staat": een ontbrekend tarief hoort een keuringsfout
-   te zijn, geen stille nul. */
-const VEREIST = [
-  'minimumUurloon',      // per leeftijdsgroep, in centen
-  'loonheffing',         // de tabel(len)
-  'premies',             // werknemersverzekeringen (werkgeverslasten)
-  'zvw',                 // inkomensafhankelijke bijdrage Zvw
-  'vakantiegeld'         // opbouwpercentage
-];
-
-/* Grenzen waarbinnen een tarief aannemelijk is. Niet om precies te zijn maar om
-   het onmogelijke tegen te houden: een loonheffing van 370% of een minimumloon
-   van 3 cent is geen tarief maar een fout in de bron of in het inlezen. */
-const AANNEMELIJK = {
-  /* De ondergrens stond op 500 cent, en dat was fout -- gevonden doordat de
-     keuring de eigen meegeleverde jaargang afwees. Het minimumJEUGDloon ligt
-     veel lager: een vijftienjarige zit rond de 30% van het volwassen tarief,
-     dus rond de 450 cent. Een grens die echte tarieven tegenhoudt is geen
-     controle maar een blokkade, en dan zet de eerste de beste hem uit.
-
-     200 cent laat elk werkelijk jeugdloon door en houdt nog steeds tegen wat
-     een fout in de bron of in het inlezen is (een tarief van 3 cent, of een
-     bedrag dat per ongeluk in euro's in plaats van centen staat). */
-  minimumUurloonCenten: [200, 10000],
-  percentage: [0, 0.75]
-};
+/* De keuring woont in ./regelpakket-keuring.js; zie daar waarom. */
+const { keur, VEREIST, AANNEMELIJK } = require('./regelpakket-keuring');
 
 const isDatum = (d) => /^\d{4}-\d{2}-\d{2}$/.test(String(d || ''));
 
@@ -81,47 +54,9 @@ function maakRegelpakket({ db, save, nu }) {
     return b[l];
   };
 
-  /* ---------- keuren ---------- */
-  /* Levert een lijst bezwaren. Leeg = goed. Nooit een boolean: wie een pakket
-     afkeurt hoort te kunnen zeggen waarom, anders staat de beheerder met een
-     rood kruis en geen richting. */
-  function keur(pakket) {
-    const bez = [];
-    if (!pakket || typeof pakket !== 'object') return ['Geen pakket ontvangen.'];
-    if (!/^[A-Z]{2}$/.test(String(pakket.land || ''))) bez.push('Land ontbreekt of is geen landcode van twee letters.');
-    if (!isDatum(pakket.geldigVan)) bez.push('geldigVan ontbreekt of is geen datum (JJJJ-MM-DD).');
-    if (pakket.geldigTot && !isDatum(pakket.geldigTot)) bez.push('geldigTot is geen datum (JJJJ-MM-DD).');
-    if (pakket.geldigTot && pakket.geldigTot < pakket.geldigVan) bez.push('geldigTot ligt voor geldigVan.');
-    if (!pakket.versie || typeof pakket.versie !== 'string') bez.push('versie ontbreekt.');
-
-    const r = pakket.regels;
-    if (!r || typeof r !== 'object') { bez.push('regels ontbreken.'); return bez; }
-    for (const veld of VEREIST) if (r[veld] == null) bez.push('regel "' + veld + '" ontbreekt.');
-
-    // aannemelijkheid: alleen wat er is, en alleen wat een getal hoort te zijn
-    const [minL, maxL] = AANNEMELIJK.minimumUurloonCenten;
-    if (r.minimumUurloon && typeof r.minimumUurloon === 'object') {
-      for (const groep of Object.keys(r.minimumUurloon)) {
-        const c = r.minimumUurloon[groep];
-        if (typeof c !== 'number' || !Number.isFinite(c)) bez.push('minimumUurloon.' + groep + ' is geen getal.');
-        else if (c < minL || c > maxL) bez.push('minimumUurloon.' + groep + ' (' + c + ' cent) is niet aannemelijk.');
-      }
-    }
-    /* De loonheffingstabel keurt zichzelf (./loonheffing.js): schijven die niet
-       oplopen, een korting met een onmogelijk deel, een laatste schijf met een
-       bovengrens. Die kennis hoort bij de tabel en niet hier -- anders staat er
-       op twee plekken wat een geldige tabel is, en dan lopen ze uit elkaar. */
-    if (r.loonheffing != null) for (const b of loonheffing.keurTabel(r.loonheffing)) bez.push(b);
-
-    const [minP, maxP] = AANNEMELIJK.percentage;
-    for (const veld of ['vakantiegeld', 'zvw']) {
-      const p = r[veld];
-      if (p == null) continue;
-      if (typeof p !== 'number' || !Number.isFinite(p)) bez.push(veld + ' is geen getal.');
-      else if (p < minP || p > maxP) bez.push(veld + ' (' + p + ') is niet aannemelijk als deel van 1.');
-    }
-    return bez;
-  }
+  /* De keuring staat in ./regelpakket-keuring.js: een eigen onderwerp (WANNEER
+     is iets een geldig pakket) naast dit bestand (hoe bewaar en vind je er
+     een), en dit bestand ging over de 10 KB. */
 
   /* ---------- binnenhalen ---------- */
   /* Een pakket toevoegen. Komt het door de keuring, dan komt het binnen met de
@@ -142,6 +77,7 @@ function maakRegelpakket({ db, save, nu }) {
     const opgenomen = {
       land: String(pakket.land).toUpperCase(),
       versie: String(pakket.versie),
+      valuta: pakket.valuta ? String(pakket.valuta).toUpperCase() : null,
       geldigVan: pakket.geldigVan,
       geldigTot: pakket.geldigTot || null,
       regels: pakket.regels,
@@ -191,7 +127,7 @@ function maakRegelpakket({ db, save, nu }) {
   const opVersie = (land, versie) => lijstVan(land).find(p => p.versie === versie) || null;
   const alle = (land) => lijstVan(land).map(p => ({ versie: p.versie, geldigVan: p.geldigVan,
     geldigTot: p.geldigTot, stand: p.stand, bron: p.bron, goedgekeurdDoor: p.goedgekeurdDoor,
-    goedgekeurdOp: p.goedgekeurdOp }));
+    goedgekeurdOp: p.goedgekeurdOp, valuta: p.valuta || null }));
 
   return { keur, neemOp, merkAan, opDatum, opVersie, alle, VEREIST };
 }

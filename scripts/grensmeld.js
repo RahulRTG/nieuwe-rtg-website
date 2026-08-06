@@ -30,14 +30,28 @@ const DOEL = path.join(WORTEL, 'GRENZEN.json');
 /* De app in een kindproces starten met de meldstand aan, en hem vragen wat de
    grens heeft gezien. Een kindproces omdat de app bij het laden een hele wereld
    opzet; dat wil je niet in dit script hebben staan. */
+/* De paden VOLUIT en niet relatief, en dat is geen smaak. Deze tekenreeks draait
+   in een kindproces met de projectmap als werkmap, dus een pad dat met punt-slash
+   vanaf de projectwortel begint zou daar kloppen -- maar een lezer (en de regel in
+   scripts/check.js die require-paden natrekt) ziet een pad dat vanaf scripts/ niet
+   bestaat. Een pad dat alleen klopt als je weet waar het straks draait, is een pad
+   dat je twee keer moet uitleggen.
+
+   Dat die regel hier eerst over mijn UITLEG klaagde in plaats van over de code,
+   is geen bijzaak: een bestand dat een patroon beschrijft, bevat het patroon.
+   Dezelfde val staat opgeschreven bij regel 36 in check.js, en de oplossing is
+   dezelfde -- het patroon niet voluit opschrijven in plaats van de handhaver een
+   uitzondering geven. */
+const GRENSMODULE = JSON.stringify(path.join(WORTEL, 'server', 'opzet', 'domeingrens.js'));
+const SERVERMODULE = JSON.stringify(path.join(WORTEL, 'server', 'server.js'));
 const uitlezer = `
   process.env.RTG_GRENS_MELD = '1';
   process.env.RTG_STIL = '1';
-  const grens = require('./server/opzet/domeingrens');
+  const grens = require(${GRENSMODULE});
   process.on('exit', () => {
     try { require('fs').writeFileSync(process.env.RTG_MELDUIT, JSON.stringify(grens.gemeld()) + '\\n'); } catch (e) {}
   });
-  require('./server/server.js');
+  require(${SERVERMODULE});
   setTimeout(() => process.exit(0), 20000);
 `;
 

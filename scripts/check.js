@@ -316,6 +316,15 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
      WAARSCHUWEN hier dus, ze breken de keuring niet -- anders staat het licht
      voor iedereen op rood voor iets wat gepland is. De lijst hoort te krimpen. */
   const NOG = new Set([
+    /* public/shared/media.js stond op 10238 bytes -- TWEE onder de grens -- en
+       ging erover zodra er een gemeten oorzaak bij de foutentabel kwam
+       (NotSupportedError). Hij hoort in NOG en niet in MAG: hij is GEEN ondeelbaar
+       stuk, er zit een duidelijke naad tussen de diagnose (reden/NAMEN/vraag) en
+       de zichtbare melding. Opknippen is wel echte bedrading: 21 pagina's laden
+       nu een module en een blad, en keuringsregel 38 rekent dat na, dus er komt
+       een tweede script bij dat overal mee moet. Dat doe je een voor een met de
+       toetsen ernaast en niet in de staart van een ronde. */
+    'public/shared/media.js',
     // server/accounts/users.js is opgeknipt: het ledendossier, de verificatie, de
     // kantoorlijsten en de vergetelheid staan nu in server/accounts/dossier.js
     'server/kern/journalistiek.js',

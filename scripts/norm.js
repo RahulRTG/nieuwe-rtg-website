@@ -320,8 +320,24 @@ function telOngeijkt(ijkBron, extraSleutels) {
      telde nul, terwijl er dertien stonden -- een meter die nul teruggeeft
      omdat zijn patroon niet past, is precies de vorm waar deze meter over
      gaat. Redenen bevatten nooit geneste accolades, dus [^{}] volstaat. */
+  /* EN DE TEKENREEKSEN ERUIT, want anders telt deze meter zijn EIGEN IJKING mee.
+
+     Dat is precies wat er gebeurde. In de registratie staat bij `metersOngeijkt`
+     een proef die telOngeijkt een VERZONNEN registratie voedt, en die verzonnen
+     tekst bevat letterlijk `p99Ms: { reden: '...' }`. Die staat in het bestand
+     vóór de echte regel `p99Ms: { proef: ... }`, en .exec() pakt de eerste
+     treffer -- dus meldde de meter p99Ms als ongeijkt terwijl hij een proef
+     heeft. Uitkomst: 2 in plaats van 1, en de echte proef werd nooit gezien.
+
+     Het is de derde keer dat een teller in dit huis over zijn eigen ijking
+     struikelt (zie de kop van de skip-teller hierboven: eerst commentaar, toen
+     een tekenreeks). De oplossing is dezelfde en staat hier daarom niet als
+     uitzondering maar als dezelfde wringer: wat tussen aanhalingstekens staat is
+     TEKST en geen code, en een teller die code telt hoort er niet in te kijken. */
+  const zonderTekst = String(blok[1])
+    .replace(/'(?:\\.|[^'\\\n])*'|"(?:\\.|[^"\\\n])*"|`(?:\\.|[^`\\])*`/g, m => m.replace(/[^\n]/g, ' '));
   return sleutels.filter(s => {
-    const m = new RegExp('(^|[^a-zA-Z0-9])' + s + '\\s*:\\s*\\{([^{}]*)\\}').exec(blok[1]);
+    const m = new RegExp('(^|[^a-zA-Z0-9])' + s + '\\s*:\\s*\\{([^{}]*)\\}').exec(zonderTekst);
     return m && /reden:/.test(m[2]);
   }).length;
 }

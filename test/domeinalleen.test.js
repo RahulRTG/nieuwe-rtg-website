@@ -70,14 +70,30 @@ function vraag(port, pad, methode) {
   });
 }
 
-async function wachtTotOp(port, uitInfo, tot = 25000) {
+/* WACHTEN OP HET PAD DAT DE TOETS ECHT GEBRUIKT, en niet op de wortel.
+
+   Hier stond eerst een wacht op GET '/'. Dat was fout, en het kwam als flake
+   boven in een volle suite: 'socket hang up' na 339 ms op /api/member/apps,
+   terwijl de wacht net daarvoor tevreden was. De wortel is een statisch bestand
+   en zegt alleen "express luistert" -- niet dat het verzoek dat deze toets stelt
+   ook al kan worden afgehandeld. Wachten op een teken dat er NAAST staat is
+   hetzelfde soort fout als wachten op de klok (eerlijkheidspunt 6.5): het houdt
+   stand op een rustige machine en niet onder belasting.
+
+   Nu wacht hij op precies de vraag die erna komt, met dezelfde methode. Sterft
+   de server, dan loopt hij af met de opstartlog erbij in plaats van met een
+   ECONNRESET waar niemand iets aan heeft. */
+async function wachtTotOp(port, uitInfo, pad, methode, tot = 25000) {
   const eind = Date.now() + tot;
+  let laatste = null;
   while (Date.now() < eind) {
     if (uitInfo.fataal) throw new Error('server crashte bij opstart:\n' + uitInfo.log.slice(-2000));
-    try { const r = await vraag(port, '/'); if (r.status) return r; } catch (e) { /* nog niet op */ }
+    try { const r = await vraag(port, pad, methode); if (r.status) return r; }
+    catch (e) { laatste = e; }
     await new Promise(r => setTimeout(r, 250));
   }
-  throw new Error('server werd niet bereikbaar binnen ' + tot + 'ms\n' + uitInfo.log.slice(-2000));
+  throw new Error('server antwoordde niet op ' + (methode || 'GET') + ' ' + pad + ' binnen ' + tot +
+    'ms (laatste fout: ' + (laatste && laatste.message) + ')\n' + uitInfo.log.slice(-2000));
 }
 
 function boot(port, dataDir, domeinen) {
@@ -97,11 +113,11 @@ function boot(port, dataDir, domeinen) {
 
 /* Opstarten met een gokte poort, net als test/boot-smoke.test.js: de suite heeft
    tientallen servers naast elkaar en een botsing is geen breuk. */
-async function opgestart(dataDir, domeinen) {
+async function opgestart(dataDir, domeinen, pad, methode) {
   for (let poging = 0; ; poging++) {
     const port = 36000 + Math.floor(Math.random() * 2000);
     const { kind, uitInfo } = boot(port, dataDir, domeinen);
-    try { await wachtTotOp(port, uitInfo); return { kind, uitInfo, port }; }
+    try { await wachtTotOp(port, uitInfo, pad, methode); return { kind, uitInfo, port }; }
     catch (e) {
       kind.kill('SIGKILL');
       if (poging < 3 && /EADDRINUSE/.test(String(e.message))) continue;
@@ -114,7 +130,7 @@ test('met RTG_DOMAINS=member draait alleen member -- de andere domeinen zijn er 
   const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-alleen-'));
   let s = null;
   try {
-    s = await opgestart(dataDir, 'member');
+    s = await opgestart(dataDir, 'member', '/api/member/apps', 'POST');
 
     const eigen = await vraag(s.port, '/api/member/apps', 'POST');
     assert.notEqual(eigen.status, 404,
@@ -152,7 +168,7 @@ test('DE TEGENPROEF: zonder RTG_DOMAINS is supplier er wel', async () => {
   const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-alles-'));
   let s = null;
   try {
-    s = await opgestart(dataDir, null);
+    s = await opgestart(dataDir, null, '/api/supplier/login', 'POST');
     const r = await vraag(s.port, '/api/supplier/login', 'POST');
     assert.notEqual(r.status, 404,
       'met alle domeinen hoort supplier/login te bestaan; 404 betekent dat de 404 hierboven niets zei over de domeinkeuze');

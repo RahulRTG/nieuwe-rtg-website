@@ -60,7 +60,13 @@ const EIGEN_SLEUTEL = [
   { app: 'foundation/club', eist: /clubcode/i },
   { app: 'foundation/partner', eist: /raadcode|stadspartner/i },
   { app: 'foundation/beroepen', eist: /beroepen-?bibliotheek/i },
-  { app: 'foundation/magazine', eist: /rtfoundation|magazine|30%/i }
+  { app: 'foundation/magazine', eist: /rtfoundation|magazine|30%/i },
+  /* werk.html erbij op 6 augustus. scripts/schermen.js noemde hem als een van de
+     vier schermen waar geen enkele toets de weg van aflegt, en hij hoort in deze
+     lijst en niet in een eigen bestand: het RTG Werk OS draait op een
+     WERKRUIMTECODE plus een lid-token, dus precies de vorm waar deze toets voor
+     bestaat -- niet "gaat hij open" maar "zegt hij welke sleutel hij mist". */
+  { app: 'werk', eist: /werkruimte|lid-token/i }
 ];
 
 /* De twee stubs, met waar ze heen horen te wijzen. `kantoor=1` is geen detail:
@@ -115,7 +121,10 @@ async function opstelling() {
   return { browser, page, fouten };
 }
 
-test('negen schermen met een eigen sleutel zeggen WELKE sleutel ze missen',
+/* Het AANTAL komt uit de lijst en staat niet in de tekst. Er stond "negen" toen
+   het er negen waren, en bij de tiende zou die kop stil hebben gelogen -- precies
+   de soort verkeerde bewering die dit huis met een handhaver bewaakt. */
+test('elk scherm met een eigen sleutel zegt WELKE sleutel het mist (' + EIGEN_SLEUTEL.length + ')',
   { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -130,7 +139,7 @@ test('negen schermen met een eigen sleutel zeggen WELKE sleutel ze missen',
       if (r.tekst.length < 60) { stuk.push(s.app + ': bijna leeg (' + r.tekst.length + ' tekens)'); continue; }
       if (!s.eist.test(r.tekst)) stuk.push(s.app + ': noemt zijn sleutel niet -- ' + r.tekst.slice(0, 130));
     }
-    assert.deepEqual(stuk, [], 'de negen wijzen naar hun eigen sleutel:\n  ' + stuk.join('\n  '));
+    assert.deepEqual(stuk, [], 'alle ' + EIGEN_SLEUTEL.length + ' wijzen naar hun eigen sleutel:\n  ' + stuk.join('\n  '));
   } finally {
     if (browser) await browser.close();
     child.kill();

@@ -119,9 +119,15 @@
 
   /* De DOMException-namen die browsers echt geven. OverconstrainedError telt als
      "geen apparaat": een camera die aan geen eis voldoet is er voor de gebruiker
-     niet. */
+     niet.
+
+     NotSupportedError staat erbij omdat hij is GEZIEN en niet omdat een lijst hem
+     noemt: Chromium geeft die naam bij een geweigerde toestemming met een
+     nepapparaat (nagemeten in drie standen; zie test/camerascherm.e2e.js). Voor
+     de gebruiker is dat geweigerd. */
   var NAMEN = {
     NotAllowedError: 'geweigerd', PermissionDeniedError: 'geweigerd', SecurityError: 'onveilig',
+    NotSupportedError: 'geweigerd',
     NotFoundError: 'geenapparaat', DevicesNotFoundError: 'geenapparaat', OverconstrainedError: 'geenapparaat',
     NotReadableError: 'bezet', TrackStartError: 'bezet', AbortError: 'afgebroken'
   };

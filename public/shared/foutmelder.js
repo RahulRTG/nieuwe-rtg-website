@@ -88,6 +88,10 @@
            tegels worden gemaat met calc(var(--e) * ...), dus valt die eenheid
            weg, dan staan ze er wel maar zijn ze nul breed. Tellen alleen zou
            dat verschil niet zien. */
+        /* Wat er MIDDEN op het scherm staat: de enige vraag die telt als
+           iemand zegt dat hij niets ziet. */
+        ' | midden=' + (function () { var m = document.elementFromPoint(Math.round(innerWidth / 2), Math.round(innerHeight / 2));
+          return m ? (m.tagName + (m.className ? '.' + String(m.className).split(' ')[0] : '')) : 'niets'; })() +
         ' | tegelbreed ' + (function () { var t = document.querySelector('.os-app'); return t ? Math.round(t.getBoundingClientRect().width) : -1; })() +
         ' | e=' + (css.getPropertyValue('--e') || '(leeg)').trim() +
         ' | dvh=' + (CSS && CSS.supports && CSS.supports('height', '100dvh')) +

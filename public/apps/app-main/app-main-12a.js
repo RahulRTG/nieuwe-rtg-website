@@ -131,12 +131,31 @@
        niets en weet niemand hiervan. */
     setTimeout(() => {
       try {
+        /* WAT STAAT ER WERKELIJK MIDDEN OP HET SCHERM?
+
+           De eerste versie van deze controle keek of er tegels BESTONDEN, en
+           dat was te nauw: bij de melder stonden ze er wel en zag hij ze toch
+           niet, dus zweeg de controle precies in het geval waarvoor hij bedoeld
+           was. Bestaan is niet hetzelfde als zichtbaar zijn -- inhoud kan naast
+           het scherm staan, nul hoog zijn, of achter iets anders liggen.
+
+           elementFromPoint op het midden van het venster stelt de enige vraag
+           die telt: kijkt de gebruiker naar iets van de app, of naar niets? */
         const thuis = document.querySelector('.os-thuisscherm');
         const tegels = document.querySelectorAll('.os-app').length;
         const hoog = thuis ? thuis.getBoundingClientRect().height : 0;
-        if ((!tegels || hoog < 40) && window.RTGFoutmelder && RTGFoutmelder.meetLeeg) {
-          RTGFoutmelder.meetLeeg(tegels ? 'thuisscherm zonder hoogte' : 'geen tegels');
-        }
+        const midden = document.elementFromPoint(Math.round(innerWidth / 2), Math.round(innerHeight / 2));
+        const leegMidden = !midden || midden === document.body || midden === document.documentElement;
+        const buitenBeeld = thuis && (() => { const b = thuis.getBoundingClientRect();
+          return b.bottom <= 0 || b.top >= innerHeight || b.width < 10; })();
+
+        let reden = null;
+        if (!tegels) reden = 'geen tegels';
+        else if (hoog < 40) reden = 'thuisscherm zonder hoogte';
+        else if (buitenBeeld) reden = 'thuisscherm buiten beeld';
+        else if (leegMidden) reden = 'niets in het midden van het scherm';
+
+        if (reden && window.RTGFoutmelder && RTGFoutmelder.meetLeeg) RTGFoutmelder.meetLeeg(reden);
       } catch (e) { /* een controle mag nooit de oorzaak van iets worden */ }
     }, 2500);
     if ((rtf.gekoppeld || []).length) ensurePush(false); // stil vernieuwen als het al aan staat

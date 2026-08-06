@@ -40,8 +40,13 @@
   .stip{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--soft);margin-right:0.4rem;}
   .stip.ok{background:var(--groen);} .stip.let{background:var(--gold);} .stip.uit{background:var(--rood);}
   .uitleg{font-size:0.72rem;color:var(--soft);margin-top:0.3rem;}
-  .balk{display:flex;align-items:center;gap:0.4rem;font-size:0.7rem;color:var(--soft);margin:0.15rem 0;}
-  .balk .meter{flex:1;height:4px;background:var(--line);border-radius:2px;overflow:hidden;}
+  /* Een raster en geen flexrij: met flex werd de meter tussen de factornaam en
+     een lange uitleg platgedrukt tot een streepje van twintig pixels, en dan
+     zeggen alle balkjes even veel -- namelijk niets. Vaste kolommen voor naam en
+     meter, de uitleg mag wikkelen in wat overblijft. */
+  .balk{display:grid;grid-template-columns:6.5rem 5rem 1fr;align-items:center;gap:0.5rem;
+    font-size:0.7rem;color:var(--soft);margin:0.2rem 0;}
+  .balk .meter{height:5px;background:var(--line);border-radius:3px;overflow:hidden;}
   .balk .meter i{display:block;height:100%;background:var(--gold);}
   .melding{position:fixed;left:50%;bottom:1rem;transform:translateX(-50%);background:var(--card2);
     border:1px solid var(--line);border-radius:999px;padding:0.55rem 1rem;font-size:0.8rem;max-width:88vw;
@@ -155,11 +160,11 @@
       kop.appendChild(naam); kop.appendChild(knop); d.appendChild(kop);
       for (const f of k.factoren) {
         const b = document.createElement('div'); b.className = 'balk';
-        const n = document.createElement('span'); n.style.minWidth = '7rem'; n.textContent = f.naam;
+        const n = document.createElement('span'); n.textContent = f.naam;
         const m = document.createElement('span'); m.className = 'meter';
         const i = document.createElement('i'); i.style.width = (f.max ? Math.round(f.punten / f.max * 100) : 0) + '%';
         m.appendChild(i);
-        const u = document.createElement('span'); u.style.minWidth = '13rem'; u.textContent = f.uitleg;
+        const u = document.createElement('span'); u.textContent = f.uitleg;
         b.appendChild(n); b.appendChild(m); b.appendChild(u); d.appendChild(b);
       }
       waar.appendChild(d);

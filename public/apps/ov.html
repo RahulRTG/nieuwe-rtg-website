@@ -39,11 +39,14 @@
   label{display:block;font-size:0.7rem;letter-spacing:0.08em;text-transform:uppercase;color:var(--soft);margin:0.75rem 0 0.3rem;}
   .duo{display:grid;grid-template-columns:1fr 1fr;gap:0.6rem;}
   /* de tabbladen: rit, ov, pendel */
-  .tabs{display:flex;gap:0.4rem;padding:0 1.1rem;max-width:640px;margin:0 auto 0.3rem;}
-  .tabs button{flex:1;background:none;border:none;border-bottom:2px solid transparent;color:var(--soft);
-    padding:0.6rem 0.2rem;font-size:0.82rem;}
-  .tabs button[aria-selected="true"]{color:var(--txt);border-bottom-color:var(--gold);}
-  .tabs button:focus-visible{outline:2px solid var(--gold);outline-offset:-2px;}
+  /* GEEN eigen tabvormgeving hier. De UI-kit (shared/rtg-ui.css) maakt van een
+     `.tabs`-rij met kale knoppen een pilrij, en van `.aan` de actieve pil --
+     dat is de vormtaal van het huis en die wint ook op specificiteit
+     (`body.rtg-stijl .tabs > button`). Er een tweede tabstijl naast zetten
+     levert alleen een rij op die er net anders uitziet dan elke andere rij in
+     het OS. Wat hier overblijft is de plaatsing. */
+  .tabs{padding:0 1.1rem;max-width:640px;margin:0 auto 0.3rem;}
+  .tabs > button:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
   /* de twee snelle check-ins: twee grote rustige vlakken */
   .snel{display:grid;grid-template-columns:1fr 1fr;gap:0.7rem;margin-top:0.8rem;}
   .snel button{display:flex;flex-direction:column;align-items:center;gap:0.4rem;background:var(--card);
@@ -98,7 +101,7 @@
   <span class="badge">Alles in &eacute;&eacute;n &middot; live gps</span>
 </header>
 <nav class="tabs" role="tablist" aria-label="Soort vervoer">
-  <button id="tabRit" type="button" role="tab" aria-selected="true" aria-controls="vRit">Een rit</button>
+  <button id="tabRit" class="aan" type="button" role="tab" aria-selected="true" aria-controls="vRit">Een rit</button>
   <button id="tabOv" type="button" role="tab" aria-selected="false" aria-controls="vOv">Openbaar vervoer</button>
   <button id="tabPendel" type="button" role="tab" aria-selected="false" aria-controls="vPendel">Bedrijfspendel</button>
 </nav>
@@ -156,10 +159,13 @@
           vervoer hier (nog) niet beschikbaar.</p>
         <div id="aanvraagLijst"></div>
       </div>
-
-      <h2>Uw ritten</h2>
-      <div class="kaart"><div id="ritHistorie"><p class="stil">Nog geen ritten.</p></div></div>
     </div>
+
+    <!-- De geschiedenis staat BUITEN het boekblok, want die verdwijnt niet als
+         er een rit loopt. Anders staart iemand tijdens het wachten naar een
+         leeg scherm met een kaartje bovenin. -->
+    <h2>Uw ritten</h2>
+    <div class="kaart"><div id="ritHistorie"><p class="stil">Nog geen ritten.</p></div></div>
   </section>
 
   <!-- ================= openbaar vervoer ================= -->
@@ -257,6 +263,7 @@
     for (const [t, v] of TABS) {
       const aan = t === welke;
       $(t).setAttribute('aria-selected', aan ? 'true' : 'false');
+      $(t).classList.toggle('aan', aan);   // de UI-kit tekent de actieve pil op .aan
       $(v).classList.toggle('weg', !aan);
     }
     if (welke === '#tabOv') verversOv();

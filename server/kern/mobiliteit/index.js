@@ -19,7 +19,7 @@
      plekken                     vertrek en bestemming uit RTG zelf (horeca,
                                  hotels, haltes) in plaats van een eigen adresboek
      matching                    toewijzing met instelbare wegingen en uitleg
-     dispatch                    het scherm van de planner
+     dispatch + dispatch-acties  het scherm van de planner: eerst kijken, dan doen
      pendel + pendel-rooster     bedrijfsvervoer met een dienstregeling
 
    DE BOUWVOLGORDE ZIT IN HET REGISTER, NIET IN DE CODE. Taxi (ride_hailing)
@@ -58,6 +58,7 @@ function maakMobiliteit(state) {
   Object.assign(ctx, require('./voortgang')(ctx));
   Object.assign(ctx, require('./matching')(ctx));
   Object.assign(ctx, require('./dispatch')(ctx));
+  Object.assign(ctx, require('./dispatch-acties')(ctx));   // leunt op poolVan uit ./dispatch
   Object.assign(ctx, require('./pendel')(ctx));
   Object.assign(ctx, require('./pendel-rooster')(ctx));
 

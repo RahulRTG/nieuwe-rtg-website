@@ -5,8 +5,12 @@ module.exports = (wctx) => {
   const { kern } = wctx;
   // alleen wat deze wervingsmodule echt gebruikt (de rest van de gedeelde kern
   // hoort hier niet thuis; opgeruimd om dode destructuring te vermijden)
-  const { DEMO, accounts, app, crypto, db, logActivity, loginFails, noteFailedTry,
+  const { DEMO, accounts, app, db, logActivity, loginFails, noteFailedTry,
     notifySupplier, save, schoon, supplierAuth, tooManyTries } = kern;
+  /* De uitnodiging zelf -- maken, terugvinden, en er iemand mee verbinden --
+     staat in ./uitnodiging.js. Hier staan de routes eromheen. */
+  const uitnodiging = require('./uitnodiging')({ kern });
+  const { invitesVan, findSupplierByName, maakInvite, wervingsLink, verbindLid } = uitnodiging;
 app.post('/api/supplier/staff/add', supplierAuth, async (req, res) => {
   if (!req.actor.manager) return res.status(403).json({ error: 'Alleen een manager kan personeel toevoegen.' });
   // Nieuw personeel gaat via een uitnodiging (kassacode) en een eigen RTG-account;
@@ -30,54 +34,14 @@ app.post('/api/supplier/staff/remove', supplierAuth, (req, res) => {
   res.json({ ok: true, staff: accounts.listStaff(req.supplier.code).map(accounts.publicStaff) });
 });
 
-/* ---- personeel = RTG-account: uitnodigen (kassacode) en zelf aanmelden ----
-   Nieuw personeel heeft altijd een eigen RTG-account; een betaalde pas is niet
-   nodig, het gratis account is genoeg. Een manager nodigt iemand uit en krijgt
-   een eenmalige kassacode; de medewerker meldt zich pas daarna zelf aan met de
-   bedrijfsnaam en die kassacode, en bewijst met de eigen RTG-inlog dat het
-   account echt is. Zo kan niemand zonder uitnodiging bij een bedrijf. */
-const KASSA_ALFABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // zonder verwarrende tekens
-function maakKassacode() {
-  let c = '';
-  for (let i = 0; i < 6; i++) c += KASSA_ALFABET[crypto.randomInt(KASSA_ALFABET.length)];
-  return c;
-}
-function invitesVan(code) {
-  db.data.staffInvites = db.data.staffInvites || {};
-  db.data.staffInvites[code] = db.data.staffInvites[code] || [];
-  return db.data.staffInvites[code];
-}
-function findSupplierByName(naam) {
-  const n = String(naam || '').trim().toLowerCase();
-  if (!n) return null;
-  return (db.data.suppliers || []).find(s => String(s.name || '').trim().toLowerCase() === n) || null;
-}
-
-// Eenmalige uitnodiging aanmaken (gedeeld door /staff/invite en het aannemen
-// van een sollicitant). Ruimt meteen verlopen/gebruikte codes op.
-function maakInvite(supplier, actor, { naam, role, func }) {
-  const lijst = invitesVan(supplier.code);
-  const nu = Date.now();
-  db.data.staffInvites[supplier.code] = lijst.filter(i => !i.used && i.expires > nu);
-  const inv = {
-    kassacode: maakKassacode(), naam: naam || null,
-    role: role === 'manager' ? 'manager' : 'staff', func: func || null,
-    door: actor.name, expires: nu + 30 * 86400000, // 30 dagen geldig
-    used: false, createdAt: new Date().toISOString()
-  };
-  db.data.staffInvites[supplier.code].push(inv);
-  save();
-  logActivity(supplier.code, actor, actor.name + ' nodigde een medewerker uit' + (inv.naam ? ' (' + inv.naam + ')' : ''));
-  return inv;
-}
-
 // Manager nodigt een medewerker uit: geeft een eenmalige kassacode terug.
 app.post('/api/supplier/staff/invite', supplierAuth, (req, res) => {
   if (!req.actor.manager) return res.status(403).json({ error: 'Alleen een manager kan medewerkers uitnodigen.' });
   const inv = maakInvite(req.supplier, req.actor, {
     naam: schoon(req.body.name, 60), role: req.body.role, func: String(req.body.func || '').slice(0, 40)
   });
-  res.json({ ok: true, invite: { kassacode: inv.kassacode, naam: inv.naam, role: inv.role, func: inv.func, expires: inv.expires }, bedrijf: req.supplier.name });
+  res.json({ ok: true, invite: { kassacode: inv.kassacode, naam: inv.naam, role: inv.role, func: inv.func, expires: inv.expires },
+    link: wervingsLink(req, inv.kassacode), bedrijf: req.supplier.name });
 });
 
 // Manager trekt een open uitnodiging in (kassacode wordt onbruikbaar).
@@ -149,14 +113,10 @@ app.post('/api/supplier/staff/join', async (req, res) => {
     return res.status(409).json({ error: 'U bent al aangemeld bij dit bedrijf. Log in met uw naam en pincode.' });
   }
   loginFails.delete(bucket);
-  const naam = inv.naam || accounts.realNameOf(lid) || 'Medewerker';
-  const staff = await accounts.createStaff({ supplierCode: s.code, name: naam, role: inv.role, func: inv.func, pin, memberId: lid.id, memberTier: lid.tier });
-  inv.used = true; inv.memberId = lid.id; inv.usedAt = new Date().toISOString();
-  save();
-  logActivity(s.code, { name: naam, role: inv.role }, naam + ' meldde zich aan als teamlid (RTG-lid)');
-  try { notifySupplier(s.code, { kind: 'team', text: naam + ' heeft zich aangemeld bij het team.' }); } catch (e) {}
+  const { staff, naam } = await verbindLid(s, inv, lid, { pin });
   res.json({ ok: true, code: s.code, staffId: staff.id, name: naam, role: inv.role });
 });
 
-  return { maakKassacode, invitesVan, findSupplierByName, maakInvite };
+  // de sollicitatiestroom gebruikt dezelfde uitnodiging-helpers
+  return uitnodiging;
 };

@@ -114,6 +114,11 @@ module.exports = function hangRoutesOp(kern) {
   require('../routes/labfonds')(kern);
   require('../routes/aanmeldingen')(kern);
   require('../routes/ledenregister')(kern);
+  /* De wervingslink /werken/<code>: een werkgever nodigt iemand uit die nog
+     geen RTG-account heeft. Leunt op dezelfde uitnodiging als de kassacode van
+     routes/supplier/werving; zie routes/werving.js voor waarom er geen tweede
+     aanmeldweg naast staat. */
+  Object.assign(kern, require('../routes/werving')(kern));
 
   /* De rest -- de kern-aanbouw met de routers die erbij horen -- staat in
      ./aanbouw.js. Daar wordt de kern nog VERDER gevuld (Object.assign) en

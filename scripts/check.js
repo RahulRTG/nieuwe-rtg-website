@@ -1373,6 +1373,7 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
     ['/api/aanmelding/aanvraag', 'een aanstaande aanvrager is nog geen lid (met rem per ip)'],
     ['/api/supplier/apply', 'solliciteren bij een zaak kan zonder account'],
     ['/api/supplier/staff/join', 'personeel meldt zich aan met een uitnodigingscode'],
+    ['/api/werving/kijk', 'wie een wervingslink krijgt heeft nog geen account; toont alleen de bedrijfsnaam en de functie, met een rem per ip'],
     ['/api/rtgid/start', 'de identiteitsstroom begint voordat er een sessie is'],
     ['/api/sso/waarheen', 'de SSO-heenweg draagt zijn eigen ondertekende staat'],
     ['/api/sso/start', 'idem; 404 op een onbekende of uitgezette koppeling'],

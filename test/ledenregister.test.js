@@ -58,3 +58,44 @@ test('de alfabetische lijst is te filteren per pas en stad', () => {
   const rtgIbiza = lr.register({ pas: 'rtg', stad: 'Ibiza' }).lijst.map(m => m.codenaam);
   assert.deepEqual(rtgIbiza, ['Anemoon', 'Ceder']);
 });
+
+/* De aanwas per bedrijf. Een werkgever kan een wervingslink sturen waarmee
+   iemand gratis lid wordt en meteen in dienst treedt; wie zo binnenkomt draagt
+   die herkomst mee (member_state.via, zie routes/supplier/werving/uitnodiging.js).
+   Voor RTG is dat een ander getal dan losse aanmeldingen: een zaak die vijftig
+   mensen binnenbrengt is een kanaal.
+
+   De regel die hier ook wordt bewaakt: geteld wordt WELK bedrijf hoeveel leden
+   bracht, en de lijst blijft op codenaam. Het register kent geen echte namen en
+   dat mag hier niet gaan schuiven. */
+const RIJEN_VIA = [
+  { id: 1, key: 'user-1', tier: 'rtg', codename: 'Anemoon', geslacht: 'v', land: 'NL',
+    via: { soort: 'zaak', code: 'ESVEDRA', naam: 'Es Vedra Tours' } },
+  { id: 2, key: 'user-2', tier: 'rtg', codename: 'Berkenhout', geslacht: 'm', land: 'NL',
+    via: { soort: 'zaak', code: 'ESVEDRA', naam: 'Es Vedra Tours' } },
+  { id: 3, key: 'user-3', tier: 'rtg', codename: 'Ceder', geslacht: 'x', land: 'NL',
+    via: { soort: 'zaak', code: 'KIKUNOI', naam: 'Kikunoi' } },
+  { id: 4, key: 'user-4', tier: 'rtg', codename: 'Dennenhout', geslacht: null, land: 'NL' }
+];
+
+test('telt wie er via welk bedrijf lid is geworden, op naam van het bedrijf', () => {
+  const lr = maak(RIJEN_VIA);
+  const r = lr.register();
+  assert.equal(r.viaBedrijf, 3, 'drie van de vier kwamen via een werkgever binnen');
+  const per = r.perBedrijf.map(b => [b.naam, b.aantal]);
+  assert.deepEqual(per, [['Es Vedra Tours', 2], ['Kikunoi', 1]], 'grootste kanaal eerst');
+  assert.equal(r.perBedrijf[0].code, 'ESVEDRA', 'de zaakcode reist mee om op te kunnen zoeken');
+});
+
+test('de aanwas per bedrijf noemt bedrijven, nooit personen', () => {
+  const lr = maak(RIJEN_VIA);
+  const r = lr.register();
+  // in de lijst staat per lid hoogstens de naam van het BEDRIJF; de leden zelf
+  // blijven codenamen, precies zoals de rest van dit register
+  const anemoon = r.lijst.find(m => m.codenaam === 'Anemoon');
+  assert.equal(anemoon.via, 'Es Vedra Tours');
+  assert.equal(anemoon.naam, undefined, 'geen echte naam in het register');
+  assert.equal(anemoon.email, undefined, 'en geen e-mailadres');
+  const zonder = r.lijst.find(m => m.codenaam === 'Dennenhout');
+  assert.equal(zonder.via, null, 'wie zichzelf aanmeldde heeft geen aanbrenger');
+});

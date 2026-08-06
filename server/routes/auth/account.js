@@ -4,7 +4,7 @@
 const eigenaar = require('../../eigenaar'); // een bron van waarheid over wie de eigenaar is
 module.exports = (actx) => {
   const { PERSONAS, PRODUCTION, UPLOAD_DIR, accounts, app, appUrl, auth, checkCred, crypto, db, express, forgetSession, fs, hasCred, leeftijdVan, loginFails, mail, memberTemplate, noteFailedTry, path, rememberSession, save, schoon, sessions, stateFor, tooManyTries, logInlog,
-    DEMO, pasAppOk, PAS_FOUT, pasAppVan, DEV_VELDEN, automatisering } = actx;
+    DEMO, pasAppOk, PAS_FOUT, pasAppVan, DEV_VELDEN, automatisering, kern } = actx;
 app.post('/api/auth/register', async (req, res) => {
   // Registratie-zekering: staat hij uit, dan nemen we tijdelijk geen nieuwe
   // accounts aan (bijv. bij misbruik). De eigenaar zet hem weer aan op de
@@ -120,9 +120,15 @@ app.post('/api/auth/register', async (req, res) => {
     const verifyUrl = appUrl(req) + '/apps/app.html?pas=' + pasAppVan(user.tier) + '&verify=' + vtok;
     try { mail.send(email, 'Bevestig uw e-mailadres bij Rahul Travel Group',
       'Welkom bij RTG. Bevestig uw e-mailadres via deze link:\n' + verifyUrl); } catch (e) {}
+    /* Kwam dit account via een WERVINGSLINK binnen, dan zijn aanmelden en in
+       dienst treden een handeling. Zie werving/uitnodiging.js. */
+    const werk = kern.wisselCodeIn
+      ? await kern.wisselCodeIn(user, String(req.body.wervingscode || '').trim().toUpperCase())
+      : null;
     const token = accounts.issueToken(user.id);
     const sess = { tier: user.tier, key: 'user-' + user.id, account: user };
-    res.json({ token, state: stateFor(sess, req.body.lang), needsEmailVerify: true, ...(DEV_VELDEN ? { devVerifyUrl: verifyUrl } : {}) });
+    res.json({ token, state: stateFor(sess, req.body.lang), needsEmailVerify: true,
+      ...(werk ? { werk } : {}), ...(DEV_VELDEN ? { devVerifyUrl: verifyUrl } : {}) });
   } catch (e) {
     return res.status(503).json({ error: 'Registreren lukte even niet. Probeer het zo opnieuw.' });
   }

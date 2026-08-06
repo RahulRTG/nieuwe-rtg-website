@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Portaal · RTFoundation</title>
+<link rel="icon" href="/icons/foundation.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<style>
+  :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--line:var(--rtg-line);--txt:var(--rtg-txt);--muted:var(--rtg-muted);--soft:var(--rtg-soft);--burgundy:#C23A5E;--gold:#A98F1C;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3rem;}
+  h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;}
+  header{padding:1rem;border-bottom:1px solid var(--line);}
+  header .ey{font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--burgundy);}
+  header h1{font-size:1.25rem;margin-top:.1rem;}
+  main{padding:1rem;max-width:760px;margin:0 auto;display:flex;flex-direction:column;gap:.9rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:.95rem 1rem;}
+  .sec{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin-bottom:.45rem;}
+  .rij{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;}
+  .veld{flex:1;min-width:9rem;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.9rem;padding:.6rem .75rem;letter-spacing:.06em;}
+  .knop{background:var(--txt);color:#000;border:none;border-radius:11px;padding:.6rem 1rem;font:inherit;font-weight:600;font-size:.86rem;cursor:pointer;}
+  .lijnrij{display:flex;gap:.5rem;align-items:baseline;padding:.45rem 0;border-bottom:1px solid var(--line);font-size:.86rem;flex-wrap:wrap;}
+  .lijnrij:last-child{border-bottom:none;}
+  .lijnrij .naam{flex:1;min-width:9rem;}
+  .lijnrij .sub{font-size:.76rem;color:var(--muted);width:100%;}
+  .pil{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:.15rem .55rem;color:var(--muted);}
+  .stat{flex:1;min-width:7rem;text-align:center;padding:.35rem 0;}
+  .stat b{font-size:1.25rem;display:block;}
+  .stat i{font-style:normal;font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);}
+  .leeg{color:var(--muted);font-size:.86rem;padding:.5rem 0;}
+  .uitleg{font-size:.78rem;color:var(--muted);line-height:1.6;}
+  .melder{font-size:.84rem;border-radius:10px;padding:.6rem .8rem;margin-top:.6rem;border:1px solid #5C1B2C;color:#F0A9BB;}
+  .verborgen{display:none;}
+</style>
+</head>
+<body class="rtg-stijl">
+<header>
+  <div class="ey">RTFoundation</div>
+  <h1>Portaal voor partners, gemeenten en ondernemers</h1>
+</header>
+<main id="main">
+  <div class="kaart">
+    <div class="sec">Uw code</div>
+    <div class="rij">
+      <input class="veld" id="code" placeholder="RTFP-... / RTFG-... / RTFO-..." maxlength="40" aria-label="Toegangscode" autocomplete="off">
+      <button class="knop" id="open">Openen</button>
+    </div>
+    <div id="melding"></div>
+    <div class="uitleg">
+      Uw code bepaalt wat u ziet, en u ziet alleen uw eigen dossier.
+      <b>RTFP</b> is een partnerstichting, <b>RTFG</b> een gemeente, <b>RTFO</b> een lokale ondernemer.
+      Een gemeente krijgt uitsluitend getelde cijfers &mdash; nooit een dossier, nooit een naam.
+      Kwijtgeraakt of iemand anders eruit? Vraag het RTF-kantoor om een nieuwe code.
+    </div>
+  </div>
+  <div id="uit"></div>
+</main>
+
+<script>
+/* Drie portalen, een deur.
+
+   WAAROM EEN PAGINA EN GEEN DRIE. Een lokale stichting, een gemeenteambtenaar
+   en een restauranthouder hebben elk EEN code en openen die hooguit een keer
+   per maand. Drie adressen onthouden is voor die drie mensen twee te veel; het
+   voorvoegsel van de code zegt al waar hij heen moet.
+
+   DE CODE GAAT NIET IN DE OPSLAG VAN DE BROWSER. Geen localStorage, geen
+   cookie: deze pagina houdt hem in het geheugen van dit tabblad en vergeet hem
+   zodra u het sluit. Op een gedeelde balie of een gemeentelaptop is dat het
+   verschil tussen "de volgende gebruiker ziet niets" en "de volgende gebruiker
+   ziet alles".
+
+   WAT ER VAN DE SERVER KOMT, IS WAT U MAG ZIEN. Er wordt hier niets gefilterd
+   om het net te houden; het filteren gebeurt op de server (kern/rtfos/), en dit
+   scherm toont wat het krijgt. Een filter in de browser is geen grens. */
+const $ = s => document.querySelector(s);
+const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const eur = n => (Number(n) || 0).toLocaleString('nl-NL', { style: 'currency', currency: 'EUR' });
+const stat = (w, l) => '<div class="stat"><b>' + esc(w) + '</b><i>' + esc(l) + '</i></div>';
+
+function fout(tekst) { $('#melding').innerHTML = '<div class="melder">' + esc(tekst) + '</div>'; }
+
+function soortVan(code) {
+  if (code.startsWith('RTFP')) return 'partner';
+  if (code.startsWith('RTFG')) return 'gemeente';
+  if (code.startsWith('RTFO')) return 'ondernemer';
+  return null;
+}
+
+async function open() {
+  const code = String($('#code').value || '').trim().toUpperCase();
+  const soort = soortVan(code);
+  $('#melding').innerHTML = '';
+  $('#uit').innerHTML = '';
+  if (!soort) {
+    fout('Deze code begint niet met RTFP, RTFG of RTFO. Controleer hem, of vraag het RTF-kantoor om een nieuwe.');
+    return;
+  }
+  let r;
+  try {
+    const res = await fetch('/api/rtfos/portaal/' + soort, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ code })
+    });
+    r = await res.json().catch(() => ({}));
+    if (!res.ok) { fout(r.error || 'Er ging iets mis.'); return; }
+  } catch (e) { fout('Geen verbinding met het RTF-kantoor.'); return; }
+  if (soort === 'partner') toonPartner(r);
+  if (soort === 'gemeente') toonGemeente(r);
+  if (soort === 'ondernemer') toonOndernemer(r);
+}
+
+function toonPartner(r) {
+  const p = r.partner, a = p.afspraken || {};
+  $('#uit').innerHTML =
+    '<div class="kaart"><h2>' + esc(p.naam) + '</h2>' +
+      '<div class="rij"><span class="pil">' + esc(p.stad || '') + '</span><span class="pil">' + esc(p.status) + '</span>' +
+      '<span class="pil">looptijd ' + esc(p.van || '?') + ' tot ' + esc(p.tot || '?') + '</span></div>' +
+      '<div class="uitleg">' + esc(p.doel || '') + '</div></div>' +
+    '<div class="kaart"><div class="sec">Wie doet wat</div>' +
+      '<div class="lijnrij"><span class="naam">Het geld</span><span class="pil">' + esc(a.geld || '?') + '</span></div>' +
+      '<div class="lijnrij"><span class="naam">De vrijwilligers</span><span class="pil">' + esc(a.vrijwilligers || '?') + '</span></div>' +
+      '<div class="lijnrij"><span class="naam">De persoonsgegevens</span><span class="pil">' + esc(a.persoonsgegevens || '?') + '</span></div>' +
+      '<div class="lijnrij"><span class="naam">De aansprakelijkheid</span><span class="pil">' + esc(a.aansprakelijk || '?') + '</span></div>' +
+      '<div class="lijnrij"><span class="naam">De rapportages</span><span class="pil">' + esc(a.rapportage || '?') + '</span></div>' +
+      '<div class="uitleg">Deze vijf staan in de samenwerkingsovereenkomst. Klopt er iets niet, dan is dat geen detail: het bepaalt wie er aan zet is als het misgaat.</div></div>' +
+    '<div class="kaart"><div class="sec">Uw projecten</div>' +
+      (r.projecten.length ? r.projecten.map(x => '<div class="lijnrij"><span class="naam">' + esc(x.naam) + '</span>' +
+        '<span class="pil">' + esc(x.status) + '</span><div class="sub">' + esc(x.doelgroep || '') + '</div></div>').join('')
+        : '<div class="leeg">Nog geen projecten aan uw stichting gekoppeld.</div>') + '</div>' +
+    '<div class="kaart"><div class="sec">Uw dossier bij RTF</div>' +
+      (p.documenten.length ? p.documenten.map(d => '<div class="lijnrij"><span class="naam">' + esc(d.naam) + '</span><span class="pil">' + esc(d.soort) + '</span></div>').join('')
+        : '<div class="leeg">Er staan nog geen documenten in uw dossier.</div>') + '</div>';
+}
+
+function toonGemeente(r) {
+  const b = r.bereik, d = r.doelen;
+  $('#uit').innerHTML =
+    '<div class="kaart"><h2>' + esc(r.gemeente.naam) + '</h2>' +
+      '<div class="rij"><span class="pil">RTF ' + esc(r.gemeente.stad) + '</span></div>' +
+      '<div class="uitleg">Alles op deze pagina is geteld. Er staat geen dossier, geen naam en geen hulpvraag in; buurten met minder dan vijf hulpvragen zijn samengevoegd, omdat een klein getal in een kleine buurt geen statistiek meer is.</div></div>' +
+    '<div class="kaart"><div class="sec">Bereik</div><div class="rij">' +
+      (b.gemeten ? stat(b.uniekGeholpen, 'uniek geholpen') + stat(b.herhaaldGeholpen, 'herhaald')
+        : '<div class="leeg">Het aantal geholpen mensen is deze periode nog niet ingevuld. Dat is niet nul; het is niet gemeten.</div>') +
+      stat(b.vrijwilligers, 'vrijwilligers') + stat(Math.round(b.vrijwilligersuren), 'vrijwilligersuren') +
+      stat(b.hulpvragen, 'hulpvragen') + stat(b.hulpvragenOpen, 'nog open') + '</div></div>' +
+    '<div class="kaart"><div class="sec">Buurten</div>' +
+      (b.buurten.length ? b.buurten.map(x => '<div class="lijnrij"><span class="naam">' + esc(x.wijk) + '</span><span class="pil">' + x.aantal + '</span></div>').join('')
+        : '<div class="leeg">Nog geen buurten geregistreerd.</div>') + '</div>' +
+    '<div class="kaart"><div class="sec">Soorten hulpvraag</div>' +
+      (Object.keys(b.perSoort).length ? Object.entries(b.perSoort).map(([s, n]) =>
+        '<div class="lijnrij"><span class="naam">' + esc(s) + '</span><span class="pil">' + n + '</span></div>').join('')
+        : '<div class="leeg">Nog geen hulpvragen geregistreerd.</div>') + '</div>' +
+    '<div class="kaart"><div class="sec">Doelen</div>' +
+      (d.gemeten ? '<div class="rij">' + stat(d.doel, 'doel') + stat(d.bereikt, 'bereikt') +
+        stat(d.doorgestroomd, 'doorgestroomd') + stat(d.inTraject, 'in traject') + stat(d.uitgevallen, 'uitgevallen') + '</div>'
+        : '<div class="leeg">Er zijn nog geen indicatoren ingevuld.</div>') + '</div>' +
+    '<div class="kaart"><div class="sec">Besteding</div><div class="rij">' +
+      stat(eur(r.besteding.binnen), 'binnengekomen') + stat(eur(r.besteding.besteed), 'besteed') +
+      stat(r.besteding.kostenPerPersoon === null ? '--' : eur(r.besteding.kostenPerPersoon), 'per geholpen persoon') + '</div></div>' +
+    '<div class="kaart"><div class="sec">Opdrachten en prestatieafspraken</div>' +
+      (r.opdrachten.length ? r.opdrachten.map(o => '<div class="lijnrij"><span class="naam">' + esc(o.omschrijving) + '</span>' +
+        '<span class="pil">' + eur(o.bedrag) + '</span><span class="pil">' + esc(o.status) + '</span>' +
+        '<div class="sub">' + esc(o.kpi || 'geen prestatieafspraak vastgelegd') +
+        (o.deadline ? ' &middot; verantwoorden voor ' + esc(o.deadline) : '') +
+        (o.voortgang ? ' &middot; ' + esc(o.voortgang) : '') + '</div></div>').join('')
+        : '<div class="leeg">Er staan nog geen opdrachten vast.</div>') + '</div>' +
+    '<div class="kaart"><div class="sec">Projecten</div>' +
+      (r.projecten.length ? r.projecten.map(p => '<div class="lijnrij"><span class="naam">' + esc(p.naam) + '</span>' +
+        '<span class="pil">' + esc(p.status) + '</span><span class="pil">' + p.deelnemersUniek + ' geholpen</span>' +
+        '<div class="sub">' + esc(p.doelgroep || '') + (p.van ? ' &middot; vanaf ' + esc(p.van) : '') + '</div>' +
+        p.indicatoren.map(i => '<div class="sub">' + esc(i.naam) + ': ' + i.bereikt + ' van ' + i.doel +
+          ' bereikt, ' + i.doorgestroomd + ' doorgestroomd, ' + i.uitgevallen + ' uitgevallen</div>').join('') +
+        '</div>').join('') : '<div class="leeg">Nog geen lopende of afgeronde projecten.</div>') + '</div>';
+}
+
+function toonOndernemer(r) {
+  const i = r.impact;
+  $('#uit').innerHTML =
+    '<div class="kaart"><h2>' + esc(r.bedrijf.naam) + '</h2>' +
+      '<div class="rij"><span class="pil">' + esc(r.bedrijf.branche || 'onderneming') + '</span>' +
+      '<span class="pil">RTF ' + esc(r.bedrijf.stad || '') + '</span></div></div>' +
+    '<div class="kaart"><div class="sec">Wat uw bijdrage deed</div><div class="rij">' +
+      stat(i.aanbiedingen, 'aanbiedingen') + stat(i.benut, 'benut') + stat(eur(i.waardeGeschat), 'geschatte waarde') + '</div>' +
+      (i.projecten.length ? '<div class="uitleg">Terechtgekomen bij: ' + esc(i.projecten.join(', ')) + '.</div>'
+        : '<div class="uitleg">Er is nog niets van uw aanbod benut. Dat is geen verwijt aan u: het RTF-stadsteam koppelt het aan een project.</div>') +
+      '<div class="uitleg">De waarde is een schatting en heet daarom ook zo. Vijftig maaltijden zijn geen vijftig keer de menuprijs.</div></div>' +
+    '<div class="kaart"><div class="sec">Uw aanbod</div>' +
+      (r.aanbod.length ? r.aanbod.map(a => '<div class="lijnrij"><span class="naam">' + esc(a.wat) + '</span>' +
+        '<span class="pil">' + esc(a.soort) + '</span><span class="pil">' + esc(a.ritme) + '</span>' +
+        '<span class="pil">' + esc(a.status) + '</span>' +
+        '<div class="sub">' + (a.aantal ? a.aantal + ' stuks &middot; ' : '') +
+        (a.project ? 'naar ' + esc(a.project.naam) + ' (' + esc(a.project.doelgroep || a.project.soort) + ')' : 'nog niet aan een project gekoppeld') +
+        '</div></div>').join('') : '<div class="leeg">Er staat nog geen aanbod van uw bedrijf geregistreerd.</div>') + '</div>';
+}
+
+$('#open').addEventListener('click', open);
+$('#code').addEventListener('keydown', e => { if (e.key === 'Enter') open(); });
+</script>
+<script src="/shared/deelmenu.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/levendekleur.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
+</body>
+</html>

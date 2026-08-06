@@ -1944,6 +1944,13 @@ Object.assign(kern, require('./kern/onderzoekslab')({ db, save, crypto, anthropi
 // De Stadsraad: per stad een invloedrijke partner die in het gezamenlijke
 // foundation-kantoor mee beslist over de lab-uitslagen
 Object.assign(kern, require('./kern/stadsraad')({ db, save, crypto }));
+/* Het Foundation OS (kern/rtfos/): het bestuurssysteem van de RTFoundation --
+   een landelijke stichting met zelfstandige stadsafdelingen, lokale
+   partnerstichtingen, projecten, vrijwilligers, geoormerkt geld, hulpvragen en
+   verantwoording aan gemeenten. Krijgt boardroomWie/magBoardroom mee: het
+   landelijke bestuur IS de boardroom, en de zetels per stad hangen aan dezelfde
+   sleutel uit een echte inlog (zie kern/rtfos/basis.js). */
+Object.assign(kern, require('./kern/rtfos')({ db, save, crypto, boardroomWie, magBoardroom }));
 /* RTG Payroll (kern/payroll.js): het loonkantoor draait op wat het platform
    al weet -- de klok, de rollen en de fiscale landtabellen. */
 Object.assign(kern, require('./kern/payroll')({ db, save, crypto, accounts, LANDEN, klokVan, openVacatures, findSupplier }));

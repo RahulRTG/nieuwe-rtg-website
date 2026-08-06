@@ -1406,6 +1406,16 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
     ['/api/rtf/club/bericht', 'idem: schrijft alleen in het logboek van die ene clubcode'],
     ['/api/rtf/partner/raad', 'de raadcode is de geloofsbrief (vindCode); alleen de eigen partnerkant'],
 
+    /* Dezelfde familie, in het Foundation OS (routes/rtfos/portalen.js). Een
+       lokale stichting, een gemeente en een lokale ondernemer hebben geen
+       RTG-account: hun code bepaalt het dossier, niet de vraagsteller. Ze
+       dragen dezelfde twee remmen (20/min per bron, 60/min per code) en de
+       gemeentekant geeft per constructie alleen getelde cijfers terug, nooit
+       een casus of een naam (kern/rtfos/gemeente.js). */
+    ['/api/rtfos/portaal/partner', 'de partnercode is de geloofsbrief (vindCode); alleen het eigen partnerdossier'],
+    ['/api/rtfos/portaal/gemeente', 'de gemeentecode is de geloofsbrief; uitsluitend geaggregeerde cijfers van die ene stad'],
+    ['/api/rtfos/portaal/ondernemer', 'de bedrijfscode is de geloofsbrief; alleen het eigen aanbod en waar het heen ging'],
+
     // ---- publieke informatie: staat ook gewoon op de site ----
     ['/api/pasprijzen', 'de prijslijst is publieke informatie'],
     ['/api/rtf/vacatures', 'openstaande vacatures zijn openbaar'],

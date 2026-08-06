@@ -105,6 +105,10 @@ module.exports = function hangRoutesOp(kern) {
   require('../routes/geloofbieb')(kern);
   /* Het RTF-kantoor, Clubs & steden en het Onderzoekslab (kern staat al hierboven). */
   require('../routes/rtfkantoor')(kern);
+  /* Het Foundation OS: steden, partnerstichtingen, projecten, vrijwilligers,
+     geld, hulpvragen, meldingen en de portalen voor partner, gemeente en
+     ondernemer (kern staat al hierboven). */
+  require('../routes/rtfos')(kern);
   /* De twee werkplekken RTG en RTF (kern staat al hierboven). */
   require('../routes/werkplek')(kern);
   /* Het RTG Werk OS: de werkplek van een hele organisatie (server/bedrijf/).

@@ -42,5 +42,17 @@ module.exports = {
     ['Lees de omzet per kanaal en per betaalwijze, met fooi en oninbaar apart',
       'Verdeel de fooienpot over gewerkte uren; de som van de delen is exact de pot',
       'Zet het loon tegenover de omzet zonder fooi en bekijk de signalen'],
-    'Er staat geen omzetprognose op dit scherm: wat er staat is wat er nu open staat en wat er vandaag is binnengekomen.')
+    'Er staat geen omzetprognose op dit scherm: wat er staat is wat er nu open staat en wat er vandaag is binnengekomen.'),
+
+  /* ---- het Foundation OS ---- */
+  '/apps/foundation/os.html': G('Foundation OS: het bestuurssysteem van de RTFoundation -- landelijk toezicht, zelfstandige stadsafdelingen, partnerstichtingen, projecten, vrijwilligers, geld en hulpvragen.',
+    ['Kies een stadsafdeling; u ziet alleen de steden waar u een zetel heeft, het landelijke bestuur ziet ze alle',
+      'Werk per tabblad: impact, projecten, partners, vrijwilligers, geld, hulpvragen, integriteit, gemeente en ondernemers',
+      'Onder Bestuur staan de knoppen van het toezicht: modules per stad, de status van de afdeling, de goedkeuringslimieten en de zetels'],
+    'Geoormerkt geld gaat hier nooit naar een ander project, wie een uitgave aanvraagt keurt hem niet zelf goed, en een melding kan niemand verwijderen -- ook het landelijke bestuur niet.'),
+  '/apps/foundation/os-portaal.html': G('Het portaal voor partnerstichtingen, gemeenten en lokale ondernemers: uw eigen dossier, op uw eigen code.',
+    ['Vul de code in die u van het RTF-kantoor kreeg (RTFP voor een stichting, RTFG voor een gemeente, RTFO voor een bedrijf)',
+      'Een stichting ziet de samenwerkingsafspraken en de eigen projecten; een gemeente uitsluitend getelde cijfers; een ondernemer waar zijn bijdrage terechtkwam',
+      'De code blijft in dit tabblad en wordt nergens bewaard -- op een gedeelde computer sluit u hem weg door het tabblad te sluiten'],
+    'Een gemeente krijgt hier nooit een dossier of een naam te zien, en buurten met minder dan vijf hulpvragen worden samengevoegd: een klein getal in een kleine buurt is geen statistiek meer.')
 };

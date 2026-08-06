@@ -31,6 +31,7 @@ module.exports = function poortwachters(deps) {
   const { jsonGzip, statischGzip } = require('../middleware/compressie');
   const { bureaublad, cspNonce } = require('../middleware/voordeur');
   const { stijlbundel, PAD: stijlbundelPad } = require('../middleware/stijlbundel');
+const { scriptbundel, PAD: scriptbundelPad } = require('../middleware/scriptbundel');
 
   const CSP_NONCE = process.env.RTG_CSP_NONCE !== '0';
   const functies = require('../functies');
@@ -74,6 +75,8 @@ module.exports = function poortwachters(deps) {
      ../middleware/stijlbundel.js voor waarom dit wel bij CSS mag en niet bij
      scripts. */
   app.get(stijlbundelPad, stijlbundel(PUBLIC_DIR));
+  // en de gebundelde scripts, om dezelfde reden en op dezelfde plek
+  app.get(scriptbundelPad, scriptbundel(PUBLIC_DIR));
   app.get(/\.(?:js|css|svg|json|webmanifest)$/, statischGzip(PUBLIC_DIR));
   /* Zelfde cache-regel als statischGzip (zie compressie.js): script en stijl
      altijd laten navragen (ETag/304), anders serveert een tussenlaag na een

@@ -12,7 +12,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '4b135699';
+var RTG_BOUW = '781d7ec8';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -1667,6 +1667,11 @@ var RTG_BOUW = '4b135699';
      gewoon door en zegt de console WELKE het was. Dat is geen doekje voor het
      bloeden: een lid dat zijn tegels, klok en wallet ziet terwijl een van de
      twintig kaarten ontbreekt, heeft een werkende app -- en wij een spoor. */
+  /* De opbouw van het beginscherm: het vangnet, de melding als er iets leeg
+     blijft, en de volgorde eerst-beeld-dan-gegevens. Apart deel omdat
+     app-main-12.js hiermee op 11,5 KB kwam en keuringsregel 13 op 10 staat --
+     en de regel heeft gelijk over de reden: de rest van dat deel is de schil
+     van de app (meldingen, tabbladen), dit gaat over hoe het scherm ontstaat. */
   /* WAT ER MISGING, OP HET SCHERM ZELF.
 
      Een gebruiker met een half leeg beginscherm hoort niet de console te
@@ -1702,6 +1707,38 @@ var RTG_BOUW = '4b135699';
     }
   }
 
+  /* EERST BEELD, DAN GEGEVENS.
+
+     renderAll() deed alles in een adem: het beginscherm, en meteen ook de
+     vijftien tabbladen erachter. Op deze machine valt dat niet op; op een
+     telefoon wel. Gemeten bij een gebruiker die "hij laadt heel lang" meldde:
+     203 verzoeken bij het openen, 53 scripts en een bundel van 530 KB, en
+     tweeentwintig opbouwstappen voordat er ook maar iets in beeld kwam. Wat je
+     dan ziet is een leeg scherm, en lang genoeg leeg voelt als kapot.
+
+     Alleen het beginscherm heeft de gegevens nodig die er al zijn; de andere
+     tabbladen kijkt niemand naar voordat hij erop tikt. Die gaan daarom NA het
+     eerste beeld, een voor een, met een adempauze ertussen zodat de telefoon
+     tussendoor kan tekenen en reageren. Wie meteen op een tabblad tikt vindt
+     hem gewoon gevuld of even later; wie op het beginscherm blijft, ziet het
+     nu meteen.
+
+     De volgorde is niet willekeurig: wat op het beginscherm zichtbaar is gaat
+     voor, daarna de rest. */
+  function naBeeld(stappen) {
+    let i = 0;
+    const volgende = () => {
+      if (i >= stappen.length) return;
+      const [naam, fn] = stappen[i++];
+      stap(naam, fn);
+      // een adempauze: de telefoon mag tussendoor tekenen en op een tik reageren
+      if (window.requestIdleCallback) requestIdleCallback(volgende, { timeout: 400 });
+      else setTimeout(volgende, 16);
+    };
+    if (window.requestIdleCallback) requestIdleCallback(volgende, { timeout: 400 });
+    else setTimeout(volgende, 50);
+  }
+
   function renderAll(){
     /* Ook deze aanloop liep zonder vangnet, en juist hier staan de regels die
        aannemen dat een element bestaat. Viel er een om, dan kwam de rest van
@@ -1719,24 +1756,6 @@ var RTG_BOUW = '4b135699';
     stap('renderHome', renderHome);
     // Rahul opent het gesprek op het beginscherm zelf, met wat hij nu ziet
     stap('rahul-thuis', () => { if (!guest && window.RTGThuisRahul) RTGThuisRahul.opent(); });
-    if (!guest){
-      stap('renderTrip', renderTrip); stap('renderPay', renderPay); stap('renderAI', renderAI);
-      stap('renderAssets', renderAssets); stap('renderFluister', renderFluister);
-    }
-    stap('renderSalon', renderSalon);
-    stap('renderTerPlaatse', renderTerPlaatse);
-    stap('laadBestellen', laadBestellen);
-    stap('laadBoodschappen', laadBoodschappen);
-    stap('laadShowroom', laadShowroom);
-    stap('laadTickets', laadTickets);
-    stap('laadVerhuur', laadVerhuur);
-    stap('laadCharter', laadCharter);
-    stap('laadContracten', laadContracten);
-    stap('laadVastgoed', laadVastgoed);
-    if (!guest) laadCare();
-    stap('loadCv', loadCv);
-    stap('loadVacatures', loadVacatures);
-    stap('laadOntmoet', laadOntmoet);
     /* Terug waar je was, maar KORT. Dit venster stond op een half uur, en dat
        was te ver doorgeschoten: openTab schrijft de tijd bij elke schermwissel
        bij, dus het venster schoof steeds mee en in gewoon gebruik landde je
@@ -1757,6 +1776,19 @@ var RTG_BOUW = '4b135699';
         if (knop && knop.style.display !== 'none') beginTab = b.tab;
       }
     } catch(e){}
+    /* De tabbladen achter het beginscherm: na het eerste beeld, een voor een. */
+    naBeeld([
+      ...(guest ? [] : [['renderTrip', renderTrip], ['renderPay', renderPay], ['renderAI', renderAI],
+                        ['renderAssets', renderAssets], ['renderFluister', renderFluister],
+                        ['laadCare', laadCare]]),
+      ['renderSalon', renderSalon], ['renderTerPlaatse', renderTerPlaatse],
+      ['laadBestellen', laadBestellen], ['laadBoodschappen', laadBoodschappen],
+      ['laadShowroom', laadShowroom], ['laadTickets', laadTickets],
+      ['laadVerhuur', laadVerhuur], ['laadCharter', laadCharter],
+      ['laadContracten', laadContracten], ['laadVastgoed', laadVastgoed],
+      ['loadCv', loadCv], ['loadVacatures', loadVacatures], ['laadOntmoet', laadOntmoet]
+    ]);
+
     openTab(beginTab);
 
     /* KIJKT DE APP OF ER IETS TE ZIEN IS. Een zwart scherm meldt zichzelf niet:

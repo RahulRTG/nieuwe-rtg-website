@@ -19,6 +19,7 @@ const path = require('path');
 const zlib = require('zlib');
 const crypto = require('crypto');
 const { herschrijfHtml: stijlbundelHtml } = require('./stijlbundel');
+const { herschrijfHtml: scriptbundelHtml } = require('./scriptbundel');
 
 /* STIJL: EEN NONCE VOOR DE BLOKKEN, EN unsafe-inline ALLEEN NOG VOOR ATTRIBUTEN.
 
@@ -129,6 +130,11 @@ function cspNonce(publicDir, aan) {
          stempels uit: wat hier verdwijnt hoeft geen nonce meer. Zie
          ./stijlbundel.js voor wat er wel en niet in mag. */
       html = stijlbundelHtml(html);
+      /* En hetzelfde voor een rij UITGESTELDE scripts. Dat mocht lang niet,
+         omdat een fout in het ene script het volgende zou meeslepen; in de
+         bundel krijgt elk bestand daarom zijn eigen try/catch, waarmee dat
+         verschil weg is. Zie ./scriptbundel.js. */
+      html = scriptbundelHtml(html);
       html = html.replace(/<script(?![^>]*\bnonce=)/g, '<script nonce="' + nonce + '"');
       // dezelfde behandeling voor de stijlblokken: sinds style-src een nonce
       // draagt, komt een ongestempeld blok er niet meer doorheen

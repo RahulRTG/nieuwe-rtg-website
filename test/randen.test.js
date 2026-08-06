@@ -163,10 +163,19 @@ test('een kapotte kaart maakt het beginscherm niet zwart', () => {
     'stap() vangt een struikelende kaart op');
   assert.match(bron, /console\.error\('\[rtg\] onderdeel "' \+ naam/,
     'en noemt hem bij naam, anders is het nog steeds een raadsel');
-  for (const stap of ['renderHome', 'renderSalon', 'renderTerPlaatse', 'laadBestellen']) {
-    assert.match(bron, new RegExp("stap\\('" + stap + "', " + stap + "\\)"),
-      stap + ' loopt door het vangnet');
+  /* Het beginscherm gaat rechtstreeks door stap(); de tabbladen erachter gaan
+     door naBeeld(), dat ze een voor een NA het eerste beeld draait en daarbij
+     dezelfde stap() gebruikt. Allebei tellen als "door het vangnet", en dit
+     onderscheid is de reden dat de app op een telefoon niet meer minutenlang
+     leeg staat. */
+  assert.match(bron, /stap\('renderHome', renderHome\)/, 'het beginscherm loopt door het vangnet');
+  assert.match(bron, /function naBeeld\(stappen\)/, 'de tabbladen gaan na het eerste beeld');
+  for (const laat of ['renderSalon', 'renderTerPlaatse', 'laadBestellen', 'laadTickets']) {
+    assert.match(bron, new RegExp("\\['" + laat + "', " + laat + "\\]"),
+      laat + ' staat in de uitgestelde rij, en die loopt zelf door stap()');
   }
+  assert.match(bron, /const \[naam, fn\] = stappen\[i\+\+\];\s*stap\(naam, fn\)/,
+    'en naBeeld draait elke stap door hetzelfde vangnet');
   assert.ok(!/\n\s+renderHome\(\);/.test(bron),
     'en niet meer kaal, want dan neemt hij de rest weer mee');
 

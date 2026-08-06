@@ -61,10 +61,14 @@
   -webkit-backdrop-filter:saturate(180%) blur(20px);
   backdrop-filter:saturate(180%) blur(20px);
 }
+/* Links en rechts krijgen precies wat ze nodig hebben, de titel krijgt de rest
+   en mag krimpen (minmax(0,1fr), anders weigert een grid-kolom smaller te
+   worden dan zijn inhoud). Met 1fr aan de zijkanten liep "Exporteer +
+   Afspraak" de balk uit en raakte de laatste knop de schermrand. */
 .ios-nav-rij{
-  display:grid; grid-template-columns:1fr auto 1fr; align-items:center;
+  display:grid; grid-template-columns:auto minmax(0,1fr) auto; align-items:center;
   gap:0.4rem; min-height:var(--ios-balk);
-  padding-inline:max(0.5rem, env(safe-area-inset-left,0px)) max(0.5rem, env(safe-area-inset-right,0px));
+  padding-inline:max(0.6rem, env(safe-area-inset-left,0px)) max(0.6rem, env(safe-area-inset-right,0px));
 }
 
 /* de terugknop: chevron plus het label van waar je vandaan komt */

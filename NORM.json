@@ -25,7 +25,8 @@
     "kernGedeeld": 142,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 491
+    "toetsenNietGemeten": 103,
+    "toetsenOngevoeligPct": 2.3
   },
   "notities": [
     {
@@ -269,6 +270,12 @@
       "meter": "toetsenNietGemeten 484 -> 491 (met de hand VERHOOGD)",
       "reden": "Vijf pure toetsen stonden als 'overleefd' terwijl de motor voor hun module GEEN ENKELE bruikbare mutatie kon maken -- geen operator die past, of elke poging brak de syntaxis en viel af bij node --check. De uitslag zei letterlijk 'overleefd (0 mutaties geprobeerd)'. Zo'n toets is niet ongevoelig gebleken; hij is nooit uitgedaagd. Ze heten nu 'geen bruikbare mutatie' en tellen bij niet-gemeten, en daarmee klopt de dekking zeven hoger uit dan de norm van tien minuten eerder.",
       "eerlijkheidshalve": "De 484 was dus geen stand maar een telfout: vijf toetsen kregen krediet voor een proef die niet is gedaan. Dat is dezelfde soort fout als de drie eerdere grondwaarde-correcties van vandaag, alleen niet in de VORM van de meter maar in de DEFINITIE eronder. En het is precies wat deze motor moet voorkomen in plaats van maken: een toets de schuld geven van iets wat niemand geprobeerd heeft. Het ongevoelig-aandeel zakte er ook van 11,8% naar 8,2% door -- lager, maar nu over 122 toetsen die echt zijn uitgedaagd."
+    },
+    {
+      "datum": "2026-08-06",
+      "meter": "toetsenOngevoeligPct: eerste grondwaarde op 2,3",
+      "reden": "De campagne is af voor de 540 toetsen die geen browser nodig hebben: 499 gezakt op een mutatie, 12 overleefd. Pas nu mag deze meter een grondwaarde: zolang de steekproef groeide wandelde het percentage op de steekproef en niet op de kwaliteit (13,3 -> 14,0 -> 13,0 -> 16,3 -> 11,8 -> 8,2 -> 5,4 -> 2,3).",
+      "eerlijkheidshalve": "2,3% is GEEN kwaliteitscijfer van de suite en het mag niet zo gelezen worden. Drie dingen erbij. (1) De 85 schermtoetsen (*.e2e.js) zijn NIET gemeten: die hebben een browser nodig en de motor kent er geen mutatie voor. toetsenNietGemeten staat daarom op 103 en niet op 0. (2) 'Gezakt' bewijst GEVOELIG, niet GOED: een toets kan op de verkeerde reden zakken en nog steeds een slappe assertie hebben. (3) Bij de servertoetsen is de liegpoort een grof mes -- het hele antwoord verdwijnt. De scherpe ronde (deuren open, alleen het eigen domein liegt) is het betere bewijs: 384 van de 387 zakken ook dan, 2 alleen op de inlog (webauthn), 1 loopt vast."
     }
   ],
   "prestatie": {

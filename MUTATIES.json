@@ -3016,9 +3016,10 @@
     },
     "smtp.test.js": {
       "soort": "puur",
-      "staat": "vastgelopen",
+      "staat": "gezakt",
       "module": "server/smtp.js",
       "operator": "===->!==#0",
+      "gezakt": 5,
       "geprobeerd": 1
     },
     "societeit.test.js": {

@@ -86,6 +86,30 @@ function nepServer(opts = {}) {
   });
 }
 
+/* SLUITEN DAT OOK DE OPEN VERBINDINGEN MEENEEMT, en dat is de reparatie waar dit
+   bestand als `vastgelopen` voor in MUTATIES.json stond.
+
+   Onder een mutatie in server/smtp.js zakken vijf van de zeven toetsen netjes --
+   de asserties doen hun werk. Wat er NIET gebeurde, is afsluiten: het proces bleef
+   staan tot de time-out (exit 124), en dan telt de motor het niet als gezakt en
+   kost een echte fout een schouderophalen in plaats van een rode regel.
+
+   Twee oorzaken, en ze horen bij elkaar. (1) Drie van de toetsen sloten hun
+   nepserver AAN HET EINDE van de body, dus een zakkende assertie sprong eroverheen
+   (hetzelfde lek als eerlijkheidspunt 6.7). (2) `srv.close()` stopt alleen het
+   AANNEMEN van nieuwe verbindingen; een socket die nog open staat -- en onder deze
+   mutatie blijft er een halfopen staan -- houdt node in leven. Vandaar
+   closeAllConnections() erbij, met een terugval voor een oudere node.
+
+   Sluiten mag nooit zelf gooien: een fout in het opruimen verdringt de assertie
+   die de toets liet zakken, en dan lees je de verkeerde oorzaak. */
+function sluitServer(s) {
+  if (!s || !s.srv) return;
+  try { if (typeof s.srv.closeAllConnections === 'function') s.srv.closeAllConnections(); } catch (e) { /* oudere node */ }
+  try { s.srv.close(); } catch (e) { /* al dicht */ }
+  try { s.srv.unref(); } catch (e) { /* geen unref */ }
+}
+
 const alleenCmd = cmds => cmds.filter(c => /^(EHLO|STARTTLS|AUTH|MAIL|RCPT|DATA|QUIT)/i.test(c));
 function bodyUit(data) {
   const b64 = data.split('\n').filter(l => /^[A-Za-z0-9+/=]+$/.test(l) && l.length > 4).join('');
@@ -94,25 +118,27 @@ function bodyUit(data) {
 
 test('plain: MAIL/RCPT/DATA-volgorde + base64-body die terug decodeert', async () => {
   const s = await nepServer({});
-  const r = await smtp.createTransport('smtp://127.0.0.1:' + s.poort).sendMail({
-    from: 'RTG <no-reply@rtg.example>', to: 'Lid <lid@voorbeeld.nl>', subject: 'Hallo', text: 'Regel een\nRegel twee' });
-  s.srv.close();
-  assert.deepEqual(alleenCmd(s.vangst.cmds).slice(0, 4),
-    ['EHLO ' + require('os').hostname(), 'MAIL FROM:<no-reply@rtg.example>', 'RCPT TO:<lid@voorbeeld.nl>', 'DATA']);
-  assert.equal(bodyUit(s.vangst.data), 'Regel een\nRegel twee');
-  assert.match(s.vangst.data, /^Content-Transfer-Encoding: base64/m);
-  assert.deepEqual(r.accepted, ['lid@voorbeeld.nl']);
+  try {
+    const r = await smtp.createTransport('smtp://127.0.0.1:' + s.poort).sendMail({
+      from: 'RTG <no-reply@rtg.example>', to: 'Lid <lid@voorbeeld.nl>', subject: 'Hallo', text: 'Regel een\nRegel twee' });
+    assert.deepEqual(alleenCmd(s.vangst.cmds).slice(0, 4),
+      ['EHLO ' + require('os').hostname(), 'MAIL FROM:<no-reply@rtg.example>', 'RCPT TO:<lid@voorbeeld.nl>', 'DATA']);
+    assert.equal(bodyUit(s.vangst.data), 'Regel een\nRegel twee');
+    assert.match(s.vangst.data, /^Content-Transfer-Encoding: base64/m);
+    assert.deepEqual(r.accepted, ['lid@voorbeeld.nl']);
+  } finally { sluitServer(s); }
 });
 
 test('niet-ASCII onderwerp wordt een RFC 2047 encoded-word', async () => {
   const s = await nepServer({});
-  await smtp.createTransport('smtp://127.0.0.1:' + s.poort).sendMail({
-    from: 'a@b.nl', to: 'c@d.nl', subject: 'Reünie café', text: 'x' });
-  s.srv.close();
-  const kop = s.vangst.data.split('\n').find(l => l.startsWith('Subject:'));
-  assert.match(kop, /=\?UTF-8\?B\?/);
-  const woord = kop.match(/=\?UTF-8\?B\?([^?]+)\?=/)[1];
-  assert.equal(Buffer.from(woord, 'base64').toString('utf8'), 'Reünie café');
+  try {
+    await smtp.createTransport('smtp://127.0.0.1:' + s.poort).sendMail({
+      from: 'a@b.nl', to: 'c@d.nl', subject: 'Reünie café', text: 'x' });
+    const kop = s.vangst.data.split('\n').find(l => l.startsWith('Subject:'));
+    assert.match(kop, /=\?UTF-8\?B\?/);
+    const woord = kop.match(/=\?UTF-8\?B\?([^?]+)\?=/)[1];
+    assert.equal(Buffer.from(woord, 'base64').toString('utf8'), 'Reünie café');
+  } finally { sluitServer(s); }
 });
 
 test('STARTTLS: de client schakelt over en doet AUTH LOGIN pas daarna', { skip: !TLS_OK }, async () => {
@@ -130,7 +156,7 @@ test('STARTTLS: de client schakelt over en doet AUTH LOGIN pas daarna', { skip: 
     assert.deepEqual(s.vangst.authRuw.map(x => Buffer.from(x, 'base64').toString('utf8')), ['user', 'pass']);
     assert.equal(bodyUit(s.vangst.data), 'geheim');
   } finally {
-    if (s) s.srv.close();
+    sluitServer(s);
     if (oud === undefined) delete process.env.NODE_TLS_REJECT_UNAUTHORIZED; else process.env.NODE_TLS_REJECT_UNAUTHORIZED = oud;
   }
 });
@@ -146,17 +172,18 @@ test('implicit TLS (smtps://) met AUTH PLAIN', { skip: !TLS_OK }, async () => {
     // AUTH PLAIN-token decodeert naar \0gebruiker\0wachtwoord
     assert.deepEqual(s.vangst.authRuw.map(x => Buffer.from(x, 'base64').toString('utf8')), ['\0naam\0sleutel']);
   } finally {
-    if (s) s.srv.close();
+    sluitServer(s);
     if (oud === undefined) delete process.env.NODE_TLS_REJECT_UNAUTHORIZED; else process.env.NODE_TLS_REJECT_UNAUTHORIZED = oud;
   }
 });
 
 test('AUTH gaat NOOIT over een onversleutelde verbinding', async () => {
   const s = await nepServer({ auth: false }); // geen STARTTLS, plaintext
-  await assert.rejects(
-    () => smtp.createTransport('smtp://user:pass@127.0.0.1:' + s.poort).sendMail({ from: 'a@b.nl', to: 'c@d.nl', subject: 'x', text: 'y' }),
-    /onversleuteld/);
-  s.srv.close();
+  try {
+    await assert.rejects(
+      () => smtp.createTransport('smtp://user:pass@127.0.0.1:' + s.poort).sendMail({ from: 'a@b.nl', to: 'c@d.nl', subject: 'x', text: 'y' }),
+      /onversleuteld/);
+  } finally { sluitServer(s); }
 });
 
 test('MIME-eenheid: adres uithalen, kopwaarde, dot-stuffing in de ruwe boodschap', () => {

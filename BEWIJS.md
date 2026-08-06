@@ -15,9 +15,9 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 618 |
 | losse beweringen (`test(...)`) | 3370 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 510 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 511 |
 | **overleefd**: geen mutatie kreeg hem rood | 12 |
-| niet te meten (al rood, geen module gevonden, ...) | 22 |
+| niet te meten (al rood, geen module gevonden, ...) | 21 |
 | alleen in de kop *genoemd*, nog niet gemeten | 4 |
 | niets van beide | 70 |
 
@@ -466,7 +466,7 @@ toets omvalt.
 | `sessies.test.js` | 2 | gezakt op `return-weg#2` | De sessie-opslag: gelijktijdige sessies mogen niet stilletjes op 400 vastlopen (dat gooide vroeger de 401e ingelogde gebruiker eruit). Verlopen sessies gaan wel weg. |
 | `sleutelwoorden.test.js` | 7 | gezakt op `===->!==#0` | Sleutelwoorden: inloggen door een gesprek met Rahul in plaats van een wachtwoord. Getoetst op kern-niveau (met een nep-kluis en echte crypto): het instellen keurt precies vier verschillende woorden van minstens drie... |
 | `sloophamer.pg.test.js` | 1 | slaat zichzelf over | De "sloophamer": de chaos-intentie van een aangeleverde test, maar dan tegen de ECHTE architectuur van dit platform (twee kind-processen op een gedeelde Postgres + Redis, echte HTTP-endpoints), niet tegen een... |
-| `smtp.test.js` | 7 | vastgelopen | Eigen SMTP-verzendclient (server/smtp.js), die nodemailer verving. We draaien tegen een nep-SMTP-server (net/tls) en controleren de protocolstappen en de MIME-opmaak: EHLO -> MAIL/RCPT/DATA, base64-body die terug... |
+| `smtp.test.js` | 7 | gezakt op `===->!==#0` | Eigen SMTP-verzendclient (server/smtp.js), die nodemailer verving. We draaien tegen een nep-SMTP-server (net/tls) en controleren de protocolstappen en de MIME-opmaak: EHLO -> MAIL/RCPT/DATA, base64-body die terug... |
 | `societeit.test.js` | 2 | gezakt op `liegpoort /api/` | Integratietests voor De Societeit (18-21): het Quizduel (tien dezelfde vragen, oplossing blijft op de server tot er geantwoord is) en het Schatduel (vijf ronden, het dichtstbij pakt het punt). Jong-profielen zijn... |
 | `sparren.test.js` | 3 | gezakt op `liegpoort /api/` | Sparren: Rahul denkt mee (niet om zijn gelijk te halen) en komt op een geparkeerde gedachte terug als je rustig thuis bent met een lege agenda. Getoetst via de routes: parkeren + lijst + status, dat een spar-vraag in... |
 | `spellen.test.js` | 19 | gezakt op `liegpoort /api/` | Integratietests voor de spellenlaag: potjes op de vriendenlaag. Twee RTG-leden worden vrienden en spelen: mens erger je niet (uitnodigen, accepteren, dobbelen, zetten), schaken (legale en onwettige zetten), woordduel... |

@@ -712,6 +712,389 @@
     "randen.test.js": {
       "soort": "puur",
       "staat": "geen module gevonden"
+    },
+    "redis.test.js": {
+      "soort": "puur",
+      "staat": "vastgelopen",
+      "module": "server/redis.js",
+      "operator": "===->!==#0",
+      "geprobeerd": 1
+    },
+    "rekenmotor.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/rekenmotor.js",
+      "operator": "true->false#0",
+      "gezakt": 6,
+      "geprobeerd": 1
+    },
+    "rekenschuif.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/rekenschuif.js",
+      "operator": "===->!==#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
+    "rem.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/rem.js",
+      "operator": "&&->||#0",
+      "gezakt": 6,
+      "geprobeerd": 1
+    },
+    "reservering-beleid.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/reservering/beleid.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "residentie4.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/residentie/vragen.js",
+      "operator": "return-weg#0",
+      "gezakt": 1,
+      "geprobeerd": 4
+    },
+    "rtgcode.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/rtgcode.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
+    "rtghorloge.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/rtghorloge.js",
+      "operator": "!==->===#0",
+      "gezakt": 5,
+      "geprobeerd": 2
+    },
+    "rtmail.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/rtmail.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "salonviraal.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/salonviraal.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "scanner.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/qr.js",
+      "operator": ">=->>#0",
+      "gezakt": 2,
+      "geprobeerd": 3
+    },
+    "scannerpdf.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/apps/scanner/pdfje.js",
+      "operator": "<=-><#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
+    "scim.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/accounts/index.js",
+      "operator": "return-weg#0",
+      "gezakt": 1,
+      "geprobeerd": 3
+    },
+    "sessies.test.js": {
+      "soort": "puur",
+      "staat": "overleefd",
+      "modules": [
+        "server/kern/sessies.js"
+      ],
+      "geprobeerd": 2,
+      "posities": 1
+    },
+    "sleutelwoorden.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/sleutelwoorden.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "smtp.test.js": {
+      "soort": "puur",
+      "staat": "vastgelopen",
+      "module": "server/smtp.js",
+      "operator": "===->!==#0",
+      "geprobeerd": 1
+    },
+    "spelregels-drift.test.js": {
+      "soort": "puur",
+      "staat": "overleefd",
+      "modules": [
+        "server/kern/spellen.js"
+      ],
+      "geprobeerd": 5,
+      "posities": 1
+    },
+    "sso.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/accounts/index.js",
+      "operator": "return-weg#0",
+      "gezakt": 12,
+      "geprobeerd": 3
+    },
+    "ssrf.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/ssrf.js",
+      "operator": "true->false#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
+    "stijlbundel.test.js": {
+      "soort": "puur",
+      "staat": "overleefd",
+      "modules": [
+        "server/middleware/stijlbundel.js"
+      ],
+      "geprobeerd": 0,
+      "posities": 1
+    },
+    "stripe-eigen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/stripe.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "stun.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/stun.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "svgpaden.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/svgpaden.js",
+      "operator": "===->!==#0",
+      "gezakt": 7,
+      "geprobeerd": 2
+    },
+    "techniek.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/techniek.js",
+      "operator": "!==->===#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
+    "tegel3d.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/tegel3d.js",
+      "operator": "!==->===#0",
+      "gezakt": 7,
+      "geprobeerd": 2
+    },
+    "tls-acme-boot.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/jws.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "tls-acme.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/jws.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
+    "tls-native.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/tls.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "tls-x509.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/x509.js",
+      "operator": "return-weg#0",
+      "gezakt": 2,
+      "geprobeerd": 4
+    },
+    "txgeld.test.js": {
+      "soort": "puur",
+      "staat": "overleefd",
+      "modules": [
+        "server/db/index.js",
+        "server/db/tx/collecties.js"
+      ],
+      "geprobeerd": 6,
+      "posities": 1
+    },
+    "txindex.test.js": {
+      "soort": "puur",
+      "staat": "overleefd",
+      "modules": [
+        "server/db/index.js"
+      ],
+      "geprobeerd": 6,
+      "posities": 1
+    },
+    "txkap.test.js": {
+      "soort": "puur",
+      "staat": "overleefd",
+      "modules": [
+        "server/db/index.js"
+      ],
+      "geprobeerd": 6,
+      "posities": 1
+    },
+    "txledger-sqlite.test.js": {
+      "soort": "puur",
+      "staat": "geen module gevonden"
+    },
+    "txledger.pg.test.js": {
+      "soort": "puur",
+      "staat": "slaat zichzelf over",
+      "overgeslagen": 1
+    },
+    "veiligadres.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/opzet/veiligadres.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
+    "verzadiging.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/verzadiging.js",
+      "operator": "&&->||#0",
+      "gezakt": 3,
+      "geprobeerd": 2
+    },
+    "vloot.test.js": {
+      "soort": "puur",
+      "staat": "geen module gevonden"
+    },
+    "vuurplan.test.js": {
+      "soort": "puur",
+      "staat": "overleefd",
+      "modules": [
+        "server/kern/events.js"
+      ],
+      "geprobeerd": 0,
+      "posities": 1
+    },
+    "wacht.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/wacht/index.js",
+      "operator": "return-weg#0",
+      "gezakt": 2,
+      "geprobeerd": 4
+    },
+    "wachter.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/functies/wachter.js",
+      "operator": "===->!==#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
+    "web.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/web/index.js",
+      "operator": "&&->||#0",
+      "gezakt": 2,
+      "geprobeerd": 2
+    },
+    "webauthn-eigen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/webauthn/index.js",
+      "operator": "!==->===#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
+    "webpush.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/webpush.js",
+      "operator": "&&->||#0",
+      "gezakt": 1,
+      "geprobeerd": 3
+    },
+    "wereldtaal.test.js": {
+      "soort": "puur",
+      "staat": "overleefd",
+      "modules": [
+        "server/talen.js",
+        "server/translate/woordenboek/wereld.js",
+        "server/translate.js"
+      ],
+      "geprobeerd": 7,
+      "posities": 1
+    },
+    "wiring-contract.test.js": {
+      "soort": "puur",
+      "staat": "overleefd",
+      "modules": [
+        "server/accounts/index.js"
+      ],
+      "geprobeerd": 3,
+      "posities": 1
+    },
+    "zegel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/zegel.js",
+      "operator": "&&->||#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
+    "zegelcheck.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "public/shared/zegelcheck.js",
+      "operator": "!==->===#0",
+      "gezakt": 2,
+      "geprobeerd": 3
+    },
+    "zinnencache.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/accounts/index.js",
+      "operator": "return-weg#0",
+      "gezakt": 3,
+      "geprobeerd": 3
     }
   }
 }

@@ -211,6 +211,19 @@ function meet() {
     breedsteBestanden: breedste.slice(0, 12).map(([f, s]) => ({ bestand: f, bereik: s.size })),
     echteKern: [...domeinenPer.entries()].filter(([, ds]) => ds.size >= 5)
       .sort((a, b) => b[1].size - a[1].size).map(([n, ds]) => ({ naam: n, domeinen: ds.size })),
+    /* DE WERKLIJST ACHTER kernGedeeld, en die ontbrak.
+
+       De meter gaf 146 en de opdracht is "onder de 100", maar wie eraan wilde
+       werken had alleen dat getal: welke 146, en door welke domeinen? Dan is het
+       geen meter maar een scorebord. Hier staan ze nu allemaal, mét de domeinen
+       die ze aanraken, zodat je kunt zien of het delen ECHT is of toevallig.
+
+       Waarom de tweetallen bovenaan sorteren: een naam die twee domeinen raakt
+       is een paar dat je kunt bekijken; een naam die er acht raakt is
+       infrastructuur en hoort in de interface. Het werk zit in de tweetallen, en
+       het gaat om de VRAAG per paar -- niet om het getal omlaag duwen. */
+    gedeeldeNamen: gedeeld.map(([n, ds]) => ({ naam: n, domeinen: [...ds].sort() }))
+      .sort((a, b) => a.domeinen.length - b.domeinen.length || a.naam.localeCompare(b.naam)),
     domeinen: [...perDomein.entries()].sort((a, b) => b[1].size - a[1].size)
       .slice(0, 15).map(([d, s]) => ({ domein: d, bereik: s.size }))
   };
@@ -230,6 +243,22 @@ if (require.main === module) {
   console.log('  ' + r.echteKern.map(x => x.naam + '(' + x.domeinen + ')').join(' ') + '\n');
   console.log('  \x1b[1mde breedste routebestanden\x1b[0m \x1b[2m(hier zou je beginnen)\x1b[0m');
   for (const b of r.breedsteBestanden) console.log('  ' + String(b.bereik).padStart(5) + '  ' + b.bestand);
+  console.log('');
+
+  /* DE WERKLIJST, want kernGedeeld moet onder de honderd en met een getal alleen
+     kan niemand beginnen. De tweetallen eerst: dat zijn de paren waarvan je kunt
+     nagaan of het delen echt is. Wie er acht raakt is infrastructuur.
+
+     Met --gedeeld staan ze er allemaal; standaard de eerste dertig, want een
+     rapport dat je moet doorscrollen wordt niet gelezen. */
+  const paren = r.gedeeldeNamen.filter(x => x.domeinen.length === 2);
+  console.log('  \x1b[1mde werklijst achter kernGedeeld\x1b[0m \x1b[2m(' + paren.length +
+    ' van de ' + r.kernGedeeld + ' raken precies TWEE domeinen -- daar zit het werk)\x1b[0m');
+  const toon = process.argv.includes('--gedeeld') ? paren : paren.slice(0, 30);
+  for (const x of toon) console.log('    ' + x.naam.padEnd(30) + x.domeinen.join(' + '));
+  if (toon.length < paren.length) {
+    console.log('    \x1b[2m... en ' + (paren.length - toon.length) + ' meer; alles met --gedeeld\x1b[0m');
+  }
   console.log('');
 }
 

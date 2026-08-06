@@ -15,9 +15,9 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 618 |
 | losse beweringen (`test(...)`) | 3370 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 509 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 510 |
 | **overleefd**: geen mutatie kreeg hem rood | 12 |
-| niet te meten (al rood, geen module gevonden, ...) | 23 |
+| niet te meten (al rood, geen module gevonden, ...) | 22 |
 | alleen in de kop *genoemd*, nog niet gemeten | 4 |
 | niets van beide | 70 |
 
@@ -385,7 +385,7 @@ toets omvalt.
 | `rechterhand-wissen.test.js` | 9 | gezakt op `liegpoort /api/` | DE RECHTERHAND: WAT ER WEGGEGOOID WORDT. Dit bestand bestaat omdat de WAARGENOMEN dekkingsmeting (scripts/dekking.js) een patroon liet zien dat een tekstzoektocht nooit had opgeleverd. |
 | `rechterhand.test.js` | 18 | gezakt op `liegpoort /api/` | Integratietests voor de extra premium ROS-apps van de Lifestyle Pass: Reisboek (reisdossier + documenten-attentie), Cellier (wijnkelder + drinkvenster), Table (diners: gasten + menu) en Maison (staf + taken). Gated... |
 | `redactie.test.js` | 7 | gezakt op `liegpoort /api/` | RTG Redactie: het persbureau (krant, magazine en drukkerij) plus de eigen Nieuws-app voor de leden. Getest: de statusketen van een artikel (publiceren is een mensbesluit; daarna is het stuk onwijzigbaar), de... |
-| `redis.test.js` | 3 | vastgelopen | Eigen Redis-client (server/redis.js), die het pakket `redis` verving. We starten een ECHTE redis-server op een vrije poort en toetsen: set/get, publish/subscribe, en kruisvalidatie met de nog geïnstalleerde... |
+| `redis.test.js` | 3 | gezakt op `===->!==#0` | Eigen Redis-client (server/redis.js), die het pakket `redis` verving. We starten een ECHTE redis-server op een vrije poort en toetsen: set/get, publish/subscribe, en kruisvalidatie met de nog geïnstalleerde... |
 | `regie.test.js` | 7 | gezakt op `liegpoort /api/` | De app-regie van de boardroom: RTG bepaalt welke apps voor wie beschikbaar zijn. Elke eigen app staat als functie op het schakelbord (per pas of doelgroep te sluiten), de grote hendel zet alles bij iedereen aan of... |
 | `reisbieb.test.js` | 6 | gezakt op `liegpoort /api/` | De Reis-Bibliotheek: echte, leesbare bestemmingsgidsen van eigen redactie. Geen miljoen lege titels meer; wat hier staat kun je openen en lezen. |
 | `reisbureau.test.js` | 6 | gezakt op `liegpoort /api/` | De losse leverancierspagina's in de app: het RTG-reisbureau (samengestelde reizen aanvragen), RTG Verblijven (hotels/appartementen/villa's boeken via /api/verblijf) en RTG Uitgaan (bars/clubs/beachclubs, aanmelden... |

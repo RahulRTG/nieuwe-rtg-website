@@ -12,12 +12,12 @@
     "e2eBestanden": 69,
     "keuringOmvang": 74,
     "keuringDubbeling": 56,
-    "keuringDekkingAdvies": 8,
+    "keuringDekkingAdvies": 46,
     "endpointsNooitAangeraakt": 0,
     "onbewaakt": 0,
     "routesNietSchakelbaar": 0,
-    "metersOngeijkt": 1,
-    "schermenZonderToets": 3,
+    "metersOngeijkt": 0,
+    "schermenZonderToets": 0,
     "keuringTeGroot": 1,
     "inlineStijlAttributen": 5549,
     "browserpoortToetsen": 103,
@@ -25,7 +25,7 @@
     "kernGedeeld": 136,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 97,
+    "toetsenNietGemeten": 96,
     "toetsenOngevoeligPct": 2.3
   },
   "notities": [
@@ -294,6 +294,12 @@
       "meter": "toetsenNietGemeten 96 -> 97: een nieuwe SCHERMtoets, en die kan deze motor niet meten",
       "reden": "test/camerascherm.e2e.js is erbij gekomen. De mutatiemotor kent geen mutatie voor een browsertoets, dus elke nieuwe e2e-toets laat dit getal met een stijgen -- ook als hij goed is. Dat is geen verslechtering van de suite maar van de DEKKING van de motor.",
       "eerlijkheidshalve": "Dit is dus een meter die de verkeerde kant op beweegt als je het goede doet, en dat is een echte tekortkoming en geen boekhoudkundig detail. Zolang de 85 schermtoetsen buiten de motor vallen, straft deze teller het schrijven van een schermtoets. Het staat op de lijst (TAKEN.md, de schermsuite meetbaar maken); tot die tijd wordt de grondwaarde met de hand meegeschoven, met deze notitie erbij zodat niemand het voor een sluipende verslechtering aanziet."
+    },
+    {
+      "datum": "2026-08-06",
+      "meter": "keuringDekkingAdvies 8 -> 46: de meter was blind, de dekking is niet verslechterd",
+      "reden": "Hij telde de dekking-MELDINGEN van scripts/keuring.js, en die zijn afgekapt op acht zodat het rapport leesbaar blijft. Er waren acht domeinen met gaten, dus stond hij op zijn plafond -- en in test/meterijk.test.js stond dat als REDEN waarom hij niet te ijken viel. keuring.js geeft nu cijfers.dekking.domeinenMetGaten terug (alle domeinen) en norm.js leest dat: 46.",
+      "eerlijkheidshalve": "Er is geen endpoint bijgekomen en geen toets verdwenen; het getal 9 was gewoon fout. Dat is de gevaarlijkste soort meterfout, want hij stond LAAG en dus geruststellend, en de ratel hield die geruststelling vast. Winst: hij kan nu bewegen, en daarmee ook geijkt worden -- metersOngeijkt gaat van 1 naar 0, dus elke meter met een norm is nu een keer zien uitslaan. Het rapport blijft op acht afgekapt met een regel eronder die de rest telt: wat je TOONT en wat je MEET horen niet hetzelfde te zijn."
     }
   ],
   "prestatie": {

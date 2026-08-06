@@ -2438,9 +2438,10 @@
     },
     "redis.test.js": {
       "soort": "puur",
-      "staat": "vastgelopen",
+      "staat": "gezakt",
       "module": "server/redis.js",
       "operator": "===->!==#0",
+      "gezakt": 3,
       "geprobeerd": 1
     },
     "regie.test.js": {

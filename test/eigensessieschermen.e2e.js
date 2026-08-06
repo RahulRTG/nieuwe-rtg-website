@@ -66,7 +66,14 @@ const EIGEN_SLEUTEL = [
      lijst en niet in een eigen bestand: het RTG Werk OS draait op een
      WERKRUIMTECODE plus een lid-token, dus precies de vorm waar deze toets voor
      bestaat -- niet "gaat hij open" maar "zegt hij welke sleutel hij mist". */
-  { app: 'werk', eist: /werkruimte|lid-token/i }
+  { app: 'werk', eist: /werkruimte|lid-token/i },
+  /* oog en scherm erbij op 6 augustus, om dezelfde reden als werk: scripts/
+     schermen.js noemde alle drie in "geen enkele toets legt dit scherm af", en
+     alle drie draaien op een andere sleutel dan de ledenpas. RTG Eye wil de
+     PDA-inlog van personeel; het tweede scherm wil de leverancier-inlog op
+     hetzelfde toestel. De eis komt uit hun eigen poorttekst en is niet gegokt. */
+  { app: 'oog', eist: /personeels-app|pda-inlog/i },
+  { app: 'scherm', eist: /leverancier-app|tweede scherm/i }
 ];
 
 /* De twee stubs, met waar ze heen horen te wijzen. `kantoor=1` is geen detail:

@@ -87,7 +87,12 @@ function metIjkRoutes(voor) {
   extra += '};\n';
   const na = metAanbouw('server/routes/klok.js', extra, () => norm.meet());
   _routeGat = { zonderTest: na.endpointsZonderTest - voor.endpointsZonderTest,
-    pctVal: voor.dekkingPct - na.dekkingPct };
+    pctVal: voor.dekkingPct - na.dekkingPct,
+    /* De honderd ijkroutes zitten onder /api/zzijkproef/, dus ze vormen een NIEUW
+       domein met gaten. keuringDekkingAdvies hoort daarmee precies een omhoog te
+       gaan -- en dat kon pas sinds die meter het echte aantal leest in plaats van
+       de acht meldingen die het rapport toont. */
+    dekkingAdvies: na.keuringDekkingAdvies - voor.keuringDekkingAdvies };
   return _routeGat;
 }
 
@@ -485,7 +490,18 @@ const IJKINGEN = {
 
   /* Hieronder: meters die je in een toets niet eerlijk kunt voeden. De reden
      staat erbij en telt mee in `metersOngeijkt`, die alleen omlaag mag. */
-  keuringDekkingAdvies: { reden: 'zit op zijn plafond: scripts/keuring.js meldt met .slice(0, 8) hooguit acht domeinen en er zijn er acht, dus omhoog kan hij niet en omlaag alleen door echte gaten te dichten' },
+  /* HIER STOND EEN REDEN EN DAT WAS EEN GEBREK, geen reden. Er stond: "zit op zijn
+     plafond -- keuring.js meldt met .slice(0, 8) hooguit acht domeinen en er zijn
+     er acht". Dat is geen eigenschap van de dekking maar van het RAPPORT: de
+     meter telde de meldingen, en die zijn afgekapt om leesbaar te blijven. Hij mat
+     dus de slice. Nagemeten: er zijn 46 domeinen met endpoints zonder toets, niet
+     acht.
+
+     scripts/keuring.js geeft nu cijfers.dekking.domeinenMetGaten terug (alle
+     domeinen) en scripts/norm.js leest dat. Daarmee KAN hij bewegen, en dus ook
+     geijkt worden: de honderd ijkroutes hieronder vormen een nieuw domein zonder
+     toets, en dan hoort dit getal precies een omhoog te gaan. */
+  keuringDekkingAdvies: { proef: (voor) => metIjkRoutes(voor).dekkingAdvies },
   routesNietSchakelbaar: {
     /* Een route die nergens in het schakelbord staat. Dat is precies wat deze
        meter telt, en het blijkt met een tijdelijk routebestand gewoon te

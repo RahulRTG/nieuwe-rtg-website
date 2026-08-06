@@ -284,12 +284,27 @@ const PRESTATIEMETERS = [
    te kijken of dat klopt of dat de groep gewoon verdwenen is. */
 function telPerGroep(k) {
   const uit = { keuringOmvang: 0, keuringDubbeling: 0, keuringDekkingAdvies: 0 };
-  const naar = { omvang: 'keuringOmvang', dubbeling: 'keuringDubbeling', dekking: 'keuringDekkingAdvies' };
+  const naar = { omvang: 'keuringOmvang', dubbeling: 'keuringDubbeling' };
   for (const b of (k.bevindingen || [])) {
     if (b.soort !== 'beter') continue;
     const sleutel = naar[b.groep];
     if (sleutel) uit[sleutel]++;
   }
+  /* DE DEKKINGSMETER LEEST EEN GETAL EN GEEN MELDINGEN, en dat is de reparatie.
+
+     Hij telde de dekking-meldingen van de keuring, en die zijn afgekapt op acht
+     zodat het rapport leesbaar blijft. Er waren acht domeinen met gaten, dus
+     stond de meter op zijn plafond en kon hij niet stijgen -- en dat stond in
+     test/meterijk.test.js als REDEN waarom hij niet te ijken viel. Een meter die
+     niet kan bewegen is geen meter; hij mat de slice.
+
+     scripts/keuring.js geeft nu cijfers.dekking.domeinenMetGaten terug: alle
+     domeinen, niet de eerste acht. Ontbreekt dat getal (een oudere keuring), dan
+     vallen we terug op de oude telling en niet op nul -- nul zou als de beste
+     score ooit gelden en de ratel zou dat vastleggen (LAT.md regel 3). */
+  const echt = k.cijfers && k.cijfers.dekking && k.cijfers.dekking.domeinenMetGaten;
+  if (typeof echt === 'number') uit.keuringDekkingAdvies = echt;
+  else uit.keuringDekkingAdvies = (k.bevindingen || []).filter(b => b.soort === 'beter' && b.groep === 'dekking').length;
   return uit;
 }
 

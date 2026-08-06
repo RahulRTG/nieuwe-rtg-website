@@ -63,7 +63,7 @@ module.exports = (kern) => {
     return true;
   };
   app.post('/api/member/vluchten/bord', auth, (req, res) => res.json(lucht.bord(req.body || {})));
-  app.post('/api/member/vluchten/boek', auth, (req, res) => { if (!lid(req, res)) return; if (gegevensStop(req, res, 'reservering')) return; stuur(res, lucht.boek(req.session, liveCodename(req.session), String(req.body.id || ''), req.body || {})); });
+  app.post('/api/member/vluchten/boek', auth, (req, res) => { if (!lid(req, res)) return; if (gegevensStop(req, res, 'vlucht')) return; stuur(res, lucht.boek(req.session, liveCodename(req.session), String(req.body.id || ''), req.body || {})); });
   app.post('/api/member/vluchten/incheck', auth, (req, res) => { if (!lid(req, res)) return; stuur(res, lucht.incheck(req.session, String(req.body.code || ''), req.body || {})); });
   app.post('/api/member/vluchten/mijn', auth, (req, res) => res.json(lucht.mijn(req.session.key)));
   // een charter aanvragen (privejet of helikopter); operations bevestigt of wijst af

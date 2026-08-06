@@ -4,6 +4,8 @@
    Draait op de gedeelde context die kern/onboarding.js een keer opbouwt. */
 module.exports = (ctx) => {
   const { accounts, save, schoon, crypto, nu, scopeVan, profielVan, profielId } = ctx;
+  // het paspoort is een eigen onderwerp en staat daarom apart
+  const { bewaarPaspoort } = require('./paspoort')(ctx);
 
   // wat we al van een echt account weten (naam, e-mail, paspoortstatus ...)
   function bekend(veldId, sess) {
@@ -41,25 +43,40 @@ module.exports = (ctx) => {
     return false;
   }
 
+  /* Vragen we dit veld NU? Een veld met moment 'later' hoort bij een handeling
+     en niet bij de voordeur: dat vraagt Rahul pas als er een derde partij bij
+     komt (kern/gegevenspoort.js). Het paspoort is de uitzondering: het staat
+     hierboven al alleen in de lijst als de pas of RTG Pay erom vraagt, en dan is
+     zijn moment per definitie nu. */
+  function nuNodig(v, tier, profiel) {
+    if (v.id === 'paspoort') return paspoortVerplicht(tier, profiel);
+    return (v.moment || 'nu') !== 'later';
+  }
+
   // De volledige onboarding-status voor deze sessie binnen een scope.
   function status(scope, sess) {
     const sc = scopeVan(scope);
     const tier = (sess && sess.tier) || 'guest';
     const profiel = profielVan(profielId(sess));
-    const velden = sc.velden
+    const toon = (v) => {
+      const w = waardeVan(v, sess, profiel);
+      return { id: v.id, label: v.label, type: v.type, ingevuld: !!(w && String(w).trim()),
+        waarde: v.type === 'kyc' ? undefined : (w != null ? String(w) : '') };
+    };
+    const mijn = sc.velden
       .filter(v => (v.voorWie || []).includes(tier))
-      .filter(v => v.id !== 'paspoort' || paspoortVerplicht(tier, profiel))
-      .map(v => {
-        const w = waardeVan(v, sess, profiel);
-        return { id: v.id, label: v.label, type: v.type, ingevuld: !!(w && String(w).trim()),
-          waarde: v.type === 'kyc' ? undefined : (w != null ? String(w) : '') };
-      });
+      .filter(v => v.id !== 'paspoort' || paspoortVerplicht(tier, profiel));
+    const velden = mijn.filter(v => nuNodig(v, tier, profiel)).map(toon);
+    /* De later-velden gaan apart mee: een scherm mag ze tonen als "nog aan te
+       vullen", maar ze zijn geen poort. Ze staan dus NIET in ontbrekend en
+       houden `klaar` niet tegen. */
+    const laterVelden = mijn.filter(v => !nuNodig(v, tier, profiel)).map(toon);
     const ontbrekend = velden.filter(v => !v.ingevuld).map(v => v.id);
     const ond = (profiel.ondertekend || {})[scope];
     const getekend = !!(ond && ond.versie === sc.contract.versie);
     return {
       scope, tier,
-      velden, ontbrekend,
+      velden, laterVelden, ontbrekend,
       contract: { versie: sc.contract.versie, titel: sc.contract.titel, tekst: sc.contract.tekst,
         ondertekend: getekend, ondertekendAt: getekend ? ond.at : null },
       klaar: ontbrekend.length === 0 && getekend
@@ -92,9 +109,26 @@ module.exports = (ctx) => {
     const sc = scopeVan(scope);
     const geldig = new Set(sc.velden.map(v => v.id));
     const p = profielVan(profielId(sess));
+    const acc = sess && sess.account;
     for (const [k, v] of Object.entries(velden || {})) {
       if (!geldig.has(k) || k === 'paspoort') continue;
-      p.velden[k] = schoon(String(v == null ? '' : v), 200);
+      const waarde = schoon(String(v == null ? '' : v), 200);
+      p.velden[k] = waarde;
+      /* HIER SCHRIJFT NIETS NAAR md.nationaliteit, EN DAT IS MET OPZET.
+
+         Deze route staat alleen achter `auth`, dus elk lid kan er zijn eigen
+         velden in zetten. Een regel die de nationaliteit doorschrijft naar het
+         ledendossier maakt daarmee een tweede schrijver naast de enige die er
+         hoort te zijn: de identiteitscontrole van het kantoor
+         (routes/office/verificaties.js). Die stond hier even, en het gat was
+         precies zo groot als het klinkt: een lid dat door het kantoor als
+         Duitse was vastgelegd zette zichzelf op Nederlandse en liep zo langs de
+         landregel van de eigenaar (gemeten: 503 werd 200).
+
+         Wie de nationaliteit WEL mag zetten doet dat met bewijs: het kantoor na
+         verificatie, of de MRZ-scan van het paspoort (bewaarPaspoort, dezelfde
+         module). Wat een lid hier typt blijft in het onboardingprofiel staan,
+         en bekend() leest md.nationaliteit al voor wie er wel een heeft. */
     }
     save();
     return status(scope, sess);
@@ -103,18 +137,19 @@ module.exports = (ctx) => {
   /* Paspoort-meta (vervaldatum, nummer) uit de MRZ-scan bewaren op het profiel.
      Rahul gebruikt de vervaldatum om een half jaar vooraf te seinen dat het
      paspoort verloopt (zie kern/fluister). Alleen een geldige ISO-datum telt. */
-  function bewaarPaspoort(sess, info) {
-    info = info || {};
-    const p = profielVan(profielId(sess));
-    if (!p.paspoort) p.paspoort = {};
-    if (info.vervaldatum && /^\d{4}-\d{2}-\d{2}$/.test(String(info.vervaldatum))) p.paspoort.vervaldatum = String(info.vervaldatum);
-    if (info.nummer) p.paspoort.nummer = schoon(String(info.nummer), 40);
-    p.paspoort.at = nu();
-    save();
-    return { ok: true, paspoort: { vervaldatum: p.paspoort.vervaldatum || null } };
-  }
+  /* Wat de scan van het paspoort oplevert, bewaren we -- en niet minder dan dat.
 
-  // Het contract ondertekenen: getypte naam + akkoord -> bewijs met vingerafdruk.
+     Hier stonden alleen nummer en vervaldatum, terwijl shared/mrz.js de hele
+     strook al leest: naam, nummer, nationaliteit, geboortedatum, vervaldatum en
+     geslacht. De rest werd stil weggegooid, en het gevolg was dat een lid dat
+     zijn paspoort al had gescand bij een vlucht ALSNOG zijn nationaliteit moest
+     intypen. Twee keer hetzelfde vragen is precies wat dit huis niet doet.
+
+     Alleen wat een grens of een luchtvaartmaatschappij echt van je wil, en
+     niets meer: geslacht en de naamvelden laten we hier bewust liggen -- de
+     naam staat al in de kluis en het geslacht heeft hier geen lezer.
+     Nationaliteit en geboortedatum gaan ook naar het ledendossier, want daar
+     kijkt de gegevenspoort. */
   function teken(scope, sess, naam, akkoord) {
     if (!akkoord) return { status: 400, error: 'Zet een vinkje dat u akkoord bent met de overeenkomst.' };
     naam = schoon(String(naam || ''), 80);

@@ -19,6 +19,7 @@ const path = require('path');
 const zlib = require('zlib');
 const crypto = require('crypto');
 const { herschrijfHtml: stijlbundelHtml } = require('./stijlbundel');
+const { herschrijfHtml: scriptbundelHtml } = require('./scriptbundel');
 
 /* STIJL: EEN NONCE VOOR DE BLOKKEN, EN unsafe-inline ALLEEN NOG VOOR ATTRIBUTEN.
 
@@ -121,12 +122,19 @@ function cspNonce(publicDir, aan) {
     if (!bestand.startsWith(publicDir + path.sep)) return next(); // geen path traversal
     fs.readFile(bestand, 'utf8', (err, html) => {
       if (err) return next(); // bestaat niet: laat de statische laag/404 het doen
-      if (paginaHaak) { try { paginaHaak(rel); } catch (e) {} }
+      // het verzoek gaat mee: alleen daaraan is te zien of dit een bezoek was
+      // of een voorophaling van een service worker (zie server/routelog.js)
+      if (paginaHaak) { try { paginaHaak(rel, req); } catch (e) {} }
       const nonce = crypto.randomBytes(16).toString('base64');
       /* Een rij opeenvolgende stijlbladen wordt EEN verwijzing. Dit gaat voor de
          stempels uit: wat hier verdwijnt hoeft geen nonce meer. Zie
          ./stijlbundel.js voor wat er wel en niet in mag. */
       html = stijlbundelHtml(html);
+      /* En hetzelfde voor een rij UITGESTELDE scripts. Dat mocht lang niet,
+         omdat een fout in het ene script het volgende zou meeslepen; in de
+         bundel krijgt elk bestand daarom zijn eigen try/catch, waarmee dat
+         verschil weg is. Zie ./scriptbundel.js. */
+      html = scriptbundelHtml(html);
       html = html.replace(/<script(?![^>]*\bnonce=)/g, '<script nonce="' + nonce + '"');
       // dezelfde behandeling voor de stijlblokken: sinds style-src een nonce
       // draagt, komt een ongestempeld blok er niet meer doorheen

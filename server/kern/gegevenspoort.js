@@ -18,7 +18,19 @@
      identiteit  de BESTAANDE verificatie (/api/verify/upload). Hier komt met
                  opzet geen tweede paspoort-intake naast: een document uploaden en
                  laten goedkeuren is een eigen weg, en die is er al. Deze poort
-                 wijst er alleen naar. */
+                 wijst er alleen naar.
+
+   De adresstap schrijft daarnaast de WOONPLAATS bij in het onboardingprofiel
+   (kern/gegevensgesprek.js): de intake vraagt hem niet meer, en het ledenregister
+   van het kantoor is de lezer die anders stil zijn stad-facet kwijt was.
+
+   EN WAT HIER NIET STAAT, EN WAAROM NIET. Nationaliteit hoort hier zodra iets hem
+   werkelijk leest -- een maatschappij die een passagier aanmeldt, bijvoorbeeld.
+   Vandaag is dat niet zo: in de hele vlucht- en grensstapel (kern/luchthaven/*,
+   kern/marechaussee.js) komt md.nationaliteit niet voor. Een poort die iets eist
+   wat niemand opvraagt is geen dataminimalisatie maar een extra drempel, dus hij
+   staat er niet. Komt die lezer er, dan is DIT het bestand waar hij bij hoort,
+   met een waarom dat je hardop kunt uitspreken. */
 
 const VELDEN = {
   telefoon: {
@@ -33,6 +45,20 @@ const VELDEN = {
     label: 'een geverifieerde identiteit',
     waarom: 'Hiervoor moet de zaak zeker weten wie er komt. Dat loopt via de identiteitscontrole, niet via dit gesprek.',
     viaVerificatie: true
+  },
+  /* Een vlucht is het ene geval waarin een derde partij meer wil dan bereikbaar
+     zijn: de maatschappij en de grens eisen documentnummer, geldigheidsdatum,
+     nationaliteit en geboortedatum. Dat is geen eis van RTG, en Rahul zegt dat
+     er ook bij -- wie het niet wil geven, boekt gewoon niet.
+
+     Het is EEN veld en geen vier, want het is ook een handeling: de scan van de
+     strook onderaan het paspoort levert ze alle vier tegelijk (shared/mrz.js).
+     Vier losse vragen stellen naar iets wat de camera in een seconde leest, is
+     precies het formulier-denken dat dit huis niet wil. */
+  reisdocument: {
+    label: 'je paspoortgegevens',
+    waarom: 'De luchtvaartmaatschappij en de grens eisen documentnummer, geldigheid, nationaliteit en geboortedatum. Dat is hun eis, niet die van ons. Scan je paspoort een keer, dan staat het er.',
+    viaScan: true
   }
 };
 
@@ -42,7 +68,8 @@ const NODIG = {
   bestelling: ['telefoon'],            // eten/drinken bij een zaak
   reservering: ['telefoon'],           // een tafel of een dienst op naam
   bezorging: ['telefoon', 'adres'],    // er komt iemand langs
-  identiteit: ['identiteit']           // afhalen/inchecken waar men je moet kennen
+  identiteit: ['identiteit'],          // afhalen/inchecken waar men je moet kennen
+  vlucht: ['telefoon', 'reisdocument'] // over een grens: bereikbaar EN papieren
 };
 
 function maakGegevenspoort({ accounts, getMemberState }) {
@@ -51,6 +78,17 @@ function maakGegevenspoort({ accounts, getMemberState }) {
     if (veld === 'telefoon') return !!(u && accounts.phoneOf(u));
     if (veld === 'adres') return !!(md && String(md.adres || '').trim());
     if (veld === 'identiteit') return !!(u && String(u.verified || '') === 'verified');
+    /* Het reisdocument is pas compleet als alle vier de gegevens er zijn EN het
+       paspoort op de dag van vandaag nog geldig is. Een verlopen paspoort telt
+       niet als "hij heeft het al": daarmee zou hij aan de balie stranden, en
+       dan is een vraag vooraf vriendelijker dan een gesloten poort achteraf. */
+    if (veld === 'reisdocument') {
+      const pas = (md && md.paspoort) || null;
+      if (!pas || !pas.nummer || !pas.vervaldatum) return false;
+      if (!(pas.nationaliteit || (md && md.nationaliteit))) return false;
+      if (!(pas.geboortedatum || (md && md.geboren))) return false;
+      return pas.vervaldatum >= new Date().toISOString().slice(0, 10);
+    }
     return true;
   }
 
@@ -66,7 +104,7 @@ function maakGegevenspoort({ accounts, getMemberState }) {
     try { md = getMemberState(u.id); } catch (e) { md = null; }
     return velden.filter(v => !heeft(v, u, md)).map(v => ({
       veld: v, label: VELDEN[v].label, waarom: VELDEN[v].waarom,
-      viaVerificatie: !!VELDEN[v].viaVerificatie
+      viaVerificatie: !!VELDEN[v].viaVerificatie, viaScan: !!VELDEN[v].viaScan
     }));
   }
 

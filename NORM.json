@@ -1,7 +1,7 @@
 {
   "vastgelegd": "2026-08-06",
   "meters": {
-    "endpointsZonderTest": 844,
+    "endpointsZonderTest": 845,
     "dekkingPct": 70,
     "keuringStuk": 0,
     "keuringScheef": 1,
@@ -10,23 +10,23 @@
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 17,
     "e2eBestanden": 69,
-    "keuringOmvang": 74,
+    "keuringOmvang": 79,
     "keuringDubbeling": 56,
-    "keuringDekkingAdvies": 46,
+    "keuringDekkingAdvies": 47,
     "endpointsNooitAangeraakt": 0,
     "onbewaakt": 0,
     "routesNietSchakelbaar": 0,
     "metersOngeijkt": 0,
-    "schermenZonderToets": 0,
+    "schermenZonderToets": 46,
     "keuringTeGroot": 1,
     "inlineStijlAttributen": 5549,
     "browserpoortToetsen": 103,
-    "kernBreedte": 986,
+    "kernBreedte": 987,
     "kernGedeeld": 136,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
     "toetsenNietGemeten": 88,
-    "toetsenOngevoeligPct": 2.3
+    "toetsenOngevoeligPct": 2.6
   },
   "notities": [
     {
@@ -311,5 +311,21 @@
     "geheugenHellingMBPerMin": 0
   },
   "prestatieBron": "4k/17g/linux/sqlite",
-  "prestatieGemeten": "2026-08-05T14:32:44.570Z"
+  "prestatieGemeten": "2026-08-05T14:32:44.570Z",
+  "tanden": [
+    {
+      "datum": "2026-08-05",
+      "meter": "schermenZonderToets 3 -> 46",
+      "reden": "Gemeten op de samengevoegde stand, niet gekozen. Twee kanten kwamen hier samen die elk een ander getal droegen: deze kant maakte de meter eerlijk (een scherm dat de service worker VOOROPHAALT telde als bezocht; dat is nu een nevenverzoek en geen bezoek), en de schooltak voegde toetsen EN schermen toe. Elk getal apart klopte voor zijn eigen boom; geen van beide klopte voor de merge. 46 is wat scripts/schermen.js hier werkelijk telt.",
+      "eerlijkheidshalve": "Dit getal gaat OMHOOG en dat is geen verslechtering van het product maar van het beeld dat we ervan hadden: de 3 rustte op een teller die voorophalen meetelde als bezoek. Het echte werk zit niet in dit cijfer maar in de 43 schermen die nu bij naam bekend zijn; de ratel hoort ze een voor een terug te dringen. Wie dit getal weer wil verlagen zonder toetsen te schrijven, moet eerst uitleggen waarom voorophalen wel een bezoek is.",
+      "eerderVastgelegd": "schermenZonderToets 3"
+    },
+    {
+      "datum": "2026-08-06",
+      "meter": "vijf meters herijkt op de SAMENGEVOEGDE stand na de merge met main",
+      "reden": "main liep negentien commits voor en bracht nieuwe routers (fout, adres), nieuwe bestanden en nieuwe toetsen mee. Vier van de vijf gaan daardoor omhoog zonder dat er iets is verslechterd: {\"endpointsZonderTest\":844,\"keuringOmvang\":74,\"keuringDekkingAdvies\":46,\"kernBreedte\":986,\"toetsenOngevoeligPct\":2.3} -> {\"endpointsZonderTest\":845,\"keuringOmvang\":79,\"keuringDekkingAdvies\":47,\"kernBreedte\":987,\"toetsenOngevoeligPct\":2.6}. endpointsZonderTest en keuringDekkingAdvies stijgen met de nieuwe endpoints, keuringOmvang met vijf bestanden die in de waarschuwband vallen, kernBreedte met de namen die die routers aanraken.",
+      "eerlijkheidshalve": "toetsenOngevoeligPct (2,3 -> 2,6) is de enige die WEL over kwaliteit gaat, en het is mijn eigen doen: test/browserpoort.e2e.js is deze ronde voor het eerst gemeten en OVERLEEFDE. Dat is geen ruis maar een uitslag -- die toets heeft een moduletoewijzing nodig zoals camerascherm die kreeg, en tot die er is telt hij terecht als ongevoelig. Ik heb het getal niet weggepoetst door hem uit de meting te halen. Verder: schermenZonderToets staat op de 46 van main, want die kant maakte de meter eerlijk (voorophalen door de service worker telde als bezoek); mijn 0 was met de oude, te milde teller gemeten en is dus geen bewijs meer.",
+      "eerderVastgelegd": "{\"endpointsZonderTest\":844,\"keuringOmvang\":74,\"keuringDekkingAdvies\":46,\"kernBreedte\":986,\"toetsenOngevoeligPct\":2.3}"
+    }
+  ]
 }

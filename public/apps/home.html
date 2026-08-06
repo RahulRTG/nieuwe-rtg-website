@@ -53,7 +53,6 @@
 <script src="/shared/seizoen.js" defer></script>
 <script src="/shared/desktopframe.js" defer></script>
 <script src="/shared/glyf.js"></script>
-<script src="/shared/uitvoer.js"></script>
 </head>
 <body class="rtg-stijl">
 <header>
@@ -85,6 +84,7 @@
   <div id="kamers"><p class="stil" style="padding:1rem 0;">De woning laadt…</p></div>
 </main>
 <div class="melding" id="melding" role="status"></div>
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));

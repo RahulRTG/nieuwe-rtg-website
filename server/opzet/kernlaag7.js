@@ -15,7 +15,7 @@
 'use strict';
 
 module.exports = (kern, hulp) => {
-  const { accounts, archief, crypto, db, findSupplier, haversine, keyVanCodenaam, klokVan, leeftijdVan, logActivity, notify, notifySupplier, path, rememberSession, save, schoon, sseToCustomer, sseToOffice, supplierState, zetRtgai } = hulp;
+  const { accounts, archief, crypto, db, findSupplier, haversine, keyVanCodenaam, klokVan, leeftijdVan, logActivity, notify, notifySupplier, onboarding, path, rememberSession, save, schoon, sseToCustomer, sseToOffice, supplierState, zetRtgai } = hulp;
 
 /* De gegevenspoort (kern/gegevenspoort.js + kern/gegevensgesprek.js): een gratis
    account vraagt vier dingen; pas als er een DERDE PARTIJ bij komt (een zaak, een
@@ -24,9 +24,20 @@ module.exports = (kern, hulp) => {
   const poort = require('../kern/gegevenspoort').maakGegevenspoort({
     accounts, getMemberState: accounts.getMemberState
   });
+  /* `onboarding` gaat mee omdat de adresstap de woonplaats bijschrijft in het
+     onboardingprofiel: dat is sinds de momenten de enige voeding van het
+     stad-facet in kern/ledenregister.js.
+
+     Deze regel komt uit main (commit 0d1306f) en is bij de merge met de hand
+     overgezet: main heeft de kernopbouw nog INLINE in server.js staan, mijn tak
+     heeft hem in kernlaag1..7 gesplitst (c2f1f1c). Git zag daardoor 126 regels
+     conflict waarvan er maar EEN inhoudelijk was; de rest was verplaatste code.
+     Blind mijn kant nemen zou die ene stil hebben laten vallen -- precies de
+     merge-botsing die main zelf in 3cbd75e beschrijft als "geen enkele toets
+     ving hem". */
   const gesprek = require('../kern/gegevensgesprek').maakGegevensgesprek({
     accounts, gegevenspoort: poort, saveMemberState: accounts.saveMemberState,
-    getMemberState: accounts.getMemberState, schoon
+    getMemberState: accounts.getMemberState, schoon, onboarding
   });
   Object.assign(kern, {
     gegevensPoort: poort.poort, gegevensNodig: poort.ontbreekt, gegevensStop: poort.stop,

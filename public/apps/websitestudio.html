@@ -4,8 +4,6 @@
 <meta charset="utf-8">
 <!-- id.js zonder defer en vooraan: RTGId levert id's die al tijdens het parsen nodig zijn -->
 <script src="/shared/id.js"></script>
-<!-- uitvoer.js zonder defer en VOOR het eigen script: dat meldt zijn model aan -->
-<script src="/shared/uitvoer.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Website-studio · RTG Atelier</title>
 <link rel="icon" href="/icon.svg">
@@ -181,6 +179,10 @@
 
 <div class="melding" id="melding" role="status"></div>
 
+<!-- uitvoer.js zonder defer en vlak voor het eigen script: dat meldt zijn
+     model aan met RTGUitvoer.bron(). In de <head> hield hij het parsen op
+     zonder dat het iets won. -->
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $=s=>document.querySelector(s);
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));

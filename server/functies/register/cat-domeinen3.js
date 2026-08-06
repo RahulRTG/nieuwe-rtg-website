@@ -32,8 +32,14 @@ module.exports = [
     uitleg: 'De algemene pin voor prive-apps en de sleutelwoord-inlog met zijn uitdaging.', paden: ['/api/pin', '/api/sleutelwoorden'] },
   { id: 'tg-zegel', categorie: 'Toegang en identiteit', naam: 'Zegel, codes en rechtenbeheer', standaard: true, doelgroepen: ALLE,
     uitleg: 'Het RTG-zegel, dynamische codes, scanbare codes en de rechtenlaag op media.', paden: ['/api/zegel', '/api/code', '/api/drm'] },
+  /* De adresopzoeker hoort bij DE PLEK WAAR EEN ADRES GEVRAAGD MAG WORDEN, en dat
+     is deze poort: de intake vraagt er sinds de momenten geen meer. Hij hoort
+     dus niet onder Onboarding -- wie daar de schakelaar omzet, zou anders ook de
+     adresvraag bij een bezorging stilzetten, en die twee hebben niets met elkaar
+     te maken. Staat hij uit, dan typt het lid zijn adres gewoon voluit. */
   { id: 'tg-gegevens', categorie: 'Toegang en identiteit', naam: 'De gegevenspoort', standaard: true, doelgroepen: ALLE,
-    uitleg: 'Het gesprek waarin een lid zelf zijn ontbrekende gegevens aanvult.', paden: ['/api/gegevens'] },
+    uitleg: 'Het gesprek waarin een lid zelf zijn ontbrekende gegevens aanvult, inclusief het opzoeken van een adres bij postcode en huisnummer.',
+    paden: ['/api/gegevens', '/api/adres'] },
   { id: 'tg-aanmeld', categorie: 'Toegang en identiteit', naam: 'Aanmelden voor een pas', standaard: true, doelgroepen: ALLE,
     uitleg: 'Het aanmeldgesprek en de aanmeldingen die daaruit volgen; het besluit blijft mensenwerk.', paden: ['/api/aanmeld', '/api/aanmelding'] },
 

@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="nl">
 <head>
+<!-- De bouwstempel. npm run build zet hier en in app-main.js hetzelfde getal;
+     wijken ze af, dan draait er nieuwe html naast een oud script (of andersom)
+     en bouwt het beginscherm zichzelf niet meer op: een zwart scherm zonder
+     foutmelding. app-main-01.js vergelijkt de twee en haalt zichzelf dan een
+     keer vers op. -->
+<meta name="rtg-bouw" content="574801e2">
+<!-- De foutmelder staat bewust VOORAAN: hij moet de fouten van het opstarten
+     kunnen zien, en die gebeuren voordat de rest geladen is. -->
+<script src="/shared/foutmelder.js"></script>
 <meta charset="UTF-8">
 <!-- id.js zonder defer en vooraan: RTGId levert id's die al tijdens het parsen nodig zijn -->
 <script src="/shared/id.js"></script>
@@ -281,7 +290,27 @@
 
        De 1.5 is gemeten, niet geschat: het eerste blad (klok, groet, pas,
        drie rijen apps, dockzone) beslaat ongeveer 66 keer --e. */
-    --e:min(clamp(11px, 3.85cqi, 19.5px), 1.48cqh);
+    /* DE ONDERGRENS IS GEEN SMAAK MAAR EEN VANGRAIL.
+
+       Gemeten op een iPhone (iOS 18.7, Safari) die meldde "na inloggen zie je
+       niks meer": venster 375x669, shell 669, thuisscherm 603, acht tegels
+       aanwezig -- en tegelbreedte NUL. Alles eromheen klopte; alleen de tegels
+       waren onzichtbaar, want hun maat is calc(var(--e) * 3.87) en --e was daar
+       nul geworden. Nul maal wat dan ook blijft nul, dus tekende de app zichzelf
+       weg zonder een fout te maken. Er viel niets te vangen: geen uitzondering,
+       geen mislukt verzoek, alleen een leeg scherm.
+
+       De nul komt uit 1.48cqh: die hoogte-eenheid heeft een container nodig die
+       zijn hoogte kent (container-type:size, hieronder pas gezet als de app
+       zichtbaar is). Rekent een browser hem uit op een moment dat die hoogte er
+       nog niet is, dan is de uitkomst nul en blijft dat zo.
+
+       max(10px, ...) maakt dat onmogelijk. Het is bewust geen exacte reparatie
+       van de volgorde waarin Safari rekent -- die kunnen we hier niet afdwingen
+       -- maar een bodem: hoe de rekensom ook uitpakt, een tegel is nooit
+       onzichtbaar. Tien is de kleinste maat waarop het beginscherm nog leesbaar
+       is; daarboven wint gewoon de normale berekening. */
+    --e:max(10px, min(clamp(11px, 3.85cqi, 19.5px), 1.48cqh));
     --os-kolom:calc(var(--e) * 34);
   }
   #app.active{display:flex;}
@@ -1172,8 +1201,20 @@
     width:auto;height:100%;aspect-ratio:1;
     /* zo groot als de overgebleven ruimte toelaat, maar nooit breder dan de
        kolom: op een telefoon vult hij het midden, op de tablet blijft hij een
-       horloge en wordt hij geen schotel */
-    max-width:min(100%, calc(var(--e) * 19));max-height:100%;
+       horloge en wordt hij geen schotel.
+
+       De twee grenzen moeten DEZELFDE zijn, en dat is geen schoonheidsfoutje.
+       Met height:100% en aspect-ratio:1 rekent de browser de breedte uit de
+       hoogte; knijpt max-width die breedte daarna af, dan blijft de hoogte
+       gewoon staan en is het vak niet langer vierkant (gemeten op een telefoon:
+       228 breed, 384 hoog). De wijzerplaat zelf blijft rond, want de SVG houdt
+       zijn verhouding -- maar de schaduw in .rtg-ring::before krijgt
+       border-radius:50% op dat uitgerekte vak en werd zo een ellips van 384
+       hoog: het donkere ei rond de klok, dat niemand aan de schaduwkleur kon
+       wijten. Dezelfde bovengrens op de hoogte houdt het vak vierkant, en de
+       schaduw dus rond om de kast. */
+    max-width:min(100%, calc(var(--e) * 19));
+    max-height:min(100%, calc(var(--e) * 19));
   }
 
   /* 3. de functies, onder de klok */
@@ -2059,6 +2100,7 @@
 </div>
 
 <script src="/shared/realtime.js"></script>
+<script src="/shared/adresvoorstel.js"></script>
 <script src="/shared/poortgesprek.js"></script>
 <script src="/apps/geo.js"></script>
 <script src="/apps/translate.js"></script>

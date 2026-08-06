@@ -11,6 +11,7 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const { startServer, letOpFouten } = require('./helper');
+const bundel = require('../scripts/bundel');
 
 function laadBrowser() {
   for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
@@ -122,6 +123,122 @@ test('deelmenu: ook een app die zijn scherm pas na een fetch bouwt',
         eersteUit: b[0].getAttribute('aria-current') !== 'true' };
     });
     assert.ok(na.tweedeAan && na.eersteUit, 'wisselen werkt (van "' + eerste + '" af)');
+
+    assert.deepEqual(fouten, [], 'paginafouten: ' + fouten.join(' | '));
+  } finally {
+    if (browser) await browser.close();
+    child.kill();
+  }
+});
+
+/* Derde geval, en de reden dat het er is: een menuknop die niets opent.
+   rtgid.html markeert zijn delen (<div class="deel">Toegang</div>) en zet er
+   meteen zijn eigen kop onder (<h2>Actieve toegang</h2>). Dat werden twee
+   delen, waarvan het eerste alleen zijn eigen kop als lid had -- en die kop
+   verbergt open() hoe dan ook, dus die knop toonde een leeg scherm: acht
+   knoppen, vier leeg, twee paren met dezelfde naam. De bewering hieronder is
+   daarom niet "er zijn minstens drie knoppen" (dat slaagt bij acht knoppen
+   waarvan vier leeg net zo vrolijk) maar: ELKE knop toont minstens een
+   element dat niet op alle standen staat, en GEEN knop zet zijn eigen tekst
+   er nog eens als kop onder.
+
+   Waarom de losse delen over de bundel heen worden geserveerd: de pagina's
+   laden public/shared/deelmenu.js, en dat bestand is bouwuitvoer -- de bron
+   staat in public/shared/deelmenu/. bundel() geeft byte-voor-byte wat de
+   build daarvan maakt (check.js regel 6 bewaakt dat de ingecheckte bundel
+   daaraan gelijk is), dus deze toets gaat over de BRON en kan niet slagen op
+   een bundel die achterloopt. Het aantal onderscheppingen wordt geteld en
+   beweerd: bedient de service worker het script alsnog uit zijn cache, dan
+   zakt de toets in plaats van stilletjes de bundel te meten. */
+const METER = function (html) {
+  var main = document.querySelector('main');
+  if (html) { main.innerHTML = html; window.RTGDeel.herscan(); }
+  var balk = main.querySelector('.rtgdeel-balk');
+  if (!balk) return { tabs: 0, regels: [] };
+  var host = balk.parentElement;
+  var knoppen = [].slice.call(balk.querySelectorAll('button'));
+  var kids = [].slice.call(host.children).filter(function (e) { return e !== balk; });
+  // per knop: wat is er zichtbaar? Wat op ELKE stand staat is vaste inhoud
+  // (de intro, een KPI-rij) en hoort bij geen enkel deel.
+  var per = knoppen.map(function (b) { b.click(); return kids.map(function (e) { return e.getClientRects().length > 0; }); });
+  var altijd = kids.map(function (e, j) { return per.every(function (v) { return v[j]; }); });
+  return { tabs: knoppen.length, regels: knoppen.map(function (b, i) {
+    var eigen = kids.filter(function (e, j) { return per[i][j] && !altijd[j]; });
+    return { naam: b.textContent, eigen: eigen.length,
+      dubbel: eigen.length > 0 && eigen[0].textContent.trim() === b.textContent.trim() };
+  }) };
+};
+
+test('deelmenu: geen knop opent een leeg scherm, geen knop herhaalt zijn eigen naam',
+  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  const { child, base } = await startServer({ env: { SMTP_URL: '' } });
+  let browser;
+  try {
+    const u = Date.now().toString().slice(-8);
+    const reg = await fetch(base + '/api/auth/register', { method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: 'iDlid', email: 'id' + u + '@x.nl', phone: '06' + u,
+        password: 'geheim123', geboortedatum: '1990-01-01', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' }) }).then(r => r.json());
+
+    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    const page = await browser.newPage();
+    const fouten = [];
+    letOpFouten(page, fouten);
+    const bron = bundel.bundel('shared/deelmenu.js').toString();
+    let onderschept = 0;
+    await page.route('**/shared/deelmenu.js*', async (route) => {
+      onderschept++;
+      await route.fulfill({ status: 200, contentType: 'application/javascript', body: bron });
+    });
+    await page.goto(base + '/apps/rtgid.html', { waitUntil: 'domcontentloaded' });
+    await page.evaluate(t => { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_cookieinfo_v1', '1'); }, reg.token);
+    await page.goto(base + '/apps/rtgid.html', { waitUntil: 'domcontentloaded' });
+    await page.waitForSelector('.rtgdeel-balk button', { timeout: 8000 });
+    assert.ok(onderschept > 0, 'de losse delen zijn echt geserveerd (anders meet deze toets de bundel)');
+
+    /* 1. rtgid.html zoals hij op de plank ligt: vier delen, vier knoppen. */
+    const id = await page.evaluate(METER, null);
+    assert.deepEqual(id.regels.map(r => r.naam), ['Inloggen', 'Toegang', 'Machtigingen', 'Inzagelog'],
+      'de vier markers van de pagina zijn de vier knoppen');
+    assert.deepEqual(id.regels.filter(r => r.eigen === 0).map(r => r.naam), [],
+      'geen knop opent een leeg scherm');
+    assert.deepEqual(id.regels.filter(r => r.dubbel).map(r => r.naam), [],
+      'geen knop met zijn eigen naam er nog eens als kop onder');
+
+    /* 2. En niet alleen op deze pagina: dezelfde eis op de andere vormen die
+       een kop zonder eigen inhoud opleveren -- een slotkop, en een kop die
+       alleen door vaste laag wordt gevolgd. Het echte component, dezelfde
+       herscan die de apps gebruiken. */
+    const vormen = [
+      ['marker met eigen kop eronder',
+        '<div class="deel">Een</div><h2>Kop een</h2><div class="kaart">inhoud een</div>' +
+        '<div class="deel">Twee</div><h2>Kop twee</h2><div class="kaart">inhoud twee</div>' +
+        '<div class="deel">Drie</div><h2>Kop drie</h2><div class="kaart">inhoud drie</div>'],
+      ['slotkop zonder inhoud eronder',
+        '<div class="deel">Een</div><div class="kaart">inhoud een</div>' +
+        '<div class="deel">Twee</div><div class="kaart">inhoud twee</div>' +
+        '<div class="deel">Drie</div><div class="kaart">inhoud drie</div><div class="deel">Vier</div>'],
+      ['kop die alleen door vaste laag wordt gevolgd',
+        '<div class="deel">Een</div><div class="kaart">inhoud een</div>' +
+        '<div class="deel">Twee</div><div class="kaart">inhoud twee</div>' +
+        '<div class="deel">Drie</div><div class="rtgdeel-vast">altijd zichtbaar</div>' +
+        '<div class="deel">Vier</div><div class="kaart">inhoud vier</div>']
+    ];
+    const slot = [];
+    for (const [naam, html] of vormen) {
+      const v = await page.evaluate(METER, html);
+      assert.equal(v.tabs, 3, naam + ': drie knoppen, want er zijn drie delen met inhoud');
+      assert.deepEqual(v.regels.filter(r => r.eigen === 0).map(r => r.naam), [],
+        naam + ': geen knop opent een leeg scherm');
+      assert.deepEqual(v.regels.filter(r => r.dubbel).map(r => r.naam), [],
+        naam + ': geen knop herhaalt zijn eigen naam');
+      slot.push(v.regels[2].eigen);
+    }
+    /* De slotkop draagt geen knop, dus zijn tekst hoort nergens door een knop
+       vervangen te worden: hij blijft gewone inhoud bij het deel erboven (twee
+       eigen elementen daar) en verhuist niet naar de vaste laag, want dan zou
+       hij op elke stand meestaan. */
+    assert.equal(slot[1], 2, 'de slotkop blijft in beeld bij het deel erboven');
 
     assert.deepEqual(fouten, [], 'paginafouten: ' + fouten.join(' | '));
   } finally {

@@ -37,11 +37,69 @@
 
   var esc = function (t) { return String(t == null ? '' : t).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); };
 
-  var css = '.mgz-knop{position:fixed;right:1rem;z-index:9980;border:none;border-radius:999px;padding:.65rem 1rem;font-family:Inter,system-ui,sans-serif;font-weight:600;font-size:.83rem;cursor:grab;touch-action:none;box-shadow:0 6px 20px rgba(0,0,0,.4);}' +
+  /* DE BALK VAN RAHUL: een vorm, op elk scherm.
+
+     Hiervoor waren er drie manieren om bij Rahul te komen en geen daarvan
+     stond er gewoon: een zwevende pil die overal was weggehaald ("te druk in
+     beeld"), een veeg vanaf de onderrand die je moest kennen, en op het
+     beginscherm een chatbalk die alleen daar stond. Nu is er een balk, overal
+     dezelfde, met de lippen als gezicht -- de vorm van het beginscherm, want
+     die was de goede.
+
+     Klein of groot bepaal je zelf: ingeklapt is hij alleen de lippen, en een
+     tik maakt hem weer een balk. Die keuze blijft bewaard (localStorage), want
+     hij hoort bij hoe JIJ werkt en niet bij de pagina waar je toevallig bent.
+     Zo is Rahul overal, zonder in de weg te staan. */
+  /* GEINTEGREERD, NIET ZWEVEND. Rahul stond hier als een venster over de
+     pagina heen: je las iets, hij ging er half overheen, en je moest hem eerst
+     wegklikken. Dat is precies wat het beginscherm en de inlogpoort NIET doen
+     -- daar hoort hij bij het scherm.
+
+     Daarom staat het blok onderaan vast, maar reserveert de pagina er ruimte
+     voor: de hoogte van het blok gaat als --rtg-rahul-h naar de body, en die
+     krijgt evenveel padding onderaan. Groeit het blok (er komt een antwoord),
+     dan schuift de inhoud mee omhoog in plaats van eronder te verdwijnen. Zo
+     staat hij nergens overheen, ook niet onderaan een lange pagina.
+
+     Klap je hem klein, dan krimpt de gereserveerde ruimte mee: de lippen
+     alleen kosten bijna niets. */
+  var css = '.mgz-blok{position:fixed;left:50%;transform:translateX(-50%);z-index:9980;' +
+      'bottom:calc(env(safe-area-inset-bottom,0px) + .9rem);width:min(30rem,calc(100vw - 1.6rem));' +
+      'display:flex;flex-direction:column;align-items:center;gap:.5rem;pointer-events:none;}' +
+    '.mgz-blok > *{pointer-events:auto;}' +
+    /* het tussenstuk dat de pagina onderaan ruimte geeft; zie meetRuimte() */
+    '.mgz-ruimte{width:100%;flex-shrink:0;pointer-events:none;}' +
+    '.mgz-blok.mgz-klein-blok{width:auto;}' +
+    '.mgz-balk{width:100%;' +
+      'display:flex;align-items:center;gap:.55rem;padding:.4rem .45rem .4rem .55rem;border-radius:999px;' +
+      'background:color-mix(in srgb, var(--card,#151312) 62%, transparent);' +
+      'backdrop-filter:blur(26px) saturate(1.5);-webkit-backdrop-filter:blur(26px) saturate(1.5);' +
+      'border:1px solid var(--line,#2A2724);box-shadow:0 12px 34px rgba(0,0,0,.42);' +
+      'transition:width .22s cubic-bezier(.22,.61,.21,1),padding .22s cubic-bezier(.22,.61,.21,1);}' +
+    '.mgz-balk:focus-within{border-color:color-mix(in srgb, var(--gold,#857007) 62%, var(--line,#2A2724));}' +
+    /* ingeklapt: alleen de lippen, en de balk krimpt eromheen */
+    '.mgz-balk.mgz-klein{width:auto;padding:.3rem;gap:0;}' +
+    '.mgz-balk.mgz-klein input,.mgz-balk.mgz-klein .mgz-balkgo{display:none;}' +
+    '.mgz-orb{width:2.4rem;height:2.4rem;flex-shrink:0;border-radius:50%;overflow:hidden;border:none;padding:0;' +
+      'display:flex;align-items:center;justify-content:center;cursor:pointer;' +
+      'background:radial-gradient(80% 80% at 50% 30%, #2A241A, #14110D);' +
+      'box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--gold,#857007) 45%, transparent);}' +
+    '.mgz-orb canvas{width:170%;height:auto;display:block;pointer-events:none;filter:brightness(1.3) saturate(1.08);}' +
+    '.mgz-balk input{flex:1;min-width:0;background:none;border:none;outline:none;color:var(--txt,#F7F5F1);' +
+      "font-family:Inter,system-ui,sans-serif;font-size:.86rem;padding:.4rem 0;}" +
+    '.mgz-balk input::placeholder{color:var(--soft,#8A8680);}' +
+    '.mgz-balkgo{flex-shrink:0;width:2.2rem;height:2.2rem;border-radius:50%;border:none;cursor:pointer;' +
+      'background:var(--gold,#857007);color:#1C1608;display:flex;align-items:center;justify-content:center;font-weight:700;}' +
+    '.mgz-balkgo:active{opacity:.85;}' +
+    '@media print{.mgz-balk{display:none;}}' +
+    '@media (prefers-reduced-motion: reduce){.mgz-balk{transition:none;}}' +
+    '.mgz-knop{position:fixed;right:1rem;z-index:9980;border:none;border-radius:999px;padding:.65rem 1rem;font-family:Inter,system-ui,sans-serif;font-weight:600;font-size:.83rem;cursor:grab;touch-action:none;box-shadow:0 6px 20px rgba(0,0,0,.4);}' +
     '.mgz-knop.mgz-sleept{cursor:grabbing;opacity:.9;box-shadow:0 12px 34px rgba(0,0,0,.55);}' +
     '.mgz-rahul{bottom:1rem;background:var(--gold,#857007);color:#000;}' +
     '.mgz-samen{bottom:3.6rem;background:#151312;color:#eee;border:1px solid var(--gold,#857007);}' +
-    '.mgz-sheet{position:fixed;right:1rem;bottom:1rem;z-index:9981;width:min(360px,92vw);background:#151312;border:1px solid var(--gold,#857007);border-radius:16px;padding:.9rem;display:flex;flex-direction:column;gap:.6rem;box-shadow:0 10px 30px rgba(0,0,0,.5);color:#eee;font-family:Inter,system-ui,sans-serif;}' +
+    /* het antwoord hoort bij de balk, niet ergens in de hoek: zelfde breedte,
+       eronder vastgeplakt, en het scrollt intern als Rahul veel zegt */
+    '.mgz-sheet{position:static;width:100%;max-height:min(42vh,22rem);overflow:auto;background:#151312;border:1px solid var(--gold,#857007);border-radius:16px;padding:.9rem;display:flex;flex-direction:column;gap:.6rem;box-shadow:0 10px 30px rgba(0,0,0,.5);color:#eee;font-family:Inter,system-ui,sans-serif;}' +
     '.mgz-sheet[hidden]{display:none;}.mgz-kop{display:flex;align-items:center;justify-content:space-between;font-weight:600;cursor:move;touch-action:none;user-select:none;-webkit-user-select:none;}' +
     '.mgz-sheet.mgz-sleept{opacity:.96;box-shadow:0 16px 44px rgba(0,0,0,.6);}' +
     '.mgz-x{background:transparent;border:1px solid #333;border-radius:8px;color:#eee;padding:.15rem .5rem;cursor:pointer;}' +

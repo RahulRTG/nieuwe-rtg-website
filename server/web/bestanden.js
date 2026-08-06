@@ -31,7 +31,22 @@ function stuurBestand(req, res, fp, st, next) {
   res.setHeader('Accept-Ranges', 'bytes');
   res.setHeader('ETag', etag);
   res.setHeader('Last-Modified', laatst);
-  if (!res.getHeader('Cache-Control')) res.setHeader('Cache-Control', onveranderlijk(fp) ? 'public, max-age=31536000, immutable' : 'public, max-age=0');
+  /* Niet-gehashte scripts en stijlen: "no-cache", niet "max-age=0". Voor een
+     browser lijkt dat hetzelfde (allebei: eerst navragen), maar voor een
+     tussenlaag niet. Cloudflare ziet max-age=0 als een gewoon cachebaar
+     antwoord, zet er zijn eigen edge-TTL op en schrijft de kop naar de browser
+     om als max-age=14400. Gevolg: na een update kreeg iedereen vier uur lang
+     oud script naast nieuwe html, en dat brak de app stil -- precies de kwaal
+     die voor de andere statische route al gerepareerd was (zie
+     middleware/compressie.js), maar deze route deelde die reparatie niet.
+     Gemeten op de live site: origin "public, max-age=0", en wat de browser
+     kreeg "max-age=14400". Met no-cache cachet Cloudflare het antwoord niet en
+     blijft het een 304 van een paar bytes. Gehashte build-output houdt zijn
+     eeuwige cache: die naam verandert immers zodra de inhoud verandert. */
+  if (!res.getHeader('Cache-Control')) {
+    res.setHeader('Cache-Control', onveranderlijk(fp) ? 'public, max-age=31536000, immutable'
+      : (/\.(?:js|css|json|webmanifest|svg)$/i.test(fp) ? 'no-cache' : 'public, max-age=0'));
+  }
 
   // voorwaardelijke GET -> 304
   const inm = req.headers['if-none-match'];
@@ -83,7 +98,9 @@ function statisch(root, opts) {
        niets over of een toets een app heeft geopend. */
     if (bestandHaak && (req.method === 'GET' || req.method === 'HEAD')) {
       const kaal = String(req.url || '').split('?')[0].split('#')[0];
-      if (/\.html?$/i.test(kaal)) { try { bestandHaak(kaal); } catch (e) {} }
+      // het verzoek gaat mee: alleen daaraan is te zien of dit een bezoek was
+      // of een voorophaling van een service worker (zie server/routelog.js)
+      if (/\.html?$/i.test(kaal)) { try { bestandHaak(kaal, req); } catch (e) {} }
     }
     return bedien(req, res, next);
   };

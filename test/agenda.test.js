@@ -6,7 +6,7 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, binnenEenDag } = require('./helper');
 
 function api(base, pad, body, token) {
   const h = { 'Content-Type': 'application/json' };
@@ -38,11 +38,17 @@ test('1. een lid plant een afspraak en de telling loopt op', async () => {
 });
 
 test('2. de AI zet gewone taal om naar een datum (zonder Claude via de parser)', async () => {
-  const r = (await api(base, '/api/agenda/ai', { opdracht: 'lunch met Sofia morgen om 13u' }, lid)).body;
-  assert.equal(r.gedaan, true, 'de AI plande het in');
-  const nieuw = r.items.find(i => /Sofia|lunch/i.test(i.titel));
-  assert.ok(nieuw, 'de afspraak staat in de agenda');
-  assert.equal(nieuw.datum, morgen(), 'morgen correct uitgerekend');
+  /* "Morgen" rekent de server uit, en morgen() hier doet dat nog een keer.
+     Loopt de suite over middernacht, dan zijn dat twee verschillende dagen;
+     binnenEenDag() doet de meting dan een keer over. */
+  const nieuw = await binnenEenDag(async () => {
+    const r = (await api(base, '/api/agenda/ai', { opdracht: 'lunch met Sofia morgen om 13u' }, lid)).body;
+    assert.equal(r.gedaan, true, 'de AI plande het in');
+    const item = r.items.find(i => /Sofia|lunch/i.test(i.titel));
+    assert.ok(item, 'de afspraak staat in de agenda');
+    assert.equal(item.datum, morgen(), 'morgen correct uitgerekend');
+    return item;
+  });
   assert.equal(nieuw.tijd, '13:00', 'om 13u -> 13:00');
 });
 

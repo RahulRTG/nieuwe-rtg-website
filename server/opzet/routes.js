@@ -63,7 +63,13 @@ module.exports = function hangRoutesOp(kern) {
   }
   // De verplichte onboarding + het contract raken leden, gasten, de eigenaar en
   // leveranciers; net als de infra-endpoints draait dit altijd mee.
+  // fouten uit de browser: bewust zonder auth, want een fout die het inloggen
+  // sloopt komt nooit binnen achter een poort die inloggen vereist
+  require('../routes/fout')(grens('fout'));
   require('../routes/onboarding')(grens('onboarding'));
+  // De adresopzoeker hoort bij het invullen van een adres (intake en het
+  // gegevensgesprek), en draait daarom net als de onboarding altijd mee.
+  require('../routes/adres')(grens('adres'));
   require('../routes/aanmeldgesprek')(grens('aanmeldgesprek'));
   require('../routes/kantoorgesprek')(grens('kantoorgesprek'));
   /* SSO staat naast de auth-routes en niet erin: het is een tweede weg naar

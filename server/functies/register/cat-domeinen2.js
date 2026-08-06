@@ -40,6 +40,13 @@ module.exports = [
     uitleg: 'De aansturing van apparaten in huis.', paden: ['/api/home'] },
 
   // ---------- identiteit en veiligheid ----------
+  /* De foutmelder hoort hier omdat hij over de gebruiker gaat en niet over een
+     dienst: hij stuurt bij een storing de foutmelding, het bestand en de regel
+     naar het logboek, zodat een kapot scherm geen raadsel blijft. Uitzetten kan
+     -- er wordt dan alleen niets meer gemeld, en verder verandert er niets aan
+     wat de app doet. */
+  { id: 'dom-foutmelder', categorie: 'Identiteit en veiligheid', naam: 'Storingsmelding uit de browser', standaard: true, doelgroepen: ALLE,
+    uitleg: 'Meldt een onafgevangen fout aan het logboek: melding, bestand, regel en pagina. Geen naam, geen codenaam, geen ingetypte tekst.', paden: ['/api/fout'] },
   { id: 'dom-rtgid', categorie: 'Identiteit en veiligheid', naam: 'RTG iD', standaard: true, doelgroepen: ALLE,
     uitleg: 'De digitale identiteit en het delen daarvan.', paden: ['/api/rtgid'] },
   { id: 'dom-veiligheid', categorie: 'Identiteit en veiligheid', naam: 'Veiligheidsdiensten', standaard: true, doelgroepen: LEDEN,

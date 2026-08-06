@@ -250,7 +250,23 @@ function pctMs(q) { let doel = q * latN, c = 0; for (let i = 0; i < GRENZEN.leng
 let child = null;
 const SRVLOG = path.join(TMP, 'server.log');
 const GC_OUT = path.join(TMP, 'gc.json');
-function rssMB(pid) { try { const m = fs.readFileSync('/proc/' + pid + '/status', 'utf8').match(/VmRSS:\s+(\d+) kB/); return m ? Math.round(m[1] / 1024) : null; } catch (e) { return null; } }
+/* Het RSS van de serverprocessen. Dit las alleen /proc/<pid>/status, en dat
+   bestaat op macOS niet: elke RAM-regel in het verslag kwam daar uit op "null
+   MB" -- een getal-vormige mededeling die niets meet. Het oordeel hing er niet
+   aan (de lek-vloer meet heapUsed via de server zelf), maar een meter die op de
+   ene machine cijfers geeft en op de andere stil niets, is precies het soort
+   meter waar dit huis niet op wil bouwen. /proc blijft voorop, want dat is
+   goedkoper dan een proces starten; anders vraagt ps het, en dat kent elke Unix. */
+function rssMB(pid) {
+  try {
+    const m = fs.readFileSync('/proc/' + pid + '/status', 'utf8').match(/VmRSS:\s+(\d+) kB/);
+    if (m) return Math.round(m[1] / 1024);
+  } catch (e) { /* geen /proc: macOS en de BSD's */ }
+  try {
+    const kb = Number(execFileSync('ps', ['-o', 'rss=', '-p', String(pid)], { encoding: 'utf8' }).trim().split(/\s+/)[0]);
+    return Number.isFinite(kb) && kb > 0 ? Math.round(kb / 1024) : null;
+  } catch (e) { return null; }
+}
 async function heapNaGc(pid) {
   let laagst = Infinity;
   for (let i = 0; i < 4; i++) {

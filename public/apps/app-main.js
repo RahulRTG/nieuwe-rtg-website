@@ -1,4 +1,32 @@
 (function(){
+/* HTML EN SCRIPT MOETEN VAN DEZELFDE BOUW ZIJN.
+
+   Een browser, een CDN of een service worker kan de pagina vers hebben en dit
+   script nog uren oud (of omgekeerd). Die mix bouwt het beginscherm niet meer
+   op: de gebruiker ziet zwart, en niets in de console legt uit waarom. Dat is
+   hier echt gebeurd, meer dan eens, en elke keer duurde het lang voordat
+   iemand doorhad dat de code al gerepareerd was.
+
+   npm run build zet in beide bestanden dezelfde stempel. Wijken ze af, dan
+   haalt de app zichzelf EEN keer vers op -- met een merk in sessionStorage,
+   zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
+   wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
+   dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
+var RTG_BOUW = '574801e2';
+(function bouwWacht(){
+  try {
+    var m = document.querySelector('meta[name="rtg-bouw"]');
+    var html = m ? m.getAttribute('content') : null;
+    if (!html || html === RTG_BOUW) return;
+    if (sessionStorage.getItem('rtg_bouw_ververst') === html) {
+      console.warn('[rtg] html-bouw ' + html + ' naast script-bouw ' + RTG_BOUW + '; verversen hielp niet, we gaan door.');
+      return;
+    }
+    sessionStorage.setItem('rtg_bouw_ververst', html);
+    console.warn('[rtg] html-bouw ' + html + ' naast script-bouw ' + RTG_BOUW + '; eenmalig vers ophalen.');
+    location.reload();
+  } catch (e) { /* geen sessionStorage: dan liever doorgaan dan omvallen */ }
+})();
   const $ = s => document.querySelector(s);
   const T = (k, nl) => (window.RTGi18n ? RTGi18n.t(k, nl) : nl);
   const lang = () => (window.RTGi18n ? RTGi18n.lang : 'nl');
@@ -441,7 +469,14 @@
       '.ag-doos{display:flex;flex-direction:column;width:100%;}' +
       // geen chatbubbels: alleen Rahuls zin, groot en stil in Bodoni, en
       // daaronder de ene regel van de gebruiker; verder niets
-      ".ag-zin{font-family:'Bodoni Moda',serif;font-weight:400;font-size:1.12rem;line-height:1.65;color:var(--txt);" +
+      /* VASTE KLEUR, GEEN MEEBEWEGENDE. Deze zin is het enige wat je aan de
+         poort te lezen krijgt, op een donkere sterrenhemel. Hij stond op
+         var(--txt), en die schuift mee met de dagkleur: afhankelijk van het
+         tijdstip werd hij warmer en doffer, en een gebruiker meldde dat de
+         letters bij hem niet zo wit waren. Leesbaarheid van de enige tekst op
+         het scherm hoort niet van het uur van de dag af te hangen. CLAUDE.md
+         is hier ook duidelijk over: op zwart is de tekstkleur wit. */
+      ".ag-zin{font-family:'Bodoni Moda',serif;font-weight:400;font-size:1.12rem;line-height:1.65;color:#FBFAF8;" +
         'text-align:center;min-height:4.6rem;display:flex;align-items:center;justify-content:center;' +
         'padding:0.9rem 0.4rem 1.1rem;text-wrap:balance;animation:agZin 0.5s ease;}' +
       '@keyframes agZin{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}' +
@@ -541,10 +576,13 @@
     // een zin, geen logboek: Rahuls woorden vervangen elkaar rustig
     function zeg(wie, tekst){
       if (wie !== 'rahul') return;
-      // Rahul typt zijn zin letter voor letter en de mond beweegt mee
-      if (window.RTGTyp){ RTGTyp.schrijf(zin, tekst, { praat: praat }); return; }
+      /* De zin staat er METEEN, niet letter voor letter. Dat typen was mooi
+         bedoeld, maar aan de poort staat iemand die naar binnen wil: die leest
+         sneller dan de machine tikt, en zit dan te wachten op tekst die er al
+         is. De mond beweegt wel gewoon mee -- dat is Rahuls gezicht, geen
+         leesvertraging. */
       zin.style.animation = 'none';
-      void zin.offsetWidth; // de fade opnieuw laten lopen
+      void zin.offsetWidth;              // de fade opnieuw laten lopen
       zin.style.animation = '';
       zin.textContent = tekst;
       praat(Math.min(2600, 500 + tekst.length * 28));
@@ -885,14 +923,15 @@
      bedraad; de gespreksfuncties staan hier. */
   let onbBezig = false, onbSt = null, onbRij = [], onbStap = null, onbHuidig = null, onbGeopend = false, onbMond = null;
   function onbEl(id){ return document.getElementById(id); }
-  // Rahuls signatuurmond boven de onboarding, dezelfde als op de poort; en zijn
-  // woorden verschijnen letter voor letter (RTGTyp) terwijl de mond meebeweegt.
+  // Rahuls signatuurmond boven de onboarding, dezelfde als op de poort. De
+  // zin staat er meteen volledig; alleen de mond beweegt mee.
   function onbMondMaak(){ const c = onbEl('onbMond'); if (c && !onbMond && window.RTGMond) onbMond = RTGMond.maak(c); }
   function onbZeg(t){
     const z = onbEl('onbTitel'); if (!z) return;
     const praat = onbMond ? function(ms){ onbMond.praat(ms); } : null;
-    if (window.RTGTyp) RTGTyp.schrijf(z, t, { praat: praat });
-    else { z.textContent = t; if (praat) praat(400); }
+    /* Ook hier meteen de hele zin; zie app-main-05.js voor waarom. */
+    z.textContent = t;
+    if (praat) praat(Math.min(2600, 500 + t.length * 28));
   }
   function onbInputType(t){ return t==='date'?'date':t==='email'?'email':t==='tel'?'tel':'text'; }
   function onbOpenVelden(){ return ((onbSt && onbSt.velden) || []).filter(function(v){ return !v.ingevuld; }); }
@@ -1627,49 +1666,189 @@
     }
   }
 
+  /* EEN KAPOTTE KAART MAG NIET HET HELE SCHERM MEENEMEN.
+
+     renderAll() riep twintig opbouwfuncties na elkaar aan, zonder vangnet.
+     Struikelde de eerste, dan stierf de rest mee en bleef er van het
+     beginscherm niets over dan wat er vast in de HTML staat -- de balk van
+     Rahul. Dat is precies het beeld dat gemeld werd: "ik zie alleen de AI-balk".
+     Een zwart scherm is bovendien de slechtste foutmelding die er is: hij zegt
+     niet wat er stuk is, en niet dat de rest het nog zou doen.
+
+     stap() draait elk onderdeel apart. Gaat er een mis, dan gaat de rest
+     gewoon door en zegt de console WELKE het was. Dat is geen doekje voor het
+     bloeden: een lid dat zijn tegels, klok en wallet ziet terwijl een van de
+     twintig kaarten ontbreekt, heeft een werkende app -- en wij een spoor. */
+  /* De opbouw van het beginscherm: het vangnet, de melding als er iets leeg
+     blijft, en de volgorde eerst-beeld-dan-gegevens. Apart deel omdat
+     app-main-12.js hiermee op 11,5 KB kwam en keuringsregel 13 op 10 staat --
+     en de regel heeft gelijk over de reden: de rest van dat deel is de schil
+     van de app (meldingen, tabbladen), dit gaat over hoe het scherm ontstaat. */
+  /* WAT ER MISGING, OP HET SCHERM ZELF.
+
+     Een gebruiker met een half leeg beginscherm hoort niet de console te
+     hoeven openen om te weten wat er speelt -- en wij horen niet te moeten
+     raden. Deze regel verschijnt alleen als er echt iets omviel: een rustige
+     mededeling onderaan met de naam van het onderdeel, en verder niets. Geen
+     stacktrace, geen alarm; wie het niet interesseert leest er gewoon
+     overheen, en wie het meldt kan het letterlijk overtypen. */
+  let leegGemeld = false;
+  function meldLeegScherm(wat) {
+    if (leegGemeld) return;
+    leegGemeld = true;
+    try {
+      const el = document.createElement('div');
+      el.id = 'rtgOnderdeelStuk';
+      el.setAttribute('role', 'status');
+      el.style.cssText = 'position:fixed;left:50%;transform:translateX(-50%);z-index:9970;' +
+        'bottom:calc(env(safe-area-inset-bottom,0px) + 8.5rem);width:min(26rem,calc(100vw - 2rem));' +
+        'background:var(--card,#151312);border:1px solid var(--line,#2A2724);border-radius:12px;' +
+        'padding:.7rem .9rem;color:var(--muted,#8A8680);font-family:Inter,system-ui,sans-serif;' +
+        'font-size:.76rem;line-height:1.5;text-align:center;';
+      el.textContent = 'Een onderdeel van dit scherm laadde niet: ' + wat + '. De rest werkt gewoon.';
+      document.body.appendChild(el);
+    } catch (e) { /* zelfs de melding mag niets breken */ }
+  }
+  // de tegelbouw (app-main-26b.js) meldt hier ook, dus hij moet daar bereikbaar zijn
+  window.RTGMeldStuk = meldLeegScherm;
+
+  function stap(naam, fn) {
+    try { fn(); } catch (e) {
+      console.error('[rtg] onderdeel "' + naam + '" van het beginscherm ging mis:', e);
+      meldLeegScherm(naam);
+    }
+  }
+
+  /* EERST BEELD, DAN GEGEVENS.
+
+     renderAll() deed alles in een adem: het beginscherm, en meteen ook de
+     vijftien tabbladen erachter. Op deze machine valt dat niet op; op een
+     telefoon wel. Gemeten bij een gebruiker die "hij laadt heel lang" meldde:
+     203 verzoeken bij het openen, 53 scripts en een bundel van 530 KB, en
+     tweeentwintig opbouwstappen voordat er ook maar iets in beeld kwam. Wat je
+     dan ziet is een leeg scherm, en lang genoeg leeg voelt als kapot.
+
+     Alleen het beginscherm heeft de gegevens nodig die er al zijn; de andere
+     tabbladen kijkt niemand naar voordat hij erop tikt. Die gaan daarom NA het
+     eerste beeld, een voor een, met een adempauze ertussen zodat de telefoon
+     tussendoor kan tekenen en reageren. Wie meteen op een tabblad tikt vindt
+     hem gewoon gevuld of even later; wie op het beginscherm blijft, ziet het
+     nu meteen.
+
+     De volgorde is niet willekeurig: wat op het beginscherm zichtbaar is gaat
+     voor, daarna de rest. */
+  function naBeeld(stappen) {
+    let i = 0;
+    const volgende = () => {
+      if (i >= stappen.length) return;
+      const [naam, fn] = stappen[i++];
+      stap(naam, fn);
+      // een adempauze: de telefoon mag tussendoor tekenen en op een tik reageren
+      if (window.requestIdleCallback) requestIdleCallback(volgende, { timeout: 400 });
+      else setTimeout(volgende, 16);
+    };
+    if (window.requestIdleCallback) requestIdleCallback(volgende, { timeout: 400 });
+    else setTimeout(volgende, 50);
+  }
+
   function renderAll(){
-    $('#codeChipTxt').textContent = user.codename;
+    /* Ook deze aanloop liep zonder vangnet, en juist hier staan de regels die
+       aannemen dat een element bestaat. Viel er een om, dan kwam de rest van
+       renderAll niet eens op gang en hielp het afschermen van de stappen
+       hieronder niets. */
     // gratis gebruiker (zonder pas): reizen, betalen en AI zijn voor leden
     const guest = user.tier === 'guest';
+    stap('scherm-aanloop', () => {
+    $('#codeChipTxt').textContent = user.codename;
     ['reizen','betalen','ai','assets','zorg'].forEach(t => { const b = document.querySelector('.tabbar button[data-tab="'+t+'"]'); if (b) b.style.display = guest ? 'none' : ''; });
     // het OS-beginscherm leest dit: zonder pas geen wallet-tegel en geen balk
     // van Rahul, want allebei zijn ze voor leden
     document.getElementById('app').classList.toggle('os-gast', guest);
-    renderHome();
+    });
+    stap('renderHome', renderHome);
     // Rahul opent het gesprek op het beginscherm zelf, met wat hij nu ziet
-    if (!guest && window.RTGThuisRahul) RTGThuisRahul.opent();
-    if (!guest){ renderTrip(); renderPay(); renderAI(); renderAssets(); renderFluister(); }
-    renderSalon();
-    renderTerPlaatse();
-    laadBestellen();
-    laadBoodschappen();
-    laadShowroom();
-    laadTickets();
-    laadVerhuur();
-    laadCharter();
-    laadContracten();
-    laadVastgoed();
-    if (!guest) laadCare();
-    loadCv();
-    loadVacatures();
-    laadOntmoet();
-    /* Terug waar je was: binnen een half uur na de laatste activiteit herstelt
-       de app de tab waar je zat (zie openTab). Ouder dan dat -- of een tab die
-       voor deze pas niet zichtbaar is -- dan gewoon het beginscherm. */
+    stap('rahul-thuis', () => { if (!guest && window.RTGThuisRahul) RTGThuisRahul.opent(); });
+    /* Terug waar je was, maar KORT. Dit venster stond op een half uur, en dat
+       was te ver doorgeschoten: openTab schrijft de tijd bij elke schermwissel
+       bij, dus het venster schoof steeds mee en in gewoon gebruik landde je
+       vrijwel altijd weer in de app waar je was. Het beginscherm -- de tegels,
+       de klok, het gezicht van het huis -- kreeg je dan nooit meer te zien.
+
+       Waar dit voor bedoeld is, is de app die ONDER je vandaan wordt gedood:
+       iOS ruimt een app in de achtergrond op, of je herlaadt per ongeluk, en
+       dan hoor je niet je plek kwijt te raken. Dat gebeurt binnen seconden,
+       niet binnen een half uur. Twee minuten dekt dat ruim, en alles wat
+       later komt is een NIEUWE keer openen -- en die begint thuis. */
+    const PLEK_VENSTER = 2 * 60000;
     let beginTab = 'home';
     try {
       const b = JSON.parse(localStorage.getItem('rtg_actieve_tab') || 'null');
-      if (b && b.tab && Date.now() - (b.t || 0) < 30 * 60000){
+      if (b && b.tab && Date.now() - (b.t || 0) < PLEK_VENSTER){
         const knop = document.querySelector('.tabbar button[data-tab="' + b.tab + '"]');
         if (knop && knop.style.display !== 'none') beginTab = b.tab;
       }
     } catch(e){}
+    /* De tabbladen achter het beginscherm: na het eerste beeld, een voor een. */
+    naBeeld([
+      ...(guest ? [] : [['renderTrip', renderTrip], ['renderPay', renderPay], ['renderAI', renderAI],
+                        ['renderAssets', renderAssets], ['renderFluister', renderFluister],
+                        ['laadCare', laadCare]]),
+      ['renderSalon', renderSalon], ['renderTerPlaatse', renderTerPlaatse],
+      ['laadBestellen', laadBestellen], ['laadBoodschappen', laadBoodschappen],
+      ['laadShowroom', laadShowroom], ['laadTickets', laadTickets],
+      ['laadVerhuur', laadVerhuur], ['laadCharter', laadCharter],
+      ['laadContracten', laadContracten], ['laadVastgoed', laadVastgoed],
+      ['loadCv', loadCv], ['loadVacatures', loadVacatures], ['laadOntmoet', laadOntmoet]
+    ]);
+
     openTab(beginTab);
+
+    /* KIJKT DE APP OF ER IETS TE ZIEN IS. Een zwart scherm meldt zichzelf niet:
+       er gooit niets, alle verzoeken slagen, en toch staat er niets. Daarom
+       meten we het na het opbouwen gewoon na. Is het beginscherm leeg, dan
+       gaan de MATEN naar het logboek (venster, hoogtes, aantal tegels, de
+       rekeneenheid) -- genoeg om een layoutstoring te plaatsen zonder dat
+       iemand een console hoeft te openen. Staat er wel wat, dan gebeurt er
+       niets en weet niemand hiervan. */
+    setTimeout(() => {
+      try {
+        /* WAT STAAT ER WERKELIJK MIDDEN OP HET SCHERM?
+
+           De eerste versie van deze controle keek of er tegels BESTONDEN, en
+           dat was te nauw: bij de melder stonden ze er wel en zag hij ze toch
+           niet, dus zweeg de controle precies in het geval waarvoor hij bedoeld
+           was. Bestaan is niet hetzelfde als zichtbaar zijn -- inhoud kan naast
+           het scherm staan, nul hoog zijn, of achter iets anders liggen.
+
+           elementFromPoint op het midden van het venster stelt de enige vraag
+           die telt: kijkt de gebruiker naar iets van de app, of naar niets? */
+        const thuis = document.querySelector('.os-thuisscherm');
+        const tegels = document.querySelectorAll('.os-app').length;
+        const hoog = thuis ? thuis.getBoundingClientRect().height : 0;
+        const midden = document.elementFromPoint(Math.round(innerWidth / 2), Math.round(innerHeight / 2));
+        const leegMidden = !midden || midden === document.body || midden === document.documentElement;
+        const buitenBeeld = thuis && (() => { const b = thuis.getBoundingClientRect();
+          return b.bottom <= 0 || b.top >= innerHeight || b.width < 10; })();
+
+        let reden = null;
+        if (!tegels) reden = 'geen tegels';
+        else if (hoog < 40) reden = 'thuisscherm zonder hoogte';
+        else if (buitenBeeld) reden = 'thuisscherm buiten beeld';
+        else if (leegMidden) reden = 'niets in het midden van het scherm';
+
+        if (reden && window.RTGFoutmelder && RTGFoutmelder.meetLeeg) RTGFoutmelder.meetLeeg(reden);
+      } catch (e) { /* een controle mag nooit de oorzaak van iets worden */ }
+    }, 2500);
     if ((rtf.gekoppeld || []).length) ensurePush(false); // stil vernieuwen als het al aan staat
   }
 
   /* ---------- tickets: activiteiten, tours en musea ---------- */
   let tkPartners = [], tkOpen = null, tkKeuze = null;
+  /* De tickets van het lid: het aanbod en wat hij al heeft. Apart deel omdat
+     app-main-12.js met deze twee functies erbij op 10,9 KB kwam en
+     keuringsregel 13 op 10 staat. De regel heeft gelijk over de reden: de rest
+     van dat deel is de schil van de app (meldingen, tabbladen, opbouw), en dit
+     gaat over tickets. */
   async function laadTickets(){
     if (!API.live) return;
     try { tkPartners = (await API.call('/tickets/aanbod')).partners || []; } catch(e){ tkPartners = []; }
@@ -3313,14 +3492,33 @@
       : (it.items.some(itemZichtbaar) ? it.sleutel + ':' + mapNaam(it) + ':' + it.items.filter(itemZichtbaar).slice(0, 9).join('+') : '')
   ).join(',')).join('|');
 
+  /* EEN KAPOTTE TEGEL MAG NIET HET HELE BEGINSCHERM KOSTEN.
+
+     Dit is de plek waar de tegels ontstaan, en hij stond buiten elk vangnet:
+     gooide een van de iconen (of een van de regels die bepaalt of hij zichtbaar
+     is), dan brak de hele lus af en bleef er geen enkele tegel over. Wat je dan
+     ziet is een leeg beginscherm met alleen de vaste onderdelen -- precies de
+     melding "ik zie alleen de Rahul-balk".
+
+     Nu valt per tegel te falen: de rest van de rij wordt gewoon gebouwd, en de
+     console noemt de tegel bij naam. Een scherm met negentien van de twintig
+     tegels is een werkende app; een leeg scherm is dat niet. */
   function bouw() {
+    const stuk = [];
     rijen.forEach((rij, p) => {
       rij.textContent = '';
       for (const it of gesorteerd(p)) {
-        if (typeof it === 'string') { if (itemZichtbaar(it)) rij.appendChild(maakAppIcoon(it)); }
-        else if (it.items.some(itemZichtbaar)) rij.appendChild(maakMapIcoon(it));
+        try {
+          if (typeof it === 'string') {  if (itemZichtbaar(it)) rij.appendChild(maakAppIcoon(it)); }
+          else if (it.items.some(itemZichtbaar)) rij.appendChild(maakMapIcoon(it));
+        } catch (e) {
+          const naam = typeof it === 'string' ? it : (it && it.sleutel) || 'onbekend';
+          stuk.push(naam);
+          console.error('[rtg] tegel "' + naam + '" kon niet gebouwd worden:', e);
+        }
       }
     });
+    if (stuk.length) meldLeegScherm('tegels: ' + stuk.join(', '));
     // wat er nu staat is per definitie bij; de waarnemer hoeft er niet overheen
     vorigeAfdruk = afdruk();
     sync();

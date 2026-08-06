@@ -2,10 +2,13 @@
     // een zin, geen logboek: Rahuls woorden vervangen elkaar rustig
     function zeg(wie, tekst){
       if (wie !== 'rahul') return;
-      // Rahul typt zijn zin letter voor letter en de mond beweegt mee
-      if (window.RTGTyp){ RTGTyp.schrijf(zin, tekst, { praat: praat }); return; }
+      /* De zin staat er METEEN, niet letter voor letter. Dat typen was mooi
+         bedoeld, maar aan de poort staat iemand die naar binnen wil: die leest
+         sneller dan de machine tikt, en zit dan te wachten op tekst die er al
+         is. De mond beweegt wel gewoon mee -- dat is Rahuls gezicht, geen
+         leesvertraging. */
       zin.style.animation = 'none';
-      void zin.offsetWidth; // de fade opnieuw laten lopen
+      void zin.offsetWidth;              // de fade opnieuw laten lopen
       zin.style.animation = '';
       zin.textContent = tekst;
       praat(Math.min(2600, 500 + tekst.length * 28));

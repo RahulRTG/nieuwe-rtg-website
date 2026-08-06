@@ -58,6 +58,23 @@ async function nieuwLid(P, naam) {
   return r.body.token;
 }
 
+/* Een zaak inloggen en haar token teruggeven. RTMAIL kent geen lid-naar-lid-knop
+   (leden lezen, het platform en de zaken bezorgen), dus de afzender in deze toets
+   is een zaak -- anders zou er nooit echt post in het postvak liggen en toetst de
+   bewering over de inbox een lege lijst.
+
+   Hij heet met opzet NIET zaak(): test/deavond.test.js en test/administratie.test.js
+   hebben een helper met die naam die { token, state } teruggeeft. Dezelfde naam met
+   een andere vorm zet de volgende lezer op het verkeerde been. */
+async function zaakToken(P, code) {
+  const r = await P('/api/supplier/roster', { code });
+  const man = ((r.body && r.body.staff) || []).find(s => s.role === 'manager');
+  assert.ok(man, 'de zaak ' + code + ' heeft een manager: ' + JSON.stringify(r.body).slice(0, 160));
+  const lg = await P('/api/supplier/login', { code, staffId: man.id, pin: '1234' });
+  assert.ok(lg.body.token, 'de manager van ' + code + ' logt in: ' + JSON.stringify(lg.body).slice(0, 160));
+  return lg.body.token;
+}
+
 async function saldo(P, token) {
   const r = await P('/api/pay/overzicht', {}, token);
   assert.equal(r.status, 200, 'het overzicht opent: ' + JSON.stringify(r.body).slice(0, 160));
@@ -243,7 +260,7 @@ test('de tikcode: je zet jezelf op ontvangen, en een nieuwe code doodt de oude',
   } finally { child.kill('SIGKILL'); }
 });
 
-test('RTMail: post tussen leden, op codenaam', async () => {
+test('RTMail: post aan een lid, op codenaam', async () => {
   const { child, base } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } });
   try {
     const P = post(base);
@@ -257,10 +274,49 @@ test('RTMail: post tussen leden, op codenaam', async () => {
     /* DE MERKREGEL: ook de post draagt de codenaam en niet de echte naam. */
     assert.ok(!/Jolein/i.test(mijnAdres), 'het adres is niet haar echte naam: ' + mijnAdres);
 
+    const eerst = await P('/api/member/rtmail/inbox', {}, lid);
+    assert.equal(eerst.status, 200, 'de inbox opent: ' + JSON.stringify(eerst.body).slice(0, 200));
+    assert.ok(Array.isArray(eerst.body.berichten),
+      'het postvak is een lijst en geen ontbrekend veld: ' + JSON.stringify(eerst.body).slice(0, 200));
+    const beginAantal = eerst.body.berichten.length;
+    const beginOngelezen = eerst.body.ongelezen;
+
+    /* En dan komt er echt post: een zaak schrijft haar aan op het adres dat ze
+       hierboven kreeg. Zonder bezorgd bericht toetst de bewering hieronder een
+       lege lijst, en een lege lijst klopt altijd. */
+    const keuken = await zaakToken(P, 'KIKUNOI');
+    const ONDERWERP = 'Uw tafel van vrijdag';
+    const verstuurd = await P('/api/supplier/rtmail/stuur',
+      { naar: mijnAdres, onderwerp: ONDERWERP, tekst: 'Tot vrijdag, om acht uur.' }, keuken);
+    assert.equal(verstuurd.status, 200, 'de zaak stuurt haar een bericht: ' + JSON.stringify(verstuurd.body).slice(0, 200));
+
     const inbox = await P('/api/member/rtmail/inbox', {}, lid);
-    assert.equal(inbox.status, 200, 'de inbox opent: ' + JSON.stringify(inbox.body).slice(0, 200));
-    assert.ok(Array.isArray(inbox.body.berichten || inbox.body.mails || inbox.body.items || []),
+    assert.equal(inbox.status, 200, 'de inbox opent opnieuw: ' + JSON.stringify(inbox.body).slice(0, 200));
+    assert.ok(Array.isArray(inbox.body.berichten),
       'met een lijst berichten: ' + JSON.stringify(inbox.body).slice(0, 200));
+    const bericht = inbox.body.berichten.find(m => m.onderwerp === ONDERWERP);
+    assert.ok(bericht, 'en het bericht is bezorgd: ' + JSON.stringify(inbox.body.berichten).slice(0, 240));
+    assert.equal(bericht.gelezen, false, 'nog ongelezen');
+
+    /* Ook de bezorgde post draagt de codenaam: het adres waarop hij binnenkwam
+       is hetzelfde adres, en nergens staat haar echte naam. */
+    assert.equal(inbox.body.adres, mijnAdres, 'het postvak draagt hetzelfde adres als /adres');
+    assert.ok(!/Jolein/i.test(JSON.stringify(inbox.body)),
+      'en haar echte naam staat nergens in het postvak: ' + JSON.stringify(inbox.body).slice(0, 240));
+
+    /* De teller en het postvak tellen hetzelfde -- twee getallen langs
+       verschillende weg, want een teller die zijn eigen lijst niet volgt is de
+       stilste fout die een postvak kan hebben. */
+    assert.equal(inbox.body.ongelezen, inbox.body.berichten.filter(m => !m.gelezen).length,
+      'de ongelezen-teller volgt het postvak: ' + inbox.body.ongelezen);
+    assert.equal(inbox.body.berichten.length, beginAantal + 1, 'er is precies een bericht bijgekomen');
+    assert.equal(inbox.body.ongelezen, beginOngelezen + 1, 'en precies een ongelezen bericht');
+
+    const gelezen = await P('/api/member/rtmail/lees', { id: bericht.id }, lid);
+    assert.equal(gelezen.status, 200, 'ze leest het: ' + JSON.stringify(gelezen.body).slice(0, 200));
+    const na = await P('/api/member/rtmail/inbox', {}, lid);
+    assert.equal(na.body.ongelezen, beginOngelezen, 'lezen haalt hem van de ongelezen-stapel');
+    assert.equal(na.body.berichten.length, beginAantal + 1, 'en het bericht blijft gewoon in het postvak staan');
   } finally {
     child.kill('SIGKILL');
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}

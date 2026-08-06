@@ -72,7 +72,6 @@
 <link href="/shared/desktopframe.css" rel="stylesheet">
 <script src="/shared/seizoen.js" defer></script>
 <script src="/shared/desktopframe.js" defer></script>
-<script src="/shared/uitvoer.js"></script>
 </head>
 <body class="rtg-stijl">
 <header>
@@ -121,6 +120,7 @@
   </div>
 </main>
 <div class="melding" id="melding" role="status"></div>
+<script src="/shared/uitvoer.js"></script>
 <script>
 const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));

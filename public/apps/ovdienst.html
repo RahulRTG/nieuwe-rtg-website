@@ -127,8 +127,18 @@
   let hier = { lat: 38.908, lng: 1.432 };
   // start ongevraagd bij het openen, dus de GPS-schakelaar in het OS-menu
   // (rtg_os_gps) wint; zonder plek blijft het demo-startpunt staan
+  /* De schakelaar blijft de baas, maar hier stil overslaan betekent: de app
+     toont haltes die niets met jou te maken hebben. shared/plek.js vraagt het
+     een keer, met de reden erbij; zeg je nee, dan blijft het demo-startpunt
+     staan en vraagt hij deze sessie niet opnieuw. */
   let gpsUit = false;
   try { gpsUit = localStorage.getItem('rtg_os_gps') !== '1'; } catch (e) {}
+  if (gpsUit && window.RTGPlek) {
+    document.addEventListener('DOMContentLoaded', () => {
+      RTGPlek.vraag({ waarom: 'Om je dienst en de haltes op je route te tonen moet ik weten waar je bent. Je locatie blijft op je toestel.' })
+        .then(plek => { if (plek) location.reload(); });
+    });
+  }
   if (!gpsUit && 'geolocation' in navigator)
     navigator.geolocation.watchPosition(p => { hier = { lat: p.coords.latitude, lng: p.coords.longitude }; }, () => {}, { enableHighAccuracy: true });
 

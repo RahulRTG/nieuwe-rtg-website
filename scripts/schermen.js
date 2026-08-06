@@ -42,6 +42,21 @@
    met RTG_ROUTELOG gezet een regel `SCHERM /apps/x.html`. Wat daarin staat is
    geopend. Wat er niet in staat, niet.
 
+   EN OPGEHAALD IS NOG NIET BEZOCHT
+
+   Dat "wat daarin staat is geopend" klopte een tijd lang niet. Een service
+   worker haalt bij zijn install zijn hele schil voorop, en die verzoeken zijn
+   van een bezoek niet te onderscheiden zolang je alleen het pad noteert: een
+   browser die eenmaal /apps/foundation/rust.html opende leverde 45 SCHERM-
+   regels op, alle 45 op naam van dezelfde toets. Sinds server/routelog.js het
+   soort verzoek meeschrijft telt hier alleen nog een echte navigatie mee.
+
+   Wat dat met het getal deed, op twee volledige e2e-rondes met een echte
+   Chromium: 3 -> 42, met in beide rondes dezelfde 42 schermen. Drieendertig
+   ervan waren wel OPGEHAALD en door geen enkele toets bezocht; die stonden
+   hiervoor als "met een eigen toets" in de telling. De reden staat voluit in
+   NORM.json.
+
    DRAAIEN
 
      npm run e2e                       (schrijft .schermjournaal)
@@ -89,22 +104,43 @@ function alleSchermen() {
 
 /* ---- het journaal: welke schermen zijn geopend, en door welke toets ----
    Alleen de SCHERM-regels; in hetzelfde bestand staan ook de routes.
-   Vorm: `SCHERM /apps/x.html toets.e2e.js`. */
+   Vorm: `SCHERM /apps/x.html toets.e2e.js navigatie|nevenverzoek`.
+
+   Zonder dat derde veld is een voorophaling niet van een bezoek te
+   onderscheiden (zie de kop), en dan meet dit script het geheugen van een
+   cache in plaats van het werk van een toets. */
 function geopendeSchermen(pad) {
   let tekst = '';
   try { tekst = fs.readFileSync(pad, 'utf8'); } catch (e) { return null; }
-  const uit = new Map();                       // scherm -> Set van toetsen
+  const afgelegd = new Map();                  // scherm -> Set van toetsen die er ECHT naartoe gingen
+  const neven = new Map();                     // scherm -> Set van toetsen die hem alleen ophaalden
+  let zonderSoort = 0;                         // regels van een server van voor deze ronde
   for (const regel of tekst.split('\n')) {
     const r = regel.trim();
     if (!r.startsWith('SCHERM ')) continue;
-    const rest = r.slice(7);
-    const sp = rest.indexOf(' ');
-    const scherm = sp === -1 ? rest : rest.slice(0, sp);
-    const toets = sp === -1 ? 'onbekend' : rest.slice(sp + 1);
-    if (!uit.has(scherm)) uit.set(scherm, new Set());
-    uit.get(scherm).add(toets);
+    const velden = r.slice(7).split(' ').filter(Boolean);
+    if (velden.length < 3) { zonderSoort++; continue; }
+    const scherm = velden[0];
+    const soort = velden[velden.length - 1];
+    const toets = velden.slice(1, -1).join(' ');
+    const doel = soort === 'navigatie' ? afgelegd : neven;
+    if (!doel.has(scherm)) doel.set(scherm, new Set());
+    doel.get(scherm).add(toets);
   }
-  return uit;
+  return { afgelegd, neven, zonderSoort };
+}
+
+/* ---- de meter zelf: welke schermen legt geen enkele toets af ----
+   Een eigen functie, en niet een filter in main(), omdat dit het sommetje is
+   dat het getal in NORM.json draagt: test/meterijk.test.js hoort DEZE aan te
+   roepen. Een ijking die hier zijn eigen telling naast zet, ijkt zijn eigen
+   telling en niet de meter (LAT-regel 10). */
+function zonderEigenToets(afgelegd, alle) {
+  const vegers = veegToetsen(afgelegd, alle.length);
+  return alle.filter(s => {
+    const t = afgelegd.get(s);
+    return !t || [...t].every(n => vegers.has(n));
+  });
 }
 
 /* ---- welke toetsen zijn VEEGTOETSEN ----
@@ -165,14 +201,25 @@ function main() {
     console.error('Het schermjournaal "' + pad + '" bestaat niet. Draaide de e2e-suite met RTG_ROUTELOG gezet?');
     return 2;
   }
-  const geopend = geopendeSchermen(pad);
-  if (!geopend) {
+  const journaal = geopendeSchermen(pad);
+  if (!journaal) {
     /* LAT.md regel 3: geen invoer is geen oordeel. Groen geven zonder journaal
        zou precies de leugen zijn die deze meter moet uitbannen. */
     console.error('Geen schermjournaal gevonden (' + path.relative(WORTEL, pad) + ').');
     console.error('Draai eerst `npm run e2e`; die schrijft het. Zonder journaal is er geen oordeel.');
     return 2;
   }
+  if (journaal.zonderSoort) {
+    /* Dezelfde regel 3, een laag dieper: dit journaal komt van een server die
+       nog niet noteerde HOE een scherm werd opgevraagd. Zo'n regel als bezoek
+       lezen geeft het oude, opgeblazen cijfer terug; hem als voorophaling
+       lezen verzint een verslechtering. Beide zijn een oordeel op een gok. */
+    console.error(journaal.zonderSoort + ' regels in ' + path.relative(WORTEL, pad) +
+      ' zeggen niet of het een bezoek of een voorophaling was.');
+    console.error('Dat journaal is van voor deze ronde. Draai `npm run e2e` opnieuw; er valt zo niets te tellen.');
+    return 2;
+  }
+  const geopend = journaal.afgelegd;
   const vers = jongerDanDeSchermen(pad);
 
   const alle = alleSchermen();
@@ -181,11 +228,17 @@ function main() {
   /* De meter: schermen waar GEEN toets zijn eigen weg aflegt. Nooit geopend
      telt mee, en alleen-door-een-veegtoets ook -- een teken van leven is geen
      bewijs dat de app doet wat hij belooft. */
-  const zonder = alle.filter(s => {
-    const t = geopend.get(s);
-    return !t || [...t].every(n => vegers.has(n));
-  });
+  const zonder = zonderEigenToets(geopend, alle);
   const alleenVeeg = zonder.length - nooit.length;
+  /* Het gat dat de oude meter dichtpleisterde: schermen die geen enkele toets
+     aflegt maar die WEL zijn opgehaald (een service worker die zijn schil
+     voorophaalt, of een fetch die alleen op status 200 kijkt). Precies deze
+     stonden hiervoor als "met een eigen toets" in de telling. Ze staan er dus
+     bij, want een getal dat met tientallen omhoog springt hoort uit te leggen
+     waarvan. (Op de ronde van 2026-08-04: 33 van de 42.) Niet op `nooit` gefilterd
+     maar op `zonder`: paginas.e2e.js tikt elk scherm even aan, dus `nooit`
+     staat in deze suite altijd op nul en die regel zou nooit iets tonen. */
+  const alleenOpgehaald = zonder.filter(s => journaal.neven.has(s));
   const norm = leesNorm();
   const grond = norm.meters && norm.meters[METER];
 
@@ -193,7 +246,7 @@ function main() {
     console.log(JSON.stringify({
       totaal: alle.length, eigenToets: alle.length - zonder.length,
       nooitGeopend: nooit, alleenVeegtoets: zonder.filter(s => !nooit.includes(s)),
-      veegtoetsen: [...vegers], vers
+      alleenOpgehaald, veegtoetsen: [...vegers], vers
     }, null, 2));
     return 0;
   }
@@ -206,6 +259,11 @@ function main() {
   console.log('  nooit geopend            ' + String(nooit.length).padStart(4));
   console.log('  ZONDER EIGEN TOETS       ' + String(zonder.length).padStart(4) +
     (typeof grond === 'number' ? '   (norm: ' + grond + ')' : '   (nog geen norm)'));
+  if (alleenOpgehaald.length) {
+    console.log('  ... daarvan wel opgehaald' + String(alleenOpgehaald.length).padStart(4));
+    console.log('      (een cache die een pagina ophaalt is geen toets die hem aflegt;');
+    console.log('       tot deze ronde telden juist deze mee als "met een eigen toets")');
+  }
   console.log('\n  veegtoetsen (tikken een kwart of meer van alle schermen aan): ' +
     ([...vegers].join(', ') || 'geen'));
 
@@ -237,4 +295,4 @@ function main() {
 }
 
 if (require.main === module) process.exit(main());
-module.exports = { alleSchermen, geopendeSchermen, jongerDanDeSchermen, veegToetsen };
+module.exports = { alleSchermen, geopendeSchermen, jongerDanDeSchermen, veegToetsen, zonderEigenToets };

@@ -95,6 +95,17 @@ test('Rahul vraagt pas om je gegevens als er een derde partij bij komt', async (
     const bezorg2 = await api(base, '/api/gegevens/nodig', { soort: 'bezorging' }, token);
     assert.deepEqual(bezorg2.body.ontbreekt, [], 'nu kan de bezorging ook');
 
+    /* 5b) EN DE WOONPLAATS IS MEEGESCHREVEN. De intake vraagt geen adres meer,
+       dus deze stap is de enige voeding van het stad-facet in het ledenregister
+       (kern/ledenregister.js leest p.velden.woonplaats). Zonder deze regel valt
+       elk nieuw lid stil in de bak "Onbekend"; test/woonplaats-poort.test.js
+       meet dat helemaal door tot wat de boardroom te zien krijgt, hier staat de
+       bewering in een ECHT draaiende server. */
+    const naAdres = await api(base, '/api/onboarding/status', {}, token);
+    const woon = (naAdres.body.laterVelden || []).find(v => v.id === 'woonplaats');
+    assert.ok(woon, 'de woonplaats bestaat als later-veld');
+    assert.equal(woon.waarde, 'Amsterdam', 'en is gevuld uit de zin die het lid zelf typte');
+
     // 6) afbreken mag altijd, en dan gaat het gewoon niet door
     const s3 = await api(base, '/api/gegevens/start', { soort: 'identiteit' }, token);
     assert.equal(s3.body.veld, 'identiteit');
@@ -257,4 +268,49 @@ test('wat je Rahul vertelt komt niet in zijn gespreksgeheugen terecht', async ()
       .map(f => path.relative(TMP, f));
     assert.deepEqual(lekt, [], 'het nummer hoort alleen in de kluis; het staat plat in: ' + lekt.join(', '));
   } finally { try { stop(child); } catch (e) {} try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} }
+});
+
+/* Een vlucht is het ene geval waarin de derde partij meer wil dan bereikbaarheid:
+   de maatschappij en de grens eisen documentnummer, geldigheid, nationaliteit en
+   geboortedatum. Dat hoort NIET bij de aanmelding thuis -- daar weet nog niemand
+   of je ooit vliegt -- maar op het moment dat je boekt.
+
+   Deze toets meet de poort rechtstreeks, want dat is waar de regel woont. Vier
+   gevallen, en de derde is de reden dat dit bestaat: een VERLOPEN paspoort telt
+   niet als "hij heeft het al". Wie daarmee doorloopt strandt aan de balie, en een
+   vraag vooraf is vriendelijker dan een gesloten poort achteraf. */
+const { maakGegevenspoort } = require('../server/kern/gegevenspoort');
+
+test('een vlucht vraagt om papieren, en een verlopen paspoort telt niet mee', () => {
+  const dagen = (n) => new Date(Date.now() + n * 864e5).toISOString().slice(0, 10);
+  const poortMet = (md) => maakGegevenspoort({
+    accounts: { phoneOf: () => '0612345678' },     // telefoon staat er al
+    getMemberState: () => md
+  }).ontbreekt({ key: 'k', account: { id: 1, verified: 'none' } }, 'vlucht');
+
+  const compleet = { nummer: 'NX1234', vervaldatum: dagen(400), nationaliteit: 'Nederlandse', geboortedatum: '1990-01-01' };
+
+  assert.deepEqual(poortMet({ paspoort: compleet }).map(m => m.veld), [],
+    'met geldige papieren mag je gewoon boeken');
+  assert.deepEqual(poortMet({}).map(m => m.veld), ['reisdocument'],
+    'zonder papieren vraagt hij erom');
+  assert.deepEqual(poortMet({ paspoort: { ...compleet, vervaldatum: dagen(-40) } }).map(m => m.veld), ['reisdocument'],
+    'een verlopen paspoort telt niet als aanwezig');
+  /* Elk van de vier apart weglaten, want een geval dat er twee tegelijk mist kan
+     niet zien welke van de twee de poort tegenhield. Dat is precies hoe een
+     toets stil zijn tanden verliest: de mutatie "nationaliteit hoeft niet meer"
+     bleef groen zolang ditzelfde geval ook de geboortedatum miste. */
+  for (const weg of ['nummer', 'vervaldatum', 'nationaliteit', 'geboortedatum']) {
+    const bijna = { ...compleet }; delete bijna[weg];
+    assert.deepEqual(poortMet({ paspoort: bijna }).map(m => m.veld), ['reisdocument'],
+      'zonder ' + weg + ' is het reisdocument niet compleet');
+  }
+
+  // en hij wijst naar de scanner, want die vier gegevens staan in de strook
+  const mist = poortMet({})[0];
+  assert.equal(mist.viaScan, true, 'het scherm hoort de scanner te openen, niet vier vragen te stellen');
+  assert.match(mist.waarom, /maatschappij|grens/i, 'en Rahul zegt eerlijk van wie die eis komt');
+
+  // wat een vlucht NIET vraagt: geen adres (je woont niet in het vliegtuig)
+  assert.ok(!poortMet({}).some(m => m.veld === 'adres'), 'een vlucht vraagt geen adres');
 });

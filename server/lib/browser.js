@@ -31,7 +31,23 @@ async function maakPage(conn, browserContextId, context) {
 
 class Context {
   constructor(browser, browserContextId) { this.browser = browser; this.id = browserContextId; this._pages = []; }
-  async newPage() { const p = await maakPage(this.browser.conn, this.id, this); this._pages.push(p); return p; }
+  /* Een script dat op ELKE pagina van deze context als eerste draait. Vier
+     e2e's zetten daarmee hun sessietoken klaar voordat de app opstart; zonder
+     deze methode vielen ze om op een TypeError in plaats van op een bewering.
+     De context zelf kent geen CDP-doel, dus we onthouden de scripts en geven
+     ze door aan elke pagina die hierna wordt gemaakt (en aan de pagina's die
+     er al zijn, zodat de volgorde van aanroepen niet uitmaakt). */
+  async addInitScript(fn, arg) {
+    this._init = this._init || [];
+    this._init.push([fn, arg]);
+    for (const p of this._pages) await p.addInitScript(fn, arg);
+  }
+  async newPage() {
+    const p = await maakPage(this.browser.conn, this.id, this);
+    for (const [fn, arg] of this._init || []) await p.addInitScript(fn, arg);
+    this._pages.push(p);
+    return p;
+  }
   async setOffline(offline) { for (const p of this._pages) await p.setOfflineIntern(offline); }
   async close() { if (this.id) { try { await this.browser.conn.stuur('Target.disposeBrowserContext', { browserContextId: this.id }); } catch (e) {} } }
 }

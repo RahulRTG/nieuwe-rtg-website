@@ -114,6 +114,12 @@ test('5. de lounges: binnen op de boarding pass, de Vleugel alleen met vip-proto
   // daarom: een verse gast op de open lijnvlucht RT205
   const bord = await api(base, '/api/member/vluchten/bord', {}, lid);
   const open = bord.body.vluchten.find(v => v.nummer === 'RT205' && v.status === 'inchecken');
+  /* Papieren voor de grens. Een vlucht boeken vraagt sinds kort om
+     documentnummer, geldigheid, nationaliteit en geboortedatum
+     (kern/gegevenspoort.js, soort 'vlucht'); zonder die scan geeft de
+     boekroute een 428 en heeft deze opzet niets om mee te toetsen. */
+  await api(base, '/api/onboarding/paspoort', { nummer: 'NX1234567', vervaldatum: '2032-01-01',
+    nationaliteit: 'Nederlandse', geboortedatum: '1990-01-01' }, lid);
   const bk = await api(base, '/api/member/vluchten/boek', { id: open.id }, lid);
   const code = bk.body.boeking.code;
   // zonder inchecken geen lounge

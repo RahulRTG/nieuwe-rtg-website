@@ -1429,6 +1429,10 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
     ['/api/vertaal/ui', 'de knopteksten van datzelfde inlogscherm'],
     ['/api/translate', 'het woordenboek is publiek; de AI-tak zit achter kern/aipoort.js'],
     ['/api/push/key', 'de VAPID-sleutel is per definitie de PUBLIEKE helft'],
+    ['/api/fout/client', 'een fout uit de browser: JUIST zonder poort, want een fout die het ' +
+      'inloggen zelf sloopt komt nooit binnen achter een poort die inloggen vereist. Er wordt ' +
+      'niets bewaard en niets uitgevoerd, alleen gelogd, met een rem per IP en afgekapte velden ' +
+      '(zie server/routes/fout.js voor wat er wel en niet meegaat)'],
     ['/api/zegel/sleutel', 'idem: de publieke helft van het zegel'],
     ['/api/zegel/controleer', 'controleert een handtekening; het bewijs zit in het verzoek'],
     ['/api/ice', 'ijs-servers voor WebRTC; geen gegevens, wel een rem'],

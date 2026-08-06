@@ -62,14 +62,15 @@
      bedraad; de gespreksfuncties staan hier. */
   let onbBezig = false, onbSt = null, onbRij = [], onbStap = null, onbHuidig = null, onbGeopend = false, onbMond = null;
   function onbEl(id){ return document.getElementById(id); }
-  // Rahuls signatuurmond boven de onboarding, dezelfde als op de poort; en zijn
-  // woorden verschijnen letter voor letter (RTGTyp) terwijl de mond meebeweegt.
+  // Rahuls signatuurmond boven de onboarding, dezelfde als op de poort. De
+  // zin staat er meteen volledig; alleen de mond beweegt mee.
   function onbMondMaak(){ const c = onbEl('onbMond'); if (c && !onbMond && window.RTGMond) onbMond = RTGMond.maak(c); }
   function onbZeg(t){
     const z = onbEl('onbTitel'); if (!z) return;
     const praat = onbMond ? function(ms){ onbMond.praat(ms); } : null;
-    if (window.RTGTyp) RTGTyp.schrijf(z, t, { praat: praat });
-    else { z.textContent = t; if (praat) praat(400); }
+    /* Ook hier meteen de hele zin; zie app-main-05.js voor waarom. */
+    z.textContent = t;
+    if (praat) praat(Math.min(2600, 500 + t.length * 28));
   }
   function onbInputType(t){ return t==='date'?'date':t==='email'?'email':t==='tel'?'tel':'text'; }
   function onbOpenVelden(){ return ((onbSt && onbSt.velden) || []).filter(function(v){ return !v.ingevuld; }); }

@@ -156,6 +156,7 @@
 </main>
 <div class="toast" id="toast" role="status"></div>
 
+<script src="/shared/plek.js" defer></script>
 <script src="/shared/drie.js"></script>
 <script src="/shared/uitvoer.js"></script>
 <script>
@@ -460,17 +461,26 @@
   }
 
   /* ---- gps: jouw echte positie (blijft op het toestel) ---- */
-  // start ongevraagd bij het openen, dus de GPS-schakelaar in het OS-menu
-  // (rtg_os_gps) wint; de kaart werkt gewoon zonder eigen positie. Alleen een
-  // uitdrukkelijke "1" geeft de locatie vrij: ongemoeid staat het vinkje uit.
-  let gpsUit = false;
-  try { gpsUit = localStorage.getItem('rtg_os_gps') !== '1'; } catch (e) {}
-  if (!gpsUit && 'geolocation' in navigator && window.isSecureContext) {
-    navigator.geolocation.watchPosition(p => {
-      hier = { lat: p.coords.latitude, lng: p.coords.longitude };
+  /* Hier stond: schakelaar uit -> stil overslaan. Dat klopt voor een kaart met
+     een demo-startpunt, maar NIET voor navigatie: je positie is hier de hele
+     functie. Wie de app opende met de schakelaar ongemoeid (en ongemoeid staat
+     hij uit) werd nooit gevonden, en niets legde uit waarom. Daarom vraagt hij
+     jij dat zegt, en gaat door zonder plek als je nee zegt. */
+  /* NA het parsen, want plek.js laadt met defer en draait dus later dan deze
+     regels. Zonder dit wachtje was window.RTGPlek hier nog niet gezet, viel de
+     if stil weg en gebeurde er precies niets -- dezelfde stilte als het defect
+     dat we repareren, alleen een laag hoger. Uitgeprobeerd in een echte
+     browser: zonder dit verschijnt de vraag niet, ermee wel. */
+  let stopVolgen = null;
+  document.addEventListener('DOMContentLoaded', () => {
+    if (!window.RTGPlek || !window.isSecureContext) return;
+    stopVolgen = RTGPlek.volg(plek => {
+      hier = { lat: plek.lat, lng: plek.lng };
       if (kaartData) bouwPinnen();
-    }, () => {}, { enableHighAccuracy: true, maximumAge: 10000 });
-  }
+    }, { waarom: 'Om je de weg te wijzen moet ik weten waar je bent. Je locatie blijft op je toestel; RTG bewaart hem niet.' });
+    // het toestel blijft niet peilen als niemand kijkt
+    window.addEventListener('pagehide', () => { if (stopVolgen) stopVolgen(); });
+  });
 
   /* ---- start ---- */
   window.addEventListener('resize', grootte);

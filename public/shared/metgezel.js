@@ -37,11 +37,69 @@
 
   var esc = function (t) { return String(t == null ? '' : t).replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); };
 
-  var css = '.mgz-knop{position:fixed;right:1rem;z-index:9980;border:none;border-radius:999px;padding:.65rem 1rem;font-family:Inter,system-ui,sans-serif;font-weight:600;font-size:.83rem;cursor:grab;touch-action:none;box-shadow:0 6px 20px rgba(0,0,0,.4);}' +
+  /* DE BALK VAN RAHUL: een vorm, op elk scherm.
+
+     Hiervoor waren er drie manieren om bij Rahul te komen en geen daarvan
+     stond er gewoon: een zwevende pil die overal was weggehaald ("te druk in
+     beeld"), een veeg vanaf de onderrand die je moest kennen, en op het
+     beginscherm een chatbalk die alleen daar stond. Nu is er een balk, overal
+     dezelfde, met de lippen als gezicht -- de vorm van het beginscherm, want
+     die was de goede.
+
+     Klein of groot bepaal je zelf: ingeklapt is hij alleen de lippen, en een
+     tik maakt hem weer een balk. Die keuze blijft bewaard (localStorage), want
+     hij hoort bij hoe JIJ werkt en niet bij de pagina waar je toevallig bent.
+     Zo is Rahul overal, zonder in de weg te staan. */
+  /* GEINTEGREERD, NIET ZWEVEND. Rahul stond hier als een venster over de
+     pagina heen: je las iets, hij ging er half overheen, en je moest hem eerst
+     wegklikken. Dat is precies wat het beginscherm en de inlogpoort NIET doen
+     -- daar hoort hij bij het scherm.
+
+     Daarom staat het blok onderaan vast, maar reserveert de pagina er ruimte
+     voor: de hoogte van het blok gaat als --rtg-rahul-h naar de body, en die
+     krijgt evenveel padding onderaan. Groeit het blok (er komt een antwoord),
+     dan schuift de inhoud mee omhoog in plaats van eronder te verdwijnen. Zo
+     staat hij nergens overheen, ook niet onderaan een lange pagina.
+
+     Klap je hem klein, dan krimpt de gereserveerde ruimte mee: de lippen
+     alleen kosten bijna niets. */
+  var css = '.mgz-blok{position:fixed;left:50%;transform:translateX(-50%);z-index:9980;' +
+      'bottom:calc(env(safe-area-inset-bottom,0px) + .9rem);width:min(30rem,calc(100vw - 1.6rem));' +
+      'display:flex;flex-direction:column;align-items:center;gap:.5rem;pointer-events:none;}' +
+    '.mgz-blok > *{pointer-events:auto;}' +
+    /* het tussenstuk dat de pagina onderaan ruimte geeft; zie meetRuimte() */
+    '.mgz-ruimte{width:100%;flex-shrink:0;pointer-events:none;}' +
+    '.mgz-blok.mgz-klein-blok{width:auto;}' +
+    '.mgz-balk{width:100%;' +
+      'display:flex;align-items:center;gap:.55rem;padding:.4rem .45rem .4rem .55rem;border-radius:999px;' +
+      'background:color-mix(in srgb, var(--card,#151312) 62%, transparent);' +
+      'backdrop-filter:blur(26px) saturate(1.5);-webkit-backdrop-filter:blur(26px) saturate(1.5);' +
+      'border:1px solid var(--line,#2A2724);box-shadow:0 12px 34px rgba(0,0,0,.42);' +
+      'transition:width .22s cubic-bezier(.22,.61,.21,1),padding .22s cubic-bezier(.22,.61,.21,1);}' +
+    '.mgz-balk:focus-within{border-color:color-mix(in srgb, var(--gold,#857007) 62%, var(--line,#2A2724));}' +
+    /* ingeklapt: alleen de lippen, en de balk krimpt eromheen */
+    '.mgz-balk.mgz-klein{width:auto;padding:.3rem;gap:0;}' +
+    '.mgz-balk.mgz-klein input,.mgz-balk.mgz-klein .mgz-balkgo{display:none;}' +
+    '.mgz-orb{width:2.4rem;height:2.4rem;flex-shrink:0;border-radius:50%;overflow:hidden;border:none;padding:0;' +
+      'display:flex;align-items:center;justify-content:center;cursor:pointer;' +
+      'background:radial-gradient(80% 80% at 50% 30%, #2A241A, #14110D);' +
+      'box-shadow:inset 0 0 0 1px color-mix(in srgb, var(--gold,#857007) 45%, transparent);}' +
+    '.mgz-orb canvas{width:170%;height:auto;display:block;pointer-events:none;filter:brightness(1.3) saturate(1.08);}' +
+    '.mgz-balk input{flex:1;min-width:0;background:none;border:none;outline:none;color:var(--txt,#F7F5F1);' +
+      "font-family:Inter,system-ui,sans-serif;font-size:.86rem;padding:.4rem 0;}" +
+    '.mgz-balk input::placeholder{color:var(--soft,#8A8680);}' +
+    '.mgz-balkgo{flex-shrink:0;width:2.2rem;height:2.2rem;border-radius:50%;border:none;cursor:pointer;' +
+      'background:var(--gold,#857007);color:#1C1608;display:flex;align-items:center;justify-content:center;font-weight:700;}' +
+    '.mgz-balkgo:active{opacity:.85;}' +
+    '@media print{.mgz-balk{display:none;}}' +
+    '@media (prefers-reduced-motion: reduce){.mgz-balk{transition:none;}}' +
+    '.mgz-knop{position:fixed;right:1rem;z-index:9980;border:none;border-radius:999px;padding:.65rem 1rem;font-family:Inter,system-ui,sans-serif;font-weight:600;font-size:.83rem;cursor:grab;touch-action:none;box-shadow:0 6px 20px rgba(0,0,0,.4);}' +
     '.mgz-knop.mgz-sleept{cursor:grabbing;opacity:.9;box-shadow:0 12px 34px rgba(0,0,0,.55);}' +
     '.mgz-rahul{bottom:1rem;background:var(--gold,#857007);color:#000;}' +
     '.mgz-samen{bottom:3.6rem;background:#151312;color:#eee;border:1px solid var(--gold,#857007);}' +
-    '.mgz-sheet{position:fixed;right:1rem;bottom:1rem;z-index:9981;width:min(360px,92vw);background:#151312;border:1px solid var(--gold,#857007);border-radius:16px;padding:.9rem;display:flex;flex-direction:column;gap:.6rem;box-shadow:0 10px 30px rgba(0,0,0,.5);color:#eee;font-family:Inter,system-ui,sans-serif;}' +
+    /* het antwoord hoort bij de balk, niet ergens in de hoek: zelfde breedte,
+       eronder vastgeplakt, en het scrollt intern als Rahul veel zegt */
+    '.mgz-sheet{position:static;width:100%;max-height:min(42vh,22rem);overflow:auto;background:#151312;border:1px solid var(--gold,#857007);border-radius:16px;padding:.9rem;display:flex;flex-direction:column;gap:.6rem;box-shadow:0 10px 30px rgba(0,0,0,.5);color:#eee;font-family:Inter,system-ui,sans-serif;}' +
     '.mgz-sheet[hidden]{display:none;}.mgz-kop{display:flex;align-items:center;justify-content:space-between;font-weight:600;cursor:move;touch-action:none;user-select:none;-webkit-user-select:none;}' +
     '.mgz-sheet.mgz-sleept{opacity:.96;box-shadow:0 16px 44px rgba(0,0,0,.6);}' +
     '.mgz-x{background:transparent;border:1px solid #333;border-radius:8px;color:#eee;padding:.15rem .5rem;cursor:pointer;}' +
@@ -118,40 +176,136 @@
   // zit Rahul wel ingebouwd, maar alleen per kamer of per kaart -- daar is een
   // chatbalk die je overal vandaan kunt oproepen (van de onderrand,
   // shared/randen.js) juist een toevoeging, geen dubbeling.
+  /* Negen pagina's hebben een eigen zwevende Rahul-knop in hun HTML staan
+     (button#rahulFab.rahulfab, met een eigen venster ernaast). Die werd
+     onderdrukt door shared/randen.js, maar dat deed hij als onderdeel van het
+     onderrand-gebaar -- en dat gebaar is weg. De onderdrukking hoort toch al
+     hier: dit is de laag die Rahul levert, dus dit is de laag die weet dat een
+     tweede knop een dubbeling is. Met !important, want het eigen script van
+     die pagina's zet hem anders terug. */
+  (function () {
+    if (!document.querySelector('button#rahulFab.rahulfab')) return;
+    if (document.getElementById('mgzFabWeg')) return;
+    var st = document.createElement('style'); st.id = 'mgzFabWeg';
+    st.textContent = 'button#rahulFab.rahulfab{display:none !important;}';
+    (document.head || document.documentElement).appendChild(st);
+  })();
+
   var eigenRahul = /\/apps\/app\.html$/.test(location.pathname);
-  if (!eigenRahul && !document.getElementById('rahulFab')) {
+  if (!eigenRahul) {
     var pad = memTok ? '/api/fluister' : '/api/supplier/ai';
     var tok = memTok || supTok;
-    var fab = maakEl('<button class="mgz-knop mgz-rahul" type="button" aria-label="Vraag Rahul">Rahul</button>');
-    /* De signatuurmond als HET gezicht van Rahul: dezelfde lippen als op de
-       voorpagina, klein op de knop, altijd in de buurt. De mond-tekenlaag
-       (shared/mond.js) laden we er zelf bij; lukt dat niet, dan blijft de
-       tekstknop gewoon staan. */
+    /* De balk in plaats van de oude pil. De lippen zijn de knop: een tik klapt
+       hem klein of groot. Typen en versturen kan alleen als hij groot is, dus
+       een ingeklapte balk kan nooit per ongeluk iets versturen. */
+    var balk = maakEl('<form class="mgz-balk" autocomplete="off">' +
+      '<button class="mgz-orb" type="button" aria-label="Rahul groter of kleiner"></button>' +
+      '<input aria-label="Vraag Rahul" placeholder="Vraag Rahul..." maxlength="300">' +
+      '<button class="mgz-balkgo" type="submit" aria-label="Stuur naar Rahul">&#8594;</button></form>');
+    var orb = balk.querySelector('.mgz-orb');
+    var balkIn = balk.querySelector('input');
+    /* De signatuurmond als HET gezicht van Rahul: dezelfde lippen als op het
+       beginscherm. De mond-tekenlaag (shared/mond.js) laden we er zelf bij;
+       lukt dat niet, dan blijft de knop gewoon een ronde knop. */
     var mond = { praat: function () {} };
     (function () {
-      var zet = function () { if (window.RTGMond) { fab.style.padding = '.3rem .55rem'; fab.style.background = '#0C0C0B'; fab.style.border = '1px solid var(--gold,#857007)'; mond = RTGMond.fab(fab); } };
+      var zet = function () { if (window.RTGMond) mond = RTGMond.fab(orb, 1.1); };
       if (window.RTGMond) return zet();
       var s = document.createElement('script'); s.src = '/shared/mond.js'; s.onload = zet; document.head.appendChild(s);
     })();
-    fab.style.position = 'fixed'; // zodat de melding-stip erop past
+    // klein of groot: de keuze van de gebruiker, en die blijft bewaard
+    var KLEIN = 'rtg_rahulbalk_klein';
+    var klein = false;
+    try { klein = localStorage.getItem(KLEIN) === '1'; } catch (e) {}
+    function zetMaat(k, focus) {
+      klein = !!k;
+      balk.classList.toggle('mgz-klein', klein);
+      blok.classList.toggle('mgz-klein-blok', klein && sheet.hidden);
+      orb.setAttribute('aria-expanded', klein ? 'false' : 'true');
+      try { localStorage.setItem(KLEIN, klein ? '1' : '0'); } catch (e) {}
+      if (!klein && focus) balkIn.focus();
+    }
+    orb.addEventListener('click', function () { zetMaat(!klein, true); });
+    var fab = orb;   // de melding-stip hangt aan de lippen
     var sheet = maakEl('<section class="mgz-sheet" aria-label="Vraag Rahul" hidden>' +
-      '<div class="mgz-kop"><span>Vraag het Rahul</span><button class="mgz-x" type="button" aria-label="Sluiten">✕</button></div>' +
+      '<div class="mgz-kop"><span>Rahul</span><button class="mgz-x" type="button" aria-label="Antwoord sluiten">&#10005;</button></div>' +
       '<div class="mgz-seintjes" data-seintjes></div>' +
       '<div class="mgz-uit" aria-live="polite"></div>' +
-      '<form class="mgz-rij"><input placeholder="bv. boek een taxi naar huis" maxlength="300" autocomplete="off" aria-label="Vraag of opdracht aan Rahul"><button class="mgz-go" type="submit" aria-label="Versturen">→</button></form></section>');
-    // De zwevende Rahul-knop rechtsonder is overal weggehaald: te druk in beeld.
-    // Rahul blijft bereikbaar -- in het leden-OS via het dock en de zoekbalk, en
-    // op elke pagina via de lege-toestand-nudges (window.RTGRahul.vraag). We
-    // houden het vraagvenster (sheet) in de DOM, alleen de knop tonen we niet.
-    document.body.appendChild(sheet);
-    // het vraagvenster is te verslepen aan zijn kopbalk; de plek blijft bewaard
-    maakSleepbaar(sheet, 'rtg_rahul_sheet_pos', sheet.querySelector('.mgz-kop'));
+      '<form class="mgz-rij" hidden><input maxlength="300" autocomplete="off" aria-label="Vraag of opdracht aan Rahul"><button class="mgz-go" type="submit">&#8594;</button></form></section>');
+    /* De balk komt WEL in beeld, anders dan de pil die hier stond. Die was
+       overal verborgen omdat hij te druk was, en daarmee was Rahul alleen nog
+       te vinden via een veeg die je moest kennen. Een balk die je zelf klein
+       maakt lost allebei op: hij is er altijd, en hij is zo groot als jij
+       wilt. */
+    /* Hier stond maakSleepbaar(): het venster was te verslepen omdat het over
+       de pagina heen lag en dus in de weg kon zitten. Nu het onderdeel van het
+       blok is, staat het waar het hoort en valt er niets te verslepen. */
     var uit = sheet.querySelector('.mgz-uit'), form = sheet.querySelector('form'), inp = form.querySelector('input');
     var seintjesVak = sheet.querySelector('[data-seintjes]');
-    fab.addEventListener('click', function () { sheet.hidden = false; fab.hidden = true; inp.focus(); doofMelding();
-      if (!uit.textContent) uit.textContent = memTok ? 'Zeg wat je wilt. Ik zoek, reserveer, boek en bestel, alles met jouw eigen inlog.' : 'Vraag me alles over je zaak: cijfers, rooster, voorraad, en ik voer uit waar dat kan.'; });
-    sheet.querySelector('.mgz-x').addEventListener('click', function () { sheet.hidden = true; fab.hidden = false; });
+    /* Balk en venster wisselen elkaar af: staat het antwoordvenster open, dan
+       hoeft de balk er niet ook nog te zijn (twee invoervelden voor hetzelfde
+       gesprek is precies de dubbeling die we net hebben opgeruimd). De lippen
+       zelf blijven de knop van de balk; het venster heeft zijn eigen kruisje. */
+    function opengaan(tekst) {
+      sheet.hidden = false; doofMelding();
+      if (tekst != null) { inp.value = String(tekst).slice(0, 300); }
+      inp.focus();
+      try { inp.setSelectionRange(inp.value.length, inp.value.length); } catch (e) {}
+      if (!uit.textContent) uit.textContent = memTok ? 'Zeg wat je wilt. Ik zoek, reserveer, boek en bestel, alles met jouw eigen inlog.' : 'Vraag me alles over je zaak: cijfers, rooster, voorraad, en ik voer uit waar dat kan.';
+    }
+    balk.addEventListener('submit', function (ev) {
+      ev.preventDefault();
+      var vraag = (balkIn.value || '').trim();
+      if (!vraag) { zetMaat(false, true); return; }   // leeg versturen opent alleen
+      balkIn.value = '';
+      opengaan(vraag);
+      // door de bestaande weg sturen, zodat antwoord en seintjes gelijk blijven
+      if (form.requestSubmit) form.requestSubmit(); else form.dispatchEvent(new Event('submit', { cancelable: true }));
+    });
+    sheet.querySelector('.mgz-x').addEventListener('click', function () {
+      // alleen het antwoord gaat weg; de balk blijft staan waar hij stond
+      sheet.hidden = true;
+      blok.classList.toggle('mgz-klein-blok', klein);
+      meetRuimte();
+    });
 
+    /* HET BLOK VAN RAHUL: het antwoord boven, de balk eronder, en de ruimte
+       die de pagina ervoor vrijhoudt. Apart deel omdat metgezel-01b.js anders
+       over de 10 KB-lat komt (scripts/check.js regel 13) en omdat dit een eigen
+       onderwerp is: waar Rahul STAAT, los van wat hij doet. */
+    /* Een blok: het antwoord boven, de balk eronder. Ze horen bij elkaar en
+       staan dus ook bij elkaar, op dezelfde breedte. */
+    var blok = document.createElement('div');
+    blok.className = 'mgz-blok';
+    blok.appendChild(sheet);
+    blok.appendChild(balk);
+    document.body.appendChild(blok);
+
+    /* De pagina reserveert de hoogte van het blok, zodat Rahul nergens overheen
+       staat -- ook niet onderaan een lange lijst. Dat doen we met een leeg
+       tussenstuk onderaan de body en NIET door body.paddingBottom te zetten:
+       veel pagina's hebben daar hun eigen marge staan (de wallet 57,6 px) en
+       die zouden we dan overschrijven. Een tussenstuk telt op bij wat er al
+       is in plaats van het te vervangen.
+       We meten het blok in plaats van een vaste hoogte te kiezen: hij groeit
+       met een antwoord mee en krimpt als je hem klein klapt. */
+    var ruimte = document.createElement('div');
+    ruimte.className = 'mgz-ruimte';
+    ruimte.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(ruimte);
+    function meetRuimte() {
+      var h = blok.hidden ? 0 : blok.getBoundingClientRect().height;
+      var px = h ? Math.round(h + 18) : 0;   // 18px lucht tussen inhoud en blok
+      document.documentElement.style.setProperty('--rtg-rahul-h', px + 'px');
+      ruimte.style.height = 'calc(' + px + 'px + env(safe-area-inset-bottom, 0px))';
+    }
+    // de bewaarde stand pas zetten nu het blok bestaat: zetMaat() raakt hem aan
+    zetMaat(klein, false);
+    if (window.ResizeObserver) { try { new ResizeObserver(meetRuimte).observe(blok); } catch (e) {} }
+    window.addEventListener('resize', meetRuimte);
+    meetRuimte();
+    // de waarnemer meldt de allereerste opmaak niet altijd; daarom nog twee keer
+    setTimeout(meetRuimte, 200); setTimeout(meetRuimte, 900);
     /* ---------- Rahul heeft een melding: de lippen verkleuren en bewegen ----------
        We halen zuinig de eigen seintjes op (kern/fluister). Zijn er nieuwe
        (t.o.v. wat de gebruiker al zag), dan gloeit de knop, komt er een teken
@@ -233,14 +387,10 @@
        en stuurt zelf, zodat de rust en de geld-drempel bij de gebruiker blijven.
        Via event-delegatie, dus het werkt ook op later bijgeladen schermen. */
     window.RTGRahul = window.RTGRahul || {};
-    // de chatbalk zonder opdracht openen: zo roept de onderrand hem op
-    // (shared/randen.js), zonder dat er ergens een knop hoeft te staan
-    window.RTGRahul.open = function () { sheet.hidden = false; fab.hidden = true; doofMelding(); inp.focus(); };
-    window.RTGRahul.vraag = function (tekst) {
-      sheet.hidden = false; fab.hidden = true; doofMelding();
-      inp.value = String(tekst || '').slice(0, 300); inp.focus();
-      try { inp.setSelectionRange(inp.value.length, inp.value.length); } catch (e) {}
-    };
+    // het antwoordvenster openen; beide wegen lopen via dezelfde functie, zodat
+    // de balk en het venster nooit tegelijk in beeld staan
+    window.RTGRahul.open = function () { opengaan(null); };
+    window.RTGRahul.vraag = function (tekst) { opengaan(tekst || ''); };
     if (!window.__rahulLeegBound) {
       window.__rahulLeegBound = true;
       document.addEventListener('click', function (ev) {

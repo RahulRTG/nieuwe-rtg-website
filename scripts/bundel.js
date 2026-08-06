@@ -32,7 +32,6 @@ const bundels = {
   'apps/office/blad.js': 'apps/office/blad',
   'apps/office/app.js': 'apps/office/app',
   'shared/handenvrij-scherm.js': 'shared/handenvrij-scherm',
-  'shared/werkblad.js': 'shared/werkblad',
   'shared/mond.js': 'shared/mond',
   'shared/rahulpoort.js': 'shared/rahulpoort',
   'shared/geluid.js': 'shared/geluid',
@@ -40,13 +39,11 @@ const bundels = {
   'shared/handenvrij-balk.js': 'shared/handenvrij-balk',
   'shared/sterren.js': 'shared/sterren',
   'shared/drie.js': 'shared/drie',
-  'shared/flagship.js': 'shared/flagship',
   'shared/levendekleur.js': 'shared/levendekleur',
   'shared/bediening.js': 'shared/bediening',
   'shared/klok3d.js': 'shared/klok3d',
   'shared/glyf.js': 'shared/glyf',
   'shared/qr.js': 'shared/qr',
-  'shared/bureau.js': 'shared/bureau',
   'shared/klok.js': 'shared/klok',
   'shared/metgezel.js': 'shared/metgezel',
   'shared/rtghorloge.js': 'shared/rtghorloge',
@@ -60,6 +57,7 @@ const bundels = {
   'apps/foundation/gezin-rt.js': 'apps/foundation/gezin-rt',
   'apps/foundation/sessie.js': 'apps/foundation/sessie',
   'shared/basis.js': 'shared/basis',
+  'shared/ios.js': 'shared/ios',
   'shared/deelmenu.js': 'shared/deelmenu',
   // uitvoer.js draagt twee onderwerpen (de gegevens en de bediening) en kwam
   // daarmee over de 10 KB-lat; opgeknipt precies langs die grens
@@ -71,7 +69,6 @@ const bundels = {
   'shared/borden.js': 'shared/borden',
   'shared/werkos.js': 'shared/werkos',
   'shared/verbinding.js': 'shared/verbinding',
-  'shared/osmenu.js': 'shared/osmenu',
   'shared/teamcall.js': 'shared/teamcall'
 };
 

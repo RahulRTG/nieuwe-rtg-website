@@ -3209,9 +3209,8 @@ var RTG_BOUW = 'c2cfc539';
             try { doel.bewaar(s.token, r); } catch (e2) {}
             // Rahuls welzijnszin (late dienst, veel starts): stil tonen, nooit blokkeren
             if (s.welzijn) bannerToon('', 'Rahul', s.welzijn);
-            // werk-app als venster op het bureaublad (breed scherm), anders schermvullend
-            if (window.RTGVensters && RTGVensters.actief()) RTGVensters.open(doel.url, doel.app || 'Werk');
-            else location.href = doel.url;
+            // de werk-app opent schermvullend, op elk formaat
+            location.href = doel.url;
           } catch (e) { bannerToon('', T('werk.dicht', 'Werk'), e.message || T('werk.mis', 'Openen lukte niet.')); }
         }));
         belLijst.appendChild(b);
@@ -3338,12 +3337,10 @@ var RTG_BOUW = 'c2cfc539';
     else {
       const l = LINKS[item.slice(5)];
       if (!l) return;
-      // op een breed scherm opent een app als venster op het bureaublad
-      // (meerdere naast elkaar); op de telefoon gewoon schermvullend.
-      const openen = () => {
-        if (window.RTGVensters && RTGVensters.actief()) RTGVensters.open(l.url, l.app || l.naam || 'App');
-        else location.href = l.url;
-      };
+      // een app opent overal hetzelfde: schermvullend. Op een breed scherm
+      // werd hier een zwevend venster geopend; die vensterlaag is weg, want
+      // een app op iOS heeft geen kader, geen titelbalk en geen dock.
+      const openen = () => { location.href = l.url; };
       // prive-apps openen pas na de algemene pin (25-os-01a.js)
       if (l.prive) return metAlgPin(openen);
       openen();

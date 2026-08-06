@@ -15,12 +15,10 @@
      (shared/klok3d.js) is daarom niet meer standaard over elke ring gelegd; dat
      leeft nog als eigen concept op /apps/horloge.html. ---- */
 
-  /* ---- 8. de 3D-tegellaag voor de werk-apps: KPI-tegels ([data-tegel3d] of
-     .kpi-tegel) krijgen diepte + muiskantel, en <canvas data-vonk3d> tekent een
-     klein isometrisch grafiekje. Rustig en zuinig; niets op touch/reduced-motion ---- */
-  var t3 = document.createElement('script');
-  t3.src = '/shared/tegel3d.js'; t3.async = true;
-  (document.head || document.documentElement).appendChild(t3);
+  /* ---- 8. de 3D-tegellaag (shared/tegel3d.js) is weg. Die liet een KPI-tegel
+     met de MUIS meekantelen -- een bureaubladtruc die op een telefoon niets
+     doet en die het OS als iOS ook niet hoort te hebben. Een tegel is plat en
+     reageert op een vinger, niet op een cursor die er overheen zweeft. ---- */
 
   /* ---- 3. het maxlength-vangnet, ook voor later gerenderde velden ---- */
   function zetGrens(v) {

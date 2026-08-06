@@ -113,7 +113,7 @@ loop(path.join(ROOT, 'public'), /\.html$/, f => {
   for (const img of imgs) if (!/\balt\s*=/.test(img)) { a11y++; fout('<img> zonder alt in ' + rel); }
 });
 // c) de vlaggenschip-schermen moeten een sla-over-link en een main-landmark hebben.
-const VLAGGENSCHIP = ['apps/index.html', 'apps/app.html',
+const VLAGGENSCHIP = ['apps/app.html',
   'apps/foundation/index.html', 'apps/foundation/vrienden.html'];
 for (const rel of VLAGGENSCHIP) {
   const p = path.join(ROOT, 'public', rel);
@@ -302,7 +302,6 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
     ['public/apps/personeel/personeel-17.js', 'een opbouwfunctie zonder binnengrens'],
     ['public/apps/backoffice/backoffice-03.js', 'een opbouwfunctie zonder binnengrens'],
     ['public/shared/glyf/glyf-02.js', 'de glyfentabel: elk icoon een pad, hoort bij elkaar'],
-    ['public/shared/flagship/flagship-02.js', 'een opbouwfunctie zonder binnengrens'],
     ['public/shared/klok3d/klok3d-01.js', 'de 3D-klok: een aaneengesloten tekenlus'],
     ['public/shared/metgezel/metgezel-01.js', 'de metgezel-laag in een IIFE zonder binnengrens'],
     ['public/shared/i18n/i18n-01.js', 'de taaltabel + kiezer, een geheel'],

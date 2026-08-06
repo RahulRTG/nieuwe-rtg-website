@@ -9,11 +9,10 @@ public/            alles wat de browser laadt (de webroot die de server serveert
 ├── sw.js          service worker (staat bewust in de root: scope /)
 ├── manifest.webmanifest
 ├── icon.svg
-├── shared/        gedeelde client-scripts (i18n.js, realtime.js, osmenu, os.css)
+├── shared/        gedeelde client-scripts (i18n.js, realtime.js, ios.js + ios.css)
 ├── site/          winkel.html (hardware-shop voor partners) + 404.html
 └── apps/          alle web-apps, per doelgroep en genre:
-    ├── app.html           leden-app (RTG-OS, tevens het inlogscherm op /)
-    ├── index.html         app-overzicht (hub)
+    ├── app.html           leden-app (RTG-OS): DE homescreen, tevens het inlogscherm op /
     ├── juridisch.html     juridische ROS-app (voorwaarden, privacy, partnervoorwaarden)
     ├── personeel.html     personeels-app (rooster, taken, walkie-talkie, SOS)
     ├── leverancier.html   werkgevers-app (alle genres)
@@ -26,7 +25,7 @@ public/            alles wat de browser laadt (de webroot die de server serveert
 server/            Node.js/Express-backend + data (db.json, rtg.db, sleutels, uploads)
 ```
 
-Er is geen losse marketingsite meer: `/` toont direct het RTG OS-bureaublad (`/apps/index.html`); wie nog niet is aangemeld ziet daar de welkomstkaart (het gratis RTG-abonnement is de minimale ingang). Alle onderlinge links en assets gebruiken absolute paden vanaf de webroot (bijv. `/shared/i18n.js`, `/apps/app.html`), zodat mappen verplaatsen geen links breekt.
+Er is geen losse marketingsite meer: `/` toont direct de homescreen van het RTG OS (`/apps/app.html`); wie nog niet is aangemeld ziet daar de welkomstkaart (het gratis RTG-abonnement is de minimale ingang). Er is nog maar **een** beginscherm: het scrollende bureaublad `/apps/index.html` bestaat niet meer, en dat pad (net als `/apps/bureau.html` en `/apps/`) brengt je gewoon thuis. Alle onderlinge links en assets gebruiken absolute paden vanaf de webroot (bijv. `/shared/i18n.js`, `/apps/app.html`), zodat mappen verplaatsen geen links breekt.
 
 ### Eén vormtaal: de UI-kit (`shared/rtg-ui.css`)
 
@@ -56,7 +55,7 @@ npm install
 npm start
 ```
 
-Open daarna **http://localhost:3000** — dat toont direct het RTG OS-bureaublad; aanmelden gaat via de welkomstkaart (Rahul).
+Open daarna **http://localhost:3000** — dat toont direct de homescreen van het RTG OS; aanmelden gaat via de welkomstkaart (Rahul).
 
 Met de backend actief lopen inloggen, betalingen, likes, reacties, DM's en de AI via de echte API:
 
@@ -267,29 +266,43 @@ En hooguit één gesprek per paar per dag; dit hoort een verrassing te zijn, gee
 knop waar je op blijft drukken. `test/klets.test.js` bewaakt alle drie de
 sloten, inclusief de controle dat er geen echte naam in de opslag belandt.
 
-### Het werkblad: je scherm zelf indelen
+### Het OS is iOS: een homescreen, en verder niets
 
-Op een kantoorwerkplek (>=1100px) liggen meerdere dingen tegelijk open. Daarom
-kan elke werkpagina zichzelf opdelen in vlakken: 1, 2 naast elkaar, 2 boven
-elkaar, 3 of 4 (`public/shared/werkblad.js` + `.css`). De verhouding zet je door
-de scheiding te verslepen, en die keuze blijft staan per pagina en per toestel.
-De knoppenrij staat in de kopbalk van de pagina, niet in de console van Rahul --
-een knop die verdwijnt zodra je de console dichtklapt, is geen knop.
+Het OS droeg lang de metaforen van twee apparaten tegelijk. Naast het
+springboard lag een tweede beginscherm (`/apps/index.html`: alle apps in
+scrollende secties, met een eigen kopbalk, woordmerk en accountchips), en een
+app-pagina kon in een **sleepbaar bureaubladvenster** staan (`desktopframe`), in
+een **vensterbeheerder met dock en stoplichtknopjes** (`vensters`), in een
+**tegel-werkblad** (`werkblad`), of omringd door **widgets** (`bureau`,
+`flagship`). Bovenin liep een balk met het woordmerk en een accountchip
+(`osbar` + `os.css`), en daarnaast een **uitschuivende hamburger** (`osmenu`).
 
-Twee dingen zijn met opzet zo:
+Dat is allemaal weg. Wat een telefoon heeft, en verder niets:
 
-- **Tegels, geen zwevende vensters.** Die bestaan al (`shared/vensters.js`) en
-  zijn goed om even iets bij te pakken. Ze overlappen, en dat is precies wat je
-  niet wilt als twee schermen de hele dag naast elkaar moeten staan.
-- **Het eerste vlak is de pagina zelf**, verhuisd en niet gekopieerd. Anders zet
-  je twee versies van hetzelfde scherm naast elkaar die elkaars gegevens niet
-  zien. De kopbalk van de pagina blijft de bovenrand van het werkblad, zodat wat
-  de pagina met `position:fixed` neerzet binnen zijn eigen vlak blijft.
+- **Een homescreen.** Het springboard in `apps/app.html`. Alle andere paden
+  (`/`, `/apps/index.html`, `/apps/bureau.html`, `/apps/`) komen daar uit.
+- **Een navigatiebalk van 44 punten, alleen als er iets te navigeren of te
+  bedienen valt.** Een balk die alleen de naam van de app herhaalt is behang;
+  die verdwijnt, en de titel komt terug als grote titel boven de inhoud, die bij
+  het scrollen in de balk terugzakt.
+- **Geen woordmerk in de chrome.** Het merk staat op het icoon en op het
+  toestel; binnen de app hoef je niemand meer te vertellen waar hij is.
+- **Een home-indicator.** Omhoog vegen brengt je thuis; de app krimpt onder je
+  vinger weg. Een losse tik doet niets -- de pil ligt waar je duim rust.
+- **Een randveeg** van links terug in de geschiedenis.
+- **Bladen in plaats van vensters** (`RTGiOS.blad(...)`): van onder omhoog, met
+  een greep, sluiten met een veeg omlaag.
 
-De console van Rahul is op het bureaublad te **verplaatsen en van maat te
-veranderen** (`handenvrij-bureau.js`); ook dat blijft onthouden. Slepen naar
-links en rechts verzet hem, omhoog en omlaag blijft van de standen.
-`test/werkblad.e2e.js` toetst het in een echte browser.
+Dat alles staat op **een** plek: `public/shared/ios.css` + `public/shared/ios.js`
+(bron in `public/shared/ios/`). De laag LEEST de kopbalk die een pagina al heeft
+en bouwt hem ter plekke om -- hetzelfde `<header>`-element, dezelfde knoppen,
+dus dezelfde id's en dezelfde luisteraars. Dat is geen detail: een kop draagt
+meer dan knoppen (`#tel` telt ongelezen berichten, `#filters` wordt pas na het
+inloggen gevuld), en wie die met de kop weggooit, breekt de app zonder dat er
+ergens iets rood wordt. Alles met een id blijft staan, altijd.
+
+Split View (`shared/split.js`) blijft: twee apps naast elkaar is iPad, geen
+bureaublad. In zo'n paneel krijgt de app geen eigen home-indicator.
 
 ## Tests
 

@@ -12,7 +12,7 @@
   // alle ROS-schermen die je naast elkaar kunt zetten: dezelfde gedeelde lijst
   // als de flagship- en bureau-widgets (shared/rosapps.js), met een terugval
   var APPS = (w.RTGApps && w.RTGApps.length) ? w.RTGApps : [
-    { naam: 'Beginscherm', url: '/apps/index.html' },
+    { naam: 'Beginscherm', url: '/apps/app.html' },
     { naam: 'De Salon', url: '/apps/app.html#salon' },
     { naam: 'RTG Mall', url: '/apps/mall.html' },
       { naam: 'De Résidence', url: '/apps/residentie.html' },

@@ -7,16 +7,12 @@
 <meta name="theme-color" content="#0C0C0B">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link href="/shared/dagkleur.css" rel="stylesheet">
-<link href="/shared/os.css" rel="stylesheet">
 <link href="/fonts/fonts.css" rel="stylesheet">
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/rosthema.css" rel="stylesheet">
-<link href="/shared/desktopframe.css" rel="stylesheet">
-<link href="/shared/werkblad.css" rel="stylesheet">
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/rosthema.js" defer></script>
 <script src="/shared/rosapps.js" defer></script>
-<script src="/shared/flagship.js" defer></script>
 <link href="/shared/rtg-ui.css" rel="stylesheet">
 <style>
   :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--card2:var(--rtg-card2);--line:var(--rtg-line);--txt:var(--rtg-txt);--muted:var(--rtg-muted);--soft:var(--rtg-soft);--burgundy:#C23A5E;--gold:#A98F1C;--green:#4C9A75;--amber:#C99A2E;}
@@ -153,8 +149,9 @@
   .wlegenda span{display:flex;gap:.35rem;align-items:center;}
 .merkvlak{display:inline-block;background:#7F1634;color:#fff;padding:.22rem .7rem .28rem;border-radius:4px;}
 </style>
+<link href="/shared/ios.css" rel="stylesheet">
 </head>
-<body data-osbar="Kantoren" data-oswereld="kantoor" data-flagship class="rtg-stijl">
+<body class="rtg-stijl">
 <a class="skip" href="#hoofd">Naar de inhoud</a>
 <header><div class="wrap">
   <div class="brand"><span class="merkvlak">RTG Kantoren</span><small>Elke afdeling een eigen kamer</small></div>
@@ -1884,7 +1881,7 @@ async function exportPortfolio(naam){
 
        En daarom staat dat sluitende teken hier ook niet uitgeschreven, ook
        niet in een opmerking: de HTML-lezer kijkt niet of iets commentaar is. */
-    '</style></head><body>'+
+    '</style>    </head><body>'+
     '<div class="balk"><span>Portfolio &middot; '+esc(p.naam)+'</span><button id="pbtn" type="button">Print / PDF</button></div>'+
     '<div class="wrap"><div class="cover"><div class="ey">Portfolio</div><h1>'+titel+'</h1>'+
     '<div class="sub">'+d.ontwerpen.length+' concept(en)'+(d.disciplines&&d.disciplines.length?' &middot; '+d.disciplines.map(esc).join(', '):'')+'</div></div>'+
@@ -3105,57 +3102,26 @@ function officeLive(){
 if (TOKEN) binnen().then(officeLive).catch(uitgelogd);
 else uitgelogd();
 
-/* ---------- het werkblad: meerdere schermen op een scherm ----------
-
-   Een kantoor is geen pagina waar je doorheen scrolt maar een bureau waar
-   dingen naast elkaar liggen. Wie de personeelsplanning naast de weekcijfers
-   wil, hoort niet te hoeven wisselen van tabblad.
-
-   De indelingsknoppen komen in de kopbalk van deze pagina; shared/werkblad.js
-   doet de rest: vlakken, verslepen van de scheiding, en onthouden. Alleen op
-   een bureaublad; op een telefoon verandert er niets. */
-(function(){
-  const SCHERMEN = [
-    { naam: 'RTG Office', url: '/apps/office.html?werk=kantoor' },
-    { naam: 'RTF-kantoor', url: '/apps/foundation/kantoor.html' },
-    { naam: 'Onderzoekslab', url: '/apps/lab.html' },
-    { naam: 'Backoffice', url: '/apps/backoffice.html' },
-    { naam: 'Boardroom', url: '/apps/boardroom.html' }
-  ];
-  const balk = document.createElement('div');
-  balk.className = 'wb-balk';
-  /* De knoppen staan in de KOPBALK van de pagina en niet in de console van
-     Rahul. Dat was de eerste opzet, en die was fout: de console klapt dicht
-     zodra je antwoordt, en dan is de indeling van je eigen scherm onbereikbaar
-     tot je hem weer opent. Iets wat over de pagina gaat, hoort op de pagina te
-     staan; de console is voor Rahul. */
-  function start(){
-    const nav = document.querySelector('header nav');
-    if (nav) nav.insertBefore(balk, nav.firstChild);
-    else document.body.insertBefore(balk, document.body.firstChild);
-    if (window.RTGWerkblad) RTGWerkblad.start({ schermen: SCHERMEN, balk });
-  }
-  // shared/werkblad.js laadt met defer; even wachten tot hij er is
-  let n = 0;
-  const t = setInterval(() => { if (window.RTGWerkblad || ++n > 25) { clearInterval(t); start(); } }, 120);
-})();
+/* Hier stond het WERKBLAD: het kantoor als een bureau met meerdere schermen
+   naast elkaar, met indelingsknoppen in de kopbalk. Dat is de metafoor van een
+   computer, niet van een telefoon, en het OS is nu iOS: één scherm tegelijk,
+   vol, en je wisselt met de home-indicator. De schermen die hier in vlakken
+   naast elkaar lagen zijn gewoon losse apps op de homescreen. */
 </script>
 <script src="/shared/drie.js"></script>
 <script src="/apps/kantoren-atelier3d.js"></script>
 <script src="/apps/kantoren-collectieboek.js"></script>
 <script src="/shared/glyf.js"></script>
 <script src="/shared/sneltoets.js" defer></script>
-<script src="/shared/desktopframe.js" defer></script>
-<script src="/shared/werkblad.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/seizoen.js" defer></script>
 <script src="/shared/accounts-os.js" defer></script>
-<script src="/shared/osbar.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 <script src="/shared/bediening.js" defer></script>
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/ios.js" defer></script>
 </body>
 </html>

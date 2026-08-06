@@ -74,9 +74,8 @@
             try { doel.bewaar(s.token, r); } catch (e2) {}
             // Rahuls welzijnszin (late dienst, veel starts): stil tonen, nooit blokkeren
             if (s.welzijn) bannerToon('', 'Rahul', s.welzijn);
-            // werk-app als venster op het bureaublad (breed scherm), anders schermvullend
-            if (window.RTGVensters && RTGVensters.actief()) RTGVensters.open(doel.url, doel.app || 'Werk');
-            else location.href = doel.url;
+            // de werk-app opent schermvullend, op elk formaat
+            location.href = doel.url;
           } catch (e) { bannerToon('', T('werk.dicht', 'Werk'), e.message || T('werk.mis', 'Openen lukte niet.')); }
         }));
         belLijst.appendChild(b);

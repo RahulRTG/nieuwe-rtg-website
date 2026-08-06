@@ -8,9 +8,7 @@
 <meta name="theme-color" content="#0C0C0B">
 <link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/apps/foundation/stijl.css">
-<link rel="stylesheet" href="/shared/os.css">
 <link rel="stylesheet" href="/shared/uitleg.css">
-<link rel="stylesheet" href="/shared/osmenu.css">
 <script src="/apps/foundation/palet.js"></script>
 <script src="/shared/verbinding.js"></script>
 <link href="/shared/rtg-ui.css" rel="stylesheet">
@@ -96,11 +94,10 @@
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/dagkleur.css" rel="stylesheet">
-<link href="/shared/desktopframe.css" rel="stylesheet">
 <script src="/shared/seizoen.js" defer></script>
-<script src="/shared/desktopframe.js" defer></script>
+<link href="/shared/ios.css" rel="stylesheet">
 </head>
-<body data-osbar="Spelen" data-oswereld="lid" class="rtg-stijl">
+<body class="rtg-stijl">
 <main class="wrap" id="hoofd">
   <!-- lobby -->
   <section id="vLobby">
@@ -1167,9 +1164,7 @@ const qs = new URLSearchParams(location.search);
 if (qs.get('potje')) openPotje(qs.get('potje'));
 </script>
 <script src="/shared/accounts-os.js" defer></script>
-<script src="/shared/osbar.js" defer></script>
 <script src="/shared/uitleg.js" defer></script>
-<script src="/shared/osmenu.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
@@ -1178,5 +1173,6 @@ if (qs.get('potje')) openPotje(qs.get('potje'));
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/sneltoets.js" defer></script>
+<script src="/shared/ios.js" defer></script>
 </body>
 </html>

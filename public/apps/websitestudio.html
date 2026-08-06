@@ -130,6 +130,7 @@
   .inlog{max-width:440px;margin:5rem auto;text-align:center;padding:0 1.2rem;}
   .inlog a{color:var(--gold);}
 </style>
+<link href="/shared/ios.css" rel="stylesheet">
 </head>
 <body class="rtg-stijl">
 <header>
@@ -426,7 +427,7 @@ function exporteer(){
   const data=JSON.stringify({titel:DESIGN.titel,thema:DESIGN.thema,accent:DESIGN.accent,kleuren:DESIGN.kleuren||null,blokken:DESIGN.blokken,volgorde:DESIGN.volgorde||null}).replace(/</g,'\\u003c');
   const paginaBg=(DESIGN.kleuren&&DESIGN.kleuren.bg)||(DESIGN.thema==='licht'?'#F5F1EA':'#0C0C0B');
   const html='<!doctype html><html lang="nl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>'+esc(DESIGN.titel||'RTG sjabloon')+'</title>'+
-    '<link href="/fonts/fonts.css" rel="stylesheet"><style>body{margin:0;background:'+paginaBg+';}'+css+'</style></head>'+
+    '<link href="/fonts/fonts.css" rel="stylesheet"><style>body{margin:0;background:'+paginaBg+';}'+css+'</style>    </head>'+
     '<body><div class="doek" data-thema="'+DESIGN.thema+'" data-ver="" style="'+kleurStijl(DESIGN)+'max-width:1080px;margin:0 auto;"></div>'+
     '<script>window.__RTG__='+data+';<\/script><script>'+EXPORT_RUNTIME+'<\/script></body></html>';
   const blob=new Blob([html],{type:'text/html'}); const a=document.createElement('a');
@@ -473,5 +474,6 @@ else {
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
+<script src="/shared/ios.js" defer></script>
 </body>
 </html>

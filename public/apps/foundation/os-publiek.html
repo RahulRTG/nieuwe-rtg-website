@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>RTFoundation in uw buurt</title>
 <link rel="icon" href="/icons/foundation.svg">
+<link rel="manifest" href="/manifests/rtf-buurt.webmanifest">
 <link href="/fonts/fonts.css" rel="stylesheet">
 <link href="/shared/rtg-ui.css" rel="stylesheet">
 <style>
@@ -130,6 +131,8 @@ async function toonStad(id) {
 }
 
 start();
+
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
 </script>
 <script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>

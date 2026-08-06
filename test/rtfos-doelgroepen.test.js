@@ -96,6 +96,57 @@ test.before(async () => {
   DCODE = (await os_('casus/code', { id: CASUS })).body.code;
 });
 
+/* ---------------------------------------------------------------------------
+   DE DRIE SCHERMEN ALS APP OP DE TELEFOON.
+
+   Een manifest is stil kapot: een verkeerd pad, een icoon dat niet bestaat of
+   een start_url buiten de scope levert geen foutmelding op, alleen een knop
+   "installeren" die er nooit komt. Daarom wordt hier de echte HTTP-route
+   gelezen en niet het bestand op schijf.
+
+   En een: de naam van het deelnemersmanifest is EEN ONTWERPBESLUIT en geen
+   detail. Een geinstalleerde app zet een icoon met een naam op een beginscherm
+   dat huisgenoten meelezen; "Mijn hulpvraag" vertelt daar iets dat de pagina
+   zelf zorgvuldig niet vertelt. Deze toets houdt die naam neutraal.
+   ------------------------------------------------------------------------- */
+test('de drie schermen zijn installeerbaar, en het deelnemersicoon verraadt niets', async () => {
+  const paden = {
+    '/apps/foundation/os-vrijwilliger.html': '/manifests/rtf-vrijwilliger.webmanifest',
+    '/apps/foundation/os-deelnemer.html': '/manifests/rtf-eigen.webmanifest',
+    '/apps/foundation/os-publiek.html': '/manifests/rtf-buurt.webmanifest'
+  };
+  for (const [scherm, manifestPad] of Object.entries(paden)) {
+    const html = await (await fetch(BASE + scherm)).text();
+    assert.ok(html.includes('rel="manifest" href="' + manifestPad + '"'),
+      scherm + ' verwijst niet naar ' + manifestPad);
+    assert.match(html, /serviceWorker\.register\('sw\.js'\)/,
+      scherm + ' registreert geen service worker, dus hij is niet installeerbaar');
+
+    const res = await fetch(BASE + manifestPad);
+    assert.equal(res.status, 200, manifestPad + ' wordt niet geserveerd');
+    const man = JSON.parse(await res.text());
+    assert.equal(man.start_url, scherm, manifestPad + ' opent een ander scherm');
+    assert.ok(scherm.startsWith(man.scope), manifestPad + ' heeft een start_url buiten zijn eigen scope');
+    for (const ic of man.icons) {
+      const i = await fetch(BASE + ic.src);
+      assert.equal(i.status, 200, 'ontbrekend icoon ' + ic.src + ' in ' + manifestPad);
+    }
+    /* De service worker moet de pagina ook echt in zijn schil hebben staan:
+       staat hij er niet in, dan opent de app zonder verbinding op een wit
+       scherm -- en dat is precies het buurthuis met slecht bereik. */
+    const sw = await (await fetch(BASE + '/apps/foundation/sw.js')).text();
+    assert.ok(sw.includes("'" + scherm + "'"), scherm + ' staat niet in de schil van de service worker');
+  }
+
+  const eigen = JSON.parse(await (await fetch(BASE + '/manifests/rtf-eigen.webmanifest')).text());
+  const zichtbaar = [eigen.name, eigen.short_name, eigen.description].join(' ').toLowerCase();
+  for (const woord of ['hulpvraag', 'hulp', 'schuld', 'voedsel', 'dossier', 'toestemming']) {
+    assert.equal(zichtbaar.includes(woord), false,
+      'het woord "' + woord + '" staat in de naam of omschrijving van de app van de hulpvrager, ' +
+      'en die staat op een beginscherm dat huisgenoten meelezen');
+  }
+});
+
 test.after(() => { stop(srv && srv.child); try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} });
 
 /* ---------------------------------------------------------------------------

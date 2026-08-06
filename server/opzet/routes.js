@@ -48,6 +48,9 @@ module.exports = function hangRoutesOp(kern) {
   }
   // De verplichte onboarding + het contract raken leden, gasten, de eigenaar en
   // leveranciers; net als de infra-endpoints draait dit altijd mee.
+  // fouten uit de browser: bewust zonder auth, want een fout die het inloggen
+  // sloopt komt nooit binnen achter een poort die inloggen vereist
+  require('../routes/fout')(kern);
   require('../routes/onboarding')(kern);
   // De adresopzoeker hoort bij het invullen van een adres (intake en het
   // gegevensgesprek), en draait daarom net als de onboarding altijd mee.

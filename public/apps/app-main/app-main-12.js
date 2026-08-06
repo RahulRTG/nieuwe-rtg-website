@@ -161,6 +161,24 @@
       }
     } catch(e){}
     openTab(beginTab);
+
+    /* KIJKT DE APP OF ER IETS TE ZIEN IS. Een zwart scherm meldt zichzelf niet:
+       er gooit niets, alle verzoeken slagen, en toch staat er niets. Daarom
+       meten we het na het opbouwen gewoon na. Is het beginscherm leeg, dan
+       gaan de MATEN naar het logboek (venster, hoogtes, aantal tegels, de
+       rekeneenheid) -- genoeg om een layoutstoring te plaatsen zonder dat
+       iemand een console hoeft te openen. Staat er wel wat, dan gebeurt er
+       niets en weet niemand hiervan. */
+    setTimeout(() => {
+      try {
+        const thuis = document.querySelector('.os-thuisscherm');
+        const tegels = document.querySelectorAll('.os-app').length;
+        const hoog = thuis ? thuis.getBoundingClientRect().height : 0;
+        if ((!tegels || hoog < 40) && window.RTGFoutmelder && RTGFoutmelder.meetLeeg) {
+          RTGFoutmelder.meetLeeg(tegels ? 'thuisscherm zonder hoogte' : 'geen tegels');
+        }
+      } catch (e) { /* een controle mag nooit de oorzaak van iets worden */ }
+    }, 2500);
     if ((rtf.gekoppeld || []).length) ensurePush(false); // stil vernieuwen als het al aan staat
   }
 

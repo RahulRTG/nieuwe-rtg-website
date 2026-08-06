@@ -36,6 +36,8 @@
      vrijwilligerportaal  de vrijwilliger zelf: planning, uren, VOG-datum
      deelnemerportaal     de hulpvrager zelf: de stand, en toestemming intrekken
      publiek          de app voor de buurt: geen inlog, dus de strengste grens
+     veld             de medewerker op pad: alleen wat aan hem is toegewezen
+     donateur         de gever: zijn eigen giften, en zijn giftbewijs
      bestuur          vergaderingen, quorum, besluiten en vastgestelde notulen
      beleid           landelijke regels; een nieuwe versie wist alle bevestigingen
      jaarverslag      het ANBI-jaarstuk, met bevroren cijfers en een besluit eronder
@@ -117,6 +119,13 @@ module.exports = (state) => {
   const vrijwilligerportaal = require('./vrijwilligerportaal')(ctx);
   const deelnemerportaal = require('./deelnemerportaal')(ctx, { toestemmingWegDirect: casus.toestemmingWegDirect });
   const publiek = require('./publiek')(ctx);
+  /* De laatste twee ingangen: de medewerker die op pad is (alleen wat aan hem
+     is toegewezen) en de gever (alleen zijn eigen giften). Beide leunen op iets
+     dat al bestaat en maken het niet na: de veld-app op de ontsleutelfunctie
+     met de auditregel uit casus-dossier.js, het donateursportaal op de cijfers
+     uit rapport.js. */
+  const veld = require('./veld')(ctx, { vind: casus.vind, contactVan: casus.contactVan });
+  const donateur = require('./donateur')(ctx, { cijfersVan: rapport.cijfersVan });
 
   /* Het auditspoor uitlezen. Alleen landelijk, en alleen lezen -- er is nergens
      een functie die erin schrijft behalve ctx.audit zelf, en nergens een die
@@ -152,6 +161,7 @@ module.exports = (state) => {
     netwerk, inkoop, uitwisseling, campagnes, koppeling,
     bestuur, beleid, jaarverslag, risico, herkomst, meldcode,
     vrijwilligerportaal, deelnemerportaal, publiek,
+    veld, donateur,
     VLAGGEN: ctx.VLAGGEN, ROLLEN: ctx.ROLLEN
   } };
 };

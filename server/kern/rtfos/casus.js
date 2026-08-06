@@ -121,7 +121,7 @@ module.exports = (ctx) => {
 
   return { lijst, maak, status: keten.status, toestemmingWeg: keten.toestemmingWeg,
     toestemmingWegDirect: keten.toestemmingWegDirect,
-    stap: dossier.stap, contactOpen: dossier.contactOpen,
+    stap: dossier.stap, contactOpen: dossier.contactOpen, contactVan: dossier.contactVan,
     vind, beeld, SOORTEN, URGENTIE, KETEN, EIST_TOESTEMMING, BEWAARDAGEN };
 };
 module.exports.SOORTEN = SOORTEN;

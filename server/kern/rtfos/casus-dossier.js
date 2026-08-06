@@ -33,17 +33,27 @@ module.exports = (ctx, eigen) => {
     return { ok: true, c, w };
   }
 
-  function contactOpen(req, id) {
-    const o = open(req, id);
-    if (!o.ok) return o;
-    if (!o.c.contact) return { ok: true, contact: null };
+  /* Het ontsleutelen EN de auditregel staan hier, in een functie, en de poort
+     ervoor staat bij de aanroeper. Dat is met opzet: de veld-app (veld.js) laat
+     dezelfde gegevens zien aan een medewerker die geen 'casus.beheren' heeft
+     maar wel een toewijzing, en die mag geen tweede versie van dit blok worden
+     (LAT.md regel 4) -- dan lopen de foutzin en de auditregel uiteen, en juist
+     die auditregel is het hele punt van deze handeling. */
+  function contactVan(w, c, waarvandaan) {
+    if (!c.contact) return { ok: true, contact: null };
     let contact;
-    try { contact = kluis.ontsleutel(o.c.contact); }
+    try { contact = kluis.ontsleutel(c.contact); }
     catch (e) {
       return { status: 500, error: 'Deze gegevens staan versleuteld en de sleutel ontbreekt op deze server. Er is dus wel een contact bekend; ik kan er alleen niet bij.' };
     }
-    audit(o.w.key, 'casus.contact-open', o.c.codenaam, 'contactgegevens ingezien');
+    audit(w.key, 'casus.contact-open', c.codenaam, 'contactgegevens ingezien' + (waarvandaan ? ' (' + waarvandaan + ')' : ''));
     return { ok: true, contact };
+  }
+
+  function contactOpen(req, id) {
+    const o = open(req, id);
+    if (!o.ok) return o;
+    return contactVan(o.w, o.c, null);
   }
 
   function stap(req, id, b) {
@@ -61,6 +71,6 @@ module.exports = (ctx, eigen) => {
     return { ok: true, casus: beeld(o.c) };
   }
 
-  return { contactOpen, stap, STAPSOORTEN };
+  return { contactOpen, contactVan, stap, STAPSOORTEN };
 };
 module.exports.STAPSOORTEN = STAPSOORTEN;

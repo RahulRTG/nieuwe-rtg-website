@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mijn lijst · RTFoundation</title>
+<link rel="icon" href="/icons/foundation.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link rel="manifest" href="/manifests/rtf-veld.webmanifest">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<style>
+  :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--line:var(--rtg-line);--txt:var(--rtg-txt);--muted:var(--rtg-muted);--soft:var(--rtg-soft);--burgundy:#C23A5E;--gold:#A98F1C;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3rem;}
+  h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;}
+  header{padding:1rem;border-bottom:1px solid var(--line);display:flex;align-items:end;gap:.8rem;flex-wrap:wrap;}
+  header .ey{font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--burgundy);}
+  header h1{font-size:1.25rem;margin-top:.1rem;}
+  header a{margin-left:auto;color:var(--muted);font-size:.78rem;text-decoration:none;}
+  main{padding:1rem;max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:.9rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:.9rem 1rem;}
+  .kaart + .kaart{margin-top:.7rem;}
+  .sec{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin-bottom:.45rem;}
+  .rij{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;}
+  .veld{flex:1;min-width:8rem;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.92rem;padding:.6rem .75rem;}
+  select.veld{min-width:9rem;}
+  .knop{background:var(--txt);color:#000;border:none;border-radius:11px;padding:.6rem 1rem;font:inherit;font-weight:600;font-size:.88rem;cursor:pointer;}
+  .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
+  .pil{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:.15rem .55rem;color:var(--muted);}
+  .pil.goed{color:#7FC79B;border-color:#2F5E42;}
+  .pil.let{color:var(--gold);border-color:#5C4E10;}
+  .pil.fout{color:var(--burgundy);border-color:#5C1B2C;}
+  .lijnrij{display:flex;gap:.5rem;align-items:baseline;padding:.45rem 0;border-bottom:1px solid var(--line);font-size:.86rem;flex-wrap:wrap;}
+  .lijnrij:last-child{border-bottom:none;}
+  .lijnrij .naam{flex:1;min-width:9rem;}
+  .lijnrij .sub{font-size:.76rem;color:var(--muted);width:100%;}
+  .leeg{color:var(--muted);font-size:.9rem;padding:.5rem 0;}
+  .stat{flex:1;min-width:6rem;text-align:center;padding:.3rem 0;}
+  .stat b{font-size:1.2rem;display:block;}
+  .stat i{font-style:normal;font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);}
+  .melder{font-size:.85rem;border-radius:10px;padding:.6rem .8rem;margin-top:.5rem;border:1px solid var(--line);line-height:1.5;}
+  .melder.fout{color:#F0A9BB;border-color:#5C1B2C;}
+  .melder.goed{color:#9FD6B4;border-color:#2F5E42;}
+  .uitleg{font-size:.8rem;color:var(--muted);line-height:1.55;}
+  .breed{width:100%;}
+</style>
+</head>
+<body class="rtg-stijl">
+<header>
+  <div><div class="ey">RTFoundation</div><h1>Mijn lijst</h1></div>
+  <a href="os.html">Foundation OS</a>
+</header>
+<main id="main">
+  <div id="meldingTop"></div>
+  <div id="uit"></div>
+</main>
+
+<script>
+/* De app van de medewerker die op pad is.
+
+   DIT IS EEN LIJST VAN DRIE ADRESSEN EN GEEN REGISTER. Wat hier staat is wat
+   aan deze medewerker is TOEGEWEZEN; de rest van de stad ziet hij niet. Dat is
+   de reden dat deze app bestaat: in een buurthuis kent iedereen elkaar, en een
+   dossier van de buurvrouw hoort niet twee tikken weg te zijn.
+
+   HET ADRES STAAT ER NIET, TOT JE ERNAAR VRAAGT. Wie op bezoek gaat heeft het
+   nodig, dus de knop bestaat -- maar het openen wordt genoteerd, precies zoals
+   op kantoor. Het verschil tussen "ik werk hieraan" en "ik heb gekeken wie dit
+   is" moet zichtbaar blijven, ook achteraf.
+
+   EN ELK RAPPORT DRAAGT EEN VERVOLG. Een bezoek dat eindigt zonder afspraak is
+   hoe een hulpvraag blijft liggen: iedereen denkt dat de ander aan zet is. */
+const $ = s => document.querySelector(s);
+const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const TOKEN = localStorage.getItem('rtg_office_token') || '';
+
+const api = (pad, body) => fetch('/api/rtfos/' + pad, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
+  body: JSON.stringify(body || {})
+}).then(async r => {
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(d.error || 'Er ging iets mis.');
+  return d;
+});
+
+function melding(tekst, goed) {
+  const el = document.getElementById('melding') || document.getElementById('meldingTop');
+  if (!el) return;
+  el.innerHTML = '<div class="melder ' + (goed ? 'goed' : 'fout') + '">' + esc(tekst) + '</div>';
+  el.scrollIntoView({ block: 'nearest' });
+}
+function doe(pad, body, na) {
+  return api(pad, body).then(r => { melding(r.melding || 'Genoteerd.', true); if (na) na(r); }).catch(e => melding(e.message, false));
+}
+const datum = d => esc(String(d || '').slice(0, 10));
+
+async function teken() {
+  if (!TOKEN) {
+    $('#uit').innerHTML = '<div class="kaart"><div class="sec">Niet ingelogd</div>' +
+      '<div class="uitleg">Log in op het <a href="/apps/office.html">kantoor</a> en kom hier terug.</div></div>';
+    return;
+  }
+  let r;
+  try { r = await api('veld/lijst', {}); }
+  catch (e) { melding(e.message, false); return; }
+
+  $('#uit').innerHTML = '<div id="melding"></div>' +
+    '<div class="kaart"><div class="rij">' +
+      '<div class="stat"><b>' + r.aantal + '</b><i>toegewezen</i></div>' +
+      '<div class="stat"><b>' + r.teLaat + '</b><i>vervolg verlopen</i></div></div>' +
+      '<div class="uitleg">Hier staat wat aan u is toegewezen, en niets anders. Ziet u een hulpvraag niet staan waar u wel ' +
+        'aan werkt? Vraag uw co&ouml;rdinator om hem toe te wijzen.</div></div>' +
+    (r.hulpvragen.length ? r.hulpvragen.map(kaart).join('')
+      : '<div class="kaart"><div class="leeg">Er staat op dit moment niets voor u open.</div></div>');
+
+  $('#uit').querySelectorAll('[data-adres]').forEach(b => b.addEventListener('click', () =>
+    api('veld/adres', { id: b.dataset.adres })
+      .then(x => melding(x.contact ? 'Contact: ' + x.contact + ' (het openen is genoteerd)' : 'Er is geen contact vastgelegd bij deze hulpvraag.', true))
+      .catch(e => melding(e.message, false))));
+
+  $('#uit').querySelectorAll('[data-rap]').forEach(b => b.addEventListener('click', () => {
+    const w = document.getElementById('h-' + b.dataset.rap);
+    doe('veld/rapport', { id: b.dataset.rap, soort: w.querySelector('.rSoort').value,
+      tekst: w.querySelector('.rTekst').value, vervolgOp: w.querySelector('.rOp').value,
+      vervolgWat: w.querySelector('.rWat').value, geenVervolg: w.querySelector('.rGeen').checked,
+      vervolgReden: w.querySelector('.rWat').value }, teken);
+  }));
+
+  $('#uit').querySelectorAll('[data-af]').forEach(b => b.addEventListener('click', () =>
+    doe('veld/afronden', { id: b.dataset.af }).catch(() => {})));
+}
+
+function kaart(h) {
+  const teLaat = h.vervolg && h.vervolg.op && Date.parse(h.vervolg.op) < Date.now();
+  return '<div class="kaart" id="h-' + esc(h.id) + '"><div class="rij">' +
+    '<span class="naam"><b>' + esc(h.codenaam) + '</b> &middot; ' + esc(h.soort) + '</span>' +
+    '<span class="pil ' + (h.urgentie === 'acuut' ? 'fout' : '') + '">' + esc(h.urgentie) + '</span>' +
+    '<span class="pil">' + esc(h.status) + '</span>' +
+    (h.toestemming ? '<span class="pil goed">toestemming</span>' : '<span class="pil let">geen toestemming</span>') +
+    (h.ingetrokken ? '<span class="pil fout">ingetrokken</span>' : '') + '</div>' +
+    '<div class="uitleg">' + esc(h.vraag) + (h.wijk ? ' &middot; ' + esc(h.wijk) : '') + '</div>' +
+    (h.vervolg
+      ? '<div class="uitleg">' + (h.vervolg.geen
+          ? 'Geen vervolg: ' + esc(h.vervolg.reden)
+          : (teLaat ? '<b>Vervolg stond op ' + datum(h.vervolg.op) + ' en is verlopen</b>' : 'Vervolg op ' + datum(h.vervolg.op)) +
+            ' &middot; ' + esc(h.vervolg.wat)) + '</div>'
+      : '<div class="uitleg">Nog geen vervolgafspraak.</div>') +
+    (h.laatste.length ? h.laatste.map(s => '<div class="lijnrij"><span class="naam">' + esc(s.tekst) + '</span>' +
+      '<span class="pil">' + esc(s.soort) + '</span><div class="sub">' + datum(s.at) + '</div></div>').join('')
+      : '<div class="leeg">Nog niets genoteerd.</div>') +
+    '<div class="rij breed"><button class="knop stil" data-adres="' + esc(h.id) + '">Adres tonen</button>' +
+      '<button class="knop stil" data-af="' + esc(h.id) + '">Afronden</button></div>' +
+    '<div class="rij breed"><select class="veld rSoort" aria-label="Soort">' +
+      ['contact', 'hulpactie', 'doorverwijzing', 'nazorg'].map(s => '<option>' + s + '</option>').join('') + '</select>' +
+      '<input class="veld rTekst" placeholder="wat heeft u gezien en gedaan" maxlength="600" aria-label="Rapport"></div>' +
+    '<div class="rij breed"><input class="veld rOp" type="date" aria-label="Vervolg op">' +
+      '<input class="veld rWat" placeholder="wat is er afgesproken (of: waarom geen vervolg)" maxlength="200" aria-label="Vervolg">' +
+      '<label class="uitleg"><input type="checkbox" class="rGeen"> geen vervolg nodig</label>' +
+      '<button class="knop" data-rap="' + esc(h.id) + '">Noteren</button></div></div>';
+}
+
+teken();
+
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
+</script>
+<script src="/shared/deelmenu.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/levendekleur.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
+</body>
+</html>

@@ -398,3 +398,77 @@ test('wegen en beslissen kan niet zonder overleg, en het gesprek overslaan niet 
   assert.equal(/\.splice\(|delete |filter\(m => m\.id !==/.test(bron), false,
     'er staat een verwijderende bewerking in meldcode.js');
 });
+
+/* ---------------------------------------------------------------------------
+   DE LIJSTEN EN DE BIJWERK-HANDELINGEN.
+
+   Ze staan hier apart omdat ze bij de eerste ronde door geen enkele toets
+   werden aangeraakt -- en een route die niemand aanroept, blijft groen bij elke
+   fout die erin komt (LAT.md regel 10). Wat hier wordt nagelopen zijn niet de
+   lijsten zelf maar de GETALLEN erin: "hoeveel notulen staan er nog open" en
+   "hoeveel zware risico's staan er nog", want dat zijn de cijfers waarop een
+   bestuur zou moeten sturen. Een lijst zonder die twee is een archief.
+   ------------------------------------------------------------------------- */
+test('de lijsten tellen wat er open staat, en een herbeoordeling vraagt een oordeel', async () => {
+  const v = await os_('vergaderingen', {});
+  assert.equal(v.status, 200);
+  assert.ok(v.body.aantal >= 4, 'de eerdere vergaderingen staan niet in de lijst');
+  assert.ok(v.body.nietVastgesteld >= 1, 'de lijst telt de openstaande notulen niet');
+
+  /* EEN VERSTREKEN HERBEOORDELING WORDT GEREKEND. Hij wordt niet opgeslagen als
+     vlag, want dan is "verlopen" een eigenschap van gisteren in plaats van van
+     vandaag -- en dan klopt hij precies zolang als niemand kijkt. */
+  const oud = await os_('risico/meld', { stad: STAD, titel: 'Sleutelbeheer buurthuis', categorie: 'veiligheid',
+    kans: 3, impact: 3, herbeoordelenOp: '2020-06-01' }, TWEE);
+  assert.equal(oud.body.risico.verlopen, true, 'een verstreken herbeoordeling werd niet als verlopen gerekend');
+
+  const r = await os_('risicos', { stad: STAD }, TWEE);
+  assert.equal(r.status, 200);
+  assert.ok(r.body.verlopen >= 1, 'de lijst telt de verlopen herbeoordelingen niet');
+  assert.equal(r.body.drempel, 15, 'de drempel staat niet in het antwoord, dus het scherm moet hem verzinnen');
+
+  // herbeoordelen zonder oordeel is alleen een nieuwe datum
+  const kaal = await os_('risico/herbeoordeel', { id: oud.body.risico.id, herbeoordelenOp: overMorgen(90) }, TWEE);
+  assert.equal(kaal.status, 400);
+  assert.match(kaal.body.error, /zonder oordeel/);
+  // en een datum in het verleden is geen herbeoordeling
+  const terug = await os_('risico/herbeoordeel', { id: oud.body.risico.id, herbeoordelenOp: '2021-01-01',
+    notitie: 'nog steeds actueel' }, TWEE);
+  assert.equal(terug.status, 400);
+
+  const goed = await os_('risico/herbeoordeel', { id: oud.body.risico.id, herbeoordelenOp: overMorgen(90),
+    notitie: 'sloten vervangen, sleutellijst bijgewerkt' }, TWEE);
+  assert.equal(goed.status, 200);
+  assert.equal(goed.body.risico.verlopen, false, 'na de herbeoordeling stond hij nog steeds als verlopen');
+
+  const m = await os_('meldcodes', { stad: STAD }, TWEE);
+  assert.equal(m.status, 200);
+  assert.deepEqual(m.body.stappen, ['signaleren', 'overleggen', 'gesprek', 'wegen', 'beslissen'],
+    'de vijf wettelijke stappen komen niet mee, dus het scherm moet ze zelf verzinnen');
+
+  /* EEN VASTGESTELD JAARVERSLAG LAAT ZICH NIET MEER BIJWERKEN. Dat is de andere
+     kant van "vaststellen betekent iets": als de tekst daarna nog verandert,
+     dekt het bestuursbesluit een stuk dat niemand zo heeft gezien. */
+  /* Het verslag hieronder is WEL vastgesteld en NIET gepubliceerd, en dat is
+     geen detail van het decor. De eerste versie van deze toets pakte het
+     gepubliceerde verslag van hierboven -- en toen de vaststellingsgrendel bij
+     wijze van proef werd weggehaald, zakte er niets: de publicatiegrendel ving
+     hem alsnog op. Een toets die twee grendels tegelijk dekt, meet de zwakste
+     van de twee (LAT.md regel 2, uitkomst AFGESLAGEN). */
+  const bijna = await os_('jaarverslag/opstellen', { jaar: 2024, verhaal: 'het eerste jaar' });
+  const besluitId = (await os_('vergaderingen', {})).body.vergaderingen
+    .filter(x => x.vastgesteld).flatMap(x => x.besluiten).filter(b => b.aangenomen)[0].id;
+  const vast2 = await os_('jaarverslag/vaststellen', { id: bijna.body.jaarverslag.id, besluitId });
+  assert.equal(vast2.status, 200, JSON.stringify(vast2.body).slice(0, 200));
+
+  const bij = await os_('jaarverslag/aanvullen', { id: bijna.body.jaarverslag.id, verhaal: 'toch nog even iets anders' });
+  assert.equal(bij.status, 400);
+  assert.match(bij.body.error, /vastgesteld/);
+
+  // op een concept kan het wel: anders bewijst het verbod niets
+  const concept = await os_('jaarverslag/opstellen', { jaar: 2025, verhaal: 'eerste opzet' });
+  const welBij = await os_('jaarverslag/aanvullen', { id: concept.body.jaarverslag.id,
+    verhaal: 'tweede opzet, met de cijfers erin', bijlage: { naam: 'balans 2025', url: '/stukken/balans-2025' } });
+  assert.equal(welBij.status, 200);
+  assert.equal(welBij.body.jaarverslag.bijlagen.length, 1);
+});

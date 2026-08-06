@@ -21,7 +21,12 @@ const SOORTEN = {
   brug: { label: 'Brug', domein: 'verkeer', jaar: 60, risico: 'kritiek', waarde: 1200000 },
   boom: { label: 'Boom', domein: null, jaar: 80, risico: 'laag', waarde: 1800 },
   speeltoestel: { label: 'Speeltoestel', domein: null, jaar: 15, risico: 'midden', waarde: 5200 },
-  halte: { label: 'OV-halte', domein: 'verkeer', jaar: 20, risico: 'midden', waarde: 14000 }
+  halte: { label: 'OV-halte', domein: 'verkeer', jaar: 20, risico: 'midden', waarde: 14000 },
+  /* Een pand is een object als elk ander: het staat ergens, het heeft een
+     eigenaar en een conditie, en het gaat op een dag aan vervanging toe. Dat
+     het LEEGSTAAT is geen technische toestand maar een economische, en die
+     woont in kern/stadsweefsel/kansen.js -- dezelfde ding, andere vraag. */
+  pand: { label: 'Bedrijfspand', domein: null, jaar: 75, risico: 'laag', waarde: 450000 }
 };
 const STATUS = ['in-dienst', 'storing', 'onderhoud', 'uit-dienst'];
 const RISICO = ['laag', 'midden', 'hoog', 'kritiek'];

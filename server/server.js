@@ -2294,6 +2294,22 @@ kern.rampbeeld.koppelStad(() => {
 kern.stad.stadKoppelVerkeer(() => ({
   ovOnderweg: (db.data.ovVoertuigen || []).filter(v => Date.now() - new Date(v.at).getTime() < (kern.VOERTUIG_TTL_MS || 120000)).length
 }));
+/* DE ECONOMISCHE NAAD van het stadsweefsel: de kansenlaag leest de vacatures,
+   de bedrijven en de beroepen die hier al bestaan, en legt ze op de kaart. Ze
+   blijven wonen waar ze wonen -- kern/werk houdt de vacatures bij, de
+   partnerlijst de bedrijven, de Beroepen-Bibliotheek de beroepen -- en het
+   weefsel is er alleen de LEZER van. Laat gebonden, want alle drie zijn ze
+   eerder gemount dan dit punt. */
+kern.weefsel.weefselKoppelEconomie({
+  vacatures: () => openVacatures(null, null).map(v => ({ id: v.id, code: v.supplierCode, bedrijf: v.bedrijf,
+    func: v.func, uren: v.uren, loc: v.loc })),
+  bedrijven: () => (db.data.suppliers || []).map(s => ({ code: s.code, naam: s.name, type: s.type || null, loc: s.loc })),
+  beroepen: () => {
+    const bb = require('./kern/beroepenbieb/data');
+    return [...bb.TECHNIEK_BEROEPEN.map(b => ({ beroep: b, wereld: 'techniek', wereldLabel: 'Technisch & agrarisch' })),
+      ...bb.ZAKEN_BEROEPEN.map(b => ({ beroep: b, wereld: 'zaken', wereldLabel: 'Bedrijfsleven' }))];
+  }
+});
 /* De eigen-AI-dataset (kern/aidata.js): een boardroom-knop verzamelt alle logs
    (Rahul-gesprekken, ballotage, audit, transacties, kantoorchat) als JSONL om
    later een eigen model te trainen -- op codenamen, de kluis blijft dicht. */

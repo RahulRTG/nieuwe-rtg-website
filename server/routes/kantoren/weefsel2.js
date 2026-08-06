@@ -104,6 +104,20 @@ module.exports = (ctx) => {
     if (r.ok) afdelingen.audit(naam(req), 'Risicokenmerken van ' + r.naam + ': ' + (r.kenmerken.join(', ') || 'geen'));
     return r;
   }));
+  // ---- de kansenlaag: onderwijs, werk en de lokale economie ----
+  app.post('/api/office/weefsel/kansen', officeAuth, (req, res) => veilig(res, () => w.weefselKansen()));
+  app.post('/api/office/weefsel/tekorten', officeAuth, (req, res) => veilig(res, () => w.weefselTekorten()));
+  app.post('/api/office/weefsel/leegstand', officeAuth, (req, res) => veilig(res, () => w.weefselLeegstand()));
+  app.post('/api/office/weefsel/pand/zet', officeAuth, (req, res) => veilig(res, () => {
+    const r = w.weefselPandZet({ objectId: req.body.objectId, leeg: req.body.leeg, m2: req.body.m2, huur: req.body.huur, wie: naam(req) });
+    if (r.ok) afdelingen.audit(naam(req), 'Pand ' + r.pand.naam + ' staat nu ' + (r.pand.leeg ? 'LEEG' : 'in gebruik'));
+    return r;
+  }));
+  app.post('/api/office/weefsel/hinder', officeAuth, (req, res) => veilig(res, () => w.weefselHinder({ gebied: req.body.gebied })));
+  app.post('/api/office/weefsel/opdrachten', officeAuth, (req, res) => veilig(res, () => w.weefselOpdrachten()));
+  app.post('/api/office/weefsel/drukte', officeAuth, (req, res) => veilig(res, () => w.weefselDrukte({
+    gebied: req.body.gebied, bezoekers: req.body.bezoekers, uren: req.body.uren })));
+
   app.post('/api/office/weefsel/simulaties', officeAuth, (req, res) => veilig(res, () => w.weefselSimulaties()));
   app.post('/api/office/weefsel/simuleer', officeAuth, (req, res) => veilig(res, () => w.weefselSimuleer({
     soort: req.body.soort, id: req.body.id, gebied: req.body.gebied, minuten: req.body.minuten,

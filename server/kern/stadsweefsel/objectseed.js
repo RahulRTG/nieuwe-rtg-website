@@ -43,8 +43,17 @@ module.exports = ({ geo, save, objecten, objectMaak }) => {
         maak('lantaarn', laan.naam + ' ' + (i * 12), langs(laan, i / 7),
           { bouwjaar: 2004 + i * 3, conditie: i > 4 ? 4 : 2, inspectieGeleden: i * 4 });
       for (let i = 1; i <= 2; i++) maak('container', z.naam + ' container ' + i, langs(laan, i / 3.2), { bouwjaar: 2016, inspectieGeleden: 3 });
-      maak('put', straat.naam + ' kolk', langs(straat, 0.5), { bouwjaar: 1994, inspectieGeleden: 30 });
+      /* De kolk staat op DRIEKWART van de dwarsstraat, niet op de helft. Op de
+         helft ligt precies het kruispunt met de laan, en dan bindt hij aan
+         allebei de segmenten -- waarna hij als adres de laan krijgt en niet de
+         straat waar hij naar heet. Een object op een kruispunt is geen fout van
+         de geografie maar wel een rare plek voor een kolk. */
+      maak('put', straat.naam + ' kolk', langs(straat, 0.75), { bouwjaar: 1994, inspectieGeleden: 30 });
       maak('halte', 'Halte ' + z.naam, langs(straat, 0.25), { bouwjaar: 2011, inspectieGeleden: 6 });
+      // twee bedrijfspanden per zone: de voorraad waar de kansenlaag mee werkt
+      for (let i = 1; i <= 2; i++)
+        maak('pand', laan.naam + ' ' + (i * 12 + 4), langs(laan, (i + 0.5) / 4),
+          { bouwjaar: 1978 + i * 12, conditie: 3, inspectieGeleden: 14, eigenaar: 'particulier' });
     }
     for (const b of geo.opNiveau('buurt')) maak('gemaal', 'Gemaal ' + b.naam, b.centrum, { bouwjaar: 1998, conditie: 3, inspectieGeleden: 4 });
     for (const w of geo.opNiveau('wijk')) maak('transformator', 'Transformator ' + w.naam, w.centrum, { bouwjaar: 1989, inspectieGeleden: 10 });

@@ -73,6 +73,7 @@ module.exports = (deps) => {
   const ene = require('./energie')(ctx); ctx.ene = ene;
   const kli = require('./klimaat')(ctx); ctx.kli = kli;
   const sim = require('./simulatie')(ctx); ctx.sim = sim;
+  const kan = require('./kansen')(ctx); ctx.kan = kan;
   const alg = require('./algoritmeregister')(ctx); ctx.alg = alg;
 
   const seintje = () => { try { if (sseToOffice) sseToOffice('sync', { scope: 'weefsel' }); } catch (e) { stil('sse', e); } };
@@ -148,9 +149,14 @@ module.exports = (deps) => {
        blijven -- twee lijsten die hetzelfde bedoelen, en een gat ertussen. */
     weefselKlimaatMeters: () => ({ regen: [0, 120], grondwater: [0, 400], riool: [0, 100], waterstand: [-100, 600], hitte: [-20, 60] }),
     // wat het gezamenlijke rampbeeld van de klimaatkant hoort te zien
-    weefselKlimaatBeeld: () => kli.voorRampbeeld()
+    weefselKlimaatBeeld: () => kli.voorRampbeeld(),
+    /* De economische naad: vacatures, bedrijven en beroepen wonen elders in het
+       huis en blijven daar. server.js hangt de LEZERS hier aan; zonder die
+       koppeling telt de kansenlaag nul en zegt hij dat er geen bron is -- niet
+       dat er geen werk is. Dat verschil is de hele reden dat het zo staat. */
+    weefselKoppelEconomie: (bronnen) => kan.koppel(bronnen || {})
   };
   Object.assign(api, geo.api, obj.api, rel.api, afh.api, tr.api, zkn.api, werk.api,
-    con.api, ond.api, ind.api, beg.api, ene.api, kli.api, sim.api, alg.api);
+    con.api, ond.api, ind.api, beg.api, ene.api, kli.api, sim.api, kan.api, alg.api);
   return { weefsel: api };
 };

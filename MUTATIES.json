@@ -561,6 +561,15 @@
       "gezakt": 4,
       "scherp": "gezakt"
     },
+    "browserpoort.e2e.js": {
+      "soort": "puur",
+      "staat": "overleefd",
+      "modules": [
+        "server/lib/browser.js"
+      ],
+      "geprobeerd": 2,
+      "posities": 8
+    },
     "bugjacht.test.js": {
       "soort": "server",
       "staat": "gezakt",

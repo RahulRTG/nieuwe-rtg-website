@@ -277,103 +277,120 @@
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 16
+      "gezakt": 16,
+      "scherp": "gezakt"
     },
     "bankbeveiliging.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 1
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "bankdeuren.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 6
+      "gezakt": 6,
+      "scherp": "gezakt"
     },
     "bankhart.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 8
+      "gezakt": 8,
+      "scherp": "gezakt"
     },
     "bedrijfbeeld.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 4
+      "gezakt": 4,
+      "scherp": "gezakt"
     },
     "bedrijfbouw.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 6
+      "gezakt": 6,
+      "scherp": "gezakt"
     },
     "bedrijfeigenaar.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 3
+      "gezakt": 3,
+      "scherp": "gezakt"
     },
     "bedrijfkern.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 7
+      "gezakt": 7,
+      "scherp": "gezakt"
     },
     "bedrijfklant.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 5
+      "gezakt": 5,
+      "scherp": "gezakt"
     },
     "bedrijfrecht.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 5
+      "gezakt": 5,
+      "scherp": "gezakt"
     },
     "bedrijfsintake.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 1
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "bedrijfwerk.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 6
+      "gezakt": 6,
+      "scherp": "gezakt"
     },
     "belasting-groothandels.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 2
+      "gezakt": 2,
+      "scherp": "gezakt"
     },
     "belastingkantoor.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 6
+      "gezakt": 6,
+      "scherp": "gezakt"
     },
     "berichten.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 10
+      "gezakt": 10,
+      "scherp": "gezakt"
     },
     "beroepenbieb.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 3
+      "gezakt": 3,
+      "scherp": "gezakt"
     },
     "beschermd.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 4
+      "gezakt": 4,
+      "scherp": "gezakt"
     },
     "bestand-binding.test.js": {
       "soort": "puur",
@@ -387,13 +404,15 @@
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 5
+      "gezakt": 5,
+      "scherp": "gezakt"
     },
     "betaaldienst.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 4
+      "gezakt": 4,
+      "scherp": "gezakt"
     },
     "betaalstore.test.js": {
       "soort": "puur",
@@ -413,7 +432,8 @@
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 13
+      "gezakt": 13,
+      "scherp": "gezakt"
     },
     "bewaartermijnen.test.js": {
       "soort": "puur",
@@ -440,31 +460,36 @@
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 5
+      "gezakt": 5,
+      "scherp": "gezakt"
     },
     "bezorging.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 1
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "bezorgketen.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 4
+      "gezakt": 4,
+      "scherp": "gezakt"
     },
     "bezorgvolgen.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 1
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "bibliotheek.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 3
+      "gezakt": 3,
+      "scherp": "gezakt"
     },
     "bijles.test.js": {
       "soort": "server",

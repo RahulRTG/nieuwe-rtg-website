@@ -134,7 +134,12 @@ function maakRun({ db, save, nu, crypto, motor, regelpakket, componenten }) {
     totaalVerschilCenten: r.totaalVerschilCenten, goedkeuringen: r.goedkeuringen, at: r.at });
 
   const lijst = (code) => bak().filter(r => !code || r.code === code).map(kort);
-  const haal = (runId) => vind(runId);
+  /* haalRun en niet haal: de kruisscan (scripts/kruisscan.js) ziet bestanden in
+     een map als slices van een opgeknipte module en las bron.haal() in
+     ./bijwerken.js als een verwijzing hierheen. Vals alarm -- dit zijn echte
+     modules met een eigen export -- maar een naam die zegt WAT hij haalt is
+     hoe dan ook beter dan een die met de scanner in de knoop ligt. */
+  const haalRun = (runId) => vind(runId);
   /* De strook van een medewerker, uit definitieve runs. Een concept is geen
      loonstrook: dat is een berekening waar nog niemand achter staat. */
   const strokenVan = (code, staffId) => bak()
@@ -148,7 +153,7 @@ function maakRun({ db, save, nu, crypto, motor, regelpakket, componenten }) {
   const { corrigeer } = require('./correctie').maakCorrectie({ db, save, nu, crypto, motor, regelpakket,
     componenten, vind, bak, kort, stempel });
 
-  return { open, keurGoed, maakDefinitief, corrigeer, lijst, haal, strokenVan, STANDEN };
+  return { open, keurGoed, maakDefinitief, corrigeer, lijst, haal: haalRun, strokenVan, STANDEN };
 }
 
 module.exports = { maakRun, STANDEN };

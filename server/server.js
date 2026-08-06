@@ -1947,6 +1947,21 @@ Object.assign(kern, require('./kern/stadsraad')({ db, save, crypto }));
 /* RTG Payroll (kern/payroll.js): het loonkantoor draait op wat het platform
    al weet -- de klok, de rollen en de fiscale landtabellen. */
 Object.assign(kern, require('./kern/payroll')({ db, save, crypto, accounts, LANDEN, klokVan, openVacatures, findSupplier }));
+/* Payroll OS (kern/payroll/): de laag eronder -- regelpakketten met versies,
+   het componentenregister, contracten als ingangsdatum-versies, de herhaalbare
+   motor, de loonrun met vier ogen, het journaal en het betaalbestand.
+
+   Let op het pad: `./kern/payroll` hierboven wijst naar payroll.js (Node kiest
+   een bestand voor een map), `./kern/payroll/index.js` hier naar de nieuwe
+   laag. Ze staan bewust naast elkaar; zie de kop van index.js voor waarom de
+   oude nog niet weg kan. */
+Object.assign(kern, require('./kern/payroll/index.js').maakPayrollOS({ db, save, crypto, accounts,
+  inzagelog: require('./inzagelog'), notify: (k, m) => { try { kern.notify(k, m); } catch (e) {} },
+  logActivity: (c, a, t) => { try { kern.logActivity(c, a, t); } catch (e) {} } }));
+/* De meegeleverde jaargang komt langs dezelfde keuring als elk ander pakket en
+   staat daarna als ONGECONTROLEERD klaar: er mag geen definitieve loonrun op
+   tot iemand hem tegen het Handboek Loonheffingen heeft gelegd. */
+try { kern.payrollOS.laadMeegeleverd(); } catch (e) { console.error('[payrollOS] jaargang laden:', e.message); }
 Object.assign(kern, require('./kern/labfonds')({ db, save, crypto, anthropic }));
 /* De werkplek (kern/werkplek.js): RTG en RTF als twee aparte huizen om in te
    werken. Ze delen het platform, maar niet hun cijfers, hun bezetting of hun

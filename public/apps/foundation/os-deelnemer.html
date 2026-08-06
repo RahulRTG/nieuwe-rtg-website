@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mijn hulpvraag · RTFoundation</title>
+<link rel="icon" href="/icons/foundation.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<style>
+  :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--line:var(--rtg-line);--txt:var(--rtg-txt);--muted:var(--rtg-muted);--soft:var(--rtg-soft);--burgundy:#C23A5E;--gold:#A98F1C;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3rem;}
+  h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;}
+  header{padding:1rem;border-bottom:1px solid var(--line);}
+  header .ey{font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--burgundy);}
+  header h1{font-size:1.25rem;margin-top:.1rem;}
+  main{padding:1rem;max-width:680px;margin:0 auto;display:flex;flex-direction:column;gap:.9rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:.95rem 1rem;}
+  .sec{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin-bottom:.45rem;}
+  .rij{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;}
+  .veld{flex:1;min-width:9rem;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.95rem;padding:.65rem .8rem;}
+  .knop{background:var(--txt);color:#000;border:none;border-radius:11px;padding:.65rem 1.1rem;font:inherit;font-weight:600;font-size:.9rem;cursor:pointer;}
+  .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
+  .groot{font-size:1.05rem;line-height:1.6;}
+  .lijnrij{display:flex;gap:.5rem;align-items:baseline;padding:.5rem 0;border-bottom:1px solid var(--line);font-size:.92rem;flex-wrap:wrap;}
+  .lijnrij:last-child{border-bottom:none;}
+  .lijnrij .naam{flex:1;min-width:9rem;}
+  .lijnrij .sub{font-size:.78rem;color:var(--muted);width:100%;}
+  .pil{font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:.15rem .55rem;color:var(--muted);}
+  .pil.goed{color:#7FC79B;border-color:#2F5E42;}
+  .leeg{color:var(--muted);font-size:.9rem;padding:.5rem 0;}
+  .uitleg{font-size:.82rem;color:var(--muted);line-height:1.65;}
+  .melder{font-size:.9rem;border-radius:10px;padding:.7rem .9rem;margin-top:.6rem;border:1px solid var(--line);line-height:1.6;}
+  .melder.fout{border-color:#5C1B2C;color:#F0A9BB;}
+  .melder.goed{border-color:#2F5E42;color:#9FD6B4;}
+  .verborgen{display:none;}
+  .ruimte{margin-top:.6rem;}
+</style>
+</head>
+<body class="rtg-stijl">
+<header>
+  <div class="ey">RTFoundation</div>
+  <h1>Mijn hulpvraag</h1>
+</header>
+<main id="main">
+  <div class="kaart" id="deur">
+    <div class="sec">Uw code</div>
+    <div class="rij">
+      <input class="veld" id="code" placeholder="RTFD-..." maxlength="40" aria-label="Uw code" autocomplete="off">
+      <button class="knop" id="open">Bekijken</button>
+    </div>
+    <div id="melding"></div>
+    <div class="uitleg">
+      Met deze code ziet u hoe het met uw vraag staat, en kunt u uw toestemming intrekken.
+      Er staan geen naam- of contactgegevens achter. De code blijft in dit tabblad en wordt nergens bewaard:
+      op een computer die u deelt, sluit u het tabblad als u klaar bent.
+    </div>
+  </div>
+  <div id="uit"></div>
+</main>
+
+<script>
+/* Het scherm van de hulpvrager.
+
+   TWEE DINGEN, EN NIET MEER. Weten waar het staat, en nee kunnen zeggen. Wie
+   hulp vraagt raakt de regie kwijt: er wordt over hem gepraat, een dossier
+   aangelegd, een partner gekoppeld -- en hij hoort niets meer tot er iemand
+   belt. Deze pagina geeft dat stukje regie terug.
+
+   DE TAAL IS DE HELFT VAN HET WERK. De status heet hier niet "in_uitvoering"
+   maar "er wordt aan gewerkt". Een ketenwoord zegt een organisatie iets en een
+   mens niets, en dit scherm is voor de mens.
+
+   WAT ER NIET IN STAAT: interne notities (werkaantekeningen van hulpverleners
+   lezen voor de betrokkene vaak als een oordeel dat niet zo bedoeld was), namen
+   van hulpverleners, en contactgegevens -- ook niet die van hemzelf, want een
+   code wordt meegelezen. */
+const $ = s => document.querySelector(s);
+const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const SOORT = { contact: 'Contact', hulpactie: 'Hulp gegeven', doorverwijzing: 'Doorverwezen', nazorg: 'Nazorg' };
+
+let CODE = null;
+
+function melding(tekst, goed) {
+  const el = document.getElementById('meldingIn') || $('#melding');
+  el.innerHTML = '<div class="melder ' + (goed ? 'goed' : 'fout') + '">' + esc(tekst) + '</div>';
+}
+const api = (pad, body) => fetch('/api/rtfos/portaal/' + pad, {
+  method: 'POST', headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(Object.assign({ code: CODE }, body || {}))
+}).then(async r => {
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(d.error || 'Er ging iets mis.');
+  return d;
+});
+
+async function open() {
+  CODE = String($('#code').value || '').trim().toUpperCase();
+  $('#melding').innerHTML = '';
+  if (!CODE.startsWith('RTFD')) {
+    melding('Deze code begint niet met RTFD. Vraag de RTF-afdeling in uw stad om de juiste code.', false);
+    return;
+  }
+  try { teken((await api('deelnemer')).hulpvraag); }
+  catch (e) { melding(e.message, false); }
+}
+
+function teken(h) {
+  $('#deur').classList.add('verborgen');
+  $('#uit').innerHTML =
+    '<div class="kaart"><div class="sec">Hoe het ervoor staat</div>' +
+      '<div class="groot">' + esc(h.uitleg) + '</div>' +
+      '<div class="rij ruimte"><span class="pil">' + esc(h.soort) + '</span>' +
+      '<span class="pil">RTF ' + esc(h.stad || '') + '</span>' +
+      (h.partner ? '<span class="pil">' + esc(h.partner) + '</span>' : '') + '</div>' +
+      '<div class="uitleg ruimte">Uw vraag zoals wij hem hebben genoteerd: ' + esc(h.vraag) + '</div>' +
+      '<div id="meldingIn"></div></div>' +
+
+    '<div class="kaart"><div class="sec">Wat er is gedaan</div>' +
+      (h.stappen.length ? h.stappen.map(s => '<div class="lijnrij"><span class="naam">' + esc(s.tekst) + '</span>' +
+        '<span class="pil">' + esc(SOORT[s.soort] || s.soort) + '</span>' +
+        '<div class="sub">' + esc(String(s.at || '').slice(0, 10)) + '</div></div>').join('')
+        : '<div class="leeg">Er is nog niets te melden. Zodra er iets gebeurt, staat het hier.</div>') + '</div>' +
+
+    '<div class="kaart"><div class="sec">Uw toestemming</div>' +
+      (h.toestemming
+        ? '<div class="groot">U heeft toestemming gegeven voor:</div>' +
+          '<div class="uitleg ruimte">&bdquo;' + esc(h.toestemming.tekst) + '&rdquo; &mdash; vastgelegd op ' +
+            esc(String(h.toestemming.at || '').slice(0, 10)) + '.</div>' +
+          '<div class="rij ruimte"><input class="veld" id="reden" placeholder="Waarom trekt u het in? (mag leeg)" maxlength="300" aria-label="Reden">' +
+          '<button class="knop stil" id="intrek">Toestemming intrekken</button></div>' +
+          '<div class="uitleg ruimte">Als u intrekt, gaat er niets meer naar een partner en gaat het werk niet verder. ' +
+            'Wat er al is gedaan blijft in het dossier staan &mdash; dat wissen zou het onbetrouwbaar maken, ook voor u.</div>'
+        : (h.ingetrokken
+          ? '<div class="groot">U heeft uw toestemming ingetrokken op ' + esc(String(h.ingetrokken.at || '').slice(0, 10)) + '.</div>' +
+            '<div class="uitleg ruimte">Er gaat niets meer naar een partner. Wilt u het later toch weer, neem dan contact op met de afdeling.</div>'
+          : '<div class="leeg">Er staat op dit moment geen toestemming van u vastgelegd. Er wordt dus niets van u met een andere organisatie gedeeld.</div>')) +
+      '</div>' +
+
+    (h.bewaarTot ? '<div class="kaart"><div class="sec">Bewaartermijn</div>' +
+      '<div class="uitleg">Dit dossier wordt bewaard tot ' + esc(h.bewaarTot) + ' en daarna verwijderd.</div></div>' : '') +
+
+    '<div class="kaart"><div class="sec">Uw rechten</div><div class="uitleg">' +
+      'U kunt vragen welke gegevens wij van u hebben, ze laten corrigeren of laten verwijderen. ' +
+      'Dat loopt via de RTF-afdeling in uw stad, zodat er iemand is die het kan uitleggen. ' +
+      'Bent u het ergens niet mee eens, dan kunt u een klacht indienen bij RTF en bij de Autoriteit Persoonsgegevens.' +
+      '</div></div>';
+
+  const knop = document.getElementById('intrek');
+  if (knop) {
+    knop.addEventListener('click', () =>
+      api('deelnemer/intrekken', { reden: ($('#reden') || {}).value })
+        .then(r => { teken(r.hulpvraag); melding(r.melding, true); })
+        .catch(e => melding(e.message, false)));
+  }
+}
+
+$('#open').addEventListener('click', open);
+$('#code').addEventListener('keydown', e => { if (e.key === 'Enter') open(); });
+</script>
+<script src="/shared/deelmenu.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/levendekleur.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
+</body>
+</html>

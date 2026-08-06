@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation in uw buurt</title>
+<link rel="icon" href="/icons/foundation.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<style>
+  :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--line:var(--rtg-line);--txt:var(--rtg-txt);--muted:var(--rtg-muted);--soft:var(--rtg-soft);--burgundy:#C23A5E;--gold:#A98F1C;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3rem;}
+  h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;}
+  header{padding:1.2rem 1rem;border-bottom:1px solid var(--line);}
+  header .ey{font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--burgundy);}
+  header h1{font-size:1.45rem;margin-top:.15rem;}
+  header p{font-size:.9rem;color:var(--muted);margin-top:.4rem;line-height:1.6;max-width:44rem;}
+  main{padding:1rem;max-width:780px;margin:0 auto;display:flex;flex-direction:column;gap:.9rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:.95rem 1rem;}
+  .sec{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin-bottom:.5rem;}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(12rem,1fr));gap:.7rem;}
+  .stadkaart{cursor:pointer;}
+  .stadkaart h2{font-size:1.05rem;}
+  .rij{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;}
+  .knop{background:var(--txt);color:#000;border:none;border-radius:11px;padding:.6rem 1rem;font:inherit;font-weight:600;font-size:.88rem;cursor:pointer;}
+  .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
+  .lijnrij{display:flex;gap:.5rem;align-items:baseline;padding:.5rem 0;border-bottom:1px solid var(--line);font-size:.92rem;flex-wrap:wrap;}
+  .lijnrij:last-child{border-bottom:none;}
+  .lijnrij .naam{flex:1;min-width:9rem;}
+  .lijnrij .sub{font-size:.78rem;color:var(--muted);width:100%;}
+  .pil{font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:.15rem .55rem;color:var(--muted);}
+  .pil.goed{color:#7FC79B;border-color:#2F5E42;}
+  .pil.let{color:var(--gold);border-color:#5C4E10;}
+  .leeg{color:var(--muted);font-size:.9rem;padding:.5rem 0;}
+  .uitleg{font-size:.86rem;color:var(--muted);line-height:1.65;}
+  .melder{font-size:.88rem;border-radius:10px;padding:.6rem .8rem;border:1px solid #5C1B2C;color:#F0A9BB;}
+  .ruimte{margin-top:.6rem;}
+  .verborgen{display:none;}
+</style>
+</head>
+<body class="rtg-stijl">
+<header>
+  <div class="ey">RTFoundation</div>
+  <h1>Wat wij doen, bij u in de buurt</h1>
+  <p id="wat">De RTFoundation werkt per stad samen met lokale stichtingen, buurthuizen, scholen en ondernemers.</p>
+</header>
+<main id="main">
+  <div class="kaart">
+    <div class="sec">Kies uw stad</div>
+    <div class="grid" id="steden"><div class="leeg">Laden...</div></div>
+  </div>
+  <div id="uit"></div>
+  <div class="kaart" id="campagnes"></div>
+</main>
+
+<script>
+/* De publieke RTF-app: geen inlog, en daarom de strengste grens van het hele
+   systeem.
+
+   DE MAAT IS EEN POSTER IN HET BUURTHUIS. Alles wat je daar niet zou ophangen,
+   staat hier niet -- en dat is de reden dat er geen enkel getal over hulpvragen
+   op deze pagina komt. "Deze week twee vragen over schulden in de Zeewijk" is in
+   een buurt van driehonderd huizen geen statistiek maar een aanwijzing. De
+   gemeente krijgt die cijfers geteld en met een drempel; de straat krijgt ze
+   niet, want daar is geen drempel hoog genoeg.
+
+   De server houdt zich aan diezelfde grens (kern/rtfos/publiek.js); dit scherm
+   toont wat het krijgt. Filteren in de browser is geen grens. */
+const $ = s => document.querySelector(s);
+const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+const api = (pad, body) => fetch('/api/rtfos/publiek/' + pad, {
+  method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {})
+}).then(async r => {
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(d.error || 'Er ging iets mis.');
+  return d;
+});
+
+async function start() {
+  try {
+    const r = await api('steden');
+    $('#wat').textContent = r.wat;
+    $('#steden').innerHTML = r.steden.length
+      ? r.steden.map(s => '<div class="kaart stadkaart" data-stad="' + esc(s.id) + '">' +
+          '<h2>RTF ' + esc(s.naam) + '</h2>' +
+          '<div class="uitleg">' + (s.soorten.length ? esc(s.soorten.join(', ')) : 'net begonnen') + '</div></div>').join('')
+      : '<div class="leeg">Er is nog geen afdeling open. Zodra er een start, staat hij hier.</div>';
+    $('#steden').querySelectorAll('[data-stad]').forEach(k =>
+      k.addEventListener('click', () => toonStad(k.dataset.stad)));
+  } catch (e) { $('#steden').innerHTML = '<div class="melder">' + esc(e.message) + '</div>'; }
+
+  try {
+    const c = await api('campagnes');
+    $('#campagnes').innerHTML = c.campagnes.length
+      ? '<div class="sec">Wat er landelijk loopt</div>' + c.campagnes.map(x =>
+          '<div class="lijnrij"><span class="naam"><b>' + esc(x.naam) + '</b></span>' +
+          (x.tot ? '<span class="pil">tot ' + esc(x.tot) + '</span>' : '') +
+          '<div class="sub">' + esc(x.doel || '') + (x.steden.length ? ' &middot; in ' + esc(x.steden.join(', ')) : '') + '</div></div>').join('') +
+        '<div class="uitleg ruimte">Er staat met opzet geen teller bij hoeveel er is opgehaald. Een thermometer werkt als aansporing, en dat is precies het soort druk dat wij niet op mensen zetten.</div>'
+      : '';
+  } catch (e) { $('#campagnes').innerHTML = ''; }
+}
+
+async function toonStad(id) {
+  try {
+    const r = await api('stad', { id });
+    $('#uit').innerHTML =
+      '<div class="kaart"><h2>RTF ' + esc(r.stad.naam) + '</h2>' +
+        '<div class="uitleg ruimte">' + esc(r.meedoen.hulp) + '</div></div>' +
+      '<div class="kaart"><div class="sec">Wat er loopt</div>' +
+        (r.projecten.length ? r.projecten.map(p => '<div class="lijnrij"><span class="naam">' + esc(p.naam) + '</span>' +
+          '<span class="pil">' + esc(p.soort) + '</span>' +
+          '<div class="sub">' + esc(p.doelgroep || '') + '</div></div>').join('')
+          : '<div class="leeg">Hier start binnenkort het eerste project.</div>') + '</div>' +
+      '<div class="kaart"><div class="sec">Waar u binnen kunt lopen</div>' +
+        (r.activiteiten.length ? r.activiteiten.map(a => '<div class="lijnrij"><span class="naam">' + esc(a.naam) + '</span>' +
+          '<span class="pil">' + esc(a.wanneer || 'datum volgt') + ' ' + esc(a.tijd || '') + '</span>' +
+          (a.vol ? '<span class="pil let">vol</span>' : '<span class="pil goed">' + a.plekVrij + ' plekken vrij</span>') +
+          '<div class="sub">' + esc(a.locatie || '') + '</div></div>').join('')
+          : '<div class="leeg">Er staat op dit moment niets open. Kijk over een paar dagen weer.</div>') + '</div>' +
+      '<div class="kaart"><div class="sec">Meedoen</div>' +
+        '<div class="uitleg">' + esc(r.meedoen.vrijwilliger) + '</div>' +
+        '<div class="uitleg ruimte">' + esc(r.meedoen.ondernemer) + '</div>' +
+        '<div class="rij ruimte"><a class="knop stil" href="os-vrijwilliger.html">Ik ben al vrijwilliger</a>' +
+        '<a class="knop stil" href="os-deelnemer.html">Ik heb een code voor mijn hulpvraag</a></div></div>';
+    window.scrollTo({ top: $('#uit').offsetTop - 20, behavior: 'smooth' });
+  } catch (e) { $('#uit').innerHTML = '<div class="kaart"><div class="melder">' + esc(e.message) + '</div></div>'; }
+}
+
+start();
+</script>
+<script src="/shared/deelmenu.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/levendekleur.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
+</body>
+</html>

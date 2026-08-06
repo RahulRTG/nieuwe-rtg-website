@@ -97,13 +97,25 @@ module.exports = (ctx, eigen) => {
     const w = wie(req);
     const g = poort(w, c.stad, 'casus.beheren', 'individual_cases');
     if (!g.ok) return g;
+    return toestemmingWegDirect(c, w.key, reden);
+  }
+
+  /* Het intrekken zelf, zonder poort. De HULPVRAGER kan dit ook, vanuit zijn
+     eigen portaal (deelnemerportaal.js) -- en dat is geen bijzaak maar de kern
+     van wat toestemming betekent: een recht waarvoor je moet bellen naar de
+     organisatie die je juist wilde stoppen, is een drempel en geen recht.
+
+     Een gedeelde functie en geen tweede implementatie: dezelfde regels, hetzelfde
+     spoor, alleen een andere `door` (LAT.md regel 4). Wie het introk staat in
+     het dossier en in het auditspoor -- 'deelnemer' als hij het zelf deed. */
+  function toestemmingWegDirect(c, door, reden) {
     if (!c.toestemming) return { status: 400, error: 'Er staat geen toestemming vastgelegd bij deze hulpvraag.' };
-    c.ingetrokken = { was: c.toestemming, door: w.key, reden: schoon(reden, 300), at: nu() };
+    c.ingetrokken = { was: c.toestemming, door: String(door || 'onbekend'), reden: schoon(reden, 300), at: nu() };
     c.toestemming = null;
-    audit(w.key, 'casus.toestemming-ingetrokken', c.codenaam, schoon(reden, 60));
+    audit(door, 'casus.toestemming-ingetrokken', c.codenaam, schoon(reden, 60));
     save();
     return { ok: true, casus: beeld(c) };
   }
 
-  return { status, toestemmingWeg };
+  return { status, toestemmingWeg, toestemmingWegDirect };
 };

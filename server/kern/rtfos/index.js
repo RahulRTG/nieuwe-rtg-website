@@ -33,6 +33,9 @@
      uitwisseling     vrijwilligers tussen steden, met toestemming en einddatum
      campagnes        landelijk werven, centnauwkeurig verdelen over steden
      koppeling        wat er naar RTG loopt, en wat er eerlijk NIET loopt
+     vrijwilligerportaal  de vrijwilliger zelf: planning, uren, VOG-datum
+     deelnemerportaal     de hulpvrager zelf: de stand, en toestemming intrekken
+     publiek          de app voor de buurt: geen inlog, dus de strengste grens
 
    WAT DIT NIET IS. Geen tweede ledenadministratie en geen tweede boekhouding.
    De 30%-afdracht van RTG naar de stichting blijft in kern/fonds.js; dit OS
@@ -81,6 +84,12 @@ module.exports = (state) => {
   const inkoop = require('./inkoop')(ctx, { boekAanvraag: geld.boekAanvraag });
   const campagnes = require('./campagnes')(ctx, { bronUitCampagne: geld.bronUitCampagne });
   const koppeling = require('./koppeling')(ctx, { agenda: state.agenda });
+  /* De drie doelgroepen die tot nu toe wel in het systeem stonden maar er niet
+     in konden: de vrijwilliger, de hulpvrager en de buurt. Alle drie op een
+     eigen ingang met een eigen, engere blik -- zie de kop van elke module. */
+  const vrijwilligerportaal = require('./vrijwilligerportaal')(ctx);
+  const deelnemerportaal = require('./deelnemerportaal')(ctx, { toestemmingWegDirect: casus.toestemmingWegDirect });
+  const publiek = require('./publiek')(ctx);
 
   /* Het auditspoor uitlezen. Alleen landelijk, en alleen lezen -- er is nergens
      een functie die erin schrijft behalve ctx.audit zelf, en nergens een die
@@ -114,6 +123,7 @@ module.exports = (state) => {
     partners, projecten, vrijwilligers, geld, casus, integriteit, rapport, gemeente, ondernemers,
     subsidies, voorraad, activiteiten, berichten,
     netwerk, inkoop, uitwisseling, campagnes, koppeling,
+    vrijwilligerportaal, deelnemerportaal, publiek,
     VLAGGEN: ctx.VLAGGEN, ROLLEN: ctx.ROLLEN
   } };
 };

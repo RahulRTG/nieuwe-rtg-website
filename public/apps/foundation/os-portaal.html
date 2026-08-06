@@ -31,6 +31,7 @@
   .stat i{font-style:normal;font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);}
   .leeg{color:var(--muted);font-size:.86rem;padding:.5rem 0;}
   .uitleg{font-size:.78rem;color:var(--muted);line-height:1.6;}
+  .uitleg a,.melder a{color:var(--txt);}
   .melder{font-size:.84rem;border-radius:10px;padding:.6rem .8rem;margin-top:.6rem;border:1px solid #5C1B2C;color:#F0A9BB;}
   .verborgen{display:none;}
 </style>
@@ -53,6 +54,15 @@
       <b>RTFP</b> is een partnerstichting, <b>RTFG</b> een gemeente, <b>RTFO</b> een lokale ondernemer.
       Een gemeente krijgt uitsluitend getelde cijfers &mdash; nooit een dossier, nooit een naam.
       Kwijtgeraakt of iemand anders eruit? Vraag het RTF-kantoor om een nieuwe code.
+    </div>
+  </div>
+  <div class="kaart">
+    <div class="sec">Hoort u hier niet?</div>
+    <div class="uitleg">
+      Bent u <b>vrijwilliger</b> (code RTFV), dan gaat u naar <a href="os-vrijwilliger.html">uw eigen app</a>.
+      Heeft u <b>zelf een hulpvraag</b> lopen (code RTFD), dan ziet u de stand op <a href="os-deelnemer.html">uw eigen pagina</a>.
+      Wilt u gewoon zien wat er in uw buurt gebeurt, dan hoeft u nergens in te loggen:
+      dat staat op <a href="os-publiek.html">de open pagina</a>.
     </div>
   </div>
   <div id="uit"></div>
@@ -95,6 +105,17 @@ async function open() {
   $('#melding').innerHTML = '';
   $('#uit').innerHTML = '';
   if (!soort) {
+    /* Een RTFV- of RTFD-code hoort op een andere pagina thuis. Hem hier
+       afwijzen met "onbekende code" is formeel juist en praktisch een
+       doodlopende weg: de vrijwilliger denkt dat zijn code stuk is. Wijs de
+       deur aan in plaats van hem dicht te doen. */
+    const ANDERS = { RTFV: ['os-vrijwilliger.html', 'een vrijwilligerscode'], RTFD: ['os-deelnemer.html', 'een code voor uw eigen hulpvraag'] };
+    const elders = ANDERS[code.slice(0, 4)];
+    if (elders) {
+      $('#melding').innerHTML = '<div class="melder">Dit is ' + esc(elders[1]) + '. Die opent u op ' +
+        '<a href="' + esc(elders[0]) + '">deze pagina</a>; daar hoort hij thuis.</div>';
+      return;
+    }
     fout('Deze code begint niet met RTFP, RTFG of RTFO. Controleer hem, of vraag het RTF-kantoor om een nieuwe.');
     return;
   }

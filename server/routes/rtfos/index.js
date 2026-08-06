@@ -32,7 +32,12 @@
    tekens meer per regel en het scheelt een blinde vlek van vijfenveertig
    routes.
 
-   DRIE PUBLIEKE DEUREN staan apart in ./portalen.js: de partnerstichting, de
+   DE PUBLIEKE DEUREN staan apart, in ./portalen.js (partner, gemeente,
+   ondernemer) en ./doelgroepen.js (vrijwilliger, hulpvrager, en de buurt
+   zonder code). Ze hebben eigen remmen nodig en horen daarom niet tussen de
+   kantoorroutes.
+
+   De drie in portalen.js: de partnerstichting, de
    gemeente en de lokale ondernemer komen binnen op een code en hebben geen
    RTG-account. Die hebben hun eigen remmen nodig en horen daarom niet tussen
    de kantoorroutes.
@@ -96,5 +101,6 @@ module.exports = (kern) => {
 
   require('./uitvoering')({ app, officeAuth, rtfos, H });
   require('./netwerk')({ app, officeAuth, rtfos, H });
+  require('./doelgroepen')({ app, officeAuth, rtfos, veilig, H });
   require('./portalen')({ app, rtfos, veilig });
 };

@@ -1,0 +1,199 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mijn vrijwilligerswerk · RTFoundation</title>
+<link rel="icon" href="/icons/foundation.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<style>
+  :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--line:var(--rtg-line);--txt:var(--rtg-txt);--muted:var(--rtg-muted);--soft:var(--rtg-soft);--burgundy:#C23A5E;--gold:#A98F1C;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3rem;}
+  h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;}
+  header{padding:1rem;border-bottom:1px solid var(--line);}
+  header .ey{font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--burgundy);}
+  header h1{font-size:1.25rem;margin-top:.1rem;}
+  main{padding:1rem;max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:.9rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:.95rem 1rem;}
+  .sec{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin-bottom:.45rem;}
+  .rij{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;}
+  .veld{flex:1;min-width:8rem;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.9rem;padding:.6rem .75rem;}
+  .knop{background:var(--txt);color:#000;border:none;border-radius:11px;padding:.6rem 1rem;font:inherit;font-weight:600;font-size:.86rem;cursor:pointer;}
+  .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
+  .knop.aan{background:var(--burgundy);color:#fff;}
+  .lijnrij{display:flex;gap:.5rem;align-items:baseline;padding:.45rem 0;border-bottom:1px solid var(--line);font-size:.87rem;flex-wrap:wrap;}
+  .lijnrij:last-child{border-bottom:none;}
+  .lijnrij .naam{flex:1;min-width:9rem;}
+  .lijnrij .sub{font-size:.76rem;color:var(--muted);width:100%;}
+  .pil{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:.15rem .55rem;color:var(--muted);}
+  .pil.goed{color:#7FC79B;border-color:#2F5E42;}
+  .pil.let{color:var(--gold);border-color:#5C4E10;}
+  .stat{flex:1;min-width:7rem;text-align:center;padding:.35rem 0;}
+  .stat b{font-size:1.25rem;display:block;}
+  .stat i{font-style:normal;font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);}
+  .leeg{color:var(--muted);font-size:.86rem;padding:.5rem 0;}
+  .uitleg{font-size:.78rem;color:var(--muted);line-height:1.6;}
+  .melder{font-size:.84rem;border-radius:10px;padding:.6rem .8rem;margin-top:.6rem;border:1px solid var(--line);}
+  .melder.fout{border-color:#5C1B2C;color:#F0A9BB;}
+  .melder.goed{border-color:#2F5E42;color:#9FD6B4;}
+  .dag{display:grid;grid-template-columns:repeat(auto-fill,minmax(4.6rem,1fr));gap:.3rem;}
+  .dag button{background:transparent;border:1px solid var(--line);border-radius:10px;color:var(--muted);font:inherit;font-size:.76rem;padding:.4rem;cursor:pointer;}
+  .dag button.aan{color:#fff;background:var(--burgundy);border-color:var(--burgundy);}
+  .verborgen{display:none;}
+  .ruimte{margin-top:.5rem;}
+</style>
+</head>
+<body class="rtg-stijl">
+<header>
+  <div class="ey">RTFoundation</div>
+  <h1>Mijn vrijwilligerswerk</h1>
+</header>
+<main id="main">
+  <div class="kaart" id="deur">
+    <div class="sec">Uw code</div>
+    <div class="rij">
+      <input class="veld" id="code" placeholder="RTFV-..." maxlength="40" aria-label="Vrijwilligerscode" autocomplete="off">
+      <button class="knop" id="open">Openen</button>
+    </div>
+    <div id="melding"></div>
+    <div class="uitleg">
+      U krijgt deze code van uw coördinator. Er staan geen contactgegevens achter &mdash; wel uw planning, uw uren
+      en tot wanneer uw VOG geldig is. De code blijft in dit tabblad en wordt nergens bewaard; sluit het tabblad
+      op een gedeelde computer.
+    </div>
+  </div>
+  <div id="uit"></div>
+</main>
+
+<script>
+/* Het scherm van de vrijwilliger zelf.
+
+   WAT ER NIET IN STAAT IS EEN ONTWERPKEUZE EN GEEN VERGETELHEID. Geen
+   contactgegevens (ook niet die van hemzelf: een code wordt meegelezen), geen
+   evaluaties (die horen langs een mens die ze kan uitleggen), en geen knop om
+   de eigen VOG-datum te zetten -- dat laatste zou van de VOG-controle een
+   formaliteit maken. Het scherm zegt dat ook, op de plek waar iemand het zoekt.
+
+   DE CODE BLIJFT IN HET GEHEUGEN VAN DIT TABBLAD. Geen localStorage, geen
+   cookie: op een balie of een bibliotheeklaptop is dat het verschil tussen "de
+   volgende ziet niets" en "de volgende ziet alles". */
+const $ = s => document.querySelector(s);
+const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const stat = (w, l) => '<div class="stat"><b>' + esc(w) + '</b><i>' + esc(l) + '</i></div>';
+const DAGNAAM = { 'ma-o': 'ma ocht', 'ma-m': 'ma mid', 'ma-a': 'ma av', 'di-o': 'di ocht', 'di-m': 'di mid',
+  'di-a': 'di av', 'wo-o': 'wo ocht', 'wo-m': 'wo mid', 'wo-a': 'wo av', 'do-o': 'do ocht', 'do-m': 'do mid',
+  'do-a': 'do av', 'vr-o': 'vr ocht', 'vr-m': 'vr mid', 'vr-a': 'vr av', za: 'zaterdag', zo: 'zondag' };
+
+let CODE = null, MIJ = null;
+
+function melding(tekst, goed) {
+  const el = document.getElementById('meldingIn') || $('#melding');
+  el.innerHTML = '<div class="melder ' + (goed ? 'goed' : 'fout') + '">' + esc(tekst) + '</div>';
+}
+const api = (pad, body) => fetch('/api/rtfos/portaal/' + pad, {
+  method: 'POST', headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(Object.assign({ code: CODE }, body || {}))
+}).then(async r => {
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(d.error || 'Er ging iets mis.');
+  return d;
+});
+
+async function open() {
+  CODE = String($('#code').value || '').trim().toUpperCase();
+  $('#melding').innerHTML = '';
+  if (!CODE.startsWith('RTFV')) {
+    melding('Een vrijwilligerscode begint met RTFV. Vraag uw coördinator om de juiste code.', false);
+    return;
+  }
+  try {
+    const r = await api('vrijwilliger');
+    MIJ = r.vrijwilliger;
+    teken();
+  } catch (e) { melding(e.message, false); }
+}
+
+function teken() {
+  const v = MIJ;
+  $('#deur').classList.add('verborgen');
+  $('#uit').innerHTML =
+    '<div class="kaart"><h2>' + esc(v.naam) + '</h2>' +
+      '<div class="rij"><span class="pil">RTF ' + esc(v.stad || '') + '</span>' +
+      '<span class="pil">' + esc(v.status) + '</span>' +
+      '<span class="pil ' + (v.vogGeldig ? 'goed' : 'let') + '">VOG ' +
+        (v.vogGeldig ? 'geldig tot ' + esc(v.vogGeldigTot) : (v.vogGeldigTot ? 'verlopen op ' + esc(v.vogGeldigTot) : 'nog niet geregeld')) + '</span>' +
+      (v.gedragscode ? '<span class="pil goed">gedragscode getekend</span>' : '<span class="pil let">gedragscode nog niet getekend</span>') +
+      '</div><div id="meldingIn"></div></div>' +
+
+    '<div class="kaart"><div class="sec">Uw uren</div><div class="rij">' +
+      stat(v.urenTotaal, 'uur bevestigd') + stat(v.projecten.length, 'projecten') +
+      stat(v.komend.length, 'komende activiteiten') + '</div>' +
+      (v.urenRecent.length ? v.urenRecent.map(u => '<div class="lijnrij"><span class="naam">' + esc(u.datum) + '</span>' +
+        '<span class="pil">' + u.uren + ' uur</span>' + (u.km ? '<span class="pil">' + u.km + ' km</span>' : '') + '</div>').join('')
+        : '<div class="leeg">Er staan nog geen bevestigde uren.</div>') +
+      '<div class="rij"><input class="veld" id="uUren" type="number" min="0.5" step="0.5" placeholder="uren" aria-label="Uren">' +
+      '<input class="veld" id="uDatum" type="date" aria-label="Datum">' +
+      '<input class="veld" id="uKm" type="number" min="0" placeholder="km" aria-label="Kilometers">' +
+      '<button class="knop" id="uMeld">Doorgeven</button></div>' +
+      '<div class="uitleg">Uren die u doorgeeft komen binnen als melding; uw coördinator bevestigt ze. Dat is dezelfde regel als bij geld: een getal dat niemand heeft gezien, telt niet mee in het jaarverslag.</div></div>' +
+
+    '<div class="kaart"><div class="sec">Wanneer kunt u</div>' +
+      '<div class="dag" id="dagen">' + v.dagdelen.map(d => '<button data-dag="' + esc(d) + '" class="' +
+        (v.beschikbaar.includes(d) ? 'aan' : '') + '">' + esc(DAGNAAM[d] || d) + '</button>').join('') + '</div>' +
+      '<div class="rij ruimte"><input class="veld" id="vTalen" placeholder="talen, met komma\'s" value="' + esc((v.talen || []).join(', ')) + '" maxlength="200" aria-label="Talen">' +
+      '<input class="veld" id="vVaardig" placeholder="wat kunt u, met komma\'s" value="' + esc((v.vaardigheden || []).join(', ')) + '" maxlength="200" aria-label="Vaardigheden"></div>' +
+      '<div class="rij"><label class="uitleg"><input type="checkbox" id="vRij"' + (v.rijbewijs ? ' checked' : '') + '> rijbewijs</label>' +
+      '<label class="uitleg"><input type="checkbox" id="vAuto"' + (v.voertuig ? ' checked' : '') + '> eigen vervoer</label>' +
+      '<button class="knop" id="vBewaar">Bewaren</button></div>' +
+      '<div class="uitleg">Uw VOG, de gedragscode en uw status zet de afdeling &mdash; niet u zelf. Dat is met opzet: een VOG die je zelf invult, is geen VOG-controle meer.</div></div>' +
+
+    (v.uitleen.length ? '<div class="kaart"><div class="sec">U werkt tijdelijk in een andere stad</div>' +
+      v.uitleen.map(u => '<div class="lijnrij"><span class="naam">RTF ' + esc(u.naarStad || '') + '</span>' +
+        '<span class="pil">tot ' + esc(u.tot || '') + '</span><div class="sub">' + esc(u.reden) + '</div></div>').join('') + '</div>' : '') +
+
+    '<div class="kaart"><div class="sec">Uw projecten</div>' +
+      (v.projecten.length ? v.projecten.map(p => '<div class="lijnrij"><span class="naam">' + esc(p.naam) + '</span>' +
+        '<span class="pil">' + esc(p.soort) + '</span><span class="pil">' + esc(p.status) + '</span>' +
+        '<div class="sub">' + esc(p.doelgroep || '') + '</div></div>').join('')
+        : '<div class="leeg">U staat nog niet op een project.</div>') + '</div>' +
+
+    '<div class="kaart"><div class="sec">Komende activiteiten waar u begeleidt</div>' +
+      (v.komend.length ? v.komend.map(a => '<div class="lijnrij"><span class="naam">' + esc(a.naam) + '</span>' +
+        '<span class="pil">' + esc(a.wanneer || 'datum volgt') + ' ' + esc(a.tijd || '') + '</span>' +
+        '<span class="pil">' + a.ingeschreven + '/' + a.capaciteit + '</span>' +
+        '<div class="sub">' + esc(a.locatie || '') + '</div></div>').join('')
+        : '<div class="leeg">Er staat niets ingepland.</div>') + '</div>' +
+
+    '<div class="kaart"><div class="sec">Inzage</div><div class="uitleg">' + esc(v.inzage) + '</div></div>';
+
+  $('#uMeld').addEventListener('click', () =>
+    api('vrijwilliger/uren', { uren: $('#uUren').value, datum: $('#uDatum').value, km: $('#uKm').value })
+      .then(r => melding(r.melding, true))
+      .catch(e => melding(e.message, false)));
+  $('#dagen').querySelectorAll('[data-dag]').forEach(b => b.addEventListener('click', () => b.classList.toggle('aan')));
+  $('#vBewaar').addEventListener('click', () => {
+    const dagen = Array.from($('#dagen').querySelectorAll('.aan')).map(b => b.dataset.dag);
+    const lijst = s => String(s || '').split(',').map(x => x.trim()).filter(Boolean);
+    api('vrijwilliger/zet', { beschikbaar: dagen, talen: lijst($('#vTalen').value),
+      vaardigheden: lijst($('#vVaardig').value), rijbewijs: $('#vRij').checked, voertuig: $('#vAuto').checked })
+      .then(r => { MIJ = r.vrijwilliger; teken(); melding('Bijgewerkt. Uw coördinator ziet dit meteen.', true); })
+      .catch(e => melding(e.message, false));
+  });
+}
+
+$('#open').addEventListener('click', open);
+$('#code').addEventListener('keydown', e => { if (e.key === 'Enter') open(); });
+</script>
+<script src="/shared/deelmenu.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/levendekleur.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
+</body>
+</html>

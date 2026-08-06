@@ -62,6 +62,7 @@
   <div><div class="ey">RTFoundation</div><h1>Foundation OS</h1></div>
   <a href="kantoor.html">RTF-kantoor</a>
   <a href="os-portaal.html">Portalen</a>
+  <a href="os-publiek.html">Buurtpagina</a>
 </header>
 <main id="main">
   <div class="kaart">
@@ -390,6 +391,12 @@ async function tabVrijwilligers() {
     doe('vrijwilliger/zet', { id: b.dataset.vzet, status: w.querySelector('.vStatus').value,
       vogGeldigTot: w.querySelector('.vVog').value, gedragscode: w.querySelector('.vCode').checked }, tekenTab);
   }));
+  $('#tabIn').querySelectorAll('[data-vcode]').forEach(b => b.addEventListener('click', () =>
+    api('vrijwilliger/code', { id: b.dataset.vcode })
+      .then(r => melding('Code ' + r.code + ' -- ' + r.melding + ' De app is /apps/foundation/os-vrijwilliger.html', true))
+      .catch(e => melding(e.message, false))));
+  $('#tabIn').querySelectorAll('[data-vuren]').forEach(b => b.addEventListener('click', () =>
+    doe('vrijwilliger/uren-bevestig', { id: b.dataset.vuren, meldingId: b.dataset.melding }, tekenTab)));
 }
 
 function vrijwilligerRij(v) {
@@ -401,7 +408,24 @@ function vrijwilligerRij(v) {
     '<div class="rij breed"><select class="veld vStatus" aria-label="Status">' + opties + '</select>' +
     '<input class="veld vVog" type="date" value="' + esc(v.vogGeldigTot || '') + '" aria-label="VOG geldig tot">' +
     '<label class="uitleg"><input type="checkbox" class="vCode"' + (v.gedragscode ? ' checked' : '') + '> gedragscode getekend</label>' +
-    '<button class="knop stil" data-vzet="' + esc(v.id) + '">Opslaan</button></div></div>';
+    '<button class="knop stil" data-vzet="' + esc(v.id) + '">Opslaan</button>' +
+    '<button class="knop stil" data-vcode="' + esc(v.id) + '">Code voor de app</button></div>' +
+    urenMeldingen(v) + '</div>';
+}
+
+/* De uren die de vrijwilliger zelf heeft doorgegeven in os-vrijwilliger.html.
+   Ze staan met opzet in de rij van die vrijwilliger en niet op een aparte
+   stapel "te bevestigen": een lijst die je apart moet openen, open je niet.
+   Bevestigen is een besluit -- uren dragen het jaarverslag en de
+   subsidieverantwoording, en dan is "hij typte het zelf in" geen bron. */
+function urenMeldingen(v) {
+  const m = v.gemeldeUren || [];
+  if (!m.length) return '';
+  return '<div class="rij breed">' + m.map(u =>
+    '<button class="knop stil" data-vuren="' + esc(v.id) + '" data-melding="' + esc(u.id) + '">' +
+      'Bevestig ' + esc(u.uren) + ' uur op ' + esc(String(u.datum || '').slice(0, 10)) +
+      (u.km ? ' (' + esc(u.km) + ' km)' : '') + '</button>').join('') +
+    '<span class="uitleg">' + m.length + ' door de vrijwilliger gemeld; telt pas mee na uw bevestiging.</span></div>';
 }
 
 /* ---------- geld ---------- */
@@ -474,6 +498,13 @@ async function tabCasussen() {
     api('casus/contact', { id: b.dataset.contact })
       .then(r => melding(r.contact ? 'Contact: ' + r.contact : 'Er is geen contact vastgelegd bij deze hulpvraag.', true))
       .catch(e => melding(e.message, false))));
+  /* De code voor os-deelnemer.html. Hij wordt getoond en niet gemaild: een
+     code die je opstuurt komt in een inbox te liggen die iemand anders ook
+     opent. Persoonlijk overhandigen is hier de veiligste route. */
+  $('#tabIn').querySelectorAll('[data-ccode]').forEach(b => b.addEventListener('click', () =>
+    api('casus/code', { id: b.dataset.ccode })
+      .then(r => melding('Code ' + r.code + ' -- ' + r.melding + ' De pagina is /apps/foundation/os-deelnemer.html', true))
+      .catch(e => melding(e.message, false))));
   $('#tabIn').querySelectorAll('[data-cstap]').forEach(b => b.addEventListener('click', () => {
     const w = document.getElementById('c-' + b.dataset.cstap);
     doe('casus/stap', { id: b.dataset.cstap, soort: w.querySelector('.cSoort').value, tekst: w.querySelector('.cTekst').value }, tekenTab);
@@ -485,6 +516,7 @@ function casusRij(c) {
     '<span class="pil ' + (c.urgentie === 'acuut' ? 'fout' : 'let') + '">' + esc(c.urgentie) + '</span>' +
     '<span class="pil">' + esc(c.status) + '</span>' +
     '<button class="knop stil" data-contact="' + esc(c.id) + '">Contact tonen</button>' +
+    '<button class="knop stil" data-ccode="' + esc(c.id) + '">Code voor de hulpvrager</button>' +
     '<div class="sub">' + esc(c.vraag) + (c.wijk ? ' &middot; ' + esc(c.wijk) : '') +
     (c.toestemming ? ' &middot; toestemming vastgelegd' : ' &middot; nog geen toestemming') + '</div>' +
     '<div class="rij breed"><select class="veld cSoort" aria-label="Soort stap">' +

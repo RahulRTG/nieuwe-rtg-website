@@ -93,6 +93,9 @@ module.exports = (ctx) => {
     if (S().casussen.length >= 200000) return { status: 400, error: 'Het casusregister zit vol.' };
     const contact = schoon(b.contact, 200);
     const c = { id: rid(), stad: g.stad.id, codenaam: codenaam(), soort, urgentie: urg, vraag,
+      // de eigen ingang van de hulpvrager (deelnemerportaal.js): de stand van
+      // ZIJN vraag, en de knop om zijn toestemming in te trekken
+      code: ctx.code('RTFD'),
       wijk: schoon(b.wijk, 60), status: 'ontvangen', toestemming: null, partnerId: null,
       projectId: null, stappen: [], bewaarTot: null,
       // Het enige veld met herleidbare gegevens, en het gaat versleuteld de db in.
@@ -117,6 +120,7 @@ module.exports = (ctx) => {
   const dossier = require('./casus-dossier')(ctx, { vind, beeld });
 
   return { lijst, maak, status: keten.status, toestemmingWeg: keten.toestemmingWeg,
+    toestemmingWegDirect: keten.toestemmingWegDirect,
     stap: dossier.stap, contactOpen: dossier.contactOpen,
     vind, beeld, SOORTEN, URGENTIE, KETEN, EIST_TOESTEMMING, BEWAARDAGEN };
 };

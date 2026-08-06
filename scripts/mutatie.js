@@ -291,6 +291,15 @@ const WACHT_MUTATIE = 90000;
 function draaiToets(bestand, env, wacht) {
   const r = spawnSync('node', ['--experimental-sqlite', '--test', bestand], {
     cwd: WORTEL, encoding: 'utf8', timeout: wacht || WACHT_NUL, maxBuffer: 64 * 1024 * 1024,
+    /* SIGKILL EN NIET HET STANDAARD SIGTERM, en dat is geen ruwheid maar een
+       lek dat ik heb zien ontstaan. Bij een time-out stuurt spawnSync SIGTERM,
+       en juist de toetsen die hier vastlopen (test/redis.test.js) blijven hangen
+       op een handle die niet meer opruimt -- die negeren dat sein. Ik zag twee
+       kindprocessen van dezelfde toets naast elkaar draaien terwijl spawnSync er
+       maar EEN kan hebben: de eerste was een wees van een afgelopen time-out.
+       Over een ronde van uren stapelen die zich op, houden ze poorten en geheugen
+       vast, en vervuilen ze de metingen die erna komen. */
+    killSignal: 'SIGKILL',
     env: Object.assign({}, process.env, env || {})
   });
   const uit = String(r.stdout || '');

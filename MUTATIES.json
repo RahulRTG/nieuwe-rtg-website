@@ -758,8 +758,10 @@
     },
     "duurzaamheid-kill.test.js": {
       "soort": "server",
-      "staat": "vastgelopen",
-      "operator": "liegpoort /api/"
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
     },
     "duurzaamheid-pg.test.js": {
       "soort": "server",
@@ -1188,8 +1190,10 @@
     },
     "herstelproef.test.js": {
       "soort": "server",
-      "staat": "vastgelopen",
-      "operator": "liegpoort /api/"
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
     },
     "homekit.test.js": {
       "soort": "server",
@@ -2990,8 +2994,10 @@
     },
     "sessie-herstart.test.js": {
       "soort": "server",
-      "staat": "vastgelopen",
-      "operator": "liegpoort /api/"
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "sessies.test.js": {
       "soort": "puur",

@@ -27,6 +27,36 @@ const path = require('path');
 // de strenge poort mag de stderr van onze eigen server meelezen
 const { bewaakKind } = require('./helper');
 
+/* ELKE FETCH MET EEN DEADLINE -- EEN TWEEDE SLOT, EN NIET DE OORZAAK.
+
+   Eerlijk over de volgorde: ik heb dit als eerste gedaan met de gedachte dat het
+   DE reparatie was voor de vastloper waar dit bestand voor in MUTATIES.json
+   stond. Dat was fout -- na deze wijziging liep hij nog steeds vast. De echte
+   oorzaak stond in het opruimen (zie de finally verderop) en kwam pas boven door
+   de proef met de hand te draaien en naar de UITVOER te kijken.
+
+   Dit blok blijft staan omdat het op zichzelf een echt gat dicht: een fetch zonder
+   time-out in een toets kan blijven staan, en dan telt een begrensde wachtlus niet
+   verder -- begrensde lus, onbegrensde stap. Het is een tweede slot op een deur
+   die nu ook echt op slot zit, geen reparatie die ik als de oorzaak mag opvoeren.
+
+   Wat er misging: onder de liegpoort (de motor laat de server op elk /api-pad
+   liegen) kwam een van deze verzoeken nooit terug. De wachtlussen hieronder zijn
+   WEL begrensd -- honderd of honderdvijftig pogingen van 200 ms -- maar een lus
+   telt niet verder zolang een stap niet klaar is. Begrensde lus, onbegrensde stap.
+   Gevolg: het proces sluit niet af, de motor noteert `vastgelopen`, en dat telt
+   niet als gezakt: het gedrag was echt veranderd en geen assertie heeft het
+   gemeld. Een toets die hangt is erger dan een toets die zakt.
+
+   fetch wordt hier op MODULENIVEAU geschaduwd. Dat dekt alle aanroepen in dit
+   bestand -- ook de geneste `await (await fetch(...)).json()` -- zonder ze een
+   voor een aan te raken, en het verandert niets buiten dit bestand. Een
+   meegegeven signal wint, dus wie zelf een AbortController gebruikt houdt zijn
+   eigen gedrag. */
+const _fetch = globalThis.fetch;
+const fetch = (u, o) => _fetch(u, Object.assign({ signal: AbortSignal.timeout(10000) }, o));
+
+
 const BASIS = 4900 + Math.floor(Math.random() * 60);
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-herstel-'));
 const KLUIS = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-kluis-')); // "secrets manager"
@@ -66,7 +96,15 @@ function post(poort, pad, body, tok) {
 let codenaam = null;
 
 test('1. een lid aanmaken en de backup laten draaien', async () => {
-  let kind = await start(BASIS);
+  /* DE SERVER IN EEN FINALLY, en deze toets had er helemaal geen. Hij stopte het
+     kind als LAATSTE regel van de body; zakt een assertie ervoor -- en onder de
+     liegpoort zakken er drie, gemeten -- dan blijft het serverproces staan en kan
+     node niet afsluiten. Het proces liep tot de time-out (exit 124), en dan telt
+     de motor het NIET als gezakt terwijl er wel asserties zakten: de stilste vorm
+     van stuk. De twee andere toetsen in dit bestand hadden hun finally al. */
+  let kind = null;
+  try {
+  kind = await start(BASIS);
   const reg = await post(BASIS, '/api/auth/register', {
     name: NAAM, email: MAIL, phone: '0622222222', password: 'geheim12345',
     geboortedatum: '1985-03-03', tier: 'rtg', pasApp: 'rtg'
@@ -113,6 +151,7 @@ test('1. een lid aanmaken en de backup laten draaien', async () => {
   // en de sleutel juist NIET -- sleutel en slot horen niet in dezelfde doos
   assert.ok(!inhoud.includes('vault.key'), 'de kluissleutel zit NIET in de backup, en dat hoort zo');
   assert.ok(!inhoud.includes('secret.key'), 'de tokensleutel ook niet');
+  } finally { try { await stop(kind); } catch (e) { /* al weg: prima */ } }
 });
 
 test('2. datamap wissen, terugzetten uit de backup, en alles is er nog', async () => {

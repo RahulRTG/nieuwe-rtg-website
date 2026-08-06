@@ -31,24 +31,6 @@ const { haversine } = require('../../lib/geo');
 const { REF, BOUNDS } = require('../navigatie');
 
 const NIVEAUS = ['stad', 'wijk', 'buurt', 'zone', 'straatsegment'];
-const CEL_LAT = 0.012, CEL_LNG = 0.016;   // een zone is ruwweg 1,3 x 1,4 km
-
-/* De zes zones op een raster rond het middelpunt, zodat ze elkaar NIET
-   overlappen: een punt hoort bij precies een zone. [id, naam, kolom, rij] */
-const ZONES = [
-  ['oudwest', 'Oud-West', -1, 1],
-  ['centrum', 'Centrum', 0, 1],
-  ['marina', 'Marina', 1, 1],
-  ['bedrijven', 'Bedrijvenkwartier', -1, 0],
-  ['groen', 'Groenzone', 0, 0],
-  ['boulevard', 'Boulevard', 1, 0]
-];
-const BUURTEN = [
-  ['oudestad', 'Oude Stad', 'kern', ['oudwest', 'centrum']],
-  ['haven', 'Haven', 'kust', ['marina', 'boulevard']],
-  ['werkgebied', 'Werkgebied', 'rand', ['bedrijven', 'groen']]
-];
-const WIJKEN = [['kern', 'Kern'], ['kust', 'Kust'], ['rand', 'Rand']];
 
 module.exports = (ctx) => {
   const { bak, save, crypto } = ctx;
@@ -61,47 +43,10 @@ module.exports = (ctx) => {
   const { hoeken, inVlak, totGeometrie: totGeo, middenVan, omhullende } = require('./meetkunde')({ REF });
   const totGeometrie = (p, g) => totGeo(p, g, haversine);
 
-  const vakVan = (kol, rij) => ({
-    lat0: REF.lat + (rij - 1) * CEL_LAT, lat1: REF.lat + rij * CEL_LAT,
-    lng0: REF.lng + (kol - 0.5) * CEL_LNG, lng1: REF.lng + (kol + 0.5) * CEL_LNG
-  });
-
-  // ---- de seed: de stad zoals hij nu bestaat ----
-
-  function zorgGeografie() {
-    if (gebieden().length) return;
-    const rij = gebieden();
-    const zet = (id, niveau, naam, ouder, soort, punten) => {
-      const g = { id: 'G-' + id, niveau, naam, ouder: ouder ? 'G-' + ouder : null,
-        geometrie: { soort, punten }, centrum: middenVan(punten) };
-      rij.push(g);
-      return g;
-    };
-    const zones = ZONES.map(([id, naam, kol, r]) => {
-      const vak = vakVan(kol, r);
-      const z = zet(id, 'zone', naam, BUURTEN.find(b => b[3].includes(id))[0], 'vlak', hoeken(vak));
-      /* Twee straatsegmenten per zone: een laan oost-west en een straat
-         noord-zuid. Ze zijn er niet om mooi te ogen -- een melding, een
-         lantaarn en een werkorder hangen straks aan een SEGMENT, en dat is het
-         niveau waarop een monteur denkt ("de Marinalaan", niet "zone Marina"). */
-      const mLat = (vak.lat0 + vak.lat1) / 2, mLng = (vak.lng0 + vak.lng1) / 2;
-      zet(id + '-laan', 'straatsegment', naam + 'laan', id, 'lijn',
-        [{ lat: mLat, lng: vak.lng0 }, { lat: mLat, lng: vak.lng1 }]);
-      zet(id + '-straat', 'straatsegment', naam + 'straat', id, 'lijn',
-        [{ lat: vak.lat0, lng: mLng }, { lat: vak.lat1, lng: mLng }]);
-      return z;
-    });
-    for (const [id, naam, wijk, kids] of BUURTEN) {
-      const punten = omhullende(zones.filter(z => kids.includes(z.id.slice(2))));
-      zet(id, 'buurt', naam, wijk, 'vlak', punten);
-    }
-    for (const [id, naam] of WIJKEN) {
-      const punten = omhullende(rij.filter(g => g.ouder === 'G-' + id));
-      zet(id, 'wijk', naam, 'stad', 'vlak', punten);
-    }
-    zet('stad', 'stad', 'RTG Stad', null, 'vlak', omhullende(rij.filter(g => g.niveau === 'wijk')));
-    save();
-  }
+  /* De seed -- de zes zones, hun straten en de gebieden erboven -- staat in
+     ./geografieseed.js. Die bouwt de boom een keer op; hieronder wordt hij
+     alleen nog bevraagd. */
+  const { zorgGeografie } = require('./geografieseed')({ REF, gebieden, save, hoeken, middenVan, omhullende });
 
   // ---- opvragen ----
 
@@ -163,7 +108,7 @@ module.exports = (ctx) => {
     let beste = null;
     for (const g of [...opNiveau('straatsegment'), ...opNiveau('zone')]) {
       const naam = g.naam.toLowerCase();
-      if (!new RegExp('(^|[^a-z])' + naam.replace(/[.*+?^${}()|[\]\\]/g, '\\  function gebiedMaak({') + '([^a-z]|$)').test(t)) continue;
+      if (!new RegExp('(^|[^a-z])' + naam.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '([^a-z]|$)').test(t)) continue;
       if (!beste || naam.length > beste.naam.length) beste = g;
     }
     return beste;

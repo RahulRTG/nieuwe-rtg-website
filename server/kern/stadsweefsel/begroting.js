@@ -32,6 +32,12 @@ module.exports = (ctx) => {
   const project = (id) => projecten().find(x => x.id === String(id || '')) || null;
   const euro = (v) => (Number(v) > 0 ? Math.round(Number(v) * 100) / 100 : 0);
 
+  /* Wat een project kostte en wat het deed (uitgaven uit de werkorders, de
+     nulmeting/eindmeting en het verschil) staat in ./begrotingcijfers.js.
+     Hier wonen de BESLUITEN, daar het rekenwerk. */
+  const { meetIndicator, besteed, publiek, effectVan } =
+    require('./begrotingcijfers')({ ctx, nu, geo, ind, werk, doel });
+
   function doelMaak({ naam, omschrijving, jaar, indicator, wie }) {
     const n = schoon(naam, 100);
     if (!n) return { status: 400, error: 'Welk doel wil de stad bereiken?' };
@@ -48,7 +54,7 @@ module.exports = (ctx) => {
   /* Een project onder een doel, met een budget en -- als het kan -- een
      nulmeting. Die nulmeting wordt NU vastgelegd en niet achteraf gereconstrueerd:
      achteraf is elke startwaarde de waarde die het beste uitkomt. */
-  function projectMaak({ doelId, naam, budget, gebied, indicator, besluitId, wie }) {
+  function projectStart({ doelId, naam, budget, gebied, indicator, besluitId, wie }) {
     const dl = doel(doelId);
     if (!dl) return { status: 404, error: 'Onbekend doel.' };
     const n = schoon(naam, 100);
@@ -82,18 +88,8 @@ module.exports = (ctx) => {
     return { ok: true, project: publiek(p) };
   }
 
-  // een indicator opvragen bij de indicatorenlaag; null als hij niet bestaat,
-  // zodat een typefout een leeg veld geeft en geen verzonnen nulmeting
-  function meetIndicator(id, gebied) {
-    try {
-      const r = ind.api.weefselIndicatoren({ dagen: 30, gebied });
-      const i = (r.indicatoren || []).find(x => x.id === id);
-      return i ? { indicator: id, label: i.label, eenheid: i.eenheid, beterIs: i.beterIs, waarde: i.waarde, at: nu() } : null;
-    } catch (e) { ctx.stil('indicator', e); return null; }
-  }
-
-  // werk aan een project hangen: dat is wat "uitgaven" straks betekenis geeft
-  function koppel({ projectId, werkorderId }) {
+  // werk aan een project hangen: dat geeft "uitgaven" straks betekenis
+  function koppelWerk({ projectId, werkorderId }) {
     const p = project(projectId);
     if (!p) return { status: 404, error: 'Onbekend project.' };
     if (p.status !== 'loopt') return { status: 400, error: 'Dit project is afgesloten.' };
@@ -103,31 +99,6 @@ module.exports = (ctx) => {
     p.werkorders.push(w.id);
     save();
     return { ok: true, project: publiek(p) };
-  }
-
-  /* Wat is er besteed? Uit de werkorders zelf, en alleen wat AF is: een order
-     die nog loopt heeft nog geen kosten, en die alvast meetellen laat een
-     project er duurder uitzien dan het is (of, erger, goedkoper als je de
-     schatting invult). */
-  function besteed(p) {
-    let uit = 0, open = 0, klaar = 0, uren = 0;
-    for (const id of p.werkorders) {
-      const w = werk.order(id);
-      if (!w) continue;
-      if (w.status === 'klaar') { uit += w.kosten || 0; uren += w.uren || 0; klaar++; }
-      else if (w.status !== 'geannuleerd') open++;
-    }
-    return { uitgegeven: Math.round(uit * 100) / 100, uren: Math.round(uren * 10) / 10, werkKlaar: klaar, werkOpen: open };
-  }
-
-  function publiek(p) {
-    const b = besteed(p);
-    const dl = doel(p.doelId);
-    const over = Math.round((p.budget - b.uitgegeven) * 100) / 100;
-    return { ...p, doel: dl ? dl.naam : null, plaats: p.gebied ? geo.label(p.gebied) : 'de hele stad',
-      ...b, resterend: over,
-      overschreden: over < 0,
-      let_op: over < 0 ? 'Dit project staat ' + (-over) + ' euro boven zijn budget. Dat wordt gemeld, niet geblokkeerd: werk stilleggen is een besluit van een mens.' : null };
   }
 
   /* Afsluiten: dezelfde indicator opnieuw meten en het verschil vastleggen.
@@ -145,20 +116,6 @@ module.exports = (ctx) => {
     p.eindmeting = p.indicator ? meetIndicator(p.indicator, p.gebied) : null;
     save();
     return { ok: true, project: publiek(p), effect: effectVan(p) };
-  }
-
-  /* Het effect: nulmeting tegen eindmeting, met de richting van de indicator
-     erbij. Zonder een van beide is er geen effect -- en dat staat er dan ook,
-     in plaats van een nul die als "geen verbetering" leest. */
-  function effectVan(p) {
-    if (!p.nulmeting || !p.eindmeting || p.nulmeting.waarde == null || p.eindmeting.waarde == null)
-      return { gemeten: false, reden: !p.indicator ? 'dit project koos geen indicator' : 'de indicator gaf in een van beide metingen geen waarde' };
-    const van = p.nulmeting.waarde, naar = p.eindmeting.waarde;
-    const beter = p.eindmeting.beterIs === 'lager' ? naar <= van : naar >= van;
-    return { gemeten: true, indicator: p.indicator, label: p.eindmeting.label, eenheid: p.eindmeting.eenheid,
-      van, naar, verschil: Math.round((naar - van) * 10) / 10, beter,
-      perEuro: null,
-      let_op: 'Dit is een verschil tussen twee metingen, geen bewijs van oorzaak: er gebeurde in dezelfde periode meer in de stad.' };
   }
 
   function beeld({ jaar } = {}) {
@@ -179,8 +136,8 @@ module.exports = (ctx) => {
     api: {
       weefselBegroting: beeld,
       weefselDoelMaak: doelMaak,
-      weefselProjectMaak: projectMaak,
-      weefselProjectKoppel: koppel,
+      weefselProjectMaak: projectStart,
+      weefselProjectKoppel: koppelWerk,
       weefselProjectSluit: projectSluit,
       weefselProject: ({ id }) => {
         const p = project(id);

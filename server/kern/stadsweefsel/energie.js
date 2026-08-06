@@ -96,7 +96,7 @@ module.exports = (ctx) => {
   /* Het advies. Kijkt naar de bezetting per gebied en stelt maatregelen voor,
      op volgorde van hoe weinig ze kosten. Geen enkele wordt uitgevoerd; dat is
      niveau 2 uit ainiveau.js en dat staat er ook bij. */
-  function advies() {
+  function energieAdvies() {
     const b = beeld();
     const voorstellen = [];
     for (const g of b.gebieden) {
@@ -166,7 +166,7 @@ module.exports = (ctx) => {
     MAATREGELEN, CAPACITEIT_KW, beeld, levend,
     api: {
       weefselEnergie: beeld,
-      weefselEnergieAdvies: advies,
+      weefselEnergieAdvies: energieAdvies,
       weefselEnergieOpdracht: opdracht,
       weefselEnergieIntrek: intrekken
     }

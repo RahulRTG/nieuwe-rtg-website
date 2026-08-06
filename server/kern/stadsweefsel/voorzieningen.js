@@ -53,44 +53,11 @@ module.exports = (ctx) => {
     return z;
   };
 
-  /* Een voorziening vastleggen. Het object komt in het gewone register (dus op
-     de kaart, met een conditie en een beheerder); de capaciteit en de wachttijd
-     staan hier. Twee vragen over hetzelfde gebouw, twee plekken -- net als bij
-     een bedrijfspand. */
-  function voorzieningMaak({ soort, naam, lat, lng, plekken, wachtDagen, doelgroep, organisatie, wie }) {
-    const s = String(soort || '');
-    if (!SOORTEN[s]) return { status: 400, error: 'Kies een soort: ' + Object.keys(SOORTEN).join(', ') + '.' };
-    const r = obj.objectMaak({ soort: 'pand', naam: schoon(naam, 80) || SOORTEN[s], lat, lng,
-      eigenaar: schoon(organisatie, 60) || 'gemeente', beheerder: schoon(organisatie, 60) || 'welzijnsorganisatie' });
-    if (!r.ok) return r;
-    const v = { id: 'V-' + crypto.randomBytes(3).toString('hex').toUpperCase(), objectId: r.object.id,
-      soort: s, soortLabel: SOORTEN[s], naam: r.object.naam,
-      organisatie: schoon(organisatie, 60) || 'onbekend',
-      plekken: Number(plekken) > 0 ? Math.round(Number(plekken)) : null,
-      wachtDagen: Number(wachtDagen) >= 0 ? Math.round(Number(wachtDagen)) : null,
-      doelgroep: schoon(doelgroep, 80) || null, open: true, door: schoon(wie, 60) || 'kantoor', at: nu() };
-    bak().voorzieningen[v.id] = v;
-    save();
-    return { ok: true, voorziening: publiek(v) };
-  }
-
-  function voorzieningZet({ id, plekken, wachtDagen, open, wie }) {
-    const v = bak().voorzieningen[String(id || '')];
-    if (!v) return { status: 404, error: 'Onbekende voorziening.' };
-    if (plekken !== undefined) v.plekken = Number(plekken) >= 0 ? Math.round(Number(plekken)) : v.plekken;
-    if (wachtDagen !== undefined) v.wachtDagen = Number(wachtDagen) >= 0 ? Math.round(Number(wachtDagen)) : v.wachtDagen;
-    if (open !== undefined) v.open = !!open;
-    v.door = schoon(wie, 60) || v.door;
-    v.gewijzigdAt = nu();
-    save();
-    return { ok: true, voorziening: publiek(v) };
-  }
-
-  function publiek(v) {
-    const o = obj.object(v.objectId);
-    return { ...v, plaats: o ? geo.label(o.gebied) : null, lat: o ? o.lat : null, lng: o ? o.lng : null,
-      gebied: o ? o.gebied : null, zone: o ? o.zone : null, conditie: o ? o.conditie : null };
-  }
+  /* Het aanbod -- een voorziening vastleggen, wijzigen en tonen -- staat in
+     ./voorzieningregister.js. Hier blijft de VRAAG, en dat is precies de kant
+     waar de grenzen aan hangen. */
+  const { voorzieningMaak, voorzieningZet, publiek } =
+    require('./voorzieningregister')({ bak, save, crypto, nu, geo, obj, schoon, SOORTEN });
 
   /* EEN TELLING BIJBOEKEN. Dit is de enige ingang voor vraagcijfers, en hij
      neemt met opzet ALLEEN een aantal aan: soort stroom, wijk, maand, hoeveel.

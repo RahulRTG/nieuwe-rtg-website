@@ -28,6 +28,7 @@
   .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
   .rij{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;}
   .sec{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin:.2rem 0;}
+  .prio{font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);}
   .deel{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted,var(--zacht,#8A8680));margin:1.6rem 0 .5rem;}
   .leeg{color:var(--muted);font-size:.85rem;padding:.6rem 0;}
   .dot{display:inline-block;width:.6rem;height:.6rem;border-radius:50%;flex:0 0 auto;}
@@ -154,7 +155,7 @@ async function laad(){
       // urgent en hoog krijgen een woord, de rest niets: een lijst waarin alles
       // een merkje draagt zegt niets meer over wat er eerst moet
       (k.prioriteit === 'urgent' || k.prioriteit === 'hoog'
-        ? '<span style="color:var(--gold);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;">' + esc(k.prioriteit) + '</span> ' : '') +
+        ? '<span class="prio">' + esc(k.prioriteit) + '</span> ' : '') +
       esc(k.omschrijving) + (k.zone ? '<br><span style="color:var(--soft);font-size:.75rem;">' + esc(k.zone) + '</span>' : '') + '</span>' +
       '<button class="knop stil" data-klaar="' + esc(k.sleutel) + '" style="font-size:.78rem;">✓ Klaar</button></div>').join('')
       : '<div class="leeg">Niets open. De stad draait.</div>';

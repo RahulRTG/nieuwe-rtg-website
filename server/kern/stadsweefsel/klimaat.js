@@ -139,11 +139,11 @@ module.exports = (ctx) => {
       gevolg: s.gevolg, zones: zones.map(z => z.naam),
       geraakt: geraakt.sort((a, b) => b.sleeptMee - a.sleeptMee).slice(0, 100), aantal: geraakt.length,
       kritiek, nuVerhoogd: metingen,
-      advies: advies(s, geraakt, kritiek, zones),
+      advies: klimaatAdvies(s, geraakt, kritiek, zones),
       let_op: 'Een berekening op het eigen register: welke objecten in welke risicozones als eerste onder druk staan. Geen weersverwachting en geen hydrologisch model.' };
   }
 
-  function advies(s, geraakt, kritiek, zones) {
+  function klimaatAdvies(s, geraakt, kritiek, zones) {
     const uit = [];
     if (!zones.length) return ['Geen enkele zone draagt het kenmerk "' + s.zoek + '"; leg dat eerst vast, anders rekent dit scenario over een lege stad.'];
     if (kritiek.length) uit.push(kritiek.length + ' kritiek of hoog-risico object(en) staan in de eerste ring: ' + kritiek.slice(0, 5).map(x => x.naam).join(', ') + '.');

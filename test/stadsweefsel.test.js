@@ -413,6 +413,41 @@ test('beheer: een gebied erbij, een relatie erbij en weer weg, werk toewijzen, e
   assert.match(tr.body.reden, /te weinig geschiedenis/, 'en zegt dat, in plaats van een percentage te verzinnen');
 });
 
+/* ---------------- 9b. Een straatnaam is invoer, geen patroon ----------------
+   De straatzoeker bouwt van een gebiedsnaam een reguliere uitdrukking, en die
+   naam komt van BUITEN: een ambtenaar typt hem in bij /weefsel/gebied/maak.
+   Staat er een haakje of een punt in, dan hoort dat een letterlijk teken te
+   zijn en geen stukje patroon -- anders werpt new RegExp en valt elke melding
+   zonder GPS om, ook die over heel andere straten.
+
+   Dit is met een mutatie nagetrokken en RAAK (alleen deze toets): in
+   geografie.js uitTekst() de ontsnapping '\\$&' vervangen door letterlijke
+   tekst. Zo stond het hier ECHT (commit 257bac8, kapotgegaan bij een
+   zoek-vervang) en niemand zag het, omdat geen van de geseede straten een
+   patroonteken in zijn naam heeft. */
+test('een gebiedsnaam met haakjes is een naam en geen patroon', async () => {
+  const zone = (await oapi('weefsel/gebieden', { niveau: 'zone' })).body.gebieden.find(z => z.naam === 'Groenzone');
+  const naam = 'Sint-Jan (Oost)';
+  const g = await oapi('weefsel/gebied/maak', { niveau: 'straatsegment', gebiedNaam: naam, ouder: zone.id,
+    punten: [{ lat: zone.geometrie.punten[0].lat, lng: zone.geometrie.punten[0].lng }, { lat: zone.centrum.lat, lng: zone.centrum.lng }] });
+  assert.equal(g.status, 200, 'de naam mag zo heten');
+
+  // een melding zonder GPS die de straat noemt: hij moet er landen, niet omvallen
+  const w = await oapi('weefsel/waarneming', { kanaal: 'telefoon', categorie: 'verlichting',
+    tekst: 'lantaarn uit op de ' + naam + ' ter hoogte van nummer 4' });
+  assert.equal(w.status, 200, 'geen serverfout op een naam met haakjes');
+  assert.equal(w.body.zaak.gebied, g.body.gebied.id, 'en de zaak landt op precies dat segment');
+
+  /* De haakjes mogen ook niets ANDERS gaan vangen. Ze WEGPOETSEN in plaats van
+     ontsnappen is de voor de hand liggende verkeerde reparatie: dan zou
+     "Sint-Jan Oost" zonder haakjes ineens deze straat worden. Hij hoort
+     onvindbaar te zijn, en dan wordt er geen plek gegokt. */
+  const w2 = await oapi('weefsel/waarneming', { kanaal: 'telefoon', categorie: 'afval',
+    tekst: 'container omgevallen op de Sint-Jan Oost bij de hoek' });
+  assert.equal(w2.status, 400, 'zonder haakjes is het een andere straat, en die bestaat niet');
+  assert.match(w2.body.error, /Waar is het/);
+});
+
 /* ---------------- 10. Samenvoegen mag geen deur openzetten ---------------- */
 /* Dit gat maakte het samenvoegen ZELF, en het is met een mutatie gevonden en
    niet met een gedachte: zolang elke melding een eigen dossier was, kon een

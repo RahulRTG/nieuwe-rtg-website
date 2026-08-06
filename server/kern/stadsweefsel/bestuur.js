@@ -113,7 +113,7 @@ module.exports = (ctx) => {
      staat in ./besluitvorming.js; hier wonen de organen en het mandaat. */
   // publiek en mandaat zijn functiedeclaraties (gehesen), dus ze mogen hier al mee
   const H = { besluiten, besluit, orgaan, ORGAANSOORT, zorgOrganen, publiek };
-  const { voorstel, advies, stem, sluit } = require('./besluitvorming')(ctx, H);
+  const { voorstelIndienen, adviesGeven, stem, sluit } = require('./besluitvorming')(ctx, H);
 
   function publiek(b) {
     return { ...b, mandaatUitleg: b.bedrag ? mandaat({ bedrag: b.bedrag }).reden : null };
@@ -136,8 +136,8 @@ module.exports = (ctx) => {
       weefselMandaat: ({ bedrag, kritiek }) => ({ status: 200, ...mandaat({ bedrag, kritiek }) }),
       weefselBesluiten: (f) => { const rij = lijst(f); return { status: 200, aantal: rij.length, besluiten: rij.slice(0, 200).map(publiek) }; },
       weefselBesluit: ({ id }) => { const b = besluit(id); return b ? { status: 200, besluit: publiek(b) } : { status: 404, error: 'Onbekend besluit.' }; },
-      weefselVoorstel: voorstel,
-      weefselAdvies: advies,
+      weefselVoorstel: voorstelIndienen,
+      weefselAdvies: adviesGeven,
       weefselStem: stem,
       weefselBesluitSluit: sluit
     }

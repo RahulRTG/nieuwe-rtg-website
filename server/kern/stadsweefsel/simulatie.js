@@ -6,7 +6,7 @@
    evenement, welke wijken worden kwetsbaar bij een storing, wat als het drie
    dagen hard regent.
 
-   Vier vormen, één ingang (`simuleer`), zodat de boardroom één knop heeft en
+   Vier vormen, één ingang (`scenarioDraai`), zodat de boardroom één knop heeft en
    niet vier schermen die elk net iets anders rekenen:
 
      uitval        een object valt weg -> de keten eronder
@@ -103,7 +103,7 @@ module.exports = (ctx) => {
 
   /* Eén ingang. Een boardroom die vier verschillende knoppen heeft voor
      dezelfde vraag, krijgt vier verschillende antwoorden. */
-  function simuleer(inv) {
+  function scenarioDraai(inv) {
     inv = inv || {};
     const soort = String(inv.soort || '');
     if (soort === 'uitval') return afh.api.weefselUitval({ id: inv.id, minuten: inv.minuten });
@@ -116,7 +116,7 @@ module.exports = (ctx) => {
   return {
     AANNAME, wegafsluiting, evenement,
     api: {
-      weefselSimuleer: simuleer,
+      weefselSimuleer: scenarioDraai,
       weefselSimulaties: () => ({ status: 200, soorten: [
         { soort: 'uitval', vraagt: 'id (een object)', wat: 'wat valt er mee om' },
         { soort: 'wegafsluiting', vraagt: 'gebied (een straatsegment), dagen', wat: 'wat staat eraan en blijft er een verbinding over' },

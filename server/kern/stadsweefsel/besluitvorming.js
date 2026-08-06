@@ -23,7 +23,7 @@ module.exports = (ctx, H) => {
   /* Een voorstel indienen. Het draagt waar het over gaat (een project, een doel
      of een gebied), zodat het besluitenregister straks niet uit losse titels
      bestaat maar uit dingen die aan de stad vastzitten. */
-  function voorstel({ orgaan: org, titel, toelichting, bedrag, projectId, doelId, gebied, wie }) {
+  function voorstelIndienen({ orgaan: org, titel, toelichting, bedrag, projectId, doelId, gebied, wie }) {
     zorgOrganen();
     const o = orgaan(org);
     if (!o) return { status: 404, error: 'Onbekend orgaan: ' + Object.keys(ORGAANSOORT).join(', ') + ' (of een wijkraad).' };
@@ -53,7 +53,7 @@ module.exports = (ctx, H) => {
      maar het staat wel in het openbare register naast het besluit, en dat is
      precies waarvoor een wijkraad bestaat: het moet zichtbaar zijn als er tegen
      een advies in wordt besloten. */
-  function advies({ besluitId, orgaan: org, standpunt, toelichting, wie }) {
+  function adviesGeven({ besluitId, orgaan: org, standpunt, toelichting, wie }) {
     const b = besluit(besluitId);
     if (!b) return { status: 404, error: 'Onbekend besluit.' };
     if (b.status !== 'ingediend') return { status: 400, error: 'Dit besluit is al genomen; advies kan alleen daarvoor.' };
@@ -117,5 +117,5 @@ module.exports = (ctx, H) => {
       let_op: tegenAdvies.length ? 'Dit besluit gaat in tegen het advies van ' + b.tegenAdvies.join(' en ') + '. Dat staat zo in het openbare register.' : null };
   }
 
-  return { voorstel, advies, stem, sluit };
+  return { voorstelIndienen, adviesGeven, stem, sluit };
 };

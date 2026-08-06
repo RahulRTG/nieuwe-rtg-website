@@ -37,7 +37,7 @@ module.exports = (ctx) => {
      na het opstarten aan. Zonder bron geeft deze laag eerlijk nul terug in
      plaats van te doen alsof er geen werk en geen bedrijven zijn. */
   let vacatureBron = null, bedrijfBron = null, beroepBron = null;
-  function koppel({ vacatures, bedrijven, beroepen }) {
+  function bronnenKoppel({ vacatures, bedrijven, beroepen }) {
     if (typeof vacatures === 'function') vacatureBron = vacatures;
     if (typeof bedrijven === 'function') bedrijfBron = bedrijven;
     if (typeof beroepen === 'function') beroepBron = beroepen;
@@ -139,7 +139,7 @@ module.exports = (ctx) => {
   }
 
   return {
-    koppel, werkKaart, tekorten, leegstand, hinder, opdrachten, panden,
+    bronnenKoppel, werkKaart, tekorten, leegstand, hinder, opdrachten, panden,
     api: {
       weefselKansen: beeld,
       weefselTekorten: () => ({ status: 200, ...tekorten(), bronnen: bronnenStaat() }),

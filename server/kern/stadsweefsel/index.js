@@ -158,7 +158,7 @@ module.exports = (deps) => {
        huis en blijven daar. server.js hangt de LEZERS hier aan; zonder die
        koppeling telt de kansenlaag nul en zegt hij dat er geen bron is -- niet
        dat er geen werk is. Dat verschil is de hele reden dat het zo staat. */
-    weefselKoppelEconomie: (bronnen) => kan.koppel(bronnen || {})
+    weefselKoppelEconomie: (bronnen) => kan.bronnenKoppel(bronnen || {})
   };
   Object.assign(api, geo.api, obj.api, rel.api, afh.api, tr.api, zkn.api, werk.api,
     con.api, ond.api, ind.api, bes.api, beg.api, insp.api, ene.api, kli.api, sim.api, kan.api, ter.api, vzn.api, alg.api);

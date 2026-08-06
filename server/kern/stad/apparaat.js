@@ -91,7 +91,7 @@ module.exports = (ctx) => {
      doos van "geproduceerd" naar "actief" wil praten, moet er langs alle
      tussenstappen mee -- want dat zijn precies de stappen waarin iemand hem
      heeft nagekeken. */
-  function faseZet({ serial, fase, wie, notitie }) {
+  function apparaatFase({ serial, fase, wie, notitie }) {
     const n = nodes()[String(serial || '')];
     if (!n) return { status: 404, error: 'Onbekende Stadsdoos.' };
     const pp = paspoort(n.serial);
@@ -158,7 +158,7 @@ module.exports = (ctx) => {
         const n = nodes()[String(serial || '')];
         return n ? { status: 200, paspoort: publiek(paspoort(n.serial), n) } : { status: 404, error: 'Onbekende Stadsdoos.' };
       },
-      stadFaseZet: faseZet,
+      stadFaseZet: apparaatFase,
       stadSleutelNieuw: sleutelNieuw,
       stadKalibreer: kalibreer,
       stadUpdateUit: updateUit

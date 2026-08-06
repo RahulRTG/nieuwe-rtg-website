@@ -273,9 +273,24 @@ for (const sein of ['SIGINT', 'SIGTERM', 'SIGHUP']) {
 process.on('uncaughtException', (e) => { zetTerug(); console.error(e); process.exit(1); });
 process.on('exit', zetTerug);
 
-function draaiToets(bestand, env) {
+/* TWEE VERSCHILLENDE WACHTTIJDEN, en het verschil komt uit een vastloper.
+
+   test/redis.test.js sluit onder een mutatie in server/redis.js niet meer af: de
+   toets houdt een handle open die bij het gewijzigde gedrag nooit wordt
+   opgeruimd, dus blijft node hangen. De motor zat daardoor twintig minuten stil
+   in spawnSync -- ik dacht dat hij niets deed, maar hij stond te wachten.
+
+   De NULMETING mag lang duren (vier minuten): een echte toets kan traag zijn en
+   die uitslag is de voorwaarde voor al het andere. Een MUTATIERONDE krijgt anderhalve
+   minuut: die toets is net zonder mutatie binnen de tijd groen geworden, dus als
+   hij nu niet afkomt, is dat de mutatie en geen traagheid. Zonder dat onderscheid
+   kost een enkel vastlopend bestand negen keer vier minuten. */
+const WACHT_NUL = 240000;
+const WACHT_MUTATIE = 90000;
+
+function draaiToets(bestand, env, wacht) {
   const r = spawnSync('node', ['--experimental-sqlite', '--test', bestand], {
-    cwd: WORTEL, encoding: 'utf8', timeout: 240000, maxBuffer: 64 * 1024 * 1024,
+    cwd: WORTEL, encoding: 'utf8', timeout: wacht || WACHT_NUL, maxBuffer: 64 * 1024 * 1024,
     env: Object.assign({}, process.env, env || {})
   });
   const uit = String(r.stdout || '');
@@ -341,7 +356,14 @@ function proefPuur(naam, posities) {
           const check = spawnSync('node', ['--check', p], { cwd: WORTEL, encoding: 'utf8' });
           if (check.status !== 0) return null;    // mutatie brak de syntaxis: telt niet
           geprobeerd++;
-          const na = draaiToets(bestand);
+          const na = draaiToets(bestand, null, WACHT_MUTATIE);
+          /* EEN VASTLOPER IS GEEN ZAKKER EN GEEN OVERLEVER. De toets was zonder
+             mutatie binnen de tijd groen; komt hij er nu niet uit, dan heeft de
+             mutatie het gedrag echt veranderd -- maar de toets heeft niets GEMELD,
+             en dat is geen bewijs dat een assertie het zag. Hij krijgt zijn eigen
+             uitslag en telt bij "niet gemeten", niet bij gezakt. */
+          if (na.tijdout) return { soort: 'puur', staat: 'vastgelopen', module: rel,
+            operator: op.naam + '#' + i, geprobeerd };
           return na.gezakt > 0 ? { soort: 'puur', staat: 'gezakt', module: rel,
             operator: op.naam + '#' + i, gezakt: na.gezakt, geprobeerd } : null;
         });
@@ -371,7 +393,8 @@ function proefServer(naam) {
   if (nul.gezakt > 0) return { soort: 'server', staat: 'al rood', gezakteZonderMutatie: nul.gezakt };
   if (!nul.toetsen) return { soort: 'server', staat: 'geen toetsen gedraaid' };
   if (nul.alGeslagen) return { soort: 'server', staat: 'slaat zichzelf over', overgeslagen: nul.overgeslagen };
-  const na = draaiToets(bestand, { RTG_LIEG: '/api/' });
+  const na = draaiToets(bestand, { RTG_LIEG: '/api/' }, WACHT_MUTATIE);
+  if (na.tijdout) return { soort: 'server', staat: 'vastgelopen', operator: 'liegpoort /api/' };
   return na.gezakt > 0
     ? { soort: 'server', staat: 'gezakt', operator: 'liegpoort /api/', gezakt: na.gezakt }
     : { soort: 'server', staat: 'overleefd', operator: 'liegpoort /api/' };

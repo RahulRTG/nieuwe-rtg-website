@@ -10,7 +10,7 @@
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 17,
     "e2eBestanden": 68,
-    "keuringOmvang": 73,
+    "keuringOmvang": 74,
     "keuringDubbeling": 56,
     "keuringDekkingAdvies": 8,
     "endpointsNooitAangeraakt": 0,
@@ -21,11 +21,11 @@
     "keuringTeGroot": 1,
     "inlineStijlAttributen": 5549,
     "browserpoortToetsen": 102,
-    "kernBreedte": 947,
-    "kernGedeeld": 142,
+    "kernBreedte": 1007,
+    "kernGedeeld": 146,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 103,
+    "toetsenNietGemeten": 102,
     "toetsenOngevoeligPct": 2.3
   },
   "notities": [
@@ -276,6 +276,18 @@
       "meter": "toetsenOngevoeligPct: eerste grondwaarde op 2,3",
       "reden": "De campagne is af voor de 540 toetsen die geen browser nodig hebben: 499 gezakt op een mutatie, 12 overleefd. Pas nu mag deze meter een grondwaarde: zolang de steekproef groeide wandelde het percentage op de steekproef en niet op de kwaliteit (13,3 -> 14,0 -> 13,0 -> 16,3 -> 11,8 -> 8,2 -> 5,4 -> 2,3).",
       "eerlijkheidshalve": "2,3% is GEEN kwaliteitscijfer van de suite en het mag niet zo gelezen worden. Drie dingen erbij. (1) De 85 schermtoetsen (*.e2e.js) zijn NIET gemeten: die hebben een browser nodig en de motor kent er geen mutatie voor. toetsenNietGemeten staat daarom op 103 en niet op 0. (2) 'Gezakt' bewijst GEVOELIG, niet GOED: een toets kan op de verkeerde reden zakken en nog steeds een slappe assertie hebben. (3) Bij de servertoetsen is de liegpoort een grof mes -- het hele antwoord verdwijnt. De scherpe ronde (deuren open, alleen het eigen domein liegt) is het betere bewijs: 384 van de 387 zakken ook dan, 2 alleen op de inlog (webauthn), 1 loopt vast."
+    },
+    {
+      "datum": "2026-08-06",
+      "meter": "kernBreedte 947 -> 1007 en kernGedeeld 142 -> 146: de METER ging breder kijken, de code niet slechter",
+      "reden": "scripts/grenzen.js kende in bereikVan alleen de contextnamen kern, tctx en ctx, terwijl er minstens tien in gebruik zijn (mctx, sctx, ...). Een routebestand dat uit een andere naam destructureert was dus onzichtbaar. Sinds b5292dc accepteert de scanner elke enkele identifier. Nagemeten op PRECIES dezelfde broncode: de oude scanner uit fe88604 geeft 947/142, de nieuwe 1007/146. Er is geen naam bijgekomen; er waren er 60 die niemand kon zien.",
+      "eerlijkheidshalve": "De oude grondwaarden waren dus te GUNSTIG, en dat is de gevaarlijke kant: een meter die te laag staat maakt een probleem kleiner dan het is, en de ratel houdt dat dan ook nog vast. Het doel in TAKEN.md 5.14 (kernGedeeld onder 100) is hiermee niet verplaatst maar eerlijk geworden -- er moet 46 af en niet 42. Dat de vier andere grenzenmeters (kernBreedsteBestand 71, kernOngebruikt 0) NIET veranderden, is de tegenproef dat het om zichtbaarheid gaat en niet om een andere telwijze."
+    },
+    {
+      "datum": "2026-08-06",
+      "meter": "keuringOmvang 73 -> 74: server/opzet/domeingrens.js komt erbij",
+      "reden": "De nieuwe module is 9647 bytes en valt daarmee in de waarschuwband vlak onder de 10 kB-grens van regel 13. Dat is geen overtreding maar een aankondiging: nog 593 bytes en regel 13 wordt rood.",
+      "eerlijkheidshalve": "Ik heb hem NIET gesplitst om deze meter te sparen. Het meeste van die 9647 bytes is de kop die uitlegt waarom het een Proxy is en geen gefilterde kopie, en dat is precies de reden die je bij de code wil hebben en niet in een ander bestand. Splitsen om een teller te laten dalen is de meter dienen in plaats van de lezer. Groeit hij verder, dan is de scheiding die er dan hoort te komen: het mechanisme (maakDoorkijk) los van de bedrading (maakVoor, die GRENZEN.json leest)."
     }
   ],
   "prestatie": {

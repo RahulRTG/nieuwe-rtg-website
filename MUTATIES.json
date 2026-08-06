@@ -700,6 +700,14 @@
       "gezakt": 7,
       "scherp": "gezakt"
     },
+    "domeingrens.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/opzet/domeingrens.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 2
+    },
     "doos-journaal.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -1581,6 +1589,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 19,
       "scherp": "gezakt"
+    },
+    "liegpoort.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/opzet/liegpoort.js",
+      "operator": "false->true#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "lifestyle.test.js": {
       "soort": "server",

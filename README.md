@@ -766,6 +766,59 @@ is een **overdracht-journaal**: wie gaf welk bestand wanneer aan welke
 dienstverlener. Dat legt vast wat er echt gebeurde, en het antwoord zegt erbij
 dat RTG niet kan zien of de CDT het heeft aanvaard.
 
+#### De multimodale reisplanner: taxi en OV als EEN reis
+
+`reisplan(-etappe).js` + `reisfactoren.js` + `reis.js` + het tabblad *Reizen* in
+`/apps/ov.html`. Dit is de functie die andere vervoersapps niet kunnen bouwen,
+en niet omdat het algoritme moeilijk is: het is dat de bestemmingen, de lijnen,
+de taxi's en de betaling hier van hetzelfde huis zijn. "Taxi naar het station,
+trein, lopen naar Sal de Mar" is bij ons **een** reis met **een** overzicht, en
+geen drie apps met drie bonnetjes.
+
+De planner zet de manieren om er te komen naast elkaar, met per optie de tijd,
+de prijs, de overstappen, de loopafstand en de uitstoot -- en wijst *snelst*,
+*goedkoopst* en *schoonst* aan zonder een "beste" te kiezen, want dat is een
+oordeel over andermans afweging. Voor Ibiza-stad naar Santa Eularia:
+
+| optie | tijd | prijs | uitstoot |
+| --- | --- | --- | --- |
+| Rechtstreeks met de taxi | 29 min | € 42,39 | 1861 g |
+| Kustlijn 1 + taxi | 35 min | € 38,35 | 1738 g |
+| Eilandexpres + 206 m lopen | 42 min | € 3,98 | 432 g |
+
+**Wat de planner bewust niet doet** is een kortste pad zoeken door een netwerk
+met overstappen. Dat vraagt een dienstregeling per halte die wij niet hebben, en
+een planner die overstappen verzint op tijden die hij niet kent, stuurt mensen
+naar een perron waar niets komt. Hij doet wat hij wel kan onderbouwen, en wat
+afvalt valt af **met reden** ("de haltes liggen zo dat je er een omweg voor
+maakt") -- een lege lijst zonder uitleg leest als een storing.
+
+Vier dingen die in code staan omdat ze anders niet waar zouden zijn:
+
+1. **Uitstoot heet een schatting**, ook op het scherm, met het gehanteerde
+   getal per kilometer erbij. Het zijn indicatieve gemiddelden om opties mee te
+   vergelijken, geen meting aan het voertuig waar u in stapt.
+2. **Betrouwbaarheid komt uit onze eigen storingsmeldingen**, met het venster
+   erbij. Geen gegevens is "niet bekend" en niet "100%".
+3. **Comfort is geen score** maar een rij feiten: hoe vaak overstappen, hoeveel
+   meter lopen, zit u zeker.
+4. **Het plan wordt bij het boeken opnieuw gerekend.** De app stuurt alleen
+   welke optie het werd; wie de prijs meestuurt, bepaalt hem anders zelf.
+
+Boeken maakt de etappes echt: de taxi wordt een opdracht in de rittenmotor, de
+OV-etappe een vervoerbewijs (of een instructie om in te checken als er op die
+lijn geen kaartverkoop is). De geldregels staan apart en eerlijk: **het kaartje
+is betaald, de rit wordt afgerekend als hij gereden is** -- tot dan is die prijs
+een schatting. Mislukt er halverwege iets, dan worden de al aangemaakte ritten
+teruggedraaid, zodat er nooit een betaald kaartje achterblijft voor een reis die
+niet doorgaat.
+
+En de fout die dit het duidelijkst maakt: de eerste versie schreef
+`haversine(a, b) || 9e9`, en dat maakt van een afstand van **nul** een oneindige.
+Stond je precies op de halte, dan werd die als verste gesorteerd en viel de hele
+OV-optie af als omweg. De planner was het slechtst op het moment dat hij het
+makkelijkst had moeten hebben.
+
 ### RTG Werk OS (de werkplek van een organisatie)
 
 `server/bedrijf/` + `/api/bedrijf/...` + `/apps/werk.html`. Een **werkruimte**

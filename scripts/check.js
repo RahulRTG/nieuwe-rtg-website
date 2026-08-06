@@ -554,7 +554,9 @@ console.log('\n16) elk leden-pad met een derde partij gaat langs de gegevenspoor
     ['/api/mob/pendel', 'de dienstregeling van je eigen werkgever bekijken'],
     ['/api/mob/pendel/reserveer', 'een stoel in de bus van je eigen werkgever; de werkgever is de klant van de vervoerder, niet het lid, en er gaat op dit moment niets naar een derde'],
     ['/api/mob/kaart/aanbod', 'kijken welke vervoerbewijzen er te koop zijn; er gebeurt nog niets'],
-    ['/api/mob/kaart/mijn', 'je eigen kaartjes bekijken']
+    ['/api/mob/kaart/mijn', 'je eigen kaartjes bekijken'],
+    ['/api/mob/reis/plan', 'reisopties naast elkaar zetten; er wordt niets geboekt'],
+    ['/api/mob/reis/mijn', 'je eigen reizen bekijken']
   ]);
   let gaten = 0, poorten = 0;
   loop(path.join(ROOT, 'server/routes'), /\.js$/, f => {

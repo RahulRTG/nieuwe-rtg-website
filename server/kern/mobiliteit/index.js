@@ -25,6 +25,7 @@
                                  uit een geldige overeenkomst met de vervoerder
      cdt + cdt-tijden/-export    de Nederlandse taxiverplichting: diensten,
                                  arbeids-, rij- en rusttijden, en een export
+     reisplan + reis             taxi en OV in EEN reis, met EEN overzicht
 
    DE BOUWVOLGORDE ZIT IN HET REGISTER, NIET IN DE CODE. Taxi (ride_hailing)
    en de OV-planner staan standaard aan; charters, boten en OV-kaartverkoop
@@ -71,6 +72,11 @@ function maakMobiliteit(state) {
   Object.assign(ctx, require('./kaartje-beeld')(ctx));
   Object.assign(ctx, require('./kaartje-gebruik')(ctx));
   Object.assign(ctx, require('./storing')(ctx));
+  // de multimodale planner: leunt op de lijnen, de tarieven en de kaartverkoop
+  Object.assign(ctx, require('./reisfactoren')(ctx));
+  Object.assign(ctx, require('./reisplan-etappe')(ctx));
+  Object.assign(ctx, require('./reisplan')(ctx));
+  Object.assign(ctx, require('./reis')(ctx));
   // de CDT-laag: de registratie eerst, de uitvoer daarna (die leest de diensten)
   Object.assign(ctx, require('./cdt')(ctx));
   Object.assign(ctx, require('./cdt-export')(ctx));
@@ -85,6 +91,7 @@ function maakMobiliteit(state) {
   ctx.ensureStoringen();
   ctx.ensureCdt();
   ctx.ensureExport();
+  ctx.ensureReizen();
 
   /* Wat een reiziger te kiezen heeft, hier, nu. Dit is het antwoord waarmee de
      app zichzelf opbouwt: welke vervoersvormen staan aan, met welke voertuigen

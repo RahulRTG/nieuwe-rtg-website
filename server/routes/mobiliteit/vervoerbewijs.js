@@ -21,6 +21,7 @@ module.exports = (kern, hulp) => {
     kaartKoop, kaartMijn, kaartAanbod, kaartControle,
     storingMeld, storingLijst, storingTeruggave,
     overeenkomstZet, overeenkomstLijst,
+    reisPlan, reisBoek, reisMijn, reisAnnuleer,
     dienstStart, dienstSoort, dienstEind, cdtBeeld, regimeZet,
     cdtExport, cdtExportLijst, cdtOverdracht, dienstverlenerZet, koppelingStand } = kern;
   const { stuur } = hulp;
@@ -50,6 +51,27 @@ module.exports = (kern, hulp) => {
   app.post('/api/mob/kaart/mijn', auth, (req, res) => {
     if (geenGast(req, res)) return;
     stuur(res, kaartMijn(req.session));
+  });
+
+  /* ---------------- de multimodale reis ---------------- */
+  app.post('/api/mob/reis/plan', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, reisPlan(req.session, req.body || {}));
+  });
+  /* Boeken zet ritten EN kaartjes in gang, dus dezelfde poort als een losse
+     rit: er komt een chauffeur van een ander bedrijf naar je toe. */
+  app.post('/api/mob/reis/boek', auth, async (req, res) => {
+    if (geenGast(req, res)) return;
+    if (gegevensStop(req, res, 'reservering')) return;
+    stuur(res, await reisBoek(req.session, req.body || {}));
+  });
+  app.post('/api/mob/reis/mijn', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, reisMijn(req.session));
+  });
+  app.post('/api/mob/reis/annuleer', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, reisAnnuleer(req.session, req.body || {}));
   });
 
   /* ---------------- het personeel: controleren ---------------- */

@@ -101,7 +101,7 @@
   <span class="badge">Alles in &eacute;&eacute;n &middot; live gps</span>
 </header>
 <nav class="tabs" role="tablist" aria-label="Soort vervoer">
-  <button id="tabRit" class="aan" type="button" role="tab" aria-selected="true" aria-controls="vRit">Een rit</button>
+  <button id="tabRit" class="aan" type="button" role="tab" aria-selected="true" aria-controls="vRit">Reizen</button>
   <button id="tabOv" type="button" role="tab" aria-selected="false" aria-controls="vOv">Openbaar vervoer</button>
   <button id="tabPendel" type="button" role="tab" aria-selected="false" aria-controls="vPendel">Bedrijfspendel</button>
 </nav>
@@ -117,6 +117,7 @@
       <p style="font-size:0.95rem;"><strong id="lopendStatus">Uw rit</strong></p>
       <p class="stil" id="lopendSub"></p>
       <div class="keten" id="lopendKeten" aria-hidden="true"></div>
+      <div id="lopendEtappes"></div>
       <p class="stil" id="lopendVoertuig"></p>
       <div style="margin-top:0.7rem;display:flex;gap:0.5rem;flex-wrap:wrap;">
         <button class="knop" id="lopendAnnuleer" type="button">Annuleren</button>
@@ -134,22 +135,23 @@
         <select id="velNaar" style="margin-top:0.4rem;"><option value="">Kies een plek</option></select>
         <p class="stil" id="velMeer"></p>
         <div class="duo">
-          <div><label for="velSoort">Soort rit</label><select id="velSoort"></select></div>
-          <div><label for="velCat">Voertuig</label><select id="velCat"></select></div>
-        </div>
-        <div class="duo">
           <div><label for="velReizigers">Reizigers</label><input id="velReizigers" type="number" min="1" max="60" value="1"></div>
           <div><label for="velBagage">Koffers</label><input id="velBagage" type="number" min="0" max="99" value="0"></div>
         </div>
-        <label for="velRolstoel" style="display:flex;align-items:center;gap:0.5rem;text-transform:none;letter-spacing:0;font-size:0.85rem;color:var(--txt);">
-          <input id="velRolstoel" type="checkbox" style="width:auto;"> Ik heb een rolstoeltoegankelijk voertuig nodig
-        </label>
-        <div style="margin-top:0.9rem;display:flex;align-items:center;gap:0.8rem;">
-          <span class="prijs" id="velPrijs">&mdash;</span>
-          <span class="rek" style="flex:1;"></span>
-          <button class="knop vol" id="velBoek" type="button">Rit aanvragen</button>
+        <div style="margin-top:0.9rem;">
+          <button class="knop vol" id="velPlan" type="button">Plan mijn reis</button>
         </div>
-        <p class="stil" id="velUitleg" style="margin-top:0.5rem;">De prijs staat vast zodra u aanvraagt en verandert daarna niet meer.</p>
+        <p class="stil" style="margin-top:0.5rem;">U ziet alle manieren om er te komen naast elkaar: taxi, openbaar
+          vervoer, of een combinatie. Met de tijd, de prijs, wat u loopt en wat het uitstoot.</p>
+      </div>
+
+      <div id="optieBlok" class="weg">
+        <h2>Hoe wilt u reizen?</h2>
+        <div id="opties"></div>
+        <div class="kaart weg" id="afvalKaart">
+          <p class="stil" style="margin-bottom:0.4rem;">Wat er niet bij staat, en waarom:</p>
+          <div id="afgevallen"></div>
+        </div>
       </div>
 
       <h2>Op aanvraag</h2>
@@ -196,6 +198,23 @@
     <div class="kaart"><div id="lijnen"><p class="stil">Even kijken wat er rijdt&hellip;</p></div></div>
     <p class="stil" id="uitleg">Uitchecken rekent eerlijk af: basistarief plus de gereden kilometers, direct uit uw
       RTG Pay-wallet (die zichzelf bijlaadt als dat nodig is).</p>
+
+    <h2>Een kaartje kopen</h2>
+    <div class="kaart">
+      <div id="kaartVorm" class="weg">
+        <label for="kaartAanbod">Wat wilt u kopen?</label>
+        <select id="kaartAanbod"></select>
+        <div class="duo" id="kaartHaltes">
+          <div><label for="kaartVan">Instappen</label><select id="kaartVan"></select></div>
+          <div><label for="kaartNaar">Uitstappen</label><select id="kaartNaar"></select></div>
+        </div>
+        <div style="margin-top:0.8rem;"><button class="knop vol" id="kaartKoop" type="button">Kopen</button></div>
+      </div>
+      <p class="stil" id="kaartReden">Even kijken wat er te koop is&hellip;</p>
+    </div>
+
+    <h2>Uw vervoerbewijzen</h2>
+    <div class="kaart"><div id="kaartLijst"><p class="stil">U heeft nog geen kaartjes.</p></div></div>
   </section>
 
   <!-- ================= bedrijfspendel ================= -->
@@ -266,7 +285,7 @@
       $(t).classList.toggle('aan', aan);   // de UI-kit tekent de actieve pil op .aan
       $(v).classList.toggle('weg', !aan);
     }
-    if (welke === '#tabOv') verversOv();
+    if (welke === '#tabOv') { verversOv(); verversKaart(); }
   }
   for (const [t] of TABS) $(t).addEventListener('click', () => toon(t));
 
@@ -305,15 +324,12 @@
     $('#velMeer').textContent = plekAfgekapt
       ? 'Nog ' + plekAfgekapt + ' andere plekken; zoek op naam om ze te vinden.'
       : (plekTotaal ? plekTotaal + ' plekken' : '');
-    const soort = $('#velSoort'); soort.innerHTML = '';
-    for (const s of (aanbod.ritsoorten || [])) {
-      const o = document.createElement('option'); o.value = s; o.textContent = s; soort.appendChild(o);
-    }
-    const cat = $('#velCat'); cat.innerHTML = '';
-    for (const c of (aanbod.direct || [])) {
-      const o = document.createElement('option'); o.value = c.categorie;
-      o.textContent = c.naam + ' · ' + c.plaatsen + 'p'; cat.appendChild(o);
-    }
+    /* Soort rit en voertuig kiest de reiziger niet meer met de hand: de planner
+       zet de manieren om er te komen naast elkaar en de gekozen optie bepaalt
+       wat er nodig is. De velden zijn daarom uit het scherm, en dit is de plek
+       waar het script ze nog vulde -- een verwijzing naar een veld dat niet meer
+       bestaat gooit de hele opbouw om, en dan blijft ook de bestemmingslijst
+       leeg. Precies dat is hier gebeurd. */
     // wat je niet met een tik boekt, staat apart en met de reden erbij
     const lijst = $('#aanvraagLijst'); lijst.innerHTML = '';
     const opAanvraag = (aanbod.opAanvraag || []).concat(aanbod.ervaringen || []);
@@ -343,52 +359,160 @@
     return null;
   };
 
-  async function boek() {
+  /* ---- de planner: alle manieren om er te komen, naast elkaar ---- */
+  let laatstePlan = null;
+  const min = m => m >= 60 ? Math.floor(m / 60) + ' u ' + (m % 60) + ' min' : m + ' min';
+
+  async function plan() {
     const naar = plekUit($('#velNaar').value);
     if (!naar) return zeg('Kies eerst een bestemming.');
-    $('#velBoek').disabled = true;
-    const r = await mob('vraag', {
-      ritsoort: $('#velSoort').value, categorie: $('#velCat').value,
+    $('#velPlan').disabled = true;
+    const r = await mob('reis/plan', {
       van: plekUit($('#velVan').value) || { hier: true }, naar,
       reizigers: Number($('#velReizigers').value) || 1,
-      bagage: Number($('#velBagage').value) || 0,
-      rolstoel: $('#velRolstoel').checked
+      bagage: Number($('#velBagage').value) || 0
     });
-    $('#velBoek').disabled = false;
+    $('#velPlan').disabled = false;
     if (r.body.error) return zeg(r.body.error);
-    zeg('Aangevraagd voor ' + eur(r.body.opdracht.prijs) + '. We zoeken een wagen.');
+    laatstePlan = r.body;
+    toonOpties(r.body);
+  }
+  $('#velPlan').addEventListener('click', plan);
+
+  function toonOpties(p) {
+    const bak = $('#opties'); bak.innerHTML = '';
+    $('#optieBlok').classList.remove('weg');
+    if (!p.opties.length) {
+      const k = document.createElement('div'); k.className = 'kaart';
+      const t = document.createElement('p'); t.className = 'stil';
+      t.textContent = p.reden || 'Geen reis gevonden.';
+      k.appendChild(t); bak.appendChild(k);
+    }
+    for (const o of p.opties) {
+      const kaart = document.createElement('div'); kaart.className = 'kaart';
+      // de kop: naam en de merken (snelst / goedkoopst / schoonst)
+      const kop = document.createElement('p'); kop.style.fontSize = '0.95rem';
+      const nm = document.createElement('strong'); nm.textContent = o.naam;
+      kop.appendChild(nm);
+      for (const [vlag, woord] of [['snelst', 'snelst'], ['goedkoopst', 'goedkoopst'], ['schoonst', 'schoonst']]) {
+        if (!o[vlag]) continue;
+        const b = document.createElement('span'); b.className = 'badge';
+        b.style.marginLeft = '0.4rem'; b.textContent = woord; kop.appendChild(b);
+      }
+      kaart.appendChild(kop);
+
+      const cijfers = document.createElement('p'); cijfers.className = 'stil';
+      cijfers.textContent = min(o.totaal.minuten) + ' · ' + eur(o.totaal.prijs) +
+        ' · ' + Math.round(o.totaal.co2Gram) + ' g CO₂ (schatting)' +
+        (o.totaal.loopM ? ' · ' + o.totaal.loopM + ' m lopen' : '');
+      kaart.appendChild(cijfers);
+
+      // de etappes onder elkaar: dit is wat iemand straks echt doet
+      for (const e of o.etappes) {
+        const rij = document.createElement('div'); rij.className = 'rijtje';
+        const l = document.createElement('span');
+        l.textContent = e.wijze === 'ov' ? e.lijnNaam + ': ' + e.van.naam + ' → ' + e.naar.naam
+          : (e.wijze === 'lopen' ? 'Lopen · ' + e.meters + ' m' : 'Taxi · ' + e.km + ' km');
+        const p2 = document.createElement('span'); p2.className = 'stil';
+        p2.textContent = min(e.minuten) + (e.prijs ? ' · ' + eur(e.prijs) : '');
+        rij.appendChild(l); rij.appendChild(p2); kaart.appendChild(rij);
+        if (e.wijze === 'ov') {
+          const sub = document.createElement('p'); sub.className = 'stil';
+          sub.style.fontSize = '0.72rem';
+          sub.textContent = 'Wachttijd ' + e.wachtMin + ' min (' + e.wachtUitleg + ')' +
+            (e.kaartTeKoop ? ' · kaartje inbegrepen' : ' · inchecken in het voertuig');
+          kaart.appendChild(sub);
+        }
+      }
+      const comf = document.createElement('p'); comf.className = 'stil';
+      comf.style.fontSize = '0.72rem'; comf.textContent = o.comfort.punten.join(' · ');
+      kaart.appendChild(comf);
+
+      const knop = document.createElement('button');
+      knop.className = 'knop vol'; knop.style.marginTop = '0.7rem';
+      knop.textContent = 'Deze reis boeken';
+      knop.addEventListener('click', () => boekReis(o.id, knop));
+      kaart.appendChild(knop);
+      bak.appendChild(kaart);
+    }
+    // wat er afviel en waarom; een lege lijst mag nooit als storing lezen
+    const af = $('#afgevallen'); af.innerHTML = '';
+    $('#afvalKaart').classList.toggle('weg', !(p.afgevallen || []).length);
+    for (const a of (p.afgevallen || [])) {
+      const r = document.createElement('p'); r.className = 'stil';
+      r.style.fontSize = '0.72rem'; r.textContent = a.naam + ': ' + a.reden;
+      af.appendChild(r);
+    }
+  }
+
+  async function boekReis(optie, knop) {
+    if (!laatstePlan) return;
+    knop.disabled = true;
+    const r = await mob('reis/boek', {
+      van: plekUit($('#velVan').value) || { hier: true },
+      naar: plekUit($('#velNaar').value),
+      optie, reizigers: Number($('#velReizigers').value) || 1,
+      bagage: Number($('#velBagage').value) || 0, idem: RTGIdem('reis')
+    });
+    knop.disabled = false;
+    if (r.body.error) return zeg(r.body.error);
+    zeg(r.body.reis.uitleg);
+    $('#optieBlok').classList.add('weg');
     verversRit();
   }
-  $('#velBoek').addEventListener('click', boek);
 
   const KETEN = ['aangevraagd', 'geprijsd', 'aangeboden', 'geaccepteerd', 'onderweg', 'aangekomen', 'ingestapt', 'rijdt', 'voltooid', 'afgerekend'];
   let lopendRef = null;
 
   async function verversRit() {
-    const r = await mob('mijn');
-    if (r.status !== 200) { $('#vPoort').classList.remove('weg'); return; }
-    const lopend = r.body.lopend;
+    const [m, reizen] = await Promise.all([mob('mijn'), mob('reis/mijn')]);
+    if (m.status !== 200) { $('#vPoort').classList.remove('weg'); return; }
+    const lopend = m.body.lopend;
+    const reis = (reizen.body.reizen || []).find(x => x.status === 'geboekt');
     lopendRef = lopend ? lopend.ref : null;
-    $('#lopendKaart').classList.toggle('weg', !lopend);
-    $('#boekBlok').classList.toggle('weg', !!lopend);
-    if (lopend) {
+
+    const iets = !!(lopend || reis);
+    $('#lopendKaart').classList.toggle('weg', !iets);
+    $('#boekBlok').classList.toggle('weg', !!iets);
+    const et = $('#lopendEtappes'); et.innerHTML = '';
+
+    if (reis) {
+      /* Een geboekte reis: de etappes onder elkaar, want dat is wat iemand
+         onderweg wil zien -- niet een statusbalk van een van de ritten. */
+      $('#lopendStatus').textContent = 'Uw reis: ' + reis.optieNaam;
+      $('#lopendSub').textContent = (reis.van.label || 'vertrek') + ' → ' + (reis.naar.label || 'bestemming');
+      $('#lopendKeten').classList.add('weg');
+      for (const e of reis.etappes) {
+        const rij = document.createElement('div'); rij.className = 'rijtje';
+        const l = document.createElement('span');
+        l.textContent = e.wijze === 'ov' ? (e.lijnNaam + ': ' + e.van.naam + ' → ' + e.naar.naam)
+          : (e.wijze === 'lopen' ? 'Lopen · ' + e.meters + ' m' : 'Taxi · ' + (e.km || 0) + ' km');
+        const st = document.createElement('span'); st.className = 'stil';
+        st.textContent = e.ritStatus || e.kaartStand || (e.instructie ? 'inchecken' : '');
+        rij.appendChild(l); rij.appendChild(st); et.appendChild(rij);
+      }
+      $('#lopendVoertuig').textContent = reis.uitleg;
+      $('#lopendAnnuleer').dataset.reis = reis.id;
+    } else if (lopend) {
       $('#lopendStatus').textContent = 'Uw rit: ' + lopend.status;
       $('#lopendSub').textContent = lopend.van.label + ' → ' + lopend.naar.label +
         ' · ' + lopend.km + ' km · ' + eur(lopend.prijs);
-      const k = $('#lopendKeten'); k.innerHTML = '';
+      const k = $('#lopendKeten'); k.classList.remove('weg'); k.innerHTML = '';
       const tot = KETEN.indexOf(lopend.status);
       for (let i = 0; i < KETEN.length; i++) {
-        const s = document.createElement('span');
-        if (tot >= 0 && i <= tot) s.className = 'af';
-        k.appendChild(s);
+        const sp = document.createElement('span');
+        if (tot >= 0 && i <= tot) sp.className = 'af';
+        k.appendChild(sp);
       }
       $('#lopendVoertuig').textContent = lopend.voertuig
         ? 'Voertuig toegewezen.' + (lopend.chauffeur ? ' Uw chauffeur staat klaar.' : '')
         : 'Nog geen voertuig toegewezen.';
+      delete $('#lopendAnnuleer').dataset.reis;
     }
+
     // de geschiedenis
     const h = $('#ritHistorie'); h.innerHTML = '';
-    const klaar = (r.body.ritten || []).filter(o => o.status === 'afgerekend' || o.status === 'voltooid' || o.status === 'geannuleerd');
+    const klaar = (m.body.ritten || []).filter(o => ['afgerekend', 'voltooid', 'geannuleerd'].includes(o.status));
     if (!klaar.length) h.innerHTML = '<p class="stil">Nog geen ritten.</p>';
     for (const o of klaar.slice(0, 10)) {
       const d = document.createElement('div'); d.className = 'rijtje';
@@ -399,16 +523,18 @@
   }
 
   $('#lopendAnnuleer').addEventListener('click', async () => {
-    if (!lopendRef) return;
-    const r = await mob('annuleer', { ref: lopendRef });
+    const reisId = $('#lopendAnnuleer').dataset.reis;
+    const r = reisId ? await mob('reis/annuleer', { id: reisId })
+      : (lopendRef ? await mob('annuleer', { ref: lopendRef }) : null);
+    if (!r) return;
     if (r.body.error) return zeg(r.body.error);
-    zeg(r.body.kostenUitleg || 'Geannuleerd.');
+    zeg(r.body.uitleg || r.body.kostenUitleg || 'Geannuleerd.');
     verversRit();
   });
   /* Ritstatus delen: de deelcode komt van de server en gaat naar het
      deelvenster van het toestel. Wij plaatsen zelf niets ergens. */
   $('#lopendDeel').addEventListener('click', async () => {
-    if (!lopendRef) return;
+    if (!lopendRef) return zeg('Deel werkt zodra er een rit onderweg is.');
     const r = await mob('volg', { ref: lopendRef });
     if (r.body.error) return zeg(r.body.error);
     const tekst = 'Ik ben onderweg naar ' + r.body.opdracht.naar.label + '. Ritcode ' + r.body.opdracht.ref + '.';
@@ -492,6 +618,71 @@
     if (r.body.error) return zeg(r.body.error);
     zeg('Uitgecheckt: ' + r.body.km + ' km · ' + eur(r.body.prijs) + ' · saldo ' + eur(r.body.saldo) + '.');
     verversOv();
+  });
+
+  /* ================= vervoerbewijzen ================= */
+  let aanbodLijst = [];
+
+  async function verversKaart() {
+    // de kaartverkoop hangt aan een overeenkomst met de vervoerder; zonder
+    // die overeenkomst is er niets te koop, en dan staat de reden er
+    const a = await mob('kaart/aanbod', { vervoerder: 'TRANSIT' });
+    aanbodLijst = (a.body && a.body.aanbod) || [];
+    $('#kaartVorm').classList.toggle('weg', !aanbodLijst.length);
+    $('#kaartReden').textContent = aanbodLijst.length
+      ? 'De vervoerder verkoopt deze bewijzen via RTG.'
+      : ((a.body && a.body.reden) || 'Er is hier niets te koop.');
+    const sel = $('#kaartAanbod'); sel.innerHTML = '';
+    aanbodLijst.forEach((x, i) => {
+      const o = document.createElement('option');
+      o.value = String(i);
+      o.textContent = x.productNaam + ' · ' + x.lijnNaam + ' (' + x.urenGeldig + ' uur geldig)';
+      sel.appendChild(o);
+    });
+    vulHaltes();
+
+    const mijn = await mob('kaart/mijn');
+    const lijst = $('#kaartLijst'); lijst.innerHTML = '';
+    const kaartjes = (mijn.body && mijn.body.kaartjes) || [];
+    if (!kaartjes.length) lijst.innerHTML = '<p class="stil">U heeft nog geen kaartjes.</p>';
+    for (const k of kaartjes.slice(0, 8)) {
+      const d = document.createElement('div'); d.className = 'rijtje';
+      const l = document.createElement('span');
+      l.innerHTML = '<strong></strong><span class="sub" style="display:block;font-size:0.72rem;color:var(--soft);"></span>';
+      l.querySelector('strong').textContent = k.productNaam + ' · ' + k.lijnNaam;
+      l.querySelector('.sub').textContent = k.reden + (k.stand === 'geldig' ? ' · code ' + k.code : '');
+      const st = document.createElement('span'); st.className = 'stil'; st.textContent = k.stand;
+      d.appendChild(l); d.appendChild(st); lijst.appendChild(d);
+    }
+  }
+
+  function vulHaltes() {
+    const x = aanbodLijst[Number($('#kaartAanbod').value) || 0];
+    // een dagkaart geldt op de hele lijn en heeft dus geen traject
+    const traject = x && x.product !== 'dagkaart';
+    $('#kaartHaltes').classList.toggle('weg', !traject);
+    if (!traject || !x) return;
+    for (const [sel, kies] of [['#kaartVan', 0], ['#kaartNaar', 1]]) {
+      const el = $(sel); el.innerHTML = '';
+      x.haltes.forEach((h, i) => {
+        const o = document.createElement('option'); o.value = h.id; o.textContent = h.naam;
+        if (i === (kies ? x.haltes.length - 1 : 0)) o.selected = true;
+        el.appendChild(o);
+      });
+    }
+  }
+  $('#kaartAanbod').addEventListener('change', vulHaltes);
+
+  $('#kaartKoop').addEventListener('click', async () => {
+    const x = aanbodLijst[Number($('#kaartAanbod').value) || 0];
+    if (!x) return zeg('Er is niets te koop.');
+    $('#kaartKoop').disabled = true;
+    const r = await mob('kaart/koop', { vervoerder: 'TRANSIT', lijnId: x.lijnId,
+      product: x.product, van: $('#kaartVan').value, naar: $('#kaartNaar').value, idem: RTGIdem('kaart') });
+    $('#kaartKoop').disabled = false;
+    if (r.body.error) return zeg(r.body.error);
+    zeg(r.body.kaartje.productNaam + ' gekocht voor ' + eur(r.body.kaartje.prijs) + '.');
+    verversKaart();
   });
 
   /* ================= bedrijfspendel ================= */

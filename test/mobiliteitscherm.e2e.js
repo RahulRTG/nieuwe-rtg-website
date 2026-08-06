@@ -79,7 +79,7 @@ async function open(base, url, sleutel, token) {
   return { browser, page, fouten };
 }
 
-test('de reizigersapp boekt echt een rit, en toont hem daarna',
+test('de reizigersapp plant een reis, toont de opties en boekt er een',
   { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
   const { child, base } = await startServer({ env: { SMTP_URL: '' } });
   let browser;
@@ -96,32 +96,112 @@ test('de reizigersapp boekt echt een rit, en toont hem daarna',
     assert.ok(opties.some(o => /restaurant|hotel|koffie|bar/i.test(o)),
       'de bestemmingslijst bevat onze eigen zaken, kreeg: ' + opties.slice(0, 5).join(' | '));
 
-    // een echte zaak kiezen en aanvragen
-    const zaakOptie = await page.$$eval('#velNaar option', els =>
-      (els.find(e => e.value.startsWith('zaak:')) || {}).value || '');
-    assert.ok(zaakOptie, 'er staat een RTG-zaak in de lijst');
-    await page.selectOption('#velNaar', zaakOptie);
-    await page.click('#velBoek');
+    /* Via de ZOEKBALK een bestemming ver weg kiezen. Dat is ook de echte weg:
+       de eerste pagina van de lijst staat vol met wat vlakbij is, en juist wat
+       je zoekt staat er dan niet in. Zonder zoeken pakte deze toets de zaak op
+       nul meter afstand en kreeg hij terecht "vertrek en bestemming liggen op
+       dezelfde plek". */
+    await page.fill('#velZoek', 'Santa Eularia');
+    await page.waitForFunction(() => {
+      const els = [...document.querySelectorAll('#velNaar option')];
+      return els.some(e => /Santa Eularia/i.test(e.textContent));
+    }, null, { timeout: 20000 });
+    const doel = await page.$$eval('#velNaar option', els =>
+      (els.find(e => /Santa Eularia/i.test(e.textContent)) || {}).value || '');
+    assert.ok(doel, 'zoeken vindt de bestemming');
+    await page.selectOption('#velNaar', doel);
+    await page.click('#velPlan');
 
-    /* De bewering die telt: na het aanvragen VERDWIJNT het formulier en staat de
-       lopende rit in beeld, met de keten eronder. Een app die de aanvraag
-       wegstuurt en daarna hetzelfde formulier toont, laat iemand tweemaal
-       boeken zonder het te weten. */
+    /* De bewering die telt: er verschijnen OPTIES met cijfers, niet een enkele
+       knop. Dat is het verschil tussen een reisplanner en een bestelknop. */
+    await page.waitForFunction(() => {
+      const b = document.querySelector('#optieBlok');
+      return b && !b.classList.contains('weg') && b.querySelectorAll('.kaart').length > 0;
+    }, null, { timeout: 20000 });
+    const kaarten = await page.$$eval('#opties .kaart', els => els.map(e => e.textContent));
+    assert.ok(kaarten.length >= 1, 'er staat minstens een reisoptie op het scherm');
+    assert.ok(kaarten.some(k => /min/.test(k) && /€/.test(k) && /CO₂/.test(k)),
+      'elke optie toont tijd, prijs en uitstoot, kreeg: ' + kaarten[0].slice(0, 120));
+    assert.ok(kaarten.some(k => /schatting/.test(k)),
+      'en de uitstoot heet op het scherm een schatting, geen meting');
+
+    // boeken: daarna staat de reis in beeld en is het formulier weg
+    await page.click('#opties .kaart button.vol');
     await page.waitForFunction(() => {
       const k = document.querySelector('#lopendKaart');
       return k && !k.classList.contains('weg');
     }, null, { timeout: 20000 });
     assert.ok(await page.$eval('#boekBlok', el => el.classList.contains('weg')),
-      'het boekformulier is weg zodra er een rit loopt');
-    const sub = await page.textContent('#lopendSub');
-    assert.match(sub, /km/, 'de lopende rit toont de afstand, kreeg: ' + sub);
-    assert.match(sub, /€/, 'en het bedrag');
-    const ketenAf = await page.$$eval('#lopendKeten span.af', els => els.length);
-    assert.ok(ketenAf >= 1, 'de statusketen staat op minstens een stap');
+      'het planformulier is weg zodra er een reis loopt');
+    const etappes = await page.$$eval('#lopendEtappes .rijtje', els => els.map(e => e.textContent));
+    assert.ok(etappes.length >= 1, 'de etappes van de reis staan op het scherm');
 
-    // en de server is het ermee eens: er staat echt een opdracht op dit lid
-    const mijn = await post(base, '/api/mob/mijn', {}, token);
-    assert.ok(mijn.lopend && mijn.lopend.ref, 'de server kent de lopende rit ook');
+    // en de server is het ermee eens
+    const reizen = await post(base, '/api/mob/reis/mijn', {}, token);
+    assert.ok((reizen.reizen || []).length, 'de server kent de geboekte reis ook');
+
+    assert.deepEqual(s.fouten, [], 'paginafouten: ' + s.fouten.join(' | '));
+  } finally {
+    if (browser) await browser.close();
+    child.kill();
+  }
+});
+
+test('het OV-tabblad zegt eerlijk dat er geen kaartje te koop is, en verkoopt er wel een als het mag',
+  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  const { child, base } = await startServer({ env: { SMTP_URL: '', OFFICE_CODE: 'KANTOOR-SCHERM-1' } });
+  let browser;
+  try {
+    const token = await nieuwLid(base);
+    const s = await open(base, '/apps/ov.html', 'rtg_member_token', token);
+    browser = s.browser;
+    const page = s.page;
+
+    await page.evaluate(() => { document.querySelector('#tabOv').click(); });
+    /* Zonder overeenkomst is er niets te koop, en dan MOET er een reden staan.
+       Een leeg vak zonder uitleg leest als een storing. */
+    await page.waitForFunction(() => {
+      const el = document.querySelector('#kaartReden');
+      return el && el.textContent.length > 20;
+    }, null, { timeout: 20000 });
+    const reden = await page.textContent('#kaartReden');
+    assert.match(reden, /Partnercontracten|overeenkomst|beschikbaar/i,
+      'het scherm legt uit waarom er niets te koop is, kreeg: ' + reden);
+    assert.ok(await page.$eval('#kaartVorm', el => el.classList.contains('weg')),
+      'en er staat geen koopknop bij iets dat niet te koop is');
+
+    // nu het kantoor de module aanzet en een overeenkomst vastlegt
+    const kantoor = (await post(base, '/api/office/login', { code: 'KANTOOR-SCHERM-1' })).token;
+    assert.ok(kantoor, 'het kantoor logt in');
+    for (const m of ['partner_contracts', 'public_transport_ticketing'])
+      await post(base, '/api/office/mob/module/zet', { id: m, aan: true }, kantoor);
+    const ok = await post(base, '/api/office/mob/overeenkomst', { vervoerder: 'TRANSIT',
+      van: '2020-01-01', tot: '2099-12-31', producten: ['enkel'], lijnen: ['L1'],
+      getekendDoor: 'J. Directeur' }, kantoor);
+    assert.ok(ok.overeenkomst, 'de overeenkomst staat: ' + JSON.stringify(ok).slice(0, 120));
+
+    /* De tab opnieuw openen zodat de app het aanbod verse ophaalt. Klikken gaat
+       hier via de pagina zelf: de console van Rahul staat onderaan vast en kan
+       de tabrij overlappen, en dat is geen fout in het scherm maar in de manier
+       waarop de toets erop tikt. De handler is dezelfde. */
+    await page.evaluate(() => { document.querySelector('#tabRit').click(); });
+    await page.evaluate(() => { document.querySelector('#tabOv').click(); });
+    await page.waitForFunction(() => {
+      const v = document.querySelector('#kaartVorm');
+      return v && !v.classList.contains('weg');
+    }, null, { timeout: 20000 });
+
+    await page.evaluate(() => { document.querySelector('#kaartKoop').click(); });
+    await page.waitForFunction(() => {
+      const l = document.querySelector('#kaartLijst');
+      return l && /geldig/.test(l.textContent);
+    }, null, { timeout: 20000 });
+    const lijst = await page.textContent('#kaartLijst');
+    assert.match(lijst, /Enkele reis/, 'het gekochte kaartje staat in de app');
+    assert.match(lijst, /geldig/, 'en het is geldig');
+
+    const mijn = await post(base, '/api/mob/kaart/mijn', {}, token);
+    assert.ok((mijn.kaartjes || []).length, 'de server kent het kaartje ook');
 
     assert.deepEqual(s.fouten, [], 'paginafouten: ' + s.fouten.join(' | '));
   } finally {

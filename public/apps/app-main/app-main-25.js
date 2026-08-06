@@ -39,7 +39,7 @@
 
   /* de Werk-kiezer: gekoppelde werkplekken uit het ene account */
   function openWerkKiezer() {
-    belTitel.textContent = T('werk.h', 'Werk');
+    belTitel.textContent = T('werk.h', 'Mijn werkplekken');
     belLijst.textContent = '';
     API.call('/account/rollen', {}).then(d => {
       const rollen = (d.rollen || []).filter(r => WERKDOEL[r.rol]);

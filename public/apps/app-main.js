@@ -3111,14 +3111,21 @@ var RTG_BOUW = 'c2cfc539';
   const premiumPas = pas === 'lifestyle' || pas === 'business';
 
   /* ---------- Werk op het OS + de algemene pin ----------
-     De werk-apps zijn gewone apps op het RTG-OS: een tik op "Werk" toont de
+     De werk-apps zijn gewone apps op het RTG-OS: een tik op "Mijn werkplekken"
+     toont de
      werkplekken die aan het ene RTG-account gekoppeld zijn (bevoegdheid), en
      openen gaat met de algemene pin (het bewijs), dezelfde pin die de
      privacygevoelige apps op dit OS beschermt. Onder water munt
      /api/account/start de werksessie, dus alle regels (zoals het werkvenster
      van de werkgever) blijven gewoon gelden. Deelt de OS-IIFE-scope:
      OSAPPS/MAPPEN/LINKS komen uit 25-os-01.js, de kiezer-scrim uit 01b. */
-  OSAPPS.werk = { naam: 'Werk' };
+  /* "Mijn werkplekken", en niet "Werk". Deze tegel staat in Het Huis naast
+     "Werk OS" (de werkplek-app zelf, link:werk) en droeg hetzelfde koffertje-
+     icoon: twee tegels die er identiek uitzagen en bijna hetzelfde heetten,
+     terwijl ze iets anders doen. Dit is de KIEZER -- hij toont de werkplekken
+     die aan je RTG-account gekoppeld zijn (personeel, leverancier, kantoor) en
+     opent die met je algemene pin. De naam zegt dat nu. */
+  OSAPPS.werk = { naam: 'Mijn werkplekken' };
   // Werk staat in de map "Het Huis" en opent met de algemene pin.
   // deze apps zijn prive: openen kan pas na de algemene pin (5 min geldig)
   for (const pk of ['berichten', 'vonk', 'rendezvous', 'wbw']) { if (LINKS[pk]) LINKS[pk].prive = true; }
@@ -3182,7 +3189,7 @@ var RTG_BOUW = 'c2cfc539';
 
   /* de Werk-kiezer: gekoppelde werkplekken uit het ene account */
   function openWerkKiezer() {
-    belTitel.textContent = T('werk.h', 'Werk');
+    belTitel.textContent = T('werk.h', 'Mijn werkplekken');
     belLijst.textContent = '';
     API.call('/account/rollen', {}).then(d => {
       const rollen = (d.rollen || []).filter(r => WERKDOEL[r.rol]);

@@ -500,7 +500,11 @@
     },
     "blindevlek.test.js": {
       "soort": "puur",
-      "staat": "geen module gevonden"
+      "staat": "gezakt",
+      "module": "server/web/routing.js",
+      "operator": "!==->===#0",
+      "gezakt": 2,
+      "geprobeerd": 2
     },
     "boardroom-poort.test.js": {
       "soort": "server",
@@ -539,7 +543,8 @@
     },
     "boot-smoke.test.js": {
       "soort": "puur",
-      "staat": "geen module gevonden"
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "overleefde 45 mutaties in server/server.js, en terecht: deze toets is bewust ONDIEP -- de server komt op en de wortel geeft de ROS-poort, meer beweert hij niet. De juiste mutatie zit in de wortelroute of in de pagina, niet in de bron"
     },
     "borden.test.js": {
       "soort": "server",
@@ -812,7 +817,8 @@
     },
     "eu-naleving.test.js": {
       "soort": "puur",
-      "staat": "geen module gevonden"
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "overleefde 5 mutaties. Deze toets vergelijkt beweringen uit EU.md met code die er nog STAAT; een operator verandert wat code doet en niet dat hij bestaat. De juiste mutatie is de code weghalen of het document laten liegen"
     },
     "eventkeuken.test.js": {
       "soort": "server",
@@ -1120,7 +1126,11 @@
     },
     "golive.test.js": {
       "soort": "puur",
-      "staat": "geen module gevonden"
+      "staat": "gezakt",
+      "module": "server/routes/auth/account.js",
+      "operator": "&&->||#0",
+      "gezakt": 1,
+      "geprobeerd": 3
     },
     "grand-integratie.pg.test.js": {
       "soort": "server",
@@ -1951,7 +1961,11 @@
     },
     "office-blad.test.js": {
       "soort": "puur",
-      "staat": "geen module gevonden"
+      "staat": "gezakt",
+      "module": "public/shared/rekenmotor.js",
+      "operator": "true->false#0",
+      "gezakt": 3,
+      "geprobeerd": 1
     },
     "office-tweede-helft.test.js": {
       "soort": "server",
@@ -2054,7 +2068,11 @@
     },
     "opslag-voorcheck.test.js": {
       "soort": "puur",
-      "staat": "geen module gevonden"
+      "staat": "gezakt",
+      "module": "server/db/sqlite.js",
+      "operator": "!==->===#0",
+      "gezakt": 6,
+      "geprobeerd": 4
     },
     "opslagblokkade.test.js": {
       "soort": "puur",
@@ -2246,7 +2264,8 @@
     },
     "poortrace.test.js": {
       "soort": "puur",
-      "staat": "geen module gevonden"
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "overleefde 45 mutaties in server/server.js. De bewering gaat over hoe een EADDRINUSE wordt BENOEMD in het log, niet over rekenend gedrag; een operator raakt dat niet"
     },
     "poortwacht.test.js": {
       "soort": "puur",
@@ -2372,7 +2391,8 @@
     },
     "randen.test.js": {
       "soort": "puur",
-      "staat": "geen module gevonden"
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "overleefde 42 mutaties in public/shared/randen.js en rahul-mond.js. Hij toetst of PAGINA'S de bladen laden en dat er geen zwevende knop terugsluipt -- structuur van de markup, niet gedrag van de module"
     },
     "rechtbank.test.js": {
       "soort": "server",
@@ -3321,7 +3341,11 @@
     },
     "txledger-sqlite.test.js": {
       "soort": "puur",
-      "staat": "geen module gevonden"
+      "staat": "gezakt",
+      "module": "server/db/tx/index.js",
+      "operator": "return-weg#0",
+      "gezakt": 2,
+      "geprobeerd": 5
     },
     "txledger.pg.test.js": {
       "soort": "puur",
@@ -3507,7 +3531,11 @@
     },
     "vloot.test.js": {
       "soort": "puur",
-      "staat": "geen module gevonden"
+      "staat": "gezakt",
+      "module": "server/vloot.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "vonk.test.js": {
       "soort": "server",

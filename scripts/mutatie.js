@@ -342,11 +342,6 @@ const EIGEN_MODULE = new Map([
      nul domeinen ophangen laat hem zakken op de 401 van member. Beide in deze
      module, en beide gezakt. */
   ['domeinalleen.test.js', ['server/opzet/routes.js']],
-  /* Boot de echte server en kijkt of de root de ROS-poort geeft. */
-  ['boot-smoke.test.js', ['server/server.js']],
-  /* Start de server naast een bezette poort; de bewering gaat over hoe
-     server.js een EADDRINUSE benoemt. */
-  ['poortrace.test.js', ['server/server.js']],
   /* Elke app als eigen proces achter de poortwachter. */
   ['vloot.test.js', ['server/vloot.js']],
   /* Productiestand: demo dicht, geen dev-lekken, registreren werkt. */
@@ -359,10 +354,6 @@ const EIGEN_MODULE = new Map([
   /* De rekenmotor van RTG Office draait in de BROWSER; de toets laadt de
      bestanden los in met een uitgerekend pad, dus zonder require-regel. */
   ['office-blad.test.js', ['public/shared/rekenmotor.js', 'public/shared/rekenfuncties.js']],
-  /* De randen van het scherm, ook browsercode. */
-  ['randen.test.js', ['public/shared/randen.js', 'public/shared/rahul-mond.js']],
-  /* De pinnen onder EU.md: beweringen die naar echte code wijzen. */
-  ['eu-naleving.test.js', ['server/routes/aanmeldingen.js', 'server/kern/appgids-data/deel1.js']],
   /* De blinde vlek zoekt structuurfouten in de PAGINA'S en niet in een module.
      Hij staat er met een kandidaat en niet met een reden, omdat ik niet ga
      beweren dat het onmeetbaar is voordat de motor het heeft geprobeerd:
@@ -370,6 +361,29 @@ const EIGEN_MODULE = new Map([
      bij een module die deze toets echt nodig heeft. Blijft hij overleven, dan
      is dat de uitslag en hoort er een reden te komen in plaats van een gok. */
   ['blindevlek.test.js', ['server/web/routing.js']]
+]);
+
+/* TOETSEN WAAR EEN BRONMUTATIE NIETS OVER ZEGT, met de reden en het aantal
+   pogingen erbij.
+
+   Deze vier stonden eerst in EIGEN_MODULE met een module die ik erbij had
+   bedacht. De motor heeft ze alle vier geprobeerd en ze overleefden -- en dan is
+   "overleefd" het verkeerde woord: dat betekent "de toets legt het gedrag niet
+   vast", terwijl hier MIJN TOEWIJZING fout was. Ze zo laten staan is de toets de
+   schuld geven van iets wat hij niet heeft gedaan, precies waar de kop van
+   proefPuur voor waarschuwt.
+
+   Ze krijgen daarom een eigen staat die als NIET GEMETEN telt en niet als
+   overlever. Dat houdt toetsenOngevoeligPct eerlijk en laat toetsenNietGemeten
+   zeggen wat waar is: deze motor kan hier niets over zeggen.
+
+   Elke reden noemt hoeveel mutaties er zijn geprobeerd, want een reden zonder
+   poging is een vermoeden. */
+const GEEN_BRONMUTATIE = new Map([
+  ['boot-smoke.test.js', 'overleefde 45 mutaties in server/server.js, en terecht: deze toets is bewust ONDIEP -- de server komt op en de wortel geeft de ROS-poort, meer beweert hij niet. De juiste mutatie zit in de wortelroute of in de pagina, niet in de bron'],
+  ['poortrace.test.js', 'overleefde 45 mutaties in server/server.js. De bewering gaat over hoe een EADDRINUSE wordt BENOEMD in het log, niet over rekenend gedrag; een operator raakt dat niet'],
+  ['eu-naleving.test.js', 'overleefde 5 mutaties. Deze toets vergelijkt beweringen uit EU.md met code die er nog STAAT; een operator verandert wat code doet en niet dat hij bestaat. De juiste mutatie is de code weghalen of het document laten liegen'],
+  ['randen.test.js', 'overleefde 42 mutaties in public/shared/randen.js en rahul-mond.js. Hij toetst of PAGINA\'S de bladen laden en dat er geen zwevende knop terugsluipt -- structuur van de markup, niet gedrag van de module']
 ]);
 
 /* Welke SERVERMODULE toetst dit bestand? Uit zijn eigen requires: een pure toets
@@ -394,6 +408,7 @@ function modulesVan(bestand) {
    bewijst "hij zakt" niets (LAT.md regel 3 -- een meter zonder invoer meet niet). */
 function proefPuur(naam, posities) {
   if (NIET_MUTEREN.has(naam)) return { soort: 'puur', staat: 'muteert zelf', reden: NIET_MUTEREN.get(naam) };
+  if (GEEN_BRONMUTATIE.has(naam)) return { soort: 'puur', staat: 'geen bronmutatie mogelijk', reden: GEEN_BRONMUTATIE.get(naam) };
   const diep = posities || 1;
   const bestand = path.join(TEST, naam);
   const nul = draaiToets(bestand);

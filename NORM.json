@@ -1,12 +1,12 @@
 {
-  "vastgelegd": "2026-08-05",
+  "vastgelegd": "2026-08-06",
   "meters": {
     "endpointsZonderTest": 844,
     "dekkingPct": 70,
     "keuringStuk": 0,
     "keuringScheef": 1,
     "dependencies": 0,
-    "testbestanden": 545,
+    "testbestanden": 548,
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 17,
     "e2eBestanden": 68,
@@ -25,7 +25,7 @@
     "kernGedeeld": 146,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 102,
+    "toetsenNietGemeten": 96,
     "toetsenOngevoeligPct": 2.3
   },
   "notities": [
@@ -295,7 +295,7 @@
     "doorvoerPerSec": 395,
     "eventLoopP99Ms": 64.8,
     "herstelSeconden": 1,
-    "verhalenSlaagPctStorm": 76.3,
+    "verhalenSlaagPctStorm": 76.4,
     "geheugenHellingMBPerMin": 0
   },
   "prestatieBron": "4k/17g/linux/sqlite",

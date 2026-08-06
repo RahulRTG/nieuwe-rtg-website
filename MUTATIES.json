@@ -1180,6 +1180,30 @@
       "operator": "liegpoort /api/",
       "gezakt": 10
     },
+    "kantoren-uitbreiding.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5
+    },
+    "kantoren.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 10
+    },
+    "kassa-modus.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5
+    },
+    "kassa-premium.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 7
+    },
     "kern-afgeleid.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -1208,6 +1232,18 @@
       "operator": "!==->===",
       "gezakt": 1
     },
+    "ketenchat.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5
+    },
+    "keuken.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 17
+    },
     "keuring.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -1223,6 +1259,12 @@
       "operator": "===->!==#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "kleine-grendels.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5
     },
     "klets.test.js": {
       "soort": "puur",
@@ -1248,6 +1290,12 @@
       "gezakt": 6,
       "geprobeerd": 3
     },
+    "koppels.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4
+    },
     "kruisscan.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -1255,6 +1303,18 @@
       "operator": "!==->===#0",
       "gezakt": 1,
       "geprobeerd": 2
+    },
+    "laatste-negen.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4
+    },
+    "laatste-twee-endpoints.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6
     },
     "lab-geheim.test.js": {
       "soort": "puur",
@@ -1272,6 +1332,17 @@
       "gezakt": 3,
       "geprobeerd": 1
     },
+    "leden-gids-pg.test.js": {
+      "soort": "server",
+      "staat": "slaat zichzelf over",
+      "overgeslagen": 1
+    },
+    "leden-teller.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1
+    },
     "ledengids-race.test.js": {
       "soort": "puur",
       "staat": "overleefd",
@@ -1281,6 +1352,12 @@
       "geprobeerd": 1,
       "posities": 8
     },
+    "ledenladder.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3
+    },
     "ledenregister.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -1288,6 +1365,12 @@
       "operator": "===->!==#0",
       "gezakt": 3,
       "geprobeerd": 1
+    },
+    "leerstof.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3
     },
     "leerstofbreed.test.js": {
       "soort": "puur",
@@ -1297,6 +1380,30 @@
       "gezakt": 1,
       "geprobeerd": 8
     },
+    "leerstofvo.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3
+    },
+    "leren-leden.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 11
+    },
+    "leren.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5
+    },
+    "levensloop.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1
+    },
     "lib.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -1305,6 +1412,29 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "lidboard.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 19
+    },
+    "lifestyle.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 7
+    },
+    "livegang.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3
+    },
+    "loghygiene.test.js": {
+      "soort": "server",
+      "staat": "overleefd",
+      "operator": "liegpoort /api/"
+    },
     "lokaal-tls.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -1312,6 +1442,24 @@
       "operator": "true->false#0",
       "gezakt": 2,
       "geprobeerd": 1
+    },
+    "luchthaven-vip.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5
+    },
+    "luchthaven.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 9
+    },
+    "luchtzijde-taal.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5
     },
     "mail-eigen.test.js": {
       "soort": "puur",

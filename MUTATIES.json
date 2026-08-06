@@ -3281,6 +3281,14 @@
       "gezakt": 2,
       "geprobeerd": 1
     },
+    "tls-boot.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/web/index.js",
+      "operator": "&&->||#0",
+      "gezakt": 3,
+      "geprobeerd": 2
+    },
     "tls-native.test.js": {
       "soort": "puur",
       "staat": "gezakt",

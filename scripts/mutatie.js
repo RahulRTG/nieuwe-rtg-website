@@ -348,6 +348,12 @@ const EIGEN_MODULE = new Map([
   ['golive.test.js', ['server/routes/auth/account.js', 'server/server.js']],
   /* De voorcheck van de SQLite-opslag; de toets noemt de module in zijn kop. */
   ['opslag-voorcheck.test.js', ['server/db/sqlite.js']],
+  /* TLS aan of uit, in de hele server en in de poortwachter. Drie mutaties met
+     de hand nagetrokken en alle drie raak: het schema in de opstartmelding
+     (luister.js), het maken van de TLS-server (web/index.js) en de schakelaar van
+     de poortwachter (trio.js). web/index.js staat vooraan omdat die de zwaarste
+     bewering draagt -- praat hij echt https. */
+  ['tls-boot.test.js', ['server/web/index.js', 'server/opzet/luister.js', 'server/trio.js']],
   /* Het grootboek op sqlite. De toets draait een rit-bestand als kindproces,
      en dat requiret server/db -- vandaar dat de scanner niets zag. */
   ['txledger-sqlite.test.js', ['server/db/tx/index.js', 'server/db/index.js']],

@@ -27,16 +27,19 @@
    database, en een loonmotor moet je juist wel duizend keer kunnen doorrekenen. */
 'use strict';
 
+const loonheffing = require('./loonheffing');
+
 const rondCenten = (x) => Math.round(x);
 
 /* De grondslag: de som van alle brutocomponenten die voor DEZE grondslag
    meetellen. Niet "alles wat belast is" -- zie componenten.js: een component
    kan wel voor de loonheffing tellen en niet voor de premies. */
-function grondslagVan(regels, componenten, welke) {
+function grondslagVan(regels, componenten, welke, alleen) {
   let som = 0;
   for (const r of regels) {
     const c = componenten[r.component];
     if (!c || c.soort !== 'bruto') continue;
+    if (alleen && !alleen(c)) continue;
     if ((c.grondslagen || []).includes(welke)) som += r.centen;
   }
   return som;
@@ -115,12 +118,29 @@ function bereken({ contract, periode, invoer, regelpakket, componenten }) {
   stappen.push({ stap: 'bruto', centen: bruto });
   stappen.push({ stap: 'grondslagen', loonheffing: gLoonheffing, premies: gPremies, zvw: gZvw });
 
-  /* 4. Loonheffing. Het regelpakket levert het tarief; welke tabel dat is en
-        uit welke jaargang, staat in de stap. */
-  const heffing = pas(regelpakket, 'loonheffing.tarief', gLoonheffing);
-  if (!heffing) return { fout: 'Het regelpakket ' + regelpakket.versie + ' kent geen loonheffing.tarief.' };
-  stappen.push({ stap: 'loonheffing', regel: heffing.regel, tarief: heffing.tarief,
-    grondslag: gLoonheffing, centen: heffing.centen, versie: regelpakket.versie });
+  /* 4. Loonheffing. Draagt het pakket een jaartabel, dan gaat het via
+        ./loonheffing.js: herleiden naar een jaarloon, over de schijven, de
+        heffingskortingen eraf, terug naar de periode. Draagt het alleen een vlak
+        percentage, dan doet diezelfde module dat -- en zegt in de stap dat het
+        vlak was, want dat is een uitspraak over de betrouwbaarheid van dit
+        bedrag.
+
+        HET BIJZONDERE LOON GAAT APART. Vakantiegeld en een bonus zijn geen loon
+        over deze maand. Tel je ze bij het periodeloon op, dan worden ze
+        meeherleid naar een jaarloon (maal twaalf!) en jaagt een enkele
+        vakantiegeldbetaling de hele strook een schijf omhoog. De component
+        zegt zelf of hij bijzonder is (componenten.js: `bijzonder`). */
+  const gBijzonder = grondslagVan(regels, comp, 'loonheffing', (c) => c.bijzonder === true);
+  const gRegulier = gLoonheffing - gBijzonder;
+  const heffing = loonheffing.bereken({ regelpakket, grondslagCenten: gRegulier,
+    bijzonderCenten: gBijzonder, betaling: contract.betaling });
+  if (!heffing) return { fout: 'Het regelpakket ' + regelpakket.versie +
+    ' kent geen loonheffing: geen schijven en geen vlak tarief.' };
+  stappen.push({ stap: 'loonheffing', regel: heffing.regel, soort: heffing.soort,
+    tarief: heffing.tarief != null ? heffing.tarief : null,
+    grondslag: gLoonheffing, regulier: gRegulier, bijzonder: gBijzonder,
+    centen: heffing.centen, versie: regelpakket.versie });
+  for (const s of heffing.stappen) stappen.push(s);
 
   /* 5. Inhoudingen uit de invoer (pensioen, loonbeslag). */
   const inhoudingen = regels.filter(r => r.soort === 'inhouding').reduce((s, r) => s + r.centen, 0);
@@ -154,26 +174,9 @@ function bereken({ contract, periode, invoer, regelpakket, componenten }) {
   };
 }
 
-/* De controlelaag hoort niet in de berekening zelf: een strook die onder het
-   minimumloon uitkomt moet WEL berekend worden en dan een waarschuwing geven,
-   niet stilletjes worden opgehoogd. Wie het bedrag aanpast zonder het te
-   melden, verbergt precies waar naar gekeken moet worden. */
-function controleer(strook, { regelpakket, leeftijdsgroep, gewerkteUren }) {
-  const waarschuwingen = [];
-  if (strook.nettoCenten < 0)
-    waarschuwingen.push({ ernst: 'hoog', soort: 'negatief_netto', uitleg: 'Het nettoloon is negatief.' });
-
-  const min = ((regelpakket.regels || {}).minimumUurloon || {})[leeftijdsgroep || '21+'];
-  if (typeof min === 'number' && gewerkteUren > 0) {
-    const feitelijk = strook.brutoCenten / gewerkteUren;
-    if (feitelijk < min) waarschuwingen.push({ ernst: 'hoog', soort: 'onder_minimumloon',
-      uitleg: 'Het feitelijke uurloon (' + Math.round(feitelijk) + ' cent) ligt onder het minimumuurloon (' + min + ' cent).',
-      regel: 'minimumUurloon.' + (leeftijdsgroep || '21+'), versie: regelpakket.versie });
-  }
-  if (regelpakket.stand !== 'goedgekeurd')
-    waarschuwingen.push({ ernst: 'hoog', soort: 'ongecontroleerd_regelpakket',
-      uitleg: 'Deze berekening draait op regelpakket ' + regelpakket.versie + ', dat nog niet is aangemerkt. Niet geschikt voor een definitieve loonrun.' });
-  return waarschuwingen;
-}
+/* De controles staan in ./motor-controle.js -- de motor rekent, hij oordeelt
+   niet. Ze komen hier weer naar buiten omdat elke aanroeper ze samen gebruikt
+   en een tweede require op elke plek alleen maar iets is om te vergeten. */
+const { controleer } = require('./motor-controle');
 
 module.exports = { bereken, controleer, grondslagVan };

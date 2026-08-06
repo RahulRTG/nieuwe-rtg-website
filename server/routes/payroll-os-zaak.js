@@ -89,6 +89,14 @@ module.exports = (kern) => {
     res.json({ ok: true, staffId: staff.id, contracten: uit });
   });
 
+  /* De aangifte over de eigen zaak: LEZEN, niet indienen. De werkgever heeft er
+     recht op te zien wat er namens hem wordt aangegeven -- hij betaalt het --
+     maar RTG voert de administratie en tekent ervoor. Twee partijen die allebei
+     kunnen indienen, is twee aangiftes over dezelfde periode. */
+  app.post('/api/supplier/payroll/aangiftes', supplierAuth, (req, res) =>
+    res.json({ ok: true, aangiftes: payrollOS.aangifte.vanZaak(req.supplier.code,
+      (req.body || {}).periode || null) }));
+
   /* De identiteit van het eigen personeel: standaard alleen ja/nee. */
   app.post('/api/supplier/identiteit', supplierAuth, (req, res) =>
     res.json({ ok: true, standen: payrollOS.identiteit.standen(accounts.listStaff(req.supplier.code)) }));

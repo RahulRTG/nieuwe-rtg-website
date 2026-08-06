@@ -28,6 +28,12 @@
                             maar niet altijd voor de premies.
      pensioengevend      -- aparte vraag, ander antwoord dan belast.
      vakantiegeldgevend  -- idem. Fooien vaak niet, overuren vaak wel.
+     bijzonder           -- is dit loon dat NIET bij deze periode hoort
+                            (vakantiegeld, bonus, dertiende maand)? Dan gaat het
+                            tegen het bijzondere tarief en wordt het niet
+                            meegeherleid naar een jaarloon. Ontbreekt de vlag,
+                            dan is het gewoon periodeloon -- de veilige kant,
+                            want dat is wat verreweg het meeste loon is.
      invoerbron          -- waar de waarde vandaan MAG komen. Een component die
                             uit de klok komt, hoort niemand met de hand te
                             kunnen intypen; dat is precies het gat waar
@@ -63,7 +69,10 @@ const BASIS = [
   { sleutel: 'nachttoeslag', naam: 'Nachttoeslag', soort: 'bruto', belast: true,
     grondslagen: ['loonheffing', 'premies', 'zvw'], pensioengevend: false, vakantiegeldgevend: true,
     invoerbron: 'klok', goedkeuring: 'manager', grootboek: '4011' },
-  { sleutel: 'vakantiegeld', naam: 'Vakantiegeld', soort: 'bruto', belast: true,
+  /* Vakantiegeld is BIJZONDER loon: het hoort niet bij deze maand. Zonder die
+     vlag wordt het meeherleid naar een jaarloon -- maal twaalf -- en jaagt een
+     enkele uitbetaling de hele strook een schijf omhoog. Zie loonheffing.js. */
+  { sleutel: 'vakantiegeld', naam: 'Vakantiegeld', soort: 'bruto', belast: true, bijzonder: true,
     grondslagen: ['loonheffing', 'premies', 'zvw'], pensioengevend: false, vakantiegeldgevend: false,
     invoerbron: 'motor', goedkeuring: 'geen', grootboek: '4020' },
   { sleutel: 'fooi', naam: 'Fooi', soort: 'bruto', belast: true,
@@ -99,6 +108,9 @@ function keur(c) {
     bez.push('belast zonder grondslagen: zeg WELKE grondslagen, anders moet de motor gokken.');
   if (!c.belast && Array.isArray(c.grondslagen) && c.grondslagen.length)
     bez.push('onbelast maar met grondslagen: dat spreekt elkaar tegen.');
+  if (c.bijzonder != null && typeof c.bijzonder !== 'boolean') bez.push('bijzonder moet true of false zijn.');
+  if (c.bijzonder === true && !c.belast)
+    bez.push('bijzonder maar onbelast: het bijzondere tarief is een tarief voor BELAST loon.');
   if (!BRONNEN.includes(c.invoerbron)) bez.push('invoerbron moet een van ' + BRONNEN.join(', ') + ' zijn.');
   if (!GOEDKEURING.includes(c.goedkeuring)) bez.push('goedkeuring moet een van ' + GOEDKEURING.join(', ') + ' zijn.');
   return bez;

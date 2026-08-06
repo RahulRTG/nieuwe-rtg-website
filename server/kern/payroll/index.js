@@ -9,6 +9,7 @@
      motor        de herhaalbare berekening
      run          concept -> vier ogen -> definitief -> correctie
      journaal     de boeking en het betaalbestand
+     aangifte     de loonaangifte: dezelfde run, derde uitgang
      uren         de klok vertaald naar meetbare feiten, en die gewogen tot
                   componenten (meten en wegen apart, zie ./uren.js)
      controles    de automatische controles; hoog blokkeert tot het verklaard is
@@ -33,6 +34,7 @@ const { maakComponenten } = require('./componenten');
 const { maakContracten } = require('./contracten');
 const { maakRun } = require('./run');
 const { maakJournaal } = require('./journaal');
+const { maakAangifte } = require('./aangifte');
 const { maakVerzuim } = require('./verzuim');
 const { maakIdentiteit } = require('./identiteit');
 const { maakBijwerken, urlBron } = require('./bijwerken');
@@ -46,6 +48,7 @@ function maakPayrollOS({ db, save, crypto, accounts, nu, inzagelog, notify, logA
   const contracten = maakContracten({ db, save, nu });
   const run = maakRun({ db, save, nu, crypto, motor, regelpakket: regels, componenten });
   const journaal = maakJournaal({ db, save, nu, crypto });
+  const aangifte = maakAangifte({ db, save, nu, crypto, run });
   const verzuim = maakVerzuim({ db, save, nu });
   const identiteit = maakIdentiteit({ accounts, db, save, nu, inzagelog, notify, logActivity });
   const bijwerken = maakBijwerken({ regelpakket: regels, db, save, nu, log });
@@ -70,7 +73,7 @@ function maakPayrollOS({ db, save, crypto, accounts, nu, inzagelog, notify, logA
 
   return {
     payrollOS: {
-      regels, componenten, contracten, motor, run, journaal, verzuim, identiteit, uren, controles,
+      regels, componenten, contracten, motor, run, journaal, aangifte, verzuim, identiteit, uren, controles,
       bijwerken, urlBron, laadMeegeleverd
     }
   };

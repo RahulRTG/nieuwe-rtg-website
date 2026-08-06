@@ -144,6 +144,36 @@ test('van de wervingslink tot de loonstrook van de medewerker', async () => {
     const def = await post(base, '/api/office/payroll/run/definitief', { runId }, kantoor);
     assert.equal(def.status, 200, 'definitief: ' + JSON.stringify(def.data));
 
+    /* ---- de drie uitgangen, en of ze hetzelfde zeggen ----
+       Boeking, betaalbestand en aangifte komen uit dezelfde run. Lopen ze
+       uiteen, dan boekt de werkgever iets anders dan hij betaalt en geeft hij
+       weer iets anders aan -- en dat komt pas boven bij een controle. */
+    const journaal = await post(base, '/api/office/payroll/journaal', { runId }, kantoor);
+    assert.equal(journaal.status, 200, JSON.stringify(journaal.data));
+    assert.equal(journaal.data.somDebet, journaal.data.somCredit, 'de boeking telt op tot nul');
+
+    const aan = await post(base, '/api/office/payroll/aangifte', { runId }, kantoor);
+    assert.equal(aan.status, 200, JSON.stringify(aan.data));
+    assert.equal(aan.data.aangifte.nominatief.length, 1, 'een nominatieve regel per werknemer');
+    const sluit = await post(base, '/api/office/payroll/aangifte/aansluiting',
+      { id: aan.data.aangifte.id }, kantoor);
+    assert.equal(sluit.status, 200, 'aangifte en loonjournaal sluiten aan: ' + JSON.stringify(sluit.data));
+    assert.equal(sluit.data.loonheffingCenten, aan.data.aangifte.totalen.ingehoudenLoonheffing);
+
+    // indienen zonder kenmerk mag niet; met kenmerk wordt het vastgelegd
+    assert.equal((await post(base, '/api/office/payroll/aangifte/indienen',
+      { id: aan.data.aangifte.id, kenmerk: '' }, kantoor)).status, 400);
+    const ingediend = await post(base, '/api/office/payroll/aangifte/indienen',
+      { id: aan.data.aangifte.id, kenmerk: 'BD-2026-03-0001' }, kantoor);
+    assert.equal(ingediend.status, 200, JSON.stringify(ingediend.data));
+    assert.equal(ingediend.data.aangifte.stand, 'ingediend');
+
+    // en de werkgever ziet hem, maar dient hem niet in
+    const bijZaak = await post(base, '/api/supplier/payroll/aangiftes', { periode: PERIODE }, zaakTok);
+    assert.equal(bijZaak.status, 200);
+    assert.equal(bijZaak.data.aangiftes.length, 1, 'de werkgever ziet wat er namens hem is aangegeven');
+    assert.equal(bijZaak.data.aangiftes[0].kenmerk, 'BD-2026-03-0001');
+
     /* ---- en dan: ziet de medewerker het? ---- */
     const lid = (await post(base, '/api/auth/login',
       { login: 'timo@rtg.example', password: 'geheim123' })).data;

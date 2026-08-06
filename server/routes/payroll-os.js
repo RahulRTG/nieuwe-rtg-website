@@ -154,17 +154,10 @@ module.exports = (kern) => {
       door: wie(req), reden: schoon(b.reden, 300) }));
   });
 
-  /* ---------- journaal en betaalbestand ---------- */
-  app.post('/api/office/payroll/journaal', officeAuth, (req, res) => {
-    const r = payrollOS.run.haal(String((req.body || {}).runId || ''));
-    antwoord(res, payrollOS.journaal.boeking(r));
-  });
-
-  app.post('/api/office/payroll/betaalbestand', officeAuth, (req, res) => {
-    const b = req.body || {};
-    const r = payrollOS.run.haal(String(b.runId || ''));
-    antwoord(res, payrollOS.journaal.betaalbestand(r, b.rekeningen || {}));
-  });
+  /* De DRIE UITGANGEN uit een definitieve run -- de boeking, het betaalbestand
+     en de loonaangifte -- staan in ./payroll-os-uitgang.js. Ze horen bij elkaar
+     (ze moeten alle drie hetzelfde zeggen) en dit bestand ging over de 10 KB. */
+  require('./payroll-os-uitgang')(kern);
 
   /* De werkgevers- en medewerkerskant staat in ./payroll-os-zaak.js: een
      eigen onderwerp (wie keurt goed, wie ziet zijn eigen strook) en dit

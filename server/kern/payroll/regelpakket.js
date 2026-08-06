@@ -35,6 +35,8 @@
    ./jaargangen/ voor de meegeleverde pakketten en hun stand. */
 'use strict';
 
+const loonheffing = require('./loonheffing');
+
 /* De velden die een pakket moet dragen om bruikbaar te zijn. Bewust met NAMEN
    en niet "alles wat er in staat": een ontbrekend tarief hoort een keuringsfout
    te zijn, geen stille nul. */
@@ -105,6 +107,12 @@ function maakRegelpakket({ db, save, nu }) {
         else if (c < minL || c > maxL) bez.push('minimumUurloon.' + groep + ' (' + c + ' cent) is niet aannemelijk.');
       }
     }
+    /* De loonheffingstabel keurt zichzelf (./loonheffing.js): schijven die niet
+       oplopen, een korting met een onmogelijk deel, een laatste schijf met een
+       bovengrens. Die kennis hoort bij de tabel en niet hier -- anders staat er
+       op twee plekken wat een geldige tabel is, en dan lopen ze uit elkaar. */
+    if (r.loonheffing != null) for (const b of loonheffing.keurTabel(r.loonheffing)) bez.push(b);
+
     const [minP, maxP] = AANNEMELIJK.percentage;
     for (const veld of ['vakantiegeld', 'zvw']) {
       const p = r[veld];

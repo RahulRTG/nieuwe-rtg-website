@@ -129,6 +129,7 @@
         <button class="knop" id="osKeur">Goedkeuren als administrateur</button>
         <button class="knop" id="osDef">Definitief maken</button>
         <button class="knop" id="osJournaal">Loonjournaal</button>
+        <button class="knop" id="osAangifte">Loonaangifte</button>
       </div>
       <div class="noot" style="margin-top:.45rem;">Definitief kan pas als de manager van de zaak ook heeft getekend, de bevindingen met ernst <b>hoog</b> zijn afgehandeld, en het regelpakket is aangemerkt.</div>
       <div id="osNaRun" style="margin-top:.6rem;"></div>
@@ -426,6 +427,58 @@ $('#osJournaal').addEventListener('click', async () => {
       '<span class="r">' + (r.debetCenten ? 'debet ' + eurC(r.debetCenten) : 'credit ' + eurC(r.creditCenten)) + '</span></div>').join('') +
       '<div class="noot">Debet ' + eur(d.somDebet) + ' tegenover credit ' + eur(d.somCredit) + ' - de boeking telt op tot nul.</div>';
   } catch (e) { $('#osNaRun').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; }
+});
+
+/* ---------- de loonaangifte ----------
+   De derde uitgang uit dezelfde run. Het scherm doet twee dingen die niet
+   losgekoppeld mogen raken: het toont de aangifte EN de aansluiting op het
+   loonjournaal. Twee wegen naar dezelfde loonheffing; lopen ze uiteen, dan
+   staat dat hier, voor het indienen -- en niet bij een controle over drie jaar.
+
+   Indienen vraagt om het kenmerk van de Belastingdienst. Dat is geen formulier
+   dat om een veld zeurt: zonder kenmerk is "ingediend" een bewering zonder
+   bewijs, en juist dat bewijs heb je bij een controle nodig. */
+async function toonAangifte(a){
+  let aansluiting = '';
+  try {
+    const s = await api('aangifte/aansluiting', { id: a.id });
+    aansluiting = '<div class="noot">Aangifte en loonjournaal sluiten aan: ' + eurC(s.loonheffingCenten) + ' loonheffing.</div>';
+  } catch (e) {
+    aansluiting = '<div class="regel"><b>' + bevPil('hoog') + ' ' + esc(e.message) + '</b></div>';
+  }
+  const rubriek = (naam, c) => '<div class="regel"><b>' + esc(naam) + '</b><span class="r">' + eurC(c) + '</span></div>';
+  $('#osNaRun').innerHTML = '<div class="sec">Loonaangifte ' + esc(a.periode) + ' · ' + esc(a.soort) +
+    ' · ' + esc(a.stand) + '</div>' +
+    (a.corrigeert ? '<div class="noot">Correctie op een eerdere aangifte; die blijft staan.</div>' : '') +
+    (a.let ? '<div class="regel"><b>' + bevPil('midden') + ' ' + esc(a.let) + '</b></div>' : '') +
+    rubriek('Loon voor de loonheffing', a.totalen.loonLoonheffing) +
+    rubriek('Ingehouden loonheffing', a.totalen.ingehoudenLoonheffing) +
+    rubriek('Premies werkgever', a.totalen.premiesWerkgever) +
+    rubriek('Zvw werkgever', a.totalen.zvwWerkgever) +
+    '<div class="regel"><b>Te betalen aan de Belastingdienst</b><span class="r"><b>' +
+      eurC(a.teBetalenCenten) + '</b></span></div>' +
+    '<div class="noot" style="margin-top:.4rem;">' + a.nominatief.length +
+      ' werknemer(s) in het nominatieve deel; de optelling daarvan IS het bedrag hierboven.</div>' +
+    aansluiting +
+    (a.stand === 'ingediend'
+      ? '<div class="noot">Ingediend door ' + esc(a.ingediendDoor) + ' op ' + esc(String(a.ingediendOp).slice(0, 10)) +
+        ', kenmerk ' + esc(a.kenmerk) + '.</div>'
+      : '<button class="knop" id="osDienIn" style="margin-top:.5rem;">Vastleggen als ingediend</button>' +
+        '<div class="noot" style="margin-top:.35rem;">RTG verstuurt de aangifte niet zelf; dit legt vast DAT hij is ingediend, met het kenmerk van de Belastingdienst erbij.</div>');
+
+  const d = document.getElementById('osDienIn');
+  if (d) d.addEventListener('click', async () => {
+    const kenmerk = prompt('Welk kenmerk gaf de Belastingdienst terug?\n\nZonder kenmerk is "ingediend" een bewering zonder bewijs.');
+    if (!kenmerk) return;
+    try { const r = await api('aangifte/indienen', { id: a.id, kenmerk }); meld(r.let); toonAangifte(r.aangifte); }
+    catch (e) { meld(e.message); }
+  });
+}
+
+$('#osAangifte').addEventListener('click', async () => {
+  if (!OSRUN) return;
+  try { const d = await api('aangifte', { runId: OSRUN.id }); await toonAangifte(d.aangifte); }
+  catch (e) { $('#osNaRun').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; }
 });
 /* Pas beginnen als er een kantoorsessie is. Zonder token stuurt uitgelogd()
    hierboven al door, maar de navigatie is niet meteen klaar en intussen liep

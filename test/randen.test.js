@@ -163,17 +163,32 @@ test('een kapotte kaart maakt het beginscherm niet zwart', () => {
     'stap() vangt een struikelende kaart op');
   assert.match(bron, /console\.error\('\[rtg\] onderdeel "' \+ naam/,
     'en noemt hem bij naam, anders is het nog steeds een raadsel');
-  /* Het beginscherm gaat rechtstreeks door stap(); de tabbladen erachter gaan
-     door naBeeld(), dat ze een voor een NA het eerste beeld draait en daarbij
-     dezelfde stap() gebruikt. Allebei tellen als "door het vangnet", en dit
-     onderscheid is de reden dat de app op een telefoon niet meer minutenlang
-     leeg staat. */
+  /* Het beginscherm gaat rechtstreeks door stap(). De tabbladen erachter gingen
+     door naBeeld() -- een voor een NA het eerste beeld, met dezelfde stap().
+
+     DAT IS SINDSDIEN VERANDERD, en deze toets is meeverhuisd naar de eigenschap
+     in plaats van naar het mechanisme. Uitstellen bleek niet genoeg: gemeten
+     kostte een keer de app openen 66 API-verzoeken, want ALLE tabbladen werden
+     gevuld terwijl je er een ziet. Drie keer openen liep tegen de eigen
+     verzoeklimiet. Een tabblad haalt zijn gegevens nu op als je hem OPENT
+     (vulTab in app-main-12.js).
+
+     Wat onveranderd moet blijven -- en dat is wat deze toets bewaakt -- is dat
+     elke lader door hetzelfde vangnet loopt. Struikelt er een, dan staat de rest
+     er gewoon en zegt de console welke het was. Zowel naBeeld() als vulTab()
+     roepen stap() aan; wie een derde weg toevoegt die dat niet doet, loopt hier
+     tegenaan. */
   assert.match(bron, /stap\('renderHome', renderHome\)/, 'het beginscherm loopt door het vangnet');
-  assert.match(bron, /function naBeeld\(stappen\)/, 'de tabbladen gaan na het eerste beeld');
-  for (const laat of ['renderSalon', 'renderTerPlaatse', 'laadBestellen', 'laadTickets']) {
-    assert.match(bron, new RegExp("\\['" + laat + "', " + laat + "\\]"),
-      laat + ' staat in de uitgestelde rij, en die loopt zelf door stap()');
+  assert.match(bron, /function naBeeld\(stappen\)/, 'de losse laders gaan na het eerste beeld');
+  assert.match(bron, /function vulTab\(tab\)/, 'een tabblad vult zich als je hem opent');
+  assert.match(bron, /for \(const \[naam, fn\] of lijst\) stap\(naam, fn\)/,
+    'en vulTab draait elke lader door hetzelfde vangnet');
+  for (const laat of ['renderSalon', 'renderTerPlaatse', 'laadTickets']) {
+    assert.match(bron, new RegExp("\\['" + laat + "', \\(\\) => " + laat + "\\(\\)\\]"),
+      laat + ' hangt aan een tabblad en loopt dus door stap()');
   }
+  assert.match(bron, /\['laadBestellen', laadBestellen\]/,
+    'laadBestellen hangt aan geen enkel tabblad en blijft in de uitgestelde rij');
   assert.match(bron, /const \[naam, fn\] = stappen\[i\+\+\];\s*stap\(naam, fn\)/,
     'en naBeeld draait elke stap door hetzelfde vangnet');
   assert.ok(!/\n\s+renderHome\(\);/.test(bron),

@@ -9,7 +9,10 @@ module.exports = (kern) => {
 
   const maakTellers = new Map(); // ip -> [timestamps]
   app.post('/api/les/maak', async (req, res) => {
-    const ip = String(req.ip || req.headers['x-forwarded-for'] || 'x');
+    // req.ip is het zorgvuldig afgeleide adres (server/web/verrijk.js: van
+    // rechts, alleen bij een vertrouwde proxy). De kop zelf terugvallen zou
+    // de aanvaller zijn eigen teller laten kiezen; liever een vaste emmer.
+    const ip = String(req.ip || 'onbekend');
     const t = Date.now();
     const rij = (maakTellers.get(ip) || []).filter(x => t - x < 3600000);
     if (rij.length >= 20) return res.status(429).json({ error: 'Rustig aan: maximaal twintig lessen per uur.' });

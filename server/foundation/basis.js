@@ -62,7 +62,22 @@ module.exports = function maakBasis() {
     pogingen.set(bucket, f);
   }
   function goedePoging(bucket) { pogingen.delete(bucket); }
-  const ipVan = req => String((req.headers['x-forwarded-for'] || '').split(',')[0].trim() || (req.socket && req.socket.remoteAddress) || 'onbekend');
+  /* HET ADRES VAN DE AANROEPER -- EN NIET HET ADRES DAT HIJ ZELF OPGEEFT.
+
+     Hier stond een eigen lezer die x-forwarded-for van LINKS pakte. Dat is
+     precies de kant die de client zelf vult: wie bij elke poging een ander
+     adres meestuurt, krijgt telkens een verse teller en raakt de grens nooit.
+     De rem op het RADEN van een gezinscode was daarmee met een enkele kop uit
+     te zetten -- en achter zo'n code van zes tekens liggen kinderprofielen
+     zonder pincode, met hun locatie en hun gezondheidsgegevens.
+
+     De server leidt het echte adres al zorgvuldig af in server/web/verrijk.js:
+     van RECHTS, en alleen bij een vertrouwde proxy, juist om deze vervalsing
+     tegen te houden. server/trio.js plakt het echte adres ook rechts aan. Er
+     was dus al een goed antwoord; deze regel was een tweede, slechter antwoord
+     op dezelfde vraag. Twee bronnen voor een waarheid betekent dat de zwakste
+     wint zodra iemand hem gebruikt. */
+  const ipVan = req => String(req.ip || (req.socket && req.socket.remoteAddress) || 'onbekend');
 
   let anthropic = null;
   if (process.env.ANTHROPIC_API_KEY) {

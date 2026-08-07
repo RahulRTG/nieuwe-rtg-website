@@ -63,6 +63,14 @@ const BELEID = [
      altijd blijft. */
   { tak: 'memberChats', label: 'gesprekken tussen leden (oud archief)', dagen: 2 * JAAR / DAG, grond: 'nodig',
     vorm: 'mapVanLijsten', datum: 'at', waarom: 'verhuisd naar commBerichten; wat er nog staat verloopt gewoon' },
+  /* En de collegaberichten van de werkvloer, om dezelfde reden bevroren. Deze
+     tak had NOOIT een termijn -- ook niet voor de verhuizing -- en dat viel
+     niet op omdat de gatenlijst per tak kijkt en niemand hem miste. Een chat
+     tussen twee collega's over de late dienst van drie jaar geleden is geen
+     bedrijfsadministratie; hij verloopt. */
+  { tak: 'collegaChats', label: 'collegaberichten op de werkvloer (oud archief)', dagen: 2 * JAAR / DAG,
+    grond: 'nodig', vorm: 'mapVanLijsten', datum: 'at',
+    waarom: 'verhuisd naar commBerichten; wat er nog staat verloopt gewoon' },
   /* De standen (gelezen tot, vastgezet, stilgezet) dragen GEEN datum en kunnen
      dus niet verlopen -- er valt ook niets aan te bewaren: het is geen inhoud
      maar een schakelaarstand per gesprek. Ze staan hier genoemd zodat de

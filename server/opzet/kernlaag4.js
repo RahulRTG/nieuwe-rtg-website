@@ -158,6 +158,11 @@ kern.commBronnen = require('../kern/comm/bronnen').maakBronnen({ db,
    die er per paar eenmalig bij wordt gehaald. Zo is er nog maar een plek waar
    deze gesprekken staan. */
 kern.commDm = require('../kern/comm/dm').maakCommDm({ db, save, comm: kern.comm, dmSleutel: kern.dmSleutel });
+/* En dezelfde brug voor de collegaberichten op de werkvloer (kern/comm/
+   collega.js). Die kon pas verhuizen sinds een deelnemer ook een mens BINNEN
+   EEN ZAAK kan zijn; routes/staff/collega.js schrijft er sindsdien in, met
+   dezelfde antwoordvorm zodat de PDA en de zaak-app niets merken. */
+kern.commCollega = require('../kern/comm/collega').maakCommCollega({ db, save, comm: kern.comm });
 kern.commAi = require('../kern/berichten/ai')({
   // de kern gooit als een gesprek niet van jou is; de AI-laag verwacht null
   draad: (mijKey, gesprekId) => { try { return kern.comm.draad(mijKey, gesprekId); } catch (e) { return null; } },

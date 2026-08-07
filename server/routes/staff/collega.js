@@ -2,7 +2,7 @@
    oproepen (buzz/walkie) en de onderlinge collega-DM's. Krijgt de gedeelde
    context een keer bij het opstarten vanuit routes/staff.js. */
 module.exports = (actx) => {
-  const { DEMO, accounts, app, checkCred, crypto, db, findStaffPartner, hasCred, klokVan, logActivity, managerOnly, notifySupplier, publicPartner, save, schoon, sseClients, sseSend, sseToOffice, sseToSupplier, supplierAuth, trustVan } = actx;
+  const { DEMO, accounts, app, checkCred, commCollega, crypto, db, findStaffPartner, hasCred, klokVan, logActivity, managerOnly, notifySupplier, publicPartner, save, schoon, sseClients, sseSend, sseToOffice, sseToSupplier, supplierAuth, trustVan } = actx;
   const { fluisterZeg, fluisterVergeet, fluisterFocus, fluisterProfiel } = actx.fluister;
 /* Het urenoverzicht voor de zaak: wie is er nu binnen, wie werkte wanneer en
    hoelang (vandaag en deze week). Elke medewerker klokt via de PDA; het
@@ -74,14 +74,18 @@ app.post('/api/staff/call', supplierAuth, (req, res) => {
 
 /* Collega tegen collega: een direct chatbericht, van toestel naar toestel.
    De lijst toont wie er ingeklokt en online is; het gesprek zelf blijft
-   tussen de twee collega's en komt bewust niet in het activiteitenlog. */
-const dmSleutel = (a, b) => (a < b ? a + '-' + b : b + '-' + a);
-const dmVan = (code, a, b) => {
-  const zaak = db.data.collegaChats[code] = db.data.collegaChats[code] || {};
-  const key = dmSleutel(a, b);
-  zaak[key] = zaak[key] || { messages: [], unread: {}, lastAt: null };
-  return zaak[key];
-};
+   tussen de twee collega's en komt bewust niet in het activiteitenlog.
+
+   DEZE DRIE ROUTES SCHRIJVEN SINDS DE VERHUIZING IN DE KERN (kern/comm/
+   collega.js) en niet meer in db.data.collegaChats. Wat hier BLIJFT staan zijn
+   de controles -- een persoonlijke login, en staat de ander echt bij deze zaak
+   op de lijst -- want die gaan over personeel en niet over berichten.
+
+   De VORM van het antwoord verandert niet ({ van, naam, text, at }), zodat
+   public/shared/collegachat.js en de PDA niets merken. Dat is met opzet: een
+   verhuizing van de opslag hoort niet zichtbaar te zijn in een scherm, want
+   dan zijn het twee veranderingen tegelijk en weet je bij een storing niet
+   welke van de twee het deed. */
 const dmCollega = (req, res) => {
   const ander = parseInt(req.body.staffId, 10);
   const st = Number.isFinite(ander) ? accounts.getStaffById(ander) : null;
@@ -95,18 +99,17 @@ const dmCollega = (req, res) => {
 app.post('/api/staff/dm/lijst', supplierAuth, (req, res) => {
   if (!req.actor.staffId) return res.status(403).json({ error: 'Alleen met een persoonlijke login.' });
   const klok = db.data.klok[req.supplier.code] || [];
-  const zaak = db.data.collegaChats[req.supplier.code] || {};
   const online = new Set(sseClients.filter(c => c.sup === req.supplier.code && c.staffId != null).map(c => c.staffId));
   const collegas = accounts.listStaff(req.supplier.code).map(accounts.publicStaff)
     .filter(m => m.id !== req.actor.staffId)
     .map(m => {
-      const t = zaak[dmSleutel(req.actor.staffId, m.id)];
+      const laatste = commCollega.laatste(req.supplier.code, req.actor.staffId, m.id);
       return {
         id: m.id, name: m.name, func: m.func || '', role: m.role,
         binnen: !!klok.find(e => e.staffId === m.id && !e.out),
         online: online.has(m.id),
-        ongelezen: t ? (t.unread[req.actor.staffId] || 0) : 0,
-        laatste: t && t.messages.length ? t.messages[t.messages.length - 1].text.slice(0, 60) : ''
+        ongelezen: commCollega.ongelezen(req.supplier.code, req.actor.staffId, m.id),
+        laatste: laatste ? String(laatste.text || '').slice(0, 60) : ''
       };
     });
   res.json({ ok: true, collegas });
@@ -116,9 +119,11 @@ app.post('/api/staff/dm/history', supplierAuth, (req, res) => {
   if (!req.actor.staffId) return res.status(403).json({ error: 'Alleen met een persoonlijke login.' });
   const st = dmCollega(req, res);
   if (!st) return;
-  const t = dmVan(req.supplier.code, req.actor.staffId, st.id);
-  if (t.unread[req.actor.staffId]) { t.unread[req.actor.staffId] = 0; save(); }
-  res.json({ ok: true, metWie: st.name, messages: t.messages.slice(-100) });
+  const naam = (id) => (Number(id) === req.actor.staffId ? req.actor.name : st.name);
+  const messages = commCollega.berichten(req.supplier.code, req.actor.staffId, st.id, 100, naam);
+  // het openen IS het lezen: dat deed de oude route ook (unread op nul)
+  commCollega.markeerGelezen(req.supplier.code, req.actor.staffId, st.id);
+  res.json({ ok: true, metWie: st.name, messages });
 });
 
 app.post('/api/staff/dm/send', supplierAuth, (req, res) => {
@@ -127,18 +132,15 @@ app.post('/api/staff/dm/send', supplierAuth, (req, res) => {
   if (!st) return;
   const text = schoon(req.body.text, 500);
   if (!text) return res.status(400).json({ error: 'Leeg bericht.' });
-  const t = dmVan(req.supplier.code, req.actor.staffId, st.id);
-  t.messages.push({ van: req.actor.staffId, naam: req.actor.name, text, at: new Date().toISOString() });
-  t.messages = t.messages.slice(-200);
-  t.unread[st.id] = (t.unread[st.id] || 0) + 1;
-  t.lastAt = new Date().toISOString();
-  save();
+  const naam = (id) => (Number(id) === req.actor.staffId ? req.actor.name : st.name);
+  commCollega.stuur(req.supplier.code, req.actor.staffId, st.id, text, { naamVan: naam });
   // alleen het toestel van de ontvanger krijgt het signaal (geen omroep)
   let bezorgd = 0;
   for (const c of sseClients) {
     if (c.sup === req.supplier.code && c.staffId === st.id) { sseSend(c.res, 'dm', { vanId: req.actor.staffId, van: req.actor.name, text }); bezorgd++; }
   }
-  res.json({ ok: true, bezorgd, messages: t.messages.slice(-100) });
+  res.json({ ok: true, bezorgd,
+    messages: commCollega.berichten(req.supplier.code, req.actor.staffId, st.id, 100, naam) });
 });
 
 };

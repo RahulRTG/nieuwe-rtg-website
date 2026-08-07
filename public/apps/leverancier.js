@@ -198,7 +198,7 @@
     doors:    { label:'Deuren',    svg:'<rect x="5" y="3" width="14" height="18" rx="1.5"/><circle cx="15" cy="12" r="1.2"/><path d="M5 21h14"/>', cap:'doors' },
     gasten:   { label:'Gasten',    svg:'<circle cx="12" cy="7.5" r="3"/><path d="M5.5 20c.7-3.6 3.2-5.5 6.5-5.5s5.8 1.9 6.5 5.5"/><path d="M12 14.5v2M12 19v.5"/>' },
     location: { label:'Locatie',   svg:'<path d="M12 21s7-5.5 7-11a7 7 0 0 0-14 0c0 5.5 7 11 7 11z"/><circle cx="12" cy="10" r="2.5"/>', cap:'location' },
-    gchat:    { label:'Gastchat',  svg:'<path d="M21 12a8 8 0 0 1-8 8H4l2.5-3A8 8 0 1 1 21 12z"/><path d="M8.5 12h.01M12 12h.01M15.5 12h.01"/>' },
+    gchat:    { label:'Berichten',  svg:'<path d="M21 12a8 8 0 0 1-8 8H4l2.5-3A8 8 0 1 1 21 12z"/><path d="M8.5 12h.01M12 12h.01M15.5 12h.01"/>' },
     ai:       { label:'AI',        svg:'<path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"/><path d="M19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z"/>' },
     meer:     { label:'Meer',      svg:'<rect x="4" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="4" width="6.5" height="6.5" rx="1.5"/><rect x="4" y="13.5" width="6.5" height="6.5" rx="1.5"/><rect x="13.5" y="13.5" width="6.5" height="6.5" rx="1.5"/>' },
     contract: { label:'Contracten', svg:'<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h4"/><path d="M14.5 18.5l1.5 1.5 3-3"/>' },
@@ -5757,7 +5757,7 @@
     $('#supType').textContent = tType(S.typeLabel) + ' · ' + S.city;
     renderActor();
     if (stationMode){ renderStation(); return; }
-    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderBezorg(); renderTickets(); renderVerhuur(); renderCharter(); renderVastgoed(); renderVracht(); renderGebouw(); renderGolf(); renderFitclub(); renderBeauty(); renderPetcare(); renderOpvang(); renderMarina(); renderWeddings(); renderAdvies(); renderPolis(); renderZorgpolis(); renderAlpine(); renderBoerderij(); renderCreator(); renderSamenwerking(); renderFacturen(); renderRtfMarkt(); renderRetail(); renderModeBezorg(); renderWinkelvloer(); renderZorgbalieLev(); renderVerkoop(); renderGroothandel(); renderInkoop(); renderZaakBoard(); renderBeveiliging(); renderPaspoort(); renderContracten(); renderOnbCfg(); renderRooms(); renderDorp(); renderMinibar(); renderKlussen(); renderTafels(); renderBeheer(); renderDoors(); renderGasten(); renderGChat(); renderPage(); renderTeam(); renderBorden(); renderReviews(); renderVoorraad(); renderMeer(); renderAIChips();
+    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderBezorg(); renderTickets(); renderVerhuur(); renderCharter(); renderVastgoed(); renderVracht(); renderGebouw(); renderGolf(); renderFitclub(); renderBeauty(); renderPetcare(); renderOpvang(); renderMarina(); renderWeddings(); renderAdvies(); renderPolis(); renderZorgpolis(); renderAlpine(); renderBoerderij(); renderCreator(); renderSamenwerking(); renderFacturen(); renderRtfMarkt(); renderRetail(); renderModeBezorg(); renderWinkelvloer(); renderZorgbalieLev(); renderVerkoop(); renderGroothandel(); renderInkoop(); renderZaakBoard(); renderBeveiliging(); renderPaspoort(); renderContracten(); renderOnbCfg(); renderRooms(); renderDorp(); renderMinibar(); renderKlussen(); renderTafels(); renderBeheer(); renderDoors(); renderGasten(); renderGChat(); laadInbox(); renderPage(); renderTeam(); renderBorden(); renderReviews(); renderVoorraad(); renderMeer(); renderAIChips();
     // Zorg dat het actieve tabblad ook echt zichtbaar is: de tabbar-knop staat al
     // op 'active', maar zonder deze aanroep krijgt geen enkele .view de active-klasse
     // en blijft het overzicht leeg bij de eerste render.
@@ -7444,21 +7444,67 @@
     }));
   }
 
-  // ---- gastchat: berichten van gasten beantwoorden ----
+  /* ---- BERICHTEN: EEN LIJST, DRIE SOORTEN DRAAD ----
+
+     Hier stonden drie plekken waar iets kon liggen: de gastchat, de
+     sollicitaties (in het team-tabblad) en de collega's (in een paneel). Voor
+     wie er werkt is dat drie keer kijken of er iets is, terwijl het onderhuids
+     allemaal gesprekken uit dezelfde kern zijn. De LIJST is daarom een: hij
+     komt van /api/supplier/comm/inbox, en die zegt per gesprek zelf welke deur
+     erbij hoort (het veld `open`).
+
+     De DRADEN blijven wel apart, en dat is geen halfheid maar een keuze. De
+     gastchat kan de Salon van de klant tonen en vertaalt per kijker; de
+     sollicitatiechat hangt aan de werk-module met haar eigen controles; de
+     collega-DM is een paneel dat in elke werk-app zit. Die drie samenvoegen
+     zou functies kosten in ruil voor uniformiteit -- en de winst zat in het
+     ZOEKEN, niet in het typen.
+
+     Valt de ene lijst weg (oude server, netwerk), dan staan de gastgesprekken
+     er nog gewoon uit state.guestChats. Een nieuw scherm hoort niet minder te
+     tonen dan het oude als er iets hapert. */
   let gchatKey = null; // open gesprek
+  let inboxRijen = null; // de ene lijst; null = nog niet opgehaald
+  async function laadInbox(){
+    try {
+      const d = await API.call('/supplier/comm/inbox', {});
+      inboxRijen = (d.gesprekken || []).filter(g => g.open);
+    } catch (e) { inboxRijen = null; }
+    renderGChat();
+  }
+  /* De terugval: de gastgesprekken zoals ze er altijd stonden. Zo is deze
+     verbouwing omkeerbaar en kost een hapering niets. */
+  const alsRij = c => ({ titel: c.codename, bij: c.dept, laatste: c.last, at: c.lastAt,
+    ongelezen: c.unread, vanMij: c.lastFrom === 'partner', open: { soort: 'gast', sleutel: c.key } });
+  function berichtRijen(){
+    if (inboxRijen && inboxRijen.length) {
+      return inboxRijen.map(g => ({ titel: g.titel, bij: (g.open.dept || SOORTNAAM(g.open.soort)),
+        laatste: g.laatste, at: g.at, ongelezen: g.ongelezen, vanMij: g.laatsteVanMij, open: g.open }));
+    }
+    return (state.guestChats || []).map(alsRij);
+  }
+  const SOORTNAAM = s => s === 'werk' ? T('gc.s.werk','Sollicitatie')
+    : s === 'collega' ? T('gc.s.collega','Collega') : T('gc.s.gast','Gast');
+
   function renderGChat(){
     const el = $('#gchatWrap'); if (!el) return;
     const chats = state.guestChats || [];
     if (gchatKey && !chats.find(c => c.key === gchatKey)) gchatKey = null;
     if (!gchatKey){
-      el.innerHTML = '<div class="card">' + (chats.length ? chats.map(c =>
-        '<button class="gc-row" data-gchat="' + c.key + '">' +
-          '<span class="av">' + c.codename.split(' ').map(w=>w[0]).slice(0,2).join('') + '</span>' +
-          '<span class="gt"><b>' + c.codename + ' <em class="gc-dept">' + c.dept + '</em>' + (c.unread ? ' <i class="gc-unread">' + c.unread + '</i>' : '') + '</b>' +
-          '<span>' + (c.lastFrom === 'partner' ? T('gc.you','U: ') : '') + c.last + ' · ' + timeAgo(c.lastAt) + '</span></span>' +
+      const rijen = berichtRijen();
+      el.innerHTML = '<div class="card">' + (rijen.length ? rijen.map((r, i) =>
+        '<button class="gc-row" data-bericht="' + i + '">' +
+          '<span class="av">' + String(r.titel || '?').split(' ').map(w=>w[0]).slice(0,2).join('') + '</span>' +
+          '<span class="gt"><b>' + r.titel + ' <em class="gc-dept">' + r.bij + '</em>' + (r.ongelezen ? ' <i class="gc-unread">' + r.ongelezen + '</i>' : '') + '</b>' +
+          '<span>' + (r.vanMij ? T('gc.you','U: ') : '') + (r.laatste || '') + ' · ' + timeAgo(r.at) + '</span></span>' +
         '</button>'
       ).join('') : '<div class="softline">' + T('gc.none','Nog geen gesprekken. Berichten van gasten verschijnen hier live.') + '</div>') + '</div>';
-      el.querySelectorAll('[data-gchat]').forEach(b => b.addEventListener('click', () => { gchatKey = b.dataset.gchat; klantSalonOpen = false; renderGChat(); openTab('gchat'); }));
+      el.querySelectorAll('[data-bericht]').forEach(b => b.addEventListener('click', () => {
+        const r = rijen[Number(b.dataset.bericht)]; if (!r) return;
+        if (r.open.soort === 'werk') return openApChat(r.open.sleutel, r.titel);
+        if (r.open.soort === 'collega') return window.CollegaChat && CollegaChat.open(r.open.staffId, r.titel);
+        gchatKey = r.open.sleutel; klantSalonOpen = false; renderGChat(); openTab('gchat');
+      }));
       return;
     }
     const meta = chats.find(c => c.key === gchatKey);

@@ -114,6 +114,62 @@ test('twee collegas praten via de kern, en de zaak leest niet mee', async () => 
   });
 });
 
+/* EEN LIJST IN PLAATS VAN DRIE, en dit is de toets die dat waarmaakt.
+
+   De zaak-app had drie plekken waar iets kon liggen: de gastchat, de
+   sollicitaties en de collega's. Onderhuids zijn dat allemaal gesprekken uit
+   dezelfde kern, dus hoort er een lijst te zijn -- een mens die wil weten of
+   er iets is, kijkt op een plek.
+
+   De DRADEN blijven wel apart (de gastchat toont de Salon van de klant, de
+   sollicitatiechat hangt aan de werk-module met haar eigen controles). Wat de
+   lijst dus moet dragen is de deur: welk soort draad, en met welke sleutel hij
+   opengaat. Zonder dat zou het scherm die sleutel uit de titel moeten raden --
+   precies hoe een scherm stil aan een opslagvorm vast komt te zitten. */
+test('de zakelijke inbox is EEN lijst, en zegt zelf welke deur bij elk gesprek hoort', async () => {
+  await metServer(async (base) => {
+    const eigen = await zaakVolk(base, 'KIKUNOI');
+    const lid = await post(base, '/api/login', { tier: 'rtg', pasApp: 'rtg' });
+    assert.ok(lid.token, 'demo-inlog');
+
+    // 1. een collega-gesprek
+    assert.ok((await post(base, '/api/supplier/comm/collega', { staffId: eigen.B.id }, eigen.A.token)).ok);
+    // 2. een gastgesprek: het lid schrijft de zaak aan
+    const g = await post(base, '/api/partner/chat/send',
+      { supplierCode: 'KIKUNOI', dept: 'Team', text: 'is de keuken nog open?' }, lid.token);
+    assert.ok(g.ok, 'de gast schrijft: ' + (g.error || ''));
+
+    const inbox = await post(base, '/api/supplier/comm/inbox', {}, eigen.A.token);
+    assert.ok(inbox.ok, inbox.error || '');
+    const soorten = (inbox.gesprekken || []).map((x) => x.open && x.open.soort).filter(Boolean);
+    assert.ok(soorten.includes('collega'), 'de collega-DM staat in de ene lijst: ' + soorten.join(','));
+    assert.ok(soorten.includes('gast'), 'en het gastgesprek ook: ' + soorten.join(','));
+
+    /* De deur van een gastgesprek moet PRECIES dezelfde sleutel dragen als de
+       zaak-state al gebruikt, en dat is een scherpere eis dan "hij opent".
+
+       Hier stond eerst alleen een vormcontrole plus "de route accepteert hem".
+       Dat was groen terwijl het scherm niets deed: de route strippt een
+       voorvoegsel en slikt dus twee vormen, maar de app VERGELIJKT de sleutel
+       uit de lijst met die uit zijn eigen state -- en die twee waren net
+       ongelijk. Gevonden door de app echt te bedienen, niet door deze toets.
+       Vandaar dat hij nu de twee sleutels naast elkaar legt. */
+    const staat = await post(base, '/api/supplier/state', {}, eigen.A.token);
+    const uitState = ((staat.state || {}).guestChats || [])[0];
+    assert.ok(uitState, 'de zaak-state kent het gastgesprek');
+    const gastRij = inbox.gesprekken.find((x) => x.open && x.open.soort === 'gast');
+    assert.equal(gastRij.open.sleutel, uitState.key,
+      'de deur uit de lijst is dezelfde sleutel als in de zaak-state');
+    const draad = await post(base, '/api/supplier/chat/history', { key: gastRij.open.sleutel }, eigen.A.token);
+    assert.ok(draad.messages && draad.messages.length, 'en die sleutel opent de draad echt');
+
+    // de collega-deur draagt het nummer waarmee het bestaande paneel opengaat
+    const colRij = inbox.gesprekken.find((x) => x.open && x.open.soort === 'collega');
+    assert.equal(colRij.open.staffId, eigen.B.id, 'de collega-deur wijst de juiste collega aan');
+    assert.equal(colRij.gedeeld, false, 'en een collega-DM is niet van het hele team');
+  });
+});
+
 test('een zaak komt niet in het gesprek van twee leden', async () => {
   await metServer(async (base) => {
     const A = await post(base, '/api/login', { tier: 'rtg', pasApp: 'rtg' });

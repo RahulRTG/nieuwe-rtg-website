@@ -61,6 +61,50 @@ module.exports = (kern) => {
     return sleutel;
   }
 
+  /* HOE JE DIT GESPREK OPENT, en waarom dat hier staat en niet in de app.
+
+     De zaak-app had drie lijsten: gastchat, sollicitaties en collega's. Elk met
+     een eigen tabblad, een eigen teller en een eigen "is er nog iets?" -- terwijl
+     het onderhuids allemaal gesprekken uit dezelfde kern zijn. Een mens die
+     wil weten of er iets ligt, hoort niet op drie plekken te kijken.
+
+     De LIJST wordt daarom een. De DRADEN blijven waar ze zijn: de gastchat kan
+     de Salon van de klant tonen en vertaalt per kijker, de sollicitatiechat
+     hangt aan de werk-module met haar eigen controles, en de collega-DM is een
+     paneel in elke werk-app. Die drie zijn niet hetzelfde en samenvoegen zou
+     functies kosten in ruil voor uniformiteit.
+
+     Wat de app dan nog mist is de sleutel waarmee zo'n draad opengaat, en die
+     staat in de meta van het gesprek -- bij de kern dus, niet in het scherm.
+     Vandaar dit veld: de lijst zegt zelf welke deur erbij hoort. Zonder dat
+     zou de app de meta moeten raden uit de titel, en dat is precies hoe een
+     scherm stil aan een opslagvorm vast komt te zitten. */
+  function hoeTeOpenen(gesprekId, sleutel) {
+    const g = comm.gesprekVan(gesprekId);
+    const m = (g && g.meta) || {};
+    if (m.bron === 'Zaak' && m.zaak) {
+      const lid = (g.deelnemers || []).find((d) => wie.isLid(d)) || '';
+      /* MET het voorvoegsel 'gast:', want zo heet deze sleutel al in de
+         zaak-state (kern/comm/gast.js, voorZaak). De chat-route slikt beide
+         vormen -- hij strippt het voorvoegsel -- en dat maakte dit verschil
+         onzichtbaar in een toets die alleen kijkt of de deur OPENT. Op het
+         scherm niet: daar wordt deze sleutel VERGELEKEN met die uit de state,
+         en dan opent de rij gewoon niets. Een sleutel heeft een vorm, niet
+         twee. */
+      return { soort: 'gast', sleutel: 'gast:' + m.zaak + '|' + lid + '|' + (m.dept || 'Team'), dept: m.dept || 'Team' };
+    }
+    if (m.bron === 'Werk' && m.sleutel) {
+      return { soort: 'werk', sleutel: String(m.sleutel).replace(/^werk:/, ''), metWie: m.metWie || null };
+    }
+    /* Wat overblijft is een gesprek tussen twee mensen van deze zaak: de
+       collega-DM. De ander is de deelnemer die ik niet ben, en zijn nummer is
+       waarmee het bestaande paneel opengaat. */
+    const ander = (g.deelnemers || []).find((d) => d !== sleutel);
+    const a = ander ? wie.ontleed(ander) : null;
+    if (a && a.soort === 'mens') return { soort: 'collega', staffId: a.nummer };
+    return null;
+  }
+
   /* De inbox van de zaak EN de eigen gesprekken in een lijst. Twee aanroepen
      van dezelfde kern en geen samengevoegde query: de kern kent een deelnemer,
      niet een verzameling deelnemers, en die grens hier oprekken zou betekenen
@@ -73,10 +117,11 @@ module.exports = (kern) => {
       for (const sleutel of a.alle) {
         comm.levensteken(sleutel);
         for (const g of comm.inbox(sleutel, { lade: req.body.lade, archief: !!req.body.archief }).gesprekken) {
-          /* De twee eigen velden staan ACHTERAAN: kwam er ooit een `alsWie` of
-             `gedeeld` uit de kern, dan hoort de route te winnen -- dit is wat
-             zij weet en de kern niet. */
-          uit.push(Object.assign({}, g, { alsWie: sleutel, gedeeld: sleutel === a.zaak }));
+          /* De drie eigen velden staan ACHTERAAN: kwam er ooit een `alsWie`,
+             `gedeeld` of `open` uit de kern, dan hoort de route te winnen --
+             dit is wat zij weet en de kern niet. */
+          uit.push(Object.assign({}, g, { alsWie: sleutel, gedeeld: sleutel === a.zaak,
+            open: hoeTeOpenen(g.id, sleutel) }));
         }
       }
       uit.sort((x, y) => (y.vast ? 1 : 0) - (x.vast ? 1 : 0) ||

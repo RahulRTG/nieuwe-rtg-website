@@ -191,25 +191,7 @@
     (document.head || document.documentElement).appendChild(st);
   })();
 
-  /* HEEFT DIT SCHERM ZIJN EIGEN RAHUL AL? Dan geen tweede balk.
-
-     Dit stond als `/\/apps\/app\.html$/.test(location.pathname)`, en dat was
-     precies één regel te letterlijk. Het leden-OS wordt namelijk niet alleen
-     op /apps/app.html geserveerd: server/middleware/voordeur.js stuurt /,
-     /apps/, /apps/index.html en /apps/bureau.html naar hetzelfde bestand,
-     zonder omleiding. De browser ziet dan pad "/" -- de toets faalt, deze laag
-     denkt dat ze op een gewone app-pagina staat, en zet zijn balk ONDER de
-     chatbalk die het beginscherm zelf al heeft. Twee balken, twee invoervelden
-     voor hetzelfde gesprek, precies onder elkaar. En op de meest bezochte
-     ingang van allemaal, want dat is de kale domeinnaam.
-
-     Een pad is dus niet waar je het aan afmeet: het scherm zegt zelf wel wat
-     het is. <body data-ios-home> is het beginscherm en #osAiBalk IS die eigen
-     chatbalk. Het pad blijft er als derde vangnet bij staan voor het geval een
-     scherm ooit zonder allebei die kenmerken opent. */
-  var eigenRahul = !!(document.getElementById('osAiBalk') ||
-    (document.body && document.body.hasAttribute('data-ios-home')) ||
-    /\/apps\/(app|bureau|index)\.html$|^\/(apps\/)?$/.test(location.pathname));
+  var eigenRahul = /\/apps\/app\.html$/.test(location.pathname);
   if (!eigenRahul) {
     var pad = memTok ? '/api/fluister' : '/api/supplier/ai';
     var tok = memTok || supTok;
@@ -298,13 +280,6 @@
     blok.appendChild(sheet);
     blok.appendChild(balk);
     document.body.appendChild(blok);
-
-    /* Rahul openen van buitenaf. Het app-menu (shared/appmenu.js) heeft een rij
-       "Vraag Rahul", en dat mag geen namaakknop worden die zelf een venster
-       tekent: dan zijn er weer twee Rahuls. Er is er hier één, en dit is zijn
-       deurklink. */
-    window.RTGMetgezel = window.RTGMetgezel || {};
-    window.RTGMetgezel.rahul = function (tekst) { zetMaat(false, false); opengaan(tekst); };
 
     /* De pagina reserveert de hoogte van het blok, zodat Rahul nergens overheen
        staat -- ook niet onderaan een lange lijst. Dat doen we met een leeg

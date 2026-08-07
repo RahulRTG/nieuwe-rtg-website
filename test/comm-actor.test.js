@@ -27,9 +27,11 @@
    3. EEN ZAAK KOMT NIET IN HET GESPREK VAN EEN ANDERE ZAAK, en al helemaal
       niet in dat van twee leden. Ook niet met het gesprek-id in de hand.
 
-   4. WIE ER NAMENS DE ZAAK ANTWOORDDE, BLIJFT BINNEN DE ZAAK. Het team ziet
-      welke collega het typte; de klant ziet de zaak. Op een platform op
-      codenaam is de naam van een medewerker geen bijzaak.
+   4. VAN WIE ER NAMENS DE ZAAK ANTWOORDDE GAAT ALLEEN DE VOORNAAM NAAR BUITEN.
+      Het team ziet de hele naam van de collega die typte, de klant zijn
+      voornaam. Dat laatste is een besluit -- "Marta brengt het zo" is het
+      verschil tussen een dienst en een systeem -- en de begrenzing is het
+      andere deel ervan: een achternaam maakt iemand vindbaar.
 
    Draait zonder server, op een nagemaakte database: dit gaat over het model
    zelf. De routes eromheen staan in comm.e2e.js. */
@@ -41,7 +43,7 @@ const wie = require('../server/kern/comm/wie');
 
 const ZAKEN = { AB12: 'Osteria Bianca', CD34: 'Hotel Nord' };
 const LEDEN = { 'user-1': 'Amberen Vos', 'user-2': 'Noordelijke Ster' };
-const MENSEN = { 7: 'Sanne', 9: 'Joris' };
+const MENSEN = { 7: 'Sanne', 9: 'Joris Aerts' };
 
 function opzet() {
   const db = { data: {} };
@@ -191,19 +193,46 @@ test('een collega-gesprek is van de twee collegas, niet van de hele zaak', () =>
 
 /* ------------------------------------- 4. de naam van de medewerker blijft binnen */
 
-test('de klant ziet de zaak, het team ziet de collega die antwoordde', () => {
+/* DE KLANT ZIET DE VOORNAAM, HET TEAM DE HELE NAAM. Dat is een besluit en geen
+   afleiding, dus het staat hier uitgeschreven.
+
+   De eerste versie hield de naam van een medewerker helemaal binnen de zaak.
+   Dat is verdedigbaar op een platform dat op codenaam draait -- maar het is
+   niet hoe gastvrijheid werkt: "Marta brengt het zo" is precies het verschil
+   tussen een dienst en een systeem, en de gastchat deed het voor de verhuizing
+   ook al.
+
+   Wat er WEL verandert ten opzichte van vroeger: toen ging de HELE naam mee
+   (het personeelsregister draagt "Marta Colom"), en dat is meer dan een gast
+   nodig heeft. Een achternaam maakt iemand vindbaar; een voornaam maakt hem
+   aanspreekbaar. Buiten de zaak dus de voornaam, binnen de zaak de hele naam
+   -- want daar werk je met elkaar en moet je weten wie wat deed. */
+test('de klant ziet de voornaam van wie antwoordde, het team de hele naam', () => {
   const { comm } = opzet();
   const g = comm.gesprekMaak({ soort: 'order', deelnemers: ['user-1', 'zaak:AB12'] });
-  comm.bericht({ gesprekId: g.id, van: 'zaak:AB12', door: 'mens:AB12:7',
+  comm.bericht({ gesprekId: g.id, van: 'zaak:AB12', door: 'mens:AB12:9',
     tekst: 'de keuken draait tot elf uur' });
 
   const bijKlant = comm.gesprek('user-1', g.id).berichten[0];
   assert.equal(bijKlant.van, 'Osteria Bianca', 'de klant hoort de zaak te zien');
-  assert.equal(bijKlant.door, null, 'de naam van de medewerker lekte naar de klant');
+  assert.equal(bijKlant.door, 'Joris', 'de klant hoort de voornaam te zien');
 
   const bijTeam = comm.gesprek('zaak:AB12', g.id).berichten[0];
   assert.equal(bijTeam.van, 'Osteria Bianca');
-  assert.equal(bijTeam.door, 'Sanne', 'het team kon niet zien wie er antwoordde');
+  assert.equal(bijTeam.door, 'Joris Aerts', 'het team hoort de hele naam te zien');
+});
+
+test('voornaam knipt op de eerste naam, en laat staan wat geen naam is', () => {
+  assert.equal(wie.voornaam('Joris Aerts'), 'Joris');
+  assert.equal(wie.voornaam('Marta Colom i Ferrer'), 'Marta');
+  assert.equal(wie.voornaam('Sanne'), 'Sanne');
+  /* Een titel hoort bij de aanspreekvorm en niet bij de achternaam: "Dr." als
+     voornaam tonen zou onbeleefd EN onbruikbaar zijn. Het personeelsregister
+     kent ze ("Dr. Elena Roig"), dus deze regel is geen bedachte grens. */
+  assert.equal(wie.voornaam('Dr. Elena Roig'), 'Dr. Elena');
+  assert.equal(wie.voornaam('Cdt. Vidal'), 'Cdt. Vidal');
+  assert.equal(wie.voornaam(''), '');
+  assert.equal(wie.voornaam(null), '');
 });
 
 test('een lid heet bij zijn codenaam en een zaak bij zijn zaaknaam', () => {

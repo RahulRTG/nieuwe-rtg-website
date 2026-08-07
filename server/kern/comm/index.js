@@ -396,14 +396,21 @@ function maakComm({ db, save, crypto, codenaamVan, naamVan, sein, sseToCustomer 
   function toonBericht(m, mij) {
     return {
       id: m.id, at: m.at, vanMij: m.van === mij, van: naam(m.van),
-      /* WIE ER NAMENS DE ZAAK TYPTE, BLIJFT BINNEN DE ZAAK. Het team moet
-         kunnen zien welke collega antwoordde -- zonder dat is een gedeelde
-         inbox onwerkbaar -- maar de klant hoort de zaak te zien en niet de
-         voornaam van wie er die avond stond. Dat is geen smaakkwestie: op een
-         platform dat op codenaam draait is de kant van de zaak niet ineens
-         vrij spel. Vandaar deze ene voorwaarde, en niet een veld dat je
-         "meestal" weglaat. */
-      door: m.door && wie.zelfdeZaak(m.door, mij) ? naam(m.door) : null,
+      /* WIE ER NAMENS DE ZAAK TYPTE: de klant ziet de VOORNAAM, het team de
+         hele naam.
+
+         De eerste versie hield die naam helemaal binnen de zaak. Dat is
+         verdedigbaar op een platform dat op codenaam draait, maar het is niet
+         hoe gastvrijheid werkt -- "Marta brengt het zo" is het verschil tussen
+         een dienst en een systeem, en de gastchat deed het voor de verhuizing
+         ook al. Het is dus een besluit geworden en geen afleiding.
+
+         Wat er wel strenger werd: vroeger ging de HELE naam mee, want het
+         personeelsregister draagt "Marta Colom". Een achternaam maakt iemand
+         vindbaar, een voornaam maakt hem aanspreekbaar. Binnen de zaak blijft
+         de hele naam staan, want daar werk je met elkaar en moet je weten wie
+         wat deed. */
+      door: m.door ? (wie.zelfdeZaak(m.door, mij) ? naam(m.door) : wie.voornaam(naam(m.door))) : null,
       tekst: m.weg ? null : m.tekst, soort: m.soort,
       bijlage: m.weg ? null : (m.bijlage || null),
       antwoordOp: m.antwoordOp || null,

@@ -143,6 +143,22 @@ test('lezen aan de ene kant zet de teller van de andere niet op nul', () => {
   assert.equal(gast.ongelezenZaak('HOSHI', 'user-1', 'Team'), 0);
 });
 
+/* Dezelfde regel als in de kern (comm-actor.test.js), maar dan op de weg waar
+   hij vandaan komt. De gastchat stuurde de naam van de medewerker altijd al
+   mee -- alleen de HELE naam, want het personeelsregister draagt "Marta
+   Colom". De gast heeft aan "Marta" genoeg; het team moet weten wie het was. */
+test('de gast ziet de voornaam van wie antwoordde, de zaak de hele naam', () => {
+  const { gast } = opzet();
+  gast.stuurZaak('HOSHI', 'user-1', 'Roomservice', 'komt eraan', 'Marta Colom');
+
+  const bijGast = gast.berichten('HOSHI', 'user-1', 'Roomservice');
+  assert.equal(bijGast[0].who, 'Marta', 'de achternaam van de medewerker ging naar de gast');
+  assert.equal(bijGast[0].from, 'partner');
+
+  const bijZaak = gast.berichten('HOSHI', 'user-1', 'Roomservice', 120, 'zaak');
+  assert.equal(bijZaak[0].who, 'Marta Colom', 'het team kon niet zien wie er antwoordde');
+});
+
 test('de oude voorraad blijft staan: er wordt niet in gewist', () => {
   const { db, gast } = opzet(OUD());
   gast.berichten('HOSHI', 'user-1', 'Roomservice');

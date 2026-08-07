@@ -64,6 +64,17 @@ function maakCommWerk({ db, save, comm }) {
   const werkgeverVan = (chat) => (chat && chat.supplierCode ? wie.zaak(chat.supplierCode) : null);
 
   const kantVan = (m, sollicitant) => (m.van === sollicitant ? 'sollicitant' : 'werkgever');
+  /* HIER WORDT `wie` NIET GEKNIPT, en dat is met opzet.
+
+     In het gastcontact (./gast.js) en in de kern (./index.js) gaat van een
+     medewerker alleen de VOORNAAM naar de andere kant. Hier niet -- want hier
+     staat aan de werkgeverskant geen persoon maar de ZAAK: de route vult
+     req.supplier.name in ("Sal de Mar"). Diezelfde regel toepassen zou daar
+     "Sal" van maken.
+
+     Deze opmerking staat er omdat het gat tussen twee bestanden er onnet
+     uitziet en het niet is. Wie de drie later gelijk wil trekken, moet eerst
+     de afzender veranderen (een medewerker in `door`) en pas dan de weergave. */
   const oudeVorm = (m, sollicitant) => ({
     id: m.id, van: kantVan(m, sollicitant), wie: m.who || '',
     tekst: m.tekst || '', lang: m.lang || null, at: m.at

@@ -44,14 +44,15 @@ app.post('/api/supplier/chat/send', supplierAuth, (req, res) => {
   notify(meta.tier || 'rtg', { icon: 'berichten', title: req.supplier.name + ' · ' + lijn.dept, body: text.slice(0, 90), scope: 'gchat' });
   sseToCustomer(lijn.lidKey, 'sync', { scope: 'gchat' });
   sseToSupplier(req.supplier.code, 'sync', { scope: 'gchat' });
-  const alles = commGast.berichten(lijn.code, lijn.lidKey, lijn.dept);
+  // 'zaak': het team ziet de hele naam van de collega die antwoordde
+  const alles = commGast.berichten(lijn.code, lijn.lidKey, lijn.dept, 120, 'zaak');
   trChat(alles, talen.taalVan(req.body.lang)).then(messages => res.json({ ok: true, messages }));
 });
 
 app.post('/api/supplier/chat/history', supplierAuth, (req, res) => {
   const lijn = lijnVan(req, res);
   if (!lijn) return;
-  const messages = commGast.berichten(lijn.code, lijn.lidKey, lijn.dept);
+  const messages = commGast.berichten(lijn.code, lijn.lidKey, lijn.dept, 120, 'zaak');
   if (messages.length) commGast.leesZaak(lijn.code, lijn.lidKey, lijn.dept);
   trChat(messages, talen.taalVan(req.body.lang))
     .then(m => res.json({ messages: m, codename: (lijn.gesprek.meta || {}).codename || null }));

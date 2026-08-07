@@ -95,6 +95,26 @@ function ontleed(sleutel) {
 
 const isLid = (sleutel) => { const a = ontleed(sleutel); return !!a && a.soort === 'lid'; };
 
+/* DE VOORNAAM, en waarom die functie hier hoort.
+
+   Buiten de zaak zie je van een medewerker zijn voornaam, binnen de zaak zijn
+   hele naam (zie ./index.js, toonBericht). Dat is een besluit: "Marta brengt
+   het zo" is het verschil tussen een dienst en een systeem, maar een
+   achternaam maakt iemand vindbaar terwijl een voornaam hem aanspreekbaar
+   maakt. Het personeelsregister draagt de hele naam, dus moet er ergens
+   geknipt worden -- en dat gebeurt op EEN plek, want een knipregel die op drie
+   plekken staat is een knipregel die op twee plekken achterloopt.
+
+   Een titel telt mee met de voornaam. Het register kent "Dr. Elena Roig" en
+   "Cdt. Vidal"; alleen "Dr." tonen is onbeleefd en onbruikbaar tegelijk. */
+const TITELS = /^(dr|drs|ir|ing|mr|mw|dhr|prof|cdt|sgt|kap|lt|mevr)\.?$/i;
+function voornaam(naam) {
+  const stukken = String(naam == null ? '' : naam).trim().split(/\s+/).filter(Boolean);
+  if (!stukken.length) return '';
+  if (stukken.length > 1 && TITELS.test(stukken[0])) return stukken[0] + ' ' + stukken[1];
+  return stukken[0];
+}
+
 /* Horen twee sleutels bij dezelfde zaak? Gebruikt om te bepalen of iemand de
    naam van een medewerker mag zien (zie ./index.js, toonBericht): binnen het
    team wel, daarbuiten nooit. Twee leden horen bij GEEN zaak -- dus false, en
@@ -179,4 +199,4 @@ function maakSein({ sseToCustomer, sseToSupplier, sseToOffice }) {
   };
 }
 
-module.exports = { RUIMTES, KANTOOR, lid, zaak, mens, gezin, ontleed, isLid, zelfdeZaak, vanZaak, maakNaam, maakSein };
+module.exports = { RUIMTES, KANTOOR, lid, zaak, mens, gezin, ontleed, isLid, voornaam, zelfdeZaak, vanZaak, maakNaam, maakSein };

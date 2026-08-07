@@ -52,10 +52,24 @@ function maakCommGast({ db, save, comm }) {
      afzender plus, voor de systeemregel, het soort. */
   const kantVan = (m, lidKey) => (m.soort === 'systeem' ? 'systeem' : (m.van === lidKey ? 'guest' : 'partner'));
 
-  const oudeVorm = (m, lidKey) => ({
-    id: m.id, from: kantVan(m, lidKey), who: m.who || '',
-    text: m.tekst || '', lang: m.lang || null, at: m.at
-  });
+  /* `kijker` is 'gast' of 'zaak', en hij bepaalt EEN ding: hoeveel van de naam
+     van de medewerker meegaat. Buiten de zaak de voornaam, binnen de zaak de
+     hele naam -- dezelfde regel als in de kern (zie ./index.js, toonBericht),
+     en om dezelfde reden: een achternaam maakt iemand vindbaar, een voornaam
+     maakt hem aanspreekbaar. Vroeger ging hier de hele naam naar de gast,
+     want het personeelsregister draagt "Marta Colom".
+
+     Alleen de kant van de ZAAK wordt geknipt. Wat de gast zelf schreef draagt
+     zijn eigen codenaam, en die is al een pseudoniem. */
+  const oudeVorm = (m, lidKey, kijker) => {
+    const kant = kantVan(m, lidKey);
+    const heel = m.who || '';
+    return {
+      id: m.id, from: kant,
+      who: (kant === 'partner' && kijker !== 'zaak') ? wie.voornaam(heel) : heel,
+      text: m.tekst || '', lang: m.lang || null, at: m.at
+    };
+  };
 
   function importeer(gesprek, code, lidKey, dept) {
     if (!gesprek || gesprek.meta.oudBinnen) return gesprek;
@@ -168,7 +182,9 @@ function maakCommGast({ db, save, comm }) {
        de oude vorm en gaat mee zoals hij ging. Het is geen deelnemer en geen
        codenaam; het scherm van de gast toonde hem al. */
     if (who) { m.who = String(who).slice(0, 60); save(); }
-    return oudeVorm(m, String(lidKey));
+    /* De schrijver krijgt zijn eigen bericht terug; hij hoort bij de kant die
+       hij zelf koos, dus de zaak ziet de hele naam en de gast de voornaam. */
+    return oudeVorm(m, String(lidKey), van === zaakVan(code) ? 'zaak' : 'gast');
   }
 
   /* De openingsregel van een nieuwe lijn. Van de zaak, met soort 'systeem'. */
@@ -182,10 +198,10 @@ function maakCommGast({ db, save, comm }) {
     return oudeVorm(m, String(lidKey));
   }
 
-  function berichten(code, lidKey, dept, hoeveel) {
+  function berichten(code, lidKey, dept, hoeveel, kijker) {
     const g = gesprek(code, lidKey, dept);
     const lijst = comm.berichtenVan(g.id).filter((m) => !m.weg);
-    return lijst.slice(-(hoeveel || 120)).map((m) => oudeVorm(m, String(lidKey)));
+    return lijst.slice(-(hoeveel || 120)).map((m) => oudeVorm(m, String(lidKey), kijker));
   }
 
   const ongelezenGast = (code, lidKey, dept) =>

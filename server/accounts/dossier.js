@@ -64,8 +64,15 @@ function maakDossier(getUserById) {
     return rows.map(r => {
       let md = {}; try { md = r.member_state ? (JSON.parse(gebonden.lees('member_state', r)) || {}) : {}; } catch (e) {}
       const gs = String(md.geslacht || '').toLowerCase();
+      /* De herkomst: via welk bedrijf dit lid binnenkwam (een wervingslink van
+         een werkgever). Alleen de code en de naam van dat BEDRIJF -- dat is
+         geen persoonsgegeven van het lid en het blijft dus binnen dezelfde
+         regel als de rest van deze rij: facetten ja, echte naam nooit. */
+      const via = md.via && md.via.code
+        ? { soort: md.via.soort || 'zaak', code: md.via.code, naam: md.via.naam || md.via.code }
+        : null;
       return { id: r.id, key: 'user-' + r.id, tier: r.tier || 'rtg', codename: r.codename || null,
-        geslacht: (gs === 'v' || gs === 'm' || gs === 'x') ? gs : null, land: md.land || null };
+        geslacht: (gs === 'v' || gs === 'm' || gs === 'x') ? gs : null, land: md.land || null, via };
     });
   }
 

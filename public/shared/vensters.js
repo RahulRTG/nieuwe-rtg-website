@@ -134,6 +134,9 @@
     el.querySelector('.rtg-naam').textContent = titel || 'App';
     var ifr = el.querySelector('iframe');
     ifr.title = titel || 'App';
+    // camera, microfoon en scherm doorgeven: zonder allow weigert de browser ze
+    // in een iframe, ook same-origin. De tekst staat in shared/media.js.
+    window.RTGMedia.kader(ifr);
     ifr.src = url;
     laag.appendChild(el);
 

@@ -70,6 +70,20 @@ function maakOv({ db, save, crypto, schoon, codenaamVan, haversine, etaMinutes, 
 
   const ovZaak = code => db.data.suppliers.find(s => s.code === code && s.type === 'ov') || null;
   const lijnVan = (s, lijnId) => (s.lijnen || []).find(l => l.id === lijnId) || null;
+
+  /* De ritprijs van een OV-lijn: basis + kilometers, met een bodem. Dit stond
+     als losse rekenregel in het uitchecken, en zodra de kaartverkoop erbij kwam
+     zou dezelfde som op een tweede plek staan -- dan lopen het kaartje aan de
+     balie en de afrekening bij het uitstappen uiteen zonder dat iets klaagt
+     (LAT.md regel 4). Een lijn zonder tarief valt terug op een middenwaarde;
+     dat is geen verzinsel maar de bestaande terugval, hierheen verhuisd. */
+  const OV_BODEM = 100;
+  function ovPrijsVan(lijn, km) {
+    const t = (lijn && lijn.tarief) || {};
+    const basis = Number.isFinite(t.basis) ? t.basis : 180;
+    const perKm = Number.isFinite(t.perKm) ? t.perKm : 20;
+    return Math.max(OV_BODEM, Math.round(basis + Math.max(0, km || 0) * perKm));
+  }
   const versVoertuig = v => Date.now() - new Date(v.at).getTime() < VOERTUIG_TTL_MS;
   const actieveRit = key => db.data.ovRitten.find(r => r.key === key && r.status === 'in') || null;
 
@@ -95,12 +109,13 @@ function maakOv({ db, save, crypto, schoon, codenaamVan, haversine, etaMinutes, 
   // de gedeelde ctx voor de deelbestanden
   const ctx = {
     db, save, crypto, schoon, nu, id, codenaamVan, haversine, etaMinutes, pay, notify, codes,
-    ensureOv, ovZaak, lijnVan, versVoertuig, actieveRit, ritStart, ritBeeld,
+    ensureOv, ovZaak, lijnVan, ovPrijsVan, versVoertuig, actieveRit, ritStart, ritBeeld,
     SOORTEN, VOERTUIG_TTL_MS, CODE_TTL_MS, GPS_CHECKIN_M, RITTEN_MAX
   };
 
   ensureOv();
-  return Object.assign({}, require('./reizen')(ctx), require('./dienst')(ctx));
+  return Object.assign({ ovPrijsVan, ovZaakVan: ovZaak, ovLijnVan: lijnVan },
+    require('./reizen')(ctx), require('./dienst')(ctx));
 }
 
 module.exports = { maakOv };

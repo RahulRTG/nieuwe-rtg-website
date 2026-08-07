@@ -12,7 +12,7 @@
   // alle ROS-schermen die je naast elkaar kunt zetten: dezelfde gedeelde lijst
   // als de flagship- en bureau-widgets (shared/rosapps.js), met een terugval
   var APPS = (w.RTGApps && w.RTGApps.length) ? w.RTGApps : [
-    { naam: 'Beginscherm', url: '/apps/index.html' },
+    { naam: 'Beginscherm', url: '/apps/app.html' },
     { naam: 'De Salon', url: '/apps/app.html#salon' },
     { naam: 'RTG Mall', url: '/apps/mall.html' },
       { naam: 'De Résidence', url: '/apps/residentie.html' },
@@ -77,7 +77,9 @@
   function paneel(kant) {
     var p = d.createElement('div'); p.className = 'sp-paneel'; p.dataset.kant = kant;
     var kop = d.createElement('div'); kop.className = 'sp-kop'; kop.appendChild(kies(staat[kant], kant));
-    var f = d.createElement('iframe'); f.src = staat[kant];
+    var f = d.createElement('iframe');
+    window.RTGMedia.kader(f);   // camera/microfoon doorgeven; tekst in shared/media.js
+    f.src = staat[kant];
     f.setAttribute('title', kant === 'a' ? 'Linkerscherm' : 'Rechterscherm');
     p.appendChild(kop); p.appendChild(f);
     return p;

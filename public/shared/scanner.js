@@ -56,8 +56,14 @@
   Scanner.prototype.start = function () {
     var self = this;
     if (this.actief) return Promise.resolve();
-    if (!navigator || !navigator.mediaDevices) return Promise.reject(new Error('camera niet beschikbaar'));
-    return navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment', width: { ideal: 1280 } }, audio: false })
+    /* Via shared/media.js: die stelt de diagnose en draagt hem in de fout mee,
+       zodat de scanknop hem kan tonen. De oude Error('camera niet beschikbaar')
+       was voor iedere oorzaak dezelfde tekst, en dus voor geen enkele bruikbaar.
+       De pure helpers van dit bestand worden ook in Node getoetst; daar is er
+       geen mediapoort en ook geen camera, en dan hoort start() te weigeren met
+       een fout die zegt wat er mist. */
+    if (!root.RTGMedia) return Promise.reject(new Error('shared/media.js is niet geladen; zonder mediapoort gaat de camera niet open'));
+    return root.RTGMedia.camera({ achter: true, video: { width: { ideal: 1280 } }, stil: true })
       .then(function (stream) {
         self.stream = stream; self.video.srcObject = stream;
         self.video.setAttribute('playsinline', ''); self.video.muted = true;

@@ -107,7 +107,13 @@ app.post('/api/auth/me', auth, (req, res) => {
     DEMO, pasAppOk, PAS_FOUT, pasAppVan, DEV_VELDEN, antivirus: kern.antivirus,
     webauthnRegOpties: kern.webauthnRegOpties, webauthnRegMaak: kern.webauthnRegMaak,
     webauthnLoginOpties: kern.webauthnLoginOpties, webauthnLoginMaak: kern.webauthnLoginMaak,
-    webauthnLijst: kern.webauthnLijst, webauthnWeg: kern.webauthnWeg, automatisering };
+    webauthnLijst: kern.webauthnLijst, webauthnWeg: kern.webauthnWeg, automatisering,
+    /* De kern zelf reist mee voor de wervingslink. Die helpers (zoekInvite,
+       verbindLid) worden PAS aan de kern gehangen als routes/werving.js is
+       gemount, en dat gebeurt na deze module -- dus uitpakken bij het opstarten
+       zou een undefined opleveren. Via het kern-object leest de registratie ze
+       op het moment dat er iemand registreert, en dan staan ze er. */
+    kern };
   require('./auth/account')(actx);
   require('./auth/herstel')(actx);
   require('./auth/verificatie')(actx);

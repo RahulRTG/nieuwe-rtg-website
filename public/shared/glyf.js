@@ -84,6 +84,8 @@
     salon: '<path d="M12 20S3.8 14.4 3.8 9C3.8 6.2 6 4.3 8.6 4.3c1.5 0 2.8.7 3.4 1.9.6-1.2 1.9-1.9 3.4-1.9 2.6 0 4.8 1.9 4.8 4.7 0 5.4-8.2 11-8.2 11z"/>',
     betalen: '<rect x="3" y="6" width="18" height="12" rx="2.4"/><path d="M3 10h18M6.5 14.5h4"/>',
     bank: '<path d="M4 9.5l8-5 8 5M5 9.5v8M9 9.5v8M15 9.5v8M19 9.5v8M3.5 20.5h17"/>',
+    // de loonstrook: een vel met regels en een streep eronder voor het nettobedrag
+    loonstrook: '<rect x="5" y="3.2" width="14" height="17.6" rx="2"/><path d="M8 8h8M8 11.4h8M8 14.8h4"/><path d="M8 17.8h8"/>',
     slot: '<rect x="5" y="10.5" width="14" height="9" rx="2"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/><circle cx="12" cy="15" r="1.2"/>',
     pas: '<rect x="3" y="5.5" width="18" height="13" rx="2.2"/><path d="M3 9.5h18M6.5 14h5"/><circle cx="16.5" cy="14" r="1.6"/>',
     // de wallet: een portefeuille met een kaart die er net bovenuit steekt

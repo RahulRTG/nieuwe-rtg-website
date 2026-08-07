@@ -158,10 +158,29 @@ function dekking() {
   // de twintig meest sprekende gaten, gegroepeerd per domein
   const perDomein = {};
   for (const r of ongedekt) { const d = r.split('/')[2] || 'overig'; (perDomein[d] = perDomein[d] || []).push(r); }
-  for (const [d, lijst] of Object.entries(perDomein).sort((a, b) => b[1].length - a[1].length).slice(0, 8))
+  const gesorteerd = Object.entries(perDomein).sort((a, b) => b[1].length - a[1].length);
+  for (const [d, lijst] of gesorteerd.slice(0, 8))
     meld('beter', 'dekking', 'Het domein "' + d + '" heeft ' + lijst.length + ' endpoint(s) zonder test.',
       lijst.slice(0, 5).join(', '), 'Neem er de volgende ronde twee of drie mee in een bestaande testfile.');
-  return { routes: apiRoutes.length, gedekt: apiRoutes.length - ongedekt.length, pct, ongedekt };
+  /* HET AANTAL DOMEINEN APART VAN DE MELDINGEN, en dat is een reparatie.
+
+     De ratelmeter keuringDekkingAdvies telde de MELDINGEN hierboven, en die zijn
+     afgekapt op acht omdat een rapport leesbaar hoort te blijven. Er waren acht
+     domeinen met gaten, dus stond de meter op zijn plafond: hij kon niet stijgen,
+     en in test/meterijk.test.js stond dat als REDEN waarom hij niet te ijken was.
+     Dat was geen reden maar een gebrek -- die meter mat de slice en niet de
+     dekking. Zou het negende domein een gat krijgen, dan bewoog er niets.
+
+     Het rapport blijft dus afgekapt (dat is voor een lezer) en de meter leest
+     vanaf nu dit getal (dat is voor de ratel). Twee dingen die uit elkaar horen:
+     wat je TOONT en wat je MEET. */
+  const domeinenMetGaten = gesorteerd.length;
+  if (gesorteerd.length > 8) {
+    meld('beter', 'dekking', 'Nog ' + (gesorteerd.length - 8) + ' domein(en) met endpoints zonder test, niet apart genoemd.',
+      gesorteerd.slice(8).map(([d]) => d).join(', '),
+      'De lijst hierboven is afgekapt op acht om leesbaar te blijven; de meter telt ze allemaal.');
+  }
+  return { routes: apiRoutes.length, gedekt: apiRoutes.length - ongedekt.length, pct, ongedekt, domeinenMetGaten };
 }
 
 /* ============================ 2. BELOFTES ============================

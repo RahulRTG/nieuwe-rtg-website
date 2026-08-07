@@ -13,10 +13,12 @@ const inzagelog = require('../inzagelog');
 const { log } = require('../log');
 
 module.exports = (kern) => {
-  const { app, accounts, anthropic, archief, betaal, beveilig, crypto, db, mail, save, sendPushToUser, sessions, DATA_DIR, fs, path, LANDEN, keyVanCodenaam, gidsHaal, talen, onboarding,
-    geldPasprijsZet, geldKortingZet, geldCommissieZet,
-    // de gedeelde inlogrem: dezelfde teller en dezelfde vijf minuten als elders
-    tooManyTries, noteFailedTry, loginFails } = kern;
+  const { app, accounts, anthropic, archief, betaal, beveilig, crypto, db, mail, save, sendPushToUser,
+          sessions, DATA_DIR, fs, path, LANDEN, keyVanCodenaam, talen, onboarding, geldPasprijsZet,
+          geldKortingZet, geldCommissieZet,
+          // de gedeelde inlogrem: dezelfde teller en dezelfde vijf minuten als elders
+    tooManyTries,
+          noteFailedTry, loginFails } = kern;
   const OWNER_EMAIL = eigenaar.OWNER_EMAIL;
 
   function staat() {

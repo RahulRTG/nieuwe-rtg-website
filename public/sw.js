@@ -2,7 +2,7 @@
    is en offline opent. API-verkeer gaat altijd naar het netwerk.
    Pagina's en scripts zijn network-first: een update op de server komt
    direct door, de cache is alleen het vangnet zonder verbinding. */
-const CACHE = 'rtg-app-c9177f1e';
+const CACHE = 'rtg-app-b2ffe9d4';
 const SHELL = ['/apps/app.html', '/apps/app-main.js', '/apps/spelen.html', '/shared/verbinding.js', '/manifest.webmanifest', '/icon.svg'];
 
 self.addEventListener('install', e => {
@@ -30,14 +30,7 @@ self.addEventListener('fetch', e => {
             caches.open(CACHE).then(c => c.put(e.request, copy));
             return res;
           }))
-      /* "Network-first" was hier niet waar. fetch(e.request) mag gewoon uit de
-         BROWSERCACHE komen, en een script dat daar nog uren als vers in ligt
-         wordt dan zonder navragen geserveerd -- terwijl de pagina er wel vers
-         doorheen komt. Die mix is het ergste geval: nieuwe html naast een oud
-         script bouwt het beginscherm niet meer op, en dat is een zwart scherm
-         zonder foutmelding. Met cache:'no-cache' vraagt hij altijd na; is er
-         niets veranderd dan is dat een 304 van een paar bytes. */
-      : fetch(new Request(e.request, { cache: 'no-cache' })).then(res => {
+      : fetch(e.request).then(res => {
           // alleen goede antwoorden bewaren: een 503 van een failover die hier
           // belandt, wordt anders voor altijd het "vangnet" van deze URL
           if (res && res.ok) {

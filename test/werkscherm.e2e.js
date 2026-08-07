@@ -169,15 +169,42 @@ test('de eigenaar staat meteen in zijn eigen werkruimte, zonder een token over t
     assert.match(stand.tekst, /Rahul Travel Group/, 'in zijn eigen werkruimte');
     assert.match(stand.tekst, /directie/, 'met de directie-rol');
 
-    /* En hij is te VINDEN: een tegel op het bureaublad. Dat was de tweede
-       helft van de melding -- een app die alleen bestaat als je het adres
-       kent, bestaat voor een gebruiker niet. */
-    await page.goto(base + '/apps/index.html', { waitUntil: 'domcontentloaded' });
-    await page.waitForTimeout(500);
-    const tegels = await page.evaluate(() => Array.from(document.querySelectorAll('a.app'))
-      .map(a => a.getAttribute('href')));
-    assert.ok(tegels.includes('/apps/werk.html'), 'de werkplek heeft een tegel op het bureaublad');
-    assert.ok(tegels.includes('/apps/office.html'), 'en RTG Office ook; die had er nooit een');
+    /* En hij is te VINDEN: een tegel op de HOMESCREEN. Dat was de tweede helft
+       van de melding -- een app die alleen bestaat als je het adres kent,
+       bestaat voor een gebruiker niet.
+
+       Die eis stond hier eerst op het bureaublad (/apps/index.html), de
+       scrollende pagina met alle apps in secties. Dat was een tweede
+       beginscherm naast het springboard en is weg; het pad brengt je nu naar
+       de homescreen. De eis verhuisde mee, en dat is geen formaliteit: bij die
+       verhuizing bleek de Werk OS-tegel NERGENS meer te staan -- geen enkele
+       pagina linkte er nog naartoe. Deze toets is wat dat aan het licht bracht.
+
+       We kijken daarom naar het scherm en niet naar de bron: een sleutel in
+       LINKS zetten is niet genoeg, hij moet ook in de indeling van een map
+       staan, anders tekent het springboard hem nooit.
+
+       DE TEGEL HEET NIET MEER "WERK OS". Er stonden twee tegels met hetzelfde
+       koffertje naast elkaar -- "Werk OS" (de werkplek-app) en "Mijn
+       werkplekken" (de kiezer) -- en erger: twee inlogs. Die zijn samengevoegd
+       tot een deur: Mijn werkplekken. Deze toets zocht daarna nog op de oude
+       naam en stond sindsdien rood, wat pas opviel toen hij weer werd
+       gedraaid. De EIS is niet veranderd -- de werkplek moet vindbaar zijn op
+       de homescreen -- alleen de naam waaronder je hem vindt. */
+    await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
+    await page.waitForTimeout(2000);
+    const tegels = await page.evaluate(() => {
+      const huis = Array.from(document.querySelectorAll('#osMappen .os-app'))
+        .find(a => /huis/i.test(a.textContent || ''));
+      if (huis) huis.click();
+      return new Promise(klaar => setTimeout(() => klaar(
+        Array.from(document.querySelectorAll('#osMapGrid .os-app')).map(a => (a.textContent || '').trim())
+      ), 400));
+    });
+    assert.ok(tegels.some(t => /mijn werkplekken/i.test(t)),
+      'de werkplek heeft een tegel op de homescreen; gevonden: ' + tegels.join(', '));
+    assert.ok(tegels.some(t => /rtg office/i.test(t)),
+      'en RTG Office ook; die had er nooit een. Gevonden: ' + tegels.join(', '));
 
     await page.goto(base + '/apps/werk.html', { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(900);

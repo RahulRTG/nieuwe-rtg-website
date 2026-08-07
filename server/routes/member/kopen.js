@@ -3,12 +3,8 @@
    activiteiten en de transfers daarbij. Alleen routes; de logica
    woont in de kern-modules. */
 module.exports = (kern) => {
-  const { PERSONAS, app, auth, betaal, centen,
-    crypto, db, findPartner, findSupplier, magBezorgen,
-    liveCodename, notifySupplier, pickupCode, publicPartner, save,
-    schoon, sseToOffice, sseToSupplier, salonZichtbaar, zorgVoor,
-    koopTicketVoor, dpBetaalDirect, dpMijnBetalingen, dpVerzoekenVoor, dpBetaalVerzoek,
-    orderMetRef, ordersVoegToe } = kern;
+  const { app, auth, centen, liveCodename, dpBetaalDirect, dpMijnBetalingen, dpVerzoekenVoor,
+          dpBetaalVerzoek } = kern;
 
 /* ============ rechtstreeks betalen aan een leverancier (Face ID) ============
    Elk betalend lid rekent alles met Face ID af, via de AI en de Salon, en het

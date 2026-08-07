@@ -14,6 +14,9 @@
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/rosthema.css" rel="stylesheet">
 <link href="/shared/rtg-ui.css" rel="stylesheet">
+<!-- de melding van de mediapoort; tussen de andere bladen zodat hij in DEZELFDE
+     stijlbundel meegaat en er geen tweede bundel bijkomt (test/stijlbundel.test.js) -->
+<link rel="stylesheet" href="/shared/media.css">
 <style>
   :root{
     --bg:var(--rtg-bg); --card:var(--rtg-card); --card2:var(--rtg-card2); --line:var(--rtg-line);
@@ -184,6 +187,9 @@
   #toast{position:absolute;bottom:calc(env(safe-area-inset-bottom,0px) + 5.5rem);left:50%;transform:translate(-50%,16px);background:var(--knop);color:var(--knop-txt);font-size:0.8rem;font-weight:500;padding:0.75rem 1.25rem;border-radius:999px;opacity:0;pointer-events:none;transition:all 0.3s;z-index:70;max-width:86%;text-align:center;}
   #toast.show{opacity:1;transform:translate(-50%,0);}
 </style>
+<!-- niet defer: dit script draait voor elke inline-body-script en voor elk kader -->
+<script src="/shared/media.js"></script>
+<link href="/shared/ios.css" rel="stylesheet">
 </head>
 <body class="rtg-stijl">
 <a class="skip" href="#content">Naar de inhoud</a>
@@ -342,7 +348,9 @@
         let geladen=false;
         sw.addEventListener('scroll',()=>{
           const prive=sw.scrollLeft>sw.clientWidth/2;
-          if(prive&&!geladen){ geladen=true; fr.src='/apps/berichten.html'; }
+          // camera/microfoon doorgeven aan het kader (shared/media.js); zonder
+          // dat weigert de browser ze in de ingesloten Berichten-app
+          if(prive&&!geladen){ geladen=true; RTGMedia.kader(fr); fr.src='/apps/berichten.html'; }
           w.classList.toggle('aan',!prive); p.classList.toggle('aan',prive);
           p.textContent=prive?'Privé':'Privé · swipe ←';
         },{passive:true});
@@ -591,5 +599,6 @@ window.I18N = { en: {
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/sneltoets.js" defer></script>
+<script src="/shared/ios.js" defer></script>
 </body>
 </html>

@@ -12,7 +12,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = 'e966f39a';
+var RTG_BOUW = '1bea48eb';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -1338,8 +1338,9 @@ var RTG_BOUW = 'e966f39a';
     return pc;
   }
   async function pakMedia(video){
-    try { return await navigator.mediaDevices.getUserMedia({ audio: true, video: video ? { facingMode: 'user' } : false }); }
-    catch(e){ toast(T('sal.geenmedia','Geen toegang tot microfoon of camera.')); return null; }
+    // shared/media.js noemt de oorzaak en plaatst de volle uitleg zelf
+    try { return await RTGMedia.vraag({ audio: true, video: video ? { facingMode: 'user' } : false }); }
+    catch(e){ toast((e.rtg && e.rtg.kort) || T('sal.geenmedia','Geen toegang tot microfoon of camera.')); return null; }
   }
   function toonGesprek(naam, video){
     $('#csNaam').textContent = naam; $('#csNaam2').textContent = naam;
@@ -3061,10 +3062,22 @@ var RTG_BOUW = 'e966f39a';
     stad:        { naam: 'Mijn Stad',    url: '/apps/stad.html' },
     clips:       { naam: 'Clips',        url: '/apps/clips.html' },
     office:      { naam: 'RTG Office',   url: '/apps/office.html' },
+    /* Hier stond een losse "Werk OS"-tegel naast "Mijn werkplekken": twee
+       tegels met hetzelfde koffertje, en erger, twee INLOGS. De ene ging via
+       het ene RTG-account, de andere vroeg opnieuw om een werkruimtecode en
+       een lid-token. Dat is precies wat "een account voor alles" niet mag
+       betekenen. De werkruimte is nu een sleutel aan diezelfde bos, dus er is
+       nog een deur: Mijn werkplekken. Wie er voor het eerst in moet, vindt de
+       werkruimte-inlog onderaan diezelfde kiezer. */
     sitemaker:   { naam: 'Website-maker', url: '/apps/sitemaker.html' },
     browser:     { naam: 'RTG Browser',  url: '/apps/browser.html' },
     vonk:        { naam: 'Vonk',         url: '/apps/vonk.html' },
     balans:      { naam: 'Balans',       url: '/apps/balans.html' },
+    /* Mijn loon staat bij Geld en niet bij Werk: het is uw geld, niet iets van
+       uw werkgever. Wie nergens werkt vindt een lege lijst met de zin die dat
+       uitlegt -- dat is beter dan een tegel die verdwijnt zodra u van baan
+       wisselt. Prive: dit scherm draagt uw loon en uw inzagespoor. */
+    loonstrook:  { naam: 'Mijn loon',    url: '/apps/loonstrook.html' },
     rechterhand: { naam: 'De Rechterhand', url: '/apps/lifestyle.html' },
     reisboek:    { naam: 'Reisboek',      url: '/apps/reisboek.html' },
     cellier:     { naam: 'Cellier',       url: '/apps/cellier.html' },
@@ -3128,7 +3141,8 @@ var RTG_BOUW = 'e966f39a';
       'link:flits', 'link:stad', 'link:reisboek', 'link:hangar', 'link:residentie', 'link:maison'] },
     { sleutel: 'map-geld', naam: 'Geld', items: [
       'tab:betalen', 'tab:bestellen', 'link:wallet', 'link:bank', 'link:wbw', 'link:rtgcode',
-      'link:balans', 'tab:assets', 'link:labfonds', 'link:mecenaat', 'link:nalatenschap', 'link:logboek'] },
+      'link:balans', 'link:loonstrook', 'tab:assets', 'link:labfonds', 'link:mecenaat',
+      'link:nalatenschap', 'link:logboek'] },
     { sleutel: 'map-salon', naam: 'De Salon', items: [
       'tab:salon', 'link:pulse', 'link:vrienden', 'os:snaps', 'link:camera', 'link:clips',
       'link:muziek', 'link:podium', 'link:theater', 'link:spelen', 'link:vonk', 'link:nieuws',
@@ -3147,18 +3161,30 @@ var RTG_BOUW = 'e966f39a';
     'mecenaat', 'nalatenschap', 'logboek', 'cercle', 'hangar', 'entourage', 'attenties', 'rendezvous']);
   const premiumPas = pas === 'lifestyle' || pas === 'business';
 
+
+  /* Afgesplitst van app-main-24.js, dat over de 10 KB ging toen "Mijn loon"
+     erbij kwam. De snede loopt langs een echte grens: hierboven staat WAT er
+     op het OS staat (de registry, de mappen), hieronder staat hoe je WERK
+     opent. Twee onderwerpen die elkaar niet nodig hebben. */
   /* ---------- Werk op het OS + de algemene pin ----------
-     De werk-apps zijn gewone apps op het RTG-OS: een tik op "Werk" toont de
+     De werk-apps zijn gewone apps op het RTG-OS: een tik op "Mijn werkplekken"
+     toont de
      werkplekken die aan het ene RTG-account gekoppeld zijn (bevoegdheid), en
      openen gaat met de algemene pin (het bewijs), dezelfde pin die de
      privacygevoelige apps op dit OS beschermt. Onder water munt
      /api/account/start de werksessie, dus alle regels (zoals het werkvenster
      van de werkgever) blijven gewoon gelden. Deelt de OS-IIFE-scope:
      OSAPPS/MAPPEN/LINKS komen uit 25-os-01.js, de kiezer-scrim uit 01b. */
-  OSAPPS.werk = { naam: 'Werk' };
+  /* "Mijn werkplekken", en niet "Werk". Deze tegel staat in Het Huis naast
+     "Werk OS" (de werkplek-app zelf, link:werk) en droeg hetzelfde koffertje-
+     icoon: twee tegels die er identiek uitzagen en bijna hetzelfde heetten,
+     terwijl ze iets anders doen. Dit is de KIEZER -- hij toont de werkplekken
+     die aan je RTG-account gekoppeld zijn (personeel, leverancier, kantoor) en
+     opent die met je algemene pin. De naam zegt dat nu. */
+  OSAPPS.werk = { naam: 'Mijn werkplekken' };
   // Werk staat in de map "Het Huis" en opent met de algemene pin.
   // deze apps zijn prive: openen kan pas na de algemene pin (5 min geldig)
-  for (const pk of ['berichten', 'vonk', 'rendezvous', 'wbw']) { if (LINKS[pk]) LINKS[pk].prive = true; }
+  for (const pk of ['berichten', 'vonk', 'rendezvous', 'wbw', 'loonstrook']) { if (LINKS[pk]) LINKS[pk].prive = true; }
 
   let pinOkTot = 0; // de pin blijft vijf minuten geldig, zoals op een telefoon
   // de werkplek-zone kan om een positie vragen: dan een keer ophalen en
@@ -3172,7 +3198,15 @@ var RTG_BOUW = 'e966f39a';
   const WERKDOEL = {
     personeel: { glyf: 'navigatie', app: 'Personeel (PDA)', url: '/apps/personeel.html', bewaar: (t, r) => { localStorage.setItem('rtg_pda_token', t); localStorage.setItem('rtg_pda_code', r.code || ''); } },
     zaak:      { glyf: 'maison', app: 'Leverancier',    url: '/apps/leverancier.html', bewaar: (t) => { localStorage.setItem('rtg_sup_token', t); } },
-    kantoor:   { glyf: 'office', app: 'Backoffice',     url: '/apps/backoffice.html', bewaar: (t) => { localStorage.setItem('rtg_office_token', t); } }
+    kantoor:   { glyf: 'office', app: 'Backoffice',     url: '/apps/backoffice.html', bewaar: (t) => { localStorage.setItem('rtg_office_token', t); } },
+    /* De werkruimte van het RTG Werk OS. Die had zijn eigen tweede inlog
+       (werkruimtecode + lid-token); wie zijn RTG-account er een keer aan
+       koppelde, moest daarna alsnog opnieuw inloggen om binnen te komen. De
+       server leest die koppeling nu ook de andere kant op, dus hier is het
+       gewoon een sleutel als alle andere. Wat we bewaren is precies wat de
+       losse inlog bewaart: de code en het lid-token. */
+    werkruimte: { glyf: 'werk', app: 'Werk OS', url: '/apps/werk.html',
+      bewaar: (t, r) => { localStorage.setItem('rtg_werk_sessie', JSON.stringify({ werkruimte: r.code, lidToken: t })); } }
   };
 
   /* vraag de algemene pin (of zet hem eerst) en geef hem door aan af(pin) */
@@ -3219,7 +3253,7 @@ var RTG_BOUW = 'e966f39a';
 
   /* de Werk-kiezer: gekoppelde werkplekken uit het ene account */
   function openWerkKiezer() {
-    belTitel.textContent = T('werk.h', 'Werk');
+    belTitel.textContent = T('werk.h', 'Mijn werkplekken');
     belLijst.textContent = '';
     API.call('/account/rollen', {}).then(d => {
       const rollen = (d.rollen || []).filter(r => WERKDOEL[r.rol]);
@@ -3228,7 +3262,6 @@ var RTG_BOUW = 'e966f39a';
         leeg.className = 'os-bel-leeg';
         leeg.textContent = T('werk.leeg', 'Nog geen werkplek gekoppeld. Bewijs eenmalig uw werk-inlog (bijvoorbeeld uw personeels-PIN in de leverancier-app); daarna opent uw werk hier met uw algemene pin.');
         belLijst.appendChild(leeg);
-        return;
       }
       for (const r of rollen) {
         const doel = WERKDOEL[r.rol];
@@ -3254,13 +3287,27 @@ var RTG_BOUW = 'e966f39a';
             try { doel.bewaar(s.token, r); } catch (e2) {}
             // Rahuls welzijnszin (late dienst, veel starts): stil tonen, nooit blokkeren
             if (s.welzijn) bannerToon('', 'Rahul', s.welzijn);
-            // werk-app als venster op het bureaublad (breed scherm), anders schermvullend
-            if (window.RTGVensters && RTGVensters.actief()) RTGVensters.open(doel.url, doel.app || 'Werk');
-            else location.href = doel.url;
+            // de werk-app opent schermvullend, op elk formaat
+            location.href = doel.url;
           } catch (e) { bannerToon('', T('werk.dicht', 'Werk'), e.message || T('werk.mis', 'Openen lukte niet.')); }
         }));
         belLijst.appendChild(b);
       }
+      /* De eerste keer. Een werkruimte heeft zijn eigen inlog (code +
+         lid-token) en hoort dat te houden: hij moet ook werken voor iemand
+         zonder RTG-pas. Maar dan moet die deur hier wel te vinden zijn --
+         anders is "een inlog" alleen waar voor wie al binnen was. Deze rij
+         staat er dus altijd, ook als de lijst leeg is. */
+      const nieuw = document.createElement('button');
+      const nzi = document.createElement('span'); nzi.className = 'zi';
+      const nzg = window.RTGGlyf && RTGGlyf.svg('werk'); if (nzg) nzi.appendChild(nzg);
+      nieuw.appendChild(nzi);
+      nieuw.appendChild(document.createTextNode(T('werk.nieuw', 'Werkruimte openen')));
+      const nm = document.createElement('span'); nm.className = 'zm';
+      nm.textContent = T('werk.nieuw.sub', 'Eerste keer: met uw werkruimtecode en lid-token. Koppelt u daar uw RTG-account, dan staat hij hierboven.');
+      nieuw.appendChild(nm);
+      nieuw.addEventListener('click', () => { location.href = '/apps/werk.html'; });
+      belLijst.appendChild(nieuw);
     }).catch(() => {
       const leeg = document.createElement('div');
       leeg.className = 'os-bel-leeg';
@@ -3383,12 +3430,10 @@ var RTG_BOUW = 'e966f39a';
     else {
       const l = LINKS[item.slice(5)];
       if (!l) return;
-      // op een breed scherm opent een app als venster op het bureaublad
-      // (meerdere naast elkaar); op de telefoon gewoon schermvullend.
-      const openen = () => {
-        if (window.RTGVensters && RTGVensters.actief()) RTGVensters.open(l.url, l.app || l.naam || 'App');
-        else location.href = l.url;
-      };
+      // een app opent overal hetzelfde: schermvullend. Op een breed scherm
+      // werd hier een zwevend venster geopend; die vensterlaag is weg, want
+      // een app op iOS heeft geen kader, geen titelbalk en geen dock.
+      const openen = () => { location.href = l.url; };
       // prive-apps openen pas na de algemene pin (25-os-01a.js)
       if (l.prive) return metAlgPin(openen);
       openen();
@@ -7769,7 +7814,7 @@ var RTG_BOUW = 'e966f39a';
     if (ontmoetSosPc) return;
     try {
       await haalIce();
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: { facingMode: 'environment' } });
+      const stream = await RTGMedia.camera({ achter: true, audio: true });
       const pc = new RTCPeerConnection({ iceServers: iceConfig || [{ urls: 'stun:stun.l.google.com:19302' }] });
       ontmoetSosPc = pc; ontmoetSosDate = dateId;
       stream.getTracks().forEach(t => pc.addTrack(t, stream));

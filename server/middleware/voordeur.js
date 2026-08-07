@@ -93,11 +93,25 @@ function herschrijf(req, naar) {
   if (eigen && eigen.writable) req.path = naar;
 }
 
-/* De site-root is het bureaublad. Twee paden, dezelfde pagina. */
+/* De site-root is de HOMESCREEN, en er is er maar een.
+
+   Hier stonden twee bureaubladen naast elkaar. /apps/app.html draagt het
+   springboard -- iconen, mappen, de horlogering, zoeken -- en dat is de
+   homescreen. Daarnaast lag /apps/index.html: een scrollende pagina met alle
+   apps in secties, een eigen kopbalk met woordmerk, accountchips, en tegels
+   die een app in een IFRAME-venster erbovenop openden. Dat was een tweede
+   beginscherm met de metaforen van een computer, en twee beginschermen is er
+   een te veel: je wist nooit welke "thuis" was.
+
+   Alle drie de paden komen nu op dezelfde plek uit. /apps/index.html blijft
+   als pad bestaan omdat er van buiten naar gelinkt kan zijn; hij brengt je
+   gewoon thuis. */
 function bureaublad(app) {
-  const naarBureaublad = (req, res, next) => { herschrijf(req, '/apps/app.html'); next(); };
-  app.get('/', naarBureaublad);
-  app.get('/apps/bureau.html', naarBureaublad);
+  const naarHome = (req, res, next) => { herschrijf(req, '/apps/app.html'); next(); };
+  app.get('/', naarHome);
+  app.get('/apps/bureau.html', naarHome);
+  app.get('/apps/index.html', naarHome);
+  app.get('/apps/', naarHome);
 }
 
 /* ---------- meekijken welke SCHERMEN er geopend worden ----------

@@ -17,7 +17,7 @@
    ========================================================================== */
 'use strict';
 
-module.exports = function bouwKernAan(kern) {
+module.exports = function bouwKernAan(kern, grens) {
   const { db, save, crypto, schoon, sseToCustomer, accounts, anthropic,
     beveilig, fs, path, DATA_DIR, rtf, gidsHaal, keyVanCodenaam, leeftijdVan, leeftijdInstr } = kern;
   /* De logger RECHTSTREEKS uit ./log, niet via kern.logboek. Bij het verhuizen
@@ -41,9 +41,9 @@ module.exports = function bouwKernAan(kern) {
      RTG Bibliotheek; adviseert alleen apps die echt in de catalogi staan. */
   Object.assign(kern, require('../kern/bibliothecaris')({ appbieb: kern.appbieb, reisbieb: kern.reisbieb,
     rtfbieb: kern.rtfbieb, schoolbieb: kern.schoolbieb, beroepenbieb: kern.beroepenbieb, geloofbieb: kern.geloofbieb, anthropic, schoon }));
-  require('../routes/bieb')(kern);
+  require('../routes/bieb')(grens('bieb'));
   Object.assign(kern, require('../kern/samenrtf')({ db, save, crypto, schoon, zijnVrienden: kern.zijnVrienden }));
-  require('../routes/rtfschool')(kern);
+  require('../routes/rtfschool')(grens('rtfschool'));
   /* Samen (kern/samen.js): met vrienden meekijken en samen doen door het hele
      leden-OS; kamers op code, live seintjes via de SSE-stroom. */
   Object.assign(kern, require('../kern/samen')({ db, save, crypto, sseToCustomer, schoon }));
@@ -51,10 +51,10 @@ module.exports = function bouwKernAan(kern) {
      suites waar leden als pionnen op codenaam rondlopen en praten, live over
      het bestaande SSE-kanaal. */
   Object.assign(kern, require('../kern/residentie').maakResidentie({ db, save, schoon, sseToCustomer }));
-  require('../routes/samen')(kern);
-  require('../routes/baby')(kern);
-  require('../routes/tiener')(kern);
-  require('../routes/welzijn')(kern);
+  require('../routes/samen')(grens('samen'));
+  require('../routes/baby')(grens('baby'));
+  require('../routes/tiener')(grens('tiener'));
+  require('../routes/welzijn')(grens('welzijn'));
   /* De zelfzorg (kern/zelfzorg): de code ruimt zichzelf op, beschermt zichzelf,
      repareert zichzelf en upgradet zichzelf. De knoppen staan in de boardroom en
      de kamers Intern & IT en Ingenieurs; de veilige delen draaien ook als stille
@@ -71,38 +71,43 @@ module.exports = function bouwKernAan(kern) {
   /* De Onderzoeker (kern/rtgonderzoeker.js): de tweede AI van het RTG Kantoor,
      door de RTG AI gebouwd; doet agentisch onderzoek en adviseert alleen. */
   Object.assign(kern, require('../kern/rtgonderzoeker')({ db, save, crypto, schoon, anthropic }));
-  require('../routes/rtgkantoor')(kern);
-  require('../routes/kantoren')(kern);
-  require('../routes/gemeente')(kern);
+  require('../routes/rtgkantoor')(grens('rtgkantoor'));
+  require('../routes/kantoren')(grens('kantoren'));
+  require('../routes/gemeente')(grens('gemeente'));
   /* De Rijks-Bibliotheek (kern/rijksbieb.js): 10.000 werk-apps voor elke
      overheidsafdeling, inbegrepen voor rijksambtenaren; routes in overheid. */
   Object.assign(kern, require('../kern/rijksbieb').maakRijksBieb({ db, save }));
-  require('../routes/overheid')(kern);
-  require('../routes/luchthaven')(kern);
-  require('../routes/marechaussee')(kern);
-  require('../routes/uitgifte')(kern);
-  require('../routes/sportclub')(kern);
-  require('../routes/drm')(kern);
-  require('../routes/pay')(kern);
-  require('../routes/bank')(kern);
-  require('../routes/bankhart')(kern);
-  require('../routes/reis')(kern);
-  require('../routes/thuis')(kern);
-  require('../routes/werkvloer')(kern);
-  require('../routes/regering')(kern);
-  require('../routes/stad')(kern);
-  require('../routes/podium')(kern);
-  require('../routes/ghost')(kern);
-  require('../routes/flits')(kern);
-  require('../routes/theater')(kern);
-  require('../routes/wbw')(kern);
-  require('../routes/ov')(kern);
-  require('../routes/navigatie')(kern);
-  require('../routes/clips')(kern);
-  require('../routes/kantoorpakket')(kern);
+  require('../routes/overheid')(grens('overheid'));
+  require('../routes/luchthaven')(grens('luchthaven'));
+  require('../routes/marechaussee')(grens('marechaussee'));
+  require('../routes/uitgifte')(grens('uitgifte'));
+  require('../routes/sportclub')(grens('sportclub'));
+  require('../routes/drm')(grens('drm'));
+  require('../routes/pay')(grens('pay'));
+  require('../routes/bank')(grens('bank'));
+  require('../routes/bankhart')(grens('bankhart'));
+  require('../routes/reis')(grens('reis'));
+  require('../routes/thuis')(grens('thuis'));
+  require('../routes/werkvloer')(grens('werkvloer'));
+  require('../routes/regering')(grens('regering'));
+  require('../routes/stad')(grens('stad'));
+  require('../routes/podium')(grens('podium'));
+  require('../routes/ghost')(grens('ghost'));
+  require('../routes/flits')(grens('flits'));
+  require('../routes/theater')(grens('theater'));
+  require('../routes/wbw')(grens('wbw'));
+  require('../routes/ov')(grens('ov'));
+  require('../routes/navigatie')(grens('navigatie'));
+  require('../routes/clips')(grens('clips'));
+  require('../routes/kantoorpakket')(grens('kantoorpakket'));
+  require('../routes/mobiliteit')(grens('mobiliteit'));
+  /* Het Foundation OS: steden, partnerstichtingen, projecten, vrijwilligers,
+     geld, hulpvragen, meldingen en de portalen voor partner, gemeente en
+     ondernemer (de kern staat al in kernlaag7). */
+  require('../routes/rtfos')(grens('rtfos'));
 
   /* Deel twee -- identiteit, wonen, vervoer en clubs -- staat in ./aanbouw2.js.
      Gesplitst omdat een bestand van 9,5 kB in de waarschuwingsband van de
      omvangregel valt, en die band is precies wat er niet moet groeien. */
-  require('./aanbouw2')(kern);
+  require('./aanbouw2')(kern, grens);
 };

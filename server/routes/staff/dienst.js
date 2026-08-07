@@ -3,13 +3,19 @@
    ziekmelden en de vertrouwenspersoon. Krijgt de gedeelde context een keer
    bij het opstarten vanuit routes/staff.js. */
 module.exports = (actx) => {
-  const { DEMO, accounts, app, checkCred, crypto, db, findStaffPartner, hasCred, klokVan, logActivity, managerOnly, notifySupplier, publicPartner, save, schoon, sseClients, sseSend, sseToOffice, sseToSupplier, supplierAuth, trustVan,
-    fluisterZeg, fluisterVergeet, fluisterFocus, fluisterProfiel, stuurLus,
-    werkbeleidPauzeStand, WERKBELEID_PAUZE_MINUTEN } = actx;
+  const { DEMO, accounts, app, checkCred, crypto, db, findStaffPartner, hasCred, klokVan, logActivity, managerOnly, notifySupplier, publicPartner, save, schoon, sseClients, sseSend, sseToOffice, sseToSupplier, supplierAuth, trustVan, stuurLus, werkbeleidPauzeStand, WERKBELEID_PAUZE_MINUTEN,
+    /* payrollOS: een ziekmelding heeft twee kanten. De bezetting van vandaag
+       (deze laag) en de loondoorbetaling (kern/payroll/verzuim). Die tweede
+       stond gebouwd en werd door niets aangeroepen: de loonrun wist niet dat
+       iemand ziek was. Hij mag ontbreken (een kaal testproces mount de loonlaag
+       niet), dus elke aanroep hieronder controleert dat. */
+    payrollOS } = actx;
+  const fluister = actx.fluister;
+  const { fluisterZeg, fluisterVergeet, fluisterFocus, fluisterProfiel } = fluister;
 /* Fluister voor de vloer staat in ./dienst-fluister.js: dat stuk praat met een
    modelaanbieder en de rest van deze laag niet, dus de vraag wat er naar buiten
    gaat hoort daar bij elkaar. */
-require('./dienst-fluister')({ app, accounts, supplierAuth, fluisterZeg, fluisterVergeet, fluisterFocus, fluisterProfiel, stuurLus });
+require('./dienst-fluister')({ app, accounts, supplierAuth, fluister, stuurLus });
 
 app.post('/api/staff/clock', supplierAuth, (req, res) => {
   if (!req.actor.staffId) return res.status(403).json({ error: 'Alleen met een persoonlijke login.' });
@@ -70,6 +76,22 @@ app.post('/api/staff/leave/request', supplierAuth, (req, res) => {
   const geldig = d => /^\d{4}-\d{2}-\d{2}$/.test(d);
   if (soort === 'verlof' && (!geldig(van) || !geldig(tot) || tot < van))
     return res.status(400).json({ error: 'Kies een geldige begin- en einddatum.' });
+
+  /* EEN ZIEKMELDING DRAAGT GEEN REDEN. Die stond hier wel: `reden` werd
+     gewoon overgenomen en het HR-scherm van de werkgever toonde hem achter de
+     naam. Dat is een gezondheidsgegeven van een werknemer in een
+     personeelssysteem, zichtbaar voor de leidinggevende -- precies de lijn die
+     de Autoriteit Persoonsgegevens trekt, en precies waar
+     kern/payroll/verzuim.js voor is gebouwd. Die laag weigerde het al; deze
+     route wist er niets van.
+
+     WEIGEREN EN NIET OPSCHONEN. Wie het veld stilzwijgend leegmaakt, laat de
+     invoerder denken dat het is aangekomen -- en de volgende keer probeert hij
+     het opnieuw, of belt hij het door. De melding hoort te stuiten, met de
+     reden erbij. De app stuurt bij een ziekmelding sowieso geen reden mee, dus
+     dit breekt niets; het sluit een deur die openstond. */
+  if (soort === 'ziek' && schoon(req.body.reden, 140))
+    return res.status(422).json({ error: 'Een ziekmelding draagt geen omschrijving. Wat je hebt, hoort bij de arbodienst; hier staat alleen dat je er niet bent en wat je nog kunt.' });
   const lijst = db.data.verlof[req.supplier.code] = db.data.verlof[req.supplier.code] || [];
   const entry = {
     id: crypto.randomBytes(4).toString('hex'),
@@ -82,6 +104,25 @@ app.post('/api/staff/leave/request', supplierAuth, (req, res) => {
   };
   lijst.unshift(entry);
   db.data.verlof[req.supplier.code] = lijst.slice(0, 2000);
+
+  /* Dezelfde melding ook naar de verzuimlaag van Payroll OS. Die kent de
+     doorbetalingspercentages per verlofsoort en weet wanneer het UWV eraan te
+     pas komt; zonder deze regel wist de loonrun niet dat iemand ziek was en
+     betaalde hij honderd procent door.
+
+     EEN SCHRIJFPAD, TWEE GEZICHTEN -- en dat is met opzet geen tweede invoer.
+     `db.data.verlof` hierboven is de goedkeuringsstroom van de zaak-app (nieuw
+     -> goedgekeurd/afgewezen); de verzuimlaag is wat de payroll ervan moet
+     weten. Zou een mens ze allebei moeten invullen, dan lopen ze uiteen en
+     klopt de loondoorbetaling niet met het rooster. */
+  if (payrollOS && payrollOS.verzuim) {
+    const v = payrollOS.verzuim.meld(req.supplier.code, req.actor.staffId, {
+      soort: soort === 'ziek' ? 'ziek' : 'vakantie', van: entry.van, tot: entry.tot
+    }, req.actor.name);
+    // een bezwaar hier is een fout in ONZE vertaling, niet in de invoer van de
+    // medewerker; hij hoort zichtbaar te zijn en de melding niet te blokkeren
+    if (v && v.error) console.error('[verzuim] melding niet vastgelegd:', v.error, v.bezwaren || '');
+  }
   save();
   if (soort === 'ziek') {
     logActivity(req.supplier.code, req.actor, 'meldde zich ziek');
@@ -94,31 +135,16 @@ app.post('/api/staff/leave/request', supplierAuth, (req, res) => {
   res.json({ ok: true, entry });
 });
 
-app.post('/api/staff/trust/send', supplierAuth, (req, res) => {
-  if (!req.actor.staffId) return res.status(403).json({ error: 'Alleen met een persoonlijke login.' });
-  const text = schoon(req.body.text, 800);
-  if (!text) return res.status(400).json({ error: 'Leeg bericht.' });
-  let t = db.data.trustLine.find(x => x.code === req.supplier.code && x.staffId === req.actor.staffId);
-  if (!t) {
-    t = { id: crypto.randomBytes(4).toString('hex'), code: req.supplier.code, company: req.supplier.name,
-          staffId: req.actor.staffId, anon: !!req.body.anon, name: req.actor.name, messages: [], open: true, lastAt: null };
-    db.data.trustLine.unshift(t);
-    db.data.trustLine = db.data.trustLine.slice(0, 2000);
-  }
-  if (req.body.anon != null) t.anon = !!req.body.anon;
-  t.messages.push({ from: 'staff', text, at: new Date().toISOString() });
-  t.messages = t.messages.slice(-60);
-  t.open = true;
-  t.lastAt = new Date().toISOString();
-  save();
-  // bewust GEEN logActivity en GEEN notifySupplier: dit blijft buiten de werkgever om
-  sseToOffice('sync', { scope: 'trust' });
-  res.json({ ok: true, trust: trustVan(req.supplier.code, req.actor.staffId) });
-});
+/* WAT KAN IK NOG WEL. Dit is de andere helft van een ziekmelding, en hij
+   ontbrak: de melding legde vast DAT je er niet bent, en `inzetbaarheid` bleef
+   staan op "niets" omdat niemand hem ooit kon veranderen. Daardoor kwam er uit
+   de planningslaag nooit iets bruikbaars -- en die laag is juist gebouwd om je
+   leidinggevende te laten plannen zonder te weten wat je hebt.
 
-app.post('/api/staff/trust/thread', supplierAuth, (req, res) => {
-  if (!req.actor.staffId) return res.status(403).json({ error: 'Alleen met een persoonlijke login.' });
-  res.json({ trust: trustVan(req.supplier.code, req.actor.staffId) });
-});
+   JIJ ZEGT HET, NIET JE WERKGEVER. Dit is de enige plek waar deze waarde wordt
+   gezet, en het is jouw eigen route. Een manager die kan invullen dat jij
+   "deels inzetbaar" bent, heeft een oordeel over je gezondheid gegeven; dat
+   hoort bij jou en de arbodienst.
 
+   En er is nog steeds GEEN veld voor waarom. Vier standen, meer niet. */
 };

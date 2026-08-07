@@ -21,6 +21,10 @@ module.exports = [
     uitleg: 'Alle vervoer in een app: de kaart, twee snelle check-ins, de dienst-PDA en de routetekenaar. De zaak-kant is alleen voor OV-zaken.',
     paden: ['/api/ov', '/api/staff/ov', '/api/supplier/ov'],
     alleenGenres: ['ov'] },
+  { id: 'mobiliteit', categorie: 'Eigen apps', naam: 'RTG Vervoer (Mobility OS)', standaard: true, doelgroepen: ['rtg', 'lifestyle', 'business', 'leverancier', 'personeel'],
+    uitleg: 'De vervoerskern: een rit aanvragen en volgen, de vloot en de dispatch van een vervoerder, en de bedrijfspendel. WELK vervoer er in een stad bestaat staat los hiervan, in het vervoersmoduleregister (backoffice); deze schakelaar zet de hele app aan of uit.',
+    paden: ['/api/mob', '/api/staff/mob', '/api/supplier/mob', '/api/office/mob'],
+    alleenGenres: ['taxi', 'jet', 'helikopter', 'ov', 'verhuur', 'charter'] },
   { id: 'wbw', categorie: 'Eigen apps', naam: 'Wie betaalt wat', standaard: true, doelgroepen: LEDEN,
     uitleg: 'Groepsuitgaven met een live balans en verrekenen via RTG Pay.', paden: ['/api/wbw'] },
   // Let op: NIET 'office' als id; die naam is al van de RTG-Backoffice hieronder.

@@ -11,10 +11,11 @@
 <link href="/fonts/fonts.css" rel="stylesheet">
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/dagkleur.css" rel="stylesheet">
-<link href="/shared/os.css" rel="stylesheet">
 <link href="/shared/uitleg.css" rel="stylesheet">
-<link href="/shared/osmenu.css" rel="stylesheet">
 <link href="/shared/rtg-ui.css" rel="stylesheet">
+<!-- de melding van de mediapoort; tussen de andere bladen zodat hij in DEZELFDE
+     stijlbundel meegaat en er geen tweede bundel bijkomt (test/stijlbundel.test.js) -->
+<link rel="stylesheet" href="/shared/media.css">
 <style>
   /* --burgundy volgt nu de levende dagkleur uit de machines (dagkleur.css),
      met de bordeaux-op-zwart als vaste terugval; --merk (wijn) en --gold
@@ -70,10 +71,11 @@
   .schakel input{width:1.05rem;height:1.05rem;accent-color:var(--gold);}
 .merkvlak{display:inline-block;background:#7F1634;color:#fff;padding:.22rem .7rem .28rem;border-radius:4px;}
 </style>
-<link href="/shared/desktopframe.css" rel="stylesheet">
-<script src="/shared/desktopframe.js" defer></script>
+<!-- niet defer: dit script draait voor elke inline-body-script en voor elk kader -->
+<script src="/shared/media.js"></script>
+<link href="/shared/ios.css" rel="stylesheet">
 </head>
-<body data-osbar="RTG Pay" data-oswereld="lid" class="rtg-stijl">
+<body class="rtg-stijl">
 <a class="skip" href="#hoofd">Naar de inhoud</a>
 <!-- de RTG-OS bovenbalk (woordmerk + klok + account) wordt door
      shared/osbar.js hierboven ingevoegd; de app-eigen header is vervallen -->
@@ -413,9 +415,7 @@ if (TOKEN) start(); else toon('vGate');
 </script>
 <script src="/shared/seizoen.js" defer></script>
 <script src="/shared/accounts-os.js" defer></script>
-<script src="/shared/osbar.js" defer></script>
 <script src="/shared/uitleg.js" defer></script>
-<script src="/shared/osmenu.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <!-- QR: de tikcode als scanbare code tonen (RTGQRteken) en scannen om te
@@ -432,5 +432,6 @@ if (TOKEN) start(); else toon('vGate');
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/sneltoets.js" defer></script>
+<script src="/shared/ios.js" defer></script>
 </body>
 </html>

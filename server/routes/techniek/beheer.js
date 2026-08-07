@@ -5,7 +5,8 @@ const techniek = require('../../techniek');
 const eigenaar = require('../../eigenaar');
 const { log } = require('../../log');
 module.exports = (tctx) => {
-  const { app, accounts, anthropic, archief, beveilig, crypto, db, mail, save, sendPushToUser, LANDEN, keyVanCodenaam, talen, onboarding, staat, eigenaarUser, isEigenaar, magInzien, techAuth, eigenaarAlleen, ctx } = tctx;
+  const { app, accounts, anthropic, archief, beveilig, crypto, db, save, sendPushToUser, staat,
+          isEigenaar, techAuth, eigenaarAlleen } = tctx;
   /* De eigenaar vraagt ZELF om een update/modernisering, in gewone taal. De AI
      geeft een concreet, veilig plan. NIETS gaat live naar de gasten: het verzoek
      wordt vastgelegd als voorstel dat via de veilige stroom (Claude stelt voor via

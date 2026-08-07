@@ -66,8 +66,17 @@ async function managerVan(P, code) {
 }
 
 /* De hele weg naar binnen bij een bedrijf: solliciteren, uitgenodigd worden,
-   aangenomen worden en je met de kassacode aanmelden. Geeft de kassacode en de
-   personeelsgegevens terug. */
+   aangenomen worden en in dienst zijn.
+
+   DE LAATSTE STAP IS VERANDERD, met opzet. Hier stond eerst: aannemen levert
+   een kassacode, en daarmee meld je je aan bij /api/supplier/staff/join. Maar
+   wie via de app solliciteert HEEFT al een RTG-account -- daar solliciteerde
+   hij mee -- en dan is een code met "typ de bedrijfsnaam over" een omweg langs
+   gegevens die het systeem zelf al heeft. Aannemen verbindt hem nu meteen.
+
+   De kassacode is niet weg: wie BUITEN de app solliciteert (naam en telefoon
+   op de open sollicitatie, zonder account) krijgt hem nog steeds, samen met de
+   wervingslink. Dat pad staat in test/werving-link.test.js. */
 async function inDienstBij(P, code, sollicitant, inlog) {
   const manager = await managerVan(P, code);
 
@@ -86,16 +95,12 @@ async function inDienstBij(P, code, sollicitant, inlog) {
 
   const aanname = await P('/api/supplier/apply/decide', { id: mijne.id, action: 'aannemen' }, manager.token);
   assert.equal(aanname.status, 200, 'de manager neemt aan: ' + JSON.stringify(aanname.body).slice(0, 160));
-  const kassacode = aanname.body.invite && aanname.body.invite.kassacode;
-  assert.ok(kassacode, 'en er komt een kassacode uit');
-
-  const join = await P('/api/supplier/staff/join', {
-    bedrijf: aanname.body.bedrijf, kassacode,
-    login: inlog.email, password: inlog.wachtwoord
-  });
-  assert.equal(join.status, 200, 'de nieuwe collega meldt zich aan met zijn eigen RTG-account: ' +
-    JSON.stringify(join.body).slice(0, 200));
-  return { kassacode, join: join.body, manager };
+  assert.ok(aanname.body.direct && aanname.body.direct.staffId,
+    'wie via de app solliciteerde is meteen in dienst, zonder code over te typen: ' +
+    JSON.stringify(aanname.body).slice(0, 200));
+  assert.equal(aanname.body.invite, undefined,
+    'en krijgt dus geen kassacode meer voor een stap die al gezet is');
+  return { direct: aanname.body.direct, join: aanname.body.direct, manager };
 }
 
 test('de levensloop: van aanmelding tot tweede baan, en er weer uit', async () => {
@@ -155,8 +160,18 @@ test('de levensloop: van aanmelding tot tweede baan, en er weer uit', async () =
     assert.equal(klok.status, 200, 'ze klokt in: ' + JSON.stringify(klok.body).slice(0, 160));
 
     /* ---- 10. ZIEK MELDEN. De werkgever hoort het te weten; een ziekmelding
-       die niemand bereikt is geen ziekmelding. ---- */
-    const ziek = await P('/api/staff/leave/request', { soort: 'ziek', reden: 'Griep' }, werk1.token);
+       die niemand bereikt is geen ziekmelding.
+
+       ZONDER "Griep". Hier stond `reden: 'Griep'`, en de route nam dat gewoon
+       aan -- een gezondheidsgegeven van een werknemer in het dossier van zijn
+       werkgever. Dat is dichtgezet (zie test/ziekmelding-privacy.test.js); wat
+       de werkgever te weten komt is DAT ze er niet is, niet WAT ze heeft. Deze
+       toets liep hier langs en legde het oude gedrag vast; dat is precies hoe
+       een fout een afspraak wordt. ---- */
+    const metReden = await P('/api/staff/leave/request', { soort: 'ziek', reden: 'Griep' }, werk1.token);
+    assert.equal(metReden.status, 422, 'een ziekmelding met een omschrijving stuit');
+
+    const ziek = await P('/api/staff/leave/request', { soort: 'ziek' }, werk1.token);
     assert.equal(ziek.status, 200, 'ze meldt zich ziek: ' + JSON.stringify(ziek.body).slice(0, 160));
     assert.equal(ziek.body.entry.soort, 'ziek', 'het staat als ziekmelding genoteerd');
     assert.equal(ziek.body.entry.status, 'gemeld', 'met de juiste status');
@@ -179,7 +194,7 @@ test('de levensloop: van aanmelding tot tweede baan, en er weer uit', async () =
     /* ---- 12. EEN TWEEDE BAAN ERBIJ. De eerste hoort te BLIJVEN staan; dat
        is precies de overgang waar zoiets stukgaat. ---- */
     const tweede = await inDienstBij(P, 'ESVEDRA', lid, inlog);
-    assert.ok(tweede.kassacode, 'ze is ook bij ESVEDRA aangenomen');
+    assert.ok(tweede.direct && tweede.direct.staffId, 'ze is ook bij ESVEDRA meteen in dienst');
 
     const naTwee = await P('/api/auth/login', { login: inlog.email, password: inlog.wachtwoord });
     const beide = naTwee.body.werkplekken || naTwee.body.werk || [];

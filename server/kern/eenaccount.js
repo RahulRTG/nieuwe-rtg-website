@@ -35,34 +35,12 @@ function maakEenAccount({ db, save, crypto, accounts, findSupplier, checkCred, h
   const koppelen = require('./eenaccount/koppelen')({ accounts, findSupplier, checkCred, hasCred,
     DEMO, DEMO_SUPPLIER, OFFICE_CODE, veiligGelijk, totpOk, logInlog, pinSlot, nu });
 
-  /* ---- de eigenaar heeft de kantoordeur al, en hoort hem ook te ZIEN ----
-
-     server/eigenaar.js legt vast dat de eigenaar overal bij de beheeromgevingen
-     kan, met zoveel woorden: "de RTG-Backoffice (met zijn eigen accountlogin,
-     zonder aparte code)". Achter de deur klopte dat ook -- boardroomWie() kent
-     hem, en accStart munt voor de rol 'kantoor' netjes een office-sessie. Maar
-     de sleutelbos zelf kende alleen GEKOPPELDE rollen, en koppelen vraagt om
-     de backoffice-code. Gevolg: de eigenaar kreeg in de Werk-kiezer op zijn
-     telefoon "Nog geen werkplek gekoppeld" -- een belofte in de tekst die de
-     code niet nakwam.
-
-     Daarom hangt de kantoorrol hier als een AFGELEIDE sleutel aan de bos: niet
-     opgeslagen (er valt niets te koppelen of te ontkoppelen aan iets wat je al
-     bent), en hij verdwijnt vanzelf zodra het eigenaarschap wordt overgedragen.
-     De controle staat server-side en gaat via dezelfde ene bron als de rest
-     van het huis (eigenaar.isEigenaar), zodat een overdracht overal tegelijk
-     telt. De algemene pin blijft gewoon gelden: bevoegdheid is het account,
-     bewijs is de pin. */
-  const eigenaar = require('../eigenaar');
-  function eigenaarKantoor(key) {
-    const m = /^user-(\d+)$/.exec(String(key || ''));
-    if (!m) return null;
-    let user = null;
-    try { user = accounts.getUserById(Number(m[1])); } catch (e) { return null; }
-    if (!user || !eigenaar.isEigenaar(accounts, user)) return null;
-    return { rol: 'kantoor', code: null, staffId: null, naam: 'RTG-Backoffice',
-      zaakNaam: null, at: null, viaEigenaar: true };
-  }
+  /* De AFGELEIDE sleutels: niet opgeslagen maar gelezen uit een waarheid die
+     ergens anders al staat -- de kantoordeur van de eigenaar en elke
+     werkruimte waar dit account aan gekoppeld is. Zie ./eenaccount/afgeleid.js
+     voor waarom dat geen tweede opslag mag worden. */
+  const afgeleid = require('./eenaccount/afgeleid')({ db, accounts });
+  const { eigenaarKantoor } = afgeleid;
 
   /* ---- de sleutelbos van dit account ---- */
   function accRollen(key) {
@@ -73,6 +51,11 @@ function maakEenAccount({ db, save, crypto, accounts, findSupplier, checkCred, h
     if (eig && !rollen.some(r => r.rol === 'kantoor')) {
       rollen.push({ rol: 'kantoor', code: null, staffId: null, naam: eig.naam,
         zaakNaam: null, sinds: null, viaEigenaar: true });
+    }
+    // en elke werkruimte waar dit account aan gekoppeld is, apart per
+    // organisatie en met de eigen functie erbij
+    for (const wr of afgeleid.werkruimtes(key)) {
+      if (!rollen.some(r => r.rol === 'werkruimte' && r.code === wr.code)) rollen.push(wr);
     }
     return { status: 200, rollen };
   }
@@ -99,6 +82,10 @@ function maakEenAccount({ db, save, crypto, accounts, findSupplier, checkCred, h
       && (wens.staffId == null || x.staffId === wens.staffId));
     // de eigenaar opent de kantoordeur zonder koppeling; zie eigenaarKantoor()
     if (!r && wens.rol === 'kantoor' && !wens.code) r = eigenaarKantoor(key);
+    // een werkruimte staat niet in de opslag maar in de koppeling zelf
+    if (!r && wens.rol === 'werkruimte') {
+      r = afgeleid.werkruimtes(key).find(x => !wens.code || x.code === wens.code) || null;
+    }
     if (!r) return { status: 404, error: 'Deze rol is niet aan uw account gekoppeld.' };
     // de algemene pin: heeft dit lid er een gezet, dan opent er geen werk-app
     // zonder (bevoegdheid = het ene account, bewijs = de pin). Zonder pin in
@@ -107,6 +94,18 @@ function maakEenAccount({ db, save, crypto, accounts, findSupplier, checkCred, h
       if (!(body || {}).pin) return { status: 401, error: 'Voer uw algemene pin in.', pinNodig: true };
       const p = await pinCheck(key, body.pin);
       if (p.error) return { status: p.status || 401, error: p.error, pinNodig: true };
+    }
+    /* De werkruimte munt geen nieuwe sessie: hij HEEFT er al een, en dat is de
+       code plus het lid-token dat deze persoon zelf in handen had toen hij
+       koppelde. We geven dus terug wat hij al bezit -- geen escalatie, wel het
+       einde van de tweede inlog. Vers opgezocht, zodat losmaken of een
+       schorsing meteen telt. */
+    if (r.rol === 'werkruimte') {
+      const wl = afgeleid.werkruimteLid(key, r.code);
+      if (!wl) return { status: 403, error: 'Deze werkruimte is niet (meer) aan uw account gekoppeld.' };
+      logInlog('werkruimte', true, wl.w.code + ' · ' + (wl.l.functie || wl.l.naam) + ' via RTG-account', req);
+      return { status: 200, ok: true, rol: 'werkruimte', token: wl.l.token,
+        code: wl.w.code, naam: wl.w.naam, functie: wl.l.functie || null };
     }
     if (r.rol === 'kantoor') {
       const token = crypto.randomBytes(24).toString('hex');

@@ -173,3 +173,30 @@ test('7. de routetekenaar: de manager zet zelf een lijn op de kaart en leden zie
   const kaart2 = await api('/api/ov/kaart', STAD, lidB);
   assert.ok(!kaart2.body.lijnen.some(l => /Lijn 9/.test(l.naam)), 'de lijn is uit de leden-app');
 });
+
+test('8. de dienst overleeft een herlaadbeurt: de stand zegt of hij loopt', async () => {
+  /* Dit ontbrak, en het was geen detail: het scherm schakelde alleen naar de
+     lopende dienst na een KLIK op "start", terwijl `stand` niet vertelde of er
+     een dienst liep. Wie de PDA herlaadde -- na een telefoontje, een
+     schermvergrendeling of een hapering -- kreeg het startscherm terug terwijl
+     zijn dienst gewoon doorliep: geen tellers, geen GPS, en geen kaartcontrole. */
+  const roster = await api('/api/supplier/roster', { code: 'TRANSIT' });
+  const ch = roster.body.staff.find(x => x.role !== 'manager');
+  const tok = (await api('/api/supplier/login', { code: 'TRANSIT', staffId: ch.id, pin: '5678' })).body.token;
+
+  const uit = await api('/api/staff/ov/stand', {}, tok);
+  assert.equal(uit.status, 200);
+  assert.equal(uit.body.aan, false, 'zonder dienst zegt de stand dat er niets loopt');
+  assert.equal(uit.body.lijn, null);
+
+  const d = await api('/api/staff/ov/dienst', { lijnId: 'M1', voertuigNaam: 'Metro 2' }, tok);
+  assert.equal(d.status, 200, d.body.error || '');
+  const aan = await api('/api/staff/ov/stand', {}, tok);
+  assert.equal(aan.body.aan, true, 'met een dienst zegt hij dat hij loopt');
+  assert.equal(aan.body.lijn.id, 'M1', 'en op welke lijn');
+  assert.equal(aan.body.voertuigNaam, 'Metro 2', 'en met welk voertuig');
+
+  await api('/api/staff/ov/dienst', { aan: false }, tok);
+  const na = await api('/api/staff/ov/stand', {}, tok);
+  assert.equal(na.body.aan, false, 'na afmelden loopt er weer niets');
+});

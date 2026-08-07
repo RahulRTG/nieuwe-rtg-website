@@ -17,6 +17,36 @@ const os = require('os');
 const path = require('path');
 const { startServer, stop } = require('./helper');
 
+/* ELKE FETCH MET EEN DEADLINE -- EEN TWEEDE SLOT, EN NIET DE OORZAAK.
+
+   Eerlijk over de volgorde: ik heb dit als eerste gedaan met de gedachte dat het
+   DE reparatie was voor de vastloper waar dit bestand voor in MUTATIES.json
+   stond. Dat was fout -- na deze wijziging liep hij nog steeds vast. De echte
+   oorzaak stond in het opruimen (zie de finally verderop) en kwam pas boven door
+   de proef met de hand te draaien en naar de UITVOER te kijken.
+
+   Dit blok blijft staan omdat het op zichzelf een echt gat dicht: een fetch zonder
+   time-out in een toets kan blijven staan, en dan telt een begrensde wachtlus niet
+   verder -- begrensde lus, onbegrensde stap. Het is een tweede slot op een deur
+   die nu ook echt op slot zit, geen reparatie die ik als de oorzaak mag opvoeren.
+
+   Wat er misging: onder de liegpoort (de motor laat de server op elk /api-pad
+   liegen) kwam een van deze verzoeken nooit terug. De wachtlussen hieronder zijn
+   WEL begrensd -- honderd of honderdvijftig pogingen van 200 ms -- maar een lus
+   telt niet verder zolang een stap niet klaar is. Begrensde lus, onbegrensde stap.
+   Gevolg: het proces sluit niet af, de motor noteert `vastgelopen`, en dat telt
+   niet als gezakt: het gedrag was echt veranderd en geen assertie heeft het
+   gemeld. Een toets die hangt is erger dan een toets die zakt.
+
+   fetch wordt hier op MODULENIVEAU geschaduwd. Dat dekt alle aanroepen in dit
+   bestand -- ook de geneste `await (await fetch(...)).json()` -- zonder ze een
+   voor een aan te raken, en het verandert niets buiten dit bestand. Een
+   meegegeven signal wint, dus wie zelf een AbortController gebruikt houdt zijn
+   eigen gedrag. */
+const _fetch = globalThis.fetch;
+const fetch = (u, o) => _fetch(u, Object.assign({ signal: AbortSignal.timeout(10000) }, o));
+
+
 // Forceer de sqlite-opslag (de standaard voor een verse installatie) ongeacht de
 // omgeving waarin de suite draait -- zonder DATABASE_URL, zonder db.json.
 const KILL_ENV = { RTG_STORE: 'sqlite', DATABASE_URL: '', PG_URL: '', SMTP_URL: '' };
@@ -36,9 +66,12 @@ const saldo = (base, tok) => api(base, 'pay/overzicht', {}, tok).then(r => r.bod
 
 test('een harde SIGKILL midden in de betaalstroom verliest geen bevestigde tik en schept geen geld', async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-kill-'));
+  /* `srv` staat BUITEN de try zodat de finally hem kan stoppen. Zie de finally
+     hieronder voor waarom dat nodig was. */
+  let srv = null;
   try {
     // ---- ronde 1: laden + tikken, elke tik bevestigd (200) ----
-    let srv = await startServer({ env: { ...KILL_ENV, RTG_DATA_DIR: TMP } });
+    srv = await startServer({ env: { ...KILL_ENV, RTG_DATA_DIR: TMP } });
     const A = await login(srv.base, 'rtg');
     const B = await login(srv.base, 'lifestyle');
     assert.ok(A.codenaam && B.codenaam && A.codenaam !== B.codenaam, 'twee leden met een eigen codenaam');
@@ -75,16 +108,29 @@ test('een harde SIGKILL midden in de betaalstroom verliest geen bevestigde tik e
     assert.equal(her.body.herhaald, true, 'de her-tik met een gebruikte sleutel is herkend als herhaling');
     assert.equal(await saldo(srv.base, B.token), bNa, 'de herhaalde tik boekt niet nog een keer');
 
-    stop(srv.child);
   } finally {
+    /* DE SERVER HOORT IN DE FINALLY, en dat was het lek waarvoor deze toets als
+       `vastgelopen` in MUTATIES.json stond. `stop(srv.child)` stond als laatste
+       regel van de try; zakt een assertie ervoor -- en onder de liegpoort zakken er
+       twee, gemeten -- dan blijft het serverproces staan en kan node niet
+       afsluiten. Het proces liep tot de time-out (exit 124), en dan telt de motor
+       het NIET als gezakt, terwijl er wel asserties zakten. Dat is de stilste vorm
+       van stuk.
+
+       De finally ruimde wel de tijdelijke map op, en dat is de val: het zag eruit
+       als een toets die opruimt. */
+    try { stop(srv && srv.child); } catch (e) { /* al weg: prima */ }
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
 });
 
 test('conservatie houdt ook als de crash midden in een burst van tikken valt', async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-kill2-'));
+  /* `srv` staat BUITEN de try zodat de finally hem kan stoppen. Zie de finally
+     hieronder voor waarom dat nodig was. */
+  let srv = null;
   try {
-    let srv = await startServer({ env: { ...KILL_ENV, RTG_DATA_DIR: TMP } });
+    srv = await startServer({ env: { ...KILL_ENV, RTG_DATA_DIR: TMP } });
     const A = await login(srv.base, 'rtg');
     const B = await login(srv.base, 'lifestyle');
     await api(srv.base, 'pay/oplaad', { centen: 100000, idem: 'op-1' }, A.token);
@@ -105,8 +151,18 @@ test('conservatie houdt ook als de crash midden in een burst van tikken valt', a
     assert.equal(aNa + bNa, geladen, 'geld-conservatie over de crash: totaal onveranderd');
     assert.equal(bNa % BEDRAG, 0, 'geen halve tik: B kreeg alleen hele bedragen (transactie-atomiciteit)');
     assert.ok(aNa >= 0 && bNa >= 0, 'geen saldo onder nul');
-    stop(srv.child);
   } finally {
+    /* DE SERVER HOORT IN DE FINALLY, en dat was het lek waarvoor deze toets als
+       `vastgelopen` in MUTATIES.json stond. `stop(srv.child)` stond als laatste
+       regel van de try; zakt een assertie ervoor -- en onder de liegpoort zakken er
+       twee, gemeten -- dan blijft het serverproces staan en kan node niet
+       afsluiten. Het proces liep tot de time-out (exit 124), en dan telt de motor
+       het NIET als gezakt, terwijl er wel asserties zakten. Dat is de stilste vorm
+       van stuk.
+
+       De finally ruimde wel de tijdelijke map op, en dat is de val: het zag eruit
+       als een toets die opruimt. */
+    try { stop(srv && srv.child); } catch (e) { /* al weg: prima */ }
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
 });

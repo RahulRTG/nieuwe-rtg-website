@@ -301,8 +301,8 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
     ['public/apps/app-main/app-main-52.js', 'een HTML-opbouw in een string, in een keer'],
     ['public/apps/personeel/personeel-17.js', 'een opbouwfunctie zonder binnengrens'],
     ['public/apps/backoffice/backoffice-03.js', 'een opbouwfunctie zonder binnengrens'],
-    ['public/shared/glyf/glyf-02.js', 'de glyfentabel: elk icoon een pad, hoort bij elkaar'],
     ['public/shared/flagship/flagship-02.js', 'een opbouwfunctie zonder binnengrens'],
+    ['public/shared/glyf/glyf-02.js', 'de glyfentabel: elk icoon een pad, hoort bij elkaar'],
     ['public/shared/klok3d/klok3d-01.js', 'de 3D-klok: een aaneengesloten tekenlus'],
     ['public/shared/metgezel/metgezel-01.js', 'de metgezel-laag in een IIFE zonder binnengrens'],
     ['public/shared/i18n/i18n-01.js', 'de taaltabel + kiezer, een geheel'],
@@ -316,6 +316,15 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
      WAARSCHUWEN hier dus, ze breken de keuring niet -- anders staat het licht
      voor iedereen op rood voor iets wat gepland is. De lijst hoort te krimpen. */
   const NOG = new Set([
+    /* public/shared/media.js stond op 10238 bytes -- TWEE onder de grens -- en
+       ging erover zodra er een gemeten oorzaak bij de foutentabel kwam
+       (NotSupportedError). Hij hoort in NOG en niet in MAG: hij is GEEN ondeelbaar
+       stuk, er zit een duidelijke naad tussen de diagnose (reden/NAMEN/vraag) en
+       de zichtbare melding. Opknippen is wel echte bedrading: 21 pagina's laden
+       nu een module en een blad, en keuringsregel 38 rekent dat na, dus er komt
+       een tweede script bij dat overal mee moet. Dat doe je een voor een met de
+       toetsen ernaast en niet in de staart van een ronde. */
+    'public/shared/media.js',
     // server/accounts/users.js is opgeknipt: het ledendossier, de verificatie, de
     // kantoorlijsten en de vergetelheid staan nu in server/accounts/dossier.js
     'server/kern/journalistiek.js',
@@ -521,7 +530,13 @@ console.log('\n15) id\'s in de client uit de CSPRNG, niet uit de klok of Math.ra
    nadenken. */
 console.log('\n16) elk leden-pad met een derde partij gaat langs de gegevenspoort');
 {
-  const DERDE = /bestel|order|reserve|boek|booking|bezorg|leveri|koerier|courier|afhaal|ophaal|verblijf|proefrit|koop|huur|ticket|vervoer|taxi|\brit\b/i;
+  /* `\/mob\/` staat er sinds het Mobility OS, en om een reden die het noteren
+     waard is: de hoofdroute daar heet /api/mob/vraag, en die glipte langs elk
+     woord in deze lijst. Een taxi bestellen bij een ANDER bedrijf is precies
+     waar deze regel over gaat, en hij zag hem niet -- niet omdat de route veilig
+     was, maar omdat hij toevallig geen van deze woorden in zijn pad had. Een
+     regel die op woordkeus afgaat, mist alles wat anders heet. */
+  const DERDE = /bestel|order|reserve|boek|booking|bezorg|leveri|koerier|courier|afhaal|ophaal|verblijf|proefrit|koop|huur|ticket|vervoer|taxi|\brit\b|\/mob\//i;
   // alleen kijken/opvragen: geen handeling, dus niets te vragen
   const KIJKEN = /\/(mijn|mine|status|volg|slots|annuleer|betaal|pay|partners|overzicht|lijst|list|historie|history|zoek|markt|advies|check|info)\b/i;
   /* Hele domeinen waar het woord toevallig valt maar geen derde partij staat:
@@ -541,7 +556,19 @@ console.log('\n16) elk leden-pad met een derde partij gaat langs de gegevenspoor
     ['/api/huur/locatie', 'vervolgstap in een lopende huur (vrijwillige positie)'],
     ['/api/huur/sos', 'noodknop tijdens een lopende huur -- hier NOOIT iets vragen'],
     ['/api/verkoop/teken', 'het contract van een deal die al loopt tekenen'],
-    ['/api/asset/koop', 'RTG Shared Assets is van RTG zelf; er staat geen derde tegenover']
+    ['/api/asset/koop', 'RTG Shared Assets is van RTG zelf; er staat geen derde tegenover'],
+    ['/api/mob/aanbod', 'welk vervoer hier bestaat opvragen; er gebeurt nog niets'],
+    ['/api/mob/plekken', 'de bestemmingenlijst opvragen; er gebeurt nog niets'],
+    ['/api/mob/favoriet', 'je eigen bewaarde plekken; er staat geen derde tegenover'],
+    ['/api/mob/pendel', 'de dienstregeling van je eigen werkgever bekijken'],
+    ['/api/mob/pendel/reserveer', 'een stoel in de bus van je eigen werkgever; de werkgever is de klant van de vervoerder, niet het lid, en er gaat op dit moment niets naar een derde'],
+    ['/api/mob/kaart/aanbod', 'kijken welke vervoerbewijzen er te koop zijn; er gebeurt nog niets'],
+    ['/api/mob/kaart/mijn', 'je eigen kaartjes bekijken'],
+    ['/api/mob/reis/plan', 'reisopties naast elkaar zetten; er wordt niets geboekt'],
+    ['/api/mob/reis/mijn', 'je eigen reizen bekijken'],
+    ['/api/mob/abo/aanbod', 'kijken of er een abonnement te koop is; er gebeurt nog niets'],
+    ['/api/mob/abo/mijn', 'je eigen abonnementen bekijken'],
+    ['/api/mob/beleid', 'het reisbeleid van je eigen werkgever lezen; er gebeurt niets']
   ]);
   let gaten = 0, poorten = 0;
   loop(path.join(ROOT, 'server/routes'), /\.js$/, f => {
@@ -1374,6 +1401,7 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
     ['/api/aanmelding/aanvraag', 'een aanstaande aanvrager is nog geen lid (met rem per ip)'],
     ['/api/supplier/apply', 'solliciteren bij een zaak kan zonder account'],
     ['/api/supplier/staff/join', 'personeel meldt zich aan met een uitnodigingscode'],
+    ['/api/werving/kijk', 'wie een wervingslink krijgt heeft nog geen account; toont alleen de bedrijfsnaam en de functie, met een rem per ip'],
     ['/api/rtgid/start', 'de identiteitsstroom begint voordat er een sessie is'],
     ['/api/sso/waarheen', 'de SSO-heenweg draagt zijn eigen ondertekende staat'],
     ['/api/sso/start', 'idem; 404 op een onbekende of uitgezette koppeling'],
@@ -1406,6 +1434,33 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
     ['/api/rtf/club/bericht', 'idem: schrijft alleen in het logboek van die ene clubcode'],
     ['/api/rtf/partner/raad', 'de raadcode is de geloofsbrief (vindCode); alleen de eigen partnerkant'],
 
+    /* Dezelfde familie, in het Foundation OS (routes/rtfos/portalen.js). Een
+       lokale stichting, een gemeente en een lokale ondernemer hebben geen
+       RTG-account: hun code bepaalt het dossier, niet de vraagsteller. Ze
+       dragen dezelfde twee remmen (20/min per bron, 60/min per code) en de
+       gemeentekant geeft per constructie alleen getelde cijfers terug, nooit
+       een casus of een naam (kern/rtfos/gemeente.js). */
+    ['/api/rtfos/portaal/partner', 'de partnercode is de geloofsbrief (vindCode); alleen het eigen partnerdossier'],
+    ['/api/rtfos/portaal/gemeente', 'de gemeentecode is de geloofsbrief; uitsluitend geaggregeerde cijfers van die ene stad'],
+    ['/api/rtfos/portaal/ondernemer', 'de bedrijfscode is de geloofsbrief; alleen het eigen aanbod en waar het heen ging'],
+
+    /* De drie doelgroepen zonder RTG-account (routes/rtfos/doelgroepen.js).
+       De eerste twee dragen dezelfde twee remmen als de codes hierboven; de
+       derde heeft geen code omdat er niets achter zit wat een code verdient --
+       zie kern/rtfos/publiek.js, waar de maat letterlijk is: wat zou je op een
+       poster in het buurthuis hangen? */
+    ['/api/rtfos/portaal/vrijwilliger', 'de vrijwilligerscode is de geloofsbrief; alleen zijn eigen planning en uren, geen contactgegevens en geen evaluaties'],
+    ['/api/rtfos/portaal/vrijwilliger/zet', 'idem: hij werkt zijn eigen beschikbaarheid bij; zijn VOG en status zet de afdeling'],
+    ['/api/rtfos/portaal/vrijwilliger/uren', 'idem: uren die hij opgeeft komen binnen als MELDING en tellen pas na bevestiging'],
+    ['/api/rtfos/portaal/deelnemer', 'de deelnemerscode is de geloofsbrief; uitsluitend de stand van die ene hulpvraag'],
+    ['/api/rtfos/portaal/deelnemer/intrekken', 'wie ja zei mag nee zeggen; een recht waarvoor je moet bellen naar de organisatie die je wilde stoppen, is geen recht'],
+    ['/api/rtfos/publiek/steden', 'de buurt-app: alleen wat op een poster in het buurthuis zou hangen, geen enkel getal over hulpvragen'],
+    ['/api/rtfos/publiek/stad', 'idem, per stad: lopende projecten en open activiteiten'],
+    ['/api/rtfos/publiek/campagnes', 'idem: welke landelijke campagnes lopen, zonder opgehaalde bedragen'],
+    ['/api/rtfos/portaal/donateur', 'de gever op zijn eigen code (RTFS-): alleen zijn eigen giften en waar ze heen gingen, nooit wie er nog meer gaf. Twee remmen, per bron en per code'],
+    ['/api/rtfos/portaal/donateur/bewijs', 'idem: het giftbewijs voor een van zijn eigen giften'],
+    ['/api/rtfos/publiek/jaarverslagen', 'de ANBI-publicatieplicht: een jaarstuk achter een inlog is niet gepubliceerd. Alleen wat het bestuur heeft vastgesteld EN gepubliceerd, met bevroren cijfers'],
+
     // ---- publieke informatie: staat ook gewoon op de site ----
     ['/api/pasprijzen', 'de prijslijst is publieke informatie'],
     ['/api/rtf/vacatures', 'openstaande vacatures zijn openbaar'],
@@ -1420,6 +1475,13 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
     ['/api/vertaal/ui', 'de knopteksten van datzelfde inlogscherm'],
     ['/api/translate', 'het woordenboek is publiek; de AI-tak zit achter kern/aipoort.js'],
     ['/api/push/key', 'de VAPID-sleutel is per definitie de PUBLIEKE helft'],
+    /* Het algoritmeregister van de stad. Een register dat alleen achter een
+       kantoorinlog te lezen is, geeft een inwoner precies niets -- en dat is
+       de enige groep voor wie het bedoeld is. Er staan regels in, geen mensen:
+       geen persoonsgegevens, geen bedrijfsgevoelige data, alleen wat er
+       meerekent en wat het mag beslissen. */
+    ['/api/stad/algoritmes', 'het openbare algoritmeregister: beschrijft regels, geen personen'],
+    ['/api/stad/besluiten', 'het openbare besluitenregister: wat de stad besloot, met welke stemverhouding; fracties stemmen met zetels, geen personen'],
     ['/api/fout/client', 'een fout uit de browser: JUIST zonder poort, want een fout die het ' +
       'inloggen zelf sloopt komt nooit binnen achter een poort die inloggen vereist. Er wordt ' +
       'niets bewaard en niets uitgevoerd, alleen gelogd, met een rem per IP en afgekapte velden ' +
@@ -1938,7 +2000,303 @@ console.log('\n36) geen proefrestant in de laatste commit');
           '\n    ' + s.uitleg + ' -- zet het bestand terug en commit opnieuw (git commit --amend)');
       }
     }
-    if (!gevonden) ok('de laatste commit draagt geen ijk- of mutatierestant');
+    /* EN DE BLINDE VLEK DIE DEZE REGEL ZELF HAD, gevonden doordat hij hem miste.
+
+       Op 2026-08-05 kwamen drie ijkbestanden mee in een commit (drie keer de
+       tijdelijke naam onder server/kern/, met -a, -b en -c erachter) en deze regel
+       gaf groen. De reden: hij grep't in de INHOUD, en de inhoud van zo'n bestand
+       is `function zzIjkTijdelijkeNaam(x)` -- camelCase, zonder streepjes. De
+       marker zat alleen in de BESTANDSNAAM, en daar keek niemand.
+       (De naam staat hier niet voluit, om precies de reden die hierboven bij de
+       opgeknipte patronen staat: dan klaagt deze regel over zijn eigen uitleg.)
+
+       Dat is precies de vorm die de rest van deze lijst probeert te voorkomen: een
+       handhaver die iets net niet dekt is gevaarlijker dan geen handhaver, want
+       hij geeft groen. Dus nu ook de namenlijst van de commit. */
+    const lijst = git('ls-tree', '-r', '--name-only', 'HEAD');
+    if (lijst.status !== 0) {
+      fout('kan de bestandenlijst van HEAD niet lezen: ' + String(lijst.stderr || '').trim());
+    } else {
+      const marker = 'zz' + '-ijk-tijdelijk';
+      for (const pad of String(lijst.stdout || '').split('\n').filter(Boolean)) {
+        if (!pad.includes(marker)) continue;
+        gevonden++;
+        fout('ijkrestant als BESTAND in de commit: ' + pad +
+          '\n    een ijking maakt dit bestand en ruimt het op; hier is er gecommit tussen die twee' +
+          ' -- git rm het bestand en commit opnieuw');
+      }
+    }
+    if (!gevonden) ok('de laatste commit draagt geen ijk- of mutatierestant, in inhoud noch in naam');
+  }
+}
+
+/* 37) een pagina die een hulpklasse gebruikt, laadt ook het blad waar hij in staat.
+
+   De hulpklassen (public/shared/rtg-hulpklassen.css) vervangen style="..."-
+   attributen, zodat style-src-attr ooit dicht kan. Dat werkt alleen als de
+   pagina dat blad ook binnenhaalt -- en als hij dat NIET doet, breekt er niets
+   zichtbaar op de plek waar je kijkt: het element verliest gewoon zijn marge of
+   zijn kleur. Precies het soort stille breuk waar deze lijst voor bestaat.
+
+   De klassen komen uit het blad zelf en niet uit een lijst hier: een tweede
+   lijst loopt binnen een week uit de pas (LAT.md regel 4). Een pagina "gebruikt"
+   een klasse als hij hem zelf draagt, of als een script of bundel die hij laadt
+   hem draagt. */
+console.log('\n37) elke pagina die een hulpklasse gebruikt, laadt ook rtg-hulpklassen.css');
+{
+  const BLAD = path.join(ROOT, 'public/shared/rtg-hulpklassen.css');
+  if (!fs.existsSync(BLAD)) {
+    fout('public/shared/rtg-hulpklassen.css ontbreekt, dus deze regel is niet vast te stellen');
+  } else {
+    const klassen = Array.from(fs.readFileSync(BLAD, 'utf8').matchAll(/^\.(h-[a-z0-9]+)\s*\{/gm)).map(m => m[1]);
+    if (!klassen.length) {
+      fout('geen enkele .h-klasse gevonden in rtg-hulpklassen.css; dan meet deze regel niets');
+    } else {
+      const draagt = new RegExp('class="[^"]*\\b(?:' + klassen.join('|') + ')\\b');
+      const PUB = path.join(ROOT, 'public');
+      const web = (p) => '/' + path.relative(PUB, p).split(path.sep).join('/');
+      const paginas = [];
+      loop(PUB, /\.html$/, f => { if (!web(f).startsWith('/dist/')) paginas.push(f); });
+      const lees = (f) => { try { return fs.readFileSync(f, 'utf8'); } catch (e) { return ''; } };
+      let mis = 0, met = 0;
+      for (const p of paginas) {
+        const s = lees(p);
+        let gebruikt = draagt.test(s);
+        if (!gebruikt) {
+          for (const m of s.matchAll(/<script[^>]*src="(\/[^"]+\.js)"/g)) {
+            const f = path.join(PUB, m[1].slice(1));
+            if (draagt.test(lees(f))) { gebruikt = true; break; }
+            // een bundel: de delen staan in een map met dezelfde naam
+            const delen = f.replace(/\.js$/, '');
+            let namen = []; try { namen = fs.readdirSync(delen); } catch (e) { namen = []; }
+            if (namen.some(n => n.endsWith('.js') && draagt.test(lees(path.join(delen, n))))) { gebruikt = true; break; }
+          }
+        }
+        if (!gebruikt) continue;
+        met++;
+        if (!s.includes('rtg-hulpklassen.css')) {
+          mis++;
+          fout(web(p) + ' gebruikt een hulpklasse maar laadt rtg-hulpklassen.css niet');
+        }
+      }
+      if (!mis) ok(met + ' pagina\'s gebruiken een hulpklasse, en alle ' + met + ' laden het blad (' + klassen.length + ' klassen)');
+    }
+  }
+}
+
+/* 38) camera en microfoon gaan door EEN deur, en elk kader geeft het recht door.
+
+   WAAR DIT UIT KOMT. De klacht was "op mijn telefoon doet niks het" -- geen
+   camera, geen microfoon, en nergens een melding. De oorzaak zit niet in de
+   camera maar in het ADRES: buiten https (en localhost) bestaat
+   navigator.mediaDevices niet. Alle zeventien losse getUserMedia-aanroepen
+   liepen daar op een rauwe TypeError, en zeven ervan gaven `null` terug of
+   lieten de fout lopen. Er gebeurde dus niets, zonder melding -- en op een
+   laptop op localhost werkte het, want dat vindt de browser wel beveiligd.
+   test/media.e2e.js meet dat op een echt LAN-adres.
+
+   Daarom loopt alles nu via public/shared/media.js: die stelt de diagnose,
+   noemt de oorzaak hardop op het moment van gebruik, en geeft nooit stil een
+   null terug. Deze regel houdt drie dingen vast: de deur, het kaderrecht, en de
+   pagina die de module ook echt binnenhaalt. Dat laatste is niet formeel --
+   laadt een pagina media.js niet, dan is RTGMedia er niet en breekt elk scherm
+   dat hem gebruikt.
+
+   OVER HET KADERRECHT, EERLIJK. Bij het bouwen was de aanname dat een iframe
+   allow="camera; microphone" nodig heeft en dat vijf van de zes kaders hier dus
+   stil stuk waren. Die aanname is nagemeten en klopt NIET voor een same-origin
+   kader: featurePolicy.allowsFeature('camera') is daar true zonder allow en de
+   camera gaat gewoon open. Voor een kader naar een andere origin is het wel
+   verplicht, en dit huis heeft die niet (frame-ancestors 'self'). Onderdeel
+   38b repareert hier dus niets -- het houdt de bedoeling expliciet en op EEN
+   plek. Dat het er staat is een keuze, geen bugfix, en zo hoort het te lezen. */
+console.log('\n38) camera en microfoon: een deur, elk kader geeft het recht door');
+{
+  const PUB = path.join(ROOT, 'public');
+  const web = (p) => '/' + path.relative(PUB, p).split(path.sep).join('/');
+  const lees = (f) => { try { return fs.readFileSync(f, 'utf8'); } catch (e) { return ''; } };
+  const DEUR = 'public/shared/media.js';
+  if (!fs.existsSync(path.join(ROOT, DEUR))) {
+    fout(DEUR + ' ontbreekt; dan is er geen deur en meet deze regel niets');
+  } else {
+    /* Bestanden: alles in public behalve de uitvoer (dist) en de deur zelf.
+       Bundels tellen mee als bestand maar niet als bron -- regel 6 bewaakt dat
+       een bundel gelijk is aan zijn delen, dus een fout daar staat al in de
+       delen en dubbel melden helpt niemand. */
+    const { bundels } = require('./bundel');
+    const bundelPaden = new Set(Object.keys(bundels).map(k => '/' + k));
+    const bronnen = [];
+    loop(PUB, /\.(js|html)$/, f => {
+      const p = web(f);
+      if (p.startsWith('/dist/') || p === '/shared/media.js') return;
+      bronnen.push(f);
+    });
+
+    // 38a) niemand anders raakt getUserMedia aan.
+    let stiekem = 0;
+    for (const f of bronnen) {
+      if (bundelPaden.has(web(f))) continue;
+      const s = zonderCommentaar(lees(f));
+      if (!/\.getUserMedia\s*\(/.test(s)) continue;
+      stiekem++;
+      fout(web(f) + ' roept getUserMedia rechtstreeks aan; dat hoort via RTGMedia (shared/media.js)');
+    }
+    if (!stiekem) ok('geen enkel bestand buiten de mediapoort roept getUserMedia rechtstreeks aan');
+
+    /* 38b) wie een iframe MAAKT, geeft het recht door. Alleen createElement en
+       een <iframe> in een string tellen: een iframe in een stijlblad
+       (`#split iframe{...}`) maakt niets. Een statisch <iframe>-element in de
+       markup mag ook zijn eigen allow= dragen -- dat is dezelfde doorgifte,
+       alleen met de hand. */
+    let kaderloos = 0, kaders = 0;
+    for (const f of bronnen) {
+      if (bundelPaden.has(web(f))) continue;
+      const s = zonderCommentaar(lees(f));
+      const maakt = /createElement\(\s*['"]iframe['"]\s*\)/.test(s) || /['"`][^'"`]*<iframe\b/.test(s);
+      const statisch = /^\s*<iframe\b/m.test(s) || />\s*<iframe\b/.test(s);
+      if (!maakt && !statisch) continue;
+      kaders++;
+      if (/RTGMedia\.kader\s*\(/.test(s)) continue;
+      // een statisch kader met eigen allow= is ook doorgifte
+      if (statisch && !maakt && /<iframe\b[^>]*\ballow=/.test(s)) continue;
+      kaderloos++;
+      fout(web(f) + ' maakt een iframe zonder RTGMedia.kader(); camera en microfoon vallen daarin stil weg');
+    }
+    if (!kaderloos) ok(kaders + ' plekken maken een kader, en alle ' + kaders + ' geven het recht door');
+
+    /* 38c) een pagina die RTGMedia gebruikt, laadt shared/media.js ook. Net als
+       regel 37: het gebruik kan in de pagina zelf staan of in een script (of
+       bundeldeel) dat hij laadt.
+
+       WAT DIT NIET ZIET: een module die met createElement('script') wordt
+       binnengehaald. Op dit moment gebruikt geen van die modules (mond, sterren,
+       glyf, handenvrij-bureau, palet, wauw) de mediapoort -- nagekeken -- maar
+       als er ooit een bijkomt, valt hij hier niet op. */
+    const gebruikt = (s) => /\bRTGMedia\b/.test(s);
+    const paginas = [];
+    loop(PUB, /\.html$/, f => { if (!web(f).startsWith('/dist/')) paginas.push(f); });
+    let misDeur = 0, metDeur = 0;
+    for (const p of paginas) {
+      const s = lees(p);
+      let raakt = gebruikt(zonderCommentaar(s));
+      if (!raakt) {
+        for (const m of s.matchAll(/<script[^>]*src="(\/[^"]+\.js)"/g)) {
+          if (m[1] === '/shared/media.js') continue;
+          const f = path.join(PUB, m[1].slice(1));
+          if (gebruikt(zonderCommentaar(lees(f)))) { raakt = true; break; }
+          const delen = f.replace(/\.js$/, '');
+          let namen = []; try { namen = fs.readdirSync(delen); } catch (e) { namen = []; }
+          if (namen.some(n => n.endsWith('.js') && gebruikt(zonderCommentaar(lees(path.join(delen, n)))))) { raakt = true; break; }
+        }
+      }
+      if (!raakt) continue;
+      metDeur++;
+      if (!s.includes('/shared/media.js')) {
+        misDeur++;
+        fout(web(p) + ' gebruikt RTGMedia maar laadt /shared/media.js niet');
+      } else if (!s.includes('/shared/media.css')) {
+        misDeur++;
+        fout(web(p) + ' laadt de mediapoort maar niet /shared/media.css; de melding staat er dan zonder vorm');
+      }
+    }
+    if (!misDeur) ok(metDeur + ' pagina\'s gebruiken de mediapoort, en alle ' + metDeur + ' laden module en blad');
+  }
+}
+
+/* 39) een routebestand pakt uit de kern wat het GEBRUIKT, en niets meer.
+
+   DE GRENS DIE ER NIET WAS. server.js geeft elke router hetzelfde object `kern`
+   met ruim driehonderd eigenschappen, en elke router pakt eruit wat hij wil. Er
+   was dus geen grens -- maar dat was nog niet het ergste. De twaalf breedste
+   routebestanden reikten alle twaalf naar 134-139 namen, en dat waren geen
+   twaalf brede domeinen: het was EEN destructurering die twaalf keer was
+   overgenomen. server/routes/supplier/kamers.js pakte honderdvierendertig namen,
+   gebruikte er NUL van, en riep daarna twee submodules aan.
+
+   Over server/routes samen: 3929 namen gepakt en nooit gebruikt, over 62
+   bestanden. Zolang dat mag, zegt de kop van een bestand niets. Hij hoort de
+   grens te ZIJN: dit heb ik nodig, de rest niet. Na het opruimen is
+   supplier/toegang.js van 139 naar 24 namen gegaan, en nu is die kop een
+   leesbare opsomming van wat dat bestand echt doet.
+
+   HOE. Een naam heet gebruikt als hij buiten de destructurering nog ergens als
+   los woord staat, niet direct achter een punt. De meting zit in
+   scripts/grenzen.js en niet hier: dezelfde bron als de ratel-meter
+   `kernOngebruikt` in NORM.json, want twee tellers voor een waarheid lopen
+   uiteen (LAT.md regel 4).
+
+   BEWUST RUIM, en die kant is de goede. Een naam die alleen in de tekst van een
+   template-string voorkomt telt als gebruikt. Dat mist een geval; de andere kant
+   -- iemand haalt een naam weg die wel gebruikt wordt -- levert een
+   ReferenceError op die pas bij het eerste verzoek valt. */
+console.log('\n39) een routebestand pakt uit de kern alleen wat het gebruikt');
+{
+  let grenzen = null;
+  try { grenzen = require('./grenzen').meet(); }
+  catch (e) { fout('de grenzen konden niet worden gemeten (' + e.message + '); dan stelt deze regel niets vast'); }
+  if (grenzen) {
+    const dood = grenzen.alleOngebruikt || [];
+    if (!dood.length) {
+      ok(grenzen.kernBreedte + ' kern-namen in gebruik, en geen enkel routebestand pakt er een die het niet gebruikt');
+    } else {
+      for (const d of dood.slice(0, 12)) {
+        fout(d.bestand + ' pakt ' + d.aantal + ' van de ' + d.gepakt +
+          ' namen uit kern zonder ze te gebruiken: ' + d.namen.slice(0, 6).join(', ') +
+          (d.namen.length > 6 ? ', ...' : ''));
+      }
+      if (dood.length > 12) fout('... en nog ' + (dood.length - 12) + ' bestanden (zie node scripts/grenzen.js)');
+    }
+  }
+}
+
+/* 40 + 41) DE TWEE GEGENEREERDE KAARTEN LOPEN NIET ACHTER.
+
+   WAAROM DIT ER IS. De derde kritiek op dit huis was de scherpste: de bus factor
+   is een. Niemand houdt 1253 servermodules en 2384 endpoints in zijn hoofd, en de
+   meetkast compenseert dat maar half -- die vertelt je of iets stuk is, niet waar
+   de dingen staan of wat een toets bewijst. Daar zijn twee documenten voor:
+
+     ARCHITECTUUR.md   de lagen, de domeinen, de gedeelde kern, waar de waarheid
+                       staat (scripts/kaart.js)
+     BEWIJS.md         per toetsbestand welke bewering, en of er een mutatie bij
+                       is vastgelegd (scripts/bewijs.js)
+
+   EN DE ENIGE REDEN DAT ZE IETS WAARD ZIJN, is dat ze niet kunnen verouderen. Een
+   handgeschreven architectuurdocument is binnen twee maanden onwaar, en dan is
+   het erger dan geen document: het stuurt iemand met vertrouwen de verkeerde kant
+   op. Beide bestanden komen uit de code, en deze regels genereren ze opnieuw en
+   vergelijken. Schuift de code, dan wordt de keuring rood tot iemand `npm run
+   kaart` of `npm run bewijs` draait -- bijwerken is een commando geworden en geen
+   schrijfwerk.
+
+   Ze staan met opzet NIET in het gegenereerde bestand zelf te controleren (geen
+   hash in een kop): dan zou iemand de hash kunnen bijwerken zonder de inhoud. De
+   vergelijking is de volle tekst. */
+console.log('\n40) ARCHITECTUUR.md loopt niet achter op de code');
+{
+  try {
+    const kaart = require('./kaart');
+    const opSchijf = fs.existsSync(kaart.DOEL) ? fs.readFileSync(kaart.DOEL, 'utf8') : null;
+    const verwacht = kaart.bouw();
+    if (opSchijf === null) fout('ARCHITECTUUR.md bestaat niet -- draai: npm run kaart');
+    else if (opSchijf !== verwacht) fout('ARCHITECTUUR.md loopt achter op de code -- draai: npm run kaart');
+    else ok('ARCHITECTUUR.md is gelijk aan wat de code nu zegt');
+  } catch (e) {
+    fout('de kaart kon niet worden gebouwd (' + e.message + '); dan stelt deze regel niets vast');
+  }
+}
+
+console.log('\n41) BEWIJS.md loopt niet achter op de toetsen');
+{
+  try {
+    const bewijs = require('./bewijs');
+    const opSchijf = fs.existsSync(bewijs.DOEL) ? fs.readFileSync(bewijs.DOEL, 'utf8') : null;
+    const verwacht = bewijs.bouw();
+    if (opSchijf === null) fout('BEWIJS.md bestaat niet -- draai: npm run bewijs');
+    else if (opSchijf !== verwacht) fout('BEWIJS.md loopt achter op de toetsen -- draai: npm run bewijs');
+    else ok('BEWIJS.md is gelijk aan wat de toetsen nu beweren');
+  } catch (e) {
+    fout('het bewijsregister kon niet worden gebouwd (' + e.message + '); dan stelt deze regel niets vast');
   }
 }
 

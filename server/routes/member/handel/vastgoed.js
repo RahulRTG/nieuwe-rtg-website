@@ -2,15 +2,8 @@
    Gemount vanuit routes/member/handel.js op de gedeelde kern. */
 module.exports = (hctx) => {
   const { kern, openLijn } = hctx;
-  const { DOOR_RELOCK_MS, app, auth, betaal, crypto,
-    db, express, findSupplier, liveCodename, logActivity,
-    notifySupplier, optieAan, save, schoon, sseToSupplier,
-    unlockDoor, reserveerTafel, mijnReserveringen, annuleerReservering, annuleerItem,
-    plaatsReview, reviewsVoor, verblijfBoek, mijnVerblijven, verblijfAnnuleer,
-    gastDeur, toggleFavoriet, favorietenVan, agendaVoor, maakSplits,
-    mijnSplitsen, betaalSplits, zetOpWachtlijst, mijnWachtlijst, rsvpAnnuleer,
-    puntenVan, verzilverPunten, salonZichtbaar, ghMarkt, ghPlaatsBestelling,
-    ghMijnBestellingen, ghAnnuleer, mbAanvraag, mbMijn, zorgVoor, zorgContact } = kern;
+  const { app, auth, crypto, db, findSupplier, liveCodename, notifySupplier, save, schoon, sseToSupplier,
+          salonZichtbaar } = kern;
 function pandPubliek(s, p) {
   return { id: p.id, titel: p.titel, soort: p.soort, transactie: p.transactie, prijs: p.prijs,
     plaats: p.plaats, adres: p.adres, slaapkamers: p.slaapkamers, badkamers: p.badkamers,

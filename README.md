@@ -9,11 +9,10 @@ public/            alles wat de browser laadt (de webroot die de server serveert
 ├── sw.js          service worker (staat bewust in de root: scope /)
 ├── manifest.webmanifest
 ├── icon.svg
-├── shared/        gedeelde client-scripts (i18n.js, realtime.js, osmenu, os.css)
+├── shared/        gedeelde client-scripts (i18n.js, realtime.js, ios.js + ios.css)
 ├── site/          winkel.html (hardware-shop voor partners) + 404.html
 └── apps/          alle web-apps, per doelgroep en genre:
-    ├── app.html           leden-app (RTG-OS, tevens het inlogscherm op /)
-    ├── index.html         app-overzicht (hub)
+    ├── app.html           leden-app (RTG-OS): DE homescreen, tevens het inlogscherm op /
     ├── juridisch.html     juridische ROS-app (voorwaarden, privacy, partnervoorwaarden)
     ├── personeel.html     personeels-app (rooster, taken, walkie-talkie, SOS)
     ├── leverancier.html   werkgevers-app (alle genres)
@@ -26,7 +25,7 @@ public/            alles wat de browser laadt (de webroot die de server serveert
 server/            Node.js/Express-backend + data (db.json, rtg.db, sleutels, uploads)
 ```
 
-Er is geen losse marketingsite meer: `/` toont direct het RTG OS-bureaublad (`/apps/index.html`); wie nog niet is aangemeld ziet daar de welkomstkaart (het gratis RTG-abonnement is de minimale ingang). Alle onderlinge links en assets gebruiken absolute paden vanaf de webroot (bijv. `/shared/i18n.js`, `/apps/app.html`), zodat mappen verplaatsen geen links breekt.
+Er is geen losse marketingsite meer: `/` toont direct de homescreen van het RTG OS (`/apps/app.html`); wie nog niet is aangemeld ziet daar de welkomstkaart (het gratis RTG-abonnement is de minimale ingang). Er is nog maar **een** beginscherm: het scrollende bureaublad `/apps/index.html` bestaat niet meer, en dat pad (net als `/apps/bureau.html` en `/apps/`) brengt je gewoon thuis. Alle onderlinge links en assets gebruiken absolute paden vanaf de webroot (bijv. `/shared/i18n.js`, `/apps/app.html`), zodat mappen verplaatsen geen links breekt.
 
 ### Eén vormtaal: de UI-kit (`shared/rtg-ui.css`)
 
@@ -56,7 +55,7 @@ npm install
 npm start
 ```
 
-Open daarna **http://localhost:3000** — dat toont direct het RTG OS-bureaublad; aanmelden gaat via de welkomstkaart (Rahul).
+Open daarna **http://localhost:3000** — dat toont direct de homescreen van het RTG OS; aanmelden gaat via de welkomstkaart (Rahul).
 
 Met de backend actief lopen inloggen, betalingen, likes, reacties, DM's en de AI via de echte API:
 
@@ -240,6 +239,42 @@ volledig op het toestel en verlaat er geen beeld het apparaat. Dat is de
 werkvloer, waar een camera de hele dag aan staat; zwijgend meekijken zou daar
 een surveillancesysteem zijn. Hier richt het lid zelf, tikt zelf en vraagt zelf.
 
+### De mediapoort: waarom de camera niet opengaat (`shared/media.js`)
+
+Camera en microfoon lopen door **één deur**. Niet als opruiming, maar omdat de
+zeventien losse `getUserMedia`-aanroepen die er stonden allemaal iets anders
+deden bij een fout — zeven gaven stil `null` terug, drie lieten de fout lopen.
+En de belangrijkste oorzaak is er een die je niet ziet: **buiten https (en
+localhost) bestaat `navigator.mediaDevices` niet.** Een telefoon die de server
+op `http://192.168.x.x` opent heeft dus geen camera-API, terwijl exact dezelfde
+code op `http://localhost` werkt. Er gebeurde dan niets, en niemand zei waarom.
+
+`RTGMedia` stelt de diagnose vóórdat hij het de browser vraagt en noemt de
+oorzaak hardop, op het moment van gebruik. Vijf oorzaken, vijf verschillende
+handelingen: **onveilig** (het adres), **kader** (een iframe dat het recht niet
+doorgeeft), **geweigerd** (het slotje in de adresbalk), **geenapparaat**,
+**bezet**. Eén melding voor alle vijf — "geen toegang tot de camera" — stuurt de
+gebruiker naar een knop die er niet is.
+
+```js
+const stroom = await RTGMedia.camera({ achter: true });   // scannen
+const mic    = await RTGMedia.microfoon();
+if (!RTGMedia.kan()) toon(RTGMedia.teksten[RTGMedia.reden()].uitleg);
+```
+
+De belofte breekt met een `Error` die `fout.rtg = { code, kort, uitleg }`
+draagt, zodat een scherm de tekst ook zelf kan plaatsen (`{ stil: true }`).
+Regel 38 van `npm run keuring` houdt vast dat niemand er langs gaat, dat elk
+iframe het recht doorgeeft (`RTGMedia.kader(el)`, één tekst op één plek), en dat
+elke pagina die de poort gebruikt hem ook laadt. `test/media.e2e.js` meet het in
+een echte browser op een echt LAN-adres.
+
+**Op een telefoon draait het dus op https.** `RTG_TLS=1 npm start` geeft meteen
+https met een self-signed certificaat (genoeg om te proberen; je accepteert op
+het toestel één keer de waarschuwing). Staat de server plat op het netwerk, dan
+zegt hij dat bij het opstarten met het adres erbij
+(`server/opzet/veiligadres.js`) — en zwijgt hij zodra het niet meer speelt.
+
 ### Het salongesprek: Rahul kletst met de Rahul van je vriend
 
 Een gimmick, en we noemen het ook zo (`server/kern/kletspraat/`). Twee AI's die
@@ -267,29 +302,43 @@ En hooguit één gesprek per paar per dag; dit hoort een verrassing te zijn, gee
 knop waar je op blijft drukken. `test/klets.test.js` bewaakt alle drie de
 sloten, inclusief de controle dat er geen echte naam in de opslag belandt.
 
-### Het werkblad: je scherm zelf indelen
+### Het OS is iOS: een homescreen, en verder niets
 
-Op een kantoorwerkplek (>=1100px) liggen meerdere dingen tegelijk open. Daarom
-kan elke werkpagina zichzelf opdelen in vlakken: 1, 2 naast elkaar, 2 boven
-elkaar, 3 of 4 (`public/shared/werkblad.js` + `.css`). De verhouding zet je door
-de scheiding te verslepen, en die keuze blijft staan per pagina en per toestel.
-De knoppenrij staat in de kopbalk van de pagina, niet in de console van Rahul --
-een knop die verdwijnt zodra je de console dichtklapt, is geen knop.
+Het OS droeg lang de metaforen van twee apparaten tegelijk. Naast het
+springboard lag een tweede beginscherm (`/apps/index.html`: alle apps in
+scrollende secties, met een eigen kopbalk, woordmerk en accountchips), en een
+app-pagina kon in een **sleepbaar bureaubladvenster** staan (`desktopframe`), in
+een **vensterbeheerder met dock en stoplichtknopjes** (`vensters`), in een
+**tegel-werkblad** (`werkblad`), of omringd door **widgets** (`bureau`,
+`flagship`). Bovenin liep een balk met het woordmerk en een accountchip
+(`osbar` + `os.css`), en daarnaast een **uitschuivende hamburger** (`osmenu`).
 
-Twee dingen zijn met opzet zo:
+Dat is allemaal weg. Wat een telefoon heeft, en verder niets:
 
-- **Tegels, geen zwevende vensters.** Die bestaan al (`shared/vensters.js`) en
-  zijn goed om even iets bij te pakken. Ze overlappen, en dat is precies wat je
-  niet wilt als twee schermen de hele dag naast elkaar moeten staan.
-- **Het eerste vlak is de pagina zelf**, verhuisd en niet gekopieerd. Anders zet
-  je twee versies van hetzelfde scherm naast elkaar die elkaars gegevens niet
-  zien. De kopbalk van de pagina blijft de bovenrand van het werkblad, zodat wat
-  de pagina met `position:fixed` neerzet binnen zijn eigen vlak blijft.
+- **Een homescreen.** Het springboard in `apps/app.html`. Alle andere paden
+  (`/`, `/apps/index.html`, `/apps/bureau.html`, `/apps/`) komen daar uit.
+- **Een navigatiebalk van 44 punten, alleen als er iets te navigeren of te
+  bedienen valt.** Een balk die alleen de naam van de app herhaalt is behang;
+  die verdwijnt, en de titel komt terug als grote titel boven de inhoud, die bij
+  het scrollen in de balk terugzakt.
+- **Geen woordmerk in de chrome.** Het merk staat op het icoon en op het
+  toestel; binnen de app hoef je niemand meer te vertellen waar hij is.
+- **Een home-indicator.** Omhoog vegen brengt je thuis; de app krimpt onder je
+  vinger weg. Een losse tik doet niets -- de pil ligt waar je duim rust.
+- **Een randveeg** van links terug in de geschiedenis.
+- **Bladen in plaats van vensters** (`RTGiOS.blad(...)`): van onder omhoog, met
+  een greep, sluiten met een veeg omlaag.
 
-De console van Rahul is op het bureaublad te **verplaatsen en van maat te
-veranderen** (`handenvrij-bureau.js`); ook dat blijft onthouden. Slepen naar
-links en rechts verzet hem, omhoog en omlaag blijft van de standen.
-`test/werkblad.e2e.js` toetst het in een echte browser.
+Dat alles staat op **een** plek: `public/shared/ios.css` + `public/shared/ios.js`
+(bron in `public/shared/ios/`). De laag LEEST de kopbalk die een pagina al heeft
+en bouwt hem ter plekke om -- hetzelfde `<header>`-element, dezelfde knoppen,
+dus dezelfde id's en dezelfde luisteraars. Dat is geen detail: een kop draagt
+meer dan knoppen (`#tel` telt ongelezen berichten, `#filters` wordt pas na het
+inloggen gevuld), en wie die met de kop weggooit, breekt de app zonder dat er
+ergens iets rood wordt. Alles met een id blijft staan, altijd.
+
+Split View (`shared/split.js`) blijft: twee apps naast elkaar is iPad, geen
+bureaublad. In zo'n paneel krijgt de app geen eigen home-indicator.
 
 ## Tests
 
@@ -650,6 +699,248 @@ staat de allergie erbij), wat is uitgegeven verdwijnt van de pas, en roomservice
 die op de kamer wordt geboekt komt op de gastrekening van diezelfde kamer
 terecht.
 
+### RTG Mobility OS (de vervoerskern)
+
+`server/kern/mobiliteit/` + `/api/mob/...`, `/api/staff/mob/...`,
+`/api/supplier/mob/...`, `/api/office/mob/...` + `/apps/ov.html` (reiziger) en
+`/apps/dispatch.html` (planner) en `/apps/zakelijk.html` (werkgever). Geen losse
+taxi-app naast RTG OV, maar **een
+kern waarop elk vervoerstype een aan- of uitzetbare module is**: taxi, pendel,
+OV, rolstoelvervoer, boot, charter en bijzonder vervoer delen dezelfde ritten-,
+voertuig-, locatie- en betaallaag.
+
+| Module | Wat erin zit |
+| --- | --- |
+| `modulecatalogus.js` + `register.js` | 25 vervoersmodules met **afhankelijkheden** en niveaus (wereld, land, stad, organisatie, vervoerder, doelgroep, testers, percentage), plus een storingsknop |
+| `voertuigcatalogus.js` + `assets.js` | een `mobility_asset` voor alles wat rijdt, vaart of vliegt (27 categorieen), met documentgeldigheid en geschiktheidstoets |
+| `keten.js` + `opdracht.js` + `voortgang.js` | de rittenmotor: een opdrachtvorm voor alle vervoersvormen, met de statusketen `aangevraagd → … → afgerekend`, de uitzonderingen ernaast, en de gebeurtenissen (`ride.accepted`, `driver.arrived`, `trip.completed`) |
+| `plekken.js` | vertrek en bestemming uit RTG zelf: onze horeca, hotels, zorgzaken en OV-haltes, plus de favoriete plekken van het lid |
+| `matching.js` | toewijzing met instelbare wegingen per stad en vervoerder, en een natrekbare rekensom per kandidaat |
+| `dispatch.js` | het planscherm: openstaand, onderweg, de vloot, toewijzen, overboeken naar een partner, telefonische boekingen |
+| `pendel.js` + `pendel-rooster.js` | bedrijfspendels: een regel wordt een dienstregeling wordt een echte rit |
+| `reisbeleid.js` + `zakelijk.js` | de zakelijke laag: dienstverband, reisbeleid, goedkeuring en het maandoverzicht van de werkgever |
+
+**De zes regels die deze laag anders maken dan een Uber-kloon.** Ze staan in
+code, en `test/mobiliteit.test.js` (14 toetsen) laat ze zakken zodra ze niet
+meer waar zijn -- alle zes zijn met een mutatie nagetrokken:
+
+1. **Een product is nooit meer aan dan waar het op leunt.** Helikoptercharter
+   vereist identiteitscontrole, een partnercontract, menselijke bevestiging, een
+   weertoets en charterafrekening. Staat er een uit, dan staat het charter uit --
+   ook als iemand hem net heeft aangezet, en aanzetten weigert met de NAAM van
+   wat ontbreekt. Zo is een half afgemaakte functie niet per ongeluk te
+   activeren.
+2. **Papieren zijn fail-closed.** Geen geldigheidsdatum telt als ONGELDIG, niet
+   als "vast wel in orde". Er is geen veld `geblokkeerd` dat kan verjaren; er is
+   een lijst redenen die leeg is of niet. Een taxi met een verlopen vergunning
+   komt niet in de rangschikking -- niet met minpunten, maar helemaal niet.
+3. **De statusketen kent maar een weg.** Een rit kan niet 'voltooid' worden
+   zonder ooit ingestapt te zijn, want daar hangt de afrekening aan. Chauffeur,
+   dispatcher, reiziger en het AI-stuur lopen allemaal over dezelfde functie.
+4. **De matcher legt zijn keuze uit.** Elke kandidaat draagt zijn rekensom mee
+   (welke factor hoeveel punten gaf en waarom), en de AFGEWEZEN voertuigen staan
+   er met hun reden bij. Een dispatcher die niet snapt waarom de motor wagen 4
+   koos, gaat handmatig toewijzen -- en dan is de motor een dure decoratie.
+5. **Werk wordt eerlijk verdeeld.** "Wie had vandaag het minste" is een factor
+   met gewicht, per stad en vervoerder in te stellen. En `surge_pricing` staat in
+   het register maar staat UIT: RTG rekent geen schaarstepremie.
+6. **Geen tweede adresboek en geen tweede grootboek.** Bestemmingen zijn onze
+   eigen zaken en haltes; afrekenen loopt via `kern/pay` zoals elke andere
+   RTG-betaling. Het woonadres uit de identiteitskluis wordt NIET aangesproken --
+   een lid bewaart zijn vertrekpunten zelf, als favoriet op codenaam.
+
+RTG voert zelf geen commerciele luchtvaart of zeevaart uit. Die producten zijn
+een marktplaats voor gecertificeerde exploitanten, en dat zit in de code als de
+boekingsvorm `aanvraag`: daar komt altijd een mens tussen.
+
+#### De OV-kaartverkoop: drie poorten voor er een vervoerbewijs uit komt
+
+`overeenkomst.js` + `kaartje(-beeld/-gebruik).js` + `storing.js`. Een kaartje is
+een afspraak tussen de reiziger en de **vervoerder** -- die rijdt, die
+controleert, die draagt het risico. RTG verkoopt hooguit namens hem. Daarom
+komen er drie poorten voor een kaartje uit, en alle drie worden ze op het moment
+zelf uitgerekend:
+
+1. de module `public_transport_ticketing` staat aan in dit gebied;
+2. er is een **geldige overeenkomst** met die vervoerder -- een dossier met
+   looptijd, handtekening en afdracht, alleen door RTG zelf vast te leggen (een
+   partij die zijn eigen overeenkomst schrijft, heeft geen overeenkomst maar een
+   vinkje);
+3. die overeenkomst dekt **deze lijn en dit product**. Een lege lijnenlijst
+   betekent geen enkele lijn, niet alle.
+
+De prijs komt uit `ovPrijsVan` -- dezelfde formule die afrekent bij het
+uitchecken, zodat de balie en de bus niet uiteenlopen. De controle door de
+conducteur is de enige plek waar een kaartje opgaat, en hij ziet het bewijs en
+niet de persoon: product, lijn, geldigheid en de codenaam, geen e-mailadres en
+geen wallet.
+
+**Abonnementen** zijn hetzelfde ding met een ander product: een periodekaart
+wordt bewaard als een kaartje met product `abonnement`, in dezelfde voorraad en
+met dezelfde code, zodat de conducteur langs precies één weg controleert. Wat er
+anders aan is staat in code: onbeperkt reizen binnen de looptijd (het aantal
+ritten wordt geteld maar niet begrensd, en dat staat er ook bij), een prijs die
+uit de **overeenkomst** komt en niet uit een formule -- wat een maandkaart kost
+is een commerciële afspraak, geen som -- en bij een storing een teruggave op
+**dagbasis**. Een maandkaarthouder de helft van zijn maand teruggeven omdat de
+bus een uur uitviel, is geen compensatie maar een weggevertje, en het komt van
+de vervoerder af.
+
+Het kaartje is te **tonen als scanbare QR** (`shared/qr.js` + `qrteken.js`, onze
+eigen codec) met de code in leesbare tekens eronder voor als de camera niet
+meewerkt; de conducteur scant hem op de dienst-PDA met dezelfde overlay als de
+kassa en de pas. Hij ziet het bewijs en niet de persoon.
+
+**Vertraging komt van de vervoerder, niet van ons.** Wij hebben live posities
+maar geen dienstregeling per halte, dus "hoeveel te laat" kunnen wij niet
+berekenen -- en een teruggave op een geraden getal is erger dan geen teruggave.
+De vervoerder meldt de storing zelf; iedereen met een kaartje in dat venster
+krijgt automatisch geld terug (vertraging 50%, uitval 100%). Twee dingen die
+daar in code staan omdat ze in de eerste versie fout gingen: nooit meer dan de
+kaartprijs terug (wie 50% kreeg en daarna uitval, kreeg anders 150%), en een
+vergoeding voor vertraging kost je je rit **niet** -- alleen bij uitval vervalt
+het kaartje.
+
+#### De CDT: klaar voor 2028, en eerlijk over wat er nog niet is
+
+`cdt.js` + `cdt-tijden.js` + `cdt-export.js`. Vanaf 1 januari 2028 gaat het
+Nederlandse taxivervoer van de boordcomputer over op de Centrale Database
+Taxivervoer. Wat hier staat:
+
+- **De dienst van een chauffeur**: aanmelden op de chauffeurskaart (zonder kaart
+  geen registratie -- fail-closed), overschakelen tussen rijden, andere
+  werkzaamheden, beschikbaarheid, pauze en rust, en afmelden. De tijdlijn heeft
+  altijd precies één open blok, zodat er geen gaten of overlappingen ontstaan.
+- **De grenzen** uit de Arbeidstijdenwet en het Arbeidstijdenbesluit vervoer
+  (12 uur arbeid, 10 uur rijden, 30 minuten pauze na 4,5 uur rijden, 10 uur
+  dagrust) staan als data op één plek en zijn per onderneming bij te stellen op
+  het eigen regime. Elk signaal noemt zijn eigen rekensom; een dienst binnen de
+  grenzen levert er géén op.
+- **De ritten worden niet overgeschreven** maar per dienst opgezocht in de
+  rittenmotor. Een tweede rittenlijst voor de inspectie zou binnen een maand
+  uiteenlopen met de eerste, en daarvan gaat er één naar de overheid.
+- **De export** is herhaalbaar en draagt een sha256 over een vaste ordening,
+  zodat later na te gaan is of het aangeleverde bestand hetzelfde was. Er staan
+  geen prijzen, codenamen of bestemmingen in: wat je niet uitlevert, kan ook niet
+  uitlekken.
+
+**En wat er bewust niet is: een knop "verzenden naar de CDT".** Aanleveren loopt
+via een ICT-dienstverlener die aan de eisen van de ILT voldoet, en RTG is dat
+niet. Zo'n knop zou een leugen zijn met een groen vinkje eronder, en bij een
+wettelijke verplichting is dat gevaarlijk in plaats van slordig: een ondernemer
+die denkt dat hij heeft aangeleverd, controleert het niet meer. Wat er wel is,
+is een **overdracht-journaal**: wie gaf welk bestand wanneer aan welke
+dienstverlener. Dat legt vast wat er echt gebeurde, en het antwoord zegt erbij
+dat RTG niet kan zien of de CDT het heeft aanvaard.
+
+#### De multimodale reisplanner: taxi en OV als EEN reis
+
+`reisplan(-etappe).js` + `reisfactoren.js` + `reis.js` + het tabblad *Reizen* in
+`/apps/ov.html`. Dit is de functie die andere vervoersapps niet kunnen bouwen,
+en niet omdat het algoritme moeilijk is: het is dat de bestemmingen, de lijnen,
+de taxi's en de betaling hier van hetzelfde huis zijn. "Taxi naar het station,
+trein, lopen naar Sal de Mar" is bij ons **een** reis met **een** overzicht, en
+geen drie apps met drie bonnetjes.
+
+De planner zet de manieren om er te komen naast elkaar, met per optie de tijd,
+de prijs, de overstappen, de loopafstand en de uitstoot -- en wijst *snelst*,
+*goedkoopst* en *schoonst* aan zonder een "beste" te kiezen, want dat is een
+oordeel over andermans afweging. Voor Ibiza-stad naar Santa Eularia:
+
+| optie | tijd | prijs | uitstoot |
+| --- | --- | --- | --- |
+| Rechtstreeks met de taxi | 29 min | € 42,39 | 1861 g |
+| Kustlijn 1 + taxi | 35 min | € 38,35 | 1738 g |
+| Eilandexpres + 206 m lopen | 42 min | € 3,98 | 432 g |
+
+**Wat de planner bewust niet doet** is een kortste pad zoeken door een netwerk
+met overstappen. Dat vraagt een dienstregeling per halte die wij niet hebben, en
+een planner die overstappen verzint op tijden die hij niet kent, stuurt mensen
+naar een perron waar niets komt. Hij doet wat hij wel kan onderbouwen, en wat
+afvalt valt af **met reden** ("de haltes liggen zo dat je er een omweg voor
+maakt") -- een lege lijst zonder uitleg leest als een storing.
+
+Vier dingen die in code staan omdat ze anders niet waar zouden zijn:
+
+1. **Uitstoot heet een schatting**, ook op het scherm, met het gehanteerde
+   getal per kilometer erbij. Het zijn indicatieve gemiddelden om opties mee te
+   vergelijken, geen meting aan het voertuig waar u in stapt.
+2. **Betrouwbaarheid komt uit onze eigen storingsmeldingen**, met het venster
+   erbij. Geen gegevens is "niet bekend" en niet "100%".
+3. **Comfort is geen score** maar een rij feiten: hoe vaak overstappen, hoeveel
+   meter lopen, zit u zeker.
+4. **Het plan wordt bij het boeken opnieuw gerekend.** De app stuurt alleen
+   welke optie het werd; wie de prijs meestuurt, bepaalt hem anders zelf.
+
+Boeken maakt de etappes echt: de taxi wordt een opdracht in de rittenmotor, de
+OV-etappe een vervoerbewijs (of een instructie om in te checken als er op die
+lijn geen kaartverkoop is). De geldregels staan apart en eerlijk: **het kaartje
+is betaald, de rit wordt afgerekend als hij gereden is** -- tot dan is die prijs
+een schatting. Mislukt er halverwege iets, dan worden de al aangemaakte ritten
+teruggedraaid, zodat er nooit een betaald kaartje achterblijft voor een reis die
+niet doorgaat.
+
+En de fout die dit het duidelijkst maakt: de eerste versie schreef
+`haversine(a, b) || 9e9`, en dat maakt van een afstand van **nul** een oneindige.
+Stond je precies op de halte, dan werd die als verste gesorteerd en viel de hele
+OV-optie af als omweg. De planner was het slechtst op het moment dat hij het
+makkelijkst had moeten hebben.
+
+#### De zakelijke laag: een product, geen knop "zakelijke rit"
+
+`reisbeleid.js` + `zakelijk.js` + `/apps/zakelijk.html` (de werkgever) en de
+velden *Op rekening van* / *Kostenplaats* in `/apps/ov.html` (de medewerker).
+Een vinkje "zakelijk" op een rit is een regel op een factuur. Wat een werkgever
+werkelijk wil is een grens, een goedkeuring en een overzicht -- en dat is wat
+hier staat.
+
+**Het gat dat hier zat, en hoe het gedicht is.** De rittenmotor nam de
+organisatiecode aan uit het verzoek. Elk lid dat de code van een bedrijf kende,
+kon op diens rekening rijden; de dienstverbandcontrole stond alleen bij de
+bedrijfspendel. Die controle staat nu op **een** plek -- in `opdrachtMaak`, waar
+elke weg naar een zakelijke rit langskomt (de app, de reisplanner, de
+dispatcher) -- en wordt op het moment zelf nagevraagd bij de
+personeelsadministratie, nooit uit iets wat de client meestuurt. Een controle
+per ingang is een controle die de volgende ingang vergeet.
+
+Het beleid kent een maximum per rit, een budget per medewerker per maand,
+toegestane tijden, dagen, steden, ritsoorten, een (verplichte) kostenplaats en
+een goedkeuringsdrempel. Vijf dingen die daarbij in code staan:
+
+1. **Elke afwijzing noemt de regel en het getal.** Niet "niet toegestaan", maar
+   *"Deze rit kost € 40,48; het maximum per rit is € 5,00."* Wie moet raden of
+   het aan het bedrag, het tijdstip of de kostenplaats lag, belt zijn manager --
+   precies wat een reisbeleid hoort te voorkomen. De werkgever ziet die zinnen
+   naast zijn eigen knoppen staan, zodat hij weet hoe zijn beleid klinkt.
+2. **Een drempel is geen verbod.** Boven het bedrag mag de rit best; er kijkt
+   eerst een mens naar. Die twee door elkaar halen is waarom mensen om een
+   beleid heen gaan werken. En wie buiten de regels valt, hoort dat hij de rit
+   op eigen rekening kan boeken -- dat is het verschil tussen een werkgever en
+   een voogd.
+3. **Een rit die op akkoord wacht, rijdt niet.** Hij staat op geen enkel
+   planbord en is niet in beweging te krijgen; de grendel zit op `opdrachtNaar`,
+   de enige weg naar een andere status, en niet op een scherm. Zou de wagen
+   alvast rijden, dan is de goedkeuring een formaliteit achteraf. Er is ook geen
+   stilzwijgende goedkeuring na verloop van tijd: wie niets doet, keurt niets
+   goed, en het besluit draagt de naam van wie het nam. Weigeren annuleert de
+   rit, want een geweigerde rit die blijft staan wordt alsnog gereden.
+4. **Bij een reis gaan de ritten naar de werkgever en blijven de
+   vervoerbewijzen persoonlijk.** Een rit wordt achteraf afgerekend en kan dus
+   naar een zakelijke rekening; een kaartje is hier en nu uit de portemonnee van
+   de reiziger betaald. Het overzicht zegt dat er met zoveel woorden bij.
+5. **Het maandoverzicht telt de rittenmotor**, per kostenplaats en per
+   medewerker, met de uitstoot erbij als schatting -- geen tweede administratie
+   die er binnen een kwartaal naast zit. De werkgever ziet de personeelsnaam die
+   hij al kent; de vervoerder ziet de codenaam. Dat is dezelfde scheiding als
+   overal: de chauffeur hoeft niet te weten wie hij ophaalt.
+
+`test/zakelijkvervoer.test.js` (14 toetsen) bewaakt dit, met mutaties
+nagetrokken: de poort die niet meer weigert, de grendel die eraf gaat, de
+wachtende rit die toch op het planbord komt, het budget dat geannuleerde ritten
+meetelt, de drempel die een verbod wordt, en een `werktBij` die niet meer naar
+het bedrijf kijkt -- elk daarvan laat een andere toets zakken. Het scherm van de
+werkgever loopt de weg af in `test/mobiliteitscherm.e2e.js`.
+
 ### RTG Werk OS (de werkplek van een organisatie)
 
 `server/bedrijf/` + `/api/bedrijf/...` + `/apps/werk.html`. Een **werkruimte**
@@ -689,6 +980,93 @@ overal als **niet gemeten** in plaats van als nul.
 
 - **RTG Bank** (`server/kern/bank/` + `kern/bankregie/`): een eigen dubbel-boekhoudend grootboek naast RTG Pay (som altijd exact nul, bewaakt door BANK-01 en PAY-02 op het technische bord). De boardroom-knop heeft drie standen (partner / hybride / eigen) met vier-ogen-autorisatie bij opschalen en een nood-fallback naar de kaart-rails; de leden-bank (rekeningen met echt IBAN, sparen, passen, krediet, salarisrun uit de klokuren) gaat pas open als de boardroom hem live zet en het lid akkoord geeft. In de eigen-stand lopen ook de Pay-autoload en de 30% RTFoundation-afdracht over de eigen rails.
 - **RTG Stad** (`server/kern/stad/`): het slimme-stad-platform op eigen hardware (de Stadsdoos-vloot, aanmelden met een eenmalig getoonde apparaat-sleutel; poorten `/api/stad/doos/*` met een rem per doos) en eigen software: acht domeinen met standen en regimes, één scenario-knop (nacht t/m nood, nood meldt de meldkamer en staat in het rampbeeld), een zelfschrijvende werklijst voor de veld-app en de bewonersapp Mijn Stad (meldingen op codenaam die als klus bij de veldploeg landen). Privacy by design: de stad meet dingen, geen mensen — geen camera's, geen persoonsvolging; de vrije tekst van bewonersmeldingen gaat niet mee in de AI-dataset.
+
+### RTF Foundation OS (de stichting als organisatie)
+
+De RTFoundation is niet één kantoor dat alles zelf doet, maar een landelijke stichting die per stad met bestaande lokale partijen samenwerkt. Het **Foundation OS** (`server/kern/rtfos/`, routes `/api/rtfos/*`, schermen `/apps/foundation/os.html`, `os-bestuur.html`, `os-veld.html`, `os-portaal.html`, `os-donateur.html`, `os-vrijwilliger.html`, `os-deelnemer.html` en `os-publiek.html`) draagt dat federatieve model: **eigen uitvoering per stad, centrale governance erboven**. Wat het landelijke toezicht draagt staat in code en niet in een afspraak.
+
+- **De boom.** RTF Internationaal > RTF Nederland > de stadsafdelingen. Een stad heeft een eigen kernteam, eigen partners, projecten, budgetten en rapportages. Wat een stad *niet* zelf doet: zichzelf activeren, zijn goedkeuringslimiet verhogen, een module aanzetten of een andere stad bekijken.
+- **Zetels in plaats van rollen.** Bevoegdheid hangt aan een sleutel uit een échte inlog (`boardroomWie`), niet aan een veld in het verzoek. De gedeelde kantoorcode wijst niemand aan en krijgt dus nooit een zetel. Het landelijke bestuur is de boardroom; daaronder staan `stadsbestuur`, `projectleider` en `medewerker` (`kern/rtfos/zetels.js`).
+- **Modules per stad** (zestien feature-vlaggen, van `youth_programs` tot `emergency_fund`). Staat een module uit, dan kan er in die stad niets van worden aangemaakt of gewijzigd — met de reden in het antwoord, niet als lege lijst.
+- **Geoormerkt geld verschuift niet.** Een bron (donatie, subsidie, sponsoring) draagt zijn bestemming; een uitgave kan alleen bronnen aanspreken die bij dát project horen. Herbestemmen kan uitsluitend landelijk, met een reden, en nooit als de gever het heeft uitgesloten. Het vrije saldo telt de nog niet besloten aanvragen mee, zodat dezelfde euro niet twee keer wordt aangevraagd.
+- **Vier ogen en een ladder.** Wie aanvraagt, besluit niet. Projectleider tot €250, stadsbestuur tot €2.500, daarboven landelijk; een stad kan die drempel verlagen, nooit verhogen. Hetzelfde getal geldt voor het goedkeuren van een project, uit dezelfde functie.
+- **Partnerstichtingen** met KvK, RSIN, ANBI, bestuurders, documenten en looptijd — plus de vijf afspraken die er in de praktijk toe doen (wie doet het geld, de vrijwilligers, de persoonsgegevens, de aansprakelijkheid en de rapportage). Landelijk goedgekeurd, en niet actief zonder samenwerkingsovereenkomst in het dossier.
+- **Vrijwilligers met een VOG-grendel.** De VOG is een datum, geen vinkje: verlopen is niet geldig. Bij werk met kinderen en ouderen wordt de koppeling geweigerd, niet gemarkeerd.
+- **Hulpvragen op codenaam.** Geen veld voor gezondheid, geloof of gezinssituatie; naam en telefoon staan versleuteld (`server/kluis.js`) en worden alleen op een aparte handeling geopend, met een auditregel per blik. Toestemming wordt bij elke stap opnieuw gelezen en is intrekbaar; afronden kan niet zonder hulpactie in het dossier en zet meteen een bewaartermijn.
+- **Integriteit.** Incidenten, klachten, klokkenluidersmeldingen en belangenverstrengeling, in vier zwaarteklassen. Hoog en kritiek staan direct op het landelijke bord; klokkenluidersmeldingen gaan buiten de stad om (anders gaan ze over het stadsbestuur langs het stadsbestuur). Niemand kan een melding verwijderen — sluiten kan, met een uitkomst.
+- **Verantwoording.** Het gemeentenportaal (`/api/rtfos/portaal/gemeente`) geeft uitsluitend getelde cijfers: bereik, buurten, besteding, prestatieafspraken. Buurten met minder dan vijf hulpvragen worden samengevoegd, want een klein getal in een kleine buurt is geen statistiek meer. Wat niet is ingevuld staat als **niet gemeten** en niet als nul.
+- **Drie code-portalen** naast het bestuursscherm: partnerstichting (`RTFP-`), gemeente (`RTFG-`) en lokale ondernemer (`RTFO-`). Zelfde familie als de clubcodes, met dezelfde twee remmen (20/min per bron, 60/min per code) en met een reden op de publieke lijst van `check.js` regel 28.
+
+**Fase twee — de uitvoering op straat**, met dezelfde discipline: elke module heeft een grendel die de praktijkfout tegenhoudt, en die grendel is met een mutatie zien zakken.
+
+- **Subsidies** (`kern/rtfos/subsidies.js`): een subsidie is geen inkomsten maar een verplichting met geld eraan — voorwaarden, rapportagemomenten, terugbetaalrisico. Toekennen *maakt zelf* de geoormerkte bron in `geld.js` (geen tweede plek die hetzelfde bedrag vasthoudt), aanvaarden boven de stadsgrens is landelijk werk, en "verantwoord" kan niet zolang er een rapportagemoment open staat of er geen bewijsstuk in het dossier zit. Een kans met een verstreken deadline komt terug als **gemist** in plaats van stil oud te worden.
+- **Voorraad** (`kern/rtfos/voorraad.js`): goederen als *batch*, niet als saldo — houdbaarheid, opslaglocatie, gever, bestemming. Bederfelijke waar zonder houdbaarheidsdatum komt niet binnen; over de datum gaat niet de deur uit (afschrijven is een andere handeling, met verplichte reden); het restant wordt uit de batch zelf gerekend. Een uitgifte wijst naar een project of naar een hulpvraag-**codenaam**, nooit naar een persoon.
+- **Activiteiten** (`kern/rtfos/activiteiten.js`): vol is een wachtlijst en geen nee — bij een afmelding schuift hij op en het antwoord zegt *wie*. Een jeugdactiviteit gaat niet open zonder begeleider met geldige VOG en zonder veiligheidsplan; een minderjarige zonder vastgelegde oudertoestemming checkt niet in; fototoestemming is een apart veld dat nergens uit meedoen wordt afgeleid. De incheckcode (de QR aan de deur) komt uit de CSPRNG.
+- **Communicatie** (`kern/rtfos/berichten.js`): naar binnen stuurt de stad zelf — anders gaat het bericht via een privé-appgroep en is het systeem het probleem. Naar buiten draagt de naam van de hele stichting en gaat langs het landelijke bestuur; spoed geeft **voorrang, geen omweg**. Wie de tekst na goedkeuring wijzigt, valt terug op concept: een goedkeuring hoort bij díé tekst.
+
+**Fase drie — de governance-laag**, en dat is de laag waarop een stichting wordt afgerekend als het misgaat: niet op wat ze deed, maar op of ze het *bevoegd* deed en het kan laten zien. Eigen scherm (`/apps/foundation/os-bestuur.html`), want dit is werk van een paar keer per jaar met een ander publiek dan de dagelijkse uitvoering.
+
+- **Bestuursvergaderingen** (`kern/rtfos/bestuur.js` + `bestuur-notulen.js`): geen quorum, geen besluit — en de weigering noemt het getal ("2 van de 5 aanwezig, er zijn er 3 nodig"), want "geweigerd" leert de secretaris niets. Wie bij een punt als belanghebbend is aangemerkt, kan niet worden geteld als stemmer, ook niet als tegenstemmer: het gaat om deelname aan de stemming, niet om de richting. Notulen worden in een **volgende** vergadering vastgesteld — een vergadering die zichzelf vaststelt zegt alleen dat de aanwezigen zeiden wat zij zeiden — en daarna weigert alles wat wijzigt, tot en met een agendapunt.
+- **Landelijk beleid** (`kern/rtfos/beleid.js`): een nieuwe versie **wist alle bevestigingen**. Dat voelt als werk weggooien en is het punt: een handtekening onder versie 1 is geen handtekening onder versie 2. Een stad kan een landelijke regel bevestigen, niet herschrijven; een regel die nog moet ingaan telt niet mee in het "wie moet nog"-lijstje.
+- **Jaarverslag en ANBI-publicatie** (`kern/rtfos/jaarverslag.js`): de cijfers worden bij het opstellen **bevroren**. Een rapportagescherm hoort live te rekenen, een verantwoording niet — een jaarverslag dat meebeweegt met de database is geen jaarverslag. Vaststellen kan alleen met een *aangenomen* besluit uit *vastgestelde* notulen, publiceren alleen na vaststelling, en daarna is een correctie een herziening met een reden. De publicatie hangt onder `/api/rtfos/publiek/jaarverslagen`: achter een inlog is een ANBI-jaarstuk niet gepubliceerd.
+- **Risicoregister** (`kern/rtfos/risico.js`): kans maal impact, allebei 1 tot 5, geen wegingsformule die precisie suggereert die er niet is. Een zwaar risico (vanaf 15) gaat niet op "beheerst" zonder maatregel, eigenaar én een herbeoordelingsdatum in de toekomst; het antwoord noemt precies welke van de drie ontbreekt. Een verstreken herbeoordeling wordt gerekend en niet opgeslagen — net als de gemiste subsidiekans.
+- **Grote en contante giften** (`kern/rtfos/herkomst.js`): boven de tienduizend euro, of vijfhonderd contant, **staat het geld stil**. Geen waarschuwing en geen vinkje op een lijst: de grendel zit op de bron (`geld-uitgaven.js`), dus wie het geld ook wil aanspreken stuit op hetzelfde. Staat er iets tegenover, dan is het geen donatie maar sponsoring en wordt het geweigerd. De sanctielijst controleert dit systeem **niet** — het veld vraagt wie het handmatig deed, want een knop die "gecontroleerd" zegt zonder te controleren is erger dan geen knop.
+- **Meldcode** (`kern/rtfos/meldcode.js`): de vijf wettelijke stappen bij zorg om een kind. Wegen en beslissen kan niet zonder de overlegstap — dat is precies de fout die de meldcode moet voorkomen: de welwillende medewerker die in zijn eentje concludeert dat het meevalt. Het gesprek met de betrokkene mag worden overgeslagen (soms verslechtert het de veiligheid), maar niet stilzwijgend. Sluiten vraagt een afweging in woorden, ook bij "geen actie". Er staat in die module geen enkele verwijderende bewerking, en de toets leest dat in de bron.
+
+Getoetst in `test/rtfos-governance.test.js` (acht scenario's) en `test/rtfosgovernance.e2e.js` (het scherm). Negen mutaties, alle negen **RAAK** — inclusief de mutatie die het jaarverslag weer live liet rekenen en die de noemer van het quorum van het scherm haalde.
+
+**Fase vier — het netwerkeffect**, de enige reden om federatief te zijn. Alles hier houdt de stadsgrenzen intact:
+
+- **Blauwdrukken** (`kern/rtfos/netwerk.js`): wat in de ene stad werkte, neemt de volgende over. Een blauwdruk kan alleen uit een project dat draait of gedraaid heeft én ten minste één ingevulde indicator heeft — anders is het een ideeënbus. Wie hem overneemt begint bij **idee** met budget nul en loopt de eigen goedkeuring; de resultaten en het bedrag van de andere stad reizen niet mee.
+- **Gezamenlijke inkoop** (`kern/rtfos/inkoop*.js`): elke stad schrijft zelf in, met een bron van de eigen stad en met het oormerk intact. Sluiten is geen betaling maar een **bestelling**: per stad ontstaat een gewone uitgave-aanvraag die daar nog door de vier ogen en de limiet moet. Minder dan twee steden is geen gezamenlijke inkoop.
+- **Vrijwilligers tussen steden** (`kern/rtfos/uitwisseling.js`): een vrijwilliger wordt gevraagd, niet verplaatst. Zonder vastgelegde toestemming loopt de uitleen niet; er is altijd een einddatum (verlopen wordt gerekend, niet door een taak omgezet); en de ontvangende stad ziet vaardigheden en beschikbaarheid, **geen evaluaties en geen urenhistorie** — dat is het dossier van de eigen stad.
+- **Landelijke campagnes** (`kern/rtfos/campagnes.js`): de verdeelsleutel staat vooraf vast en telt op tot exact 100%; een ronde verdeelt centnauwkeurig (grootste rest) en landt als bron in de stad zelf. Geen automatische formule op inwonertal of prestatie — het bestuur kiest, met de reden in het auditspoor.
+- **Benchmark** (`kern/rtfos/netwerk-meting.js`): steden naast elkaar mét hun noemer, en met opzet **geen rangschikking op doelmatigheid**. Een stad ziet zichzelf naast de landelijke mediaan, niet naast de buren bij naam. Uitschieters komen terug als *vraag* ("zijn dit langere trajecten, of loopt hier iets vast?"), niet als oordeel.
+- **Koppelbord met RTG** (`kern/rtfos/koppeling.js`): alleen de agenda werkt vandaag echt (een activiteit in je eigen RTG-agenda). Vervoer, betalingen en chat staan er als **niet gekoppeld**, met per stuk de reden en wat ervoor nodig is. Een knop die stilletjes niets doet, is erger dan geen knop.
+
+**Fase vijf — de drie doelgroepen die nog geen eigen ingang hadden.** De functies bestonden al; wat ontbrak was de deur waar de vrijwilliger, de hulpvrager en de buurt zelf naar binnen gaan. Alle drie de schermen houden de code in het tabblad en nergens anders — op een gedeelde computer sluit je het tabblad en is het weg.
+
+- **De vrijwilligersapp** (`kern/rtfos/vrijwilligerportaal.js`, scherm `/apps/foundation/os-vrijwilliger.html`, code `RTFV-`): eigen beschikbaarheid, talen en vaardigheden bijwerken, en uren melden. Wat hij hier *niet* zet: zijn VOG-datum, de gedragscode en zijn status — dat doet de afdeling, met de reden in het antwoord in plaats van een stille weigering. Gemelde uren landen in `gemeldeUren` en tellen pas mee ná bevestiging door de coördinator: uren zijn een verantwoording naar buiten, en dan is "de vrijwilliger typte het in" geen bron. Zijn eigen beeld bevat bewust geen evaluaties en geen contactgegevens, met de tekst erbij dat hij ze wél mag opvragen — bij een mens, niet bij een knop.
+- **Het deelnemersportaal** (`kern/rtfos/deelnemerportaal.js`, scherm `/apps/foundation/os-deelnemer.html`, code `RTFD-`): waar staat mijn vraag, en nee kunnen zeggen. De keten-woorden worden vertaald (`in_uitvoering` wordt "er wordt aan gewerkt"), interne notities blijven binnen, de helpende organisatie staat er wel en de namen van hulpverleners niet. Intrekken loopt door dezelfde functie als de kantoorkant (`casus.toestemmingWegDirect`) — de eerste versie had de controle er nog een tweede keer omheen staan, en een mutatie die hem weghaalde liet geen enkele toets zakken. Dat was een controle te veel, geen extra veiligheid.
+- **De publieke RTF-app** (`kern/rtfos/publiek.js`, scherm `/apps/foundation/os-publiek.html`): zonder inlog, en met een simpele maat — wat zou je op een poster in het buurthuis hangen? Actieve steden, wat er te doen is en de landelijke campagnes. Geen aantallen hulpvragen, geen namen, geen bedragen: die zeggen op straat niets en verraden in een kleine buurt wél iets.
+
+Alle drie zijn ze **installeerbaar als eigen app** (`manifests/rtf-vrijwilliger`, `rtf-eigen`, `rtf-buurt`) en staan ze in de offline-schil van de bestaande foundation-service-worker — niet in een eigen: een tweede service worker op `/apps/foundation/` vervangt de eerste, en dan is de gezinsapp zijn cache kwijt. Wat offline komt is de pagina zelf en niet de inhoud; die loopt over een POST-API die nooit uit de cache komt. Het manifest van de hulpvrager heet met opzet gewoon **RTFoundation** en niet "Mijn hulpvraag": een geïnstalleerde app zet een icoon mét naam op een beginscherm dat huisgenoten meelezen, en dan vertelt de telefoon wat de pagina zelf zorgvuldig niet vertelt. Dezelfde reden waarom er geen contactgegevens op staan.
+
+**De laatste twee ingangen**, waarmee alle tien de interfaces uit de opzet bestaan.
+
+- **De veld-app** (`kern/rtfos/veld.js`, scherm `/apps/foundation/os-veld.html`): het verschil met het bestuursscherm is niet het formaat maar de blik. Een medewerker ziet uitsluitend wat aan hem is **toegewezen** — niet zijn stad, niet zijn project, aan hem. In een buurthuis kent iedereen elkaar; een dossier van de buurvrouw hoort niet twee tikken weg te zijn. Het adres opent apart en dat komt in hetzelfde auditspoor als op kantoor (dezelfde functie, niet een tweede versie ervan). Elk bezoekrapport draagt een vervolgafspraak, of de uitdrukkelijke mededeling dat er geen vervolg nodig is met de reden erbij — een rapport zonder vervolg is hoe een hulpvraag blijft liggen: iedereen denkt dat de ander aan zet is. Afronden kan hier niet, en de weigering legt uit waarom: dat zet de bewaartermijn in gang en sluit de zaak, en zo'n besluit hoort niet op de stoep te vallen.
+- **Het donateursportaal** (`kern/rtfos/donateur.js`, scherm `/apps/foundation/os-donateur.html`, code `RTFS-`): wat gaf ik, en waar ging het heen. Nooit wie er nog meer gaf — een code die het donateursbestand opent is de adressenlijst van iemand anders — en nooit op mensniveau: "uw gift ging naar het Taalcafé" mag, "u hielp mevrouw K." niet. Het giftbewijs zegt wat het **is**: bij sponsoring komt er geen bewijs maar de reden (er staat iets tegenover, dus het zijn zakelijke kosten), bij een gift waarvan de herkomst nog open staat evenmin, en **periodiek** heet het alleen met een vastgelegde overeenkomst van ten minste vijf jaar. Dat laatste is geen detail: een bewijs dat iets anders suggereert kost de gever geld bij zijn aangifte.
+
+Getoetst in `test/rtfos-afmaak.test.js` (zes scenario's, inclusief de publieke campagnelijst — de laatste rtfos-route die nog door geen enkele toets werd aangeraakt) en `test/rtfosafmaak.e2e.js` (beide schermen, tekst én rauw antwoord). Acht mutaties, alle acht **RAAK**.
+
+**Elk routepad staat letterlijk in de bron**, en dat is een reparatie met een verhaal: de eerste versie bouwde de paden op (`app.post('/api/rtfos/' + pad, …)`). Dat werkte, en het maakte 85 routes onzichtbaar voor vier meters tegelijk — de poort-audit (`check.js` regel 28), de dubbele-routecontrole (regel 31), `scripts/schakelbaar.js` en de routekaart lezen allemaal de bron met een regex op een letterlijk pad. Ze zagen één route, `/api/rtfos/`. Alles stond groen omdat er niets te zien was. Sinds de paden letterlijk zijn, ziet de poort-audit ze wel (nagetrokken met een mutatie: `officeAuth` weghalen laat regel 28 zakken met die route bij naam), en werd zichtbaar dat 24 ervan nog nooit door een toets waren aangeraakt.
+
+Getoetst in `test/rtfos.test.js` (twaalf scenario's op de governance-grendels), `test/rtfos-uitvoering.test.js` (zes op de uitvoering), `test/rtfos-portalen.test.js` (acht op de portalen en dossiers), `test/rtfos-netwerk.test.js` (zeven op het netwerkeffect), `test/rtfos-doelgroepen.test.js` (zes op de drie eigen ingangen, inclusief de manifesten en de offline-schil), `test/rtfosschermen.e2e.js` (de twee bestuursschermen, inclusief het rauwe antwoord aan de gemeente) en `test/rtfosdoelgroepen.e2e.js` (de drie doelgroepschermen plus de overdracht van code en uren vanaf het bestuursscherm, met een lijst dingen die op géén van de drie mag opduiken — gecontroleerd in de zichtbare tekst én in de rauwe antwoorden, want een scherm dat gevoelige gegevens ophaalt maar niet toont, lekt ze nog steeds). De 30%-afdracht van RTG naar de stichting blijft waar hij stond (`kern/fonds.js`); dit OS gaat over wat de stichting met dat geld dóét.
+### Het stadsweefsel (`server/kern/stadsweefsel/`)
+
+RTG had de organen van een stad al — sensoren, gemeente, overheid, OV, hulpdiensten, rampbeeld, gebouwen, betalingen — maar niet het weefsel ertussen. Het platform wist wél dát er iets speelde, maar niet waar het lag, wat eromheen stond, of twee meldingen hetzelfde probleem waren, wat er meeviel bij uitval, of het vaker gebeurde, en wat oplossen had gekost. Deze laag is dat weefsel. De boardroom-routes staan onder `/api/office/weefsel/*` (`routes/kantoren/weefsel.js`), de toetsen in `test/stadsweefsel.test.js` (negen toetsen, negen mutaties, alle negen RAAK).
+
+- **Eén geografische waarheid** (`geografie.js` + `meetkunde.js`): `stad → wijk → buurt → zone → straatsegment`, elk gebied met een geometrie (punt, lijn of vlak). De grens van een wijk is de omhullende van zijn buurten, dus geen tweede getal. Middelpunt en grenzen komen uit `kern/navigatie` (REF/BOUNDS, Ibiza-stad), zodat de stad en haar A*-wegennet in dezelfde wereld liggen. `plaats(lat,lng)` geeft het diepste gebied plus het hele kruimelpad; zones overlappen niet, dus een punt hoort bij precies één zone. **De zes zones van RTG Stad wonen hier**: `kern/stad` had ze in een eigen `db.data.stadZones` en leest ze nu hier — één lijst in plaats van twee die uiteenlopen.
+- **Het objectregister** (`objecten.js`, `objectsoorten.js`, `objectseed.js`): twaalf soorten (lantaarn, container, gemaal, transformator, laadpaal, brug, halte …) met eigenaar, beheerder, status, risicoklasse, conditie (NEN 2767-achtig: 1 uitstekend … 6 zeer slecht), bouwjaar, technische levensduur, vervangingswaarde en een eigen onderhoudshistorie. Het gebied is **afgeleid uit de positie**, nooit ingetikt. `weefselAandacht` geeft wat om aandacht vraagt zónder dat iemand belde (conditie ≥ 4 of over de levensduur heen). De laadpalen worden gezaaid uit de POI-laag van de navigatie, zodat het laadpunt dat je aanwijst hetzelfde ding is als het laadpunt dat je onderhoudt.
+- **Relaties en afhankelijkheden** (`relaties.js`, `afhankelijkheden.js`): getypeerde randen van oorzaak naar gevolg (`voedt`, `afvoer-naar`, `stuurt`). Daarmee beantwoordt `/api/office/weefsel/uitval` de wat-als-vraag ("transformator Kern valt uit → vijftien objecten in twee zones, waaronder een gemaal"), en `keten` de omgekeerde ("waar hangt deze lantaarn van af"). De doorloop is begrensd op diepte en knopen en zegt het zelf als hij afkapt.
+- **Het geheugen** (`tijdreeksen.js`): elke meting rolt op in een uur- en een dagemmer per sensorsoort per zone (n, som, min, max). Cijfers voor een buurt, wijk of de hele stad worden **gerekend** uit de zones eronder en niet apart bewaard. Bewaartermijn per laag (`RTG_WEEFSEL_UURDAGEN`, standaard 14; `RTG_WEEFSEL_DAGDAGEN`, standaard 400) en de veger ruimt echt op.
+- **Eén zaak- en werkordermotor** (`zaken.js`, `zaakbeeld.js`, `werkorders.js`, `categorien.js`): elk kanaal — bewonersapp, gemeenteloket, telefoon, ambtenaar, Stadsdoos, politie, vervoerder, bedrijf — biedt een **waarneming** aan. Zelfde categorie, zelfde object (of binnen 75 meter) en binnen 72 uur op een open zaak: dan hoort het bij die zaak. Tien meldingen over dezelfde paal zijn zo één zaak met tien melders in plaats van tien klussen. Elke zaak krijgt meteen een werkorder; klaarmelden boekt de handeling mét kosten en uren in de onderhoudshistorie van het object (precies één keer) en sluit de zaak, waarna de melder het live terugziet. En hangen meerdere open zaken van dezelfde soort onder één bovenstroomse bron, dan **wijst** de motor die aan als mogelijke gedeelde oorzaak — als hint voor een mens, niet als besluit.
+- **Onderhoud dat niet op meldingen wacht** (`onderhoud.js`): een inspectieregime per objectsoort (speeltoestel elk kwartaal, lantaarn eens in de vier jaar), en een signaal van 0–100 uit conditie, restlevensduur, hoe vaak er het afgelopen jaar aan is gesleuteld, de overschreden schouwtermijn en de huidige status — altijd **met de redenen erbij**. Een ronde is een voorstel dat een mens gunt; bij een object met risicoklasse *kritiek* (gemaal, transformator, brug) kan dat alleen met **vier ogen**: twee namen, en niet twee keer dezelfde.
+- **Contracten, SLA's en prestatie** (`contracten.js`): een aannemer is een partij met een scope (welke soorten, welk gebied), tarieven, een looptijd en een SLA per prioriteit — twee klokken, want reageren en herstellen zijn verschillende beloftes. Het **meest specifieke** lopende contract wint. De reactieklok stopt bij een handeling (iemand pakt de order op), niet bij een status die je zelf kunt zetten. `weefselPrestatie` geeft per partij het percentage op tijd, en noemt apart wat nog openstaat én over zijn termijn is — de vorm waar een gemiddelde overheen kijkt.
+- **Stedelijke indicatoren** (`indicatoren.js`): doorlooptijd (mediaan én gemiddelde, want het verschil vertelt zelf iets), open en opgeloste zaken, kosten per domein, SLA-nakoming, herhaling per object, en het **verschil tussen wijken** met de spreiding erbij. Elke indicator draagt zijn eenheid en zijn richting; *niet gemeten* is null met een tekst, nooit 0. Technische beschikbaarheid ("99,9% sensoren online") staat er met opzet **niet** tussen — dat is een randvoorwaarde, geen resultaat, en hij hoort op het techniekbord.
+- **Van beleidsdoel tot uitkomst** (`begroting.js`): `doel → budget → project → werkorders → uitgaven → effect`. Een project legt zijn **nulmeting bij de start** vast (achteraf is elke startwaarde de waarde die het beste uitkomt) en meet bij het afsluiten dezelfde indicator opnieuw. Alleen afgerond werk telt als uitgave; een overschrijding wordt **gemeld, niet geblokkeerd** — werk stilleggen omdat een potje leeg is, is een besluit van een mens. Er wordt hier geen geld verplaatst.
+- **Energie als planlaag** (`energie.js`): per voedingsgebied de capaciteit, wat eraan hangt, gemeten naast geschat verbruik, en de bezetting — met een marge die voor hulpdiensten gereserveerd blijft. Maatregelen (laden uitstellen, dimmen, batterijen inzetten, bedrijven waarschuwen) komen met hun verwachte winst **en hun terugvalstand**. Een opdracht is een *vastgelegd voornemen* met een naam, een reden en een vervaltijd, geen schakelaar: dit platform stuurt geen enkele fysieke installatie aan. Zware maatregelen vragen vier ogen; een maatregel die een veiligheidskritiek object raakt wordt geweigerd, ook mét twee namen.
+- **Water, hitte en droogte** (`klimaat.js`): vijf meetsoorten naast de acht domeinen (regen, grondwater, rioolbelasting, waterstand, gevoelstemperatuur), risicokenmerken per zone (laag, hitte, kade) en vier scenario's — extreme regen, hittegolf, droogte, hoogwater — die combineren welke objecten in welke risicozone staan, in welke conditie, en wat ze bij uitval meeslepen. De Stadsdoos mag deze vijf gewoon insturen: dezelfde hardware, dezelfde sleutel.
+- **Eén wat-als-motor** (`simulatie.js`): uitval, wegafsluiting (wat staat eraan, welke halte vervalt, blijft er een verbinding over), evenement (houdt wat er *staat* het vol — containers, haltes, laadpunten) en klimaat, achter één ingang. De aannames staan met naam en getal in het antwoord, zodat je kunt zien waarop het rust.
+- **Vijf niveaus en een openbaar algoritmeregister** (`ainiveau.js`, `algoritmeregister.js`): van *waarnemen* tot *verboden zonder een expliciete menselijke beslissing*, als tabel die elk deel leest. Wat op niveau 4 staat, staat er met naam (hulpdiensten inzetten, een weg of brug afsluiten, kritieke infrastructuur uitschakelen, een vergunning weigeren, een persoonsrisico bepalen). Het register op **`/api/stad/algoritmes` is openbaar** — een register dat alleen achter de kantoorinlog te lezen is, geeft een inwoner niets — en noemt per regel het doel, de gebruikte gegevens, de beslisruimte, **de bekende beperkingen** en waar je terecht kunt.
+- **Onderwijs, werk en de lokale economie** (`kansen.js`, `ondernemers.js`): deze laag houdt bijna niets zelf bij en dat is het punt. Vacatures komen uit `kern/werk`, bedrijven uit de partnerlijst, beroepen uit de Beroepen-Bibliotheek, aankomend werk uit de onderhoudsplanning — de kansenlaag legt ze op de **kaart** en maakt er verbindingen van: waar zit het werk per wijk, welk beroep is schaars (en dus: welk **gratis leerpad** hoort daarbij), welke panden staan leeg en **wat staat daaromheen** (haltes, laadpunten, bedrijven, open zaken), welk werk komt eraan waar nog geen contract voor loopt (een kans voor een lokale partij), wie moet weten dat zijn straat open gaat, en welke ondernemers een evenement raakt. Ontbreekt een bron, dan zegt de laag dat de **bron** ontbreekt — niet dat er geen werk is. Geteld wordt waar het *werk* is, nooit wie er zoekt.
+- **Wie mag wat besluiten** (`bestuur.js`, `besluitvorming.js`): vier organen die niet hetzelfde doen — de raad stelt vast en controleert, het college bestuurt daarbinnen, een wijkraad **adviseert** (per wijk uit de geografie), de rekenkamer onderzoekt en besluit nooit. Het **mandaat** hangt aan het bedrag én aan het risico: onder €25.000 tekent een ambtenaar, daarboven het college, daarboven de raad, en veiligheidskritiek werk schuift altijd een trede op. En het **bijt**: `begroting.js` weigert een project boven de grens zolang er geen *aangenomen* besluit van het *juiste orgaan* onder ligt dat het bedrag ook echt dekt. Stemmen gaat per fractie met zetels — een demostad hoort geen ledenlijst te bevatten — en de meerderheid gaat over álle zetels, niet over de aanwezigen. Wordt er tegen een advies in besloten, dan staat dát in het besluit.
+- **Inspraak en controle** (`inspraak.js`, `rekenkamer.js`): een raadpleging hangt aan een gebied en telt **twee keer** — iedereen, en alleen wie uit dat gebied komt; het verschil ertussen is zelf informatie. Eén reactie per codenaam, te wijzigen zolang hij loopt, en de toelichting van een ander is nooit zichtbaar. Het rekenkameronderzoek voegt geen enkel gegeven toe: het legt budget, uitgaven, effect, besluit en SLA naast elkaar en stelt de **vragen** die daaruit volgen — geen score, geen stoplicht. Het toetst het mandaat op wat een project werkelijk *kostte*, want een project dat onder de grens begon en er tijdens de rit overheen ging, kan de begroting per definitie niet tegenhouden.
+- **Openbaar**: net als het algoritmeregister staat het **besluitenregister** op `/api/stad/besluiten` zonder inlog — wat een stad besluit, met welke stemverhouding en tegen welk advies in, is de kern van waarom een inwoner er iets over te zeggen heeft. Er staan geen personen in.
+- **De Stadsdoos als product** (`kern/stad/apparaat.js`, `kalibratie.js`, `apparaatupdate.js`): een levensloop met vaste overgangen (geproduceerd → getest → geregistreerd → geïnstalleerd → gekalibreerd → actief → onderhoud → vervangen → gewist → afgevoerd) en een productpaspoort; *actief* kan pas als élke sensor gekalibreerd is, en *gewist* verwijdert de sleutel echt. **Sleutelrotatie met overlap** — de nieuwe sleutel wordt één keer getoond, de oude blijft een dag geldig, want zonder die overlap sluit je precies de dozen buiten die net offline waren. **Ondertekende updates**: het manifest draagt versie, hash en een HMAC met de eigen sleutel van het apparaat, plus altijd een terugvalversie. **Kalibratie** per sensor met een geldigheidstermijn, toegepast bij binnenkomst zodat er nooit een ruwe én een gecorrigeerde versie bestaat. En een **buffer**: een doos die dagen zonder netwerk zat mag zijn eigen tijdstempels meesturen (niet in de toekomst, niet ouder dan 30 dagen) — ze op "nu" stempelen zou van een storing een piek maken die er nooit was. Sabotage gaat naar de beveiligingslaag, niet naar de klussenlijst.
+- **De stad mag niet dom worden als wij uitvallen** (`terugval.js`): per kritiek systeem de veilige terugvalstand, hoe een mens het ter plekke bedient, waar de papieren procedure ligt, en **wanneer dat voor het laatst écht is geoefend**. Een terugvalstand die nooit is geoefend heet hier een *aanname* en staat bovenaan de noodkaart; een mislukte oefening telt niet als geoefend. De noodkaart rekent niets uit en heeft geen ander deel van het systeem nodig — hij is bedoeld om af te drukken. Daarnaast liggen de **vertrouwenszones** vast (publiek, sensorinname, stadsregie, hulpdiensten, geld) met per zone wat er nooit bij mag; de scheiding zelf hoort in de infrastructuur, en een applicatie die beweert haar eigen netwerk te bewaken bewaakt niets.
+- **Het sociaal domein, en waar het stopt** (`voorzieningen.js`, `sociaalgrenzen.js`): voorzieningen met capaciteit en wachttijd op de kaart, en vraagcijfers **per wijk per maand** — genoeg om beleid op te maken, te weinig om iemand mee te vinden. Er komt geen enkele persoon in: niet "we slaan het niet op", maar er is geen veld waar een persoon in past. Wat deze laag met opzet *niet* kan (wie zit er in de schuldhulp, geef deze inwoner een risicoscore, combineer stromen tot een profiel) staat als **lijst met redenen**, inclusief wat er eerst nodig zou zijn — een grondslag en een besluit dat buiten de code valt.
+- **Privacy**: het weefsel kent objecten, plaatsen en codenamen — geen inwoners. Waarnemingen dragen een codenaam, een melder ziet alleen zijn eigen meldingen, en de vrije tekst gaat niet de AI-dataset in. De zaken en werkorders hebben een bewaartermijn (drie jaar, `server/bewaarbeleid.js`); het register zelf verloopt niet, want een lantaarnpaal verloopt niet.
 
 **Blijf ingelogd:** sessies worden bewaard (server-side in `db.json`, client-side in de browser). Wie inlogt blijft ingelogd, ook na een herstart van de server of het sluiten van de app. Uitloggen kan in elke app (leden-app: onderin het meldingenpaneel; partner-app: de gebruikerschip rechtsboven; personeels-app: Wissel). Personeels-PIN's zijn beschermd tegen raden: na vijf foute pogingen volgt een minuut wachttijd.
 

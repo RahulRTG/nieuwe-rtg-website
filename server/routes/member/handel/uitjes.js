@@ -2,16 +2,12 @@
    Gemount vanuit routes/member/handel.js op de gedeelde kern. */
 module.exports = (hctx) => {
   const { kern, openLijn } = hctx;
-  const { DOOR_RELOCK_MS, app, auth, betaal, crypto,
-    db, express, findSupplier, liveCodename, logActivity,
-    notifySupplier, optieAan, save, schoon, sseToSupplier,
-    unlockDoor, reserveerTafel, mijnReserveringen, annuleerReservering, annuleerItem,
-    plaatsReview, reviewsVoor, verblijfBoek, mijnVerblijven, verblijfAnnuleer,
-    gastDeur, toggleFavoriet, favorietenVan, agendaVoor, maakSplits,
-    mijnSplitsen, betaalSplits, zetOpWachtlijst, mijnWachtlijst, rsvpAnnuleer,
-    puntenVan, verzilverPunten, salonZichtbaar, ghMarkt, ghPlaatsBestelling,
-    ghMijnBestellingen, ghAnnuleer, mbAanvraag, mbMijn, zorgVoor, zorgContact, idGeverifieerd,
-    gegevensStop } = kern;
+  const { DOOR_RELOCK_MS, app, auth, liveCodename, logActivity, optieAan, save, unlockDoor,
+          reserveerTafel, mijnReserveringen, annuleerReservering, annuleerItem, plaatsReview,
+          reviewsVoor, verblijfBoek, mijnVerblijven, verblijfAnnuleer, gastDeur, toggleFavoriet,
+          favorietenVan, agendaVoor, maakSplits, mijnSplitsen, betaalSplits, zetOpWachtlijst,
+          mijnWachtlijst, rsvpAnnuleer, puntenVan, verzilverPunten, zorgVoor, idGeverifieerd,
+          gegevensStop } = kern;
 app.post('/api/verblijf', auth, (req, res) => {
   if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
   // een verblijf staat op uw naam bij een derde: de receptie moet u kunnen bereiken

@@ -63,9 +63,14 @@
     return pc;
   }
   function metMicrofoon(fn) {
-    haalIce().then(function () { return navigator.mediaDevices.getUserMedia({ audio: true }); })
+    haalIce().then(function () { return window.RTGMedia.microfoon({ stil: true }); })
       .then(function (st) { stream = st; fn(); })
-      .catch(function () { toon('Geen microfoon beschikbaar op dit toestel.', false); setTimeout(stop, 2500); });
+      .catch(function (e) {
+        // de reden erbij: "geen microfoon" is bijna nooit wat er aan de hand is
+        toon((e.rtg && e.rtg.kort) || 'Geen microfoon beschikbaar op dit toestel.', false);
+        if (e.rtg) window.RTGMedia.meld(e);
+        setTimeout(stop, 2500);
+      });
   }
   function flushIce() { iceQ.forEach(function (c) { try { pc.addIceCandidate(c); } catch (e) {} }); iceQ = []; }
   function neemOp() {

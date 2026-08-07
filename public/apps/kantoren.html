@@ -7,17 +7,16 @@
 <meta name="theme-color" content="#0C0C0B">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
 <link href="/shared/dagkleur.css" rel="stylesheet">
-<link href="/shared/os.css" rel="stylesheet">
 <link href="/fonts/fonts.css" rel="stylesheet">
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/rosthema.css" rel="stylesheet">
-<link href="/shared/desktopframe.css" rel="stylesheet">
-<link href="/shared/werkblad.css" rel="stylesheet">
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/rosthema.js" defer></script>
 <script src="/shared/rosapps.js" defer></script>
-<script src="/shared/flagship.js" defer></script>
 <link href="/shared/rtg-ui.css" rel="stylesheet">
+<!-- de melding van de mediapoort; tussen de andere bladen zodat hij in DEZELFDE
+     stijlbundel meegaat en er geen tweede bundel bijkomt (test/stijlbundel.test.js) -->
+<link rel="stylesheet" href="/shared/media.css">
 <style>
   :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--card2:var(--rtg-card2);--line:var(--rtg-line);--txt:var(--rtg-txt);--muted:var(--rtg-muted);--soft:var(--rtg-soft);--burgundy:#C23A5E;--gold:#A98F1C;--green:#4C9A75;--amber:#C99A2E;}
   *{margin:0;padding:0;box-sizing:border-box;}
@@ -153,8 +152,11 @@
   .wlegenda span{display:flex;gap:.35rem;align-items:center;}
 .merkvlak{display:inline-block;background:#7F1634;color:#fff;padding:.22rem .7rem .28rem;border-radius:4px;}
 </style>
+<!-- niet defer: dit script draait voor elke inline-body-script en voor elk kader -->
+<script src="/shared/media.js"></script>
+<link href="/shared/ios.css" rel="stylesheet">
 </head>
-<body data-osbar="Kantoren" data-oswereld="kantoor" data-flagship class="rtg-stijl">
+<body class="rtg-stijl">
 <a class="skip" href="#hoofd">Naar de inhoud</a>
 <header><div class="wrap">
   <div class="brand"><span class="merkvlak">RTG Kantoren</span><small>Elke afdeling een eigen kamer</small></div>
@@ -1884,7 +1886,7 @@ async function exportPortfolio(naam){
 
        En daarom staat dat sluitende teken hier ook niet uitgeschreven, ook
        niet in een opmerking: de HTML-lezer kijkt niet of iets commentaar is. */
-    '</style></head><body>'+
+    '</style>    </head><body>'+
     '<div class="balk"><span>Portfolio &middot; '+esc(p.naam)+'</span><button id="pbtn" type="button">Print / PDF</button></div>'+
     '<div class="wrap"><div class="cover"><div class="ey">Portfolio</div><h1>'+titel+'</h1>'+
     '<div class="sub">'+d.ontwerpen.length+' concept(en)'+(d.disciplines&&d.disciplines.length?' &middot; '+d.disciplines.map(esc).join(', '):'')+'</div></div>'+
@@ -3105,6 +3107,11 @@ function officeLive(){
 if (TOKEN) binnen().then(officeLive).catch(uitgelogd);
 else uitgelogd();
 
+/* Hier stond het WERKBLAD: het kantoor als een bureau met meerdere schermen
+   naast elkaar, met indelingsknoppen in de kopbalk. Dat is de metafoor van een
+   computer, niet van een telefoon, en het OS is nu iOS: één scherm tegelijk,
+   vol, en je wisselt met de home-indicator. De schermen die hier in vlakken
+   naast elkaar lagen zijn gewoon losse apps op de homescreen. */
 /* ---------- het werkblad: meerdere schermen op een scherm ----------
 
    Een kantoor is geen pagina waar je doorheen scrolt maar een bureau waar
@@ -3118,6 +3125,7 @@ else uitgelogd();
   const SCHERMEN = [
     { naam: 'RTG Office', url: '/apps/office.html?werk=kantoor' },
     { naam: 'RTF-kantoor', url: '/apps/foundation/kantoor.html' },
+    { naam: 'Foundation OS', url: '/apps/foundation/os.html' },
     { naam: 'Onderzoekslab', url: '/apps/lab.html' },
     { naam: 'Backoffice', url: '/apps/backoffice.html' },
     { naam: 'Boardroom', url: '/apps/boardroom.html' }
@@ -3145,17 +3153,15 @@ else uitgelogd();
 <script src="/apps/kantoren-collectieboek.js"></script>
 <script src="/shared/glyf.js"></script>
 <script src="/shared/sneltoets.js" defer></script>
-<script src="/shared/desktopframe.js" defer></script>
-<script src="/shared/werkblad.js" defer></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/seizoen.js" defer></script>
 <script src="/shared/accounts-os.js" defer></script>
-<script src="/shared/osbar.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 <script src="/shared/bediening.js" defer></script>
 <script src="/shared/randen.js" defer></script>
 <script src="/shared/volscherm.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
+<script src="/shared/ios.js" defer></script>
 </body>
 </html>

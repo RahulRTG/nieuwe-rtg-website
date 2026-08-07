@@ -23,12 +23,12 @@
   if (window.__rtgBasis) return; window.__rtgBasis = true;
   var rtf = location.pathname.indexOf('/apps/foundation/') === 0;
 
-  /* In een OS-venster (same-origin iframe uit shared/vensters.js) levert de
-     vensterbeheerder de rand al: titelbalk, sluiten, minimaliseren, volledig
-     scherm. desktopframe.js zet deze class ook, maar staat maar op 91 van de
-     188 pagina's; hier staat hij overal (de 9+-keuring eist basis.js), dus
-     ook camera, clips en de RTFoundation-pagina's weten het nu. Los venster
-     (popout) en mobiel hebben geen iframe en houden hun eigen kop. */
+  /* In een SPLIT-paneel (same-origin iframe uit shared/split.js) staat de app
+     in een halve breedte naast een andere app. De vensterbeheerder en het
+     desktopframe die deze class ook zetten bestaan niet meer -- het OS is iOS
+     en kent geen zwevende vensters -- maar Split View is er nog, en daar is
+     een volle kopbalk per paneel te veel. Vol scherm heeft geen iframe en
+     houdt zijn eigen kop. */
   if (window.self !== window.top) {
     try { document.documentElement.classList.add('rtg-in-frame'); } catch (e) {}
   }
@@ -52,15 +52,15 @@
     '.bss-wat{font-size:.84rem;color:#ccc;line-height:1.55;}' +
     '.bss-doe{margin:0;padding-left:1.1rem;font-size:.82rem;color:#bbb;line-height:1.6;}' +
     '.bss-tip{font-size:.8rem;color:#d7c690;line-height:1.5;border-top:1px solid rgba(255,255,255,.08);padding-top:.55rem;}' +
-    /* In een OS-venster is de paginakop dubbelop: de venstertitelbalk toont de
-       naam al en de rode lamp sluit. De kop wordt daarom stil: geen balk meer
-       (statisch, transparant), en titel, eyebrow en terugknop gaan uit het
+    /* In een split-paneel is de grote titel dubbelop: je hebt de app zelf net
+       gekozen in de paneelkiezer. De titel en de terugknop gaan daarom uit het
        zicht maar blijven in de toegankelijkheidsboom (zelfde techniek als
-       .vis-verborgen). De ACTIEknoppen in de kop (zoeken, uploaden, nieuw)
+       .vis-verborgen). De ACTIEknoppen in de balk (zoeken, uploaden, nieuw)
        blijven gewoon staan: dat is bediening, geen chrome. */
     'html.rtg-in-frame body>header{position:static!important;background:none!important;border:0!important;box-shadow:none!important;backdrop-filter:none!important;}' +
-    'html.rtg-in-frame body>header h1,html.rtg-in-frame body>header .ey,html.rtg-in-frame body>header .terug,' +
-    'html.rtg-in-frame body>header>a[href^="/apps/app.html"],html.rtg-in-frame body>header>a[href^="/apps/index.html"]' +
+    'html.rtg-in-frame .ios-groot,html.rtg-in-frame body>header h1,' +
+    'html.rtg-in-frame body>header .ios-terug,html.rtg-in-frame body>header .terug,' +
+    'html.rtg-in-frame body>header>a[href^="/apps/app.html"]' +
     '{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:0!important;overflow:hidden!important;clip-path:inset(50%)!important;white-space:nowrap!important;}';
   var st = document.createElement('style'); st.textContent = css;
   (document.head || document.documentElement).appendChild(st);
@@ -97,12 +97,10 @@
      (shared/klok3d.js) is daarom niet meer standaard over elke ring gelegd; dat
      leeft nog als eigen concept op /apps/horloge.html. ---- */
 
-  /* ---- 8. de 3D-tegellaag voor de werk-apps: KPI-tegels ([data-tegel3d] of
-     .kpi-tegel) krijgen diepte + muiskantel, en <canvas data-vonk3d> tekent een
-     klein isometrisch grafiekje. Rustig en zuinig; niets op touch/reduced-motion ---- */
-  var t3 = document.createElement('script');
-  t3.src = '/shared/tegel3d.js'; t3.async = true;
-  (document.head || document.documentElement).appendChild(t3);
+  /* ---- 8. de 3D-tegellaag (shared/tegel3d.js) is weg. Die liet een KPI-tegel
+     met de MUIS meekantelen -- een bureaubladtruc die op een telefoon niets
+     doet en die het OS als iOS ook niet hoort te hebben. Een tegel is plat en
+     reageert op een vinger, niet op een cursor die er overheen zweeft. ---- */
 
   /* ---- 3. het maxlength-vangnet, ook voor later gerenderde velden ---- */
   function zetGrens(v) {

@@ -12,6 +12,8 @@ const LEDEN_GAST = ['rtg', 'lifestyle', 'business', 'gast'];
 module.exports = [
   { id: 'dom-rtfkantoor', categorie: 'RTFoundation', naam: 'Het RTF-kantoor', standaard: true, doelgroepen: ['foundation'],
     uitleg: 'Het eigen kantoor van de stichting: kamers, clubs en het onderzoekslab.', paden: ['/api/rtfkantoor'] },
+  { id: 'dom-rtfos', categorie: 'RTFoundation', naam: 'Foundation OS', standaard: true, doelgroepen: ['foundation'],
+    uitleg: 'Steden, partnerstichtingen, projecten, vrijwilligers, geld, hulpvragen en verantwoording.', paden: ['/api/rtfos'] },
   { id: 'dom-lab', categorie: 'RTFoundation', naam: 'Het Onderzoekslab', standaard: true, doelgroepen: ['foundation'],
     uitleg: 'Projecten, fases, bevindingen en de kennisbank van het lab.', paden: ['/api/lab'] },
   { id: 'dom-labfonds', categorie: 'RTFoundation', naam: 'Het labfonds', standaard: true, doelgroepen: ['foundation'],

@@ -34,6 +34,21 @@
 module.exports = function hangRoutesOp(kern) {
   const { db, save, crypto, schoon, sseToCustomer, accounts, anthropic,
     beveilig, logboek, fs, path, DATA_DIR, rtf, gidsHaal, keyVanCodenaam, leeftijdVan, leeftijdInstr } = kern;
+
+  /* DE DOMEINGRENS. Elke router krijgt vanaf hier geen kern meer maar een
+     DOORKIJK op de kern die alleen doorlaat wat dat domein in GRENZEN.json heeft
+     opgeschreven (server/opzet/domeingrens.js). Reikt een domein daarbuiten, dan
+     gooit het bij de eerste aanraking met een fout die het domein en de naam
+     noemt -- geen undefined, want daar slaat code stil overheen.
+
+     Het is een Proxy en geen kopie omdat de kern LATE BINDING doet: sommige
+     routers noemen een naam die er bij het ophangen nog niet is (zie de kop van
+     routes/supplier/genrepuls.js). Een kopie bevriest dat.
+
+     De belofte hieronder -- "met RTG_DOMAINS draait dit proces alleen die
+     domeinen" -- is hier voor het eerst meer dan een belofte: een domein KAN nu
+     niet meer bij het werk van een ander. */
+  const grens = require('./domeingrens').maakVoor(kern);
   /* Welke domeinen dit proces bedient. Standaard alle (een proces, gedeeld
      geheugen, zoals nu). Met RTG_DOMAINS=member,social draait dit proces alleen
      die domeinen; een gateway (server/poort.js) stuurt de padprefixen dan naar
@@ -44,83 +59,92 @@ module.exports = function hangRoutesOp(kern) {
     .split(',').map(s => s.trim()).filter(s => s && s !== '-'); // '-' = bewust geen domeinen (vloot)
   for (const naam of gekozenDomeinen) {
     if (!ALLE_DOMEINEN.includes(naam)) { console.warn('[start] onbekend domein overgeslagen:', naam); continue; }
-    require('../routes/' + naam)(kern);
+    require('../routes/' + naam)(grens(naam));
   }
   // De verplichte onboarding + het contract raken leden, gasten, de eigenaar en
   // leveranciers; net als de infra-endpoints draait dit altijd mee.
-  // fouten uit de browser: bewust zonder auth, want een fout die het inloggen
-  // sloopt komt nooit binnen achter een poort die inloggen vereist
-  require('../routes/fout')(kern);
-  require('../routes/onboarding')(kern);
-  // De adresopzoeker hoort bij het invullen van een adres (intake en het
-  // gegevensgesprek), en draait daarom net als de onboarding altijd mee.
-  require('../routes/adres')(kern);
-  require('../routes/aanmeldgesprek')(kern);
-  require('../routes/kantoorgesprek')(kern);
+  /* Fouten uit de browser: bewust zonder auth, want een fout die het inloggen
+     sloopt komt nooit binnen achter een poort die inloggen vereist. Hij gaat
+     wel door de domeingrens: hij raakt alleen app, express en tooManyTries, en
+     die staan alle drie in de gedeelde interface. */
+  require('../routes/fout')(grens('fout'));
+  require('../routes/onboarding')(grens('onboarding'));
+  /* De adresopzoeker hoort bij het invullen van een adres (de intake en het
+     gegevensgesprek) en draait daarom net als de onboarding altijd mee. */
+  require('../routes/adres')(grens('adres'));
+  require('../routes/aanmeldgesprek')(grens('aanmeldgesprek'));
+  require('../routes/kantoorgesprek')(grens('kantoorgesprek'));
   /* SSO staat naast de auth-routes en niet erin: het is een tweede weg naar
      binnen, met een eigen levensloop (koppelingen, providers), en het moet ook
      draaien als het auth-domein apart is opgestart. */
-  require('../routes/sso')(kern);
+  require('../routes/sso')(grens('sso'));
   /* SCIM: de provisioning-deur voor de IdP van een klant. Eigen auth (een sleutel
      per organisatie), dus bewust naast de gewone routes en niet in een domein. */
-  require('../routes/scim')(kern);
-  require('../routes/meting')(kern);
-  require('../routes/algpin')(kern);
-  require('../routes/werkbeleid')(kern);
-  require('../routes/sleutelwoorden')(kern);
-  require('../routes/agenda')(kern);
-  require('../routes/notities')(kern);
-  require('../routes/bestanden')(kern);
-  require('../routes/meet')(kern);
-  require('../routes/galerij')(kern);
-  require('../routes/klok')(kern);
-  require('../routes/vertaal')(kern);
-  require('../routes/memo')(kern);
-  require('../routes/boeken')(kern);
-  require('../routes/onderwijs')(kern);
-  require('../routes/leerstof')(kern);
-  require('../routes/bijles')(kern);
-  require('../routes/facturatie')(kern);
-  require('../routes/rtmail')(kern);
-  require('../routes/rtmail-vak')(kern);
-  require('../routes/rtmail-schrijf')(kern);
-  require('../routes/rtmail-bestuur')(kern);
-  require('../routes/rtmail-team')(kern);
-  require('../routes/werkmail')(kern);
-  require('../routes/mailpost')(kern);
-  require('../routes/payroll')(kern);
-  require('../routes/huis')(kern);
-  require('../routes/muziek')(kern);
-  require('../routes/muziek-samen')(kern);
-  require('../routes/atelierweb')(kern);
-  require('../routes/webmaker')(kern);
-  require('../routes/journalistiek')(kern);
-  require('../routes/markt')(kern);
-  require('../routes/borden')(kern);
-  require('../routes/spellen')(kern);
-  require('../routes/leren')(kern);
+  require('../routes/scim')(grens('scim'));
+  require('../routes/meting')(grens('meting'));
+  require('../routes/algpin')(grens('algpin'));
+  require('../routes/werkbeleid')(grens('werkbeleid'));
+  require('../routes/sleutelwoorden')(grens('sleutelwoorden'));
+  require('../routes/agenda')(grens('agenda'));
+  require('../routes/notities')(grens('notities'));
+  require('../routes/bestanden')(grens('bestanden'));
+  require('../routes/meet')(grens('meet'));
+  require('../routes/galerij')(grens('galerij'));
+  require('../routes/klok')(grens('klok'));
+  require('../routes/vertaal')(grens('vertaal'));
+  require('../routes/memo')(grens('memo'));
+  require('../routes/boeken')(grens('boeken'));
+  require('../routes/onderwijs')(grens('onderwijs'));
+  require('../routes/leerstof')(grens('leerstof'));
+  require('../routes/bijles')(grens('bijles'));
+  require('../routes/facturatie')(grens('facturatie'));
+  require('../routes/rtmail')(grens('rtmail'));
+  require('../routes/rtmail-vak')(grens('rtmail-vak'));
+  require('../routes/rtmail-schrijf')(grens('rtmail-schrijf'));
+  require('../routes/rtmail-bestuur')(grens('rtmail-bestuur'));
+  require('../routes/rtmail-team')(grens('rtmail-team'));
+  require('../routes/werkmail')(grens('werkmail'));
+  require('../routes/mailpost')(grens('mailpost'));
+  require('../routes/payroll')(grens('payroll'));
+  require('../routes/huis')(grens('huis'));
+  require('../routes/muziek')(grens('muziek'));
+  require('../routes/muziek-samen')(grens('muziek-samen'));
+  require('../routes/atelierweb')(grens('atelierweb'));
+  require('../routes/webmaker')(grens('webmaker'));
+  require('../routes/journalistiek')(grens('journalistiek'));
+  require('../routes/markt')(grens('markt'));
+  require('../routes/borden')(grens('borden'));
+  require('../routes/spellen')(grens('spellen'));
+  require('../routes/leren')(grens('leren'));
+  /* Payroll OS: de routes van de nieuwe loonlaag (kern/payroll/), naast de
+     oude payroll-routes en met dezelfde poorten. */
+  require('../routes/payroll-os')(grens('payroll-os'));
   /* De RTF-bieb-routes (de kern staat al bij de Mall-bibliotheken). */
-  require('../routes/rtfbieb')(kern);
+  require('../routes/rtfbieb')(grens('rtfbieb'));
   /* De Geloof & Wijsheid-Bibliotheek-routes (kern staat al hierboven). */
-  require('../routes/geloofbieb')(kern);
+  require('../routes/geloofbieb')(grens('geloofbieb'));
   /* Het RTF-kantoor, Clubs & steden en het Onderzoekslab (kern staat al hierboven). */
-  require('../routes/rtfkantoor')(kern);
+  require('../routes/rtfkantoor')(grens('rtfkantoor'));
   /* De twee werkplekken RTG en RTF (kern staat al hierboven). */
-  require('../routes/werkplek')(kern);
+  require('../routes/werkplek')(grens('werkplek'));
   /* Het RTG Werk OS: de werkplek van een hele organisatie (server/bedrijf/).
      Staat naast werkplek.js en niet erin: dat is het beeld van RTG en RTF zelf,
      dit is een werkruimte die ook aan een andere organisatie te geven is. */
-  require('../routes/bedrijf')(kern);
-  require('../routes/labfonds')(kern);
-  require('../routes/aanmeldingen')(kern);
-  require('../routes/ledenregister')(kern);
+  require('../routes/bedrijf')(grens('bedrijf'));
+  require('../routes/labfonds')(grens('labfonds'));
+  require('../routes/aanmeldingen')(grens('aanmeldingen'));
+  require('../routes/ledenregister')(grens('ledenregister'));
+  /* De wervingslink /werken/<code>: een werkgever nodigt iemand uit die nog
+     geen RTG-account heeft, langs dezelfde uitnodiging als de kassacode van
+     routes/supplier/werving. */
+  Object.assign(kern, require('../routes/werving')(grens('werving')));
 
   /* De rest -- de kern-aanbouw met de routers die erbij horen -- staat in
      ./aanbouw.js. Daar wordt de kern nog VERDER gevuld (Object.assign) en
      hangen de routers die op die aanvulling leunen. Twee bestanden en niet een,
      omdat een van 14 kB weer over dezelfde grens gaat die dit hele werk in gang
      zette. */
-  require('./aanbouw')(kern);
+  require('./aanbouw')(kern, grens);
   console.log('[start] domeinen actief:', gekozenDomeinen.join(', '));
 
   return gekozenDomeinen;

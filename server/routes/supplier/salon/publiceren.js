@@ -2,15 +2,8 @@
    claimcodes (maken en verzilveren) en polls. Kan alleen met een compleet
    Salon-profiel (eisSalonProfiel komt mee vanuit routes/supplier/salon.js). */
 module.exports = (kern, eisSalonProfiel) => {
-  const { ALT_IDEE, BOEK_KETEN, DEMO, DEMO_SUPPLIER, HK_STATUSES, LANDEN, POS_METHODS, RIT_KETEN, RIT_LEGACY, TABLE_STATUSES, VAC_SOORTEN, ZAAK_OPTIES, accounts, addTicket, aiFindDoor, aiFindRoom, alcoholGrensVan, anthropic, app, applyChatPubliek, applyChatVertaald, auth, beslisReservering, isFavoriet, broadcastSync,
-    zetCollectie, zetArtikel, pasVoorraad, releaseDrop, klantProfiel, zetKlantMaten, voegKlantnotitie,
-    legApart, vraagPaskamer, paskamerBreng, stuurStyling, retailVerkoop, voorraadZoek, retailState,
-    RETAIL_MATEN, RETAIL_SEIZOENEN, PASPOORT_NIVEAUS, paspoortVraag, paspoortBekijk, paspoortIncident, paspoortPartner,
-    cannedBoekhouder, cateringDishes, chatStuur, checkCred, coachCache, coachRules, crypto, db, ensureApplyChat, eventCovers, express, fallbackRunsheet, financeVoor, factuur, facturatie, boekhoudkennis, talen, findSupplier, gcCode, geborenVan, guestsFor, hasCred, i18n, ledenPrijs, leeftijdVan, logActivity, keyVanCodenaam, magBezorgen, haversine, etaMinutes, ticketsVoorSlot, loginFails, managerOnly, noteFailedTry, notify, notifyApplicant, notifySupplier, parseRunsheetText, pickupCode, posDay, publicSupplier, pushLive, rememberSession, ritBezetting, ritVerder, runItem, salonNaarVolgers, salonProfielCompleet, salonItemsVan, save, scheduleFor, schoon, sectiesForOrder, sessionFor, setRoomHk, sortRunsheet, sseClients, sseSend, sseToCustomer, sseToOffice, sseToSupplier, stationsForOrder, supplierAuth, supplierState, tooManyTries, trChat, unlockDoor, weekdagFactor,
-    zaakBoard, zaakZet, zaakFunctieAan, klantSalon, media,
-    dpVerzoekMaak, dpVerzoekIntrek, dpOntvangsten, logInlog, pay,
-    tafelplanning, reserveringTafel, reserveringKomst, walkIn, shiftSamenvatting,
-    fluisterZeg, orderMetRef, ordersVanZaak, ordersVoegToe, boekingenVanZaak , salon} = kern;
+  const { app, broadcastSync, db, express, talen, logActivity, salonNaarVolgers, save, schoon,
+          sseToOffice, supplierAuth, media, salon } = kern;
 app.post('/api/supplier/salon/post', express.json({ limit: '6mb' }), supplierAuth, async (req, res) => {
   /* Publiceren namens de zaak is management-werk, net als de vijf andere
      Salon-routes (deal, poll, bio, folder, stats). Deze was de enige zonder die

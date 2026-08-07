@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mijn giften · RTFoundation</title>
+<link rel="icon" href="/icons/foundation.svg">
+<link rel="manifest" href="/manifests/rtf-gever.webmanifest">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<style>
+  :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--line:var(--rtg-line);--txt:var(--rtg-txt);--muted:var(--rtg-muted);--soft:var(--rtg-soft);--burgundy:#C23A5E;--gold:#A98F1C;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:3rem;}
+  h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;}
+  header{padding:1rem;border-bottom:1px solid var(--line);}
+  header .ey{font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--burgundy);}
+  header h1{font-size:1.25rem;margin-top:.1rem;}
+  main{padding:1rem;max-width:680px;margin:0 auto;display:flex;flex-direction:column;gap:.9rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:.95rem 1rem;}
+  .kaart + .kaart{margin-top:.7rem;}
+  .sec{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin-bottom:.45rem;}
+  .rij{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;}
+  .veld{flex:1;min-width:9rem;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.95rem;padding:.65rem .8rem;}
+  .knop{background:var(--txt);color:#000;border:none;border-radius:11px;padding:.65rem 1.1rem;font:inherit;font-weight:600;font-size:.9rem;cursor:pointer;}
+  .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
+  .groot{font-size:1.05rem;line-height:1.6;}
+  .lijnrij{display:flex;gap:.5rem;align-items:baseline;padding:.5rem 0;border-bottom:1px solid var(--line);font-size:.9rem;flex-wrap:wrap;}
+  .lijnrij:last-child{border-bottom:none;}
+  .lijnrij .naam{flex:1;min-width:9rem;}
+  .lijnrij .sub{font-size:.78rem;color:var(--muted);width:100%;}
+  .pil{font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:.15rem .55rem;color:var(--muted);}
+  .pil.goed{color:#7FC79B;border-color:#2F5E42;}
+  .pil.let{color:var(--gold);border-color:#5C4E10;}
+  .stat{flex:1;min-width:6.5rem;text-align:center;padding:.3rem 0;}
+  .stat b{font-size:1.2rem;display:block;}
+  .stat i{font-style:normal;font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);}
+  .leeg{color:var(--muted);font-size:.9rem;padding:.5rem 0;}
+  .uitleg{font-size:.82rem;color:var(--muted);line-height:1.65;}
+  .melder{font-size:.9rem;border-radius:10px;padding:.7rem .9rem;margin-top:.6rem;border:1px solid var(--line);line-height:1.6;}
+  .melder.fout{border-color:#5C1B2C;color:#F0A9BB;}
+  .melder.goed{border-color:#2F5E42;color:#9FD6B4;}
+  .verborgen{display:none;}
+  .ruimte{margin-top:.6rem;}
+  .breed{width:100%;}
+</style>
+</head>
+<body class="rtg-stijl">
+<header>
+  <div class="ey">RTFoundation</div>
+  <h1>Mijn giften</h1>
+</header>
+<main id="main">
+  <div class="kaart" id="deur">
+    <div class="sec">Uw code</div>
+    <div class="rij">
+      <input class="veld" id="code" placeholder="RTFS-..." maxlength="40" aria-label="Uw code" autocomplete="off">
+      <button class="knop" id="open">Bekijken</button>
+    </div>
+    <div id="melding"></div>
+    <div class="uitleg">
+      Met deze code ziet u wat u heeft gegeven en waar het heen ging, en kunt u uw giftbewijs opvragen.
+      U ziet uitsluitend uw eigen giften. De code blijft in dit tabblad en wordt nergens bewaard.
+    </div>
+  </div>
+  <div id="uit"></div>
+</main>
+
+<script>
+/* Het scherm van de gever.
+
+   TWEE VRAGEN, MEER NIET: wat heb ik gegeven, en waar is het heen gegaan. Wie
+   geld geeft en er daarna nooit meer iets van hoort, geeft de volgende keer
+   niet meer -- en dat is geen marketingprobleem maar een verantwoordingsgat.
+
+   WAT ER NIET OP STAAT. Geen andere gevers, geen bedragen van anderen: een code
+   die het donateursbestand opent is een adressenlijst van iemand anders. En
+   geen mensen: "uw gift ging naar het Taalcafe" mag, "u hielp mevrouw K." niet.
+
+   HET GIFTBEWIJS ZEGT WAT HET IS. Bij sponsoring staat er geen giftbewijs maar
+   de reden waarom niet -- er staat iets tegenover, dus het is zakelijke kosten
+   en geen aftrekbare gift. En periodiek heet alleen periodiek als er een
+   overeenkomst van ten minste vijf jaar bij ligt; anders zou dit scherm de
+   gever geld kosten bij zijn aangifte. */
+const $ = s => document.querySelector(s);
+const esc = t => String(t == null ? '' : t).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+let CODE = null;
+
+function melding(tekst, goed) {
+  const el = document.getElementById('meldingIn') || $('#melding');
+  el.innerHTML = '<div class="melder ' + (goed ? 'goed' : 'fout') + '">' + esc(tekst) + '</div>';
+}
+const api = (pad, body) => fetch('/api/rtfos/portaal/' + pad, {
+  method: 'POST', headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(Object.assign({ code: CODE }, body || {}))
+}).then(async r => {
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(d.error || 'Er ging iets mis.');
+  return d;
+});
+
+async function open() {
+  CODE = String($('#code').value || '').trim().toUpperCase();
+  $('#melding').innerHTML = '';
+  if (!CODE.startsWith('RTFS')) {
+    melding('Deze code begint niet met RTFS. Vraag de stichting om de juiste code.', false);
+    return;
+  }
+  try { teken((await api('donateur')).donateur); }
+  catch (e) { melding(e.message, false); }
+}
+
+function teken(d) {
+  $('#deur').classList.add('verborgen');
+  const s = d.stichting;
+  $('#uit').innerHTML =
+    '<div class="kaart"><div class="sec">Wat u heeft gegeven</div>' +
+      '<div class="rij"><div class="stat"><b>EUR ' + esc(d.totaal) + '</b><i>totaal</i></div>' +
+      '<div class="stat"><b>' + d.aantal + '</b><i>giften</i></div></div>' +
+      '<div class="uitleg">Op naam van ' + esc(d.naam) + (d.anoniem ? ' (anoniem naar buiten toe)' : '') + '. ' +
+        'U ziet hier uitsluitend uw eigen giften.</div>' +
+      '<div id="meldingIn"></div></div>' +
+
+    '<div class="kaart"><div class="sec">Waar het heen ging</div>' +
+      d.giften.map(giftRij).join('') + '</div>' +
+
+    '<div class="kaart"><div class="sec">De stichting als geheel</div>' +
+      '<div class="rij"><div class="stat"><b>' + s.steden + '</b><i>steden</i></div>' +
+      '<div class="stat"><b>' + s.projectenActief + '</b><i>projecten</i></div>' +
+      '<div class="stat"><b>' + s.vrijwilligers + '</b><i>vrijwilligers</i></div>' +
+      '<div class="stat"><b>EUR ' + esc(s.bestedingenEuro) + '</b><i>besteed</i></div></div>' +
+      '<div class="uitleg">Er staan met opzet geen aantallen hulpvragen op dit scherm en geen namen. ' +
+        'Waar uw geld heen ging is een project; wie er geholpen is, is niet aan ons om te vertellen.</div></div>' +
+
+    '<div class="kaart"><div class="sec">Iets veranderen</div><div class="uitleg">' +
+      'Wilt u uw gift anders bestemmen, uw gegevens laten corrigeren of stoppen met geven? ' +
+      'Neem contact op met de stichting; dat loopt via een mens, niet via een knop.' +
+      '</div></div>';
+
+  $('#uit').querySelectorAll('[data-bewijs]').forEach(b => b.addEventListener('click', () =>
+    api('donateur/bewijs', { giftId: b.dataset.bewijs })
+      .then(r => toonBewijs(r.bewijs))
+      .catch(e => melding(e.message, false))));
+}
+
+function giftRij(g) {
+  const b = g.bestemming;
+  return '<div class="lijnrij"><span class="naam"><b>EUR ' + esc(g.bedrag) + '</b> &middot; ' + esc(g.soort) + '</span>' +
+    '<span class="pil">' + esc(g.ontvangenOp) + '</span>' +
+    (g.geoormerkt ? '<span class="pil goed">geoormerkt</span>' : '') +
+    (g.periodiek ? '<span class="pil goed">periodiek</span>' : '') +
+    '<div class="sub">Naar: ' + esc(b.naam) + (b.doelgroep ? ' &middot; ' + esc(b.doelgroep) : '') +
+      (b.doel ? ' &middot; doel ' + esc(b.doel.doel) + ', bereikt ' + esc(b.doel.bereikt) : '') +
+      ' &middot; hiervan besteed: EUR ' + esc(g.besteed) + '</div>' +
+    '<div class="rij breed">' + (g.bewijs.kan
+      ? '<button class="knop stil" data-bewijs="' + esc(g.id) + '">Giftbewijs</button>'
+      : '<span class="uitleg">' + esc(g.bewijs.waarom) + '</span>') + '</div></div>';
+}
+
+function toonBewijs(b) {
+  melding('Giftbewijs opgehaald; het staat hieronder.', true);
+  const el = document.createElement('div');
+  el.className = 'kaart';
+  el.innerHTML = '<div class="sec">Giftbewijs</div>' +
+    '<div class="groot">EUR ' + esc(b.bedrag) + ' aan ' + esc(b.stichting) + ' op ' + esc(b.datum) + '.</div>' +
+    '<div class="uitleg ruimte">Gever: ' + esc(b.gever) + ' &middot; bestemming: ' + esc(b.bestemming) + '</div>' +
+    (b.overeenkomst ? '<div class="uitleg">Overeenkomst ' + esc(b.overeenkomst.kenmerk) + ', ' + esc(b.overeenkomst.jaren) +
+      ' jaar, tot ' + esc(b.overeenkomst.tot) + '.</div>' : '') +
+    '<div class="uitleg ruimte">' + esc(b.toelichting) + '</div>';
+  $('#uit').appendChild(el);
+  el.scrollIntoView({ block: 'nearest' });
+}
+
+$('#open').addEventListener('click', open);
+$('#code').addEventListener('keydown', e => { if (e.key === 'Enter') open(); });
+
+if ('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(() => {});
+</script>
+<script src="/shared/deelmenu.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/levendekleur.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
+</body>
+</html>

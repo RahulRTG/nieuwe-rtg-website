@@ -31,8 +31,13 @@
           if (zin) opties.opTekst(zin);
         });
         rec.addEventListener('end', () => { knop.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0 0 12 0M12 17v3"/></svg>'; });
-        rec.addEventListener('error', () => {
+        rec.addEventListener('error', ev => {
           knop.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M6 11a6 6 0 0 0 12 0M12 17v3"/></svg>';
+          /* Een microfoon die niet MAG is iets anders dan een zin die niet
+             verstaan wordt, en het onderscheid stond hier niet. De mediapoort
+             (shared/media.js) noemt de oorzaak en zet hem in beeld; alleen als
+             het echt aan het verstaan lag, valt de app terug op haar eigen hint. */
+          if (w.RTGMedia && w.RTGMedia.spraak(ev && ev.error)) return;
           if (opties.nietVerstaan) opties.nietVerstaan();
         });
         rec.start();

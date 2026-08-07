@@ -149,4 +149,9 @@ function maakNavigatie({ db, save, crypto, haversine, flitsRond, flitsMeld }) {
   return { navBestemmingen: bestemmingen, navRoute: route, navPoi: poiLagen, navKaart: kaart, navMeld: meld };
 }
 
-module.exports = { maakNavigatie };
+/* REF, BOUNDS en POI gaan mee naar buiten omdat het STADSWEEFSEL ze leest: de
+   geografie van de stad hangt op hetzelfde middelpunt en dezelfde grenzen als
+   het wegennet, en de laadpunten in het objectregister zijn dezelfde laadpunten
+   als die de navigatie aanwijst. Een tweede middelpunt zou betekenen dat de
+   stad en haar wegen naast elkaar bestaan zonder elkaar te raken. */
+module.exports = { maakNavigatie, REF, BOUNDS, POI };

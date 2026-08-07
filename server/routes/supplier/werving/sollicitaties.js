@@ -3,16 +3,10 @@
    laag) en de sollicitatiechat. Gemount vanuit routes/supplier/werving.js. */
 const { eigenVeld } = require('../../../kern/util');
 module.exports = (wctx) => {
-  const { kern, maakKassacode, invitesVan, findSupplierByName, maakInvite } = wctx;
-  const { ALT_IDEE, BOEK_KETEN, DEMO, DEMO_SUPPLIER, HK_STATUSES, LANDEN, POS_METHODS, RIT_KETEN, RIT_LEGACY, TABLE_STATUSES, VAC_SOORTEN, ZAAK_OPTIES, accounts, addTicket, aiFindDoor, aiFindRoom, alcoholGrensVan, anthropic, app, applyChatPubliek, applyChatVertaald, auth, beslisReservering, isFavoriet, broadcastSync,
-    zetCollectie, zetArtikel, pasVoorraad, releaseDrop, klantProfiel, zetKlantMaten, voegKlantnotitie,
-    legApart, vraagPaskamer, paskamerBreng, stuurStyling, retailVerkoop, voorraadZoek, retailState,
-    RETAIL_MATEN, RETAIL_SEIZOENEN, PASPOORT_NIVEAUS, paspoortVraag, paspoortBekijk, paspoortIncident, paspoortPartner,
-    cannedBoekhouder, cateringDishes, chatStuur, checkCred, coachCache, coachRules, crypto, db, ensureApplyChat, eventCovers, express, fallbackRunsheet, financeVoor, factuur, facturatie, boekhoudkennis, talen, findSupplier, gcCode, geborenVan, guestsFor, hasCred, i18n, ledenPrijs, leeftijdVan, logActivity, keyVanCodenaam, magBezorgen, haversine, etaMinutes, ticketsVoorSlot, loginFails, managerOnly, noteFailedTry, notify, notifyApplicant, notifySupplier, parseRunsheetText, pickupCode, posDay, publicSupplier, pushLive, rememberSession, ritBezetting, ritVerder, runItem, salonNaarVolgers, salonProfielCompleet, salonItemsVan, save, scheduleFor, schoon, sectiesForOrder, sessionFor, setRoomHk, sortRunsheet, sseClients, sseSend, sseToCustomer, sseToOffice, sseToSupplier, stationsForOrder, supplierAuth, supplierState, tooManyTries, trChat, unlockDoor, weekdagFactor,
-    zaakBoard, zaakZet, zaakFunctieAan, klantSalon, media,
-    dpVerzoekMaak, dpVerzoekIntrek, dpOntvangsten, logInlog, pay,
-    tafelplanning, reserveringTafel, reserveringKomst, walkIn, shiftSamenvatting,
-    fluisterZeg, orderMetRef, ordersVanZaak, ordersVoegToe, boekingenVanZaak } = kern;
+  const { kern, maakKassacode, invitesVan, findSupplierByName, maakInvite, neemAan, wervingsLink } = wctx;
+  const { VAC_SOORTEN, app, applyChatVertaald, chatStuur, crypto, db, ensureApplyChat, talen,
+          findSupplier, logActivity, managerOnly, notify, notifyApplicant, notifySupplier, save, schoon,
+          sseToOffice, sseToSupplier, supplierAuth } = kern;
 app.post('/api/supplier/apply', (req, res) => {
   const s = findSupplier(req.body.code);
   if (!s) return res.status(404).json({ error: 'Bedrijf niet gevonden.' });
@@ -53,20 +47,30 @@ app.post('/api/supplier/apply/decide', supplierAuth, async (req, res) => {
     return applyChatVertaald(chat, talen.taalVan(req.body.lang)).then(c => res.json({ ok: true, chat: c }));
   }
   if (req.body.action === 'aannemen') {
-    // Aannemen maakt geen personeelsaccount meer aan: de nieuwe collega is een
-    // RTG-lid en meldt zich zelf aan met de bedrijfsnaam + deze kassacode.
     const inv = maakInvite(req.supplier, req.actor, { naam: a.name, role: 'staff', func: a.func });
     a.status = 'aangenomen';
+
+    // wie via de app solliciteerde is meteen in dienst; wie daarbuiten
+    // solliciteerde houdt de kassacode en de wervingslink (zie uitnodiging.js)
+    const direct = await neemAan(req.supplier, inv, a.key);
     ensureApplyChat(req.supplier.code, a); // ook aangenomen sollicitanten kunnen chatten om af te spreken
     save();
     logActivity(req.supplier.code, req.actor, 'nam ' + a.name + ' aan als ' + a.func);
     sseToSupplier(req.supplier.code, 'sync', { scope: 'team' });
     sseToOffice('sync', { scope: 'team' });
     notifyApplicant(a, req.supplier);
-    // krijgt de sollicitant meldingen in de app, dan sturen we de kassacode direct mee
-    if (a.key && db.data.notifications[a.key])
-      notify(a.key, { icon: 'ster', title: 'Aangenomen bij ' + req.supplier.name, body: 'Meld u aan in de leverancier-app met bedrijfsnaam "' + req.supplier.name + '" en kassacode ' + inv.kassacode + '.' });
-    return res.json({ ok: true, invite: { kassacode: inv.kassacode, naam: a.name, func: a.func }, bedrijf: req.supplier.name });
+    if (a.key && db.data.notifications[a.key]) {
+      notify(a.key, direct
+        ? { icon: 'ster', title: 'Aangenomen bij ' + req.supplier.name,
+            body: 'Welkom bij het team. Uw werkplek staat klaar in de app onder Mijn werkplekken; u hoeft niets meer in te vullen.' }
+        : { icon: 'ster', title: 'Aangenomen bij ' + req.supplier.name,
+            body: 'Meld u aan in de leverancier-app met bedrijfsnaam "' + req.supplier.name + '" en kassacode ' + inv.kassacode + '.' });
+    }
+    return res.json({ ok: true, bedrijf: req.supplier.name,
+      // de kassacode blijft in het antwoord voor wie hem nog nodig heeft; is de
+      // sollicitant al verbonden, dan is hij verbruikt en zegt 'direct' dat
+      ...(direct ? { direct } : { invite: { kassacode: inv.kassacode, naam: a.name, func: a.func },
+        link: wervingsLink(req, inv.kassacode) }) });
   }
   a.status = 'afgewezen';
   save();

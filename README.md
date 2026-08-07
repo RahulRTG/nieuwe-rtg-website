@@ -370,10 +370,10 @@ Dat is allemaal weg. Wat een telefoon heeft, en verder niets:
 - **Een randveeg** van links terug in de geschiedenis.
 - **Bladen in plaats van vensters** (`RTGiOS.blad(...)`): van onder omhoog, met
   een greep, sluiten met een veeg omlaag.
-- **Een hamburger rechtsboven, op elk scherm** (`shared/appmenu.js`, door
+- **Een hamburger rechtsboven, in elke app** (`shared/appmenu.js`, door
   `ios.js` binnengehaald). Hij opent een blad met twee delen: *deze app* -- de
   functies van het scherm waar je staat -- en *overal*: beginscherm, een stap
-  terug, instellingen, meldingen, Rahul, delen, uitloggen. Elke rij verschijnt
+  terug, instellingen, Rahul, volledig scherm, delen. Elke rij verschijnt
   alleen als er op dat scherm ook echt iets achter zit.
 
   De app-functies worden niet per app opgeschreven (dat zijn honderdenveertig+ bestanden die
@@ -385,10 +385,14 @@ Dat is allemaal weg. Wat een telefoon heeft, en verder niets:
   zelf beter weet wat erin hoort, zegt dat met `RTGAppMenu.zet([...])` of
   `RTGAppMenu.voegToe({...})`.
 
-  Op de homescreen neemt dezelfde hamburger de drie losse knopjes uit de
-  statusbalk op (batterij, bel, bedieningspaneel) plus scannen, Zegel en
-  backoffice. Die knoppen blijven in de HTML staan, verborgen: het menu klikt ze
-  aan, zodat het gedrag op één plek blijft wonen.
+  **De homescreen krijgt hem niet.** Daar stonden eerst drie losse knopjes in de
+  statusbalk (batterij, bel, bedieningspaneel); die zijn weggehaald, en er een
+  vierde teken voor terugzetten is niet veel beter. Het beginscherm is de
+  rustplek: mappen, klok, functies, de balk van Rahul, en verder niets. Wat er
+  aan systeem achter zit haal je van de bovenrand omlaag (`shared/randen.js`
+  opent daar het bedieningspaneel), en dat paneel draagt zoeken, **meldingen**,
+  scannen, je Zegel en je backoffice. De knoppen zelf blijven in de HTML staan,
+  verborgen: het paneel klikt ze aan, zodat het gedrag op één plek blijft wonen.
 
 Dat alles staat op **een** plek: `public/shared/ios.css` + `public/shared/ios.js`
 (bron in `public/shared/ios/`). De laag LEEST de kopbalk die een pagina al heeft
@@ -1329,9 +1333,11 @@ Elk lid heeft een **notificatiebel**: reacties, likes en privéberichten op je e
 
 ### Het beginscherm: vier lagen, één scherm
 
-De app is een besturingssysteem (het "ROS"). Het beginscherm heeft vier lagen, van boven naar beneden, en verder niets:
+De app is een besturingssysteem (het "ROS"). Het beginscherm heeft vier lagen, van boven naar beneden, en verder niets. Geen begroeting bovenaan (die is aardig de eerste keer en behang de honderdste, en hij kostte precies de hoogte die de mappen nodig hebben), geen knopjes in de statusbalk, geen hamburger: alleen de regel die zegt welke pas je hebt en sinds wanneer, en dan:
 
-1. **De mappen met apps** — vier mappen (Reizen, Geld, De Salon, Het Huis). Alles waar je pas je recht op geeft zit er al in; je hoeft niets te installeren. Een tik opent de map, een tik op een app opent hem schermvullend.
+1. **De mappen met apps** — acht mappen in twee rijen: Reizen, Geld, De Salon, Het Huis / Media, Zorg, Werk, Veilig. Alles waar je pas je recht op geeft zit er al in; je hoeft niets te installeren. Een tik opent de map, een tik op een app opent hem schermvullend.
+
+   Het waren er vier, en dat leek rustig tot je ze opendeed: De Salon droeg eenentwintig apps en Het Huis zeventien. Een map met eenentwintig tegels is geen map maar een lade waar je in graait. Vier mappen erbij kosten één rij op het scherm en halen de twee volste terug naar een grootte die je in één blik overziet; de vier oorspronkelijke namen blijven staan. Een app staat in precies **één** map — twee plekken voor hetzelfde is precies waarom je hem nergens meer vindt.
 2. **De ronde RTG-klok**, in het midden — hetzelfde horloge als op het inlogscherm (`shared/klok.js`, `data-rtg-klok="ring"`).
 3. **De functierij**: Bellen, Berichten, Videobellen en je **Wallet**. Deze vier staan vast en kunnen niet uit.
 4. **De balk van Rahul**. Typ wat je wilt: is het iets dat het OS zelf kan ("open Reizen", "donker", "zoek villa", "hernoem Geld naar Bank"), dan gebeurt het meteen en blijf je thuis; al het andere gaat naar Rahul, wiens app opent met je vraag erin.

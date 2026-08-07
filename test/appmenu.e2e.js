@@ -16,13 +16,20 @@
       De mutatie die hem hoort te laten zakken: zet in shared/metgezel.js de
       padtoets terug als enige voorwaarde voor `eigenRahul`.
 
-   2. ELKE APP HEEFT EEN MENU. De hamburger rechtsboven komt van
-      shared/appmenu.js, en die wordt door shared/ios.js binnengehaald -- één
-      plek voor elke app-pagina. Dat is de kracht en de zwakte tegelijk: valt die
-      koppeling weg, of vergeet een nieuwe pagina shared/ios.js (dat was bij
-      dispatch.html en zakelijk.html precies wat er aan de hand was), dan is er
-      geen foutmelding en geen rood -- alleen een app zonder weg terug naar
-      huis. Deze toets loopt daarom ALLE app-pagina's af.
+   2. ELKE APP HEEFT EEN MENU -- EN HET BEGINSCHERM JUIST NIET. De hamburger
+      rechtsboven komt van shared/appmenu.js, en die wordt door shared/ios.js
+      binnengehaald -- één plek voor elke app-pagina. Dat is de kracht en de
+      zwakte tegelijk: valt die koppeling weg, of vergeet een nieuwe pagina
+      shared/ios.js (dat was bij dispatch.html, zakelijk.html en de zeven
+      foundation/os-*.html precies wat er aan de hand was), dan is er geen
+      foutmelding en geen rood -- alleen een app zonder weg terug naar huis.
+      Deze toets loopt daarom ALLE app-pagina's af.
+
+      Het beginscherm is de rustplek en heeft er met opzet géén: daar is de
+      bovenrand de ingang naar het systeem. Die kant kan stil kapot -- knoppen
+      weghalen zie je, een ingang die niemand meer heeft niet -- dus de toets
+      hieronder haalt de bovenrand echt omlaag en kijkt of het paneel opengaat
+      en of meldingen erin staan.
 
       De mutatie: haal het blok dat appmenu.js bijlaadt uit shared/ios.js.
 
@@ -143,7 +150,12 @@ test('elke app-pagina draagt de hamburger van het app-menu',
         await page.waitForTimeout(200);
         let meedoen;
         try {
-          meedoen = await page.evaluate(() => !document.body.hasAttribute('data-ios-uit'));
+          /* data-ios-uit: de pagina zegt zelf dat ze de OS-chrome niet wil.
+             data-ios-home: het beginscherm, en dat krijgt met opzet geen
+             hamburger -- daar is de bovenrand de ingang naar het systeem (zie
+             de kop van shared/appmenu.js). */
+          meedoen = await page.evaluate(() => !document.body.hasAttribute('data-ios-uit') &&
+            !document.body.hasAttribute('data-ios-home'));
         } catch (e) { continue; }
         if (!meedoen) continue;
         if (new URL(page.url()).pathname !== pad) continue;
@@ -200,55 +212,113 @@ test('het menu opent en brengt je terug naar het beginscherm',
   });
 });
 
-test('op de homescreen zitten de losse statusknopjes in het menu, niet in de balk',
+test('het beginscherm heeft géén hamburger: de statusbalk is leeg en de bovenrand is de ingang',
   { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
   await metLid(async ({ base, ctx }) => {
     const page = await ctx.newPage();
     await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
-    await page.waitForSelector('#osMenuBtn', { timeout: 10000 });
+    await page.waitForSelector('#osAiBalk', { timeout: 10000 });
     /* Een vers geregistreerd lid staat nog in de intake, en die legt een blad
        over het hele scherm. Wat we hier meten ligt eronder: de statusbalk van
-       de homescreen. Het blad gaat dus opzij -- de intake zelf heeft een eigen
+       het beginscherm. Het blad gaat dus opzij -- de intake heeft een eigen
        toets en hoort niet in deze. */
     await page.evaluate(() => { const g = document.getElementById('onbGate'); if (g) g.hidden = true; });
-    await page.waitForTimeout(200);
+    await page.waitForTimeout(400);
 
-    /* De knoppen mogen NIET uit de HTML verdwijnen: het menu, het
-       bedieningspaneel en de rest van de app klikken ze aan. Ze horen alleen
-       niet meer in beeld te staan. */
+    /* HET BEGINSCHERM IS DE RUSTPLEK. Geen batterij, geen bel, geen paneelknop
+       en ook geen hamburger: mappen, klok, functies, de balk van Rahul, en
+       verder niets. De knoppen mogen wel BESTAAN -- het bedieningspaneel en de
+       rest van de app klikken ze aan, en dat is de enige plek waar hun gedrag
+       staat -- ze horen alleen niet in beeld. */
     const balk = await page.evaluate(() => {
       const zichtbaar = (id) => {
         const e = document.getElementById(id);
         return e ? !!e.offsetParent : null;   // null = bestaat niet meer
       };
-      return { bel: zichtbaar('bell'), paneel: zichtbaar('osCcBtn'), accu: zichtbaar('osBat'),
-        knoppenInBalk: [...document.querySelectorAll('.topbar .os-rechts button')]
-          .filter((b) => b.offsetParent).map((b) => b.id) };
+      return {
+        bel: zichtbaar('bell'), paneel: zichtbaar('osCcBtn'), accu: zichtbaar('osBat'),
+        hamburger: !!document.getElementById('osMenuBtn'),
+        groet: !!document.getElementById('homeGreeting'),
+        zichtbaarRechts: [...document.querySelectorAll('.topbar .os-rechts button')]
+          .filter((b) => b.offsetParent).map((b) => b.id || b.className)
+      };
     });
     assert.equal(balk.bel, false, 'de bel staat nog in de statusbalk');
     assert.equal(balk.paneel, false, 'het bedieningspaneel staat nog als knop in de statusbalk');
     assert.equal(balk.accu, false, 'de batterij staat nog in de statusbalk');
-    assert.deepEqual(balk.knoppenInBalk, ['osMenuBtn'],
-      'er staat meer dan alleen de hamburger rechts in de statusbalk: ' + balk.knoppenInBalk.join(', '));
+    assert.equal(balk.hamburger, false, 'het beginscherm hoort geen hamburger te hebben');
+    assert.equal(balk.groet, false, 'de begroeting hoort van het beginscherm af te zijn');
+    assert.deepEqual(balk.zichtbaarRechts, [],
+      'er staat nog iets in de statusbalk: ' + balk.zichtbaarRechts.join(', '));
 
-    await page.click('#osMenuBtn');
-    await page.waitForSelector('.amn-scrim.amn-open', { timeout: 5000 });
-    const rijen = await page.evaluate(() =>
-      [...document.querySelectorAll('.amn-rij')].map((b) => b.textContent.trim()));
-    for (const woord of ['Meldingen', 'Instellingen', 'Zoeken', 'Scannen']) {
-      assert.ok(rijen.some((t) => new RegExp(woord, 'i').test(t)), woord + ' ontbreekt in het menu');
+    /* ...EN DAN MOET DE WEG NAAR HET SYSTEEM ER WEL ZIJN. Dit is de helft die
+       stil kapot kan: knoppen weghalen is zichtbaar, een ingang die niemand
+       meer heeft niet. De bovenrand omlaag halen (shared/randen.js) opent het
+       bedieningspaneel, en dat paneel draagt alles wat uit de balk is gehaald
+       -- meldingen incluis, want zonder die tegel was er na het leegmaken geen
+       enkele ingang meer naar wat er voor je klaarligt. */
+    await page.mouse.move(196, 4);
+    await page.mouse.down();
+    for (const y of [20, 50, 90, 130]) { await page.mouse.move(196, y); await page.waitForTimeout(40); }
+    await page.mouse.up();
+    await page.waitForTimeout(600);
+    assert.equal(await page.evaluate(() => {
+      const s = document.getElementById('osCcScrim');
+      return !!(s && s.classList.contains('open'));
+    }), true, 'de bovenrand opent het bedieningspaneel niet');
+
+    const tegels = await page.evaluate(() =>
+      [...document.querySelectorAll('.os-cc-tegels button')].filter((b) => !b.hidden)
+        .map((b) => b.textContent.trim()));
+    for (const woord of ['Meldingen', 'Zoeken', 'Scannen', 'Zegel', 'backoffice']) {
+      assert.ok(tegels.some((t) => new RegExp(woord, 'i').test(t)),
+        woord + ' ontbreekt in het bedieningspaneel');
     }
 
-    // en de bel doet het nog: het menu klikt de verborgen knop aan
-    await page.evaluate(() => {
-      const rij = [...document.querySelectorAll('.amn-rij')].find((b) => /Meldingen/i.test(b.textContent));
-      rij.click();
-    });
+    // en de tegel doet het echt: hij klikt de verborgen bel aan
+    await page.click('#osCcBel');
     await page.waitForTimeout(500);
     assert.equal(await page.evaluate(() => {
       const p = document.getElementById('notifPanel');
       return !!(p && p.classList.contains('open'));
-    }), true, 'de rij Meldingen opent het meldingenpaneel niet');
+    }), true, 'de tegel Meldingen opent het meldingenpaneel niet');
+    await page.close();
+  });
+});
+
+test('het beginscherm draagt twee rijen mappen, en de klok staat erboven',
+  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  await metLid(async ({ base, ctx }) => {
+    const page = await ctx.newPage();
+    await page.setViewportSize({ width: 393, height: 852 });
+    await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
+    await page.waitForSelector('#osMappen .os-app', { timeout: 10000 });
+    await page.evaluate(() => { const g = document.getElementById('onbGate'); if (g) g.hidden = true; });
+    await page.waitForTimeout(400);
+
+    const r = await page.evaluate(() => {
+      const tegels = [...document.querySelectorAll('#osMappen .os-app')];
+      const rijen = new Set(tegels.map((t) => Math.round(t.getBoundingClientRect().top)));
+      const y = (s) => Math.round(document.querySelector(s).getBoundingClientRect().top);
+      const onder = document.querySelector('#osDemoWet') || document.querySelector('#osAiWet');
+      return {
+        mappen: tegels.length, rijen: rijen.size,
+        volgorde: ['#osMappen', '.os-klokvak', '#osFuncties', '#osAiBalk'].map(y),
+        onderrand: Math.round(onder.getBoundingClientRect().bottom), hoogte: innerHeight
+      };
+    });
+    assert.ok(r.mappen >= 8, 'er staan minder dan acht mappen: ' + r.mappen);
+    assert.equal(r.rijen, 2, 'de mappen staan niet in twee rijen (rijen: ' + r.rijen + ')');
+    assert.deepEqual(r.volgorde.slice().sort((a, b) => a - b), r.volgorde,
+      'de volgorde is mappen, klok, functies, balk');
+    /* DE KLOK CENTREERDE ZICHZELF IN ALLE OVERGEBLEVEN RUIMTE, en duwde daarmee
+       de functierij en de balk van Rahul tot vlak boven de browserbalk. Nu heeft
+       het klokvak een bovengrens en zakt de overtollige ruimte naar het einde
+       van de kolom. Die kussen onderaan IS de reparatie, dus die toetsen we:
+       zonder de bovengrens is hij nul. */
+    assert.ok(r.hoogte - r.onderrand > 40,
+      'er staat geen lucht meer onder de balk van Rahul (' + (r.hoogte - r.onderrand) + 'px): ' +
+      'de klok centreert zich weer in alle ruimte');
     await page.close();
   });
 });

@@ -47,7 +47,21 @@ test('leden-app: Toon je Zegel -> QR met RTG-geverifieerd en de bewezen claim',
     await page.waitForSelector('#zegelBtn', { state: 'attached', timeout: 15000 });
     await page.evaluate(() => { const g = document.getElementById('onbGate'); if (g) g.hidden = true; });
 
-    await page.click('#osCcBtn');
+    /* HET BEDIENINGSPANEEL OPENEN ZOALS EEN GEBRUIKER DAT DOET.
+
+       Hier stond `page.click('#osCcBtn')`. Die knop stond toen nog in de
+       statusbalk van het beginscherm; die balk is leeggemaakt (mappen, klok,
+       functies, de balk van Rahul, en verder niets) en de knop is nu een
+       verborgen model dat het paneel zelf aanklikt. Klikken op iets dat niet in
+       beeld staat kan een gebruiker niet, dus deze toets ook niet.
+
+       De echte weg is de bovenrand omlaag halen (shared/randen.js). Dat is
+       meteen de betere toets: hij meet de ingang die er nu is en niet de knop
+       die er toevallig nog staat. */
+    await page.mouse.move(196, 4);
+    await page.mouse.down();
+    for (const y of [20, 50, 90, 130]) { await page.mouse.move(196, y); await page.waitForTimeout(40); }
+    await page.mouse.up();
     await page.waitForSelector('#osCcZegel', { state: 'visible', timeout: 8000 });
     await page.click('#osCcZegel');
     await page.waitForSelector('.zg-ov', { timeout: 8000 });

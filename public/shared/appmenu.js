@@ -1,18 +1,19 @@
-/* ===================== HET APP-MENU: één hamburger, overal =====================
+/* =================== HET APP-MENU: één hamburger, in de apps ===================
 
-   WAAROM DIT ER IS. De statusbalk van het beginscherm droeg drie losse
-   knopjes: de batterij, de bel en het bedieningspaneel. Drie tekens naast
-   elkaar boven een scherm dat verder alleen lucht en een klok is -- dat is
-   precies de stapeling waar de merkregels tegen waarschuwen. En in de apps
-   erachter was het omgekeerde probleem: daar was helemaal niets. Je stond in
-   Muziek of in de Mall en er was geen weg terug naar huis, geen instellingen,
-   geen overzicht van wat die app kon; alleen de veeg van de onderrand, die je
-   moest kennen.
+   WAAROM DIT ER IS. In de apps van het OS was er niets: je stond in Muziek of
+   in de Mall en er was geen weg terug naar huis, geen instellingen, geen
+   overzicht van wat die app kon; alleen de veeg van de onderrand, die je moest
+   kennen. Eén hamburger rechtsboven, op elk app-scherm, lost dat op.
 
-   Eén vorm lost allebei op: een hamburger, rechtsboven, op elk scherm van het
-   OS. Op het beginscherm neemt hij de drie knopjes op (ze blijven bestaan,
-   verborgen, want de rest van de app klikt ze aan -- zie .os-verborgen-knop in
-   apps/app.html). In een app opent hij een menu dat bij DIE app past.
+   HET BEGINSCHERM KRIJGT HEM NIET, en dat is een keuze en geen vergeetpost.
+   Daar droeg de statusbalk eerst drie losse knopjes (batterij, bel,
+   bedieningspaneel); die zijn weggehaald omdat drie tekens naast elkaar boven
+   een scherm van lucht en een klok precies de stapeling zijn waar de
+   merkregels tegen waarschuwen. Er een vierde teken voor terugzetten is dan
+   niet veel beter. Het beginscherm is de rustplek: mappen, klok, functies, de
+   balk van Rahul, en verder niets. Wat er aan systeem achter zit haal je van
+   de bovenrand omlaag (shared/randen.js opent daar het bedieningspaneel), en
+   dat paneel draagt zoeken, meldingen, scannen, je Zegel en je backoffice.
 
    WAT ER IN HET MENU STAAT, en waar het vandaan komt:
 
@@ -37,8 +38,10 @@
 
   var body = d.body;
   if (!body || body.hasAttribute('data-appmenu-uit')) return;
+  /* Het beginscherm doet niet mee: zie de kop. Daar is de bovenrand de ingang
+     naar het systeem, niet een knop in beeld. */
+  if (body.hasAttribute('data-ios-home')) return;
 
-  var isThuis = body.hasAttribute('data-ios-home');
   var T = function (k, nl) { return (w.RTGi18n && w.RTGi18n.t) ? w.RTGi18n.t(k, nl) : nl; };
 
   /* HET MENU BRENGT ZIJN EIGEN WOORDEN MEE.
@@ -61,8 +64,8 @@
     var eigen = {
       'menu.label': 'Menu', 'menu.sluit': 'Close menu', 'menu.thuis': 'Home screen',
       'menu.terug': 'One step back', 'menu.instel': 'Settings', 'menu.rahul': 'Ask Rahul',
-      'menu.deel': 'Share this screen', 'menu.accu': 'Battery', 'menu.deze': 'This app',
-      'menu.overal': 'Everywhere', 'menu.osdeel': 'The system', 'menu.app': 'This app',
+      'menu.deel': 'Share this screen', 'menu.deze': 'This app',
+      'menu.overal': 'Everywhere', 'menu.app': 'This app',
       'menu.niets': 'There is nothing extra to do on this screen.',
       'os.zoek': 'Search', 'app.notifs': 'Notifications', 'app.logout': 'Sign out',
       'os.cc.scan': 'Scan', 'os.cc.zegel': 'My Seal', 'os.cc.bo': 'My back office',
@@ -90,11 +93,6 @@
         'stroke-width:1.7;stroke-linecap:round;}' +
       '.amn-knop:hover{color:var(--txt,#F7F5F1);}' +
       '.amn-knop:focus-visible{outline:2px solid var(--gold,#857007);outline-offset:3px;border-radius:8px;}' +
-      /* de stip: er ligt iets klaar. Neemt de bel-badge over, want die staat
-         nu verborgen en anders zag je nergens meer dat er iets was. */
-      '.amn-stip{position:absolute;top:1px;right:1px;width:8px;height:8px;border-radius:50%;' +
-        'background:var(--burgundy,#7F1634);display:none;}' +
-      '.amn-knop[data-nieuw] .amn-stip{display:block;}' +
       /* zwevend, voor de paar pagina\'s zonder eigen kopbalk */
       '.amn-knop.amn-zweef{position:fixed;z-index:9970;' +
         'top:calc(env(safe-area-inset-top,0px) + .55rem);' +
@@ -122,8 +120,6 @@
         'letter-spacing:-.01em;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}' +
       '.amn-x{background:none;border:none;color:#8A8680;font-size:1rem;cursor:pointer;padding:.3rem .1rem;}' +
       '.amn-x:hover{color:#F4F1EC;}' +
-      '.amn-meta{color:#8A8680;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;' +
-        'margin:.15rem 0 0;}' +
       '.amn-sectie{color:#8A8680;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;' +
         'margin:1.1rem 0 .5rem;}' +
       /* de tegels: de functies van deze app, twee op een rij */
@@ -267,7 +263,6 @@
       gezien[String(it.label).toLowerCase()] = true;
       uit.push(it);
     }
-    if (isThuis) return uit;   // het beginscherm heeft geen "deze app"
     /* De naam van de app staat al boven het menu. Stond hij ook nog eens als
        enige tegel eronder (Reisboek, Table, Cellier hadden dat: hun <h2> is de
        titel van de pagina), dan leek het menu een functie te hebben die het
@@ -306,69 +301,30 @@
   function vasteFuncties() {
     var uit = [];
 
-    if (!isThuis) {
-      uit.push({ label: T('menu.thuis', 'Beginscherm'), icoon: 'thuis', doe: function () {
-        if (w.RTGiOS && w.RTGiOS.thuis) w.RTGiOS.thuis();
-        else location.href = '/apps/app.html';
-      } });
-      if (w.history.length > 1) {
-        uit.push({ label: T('menu.terug', 'Een stap terug'), icoon: 'terug',
-          doe: function () { w.history.back(); } });
-      }
+    uit.push({ label: T('menu.thuis', 'Beginscherm'), icoon: 'thuis', doe: function () {
+      if (w.RTGiOS && w.RTGiOS.thuis) w.RTGiOS.thuis();
+      else location.href = '/apps/app.html';
+    } });
+    if (w.history.length > 1) {
+      uit.push({ label: T('menu.terug', 'Een stap terug'), icoon: 'terug',
+        doe: function () { w.history.back(); } });
     }
 
-    /* Zoeken door alle apps en acties: op het beginscherm is dat de spotlight
-       (de tegel in het bedieningspaneel opent hem), elders bestaat hij niet. */
-    if (isThuis && bestaat('osCcZoek')) {
-      uit.push({ label: T('os.zoek', 'Zoeken'), icoon: 'zoek',
-        doe: function () { klik('osCcZoek'); } });
-    }
-
-    if (bestaat('bell')) {
-      uit.push({ label: T('app.notifs', 'Meldingen'), icoon: 'bel', tel: function () {
-        var b = el('bellBadge');
-        return (b && b.style.display !== 'none') ? b.textContent : '';
-      }, doe: function () { klik('bell'); } });
-    }
-
-    /* Instellingen. Op het beginscherm is dat het bedieningspaneel van het OS
-       (thema, helderheid, taal, push, scannen, zegel, backoffice); op een
-       app-pagina het paneel van shared/bediening.js, dat dezelfde rol speelt
-       voor dat ene scherm. Is geen van beide er, dan is er niets in te
-       stellen en staat de rij er ook niet. */
-    if (isThuis && bestaat('osCcBtn')) {
-      uit.push({ label: T('menu.instel', 'Instellingen'), icoon: 'instel',
-        doe: function () { klik('osCcBtn'); } });
-    } else if (w.RTGBediening && w.RTGBediening.aanwezig) {
+    /* Instellingen: het paneel van shared/bediening.js, dat voor dit ene
+       scherm dezelfde rol speelt als het bedieningspaneel van het OS. Is het
+       er niet, dan valt er niets in te stellen en staat de rij er ook niet. */
+    if (w.RTGBediening && w.RTGBediening.aanwezig) {
       uit.push({ label: T('menu.instel', 'Instellingen'), icoon: 'instel',
         doe: function () { w.RTGBediening.open(); } });
     }
 
-    /* Rahul. Op het beginscherm staat zijn balk er al -- dan zetten we de
-       cursor er gewoon in; in een app opent het menu zijn venster. */
-    if (isThuis && bestaat('osAiIn')) {
-      uit.push({ label: T('menu.rahul', 'Vraag Rahul'), icoon: 'rahul', doe: function () {
-        var i = el('osAiIn'); i.scrollIntoView({ block: 'center' }); i.focus();
-      } });
-    } else if (w.RTGMetgezel && w.RTGMetgezel.rahul) {
+    /* Rahul: het menu opent zijn venster, het tekent er zelf geen tweede. */
+    if (w.RTGMetgezel && w.RTGMetgezel.rahul) {
       uit.push({ label: T('menu.rahul', 'Vraag Rahul'), icoon: 'rahul',
         doe: function () { w.RTGMetgezel.rahul(); } });
     }
 
-    if (isThuis && bestaat('scanBtn')) {
-      uit.push({ label: T('os.cc.scan', 'Scannen'), icoon: 'scan',
-        doe: function () { klik('scanBtn'); } });
-    }
-    if (isThuis && bestaat('zegelBtn')) {
-      uit.push({ label: T('os.cc.zegel', 'Mijn Zegel'), icoon: 'zegel',
-        doe: function () { klik('zegelBtn'); } });
-    }
-    if (isThuis && bestaat('boBtn')) {
-      uit.push({ label: T('os.cc.bo', 'Mijn backoffice'), icoon: 'kantoor',
-        doe: function () { klik('boBtn'); } });
-    }
-
-    if (!isThuis && w.RTGVol && w.RTGVol.wissel) {
+    if (w.RTGVol && w.RTGVol.wissel) {
       uit.push({ label: T('os.cc.vol', 'Volledig scherm'), icoon: 'vol',
         doe: function () { w.RTGVol.wissel(); } });
     }
@@ -392,12 +348,10 @@
   /* --------------------------------------------------------- het blad */
   var scrim = null, blad = null, knop = null, laatstFocus = null;
 
+  /* De titel zegt WAAR JE BENT: de naam van deze app, uit de navigatiebalk of
+     de grote titel. Nooit een woordmerk -- dat is precies wat shared/ios.js
+     overal uit de chrome veegt. */
   function titel() {
-    /* De titel zegt WAAR JE BENT, ook op het beginscherm. Daar stond eerst
-       "RTG OS", en dat is precies het woordmerk dat shared/ios.js overal uit de
-       chrome veegt: binnen het systeem hoef je niemand meer te vertellen van
-       wie het is. */
-    if (isThuis) return T('menu.thuis', 'Beginscherm');
     var nav = d.querySelector('.ios-nav-titel');
     if (nav && nav.textContent.trim()) return nav.textContent.trim();
     var groot = d.querySelector('.ios-groot');
@@ -472,16 +426,6 @@
     kop.appendChild(naam); kop.appendChild(x);
     blad.appendChild(kop);
 
-    /* De batterij stond als icoontje in de statusbalk. Hij is geen knop en
-       hoort dus ook niet als knop in dit menu: hier is hij een regel tekst,
-       precies wat hij is -- een stand van zaken. */
-    var bat = el('osBatPct');
-    if (bat && bat.textContent) {
-      var m = d.createElement('p'); m.className = 'amn-meta';
-      m.textContent = T('menu.accu', 'Batterij') + ' ' + bat.textContent;
-      blad.appendChild(m);
-    }
-
     var eigen = eigenFuncties();
     if (eigen.length) {
       blad.appendChild(sectie(T('menu.deze', 'Deze app')));
@@ -492,7 +436,7 @@
 
     var vast = vasteFuncties();
     if (vast.length) {
-      blad.appendChild(sectie(isThuis ? T('menu.osdeel', 'Het systeem') : T('menu.overal', 'Overal')));
+      blad.appendChild(sectie(T('menu.overal', 'Overal')));
       var lijst = d.createElement('div'); lijst.className = 'amn-lijst';
       for (var j = 0; j < vast.length; j++) lijst.appendChild(maakRij(vast[j]));
       blad.appendChild(lijst);
@@ -559,16 +503,12 @@
       p.setAttribute('d', dd); svg.appendChild(p);
     });
     knop.appendChild(svg);
-    var stip = d.createElement('span'); stip.className = 'amn-stip';
-    knop.appendChild(stip);
     knop.addEventListener('click', wissel);
 
     hangOp();
   }
 
   function hangOp() {
-    var rechts = d.querySelector('.topbar .os-rechts');
-    if (rechts) { knop.classList.add('bell'); rechts.appendChild(knop); return; }
     var acties = d.querySelector('.ios-nav .ios-nav-acties');
     if (acties) { knop.classList.remove('amn-zweef'); acties.appendChild(knop); return; }
     knop.classList.add('amn-zweef');
@@ -592,27 +532,10 @@
     }).observe(d.body, { childList: true });
   }
 
-  /* De stip op de hamburger volgt de bel-badge. Die badge is de enige plek
-     waar de app bijhoudt of er iets ligt; hem naschrijven zou een tweede
-     waarheid zijn, dus we kijken gewoon mee. */
-  function volgMeldingen() {
-    var badge = el('bellBadge');
-    if (!badge || !w.MutationObserver) return;
-    var lees = function () {
-      var aan = badge.style.display !== 'none' && (badge.textContent || '').trim() &&
-        badge.textContent.trim() !== '0';
-      if (aan) knop.setAttribute('data-nieuw', ''); else knop.removeAttribute('data-nieuw');
-    };
-    new w.MutationObserver(lees).observe(badge,
-      { attributes: true, childList: true, characterData: true, subtree: true });
-    lees();
-  }
-
   /* --------------------------------------------------------- aanzetten */
   stijl();
   plaatsKnop();
   bewaakKnop();
-  volgMeldingen();
 
   w.RTGAppMenu = {
     open: open, sluit: sluit, wissel: wissel,

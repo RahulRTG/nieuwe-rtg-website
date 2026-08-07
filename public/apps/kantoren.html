@@ -3450,9 +3450,13 @@ else uitgelogd();
     else document.body.insertBefore(balk, document.body.firstChild);
     if (window.RTGWerkblad) RTGWerkblad.start({ schermen: SCHERMEN, balk });
   }
-  // shared/werkblad.js laadt met defer; even wachten tot hij er is
-  let n = 0;
-  const t = setInterval(() => { if (window.RTGWerkblad || ++n > 25) { clearInterval(t); start(); } }, 120);
+  /* Hier stond een lus die drie seconden lang wachtte tot shared/werkblad.js
+     zou verschijnen. Dat bestand is er niet meer: de ios-ronde haalde het
+     bureaublad weg ("een homescreen, geen bureaublad eromheen") en niets laadt
+     het nog. Wachten op iets dat nooit komt is geen vangnet maar drie seconden
+     stilte. start() zet de balk gewoon neer; is er ooit weer een werkblad, dan
+     pikt hij hem op via dezelfde controle daarbinnen. */
+  start();
 })();
 </script>
 <script src="/shared/drie.js"></script>

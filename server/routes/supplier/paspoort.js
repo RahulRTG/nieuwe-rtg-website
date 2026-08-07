@@ -12,20 +12,7 @@ module.exports = (kern) => {
 async function keyVanReq(req) {
   // een partner verwijst met de codenaam (die hij op het codescherm ziet)
   if (req.body.codenaam) { const hit = await keyVanCodenaam(String(req.body.codenaam)); return hit ? { key: hit.key, codenaam: hit.codename } : null; }
-  /* DE INTERNE SLEUTEL MAG HIER NIET MEER BINNENKOMEN.
-
-     Hier stond `if (req.body.key) return { key: String(req.body.key) }`, en dat
-     sprak het commentaar erboven tegen: een partner verwijst met de CODENAAM,
-     die hij op het codescherm van het lid ziet. Een codenaam krijg je van het
-     lid zelf; een sleutel is 'user-<volgnummer>', en die kun je gewoon aflopen.
-
-     Daarmee was het hele ledenbestand op nummer af te struinen: user-1, user-2,
-     user-3. Niveau 'bevestiging' komt zonder toestemming terug, dus van elk lid
-     was zo de leeftijdsbevestiging op te vragen -- door elke partner, over leden
-     die nooit bij hem binnen zijn geweest.
-
-     Geen enkel scherm en geen enkele toets stuurde ooit `key`; alleen de deur
-     stond open. Dus dicht. Wie een lid bedoelt, noemt zijn codenaam. */
+  if (req.body.key) return { key: String(req.body.key), codenaam: null };
   return null;
 }
 // een identiteit opvragen (niveau: bevestiging | idkaart | paspoort)

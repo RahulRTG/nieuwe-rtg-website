@@ -16,7 +16,7 @@
 'use strict';
 
 module.exports = (kern, hulp) => {
-  const { accounts, archief, crypto, db, findSupplier, onboarding, haversine, keyVanCodenaam, klokVan, leeftijdVan, logActivity, notify, openVacatures, notifySupplier, path, rememberSession, save, schoon, sseToCustomer, sseToOffice, supplierState, zetRtgai } = hulp;
+  const { accounts, archief, crypto, db, findSupplier, haversine, keyVanCodenaam, klokVan, leeftijdVan, logActivity, notify, openVacatures, notifySupplier, path, rememberSession, save, schoon, sseToCustomer, sseToOffice, supplierState, zetRtgai } = hulp;
 
 /* De gegevenspoort (kern/gegevenspoort.js + kern/gegevensgesprek.js): een gratis
    account vraagt vier dingen; pas als er een DERDE PARTIJ bij komt (een zaak, een
@@ -125,22 +125,6 @@ Object.assign(kern, require('../kern/theater').maakTheater({
    de natuurlijke naad van dit bestand -- alles hierboven BOUWT de kern op,
    vanaf daar wordt er alleen nog opgehangen. De volgorde daarbinnen is
    gedrag en geen smaak; zie de kop van dat bestand. */
-/* De ledenbalie (kern/ledenbalie*.js): de afdeling die een lid mag HELPEN --
-   zoeken op codenaam of steuncode, het dossier inzien met een reden erbij, een
-   wachtwoordherstel in gang zetten, een klacht vastleggen en een abo-wijziging
-   VOORSTELLEN.
-
-   Wat hij met opzet NIET kan (merkregels, geen voorzichtigheid): een naam,
-   adres of nummer zien; een wachtwoord zien of zetten; Lifestyle of Business
-   toekennen. herstelStart komt uit routes/auth/herstel.js -- DEZELFDE stroom als
-   /api/auth/forgot, geen tweede kopie. Late binding, want die route hangt later. */
-Object.assign(kern, require('../kern/ledenbalie')({
-  db, save, accounts, onboarding,
-  geldPasprijzen: () => (kern.geldPasprijzen ? kern.geldPasprijzen() : null),
-  magBoardroom: (k) => (kern.magBoardroom ? kern.magBoardroom(k) : false),
-  herstelStart: (u, req) => (kern.herstelStart ? kern.herstelStart(u, req) : null)
-}));
-
 /* LET OP DE VOLGORDE: dit MOET boven de regel hieronder staan die de routers
    ophangt. routes/rtfos/index.js pakt zijn kern bij het ophangen uit elkaar
    (const { app, officeAuth, rtfos } = kern), dus een kern die pas daarna wordt
@@ -177,4 +161,26 @@ Object.assign(kern, require('../kern/rtfos')({ db, save, crypto,
   // (een RTF-activiteit als afspraak in je eigen RTG-agenda). Zonder hem
   // meldt het koppelbord hem eerlijk als kapot, en dat is hij dan ook.
   agenda: kern.agenda }));
+
+const gekozenDomeinen = require('./routes')(kern);
+/* De meelezer van de RTG AI wordt hierboven in de bedrading gebouwd, maar de
+   middleware die hem voedt staat bovenaan dit bestand en sluit over deze
+   variabele. Hij wordt daarom HIER gezet en niet in opzet/routes.js: een
+   toewijzing aan een binding uit een ander bestand is geen bedrading meer maar
+   een verborgen draad terug. Per verzoek uitgelezen, dus dit moment is vroeg
+   genoeg. */
+zetRtgai(kern.rtgai || null);
+
+/* Archiveren gebeurt bij het opstarten en daarna elk uur. In vloot-modus doet
+   alleen het office-domein dit, zodat niet twee processen tegelijk aan de
+   orders-collectie trekken. */
+if (gekozenDomeinen.includes('office')) {
+  try { archief.archiveerNu(); } catch (e) { console.warn('[archief] ronde mislukt:', e.message); }
+  const archiefTimer = setInterval(() => {
+    try { archief.archiveerNu(); } catch (e) { console.warn('[archief] ronde mislukt:', e.message); }
+  }, 3600000);
+  if (archiefTimer.unref) archiefTimer.unref();
+}
+
+
 };

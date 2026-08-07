@@ -42,6 +42,13 @@ module.exports = [
     paden: ['/api/gegevens', '/api/adres'] },
   { id: 'tg-aanmeld', categorie: 'Toegang en identiteit', naam: 'Aanmelden voor een pas', standaard: true, doelgroepen: ALLE,
     uitleg: 'Het aanmeldgesprek en de aanmeldingen die daaruit volgen; het besluit blijft mensenwerk.', paden: ['/api/aanmeld', '/api/aanmelding'] },
+  /* De wervingslink: een werkgever nodigt iemand uit die nog geen RTG-account
+     heeft. Dit stond nergens in de kast, dus was hij als enige niet uit te
+     zetten -- terwijl juist een uitnodigingslink iets is dat je wilt kunnen
+     dichtdraaien als er misbruik van wordt gemaakt. Geen recht en geen
+     infrastructuur, dus geen plaats op de BUITEN-lijst. */
+  { id: 'tg-werving', categorie: 'Toegang en identiteit', naam: 'Wervingslink van een werkgever', standaard: true, doelgroepen: ALLE,
+    uitleg: 'De link /werken/<code> waarmee een werkgever iemand uitnodigt die nog geen account heeft; aanmelden en in dienst treden worden dan een handeling.', paden: ['/api/werving'] },
 
   // ---------- de kern van de app ----------
   { id: 'kern-state', categorie: 'Leden (RTG-app)', naam: 'De app-staat', standaard: true, doelgroepen: ALLE,

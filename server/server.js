@@ -1871,7 +1871,6 @@ require('./opzet/kernlaag4b')(kern, hulp);
 require('./opzet/kernlaag5')(kern, hulp);
 require('./opzet/kernlaag6')(kern, hulp);
 require('./opzet/kernlaag7')(kern, hulp);
-require('./opzet/kernlaag7b')(kern, hulp);   // de routers ophangen; zie de kop daar waarom dat NA alle Object.assign moet
 
 /* ---------- de afsluiters en de start staan in ./opzet/start.js ----------
 

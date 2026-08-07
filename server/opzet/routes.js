@@ -134,14 +134,6 @@ module.exports = function hangRoutesOp(kern) {
   require('../routes/labfonds')(grens('labfonds'));
   require('../routes/aanmeldingen')(grens('aanmeldingen'));
   require('../routes/ledenregister')(grens('ledenregister'));
-  /* Het doorgeefjournaal: een leesbare regel per verzoek en per uitgaand
-     bericht. Naast het ledenregister, want het staat achter dezelfde poort en
-     om dezelfde reden -- meekijken met het verkeer hoort een naam te hebben. */
-  require('../routes/journaal')(grens('journaal'));
-  /* De ledenbalie: de afdeling die een lid mag helpen met zijn abo, zijn
-     wachtwoord of een klacht. Achter een eigen zetel, niet achter de gedeelde
-     kantoorcode -- iemands account aanraken hoort een naam te hebben. */
-  require('../routes/ledenbalie')(grens('ledenbalie'));
   /* De wervingslink /werken/<code>: een werkgever nodigt iemand uit die nog
      geen RTG-account heeft, langs dezelfde uitnodiging als de kassacode van
      routes/supplier/werving. */

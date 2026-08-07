@@ -4,7 +4,7 @@
    bij het opstarten vanuit routes/auth.js. */
 module.exports = (actx) => {
   const { PERSONAS, PRODUCTION, UPLOAD_DIR, accounts, app, appUrl, auth, checkCred, crypto, db, express, forgetSession, fs, hasCred, leeftijdVan, loginFails, mail, memberTemplate, noteFailedTry, path, rememberSession, save, schoon, sessions, stateFor, tooManyTries, logInlog,
-    DEMO, pasAppOk, PAS_FOUT, pasAppVan, DEV_VELDEN , kern} = actx;
+    DEMO, pasAppOk, PAS_FOUT, pasAppVan, DEV_VELDEN } = actx;
 /* Wachtwoord vergeten: tweestapsverificatie via de website. Stap 1 is de
    herstel-link in de e-mail; stap 2 is een zescijferige code die per SMS naar de
    telefoon van het account gaat (zonder provider naar de outbox). Pas met link
@@ -31,50 +31,6 @@ const codeHash = (c) => crypto.createHash('sha256').update(String(c)).digest('he
    lijn; een gewone gebruiker merkt een kwart seconde niet. */
 const MIN_MS = 250;
 
-/* HET HERSTEL IN GANG ZETTEN -- als eigen functie, niet alleen als route.
-
-   Deze stroom stond volledig binnen de route. Dat werkte, tot er een TWEEDE
-   plek kwam die hem nodig heeft: de ledenbalie, waar een medewerker een lid
-   helpt dat er niet meer in komt. Die had de stroom moeten nabouwen, en dan
-   heb je twee waarheden over hoe een herstel werkt -- precies de vorm waar
-   vandaag de helft van de fouten vandaan kwam.
-
-   Dus een functie, en de route roept hem aan. De balie straks ook. Wie de regels
-   verandert, verandert ze voor allebei. */
-function herstelStart(u, req) {
-  if (!u) return { ok: true, tweestaps: false };   // bestaan lekken we nooit
-  const tok = accounts.createReset(u.id);
-  const url = appUrl(req) + '/apps/app.html?pas=' + pasAppVan(u.tier) + '&reset=' + tok;
-  const code = String(crypto.randomInt(100000, 1000000));
-  mail.send(accounts.emailOf(u) || '', 'Wachtwoord herstellen bij Rahul Travel Group',
-    'U vroeg een nieuw wachtwoord aan. Stel het in via deze link (1 uur geldig):\n' + url +
-    '\n\nUit veiligheid sturen we ook een code naar uw telefoon; die vult u op de website in.');
-  /* GEEN TELEFOON, GEEN TWEEDE STAP -- en dat moet je dan ook zeggen.
-     Hier stond `accounts.phoneOf(u) || 'onbekend'`, en de code ging als
-     'sms:onbekend' de deur uit: naar niemand. /api/auth/reset EIST die code,
-     dus voor elk account zonder telefoonnummer was herstellen onmogelijk. En de
-     registratie vraagt met opzet GEEN telefoonnummer, dus dat was niet de
-     uitzondering maar de regel. Een `|| 'onbekend'` is een fallback die iets
-     VERZINT in plaats van te weigeren. */
-  const tel = accounts.phoneOf(u);
-  if (tel) {
-    herstel2fa()[u.id] = { hash: codeHash(code), tot: Date.now() + 3600000, pogingen: 0 };
-    mail.send('sms:' + tel, 'Uw RTG-herstelcode',
-      'Uw code om het wachtwoord te herstellen: ' + code + '\nGeldig: 1 uur. Vroeg u dit niet aan? Negeer dit bericht.');
-  } else {
-    herstel2fa()[u.id] = { zonderCode: true, tot: Date.now() + 3600000, pogingen: 0 };
-  }
-  save();
-  return { ok: true, tweestaps: !!tel, url, code: tel ? code : null };
-}
-/* De balie (routes/ledenbalie.js) zet hetzelfde herstel in gang voor een lid dat
-   belt. Hij krijgt de LINK en de CODE bewust NIET terug -- alleen dat het is
-   verstuurd. Een medewerker die de link ziet, kan het account overnemen. */
-kern.herstelStart = (u, req) => {
-  const r = herstelStart(u, req);
-  return { ok: r.ok, verstuurd: !!u, tweestaps: r.tweestaps };
-};
-
 app.post('/api/auth/forgot', (req, res) => {
   const begon = Date.now();
   const antwoord = (lijf) => {
@@ -84,11 +40,48 @@ app.post('/api/auth/forgot', (req, res) => {
   };
   const email = String(req.body.email || '').trim();
   const u = email ? accounts.findByLogin(email) : null;
-  const r = herstelStart(u, req);
-  const dev = DEV_VELDEN(req) && u ? { devResetUrl: r.url, devCode: r.code } : {};
+  let devResetUrl, devCode, tweestaps = false;
+  if (u) {
+    const tok = accounts.createReset(u.id);
+    const url = appUrl(req) + '/apps/app.html?pas=' + pasAppVan(u.tier) + '&reset=' + tok;
+    // stap 2: de code naar de telefoon (tweede kanaal, los van de e-mail)
+    const code = String(crypto.randomInt(100000, 1000000));
+    herstel2fa()[u.id] = { hash: codeHash(code), tot: Date.now() + 3600000, pogingen: 0 };
+    save();
+    mail.send(accounts.emailOf(u) || email, 'Wachtwoord herstellen bij Rahul Travel Group',
+      'U vroeg een nieuw wachtwoord aan. Stel het in via deze link (1 uur geldig):\n' + url +
+      '\n\nUit veiligheid sturen we ook een code naar uw telefoon; die vult u op de website in.');
+    /* GEEN TELEFOON, GEEN TWEEDE STAP -- en dat moet je dan ook zeggen.
+
+       Hier stond `accounts.phoneOf(u) || 'onbekend'`, en de code ging als
+       'sms:onbekend' de deur uit: naar niemand. /api/auth/reset EIST die code,
+       dus voor elk account zonder telefoonnummer was herstellen onmogelijk. En
+       de registratie vraagt met opzet GEEN telefoonnummer (naam, geboortedatum,
+       e-mail, wachtwoord -- meer niet), dus dat is niet de uitzondering maar de
+       regel. Het antwoord meldde ondertussen vrolijk `tweestaps: true` en de
+       gebruiker keek op een telefoon waar niets binnenkwam.
+
+       Een `|| 'onbekend'` is een fallback die iets VERZINT in plaats van te
+       weigeren -- dezelfde vorm als de sleutels die zichzelf opnieuw verzonnen.
+
+       Nu: is er een tweede kanaal, dan is er een tweede stap. Is die er niet,
+       dan is de link uit de e-mail het bewijs -- precies wat een herstelmail
+       overal is -- en zegt het antwoord dat ook, zodat het scherm niet om een
+       code vraagt die nooit komt. */
+    const tel = accounts.phoneOf(u);
+    if (tel) {
+      mail.send('sms:' + tel, 'Uw RTG-herstelcode',
+        'Uw code om het wachtwoord te herstellen: ' + code + '\nGeldig: 1 uur. Vroeg u dit niet aan? Negeer dit bericht.');
+    } else {
+      herstel2fa()[u.id] = { zonderCode: true, tot: Date.now() + 3600000, pogingen: 0 };
+    }
+    tweestaps = !!tel;
+    if (DEV_VELDEN(req)) { devResetUrl = url; devCode = code; }
+  }
   // Altijd hetzelfde antwoord, en sinds deze ronde ook in dezelfde tijd.
-  antwoord({ ok: true, tweestaps: r.tweestaps, ...dev });
+  antwoord({ ok: true, tweestaps, ...(devResetUrl ? { devResetUrl, devCode } : {}) });
 });
+
 app.post('/api/auth/reset', async (req, res) => {
   const u = accounts.findByReset(req.body.token);
   if (!u) return res.status(400).json({ error: 'Ongeldige of verlopen herstel-link.' });

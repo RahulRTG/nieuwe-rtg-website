@@ -33,7 +33,7 @@ async function wachtTot(fn, ms = 20000) {
 test.before(async () => {
   vloot = spawn(process.execPath, [path.join(__dirname, '..', 'server', 'vloot.js')], {
     env: {
-      ...process.env, NODE_ENV: 'test', RTG_DATA_DIR: TMP, SMTP_URL: '',
+      ...process.env, NODE_ENV: 'test', RTG_DEMO: '1', RTG_DATA_DIR: TMP, SMTP_URL: '',
       RTG_POORT: String(POORT), RTG_VLOOT_BASIS: String(BASIS),
       RTG_VLOOT_GROEPEN: 'leden:auth,member,social,zakelijk|kantoor:office,techniek|rtf:-'
     },

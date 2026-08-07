@@ -77,7 +77,7 @@ function stopCloud(kind) {
 function startCloud() {
   stopCloud(cloudChild);
   cloudChild = spawn(process.execPath, ['--experimental-sqlite', path.join(__dirname, '..', 'server', 'server.js')], {
-    env: { ...process.env, NODE_ENV: 'test', PORT: String(cloudPort), RTG_DATA_DIR: TMP_CLOUD, SMTP_URL: '', RTG_DOOS_SLEUTEL: SLEUTEL, OFFICE_CODE: 'DOOS-KANTOOR-1' },
+    env: { ...process.env, NODE_ENV: 'test', RTG_DEMO: '1', PORT: String(cloudPort), RTG_DATA_DIR: TMP_CLOUD, SMTP_URL: '', RTG_DOOS_SLEUTEL: SLEUTEL, OFFICE_CODE: 'DOOS-KANTOOR-1' },
     stdio: ['ignore', 'ignore', 'inherit']
   });
   alleClouds.push(cloudChild);
@@ -298,7 +298,7 @@ test('cloud-failover: valt de primaire cloud weg, dan pakt de doos de replica', 
   const portA = await vrijePoort();
   const portB = await vrijePoort();
   const spawnCloud = (port, dir) => spawn(process.execPath, ['--experimental-sqlite', path.join(__dirname, '..', 'server', 'server.js')], {
-    env: { ...process.env, NODE_ENV: 'test', PORT: String(port), RTG_DATA_DIR: dir, SMTP_URL: '', RTG_DOOS_SLEUTEL: SLEUTEL, OFFICE_CODE: 'DOOS-KANTOOR-2' },
+    env: { ...process.env, NODE_ENV: 'test', RTG_DEMO: '1', PORT: String(port), RTG_DATA_DIR: dir, SMTP_URL: '', RTG_DOOS_SLEUTEL: SLEUTEL, OFFICE_CODE: 'DOOS-KANTOOR-2' },
     stdio: ['ignore', 'ignore', 'inherit']
   });
   let cloudA = spawnCloud(portA, dirA);

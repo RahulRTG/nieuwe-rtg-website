@@ -69,9 +69,6 @@ const bundels = {
   'shared/borden.js': 'shared/borden',
   'shared/werkos.js': 'shared/werkos',
   'shared/verbinding.js': 'shared/verbinding',
-  'shared/werkblad.js': 'shared/werkblad',
-  'shared/flagship.js': 'shared/flagship',
-  'shared/bureau.js': 'shared/bureau',
   'shared/teamcall.js': 'shared/teamcall'
 };
 

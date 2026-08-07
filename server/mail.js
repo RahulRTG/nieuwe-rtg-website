@@ -156,7 +156,22 @@ async function bezorgNu(to, subject, text) {
 }
 
 function send(to, subject, text) {
-  if (!to || !/@/.test(String(to))) return;
+  if (!to) return;
+  /* EEN BERICHT DAT NERGENS HEEN KAN, MOET JE KUNNEN ZIEN.
+
+     Hier stond `if (!/@/.test(to)) return;` -- alles zonder apenstaartje viel
+     stil op de grond. Dat raakt precies een ding: de tweede stap van het
+     wachtwoordherstel, want die gaat als 'sms:<nummer>' de deur uit. Zonder
+     SMS-kanaal verdween die code dus spoorloos, terwijl het antwoord aan de
+     gebruiker vrolijk `tweestaps: true` meldde. Het herstel was daarmee voor
+     IEDEREEN onmogelijk, en niets in het systeem zei dat.
+
+     Een sms-kanaal maken we hier niet; wat we wel doen is het bericht bewaren
+     zoals elk ander onbestelbaar bericht, in de outbox. Dan is een storing te
+     zien in plaats van te raden, en kan de eigenaar de code desnoods zelf
+     voorlezen tot er een echt kanaal staat. */
+  const isMail = /@/.test(String(to));
+  if (!isMail) { try { toOutbox(to, subject, text); } catch (e) { console.warn('[mail] mislukt:', e.message); } return; }
   if (transporter) {
     transporter.sendMail({ from: FROM, to, subject, text })
       .then(() => console.log(`[mail] verzonden naar ${to}: ${subject}`))

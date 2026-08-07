@@ -63,6 +63,63 @@ module.exports = (kern) => {
   route('twin/installatie/weg', (k, b) => B.twinInstallatieWeg(k, b));
   route('twin/beurt', (k, b) => B.twinBeurt(k, b));
 
+  /* ---- De zes kamers die er als laatste bij kwamen ----
+     Beveiliging, reputatie en dieren waren de drie die op de plattegrond nog als
+     "in aanbouw" stonden; collectie, relaties en reisdek maken drie kamers af
+     die er wel waren maar dun. Alle zes leveren hun datums in bij dezelfde
+     Control Tower; deze routes vullen hem alleen. */
+  route('beveiliging', (k) => B.beveiliging(k));
+  route('beveiliging/post', (k, b) => B.bvPost(k, b));
+  route('beveiliging/post/weg', (k, b) => B.bvPostWeg(k, String(b.id || '')));
+  route('beveiliging/risico', (k, b) => B.bvRisico(k, b));
+  route('beveiliging/risico/weg', (k, b) => B.bvRisicoWeg(k, String(b.id || '')));
+  route('beveiliging/digitaal', (k, b) => B.bvDigitaal(k, b));
+  route('beveiliging/digitaal/weg', (k, b) => B.bvDigitaalWeg(k, String(b.id || '')));
+  // een incident wordt een warroom-zaak; zie kern/bureau/beveiliging.js
+  route('beveiliging/incident', (k, b) => B.bvIncident(k, b));
+
+  route('reputatie', (k) => B.reputatie(k));
+  route('reputatie/optreden', (k, b) => B.rpOptreden(k, b));
+  route('reputatie/optreden/weg', (k, b) => B.rpOptredenWeg(k, String(b.id || '')));
+  route('reputatie/lijn', (k, b) => B.rpLijn(k, b));
+  route('reputatie/lijn/weg', (k, b) => B.rpLijnWeg(k, String(b.id || '')));
+  route('reputatie/woordvoerder', (k, b) => B.rpWoordvoerder(k, b));
+  route('reputatie/woordvoerder/weg', (k, b) => B.rpWoordvoerderWeg(k, String(b.id || '')));
+  route('reputatie/vermelding', (k, b) => B.rpVermelding(k, b));
+  route('reputatie/vermelding/weg', (k, b) => B.rpVermeldingWeg(k, String(b.id || '')));
+
+  route('dieren', (k) => B.dieren(k));
+  route('dieren/dier', (k, b) => B.drDier(k, b));
+  route('dieren/dier/weg', (k, b) => B.drDierWeg(k, String(b.id || '')));
+  route('dieren/document', (k, b) => B.drDocument(k, b));
+  route('dieren/document/weg', (k, b) => B.drDocumentWeg(k, b));
+  route('dieren/zorg', (k, b) => B.drZorg(k, b));
+  route('dieren/zorg/weg', (k, b) => B.drZorgWeg(k, b));
+
+  route('collectie', (k, b) => B.collectie(k, String(b.bezitId || '')));
+  route('collectie/herkomst', (k, b) => B.colHerkomst(k, b));
+  route('collectie/herkomst/weg', (k, b) => B.colHerkomstWeg(k, b));
+  route('collectie/taxatie', (k, b) => B.colTaxatie(k, b));
+  route('collectie/taxatie/weg', (k, b) => B.colTaxatieWeg(k, b));
+  route('collectie/conditie', (k, b) => B.colConditie(k, b));
+  route('collectie/bruikleen', (k, b) => B.colBruikleen(k, b));
+  route('collectie/terug', (k, b) => B.colTerug(k, b));
+
+  route('relaties', (k, b) => B.relaties(k, String(b.relatieId || '')));
+  route('relaties/band', (k, b) => B.relBand(k, b));
+  route('relaties/band/weg', (k, b) => B.relBandWeg(k, b));
+  route('relaties/ontmoeting', (k, b) => B.relOntmoeting(k, b));
+  route('relaties/ontmoeting/weg', (k, b) => B.relOntmoetingWeg(k, b));
+  route('relaties/context', (k, b) => B.relContext(k, b));
+
+  route('reisdek', (k, b) => B.reisdek(k, String(b.reisId || '')));
+  route('reisdek/verstoring', (k, b) => B.rdVerstoring(k, b));
+  route('reisdek/verstoring/weg', (k, b) => B.rdVerstoringWeg(k, b));
+  route('reisdek/gevolg', (k, b) => B.rdGevolg(k, b));
+  route('reisdek/bon', (k, b) => B.rdBon(k, b));
+  route('reisdek/vergeten', (k, b) => B.rdVergeten(k, b));
+  route('reisdek/punten', (k, b) => B.rdPunten(k, b));
+
   // zaken (cases)
   route('zaken', (k) => B.cases(k));
   route('zaak/open', (k, b) => B.caseOpen(k, b));

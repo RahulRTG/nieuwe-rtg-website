@@ -56,10 +56,22 @@ module.exports = ({ db, save, crypto, anthropic, liveCodename, notify, bezitZet 
     beoordeel: delegatieMod.beoordeel, deelopdrachten: orkMod.deelopdrachten, bezitZet });
   const nuMod = require('./nu')({ tower: termijnenMod.tower, cases: casesMod.cases,
     samenvatting: graafMod.samenvatting, graaf: graafMod.graaf });
-  const twinMod = require('./twin')({ db, save, nu, rid, schoon,
-    isDatum: d => /^\d{4}-\d{2}-\d{2}$/.test(String(d || '')) });
+  const twinMod = require('./twin')({ db, save, nu, rid, schoon, isDatum: d => /^\d{4}-\d{2}-\d{2}$/.test(String(d || '')) });
   const briefMod = require('./briefing')({ nuBeeld: nuMod.nuBeeld, tower: termijnenMod.tower,
     cases: casesMod.cases, graaf: graafMod.graaf });
+  /* De zes kamers die er als laatste bij kwamen. Ze delen de helpers en leveren
+     hun datums in bij graaf-bronnen3.js; verder kennen ze elkaar niet. De
+     Security Office is de enige met een lijn naar buiten: een incident wordt
+     een warroom-zaak, dus hij krijgt caseOpen mee. */
+  const isDatum = d => /^\d{4}-\d{2}-\d{2}$/.test(String(d || ''));
+  const getal = (v, max) => Math.max(0, Math.min(max || 1e11, Math.round(Number(v) || 0)));
+  const zes = { db, save, nu, rid, schoon, isDatum, getal };
+  const bvMod = require('./beveiliging')(Object.assign({}, zes, { caseOpen: casesMod.caseOpen }));
+  const rpMod = require('./reputatie')(zes);
+  const drMod = require('./dieren')(zes);
+  const colMod = require('./collectie')(zes);
+  const relMod = require('./relaties')(zes);
+  const rdMod = require('./reisdek')(zes);
 
   const aiMod = require('./ai')({ anthropic, schoon, nuBeeld: nuMod.nuBeeld,
     graaf: graafMod.graaf, delegatie: delegatieMod.delegatie });
@@ -102,40 +114,13 @@ module.exports = ({ db, save, crypto, anthropic, liveCodename, notify, bezitZet 
 
      De route-module doet er `const { ... } = kern.bureau;` mee en merkt verder
      niets. */
-  return {
-    bureau: {
-      overzicht: bureauOverzicht, ai: bureauAI,
-      nu: nuMod.nuBeeld, knoop: nuMod.knoopDetail,
-      tower: termijnenMod.tower, termijnen: termijnenMod.termijnenAlle,
-      graaf: graafMod.graafVoor, graafSamenvatting: graafMod.samenvatting,
-      // alleen voor de toets; zie de staart van ./graaf.js
-      knoopFabriek: graafMod.knoop,
-      delegatie: delegatieMod.delegatie, delegatieZet: delegatieMod.delegatieZet,
-      beoordeel: delegatieMod.beoordeel,
-      kamers: kamersMod.kamers,
-      raakvlak: orkMod.raakvlak, briefing: briefMod.bureauBriefing,
-      twin: twinMod.twin, twinRuimte: twinMod.twinRuimte, twinRuimteWeg: twinMod.twinRuimteWeg,
-      twinInstallatie: twinMod.twinInstallatie, twinInstallatieWeg: twinMod.twinInstallatieWeg,
-      twinBeurt: twinMod.twinBeurt,
-      cases: casesMod.cases, caseOpen: casesMod.caseOpen,
-      caseBeslis: casesMod.caseBeslis, caseIntrek: casesMod.caseIntrek,
-      KAMERS: kamersMod.BUREAU_KAMERS,
-      DOMEINEN: delegatieMod.DELEGATIE_DOMEINEN,
-      NIVEAUS: delegatieMod.DELEGATIE_NIVEAUS,
-      CASE_SOORTEN: casesMod.CASE_SOORTEN
-    },
-    /* De KANTOOR-kant staat apart, en dat is geen indeling maar een grens.
-
-       Zat hij in `kern.bureau`, dan had routes/office/ toegang tot de graaf, het
-       mandaat en de zaken van elk lid -- en dan is "het bureau ziet geen
-       besloten kamers" een afspraak in plaats van een muur. Nu krijgt het
-       kantoor precies twee functies: de wachtrij zien, en er een stap in zetten.
-       Alles wat het niet nodig heeft, kan het niet bereiken.
-
-       Dat het hierdoor twee kern-namen zijn in plaats van een, is de prijs. Die
-       staat als bewuste verruiming in NORM.json. */
-    bureauBalie: {
-      desk: casesMod.bureauDesk, voortgang: casesMod.bureauVoortgang
-    }
-  };
+  /* De montagelijst staat in ./uitgang.js: vierenzeventig onderdelen onder twee
+     namen. Apart omdat het configuratie is en geen gedrag -- en omdat dit bestand
+     er anders over de tien KB gaat. */
+  return require('./uitgang')({
+    overzicht: bureauOverzicht, ai: bureauAI,
+    nu: nuMod, termijnen: termijnenMod, graaf: graafMod, delegatie: delegatieMod,
+    kamers: kamersMod, ork: orkMod, brief: briefMod, twin: twinMod, cases: casesMod,
+    bv: bvMod, rp: rpMod, dr: drMod, col: colMod, rel: relMod, rd: rdMod
+  });
 };

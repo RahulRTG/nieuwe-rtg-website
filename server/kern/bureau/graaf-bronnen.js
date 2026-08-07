@@ -162,4 +162,4 @@ const DEEL1 = [
 
 /* De volledige lijst: deze helft plus de andere. graaf.js kent alleen ALLE en
    merkt van de knip niets. */
-module.exports = { ALLE: DEEL1.concat(require('./graaf-bronnen2')) };
+module.exports = { ALLE: DEEL1.concat(require('./graaf-bronnen2'), require('./graaf-bronnen3')) };

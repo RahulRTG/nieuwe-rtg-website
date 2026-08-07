@@ -132,7 +132,7 @@ const MND=['','jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov',
 function datum(d){ if(!d) return ''; const [y,m,dd]=d.split('-'); return Number(dd)+' '+MND[Number(m)]+' '+y; }
 
 let tab='nu';
-const TABS=[['nu','Nu'],['vooruit','Vooruit'],['zaken','Zaken'],['kantoor','Kantoor'],['woning','Woning'],['mandaat','Mandaat'],['graaf','Overzicht']];
+const TABS=[['nu','Nu'],['vooruit','Vooruit'],['zaken','Zaken'],['kantoor','Kantoor'],['woning','Woning'],['kring','Kring'],['bezit','Bezit'],['reis','Reis'],['veilig','Veilig'],['mandaat','Mandaat'],['graaf','Overzicht']];
 
 /* Meenemen (shared/uitvoer.js): elk paneel meldt zijn eigen lijst aan, zodat wat
    u exporteert hetzelfde is als wat u ziet. De besloten kamers (gezondheid,
@@ -153,7 +153,7 @@ function teken(){
   $('#main').innerHTML = '<div class="chips" id="chips"></div><div id="paneel"><div class="leeg">Laden…</div></div>';
   $('#chips').innerHTML = TABS.map(([k,l])=>'<button class="chip'+(k===tab?' aan':'')+'" data-t="'+k+'">'+l+'</button>').join('');
   $('#chips').querySelectorAll('.chip').forEach(b=> b.onclick=()=>{ tab=b.dataset.t; teken(); });
-  ({nu:vNu, vooruit:vVooruit, zaken:vZaken, kantoor:vKantoor, woning:vWoning, mandaat:vMandaat, graaf:vGraaf}[tab])();
+  ({nu:vNu, vooruit:vVooruit, zaken:vZaken, kantoor:vKantoor, woning:vWoning, kring:vKring, bezit:vBezit, reis:vReis, veilig:vVeilig, mandaat:vMandaat, graaf:vGraaf}[tab])();
 }
 const P = h => { $('#paneel').innerHTML = h; };
 const fout = e => P('<div class="leeg">'+esc(e.message)+'</div>');
@@ -399,6 +399,222 @@ async function vWoning(){
     try{ await api('twin/beurt', {huisId:twinHuis, id:b.dataset.i, wat, volgende:vlg}); vWoning(); }
     catch(e){ meld(e.message); }
   });
+}
+
+/* ===================== KRING -- relaties met geheugen ========================
+   Wie bij wie hoort, wanneer u elkaar zag, en wat u beter niet aanroert. Dat
+   laatste staat er met een waarschuwing bij: het is een hoffelijkheid, geen
+   dossier. */
+let kringId='';
+async function vKring(){
+  let d; try{ d = await api('relaties', {relatieId:kringId}); }catch(e){ return fout(e); }
+  if(!d.relaties.length) return P('<div class="kaart"><h2>Uw kring</h2><div class="leeg">'
+    + 'U heeft nog geen relaties vastgelegd. Dat doet u in Attenties; hier komt daarna de kring eromheen.</div>'
+    + '<div class="mt-m"><a class="knop stil" href="/apps/attenties.html">Naar Attenties</a></div></div>');
+  let h = '<div class="kaart"><h2>Uw kring</h2><div class="sub">' + d.relaties.length + ' relaties</div>'
+    + d.relaties.map(r=>'<div class="item"><div class="body"><b>'+esc(r.naam)+'</b><div class="meta">'
+      + [r.band, r.banden? r.banden+' banden':'', r.laatstGezien? 'laatst gezien '+datum(r.laatstGezien):'']
+        .filter(Boolean).map(esc).join(' · ')
+      + (r.letOp? ' · <span class="goud">let op</span>':'')
+      + '</div></div><button class="knop klein stil js-rel" data-r="'+esc(r.id)+'">Open</button></div>').join('')
+    + '</div>';
+  if(d.gekozen){
+    const g = d.gekozen;
+    h += '<div class="kaart let"><h2>'+esc(g.naam)+'</h2>'
+      + (g.kring.length ? '<div class="lbl">Kring</div>' + g.kring.map(b=>'<div class="meta">'+esc(b.naam)+' · '+esc(b.wat)+'</div>').join('') : '')
+      + '<div class="rij mt-s"><div><label class="lbl">Band met</label><select class="veld" id="bR">'
+      + d.relaties.filter(r=>r.id!==g.id).map(r=>'<option value="'+esc(r.id)+'">'+esc(r.naam)+'</option>').join('')
+      + '</select></div><div><label class="lbl">Wat</label><select class="veld" id="bW">'
+      + d.banden.map(b=>'<option value="'+esc(b)+'">'+esc(b)+'</option>').join('') + '</select></div>'
+      + '<button class="knop klein" id="bK">Leggen</button></div>'
+      + '<div class="lbl mt-m">Context</div>'
+      + '<div class="rij"><div><input class="veld" id="cW" placeholder="Werk" value="'+esc((g.context||{}).werk||'')+'"></div>'
+      + '<div><input class="veld" id="cO" placeholder="Goede onderwerpen" value="'+esc((g.context||{}).onderwerpen||'')+'"></div></div>'
+      + '<div class="rij mt-s"><div><input class="veld" id="cN" placeholder="Liever niet over…" value="'+esc((g.context||{}).nooitOver||'')+'"></div>'
+      + '<button class="knop klein" id="cK">Vastleggen</button></div>'
+      + '<div class="meta fijner">Dit is een hoffelijkheid voor wie namens u praat, geen dossier. Het blijft bij u en uw Rechterhand.</div>'
+      + '<div class="lbl mt-m">Ontmoetingen</div>'
+      + (g.ontmoetingen.length ? g.ontmoetingen.map(o=>'<div class="meta">'+esc(datum(o.op))+(o.waar?' · '+esc(o.waar):'')+'<br><span class="zacht">'+esc(o.wat)+'</span></div>').join('') : '<div class="leeg">Nog niets genoteerd.</div>')
+      + '<div class="rij mt-s"><div><input class="veld" id="oWaar" placeholder="Waar"></div>'
+      + '<div><input class="veld" id="oWat" placeholder="Waar ging het over"></div>'
+      + '<button class="knop klein" id="oK">Noteren</button></div></div>';
+  }
+  P(h);
+  zetUit('Kring', ['Naam','Band','Banden','Laatst gezien'], d.relaties.map(r=>[r.naam,r.band,r.banden,r.laatstGezien]));
+  $('#paneel').querySelectorAll('.js-rel').forEach(b=> b.onclick=()=>{ kringId=b.dataset.r; vKring(); });
+  const bind=(id,fn)=>{ const e=$('#'+id); if(e) e.onclick=fn; };
+  bind('bK', async()=>{ try{ await api('relaties/band',{relatieId:kringId, naarId:$('#bR').value, wat:$('#bW').value}); vKring(); }catch(e){ meld(e.message); } });
+  bind('cK', async()=>{ try{ await api('relaties/context',{relatieId:kringId, werk:$('#cW').value, onderwerpen:$('#cO').value, nooitOver:$('#cN').value}); meld('Vastgelegd.'); vKring(); }catch(e){ meld(e.message); } });
+  bind('oK', async()=>{ const wat=$('#oWat').value.trim(); if(!wat) return meld('Waar ging het over?');
+    try{ await api('relaties/ontmoeting',{relatieId:kringId, waar:$('#oWaar').value, wat}); vKring(); }catch(e){ meld(e.message); } });
+}
+
+/* ===================== BEZIT -- het collectiedossier ==========================
+   Herkomst, taxatiereeks, conditie, standplaats en bruikleen. Alleen voor kunst,
+   horloges en sieraden uit uw register: die drie zijn het waard. */
+let colId='';
+async function vBezit(){
+  let d; try{ d = await api('collectie', {bezitId:colId}); }catch(e){ return fout(e); }
+  if(!d.stukken.length) return P('<div class="kaart"><h2>Uw collectie</h2><div class="leeg">'
+    + 'Er staat nog geen kunst, horloge of sieraad in uw register.</div></div>');
+  let h = '<div class="kaart"><h2>Uw collectie</h2><div class="sub">'+d.stukken.length+' stukken</div>'
+    + d.stukken.map(x=>'<div class="item"><div class="body"><b>'+esc(x.naam)+'</b><div class="meta">'
+      + [x.soort, x.waarde? euro(x.waarde*100):'', x.taxaties+' taxaties', x.herkomst+' in de keten', x.staat, x.waar]
+        .filter(Boolean).map(esc).join(' · ')
+      + (x.uitgeleend? ' · <span class="goud">uitgeleend</span>':'')
+      + '</div></div><button class="knop klein stil js-col" data-c="'+esc(x.id)+'">Open</button></div>').join('') + '</div>';
+  if(d.gekozen){
+    const g=d.gekozen;
+    h += '<div class="kaart let"><h2>'+esc(g.naam)+'</h2>'
+      + '<div class="lbl">Herkomst</div>'
+      + (g.herkomst.length ? g.herkomst.map(x=>'<div class="meta">'+esc(x.op? datum(x.op):'?')+' · '+esc(x.van||'?')+' → '+esc(x.naar)+(x.hoe?' ('+esc(x.hoe)+')':'')+'</div>').join('') : '<div class="leeg">Geen keten vastgelegd.</div>')
+      + '<div class="rij mt-s"><div><input class="veld" id="hV" placeholder="Van"></div><div><input class="veld" id="hN" placeholder="Naar"></div>'
+      + '<div><input class="veld" id="hD" type="date"></div><button class="knop klein" id="hK">Erbij</button></div>'
+      + '<div class="lbl mt-m">Taxaties</div>'
+      + (g.taxaties.length ? g.taxaties.map(t=>'<div class="meta">'+esc(datum(t.op))+' · '+euro(t.bedrag*100)+' · '+esc(t.door)+(t.volgende?' · volgende '+esc(datum(t.volgende)):'')+'</div>').join('') : '<div class="leeg">Nog niet getaxeerd.</div>')
+      + '<div class="rij mt-s"><div><input class="veld" id="tB" type="number" placeholder="Bedrag"></div>'
+      + '<div><input class="veld" id="tD" placeholder="Door wie"></div>'
+      + '<div><label class="lbl">Volgende</label><input class="veld" id="tV" type="date"></div>'
+      + '<button class="knop klein" id="tK">Vastleggen</button></div>'
+      + '<div class="lbl mt-m">Bruikleen</div>'
+      + (g.bruikleen.length ? g.bruikleen.map(b=>'<div class="item"><div class="body"><b>'+esc(b.aan)+'</b><div class="meta">'
+          + esc(datum(b.van))+' tot '+esc(datum(b.tot))+(b.terug? ' · terug op '+esc(datum(b.terug)) : ' · <span class="goud">nog uit</span>')+'</div></div>'
+          + (b.terug? '' : '<button class="knop klein stil js-terug" data-b="'+esc(b.id)+'">Terug</button>')+'</div>').join('') : '<div class="leeg">Niets uitgeleend.</div>')
+      + '<div class="rij mt-s"><div><input class="veld" id="lA" placeholder="Aan wie"></div>'
+      + '<div><label class="lbl">Tot</label><input class="veld" id="lT" type="date"></div>'
+      + '<button class="knop klein" id="lK">Uitlenen</button></div></div>';
+  }
+  P(h);
+  zetUit('Bezit', ['Naam','Soort','Waarde','Taxaties','Staat','Waar'], d.stukken.map(x=>[x.naam,x.soort,x.waarde,x.taxaties,x.staat,x.waar]));
+  $('#paneel').querySelectorAll('.js-col').forEach(b=> b.onclick=()=>{ colId=b.dataset.c; vBezit(); });
+  const bind=(id,fn)=>{ const e=$('#'+id); if(e) e.onclick=fn; };
+  bind('hK', async()=>{ const naar=$('#hN').value.trim(); if(!naar) return meld('Naar wie ging het?');
+    try{ await api('collectie/herkomst',{bezitId:colId, van:$('#hV').value, naar, op:$('#hD').value}); vBezit(); }catch(e){ meld(e.message); } });
+  bind('tK', async()=>{ try{ await api('collectie/taxatie',{bezitId:colId, bedrag:Number($('#tB').value)||0, door:$('#tD').value, volgende:$('#tV').value}); vBezit(); }catch(e){ meld(e.message); } });
+  bind('lK', async()=>{ try{ await api('collectie/bruikleen',{bezitId:colId, aan:$('#lA').value, tot:$('#lT').value}); vBezit(); }catch(e){ meld(e.message); } });
+  $('#paneel').querySelectorAll('.js-terug').forEach(b=> b.onclick=async()=>{
+    try{ await api('collectie/terug',{bezitId:colId, id:b.dataset.b}); meld('Terug genoteerd.'); vBezit(); }catch(e){ meld(e.message); } });
+}
+
+/* ===================== REIS -- verstoringen en nazorg ========================= */
+let reisId='';
+async function vReis(){
+  let d; try{ d = await api('reisdek', {reisId}); }catch(e){ return fout(e); }
+  if(!d.reizen.length) return P('<div class="kaart"><h2>Uw reizen</h2><div class="leeg">'
+    + 'Er staat nog geen reis in uw reisboek.</div><div class="mt-m"><a class="knop stil" href="/apps/reisboek.html">Naar het Reisboek</a></div></div>');
+  let h = '<div class="kaart"><h2>Uw reizen</h2><div class="niv">'
+    + d.reizen.map(r=>'<button class="js-reis'+(reisId===r.id?' aan':'')+'" data-r="'+esc(r.id)+'">'+esc(r.naam)
+      + (r.openGevolgen? ' · '+r.openGevolgen:'')+'</button>').join('') + '</div></div>';
+  if(d.gekozen){
+    const g=d.gekozen;
+    h += '<div class="kaart"><h2>Verstoringen</h2>'
+      + (g.verstoringen.length ? g.verstoringen.map(v=>'<div class="item"><div class="body"><b>'+esc(v.wat)+'</b>'
+          + '<div class="meta">'+(v.minuten? v.minuten+' minuten · ':'')+esc(String(v.op).slice(0,10))+'</div>'
+          + (v.gevolgen||[]).map(x=>'<div class="meta">· '+esc(x.wat)+' · <span class="'+(x.stand==='geregeld'?'goud':'zacht')+'">'+esc(x.stand)+'</span>'
+              + (x.stand==='genoteerd'? ' <button class="knop klein js-gev" data-v="'+esc(v.id)+'" data-g="'+esc(x.id)+'">geregeld</button>':'')+'</div>').join('')
+          + '</div></div>').join('') : '<div class="leeg">Geen verstoringen. Dat is het doel.</div>')
+      + '<div class="rij mt-s"><div><input class="veld" id="vW" placeholder="Wat ging er mis"></div>'
+      + '<div><input class="veld" id="vM" type="number" placeholder="Minuten"></div>'
+      + '<div><input class="veld" id="vG" placeholder="Gevolgen, met komma\'s"></div>'
+      + '<button class="knop klein" id="vK">Noteren</button></div></div>';
+    h += '<div class="kaart"><h2>Nazorg</h2><div class="sub">Bonnen ' + euro(g.bonTotaal) + '</div>'
+      + '<div class="lbl">Blijven liggen</div>'
+      + ((g.nazorg.vergeten||[]).length ? g.nazorg.vergeten.map(v=>'<div class="meta">'+esc(v.wat)+(v.waar?' · '+esc(v.waar):'')
+          + ' · '+esc(v.stand)+(v.terugOp?' · '+esc(datum(v.terugOp)):'')
+          + (v.stand!=='terug'? ' <button class="knop klein js-terugv" data-v="'+esc(v.id)+'" data-w="'+esc(v.wat)+'">terug</button>':'')+'</div>').join('') : '<div class="leeg">Niets kwijt.</div>')
+      + '<div class="rij mt-s"><div><input class="veld" id="kW" placeholder="Wat"></div><div><input class="veld" id="kR" placeholder="Waar"></div>'
+      + '<div><label class="lbl">Er weer achteraan</label><input class="veld" id="kD" type="date"></div>'
+      + '<button class="knop klein" id="kK">Noteren</button></div>'
+      + '<div class="lbl mt-m">Bonnen</div>'
+      + '<div class="rij"><div><input class="veld" id="nW" placeholder="Waarvoor"></div>'
+      + '<div><input class="veld" id="nB" type="number" placeholder="Bedrag"></div>'
+      + '<button class="knop klein" id="nK">Erbij</button></div></div>';
+  }
+  P(h);
+  zetUit('Reis', ['Reis','Verstoringen','Open gevolgen','Kwijt','Bonnen'], d.reizen.map(r=>[r.naam,r.verstoringen,r.openGevolgen,r.kwijt,r.bonnen]));
+  $('#paneel').querySelectorAll('.js-reis').forEach(b=> b.onclick=()=>{ reisId=b.dataset.r; vReis(); });
+  const bind=(id,fn)=>{ const e=$('#'+id); if(e) e.onclick=fn; };
+  bind('vK', async()=>{ const wat=$('#vW').value.trim(); if(!wat) return meld('Wat ging er mis?');
+    try{ await api('reisdek/verstoring',{reisId, wat, minuten:Number($('#vM').value)||0,
+      gevolgen:$('#vG').value.split(',').map(x=>x.trim()).filter(Boolean)}); vReis(); }catch(e){ meld(e.message); } });
+  bind('kK', async()=>{ const wat=$('#kW').value.trim(); if(!wat) return meld('Wat is er blijven liggen?');
+    try{ await api('reisdek/vergeten',{reisId, wat, waar:$('#kR').value, terugOp:$('#kD').value}); vReis(); }catch(e){ meld(e.message); } });
+  bind('nK', async()=>{ try{ await api('reisdek/bon',{reisId, wat:$('#nW').value, bedragCenten:Math.round((Number($('#nB').value)||0)*100)}); vReis(); }catch(e){ meld(e.message); } });
+  $('#paneel').querySelectorAll('.js-gev').forEach(b=> b.onclick=async()=>{
+    try{ await api('reisdek/gevolg',{reisId, verstoringId:b.dataset.v, id:b.dataset.g, stand:'geregeld'}); vReis(); }catch(e){ meld(e.message); } });
+  $('#paneel').querySelectorAll('.js-terugv').forEach(b=> b.onclick=async()=>{
+    try{ await api('reisdek/vergeten',{reisId, id:b.dataset.v, wat:b.dataset.w, stand:'terug'}); vReis(); }catch(e){ meld(e.message); } });
+}
+
+/* ============ VEILIG -- beveiliging, reputatie en de dieren ==================
+   Drie kamers op een tabblad omdat ze alle drie klein beginnen en alle drie over
+   hetzelfde gaan: wat er klaarstaat voordat er iets gebeurt. */
+async function vVeilig(){
+  let b, r, d;
+  try{ [b, r, d] = await Promise.all([api('beveiliging'), api('reputatie'), api('dieren')]); }
+  catch(e){ return fout(e); }
+  let h = '<div class="kaart"><h2>Beveiliging</h2><div class="sub">'+esc(b.bron)+'</div>'
+    + (b.posten.length ? b.posten.map(p=>'<div class="meta">'+esc(p.waar)+' · '+esc(p.soort)
+        + (p.contractTot? ' · contract tot '+esc(datum(p.contractTot)):'')
+        + (p.keuringOp? ' · keuring '+esc(datum(p.keuringOp)):'')+'</div>').join('') : '<div class="leeg">Nog geen posten vastgelegd.</div>')
+    + '<div class="rij mt-s"><div><input class="veld" id="pW" placeholder="Waar (Villa, hal)"></div>'
+    + '<div><label class="lbl">Keuring</label><input class="veld" id="pK" type="date"></div>'
+    + '<button class="knop klein" id="pB">Erbij</button></div>'
+    + '<div class="lbl mt-m">Reisrisico</div>'
+    + (b.reisrisico.length ? b.reisrisico.map(x=>'<div class="meta">'+esc(x.land)+' · '+esc(x.niveau)+' · geldig tot '+esc(datum(x.tot))+'</div>').join('') : '<div class="leeg">Niets vastgelegd.</div>')
+    + '<div class="rij mt-s"><div><input class="veld" id="rL" placeholder="Bestemming"></div>'
+    + '<div><select class="veld" id="rN">'+b.niveaus.map(n=>'<option>'+n+'</option>').join('')+'</select></div>'
+    + '<div><label class="lbl">Geldig tot</label><input class="veld" id="rT" type="date"></div>'
+    + '<button class="knop klein" id="rB">Vastleggen</button></div>'
+    + '<div class="lbl mt-m">Incident melden</div>'
+    + '<div class="rij"><div><input class="veld" id="iW" placeholder="Wat is er gebeurd"></div>'
+    + '<button class="knop klein" id="iB">Melden</button></div>'
+    + '<div class="meta fijner">Een melding wordt meteen een zaak met een incidentteam.</div></div>';
+
+  h += '<div class="kaart"><h2>Reputatie</h2><div class="sub">'+esc(r.bron)+'</div>'
+    + (r.optredens.length ? r.optredens.map(o=>'<div class="meta">'+esc(o.wat)+' · '+esc(o.soort)
+        + (o.datum? ' · '+esc(datum(o.datum)):'') + (o.woordvoerder? ' · '+esc(o.woordvoerder):'')
+        + (o.embargoTot? ' · <span class="goud">embargo tot '+esc(datum(o.embargoTot))+'</span>':'')+'</div>').join('') : '<div class="leeg">Niets gepland.</div>')
+    + '<div class="rij mt-s"><div><input class="veld" id="oW" placeholder="Waarover"></div>'
+    + '<div><label class="lbl">Datum</label><input class="veld" id="oD" type="date"></div>'
+    + '<div><label class="lbl">Embargo tot</label><input class="veld" id="oE" type="date"></div>'
+    + '<button class="knop klein" id="oB">Erbij</button></div>'
+    + '<div class="lbl mt-m">Lijnen</div>'
+    + (r.lijnen.length ? r.lijnen.map(l=>'<div class="meta"><b>'+esc(l.onderwerp)+'</b><br>'+esc(l.lijn)
+        + (l.nooit? '<br><span class="rood">Niet over: '+esc(l.nooit)+'</span>':'')+'</div>').join('') : '<div class="leeg">Nog geen lijn afgesproken.</div>')
+    + '<div class="rij mt-s"><div><input class="veld" id="lO" placeholder="Onderwerp"></div>'
+    + '<div><input class="veld" id="lL" placeholder="Wat u erover zegt"></div>'
+    + '<div><input class="veld" id="lN" placeholder="Waar u het niet over hebt"></div>'
+    + '<button class="knop klein" id="lB">Vastleggen</button></div></div>';
+
+  h += '<div class="kaart"><h2>Dieren</h2>'
+    + (d.zonderOppas ? '<div class="sub rood">'+d.zonderOppas+' zonder oppas vastgelegd.</div>' : '<div class="sub">'+d.dieren.length+' dieren</div>')
+    + (d.dieren.length ? d.dieren.map(x=>'<div class="item"><div class="body"><b>'+esc(x.naam)+'</b><div class="meta">'
+        + [x.soort, x.dierenarts, x.verzekerdTot? 'verzekerd tot '+datum(x.verzekerdTot):'', x.volgendeZorg? 'zorg '+datum(x.volgendeZorg):'', x.oppas? 'oppas: '+x.oppas : 'geen oppas']
+          .filter(Boolean).map(esc).join(' · ') + '</div></div>'
+        + '<button class="knop klein stil js-zorg" data-d="'+esc(x.id)+'">Zorg</button></div>').join('') : '<div class="leeg">Nog geen dieren vastgelegd.</div>')
+    + '<div class="rij mt-s"><div><input class="veld" id="dN" placeholder="Naam"></div>'
+    + '<div><select class="veld" id="dS">'+d.soorten.map(x=>'<option>'+x+'</option>').join('')+'</select></div>'
+    + '<div><input class="veld" id="dO" placeholder="Oppas"></div>'
+    + '<button class="knop klein" id="dB">Erbij</button></div></div>';
+  P(h);
+  zetUit('Veilig', ['Soort','Wat','Datum'],
+    b.posten.map(p=>['post',p.waar,p.keuringOp])
+      .concat(b.reisrisico.map(x=>['risico',x.land+' ('+x.niveau+')',x.tot]))
+      .concat(r.optredens.map(o=>['optreden',o.wat,o.datum]))
+      .concat(d.dieren.map(x=>['dier',x.naam,x.verzekerdTot])));
+  const bind=(id,fn)=>{ const e=$('#'+id); if(e) e.onclick=fn; };
+  bind('pB', async()=>{ try{ await api('beveiliging/post',{waar:$('#pW').value, keuringOp:$('#pK').value}); vVeilig(); }catch(e){ meld(e.message); } });
+  bind('rB', async()=>{ try{ await api('beveiliging/risico',{land:$('#rL').value, niveau:$('#rN').value, tot:$('#rT').value}); vVeilig(); }catch(e){ meld(e.message); } });
+  bind('iB', async()=>{ const wat=$('#iW').value.trim(); if(!wat) return meld('Wat is er gebeurd?');
+    try{ await api('beveiliging/incident',{wat}); meld('Gemeld. Er staat een team op.'); vVeilig(); }catch(e){ meld(e.message); } });
+  bind('oB', async()=>{ try{ await api('reputatie/optreden',{wat:$('#oW').value, datum:$('#oD').value, embargoTot:$('#oE').value}); vVeilig(); }catch(e){ meld(e.message); } });
+  bind('lB', async()=>{ try{ await api('reputatie/lijn',{onderwerp:$('#lO').value, lijn:$('#lL').value, nooit:$('#lN').value}); vVeilig(); }catch(e){ meld(e.message); } });
+  bind('dB', async()=>{ try{ await api('dieren/dier',{naam:$('#dN').value, soort:$('#dS').value, oppas:$('#dO').value}); vVeilig(); }catch(e){ meld(e.message); } });
+  $('#paneel').querySelectorAll('.js-zorg').forEach(b2=> b2.onclick=async()=>{
+    const wat=prompt('Wat is er gedaan?'); if(!wat) return;
+    const vlg=prompt('Volgende keer (jjjj-mm-dd, mag leeg)')||'';
+    try{ await api('dieren/zorg',{id:b2.dataset.d, wat, volgende:vlg}); vVeilig(); }catch(e){ meld(e.message); } });
 }
 
 /* ======================== MANDAAT -- de delegatie-engine =======================

@@ -17,6 +17,9 @@
 
    Afgesplitst uit webmaker.js toen die de 10 KB passeerde. */
 module.exports = function maakWebmakerFotos({ store, save, media }) {
+  // deze module heeft zijn EIGEN nogInGebruik (hieronder) en kijkt in store(),
+  // niet in db. Hij geeft dus geen db mee: mediaopruim wist dan niets in plaats
+  // van te veel, en de controle die hier telt staat een paar regels verderop.
   const opruim = require('./mediaopruim')(media);
   const FOTO_MAX = 24;        // hoeveel eigen foto's een lid in zijn bibliotheek houdt
 

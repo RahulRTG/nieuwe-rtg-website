@@ -25,7 +25,7 @@ module.exports = ({ db, save, media, liveCodename, codenaamVan, crypto, broadcas
   /* Valt een post uit het venster, of haalt de auteur hem weg, dan gaan zijn
      foto's mee. Dat gebeurde niet: de verwijzing verdween, het bestand bleef --
      zie kern/mediaopruim.js voor wat dat op drie plekken tegelijk aanrichtte. */
-  const opruim = require('../mediaopruim')(media);
+  const opruim = require('../mediaopruim')(media, db);
   const MAX_POSTS = Number(process.env.SALON_MAX || 2000);
   const MAX_MEDIA = 6;              // foto's per post (de karrousel)
   const PAGINA = 20;                // posts per bladzijde

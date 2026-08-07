@@ -45,7 +45,19 @@ module.exports = function maakBackup(deps) {
      precies hoe grootboek.db erbuiten kon vallen. Vandaar een. */
   const BACKUP_BESTANDEN = ['db.json', 'rtg.db', 'rtg.db-wal', 'store.db', 'store.db-wal',
     'grootboek.db', 'grootboek.db-wal', 'papieren.json'];
-  const BACKUP_MAPPEN = ['archief'];
+  /* DE BESTANDSOPSLAG HOORT ER OOK BIJ.
+
+     Hier stond alleen 'archief'. De database ging mee, de BESTANDEN niet -- en
+     de verwijzingen ernaar wel. Een teruggezette backup gaf dus een systeem dat
+     naar bestanden wijst die er niet zijn: paspoortscans, media in de Salon,
+     gedeelde bestanden, en de outbox met alles wat nog niet bezorgd was.
+
+     Dit is dezelfde soort fout als de sleutels die niet in de backup zaten:
+     bewaren wat naar iets verwijst, zonder te bewaren waarnaar het verwijst.
+
+     'uploads' draagt ook de identiteitsscans, dus deze mappen staan met dezelfde
+     rechten (0700/0600) in de backup als daarbuiten -- zie kopieerMap. */
+  const BACKUP_MAPPEN = ['archief', 'uploads', 'media', 'bestanden', 'outbox'];
 
   /* Een map kopieren, plat en zonder verrassingen: alleen gewone bestanden, een
      niveau diep per submap. Het archief is een map met maandbestanden, geen boom
@@ -93,8 +105,22 @@ module.exports = function maakBackup(deps) {
         if (fs.existsSync(from)) { const doel = path.join(dir, f); fs.copyFileSync(from, doel); try { fs.chmodSync(doel, 0o600); } catch (e) {} }
       }
       for (const m of BACKUP_MAPPEN) kopieerMap(path.join(DATA_DIR, m), path.join(dir, m));
-      // hooguit 14 dagen bewaren
-      const days = fs.readdirSync(BACKUP_DIR).sort();
+      /* Hooguit 14 dagen bewaren -- en dan ook echt alleen DAGEN.
+
+         Hier stond `fs.readdirSync(BACKUP_DIR).sort()` over ALLES wat er lag.
+         Ligt er iets anders in die map (een los bestand, een handmatige kopie,
+         een .DS_Store), dan telde dat mee als "dag". Erger: zulke namen sorteren
+         NA de datummappen, dus `slice(0, lengte - 14)` sneed er precies de
+         oudste ECHTE backups af terwijl de rommel bleef staan. Hoe meer troep,
+         hoe minder backups -- en niets zei dat.
+
+         Een datummap herkennen we aan zijn vorm, en we kijken of het een map is.
+         Wat daar niet aan voldoet telt niet mee en wordt ook niet weggegooid:
+         het is niet van ons. */
+      const isDag = (n) => /^\d{4}-\d{2}-\d{2}$/.test(n);
+      const days = fs.readdirSync(BACKUP_DIR)
+        .filter(n => isDag(n) && (() => { try { return fs.statSync(path.join(BACKUP_DIR, n)).isDirectory(); } catch (e) { return false; } })())
+        .sort();
       for (const d of days.slice(0, Math.max(0, days.length - 14)))
         fs.rmSync(path.join(BACKUP_DIR, d), { recursive: true, force: true });
       // extra kopie naar een tweede schijf/mount (RTG_BACKUP_DIR), zodat een

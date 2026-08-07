@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 675 bestanden en 3762 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 676 bestanden en 3765 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 675 |
-| losse beweringen (`test(...)`) | 3762 |
+| toetsbestanden | 676 |
+| losse beweringen (`test(...)`) | 3765 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 517 |
 | **overleefd**: geen mutatie kreeg hem rood | 12 |
 | niet te meten (al rood, geen module gevonden, ...) | 16 |
 | alleen in de kop *genoemd*, nog niet gemeten | 22 |
-| niets van beide | 108 |
+| niets van beide | 109 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-599 bestanden, 3630 beweringen.
+600 bestanden, 3633 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -238,6 +238,7 @@ toets omvalt.
 | `imap.test.js` | 10 | gezakt op `!==->===` | IMAP: een externe mailclient die meeleest met een RTG-postvak. DEZE TOETS PRAAT HET PROTOCOL, ZONDER SOCKET. |
 | `inkoopketen.test.js` | 5 | gezakt op `liegpoort /api/` | DE KETEN VAN BESTELLEN NAAR KEUKEN -- 5 endpoints uit de supplier-groep. groothandel/product, groothandel/voorraad, inkoop/annuleer, inkoop/ai-bevestig en mep/daily/done stonden als nooit aangeroepen in de... |
 | `inzagelog.test.js` | 10 | gezakt op `===->!==` | Het inzagejournaal: wie keek er in wiens identiteitskluis. De twee regels die dit journaal bruikbaar EN veilig maken staan hier als test, want ze zijn allebei makkelijk stuk te maken zonder dat je het merkt: 1. |
+| `journaalschrijf.test.js` | 3 | -- | EEN LOGBOEK MAG DE SERVER NIET TRAAG MAKEN. WAT ER MIS WAS, en het was mijn eigen code van dezelfde dag. |
 | `journalistiek-redactie.test.js` | 11 | gezakt op `liegpoort /api/` | DE REDACTIE VAN EEN NIEUWSBEDRIJF -- 13 endpoints achter de leverancier-inlog. Deze dertien wees de waargenomen dekkingsmeting aan als nooit aangeroepen: niet een enkele test raakte /api/supplier/redactie/*. |
 | `kaart.test.js` | 8 | gezakt op `===->!==` | De kaart-uitwijk (public/shared/kaart.js): de pure parseGeo() ontleedt de geo:-URI's die het huis gebruikt tot iets toonbaars. Getoetst op beide vormen (echte coördinaten en het adres-alleen 0,0?q=...), op de... |
 | `kantoordienst.test.js` | 3 | gezakt op `liegpoort /api/` | HET RTG-KANTOOR OP EEN WERKDAG: AANMELDEN, INWERKEN, EN DE NOODKNOP. DRIE DINGEN DIE HIER SAMENKOMEN 1. |

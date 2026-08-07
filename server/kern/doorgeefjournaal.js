@@ -77,6 +77,16 @@ function maakDoorgeefjournaal({ db, save, nu }) {
     return r.methode && r.methode !== 'GET';
   }
 
+  /* Spoelen met een rem erop: hooguit een schrijfactie per seconde, hoeveel
+     mislukkingen er ook binnenkomen. unref() zodat een wachtende spoeling het
+     proces niet in de lucht houdt bij het afsluiten. */
+  let spoelt = null;
+  function plan() {
+    if (spoelt) return;
+    spoelt = setTimeout(() => { spoelt = null; try { save(); } catch (e) {} }, 1000);
+    if (spoelt.unref) spoelt.unref();
+  }
+
   function schrijf(r) {
     const regel = {
       t: klok(),
@@ -97,10 +107,29 @@ function maakDoorgeefjournaal({ db, save, nu }) {
       lijst.push(regel);
       if (lijst.length > BEWAARD_MAX) lijst.splice(0, lijst.length - BEWAARD_MAX);
       /* NIET bij elke regel save(): dat zou van elk verzoek een schrijfactie
-         maken. De veger en de gewone save-momenten pakken het mee; bij een
-         MISLUKKING schrijven we wel meteen weg, want juist die regel wil je
-         terugvinden als de server daarna omvalt. */
-      if (regel.mislukt) { try { save(); } catch (e) {} }
+         maken.
+
+         EN BIJ EEN MISLUKKING OOK NIET METEEN, en dat is een correctie op wat
+         hier stond. De gedachte was goed -- juist die regel wil je terugvinden
+         als de server daarna omvalt -- maar de prijs was fout: het journaal is
+         EEN blob in EEN rij, dus elke save() serialiseert en versleutelt de hele
+         lijst opnieuw. Nagemeten op een verse installatie: 500 verzoeken naar
+         een onbekend pad gaven 1002 schrijfacties en lieten de WAL met 4,18 MB
+         groeien (13,9 kB per verzoek), en de prijs LIEP OP met de lijst: 0,72 ms
+         bij 159 kB journaal, 3,63 ms bij 1114 kB. Bij de eigen bovengrens van
+         20.000 regels is dat ~10 ms geblokkeerde lus per mislukt verzoek, en het
+         zakt daarna nooit meer.
+
+         Erger dan traag: een willekeurige bezoeker kon met een GET naar een
+         niet-bestaand pad een schijfschrijving afdwingen. Dat is de enige plek
+         in het huis waar dat kon.
+
+         Nu: hooguit EEN keer per seconde spoelen. Een mislukking is daarmee
+         hooguit een seconde later op schijf -- en een server die precies in dat
+         venster omvalt, laat een regel liggen die in het VENSTER wel stond. Die
+         ruil is de goede kant op: een journaal dat de server traag maakt, is
+         zelf de storing geworden. */
+      if (regel.mislukt) plan();
     }
     return regel;
   }

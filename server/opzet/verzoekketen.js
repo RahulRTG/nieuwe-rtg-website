@@ -103,6 +103,33 @@ module.exports = function verzoekketen(deps) {
       if (!req.secure && !intern) return res.redirect(301, 'https://' + req.get('host') + req.originalUrl);
       if (req.secure) res.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
     }
+    /* EN OOK ZONDER DIE VLAG, als de bezoeker van een ECHT DOMEIN komt.
+
+       Dit hing alleen aan PRODUCTION, en die vlag was op de echte server nooit
+       gezet. Van buiten gemeten: http://app.rahultravelgroup.com/apps/app.html
+       gaf gewoon 200 met de hele app, geen 301, en op https ontbrak HSTS. Elk
+       sessietoken, elk wachtwoord en de backoffice-code gingen daarmee leesbaar
+       over de lijn voor wie op http binnenkwam.
+
+       Een slot dat opengaat als iemand een vlag vergeet, is geen slot -- dat is
+       vandaag de vierde keer dat diezelfde vorm bovenkomt. Daarom hangt het nu
+       aan iets wat niet te vergeten valt: KOMT DIT VAN EEN ECHT DOMEIN? Wie op
+       localhost of een adres in het eigen netwerk ontwikkelt, merkt niets (daar
+       is ook geen certificaat); wie via een domeinnaam binnenkomt, wordt
+       doorgestuurd en krijgt HSTS mee -- ook als NODE_ENV nergens staat. */
+    if (!PRODUCTION) {
+      const host = String(req.get('host') || '').split(':')[0].toLowerCase();
+      const lokaal = !host || host === 'localhost' || host.endsWith('.local') ||
+        /^127\./.test(host) || host === '::1' || host === '[::1]' ||
+        /^192\.168\./.test(host) || /^10\./.test(host) ||
+        /^172\.(1[6-9]|2\d|3[01])\./.test(host);
+      if (!lokaal) {
+        const intern2 = req.path === '/api/health' || req.path === '/api/ready' ||
+          req.path.indexOf('/api/cluster/') === 0;
+        if (!req.secure && !intern2) return res.redirect(301, 'https://' + req.get('host') + req.originalUrl);
+        if (req.secure) res.set('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+      }
+    }
     next();
   });
 

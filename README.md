@@ -1483,6 +1483,22 @@ En bij deze tak zaten dezelfde twee gaten als eerder, allebei ouder dan de verhu
 
 **Wat er nog niet in zit** — zodat niemand het hier gaat zoeken: end-to-end encryptie, rollen en rechten binnen een zaak (RBAC), SSO/SCIM, legal hold, eDiscovery, DLP en de publieke API voor externe ontwikkelaars. `podiumChat` staat er ook nog, maar dat is bewust: een livestream-chat is vluchtig en publiek — geen gesprek tussen partijen die elkaar kennen — en hoort niet in een model dat op deelnemerslijsten draait. Het model is op de rest gebouwd, maar het staat er niet. Een half aangezette compliance-laag is gevaarlijker dan een afwezige. Hetzelfde geldt voor groepsbellen met breakout rooms en opname: dat blijft voorlopig RTG Meet.
 
+## De ledenbalie: de derde poort van het kantoor
+
+Het RTG-kantoor is een ongedeelde ruimte die men binnenkomt met een **gedeelde** code, en die code wijst niemand aan. Voor het meeste kantoorwerk is dat prima: een wachtrij bekijken of een partner goedkeuren gaat over een dossier, niet over een mens. Iemand helpen met zijn abonnement of zijn wachtwoord is iets anders — dat raakt zijn *account*, en het is precies het soort handeling waarvan een lid later mag vragen: wie was dat, en waarom?
+
+Vandaar de **zetel**: uitgedeeld vanuit de boardroom, gekoppeld aan een echte persoonlijke inlog — dezelfde constructie die die kamer zelf al gebruikt. Vijf regels, en het zijn allemaal een nee:
+
+1. **Geen zetel, geen dossier** — ook niet met een geldige kantoorcode. De code opent het kantoor, niet de balie. En de zetel komt uit de sessie: er is geen veld waarin een verzoek zegt wie het is.
+2. **Het dossier draagt de codenaam.** Precies acht velden (`codename`, `pas`, `sinds`, `stad`, `land`, `steuncode`, `abo`, `klachten`) en geen een erbij — de toets pint die lijst dicht af, zodat een veld dat er morgen bij wil eerst langs een mens moet. Geen naam, geen adres, geen telefoon, geen document. De steuncode is het handvat voor het gesprek: een kort kenmerk zodat beide kanten naar hetzelfde contact kunnen verwijzen zonder dat er ooit een naam over tafel gaat.
+3. **Een reden van niks is geen reden.** "test", "x", "……" worden geweigerd — en zo'n geweigerde vraag is *geen* inzage, dus komt hij ook niet in het journaal. Anders vult het journaal zich met pogingen in plaats van met inzagen.
+4. **De balie zet geen wachtwoord.** Herstel loopt via de bestaande stroom naar het lid zelf; de balie hoort alleen dát het in gang is gezet. Geen adres terug, geen link, geen code.
+5. **Een abo-voorstel kent niets toe.** De balie mag een aanvraag klaarzetten voor een andere pas; het besluit blijft bij een mens via `/api/aanmelding/beslis` — dezelfde merkregel als overal.
+
+Alles wat de balie wél doet — een dossier openen, een codenaam natrekken — gaat door het **bestaande** inzagejournaal (`server/inzagelog.js`), met de zetel als "wie" en de opgegeven aanleiding als "waarom". Bewust geen eigen logboek: een tweede journaal is een journaal dat bij een audit wordt vergeten. Ook zoeken telt als inzage, ook als er niets uitkomt — wie een codenaam natrekt om te zien óf hij bestaat, doet precies wat het journaal moet vastleggen.
+
+Kern: `server/kern/ledenbalie.js`, routes `/api/office/balie/{zetels,zetel,zoek,dossier,herstel,klacht,klacht/status,abo}`, getoetst in `test/ledenbalie.test.js`.
+
 ## Veiligheid & verbinding: vier apps op één ruggengraat
 
 Vier losse apps (elk met eigen PWA-manifest), die onderhuids dezelfde kern delen

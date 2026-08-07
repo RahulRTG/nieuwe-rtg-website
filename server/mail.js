@@ -54,10 +54,27 @@ const CONFIGURED = !!transporter;
    als de rest: staat RTG_ENC_KEY, dan versleuteld (.eml.enc), anders leesbaar
    (.txt) zodat lokaal ontwikkelen niet omslachtig wordt. Terugkijken kan met
    `npm run outbox`. */
+/* TWEE BERICHTEN IN DEZELFDE MILLISECONDE OVERSCHREVEN ELKAAR.
+
+   De bestandsnaam was alleen een tijdstempel, en die gaat tot milliseconden.
+   Wie twee keer vlak achter elkaar verstuurt -- en dat doet de herstelstroom
+   letterlijk: eerst de link per e-mail, dan de code per SMS -- kon dus een
+   bericht kwijtraken zonder enige melding. Precies de twee berichten waarvan
+   het samen werken het hele tweestapsverhaal is.
+
+   Het viel op doordat een toets soms zakte en soms niet: "die post gaat naar
+   het lid zelf" vond alleen nog de SMS. Een fout die van de klok afhangt is de
+   vervelendste soort, want hij verdwijnt zodra je hem gaat zoeken.
+
+   Een teller erbij, en niet een willekeurig getal: de outbox wordt op naam
+   gesorteerd gelezen (`npm run outbox`), en dan hoort de volgorde nog steeds
+   de verzendvolgorde te zijn. */
+let outboxTeller = 0;
 function toOutbox(to, subject, text) {
   fs.mkdirSync(OUTBOX, { recursive: true, mode: 0o700 });
   try { fs.chmodSync(OUTBOX, 0o700); } catch (e) {}
-  const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const stamp = new Date().toISOString().replace(/[:.]/g, '-')
+    + '-' + String(++outboxTeller % 100000).padStart(5, '0');
   const bericht = `From: ${FROM}\nTo: ${to}\nSubject: ${subject}\n\n${text}\n`;
   const kluis = require('./kluis');
   const naam = stamp + (kluis.AAN ? '.eml.enc' : '.txt');

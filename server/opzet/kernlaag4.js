@@ -185,4 +185,18 @@ Object.assign(kern, require('../kern/geldregie').maakGeldregie({ db, save }));
    en de 30%-foundationsplit (20% lokaal, 10% RTF). Na de geldregie gemount, want
    het leunt op de pasprijzen daaruit. */
 Object.assign(kern, require('../kern/ledenregister')({ accounts, onboarding, geldPasprijzen: kern.geldPasprijzen, ledenAantal }));
+/* DE LEDENBALIE (kern/ledenbalie.js): de derde poort van het kantoor -- een
+   zetel uit de boardroom, een dossier op codenaam, en elke raadpleging in het
+   bestaande inzagejournaal. Zie de kop daar voor de vijf regels.
+
+   Twee late bindingen, allebei omdat deze laag vroeger wordt gebouwd dan wat
+   hij aanroept: de herstelstroom hangt in routes/auth/herstel.js (die zet hem
+   op de gedeelde context zodra hij gemount is) en de aanmeldstroom komt uit
+   kernlaag2 maar wordt hier op aanroepmoment gelezen, zodat er nooit een
+   bevroren undefined in staat. */
+kern.ledenbalie = require('../kern/ledenbalie').maakLedenbalie({
+  db, save, accounts, inzagelog: require('../inzagelog'), onboarding,
+  aanmeldingen: kern.aanmeldingen,
+  herstelVoor: (u) => (kern.startHerstel ? kern.startHerstel(u) : null)
+});
 };

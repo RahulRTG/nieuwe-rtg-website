@@ -20,4 +20,6 @@ module.exports = (kern) => {
   require('./office/werk')(octx);
   require('./office/bewaarverzoek')(octx);
   require('./office/concierge')(octx);
+  /* De ledenbalie: de derde poort van het kantoor. Zie ./office/balie.js. */
+  require('./office/balie')(octx);
 };

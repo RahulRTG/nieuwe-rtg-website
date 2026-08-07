@@ -31,6 +31,39 @@ const codeHash = (c) => crypto.createHash('sha256').update(String(c)).digest('he
    lijn; een gewone gebruiker merkt een kwart seconde niet. */
 const MIN_MS = 250;
 
+/* DE HERSTELSTROOM ZELF, los van de route. Reden: de LEDENBALIE zet hem ook in
+   gang (kern/ledenbalie.js) als een lid belt dat hij niet meer inlogt -- en de
+   enige veilige manier om dat te doen is DEZE stroom aanroepen, niet hem
+   nabouwen. Een tweede plek die een hersteltoken maakt is een tweede plek waar
+   je kunt vergeten dat er ook een code per SMS hoort, of dat de link naar het
+   LID gaat en niet naar wie hem aanvroeg.
+
+   Geeft { url, code } terug voor wie ze mag zien (alleen deze route, en alleen
+   met de dev-vlag). De balie krijgt er niets van: die kijkt alleen of het
+   gelukt is. */
+function startHerstel(u, basisUrl) {
+  if (!u) return null;
+  const tok = accounts.createReset(u.id);
+  const url = basisUrl + '/apps/app.html?pas=' + pasAppVan(u.tier) + '&reset=' + tok;
+  // stap 2: de code naar de telefoon (tweede kanaal, los van de e-mail)
+  const code = String(crypto.randomInt(100000, 1000000));
+  herstel2fa()[u.id] = { hash: codeHash(code), tot: Date.now() + 3600000, pogingen: 0 };
+  save();
+  mail.send(accounts.emailOf(u) || '', 'Wachtwoord herstellen bij Rahul Travel Group',
+    'U vroeg een nieuw wachtwoord aan. Stel het in via deze link (1 uur geldig):\n' + url +
+    '\n\nUit veiligheid sturen we ook een code naar uw telefoon; die vult u op de website in.');
+  const tel = accounts.phoneOf(u) || 'onbekend';
+  mail.send('sms:' + tel, 'Uw RTG-herstelcode',
+    'Uw code om het wachtwoord te herstellen: ' + code + '\nGeldig: 1 uur. Vroeg u dit niet aan? Negeer dit bericht.');
+  return { url, code };
+}
+/* De balie roept hem aan zonder verzoek in de hand. appUrl(null) is dan het
+   juiste antwoord en geen gebrek: met APP_URL gezet komt daar de publieke
+   basis uit, en zonder die instelling een lege basis -- een pad in plaats van
+   een volledige link. Dat is precies goed, want de link moet wijzen naar waar
+   het LID hem opent, niet naar de host waarop de balie toevallig zit. */
+actx.startHerstel = (u) => startHerstel(u, appUrl(null));
+
 app.post('/api/auth/forgot', (req, res) => {
   const begon = Date.now();
   const antwoord = (lijf) => {
@@ -42,19 +75,8 @@ app.post('/api/auth/forgot', (req, res) => {
   const u = email ? accounts.findByLogin(email) : null;
   let devResetUrl, devCode;
   if (u) {
-    const tok = accounts.createReset(u.id);
-    const url = appUrl(req) + '/apps/app.html?pas=' + pasAppVan(u.tier) + '&reset=' + tok;
-    // stap 2: de code naar de telefoon (tweede kanaal, los van de e-mail)
-    const code = String(crypto.randomInt(100000, 1000000));
-    herstel2fa()[u.id] = { hash: codeHash(code), tot: Date.now() + 3600000, pogingen: 0 };
-    save();
-    mail.send(accounts.emailOf(u) || email, 'Wachtwoord herstellen bij Rahul Travel Group',
-      'U vroeg een nieuw wachtwoord aan. Stel het in via deze link (1 uur geldig):\n' + url +
-      '\n\nUit veiligheid sturen we ook een code naar uw telefoon; die vult u op de website in.');
-    const tel = accounts.phoneOf(u) || 'onbekend';
-    mail.send('sms:' + tel, 'Uw RTG-herstelcode',
-      'Uw code om het wachtwoord te herstellen: ' + code + '\nGeldig: 1 uur. Vroeg u dit niet aan? Negeer dit bericht.');
-    if (DEV_VELDEN(req)) { devResetUrl = url; devCode = code; }
+    const uit = startHerstel(u, appUrl(req));
+    if (DEV_VELDEN(req)) { devResetUrl = uit.url; devCode = uit.code; }
   }
   // Altijd hetzelfde antwoord, en sinds deze ronde ook in dezelfde tijd.
   antwoord({ ok: true, tweestaps: true, ...(devResetUrl ? { devResetUrl, devCode } : {}) });

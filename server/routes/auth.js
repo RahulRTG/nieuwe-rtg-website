@@ -155,6 +155,13 @@ app.post('/api/auth/me', auth, (req, res) => {
     kern };
   require('./auth/account')(actx);
   require('./auth/herstel')(actx);
+  /* De herstelstroom komt uit die submodule (startHerstel) en de LEDENBALIE
+     roept hem aan: een lid dat belt dat hij niet meer inlogt, krijgt dezelfde
+     mail als wanneer hij zelf op "wachtwoord vergeten" drukt. Hier op de kern
+     zetten en niet in de submodule, want actx is van dit bestand -- de balie
+     leest kern.startHerstel. Nabouwen was de andere optie en die is fout: dan
+     is er een tweede plek die een hersteltoken maakt. */
+  kern.startHerstel = actx.startHerstel;
   require('./auth/verificatie')(actx);
   require('./auth/webauthn')(actx);
 };

@@ -129,6 +129,35 @@ test('2. de boardroom deelt een zetel uit; daarna mag die persoon wel', async ()
   assert.equal((await api(R.zetel, { key: balieKey }, baas)).status, 200, 'terugzetten voor de rest van de toetsen');
 });
 
+/* DEZE STOND ER NIET, en hij hoort er wel te staan.
+
+   De toetsen hierboven en hieronder meten dat de balie de GOEDE zetel
+   gebruikt. Geen van alle meet of er een weg is om er zelf een te KIEZEN --
+   en dat is nu juist het gat dat telt: wie de gedeelde kantoorcode heeft, mag
+   het kantoor in, en als hij daarbij zelf mag zeggen wie hij is, dan is de
+   zetel een suggestie in plaats van een poort. Precies dezelfde regel als aan
+   de zakelijke kant van de communicatiekern (test/comm-zaak.e2e.js), en om
+   dezelfde reden hier uitgeschreven: de sleutel wordt AFGELEID, nooit
+   aangeleverd.
+
+   Bij het bouwen bleek deze bewering nodig: een mutatie die `req.body.zetel`
+   liet meetellen brak geen enkele andere toets. Hij staat NA toets 2 en niet
+   ervoor, en dat is het halve punt: voor die tijd bestaat er nog geen zetel,
+   dus zou zelfs een lekkende route 403 geven en zou deze toets niets meten.
+   Een probe die het gat niet kan zien, bewijst niets. */
+test('2b. de zetel komt uit de sessie en is niet mee te sturen', async () => {
+  const vraag = { id: lidId, reden: REDEN };
+  const namen = ['zetel', 'key', 'door', 'balie', 'wie', 'als'];
+  const gelukt = [];
+  for (const veld of namen) {
+    for (const waarde of [balieKey, 'user-1', 'office-gedeeld']) {
+      const r = await api(R.dossier, Object.assign({}, vraag, { [veld]: waarde }), office);
+      if (r.status === 200) gelukt.push(veld + '=' + waarde);
+    }
+  }
+  assert.deepEqual(gelukt, [], 'met de gedeelde code een zetel opgeven lukte via: ' + gelukt.join(', '));
+});
+
 test('3. het dossier draagt de codenaam, nooit de naam, het adres of het nummer', async () => {
   const r = await api(R.dossier, { id: lidId, reden: REDEN }, balieOffice);
   assert.equal(r.status, 200);
@@ -150,7 +179,11 @@ test('3. het dossier draagt de codenaam, nooit de naam, het adres of het nummer'
 
 test('4. zonder reden, of met een reden van niks, geen dossier', async () => {
   const voor = (await journaal()).totaal;
-  for (const reden of [undefined, '', '   ', 'test', 'x', '......']) {
+  /* De laatste twee trekken de twee helften van de regel uit elkaar:
+     'aaaaaaaaaa' heeft genoeg letters maar is geen zin, en 'a b c' is wel een
+     zin maar zegt niets. Zonder die twee dekken de clausules elkaar af en kun
+     je er een weghalen zonder dat iets zakt -- gemeten met een mutatie. */
+  for (const reden of [undefined, '', '   ', 'test', 'x', '......', 'aaaaaaaaaa', 'a b c']) {
     const r = await api(R.dossier, { id: lidId, reden }, balieOffice);
     assert.equal(r.status, 400, 'reden ' + JSON.stringify(reden) + ' hoort te worden geweigerd');
     assert.equal(r.body.lid, undefined, 'en er komt geen dossier mee');

@@ -70,12 +70,17 @@ kern.muziekSamen = require('../kern/muziek-samen')({ save,
 Object.assign(kern, kern.muziekSamen);
 Object.assign(kern, require('../kern/muziek-uitgave')({ db, save, crypto, schoon,
   trackMet: kern.muziekTrackMet, codenaamVan: kern.codenaamVan,
-  makersVan: kern.muziekMakersVan, notify }));
+  makersVan: kern.muziekMakersVan, notify,
+  // de haak van de Media OS: nieuw werk wekt volgers (zie ./mediaos.js)
+  nieuwWerk: (key, soort, titel) => (kern.mediaNieuwWerk ? kern.mediaNieuwWerk(key, soort, titel) : null),
+}));
 kern.muziekRahul = require('../kern/muziek-rahul')({ schoonTrack: kern.muziekSchoonTrack });
 Object.assign(kern, require('../kern/clips').maakClips({
   db, save, crypto, schoon, codenaamVan: kern.codenaamVan, sseToCustomer, sseToOffice,
   // eigen muziek mag onder een eigen clip; de muziekmodule toetst het eigendom
-  eigenTrack: kern.muziekEigenTrack
+  eigenTrack: kern.muziekEigenTrack,
+  // de haak van de Media OS: nieuw werk wekt volgers (zie ./mediaos.js)
+  nieuwWerk: (key, soort, titel) => (kern.mediaNieuwWerk ? kern.mediaNieuwWerk(key, soort, titel) : null),
 }));
 /* RTG Office (kern/office.js): het eigen kantoorpakket. Documenten
    (tekstdocument of rekenblad) op het account, alleen-lezen te delen op

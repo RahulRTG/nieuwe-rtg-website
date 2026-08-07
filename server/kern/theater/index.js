@@ -78,6 +78,12 @@ function maakTheater({ db, save, crypto, schoon, codenaamVan, notify, sseToOffic
     const thuis = v.bewaring === 'thuis';
     return { id: v.id, titel: v.titel, omschrijving: v.omschrijving, poster: v.poster,
       duurS: v.duurS, mb: thuis ? (v.mbGeschat || 0) : mbVan(v.bytes), kanaal: k ? k.naam : '?', kanaalId: v.kanaalId,
+      /* Twee velden voor de laag erboven (kern/mediaos/): het GENRE van het
+         kanaal is het enige onderwerp dat hier bekend is en waarop een lid zijn
+         wereld kan bijsturen, en KLAAR zegt of de bytes er al op staan -- het
+         eigen kanaal toont ook lege kaarten, en zonder dit veld stond daar een
+         filter op dat nooit iets kon uitsluiten (LAT.md regel 9). */
+      genre: k ? k.genre : null, klaar: !!v.klaar,
       bewaring: v.bewaring || 'rtg', online: thuis ? thuisOnline(v) : true,
       codenaam: codenaamVan(v.key), reacties: (db.data.theaterReacties[v.id] || []).length, at: v.at };
   }
@@ -135,7 +141,29 @@ function maakTheater({ db, save, crypto, schoon, codenaamVan, notify, sseToOffic
     THUIS_TTL_MS, THUIS_SIGNALEN, MAX_VIDEO_MB, MAX_KANAAL_MB
   };
   const v = require('./video')(ctx);
+  /* Lezers voor de Media OS: vragen die het Theater over ZICHZELF beantwoordt,
+     zodat de laag erboven geen tweede administratie aanlegt (regel 4). */
+  const kanaalVanMaker = (makerKey) => {
+    const k = kanaalVan(makerKey);
+    return k && k.status === 'goedgekeurd' ? eigenBeeld(k) : null;
+  };
+  const videosVanMaker = (makerKey) => {
+    const k = kanaalVan(makerKey);
+    if (!k || k.status !== 'goedgekeurd') return [];
+    return db.data.theaterVideos.filter(x => x.kanaalId === k.id && x.klaar).map(videoBeeld);
+  };
+  const volgtMaker = (key, makerKey) => {
+    const k = kanaalVan(makerKey);
+    return !!(k && (k.volgers || []).includes(key));
+  };
+  // de sleutels van de abonnees, voor wie ze een voor een wil wekken
+  const volgersVanMaker = (makerKey) => {
+    const k = kanaalVan(makerKey);
+    return k && k.status === 'goedgekeurd' ? (k.volgers || []).slice() : [];
+  };
   return {
+    theaterKanaalVan: kanaalVanMaker, theaterVideosVan: videosVanMaker, theaterVolgt: volgtMaker,
+    theaterVolgersVan: volgersVanMaker,
     theaterKanaalMaak: kanaalMaak, theaterOfficeLijst: officeLijst,
     theaterOfficeBeslis: officeBeslis, theaterVideoMaak: v.videoMaak, theaterVideoUpload: v.videoUpload,
     theaterVerwijder: v.verwijder, theaterStreamVan: v.streamVan, theaterZaal: zaal,

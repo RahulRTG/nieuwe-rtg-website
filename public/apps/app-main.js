@@ -12,7 +12,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '8961bfd3';
+var RTG_BOUW = '19121e5e';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -3069,6 +3069,14 @@ var RTG_BOUW = '8961bfd3';
     ov:          { naam: 'Openbaar vervoer',           url: '/apps/ov.html' },
     stad:        { naam: 'Stad',    url: '/apps/stad.html' },
     clips:       { naam: 'Video',        url: '/apps/clips.html' },
+    /* RTG Media staat NAAST Video, Sound, Theater en Podium en niet in plaats
+       daarvan: het is de laag die ze tot een wereld maakt, en wie recht naar de
+       studio of de zaal wil, hoort daar gewoon heen te kunnen.
+
+       De NAMEN komen van deze kant en de app van de andere: deze ronde
+       hernoemde de tegels naar gewone woorden ("Video" in plaats van "Clips"),
+       en een tak die daarvoor aftakte kent die keuze nog niet. */
+    mediaos:     { naam: 'RTG Media',    url: '/apps/media.html' },
     office:      { naam: 'Documenten',   url: '/apps/office.html' },
     /* Hier stond een losse "Werk OS"-tegel naast "Mijn werkplekken": twee
        tegels met hetzelfde koffertje, en erger, twee INLOGS. De ene ging via
@@ -3143,6 +3151,13 @@ var RTG_BOUW = '8961bfd3';
      Een map heeft een vaste sleutel (waar je eigen naam onder bewaard wordt),
      een standaardnaam en zijn apps. Apps die voor jouw pas niet bestaan
      vallen er vanzelf uit (itemZichtbaar). */
+  /* DE MAPPEN VAN HET BEGINSCHERM -- afgesplitst uit ./app-main-24.js.
+
+     Dat deel droeg twee dingen: WELKE apps er zijn (OSAPPS/LINKS) en HOE ze op
+     het beginscherm in mappen liggen. Samen gingen ze over de 10 KB-lat, en de
+     knip loopt langs die grens: hierboven de catalogus, hier de indeling.
+
+     Dit deel deelt de scope van de bundel (zie scripts/bundel.js). */
   const MAPPEN = [
     { sleutel: 'map-reizen', naam: 'Reizen', secties: [
       { naam: 'Plannen', items: ['tab:reizen', 'link:vluchten', 'link:residentie'] },
@@ -3154,7 +3169,7 @@ var RTG_BOUW = '8961bfd3';
       { naam: 'Samen en bezit', items: ['link:wbw', 'tab:assets', 'link:labfonds'] }
     ] },
     { sleutel: 'map-salon', naam: 'De Salon', secties: [
-      { naam: 'Delen', items: ['tab:salon', 'link:pulse', 'os:snaps', 'link:camera', 'link:clips'] },
+      { naam: 'Delen', items: ['tab:salon', 'link:pulse', 'os:snaps', 'link:camera', 'link:mediaos', 'link:clips'] },
       { naam: 'Mensen', items: ['link:vrienden', 'link:vonk'] },
       { naam: 'Kijken en luisteren', items: ['link:muziek', 'link:theater', 'link:podium', 'link:spelen'] },
       { naam: 'Lezen', items: ['link:nieuws', 'link:krant', 'link:sport'] }
@@ -4331,7 +4346,8 @@ var RTG_BOUW = '8961bfd3';
      dit houdt het scherm eerlijk). De sleutel hier is de functie-id op het
      schakelbord; alles wat niet genoemd wordt, blijft gewoon staan. */
   const REGIE = { spelen: 'spellen', podium: 'podium', flits: 'flits', theater: 'theater',
-    wbw: 'wbw', passkeys: 'webauthn', ov: 'ov', clips: 'clips', office: 'kantoorpakket', vonk: 'vonk' };
+    wbw: 'wbw', passkeys: 'webauthn', ov: 'ov', clips: 'clips', office: 'kantoorpakket', vonk: 'vonk',
+    mediaos: 'mediaos' };
   (function () {
     let tok = null; try { tok = localStorage.getItem('rtg_member_token'); } catch (e) {}
     if (!tok) return;

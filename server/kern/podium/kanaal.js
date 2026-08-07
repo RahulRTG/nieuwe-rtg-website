@@ -5,7 +5,7 @@
    kern/podium/index.js. */
 module.exports = (ctx) => {
   const { db, save, schoon, id, nu, mag, lijsten, kanaalMet, kanaalVan, isAbonnee, verseKijkers,
-    stuurRond, kijkBeeld, eigenBeeld, codenaamVan, sseToCustomer, sseToOffice, notify,
+    stuurRond, kijkBeeld, eigenBeeld, codenaamVan, sseToCustomer, sseToOffice, notify, nieuwWerk,
     koppel, herstelBoom, ouderKeyVan, GENRES, CADEAUS, SIGNALEN } = ctx;
 
   /* ---- het kanaal: aanmelden, en pas open na een mens van kantoor ---- */
@@ -54,6 +54,8 @@ module.exports = (ctx) => {
       k.live = null; k.kijkers = {}; k.boom = {};
     }
     save(); sseToOffice('sync', { scope: 'podium' });
+    // alleen bij AANgaan: "hij is offline" is geen nieuws om iemand voor te wekken
+    if (aan && nieuwWerk) { try { nieuwWerk(key, 'live', k.live.titel); } catch (e) {} }
     return { status: 200, ok: true, kanaal: eigenBeeld(k) };
   }
   function kijk(key, kid) {

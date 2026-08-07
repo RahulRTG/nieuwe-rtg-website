@@ -111,7 +111,9 @@ Object.assign(kern, maakOntmoeting({
    via RTG Pay. Na pay en sociaal gemount (gebruikt beide). */
 Object.assign(kern, require('../kern/podium').maakPodium({
   db, save, crypto, accounts, leeftijdVan, codenaamVan: kern.codenaamVan,
-  sseToCustomer, sseToOffice, notify, pay: kern.pay, schoon
+  sseToCustomer, sseToOffice, notify, pay: kern.pay, schoon,
+  // de haak van de Media OS: nieuw werk wekt volgers (zie ./mediaos.js)
+  nieuwWerk: (key, soort, titel) => (kern.mediaNieuwWerk ? kern.mediaNieuwWerk(key, soort, titel) : null)
 }));
 /* RTG Eye (kern/oog.js): de camerabril van de werkvloer. Het kijken gebeurt
    op het toestel; hier landen alleen compacte schouw-/uitgifteregels

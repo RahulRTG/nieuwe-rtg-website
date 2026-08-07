@@ -3,6 +3,11 @@
 const G = (wat, doe, tip) => ({ wat, doe, tip });
 
 module.exports = {
+  '/apps/media.html': G('RTG Media: één mediawereld -- muziek, video, korte video en live bij elkaar.',
+    ['Kies een stand: Muziek, Kijk of Flow -- het is dezelfde wereld',
+     'Open "alles hierover" en zie het hele stuk: de maker, zijn andere werk en de clips met dit geluid eronder',
+     'Stuur uw wereld zelf bij met meer, minder, nooit en verras me'],
+    'Bij elk stuk staat waarom het er staat. Wat u niet zelf hebt gezegd, weegt hier niet mee.'),
   '/apps/muziek.html': G('RTG Sound: muziek voor je dag, samengesteld zonder gejaag.',
     ['Kies een sfeer of kanaal', 'Speel af en bedien vanaf elk scherm', 'Bewaar wat je mooi vindt'],
     'Muziek zonder eindeloos scrollen: kies één sfeer en laat hem gewoon spelen.'),

@@ -11,14 +11,20 @@ module.exports = {
   '/apps/app.html': G('Je homescreen: mappen boven de klok, bellen en je wallet eronder, Rahul in de balk.',
     ['Tik een app; omhoog vegen op het streepje onderin brengt je terug op de homescreen', 'Typ in de balk onderaan: het OS doet het zelf of Rahul pakt het op', 'Je ledenpas ligt in je wallet, de tegel rechts onder de klok'],
     'Je echte naam blijft in de kluis; partners zien alleen je codenaam. Dat is bewust ons ontwerp.'),
-  '/apps/index.html': G('De homescreen (dit pad brengt je daarheen).',
-    ['Tik een van de brede apps: Reizen, Geld, De Salon, Het Huis',
-      'Binnen een app staat het in secties, met erbij wat je er doet',
-      'Omhoog vegen op het streepje onderin brengt je terug'],
-    'Het scrollende bureaublad met alle apps in secties bestaat niet meer: een OS heeft een beginscherm, geen tweede.'),
+  /* Deze gids stond te liegen, en de toets ving alleen de helft ervan. Er
+     stond dat dit bureaublad "niet meer bestaat" -- terwijl de pagina er
+     gewoon is en werkt: alle werelden onder elkaar (leden, RTFoundation,
+     personeel en werkgevers, en de zaken per soort), met de accounts die op
+     dit toestel bekend zijn. test/negenplus.test.js zakte er alleen op het
+     AANTAL stappen; dat er ondertussen iets onwaars stond, telde niemand.
+     Nu staat er wat het scherm echt doet (LAT.md regel 6). */
+  '/apps/index.html': G('Het RTG OS-bureaublad: alle werelden van het platform onder elkaar, met de accounts die op dit toestel bekend zijn.',
+    ['Kies een wereld: leden, RTFoundation, personeel en werkgevers, of een zaak per soort',
+     'Tik een app om hem te openen; het beginscherm van de leden-app blijft /apps/app.html',
+     'Wissel bovenin van account als er meer dan een op dit toestel staat'],
+    'Dit is de brede ingang naast het beginscherm: handig op een groot scherm, en de enige plek waar de werelden naast elkaar staan.'),
   '/apps/bureau.html': G('De homescreen (dit pad brengt je daarheen).',
-    ['Tik een van de brede apps; er zijn er een handvol, geen honderd',
-      'Omhoog vegen op het streepje onderin brengt je terug'],
+    ['Tik een app; omhoog vegen op het streepje onderin brengt je terug'],
     'Een oude ingang uit de tijd dat er nog een apart bureaublad was.'),
   '/apps/berichten.html': G('Je berichten met vrienden en partners, automatisch vertaald als dat nodig is.',
     ['Stuur een bericht op codenaam', 'Bel of videobel vanuit het gesprek', 'Deel een snap of verhaal met wie jij kiest'],

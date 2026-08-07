@@ -63,6 +63,42 @@ Met de backend actief lopen inloggen, betalingen, likes, reacties, DM's en de AI
 - de Salon-rechten worden **server-side** afgedwongen: zonder pas alleen liken, RTG-leden reageren/dm'en onderling, Lifestyle- en Business-leden hebben volledige interactie met alle leden;
 - creators verdienen reiskorting met hun content (elke 50 likes = 1% korting, tot 10% per kwartaal).
 
+### De echte server op deze Mac (versleutelde data)
+
+Draait de server met versleuteling-at-rest, dan staat de data in
+`server/data/store.db` versleuteld en komt de sleutel uit `RTG_ENC_KEY`. **Start
+hem dan niet met `npm start`**, want dan mist die sleutel en weigert hij op te
+starten -- terecht: hij stopt liever dan onleesbare data te serveren.
+
+```bash
+bash bin/rtg-start.sh
+```
+
+Dat script haalt de sleutel uit de sleutelhanger van de Mac (Keychain) en geeft
+hem aan de server mee. Hij komt nooit in een bestand, nooit in de git-map en
+nooit in beeld.
+
+De sleutel opbergen of vervangen (hij vraagt hem, dus je typt hem niet in beeld):
+
+```bash
+security add-generic-password -a rtg -s RTG_ENC_KEY -U -w
+```
+
+**Waarom dit er zo staat.** De sleutel zat een tijd lang nergens anders dan in
+het geheugen van het draaiende proces. Wie dat proces stopte, gooide de sleutel
+weg. Dat is een keer echt gebeurd en toen lag de site eruit tot de sleutel
+elders werd teruggevonden. Een sleutel die maar op een plek staat, en dan nog
+in het geheugen, is geen sleutel maar een kwestie van tijd.
+
+De server start vanzelf bij het aanmelden en komt terug als hij omvalt, via
+`~/Library/LaunchAgents/nl.rtg.server.plist`. Nagemeten door hem te doden: na
+25 seconden draaide hij weer, met een nieuw procesnummer. Logboek:
+`~/Library/Logs/rtg-server.log`.
+
+```bash
+launchctl kickstart -k gui/501/nl.rtg.server   # met de hand herstarten
+```
+
 ### Echte AI (optioneel)
 
 Zet een Anthropic API-key in de omgeving en de persoonlijke AI draait op Claude:

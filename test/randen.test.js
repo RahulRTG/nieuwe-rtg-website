@@ -163,19 +163,41 @@ test('een kapotte kaart maakt het beginscherm niet zwart', () => {
     'stap() vangt een struikelende kaart op');
   assert.match(bron, /console\.error\('\[rtg\] onderdeel "' \+ naam/,
     'en noemt hem bij naam, anders is het nog steeds een raadsel');
-  /* Het beginscherm gaat rechtstreeks door stap(); de tabbladen erachter gaan
-     door naBeeld(), dat ze een voor een NA het eerste beeld draait en daarbij
-     dezelfde stap() gebruikt. Allebei tellen als "door het vangnet", en dit
-     onderscheid is de reden dat de app op een telefoon niet meer minutenlang
-     leeg staat. */
+  /* HIER LIEP DEZE TOETS ACHTER OP DE CODE, en dat is precies de vorm waar
+     LAT.md regel 6 over gaat -- alleen andersom: niet de tekst die veroudert,
+     maar de TOETS die een oude vorm vasthoudt en daardoor rood staat om iets
+     wat verbeterd is.
+
+     Wat er stond: elke uitgestelde opbouwfunctie moest met naam in de rij van
+     naBeeld() staan (['renderSalon', renderSalon] enzovoort). Die rij bestaat
+     nog, maar hij is korter geworden omdat de app iets beters doet: sinds
+     f1e80cf haalt een TABBLAD zijn eigen gegevens op als je het opent
+     (LADERS_PER_TAB + vulTab in app-main-12.js). Gegevens ophalen voor een
+     scherm dat niemand ziet, is werk dat de telefoon niet hoeft te doen.
+
+     Wat deze toets moet bewaken is niet de VORM van die rij maar de garantie
+     eronder: alles wat het scherm opbouwt loopt door stap(), zodat een
+     struikelende kaart de rest niet meeneemt. Dat wordt hieronder per weg
+     nagegaan -- het beginscherm, de rij na het eerste beeld, en de laders per
+     tabblad -- en de renderers die vroeger in de rij stonden moeten nog steeds
+     ergens ingepland zijn, want anders laadt dat tabblad stil niets meer. */
   assert.match(bron, /stap\('renderHome', renderHome\)/, 'het beginscherm loopt door het vangnet');
   assert.match(bron, /function naBeeld\(stappen\)/, 'de tabbladen gaan na het eerste beeld');
-  for (const laat of ['renderSalon', 'renderTerPlaatse', 'laadBestellen', 'laadTickets']) {
-    assert.match(bron, new RegExp("\\['" + laat + "', " + laat + "\\]"),
-      laat + ' staat in de uitgestelde rij, en die loopt zelf door stap()');
-  }
   assert.match(bron, /const \[naam, fn\] = stappen\[i\+\+\];\s*stap\(naam, fn\)/,
     'en naBeeld draait elke stap door hetzelfde vangnet');
+  // de drie die bij het openen moeten laden (ze vullen geen eigen .view)
+  for (const altijd of ['laadCare', 'laadBestellen', 'loadCv']) {
+    assert.match(bron, new RegExp("\\['" + altijd + "', " + altijd + "\\]"),
+      altijd + ' staat in de rij na het eerste beeld');
+  }
+  // en de rest hangt aan zijn eigen tabblad, dat zichzelf door stap() vult
+  assert.match(bron, /const LADERS_PER_TAB = \{/, 'er is een indeling van laders per tabblad');
+  assert.match(bron, /for \(const \[naam, fn\] of lijst\) stap\(naam, fn\)/,
+    'en vulTab draait ze door hetzelfde vangnet');
+  for (const laat of ['renderSalon', 'renderTerPlaatse', 'laadTickets', 'renderTrip', 'renderPay']) {
+    assert.match(bron, new RegExp("\\['" + laat + "', \\(\\) => " + laat + "\\(\\)\\]"),
+      laat + ' is ingepland bij zijn tabblad; anders laadt dat tabblad stil niets');
+  }
   assert.ok(!/\n\s+renderHome\(\);/.test(bron),
     'en niet meer kaal, want dan neemt hij de rest weer mee');
 

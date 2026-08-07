@@ -75,7 +75,7 @@
     camera:      { naam: 'Camera',       url: '/apps/camera.html' },
     muziek:      { naam: 'Muziek',    url: '/apps/muziek.html' },
     podium:      { naam: 'Live',       url: '/apps/podium.html' },
-    flits:       { naam: 'Onderweg',        url: '/apps/flits.html' },
+    flits:       { naam: 'Verkeer',           url: '/apps/flits.html' },
     navigatie:   { naam: 'Navigatie',    url: '/apps/navigatie.html' },
     theater:     { naam: 'Films en series',      url: '/apps/theater.html' },
     residentie:  { naam: 'Verblijven', url: '/apps/residentie.html' },

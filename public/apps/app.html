@@ -1203,11 +1203,30 @@
     overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
   }
 
-  /* 1. de mappen, bovenaan -- twee rijen van vier. De rijen staan dichter op
-        elkaar dan de standaard-rasterafstand: acht tegels in twee rijen zijn
-        samen één blok, en met de losse afstand van .os-grid viel dat blok in
-        twee losse rijen uiteen. */
-  .os-mappen{margin-top:calc(var(--e) * 0.9);flex-shrink:0;row-gap:calc(var(--e) * 1.05);}
+  /* 1. de mappen, bovenaan -- vier op de eerste rij, drie op de tweede.
+
+        DE TWEEDE RIJ STAAT GECENTREERD, en daarvoor moet dit blok uit het
+        raster stappen. Een grid van vier kolommen zet een restrij links tegen
+        de eerste kolom aan en laat rechts een kolom leeg; drie mappen lezen
+        dan als een halfvolle rij van vier -- alsof er eentje ontbreekt.
+        Hetzelfde blok als flexrij die terugvalt en zichzelf centreert, leest
+        als een vorm: vier boven, drie eronder, netjes onder het midden.
+
+        De tegels houden de breedte die ze in het raster hadden (een kwart
+        minus de tussenruimte), anders worden het er op de tweede rij drie
+        brede, en dan is het geen tweede rij meer maar een andere maat.
+
+        De rijen staan ook dichter op elkaar dan de rasterafstand van
+        .os-grid: zeven tegels in twee rijen zijn samen één blok, en met de
+        losse afstand viel dat blok in twee losse rijen uiteen. */
+  .os-mappen{
+    display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;
+    margin-top:calc(var(--e) * 0.9);flex-shrink:0;
+    column-gap:calc(var(--e) * 0.75);row-gap:calc(var(--e) * 1.05);
+  }
+  .os-mappen .os-app{
+    width:calc((100% - var(--e) * 2.25) / 4);
+  }
 
   /* 2. de ronde klok, in het midden. Dit vak pakt alle ruimte die de andere
         lagen overlaten en centreert de klok daarin -- dus staat er evenveel

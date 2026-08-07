@@ -301,14 +301,24 @@ test('het beginscherm draagt twee rijen mappen, en de klok staat erboven',
         const b = document.querySelector(s).getBoundingClientRect();
         return { top: Math.round(b.top), bodem: Math.round(b.bottom) };
       };
-      const tegels = [...document.querySelectorAll('#osMappen .os-app')];
+      const nav = document.getElementById('osMappen');
+      const navVak = nav.getBoundingClientRect();
+      const tegels = [...nav.querySelectorAll('.os-app')];
       const rijen = new Set(tegels.map((t) => Math.round(t.getBoundingClientRect().top)));
+      // de laatste rij: telt hij minder tegels, dan hoort hij gecentreerd te staan
+      const laatsteTop = Math.max(...tegels.map((t) => Math.round(t.getBoundingClientRect().top)));
+      const laatste = tegels.filter((t) => Math.round(t.getBoundingClientRect().top) === laatsteTop);
+      const marge = {
+        links: Math.round(laatste[0].getBoundingClientRect().left - navVak.left),
+        rechts: Math.round(navVak.right - laatste[laatste.length - 1].getBoundingClientRect().right)
+      };
       const onder = document.querySelector('#osDemoWet') || document.querySelector('#osAiWet');
       const klokvak = vak('.os-klokvak'), klok = vak('#homeKlok');
       const tips = document.querySelector('#osAiTips');
       const boven = tips && !tips.hidden ? vak('#osAiTips') : vak('#osAiDraad');
       return {
-        mappen: tegels.length, rijen: rijen.size,
+        mappen: tegels.length, rijen: rijen.size, marge: marge,
+        breedtes: [...new Set(tegels.map((t) => Math.round(t.getBoundingClientRect().width)))],
         volgorde: ['#osMappen', '.os-klokvak', '#osFuncties', '#osAiBalk']
           .map((s) => vak(s).top),
         luchtBovenKlok: klok.top - klokvak.top,
@@ -317,8 +327,20 @@ test('het beginscherm draagt twee rijen mappen, en de klok staat erboven',
         onderrand: Math.round(onder.getBoundingClientRect().bottom), hoogte: innerHeight
       };
     });
-    assert.ok(r.mappen >= 8, 'er staan minder dan acht mappen: ' + r.mappen);
+    assert.ok(r.mappen >= 7, 'er staan minder dan zeven mappen: ' + r.mappen);
     assert.equal(r.rijen, 2, 'de mappen staan niet in twee rijen (rijen: ' + r.rijen + ')');
+    /* DE TWEEDE RIJ TELT ER DRIE EN HOORT GECENTREERD TE STAAN. In een raster
+       van vier kolommen schuift zo'n restrij tegen de linkerkolom aan en blijft
+       er rechts een kolom leeg -- dan lees je een halfvolle rij van vier in
+       plaats van een rij van drie. Links en rechts even veel marge is dus geen
+       opmaakdetail maar het verschil tussen "een vorm" en "er ontbreekt er
+       een". En de tegels houden hun rasterbreedte: drie brede tegels zijn geen
+       tweede rij meer maar een andere maat. */
+    assert.ok(Math.abs(r.marge.links - r.marge.rechts) <= 2,
+      'de laatste rij mappen staat niet gecentreerd (links ' + r.marge.links +
+      ', rechts ' + r.marge.rechts + ')');
+    assert.equal(r.breedtes.length, 1,
+      'niet alle maptegels zijn even breed: ' + r.breedtes.join(', '));
     assert.deepEqual(r.volgorde.slice().sort((a, b) => a - b), r.volgorde,
       'de volgorde is mappen, klok, functies, balk');
 
@@ -348,4 +370,77 @@ test('het beginscherm draagt twee rijen mappen, en de klok staat erboven',
       'de berichten van Rahul plakken aan zijn balk (' + r.gatNaarBalk + 'px ertussen)');
     await page.close();
   });
+});
+
+test('geen enkele map loopt leeg op de instappas',
+  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  /* DE TEGELS TELLEN NIET VOOR IEDEREEN HETZELFDE, en dat is precies waar de
+     indeling van de mappen op stukging. Veertien apps zijn Lifestyle/Business
+     (de PREMIUM-set in app-main.js) en vallen voor een RTG-pas vanzelf weg.
+     Het Huis was gevuld met Maison, Table, Cellier, Garde-robe en De
+     Rechterhand -- alle vijf premium -- dus een Business-lid zag daar acht
+     tegels en een RTG-lid drie. Dezelfde map, half zo vol, precies op de
+     instappas. De merkregel is daar niet vaag over: RTG Pass is de instap,
+     maar mag nooit budget aanvoelen.
+
+     Zoiets zie je niet in de bron -- daar staan gewoon acht sleutels in een
+     lijst -- en ook niet op je eigen scherm, want wie dit bouwt kijkt met de
+     pas die alles ziet. Je ziet het alleen door de mappen echt open te klikken
+     mét de kleinste pas. Vandaar deze toets.
+
+     De mutatie die hem hoort te laten zakken: zet de zorg-apps (tab:zorg,
+     tab:gezin, link:vitaal, link:thuisrust) uit Het Huis terug in een eigen
+     map. */
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-mappen-'));
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  let browser;
+  try {
+    const tok = await lidToken(base, 'mappen' + process.pid + '@x.nl');
+    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    const ctx = await browser.newContext({ viewport: { width: 393, height: 852 } });
+    await ctx.addInitScript((t) => {
+      try {
+        localStorage.setItem('rtg_member_token', t);
+        localStorage.setItem('rtg_lang', 'nl');
+        localStorage.setItem('rtg_cookieinfo_v1', '1');
+      } catch (e) {}
+    }, tok);
+    const page = await ctx.newPage();
+    await page.goto(base + '/apps/app.html?pas=rtg', { waitUntil: 'domcontentloaded' });
+    await page.waitForSelector('#osMappen .os-app', { timeout: 15000 });
+    await page.evaluate(() => { const g = document.getElementById('onbGate'); if (g) g.hidden = true; });
+    await page.waitForTimeout(400);
+
+    const mappen = await page.evaluate(async () => {
+      const wacht = (ms) => new Promise((k) => setTimeout(k, ms));
+      const uit = [];
+      for (const map of [...document.querySelectorAll('#osMappen .os-app')]) {
+        const naam = (map.getAttribute('aria-label') || '').replace(/^Map /, '').trim();
+        map.click();
+        await wacht(320);
+        const apps = [...document.querySelectorAll('#osMapGrid .os-app')]
+          .map((a) => (a.getAttribute('aria-label') || '').trim());
+        uit.push({ naam: naam, apps: apps });
+        const scrim = document.getElementById('osMapScrim');
+        if (scrim) scrim.classList.remove('open');
+        await wacht(120);
+      }
+      return uit;
+    });
+
+    assert.ok(mappen.length >= 7, 'er zijn minder dan zeven mappen gemeten: ' + mappen.length);
+    const mager = mappen.filter((m) => m.apps.length < 4);
+    assert.deepEqual(mager.map((m) => m.naam + ' (' + m.apps.length + ')'), [],
+      'deze mappen zijn op een RTG-pas bijna leeg:\n' +
+      mappen.map((m) => '  ' + m.naam + ': ' + m.apps.length + ' -- ' + m.apps.join(', ')).join('\n'));
+
+    // en een app hoort in precies EEN map te staan
+    const alle = mappen.flatMap((m) => m.apps);
+    const dubbel = alle.filter((x, i) => alle.indexOf(x) !== i);
+    assert.deepEqual([...new Set(dubbel)], [], 'deze apps staan in meer dan een map');
+  } finally {
+    if (browser) await browser.close();
+    stop(child);
+    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+  }
 });

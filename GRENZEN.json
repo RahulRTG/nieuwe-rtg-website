@@ -250,6 +250,7 @@
       "stuur",
       "veilig",
       "wacht",
+      "weefsel",
       "werkplaats",
       "zelfzorg"
     ],
@@ -1006,7 +1007,8 @@
       "stateFor"
     ],
     "stad": [
-      "stad"
+      "stad",
+      "weefsel"
     ],
     "staff": [
       "DEMO",

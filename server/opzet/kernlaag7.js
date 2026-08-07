@@ -16,7 +16,7 @@
 'use strict';
 
 module.exports = (kern, hulp) => {
-  const { accounts, archief, crypto, db, findSupplier, haversine, keyVanCodenaam, klokVan, leeftijdVan, logActivity, notify, notifySupplier, path, rememberSession, save, schoon, sseToCustomer, sseToOffice, supplierState, zetRtgai } = hulp;
+  const { accounts, archief, crypto, db, findSupplier, haversine, keyVanCodenaam, klokVan, leeftijdVan, logActivity, notify, openVacatures, notifySupplier, path, rememberSession, save, schoon, sseToCustomer, sseToOffice, supplierState, zetRtgai } = hulp;
 
 /* De gegevenspoort (kern/gegevenspoort.js + kern/gegevensgesprek.js): een gratis
    account vraagt vier dingen; pas als er een DERDE PARTIJ bij komt (een zaak, een
@@ -131,6 +131,23 @@ Object.assign(kern, require('../kern/theater').maakTheater({
    gevuld komt daar nooit meer aan. Stond dit blok eronder, dan hing de hele
    RTFoundation aan een undefined en gaf elke ingang "Cannot read properties of
    undefined" -- 115 toetsen lang, zonder dat de server ook maar iets meldde. */
+/* DE ECONOMISCHE NAAD van het stadsweefsel: de kansenlaag leest de vacatures,
+   de bedrijven en de beroepen die hier al bestaan, en legt ze op de kaart. Ze
+   blijven wonen waar ze wonen -- kern/werk houdt de vacatures bij, de
+   partnerlijst de bedrijven, de Beroepen-Bibliotheek de beroepen -- en het
+   weefsel is er alleen de LEZER van. Laat gebonden, want alle drie zijn ze
+   eerder gemount dan dit punt. */
+kern.weefsel.weefselKoppelEconomie({
+  vacatures: () => openVacatures(null, null).map(v => ({ id: v.id, code: v.supplierCode, bedrijf: v.bedrijf,
+    func: v.func, uren: v.uren, loc: v.loc })),
+  bedrijven: () => (db.data.suppliers || []).map(s => ({ code: s.code, naam: s.name, type: s.type || null, loc: s.loc })),
+  beroepen: () => {
+    const bb = require('../kern/beroepenbieb/data');
+    return [...bb.TECHNIEK_BEROEPEN.map(b => ({ beroep: b, wereld: 'techniek', wereldLabel: 'Technisch & agrarisch' })),
+      ...bb.ZAKEN_BEROEPEN.map(b => ({ beroep: b, wereld: 'zaken', wereldLabel: 'Bedrijfsleven' }))];
+  }
+});
+
 /* Het Foundation OS (kern/rtfos/): het bestuurssysteem van de RTFoundation --
    een landelijke stichting met zelfstandige stadsafdelingen, lokale
    partnerstichtingen, projecten, vrijwilligers, geoormerkt geld, hulpvragen en
@@ -143,7 +160,7 @@ Object.assign(kern, require('../kern/rtfos')({ db, save, crypto,
   // en de agenda: dat is de ENIGE koppeling die vandaag echt iets doet
   // (een RTF-activiteit als afspraak in je eigen RTG-agenda). Zonder hem
   // meldt het koppelbord hem eerlijk als kapot, en dat is hij dan ook.
-  agenda: kern.agenda }));
+  }));
 
 const gekozenDomeinen = require('./routes')(kern);
 /* De meelezer van de RTG AI wordt hierboven in de bedrading gebouwd, maar de

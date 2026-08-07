@@ -13,13 +13,13 @@
 'use strict';
 
 module.exports = (kern, hulp) => {
-  const { PERSONAS, accounts, alcoholGrensVan, annuleerReservering, anthropic, beveilig, crypto, db, entreeCode, findSupplier, fooiUit, geborenVan, haversine, idGeverifieerd, keyVanCodenaam, klantProfiel, ledenPrijs, leeftijdVan, legApart, liveCodename, logActivity, maakOntmoeting, notify, notifySupplier, optieAan, pasTegoedToe, pickupCode, pushLive, reserveerTafel, save, schoon, sseToCustomer, sseToOffice, sseToSupplier, ticketsVoorSlot, verdienPunten, zorgContact } = hulp;
+  const { PERSONAS, accounts, alcoholGrensVan, annuleerReservering, anthropic, beveilig, crypto, db, entreeCode, findSupplier, fooiUit, geborenVan, haversine, idGeverifieerd, keyVanCodenaam, klantProfiel, ledenPrijs, leeftijdVan, legApart, liveCodename, log, logActivity, maakOntmoeting, notify, notifySupplier, optieAan, pasTegoedToe, pickupCode, pushLive, reserveerTafel, save, schoon, sseToCustomer, sseToOffice, sseToSupplier, ticketsVoorSlot, verdienPunten, zorgContact } = hulp;
 
 /* RTG Stad (kern/stad): het slimme-stad-platform op EIGEN hardware (de
    Stadsdoos-vloot, dezelfde familie als de Zaakdoos) en eigen software --
    domeinen met regimes, een scenario-knop in de boardroom en een
    AI-stadsregisseur. Privacy by design: de stad meet dingen, geen mensen. */
-Object.assign(kern, require('../kern/stad')({ db, save, crypto, schoon, anthropic, sseToOffice, beveilig, keyVanCodenaam, sseToCustomer }));
+Object.assign(kern, require('../kern/stad')({ db, save, crypto, schoon, anthropic, sseToOffice, beveilig, keyVanCodenaam, sseToCustomer, weefsel: kern.weefsel }));
 /* De stad in het gezamenlijke rampbeeld: tijdens een calamiteit ziet de hele
    keten (korpsen, zorg, defensie, boardroom) ook het stadsscenario, de
    bord-waarschuwingen en de vloot -- operationele toestand, geen

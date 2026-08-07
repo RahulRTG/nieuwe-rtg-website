@@ -192,9 +192,23 @@ try {
    aanroep; twee plekken die hetzelfde schema maken is precies hoe ze uit elkaar
    gaan lopen. */
 accounts.init();
-// Demo-modus: alleen buiten productie, of expliciet met RTG_DEMO=1. Zo staan de
-// demo-inlog en het demo-account (Rahul/Imran) nooit per ongeluk open op productie.
-const DEMO = process.env.NODE_ENV !== 'production' || process.env.RTG_DEMO === '1';
+/* DEMO-MODUS: UIT, TENZIJ IEMAND HEM BEWUST AANZET.
+
+   Hier stond `NODE_ENV !== 'production' || RTG_DEMO === '1'`, met de belofte
+   erboven dat de demo-inlog "nooit per ongeluk open op productie" staat. Die
+   belofte was precies verkeerd om: de demo stond AAN zolang niemand NODE_ENV
+   had gezet. Op de echte server, op het open internet, was dat het geval.
+
+   Wat er daardoor openstond, nagemeten met twee curl-opdrachten van buitenaf:
+   een POST naar /api/login met {"tier":"business"} gaf zonder wachtwoord een
+   volledige Business-sessie op naam van de eigenaar, en de backoffice ging open
+   met de vaste code 'RTG-OFFICE' die in deze repo te lezen staat -- en achter
+   die deur ligt de identiteitskluis met echte namen en paspoortscans.
+
+   Een slot dat opengaat als iemand iets vergeet is geen slot. Aanzetten kan
+   alleen nog uitdrukkelijk, met RTG_DEMO=1. Wie lokaal demonstreert zet die
+   vlag; een server die niets weet, doet niets. */
+const DEMO = process.env.RTG_DEMO === '1';
 // Het eigenaarsaccount (Rahul Imran Ismail), zodat Rahul/Imran ook via de
 // echte accountlogin werkt. Bestaat het account al (een oudere lokale
 // database), dan krijgt het hier de juiste naam; de kluis blijft de bron.
@@ -1669,7 +1683,12 @@ const { ritVerder, ritBezetting } = maakVervoer({
 // In productie mag de demo-backofficecode ('RTG-OFFICE') nooit werken: zonder een
 // eigen OFFICE_CODE wordt hij onraadbaar willekeurig, zodat de deur dichtblijft
 // tot er een echte code is gezet. Buiten productie houden we de demo-code.
-const OFFICE_CODE = process.env.OFFICE_CODE || (PRODUCTION ? crypto.randomBytes(18).toString('hex') : 'RTG-OFFICE');
+/* Zonder eigen OFFICE_CODE wordt hij onraadbaar willekeurig -- ALTIJD, niet
+   alleen in productie. De terugval op 'RTG-OFFICE' hing aan dezelfde vergeten
+   vlag als hierboven, en die code staat letterlijk in deze repo: iedereen die
+   hem gelezen heeft kon de backoffice van deze server openen. De demo-code komt
+   alleen nog terug als de demo-modus uitdrukkelijk aanstaat. */
+const OFFICE_CODE = process.env.OFFICE_CODE || (DEMO ? 'RTG-OFFICE' : crypto.randomBytes(18).toString('hex'));
 
 
 /* De backoffice-laag (officeAuth, officeState, pendingVerifications) staat in

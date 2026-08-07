@@ -14,10 +14,14 @@
    moeten er al zijn. */
 'use strict';
 
-module.exports = (kern) => {
+module.exports = (kern, notify) => {
+  /* `notify` komt uit de hulp-bag van kernlaag7 en niet uit de kern: de
+     meldingenlaag hangt daar niet in. Hij gaat mee omdat ./wekken.js de
+     volgers van een maker wekt langs precies dezelfde weg als het Theater en
+     het Podium dat doen -- inclusief de scope-schakelaar van het lid. */
   const { db, save, schoon, keyVanCodenaam } = kern;
   Object.assign(kern, require('../kern/mediaos').maakMediaOS({
-    db, save, schoon, codenaamVan: kern.codenaamVan, keyVanCodenaam,
+    db, save, schoon, codenaamVan: kern.codenaamVan, keyVanCodenaam, notify,
     bronnen: {
       // de vier wereldbeelden, elk zoals het domein hem zelf al toont
       tracks: (sess) => kern.muziekZaal(sess, {}),
@@ -30,6 +34,7 @@ module.exports = (kern) => {
       clipsVan: (mKey, kijker) => kern.clipsVan(mKey, kijker),
       clipsMetTrack: (trackId, kijker) => kern.clipsMetTrack(trackId, kijker),
       clipsVolgersVan: (mKey) => kern.clipsVolgersVan(mKey),
+      theaterVolgersVan: (mKey) => kern.theaterVolgersVan(mKey),
       liveVan: (mKey, kijker) => kern.podiumKanaalVan(mKey, kijker),
       theaterKanaalVan: (mKey) => kern.theaterKanaalVan(mKey),
       volgtTheater: (key, mKey) => kern.theaterVolgt(key, mKey),

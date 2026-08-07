@@ -31,7 +31,7 @@ const ONDER = ['codenaam', 'rtg'];
 const ZAAL = 30;                 // wat je in één keer te horen krijgt
 const MAX_REACTIES = 200;
 
-module.exports = ({ db, save, crypto, schoon, trackMet, codenaamVan, makersVan, publiekeTrack, notify }) => {
+module.exports = ({ db, save, crypto, schoon, trackMet, codenaamVan, makersVan, publiekeTrack, notify, nieuwWerk }) => {
   const nu = () => new Date().toISOString();
   const rid = () => 'u' + crypto.randomBytes(5).toString('hex');
 
@@ -79,6 +79,10 @@ module.exports = ({ db, save, crypto, schoon, trackMet, codenaamVan, makersVan, 
     if (onder === 'rtg' && notify) {
       try { notify('kantoor', 'Klankwerk: aanvraag om uit te geven onder de RTG-naam ("' + u.naam + '").'); } catch (e) {}
     }
+    /* Nieuw werk: de Media OS wekt de volgers die MUZIEK van deze maker aan
+       hebben staan. Laat gebonden en optioneel -- het Klankwerk hoeft niet te
+       weten dat er een laag boven hem hangt, en werkt zonder hem gewoon door. */
+    if (nieuwWerk) { try { nieuwWerk(sess.key, 'muziek', u.naam); } catch (e) {} }
     return { status: 200, ok: true, uitgave: publiek(u, sess.key) };
   }
 

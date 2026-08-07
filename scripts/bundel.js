@@ -35,6 +35,7 @@ const bundels = {
   'shared/mond.js': 'shared/mond',
   'shared/rahulpoort.js': 'shared/rahulpoort',
   'shared/geluid.js': 'shared/geluid',
+  'shared/clipdeler.js': 'shared/clipdeler',
   'shared/handenvrij-bureau.js': 'shared/handenvrij-bureau',
   'shared/handenvrij-balk.js': 'shared/handenvrij-balk',
   'shared/sterren.js': 'shared/sterren',

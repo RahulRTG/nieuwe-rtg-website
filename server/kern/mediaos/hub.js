@@ -121,7 +121,7 @@ function maakHub({ catalogus, bronnen, keyVanCodenaam, codenaamVan }) {
     const clips = lijst(() => bronnen.clipsVan(key, key));
     const kanaal = bronnen.liveVan ? bronnen.liveVan(key, key) : null;
     const theaterKanaal = bronnen.theaterKanaalVan ? bronnen.theaterKanaalVan(key) : null;
-    const clipVolgers = bronnen.clipsVolgersVan ? bronnen.clipsVolgersVan(key) : 0;
+    const clipVolgers = (bronnen.clipsVolgersVan ? bronnen.clipsVolgersVan(key) : []).length;
 
     const som = (rij, veld) => rij.reduce((n, x) => n + (Number(x[veld]) || 0), 0);
     const volgers = (theaterKanaal ? (theaterKanaal.volgers || 0) : 0) + clipVolgers;

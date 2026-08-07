@@ -79,15 +79,12 @@ module.exports = ({ db, save, schoon, catalogus }) => {
     t[sess.key] = t[sess.key] && typeof t[sess.key] === 'object' ? t[sess.key] : {};
     t[sess.key][naam] = soorten;
     save();
-    /* EERLIJK OVER WAT DIT VANDAAG DOET (regel 6: een belofte in tekst is een
-       belofte in code). De voorkeur wordt vastgelegd en de Media OS geeft hem
-       terug, maar er hangt hier nog GEEN verzending aan: de vier apps sturen
-       hun eigen meldingen zoals ze dat altijd deden. Een scherm dat "u krijgt
-       voortaan alleen nog X" zou beloven wat er niet gebeurt. Staat als taak
-       in TAKEN.md, met de oorzaak erbij. */
+    /* Deze zin is een belofte in code (regel 6): ./wekken.js kijkt bij elk
+       nieuw stuk van deze maker precies naar DEZE lijst. Verandert dat, dan
+       verandert de zin mee -- toets 12 houdt ze aan elkaar. */
     return { status: 200, ok: true, codenaam: naam, soorten, soortenMogelijk: MELD_SOORTEN,
-      let: 'Vastgelegd. Er hangt hier vandaag nog geen verzending aan: de vier apps sturen hun eigen meldingen. ' +
-        'Dit is de lijst waar de Media OS naar kijkt zodra hij zelf gaat sturen.' };
+      let: 'Vastgelegd. Nieuw werk van ' + naam + ' wekt de volgers die dat soort aan hebben staan; ' +
+        'de algemene meldingsschakelaar van uw account blijft er nog bovenop staan.' };
   }
   const meldVan = (key, naam) => {
     const t = meldTabel()[key] || {};

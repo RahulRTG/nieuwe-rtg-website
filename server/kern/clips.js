@@ -18,7 +18,7 @@ const DAGSELECTIE = 25;              // de eindige dagselectie
 const CLIPS_PER_MAKER = 100;
 const REACTIES_MAX = 200;
 
-function maakClips({ db, save, crypto, schoon, codenaamVan, sseToCustomer, sseToOffice, eigenTrack }) {
+function maakClips({ db, save, crypto, schoon, codenaamVan, sseToCustomer, sseToOffice, eigenTrack, nieuwWerk }) {
   const id = () => 'c' + crypto.randomBytes(5).toString('hex');
   const nu = () => new Date().toISOString();
   const aanwezigheid = new Map();     // clipId -> ts van de laatste hartslag
@@ -51,6 +51,7 @@ function maakClips({ db, save, crypto, schoon, codenaamVan, sseToCustomer, sseTo
     db.data.clips.push(c);
     save();
     aanwezigheid.set(c.id, Date.now());
+    if (nieuwWerk) { try { nieuwWerk(key, 'flow', c.titel); } catch (e) {} }
     return { status: 200, ok: true, id: c.id };
   }
   function weg(key, cid) {

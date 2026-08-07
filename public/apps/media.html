@@ -75,6 +75,11 @@
   .speler .sub{font-size:0.7rem;color:var(--soft);}
   .speler video{width:100%;max-height:36vh;background:#000;border-radius:10px;margin-bottom:0.5rem;display:none;}
   .speler video.zien{display:block;}
+  #clipvlak{margin-bottom:0.5rem;}
+  #clipvlak[hidden]{display:none;}
+  #clipvlak video{display:block;max-height:40vh;}
+  #clipvlak .ondert{text-align:center;font-size:0.85rem;padding:0.3rem 0;}
+  #clipvlak .ondert span{background:rgba(0,0,0,0.7);padding:0.1rem 0.4rem;border-radius:4px;}
 
   .melding{position:fixed;left:50%;transform:translateX(-50%);bottom:6.5rem;background:var(--card2);
     border:1px solid var(--line);border-radius:10px;padding:0.55rem 0.9rem;font-size:0.8rem;z-index:30;
@@ -117,6 +122,12 @@
 
 <footer class="speler" aria-label="Speler">
   <video id="film" playsinline controls></video>
+  <!-- de clip speelt in zijn eigen vlak: de deler zet er het beeld, de
+       ondertitelband en de statusregel in -->
+  <div id="clipvlak" hidden>
+    <video id="clipfilm" playsinline controls></video>
+    <div class="status stil"></div>
+  </div>
   <div class="rij">
     <div class="info">
       <div class="titel" id="spTitel">Nog stil</div>
@@ -134,6 +145,12 @@
 <script src="/apps/klankwerk/klanken.js"></script>
 <script src="/apps/klankwerk/zang.js"></script>
 <script src="/apps/klankwerk/motor.js"></script>
+<!-- De clipdeler: DEZELFDE laag waarmee /apps/clips.html clips afspeelt en
+     uitdient. Geen tweede exemplaar van het P2P-protocol (LAT.md regel 4);
+     hierdoor speelt FLOW een clip hier ter plekke, en dient dit scherm de
+     eigen clips ook uit zolang het openstaat. -->
+<script src="/shared/clipdeler.js"></script>
+<script src="/apps/media/speler.js"></script>
 <script src="/apps/media/wereld.js"></script>
 <script src="/apps/media/blad.js"></script>
 <script src="/shared/deelmenu.js" defer></script>

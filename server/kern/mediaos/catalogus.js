@@ -99,9 +99,18 @@ function maakCatalogus({ bronnen }) {
       at: c.at, duurS: c.speelduurS || c.duurS, onderwerp: null,
       meta: (c.speelduurS || c.duurS) + 's · ' + (c.online ? 'maker online' : 'maker offline') +
         (c.ondertiteld ? ' · ondertiteld' : ''),
-      spelen: { soort: 'elders', bron: '/apps/clips.html', reden: 'Het beeld staat op het toestel van de maker en reist rechtstreeks; dat doorgeefluik staat in Clips.' },
+      /* 'p2p': dit speelt WEL hier, maar niet langs RTG. De bytes staan op het
+         toestel van de maker en reizen rechtstreeks; shared/clipdeler.js doet
+         dat, en dezelfde laag speelt hem in Clips. `bron` is waar een scherm
+         zonder die laag hem alsnog kan kijken -- geen dode knop. */
+      spelen: { soort: 'p2p', bron: '/apps/clips.html',
+        reden: 'Het beeld staat op het toestel van de maker en reist rechtstreeks; RTG heeft die bytes niet.' },
       cijfers: { reacties: c.reacties || 0 },
       poster: c.poster || null, geluid: c.geluid || 'eigen', muziek: c.muziek || null,
+      /* Wat de speler nodig heeft om de clip te tonen ZOALS de maker hem
+         bedoelde: is hij nu bereikbaar, waar begint en eindigt de knip, en de
+         ondertitels (die komen wel van RTG, want tekst is klein). */
+      online: !!c.online, knip: c.knip || null, ondertitels: c.ondertitels || [],
       mijn: !!c.mijn, volgIk: !!c.volgIk
     };
   }

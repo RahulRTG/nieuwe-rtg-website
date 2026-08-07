@@ -40,45 +40,12 @@
 
   var stand = null, modus = 'alles';
 
-  /* ---- afspelen ----
-     Muziek rekent uw eigen toestel uit met de motor van het Klankwerk; een
-     video komt met bereik-verzoeken uit het Theater. Wat elders hoort te
-     spelen (een clip staat op het toestel van de maker, live gaat van kijker
-     naar kijker) zegt dat, en brengt u naar de app waar dat doorgeefluik
-     staat. Een knop die doet alsof, is erger dan een knop die verwijst. */
-  function stopAlles() {
-    if (window.RTGStudioMotor) window.RTGStudioMotor.stop();
-    var f = $('#film');
-    f.pause(); f.removeAttribute('src'); f.load(); f.classList.remove('zien');
-  }
-  function speel(s) {
-    stopAlles();
-    if (s.spelen.soort === 'motor') {
-      fetch('/api/muziek/uitgave', { method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
-        body: JSON.stringify({ id: s.spelen.bron }) })
-        .then(function (r) { return r.json(); })
-        .then(function (d) {
-          if (!d || d.error || !d.uitgave) return zeg((d && d.error) || 'Dat stuk kon niet geladen worden.');
-          var u = d.uitgave;
-          window.RTGStudioMotor.speel({ bpm: u.bpm, maten: u.maten, stappen: u.stappen, kanalen: u.kanalen }, { lus: false });
-          $('#spTitel').textContent = s.titel;
-          $('#spSub').textContent = s.maker.codenaam + ' · uw toestel rekent dit zelf uit; er reist geen bestand';
-        });
-      return;
-    }
-    if (s.spelen.soort === 'stream') {
-      var f = $('#film');
-      f.src = s.spelen.bron + '?token=' + encodeURIComponent(TOKEN);
-      f.classList.add('zien');
-      f.play().catch(function () {});
-      $('#spTitel').textContent = s.titel;
-      $('#spSub').textContent = s.maker.codenaam + ' · origineel beeld uit het Theater';
-      return;
-    }
-    zeg(s.spelen.reden || 'Dit speelt in zijn eigen app.');
-    window.location.href = s.spelen.bron;
-  }
+
+  /* Afspelen staat in ./speler.js: drie heel verschillende manieren waarop een
+     stuk kan klinken of te zien zijn (de motor op dit toestel, een stroom uit
+     het Theater, of rechtstreeks van het toestel van een ander), en dat is een
+     eigen onderwerp -- en dit bestand blijft er onder de omvangregel mee. */
+  var S = window.RTGMediaSpeler;
 
   /* ---- de kaart van één stuk ---- */
   function kaart(s) {
@@ -95,8 +62,9 @@
     if (s.waarom) k.appendChild(el('div', 'waarom', s.waarom));
 
     var rij = el('div', 'rij');
-    rij.appendChild(knop(s.spelen.soort === 'stream' ? '▶ Kijk' : (s.spelen.soort === 'motor' ? '▶ Luister' : '↗ Open'),
-      'vol', function () { speel(s); }));
+    var speelNaam = s.spelen.soort === 'stream' ? '▶ Kijk'
+      : (s.spelen.soort === 'motor' ? '▶ Luister' : (s.spelen.soort === 'p2p' && S.deler ? '▶ Speel' : '↗ Open'));
+    rij.appendChild(knop(speelNaam, 'vol', function () { S.speel(s); }));
     rij.appendChild(knop('Alles hierover', '', function () { window.RTGMediaBlad.stuk(s.id); }));
     var bew = knop(s.bewaard ? '✓ Bewaard' : '+ Bewaar', s.bewaard ? 'aan' : '', function () {
       api('bewaar', { id: s.id, aan: !s.bewaard }).then(function (d) {
@@ -161,6 +129,13 @@
   }
   function teken(d) {
     stand = d;
+    /* Welke clips op DIT toestel staan, zodat de deler ze kan uitdienen en de
+       aanwezigheid kan kloppen. Zonder deze regel is een maker die hier zit
+       voor iedereen "offline" terwijl zijn toestel gewoon aanstaat. */
+    if (S.deler && !d.error) {
+      S.deler.zetEigen((d.stukken || []).filter(function (x) { return x.vorm === 'clip' && x.mijn; })
+        .map(function (x) { return x.id.slice(x.id.indexOf(':') + 1); }));
+    }
     if (d.error) { $('#uitleg').textContent = d.error; return; }
     tekenStanden(d);
     $('#uitleg').textContent = d.uitleg;
@@ -191,15 +166,9 @@
     api('wereld', { modus: modus }).then(teken);
   }
 
-  $('#spStop').addEventListener('click', function () {
-    stopAlles();
-    $('#spTitel').textContent = 'Nog stil';
-    $('#spSub').textContent = 'Kies iets uit uw wereld.';
-  });
-
   /* Wat blad.js (de lade met de hub, de maker en het bord) nodig heeft. Eén
      api-ingang en één speler voor het hele scherm; geen tweede exemplaar. */
-  window.RTGMediaOS = { api: api, zeg: zeg, el: el, knop: knop, speel: speel, haal: haal,
+  window.RTGMediaOS = { api: api, zeg: zeg, el: el, knop: knop, speel: S.speel, haal: haal,
     kaart: kaart, stand: function () { return stand; } };
 
   haal();

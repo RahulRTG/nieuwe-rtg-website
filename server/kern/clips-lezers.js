@@ -29,10 +29,14 @@ module.exports = ({ db, lijsten, beeld }) => {
     if (!t) return [];
     return db.data.clips.filter(c => c.muziek && c.muziek.id === t).sort(opDatum).map(c => beeld(c, kijkerKey));
   };
+  /* De SLEUTELS van wie deze maker volgt, niet een getal. Het makersbord wil
+     tellen en de meldingslaag wil ze een voor een wekken; als dit een getal
+     was, kwam er voor dat tweede een tweede functie -- en dan kunnen ze uit
+     elkaar gaan lopen (LAT.md regel 4). Tellen doet de beller maar. */
   const clipsVolgersVan = (makerKey) => {
     lijsten();
     return Object.keys(db.data.clipsVolg)
-      .filter(k => (db.data.clipsVolg[k] || []).includes(makerKey)).length;
+      .filter(k => (db.data.clipsVolg[k] || []).includes(makerKey));
   };
 
   return { clipsVan, clipsMetTrack, clipsVolgersVan };

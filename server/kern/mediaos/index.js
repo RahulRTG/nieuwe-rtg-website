@@ -34,6 +34,7 @@
 const { maakCatalogus } = require('./catalogus');
 const { maakSmaak } = require('./smaak');
 const { maakHub } = require('./hub');
+const { maakWekken } = require('./wekken');
 
 const MODI = {
   muziek: { naam: 'Muziek', vormen: ['track'] },
@@ -43,7 +44,7 @@ const MODI = {
 };
 const WERELD_MAX = 60;      // de wereld is eindig, en zegt waar hij ophoudt
 
-function maakMediaOS({ db, save, schoon, codenaamVan, keyVanCodenaam, bronnen }) {
+function maakMediaOS({ db, save, schoon, codenaamVan, keyVanCodenaam, notify, bronnen }) {
   const catalogus = maakCatalogus({ bronnen });
   const smaak = maakSmaak({ db, save, schoon });
   const hub = maakHub({ catalogus, bronnen, keyVanCodenaam, codenaamVan });
@@ -54,6 +55,10 @@ function maakMediaOS({ db, save, schoon, codenaamVan, keyVanCodenaam, bronnen })
      bestand is het enige dat schrijft in eigen tafels. */
   const eigen = require('./eigen')({ db, save, schoon, catalogus });
   const { biebVan, bewaar, bieb, meldZet, meldVan, MELD_SOORTEN } = eigen;
+  /* En de andere kant van die voorkeur: nieuw werk wekt de volgers die dit
+     soort van deze maker aan hebben staan (./wekken.js). De vier domeinen
+     roepen dat aan via een laat gebonden haak in ./opzet/kernlaag*.js. */
+  const wekken = maakWekken({ notify, codenaamVan, meldVan, bronnen });
 
   /* ---- volgen: één knop, en hij schrijft in de domeinen zelf ----
      Clips en het Theater kennen een gratis volgrelatie; die worden allebei
@@ -138,6 +143,7 @@ function maakMediaOS({ db, save, schoon, codenaamVan, keyVanCodenaam, bronnen })
     mediaSmaakStuur: (sess, o) => smaak.smaakStuur(sess.key, o),
     mediaSmaakVan: (sess) => ({ status: 200, smaak: smaak.smaakVan(sess.key), regelaars: smaak.smaakRegelaars() }),
     mediaStuk: hub.mediaStuk, mediaMaker: hub.mediaMaker, mediaBord: hub.mediaBord,
+    mediaNieuwWerk: wekken.mediaNieuwWerk, mediaVolgersVan: wekken.mediaVolgersVan,
     MEDIA_MODI: MODI, MEDIA_MELD_SOORTEN: MELD_SOORTEN
   };
 }

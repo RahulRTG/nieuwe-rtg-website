@@ -83,6 +83,15 @@ test('2. één catalogus, drie standen: elke vorm komt in zijn eigen stand terug
   assert.ok(clip, 'de clip staat in FLOW, met het universele id clip:<id>');
   assert.equal(clip.vorm, 'clip');
   assert.equal(clip.maker.codenaam, makerNaam, 'op codenaam, nooit op naam');
+  /* Een clip speelt WEL in dit scherm, maar niet langs RTG: de bytes staan op
+     het toestel van de maker. Daarom draagt hij alles wat de gedeelde
+     clipdeler nodig heeft om hem te tonen zoals de maker hem bedoelde. */
+  assert.equal(clip.spelen.soort, 'p2p');
+  assert.equal(clip.spelen.bron, '/apps/clips.html', 'en waar een scherm zonder die laag hem alsnog kan kijken');
+  assert.match(clip.spelen.reden, /RTG heeft die bytes niet/);
+  assert.equal(clip.online, true, 'de maker is net actief geweest');
+  assert.deepEqual(clip.ondertitels, []);
+  assert.equal(clip.knip, null);
   assert.ok(!flow.body.stukken.some(s => s.vorm === 'track'), 'FLOW bevat geen muziek');
 
   const muziek = await api('/api/mediaos/wereld', { modus: 'muziek' }, kijker);
@@ -267,6 +276,41 @@ test('11. het makersbord telt alleen wat er echt geteld wordt, en zegt wat niet'
   assert.ok(b.body.nietGeteld.some(x => /kijktijd/.test(x)));
 });
 
+test('11c. nieuw werk wekt de volgers die dat soort aan hebben staan -- en niemand anders', async () => {
+  /* De andere kant van de meldingsvoorkeur. De kijker volgt de maker (uit
+     toets 2c/4) en zet zijn voorkeur op ALLEEN muziek. Dan geeft de maker een
+     tweede stuk uit: dat moet aankomen. Daarna maakt hij een clip: die mag
+     juist NIET aankomen, want daar heeft de kijker niet om gevraagd. Zonder
+     dat tweede deel toetst dit alleen "er komt iets binnen". */
+  const melding = async (token) => (await api('/api/privacy/export', {}, token)).body.notifications || [];
+  await api('/api/mediaos/meldingen', { codenaam: makerNaam, soorten: ['muziek'] }, kijker);
+  const voor = (await melding(kijker)).length;
+
+  const t2 = (await api('/api/muziek/maak', {}, maker)).body.track.id;
+  await api('/api/muziek/bewaar', { id: t2, naam: 'Ochtendlicht', klaar: true }, maker);
+  assert.equal((await api('/api/muziek/uitgeven', { id: t2 }, maker)).status, 200);
+  const na = await melding(kijker);
+  assert.equal(na.length, voor + 1, 'er is precies één melding bijgekomen');
+  assert.equal(na[0].title, 'RTG Media');
+  assert.match(na[0].body, new RegExp(makerNaam + ': nieuwe muziek -- "Ochtendlicht"'));
+
+  const clip = await api('/api/clips/maak', { titel: 'Stil straatje', duurS: 8, mbGeschat: 1 }, maker);
+  assert.equal(clip.status, 200);
+  assert.equal((await melding(kijker)).length, voor + 1, 'een clip wekt hem niet: daar vroeg hij niet om');
+
+  /* En de maker wordt nooit over zijn eigen werk gewekt. Dat is geen dode
+     regel: het Theater laat een maker zich wél op zijn eigen kanaal
+     abonneren, en dan staat hij dus in zijn eigen volgerslijst. Zonder de
+     uitzondering in wekken.js krijgt hij hieronder zijn eigen uitgave terug. */
+  assert.equal((await api('/api/theater/abonneer', { kanaalId, aan: true }, maker)).status, 200);
+  const t3 = (await api('/api/muziek/maak', {}, maker)).body.track.id;
+  await api('/api/muziek/bewaar', { id: t3, naam: 'Eigen echo', klaar: true }, maker);
+  assert.equal((await api('/api/muziek/uitgeven', { id: t3 }, maker)).status, 200);
+  assert.ok(!(await melding(maker)).some(n => n.title === 'RTG Media'), 'geen melding over je eigen werk');
+  await api('/api/theater/abonneer', { kanaalId, aan: false }, maker);
+  await api('/api/clips/weg', { id: clip.body.id }, maker);
+});
+
 test('11b. Rahul kan hier zelf aan draaien: de paden staan op zijn kaart', async () => {
   /* Het AI-stuur (kern/stuur.js) leest de router en houdt geen eigen lijst bij,
      dus een nieuw domein valt er vanzelf onder -- MITS het geen werk-pad is en
@@ -285,10 +329,7 @@ test('12. meldingen per maker: één keer volgen, zelf kiezen waarvoor', async (
   const m = await api('/api/mediaos/meldingen', { codenaam: makerNaam, soorten: ['muziek', 'live', 'onzin'] }, kijker);
   assert.equal(m.status, 200);
   assert.deepEqual(m.body.soorten, ['muziek', 'live'], 'een verzonnen soort wordt weggegooid, niet overgenomen');
-  /* En hij belooft geen bezorging die er niet is: de voorkeur wordt vastgelegd,
-     maar de Media OS verstuurt vandaag zelf niets (TAKEN.md). Dat staat in het
-     antwoord, zodat het scherm het niet zelf hoeft te verzinnen. */
-  assert.match(m.body.let, /nog geen verzending/);
+  assert.match(m.body.let, /wekt de volgers/, 'en het antwoord zegt wat er met die voorkeur gebeurt');
   // toets 10 haalde de clip weg; zonder volgbaar werk is er niets om aan te haken
   const nieuw = await api('/api/clips/maak', { titel: 'Tweede clip', duurS: 12, mbGeschat: 2 }, maker);
   assert.equal(nieuw.status, 200);

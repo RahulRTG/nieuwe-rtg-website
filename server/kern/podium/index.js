@@ -36,7 +36,7 @@ const SIGNALEN = ['offer', 'answer', 'ice', 'stop'];
 // en groeit de boom in de diepte mee - onbeperkt veel kijkers, zonder mediaserver.
 const FANOUT = 4;
 
-function maakPodium({ db, save, crypto, accounts, leeftijdVan, codenaamVan, sseToCustomer, sseToOffice, notify, pay, schoon }) {
+function maakPodium({ db, save, crypto, accounts, leeftijdVan, codenaamVan, sseToCustomer, sseToOffice, notify, nieuwWerk, pay, schoon }) {
   const id = () => 'pk' + crypto.randomBytes(4).toString('hex');
   const nu = () => new Date().toISOString();
 
@@ -154,7 +154,7 @@ function maakPodium({ db, save, crypto, accounts, leeftijdVan, codenaamVan, sseT
   // de gedeelde ctx voor de deelbestanden
   const ctx = {
     db, save, schoon, id, nu, mag, lijsten, kanaalMet, kanaalVan, isAbonnee, verseKijkers,
-    stuurRond, kijkBeeld, eigenBeeld, metIdem, codenaamVan, sseToCustomer, sseToOffice, notify, pay,
+    stuurRond, kijkBeeld, eigenBeeld, metIdem, codenaamVan, sseToCustomer, sseToOffice, notify, nieuwWerk, pay,
     koppel, herstelBoom, ouderKeyVan, kiesOuder,
     GENRES, CADEAUS, CHAT_MAX, ABB_DAGEN, SIGNALEN, FANOUT
   };

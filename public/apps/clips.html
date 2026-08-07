@@ -169,6 +169,7 @@
 
 <div class="melding" id="melding" role="status"></div>
 <script src="/shared/uitvoer.js"></script>
+<script src="/shared/clipdeler.js"></script>
 <script>
 (() => {
   const $ = s => document.querySelector(s);
@@ -181,16 +182,12 @@
   const zeg = t => { const m = $('#melding'); m.textContent = t; m.classList.add('zien');
     clearTimeout(meldT); meldT = setTimeout(() => m.classList.remove('zien'), 3400); };
 
-  /* ---------- OPFS: het eigen archief van maker en kijker ---------- */
-  const opfs = () => navigator.storage.getDirectory();
-  async function schrijf(naam, blob) {
-    const fh = await (await opfs()).getFileHandle(naam, { create: true });
-    const w = await fh.createWritable(); await w.write(blob); await w.close();
-  }
-  async function lees(naam) {
-    try { return await (await (await opfs()).getFileHandle(naam)).getFile(); }
-    catch (e) { return null; }
-  }
+  /* ---------- de clipdeler: OPFS, afspelen, dienen en het signaalkanaal ----------
+     Dit alles staat in /shared/clipdeler.js, want de Media OS (/apps/media.html)
+     speelt dezelfde clips in de stand FLOW. Twee exemplaren van dit protocol
+     zouden twee waarheden opleveren over knip, ondertitels, cache en dienen
+     (LAT.md regel 4). De deler dient ook UIT zolang deze pagina openstaat. */
+  const deler = window.RTGClipDeler ? window.RTGClipDeler.start({ token: token, opStatus: zeg }) : null;
 
   /* ---------- de feed: eindige dagselectie, geen oneindige scroll ---------- */
   let feedData = null, mijnIds = [];
@@ -237,7 +234,7 @@
       const maakKnop = (tekst, cls, doe) => { const b = document.createElement('button');
         b.className = 'knop ' + (cls || ''); b.type = 'button'; b.textContent = tekst;
         b.addEventListener('click', doe); rij.appendChild(b); return b; };
-      maakKnop('▶ Speel', 'vol', () => speel(sec, c));
+      maakKnop('▶ Speel', 'vol', () => (deler ? deler.speel(sec, c) : zeg('Afspelen kan hier niet.')));
       if (!c.mijn) {
         const vb = maakKnop(c.volgIk ? '✓ Volgend' : '+ Volg', '', async () => {
           const r2 = await api('volg', { id: c.id, aan: !c.volgIk });
@@ -268,123 +265,7 @@
     nogEen.addEventListener('click', () => $('#feed').scrollTo({ top: 0, behavior: 'smooth' }));
     einde.appendChild(nogEen);
     feed.appendChild(einde);
-    hartslag();
-  }
-
-  /* ---------- afspelen: eigen archief, cache, of rechtstreeks P2P ---------- */
-  const ijs = [{ urls: 'stun:stun.l.google.com:19302' }];
-  let ontvangst = null, kijkPc = null;
-  async function speel(sec, c) {
-    const vid = sec.querySelector('video');
-    if (vid.src) { vid.muted = false; vid.play().catch(() => {}); return; }
-    const eigen = await lees((c.mijn ? 'clip-' : 'clipcache-') + c.id + '.webm');
-    if (eigen) { toonVideo(sec, eigen, c); return; }
-    if (c.mijn) { zeg('Deze clip staat niet (meer) op dit toestel.'); return; }
-    if (!c.online) { zeg('De maker is nu niet online; deze clip staat alleen op diens eigen toestel.'); return; }
-    sec.querySelector('.status').textContent = 'Rechtstreeks ophalen bij ' + c.codenaam + '…';
-    ontvangst = { clipId: c.id, clip: c, sec, brokken: [], bytes: 0, totaal: 0 };
-    const r = await api('signaal', { id: c.id, kind: 'vraag' });
-    if (r.body.error) { zeg(r.body.error); ontvangst = null; }
-  }
-  /* Afspelen met de knip en de ondertitels van de maker.
-     DE KNIP IS GEEN NIEUWE VIDEO. Het origineel staat bij de maker en blijft
-     heel; wij springen naar het begin en stoppen bij het eind. Daarom kan een
-     knip ook altijd terug: er is nooit iets weggegooid.
-     De ondertitels komen wel van RTG (tekst is klein), zodat de kijker ze heeft
-     ook al reist het beeld rechtstreeks van toestel naar toestel. */
-  function toonVideo(sec, blob, c) {
-    const vid = sec.querySelector('video');
-    vid.src = URL.createObjectURL(blob);
-    // "stil" is de mededeling van de maker dat deze clip zonder geluid werkt
-    vid.muted = !!(c && c.geluid === 'stil');
-    const knip = c && c.knip;
-    if (knip) {
-      const start = () => { if (vid.currentTime < knip.van) vid.currentTime = knip.van; };
-      vid.addEventListener('loadedmetadata', start);
-      if (vid.readyState >= 1) start();
-      vid.addEventListener('timeupdate', () => { if (vid.currentTime >= knip.tot) vid.pause(); });
-    }
-    if (c && c.ondertitels && c.ondertitels.length) toonOndertitels(sec, vid, c.ondertitels);
-    vid.play().catch(() => { vid.muted = true; vid.play().catch(() => {}); });
-    const p = sec.querySelector('img.poster'); if (p) p.remove();
-    sec.querySelector('.status').textContent = 'Speelt: rechtstreeks ontvangen, niets bij RTG bewaard';
-  }
-  function toonOndertitels(sec, vid, regels) {
-    let band = sec.querySelector('.ondert');
-    if (!band) { band = document.createElement('div'); band.className = 'ondert'; sec.appendChild(band); }
-    vid.addEventListener('timeupdate', () => {
-      const t = vid.currentTime;
-      const nu = regels.find(r => t >= r.van && t <= r.tot);
-      band.innerHTML = nu ? '<span>' + esc(nu.tekst) + '</span>' : '';
-    });
-  }
-  async function kijkOntvang(d) {
-    if (!ontvangst || d.clipId !== ontvangst.clipId) return;
-    if (d.kind === 'offer') {
-      if (kijkPc) { try { kijkPc.close(); } catch (e) {} }
-      kijkPc = new RTCPeerConnection({ iceServers: ijs });
-      kijkPc.onicecandidate = ev => { if (ev.candidate) api('signaal', { id: d.clipId, kind: 'ice', payload: ev.candidate }); };
-      kijkPc.ondatachannel = ev => {
-        const kanaal = ev.channel; kanaal.binaryType = 'arraybuffer';
-        kanaal.onmessage = async m => {
-          if (typeof m.data === 'string') {
-            const b = JSON.parse(m.data);
-            if (b.soort === 'kop') ontvangst.totaal = b.bytes;
-            if (b.soort === 'klaar') {
-              const blob = new Blob(ontvangst.brokken, { type: 'video/webm' });
-              try { await schrijf('clipcache-' + ontvangst.clipId + '.webm', blob); } catch (e) {}
-              toonVideo(ontvangst.sec, blob, ontvangst.clip);
-            }
-            return;
-          }
-          ontvangst.brokken.push(m.data); ontvangst.bytes += m.data.byteLength;
-          if (ontvangst.totaal) ontvangst.sec.querySelector('.status').textContent =
-            'Ophalen: ' + Math.round(ontvangst.bytes / ontvangst.totaal * 100) + '%';
-        };
-      };
-      await kijkPc.setRemoteDescription(d.payload);
-      const antwoord = await kijkPc.createAnswer();
-      await kijkPc.setLocalDescription(antwoord);
-      api('signaal', { id: d.clipId, kind: 'answer', payload: antwoord });
-    } else if (d.kind === 'ice' && kijkPc) { try { await kijkPc.addIceCandidate(d.payload); } catch (e) {} }
-  }
-
-  /* ---------- als maker dienen: het origineel uit het eigen archief ---------- */
-  const dienPcs = new Map();
-  async function dienUit(d) {
-    const f = await lees('clip-' + d.clipId + '.webm'); if (!f) return;
-    const buf = await f.arrayBuffer();
-    const pc = new RTCPeerConnection({ iceServers: ijs });
-    dienPcs.set(d.van, pc);
-    const kanaal = pc.createDataChannel('clip');
-    kanaal.binaryType = 'arraybuffer';
-    kanaal.onopen = async () => {
-      kanaal.send(JSON.stringify({ soort: 'kop', bytes: buf.byteLength }));
-      const BROK = 64 * 1024;
-      for (let p = 0; p < buf.byteLength; p += BROK) {
-        while (kanaal.bufferedAmount > 4 * 1024 * 1024) await new Promise(r => setTimeout(r, 60));
-        kanaal.send(buf.slice(p, p + BROK));
-      }
-      kanaal.send(JSON.stringify({ soort: 'klaar' }));
-    };
-    pc.onicecandidate = ev => { if (ev.candidate) api('signaal', { id: d.clipId, kind: 'ice', doelKey: d.van, payload: ev.candidate }); };
-    const offer = await pc.createOffer();
-    await pc.setLocalDescription(offer);
-    api('signaal', { id: d.clipId, kind: 'offer', doelKey: d.van, payload: offer });
-  }
-  async function hartslag() { if (mijnIds.length) await api('aanwezig', { ids: mijnIds }); }
-  setInterval(hartslag, 45000);
-
-  function startSse() {
-    if (!window.EventSource || !token) return;
-    const es = new EventSource('/api/stream?token=' + encodeURIComponent(token));
-    es.addEventListener('clips', async e => {
-      const d = JSON.parse(e.data);
-      if (d.kind === 'vraag') dienUit(d);
-      else if (d.kind === 'answer') { const pc = dienPcs.get(d.van); if (pc) try { await pc.setRemoteDescription(d.payload); } catch (e2) {} }
-      else if (d.kind === 'ice' && dienPcs.get(d.van)) { try { await dienPcs.get(d.van).addIceCandidate(d.payload); } catch (e2) {} }
-      else kijkOntvang(d);
-    });
+    if (deler) deler.zetEigen(mijnIds);
   }
 
   /* ---------- de studio: opnemen, lokaal bewaren, kaart delen ---------- */
@@ -434,7 +315,7 @@
     const poster = await posterVan(opnameBlob);
     const r = await api('maak', { titel, duurS, poster, mbGeschat: Math.max(1, Math.round(opnameBlob.size / 1048576)) });
     if (r.body.error) return zeg(r.body.error);
-    try { await schrijf('clip-' + r.body.id + '.webm', opnameBlob); }
+    try { await deler.bewaar(r.body.id, opnameBlob); }
     catch (e) { await api('weg', { id: r.body.id }); return zeg('Lokaal bewaren lukte niet: ' + e.message); }
     zeg('"' + titel + '" staat in uw archief; kijkers halen hem rechtstreeks bij u op.');
     $('#clipTitel').value = ''; $('#deelClip').disabled = true;
@@ -564,7 +445,7 @@
   $('#reactieDicht').addEventListener('click', () => $('#reactieSheet').classList.remove('open'));
 
   if (!token) { zeg('Log eerst in op de leden-app.'); }
-  else { laadFeed(); startSse(); }
+  else { laadFeed(); }
 })();
 </script>
 <script src="/shared/metgezel.js" defer></script>

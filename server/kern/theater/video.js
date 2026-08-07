@@ -5,6 +5,8 @@
    en geven het WebRTC-signaal door. Plus verwijderen en de stream-verwijzing voor de
    kijk-route. Krijgt de gedeelde ctx van kern/theater/index.js. */
 module.exports = (ctx) => {
+  // nieuwWerk: de haak van de Media OS (laat gebonden en optioneel)
+  const nieuwWerk = ctx.nieuwWerk;
   const { db, save, fs, path, mediaDir, schoon, nu, id, lijsten, kanaalVan, kanaalMet, videoMet,
     kanaalBytes, mbVan, sseToCustomer, thuisAanwezigheid, thuisOnline,
     THUIS_TTL_MS, THUIS_SIGNALEN, MAX_VIDEO_MB, MAX_KANAAL_MB } = ctx;
@@ -45,6 +47,10 @@ module.exports = (ctx) => {
     try { fs.writeFileSync(path.join(mediaDir, v.id + '.' + v.ext), buffer); }
     catch (e) { return { status: 500, error: 'Opslaan mislukte: ' + e.message }; }
     v.bytes = buffer.length; v.klaar = true; save();
+    /* Pas HIER is er iets te kijken: een kaart zonder bytes is geen video, en
+       de volgers wekken op het moment van aanmaken zou ze naar een leeg scherm
+       sturen. Laat gebonden; zie kern/mediaos/. */
+    if (nieuwWerk) { try { nieuwWerk(key, 'video', v.titel); } catch (e) {} }
     return { status: 200, ok: true, mb: mbVan(v.bytes) };
   }
   function videoWeg(vid) {

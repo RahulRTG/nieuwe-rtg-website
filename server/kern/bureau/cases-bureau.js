@@ -17,7 +17,7 @@
 'use strict';
 
 module.exports = (ctx) => {
-  const { db, save, liveCodename, notify, lees, stap, openCase, KANTOOR_STATUSSEN, SOORTEN } = ctx;
+  const { db, save, liveCodename, notify, lees, stap, openCase, KANTOOR_STATUSSEN, SOORTEN, bezitZet } = ctx;
 
   function bureauDesk() {
     const uit = [];
@@ -44,6 +44,27 @@ module.exports = (ctx) => {
     if (!KANTOOR_STATUSSEN.includes(status)) return { status: 400, error: 'Onbekende status.' };
     if (c.beslissing.nodig) return { status: 400, error: 'Dit lid heeft nog geen akkoord gegeven.' };
     stap(c, status, notitie, 'kantoor');
+
+    /* DE STAART VAN EEN INKOOP. Zodra een aankoop geregeld is, schrijft hij
+       zichzelf in het Bezittingenregister -- de app die daarover gaat, via zijn
+       eigen functie, want een tweede plek waar bezittingen ontstaan is precies
+       wat hier niet mag. Vanaf dat moment loopt het voorwerp mee in de graaf en
+       vraagt de Control Tower er vanzelf een verzekering en een taxatie bij.
+
+       Dat is de verbinding waar het om gaat: "ik heb X nodig" eindigt niet bij
+       de levering maar bij een voorwerp dat verzekerd, getaxeerd en teruggevonden
+       kan worden. Faalt het schrijven, dan blijft `gedaan` false en zegt het
+       scherm dat er nog iets in het register moet -- stil doorlopen zou een
+       aankoop onzichtbaar maken. */
+    if (status === 'geregeld' && c.registreren && !c.registreren.gedaan && bezitZet) {
+      const r = bezitZet(key, { naam: c.registreren.naam, soort: c.registreren.soort,
+        waarde: c.registreren.waarde });
+      if (r && r.ok) {
+        c.registreren.gedaan = true;
+        c.registreren.bezitId = r.bezit && r.bezit.id;
+        stap(c, status, 'In uw register gezet als "' + c.registreren.naam + '". Wij vragen u nog om de verzekering.', 'systeem');
+      }
+    }
     if (notify) {
       try { notify(key, { title: 'Uw Privékantoor', body: '"' + c.titel + '" is nu: ' + status + '.', scope: 'lifestyle' }); }
       catch (e) { /* een melding die niet aankomt mag de statusstap niet omgooien */ }

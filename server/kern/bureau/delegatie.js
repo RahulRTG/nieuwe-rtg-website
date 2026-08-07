@@ -137,8 +137,13 @@ module.exports = (ctx) => {
 
   /* HET OORDEEL. Elke case loopt hierlangs, en het antwoord bepaalt of er een
      handtekening nodig is. Eén plek, zodat de regel niet per soort verzoek
-     opnieuw wordt bedacht. */
-  function beoordeel(key, domein, centen) {
+     opnieuw wordt bedacht.
+
+     Heet `delegatieOordeel` en niet `beoordeel`: dat laatste stond al in twee
+     andere kernmodules, en de keuring wees dat aan. Drie functies met dezelfde
+     naam in dezelfde laag is hoe je bij het verkeerde oordeel uitkomt als je
+     ooit iets verplaatst. */
+  function delegatieOordeel(key, domein, centen) {
     const d = D(key);
     const st = standVan(d, domein);
     if (!st) return { niveau: STANDAARD_NIVEAU, magZelf: false, reden: 'Onbekend domein: wij vragen u om akkoord.' };
@@ -166,6 +171,6 @@ module.exports = (ctx) => {
         : 'Routine binnen uw grens van ' + eur(st.grensCenten) + '. U leest het terug in het logboek.' };
   }
 
-  return { delegatie, delegatieZet, beoordeel, delegatieStand: (key, dom) => standVan(D(key), dom),
+  return { delegatie, delegatieZet, beoordeel: delegatieOordeel, delegatieStand: (key, dom) => standVan(D(key), dom),
     DELEGATIE_DOMEINEN: DOMEINEN, DELEGATIE_NIVEAUS: NIVEAUS };
 };

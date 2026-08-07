@@ -5,7 +5,9 @@
    bevestigt een MENS de boeking, nooit de AI. Gemount vanuit routes/office.js. */
 module.exports = (octx) => {
   const { kern } = octx;
-  const { app, officeAuth, conciergeDesk, conciergeVoortgang, bureauDesk, bureauVoortgang } = kern;
+  const { app, officeAuth, conciergeDesk, conciergeVoortgang } = kern;
+  // alleen de balie: het kantoor kan de graaf en het mandaat van een lid niet zien
+  const B = kern.bureauBalie;
 
   app.post('/api/office/concierge', officeAuth, (req, res) => res.json(conciergeDesk()));
 
@@ -20,10 +22,10 @@ module.exports = (octx) => {
      zit een MENS, en alleen deze kant kan een zaak op 'geregeld' zetten.
      Besloten zaken (gezondheid, nalatenschap) komen hier niet binnen; dat is
      geen filter op dit scherm maar een grendel in de kern. */
-  app.post('/api/office/bureau', officeAuth, (req, res) => res.json(bureauDesk()));
+  app.post('/api/office/bureau', officeAuth, (req, res) => res.json(B.desk()));
 
   app.post('/api/office/bureau/voortgang', officeAuth, (req, res) => {
-    const r = bureauVoortgang(String(req.body.key || ''), String(req.body.id || ''), String(req.body.status || ''), req.body.notitie);
+    const r = B.voortgang(String(req.body.key || ''), String(req.body.id || ''), String(req.body.status || ''), req.body.notitie);
     if (r.error) return res.status(r.status || 400).json({ error: r.error });
     res.json(r);
   });

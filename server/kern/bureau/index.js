@@ -35,7 +35,7 @@
    de suite (routes/member/bureau.js). */
 'use strict';
 
-module.exports = ({ db, save, crypto, anthropic, liveCodename, notify }) => {
+module.exports = ({ db, save, crypto, anthropic, liveCodename, notify, bezitZet }) => {
   const nu = () => new Date().toISOString();
   const rid = () => crypto.randomBytes(4).toString('hex');
   const schoon = (t, n) => String(t == null ? '' : t).replace(/[<>]/g, '').trim().slice(0, n || 200);
@@ -44,63 +44,26 @@ module.exports = ({ db, save, crypto, anthropic, liveCodename, notify }) => {
   const graafMod = require('./graaf')({ db, vandaag });
   const termijnenMod = require('./termijnen')({ graaf: graafMod.graaf });
   const delegatieMod = require('./delegatie')({ db, save, nu });
-  const casesMod = require('./cases')({ db, save, nu, rid, schoon, liveCodename, notify,
-    beoordeel: delegatieMod.beoordeel });
   const kamersMod = require('./kamers')({ samenvatting: graafMod.samenvatting });
+  /* De orkestratie kent de zaken en de zaken kennen de orkestratie: die knoop
+     wordt hier doorgehakt met een late verwijzing. `casesMod` bestaat nog niet
+     als deze regel draait, maar raakvlak() wordt pas aangeroepen als alles
+     staat -- en zo hoeft geen van beide de ander na te bouwen. */
+  const orkMod = require('./orkestratie')({ graaf: graafMod.graaf,
+    cases: (k) => casesMod.cases(k), beoordeel: delegatieMod.beoordeel, rid,
+    inAanbouw: kamersMod.inAanbouw });
+  const casesMod = require('./cases')({ db, save, nu, rid, schoon, liveCodename, notify,
+    beoordeel: delegatieMod.beoordeel, deelopdrachten: orkMod.deelopdrachten, bezitZet });
   const nuMod = require('./nu')({ tower: termijnenMod.tower, cases: casesMod.cases,
     samenvatting: graafMod.samenvatting, graaf: graafMod.graaf });
+  const twinMod = require('./twin')({ db, save, nu, rid, schoon,
+    isDatum: d => /^\d{4}-\d{2}-\d{2}$/.test(String(d || '')) });
+  const briefMod = require('./briefing')({ nuBeeld: nuMod.nuBeeld, tower: termijnenMod.tower,
+    cases: casesMod.cases, graaf: graafMod.graaf });
 
-  /* Rahul in het Privékantoor. Hij is hier de ROUTER, niet de uitvoerder: hij
-     leest de situatie, zegt wat hij ziet en noteert wat u wilt. Wat hij niet
-     doet -- en dit staat zowel in de systeemprompt als in de code eromheen --
-     is iets bevestigen. Een boeking, een tafel, een toegang: die bevestigt een
-     mens achter het bureau (cases.js), en Rahul kan die functie niet aanroepen.
-
-     De context die hij meekrijgt is het NU-beeld en de delegatiestand, want dat
-     is precies wat het antwoord anders maakt: bij L4 op vervoer mag hij zeggen
-     "dat regelen wij", bij L2 hoort hij te zeggen "dat leggen wij u voor". */
-  async function bureauAI(key, vraag) {
-    const q = schoon(vraag, 500);
-    const beeld = nuMod.nuBeeld(key, graafMod.graaf(key));
-    const del = delegatieMod.delegatie(key);
-    const magZelf = del.domeinen.filter(d => d.niveau >= 3).map(d => d.naam.toLowerCase());
-    /* Deze zin gaat naar het lid en niet alleen naar het model, dus hij is
-       geschreven en niet met haakjes in elkaar gezet: "1 zaak/zaken lopen" is
-       geen u-vorm. */
-    const t = beeld.tellingen;
-    const stuk = (n, een, veel) => n + ' ' + (n === 1 ? een : veel);
-    const delen = [];
-    if (t.beslissingen) delen.push(stuk(t.beslissingen, 'beslissing', 'beslissingen') + ' voor u');
-    if (t.achterstallig) delen.push(stuk(t.achterstallig, 'punt', 'punten') + ' achterstallig');
-    if (t.dezeWeek) delen.push(stuk(t.dezeWeek, 'punt', 'punten') + ' deze week');
-    if (t.lopend) delen.push(stuk(t.lopend, 'zaak', 'zaken') + ' in behandeling');
-    const samenvatting = beeld.kop + '. ' +
-      (delen.length ? delen.join(', ') + '. ' : 'Er staat niets open. ') +
-      (magZelf.length ? 'U heeft ons mandaat gegeven voor: ' + magZelf.join(', ') + '.'
-        : 'Wij hebben voor geen enkel onderwerp een uitvoerend mandaat; alles gaat langs u.');
-
-    if (anthropic && q) {
-      try {
-        const res = await anthropic.messages.create({
-          model: 'claude-sonnet-5', max_tokens: 400,
-          system: require('../rahul').rahulLeadVoor(key) +
-            'U bent het Privékantoor van dit Lifestyle Pass-lid: hun chef de bureau. Spreek het lid consequent aan met "u". ' +
-            'Voorkomend, discreet, to the point, geen opsmuk. U bent de ROUTER: u leest de situatie, u zegt wat u ziet en u noteert. ' +
-            'U bevestigt NOOIT een boeking, tafel, toegang, levering of prijs -- dat doet een van onze mensen, en u zegt dat er eerlijk bij. ' +
-            'U verzint geen partners, bedragen of namen. Waar het lid ons een uitvoerend mandaat gaf mag u zeggen dat wij het oppakken; ' +
-            'waar dat mandaat er niet is, zegt u dat u het ter goedkeuring voorlegt. Over gezondheid en nalatenschap adviseert u niet en ' +
-            'schakelt u niemand in: daarover beslist het lid zelf. Situatie nu (privé): ' + samenvatting,
-          messages: [{ role: 'user', content: q }]
-        });
-        const tekst = res.content && res.content[0] && res.content[0].text;
-        if (tekst) return { status: 200, ok: true, antwoord: tekst, kop: beeld.kop };
-      } catch (e) { /* val terug op het vaste antwoord hieronder */ }
-    }
-    return { status: 200, ok: true, demo: true, kop: beeld.kop,
-      antwoord: 'Tot uw dienst. ' + samenvatting +
-        ' Zegt u wat u geregeld wilt hebben, dan leg ik er een zaak voor aan en pakt een van onze mensen het persoonlijk op. ' +
-        'Bevestigen doe ik pas als het rond is.' };
-  }
+  const aiMod = require('./ai')({ anthropic, schoon, nuBeeld: nuMod.nuBeeld,
+    graaf: graafMod.graaf, delegatie: delegatieMod.delegatie });
+  const bureauAI = aiMod.bureauAI;
 
   /* Het openingsscherm van de app: de kop uit de Situation Room, de tower op
      één regel per venster, de plattegrond en hoeveel er in de graaf staat. Eén
@@ -128,22 +91,51 @@ module.exports = ({ db, save, crypto, anthropic, liveCodename, notify }) => {
     };
   }
 
+  /* EEN naam in de kern, niet vierentwintig.
+
+     De andere modules hier zetten elk van hun functies los in `kern`, en dat
+     werkt prima bij vijf. Bij vierentwintig maakt het de kern zo breed dat de
+     meter `kernBreedte` erop aanslaat -- terecht: elke naam die een route kan
+     aanraken is een naam die iemand ergens anders per ongeluk kan aanraken. De
+     boardroom deed dit al goed (`kern.lidboard`), en dit kantoor is precies zo'n
+     samenhangend geheel. Dus: EEN eigenschap, met de app erin.
+
+     De route-module doet er `const { ... } = kern.bureau;` mee en merkt verder
+     niets. */
   return {
-    bureauOverzicht, bureauAI,
-    bureauNu: nuMod.nuBeeld, bureauKnoop: nuMod.knoopDetail,
-    bureauTower: termijnenMod.tower, bureauTermijnen: termijnenMod.termijnenAlle,
-    bureauGraaf: graafMod.graafVoor, bureauGraafSamenvatting: graafMod.samenvatting,
-    // alleen voor de toets; zie de staart van ./graaf.js
-    bureauKnoopFabriek: graafMod.knoop,
-    bureauDelegatie: delegatieMod.delegatie, bureauDelegatieZet: delegatieMod.delegatieZet,
-    bureauBeoordeel: delegatieMod.beoordeel,
-    bureauKamers: kamersMod.kamers,
-    bureauCases: casesMod.cases, bureauCaseOpen: casesMod.caseOpen,
-    bureauCaseBeslis: casesMod.caseBeslis, bureauCaseIntrek: casesMod.caseIntrek,
-    bureauDesk: casesMod.bureauDesk, bureauVoortgang: casesMod.bureauVoortgang,
-    BUREAU_KAMERS: kamersMod.BUREAU_KAMERS,
-    BUREAU_DOMEINEN: delegatieMod.DELEGATIE_DOMEINEN,
-    BUREAU_NIVEAUS: delegatieMod.DELEGATIE_NIVEAUS,
-    BUREAU_CASE_SOORTEN: casesMod.CASE_SOORTEN
+    bureau: {
+      overzicht: bureauOverzicht, ai: bureauAI,
+      nu: nuMod.nuBeeld, knoop: nuMod.knoopDetail,
+      tower: termijnenMod.tower, termijnen: termijnenMod.termijnenAlle,
+      graaf: graafMod.graafVoor, graafSamenvatting: graafMod.samenvatting,
+      // alleen voor de toets; zie de staart van ./graaf.js
+      knoopFabriek: graafMod.knoop,
+      delegatie: delegatieMod.delegatie, delegatieZet: delegatieMod.delegatieZet,
+      beoordeel: delegatieMod.beoordeel,
+      kamers: kamersMod.kamers,
+      raakvlak: orkMod.raakvlak, briefing: briefMod.bureauBriefing,
+      twin: twinMod.twin, twinRuimte: twinMod.twinRuimte, twinRuimteWeg: twinMod.twinRuimteWeg,
+      twinInstallatie: twinMod.twinInstallatie, twinInstallatieWeg: twinMod.twinInstallatieWeg,
+      twinBeurt: twinMod.twinBeurt,
+      cases: casesMod.cases, caseOpen: casesMod.caseOpen,
+      caseBeslis: casesMod.caseBeslis, caseIntrek: casesMod.caseIntrek,
+      KAMERS: kamersMod.BUREAU_KAMERS,
+      DOMEINEN: delegatieMod.DELEGATIE_DOMEINEN,
+      NIVEAUS: delegatieMod.DELEGATIE_NIVEAUS,
+      CASE_SOORTEN: casesMod.CASE_SOORTEN
+    },
+    /* De KANTOOR-kant staat apart, en dat is geen indeling maar een grens.
+
+       Zat hij in `kern.bureau`, dan had routes/office/ toegang tot de graaf, het
+       mandaat en de zaken van elk lid -- en dan is "het bureau ziet geen
+       besloten kamers" een afspraak in plaats van een muur. Nu krijgt het
+       kantoor precies twee functies: de wachtrij zien, en er een stap in zetten.
+       Alles wat het niet nodig heeft, kan het niet bereiken.
+
+       Dat het hierdoor twee kern-namen zijn in plaats van een, is de prijs. Die
+       staat als bewuste verruiming in NORM.json. */
+    bureauBalie: {
+      desk: casesMod.bureauDesk, voortgang: casesMod.bureauVoortgang
+    }
   };
 };

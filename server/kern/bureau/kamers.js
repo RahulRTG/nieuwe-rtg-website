@@ -36,16 +36,18 @@ const KAMERS = [
   K('vermogen', 'Family Office', 'Wat u bezit, wat het waard is, wie het verzekert en wanneer het opnieuw bekeken moet worden.',
     ['vermogen'], [{ naam: 'Bezittingenregister', url: '/apps/lifestyle.html', pas: 'lifestyle' },
       { naam: 'Balans', url: '/apps/balans.html', pas: 'rtg' }]),
-  K('huishouden', 'Household Office', 'Uw huizen en hun huishouding: staf, taken, onderhoud en wat er speelt in en om huis.',
-    ['huishouden'], [{ naam: 'Maison', url: '/apps/maison.html', pas: 'lifestyle' }]),
+  K('huishouden', 'Household Office', 'Uw huizen tot op de pomp in het zwembad: ruimtes, installaties, onderhoud, garanties en wie het levert.',
+    ['huishouden'], [{ naam: 'Woningtweeling', url: '/apps/lifestyle.html', pas: 'lifestyle' },
+      { naam: 'Maison', url: '/apps/maison.html', pas: 'lifestyle' }]),
   K('reizen', 'Travel Office', 'Reizen van begin tot eind: draaiboek, verblijven, documenten en het programma per dag.',
     ['reizen'], [{ naam: 'Reisboek', url: '/apps/reisboek.html', pas: 'lifestyle' },
       { naam: 'Vluchten', url: '/apps/vluchten.html', pas: 'rtg' }]),
   K('vervoer', 'Mobility Office', 'Toestellen, vaartuigen en wagens: waar ze staan, wanneer ze gekeurd moeten en wat ze kosten.',
     ['vervoer'], [{ naam: 'Hangar', url: '/apps/hangar.html', pas: 'lifestyle' },
       { naam: 'Logboek', url: '/apps/logboek.html', pas: 'lifestyle' }]),
-  K('zakelijk', 'Executive Office', 'Uw professionele kant: netwerk, boardroom, facturen en de zakelijke agenda.',
-    [], [{ naam: 'RTG Zakelijk', url: '/apps/zakelijk.html', pas: 'lifestyle' },
+  K('zakelijk', 'Executive Office', 'Uw professionele kant: de ochtend- en avondbriefing, uw netwerk, de boardroom en de zakelijke agenda.',
+    [], [{ naam: 'Uw briefing', url: '/apps/lifestyle.html', pas: 'lifestyle' },
+      { naam: 'RTG Zakelijk', url: '/apps/zakelijk.html', pas: 'lifestyle' },
       { naam: 'Boardroom', url: '/apps/boardroom.html', pas: 'rtg' }]),
   K('kring', 'Social Office', 'De mensen om u heen: uw clubs, uw relaties en de momenten die u niet wilt missen.',
     ['kring'], [{ naam: 'Cercle', url: '/apps/cercle.html', pas: 'lifestyle' },
@@ -76,7 +78,8 @@ const KAMERS = [
   // ---- de vier die er nog niet zijn; zie de kop van dit bestand ----
   K('beveiliging', 'Security Office', 'Fysieke beveiliging, reisrisico en digitale veiligheid, met één ingang bij een incident.', [], []),
   K('reputatie', 'Reputation Office', 'Pers, publieke optredens en wat er online over u staat.', [], []),
-  K('inkoop', 'Personal Commerce', 'Persoonlijke inkoop en sourcing: van een cadeau tot een stuk dat nergens te koop is.', [], []),
+  K('inkoop', 'Personal Commerce', 'Persoonlijke inkoop en sourcing: zeg wat u nodig heeft; wat geleverd wordt, staat daarna in uw register.',
+    [], [{ naam: 'Een inkoopzaak aanleggen', url: '/apps/lifestyle.html', pas: 'lifestyle' }]),
   K('dieren', 'Pet Office', 'Uw dieren: verzorging, reizen, afspraken en documenten.', [], [])
 ];
 
@@ -108,5 +111,9 @@ module.exports = (ctx) => {
     };
   }
 
-  return { kamers, BUREAU_KAMERS: KAMERS };
+  // welke werelden nog geen deur hebben; de orkestratie gebruikt dit om te
+  // zeggen waar hij geen zicht op heeft (zie orkestratie.js)
+  const inAanbouw = () => KAMERS.filter(k => !k.apps.length).map(k => k.id);
+
+  return { kamers, inAanbouw, BUREAU_KAMERS: KAMERS };
 };

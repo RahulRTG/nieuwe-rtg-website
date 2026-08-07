@@ -21,7 +21,7 @@
     "keuringTeGroot": 2,
     "inlineStijlAttributen": 5656,
     "browserpoortToetsen": 103,
-    "kernBreedte": 1074,
+    "kernBreedte": 1076,
     "kernGedeeld": 140,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
@@ -29,6 +29,11 @@
     "toetsenOngevoeligPct": 2.3
   },
   "notities": [
+    {
+      "datum": "2026-08-07",
+      "meter": "kernBreedte 1074 -> 1076",
+      "reden": "Met de hand verruimd voor Het Privekantoor (kern/bureau). Twee kern-namen erbij, en geen een meer: `bureau` voor de leden-app en `bureauBalie` voor de kantoor-kant. De eenendertig functies van dit kantoor staan bewust NIET los in de kern -- dat zou eenendertig namen zijn geweest en de meter had gelijk gehad. Dat het er twee zijn en geen een is een BESLUIT en geen slordigheid: zat de balie in `bureau`, dan kon routes/office bij de levensgraaf, het mandaat en de zaken van elk lid, en dan is \"het bureau ziet geen besloten kamers\" een afspraak in plaats van een muur. kernGedeeld blijft daardoor op 140: de twee namen worden elk door precies een domein aangeraakt."
+    },
     {
       "datum": "2026-08-07",
       "meter": "endpointsZonderTest 1011 -> 1016; keuringOmvang 105 -> 106; kernBreedte 1073 -> 1074",

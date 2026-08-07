@@ -12,6 +12,36 @@ const H = require('./graaf-hulp');
 const { OPEN, PERSOONLIJK, VERTROUWELIJK, BESLOTEN, isDatum, straks, lijst, obj, volgendeJaardag } = H;
 
 const DEEL2 = [
+  /* ---- De digitale tweeling: ruimtes en installaties onder een woning.
+
+     Dit is de reden dat de tweeling geen eigen waarschuwingssysteem heeft. Elke
+     pomp, ketel en lift levert hier zijn onderhouds- en garantiedatum in, en
+     vanaf dat punt is hij niet meer te onderscheiden van een verzekering of een
+     paspoort: dezelfde Control Tower, dezelfde Situation Room, dezelfde
+     achterstalligheid. De installatie hangt met `ouder` aan de bezitting, zodat
+     de tower "Villa Ibiza" bij de beurt kan zetten. ---- */
+  { kamer: 'huishouden', knopen(l, K) {
+    const alle = obj(l.twin), uit = [];
+    for (const [huisId, t] of Object.entries(alle)) {
+      const huis = 'bezit:' + huisId;
+      for (const r of lijst(obj(t).ruimtes)) {
+        for (const i of lijst(r.installaties)) {
+          const id = 'inst:' + i.id;
+          uit.push(K({ id, soort: 'installatie', naam: (r.naam ? r.naam + ' · ' : '') + i.naam,
+            kamer: 'huishouden', bron: 'Woningtweeling', gevoelig: PERSOONLIJK,
+            deel: 'rechterhand', ouder: huis }));
+          for (const [veld, wat] of [['onderhoudOp', 'onderhoud'], ['garantieTot', 'garantie']]) {
+            if (!isDatum(i[veld])) continue;
+            uit.push(K({ id: id + ':' + wat, soort: 'termijn', naam: i.naam + ' · ' + wat,
+              kamer: 'huishouden', bron: 'Woningtweeling', gevoelig: PERSOONLIJK,
+              deel: 'rechterhand', vervalt: i[veld], vervaltWat: wat, ouder: id }));
+          }
+        }
+      }
+    }
+    return uit;
+  } },
+
     /* ---- Reisboek: de reizen en hun documenten ---- */
     { kamer: 'reizen', knopen(l, K) {
       const uit = [];

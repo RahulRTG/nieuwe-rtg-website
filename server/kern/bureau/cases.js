@@ -28,49 +28,11 @@
    Gemount via ./index.js. */
 'use strict';
 
-/* De keten. `eind` betekent: hier houdt de case op te leven en telt hij nergens
-   meer als open. */
-const STATUSSEN = [
-  { s: 'genoteerd', label: 'Genoteerd' },
-  { s: 'in voorbereiding', label: 'In voorbereiding' },
-  { s: 'wacht op uw akkoord', label: 'Wacht op uw akkoord' },
-  { s: 'in uitvoering', label: 'In uitvoering' },
-  { s: 'geregeld', label: 'Geregeld', eind: true },
-  { s: 'afgewezen', label: 'Niet gelukt', eind: true },
-  { s: 'ingetrokken', label: 'Ingetrokken', eind: true }
-];
-const EINDSTATUS = new Set(STATUSSEN.filter(x => x.eind).map(x => x.s));
-// alleen de kantoor-kant mag hier komen; zie de kop van dit bestand
-const KANTOOR_STATUSSEN = ['in voorbereiding', 'in uitvoering', 'geregeld', 'afgewezen'];
-
-const SOORTEN = ['regulier', 'bijzonder', 'warroom'];
-
-/* Wie eraan werkt. Dit zijn ROLLEN, geen namen: het systeem wijst een stoel aan
-   en niet een persoon, want een naam op een scherm die er in het echt niet is,
-   is precies de belofte die wij niet doen. */
-const SPECIALIST = {
-  reizen: 'Reisspecialist',
-  vervoer: 'Vervoer & onderhoud',
-  huishouden: 'Household manager',
-  gelegenheden: 'Hospitality & events',
-  gezelschap: 'Staf & planning',
-  collectie: 'Sourcing & collecties',
-  kring: 'Attenties',
-  filantropie: 'Filantropie-adviseur',
-  vermogen: 'Family office',
-  gezondheid: 'Persoonlijk assistent',
-  nalatenschap: 'Persoonlijk assistent'
-};
-
-/* Domeinen waarvan een case het kantoor NOOIT bereikt. Dezelfde twee die in
-   delegatie.js een dak van 1 en 0 hebben, en in de graaf op 'besloten' staan.
-   Drie bestanden, één regel -- en dat is geen dubbeling maar dezelfde grens die
-   op drie plekken iets anders moet doen: niet delegeren, niet tonen, niet
-   doorsturen. */
-const BESLOTEN_DOMEIN = new Set(['gezondheid', 'nalatenschap']);
+const { STATUSSEN, EINDSTATUS, KANTOOR_STATUSSEN, SOORTEN, SPECIALIST, BESLOTEN_DOMEIN } =
+  require('./cases-soorten');
 
 module.exports = (ctx) => {
-  const { db, save, nu, rid, schoon, liveCodename, notify, beoordeel } = ctx;
+  const { db, save, nu, rid, schoon, liveCodename, notify, beoordeel, deelopdrachten } = ctx;
 
   /* C() maakt de lijst aan en is dus alleen voor SCHRIJVERS. lees() raakt niets
      aan en is voor lezers.
@@ -101,6 +63,7 @@ module.exports = (ctx) => {
     const s = SPECIALIST[domein];
     if (s) team.push({ rol: s });
     if (soort === 'bijzonder') team.push({ rol: 'Sourcing-specialist' });
+    if (soort === 'inkoop') team.push({ rol: 'Inkoop & sourcing' });
     if (soort === 'warroom') team.push({ rol: 'Incidentcoördinator' });
     return team;
   }
@@ -125,9 +88,10 @@ module.exports = (ctx) => {
       return { status: 400, error: 'Er lopen veel zaken voor u. Wij ronden er graag eerst een paar met u af.' };
 
     const bedrag = Math.max(0, Math.min(1e11, Math.round(Number(b.bedragCenten) || 0)));
+    const dat = d => (/^\d{4}-\d{2}-\d{2}$/.test(String(d || '')) ? d : '');
     /* De warroom vraagt niet naar geld en de bijzondere case gaat altijd langs
        een mens; alleen het reguliere werk loopt langs de delegatie-engine. */
-    const oordeel = soort === 'regulier' ? beoordeel(key, domein, bedrag)
+    const oordeel = (soort === 'regulier' || soort === 'inkoop') ? beoordeel(key, domein, bedrag)
       : { niveau: null, magZelf: false, meldVooraf: false,
         reden: soort === 'warroom'
           ? 'Een incident: wij zetten er direct mensen op en vragen u pas om een besluit als dat nodig is.'
@@ -135,11 +99,20 @@ module.exports = (ctx) => {
 
     const c = {
       id: rid(), titel, wat: schoon(b.wat, 1200), soort, domein,
+      // de periode waarover het gaat: hierop draait de orkestratie ("zes weken
+      // weg" raakt alles met een datum in die weken)
+      van: dat(b.van), tot: dat(b.tot) || dat(b.van),
       bedragCenten: bedrag, at: nu(), status: 'genoteerd',
       besloten: BESLOTEN_DOMEIN.has(domein),
       delegatie: { niveau: oordeel.niveau, magZelf: !!oordeel.magZelf, reden: oordeel.reden },
       team: teamVoor(soort, domein),
       knopen: (Array.isArray(b.knopen) ? b.knopen : []).slice(0, 40).map(x => schoon(x, 80)).filter(Boolean),
+      /* Wat er in het register komt zodra dit geregeld is. Alleen bij inkoop, en
+         alleen als het lid het invulde -- wij verzinnen geen bezitting. */
+      registreren: soort === 'inkoop' && schoon(b.registreerNaam, 100)
+        ? { naam: schoon(b.registreerNaam, 100), soort: schoon(b.registreerSoort, 30) || 'overig',
+          waarde: Math.round(bedrag / 100), gedaan: false }
+        : null,
       beslissing: { nodig: false, gegeven: '', op: '' },
       tijdlijn: []
     };
@@ -156,6 +129,13 @@ module.exports = (ctx) => {
     /* Een besloten case blijft binnen: hij komt niet op het bureau en krijgt dus
        ook geen team dat hem zou zien. */
     if (c.besloten) c.team = [{ rol: 'U zelf' }];
+
+    /* De deelopdrachten worden hier VASTGEZET en niet bij elk uitlezen opnieuw
+       berekend. Zelfde reden als bij het hoofdoordeel: wie zijn mandaat morgen
+       verruimt, verruimt niet met terugwerkende kracht wat er vandaag al aan
+       hem is voorgelegd. Een besloten zaak krijgt er geen -- die verlaat de
+       kamer niet. */
+    c.deelopdrachten = c.besloten || !deelopdrachten ? [] : deelopdrachten(key, c);
 
     cases.unshift(c);
     if (cases.length > 300) cases.length = 300;
@@ -204,7 +184,7 @@ module.exports = (ctx) => {
      bouwen: een tweede `openCase` zou op een dag iets anders "open" noemen dan
      deze. */
   const bureau = require('./cases-bureau')({ db, save, liveCodename, notify,
-    lees, stap, openCase, KANTOOR_STATUSSEN, SOORTEN });
+    lees, stap, openCase, KANTOOR_STATUSSEN, SOORTEN, bezitZet: ctx.bezitZet });
 
   return { caseOpen, caseBeslis, caseIntrek, cases,
     bureauDesk: bureau.bureauDesk, bureauVoortgang: bureau.bureauVoortgang,

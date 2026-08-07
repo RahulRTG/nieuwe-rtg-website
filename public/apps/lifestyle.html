@@ -86,6 +86,23 @@
   .chatbox{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:.8rem;min-height:3rem;font-size:.92rem;line-height:1.55;white-space:pre-wrap;}
   .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:.6rem 1rem;font-size:.85rem;opacity:0;transition:opacity .3s;z-index:30;pointer-events:none;}
   .inlog{text-align:center;padding:2.5rem 1rem;}
+  /* Kleine hulpklassen in plaats van style="..."-attributen: elk zo'n attribuut
+     houdt style-src-attr open in de CSP, en de meter telt ze. Vandaar hier en
+     niet in de opbouw van de HTML. */
+  .knoprij{display:flex;gap:.4rem;margin-top:.5rem;}
+  .goud{color:var(--gold);}
+  .rood{color:var(--burgundy);}
+  .zacht{opacity:.7;}
+  .mt-s{margin-top:.5rem;}
+  .mt-m{margin-top:.7rem;}
+  .mt-l{margin-top:1rem;}
+  .fijn{font-size:.78rem;color:var(--soft);line-height:1.6;}
+  .fijn.mt{margin-top:.55rem;}
+  .fijner{font-size:.75rem;color:var(--soft);margin-top:.4rem;}
+  .fijner.goud{color:var(--gold);margin-top:.45rem;}
+  .briefkop{font-family:'Bodoni Moda',serif;font-size:1.15rem;margin:.6rem 0 .2rem;}
+  .kaart.let{border-color:var(--burgundy);}
+  .verborgen{display:none;}
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/dagkleur.css" rel="stylesheet">
@@ -115,7 +132,7 @@ const MND=['','jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov',
 function datum(d){ if(!d) return ''; const [y,m,dd]=d.split('-'); return Number(dd)+' '+MND[Number(m)]+' '+y; }
 
 let tab='nu';
-const TABS=[['nu','Nu'],['vooruit','Vooruit'],['zaken','Zaken'],['kantoor','Kantoor'],['mandaat','Mandaat'],['graaf','Overzicht']];
+const TABS=[['nu','Nu'],['vooruit','Vooruit'],['zaken','Zaken'],['kantoor','Kantoor'],['woning','Woning'],['mandaat','Mandaat'],['graaf','Overzicht']];
 
 /* Meenemen (shared/uitvoer.js): elk paneel meldt zijn eigen lijst aan, zodat wat
    u exporteert hetzelfde is als wat u ziet. De besloten kamers (gezondheid,
@@ -125,7 +142,7 @@ function zetUit(naam, kolommen, rijen){ UIT = rijen.length ? { naam:naam, kolomm
 if(window.RTGUitvoer) RTGUitvoer.bron(function(){ return UIT; });
 
 async function start(){
-  if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2><p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">Het Privékantoor is er voor leden met een Lifestyle Pass. Open de app en log in met uw RTG-account.</p><p style="margin-top:1rem;"><a href="/apps/app.html">Naar de app →</a></p></div>'; return; }
+  if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2><p class="fijn mt">Het Privékantoor is er voor leden met een Lifestyle Pass. Open de app en log in met uw RTG-account.</p><p class="mt-l"><a href="/apps/app.html">Naar de app →</a></p></div>'; return; }
   try{ await api('overzicht'); }catch(e){
     if(e.status===403){ RTGDeur.toon($('#main'), { soort:'pas', pas:'Lifestyle' }); return; }
     $('#main').innerHTML='<div class="leeg">Kon het Privékantoor niet laden.</div>'; return;
@@ -136,7 +153,7 @@ function teken(){
   $('#main').innerHTML = '<div class="chips" id="chips"></div><div id="paneel"><div class="leeg">Laden…</div></div>';
   $('#chips').innerHTML = TABS.map(([k,l])=>'<button class="chip'+(k===tab?' aan':'')+'" data-t="'+k+'">'+l+'</button>').join('');
   $('#chips').querySelectorAll('.chip').forEach(b=> b.onclick=()=>{ tab=b.dataset.t; teken(); });
-  ({nu:vNu, vooruit:vVooruit, zaken:vZaken, kantoor:vKantoor, mandaat:vMandaat, graaf:vGraaf}[tab])();
+  ({nu:vNu, vooruit:vVooruit, zaken:vZaken, kantoor:vKantoor, woning:vWoning, mandaat:vMandaat, graaf:vGraaf}[tab])();
 }
 const P = h => { $('#paneel').innerHTML = h; };
 const fout = e => P('<div class="leeg">'+esc(e.message)+'</div>');
@@ -154,17 +171,26 @@ async function vNu(){
     + (t.dezeWeek? ' · '+t.dezeWeek+' deze week':'')
     + '</div></div>';
 
+  h += '<div class="kaart"><h2>Uw briefing</h2><div class="sub">Eén bericht, geen zevenendertig meldingen.</div>'
+    + '<div class="niv"><button class="js-brief aan" data-m="ochtend">Ochtend</button>'
+    + '<button class="js-brief" data-m="avond">Avond</button></div><div id="brUit"></div></div>';
+
+  h += '<div class="kaart"><h2>Wij gaan weg</h2><div class="sub">Noem de periode. Wij zoeken op wat daar in uw andere apps mee samenhangt.</div>'
+    + '<div class="rij"><div><label class="lbl">Van</label><input class="veld" id="rvV" type="date"></div>'
+    + '<div><label class="lbl">Tot</label><input class="veld" id="rvT" type="date"></div>'
+    + '<button class="knop stil" id="rvK">Wat raakt dat?</button></div><div id="rvUit"></div></div>';
+
   h += '<div class="kaart"><h2>Rahul</h2><div class="sub">Zeg wat u geregeld wilt hebben. Hij noteert en legt aan; bevestigen doet een mens.</div>'
     + '<div class="rij"><div><input class="veld" id="aiV" placeholder="Wij gaan in augustus zes weken naar Ibiza…"></div>'
     + '<button class="knop" id="aiK">Vraag</button></div>'
-    + '<div class="chatbox" id="aiUit" style="margin-top:.7rem;display:none;"></div></div>';
+    + '<div class="chatbox verborgen mt-m" id="aiUit"></div></div>';
 
   if(!d.regels.length){
     h += '<div class="kaart"><div class="leeg">Er staat niets open. Wij houden het in de gaten.</div></div>';
   } else {
     h += '<div class="kaart">' + d.regels.map(r=>{
       const kn = r.soort==='beslissing'
-        ? '<div style="display:flex;gap:.4rem;margin-top:.5rem;"><button class="knop klein js-ja" data-id="'+esc(r.id)+'">Akkoord</button>'
+        ? '<div class="knoprij"><button class="knop klein js-ja" data-id="'+esc(r.id)+'">Akkoord</button>'
           + '<button class="knop klein stil js-nee" data-id="'+esc(r.id)+'">Afzien</button></div>' : '';
       return '<div class="regel e'+r.ernst+'"><div class="streep"></div><div class="body">'
         + '<b>'+esc(r.tekst)+'</b><div class="meta">'+esc(r.detail||'')+'</div>'+kn+'</div></div>';
@@ -173,6 +199,44 @@ async function vNu(){
   P(h);
   zetUit('Nu', ['Soort','Wat','Toelichting'], d.regels.map(r=>[r.soort, r.tekst, r.detail||'']));
 
+  async function brief(moment){
+    const u = $('#brUit'); u.innerHTML = '<div class="leeg">Een moment…</div>';
+    try{
+      const d = await api('briefing', {moment});
+      const lijst = (t, a, hoe) => a.length ? '<div class="lbl">'+t+'</div>' + a.map(hoe).join('') : '';
+      const punt = x => '<div class="meta">' + esc((x.waarvan? x.waarvan+' · ':'') + x.naam) + ' · ' + esc(datum(x.datum)) + '</div>';
+      u.innerHTML = '<div class="briefkop">' + esc(d.kop) + '</div>'
+        + (moment==='ochtend'
+          ? lijst('Vandaag', d.vandaag, punt) + lijst('Morgen', d.morgen, punt)
+            + lijst('Verder deze week', d.restVanDeWeek, punt)
+            + lijst('Achterstallig', d.achterstallig, punt)
+            + lijst('Wacht op u', d.beslissingen, x=>'<div class="meta">'+esc(x.titel)+' · '+esc(x.reden)+'</div>')
+            + lijst('Wij doen vandaag', d.wijDoen, x=>'<div class="meta">'+esc(x.titel)+' ('+esc(x.team.join(', '))+')</div>')
+          : lijst('Vandaag gebeurd', d.gebeurd, x=>'<div class="meta">'+esc(x.zaak)+' → '+esc(x.status)+'<br><span class="zacht">'+esc(x.notitie)+'</span></div>')
+            + '<div class="meta mt-s">' + d.doorOns + ' door ons, ' + d.doorU + ' door u · ' + d.lopend + ' lopen er nog.</div>'
+            + lijst('Morgen', d.morgen, punt)
+            + lijst('Wacht op u', d.beslissingen, x=>'<div class="meta">'+esc(x.titel)+'</div>'));
+    }catch(e){ u.innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; }
+  }
+  $('#paneel').querySelectorAll('.js-brief').forEach(b=> b.onclick=()=>{
+    $('#paneel').querySelectorAll('.js-brief').forEach(x=>x.classList.remove('aan'));
+    b.classList.add('aan'); brief(b.dataset.m);
+  });
+  brief('ochtend');
+  $('#rvK').onclick = async () => {
+    const u = $('#rvUit'); u.innerHTML = '<div class="leeg">Een moment…</div>';
+    try{
+      const r = await api('raakvlak', { van:$('#rvV').value, tot:$('#rvT').value, domein:'reizen' });
+      u.innerHTML = '<div class="lbl">' + r.dagen + ' dagen · ' + r.raakt.length + ' punten uit uw apps</div>'
+        + (r.raakt.length ? r.raakt.map(x=>'<div class="regel e2"><div class="streep"></div><div class="body"><b>'
+            + esc((x.waarvan? x.waarvan+' · ':'')+x.naam) + '</b><div class="meta">' + esc(x.bron) + ' · ' + esc(datum(x.datum)) + '</div></div></div>').join('')
+           : '<div class="leeg">Er valt niets in die periode.</div>')
+        + '<div class="lbl mt-m">Wat wij dan oppakken</div>'
+        + r.keten.map(k=>'<div class="meta">' + esc(k.wat) + (k.raakt.length? ' <span class="goud">('+k.raakt.length+' concreet)</span>':'')
+            + '<br><span class="zacht">' + esc(k.waarom) + '</span></div>').join('')
+        + '<div class="meta mt-m rood">Hier hebben wij nog geen zicht op: ' + r.nietGedekt.join(', ') + '.</div>';
+    }catch(e){ u.innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; }
+  };
   $('#aiK').onclick = async () => {
     const v = $('#aiV').value.trim(); if(!v) return;
     const u = $('#aiUit'); u.style.display='block'; u.textContent='Een moment…';
@@ -193,12 +257,12 @@ async function vVooruit(){
   let d; try{ d = await api('tower'); }catch(e){ return fout(e); }
   const regel = r => '<div class="item"><div class="body"><b>'+esc((r.waarvan? r.waarvan+' · ':'')+r.naam)+'</b>'
     + '<div class="meta">'+esc(r.bron)+' · '+esc(datum(r.datum))
-    + (r.dagen<0 ? ' · <span style="color:var(--burgundy);">'+Math.abs(r.dagen)+' dagen te laat</span>'
+    + (r.dagen<0 ? ' · <span class="rood">'+Math.abs(r.dagen)+' dagen te laat</span>'
       : r.dagen===0 ? ' · vandaag' : ' · over '+r.dagen+' dagen')
     + '</div></div></div>';
   let h = '';
   if(d.achterstallig.length){
-    h += '<div class="kaart" style="border-color:var(--burgundy);"><h2>Achterstallig</h2>'
+    h += '<div class="kaart let"><h2>Achterstallig</h2>'
       + '<div class="sub">Deze datums zijn voorbij. Ze stonden in uw apps, maar nergens bij elkaar.</div>'
       + d.achterstallig.map(regel).join('') + '</div>';
   }
@@ -229,8 +293,8 @@ async function vZaken(){
     + d.soorten.map(s=>'<option value="'+s+'">'+({regulier:'Regulier',bijzonder:'Bijzonder verzoek',warroom:'Incident'}[s])+'</option>').join('')
     + '</select></div><div><label class="lbl">Domein</label><select class="veld" id="zD">'+doms+'</select></div>'
     + '<div><label class="lbl">Richtbedrag (euro)</label><input class="veld" id="zB" type="number" min="0" placeholder="0"></div></div>'
-    + '<div class="meta" id="zU" style="font-size:.78rem;color:var(--soft);margin-top:.55rem;line-height:1.5;"></div>'
-    + '<div style="margin-top:.7rem;"><button class="knop" id="zK">Aanleggen</button></div></div>';
+    + '<div class="meta fijn mt" id="zU"></div>'
+    + '<div class="mt-m"><button class="knop" id="zK">Aanleggen</button></div></div>';
 
   h += '<div class="kaart"><h2>Uw zaken</h2><div class="sub">'+d.open+' open · '+d.beslissingen+' wacht op u</div>'
     + (d.zaken.length ? d.zaken.map(z=>{
@@ -239,9 +303,9 @@ async function vZaken(){
       return '<div class="item"><div class="body"><b>'+esc(z.titel)+'</b>'
         + '<div class="meta">'+esc(z.team.map(t=>t.rol).join(' · '))
         + (z.bedragCenten? ' · '+euro(z.bedragCenten):'')
-        + (z.besloten? ' · <span style="color:var(--gold);">besloten, blijft bij u</span>':'')
+        + (z.besloten? ' · <span class="goud">besloten, blijft bij u</span>':'')
         + '<br>'+esc(laatste.notitie||'')+'</div>'
-        + (z.beslissing.nodig ? '<div style="display:flex;gap:.4rem;margin-top:.5rem;">'
+        + (z.beslissing.nodig ? '<div class="knoprij">'
             + '<button class="knop klein js-ja" data-id="'+esc(z.id)+'">Akkoord</button>'
             + '<button class="knop klein stil js-nee" data-id="'+esc(z.id)+'">Afzien</button></div>' : '')
         + '</div><span class="status '+kl+'">'+esc(z.status)+'</span></div>';
@@ -281,6 +345,62 @@ async function vKantoor(){
   zetUit('Kantoor', ['Wereld','Status','In beeld','Waarde'], d.kamers.map(k=>[k.naam,k.status,k.knopen,k.waarde/100]));
 }
 
+/* ==================== WONING -- de digitale tweeling ==========================
+   Per woning uit uw register: ruimtes, en daarin wat er hangt of staat. De
+   datums die u hier invult lopen langs dezelfde Control Tower als uw
+   verzekeringen -- deze pagina heeft geen eigen waarschuwingen. */
+let twinHuis='';
+async function vWoning(){
+  let d; try{ d = await api('twin', {huisId:twinHuis}); }catch(e){ return fout(e); }
+  if(!d.woningen.length) return P('<div class="kaart"><h2>Uw woningen</h2>'
+    + '<div class="leeg">U heeft nog geen vastgoed in uw register staan. Leg een woning vast onder Zaken → uw bezittingen, dan kunt u hem hier inrichten.</div></div>');
+  let h = '<div class="kaart"><h2>Uw woningen</h2><div class="sub">Kies een woning om hem in te richten.</div>'
+    + '<div class="niv">' + d.woningen.map(w=>'<button class="js-huis'+(twinHuis===w.id?' aan':'')+'" data-h="'+esc(w.id)+'">'
+      + esc(w.naam) + ' · ' + w.installaties + '</button>').join('') + '</div></div>';
+  if(d.gekozen){
+    const g = d.gekozen;
+    h += '<div class="kaart"><h2>' + esc(g.naam) + '</h2><div class="sub">' + g.ruimtes.length + ' ruimtes</div>'
+      + '<div class="rij"><div><input class="veld" id="rNaam" placeholder="Naam van een ruimte (Zwembad)"></div>'
+      + '<button class="knop klein" id="rK">Ruimte erbij</button></div></div>';
+    for(const r of g.ruimtes){
+      h += '<div class="kaart"><h2>' + esc(r.naam) + '</h2>'
+        + ((r.installaties||[]).length ? (r.installaties||[]).map(i=>
+            '<div class="item"><div class="body"><b>' + esc(i.naam) + '</b><div class="meta">'
+            + [i.merk, i.soort, i.geplaatst? 'geplaatst '+datum(i.geplaatst):'', i.leverancier].filter(Boolean).map(esc).join(' · ')
+            + (i.onderhoudOp? '<br>Volgende beurt: ' + esc(datum(i.onderhoudOp)) : '')
+            + (i.garantieTot? ' · garantie tot ' + esc(datum(i.garantieTot)) : '')
+            + ((i.historie||[]).length? '<br>' + i.historie.length + ' beurt(en) bijgeschreven, laatst: ' + esc(i.historie[0].wat) + ' (' + esc(datum(i.historie[0].op)) + ')' : '')
+            + '</div></div><button class="knop klein stil js-beurt" data-i="' + esc(i.id) + '">Beurt</button></div>').join('')
+          : '<div class="leeg">Nog niets vastgelegd in deze ruimte.</div>')
+        + '<div class="rij mt-s"><div><input class="veld js-iNaam" data-r="' + esc(r.id) + '" placeholder="Wat staat hier (Pomp 2)"></div>'
+        + '<div><input class="veld js-iMerk" data-r="' + esc(r.id) + '" placeholder="Merk"></div>'
+        + '<div><label class="lbl">Volgende beurt</label><input class="veld js-iDat" data-r="' + esc(r.id) + '" type="date"></div>'
+        + '<button class="knop klein js-iK" data-r="' + esc(r.id) + '">Erbij</button></div></div>';
+    }
+  }
+  P(h);
+  if(d.gekozen) zetUit('Woning', ['Ruimte','Wat','Merk','Volgende beurt','Leverancier'],
+    d.gekozen.ruimtes.flatMap(r=>(r.installaties||[]).map(i=>[r.naam,i.naam,i.merk,i.onderhoudOp,i.leverancier])));
+  $('#paneel').querySelectorAll('.js-huis').forEach(b=> b.onclick=()=>{ twinHuis=b.dataset.h; vWoning(); });
+  const rk = $('#rK'); if(rk) rk.onclick = async () => {
+    const naam = $('#rNaam').value.trim(); if(!naam) return meld('Hoe heet de ruimte?');
+    try{ await api('twin/ruimte', {huisId:twinHuis, naam}); vWoning(); }catch(e){ meld(e.message); }
+  };
+  $('#paneel').querySelectorAll('.js-iK').forEach(b=> b.onclick = async () => {
+    const q = sel => $('#paneel').querySelector(sel + '[data-r="' + b.dataset.r + '"]');
+    const naam = q('.js-iNaam').value.trim(); if(!naam) return meld('Wat staat hier?');
+    try{ await api('twin/installatie', {huisId:twinHuis, ruimteId:b.dataset.r, naam,
+      merk:q('.js-iMerk').value.trim(), onderhoudOp:q('.js-iDat').value}); vWoning(); }
+    catch(e){ meld(e.message); }
+  });
+  $('#paneel').querySelectorAll('.js-beurt').forEach(b=> b.onclick = async () => {
+    const wat = prompt('Wat is er gedaan?'); if(!wat) return;
+    const vlg = prompt('Volgende beurt (jjjj-mm-dd, mag leeg)') || '';
+    try{ await api('twin/beurt', {huisId:twinHuis, id:b.dataset.i, wat, volgende:vlg}); vWoning(); }
+    catch(e){ meld(e.message); }
+  });
+}
+
 /* ======================== MANDAAT -- de delegatie-engine =======================
    Het scherm waar het lid bepaalt hoeveel kantoor hij koopt. Het dak per domein
    staat erbij: een niveau dat niet kan, is uitgeschakeld en niet stiekem
@@ -289,16 +409,16 @@ async function vMandaat(){
   let d; try{ d = await api('delegatie'); }catch(e){ return fout(e); }
   let h = '<div class="kaart"><h2>Wat mogen wij zelf?</h2><div class="sub">Per onderwerp bepaalt u hoe ver wij gaan, en tot welk bedrag. '
     + 'Alles staat standaard op voorbereiden: wij doen niets zonder uw akkoord tot u dat verandert.</div>'
-    + d.niveaus.map(n=>'<div class="meta" style="font-size:.78rem;color:var(--soft);line-height:1.6;"><b style="color:var(--txt);">L'+n.n+' '+esc(n.label)+'</b> · '+esc(n.uitleg)+'</div>').join('')
+    + d.niveaus.map(n=>'<div class="meta fijn"><b>L'+n.n+' '+esc(n.label)+'</b> · '+esc(n.uitleg)+'</div>').join('')
     + '</div>';
   h += d.domeinen.map(x=>'<div class="kaart"><h2>'+esc(x.naam)+'</h2>'
     + '<div class="niv">'+d.niveaus.map(n=>'<button class="js-niv'+(n.n===x.niveau?' aan':'')+'" data-d="'+esc(x.domein)+'" data-n="'+n.n+'"'
         + (n.n>x.dak?' disabled title="Over dit onderwerp beslist u zelf."':'')+'>L'+n.n+' '+esc(n.label)+'</button>').join('')+'</div>'
-    + (x.dak<4 ? '<div class="meta" style="font-size:.75rem;color:var(--gold);margin-top:.45rem;">Verder dan L'+x.dak+' gaat het hier niet. Over dit onderwerp beslist u zelf.</div>':'')
+    + (x.dak<4 ? '<div class="meta fijner goud">Verder dan L'+x.dak+' gaat het hier niet. Over dit onderwerp beslist u zelf.</div>':'')
     + (x.niveau>=3 ? '<label class="lbl">Uw grens per zaak (euro)</label>'
         + '<div class="rij"><div><input class="veld js-grens" data-d="'+esc(x.domein)+'" type="number" min="0" value="'+Math.round(x.grensCenten/100)+'"></div>'
         + '<button class="knop klein js-grensk" data-d="'+esc(x.domein)+'">Vastzetten</button></div>'
-        + '<div class="meta" style="font-size:.75rem;color:var(--soft);margin-top:.4rem;">Tot dit bedrag pakken wij het op zonder u te storen. Daarboven leggen wij het voor.</div>' : '')
+        + '<div class="meta fijner">Tot dit bedrag pakken wij het op zonder u te storen. Daarboven leggen wij het voor.</div>' : '')
     + '</div>').join('');
   if(d.log.length){
     h += '<div class="kaart"><h2>Wat u ons gaf</h2><div class="sub">Elke wijziging, met de oude stand erbij.</div>'
@@ -338,7 +458,7 @@ async function vGraaf(){
   h += '<div class="kaart">' + (zicht.length ? zicht.slice(0,300).map(k=>
     '<div class="item"><div class="body"><b>'+esc(k.naam)+'</b><div class="meta">'
     + esc(k.bron)+' · '+esc(k.kamer)+' · '+GEV[k.gevoelig]
-    + (k.deel==='lid'? ' · <span style="color:var(--gold);">blijft bij u</span>' : k.deel==='rechterhand'? ' · uw Rechterhand' : ' · ook het bureau')
+    + (k.deel==='lid'? ' · <span class="goud">blijft bij u</span>' : k.deel==='rechterhand'? ' · uw Rechterhand' : ' · ook het bureau')
     + (k.waarde? ' · '+euro(k.waarde):'')
     + (k.vervalt? ' · '+esc(k.vervaltWat)+' '+esc(datum(k.vervalt)):'')
     + '</div></div><button class="knop klein stil js-kn" data-id="'+esc(k.id)+'">Verband</button></div>').join('')

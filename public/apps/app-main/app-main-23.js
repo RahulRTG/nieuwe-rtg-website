@@ -68,16 +68,16 @@
   // Elke app kent zijn eigen huisstijl-glyf (shared/glyf.js) op naam van de
   // sleutel; de tegel tekent die als dunne lijn-icoon (geen emoji meer).
   const LINKS = {
-    ontdek:      { naam: 'Het Huis',     url: '/apps/rtg.html' },
+    ontdek:      { naam: 'Ontdekken',     url: '/apps/rtg.html' },
     spelen:      { naam: 'Spelen',       url: '/apps/spelen.html?pas=' + encodeURIComponent(pas) },
     vrienden:    { naam: 'Vrienden',     url: '/apps/foundation/vrienden.html' },
     juridisch:   { naam: 'Juridisch',    url: '/apps/juridisch.html' },
     camera:      { naam: 'Camera',       url: '/apps/camera.html' },
-    muziek:      { naam: 'RTG Sound',    url: '/apps/muziek.html' },
-    podium:      { naam: 'Podium',       url: '/apps/podium.html' },
-    flits:       { naam: 'Flits',        url: '/apps/flits.html' },
+    muziek:      { naam: 'Muziek',    url: '/apps/muziek.html' },
+    podium:      { naam: 'Live',       url: '/apps/podium.html' },
+    flits:       { naam: 'Onderweg',        url: '/apps/flits.html' },
     navigatie:   { naam: 'Navigatie',    url: '/apps/navigatie.html' },
-    theater:     { naam: 'Theater',      url: '/apps/theater.html' },
-    residentie:  { naam: 'De Résidence', url: '/apps/residentie.html' },
-    wbw:         { naam: 'Wie betaalt wat', url: '/apps/wbw.html' },
+    theater:     { naam: 'Films en series',      url: '/apps/theater.html' },
+    residentie:  { naam: 'Verblijven', url: '/apps/residentie.html' },
+    wbw:         { naam: 'Samen betalen', url: '/apps/wbw.html' },
     passkeys:    { naam: 'Passkeys',     url: '/apps/passkeys.html' },

@@ -133,7 +133,7 @@ module.exports = (ctx) => {
   /* Wat er in de graaf staat, samengevat per kamer. Dit voedt het bureaublad
      van de app: een kamer zonder knopen is niet stuk, hij is leeg, en dat is
      iets anders dan "in aanbouw" (zie ./kamers.js). */
-  function samenvatting(key, voorafG) {
+  function graafSamenvatting(key, voorafG) {
     const g = voorafG || graaf(key);
     const perKamer = {};
     for (const k of g.knopen) {
@@ -160,6 +160,6 @@ module.exports = (ctx) => {
      afgeslagen mutatie is een bevinding, niet een geslaagde toets.
      test/bureau.test.js voert hem nu rechtstreeks een knoop die het
      tegenovergestelde beweert. */
-  return { graaf, graafVoor, samenvatting, vandaag, knoop,
+  return { graaf, graafVoor, samenvatting: graafSamenvatting, vandaag, knoop,
     NIVEAUS: { OPEN, PERSOONLIJK, VERTROUWELIJK, BESLOTEN }, KRING };
 };

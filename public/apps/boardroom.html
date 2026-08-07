@@ -34,7 +34,47 @@
     <p data-i18n="bo.sub">Zet zelf aan wat je gebruikt en uit wat je niet wilt. Gevoelige deel-functies staan bewust standaard uit. Je keuzes reizen mee naar al je toestellen, en wat je hier uitzet gaat ook echt dicht.</p>
   </div>
   <div class="rtg-melder" id="melder" role="status" aria-live="polite"></div>
-  <div id="bord"><p class="rtg-leeg" id="melding" data-i18n="bo.laden">Boardroom laden&hellip;</p></div>
+
+  <!-- De tabrij staat dicht tot de server de boardroom-poort opendoet; een
+       gewoon lid ziet hier niets en houdt de pagina die hij altijd had. -->
+  <div class="tabs" id="boTabs" hidden role="tablist" aria-label="Boardroom">
+    <button class="tab aan" type="button" role="tab" aria-selected="true" data-paneel="tabBoard" data-i18n="bo.tab.board">Boardroom</button>
+    <button class="tab" type="button" role="tab" aria-selected="false" data-paneel="tabLeden" data-i18n="bo.tab.leden">Leden</button>
+  </div>
+
+  <!-- #bord blijft de eerste eigen doos: de eigenaarszetel schuift zichzelf er
+       vlak voor, en hoort dus binnen deze tab te landen. -->
+  <div id="tabBoard">
+    <div id="bord"><p class="rtg-leeg" id="melding" data-i18n="bo.laden">Boardroom laden&hellip;</p></div>
+  </div>
+
+  <div id="tabLeden" hidden>
+    <section class="rtg-groep">
+      <h2 data-i18n="lr.h">Het ledenregister</h2>
+      <p class="rtg-uitleg" data-i18n="lr.sub">Alle leden op codenaam; de echte naam blijft in de kluis. Te ordenen op pas, geslacht, land, stad en op alfabet.</p>
+      <div class="chips">
+        <select class="rtg-veld" id="lrPas" aria-label="Pas"><option value="" data-i18n="lr.allepas">Alle passen</option></select>
+        <select class="rtg-veld" id="lrGeslacht" aria-label="Geslacht"><option value="">m/v/x</option><option value="v">Vrouw</option><option value="m">Man</option><option value="x">X</option></select>
+        <select class="rtg-veld" id="lrLand" aria-label="Land"><option value="" data-i18n="lr.alleland">Alle landen</option></select>
+        <select class="rtg-veld" id="lrStad" aria-label="Stad"><option value="" data-i18n="lr.allestad">Alle steden</option></select>
+      </div>
+      <div id="lrSplit"><p class="rtg-leeg" data-i18n="lr.laden">Register laden&hellip;</p></div>
+      <div id="lrLijst"></div>
+    </section>
+
+    <section class="rtg-groep">
+      <h2 data-i18n="bz.h">De ledenbalie</h2>
+      <p class="rtg-uitleg" data-i18n="bz.sub">Wie aan de balie zit, helpt leden met hun abonnement of hun wachtwoord. Dat raakt een account, dus hoort de zetel bij een echte inlog en niet bij een gedeelde code. U geeft hem op codenaam en trekt hem hier ook weer in.</p>
+      <div id="bzLijst"><p class="rtg-leeg" data-i18n="bz.laden">Zetels laden&hellip;</p></div>
+      <!-- Uitdelen is van de eigenaar alleen; wie enkel de sleutel van de kamer
+           kreeg, ziet deze rij niet. De server weigert het ook, maar een knop
+           die altijd afketst is geen knop. -->
+      <div class="rtg-rij" id="bzGeven" hidden>
+        <input class="rtg-veld" id="bzCode" maxlength="60" style="flex:1;" data-i18n-ph="bz.ph" placeholder="Codenaam of sleutel van het lid">
+        <button class="rtg-knop vol" id="bzGeef" type="button" data-i18n="bz.geef">Geef een zetel</button>
+      </div>
+    </section>
+  </div>
 </main>
 
 <script>
@@ -74,8 +114,225 @@ window.I18N = { en: {
   'ez.vraag':'Ask Rahul for a proposal', 'ez.pastoe':'Apply this proposal', 'ez.toegepast':'Applied: ',
   'ez.geenvoorstel':'No proposal.', 'ez.geenai':'AI direction becomes available once an AI key is configured.',
   'ez.geenlog':'The fault warden has not had to act yet.',
-  'ez.aiph':'For instance: switch Clips off for teenagers, or: give hospitality 10% commission.'
+  'ez.aiph':'For instance: switch Clips off for teenagers, or: give hospitality 10% commission.',
+  'bo.tab.board':'Boardroom', 'bo.tab.leden':'Members',
+  'lr.h':'The member register',
+  'lr.sub':'Every member by codename; the real name stays in the vault. Sort by pass, gender, country, city and alphabet.',
+  'lr.allepas':'All passes', 'lr.alleland':'All countries', 'lr.allestad':'All cities',
+  'lr.laden':'Loading register…', 'lr.pas':'By pass', 'lr.gesl':'By gender',
+  'lr.land':'By country', 'lr.stad':'By city', 'lr.alfabet':'Alphabetically',
+  'lr.geen':'No members in this selection.', 'lr.mislukt':'That did not work.',
+  'bz.h':'The member desk',
+  'bz.sub':'Whoever sits at the desk helps members with their subscription or their password. That touches an account, so the seat belongs to a real sign-in and not to a shared code. You hand it out by codename and withdraw it here as well.',
+  'bz.laden':'Loading seats…', 'bz.ph':'Codename or key of the member', 'bz.geef':'Give a seat',
+  'bz.geen':'Nobody is at the desk yet.', 'bz.sinds':'at the desk since ', 'bz.weg':'Withdraw',
+  'bz.leeg':'Please fill in the codename of the member first.',
+  'bz.nietgevonden':'We do not know this codename.', 'bz.meer':'More than one member matches; please be more precise.',
+  'bz.geefOk':'The seat has been given.', 'bz.wegOk':'The seat has been withdrawn.'
 } };
+</script>
+<script>
+/* De Leden-tab: het bestaande ledenregister (/api/office/ledenregister) plus
+   het beheer van de baliezetels. Geen tweede register en geen eigen opmaak --
+   dezelfde tabrij, kaarten en pilknoppen die de UI-kit al levert.
+
+   De tab verschijnt pas als de server de boardroom-poort werkelijk opendoet:
+   we vragen het register gewoon op, en komt daar een 401 of 403 terug, dan
+   blijft alles dicht. De poort zit op de server (boardroomAuth); dit is de
+   etalage, nooit de controle. */
+(function () {
+  'use strict';
+  var T = function (k, s) { return (window.RTGi18n && RTGi18n.t) ? RTGi18n.t(k, s) : s; };
+  var $ = function (id) { return document.getElementById(id); };
+  function token() { try { return localStorage.getItem('rtg_member_token') || ''; } catch (e) { return ''; } }
+  function post(pad, body) {
+    return fetch(pad, { method: 'POST', body: JSON.stringify(body || {}),
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token() }
+    }).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (d) {
+        if (!r.ok) throw new Error(d.error || T('lr.mislukt', 'Dat lukte niet.'));
+        return d;
+      });
+    });
+  }
+  // dezelfde melder als de rest van deze pagina, met dezelfde standen
+  function zeg(t, soort) {
+    var e = $('melder'); if (!e) return;
+    e.textContent = t || '';
+    e.className = 'rtg-melder' + (t ? ' zien' : '') + (soort ? ' ' + soort : '');
+  }
+  function el(tag, cls, tekst) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (tekst != null) e.textContent = tekst;
+    return e;
+  }
+  function kop(doel, t) { doel.appendChild(el('div', 'titel', t)); }
+  function tegels(doel, arr) {
+    var r = el('div', 'kpis');
+    arr.forEach(function (x) {
+      var k = el('div', 'kpi');
+      k.appendChild(el('b', null, String(x.aantal)));
+      k.appendChild(el('small', null, x.naam));
+      r.appendChild(k);
+    });
+    doel.appendChild(r);
+  }
+  function rij(doel, naam, sub, knop) {
+    var r = el('div', 'rtg-rij'), t = el('div', 'rtg-tekst');
+    t.appendChild(el('div', 'rtg-naam', naam));
+    if (sub) t.appendChild(el('div', 'rtg-sub', sub));
+    r.appendChild(t);
+    if (knop) r.appendChild(knop);
+    doel.appendChild(r);
+  }
+  function leeg(doel, tekst) { doel.textContent = ''; doel.appendChild(el('p', 'rtg-leeg', tekst)); }
+
+  /* ---- het ledenregister ---- */
+  var optiesKlaar = false;
+  function filter() {
+    return { pas: $('lrPas').value || undefined, geslacht: $('lrGeslacht').value || undefined,
+      land: $('lrLand').value || undefined, stad: $('lrStad').value || undefined };
+  }
+  function toonRegister(d) {
+    var s = $('lrSplit'); s.textContent = '';
+    kop(s, T('lr.pas', 'Per pas')); tegels(s, d.perPas || []);
+    kop(s, T('lr.gesl', 'Per geslacht')); tegels(s, d.perGeslacht || []);
+    kop(s, T('lr.land', 'Per land')); tegels(s, (d.perLand || []).slice(0, 12));
+    kop(s, T('lr.stad', 'Per stad')); tegels(s, (d.perStad || []).slice(0, 12));
+    var lijst = d.lijst || [], L = $('lrLijst');
+    L.textContent = '';
+    kop(L, T('lr.alfabet', 'Op alfabet') + ' (' + lijst.length + ')');
+    if (!lijst.length) { L.appendChild(el('p', 'rtg-leeg', T('lr.geen', 'Geen leden in deze selectie.'))); return; }
+    // een lange lijst rolt in zijn eigen venster; de kaart eronder blijft bereikbaar
+    var box = el('div');
+    box.style.cssText = 'max-height:18rem;overflow:auto;';
+    lijst.forEach(function (m) {
+      rij(box, m.codenaam, [m.pasNaam, m.geslachtNaam, m.stad, m.land].filter(Boolean).join(' · '));
+    });
+    L.appendChild(box);
+  }
+  // de keuzelijsten komen uit de facetten zelf, dus eenmalig en nooit verzonnen
+  function vulOpties(d) {
+    if (optiesKlaar) return;
+    var vul = function (id, items, veld) {
+      var sel = $(id);
+      items.forEach(function (x) {
+        var o = document.createElement('option');
+        o.value = veld ? x[veld] : x.naam;
+        o.textContent = x.naam + ' (' + x.aantal + ')';
+        sel.appendChild(o);
+      });
+    };
+    vul('lrPas', (d.perPas || []).filter(function (p) { return p.aantal; }), 'pas');
+    vul('lrLand', (d.perLand || []).filter(function (x) { return x.naam !== 'Onbekend'; }));
+    vul('lrStad', (d.perStad || []).filter(function (x) { return x.naam !== 'Onbekend'; }));
+    optiesKlaar = true;
+    ['lrPas', 'lrGeslacht', 'lrLand', 'lrStad'].forEach(function (id) {
+      $(id).addEventListener('change', function () { laadRegister(false); });
+    });
+  }
+  function laadRegister(eerste) {
+    return post('/api/office/ledenregister', filter()).then(function (d) {
+      toonRegister(d); vulOpties(d); return true;
+    }).catch(function (e) {
+      // de eerste keer is dit de poortvraag: geen toegang, dus stil blijven
+      if (!eerste) leeg($('lrSplit'), e.message);
+      return false;
+    });
+  }
+
+  /* ---- de baliezetels ----
+     De server draagt SLEUTELS ('user-<id>') en geen namen, en dat is precies
+     de bedoeling: het kantoor draait op pseudoniemen. De lijst toont die
+     sleutel dus zoals hij is. Het antwoord op een wijziging draagt de verse
+     lijst al mee, dus er gaat geen tweede ronde langs de server -- die zou het
+     beeld alleen maar even uit de pas laten lopen. */
+  var zetelBaas = false;
+  function zetelsUit(d) { return (d && (d.zetels || d.lijst)) || []; }
+  function datum(t) { try { return t ? new Date(t).toLocaleDateString() : ''; } catch (e) { return ''; } }
+  function toonZetels(lijst) {
+    var box = $('bzLijst');
+    $('bzGeven').hidden = !zetelBaas;
+    if (!lijst.length) { leeg(box, T('bz.geen', 'Er zit nog niemand aan de balie.')); return; }
+    box.textContent = '';
+    lijst.forEach(function (z) {
+      var k = null;
+      if (zetelBaas) {
+        k = el('button', 'rtg-knop', T('bz.weg', 'Trek in'));
+        k.type = 'button';
+        k.addEventListener('click', function () {
+          k.disabled = true;
+          post('/api/office/balie/zetel', { key: z.key, weg: true })
+            .then(function (d) { zeg(T('bz.wegOk', 'De zetel is ingetrokken.'), 'goed'); toonZetels(zetelsUit(d)); })
+            .catch(function (e) { zeg(e.message, 'fout'); k.disabled = false; });
+        });
+      }
+      rij(box, z.key, T('bz.sinds', 'aan de balie sinds ') + datum(z.sinds), k);
+    });
+  }
+  function laadZetels() {
+    return post('/api/office/balie/zetels', {}).then(function (d) {
+      zetelBaas = !!d.baas;
+      toonZetels(zetelsUit(d));
+    }).catch(function (e) { leeg($('bzLijst'), e.message); });
+  }
+  /* Uitdelen gaat op codenaam, want een sleutel kent niemand uit zijn hoofd;
+     de bestaande balie-zoekroute vertaalt het een in het ander. Die vertaling
+     komt in het inzagejournaal terecht, en dat hoort ook: er wordt een lid
+     opgezocht. Een sleutel mag ook rechtstreeks -- de lijst hierboven toont er
+     een, en die moet je kunnen overtypen. */
+  function sleutelVan(v) {
+    if (/^user-\d+$/.test(v)) return Promise.resolve(v);
+    return post('/api/office/balie/zoek', { codenaam: v }).then(function (d) {
+      var t = d.treffers || [];
+      if (!t.length) throw new Error(T('bz.nietgevonden', 'Deze codenaam kennen we niet.'));
+      if (t.length > 1) throw new Error(T('bz.meer', 'Meerdere leden passen hierop; wees preciezer.'));
+      return t[0].key;
+    });
+  }
+  function geefZetel() {
+    var v = $('bzCode').value.trim();
+    if (!v) { zeg(T('bz.leeg', 'Vul eerst de codenaam van het lid in.'), 'let'); return; }
+    var b = $('bzGeef');
+    b.disabled = true;
+    sleutelVan(v).then(function (key) {
+      return post('/api/office/balie/zetel', { key: key });
+    }).then(function (d) {
+      $('bzCode').value = '';
+      zeg(T('bz.geefOk', 'De zetel is gegeven.'), 'goed');
+      toonZetels(zetelsUit(d));
+    }).catch(function (e) { zeg(e.message, 'fout'); }).then(function () { b.disabled = false; });
+  }
+
+  function tabrij() {
+    var bar = $('boTabs');
+    bar.addEventListener('click', function (e) {
+      var b = e.target.closest && e.target.closest('.tab');
+      if (!b) return;
+      Array.prototype.forEach.call(bar.querySelectorAll('.tab'), function (x) {
+        var aan = x === b;
+        x.classList.toggle('aan', aan);
+        x.setAttribute('aria-selected', aan ? 'true' : 'false');
+        $(x.getAttribute('data-paneel')).hidden = !aan;
+      });
+    });
+    bar.hidden = false;
+  }
+
+  function start() {
+    if (!token()) return;
+    laadRegister(true).then(function (ok) {
+      if (!ok) return;
+      tabrij();
+      laadZetels();
+      $('bzGeef').addEventListener('click', geefZetel);
+      $('bzCode').addEventListener('keydown', function (e) { if (e.key === 'Enter') geefZetel(); });
+    });
+  }
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
+  else start();
+})();
 </script>
 <script src="/shared/i18n.js"></script>
 <script src="/shared/uitvoer.js"></script>

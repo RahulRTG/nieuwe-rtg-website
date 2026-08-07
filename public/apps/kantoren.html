@@ -819,6 +819,89 @@
     <div class="kaart lijst" id="techRaad" style="margin-top:.6rem;"><div class="leeg">Geen open voorstellen.</div></div>
   </section>
 
+  <!-- de ledenbalie: de derde poort, naast de boardroom en de paniekkamer en om
+       dezelfde reden. Wie helpt met een abonnement of een wachtwoord raakt het
+       account van een lid, en dat mag niet achter de gedeelde kantoorcode die
+       niemand aanwijst. De zetel hangt daarom aan een echte inlog. -->
+  <section id="vBalie" hidden>
+    <div class="kop">
+      <button class="terug" id="balTerug">← alle kamers</button>
+      <h1 id="balH1">De Ledenbalie</h1>
+    </div>
+    <p class="deck">Hier helpt u een lid met zijn abonnement, zijn wachtwoord of een klacht. De balie werkt op codenaam: een naam, een e-mailadres, een telefoonnummer of een document komt hier niet in beeld. Elke raadpleging gaat met uw reden het inzagelog in.</p>
+
+    <div class="kaart" id="balDicht" hidden style="padding:1.1rem 1.2rem;margin-top:1rem;">
+      <p class="stil" style="font-size:.85rem;color:var(--muted);line-height:1.6;margin:0;" id="balDichtTekst"></p>
+    </div>
+
+    <div id="balWerk">
+      <h3 class="sec">Zoeken op codenaam of steuncode</h3>
+      <div class="kaart" style="padding:1.1rem 1.2rem;">
+        <p class="stil" style="font-size:.78rem;color:var(--soft);line-height:1.6;margin:0 0 .2rem;">Het lid noemt zijn codenaam of leest de steuncode voor uit de app. Zonder een van beide zoekt de balie niet: door het ledenbestand bladeren is geen hulpvraag.</p>
+        <div class="taakrij">
+          <input class="veld" id="balCode" style="flex:1;" placeholder="Codenaam" maxlength="60" autocomplete="off">
+          <input class="veld" id="balSteun" style="max-width:11rem;" placeholder="Steuncode" maxlength="24" autocomplete="off">
+          <button class="knop stil" id="balZoek" type="button">Zoek</button>
+        </div>
+        <div id="balTreffers" style="margin-top:.6rem;" aria-live="polite"></div>
+      </div>
+
+      <h3 class="sec" id="balDossierKop" hidden>Het dossier</h3>
+      <div class="kaart" id="balDossierKaart" hidden style="padding:1.1rem 1.2rem;">
+        <p class="stil" style="font-size:.78rem;color:var(--soft);line-height:1.6;margin:0 0 .2rem;">U opent het dossier van <b id="balGekozen" style="color:var(--txt);"></b>. Noteer eerst waarvoor: die reden gaat mee het inzagelog in, en zonder reden blijft het dossier dicht.</p>
+        <div class="taakrij">
+          <input class="veld" id="balReden" style="flex:1;" placeholder="Waarvoor opent u dit dossier? Bijv. lid belt over een dubbele afschrijving" maxlength="200">
+          <button class="knop" id="balOpenen" type="button">Open het dossier</button>
+        </div>
+        <div id="balDossier" style="margin-top:.7rem;" aria-live="polite"></div>
+      </div>
+
+      <div id="balActies" hidden>
+        <h3 class="sec">Wachtwoordherstel</h3>
+        <div class="kaart" style="padding:1.1rem 1.2rem;">
+          <p class="stil" style="font-size:.78rem;color:var(--soft);line-height:1.6;margin:0 0 .2rem;">De herstellink gaat naar het adres van het lid zelf. U krijgt dat adres niet te zien, u zet geen wachtwoord en u leest er nooit een voor. Het lid kiest via de link zijn eigen nieuwe wachtwoord.</p>
+          <div class="taakrij">
+            <input class="veld" id="balHerstelReden" style="flex:1;" placeholder="Waarom stuurt u de herstellink?" maxlength="200">
+            <button class="knop stil" id="balHerstelKnop" type="button">Verstuur wachtwoordherstel</button>
+          </div>
+          <div class="stil" id="balHerstelUit" style="font-size:.8rem;color:var(--soft);line-height:1.6;margin-top:.5rem;" aria-live="polite"></div>
+        </div>
+
+        <h3 class="sec">Klachten</h3>
+        <div class="kaart" style="padding:1.1rem 1.2rem;">
+          <div id="balKlachtLijst"><div class="leeg">Geen klachten vastgelegd.</div></div>
+          <div class="taakrij">
+            <select class="veld" id="balKlachtSoort" style="max-width:11rem;" aria-label="Soort klacht">
+              <option value="reis">Reis</option>
+              <option value="betaling">Betaling</option>
+              <option value="app">App of portaal</option>
+              <option value="partner">Partner</option>
+              <option value="anders">Anders</option>
+            </select>
+            <input class="veld" id="balKlachtTekst" style="flex:1;" placeholder="Wat meldt het lid?" maxlength="300">
+            <button class="knop stil" id="balKlachtKnop" type="button">Leg de klacht vast</button>
+          </div>
+        </div>
+
+        <h3 class="sec">Een abonnementswijziging voorstellen</h3>
+        <div class="kaart" style="padding:1.1rem 1.2rem;">
+          <p class="stil" style="font-size:.78rem;color:var(--soft);line-height:1.6;margin:0 0 .2rem;">Lifestyle en Business worden uitsluitend na een menselijk besluit toegekend. Wat u hier vastlegt is een voorstel: het gaat naar diezelfde goedkeuring en verleent zelf niets. Beloof het lid dus geen toegang, ook niet als het voorstel voor de hand ligt.</p>
+          <div class="taakrij">
+            <select class="veld" id="balAboPas" style="max-width:12rem;" aria-label="Voorgestelde pas">
+              <option value="gratis">De gratis app</option>
+              <option value="rtg">RTG Pass</option>
+              <option value="lifestyle">Lifestyle Pass</option>
+              <option value="business">Business Pass</option>
+            </select>
+            <input class="veld" id="balAboReden" style="flex:1;" placeholder="Waarom deze wijziging?" maxlength="200">
+            <button class="knop stil" id="balAboKnop" type="button">Leg het voorstel vast</button>
+          </div>
+          <div class="stil" id="balAboUit" style="font-size:.8rem;color:var(--soft);line-height:1.6;margin-top:.5rem;" aria-live="polite"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
 </div></main>
 <div class="melding" id="melding" role="status"></div>
 
@@ -834,7 +917,7 @@ const api = (pad, body) => fetch('/api/office/' + pad, {
   body: JSON.stringify(body || {})
 }).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) { if (r.status === 401) uitgelogd(); throw new Error(d.error || 'Er ging iets mis.'); } return d; });
 function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 2600); }
-function toon(v){ ['vKamers','vKamer','vBoard','vPaniek','vBank','vStad','vTechniek','vAtelier','vStudio','vHardware','vArchitect','vIdeeen','vWerkplaats'].forEach(x => $('#'+x).hidden = (x!==v)); }
+function toon(v){ ['vKamers','vKamer','vBoard','vPaniek','vBank','vStad','vTechniek','vBalie','vAtelier','vStudio','vHardware','vArchitect','vIdeeen','vWerkplaats'].forEach(x => $('#'+x).hidden = (x!==v)); }
 /* Het inloggen woont in de personeels-app (kantoor-ingang, met TOTP als die
    is ingesteld); zonder geldige sessie sturen we daarheen, met een
    terug-adres zodat ook een ?kamer=-link na het inloggen gewoon opent. */
@@ -867,6 +950,7 @@ async function binnen(){
     else if (start === 'paniekkamer') await openPaniek();
     else if (start === 'bank') await openBank();
     else if (start === 'stad') await openStad();
+    else if (start === 'balie') await openBalie();
     else if (start === 'atelier') await openAtelier();
     else if (start === 'studio') await openStudio();
     else if (start === 'hardware') await openHardware();
@@ -905,12 +989,13 @@ async function laadKamers(){
     '<button class="kaart kamer board" data-kamer="redactie"><span class="ic">'+ico('nieuws')+'</span><h2>RTG Redactie</h2><p>Krant, magazine en drukkerij in eigen huis; de nieuwstips komen uit het hele platform.</p><span class="kpi">Naar het perskantoor →</span></button>' +
     '<button class="kaart kamer board" data-kamer="techniek"><span class="ic">'+ico('schild')+'</span><h2>Techniek &amp; De Wacht</h2><p>De motor onder de motorkap: sluiten beide grootboeken op de cent, draait de Rust-motor mee, en werpt De Wacht netjes load af onder druk?</p><span class="kpi">De controlekamer →</span></button>' +
     '<button class="kaart kamer board" data-kamer="werkplaats"><span class="ic">'+ico('sitemaker')+'</span><h2>RTG Werkplaats</h2><p>Het app-bureau: bedenk met AI nieuwe apps en verbeter bestaande apps, de Bibliotheek en de App Store.</p><span class="kpi">Bouwen &amp; verbeteren →</span></button>' +
+    '<button class="kaart kamer" data-kamer="balie"><span class="ic">'+ico('rechterhand')+'</span><h2>De Ledenbalie</h2><p>Een lid helpen met zijn abonnement, wachtwoord of klacht. Op codenaam, met een reden, en alleen met een zetel.</p><span class="kpi">Aan de balie →</span></button>' +
     '<button class="kaart kamer" data-kamer="paniekkamer" style="border-color:var(--burgundy);"><span class="ic">'+ico('schild')+'</span><h2>De Paniekkamer</h2><p>Alle knoppen, met vier ogen: elke schakeling wordt een voorstel aan de boardroom.</p><span class="kpi" style="color:var(--burgundy);">Voorstellen doen →</span></button>';
   $('#grid').innerHTML = board + d.kamers.map(k =>
     '<button class="kaart kamer" data-kamer="'+k.id+'"><span class="ic">'+ico(k.icoon)+'</span><h2>'+esc(k.naam)+'</h2><p>'+esc(k.missie)+'</p>'+
     '<span class="kpi">'+esc(k.kpi[0])+': '+esc(String(k.kpi[1]))+(k.takenOpen ? ' · '+k.takenOpen+' taak(en) open' : '')+'</span></button>').join('');
   $('#grid').querySelectorAll('[data-kamer]').forEach(b => b.addEventListener('click', () =>
-    b.dataset.kamer === 'boardroom' ? openBoard() : b.dataset.kamer === 'bank' ? openBank() : b.dataset.kamer === 'stad' ? openStad() : b.dataset.kamer === 'techniek' ? openTechniek() : b.dataset.kamer === 'redactie' ? (location.href = '/apps/redactiekantoor.html') : b.dataset.kamer === 'paniekkamer' ? openPaniek() : b.dataset.kamer === 'atelier' ? openAtelier() : b.dataset.kamer === 'studio' ? openStudio() : b.dataset.kamer === 'hardware' ? openHardware() : b.dataset.kamer === 'architect' ? openArchitect() : b.dataset.kamer === 'werkplaats' ? openWerkplaats() : openKamer(b.dataset.kamer)));
+    b.dataset.kamer === 'boardroom' ? openBoard() : b.dataset.kamer === 'bank' ? openBank() : b.dataset.kamer === 'stad' ? openStad() : b.dataset.kamer === 'techniek' ? openTechniek() : b.dataset.kamer === 'balie' ? openBalie() :b.dataset.kamer === 'redactie' ? (location.href = '/apps/redactiekantoor.html') : b.dataset.kamer === 'paniekkamer' ? openPaniek() : b.dataset.kamer === 'atelier' ? openAtelier() : b.dataset.kamer === 'studio' ? openStudio() : b.dataset.kamer === 'hardware' ? openHardware() : b.dataset.kamer === 'architect' ? openArchitect() : b.dataset.kamer === 'werkplaats' ? openWerkplaats() : openKamer(b.dataset.kamer)));
   gezondBand();
 }
 
@@ -2440,6 +2525,228 @@ async function techVervers(){
     : '<div class="leeg">Geen open voorstellen - De Wacht heeft niets te melden.</div>');
 }
 $('#techTerug') && $('#techTerug').addEventListener('click', () => { clearInterval(techTimer); laadKamers(); });
+
+/* ---------- de ledenbalie ----------
+   Alles hier draait op codenamen. Het scherm verbergt geen naam, e-mailadres,
+   telefoonnummer of document: de kern stuurt ze niet mee, en daarom valt er
+   ook niets te lekken als iemand dit scherm openzet naast een lid.
+
+   De volgorde is met opzet stroef: eerst zoeken, dan kiezen, dan een reden, en
+   pas daarna een dossier met knoppen eronder. Wie meteen wil handelen, moet
+   eerst opschrijven waarom hij kijkt. */
+const BALIE_DICHT = 'balie-zonder-zetel';   // interne markering, geen tekst voor het scherm
+let BALIE = null;          // het gekozen lid uit de treffers
+let BALIE_DOSSIER = null;  // wat de kern van dat lid teruggaf
+/* dezelfde standen als de kern (server/kern/ledenbalie-zaken.js); een stand die
+   daar niet in staat wordt geweigerd, dus verzinnen we er hier geen */
+const BALIE_STATUS = [['open', 'Open'], ['in behandeling', 'In behandeling'], ['opgelost', 'Opgelost'], ['gesloten', 'Gesloten']];
+const BALIE_DICHTE_STANDEN = ['opgelost', 'gesloten'];
+
+/* Een eigen fetch in plaats van api(): bij de balie doet de STATUS ertoe. 403
+   betekent "geen zetel" en verdient de uitleg in plaats van een rode regel bij
+   een knop; elke andere fout hoort wel bij de knop waarop u drukte. */
+async function balieApi(pad, body){
+  const r = await fetch('/api/office/balie/' + pad, {
+    method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
+    body: JSON.stringify(body || {}) });
+  const d = await r.json().catch(() => ({}));
+  if (r.status === 401) { uitgelogd(); throw new Error(BALIE_DICHT); }
+  if (r.status === 403) { balieDeur(true, d.error); throw new Error(BALIE_DICHT); }
+  if (!r.ok) throw new Error(d.error || 'Er ging iets mis.');
+  return d;
+}
+/* De deur. Zonder zetel blijft er niet een leeg scherm of een technische fout
+   staan, maar de reden waarom hij dicht is en bij wie u moet zijn. */
+function balieDeur(dicht, tekst){
+  $('#balDicht').hidden = !dicht;
+  $('#balWerk').hidden = dicht;
+  if (dicht) $('#balDichtTekst').textContent = (tekst || 'U hebt geen zetel aan de ledenbalie.') +
+    ' De eigenaar deelt de zetels uit. Een zetel hangt aan uw eigen inlog en niet aan de gedeelde kantoorcode: wie een lid helpt met zijn abonnement of zijn wachtwoord, raakt zijn account, en dan hoort er een mens met een naam achter de balie te zitten.';
+}
+/* De kern noemt een pas bij zijn sleutel ('rtg', 'lifestyle'); aan een balie
+   staat de naam die het lid zelf kent. Onbekend blijft onbekend: liever de
+   ruwe sleutel dan een naam die wij erbij verzinnen. */
+const BALIE_PASNAAM = { gratis: 'De gratis app', rtg: 'RTG Pass', lifestyle: 'Lifestyle Pass', business: 'Business Pass' };
+const balPas = p => BALIE_PASNAAM[p] || p || '';
+function balDatum(w){
+  if (!w) return '';
+  const d = new Date(w);
+  return isNaN(d) ? String(w) : d.toLocaleDateString('nl-NL', { day: '2-digit', month: '2-digit', year: 'numeric' });
+}
+function balieLeeg(){
+  BALIE = null; BALIE_DOSSIER = null;
+  $('#balDossierKop').hidden = $('#balDossierKaart').hidden = $('#balActies').hidden = true;
+  $('#balDossier').innerHTML = ''; $('#balReden').value = '';
+  $('#balHerstelUit').textContent = ''; $('#balAboUit').textContent = '';
+}
+async function openBalie(){
+  zetKamerUrl('balie'); toon('vBalie');
+  $('#balH1').innerHTML = ico('rechterhand') + ' De Ledenbalie';
+  balieDeur(false);
+  balieLeeg();
+  $('#balTreffers').innerHTML = '';
+  /* De poort meteen aftasten met een zoekopdracht zonder zoekterm: die vindt
+     niemand en is dus ook geen raadpleging voor het inzagelog, maar een 403
+     komt er wel uit. Zo staat de uitleg er al voordat iemand voor niets een
+     codenaam intypt; een 400 ("vul iets in") negeren we hier bewust. */
+  try { await balieApi('zoek', {}); } catch (e) {}
+}
+$('#balTerug').addEventListener('click', () => laadKamers());
+
+/* zoeken: op codenaam of op de steuncode die het lid voorleest */
+async function balieZoek(){
+  const codenaam = $('#balCode').value.trim(), steuncode = $('#balSteun').value.trim();
+  const box = $('#balTreffers');
+  balieLeeg();
+  if (!codenaam && !steuncode) { box.innerHTML = '<div class="leeg">Vul een codenaam of een steuncode in.</div>'; return; }
+  let d;
+  try { d = await balieApi('zoek', { codenaam, steuncode }); }
+  catch (e) { if (e.message !== BALIE_DICHT) box.innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; return; }
+  const t = d.treffers || [];
+  const deel = w => w ? ' · ' + esc(w) : '';
+  box.innerHTML = t.length ? t.map((m, i) =>
+    '<div class="taakrij" style="margin-top:0;align-items:center;border-bottom:1px solid var(--line);padding:.45rem 0;">'+
+      '<span style="flex:1;"><b>'+esc(m.codename)+'</b> <span class="stil" style="color:var(--soft);font-size:.74rem;">'+
+        esc(balPas(m.pas) || 'pas onbekend')+deel(m.stad)+deel(m.land)+(m.sinds ? ' · lid sinds '+esc(balDatum(m.sinds)) : '')+'</span></span>'+
+      '<button class="knop stil" data-balkies="'+i+'" type="button" style="padding:.25rem .8rem;font-size:.75rem;">Kies</button>'+
+    '</div>').join('')
+    : '<div class="leeg">Geen lid gevonden. Vraag het lid de codenaam of de steuncode nog eens voor te lezen.</div>';
+  box.querySelectorAll('[data-balkies]').forEach(b => b.addEventListener('click', () => balieKies(t[Number(b.dataset.balkies)])));
+}
+$('#balZoek').addEventListener('click', balieZoek);
+['#balCode', '#balSteun'].forEach(id => $(id).addEventListener('keydown', e => { if (e.key === 'Enter') balieZoek(); }));
+
+function balieKies(m){
+  if (!m) return;
+  balieLeeg();
+  BALIE = m;
+  $('#balGekozen').textContent = m.codename || '';
+  $('#balDossierKop').hidden = $('#balDossierKaart').hidden = false;
+  $('#balReden').focus();
+}
+
+/* het dossier: pas na een reden, en die reden gaat mee het inzagelog in */
+$('#balOpenen').addEventListener('click', async () => {
+  if (!BALIE) return;
+  const reden = $('#balReden').value.trim();
+  if (!reden) { $('#balDossier').innerHTML = '<div class="leeg">Noteer eerst waarvoor u dit dossier opent.</div>'; return; }
+  let d;
+  /* Wie er kijkt sturen we niet mee: de server leest dat uit de zetel achter
+     deze sessie. Een `door` uit het scherm zou een naam zijn die de client
+     zelf verzint, en dan is het inzagelog een verhaal in plaats van een spoor. */
+  try { d = await balieApi('dossier', { id: BALIE.id, reden }); }
+  catch (e) { if (e.message !== BALIE_DICHT) $('#balDossier').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; return; }
+  BALIE_DOSSIER = d.lid || {};
+  balieTekenDossier();
+});
+$('#balReden').addEventListener('keydown', e => { if (e.key === 'Enter') $('#balOpenen').click(); });
+
+function balieTekenDossier(){
+  const l = BALIE_DOSSIER || {};
+  const rij = (label, waarde) => '<div class="taakrij" style="margin-top:0;border-bottom:1px solid var(--line);padding:.35rem 0;gap:.6rem;">'+
+    '<span style="flex:1;color:var(--soft);font-size:.78rem;">'+label+'</span>'+
+    '<span style="font-size:.85rem;">'+esc(waarde === null || waarde === undefined || waarde === '' ? 'onbekend' : String(waarde))+'</span></div>';
+  /* De abo-stand komt als klein object terug (pas, bedrag, lopende
+     voorstellen); een tekst zou hier ook mogen en beide worden een leesbare
+     regel, want [object Object] aan een balie helpt niemand. */
+  const abo = l.abo;
+  const aboTekst = (abo && typeof abo === 'object')
+    ? [abo.pasNaam || balPas(abo.pas), abo.status,
+       abo.opMaat ? 'op maat' : (abo.maandbijdrage == null ? '' : '€ ' + abo.maandbijdrage + ' p/m')].filter(Boolean).join(' · ')
+    : abo;
+  const voorstellen = (abo && abo.voorstellen) || [];
+  const klachten = (l.klachten || []).filter(k => BALIE_DICHTE_STANDEN.indexOf(k.status) < 0);
+  $('#balDossier').innerHTML =
+    rij('Codenaam', l.codename) + rij('Steuncode', l.steuncode) +
+    rij('Pas', balPas(l.pas)) + rij('Land', l.land) + rij('Stad', l.stad) +
+    rij('Lid sinds', balDatum(l.sinds)) + rij('Abonnement', aboTekst) +
+    rij('Open klachten', klachten.length) +
+    (voorstellen.length ? rij('Lopende voorstellen', voorstellen.map(v =>
+      balPas(v.naarPas) + ' (' + v.status + ', ' + balDatum(v.at) + ')').join(' · ')) : '') +
+    '<p class="stil" style="color:var(--soft);font-size:.74rem;line-height:1.6;margin:.6rem 0 0;">Meer staat hier niet, en dat is geen instelling die aanstaat: de kern stuurt geen naam, e-mailadres, telefoonnummer of document mee. Wie die wel nodig heeft, is bij de balie aan het verkeerde loket. De steuncode wijst een lid aan, maar bewijst niemand.</p>';
+  $('#balActies').hidden = false;
+  balieTekenKlachten();
+}
+
+/* wachtwoordherstel: de bestaande herstelstroom naar het lid zelf */
+$('#balHerstelKnop').addEventListener('click', async () => {
+  if (!BALIE) return;
+  const uit = $('#balHerstelUit');
+  const reden = $('#balHerstelReden').value.trim();
+  if (!reden) { uit.textContent = 'Noteer eerst waarom u de herstellink stuurt.'; return; }
+  try {
+    await balieApi('herstel', { id: BALIE.id, reden });
+    $('#balHerstelReden').value = '';
+    uit.textContent = 'De herstellink is naar het lid zelf onderweg. Vraag het lid in zijn eigen mailbox te kijken: wij zien dat adres niet, lezen de link niet voor en zetten geen wachtwoord.';
+    meld('Herstellink verstuurd.');
+  } catch (e) { if (e.message !== BALIE_DICHT) uit.textContent = e.message; }
+});
+
+/* klachten: vastleggen en de status bijwerken */
+function balieTekenKlachten(){
+  const ks = (BALIE_DOSSIER && BALIE_DOSSIER.klachten) || [];
+  const box = $('#balKlachtLijst');
+  box.innerHTML = ks.length ? ks.map(k =>
+    '<div style="border-bottom:1px solid var(--line);padding:.5rem 0;">'+
+      '<div style="font-size:.85rem;"><b>'+esc(k.soort || 'klacht')+'</b> '+
+        '<span class="stil" style="color:var(--soft);font-size:.74rem;">'+esc(balDatum(k.at))+'</span></div>'+
+      '<div style="font-size:.82rem;color:var(--muted);">'+esc(k.tekst || '')+'</div>'+
+      '<div class="taakrij"><select class="veld" style="max-width:11rem;" data-balstat="'+esc(k.id)+'" aria-label="Status van deze klacht">'+
+        BALIE_STATUS.map(s => '<option value="'+s[0]+'"'+(k.status === s[0] ? ' selected' : '')+'>'+s[1]+'</option>').join('')+
+      '</select><button class="knop stil" data-balzet="'+esc(k.id)+'" type="button" style="padding:.3rem .9rem;font-size:.78rem;">Werk bij</button></div>'+
+    '</div>').join('') : '<div class="leeg">Geen klachten vastgelegd.</div>';
+  box.querySelectorAll('[data-balzet]').forEach(b => b.addEventListener('click', async () => {
+    const sel = box.querySelector('[data-balstat="' + b.dataset.balzet + '"]');
+    if (!sel) return;
+    try {
+      const r = await balieApi('klacht/status', { klachtId: b.dataset.balzet, status: sel.value });
+      balieVervangKlacht(r.klacht);
+      meld('Status bijgewerkt.');
+    } catch (e) { if (e.message !== BALIE_DICHT) meld(e.message); }
+  }));
+}
+/* De kern geeft de bijgewerkte klacht terug; die zetten we op de plek van de
+   oude, zodat het scherm toont wat de kern bewaarde en niet wat wij hoopten. */
+function balieVervangKlacht(k){
+  if (!k || !BALIE_DOSSIER) return;
+  const ks = BALIE_DOSSIER.klachten = BALIE_DOSSIER.klachten || [];
+  const i = ks.findIndex(x => x.id === k.id);
+  if (i < 0) ks.unshift(k); else ks[i] = k;
+  balieTekenKlachten();
+}
+$('#balKlachtKnop').addEventListener('click', async () => {
+  if (!BALIE || !BALIE_DOSSIER) return;
+  const tekst = $('#balKlachtTekst').value.trim();
+  if (!tekst) { meld('Noteer eerst wat het lid meldt.'); return; }
+  try {
+    const r = await balieApi('klacht', { id: BALIE.id, soort: $('#balKlachtSoort').value, tekst });
+    $('#balKlachtTekst').value = '';
+    balieVervangKlacht(r.klacht);
+    meld('Klacht vastgelegd.');
+  } catch (e) { if (e.message !== BALIE_DICHT) meld(e.message); }
+});
+
+/* de abo-wijziging: een VOORSTEL, nooit een toekenning. Lifestyle en Business
+   lopen langs een mens (de goedkeuring bij de aanmeldingen); de balie legt
+   alleen vast wat het lid vraagt en waarom. */
+$('#balAboKnop').addEventListener('click', async () => {
+  if (!BALIE) return;
+  const uit = $('#balAboUit');
+  const naarPas = $('#balAboPas').value;
+  const reden = $('#balAboReden').value.trim();
+  if (!reden) { uit.textContent = 'Noteer eerst waarom u deze wijziging voorstelt.'; return; }
+  try {
+    const r = await balieApi('abo', { id: BALIE.id, naarPas, reden });
+    $('#balAboReden').value = '';
+    /* De kern zegt zelf wat er is vastgelegd; dat nemen we over in plaats van
+       het na te vertellen, want twee formuleringen van dezelfde regel gaan
+       vroeg of laat uit elkaar lopen. */
+    uit.textContent = (r && r.let) ? r.let : 'Het voorstel staat genoteerd; de balie verleent zelf geen pas.';
+    if (naarPas === 'lifestyle' || naarPas === 'business')
+      uit.textContent += ' Zeg het lid toe dat wij het voorleggen, niet dat het rond is.';
+    meld('Voorstel vastgelegd.');
+  } catch (e) { if (e.message !== BALIE_DICHT) uit.textContent = e.message; }
+});
 
 async function openStad(){
   zetKamerUrl('stad'); toon('vStad');

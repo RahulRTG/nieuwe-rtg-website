@@ -51,6 +51,7 @@
       "checkCred",
       "forgetSession",
       "hasCred",
+      "herstelStart",
       "leeftijdVan",
       "logInlog",
       "loginFails",

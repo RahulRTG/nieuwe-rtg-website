@@ -1,0 +1,39 @@
+/* Het Privekantoor, deelbestand "graaf-hulp": het gereedschap dat beide
+   bronbestanden delen.
+
+   Apart, en niet in een van de twee, omdat graaf-bronnen.js en
+   graaf-bronnen2.js elkaar dan zouden moeten kennen. Twee bestanden die
+   hetzelfde `straks()` nodig hebben en het ieder apart definieren is precies de
+   vorm waarvan regel 4 van de lat zegt dat hij uiteenloopt -- en juist bij deze
+   helpers zou dat stil gebeuren: een bron die "voorbij" net anders uitlegt,
+   levert termijnen die de Control Tower net anders telt, zonder dat iets klaagt.
+
+   Ook de gevoeligheidstrap woont hier, zodat een bron hem niet uit graaf.js hoeft
+   te importeren. */
+'use strict';
+
+// de trap; drie is het dak (gezondheid, nalatenschap)
+const OPEN = 0, PERSOONLIJK = 1, VERTROUWELIJK = 2, BESLOTEN = 3;
+
+const vandaag = () => new Date().toISOString().slice(0, 10);
+const isDatum = d => /^\d{4}-\d{2}-\d{2}$/.test(String(d || ''));
+/* Een gebeurtenis telt alleen mee als hij nog moet komen; een diner van vorig
+   jaar is geschiedenis en hoort niet als "achterstallig" in de tower. Een
+   TERMIJN (een verzekering, een paspoort) gaat hier NIET doorheen: die hoort
+   juist wel achterstallig te worden. */
+const straks = d => (isDatum(d) && d >= vandaag() ? d : '');
+const lijst = v => (Array.isArray(v) ? v : []);
+const obj = v => (v && typeof v === 'object' ? v : {});
+
+/* Een 'MM-DD' (verjaardag) naar de eerstvolgende echte datum. Zonder dit zou een
+   verjaardag nooit in een termijnvenster vallen, want '02-20' is geen datum die
+   je met vandaag kunt vergelijken. */
+function volgendeJaardag(md) {
+  if (!/^\d{2}-\d{2}$/.test(String(md || ''))) return '';
+  const t = vandaag();
+  const dit = t.slice(0, 4) + '-' + md;
+  return dit >= t ? dit : (Number(t.slice(0, 4)) + 1) + '-' + md;
+}
+
+module.exports = { OPEN, PERSOONLIJK, VERTROUWELIJK, BESLOTEN,
+  vandaag, isDatum, straks, lijst, obj, volgendeJaardag };

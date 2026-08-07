@@ -6,7 +6,7 @@
      en bouwt het beginscherm zichzelf niet meer op: een zwart scherm zonder
      foutmelding. app-main-01.js vergelijkt de twee en haalt zichzelf dan een
      keer vers op. -->
-<meta name="rtg-bouw" content="f9231c8c">
+<meta name="rtg-bouw" content="8961bfd3">
 <!-- De foutmelder staat bewust VOORAAN: hij moet de fouten van het opstarten
      kunnen zien, en die gebeuren voordat de rest geladen is. -->
 <script src="/shared/foutmelder.js"></script>
@@ -1350,6 +1350,12 @@
     font-size:0.85rem;letter-spacing:0.08em;margin-bottom:0.9rem;color:var(--txt);
   }
   .os-map-grid{grid-template-columns:repeat(3,1fr);margin-top:0;}
+  /* De brede app in secties: een kopje, daaronder wat je daar doet. */
+  .os-mapsecties{display:flex;flex-direction:column;gap:0.55rem;}
+  .os-sectiekop{font-family:Inter,system-ui,sans-serif;font-size:0.6rem;font-weight:600;
+    letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,.5);
+    margin:0.5rem 0 -0.15rem;}
+  .os-sectiekop:first-child{margin-top:0;}
   /* de map-tegel op het springboard: 3x3 voorproefje van de inhoud */
   .os-app .os-tegel.os-map-tegel{
     background:color-mix(in srgb, var(--card2) 70%, transparent);
@@ -1834,7 +1840,7 @@
     <div class="os-scrim" id="osMapScrim">
       <div class="os-map-paneel" role="dialog" aria-modal="true" aria-labelledby="osMapTitel">
         <h3 id="osMapTitel"></h3>
-        <div class="os-grid os-map-grid" id="osMapGrid"></div>
+        <div class="os-mapsecties" id="osMapGrid"></div>
       </div>
     </div>
 

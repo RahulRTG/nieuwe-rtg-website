@@ -125,3 +125,62 @@ test('een lege of rare database laat niets omvallen', () => {
     assert.ok(Array.isArray(bt.zonderBeleid(db)));
   }
 });
+
+/* ---------------------------------------------------------------------------
+   DE GATENLIJST TEGEN DE ECHTE DATABASE, en niet tegen een nagemaakte.
+
+   Waarom deze toets er is: hij had een echte fout moeten vangen en deed dat
+   niet. Toen de gesprekken van de leden naar de communicatiekern verhuisden
+   (db.data.memberChats -> commGesprekken + commBerichten), bleef het
+   bewaarbeleid wijzen naar de tak die leeg achterbleef. Gevolg: de oude tak had
+   een termijn en niets om te verlopen, en de NIEUWE tak -- waar sindsdien alle
+   gesprekken in staan -- had er geen. Persoonlijke berichten werden vanaf dat
+   moment voor altijd bewaard, en niets werd er rood van.
+
+   De toets die er stond keek naar een verzonnen database met een verzonnen tak.
+   Die kan zoiets per definitie niet zien: hij toetst de motor, niet de dekking.
+   Deze kijkt naar de takken die de kern ECHT maakt en eist dat elk daarvan in
+   het beleid staat. Wie er morgen een voorraad bij zet, komt hier langs. */
+const { maakComm } = require('../server/kern/comm');
+const cryptoNode = require('crypto');
+
+test('elke tak die de communicatiekern maakt, heeft een bewaartermijn', () => {
+  /* We laten de kern zelf zijn takken aanmaken in plaats van ze hier op te
+     schrijven: een lijst die je met de hand bijhoudt loopt achter, en dan
+     toetst hij precies wat hij hoort te bewaken niet meer. */
+  const db = { data: {} };
+  const comm = maakComm({ db, save() {}, crypto: cryptoNode, codenaamVan: (k) => k });
+  const g = comm.tussen('a', 'b');
+  comm.bericht({ gesprekId: g.id, van: 'a', tekst: 'hallo' });
+  comm.lees('b', g.id);
+  comm.vlag('a', g.id, 'vast', true);
+
+  /* De kluis staat er altijd bij als bekend, benoemd gat (zie zonderBeleid):
+     het ledendossier van een echt account staat versleuteld buiten db.data en
+     wacht op een besluit over zijn termijn. Dat is geen tak van deze kern, dus
+     hij hoort hier niet mee te tellen -- maar hem eruit filteren op naam is wel
+     iets wat je moet ZIEN staan, anders verdwijnt er ooit stilletjes een echt
+     gat in dezelfde filter. */
+  const gaten = bt.zonderBeleid(db).map((x) => x.tak).filter((t) => !t.startsWith('kluis:'));
+  assert.deepEqual(gaten, [],
+    'deze takken van de communicatiekern hebben geen bewaartermijn: ' + gaten.join(', '));
+});
+
+test('een gesprek dat twee jaar stil is, verloopt met zijn berichten mee', () => {
+  const lang = geleden(3 * 365);
+  const db = { data: {
+    commGesprekken: [
+      { id: 'oud', deelnemers: ['a', 'b'], laatst: lang },
+      { id: 'nu', deelnemers: ['a', 'b'], laatst: geleden(1) }
+    ],
+    commBerichten: {
+      oud: [{ at: lang, tekst: 'lang geleden' }],
+      nu: [{ at: geleden(1), tekst: 'gisteren' }]
+    }
+  } };
+  bt.veeg(db, { echt: true });
+  assert.deepEqual(db.data.commGesprekken.map((x) => x.id), ['nu'],
+    'het oude gesprek staat er nog');
+  assert.equal(db.data.commBerichten.oud.length, 0, 'de oude berichten staan er nog');
+  assert.equal(db.data.commBerichten.nu.length, 1, 'een gesprek van gisteren is meegeveegd');
+});

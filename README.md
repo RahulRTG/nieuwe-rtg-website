@@ -1430,7 +1430,14 @@ Wat de app kan: threads met antwoord-op en citaat, reacties, wijzigen binnen een
 
 API: `/api/comm/{inbox,gesprek,begin,stuur,wijzig,wis,reactie,lees,vlag,concept,typt,por,zoek,ai}`; de oude `/api/member/dm{,/send}` blijven bestaan en schrijven in dezelfde kern. Getoetst in `test/comm.e2e.js`, `test/comm-dm.test.js` en `test/berichten.e2e.js`.
 
-**Wat er nog niet in zit** — zodat niemand het hier gaat zoeken: end-to-end encryptie, tenants/RBAC, SSO/SCIM, retentiebeleid, legal hold, eDiscovery, DLP en de publieke API voor externe ontwikkelaars. Het model is erop gebouwd (elk bericht hoort bij een gesprek met een soort en een `meta`), maar ze staan er niet. Een half aangezette compliance-laag is gevaarlijker dan een afwezige. Hetzelfde geldt voor groepsbellen met breakout rooms en opname: dat blijft voorlopig RTG Meet.
+**Bewaartermijn en wisrecht.** Twee gaten die de verhuizing zelf maakte, en die allebei groen waren:
+
+- Het **bewaarbeleid** wees naar `memberChats` — de tak die leeg achterbleef. De nieuwe takken hadden er geen, dus persoonlijke berichten werden vanaf dat moment voor altijd bewaard. `commGesprekken` en `commBerichten` staan nu in `server/bewaarbeleid.js` met dezelfde twee jaar als daarvoor (een termijn die bij een verhuizing stilletjes ruimer wordt, is hoe "we bewaren niet eindeloos" een dode letter wordt), en `memberChats` blijft als bevroren archief zijn termijn houden — juist omdat er niets meer bij komt.
+- Het **wisrecht** kende de nieuwe takken niet: een lid dat om vergetelheid vroeg, verdween uit zijn account en bleef in zijn gesprekken. `kern/vergeten/gesprekken.js` doet dat nu, met dezelfde lezing van art. 17 als bij de eigen Salon-posts: wat dít lid schreef gaat weg, en blijft er niemand over dan gaat het hele gesprek weg — maar de kant van de ander blijft staan, want dat is zijn inhoud.
+
+Allebei waren ze onzichtbaar, en om dezelfde reden: de bezem in `test/vergeten.test.js` loopt na het verwijderen door de hele database, maar de wandeling ervóór maakt geen gesprek (daar heb je een tweede, verbonden lid voor nodig) — en een tak die nooit is aangeraakt kan een bezem niet vinden. **De dekking van een bezem is de dekking van de wandeling ervoor.** Daarom zijn er nu twee toetsen die de takken écht aanmaken met de kern zelf: `test/bewaartermijnen.test.js` eist dat elke tak die de kern maakt een termijn heeft (met de tak-lijst uit de kern gehaald en niet met de hand overgeschreven), en `test/comm-vergeten.test.js` roept dezelfde functie aan die `wisLid()` aanroept.
+
+**Wat er nog niet in zit** — zodat niemand het hier gaat zoeken: end-to-end encryptie, tenants/RBAC, SSO/SCIM, legal hold, eDiscovery, DLP en de publieke API voor externe ontwikkelaars. Het model is erop gebouwd (elk bericht hoort bij een gesprek met een soort en een `meta`), maar ze staan er niet. Een half aangezette compliance-laag is gevaarlijker dan een afwezige. Hetzelfde geldt voor groepsbellen met breakout rooms en opname: dat blijft voorlopig RTG Meet.
 
 ## Veiligheid & verbinding: vier apps op één ruggengraat
 

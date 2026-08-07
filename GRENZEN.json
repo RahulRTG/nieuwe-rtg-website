@@ -190,6 +190,11 @@
       "geloof",
       "stemmingToon"
     ],
+    "journaal": [
+      "boardroomAuth",
+      "journaalBeeld",
+      "journaalLees"
+    ],
     "journalistiek": [
       "journalistiek"
     ],

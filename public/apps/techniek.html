@@ -296,6 +296,24 @@
         De Wacht bewaakt het platform: live meters, een grafiek, een afweer die indringers afsnijdt,
         zelf opruimen, en een raadkamer waarin de AI voorstellen doet die u accepteert, afwijst of inconclaaf laat.
       </div>
+      <!-- HET DOORGEEFJOURNAAL. De grafiek hieronder toont hoeveel; dit toont WAT.
+           Dat verschil kostte vannacht uren: een sms die stil op de grond viel is
+           in een grafiek onzichtbaar, in een regel niet. -->
+      <div class="kaart" id="journaalKaart" style="padding:.7rem;margin-bottom:.8rem;">
+        <div style="display:flex;align-items:baseline;gap:.6rem;flex-wrap:wrap;margin-bottom:.5rem;">
+          <div class="sec" style="margin:0;">Doorgeefjournaal</div>
+          <span class="muted" id="journaalTel" style="font-size:.74rem;"></span>
+          <span style="flex:1"></span>
+          <button class="knop-klein" id="journaalAlles" aria-pressed="true">alles</button>
+          <button class="knop-klein" id="journaalFouten" aria-pressed="false">alleen fouten</button>
+          <button class="knop-klein" id="journaalUit" aria-pressed="false">alleen uitgaand</button>
+          <button class="knop-klein" id="journaalVernieuw">vernieuwen</button>
+        </div>
+        <div class="muted" style="font-size:.74rem;margin-bottom:.4rem;">
+          Een regel per binnenkomend verzoek en per uitgaand bericht. Op codenaam en op domein: nooit een naam, adres of nummer.
+        </div>
+        <div id="journaalLijst" style="max-height:22rem;overflow:auto;font-size:.76rem;"></div>
+      </div>
       <div class="telrij" id="wachtMeters"></div>
       <div id="wachtLastafworp"></div>
       <div class="kaart" id="wachtRand" style="padding:.6rem .8rem;"></div>
@@ -334,6 +352,7 @@
 
 <script src="/apps/util.js"></script>
 <script src="/shared/uitvoer.js"></script>
+<script src="/shared/journaalbord.js"></script>
 <script src="/apps/techniek.js"></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/seizoen.js" defer></script>

@@ -302,8 +302,23 @@
 
   function laadWacht(){
     api('/api/techniek/wacht/bord', {}).then(tekenWacht).catch(function(e){ toast(e.message); });
+    laadJournaal();
   }
 
+  // het doorgeefjournaal: /shared/journaalbord.js (eigen bestand, 10 KB-lat)
+  function laadJournaal(){ if (window.RTGJournaalbord) RTGJournaalbord.laad(api, $, toast); }
+  if (window.RTGJournaalbord) RTGJournaalbord.koppel($, laadJournaal);
+
+
+  /* DE CONTROLEKAMER -- afgesplitst uit techniek-02.js.
+
+     Die had twee onderwerpen: De Wacht (meters, grafiek, journaal) en de
+     controlekamer (functies per doelgroep, alles via een aanvraag). Twee lezers,
+     twee vragen, en samen over de 10 KB-lat. De knip loopt langs die grens en
+     niet halverwege een functie.
+
+     Dit deel deelt de scope van de bundel (zie scripts/bundel.js): $, api, toast
+     en de rest komen uit de delen hiervoor. */
   /* ---------- controlekamer: functies per doelgroep, alles via een aanvraag ---------- */
   var wachtend = {};         // sleutel id|doelgroep -> open aanvraag
   var catData = [];          // laatste catalogus

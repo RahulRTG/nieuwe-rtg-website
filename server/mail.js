@@ -132,16 +132,22 @@ function send(to, subject, text) {
      zoals elk ander onbestelbaar bericht, in de outbox. Dan is een storing te
      zien in plaats van te raden, en kan de eigenaar de code desnoods zelf
      voorlezen tot er een echt kanaal staat. */
+  /* Elk bericht dat de deur uitgaat komt in het doorgeefjournaal: WAT, WAARHEEN
+     (alleen de soort of het domein, nooit de persoon) en of het lukte. Dat is de
+     kant die vandaag ontbrak toen een sms spoorloos verdween. */
+  const journaal = (gelukt, hoe, reden) => {
+    try { require('./journaalhaak').meld({ richting: 'uit', wat: 'post/' + hoe, naar: to, mislukt: !gelukt, reden }); } catch (e) {}
+  };
   const isMail = /@/.test(String(to));
-  if (!isMail) { try { toOutbox(to, subject, text); } catch (e) { console.warn('[mail] mislukt:', e.message); } return; }
+  if (!isMail) { try { toOutbox(to, subject, text); journaal(true, 'outbox'); } catch (e) { console.warn('[mail] mislukt:', e.message); journaal(false, 'outbox', e.message); } return; }
   if (transporter) {
     transporter.sendMail({ from: FROM, to, subject, text })
-      .then(() => console.log(`[mail] verzonden naar ${to}: ${subject}`))
-      .catch(e => { console.warn('[mail] verzenden mislukt, naar outbox:', e.message); try { toOutbox(to, subject, text); } catch (e2) {} });
+      .then(() => { console.log(`[mail] verzonden naar ${to}: ${subject}`); journaal(true, 'smtp'); })
+      .catch(e => { console.warn('[mail] verzenden mislukt, naar outbox:', e.message); journaal(false, 'smtp', e.message); try { toOutbox(to, subject, text); } catch (e2) {} });
     return;
   }
   if (DIRECT) return stuurDirect(to, subject, text);
-  try { toOutbox(to, subject, text); } catch (e) { console.warn('[mail] mislukt:', e.message); }
+  try { toOutbox(to, subject, text); journaal(true, 'outbox'); } catch (e) { console.warn('[mail] mislukt:', e.message); journaal(false, 'outbox', e.message); }
 }
 
 async function bezorgNu(to, subject, text) {

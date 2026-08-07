@@ -1638,9 +1638,23 @@ console.log('\n29) de Authorization-kop wordt gelezen om een token te halen, nie
   /* Plekken die de kop bewust lezen zonder te verifieren. Vandaag leeg, en dat
      hoort zo te blijven: wie hier iets toevoegt legt uit waarom betasten hier
      genoeg is. Kun je dat niet, dan is het waarschijnlijk gewoon een gat. */
+  /* DE SLEUTEL IS HET BESTAND PLUS DE REGEL ZELF, NIET HET REGELNUMMER.
+
+     Hier stonden nummers ('basis.js:131'). Dat brak zodra iemand er BOVEN een
+     regel bijzette: de uitzondering verschoof mee naar 146, de sleutel niet, en
+     de keuring wees ineens een plek aan die niemand had aangeraakt. Dat is
+     vandaag gebeurd -- bij een commentaarblok van vijftien regels.
+
+     Erger is de andere kant: op zo'n vrijgekomen nummer kan een ANDERE regel
+     komen te staan, en die wordt dan stilzwijgend vrijgepleit door een
+     uitzondering die niet voor hem bedoeld was. test/scheiding.test.js heeft
+     precies deze les al geleerd en sleutelt daarom op het routepad. Een
+     regelnummer schuift op; de regel zelf niet. */
   const MAG_BETASTEN = new Map([
-    ['server/foundation/basis.js:131', 'tokenUit() HAALT alleen het token uit het verzoek; de aanroepers verifieren het. Een extractor is geen beslissing.'],
-    ['server/kern/stuur.js:110', 'geeft de kop ONGEWIJZIGD door aan een interne dienst op 127.0.0.1, die zelf verifieert. Hier wordt niets besloten.']
+    ["server/foundation/basis.js|const h = ((req.get && req.get('authorization')) || '');",
+      'tokenUit() HAALT alleen het token uit het verzoek; de aanroepers verifieren het (profielVan zoekt het op in de profielen van dat gezin). Een extractor is geen beslissing.'],
+    ["server/kern/stuur.js|const auth = req.get && req.get('authorization');",
+      'geeft de kop ONGEWIJZIGD door aan een interne dienst op 127.0.0.1, die zelf verifieert. Hier wordt niets besloten.']
   ]);
   let los = 0, gekeurd = 0;
   loop(path.join(ROOT, 'server'), /\.js$/, f => {
@@ -1650,7 +1664,7 @@ console.log('\n29) de Authorization-kop wordt gelezen om een token te halen, nie
       if (!KOP.test(r)) return;
       gekeurd++;
       const plek = rel + ':' + (i + 1);
-      if (MAG_BETASTEN.has(plek)) return;
+      if (MAG_BETASTEN.has(rel + '|' + r.trim())) return;
       if (VERIFIER.test(regels.slice(i, i + VENSTER).join('\n'))) return;
       los++;
       fout(plek + ' leest de Authorization-kop maar haalt het token binnen ' + VENSTER +

@@ -160,7 +160,7 @@ Object.assign(kern, require('../kern/rtfos')({ db, save, crypto,
   // en de agenda: dat is de ENIGE koppeling die vandaag echt iets doet
   // (een RTF-activiteit als afspraak in je eigen RTG-agenda). Zonder hem
   // meldt het koppelbord hem eerlijk als kapot, en dat is hij dan ook.
-  }));
+  agenda: kern.agenda }));
 
 const gekozenDomeinen = require('./routes')(kern);
 /* De meelezer van de RTG AI wordt hierboven in de bedrading gebouwd, maar de

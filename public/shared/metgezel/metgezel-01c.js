@@ -10,6 +10,13 @@
     blok.appendChild(balk);
     document.body.appendChild(blok);
 
+    /* Rahul openen van buitenaf. Het app-menu (shared/appmenu.js) heeft een rij
+       "Vraag Rahul", en dat mag geen namaakknop worden die zelf een venster
+       tekent: dan zijn er weer twee Rahuls. Er is er hier één, en dit is zijn
+       deurklink. */
+    window.RTGMetgezel = window.RTGMetgezel || {};
+    window.RTGMetgezel.rahul = function (tekst) { zetMaat(false, false); opengaan(tekst); };
+
     /* De pagina reserveert de hoogte van het blok, zodat Rahul nergens overheen
        staat -- ook niet onderaan een lange lijst. Dat doen we met een leeg
        tussenstuk onderaan de body en NIET door body.paddingBottom te zetten:

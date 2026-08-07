@@ -81,16 +81,16 @@ const LADEN = [
   { id: 'rahul', naam: 'Rahul', soorten: ['ai'] }
 ];
 
-const VLAGGEN = ['vast', 'stil', 'weg'];
 const MAX_TEKST = 4000;         // een bericht is een bericht, geen document
 const MAX_PER_GESPREK = 500;    // wat we per gesprek bewaren
 const MAX_GESPREKKEN = 400;     // per lid, in de inbox
 const MAX_DEELNEMERS = 256;
-const WIJZIG_MS = 15 * 60000;   // een correctie mag een kwartier lang
-const TYPT_MS = 6000;           // "typt..." vervalt vanzelf
-const AANWEZIG_MS = 45000;      // zo lang geldt een teken van leven als online
+/* De grenzen die van de MENS zijn (een kwartier corrigeren, een por per
+   minuut) staan bij de handelingen zelf: ./deelnemer.js. */
 
 const wie = require('./wie');
+const { maakTonen } = require('./tonen');
+const { maakDeelnemer } = require('./deelnemer');
 
 function maakComm({ db, save, crypto, codenaamVan, naamVan, sein, sseToCustomer }) {
   const nu = () => new Date().toISOString();
@@ -128,13 +128,6 @@ function maakComm({ db, save, crypto, codenaamVan, naamVan, sein, sseToCustomer 
     if (!Object.keys(st).length) delete rij[gid];
     return st;
   }
-
-  /* Aanwezigheid en "typt..." staan MET OPZET NIET in de database. Ze zijn
-     seconden geldig en zouden bij elke toetsaanslag een schrijfronde kosten;
-     na een herstart is "wie is er online" bovendien per definitie onbekend.
-     Een Map in het geheugen is hier de eerlijke opslag. */
-  const aanwezig = new Map();   // key -> ms
-  const typt = new Map();       // gesprekId -> Map(key -> ms)
 
   /* -------------------------------------------------------- toegang */
   const gesprekVan = (gid) => G().find((g) => g.id === gid) || null;
@@ -244,7 +237,7 @@ function maakComm({ db, save, crypto, codenaamVan, naamVan, sein, sseToCustomer 
     standZet(o.van, g.id, 'gelezen', m.at);
     standZet(o.van, g.id, 'concept', null);
     save();
-    seinNaarDeRest(g, o.van, 'bericht', { gesprekId: g.id, bericht: toonBericht(m, o.van) });
+    seinNaarDeRest(g, o.van, 'bericht', { gesprekId: g.id, bericht: tonen.toonBericht(m, o.van) });
     return m;
   }
 
@@ -269,244 +262,6 @@ function maakComm({ db, save, crypto, codenaamVan, naamVan, sein, sseToCustomer 
     }
   }
 
-  /* ------------------------------------------- wijzigen, wissen, reageren */
-  /* Een correctie binnen een kwartier, en daarna niet meer. De oorspronkelijke
-     tekst blijft in `was` staan: "bewerkt" zonder te kunnen zien wat er stond
-     is een uitnodiging om een gesprek achteraf te herschrijven. */
-  function wijzig(key, gesprekId, berichtId, tekst) {
-    const g = eis(gesprekId, key);
-    const m = (B()[g.id] || []).find((x) => x.id === berichtId);
-    if (!m) throw new Error('Dat bericht bestaat niet.');
-    if (m.van !== key) throw new Error('Je kunt alleen je eigen bericht wijzigen.');
-    if (m.weg) throw new Error('Dit bericht is ingetrokken.');
-    if (Date.now() - Date.parse(m.at) > WIJZIG_MS) throw new Error('Dit bericht is te oud om nog te wijzigen.');
-    const nieuw = String(tekst || '').slice(0, MAX_TEKST).trim();
-    if (!nieuw) throw new Error('Een bericht leegmaken is intrekken, niet wijzigen.');
-    m.was = m.was || m.tekst;
-    m.tekst = nieuw;
-    m.gewijzigd = nu();
-    save();
-    seinNaarDeRest(g, key, 'wijzig', { gesprekId: g.id, berichtId: m.id });
-    return m;
-  }
-
-  /* Intrekken laat een spoor achter, en dat is met opzet: de andere kant heeft
-     het gelezen, en doen alsof er nooit iets stond is liegen tegen wie erbij
-     was. Wat weg is, is de inhoud. */
-  function wis(key, gesprekId, berichtId) {
-    const g = eis(gesprekId, key);
-    const m = (B()[g.id] || []).find((x) => x.id === berichtId);
-    if (!m) throw new Error('Dat bericht bestaat niet.');
-    if (m.van !== key) throw new Error('Je kunt alleen je eigen bericht intrekken.');
-    m.weg = nu(); m.tekst = null; m.bijlage = null; m.was = null; m.reacties = {};
-    save();
-    seinNaarDeRest(g, key, 'wis', { gesprekId: g.id, berichtId: m.id });
-    return m;
-  }
-
-  function reactie(key, gesprekId, berichtId, teken) {
-    const g = eis(gesprekId, key);
-    const m = (B()[g.id] || []).find((x) => x.id === berichtId);
-    if (!m) throw new Error('Dat bericht bestaat niet.');
-    if (m.weg) throw new Error('Dit bericht is ingetrokken.');
-    // een reactie is een teken, geen zin: langer dan dat is een bericht
-    const t = String(teken || '').slice(0, 8);
-    if (!t) throw new Error('Welke reactie?');
-    m.reacties = m.reacties || {};
-    const wie = m.reacties[t] = m.reacties[t] || [];
-    const i = wie.indexOf(key);
-    if (i >= 0) wie.splice(i, 1); else wie.push(key);   // nog een tik haalt hem weg
-    if (!wie.length) delete m.reacties[t];
-    save();
-    seinNaarDeRest(g, key, 'reactie', { gesprekId: g.id, berichtId: m.id });
-    return m.reacties;
-  }
-
-  /* ------------------------------------------------------ standen */
-  function lees(key, gesprekId) {
-    const g = eis(gesprekId, key);
-    standZet(key, g.id, 'gelezen', nu());
-    save();
-    seinNaarDeRest(g, key, 'gelezen', { gesprekId: g.id, wie: noem(key) });
-    return standVan(key, g.id);
-  }
-  function vlag(key, gesprekId, welke, aan) {
-    if (!VLAGGEN.includes(welke)) throw new Error('Onbekende vlag.');
-    eis(gesprekId, key);
-    const st = standZet(key, gesprekId, welke, !!aan || null);
-    save();
-    return st;
-  }
-  /* Het concept reist mee tussen apparaten. Een half getypt bericht dat weg is
-     omdat je van telefoon naar laptop wisselde, is precies het soort verlies
-     dat je niet aan de app vergeeft. */
-  function concept(key, gesprekId, tekst) {
-    eis(gesprekId, key);
-    const st = standZet(key, gesprekId, 'concept', String(tekst || '').slice(0, MAX_TEKST) || null);
-    save();
-    return st;
-  }
-
-  /* -------------------------------------------- aanwezigheid en typen */
-  function levensteken(key) { aanwezig.set(key, Date.now()); }
-  const isAanwezig = (key) => (Date.now() - (aanwezig.get(key) || 0)) < AANWEZIG_MS;
-  function typtNu(key, gesprekId) {
-    const g = eis(gesprekId, key);
-    levensteken(key);
-    const m = typt.get(g.id) || new Map();
-    m.set(key, Date.now());
-    typt.set(g.id, m);
-    seinNaarDeRest(g, key, 'typt', { gesprekId: g.id, wie: noem(key) });
-    return true;
-  }
-  function wieTypt(gesprekId, behalve) {
-    const m = typt.get(gesprekId);
-    if (!m) return [];
-    const uit = [];
-    for (const [key, t] of m) {
-      if (Date.now() - t > TYPT_MS) { m.delete(key); continue; }
-      if (key === behalve) continue;
-      uit.push(noem(key));
-    }
-    return uit.filter(Boolean);
-  }
-
-  /* ------------------------------------------------------------- nudge */
-  /* De buzz van MSN, en de reden dat hij hier mag staan is dat hij iets kan wat
-     een bericht niet kan: door "stil" heen komen. Precies daarom is hij ook
-     begrensd -- een aandachtsknop zonder rem is een pestknop. Een per minuut
-     per gesprek, en alleen in een gesprek waar de ander je al kent. */
-  const nudges = new Map();     // key|gesprekId -> ms
-  const NUDGE_MS = 60000;
-  function nudge(key, gesprekId) {
-    const g = eis(gesprekId, key);
-    const s = key + '|' + gesprekId;
-    const laatst = nudges.get(s) || 0;
-    if (Date.now() - laatst < NUDGE_MS) {
-      throw new Error('Even wachten -- een por mag een keer per minuut.');
-    }
-    nudges.set(s, Date.now());
-    seinNaarDeRest(g, key, 'nudge', { gesprekId: g.id, wie: noem(key) });
-    return true;
-  }
-
-  /* --------------------------------------------------------- tonen */
-  const naam = (key) => noem(key) || 'Onbekend';
-
-  function toonBericht(m, mij) {
-    return {
-      id: m.id, at: m.at, vanMij: m.van === mij, van: naam(m.van),
-      /* WIE ER NAMENS DE ZAAK TYPTE: de klant ziet de VOORNAAM, het team de
-         hele naam.
-
-         De eerste versie hield die naam helemaal binnen de zaak. Dat is
-         verdedigbaar op een platform dat op codenaam draait, maar het is niet
-         hoe gastvrijheid werkt -- "Marta brengt het zo" is het verschil tussen
-         een dienst en een systeem, en de gastchat deed het voor de verhuizing
-         ook al. Het is dus een besluit geworden en geen afleiding.
-
-         Wat er wel strenger werd: vroeger ging de HELE naam mee, want het
-         personeelsregister draagt "Marta Colom". Een achternaam maakt iemand
-         vindbaar, een voornaam maakt hem aanspreekbaar. Binnen de zaak blijft
-         de hele naam staan, want daar werk je met elkaar en moet je weten wie
-         wat deed. */
-      door: m.door ? (wie.zelfdeZaak(m.door, mij) ? naam(m.door) : wie.voornaam(naam(m.door))) : null,
-      tekst: m.weg ? null : m.tekst, soort: m.soort,
-      bijlage: m.weg ? null : (m.bijlage || null),
-      antwoordOp: m.antwoordOp || null,
-      reacties: Object.entries(m.reacties || {}).map(([teken, wie]) => ({
-        teken, aantal: wie.length, vanMij: wie.includes(mij)
-      })),
-      gewijzigd: m.gewijzigd || null, was: m.gewijzigd ? m.was : null,
-      lang: m.lang || null,
-      weg: m.weg || null
-    };
-  }
-
-  /* De titel van een een-op-een gesprek is de codenaam van de ANDER, en die
-     hangt dus af van wie er kijkt. Vandaar hier en niet in het gesprek zelf:
-     een opgeslagen titel zou voor een van beiden altijd de verkeerde zijn. */
-  function toonGesprek(g, mij) {
-    const lijst = B()[g.id] || [];
-    const st = standVan(mij, g.id);
-    const laatste = [...lijst].reverse().find((m) => !m.weg) || lijst[lijst.length - 1] || null;
-    const gelezen = st.gelezen || '';
-    const ongelezen = lijst.filter((m) => m.van !== mij && !m.weg && m.at > gelezen).length;
-    const anderen = g.deelnemers.filter((d) => d !== mij);
-    return {
-      id: g.id, soort: g.soort, lade: ladeVan(g.soort),
-      titel: g.titel || (anderen.length === 1 ? naam(anderen[0]) : anderen.map(naam).join(', ')) || 'Gesprek',
-      deelnemers: anderen.map(naam), aantal: g.deelnemers.length,
-      laatste: laatste ? (laatste.weg ? 'Bericht ingetrokken' : (laatste.tekst || '(bijlage)')).slice(0, 140) : null,
-      laatsteVanMij: laatste ? laatste.van === mij : false,
-      at: g.laatst, ongelezen,
-      vast: !!st.vast, stil: !!st.stil, weg: !!st.weg, concept: st.concept || null,
-      online: anderen.length === 1 ? isAanwezig(anderen[0]) : anderen.some(isAanwezig),
-      bron: (g.meta && g.meta.bron) || null, link: (g.meta && g.meta.link) || null
-    };
-  }
-  const ladeVan = (soort) => (LADEN.find((l) => l.soorten.includes(soort)) || LADEN[0]).id;
-
-  /* ------------------------------------------------------------ lezen */
-  function inbox(mij, opties) {
-    const o = opties || {};
-    let mijne = G().filter((g) => magErin(g, mij));
-    if (o.lade) {
-      const lade = LADEN.find((l) => l.id === o.lade);
-      if (lade) mijne = mijne.filter((g) => lade.soorten.includes(g.soort));
-    }
-    const uit = mijne.map((g) => toonGesprek(g, mij))
-      .filter((g) => o.archief ? g.weg : !g.weg)
-      .sort((a, b) => (b.vast ? 1 : 0) - (a.vast ? 1 : 0) ||
-        String(b.at || '').localeCompare(String(a.at || '')));
-    return { gesprekken: uit.slice(0, MAX_GESPREKKEN), laden: LADEN };
-  }
-
-  function gesprek(mij, gesprekId, opties) {
-    const g = eis(gesprekId, mij);
-    const o = opties || {};
-    const lijst = B()[g.id] || [];
-    const vanaf = Math.max(0, lijst.length - (Number(o.aantal) || 120));
-    return Object.assign(toonGesprek(g, mij), {
-      berichten: lijst.slice(vanaf).map((m) => toonBericht(m, mij)),
-      meer: vanaf > 0,
-      typt: wieTypt(g.id, mij)
-    });
-  }
-
-  /* Zoeken over ALLES wat van jou is, in een keer. Dit is wat een berichtenapp
-     onderscheidt van een archiefkast: niet weten in welke module iets stond en
-     het toch vinden. */
-  function zoek(mij, vraag) {
-    const naald = String(vraag || '').trim().toLowerCase().slice(0, 80);
-    if (naald.length < 2) return { treffers: [], vraag: naald };
-    const uit = [];
-    for (const g of G()) {
-      if (!magErin(g, mij)) continue;
-      for (const m of (B()[g.id] || [])) {
-        if (m.weg || !m.tekst) continue;
-        if (!m.tekst.toLowerCase().includes(naald)) continue;
-        uit.push({ gesprekId: g.id, berichtId: m.id, soort: g.soort, lade: ladeVan(g.soort),
-          titel: toonGesprek(g, mij).titel, tekst: m.tekst.slice(0, 160),
-          at: m.at, vanMij: m.van === mij });
-      }
-    }
-    uit.sort((a, b) => String(b.at || '').localeCompare(String(a.at || '')));
-    return { treffers: uit.slice(0, 60), vraag: naald, totaal: uit.length };
-  }
-
-  /* De draad als leesbare regels, voor de AI-laag (./ai). Alleen codenamen,
-     alleen dit gesprek, alleen wat er nu staat. Dit is het ENIGE wat een model
-     van een gesprek te zien krijgt. */
-  function draad(mij, gesprekId, hoeveel) {
-    const g = eis(gesprekId, mij);
-    const lijst = (B()[g.id] || []).filter((m) => !m.weg && m.tekst);
-    return {
-      titel: toonGesprek(g, mij).titel,
-      regels: lijst.slice(-(hoeveel || 60)).map((m) => (m.van === mij ? 'Ik' : naam(m.van)) + ': ' + m.tekst)
-    };
-  }
-
   /* Twee deuren voor de verhuizing van een oude voorraad (./dm.js), en
      bewust smal: de geschiedenis moet MET zijn eigen tijdstempels naar binnen
      kunnen, en de leesstand moet meeverhuizen. Via bericht() zou alles op NU
@@ -519,15 +274,32 @@ function maakComm({ db, save, crypto, codenaamVan, naamVan, sein, sseToCustomer 
     if (at > nuStand) standZet(key, gesprekId, 'gelezen', at);
   }
 
+  /* De twee andere helften krijgen de binnenkant mee en niet de db: zo is aan
+     deze regels af te lezen wat ze precies mogen aanraken.
+
+     ./deelnemer.js eerst, want ./tonen.js leunt op isAanwezig en wieTypt --
+     "wie is er online" en "wie typt er" horen bij de handelingen en niet bij de
+     weergave, maar de weergave laat ze wel zien. */
+  const deelnemer = maakDeelnemer({
+    B, eis, nu, save, seinNaarDeRest, standZet, standVan, noem, MAX_TEKST
+  });
+  const tonen = maakTonen({
+    G, B, standVan, magErin, eis, noem,
+    isAanwezig: deelnemer.isAanwezig, wieTypt: deelnemer.wieTypt,
+    LADEN, MAX_GESPREKKEN
+  });
+
   return {
     SOORTEN, LADEN,
     // voor andere modules: dit is de hele koppelvlakte
     gesprekMaak, tussen, bericht, gesprekVan, gesprekMetSleutel, magErin,
     berichtenVan, leesZet,
-    // voor de app
-    inbox, gesprek, zoek, draad,
-    lees, vlag, concept, wijzig, wis, reactie,
-    levensteken, isAanwezig, typtNu, wieTypt, nudge
+    // voor de app -- de leeskant uit ./tonen.js, de handelingen uit ./deelnemer.js
+    inbox: tonen.inbox, gesprek: tonen.gesprek, zoek: tonen.zoek, draad: tonen.draad,
+    lees: deelnemer.lees, vlag: deelnemer.vlag, concept: deelnemer.concept,
+    wijzig: deelnemer.wijzig, wis: deelnemer.wis, reactie: deelnemer.reactie,
+    levensteken: deelnemer.levensteken, isAanwezig: deelnemer.isAanwezig,
+    typtNu: deelnemer.typtNu, wieTypt: deelnemer.wieTypt, nudge: deelnemer.nudge
   };
 }
 

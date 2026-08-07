@@ -3,8 +3,8 @@
    routes/social.js op de gedeelde kern. */
 module.exports = (sctx) => {
   const { kern, isKindVanGezin, rtfOnbSess, rtfSociaal } = sctx;
-  const { app, express, auth, geenGast, db, save, socialZoek, socialVerbind, socialAntwoord,
-          socialConnecties, liveCodename, connectieTussen, verbActief, dmSleutel, codenaamVan,
+  const { app, express, auth, geenGast, db, socialZoek, socialVerbind, socialAntwoord,
+          socialConnecties, liveCodename, connectieTussen, verbActief, codenaamVan,
           sseToCustomer, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor,
           verhaalBekijken, dagOpdracht, isGeblokkeerd } = kern;
 

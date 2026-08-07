@@ -9,7 +9,7 @@
    overige kanalen verwijzen nog door naar hun bron-app, die zelf de leesstanden
    bijhoudt. Gemount vanuit routes/member.js. */
 module.exports = (kern) => {
-  const { app, auth, db, convOf, socialConnecties, dmSleutel, codenaamVan, overheid, stemmingVan, jarigVan, rtmail, berichten, commWerk } = kern;
+  const { app, auth, db, convOf, socialConnecties, codenaamVan, overheid, stemmingVan, jarigVan, rtmail, berichten, commWerk } = kern;
   // het RTMAIL-adres van dit lid: zijn codenaam (privacy by design)
   const mijnCodenaam = req => (req.session.account && req.session.account.codename) || (codenaamVan ? codenaamVan(req.session.key) : null);
 

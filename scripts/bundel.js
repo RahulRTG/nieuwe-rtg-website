@@ -106,7 +106,15 @@ function controleer() {
     if (!oud.equals(inhoud)) scheef.push(uit + ' (bundel ' + oud.length + ', delen ' + inhoud.length + ' bytes)');
   }
   if (scheef.length) {
-    throw new Error(scheef.length + ' bundel(s) wijken af van hun losse delen: ' + scheef.join(', ') + '. Draai `npm run build` en bewerk de delen, niet de bundel.');
+    /* De melding zei hier alleen "draai `npm run build`", en dat is precies de
+       handeling die de nieuwste inhoud weggooit wanneer de BUNDEL de nieuwe
+       kant is (iemand bewerkte de bundel in plaats van de delen). Zo verdween
+       hier het lege beginscherm en het app-menu. Kijk dus eerst welke kant de
+       nieuwe is; pas dan bouwen. */
+    throw new Error(scheef.length + ' bundel(s) wijken af van hun losse delen: ' +
+      scheef.join(', ') +
+      '. KIJK EERST welke kant de nieuwe is (`git diff -- <bundel>`): `npm run build` OVERSCHRIJFT de bundel met de delen, ' +
+      'dus een wijziging die alleen in de bundel staat is daarna weg. Zet hem eerst in de delen; die zijn de bron.');
   }
 }
 

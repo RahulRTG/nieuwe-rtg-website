@@ -469,4 +469,21 @@
   if (!isThuis && !inPaneel) { homeIndicator(); randveeg(); }
 
   w.RTGiOS = { blad: blad, thuis: naarThuis, THUIS: THUIS };
+
+  /* 6. HET MENU. De hamburger rechtsboven, met de functies van deze app en de
+     vaste weg naar huis en naar de instellingen (shared/appmenu.js). Hij hangt
+     hier om dezelfde reden als al het andere in dit bestand: dit is de laag die
+     al op elke app-pagina staat en die de navigatiebalk net heeft gebouwd, dus
+     dit is de plek waar de knop erbij kan zonder elke pagina te openen.
+
+     Na de balk, want het menu zoekt zijn plek in .ios-nav-acties. In een
+     split-paneel niet: daar hoort één menu bij het scherm eromheen, net als de
+     home-indicator hierboven. */
+  if (!inPaneel && !d.getElementById('rtgAppMenuJs')) {
+    var menuS = d.createElement('script');
+    menuS.id = 'rtgAppMenuJs';
+    menuS.src = '/shared/appmenu.js';
+    menuS.defer = true;
+    (d.head || d.documentElement).appendChild(menuS);
+  }
 })(window, document);

@@ -136,10 +136,17 @@
   if (ccPush) ccPush.addEventListener('click', async () => { if (window.RTGRealtime) { await RTGRealtime.enablePush(); ccSync(); } });
   const ccZoek = $('#osCcZoek');
   if (ccZoek) ccZoek.addEventListener('click', openZoek);
-  /* Scannen, je Zegel en je backoffice zaten als losse knopjes in de
-     statusbalk; die staat nu leeg op de bel en dit paneel na. De knoppen zelf
-     blijven het model -- we klikken ze hier gewoon aan. */
-  [['#osCcScan', '#scanBtn'], ['#osCcZegel', '#zegelBtn'], ['#osCcBo', '#boBtn']].forEach(([tegel, knop]) => {
+  /* Scannen, je Zegel, je backoffice en de bel zaten als losse knopjes in de
+     statusbalk; die staat nu helemaal leeg. Het beginscherm is mappen, klok,
+     functies en de balk van Rahul -- en verder niets. De knoppen zelf blijven
+     het model (verborgen in de HTML): we klikken ze hier gewoon aan, zodat het
+     gedrag op EEN plek blijft wonen.
+
+     De bel hoorde er per se bij. Zonder deze tegel was er na het leegmaken van
+     de balk geen enkele ingang meer naar wat er voor je klaarligt, en dat merk
+     je pas als je iets mist -- de stilste storing die er is. */
+  [['#osCcScan', '#scanBtn'], ['#osCcZegel', '#zegelBtn'], ['#osCcBo', '#boBtn'],
+   ['#osCcBel', '#bell']].forEach(([tegel, knop]) => {
     const t = $(tegel), k = $(knop);
     if (t && k) t.addEventListener('click', () => { sluitScrims(); k.click(); });
     else if (t) t.hidden = true;

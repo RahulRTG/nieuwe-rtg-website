@@ -28,11 +28,9 @@
     // de stem volgt de pas van het ingelogde lid (niet alleen de ingang)
     document.documentElement.setAttribute('data-stem', user.tier);
     stemKoppen();
-    $('#homeGreeting').textContent = stem(
-      'Ha ' + first + ', goed je te zien.',
-      'Dag ' + first + '. Alles onder controle.',
-      'Welkom terug, ' + first + '. Alles staat voor u klaar.'
-    ) || (T('app.welcome','Welkom,') + ' ' + first + '.');
+    /* De begroeting ("Ha <naam>, goed je te zien.") is van het beginscherm af:
+       zie de opmerking bij .os-thuisscherm in apps/app.html. De regel eronder
+       blijft -- die groet niet, die zegt welke pas je hebt en sinds wanneer. */
     $('#homeSub').textContent = TIER_LABEL[user.tier] + ' · ' + T('app.membersince','lid sinds') + ' ' + user.since;
 
     // De ledenpas staat niet meer op het beginscherm: daar staat de klok, en
@@ -75,7 +73,6 @@
   function renderHomeGuest(){
     document.documentElement.setAttribute('data-stem', 'rtg');
     stemKoppen();
-    $('#homeGreeting').textContent = stem('Ha, fijn dat je er bent.', '', '') || (T('app.welcome','Welkom,') + '.');
     $('#homeSub').textContent = T('app.guestsub','Gratis, zonder pas');
     const gastKaart = $('#homeGast');
     if (gastKaart){

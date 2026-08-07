@@ -5,7 +5,7 @@
 module.exports = (kern) => {
   const { app, auth, db, save, crypto, findSupplier, optieAan, unlockDoor, logActivity,
     notifySupplier, notify, sseToSupplier, sseToOffice, sseToCustomer, schoon, PERSONAS,
-    DOOR_RELOCK_MS, validDept, chatKeyOf, talen, trChat, commGast } = kern;
+    DOOR_RELOCK_MS, validDept, talen, trChat, commGast } = kern;
 
   app.post('/api/live/door', auth, (req, res) => {
     const L = db.data.live[req.session.key];

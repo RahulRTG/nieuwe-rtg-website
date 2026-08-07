@@ -63,6 +63,12 @@ Object.assign(kern, require('../kern/geloofbieb').maakGeloofBieb({ db, save }));
 Object.assign(kern, require('../kern/rtfkantoor')({ db, save, crypto, anthropic }));
 Object.assign(kern, require('../kern/rtfclubs')({ db, save, crypto }));
 Object.assign(kern, require('../kern/onderzoekslab')({ db, save, crypto, anthropic }));
+/* Het RTF Living Lab (kern/livinglab/): het onderzoeksplatform van de stichting
+   per stad -- de volledige onderzoekscyclus, de methodiekbibliotheek, de
+   ethieklaag met risicoklassen, de bewijsmotor en de pijplijn naar echte
+   verandering. Het krijgt het Onderzoekslab hierboven mee: een pilot uit een
+   afgerond onderzoek wordt daar een project, en nergens een tweede lijst. */
+Object.assign(kern, require('../kern/livinglab')({ db, save, crypto, anthropic, lab: kern.lab }));
 // De Stadsraad: per stad een invloedrijke partner die in het gezamenlijke
 // foundation-kantoor mee beslist over de lab-uitslagen
 Object.assign(kern, require('../kern/stadsraad')({ db, save, crypto }));

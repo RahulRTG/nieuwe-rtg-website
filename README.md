@@ -376,6 +376,75 @@ ergens iets rood wordt. Alles met een id blijft staan, altijd.
 Split View (`shared/split.js`) blijft: twee apps naast elkaar is iPad, geen
 bureaublad. In zo'n paneel krijgt de app geen eigen home-indicator.
 
+### Het RTF Living Lab: spelenderwijs, maar niet vrijblijvend
+
+`server/kern/livinglab/` + `server/routes/livinglab/` + `/apps/livinglab.html`
+(kantoor) en `/apps/labpas.html` (bewoner). Het onderzoeksplatform van de
+stichting, per stad in te zetten: buurtbewoners, onderzoekers, studenten,
+organisaties en gemeenten onderzoeken er samen echte problemen.
+
+De stelling in één zin: **de voorkant mag speels zijn, de achterkant is een
+onderzoeksinstituut.** Wat dat concreet betekent:
+
+- **Eén cyclus van tien stappen** voor elk onderzoek: vraagstuk → hypothese →
+  plan → deelnemers → experiment → observaties → reflectie → resultaten →
+  besluit → vervolg. Nooit een stap overslaan, en nooit terug -- wie halverwege
+  iets anders ontdekt, zet dat in de reflectie; een echt nieuw plan is een
+  nieuwe studie. Elke stap heeft een poort die **alle** openstaande gebreken
+  teruggeeft, niet alleen het eerste (`kern/livinglab/cyclus.js`).
+- **Twaalf projectsoorten**, van sensoren tot sociale cohesie. "Vermindert een
+  buurttuin eenzaamheid?" draait op dezelfde motor als "welke sensor meet
+  wateroverlast het beste?". Wat verschilt is het GEWICHT, niet de kwaliteit van
+  de ondersteuning: bij een menselijk onderwerp weegt het professionele oordeel
+  zwaarder, ligt de bewijslat hoger en blijft de data gescheiden. Dat verschil
+  staat als DATA in `kader.js` en niet als apart codepad -- anders krijgt de
+  sociale kant vanzelf de tweederangs versie.
+- **De bewijsmotor** (`bewijs.js` + `graden.js`) voorkomt dat een mooi verhaal
+  een feit wordt. Een conclusie draagt bronnen, datasets, observaties,
+  interviews, experimenten en statistiek, en de graad (aanname → waarneming →
+  indicatie → sterk bewijs → bewezen binnen deze studie) is geen keuze maar een
+  uitkomst van drie plafonds: wat eronder ligt, wat de methode kan dragen, en
+  wie tekent. Bewijs weghalen laat een conclusie zakken; bewijs toevoegen mag
+  hem nooit verlagen (die regressie zat er, en `test/livinglab.test.js` bewaakt
+  hem).
+- **Ethiek als poort, niet als vinkje** (`ethiek.js` + `waarborg.js`). Vier
+  risicoklassen bepalen wat er af moet zijn vóór er één deelnemer bij mag:
+  review met één of twee handtekeningen (waarvan één onafhankelijk),
+  privacytoets, toestemmingsregime, ouderlijke toestemming, stopcriteria. De AI
+  kan die grenzen niet omzeilen -- niet omdat het in zijn prompt staat, maar
+  omdat de poort in code staat.
+- **Gescheiden onderzoeksdata.** Bij klasse hoog en hoger wordt de koppeling
+  alias → Foundation-sleutel **nergens** vastgelegd; de deelnemer houdt zijn
+  labpas en dat is de enige handle. Aliassen zijn bovendien per studie, dus twee
+  dossiers zijn niet naast elkaar te leggen. De prijs staat er eerlijk bij: het
+  lab kan zo'n deelnemer niet terugvinden vanuit zijn profiel. Dat is de
+  bedoeling.
+- **Bewoners als medeonderzoeker.** Ze dragen vragen aan en stemmen erop
+  (`themas.js`), doen mee in zeven rollen, sturen observaties in en trekken zich
+  terug -- alles op een **labpas en zonder account**. De alias komt altijd uit
+  die pas en nooit uit het lijf van het verzoek.
+- **Gamification op kwaliteit** (`spel.js`). Geen punt per observatie en geen
+  ranglijst op volume; wél punten voor een bron natrekken, iemand echt spreken,
+  een fout vastleggen en -- het zwaarst -- een eerdere conclusie herzien of een
+  onderzoek stoppen omdat het bewijs tegenviel.
+- **Van onderzoek naar verandering** (`doorbraak.js`): zeven uitgangen (pilot,
+  werkorder, subsidie, beleid, startup, onderwijs, nieuw onderzoek), elk met een
+  bewijs-ondergrens. Een beleidsvoorstel vraagt minstens een indicatie; nieuw
+  onderzoek mag juist uit een aanname komen. Een pilot gaat door naar het
+  bestaande **RTG Onderzoekslab** (`kern/onderzoekslab.js`) en wordt daar één
+  project -- er komt geen tweede projectenlijst bij.
+- **Meerdere labs onder één RTF** (`bestuur.js`): Haarlem werkt anders dan
+  Nairobi, maar de cyclus, de bewijsgraden en de risicoklassen zijn centraal en
+  lokaal niet te verlagen. De bewaartermijn mag lokaal omhoog, nooit onder de
+  RTF-ondergrens.
+- **Impact die ook de tegenvallers telt** (`impact.js`): gestopte studies staan
+  bij de opbrengst en niet bij de uitval, met het stoppercentage als eigen
+  getal. Een lab dat nooit iets stopt, onderzoekt niets.
+
+De schermen halen hun cyclus, methoden en bewijsgraden op bij
+`/api/lab2/kader` en bouwen niets van dat alles zelf na, zodat er geen stap in
+beeld kan staan die de server weigert.
+
 ## Tests
 
 ```bash

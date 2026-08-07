@@ -1,0 +1,119 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mijn Living Lab</title>
+<link rel="icon" href="/icons/foundation.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rosthema.css" rel="stylesheet">
+<script src="/shared/levendekleur.js" defer></script>
+<script src="/shared/rosthema.js" defer></script>
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<style>
+  :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--line:var(--rtg-line);--txt:var(--rtg-txt);--muted:var(--rtg-muted);--soft:var(--rtg-soft);--burgundy:#C23A5E;--gold:#A98F1C;--green:#4C9A75;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:2rem;}
+  h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;}
+  header{padding:1.4rem 1rem .8rem;border-bottom:1px solid var(--line);}
+  header .ey{font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);}
+  header h1{font-size:1.45rem;margin-top:.2rem;}
+  main{padding:1rem;max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:.9rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:.9rem 1rem;}
+  .sec{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin:.2rem 0;}
+  .rij{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;}
+  .veld{flex:1;min-width:8rem;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.88rem;padding:.6rem .7rem;}
+  select.veld{color-scheme:dark;}
+  .knop{background:var(--txt);color:#000;border:none;border-radius:11px;padding:.6rem .95rem;font:inherit;font-weight:600;font-size:.86rem;cursor:pointer;}
+  .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
+  .leeg{color:var(--muted);font-size:.85rem;padding:.4rem 0;line-height:1.5;}
+  .log{font-size:.82rem;color:var(--muted);line-height:1.5;padding:.35rem 0;border-bottom:1px solid var(--line);}
+  .pil{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:.15rem .55rem;color:var(--muted);}
+  .pil.ok{color:var(--green);border-color:var(--green);}
+
+  /* De uitdaging: waar dit voor een bewoner mee begint. Geen projectkaart maar
+     een vraag die ergens over gaat. */
+  .uitdaging{border:1px solid var(--gold);border-radius:16px;padding:1.1rem;background:linear-gradient(180deg,rgba(169,143,7,.08),transparent);}
+  .uitdaging .sec{color:var(--gold);}
+  .uitdaging h2{font-size:1.2rem;margin:.25rem 0 .4rem;}
+  .uitdaging .vraag{font-size:.92rem;color:var(--muted);line-height:1.55;}
+
+  /* De route als pad, gelijk aan het kantoorscherm -- dezelfde tien stappen,
+     want het is hetzelfde onderzoek. */
+  .route{display:flex;gap:0;overflow-x:auto;padding:.6rem 0 .3rem;}
+  .stap{flex:0 0 auto;display:flex;align-items:center;gap:.35rem;padding-right:.35rem;}
+  .stap .bol{width:1.35rem;height:1.35rem;border-radius:999px;border:1px solid var(--line);display:grid;place-items:center;font-size:.62rem;color:var(--muted);}
+  .stap.af .bol{background:var(--green);border-color:var(--green);color:#000;}
+  .stap.nu .bol{background:var(--gold);border-color:var(--gold);color:#000;}
+  .stap .nm{font-size:.72rem;color:var(--muted);white-space:nowrap;}
+  .stap.nu .nm{color:var(--txt);font-weight:600;}
+  .stap .lijn{width:1rem;height:1px;background:var(--line);}
+
+  /* Het labpaspoort. */
+  .pas{display:flex;align-items:center;gap:.9rem;}
+  .pas .nv{font-family:'Bodoni Moda',serif;font-size:2rem;font-weight:500;line-height:1;}
+  .badge{display:inline-block;font-size:.7rem;border:1px solid var(--gold);color:var(--gold);border-radius:999px;padding:.2rem .6rem;margin:.15rem .15rem 0 0;}
+  .balk{height:3px;background:var(--line);border-radius:2px;overflow:hidden;margin-top:.4rem;}
+  .balk i{display:block;height:100%;background:var(--gold);}
+</style>
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<script src="/shared/seizoen.js" defer></script>
+<link href="/shared/ios.css" rel="stylesheet">
+</head>
+<body class="rtg-stijl">
+<header>
+  <div class="ey">RTFoundation &middot; Living Lab</div>
+  <h1 id="kop">Mijn onderzoek</h1>
+</header>
+<main id="main">
+  <!-- De poort: een labpas, geen account. Dat is het hele punt. -->
+  <div class="kaart" id="poort">
+    <div class="sec">Uw labpas</div>
+    <div class="leeg">U heeft geen account nodig. Vul de labpas in die u bij uw onderzoek heeft gekregen.</div>
+    <div class="rij"><input class="veld" id="pasVeld" placeholder="LABPAS-XXXXXXX" maxlength="20" autocomplete="off">
+      <button class="knop" id="pasOpen" type="button">Open</button></div>
+    <div class="leeg" id="pasFout"></div>
+  </div>
+
+  <div id="mijn" hidden>
+    <div class="uitdaging" id="uitdaging"></div>
+    <div class="route" id="route"></div>
+    <div class="kaart" id="watnu"></div>
+    <div class="kaart" id="paspoort"></div>
+    <div class="kaart" id="bijdrage"></div>
+    <div class="kaart" id="mijnTaken"></div>
+    <div class="kaart" id="uitstap"></div>
+  </div>
+
+  <div class="kaart" id="buurt">
+    <div class="sec">Vragen uit de buurt</div>
+    <div class="leeg">Wat zou hier onderzocht moeten worden? Iedereen mag een vraag aandragen en op vragen stemmen.</div>
+    <div class="rij">
+      <select class="veld" id="bLab" style="max-width:12rem;" aria-label="Kies een lab"></select>
+    </div>
+    <div class="rij" style="margin-top:.4rem;">
+      <input class="veld" id="bVraag" placeholder="Bijv. Kan deze straat beter omgaan met zware regen?" maxlength="300">
+      <button class="knop stil" id="bStuur" type="button">Dien in</button>
+    </div>
+    <div id="bLijst"></div>
+  </div>
+</main>
+
+<script src="/shared/deur.js"></script>
+<!-- RTGId zonder defer en vóór de app: hij levert de gastnaam waaronder een
+     bezoeker zonder labpas op een buurtvraag stemt. -->
+<script src="/shared/id.js"></script>
+<script src="/apps/labpas-buurt.js"></script>
+<script src="/apps/labpas.js"></script>
+<script src="/shared/deelmenu.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/ios.js" defer></script>
+</body>
+</html>

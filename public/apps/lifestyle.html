@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>De Rechterhand · Lifestyle Pass</title>
+<title>Het Privékantoor · Lifestyle Pass</title>
 <link rel="icon" href="/icons/partners.svg">
 <link href="/fonts/fonts.css" rel="stylesheet">
 <link href="/shared/rtg-ui.css" rel="stylesheet">
@@ -20,11 +20,6 @@
   header h1{font-size:1.4rem;margin-top:.05rem;}
   .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;margin-left:auto;}
   main{padding:1.1rem;max-width:820px;margin:0 auto;}
-  /* De onderdelenbalk draagt dezelfde stijl als het deelmenu elders in het
-     huis: kale knoppen op een dunne lijn, de actieve met een gouden streep
-     eronder. Het schakelen zelf blijft van deze pagina.
-     De body.rtg-stijl-voorvoegsels zijn nodig omdat de gedeelde pilrij in
-     rtg-ui.css (body.rtg-stijl .chips > button.aan) anders zwaarder weegt. */
   body.rtg-stijl .chips{display:flex;flex-wrap:nowrap;gap:.15rem;overflow-x:auto;margin:0 0 1.1rem;
     padding:0 0 .1rem;border-bottom:1px solid var(--line);}
   body.rtg-stijl .chips > button.chip{white-space:nowrap;background:none;border:0;border-bottom:2px solid transparent;
@@ -35,6 +30,22 @@
   .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1.1rem 1.2rem;margin-bottom:1rem;}
   .kaart h2{font-size:1.12rem;margin-bottom:.2rem;}
   .kaart h2 + .sub{color:var(--soft);font-size:.85rem;margin-bottom:.8rem;}
+  /* ---- De kop van de Situation Room. Dit is het enige echt grote element op
+     de pagina: één zin die zegt of u iets moet doen. Alles eronder onderbouwt
+     hem. Geen tweede signatuurelement erbij -- zie CLAUDE.md. ---- */
+  .kop{padding:1.6rem 0 1.3rem;border-bottom:1px solid var(--line);margin-bottom:1.2rem;}
+  .kop .datum{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--soft);}
+  .kop h2{font-size:1.9rem;line-height:1.2;margin-top:.5rem;}
+  .kop.hoog h2,.kop.storing h2{color:var(--burgundy);}
+  .kop .telling{color:var(--soft);font-size:.85rem;margin-top:.6rem;line-height:1.6;}
+  .regel{display:flex;gap:.8rem;align-items:flex-start;border-top:1px solid var(--line);padding:.85rem 0;}
+  .regel:first-child{border-top:0;}
+  .regel .streep{width:2px;align-self:stretch;background:var(--line);flex-shrink:0;border-radius:2px;}
+  .regel.e3 .streep{background:var(--burgundy);}
+  .regel.e2 .streep{background:var(--gold);}
+  .regel .body{flex:1;min-width:0;}
+  .regel b{display:block;font-weight:600;font-size:.94rem;}
+  .regel .meta{font-size:.8rem;color:var(--soft);margin-top:.15rem;line-height:1.5;}
   .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:.7rem;margin-bottom:1rem;}
   .stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.9rem 1rem;}
   .stat .n{font-family:'Bodoni Moda',serif;font-size:1.6rem;}
@@ -53,14 +64,25 @@
   .item .body b{display:block;}
   .item .meta{font-size:.78rem;color:var(--soft);margin-top:.15rem;line-height:1.5;}
   .status{font-size:.72rem;padding:.15rem .55rem;border-radius:999px;border:1px solid var(--line);color:var(--muted);white-space:nowrap;}
-  .status.aangevraagd{border-color:var(--gold);color:var(--gold);}
-  .status.ingetrokken,.status.afgerond{opacity:.6;}
-  .att{font-size:.8rem;color:var(--burgundy);}
-  .att.ok{color:var(--muted);}
-  .weg{background:transparent;border:1px solid var(--line);color:var(--soft);border-radius:8px;width:1.9rem;height:1.9rem;font-size:.9rem;cursor:pointer;flex-shrink:0;}
-  .weg:hover{color:var(--txt);border-color:var(--gold);}
+  .status.wacht{border-color:var(--gold);color:var(--gold);}
+  .status.loopt{border-color:var(--green);color:var(--green);}
+  .status.klaar,.status.weg{opacity:.55;}
   .leeg{color:var(--soft);font-size:.88rem;padding:.4rem 0;}
-  .chat{margin-top:.7rem;}
+  /* de plattegrond: twintig werelden, de nog-niet-gebouwde ingetogen maar zichtbaar */
+  .kamers{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:.7rem;}
+  .kamer{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.9rem 1rem;display:block;text-decoration:none;}
+  .kamer h3{font-size:1rem;}
+  .kamer .wat{font-size:.78rem;color:var(--soft);margin-top:.3rem;line-height:1.5;}
+  .kamer .tel{font-size:.72rem;color:var(--muted);margin-top:.55rem;letter-spacing:.04em;}
+  .kamer.aanbouw{opacity:.5;}
+  .kamer .apps{margin-top:.5rem;display:flex;gap:.35rem;flex-wrap:wrap;}
+  .kamer .apps a{font-size:.72rem;border:1px solid var(--line);border-radius:999px;padding:.14rem .5rem;color:var(--muted);text-decoration:none;}
+  .kamer .apps a:hover{border-color:var(--gold);color:var(--txt);}
+  /* de mandaatschuif */
+  .niv{display:flex;gap:.25rem;flex-wrap:wrap;margin-top:.35rem;}
+  .niv button{background:none;border:1px solid var(--line);border-radius:8px;color:var(--muted);font:inherit;font-size:.72rem;padding:.25rem .55rem;cursor:pointer;}
+  .niv button.aan{border-color:var(--gold);color:var(--gold);}
+  .niv button:disabled{opacity:.3;cursor:not-allowed;}
   .chatbox{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:.8rem;min-height:3rem;font-size:.92rem;line-height:1.55;white-space:pre-wrap;}
   .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:.6rem 1rem;font-size:.85rem;opacity:0;transition:opacity .3s;z-index:30;pointer-events:none;}
   .inlog{text-align:center;padding:2.5rem 1rem;}
@@ -72,7 +94,7 @@
 </head>
 <body class="rtg-stijl">
 <header>
-  <div><div class="ey">Lifestyle Pass</div><h1>De Rechterhand</h1></div>
+  <div><div class="ey">Lifestyle Pass</div><h1>Het Privékantoor</h1></div>
   <a class="terug" href="/apps/app.html?pas=lifestyle">← app</a>
 </header>
 <main id="main"><div class="leeg">Laden…</div></main>
@@ -85,168 +107,261 @@ const $ = s => document.querySelector(s);
 const esc = t => String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let TOKEN=null; try{ TOKEN = localStorage.getItem('rtg_member_token'); }catch(e){}
 function meld(t){ const m=$('#melding'); m.textContent=t; m.style.opacity='1'; clearTimeout(m._t); m._t=setTimeout(()=>m.style.opacity='0',2600); }
-const api = (pad, body) => fetch('/api/member/lifestyle/'+pad, {
+const api = (pad, body) => fetch('/api/member/bureau/'+pad, {
   method:'POST', headers:{'Content-Type':'application/json', Authorization:'Bearer '+TOKEN}, body:JSON.stringify(body||{})
 }).then(async r=>{ const d=await r.json().catch(()=>({})); if(!r.ok){ const e=new Error(d.error||'Er ging iets mis.'); e.status=r.status; throw e; } return d; });
-const euro = c => '€ ' + Number(c||0).toLocaleString('nl-NL');
+const euro = c => '€ ' + Math.round(Number(c||0)/100).toLocaleString('nl-NL');
 const MND=['','jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'];
 function datum(d){ if(!d) return ''; const [y,m,dd]=d.split('-'); return Number(dd)+' '+MND[Number(m)]+' '+y; }
 
-let tab='overzicht';
-const TABS=[['overzicht','Overzicht'],['concierge','Concierge'],['bezit','Bezittingen'],['gezondheid','Gezondheid']];
+let tab='nu';
+const TABS=[['nu','Nu'],['vooruit','Vooruit'],['zaken','Zaken'],['kantoor','Kantoor'],['mandaat','Mandaat'],['graaf','Overzicht']];
 
-/* Meenemen (shared/uitvoer.js): De Rechterhand houdt per tabblad een andere
-   lijst vast -- attentiepunten, verzoeken, het bezittingenregister, de
-   afspraken. Elk paneel meldt zijn eigen model aan als het klaar is met
-   tekenen, zodat wat u meeneemt hetzelfde is als wat u ziet. Het
-   prive-dossier blijft erbuiten: dat zijn losse aantekeningen, geen register. */
+/* Meenemen (shared/uitvoer.js): elk paneel meldt zijn eigen lijst aan, zodat wat
+   u exporteert hetzelfde is als wat u ziet. De besloten kamers (gezondheid,
+   nalatenschap) leveren hier niets aan: die blijven op het scherm. */
 let UIT=null;
 function zetUit(naam, kolommen, rijen){ UIT = rijen.length ? { naam:naam, kolommen:kolommen, rijen:rijen } : null; }
 if(window.RTGUitvoer) RTGUitvoer.bron(function(){ return UIT; });
 
 async function start(){
-  if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2><p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">De Rechterhand is er voor leden met een Lifestyle Pass. Open de app en log in met uw RTG-account.</p><p style="margin-top:1rem;"><a href="/apps/app.html">Naar de app →</a></p></div>'; return; }
+  if(!TOKEN){ $('#main').innerHTML='<div class="inlog"><h2>Log eerst in</h2><p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">Het Privékantoor is er voor leden met een Lifestyle Pass. Open de app en log in met uw RTG-account.</p><p style="margin-top:1rem;"><a href="/apps/app.html">Naar de app →</a></p></div>'; return; }
   try{ await api('overzicht'); }catch(e){
     if(e.status===403){ RTGDeur.toon($('#main'), { soort:'pas', pas:'Lifestyle' }); return; }
-    $('#main').innerHTML='<div class="leeg">Kon De Rechterhand niet laden.</div>'; return;
+    $('#main').innerHTML='<div class="leeg">Kon het Privékantoor niet laden.</div>'; return;
   }
   teken();
 }
 function teken(){
-  $('#main').innerHTML = '<div class="chips" id="chips"></div><div id="paneel"></div>';
+  $('#main').innerHTML = '<div class="chips" id="chips"></div><div id="paneel"><div class="leeg">Laden…</div></div>';
   $('#chips').innerHTML = TABS.map(([k,l])=>'<button class="chip'+(k===tab?' aan':'')+'" data-t="'+k+'">'+l+'</button>').join('');
   $('#chips').querySelectorAll('.chip').forEach(b=> b.onclick=()=>{ tab=b.dataset.t; teken(); });
-  ({overzicht:vOverzicht, concierge:vConcierge, bezit:vBezit, gezondheid:vGezondheid}[tab])();
+  ({nu:vNu, vooruit:vVooruit, zaken:vZaken, kantoor:vKantoor, mandaat:vMandaat, graaf:vGraaf}[tab])();
+}
+const P = h => { $('#paneel').innerHTML = h; };
+const fout = e => P('<div class="leeg">'+esc(e.message)+'</div>');
+
+/* ============================ NU -- de Situation Room ============================
+   Eén kop, en daaronder alleen regels die die kop waarmaken. De beslissingen
+   krijgen hier meteen hun twee knoppen: wie op dit scherm ziet dat er iets op
+   hem wacht, hoort het niet ergens anders te moeten gaan zoeken. */
+async function vNu(){
+  let d; try{ d = await api('nu'); }catch(e){ return fout(e); }
+  const t = d.tellingen;
+  let h = '<div class="kop '+esc(d.ernst)+'"><div class="datum">'+esc(datum(d.datum))+'</div><h2>'+esc(d.kop)+'</h2>'
+    + '<div class="telling">'+t.knopen+' zaken in uw kantoor'
+    + (t.lopend? ' · '+t.lopend+' in behandeling':'')
+    + (t.dezeWeek? ' · '+t.dezeWeek+' deze week':'')
+    + '</div></div>';
+
+  h += '<div class="kaart"><h2>Rahul</h2><div class="sub">Zeg wat u geregeld wilt hebben. Hij noteert en legt aan; bevestigen doet een mens.</div>'
+    + '<div class="rij"><div><input class="veld" id="aiV" placeholder="Wij gaan in augustus zes weken naar Ibiza…"></div>'
+    + '<button class="knop" id="aiK">Vraag</button></div>'
+    + '<div class="chatbox" id="aiUit" style="margin-top:.7rem;display:none;"></div></div>';
+
+  if(!d.regels.length){
+    h += '<div class="kaart"><div class="leeg">Er staat niets open. Wij houden het in de gaten.</div></div>';
+  } else {
+    h += '<div class="kaart">' + d.regels.map(r=>{
+      const kn = r.soort==='beslissing'
+        ? '<div style="display:flex;gap:.4rem;margin-top:.5rem;"><button class="knop klein js-ja" data-id="'+esc(r.id)+'">Akkoord</button>'
+          + '<button class="knop klein stil js-nee" data-id="'+esc(r.id)+'">Afzien</button></div>' : '';
+      return '<div class="regel e'+r.ernst+'"><div class="streep"></div><div class="body">'
+        + '<b>'+esc(r.tekst)+'</b><div class="meta">'+esc(r.detail||'')+'</div>'+kn+'</div></div>';
+    }).join('') + '</div>';
+  }
+  P(h);
+  zetUit('Nu', ['Soort','Wat','Toelichting'], d.regels.map(r=>[r.soort, r.tekst, r.detail||'']));
+
+  $('#aiK').onclick = async () => {
+    const v = $('#aiV').value.trim(); if(!v) return;
+    const u = $('#aiUit'); u.style.display='block'; u.textContent='Een moment…';
+    try{ const a = await api('ai', {vraag:v}); u.textContent = a.antwoord; }
+    catch(e){ u.textContent = e.message; }
+  };
+  $('#paneel').querySelectorAll('.js-ja,.js-nee').forEach(b => b.onclick = async () => {
+    try{ await api('zaak/beslis', {id:b.dataset.id, akkoord:b.classList.contains('js-ja')});
+      meld(b.classList.contains('js-ja')?'Akkoord genoteerd.':'Genoteerd; wij zien ervan af.'); vNu(); }
+    catch(e){ meld(e.message); }
+  });
 }
 
-/* ---------- Overzicht + Rahul (u-vorm) ---------- */
-async function vOverzicht(){
-  const p=$('#paneel'); p.innerHTML='<div class="leeg">Laden…</div>';
-  const d=await api('overzicht');
-  const att=d.attenties||[];
-  p.innerHTML =
-    '<div class="grid">'
-    + stat(d.verzoekenOpen, 'Open verzoeken')
-    + stat(d.volgendeAfspraak?datum(d.volgendeAfspraak.datum):'-', 'Volgende afspraak')
-    + stat(d.bezittingen, 'Objecten')
-    + stat(euro(d.bezittingenWaarde), 'Registerwaarde')
-    + '</div>'
-    + '<div class="kaart"><h2>Attentiepunten</h2><div class="sub">Wat binnenkort uw aandacht vraagt in het bezittingenregister.</div>'
-    + (att.length ? att.map(a=>'<div class="att'+(a.verlopen?'':' ok')+'">'+(a.verlopen?'':'• ')+esc(a.naam)+' - '+esc(a.soort)+' '+(a.verlopen?'verlopen op ':'op ')+datum(a.datum)+'</div>').join('') : '<div class="leeg">Niets dat op korte termijn uw aandacht vraagt.</div>')
-    + '</div>'
-    + '<div class="kaart"><h2>Vraag De Rechterhand</h2><div class="sub">Rahul kijkt met u mee, regelt en noteert - en bevestigt pas als iets echt rond is.</div>'
-    + '<div class="rij"><div style="flex:1;"><input class="veld" id="aiV" placeholder="Waarmee kan ik u van dienst zijn?"></div><button class="knop" id="aiK">Vraag</button></div>'
-    + '<div class="chat"><div class="chatbox" id="aiA">Tot uw dienst. Zeg mij waarmee ik u kan helpen.</div></div></div>';
-  $('#aiK').onclick=async()=>{ const v=$('#aiV').value.trim(); if(!v) return; $('#aiA').textContent='Een ogenblik…'; try{ const r=await api('ai',{vraag:v}); $('#aiA').textContent=r.antwoord; $('#aiV').value=''; }catch(e){ $('#aiA').textContent=e.message; } };
-  $('#aiV').addEventListener('keydown',e=>{ if(e.key==='Enter') $('#aiK').click(); });
-  zetUit('attentiepunten',['object','soort','datum','verlopen'],att.map(a=>[a.naam,a.soort,a.datum||'',a.verlopen?'ja':'nee']));
-}
-const stat=(n,l)=>'<div class="stat"><div class="n">'+esc(n)+'</div><div class="l">'+esc(l)+'</div></div>';
-
-/* ---------- Concierge-bureau + voorkeuren ---------- */
-async function vConcierge(){
-  const p=$('#paneel'); p.innerHTML='<div class="leeg">Laden…</div>';
-  const [d,vk]=await Promise.all([api('concierge'), api('voorkeuren')]);
-  const cats=d.categorieen||[];
-  let h='<div class="kaart"><h2>Een verzoek indienen</h2><div class="sub">Wij noteren het en pakken het persoonlijk voor u op.</div>'
-    + '<span class="lbl">Waarmee kunnen wij u van dienst zijn?</span><input class="veld" id="cT" maxlength="100" placeholder="Bijv. een tafel voor vier, vrijdagavond">'
-    + '<span class="lbl">Categorie</span><select class="veld" id="cC">'+cats.map(c=>'<option>'+c+'</option>').join('')+'</select>'
-    + '<span class="lbl">Toelichting (optioneel)</span><textarea class="veld" id="cD" maxlength="800" placeholder="Voorkeuren, tijdstip, gelegenheid…"></textarea>'
-    + '<div style="margin-top:.7rem;"><button class="knop" id="cDoe">Indienen</button></div></div>';
-  h+='<div class="kaart"><h2>Uw verzoeken</h2><div id="cLijst"></div></div>';
-  // voorkeuren
-  const V=vk.voorkeuren||{};
-  const velden=[['dieet','Dieet & allergieën'],['restaurant','Voorkeur restaurants'],['hotelkamer','Type hotelkamer'],['stoel','Stoelvoorkeur (vlucht)'],['chauffeur','Vaste chauffeur'],['bloemen','Bloemen'],['overig','Overig']];
-  h+='<div class="kaart"><h2>Vaste voorkeuren</h2><div class="sub">Deze reizen automatisch mee bij alles wat wij voor u regelen.</div>'
-    + velden.map(([k,l])=>'<span class="lbl">'+l+'</span><input class="veld vk" data-k="'+k+'" value="'+esc(V[k]||'')+'">').join('')
-    + '<div style="margin-top:.7rem;"><button class="knop stil" id="vkDoe">Voorkeuren bewaren</button></div></div>';
-  p.innerHTML=h;
-  cLijst(d.verzoeken||[]);
-  $('#cDoe').onclick=async()=>{ const titel=$('#cT').value.trim(); if(!titel) return meld('Waarmee kunnen wij u van dienst zijn?'); try{ await api('concierge/vraag',{titel,categorie:$('#cC').value,details:$('#cD').value}); $('#cT').value='';$('#cD').value=''; meld('Genoteerd. Wij pakken het voor u op.'); vConcierge(); }catch(e){ meld(e.message); } };
-  $('#vkDoe').onclick=async()=>{ const body={}; document.querySelectorAll('.vk').forEach(i=>body[i.dataset.k]=i.value); try{ await api('voorkeuren/zet',body); meld('Uw voorkeuren zijn bewaard.'); }catch(e){ meld(e.message); } };
-}
-function cLijst(v){
-  $('#cLijst').innerHTML = v.length ? v.map(x=>
-    '<div class="item"><div class="body"><b>'+esc(x.titel)+'</b><div class="meta">'+esc(x.categorie)+(x.details?' · '+esc(x.details):'')+'<br>'+esc((x.updates&&x.updates[x.updates.length-1]||{}).notitie||'')+'</div></div>'
-    + '<span class="status '+esc(x.status)+'">'+esc(x.status)+'</span>'
-    + (x.status!=='afgerond'&&x.status!=='ingetrokken'?'<button class="weg" data-intrek="'+x.id+'" title="Intrekken">×</button>':'')+'</div>'
-  ).join('') : '<div class="leeg">U heeft nog geen lopende verzoeken.</div>';
-  $('#cLijst').querySelectorAll('[data-intrek]').forEach(b=> b.onclick=async()=>{ try{ await api('concierge/intrek',{id:b.dataset.intrek}); vConcierge(); }catch(e){ meld(e.message); } });
-  zetUit('verzoeken',['titel','categorie','status','ingediend'],v.map(x=>[x.titel,x.categorie,x.status,String(x.at||'').slice(0,10)]));
+/* ======================= VOORUIT -- de Control Tower ==========================
+   Alle datums uit alle premium-apps, in vier vensters. Achterstallig staat
+   bovenaan en apart: dat venster bestond nergens. */
+async function vVooruit(){
+  let d; try{ d = await api('tower'); }catch(e){ return fout(e); }
+  const regel = r => '<div class="item"><div class="body"><b>'+esc((r.waarvan? r.waarvan+' · ':'')+r.naam)+'</b>'
+    + '<div class="meta">'+esc(r.bron)+' · '+esc(datum(r.datum))
+    + (r.dagen<0 ? ' · <span style="color:var(--burgundy);">'+Math.abs(r.dagen)+' dagen te laat</span>'
+      : r.dagen===0 ? ' · vandaag' : ' · over '+r.dagen+' dagen')
+    + '</div></div></div>';
+  let h = '';
+  if(d.achterstallig.length){
+    h += '<div class="kaart" style="border-color:var(--burgundy);"><h2>Achterstallig</h2>'
+      + '<div class="sub">Deze datums zijn voorbij. Ze stonden in uw apps, maar nergens bij elkaar.</div>'
+      + d.achterstallig.map(regel).join('') + '</div>';
+  }
+  for(const v of d.vensters){
+    h += '<div class="kaart"><h2>'+esc(v.label)+'</h2><div class="sub">'+v.aantal+(v.aantal===1?' punt':' punten')+'</div>'
+      + (v.items.length ? v.items.map(regel).join('') : '<div class="leeg">Niets.</div>') + '</div>';
+  }
+  h += '<div class="kaart"><div class="leeg">'+d.totaal+' termijnen in beeld'+(d.later? ', waarvan '+d.later+' verder weg dan een jaar':'')
+    + '. Alles hierboven komt uit een datum die u zelf ergens heeft ingevuld; wij verzinnen er geen bij.</div></div>';
+  P(h);
+  const alle = d.achterstallig.concat(...d.vensters.map(v=>v.items));
+  zetUit('Vooruit', ['Wat','Waarvan','Bron','Datum','Dagen'], alle.map(r=>[r.naam, r.waarvan, r.bron, r.datum, r.dagen]));
 }
 
-/* ---------- Bezittingenregister ---------- */
-async function vBezit(){
-  const p=$('#paneel'); p.innerHTML='<div class="leeg">Laden…</div>';
-  const d=await api('bezit');
-  const soorten=['vastgoed','voertuig','vaartuig','kunst','horloge','sieraad','overig'];
-  let h='<div class="kaart"><h2>Object toevoegen</h2>'
-    + '<div class="rij"><div><span class="lbl">Soort</span><select class="veld" id="bS">'+soorten.map(s=>'<option>'+s+'</option>').join('')+'</select></div>'
-    + '<div><span class="lbl">Naam</span><input class="veld" id="bN" maxlength="100" placeholder="Bijv. Villa Ibiza"></div>'
-    + '<div><span class="lbl">Waarde (€)</span><input class="veld" id="bW" type="number" min="0"></div></div>'
-    + '<div class="rij"><div><span class="lbl">Verzekeraar</span><input class="veld" id="bVz" maxlength="80"></div>'
-    + '<div><span class="lbl">Verzekerd tot</span><input class="veld" id="bVd" type="date"></div>'
-    + '<div><span class="lbl">Taxatie op</span><input class="veld" id="bTx" type="date"></div>'
-    + '<div><span class="lbl">Onderhoud op</span><input class="veld" id="bOh" type="date"></div></div>'
-    + '<div style="margin-top:.7rem;"><button class="knop" id="bDoe">In het register</button></div></div>';
-  h+='<div class="grid">'+stat(d.bezittingen.length,'Objecten')+stat(euro(d.totaalWaarde),'Totaalwaarde')+stat((d.attenties||[]).length,'Attentiepunten')+'</div>';
-  h+='<div class="kaart"><h2>Uw register</h2><div id="bLijst"></div></div>';
-  p.innerHTML=h;
-  bLijst(d.bezittingen||[]);
-  $('#bDoe').onclick=async()=>{ const naam=$('#bN').value.trim(); if(!naam) return meld('Geef het object een naam.');
-    try{ await api('bezit/zet',{soort:$('#bS').value,naam,waarde:$('#bW').value,verzekeraar:$('#bVz').value,verzekerdTot:$('#bVd').value,taxatieOp:$('#bTx').value,onderhoudOp:$('#bOh').value}); ['bN','bW','bVz','bVd','bTx','bOh'].forEach(i=>$('#'+i).value=''); meld('Toegevoegd aan uw register.'); vBezit(); }catch(e){ meld(e.message); } };
-}
-function bLijst(b){
-  $('#bLijst').innerHTML = b.length ? b.map(x=>{
-    const info=[x.verzekeraar?'verzekerd bij '+esc(x.verzekeraar):'', x.verzekerdTot?'tot '+datum(x.verzekerdTot):'', x.taxatieOp?'taxatie '+datum(x.taxatieOp):'', x.onderhoudOp?'onderhoud '+datum(x.onderhoudOp):''].filter(Boolean).join(' · ');
-    return '<div class="item"><div class="body"><b>'+esc(x.naam)+' <span class="status">'+esc(x.soort)+'</span></b><div class="meta">'+euro(x.waarde)+(info?' · '+info:'')+(x.notitie?'<br>'+esc(x.notitie):'')+'</div></div><button class="weg" data-weg="'+x.id+'" title="Verwijderen">×</button></div>';
-  }).join('') : '<div class="leeg">Uw register is nog leeg.</div>';
-  $('#bLijst').querySelectorAll('[data-weg]').forEach(b2=> b2.onclick=async()=>{ if(!confirm('Uit het register halen?')) return; try{ await api('bezit/weg',{id:b2.dataset.weg}); vBezit(); }catch(e){ meld(e.message); } });
-  zetUit('bezittingen',['naam','soort','waarde','verzekeraar','verzekerd-tot','taxatie-op','onderhoud-op'],
-    b.map(x=>[x.naam,x.soort,x.waarde||0,x.verzekeraar||'',x.verzekerdTot||'',x.taxatieOp||'',x.onderhoudOp||'']));
+/* ============================ ZAKEN -- de cases ============================== */
+const SOORT_UITLEG = {
+  regulier:'Loopt langs uw mandaat: binnen uw grenzen pakken wij het op, daarbuiten leggen wij het u voor.',
+  bijzonder:'Het verzoek dat niet in een formulier past. Gaat altijd langs een van onze mensen, en altijd langs u.',
+  warroom:'Er is iets misgegaan. Wij zetten er direct mensen op en vragen pas om een besluit als het nodig is.'
+};
+async function vZaken(){
+  let d, del; try{ [d, del] = await Promise.all([api('zaken'), api('delegatie')]); }catch(e){ return fout(e); }
+  const doms = del.domeinen.map(x=>'<option value="'+esc(x.domein)+'">'+esc(x.naam)+'</option>').join('');
+  let h = '<div class="kaart"><h2>Een zaak aanleggen</h2><div class="sub">Zegt u wat er moet gebeuren. Wij bepalen wie het oppakt.</div>'
+    + '<label class="lbl">Wat wilt u geregeld hebben</label><input class="veld" id="zT" placeholder="Diner voor twaalf, zaterdag, bij ons thuis">'
+    + '<label class="lbl">Toelichting</label><textarea class="veld" id="zW" placeholder="Alles wat wij moeten weten."></textarea>'
+    + '<div class="rij"><div><label class="lbl">Soort</label><select class="veld" id="zS">'
+    + d.soorten.map(s=>'<option value="'+s+'">'+({regulier:'Regulier',bijzonder:'Bijzonder verzoek',warroom:'Incident'}[s])+'</option>').join('')
+    + '</select></div><div><label class="lbl">Domein</label><select class="veld" id="zD">'+doms+'</select></div>'
+    + '<div><label class="lbl">Richtbedrag (euro)</label><input class="veld" id="zB" type="number" min="0" placeholder="0"></div></div>'
+    + '<div class="meta" id="zU" style="font-size:.78rem;color:var(--soft);margin-top:.55rem;line-height:1.5;"></div>'
+    + '<div style="margin-top:.7rem;"><button class="knop" id="zK">Aanleggen</button></div></div>';
+
+  h += '<div class="kaart"><h2>Uw zaken</h2><div class="sub">'+d.open+' open · '+d.beslissingen+' wacht op u</div>'
+    + (d.zaken.length ? d.zaken.map(z=>{
+      const kl = z.status==='wacht op uw akkoord'?'wacht': z.status==='in uitvoering'?'loopt': (z.status==='geregeld'?'klaar':(z.beslissing.gegeven==='afgewezen'||z.status==='ingetrokken'||z.status==='afgewezen'?'weg':''));
+      const laatste = z.tijdlijn[z.tijdlijn.length-1] || {};
+      return '<div class="item"><div class="body"><b>'+esc(z.titel)+'</b>'
+        + '<div class="meta">'+esc(z.team.map(t=>t.rol).join(' · '))
+        + (z.bedragCenten? ' · '+euro(z.bedragCenten):'')
+        + (z.besloten? ' · <span style="color:var(--gold);">besloten, blijft bij u</span>':'')
+        + '<br>'+esc(laatste.notitie||'')+'</div>'
+        + (z.beslissing.nodig ? '<div style="display:flex;gap:.4rem;margin-top:.5rem;">'
+            + '<button class="knop klein js-ja" data-id="'+esc(z.id)+'">Akkoord</button>'
+            + '<button class="knop klein stil js-nee" data-id="'+esc(z.id)+'">Afzien</button></div>' : '')
+        + '</div><span class="status '+kl+'">'+esc(z.status)+'</span></div>';
+    }).join('') : '<div class="leeg">Er lopen nog geen zaken.</div>') + '</div>';
+  P(h);
+  zetUit('Zaken', ['Titel','Soort','Domein','Status','Bedrag'], d.zaken.map(z=>[z.titel,z.soort,z.domein,z.status,z.bedragCenten/100]));
+
+  const toonUitleg = () => { $('#zU').textContent = SOORT_UITLEG[$('#zS').value] || ''; };
+  $('#zS').onchange = toonUitleg; toonUitleg();
+  $('#zK').onclick = async () => {
+    const titel = $('#zT').value.trim(); if(!titel) return meld('Waarmee kunnen wij u van dienst zijn?');
+    try{
+      const r = await api('zaak/open', { titel, wat:$('#zW').value.trim(), soort:$('#zS').value,
+        domein:$('#zD').value, bedragCenten: Math.round((Number($('#zB').value)||0)*100) });
+      meld(r.zaak.beslissing.nodig ? 'Aangelegd. Er ligt een besluit voor u klaar.' : 'Aangelegd. Wij pakken het op.');
+      vZaken();
+    }catch(e){ meld(e.message); }
+  };
+  $('#paneel').querySelectorAll('.js-ja,.js-nee').forEach(b => b.onclick = async () => {
+    try{ await api('zaak/beslis', {id:b.dataset.id, akkoord:b.classList.contains('js-ja')}); vZaken(); }
+    catch(e){ meld(e.message); }
+  });
 }
 
-/* ---------- Gezondheid & welzijn ---------- */
-async function vGezondheid(){
-  const p=$('#paneel'); p.innerHTML='<div class="leeg">Laden…</div>';
-  const d=await api('gezondheid');
-  let h='<div class="kaart"><h2>Afspraak toevoegen</h2>'
-    + '<div class="rij"><div><span class="lbl">Wat</span><input class="veld" id="gW" maxlength="100" placeholder="Bijv. controle cardioloog"></div>'
-    + '<div><span class="lbl">Specialist</span><input class="veld" id="gS" maxlength="80"></div></div>'
-    + '<div class="rij"><div><span class="lbl">Datum</span><input class="veld" id="gD" type="date"></div>'
-    + '<div><span class="lbl">Tijd</span><input class="veld" id="gT" type="time"></div>'
-    + '<div><span class="lbl">Waar</span><input class="veld" id="gWr" maxlength="100"></div></div>'
-    + '<div style="margin-top:.7rem;"><button class="knop" id="gDoe">Afspraak opslaan</button></div></div>';
-  h+='<div class="kaart"><h2>Uw afspraken</h2><div id="gLijst"></div></div>';
-  h+='<div class="kaart"><h2>Prive-dossier</h2><div class="sub">Voor uw eigen aantekeningen - alleen voor u zichtbaar.</div>'
-    + '<span class="lbl">Titel</span><input class="veld" id="nT" maxlength="100">'
-    + '<span class="lbl">Notitie</span><textarea class="veld" id="nX" maxlength="2000"></textarea>'
-    + '<div style="margin-top:.7rem;"><button class="knop stil" id="nDoe">Notitie bewaren</button></div>'
-    + '<div id="nLijst" style="margin-top:.6rem;"></div></div>';
-  p.innerHTML=h;
-  gLijst(d.afspraken||[]); nLijst(d.dossier||[]);
-  $('#gDoe').onclick=async()=>{ const wat=$('#gW').value.trim(); if(!wat) return meld('Wat voor afspraak betreft het?'); if(!$('#gD').value) return meld('Kies een datum.');
-    try{ await api('gezondheid/afspraak',{wat,specialist:$('#gS').value,datum:$('#gD').value,tijd:$('#gT').value,waar:$('#gWr').value}); ['gW','gS','gD','gT','gWr'].forEach(i=>$('#'+i).value=''); meld('Afspraak opgeslagen.'); vGezondheid(); }catch(e){ meld(e.message); } };
-  $('#nDoe').onclick=async()=>{ const titel=$('#nT').value.trim(); if(!titel) return meld('Geef de notitie een titel.'); try{ await api('gezondheid/dossier',{titel,tekst:$('#nX').value}); $('#nT').value='';$('#nX').value=''; vGezondheid(); }catch(e){ meld(e.message); } };
-}
-function gLijst(a){
-  const komend=a.filter(x=>!x.voorbij);
-  $('#gLijst').innerHTML = komend.length ? komend.map(x=>
-    '<div class="item"><div class="body"><b>'+esc(x.wat)+'</b><div class="meta">'+datum(x.datum)+(x.tijd?' '+esc(x.tijd):'')+(x.specialist?' · '+esc(x.specialist):'')+(x.waar?' · '+esc(x.waar):'')+'</div></div>'
-    + '<span class="status'+(x.dagenTot<=7?' aangevraagd':'')+'">'+(x.dagenTot===0?'vandaag':x.dagenTot===1?'morgen':'over '+x.dagenTot+' dgn')+'</span>'
-    + '<button class="weg" data-gweg="'+x.id+'" title="Verwijderen">×</button></div>'
-  ).join('') : '<div class="leeg">Geen afspraken gepland.</div>';
-  $('#gLijst').querySelectorAll('[data-gweg]').forEach(b=> b.onclick=async()=>{ try{ await api('gezondheid/afspraak/weg',{id:b.dataset.gweg}); vGezondheid(); }catch(e){ meld(e.message); } });
-  zetUit('afspraken',['wat','datum','tijd','specialist','waar'],
-    komend.map(x=>[x.wat,x.datum||'',x.tijd||'',x.specialist||'',x.waar||'']));
-}
-function nLijst(n){
-  $('#nLijst').innerHTML = n.length ? n.map(x=>
-    '<div class="item"><div class="body"><b>'+esc(x.titel)+'</b><div class="meta">'+esc(x.tekst)+'</div></div><button class="weg" data-nweg="'+x.id+'" title="Verwijderen">×</button></div>'
-  ).join('') : '';
-  $('#nLijst').querySelectorAll('[data-nweg]').forEach(b=> b.onclick=async()=>{ try{ await api('gezondheid/dossier/weg',{id:b.dataset.nweg}); vGezondheid(); }catch(e){ meld(e.message); } });
+/* ==================== KANTOOR -- de plattegrond van twintig ==================== */
+async function vKantoor(){
+  let d; try{ d = await api('kamers'); }catch(e){ return fout(e); }
+  const kaart = k => '<div class="kamer'+(k.status==='in aanbouw'?' aanbouw':'')+'">'
+    + '<h3>'+esc(k.naam)+'</h3><div class="wat">'+esc(k.wat)+'</div>'
+    + (k.apps.length ? '<div class="apps">'+k.apps.map(a=>'<a href="'+esc(a.url)+'">'+esc(a.naam)+'</a>').join('')+'</div>' : '')
+    + '<div class="tel">'+(k.status==='in aanbouw' ? 'In aanbouw'
+        : k.gevuld ? k.knopen+' in beeld'+(k.termijnen? ' · '+k.termijnen+' met een datum':'')+(k.waarde? ' · '+euro(k.waarde):'')
+        : 'Nog niets vastgelegd')+'</div></div>';
+  P('<div class="kaart"><h2>Uw kantoor</h2><div class="sub">'+d.ingericht+' werelden ingericht, '+d.inAanbouw+' in aanbouw. '
+    + 'Wat in aanbouw staat, staat er omdat het erbij hoort, niet omdat het er al is.</div></div>'
+    + '<div class="kamers">'+d.kamers.map(kaart).join('')+'</div>');
+  zetUit('Kantoor', ['Wereld','Status','In beeld','Waarde'], d.kamers.map(k=>[k.naam,k.status,k.knopen,k.waarde/100]));
 }
 
+/* ======================== MANDAAT -- de delegatie-engine =======================
+   Het scherm waar het lid bepaalt hoeveel kantoor hij koopt. Het dak per domein
+   staat erbij: een niveau dat niet kan, is uitgeschakeld en niet stiekem
+   weggelaten -- dan zou het lijken of het er nooit was. */
+async function vMandaat(){
+  let d; try{ d = await api('delegatie'); }catch(e){ return fout(e); }
+  let h = '<div class="kaart"><h2>Wat mogen wij zelf?</h2><div class="sub">Per onderwerp bepaalt u hoe ver wij gaan, en tot welk bedrag. '
+    + 'Alles staat standaard op voorbereiden: wij doen niets zonder uw akkoord tot u dat verandert.</div>'
+    + d.niveaus.map(n=>'<div class="meta" style="font-size:.78rem;color:var(--soft);line-height:1.6;"><b style="color:var(--txt);">L'+n.n+' '+esc(n.label)+'</b> · '+esc(n.uitleg)+'</div>').join('')
+    + '</div>';
+  h += d.domeinen.map(x=>'<div class="kaart"><h2>'+esc(x.naam)+'</h2>'
+    + '<div class="niv">'+d.niveaus.map(n=>'<button class="js-niv'+(n.n===x.niveau?' aan':'')+'" data-d="'+esc(x.domein)+'" data-n="'+n.n+'"'
+        + (n.n>x.dak?' disabled title="Over dit onderwerp beslist u zelf."':'')+'>L'+n.n+' '+esc(n.label)+'</button>').join('')+'</div>'
+    + (x.dak<4 ? '<div class="meta" style="font-size:.75rem;color:var(--gold);margin-top:.45rem;">Verder dan L'+x.dak+' gaat het hier niet. Over dit onderwerp beslist u zelf.</div>':'')
+    + (x.niveau>=3 ? '<label class="lbl">Uw grens per zaak (euro)</label>'
+        + '<div class="rij"><div><input class="veld js-grens" data-d="'+esc(x.domein)+'" type="number" min="0" value="'+Math.round(x.grensCenten/100)+'"></div>'
+        + '<button class="knop klein js-grensk" data-d="'+esc(x.domein)+'">Vastzetten</button></div>'
+        + '<div class="meta" style="font-size:.75rem;color:var(--soft);margin-top:.4rem;">Tot dit bedrag pakken wij het op zonder u te storen. Daarboven leggen wij het voor.</div>' : '')
+    + '</div>').join('');
+  if(d.log.length){
+    h += '<div class="kaart"><h2>Wat u ons gaf</h2><div class="sub">Elke wijziging, met de oude stand erbij.</div>'
+      + d.log.map(l=>'<div class="item"><div class="body"><b>'+esc(l.naam)+'</b><div class="meta">L'+l.van+' → L'+l.naar
+      + (l.grensNaar!==l.grensVan? ' · grens '+euro(l.grensVan)+' → '+euro(l.grensNaar):'')+' · '+esc(String(l.op).slice(0,10))+'</div></div></div>').join('')+'</div>';
+  }
+  P(h);
+  const zet = async (domein, niveau, grensCenten) => {
+    const huidig = d.domeinen.find(x=>x.domein===domein);
+    try{ await api('delegatie/zet', { domein, niveau: niveau==null?huidig.niveau:niveau,
+      grensCenten: grensCenten==null?huidig.grensCenten:grensCenten });
+      meld('Vastgelegd.'); vMandaat(); }
+    catch(e){ meld(e.message); }
+  };
+  $('#paneel').querySelectorAll('.js-niv').forEach(b=> b.onclick=()=> zet(b.dataset.d, Number(b.dataset.n), null));
+  $('#paneel').querySelectorAll('.js-grensk').forEach(b=> b.onclick=()=>{
+    const inp = $('#paneel').querySelector('.js-grens[data-d="'+b.dataset.d+'"]');
+    zet(b.dataset.d, null, Math.round((Number(inp.value)||0)*100));
+  });
+}
+
+/* ===================== OVERZICHT -- de Life Graph, doorloopbaar =================
+   Geen bollenplaatje. De vraag die een mens stelt is "wat raakt dit nog meer?",
+   en dat is een lijst: dit ding, waar het onder hangt, en wat eraan hangt. */
+let graafKamer='';
+async function vGraaf(){
+  let d; try{ d = await api('graaf'); }catch(e){ return fout(e); }
+  const knopen = d.graaf.knopen;
+  const kamers = [...new Set(knopen.map(k=>k.kamer))].sort();
+  const zicht = graafKamer ? knopen.filter(k=>k.kamer===graafKamer) : knopen;
+  const GEV=['open','persoonlijk','vertrouwelijk','besloten'];
+  let h = '<div class="kaart"><h2>Alles wat wij van u weten</h2>'
+    + '<div class="sub">'+knopen.length+' zaken uit '+[...new Set(knopen.map(k=>k.bron))].length+' apps. Bij elk staat waar het vandaan komt, '
+    + 'wie het mag zien en wanneer het aandacht vraagt. Dit is geen kopie: het staat in de app waar u het invulde.</div>'
+    + '<div class="niv"><button class="js-kam'+(graafKamer?'':' aan')+'" data-k="">Alles</button>'
+    + kamers.map(k=>'<button class="js-kam'+(graafKamer===k?' aan':'')+'" data-k="'+esc(k)+'">'+esc(k)+'</button>').join('')+'</div></div>';
+  h += '<div class="kaart">' + (zicht.length ? zicht.slice(0,300).map(k=>
+    '<div class="item"><div class="body"><b>'+esc(k.naam)+'</b><div class="meta">'
+    + esc(k.bron)+' · '+esc(k.kamer)+' · '+GEV[k.gevoelig]
+    + (k.deel==='lid'? ' · <span style="color:var(--gold);">blijft bij u</span>' : k.deel==='rechterhand'? ' · uw Rechterhand' : ' · ook het bureau')
+    + (k.waarde? ' · '+euro(k.waarde):'')
+    + (k.vervalt? ' · '+esc(k.vervaltWat)+' '+esc(datum(k.vervalt)):'')
+    + '</div></div><button class="knop klein stil js-kn" data-id="'+esc(k.id)+'">Verband</button></div>').join('')
+    : '<div class="leeg">Niets in deze kamer.</div>') + '</div>';
+  P(h);
+  zetUit('Overzicht', ['Naam','Bron','Kamer','Gevoeligheid','Zichtbaar voor','Vervalt'],
+    zicht.map(k=>[k.naam,k.bron,k.kamer,GEV[k.gevoelig],k.deel,k.vervalt]));
+  $('#paneel').querySelectorAll('.js-kam').forEach(b=> b.onclick=()=>{ graafKamer=b.dataset.k; vGraaf(); });
+  $('#paneel').querySelectorAll('.js-kn').forEach(b=> b.onclick=async()=>{
+    try{
+      const r = await api('knoop',{id:b.dataset.id});
+      const lijst = (t,a) => a.length ? '<div class="lbl">'+t+'</div>'+a.map(x=>'<div class="meta">'+esc(x.naam)+' · '+esc(x.bron)+(x.vervalt?' · '+esc(datum(x.vervalt)):'')+'</div>').join('') : '';
+      const el = document.createElement('div');
+      el.className='kaart'; el.style.borderColor='var(--gold)';
+      el.innerHTML = '<h2>'+esc(r.knoop.naam)+'</h2><div class="sub">'+esc(r.knoop.bron)+' · '+esc(r.knoop.kamer)+'</div>'
+        + (r.ouder? '<div class="lbl">Hangt onder</div><div class="meta">'+esc(r.ouder.naam)+'</div>':'')
+        + lijst('Hieraan hangt', r.kinderen) + lijst('Hier vlakbij', r.naast)
+        + (!r.ouder && !r.kinderen.length && !r.naast.length ? '<div class="leeg">Dit staat op zichzelf.</div>':'');
+      b.closest('.item').after(el);
+      b.remove();
+    }catch(e){ meld(e.message); }
+  });
+}
 start();
 </script>
 <script src="/shared/sneltoets.js" defer></script>

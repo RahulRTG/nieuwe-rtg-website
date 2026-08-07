@@ -125,6 +125,8 @@ module.exports = (kern) => {
   require('./member/rechterhand')(kern);
   // Rendez-vous: de besloten AI-datingapp van de Lifestyle Pass
   require('./member/rendezvous')(kern);
+  // Het Privekantoor: de ENE app van de Lifestyle Pass (graaf, tower, delegatie, zaken)
+  require('./member/bureau')(kern);
   // RTG Pulse: het eigen 9+-microblog op codenaam
   require('./member/pulse')(kern);
   // De Berichten-app: alle gesprekken van het platform op een plek (de lijst),

@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 2745 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 2748 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,13 +18,13 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 2745 |
-| servermodules (`server/**/*.js`) | 1442 |
-| routebestanden (`server/routes/**`) | 338 |
-| kernmodules (`server/kern/**`) | 806 |
+| API-endpoints | 2748 |
+| servermodules (`server/**/*.js`) | 1454 |
+| routebestanden (`server/routes/**`) | 339 |
+| kernmodules (`server/kern/**`) | 817 |
 | schermen (`public/**/*.html`) | 209 |
 | gedeelde browsermodules (`public/shared/*.js`) | 158 |
-| toetsbestanden (`test/*.test.js`) | 599 |
+| toetsbestanden (`test/*.test.js`) | 600 |
 | schermtoetsen (`test/*.e2e.js`) | 76 |
 
 ## 2. De weg van een verzoek
@@ -98,9 +98,9 @@ zie §5 -- er zijn nog 140 kern-namen die meer dan één domein aanraakt.
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
 | `auth` | 19 | 5 | 8 | 44 |
-| `member` | 391 | 47 | 9 | 342 |
+| `member` | 392 | 48 | 9 | 356 |
 | `supplier` | 481 | 87 | 6 | 272 |
-| `office` | 31 | 7 | 3 | 52 |
+| `office` | 33 | 7 | 3 | 54 |
 | `staff` | 26 | 7 | 1 | 39 |
 | `social` | 55 | 6 | 31 | 52 |
 | `techniek` | 42 | 11 | 1 | 49 |
@@ -119,9 +119,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1074 |
+| kern-namen die routes aanraken | 1090 |
 | daarvan door **meer dan één** domein (de echte koppeling) | 140 |
-| daarvan door precies één domein | 934 |
+| daarvan door precies één domein | 950 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 

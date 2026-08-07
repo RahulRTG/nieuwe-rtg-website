@@ -12,7 +12,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = 'f9231c8c';
+var RTG_BOUW = 'd17c228a';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -3086,7 +3086,7 @@ var RTG_BOUW = 'f9231c8c';
        uitlegt -- dat is beter dan een tegel die verdwijnt zodra u van baan
        wisselt. Prive: dit scherm draagt uw loon en uw inzagespoor. */
     loonstrook:  { naam: 'Mijn loon',    url: '/apps/loonstrook.html' },
-    rechterhand: { naam: 'De Rechterhand', url: '/apps/lifestyle.html' },
+    rechterhand: { naam: 'Het Privekantoor', url: '/apps/lifestyle.html' },
     reisboek:    { naam: 'Reisboek',      url: '/apps/reisboek.html' },
     cellier:     { naam: 'Cellier',       url: '/apps/cellier.html' },
     table:       { naam: 'Table',         url: '/apps/table.html' },
@@ -3146,25 +3146,31 @@ var RTG_BOUW = 'f9231c8c';
   const MAPPEN = [
     { sleutel: 'map-reizen', naam: 'Reizen', items: [
       'tab:reizen', 'tab:terplaatse', 'link:vluchten', 'link:ov', 'link:navigatie',
-      'link:flits', 'link:stad', 'link:reisboek', 'link:hangar', 'link:residentie', 'link:maison'] },
+      'link:flits', 'link:stad', 'link:residentie'] },
     { sleutel: 'map-geld', naam: 'Geld', items: [
       'tab:betalen', 'tab:bestellen', 'link:wallet', 'link:bank', 'link:wbw', 'link:rtgcode',
-      'link:balans', 'link:loonstrook', 'tab:assets', 'link:labfonds', 'link:mecenaat',
-      'link:nalatenschap', 'link:logboek'] },
+      'link:balans', 'link:loonstrook', 'tab:assets', 'link:labfonds'] },
     { sleutel: 'map-salon', naam: 'De Salon', items: [
       'tab:salon', 'link:pulse', 'link:vrienden', 'os:snaps', 'link:camera', 'link:clips',
       'link:muziek', 'link:podium', 'link:theater', 'link:spelen', 'link:vonk', 'link:nieuws',
-      'link:krant', 'link:sport', 'link:cercle', 'link:entourage', 'link:rendezvous',
-      'link:attenties', 'link:table', 'link:cellier', 'link:garderobe'] },
+      'link:krant', 'link:sport'] },
     { sleutel: 'map-huis', naam: 'Het Huis', items: [
       'link:ontdek', 'os:rtf', 'link:school', 'tab:zorg', 'tab:gezin', 'link:rechterhand',
       'link:office', 'link:browser', 'link:sitemaker', 'link:juridisch', 'link:passkeys',
       'link:ik', 'link:thuiswacht', 'link:codewoord', 'link:vitaal', 'link:thuisrust', 'os:werk'] }
   ];
 
-  /* De premium-suite (De Rechterhand) bestaat alleen voor Lifestyle en
-     Business. De registry kent de apps voor iedereen; hier staat wie ze mag
-     zien, zodat een RTG-pas ze niet in zijn mappen of in Spotlight tegenkomt. */
+  /* De premium-suite bestaat alleen voor Lifestyle en Business. De registry kent
+     de apps voor iedereen; hier staat wie ze mag zien, zodat een RTG-pas ze niet
+     in zijn mappen of in Spotlight tegenkomt.
+
+     Sinds Het Privekantoor staat hiervan nog EEN in de mappen: 'rechterhand',
+     dat /apps/lifestyle.html opent. De andere dertien zijn geen tegels meer maar
+     KAMERS binnen die app -- je komt er via de plattegrond, en de app legt de
+     verbanden die je zelf moest leggen toen het dertien losse tegels waren.
+     Ze blijven wel in deze lijst: de pagina's bestaan nog, worden gelinkt vanuit
+     het kantoor en zijn nog in Spotlight te vinden. Een oude link mag niets
+     opleveren is de regel; uit de mappen halen is iets anders dan opheffen. */
   const PREMIUM = new Set(['rechterhand', 'reisboek', 'cellier', 'table', 'maison', 'garderobe',
     'mecenaat', 'nalatenschap', 'logboek', 'cercle', 'hangar', 'entourage', 'attenties', 'rendezvous']);
   const premiumPas = pas === 'lifestyle' || pas === 'business';

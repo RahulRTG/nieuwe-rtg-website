@@ -63,7 +63,13 @@ async function inlog(code, rol) {
 }
 
 test.before(async () => {
-  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_DEMO: '0' } });
+  /* RTG_DEMO stond hier op '0', en dat deed NIETS: de oude regel was
+     `!PRODUCTION || RTG_DEMO === '1'`, dus buiten productie stond de demo altijd
+     aan -- ook met een nul ervoor. Deze toets LEUNT op de demo-inlog
+     (demoLid() gebruikt /api/login met alleen een tier), dus hij had de demo
+     nodig en dacht hem uit te zetten. Sinds de demo-stand alleen nog met een
+     uitdrukkelijke '1' aangaat, komt dat uit. Nu staat er wat hij bedoelt. */
+  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_DEMO: '1' } });
   base = srv.base;
   vrager = await nieuwLid('De Vrager');
   /* De betaler is een Lifestyle-pas. Niet uit luxe: de KYC-poort van RTG Pay

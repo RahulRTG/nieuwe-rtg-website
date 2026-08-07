@@ -9,7 +9,7 @@
    overige kanalen verwijzen nog door naar hun bron-app, die zelf de leesstanden
    bijhoudt. Gemount vanuit routes/member.js. */
 module.exports = (kern) => {
-  const { app, auth, db, convOf, socialConnecties, dmSleutel, codenaamVan, overheid, stemmingVan, jarigVan, rtmail, berichten } = kern;
+  const { app, auth, db, convOf, socialConnecties, dmSleutel, codenaamVan, overheid, stemmingVan, jarigVan, rtmail, berichten, commWerk } = kern;
   // het RTMAIL-adres van dit lid: zijn codenaam (privacy by design)
   const mijnCodenaam = req => (req.session.account && req.session.account.codename) || (codenaamVan ? codenaamVan(req.session.key) : null);
 
@@ -59,7 +59,9 @@ module.exports = (kern) => {
     try {
       for (const c of Object.values(db.data.applyChats || {})) {
         if (!c.applicant || c.applicant.kind !== 'rtg' || c.applicant.key !== mij) continue;
-        const l = c.berichten[c.berichten.length - 1];
+        // de berichten staan sinds de verhuizing in de kern (kern/comm/werk.js)
+        const rij = commWerk ? commWerk.berichten(c.id) : [];
+        const l = rij[rij.length - 1];
         kanalen.push({ soort: 'werk', titel: c.bedrijf + ' · ' + c.func, icoon: 'werk',
           laatste: l ? String(l.tekst).slice(0, 120) : 'Sollicitatie gestart.',
           at: l ? l.at : c.at, ongelezen: l && l.van !== 'sollicitant' ? 1 : 0, link: '/apps/app.html' });

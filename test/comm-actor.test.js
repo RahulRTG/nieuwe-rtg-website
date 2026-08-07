@@ -90,16 +90,36 @@ test('een ledensleutel met een dubbele punt erin valt om in plaats van een zaak 
 });
 
 test('ontleed leest elke vorm terug, en een onbekende ruimte is geen actor', () => {
-  assert.deepEqual(wie.ontleed('user-1'), { soort: 'lid', sleutel: 'user-1', code: null, staffId: null });
-  assert.deepEqual(wie.ontleed('zaak:AB12'), { soort: 'zaak', sleutel: 'zaak:AB12', code: 'AB12', staffId: null });
-  assert.deepEqual(wie.ontleed('mens:AB12:7'), { soort: 'mens', sleutel: 'mens:AB12:7', code: 'AB12', staffId: 7 });
-  assert.deepEqual(wie.ontleed('kantoor'), { soort: 'kantoor', sleutel: 'kantoor', code: null, staffId: null });
+  assert.deepEqual(wie.ontleed('user-1'), { soort: 'lid', sleutel: 'user-1', code: null, nummer: null });
+  assert.deepEqual(wie.ontleed('zaak:AB12'), { soort: 'zaak', sleutel: 'zaak:AB12', code: 'AB12', nummer: null });
+  assert.deepEqual(wie.ontleed('mens:AB12:7'), { soort: 'mens', sleutel: 'mens:AB12:7', code: 'AB12', nummer: 7 });
+  assert.deepEqual(wie.ontleed('kantoor'), { soort: 'kantoor', sleutel: 'kantoor', code: null, nummer: null });
   /* Een verzonnen ruimte levert null en geen half ingevulde actor: alles wat
      hierop leunt (mag deze sessie hierbij?) moet dan weigeren, niet gokken. */
   assert.equal(wie.ontleed('rechter:1'), null);
   assert.equal(wie.ontleed('mens:AB12'), null, 'een persoon zonder nummer is geen persoon');
   assert.equal(wie.ontleed(''), null);
   assert.equal(wie.ontleed(null), null);
+});
+
+/* De vierde soort kwam er later bij, en om een concrete reden: een
+   sollicitatie kan van een RTF-GEZINSPROFIEL komen (een jongere die via zijn
+   gezin solliciteert). Dat is geen lid -- het heeft geen ledensleutel en geen
+   codenaam -- maar het is wel de ene kant van een echt gesprek. Zonder deze
+   soort had de sollicitatiechat maar half kunnen verhuizen: leden wel,
+   gezinsprofielen niet. Een halve verhuizing is twee voorraden. */
+test('een gezinsprofiel is een eigen soort deelnemer, met zijn gezin in de sleutel', () => {
+  assert.equal(wie.gezin('fam7', 3), 'gezin:FAM7:3');
+  assert.deepEqual(wie.ontleed('gezin:FAM7:3'),
+    { soort: 'gezin', sleutel: 'gezin:FAM7:3', code: 'FAM7', nummer: 3 });
+  /* Net als bij een medewerker zit de CODE in de sleutel. Twee gezinnen met
+     allebei een profiel 3 zijn twee verschillende mensen, en zonder de code
+     zouden ze hetzelfde gesprek delen. */
+  assert.notEqual(wie.gezin('FAM7', 3), wie.gezin('FAM8', 3));
+  assert.equal(wie.ontleed('gezin:FAM7'), null, 'een profiel zonder nummer is geen profiel');
+  // en een gezinsprofiel hoort bij geen enkele ZAAK, dus deelt het niets met een team
+  assert.equal(wie.zelfdeZaak('gezin:FAM7:3', 'mens:FAM7:3'), false,
+    'een gezinsprofiel en een medewerker met dezelfde code gelden als dezelfde zaak');
 });
 
 test('zelfdeZaak vergelijkt de zaak en niet de tekst', () => {

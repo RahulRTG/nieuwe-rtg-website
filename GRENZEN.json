@@ -399,6 +399,7 @@
       "commBronnen",
       "commDm",
       "commGast",
+      "commWerk",
       "conciergeIntrek",
       "conciergeVerzoeken",
       "conciergeVraag",
@@ -1151,6 +1152,7 @@
       "coachRules",
       "comm",
       "commGast",
+      "commWerk",
       "controleerSom",
       "creator",
       "dagrapport",
@@ -1511,6 +1513,7 @@
       "tafelwensen"
     ],
     "werving": [
+      "commWerk",
       "loginFails",
       "noteFailedTry",
       "notifySupplier",
@@ -1520,6 +1523,7 @@
     "zakelijk": [
       "PRO",
       "Z",
+      "commWerk",
       "connectieTussen",
       "connectiesVan",
       "gedeeldeConnecties",

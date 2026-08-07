@@ -49,11 +49,14 @@ module.exports = (kern) => {
 
   /* Een gesprek openen: de berichten, wie er typt, en de stand.
 
-     EEN BRON OPENT NET ZO GOED. Deze kanalen wonen nog in hun eigen module
-     (kern/comm/bronnen.js), maar dat is een detail van de opslag en geen reden
-     om de lezer naar een andere app te sturen -- dan is de ene app voor die
-     kanalen weer de leeslijst die hij niet meer mocht zijn. De module levert
-     de berichten, deze route zet ze in dezelfde vorm. */
+     EEN BRON OPENT NIET MEER, en dat is goed nieuws. Er stonden vier kanalen
+     buiten de kern; het gastcontact en de sollicitatiechat zijn inmiddels echt
+     verhuisd en komen hier gewoon als gesprek binnen. Wat overblijft in
+     kern/comm/bronnen.js zijn twee LEESLIJSTEN -- de Berichtenbox van
+     MijnOverheid en het doorlopende gesprek met Rahul -- en die hebben allebei
+     een eigen scherm waar ze thuishoren. Vandaar dat open() daar null geeft en
+     deze tak de lezer netjes doorstuurt in plaats van een leeg venster te
+     tonen. */
   app.post('/api/comm/gesprek', auth, (req, res) => {
     if (geenGast(req, res)) return;
     try {

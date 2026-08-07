@@ -1,15 +1,17 @@
 /* ============== DE BRONNEN: wat er al was, in dezelfde inbox ==============
 
    De kern (./index.js) is het model waar alles naartoe hoort. Maar er staan al
-   gesprekken in dit huis die er niet in zitten: sollicitatie-chats, de
-   Berichtenbox van MijnOverheid en het doorlopende gesprek met Rahul zelf. Die
-   staan in hun eigen voorraden, met hun eigen vorm, en ze zijn niet stuk -- ze
-   horen alleen thuis in dezelfde lijst.
+   gesprekken in dit huis die er niet in zitten: de Berichtenbox van
+   MijnOverheid en het doorlopende gesprek met Rahul zelf. Die staan in hun
+   eigen voorraden, met hun eigen vorm, en ze zijn niet stuk -- ze horen alleen
+   thuis in dezelfde lijst.
 
-   DIT BESTAND KRIMPT, EN DAT IS DE BEDOELING. Het gastcontact met een zaak
-   stond hier ook; dat is inmiddels echt verhuisd (./gast.js) en dus hier weg.
-   De collegachat en de priveberichten hebben hier nooit gestaan om dezelfde
-   reden. Wat overblijft is wat nog niet over is.
+   DIT BESTAND IS GEKROMPEN, EN DAT IS DE BEDOELING. Er stonden er vier: het
+   gastcontact met een zaak en de sollicitatiechat zijn inmiddels echt verhuisd
+   (./gast.js, ./werk.js) en dus hier weg; de collegachat en de priveberichten
+   hebben hier om dezelfde reden nooit gestaan. Wat overblijft zijn twee
+   bronnen die je alleen LEEST -- en dat blijft waarschijnlijk zo: officiele
+   post is eenrichtingsverkeer en Rahul heeft zijn eigen scherm.
 
    TWEE MANIEREN OM DAT OP TE LOSSEN, en de keuze is hier belangrijk.
 
@@ -46,7 +48,7 @@
 
 const MAX_PER_BRON = 40;
 
-function maakBronnen({ db, codenaamVan, convOf, overheid, rtmail, werk }) {
+function maakBronnen({ db, codenaamVan, convOf, overheid, rtmail }) {
   const snij = (t, n) => String(t == null ? '' : t).slice(0, n || 140);
 
   /* Elke bron levert dezelfde vorm als comm.toonGesprek(), plus `extern: true`
@@ -99,25 +101,12 @@ function maakBronnen({ db, codenaamVan, convOf, overheid, rtmail, werk }) {
     } catch (e) { return []; }
   }
 
-  /* 3. De sollicitatie-chats. Een gesprek met een bedrijf over een vacature is
-        een zakelijk gesprek, en dus hoort het in de la Zaken -- niet in een
-        tabblad binnen de werk-app waar je het alleen vindt als je er al was. */
-  function sollicitaties(mij) {
-    const uit = [];
-    try {
-      for (const c of Object.values(db.data.applyChats || {})) {
-        if (!c.applicant || c.applicant.kind !== 'rtg' || c.applicant.key !== mij) continue;
-        const b = (c.berichten || [])[(c.berichten || []).length - 1];
-        uit.push(rij({
-          id: 'werk:' + (c.id || c.vacId), soort: 'business', lade: 'zaken',
-          titel: (c.bedrijf || 'Werkgever') + ' · ' + (c.func || 'sollicitatie'),
-          laatste: b ? b.tekst : 'Nog geen bericht.', at: b ? b.at : null,
-          bronnaam: 'Werk', link: '/apps/app.html'
-        }));
-      }
-    } catch (e) {}
-    return uit.slice(0, MAX_PER_BRON);
-  }
+  /* 3. DE SOLLICITATIECHAT STOND HIER, EN IS WEG -- ook verhuisd.
+
+        Hij woont sinds kern/comm/werk.js in de kern, met de zaak als
+        deelnemer en de sollicitant (een lid of een gezinsprofiel) ertegenover.
+        Hij komt dus al via comm.inbox() binnen; hier ook nog eens zou hem
+        dubbel in de lijst zetten. */
 
   /* 4. HET GASTCONTACT STOND HIER, EN IS WEG -- want het is verhuisd.
 
@@ -135,53 +124,28 @@ function maakBronnen({ db, codenaamVan, convOf, overheid, rtmail, werk }) {
      mee. Vandaar dat elke bron zijn eigen try/catch heeft en een lege lijst
      teruggeeft in plaats van de hele inbox mee te slepen. */
   function alles(mij, account) {
-    return [].concat(rahul(mij, account), overheidBox(mij), sollicitaties(mij));
+    return [].concat(rahul(mij, account), overheidBox(mij));
   }
 
-  /* ---------------- open en beantwoorden, via de module ----------------
+  /* ---------------- openen: alleen nog LEZEN ----------------
 
-     De id draagt zijn herkomst ('bron:werk:123'), dus hier is precies te zien
-     welke module het is en welk gesprek. Wat een bron NIET kan, zegt hij ook:
-     de Berichtenbox van de overheid is eenrichtingsverkeer en Rahul heeft zijn
-     eigen scherm. Een invoerveld tonen bij iets waar je niet op kunt
-     antwoorden is erger dan geen invoerveld. */
+     Hier stond het doorgeven naar de module die een bron beheerde: de app
+     kreeg te horen WAAR een antwoord heen moest ('/api/member/apply/chat/send'
+     bijvoorbeeld) en postte daar rechtstreeks naartoe. Dat was de goede vorm
+     zolang die voorraden nog buiten de kern stonden.
+
+     Ze staan er niet meer. Het gastcontact en de sollicitatiechat zijn allebei
+     echt verhuisd (./gast.js, ./werk.js) en komen nu als gewoon gesprek uit de
+     kern. Wat overblijft zijn twee bronnen die je alleen kunt LEZEN, en dat is
+     geen tekortkoming: officiele post van de overheid is eenrichtingsverkeer,
+     en Rahul heeft zijn eigen scherm. Een invoerveld tonen bij iets waar je
+     niet op kunt antwoorden is erger dan geen invoerveld. */
   function ontleed(bronId) {
     const kaal = String(bronId || '').replace(/^bron:/, '');
     const i = kaal.indexOf(':');
     return { soort: i < 0 ? kaal : kaal.slice(0, i), sleutel: i < 0 ? '' : kaal.slice(i + 1) };
   }
-
-  /* De berichten in de vorm van de kern, zodat de app er geen tweede
-     tekenroutine voor nodig heeft. */
-  const alsBericht = (m, mij) => ({
-    id: m.id || null, at: m.at, vanMij: !!m.vanMij, van: m.van || '',
-    tekst: m.tekst == null ? null : String(m.tekst), soort: 'tekst',
-    bijlage: null, antwoordOp: null, reacties: [], gewijzigd: null, was: null,
-    lang: m.lang || null, weg: null
-  });
-
-  function open(mij, bronId, lang) {
-    const b = ontleed(bronId);
-    if (b.soort === 'werk' && werk) {
-      const chat = (db.data.applyChats || {})[b.sleutel];
-      if (!chat || !chat.applicant || chat.applicant.key !== mij) return null;
-      return {
-        titel: (chat.bedrijf || 'Werkgever') + ' \u00b7 ' + (chat.func || 'sollicitatie'),
-        /* Waar een antwoord heen moet: de eigen route van de werk-module, met
-           de velden die zij verwacht. De app post daar rechtstreeks naartoe --
-           zo blijft die route de enige ingang op deze voorraad, met al haar
-           controles, en staat er hier niets nagebouwd. */
-        antwoord: { pad: '/api/member/apply/chat/send', vast: { id: b.sleutel }, veld: 'text' },
-        berichten: (chat.berichten || []).map((m) => alsBericht({
-          at: m.at, vanMij: m.van === 'sollicitant', van: m.van === 'sollicitant' ? 'Ik' : (chat.bedrijf || 'Werkgever'),
-          tekst: m.tekst, lang: m.lang
-        }, mij))
-      };
-    }
-    /* De rest is te lezen in de lijst en verder niet: officiele post is
-       eenrichtingsverkeer, en Rahul heeft zijn eigen scherm. */
-    return null;
-  }
+  const open = () => null;
 
   return { alles, open, ontleed };
 }

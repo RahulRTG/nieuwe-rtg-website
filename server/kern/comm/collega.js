@@ -126,7 +126,7 @@ function maakCommCollega({ db, save, comm }) {
      collegachat.js en de routes niets merken. `van` blijft het NUMMER en niet
      de sleutel: het scherm vergelijkt hem met het eigen staffId, en dat
      omzetten zou een verhuizing van de opslag zichtbaar maken in de UI. */
-  const nummerVan = (sleutel) => { const a = wie.ontleed(sleutel); return a ? a.staffId : null; };
+  const nummerVan = (sleutel) => { const a = wie.ontleed(sleutel); return a ? a.nummer : null; };
   const oudeVorm = (m, naamVan) => ({
     id: m.id, van: nummerVan(m.van), naam: (naamVan && naamVan(nummerVan(m.van))) || '',
     text: m.tekst || '', at: m.at

@@ -41,6 +41,14 @@ const BELEID = [
     vorm: 'mapVanLijsten', datum: 'at', waarom: 'een jaar na indienen; daarna heeft niemand er nog iets aan' },
   { tak: 'guestChats', label: 'gastgesprekken met een zaak', dagen: 365, grond: 'nodig',
     vorm: 'mapVanLijsten', datum: 'at', waarom: 'servicegesprek over een bezoek van vorig jaar is voorbij' },
+  /* De sollicitatiechats. Deze tak had NOOIT een termijn -- ook niet voor de
+     verhuizing -- terwijl de sollicitatie waar hij bij hoort er wel een had
+     (een jaar, hierboven). Dat is de scheefste vorm die er is: het dossier
+     verloopt en het gesprek erover blijft eeuwig staan. Dezelfde termijn dus
+     als de sollicitatie zelf; de berichten wonen sinds de verhuizing in
+     commBerichten en verlopen op hun eigen twee jaar. */
+  { tak: 'applyChats', label: 'sollicitatiegesprekken (schakel)', dagen: 365, grond: 'nodig',
+    vorm: 'mapVanLijsten', datum: 'at', waarom: 'volgt de sollicitatie waar hij bij hoort' },
   /* DE GESPREKKEN VAN HET PLATFORM (kern/comm). Twee takken, want een gesprek
      en zijn berichten staan apart: commGesprekken draagt de deelnemers en het
      tijdstip van het laatste bericht, commBerichten de berichten zelf.

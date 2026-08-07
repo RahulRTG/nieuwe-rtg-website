@@ -486,19 +486,18 @@
     var tekst = veld.value.trim();
     if (!tekst || !staat.open) return;
     $('#stuur').disabled = true;
-    /* Een gesprek uit een bron heeft zijn eigen verstuurweg: de server zegt in
-       `antwoord` welke route en met welke velden. We posten daar rechtstreeks
-       naartoe, zodat de module de enige ingang op haar eigen voorraad blijft. */
-    var g = staat.gesprek;
-    var heen = (g && g.antwoord)
-      ? fetch(g.antwoord.pad, { method: 'POST',
-          headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
-          body: JSON.stringify(Object.assign({}, g.antwoord.vast,
-            (function (o) { o[g.antwoord.veld] = tekst; return o; })({}))) })
-          .then(function (r) { return r.json().catch(function () { return {}; })
-            .then(function (d) { if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; }); })
-      : api('/stuur', { id: staat.open, tekst: tekst, antwoordOp: staat.antwoordOp });
-    heen
+    /* HIER STOND EEN TWEEDE VERSTUURWEG, voor gesprekken die nog buiten de kern
+       woonden: de server gaf in `antwoord` mee naar welke route van welke
+       module dit bericht moest, en de app postte daar rechtstreeks naartoe.
+       Dat was de goede vorm zolang die voorraden er nog waren.
+
+       Ze zijn er niet meer -- het gastcontact en de sollicitatiechat zijn
+       verhuisd naar de kern (server/kern/comm/gast.js en werk.js), en de twee
+       bronnen die overblijven zijn leeslijsten met een eigen scherm. Er is dus
+       nog EEN verstuurweg, en dat is precies wat "communicatie is
+       infrastructuur" hoort te betekenen. Een tak laten staan die niets meer
+       kan bereiken is een tak die niemand meer nakijkt. */
+    api('/stuur', { id: staat.open, tekst: tekst, antwoordOp: staat.antwoordOp })
       .then(function () {
         veld.value = ''; veld.style.height = 'auto';
         staat.antwoordOp = null; $('#antwoordop').hidden = true;

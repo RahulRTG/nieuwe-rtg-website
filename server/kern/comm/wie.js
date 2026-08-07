@@ -17,7 +17,14 @@
        lid       user-12          de kale ledensleutel, ongewijzigd
        zaak      zaak:AB12        de zaak als geheel; het team deelt hem
        mens      mens:AB12:7      een persoon binnen die zaak, op staffId
+       gezin     gezin:FAM7:3     een profiel binnen een RTF-gezin
        kantoor   kantoor          de backoffice van RTG
+
+   DE VIERDE KWAM ER LATER BIJ, en om een concrete reden: een sollicitatie kan
+   van een RTF-gezinsprofiel komen (een jongere die via zijn gezin solliciteert
+   -- geen lid, geen codenaam, wel de ene kant van een echt gesprek). Zonder
+   die soort had de sollicitatiechat maar half kunnen verhuizen: leden wel,
+   gezinsprofielen niet, en een halve verhuizing is twee voorraden.
 
    Een lid houdt zijn KALE sleutel, en dat is geen slordigheid maar de reden
    dat deze verbouwing zonder migratie kon: zo staan de bestaande gesprekken,
@@ -40,7 +47,7 @@
    de deelnemerslijst geen poort meer maar een suggestie. */
 'use strict';
 
-const RUIMTES = ['zaak', 'mens', 'kantoor'];
+const RUIMTES = ['zaak', 'mens', 'gezin', 'kantoor'];
 
 const codeVan = (c) => String(c || '').trim().toUpperCase();
 
@@ -55,6 +62,7 @@ function lid(key) {
 }
 const zaak = (code) => 'zaak:' + codeVan(code);
 const mens = (code, staffId) => 'mens:' + codeVan(code) + ':' + Number(staffId);
+const gezin = (code, profielId) => 'gezin:' + codeVan(code) + ':' + Number(profielId);
 const KANTOOR = 'kantoor';
 
 /* Terug naar de onderdelen. Een onbekende ruimte levert NULL en geen half
@@ -63,19 +71,24 @@ const KANTOOR = 'kantoor';
 function ontleed(sleutel) {
   const s = String(sleutel == null ? '' : sleutel);
   if (!s) return null;
-  if (s === KANTOOR) return { soort: 'kantoor', sleutel: s, code: null, staffId: null };
+  if (s === KANTOOR) return { soort: 'kantoor', sleutel: s, code: null, nummer: null };
   const i = s.indexOf(':');
-  if (i < 0) return { soort: 'lid', sleutel: s, code: null, staffId: null };
+  if (i < 0) return { soort: 'lid', sleutel: s, code: null, nummer: null };
   const ruimte = s.slice(0, i);
   if (!RUIMTES.includes(ruimte)) return null;
   const rest = s.slice(i + 1).split(':');
   if (ruimte === 'zaak') {
-    return rest.length === 1 && rest[0] ? { soort: 'zaak', sleutel: s, code: rest[0], staffId: null } : null;
+    return rest.length === 1 && rest[0] ? { soort: 'zaak', sleutel: s, code: rest[0], nummer: null } : null;
   }
-  if (ruimte === 'mens') {
+  /* 'mens' en 'gezin' hebben dezelfde vorm (code + nummer) en worden dus ook
+     hetzelfde gelezen. Het VELD heet `nummer` en niet `staffId`: bij een
+     gezinsprofiel is het geen personeelsnummer, en een naam die voor de ene
+     soort klopt en voor de andere liegt, is precies hoe een verkeerde
+     vergelijking er later normaal uitziet. */
+  if (ruimte === 'mens' || ruimte === 'gezin') {
     const id = Number(rest[1]);
     if (rest.length !== 2 || !rest[0] || !Number.isFinite(id)) return null;
-    return { soort: 'mens', sleutel: s, code: rest[0], staffId: id };
+    return { soort: ruimte, sleutel: s, code: rest[0], nummer: id };
   }
   return null;
 }
@@ -86,9 +99,15 @@ const isLid = (sleutel) => { const a = ontleed(sleutel); return !!a && a.soort =
    naam van een medewerker mag zien (zie ./index.js, toonBericht): binnen het
    team wel, daarbuiten nooit. Twee leden horen bij GEEN zaak -- dus false, en
    niet "allebei null dus gelijk", wat de vergelijking stil zou omkeren. */
+const ZAKELIJK = ['zaak', 'mens'];
 function zelfdeZaak(a, b) {
   const x = ontleed(a), y = ontleed(b);
   if (!x || !y || !x.code || !y.code) return false;
+  /* Alleen een zaak en haar mensen horen bij een ZAAK. Een gezinsprofiel
+     draagt ook een code, maar dat is een gezinscode -- die vergelijken met een
+     bedrijfscode zou betekenen dat gezin FAM7 en bedrijf FAM7 elkaars team
+     zijn. Een toevallige gelijke tekst is geen gedeeld verband. */
+  if (!ZAKELIJK.includes(x.soort) || !ZAKELIJK.includes(y.soort)) return false;
   return x.code === y.code;
 }
 
@@ -125,13 +144,14 @@ function vanZaak(req) {
 
    De opzoekers komen van buiten (kernlaag4), zodat dit bestand niets weet van
    db, accounts of de leverancierskast. */
-function maakNaam({ codenaamVan, zaakNaam, mensNaam }) {
+function maakNaam({ codenaamVan, zaakNaam, mensNaam, gezinNaam }) {
   return function naamVan(sleutel) {
     const a = ontleed(sleutel);
     if (!a) return null;
     if (a.soort === 'lid') return codenaamVan ? codenaamVan(a.sleutel) : null;
     if (a.soort === 'zaak') return (zaakNaam ? zaakNaam(a.code) : null) || 'Een zaak';
-    if (a.soort === 'mens') return (mensNaam ? mensNaam(a.code, a.staffId) : null) || 'Een collega';
+    if (a.soort === 'mens') return (mensNaam ? mensNaam(a.code, a.nummer) : null) || 'Een collega';
+    if (a.soort === 'gezin') return (gezinNaam ? gezinNaam(a.code, a.nummer) : null) || 'Een gezinslid';
     return 'RTG';
   };
 }
@@ -149,10 +169,14 @@ function maakSein({ sseToCustomer, sseToSupplier, sseToOffice }) {
     if (!a) return;
     if (a.soort === 'lid') return sseToCustomer && sseToCustomer(a.sleutel, event, data);
     if (a.soort === 'kantoor') return sseToOffice && sseToOffice(event, data);
+    /* Een gezinsprofiel heeft geen open lijn in dit huis: de RTF-app haalt
+       zelf op. Niets sturen is hier het eerlijke antwoord, en beter dan het
+       naar de leverancierstroom sturen omdat de vorm toevallig lijkt. */
+    if (a.soort === 'gezin') return;
     /* Zaak en mens luisteren allebei op de stroom van hun zaak; de app aan die
        kant kijkt zelf of het bericht voor het team of voor hem is. */
     return sseToSupplier && sseToSupplier(a.code, event, data);
   };
 }
 
-module.exports = { RUIMTES, KANTOOR, lid, zaak, mens, ontleed, isLid, zelfdeZaak, vanZaak, maakNaam, maakSein };
+module.exports = { RUIMTES, KANTOOR, lid, zaak, mens, gezin, ontleed, isLid, zelfdeZaak, vanZaak, maakNaam, maakSein };

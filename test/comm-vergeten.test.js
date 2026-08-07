@@ -18,7 +18,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const crypto = require('crypto');
 const { maakComm } = require('../server/kern/comm');
-const { wisGesprekkenVan } = require('../server/kern/vergeten/gesprekken');
+const { wisGesprekkenVan, wisSollicitatiechats } = require('../server/kern/vergeten/gesprekken');
 
 function opzet() {
   const db = { data: {} };
@@ -107,6 +107,43 @@ test('een lid verdwijnt ook uit een gesprek met een zaak -- en de zaak houdt haa
   assert.deepEqual(over.deelnemers, ['zaak:AB12'], 'de zaak is uit haar eigen gesprek gezet');
   assert.deepEqual((db.data.commBerichten[g.id] || []).map((m) => m.tekst), ['tot elf uur'],
     'de zaak is haar eigen antwoord kwijt, of het bericht van het lid staat er nog');
+});
+
+/* De sollicitatiechat had dit gat al voor de verhuizing, en hij bleef staan
+   omdat hij op een RECORD zit en niet op een bericht. vergeten/anoniem.js
+   haalt de persoon netjes uit db.data.applications -- naam, contact, cv,
+   codenaam, sleutel -- maar db.data.applyChats[id].applicant droeg diezelfde
+   sleutel en naam nog een keer, en die tak kwam er niet in voor.
+
+   Het gesprek zelf is sinds de verhuizing wel gedekt (het lid is deelnemer,
+   dus wisGesprekkenVan haalt hem eruit). Wat overbleef was de SCHAKEL: het
+   record dat zegt wie er solliciteerde. Een bedrijf dat zijn administratie
+   houdt, hoort dat te doen zonder te weten wie het was. */
+test('een sollicitatiechat draagt na vergetelheid geen sleutel en geen naam meer', () => {
+  const db = { data: {
+    applyChats: {
+      'app-1': { id: 'app-1', supplierCode: 'KIKUNOI', func: 'Bediening', bedrijf: 'Sal de Mar',
+        applicant: { kind: 'rtg', key: 'weg', naam: 'Amberen Vos' }, berichten: [] },
+      'app-2': { id: 'app-2', supplierCode: 'KIKUNOI', func: 'Bar',
+        applicant: { kind: 'rtg', key: 'blijft', naam: 'Noordelijke Ster' }, berichten: [] }
+    }
+  } };
+  const comm = maakComm({ db, save() {}, crypto, codenaamVan: (k) => k });
+  const g = comm.gesprekMaak({ soort: 'business', deelnemers: ['weg', 'zaak:KIKUNOI'],
+    meta: { sleutel: 'werk:app-1' } });
+  comm.bericht({ gesprekId: g.id, van: 'weg', tekst: 'ik wil graag solliciteren' });
+
+  wisGesprekkenVan(db, 'weg');
+  wisSollicitatiechats(db, 'weg');
+
+  assert.ok(!JSON.stringify(db.data).includes('"weg"'),
+    'de sleutel van het verwijderde lid staat nog in een sollicitatiechat');
+  assert.equal(db.data.applyChats['app-1'].applicant.naam, '(op verzoek verwijderd)');
+  /* De zaak houdt haar administratie: de sollicitatie zelf blijft, met vak en
+     bedrijf. Alleen wie het was, is weg. */
+  assert.equal(db.data.applyChats['app-1'].func, 'Bediening');
+  assert.equal(db.data.applyChats['app-2'].applicant.naam, 'Noordelijke Ster',
+    'de sollicitatie van een ander lid is meegewist');
 });
 
 test('een database zonder gesprekken laat niets omvallen', () => {

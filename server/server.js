@@ -1231,7 +1231,11 @@ const pinSlot = require('./pinslot').maakPinSlot({ beveilig });
    dragen db, i18n, mail, LANDEN en de leverancier-/realtime-helpers.
    findSupplier, sseToSupplier, notifySupplier en notify zijn hoisted functies. */
 const { trChat, chatApplicant, ensureApplyChat, applyChatPubliek, applyChatVertaald, chatStuur, meldWerkgever, openVacatures, werkgeverSollicitatie, notifyApplicant } =
-  maakWerk({ db, save, i18n, mail, LANDEN, findSupplier, sseToSupplier, sseToCustomer, notifySupplier, notify });
+  maakWerk({ db, save, i18n, mail, LANDEN, findSupplier, sseToSupplier, sseToCustomer, notifySupplier, notify,
+    /* Late binding: de communicatiekern wordt pas in kernlaag4 gebouwd, ver na
+       deze regel. Een verwijzing zou hier voor altijd undefined zijn en de
+       sollicitatiechat stil op de oude tak zetten. */
+    commWerk: () => kern.commWerk });
 
 /* De leverancier-laag (publieke weergave, dashboard/supplierState, kassa,
    gastchat, kamers/HK, deuren, tickets, De Salon, AI-zoekhulpjes, zaak-opties)

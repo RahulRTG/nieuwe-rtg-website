@@ -63,4 +63,30 @@ function wisGesprekkenVan(db, key) {
   return { gesprekkenWeg, berichtenWeg };
 }
 
-module.exports = { wisGesprekkenVan };
+/* DE SCHAKEL VAN EEN SOLLICITATIE. db.data.applyChats[id] is sinds de
+   verhuizing geen berichtenvoorraad meer maar het record dat een sollicitatie
+   aan haar gesprek koppelt -- en dat record draagt wie de sollicitant is.
+
+   Dat gat is ouder dan de verhuizing. vergeten/anoniem.js haalde de persoon
+   netjes uit db.data.applications (naam, contact, cv, codenaam, sleutel), maar
+   deze tweede tak droeg diezelfde sleutel en naam nog een keer, en niemand
+   kwam er langs. Het gesprek zelf is wel gedekt: het lid is deelnemer, dus
+   wisGesprekkenVan() haalt hem eruit.
+
+   Dezelfde lezing als bij de sollicitaties zelf: het bedrijf houdt zijn
+   administratie -- welk vak, welke datum -- maar zonder iets dat naar deze
+   persoon herleidbaar is. Het record blijft dus staan; de persoon gaat eruit. */
+function wisSollicitatiechats(db, key) {
+  if (!db || !db.data || !key) return 0;
+  let raak = 0;
+  for (const chat of Object.values(db.data.applyChats || {})) {
+    const a = chat && chat.applicant;
+    if (!a || a.key !== key) continue;
+    a.key = null;
+    a.naam = '(op verzoek verwijderd)';
+    raak++;
+  }
+  return raak;
+}
+
+module.exports = { wisGesprekkenVan, wisSollicitatiechats };

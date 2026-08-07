@@ -25,8 +25,10 @@
    precies de kanalen die verhuisd waren niet meer -- en dat is de stilste fout
    van allemaal: een zoekopdracht die niets vindt ziet er hetzelfde uit als een
    zoekopdracht zonder treffers. */
-module.exports = ({ db, save, socialConnecties, dmSleutel, codenaamVan, rtmail, overheid, anthropic, commDm }) => {
+module.exports = ({ db, save, socialConnecties, dmSleutel, codenaamVan, rtmail, overheid, anthropic, commDm, commWerk }) => {
   const DM = () => (typeof commDm === 'function' ? commDm() : null);
+  // zelfde late binding als DM: de kern bestaat nog niet op het moment van mounten
+  const WERK = () => (typeof commWerk === 'function' ? commWerk() : null);
     const MAX_TREFFERS = 40;
   const MAX_KANALEN = 100;       // gesprekken die een zoekopdracht doorloopt
   const MAX_PER_KANAAL = 300;    // berichten per gesprek (dat is ook de bewaargrens)
@@ -101,7 +103,9 @@ module.exports = ({ db, save, socialConnecties, dmSleutel, codenaamVan, rtmail, 
     try {
       for (const c of Object.values(db.data.applyChats || {})) {
         if (!c.applicant || c.applicant.kind !== 'rtg' || c.applicant.key !== mij) continue;
-        for (const b of (c.berichten || [])) {
+        // de berichten staan sinds de verhuizing in de kern (kern/comm/werk.js)
+        const W = WERK();
+        for (const b of (W ? W.berichten(c.id) : [])) {
           if (!raak(b.tekst, naald)) continue;
           uit.push({ soort: 'werk', id: 'werk:' + (c.id || c.vacId), titel: c.bedrijf + ' - ' + c.func,
             tekst: snip(b.tekst, naald), at: b.at, vanMij: b.van === 'sollicitant', link: '/apps/app.html' });
@@ -137,7 +141,8 @@ module.exports = ({ db, save, socialConnecties, dmSleutel, codenaamVan, rtmail, 
       const c = Object.values(db.data.applyChats || {})
         .find(x => String(x.id || x.vacId) === sleutel && x.applicant && x.applicant.key === mij);
       if (!c) return null;
-      return { titel: c.bedrijf + ' - ' + c.func, regels: (c.berichten || []).slice(-DRAAD_MAX)
+      const W = WERK();
+      return { titel: c.bedrijf + ' - ' + c.func, regels: (W ? W.berichten(c.id) : []).slice(-DRAAD_MAX)
         .map(b => (b.van === 'sollicitant' ? 'Ik' : c.bedrijf) + ': ' + String(b.tekst || '')) };
     }
     return null;

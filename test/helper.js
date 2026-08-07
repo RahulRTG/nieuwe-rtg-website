@@ -147,6 +147,9 @@ async function startEens(opts) {
        zegt hij voorgoed "in orde" -- precies de vorm waar LAT-regel 10 voor
        waarschuwt. */
     env: {
+      // toetsen doorlopen de hele herstelstroom; op een echte server staat
+      // deze vlag uit en komt er nooit een link of code in een antwoord
+      RTG_DEV_LINKS: '1',
       ...process.env, NODE_ENV: 'test',
       RTG_TOETS: path.basename(String(process.argv[1] || 'onbekend')),
       ...(eigenMap ? { RTG_DATA_DIR: eigenMap } : {}),

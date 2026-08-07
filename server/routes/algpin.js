@@ -5,16 +5,9 @@
    tegen raden zit in kern/algpin.js. */
 module.exports = (kern) => {
   const { app, auth, accounts, appUrl, mail, pinInfo, pinZet, pinCheck, pinHerstelStart, pinHerstelZet } = kern;
-  /* Zonder SMTP geven we de link in het antwoord terug, net als het
-     wachtwoordherstel -- maar ALLEEN aan een verzoek van deze machine zelf.
-     Hier stond `!process.env.RTG_PRODUCTION`, en die naam bestaat niet eens
-     in dit project (de vlag heet NODE_ENV=production). Een controle op een
-     variabele die nooit gezet wordt, staat altijd open. */
-  const vanDezeMachine = (req) => {
-    const ip = String((req && req.ip) || '').replace(/^::ffff:/, '');
-    return ip === '127.0.0.1' || ip === '::1' || ip === '';
-  };
-  const devVelden = (req) => !(mail && mail.configured) && vanDezeMachine(req);
+  // zelfde regel als bij het wachtwoordherstel: uit, tenzij RTG_DEV_LINKS=1
+  // bewust aanstaat. Zie server/routes/auth.js voor waarom dat zo hoort.
+  const devVelden = () => process.env.RTG_DEV_LINKS === '1';
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const echtAccount = (req, res) => {
     if (req.session.tier === 'guest' || !req.session.account) {

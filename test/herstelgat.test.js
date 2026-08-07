@@ -8,14 +8,14 @@
    een willekeurig e-mailadres de herstel-link EN de code ophalen, en daarmee elk
    account overnemen. Nagemeten met een curl van buiten; het werkte.
 
-   Een vlag die je moet onthouden is geen slot. Het hangt nu aan het IP van het
-   verzoek: alleen deze machine krijgt de velden.
+   De eerste reparatie hing het aan het IP van het verzoek, en die was OOK fout:
+   de gateway (server/trio.js) stuurt alles lokaal door, dus de server ziet elk
+   verzoek als lokaal. Van buiten gemeten bleef het gat open. Een controle die je
+   niet van buitenaf naprikt is een aanname.
 
-   DEZE TOETS BEWAAKT PRECIES DAT. Hij draait zelf op localhost -- dus hij ziet
-   de dev-velden WEL, en dat hoort ook: anders zou hij niets bewijzen over het
-   verschil. Het verschil zelf toetsen we door het IP te vervalsen met een
-   X-Forwarded-For, want zo komt een verzoek van buiten binnen als er een proxy
-   voor staat. */
+   Nu staat het om: alleen met RTG_DEV_LINKS=1 komen de velden mee. Deze toets
+   bewaakt precies dat, en wel van beide kanten -- met de vlag horen ze er te
+   zijn (anders is de stroom nergens te doorlopen) en zonder de vlag nooit. */
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -30,38 +30,37 @@ const post = (base) => async (pad, body, kop) => {
   return { status: r.status, body: await r.json().catch(() => ({})) };
 };
 
-test('de herstel-link komt nooit terug bij een verzoek dat niet van deze machine komt', async () => {
-  // TRUST_PROXY aan: dan telt X-Forwarded-For als het echte adres, precies zoals
-  // achter een doorgeefluik in productie
-  const srv = await startServer({ env: { SMTP_URL: '', TRUST_PROXY: '1' } });
+test('met RTG_DEV_LINKS aan is de herstelstroom lokaal te doorlopen', async () => {
+  const srv = await startServer({ env: { SMTP_URL: '' } });   // helper zet RTG_DEV_LINKS=1
   const p = post(srv.base);
   try {
     const reg = await p('/api/auth/register', { name: 'Gat Lid', email: 'gatlid@x.nl', phone: '0612345788',
       password: 'geheim123', geboortedatum: '1990-01-01', pasApp: 'rtg' });
     assert.ok(reg.body.token, 'registreren lukte: ' + JSON.stringify(reg.body).slice(0, 140));
 
-    // van deze machine: de velden mogen er zijn, anders werkt lokaal niets
-    const eigen = await p('/api/auth/forgot', { email: 'gatlid@x.nl' });
-    assert.equal(eigen.status, 200);
-    assert.ok(eigen.body.devResetUrl, 'lokaal hoort de link er wel te zijn, anders is de stroom niet te doorlopen');
-
-    // van buiten: geen link, geen code, en verder exact hetzelfde antwoord
-    const vreemd = await p('/api/auth/forgot', { email: 'gatlid@x.nl' }, { 'X-Forwarded-For': '203.0.113.9' });
-    assert.equal(vreemd.status, 200, 'het antwoord blijft gelijk: geen bestaan lekken');
-    assert.equal(vreemd.body.devResetUrl, undefined, 'een vreemde krijgt de herstel-link NIET');
-    assert.equal(vreemd.body.devCode, undefined, 'een vreemde krijgt de telefooncode NIET');
-    assert.ok(!JSON.stringify(vreemd.body).includes('reset='),
-      'er hoort nergens een reset-sleutel in het antwoord te staan: ' + JSON.stringify(vreemd.body).slice(0, 160));
+    // met de vlag aan: de velden mogen er zijn, anders werkt lokaal niets
+    const met = await p('/api/auth/forgot', { email: 'gatlid@x.nl' });
+    assert.equal(met.status, 200);
+    assert.ok(met.body.devResetUrl, 'met de vlag hoort de link er te zijn, anders is de stroom niet te doorlopen');
   } finally { stop(srv.child); }
 });
 
-test('hetzelfde geldt voor de bevestigingslink bij registreren', async () => {
-  const srv = await startServer({ env: { SMTP_URL: '', TRUST_PROXY: '1' } });
+/* De stand die een echte server heeft: de vlag NIET gezet. Dit is de toets die
+   het gat zou hebben gevangen, en die er niet was. */
+test('zonder RTG_DEV_LINKS komt er nooit een link of code in een antwoord', async () => {
+  const srv = await startServer({ env: { SMTP_URL: '', RTG_DEV_LINKS: '' } });
   const p = post(srv.base);
   try {
-    const vreemd = await p('/api/auth/register', { name: 'Van Buiten', email: 'vanbuiten@x.nl', phone: '0612345799',
-      password: 'geheim123', geboortedatum: '1990-01-01', pasApp: 'rtg' }, { 'X-Forwarded-For': '203.0.113.9' });
-    assert.ok(vreemd.body.token, 'registreren lukt gewoon: ' + JSON.stringify(vreemd.body).slice(0, 140));
-    assert.equal(vreemd.body.devVerifyUrl, undefined, 'de bevestigingslink hoort niet naar buiten te gaan');
+    const reg = await p('/api/auth/register', { name: 'Zonder Vlag', email: 'zondervlag@x.nl', phone: '0612345799',
+      password: 'geheim123', geboortedatum: '1990-01-01', pasApp: 'rtg' });
+    assert.ok(reg.body.token, 'registreren lukt gewoon: ' + JSON.stringify(reg.body).slice(0, 140));
+    assert.equal(reg.body.devVerifyUrl, undefined, 'de bevestigingslink hoort er niet in te staan');
+
+    const v = await p('/api/auth/forgot', { email: 'zondervlag@x.nl' });
+    assert.equal(v.status, 200, 'het antwoord blijft gelijk: geen bestaan lekken');
+    assert.equal(v.body.devResetUrl, undefined, 'de herstel-link hoort er niet in te staan');
+    assert.equal(v.body.devCode, undefined, 'de telefooncode hoort er niet in te staan');
+    assert.ok(!/reset=|devCode/.test(JSON.stringify(v.body)),
+      'nergens een sleutel of code: ' + JSON.stringify(v.body).slice(0, 160));
   } finally { stop(srv.child); }
 });

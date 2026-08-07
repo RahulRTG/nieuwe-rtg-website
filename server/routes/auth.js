@@ -34,27 +34,27 @@ module.exports = (kern) => {
   const PAS_FOUT = 'Deze inloggegevens horen bij een andere pas. Open de app van uw eigen pas via rtg.example/apps.';
   // e-maillinks (bevestigen/herstellen) landen in de pas-app van het account
   const pasAppVan = (tier) => tier === 'lifestyle' || tier === 'business' ? tier : 'rtg';
-  /* Zonder SMTP geven we de herstel-link en de telefooncode in het antwoord
-     terug (dev-velden), zodat lokaal en in tests de hele flow werkt.
+  /* DE HERSTEL-LINK IN HET ANTWOORD: UIT, TENZIJ IEMAND HEM BEWUST AANZET.
 
-     DIT HING AAN `!PRODUCTION`, EN DAT WAS EEN GAT. NODE_ENV=production is een
-     vlag die iemand moet zetten, en op deze machine was hij vergeten -- terwijl
-     de server gewoon op het open internet stond en geen SMTP had. Gevolg: wie
-     dan ook kon POSTen naar /api/auth/forgot met een willekeurig adres en kreeg
-     de herstel-link EN de code terug. Dat is elk account op deze server, ook de
-     eigenaar. Nagemeten met een curl vanaf buiten; het werkte.
+     Zonder SMTP geeft deze route de herstel-link en de telefooncode terug in het
+     antwoord, zodat de stroom lokaal en in toetsen te doorlopen is. Dat hing aan
+     `!PRODUCTION && !mail.configured` -- twee dingen die WAAR zijn zodra iemand
+     iets vergeet. Op de echte server was NODE_ENV niet gezet en was er geen post
+     ingesteld, en die server staat op het open internet: een POST met een
+     willekeurig adres leverde de link EN de code op. Elk account was daarmee over
+     te nemen, de eigenaar incluis. Nagemeten met een curl van buiten.
 
-     Een vlag die je moet onthouden is geen slot. Daarom hangt het nu aan iets
-     wat niet vergeten kan worden: het verzoek moet van deze machine zelf komen.
-     Wie op zijn eigen laptop ontwikkelt merkt niets; wie van buiten aanklopt
-     krijgt niets, ook niet als de vlag verkeerd staat en er geen post is
-     ingesteld. Dat de dev-velden ook in productie uit blijven, volgt daar
-     vanzelf uit -- die eis staat niet langer op zichzelf. */
-  const VAN_DEZE_MACHINE = (req) => {
-    const ip = String((req && req.ip) || '').replace(/^::ffff:/, '');
-    return ip === '127.0.0.1' || ip === '::1' || ip === '';
-  };
-  const DEV_VELDEN = (req) => !PRODUCTION && !mail.configured && VAN_DEZE_MACHINE(req);
+     De reparatie erna was OOK fout, en dat is het leerzame deel: ik hing hem aan
+     "het verzoek moet van deze machine komen". Maar de gateway (server/trio.js)
+     stuurt alles lokaal door, dus de server ziet ELK verzoek als lokaal. Van
+     buiten gemeten bleef het gat wagenwijd open. Een controle die je niet van
+     buitenaf naprikt, is een aanname.
+
+     Nu staat het om: alleen met RTG_DEV_LINKS=1 komen die velden mee. Uit is de
+     stand die je krijgt als je niets doet, en dat is de enige stand die veilig
+     mag zijn. De toetshelper zet hem, dus toetsen merken niets. Een echte server
+     zet hem niet, en dan is er niets te vergeten. */
+  const DEV_VELDEN = () => process.env.RTG_DEV_LINKS === '1';
 
 app.post('/api/login', (req, res) => {
   let tier = String(req.body.tier || '');

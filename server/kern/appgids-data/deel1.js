@@ -17,7 +17,7 @@ module.exports = {
   '/apps/bureau.html': G('De homescreen (dit pad brengt je daarheen).',
     ['Tik een app; omhoog vegen op het streepje onderin brengt je terug'],
     'Een oude ingang uit de tijd dat er nog een apart bureaublad was.'),
-  '/apps/berichten.html': G('Je berichten met vrienden en partners, automatisch vertaald als dat nodig is.',
+  '/apps/comm.html': G('Je berichten met vrienden en partners, automatisch vertaald als dat nodig is.',
     ['Stuur een bericht op codenaam', 'Bel of videobel vanuit het gesprek', 'Deel een snap of verhaal met wie jij kiest'],
     'Berichten in een andere taal worden voor je vertaald; jij leest en schrijft gewoon in je eigen taal.'),
   '/apps/genootschap.html': G('Genootschap: je besloten groepen binnen RTG, met een prikbord en bijeenkomsten.',

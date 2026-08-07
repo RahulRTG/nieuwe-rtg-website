@@ -100,6 +100,32 @@ kern.genootschapUitvoer = require('../kern/genootschap/uitvoer')({ genootschap: 
    afspraken eruit halen). De AI stelt op, de mens verstuurt. */
 kern.berichten = require('../kern/berichten')({ db, save, socialConnecties: kern.socialConnecties,
   dmSleutel: kern.dmSleutel, codenaamVan: kern.codenaamVan, rtmail, overheid: kern.overheid, anthropic });
+
+/* ---------------------- RTG Communication Core ----------------------
+   Een gespreksmodel voor het hele platform (kern/comm). Elke module die een
+   gesprek nodig heeft -- een rit, een bestelling, een klas, een ticket --
+   vraagt het hier aan in plaats van een zevende berichtenvoorraad te bouwen:
+
+       kern.comm.gesprekMaak({ soort: 'ride', deelnemers: [a, b],
+                               meta: { sleutel: 'rit:RT-1941' } })
+
+   NA kern.berichten gemount, want de AI-laag van de Berichten-app wordt
+   hergebruikt: dezelfde drie taken (samenvatten, opstellen, afspraken) op de
+   draad van de kern. Een tweede AI-laag zou een tweede plek zijn waar de regel
+   "de AI stelt op, de mens verstuurt" gehandhaafd moet worden. */
+kern.comm = require('../kern/comm').maakComm({ db, save, crypto,
+  codenaamVan: kern.codenaamVan, sseToCustomer: hulp.sseToCustomer });
+kern.commBronnen = require('../kern/comm/bronnen').maakBronnen({ db,
+  codenaamVan: kern.codenaamVan,
+  /* convOf wordt pas later in de opbouw gezet (server.js); daarom hier op het
+     moment van AANROEPEN opgehaald en niet nu vastgelegd -- anders staat er
+     voor altijd undefined in. */
+  convOf: (id) => (kern.convOf ? kern.convOf(id) : []),
+  overheid: kern.overheid, rtmail });
+kern.commAi = require('../kern/berichten/ai')({
+  // de kern gooit als een gesprek niet van jou is; de AI-laag verwacht null
+  draad: (mijKey, gesprekId) => { try { return kern.comm.draad(mijKey, gesprekId); } catch (e) { return null; } },
+  anthropic });
 // Toren 4: RTG Care (zorg & welzijn). Behandelingen boeken met het zorgprofiel
 // dat meereist en een aparte, veilige intake-deling per aanbieder.
 Object.assign(kern, require('../kern/care')({ db, save, crypto, schoon, notify, zorgVoor: kern.zorgVoor }));

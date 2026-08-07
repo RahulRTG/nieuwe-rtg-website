@@ -4,7 +4,7 @@
 module.exports = [
 
   // ---- sociaal & contact ----
-  ['berichten', 'Berichten', 'sociaal', '/apps/berichten.html', 'Al je gesprekken op een plek, met zoeken over alles heen. Rahul vat een lang gesprek samen, stelt een antwoord op en haalt de afspraken eruit.'],
+  ['berichten', 'Berichten', 'sociaal', '/apps/comm.html', 'Alle gesprekken van het platform op een plek -- mensen, zaken, onderweg, officieel -- met bellen en videobellen in de kop van het gesprek. Rahul vat samen, stelt een antwoord op en haalt de afspraken eruit.'],
   ['salon', 'De Salon', 'sociaal', '/apps/salon.html', 'Het besloten sociale netwerk van RTG: zelf plaatsen met foto\'s en onderwerpen, leden volgen, bewaren en reageren. Rahul schrijft een bijschrift mee en vat de reacties samen.'],
   ['genootschap', 'Genootschap', 'sociaal', '/apps/genootschap.html', 'Besloten groepen met een prikbord, peilingen en bijeenkomsten. Geheim is echt geheim, en er is geen enkele groeitruc.'],
   ['pulse', 'Pulse', 'sociaal', '/apps/pulse.html', 'De hoogtepunten van vandaag in jouw RTG-wereld, rustig gebundeld, geen eindeloze feed.'],

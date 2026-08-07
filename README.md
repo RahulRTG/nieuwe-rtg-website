@@ -1391,6 +1391,39 @@ De koppeling lid ↔ werkgever zijn de rollen aan het ene RTG-account (`kern/een
 
 API: `/api/member/boardroom{,/zet,/zetveel,/herstel,/logboek}` en `/api/supplier/werkbeleid{,/zet}`. Getoetst in `test/lidboard.test.js` (21 toetsen: standaarden, handhaving, voogdij, versie-botsing, bulk, herstel, journaal, export, rem, beheerd-door-RTG, vergetelheid, taal en het werkgeversbeleid).
 
+## RTG Communication Core: communicatie is infrastructuur, geen functie
+
+**Wat er misging.** Dit huis had **zes berichtenvoorraden naast elkaar** — `db.data.memberChats` (vrienden), `applyChats` (sollicitaties), `guestChats` (gast en zaak), `collegaChats` (werkvloer), `podiumChat` en `rijkBerichten` (overheid) — en elke module die er een gesprek bij wilde, bouwde de zevende. Elk met een eigen berichtvorm, een eigen verstuurroute en een eigen leesstand; geen van alle met zoiets gewoons als een reactie, een antwoord-op of een correctie. De Berichten-app was daarbovenop een **leeslijst** die naar de bron-app doorverwees: hij kon tonen dát er iets was, en verder niets.
+
+Dat is de fout die je maar één keer moet maken. Een chatfunctie per module betekent dat "verwijderen voor iedereen", "gelezen op dit apparaat" of "zoeken over alles" zes keer gebouwd en zes keer nét anders wordt — en dat de zevende module weer bij nul begint.
+
+**De kern** (`server/kern/comm/`) is één gespreksmodel voor het hele platform. Elke module vraagt het daar aan in plaats van zelf iets te bouwen:
+
+```js
+kern.comm.gesprekMaak({ soort: 'ride', deelnemers: [chauffeur, reiziger],
+                        titel: 'Rit RT-1941', meta: { sleutel: 'rit:RT-1941' } })
+```
+
+Taxi bouwt dus geen berichtenbackend. Horeca ook niet. School ook niet. `meta.sleutel` maakt het **idempotent**: een rit, een bestelling of een ticket vraagt bij elke stap opnieuw om "zijn" gesprek en krijgt er dan niet elke keer een nieuw — zonder dat zou de module zelf moeten onthouden welk gesprek bij welke rit hoort, en dan zit de koppeling weer in de module.
+
+**Het soort is de context**, en dat is meer dan een etiket: het bepaalt in welke la van de inbox een gesprek valt. Twaalf, bewust een gesloten lijst (een vrij tekstveld was binnen een maand een verzameling spelfouten): `personal, group, business, order, ride, school, project, support, marketplace, government, event, ai`. De laden erboven zijn Mensen / Zaken / Onderweg / Officieel / Rahul — dat is de **Universal Inbox**: *Chats → Mobiliteit → Rit #RT-1941*, terwijl het technisch allemaal gesprekken blijven.
+
+**Drie regels die worden afgedwongen, niet alleen beschreven:**
+
+1. **Alles op codenaam.** De kern kent sleutels en codenamen, nooit echte namen; die staan in de gescheiden kluis en komen hier niet langs. Ook niet in een titel, ook niet in een zoekindex.
+2. **Wie er niet in zit, leest niet mee.** Elke weg — lezen, sturen, reageren, wijzigen, wissen, lezen-melden, typen, porren, vlaggen, samenvatten — loopt langs dezelfde poort. Een gesprek-id raden is nooit genoeg. Getoetst met alle tien wegen apart, want een poort die op vier plekken moet staan, wordt op de vijfde vergeten.
+3. **De AI stelt op, de mens verstuurt.** Er is geen enkele weg waarop een model zelf een bericht plaatst; `@Rahul` levert tekst terug en die belandt in het invoerveld. Dezelfde drempel als bij geld.
+
+**Wat er al was, loopt mee.** De sollicitatie-chats, de Berichtenbox van MijnOverheid, het gastcontact met een zaak en het doorlopende gesprek met Rahul wonen nog in hun eigen module. `kern/comm/bronnen.js` **leest** ze en laat ze in dezelfde inbox meelopen, met een weg naar de app waar ze wonen. Vier voorraden tegelijk migreren terwijl hun modules er ook nog in schrijven, is vier keer de kans om berichten kwijt te raken in een ronde waarin niemand dat merkt tot iemand iets terugzoekt. Een bron **schrijft** daarom nooit — dat zou de tweede schrijver op één voorraad zijn, precies de splitsing die we opheffen. Elke bron die later wél overgaat, verdwijnt gewoon uit dat bestand.
+
+**Eén app** (`public/apps/comm.html`). Op het beginscherm stonden er vier — Berichten, Bellen, Videobellen en Snaps — plus Meet als vijfde, voor iets dat een mens als *één* ding ziet: contact met iemand. Nu: links de inbox met zijn laden, rechts het gesprek, en bellen en videobellen zijn twee knoppen in de kop van het gesprek waar je toch al bent (de verbinding zelf loopt over de bestaande WebRTC-laag; een tweede belimplementatie zou een tweede plek zijn waar het misgaat). `/apps/berichten.html` blijft bestaan als pad en leidt erheen.
+
+Wat de app kan: threads met antwoord-op en citaat, reacties, wijzigen binnen een kwartier (met de oorspronkelijke tekst bewaard — "bewerkt" zonder te kunnen zien wat er stond is een uitnodiging om een gesprek achteraf te herschrijven), intrekken dat een spoor achterlaat (de ander heeft het gelezen; doen alsof er nooit iets stond is liegen tegen wie erbij was), ongelezen-tellers, leesbevestiging, `typt…`, aanwezigheid, zoeken over álle gesprekken tegelijk, vastzetten/stilzetten/archiveren, een concept dat meereist tussen apparaten, en de **por** — de buzz van MSN, die door "stil" heen mag omdat dat zijn hele bestaansreden is, en precies daarom begrensd is tot één per minuut per gesprek. Een aandachtsknop zonder rem is een pestknop.
+
+API: `/api/comm/{inbox,gesprek,begin,stuur,wijzig,wis,reactie,lees,vlag,concept,typt,por,zoek,ai}`. Getoetst in `test/comm.e2e.js`.
+
+**Wat er nog niet in zit** — zodat niemand het hier gaat zoeken: end-to-end encryptie, tenants/RBAC, SSO/SCIM, retentiebeleid, legal hold, eDiscovery, DLP en de publieke API voor externe ontwikkelaars. Het model is erop gebouwd (elk bericht hoort bij een gesprek met een soort en een `meta`), maar ze staan er niet. Een half aangezette compliance-laag is gevaarlijker dan een afwezige. Hetzelfde geldt voor groepsbellen met breakout rooms en opname: dat blijft voorlopig RTG Meet.
+
 ## Veiligheid & verbinding: vier apps op één ruggengraat
 
 Vier losse apps (elk met eigen PWA-manifest), die onderhuids dezelfde kern delen

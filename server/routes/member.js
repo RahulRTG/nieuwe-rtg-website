@@ -131,6 +131,9 @@ module.exports = (kern) => {
   // en de handelingen erbij: zoeken, vlaggen en de drie AI-taken
   require('./member/berichten')(kern);
   require('./member/berichtenapp')(kern);
+  /* Het communicatieplatform (kern/comm): een koppelvlak voor alle gesprekken
+     van het hele platform, in plaats van een berichtenroute per module. */
+  require('./member/comm')(kern);
   // De Salon als app: plaatsen, feed met paginering, profielen, reacties, AI
   require('./member/salonapp')(kern);
   // Métier: het beroepsprofiel op codenaam, met de naam als sleutel die je per

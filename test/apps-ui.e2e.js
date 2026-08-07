@@ -113,8 +113,17 @@ test('Leden-app: de eigen pas komt beveiligd op na herstel van de sessie',
       assert.ok(thuis.mappen >= 3, 'er staan mappen met apps boven de klok');
       assert.ok(thuis.klok, 'de ronde RTG-klok staat in het midden');
       assert.ok(thuis.balk, 'de balk van Rahul staat onderaan');
-      assert.deepEqual(thuis.functies, ['Bellen', 'Berichten', 'Videobellen', 'Wallet'],
-        'onder de klok staan bellen, chat en de wallet');
+      /* De functierij: vier dingen die je zonder nadenken moet kunnen pakken.
+         Hier stond ['Bellen', 'Berichten', 'Videobellen', 'Wallet'] -- maar
+         bellen en videobellen zijn geen eigen apps meer: ze zijn opgegaan in de
+         ene communicatie-app en staan nu als knop in de kop van het gesprek
+         waar je toch al bent. De EIS is niet veranderd (vier, en Berichten en
+         Wallet horen erbij); de invulling wel. */
+      assert.equal(thuis.functies.length, 4, 'de functierij telt geen vier tegels: ' + thuis.functies.join(', '));
+      assert.ok(thuis.functies.includes('Berichten'), 'Berichten staat niet in de functierij');
+      assert.ok(thuis.functies.includes('Wallet'), 'de Wallet staat niet in de functierij');
+      assert.ok(!thuis.functies.includes('Bellen') && !thuis.functies.includes('Videobellen'),
+        'bellen staat nog als eigen app onder de klok: ' + thuis.functies.join(', '));
       assert.deepEqual(thuis.y.slice().sort((a, b) => a - b), thuis.y,
         'de volgorde is mappen, klok, functies, balk');
       assert.ok((await page.textContent('#homeTrip .big')).trim().length > 0, 'de eerstvolgende reis staat er');

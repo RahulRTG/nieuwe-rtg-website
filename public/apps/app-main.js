@@ -3110,7 +3110,13 @@ var RTG_BOUW = 'f9231c8c';
     vluchten:    { naam: 'Vluchten',      url: '/apps/vluchten.html' },
     sport:       { naam: 'Sport',         url: '/apps/sport.html' },
     school:      { naam: 'RTG School',    url: '/apps/rtgschool.html' },
-    berichten:   { naam: 'Berichten',     url: '/apps/berichten.html' },
+    /* EEN app voor alle communicatie (kern/comm + apps/comm.html). Hier
+       stonden er vier op het beginscherm -- Berichten, Bellen, Videobellen en
+       Snaps -- voor iets dat een mens als EEN ding ziet: contact met iemand.
+       Bellen en videobellen zijn nu twee knoppen in de kop van het gesprek
+       waar je toch al bent; de oude /apps/berichten.html blijft bestaan als
+       pad, want er kan naar gelinkt zijn. */
+    berichten:   { naam: 'Berichten',     url: '/apps/comm.html' },
     hangar:      { naam: 'Hangar',        url: '/apps/hangar.html' },
     entourage:   { naam: 'Entourage',     url: '/apps/entourage.html' },
     attenties:   { naam: 'Attenties',     url: '/apps/attenties.html' },
@@ -3139,7 +3145,11 @@ var RTG_BOUW = 'f9231c8c';
   /* ---------- de functierij, onder de klok ----------
      Bellen, berichten, videobellen en je wallet: de vier dingen die je zonder
      nadenken moet kunnen pakken. Ze staan vast en kunnen niet uit. */
-  const FUNCTIES = ['os:bellen', 'link:berichten', 'os:videobellen', 'link:wallet'];
+  /* De functierij onder de klok. Bellen en videobellen stonden hier als eigen
+     app; ze zitten nu in Berichten, bij het gesprek. De vrijgekomen plek gaat
+     naar Camera -- de andere manier waarop je iets met iemand deelt -- zodat de
+     rij vier dingen houdt die je zonder nadenken moet kunnen pakken. */
+  const FUNCTIES = ['link:berichten', 'os:snaps', 'link:camera', 'link:wallet'];
 
   /* ---------- de mappen, boven de klok ----------
      Zeven mappen, een rij van vier en een rij van drie, en daar zit alles in

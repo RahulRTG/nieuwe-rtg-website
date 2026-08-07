@@ -23,7 +23,17 @@ function loop(dir, filter, fn) {
   for (const naam of fs.readdirSync(dir)) {
     const vol = path.join(dir, naam);
     const st = fs.statSync(vol);
-    if (st.isDirectory()) { if (!/node_modules|\.git|data|dist/.test(naam)) loop(vol, filter, fn); }
+    /* De overslaglijst matcht op de HELE mapnaam en niet op een deelstring.
+       Stond hier `/data/`, en daardoor sloeg elke regel in dit bestand stilletjes
+       server/kern/appgids-data, server/kern/initdata, server/kern/leerstof-data
+       en server/foundation/buddy/coachdata over -- vier mappen met echte
+       productcode. Niet gemeld, niet geteld: de keuring vond er wel bestanden
+       over de 10 kB die check.js nooit had gezien.
+
+       Dit is regel 10 van de lat op de handhaver zelf. Een meter die een deel
+       van zijn invoer niet eens BEKIJKT, zegt niet "in orde" maar "ik heb niet
+       gekeken", en dat verschil was hier onzichtbaar. */
+    if (st.isDirectory()) { if (!/^(node_modules|\.git|data|dist)$/.test(naam)) loop(vol, filter, fn); }
     else if (filter.test(naam)) fn(vol);
   }
 }

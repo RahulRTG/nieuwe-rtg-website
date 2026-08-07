@@ -1,8 +1,14 @@
-/* App-gids data, deel6 (24 pagina's). Zie ../appgids.js voor de uitleg;
+/* App-gids data, deel6, eerste helft. Zie ../appgids.js voor de uitleg;
    nieuwe pagina's krijgen hier (of in het passende deel) een eigen entry. */
 const G = (wat, doe, tip) => ({ wat, doe, tip });
 
-module.exports = {
+/* Opgeknipt op de 10 kB-grens: het vervolg staat in ./deel6b.js. De knip zit
+   op een entry-grens en niet op een onderwerp -- een gidslijst is een lijst.
+   Dat dit bestand er tot vandaag OVERHEEN ging kwam niet doordat niemand
+   keek, maar doordat scripts/check.js deze hele map oversloeg: de mapfilter
+   matchte 'data' als deelstring, en 'appgids-data' bevat dat. Sinds die
+   reparatie ziet de check hem wel. */
+module.exports = Object.assign({
   '/apps/muziek.html': G('RTG Sound: muziek voor je dag, samengesteld zonder gejaag.',
     ['Kies een sfeer of kanaal', 'Speel af en bedien vanaf elk scherm', 'Bewaar wat je mooi vindt'],
     'Muziek zonder eindeloos scrollen: kies één sfeer en laat hem gewoon spelen.'),
@@ -57,46 +63,5 @@ module.exports = {
     'Cadeaus zijn echt geld: de app vraagt altijd eerst een bevestiging.'),
   '/apps/camera.html': G('RTG Camera: foto\'s maken en nabewerken in de eigen studio.',
     ['Maak een foto met de zoeker', 'Bewerk in de studio: licht, kleur, kader', 'Bewaar of deel bewust'],
-    'De beste bewerking is licht: probeer eerst de belichting voor je naar filters grijpt.'),
-  '/apps/oog.html': G('RTG Eye: camera-visie op je toestel, voor voertuigschouw en werkvloerlog.',
-    ['Scan een voertuig voor of na gebruik', 'Log hands-free wat je ziet', 'Deel het rapport met de zaak'],
-    'Een schouw van één minuut vooraf voorkomt discussies achteraf; de foto\'s zijn je bewijs.'),
-  '/apps/ov.html': G('RTG Vervoer: een rit boeken, het OV en de bedrijfspendel in één app met live GPS.',
-    ['Boek een rit naar een RTG-zaak, halte of favoriete plek', 'Check in op bus, trein, metro of veerboot',
-      'Reserveer je plek in de pendel van je werkgever'],
-    'De prijs staat vast zodra je aanvraagt; wat je daarna ziet is dezelfde prijs.'),
-  '/apps/dispatch.html': G('RTG Dispatch: het planscherm van een vervoerder, met de vloot en de openstaande ritten.',
-    ['Zie wat er open staat en wat er onderweg is', 'Wijs toe met de hand of laat de motor voorstellen',
-      'Voer een boeking in voor iemand zonder app'],
-    'Kijk bij een voorstel altijd even naar de rekensom eronder: die vertelt waarom die wagen bovenaan staat.'),
-  '/apps/ovdienst.html': G('De OV-dienst: het werkscherm van de chauffeur en de verkeersleiding.',
-    ['Zie je dienst en je voertuig', 'Meld vertrek, halte en bijzonderheden', 'Houd contact met de meldkamer'],
-    'Rustig rijden en eerlijk melden: de reiziger ziet live wat jij doorgeeft.'),
-  '/apps/ovroutes.html': G('De OV-routetekenaar: lijnen en haltes op de kaart zetten.',
-    ['Teken een lijn met haltes', 'Zet tijden en frequenties', 'Publiceer naar de reisapp'],
-    'Teken eerst de haltes, dan de lijn; dat werkt sneller en preciezer.'),
-  '/apps/flits.html': G('RTG Flits: het rustige rijscherm met meldingen van de community.',
-    ['Zie flitsers, files en ongevallen op je route', 'Meld zelf met één tik of met je stem', 'De landregels bepalen wat getoond mag worden'],
-    'Handen aan het stuur: alles kan met spraak, en de app houdt zelf zijn mond op het juiste moment.'),
-  '/apps/navigatie.html': G('RTG Navigatie: het huiseigen navigatiesysteem in 3D, met alles wat wij kunnen.',
-    ['Zoek een zaak, halte, loket of laadpaal en rijd erheen', 'Kies auto, EV, fiets, lopen of OV; de ETA past mee', 'Zet lagen aan (tank, laad, Flits) en meld zelf een wegprobleem'],
-    'De kaart is helemaal van ons: geen Google, geen externe tegels. Sleep om rond te kijken, knijp om te zoomen.'),
-  '/apps/horloge.html': G('Het RTG-horloge: het signatuurhorloge van het huis, een opengewerkt skelethorloge dat naast de lippen het symbool van RTG wordt.',
-    ['Bekijk het levende 3D-uurwerk dat op de klok van je toestel loopt', 'Zie de drie scholen: de vorm (AP), de leesbaarheid (Rolex) en de techniek (Porsche)', 'Beweeg de muis om het relief te laten spelen (op een computer)'],
-    'Alles klopt tot op de milliseconde: de balans op precies 4 Hz, 28.800 halveslagen per uur, foutmarge 0,0.'),
-  '/apps/rtg.html': G('RTG - Het Huis: de website van het huis als een high-end magazine op een pagina; swipe zijwaarts om te bladeren.',
-    ['Swipe (of gebruik de pijlen) om door de bladen te bladeren', 'Lees per blad een tak: de passen, reizen, care, leren, cultuur, De Salon, de foundation en partners', 'Op het slotblad spring je naar het 3D-uitzicht of terug naar het bureaublad'],
-    'Een magazine als app: geen losse internetpagina\'s, alles in een pagina die je doorbladert, in de rustige huisstijl.'),
-  '/apps/uitzicht.html': G('Het uitzicht van RTG: een stille 3D-skyline van het hele ecosysteem, in eigen huis getekend.',
-    ['Kijk naar de langzaam draaiende stad; elk blok is een tak van het huis', 'Zie het gouden rasterlicht op de grond, hetzelfde als onder de navigatie', 'Rechtsboven loopt de analoge RTG-klok mee op de tijd van je toestel'],
-    'Alles is eigen werk op een huiseigen WebGL-motor: geen three.js, geen stockbeeld, geen extern merk.'),
-  '/apps/ghost.html': G('Ghost Driver: de voorspellende verkeers- en logistieksimulatie.',
-    ['Bekijk de verwachte drukte per uur', 'Speel een scenario door voor je vloot', 'Deel het beeld met de verkeersleider'],
-    'Plan je ritten om de voorspelde pieken heen; tien minuten schuiven scheelt vaak een half uur file.'),
-  '/apps/vonk.html': G('RTG Vonk: kennismaken op wensen, met een reservering in het midden.',
-    ['Vertel wat jij zoekt', 'Bij een wederzijdse like regelt de app een plek in het midden', 'De eerste ronde is geregeld; de rest is aan jullie'],
-    'Wees eerlijk in je wensen; de match wordt er alleen maar beter van.'),
-  '/apps/rtgschool.html': G('RTG School: je leerpaspoort dat een leven lang meegaat, met lessen, oefenen, examentraining en je eigen Rahul Bijles.',
-    ['Schrijf je in op je fase van de officiele ladder; je paspoort telt elk behaald leerdoel mee', 'Kies een groep of fase, lees de les en oefen vijf opgaven; bij vier goed wordt het doel bijgeschreven', 'Train voor een examen (terugblik pas aan het eind) of vraag het niveau-advies; Rahul Bijles legt alles geduldig uit op jouw niveau'],
-    'Alles hier is oefening en advies: over overgaan, toelating en echte examens beslissen mensen en de officiele instellingen. Geen scores buiten de sessie, geen ranglijsten; leren is geen wedstrijd.')
-};
+    'De beste bewerking is licht: probeer eerst de belichting voor je naar filters grijpt.')
+}, require('./deel6b'));

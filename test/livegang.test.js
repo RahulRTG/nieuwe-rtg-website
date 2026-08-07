@@ -24,7 +24,17 @@ async function api(pad, body) {
 
 test.before(async () => {
   ({ child, base: BASE } = await startServer({ env: {
-    NODE_ENV: 'production', RTG_DATA_DIR: TMP, SMTP_URL: '',
+    /* RTG_DEMO EXPLICIET UIT, en dat is precies wat deze toets aantoont.
+       test/helper.js zet hem standaard op '1' omdat vrijwel elke toets op de
+       demostand leunt (vaste inlog, bekend eigenaarsaccount). Deze toets start
+       juist een ECHTE productieserver, en die weigert sindsdien te starten met
+       demo aan: "[config] RTG_DEMO=1 in productie: de demo-inlog zou
+       openstaan." Dat is de grendel uit dezelfde ronde die deze toets bewaakt.
+
+       Het gevolg was dat alle drie de toetsen omvielen met "server stopte
+       tijdens opstarten (exit 1)" -- de grendel werkte, en de toets die hem
+       bewijst kwam er niet meer doorheen. */
+    NODE_ENV: 'production', RTG_DEMO: '0', RTG_DATA_DIR: TMP, SMTP_URL: '',
     RTG_ENC_KEY: 'k'.repeat(64), RTG_OWNER_EMAIL: 'eigenaar@echtdomein.nl',
     OFFICE_CODE: 'GEHEIME-CODE-123',
     // sinds de sleutel-hardening (config fail-fast) eist een productiestart de

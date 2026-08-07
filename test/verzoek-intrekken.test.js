@@ -63,7 +63,18 @@ async function inlog(code, rol) {
 }
 
 test.before(async () => {
-  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_DEMO: '0' } });
+  /* RTG_DEMO=1, en dat is geen slordigheid maar wat deze toets nodig heeft:
+     demoLid() logt in met /api/login (dat is de demo-deur, zie de opmerking
+     daar) en inlog() heeft de demo-zaken KIKUNOI en HOSHI nodig.
+
+     Hier stond RTG_DEMO='0'. Dat werkte zolang de demo-vlag in routes/auth.js
+     op `!PRODUCTION` stond -- een fout die inmiddels is gerepareerd: met de
+     demostand uit gaf POST /api/login {"tier":"business"} nog een volledige
+     sessie. Die reparatie was terecht en deze toets is er stil op stukgelopen:
+     de rooster-aanroep gaf undefined en elke toets viel om in de before-haak.
+     Demo AAN zetten is hier dus het herstel, niet het verzwakken -- wat deze
+     toets bewaakt (wie een betaalverzoek mag intrekken) staat er los van. */
+  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_DEMO: '1' } });
   base = srv.base;
   vrager = await nieuwLid('De Vrager');
   /* De betaler is een Lifestyle-pas. Niet uit luxe: de KYC-poort van RTG Pay

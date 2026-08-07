@@ -29,7 +29,15 @@ const ORDER = (ref, at, status) => ({
 function boot() {
   child = spawn(process.execPath, ['--experimental-sqlite', path.join(__dirname, '..', 'server', 'server.js')], {
     // deze test seedt en leest het rauwe db.json en test dus bewust de JSON-opslag
-    env: { ...process.env, PORT: String(PORT), RTG_DATA_DIR: TMP, RTG_STORE: 'json', NODE_ENV: 'test', SMTP_URL: '', RTG_OWNER_EMAIL: '' },
+    /* RTG_DEMO=1 omdat deze toets inlogt als de EIGENAAR (ownerToken), en dat
+       account wordt buiten demostand door niets meer aangemaakt: "wie het
+       eigenaarsadres als eerste registreerde kreeg het platform", dus die
+       route is dichtgezet (server.js, routes/auth/account.js). Terecht -- maar
+       deze toets ging er stil op stuk: /api/auth/login gaf 401, de timeline
+       gaf geen `total`, en de melding was "undefined !== 0". Wat hij bewaakt
+       (verhuizen afgeronde oude tickets naar een maandbestand) staat los van
+       de demostand. */
+    env: { ...process.env, PORT: String(PORT), RTG_DATA_DIR: TMP, RTG_STORE: 'json', NODE_ENV: 'test', SMTP_URL: '', RTG_OWNER_EMAIL: '', RTG_DEMO: '1' },
     stdio: ['ignore', 'ignore', 'inherit']
   });
   return (async () => {

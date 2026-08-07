@@ -33,7 +33,20 @@ async function wachtTot(fn, ms = 20000) {
 test.before(async () => {
   vloot = spawn(process.execPath, [path.join(__dirname, '..', 'server', 'vloot.js')], {
     env: {
+      /* OFFICE_CODE expliciet, want deze toets start de vloot ZELF (niet via
+         test/helper.js) en dus zonder demostand. Sinds die ronde geldt: zonder
+         eigen OFFICE_CODE wordt hij onraadbaar willekeurig -- de vaste waarde
+         'RTG-OFFICE' uit deze repo opende de backoffice, en daarachter ligt de
+         identiteitskluis. Terecht dichtgezet, maar de gereedheidscheck
+         hieronder klopte bij de kantoor-groep aan met precies die code, kreeg
+         nooit een ok, en liet beide toetsen na 30 seconden omvallen met "de
+         vloot komt op" -- terwijl de vloot prima opkwam. */
       ...process.env, NODE_ENV: 'test', RTG_DATA_DIR: TMP, SMTP_URL: '',
+      /* En RTG_DEMO=1 om dezelfde reden: de toetsen hieronder kloppen aan met
+         /api/login {tier} -- de demo-deur -- om te bewijzen dat de andere
+         groepen doordraaien. Deze toets gaat over foutisolatie, niet over de
+         productiegrendels; die staan in test/livegang.test.js. */
+      OFFICE_CODE: 'RTG-VLOOT-TOETS', RTG_DEMO: '1',
       RTG_POORT: String(POORT), RTG_VLOOT_BASIS: String(BASIS),
       RTG_VLOOT_GROEPEN: 'leden:auth,member,social,zakelijk|kantoor:office,techniek|rtf:-'
     },
@@ -42,7 +55,7 @@ test.before(async () => {
   // alle drie de groepen en de gateway moeten opkomen
   const klaar = await wachtTot(async () => {
     const a = await fetch(BASE + '/api/health');                    // via gateway -> groep leden
-    const b = await post('/api/office/login', { code: 'RTG-OFFICE' }); // via gateway -> groep kantoor
+    const b = await post('/api/office/login', { code: 'RTG-VLOOT-TOETS' }); // via gateway -> groep kantoor
     const c = await fetch(BASE + '/api/foundation/health');        // via gateway -> groep rtf
     return a.ok && b.ok && c.ok;
   }, 30000);
@@ -69,7 +82,7 @@ test('crasht de kantoor-groep, dan valt ALLEEN kantoor uit; de rest draait door'
 
   // kantoor is nu (even) onbereikbaar via de gateway: 502, geen hangende aanvraag
   const kantoorPlat = await wachtTot(async () =>
-    (await post('/api/office/login', { code: 'RTG-OFFICE' })).status === 502, 5000);
+    (await post('/api/office/login', { code: 'RTG-VLOOT-TOETS' })).status === 502, 5000);
   assert.ok(kantoorPlat, 'de gateway geeft 502 voor alleen het kantoor-domein');
 
   // de andere apps merken er NIETS van
@@ -78,6 +91,6 @@ test('crasht de kantoor-groep, dan valt ALLEEN kantoor uit; de rest draait door'
 
   // de vloot herstart de groep vanzelf; daarna doet kantoor het weer
   const terug = await wachtTot(async () =>
-    (await post('/api/office/login', { code: 'RTG-OFFICE' })).status === 200, 25000);
+    (await post('/api/office/login', { code: 'RTG-VLOOT-TOETS' })).status === 200, 25000);
   assert.ok(terug, 'de kantoor-groep is automatisch herstart en werkt weer');
 });

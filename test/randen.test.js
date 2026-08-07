@@ -170,10 +170,23 @@ test('een kapotte kaart maakt het beginscherm niet zwart', () => {
      leeg staat. */
   assert.match(bron, /stap\('renderHome', renderHome\)/, 'het beginscherm loopt door het vangnet');
   assert.match(bron, /function naBeeld\(stappen\)/, 'de tabbladen gaan na het eerste beeld');
-  for (const laat of ['renderSalon', 'renderTerPlaatse', 'laadBestellen', 'laadTickets']) {
-    assert.match(bron, new RegExp("\\['" + laat + "', " + laat + "\\]"),
-      laat + ' staat in de uitgestelde rij, en die loopt zelf door stap()');
+  /* DE UITGESTELDE RIJ IS EEN RIJ PER TABBLAD GEWORDEN, en die vorm is beter
+     dan wat hier eerst stond. Toen ging alles na het eerste beeld draaien, ook
+     voor tabbladen die niemand opende: een keer de app openen kostte 66
+     verzoeken, en na drie keer zat je tegen de rem. Nu haalt een tabblad zijn
+     eigen gegevens op het moment dat je het opent (LADERS_PER_TAB + vulTab).
+
+     Deze toets bewaakt daarom niet langer de letterlijke schrijfwijze van toen
+     -- die was aan een verbetering gaan hangen -- maar de EIGENSCHAP die hij
+     altijd bedoelde: de zware laders staan in de uitgestelde rij, en die rij
+     loopt door hetzelfde vangnet. Haalt iemand een lader uit de kaart of
+     roept vulTab hem buiten stap() om aan, dan zakt hij weer. */
+  for (const laat of ['renderSalon', 'renderTerPlaatse', 'laadBoodschappen', 'laadTickets']) {
+    assert.match(bron, new RegExp("\\['" + laat + "', \\(\\) => " + laat + "\\("),
+      laat + ' staat in de uitgestelde rij (LADERS_PER_TAB)');
   }
+  assert.match(bron, /for \(const \[naam, fn\] of lijst\) stap\(naam, fn\);/,
+    'en vulTab draait die rij door hetzelfde vangnet');
   assert.match(bron, /const \[naam, fn\] = stappen\[i\+\+\];\s*stap\(naam, fn\)/,
     'en naBeeld draait elke stap door hetzelfde vangnet');
   assert.ok(!/\n\s+renderHome\(\);/.test(bron),

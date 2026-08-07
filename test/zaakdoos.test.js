@@ -77,7 +77,13 @@ function stopCloud(kind) {
 function startCloud() {
   stopCloud(cloudChild);
   cloudChild = spawn(process.execPath, ['--experimental-sqlite', path.join(__dirname, '..', 'server', 'server.js')], {
-    env: { ...process.env, NODE_ENV: 'test', PORT: String(cloudPort), RTG_DATA_DIR: TMP_CLOUD, SMTP_URL: '', RTG_DOOS_SLEUTEL: SLEUTEL, OFFICE_CODE: 'DOOS-KANTOOR-1' },
+    /* RTG_DEMO=1 op de CLOUD, en dat was het gat. De doos komt op via
+       test/helper.js (die zet demo standaard aan), maar deze cloud wordt hier
+       met een eigen spawn gestart en kreeg hem niet. De toets logt in met
+       username/wachtwoord -- de demo-inlog van een zaak -- en die deur is
+       sinds de hardening dicht zonder demostand. Het doorgeefluik werkte dus
+       prima; de inlog aan de andere kant bestond niet meer. */
+    env: { ...process.env, NODE_ENV: 'test', PORT: String(cloudPort), RTG_DATA_DIR: TMP_CLOUD, SMTP_URL: '', RTG_DOOS_SLEUTEL: SLEUTEL, OFFICE_CODE: 'DOOS-KANTOOR-1', RTG_DEMO: '1' },
     stdio: ['ignore', 'ignore', 'inherit']
   });
   alleClouds.push(cloudChild);

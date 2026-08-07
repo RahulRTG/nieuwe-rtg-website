@@ -1209,22 +1209,24 @@
         twee losse rijen uiteen. */
   .os-mappen{margin-top:calc(var(--e) * 0.9);flex-shrink:0;row-gap:calc(var(--e) * 1.05);}
 
-  /* 2. de ronde klok, onder de mappen.
-        HIJ STOND TE LAAG, EN DE OORZAAK WAS EEN CENTRERING. Dit vak had
-        flex:1 en centreerde de klok in wat er overbleef -- alle overtollige
-        ruimte werd dus keurig in tweeën gedeeld en boven én onder de klok
-        gelegd. Op een telefoon was dat 110 punten lucht boven en 110 onder:
-        de klok zakte naar het midden en duwde de functierij en de balk van
-        Rahul mee naar beneden, tot vlak boven de browserbalk.
+  /* 2. de ronde klok, in het midden. Dit vak pakt alle ruimte die de andere
+        lagen overlaten en centreert de klok daarin -- dus staat er evenveel
+        lucht boven als onder, en dat is precies wat een horloge nodig heeft
+        om een horloge te blijven en geen tegel te worden.
 
-        Nu heeft het vak een bovengrens die precies de klok is. Groeien doet
-        het nog steeds (op een klein scherm krimpt de klok netjes mee), maar
-        wat er daarboven overblijft heeft binnen dit vak geen plek meer en
-        zakt naar het einde van de kolom -- onder de balk van Rahul, waar
-        lucht niets in de weg staat. Alles erboven schuift dus omhoog. */
+        HIER HEEFT EEN BOVENGRENS OP GESTAAN, en die is er weer af. Bedoeling
+        was de klok omhoog te halen; gevolg was dat alle overtollige ruimte
+        naar het einde van de kolom zakte, de balk van Rahul los van de
+        onderrand kwam te hangen en er een gat van 155 punten onder het scherm
+        stond. De balk hoort aan de onderrand -- daar zoekt je duim hem -- en
+        de klok hoort lucht om zich heen. Allebei krijg je terug door dit vak
+        gewoon zijn werk te laten doen.
+
+        Wil je de laag ERBOVEN of ERONDER verschuiven, doe dat dan met een
+        marge op die laag zelf (zie .os-aibalk): dit vak krimpt dan mee en de
+        onderrand blijft waar hij staat. */
   .os-klokvak{
-    flex:1 1 auto;min-height:0;display:flex;align-items:center;justify-content:center;
-    max-height:calc(var(--e) * 22);
+    flex:1;min-height:0;display:flex;align-items:center;justify-content:center;
     padding:calc(var(--e) * 0.5) 0;
   }
   .os-klokvak .os-home-klok.rtg-ring{
@@ -1301,9 +1303,18 @@
   .os-aitips button:hover{border-color:color-mix(in srgb, var(--gold) 55%, var(--line));}
   #app.os-gast .os-aidraad,#app.os-gast .os-aitips{display:none;}
 
-  /* de balk van Rahul, onderaan */
+  /* de balk van Rahul, onderaan -- en onderaan is letterlijk: hij hoort aan de
+     onderrand, want daar zoekt je duim hem.
+
+     De marge hierboven doet twee dingen tegelijk, en dat is met opzet. Ze zet
+     de berichten van Rahul op afstand van zijn balk (die stonden er tegenaan
+     en dat las als één blok in plaats van gesprek en invoer), en omdat het
+     klokvak hierboven alle overgebleven ruimte pakt, krimpt dát vak met deze
+     marge mee. Het gesprek schuift dus omhoog terwijl de balk blijft staan
+     waar hij staat -- precies andersom dan een bovengrens op het klokvak, die
+     de balk zelf omhoog trok. */
   .os-aibalk{
-    flex-shrink:0;margin-top:calc(var(--e) * 1.15);
+    flex-shrink:0;margin-top:calc(var(--e) * 2.8);
     display:flex;align-items:center;gap:calc(var(--e) * 0.5);
     padding:calc(var(--e) * 0.4) calc(var(--e) * 0.45) calc(var(--e) * 0.4) calc(var(--e) * 0.55);
     border-radius:999px;

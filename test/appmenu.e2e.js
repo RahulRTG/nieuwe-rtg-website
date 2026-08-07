@@ -297,13 +297,23 @@ test('het beginscherm draagt twee rijen mappen, en de klok staat erboven',
     await page.waitForTimeout(400);
 
     const r = await page.evaluate(() => {
+      const vak = (s) => {
+        const b = document.querySelector(s).getBoundingClientRect();
+        return { top: Math.round(b.top), bodem: Math.round(b.bottom) };
+      };
       const tegels = [...document.querySelectorAll('#osMappen .os-app')];
       const rijen = new Set(tegels.map((t) => Math.round(t.getBoundingClientRect().top)));
-      const y = (s) => Math.round(document.querySelector(s).getBoundingClientRect().top);
       const onder = document.querySelector('#osDemoWet') || document.querySelector('#osAiWet');
+      const klokvak = vak('.os-klokvak'), klok = vak('#homeKlok');
+      const tips = document.querySelector('#osAiTips');
+      const boven = tips && !tips.hidden ? vak('#osAiTips') : vak('#osAiDraad');
       return {
         mappen: tegels.length, rijen: rijen.size,
-        volgorde: ['#osMappen', '.os-klokvak', '#osFuncties', '#osAiBalk'].map(y),
+        volgorde: ['#osMappen', '.os-klokvak', '#osFuncties', '#osAiBalk']
+          .map((s) => vak(s).top),
+        luchtBovenKlok: klok.top - klokvak.top,
+        luchtOnderKlok: klokvak.bodem - klok.bodem,
+        gatNaarBalk: vak('#osAiBalk').top - boven.bodem,
         onderrand: Math.round(onder.getBoundingClientRect().bottom), hoogte: innerHeight
       };
     });
@@ -311,14 +321,31 @@ test('het beginscherm draagt twee rijen mappen, en de klok staat erboven',
     assert.equal(r.rijen, 2, 'de mappen staan niet in twee rijen (rijen: ' + r.rijen + ')');
     assert.deepEqual(r.volgorde.slice().sort((a, b) => a - b), r.volgorde,
       'de volgorde is mappen, klok, functies, balk');
-    /* DE KLOK CENTREERDE ZICHZELF IN ALLE OVERGEBLEVEN RUIMTE, en duwde daarmee
-       de functierij en de balk van Rahul tot vlak boven de browserbalk. Nu heeft
-       het klokvak een bovengrens en zakt de overtollige ruimte naar het einde
-       van de kolom. Die kussen onderaan IS de reparatie, dus die toetsen we:
-       zonder de bovengrens is hij nul. */
-    assert.ok(r.hoogte - r.onderrand > 40,
-      'er staat geen lucht meer onder de balk van Rahul (' + (r.hoogte - r.onderrand) + 'px): ' +
-      'de klok centreert zich weer in alle ruimte');
+
+    /* DRIE DINGEN DIE ELKAAR IN DE WEG ZITTEN, en daarom hier bij elkaar staan.
+
+       Er heeft een bovengrens op het klokvak gestaan om de klok omhoog te
+       halen. Gevolg: alle overtollige ruimte zakte naar het einde van de kolom,
+       de balk van Rahul kwam los van de onderrand en er stond een gat van 155
+       punten onder het scherm. Die grens is er weer af, en dat maakt deze drie
+       eisen tegelijk waar -- verschuif er één en de andere twee bewegen mee, dus
+       ze horen in één meting.
+
+       1. DE BALK STAAT ONDERAAN. Daar zoekt je duim hem.
+       2. DE KLOK HEEFT LUCHT OM ZICH HEEN, boven en onder ongeveer evenveel;
+          een horloge zonder marge wordt een tegel.
+       3. HET GESPREK PLAKT NIET AAN DE BALK. Anders leest het als één blok in
+          plaats van gesprek en invoer. */
+    assert.ok(r.hoogte - r.onderrand < 60,
+      'de balk van Rahul hangt los van de onderrand (' + (r.hoogte - r.onderrand) + 'px eronder)');
+    assert.ok(r.luchtBovenKlok > 25 && r.luchtOnderKlok > 25,
+      'de klok heeft te weinig lucht om zich heen (boven ' + r.luchtBovenKlok +
+      ', onder ' + r.luchtOnderKlok + ')');
+    assert.ok(Math.abs(r.luchtBovenKlok - r.luchtOnderKlok) < 20,
+      'de klok hangt niet in het midden van zijn vak (boven ' + r.luchtBovenKlok +
+      ', onder ' + r.luchtOnderKlok + ')');
+    assert.ok(r.gatNaarBalk > 22,
+      'de berichten van Rahul plakken aan zijn balk (' + r.gatNaarBalk + 'px ertussen)');
     await page.close();
   });
 });

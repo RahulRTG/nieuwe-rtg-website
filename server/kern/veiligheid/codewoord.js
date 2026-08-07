@@ -62,6 +62,18 @@ module.exports = ({ db, save, crypto, kluis, alarm, plek, sociaal }) => {
     if (w.length < MIN_WOORDEN)
       return { status: 400, error: 'Kies een zin van minstens ' + MIN_WOORDEN + ' woorden. Een los woord valt te makkelijk per ongeluk.' };
     if (w.length > 12) return { status: 400, error: 'Houd het bij hooguit twaalf woorden; je moet hem onder spanning nog kunnen typen.' };
+    /* EEN NOODSIGNAAL ZONDER ONTVANGER IS GEEN NOODSIGNAAL.
+
+       alarmSlaan weigert al bij een lege kring, maar codewoordCheck gooide die
+       weigering weg -- en dat MOET stil zijn, want een melding op je toestel is
+       precies wat een codewoord niet mag geven. Gevolg: je stelde je stille
+       noodzin in, oefende hem (de proef zei "raak"), liet hem vallen op het
+       moment dat het erop aankwam, en er ging niets af. Niets zei dat, aan
+       niemand, nooit.
+
+       Het enige moment waarop je het nog kunt horen is NU, bij het instellen. */
+    if (alarm.kringLeeg && alarm.kringLeeg(handle))
+      return { status: 400, error: 'Je kring is leeg. Een codewoord waarschuwt je kring, dus zet daar eerst iemand in -- anders gaat er straks niets af en merk je dat niet.' };
     const C = lijsten();
     const zout = crypto.randomBytes(16).toString('hex');
     C[handle] = {
@@ -77,12 +89,20 @@ module.exports = ({ db, save, crypto, kluis, alarm, plek, sociaal }) => {
   function codewoordStand(handle) {
     const c = lijsten()[handle];
     // met opzet GEEN zin, geen hash en geen zout terug; alleen dat hij er is
-    return c ? { ingesteld: true, aan: c.aan !== false, aantal: c.aantal, at: c.at, keer: c.keer || 0, doe: c.doe } : { ingesteld: false, aan: false };
+    /* kringLeeg gaat mee: het scherm hoort te waarschuwen zodra je codewoord
+       niemand meer kan bereiken. Zonder dit is de enige manier om erachter te
+       komen dat je hem gebruikt op het slechtst denkbare moment. */
+    const leeg = !!(alarm.kringLeeg && alarm.kringLeeg(handle));
+    return c ? { ingesteld: true, aan: c.aan !== false, aantal: c.aantal, at: c.at, keer: c.keer || 0, doe: c.doe,
+      kringLeeg: leeg, laatsteMislukking: c.mislukt || null } : { ingesteld: false, aan: false, kringLeeg: leeg };
   }
 
   function codewoordSchakel(handle, aan) {
     const C = lijsten();
     if (!C[handle]) return { status: 404, error: 'Er is nog geen codewoord ingesteld.' };
+    // ook hier, want een kring kan leeg raken nadat het codewoord is ingesteld
+    if (aan !== false && alarm.kringLeeg && alarm.kringLeeg(handle))
+      return { status: 400, error: 'Je kring is leeg. Zet er eerst iemand in; een codewoord dat niemand bereikt geeft je een zekerheid die er niet is.' };
     C[handle].aan = aan !== false;
     save();
     return { status: 200, ok: true, stand: codewoordStand(handle) };
@@ -136,13 +156,25 @@ module.exports = ({ db, save, crypto, kluis, alarm, plek, sociaal }) => {
       if (Date.now() - vorig < 60000) return true;
 
       if (c.doe && c.doe.locatie !== false) plek.vensterOpen(handle, 180, 'codewoord');
-      alarm.alarmSlaan({
+      const r = alarm.alarmSlaan({
         handle,
         codenaam: sociaal.codenaamVan(handle) || handle,
         soort: 'codewoord',
         notitie: 'Stil om hulp gevraagd' + (bron ? ' (' + String(bron).slice(0, 20) + ')' : '') + '.',
         stil: true                                  // geen bevestiging naar het eigen toestel
       });
+      /* De uitkomst NIET weggooien. Naar het toestel mag niets (dat is de hele
+         functie van een codewoord), maar het mag ook niet nergens staan: dan
+         weet zelfs achteraf niemand dat het signaal niet is aangekomen. Het
+         gaat in de stand, zodat het scherm het toont zodra iemand kijkt, en in
+         het logboek, zodat het terug te vinden is. */
+      if (r && r.error) {
+        try {
+          const C = lijsten();
+          if (C[handle]) { C[handle].mislukt = { t: nu(), reden: String(r.error).slice(0, 140) }; save(); }
+        } catch (e2) {}
+        console.error('[veiligheid] codewoord van ' + handle + ' sloeg GEEN alarm: ' + r.error);
+      }
       return true;
     } catch (e) { return false; }
   }

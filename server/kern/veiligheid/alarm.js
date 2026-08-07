@@ -142,5 +142,16 @@ module.exports = ({ db, save, crypto, kring, plek, meldAan, mail, appUrl }) => {
       });
   }
 
-  return { alarmSlaan, alarmAfsluiten, alarmenVan, alarmenVoorMij, kaartLink };
+  /* KAN ER IEMAND GEWAARSCHUWD WORDEN? Deze vraag hoort hier thuis, want hier
+     staat ook het antwoord dat alarmSlaan zelf geeft. Het codewoord en de
+     dodemansknop moeten hem VOORAF kunnen stellen -- op het moment dat iemand
+     zijn noodsignaal instelt en er nog iets aan te doen valt. Dat is het enige
+     moment waarop je het nog kunt zeggen: als het codewoord eenmaal valt, is
+     het stil (met opzet) en hoort er geen melding op dat toestel te komen. */
+  function kringLeeg(handle) {
+    try { const o = kring.ontvangers(handle); return !o.alle.length && !o.mails.length; }
+    catch (e) { return false; }   // bij twijfel niet in de weg staan
+  }
+
+  return { alarmSlaan, alarmAfsluiten, alarmenVan, alarmenVoorMij, kaartLink, kringLeeg };
 };

@@ -55,6 +55,16 @@ module.exports = ({ db, save, crypto, schoon, alarm, plek, meldAan, sociaal }) =
     if (!minuten) return { status: 400, error: 'Hoe lang duurt het voordat je je meldt?' };
     if (lopendeVan(handle).some(w => w.soort === soort))
       return { status: 409, error: soort === 'thuis' ? 'Er loopt al een wacht. Stop die eerst, of check in.' : 'Er loopt al een check-in. Stop die eerst.' };
+    /* EEN WACHT ZONDER KRING WAAKT OVER NIEMAND.
+
+       Trede 2 slaat alarm bij je kring. alarmSlaan weigert bij een lege kring,
+       maar sweep() keek alleen naar `r && r.id` en zette de wacht toch op
+       'alarm' -- dus stond er "alarm geslagen" terwijl er niemand gebeld was.
+       Iemand die alleen thuiskomt en dit aanzet, denkt dat er iemand meekijkt.
+
+       Hier is het nog te zeggen, en dat is het moment dat telt. */
+    if (alarm.kringLeeg && alarm.kringLeeg(handle))
+      return { status: 400, error: 'Je kring is leeg. Deze wacht waarschuwt je kring als je je niet meldt, dus zet daar eerst iemand in -- anders waakt hij over niemand.' };
 
     const marge = Math.max(0, Math.min(120, body.marge == null ? GENADE_STD : Math.round(Number(body.marge))));
     const w = {
@@ -170,7 +180,17 @@ module.exports = ({ db, save, crypto, schoon, alarm, plek, meldAan, sociaal }) =
           soort: w.soort,
           notitie: w.label
         });
+        /* En als het TOCH misgaat (de kring is leeggelopen nadat de wacht
+           begon): niet stil op 'alarm' zetten. De stand zegt dan wat er echt
+           gebeurde, en het logboek ook -- anders staat er "alarm" terwijl er
+           niemand is gewaarschuwd, en dat is een gerustheid die niet klopt. */
         if (r && r.id) w.alarmId = r.id;
+        else if (r && r.error) {
+          w.status = 'alarm-mislukt';
+          w.alarmFout = String(r.error).slice(0, 140);
+          console.error('[veiligheid] wacht van ' + w.handle + ' sloeg GEEN alarm: ' + r.error);
+          try { meldAan(w.handle, { title: 'Je wacht kon niemand waarschuwen', body: 'De wacht liep af, maar je kring is leeg. Zet iemand in je kring.', icon: 'alarm' }); } catch (e) {}
+        }
         veranderd++;
       }
     }

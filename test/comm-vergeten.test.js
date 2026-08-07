@@ -29,6 +29,15 @@ function opzet() {
   const alleen = comm.gesprekMaak({ soort: 'personal', deelnemers: ['weg'], door: 'weg',
     meta: { sleutel: 'alleen' } });
   comm.bericht({ gesprekId: alleen.id, van: 'weg', tekst: 'alleen van mij' });
+  /* Een gesprek dat de vertrekker BEGON en waar de ander in blijft. Dat scheelt
+     een letter met `samen` en het is precies de letter die telt: een gesprek
+     draagt in `door` wie het opende, en die sleutel wordt door geen enkele
+     lus hierboven aangeraakt. In `samen` viel dat niet op omdat tussen() de
+     twee sleutels alfabetisch zet en 'blijft' voor 'weg' komt -- de bewaking
+     hing dus aan de toevalligheid dat de blijver vooraan in het alfabet staat. */
+  const begonnen = comm.gesprekMaak({ soort: 'group', deelnemers: ['weg', 'blijft'],
+    door: 'weg', titel: 'Een groep', meta: { sleutel: 'begonnen' } });
+  comm.bericht({ gesprekId: begonnen.id, van: 'blijft', tekst: 'van de blijver' });
   comm.vlag('weg', samen.id, 'vast', true);
   comm.lees('blijft', samen.id);
   return { db, comm, samen, alleen };
@@ -43,7 +52,7 @@ test('wie vertrekt, laat geen woord achter -- en de ander houdt het zijne', () =
   assert.ok(over.includes(samen.id), 'het gesprek met de blijver is meegesleept');
 
   const teksten = Object.values(db.data.commBerichten).flat().map((m) => m.tekst);
-  assert.deepEqual(teksten, ['van de blijver'],
+  assert.deepEqual(teksten, ['van de blijver', 'van de blijver'],
     'er staat nog inhoud van de vertrekker, of die van de blijver is weg: ' + teksten.join(' | '));
 });
 
@@ -64,6 +73,40 @@ test('de leesstanden en vlaggen van de vertrekker gaan mee, die van de ander nie
   wisGesprekkenVan(db, 'weg');
   assert.equal(db.data.commStand.weg, undefined, 'de standen van de vertrekker staan er nog');
   assert.ok(db.data.commStand.blijft, 'de leesstand van de blijver is meegewist');
+});
+
+/* Sinds kern/comm/wie.js kan de andere kant van een gesprek een ZAAK zijn: een
+   bestelling, een rit, een boeking. Dat maakt een geval bereikbaar dat er
+   eerder niet was -- een lid vertrekt uit een gesprek waarin verder geen mens
+   zit -- en juist daar mag het wisrecht niet stilvallen. Twee dingen moeten
+   allebei waar zijn, en ze trekken tegen elkaar in:
+
+     - van het LID blijft niets over. Zijn sleutel, zijn berichten, zijn
+       leesstand: weg, net als in een gesprek tussen twee mensen. Dat de
+       tegenpartij een bedrijf is, verandert daar niets aan.
+     - de ZAAK houdt haar eigen kant. Een bedrijf heeft een eigen administratie
+       en eigen bewaarplichten; het gesprek weggooien omdat de klant vertrekt
+       zou die kant meesleuren, en dat is niet aan het lid.
+
+   Vandaar deze toets: hij bewaakt de scheidslijn, niet een van beide helften. */
+test('een lid verdwijnt ook uit een gesprek met een zaak -- en de zaak houdt haar eigen kant', () => {
+  const db = { data: {} };
+  const comm = maakComm({ db, save() {}, crypto, codenaamVan: (k) => k });
+  const g = comm.gesprekMaak({ soort: 'order', deelnemers: ['weg', 'zaak:AB12'],
+    meta: { sleutel: 'bestelling:1' } });
+  comm.bericht({ gesprekId: g.id, van: 'weg', tekst: 'is de keuken nog open' });
+  comm.bericht({ gesprekId: g.id, van: 'zaak:AB12', door: 'mens:AB12:7', tekst: 'tot elf uur' });
+  comm.lees('weg', g.id);
+
+  wisGesprekkenVan(db, 'weg');
+
+  assert.ok(!JSON.stringify(db.data).includes('"weg"'),
+    'de sleutel van het verwijderde lid staat nog in het gesprek met de zaak');
+  const over = db.data.commGesprekken.find((x) => x.id === g.id);
+  assert.ok(over, 'het gesprek is meegesleept terwijl de zaak er nog in zat');
+  assert.deepEqual(over.deelnemers, ['zaak:AB12'], 'de zaak is uit haar eigen gesprek gezet');
+  assert.deepEqual((db.data.commBerichten[g.id] || []).map((m) => m.tekst), ['tot elf uur'],
+    'de zaak is haar eigen antwoord kwijt, of het bericht van het lid staat er nog');
 });
 
 test('een database zonder gesprekken laat niets omvallen', () => {

@@ -2663,13 +2663,20 @@ window.I18N = { en: {
 <script src="/shared/rosapps.js" defer></script>
 <script src="/shared/split.js" defer></script>
 <script src="/shared/sneltoets.js" defer></script>
-<!-- Deze twee stonden IN ELKAAR: <script src="ios.js" defer> werd nooit
+<!-- Deze twee stonden IN ELKAAR: de openingstag van ios.js werd nooit
      afgesloten, dus de regel erna belandde als tekstinhoud binnen dat element
-     en de sluittag eronder sloot ios.js af. Een <script> met een src negeert
+     en de sluittag eronder sloot ios.js af. Een scripttag met een src negeert
      zijn eigen inhoud, dus pinherstel.js is nooit geladen -- en dat is precies
      het script dat de herstel-link uit server/routes/algpin.js afhandelt
      (/apps/app.html?pinherstel=...). Geen foutmelding, geen rode toets: alleen
-     een link die niets deed. -->
+     een link die niets deed.
+
+     En daarom staat er hierboven geen enkele scripttag meer UITGESCHREVEN.
+     Deze uitleg deed het eerst wel, en toen las de scanner van
+     test/blindevlek.test.js die tag als een echt scriptblok: hij knipt op tags
+     en niet op commentaar, met opzet (een commentaar dat per ongeluk niet
+     sluit, maakt de tag erin wel degelijk levend). De uitleg viel dus over
+     precies de fout die hij uitlegt. -->
 <script src="/shared/ios.js" defer></script>
 <script src="/shared/pinherstel.js" defer></script>
 </body>

@@ -1437,7 +1437,24 @@ API: `/api/comm/{inbox,gesprek,begin,stuur,wijzig,wis,reactie,lees,vlag,concept,
 
 Allebei waren ze onzichtbaar, en om dezelfde reden: de bezem in `test/vergeten.test.js` loopt na het verwijderen door de hele database, maar de wandeling ervóór maakt geen gesprek (daar heb je een tweede, verbonden lid voor nodig) — en een tak die nooit is aangeraakt kan een bezem niet vinden. **De dekking van een bezem is de dekking van de wandeling ervoor.** Daarom zijn er nu twee toetsen die de takken écht aanmaken met de kern zelf: `test/bewaartermijnen.test.js` eist dat elke tak die de kern maakt een termijn heeft (met de tak-lijst uit de kern gehaald en niet met de hand overgeschreven), en `test/comm-vergeten.test.js` roept dezelfde functie aan die `wisLid()` aanroept.
 
-**Wat er nog niet in zit** — zodat niemand het hier gaat zoeken: end-to-end encryptie, tenants/RBAC, SSO/SCIM, legal hold, eDiscovery, DLP en de publieke API voor externe ontwikkelaars. Het model is erop gebouwd (elk bericht hoort bij een gesprek met een soort en een `meta`), maar ze staan er niet. Een half aangezette compliance-laag is gevaarlijker dan een afwezige. Hetzelfde geldt voor groepsbellen met breakout rooms en opname: dat blijft voorlopig RTG Meet.
+Diezelfde toets vond er later nog één, en die was ouder dan de verhuizing: een gesprek draagt in `door` wie het opende, en dat veld is geen deelnemer en geen bericht — dus liep het langs allebei de wislussen heen. Dat het lang groen bleef, kwam doordat `tussen()` de twee sleutels alfabetisch zet en de blijver in de toets toevallig vooraan stond. Het gaat nu op `null` (niet naar de eerstvolgende deelnemer: die heeft het gesprek niet geopend, en een verkeerd antwoord is erger dan geen).
+
+**Een deelnemer is niet meer per se een lid** (`server/kern/comm/wie.js`). Dit was het stuk dat de rest blokkeerde. Zolang alleen leden een sleutel hadden, kon een zaak geen deelnemer zijn — en dus bleven het gastcontact met een restaurant, de collega-DM op de werkvloer en de sollicitatiechat in hun eigen voorraad staan. Niet omdat ze anders waren, maar omdat de andere kant van het gesprek geen naam had in dit model. Er zijn nu vier soorten deelnemer, en de vorm is de hele beveiliging:
+
+| | sleutel | |
+|---|---|---|
+| lid | `user-12` | de kale ledensleutel, **ongewijzigd** |
+| zaak | `zaak:AB12` | de zaak als geheel; het team deelt hem |
+| mens | `mens:AB12:7` | een persoon binnen die zaak |
+| kantoor | `kantoor` | de backoffice van RTG |
+
+Een lid houdt zijn kále sleutel, en dat is de reden dat dit zonder migratie kon: zo staan de bestaande gesprekken, leesstanden en SSE-routering er al in. De prijs staat in `lid()`: omdat een lid geen voorvoegsel draagt, is "geen dubbele punt" het enige wat hem van een actor onderscheidt — dus **gooit** die functie op een ledensleutel met een dubbele punt erin. Vandaag kan dat niet, maar "kan vandaag niet" is geen bewaking.
+
+En de regel die alles draagt: **een sleutel wordt afgeleid, nooit aangeleverd.** `wie.vanZaak(req)` maakt hem uit de sessie die `supplierAuth` al controleerde; er is met opzet geen parameter waarin een verzoek kan zeggen wie het is. Zou die er wél zijn, dan vult een leverancier de sleutel van een lid in en leest hij mee in een gesprek tussen twee mensen die hem niet kennen. `test/comm-zaak.e2e.js` probeert dat expliciet — met alle veldnamen die een programmeur zou kiezen (`alsWie`, `van`, `sleutel`, `key`, `deelnemer`, `actor`, `mij`) — want de andere toetsen meten alleen dat de route de góéde sleutel gebruikt, niet dat er geen weg is om hem te kíézen.
+
+De zakelijke deur is `routes/supplier/comm.js`: `/api/supplier/comm/{inbox,gesprek,stuur,lees,typt,zoek,collega}`, dezelfde kern, geen tweede berichtenmodel. Twee sleutels per sessie, en dat is het hele verschil tussen een gedeelde inbox (een bestelling is van het bedrijf) en eigen berichten (een collega-DM deelt het team juist niet). Wie er namens de zaak typte blijft binnen de zaak: het team ziet welke collega antwoordde, de klant ziet het bedrijf. Er is bewust géén `/begin` met een lid — een zakelijk gesprek met een klant ontstaat uit iets dat er al is (een bestelling, een rit, een boeking) en de module die dát weet maakt het via `comm.gesprekMaak()`. Wél een `/collega`, met de personeelslijst als poort in plaats van vriendschap.
+
+**Wat er nog niet in zit** — zodat niemand het hier gaat zoeken: end-to-end encryptie, rollen en rechten binnen een zaak (RBAC), SSO/SCIM, legal hold, eDiscovery, DLP en de publieke API voor externe ontwikkelaars. Ook de vier oude voorraden zijn nog niet verhuisd: het actormodel maakt dat mogelijk, maar `applyChats`, `guestChats`, `collegaChats` en `podiumChat` staan er nog, en elk daarvan verdient zijn eigen ronde met zijn eigen migratietoets (zie `test/comm-dm.test.js` voor waarom). Het model is op dit alles gebouwd, maar het staat er niet. Een half aangezette compliance-laag is gevaarlijker dan een afwezige. Hetzelfde geldt voor groepsbellen met breakout rooms en opname: dat blijft voorlopig RTG Meet.
 
 ## Veiligheid & verbinding: vier apps op één ruggengraat
 

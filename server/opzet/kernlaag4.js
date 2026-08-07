@@ -31,6 +31,7 @@
 
 module.exports = (kern, hulp) => {
   const { accounts, anthropic, broadcastSync, crypto, db, findSupplier, keyVanCodenaam, ledenAantal, liveCodename, media, notify, notifySupplier, onboarding, rtmail, save, schoon } = hulp;
+  // sseToCustomer/sseToSupplier/sseToOffice worden via hulp.* gelezen (zie kern.comm)
 
 
 /* Het Huis: het reisdossier achter de hoofdingang. Leest alleen wat er al is --
@@ -115,8 +116,31 @@ kern.berichten = require('../kern/berichten')({ db, save, socialConnecties: kern
    hergebruikt: dezelfde drie taken (samenvatten, opstellen, afspraken) op de
    draad van de kern. Een tweede AI-laag zou een tweede plek zijn waar de regel
    "de AI stelt op, de mens verstuurt" gehandhaafd moet worden. */
+/* WIE ER AAN TAFEL MAG ZITTEN (kern/comm/wie.js). Een deelnemer was tot nu toe
+   altijd een lid; sinds hier ook een zaak, een collega of het kantoor in een
+   gesprek kan zitten, moet de kern twee dingen weten die hij zelf niet kan
+   opzoeken: hoe zo'n deelnemer HEET en op welke SSE-stroom hij luistert. Beide
+   komen hier binnen, zodat kern/comm niets weet van de leverancierskast of de
+   personeelstabel.
+
+   De naam van een medewerker komt alleen terug als hij ECHT bij die zaak hoort.
+   Zonder die vergelijking zou 'mens:AB12:7' de naam van teamlid 7 opleveren,
+   welk bedrijf dat ook is -- een sleutel verzinnen was dan een manier om de
+   personeelstabel af te lopen. */
+const commNaam = require('../kern/comm/wie').maakNaam({
+  codenaamVan: kern.codenaamVan,
+  zaakNaam: (code) => { const z = findSupplier(code); return z ? z.name : null; },
+  mensNaam: (code, id) => {
+    try {
+      const s = accounts.getStaffById(id);
+      return s && String(s.supplier_code || '').toUpperCase() === String(code).toUpperCase() ? s.name : null;
+    } catch (e) { return null; }
+  }
+});
 kern.comm = require('../kern/comm').maakComm({ db, save, crypto,
-  codenaamVan: kern.codenaamVan, sseToCustomer: hulp.sseToCustomer });
+  codenaamVan: kern.codenaamVan, naamVan: commNaam,
+  sein: require('../kern/comm/wie').maakSein({ sseToCustomer: hulp.sseToCustomer,
+    sseToSupplier: hulp.sseToSupplier, sseToOffice: hulp.sseToOffice }) });
 kern.commBronnen = require('../kern/comm/bronnen').maakBronnen({ db,
   codenaamVan: kern.codenaamVan,
   /* convOf wordt pas later in de opbouw gezet (server.js); daarom hier op het

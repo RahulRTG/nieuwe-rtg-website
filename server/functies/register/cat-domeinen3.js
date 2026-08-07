@@ -52,6 +52,16 @@ module.exports = [
     uitleg: 'De meldingen in de app, de voorkeuren daarvoor en de push naar het toestel.', paden: ['/api/notifications', '/api/meldingen', '/api/push'] },
   { id: 'kern-berichten', categorie: 'Leden (RTG-app)', naam: 'Berichten en gesprekken', standaard: true, doelgroepen: ALLE,
     uitleg: 'De chat met de concierge, prive-berichten op codenaam en de groepsklets.', paden: ['/api/chat', '/api/dm', '/api/klets'] },
+  /* Het communicatieplatform (kern/comm). Bewust een EIGEN knop en niet
+     ondergebracht bij kern-berichten hierboven: dat gaat over de oude losse
+     kanalen, dit over het gespreksmodel waar elke module op aansluit -- een
+     rit, een bestelling, een klas. Wie deze knop omzet, zet meer uit dan een
+     chatvenster, en dat hoort de boardroom te kunnen zien voor hij hem
+     aanraakt. De zakelijke kant (/api/supplier/comm) valt onder de
+     leverancierskast en staat daarom niet apart. */
+  { id: 'kern-comm', categorie: 'Leden (RTG-app)', naam: 'Communicatieplatform', standaard: true, doelgroepen: ALLE,
+    uitleg: 'Het ene gespreksmodel: de inbox met al zijn laden, threads, reacties, zoeken over alles, en @Rahul die opstelt maar nooit verstuurt. Ook de gesprekken die modules aanmaken (een rit, een bestelling) lopen hierlangs.',
+    paden: ['/api/comm'] },
   { id: 'kern-taal', categorie: 'Leden (RTG-app)', naam: 'Taal en vertaling', standaard: true, doelgroepen: ALLE,
     uitleg: 'De talenlijst en het vertalen van schermteksten en berichten.', paden: ['/api/vertaal', '/api/translate', '/api/talen'] },
   { id: 'kern-locatie', categorie: 'Leden (RTG-app)', naam: 'Locatie delen', standaard: true, doelgroepen: LEDEN,

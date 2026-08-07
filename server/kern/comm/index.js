@@ -43,12 +43,23 @@
       een model zelf een bericht plaatst; @Rahul levert tekst terug (zie ./ai)
       en die belandt in het invoerveld. Dezelfde drempel als bij geld.
 
+   EEN DEELNEMER IS NIET PER SE EEN LID. In `deelnemers` staan sleutels, en
+   sinds ./wie.js kan zo'n sleutel ook een zaak zijn ('zaak:AB12'), een
+   medewerker ('mens:AB12:7') of het kantoor. Dat is wat de laatste voorraden
+   ontsluit -- het gastcontact, de collega-DM, de sollicitatie stonden niet
+   apart omdat ze anders waren, maar omdat de andere kant van het gesprek geen
+   naam had in dit model. Deze kern verandert er nauwelijks door: de poort is
+   nog steeds de deelnemerslijst, en die kent alleen sleutels. Wie zo'n sleutel
+   MAG dragen, wordt beantwoord waar de sessie is (routes/supplier/comm.js) en
+   niet hier.
+
    WAT HIER (NOG) NIET IN ZIT, zodat niemand het hier gaat zoeken: end-to-end
-   encryptie, tenants/RBAC, retentiebeleid, legal hold, eDiscovery en de
-   publieke API voor externe ontwikkelaars. Die horen in dit model thuis -- het
-   is er ook op gebouwd, zie meta en het feit dat elk bericht een gesprek met
-   een soort heeft -- maar ze staan er niet. Een half aangezette
-   compliance-laag is gevaarlijker dan een afwezige.
+   encryptie, rollen en rechten binnen een zaak (RBAC), legal hold, eDiscovery
+   en de publieke API voor externe ontwikkelaars. Die horen in dit model thuis
+   -- het is er ook op gebouwd, zie meta en het feit dat elk bericht een
+   gesprek met een soort heeft -- maar ze staan er niet. Een half aangezette
+   compliance-laag is gevaarlijker dan een afwezige. Het retentiebeleid staat
+   er sinds de verhuizing wel (server/bewaarbeleid.js).
    ================================================================ */
 'use strict';
 
@@ -79,9 +90,20 @@ const WIJZIG_MS = 15 * 60000;   // een correctie mag een kwartier lang
 const TYPT_MS = 6000;           // "typt..." vervalt vanzelf
 const AANWEZIG_MS = 45000;      // zo lang geldt een teken van leven als online
 
-function maakComm({ db, save, crypto, codenaamVan, sseToCustomer }) {
+const wie = require('./wie');
+
+function maakComm({ db, save, crypto, codenaamVan, naamVan, sein, sseToCustomer }) {
   const nu = () => new Date().toISOString();
   const id = (p) => p + '_' + crypto.randomBytes(8).toString('hex');
+
+  /* Een deelnemer heet bij zijn naam en nooit bij zijn sleutel. Welke naam dat
+     is, hangt af van wat voor actor het is (./wie.js): een lid draagt zijn
+     codenaam, een zaak zijn zaaknaam. Staat er geen naamVan opgehangen, dan is
+     dit precies de oude regel -- alleen leden hebben een naam. */
+  const noem = (key) => {
+    const f = naamVan || codenaamVan;
+    return (f ? f(key) : null) || null;
+  };
 
   /* ---------------------------------------------------------- opslag */
   function G() {
@@ -189,6 +211,11 @@ function maakComm({ db, save, crypto, codenaamVan, sseToCustomer }) {
     }
     const m = {
       id: id('brc'), van: o.van, at: nu(),
+      /* Namens wie er geschreven wordt (`van`) en WIE het typte (`door`) zijn
+         bij een zaak niet hetzelfde. Alleen ingevuld als het iemand uit
+         dezelfde zaak is: `door` van een vreemde sleutel zou een manier zijn
+         om een naam in andermans gesprek te zetten. */
+      door: o.door && wie.zelfdeZaak(o.door, o.van) ? String(o.door) : null,
       tekst: tekst || null,
       soort: o.soort || (bijlage ? bijlage.soort || 'bijlage' : 'tekst'),
       antwoordOp: o.antwoordOp || null,
@@ -214,12 +241,22 @@ function maakComm({ db, save, crypto, codenaamVan, sseToCustomer }) {
 
   /* Iedereen behalve de afzender krijgt het sein. Wie het gesprek stil heeft
      gezet krijgt het OOK -- stil gaat over meldingen, niet over of het scherm
-     bijwerkt; een gesprek dat pas na een verversing verandert voelt kapot. */
+     bijwerkt; een gesprek dat pas na een verversing verandert voelt kapot.
+
+     WELKE STROOM dat is, hangt af van wie de deelnemer is: een lid luistert op
+     de ledenapp, een zaak op de leveranciersstroom. Die wissel staat in
+     ./wie.js (maakSein) en niet hier, zodat er een plek is waar "waar woont
+     deze actor" wordt beantwoord. Zonder `sein` valt de kern terug op de oude
+     weg, en dan zijn alleen leden bereikbaar -- eerlijk, want dan zijn er ook
+     geen actoren opgehangen. */
+  const stuurSein = sein || (sseToCustomer
+    ? (sleutel, event, data) => { if (wie.isLid(sleutel)) sseToCustomer(sleutel, event, data); }
+    : null);
   function seinNaarDeRest(g, behalve, event, data) {
-    if (!sseToCustomer) return;
+    if (!stuurSein) return;
     for (const d of g.deelnemers) {
       if (d === behalve) continue;
-      try { sseToCustomer(d, 'comm', Object.assign({ soort: event }, data)); } catch (e) {}
+      try { stuurSein(d, 'comm', Object.assign({ soort: event }, data)); } catch (e) {}
     }
   }
 
@@ -281,7 +318,7 @@ function maakComm({ db, save, crypto, codenaamVan, sseToCustomer }) {
     const g = eis(gesprekId, key);
     standZet(key, g.id, 'gelezen', nu());
     save();
-    seinNaarDeRest(g, key, 'gelezen', { gesprekId: g.id, wie: codenaamVan ? codenaamVan(key) : null });
+    seinNaarDeRest(g, key, 'gelezen', { gesprekId: g.id, wie: noem(key) });
     return standVan(key, g.id);
   }
   function vlag(key, gesprekId, welke, aan) {
@@ -310,7 +347,7 @@ function maakComm({ db, save, crypto, codenaamVan, sseToCustomer }) {
     const m = typt.get(g.id) || new Map();
     m.set(key, Date.now());
     typt.set(g.id, m);
-    seinNaarDeRest(g, key, 'typt', { gesprekId: g.id, wie: codenaamVan ? codenaamVan(key) : null });
+    seinNaarDeRest(g, key, 'typt', { gesprekId: g.id, wie: noem(key) });
     return true;
   }
   function wieTypt(gesprekId, behalve) {
@@ -320,7 +357,7 @@ function maakComm({ db, save, crypto, codenaamVan, sseToCustomer }) {
     for (const [key, t] of m) {
       if (Date.now() - t > TYPT_MS) { m.delete(key); continue; }
       if (key === behalve) continue;
-      uit.push(codenaamVan ? codenaamVan(key) : key);
+      uit.push(noem(key));
     }
     return uit.filter(Boolean);
   }
@@ -340,16 +377,24 @@ function maakComm({ db, save, crypto, codenaamVan, sseToCustomer }) {
       throw new Error('Even wachten -- een por mag een keer per minuut.');
     }
     nudges.set(s, Date.now());
-    seinNaarDeRest(g, key, 'nudge', { gesprekId: g.id, wie: codenaamVan ? codenaamVan(key) : null });
+    seinNaarDeRest(g, key, 'nudge', { gesprekId: g.id, wie: noem(key) });
     return true;
   }
 
   /* --------------------------------------------------------- tonen */
-  const naam = (key) => (codenaamVan ? codenaamVan(key) : null) || 'Onbekend';
+  const naam = (key) => noem(key) || 'Onbekend';
 
   function toonBericht(m, mij) {
     return {
       id: m.id, at: m.at, vanMij: m.van === mij, van: naam(m.van),
+      /* WIE ER NAMENS DE ZAAK TYPTE, BLIJFT BINNEN DE ZAAK. Het team moet
+         kunnen zien welke collega antwoordde -- zonder dat is een gedeelde
+         inbox onwerkbaar -- maar de klant hoort de zaak te zien en niet de
+         voornaam van wie er die avond stond. Dat is geen smaakkwestie: op een
+         platform dat op codenaam draait is de kant van de zaak niet ineens
+         vrij spel. Vandaar deze ene voorwaarde, en niet een veld dat je
+         "meestal" weglaat. */
+      door: m.door && wie.zelfdeZaak(m.door, mij) ? naam(m.door) : null,
       tekst: m.weg ? null : m.tekst, soort: m.soort,
       bijlage: m.weg ? null : (m.bijlage || null),
       antwoordOp: m.antwoordOp || null,

@@ -10,6 +10,9 @@ module.exports = (kern) => {
 /* De toegang- en backofficelaag draaien als submodules op de gedeelde kern. */
 require('./supplier/toegang')(kern);
 require('./supplier/moedertaal')(kern);
+/* De zakelijke kant van het communicatieplatform: dezelfde kern als de
+   ledenapp, met de sleutel die uit de sessie volgt. Zie ./supplier/comm.js. */
+require('./supplier/comm')(kern);
 require('./supplier/backoffice')(kern);
 require('./supplier/hrplus')(kern);
 require('./supplier/prplus')(kern);

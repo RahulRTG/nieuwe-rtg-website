@@ -39,6 +39,17 @@ function wisGesprekkenVan(db, key) {
         gesprekkenWeg++;
         continue;
       }
+      /* WIE HET GESPREK OPENDE staat apart in `door`, en dat veld is geen
+         deelnemer en geen bericht -- dus liep het langs beide lussen heen. Een
+         sleutel die daar blijft staan is precies waarmee iemand terug te
+         vinden is, en dat het nergens meer gelezen wordt maakt niet uit: het
+         wisrecht gaat over wat er STAAT.
+
+         Het gaat op null en niet naar de eerstvolgende deelnemer: die heeft
+         het gesprek niet geopend, en een verkeerd antwoord is erger dan geen.
+         Dat dit lang groen bleef, kwam doordat tussen() de twee sleutels
+         alfabetisch zet -- in de toets stond de blijver toevallig vooraan. */
+      if (g.door === key) g.door = null;
       const voor = (berichten[g.id] || []).length;
       berichten[g.id] = (berichten[g.id] || []).filter((m) => m.van !== key);
       berichtenWeg += voor - berichten[g.id].length;

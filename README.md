@@ -149,7 +149,13 @@ provider.
 
 Op elke app-pagina staat onderaan één balk met daarboven het gesprek
 (`public/shared/handenvrij.js` + `-balk.js` + `-chat.js` + `-mond.js`,
-aangehaakt via `shared/metgezel.js`). Daarin typ je of praat je, en er gebeurt
+aangehaakt via `shared/metgezel.js`). **Eén**, en dat is een regel en geen
+toevalligheid: de homescreen heeft zijn eigen chatbalk (`#osAiBalk`), en
+`metgezel.js` houdt zich daar dus stil. Hij herkent dat scherm aan wat het IS
+(`<body data-ios-home>`, `#osAiBalk`) en niet aan zijn pad -- de homescreen
+wordt namelijk op vier paden geserveerd (`/`, `/apps/`, `/apps/index.html`,
+`/apps/bureau.html`) en een padtoets liet er drie doorheen, met twee balken
+onder elkaar tot gevolg. Daarin typ je of praat je, en er gebeurt
 iets. Het leest als een chat met Rahul: jouw beurt rechts in bordeaux, zijn
 beurt links met de signatuurmond ernaast, drie puntjes terwijl hij bezig is.
 
@@ -364,6 +370,25 @@ Dat is allemaal weg. Wat een telefoon heeft, en verder niets:
 - **Een randveeg** van links terug in de geschiedenis.
 - **Bladen in plaats van vensters** (`RTGiOS.blad(...)`): van onder omhoog, met
   een greep, sluiten met een veeg omlaag.
+- **Een hamburger rechtsboven, op elk scherm** (`shared/appmenu.js`, door
+  `ios.js` binnengehaald). Hij opent een blad met twee delen: *deze app* -- de
+  functies van het scherm waar je staat -- en *overal*: beginscherm, een stap
+  terug, instellingen, meldingen, Rahul, delen, uitloggen. Elke rij verschijnt
+  alleen als er op dat scherm ook echt iets achter zit.
+
+  De app-functies worden niet per app opgeschreven (dat zijn honderdenveertig+ bestanden die
+  binnen een week uit elkaar lopen) maar GELEZEN uit wat de pagina al heeft: de
+  delenbalk van `shared/deelmenu.js`, de tab- en filterrij die `ios.js` in de
+  tweede rij van de navigatiebalk heeft gezet, en anders de eerste schakelrij
+  die op vorm te herkennen is (een vakje met drie tot acht knoppen met korte
+  labels -- `.chips`, `.rubrieken`, `.filters`, hoe hij ook heet). Een app die
+  zelf beter weet wat erin hoort, zegt dat met `RTGAppMenu.zet([...])` of
+  `RTGAppMenu.voegToe({...})`.
+
+  Op de homescreen neemt dezelfde hamburger de drie losse knopjes uit de
+  statusbalk op (batterij, bel, bedieningspaneel) plus scannen, Zegel en
+  backoffice. Die knoppen blijven in de HTML staan, verborgen: het menu klikt ze
+  aan, zodat het gedrag op één plek blijft wonen.
 
 Dat alles staat op **een** plek: `public/shared/ios.css` + `public/shared/ios.js`
 (bron in `public/shared/ios/`). De laag LEEST de kopbalk die een pagina al heeft

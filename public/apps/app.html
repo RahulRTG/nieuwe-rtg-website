@@ -1599,20 +1599,34 @@
              is. De plek blijft leeg; osTerug hiernaast vult hem zodra er een
              app open staat. -->
       </div>
-      <!-- De statusbalk houdt drie dingen vast: hoe vol de batterij is, of er
-           iets voor je klaarligt (de bel) en de ingang naar alle instellingen
-           (het paneel). Scannen, je Zegel tonen en je backoffice zaten hier
-           ook als losse knopjes; die staan nu in het paneel, zodat de balk
-           rustig blijft. De knoppen zelf blijven bestaan (verborgen), want de
-           rest van de app klikt ze aan. -->
+      <!-- HIER STONDEN DRIE KNOPJES, EN NU STAAT ER ÉÉN.
+
+           De batterij, de bel en het bedieningspaneel lagen los naast elkaar
+           boven een scherm dat verder alleen lucht, een klok en vier mappen is.
+           Drie tekens naast elkaar is een stapeling, en de merkregel zegt: één
+           signatuurelement, geen stapeling van trucjes. Ze zitten nu in het
+           app-menu achter de hamburger (shared/appmenu.js), samen met scannen,
+           je Zegel en je backoffice -- dezelfde hamburger die in élke app van
+           het OS rechtsboven staat, zodat het overal dezelfde beweging is.
+
+           De knoppen zelf blijven bestaan, verborgen: het menu, het
+           bedieningspaneel en de rest van de app klikken ze aan, en dat blijft
+           de enige plek waar het gedrag staat. Dezelfde afspraak als bij
+           scannen/Zegel/backoffice hieronder. De batterijstand komt als regel
+           tekst in het menu terug -- hij is geen knop, dus hij hoort er ook
+           niet als knop in.
+
+           De hamburger zelf staat niet in deze HTML maar wordt door
+           shared/appmenu.js in .os-rechts gehangen: één knop op één plek in de
+           code, in plaats van dezelfde knop op elke pagina met de hand. -->
       <div class="os-rechts">
-        <span class="os-bat" id="osBat" hidden aria-hidden="true"><i><b id="osBatVul"></b></i><em id="osBatPct"></em></span>
+        <span class="os-bat os-verborgen-knop" id="osBat" hidden aria-hidden="true"><i><b id="osBatVul"></b></i><em id="osBatPct"></em></span>
         <button class="os-klaar" id="osKlaar" hidden>Klaar</button>
-        <button class="bell" id="bell" aria-label="Meldingen">
+        <button class="bell os-verborgen-knop" id="bell" aria-label="Meldingen" tabindex="-1">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
           <span class="bell-badge" id="bellBadge" style="display:none;">0</span>
         </button>
-        <button class="bell" id="osCcBtn" aria-label="Bedieningspaneel">
+        <button class="bell os-verborgen-knop" id="osCcBtn" aria-label="Bedieningspaneel" tabindex="-1">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/><circle cx="9" cy="7" r="2" fill="var(--bg)"/><circle cx="15" cy="12" r="2" fill="var(--bg)"/><circle cx="7" cy="17" r="2" fill="var(--bg)"/></svg>
         </button>
         <button class="bell os-verborgen-knop" id="scanBtn" aria-label="Scan een tafel- of RTG-code" tabindex="-1">
@@ -2581,7 +2595,14 @@ window.I18N = { en: {
 <script src="/shared/rosapps.js" defer></script>
 <script src="/shared/split.js" defer></script>
 <script src="/shared/sneltoets.js" defer></script>
-<script src="/shared/ios.js" defer>
-<script src="/shared/pinherstel.js" defer></script></script>
+<!-- Deze twee stonden IN ELKAAR: <script src="ios.js" defer> werd nooit
+     afgesloten, dus de regel erna belandde als tekstinhoud binnen dat element
+     en de sluittag eronder sloot ios.js af. Een <script> met een src negeert
+     zijn eigen inhoud, dus pinherstel.js is nooit geladen -- en dat is precies
+     het script dat de herstel-link uit server/routes/algpin.js afhandelt
+     (/apps/app.html?pinherstel=...). Geen foutmelding, geen rode toets: alleen
+     een link die niets deed. -->
+<script src="/shared/ios.js" defer></script>
+<script src="/shared/pinherstel.js" defer></script>
 </body>
 </html>

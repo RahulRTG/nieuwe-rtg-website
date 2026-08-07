@@ -82,6 +82,8 @@ function maakMobiliteit(state) {
   Object.assign(ctx, require('./reis')(ctx));
   // de zakelijke laag: het beleid eerst, want de rittenmotor toetst eraan
   Object.assign(ctx, require('./reisbeleid')(ctx));
+  // de toets staat apart (10 KB-lat); hij leunt op beleidVan/werktBij hierboven
+  Object.assign(ctx, require('./reisbeleid-toets')(ctx));
   Object.assign(ctx, require('./zakelijk')(ctx));
   // de CDT-laag: de registratie eerst, de uitvoer daarna (die leest de diensten)
   Object.assign(ctx, require('./cdt')(ctx));

@@ -254,8 +254,19 @@ test('elke routehandler die een id uit het verzoek pakt, noemt ook de sessie', (
        (b) OPENBARE INHOUD ACHTER EEN INLOG. Het id wijst een reisadvertentie,
            een boerderij, een reisgids of een boarding pass aan -- dingen die
            iedereen met een pas mag zien. Er is geen tweede eigenaar, dus er is
-           niets te scheiden; de poortwachter is genoeg. */
+           niets te scheiden; de poortwachter is genoeg.
+       (c) ER WORDT NIETS OPGEZOCHT. De handler leest het id wel uit het
+           verzoek, maar raakt er geen gegeven mee aan: hij keurt de VORM en
+           stuurt door. Wat het id waard is, wordt ergens anders bepaald -- en
+           daar staat de controle. Een sessie eisen zou hier niets scheiden,
+           want er valt niets te scheiden. */
   const GEDULD = {
+    /* (c) er wordt niets opgezocht: deze handler controleert alleen of de
+       code zes tekens A-Z0-9 is en schrijft het adres om naar
+       /apps/app.html?werving=<code>. Hij leest geen uitnodiging, geen
+       bedrijf en geen account. Het inwisselen gebeurt pas bij het
+       registreren (routes/auth/account.js), en DAAR hangt de controle. */
+    'server/routes/werving.js GET /werken/:code': 'stuurt alleen door; de code wordt bij registreren ingewisseld en daar gecontroleerd',
     // (a) de code is de sleutel
     'server/routes/lesmaker.js POST /api/les/leraar': 'klaslokaal: leraarToken is de sleutel, geen account',
     'server/routes/lesmaker.js POST /api/les/volgende': 'klaslokaal: leraarToken is de sleutel',

@@ -26,7 +26,7 @@
 'use strict';
 
 module.exports = (kern, hulp) => {
-  const { DATA_DIR, PERSONAS, accounts, anthropic, boekingenVanKlant, crypto, db, findSupplier, keyVanCodenaam, ledenAantal, leeftijdVan, mail, media, ordersVanKlant, ordersVanZaak, rtf, save, schoon, sendPush, sendPushToUser, sociaal, sseToCustomer } = hulp;
+  const { DATA_DIR, PERSONAS, accounts, anthropic, boekingenVanKlant, crypto, db, findSupplier, keyVanCodenaam, ledenAantal, leeftijdVan, log, mail, media, ordersVanKlant, ordersVanZaak, rtf, save, schoon, sendPush, sendPushToUser, sociaal, sseToCustomer, sseToOffice } = hulp;
 
 Object.assign(kern, sociaal); // de sociale kern-helpers erbij
 /* Tafelticket (kern/tafelticket.js): de bonnen van dezelfde tafel op een
@@ -137,4 +137,20 @@ Object.assign(kern, require('../kern/studio').maakStudio({ db, save, crypto, ant
    accessoires. AI tekent het concept uit, levert een stuklijst en de blik
    van de chef-engineer. */
 Object.assign(kern, require('../kern/hardwarelab').maakHardwarelab({ db, save, crypto, anthropic, schoon }));
+
+/* Het stadsweefsel (kern/stadsweefsel/): de ondergrond onder de stad --
+   geografie, objecten, indicatoren, begroting, besluitvorming en het
+   algoritmeregister.
+
+   DE VOLGORDE IS HIER GEDRAG. Het weefsel staat VOOR zijn lezers: kern/gemeente
+   (laag 2) biedt zijn meldingen bij de zaakmotor aan en kern/stad (laag 5) leest
+   zijn zones uit de geografie. Wie dit blok naar beneden schuift, start een stad
+   zonder ondergrond -- en dan hangt een gemeentemelding aan geen enkele zaak.
+   Het staat in deze laag en niet in laag 2 omdat die daarmee over de 10 KB ging;
+   eerder is hier ook goed, want alles wat het weefsel nodig heeft bestaat al. */
+const melderSeintje = (codenaam) => {
+  try { Promise.resolve(keyVanCodenaam(codenaam)).then(t => { if (t && t.key) sseToCustomer(t.key, 'sync', { scope: 'stad' }); }).catch(() => {}); }
+  catch (e) { log.uitzondering(e, { bron: 'weefsel', waar: 'melderSeintje' }); }
+};
+Object.assign(kern, require('../kern/stadsweefsel')({ db, save, crypto, sseToOffice, melderSeintje, log }));
 };

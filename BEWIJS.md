@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 655 bestanden en 3677 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 660 bestanden en 3719 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,13 +12,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 655 |
-| losse beweringen (`test(...)`) | 3677 |
+| toetsbestanden | 660 |
+| losse beweringen (`test(...)`) | 3719 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 517 |
 | **overleefd**: geen mutatie kreeg hem rood | 12 |
 | niet te meten (al rood, geen module gevonden, ...) | 16 |
-| alleen in de kop *genoemd*, nog niet gemeten | 17 |
+| alleen in de kop *genoemd*, nog niet gemeten | 22 |
 | niets van beide | 93 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-580 bestanden, 3546 beweringen.
+585 bestanden, 3588 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -504,7 +504,12 @@ toets omvalt.
 | `sso.test.js` | 28 | gezakt op `return-weg#0` | SSO: de laag waarmee een zakelijke klant met zijn eigen identiteitsprovider inlogt. Dit is auth, dus de tests gaan vooral over wat er NIET mag. |
 | `ssrf.test.js` | 10 | gezakt op `true->false#0` | Tests voor de SSRF-afweer (server/kern/ssrf.js). Het scherpst getoetste geval is het web-push-endpoint: dat komt van de client en de server POST daar later naartoe. |
 | `stad.test.js` | 6 | gezakt op `liegpoort /api/` | RTG Stad: het slimme-stad-platform op eigen hardware (de Stadsdoos-vloot) en eigen software. Getest: het stadsbeeld met de demovloot en de privacy-belofte; de scenario-knop die alle regimes in een keer verzet (met... |
+| `stadsbesluit.test.js` | 7 | genoemd | DE BESTUURLIJKE LAAG: organen, mandaat, besluitvorming, inspraak, rekenkamer. Het weefsel kon alles uitrekenen. |
+| `stadsbestuur.test.js` | 9 | genoemd | HET STADSWEEFSEL, BESTUURSKANT: onderhoud, contracten, indicatoren, begroting, energie, klimaat, simulatie en het algoritmeregister. test/stadsweefsel.test.js dekt de operatie (waar staat het, wie gaat erheen); dit... |
+| `stadshardware.test.js` | 8 | genoemd | DE STADSDOOS ALS PRODUCT, DE NOODBEDIENING EN HET SOCIAAL DOMEIN. Drie lagen die alle drie over hetzelfde gaan: wat er gebeurt als de werkelijkheid niet meewerkt. |
+| `stadskansen.test.js` | 6 | genoemd | DE STEDELIJKE KANSENLAAG: onderwijs, werk en de lokale economie. Het punt van deze laag is dat hij bijna niets zelf bijhoudt: vacatures komen uit kern/werk, bedrijven uit de partnerlijst, beroepen uit de... |
 | `stadsraad.test.js` | 3 | gezakt op `liegpoort /api/` | De Stadsraad: per stad EEN invloedrijke partner (foundation/club/instelling) die met een eigen raadcode het gezamenlijke foundation-kantoor in mag en daar SAMEN met RTG-personeel beslist over de lab-uitslagen.... |
+| `stadsweefsel.test.js` | 12 | genoemd | HET STADSWEEFSEL: de laag die van losse stadssystemen een stad maakt. Getest, en per toets is de bewering met een MUTATIE nagetrokken (de lat, regel 2). |
 | `staffinvite.test.js` | 11 | gezakt op `liegpoort /api/` | Personeel = RTG-account, met uitnodiging. Een manager nodigt uit en krijgt een eenmalige kassacode; pas daarna kan de medewerker zich aanmelden met de bedrijfsnaam + kassacode + eigen RTG-inlog. |
 | `stijlbundel.test.js` | 9 | -- | DE STIJLBUNDEL: WAT ER SAMEN MAG, EN VOORAL WAT NIET. /apps/app.html doet 72 verzoeken. |
 | `streng-poorten.test.js` | 7 | gezakt op `liegpoort /api/` | De strenge poorten-veeg over de nieuwe genredomeinen: elke werkplek-API weigert anoniemen (401) en zaken zonder het juiste vermogen (403), de leden-lagen weigeren gasten (403), en rommel-invoer (HTML-injectie,... |

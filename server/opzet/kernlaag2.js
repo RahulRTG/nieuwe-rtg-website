@@ -26,25 +26,11 @@
 'use strict';
 
 module.exports = (kern, hulp) => {
-  const { LANDEN, accounts, anthropic, crypto, db, findSupplier, keyVanCodenaam, klokVan, log, notify, notifySupplier, openVacatures, save, schoon, sseToCustomer, sseToOffice, sseToSupplier } = hulp;
+  const { LANDEN, accounts, anthropic, crypto, db, findSupplier, klokVan, notify, notifySupplier, openVacatures, save, schoon, sseToSupplier } = hulp;
 
 /* RTG Architectenbureau (kern/architect.js): de vierde ontwerptak, voor het
    gebouwde: villa's, penthouses, landgoederen, chalets en paviljoens. AI tekent
    het concept uit, levert een bouwstaat en de blik van de chef-architect. */
-/* Het stadsweefsel (kern/stadsweefsel/): de ondergrond onder de stad --
-   geografie, objecten, indicatoren, begroting, besluitvorming en het
-   algoritmeregister.
-
-   DE VOLGORDE IS HIER GEDRAG. Het weefsel staat VOOR zijn lezers: de gemeente
-   biedt zijn meldingen bij de zaakmotor aan, en kern/stad leest zijn zones uit
-   de geografie. Wie dit blok naar beneden schuift, start een stad zonder
-   ondergrond -- en dan hangt een gemeentemelding aan geen enkele zaak. */
-const melderSeintje = (codenaam) => {
-  try { Promise.resolve(keyVanCodenaam(codenaam)).then(t => { if (t && t.key) sseToCustomer(t.key, 'sync', { scope: 'stad' }); }).catch(() => {}); }
-  catch (e) { log.uitzondering(e, { bron: 'weefsel', waar: 'melderSeintje' }); }
-};
-Object.assign(kern, require('../kern/stadsweefsel')({ db, save, crypto, sseToOffice, melderSeintje, log }));
-
 Object.assign(kern, require('../kern/architect').maakArchitect({ db, save, crypto, anthropic, schoon }));
 /* RTG Werkplaats (kern/werkplaats.js): het app-bureau van de kantoren. Bedenkt
    nieuwe apps en verbetert bestaande apps, de Bibliotheek en de App Store met AI

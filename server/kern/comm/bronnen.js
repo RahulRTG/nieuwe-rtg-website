@@ -27,14 +27,22 @@
    nodig is die niemand durft te doen. Elke bron die later wel overgaat,
    verdwijnt gewoon uit dit bestand.
 
-   REGEL: een bron LEEST alleen. Er staat hier geen enkele weg om iets te
-   schrijven -- dat zou de tweede schrijver op een voorraad zijn en precies de
-   splitsing veroorzaken die we aan het opheffen zijn. */
+   REGEL: een bron SCHRIJFT NIET ZELF. Hij mag wel een bericht DOORGEVEN aan
+   de module die de voorraad beheert -- en dat verschil is het hele punt. Een
+   sollicitatiechat beantwoorden gaat via de werk-module, met haar eigen
+   controles (is dit jouw sollicitatie?), haar eigen vertaallaag en haar eigen
+   melding aan de werkgever. Dit bestand kopieert daar niets van; het roept aan.
+
+   Zonder dat doorgeven was de ene app voor deze kanalen weer een leeslijst:
+   je zag dat er iets lag en werd naar een andere app gestuurd om te antwoorden
+   -- precies wat er hiervoor mis was. Met een eigen schrijfweg zou hij de
+   tweede schrijver op een voorraad zijn, en dat is de splitsing die we aan het
+   opheffen zijn. Doorgeven is de enige vorm die allebei vermijdt. */
 'use strict';
 
 const MAX_PER_BRON = 40;
 
-function maakBronnen({ db, codenaamVan, convOf, overheid, rtmail }) {
+function maakBronnen({ db, codenaamVan, convOf, overheid, rtmail, werk, zaak }) {
   const snij = (t, n) => String(t == null ? '' : t).slice(0, n || 140);
 
   /* Elke bron levert dezelfde vorm als comm.toonGesprek(), plus `extern: true`
@@ -137,7 +145,65 @@ function maakBronnen({ db, codenaamVan, convOf, overheid, rtmail }) {
     return [].concat(rahul(mij, account), overheidBox(mij), sollicitaties(mij), zaken(mij));
   }
 
-  return { alles };
+  /* ---------------- open en beantwoorden, via de module ----------------
+
+     De id draagt zijn herkomst ('bron:werk:123'), dus hier is precies te zien
+     welke module het is en welk gesprek. Wat een bron NIET kan, zegt hij ook:
+     de Berichtenbox van de overheid is eenrichtingsverkeer en Rahul heeft zijn
+     eigen scherm. Een invoerveld tonen bij iets waar je niet op kunt
+     antwoorden is erger dan geen invoerveld. */
+  function ontleed(bronId) {
+    const kaal = String(bronId || '').replace(/^bron:/, '');
+    const i = kaal.indexOf(':');
+    return { soort: i < 0 ? kaal : kaal.slice(0, i), sleutel: i < 0 ? '' : kaal.slice(i + 1) };
+  }
+
+  /* De berichten in de vorm van de kern, zodat de app er geen tweede
+     tekenroutine voor nodig heeft. */
+  const alsBericht = (m, mij) => ({
+    id: m.id || null, at: m.at, vanMij: !!m.vanMij, van: m.van || '',
+    tekst: m.tekst == null ? null : String(m.tekst), soort: 'tekst',
+    bijlage: null, antwoordOp: null, reacties: [], gewijzigd: null, was: null,
+    lang: m.lang || null, weg: null
+  });
+
+  function open(mij, bronId, lang) {
+    const b = ontleed(bronId);
+    if (b.soort === 'werk' && werk) {
+      const chat = (db.data.applyChats || {})[b.sleutel];
+      if (!chat || !chat.applicant || chat.applicant.key !== mij) return null;
+      return {
+        titel: (chat.bedrijf || 'Werkgever') + ' \u00b7 ' + (chat.func || 'sollicitatie'),
+        /* Waar een antwoord heen moet: de eigen route van de werk-module, met
+           de velden die zij verwacht. De app post daar rechtstreeks naartoe --
+           zo blijft die route de enige ingang op deze voorraad, met al haar
+           controles, en staat er hier niets nagebouwd. */
+        antwoord: { pad: '/api/member/apply/chat/send', vast: { id: b.sleutel }, veld: 'text' },
+        berichten: (chat.berichten || []).map((m) => alsBericht({
+          at: m.at, vanMij: m.van === 'sollicitant', van: m.van === 'sollicitant' ? 'Ik' : (chat.bedrijf || 'Werkgever'),
+          tekst: m.tekst, lang: m.lang
+        }, mij))
+      };
+    }
+    if (b.soort === 'zaak' && zaak) {
+      const chat = (db.data.guestChats || {})[b.sleutel];
+      if (!chat || !String(b.sleutel).includes(mij)) return null;
+      return {
+        titel: chat.zaakNaam || chat.naam || 'Een zaak',
+        antwoord: { pad: '/api/partner/chat/send',
+          vast: { supplierCode: chat.supplierCode || null, dept: chat.dept || null }, veld: 'text' },
+        berichten: (chat.messages || []).map((m) => alsBericht({
+          at: m.at, vanMij: m.from === 'guest', van: m.from === 'guest' ? 'Ik' : (chat.zaakNaam || 'De zaak'),
+          tekst: m.text, lang: m.lang
+        }, mij))
+      };
+    }
+    /* De rest is te lezen in de lijst en verder niet: officiele post is
+       eenrichtingsverkeer, en Rahul heeft zijn eigen scherm. */
+    return null;
+  }
+
+  return { alles, open, ontleed };
 }
 
 module.exports = { maakBronnen };

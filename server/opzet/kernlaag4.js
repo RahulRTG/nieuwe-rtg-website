@@ -123,7 +123,12 @@ kern.commBronnen = require('../kern/comm/bronnen').maakBronnen({ db,
      moment van AANROEPEN opgehaald en niet nu vastgelegd -- anders staat er
      voor altijd undefined in. */
   convOf: (id) => (kern.convOf ? kern.convOf(id) : []),
-  overheid: kern.overheid, rtmail });
+  overheid: kern.overheid, rtmail,
+  /* De twee bronnen die je ook kunt BEANTWOORDEN. Ze staan hier als vlag en
+     niet als functie: het doorgeven gebeurt in de route (routes/member/comm.js),
+     die het verzoek omzet naar de eigen route van de module. Zo blijft elke
+     controle staan waar hij hoort. */
+  werk: true, zaak: true });
 /* De brug voor de priveberichten: de sociale laag en haar routes schrijven
    sinds de verhuizing IN de kern (kern/comm/dm.js), met de oude geschiedenis
    die er per paar eenmalig bij wordt gehaald. Zo is er nog maar een plek waar

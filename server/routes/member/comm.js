@@ -47,12 +47,25 @@ module.exports = (kern) => {
     } catch (e) { fout(res, e); }
   });
 
-  // Een gesprek openen: de berichten, wie er typt, en de stand.
+  /* Een gesprek openen: de berichten, wie er typt, en de stand.
+
+     EEN BRON OPENT NET ZO GOED. Deze kanalen wonen nog in hun eigen module
+     (kern/comm/bronnen.js), maar dat is een detail van de opslag en geen reden
+     om de lezer naar een andere app te sturen -- dan is de ene app voor die
+     kanalen weer de leeslijst die hij niet meer mocht zijn. De module levert
+     de berichten, deze route zet ze in dezelfde vorm. */
   app.post('/api/comm/gesprek', auth, (req, res) => {
     if (geenGast(req, res)) return;
     try {
       comm.levensteken(mij(req));
-      res.json({ ok: true, gesprek: comm.gesprek(mij(req), req.body.id, { aantal: req.body.aantal }) });
+      const id = String(req.body.id || '');
+      if (id.startsWith('bron:')) {
+        const uit = commBronnen && commBronnen.open(mij(req), id, req.body.lang);
+        if (!uit) throw new Error('Dit gesprek lees je in zijn eigen app.');
+        const rij = (commBronnen.alles(mij(req), req.session.account) || []).find((g) => g.id === id) || {};
+        return res.json({ ok: true, gesprek: Object.assign({}, rij, uit, { id, extern: true, typt: [] }) });
+      }
+      res.json({ ok: true, gesprek: comm.gesprek(mij(req), id, { aantal: req.body.aantal }) });
     } catch (e) { fout(res, e); }
   });
 
@@ -93,13 +106,31 @@ module.exports = (kern) => {
     } catch (e) { fout(res, e); }
   });
 
+  /* Versturen. Alleen voor gesprekken van de kern.
+
+     HIER STOND EEN DOORGEEFLUIK, en dat was fout op twee manieren. Het riep
+     app._router.handle() aan om het verzoek naar de route van de module te
+     sturen -- een Express-truc, en dit huis heeft zijn eigen router
+     (server/web/routing.js), dus het gaf een 500. Maar ook als het had
+     gewerkt was het de verkeerde vorm: een route die een andere route naspeelt
+     is een tweede plek waar je moet weten hoe die eerste heet en wat hij
+     verwacht.
+
+     Nu zegt /gesprek bij een bron gewoon WAAR je moet zijn (het veld
+     `antwoord`), en de app post daar rechtstreeks naartoe. De module blijft de
+     enige ingang op haar eigen voorraad, met al haar controles, en er is niets
+     nagebouwd. */
   app.post('/api/comm/stuur', auth, (req, res) => {
     if (geenGast(req, res)) return;
     try {
+      const id = String(req.body.id || '');
+      if (id.startsWith('bron:')) {
+        throw new Error('Dit kanaal heeft zijn eigen verstuurweg; open het gesprek opnieuw.');
+      }
       comm.levensteken(mij(req));
-      comm.bericht({ gesprekId: req.body.id, van: mij(req), tekst: req.body.tekst,
+      comm.bericht({ gesprekId: id, van: mij(req), tekst: req.body.tekst,
         antwoordOp: req.body.antwoordOp });
-      res.json({ ok: true, gesprek: comm.gesprek(mij(req), req.body.id) });
+      res.json({ ok: true, gesprek: comm.gesprek(mij(req), id) });
     } catch (e) { fout(res, e); }
   });
 

@@ -318,11 +318,14 @@
   }
 
   /* --------------------------------------------------------- een gesprek */
-  /* Een gesprek uit een BRON (kern/comm/bronnen.js) woont nog in zijn eigen
-     module: dat lees je daar en beantwoord je daar. In plaats van een half
-     werkend scherm te tonen sturen we door naar waar het echt is. */
+  /* Een gesprek uit een BRON woont nog in zijn eigen module, maar dat is een
+     detail van de opslag: je opent het gewoon hier. Alleen waar antwoorden
+     echt niet kan -- officiele post is eenrichtingsverkeer, Rahul heeft zijn
+     eigen scherm -- sturen we door naar waar het thuishoort. De server zegt
+     welke dat zijn; dit scherm gokt dat niet. */
+  var GEEN_ANTWOORD = /^bron:(rahul|overheid)/;
   function open(g) {
-    if (g.extern) { location.href = g.link || '/apps/app.html'; return; }
+    if (g.extern && GEEN_ANTWOORD.test(g.id)) { location.href = g.link || '/apps/app.html'; return; }
     staat.open = g.id; staat.antwoordOp = null;
     document.body.setAttribute('data-pane', 'draad');
     $('#draad').hidden = false;
@@ -338,6 +341,10 @@
     return api('/gesprek', { id: staat.open }).then(function (d) {
       staat.gesprek = d.gesprek;
       tekenGesprek(); vulAppMenu();
+      /* Een bron houdt zijn eigen leesstand bij (in zijn module, op het moment
+         dat je hem opent). De kern een leesmelding sturen voor een gesprek dat
+         hij niet kent zou alleen een foutmelding opleveren. */
+      if (staat.gesprek.extern) return null;
       return api('/lees', { id: staat.open });
     }).then(function () { return laadInbox(); }).catch(function (e) {
       $('#bubbels').innerHTML = '<p class="leeg">' + esc(e.message) + '</p>';
@@ -385,7 +392,7 @@
     html += '<span class="onder">' + esc(klok(m.at)) + (m.gewijzigd ? ' &middot; bewerkt' : '') + '</span>';
     el.innerHTML = html;
 
-    if (!m.weg) {
+    if (!m.weg && !g.extern) {
       var rea = document.createElement('div'); rea.className = 'reacties';
       (m.reacties || []).forEach(function (r) {
         var b = document.createElement('button');
@@ -457,7 +464,8 @@
 
   var typTimer = 0;
   function meldTypen() {
-    if (!staat.open || Date.now() - typTimer < 3000) return;
+    if (!staat.open || (staat.gesprek && staat.gesprek.extern)) return;
+    if (Date.now() - typTimer < 3000) return;
     typTimer = Date.now();
     api('/typt', { id: staat.open }).catch(function () {});
   }
@@ -466,7 +474,7 @@
      stil bent -- bij elke toetsaanslag een verzoek is verkeer zonder winst. */
   var conceptTimer = null;
   veld.addEventListener('input', function () {
-    if (!staat.open) return;
+    if (!staat.open || (staat.gesprek && staat.gesprek.extern)) return;
     clearTimeout(conceptTimer);
     conceptTimer = setTimeout(function () {
       api('/concept', { id: staat.open, tekst: veld.value }).catch(function () {});
@@ -478,7 +486,19 @@
     var tekst = veld.value.trim();
     if (!tekst || !staat.open) return;
     $('#stuur').disabled = true;
-    api('/stuur', { id: staat.open, tekst: tekst, antwoordOp: staat.antwoordOp })
+    /* Een gesprek uit een bron heeft zijn eigen verstuurweg: de server zegt in
+       `antwoord` welke route en met welke velden. We posten daar rechtstreeks
+       naartoe, zodat de module de enige ingang op haar eigen voorraad blijft. */
+    var g = staat.gesprek;
+    var heen = (g && g.antwoord)
+      ? fetch(g.antwoord.pad, { method: 'POST',
+          headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+          body: JSON.stringify(Object.assign({}, g.antwoord.vast,
+            (function (o) { o[g.antwoord.veld] = tekst; return o; })({}))) })
+          .then(function (r) { return r.json().catch(function () { return {}; })
+            .then(function (d) { if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; }); })
+      : api('/stuur', { id: staat.open, tekst: tekst, antwoordOp: staat.antwoordOp });
+    heen
       .then(function () {
         veld.value = ''; veld.style.height = 'auto';
         staat.antwoordOp = null; $('#antwoordop').hidden = true;

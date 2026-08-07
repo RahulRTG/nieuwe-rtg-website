@@ -5,9 +5,16 @@
    tegen raden zit in kern/algpin.js. */
 module.exports = (kern) => {
   const { app, auth, accounts, appUrl, mail, pinInfo, pinZet, pinCheck, pinHerstelStart, pinHerstelZet } = kern;
-  // buiten productie zonder SMTP geven we de link in het antwoord terug, net als
-  // het wachtwoordherstel doet -- anders is de stroom lokaal niet te doorlopen
-  const DEV_VELDEN = !process.env.RTG_PRODUCTION && !(mail && mail.configured);
+  /* Zonder SMTP geven we de link in het antwoord terug, net als het
+     wachtwoordherstel -- maar ALLEEN aan een verzoek van deze machine zelf.
+     Hier stond `!process.env.RTG_PRODUCTION`, en die naam bestaat niet eens
+     in dit project (de vlag heet NODE_ENV=production). Een controle op een
+     variabele die nooit gezet wordt, staat altijd open. */
+  const vanDezeMachine = (req) => {
+    const ip = String((req && req.ip) || '').replace(/^::ffff:/, '');
+    return ip === '127.0.0.1' || ip === '::1' || ip === '';
+  };
+  const devVelden = (req) => !(mail && mail.configured) && vanDezeMachine(req);
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const echtAccount = (req, res) => {
     if (req.session.tier === 'guest' || !req.session.account) {
@@ -45,7 +52,7 @@ module.exports = (kern) => {
       '\n\nVroeg u dit niet aan? Dan hoeft u niets te doen; uw huidige pincode blijft gewoon staan.');
     /* Het antwoord noemt het adres NIET terug. Wie de sessie heeft weet het al,
        en wie hem gestolen heeft hoeft het niet van ons te horen. */
-    res.json({ ok: true, verstuurd: true, ...(DEV_VELDEN ? { devPinUrl: url } : {}) });
+    res.json({ ok: true, verstuurd: true, ...(devVelden(req) ? { devPinUrl: url } : {}) });
   });
 
   app.post('/api/pin/herstel', async (req, res) => {

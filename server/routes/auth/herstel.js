@@ -54,7 +54,7 @@ app.post('/api/auth/forgot', (req, res) => {
     const tel = accounts.phoneOf(u) || 'onbekend';
     mail.send('sms:' + tel, 'Uw RTG-herstelcode',
       'Uw code om het wachtwoord te herstellen: ' + code + '\nGeldig: 1 uur. Vroeg u dit niet aan? Negeer dit bericht.');
-    if (DEV_VELDEN) { devResetUrl = url; devCode = code; }
+    if (DEV_VELDEN(req)) { devResetUrl = url; devCode = code; }
   }
   // Altijd hetzelfde antwoord, en sinds deze ronde ook in dezelfde tijd.
   antwoord({ ok: true, tweestaps: true, ...(devResetUrl ? { devResetUrl, devCode } : {}) });

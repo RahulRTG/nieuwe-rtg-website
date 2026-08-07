@@ -34,11 +34,27 @@ module.exports = (kern) => {
   const PAS_FOUT = 'Deze inloggegevens horen bij een andere pas. Open de app van uw eigen pas via rtg.example/apps.';
   // e-maillinks (bevestigen/herstellen) landen in de pas-app van het account
   const pasAppVan = (tier) => tier === 'lifestyle' || tier === 'business' ? tier : 'rtg';
-  /* Zonder SMTP geven we buiten productie de link/code in het antwoord terug
-     (dev-velden), zodat lokaal en in tests de hele flow werkt. In PRODUCTIE
-     nooit: anders zou een aanvrager de herstel-link en telefooncode van een
-     ander account zo in het antwoord krijgen. */
-  const DEV_VELDEN = !PRODUCTION && !mail.configured;
+  /* Zonder SMTP geven we de herstel-link en de telefooncode in het antwoord
+     terug (dev-velden), zodat lokaal en in tests de hele flow werkt.
+
+     DIT HING AAN `!PRODUCTION`, EN DAT WAS EEN GAT. NODE_ENV=production is een
+     vlag die iemand moet zetten, en op deze machine was hij vergeten -- terwijl
+     de server gewoon op het open internet stond en geen SMTP had. Gevolg: wie
+     dan ook kon POSTen naar /api/auth/forgot met een willekeurig adres en kreeg
+     de herstel-link EN de code terug. Dat is elk account op deze server, ook de
+     eigenaar. Nagemeten met een curl vanaf buiten; het werkte.
+
+     Een vlag die je moet onthouden is geen slot. Daarom hangt het nu aan iets
+     wat niet vergeten kan worden: het verzoek moet van deze machine zelf komen.
+     Wie op zijn eigen laptop ontwikkelt merkt niets; wie van buiten aanklopt
+     krijgt niets, ook niet als de vlag verkeerd staat en er geen post is
+     ingesteld. Dat de dev-velden ook in productie uit blijven, volgt daar
+     vanzelf uit -- die eis staat niet langer op zichzelf. */
+  const VAN_DEZE_MACHINE = (req) => {
+    const ip = String((req && req.ip) || '').replace(/^::ffff:/, '');
+    return ip === '127.0.0.1' || ip === '::1' || ip === '';
+  };
+  const DEV_VELDEN = (req) => !PRODUCTION && !mail.configured && VAN_DEZE_MACHINE(req);
 
 app.post('/api/login', (req, res) => {
   let tier = String(req.body.tier || '');

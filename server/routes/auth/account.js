@@ -128,7 +128,7 @@ app.post('/api/auth/register', async (req, res) => {
     const token = accounts.issueToken(user.id);
     const sess = { tier: user.tier, key: 'user-' + user.id, account: user };
     res.json({ token, state: stateFor(sess, req.body.lang), needsEmailVerify: true,
-      ...(werk ? { werk } : {}), ...(DEV_VELDEN ? { devVerifyUrl: verifyUrl } : {}) });
+      ...(werk ? { werk } : {}), ...(DEV_VELDEN(req) ? { devVerifyUrl: verifyUrl } : {}) });
   } catch (e) {
     return res.status(503).json({ error: 'Registreren lukte even niet. Probeer het zo opnieuw.' });
   }
@@ -147,6 +147,6 @@ app.post('/api/auth/resend', auth, (req, res) => {
   const vtok = accounts.issueActionToken(u.id, 'verify-email', 3 * 86400000);
   const url = appUrl(req) + '/apps/app.html?pas=' + pasAppVan(u.tier) + '&verify=' + vtok;
   mail.send(accounts.emailOf(u), 'Bevestig uw e-mailadres', 'Bevestig uw e-mailadres via deze link:\n' + url);
-  res.json({ ok: true, ...(DEV_VELDEN ? { devVerifyUrl: url } : {}) });
+  res.json({ ok: true, ...(DEV_VELDEN(req) ? { devVerifyUrl: url } : {}) });
 });
 };

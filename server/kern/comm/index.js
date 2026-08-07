@@ -193,6 +193,11 @@ function maakComm({ db, save, crypto, codenaamVan, sseToCustomer }) {
       soort: o.soort || (bijlage ? bijlage.soort || 'bijlage' : 'tekst'),
       antwoordOp: o.antwoordOp || null,
       bijlage: bijlage,
+      /* De brontaal reist mee met het bericht en niet met de lezer. Dat lijkt
+         een detail tot iemand van taal wisselt: dan moet een oud bericht nog
+         steeds vertaald kunnen worden vanaf de taal waarin het GESCHREVEN is,
+         en niet vanaf de taal die de schrijver vandaag toevallig heeft staan. */
+      lang: o.lang || null,
       reacties: {}
     };
     const lijst = B()[g.id] = B()[g.id] || [];
@@ -352,6 +357,7 @@ function maakComm({ db, save, crypto, codenaamVan, sseToCustomer }) {
         teken, aantal: wie.length, vanMij: wie.includes(mij)
       })),
       gewijzigd: m.gewijzigd || null, was: m.gewijzigd ? m.was : null,
+      lang: m.lang || null,
       weg: m.weg || null
     };
   }
@@ -440,10 +446,23 @@ function maakComm({ db, save, crypto, codenaamVan, sseToCustomer }) {
     };
   }
 
+  /* Twee deuren voor de verhuizing van een oude voorraad (./dm.js), en
+     bewust smal: de geschiedenis moet MET zijn eigen tijdstempels naar binnen
+     kunnen, en de leesstand moet meeverhuizen. Via bericht() zou alles op NU
+     komen te staan -- een gesprek van twee jaar dat er ineens uitziet alsof
+     het vanmiddag gebeurde. Wie niets te verhuizen heeft, gebruikt bericht(). */
+  const berichtenVan = (gesprekId) => (B()[gesprekId] = B()[gesprekId] || []);
+  function leesZet(key, gesprekId, at) {
+    if (!key || !at) return;
+    const nuStand = standVan(key, gesprekId).gelezen || '';
+    if (at > nuStand) standZet(key, gesprekId, 'gelezen', at);
+  }
+
   return {
     SOORTEN, LADEN,
     // voor andere modules: dit is de hele koppelvlakte
     gesprekMaak, tussen, bericht, gesprekVan, magErin,
+    berichtenVan, leesZet,
     // voor de app
     inbox, gesprek, zoek, draad,
     lees, vlag, concept, wijzig, wis, reactie,

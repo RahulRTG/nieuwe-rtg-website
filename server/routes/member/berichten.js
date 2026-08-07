@@ -31,14 +31,17 @@ module.exports = (kern) => {
     try {
       const sc = socialConnecties(mij);
       for (const c of (sc.connections || []).slice(0, 40)) {
-        const chat = (db.data.memberChats || {})[dmSleutel(mij, c.key)];
-        if (!chat || !chat.messages.length) continue;
-        const l = chat.messages[chat.messages.length - 1];
-        const gelezen = chat.read && chat.read[mij];
-        const ongelezen = chat.messages.filter(m => m.from !== mij && (!gelezen || m.at > gelezen)).length;
+        /* Uit de communicatiekern: de priveberichten wonen daar sinds de
+           verhuizing, en twee tellers voor hetzelfde aantal is hoe ze uit
+           elkaar gaan lopen. */
+        const brug = kern.commDm;
+        if (!brug) break;
+        const l = brug.laatste(mij, c.key);
+        if (!l) continue;
+        const ongelezen = brug.ongelezen(mij, c.key);
         kanalen.push({ soort: 'dm', key: c.key, titel: c.codename || codenaamVan(c.key), icoon: 'berichten',
           laatste: String(l.text || (l.post ? 'Deelde een Salon-post' : '')).slice(0, 120),
-          at: l.at, ongelezen, link: '/apps/vrienden.html',
+          at: l.at, ongelezen, link: '/apps/comm.html',
           // de wauw-laag reist mee: de dag-stemming en verjaardagsglans van je vriend
           stemming: stemmingVan ? stemmingVan(c.key) : null, jarig: jarigVan ? !!jarigVan(c.key) : false });
       }

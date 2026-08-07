@@ -794,7 +794,13 @@ function eisAccount(req, res) {
    alleen het signaleringskanaal en ziet nooit beeld of geluid). */
 
 // De sociale kern (vrienden, veiligheid, snaps) zit in server/kern/sociaal.js.
-const sociaal = require('./kern/sociaal')({ db, save, sseToCustomer, rtf, crypto, gidsHaal, gidsZoekCodenaam, media });
+/* De sociale laag wordt hier gebouwd, de communicatiekern pas in kernlaag4 --
+   dus krijgt hij geen verwijzing naar die kern maar een manier om hem OP TE
+   HALEN. Dat is geen omweg om de volgorde heen: de sociale laag heeft de kern
+   alleen nodig op het moment dat er echt een bericht langskomt, en tegen die
+   tijd staat hij er. Een vaste verwijzing zou hier voor altijd undefined zijn. */
+const sociaal = require('./kern/sociaal')({ db, save, sseToCustomer, rtf, crypto, gidsHaal, gidsZoekCodenaam, media,
+  commDm: () => kern && kern.commDm });
 // Verplichte intake (paspoort/e-mail/telefoon/adres/standaard) + contract voor elk
 // account, per scope (platform 'rtg' of leverancier-code), AI-aanpasbaar.
 const onboarding = require('./kern/onboarding').maakOnboarding({ db, save, crypto, accounts, anthropic, schoon });

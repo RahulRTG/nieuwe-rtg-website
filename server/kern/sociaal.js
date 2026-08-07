@@ -4,7 +4,7 @@
    te lezen en te testen is. Krijgt de gedeelde kern-onderdelen mee en praat
    nergens rechtstreeks met de buitenwereld. */
 module.exports = (core) => {
-  const { db, save, sseToCustomer, rtf, crypto, gidsHaal, gidsZoekCodenaam, media } = core;
+  const { db, save, sseToCustomer, rtf, crypto, gidsHaal, gidsZoekCodenaam, media, commDm } = core;
 
 function dmSleutel(a, b) { return [a, b].sort().join('|'); }
 function connectieTussen(a, b) {
@@ -61,7 +61,7 @@ function sociaalRate(mij, actie, max, perMs) {
 /* De vriendenlaag en de snaps/verhalen-laag draaien als submodules op een
    gedeelde context, een keer opgebouwd bij het opstarten; de vriendenlaag
    levert zijnVrienden aan de snapslaag via die context. */
-const ctx = { db, save, sseToCustomer, rtf, crypto, gidsHaal, gidsZoekCodenaam, media,
+const ctx = { db, save, sseToCustomer, rtf, crypto, gidsHaal, gidsZoekCodenaam, media, commDm,
   dmSleutel, connectieTussen, isRtf, codeExists, codenaamVan, soortVan, isKindHandle,
   isBeschermdHandle, verbActief, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, sociaalRate };
 const deelVrienden = require('./sociaal/vrienden')(ctx);

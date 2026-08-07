@@ -99,7 +99,9 @@ kern.genootschapUitvoer = require('../kern/genootschap/uitvoer')({ genootschap: 
    archiveren, en de drie AI-taken (samenvatten, een antwoord opstellen, de
    afspraken eruit halen). De AI stelt op, de mens verstuurt. */
 kern.berichten = require('../kern/berichten')({ db, save, socialConnecties: kern.socialConnecties,
-  dmSleutel: kern.dmSleutel, codenaamVan: kern.codenaamVan, rtmail, overheid: kern.overheid, anthropic });
+  dmSleutel: kern.dmSleutel, codenaamVan: kern.codenaamVan, rtmail, overheid: kern.overheid, anthropic,
+  // de brug wordt hieronder pas gezet; vandaar bij gebruik ophalen
+  commDm: () => kern.commDm });
 
 /* ---------------------- RTG Communication Core ----------------------
    Een gespreksmodel voor het hele platform (kern/comm). Elke module die een
@@ -122,6 +124,11 @@ kern.commBronnen = require('../kern/comm/bronnen').maakBronnen({ db,
      voor altijd undefined in. */
   convOf: (id) => (kern.convOf ? kern.convOf(id) : []),
   overheid: kern.overheid, rtmail });
+/* De brug voor de priveberichten: de sociale laag en haar routes schrijven
+   sinds de verhuizing IN de kern (kern/comm/dm.js), met de oude geschiedenis
+   die er per paar eenmalig bij wordt gehaald. Zo is er nog maar een plek waar
+   deze gesprekken staan. */
+kern.commDm = require('../kern/comm/dm').maakCommDm({ db, save, comm: kern.comm, dmSleutel: kern.dmSleutel });
 kern.commAi = require('../kern/berichten/ai')({
   // de kern gooit als een gesprek niet van jou is; de AI-laag verwacht null
   draad: (mijKey, gesprekId) => { try { return kern.comm.draad(mijKey, gesprekId); } catch (e) { return null; } },

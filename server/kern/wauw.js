@@ -53,10 +53,17 @@ module.exports = ({ db, save, accounts, socialConnecties }) => {
       likes += Object.keys(x.likes || {}).length;
       reacties += (x.reacties || []).filter(r => r.key !== key && r.at > grens).length;
     }
+    /* Wat jij vandaag hebt gestuurd, uit de communicatiekern -- daar wonen de
+       gesprekken sinds de verhuizing. Dit telt ALLE gesprekken mee (ook die van
+       een rit of een bestelling) en niet alleen de vriendenchat, en dat is
+       eerlijker: het gaat over hoe druk jouw dag was, niet over in welke module
+       je toevallig zat. */
     let gestuurd = 0;
-    for (const [k, chat] of Object.entries(db.data.memberChats || {})) {
-      if (!k.split('|').includes(key)) continue;
-      gestuurd += (chat.messages || []).filter(mm => mm.from === key && mm.at > grens).length;
+    for (const g of (db.data.commGesprekken || [])) {
+      if (!Array.isArray(g.deelnemers) || !g.deelnemers.includes(key)) continue;
+      for (const mm of ((db.data.commBerichten || {})[g.id] || [])) {
+        if (mm.van === key && !mm.weg && mm.at > grens) gestuurd++;
+      }
     }
     let vrienden = 0;
     try {

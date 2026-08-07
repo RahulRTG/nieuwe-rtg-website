@@ -397,6 +397,7 @@
       "comm",
       "commAi",
       "commBronnen",
+      "commDm",
       "conciergeIntrek",
       "conciergeVerzoeken",
       "conciergeVraag",
@@ -959,6 +960,7 @@
     ],
     "social": [
       "blokkeer",
+      "commDm",
       "connectieTussen",
       "dagOpdracht",
       "deblokkeer",

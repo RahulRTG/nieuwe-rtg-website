@@ -78,6 +78,16 @@ function maakTheater({ db, save, crypto, schoon, codenaamVan, notify, sseToOffic
     const thuis = v.bewaring === 'thuis';
     return { id: v.id, titel: v.titel, omschrijving: v.omschrijving, poster: v.poster,
       duurS: v.duurS, mb: thuis ? (v.mbGeschat || 0) : mbVan(v.bytes), kanaal: k ? k.naam : '?', kanaalId: v.kanaalId,
+      /* Het genre van het kanaal hoort bij de video die eronder hangt: het is
+         het enige onderwerp dat hier bekend is, en de Media OS laat een lid er
+         zijn eigen wereld mee bijsturen ("meer reizen", "geen film"). */
+      genre: k ? k.genre : null,
+      /* `klaar` hoort in het beeld: het eigen kanaal toont ook kaarten waar de
+         bytes nog niet op staan, en een laag erboven kan dat anders niet zien.
+         Zonder dit veld stond er in de Media OS een filter op `v.klaar` dat
+         nooit iets kon uitsluiten -- een toets die niet kan zakken, maar dan
+         als code (LAT.md regel 9). */
+      klaar: !!v.klaar,
       bewaring: v.bewaring || 'rtg', online: thuis ? thuisOnline(v) : true,
       codenaam: codenaamVan(v.key), reacties: (db.data.theaterReacties[v.id] || []).length, at: v.at };
   }
@@ -135,7 +145,25 @@ function maakTheater({ db, save, crypto, schoon, codenaamVan, notify, sseToOffic
     THUIS_TTL_MS, THUIS_SIGNALEN, MAX_VIDEO_MB, MAX_KANAAL_MB
   };
   const v = require('./video')(ctx);
+  /* ---- lezers voor de Media OS (kern/mediaos/) ----
+     Drie vragen die het Theater over zichzelf beantwoordt, zodat de laag
+     erboven geen tweede administratie hoeft aan te leggen: welk kanaal is van
+     deze maker, wat staat erin, en volgt dit lid hem al. */
+  const kanaalVanMaker = (makerKey) => {
+    const k = kanaalVan(makerKey);
+    return k && k.status === 'goedgekeurd' ? eigenBeeld(k) : null;
+  };
+  const videosVanMaker = (makerKey) => {
+    const k = kanaalVan(makerKey);
+    if (!k || k.status !== 'goedgekeurd') return [];
+    return db.data.theaterVideos.filter(x => x.kanaalId === k.id && x.klaar).map(videoBeeld);
+  };
+  const volgtMaker = (key, makerKey) => {
+    const k = kanaalVan(makerKey);
+    return !!(k && (k.volgers || []).includes(key));
+  };
   return {
+    theaterKanaalVan: kanaalVanMaker, theaterVideosVan: videosVanMaker, theaterVolgt: volgtMaker,
     theaterKanaalMaak: kanaalMaak, theaterOfficeLijst: officeLijst,
     theaterOfficeBeslis: officeBeslis, theaterVideoMaak: v.videoMaak, theaterVideoUpload: v.videoUpload,
     theaterVerwijder: v.verwijder, theaterStreamVan: v.streamVan, theaterZaal: zaal,

@@ -321,6 +321,18 @@
     "markt": [
       "markt"
     ],
+    "mediaos": [
+      "mediaBewaar",
+      "mediaBieb",
+      "mediaBord",
+      "mediaMaker",
+      "mediaMeldZet",
+      "mediaSmaakStuur",
+      "mediaSmaakVan",
+      "mediaStuk",
+      "mediaVolg",
+      "mediaWereld"
+    ],
     "meet": [
       "meet"
     ],

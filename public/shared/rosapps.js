@@ -17,6 +17,7 @@
     { naam: 'Vrienden',        url: '/apps/foundation/vrienden.html' },
     { naam: 'Berichten',       url: '/apps/berichten.html' },
     { naam: 'Camera',          url: '/apps/camera.html' },
+    { naam: 'RTG Media',       url: '/apps/media.html' },
     { naam: 'RTG Sound',       url: '/apps/muziek.html' },
     { naam: 'Podium',          url: '/apps/podium.html' },
     { naam: 'Theater',         url: '/apps/theater.html' },

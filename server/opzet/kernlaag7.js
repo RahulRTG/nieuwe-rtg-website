@@ -12,7 +12,8 @@
      rahul
      rahul-fases
      theater
-     rtfos */
+     rtfos
+     mediaos */
 'use strict';
 
 module.exports = (kern, hulp) => {
@@ -177,4 +178,9 @@ Object.assign(kern, require('../kern/rtfos')({ db, save, crypto,
   // (een RTF-activiteit als afspraak in je eigen RTG-agenda). Zonder hem
   // meldt het koppelbord hem eerlijk als kapot, en dat is hij dan ook.
   agenda: kern.agenda }));
+
+/* De Media OS (kern/mediaos/, bedraad in ./mediaos.js) hangt HIER, als
+   laatste: hij LEEST Klankwerk, Theater, Clips en Podium, dus die moeten er
+   alle vier al zijn. */
+require('./mediaos')(kern);
 };

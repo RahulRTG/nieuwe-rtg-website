@@ -7,6 +7,10 @@
     ov:          { naam: 'OV',           url: '/apps/ov.html' },
     stad:        { naam: 'Mijn Stad',    url: '/apps/stad.html' },
     clips:       { naam: 'Clips',        url: '/apps/clips.html' },
+    /* RTG Media staat NAAST Clips, Sound, Theater en Podium en niet in plaats
+       daarvan: het is de laag die ze tot één wereld maakt, en wie recht naar
+       de studio of de zaal wil, hoort daar gewoon heen te kunnen. */
+    mediaos:     { naam: 'RTG Media',    url: '/apps/media.html' },
     office:      { naam: 'RTG Office',   url: '/apps/office.html' },
     /* Hier stond een losse "Werk OS"-tegel naast "Mijn werkplekken": twee
        tegels met hetzelfde koffertje, en erger, twee INLOGS. De ene ging via
@@ -90,7 +94,7 @@
       'link:balans', 'link:loonstrook', 'tab:assets', 'link:labfonds', 'link:mecenaat',
       'link:nalatenschap', 'link:logboek'] },
     { sleutel: 'map-salon', naam: 'De Salon', items: [
-      'tab:salon', 'link:pulse', 'link:vrienden', 'os:snaps', 'link:camera', 'link:clips',
+      'tab:salon', 'link:pulse', 'link:vrienden', 'os:snaps', 'link:camera', 'link:mediaos', 'link:clips',
       'link:muziek', 'link:podium', 'link:theater', 'link:spelen', 'link:vonk', 'link:nieuws',
       'link:krant', 'link:sport', 'link:cercle', 'link:entourage', 'link:rendezvous',
       'link:attenties', 'link:table', 'link:cellier', 'link:garderobe'] },

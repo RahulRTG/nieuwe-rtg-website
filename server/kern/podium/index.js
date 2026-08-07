@@ -158,7 +158,19 @@ function maakPodium({ db, save, crypto, accounts, leeftijdVan, codenaamVan, sseT
     koppel, herstelBoom, ouderKeyVan, kiesOuder,
     GENRES, CADEAUS, CHAT_MAX, ABB_DAGEN, SIGNALEN, FANOUT
   };
-  return Object.assign({}, require('./kanaal')(ctx), require('./interactie')(ctx));
+  /* Lezer voor de Media OS (kern/mediaos/): het goedgekeurde kanaal van één
+     maker, gezien door de ogen van dit lid. De 18+/verificatie-eis van mag()
+     blijft staan -- wie het Podium niet in mag, krijgt hier ook geen kanaal,
+     en de Media OS meldt dan dat de bron buiten staat en waarom. */
+  function kanaalVanMaker(makerKey, kijkerKey) {
+    if (kijkerKey && !mag(kijkerKey).ok) return null;
+    lijsten();
+    const k = kanaalVan(makerKey);
+    if (!k || k.status !== 'goedgekeurd') return null;
+    return k.key === kijkerKey ? eigenBeeld(k) : kijkBeeld(k, kijkerKey || null);
+  }
+  return Object.assign({ podiumKanaalVan: kanaalVanMaker },
+    require('./kanaal')(ctx), require('./interactie')(ctx));
 }
 
 module.exports = { maakPodium };

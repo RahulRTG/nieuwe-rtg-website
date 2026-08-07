@@ -112,16 +112,33 @@ function maakClips({ db, save, crypto, schoon, codenaamVan, sseToCustomer, sseTo
       alleenOndertiteld: !!o.alleenOndertiteld,
       einde: 'Dat was het voor nu.', maxS: CLIP_MAX_S };
   }
-  function volg(key, cid, aan) {
+  /* Volgen gaat over een MAKER, niet over een clip -- de feed zet de maker in
+     de volgerslijst, niet het stukje video. Daarom staat de handeling hier als
+     volgMaker, en is volg(clip) er de tweede ingang van: de Media OS
+     (kern/mediaos/) volgt dezelfde maker vanuit een muziekuitgave of een
+     video, waar helemaal geen clip-id bij de hand is. Eén handeling, twee
+     deuren -- geen tweede lijst (LAT.md regel 4). */
+  function volgMaker(key, makerKey, aan) {
     lijsten();
-    const c = clipMet(cid); if (!c) return { status: 404, error: 'Clip niet gevonden.' };
-    if (c.key === key) return { status: 400, error: 'Uzelf volgen hoeft niet.' };
-    const rij = (db.data.clipsVolg[key] = db.data.clipsVolg[key] || []).filter(k => k !== c.key);
-    if (aan !== false) rij.push(c.key);
+    if (!makerKey) return { status: 404, error: 'Maker niet gevonden.' };
+    if (makerKey === key) return { status: 400, error: 'Uzelf volgen hoeft niet.' };
+    const rij = (db.data.clipsVolg[key] = db.data.clipsVolg[key] || []).filter(k => k !== makerKey);
+    if (aan !== false) rij.push(makerKey);
     db.data.clipsVolg[key] = rij.slice(-500);
     save();
     return { status: 200, ok: true, volg: aan !== false };
   }
+  function volg(key, cid, aan) {
+    lijsten();
+    const c = clipMet(cid); if (!c) return { status: 404, error: 'Clip niet gevonden.' };
+    return volgMaker(key, c.key, aan);
+  }
+
+  /* De lezers voor de Media OS (alles van één maker, welke clips een bepaald
+     eigen muziekstuk als geluid dragen, hoeveel volgers een maker heeft)
+     staan in ./clips-lezers.js -- een eigen onderwerp, en dit bestand blijft
+     er onder de omvangregel van de keuring mee. */
+  const lezers = require('./clips-lezers')({ db, lijsten, beeld });
 
   /* ---- reacties en melden (op codenaam, begrensd) ---- */
   function reactie(key, cid, tekst) {
@@ -162,7 +179,10 @@ function maakClips({ db, save, crypto, schoon, codenaamVan, sseToCustomer, sseTo
   }
 
   return Object.assign(studio, { clipsMaak: maak, clipsWeg: weg, clipsAanwezig: aanwezig, clipsSignaal: signaal,
-    clipsFeed: feed, clipsVolg: volg, clipsReactie: reactie, clipsReacties: reacties,
+    clipsFeed: feed, clipsVolg: volg, clipsVolgMaker: volgMaker,
+    clipsVan: lezers.clipsVan, clipsMetTrack: lezers.clipsMetTrack,
+    clipsVolgersVan: lezers.clipsVolgersVan,
+    clipsReactie: reactie, clipsReacties: reacties,
     clipsMeld: meld, clipsOfficeLijst: officeLijst, clipsOfficeVerwijder: officeVerwijder });
 }
 

@@ -18,6 +18,7 @@
       { naam: 'De Résidence', url: '/apps/residentie.html' },
     { naam: 'Food Court', url: '/apps/foodcourt.html' },
     { naam: 'RTG OV', url: '/apps/ov.html' },
+    { naam: 'RTG Media', url: '/apps/media.html' },
     { naam: 'RTG Clips', url: '/apps/clips.html' },
     { naam: 'RTG Podium', url: '/apps/podium.html' },
     { naam: 'RTG Eye', url: '/apps/oog.html' },

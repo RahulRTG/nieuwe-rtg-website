@@ -34,6 +34,7 @@ module.exports = [
   ['uitgaan', 'Uitgaan', 'eten', '/apps/uitgaan.html', 'Bars, clubs en beachclubs met hun avonden en gastenlijsten.'],
 
   // ---- media & creatie ----
+  ['mediaos', 'RTG Media', 'media', '/apps/media.html', 'Eén mediawereld over Klankwerk, Theater, Clips en Podium heen: muziek, kijk en flow als drie standen op dezelfde catalogus, met één makersprofiel en uw eigen regelaars in plaats van een algoritme.'],
   ['camera', 'Camera', 'media', '/apps/camera.html', 'Fotograferen, plus RTG Eye: voertuigschouw en hands-free werkvloerlog.'],
   ['muziek', 'RTG Sound', 'media', '/apps/muziek.html', 'Je muziek, rustig en zonder reclame.'],
   ['theater', 'Theater', 'media', '/apps/theater.html', 'Videobibliotheek op bioscoopniveau, tot 4K, met kanalen en reacties.'],

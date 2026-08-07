@@ -12,7 +12,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = 'f9231c8c';
+var RTG_BOUW = '6bdb887c';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -3069,6 +3069,10 @@ var RTG_BOUW = 'f9231c8c';
     ov:          { naam: 'OV',           url: '/apps/ov.html' },
     stad:        { naam: 'Mijn Stad',    url: '/apps/stad.html' },
     clips:       { naam: 'Clips',        url: '/apps/clips.html' },
+    /* RTG Media staat NAAST Clips, Sound, Theater en Podium en niet in plaats
+       daarvan: het is de laag die ze tot één wereld maakt, en wie recht naar
+       de studio of de zaal wil, hoort daar gewoon heen te kunnen. */
+    mediaos:     { naam: 'RTG Media',    url: '/apps/media.html' },
     office:      { naam: 'RTG Office',   url: '/apps/office.html' },
     /* Hier stond een losse "Werk OS"-tegel naast "Mijn werkplekken": twee
        tegels met hetzelfde koffertje, en erger, twee INLOGS. De ene ging via
@@ -3152,7 +3156,7 @@ var RTG_BOUW = 'f9231c8c';
       'link:balans', 'link:loonstrook', 'tab:assets', 'link:labfonds', 'link:mecenaat',
       'link:nalatenschap', 'link:logboek'] },
     { sleutel: 'map-salon', naam: 'De Salon', items: [
-      'tab:salon', 'link:pulse', 'link:vrienden', 'os:snaps', 'link:camera', 'link:clips',
+      'tab:salon', 'link:pulse', 'link:vrienden', 'os:snaps', 'link:camera', 'link:mediaos', 'link:clips',
       'link:muziek', 'link:podium', 'link:theater', 'link:spelen', 'link:vonk', 'link:nieuws',
       'link:krant', 'link:sport', 'link:cercle', 'link:entourage', 'link:rendezvous',
       'link:attenties', 'link:table', 'link:cellier', 'link:garderobe'] },
@@ -4270,7 +4274,8 @@ var RTG_BOUW = 'f9231c8c';
      dit houdt het scherm eerlijk). De sleutel hier is de functie-id op het
      schakelbord; alles wat niet genoemd wordt, blijft gewoon staan. */
   const REGIE = { spelen: 'spellen', podium: 'podium', flits: 'flits', theater: 'theater',
-    wbw: 'wbw', passkeys: 'webauthn', ov: 'ov', clips: 'clips', office: 'kantoorpakket', vonk: 'vonk' };
+    wbw: 'wbw', passkeys: 'webauthn', ov: 'ov', clips: 'clips', office: 'kantoorpakket', vonk: 'vonk',
+    mediaos: 'mediaos' };
   (function () {
     let tok = null; try { tok = localStorage.getItem('rtg_member_token'); } catch (e) {}
     if (!tok) return;

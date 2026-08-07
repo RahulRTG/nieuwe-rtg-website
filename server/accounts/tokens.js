@@ -29,8 +29,14 @@ const strikt = (t) => (typeof t === 'string' && TOKENVORM.test(t) ? t : null);
 
 function maakTokens(getUserById) {
   /* ---------- staatloze ondertekende tokens ---------- */
+  /* Het token draagt nu ook WANNEER het is uitgegeven. Dat is de enige manier om
+     bij een staatloos token later te kunnen zeggen "alles van voor dit moment
+     telt niet meer" -- en dat is precies wat een wachtwoordwijziging hoort te
+     doen. Een oud token zonder dat derde deel geldt als uitgegeven op moment 0
+     en valt dus af zodra er ooit een grens is gezet; dat is de juiste kant om
+     naar te falen. */
   function issueToken(userId, days = 30) {
-    const body = userId + '.' + (Date.now() + days * 86400000);
+    const body = userId + '.' + (Date.now() + days * 86400000) + '.' + Date.now();
     return Buffer.from(body).toString('base64url') + '.' + kluis.sign(body);
   }
   /* DE INTREKLIJST -- waarom een staatloos token er toch een nodig heeft.
@@ -113,10 +119,16 @@ function maakTokens(getUserById) {
       if (!b64 || !sig) return null;
       const body = Buffer.from(b64, 'base64url').toString();
       if (kluis.sign(body) !== sig) return null;
-      const [id, exp] = body.split('.');
+      const [id, exp, uitgegeven] = body.split('.');
       if (Number(exp) < Date.now()) return null;
       if (isIngetrokken(token)) return null; // uitgelogd: de handtekening klopt, wij niet meer
       const u = getUserById(Number(id));
+      /* De grens per account: alles wat voor sessies_vanaf is uitgegeven, geldt
+         niet meer. Een wachtwoordwijziging zet die grens (zie setPassword), en
+         daarmee vliegt elke lopende sessie eruit -- ook de sessie van iemand die
+         het wachtwoord kende en er niet meer bij hoort. Dat was de hele reden
+         voor de wijziging. */
+      if (u && Number(u.sessies_vanaf || 0) > Number(uitgegeven || 0)) return null;
       /* De ene plek waar een uitgezet account eruit valt. Zie de toelichting bij
          de kolom in accounts/index.js: staatloze tokens zijn niet allemaal
          terug te halen, een vlag op het account wel. */
@@ -164,9 +176,19 @@ function maakTokens(getUserById) {
     if (!u || !u.reset_expires || u.reset_expires < Date.now()) return null;
     return u;
   }
+  /* EEN NIEUW WACHTWOORD BEEINDIGT ELKE LOPENDE SESSIE.
+
+     Dat gebeurde niet: wie eenmaal binnen was bleef dertig dagen binnen, ook na
+     een volledig herstel. Juist bij een herstel is dat verkeerd om -- iemand
+     herstelt zijn wachtwoord meestal OMDAT er iets mis is, en dan hoort de ander
+     eruit te vliegen, niet te blijven zitten.
+
+     Het token is staatloos, dus er valt niets weg te gooien. Wat wel kan is een
+     grens per account: alles wat voor dit moment is uitgegeven, telt niet meer.
+     Zie verifyToken. */
   async function setPassword(userId, password) {
-    S.zin('UPDATE users SET password_hash = ?, reset_hash = NULL, reset_expires = NULL WHERE id = ?')
-      .run(await kluis.hashPassword(password), userId);
+    S.zin('UPDATE users SET password_hash = ?, reset_hash = NULL, reset_expires = NULL, sessies_vanaf = ? WHERE id = ?')
+      .run(await kluis.hashPassword(password), Date.now(), userId);
     mirror.markUser(userId);
     return getUserById(userId);
   }

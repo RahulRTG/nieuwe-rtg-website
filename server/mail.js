@@ -57,10 +57,17 @@ const CONFIGURED = !!transporter;
 function toOutbox(to, subject, text) {
   fs.mkdirSync(OUTBOX, { recursive: true, mode: 0o700 });
   try { fs.chmodSync(OUTBOX, 0o700); } catch (e) {}
+  /* De naam draagt de tijd EN een willekeurig staartje. Zonder dat staartje
+     schrijven twee berichten in dezelfde milliseconde over elkaar heen -- en dat
+     is geen zeldzaam geval: een herstelaanvraag stuurt de LINK en de CODE vlak
+     na elkaar, precies de twee dingen die je allebei nodig hebt. Een van de twee
+     verdween dan, terwijl het logboek beide als bewaard meldde. Zelfde soort
+     fout als de rest: een storing die je niet kunt zien. */
   const stamp = new Date().toISOString().replace(/[:.]/g, '-');
+  const staart = require('crypto').randomBytes(4).toString('hex');
   const bericht = `From: ${FROM}\nTo: ${to}\nSubject: ${subject}\n\n${text}\n`;
   const kluis = require('./kluis');
-  const naam = stamp + (kluis.AAN ? '.eml.enc' : '.txt');
+  const naam = stamp + '-' + staart + (kluis.AAN ? '.eml.enc' : '.txt');
   fs.writeFileSync(path.join(OUTBOX, naam), kluis.versleutel(bericht), { mode: 0o600 });
   // het adres zelf hoort niet in het logboek als de inhoud wel beschermd is
   console.log(`[mail] (outbox) ${kluis.AAN ? 'versleuteld opgeslagen' : 'naar ' + to}: ${subject}`);
@@ -102,58 +109,13 @@ function bouwBericht(to, subject, text) {
   return { rauw: kop + '\r\n\r\n' + lijf, ondertekend: !!dkim, messageId: id };
 }
 
-/* Zelf bezorgen. Let op de meldingen: een PERMANENTE weigering (5xx) zegt dat
-   het adres niet bestaat en opnieuw proberen zinloos is; een tijdelijke zegt
-   het tegenovergestelde. Dat verschil hoort in het logboek te staan, anders
-   blijft iemand dagen bonzen op een adres dat er niet is. */
-function stuurDirect(to, subject, text) {
-  const { rauw, ondertekend } = bouwBericht(to, subject, text);
-  const van = (/<([^>]+)>/.exec(FROM) || [null, FROM])[1];
-  require('./smtp-direct').bezorg({ van, naar: to, bericht: rauw })
-    .then(uit => {
-      if (uit.ok) {
-        console.log('[mail] zelf bezorgd bij ' + uit.via + (ondertekend ? ' (ondertekend)' : ' (NIET ondertekend: zet DKIM_PRIVATE_KEY)'));
-        return;
-      }
-      console.warn('[mail] ' + uit.soort + ' niet bezorgd (' + (uit.waarom || uit.code) + '); naar de outbox' +
-        (uit.soort === 'permanent' ? ' -- opnieuw proberen heeft geen zin' : ' -- later opnieuw proberen kan wel'));
-      try { toOutbox(to, subject, text); } catch (e) {}
-    })
-    .catch(e => { console.warn('[mail] eigen bezorging mislukt:', e.message); try { toOutbox(to, subject, text); } catch (e2) {} });
-}
-
-/* DEZELFDE VERZENDING, MAAR MET EEN ANTWOORD. `send()` hierboven is
-   fire-and-forget: goed genoeg voor een bevestigingsmail, maar onbruikbaar voor
-   een wachtrij, want die moet WETEN wat er gebeurde. Deze variant geeft
-   { ok, soort } terug -- bezorgd, tijdelijk of permanent -- en dat onderscheid
-   is waar kern/mailwachtrij.js zijn hele gedrag op baseert: bij tijdelijk
-   opnieuw proberen, bij permanent nooit meer.
-
-   De outbox telt hier als BEZORGD, met `via: 'outbox'` erbij. Dat is eerlijker
-   dan hem als mislukking tellen: zonder SMTP-instellingen is de outbox de
-   afgesproken bestemming, en een wachtrij die daar eindeloos op blijft
-   herproberen doet alsof er iets stuk is. */
-async function bezorgNu(to, subject, text) {
-  if (!to || !/@/.test(String(to))) return { ok: false, soort: 'permanent', waarom: 'dat is geen e-mailadres' };
-  if (transporter) {
-    try {
-      await transporter.sendMail({ from: FROM, to, subject, text });
-      return { ok: true, soort: 'bezorgd', via: 'smarthost' };
-    } catch (e) {
-      const m = String((e && e.message) || '');
-      // een 5xx van de smarthost is net zo permanent als een 5xx van de ontvanger
-      return { ok: false, soort: /\b5\d\d\b/.test(m) ? 'permanent' : 'tijdelijk', waarom: m };
-    }
-  }
-  if (DIRECT) {
-    const { rauw } = bouwBericht(to, subject, text);
-    const van = (/<([^>]+)>/.exec(FROM) || [null, FROM])[1];
-    try { return await require('./smtp-direct').bezorg({ van, naar: to, bericht: rauw }); }
-    catch (e) { return { ok: false, soort: 'tijdelijk', waarom: (e && e.message) || 'onbekende fout' }; }
-  }
-  try { toOutbox(to, subject, text); return { ok: true, soort: 'bezorgd', via: 'outbox' }; }
-  catch (e) { return { ok: false, soort: 'tijdelijk', waarom: (e && e.message) || 'de outbox is niet te schrijven' }; }
-}
+/* Zelf bezorgen staat in ./mail-bezorgen.js. Afgesplitst omdat dit bestand over
+   de 10 KB ging, en de knip loopt langs een echte grens: hierboven staat WAT er
+   verstuurd wordt en waar het blijft als dat niet lukt, daar staat HOE het over
+   de lijn gaat (MX opzoeken, SMTP praten, de meldingen van de andere kant
+   lezen). Twee onderwerpen, twee lezers. */
+const stuurDirect = (to, subject, text) =>
+  require('./mail-bezorgen').stuurDirect({ to, subject, text, FROM, bouwBericht, toOutbox });
 
 function send(to, subject, text) {
   if (!to) return;
@@ -180,6 +142,28 @@ function send(to, subject, text) {
   }
   if (DIRECT) return stuurDirect(to, subject, text);
   try { toOutbox(to, subject, text); } catch (e) { console.warn('[mail] mislukt:', e.message); }
+}
+
+async function bezorgNu(to, subject, text) {
+  if (!to || !/@/.test(String(to))) return { ok: false, soort: 'permanent', waarom: 'dat is geen e-mailadres' };
+  if (transporter) {
+    try {
+      await transporter.sendMail({ from: FROM, to, subject, text });
+      return { ok: true, soort: 'bezorgd', via: 'smarthost' };
+    } catch (e) {
+      const m = String((e && e.message) || '');
+      // een 5xx van de smarthost is net zo permanent als een 5xx van de ontvanger
+      return { ok: false, soort: /\b5\d\d\b/.test(m) ? 'permanent' : 'tijdelijk', waarom: m };
+    }
+  }
+  if (DIRECT) {
+    const { rauw } = bouwBericht(to, subject, text);
+    const van = (/<([^>]+)>/.exec(FROM) || [null, FROM])[1];
+    try { return await require('./smtp-direct').bezorg({ van, naar: to, bericht: rauw }); }
+    catch (e) { return { ok: false, soort: 'tijdelijk', waarom: (e && e.message) || 'onbekende fout' }; }
+  }
+  try { toOutbox(to, subject, text); return { ok: true, soort: 'bezorgd', via: 'outbox' }; }
+  catch (e) { return { ok: false, soort: 'tijdelijk', waarom: (e && e.message) || 'de outbox is niet te schrijven' }; }
 }
 
 module.exports = { send, bezorgNu, configured: CONFIGURED || DIRECT, direct: DIRECT, bouwBericht };

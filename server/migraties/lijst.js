@@ -88,7 +88,13 @@ const MIGRATIES = [
   { n: 3, naam: 'scim-sleutels', op: (db) => require('../scim').zorgTabel(db) },
   /* De aan/uit-vlag op een account: uit dienst gemeld door de IdP van een klant
      moet elke lopende sessie meteen wegnemen. Zie accounts/tokens.js. */
-  { n: 4, naam: 'account-actief', op: (db) => voegKolomToe(db, 'users', 'actief', 'INTEGER NOT NULL DEFAULT 1') }
+  { n: 4, naam: 'account-actief', op: (db) => voegKolomToe(db, 'users', 'actief', 'INTEGER NOT NULL DEFAULT 1') },
+  /* Een wachtwoordwijziging hoort ELKE lopende sessie te beeindigen. Tokens zijn
+     hier staatloos, dus er valt niets weg te gooien; wat wel kan is een grens per
+     account. Alles wat VOOR die grens is uitgegeven, geldt niet meer. Zonder dit
+     bleef wie eenmaal binnen was dertig dagen binnen -- ook na een volledig
+     herstel, en juist dan wil je hem eruit. Zie accounts/tokens.js. */
+  { n: 5, naam: 'sessies-vanaf', op: (db) => voegKolomToe(db, 'users', 'sessies_vanaf', 'INTEGER NOT NULL DEFAULT 0') }
 ];
 
 module.exports = { MIGRATIES, voegKolomToe, accountsBasis };

@@ -120,8 +120,11 @@ const isActief = (u) => !!u && u.actief !== 0;
 /* Wachtwoord zetten zonder await, voor het opstart-seed; verder gelijk aan
    setPassword. Blokkeren kan daar geen kwaad: dit draait voor 'listen'. */
 function setPasswordSync(userId, password) {
-  S.zin('UPDATE users SET password_hash = ?, reset_hash = NULL, reset_expires = NULL WHERE id = ?')
-    .run(kluis.hashPasswordSync(password), userId);
+  // ook hier de sessiegrens, en om dezelfde reden als in tokens.js setPassword:
+  // twee wegen naar hetzelfde wachtwoord horen niet twee verschillende dingen
+  // met de lopende sessies te doen
+  S.zin('UPDATE users SET password_hash = ?, reset_hash = NULL, reset_expires = NULL, sessies_vanaf = ? WHERE id = ?')
+    .run(kluis.hashPasswordSync(password), Date.now(), userId);
   mirror.markUser(userId);
   return getUserById(userId);
 }

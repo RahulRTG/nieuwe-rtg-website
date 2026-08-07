@@ -40,7 +40,7 @@ app.post('/api/auth/forgot', (req, res) => {
   };
   const email = String(req.body.email || '').trim();
   const u = email ? accounts.findByLogin(email) : null;
-  let devResetUrl, devCode;
+  let devResetUrl, devCode, tweestaps = false;
   if (u) {
     const tok = accounts.createReset(u.id);
     const url = appUrl(req) + '/apps/app.html?pas=' + pasAppVan(u.tier) + '&reset=' + tok;
@@ -51,13 +51,35 @@ app.post('/api/auth/forgot', (req, res) => {
     mail.send(accounts.emailOf(u) || email, 'Wachtwoord herstellen bij Rahul Travel Group',
       'U vroeg een nieuw wachtwoord aan. Stel het in via deze link (1 uur geldig):\n' + url +
       '\n\nUit veiligheid sturen we ook een code naar uw telefoon; die vult u op de website in.');
-    const tel = accounts.phoneOf(u) || 'onbekend';
-    mail.send('sms:' + tel, 'Uw RTG-herstelcode',
-      'Uw code om het wachtwoord te herstellen: ' + code + '\nGeldig: 1 uur. Vroeg u dit niet aan? Negeer dit bericht.');
+    /* GEEN TELEFOON, GEEN TWEEDE STAP -- en dat moet je dan ook zeggen.
+
+       Hier stond `accounts.phoneOf(u) || 'onbekend'`, en de code ging als
+       'sms:onbekend' de deur uit: naar niemand. /api/auth/reset EIST die code,
+       dus voor elk account zonder telefoonnummer was herstellen onmogelijk. En
+       de registratie vraagt met opzet GEEN telefoonnummer (naam, geboortedatum,
+       e-mail, wachtwoord -- meer niet), dus dat is niet de uitzondering maar de
+       regel. Het antwoord meldde ondertussen vrolijk `tweestaps: true` en de
+       gebruiker keek op een telefoon waar niets binnenkwam.
+
+       Een `|| 'onbekend'` is een fallback die iets VERZINT in plaats van te
+       weigeren -- dezelfde vorm als de sleutels die zichzelf opnieuw verzonnen.
+
+       Nu: is er een tweede kanaal, dan is er een tweede stap. Is die er niet,
+       dan is de link uit de e-mail het bewijs -- precies wat een herstelmail
+       overal is -- en zegt het antwoord dat ook, zodat het scherm niet om een
+       code vraagt die nooit komt. */
+    const tel = accounts.phoneOf(u);
+    if (tel) {
+      mail.send('sms:' + tel, 'Uw RTG-herstelcode',
+        'Uw code om het wachtwoord te herstellen: ' + code + '\nGeldig: 1 uur. Vroeg u dit niet aan? Negeer dit bericht.');
+    } else {
+      herstel2fa()[u.id] = { zonderCode: true, tot: Date.now() + 3600000, pogingen: 0 };
+    }
+    tweestaps = !!tel;
     if (DEV_VELDEN(req)) { devResetUrl = url; devCode = code; }
   }
   // Altijd hetzelfde antwoord, en sinds deze ronde ook in dezelfde tijd.
-  antwoord({ ok: true, tweestaps: true, ...(devResetUrl ? { devResetUrl, devCode } : {}) });
+  antwoord({ ok: true, tweestaps, ...(devResetUrl ? { devResetUrl, devCode } : {}) });
 });
 
 app.post('/api/auth/reset', async (req, res) => {
@@ -67,6 +89,14 @@ app.post('/api/auth/reset', async (req, res) => {
   const entry = herstel2fa()[u.id];
   if (!entry || entry.tot < Date.now())
     return res.status(400).json({ error: 'De code is verlopen. Vraag een nieuwe herstel-link aan.' });
+  /* Was er geen tweede kanaal, dan is de link het bewijs. De vlag komt uit
+     dezelfde aanvraag die de link maakte, dus een aanvaller kan hem niet zelf
+     zetten: hij zou eerst het telefoonnummer van het account moeten weghalen,
+     en daarvoor moet hij al binnen zijn. */
+  if (entry.zonderCode) {
+    delete herstel2fa()[u.id];
+    save();
+  } else
   if (entry.hash !== codeHash(String(req.body.code || '').trim())) {
     entry.pogingen = (entry.pogingen || 0) + 1;
     if (entry.pogingen >= 5) {

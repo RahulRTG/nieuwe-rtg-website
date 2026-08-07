@@ -83,13 +83,18 @@ test('4. EEN DATABASE VAN DE TOEKOMST BLOKKEERT DE START', () => {
 test('5. een database die achterloopt is geen fout maar werk', () => {
   const db = verseDb();
   migraties.draai(db);
-  // doe alsof migratie 4 nog niet bestond
-  db.prepare('DELETE FROM schema_versie WHERE n = ?').run(4);
+  /* Doe alsof de LAATSTE migratie nog niet gedraaid was. Hier stond een vaste 4,
+     en dat brak zodra er een vijfde bijkwam: het verwijderde nummer was dan niet
+     meer de hoogste, dus liep de database helemaal niet achter en zakte de toets
+     op iets wat niemand had aangeraakt. Een toets over "de laatste" hoort de
+     laatste te vragen, niet een nummer te onthouden. */
+  const laatste = migraties.MIGRATIES[migraties.MIGRATIES.length - 1].n;
+  db.prepare('DELETE FROM schema_versie WHERE n = ?').run(laatste);
   const c = migraties.controleer(db);
   assert.equal(c.achter, 1);
   const r = migraties.draai(db);
   assert.equal(r.gedraaid.length, 1);
-  assert.equal(r.gedraaid[0].n, 4);
+  assert.equal(r.gedraaid[0].n, laatste);
   db.close();
 });
 

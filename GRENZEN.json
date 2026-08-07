@@ -15,6 +15,9 @@
       "accRollen",
       "accStart"
     ],
+    "adres": [
+      "adresZoek"
+    ],
     "agenda": [
       "agenda"
     ],
@@ -61,7 +64,8 @@
       "webauthnRegMaak",
       "webauthnRegOpties",
       "webauthnWeg",
-      "werkplekkenBijLogin"
+      "werkplekkenBijLogin",
+      "wisselCodeIn"
     ],
     "baby": [
       "baby"
@@ -147,6 +151,7 @@
       "flitsStem",
       "flitsVooruit"
     ],
+    "fout": [],
     "galerij": [
       "galerij"
     ],
@@ -640,6 +645,73 @@
     ],
     "memo": [],
     "meting": [],
+    "mobiliteit": [
+      "aboAanbod",
+      "aboKoop",
+      "aboMijn",
+      "assetLijst",
+      "assetZet",
+      "beleidLees",
+      "beleidZet",
+      "besteedDezeMaand",
+      "cdtBeeld",
+      "cdtExport",
+      "cdtExportLijst",
+      "cdtOverdracht",
+      "dienstEind",
+      "dienstSoort",
+      "dienstStart",
+      "dienstverlenerZet",
+      "dispatchBeeld",
+      "dispatchOverboek",
+      "dispatchSpoor",
+      "dispatchTelefoonboeking",
+      "dispatchVoorstel",
+      "dispatchWijsToe",
+      "favLijst",
+      "favZet",
+      "kaartAanbod",
+      "kaartControle",
+      "kaartKoop",
+      "kaartMijn",
+      "koppelingStand",
+      "matchGewichten",
+      "matchGewichtenZet",
+      "mobAanbod",
+      "mobAnnuleer",
+      "mobMijn",
+      "mobVraag",
+      "modAan",
+      "modBord",
+      "modStoring",
+      "modZet",
+      "opdrachtBeeld",
+      "opdrachtMet",
+      "opdrachtNaar",
+      "opdrachtPositie",
+      "overeenkomstLijst",
+      "overeenkomstZet",
+      "pendelLijst",
+      "pendelNoShow",
+      "pendelPlan",
+      "pendelReserveer",
+      "pendelRooster",
+      "pendelVoorMedewerker",
+      "pendelZet",
+      "plekLijst",
+      "regimeZet",
+      "reisAnnuleer",
+      "reisBoek",
+      "reisMijn",
+      "reisPlan",
+      "storingLijst",
+      "storingMeld",
+      "storingTeruggave",
+      "stuur",
+      "zakelijkBesluit",
+      "zakelijkOverzicht",
+      "zakelijkWacht"
+    ],
     "muziek": [
       "muziekBewaar",
       "muziekMaak",
@@ -749,6 +821,26 @@
       "openVacatures",
       "payroll"
     ],
+    "payroll-os": [
+      "findSupplier",
+      "payrollOS"
+    ],
+    "payroll-os-dekking": [
+      "payrollOS"
+    ],
+    "payroll-os-mens": [
+      "findSupplier",
+      "payrollOS"
+    ],
+    "payroll-os-register": [
+      "payrollOS"
+    ],
+    "payroll-os-uitgang": [
+      "payrollOS"
+    ],
+    "payroll-os-zaak": [
+      "payrollOS"
+    ],
     "planners": [
       "advies",
       "polis",
@@ -795,6 +887,9 @@
       "rtfkantoor",
       "stadsraad",
       "veilig"
+    ],
+    "rtfos": [
+      "rtfos"
     ],
     "rtfschool": [
       "beroepenbieb",
@@ -935,6 +1030,7 @@
       "oogSpullen",
       "oogUitgifteLog",
       "oogVoertuigen",
+      "payrollOS",
       "publicPartner",
       "stuurLus",
       "trustVan",
@@ -1121,6 +1217,7 @@
       "mbSetup",
       "mbWinkelOverzicht",
       "media",
+      "neemAan",
       "netLink",
       "netPaar",
       "netState",
@@ -1194,6 +1291,7 @@
       "uitEuro",
       "unlockDoor",
       "vakwerk",
+      "verbindLid",
       "verblijfBeslis",
       "verblijfCheckin",
       "verblijfCheckout",
@@ -1206,6 +1304,7 @@
       "weekdagFactor",
       "werkAdvies",
       "werkvensterVan",
+      "wervingsLink",
       "zaakBoard",
       "zaakFunctieAan",
       "zaakZet",
@@ -1381,6 +1480,13 @@
       "checklijst",
       "koppel",
       "tafelwensen"
+    ],
+    "werving": [
+      "loginFails",
+      "noteFailedTry",
+      "notifySupplier",
+      "verbindLid",
+      "zoekInvite"
     ],
     "zakelijk": [
       "PRO",

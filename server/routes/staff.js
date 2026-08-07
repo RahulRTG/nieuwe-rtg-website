@@ -1,7 +1,11 @@
 /* Domein "staff" (aparte module op de gedeelde kern). Alleen de routes;
    de helpers blijven in de kern (server.js) en komen via het kern-object binnen. */
 module.exports = (kern) => {
-  const { DEMO, accounts, app, checkCred, crypto, db, findStaffPartner, hasCred, klokVan, logActivity, managerOnly, notifySupplier, publicPartner, save, schoon, sseClients, sseSend, sseToOffice, sseToSupplier, supplierAuth, trustVan, stuurLus, werkbeleidPauzeStand, WERKBELEID_PAUZE_MINUTEN, oogVoertuigen, oogNulmetingZet, oogNulmetingVan, oogSchouwLog, oogSchouwen, oogLeer, oogSpullen, oogUitgifteLog, oogOverzicht } = kern;
+  const { DEMO, accounts, app, checkCred, crypto, db, findStaffPartner, hasCred, klokVan, logActivity, managerOnly, notifySupplier, publicPartner, save, schoon, sseClients, sseSend, sseToOffice, sseToSupplier, supplierAuth, trustVan, stuurLus, werkbeleidPauzeStand, WERKBELEID_PAUZE_MINUTEN, oogVoertuigen, oogNulmetingZet, oogNulmetingVan, oogSchouwLog, oogSchouwen, oogLeer, oogSpullen, oogUitgifteLog, oogOverzicht,
+    // payrollOS gaat door naar staff/dienst.js: een ziekmelding raakt ook de
+    // loondoorbetaling. Hij mag ontbreken (een kaal testproces mount de
+    // loonlaag niet), dus de aanroepen daar controleren dat.
+    payrollOS } = kern;
   /* De fluisterlaag als EEN naam, en die geven we ook als een naam door. Zou
      staff.js hier de vier losse namen uitpakken en die in actx zetten, dan staan
      ze weer los in de subcontext -- en dan zegt geen enkel bestand meer dat dit

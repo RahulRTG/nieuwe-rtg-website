@@ -101,6 +101,10 @@ module.exports = function bouwKernAan(kern, grens) {
   require('../routes/clips')(grens('clips'));
   require('../routes/kantoorpakket')(grens('kantoorpakket'));
   require('../routes/mobiliteit')(grens('mobiliteit'));
+  /* Het Foundation OS: steden, partnerstichtingen, projecten, vrijwilligers,
+     geld, hulpvragen, meldingen en de portalen voor partner, gemeente en
+     ondernemer (de kern staat al in kernlaag7). */
+  require('../routes/rtfos')(grens('rtfos'));
 
   /* Deel twee -- identiteit, wonen, vervoer en clubs -- staat in ./aanbouw2.js.
      Gesplitst omdat een bestand van 9,5 kB in de waarschuwingsband van de

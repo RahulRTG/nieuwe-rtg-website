@@ -151,8 +151,8 @@ talen(6) boardroomWie(5) loginFails(5) sseToSupplier(5)
 | 39 | `server/routes/member/voertuigen/ontmoeten.js` |
 | 36 | `server/routes/auth.js` |
 | 35 | `server/routes/auth/account.js` |
+| 35 | `server/routes/staff.js` |
 | 34 | `server/routes/member/handel/uitjes.js` |
-| 34 | `server/routes/staff.js` |
 
 ## 6. Waar de waarheid staat
 

@@ -2,6 +2,7 @@
    Waarom er op positie is geknipt en wat `kern` en `hulp` zijn: zie de kop van
    ./kernlaag1.js. Wat er in dit deel zit, in deze volgorde:
      ov
+     mobiliteit
      navigatie
      muziek
      muziek-samen
@@ -28,6 +29,21 @@ module.exports = (kern, hulp) => {
    uitchecken met eerlijke km-prijs via RTG Pay. Na pay en sociaal gemount. */
 Object.assign(kern, require('../kern/ov').maakOv({
   db, save, crypto, schoon, codenaamVan: kern.codenaamVan, haversine, etaMinutes, pay: kern.pay, notify
+}));
+/* Het Mobility OS (kern/mobiliteit/): de vervoerskern onder alles wat rijdt,
+   vaart of vliegt. Een moduleregister met afhankelijkheden (welk vervoer
+   bestaat waar), een voertuigmodel voor alle categorieen, een rittenmotor die
+   alle vervoersvormen deelt, instelbare toewijzing, dispatch en bedrijfspendel.
+   Vertrek en bestemming komen uit RTG zelf -- onze horeca, hotels en OV-haltes
+   -- dus na ov gemount, dat de lijnen en haltes neerzet. */
+Object.assign(kern, require('../kern/mobiliteit').maakMobiliteit({
+  db, save, crypto, schoon, codenaamVan: kern.codenaamVan, haversine, etaMinutes,
+  notify, findSupplier, logActivity, sseToOffice, sseToCustomer,
+  // de kaartverkoop rekent af via dezelfde betaalkern en met dezelfde
+  // OV-prijsformule als het uitchecken; geen tweede som, geen tweede grootboek
+  pay: kern.pay, ovPrijsVan: kern.ovPrijsVan,
+  // voor de dienstverbandcontrole bij zakelijke ritten
+  accounts
 }));
 /* RTG Navigatie (kern/navigatie.js): het huiseigen navigatiesysteem. Een eigen
    wegennet met A*-route, bocht-voor-bocht en ETA per vervoerwijze; bestemmingen

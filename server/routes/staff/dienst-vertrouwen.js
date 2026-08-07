@@ -10,7 +10,7 @@
    belandt, is hier geen bug maar een schending. Wie dit bestand aanraakt, weet
    waar hij aan zit. */
 module.exports = (actx) => {
-  const { app, crypto, db, save, schoon, sseToOffice, supplierAuth } = actx;
+  const { app, crypto, db, save, schoon, sseToOffice, supplierAuth, trustVan } = actx;
 
 
 app.post('/api/staff/trust/send', supplierAuth, (req, res) => {

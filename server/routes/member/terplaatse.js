@@ -5,7 +5,7 @@
 module.exports = (kern) => {
   const { app, auth, db, save, crypto, findSupplier, optieAan, unlockDoor, logActivity,
     notifySupplier, notify, sseToSupplier, sseToOffice, sseToCustomer, schoon, PERSONAS,
-    DOOR_RELOCK_MS, validDept, getChat, chatKeyOf, talen, trChat } = kern;
+    DOOR_RELOCK_MS, validDept, chatKeyOf, talen, trChat, commGast } = kern;
 
   app.post('/api/live/door', auth, (req, res) => {
     const L = db.data.live[req.session.key];
@@ -57,27 +57,29 @@ module.exports = (kern) => {
     if (!text) return res.status(400).json({ error: 'Leeg bericht.' });
     const dept = validDept(s, String(req.body.dept || ''));
     const codename = req.session.account ? req.session.account.codename : PERSONAS[req.session.tier].codename;
-    const chat = getChat(s, req.session.key, codename, req.session.tier, dept);
-    chat.codename = codename;
-    chat.messages.push({ from: 'guest', who: codename, text, lang: talen.taalVan(req.body.lang), at: new Date().toISOString() });
-    chat.messages = chat.messages.slice(-120);
-    chat.unreadPartner += 1;
-    chat.lastAt = new Date().toISOString();
-    save();
+    /* Sinds de verhuizing schrijft dit in de communicatiekern (kern/comm/
+       gast.js) en niet meer in db.data.guestChats. Alles eromheen blijft
+       staan: de controle of de gastchat aanstaat, de vertaling, de melding
+       aan het personeel en het live-seintje. Die gaan over de zaak en niet
+       over berichten. */
+    commGast.stuurGast(s.code, req.session.key, dept, text, codename,
+      { lang: talen.taalVan(req.body.lang), codename, tier: req.session.tier });
     notifySupplier(s.code, { icon: 'berichten', title: codename + ' → ' + dept, body: text.slice(0, 90) });
     sseToSupplier(s.code, 'sync', { scope: 'gchat' });
     sseToCustomer(req.session.key, 'sync', { scope: 'gchat' });
-    trChat(chat.messages, talen.taalVan(req.body.lang)).then(messages => res.json({ ok: true, messages }));
+    const alles = commGast.berichten(s.code, req.session.key, dept);
+    trChat(alles, talen.taalVan(req.body.lang)).then(messages => res.json({ ok: true, messages }));
   });
 
   app.post('/api/partner/chat/history', auth, (req, res) => {
     const s = findSupplier(req.body.supplierCode);
     if (!s) return res.status(404).json({ error: 'Partner niet gevonden.' });
     const dept = validDept(s, String(req.body.dept || ''));
-    const chat = db.data.guestChats[chatKeyOf(s.code, req.session.key, dept)];
-    if (chat && chat.unreadGuest) { chat.unreadGuest = 0; save(); }
+    const messages = commGast.berichten(s.code, req.session.key, dept);
+    // het openen IS het lezen; dat deed de oude route ook (unreadGuest op nul)
+    if (messages.length) commGast.leesGast(s.code, req.session.key, dept);
     const to = talen.taalVan(req.body.lang);
-    trChat(chat ? chat.messages : [], to).then(messages => res.json({ messages, dept }));
+    trChat(messages, to).then(m => res.json({ messages: m, dept }));
   });
 
   app.post('/api/event/rsvp', auth, (req, res) => {

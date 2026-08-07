@@ -5,8 +5,8 @@ module.exports = (ctx) => {
   const { db, save, crypto, i18n, notify, broadcastSync, sseToSupplier, sseToCustomer, logActivity,
     findSupplier, connectedSupplierCodes, guestsFor, gidsHaal, etaMinutes, haversine, accounts, werkgeverSollicitatie,
     HK_STATUSES, POS_METHODS, DOOR_RELOCK_MS, TABLE_STATUSES, ZAAK_OPTIES,
-    ordersVanZaak, boekingenVanZaak, publicTrip } = ctx;
-  const { deptsFor, chatKeyOf, getChat, validDept, zorgContact, klantSalon, publicSupplier, magBezorgen, ticketsVoorSlot, addTicket, setRoomHk, salonNaarVolgers, posDay, unlockDoor, makeSupplierCode, managerOnly, optieAan, aiFindRoom, aiFindDoor } = ctx;
+    ordersVanZaak, boekingenVanZaak, publicTrip, commGastVan } = ctx;
+  const { deptsFor, chatKeyOf, validDept, zorgContact, klantSalon, publicSupplier, magBezorgen, ticketsVoorSlot, addTicket, setRoomHk, salonNaarVolgers, posDay, unlockDoor, makeSupplierCode, managerOnly, optieAan, aiFindRoom, aiFindDoor } = ctx;
   function supplierState(s, actor) {
     const t = Object.assign({}, db.data.supplierTypes[s.type] || {}, { caps: db.capsVan(s) });
     const vandaag = new Date().toISOString().slice(0, 10);
@@ -67,11 +67,14 @@ module.exports = (ctx) => {
       })(),
       tickets: (db.data.tickets[s.code] || []).slice(0, 40),
       lostfound: (db.data.lostfound[s.code] || []).slice(0, 40),
-      guestChats: Object.entries(db.data.guestChats)
-        .filter(([, c]) => c.supplierCode === s.code && c.messages.length)
-        .map(([k, c]) => ({ key: k, codename: c.codename, dept: c.dept || 'Team', unread: c.unreadPartner, last: c.messages[c.messages.length - 1].text.slice(0, 60), lastFrom: c.messages[c.messages.length - 1].from, lastAt: c.lastAt }))
-        .sort((a, b) => (b.lastAt || '').localeCompare(a.lastAt || ''))
-        .slice(0, 30),
+      /* De gastgesprekken komen sinds de verhuizing uit de communicatiekern
+         (kern/comm/gast.js). voorZaak() levert dezelfde vorm als hiervoor
+         ({ key, codename, dept, unread, last, lastFrom, lastAt }), zodat de
+         zaak-app niets merkt -- en haalt onderweg de lijnen binnen die nog in
+         de oude voorraad stonden. Zonder dat laatste zou dit scherm op de dag
+         van de verhuizing leeg staan, en is er geen weg terug: de lijst IS de
+         manier om een gesprek te openen. */
+      guestChats: (() => { const g = commGastVan && commGastVan(); return g ? g.voorZaak(s.code).slice(0, 30) : []; })(),
       // leden die nu live onderweg zijn maar nog niet met dit bedrijf verbonden
       nearbyGuests: Object.values(db.data.live || {})
         .filter(L => L.active && !connectedSupplierCodes(L.key).includes(s.code))

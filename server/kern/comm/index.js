@@ -186,6 +186,15 @@ function maakComm({ db, save, crypto, codenaamVan, naamVan, sein, sseToCustomer 
     return g;
   }
 
+  /* Het gesprek van een module OPZOEKEN zonder het te maken. gesprekMaak() is
+     idempotent op meta.sleutel en dus verleidelijk om ook als opzoeker te
+     gebruiken -- maar dan MAAKT een leesvraag een gesprek, en een module die
+     "bestaat deze lijn?" vraagt krijgt altijd ja. Dat is geen detail: bij het
+     gastcontact hing er een controle aan ("alleen inzage als er echt een lijn
+     is"), en die viel om zodra de vraag zelf de lijn aanlegde. */
+  const gesprekMetSleutel = (sleutel) =>
+    (sleutel ? G().find((g) => g.meta && g.meta.sleutel === String(sleutel)) : null) || null;
+
   /* Het een-op-een gesprek tussen twee leden is er precies een, welke kant je
      het ook opent. De sleutel is daarom de twee sleutels op alfabet -- zonder
      dat krijg je twee gesprekken die elkaars berichten niet zien, en dat is
@@ -506,7 +515,7 @@ function maakComm({ db, save, crypto, codenaamVan, naamVan, sein, sseToCustomer 
   return {
     SOORTEN, LADEN,
     // voor andere modules: dit is de hele koppelvlakte
-    gesprekMaak, tussen, bericht, gesprekVan, magErin,
+    gesprekMaak, tussen, bericht, gesprekVan, gesprekMetSleutel, magErin,
     berichtenVan, leesZet,
     // voor de app
     inbox, gesprek, zoek, draad,

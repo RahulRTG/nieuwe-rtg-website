@@ -2,7 +2,7 @@
    (dagcijfers, weektrend, toppers, actiecentrum en briefing). Krijgt de
    gedeelde kern een keer bij het opstarten vanuit routes/supplier.js. */
 module.exports = (kern) => {
-  const { app, db, supplierAuth, ordersVanZaak, boekingenVanZaak } = kern;
+  const { app, db, supplierAuth, ordersVanZaak, boekingenVanZaak, commGast } = kern;
 
 
 app.post('/api/supplier/backoffice', supplierAuth, (req, res) => {
@@ -75,7 +75,8 @@ app.post('/api/supplier/backoffice', supplierAuth, (req, res) => {
   if (verlofN) alerts.push({ level: 'amber', text: en ? verlofN + ' leave request(s) await your decision (HR & team).' : verlofN + ' verlofaanvraag/aanvragen wachten op uw besluit (HR & team).' });
   const sollN = (db.data.applications[s.code] || []).filter(a => a.status === 'nieuw').length;
   if (sollN) alerts.push({ level: 'info', text: en ? sollN + ' open application(s) (HR & team).' : sollN + ' open sollicitatie(s) (HR & team).' });
-  const chatsN = Object.values(db.data.guestChats).filter(c => c.supplierCode === s.code && c.unreadPartner).length;
+  // sinds de verhuizing uit de communicatiekern (kern/comm/gast.js)
+  const chatsN = (commGast ? commGast.voorZaak(s.code) : []).filter(c => c.unread).length;
   if (chatsN) alerts.push({ level: 'amber', text: en ? chatsN + ' guest chat(s) waiting for a reply.' : chatsN + ' gastchat(s) wachten op een antwoord.' });
   const klussenN = (db.data.tickets[s.code] || []).filter(t => t.status !== 'klaar').length;
   if (klussenN) alerts.push({ level: 'info', text: en ? klussenN + ' open job(s) or maintenance.' : klussenN + ' open klus(sen) of onderhoud.' });

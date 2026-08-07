@@ -152,7 +152,7 @@ kern.commBronnen = require('../kern/comm/bronnen').maakBronnen({ db,
      niet als functie: het doorgeven gebeurt in de route (routes/member/comm.js),
      die het verzoek omzet naar de eigen route van de module. Zo blijft elke
      controle staan waar hij hoort. */
-  werk: true, zaak: true });
+  werk: true });
 /* De brug voor de priveberichten: de sociale laag en haar routes schrijven
    sinds de verhuizing IN de kern (kern/comm/dm.js), met de oude geschiedenis
    die er per paar eenmalig bij wordt gehaald. Zo is er nog maar een plek waar
@@ -163,6 +163,10 @@ kern.commDm = require('../kern/comm/dm').maakCommDm({ db, save, comm: kern.comm,
    EEN ZAAK kan zijn; routes/staff/collega.js schrijft er sindsdien in, met
    dezelfde antwoordvorm zodat de PDA en de zaak-app niets merken. */
 kern.commCollega = require('../kern/comm/collega').maakCommCollega({ db, save, comm: kern.comm });
+/* En het gastcontact: de lijn tussen een lid en een zaak, per afdeling
+   (kern/comm/gast.js). Het eerste gesprek waarin een codenaam en een bedrijf
+   samen zitten, en daarmee het gesprek waarvoor het actormodel is gemaakt. */
+kern.commGast = require('../kern/comm/gast').maakCommGast({ db, save, comm: kern.comm });
 kern.commAi = require('../kern/berichten/ai')({
   // de kern gooit als een gesprek niet van jou is; de AI-laag verwacht null
   draad: (mijKey, gesprekId) => { try { return kern.comm.draad(mijKey, gesprekId); } catch (e) { return null; } },

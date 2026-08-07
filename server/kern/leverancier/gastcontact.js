@@ -5,20 +5,18 @@ module.exports = (ctx) => {
   const { db, save, crypto, i18n, notify, broadcastSync, sseToSupplier, sseToCustomer, logActivity,
     findSupplier, connectedSupplierCodes, guestsFor, gidsHaal, etaMinutes, haversine, accounts, werkgeverSollicitatie,
     HK_STATUSES, POS_METHODS, DOOR_RELOCK_MS, TABLE_STATUSES, ZAAK_OPTIES,
-    ordersVanZaak, boekingenVanZaak, publicTrip } = ctx;
+    ordersVanZaak, boekingenVanZaak, publicTrip, commGastVan } = ctx;
   function deptsFor(s) {
     if (s.type === 'hotel') return ['Receptie', 'Roomservice', 'Housekeeping', 'Onderhoud', 'Security'];
     if (s.type === 'apartment' || s.type === 'villa') return ['Beheer', 'Onderhoud', 'Security'];
     return ['Team'];
   }
+  /* De sleutel van een lijn blijft dezelfde drie delen dragen (CODE|lid|
+     afdeling): de schermen sturen hem mee en kern/comm/gast.js herkent hem
+     terug. getChat() stond hier ook en is WEG -- die maakte een record in
+     db.data.guestChats aan, en die voorraad is sinds de verhuizing een
+     bevroren archief. Een lijn aanmaken doet zorgContact() nu in de kern. */
   function chatKeyOf(supplierCode, customerKey, dept) { return supplierCode + '|' + customerKey + '|' + dept; }
-  function getChat(s, customerKey, codename, tier, dept) {
-    const k = chatKeyOf(s.code, customerKey, dept);
-    if (!db.data.guestChats[k]) {
-      db.data.guestChats[k] = { supplierCode: s.code, customerKey, codename, tier, dept, messages: [], unreadGuest: 0, unreadPartner: 0, lastAt: null };
-    }
-    return db.data.guestChats[k];
-  }
   function validDept(s, dept) {
     const list = deptsFor(s);
     return list.includes(dept) ? dept : list[0];
@@ -28,23 +26,33 @@ module.exports = (ctx) => {
      koopt of gewoon de etalage bekijkt) openen we automatisch een chatlijn.
      Zo zijn ze nooit vreemden: beiden kunnen elkaars Salon bekijken en direct
      appen. Idempotent: de lijn wordt maar een keer aangemaakt. */
+  /* SINDS DE VERHUIZING SCHRIJFT DIT NIET MEER IN db.data.guestChats. Die
+     voorraad is een bevroren archief: er wordt uit gelezen zolang er nog niet
+     verhuisde lijnen in staan, en er komt niets meer bij. Een nieuwe lijn
+     aanmaken in de oude vorm zou dat weer een half-levende voorraad maken --
+     twee plekken waar "bestaat deze lijn" beantwoord wordt, en dat is precies
+     de splitsing die deze hele ronde opheft.
+
+     De openingsregel komt van de ZAAK met een eigen soort: de kern eist dat
+     een afzender deelnemer is, en die poort zetten we niet open voor een
+     uitzondering. Naar buiten heet hij nog steeds 'systeem'. */
   function zorgContact(s, customerKey, codename, tier) {
     if (!s || !customerKey || String(customerKey).startsWith('rtf:')) return null;
-    const k = chatKeyOf(s.code, customerKey, 'Team');
-    const bestond = !!db.data.guestChats[k];
-    const chat = getChat(s, customerKey, codename || customerKey, tier || 'rtg', 'Team');
-    chat.open = true;
-    if (codename) chat.codename = codename;
-    if (tier) chat.tier = tier;
+    const g = commGastVan && commGastVan();
+    if (!g) return null;
+    const bestond = !!g.bestaand(s.code, customerKey, 'Team');
+    const gesprek = g.gesprek(s.code, customerKey, 'Team',
+      { codename: codename || customerKey, tier: tier || 'rtg' });
     if (!bestond) {
-      chat.messages.push({ from: 'systeem', text: 'U heeft nu een open lijn met ' + s.name + '. Bekijk gerust elkaars Salon.', at: new Date().toISOString() });
-      chat.lastAt = new Date().toISOString();
+      g.opening(s.code, customerKey, 'Team',
+        'U heeft nu een open lijn met ' + s.name + '. Bekijk gerust elkaars Salon.',
+        { codename: codename || customerKey, tier: tier || 'rtg' });
       try { save(); } catch (e) {}
       try { notify(tier || 'rtg', { icon: 'berichten', title: 'Open lijn met ' + s.name, body: 'App direct en bekijk elkaars Salon.', scope: 'gchat' }); } catch (e) {}
       try { sseToCustomer(customerKey, 'sync', { scope: 'gchat' }); } catch (e) {}
       try { sseToSupplier(s.code, 'sync', { scope: 'gchat' }); } catch (e) {}
     }
-    return chat;
+    return gesprek;
   }
 
   /* De Salon van een klant zoals de partner die ziet: privacy-first, dus alleen
@@ -54,8 +62,20 @@ module.exports = (ctx) => {
     let codename = key, tier = 'rtg';
     const dir = (db.data.memberDir || {})[key];
     if (dir) { codename = dir.codename || key; tier = dir.tier || tier; }
-    // val terug op een lopende chat voor de codenaam als de gids hem niet kent
-    if (!dir) { for (const c of Object.values(db.data.guestChats || {})) if (c.customerKey === key) { codename = c.codename || codename; tier = c.tier || tier; break; } }
+    /* Val terug op een lopende lijn als de ledengids deze sleutel niet kent.
+       Die stond in db.data.guestChats en staat sinds de verhuizing in de
+       kern: de codenaam en de pas reizen mee in de meta van het gesprek.
+       Was deze terugval op de oude voorraad blijven staan, dan had hij het
+       precies voor de NIEUWE leden niet meer gedaan -- en dat is het soort
+       storing dat pas opvalt als iemand zegt "bij mij staat er niets". */
+    if (!dir) {
+      const g = commGastVan && commGastVan();
+      const lijnen = g ? g.voorLid(key) : {};
+      for (const r of Object.values(lijnen)) {
+        if (!r.codename) continue;
+        codename = r.codename; tier = r.tier || tier; break;
+      }
+    }
     // early exit: we tonen er hooguit 12, dus nooit de hele feed doorlopen
     const posts = [];
     for (const p of (db.data.posts || [])) {
@@ -67,5 +87,5 @@ module.exports = (ctx) => {
   }
 
   // publieke weergave van een leverancier (voor de klant)
-  return { deptsFor, chatKeyOf, getChat, validDept, zorgContact, klantSalon };
+  return { deptsFor, chatKeyOf, validDept, zorgContact, klantSalon };
 };

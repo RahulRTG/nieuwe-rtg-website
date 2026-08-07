@@ -2,10 +2,14 @@
 
    De kern (./index.js) is het model waar alles naartoe hoort. Maar er staan al
    gesprekken in dit huis die er niet in zitten: sollicitatie-chats, de
-   Berichtenbox van MijnOverheid, het gastcontact met een zaak, en het
-   doorlopende gesprek met Rahul zelf. Die staan in hun eigen voorraden, met
-   hun eigen vorm, en ze zijn niet stuk -- ze horen alleen thuis in dezelfde
-   lijst.
+   Berichtenbox van MijnOverheid en het doorlopende gesprek met Rahul zelf. Die
+   staan in hun eigen voorraden, met hun eigen vorm, en ze zijn niet stuk -- ze
+   horen alleen thuis in dezelfde lijst.
+
+   DIT BESTAND KRIMPT, EN DAT IS DE BEDOELING. Het gastcontact met een zaak
+   stond hier ook; dat is inmiddels echt verhuisd (./gast.js) en dus hier weg.
+   De collegachat en de priveberichten hebben hier nooit gestaan om dezelfde
+   reden. Wat overblijft is wat nog niet over is.
 
    TWEE MANIEREN OM DAT OP TE LOSSEN, en de keuze is hier belangrijk.
 
@@ -42,7 +46,7 @@
 
 const MAX_PER_BRON = 40;
 
-function maakBronnen({ db, codenaamVan, convOf, overheid, rtmail, werk, zaak }) {
+function maakBronnen({ db, codenaamVan, convOf, overheid, rtmail, werk }) {
   const snij = (t, n) => String(t == null ? '' : t).slice(0, n || 140);
 
   /* Elke bron levert dezelfde vorm als comm.toonGesprek(), plus `extern: true`
@@ -115,34 +119,23 @@ function maakBronnen({ db, codenaamVan, convOf, overheid, rtmail, werk, zaak }) 
     return uit.slice(0, MAX_PER_BRON);
   }
 
-  /* 4. Het gastcontact met een zaak: de lijn tussen een lid en een horeca- of
-        winkelbedrijf waar hij besteld heeft. Dat is de la Onderweg -- het gaat
-        over iets dat loopt. */
-  function zaken(mij) {
-    const uit = [];
-    try {
-      for (const [sleutel, chat] of Object.entries(db.data.guestChats || {})) {
-        if (!sleutel.includes(mij)) continue;
-        const berichten = chat.messages || chat.berichten || [];
-        const b = berichten[berichten.length - 1];
-        if (!b) continue;
-        uit.push(rij({
-          id: 'zaak:' + sleutel, soort: 'order', lade: 'onderweg',
-          titel: chat.zaakNaam || chat.naam || 'Een zaak',
-          laatste: b.text || b.tekst, at: b.at,
-          bronnaam: 'Zaak', link: '/apps/app.html'
-        }));
-      }
-    } catch (e) {}
-    return uit.slice(0, MAX_PER_BRON);
-  }
+  /* 4. HET GASTCONTACT STOND HIER, EN IS WEG -- want het is verhuisd.
+
+        De lijn tussen een lid en een zaak woont sinds kern/comm/gast.js in de
+        kern zelf: een echt gesprek, met de zaak als deelnemer. Hij komt dus al
+        via comm.inbox() binnen, en zou hij hier OOK nog als bron staan, dan
+        stond elke gastchat twee keer in de lijst -- een keer echt en een keer
+        als kopie van dezelfde voorraad, met een ander id en een eigen teller.
+
+        Dat is precies wat de kop van dit bestand belooft: "elke bron die later
+        wel overgaat, verdwijnt gewoon uit dit bestand." Dit is de eerste. */
 
   /* Alles bij elkaar. De volgorde doet er niet toe -- de inbox sorteert zelf
      op tijd -- maar de bronnen wel: valt er een om, dan vallen de andere niet
      mee. Vandaar dat elke bron zijn eigen try/catch heeft en een lege lijst
      teruggeeft in plaats van de hele inbox mee te slepen. */
   function alles(mij, account) {
-    return [].concat(rahul(mij, account), overheidBox(mij), sollicitaties(mij), zaken(mij));
+    return [].concat(rahul(mij, account), overheidBox(mij), sollicitaties(mij));
   }
 
   /* ---------------- open en beantwoorden, via de module ----------------
@@ -182,19 +175,6 @@ function maakBronnen({ db, codenaamVan, convOf, overheid, rtmail, werk, zaak }) 
         berichten: (chat.berichten || []).map((m) => alsBericht({
           at: m.at, vanMij: m.van === 'sollicitant', van: m.van === 'sollicitant' ? 'Ik' : (chat.bedrijf || 'Werkgever'),
           tekst: m.tekst, lang: m.lang
-        }, mij))
-      };
-    }
-    if (b.soort === 'zaak' && zaak) {
-      const chat = (db.data.guestChats || {})[b.sleutel];
-      if (!chat || !String(b.sleutel).includes(mij)) return null;
-      return {
-        titel: chat.zaakNaam || chat.naam || 'Een zaak',
-        antwoord: { pad: '/api/partner/chat/send',
-          vast: { supplierCode: chat.supplierCode || null, dept: chat.dept || null }, veld: 'text' },
-        berichten: (chat.messages || []).map((m) => alsBericht({
-          at: m.at, vanMij: m.from === 'guest', van: m.from === 'guest' ? 'Ik' : (chat.zaakNaam || 'De zaak'),
-          tekst: m.text, lang: m.lang
         }, mij))
       };
     }

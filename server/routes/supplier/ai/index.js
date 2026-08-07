@@ -7,7 +7,7 @@
 module.exports = (kern) => {
   // alleen wat deze AI-module echt gebruikt (de rest van de gedeelde kern hoort
   // hier niet thuis; opgeruimd om dode destructuring te vermijden)
-  const { addTicket, aiFindDoor, aiFindRoom, app, db, guestsFor, logActivity, posDay, save, scheduleFor, setRoomHk, sseToSupplier, supplierAuth, unlockDoor, ordersVanZaak } = kern;
+  const { addTicket, aiFindDoor, aiFindRoom, app, db, guestsFor, logActivity, posDay, save, scheduleFor, setRoomHk, sseToSupplier, supplierAuth, unlockDoor, ordersVanZaak, commGast } = kern;
   const { fluisterZeg } = kern.fluister;
   const ambtenaar = require('./ambtenaar')(kern);
 
@@ -93,9 +93,10 @@ app.post('/api/supplier/ai', supplierAuth, async (req, res) => {
       : 'Er is nu geen gast live onderweg naar u.');
   }
   if (/(bericht|chat|onbeantwoord|messages?)/.test(ql)) {
-    const chats = Object.values(db.data.guestChats).filter(c => c.supplierCode === s.code && c.unreadPartner > 0);
+    // sinds de verhuizing uit de communicatiekern (kern/comm/gast.js)
+    const chats = (commGast ? commGast.voorZaak(s.code) : []).filter(c => c.unread > 0);
     return A(chats.length
-      ? 'U heeft ' + chats.reduce((n, c) => n + c.unreadPartner, 0) + ' onbeantwoord(e) bericht(en): ' + chats.map(c => c.codename + ' (' + (c.dept || 'Team') + '): "' + c.messages[c.messages.length - 1].text.slice(0, 40) + '"').join('; ') + '.'
+      ? 'U heeft ' + chats.reduce((n, c) => n + c.unread, 0) + ' onbeantwoord(e) bericht(en): ' + chats.map(c => c.codename + ' (' + c.dept + '): "' + String(c.last).slice(0, 40) + '"').join('; ') + '.'
       : 'Alle gastberichten zijn beantwoord.');
   }
   if (/(minibar)/.test(ql) && Array.isArray(s.minibar)) {

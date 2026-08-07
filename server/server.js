@@ -1241,13 +1241,20 @@ const { trChat, chatApplicant, ensureApplyChat, applyChatPubliek, applyChatVerta
    blijven hierboven. HK_STATUSES, POS_METHODS, DOOR_RELOCK_MS, TABLE_STATUSES en
    ZAAK_OPTIES komen als directe export uit dezelfde module. */
 const {
-  publicTrip, deptsFor, chatKeyOf, getChat, validDept, zorgContact, klantSalon, publicSupplier, magBezorgen,
+  publicTrip, deptsFor, chatKeyOf, validDept, zorgContact, klantSalon, publicSupplier, magBezorgen,
   ticketsVoorSlot, addTicket, setRoomHk, salonNaarVolgers, posDay, unlockDoor,
   makeSupplierCode, managerOnly, optieAan, aiFindRoom, aiFindDoor, supplierState
 } = maakLeverancier({
   db, save, crypto, i18n, notify, broadcastSync, sseToSupplier, sseToCustomer,
   logActivity, findSupplier, connectedSupplierCodes, guestsFor, gidsHaal,
-  etaMinutes, haversine, accounts, werkgeverSollicitatie
+  etaMinutes, haversine, accounts, werkgeverSollicitatie,
+  /* De gastchat woont sinds de verhuizing in de communicatiekern, en die wordt
+     pas in kernlaag4 gebouwd -- ver na deze regel. Vandaar een functie en geen
+     verwijzing: hij wordt opgehaald op het moment van AANROEPEN. Zou hier de
+     waarde staan, dan stond er voor altijd undefined in en nam het zaakscherm
+     stil de "geen gesprekken"-tak. Dezelfde constructie als convOf in
+     kern/comm/bronnen.js, en om dezelfde reden. */
+  commGastVan: () => kern.commGast
 });
 
 /* De ervaring-laag (kern/ervaring.js): tafelreserveringen, annuleren, reviews,
@@ -1767,7 +1774,7 @@ const kern = {
   chatKeyOf, chatStuur, checkCred, coachCache, coachRules, conciergeInbox, connectedSupplierCodes, convOf,
   crypto, cvReady, db, deptsFor, dirTouch, eisAccount, engageError, ensureApplyChat, foutmelder,
   ensureSupplierDefaults, etaMinutes, eventCovers, express, fallbackRunsheet, financeVoor, dagrapport, shiftSamenvatting, findPartner, findStaffPartner,
-  findSupplier, forgetSession, fs, gcCode, geborenVan, geenGast, idGeverifieerd, generateAiReply, getChat,
+  findSupplier, forgetSession, fs, gcCode, geborenVan, geenGast, idGeverifieerd, generateAiReply,
   guestsFor, hasContact, hasCred, haversine, i18n, initRealtime, klokVan, ledenPrijs,
   leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename, liveStateFor, load, logActivity, loginFails,
   mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, noteerBeurt, memberTemplate, myApplications, nextSseId, onboarding, boerderij, journalistiek, creator, samenwerking, agenda, notities, bestanden, meet, galerij, klok, boeken, onderwijs, leerstof, bijles, vervolg, facturatie, markt,

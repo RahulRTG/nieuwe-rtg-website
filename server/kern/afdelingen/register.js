@@ -137,8 +137,15 @@ module.exports = (ctx) => {
       lijsten: () => [] },
     klantenservice: { naam: 'Klantenservice', icoon: 'help', missie: 'Elke gast en elk gezin snel en warm geholpen.', naamInzage: true,
       kpis: () => [
-        ['Gastgesprekken', tel(Object.keys(d().guestChats || {}))],
-        ['Ledengesprekken', tel(Object.keys(d().memberChats || {}))],
+        /* Uit de communicatiekern en niet meer uit guestChats/memberChats: die
+           twee zijn sinds de verhuizing bevroren archieven. Bleven deze
+           tellers daarop staan, dan zouden ze langzaam stilvallen op het
+           aantal van de dag van de verhuizing -- een KPI die niet meer
+           beweegt ziet er hetzelfde uit als een KPI waar niets gebeurt. */
+        ['Gastgesprekken', tel(lijst(d().commGesprekken).filter(g => g.meta && g.meta.bron === 'Zaak'))],
+        ['Ledengesprekken', tel(lijst(d().commGesprekken).filter(g =>
+          (g.soort === 'personal' || g.soort === 'group') &&
+          (g.deelnemers || []).every(x => !String(x).includes(':'))))],
         ['Meldingen open', tel(lijst(d().notifications).filter(n => !n.read))]
       ],
       lijsten: () => [] }

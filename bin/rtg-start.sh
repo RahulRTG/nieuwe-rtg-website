@@ -23,18 +23,34 @@
 set -e
 cd "$(dirname "$0")/.."
 
-SLEUTEL=$(security find-generic-password -a rtg -s RTG_ENC_KEY -w 2>/dev/null || true)
-if [ -z "$SLEUTEL" ]; then
-  echo "FOUT: geen RTG_ENC_KEY in de sleutelhanger."
-  echo "      Zonder die sleutel start de server niet, en dat hoort ook zo:"
-  echo "      hij weigert liever dan onleesbare data te serveren."
-  echo "      Berg hem op met: security add-generic-password -a rtg -s RTG_ENC_KEY -U -w"
-  exit 1
-fi
+# VIER SLEUTELS, en ze doen alle vier iets anders:
+#   RTG_ENC_KEY     versleutelt de opgeslagen data (store.db)
+#   RTG_VAULT_KEY   versleutelt de identiteitsgegevens EN maakt de zoek-hash van
+#                   een e-mailadres. Verandert deze, dan wordt geen enkel
+#                   bestaand account nog gevonden bij het inloggen.
+#   RTG_SECRET_KEY  ondertekent de sessietokens
+#   RTG_VAULT_RING  oudere kluissleutels, nieuwste eerst, zodat gegevens van
+#                   voor een sleutelwissel leesbaar blijven
+#
+# DE REDEN DAT ZE HIER ALLE VIER STAAN. Ze zaten alleen in de omgeving van het
+# draaiende proces, nergens anders. Toen dat proces stopte en opnieuw startte
+# zonder die omgeving, verzon server/accounts/index.js er nieuwe -- stil, zonder
+# waarschuwing. Elk bestaand account was daarmee in een klap onvindbaar, en het
+# zag eruit als "mijn wachtwoord klopt niet meer".
+for NAAM in RTG_ENC_KEY RTG_VAULT_KEY RTG_SECRET_KEY RTG_VAULT_RING; do
+  WAARDE=$(security find-generic-password -a rtg -s "$NAAM" -w 2>/dev/null || true)
+  if [ -z "$WAARDE" ]; then
+    echo "FOUT: $NAAM staat niet in de sleutelhanger."
+    echo "      Starten zonder deze sleutel maakt bestaande accounts onvindbaar."
+    echo "      Berg hem op met: security add-generic-password -a rtg -s $NAAM -U -w"
+    exit 1
+  fi
+  export "$NAAM=$WAARDE"
+done
+SLEUTEL="$RTG_ENC_KEY"
 
 # een draaiende server eerst netjes stoppen, anders vecht de nieuwe om de poort
 pkill -f "node server/trio.js" 2>/dev/null || true
 sleep 2
 
-export RTG_ENC_KEY="$SLEUTEL"
 exec node server/trio.js

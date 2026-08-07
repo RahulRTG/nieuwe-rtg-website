@@ -1398,6 +1398,7 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
     // ---- de deuren zelf: hier kan per definitie nog geen sessie zijn ----
     ['/api/auth/register', 'registreren kan alleen zonder account'],
     ['/api/auth/forgot', 'wachtwoord vergeten: wie buitengesloten is heeft geen token'],
+    ['/api/pin/herstel', 'pin vergeten: de eenmalige sleutel uit de mail IS het bewijs, net als bij /api/auth/reset'],
     ['/api/aanmelding/aanvraag', 'een aanstaande aanvrager is nog geen lid (met rem per ip)'],
     ['/api/supplier/apply', 'solliciteren bij een zaak kan zonder account'],
     ['/api/supplier/staff/join', 'personeel meldt zich aan met een uitnodigingscode'],

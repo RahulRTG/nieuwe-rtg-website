@@ -22,7 +22,11 @@
       "agenda"
     ],
     "algpin": [
+      "appUrl",
+      "mail",
       "pinCheck",
+      "pinHerstelStart",
+      "pinHerstelZet",
       "pinInfo",
       "pinZet"
     ],
@@ -259,6 +263,19 @@
     ],
     "labfonds": [
       "labfonds"
+    ],
+    "ledenbalie": [
+      "balieAboVoorstel",
+      "balieDossier",
+      "balieHerstel",
+      "balieKlachtOpen",
+      "balieKlachtStatus",
+      "balieZetelWeg",
+      "balieZetelZet",
+      "balieZetels",
+      "balieZoek",
+      "boardroomAuth",
+      "magBalie"
     ],
     "ledenregister": [
       "boardroomAuth",

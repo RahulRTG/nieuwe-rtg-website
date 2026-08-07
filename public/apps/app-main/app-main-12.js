@@ -83,6 +83,12 @@
     for (const [naam, fn] of lijst) stap(naam, fn);
   }
 
+  /* De pin-herstellink uit de mail (?pinherstel=...) wordt opgevangen door
+     /shared/pinherstel.js. Dat staat apart en niet hier, omdat dit deel daarmee
+     over de 10 KB ging -- en omdat het een op zichzelf staand schermpje is dat
+     niets van de app-schil nodig heeft. */
+  function pinHerstelUitAdres(){ if (window.RTGPinHerstel) RTGPinHerstel.opvangen(API, T); }
+
   function openTab(tab, focusView){
     vulTab(tab);   // nu pas de gegevens van dit tabblad, en alleen de eerste keer
     document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.dataset.view === tab));

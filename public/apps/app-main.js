@@ -12,7 +12,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '1bea48eb';
+var RTG_BOUW = 'f9231c8c';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -1692,6 +1692,12 @@ var RTG_BOUW = '1bea48eb';
     for (const [naam, fn] of lijst) stap(naam, fn);
   }
 
+  /* De pin-herstellink uit de mail (?pinherstel=...) wordt opgevangen door
+     /shared/pinherstel.js. Dat staat apart en niet hier, omdat dit deel daarmee
+     over de 10 KB ging -- en omdat het een op zichzelf staand schermpje is dat
+     niets van de app-schil nodig heeft. */
+  function pinHerstelUitAdres(){ if (window.RTGPinHerstel) RTGPinHerstel.opvangen(API, T); }
+
   function openTab(tab, focusView){
     vulTab(tab);   // nu pas de gegevens van dit tabblad, en alleen de eerste keer
     document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.dataset.view === tab));
@@ -1815,6 +1821,8 @@ var RTG_BOUW = '1bea48eb';
     document.getElementById('app').classList.toggle('os-gast', guest);
     });
     stap('renderHome', renderHome);
+    // een pin-herstellink uit de mail opvangen (zie ./app-main-12.js)
+    stap('pin-herstel', pinHerstelUitAdres);
     // Rahul opent het gesprek op het beginscherm zelf, met wat hij nu ziet
     stap('rahul-thuis', () => { if (!guest && window.RTGThuisRahul) RTGThuisRahul.opent(); });
     /* Terug waar je was, maar KORT. Dit venster stond op een half uur, en dat
@@ -1838,7 +1846,7 @@ var RTG_BOUW = '1bea48eb';
       }
     } catch(e){}
     /* De tabbladen achter het beginscherm halen hun gegevens nu pas op als je
-       ze opent -- zie LADERS_PER_TAB in ./app-main-12c.js voor waarom, en wat
+       ze opent -- zie LADERS_PER_TAB in ./app-main-12.js voor waarom, en wat
        er gemeten is. Hier blijven alleen de drie laders staan die aan geen
        enkel tabblad vastzitten; die gaan na het eerste beeld, een voor een. */
     naBeeld([
@@ -3246,6 +3254,11 @@ var RTG_BOUW = '1bea48eb';
       ga.addEventListener('click', doe);
       inp.addEventListener('keydown', e => { if (e.key === 'Enter') doe(); });
       belLijst.appendChild(ga);
+
+      // "Pin vergeten?" onder het veld. De hele stroom -- de knop, de aanvraag
+      // en het scherm dat de nieuwe pin zet -- woont in /shared/pinherstel.js:
+      // een plek voor een ding, en dit deel zat al aan de 10 KB-grens.
+      if (!zetten && window.RTGPinHerstel) RTGPinHerstel.knop(belLijst, fout, API, T);
       belScrim.classList.add('open');
       setTimeout(() => inp.focus(), 60);
     }).catch(() => af(null)); // geen account/lijn: niet blokkeren, de werk-app vraagt zelf

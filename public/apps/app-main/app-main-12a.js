@@ -85,6 +85,8 @@
     document.getElementById('app').classList.toggle('os-gast', guest);
     });
     stap('renderHome', renderHome);
+    // een pin-herstellink uit de mail opvangen (zie ./app-main-12.js)
+    stap('pin-herstel', pinHerstelUitAdres);
     // Rahul opent het gesprek op het beginscherm zelf, met wat hij nu ziet
     stap('rahul-thuis', () => { if (!guest && window.RTGThuisRahul) RTGThuisRahul.opent(); });
     /* Terug waar je was, maar KORT. Dit venster stond op een half uur, en dat
@@ -108,7 +110,7 @@
       }
     } catch(e){}
     /* De tabbladen achter het beginscherm halen hun gegevens nu pas op als je
-       ze opent -- zie LADERS_PER_TAB in ./app-main-12c.js voor waarom, en wat
+       ze opent -- zie LADERS_PER_TAB in ./app-main-12.js voor waarom, en wat
        er gemeten is. Hier blijven alleen de drie laders staan die aan geen
        enkel tabblad vastzitten; die gaan na het eerste beeld, een voor een. */
     naBeeld([

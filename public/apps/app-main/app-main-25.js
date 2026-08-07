@@ -32,6 +32,11 @@
       ga.addEventListener('click', doe);
       inp.addEventListener('keydown', e => { if (e.key === 'Enter') doe(); });
       belLijst.appendChild(ga);
+
+      // "Pin vergeten?" onder het veld. De hele stroom -- de knop, de aanvraag
+      // en het scherm dat de nieuwe pin zet -- woont in /shared/pinherstel.js:
+      // een plek voor een ding, en dit deel zat al aan de 10 KB-grens.
+      if (!zetten && window.RTGPinHerstel) RTGPinHerstel.knop(belLijst, fout, API, T);
       belScrim.classList.add('open');
       setTimeout(() => inp.focus(), 60);
     }).catch(() => af(null)); // geen account/lijn: niet blokkeren, de werk-app vraagt zelf

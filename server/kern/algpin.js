@@ -70,7 +70,56 @@ function maakAlgPin({ db, save, crypto, slot }) {
     return { ok: true, gezet: true };
   }
 
-  return { pinInfo, pinZet, pinCheck };
+  /* ---- pin vergeten ----
+
+     "Wijzigen kan alleen met de oude pin" is goed tegen iemand die even achter
+     je toestel kruipt, maar het liet iedereen die zijn pin kwijt was voorgoed
+     buiten staan: de kantoorrol en de werk-apps gaan niet open zonder pin, en
+     er was geen enkele weg terug. Dat is hier echt gebeurd, en het kostte de
+     eigenaar de toegang tot zijn eigen boardroom.
+
+     De weg terug loopt langs hetzelfde tweede kanaal als het wachtwoord: een
+     eenmalige sleutel naar het e-mailadres van het lid zelf (zie
+     routes/auth/herstel.js, en dit is met opzet dezelfde vorm -- twee
+     verschillende herstelwegen zijn twee verschillende waarheden).
+
+     Waarom dit veilig genoeg is: aanvragen kan alleen vanuit een INGELOGDE
+     sessie van het lid zelf, en de sleutel gaat naar een adres dat wij hebben
+     en de aanvrager niet kiest. Wie het account al heeft EN de mailbox al
+     heeft, kon het wachtwoord toch al herstellen; de pin wordt daarmee niet
+     zwakker dan de deur die eromheen zit. */
+  const HERSTEL_MS = 3600000;   // een uur, net als de wachtwoordlink
+  const herstelRij = () => {
+    if (!db.data.algPinHerstel || typeof db.data.algPinHerstel !== 'object') db.data.algPinHerstel = {};
+    return db.data.algPinHerstel;
+  };
+  const sleutelHash = t => crypto.createHash('sha256').update(String(t)).digest('hex');
+
+  function pinHerstelStart(key) {
+    const t = crypto.randomBytes(24).toString('hex');
+    herstelRij()[sleutelHash(t)] = { key, tot: Date.now() + HERSTEL_MS };
+    // afgelopen sleutels meteen opruimen: anders groeit deze rij eeuwig door
+    for (const [h, r] of Object.entries(herstelRij())) if (!r || r.tot < Date.now()) delete herstelRij()[h];
+    save();
+    return { ok: true, sleutel: t, geldigTot: new Date(Date.now() + HERSTEL_MS).toISOString() };
+  }
+
+  /* Eenmalig: de sleutel gaat weg zodra hij is gebruikt, ook als het zetten
+     daarna misgaat. Een sleutel die na een misgreep nog werkt is geen sleutel. */
+  async function pinHerstelZet(sleutel, pin) {
+    const h = sleutelHash(String(sleutel || ''));
+    const r = herstelRij()[h];
+    if (!r || r.tot < Date.now()) return { status: 400, error: 'Deze herstellink is verlopen of al gebruikt. Vraag een nieuwe aan.' };
+    delete herstelRij()[h];
+    if (!PIN_RE.test(String(pin || ''))) { save(); return { status: 400, error: 'Kies een pincode van 4 tot 8 cijfers.' }; }
+    const zout = crypto.randomBytes(16);
+    rij()[r.key] = { zout: zout.toString('base64'), hash: await hash(pin, zout), at: new Date().toISOString() };
+    slot.goed(doel(r.key));   // schone lei: het slot van de oude pin telt niet meer mee
+    save();
+    return { ok: true, gezet: true };
+  }
+
+  return { pinInfo, pinZet, pinCheck, pinHerstelStart, pinHerstelZet };
 }
 
 module.exports = { maakAlgPin };

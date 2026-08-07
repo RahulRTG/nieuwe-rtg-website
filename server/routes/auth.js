@@ -12,6 +12,20 @@ module.exports = (kern) => {
      app en speelt mee in de RTG-app, met minder functies. Er is geen brede
      leden-app meer; zonder pasApp (directe API-koppelingen en tests) blijft
      elke pas werken. */
+  /* DE EIGENAAR LOOPT LANGS DE PAS-CONTROLE.
+
+     Die controle bestaat om leden in de app van hun eigen pas te houden: een
+     Business-account komt de Lifestyle-app niet in, en andersom. Voor de
+     eigenaar slaat dat nergens op -- hij bouwt ze alle drie, moet ze alle drie
+     kunnen laten zien, en zijn eigen account draagt nu eenmaal maar een pas.
+     Zonder deze uitzondering wees zijn eigen huis hem de deur.
+
+     Het is geen gat: eigenaar zijn hangt aan het e-mailadres uit de
+     identiteitskluis (server/eigenaar.js), niet aan een veld in het verzoek.
+     Wie geen eigenaar is, merkt van deze regel niets. */
+  const eigenaar = require('../eigenaar');
+  const isBaas = (user) => { try { return eigenaar.isEigenaar(accounts, user); } catch (e) { return false; } };
+
   function pasAppOk(pasApp, tier) {
     if (!['rtg', 'lifestyle', 'business'].includes(pasApp)) return true; // brede app
     if (pasApp === 'rtg') return tier === 'rtg' || tier === 'guest';
@@ -84,8 +98,9 @@ app.post('/api/auth/login', async (req, res) => {
      deze regel zou iemand een token krijgen dat meteen daarna nergens voor
      deugt: verwarrend, en het verbergt de echte reden. */
   if (!accounts.isActief(user)) return res.status(403).json({ error: 'Dit account is door uw organisatie op non-actief gezet. Neem contact op met uw beheerder.' });
-  // juiste gegevens, maar de verkeerde pas-app: netjes doorverwijzen
-  if (!pasAppOk(String(req.body.pasApp || ''), user.tier)) return res.status(403).json({ error: PAS_FOUT });
+  // juiste gegevens, maar de verkeerde pas-app: netjes doorverwijzen. De
+  // eigenaar mag in alle drie de apps; zie de uitleg bij pasAppOk hierboven.
+  if (!isBaas(user) && !pasAppOk(String(req.body.pasApp || ''), user.tier)) return res.status(403).json({ error: PAS_FOUT });
   const token = accounts.issueToken(user.id);
   const sess = { tier: user.tier, key: 'user-' + user.id, account: user };
   /* Een account voor alles: heeft dit lid een werkplek, dan komt die hier meteen

@@ -1,7 +1,7 @@
 {
   "vastgelegd": "2026-08-07",
   "meters": {
-    "endpointsZonderTest": 1011,
+    "endpointsZonderTest": 1016,
     "dekkingPct": 68,
     "keuringStuk": 0,
     "keuringScheef": 6,
@@ -10,7 +10,7 @@
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 17,
     "e2eBestanden": 69,
-    "keuringOmvang": 105,
+    "keuringOmvang": 106,
     "keuringDubbeling": 67,
     "keuringDekkingAdvies": 50,
     "endpointsNooitAangeraakt": 0,
@@ -21,7 +21,7 @@
     "keuringTeGroot": 2,
     "inlineStijlAttributen": 5656,
     "browserpoortToetsen": 103,
-    "kernBreedte": 1073,
+    "kernBreedte": 1074,
     "kernGedeeld": 140,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
@@ -29,6 +29,11 @@
     "toetsenOngevoeligPct": 2.3
   },
   "notities": [
+    {
+      "datum": "2026-08-07",
+      "meter": "endpointsZonderTest 1011 -> 1016; keuringOmvang 105 -> 106; kernBreedte 1073 -> 1074",
+      "reden": "Laatste bijstelling van de veiligheidsronde, na het terugzetten van de bedrading die ik zelf met een git checkout had weggegooid. Noemer, geen kwaliteit: de wervingslink staat er als functie bij en de nieuwe toetsen zijn nog niet door de mutatiemotor gegaan."
+    },
     {
       "datum": "2026-08-07",
       "meter": "keuringScheef 3 -> 6; keuringOmvang 101 -> 105; kernBreedte 1059 -> 1073; toetsenNietGemeten 131 -> 146; inlineStijlAttributen 5610 -> 5656",

@@ -150,11 +150,16 @@ async function startEens(opts) {
       // toetsen doorlopen de hele herstelstroom; op een echte server staat
       // deze vlag uit en komt er nooit een link of code in een antwoord
       RTG_DEV_LINKS: '1',
-      // toetsen leunen op de demo-stand (vaste inlog, bekend eigenaarsaccount).
-      // Op een echte server staat die UIT tenzij iemand hem aanzet -- hij stond
-      // aan zolang NODE_ENV niet gezet was, en dat zette het wachtwoord van de
-      // eigenaar bij elke start terug op een waarde uit de repo.
-      RTG_DEMO: '1',
+      /* De meeste toetsen leunen op de demo-stand (vaste inlog, bekend
+         eigenaarsaccount). Op een echte server staat die UIT tenzij iemand hem
+         aanzet -- hij stond aan zolang NODE_ENV niet gezet was, en dat zette het
+         wachtwoord van de eigenaar bij elke start terug op een waarde uit de repo.
+
+         MAAR NIET IN EEN PRODUCTIETOETS. Wie NODE_ENV=production meegeeft wil
+         juist bewijzen dat de grendels dichtzitten, en de config weigert dan
+         terecht te starten met RTG_DEMO=1. Deze standaard zette zulke toetsen
+         stil om. */
+      ...(((opts.env || {}).NODE_ENV) === 'production' ? {} : { RTG_DEMO: '1' }),
       ...process.env, NODE_ENV: 'test',
       RTG_TOETS: path.basename(String(process.argv[1] || 'onbekend')),
       ...(eigenMap ? { RTG_DATA_DIR: eigenMap } : {}),

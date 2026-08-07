@@ -103,6 +103,13 @@ const log = {
    status en duur. Het id komt terug in de response-header (X-Request-Id) zodat
    een gebruiker of monitor een klacht aan een logregel kan koppelen. Gezondheid-
    checks loggen we op debug, zodat ze de productielog niet volspammen. */
+/* Het pad in VORM, zoals het journaal het bewaart: /api/lid/42 wordt
+   /api/lid/:id. Zo tellen honderd verzoeken naar honderd leden als een regel, en
+   belandt er geen nummer in het journaal dat naar een persoon leidt. Uit het
+   journaal zelf gehaald, want twee regexen die hetzelfde bedoelen lopen uiteen. */
+const journaalPad = (p) => { try { return require('./kern/doorgeefjournaal').padVorm(p); } catch (e) { return String(p || ''); } };
+let journaalStuk = false;   // een kapot journaal meldt zich een keer, niet bij elk verzoek
+
 function middleware() {
   const crypto = require('crypto');
   return (req, res, next) => {
@@ -115,6 +122,23 @@ function middleware() {
       const stil = req.path === '/api/health' || req.path === '/api/ready';
       const niveau = res.statusCode >= 500 ? 'error' : res.statusCode >= 400 ? 'warn' : (stil ? 'debug' : 'info');
       schrijf(niveau, 'verzoek', { id, m: req.method, p: req.path, s: res.statusCode, ms: Math.round(ms) });
+      /* Ook naar het doorgeefjournaal, want een logbestand is geen scherm. Hier
+         staat alles al klaar, dus dit kost niets extra's. Het pad gaat er in
+         VORM in (/api/lid/:id) -- honderd verzoeken naar honderd leden tellen zo
+         als een regel, en er belandt geen id in het journaal dat naar een
+         persoon leidt. Zie kern/doorgeefjournaal.js. */
+      try {
+        const haak = require('./journaalhaak');
+        haak.meld({ richting: 'in', wat: journaalPad(req.path), methode: req.method,
+          status: res.statusCode, ms: Math.round(ms), mislukt: res.statusCode >= 400 });
+      } catch (e) {
+        /* Een journaal mag nooit een verzoek raken -- maar het mag ook niet stil
+           mislukken. Deze catch slikte een ReferenceError (journaalPad bestond
+           niet) en daardoor kwam er weken niets in het journaal terwijl alles er
+           goed uitzag. Precies de fout die dit journaal moet helpen vinden. Dus:
+           EEN keer melden, en daarna zwijgen. */
+        if (!journaalStuk) { journaalStuk = true; console.error('[journaal] melden mislukt, en dat blijft zo tot een herstart:', e.message); }
+      }
     });
     next();
   };

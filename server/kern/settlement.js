@@ -19,7 +19,7 @@
    db, accounts en fonds kan meegeven. */
 module.exports = { maakSettlement };
 
-function maakSettlement({ db, save, accounts, fonds, log, dpRegistreerMunt }) {
+function maakSettlement({ db, save, accounts, fonds, log, dpRegistreerMunt, payOplaadAfronden }) {
   return async function settleFactuur(ctx, betaling) {
   if (!ctx) return;
   // Een rechtstreekse betaling aan een partner met munten: de leverancier wordt
@@ -27,6 +27,27 @@ function maakSettlement({ db, save, accounts, fonds, log, dpRegistreerMunt }) {
   if (ctx.soort === 'direct') {
     try { dpRegistreerMunt({ key: ctx.key, codename: ctx.codename, supplierCode: ctx.supplierCode, bedragCenten: betaling.centen, omschrijving: ctx.omschrijving }); }
     catch (e) { /* de afdracht mag de settlement nooit blokkeren */ }
+    return;
+  }
+  /* Een OPLADING van de RTG Pay-wallet. Deze tak ontbrak, en daarmee viel de
+     hele oplaad-stroom bij een echte aanbieder in het niets: de kaart werd
+     afgeschreven, de wallet nooit bijgeschreven, en de webhook antwoordde
+     200 ok. Zelfde blinde vlek als hierboven bij de facturen -- in demostand
+     is een betaling meteen 'betaald' en komt de code hier niet eens langs.
+
+     Het bijschrijven gaat door DEZELFDE boeking als de directe oplading
+     (payOplaadAfronden in kern/pay), zodat er geen tweede boekingsregel
+     ontstaat die ooit uit de pas gaat lopen met de eerste. De webhook heeft de
+     regel al uit kaartWachtend gehaald voor hij ons aanroept, dus een herhaalde
+     webhook boekt niets dubbel. */
+  if (ctx.soort === 'oplaad') {
+    if (!payOplaadAfronden) { (log && log.error || console.error)('[settlement] oplading kan niet worden bijgeschreven: de betaalkern ontbreekt', { id: betaling && betaling.id }); return; }
+    try {
+      const r = await payOplaadAfronden({ codenaam: ctx.codenaam, centen: betaling.centen, oms: ctx.oms, ref: betaling.id });
+      if (r && r.error) (log && log.error || console.error)('[settlement] oplading NIET bijgeschreven: ' + r.error, { id: betaling && betaling.id });
+    } catch (e) {
+      (log && log.error || console.error)('[settlement] oplading NIET bijgeschreven: ' + e.message, { id: betaling && betaling.id });
+    }
     return;
   }
   if (ctx.soort !== 'factuur') return;

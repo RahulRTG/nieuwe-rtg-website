@@ -133,7 +133,7 @@ module.exports = ({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, sch
   /* Het oplaaddeel (laadOp, bankdekking, zorgSaldo, herstart-reconcile) staat
      in ./opladen.js; het krijgt de guard (boekAsync) en de helpers mee en
      raakt de boekingsregels zelf niet aan. */
-  const { laadOp, koppelBank, reconcileVanMotor, zorgSaldo, bestaatLid } = require('./opladen').maakOpladen({
+  const { laadOp, oplaadAfronden, koppelBank, reconcileVanMotor, zorgSaldo, bestaatLid } = require('./opladen').maakOpladen({
     betaal, metIdem, boekAsync, rekLid, saldoVan, nu, d, save,
     motorklant, geldModus, keyVanCodenaam,
     OPLAAD_MIN, MAX_CENTEN, AUTOLAAD_STAP
@@ -147,7 +147,7 @@ module.exports = ({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, sch
     betaaldienstKosten: betaaldienstKosten || (() => 0),
     MIN_CENTEN, MAX_CENTEN, KASCODE_MS, KASCODE_MAX
   };
-  const api = { MIN_CENTEN, MAX_CENTEN, boek, boekAsync, geldModus, sluitcontrole, laadOp, saldoVan, koppelBank, reconcileVanMotor };
+  const api = { MIN_CENTEN, MAX_CENTEN, boek, boekAsync, geldModus, sluitcontrole, laadOp, oplaadAfronden, saldoVan, koppelBank, reconcileVanMotor };
   // schaduw-stand voor het statusbord (drift-detector): vergelijkt de JS-stand
   // met de Rust-motor -- niet alleen de som maar ook een vingerafdruk over ALLE
   // saldi, zodat per-rekening-drift die de som mist er alsnog uit komt. De afdruk

@@ -1437,7 +1437,13 @@ const munten = maakMunten({ db, save, muntbetaal });
    kern/settlement.js, zodat hij los te toetsen is -- dat was hier niet mogelijk
    en juist daar zat de fout: de kaartkant werd nooit afgewikkeld. */
 const { maakSettlement } = require('./kern/settlement');
-const settleFactuur = maakSettlement({ db, save, accounts, fonds, log, dpRegistreerMunt });
+/* payOplaadAfronden als LATE binding: de betaalkern wordt pas verderop gebouwd
+   (kernlaag), maar deze functie draait pas als er een webhook binnenkomt -- dan
+   staat hij er. Zonder deze draad kan settlement een bevestigde oplading niet
+   bijschrijven, en dat is precies wat er misging: kaart afgeschreven, wallet
+   niet bijgeschreven, webhook antwoordde 200 ok. */
+const settleFactuur = maakSettlement({ db, save, accounts, fonds, log, dpRegistreerMunt,
+  payOplaadAfronden: (a) => (kern.pay && kern.pay.oplaadAfronden ? kern.pay.oplaadAfronden(a) : null) });
 
 /* De paspoort-/identiteitslaag (kern/paspoort.js): een gecontroleerd, veilig
    en toestemmingsgestuurd kanaal waarlangs een partner de identiteit achter een

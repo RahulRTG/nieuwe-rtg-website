@@ -23,14 +23,47 @@ function maakOpladen(basis) {
         });
       } catch (e) { return { status: 502, error: 'De betaling lukte niet: ' + e.message }; }
       if (betaling.status !== 'betaald' && betaling.status !== 'succeeded') {
-        // bij een echte aanbieder rondt de klant het af (Apple Pay-sheet); de
-        // webhook crediteert daarna. In de demo is hij altijd meteen betaald.
+        /* "De webhook crediteert daarna" -- dat stond hier, en het was niet waar.
+           Niets vertelde die webhook WELKE oplading bij welk lid hoorde: hij kijkt
+           in db.data.kaartWachtend, en daar kwam alleen een FACTUUR in te staan
+           (routes/member/betalen.js). Een oplading stond er nergens, dus vond de
+           webhook niets, logde "zonder wachtende betaling" en deed niets.
+
+           Het gevolg bij een echte aanbieder: de kaart van het lid werd wel
+           afgeschreven en zijn wallet nooit bijgeschreven. De aanroeper kreeg
+           een nette 402 "wacht op bevestiging" en die bevestiging kwam nooit aan.
+           In demostand viel het niet op, want daar is de betaling meteen betaald
+           en loopt de code hier niet langs -- precies dezelfde blinde vlek die
+           kern/settlement.js in zijn kop beschrijft voor de facturen.
+
+           De context gaat lokaal in de boeken, op het betaal-id. Bewust lokaal
+           en niet als metadata bij de provider: een codenaam hoort niet naar een
+           derde partij, ook niet als pseudoniem. */
+        try {
+          d().kaartWachtend = d().kaartWachtend && typeof d().kaartWachtend === 'object' ? d().kaartWachtend : {};
+          d().kaartWachtend[betaling.id] = { soort: 'oplaad', codenaam, centen: c, oms: oms || 'Opladen', at: Date.now() };
+          // hetzelfde plafond als bij de facturen, zodat afgebroken betalingen dit niet laten groeien
+          const sleutels = Object.keys(d().kaartWachtend);
+          if (sleutels.length > 20000) for (const k of sleutels.slice(0, sleutels.length - 20000)) delete d().kaartWachtend[k];
+          save();
+        } catch (e) { /* de registratie mag de betaling niet omgooien */ }
         return { status: 402, error: 'De betaling wacht op bevestiging.', betaalStatus: betaling.status };
       }
-      const b = await boekAsync({ van: 'extern:oplaad', naar: rekLid(codenaam), centen: c, soort: 'oplaad', oms: oms || 'Opladen', ref: betaling.id });
-      if (b.error) return b;
-      return { ok: true, saldo: saldoVan(rekLid(codenaam)), geladen: c };
+      return oplaadAfronden({ codenaam, centen: c, oms, ref: betaling.id });
     });
+  }
+
+  /* HET BIJSCHRIJVEN ZELF, als eigen functie -- want het gebeurt op TWEE
+     momenten: meteen (de aanbieder bevestigt direct) en later (de webhook
+     bevestigt, kern/settlement.js). Die tweede weg bestond niet en daar ging
+     het geld verloren. Een tweede boekingsregel ernaast zou hetzelfde soort
+     fout zijn: twee bronnen die ooit uit de pas lopen. Dus een. */
+  async function oplaadAfronden({ codenaam, centen, oms, ref }) {
+    const c = Math.round(Number(centen));
+    if (!Number.isFinite(c) || c <= 0) return { status: 400, error: 'Geen geldig bedrag om bij te schrijven.' };
+    const b = await boekAsync({ van: 'extern:oplaad', naar: rekLid(codenaam), centen: c, soort: 'oplaad', oms: oms || 'Opladen', ref });
+    if (b.error) return b;
+    return { ok: true, saldo: saldoVan(rekLid(codenaam)), geladen: c };
   }
 
   /* De eigen bank als eerste dekking: is de RTG Bank live en heeft het lid
@@ -82,7 +115,7 @@ function maakOpladen(basis) {
     try { return !!(await keyVanCodenaam(codenaam)); } catch (e) { return false; }
   }
 
-  return { laadOp, koppelBank, reconcileVanMotor, zorgSaldo, bestaatLid };
+  return { laadOp, oplaadAfronden, koppelBank, reconcileVanMotor, zorgSaldo, bestaatLid };
 }
 
 module.exports = { maakOpladen };

@@ -64,24 +64,12 @@ function maakPodium({ db, save, crypto, accounts, leeftijdVan, codenaamVan, keyV
     return { ok: true };
   }
   const zones = require('./zones');
-  /* Bij welke organisaties hoort dit lid, en waar heeft hij de leiding? Uit de
-     personeelsadministratie die het huis al heeft -- geen tweede lijst, en dus
-     ook geen lijst die kan gaan afwijken (LAT.md regel 4). */
-  function zakenVan(key) {
-    const m = /^user-(\d+)$/.exec(String(key || ''));
-    if (!m) return [];
-    let rijen = [];
-    try { rijen = accounts.staffPositions(Number(m[1])) || []; } catch (e) { return []; }
-    /* De naam die hier hoort is die van de ZAAK, niet die van de medewerker:
-       een kijker kiest straks "Bakkerij Imran" en niet "Wendy Werker". De
-       personeelsrij draagt alleen de code, dus de naam komt uit het
-       leveranciersregister -- en als die zaak niet meer bestaat, valt de
-       werkplek weg in plaats van naamloos mee te gaan. */
-    return rijen.map(r => {
-      const s = findSupplier ? findSupplier(r.supplier_code) : null;
-      return { code: r.supplier_code, naam: (s && s.name) || r.supplier_code, bestaat: !!s, leiding: r.role === 'manager' };
-    }).filter(z => !findSupplier || z.bestaat);
-  }
+  /* Bij welke organisaties hoort dit lid, en waar heeft hij de leiding? Die
+     vraag staat in kern/werkplekken.js, want het Theater stelt hem inmiddels
+     ook (de interne videobibliotheek). Twee keer beantwoorden is twee plekken
+     die uit elkaar kunnen lopen, en bij een TOEGANGSvraag is dat de
+     gevaarlijkste soort (LAT.md regel 4). */
+  const { zakenVan } = require('../werkplekken').maakWerkplekken({ accounts, findSupplier });
   const poort = zones.maakZonePoort({ lat, zakenVan });
   /* mag() blijft bestaan als DE deur van de 18+-zone, want dat is precies wat
      hij altijd al was. Alles wat een kanaal in handen heeft, hoort echter

@@ -11,9 +11,22 @@ module.exports = (ctx) => {
     kanaalBytes, mbVan, sseToCustomer, thuisAanwezigheid, thuisOnline,
     THUIS_TTL_MS, THUIS_SIGNALEN, MAX_VIDEO_MB, MAX_KANAAL_MB } = ctx;
 
+  /* Een intern kanaal van een zaak waar dit lid de LEIDING heeft. Geen leiding,
+     of een kanaal van een andere zaak: dan bestaat het hier niet. */
+  function intern(key, kanaalId) {
+    const k = kanaalMet(kanaalId);
+    if (!k || !k.zaakCode) return null;
+    return (ctx.zakenVan(key) || []).some(z => z.code === k.zaakCode && z.leiding) ? k : null;
+  }
+
   /* ---- de video: eerst de kaart, dan de bytes (originele kwaliteit) ---- */
   function videoMaak(key, data) {
-    const k = kanaalVan(key);
+    /* Publiceren kan in het EIGEN kanaal, of in de interne bibliotheek van een
+       zaak waar dit lid de leiding heeft (./zaak.js). Dat tweede geval vraagt
+       er uitdrukkelijk om met een kanaalId: anders zou een video stilletjes in
+       de verkeerde wereld landen, en dat is precies het soort fout dat je pas
+       merkt als de verkeerde mensen meekijken. */
+    const k = data && data.kanaalId ? intern(key, String(data.kanaalId)) : kanaalVan(key);
     if (!k) return { status: 404, error: 'Meld eerst een kanaal aan.' };
     if (k.status !== 'goedgekeurd') return { status: 403, error: 'Uw kanaal wacht nog op goedkeuring door RTG-kantoor.' };
     const titel = schoon(data.titel, 80); if (!titel) return { status: 400, error: 'Geef de video een titel.' };
@@ -67,8 +80,13 @@ module.exports = (ctx) => {
     return { status: 200, ok: true };
   }
   // voor de kijk-route: waar de bytes staan (in productie: de CDN-verwijzing)
-  function streamVan(vid) {
+  function streamVan(vid, key) {
     const v = videoMet(vid); if (!v || !v.klaar || !v.ext) return null;   // thuis-video: wij hebben de bytes niet
+    /* DE DEUR OP DE BYTES ZELF. Een interne bibliotheek die alleen uit de
+       lijsten is weggelaten, is geen interne bibliotheek: wie het video-id
+       heeft, haalt de beelden dan gewoon op met een link. Daarom vraagt ook
+       deze route of dit lid bij die zaak werkt (./zaak.js). */
+    if (ctx.zaakMagVideo && !ctx.zaakMagVideo(key, v)) return null;
     return { pad: path.join(mediaDir, v.id + '.' + v.ext), bytes: v.bytes,
       type: v.ext === 'webm' ? 'video/webm' : 'video/mp4', titel: v.titel };
   }

@@ -41,7 +41,13 @@ const MODI = {
   muziek: { naam: 'Muziek', vormen: ['track'] },
   kijk: { naam: 'Kijk', vormen: ['video', 'live'] },
   flow: { naam: 'Flow', vormen: ['clip'] },
-  alles: { naam: 'Alles', vormen: ['track', 'video', 'clip', 'live'] }
+  alles: { naam: 'Alles', vormen: ['track', 'video', 'clip', 'live'] },
+  /* MEDIA FOR BUSINESS. Een eigen stand, geen filter over de gewone wereld:
+     wat hier staat is INTERN gepubliceerd (kern/theater/zaak.js, kern/podium
+     zone 'zaak') en staat in geen enkele openbare lijst. Een filter over
+     openbaar werk zou het woord "intern" gebruiken voor iets wat het niet is.
+     De stand verschijnt alleen bij wie ergens werkt -- zie zaakWereld(). */
+  zaak: { naam: 'Zaak', vormen: ['video', 'live'], intern: true }
 };
 const WERELD_MAX = 60;      // de wereld is eindig, en zegt waar hij ophoudt
 
@@ -71,49 +77,22 @@ function maakMediaOS({ db, save, schoon, crypto, codenaamVan, keyVanCodenaam, no
      roepen dat aan via een laat gebonden haak in ./opzet/kernlaag*.js. */
   const wekken = maakWekken({ notify, codenaamVan, meldVan, bronnen });
 
-  /* ---- volgen: één knop, en hij schrijft in de domeinen zelf ----
-     Clips en het Theater kennen een gratis volgrelatie; die worden allebei
-     gezet. Het Podium kent alleen een BETAALD maandabonnement, en dat wordt
-     hier met opzet niet aangeraakt: één volgknop die ongemerkt een incasso
-     start is precies wat niet mag. De hub geeft dat als aparte stap terug. */
-  async function volg(sess, opdracht) {
-    const o = opdracht || {};
-    const naam = schoon(o.codenaam, 60);
-    if (!naam) return { status: 400, error: 'Zeg erbij wie u wilt volgen.' };
-    /* De gids is async en geeft een RIJ terug, geen sleutel; zie de uitleg in
-       ./hub.js. Wie hier de Promise als sleutel gebruikt, schrijft een
-       onvindbare volgrelatie weg zonder dat er iets klaagt. */
-    const rij = keyVanCodenaam ? await keyVanCodenaam(naam) : null;
-    const mKey = rij && rij.key ? rij.key : null;
-    if (!mKey) return { status: 404, error: 'Deze maker bestaat niet (of heeft een andere codenaam).' };
-    if (mKey === sess.key) return { status: 400, error: 'U hoeft uzelf niet te volgen.' };
-    const aan = o.aan !== false;
-    const gedaan = [];
-    /* Alleen schrijven waar er ook iets te volgen IS. Een volgrelatie op een
-       maker zonder werk zou een rij in de lijst van Clips zetten waar nooit
-       iets uit komt -- en het lid zou "volgend" zien staan zonder dat dat
-       ergens op slaat. */
-    const heeftClips = bronnen.clipsVan ? (bronnen.clipsVan(mKey, sess.key) || []).length > 0 : false;
-    if (heeftClips && bronnen.volgClips) {
-      const r = bronnen.volgClips(sess.key, mKey, aan);
-      if (r && !r.error) gedaan.push('clips');
-    }
-    const kanaal = bronnen.theaterKanaalVan ? bronnen.theaterKanaalVan(mKey) : null;
-    if (kanaal && bronnen.volgTheater) {
-      const r = bronnen.volgTheater(sess.key, kanaal.id, aan);
-      if (r && !r.error) gedaan.push('theater');
-    }
-    if (!gedaan.length) {
-      return { status: 409, error: 'Van deze maker staat er nog niets waar een volgrelatie op past.' };
-    }
-    return { status: 200, ok: true, volg: aan, in: gedaan, codenaam: naam,
-      meldingen: meldVan(sess.key, naam), soortenMogelijk: MELD_SOORTEN,
-      let: 'Een livekanaal van het Podium kost een maandbedrag; dat blijft een aparte, bewuste stap.' };
-  }
+  /* VOLGEN staat in ./volgen.js: één knop die in Clips en het Theater tegelijk
+     schrijft, en met opzet NIET in het betaalde Podium-abonnement. Dat is een
+     eigen onderwerp -- het gaat over schrijven in de domeinen, terwijl de rest
+     van dit bestand leest. */
+  const volg = require('./volgen')({ schoon, keyVanCodenaam, bronnen, meldVan, MELD_SOORTEN });
+
+  /* MEDIA FOR BUSINESS (./zaakwereld.js): de interne wereld van uw organisatie
+     -- de opgenomen bibliotheek van het Theater en de interne livekanalen van
+     het Podium. Eigen bestand, want het is een eigen wereld met een eigen deur;
+     zie de kop daar voor waarom dit géén filter over de openbare wereld is. */
+  const { zaakWereld, modiVoor } = require('./zaakwereld')({ MODI, catalogus, bronnen });
 
   /* ---- de wereld: één catalogus, drie standen ---- */
   function wereld(sess, opties) {
     const o = opties || {};
+    if (o.modus === 'zaak') return zaakWereld(sess);
     const modusNaam = MODI[o.modus] ? o.modus : 'alles';
     const modus = MODI[modusNaam];
     const alles = catalogus.alles(sess);
@@ -137,7 +116,7 @@ function maakMediaOS({ db, save, schoon, crypto, codenaamVan, keyVanCodenaam, no
     return {
       status: 200, modus: modusNaam, modusNaam: modus.naam,
       leeg,
-      modi: Object.keys(MODI).map(k => ({ id: k, naam: MODI[k].naam })),
+      modi: modiVoor(sess),
       stukken: rijen,
       totaal: geordend.rijen.length,
       einde: meer > 0

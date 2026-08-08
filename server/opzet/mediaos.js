@@ -37,6 +37,12 @@ module.exports = (kern, hulp) => {
       clips: (key) => kern.clipsFeed(key, {}),
       // alleen de zones die in de gedeelde index horen; 18+ en besloten niet
       live: (key) => kern.podiumGedeeld(key),
+      /* Media for Business: de twee bronnen die AL intern zijn. Ze geven per
+         lid alleen wat bij een zaak van dat lid hoort -- de Media OS filtert
+         hier niets openbaars "intern". */
+      zakenVan: (key) => (kern.werkplekken ? kern.werkplekken.zakenVan(key) : []),
+      videosZaak: (key) => kern.theaterZaakVideos(key),
+      liveZaak: (key) => kern.podiumZaak(key),
       // gericht: één maker, en de verbinding tussen een uitgave en de clips eronder
       tracksVan: (mKey, kijker) => kern.muziekUitgavenVan(mKey, kijker),
       videosVan: (mKey) => kern.theaterVideosVan(mKey),

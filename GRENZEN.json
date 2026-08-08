@@ -1426,6 +1426,8 @@
       "theaterVerwijder",
       "theaterVideoMaak",
       "theaterVideoUpload",
+      "theaterZaakMaak",
+      "theaterZaakZaal",
       "theaterZaal"
     ],
     "thuis": [

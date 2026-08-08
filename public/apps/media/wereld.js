@@ -177,7 +177,11 @@
       d.weggelaten.forEach(function (x) { k2.appendChild(el('p', 'stil', x.id + ' -- ' + x.reden)); });
       w.appendChild(k2);
     }
-    tekenRegelaars(d);
+    /* De regelaars horen bij UW wereld en niet bij die van uw werkgever: in de
+       stand Zaak staat wat uw organisatie publiceert, en "minder van deze
+       maker" slaat daar nergens op. De server stuurt daar dan ook geen
+       smaakprofiel mee, en dit scherm verzint er geen. */
+    if (d.smaak) tekenRegelaars(d); else $('#regelaars').hidden = true;
   }
   function haal() {
     api('wereld', { modus: modus }).then(teken);

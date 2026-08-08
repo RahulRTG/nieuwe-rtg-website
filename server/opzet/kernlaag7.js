@@ -114,15 +114,11 @@ require('../kern/rahul').zetGeslachtBron((key) => {
   };
 });
 
-/* RTG Theater (kern/theater.js): de videobibliotheek op bioscoopniveau.
-   Kanalen na menselijke goedkeuring; de bytes blijven origineel (geen
-   hercompressie) en staan als bestanden in de datamap, nooit in git. */
-Object.assign(kern, require('../kern/theater').maakTheater({
-  db, save, crypto, schoon, codenaamVan: kern.codenaamVan, notify, sseToOffice, sseToCustomer,
-  mediaDir: path.join(process.env.RTG_DATA_DIR || path.join(__dirname, 'data'), 'theater'),
-  // de Media-OS-haak: nieuw werk wekt volgers (./mediaos.js)
-  nieuwWerk: (k2, s2, t2) => (kern.mediaNieuwWerk ? kern.mediaNieuwWerk(k2, s2, t2) : null)
-}));
+/* RTG Theater staat in ./theater.js: de videobibliotheek plus de interne
+   bibliotheek per organisatie. Eigen bestand om dezelfde reden als ./mediaos.js
+   -- het is een eigen onderwerp, en dit bestand blijft er onder de omvangregel
+   mee. Moet VOOR de Media OS, want die leest het Theater. */
+require('./theater')(kern, hulp);
 /* De routebedrading staat in ./opzet/routes.js: welke domeinen dit proces
    bedient en welke routers er daarna op de kern worden gehangen. Dat blok is
    de natuurlijke naad van dit bestand -- alles hierboven BOUWT de kern op,

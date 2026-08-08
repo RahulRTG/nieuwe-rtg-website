@@ -94,6 +94,13 @@
     <h2>Nieuw in de zaal</h2>
     <div class="films" id="filmsNieuw"></div>
     <p class="stil weg" id="leeg">Nog geen video's in de zaal. Start uw eigen kanaal hieronder.</p>
+    <!-- Media for Business: de interne bibliotheek van de zaak waar u werkt -->
+    <section id="blokZaak" class="weg">
+      <h2>Van uw werk</h2>
+      <p class="stil" id="zaakUitleg"></p>
+      <div class="films" id="filmsZaak"></div>
+      <div id="zaakBeheer"></div>
+    </section>
     <h2>Mijn kanaal</h2>
     <div id="mijnBlok"></div>
   </section>
@@ -165,8 +172,62 @@
     for (const v of zaal.abonnementen || []) abb.appendChild(filmKnop(v));
     for (const v of zaal.nieuw || []) nieuw.appendChild(filmKnop(v));
     $('#leeg').classList.toggle('weg', !!((zaal.nieuw || []).length + (zaal.abonnementen || []).length));
+    /* Eerst de zakenstand, dan pas het eigen blok: de keuze "waar komt deze
+       video" wordt in tekenMijn() opgebouwd en heeft die stand nodig. Andersom
+       verschijnt de keuze pas na een herlaadbeurt -- precies het soort stille
+       halve werking waar niemand een melding van krijgt. */
+    await laadZaak();
     tekenMijn();
     toon('vZaal');
+  }
+
+  /* ---------- Media for Business: de interne bibliotheek van uw organisatie ----------
+     Wat hier staat is INTERN gepubliceerd en staat in geen enkele openbare
+     lijst -- ook de bytes zitten achter dezelfde deur (server/kern/theater/
+     zaak.js). Dit blok verschijnt alleen bij wie ergens werkt; wie nergens
+     werkt hoort geen tab te zien die altijd nee zegt. */
+  let zaakStand = null;
+  async function laadZaak() {
+    const r = await api('zaak');
+    zaakStand = r.body || {};
+    const blok = $('#blokZaak');
+    blok.classList.toggle('weg', !zaakStand.mag);
+    if (!zaakStand.mag) return;
+    $('#zaakUitleg').textContent = zaakStand.uitleg || '';
+    const doos = $('#filmsZaak'); doos.innerHTML = '';
+    for (const v of (zaakStand.videos || [])) doos.appendChild(filmKnop(v));
+    if (!(zaakStand.videos || []).length) {
+      const p = document.createElement('p'); p.className = 'stil';
+      p.textContent = 'Uw organisatie heeft nog geen interne video.';
+      doos.appendChild(p);
+    }
+    const beheer = $('#zaakBeheer'); beheer.innerHTML = '';
+    for (const z of (zaakStand.zaken || [])) {
+      if (!z.leiding || z.bibliotheek) continue;
+      const kaart = document.createElement('div'); kaart.className = 'kaart';
+      kaart.innerHTML = '<p class="stil">' + esc(z.naam) + ' heeft nog geen interne bibliotheek. ' +
+        'U heeft er de leiding, dus u kunt er een beginnen. RTG-kantoor keurt hem eerst goed, zoals elk kanaal.</p>' +
+        '<div class="rij"><button class="knop vol" type="button">Begin de interne bibliotheek</button></div>';
+      kaart.querySelector('button').addEventListener('click', async () => {
+        const r2 = await api('zaak/aanmeld', { zaakCode: z.code, naam: z.naam });
+        zeg(r2.body.error || 'Aangemeld. RTG-kantoor kijkt er persoonlijk naar.');
+        laadZaak();
+      });
+      beheer.appendChild(kaart);
+    }
+  }
+  /* Waar publiceert deze video naartoe? Standaard het eigen kanaal; wie de
+     leiding heeft over een goedgekeurde interne bibliotheek kan die kiezen.
+     Het staat er UITDRUKKELIJK bij, want een video die stilletjes in de
+     verkeerde wereld landt is precies de fout die je pas merkt als de
+     verkeerde mensen meekijken. */
+  function zaakKeuze() {
+    const rijen = ((zaakStand && zaakStand.kanalen) || []).filter(k => k.leiding && k.status === 'goedgekeurd');
+    if (!rijen.length) return '';
+    return '<label for="vDoel">Waar komt deze video?</label><select id="vDoel">' +
+      '<option value="">Mijn eigen kanaal (openbaar)</option>' +
+      rijen.map(k => '<option value="' + esc(k.id) + '">Intern: ' + esc(k.zaakNaam) + '</option>').join('') +
+      '</select>';
   }
 
   /* Meenemen (shared/uitvoer.js): de zaal is een catalogus, en die neemt een
@@ -213,6 +274,7 @@
     kaart.innerHTML = '<p class="stil"><strong>' + esc(m.naam) + '</strong> · ' + m.volgers + ' abonnees · ' +
       m.gebruiktMb + ' van ' + m.maxMb + ' MB gebruikt</p>' +
       '<label for="vTitel">Titel van de nieuwe video</label><input id="vTitel" maxlength="80">' +
+      zaakKeuze() +
       '<label for="vBewaring">Waar bewaren we het origineel?</label>' +
       '<select id="vBewaring">' +
       '<option value="rtg">In de RTG-zaal (altijd beschikbaar)</option>' +
@@ -281,6 +343,9 @@
     if (bewaring === 'thuis') {
       /* Het Thuisarchief: het origineel gaat naar het eigen bestandssysteem
          van de browser (OPFS); bij RTG landen alleen titel en affiche. */
+      /* Het Thuisarchief kan NIET intern: die bytes blijven op het toestel van
+         de maker en gaan p2p naar de kijker, dus de deur van de organisatie
+         zou er niet omheen zitten. Beloof dat dan ook niet. */
       const kaart = await api('video/maak', { titel, duurS: duurS || 0, poster, bewaring: 'thuis',
         mbGeschat: Math.max(1, Math.round(blob.size / 1048576)) });
       if (kaart.body.error) return zeg(kaart.body.error);
@@ -295,7 +360,9 @@
       laadZaal();
       return;
     }
-    const kaart = await api('video/maak', { titel, duurS: duurS || 0, poster });
+    // het gekozen doel: leeg = het eigen (openbare) kanaal, anders de interne bibliotheek
+    const doel = (($('#vDoel') || {}).value || '') || undefined;
+    const kaart = await api('video/maak', { titel, duurS: duurS || 0, poster, kanaalId: doel });
     if (kaart.body.error) return zeg(kaart.body.error);
     // rauwe bytes met voortgang (XHR kan uploadvoortgang tonen, fetch niet)
     const balk = $('#vVoortgang'); balk.classList.add('zien');

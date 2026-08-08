@@ -9,7 +9,7 @@ module.exports = (kern) => {
     theaterKanaalMaak, theaterOfficeLijst, theaterOfficeBeslis, theaterVideoMaak,
     theaterVideoUpload, theaterVerwijder, theaterStreamVan, theaterZaal,
     theaterAbonneer, theaterReactie, theaterReacties, theaterMeld,
-    theaterThuisAanwezig, theaterSignaal } = kern;
+    theaterThuisAanwezig, theaterSignaal, theaterZaakMaak, theaterZaakZaal } = kern;
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const geenGast = (req, res) => {
     if (req.session.tier === 'guest') { res.status(403).json({ error: 'Het Theater is voor leden.' }); return true; }
@@ -83,7 +83,7 @@ module.exports = (kern) => {
   app.get('/api/theater/kijk/:id', kijkRem, (req, res) => {
     const sess = resolveSession(req.query.token);
     if (!sess || sess.tier === 'guest') return res.status(401).end();
-    const v = theaterStreamVan(String(req.params.id || ''));
+    const v = theaterStreamVan(String(req.params.id || ''), sess.key);
     if (!v) return res.status(404).end();
     const range = /^bytes=(\d*)-(\d*)$/.exec(String(req.headers.range || ''));
     if (range && (range[1] || range[2])) {
@@ -96,6 +96,18 @@ module.exports = (kern) => {
     }
     res.writeHead(200, { 'Content-Type': v.type, 'Accept-Ranges': 'bytes', 'Content-Length': v.bytes });
     fs.createReadStream(v.pad).pipe(res);
+  });
+
+  /* Media for Business, opgenomen kant: de interne bibliotheek van een
+     organisatie. Wie er werkt kijkt; wie er niet werkt komt er niet in, ook
+     niet met het id -- en de bytes-route vraagt het opnieuw. */
+  app.post('/api/theater/zaak', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, theaterZaakZaal(req.session.key));
+  });
+  app.post('/api/theater/zaak/aanmeld', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, theaterZaakMaak(req.session.key, req.body || {}));
   });
 
   // de kantoorkant: kanalen goedkeuren, meldingen zien, verwijderen

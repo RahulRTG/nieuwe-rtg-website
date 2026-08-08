@@ -145,6 +145,7 @@ module.exports = (ctx) => {
   return {
     podiumKanaalMaak: kanaalMaak, podiumKanaalZet: kanaalZet,
     podiumKanalen: lijstjes.kanalen, podiumGedeeld: lijstjes.gedeeld, podiumMijn: lijstjes.mijnPodium,
+    podiumZaak: lijstjes.zaakKanalen,
     podiumLiveZet: liveZet,
     podiumKijk: kijk, podiumWeg: weg, podiumSignaal: signaal,
     podiumOfficeLijst: officeLijst, podiumOfficeBeslis: officeBeslis

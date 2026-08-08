@@ -50,6 +50,20 @@ module.exports = (ctx) => {
     return { status: 200, mag: true, zones: open, cadeaus: CADEAUS, kanalen: rijen };
   }
 
+  /* De interne livekanalen (zone 'zaak') van de zaken waar dit lid werkt --
+     de live-kant van Media for Business. Hij staat naast gedeeld() en niet
+     erin: die is voor de OPENBARE index, en een town hall hoort daar niet in.
+     De deur is dezelfde als overal (poort.magKanaal vergelijkt de zaakCode van
+     het kanaal met de werkplekken van de kijker). */
+  function zaakKanalen(key) {
+    lijsten();
+    return db.data.podiumKanalen
+      .filter(k => k.status === 'goedgekeurd' && zones.zoneVan(k) === 'zaak')
+      .filter(k => poort.magKanaal(key, k).ok)
+      .map(k => kijkBeeld(k, key))
+      .sort((a, b) => (b.live ? 1 : 0) - (a.live ? 1 : 0) || b.kijkers - a.kijkers);
+  }
+
   function mijnPodium(key) {
     const k = kanaalVan(key);
     return { status: 200, mag: true, kanaal: k ? eigenBeeld(k) : null,
@@ -57,5 +71,5 @@ module.exports = (ctx) => {
       chat: k ? (db.data.podiumChat[k.id] || []).slice(-40) : [] };
   }
 
-  return { kanalen, gedeeld, mijnPodium };
+  return { kanalen, gedeeld, mijnPodium, zaakKanalen };
 };

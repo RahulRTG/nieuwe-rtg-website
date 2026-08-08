@@ -75,6 +75,13 @@ const automatisering = require('../kern/automatisering')({ rtmail });
 // Werkmail: het zakelijke adresboek per zaak boven op RTMAIL (domein <naam>.rtg,
 // eigenaar- en managementadressen, rahul@<domein>, de buitenpost en -poort)
 const { werkmail } = require('../kern/werkmail')({ db, save, crypto, rtmail, mail, accounts });
+/* Post van buiten AANNEMEN, op een plek (kern/mailaanname.js). Twee deuren
+   komen hier binnen -- de HTTP-buitenpoort (/api/mail/binnen) en de
+   SMTP-ontvanger (server/smtp-in.js) -- en de keten erachter hoort er maar een
+   keer te staan. Staat NA werkmail en de teams, want de ontvangertoets vraagt
+   die twee of een adres hier een postvak is. */
+const { mailAanname } = require('../kern/mailaanname')({ rtmail, mailIn, mailBijlage, mailAuth,
+  werkmail, findSupplier, team: rtmailTeam });
 
 /* Universeel scan-net: elke schrijf-aanvraag wordt door De Ontsmetter gehaald.
    Zit er een BESMETTE beeld-/PDF-data-URL in de body (waar dan ook, hoe diep
@@ -146,6 +153,6 @@ function auth(req, res, next) {
 
   return {
     aiPoort, antivirus, archief, atelierweb, auth, automatisering, beveilig, naamlaag, 
-    resolveSession, mailQ, mailIn, mailAuth, mailBijlage, mailSleutel, rtmailAi, rtmail, rtmailTeam, rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels, rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar, scanNet, wacht, werkmail
+    resolveSession, mailQ, mailIn, mailAuth, mailBijlage, mailSleutel, rtmailAi, rtmail, rtmailTeam, rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels, rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar, mailAanname, scanNet, wacht, werkmail
   };
 };

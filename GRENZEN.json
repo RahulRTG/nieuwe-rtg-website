@@ -305,7 +305,7 @@
       "lucht"
     ],
     "mailpost": [
-      "mailAuth",
+      "mailAanname",
       "mailBijlage",
       "mailIn",
       "mailQ",

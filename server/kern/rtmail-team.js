@@ -40,6 +40,12 @@ module.exports = ({ db, save, crypto, rtmail, findSupplier, CODENAMES }) => {
   }
 
   const teamMet = (id) => T().teams.find(x => x.id === id) || null;
+  /* Hetzelfde team, maar opgezocht op ADRES in plaats van op id. Staat hier
+     omdat dit bestand de teams bewaart en `zelfdeBus` de regel is die bepaalt
+     of twee schrijfwijzen hetzelfde postvak zijn; wie dat elders nabouwt, bouwt
+     de tweede waarheid. Nodig voor de SMTP-ontvanger: die moet bij RCPT TO
+     kunnen antwoorden of dit adres hier bestaat, en kent alleen het adres. */
+  const teamOpAdres = (adres) => T().teams.find(x => adresLaag.zelfdeBus(x.adres, adres)) || null;
   const isLid = (team, key) => !!(team && (team.leden || []).some(l => l.key === key));
   const isEigenaar = (team, key) => !!(team && team.eigenaar === key);
 
@@ -124,5 +130,5 @@ module.exports = ({ db, save, crypto, rtmail, findSupplier, CODENAMES }) => {
   const mijne = (key) => T().teams.filter(t => isLid(t, key));
   const mijn = (sess) => ({ ok: true, teams: mijne(sess.key).map(t => publiek(t, sess.key)) });
 
-  return { maak, hef, lidZet, verlaat, mijn, teamMet, isLid, publiek };
+  return { maak, hef, lidZet, verlaat, mijn, teamMet, teamOpAdres, isLid, publiek };
 };

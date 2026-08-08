@@ -2,8 +2,8 @@
    LUISTEREN, EN WEER NETJES DICHTGAAN.
 
    Waar de server op gaat staan, wat er gebeurt als dat niet lukt, de poorten
-   die er naast staan (IMAP, STUN), het eigen TLS-certificaat via ACME, en de
-   afsluiter op SIGTERM/SIGINT.
+   die er naast staan (STUN; IMAP en SMTP staan in ./luister-poorten.js), het
+   eigen TLS-certificaat via ACME, en de afsluiter op SIGTERM/SIGINT.
    ========================================================================== */
 'use strict';
 
@@ -51,23 +51,13 @@ module.exports = function luister(deps) {
   }
   const server = HOST ? app.listen(PORT, HOST, gestart) : app.listen(PORT, gestart);
 
-  /* IMAP: een externe mailclient laten meelezen (server/imap.js). Staat UIT
-     tenzij IMAP_POORT is gezet, en dat is met opzet: een mailpoort die vanzelf
-     openstaat op elke machine waar dit draait, is een deur die niemand heeft
-     besloten open te zetten. Zonder TLS-sleutel praat hij plat, en dan hoort hij
-     alleen achter een eigen doorgeefluik -- er wordt niet gedaan alsof dat
-     veilig is. */
-  if (process.env.IMAP_POORT) {
-    try {
-      const fsI = require('fs');
-      const tlsOpties = process.env.IMAP_KEY && process.env.IMAP_CERT
-        ? { key: fsI.readFileSync(process.env.IMAP_KEY), cert: fsI.readFileSync(process.env.IMAP_CERT) } : null;
-      require('../imap-server')({ vak: kern.rtmailVak, rtmail: kern.rtmail, sleutels: kern.mailSleutel,
-        poort: Number(process.env.IMAP_POORT), host: process.env.IMAP_HOST || '127.0.0.1', tlsOpties })
-        .start().then(() => console.log('[imap] luistert op ' + (process.env.IMAP_HOST || '127.0.0.1') + ':' +
-          process.env.IMAP_POORT + (tlsOpties ? ' (TLS)' : ' -- PLAT, zet er een doorgeefluik met TLS voor')));
-    } catch (e) { console.warn('[imap] niet gestart:', e && e.message); }
-  }
+  /* De twee MAILPOORTEN die naast de site staan -- IMAP (meelezen) en SMTP
+     (post aannemen). Ze staan in ./luister-poorten.js omdat dit bestand anders
+     over de tien kilobyte gaat, en de knip loopt langs een echte grens: hier
+     gaat het over de webserver, daar over twee losse deuren die allebei UIT
+     staan tenzij iemand er een poort voor zet. */
+  require('./luister-poorten')(kern);
+
   /* EEN BEZETTE POORT IS EEN STARTFOUT, GEEN SERVERFOUT.
 
      app.listen meldt een mislukking (EADDRINUSE als de poort bezet is, EACCES

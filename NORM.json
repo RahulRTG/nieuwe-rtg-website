@@ -25,10 +25,16 @@
     "kernGedeeld": 142,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 147,
+    "toetsenNietGemeten": 148,
     "toetsenOngevoeligPct": 2.3
   },
   "notities": [
+    {
+      "datum": "2026-08-08",
+      "meter": "toetsenNietGemeten 147 -> 148",
+      "reden": "test/smtp-in.test.js is erbij: de SMTP-ontvanger, de deur die post van buiten AANNEEMT. Noemer en geen kwaliteit -- de mutatiemotor is er nog niet langs. kernBreedte staat stil en dat is geen toeval: `mailAanname` komt erbij als kern-naam, maar `mailAuth` verdwijnt uit routes/mailpost.js omdat de stempelketen nu in kern/mailaanname.js woont. Een naam erbij, een naam eraf.",
+      "eerlijkheidshalve": "Er zijn TIEN mutaties met de hand op deze toetsen losgelaten en alle tien bijten ze. Twee sloegen eerst af, en dat waren de twee belangrijkste bevindingen van deze ronde. (1) kern/mailaanname.js elk adres in ONZE EIGEN domeinen laten accepteren veranderde niets zichtbaars: de socket-toetsen weigerden een VREEMD domein, en dat gaat langs een andere regel. (2) De domeincontrole helemaal weghalen bleef ook onopgemerkt -- terwijl juist die een open relay voorkomt: kern/werkmail.js schrijft UITGAANDE post naar buiten ook als logregel in RTMAIL weg, dus zodra een partner een klant op gmail mailt, LIGT er post op dat gmail-adres. Zonder de domeincontrole zou 'waar post ligt, woont iemand' daarop ja zeggen en namen wij post aan voor gmail-adressen die onze eigen partners ooit hebben gemaild. Beide gaten zijn nu met een toets afgedekt die zakt als de regel verdwijnt. Een derde bevinding kwam van de meter zelf en niet van een mutatie: `mailAanname` was wel in routes/mailpost.js uitgepakt maar nooit in server.js doorgegeven, en scripts/grensmeld.js meldde GEEN gat -- die meldt namen die bestaan maar niet mogen, niet namen die helemaal niet bestaan. De route had bij het eerste verzoek op undefined gestaan."
+    },
     {
       "datum": "2026-08-08",
       "meter": "kernBreedte 1077 -> 1078; kernGedeeld 141 -> 142; keuringOmvang 106 -> 107; toetsenNietGemeten 146 -> 147",

@@ -162,6 +162,7 @@ gegevensStop(6) talen(6) mail(5) loginFails(5) sseToSupplier(5)
 | Hoe start ik dit, hoe zet ik het live, hoe herstel ik het? | `RUNBOOK.md` |
 | Hoe hoort er code geschreven te worden? | `LAT.md` (negen regels, elk uit een echte fout) |
 | Welke merkregels gelden? | `CLAUDE.md` |
+| Waar bouwen we naartoe, en wat staat daarbij in de weg? | `PLATFORM.md` |
 | Wat moet er nog, en welke schuld staat er open? | `TAKEN.md` |
 | Welke toets bewijst wat? | `BEWIJS.md` |
 | Wat is er gemeten, en welke kant mag het op? | `NORM.json` + `npm run norm` |

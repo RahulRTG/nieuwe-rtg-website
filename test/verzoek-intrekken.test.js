@@ -63,7 +63,20 @@ async function inlog(code, rol) {
 }
 
 test.before(async () => {
-  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_DEMO: '0' } });
+  /* DE DEMO-STAND MOET AAN, en dat is een reparatie met een geschiedenis.
+     Deze toets stond hier met RTG_DEMO: '0'. Toen hij geschreven werd was dat
+     onschadelijk: de demo-stand stond destijds AAN zolang niemand hem uitzette.
+     Sinds de reparatie van 7 augustus (de demo-stand stond open op het
+     internet) moet hij uitdrukkelijk aan, en pas toen ging die '0' echt gelden
+     -- waarna deze toets omviel op zijn eigen eerste regel: zonder demo is er
+     geen /api/login-sessie en geen demo-personeel, dus `roster.body.staff` was
+     undefined. Vier toetsen rood op een `.find` van undefined.
+
+     De toets HEEFT de demo-stand nodig: hij logt de betaler in met /api/login
+     (dat is precies wat hem door de KYC-poort brengt, zie hieronder) en de
+     zaakkant met het demo-personeel van KIKUNOI en HOSHI. De vlag hoort hier
+     dus niet te staan; de helper zet RTG_DEMO zelf op 1. */
+  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   base = srv.base;
   vrager = await nieuwLid('De Vrager');
   /* De betaler is een Lifestyle-pas. Niet uit luxe: de KYC-poort van RTG Pay

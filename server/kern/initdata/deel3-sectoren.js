@@ -12,8 +12,6 @@ module.exports = (ctx) => {
   // het vastgoed-genre: makelaars bieden hun aanbod aan, gericht aan gekozen
   // leden (via de Salon of prive), met biedingen, bezichtigingen en keyless
   // toegang, en snelle contracten via het contractsysteem
-  if (!db.data.supplierTypes.vastgoed)
-    db.data.supplierTypes.vastgoed = { label: 'Vastgoed & makelaar', icon: 'gebouw', caps: ['vastgoed', 'location', 'pricing'] };
   if (!db.data.suppliers.find(s => s.code === 'IBIZALIV')) {
     db.data.suppliers.push({
       code: 'IBIZALIV', name: 'Ibiza Living Estates', type: 'vastgoed', city: 'Ibiza',
@@ -36,8 +34,6 @@ module.exports = (ctx) => {
     });
   }
   // --- retail/mode: modehuizen, merken en winkels ---
-  if (!db.data.supplierTypes.retail)
-    db.data.supplierTypes.retail = { label: 'Mode & retail', icon: 'mode', caps: ['retail', 'location', 'pricing'] };
   if (!db.data.suppliers.find(s => s.code === 'MAISON')) {
     const c1 = crypto.randomBytes(4).toString('hex'), c2 = crypto.randomBytes(4).toString('hex');
     const va = (sku, kleuren, maten, v) => { const out = []; for (const k of kleuren) for (const m of maten) out.push({ vsku: sku + '-' + k.slice(0, 3).toUpperCase() + '-' + m, kleur: k, maat: m, voorraad: v }); return out; };
@@ -71,8 +67,6 @@ module.exports = (ctx) => {
   if (!db.data.retailApart) db.data.retailApart = [];
   if (!Array.isArray(db.data.modeBezorg)) db.data.modeBezorg = [];   // veilige mode-bezorgingen
   // --- groothandel & markt: B2B naar horeca, boodschappen naar leden, doorverkoop ---
-  if (!db.data.supplierTypes.groothandel)
-    db.data.supplierTypes.groothandel = { label: 'Groothandel & markt', icon: 'logistiek', caps: ['groothandel', 'bezorgen', 'location', 'pricing'] };
   if (!Array.isArray(db.data.groothandelOrders)) db.data.groothandelOrders = [];
   if (!db.data.suppliers.find(s => s.code === 'MERCABIZA')) {
     const gp = (naam, categorie, eenheid, inkoop, cons, voorraad, minB, herkomst) => ({
@@ -103,8 +97,6 @@ module.exports = (ctx) => {
     });
   }
   // --- beveiliging: een commandocentrum + PDA voor topbeveiligingsteams ---
-  if (!db.data.supplierTypes.beveiliging)
-    db.data.supplierTypes.beveiliging = { label: 'Beveiliging & security', icon: 'schild', caps: ['beveiliging', 'location', 'pricing'] };
   // een beveiligingsbureau rekent uurtarieven; het genre miste als enige de prijzenkant
   if (db.data.supplierTypes.beveiliging && !db.data.supplierTypes.beveiliging.caps.includes('pricing'))
     db.data.supplierTypes.beveiliging.caps.push('pricing');
@@ -112,4 +104,12 @@ module.exports = (ctx) => {
   if (!Array.isArray(db.data.bevAanvragen)) db.data.bevAanvragen = [];
   if (!Array.isArray(db.data.bevIncidenten)) db.data.bevIncidenten = [];
   if (!Array.isArray(db.data.bevRondes)) db.data.bevRondes = [];
+
+  /* Merk de zaken die dit deel zaait, ook als ze er al stonden: op een
+     database van voor het merkteken is anders niet meer te zien dat ze uit de
+     seed komen, en dan overleven ze de opruiming in ./index.js. */
+  for (const c of ['IBIZALIV', 'MAISON', 'MERCABIZA']) {
+    const z = db.data.suppliers.find(s => s.code === c);
+    if (z) z.geseed = true;
+  }
 };

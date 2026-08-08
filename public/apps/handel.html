@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Handel: inkoop tussen zaken</title>
+<link rel="icon" href="/icon.svg">
+<meta name="theme-color" content="#0C0C0B">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<link href="/shared/zaakscherm.css" rel="stylesheet">
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<script src="/shared/glyf.js" defer></script>
+<link href="/shared/ios.css" rel="stylesheet">
+</head>
+<body class="rtg-stijl">
+<header>
+  <a class="terug" href="/apps/leverancier.html" aria-label="Terug naar de zaak">&#8592;</a>
+  <span><span class="ey">RTG Handel</span><h1>Inkoop tussen zaken</h1></span>
+  <span style="flex:1;"></span>
+</header>
+<main id="main">
+  <div class="kaart">
+    <div class="kop">Wat u nodig heeft</div>
+    <div class="rij">
+      <select class="veld" id="hModus" aria-label="Hoe u inkoopt" style="flex:0 1 20rem;">
+        <option value="aanvraag">Uitzetten bij een soort bedrijf &mdash; offertes vergelijken</option>
+        <option value="bestelling">Bestellen bij een bekende zaak &mdash; prijs staat vast</option>
+      </select>
+    </div>
+    <p class="stil" id="hUitleg" style="margin:.5rem 0 .7rem;">
+      Een aanvraag gaat naar een heel soort bedrijf, niet naar één adres. Elke zaak van dat
+      soort ziet hem &mdash; ook een die zich gisteren heeft aangemeld. U kiest daarna zelf
+      uit de offertes die binnenkomen.
+    </p>
+    <div class="rij">
+      <select class="veld" id="hGenre" aria-label="Aan welk soort bedrijf" style="flex:0 1 16rem;"></select>
+      <input class="veld" id="hZaak" maxlength="20" placeholder="Zaakcode van de leverancier" aria-label="Zaakcode van de leverancier" style="flex:0 1 16rem;display:none;">
+      <input class="veld" id="hPrijs" type="number" step="0.01" min="0" placeholder="Afgesproken bedrag" aria-label="Afgesproken bedrag" style="flex:0 1 11rem;display:none;">
+      <input class="veld" id="hTitel" maxlength="80" placeholder="Waar het om gaat, kort" aria-label="Waar het om gaat">
+    </div>
+    <div class="rij" style="margin-top:.5rem;">
+      <input class="veld" id="hWat" maxlength="60" placeholder="Wat u nodig heeft" aria-label="Wat u nodig heeft">
+      <input class="veld" id="hAantal" type="number" min="1" step="1" placeholder="Aantal" aria-label="Aantal" style="flex:0 1 7rem;">
+      <select class="veld" id="hEenheid" aria-label="Eenheid" style="flex:0 1 8rem;"></select>
+      <button class="knop" id="hRegel" type="button">Regel erbij</button>
+    </div>
+    <div id="hRegels" style="margin-top:.5rem;"></div>
+    <div class="rij" style="margin-top:.5rem;">
+      <input class="veld" id="hOphalen" maxlength="60" placeholder="Ophalen (wanneer)" aria-label="Ophalen">
+      <input class="veld" id="hRetour" maxlength="60" placeholder="Retour (wanneer)" aria-label="Retour">
+      <button class="knop p" id="hZet" type="button">Aanvraag uitzetten</button>
+    </div>
+  </div>
+
+  <div class="kaart">
+    <div class="kop">Open aanvragen in uw vak</div>
+    <p class="stil" id="hOpenLeeg">Er staat op dit moment niets open voor uw soort bedrijf.</p>
+    <div id="hOpen"></div>
+  </div>
+
+  <div class="kaart">
+    <div class="kop">Wat u vraagt</div>
+    <p class="stil" id="hKoperLeeg">U heeft nog niets uitgezet.</p>
+    <div id="hKoper"></div>
+  </div>
+
+  <div class="kaart">
+    <div class="kop">Wat u levert</div>
+    <p class="stil" id="hLevLeeg">Er is nog niets aan u gegund.</p>
+    <div id="hLev"></div>
+  </div>
+</main>
+<div class="melding" id="melding" role="status"></div>
+<script src="/shared/deur.js"></script>
+<script src="/apps/handel.js"></script>
+<script src="/apps/handel-aanvraag.js"></script>
+<script src="/shared/schermbeeld.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
+<script src="/shared/ios.js" defer></script>
+</body>
+</html>

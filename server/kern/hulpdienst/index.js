@@ -17,14 +17,12 @@
    overzicht en de meldkamer-AI wonen hier; de eenheden/meldkamer in
    ./meldkamer, het ziekenhuis en de huisarts in ./zorg. */
 
-const HULP_TYPES = {
-  politie:    { label: 'Politie',        icon: '\u{1F694}', caps: ['location'] },
-  brandweer:  { label: 'Brandweer',      icon: '\u{1F692}', caps: ['location'] },
-  ambulance:  { label: 'Ambulance',      icon: '\u{1F691}', caps: ['location'] },
-  ziekenhuis: { label: 'Ziekenhuis',     icon: '\u{1F3E5}', caps: ['location'] },
-  huisarts:   { label: 'Huisarts',       icon: '\u{1FA7A}', caps: ['location'] },
-  specials:   { label: 'Special Forces', icon: '\u{1F985}', caps: ['location'], besloten: true }
-};
+/* Welke genres hier meedoen: de korpsen en zorgposten die op de meldkamer draaien. De MEMBERSHIP staat hier, want dat is
+   eigen aan deze module; het LABEL en de caps komen uit het genre-register, zodat
+   er geen tweede beschrijving van hetzelfde genre ontstaat (LAT-regel 4). */
+const { GENRES } = require('../../seed/genres');
+const HULP_TYPES_GENRES = ['politie', 'brandweer', 'ambulance', 'ziekenhuis', 'huisarts', 'specials'];
+const HULP_TYPES = Object.fromEntries(HULP_TYPES_GENRES.map(g => [g, GENRES[g]]));
 const EENHEID_SOORTEN = ['land', 'water', 'lucht', 'heli'];
 const PRIOS = [1, 2, 3];
 

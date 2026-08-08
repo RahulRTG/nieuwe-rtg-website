@@ -19,8 +19,6 @@ module.exports = (ctx) => {
   // beide partijen, onveranderbaar), er is een SOS-knop tijdens de huur, en de
   // huurder kan vrijwillig zijn live locatie delen. Vaste dagprijs, geen
   // verrassingen aan de balie.
-  if (!db.data.supplierTypes.verhuur)
-    db.data.supplierTypes.verhuur = { label: 'Autoverhuur', icon: 'sleutel', caps: ['huur', 'location', 'pricing'] };
   if (!db.data.suppliers.find(s => s.code === 'ISLAREN')) {
     db.data.suppliers.push({
       code: 'ISLAREN', name: 'Isla Rent Ibiza', type: 'verhuur', city: 'Ibiza',
@@ -59,8 +57,6 @@ module.exports = (ctx) => {
   // helikopters en piloten. Verloopt via dezelfde ritketen (aanvraag, toewijzen,
   // onderweg, gearriveerd) met slimme toewijzing van piloot en toestel; 18+ zoals
   // de privejet, en de piloot bevestigt weer en helipad voor het opstijgen.
-  if (!db.data.supplierTypes.helikopter)
-    db.data.supplierTypes.helikopter = { label: 'Helikopter transfers', icon: 'vluchten', caps: ['rides', 'fleet', 'location', 'pricing'] };
   if (!db.data.suppliers.find(s => s.code === 'IBIZAIR')) {
     db.data.suppliers.push({
       code: 'IBIZAIR', name: 'Ibiza Sky Charter', type: 'helikopter', city: 'Ibiza',
@@ -84,8 +80,6 @@ module.exports = (ctx) => {
   // eerlijke mechaniek als autoverhuur (vaste prijs vooraf, staat met foto's voor
   // en na, borg, SOS en live positie op het water), aangevuld met vaartuig-specifieke
   // zaken: motoruren, brandstof, ligplaats, en bemand (crewed) of bareboat varen.
-  if (!db.data.supplierTypes.charter)
-    db.data.supplierTypes.charter = { label: 'Boten & jachten', icon: 'boot', caps: ['charter', 'location', 'pricing'] };
   if (!db.data.suppliers.find(s => s.code === 'AZUL')) {
     const vaartuig = (id, o) => Object.assign({ id, actief: true, type: 'Motorjacht', lengte: 12, bouwjaar: 2022,
       gasten: 8, hutten: 2, slaapplaatsen: 4, brandstof: 'diesel', snelheidKn: 25, ligplaats: 'Marina Botafoch',
@@ -108,4 +102,12 @@ module.exports = (ctx) => {
     });
   }
   if (!db.data.charterFotos) db.data.charterFotos = {};   // ref -> { voor: [], na: [] }
+
+  /* Merk de zaken die dit deel zaait, ook als ze er al stonden: op een
+     database van voor het merkteken is anders niet meer te zien dat ze uit de
+     seed komen, en dan overleven ze de opruiming in ./index.js. */
+  for (const c of ['MACE', 'ISLAREN', 'IBIZAIR', 'AZUL']) {
+    const z = db.data.suppliers.find(s => s.code === c);
+    if (z) z.geseed = true;
+  }
 };

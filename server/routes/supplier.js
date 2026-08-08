@@ -81,6 +81,7 @@ app.post('/api/supplier/notifications/read', supplierAuth, (req, res) => {
   require('./supplier/boerderij')(kern);
   require('./supplier/creator')(kern);
   require('./supplier/samenwerking')(kern);
+  require('./supplier/handel')(kern);
   require('./supplier/groothandel')(kern);
   require('./supplier/modebezorg')(kern);
   require('./supplier/autoverkoop')(kern);

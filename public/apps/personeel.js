@@ -71,9 +71,13 @@
   function timeAgo(iso){ const s=Math.max(1,Math.round((Date.now()-new Date(iso))/1000)); if(s<60)return T('t.now','zojuist'); const m=Math.round(s/60); if(m<60)return m+T('t.min',' min'); const h=Math.round(m/60); if(h<24)return h+T('t.hour',' uur'); return Math.round(h/24)+T('t.days',' dg'); }
   function esc(x){ return String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
 
+  /* Welke eigen tabs deze zaak aanzet, bepaalt de server: kern/pda/modules.js.
+     Stond hier als caps.includes(..) per tab; dan weten twee plekken hetzelfde. */
+  const heeftModule = m => !!(state && state.supplier && (state.supplier.modules || []).includes(m));
+
   // ---- het kantoorgebouw (Zuidas) op zak: receptie, facilitair, concierge ----
   let pdGeb = null;
-  const heeftGebouw = () => !!(state && state.supplier && (state.supplier.caps || []).includes('gebouw'));
+  const heeftGebouw = () => heeftModule('gebouw');
   async function laadGebouwPda(){
     if (!heeftGebouw()) return;
     try { pdGeb = await API.call('/supplier/gebouw', {}); } catch(e){ pdGeb = null; }
@@ -127,7 +131,7 @@
 
   // ---- de marina op zak: steiger, brandstof, service en de concierge ----
   let pdMar = null;
-  const heeftMarina = () => !!(state && state.supplier && (state.supplier.caps || []).includes('marina'));
+  const heeftMarina = () => heeftModule('marina');
   async function laadMarinaPda(){
     if (!heeftMarina()) return;
     try { pdMar = await API.call('/supplier/marina', {}); } catch(e){ pdMar = null; }
@@ -178,7 +182,7 @@
 
   // ---- de verzekeraar op zak: adviesvragen, declaraties, pas-controle ----
   let pdPol = null, pdPolZorg = null;
-  const heeftPolis = () => !!(state && state.supplier && (state.supplier.caps || []).includes('polis'));
+  const heeftPolis = () => heeftModule('verzekeraar');
   async function laadPolisPda(){
     if (!heeftPolis()) return;
     try { pdPol = await API.call('/supplier/polis', {}); } catch(e){ pdPol = null; }
@@ -1496,7 +1500,7 @@
   const RIDE_LBL = { 'geaccepteerd':['pd.r.accept','Accepteer'], 'onderweg':['pd.r.go','Ik rijd'], 'aangekomen':['pd.r.atpickup','Ik sta voor'], 'aan-boord':['pd.r.board','Aan boord'], 'afgerond':['pd.r.done','Afronden'] };
   const RIT_ST = { 'aangevraagd':['pd.rs.new','nieuw'], 'geaccepteerd':['pd.rs.acc','geaccepteerd'], 'onderweg':['pd.rs.go','onderweg'], 'aangekomen':['pd.rs.at','staat voor'], 'aan-boord':['pd.rs.board','gast aan boord'], 'rijdt':['pd.rs.board','gast aan boord'] };
   const RIT_KLAAR = st => st === 'gearriveerd' || st === 'afgerond' || st === 'geweigerd';
-  const heeftRitten = () => !!(state && state.supplier && (state.supplier.caps || []).includes('rides'));
+  const heeftRitten = () => heeftModule('ritten');
   function renderRitten(){
     const aan = heeftRitten();
     const tabBtn = document.getElementById('tabRitten');
@@ -2132,7 +2136,7 @@
   let pdRetail = null;      // retail-toestand van het merk (voorraad, paskamer, apart)
   let winkelKlant = null;   // geopend klantdossier op de vloer
   let winkelCart = [];      // mobiele kassa: [{vsku, naam, kleur, maat, price, aantal}]
-  const heeftRetail = () => !!(state && state.supplier && (state.supplier.caps || []).includes('retail'));
+  const heeftRetail = () => heeftModule('winkel');
   async function laadWinkel(){
     if (!heeftRetail()) return;
     try { pdRetail = (await API.call('/supplier/retail', {})).retail; } catch(e){ pdRetail = { artikelen:[], paskamer:[], apart:[], klanten:[], stats:{} }; }
@@ -2259,7 +2263,7 @@
 
   // ---- op het land (boerderij): de knecht doet de taken van vandaag ----
   let pdBoer = null;
-  const heeftBoer = () => !!(state && state.supplier && (state.supplier.caps || []).includes('boerderij'));
+  const heeftBoer = () => heeftModule('boer');
   async function laadBoer(){
     if (!heeftBoer()) return;
     try { pdBoer = (await API.call('/supplier/boerderij/overzicht', {})); } catch(e){ pdBoer = null; }
@@ -2302,7 +2306,7 @@
     wrap.querySelectorAll('[data-bvoer]').forEach(b => b.addEventListener('click', async () => { try { const r = await API.call('/supplier/boerderij/voer', { id: b.dataset.bvoer }); toast(T('pd.boer.voerok','Gevoerd.')); boerPdaToe(r); } catch(e){ toast(e.message); } }));
   }
 
-  const heeftEntree = () => !!(state && state.supplier && (state.supplier.caps || []).includes('tickets'));
+  const heeftEntree = () => heeftModule('entree');
   async function laadEntree(){
     if (!heeftEntree()) return;
     try { pdProgramma = await API.call('/supplier/programma', {}); } catch(e){ pdProgramma = { datum: '', slots: [] }; }
@@ -2392,7 +2396,7 @@
 
   // ---- vaart (charter): de schipper handelt de charters van vandaag af ----
   let pdCharters = null;
-  const heeftCharter = () => !!(state && state.supplier && (state.supplier.caps || []).includes('charter'));
+  const heeftCharter = () => heeftModule('vaart');
   const VAART_ST = { 'aangevraagd':'klaar om uit te varen', 'lopend':'op zee', 'afgerond':'afgerond' };
   async function laadVaart(){
     if (!heeftCharter()) return;
@@ -2454,7 +2458,7 @@
 
   // ---- autoverkoop op de PDA: proefritten inplannen/rijden en auto's afleveren ----
   let pdVerkoop = null;
-  const heeftVerkoop = () => !!(state && state.supplier && state.supplier.type === 'verhuur');
+  const heeftVerkoop = () => heeftModule('verkoop');
   async function laadVerkoop(){
     if (!heeftVerkoop()) return;
     try { pdVerkoop = await API.call('/supplier/verkoop/overzicht', {}); } catch(e){ pdVerkoop = { pda: [] }; }
@@ -2488,7 +2492,7 @@
 
   /* ---- PDA beveiliging: mijn dienst, inklokken, rondes, incidenten, SOS ---- */
   let pdBev = null;
-  const heeftBeveiliging = () => !!(state && state.supplier && state.supplier.type === 'beveiliging');
+  const heeftBeveiliging = () => heeftModule('beveiliging');
   function bevPos(cb){ // GPS met korte time-out en veilige terugval
     let klaar = false; const fire = (lat, lng) => { if (klaar) return; klaar = true; cb(lat, lng); };
     if (navigator.geolocation){

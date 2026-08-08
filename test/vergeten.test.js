@@ -68,6 +68,13 @@ function post(pad, body, tok) {
   return fetch(BASE + pad, { method: 'POST', headers: h, body: JSON.stringify(body || {}) });
 }
 
+/* RTG_DEMO=1 is hier nodig en het staat er met reden. Deze toets heeft een
+   CATALOGUS nodig (een partner om sporen bij achter te laten). Sinds de
+   livegang-schoonmaak is gerepareerd, staat er in een niet-demo-database geen
+   enkele geseede partner meer -- dat is de bedoeling en niet een gebrek. Een
+   toets die een catalogus nodig heeft, moet dus om de demostand vragen. Wat
+   deze toets bewijst verandert er niet door: hij werkt met leden die hij zelf
+   registreert. */
 test('een lid aanmaken dat overal sporen achterlaat', async () => {
   /* RTG_STORE=json is hier een bewuste testkeuze, geen omweg. Een verse
      installatie draait op SQLite (store.db), en die inhoud is exact dezelfde --
@@ -76,7 +83,7 @@ test('een lid aanmaken dat overal sporen achterlaat', async () => {
      databaseschema hoeft te kennen dat met elke functie kan veranderen. */
   kind = spawn(process.execPath, ['--experimental-sqlite', SERVER], {
     env: { ...process.env, NODE_ENV: 'test', PORT: String(PORT), RTG_DATA_DIR: TMP,
-      SMTP_URL: '', RTG_DEMO: '0', RTG_STORE: 'json' },
+      SMTP_URL: '', RTG_DEMO: '1', RTG_STORE: 'json' },
     // stderr naar 'pipe' zodat de strenge poort meeleest (zie helper.bewaakKind)
     stdio: ['ignore', 'ignore', 'pipe']
   });

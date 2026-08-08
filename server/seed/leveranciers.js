@@ -7,17 +7,12 @@ module.exports = {
      De leverancier-app is één app die zich aanpast aan het type. Elk type
      heeft eigen mogelijkheden (caps) die de app-schermen bepalen. Leveranciers
      gebruiken de app gratis in ruil voor de beste dynamische prijs aan RTG. */
-  supplierTypes: {
-    hotel:      { label: 'Hotel',        icon: 'hotel', caps: ['bookings', 'location', 'pricing'] },
-    apartment:  { label: 'Appartement',  icon: 'maison', caps: ['bookings', 'doors', 'location', 'pricing'] },
-    taxi:       { label: 'Taxi',         icon: 'auto', caps: ['rides', 'location', 'pricing'] },
-    jet:        { label: 'Privéjet',     icon: 'vluchten', caps: ['rides', 'location', 'pricing'] },
-    restaurant: { label: 'Restaurant',   icon: 'horeca', caps: ['menu', 'orders', 'reservations', 'tickets', 'location', 'pricing'] },
-    bar:        { label: 'Bar',          icon: 'bar', caps: ['menu', 'orders', 'tickets', 'location', 'pricing'] },
-    club:       { label: 'Club',         icon: 'muziek', caps: ['menu', 'orders', 'tickets', 'location', 'pricing'] },
-    zorg:       { label: 'Zorg & welzijn', icon: 'zorg', caps: ['care', 'location', 'pricing'] },
-    journalistiek: { label: 'Journalistiek', icon: 'nieuws', caps: ['redactie', 'location', 'pricing'] }
-  },
+  /* De genres zelf staan in ./genres.js, het genre-register: alle 73 met hun
+     sector en caps op een plek. Hier stonden er negen van, en dat was het begin
+     van dezelfde waarheid op zestien plekken (LAT-regel 4). Deze sleutel blijft
+     als lege kast staan zodat db.data zijn vorm houdt; initdata/index.js vult
+     hem bij elke start uit het register. */
+  supplierTypes: {},
 
   /* Voorbeeldleveranciers (demo-inlogcodes). rate = de dynamische prijs die
      de leverancier aan RTG-leden biedt (intern, nooit aan de klant getoond).

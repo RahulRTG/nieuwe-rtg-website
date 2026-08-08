@@ -816,6 +816,12 @@ const agenda = require('./kern/agenda').maakAgenda({ db, save, crypto, anthropic
 // automatisch EGn tweezijdige factuur die beide partijen in de app zien, plus een
 // AI-factuurtool. Alle apps haken hierop in.
 const facturatie = require('./kern/facturatie').maakFacturatie({ db, save, crypto, findSupplier, keyVanCodenaam, notify, notifySupplier, sseToCustomer, sseToSupplier, factuur, anthropic, schoon, automatisering });
+// De handelsketen (kern/handelsketen.js): een weg waarlangs ELKE zaak met elke
+// andere zaak zaken doet -- aanvraag, offerte, gunning, planning, levering,
+// factuur, betaling. Vervangt op termijn de veertien losse aanvraagcollecties.
+// Staat NA de facturatielaag omdat de keten zijn factuur daar inhangt: een
+// tweede nummerreeks naast die van kern/facturatie.js zou twee waarheden geven.
+const handelsketen = require('./kern/handelsketen').maakHandelsketen({ db, save, crypto, findSupplier, notifySupplier, sseToSupplier, schoon, facturatie });
 // De marktplaats (kern/markt.js): één gedeelde motor voor de RTFoundation-app
 // (gezinnen kopen/verkopen) en voor leveranciers die er ook op willen verkopen.
 const markt = require('./kern/markt').maakMarkt({ db, save, crypto, anthropic, schoon, notify, notifySupplier, haversine, betaal });
@@ -1770,7 +1776,7 @@ const kern = {
   findSupplier, forgetSession, fs, gcCode, geborenVan, geenGast, idGeverifieerd, generateAiReply, getChat,
   guestsFor, hasContact, hasCred, haversine, i18n, initRealtime, klokVan, ledenPrijs,
   leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename, liveStateFor, load, logActivity, loginFails,
-  mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, noteerBeurt, memberTemplate, myApplications, nextSseId, onboarding, boerderij, journalistiek, creator, samenwerking, agenda, notities, bestanden, meet, galerij, klok, boeken, onderwijs, leerstof, bijles, vervolg, facturatie, markt,
+  mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, noteerBeurt, memberTemplate, myApplications, nextSseId, onboarding, boerderij, journalistiek, creator, samenwerking, handelsketen, agenda, notities, bestanden, meet, galerij, klok, boeken, onderwijs, leerstof, bijles, vervolg, facturatie, markt,
   noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, openVacatures, optieAan,
   entreeCode, keyVanCodenaam, gidsHaal, gidsZoekCodenaam, gidsWeg, magBezorgen, parseRunsheetText, path, pendingVerifications, pickupCode, pinSlot, posDay, publicPartner, publicSupplier, ticketsVoorSlot,
   publicTrip, pushLive, registerContact, rememberSession, resolveSession, ritBezetting, ritVerder, rtf,

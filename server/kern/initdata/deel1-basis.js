@@ -74,8 +74,6 @@ module.exports = (ctx) => {
   if (!db.data.posSales) db.data.posSales = {};                   // kassaverkopen per bedrijf
   // het zzp-genre: zelfstandige professionals (mode, health, fotografie...)
   // bieden diensten en producten aan; leden boeken met datum en tijd
-  if (!db.data.supplierTypes.zzp)
-    db.data.supplierTypes.zzp = { label: 'Zelfstandig professional', icon: 'werk', caps: ['services', 'location', 'pricing'] };
   if (!db.data.boekingen) db.data.boekingen = [];
   if (!db.data.suppliers.find(s => s.code === 'AYAKA')) {
     db.data.suppliers.push({
@@ -104,8 +102,6 @@ module.exports = (ctx) => {
   // het activiteiten-genre: tours, musea en experiences verkopen tickets met
   // tijdsloten en capaciteit; personeel (gids/security/balie) checkt de
   // entreecode af aan de deur, op eigen naam
-  if (!db.data.supplierTypes.activiteit)
-    db.data.supplierTypes.activiteit = { label: 'Activiteiten & musea', icon: 'ticket', caps: ['tickets', 'rides', 'location', 'pricing'] };
   // eigen transferdienst: activiteitenzaken rijden ook (migratie voor bestaande kasten)
   if (db.data.supplierTypes.activiteit && !db.data.supplierTypes.activiteit.caps.includes('rides'))
     db.data.supplierTypes.activiteit.caps.push('rides');
@@ -119,5 +115,13 @@ module.exports = (ctx) => {
         { id: 'a2', name: 'Snorkeltocht drie baaien', desc: 'Kleine boot, maximaal tien gasten, materiaal inbegrepen.', prijs: 55, capaciteit: 10, duur: '3 uur', tijden: ['10:00', '14:00'] }
       ]
     });
+  }
+
+  /* Merk de zaken die dit deel zaait, ook als ze er al stonden: op een
+     database van voor het merkteken is anders niet meer te zien dat ze uit de
+     seed komen, en dan overleven ze de opruiming in ./index.js. */
+  for (const c of ['SAKURA', 'AYAKA', 'KAITO', 'ESVEDRA']) {
+    const z = db.data.suppliers.find(s => s.code === c);
+    if (z) z.geseed = true;
   }
 };

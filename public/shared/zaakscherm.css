@@ -1,5 +1,9 @@
-/* De vormtaal van de horecaschermen. Een keer, voor alle acht de pagina's:
-   dienst, expeditie, bezorging, hotel, events, club, HACCP en beheer.
+/* De vormtaal van de ZAAKSCHERMEN: losse pagina's die op de zaak-inlog draaien.
+   Een keer, voor de acht horecaschermen (dienst, expeditie, bezorging, hotel,
+   events, club, HACCP, beheer) en voor de handelsketen, die genre-overstijgend
+   is. Stond onder apps/horeca/ toen alleen de horeca hem gebruikte; verhuisd
+   naar shared/ toen een pagina buiten dat domein hem ook nodig had -- kopieren
+   zou twee stijlbladen geven die uiteenlopen (LAT-regel 4).
 
    Hij leunt volledig op de tokens van shared/rtg-ui.css -- geen eigen grijzen,
    geen eigen rondingen. Het enige wat hier bij komt, is wat een horecascherm

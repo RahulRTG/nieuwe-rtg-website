@@ -20,8 +20,6 @@ module.exports = (ctx) => {
     });
   }
   // --- boerderij: boeren en tuinders met een slim bedrijfssysteem + AI-adviseur ---
-  if (!db.data.supplierTypes.boerderij)
-    db.data.supplierTypes.boerderij = { label: 'Boerderij & landbouw', icon: 'oogst', caps: ['boerderij', 'location', 'pricing'] };
   if (!db.data.suppliers.find(s => s.code === 'CANFERRER')) {
     const dag = n => new Date(Date.now() - n * 86400000).toISOString();
     db.data.suppliers.push({
@@ -49,8 +47,6 @@ module.exports = (ctx) => {
     });
   }
   // --- content creators: influencers/videomakers met een carriere-app ---
-  if (!db.data.supplierTypes.creator)
-    db.data.supplierTypes.creator = { label: 'Content creator', icon: 'camera', caps: ['creator', 'location', 'pricing'] };
   if (!db.data.suppliers.find(s => s.code === 'LUMINA')) {
     db.data.suppliers.push({
       code: 'LUMINA', name: 'Lumina Media', type: 'creator', city: 'Ibiza',
@@ -108,5 +104,13 @@ module.exports = (ctx) => {
       save();
     }
     webpush.setVapidDetails('mailto:leden@rahultravelgroup.example', db.data.vapid.publicKey, db.data.vapid.privateKey);
+  }
+
+  /* Merk de zaken die dit deel zaait, ook als ze er al stonden: op een
+     database van voor het merkteken is anders niet meer te zien dat ze uit de
+     seed komen, en dan overleven ze de opruiming in ./index.js. */
+  for (const c of ['AEGIS', 'CANFERRER', 'LUMINA']) {
+    const z = db.data.suppliers.find(s => s.code === c);
+    if (z) z.geseed = true;
   }
 };

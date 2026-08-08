@@ -14,7 +14,7 @@
     wrap.querySelectorAll('[data-bvoer]').forEach(b => b.addEventListener('click', async () => { try { const r = await API.call('/supplier/boerderij/voer', { id: b.dataset.bvoer }); toast(T('pd.boer.voerok','Gevoerd.')); boerPdaToe(r); } catch(e){ toast(e.message); } }));
   }
 
-  const heeftEntree = () => !!(state && state.supplier && (state.supplier.caps || []).includes('tickets'));
+  const heeftEntree = () => heeftModule('entree');
   async function laadEntree(){
     if (!heeftEntree()) return;
     try { pdProgramma = await API.call('/supplier/programma', {}); } catch(e){ pdProgramma = { datum: '', slots: [] }; }

@@ -31,8 +31,7 @@ function maakMarechaussee({ db, save, crypto, anthropic }) {
   }
   function seed() {
     if (!Array.isArray(db.data.suppliers)) return;
-    if (!db.data.supplierTypes.marechaussee)
-      db.data.supplierTypes.marechaussee = { label: 'Marechaussee', icon: 'schild', caps: ['marechaussee'] };
+    require('../seed/genres').zetGenre(db, 'marechaussee');
     if (!db.data.suppliers.find(s => s.code === 'KMAR')) {
       db.data.suppliers.push({
         code: 'KMAR', name: 'Brigade RTG Airport', type: 'marechaussee', city: 'Ibiza',

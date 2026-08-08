@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 2745 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 2755 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,14 +18,14 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 2745 |
-| servermodules (`server/**/*.js`) | 1442 |
-| routebestanden (`server/routes/**`) | 338 |
-| kernmodules (`server/kern/**`) | 806 |
-| schermen (`public/**/*.html`) | 209 |
+| API-endpoints | 2755 |
+| servermodules (`server/**/*.js`) | 1449 |
+| routebestanden (`server/routes/**`) | 339 |
+| kernmodules (`server/kern/**`) | 810 |
+| schermen (`public/**/*.html`) | 210 |
 | gedeelde browsermodules (`public/shared/*.js`) | 158 |
-| toetsbestanden (`test/*.test.js`) | 600 |
-| schermtoetsen (`test/*.e2e.js`) | 77 |
+| toetsbestanden (`test/*.test.js`) | 604 |
+| schermtoetsen (`test/*.e2e.js`) | 78 |
 
 ## 2. De weg van een verzoek
 
@@ -99,7 +99,7 @@ zie §5 -- er zijn nog 140 kern-namen die meer dan één domein aanraakt.
 |---|---|---|---|---|
 | `auth` | 19 | 5 | 8 | 44 |
 | `member` | 391 | 47 | 9 | 342 |
-| `supplier` | 481 | 87 | 6 | 272 |
+| `supplier` | 491 | 88 | 6 | 273 |
 | `office` | 31 | 7 | 3 | 52 |
 | `staff` | 26 | 7 | 1 | 39 |
 | `social` | 55 | 6 | 31 | 52 |
@@ -119,9 +119,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1074 |
+| kern-namen die routes aanraken | 1075 |
 | daarvan door **meer dan één** domein (de echte koppeling) | 140 |
-| daarvan door precies één domein | 934 |
+| daarvan door precies één domein | 935 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 
@@ -162,6 +162,7 @@ gegevensStop(6) talen(6) mail(5) loginFails(5) sseToSupplier(5)
 | Hoe start ik dit, hoe zet ik het live, hoe herstel ik het? | `RUNBOOK.md` |
 | Hoe hoort er code geschreven te worden? | `LAT.md` (negen regels, elk uit een echte fout) |
 | Welke merkregels gelden? | `CLAUDE.md` |
+| Waar bouwen we naartoe, en wat staat daarbij in de weg? | `PLATFORM.md` |
 | Wat moet er nog, en welke schuld staat er open? | `TAKEN.md` |
 | Welke toets bewijst wat? | `BEWIJS.md` |
 | Wat is er gemeten, en welke kant mag het op? | `NORM.json` + `npm run norm` |

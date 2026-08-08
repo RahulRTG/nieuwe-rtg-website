@@ -231,6 +231,7 @@ function bouw() {
   p('| Hoe start ik dit, hoe zet ik het live, hoe herstel ik het? | `RUNBOOK.md` |');
   p('| Hoe hoort er code geschreven te worden? | `LAT.md` (negen regels, elk uit een echte fout) |');
   p('| Welke merkregels gelden? | `CLAUDE.md` |');
+  p('| Waar bouwen we naartoe, en wat staat daarbij in de weg? | `PLATFORM.md` |');
   p('| Wat moet er nog, en welke schuld staat er open? | `TAKEN.md` |');
   p('| Welke toets bewijst wat? | `BEWIJS.md` |');
   p('| Wat is er gemeten, en welke kant mag het op? | `NORM.json` + `npm run norm` |');

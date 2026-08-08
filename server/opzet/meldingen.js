@@ -20,7 +20,9 @@ module.exports = function maakMeldingen(deps) {
     ensureSupplierDefaults, save, sessions, tokenHash, webpush
   } = deps;
 function initRealtime() {
-  require('../kern/initdata')({ db, save, crypto, sessions, tokenHash, ensureSupplierDefaults, webpush, DEMO, PERSONAS, GIDS_SEED_TIERS });
+  /* accounts gaat mee omdat de opruiming van de demozaken (zonder RTG_DEMO) ook
+     het personeel van die zaken uit de identiteitskluis moet halen. */
+  require('../kern/initdata')({ db, save, crypto, sessions, tokenHash, ensureSupplierDefaults, webpush, DEMO, PERSONAS, GIDS_SEED_TIERS, accounts });
 }
 
 // stuur een sync-signaal naar één of meer tiers (open schermen herladen data)

@@ -96,6 +96,24 @@ if (!domein) {
     console.log('  ' + r.waarde);
     console.log('  -> ' + r.wat);
   }
+
+  /* ---------------- en dan: STAAT HET ER OOK ECHT? ----------------
+
+     Alles hierboven is een VOORSCHRIFT. Dat is de helft van het werk; de andere
+     helft is nagaan of het ook gebeurd is. Zonder deze meting ziet een goed
+     opgevolgde instructie er precies zo uit als een vergeten instructie -- post
+     die niet aankomt en niemand die zegt waarom. */
+  console.log('\n=== 5. Staat het er ook echt? (meting, geen voorschrift) ===');
+  const meting = await require('../server/maildns').controleer({
+    dns: require('dns').promises, domein, ip, selector,
+    helo: process.env.MAIL_HELO || require('os').hostname()
+  });
+  for (const r of meting.regels) {
+    console.log('  ' + (r.ok ? 'OK  ' : 'MIS ') + r.wat.padEnd(7) + ' ' + r.zegt);
+    if (r.doen) console.log('        -> ' + r.doen);
+  }
+  console.log('\n  ' + meting.goed + ' in orde, ' + meting.mis + ' te doen.' +
+    (meting.mis ? '' : '  Alles wat hier te meten valt, klopt.'));
   console.log('');
 })();
 

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 679 bestanden en 3831 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 680 bestanden en 3839 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 679 |
-| losse beweringen (`test(...)`) | 3831 |
+| toetsbestanden | 680 |
+| losse beweringen (`test(...)`) | 3839 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 520 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 521 |
 | **overleefd**: geen mutatie kreeg hem rood | 12 |
 | niet te meten (al rood, geen module gevonden, ...) | 16 |
 | alleen in de kop *genoemd*, nog niet gemeten | 22 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-602 bestanden, 3698 beweringen.
+603 bestanden, 3706 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -294,6 +294,7 @@ toets omvalt.
 | `mail-eigen.test.js` | 18 | gezakt op `===->!==#0` | Eigen post: DKIM-ondertekening (server/dkim.js) en directe bezorging bij de mailserver van de ontvanger (server/smtp-direct.js), plus de koppeling in server/mail.js. Waar dit op let, in volgorde van belang: 1. |
 | `mailauth.test.js` | 14 | gezakt op `===->!==#0` | SPF en DMARC: de twee controles die RTG Mail tot vandaag als "niet gecontroleerd" meldde. ALLES HIER DRAAIT ZONDER NETWERK. |
 | `mailbijlage.test.js` | 7 | gezakt op `liegpoort /api/` | Bijlagen van buiten: door de scanner, en pas dan te openen. Vier beweringen, en de eerste is de enige die er echt toe doet: 1. |
+| `maildns.test.js` | 8 | gezakt op `===->!==#0` | De mail-DNS nameting (server/maildns.js): staat het er ook echt, en klopt het? WAAROM DEZE TOETS EEN TABEL GEBRUIKT EN NIET HET INTERNET. |
 | `mailpost-kantoor.test.js` | 9 | gezakt op `liegpoort /api/` | DE DERTIEN LAATSTE MAILENDPOINTS ZONDER TOETS -- de kantoorkant, de IMAP-sleutels en de PDF-notities. Ze zijn samen genomen omdat ze samen de rest van de mailronde van vandaag vormen: alles wat erbij kwam en waar de... |
 | `mailpost.test.js` | 11 | gezakt op `liegpoort /api/` | De MAILINFRASTRUCTUUR: de verzendwachtrij en de buitenpoort. Vier beweringen, en ze gaan alle vier over wat er gebeurt als het MISGAAT -- want dat is waar een mailsysteem zich onderscheidt van een verzendknop: 1. |
 | `mall.test.js` | 8 | gezakt op `liegpoort /api/` | De RTG Mall (kern/mall.js): de luxe shoppingmall in de leden-app. De mall stelt zich samen uit de retail-partners, verdeeld over etages; de demo-boutieks vullen de etages, en elke boutique opent haar catalogus. |

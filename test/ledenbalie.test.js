@@ -106,6 +106,17 @@ test('1. zonder zetel geen dossier, ook niet met een geldige kantoorcode', async
   assert.equal((await api(R.herstel, vraag, office)).status, 403, 'en herstel al helemaal niet');
   assert.equal((await api(R.dossier, vraag, lidToken)).status, 401, 'een gewoon lidtoken is geen kantoor');
   assert.equal((await api(R.zetels, {}, office)).status, 403, 'de zetels zelf zijn bestuurswerk');
+
+  /* DE KLACHTEN STONDEN HIER NIET BIJ, en dat was te merken: haal je de
+     zetelcontrole uit balieKlachtOpen weg, dan zakt er niets. Een klacht
+     opnemen vraagt geen aanleiding (de klacht IS de aanleiding) maar wel een
+     zetel -- anders schrijft de gedeelde kantoorcode iets in het dossier van
+     een lid, en wijst dat weer niemand aan. */
+  assert.equal((await api(R.klacht, { id: lidId, soort: 'betaling',
+    tekst: 'Twee keer afgeschreven, zegt het lid.' }, balieOffice)).status, 403,
+  'een klacht opnemen hoort ook achter de zetel te zitten');
+  assert.equal((await api(R.klachtStatus, { klachtId: 'kl_bestaatniet', status: 'gesloten' }, office)).status, 403,
+    'en een klacht sluiten evengoed -- ook als hij niet bestaat, want dat is het antwoord dat je NIET geeft');
 });
 
 test('2. de boardroom deelt een zetel uit; daarna mag die persoon wel', async () => {

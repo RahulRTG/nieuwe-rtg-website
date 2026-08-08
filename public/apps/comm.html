@@ -183,8 +183,12 @@
     font:inherit;font-size:.78rem;color:var(--rtg-txt);cursor:pointer;margin-top:.9rem;}
 </style>
 </head>
-<body class="rtg-stijl" data-pane="lijst">
-<div class="comm">
+<body class="rtg-stijl" data-pane="lijst" data-eigen-rahul>
+<!-- data-eigen-rahul: deze app HEEFT Rahul al, in het gesprek zelf (de hulprij
+     onder het invoerveld). De metgezel-laag laadt wel -- voor het palet en de
+     wauw-laag -- maar zet zijn eigen chatbalk niet neer; twee invoervelden
+     boven elkaar voor twee verschillende gesprekken is erger dan geen balk. -->
+<main class="comm">
   <!-- links: de Universal Inbox -->
   <section class="lijst" aria-label="Gesprekken">
     <div class="lijst-kop">
@@ -234,7 +238,7 @@
       <p class="wetregel">Rahul is een AI &middot; hij stelt op, jij verstuurt</p>
     </div>
   </section>
-</div>
+</main>
 
 <div class="blad-waas" id="bladWaas"><div class="blad" id="blad" role="dialog" aria-modal="true"></div></div>
 
@@ -397,7 +401,16 @@
       (m.reacties || []).forEach(function (r) {
         var b = document.createElement('button');
         b.type = 'button'; b.className = r.vanMij ? 'mijne' : '';
-        b.textContent = r.teken + ' ' + r.aantal;
+        /* Een reactie die een GLYFNAAM is, wordt getekend en niet uitgeschreven
+           -- anders staat er letterlijk "emo-duim 3" op het scherm. Alles wat
+           geen naam uit onze set is (een oud bericht, een andere client) blijft
+           gewoon tekst: een onbekende naam hoort terug te vallen, niet te
+           verdwijnen. */
+        if (window.RTGGlyf && RTGGlyf.heeft(r.teken)) {
+          b.innerHTML = RTGGlyf.svgHTML(r.teken, { klasse: 'gl-inline' }) + ' ' + esc(String(r.aantal));
+        } else {
+          b.textContent = r.teken + ' ' + r.aantal;
+        }
         b.addEventListener('click', function () {
           api('/reactie', { id: staat.open, berichtId: m.id, teken: r.teken }).then(laadGesprek);
         });
@@ -406,8 +419,12 @@
       el.appendChild(rea);
 
       var act = document.createElement('div'); act.className = 'acties';
+      /* De duim uit onze eigen glyfenset (shared/glyf.js) en niet uit de
+         emoji-font van het toestel: die ziet er op elk apparaat anders uit, en
+         de rest van dit huis tekent zijn beeld al zelf. De kern bewaart het
+         teken als tekst (hoogstens acht tekens), dus 'emo-duim' past. */
       act.appendChild(knopje('Reageer', function () {
-        api('/reactie', { id: staat.open, berichtId: m.id, teken: '👍' }).then(laadGesprek);
+        api('/reactie', { id: staat.open, berichtId: m.id, teken: 'emo-duim' }).then(laadGesprek);
       }));
       act.appendChild(knopje('Antwoord', function () { zetAntwoord(m); }));
       if (m.vanMij) {
@@ -697,5 +714,6 @@
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/sneltoets.js" defer></script>
 <script src="/shared/ios.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
 </body>
 </html>

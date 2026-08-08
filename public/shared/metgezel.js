@@ -170,6 +170,11 @@
     window.addEventListener('resize', function () { if (el.style.left) { var r = el.getBoundingClientRect(); zet(r.left, r.top); } });
   }
 
+
+  /* Afgesplitst van metgezel-01b.js, dat over de 10 KB ging. De snede loopt
+     langs de grens tussen SLEPEN (een uitspringend element een greep geven en
+     zijn plek onthouden) en RAHUL zelf (de balk, en de vraag of dit scherm er
+     al een heeft). */
   /* ---------- Rahul: vraagt en doet, met de inlog die er is ---------- */
   // Het leden-OS heeft Rahul als eigen app in het dock; daar zou een tweede
   // chatbalk een kopie zijn. Op de werk-apps (leverancier, PDA, backoffice)
@@ -206,9 +211,22 @@
      Een pad is dus niet waar je het aan afmeet: het scherm zegt zelf wel wat
      het is. <body data-ios-home> is het beginscherm en #osAiBalk IS die eigen
      chatbalk. Het pad blijft er als derde vangnet bij staan voor het geval een
-     scherm ooit zonder allebei die kenmerken opent. */
+     scherm ooit zonder allebei die kenmerken opent.
+
+     EN <body data-eigen-rahul> voor het derde geval, dat geen van beide is:
+     een scherm dat Rahul IN iets anders heeft zitten. De communicatie-app
+     (apps/comm.html) heeft hem in het gesprek -- "vat samen", "stel een
+     antwoord op" -- onder het invoerveld van dat gesprek. Een tweede balk
+     eronder zou daar twee invoervelden boven elkaar zetten voor twee
+     verschillende gesprekken, en dat is verwarrender dan de dubbele balk op
+     het beginscherm ooit was.
+
+     De rest van deze laag (het palet, de wauw-laag, de stijl hierboven) draait
+     wel gewoon door: dat is de reden dat zo'n scherm de laag WEL laadt en niet
+     overslaat. Alleen de balk blijft weg. */
   var eigenRahul = !!(document.getElementById('osAiBalk') ||
     (document.body && document.body.hasAttribute('data-ios-home')) ||
+    (document.body && document.body.hasAttribute('data-eigen-rahul')) ||
     /\/apps\/(app|bureau|index)\.html$|^\/(apps\/)?$/.test(location.pathname));
   if (!eigenRahul) {
     var pad = memTok ? '/api/fluister' : '/api/supplier/ai';

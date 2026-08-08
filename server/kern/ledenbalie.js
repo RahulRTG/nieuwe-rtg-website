@@ -44,8 +44,9 @@
    vergeten. */
 'use strict';
 
-const KLACHT_SOORTEN = ['betaling', 'toegang', 'reis', 'partner', 'privacy', 'overig'];
-const MAX_KLACHTEN = 5000;
+const { maakDossier } = require('./ledenbalie-dossier');
+const { KLACHT_SOORTEN, maakKlachten } = require('./ledenbalie-klachten');
+
 
 /* De reden bij een inzage. Zie regel 3 hierboven; hier staat wat "van niks"
    betekent.
@@ -65,7 +66,7 @@ function redenOk(reden) {
   return (t.match(/\p{L}/gu) || []).length >= 10;
 }
 
-function maakLedenbalie({ db, save, accounts, inzagelog, aanmeldingen, onboarding, herstelVoor }) {
+function maakLedenbalie({ db, save, crypto, accounts, inzagelog, aanmeldingen, onboarding, herstelVoor }) {
   const nu = () => new Date().toISOString();
   const kap = (v, n) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, n);
 
@@ -104,54 +105,6 @@ function maakLedenbalie({ db, save, accounts, inzagelog, aanmeldingen, onboardin
     return balieZetels();
   }
 
-  /* --------------------------------------------------------- het dossier */
-
-  /* De steuncode: een kort kenmerk voor DIT contact, af te leiden uit het
-     ledennummer en verder nietszeggend. De balie kan hem noemen ("noteert u
-     even RTG-S-0042") zodat beide kanten naar hetzelfde gesprek verwijzen
-     zonder dat er ooit een naam over tafel gaat. Dat is de hele reden dat hij
-     bestaat: een gesprek moet een handvat hebben, en op een platform op
-     codenaam mag dat handvat geen persoon zijn. */
-  const steuncodeVan = (id) => 'RTG-S-' + String(1000 + Number(id)).slice(-4);
-
-  /* De stad komt uit het onboardingprofiel (woonplaats), op sleutel -- zelfde
-     bron als het ledenregister gebruikt, en met opzet ALLEEN de woonplaats:
-     een straat en huisnummer horen in de kluis en niet op een baliescherm. */
-  const stadVan = (key) => {
-    try {
-      const p = ((onboarding && onboarding.store && onboarding.store().profielen) || {})[key];
-      const w = p && p.velden && p.velden.woonplaats;
-      return w ? kap(w, 60) : null;
-    } catch (e) { return null; }
-  };
-  const landVan = (id) => {
-    try {
-      const st = accounts.getMemberState(id) || {};
-      return st.land ? kap(st.land, 60) : null;
-    } catch (e) { return null; }
-  };
-
-  const openKlachten = (id) => klachtLijst()
-    .filter((k) => String(k.lidId) === String(id) && k.status === 'open')
-    .map((k) => ({ id: k.id, soort: k.soort, tekst: k.tekst, status: k.status, at: k.at }));
-
-  /* PRECIES ACHT VELDEN, en de toets pint ze dicht af. Dat is geen pesterij
-     maar de bedoeling: groeit dit dossier er ooit een veld bij, dan hoort daar
-     een mens naar te kijken in plaats van dat het meelift. De kolom die er
-     morgen bij wil is een keer het telefoonnummer. */
-  function dossierVan(u) {
-    return {
-      codename: u.codename || null,
-      pas: u.tier || 'rtg',
-      sinds: new Date(u.created_at).toISOString().slice(0, 10),
-      stad: stadVan('user-' + u.id),
-      land: landVan(u.id),
-      steuncode: steuncodeVan(u.id),
-      abo: { pas: u.tier || 'rtg', sinds: new Date(u.created_at).toISOString().slice(0, 10), loopt: true },
-      klachten: openKlachten(u.id)
-    };
-  }
-
   /* Elke leesweg langs dezelfde poort: een zetel, een echte reden, en een
      regel in het journaal. Dat laatste NA de controles, want een geweigerde
      vraag is geen inzage (regel 3). */
@@ -167,36 +120,6 @@ function maakLedenbalie({ db, save, accounts, inzagelog, aanmeldingen, onboardin
       over: { id: u.id, codenaam: u.codename || null },
       waarom: reden, bron: 'balie/' + wat
     });
-  }
-
-  function balieDossier(zetel, id, reden) {
-    const nee = eis(zetel, reden);
-    if (nee) return nee;
-    const u = accounts.getUserById(Number(id));
-    if (!u) return { status: 404, error: 'Dit lid kennen we niet.' };
-    noteer(zetel, u, reden, 'dossier');
-    return { ok: true, lid: dossierVan(u) };
-  }
-
-  /* Zoeken op codenaam is OOK inzage. Wie een codenaam natrekt om te zien of
-     hij bestaat, doet precies wat het journaal moet vastleggen -- ook als er
-     niets uitkomt. Vandaar dat er hier geen "alleen bij een treffer" staat. */
-  function balieZoek(zetel, codenaam, reden) {
-    const nee = eis(zetel, reden || 'zoeken op codenaam aan de balie');
-    if (nee && nee.status === 403) return nee;
-    const naald = kap(codenaam, 60).toLowerCase();
-    if (naald.length < 2) return { status: 400, error: 'Geef minstens twee letters van de codenaam.' };
-    const rijen = accounts.ledenRegisterRijen ? accounts.ledenRegisterRijen(20000) : [];
-    const treffers = rijen
-      .filter((r) => String(r.codename || '').toLowerCase().includes(naald))
-      .slice(0, 25)
-      .map((r) => ({ id: r.id, codename: r.codename, pas: r.tier || 'rtg', land: r.land || null }));
-    inzagelog.noteer({
-      door: { id: zetel, naam: zetel },
-      over: { id: treffers.length === 1 ? treffers[0].id : null, codenaam: naald },
-      waarom: reden || 'zoeken op codenaam aan de balie', bron: 'balie/zoek'
-    });
-    return { ok: true, treffers };
   }
 
   /* ------------------------------------------------------------- herstel */
@@ -218,36 +141,14 @@ function maakLedenbalie({ db, save, accounts, inzagelog, aanmeldingen, onboardin
     return { ok: true, verstuurd: true, let: 'Het lid ontvangt zelf een bericht. De balie krijgt de link niet te zien.' };
   }
 
-  /* --------------------------------------------------------------- klachten */
-
-  function balieKlachtOpen(zetel, id, soort, tekst) {
-    if (!magBalie(zetel)) return { status: 403, error: 'Hiervoor is een baliezetel nodig.' };
-    const u = accounts.getUserById(Number(id));
-    if (!u) return { status: 404, error: 'Dit lid kennen we niet.' };
-    const s = KLACHT_SOORTEN.includes(String(soort)) ? String(soort) : 'overig';
-    const t = kap(tekst, 600);
-    /* Een klacht is het begin van een dossier waar later iemand anders naar
-       kijkt. "x" is dan geen klacht maar ruis, en ruis in een klachtenlijst
-       kost precies de aandacht die de echte klacht nodig heeft. */
-    if (t.length < 12) return { status: 400, error: 'Schrijf op waar de klacht over gaat (een zin volstaat).' };
-    const k = { id: 'kl_' + Math.random().toString(36).slice(2, 10), lidId: u.id, soort: s, tekst: t,
-      status: 'open', door: zetel, at: nu(), dicht: null };
-    klachtLijst().unshift(k);
-    if (klachtLijst().length > MAX_KLACHTEN) klachtLijst().length = MAX_KLACHTEN;
-    save();
-    return { ok: true, klacht: { id: k.id, soort: k.soort, tekst: k.tekst, status: k.status, at: k.at } };
-  }
-
-  function balieKlachtStatus(zetel, klachtId, status) {
-    if (!magBalie(zetel)) return { status: 403, error: 'Hiervoor is een baliezetel nodig.' };
-    const k = klachtLijst().find((x) => x.id === String(klachtId));
-    if (!k) return { status: 404, error: 'Deze klacht kennen we niet.' };
-    const nieuw = String(status) === 'gesloten' ? 'gesloten' : 'open';
-    k.status = nieuw;
-    k.dicht = nieuw === 'gesloten' ? nu() : null;
-    save();
-    return { ok: true, klacht: { id: k.id, soort: k.soort, tekst: k.tekst, status: k.status, at: k.at } };
-  }
+  /* Het dossier en het zoeken staan in ./ledenbalie-dossier.js: dat is de
+     enige plek waar velden over een MENS bij elkaar komen, en die hoort in
+     zijn geheel leesbaar te zijn. Hij krijgt de poort (eis, noteer) mee en
+     bouwt er niets omheen. */
+  const klachten = maakKlachten({ crypto, save, accounts, kap, nu, magBalie, klachtLijst });
+  const dossier = maakDossier({ accounts, inzagelog, onboarding, kap,
+    openKlachten: klachten.openKlachten, eis, noteer });
+  const steuncodeVan = dossier.steuncodeVan;
 
   /* ------------------------------------------------------- het abo-voorstel */
 
@@ -274,8 +175,10 @@ function maakLedenbalie({ db, save, accounts, inzagelog, aanmeldingen, onboardin
   }
 
   return { magBalie, balieZetels, balieZetelZet, balieZetelWeg,
-    balieZoek, balieDossier, balieHerstel, balieKlachtOpen, balieKlachtStatus, balieAboVoorstel,
-    redenOk, KLACHT_SOORTEN };
+    // het dossier en het zoeken uit ./ledenbalie-dossier.js, de klachten uit ./ledenbalie-klachten.js
+    balieZoek: dossier.balieZoek, balieDossier: dossier.balieDossier, balieHerstel,
+    balieKlachtOpen: klachten.balieKlachtOpen, balieKlachtStatus: klachten.balieKlachtStatus,
+    balieAboVoorstel, redenOk, KLACHT_SOORTEN };
 }
 
 module.exports = { maakLedenbalie, redenOk, KLACHT_SOORTEN };

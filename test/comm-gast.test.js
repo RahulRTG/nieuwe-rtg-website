@@ -194,19 +194,42 @@ test('de dag van de verhuizing: een zaak ziet haar lopende gesprekken meteen', (
 });
 
 test('de dag van de verhuizing: de gegevensuitvoer van een lid is compleet', () => {
-  const { gast } = opzet(OUD());
+  const { comm, gast } = opzet(OUD());
+  /* Een gewoon gesprek van hetzelfde lid, met een ander lid. Het staat in
+     dezelfde kern en het is van dit lid, dus zonder de filter op meta.bron
+     komt het in de kop "gesprekken met zaken" van de gegevensuitvoer terecht.
+     Dat is geen lek -- het is zijn eigen gesprek -- maar het is wel een
+     antwoord dat niet klopt, en een uitvoer die verkeerd sorteert is precies
+     zo moeilijk te weerleggen als een die iets mist. */
+  const vriend = comm.tussen('user-1', 'user-2');
+  comm.bericht({ gesprekId: vriend.id, van: 'user-1', tekst: 'zin in zaterdag' });
+
   const uit = gast.voorLid('user-1');
   const sleutels = Object.keys(uit);
   assert.deepEqual(sleutels, ['HOSHI|user-1|Roomservice'],
-    'de uitvoer van het lid miste zijn gesprekken met zaken');
+    'de uitvoer van het lid miste zijn gesprekken met zaken, of droeg er te veel');
   assert.equal(uit[sleutels[0]].messages.length, 3, 'de berichten ontbreken in de uitvoer');
   assert.equal(uit[sleutels[0]].supplierCode, 'HOSHI');
 });
 
 test('de lijst voor het zaakscherm: alleen de eigen zaak, nieuwste eerst', () => {
-  const { gast } = opzet(OUD());
+  const { comm, gast } = opzet(OUD());
   gast.stuurGast('PONTO', 'user-1', 'Team', 'bij de bar', 'Amberen Vos');
   gast.stuurGast('HOSHI', 'user-1', 'Team', 'bij de receptie', 'Amberen Vos');
+
+  /* EN NIET ALLEEN VAN EEN ANDERE ZAAK. Sinds de verhuizing zit dezelfde zaak
+     ook in gesprekken die GEEN gastcontact zijn: een DM tussen twee collega's,
+     een sollicitatie. Die staan in dezelfde kern en met dezelfde poort, dus
+     "van mij" is hier niet genoeg -- het gastenscherm hoort alleen de lijnen
+     met klanten te tonen. Zonder deze twee regels zakt er niets als je de
+     filter op meta.bron weghaalt, en dan lekt de sollicitatie van iemand het
+     gastenoverzicht in. */
+  const collega = comm.gesprekMaak({ soort: 'project',
+    deelnemers: [wie.zaak('HOSHI'), 'mens:HOSHI:7'], meta: { bron: 'Collega' } });
+  comm.bericht({ gesprekId: collega.id, van: 'mens:HOSHI:7', tekst: 'neem jij de late dienst' });
+  const werk = comm.gesprekMaak({ soort: 'business', deelnemers: [wie.zaak('HOSHI'), 'user-2'],
+    meta: { bron: 'Werk', sleutel: 'werk:HOSHI|1' } });
+  comm.bericht({ gesprekId: werk.id, van: 'user-2', tekst: 'ik solliciteer op de vacature' });
 
   const hoshi = gast.voorZaak('HOSHI');
   assert.deepEqual(hoshi.map((r) => r.dept).sort(), ['Roomservice', 'Team']);

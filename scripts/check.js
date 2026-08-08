@@ -185,6 +185,20 @@ console.log('\n10) de 9+-keuring op alle app-pagina\'s');
   for (const f of paginas) {
     const rel = path.relative(path.join(ROOT, 'public'), f).replace(/\\/g, '/');
     const s = fs.readFileSync(f, 'utf8');
+    /* EEN OMLEIDING IS GEEN SCHERM. Een pad dat is opgegaan in een ander blijft
+       bestaan -- er kan van buiten naar gelinkt zijn, en een dood pad is erger
+       dan een omleiding -- maar het is een briefje van drie regels en geen app.
+       Een main-landmark, de basis-laag en de metgezel-laag eisen van zo'n
+       briefje betekent: drie scripts laden op een pagina die er 0 ms staat, en
+       een <main> om een zin die niemand leest.
+
+       Streng afgebakend, zodat dit geen achterdeur wordt: er moet een
+       meta-refresh IN staan, hij moet naar een pagina van onszelf wijzen, en er
+       mag geen <script src> op staan. Een pagina die iets DOET valt er dus
+       buiten, ook als er toevallig een refresh in staat. */
+    const omleiding = /<meta[^>]+http-equiv=["']refresh["'][^>]+url=\/[^"'>]+/i.test(s) &&
+      !/<script[^>]+src=/i.test(s);
+    if (omleiding) continue;
     const htmlTag = s.match(/<html[^>]*>/i);
     if (!htmlTag || !/\blang\s*=/.test(htmlTag[0])) { np++; fout('9+: geen lang op <html> in ' + rel); }
     if (!/name="viewport"/.test(s)) { np++; fout('9+: geen viewport in ' + rel); }
@@ -308,6 +322,7 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
     ['public/shared/i18n/i18n-01.js', 'de taaltabel + kiezer, een geheel'],
     ['public/shared/i18n/i18n-03.js', 'de taaltabel + kiezer, een geheel'],
     ['server/server.js', 'de bedrading van de hele app; wordt per ronde verder verdund'],
+    ['server/opzet/kernlaag4.js', 'een ophanglijst, geen module: elke regel hangt een kern op aan de vorige laag. Dezelfde reden als server.js hierboven -- er zit geen naad in, alleen volgorde, en die volgorde IS de inhoud'],
     ['public/apps/boardroom-eigenaar.js', 'de eigenaarszetel: vier panelen op een gedeelde api/el-kern in een IIFE']
   ]);
   /* NOG TE DOEN. Deze staan net boven de grens en moeten opgeknipt worden, maar
@@ -332,7 +347,47 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
     'server/kern/werkplaats.js',
     'server/lokaal-tls.js',
     'server/techniek.js',
-    'server/trio.js'
+    'server/trio.js',
+
+    /* DE COMMUNICATIEKERN EN WAT ERAAN VASTZIT. Deze zeven kwamen erbij toen de
+       zes losse berichtenvoorraden naar een kern verhuisden, en ze staan hier
+       met een reden per stuk -- niet als groep, want dan is het geen lijst maar
+       een uitzondering met zeven namen.
+
+       Er is al geknipt waar de naad echt zat: kern/comm/index.js ging van 25,7
+       naar 15,1 KB (./tonen.js en ./deelnemer.js), kern/comm/gast.js van 15,5
+       naar 9,4 (./gast-verhuizing.js en ./gast-lijsten.js), kern/ledenbalie.js
+       van 13,7 naar 9,2 (-dossier en -klachten). Wat hieronder staat is wat er
+       DAARNA nog over de grens ligt. */
+
+    // 15,1 KB, waarvan 3,6 KB architectuurkop -- die legt de hele kern uit en
+    // hoort bij de ingang. De volgende snede is bericht() + het sein eruit;
+    // dat is echte bedrading (elke module schrijft via bericht) en hoort een
+    // eigen ronde met de toetsen ernaast.
+    'server/kern/comm/index.js',
+    // 10,4 KB: het actormodel is EEN tabel (lid/zaak/mens/gezin/kantoor) met de
+    // wissels die eruit volgen (naam, sein, voornaam). Knippen zou de vorm van
+    // een sleutel scheiden van wat je ermee mag -- precies wat hier bij elkaar
+    // hoort, want dat is de poort. Kandidaat voor MAG, niet voor een snede.
+    'server/kern/comm/wie.js',
+    // 10,2 en 11,1 KB: de twee deuren naar de kern (lid en zaak). Ze delen hun
+    // vorm; de snede die er hoort is een gedeelde routelaag voor allebei, en
+    // dat is een verbouwing van twee bestanden tegelijk.
+    'server/routes/member/comm.js',
+    'server/routes/supplier/comm.js',
+    // 10,1 KB: de auth-routes groeiden met startHerstel(), dat de ledenbalie
+    // hergebruikt. De herstelstroom staat al apart (routes/auth/herstel.js);
+    // wat hier over is, is de bedrading eromheen.
+    'server/routes/auth.js',
+    // 10,3 KB: de vergetelheid raakt elke voorraad, en sinds de verhuizing ook
+    // de vier oude berichtenstapels. Elke regel is een andere plek in de
+    // database; ze uit elkaar halen maakt "wat wordt er gewist" moeilijker na
+    // te lopen, en dat is juist de vraag die dit bestand moet beantwoorden.
+    'server/kern/vergeten.js',
+    // 10,7 KB: de postbus. Ging over de grens toen de outbox een teller kreeg
+    // (twee mails in dezelfde milliseconde overschreven elkaar). De naad zit
+    // tussen het opstellen en het afleveren.
+    'server/mail.js'
   ]);
   let teGroot = 0, uitz = 0, nog = [];
   for (const map of ['server', 'public']) {

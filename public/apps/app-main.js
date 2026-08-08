@@ -12,7 +12,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = 'f9231c8c';
+var RTG_BOUW = 'e0fa5644';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -3151,6 +3151,11 @@ var RTG_BOUW = 'f9231c8c';
      rij vier dingen houdt die je zonder nadenken moet kunnen pakken. */
   const FUNCTIES = ['link:berichten', 'os:snaps', 'link:camera', 'link:wallet'];
 
+
+  /* Afgesplitst van app-main-24.js, dat over de 10 KB ging. De snede loopt
+     langs een echte grens: hierboven staat de registry van alle apps en de
+     vaste functierij, hieronder de MAPPEN waarin die apps vallen en de vraag
+     welke ervan bij welke pas horen. */
   /* ---------- de mappen, boven de klok ----------
      Zeven mappen, een rij van vier en een rij van drie, en daar zit alles in
      waar je pas je recht op geeft. Niets installeren: het staat er al. Wil je
@@ -3831,6 +3836,10 @@ var RTG_BOUW = 'f9231c8c';
   function openZoek() { sluitScrims(); zoekScrim.classList.add('open'); zoekInput.value = ''; zoek(); zoekInput.focus(); }
   if (zoekInput) zoekInput.addEventListener('input', zoek);
 
+
+  /* Afgesplitst van app-main-27.js, dat over de 10 KB ging. De snede loopt
+     langs de grens tussen ZOEKEN (Spotlight: wat staat er op dit OS) en
+     BEDIENEN (het paneel, de helderheid, de wiebel-modus). */
   /* ---------- bedieningspaneel ---------- */
   const ccScrim = $('#osCcScrim');
   const ccBtn = $('#osCcBtn');

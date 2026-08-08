@@ -46,6 +46,9 @@ const bundels = {
   'shared/qr.js': 'shared/qr',
   'shared/klok.js': 'shared/klok',
   'shared/metgezel.js': 'shared/metgezel',
+  // het app-menu: stijl, tekens, de eigen functies van een app, de vaste
+  // functies, het blad en de knop -- zes onderdelen achter elkaar in een IIFE
+  'shared/appmenu.js': 'shared/appmenu',
   'shared/rtghorloge.js': 'shared/rtghorloge',
   'apps/residentie.js': 'apps/residentie',
   'apps/leverancier.js': 'apps/leverancier',

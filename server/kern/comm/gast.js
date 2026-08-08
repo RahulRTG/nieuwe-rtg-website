@@ -38,6 +38,8 @@
 'use strict';
 
 const wie = require('./wie');
+const { maakGastVerhuizing } = require('./gast-verhuizing');
+const { maakGastLijsten } = require('./gast-lijsten');
 
 const MAX_TEKST = 500;      // zoals de oude routes hem afkapten
 
@@ -46,6 +48,7 @@ function maakCommGast({ db, save, comm }) {
   // exact de oude sleutel (kern/leverancier/gastcontact.js, chatKeyOf)
   const lijnSleutel = (code, key, dept) => codeVan(code) + '|' + key + '|' + (dept || 'Team');
   const zaakVan = (code) => wie.zaak(code);
+  const verhuizing = maakGastVerhuizing({ db, save, comm, lijnSleutel, zaakVan });
 
   /* De vertaling tussen de twee vormen, op EEN plek. `from` was de kant van
      het gesprek ('guest' | 'partner' | 'systeem'); in de kern is dat de
@@ -71,60 +74,6 @@ function maakCommGast({ db, save, comm }) {
     };
   };
 
-  function importeer(gesprek, code, lidKey, dept) {
-    if (!gesprek || gesprek.meta.oudBinnen) return gesprek;
-    gesprek.meta.oudBinnen = new Date().toISOString();
-    let oud = null;
-    try { oud = (db.data.guestChats || {})[lijnSleutel(code, lidKey, dept)]; } catch (e) {}
-    const berichten = (oud && Array.isArray(oud.messages)) ? oud.messages : [];
-    if (berichten.length) {
-      /* Rechtstreeks in de voorraad van de kern en niet via comm.bericht():
-         die zet elk bericht op NU, en dan ziet een gesprek van vorig jaar
-         eruit alsof het vanmiddag gebeurde. Geen migratie maar een
-         vervalsing, en niet terug te draaien. */
-      const lijst = comm.berichtenVan(gesprek.id);
-      for (const m of berichten) {
-        if (!m || !m.text) continue;
-        const systeem = m.from === 'systeem';
-        lijst.push({
-          id: 'brc_oud_' + (lijst.length + 1) + '_' + gesprek.id.slice(-6),
-          van: (m.from === 'guest') ? lidKey : zaakVan(code), door: null,
-          at: m.at || gesprek.op,
-          tekst: String(m.text).slice(0, 4000),
-          soort: systeem ? 'systeem' : 'tekst',
-          who: m.who || '', antwoordOp: null, bijlage: null,
-          lang: m.lang || null, reacties: {}
-        });
-      }
-      lijst.sort((x, y) => String(x.at || '').localeCompare(String(y.at || '')));
-      const laatste = lijst[lijst.length - 1];
-      if (laatste && laatste.at > gesprek.laatst) gesprek.laatst = laatste.at;
-      /* De tellers omrekenen naar "gelezen tot", per kant. Ging dit mis, dan
-         springt bij iedereen elk oud gesprek op ongelezen: een stapel rode
-         bolletjes die niemand heeft veroorzaakt. */
-      leesUitTeller(lijst, gesprek, lidKey, zaakVan(code), (oud && oud.unreadGuest) || 0);
-      leesUitTeller(lijst, gesprek, zaakVan(code), lidKey, (oud && oud.unreadPartner) || 0);
-    }
-    save();
-    return gesprek;
-  }
-
-  /* `n` ongelezen betekende: de laatste n berichten VAN DE ANDER heeft deze
-     kant niet gezien. Dus terugtellen tot je er n voorbij bent, en "gelezen
-     tot" op het bericht daarvoor zetten. Staat de teller op nul, dan is alles
-     gelezen -- en dat is juist de kant die je moet zetten, want zonder
-     tijdstip telt de kern ALLES van de ander als ongelezen. */
-  function leesUitTeller(lijst, gesprek, mij, ander, aantal) {
-    const n = Math.max(0, Number(aantal) || 0);
-    let gezien = 0;
-    for (let i = lijst.length - 1; i >= 0; i--) {
-      if (lijst[i].van === mij) continue;      // eigen berichten tellen niet mee
-      if (gezien >= n) { comm.leesZet(mij, gesprek.id, lijst[i].at); return; }
-      gezien++;
-    }
-    // de ander schreef minder dan de teller beweert: alles blijft ongelezen
-  }
-
   /* De lijn tussen dit lid en deze zaak, voor deze afdeling. De enige ingang.
      `soort: 'order'` zet hem in de la Onderweg van de inbox -- het gaat over
      iets dat loopt -- en `meta` draagt wat het scherm nodig heeft. */
@@ -143,7 +92,7 @@ function maakCommGast({ db, save, comm }) {
     });
     if (o.codename && g.meta.codename !== o.codename) g.meta.codename = o.codename;
     if (o.tier && g.meta.tier !== o.tier) g.meta.tier = o.tier;
-    return importeer(g, c, String(lidKey), dept);
+    return verhuizing.importeer(g, c, String(lidKey), dept);
   }
 
   /* De lijn OPZOEKEN zonder hem aan te leggen, en dat verschil is een
@@ -216,96 +165,17 @@ function maakCommGast({ db, save, comm }) {
     comm.leesZet(zaakVan(code), gesprek(code, lidKey, dept).id, new Date().toISOString()); save();
   }
 
-  /* ------------------------------------------------- de lijsten
-
-     Het zaakscherm en de gegevensuitvoer van een lid lazen allebei
-     rechtstreeks in db.data.guestChats. Nu lezen ze hier, en dat is meer dan
-     een verplaatsing: de zaak krijgt ALLEEN de gesprekken waar haar eigen
-     sleutel in zit, en dat is dezelfde poort die de rest van de kern gebruikt
-     -- geen filter op een veld dat iemand kan vergeten.
-
-     MAAR EERST DIT, EN HET IS DE BELANGRIJKSTE REGEL VAN DIT BESTAND.
-
-     De import gebeurt per lijn, op het moment dat die lijn wordt geopend. Dat
-     is bij ./dm.js en ./collega.js precies goed: daar is de lijst opgebouwd
-     uit iets anders (de vriendenlijst, de personeelslijst) en wordt elke lijn
-     onderweg aangeraakt. Hier niet. Een lijst die rechtstreeks uit de kern
-     komt, ziet alleen wat al verhuisd IS -- en de lijst is nu juist de enige
-     manier om een gesprek te openen.
-
-     Het gevolg zou zijn: op de dag van de verhuizing staat het gastenscherm
-     van elke zaak LEEG, en elk gesprek lijkt weg. Niet stuk, niet te
-     herstellen door te wachten -- gewoon onbereikbaar, want de deur die je
-     nodig hebt om te importeren is de deur die je niet meer kunt vinden.
-
-     Vandaar dat de lijst zijn eigen voorraad eerst binnenhaalt. Begrensd tot
-     wat bij DEZE zaak of DIT lid hoort, dus het blijft een verhuizing op
-     aanraking en geen script over de hele database. */
-  function haalBinnen(mij, filter) {
-    let oud = null;
-    try { oud = db.data.guestChats || {}; } catch (e) { return; }
-    /* Wat er AL is, in een keer opgehaald. Zonder deze verzameling zou elke
-       oude regel opnieuw langs gesprekMaak() gaan om te ontdekken dat hij er
-       al staat -- en die zoekt zelf ook de hele lijst af. Op een scherm dat
-       bij elke verversing langskomt is dat het verschil tussen een wandeling
-       en een wandeling per stap. */
-    const binnen = new Set();
-    for (const g of comm.inbox(mij, {}).gesprekken) {
-      const kern = comm.gesprekVan(g.id);
-      if (kern && kern.meta && kern.meta.sleutel) binnen.add(kern.meta.sleutel);
-    }
-    for (const [sleutel, chat] of Object.entries(oud)) {
-      const stuk = String(sleutel).split('|');
-      if (stuk.length < 3 || !chat) continue;
-      const [code, lidKey, dept] = [stuk[0], stuk[1], stuk.slice(2).join('|')];
-      if (!filter(code, lidKey)) continue;
-      if (binnen.has('gast:' + lijnSleutel(code, lidKey, dept))) continue;
-      gesprek(code, lidKey, dept, { codename: chat.codename || null });
-    }
-  }
-
-  function voorZaak(code) {
-    const c = codeVan(code), mij = zaakVan(c);
-    haalBinnen(mij, (k) => codeVan(k) === c);
-    const uit = [];
-    for (const g of comm.inbox(mij, {}).gesprekken) {
-      const kern = comm.gesprekVan(g.id);
-      if (!kern || !kern.meta || kern.meta.bron !== 'Zaak') continue;
-      const lidKey = kern.deelnemers.find((d) => d !== mij) || '';
-      const lijst = comm.berichtenVan(g.id).filter((m) => !m.weg);
-      if (!lijst.length) continue;
-      const laatste = lijst[lijst.length - 1];
-      uit.push({ key: 'gast:' + lijnSleutel(c, lidKey, kern.meta.dept), gesprekId: g.id,
-        codename: kern.meta.codename || g.titel, dept: kern.meta.dept || 'Team',
-        unread: g.ongelezen, last: String(laatste.tekst || '').slice(0, 60),
-        lastFrom: kantVan(laatste, lidKey), lastAt: g.at });
-    }
-    return uit.sort((a, b) => String(b.lastAt || '').localeCompare(String(a.lastAt || '')));
-  }
-
-  /* Alles wat dit lid met zaken besproken heeft, voor de gegevensuitvoer
-     (routes/member/privacy.js). Die uitvoer is een RECHT en geen extraatje:
-     mist er een gesprek, dan is het antwoord op "wat heeft u van mij"
-     onvolledig, en dat merkt niemand tot het te laat is. */
-  function voorLid(lidKey) {
-    const uit = {};
-    haalBinnen(String(lidKey), (c, k) => k === String(lidKey));
-    for (const g of comm.inbox(String(lidKey), {}).gesprekken) {
-      const kern = comm.gesprekVan(g.id);
-      if (!kern || !kern.meta || kern.meta.bron !== 'Zaak') continue;
-      const sleutel = lijnSleutel(kern.meta.zaak, lidKey, kern.meta.dept);
-      uit[sleutel] = {
-        supplierCode: kern.meta.zaak, customerKey: String(lidKey),
-        codename: kern.meta.codename || null, tier: kern.meta.tier || null,
-        dept: kern.meta.dept || 'Team', lastAt: g.at,
-        messages: comm.berichtenVan(g.id).filter((m) => !m.weg).map((m) => oudeVorm(m, String(lidKey)))
-      };
-    }
-    return uit;
-  }
+  /* De verhuizing van de oude voorraad staat in ./gast-verhuizing.js (dat
+     bestand kan weg zodra de laatste lijn binnen is), de twee lijsten in
+     ./gast-lijsten.js. De lijsten krijgen gesprek() mee -- dat is hun enige
+     manier om een oude lijn binnen te halen, en meteen de reden dat ze niet
+     zelf in db.data.guestChats hoeven te schrijven. */
+  const lijsten = maakGastLijsten({ db, comm, lijnSleutel, codeVan, zaakVan,
+    kantVan, oudeVorm, gesprek });
 
   return { gesprek, bestaand, stuurGast, stuurZaak, opening, berichten, oudeVorm,
-    ongelezenGast, ongelezenZaak, leesGast, leesZaak, voorZaak, voorLid, lijnSleutel };
+    ongelezenGast, ongelezenZaak, leesGast, leesZaak,
+    voorZaak: lijsten.voorZaak, voorLid: lijsten.voorLid, lijnSleutel };
 }
 
 module.exports = { maakCommGast };

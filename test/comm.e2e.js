@@ -33,7 +33,7 @@
    Draai: npm run e2e */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, stop } = require('./helper');
+const { startServer, stop, letOpFouten } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -207,8 +207,7 @@ test('er is EEN communicatie-app: het oude berichtenpad leidt erheen en bellen s
         } catch (e) {}
       }, A.token);
       const page = await ctx.newPage();
-      const fouten = [];
-      page.on('pageerror', (e) => fouten.push(e.message));
+      const fouten = letOpFouten(page, []);
 
       /* Het oude pad blijft bestaan -- er kan van buiten naar gelinkt zijn --
          maar het brengt je naar de ene app. Een dood pad is erger dan een

@@ -195,7 +195,7 @@ Object.assign(kern, require('../kern/ledenregister')({ accounts, onboarding, gel
    kernlaag2 maar wordt hier op aanroepmoment gelezen, zodat er nooit een
    bevroren undefined in staat. */
 kern.ledenbalie = require('../kern/ledenbalie').maakLedenbalie({
-  db, save, accounts, inzagelog: require('../inzagelog'), onboarding,
+  db, save, crypto, accounts, inzagelog: require('../inzagelog'), onboarding,
   aanmeldingen: kern.aanmeldingen,
   herstelVoor: (u) => (kern.startHerstel ? kern.startHerstel(u) : null)
 });

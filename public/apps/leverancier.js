@@ -7486,6 +7486,11 @@
   const SOORTNAAM = s => s === 'werk' ? T('gc.s.werk','Sollicitatie')
     : s === 'collega' ? T('gc.s.collega','Collega') : T('gc.s.gast','Gast');
 
+
+  /* Afgesplitst van leverancier-74.js, dat over de 10 KB ging toen de drie
+     berichtenlijsten er een werden. De snede loopt langs de grens tussen de
+     LIJST (welke draden er zijn, van welke soort) en de DRAAD zelf (de
+     gastchat: bubbels, vertaling, de Salon-knop). */
   function renderGChat(){
     const el = $('#gchatWrap'); if (!el) return;
     const chats = state.guestChats || [];

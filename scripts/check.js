@@ -28,12 +28,39 @@ function loop(dir, filter, fn) {
   }
 }
 
-console.log('1) server-bestanden compileren');
-loop(path.join(ROOT, 'server'), /\.js$/, f => {
-  const r = cp.spawnSync(process.execPath, ['--check', f]);
-  if (r.status !== 0) fout('syntaxfout in ' + path.relative(ROOT, f) + '\n' + r.stderr);
-});
-if (!fouten) ok('alle server-bestanden compileren');
+/* DE BROWSERSCRIPTS STONDEN HIER NIET BIJ, en dat is de gevaarlijkste helft.
+
+   Deze regel keurde alleen server/. Een kapotte servermodule merk je meteen --
+   de server start niet -- maar een kapot bestand in public/shared laadt gewoon,
+   valt stil in de console van de bezoeker, en neemt elke app-pagina mee die het
+   nodig heeft. Er is geen foutmelding waar iemand naar kijkt.
+
+   Gevonden door het per ongeluk te doen: een snede in shared/ios.js viel midden
+   in een commentaarblok, ios.js was daarmee geen geldige JS meer, en deze
+   keuring meldde "Alles in orde". Elke app-pagina had toen zijn navigatiebalk,
+   grote titel, home-indicator en app-menu verloren.
+
+   Bundels (public/apps/leverancier.js en broers) doen mee: dat is wat er
+   uitgeserveerd wordt. De losse delen NIET -- die zijn per stuk geen geldig
+   programma (deel 2 begint midden in een functie), en dat is precies de opzet.
+   public/dist is bouwuitvoer. */
+console.log('1) server- en browserbestanden compileren');
+const { bundels: BUNDELLIJST } = require('./bundel');
+const DEELMAPPEN = new Set(Object.values(BUNDELLIJST).map((d) => 'public/' + d + '/'));
+function compileerbaar(rel) {
+  if (rel.startsWith('public/dist/') || rel.includes('/data/')) return false;
+  for (const map of DEELMAPPEN) if (rel.startsWith(map)) return false;
+  return true;
+}
+for (const map of ['server', 'public']) {
+  loop(path.join(ROOT, map), /\.js$/, f => {
+    const rel = path.relative(ROOT, f).replace(/\\/g, '/');
+    if (!compileerbaar(rel)) return;
+    const r = cp.spawnSync(process.execPath, ['--check', f]);
+    if (r.status !== 0) fout('syntaxfout in ' + rel + '\n' + r.stderr);
+  });
+}
+if (!fouten) ok('alle server- en browserbestanden compileren');
 
 /* Deze regel kijkt alleen in de .html-bestanden, want dat is de snelle
    keuring. De volledige variant staat in test/blindevlek.test.js (toets 6): die

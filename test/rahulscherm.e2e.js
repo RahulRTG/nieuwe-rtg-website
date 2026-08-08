@@ -48,7 +48,20 @@ test('het scherm van Rahul beweegt mee en zit nooit in de weg', { skip: pw ? fal
     const page = await ctx.newPage();
     const fouten = [];
     letOpFouten(page, fouten);
-    await page.goto(srv.base + '/apps/berichten.html', { waitUntil: 'domcontentloaded' });
+    /* EEN GEWONE, SCROLLENDE APP-PAGINA, en dat is hier de hele opzet.
+
+       Hier stond /apps/berichten.html, en dat werkte tot Berichten opging in de
+       communicatie-app: sindsdien is dat pad een omleiding naar
+       /apps/comm.html. Die app is een chatvenster -- height:100dvh met een
+       eigen scrollend middenstuk -- en zet zijn body dus met opzet op
+       overflow:hidden, net als elke mailclient. Belofte 3 hieronder ("de
+       pagina blijft scrollen") viel daarmee om, en dat mat niets over Rahul:
+       de vergrendeling kwam van het scherm eronder.
+
+       Een toets voor "Rahul zit nooit in de weg" hoort op een pagina te staan
+       die zonder Rahul WEL scrolt. Vandaar het logboek: een lange lijst,
+       geen eigen hoogte, geen eigen slot. */
+    await page.goto(srv.base + '/apps/logboek.html', { waitUntil: 'domcontentloaded' });
     /* de balk en het paneel horen er te komen zonder dat er iets geopend wordt.
        Let op 'attached', niet zichtbaar: sinds "Losse knoppen weg" staat er geen
        vaste balk meer op het scherm. Hij hangt klaar en komt pas als je Rahul

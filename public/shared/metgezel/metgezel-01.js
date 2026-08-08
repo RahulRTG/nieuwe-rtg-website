@@ -67,6 +67,15 @@
       'bottom:calc(env(safe-area-inset-bottom,0px) + .9rem);width:min(30rem,calc(100vw - 1.6rem));' +
       'display:flex;flex-direction:column;align-items:center;gap:.5rem;pointer-events:none;}' +
     '.mgz-blok > *{pointer-events:auto;}' +
+    /* [hidden] MOET HIER STAAN, en dat is niet vanzelfsprekend. Het attribuut
+       is in de browser niets anders dan display:none uit de standaardstijl, en
+       een klasseregel met display:flex wint daarvan. blok.hidden = true zette
+       dus wel het attribuut en veranderde niets: de balk bleef staan, bleef
+       kliks opvangen, en meetRuimte() rekende hem intussen op nul. Gevonden
+       doordat de browser het letterlijk meldde -- "<div hidden class=mgz-blok>
+       ... intercepts pointer events" -- op een knop die zichtbaar en aanwijsbaar
+       was en toch niets deed. */
+    '.mgz-blok[hidden]{display:none;}' +
     /* het tussenstuk dat de pagina onderaan ruimte geeft; zie meetRuimte() */
     '.mgz-ruimte{width:100%;flex-shrink:0;pointer-events:none;}' +
     '.mgz-blok.mgz-klein-blok{width:auto;}' +

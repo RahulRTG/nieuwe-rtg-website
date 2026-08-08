@@ -77,10 +77,28 @@
     for (var i = 0; i < weg.length; i++) weg[i].remove();
   }
 
+  /* .ey STOND HIER, EN DAT WAS EEN VERGISSING. De regel is "geen woordmerk in
+     de chrome van een app", en .ey/.eyebrow/.kicker zijn geen woordmerk maar
+     een typografisch middel: de bovenregel boven een titel. Zevenentachtig
+     app-pagina's gebruiken hem, en vijfenvijftig verschillende teksten lang is
+     er geen woordmerk bij -- wel dingen als "Alleen voor leden",
+     "Belastingdienst · inspecteur" en "Gemeente-medewerker". Precies de zin die
+     zegt wat een scherm is en voor wie.
+
+     Die verdwenen dus van elke pagina waar ze in de kopbalk stonden. Geen
+     foutmelding, geen kapotte pagina, alleen een zin minder. Drie schermtoetsen
+     zakten erop ("zegt niet waar het voor is", "noemt niet voor welke rol dit
+     loket is") en dat was de enige plek waar het opviel.
+
+     Dat het een vergissing was, staat er zelf al bij: MERK_PAGINA hieronder --
+     dezelfde vraag, buiten de balk -- noemt .ey niet. Buiten de kopbalk was een
+     bovenregel altijd al gewoon tekst.
+
+     Hij reist nu mee naar boven de grote titel (zie bovenregelVan in ios-02),
+     dus de balk blijft even kaal als hij was. */
   var MERK_CHROME = [
     '.os-merk', '.os-merk-logo', '.brand', '.merk', '.logo', '.logo-img',
     '.os-chip', '.osbar', '.os-kick',
-    '.ey', '.eyebrow', '.kicker',
     'img[src*="/icon"]', 'img[src*="logo"]', 'img[alt="RTG"]'
   ].join(',');
 

@@ -184,17 +184,27 @@ test('deelmenu: geen knop opent een leeg scherm, geen knop herhaalt zijn eigen n
     const page = await browser.newPage();
     const fouten = [];
     letOpFouten(page, fouten);
-    const bron = bundel.bundel('shared/deelmenu.js').toString();
-    let onderschept = 0;
-    await page.route('**/shared/deelmenu.js*', async (route) => {
-      onderschept++;
-      await route.fulfill({ status: 200, contentType: 'application/javascript', body: bron });
-    });
+    /* HIER STOND EEN ONDERSCHEPPING, en die kon niet meer aankomen.
+
+       Deze toets ving /shared/deelmenu.js op en serveerde in plaats daarvan de
+       som van de losse delen, zodat hij zeker de BRON mat en niet een bundel
+       die achterloopt. Sindsdien voegt de server uitgestelde scripts samen tot
+       een verzoek (server/middleware/scriptbundel.js), dus vraagt de pagina dat
+       pad helemaal niet meer op -- de onderschepping vuurde nooit, en de
+       controle erachter ("onderschept > 0") zakte.
+
+       De vervanging is geen versoepeling maar een verplaatsing. Dat de bundel
+       gelijk is aan zijn delen is nu een eis in de gewone suite
+       (test/bundeldelen.test.js, met een ijking die hem laat uitslaan bij een
+       byte verschil). Wat de server hier uitserveert IS dus de som van de
+       delen, en deze toets hoeft dat niet nog eens langs een andere weg te
+       bewijzen. Een tweede bewijs op de verkeerde plek is geen extra zekerheid;
+       het is een toets die stuk gaat om iets waar hij niet over gaat. */
+    bundel.controleer();
     await page.goto(base + '/apps/rtgid.html', { waitUntil: 'domcontentloaded' });
     await page.evaluate(t => { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_cookieinfo_v1', '1'); }, reg.token);
     await page.goto(base + '/apps/rtgid.html', { waitUntil: 'domcontentloaded' });
     await page.waitForSelector('.rtgdeel-balk button', { timeout: 8000 });
-    assert.ok(onderschept > 0, 'de losse delen zijn echt geserveerd (anders meet deze toets de bundel)');
 
     /* 1. rtgid.html zoals hij op de plank ligt: vier delen, vier knoppen. */
     const id = await page.evaluate(METER, null);

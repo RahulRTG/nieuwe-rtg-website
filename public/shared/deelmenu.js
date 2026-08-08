@@ -41,10 +41,26 @@
     return !el.hidden && (!el.style || el.style.display !== 'none');
   }
 
-  // wat nooit meetelt als inhoud: onze eigen balk, wat vast staat, de greep
+  /* Wat nooit meetelt als inhoud: onze eigen balk, wat vast staat, de greep --
+     en de GROTE TITEL VAN DE IOS-LAAG.
+
+     Die laatste kostte twee toetsen en was van buiten niet te zien. De iOS-laag
+     (shared/ios.js) verhuist de kop van een pagina naar binnen main, als eerste
+     kind, met klasse ios-groot: dat is de titel die bij het scrollen terugzakt
+     in de navigatiebalk. Chrome dus, geen inhoud -- maar gastheren() hieronder
+     telde hem gewoon mee. Een app als klankwerk.html heeft dan twee zichtbare
+     kinderen (de titel en het werkvlak) in plaats van een, de afdaling stopt op
+     main, en daar staan geen deelmarkeringen. Uitkomst: geen menu, geen balk,
+     en RTGDeel.delen() dat leeg blijft op een pagina met zeven delen.
+
+     Geen foutmelding, geen kapotte regel. De app werkte, hij was alleen zijn
+     inhoudsopgave kwijt -- op elke pagina waar de iOS-laag een titel neerzet
+     naast een enkel scherm. */
   function eigenLaag(el) {
     return el.classList && (el.classList.contains('rtgdeel-balk') ||
-      el.classList.contains('rtgdeel-vast') || el.classList.contains('rtg-greep'));
+      el.classList.contains('rtgdeel-vast') || el.classList.contains('rtg-greep') ||
+      el.classList.contains('ios-groot') ||
+      el.classList.contains('ios-boven') || el.classList.contains('ios-onder'));
   }
   /* De mogelijke gastheren van de delen, van buiten naar binnen. Veel apps
      zetten hun kaarten niet los in <main> maar in een opmaaklaag ernaast

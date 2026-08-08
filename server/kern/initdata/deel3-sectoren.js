@@ -112,4 +112,12 @@ module.exports = (ctx) => {
   if (!Array.isArray(db.data.bevAanvragen)) db.data.bevAanvragen = [];
   if (!Array.isArray(db.data.bevIncidenten)) db.data.bevIncidenten = [];
   if (!Array.isArray(db.data.bevRondes)) db.data.bevRondes = [];
+
+  /* Merk de zaken die dit deel zaait, ook als ze er al stonden: op een
+     database van voor het merkteken is anders niet meer te zien dat ze uit de
+     seed komen, en dan overleven ze de opruiming in ./index.js. */
+  for (const c of ['IBIZALIV', 'MAISON', 'MERCABIZA']) {
+    const z = db.data.suppliers.find(s => s.code === c);
+    if (z) z.geseed = true;
+  }
 };

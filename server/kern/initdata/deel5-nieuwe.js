@@ -32,5 +32,9 @@ module.exports = (ctx) => {
   };
   for (const [t, def] of Object.entries(NIEUWE_TYPES)) if (!db.data.supplierTypes[t]) db.data.supplierTypes[t] = def;
   const NIEUWE_PARTNERS = require('./deel5-partners');
-  for (const p of NIEUWE_PARTNERS) if (!db.data.suppliers.find(s => s.code === p.code)) { db.data.suppliers.push(p); ensureSupplierDefaults(p); }
+  for (const p of NIEUWE_PARTNERS) {
+    const bestaand = db.data.suppliers.find(s => s.code === p.code);
+    if (!bestaand) { p.geseed = true; db.data.suppliers.push(p); ensureSupplierDefaults(p); }
+    else bestaand.geseed = true;  // ook op een database van voor het merkteken
+  }
 };

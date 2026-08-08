@@ -120,4 +120,12 @@ module.exports = (ctx) => {
       ]
     });
   }
+
+  /* Merk de zaken die dit deel zaait, ook als ze er al stonden: op een
+     database van voor het merkteken is anders niet meer te zien dat ze uit de
+     seed komen, en dan overleven ze de opruiming in ./index.js. */
+  for (const c of ['SAKURA', 'AYAKA', 'KAITO', 'ESVEDRA']) {
+    const z = db.data.suppliers.find(s => s.code === c);
+    if (z) z.geseed = true;
+  }
 };

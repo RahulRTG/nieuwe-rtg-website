@@ -34,7 +34,9 @@ module.exports = (ctx) => {
   ];
   for (const p of HULP_KORPSEN) {
     const { hulpEenheden, defEenheden, defMaterieel, ...zaak } = p;
-    if (!db.data.suppliers.find(s => s.code === zaak.code)) { db.data.suppliers.push(zaak); ensureSupplierDefaults(zaak); }
+    const bestaand = db.data.suppliers.find(s => s.code === zaak.code);
+    if (!bestaand) { zaak.geseed = true; db.data.suppliers.push(zaak); ensureSupplierDefaults(zaak); }
+    else bestaand.geseed = true;  // ook op een database van voor het merkteken
     if (hulpEenheden) {
       if (!db.data.hulp) db.data.hulp = {};
       if (!db.data.hulp.eenheden) db.data.hulp.eenheden = {};

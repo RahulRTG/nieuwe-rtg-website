@@ -74,23 +74,10 @@ module.exports = (ctx) => {
   };
   ctx.salonProfielen();
 
-  /* Livegang-schoonmaak: in productie (zonder RTG_DEMO) horen de demozaken
-     niet in de catalogus, ook niet als de database ooit als demo begon. De
-     lijst dekt alle geseede partners; echte partners (via de aanvraag met
-     Business Pass) blijven onaangeroerd. */
-  if (!DEMO) {
-    const DEMO_ZAKEN = ['KIKUNOI', 'PONTO', 'HOSHI', 'SAKURA', 'MKKX', 'JETAG', 'IBIZAIR',
-      'AYAKA', 'KAITO', 'ESVEDRA', 'MACE', 'ISLAREN', 'IBIZALIV', 'MAISON', 'MERCABIZA',
-      'AZUL', 'AEGIS', 'CANFERRER', 'LUMINA',
-      'VORA', 'BRISA', 'FUEGO', 'LUNARA', 'MOTOISLA', 'FESTA', 'SERENA', 'ORODOR', 'LIENZO',
-      'GUARDIA', 'BOMBERS', 'URGENCIA', 'CANMISSES', 'CONSULTA', 'FALCO',
-      'FARMACIA', 'CARDIO', 'ESTETICA', 'GARNIZOEN', 'CASTELL',
-      'TALLER', 'BRILLA', 'VERDIA', 'LAVANDA', 'ESCOLA', 'FAUNA', 'DENTAL', 'LUZ', 'MUDANZA', 'DIGITAL',
-      'SOMBRA', 'IVORA', 'ISLATR', 'CUIDADO', 'RUTA', 'VAKISLA'];
-    const voor = db.data.suppliers.length;
-    db.data.suppliers = db.data.suppliers.filter(s => !DEMO_ZAKEN.includes(s.code));
-    // en de bijbehorende voorbeeldposts uit De Salon (de zes geseede verhalen)
-    db.data.posts = (db.data.posts || []).filter(p => !(typeof p.id === 'number' && p.id >= 1 && p.id <= 6));
-    if (db.data.suppliers.length !== voor) save();
-  }
+  /* De livegang-schoonmaak stond hier en is verhuisd naar ./index.js, naar NA
+     het laatste zaai-deel. Reden: precies dezelfde als die van salonProfielen
+     hierboven -- deel8, deel9 en deel10 zetten hun zaken pas na deel7 neer. Een
+     opruiming die in deel7 draait ziet die zaken dus nooit, en zeventien
+     demozaken bleven daardoor in een productiecatalogus staan terwijl de zes
+     oudste er wel uit gingen. Zie ./index.js voor de opruiming zelf. */
 };

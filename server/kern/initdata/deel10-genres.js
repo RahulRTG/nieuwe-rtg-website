@@ -39,6 +39,8 @@ module.exports = (ctx) => {
   for (const [t, def] of Object.entries(GENRE_TYPES)) if (!db.data.supplierTypes[t]) db.data.supplierTypes[t] = def;
 
   for (const p of require('./deel10-zaken')) {
-    if (!db.data.suppliers.find(s => s.code === p.code)) { db.data.suppliers.push(p); ensureSupplierDefaults(p); }
+    const bestaand = db.data.suppliers.find(s => s.code === p.code);
+    if (!bestaand) { p.geseed = true; db.data.suppliers.push(p); ensureSupplierDefaults(p); }
+    else bestaand.geseed = true;  // ook op een database van voor het merkteken
   }
 };

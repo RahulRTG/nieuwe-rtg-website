@@ -5,8 +5,11 @@ module.exports = (ctx) => {
   const { db, ensureSupplierDefaults } = ctx;
   if (!db.data.supplierTypes.bouw)
     db.data.supplierTypes.bouw = { label: 'Bouw & installatie', icon: 'werk', caps: ['services', 'location', 'pricing'] };
-  if (!db.data.suppliers.find(s => s.code === 'CASTELL')) {
+  const bestaandCastell = db.data.suppliers.find(s => s.code === 'CASTELL');
+  if (bestaandCastell) bestaandCastell.geseed = true;  // ook op een database van voor het merkteken
+  if (!bestaandCastell) {
     const p = {
+      geseed: true,
       code: 'CASTELL', name: 'Castell Bouw & Ambacht', type: 'bouw', city: 'Ibiza',
       vak: 'Timmerman, loodgieter & elektricien',
       loc: { lat: 38.917, lng: 1.41, label: 'Sant Rafel, Ibiza' }, rate: 0.1, menu: [], photos: [],

@@ -41,6 +41,24 @@ async function setStaffPin(id, pin) {
   return getStaffById(id);
 }
 function deactivateStaff(id) { S.zin('UPDATE supplier_staff SET active = 0 WHERE id = ?').run(id); mirror.markStaff(id); }
+/* Al het personeel van één zaak in één keer inactief zetten. Nodig wanneer een
+   zaak uit de catalogus verdwijnt: bleef het personeel staan, dan hield de kluis
+   namen en pincodes vast van een bedrijf dat niet meer bestaat -- en die mensen
+   konden nog inloggen op een PDA van een zaak die nergens meer te vinden was.
+
+   Deactiveren en niet verwijderen, en dat is geen halfheid maar de enige vorm
+   die overleeft: flushMirror in ./mirror kent wel deleteUser maar GEEN
+   deleteStaff, dus een DELETE hier zou lokaal slagen en bij de eerstvolgende
+   pullAlles() gewoon weer uit Postgres terugkomen ("Postgres wint"). Een rij op
+   active = 0 wordt wel netjes mee gespiegeld. Alles wat personeel opvraagt
+   (getStaffById, listStaff, countStaff, verifyStaffPin, staffPositions) filtert
+   op active = 1, dus de toegang is hiermee dicht. */
+function deactivateStaffVanZaak(code) {
+  const rijen = S.zin('SELECT id FROM supplier_staff WHERE supplier_code = ? AND active = 1')
+    .all(String(code || '').toUpperCase());
+  for (const r of rijen) deactivateStaff(r.id);
+  return rijen.length;
+}
 // Actief personeelsaccount van een lid binnen een bedrijf (voorkomt dubbel aanmelden).
 function staffByMember(supplierCode, memberId) {
   if (memberId == null) return null;
@@ -68,5 +86,6 @@ function makePin() { return String(crypto.randomInt(1000, 10000)); }
 
 module.exports = {
   createStaff, createStaffSync, getStaffById, listStaff, countStaff, verifyStaffPin,
-  setStaffPin, deactivateStaff, staffByMember, staffPositions, setStaffMember, publicStaff, makePin
+  setStaffPin, deactivateStaff, deactivateStaffVanZaak, staffByMember, staffPositions,
+  setStaffMember, publicStaff, makePin
 };

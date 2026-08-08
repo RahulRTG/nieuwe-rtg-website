@@ -106,7 +106,27 @@ test('van aanvraag tot betaling: een beachclub koopt linnen bij een wasserij', a
     const fac = await post(srv.base, '/supplier/handel/factureren', { id, bedrag: 240 }, was);
     assert.equal(fac.status, 200, JSON.stringify(fac.body));
     assert.equal(fac.body.handel.status, 'gefactureerd');
-    assert.ok(/^F-/.test(fac.body.handel.factuur.nummer), 'de factuur hoort een nummer te dragen');
+    assert.ok(fac.body.handel.factuur.nummer, 'de factuur hoort een nummer te dragen');
+
+    /* En dat nummer komt uit de CENTRALE facturatielaag, niet uit een eigen
+       reeks van deze keten. De bewering daarvoor is niet de vorm van het nummer
+       maar de vindbaarheid: de factuur hoort in het overzicht van BEIDE zaken te
+       staan, met de aanvraagreferentie eraan. Een keten met een eigen
+       nummerreeks zou hier slagen op een prefix en toch buiten de boekhouding
+       staan. */
+    const nummer = fac.body.handel.factuur.nummer;
+    const bijLev = await post(srv.base, '/supplier/facturen/mijn', {}, was);
+    const bijKop = await post(srv.base, '/supplier/facturen/mijn', {}, club);
+    const zoek = (lijst) => (lijst || []).find(f => f.nummer === nummer);
+
+    const verkocht = zoek(bijLev.body.verkocht);
+    assert.ok(verkocht, 'de handelsfactuur hoort bij de leverancier onder "verkocht" te staan');
+    assert.equal(verkocht.ref, aan.body.handel.ref,
+      'de factuur hoort de aanvraagreferentie te dragen, anders is hij niet terug te vinden bij de handel');
+    assert.ok(zoek(bijKop.body.gekocht),
+      'en bij de koper onder "gekocht" -- een factuur die maar een kant kent, is geen boekhouding');
+    assert.equal(zoek(bijLev.body.gekocht), undefined,
+      'de leverancier hoort zijn eigen factuur niet ook als inkoop te zien');
 
     const bet = await post(srv.base, '/supplier/handel/betalen', { id }, club);
     assert.equal(bet.status, 200, JSON.stringify(bet.body));

@@ -2,47 +2,37 @@
 
    WAAROM DIT BESTAAT
 
-   Zaak-naar-zaak werkte hier al, maar elk PAAR had zijn eigen uitvinding.
-   Geteld in de code stonden er veertien verschillende aanvraag- en
-   ordercollecties naast elkaar (bevAanvragen, groothandelOrders, vakOffertes,
-   samenwerkingen, winkelBestellingen ...), elk met een eigen vorm, eigen
-   statuswoorden en eigen endpoints. De groothandel had een volwaardige
-   inkoopstroom, maar alleen naar groothandels. De creator-laag koppelde
-   creators aan leveranciers, maar alleen die twee.
-
-   Dat is de N-kwadraat-val. 73 genres die onderling zaken doen zijn 5329 paren;
-   bij 130 genres 16.900. Zo komt het er nooit -- en het is precies de reden dat
-   een beachclub geen linnen bij een wasserij kon bestellen: niet omdat het
-   moeilijk is, maar omdat dat ene paar nog niet gebouwd was.
-
-   Eén keten maakt van N-kwadraat weer N. Een zaak hoeft alleen deze weg te
-   spreken en kan dan met ELK genre zaken doen:
+   Zaak-naar-zaak werkte hier al, maar elk PAAR had zijn eigen uitvinding:
+   veertien aanvraag- en ordercollecties naast elkaar (bevAanvragen,
+   groothandelOrders, vakOffertes, samenwerkingen ...), elk met een eigen vorm en
+   eigen statuswoorden. Dat is de N-kwadraat-val -- 73 genres zijn 5329 paren, bij
+   130 genres 16.900 -- en precies waarom een beachclub geen linnen bij een
+   wasserij kon bestellen: niet omdat het moeilijk is, maar omdat dat ene paar
+   niet gebouwd was. Een keten maakt daar weer N van:
 
      aanvraag -> offerte -> gunning -> planning -> levering (met bewijs)
               -> factuur -> betaling
 
-   HOE HET VINDEN WERKT, EN WAAROM DAT HIER GRATIS IS
+   HOE HET VINDEN WERKT
 
-   Een aanvraag wordt niet aan een BEDRIJF gericht maar aan een GENRE. "Ik zoek
-   een wasserij" bereikt elke wasserij op het net, ook een die zich gisteren
-   heeft aangemeld. Dat kan sinds het genre-register (seed/genres.js) bestaat:
-   het genre is een echte, gedeelde sleutel geworden in plaats van een woord dat
-   op zestien plekken los werd opgeschreven. Een aanvraag op een sector kan
-   later op dezelfde manier.
+   Een aanvraag gaat naar een GENRE en niet naar een bedrijf: "ik zoek een
+   wasserij" bereikt elke wasserij op het net, ook een die zich gisteren heeft
+   aangemeld. Dat kan sinds het genre-register (seed/genres.js) van het genre
+   een echte gedeelde sleutel maakte in plaats van een woord dat op zestien
+   plekken los werd opgeschreven.
 
    WAT DIT (NOG) NIET DOET
 
-   De factuur blijft in deze keten staan en gaat nog niet de centrale
-   facturatielaag (kern/facturatie.js) in, en er wordt geen geld verplaatst:
-   "betaald" is hier een administratieve vaststelling door de koper. Dat is
-   bewust de eerste snede -- de keten eerst kloppend, daarna de koppeling naar
-   het grootboek. Zie PLATFORM.md; het staat als open punt in TAKEN.md. */
+   De veertien oude aanvraagcollecties draaien er nog naast; die migreren is een
+   eigen stap per stuk (zie TAKEN.md). En "betaald" is een vaststelling door de
+   koper: de factuur staat in het grootboek, maar er wordt hier geen geld
+   verplaatst. Zie PLATFORM.md. */
 
 'use strict';
 
 const { STAPPEN, EENHEDEN, magStap, publiek, overzicht } = require('./handelsketen/regels');
 
-function maakHandelsketen({ db, save, crypto, findSupplier, notifySupplier, sseToSupplier, schoon }) {
+function maakHandelsketen({ db, save, crypto, findSupplier, notifySupplier, sseToSupplier, schoon, facturatie }) {
   const nu = () => new Date().toISOString();
   const scho = schoon || ((v, n) => String(v == null ? '' : v).trim().slice(0, n || 200));
   const getal = (v, max) => { const n = Number(v); return Number.isFinite(n) && n >= 0 ? Math.min(n, max) : 0; };
@@ -181,9 +171,25 @@ function maakHandelsketen({ db, save, crypto, findSupplier, notifySupplier, sseT
        is "gegund voor 240" een schatting geworden en niemand die het merkt. */
     const bedrag = getal(body.bedrag, 1000000);
     if (Math.abs(bedrag - h.gegundAan.prijs) > 0.005)
-      return { status: 409, error: 'Het gegunde bedrag is € ' + h.gegundAan.prijs.toFixed(2) +
+      return { status: 409, error: 'Het gegunde bedrag is \u20ac ' + h.gegundAan.prijs.toFixed(2) +
         '. Wijkt de factuur af, dan hoort daar een nieuwe afspraak bij.' };
-    h.factuur = { nummer: 'F-' + crypto.randomBytes(3).toString('hex').toUpperCase(), bedrag, at: nu() };
+
+    /* De factuur gaat de CENTRALE facturatielaag in en krijgt daar zijn nummer.
+       Eerst deed deze keten dat zelf, met een eigen reeks -- en dan bestaan er
+       twee soorten facturen in huis die geen van beide de andere kennen
+       (LAT-regel 4). Nu staat een handelsfactuur gewoon in het factuuroverzicht
+       van beide zaken, met de aanvraagreferentie eraan. */
+    const geboekt = facturatie && typeof facturatie.boek === 'function'
+      ? facturatie.boek({
+        soort: 'dienst', verkoperCode: s.code, verkoperNaam: s.name,
+        koper: { supplierCode: h.koper.code, naam: h.koper.naam },
+        totaal: bedrag, omschrijving: h.titel, ref: h.ref
+      })
+      : null;
+    if (geboekt && geboekt.error) return { status: 409, error: geboekt.error };
+    const f = geboekt && geboekt.factuur;
+    if (!f || !f.nummer) return { status: 500, error: 'De factuur kon niet worden geboekt.' };
+    h.factuur = { nummer: f.nummer, id: f.id || null, bedrag, at: nu() };
     h.status = 'gefactureerd';
     meld(h, h.koper.code, 'Factuur ontvangen', s.name + ': € ' + bedrag.toFixed(2) + ' (' + h.factuur.nummer + ')');
     save();

@@ -76,6 +76,13 @@ test.test('RTG Handel in de browser: de beachclub zet een aanvraag uit en de was
     // zichtbaar. Wachten tot de lijst gevuld IS, is de bewering die we bedoelen.
     await clubPagina.waitForFunction(() => document.querySelectorAll('#hGenre option').length > 0,
       null, { timeout: 12000 });
+    /* De keuzelijst staat per SECTOR gegroepeerd; dat is de eerste plek waar de
+       sectorlaag uit het genre-register echt werk doet. Zonder kopjes zijn het
+       72 losse regels en is kiezen geen kiezen. */
+    const kopjes = await clubPagina.locator('#hGenre optgroup').count();
+    assert.ok(kopjes > 5, 'de soorten bedrijf horen per sector gegroepeerd te staan (kreeg ' + kopjes + ' kopjes)');
+    assert.equal(await clubPagina.locator('#hGenre optgroup[label="Bouw & vakwerk"] option[value="wasserij"]').count(), 1,
+      'een wasserij hoort onder haar eigen sector te staan');
     await clubPagina.selectOption('#hGenre', 'wasserij');
     await clubPagina.fill('#hTitel', 'Linnen voor het weekend');
     await clubPagina.fill('#hWat', 'servetten');

@@ -809,10 +809,6 @@ const creator = require('./kern/creator').maakCreator({ db, save, crypto, anthro
 // De samenwerkingslaag (kern/samenwerking.js): EGn knop tussen creators en
 // leveranciers, plus oproepen voor content creators.
 const samenwerking = require('./kern/samenwerking').maakSamenwerking({ db, save, crypto, findSupplier, notifySupplier, sseToSupplier, schoon });
-// De handelsketen (kern/handelsketen.js): een weg waarlangs ELKE zaak met elke
-// andere zaak zaken doet -- aanvraag, offerte, gunning, planning, levering,
-// factuur, betaling. Vervangt op termijn de veertien losse aanvraagcollecties.
-const handelsketen = require('./kern/handelsketen').maakHandelsketen({ db, save, crypto, findSupplier, notifySupplier, sseToSupplier, schoon });
 // De persoonlijke, interactieve AI-agenda (kern/agenda.js) voor leveranciers en
 // leden, in de boardroom, met een ballon-badge op de voorkant.
 const agenda = require('./kern/agenda').maakAgenda({ db, save, crypto, anthropic, schoon });
@@ -820,6 +816,12 @@ const agenda = require('./kern/agenda').maakAgenda({ db, save, crypto, anthropic
 // automatisch EGn tweezijdige factuur die beide partijen in de app zien, plus een
 // AI-factuurtool. Alle apps haken hierop in.
 const facturatie = require('./kern/facturatie').maakFacturatie({ db, save, crypto, findSupplier, keyVanCodenaam, notify, notifySupplier, sseToCustomer, sseToSupplier, factuur, anthropic, schoon, automatisering });
+// De handelsketen (kern/handelsketen.js): een weg waarlangs ELKE zaak met elke
+// andere zaak zaken doet -- aanvraag, offerte, gunning, planning, levering,
+// factuur, betaling. Vervangt op termijn de veertien losse aanvraagcollecties.
+// Staat NA de facturatielaag omdat de keten zijn factuur daar inhangt: een
+// tweede nummerreeks naast die van kern/facturatie.js zou twee waarheden geven.
+const handelsketen = require('./kern/handelsketen').maakHandelsketen({ db, save, crypto, findSupplier, notifySupplier, sseToSupplier, schoon, facturatie });
 // De marktplaats (kern/markt.js): één gedeelde motor voor de RTFoundation-app
 // (gezinnen kopen/verkopen) en voor leveranciers die er ook op willen verkopen.
 const markt = require('./kern/markt').maakMarkt({ db, save, crypto, anthropic, schoon, notify, notifySupplier, haversine, betaal });

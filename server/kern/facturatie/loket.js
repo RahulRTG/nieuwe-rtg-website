@@ -10,7 +10,12 @@ module.exports = (ctx) => {
     return {
       id: f.id, nummer: f.nummer, soort: f.soort, datum: f.datum, at: f.at,
       verkoper: f.verkoper.naam, verkoperCode: f.verkoper.code,
-      koper: f.koper.naam, koperCodenaam: f.koper.codenaam,
+      koper: f.koper.naam, koperCodenaam: f.koper.codenaam, koperCode: f.koper.supplierCode || null,
+      /* ref is de herkomst: de bon, de rit of -- sinds de handelsketen -- de
+         aanvraag waar deze factuur uit voortkomt. Hij werd wel opgeslagen maar
+         niet getoond, en dan is een factuur niet terug te leiden naar wat hem
+         veroorzaakte; bij zaak-aan-zaak is dat precies wat je moet kunnen. */
+      ref: f.ref || null,
       regels: f.regels, subtotaal: f.subtotaal, btwBedrag: f.btwBedrag, totaal: f.totaal, methode: f.methode
     };
   }

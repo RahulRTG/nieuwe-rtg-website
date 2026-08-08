@@ -52,7 +52,7 @@ laag werkt.
 |---|---|---|---|
 | 1 — Core | identiteit, organisaties, locaties, personen, rechten, documenten, geld, communicatie, workflow, audit | grotendeels: kluis met codenamen, SSO/SCIM, passkeys, betalen, grootboek, bestanden, auditlog | een expliciete organisatie-entiteit; een zaak is nu een rij in `suppliers` |
 | 2 — Enterprise engines | CRM, ERP, HR, finance, procurement, inventory, assets, projecten, planning, service, BI, AI | veel, verspreid: payroll, roosters, voorraad, agenda, facturatie, boardroom, AI | ze staan naast elkaar, niet als aanroepbare motoren onder de genres |
-| 3 — Industry engines | hospitality, horeca, retail, zorg, mobility, bouw, overheid … | **het aanknopingspunt**: elk genre draagt nu een `industry`, 73 genres in 26 sectoren (`server/seed/genres-lijst.js`) | de motoren zelf — er hangt nog geen gedeelde sectorlogica aan |
+| 3 — Industry engines | hospitality, horeca, retail, zorg, mobility, bouw, overheid … | **het aanknopingspunt**: elk genre draagt een `industry`, 73 genres in 26 sectoren; de sector doet zijn eerste echte werk in de handelsketen (de keuzelijst groepeert erop) | de motoren zelf — er hangt nog geen gedeelde sectorlogica aan |
 | 4 — Capabilities | `rooms`, `rides`, `menu`, `tickets` … | **ja, en dit werkt** | meer caps naarmate sectoren erbij komen |
 | 5 — PDA | één adaptieve Work PDA | **ja**, en de server bepaalt sinds kort welke modules een zaak krijgt (`server/kern/pda/modules.js`) | de PDA-delen zijn nog geen echte modules (één gesloten scope) |
 | 6 — Business Network | vinden, RFQ, offerte, contract, order, intercompany, levering, factuur, betaling | **de keten staat** (`server/kern/handelsketen.js`) en draait op één paar: beachclub → wasserij | de veertien oude collecties migreren; koppeling naar het grootboek |
@@ -127,9 +127,15 @@ ander paar zonder een regel extra.
 Bewaakt door `test/handelsketen.test.js` (7) en `test/handelscherm.e2e.js`, met
 het scherm op `/apps/handel.html`.
 
-**Wat er nog niet is:** de veertien oude collecties draaien er nog naast, en de
-factuur gaat nog niet de centrale facturatielaag in — "betaald" is nu een
-administratieve vaststelling door de koper, er wordt geen geld verplaatst.
+De factuur gaat de **centrale facturatielaag** in (`kern/facturatie.js`) en
+krijgt daar zijn nummer: een handelsfactuur staat gewoon bij de leverancier
+onder "verkocht" en bij de koper onder "gekocht", met de aanvraagreferentie
+eraan. Een eigen nummerreeks zou twee soorten facturen in huis geven die elkaar
+niet kennen.
+
+**Wat er nog niet is:** de veertien oude collecties draaien er nog naast, en
+"betaald" is een vaststelling door de koper — de factuur staat in het grootboek,
+maar er wordt geen geld verplaatst.
 
 ### Breuklijn 3 — de PDA schaalde niet ✅ *half gedicht*
 
@@ -183,8 +189,11 @@ hieronder vraagt om het herschrijven van wat er staat.
 5. **De bestaande veertien collecties migreren**, één per keer, elk met de
    toetsen die de oude vorm bewezen (LAT-regel 2: de oude toets moet op de
    nieuwe vorm zakken voordat de migratie klaar is). En de factuur aan
-   `kern/facturatie.js` en het grootboek hangen, zodat "betaald" geld is en
-   geen vinkje. **Dit is nu het grootste openstaande stuk.**
+   ~~de factuur aan `kern/facturatie.js` hangen~~ ✅ *gedaan* — de handelsfactuur
+   krijgt haar nummer uit de centrale laag en staat bij beide zaken in de
+   boekhouding. Wat rest: de veertien migreren, en van "betaald" een echte
+   betaling maken in plaats van een vaststelling. **Dit is nu het grootste
+   openstaande stuk.**
 6. **Sectormotoren**, in volgorde van wat er al ligt: horeca en hospitality
    eerst (daar staat het meeste), daarna vakwerk/field service, daarna retail.
    Pas hier wordt "een hotel voelt als hotelsoftware" echt waar; het

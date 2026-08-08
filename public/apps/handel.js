@@ -1,21 +1,17 @@
 /* RTG Handel: het scherm van de handelsketen (server/kern/handelsketen.js).
 
-   Eén pagina voor BEIDE kanten, en dat is geen bezuiniging maar het punt: een
-   beachclub die linnen inkoopt is dezelfde week de leverancier van een
-   cateraar. Wie koper en leverancier twee schermen geeft, dwingt elke zaak zich
-   in een rol te wurmen die zij niet heeft.
+   Eén pagina voor BEIDE kanten, en dat is het punt: wie maandag linnen inkoopt,
+   is donderdag de leverancier van een cateraar.
 
    Welke knoppen een zaak ziet, verzint dit bestand niet. De server stuurt per
-   handel een `mag`-lijst mee met de stappen die DEZE zaak nu mag zetten; hier
-   worden alleen die knoppen getekend. Zou het scherm de toestand zelf
-   naspelen, dan weten twee plekken de levensloop en lopen ze uiteen -- dezelfde
-   fout die de PDA had met de caps (LAT-regel 4). */
+   handel een `mag`-lijst mee; hier worden alleen die knoppen getekend. Zou het
+   scherm de levensloop naspelen, dan weten twee plekken hem en lopen ze uiteen
+   (LAT-regel 4). */
 (function () {
   'use strict';
   var TOKEN = null;
   try { TOKEN = localStorage.getItem('rtg_sup_token'); } catch (e) {}
 
-  var regels = [];      // de regels van de aanvraag in aanbouw
   var data = null;
 
   function esc(t) {
@@ -134,26 +130,25 @@
     if (leeg) leeg.style.display = lijst.length ? 'none' : '';
   }
 
-  function tekenRegels() {
-    var el = document.getElementById('hRegels');
-    el.innerHTML = regels.length
-      ? regels.map(function (r, i) {
-        return '<div class="item"><span>' + regelTekst(r) + '</span>' +
-          '<button class="knop" type="button" data-weg="' + i + '">Weg</button></div>';
-      }).join('')
-      : '<p class="stil">Nog geen regels.</p>';
-    Array.prototype.forEach.call(el.querySelectorAll('[data-weg]'), function (b) {
-      b.addEventListener('click', function () { regels.splice(Number(b.dataset.weg), 1); tekenRegels(); });
-    });
-  }
-
   function teken() {
     if (!data) return;
     var g = document.getElementById('hGenre');
-    if (g && !g.options.length)
-      g.innerHTML = data.genres.map(function (x) {
-        return '<option value="' + esc(x.id) + '">' + esc(x.label) + '</option>';
+    if (g && !g.options.length) {
+      // per sector een kopje: 72 losse regels is geen keuze, 26 kopjes wel
+      var perSector = {};
+      data.genres.forEach(function (x) {
+        var k = x.industry || 'overig';
+        (perSector[k] = perSector[k] || []).push(x);
+      });
+      g.innerHTML = Object.keys(perSector).sort(function (a, b) {
+        return String((data.sectoren || {})[a] || a).localeCompare(String((data.sectoren || {})[b] || b));
+      }).map(function (k) {
+        return '<optgroup label="' + esc((data.sectoren || {})[k] || k) + '">' +
+          perSector[k].map(function (x) {
+            return '<option value="' + esc(x.id) + '">' + esc(x.label) + '</option>';
+          }).join('') + '</optgroup>';
       }).join('');
+    }
     var e = document.getElementById('hEenheid');
     if (e && !e.options.length)
       e.innerHTML = data.eenheden.map(function (x) { return '<option>' + esc(x) + '</option>'; }).join('');
@@ -193,31 +188,14 @@
 
   function start() {
     if (!poort()) return;
-    document.getElementById('hRegel').addEventListener('click', function () {
-      var wat = document.getElementById('hWat'), aantal = document.getElementById('hAantal'),
-        eenheid = document.getElementById('hEenheid');
-      if (!wat.value.trim() || !(Number(aantal.value) > 0)) { meld('Vul in wat u nodig heeft, en hoeveel.'); return; }
-      regels.push({ wat: wat.value.trim(), aantal: Number(aantal.value), eenheid: eenheid.value });
-      wat.value = ''; aantal.value = '';
-      tekenRegels();
-    });
-    document.getElementById('hZet').addEventListener('click', function () {
-      api('/aanvraag', {
-        genre: document.getElementById('hGenre').value,
-        titel: document.getElementById('hTitel').value,
-        regels: regels,
-        ophalen: document.getElementById('hOphalen').value,
-        retour: document.getElementById('hRetour').value
-      }).then(function () {
-        meld('Aanvraag uitgezet.');
-        regels = []; tekenRegels();
-        document.getElementById('hTitel').value = '';
-        laden();
-      }).catch(function (err) { meld(err.message); });
-    });
-    tekenRegels();
     laden();
+    // het aanvraagformulier draait in handel-aanvraag.js op deze zelfde schil
+    if (window.RTGHandel.formulier) window.RTGHandel.formulier();
   }
+
+  /* De schil die het deelscript gebruikt. Eén api, één meldbalk, één laadronde:
+     twee kopieen van dezelfde fetch-wrapper lopen gegarandeerd uiteen. */
+  window.RTGHandel = { api: api, meld: meld, esc: esc, laden: laden, regelTekst: regelTekst };
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', start);
   else start();

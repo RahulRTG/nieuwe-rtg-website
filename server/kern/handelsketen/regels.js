@@ -9,6 +9,8 @@
 /* De toestanden, en wie er vanaf mag. De sleutel is de toestand waarin de
    handel STAAT, de waarde zegt wie de volgende stap zet. Een tabel en geen reeks
    losse ifs, want dan is de hele levensloop op een plek te lezen. */
+const { SECTOREN } = require('../../seed/genres');
+
 const STAPPEN = {
   aanvraag:      { offreren: 'leverancier', gunnen: 'koper', intrekken: 'koper' },
   gegund:        { plannen: 'leverancier', leveren: 'leverancier' },
@@ -77,9 +79,14 @@ function overzicht(alles, types, s) {
     alsLeverancier: alles.filter(h => h.gegundAan && h.gegundAan.code === s.code).map(h => publiek(h, s)).reverse(),
     open: alles.filter(h => h.status === 'aanvraag' && h.genre === s.type && h.koper.code !== s.code)
       .map(h => publiek(h, s)).reverse(),
+    /* De genres gaan met hun SECTOR mee, en de sectornamen erbij. Het scherm
+       groepeert daarop, en dat is de eerste plek waar de sectorlaag echt werk
+       doet in plaats van alleen te bestaan: 72 losse regels in een keuzelijst
+       is geen keuze, 26 kopjes wel. */
     genres: Object.entries(types).filter(([id]) => id !== s.type)
       .map(([id, t]) => ({ id, label: t.label, industry: t.industry || null }))
       .sort((a, b) => String(a.label).localeCompare(String(b.label))),
+    sectoren: SECTOREN,
     eenheden: EENHEDEN
   };
 }

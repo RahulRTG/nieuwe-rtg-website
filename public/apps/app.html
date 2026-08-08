@@ -1349,6 +1349,13 @@
     text-align:center;font-family:'Inter',sans-serif;font-weight:600;
     font-size:0.85rem;letter-spacing:0.08em;margin-bottom:0.9rem;color:var(--txt);
   }
+  /* Het vel waarop de secties liggen is een STAPEL en geen raster. Het raster
+     zit op de rij (.os-map-grid), en openMap hangt zulke rijen in dit vel.
+     Stond het raster ook hier, dan viel elke rij in een van de drie kolommen
+     van het vel -- 87px van de 282px -- en moesten daar nog eens drie tegels
+     van 62px in. Dat was precies de meldingsfoto: tegels over elkaar heen,
+     labels afgekapt tot "MU..." en tweederde van het paneel leeg. */
+  .os-mapvel{display:flex;flex-direction:column;gap:calc(var(--e) * 1.2);}
   .os-map-grid{grid-template-columns:repeat(3,1fr);margin-top:0;}
   /* de map-tegel op het springboard: 3x3 voorproefje van de inhoud */
   .os-app .os-tegel.os-map-tegel{
@@ -1834,7 +1841,7 @@
     <div class="os-scrim" id="osMapScrim">
       <div class="os-map-paneel" role="dialog" aria-modal="true" aria-labelledby="osMapTitel">
         <h3 id="osMapTitel"></h3>
-        <div class="os-grid os-map-grid" id="osMapGrid"></div>
+        <div class="os-mapvel" id="osMapGrid"></div>
       </div>
     </div>
 

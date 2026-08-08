@@ -444,3 +444,114 @@ test('geen enkele map loopt leeg op de instappas',
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
 });
+
+test('een geopende map legt zijn tegels naast elkaar en niet over elkaar',
+  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  /* DIT IS NIET AAN DE BRON TE ZIEN EN OOK NIET AAN EEN GROENE MAPTOETS.
+
+     De toets hierboven telt of een map genoeg apps heeft. Die stond groen
+     terwijl elke map er kapot uitzag: de tegels lagen over elkaar heen, tegen
+     de linkerrand geplakt, met labels afgekapt tot "MU..." en "FIL..." en
+     tweederde van het paneel leeg. Tellen is geen kijken.
+
+     De oorzaak zat in twee rasters op elkaar. #osMapGrid droeg zelf al
+     `os-grid os-map-grid` (drie kolommen), en openMap hangt daar RIJEN in die
+     ook `os-grid os-map-grid` heten. Elke rij viel dus in één kolom van het
+     vel -- 87px van de 282px die het paneel binnen zijn rand heeft -- en
+     daarbinnen moesten opnieuw drie tegels van 62px passen. Het vel is nu een
+     stapel (.os-mapvel) en het raster zit alleen nog op de rij.
+
+     Waarom het zo gemeten wordt en niet op een klassenaam: een toets die
+     `.os-mapvel` afleest, bewijst dat er een naam staat en niet dat er iets
+     naast elkaar ligt. De volgende overlap komt van een andere kant -- een
+     tegel die breder wordt, een paneel dat smaller wordt, een gap die groeit --
+     en dan moet deze toets alsnog zakken. Daarom meet hij de rechthoeken zelf.
+
+     De mutatie die hem hoort te laten zakken: zet in apps/app.html de klasse
+     van #osMapGrid terug op "os-grid os-map-grid". */
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-mapvorm-'));
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  let browser;
+  try {
+    const tok = await lidToken(base, 'mapvorm' + process.pid + '@x.nl');
+    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    const ctx = await browser.newContext({ viewport: { width: 393, height: 852 } });
+    await ctx.addInitScript((t) => {
+      try {
+        localStorage.setItem('rtg_member_token', t);
+        localStorage.setItem('rtg_lang', 'nl');
+        localStorage.setItem('rtg_cookieinfo_v1', '1');
+      } catch (e) {}
+    }, tok);
+    const page = await ctx.newPage();
+    await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
+    await page.waitForSelector('#osMappen .os-app', { timeout: 15000 });
+    await page.evaluate(() => { const g = document.getElementById('onbGate'); if (g) g.hidden = true; });
+    await page.waitForTimeout(400);
+
+    const mappen = await page.evaluate(async () => {
+      const wacht = (ms) => new Promise((k) => setTimeout(k, ms));
+      const uit = [];
+      for (const map of [...document.querySelectorAll('#osMappen .os-app')]) {
+        const naam = (map.getAttribute('aria-label') || '').replace(/^Map /, '').trim();
+        map.click();
+        await wacht(320);
+        const grid = document.getElementById('osMapGrid');
+        const paneel = grid.closest('.os-map-paneel');
+        const apps = [...document.querySelectorAll('#osMapGrid .os-app')];
+        if (apps.length) {
+          const pr = paneel.getBoundingClientRect();
+          const ps = getComputedStyle(paneel);
+          const binnen = pr.width - parseFloat(ps.paddingLeft) - parseFloat(ps.paddingRight);
+          const doosjes = apps.map((a) => a.querySelector('.os-tegel').getBoundingClientRect());
+          const overlap = [];
+          for (let i = 0; i < doosjes.length; i++) {
+            for (let j = i + 1; j < doosjes.length; j++) {
+              const a = doosjes[i], b = doosjes[j];
+              // een halve pixel speling: afronding is geen overlap
+              if (a.left < b.right - 0.5 && b.left < a.right - 0.5 &&
+                  a.top < b.bottom - 0.5 && b.top < a.bottom - 0.5) overlap.push(i + '/' + j);
+            }
+          }
+          const links = Math.min(...doosjes.map((r) => r.left));
+          const rechts = Math.max(...doosjes.map((r) => r.right));
+          uit.push({
+            naam: naam, aantal: apps.length, overlap: overlap.length,
+            // buiten de rand van het paneel getekend?
+            buiten: doosjes.filter((r) => r.left < pr.left - 0.5 || r.right > pr.right + 0.5).length,
+            benutPct: Math.round(((rechts - links) / binnen) * 100),
+          });
+        }
+        const scrim = document.getElementById('osMapScrim');
+        if (scrim) scrim.classList.remove('open');
+        await wacht(120);
+      }
+      return uit;
+    });
+
+    assert.ok(mappen.length >= 7, 'er zijn minder dan zeven mappen gemeten: ' + mappen.length);
+
+    const stapelend = mappen.filter((m) => m.overlap > 0);
+    assert.deepEqual(stapelend.map((m) => m.naam + ' (' + m.overlap + ' paren)'), [],
+      'in deze mappen liggen tegels over elkaar heen:\n' +
+      mappen.map((m) => '  ' + m.naam + ': ' + m.aantal + ' tegels, ' + m.overlap +
+        ' overlappende paren, ' + m.benutPct + '% van de breedte benut').join('\n'));
+
+    const overrand = mappen.filter((m) => m.buiten > 0);
+    assert.deepEqual(overrand.map((m) => m.naam + ' (' + m.buiten + ')'), [],
+      'deze mappen tekenen tegels buiten hun eigen paneel');
+
+    /* En de tegels staan niet met z'n allen tegen één rand. Drie kolommen op
+       drie tegels vullen ~86% van de binnenmaat; bij de kapotte versie was dat
+       40%. Vijftig is de grens: ruim onder de gezonde stand, ruim boven de
+       kapotte, zodat een gap die iets verandert hem niet meteen rood maakt. */
+    const smal = mappen.filter((m) => m.aantal >= 3 && m.benutPct < 50);
+    assert.deepEqual(smal.map((m) => m.naam + ' (' + m.benutPct + '%)'), [],
+      'deze mappen persen hun tegels in een strook aan één kant:\n' +
+      mappen.map((m) => '  ' + m.naam + ': ' + m.benutPct + '%').join('\n'));
+  } finally {
+    if (browser) await browser.close();
+    stop(child);
+    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+  }
+});

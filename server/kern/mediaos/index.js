@@ -35,6 +35,7 @@ const { maakCatalogus } = require('./catalogus');
 const { maakSmaak } = require('./smaak');
 const { maakHub } = require('./hub');
 const { maakWekken } = require('./wekken');
+const { legeStand } = require('./leeg');
 
 const MODI = {
   muziek: { naam: 'Muziek', vormen: ['track'] },
@@ -119,8 +120,13 @@ function maakMediaOS({ db, save, schoon, codenaamVan, keyVanCodenaam, notify, br
       .map(r => Object.assign({}, r, { bewaard: bewaard.has(r.id) }));
 
     const meer = geordend.rijen.length - rijen.length;
+    /* Een leeg raster ziet eruit als een kapotte app en zegt niet waarom. Bij
+       niets te tonen komt er daarom een stand mee die WEL iets zegt: wat hier
+       komt, waarom het er nu niet is, en welke stap dat opheft (./leeg.js). */
+    const leeg = rijen.length ? null : legeStand(modusNaam, alles.buiten, geordend.weggelaten, modus.vormen);
     return {
       status: 200, modus: modusNaam, modusNaam: modus.naam,
+      leeg,
       modi: Object.keys(MODI).map(k => ({ id: k, naam: MODI[k].naam })),
       stukken: rijen,
       totaal: geordend.rijen.length,
@@ -130,7 +136,11 @@ function maakMediaOS({ db, save, schoon, codenaamVan, keyVanCodenaam, notify, br
       uitleg: 'Op volgorde van: wie u volgt, wat u zelf hebt aangewezen, en daarna wat er het laatst bij kwam. ' +
         'Er is geen hitlijst en geen volgorde op kijkcijfers; bij elk stuk staat waarom het er staat.',
       weggelaten: geordend.weggelaten,
-      buiten: alles.buiten,
+      /* Alleen de bronnen die in DEZE stand horen. Onder FLOW stond anders een
+         kaart "Live staat buiten uw wereld" -- waar in die stand helemaal geen
+         live in zit. Zelfde filter als in ./leeg.js, en om dezelfde reden: een
+         scherm hoort geen deur te noemen die er niet toe doet. */
+      buiten: (alles.buiten || []).filter(b => modus.vormen.includes(b.vorm)),
       smaak: s, regelaars: smaak.smaakRegelaars(),
       volgt: [...volgt].filter(Boolean)
     };

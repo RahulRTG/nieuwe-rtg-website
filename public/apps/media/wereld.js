@@ -140,8 +140,25 @@
     tekenStanden(d);
     $('#uitleg').textContent = d.uitleg;
     var doos = $('#stukken'); doos.textContent = '';
-    if (!d.stukken.length) {
-      doos.appendChild(el('p', 'stil', 'Hier staat nog niets. Wat er komt, komt van makers die u volgt of van wat er nieuw bij komt.'));
+    /* Een lege stand is geen leeg raster: de server zegt wat hier komt, waarom
+       het er nu niet is, en welke stap dat opheft. Die tekst staat daar en niet
+       hier, want de reden hangt van de gegevens af (zie kern/mediaos/leeg.js). */
+    if (d.leeg) {
+      var kader = el('div', 'kader');
+      kader.style.gridColumn = '1 / -1';   // over de hele breedte, het is geen kaart tussen kaarten
+      kader.appendChild(el('b', null, d.leeg.titel));
+      kader.appendChild(el('p', 'stil', d.leeg.wat));
+      kader.appendChild(el('p', 'stil', d.leeg.waarom));
+      var rij = el('div', 'rij');
+      rij.style.display = 'flex'; rij.style.gap = '0.35rem'; rij.style.flexWrap = 'wrap'; rij.style.marginTop = '0.7rem';
+      (d.leeg.stappen || []).forEach(function (st) {
+        var a = document.createElement('a');
+        a.className = 'knop'; a.href = st.pad; a.textContent = st.tekst;
+        a.style.textDecoration = 'none'; a.style.display = 'inline-block';
+        rij.appendChild(a);
+      });
+      kader.appendChild(rij);
+      doos.appendChild(kader);
     }
     d.stukken.forEach(function (s) { doos.appendChild(kaart(s)); });
     $('#einde').textContent = d.einde;

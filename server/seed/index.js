@@ -7,9 +7,9 @@
    echte leden via hun eigen account. De demo-inhoud blijft volledig
    beschikbaar voor lokaal en demogebruik.
 
-   De volledige startset is opgesplitst in drie datamodules: ./leden (Salon,
-   facturen, reis), ./partners (partnerkanaal + grootboeken) en ./leveranciers
-   (typen + voorbeeldzaken). */
+   De volledige startset is opgesplitst in vier datamodules: ./leden (Salon,
+   facturen, reis), ./partners (partnerkanaal + grootboeken), ./leveranciers
+   (typen + voorbeeldzaken) en ./media (uitgegeven muziek uit het Klankwerk). */
 
 module.exports = function seed() {
   const demo = process.env.NODE_ENV !== 'production' || process.env.RTG_DEMO === '1';
@@ -21,7 +21,11 @@ module.exports = function seed() {
     partners: [],       // geen demo-partnerkanalen (influencer/bedrijf)
     partnerTrips: [],   // geen fictieve reizen op boeken.html
     invoices: [],
-    contacts: []
+    contacts: [],
+    /* Ook de geseede muziek is demo-inhoud: in productie begint de zaal leeg
+       en vult hij zich met wat leden zelf uitgeven. De Media OS zegt in die
+       stand zelf wat er komt en hoe (kern/mediaos/index.js). */
+    muziekUitgaven: { lijst: [], reacties: {} }
   });
 };
 
@@ -30,6 +34,7 @@ function maakVolledigeSeed() {
     {},
     require('./leden'),
     require('./partners'),
-    require('./leveranciers')
+    require('./leveranciers'),
+    require('./media')
   );
 }

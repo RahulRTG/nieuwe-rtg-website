@@ -75,7 +75,7 @@
           const magHier = vastePas ? (vastePas === 'rtg' ? ['rtg', 'guest'] : [vastePas]) : [];
           if (!magHier.includes(user.tier) && ['rtg', 'lifestyle', 'business'].includes(doelPas)){
             try { localStorage.setItem('rtg_member_token', API.token); } catch (e2) {}
-            location.replace(location.pathname + '?pas=' + doelPas);
+            location.replace(pasAdres(doelPas));
             return;
           }
         } catch (e) { toast(e.message || 'Onjuiste inloggegevens.'); return; }

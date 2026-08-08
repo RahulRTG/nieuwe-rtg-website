@@ -12,7 +12,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = 'f9231c8c';
+var RTG_BOUW = '34b4e892';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -241,6 +241,27 @@ var RTG_BOUW = 'f9231c8c';
   if (!['rtg','lifestyle','business'].includes(vastePas)) vastePas = null;
   // vangnet voor oude e-maillinks zonder pas: die landen in de RTG-app
   if (!vastePas && (zoekParams.get('verify') || zoekParams.get('reset'))) vastePas = 'rtg';
+
+  /* HET DOORSTUREN NAAR DE JUISTE PAS-APP MAG DE REST VAN HET ADRES NIET OPETEN.
+
+     Hieronder sturen twee plekken door naar de eigen app van de pas, en allebei
+     bouwden ze het nieuwe adres op als pathname + '?pas=' + doelPas. Daarmee
+     ging ELKE andere parameter verloren -- en juist daar komen onze e-maillinks
+     binnen. De pin-herstellink (/apps/app.html?pinherstel=SLEUTEL) heeft geen
+     ?pas=, dus restoreSession stuurde meteen door naar ?pas=<tier> en de sleutel
+     was weg voordat /shared/pinherstel.js hem kon opvangen. Resultaat: de link
+     uit de mail deed niets, en er was geen weg terug naar je pin.
+
+     Hetzelfde gold stil voor ?verify= en ?reset= van een lid dat GEEN RTG-pas
+     heeft: het vangnet hierboven zet die op 'rtg', waarna de omleiding naar de
+     eigen pas-app hun token alsnog weggooide.
+
+     Dus: we nemen het hele adres mee en wisselen alleen de pas om. */
+  const pasAdres = (doelPas) => {
+    const p = new URLSearchParams(location.search);
+    p.set('pas', doelPas);
+    return location.pathname + '?' + p.toString();
+  };
   if (vastePas){
     const ml = document.getElementById('manifestLink');
     if (ml) ml.href = '/manifests/pas-' + vastePas + '.webmanifest';
@@ -383,7 +404,7 @@ var RTG_BOUW = 'f9231c8c';
           const magHier = vastePas ? (vastePas === 'rtg' ? ['rtg', 'guest'] : [vastePas]) : [];
           if (!magHier.includes(user.tier) && ['rtg', 'lifestyle', 'business'].includes(doelPas)){
             try { localStorage.setItem('rtg_member_token', API.token); } catch (e2) {}
-            location.replace(location.pathname + '?pas=' + doelPas);
+            location.replace(pasAdres(doelPas));
             return;
           }
         } catch (e) { toast(e.message || 'Onjuiste inloggegevens.'); return; }
@@ -428,7 +449,7 @@ var RTG_BOUW = 'f9231c8c';
       const doelPas = user.tier === 'guest' ? 'rtg' : user.tier;
       const magHier = vastePas ? (vastePas === 'rtg' ? ['rtg','guest'] : [vastePas]) : [];
       if (!magHier.includes(user.tier)){
-        if (['rtg','lifestyle','business'].includes(doelPas)){ location.replace(location.pathname + '?pas=' + doelPas); return; }
+        if (['rtg','lifestyle','business'].includes(doelPas)){ location.replace(pasAdres(doelPas)); return; }
         API.token = null; return; // onbekende pas: poort tonen
       }
       $('#gate').style.display = 'none';

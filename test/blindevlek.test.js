@@ -121,6 +121,63 @@ test('BLINDE VLEK: elk inline script op een pagina is geldige JS', () => {
   assert.deepEqual(stuk, [], 'pagina met een script dat niet draait:\n  ' + stuk.join('\n  '));
 });
 
+/* ---------------- 1b. een verwijzend script dat zijn buurman opeet ----------------
+   Toets 1 kijkt met opzet alleen naar INLINE scripts: zijn expressie slaat via
+   `(?![^>]*\bsrc=)` elk script met een src over. Precies daar zat de vlek.
+
+   De regel van de HTML-lezer: de inhoud van een script is RUWE TEKST tot het
+   eerste sluitteken. Vergeet je dat sluitteken bij een <script src=...>, dan
+   wordt alles wat erachter staat de TEKST van dat element -- inclusief de
+   scripttags die erop volgen. En omdat het element een src heeft, gooit de
+   browser die tekst weg: die scripts bestaan niet als element, worden nooit
+   opgehaald en draaien nooit. Geen foutmelding, geen 404, niets in de console.
+
+   Zo werd in public/apps/app.html /shared/pinherstel.js opgeslokt door een
+   ios.js-tag zonder sluitteken. Niet cosmetisch: window.RTGPinHerstel bestond
+   daardoor niet, dus de knop "Pin vergeten?" verscheen nooit en de herstellink
+   uit de mail (?pinherstel=...) deed niets. Beide aanroepen in app-main.js
+   staan achter `if (window.RTGPinHerstel)` en zwegen dus keurig -- de vangnetten
+   maakten de fout onzichtbaar in plaats van luid.
+
+   Toets 2 zag het evenmin: die zoekt src="..." in de TEKST, en het bestand
+   /shared/pinherstel.js bestaat wel degelijk. Alleen niet als element.
+
+   Wat we hier toetsen is de regel van de lezer zelf: een script met een src
+   heeft geen inhoud. Staat er toch iets in, dan is er iets opgeslokt. */
+function scriptElementen(html) {
+  const uit = [];
+  const laag = html.toLowerCase();
+  const open = /<script\b[^>]*>/gi;
+  let m;
+  while ((m = open.exec(html))) {
+    const tag = m[0];
+    const start = m.index + tag.length;
+    const eind = laag.indexOf('</scr' + 'ipt>', start);
+    uit.push({
+      regel: html.slice(0, m.index).split('\n').length,
+      src: (/\bsrc\s*=\s*"([^"]*)"/i.exec(tag) || [])[1] || null,
+      inhoud: eind < 0 ? html.slice(start) : html.slice(start, eind),
+      gesloten: eind >= 0
+    });
+    if (eind < 0) break;
+    open.lastIndex = eind + 9;   // '</script>'.length
+  }
+  return uit;
+}
+
+test('BLINDE VLEK: een script met een src heeft geen inhoud, en sluit', () => {
+  const stuk = [];
+  for (const f of paginas) {
+    for (const s of scriptElementen(fs.readFileSync(f, 'utf8'))) {
+      if (!s.gesloten) { stuk.push(rel(f) + ':' + s.regel + ' scripttag wordt nooit gesloten'); continue; }
+      if (!s.src || !s.inhoud.trim()) continue;   // inline hoort bij toets 1; leeg is goed
+      stuk.push(rel(f) + ':' + s.regel + ' src="' + s.src + '" slokt op: '
+        + s.inhoud.trim().replace(/\s+/g, ' ').slice(0, 70));
+    }
+  }
+  assert.deepEqual(stuk, [], 'script dat stil een ander script opeet:\n  ' + stuk.join('\n  '));
+});
+
 /* ---------------- 2. verwijst de pagina naar bestanden die bestaan? ----------------
    Een verkeerd pad geeft een 404 die niemand ziet: de pagina laadt, alleen die
    ene laag doet niets. Alleen eigen paden (beginnend met /), want extern

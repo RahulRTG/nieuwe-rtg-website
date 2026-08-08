@@ -4,7 +4,7 @@
       const doelPas = user.tier === 'guest' ? 'rtg' : user.tier;
       const magHier = vastePas ? (vastePas === 'rtg' ? ['rtg','guest'] : [vastePas]) : [];
       if (!magHier.includes(user.tier)){
-        if (['rtg','lifestyle','business'].includes(doelPas)){ location.replace(location.pathname + '?pas=' + doelPas); return; }
+        if (['rtg','lifestyle','business'].includes(doelPas)){ location.replace(pasAdres(doelPas)); return; }
         API.token = null; return; // onbekende pas: poort tonen
       }
       $('#gate').style.display = 'none';

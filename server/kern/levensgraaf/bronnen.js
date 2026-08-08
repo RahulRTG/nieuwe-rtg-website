@@ -24,13 +24,13 @@
    die komt later terug als een chauffeur die op het verkeerde adres staat.
 
    Dit bestand draagt de bezittingen, het huishouden en het vervoer; de kring, de
-   reizen en de collecties staan in ./graaf-bronnen2.js. De knip zit op tien KB
+   reizen en de collecties staan in ./bronnen2.js. De knip zit op tien KB
    en niet op een inhoudelijke grens -- de lijst is een lijst. Het gedeelde
-   gereedschap staat in ./graaf-hulp.js, zodat de twee helften niet ieder hun
+   gereedschap staat in ./hulp.js, zodat de twee helften niet ieder hun
    eigen uitleg van "voorbij" kunnen krijgen. */
 'use strict';
 
-const H = require('./graaf-hulp');
+const H = require('./hulp');
 const { PERSOONLIJK, VERTROUWELIJK, isDatum, straks, lijst, obj, volgendeJaardag } = H;
 
 // Waar hoort een bezitting thuis? Het register kent een soort; de kamers van het
@@ -161,8 +161,8 @@ const DEEL1 = [
 ];
 
 /* De volledige lijst: de drie helften met wat het LID invulde, plus
-   ./graaf-platform.js met wat het PLATFORM al van hem weet (boekingen, agenda).
+   ./bronnen-platform.js met wat het PLATFORM al van hem weet (boekingen, agenda).
    Die laatste staat achteraan omdat hij als enige buiten het lifestyle-dossier
    kijkt en daarvoor de sleutel nodig heeft; zie het contract in ./graaf.js. */
-module.exports = { ALLE: DEEL1.concat(require('./graaf-bronnen2'), require('./graaf-bronnen3'),
-  require('./graaf-platform')) };
+module.exports = { ALLE: require('./bronnen-basis').concat(DEEL1, require('./bronnen2'),
+  require('./bronnen3'), require('./bronnen-platform')) };

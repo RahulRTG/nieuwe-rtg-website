@@ -132,10 +132,13 @@ Object.assign(kern, require('../kern/rechterhand')({ db, save, crypto, liveCoden
 /* Het Privékantoor: de ENE app die de veertien premium-apps aan elkaar knoopt.
    Life Graph, Control Tower, delegatie en zaken. Staat NA de twee hierboven
    omdat hij op hun dossiers projecteert; hij schrijft er niets in terug. */
-/* bezitZet komt uit de lifestyle-mount hierboven: een inkoopzaak die geregeld
-   is, schrijft zichzelf in het Bezittingenregister via de functie van die app.
-   Vandaar dat deze regel NA die twee moet staan -- kern.bezitZet bestaat pas
-   dan. */
+// De levensgraaf: de motor onder het Privekantoor, maar voor ELKE pas. Staat
+// vóór kern/bureau, dat hem gebruikt; paspoortVervalt als thunk (andere laag).
+Object.assign(kern, require('../kern/levensgraaf')({ db,
+  paspoortVervalt: (key) => (kern.paspoortVervaldatumVan ? kern.paspoortVervaldatumVan(key) : null) }));
+// bezitZet komt uit de lifestyle-mount hierboven: een geregelde inkoopzaak
+// schrijft zichzelf in het register. Vandaar NA die twee.
+
 Object.assign(kern, require('../kern/bureau')({ db, save, crypto, anthropic, liveCodename, notify,
-  bezitZet: kern.bezitZet }));
+  bezitZet: kern.bezitZet, levensgraaf: kern.levensgraaf }));
 };

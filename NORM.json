@@ -21,7 +21,7 @@
     "keuringTeGroot": 2,
     "inlineStijlAttributen": 5656,
     "browserpoortToetsen": 103,
-    "kernBreedte": 1076,
+    "kernBreedte": 1077,
     "kernGedeeld": 140,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
@@ -29,6 +29,11 @@
     "toetsenOngevoeligPct": 2.3
   },
   "notities": [
+    {
+      "datum": "2026-08-07",
+      "meter": "kernBreedte 1076 -> 1077",
+      "reden": "Een kern-naam erbij: `levensgraaf`. De graaf en de Control Tower zaten in kern/bureau en daarmee achter de Lifestyle Pass; ze staan nu in een eigen kern-module die voor ELKE pas geldt, ook de gratis. Dat is de hele bedoeling van die verhuizing -- een gratis lid heeft ook een paspoort dat verloopt. Het kantoor leunt erop in plaats van hem te bezitten, dus er is geen tweede kopie: kern/bureau geeft de motor door aan zijn eigen onderdelen. Een van de vijfenzeventig functies van dat kantoor is hierdoor GEEN kern-naam meer geworden, dus netto is dit precies een."
+    },
     {
       "datum": "2026-08-07",
       "meter": "kernBreedte 1074 -> 1076",

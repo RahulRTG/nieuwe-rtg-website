@@ -34,10 +34,10 @@
    knopen staat. Krijgt de boekingenlaag ooit een index per lid, dan hoort die
    hier gebruikt te worden.
 
-   Gemount via ./graaf-bronnen.js. */
+   Gemount via ./bronnen.js. */
 'use strict';
 
-const H = require('./graaf-hulp');
+const H = require('./hulp');
 const { PERSOONLIJK, VERTROUWELIJK, isDatum, vandaag, lijst } = H;
 /* De agenda ligt onder 'lid:<key>' en niet onder de kale sleutel. Die regel komt
    uit kern/agenda.js zelf en wordt hier NIET overgeschreven: zou hij hier als

@@ -35,14 +35,18 @@
    de suite (routes/member/bureau.js). */
 'use strict';
 
-module.exports = ({ db, save, crypto, anthropic, liveCodename, notify, bezitZet }) => {
+module.exports = ({ db, save, crypto, anthropic, liveCodename, notify, bezitZet, levensgraaf }) => {
   const nu = () => new Date().toISOString();
   const rid = () => crypto.randomBytes(4).toString('hex');
   const schoon = (t, n) => String(t == null ? '' : t).replace(/[<>]/g, '').trim().slice(0, n || 200);
   const vandaag = () => new Date().toISOString().slice(0, 10);
 
-  const graafMod = require('./graaf')({ db, vandaag });
-  const termijnenMod = require('./termijnen')({ graaf: graafMod.graaf });
+  /* De graaf en de tower zijn geen eigendom van dit kantoor meer: ze staan in
+     kern/levensgraaf en gelden voor elke pas, ook de gratis. Wat hier blijft is
+     wat je ERMEE doet -- mandaat, zaken, orkestratie, de twintig kamers. */
+  const lg = levensgraaf;
+  const graafMod = { graaf: lg.graaf, graafVoor: lg.voor, samenvatting: lg.samenvatting, knoop: lg.knoopFabriek };
+  const termijnenMod = { tower: lg.tower, termijnenAlle: lg.termijnen };
   const delegatieMod = require('./delegatie')({ db, save, nu });
   const kamersMod = require('./kamers')({ samenvatting: graafMod.samenvatting });
   /* De orkestratie kent de zaken en de zaken kennen de orkestratie: die knoop

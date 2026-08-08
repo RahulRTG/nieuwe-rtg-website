@@ -68,6 +68,11 @@
       (myApps && myApps.length ? rij(T('bo2.sollicitaties','Sollicitaties'), String(myApps.length)) : ''));
 
     // interactieve AI-agenda
+    /* "Vooruit": uw termijnen, voor ELKE pas -- ook de gratis app. De motor
+       (kern/levensgraaf) zit niet achter een pas, want een gratis lid heeft ook
+       een paspoort dat verloopt en een boeking die komt. Vandaar geen
+       tier-controle op deze regel, in tegenstelling tot de twee eronder. */
+    html += '<div id="boVooruitCard"></div>';
     if (user.tier !== 'guest') html += '<div id="boAgendaCard"></div>';
     // mijn facturen (automatisch bij elke aankoop)
     if (user.tier !== 'guest') html += '<div id="boFacturenCard"></div>';

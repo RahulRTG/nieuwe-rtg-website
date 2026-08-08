@@ -1,5 +1,5 @@
 /* Het Privekantoor, deelbestand "graaf-bronnen2": het vervolg van
-   ./graaf-bronnen.js. Zie daar de uitleg; hier staan de reizen, de gelegenheden,
+   ./bronnen.js. Zie daar de uitleg; hier staan de reizen, de gelegenheden,
    de collecties, de kring, de filantropie en de twee besloten kamers.
 
    De laatste twee zijn de reden dat dit bestand niet zomaar "de rest" is:
@@ -8,7 +8,7 @@
    geen dubbeling maar de bedoeling opschrijven waar iemand hem leest. */
 'use strict';
 
-const H = require('./graaf-hulp');
+const H = require('./hulp');
 const { OPEN, PERSOONLIJK, VERTROUWELIJK, BESLOTEN, isDatum, straks, lijst, obj, volgendeJaardag } = H;
 
 const DEEL2 = [

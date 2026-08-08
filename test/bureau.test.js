@@ -59,6 +59,20 @@ async function lidMet(tier) {
 }
 const overDagen = n => new Date(Date.now() + n * 86400000).toISOString().slice(0, 10);
 
+/* Het kantoor rechtstreeks bouwen, voor de toetsen die geen server nodig hebben.
+   De levensgraaf gaat er apart in: die is sinds deze ronde GEEN onderdeel meer
+   van het Privekantoor maar een eigen kern-module die voor elke pas geldt, en
+   het kantoor leunt erop. Een helper, want zes losse aanroepen die dezelfde
+   bedrading nabouwen lopen uiteen zodra die bedrading verandert -- wat hier
+   letterlijk gebeurde. */
+function kantoorMet(db, extra) {
+  const lg = require('../server/kern/levensgraaf')({ db,
+    paspoortVervalt: (extra && extra.paspoortVervalt) || (() => null) });
+  return require('../server/kern/bureau')(Object.assign({ db, save: () => {}, crypto,
+    anthropic: null, liveCodename: () => '', notify: null, levensgraaf: lg.levensgraaf },
+    extra || {}));
+}
+
 /* ---------------------------------------------------------------- de poort -- */
 test('een RTG-pas komt het Privekantoor op geen enkele route binnen', async () => {
   const rtg = await lidMet('rtg');
@@ -161,8 +175,7 @@ test('de graaf schrijft niets terug in het dossier van het lid', async () => {
      geschreven" niet te zien. */
   const db = { data: { lifestyle: { k1: { bezittingen: [{ id: 'b1', soort: 'kunst', naam: 'Doek', waarde: 100 }] } } } };
   let bewaard = 0;
-  const kern = require('../server/kern/bureau')({ db, save: () => { bewaard++; },
-    crypto, anthropic: null, liveCodename: () => 'Codenaam', notify: null });
+  const kern = kantoorMet(db, { save: () => { bewaard++; }, liveCodename: () => 'Codenaam' });
   const voor = JSON.stringify(db.data.lifestyle);
   kern.bureau.overzicht('k1');
   kern.bureau.tower('k1');
@@ -302,8 +315,7 @@ test('alleen een mens achter het bureau kan een zaak op geregeld zetten', async 
 test('elke deur op de plattegrond geeft toegang tot een pagina die bestaat', async () => {
   /* Een kamer die naar een pagina wijst die er niet is, is een gesloten deur met
      een bordje. Dit is de machinale handhaving van de belofte in kamers.js. */
-  const kern = require('../server/kern/bureau')({ db: { data: { lifestyle: {} } }, save: () => {},
-    crypto, anthropic: null, liveCodename: () => '', notify: null });
+  const kern = kantoorMet({ data: { lifestyle: {} } });
   const wortel = path.join(__dirname, '..', 'public');
   let geteld = 0;
   for (const kamer of kern.bureau.KAMERS) {
@@ -329,8 +341,7 @@ test('besloten knopen verlaten de kring van het lid niet, wat een bron ook bewee
     afspraken: [{ id: 'a1', wat: 'Uitslag bespreken', datum: overDagen(2) }],
     nalatenschap: { documenten: [{ id: 'n1', titel: 'Testament' }] }
   } } } };
-  const kern = require('../server/kern/bureau')({ db, save: () => {}, crypto,
-    anthropic: null, liveCodename: () => '', notify: null });
+  const kern = kantoorMet(db);
 
   const alles = kern.bureau.graaf('k1', 'lid');
   assert.equal(alles.knopen.length, 3, 'het lid ziet zijn eigen kantoor helemaal');
@@ -353,8 +364,7 @@ test('de knoop-fabriek zet een bron terug die zichzelf te ver vrijgeeft', async 
      de toets hierboven de FABRIEK niet: een mutatie die de regel eruit sloopte
      liet alles groen (afgeslagen -- regel 2 van de lat noemt dat een bevinding).
      Hier gaat de knoop er rechtstreeks in, met een bewering die niet mag. */
-  const kern = require('../server/kern/bureau')({ db: { data: { lifestyle: {} } }, save: () => {},
-    crypto, anthropic: null, liveCodename: () => '', notify: null });
+  const kern = kantoorMet({ data: { lifestyle: {} } });
   const K = kern.bureau.knoopFabriek;
 
   const stout = K({ id: 'x:1', soort: 'afspraak', naam: 'Uitslag', kamer: 'gezondheid',
@@ -564,8 +574,7 @@ test('de avondbriefing telt alleen de stappen van vandaag', async () => {
       { op: gisteren, status: 'in voorbereiding', notitie: 'Gisteren opgepakt.', door: 'kantoor' },
       { op: new Date().toISOString(), status: 'in uitvoering', notitie: 'Vandaag verder.', door: 'kantoor' }
     ] }] } } } };
-  const kern = require('../server/kern/bureau')({ db, save: () => {}, crypto,
-    anthropic: null, liveCodename: () => '', notify: null });
+  const kern = kantoorMet(db);
   const av = kern.bureau.briefing('k1', 'avond');
   assert.equal(av.gebeurd.length, 1, 'twee stappen zijn van gisteren en horen er niet bij');
   assert.equal(av.gebeurd[0].notitie, 'Vandaag verder.');
@@ -730,8 +739,7 @@ test('een verstoring houdt zijn gevolgen apart bij, en wat blijft liggen krijgt 
 });
 
 test('alle twintig werelden hebben een deur, en de plattegrond beweert dat niet zelf', async () => {
-  const kern = require('../server/kern/bureau')({ db: { data: { lifestyle: {} } }, save: () => {},
-    crypto, anthropic: null, liveCodename: () => '', notify: null });
+  const kern = kantoorMet({ data: { lifestyle: {} } });
   const k = kern.bureau.kamers('leeg');
   assert.equal(k.kamers.length, 20);
   assert.equal(k.ingericht, 20);
@@ -834,8 +842,7 @@ test('het dak op de platformbronnen zwijgt niet als het wordt bereikt', async ()
     agendas[agendaLidSleutel('k1')].push({ id: 'a' + i, titel: 'Item ' + i,
       datum: new Date(Date.now() + (i + 1) * 86400000).toISOString().slice(0, 10) });
   }
-  const kern = require('../server/kern/bureau')({ db: { data: { lifestyle: {}, agendas, boekingen: [] } },
-    save: () => {}, crypto, anthropic: null, liveCodename: () => '', notify: null });
+  const kern = kantoorMet({ data: { lifestyle: {}, agendas, boekingen: [] } });
   const sam = kern.bureau.graafSamenvatting('k1');
   assert.equal(sam.knopen, 200, 'het dak doet wat het belooft');
   assert.equal(sam.afgekapt.length, 1);
@@ -849,8 +856,7 @@ test('het dak op de platformbronnen zwijgt niet als het wordt bereikt', async ()
 
   // onder het dak zegt hij niets: een melding die er altijd staat, meldt niets
   const klein = { [agendaLidSleutel('k2')]: agendas[agendaLidSleutel('k1')].slice(0, 5) };
-  const kern2 = require('../server/kern/bureau')({ db: { data: { lifestyle: {}, agendas: klein, boekingen: [] } },
-    save: () => {}, crypto, anthropic: null, liveCodename: () => '', notify: null });
+  const kern2 = kantoorMet({ data: { lifestyle: {}, agendas: klein, boekingen: [] } });
   assert.equal(kern2.bureau.nu('k2').tellingen.afgekapt, 0);
 });
 
@@ -866,8 +872,7 @@ test('vijftigduizend boekingen op het platform kosten dit scherm geen seconde', 
       service: { name: 'Dienst' }, status: 'aangevraagd',
       wanneer: new Date(Date.now() + ((i % 900) - 300) * 86400000).toISOString().slice(0, 10) + ' 12:00' });
   }
-  const kern = require('../server/kern/bureau')({ db: { data: { lifestyle: {}, boekingen, agendas: {} } },
-    save: () => {}, crypto, anthropic: null, liveCodename: () => '', notify: null });
+  const kern = kantoorMet({ data: { lifestyle: {}, boekingen, agendas: {} } });
   const g = kern.bureau.graaf('lid7', 'lid');
   assert.ok(g.knopen.length > 0 && g.knopen.length < 50, 'alleen zijn eigen toekomstige boekingen');
 
@@ -875,4 +880,85 @@ test('vijftigduizend boekingen op het platform kosten dit scherm geen seconde', 
   for (let i = 0; i < 10; i++) kern.bureau.overzicht('lid7');
   const ms = Number(process.hrtime.bigint() - t0) / 10 / 1e6;
   assert.ok(ms < 250, 'een schermbezoek koste ' + ms.toFixed(1) + ' ms bij 50.000 boekingen');
+});
+
+/* ================= De motor is niet premium ================================= */
+test('een RTG-pas ziet zijn eigen termijnen, ook zonder Privekantoor', async () => {
+  /* Dit is de kern van de hele levensgraaf-laag. Het Privekantoor blijft achter
+     de Lifestyle Pass, maar de MOTOR eronder niet: een gewoon lid heeft ook een
+     paspoort dat verloopt en een boeking die komt, en die datums zijn van hem. */
+  const rtg = await lidMet('rtg');
+  assert.equal((await bu('overzicht', {}, rtg)).status, 403, 'het kantoor blijft dicht');
+  const v = await raw('/member/vooruit', {}, rtg);
+  assert.equal(v.status, 200, 'maar zijn eigen termijnen zijn van hem');
+
+  const leeg = await json(v);
+  assert.equal(leeg.totaal, 0, 'nog niets: hij heeft nog niets gedaan');
+
+  // een boeking bij een partner: geen enkele extra handeling, wel een datum
+  const zaken = await json(await raw('/suppliers', {}, rtg));
+  const zaak = (zaken.suppliers || []).find(p => (p.services || []).length);
+  assert.ok(zaak, 'de seed hoort een partner met een dienst te hebben');
+  assert.equal((await raw('/booking/request', { supplierCode: zaak.code,
+    serviceId: zaak.services[0].id, date: overDagen(3), time: '19:30' }, rtg)).status, 200);
+
+  const na = await json(await raw('/member/vooruit', {}, rtg));
+  assert.equal(na.totaal, 1);
+  assert.deepEqual(na.bronnen, ['Boekingen'], 'en het scherm kan tonen dat niemand dit typte');
+  assert.equal(na.vensters.find(x => x.sleutel === 'week').aantal, 1);
+});
+
+test('een Lifestyle-lid ziet op dezelfde route meer, want hij heeft meer', async () => {
+  /* Er staat GEEN pas-controle in de motor: de bronnen die het lifestyle-dossier
+     lezen geven vanzelf niets terug voor wie dat dossier niet heeft. Deze toets
+     bewijst dat verschil aan de buitenkant, met dezelfde route. */
+  const life = await lidMet('lifestyle');
+  await ls('bezit/zet', { soort: 'vastgoed', naam: 'Villa', waarde: 1, verzekerdTot: overDagen(5) }, life);
+  const v = await json(await raw('/member/vooruit', {}, life));
+  assert.equal(v.totaal, 1);
+  assert.deepEqual(v.bronnen, ['Bezittingenregister']);
+
+  // en een RTG-lid dat exact hetzelfde probeert, komt niet eens bij die app
+  const rtg = await lidMet('rtg');
+  assert.equal((await ls('bezit/zet', { soort: 'vastgoed', naam: 'Villa', waarde: 1 }, rtg)).status, 403);
+  assert.equal((await json(await raw('/member/vooruit', {}, rtg))).totaal, 0);
+});
+
+test('het paspoort uit de kluis wordt een termijn zonder dat iemand hem typt', async () => {
+  /* shared/mrz.js leest de vervaldatum van een paspoortscan en
+     kern/onboarding/paspoort.js schrijft hem naar het ledendossier. De graaf
+     vraagt hem op bij kern/paspoort.js -- de module die erover gaat -- en niet
+     door zelf in de kluis te graaien.
+
+     Rechtstreeks op de kern, want een echte paspoortscan door de MRZ-lezer duwen
+     is een browsertoets; wat HIER bewezen moet worden is dat de datum de graaf
+     in komt en niet verder reikt dan het lid. */
+  const kern = kantoorMet({ data: { lifestyle: {} } }, { paspoortVervalt: () => overDagen(40) });
+  const g = kern.bureau.graaf('wie', 'lid');
+  const p = g.knopen.find(k => k.bron === 'Paspoort');
+  assert.ok(p, 'de datum komt uit de kluis de graaf in');
+  assert.equal(p.vervaltWat, 'paspoort');
+  assert.equal(p.vervalt, overDagen(40));
+
+  /* En hij blijft bij het lid. Een concierge hoeft niet te weten wanneer uw
+     paspoort verloopt om zijn werk te doen; het nummer en de nationaliteit uit
+     diezelfde scan komen sowieso de graaf niet in. */
+  assert.equal(p.deel, 'lid');
+  assert.equal(kern.bureau.graaf('wie', 'kantoor').knopen.length, 0);
+
+  // zonder scan geen knoop -- geen verzonnen datum
+  const zonder = kantoorMet({ data: { lifestyle: {} } });
+  assert.equal(zonder.bureau.graaf('wie', 'lid').knopen.length, 0);
+
+  /* EN GEEN KNOOP OP IETS DAT GEEN DATUM IS. Een mutatie die de vormcontrole uit
+     kern/paspoort.js sloopte SLOEG AF: er staan er twee op deze weg, dus de ene
+     weghalen verandert niets. Dat is een bevinding en geen geslaagde toets
+     (regel 2 van de lat), en dit is de laag die de graaf echt beschermt --
+     zonder hem hangt er een termijn in de tower met "maart" als datum, en dan
+     rekent dagenTussen op NaN. */
+  for (const rommel of ['ergens in maart', '2027-13-45', '', null, 42]) {
+    const raar = kantoorMet({ data: { lifestyle: {} } }, { paspoortVervalt: () => rommel });
+    assert.equal(raar.bureau.graaf('wie', 'lid').knopen.length, 0,
+      JSON.stringify(rommel) + ' is geen datum en hoort geen knoop op te leveren');
+  }
 });

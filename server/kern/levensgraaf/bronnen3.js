@@ -2,7 +2,7 @@
    laatste bij kwamen.
 
    Beveiliging, reputatie, dieren, de collectiedossiers, de relatiekring en het
-   reisdek. Zie ./graaf-bronnen.js voor hoe een bron werkt; hier staat alleen wat
+   reisdek. Zie ./bronnen.js voor hoe een bron werkt; hier staat alleen wat
    deze zes inleveren.
 
    DE REDEN DAT ZE HIER STAAN EN NIET IN HUN EIGEN MODULE: een kamer die zijn
@@ -19,7 +19,7 @@
    uitpakt. */
 'use strict';
 
-const H = require('./graaf-hulp');
+const H = require('./hulp');
 const { OPEN, PERSOONLIJK, VERTROUWELIJK, isDatum, straks, lijst, obj } = H;
 
 const DEEL3 = [

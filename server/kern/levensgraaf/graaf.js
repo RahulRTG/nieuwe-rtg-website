@@ -29,21 +29,21 @@
    optellen. Dat doet ./termijnen.js, op deze graaf, en daar komt de
    Control Tower vandaan.
 
-   Gemount via ./index.js. De bronnen zelf staan in ./graaf-bronnen.js. */
+   Gemount via ./index.js. De bronnen zelf staan in ./bronnen.js. */
 'use strict';
 
-/* De gevoeligheidstrap komt uit ./graaf-hulp.js en staat hier NIET nog een keer:
+/* De gevoeligheidstrap komt uit ./hulp.js en staat hier NIET nog een keer:
    de bronnen lezen hem daar ook, en twee definities van "besloten" is precies de
    dubbeling die regel 4 van de lat verbiedt. */
-const { OPEN, PERSOONLIJK, VERTROUWELIJK, BESLOTEN } = require('./graaf-hulp');
+const { OPEN, PERSOONLIJK, VERTROUWELIJK, BESLOTEN } = require('./hulp');
 
 /* Wie mag het zien. Oplopend: wat de bureau-kant mag zien mag de Rechterhand
    ook, wat de Rechterhand mag zien mag het lid altijd. */
 const KRING = { lid: 0, rechterhand: 1, kantoor: 2 };
 
 module.exports = (ctx) => {
-  const { db, vandaag } = ctx;
-  const bronnen = require('./graaf-bronnen');
+  const { db, vandaag, paspoortVervalt } = ctx;
+  const bronnen = require('./bronnen');
 
   /* De enige plek waar een knoop ontstaat. Alles loopt hierdoorheen, en daarom
      kan hier EEN regel staan die overal geldt: besloten (3) betekent alleen het
@@ -96,11 +96,11 @@ module.exports = (ctx) => {
          uitval waar regel 5 over gaat. We tellen hem, en ./nu.js zet het op het
          scherm -- niet in een log dat niemand leest. */
       /* Een bron krijgt er de SLEUTEL en de database bij. De veertien bronnen
-         die het dossier lezen negeren dat derde argument; ./graaf-platform.js
+         die het dossier lezen negeren dat derde argument; ./bronnen-platform.js
          heeft het nodig, want die leest wat het PLATFORM al van dit lid weet en
          dat staat niet in `l`. Het contract is daarmee uitgebreid en niet
          gebroken. */
-      try { uit = bron.knopen(l, knoop, { key, db }) || []; }
+      try { uit = bron.knopen(l, knoop, { key, db, paspoortVervalt }) || []; }
       catch (e) { uit = [{ __stuk: bron.kamer }]; }
       for (const k of uit) knopen.push(k);
     }

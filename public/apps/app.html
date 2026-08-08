@@ -6,7 +6,7 @@
      en bouwt het beginscherm zichzelf niet meer op: een zwart scherm zonder
      foutmelding. app-main-01.js vergelijkt de twee en haalt zichzelf dan een
      keer vers op. -->
-<meta name="rtg-bouw" content="8961bfd3">
+<meta name="rtg-bouw" content="d09868df">
 <!-- De foutmelder staat bewust VOORAAN: hij moet de fouten van het opstarten
      kunnen zien, en die gebeuren voordat de rest geladen is. -->
 <script src="/shared/foutmelder.js"></script>
@@ -1356,6 +1356,17 @@
     letter-spacing:0.18em;text-transform:uppercase;color:rgba(255,255,255,.5);
     margin:0.5rem 0 -0.15rem;}
   .os-sectiekop:first-child{margin-top:0;}
+  /* De Vooruit-kaart (app-main-53b.js). Klassen en geen style="..."-attributen:
+     elk zo'n attribuut houdt style-src-attr open in de CSP, en de meter telt ze. */
+  .vo-kop{font-size:0.8rem;}
+  .vo-groep{font-size:0.68rem;color:var(--soft);margin-top:0.5rem;}
+  .vo-groep.laat{color:#E0736A;}
+  .vo-rij{display:flex;justify-content:space-between;gap:0.5rem;font-size:0.78rem;margin-top:0.4rem;}
+  .vo-dag{color:var(--muted);white-space:nowrap;}
+  .vo-let{color:#E0736A;}
+  .vo-dak{color:#E0B84C;}
+  .vo-mt{margin-top:0.4rem;}
+  .vo-mt2{margin-top:0.5rem;}
   /* de map-tegel op het springboard: 3x3 voorproefje van de inhoud */
   .os-app .os-tegel.os-map-tegel{
     background:color-mix(in srgb, var(--card2) 70%, transparent);

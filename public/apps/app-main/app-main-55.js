@@ -21,6 +21,7 @@
         '<div class="fineprint">' + T('bo2.vr.s','Boeken, betalen, vrienden en De Salon zitten in uw pas. Lifestyle en Business voegen de concierge, de AI-boekhouder en RTG Zakelijk toe.') + '</div>');
     }
     body.innerHTML = html;
+    renderVooruit();
     renderAgendaLid();
     renderFacturenLid();
 

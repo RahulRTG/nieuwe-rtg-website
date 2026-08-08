@@ -12,7 +12,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '8961bfd3';
+var RTG_BOUW = 'd09868df';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -7200,6 +7200,7 @@ var RTG_BOUW = '8961bfd3';
   }
   async function laadAgendaLid(){ if (!API.live || !API.token) return; try { memberAgenda = await API.call('/agenda/mijn-lijst', {}); } catch(e){ return; } agendaBadgeLid(memberAgenda.telling || 0); }
   function agendaToeLid(r){ if (r && r.items){ memberAgenda = r; agendaBadgeLid(r.telling || 0); } renderAgendaLid(); }
+
   function renderAgendaLid(){
     const el = document.getElementById('boAgendaCard'); if (!el) return;
     if (!memberAgenda){ el.innerHTML = '<div class="zak-kaart"><b style="font-size:0.8rem;">' + T('ag.titel','Agenda') + '</b><div class="fineprint">…</div></div>'; laadAgendaLid().then(renderAgendaLid); return; }
@@ -7236,6 +7237,57 @@ var RTG_BOUW = '8961bfd3';
     el.innerHTML = h;
     el.querySelectorAll('[data-fpdf]').forEach(b => b.addEventListener('click', () => downloadPdf('/facturen/pdf', { id: b.dataset.fpdf }, (b.dataset.nr||'factuur')+'.pdf')));
     renderKluisLid(el);
+  /* De Vooruit-kaart: uw termijnen, voor elke pas. Afgesplitst van 53.js toen
+     dat over de 10 kB ging; de snede loopt langs een echte grens -- 53 gaat over
+     de AGENDA (wat u zelf plant), dit over wat er VANZELF op u afkomt.
+     Deelt de IIFE-scope met 53: API, T, esc, lang komen daarvandaan. */
+  /* ---------- "Vooruit": uw termijnen, voor ELKE pas ----------
+     Alles wat een datum heeft en van u is: uw paspoort uit de kluis, uw
+     boekingen, uw agenda, en -- als u een Lifestyle Pass heeft -- ook uw
+     verzekeringen, keuringen en visa. De motor (kern/levensgraaf) kent geen
+     pas-controle; de bronnen die het premium-dossier lezen geven vanzelf niets
+     terug voor wie dat dossier niet heeft.
+
+     NIEMAND TYPT DIT. Dat is de hele reden dat deze kaart bestaat, en daarom
+     staat er ook bij WAAR het vandaan komt: een lid dat ziet dat zijn paspoort
+     er vanzelf in staat, vertrouwt de rest van de lijst ook. */
+  let vooruitData = null;
+  async function laadVooruit(){
+    if (!API.live || !API.token) return;
+    try { vooruitData = await API.call('/member/vooruit', {}); } catch(e){ vooruitData = { fout: true }; }
+  }
+  function renderVooruit(){
+    const el = document.getElementById('boVooruitCard'); if (!el) return;
+    if (!vooruitData){ el.innerHTML = '<div class="zak-kaart"><b class="vo-kop">' + T('vo.titel','Vooruit') + '</b><div class="fineprint">…</div></div>'; laadVooruit().then(renderVooruit); return; }
+    const d = vooruitData;
+    if (d.fout){ el.innerHTML = ''; return; }
+    const dagLbl = x => { try { return new Date(x+'T12:00:00').toLocaleDateString(lang()==='en'?'en-GB':'nl-NL',{day:'numeric',month:'short'}); } catch(e){ return x; } };
+    const regel = r => '<div class="vo-rij">'
+      + '<span>' + esc((r.waarvan ? r.waarvan + ' · ' : '') + r.naam) + '</span>'
+      + '<span class="vo-dag">' + esc(dagLbl(r.datum)) + '</span></div>';
+    let h = '<div class="zak-kaart"><b class="vo-kop">' + T('vo.titel','Vooruit')
+      + (d.achterstallig.length ? ' <span class="vo-let">(' + d.achterstallig.length + ')</span>' : '') + '</b>';
+    if (!d.totaal){
+      h += '<div class="fineprint vo-mt">' + T('vo.leeg','Er staat nog niets met een datum op uw naam. Zodra u iets boekt of uw paspoort scant, verschijnt het hier vanzelf.') + '</div>';
+    } else {
+      if (d.achterstallig.length){
+        h += '<div class="vo-groep laat">' + T('vo.laat','Al voorbij') + '</div>';
+        h += d.achterstallig.slice(0,4).map(regel).join('');
+      }
+      for (const v of d.vensters){
+        if (!v.aantal) continue;
+        h += '<div class="vo-groep">' + esc(v.label) + '</div>';
+        h += v.items.slice(0,5).map(regel).join('');
+        break;   // alleen het eerstvolgende venster met inhoud; dit is een kaart, geen lijst
+      }
+      h += '<div class="fineprint vo-mt2">'
+        + T('vo.bron','Automatisch verzameld uit') + ': ' + esc(d.bronnen.join(', ')) + '.</div>';
+    }
+    for (const a of (d.afgekapt || [])) h += '<div class="fineprint vo-dak">' + T('vo.dak','Wij tonen de eerste') + ' ' + a.dak + ' ' + T('vo.uit','uit') + ' ' + esc(a.bron) + '.</div>';
+    for (const s2 of (d.stuk || [])) h += '<div class="fineprint vo-let">' + T('vo.stuk','Wij kunnen dit deel nu niet uitlezen') + ': ' + esc(s2) + '.</div>';
+    h += '</div>';
+    el.innerHTML = h;
+  }
     const aiGo = document.getElementById('factLidAiGo'); if (aiGo){ const doe = async () => { const opdracht = document.getElementById('factLidAiIn').value.trim(); if (!opdracht) return; const out = document.getElementById('factLidAiOut'); out.innerHTML = '<div class="fineprint">…</div>'; try { const r = await API.call('/facturen/ai', { opdracht }); out.innerHTML = '<div class="fineprint" style="color:var(--txt);white-space:pre-wrap;">'+esc(r.antwoord)+'</div>'; document.getElementById('factLidAiIn').value=''; if (r.overzicht){ memberFacturen = r.overzicht; } } catch(e){ out.innerHTML = '<div class="fineprint" style="color:#E0736A;">'+esc(e.message)+'</div>'; } }; aiGo.addEventListener('click', doe); const i2 = document.getElementById('factLidAiIn'); if (i2) i2.addEventListener('keydown', e => { if (e.key==='Enter') doe(); }); }
   }
 
@@ -7306,6 +7358,11 @@ var RTG_BOUW = '8961bfd3';
       (myApps && myApps.length ? rij(T('bo2.sollicitaties','Sollicitaties'), String(myApps.length)) : ''));
 
     // interactieve AI-agenda
+    /* "Vooruit": uw termijnen, voor ELKE pas -- ook de gratis app. De motor
+       (kern/levensgraaf) zit niet achter een pas, want een gratis lid heeft ook
+       een paspoort dat verloopt en een boeking die komt. Vandaar geen
+       tier-controle op deze regel, in tegenstelling tot de twee eronder. */
+    html += '<div id="boVooruitCard"></div>';
     if (user.tier !== 'guest') html += '<div id="boAgendaCard"></div>';
     // mijn facturen (automatisch bij elke aankoop)
     if (user.tier !== 'guest') html += '<div id="boFacturenCard"></div>';
@@ -7349,6 +7406,7 @@ var RTG_BOUW = '8961bfd3';
         '<div class="fineprint">' + T('bo2.vr.s','Boeken, betalen, vrienden en De Salon zitten in uw pas. Lifestyle en Business voegen de concierge, de AI-boekhouder en RTG Zakelijk toe.') + '</div>');
     }
     body.innerHTML = html;
+    renderVooruit();
     renderAgendaLid();
     renderFacturenLid();
 

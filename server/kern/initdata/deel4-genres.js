@@ -20,8 +20,6 @@ module.exports = (ctx) => {
     });
   }
   // --- boerderij: boeren en tuinders met een slim bedrijfssysteem + AI-adviseur ---
-  if (!db.data.supplierTypes.boerderij)
-    db.data.supplierTypes.boerderij = { label: 'Boerderij & landbouw', icon: 'oogst', caps: ['boerderij', 'location', 'pricing'] };
   if (!db.data.suppliers.find(s => s.code === 'CANFERRER')) {
     const dag = n => new Date(Date.now() - n * 86400000).toISOString();
     db.data.suppliers.push({
@@ -49,8 +47,6 @@ module.exports = (ctx) => {
     });
   }
   // --- content creators: influencers/videomakers met een carriere-app ---
-  if (!db.data.supplierTypes.creator)
-    db.data.supplierTypes.creator = { label: 'Content creator', icon: 'camera', caps: ['creator', 'location', 'pricing'] };
   if (!db.data.suppliers.find(s => s.code === 'LUMINA')) {
     db.data.suppliers.push({
       code: 'LUMINA', name: 'Lumina Media', type: 'creator', city: 'Ibiza',

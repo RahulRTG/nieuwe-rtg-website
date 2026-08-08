@@ -9,6 +9,14 @@ module.exports = function initRealtime(ctx) {
      liep al vijftien zaken achter (zie de opruiming onderaan). */
   const voorZaaien = new Set((ctx.db.data.suppliers || []).map(s => s.code));
 
+  /* Eerst het genre-register: alle bedrijfssoorten met hun sector en caps, van
+     een plek. Dit stond verspreid over tien delen hier en zes kernmodules, elk
+     met een eigen `if (!supplierTypes.x)`-regel -- dezelfde waarheid op zestien
+     plekken (LAT-regel 4). Het register vult ook de sector aan op databases die
+     die nog niet kenden. Moet VOOR de zaai-delen, want die zetten zaken neer
+     die naar een genre wijzen. */
+  require('../../seed/genres').zetRegister(ctx.db);
+
   require('./deel1-basis')(ctx);
   require('./deel2-kern')(ctx);
   require('./deel3-sectoren')(ctx);

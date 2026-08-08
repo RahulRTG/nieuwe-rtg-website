@@ -64,8 +64,7 @@ function maakOverheid({ db, save, crypto, anthropic, findSupplier, notify, notif
 
   function seed() {
     if (!Array.isArray(db.data.suppliers)) return;
-    if (!db.data.supplierTypes.rijk)
-      db.data.supplierTypes.rijk = { label: 'Rijksoverheid', icon: 'gebouw', caps: ['rijk'] };
+    require('../../seed/genres').zetGenre(db, 'rijk');
     for (const k of ['rijkBerichten', 'rijkAanslagen', 'rijkToeslagen', 'rijkVoertuigen', 'rijkRijbewijzen',
       'rijkKvk', 'rijkUitkeringen', 'rijkBezwaren', 'rijkStemmen', 'rijkBekend',
       'rijkSubsidies', 'waterAanslagen', 'waterMeldingen', 'rijkZaken'])

@@ -71,9 +71,13 @@
   function timeAgo(iso){ const s=Math.max(1,Math.round((Date.now()-new Date(iso))/1000)); if(s<60)return T('t.now','zojuist'); const m=Math.round(s/60); if(m<60)return m+T('t.min',' min'); const h=Math.round(m/60); if(h<24)return h+T('t.hour',' uur'); return Math.round(h/24)+T('t.days',' dg'); }
   function esc(x){ return String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
 
+  /* Welke eigen tabs deze zaak aanzet, bepaalt de server: kern/pda/modules.js.
+     Stond hier als caps.includes(..) per tab; dan weten twee plekken hetzelfde. */
+  const heeftModule = m => !!(state && state.supplier && (state.supplier.modules || []).includes(m));
+
   // ---- het kantoorgebouw (Zuidas) op zak: receptie, facilitair, concierge ----
   let pdGeb = null;
-  const heeftGebouw = () => !!(state && state.supplier && (state.supplier.caps || []).includes('gebouw'));
+  const heeftGebouw = () => heeftModule('gebouw');
   async function laadGebouwPda(){
     if (!heeftGebouw()) return;
     try { pdGeb = await API.call('/supplier/gebouw', {}); } catch(e){ pdGeb = null; }
@@ -108,6 +112,3 @@
       valet.map(v => '<div class="task"><div class="t"><b>'+esc(v.wie)+'</b><span>'+T('pd.geb.valet','valet')+' · '+esc(v.status)+'</span></div>'+
         (v.status==='gevraagd' ? '<button class="abtn" data-pgvv="'+v.id+'">'+T('pd.geb.voorrijden','Voorrijden')+'</button>' : '<button class="abtn" data-pgvk="'+v.id+'">'+T('pd.geb.klaar','Klaar')+'</button>')+'</div>').join('')+
       jetset.map(j => '<div class="task"><div class="t"><b>'+JET[j.soort]+' · '+esc(j.voorWie)+'</b><span>'+esc(j.wens)+' · '+esc(j.moment)+' · '+esc(j.status)+'</span></div>'+
-        (j.status==='aangevraagd' ? '<button class="abtn" data-pgjb="'+j.id+'">'+T('pd.geb.bevestig','Bevestig')+'</button>' : '<button class="abtn" data-pgja="'+j.id+'">'+T('pd.geb.afgerond','Afgerond')+'</button>')+'</div>').join('')+
-      ((valet.length+jetset.length) ? '' : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.geb.geenjetset','Geen open verzoeken.')+'</div>')+'</div>';
-    wrap.innerHTML = html;

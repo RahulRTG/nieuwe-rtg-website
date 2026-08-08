@@ -9,11 +9,12 @@
    wonen hier; de recepten/SEH/verwijzingen in ./keten, de afspraken en de receptie in
    ./balie. */
 
-const ZORG_TYPES = {
-  apotheek:      { label: 'Apotheek',          icon: '\u{1F48A}', caps: ['location'] },
-  specialist:    { label: 'Medisch specialist', icon: '\u{1FAC0}', caps: ['location'] },
-  beautymedical: { label: 'Beauty medical',     icon: '\u{2728}', caps: ['location'] }
-};
+/* Welke genres hier meedoen: de zorgpartners met een eigen agenda en receptenstroom. De MEMBERSHIP staat hier, want dat is
+   eigen aan deze module; het LABEL en de caps komen uit het genre-register, zodat
+   er geen tweede beschrijving van hetzelfde genre ontstaat (LAT-regel 4). */
+const { GENRES } = require('../../seed/genres');
+const ZORG_TYPES_GENRES = ['apotheek', 'specialist', 'beautymedical'];
+const ZORG_TYPES = Object.fromEntries(ZORG_TYPES_GENRES.map(g => [g, GENRES[g]]));
 const VOORSCHRIJVERS = ['huisarts', 'ziekenhuis', 'specialist'];
 const VERWIJZERS = ['huisarts', 'ziekenhuis'];
 const AGENDAS = ['specialist', 'beautymedical'];

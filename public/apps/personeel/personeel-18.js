@@ -66,7 +66,7 @@
   let pdRetail = null;      // retail-toestand van het merk (voorraad, paskamer, apart)
   let winkelKlant = null;   // geopend klantdossier op de vloer
   let winkelCart = [];      // mobiele kassa: [{vsku, naam, kleur, maat, price, aantal}]
-  const heeftRetail = () => !!(state && state.supplier && (state.supplier.caps || []).includes('retail'));
+  const heeftRetail = () => heeftModule('winkel');
   async function laadWinkel(){
     if (!heeftRetail()) return;
     try { pdRetail = (await API.call('/supplier/retail', {})).retail; } catch(e){ pdRetail = { artikelen:[], paskamer:[], apart:[], klanten:[], stats:{} }; }

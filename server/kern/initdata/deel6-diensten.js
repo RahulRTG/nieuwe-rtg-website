@@ -8,12 +8,7 @@ module.exports = (ctx) => {
      met de meldkamer als klantenservice-room. Special forces zijn besloten:
      alleen de politie kan ze om bijstand vragen. Per korps een demokorps met
      eenheden over land, water en door de lucht. ---- */
-  const HULP_TYPES = require('../hulpdienst').HULP_TYPES;
-  for (const [t, def] of Object.entries(HULP_TYPES)) if (!db.data.supplierTypes[t]) db.data.supplierTypes[t] = def;
-  const ZORG_TYPES = require('../zorgketen').ZORG_TYPES;
-  for (const [t, def] of Object.entries(ZORG_TYPES)) if (!db.data.supplierTypes[t]) db.data.supplierTypes[t] = def;
-  const DEF_TYPES = require('../defensie').DEF_TYPES;
-  for (const [t, def] of Object.entries(DEF_TYPES)) if (!db.data.supplierTypes[t]) db.data.supplierTypes[t] = def;
+  // De genres van dit deel staan in server/seed/genres.js (het genre-register).
   const HULP_KORPSEN = [
     { code: 'GUARDIA', name: 'Politie Ibiza', type: 'politie', city: 'Ibiza', loc: { lat: 38.912, lng: 1.438, label: 'Ibiza-stad' }, rate: 0, menu: [],
       hulpEenheden: [['Noodhulp 11', 'land'], ['Noodhulp 12', 'land'], ['Politieheli PH-1', 'heli'], ['Vliegdienst PV-2', 'lucht'], ['Patrouillevaartuig P-9', 'water']] },

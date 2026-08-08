@@ -19,7 +19,7 @@
 
   /* ---- PDA beveiliging: mijn dienst, inklokken, rondes, incidenten, SOS ---- */
   let pdBev = null;
-  const heeftBeveiliging = () => !!(state && state.supplier && state.supplier.type === 'beveiliging');
+  const heeftBeveiliging = () => heeftModule('beveiliging');
   function bevPos(cb){ // GPS met korte time-out en veilige terugval
     let klaar = false; const fire = (lat, lng) => { if (klaar) return; klaar = true; cb(lat, lng); };
     if (navigator.geolocation){

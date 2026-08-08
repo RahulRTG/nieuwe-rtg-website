@@ -1,3 +1,6 @@
+        (j.status==='aangevraagd' ? '<button class="abtn" data-pgjb="'+j.id+'">'+T('pd.geb.bevestig','Bevestig')+'</button>' : '<button class="abtn" data-pgja="'+j.id+'">'+T('pd.geb.afgerond','Afgerond')+'</button>')+'</div>').join('')+
+      ((valet.length+jetset.length) ? '' : '<div style="margin-top:0.5rem;font-size:0.8rem;color:var(--soft);">'+T('pd.geb.geenjetset','Geen open verzoeken.')+'</div>')+'</div>';
+    wrap.innerHTML = html;
     const doe = (sel, body) => wrap.querySelectorAll('['+sel+']').forEach(b => b.addEventListener('click', async () => {
       const { pad, data } = body(b.dataset);
       try { await API.call(pad, data); laadGebouwPda(); } catch(e){ toast(e.message); }
@@ -14,7 +17,7 @@
 
   // ---- de marina op zak: steiger, brandstof, service en de concierge ----
   let pdMar = null;
-  const heeftMarina = () => !!(state && state.supplier && (state.supplier.caps || []).includes('marina'));
+  const heeftMarina = () => heeftModule('marina');
   async function laadMarinaPda(){
     if (!heeftMarina()) return;
     try { pdMar = await API.call('/supplier/marina', {}); } catch(e){ pdMar = null; }
@@ -65,7 +68,7 @@
 
   // ---- de verzekeraar op zak: adviesvragen, declaraties, pas-controle ----
   let pdPol = null, pdPolZorg = null;
-  const heeftPolis = () => !!(state && state.supplier && (state.supplier.caps || []).includes('polis'));
+  const heeftPolis = () => heeftModule('verzekeraar');
   async function laadPolisPda(){
     if (!heeftPolis()) return;
     try { pdPol = await API.call('/supplier/polis', {}); } catch(e){ pdPol = null; }

@@ -3,8 +3,6 @@
    Draait elke start met het ensure-patroon, dus ook op een bestaande demo-db. */
 module.exports = (ctx) => {
   const { db, ensureSupplierDefaults } = ctx;
-  if (!db.data.supplierTypes.bouw)
-    db.data.supplierTypes.bouw = { label: 'Bouw & installatie', icon: 'werk', caps: ['services', 'location', 'pricing'] };
   const bestaandCastell = db.data.suppliers.find(s => s.code === 'CASTELL');
   if (bestaandCastell) bestaandCastell.geseed = true;  // ook op een database van voor het merkteken
   if (!bestaandCastell) {

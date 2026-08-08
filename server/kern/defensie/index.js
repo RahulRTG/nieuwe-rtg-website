@@ -14,9 +14,12 @@
    eenheden/materieel/bevoorrading/oefeningen in ./beheer, het veldhospitaal en
    de verplaatsingen in ./veld. */
 
-const DEF_TYPES = {
-  defensie: { label: 'Defensie', icon: '\u{1F396}\u{FE0F}', caps: ['location'], besloten: true }
-};
+/* Welke genres hier meedoen: de defensie-organisaties. De MEMBERSHIP staat hier, want dat is
+   eigen aan deze module; het LABEL en de caps komen uit het genre-register, zodat
+   er geen tweede beschrijving van hetzelfde genre ontstaat (LAT-regel 4). */
+const { GENRES } = require('../../seed/genres');
+const DEF_TYPES_GENRES = ['defensie'];
+const DEF_TYPES = Object.fromEntries(DEF_TYPES_GENRES.map(g => [g, GENRES[g]]));
 const PARAAT = ['gevechtsgereed', 'beperkt', 'in-onderhoud', 'niet-inzetbaar'];
 const MAT_STAAT = ['inzetbaar', 'in-onderhoud', 'defect'];
 const MAT_SOORTEN = ['voertuig', 'vaartuig', 'luchtvaartuig', 'uitrusting', 'medisch', 'verbinding'];

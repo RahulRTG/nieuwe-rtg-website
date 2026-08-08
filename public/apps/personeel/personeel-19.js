@@ -90,7 +90,7 @@
 
   // ---- op het land (boerderij): de knecht doet de taken van vandaag ----
   let pdBoer = null;
-  const heeftBoer = () => !!(state && state.supplier && (state.supplier.caps || []).includes('boerderij'));
+  const heeftBoer = () => heeftModule('boer');
   async function laadBoer(){
     if (!heeftBoer()) return;
     try { pdBoer = (await API.call('/supplier/boerderij/overzicht', {})); } catch(e){ pdBoer = null; }

@@ -38,7 +38,7 @@
 
   // ---- vaart (charter): de schipper handelt de charters van vandaag af ----
   let pdCharters = null;
-  const heeftCharter = () => !!(state && state.supplier && (state.supplier.caps || []).includes('charter'));
+  const heeftCharter = () => heeftModule('vaart');
   const VAART_ST = { 'aangevraagd':'klaar om uit te varen', 'lopend':'op zee', 'afgerond':'afgerond' };
   async function laadVaart(){
     if (!heeftCharter()) return;
@@ -100,7 +100,7 @@
 
   // ---- autoverkoop op de PDA: proefritten inplannen/rijden en auto's afleveren ----
   let pdVerkoop = null;
-  const heeftVerkoop = () => !!(state && state.supplier && state.supplier.type === 'verhuur');
+  const heeftVerkoop = () => heeftModule('verkoop');
   async function laadVerkoop(){
     if (!heeftVerkoop()) return;
     try { pdVerkoop = await API.call('/supplier/verkoop/overzicht', {}); } catch(e){ pdVerkoop = { pda: [] }; }

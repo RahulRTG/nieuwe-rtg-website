@@ -52,15 +52,16 @@ laag werkt.
 |---|---|---|---|
 | 1 — Core | identiteit, organisaties, locaties, personen, rechten, documenten, geld, communicatie, workflow, audit | grotendeels: kluis met codenamen, SSO/SCIM, passkeys, betalen, grootboek, bestanden, auditlog | een expliciete organisatie-entiteit; een zaak is nu een rij in `suppliers` |
 | 2 — Enterprise engines | CRM, ERP, HR, finance, procurement, inventory, assets, projecten, planning, service, BI, AI | veel, verspreid: payroll, roosters, voorraad, agenda, facturatie, boardroom, AI | ze staan naast elkaar, niet als aanroepbare motoren onder de genres |
-| 3 — Industry engines | hospitality, horeca, retail, zorg, mobility, bouw, overheid … | **niets als laag.** Genre-eigen logica hangt los in `kern/` | de laag zelf |
+| 3 — Industry engines | hospitality, horeca, retail, zorg, mobility, bouw, overheid … | **het aanknopingspunt**: elk genre draagt nu een `industry`, 73 genres in 26 sectoren (`server/seed/genres-lijst.js`) | de motoren zelf — er hangt nog geen gedeelde sectorlogica aan |
 | 4 — Capabilities | `rooms`, `rides`, `menu`, `tickets` … | **ja, en dit werkt** | meer caps naarmate sectoren erbij komen |
-| 5 — PDA | één adaptieve Work PDA | **ja**, `public/apps/personeel.html` | de tabs zitten hard in één bestand (zie breuklijn 3) |
-| 6 — Business Network | vinden, RFQ, offerte, contract, order, intercompany, levering, factuur, betaling | fragmenten, per paar apart gebouwd | het protocol (zie breuklijn 2) |
+| 5 — PDA | één adaptieve Work PDA | **ja**, en de server bepaalt sinds kort welke modules een zaak krijgt (`server/kern/pda/modules.js`) | de PDA-delen zijn nog geen echte modules (één gesloten scope) |
+| 6 — Business Network | vinden, RFQ, offerte, contract, order, intercompany, levering, factuur, betaling | fragmenten, per paar apart gebouwd | het protocol (zie breuklijn 2) — **dit is nu het grootste gat** |
 | 7 — Consumer Network | de ledenkant | **ja**, het verst ontwikkeld | — |
 
-De conclusie uit die tabel: laag 1, 4, 5 en 7 staan. Laag 2 ligt er als
-onderdelen zonder samenhang. **Laag 3 en laag 6 bestaan niet**, en dat zijn
-precies de twee die de visie dragen.
+De conclusie uit die tabel: laag 1, 4, 5 en 7 staan. Laag 3 heeft sinds het
+genre-register zijn ophangpunt maar nog geen motoren. Laag 2 ligt er als
+onderdelen zonder samenhang. **Laag 6 bestaat niet**, en dat is de laag waar de
+visie op staat of valt.
 
 ---
 
@@ -69,22 +70,24 @@ precies de twee die de visie dragen.
 Dit zijn de plekken waar de huidige opzet de richting actief tegenwerkt. Ze zijn
 alle drie nagemeten, niet aangenomen.
 
-### Breuklijn 1 — een genre kent zijn sector niet
+### Breuklijn 1 — een genre kende zijn sector niet ✅ *gedicht*
 
-Een genre draagt een `label`, een `icon` en `caps`. Meer niet. Er is geen veld
-dat zegt dat `hotel`, `apartment`, `villa` en `wintersport` dezelfde
-hospitality-motor delen, of dat `restaurant`, `bar`, `club` en `beachclub`
-dezelfde horeca-motor delen.
+Een genre droeg een `label`, een `icon` en `caps`. Meer niet. Er was geen veld
+dat zei dat `hotel`, `apartment`, `villa` en `wintersport` dezelfde
+hospitality-motor delen. Gedeelde sectorlogica kon daardoor nergens wonen: aan
+`rooms` gehangen lekte housekeeping naar `wellness`, aan `hotel` gehangen moest
+het bij `villa` opnieuw.
 
-Het gevolg is dat gedeelde sectorlogica nergens kán wonen. Wie housekeeping
-bouwt, bouwt het aan `rooms` vast of aan een genre. Wie het aan `rooms` hangt
-krijgt het ook bij `wellness`, wie het aan `hotel` hangt moet het bij `villa`
-overschrijven. Dat is de reden dat "een hotel voelt als hotelsoftware" nu alleen
-bereikbaar is door per genre schermen bij te bouwen.
+**Wat er nu staat.** Het genre-register (`server/seed/genres.js` +
+`genres-lijst.js`) draagt alle 73 genres met hun sector en caps op één plek —
+26 sectoren, drie niveaus: **sector → genre → caps**. Ze stonden verspreid over
+tien `initdata`-delen en zes kernmodules, elk met een eigen
+`if (!supplierTypes.x)`-regel: dezelfde waarheid op zestien plekken.
+`test/genreregister.test.js` zakt zodra iemand een genre buiten het register
+definieert, dus de verspreiding kan niet terugkomen.
 
-**Wat het wordt:** een genre krijgt een `industry`. Genres groeperen onder een
-sector, de sector draagt de gedeelde motor, de caps blijven bepalen wat een
-individuele zaak kan. Drie niveaus in plaats van twee: sector → genre → caps.
+**Wat er nog niet is:** de sectormotoren zelf. Het veld is er, het ophangpunt is
+er, maar er hangt nog geen gedeelde logica aan. Dat is stap 6 hieronder.
 
 ### Breuklijn 2 — B2B is paarsgewijs gebouwd, en dat is N²
 
@@ -119,7 +122,7 @@ contract → order → planning → levering → bewijs → factuur → betaling
 Eén protocol maakt van N² weer N: een genre hoeft alleen zijn catalogus te
 publiceren en de keten te spreken, en kan dan met alle andere zaken doen.
 
-### Breuklijn 3 — de PDA schaalt niet in zijn huidige vorm
+### Breuklijn 3 — de PDA schaalde niet ✅ *half gedicht*
 
 Er is één PDA, en dat is goed. De bron staat ook al opgeknipt: `personeel.js`
 wordt door `scripts/bundel.js` samengesteld uit 28 delen in
@@ -128,15 +131,23 @@ gesloten scope en worden rauw aaneengeplakt, dus ze zijn niet los te laden, niet
 los te toetsen en niet per genre in of uit te schakelen. Het opknippen is
 leesbaarheid, geen architectuur.
 
-Daarbovenop zit de echte fout: de 16 tabs schakelen aan op `heeftX()`-controles
-die aan de clientkant weten welke caps er bestaan. Dat is de dubbelvorm die
-LAT-regel 4 verbiedt — de server weet welke caps een zaak heeft, en de PDA weet
-nog eens apart welke caps een tab verdienen. Elk nieuw genre met een eigen
-werkvloer vraagt een wijziging aan beide kanten, en die twee lopen uiteen.
+Daarbovenop zat de echte fout: de tabs schakelden aan op `heeftX()`-controles die
+aan de clientkant wisten welke caps er bestaan. De server wist welke caps een
+zaak heeft, en de PDA wist nóg eens apart welke caps een tab verdienen —
+LAT-regel 4, over de lijn heen. Een nieuw genre kreeg zijn caps op de server en
+bleef in de PDA onzichtbaar, zonder dat iets klaagde.
 
-**Wat het wordt:** de server levert bij de sessie welke modules deze medewerker
-op deze plek mag zien; de PDA is een shell die ze laadt. Eén waarheid, aan de
-serverkant, waar de rechten toch al wonen.
+**Wat er nu staat.** `server/kern/pda/modules.js` bepaalt welke modules een zaak
+aanzet; de lijst komt mee in `/api/supplier/state` en de PDA schakelt daarop.
+`test/pdamodules.test.js` bewaakt de lijn zelf: het zakt zodra de PDA een module
+opvraagt die de server niet kent. Tabs die volgen uit wat een zaak feitelijk
+heeft (kamers, een barstation op de kaart, een bezorgdienst die aanstaat) blijven
+bewust in de PDA — dat is een gevolgtrekking uit eigen inhoud, geen tweede kopie
+van de afbeelding.
+
+**Wat er nog niet is:** de 28 delen van `personeel.js` zijn nog geen echte
+modules. Ze delen één gesloten scope en worden rauw aaneengeplakt, dus ze zijn
+niet los te laden of los te toetsen. Dat is de volgende stap voor deze laag.
 
 ---
 
@@ -145,26 +156,36 @@ serverkant, waar de rechten toch al wonen.
 Klein en omkeerbaar eerst, en elke stap levert op zichzelf iets op. Niets
 hieronder vraagt om het herschrijven van wat er staat.
 
-1. **Genres krijgen een `industry`.** Puur additief: een veld erbij, niets dat
-   breekt. Levert meteen wat op — de catalogus en de boardroom tonen nu allebei
-   een platte lijst van 73 regels en kunnen dan per sector groeperen.
-2. **Eén genre-register.** De 73 genres staan nu verspreid over tien
-   `initdata`-delen. Ze horen op één plek te staan, met sector en caps erbij.
-   Dit is LAT-regel 4 toegepast op de genres zelf, en het is dezelfde fout als
-   de demozaken-lijst: een waarheid die over tien bestanden verspreid staat.
-3. **De PDA vraagt zijn modules aan de server.** De server bepaalt bij de sessie
-   welke modules deze medewerker op deze plek krijgt, de PDA schakelt daarop.
-   Gedrag blijft gelijk; de dubbele waarheid over caps verdwijnt.
-4. **Het B2B-protocol, op één paar.** De keten bouwen en er precies één echte
-   stroom op zetten — beachclub → wasserij is een goede eerste, want die bestaat
-   nog niet en is klein genoeg om af te maken.
+1. ✅ **Eén genre-register, met een `industry` per genre.** Stap 1 en 2 uit de
+   eerste opzet zijn samen gedaan, want ze raakten dezelfde regels.
+   `server/seed/genres-lijst.js` draagt de 73 genres in 26 sectoren; de tien
+   `initdata`-delen en zes kernmodules die hun eigen kopie hielden, wijzen nu
+   hierheen. Bewaakt door `test/genreregister.test.js`.
+2. ✅ **De PDA vraagt zijn modules aan de server.** `server/kern/pda/modules.js`
+   bepaalt de lijst, `/api/supplier/state` levert hem, de PDA schakelt erop.
+   Bewaakt door `test/pdamodules.test.js`, dat ook de lijn zelf toetst.
+3. **De PDA-delen echte modules maken.** Nu nog 28 stukken in één gesloten
+   scope. Zolang dat zo is, kan een sector geen eigen PDA-module meebrengen
+   zonder in de gedeelde bron te snijden. Dit is de laatste stap voordat laag 5
+   op eigen benen staat.
+4. **Het B2B-protocol, op één paar.** De keten `aanvraag → offerte → contract →
+   order → planning → levering → bewijs → factuur` bouwen en er precies één
+   echte stroom op zetten. Beachclub → wasserij is de goede eerste: dat paar
+   bestaat nog niet, het raakt geen bestaande stroom, en het is klein genoeg om
+   helemaal af te maken. **Dit is nu het grootste openstaande stuk** en de laag
+   waar het hele idee op staat of valt.
 5. **De bestaande veertien collecties migreren**, één per keer, elk met de
-   toetsen die de oude vorm bewezen.
+   toetsen die de oude vorm bewezen (LAT-regel 2: de oude toets moet op de
+   nieuwe vorm zakken voordat de migratie klaar is).
 6. **Sectormotoren**, in volgorde van wat er al ligt: horeca en hospitality
    eerst (daar staat het meeste), daarna vakwerk/field service, daarna retail.
+   Pas hier wordt "een hotel voelt als hotelsoftware" echt waar; het
+   ophangpunt (`industry`) ligt er sinds stap 1.
 
-Stap 1 en 2 zijn samen een dag werk en maken stap 3 tot en met 6 mogelijk.
-Zonder stap 1 en 2 is elke sectormotor opnieuw een eilandje.
+Stap 1 en 2 zijn gedaan en waren de voorwaarde voor de rest: zonder één register
+en zonder een serverzijdige modulelijst is elke sectormotor opnieuw een eilandje.
+Stap 4 is geen dag werk maar een feature op zichzelf, en hoort als zodanig
+gepland te worden — niet ertussendoor.
 
 ---
 

@@ -341,6 +341,19 @@
   }
   // Inloggen met het RTG-account en landen op de juiste bedrijfspagina.
   async function mijnLogin(login, password, bedrijf){
+    const d = await API.call('/supplier/mijn/login', { login, password, bedrijf: bedrijf || '' });
+    await landMijn(d);
+  }
+/* DIT SLUITHAAKJE HOORT HIER, EN NIET EEN BESTAND VERDEROP.
+
+   Het stond bovenaan 04.js, waardoor mijnLogin() pas daar dichtging -- en
+   deel 3b, het oude inlogFORMULIER, kwam daarmee BINNEN die functie te liggen.
+   Gevolg: stepLogin() riep formulierLogin() aan terwijl die naam daar niet
+   bestond. Dat vangnet stond er juist "voor het geval de poort er niet is,
+   zonder inlogscherm zou de app onbruikbaar zijn" -- en het was zelf stuk.
+
+   Gevonden door regel 42 van scripts/check.js, die op dezelfde fout in de
+   Vooruit-kaart is gebouwd. */
 /* Personeel, deel 3b: het oude inlogFORMULIER, nog als vangnet.
    De gewone ingang is het gesprek met Rahul (deel 3). Dit blok staat er
    voor het geval shared/rahulpoort.js niet geladen is; zonder inlogscherm
@@ -371,9 +384,6 @@
     $('#toForgot').addEventListener('click', stepForgot);
     $('#toDevice').addEventListener('click', stepSector);
     $('#liUser').focus();
-  }
-    const d = await API.call('/supplier/mijn/login', { login, password, bedrijf: bedrijf || '' });
-    await landMijn(d);
   }
   // Land (of wissel) naar een van de eigen werkplekken: sessie zetten en de app openen.
   async function landMijn(d){

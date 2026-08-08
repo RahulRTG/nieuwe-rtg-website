@@ -69,3 +69,19 @@
       try { await API.call('/supplier/betaalverzoek', { codename: ($('#bvCode')||{}).value, bedrag, omschrijving: ($('#bvOms')||{}).value }); toast(''+T('zb.verzoekgestuurd','Betaalverzoek verstuurd.')); renderZaakBoard(); }
       catch(e){ toast(e.message); }
     });
+    el.querySelectorAll('[data-bvweg]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/betaalverzoek/intrek', { ref:b.dataset.bvweg }); renderZaakBoard(); } catch(e){ toast(e.message); }
+    }));
+  }
+/* DIT SLUITHAAKJE HOORT HIER, EN NIET EEN BESTAND VERDEROP.
+
+   Het stond bovenaan 56.js, waardoor renderZaakBoard() pas daar dichtging en
+   alles wat ertussen stond BINNEN die functie kwam te liggen -- zoals de
+   Vooruit-kaart en de postvoorstellen van deze zaak (55c/55d). Aan deze kant
+   viel dat niet meteen op, want renderZaakBoard roept ze zelf aan en een
+   functieverklaring hijst binnen zijn eigen functie. Kapot was het toch: de
+   `let`-variabelen ernaast werden bij ELKE render opnieuw op null gezet, dus de
+   kaart haalde zijn gegevens elke keer opnieuw op en onthield niets.
+
+   Aan de ledenkant liep dezelfde fout wel meteen stuk ("renderVooruit is not
+   defined"). Zie de gelijkluidende opmerking in apps/app-main/app-main-53.js. */

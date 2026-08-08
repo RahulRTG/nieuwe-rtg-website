@@ -60,8 +60,8 @@
 
   async function renderZaakBoard(){
     const el = $('#boardroomWrap'); if (!el) return;
-    renderVooruitSup();   // wat er vanzelf op de zaak afkomt (54b), boven de agenda
-    renderPostSup();      // en wat er uit de post te bevestigen valt (54c)
+    renderVooruitSup();   // wat er vanzelf op de zaak afkomt (55c), boven de agenda
+    renderPostSup();      // en wat er uit de post te bevestigen valt (55d)
     renderAgendaSup();
     let d; try { d = await API.call('/supplier/zaak/board'); } catch(e){ return; }
     const zbChips = '<div style="display:flex;flex-wrap:wrap;gap:0.4rem;">'+

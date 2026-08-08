@@ -10,7 +10,7 @@
      staat er ook bij WAAR het vandaan komt; een lijst die zichzelf vult verdient
      die verantwoording, anders is het een lijst waarvan niemand weet wie hem bijhoudt.
 
-     Deelt de IIFE-scope met 54: API, T, esc, lang, $, actor komen daarvandaan. */
+     Deelt de IIFE-scope met 54/55: API, T, esc, lang, $, actor komen daarvandaan. */
   let vooruitSupData = null;
   async function laadVooruitSup(){
     if (!API.live) return;

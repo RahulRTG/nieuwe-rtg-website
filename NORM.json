@@ -25,10 +25,16 @@
     "kernGedeeld": 142,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 148,
+    "toetsenNietGemeten": 147,
     "toetsenOngevoeligPct": 2.3
   },
   "notities": [
+    {
+      "datum": "2026-08-08",
+      "meter": "toetsenNietGemeten 148 -> 147 (BETER, en met de hand vastgezet)",
+      "reden": "De mutatiemotor is alsnog over test/postdatum.test.js en test/smtp-in.test.js gegaan: allebei GEZAKT, en allebei ook in de scherpe ronde (waarin alleen het eigen domein liegt en de deuren open blijven). Daar staat een nieuw toetsbestand tegenover dat de motor NIET kan meten -- test/vooruitscherm.e2e.js heeft een browser nodig. Netto een omlaag. Ik zet hem met de hand op 147 en gebruik --vastleggen niet: dat tilt ook meters op die deze ronde niet zijn aangeraakt.",
+      "eerlijkheidshalve": "Die schermtoets is verreweg de nuttigste van de drie geweest, en dat zegt iets over waar de blinde vlek zat. Hij vond namelijk dat de Vooruit-kaart NOOIT heeft gerenderd sinds hij bestaat: renderVooruit() stond binnen renderFacturenLid(), dus gaf het scherm 'renderVooruit is not defined' en een leeg vak -- terwijl elke API-toets groen stond, npm run check zweeg en de kruisscan er niets van kon zien (die zoekt top-level namen, en deze naam stond nergens op top-level). Dezelfde fout stond aan de leverancierskant en, niet door mij gemaakt, in apps/personeel.js: daar was het VANGNET-inlogformulier op die manier onbereikbaar, precies het formulier dat er staat omdat de app zonder inlogscherm onbruikbaar zou zijn. Regel 42 in scripts/check.js vangt de klasse nu af; hij is twee keer fout geweest voordat hij goed was (eerst objecten vergeleken in plaats van posities, daarna te weinig bindingen geteld waardoor hij loze meldingen gaf) en is pas vastgezet nadat ik hem op de echte fout heb zien AFGAAN en na herstel weer zien zwijgen."
+    },
     {
       "datum": "2026-08-08",
       "meter": "toetsenNietGemeten 147 -> 148",

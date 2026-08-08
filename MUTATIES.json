@@ -2309,6 +2309,13 @@
       "gezakt": 5,
       "scherp": "gezakt"
     },
+    "postdatum.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 13,
+      "scherp": "gezakt"
+    },
     "productie.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -3042,6 +3049,13 @@
       "soort": "server",
       "staat": "slaat zichzelf over",
       "overgeslagen": 1
+    },
+    "smtp-in.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 15,
+      "scherp": "gezakt"
     },
     "smtp.test.js": {
       "soort": "puur",

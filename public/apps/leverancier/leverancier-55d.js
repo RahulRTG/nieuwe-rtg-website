@@ -9,7 +9,7 @@
      en dat raden gaat vaak goed en soms mis. Vandaar de ZIN erbij en een knop
      ervoor. Zie de kop van server/kern/postdatum.js.
 
-     Deelt de IIFE-scope met 54: API, T, esc, lang, $, actor komen daarvandaan. */
+     Deelt de IIFE-scope met 54/55: API, T, esc, lang, $, actor komen daarvandaan. */
   let postSupData = null;
   async function laadPostSup(){
     if (!API.live) return;

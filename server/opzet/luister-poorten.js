@@ -54,15 +54,46 @@ module.exports = (kern) => {
      door -- een mailpoort die niet opengaat, mag de site niet meenemen. */
   if (process.env.MAIL_IN_POORT) {
     try {
-      
-      const tlsOpties = process.env.MAIL_IN_KEY && process.env.MAIL_IN_CERT
-        ? { key: fs.readFileSync(process.env.MAIL_IN_KEY), cert: fs.readFileSync(process.env.MAIL_IN_CERT) } : null;
       const mHost = process.env.MAIL_IN_HOST || '127.0.0.1';
+      /* STARTTLS: eigen sleutel als die er is, anders DIE VAN DE SITE.
+
+         Zonder deze terugval was versleuteld het geval waarin je twee extra
+         variabelen had gezet, en plat het geval waarin je niets deed -- op een
+         machine die allang een certificaat heeft voor haar eigen site. Dat is de
+         verkeerde standaard: op poort 25 is TLS opportunistisch, de verzendende
+         kant gebruikt hem als hij wordt aangeboden en controleert de naam meestal
+         niet. Een certificaat dat niet exact bij het mailadres hoort is daar dus
+         nog altijd veel beter dan geen.
+
+         Wat hij NIET doet: er zelf een aanmaken. Een mailpoort die als bijwerking
+         een sleutelpaar op schijf zet, doet iets wat niemand heeft gevraagd. */
+      let tlsOpties = null;
+      if (process.env.MAIL_IN_KEY && process.env.MAIL_IN_CERT) {
+        tlsOpties = { key: fs.readFileSync(process.env.MAIL_IN_KEY), cert: fs.readFileSync(process.env.MAIL_IN_CERT) };
+      } else if (process.env.RTG_TLS_KEY && process.env.RTG_TLS_CERT) {
+        try {
+          tlsOpties = { key: fs.readFileSync(process.env.RTG_TLS_KEY), cert: fs.readFileSync(process.env.RTG_TLS_CERT) };
+        } catch (e) { tlsOpties = null; }
+      }
       require('../smtp-in-server')({ aanname: kern.mailAanname, naam: process.env.MAIL_DOMEIN || 'rtg-mail',
         poort: Number(process.env.MAIL_IN_POORT), host: mHost, tlsOpties })
         .start().then(() => console.log('[smtp-in] neemt post aan op ' + mHost + ':' + process.env.MAIL_IN_POORT +
           (tlsOpties ? ' (STARTTLS beschikbaar)' : ' -- ZONDER STARTTLS, dus alles gaat plat over de lijn')))
-        .catch((e) => console.warn('[smtp-in] niet gestart:', e && e.message));
+        /* EEN MISLUKTE START HOORT TE ZEGGEN WAT ERAAN TE DOEN IS. "EACCES" is
+           voor wie het niet kent geen mededeling maar een raadsel, en dit is de
+           meest voorkomende manier waarop deze poort niet opengaat. De webserver
+           doet dit al zo (zie opzet/luister.js); hier stond alleen de kale fout. */
+        .catch((e) => {
+          const c = e && e.code;
+          const waar = mHost + ':' + process.env.MAIL_IN_POORT;
+          console.warn('[smtp-in] niet gestart -- ' + (c === 'EACCES'
+            ? 'geen rechten om op ' + waar + ' te luisteren. Poorten onder 1024 vragen root of'
+              + ' CAP_NET_BIND_SERVICE; of zet MAIL_IN_POORT=2525 met een doorstuurregel van 25 ernaartoe.'
+            : c === 'EADDRINUSE'
+              ? waar + ' is al in gebruik -- draait er al een mailserver op deze machine?'
+              : 'kon niet op ' + waar + ' luisteren: ' + (e && e.message))
+            + ' De site draait gewoon door; er komt alleen geen post binnen.');
+        });
     } catch (e) { console.warn('[smtp-in] niet gestart:', e && e.message); }
   }
 };

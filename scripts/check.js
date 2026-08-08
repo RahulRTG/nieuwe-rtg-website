@@ -2325,5 +2325,97 @@ console.log('\n41) BEWIJS.md loopt niet achter op de toetsen');
   }
 }
 
+/* 42) een naam die in EEN functie wordt verklaard, wordt niet buiten die functie
+   aangeroepen.
+
+   DE FOUT DIE DIT VANGT, en hij is hier echt gemaakt. De grote app-scripts staan
+   opgeknipt in deelbestanden die bij de build weer aaneengeplakt worden
+   (scripts/bundel.js). Zo'n knip mag midden in een functie liggen -- dat gebeurt
+   ook, want sommige functies zijn groter dan een deelbestand. Maar dan ligt
+   ALLES wat er in de volgende deelbestanden staat BINNEN die functie, en dat is
+   zelden de bedoeling.
+
+   Zo raakten de Vooruit-kaart en de postvoorstellen binnen renderFacturenLid()
+   te liggen. Op het scherm gaf dat "renderVooruit is not defined" en dus een
+   lege kaart, terwijl elke API-toets groen stond en `npm run check` niets zei.
+   Regel 9 (de kruisscan) kon het niet zien: die zoekt kale verwijzingen naar
+   TOP-LEVEL namen van een zuster, en deze namen stonden nergens op top-level.
+
+   Wat deze regel doet is smal en precies: een functie die binnen een andere
+   functie wordt verklaard, en waarvan de naam ERBUITEN wordt aangeroepen. Dat is
+   altijd fout -- geen stijlkwestie, maar een ReferenceError die op een pad ligt
+   dat niemand heeft gelopen.
+
+   Wat hij NIET doet: klagen over een knip midden in een functie. Dat is een
+   geldige manier om een groot bestand te delen, en er zijn er hier meer dan een. */
+console.log('\n42) geen functie die binnen een andere functie staat en erbuiten wordt aangeroepen');
+{
+  const { loop: loopKnopen } = require('./ast/walk');
+  const bundels = require('./bundel').bundels;
+  let stuk = 0, gekeken = 0;
+  for (const doel of Object.keys(bundels)) {
+    const bron = path.join(ROOT, 'public', doel);
+    let src; try { src = fs.readFileSync(bron, 'utf8'); } catch (e) { continue; }
+    let ast; try { ast = ontleed(src); } catch (e) { fout(doel + ' ontleedt niet: ' + e.message); stuk++; continue; }
+    gekeken++;
+    /* De plek van een knoop is soms een GETAL en soms een token-object met zijn
+       eigen start/end (zo werkt onze parser). Wie dat door elkaar haalt,
+       vergelijkt objecten met `>=` -- dat levert geen fout op maar onzin, en dan
+       meldt deze regel keurig vier problemen die er niet zijn. Dat gebeurde hier
+       bij de eerste versie; bij de tweede zat het getal nog een laag dieper en
+       zweeg de regel juist over een fout die er WEL was. Vandaar: doorpellen tot
+       er een getal ligt, en anders niets beweren. */
+    const plek = (v, sleutel) => {
+      let x = v;
+      for (let i = 0; i < 6 && x && typeof x === 'object'; i++) x = x[sleutel];
+      return typeof x === 'number' ? x : null;
+    };
+    const van = (n) => plek(n.start, 'start');
+    const tot = (n) => plek(n.end, 'end');
+
+    /* EERST TELLEN HOE VAAK EEN NAAM ERGENS WORDT GEBONDEN -- als functie, als
+       const/let/var, of als parameter. Een naam die meer dan een keer voorkomt
+       slaan we over: welke binding een aanroep bedoelt, is dan niet uit te maken
+       zonder echte scope-analyse, en een regel die gokt is erger dan een regel
+       die zwijgt. Zonder deze telling meldde deze regel `stuur()` en `zet()` --
+       namen die elders gewoon een const zijn. */
+    const bindingen = new Map();
+    const bind = (naam) => { if (naam) bindingen.set(naam, (bindingen.get(naam) || 0) + 1); };
+    loopKnopen(ast, (n) => {
+      if (n.type === 'FunctionDeclaration' && n.id) bind(n.id.name);
+      else if (n.type === 'VariableDeclarator' && n.id && n.id.name) bind(n.id.name);
+      else if (n.type === 'FunctionExpression' || n.type === 'ArrowFunctionExpression') {
+        for (const p2 of (n.params || [])) if (p2 && p2.name) bind(p2.name);
+      }
+      if (n.type === 'FunctionDeclaration') for (const p2 of (n.params || [])) if (p2 && p2.name) bind(p2.name);
+    });
+
+    /* Elke functieverklaring die BINNEN een andere functie staat, met de grenzen
+       van dat omhulsel erbij. */
+    const binnenIn = new Map();   // naam -> { van, tot } van de OMHULLENDE functie
+    loopKnopen(ast, (n, pad) => {
+      if (n.type !== 'FunctionDeclaration' || !n.id) return;
+      if ((bindingen.get(n.id.name) || 0) > 1) return;   // te dubbelzinnig, zie hierboven
+      const ouders = pad.filter(x => /Function/.test(x.type));
+      const omhulsel = ouders[ouders.length - 1];
+      // ouders[0] is de IIFE zelf; alleen dieper dan dat telt als "binnen een functie"
+      if (ouders.length >= 2 && omhulsel) binnenIn.set(n.id.name, { van: van(omhulsel), tot: tot(omhulsel) });
+    });
+    if (!binnenIn.size) continue;
+    loopKnopen(ast, (n) => {
+      if (n.type !== 'CallExpression' || !n.callee || n.callee.type !== 'Identifier') return;
+      const g = binnenIn.get(n.callee.name);
+      if (!g || typeof g.van !== 'number' || typeof g.tot !== 'number') return;
+      const p = van(n);
+      if (typeof p !== 'number') return;
+      if (p >= g.van && p < g.tot) return;   // netjes binnen het omhulsel
+      stuk++;
+      fout(doel + ': ' + n.callee.name + '() wordt aangeroepen buiten de functie waarin hij verklaard staat' +
+        ' -- op het scherm is dat een ReferenceError en een leeg vak');
+    });
+  }
+  if (!stuk) ok(gekeken + ' gebundelde app-scripts: geen enkele functie wordt buiten zijn eigen omhulsel aangeroepen');
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

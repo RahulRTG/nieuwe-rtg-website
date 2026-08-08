@@ -315,6 +315,52 @@ test('over die echte poort komt post voor een vreemde er niet doorheen', async (
   assert.match(uit, /550 /, 'geen doorstuurdienst voor vreemden: ' + uit);
 });
 
+test('zonder eigen mailsleutel biedt de poort toch STARTTLS aan -- die van de site', async () => {
+  /* De terugval waar het om gaat. Zonder hem was versleuteld het geval waarin je
+     twee EXTRA variabelen had gezet, en plat het geval waarin je niets deed --
+     op een machine die allang een certificaat voor haar eigen site heeft. Op
+     poort 25 is TLS opportunistisch: de verzendende kant pakt hem als hij wordt
+     aangeboden. Een certificaat dat niet exact bij het mailadres hoort is daar
+     dus nog altijd veel beter dan geen.
+
+     Deze toets zet MAIL_IN_KEY/MAIL_IN_CERT NIET en alleen RTG_TLS_KEY/CERT, en
+     kijkt of EHLO STARTTLS noemt. Dat is de enige plek waar je het van buiten
+     kunt zien -- en het is ook precies wat een verzendende server afgaat. */
+  const x509 = require('../server/lib/x509');
+  const ss = x509.selfSigned({ names: ['localhost', '127.0.0.1'] });
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-smtptls-'));
+  const kPad = path.join(dir, 'site.key'), cPad = path.join(dir, 'site.crt');
+  fs.writeFileSync(kPad, ss.keyPem); fs.writeFileSync(cPad, ss.certPem);
+
+  const poort = SMTP_POORT + 1;
+  const eigen = await startServer({ env: { RTG_DATA_DIR: fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-smtptls-d-')),
+    SMTP_URL: '', MAIL_IN_POORT: String(poort), MAIL_IN_HOST: '127.0.0.1',
+    RTG_TLS_KEY: kPad, RTG_TLS_CERT: cPad } });
+  try {
+    const uit = await new Promise((res, rej) => {
+      const sok = net.connect(poort, '127.0.0.1');
+      let alles = '', buf = '', gestuurd = false;
+      const klaar = setTimeout(() => { sok.destroy(); rej(new Error('geen antwoord; kreeg: ' + alles)); }, 20000);
+      sok.setEncoding('utf8');
+      sok.on('data', (d) => {
+        alles += d; buf += d;
+        let j;
+        while ((j = buf.indexOf('\r\n')) >= 0) {
+          const regel = buf.slice(0, j); buf = buf.slice(j + 2);
+          if (!/^\d{3} /.test(regel)) continue;
+          if (!gestuurd) { gestuurd = true; sok.write('EHLO buiten.test\r\n'); continue; }
+          clearTimeout(klaar); sok.end(); res(alles); return;
+        }
+      });
+      sok.on('error', (e) => { clearTimeout(klaar); rej(e); });
+    });
+    assert.match(uit, /STARTTLS/, 'de poort hoort STARTTLS aan te bieden op het cert van de site: ' + uit);
+  } finally {
+    if (eigen && eigen.child) try { eigen.child.kill('SIGKILL'); } catch (e) {}
+    try { fs.rmSync(dir, { recursive: true, force: true }); } catch (e) {}
+  }
+});
+
 test('een adres in ONS EIGEN domein is nog geen postvak', async () => {
   /* Dit is de regel die de postberg voorkomt, en hij is scherper dan de vorige
      toets. Die weigert een VREEMD domein -- daar hoort iedereen het over eens te

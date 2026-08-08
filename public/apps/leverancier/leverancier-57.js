@@ -72,12 +72,16 @@
     // RTMAIL voor de zaak: het postvak op de zaakcode, waar de draaiboeken hun
     // seintjes bezorgen (eigen pagina, zelfde zaak-inlog).
     const rtmail = '<button class="meer-btn" data-rtmail="1"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg><b>RTMAIL</b></button>';
+    /* RTG Handel: inkoop bij andere zaken, over alle genres heen (eigen pagina,
+       zelfde zaak-inlog). Zie server/kern/handelsketen.js. */
+    const handel = '<button class="meer-btn" data-handel="1"><svg viewBox="0 0 24 24"><path d="M3 7h13l2 4h3v6H3z"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/></svg><b>RTG Handel</b></button>';
     el.innerHTML = '<div class="meer-grid">' + keys.map(k =>
       '<button class="meer-btn" data-goto2="'+k+'"><svg viewBox="0 0 24 24">'+TABDEF[k].svg+'</svg><b>'+T('tab.'+k, TABDEF[k].label)+'</b></button>'
-    ).join('') + office + rtmail + ghost + scherm + '</div>';
+    ).join('') + office + rtmail + handel + ghost + scherm + '</div>';
     el.querySelectorAll('[data-goto2]').forEach(b => b.addEventListener('click', () => openTab(b.dataset.goto2)));
     el.querySelectorAll('[data-office]').forEach(b => b.addEventListener('click', () => { location.href = '/apps/office.html?werk=zaak'; }));
     el.querySelectorAll('[data-rtmail]').forEach(b => b.addEventListener('click', () => { location.href = '/apps/leverancier-rtmail.html'; }));
+    el.querySelectorAll('[data-handel]').forEach(b => b.addEventListener('click', () => { location.href = '/apps/handel.html'; }));
     el.querySelectorAll('[data-ghost]').forEach(b => b.addEventListener('click', () => { location.href = '/apps/ghost.html'; }));
     el.querySelectorAll('[data-scherm]').forEach(b => b.addEventListener('click', () => {
       window.open('/apps/scherm.html', 'rtg-scherm', 'width=1280,height=800');

@@ -55,7 +55,7 @@ laag werkt.
 | 3 — Industry engines | hospitality, horeca, retail, zorg, mobility, bouw, overheid … | **het aanknopingspunt**: elk genre draagt nu een `industry`, 73 genres in 26 sectoren (`server/seed/genres-lijst.js`) | de motoren zelf — er hangt nog geen gedeelde sectorlogica aan |
 | 4 — Capabilities | `rooms`, `rides`, `menu`, `tickets` … | **ja, en dit werkt** | meer caps naarmate sectoren erbij komen |
 | 5 — PDA | één adaptieve Work PDA | **ja**, en de server bepaalt sinds kort welke modules een zaak krijgt (`server/kern/pda/modules.js`) | de PDA-delen zijn nog geen echte modules (één gesloten scope) |
-| 6 — Business Network | vinden, RFQ, offerte, contract, order, intercompany, levering, factuur, betaling | fragmenten, per paar apart gebouwd | het protocol (zie breuklijn 2) — **dit is nu het grootste gat** |
+| 6 — Business Network | vinden, RFQ, offerte, contract, order, intercompany, levering, factuur, betaling | **de keten staat** (`server/kern/handelsketen.js`) en draait op één paar: beachclub → wasserij | de veertien oude collecties migreren; koppeling naar het grootboek |
 | 7 — Consumer Network | de ledenkant | **ja**, het verst ontwikkeld | — |
 
 De conclusie uit die tabel: laag 1, 4, 5 en 7 staan. Laag 3 heeft sinds het
@@ -89,7 +89,7 @@ definieert, dus de verspreiding kan niet terugkomen.
 **Wat er nog niet is:** de sectormotoren zelf. Het veld is er, het ophangpunt is
 er, maar er hangt nog geen gedeelde logica aan. Dat is stap 6 hieronder.
 
-### Breuklijn 2 — B2B is paarsgewijs gebouwd, en dat is N²
+### Breuklijn 2 — B2B was paarsgewijs gebouwd ✅ *de weg ligt er*
 
 Zaak-naar-zaak werkt vandaag, maar elk paar heeft zijn eigen uitvinding. Geteld
 in de code staan er **veertien** verschillende aanvraag-/ordercollecties naast
@@ -111,16 +111,25 @@ omdat dat paar nog niet gebouwd is.
 Dat is de N²-val: 73 genres die onderling zaken doen zijn 5329 paren. Bij 130
 genres 16.900. Zo komt het er nooit.
 
-**Wat het wordt:** één keten die elk genre spreekt, en die de veertien
-collecties op termijn vervangt:
+**Wat er nu staat.** `server/kern/handelsketen.js` is die ene keten:
 
 ```
-organisatie → locatie → persoon → product/dienst → aanvraag → offerte →
-contract → order → planning → levering → bewijs → factuur → betaling → service
+aanvraag → offerte → gunning → planning → levering (met bewijs) → factuur → betaling
 ```
 
-Eén protocol maakt van N² weer N: een genre hoeft alleen zijn catalogus te
-publiceren en de keten te spreken, en kan dan met alle andere zaken doen.
+Het vinden is het kernpunt en het was gratis dankzij stap 1: **een aanvraag gaat
+naar een GENRE, niet naar een adres.** "Ik zoek een wasserij" bereikt elke
+wasserij op het net, ook een die zich gisteren heeft aangemeld. Dat werkt voor
+alle 73 genres tegelijk — dát is wat van N² weer N maakt. De beachclub die geen
+linnen bij een wasserij kon bestellen, kan dat nu; en dezelfde weg draagt elk
+ander paar zonder een regel extra.
+
+Bewaakt door `test/handelsketen.test.js` (7) en `test/handelscherm.e2e.js`, met
+het scherm op `/apps/handel.html`.
+
+**Wat er nog niet is:** de veertien oude collecties draaien er nog naast, en de
+factuur gaat nog niet de centrale facturatielaag in — "betaald" is nu een
+administratieve vaststelling door de koper, er wordt geen geld verplaatst.
 
 ### Breuklijn 3 — de PDA schaalde niet ✅ *half gedicht*
 
@@ -168,15 +177,14 @@ hieronder vraagt om het herschrijven van wat er staat.
    scope. Zolang dat zo is, kan een sector geen eigen PDA-module meebrengen
    zonder in de gedeelde bron te snijden. Dit is de laatste stap voordat laag 5
    op eigen benen staat.
-4. **Het B2B-protocol, op één paar.** De keten `aanvraag → offerte → contract →
-   order → planning → levering → bewijs → factuur` bouwen en er precies één
-   echte stroom op zetten. Beachclub → wasserij is de goede eerste: dat paar
-   bestaat nog niet, het raakt geen bestaande stroom, en het is klein genoeg om
-   helemaal af te maken. **Dit is nu het grootste openstaande stuk** en de laag
-   waar het hele idee op staat of valt.
+4. ✅ **Het B2B-protocol, op één paar.** De keten staat en beachclub → wasserij
+   loopt er helemaal overheen, van aanvraag tot betaling, inclusief scherm.
+   Omdat het vinden op genre gaat, draagt diezelfde weg meteen elk ander paar.
 5. **De bestaande veertien collecties migreren**, één per keer, elk met de
    toetsen die de oude vorm bewezen (LAT-regel 2: de oude toets moet op de
-   nieuwe vorm zakken voordat de migratie klaar is).
+   nieuwe vorm zakken voordat de migratie klaar is). En de factuur aan
+   `kern/facturatie.js` en het grootboek hangen, zodat "betaald" geld is en
+   geen vinkje. **Dit is nu het grootste openstaande stuk.**
 6. **Sectormotoren**, in volgorde van wat er al ligt: horeca en hospitality
    eerst (daar staat het meeste), daarna vakwerk/field service, daarna retail.
    Pas hier wordt "een hotel voelt als hotelsoftware" echt waar; het

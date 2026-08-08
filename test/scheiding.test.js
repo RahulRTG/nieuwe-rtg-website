@@ -46,7 +46,14 @@ function post(pad, body, token) {
 }
 
 test('server starten en twee losse leden aanmaken', async () => {
-  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_DEMO: '0' } });
+  /* RTG_DEMO=1 is hier nodig en het staat er met reden. Deze toets heeft een
+     CATALOGUS nodig (een partner om sporen bij achter te laten). Sinds de
+     livegang-schoonmaak is gerepareerd, staat er in een niet-demo-database geen
+     enkele geseede partner meer -- dat is de bedoeling en niet een gebrek. Een
+     toets die een catalogus nodig heeft, moet dus om de demostand vragen. Wat
+     deze toets bewijst verandert er niet door: hij werkt met leden die hij zelf
+     registreert. */
+  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_DEMO: '1' } });
   BASE = srv.base;
   const maak = async (naam, mail) => {
     const r = await post('/api/auth/register', {

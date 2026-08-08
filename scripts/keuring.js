@@ -260,7 +260,12 @@ function privacy() {
    Als negen van de tien vergelijkbare genres een functie hebben en de
    tiende niet, is dat meestal vergeten, niet bedoeld. */
 function pariteit() {
-  const seed = alle.filter(p => p.includes('/kern/initdata/') || p.endsWith('seed.js'));
+  /* Het genre-register (server/seed/genres-lijst.js) hoort er sinds de genres
+     daarheen zijn verhuisd bij. Stond hij er niet in, dan telde deze meter nul
+     genres en meldde hij vrolijk niets -- precies LAT-regel 3: een meter zonder
+     invoer hoort te zakken, en deze deed dat ook (test/keuring.test.js). */
+  const seed = alle.filter(p => p.includes('/kern/initdata/') || p.endsWith('seed.js') ||
+    p.includes('/seed/genres'));
   const tekst = seed.map(lees).join('\n');
   const types = {};
   /* Genres worden op twee manieren neergezet: los toegewezen

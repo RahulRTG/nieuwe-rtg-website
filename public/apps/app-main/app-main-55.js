@@ -22,6 +22,7 @@
     }
     body.innerHTML = html;
     renderVooruit();
+    renderPostDatums();
     renderAgendaLid();
     renderFacturenLid();
 

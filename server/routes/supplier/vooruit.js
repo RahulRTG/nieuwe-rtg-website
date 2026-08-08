@@ -21,7 +21,9 @@
 
    Gemount vanuit routes/supplier.js. */
 module.exports = (kern) => {
-  const { app, supplierAuth, levensgraaf } = kern;
+  const { app, db, managerOnly, supplierAuth, levensgraaf, postdatum, rtmail, codenaamVan } = kern;
+  const wie = require('../../kern/rtmail-wie')({ db, rtmail, codenaamVan });
+  const { agendaZaakSleutel } = require('../../kern/agenda');
 
   app.post('/api/supplier/vooruit', supplierAuth, (req, res) => {
     try {
@@ -47,5 +49,35 @@ module.exports = (kern) => {
     } catch (e) {
       res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' });
     }
+  });
+
+  /* ---------- Uit de post van de zaak ----------
+
+     Dezelfde drie routes als aan de ledenkant, op het postvak van de zaak
+     (<code>@partner.rtg) en haar eigen agenda. Voor een kantoor is dit eerder
+     regel dan uitzondering: een leveringsbevestiging, een keuringsafspraak, een
+     inspectie -- ze komen bijna allemaal per post binnen.
+
+     ALLEEN DE MANAGER. Aannemen zet iets in de agenda van de HELE zaak, en
+     wegleggen haalt het van ieders scherm. Lezen valt hier onder hetzelfde dak:
+     in het postvak van een zaak staat post van klanten. */
+  const adresVan = (req) => wie.zaakAdres(req);
+  const zaakAgenda = (req) => agendaZaakSleutel(req.supplier.code);
+
+  app.post('/api/supplier/vooruit/post', supplierAuth, (req, res) => {
+    if (!managerOnly(req, res)) return;
+    res.json(Object.assign({ status: 200 }, postdatum.voorstellen(adresVan(req), zaakAgenda(req))));
+  });
+  app.post('/api/supplier/vooruit/post/neem', supplierAuth, (req, res) => {
+    if (!managerOnly(req, res)) return;
+    const r = postdatum.neem(adresVan(req), zaakAgenda(req), req.body || {});
+    if (r.error) return res.status(400).json(r);
+    res.json(r);
+  });
+  app.post('/api/supplier/vooruit/post/negeer', supplierAuth, (req, res) => {
+    if (!managerOnly(req, res)) return;
+    const r = postdatum.negeer(zaakAgenda(req), (req.body || {}).id);
+    if (r.error) return res.status(400).json(r);
+    res.json(r);
   });
 };

@@ -6,7 +6,7 @@
      en bouwt het beginscherm zichzelf niet meer op: een zwart scherm zonder
      foutmelding. app-main-01.js vergelijkt de twee en haalt zichzelf dan een
      keer vers op. -->
-<meta name="rtg-bouw" content="d09868df">
+<meta name="rtg-bouw" content="66133396">
 <!-- De foutmelder staat bewust VOORAAN: hij moet de fouten van het opstarten
      kunnen zien, en die gebeuren voordat de rest geladen is. -->
 <script src="/shared/foutmelder.js"></script>
@@ -1367,6 +1367,14 @@
   .vo-dak{color:#E0B84C;}
   .vo-mt{margin-top:0.4rem;}
   .vo-mt2{margin-top:0.5rem;}
+  /* de voorstellen uit de eigen post (app-main-53c.js) */
+  .po-blok{border-top:1px solid var(--line);margin-top:0.6rem;padding-top:0.5rem;}
+  .po-van{font-size:0.66rem;color:var(--soft);}
+  .po-ond{font-size:0.8rem;font-weight:600;}
+  .po-knoppen{display:flex;gap:0.4rem;margin-top:0.35rem;flex-wrap:wrap;}
+  .po-ja,.po-nee{font-family:inherit;font-size:0.72rem;border-radius:999px;padding:0.3rem 0.75rem;border:1px solid var(--line);background:transparent;color:var(--txt);}
+  .po-ja{border-color:var(--burgundy);color:var(--burgundy);}
+  .po-nee{color:var(--soft);}
   /* de map-tegel op het springboard: 3x3 voorproefje van de inhoud */
   .os-app .os-tegel.os-map-tegel{
     background:color-mix(in srgb, var(--card2) 70%, transparent);

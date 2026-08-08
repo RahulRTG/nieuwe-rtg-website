@@ -24,7 +24,9 @@
 
    Gemount vanuit routes/member.js. */
 module.exports = (kern) => {
-  const { app, auth, levensgraaf } = kern;
+  const { app, auth, db, geenGast, levensgraaf, postdatum, rtmail, codenaamVan } = kern;
+  const wie = require('../../kern/rtmail-wie')({ db, rtmail, codenaamVan });
+  const { agendaLidSleutel } = require('../../kern/agenda');
 
   /* Een lid vraagt zijn EIGEN termijnen op, dus de kring is 'lid'. Dat staat er
      expliciet en niet als weggelaten argument: een standaardwaarde die toevallig
@@ -52,5 +54,34 @@ module.exports = (kern) => {
     } catch (e) {
       res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' });
     }
+  });
+
+  /* ---------- Uit uw post: datums die zichzelf aandienen ----------
+
+     De tower vult zich vanzelf met wat u HIER doet. De meeste datums in een
+     mensenleven komen per post binnen, en die staan daarna nergens meer. Deze
+     drie routes lezen uw eigen postvak en zetten wat ze vinden klaar als
+     VOORSTEL -- met de zin erbij, en pas na uw knop in de agenda.
+
+     Waarom niet automatisch: zie de kop van kern/postdatum.js. Een gast heeft
+     geen postvak, dus die komt hier niet langs. */
+  const adresVan = (req) => wie.lidAdres(req);
+  const mijnAgenda = (req) => agendaLidSleutel(req.session.key);
+
+  app.post('/api/member/vooruit/post', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    res.json(Object.assign({ status: 200 }, postdatum.voorstellen(adresVan(req), mijnAgenda(req))));
+  });
+  app.post('/api/member/vooruit/post/neem', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    const r = postdatum.neem(adresVan(req), mijnAgenda(req), req.body || {});
+    if (r.error) return res.status(400).json(r);
+    res.json(r);
+  });
+  app.post('/api/member/vooruit/post/negeer', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    const r = postdatum.negeer(mijnAgenda(req), (req.body || {}).id);
+    if (r.error) return res.status(400).json(r);
+    res.json(r);
   });
 };

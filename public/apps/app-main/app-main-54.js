@@ -73,6 +73,9 @@
        een paspoort dat verloopt en een boeking die komt. Vandaar geen
        tier-controle op deze regel, in tegenstelling tot de twee eronder. */
     html += '<div id="boVooruitCard"></div>';
+    /* En de voorstellen uit de eigen post (53c). Wel achter "geen gast": een
+       gast heeft geen postvak, dus die kaart zou voor hem altijd leeg zijn. */
+    if (user.tier !== 'guest') html += '<div id="boPostCard"></div>';
     if (user.tier !== 'guest') html += '<div id="boAgendaCard"></div>';
     // mijn facturen (automatisch bij elke aankoop)
     if (user.tier !== 'guest') html += '<div id="boFacturenCard"></div>';

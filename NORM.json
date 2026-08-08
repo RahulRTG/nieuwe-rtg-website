@@ -10,7 +10,7 @@
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 17,
     "e2eBestanden": 69,
-    "keuringOmvang": 106,
+    "keuringOmvang": 107,
     "keuringDubbeling": 67,
     "keuringDekkingAdvies": 50,
     "endpointsNooitAangeraakt": 0,
@@ -21,14 +21,20 @@
     "keuringTeGroot": 2,
     "inlineStijlAttributen": 5656,
     "browserpoortToetsen": 103,
-    "kernBreedte": 1077,
-    "kernGedeeld": 141,
+    "kernBreedte": 1078,
+    "kernGedeeld": 142,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 146,
+    "toetsenNietGemeten": 147,
     "toetsenOngevoeligPct": 2.3
   },
   "notities": [
+    {
+      "datum": "2026-08-08",
+      "meter": "kernBreedte 1077 -> 1078; kernGedeeld 141 -> 142; keuringOmvang 106 -> 107; toetsenNietGemeten 146 -> 147",
+      "reden": "De postdatums (kern/postdatum.js + kern/postdatum-lezer.js): de datums die per POST binnenkomen, als voorstel. Een kern-naam erbij (`postdatum`), en die wordt meteen door twee domeinen aangeraakt -- member en supplier krijgen dezelfde drie routes, want een zaak heeft dit harder nodig dan een lid (een keuringsafspraak komt vrijwel altijd per mail). Dat is dezelfde afweging als bij `levensgraaf` een commit eerder: een tweede lezer naast de eerste zou de dubbeling zijn die regel 4 verbiedt. keuringOmvang: postdatum-lezer.js staat met 9527 bytes in de waarschuwingsband. Ik heb hem NIET geknipt -- het leeuwendeel is de kop die uitlegt waarom '03/04/2026' wordt OVERGESLAGEN in plaats van geraden, en die uitleg hoort bij de regel te staan die hij verdedigt. Wat ik wel heb geknipt is kernlaag3.js: die kwam door de nieuwe montage in de band en is op een echte naad gesplitst (kernlaag3b.js draagt levensgraaf + bureau + postdatum, die samen een keten zijn). Netto dus een en niet twee. toetsenNietGemeten: test/postdatum.test.js is er nieuw en de mutatiemotor is er nog niet langs -- noemer, geen kwaliteit.",
+      "eerlijkheidshalve": "Dat de motor er nog niet langs is, betekent NIET dat deze toetsen niet zijn uitgedaagd: er zijn er acht met de hand op losgelaten (de twijfelregel weg, de vandaag-controle terug naar een vormcontrole, de datumcontrole bij neem() weg, het lijf weer rechtstreeks door bij agenda/toevoegen, negeer() dat niets bewaart, de managerpoort weg, 'besloten' dat de agenda niet meer leest, geenGast weg) en alle acht bijten. Twee daarvan waren echte bevindingen en geen bevestigingen: de vandaag-controle was een VORMcontrole waar '2026-13-45' doorheen kwam -- precies regel 8, en dezelfde fout die eerder in de graaf zat -- en het lijf van /api/agenda/toevoegen liep rechtstreeks door naar de opslag, waardoor een pagina zelf het etiket 'uit uw post' kon opplakken. Wat hier NIET wordt beweerd: dat de lezer elke datum in elke mail vindt. Hij kent drie vormen en slaat de twijfelgevallen over, en hij telt hardop hoeveel hij liet liggen."
+    },
     {
       "datum": "2026-08-08",
       "meter": "kernGedeeld 140 -> 141 (met de hand VERHOOGD)",

@@ -1866,6 +1866,7 @@ const hulp = {
 require('./opzet/kernlaag1')(kern, hulp);
 require('./opzet/kernlaag2')(kern, hulp);
 require('./opzet/kernlaag3')(kern, hulp);
+require('./opzet/kernlaag3b')(kern, hulp);
 require('./opzet/kernlaag4')(kern, hulp);
 require('./opzet/kernlaag4b')(kern, hulp);
 require('./opzet/kernlaag5')(kern, hulp);

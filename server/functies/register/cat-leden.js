@@ -18,6 +18,9 @@ module.exports = [
     uitleg: 'Leden solliciteren met hun cv op vacatures bij partners.', paden: ['/api/member/apply'] },
   { id: 'zakelijk', categorie: 'Leden (RTG-app)', naam: 'RTG Zakelijk (professioneel netwerk)', standaard: true, doelgroepen: ['lifestyle', 'business'],
     uitleg: 'De LinkedIn-laag van de Lifestyle en Business Pass: zakelijk profiel, gids, verbinden, feed, aanbevelingen en het kansenbord.', paden: ['/api/zakelijk'] },
+  { id: 'privekantoor', categorie: 'Leden (RTG-app)', naam: 'Het Privékantoor (Lifestyle)', standaard: true, doelgroepen: ['lifestyle', 'business'],
+    uitleg: 'De ene app van de Lifestyle Pass: de levensgraaf over de premium-apps heen, de Control Tower met alle termijnen, het mandaat (wat mag het kantoor zelf) en zaken met een team en een tijdlijn. Uit zetten laat de onderliggende apps staan; alleen de samenhang verdwijnt.',
+    paden: ['/api/member/bureau', '/api/office/bureau'] },
 
   // ---- Genres & diensten (leden boeken/kopen per sector) ----
   { id: 'bestellen', categorie: 'Genres & diensten', naam: 'Bestellen & bezorgen', standaard: true, doelgroepen: LEDEN_GAST,

@@ -125,6 +125,10 @@ module.exports = function hangRoutesOp(kern) {
   require('../routes/geloofbieb')(grens('geloofbieb'));
   /* Het RTF-kantoor, Clubs & steden en het Onderzoekslab (kern staat al hierboven). */
   require('../routes/rtfkantoor')(grens('rtfkantoor'));
+  /* Het RTF Living Lab: het onderzoeksplatform per stad. Eigen domein en niet
+     bij rtfkantoor ingehangen, want de bewonerskant heeft publieke deuren met
+     een eigen rem -- dat is een andere poort dan de kantoorinlog daar. */
+  require('../routes/livinglab')(grens('livinglab'));
   /* De twee werkplekken RTG en RTF (kern staat al hierboven). */
   require('../routes/werkplek')(grens('werkplek'));
   /* Het RTG Werk OS: de werkplek van een hele organisatie (server/bedrijf/).

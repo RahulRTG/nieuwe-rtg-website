@@ -12,7 +12,8 @@
      rahul
      rahul-fases
      theater
-     rtfos */
+     rtfos
+     mediaos */
 'use strict';
 
 module.exports = (kern, hulp) => {
@@ -118,7 +119,9 @@ require('../kern/rahul').zetGeslachtBron((key) => {
    hercompressie) en staan als bestanden in de datamap, nooit in git. */
 Object.assign(kern, require('../kern/theater').maakTheater({
   db, save, crypto, schoon, codenaamVan: kern.codenaamVan, notify, sseToOffice, sseToCustomer,
-  mediaDir: path.join(process.env.RTG_DATA_DIR || path.join(__dirname, 'data'), 'theater')
+  mediaDir: path.join(process.env.RTG_DATA_DIR || path.join(__dirname, 'data'), 'theater'),
+  // de Media-OS-haak: nieuw werk wekt volgers (./mediaos.js)
+  nieuwWerk: (k2, s2, t2) => (kern.mediaNieuwWerk ? kern.mediaNieuwWerk(k2, s2, t2) : null)
 }));
 /* De routebedrading staat in ./opzet/routes.js: welke domeinen dit proces
    bedient en welke routers er daarna op de kern worden gehangen. Dat blok is
@@ -177,4 +180,8 @@ Object.assign(kern, require('../kern/rtfos')({ db, save, crypto,
   // (een RTF-activiteit als afspraak in je eigen RTG-agenda). Zonder hem
   // meldt het koppelbord hem eerlijk als kapot, en dat is hij dan ook.
   agenda: kern.agenda }));
+
+// De Media OS hangt HIER, als laatste: hij LEEST de vier media-domeinen en
+// die moeten er dus al zijn. Uitleg: ./mediaos.js.
+require('./mediaos')(kern, notify);
 };

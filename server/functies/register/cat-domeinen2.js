@@ -16,6 +16,19 @@ module.exports = [
     uitleg: 'Steden, partnerstichtingen, projecten, vrijwilligers, geld, hulpvragen en verantwoording.', paden: ['/api/rtfos'] },
   { id: 'dom-lab', categorie: 'RTFoundation', naam: 'Het Onderzoekslab', standaard: true, doelgroepen: ['foundation'],
     uitleg: 'Projecten, fases, bevindingen en de kennisbank van het lab.', paden: ['/api/lab'] },
+  /* Het Living Lab staat als TWEE schakelaars in de kast, en dat is met opzet.
+     De kantoorkant en de bewonerskant zijn hier echt verschillende deuren: de
+     eerste zit achter de kantoorinlog, de tweede staat open op een labpas of
+     helemaal zonder code. Een lab dat zijn publieke kant even wil sluiten (een
+     gemeente die eerst het beleid rond wil hebben, een stad waar het nog niet
+     loopt) moet dat kunnen doen zonder het onderzoek zelf plat te leggen --
+     en omgekeerd. Eén schakelaar over allebei had die keuze onmogelijk gemaakt. */
+  { id: 'dom-livinglab', categorie: 'RTFoundation', naam: 'Het RTF Living Lab', standaard: true, doelgroepen: ['foundation'],
+    uitleg: 'De onderzoekscyclus, de ethieklaag, de bewijsmotor, de apparatuur en de pijplijn naar verandering.',
+    paden: ['/api/lab2'] },
+  { id: 'dom-livinglab-bewoner', categorie: 'RTFoundation', naam: 'Living Lab: de bewonerskant', standaard: true, doelgroepen: ALLE,
+    uitleg: 'Meedoen met een labpas, een onderzoeksvraag aandragen, stemmen en het labpaspoort.',
+    paden: ['/api/lab2/bewoner', '/api/lab2/mijn'] },
   { id: 'dom-labfonds', categorie: 'RTFoundation', naam: 'Het labfonds', standaard: true, doelgroepen: ['foundation'],
     uitleg: 'De financiering van onderzoeksprojecten.', paden: ['/api/labfonds'] },
   { id: 'dom-samen', categorie: 'RTFoundation', naam: 'Samen (stadsraad)', standaard: true, doelgroepen: ['foundation'],

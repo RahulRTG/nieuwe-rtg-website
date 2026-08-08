@@ -376,6 +376,75 @@ ergens iets rood wordt. Alles met een id blijft staan, altijd.
 Split View (`shared/split.js`) blijft: twee apps naast elkaar is iPad, geen
 bureaublad. In zo'n paneel krijgt de app geen eigen home-indicator.
 
+### Het RTF Living Lab: spelenderwijs, maar niet vrijblijvend
+
+`server/kern/livinglab/` + `server/routes/livinglab/` + `/apps/livinglab.html`
+(kantoor) en `/apps/labpas.html` (bewoner). Het onderzoeksplatform van de
+stichting, per stad in te zetten: buurtbewoners, onderzoekers, studenten,
+organisaties en gemeenten onderzoeken er samen echte problemen.
+
+De stelling in één zin: **de voorkant mag speels zijn, de achterkant is een
+onderzoeksinstituut.** Wat dat concreet betekent:
+
+- **Eén cyclus van tien stappen** voor elk onderzoek: vraagstuk → hypothese →
+  plan → deelnemers → experiment → observaties → reflectie → resultaten →
+  besluit → vervolg. Nooit een stap overslaan, en nooit terug -- wie halverwege
+  iets anders ontdekt, zet dat in de reflectie; een echt nieuw plan is een
+  nieuwe studie. Elke stap heeft een poort die **alle** openstaande gebreken
+  teruggeeft, niet alleen het eerste (`kern/livinglab/cyclus.js`).
+- **Twaalf projectsoorten**, van sensoren tot sociale cohesie. "Vermindert een
+  buurttuin eenzaamheid?" draait op dezelfde motor als "welke sensor meet
+  wateroverlast het beste?". Wat verschilt is het GEWICHT, niet de kwaliteit van
+  de ondersteuning: bij een menselijk onderwerp weegt het professionele oordeel
+  zwaarder, ligt de bewijslat hoger en blijft de data gescheiden. Dat verschil
+  staat als DATA in `kader.js` en niet als apart codepad -- anders krijgt de
+  sociale kant vanzelf de tweederangs versie.
+- **De bewijsmotor** (`bewijs.js` + `graden.js`) voorkomt dat een mooi verhaal
+  een feit wordt. Een conclusie draagt bronnen, datasets, observaties,
+  interviews, experimenten en statistiek, en de graad (aanname → waarneming →
+  indicatie → sterk bewijs → bewezen binnen deze studie) is geen keuze maar een
+  uitkomst van drie plafonds: wat eronder ligt, wat de methode kan dragen, en
+  wie tekent. Bewijs weghalen laat een conclusie zakken; bewijs toevoegen mag
+  hem nooit verlagen (die regressie zat er, en `test/livinglab.test.js` bewaakt
+  hem).
+- **Ethiek als poort, niet als vinkje** (`ethiek.js` + `waarborg.js`). Vier
+  risicoklassen bepalen wat er af moet zijn vóór er één deelnemer bij mag:
+  review met één of twee handtekeningen (waarvan één onafhankelijk),
+  privacytoets, toestemmingsregime, ouderlijke toestemming, stopcriteria. De AI
+  kan die grenzen niet omzeilen -- niet omdat het in zijn prompt staat, maar
+  omdat de poort in code staat.
+- **Gescheiden onderzoeksdata.** Bij klasse hoog en hoger wordt de koppeling
+  alias → Foundation-sleutel **nergens** vastgelegd; de deelnemer houdt zijn
+  labpas en dat is de enige handle. Aliassen zijn bovendien per studie, dus twee
+  dossiers zijn niet naast elkaar te leggen. De prijs staat er eerlijk bij: het
+  lab kan zo'n deelnemer niet terugvinden vanuit zijn profiel. Dat is de
+  bedoeling.
+- **Bewoners als medeonderzoeker.** Ze dragen vragen aan en stemmen erop
+  (`themas.js`), doen mee in zeven rollen, sturen observaties in en trekken zich
+  terug -- alles op een **labpas en zonder account**. De alias komt altijd uit
+  die pas en nooit uit het lijf van het verzoek.
+- **Gamification op kwaliteit** (`spel.js`). Geen punt per observatie en geen
+  ranglijst op volume; wél punten voor een bron natrekken, iemand echt spreken,
+  een fout vastleggen en -- het zwaarst -- een eerdere conclusie herzien of een
+  onderzoek stoppen omdat het bewijs tegenviel.
+- **Van onderzoek naar verandering** (`doorbraak.js`): zeven uitgangen (pilot,
+  werkorder, subsidie, beleid, startup, onderwijs, nieuw onderzoek), elk met een
+  bewijs-ondergrens. Een beleidsvoorstel vraagt minstens een indicatie; nieuw
+  onderzoek mag juist uit een aanname komen. Een pilot gaat door naar het
+  bestaande **RTG Onderzoekslab** (`kern/onderzoekslab.js`) en wordt daar één
+  project -- er komt geen tweede projectenlijst bij.
+- **Meerdere labs onder één RTF** (`bestuur.js`): Haarlem werkt anders dan
+  Nairobi, maar de cyclus, de bewijsgraden en de risicoklassen zijn centraal en
+  lokaal niet te verlagen. De bewaartermijn mag lokaal omhoog, nooit onder de
+  RTF-ondergrens.
+- **Impact die ook de tegenvallers telt** (`impact.js`): gestopte studies staan
+  bij de opbrengst en niet bij de uitval, met het stoppercentage als eigen
+  getal. Een lab dat nooit iets stopt, onderzoekt niets.
+
+De schermen halen hun cyclus, methoden en bewijsgraden op bij
+`/api/lab2/kader` en bouwen niets van dat alles zelf na, zodat er geen stap in
+beeld kan staan die de server weigert.
+
 ## Tests
 
 ```bash
@@ -1011,6 +1080,38 @@ tekent; een feature flag zonder opruimdatum bestaat niet; de laatste opzegdag
 wordt uitgerekend uit de einddatum en de opzegtermijn; stemmen kan pas na de
 adviesronde en het beheer-token stemt niet; en wat niet gemeten wordt staat
 overal als **niet gemeten** in plaats van als nul.
+
+### RTG Media OS (één mediawereld over vier apps)
+
+Er waren vier media-apps die niets van elkaar wisten: **RTG Klankwerk** (zelf muziek maken en uitgeven), **RTG Theater** (video), **RTG Clips** (korte verticale video) en **RTG Podium** (live). Voor een lid was dat vier keer dezelfde maker, vier keer een volgknop en vier keer zoeken; voor een maker vier keer publiceren en vier keer bijhouden hoe het gaat.
+
+`server/kern/mediaos/` legt daar één laag overheen met **drie standen op dezelfde wereld**: **Muziek**, **Kijk** (video + live) en **Flow** (korte video). Eén app: `/apps/media.html`.
+
+Het ontwerpbesluit dat alles draagt: **de Media OS bezit die vier domeinen niet.** Elke rij wordt bij het opvragen uit het domein zelf gehaald en een volgknop schrijft in de volgerslijst van het domein zelf, dus er komt nergens een tweede administratie naast het origineel te staan (LAT.md regel 4). Wat de Media OS wél bezit, is precies wat nergens bestond: de bibliotheek over de vormen heen, het smaakprofiel dat u zelf invult, en de meldingsvoorkeur per maker.
+
+- **Eén universele contentidentiteit.** Elk stuk heet `<vorm>:<domein-id>` (`track:u91c0`, `video:v3f1a2`, `clip:c77b0`, `live:p12`). Daarmee praten de bibliotheek, de hub en de smaak over de vier vormen heen zonder te weten waar iets vandaan komt.
+- **Eén makersprofiel.** Al het werk van één codenaam bij elkaar, met één volgknop die onder water in Clips én in het Theaterkanaal schrijft. Het maandabonnement op een livekanaal blijft er met opzet buiten: dat kost geld en hoort een aparte, bewuste stap te zijn.
+- **De stuk-hub.** Onder een uitgegeven nummer hangen de korte video's die dat nummer als geluid dragen (die verbinding bestaat écht: `kern/clips-studio.js` legt het track-id vast als een maker zijn eigen stuk onder een clip zet), plus zijn andere werk. Er wordt niets bij elkaar geraden — een "officiële videoclip bij dit nummer" bestaat niet in de gegevens en staat er dus ook niet.
+- **Meldingen die je zelf richt.** Eén keer volgen, en dan per maker kiezen waarvoor je gewekt wilt worden (muziek, video, flow, live). Bij een uitgave, een video waarvan de bytes binnen zijn, een nieuwe clip of live gaan wekt `kern/mediaos/wekken.js` precies die mensen — en niemand anders; de maker zelf ook niet.
+- **Een korte video speelt gewoon in de app.** Het clip-protocol staat als één gedeelde laag in `public/shared/clipdeler.js`: kijken, uitdienen, het toestelarchief, de knip en de ondertitels. `clips.html` en `media.html` gebruiken allebei die laag, dus er is geen tweede exemplaar van dezelfde waarheid — en een maker die in de Media OS zit, dient zijn eigen clips gewoon uit in plaats van "offline" te lijken. `test/clipdeler.e2e.js` laat een clip echt van de ene browser naar de andere reizen en controleert dat er géén clipbestand in de datamap van RTG belandt.
+- **Uw eigen regelaars in plaats van een algoritme.** Geen stil meegeschreven kijkprofiel: alleen wat u zelf zegt (meer, minder, nooit, verras me, wissen). Bij élk stuk staat waarom het er staat, en die zin komt uit dezelfde code die de volgorde bepaalt. Geen volgorde op populariteit en geen oneindige feed — de drie apps eronder weigeren die alle drie met zoveel woorden.
+- **Niets valt stil weg.** Een bron die dicht is (het Podium eist 18+ en verificatie) staat met de reden van dat domein zelf onder de wereld; wat u met "nooit" wegzet, wordt geteld getoond; een bewaard stuk dat de maker heeft weggehaald staat als verdwenen in plaats van te verdampen.
+- **Het makersbord** telt alleen wat er écht geteld wordt (uitgaven, "mooi", reacties, volgers, Podium-abonnees en -omzet) en zet er met naam bij wat er níét geteld wordt: weergaven, kijktijd en bereik houdt RTG nergens bij. Liever geen getal dan een getal dat niets meet.
+
+| Endpoint | Doel |
+|---|---|
+| `POST /api/mediaos/wereld` `{modus}` | De wereld in één stand (`muziek`, `kijk`, `flow`, `alles`), met per stuk een `waarom` |
+| `POST /api/mediaos/stuk` `{id}` | De stuk-hub: dit stuk, de clips met dit geluid eronder, en ander werk van de maker |
+| `POST /api/mediaos/maker` `{codenaam}` | Eén makersprofiel over de vier vormen heen, met de volgstand |
+| `POST /api/mediaos/volg` `{codenaam, aan}` | Volgen/ontvolgen; schrijft in Clips en het Theater, nooit in een betaald abonnement |
+| `POST /api/mediaos/meldingen` `{codenaam, soorten}` | Waarvoor u van deze maker gewekt wilt worden (muziek/video/flow/live); nieuw werk wekt precies die mensen |
+| `POST /api/mediaos/bieb` · `/bewaar` `{id, aan}` | De bibliotheek over de vier vormen heen |
+| `POST /api/mediaos/smaak` · `/stuur` `{richting, maker\|onderwerp}` | Het smaakprofiel lezen en bijsturen |
+| `POST /api/mediaos/bord` | Het makersbord, inclusief wat er niet geteld wordt |
+
+Wat er nog niet speelt in de Media OS zelf: een **livestream** van het Podium. Dat is een andere stroom (een relay-boom over kijkers, met een betaalde toegangsdeur ervoor) en geen kopie van het clip-protocol; de kaart verwijst daarvoor naar het Podium en zegt waarom. Staat als 4.12 in `TAKEN.md`.
+
+De vier apps eronder blijven gewoon bestaan en werken los: wie recht naar de studio, de zaal of het Podium wil, hoort daar zonder omweg te kunnen. Zet de boardroom de schakelaar `mediaos` uit, dan verdwijnt alleen de verbindende laag.
 
 ### RTG Bank & RTG Stad (de eigen infrastructuur)
 

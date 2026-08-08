@@ -305,6 +305,7 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
     ['public/shared/glyf/glyf-02.js', 'de glyfentabel: elk icoon een pad, hoort bij elkaar'],
     ['public/shared/klok3d/klok3d-01.js', 'de 3D-klok: een aaneengesloten tekenlus'],
     ['public/shared/metgezel/metgezel-01.js', 'de metgezel-laag in een IIFE zonder binnengrens'],
+    ['server/kern/livinglab/kader.js', 'de tabellen van het Living Lab (cyclus, soorten, methoden, rollen, bewijsgraden, risicoklassen): één tabelset zonder logica, en juist het bestand dat NIET op twee plekken mag staan'],
     ['public/shared/i18n/i18n-01.js', 'de taaltabel + kiezer, een geheel'],
     ['public/shared/i18n/i18n-03.js', 'de taaltabel + kiezer, een geheel'],
     ['server/server.js', 'de bedrading van de hele app; wordt per ronde verder verdund'],
@@ -1434,6 +1435,43 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
     ['/api/rtf/club/portaal', 'de clubcode is de geloofsbrief (vindCode); alleen het eigen clubdossier'],
     ['/api/rtf/club/bericht', 'idem: schrijft alleen in het logboek van die ene clubcode'],
     ['/api/rtf/partner/raad', 'de raadcode is de geloofsbrief (vindCode); alleen de eigen partnerkant'],
+
+    /* HET RTF LIVING LAB (routes/livinglab/bewoner.js). Dezelfde familie, en om
+       een reden die in het ontwerp zelf zit: een Living Lab waarin een bewoner
+       een account nodig heeft om een vraag aan te dragen of zijn eigen
+       onderzoek te openen, is geen Living Lab meer. Twee soorten deuren:
+
+       - OP EEN CODE (de labpas, het labpaspoort). De pas is de geloofsbrief
+         (mensen.opPas) en bepaalt de alias; die wordt nooit uit het lijf
+         gelezen, want een alias staat in het teambeeld en bewijst dus niets
+         (regel 8). Ze dragen dezelfde twee remmen als de andere codedeuren:
+         20/min per bron tegen het afgrazen, 60/min per code tegen veel bronnen
+         op een code.
+       - ZONDER CODE (een vraag aandragen, stemmen, een klacht indienen, het
+         publieke labbeeld). Die kennen geen geheim en horen dat ook niet te
+         kennen. Ze geven per constructie alleen de BUITENSTE ring terug
+         (kern/livinglab/studie.js: geen deelnemers, geen observaties, en bij een
+         gescheiden studie zelfs geen vraagstelling), en de schrijfkant staat op
+         10/min per bron omdat daar inhoud binnenkomt.
+
+       De klacht staat er bewust zonder pas bij: een klacht kan juist gaan over
+       hoe het onderzoek met je omging, en "log eerst in" is daar het verkeerde
+       antwoord. Wat blijft staan voor de externe toets, net als bij de club- en
+       raadcodes: passen zonder vervaldatum en zonder intrekknop. */
+    ['/api/lab2/mijn', 'de labpas is de geloofsbrief (opPas); alleen het eigen onderzoek van die ene deelnemer'],
+    ['/api/lab2/mijn/observatie', 'idem; de alias komt uit de pas en niet uit het lijf'],
+    ['/api/lab2/mijn/reflectie', 'idem; juist het gedrag dat dit lab wil hebben, dus het mag geen drempel krijgen'],
+    ['/api/lab2/mijn/terugtrekken', 'toestemming intrekken moet werken met wat de deelnemer zelf heeft: zijn pas'],
+    ['/api/lab2/bewoner/themas', 'de vragen uit de buurt zijn openbaar; dat is de trechter vóór het onderzoek'],
+    ['/api/lab2/bewoner/thema', 'een bewoner draagt een onderzoeksvraag aan zonder account (rem 10/min per bron)'],
+    ['/api/lab2/bewoner/stem', 'stemmen op een thema; de teller hangt aan het THEMA en niet aan de stemmer (regel 7)'],
+    ['/api/lab2/bewoner/overzicht', 'het publieke labbeeld: alleen de buitenste ring, nooit deelnemers of ruwe data'],
+    ['/api/lab2/bewoner/studie', 'idem per onderzoek; bij een gescheiden studie niet meer dan titel en stap'],
+    ['/api/lab2/bewoner/labs', 'welke Living Labs er zijn; zonder budget, tekenaars en partners'],
+    ['/api/lab2/bewoner/klacht', 'de klachtenprocedure mag geen inlog vragen: de klacht kan over het onderzoek zelf gaan'],
+    ['/api/lab2/bewoner/paspoort', 'de paspoortcode is de geloofsbrief; toont alleen punten, niveau en badges'],
+    ['/api/lab2/bewoner/paspoort-maak', 'een labpaspoort aanmaken op een zelfgekozen roepnaam (rem 10/min per bron)'],
+    ['/api/lab2/bewoner/kader', 'de spelregels van het lab: cyclus, methoden en bewijsgraden horen juist openbaar te zijn'],
 
     /* Dezelfde familie, in het Foundation OS (routes/rtfos/portalen.js). Een
        lokale stichting, een gemeente en een lokale ondernemer hebben geen

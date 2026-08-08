@@ -31,7 +31,7 @@ const ONDER = ['codenaam', 'rtg'];
 const ZAAL = 30;                 // wat je in één keer te horen krijgt
 const MAX_REACTIES = 200;
 
-module.exports = ({ db, save, crypto, schoon, trackMet, codenaamVan, makersVan, publiekeTrack, notify }) => {
+module.exports = ({ db, save, crypto, schoon, trackMet, codenaamVan, makersVan, publiekeTrack, notify, nieuwWerk }) => {
   const nu = () => new Date().toISOString();
   const rid = () => 'u' + crypto.randomBytes(5).toString('hex');
 
@@ -79,6 +79,10 @@ module.exports = ({ db, save, crypto, schoon, trackMet, codenaamVan, makersVan, 
     if (onder === 'rtg' && notify) {
       try { notify('kantoor', 'Klankwerk: aanvraag om uit te geven onder de RTG-naam ("' + u.naam + '").'); } catch (e) {}
     }
+    /* Nieuw werk: de Media OS wekt de volgers die MUZIEK van deze maker aan
+       hebben staan. Laat gebonden en optioneel -- het Klankwerk hoeft niet te
+       weten dat er een laag boven hem hangt, en werkt zonder hem gewoon door. */
+    if (nieuwWerk) { try { nieuwWerk(sess.key, 'muziek', u.naam); } catch (e) {} }
     return { status: 200, ok: true, uitgave: publiek(u, sess.key) };
   }
 
@@ -178,26 +182,15 @@ module.exports = ({ db, save, crypto, schoon, trackMet, codenaamVan, makersVan, 
   }
   const reacties = (id) => ({ status: 200, reacties: (U().reacties[String(id || '')] || []).slice(-60) });
 
-  /* Wat een uitgave naar buiten toont. NOOIT een sleutel en nooit een echte
-     naam: alleen codenamen, en de RTG-naam waar die verdiend is. */
-  const publiek = (u, key) => ({
-    id: u.id, naam: u.naam, bpm: u.bpm, maten: u.maten,
-    onder: u.onder,
-    naamOnder: u.onder === 'rtg' ? 'Rahul Travel Group' : (u.makers[0] || {}).codenaam || codenaamVan(u.key),
-    makers: u.makers,
-    toelichting: u.toelichting,
-    rtgAanvraag: u.rtgAanvraag || null,
-    rtgReden: u.rtgReden || '',
-    mooi: Object.keys(u.mooi || {}).length,
-    ikVindHem: !!(u.mooi || {})[key],
-    vanMij: u.key === key,
-    reacties: (U().reacties[u.id] || []).length,
-    at: u.at
-  });
+  /* Wat een uitgave naar buiten toont, en alles van één maker: dat staat in
+     ./muziek-uitgave-beeld.js. Apart, omdat het een eigen onderwerp is (welke
+     velden mogen naar buiten, en welke nooit) en omdat dit bestand anders over
+     de omvangregel van de keuring gaat. */
+  const { publiek, vanMaker } = require('./muziek-uitgave-beeld')({ U, codenaamVan });
 
   return { muziekGeefUit: geefUit, muziekTrekIn: trekIn, muziekVraagRtg: vraagRtg,
     muziekZaal: zaal, muziekLuister: luister, muziekMooi: mooi, muziekReageer: reageer,
-    muziekReacties: reacties,
+    muziekReacties: reacties, muziekUitgavenVan: vanMaker,
     // "is dit stuk al uitgegeven?" -- de studio moet dat kunnen vragen zonder de
     // hele zaal op te halen en op naam te gaan raden
     muziekUitgaveVan: (sess, trackId) => {

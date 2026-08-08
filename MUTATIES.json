@@ -561,11 +561,27 @@
       "gezakt": 4,
       "scherp": "gezakt"
     },
+    "browserpoort.e2e.js": {
+      "soort": "puur",
+      "staat": "overleefd",
+      "modules": [
+        "server/lib/browser.js"
+      ],
+      "geprobeerd": 2,
+      "posities": 8
+    },
     "bugjacht.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 28,
+      "scherp": "gezakt"
+    },
+    "bureau.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 16,
       "scherp": "gezakt"
     },
     "ca.test.js": {

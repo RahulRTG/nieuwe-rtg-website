@@ -109,14 +109,47 @@
 
   /* ---------- mappen openen ---------- */
   const mapScrim = $('#osMapScrim'), mapGrid = $('#osMapGrid'), mapTitel = $('#osMapTitel');
+  /* Een brede app opent in SECTIES en niet als een raster losse merknamen.
+
+     Dat is het verschil tussen honderd apps en vijf. Wie "Geld" opende zag
+     tien tegels met ieder een eigen naam -- Wallet, RTG-code, Lab-fonds -- en
+     moest zelf uitzoeken welke hij nodig had. Nu staat er "Betalen",
+     "Rekeningen", "Samen en bezit", en daaronder wat je daar doet. De namen
+     eronder zijn functies geworden en geen producten (zie LINKS in 24.js).
+
+     Een sectie waarvan geen enkel onderdeel zichtbaar is (pas, boardroom, gast)
+     verdwijnt hier helemaal: een kopje boven een leeg vak is erger dan geen
+     kopje, want het suggereert dat er iets weg is. */
   function openMap(map) {
     mapTitel.textContent = mapNaam(map);
     mapGrid.textContent = '';
-    for (const item of map.items.filter(itemZichtbaar)) {
-      const el = maakAppIcoon(item);
-      // alleen de map zelf dicht: een os-app (Bellen) opent hierna zijn kiezer
-      el.addEventListener('click', () => mapScrim.classList.remove('open'));
-      mapGrid.appendChild(el);
+    // oudere bewaarde indelingen kennen alleen een vlakke lijst; die krijgt
+    // hier een naamloze sectie, zodat een map altijd te openen is
+    const secties = map.secties || [{ naam: '', items: map.items }];
+    /* Een brede app met maar EEN deur opent die deur. Het Privekantoor is zo'n
+       geval -- het is zelf al een app met kamers, dus een tussenscherm met een
+       enkele tegel erop zou een extra tik zijn die niets kiest. Dit geldt ook
+       als een lid de rest van een map heeft uitgezet in zijn boardroom. */
+    const zichtbaar = secties.reduce((a, x) => a.concat(x.items.filter(itemZichtbaar)), []);
+    if (zichtbaar.length === 1) { openItem(zichtbaar[0]); return; }
+    for (const sectie of secties) {
+      const zicht = sectie.items.filter(itemZichtbaar);
+      if (!zicht.length) continue;
+      if (sectie.naam) {
+        const kop = document.createElement('h4');
+        kop.className = 'os-sectiekop';
+        kop.textContent = T('os.sectie.' + sectie.naam.toLowerCase().replace(/[^a-z]+/g, ''), sectie.naam);
+        mapGrid.appendChild(kop);
+      }
+      const rij = document.createElement('div');
+      rij.className = 'os-grid os-map-grid';
+      for (const item of zicht) {
+        const el = maakAppIcoon(item);
+        // alleen de map zelf dicht: een os-app (Bellen) opent hierna zijn kiezer
+        el.addEventListener('click', () => mapScrim.classList.remove('open'));
+        rij.appendChild(el);
+      }
+      mapGrid.appendChild(rij);
     }
     mapScrim.classList.add('open');
   }

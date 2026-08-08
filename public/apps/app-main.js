@@ -12,7 +12,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '34b4e892';
+var RTG_BOUW = '547fa9d4';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -3068,18 +3068,18 @@ var RTG_BOUW = '34b4e892';
   // Elke app kent zijn eigen huisstijl-glyf (shared/glyf.js) op naam van de
   // sleutel; de tegel tekent die als dunne lijn-icoon (geen emoji meer).
   const LINKS = {
-    ontdek:      { naam: 'Het Huis',     url: '/apps/rtg.html' },
+    ontdek:      { naam: 'Ontdekken',     url: '/apps/rtg.html' },
     spelen:      { naam: 'Spelen',       url: '/apps/spelen.html?pas=' + encodeURIComponent(pas) },
     vrienden:    { naam: 'Vrienden',     url: '/apps/foundation/vrienden.html' },
     juridisch:   { naam: 'Juridisch',    url: '/apps/juridisch.html' },
     camera:      { naam: 'Camera',       url: '/apps/camera.html' },
-    muziek:      { naam: 'RTG Sound',    url: '/apps/muziek.html' },
-    podium:      { naam: 'Podium',       url: '/apps/podium.html' },
-    flits:       { naam: 'Flits',        url: '/apps/flits.html' },
+    muziek:      { naam: 'Muziek',    url: '/apps/muziek.html' },
+    podium:      { naam: 'Live',       url: '/apps/podium.html' },
+    flits:       { naam: 'Verkeer',           url: '/apps/flits.html' },
     navigatie:   { naam: 'Navigatie',    url: '/apps/navigatie.html' },
-    theater:     { naam: 'Theater',      url: '/apps/theater.html' },
-    residentie:  { naam: 'De Résidence', url: '/apps/residentie.html' },
-    wbw:         { naam: 'Wie betaalt wat', url: '/apps/wbw.html' },
+    theater:     { naam: 'Films en series',      url: '/apps/theater.html' },
+    residentie:  { naam: 'Verblijven', url: '/apps/residentie.html' },
+    wbw:         { naam: 'Samen betalen', url: '/apps/wbw.html' },
     passkeys:    { naam: 'Passkeys',     url: '/apps/passkeys.html' },
     // veiligheid en verbinding: vier apps op een gedeelde kern
     ik:          { naam: 'Wie ben ik',   url: '/apps/ik.html' },
@@ -3087,10 +3087,18 @@ var RTG_BOUW = '34b4e892';
     codewoord:   { naam: 'Codewoord',    url: '/apps/codewoord.html' },
     vitaal:      { naam: 'Vitaal',       url: '/apps/vitaal.html' },
     thuisrust:   { naam: 'Thuisrust',    url: '/apps/thuisrust.html' },
-    ov:          { naam: 'OV',           url: '/apps/ov.html' },
-    stad:        { naam: 'Mijn Stad',    url: '/apps/stad.html' },
-    clips:       { naam: 'Clips',        url: '/apps/clips.html' },
-    office:      { naam: 'RTG Office',   url: '/apps/office.html' },
+    ov:          { naam: 'Openbaar vervoer',           url: '/apps/ov.html' },
+    stad:        { naam: 'Stad',    url: '/apps/stad.html' },
+    clips:       { naam: 'Video',        url: '/apps/clips.html' },
+    /* RTG Media staat NAAST Video, Sound, Theater en Podium en niet in plaats
+       daarvan: het is de laag die ze tot een wereld maakt, en wie recht naar de
+       studio of de zaal wil, hoort daar gewoon heen te kunnen.
+
+       De NAMEN komen van deze kant en de app van de andere: deze ronde
+       hernoemde de tegels naar gewone woorden ("Video" in plaats van "Clips"),
+       en een tak die daarvoor aftakte kent die keuze nog niet. */
+    mediaos:     { naam: 'RTG Media',    url: '/apps/media.html' },
+    office:      { naam: 'Documenten',   url: '/apps/office.html' },
     /* Hier stond een losse "Werk OS"-tegel naast "Mijn werkplekken": twee
        tegels met hetzelfde koffertje, en erger, twee INLOGS. De ene ging via
        het ene RTG-account, de andere vroeg opnieuw om een werkruimtecode en
@@ -3098,33 +3106,33 @@ var RTG_BOUW = '34b4e892';
        betekenen. De werkruimte is nu een sleutel aan diezelfde bos, dus er is
        nog een deur: Mijn werkplekken. Wie er voor het eerst in moet, vindt de
        werkruimte-inlog onderaan diezelfde kiezer. */
-    sitemaker:   { naam: 'Website-maker', url: '/apps/sitemaker.html' },
-    browser:     { naam: 'RTG Browser',  url: '/apps/browser.html' },
-    vonk:        { naam: 'Vonk',         url: '/apps/vonk.html' },
+    sitemaker:   { naam: 'Website', url: '/apps/sitemaker.html' },
+    browser:     { naam: 'Web',  url: '/apps/browser.html' },
+    vonk:        { naam: 'Daten',         url: '/apps/vonk.html' },
     balans:      { naam: 'Balans',       url: '/apps/balans.html' },
     /* Mijn loon staat bij Geld en niet bij Werk: het is uw geld, niet iets van
        uw werkgever. Wie nergens werkt vindt een lege lijst met de zin die dat
        uitlegt -- dat is beter dan een tegel die verdwijnt zodra u van baan
        wisselt. Prive: dit scherm draagt uw loon en uw inzagespoor. */
-    loonstrook:  { naam: 'Mijn loon',    url: '/apps/loonstrook.html' },
-    rechterhand: { naam: 'De Rechterhand', url: '/apps/lifestyle.html' },
+    loonstrook:  { naam: 'Loon',    url: '/apps/loonstrook.html' },
+    rechterhand: { naam: 'Privekantoor', url: '/apps/lifestyle.html' },
     reisboek:    { naam: 'Reisboek',      url: '/apps/reisboek.html' },
     cellier:     { naam: 'Cellier',       url: '/apps/cellier.html' },
     table:       { naam: 'Table',         url: '/apps/table.html' },
     maison:      { naam: 'Maison',        url: '/apps/maison.html' },
     garderobe:   { naam: 'Garde-robe',    url: '/apps/garderobe.html' },
     mecenaat:    { naam: 'Mecenaat',      url: '/apps/mecenaat.html' },
-    labfonds:    { naam: 'Lab-fonds',     url: '/apps/labfonds.html' },
-    rtgcode:     { naam: 'RTG-code',      url: '/apps/rtgcode.html' },
+    labfonds:    { naam: 'Fonds',     url: '/apps/labfonds.html' },
+    rtgcode:     { naam: 'Betaalcode',      url: '/apps/rtgcode.html' },
     nalatenschap:{ naam: 'Nalatenschap',  url: '/apps/nalatenschap.html' },
     logboek:     { naam: 'Logboek',       url: '/apps/logboek.html' },
     cercle:      { naam: 'Cercle',        url: '/apps/cercle.html' },
-    pulse:       { naam: 'Pulse',         url: '/apps/pulse.html' },
+    pulse:       { naam: 'Vandaag',         url: '/apps/pulse.html' },
     nieuws:      { naam: 'Nieuws',        url: '/apps/nieuws.html' },
-    krant:       { naam: 'RTG Krant',     url: '/apps/krant.html' },
+    krant:       { naam: 'Krant',     url: '/apps/krant.html' },
     vluchten:    { naam: 'Vluchten',      url: '/apps/vluchten.html' },
     sport:       { naam: 'Sport',         url: '/apps/sport.html' },
-    school:      { naam: 'RTG School',    url: '/apps/rtgschool.html' },
+    school:      { naam: 'School',    url: '/apps/rtgschool.html' },
     berichten:   { naam: 'Berichten',     url: '/apps/berichten.html' },
     hangar:      { naam: 'Hangar',        url: '/apps/hangar.html' },
     entourage:   { naam: 'Entourage',     url: '/apps/entourage.html' },
@@ -3164,28 +3172,63 @@ var RTG_BOUW = '34b4e892';
      Een map heeft een vaste sleutel (waar je eigen naam onder bewaard wordt),
      een standaardnaam en zijn apps. Apps die voor jouw pas niet bestaan
      vallen er vanzelf uit (itemZichtbaar). */
+  /* DE MAPPEN VAN HET BEGINSCHERM -- afgesplitst uit ./app-main-24.js.
+
+     Dat deel droeg twee dingen: WELKE apps er zijn (OSAPPS/LINKS) en HOE ze op
+     het beginscherm in mappen liggen. Samen gingen ze over de 10 KB-lat, en de
+     knip loopt langs die grens: hierboven de catalogus, hier de indeling.
+
+     Dit deel deelt de scope van de bundel (zie scripts/bundel.js). */
   const MAPPEN = [
-    { sleutel: 'map-reizen', naam: 'Reizen', items: [
-      'tab:reizen', 'tab:terplaatse', 'link:vluchten', 'link:ov', 'link:navigatie',
-      'link:flits', 'link:stad', 'link:reisboek', 'link:hangar', 'link:residentie', 'link:maison'] },
-    { sleutel: 'map-geld', naam: 'Geld', items: [
-      'tab:betalen', 'tab:bestellen', 'link:wallet', 'link:bank', 'link:wbw', 'link:rtgcode',
-      'link:balans', 'link:loonstrook', 'tab:assets', 'link:labfonds', 'link:mecenaat',
-      'link:nalatenschap', 'link:logboek'] },
-    { sleutel: 'map-salon', naam: 'De Salon', items: [
-      'tab:salon', 'link:pulse', 'link:vrienden', 'os:snaps', 'link:camera', 'link:clips',
-      'link:muziek', 'link:podium', 'link:theater', 'link:spelen', 'link:vonk', 'link:nieuws',
-      'link:krant', 'link:sport', 'link:cercle', 'link:entourage', 'link:rendezvous',
-      'link:attenties', 'link:table', 'link:cellier', 'link:garderobe'] },
-    { sleutel: 'map-huis', naam: 'Het Huis', items: [
-      'link:ontdek', 'os:rtf', 'link:school', 'tab:zorg', 'tab:gezin', 'link:rechterhand',
-      'link:office', 'link:browser', 'link:sitemaker', 'link:juridisch', 'link:passkeys',
-      'link:ik', 'link:thuiswacht', 'link:codewoord', 'link:vitaal', 'link:thuisrust', 'os:werk'] }
+    { sleutel: 'map-reizen', naam: 'Reizen', secties: [
+      { naam: 'Plannen', items: ['tab:reizen', 'link:vluchten', 'link:residentie'] },
+      { naam: 'Onderweg', items: ['tab:terplaatse', 'link:navigatie', 'link:ov', 'link:flits', 'link:stad'] }
+    ] },
+    { sleutel: 'map-geld', naam: 'Geld', secties: [
+      { naam: 'Betalen', items: ['tab:betalen', 'link:wallet', 'link:rtgcode', 'tab:bestellen'] },
+      { naam: 'Rekeningen', items: ['link:bank', 'link:balans', 'link:loonstrook'] },
+      { naam: 'Samen en bezit', items: ['link:wbw', 'tab:assets', 'link:labfonds'] }
+    ] },
+    { sleutel: 'map-salon', naam: 'De Salon', secties: [
+      { naam: 'Delen', items: ['tab:salon', 'link:pulse', 'os:snaps', 'link:camera', 'link:mediaos', 'link:clips'] },
+      { naam: 'Mensen', items: ['link:vrienden', 'link:vonk'] },
+      { naam: 'Kijken en luisteren', items: ['link:muziek', 'link:theater', 'link:podium', 'link:spelen'] },
+      { naam: 'Lezen', items: ['link:nieuws', 'link:krant', 'link:sport'] }
+    ] },
+    { sleutel: 'map-huis', naam: 'Het Huis', secties: [
+      { naam: 'Thuis', items: ['link:ontdek', 'tab:zorg', 'tab:gezin', 'link:thuiswacht', 'link:thuisrust', 'link:vitaal'] },
+      { naam: 'Leren', items: ['os:rtf', 'link:school'] },
+      { naam: 'Werken', items: ['os:werk', 'link:office', 'link:sitemaker', 'link:browser'] },
+      { naam: 'Uzelf', items: ['link:ik', 'link:passkeys', 'link:codewoord', 'link:juridisch'] }
+    ] },
+    /* Het Privekantoor staat als VIJFDE brede app op het beginscherm en niet
+       meer als tegel binnen Het Huis. Bij twintigduizend euro per maand is het
+       geen onderdeel van je huis; het is de reden dat je die pas hebt. Voor een
+       RTG-pas valt hij vanzelf weg (PREMIUM + itemZichtbaar), en dan staan er
+       vier. */
+    { sleutel: 'map-kantoor', naam: 'Privekantoor', secties: [
+      { naam: 'Uw kantoor', items: ['link:rechterhand'] }
+    ] }
   ];
 
-  /* De premium-suite (De Rechterhand) bestaat alleen voor Lifestyle en
-     Business. De registry kent de apps voor iedereen; hier staat wie ze mag
-     zien, zodat een RTG-pas ze niet in zijn mappen of in Spotlight tegenkomt. */
+  /* De vlakke itemlijst per map wordt AFGELEID uit de secties en niet apart
+     bijgehouden. Spotlight, de zijpanelen en de volgorde-bewaring lezen
+     `map.items`; zou die naast `secties` bestaan, dan vergeet iemand op een dag
+     de ene bij te werken en verdwijnt een app stil uit het zoeken terwijl hij op
+     het scherm staat. Regel 4 van de lat, op een plek waar het echt gebeurt. */
+  for (const mp of MAPPEN) mp.items = mp.secties.reduce((a, s) => a.concat(s.items), []);
+
+  /* De premium-suite bestaat alleen voor Lifestyle en Business. De registry kent
+     de apps voor iedereen; hier staat wie ze mag zien, zodat een RTG-pas ze niet
+     in zijn mappen of in Spotlight tegenkomt.
+
+     Sinds Het Privekantoor staat hiervan nog EEN in de mappen: 'rechterhand',
+     dat /apps/lifestyle.html opent. De andere dertien zijn geen tegels meer maar
+     KAMERS binnen die app -- je komt er via de plattegrond, en de app legt de
+     verbanden die je zelf moest leggen toen het dertien losse tegels waren.
+     Ze blijven wel in deze lijst: de pagina's bestaan nog, worden gelinkt vanuit
+     het kantoor en zijn nog in Spotlight te vinden. Een oude link mag niets
+     opleveren is de regel; uit de mappen halen is iets anders dan opheffen. */
   const PREMIUM = new Set(['rechterhand', 'reisboek', 'cellier', 'table', 'maison', 'garderobe',
     'mecenaat', 'nalatenschap', 'logboek', 'cercle', 'hangar', 'entourage', 'attenties', 'rendezvous']);
   const premiumPas = pas === 'lifestyle' || pas === 'business';
@@ -3649,14 +3692,47 @@ var RTG_BOUW = '34b4e892';
 
   /* ---------- mappen openen ---------- */
   const mapScrim = $('#osMapScrim'), mapGrid = $('#osMapGrid'), mapTitel = $('#osMapTitel');
+  /* Een brede app opent in SECTIES en niet als een raster losse merknamen.
+
+     Dat is het verschil tussen honderd apps en vijf. Wie "Geld" opende zag
+     tien tegels met ieder een eigen naam -- Wallet, RTG-code, Lab-fonds -- en
+     moest zelf uitzoeken welke hij nodig had. Nu staat er "Betalen",
+     "Rekeningen", "Samen en bezit", en daaronder wat je daar doet. De namen
+     eronder zijn functies geworden en geen producten (zie LINKS in 24.js).
+
+     Een sectie waarvan geen enkel onderdeel zichtbaar is (pas, boardroom, gast)
+     verdwijnt hier helemaal: een kopje boven een leeg vak is erger dan geen
+     kopje, want het suggereert dat er iets weg is. */
   function openMap(map) {
     mapTitel.textContent = mapNaam(map);
     mapGrid.textContent = '';
-    for (const item of map.items.filter(itemZichtbaar)) {
-      const el = maakAppIcoon(item);
-      // alleen de map zelf dicht: een os-app (Bellen) opent hierna zijn kiezer
-      el.addEventListener('click', () => mapScrim.classList.remove('open'));
-      mapGrid.appendChild(el);
+    // oudere bewaarde indelingen kennen alleen een vlakke lijst; die krijgt
+    // hier een naamloze sectie, zodat een map altijd te openen is
+    const secties = map.secties || [{ naam: '', items: map.items }];
+    /* Een brede app met maar EEN deur opent die deur. Het Privekantoor is zo'n
+       geval -- het is zelf al een app met kamers, dus een tussenscherm met een
+       enkele tegel erop zou een extra tik zijn die niets kiest. Dit geldt ook
+       als een lid de rest van een map heeft uitgezet in zijn boardroom. */
+    const zichtbaar = secties.reduce((a, x) => a.concat(x.items.filter(itemZichtbaar)), []);
+    if (zichtbaar.length === 1) { openItem(zichtbaar[0]); return; }
+    for (const sectie of secties) {
+      const zicht = sectie.items.filter(itemZichtbaar);
+      if (!zicht.length) continue;
+      if (sectie.naam) {
+        const kop = document.createElement('h4');
+        kop.className = 'os-sectiekop';
+        kop.textContent = T('os.sectie.' + sectie.naam.toLowerCase().replace(/[^a-z]+/g, ''), sectie.naam);
+        mapGrid.appendChild(kop);
+      }
+      const rij = document.createElement('div');
+      rij.className = 'os-grid os-map-grid';
+      for (const item of zicht) {
+        const el = maakAppIcoon(item);
+        // alleen de map zelf dicht: een os-app (Bellen) opent hierna zijn kiezer
+        el.addEventListener('click', () => mapScrim.classList.remove('open'));
+        rij.appendChild(el);
+      }
+      mapGrid.appendChild(rij);
     }
     mapScrim.classList.add('open');
   }
@@ -4291,7 +4367,8 @@ var RTG_BOUW = '34b4e892';
      dit houdt het scherm eerlijk). De sleutel hier is de functie-id op het
      schakelbord; alles wat niet genoemd wordt, blijft gewoon staan. */
   const REGIE = { spelen: 'spellen', podium: 'podium', flits: 'flits', theater: 'theater',
-    wbw: 'wbw', passkeys: 'webauthn', ov: 'ov', clips: 'clips', office: 'kantoorpakket', vonk: 'vonk' };
+    wbw: 'wbw', passkeys: 'webauthn', ov: 'ov', clips: 'clips', office: 'kantoorpakket', vonk: 'vonk',
+    mediaos: 'mediaos' };
   (function () {
     let tok = null; try { tok = localStorage.getItem('rtg_member_token'); } catch (e) {}
     if (!tok) return;

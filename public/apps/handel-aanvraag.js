@@ -32,15 +32,41 @@
       wat.value = ''; aantal.value = '';
       tekenRegels();
     });
+    /* Twee ingangen, één formulier. De regels, het ophalen en het retour zijn
+       voor allebei hetzelfde; alleen de kop verschilt -- een soort bedrijf en
+       offertes, of een bekende zaak en een prijs die al vaststaat. */
+    var modus = document.getElementById('hModus');
+    var UITLEG = {
+      aanvraag: 'Een aanvraag gaat naar een heel soort bedrijf, niet naar \u00e9\u00e9n adres. ' +
+        'Elke zaak van dat soort ziet hem, ook een die zich gisteren heeft aangemeld. ' +
+        'U kiest daarna zelf uit de offertes die binnenkomen.',
+      bestelling: 'Bij een vaste leverancier met een afgesproken prijs is offreren een omweg. ' +
+        'De bestelling gaat meteen naar die zaak; daarna loopt hij dezelfde weg: inplannen, ' +
+        'leveren, factureren, betalen.'
+    };
+    function zetModus() {
+      var best = modus.value === 'bestelling';
+      document.getElementById('hGenre').style.display = best ? 'none' : '';
+      document.getElementById('hZaak').style.display = best ? '' : 'none';
+      document.getElementById('hPrijs').style.display = best ? '' : 'none';
+      document.getElementById('hUitleg').textContent = UITLEG[modus.value];
+      document.getElementById('hZet').textContent = best ? 'Bestelling plaatsen' : 'Aanvraag uitzetten';
+    }
+    modus.addEventListener('change', zetModus);
+    zetModus();
+
     document.getElementById('hZet').addEventListener('click', function () {
-      RTGHandel.api('/aanvraag', {
+      var best = modus.value === 'bestelling';
+      RTGHandel.api(best ? '/bestellen' : '/aanvraag', {
         genre: document.getElementById('hGenre').value,
+        leverancierCode: document.getElementById('hZaak').value,
+        prijs: document.getElementById('hPrijs').value,
         titel: document.getElementById('hTitel').value,
         regels: regels,
         ophalen: document.getElementById('hOphalen').value,
         retour: document.getElementById('hRetour').value
       }).then(function () {
-        RTGHandel.meld('Aanvraag uitgezet.');
+        RTGHandel.meld(best ? 'Bestelling geplaatst.' : 'Aanvraag uitgezet.');
         regels = []; tekenRegels();
         document.getElementById('hTitel').value = '';
         RTGHandel.laden();

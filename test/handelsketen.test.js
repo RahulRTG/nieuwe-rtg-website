@@ -256,6 +256,68 @@ test('een aanvraag zonder soort, zonder regels of aan het eigen vak weigert', as
   } finally { await stop(srv); }
 });
 
+test('rechtstreeks bestellen: dezelfde staart, zonder de omweg langs een offerte', async () => {
+  /* WAAROM DEZE TWEEDE INGANG BESTAAT. Er zijn twee manieren waarop zaken bij
+     elkaar kopen: je weet niet wie en niet voor hoeveel (dan zet je een aanvraag
+     uit), of je weet het allebei al (een vaste leverancier, een prijslijst). In
+     het tweede geval is offreren een omweg langs iets wat vaststaat.
+
+     Alleen de KOP verschilt; de staart -- inplannen, leveren, factureren,
+     betalen -- is identiek. Deze toets legt vast dat het ook echt DEZELFDE
+     staart is en geen tweede keten met dezelfde woorden erop. */
+  const srv = await startServer({ env: { SMTP_URL: '' } });
+  try {
+    const club = await beheer(srv.base, KOPER);
+    const was = await beheer(srv.base, WASSERIJ);
+
+    const best = await post(srv.base, '/supplier/handel/bestellen', {
+      leverancierCode: WASSERIJ, titel: 'Weekvoorraad servetten',
+      regels: [{ wat: 'servetten', aantal: 500, eenheid: 'stuk' }],
+      prijs: 150, ophalen: 'maandag 08:00'
+    }, club);
+    assert.equal(best.status, 200, JSON.stringify(best.body));
+    const id = best.body.handel.id;
+
+    // meteen gegund: geen offerterondje, de prijs stond al vast
+    assert.equal(best.body.handel.status, 'gegund');
+    assert.equal(best.body.handel.gegundAan.prijs, 150);
+
+    // hij staat NIET in de open lijst van andere wasserijen: dit is geen aanvraag
+    const bijWas = await post(srv.base, '/supplier/handel/mijn', {}, was);
+    assert.equal((bijWas.body.open || []).find(h => h.id === id), undefined,
+      'een rechtstreekse bestelling hoort niet als open aanvraag rond te gaan');
+    assert.ok((bijWas.body.alsLeverancier || []).find(h => h.id === id),
+      'de bestelde zaak hoort hem meteen als opdracht te zien');
+
+    // en dan exact dezelfde staart als bij een gegunde aanvraag
+    assert.equal((await post(srv.base, '/supplier/handel/plannen',
+      { id, ophaalMoment: 'maandag 08:00' }, was)).status, 200);
+    assert.equal((await post(srv.base, '/supplier/handel/leveren',
+      { id, bewijs: 'Marta' }, was)).status, 200);
+    // de factuurcontrole is woordelijk dezelfde: afwijken van de afspraak weigert
+    assert.equal((await post(srv.base, '/supplier/handel/factureren', { id, bedrag: 200 }, was)).status, 409,
+      'ook bij een rechtstreekse bestelling is de afgesproken prijs de afspraak');
+    const fac = await post(srv.base, '/supplier/handel/factureren', { id, bedrag: 150 }, was);
+    assert.equal(fac.status, 200, JSON.stringify(fac.body));
+    assert.equal((await post(srv.base, '/supplier/handel/betalen', { id }, club)).status, 200);
+  } finally { await stop(srv); }
+});
+
+test('bestellen weigert bij uzelf, bij een onbekende zaak en zonder afgesproken bedrag', async () => {
+  const srv = await startServer({ env: { SMTP_URL: '' } });
+  try {
+    const club = await beheer(srv.base, KOPER);
+    const regels = [{ wat: 'servetten', aantal: 10, eenheid: 'stuk' }];
+    assert.equal((await post(srv.base, '/supplier/handel/bestellen',
+      { leverancierCode: KOPER, titel: 'X', regels, prijs: 10 }, club)).status, 400);
+    assert.equal((await post(srv.base, '/supplier/handel/bestellen',
+      { leverancierCode: 'BESTAATNIET', titel: 'X', regels, prijs: 10 }, club)).status, 404);
+    assert.equal((await post(srv.base, '/supplier/handel/bestellen',
+      { leverancierCode: WASSERIJ, titel: 'X', regels, prijs: 0 }, club)).status, 400,
+      'zonder afgesproken bedrag is het geen bestelling maar een aanvraag');
+  } finally { await stop(srv); }
+});
+
 test('elke stap uit de levensloop heeft een endpoint, en het scherm kent geen andere', () => {
   /* HOE DIT ER KWAM. Het scherm leidt zijn pad af uit de STAPNAAM
      (/api/supplier/handel/<stap>), en de route heette 'offerte' terwijl de stap

@@ -166,6 +166,51 @@ niet los te laden of los te toetsen. Dat is de volgende stap voor deze laag.
 
 ---
 
+### Correctie op stap 5: de veertien migreren niet allemaal
+
+In een eerdere versie van dit bestand stond dat de handelsketen "de veertien
+collecties op termijn vervangt". Dat is nagemeten en het klopt niet, en het
+hoort hier te staan in plaats van stilletjes te verdwijnen (LAT-regel 6).
+
+Wat de meting liet zien toen de eerste migratie werd voorbereid:
+
+| collectie | wat het werkelijk is |
+|---|---|
+| `groothandelOrders` | koper kan een LID, een zaak of een groothandel zijn; met voorraadreservering en contractprijzen |
+| `vakOffertes` | lid → zaak (`klant` is een codenaam), dus consument en geen B2B |
+| `reisAanvragen`, `winkelBestellingen`, `orders` | lid → zaak |
+| `bevAanvragen` | intern inzetverzoek dat in een ROOSTER eindigt; geen offerte, geen prijs, geen factuur |
+| `identiteitVerzoeken`, `paspoortVerzoeken` | identiteit en privacy, geen handel |
+| `payrollContracten` | arbeidsvoorwaarden |
+| `betaalVerzoeken` | de betaalrail zelf |
+
+Van de veertien is er dus geen enkele die ongeschonden in de keten past zoals
+die er nu staat. `bevAanvragen` erin persen zou de roosterkoppeling weggooien;
+`groothandelOrders` zou de voorraadreservering, de contractprijzen en de
+consumentenkant kosten. **Een migratie die functies kost, is geen migratie maar
+een achteruitgang.**
+
+Wat er wél gedeeld hoort te worden, is niet de hele stroom maar de **staart**:
+
+```
+kop (verschilt)                          staart (gedeeld)
+─────────────────────────────────────    ───────────────────────────────────────
+aanvraag → offertes → gunning        ┐
+rechtstreekse bestelling             ├─→ planning → levering (bewijs)
+catalogus-order (voorraad, contract) ┘   → factuur → betaling
+```
+
+Daarom heeft de keten sinds deze ronde een **tweede ingang**: een rechtstreekse
+bestelling bij een bekende zaak tegen een afgesproken prijs, die meteen op
+"gegund" binnenkomt en daarna woordelijk dezelfde staart doorloopt. Dat is de
+voorwaarde om `groothandelOrders` later zijn eigen kop te laten houden
+(voorraad, contractprijzen) terwijl de afhandeling gedeeld wordt — zonder verlies.
+
+De herziene stap 5 is dus niet "veertien migreren" maar: **de staart delen waar
+hij hetzelfde is, en de kop laten waar hij verschilt.**
+
+---
+
 ## 4. De volgorde
 
 Klein en omkeerbaar eerst, en elke stap levert op zichzelf iets op. Niets
@@ -186,9 +231,11 @@ hieronder vraagt om het herschrijven van wat er staat.
 4. ✅ **Het B2B-protocol, op één paar.** De keten staat en beachclub → wasserij
    loopt er helemaal overheen, van aanvraag tot betaling, inclusief scherm.
    Omdat het vinden op genre gaat, draagt diezelfde weg meteen elk ander paar.
-5. **De bestaande veertien collecties migreren**, één per keer, elk met de
-   toetsen die de oude vorm bewezen (LAT-regel 2: de oude toets moet op de
-   nieuwe vorm zakken voordat de migratie klaar is). En de factuur aan
+5. **De staart delen waar hij hetzelfde is** — niet "de veertien migreren", zie
+   de correctie hierboven. De tweede ingang (rechtstreeks bestellen) staat er;
+   de volgende stap is `groothandelOrders` zijn eigen kop laten houden
+   (voorraad, contractprijzen, de consumentenkant) en alleen de afhandeling aan
+   de keten geven. En de factuur aan
    ~~de factuur aan `kern/facturatie.js` hangen~~ ✅ *gedaan* — de handelsfactuur
    krijgt haar nummer uit de centrale laag en staat bij beide zaken in de
    boekhouding. Wat rest: de veertien migreren, en van "betaald" een echte

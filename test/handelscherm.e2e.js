@@ -122,6 +122,27 @@ test.test('RTG Handel in de browser: de beachclub zet een aanvraag uit en de was
     assert.match(await clubPagina.textContent('#hKoper'), /Lavanda Wasserij/);
     assert.match(await clubPagina.textContent('#hKoper'), /240[.,]00/);
 
+    /* ---- de tweede ingang: rechtstreeks bestellen, vanaf hetzelfde formulier ---- */
+    await clubPagina.selectOption('#hModus', 'bestelling');
+    // de kop wisselt: geen soort bedrijf meer, wel een zaakcode en een bedrag
+    assert.equal(await clubPagina.locator('#hGenre').isVisible(), false,
+      'bij een bestelling hoort de soort-bedrijf-keuze te verdwijnen');
+    assert.ok(await clubPagina.locator('#hZaak').isVisible(), 'er hoort een zaakcode gevraagd te worden');
+    assert.ok(await clubPagina.locator('#hPrijs').isVisible(), 'en het afgesproken bedrag');
+
+    await clubPagina.fill('#hZaak', 'LAVANDA');
+    await clubPagina.fill('#hPrijs', '150');
+    await clubPagina.fill('#hTitel', 'Weekvoorraad servetten');
+    await clubPagina.fill('#hWat', 'servetten');
+    await clubPagina.fill('#hAantal', '500');
+    await clubPagina.click('#hRegel');
+    await clubPagina.click('#hZet');
+    await clubPagina.waitForFunction(
+      () => /Weekvoorraad servetten/.test(document.getElementById('hKoper').textContent), null, { timeout: 8000 });
+    const naBestelling = await clubPagina.textContent('#hKoper');
+    assert.match(naBestelling, /gegund/, 'een rechtstreekse bestelling staat meteen op gegund');
+    assert.match(naBestelling, /Lavanda Wasserij/);
+
     assert.deepEqual(fouten, [], 'geen paginafouten: ' + fouten.join(' | '));
   } finally {
     if (browser) await browser.close();

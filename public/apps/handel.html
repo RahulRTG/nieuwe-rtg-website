@@ -22,14 +22,22 @@
 </header>
 <main id="main">
   <div class="kaart">
-    <div class="kop">Wat u zoekt</div>
-    <p class="stil" style="margin-bottom:.7rem;">
+    <div class="kop">Wat u nodig heeft</div>
+    <div class="rij">
+      <select class="veld" id="hModus" aria-label="Hoe u inkoopt" style="flex:0 1 20rem;">
+        <option value="aanvraag">Uitzetten bij een soort bedrijf &mdash; offertes vergelijken</option>
+        <option value="bestelling">Bestellen bij een bekende zaak &mdash; prijs staat vast</option>
+      </select>
+    </div>
+    <p class="stil" id="hUitleg" style="margin:.5rem 0 .7rem;">
       Een aanvraag gaat naar een heel soort bedrijf, niet naar één adres. Elke zaak van dat
       soort ziet hem &mdash; ook een die zich gisteren heeft aangemeld. U kiest daarna zelf
       uit de offertes die binnenkomen.
     </p>
     <div class="rij">
       <select class="veld" id="hGenre" aria-label="Aan welk soort bedrijf" style="flex:0 1 16rem;"></select>
+      <input class="veld" id="hZaak" maxlength="20" placeholder="Zaakcode van de leverancier" aria-label="Zaakcode van de leverancier" style="flex:0 1 16rem;display:none;">
+      <input class="veld" id="hPrijs" type="number" step="0.01" min="0" placeholder="Afgesproken bedrag" aria-label="Afgesproken bedrag" style="flex:0 1 11rem;display:none;">
       <input class="veld" id="hTitel" maxlength="80" placeholder="Waar het om gaat, kort" aria-label="Waar het om gaat">
     </div>
     <div class="rij" style="margin-top:.5rem;">

@@ -63,39 +63,26 @@ function maakHandelsketen({ db, save, crypto, findSupplier, notifySupplier, sseT
     return fout ? { fout } : { h };
   }
 
-  /* ---------- de koper: een aanvraag uitzetten bij een heel genre ---------- */
-  function nieuweAanvraag(s, body) {
-    const genre = scho(body.genre, 40);
-    if (!genre || !(db.data.supplierTypes || {})[genre])
-      return { status: 400, error: 'Kies een geldig soort bedrijf.' };
-    if (genre === s.type) return { status: 400, error: 'Een aanvraag aan uw eigen soort bedrijf zetten we niet uit.' };
-    const titel = scho(body.titel, 80);
-    if (!titel) return { status: 400, error: 'Geef kort aan wat u nodig heeft.' };
-    const regels = (Array.isArray(body.regels) ? body.regels : []).slice(0, 20)
+  /* De twee stukken die BEIDE ingangen delen: het lezen van de regels en het
+     bouwen van een lege handel. Ze staan hier los omdat een rechtstreekse
+     bestelling (./handelsketen/bestellen.js) ze ook gebruikt -- twee keer
+     hetzelfde bouwen zou twee soorten handel geven met dezelfde woorden erop. */
+  function leesRegels(regelsIn) {
+    return (Array.isArray(regelsIn) ? regelsIn : []).slice(0, 20)
       .map(r => ({ wat: scho(r && r.wat, 60), aantal: getal(r && r.aantal, 100000),
         eenheid: EENHEDEN.includes(r && r.eenheid) ? r.eenheid : 'stuk' }))
       .filter(r => r.wat && r.aantal > 0);
-    if (!regels.length) return { status: 400, error: 'Zet er minstens een regel in, met een aantal.' };
-
-    const h = {
+  }
+  function nieuweHandel(s, d) {
+    return {
       id: 'h' + crypto.randomBytes(6).toString('hex'),
       ref: 'AAN-' + crypto.randomBytes(3).toString('hex').toUpperCase(),
-      koper: zaakInfo(s), genre, genreLabel: genreLabel(genre),
-      titel, regels,
-      ophalen: scho(body.ophalen, 60) || null,
-      retour: scho(body.retour, 60) || null,
-      status: 'aanvraag',
+      koper: zaakInfo(s), genre: d.genre, genreLabel: genreLabel(d.genre),
+      titel: d.titel, regels: d.regels, ophalen: d.ophalen || null, retour: d.retour || null,
+      status: 'aanvraag', bron: 'aanvraag',
       offertes: [], gegundAan: null, planning: null, levering: null, factuur: null, betaaldAt: null,
-      at: nu(), log: [{ wat: 'Aanvraag uitgezet', wie: s.code, at: nu() }]
+      at: nu(), log: [{ wat: 'Aangemaakt', wie: s.code, at: nu() }]
     };
-    store().push(h);
-    save();
-    // iedereen in het gevraagde genre krijgt hem te zien; de melding gaat mee
-    for (const lev of db.data.suppliers || [])
-      if (lev.type === genre && lev.code !== s.code)
-        meld(h, lev.code, 'Nieuwe aanvraag', s.name + ' zoekt: ' + titel);
-    save();
-    return { handel: publiek(h, s) };
   }
 
   /* ---------- de leverancier: offreren ---------- */
@@ -209,7 +196,14 @@ function maakHandelsketen({ db, save, crypto, findSupplier, notifySupplier, sseT
 
   const mijn = (s) => overzicht(store(), db.data.supplierTypes || {}, s);
 
-  return { STAPPEN, EENHEDEN, nieuweAanvraag, offreren, gunnen, intrekken, plannen,
+  /* De twee INGANGEN van de keten -- een aanvraag bij een heel genre, of een
+     rechtstreekse bestelling bij een bekende zaak -- staan samen in een eigen
+     bestand. Samen, want ze delen alles behalve hun kop; zie daar waarom die
+     tweede ingang bestaat. */
+  const { nieuweAanvraag, bestellen } = require('./handelsketen/ingangen')({
+    db, crypto, findSupplier, store, save, meld, scho, getal, nu, publiek, nieuweHandel, leesRegels });
+
+  return { STAPPEN, EENHEDEN, nieuweAanvraag, bestellen, offreren, gunnen, intrekken, plannen,
     leveren, factureren, betalen, mijn, publiek };
 }
 

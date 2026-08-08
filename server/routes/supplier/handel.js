@@ -20,6 +20,13 @@ module.exports = (kern) => {
     if (!managerOnly(req, res)) return;
     uit(res, handelsketen.nieuweAanvraag(req.supplier, req.body || {}));
   });
+  /* Rechtstreeks bestellen bij een bekende zaak tegen een afgesproken bedrag:
+     dezelfde keten, alleen zonder het offerterondje. Beheer, want dit bindt de
+     zaak meteen aan een prijs. */
+  app.post('/api/supplier/handel/bestellen', supplierAuth, (req, res) => {
+    if (!managerOnly(req, res)) return;
+    uit(res, handelsketen.bestellen(req.supplier, req.body || {}));
+  });
   app.post('/api/supplier/handel/gunnen', supplierAuth, (req, res) => {
     if (!managerOnly(req, res)) return;
     uit(res, handelsketen.gunnen(req.supplier, req.body.id, req.body.offerteId));

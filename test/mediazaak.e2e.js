@@ -94,6 +94,29 @@ test('de leiding begint een interne bibliotheek, en wie nergens werkt ziet hem n
     assert.match(opties[0], /eigen kanaal/i);
     assert.match(opties[1], /^Intern:/, 'en de interne bibliotheek met zijn zaaknaam');
 
+    /* En de werklijst: de leiding zet de video erop, en dan staat hij er bij
+       de medewerker ook -- met de zin erbij dat er geen kijkgedrag gemeten
+       wordt. Zonder dit rondje is die hele knop nooit door iets aangeraakt. */
+    const bieb = (await api('/api/theater/zaak', {}, baas.body.token)).body;
+    const biebKanaal = (bieb.kanalen || [])[0];
+    const vid = (await api('/api/theater/video/maak', { kanaalId: biebKanaal.id, titel: 'Werkinstructie', duurS: 30 }, baas.body.token)).body.id;
+    await fetch(base + '/api/theater/upload/' + vid, { method: 'POST',
+      headers: { 'Content-Type': 'video/webm', Authorization: 'Bearer ' + baas.body.token },
+      body: Buffer.concat([Buffer.from([0x1A, 0x45, 0xDF, 0xA3]), Buffer.alloc(600, 7)]) });
+
+    await page.reload({ waitUntil: 'load' });
+    await page.waitForSelector('#kijkplicht .kaart', { timeout: 20000 });
+    await page.locator('#kijkplicht .knop', { hasText: 'Zet op de werklijst' }).click();
+    await page.waitForFunction(() => /werklijst gezet/.test(document.querySelector('#melding').textContent),
+      null, { timeout: 10000 });
+    await page.waitForFunction(() => /Uw werk vraagt u dit te bekijken/.test(document.querySelector('#kijkplicht').textContent),
+      null, { timeout: 10000 });
+    assert.match(await page.$eval('#kijkplicht', e => e.textContent), /meet geen kijkgedrag/,
+      'en het scherm zegt zelf wat er niet gemeten wordt');
+    await page.locator('#kijkplicht .knop', { hasText: 'Ik heb dit gezien' }).click();
+    await page.waitForFunction(() => /eigen verklaring/.test(document.querySelector('#melding').textContent),
+      null, { timeout: 10000 });
+
     // en wie nergens werkt, ziet het hele blok niet
     const kaal = await maakPagina(buiten.body.token);
     const fouten2 = letOpFouten(kaal, []);

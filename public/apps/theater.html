@@ -99,6 +99,8 @@
       <h2>Van uw werk</h2>
       <p class="stil" id="zaakUitleg"></p>
       <div class="films" id="filmsZaak"></div>
+      <!-- wat uw werk u vraagt te bekijken; u tekent zelf af -->
+      <div id="kijkplicht"></div>
       <div id="zaakBeheer"></div>
     </section>
     <h2>Mijn kanaal</h2>
@@ -201,6 +203,7 @@
       p.textContent = 'Uw organisatie heeft nog geen interne video.';
       doos.appendChild(p);
     }
+    await laadKijkplicht();
     const beheer = $('#zaakBeheer'); beheer.innerHTML = '';
     for (const z of (zaakStand.zaken || [])) {
       if (!z.leiding || z.bibliotheek) continue;
@@ -216,6 +219,91 @@
       beheer.appendChild(kaart);
     }
   }
+  /* WAT UW WERK U VRAAGT TE BEKIJKEN. Twee kanten van dezelfde lijst: de
+     medewerker tekent zelf af, de leiding ziet wie dat gedaan heeft. Wat er
+     NIET gebeurt is kijkgedrag meten -- geen kijktijd, geen weergaven, geen
+     apparaat. Dat staat er ook bij, aan allebei de kanten, want een belofte
+     die alleen in de code staat leest niemand. */
+  async function laadKijkplicht() {
+    const el = $('#kijkplicht'); el.innerHTML = '';
+    const r = await api('kijkplicht/mijn');
+    const rijen = (r.body || {}).rijen || [];
+    if (rijen.length) {
+      const kaart = document.createElement('div'); kaart.className = 'kaart';
+      kaart.innerHTML = '<b>Uw werk vraagt u dit te bekijken</b><p class="stil">' + esc(r.body.uitleg) + '</p>';
+      for (const rij of rijen) {
+        const regel = document.createElement('div'); regel.className = 'rij';
+        const naam = document.createElement('span'); naam.className = 'stil'; naam.style.flex = '1';
+        naam.textContent = (rij.titel || '(video weggehaald)') + ' · ' + rij.zaakNaam +
+          (rij.uiterlijk ? ' · uiterlijk ' + rij.uiterlijk : '') +
+          (rij.gedaan ? ' · afgetekend op ' + String(rij.gedaanOp).slice(0, 10) : '');
+        regel.appendChild(naam);
+        if (rij.titel) {
+          const kijk = document.createElement('button'); kijk.type = 'button'; kijk.className = 'knop';
+          kijk.textContent = 'Bekijk';
+          kijk.addEventListener('click', () => { const v = (zaakStand.videos || []).find(x => x.id === rij.videoId); if (v) kijk(v); });
+          regel.appendChild(kijk);
+        }
+        const af = document.createElement('button'); af.type = 'button';
+        af.className = 'knop' + (rij.gedaan ? '' : ' vol');
+        af.textContent = rij.gedaan ? 'Teken terug' : 'Ik heb dit gezien';
+        af.addEventListener('click', async () => {
+          const g = await api('kijkplicht/gedaan', { id: rij.id, aan: !rij.gedaan });
+          zeg(g.body.error || g.body.let || 'Vastgelegd.');
+          laadKijkplicht();
+        });
+        regel.appendChild(af);
+        kaart.appendChild(regel);
+      }
+      el.appendChild(kaart);
+    }
+    // en de kant van de leiding: dezelfde lijst, met wie er heeft afgetekend
+    for (const z of ((zaakStand && zaakStand.zaken) || [])) {
+      if (!z.leiding) continue;
+      const st = await api('kijkplicht/stand', { zaakCode: z.code });
+      if (st.body.error) continue;
+      const kaart = document.createElement('div'); kaart.className = 'kaart';
+      kaart.innerHTML = '<b>Werklijst van ' + esc(z.naam) + '</b><p class="stil">' + esc(st.body.uitleg) + '</p>';
+      for (const rij of (st.body.lijst || [])) {
+        const gedaan = rij.mensen.filter(m => m.gedaan).length;
+        const kan = rij.mensen.filter(m => m.gekoppeld).length;
+        const p = document.createElement('p'); p.className = 'stil';
+        p.textContent = (rij.titel || '(video weggehaald)') + ' · ' + gedaan + ' van ' + kan +
+          ' afgetekend' + (kan < rij.mensen.length ? ' (' + (rij.mensen.length - kan) + ' zonder gekoppeld account)' : '') +
+          (rij.uiterlijk ? ' · uiterlijk ' + rij.uiterlijk : '');
+        kaart.appendChild(p);
+        const wie = document.createElement('p'); wie.className = 'stil';
+        wie.textContent = rij.mensen.map(m => m.naam + (m.gekoppeld ? (m.gedaan ? ' ✓' : ' --') : ' (geen account)')).join(' · ');
+        kaart.appendChild(wie);
+        const weg = document.createElement('button'); weg.type = 'button'; weg.className = 'knop';
+        weg.textContent = 'Haal van de lijst';
+        weg.addEventListener('click', async () => {
+          const w = await api('kijkplicht/zet', { zaakCode: z.code, id: rij.id, weg: true });
+          zeg(w.body.error || 'Van de lijst gehaald. De video zelf blijft staan.');
+          laadZaak();
+        });
+        kaart.appendChild(weg);
+      }
+      // en er een toevoegen uit de eigen interne bibliotheek
+      const eigenVideos = (zaakStand.videos || []).filter(v => v.zaakCode === z.code);
+      if (eigenVideos.length) {
+        const kies = document.createElement('select');
+        kies.innerHTML = eigenVideos.map(v => '<option value="' + esc(v.id) + '">' + esc(v.titel) + '</option>').join('');
+        const knop = document.createElement('button'); knop.type = 'button'; knop.className = 'knop vol';
+        knop.textContent = 'Zet op de werklijst';
+        knop.addEventListener('click', async () => {
+          const z2 = await api('kijkplicht/zet', { zaakCode: z.code, videoId: kies.value });
+          zeg(z2.body.error || 'Op de werklijst gezet.');
+          laadZaak();
+        });
+        const rij2 = document.createElement('div'); rij2.className = 'rij';
+        rij2.appendChild(kies); rij2.appendChild(knop);
+        kaart.appendChild(rij2);
+      }
+      el.appendChild(kaart);
+    }
+  }
+
   /* Waar publiceert deze video naartoe? Standaard het eigen kanaal; wie de
      leiding heeft over een goedgekeurde interne bibliotheek kan die kiezen.
      Het staat er UITDRUKKELIJK bij, want een video die stilletjes in de

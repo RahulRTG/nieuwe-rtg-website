@@ -49,7 +49,7 @@ function maakTheater({ db, save, crypto, schoon, codenaamVan, notify, sseToOffic
   /* Bij welke organisaties hoort dit lid? Zelfde bron als het Podium
      (kern/werkplekken.js) -- een tweede antwoord op een toegangsvraag is er
      een te veel (LAT.md regel 4). */
-  const { zakenVan } = require('../werkplekken').maakWerkplekken({ accounts, findSupplier });
+  const { zakenVan, personeelVan } = require('../werkplekken').maakWerkplekken({ accounts, findSupplier });
   const kanaalMet = kid => { lijsten(); return db.data.theaterKanalen.find(k => k.id === kid) || null; };
   const videoMet = vid => { lijsten(); return db.data.theaterVideos.find(v => v.id === vid) || null; };
   const mbVan = bytes => bytes ? Math.max(0.1, Math.round(bytes / 1048576 * 10) / 10) : 0;
@@ -106,7 +106,7 @@ function maakTheater({ db, save, crypto, schoon, codenaamVan, notify, sseToOffic
   const ctx = {
     db, save, fs, path, mediaDir, schoon, nu, id, lijsten, kanaalVan, kanaalMet, videoMet,
     kanaalBytes, mbVan, sseToCustomer, sseToOffice, thuisAanwezigheid, thuisOnline,
-    zakenVan, videoBeeld, eigenBeeld, codenaamVan, GENRES, REACTIES_MAX,
+    zakenVan, personeelVan, videoBeeld, eigenBeeld, codenaamVan, GENRES, REACTIES_MAX,
     THUIS_TTL_MS, THUIS_SIGNALEN, MAX_VIDEO_MB, MAX_KANAAL_MB
   };
   /* De interne bibliotheek van een organisatie (Media for Business, opgenomen
@@ -121,6 +121,11 @@ function maakTheater({ db, save, crypto, schoon, codenaamVan, notify, sseToOffic
      staan in ./zaal.js: dat is WAT DE KIJKER ZIET EN DOET, een ander onderwerp
      dan het beheren van een kanaal en zijn bytes. */
   const z = require('./zaal')(ctx);
+  /* Wat uw werk u vraagt te bekijken (./kijkplicht.js). Bewust een eigen
+     bestand, want het draagt een eigen belofte: de medewerker tekent zelf af en
+     er wordt GEEN kijkgedrag gemeten. Die belofte hoort op een plek te staan
+     waar je hem kunt lezen. */
+  const kp = require('./kijkplicht')(ctx);
   /* Lezers voor de Media OS: vragen die het Theater over ZICHZELF beantwoordt,
      zodat de laag erboven geen tweede administratie aanlegt (regel 4). */
   const kanaalVanMaker = (makerKey) => {
@@ -151,7 +156,9 @@ function maakTheater({ db, save, crypto, schoon, codenaamVan, notify, sseToOffic
     theaterThuisAanwezig: v.thuisAanwezig, theaterSignaal: v.signaal,
     // Media for Business, opgenomen kant (./zaak.js)
     theaterZaakMaak: zaak.zaakKanaalMaak, theaterZaakZaal: zaak.zaakZaal,
-    theaterZaakVideos: zaak.zaakVideosVoor
+    theaterZaakVideos: zaak.zaakVideosVoor,
+    theaterKijkplichtZet: kp.kijkplichtZet, theaterKijkplichtGedaan: kp.kijkplichtGedaan,
+    theaterKijkplichtMijn: kp.kijkplichtMijn, theaterKijkplichtStand: kp.kijkplichtStand
   };
 }
 

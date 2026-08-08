@@ -9,7 +9,8 @@ module.exports = (kern) => {
     theaterKanaalMaak, theaterOfficeLijst, theaterOfficeBeslis, theaterVideoMaak,
     theaterVideoUpload, theaterVerwijder, theaterStreamVan, theaterZaal,
     theaterAbonneer, theaterReactie, theaterReacties, theaterMeld,
-    theaterThuisAanwezig, theaterSignaal, theaterZaakMaak, theaterZaakZaal } = kern;
+    theaterThuisAanwezig, theaterSignaal, theaterZaakMaak, theaterZaakZaal,
+    theaterKijkplichtZet, theaterKijkplichtGedaan, theaterKijkplichtMijn, theaterKijkplichtStand } = kern;
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const geenGast = (req, res) => {
     if (req.session.tier === 'guest') { res.status(403).json({ error: 'Het Theater is voor leden.' }); return true; }
@@ -108,6 +109,25 @@ module.exports = (kern) => {
   app.post('/api/theater/zaak/aanmeld', auth, (req, res) => {
     if (geenGast(req, res)) return;
     stuur(res, theaterZaakMaak(req.session.key, req.body || {}));
+  });
+
+  /* Wat uw werk u vraagt te bekijken. De medewerker tekent ZELF af; er wordt
+     geen kijkgedrag gemeten, en beide kanten lezen dezelfde lijst. */
+  app.post('/api/theater/kijkplicht/mijn', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, theaterKijkplichtMijn(req.session.key));
+  });
+  app.post('/api/theater/kijkplicht/gedaan', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, theaterKijkplichtGedaan(req.session.key, req.body || {}));
+  });
+  app.post('/api/theater/kijkplicht/zet', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, theaterKijkplichtZet(req.session.key, req.body || {}));
+  });
+  app.post('/api/theater/kijkplicht/stand', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, theaterKijkplichtStand(req.session.key, String((req.body || {}).zaakCode || '')));
   });
 
   // de kantoorkant: kanalen goedkeuren, meldingen zien, verwijderen

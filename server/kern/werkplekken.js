@@ -30,10 +30,21 @@ function maakWerkplekken({ accounts, findSupplier }) {
       return { code: r.supplier_code, naam: (s && s.name) || r.supplier_code, bestaat: !!s, leiding: r.role === 'manager' };
     }).filter(z => !findSupplier || z.bestaat);
   }
+  /* Andersom: het personeel van EEN zaak, met per persoon de sleutel van zijn
+     RTG-account als hij die gekoppeld heeft. Dit is de personeelslijst van de
+     werkgever zelf (namen die hij zelf invoerde) -- geen codenamen, en er is
+     uit deze lijst ook geen codenaam af te leiden. Wie geen account koppelde
+     heeft geen sleutel; dat is een eigen stand en geen "nog niet gedaan". */
+  function personeelVan(code) {
+    let rijen = [];
+    try { rijen = accounts.listStaff(String(code || '')) || []; } catch (e) { return []; }
+    return rijen.map(s => ({ naam: s.name, rol: s.role, func: s.func || null,
+      key: s.member_id != null ? 'user-' + s.member_id : null }));
+  }
   // werkt dit lid bij deze zaak? en heeft hij er de leiding?
   const werktBij = (key, code) => zakenVan(key).some(z => z.code === code);
   const leidtBij = (key, code) => zakenVan(key).some(z => z.code === code && z.leiding);
-  return { zakenVan, werktBij, leidtBij };
+  return { zakenVan, personeelVan, werktBij, leidtBij };
 }
 
 module.exports = { maakWerkplekken };

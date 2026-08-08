@@ -6,14 +6,15 @@ const { eigenVeld } = require('../../kern/util'); // veilige objecttoegang (geen
 module.exports = (kern) => {
   const { app, auth, db, save, crypto, talen, chatStuur, applyChatVertaald, meldWerkgever, LANDEN,
           openVacatures, findSupplier, cvReady, leeftijdVan, geborenVan, notifySupplier, sseToSupplier,
-          sseToOffice, PERSONAS, automatisering } = kern;
+          sseToOffice, PERSONAS, automatisering, commWerk } = kern;
   app.post('/api/member/apply/chats', auth, (req, res) => {
     // ook gratis gebruikers chatten met de werkgever over hun sollicitatie
-    const uit = Object.values(db.data.applyChats)
-      .filter(c => c.applicant.kind === 'rtg' && c.applicant.key === req.session.key)
-      .map(c => { const l = c.berichten[c.berichten.length - 1]; return { id: c.id, bedrijf: c.bedrijf, func: c.func, laatste: l ? l.tekst : null, laatsteVan: l ? l.van : null, at: l ? l.at : c.at }; })
-      .sort((x, y) => (y.at || '').localeCompare(x.at || ''));
-    res.json({ chats: uit });
+    /* Sinds de verhuizing uit de communicatiekern (kern/comm/werk.js), in
+       dezelfde vorm als hiervoor. voorSollicitant() haalt onderweg de
+       sollicitaties binnen die nog in de oude voorraad stonden -- zonder dat
+       zou deze lijst op de dag van de verhuizing leeg staan, en de lijst IS de
+       manier om een sollicitatiechat te openen. */
+    res.json({ chats: commWerk ? commWerk.voorSollicitant(req.session.key) : [] });
   });
 
   app.post('/api/member/apply/chat', auth, (req, res) => {

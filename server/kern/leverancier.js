@@ -30,7 +30,7 @@ const ZAAK_OPTIES = {
 
 const { ordersVanZaak, boekingenVanZaak } = require('../db'); // O(1) per zaak i.p.v. een scan over alle orders/boekingen
 
-function maakLeverancier({ db, save, crypto, i18n, notify, broadcastSync, sseToSupplier, sseToCustomer, logActivity, findSupplier, connectedSupplierCodes, guestsFor, gidsHaal, etaMinutes, haversine, accounts, werkgeverSollicitatie }) {
+function maakLeverancier({ db, save, crypto, i18n, notify, broadcastSync, sseToSupplier, sseToCustomer, logActivity, findSupplier, connectedSupplierCodes, guestsFor, gidsHaal, etaMinutes, haversine, accounts, werkgeverSollicitatie, commGastVan }) {
   function publicTrip(t, staffRate, lang) {
     const out = {
       id: t.id, dest: t.dest, visual: t.visual, title: i18n.localize(t.title, lang),
@@ -49,18 +49,18 @@ function maakLeverancier({ db, save, crypto, i18n, notify, broadcastSync, sseToS
   const ctx = { db, save, crypto, i18n, notify, broadcastSync, sseToSupplier, sseToCustomer, logActivity,
     findSupplier, connectedSupplierCodes, guestsFor, gidsHaal, etaMinutes, haversine, accounts, werkgeverSollicitatie,
     HK_STATUSES, POS_METHODS, DOOR_RELOCK_MS, TABLE_STATUSES, ZAAK_OPTIES,
-    ordersVanZaak, boekingenVanZaak, publicTrip };
+    ordersVanZaak, boekingenVanZaak, publicTrip, commGastVan };
   const deelGastcontact = require('./leverancier/gastcontact')(ctx);
   Object.assign(ctx, deelGastcontact);
   const deelZaak = require('./leverancier/zaak')(ctx);
   Object.assign(ctx, deelZaak);
   const deelState = require('./leverancier/state')(ctx);
-  const { deptsFor, chatKeyOf, getChat, validDept, zorgContact, klantSalon } = deelGastcontact;
+  const { deptsFor, chatKeyOf, validDept, zorgContact, klantSalon } = deelGastcontact;
   const { publicSupplier, magBezorgen, ticketsVoorSlot, addTicket, setRoomHk, salonNaarVolgers, posDay, unlockDoor, makeSupplierCode, managerOnly, optieAan, aiFindRoom, aiFindDoor } = deelZaak;
   const { supplierState } = deelState;
 
   return {
-    publicTrip, deptsFor, chatKeyOf, getChat, validDept, zorgContact, klantSalon, publicSupplier, magBezorgen,
+    publicTrip, deptsFor, chatKeyOf, validDept, zorgContact, klantSalon, publicSupplier, magBezorgen,
     ticketsVoorSlot, addTicket, setRoomHk, salonNaarVolgers, posDay, unlockDoor,
     makeSupplierCode, managerOnly, optieAan, aiFindRoom, aiFindDoor, supplierState
   };

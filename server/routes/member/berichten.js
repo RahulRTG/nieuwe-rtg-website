@@ -9,7 +9,7 @@
    overige kanalen verwijzen nog door naar hun bron-app, die zelf de leesstanden
    bijhoudt. Gemount vanuit routes/member.js. */
 module.exports = (kern) => {
-  const { app, auth, db, convOf, socialConnecties, dmSleutel, codenaamVan, overheid, stemmingVan, jarigVan, rtmail, berichten } = kern;
+  const { app, auth, db, convOf, socialConnecties, codenaamVan, overheid, stemmingVan, jarigVan, rtmail, berichten, commWerk } = kern;
   // het RTMAIL-adres van dit lid: zijn codenaam (privacy by design)
   const mijnCodenaam = req => (req.session.account && req.session.account.codename) || (codenaamVan ? codenaamVan(req.session.key) : null);
 
@@ -31,14 +31,17 @@ module.exports = (kern) => {
     try {
       const sc = socialConnecties(mij);
       for (const c of (sc.connections || []).slice(0, 40)) {
-        const chat = (db.data.memberChats || {})[dmSleutel(mij, c.key)];
-        if (!chat || !chat.messages.length) continue;
-        const l = chat.messages[chat.messages.length - 1];
-        const gelezen = chat.read && chat.read[mij];
-        const ongelezen = chat.messages.filter(m => m.from !== mij && (!gelezen || m.at > gelezen)).length;
+        /* Uit de communicatiekern: de priveberichten wonen daar sinds de
+           verhuizing, en twee tellers voor hetzelfde aantal is hoe ze uit
+           elkaar gaan lopen. */
+        const brug = kern.commDm;
+        if (!brug) break;
+        const l = brug.laatste(mij, c.key);
+        if (!l) continue;
+        const ongelezen = brug.ongelezen(mij, c.key);
         kanalen.push({ soort: 'dm', key: c.key, titel: c.codename || codenaamVan(c.key), icoon: 'berichten',
           laatste: String(l.text || (l.post ? 'Deelde een Salon-post' : '')).slice(0, 120),
-          at: l.at, ongelezen, link: '/apps/vrienden.html',
+          at: l.at, ongelezen, link: '/apps/comm.html',
           // de wauw-laag reist mee: de dag-stemming en verjaardagsglans van je vriend
           stemming: stemmingVan ? stemmingVan(c.key) : null, jarig: jarigVan ? !!jarigVan(c.key) : false });
       }
@@ -56,7 +59,9 @@ module.exports = (kern) => {
     try {
       for (const c of Object.values(db.data.applyChats || {})) {
         if (!c.applicant || c.applicant.kind !== 'rtg' || c.applicant.key !== mij) continue;
-        const l = c.berichten[c.berichten.length - 1];
+        // de berichten staan sinds de verhuizing in de kern (kern/comm/werk.js)
+        const rij = commWerk ? commWerk.berichten(c.id) : [];
+        const l = rij[rij.length - 1];
         kanalen.push({ soort: 'werk', titel: c.bedrijf + ' · ' + c.func, icoon: 'werk',
           laatste: l ? String(l.tekst).slice(0, 120) : 'Sollicitatie gestart.',
           at: l ? l.at : c.at, ongelezen: l && l.van !== 'sollicitant' ? 1 : 0, link: '/apps/app.html' });

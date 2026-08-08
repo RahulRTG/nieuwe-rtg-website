@@ -138,6 +138,23 @@
 }
 
 /* ------------------------------------------------------ de grote titel */
+/* De bovenregel die met de titel meekwam uit de kopbalk (zie shared/ios.js,
+   bovenregelVan). Hij houdt zijn eigen kleur en spatiëring uit .ey; hier staat
+   alleen de uitlijning, zodat hij precies boven de grote titel valt en niet
+   tegen de rand van het scherm. */
+.ios-boven{
+  padding:0.5rem max(1rem, env(safe-area-inset-left,0px)) 0;
+  margin:0;
+}
+.ios-boven + .ios-groot{ padding-top:0.1rem; }
+/* De ondertitel onder de grote titel. Hij houdt zijn eigen kleur en maat uit de
+   klasse die hij al had (.stil, .badge); hier staat alleen de uitlijning. */
+.ios-onder{
+  padding:0 max(1rem, env(safe-area-inset-left,0px)) 0.5rem;
+  margin:0;
+}
+.ios-groot:has(+ .ios-onder){ padding-bottom:0.25rem; }
+
 .ios-groot{
   font-family:'Bodoni Moda',serif; font-weight:500;
   font-size:34px; line-height:1.15; letter-spacing:-0.01em;

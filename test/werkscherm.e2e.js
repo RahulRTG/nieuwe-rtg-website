@@ -190,16 +190,29 @@ test('de eigenaar staat meteen in zijn eigen werkruimte, zonder een token over t
        tot een deur: Mijn werkplekken. Deze toets zocht daarna nog op de oude
        naam en stond sindsdien rood, wat pas opviel toen hij weer werd
        gedraaid. De EIS is niet veranderd -- de werkplek moet vindbaar zijn op
-       de homescreen -- alleen de naam waaronder je hem vindt. */
+       de homescreen -- alleen de naam waaronder je hem vindt.
+
+       EN NIET MEER IN WELKE MAP. Deze toets opende "Het Huis" en keek daarin;
+       toen de vier mappen er acht werden verhuisden Mijn werkplekken en RTG
+       Office naar de map Werk, en stond hij weer rood om een indeling en niet
+       om de eis. De eis is: vindbaar op de homescreen, in EEN van de mappen.
+       We lopen ze daarom allemaal af. Een indeling mag schuiven; een app die
+       nergens meer staat mag niet. */
     await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(2000);
-    const tegels = await page.evaluate(() => {
-      const huis = Array.from(document.querySelectorAll('#osMappen .os-app'))
-        .find(a => /huis/i.test(a.textContent || ''));
-      if (huis) huis.click();
-      return new Promise(klaar => setTimeout(() => klaar(
-        Array.from(document.querySelectorAll('#osMapGrid .os-app')).map(a => (a.textContent || '').trim())
-      ), 400));
+    const tegels = await page.evaluate(async () => {
+      const wacht = (ms) => new Promise((k) => setTimeout(k, ms));
+      const mappen = Array.from(document.querySelectorAll('#osMappen .os-app'));
+      const uit = [];
+      for (const map of mappen) {
+        map.click();
+        await wacht(300);
+        for (const a of document.querySelectorAll('#osMapGrid .os-app')) uit.push((a.textContent || '').trim());
+        const scrim = document.getElementById('osMapScrim');
+        if (scrim) scrim.classList.remove('open');
+        await wacht(120);
+      }
+      return uit;
     });
     assert.ok(tegels.some(t => /mijn werkplekken/i.test(t)),
       'de werkplek heeft een tegel op de homescreen; gevonden: ' + tegels.join(', '));

@@ -26,9 +26,18 @@ module.exports = {
   '/apps/bureau.html': G('De homescreen (dit pad brengt je daarheen).',
     ['Tik een app; omhoog vegen op het streepje onderin brengt je terug'],
     'Een oude ingang uit de tijd dat er nog een apart bureaublad was.'),
-  '/apps/berichten.html': G('Je berichten met vrienden en partners, automatisch vertaald als dat nodig is.',
+  '/apps/comm.html': G('Je berichten met vrienden en partners, automatisch vertaald als dat nodig is.',
     ['Stuur een bericht op codenaam', 'Bel of videobel vanuit het gesprek', 'Deel een snap of verhaal met wie jij kiest'],
     'Berichten in een andere taal worden voor je vertaald; jij leest en schrijft gewoon in je eigen taal.'),
+  /* Berichten is opgegaan in comm.html, maar het PAD bestaat nog: er kan van
+     buiten naar gelinkt zijn (een melding, een bladwijzer), dus staat er een
+     omleiding. Een pagina die bestaat hoort een eigen uitleg te hebben -- de
+     algemene terugval zegt niets en de gids belooft dekking van elke pagina.
+     Dit ontbrak doordat de ingang bij de verhuizing HERNOEMD werd in plaats
+     van bijgezet: comm.html kreeg er een, berichten.html raakte de zijne kwijt. */
+  '/apps/berichten.html': G('De oude ingang van Berichten. Hij brengt je meteen naar de communicatie-app, waar al je gesprekken in een lijst staan.',
+    ['Je wordt vanzelf doorgestuurd naar de communicatie-app', 'Werk je bladwijzer bij naar de nieuwe app'],
+    'Oude links blijven werken: RTG gooit een pad nooit zomaar weg, want een dood pad is erger dan een omleiding.'),
   '/apps/genootschap.html': G('Genootschap: je besloten groepen binnen RTG, met een prikbord en bijeenkomsten.',
     ['Richt er een op en kies wie erbij mag: openbaar, besloten of geheim', 'Zet iets op het prikbord, of stel een peiling voor met een paar keuzes', 'Roep een bijeenkomst uit en zie wie ja, misschien of nee zegt'],
     'Geheim is hier echt geheim: zo\'n genootschap staat in geen enkele lijst en is alleen met een uitnodiging te vinden.'),

@@ -58,7 +58,7 @@ test('leden-app: scan een tafel-QR -> het menu opent met de tafel voorgekozen',
     //    het OS-beginscherm staat scannen in het bedieningspaneel en niet meer
     //    als los knopje in de statusbalk; de knop zelf blijft het model.
     await page.waitForSelector('#scanBtn', { state: 'attached', timeout: 15000 });
-    await page.waitForSelector('#osCcBtn', { timeout: 15000 });
+    await page.waitForSelector('#osCcBtn', { state: 'attached', timeout: 15000 });
     // de verplichte onboarding-poort staat los van deze test; we sluiten hem zoals
     // de app dat doet zodra de intake rond is, om de scan-stroom te kunnen toetsen
     await page.evaluate(() => { const g = document.getElementById('onbGate'); if (g) g.hidden = true; });
@@ -72,7 +72,21 @@ test('leden-app: scan een tafel-QR -> het menu opent met de tafel voorgekozen',
     assert.equal(rt, 'RTG-tafel', 'de QR-codec round-tript in de browser');
 
     // 5) bedieningspaneel -> Scannen -> overlay -> met de hand de tafel-QR invoeren
-    await page.click('#osCcBtn');
+    /* HET BEDIENINGSPANEEL OPENEN ZOALS EEN GEBRUIKER DAT DOET.
+
+       Hier stond `page.click('#osCcBtn')`. Die knop stond toen nog in de
+       statusbalk van het beginscherm; die balk is leeggemaakt (mappen, klok,
+       functies, de balk van Rahul, en verder niets) en de knop is nu een
+       verborgen model dat het paneel zelf aanklikt. Klikken op iets dat niet in
+       beeld staat kan een gebruiker niet, dus deze toets ook niet.
+
+       De echte weg is de bovenrand omlaag halen (shared/randen.js). Dat is
+       meteen de betere toets: hij meet de ingang die er nu is en niet de knop
+       die er toevallig nog staat. */
+    await page.mouse.move(196, 4);
+    await page.mouse.down();
+    for (const y of [20, 50, 90, 130]) { await page.mouse.move(196, y); await page.waitForTimeout(40); }
+    await page.mouse.up();
     await page.waitForSelector('#osCcScan', { state: 'visible', timeout: 8000 });
     await page.click('#osCcScan');
     await page.waitForSelector('.rtg-scan-ov', { timeout: 8000 });

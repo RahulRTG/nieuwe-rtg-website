@@ -62,6 +62,7 @@
       "pasAppVan",
       "rememberSession",
       "sessions",
+      "startHerstel",
       "stateFor",
       "webauthnLijst",
       "webauthnLoginMaak",
@@ -302,7 +303,12 @@
       "status"
     ],
     "livinglab": [
-      "livinglab"
+      "id",
+      "livinglab",
+      "staf",
+      "veilig",
+      "veiligAsync",
+      "wie"
     ],
     "luchthaven": [
       "lucht"
@@ -416,6 +422,12 @@
       "chatKeyOf",
       "chatStuur",
       "codewoordCheck",
+      "comm",
+      "commAi",
+      "commBronnen",
+      "commDm",
+      "commGast",
+      "commWerk",
       "conciergeIntrek",
       "conciergeVerzoeken",
       "conciergeVraag",
@@ -979,6 +991,7 @@
     ],
     "social": [
       "blokkeer",
+      "commDm",
       "connectieTussen",
       "dagOpdracht",
       "deblokkeer",
@@ -1054,6 +1067,7 @@
       "DEMO",
       "WERKBELEID_PAUZE_MINUTEN",
       "checkCred",
+      "commCollega",
       "findStaffPartner",
       "fluister",
       "fluisterFocus",
@@ -1164,6 +1178,8 @@
       "checkCred",
       "coachCache",
       "coachRules",
+      "comm",
+      "commGast",
       "controleerSom",
       "creator",
       "dagrapport",

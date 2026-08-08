@@ -15,7 +15,7 @@
     { naam: 'Spelen',          url: '/apps/spelen.html' },
     { naam: 'RTG School',      url: '/apps/rtgschool.html' },
     { naam: 'Vrienden',        url: '/apps/foundation/vrienden.html' },
-    { naam: 'Berichten',       url: '/apps/berichten.html' },
+    { naam: 'Berichten',       url: '/apps/comm.html' },
     { naam: 'Camera',          url: '/apps/camera.html' },
     { naam: 'RTG Media',       url: '/apps/media.html' },
     { naam: 'RTG Sound',       url: '/apps/muziek.html' },

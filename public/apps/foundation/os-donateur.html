@@ -186,5 +186,10 @@ if ('serviceWorker' in navigator && location.protocol.startsWith('http')) naviga
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/cookie.js" defer></script>
 <script src="/shared/sneltoets.js" defer></script>
+<!-- De iOS-laag ontbrak op de zeven os-*.html van de RTFoundation, terwijl
+     alle andere foundation-pagina's hem wel hebben: geen navigatiebalk zoals
+     de rest, geen home-indicator, en sinds kort ook geen app-menu (dat wordt
+     door deze laag binnengehaald). -->
+<script src="/shared/ios.js" defer></script>
 </body>
 </html>

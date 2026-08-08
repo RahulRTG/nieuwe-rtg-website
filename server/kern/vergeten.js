@@ -43,6 +43,7 @@ module.exports = function maakVergeten(kern) {
   // de identiteitsmap (paspoortscans en selfies): zie ../identiteitsmap.js
   const identiteitsmap = require('../identiteitsmap').maakIdentiteitsmap(UPLOAD_DIR);
   const anoniem = require('./vergeten/anoniem')({ db, accounts });
+  const { wisGesprekkenVan: wisGesprekken, wisSollicitatiechats } = require('./vergeten/gesprekken');
 
   /* Wist dit lid definitief. Async omdat de mediastore ook een objectopslag op
      afstand kan zijn (S3); de aanroeper wacht erop voordat hij antwoordt --
@@ -54,6 +55,15 @@ module.exports = function maakVergeten(kern) {
     delete db.data.cvs[key];
     delete db.data.live[key];
     for (const k of Object.keys(db.data.guestChats || {})) if (k.split('|')[1] === key) delete db.data.guestChats[k];
+    /* De gesprekken van de communicatiekern. De regel staat apart (./vergeten/
+       gesprekken.js) omdat hij binnen deze functie niet los te toetsen was --
+       en precies daardoor stond hij er eerst helemaal niet: de bezem liep groen
+       over een database waar de berichten van het verwijderde lid nog in
+       stonden. Zie de kop daar voor welke lezing van art. 17 hij volgt. */
+    wisGesprekken(db, key);
+    /* En de schakel van een sollicitatie: het record dat zegt wie er
+       solliciteerde. Zie de opmerking bij wisSollicitatiechats(). */
+    wisSollicitatiechats(db, key);
     for (const p of db.data.posts) if (p.likedBy) delete p.likedBy[key];
     /* De eigen Salon-posts gaan WEG. Dat is de schoonste lezing van art. 17:
        het is de inhoud van dit lid en dit lid vraagt vergetelheid. De reacties

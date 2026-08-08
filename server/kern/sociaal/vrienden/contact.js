@@ -4,7 +4,18 @@
 module.exports = (ctx) => {
 const { db, save, sseToCustomer, rtf, crypto, gidsHaal, gidsZoekCodenaam, media,
   dmSleutel, connectieTussen, isRtf, codeExists, codenaamVan, soortVan, isKindHandle,
-  isBeschermdHandle, verbActief, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, sociaalRate } = ctx;
+  isBeschermdHandle, verbActief, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, sociaalRate, commDm } = ctx;
+/* De priveberichten wonen sinds de verhuizing in de communicatiekern
+   (kern/comm + kern/comm/dm). Deze laag houdt wat van haar is -- de
+   vriendschapscontrole, de blokkade en de snelheidslimiet -- en laat het
+   bewaren daar. Die kern wordt later opgebouwd dan deze laag, dus we halen
+   hem op bij gebruik; is hij er onverhoopt niet, dan zegt dat het eerlijk
+   in plaats van stilletjes in een tweede voorraad te schrijven. */
+const DM = () => {
+  const b = typeof commDm === 'function' ? commDm() : null;
+  if (!b) throw new Error('De communicatiekern is niet beschikbaar.');
+  return b;
+};
 function socialAntwoord(mij, ander, action) {
   const c = connectieTussen(mij, ander);
   if (!c || c.status !== 'pending' || c.requestedBy === mij) return { status: 404, error: 'Geen openstaand verzoek van deze codenaam.' };
@@ -21,10 +32,12 @@ function socialAntwoord(mij, ander, action) {
 function socialConnecties(mij) {
   const conns = db.data.connections.filter(c => (c.a === mij || c.b === mij) && verbActief(c)).map(c => {
     const ander = c.a === mij ? c.b : c.a;
-    const chat = db.data.memberChats[dmSleutel(mij, ander)];
-    const laatst = chat && chat.messages.length ? chat.messages[chat.messages.length - 1] : null;
-    const gelezen = chat && chat.read && chat.read[mij] ? chat.read[mij] : '';
-    const unread = chat ? chat.messages.filter(m => m.from !== mij && m.at > gelezen).length : 0;
+    /* Teller en laatste regel komen uit de kern, niet meer uit een eigen
+       voorraad: twee tellers voor hetzelfde aantal is hoe ze uit elkaar gaan
+       lopen. Valt de kern weg, dan tonen we de vriend zonder teller -- een
+       vriendenlijst hoort niet om te vallen omdat er geen bericht te tellen is. */
+    let laatst = null, unread = 0;
+    try { const b = DM(); laatst = b.laatste(mij, ander); unread = b.ongelezen(mij, ander); } catch (e) {}
     return { key: ander, codename: codenaamVan(ander), tier: soortVan(ander), unread, last: laatst ? (laatst.post ? '↗ post' : String(laatst.text || '').slice(0, 48)) : null, lastAt: laatst ? laatst.at : c.acceptedAt };
   }).sort((x, y) => String(y.lastAt).localeCompare(String(x.lastAt)));
   const requests = db.data.connections.filter(c => (c.a === mij || c.b === mij) && c.status === 'pending' && c.requestedBy !== mij && !isBeschermdHandle(mij)).map(c => ({ key: c.requestedBy, codename: codenaamVan(c.requestedBy), at: c.at }));
@@ -33,10 +46,9 @@ function socialConnecties(mij) {
 // DM lezen/sturen (werkt over beide werelden zolang de vriendschap actief is)
 function socialDm(mij, ander) {
   if (!verbActief(connectieTussen(mij, ander))) return { status: 403, error: 'Je bent nog niet verbonden met deze codenaam.' };
-  const k = dmSleutel(mij, ander);
-  const chat = db.data.memberChats[k] = db.data.memberChats[k] || { messages: [], read: {} };
-  chat.read[mij] = new Date().toISOString(); save();
-  return { status: 200, messages: chat.messages.slice(-80), codename: codenaamVan(ander) };
+  const b = DM();
+  b.markeerGelezen(mij, ander);
+  return { status: 200, messages: b.berichten(mij, ander, 80), codename: codenaamVan(ander) };
 }
 function socialDmSend(mij, ander, text) {
   if (isGeblokkeerd(mij, ander)) return { status: 403, error: 'Dit contact is niet beschikbaar.' };
@@ -44,12 +56,10 @@ function socialDmSend(mij, ander, text) {
   if (!sociaalRate(mij, 'dm', 60, 60 * 1000)) return { status: 429, error: 'Rustig aan met berichten sturen.' };
   text = String(text || '').replace(/[<>]/g, '').slice(0, 500).trim();
   if (!text) return { status: 400, error: 'Leeg bericht.' };
-  const k = dmSleutel(mij, ander);
-  const chat = db.data.memberChats[k] = db.data.memberChats[k] || { messages: [], read: {} };
-  chat.messages.push({ from: mij, text, at: new Date().toISOString() });
-  chat.messages = chat.messages.slice(-200); save();
+  const b = DM();
+  b.stuur(mij, ander, { tekst: text });
   sseToCustomer(ander, 'social', { kind: 'dm', from: mij, codename: codenaamVan(mij), text });
-  return { status: 200, ok: true, messages: chat.messages.slice(-80) };
+  return { status: 200, ok: true, messages: b.berichten(mij, ander, 80) };
 }
 const zijnVrienden = (a, b) => verbActief(connectieTussen(a, b));
 // vriendschapsverzoeken van kinderen van dit gezin die op ouderakkoord wachten

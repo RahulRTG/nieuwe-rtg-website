@@ -350,7 +350,7 @@
           const prive=sw.scrollLeft>sw.clientWidth/2;
           // camera/microfoon doorgeven aan het kader (shared/media.js); zonder
           // dat weigert de browser ze in de ingesloten Berichten-app
-          if(prive&&!geladen){ geladen=true; RTGMedia.kader(fr); fr.src='/apps/berichten.html'; }
+          if(prive&&!geladen){ geladen=true; RTGMedia.kader(fr); fr.src='/apps/comm.html'; }
           w.classList.toggle('aan',!prive); p.classList.toggle('aan',prive);
           p.textContent=prive?'Privé':'Privé · swipe ←';
         },{passive:true});

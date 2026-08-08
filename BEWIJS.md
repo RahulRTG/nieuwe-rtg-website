@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 688 bestanden en 3850 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 699 bestanden en 3932 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 688 |
-| losse beweringen (`test(...)`) | 3850 |
+| toetsbestanden | 699 |
+| losse beweringen (`test(...)`) | 3932 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 518 |
 | **overleefd**: geen mutatie kreeg hem rood | 13 |
 | niet te meten (al rood, geen module gevonden, ...) | 16 |
-| alleen in de kop *genoemd*, nog niet gemeten | 23 |
-| niets van beide | 118 |
+| alleen in de kop *genoemd*, nog niet gemeten | 24 |
+| niets van beide | 128 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-608 bestanden, 3714 beweringen.
+616 bestanden, 3782 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -101,7 +101,7 @@ toets omvalt.
 | `betaalstore.test.js` | 2 | gezakt op `===->!==` | De betaal-naad met een geïnjecteerde, durable idempotentie-store (zoals server.js hem nu koppelt aan de database): dezelfde sleutel geeft hetzelfde resultaat terug, het resultaat staat echt in de store (en overleeft... |
 | `beveiliging.test.js` | 11 | gezakt op `===->!==` | Tests voor de beveiligingsmeldingen (server/beveiliging.js): melden, samenvoegen, samenvatting, afhandelen en escalatie naar de eigenaar. Zuiver, met een nagemaakte db. |
 | `beveiligingsteam.test.js` | 13 | gezakt op `liegpoort /api/` | Het beveiligings-commandocentrum voor topbeveiligingsteams: de manager plant het rooster (of laat de AI het overnemen), bewaakt het budget, beheert posten en handelt inzetaanvragen af; de bewaker gebruikt de PDA (op... |
-| `bewaartermijnen.test.js` | 8 | gezakt op `false->true` | BEWAARTERMIJNEN -- houden we niet langer dan mag, en niet korter dan moet? Twee kanten die allebei fout kunnen gaan, en die elkaars tegenpool zijn: te LANG bewaren -> overtreding van opslagbeperking (AVG art. |
+| `bewaartermijnen.test.js` | 10 | gezakt op `false->true` | BEWAARTERMIJNEN -- houden we niet langer dan mag, en niet korter dan moet? Twee kanten die allebei fout kunnen gaan, en die elkaars tegenpool zijn: te LANG bewaren -> overtreding van opslagbeperking (AVG art. |
 | `bewaarveger.test.js` | 11 | gezakt op `+->-` | De bewaarveger: de wisregels uit het papierwerkregister als code (server/bewaarveger.js). Elke regel heeft een eigen toets en is met een mutatie geverifieerd; de klok is geinjecteerd, dus niets slaapt echt. |
 | `bewaarwacht.test.js` | 7 | gezakt op `===->!==` | DE BEWAARWACHT -- kijkt vanzelf, en houdt zich in. Een bewaarbeleid faalt op twee manieren die allebei stil zijn: niemand kijkt ooit -> de termijn staat op papier en nergens anders de wacht wist zelf -> data... |
 | `bezorg.test.js` | 5 | gezakt op `liegpoort /api/` | De ophaal/bezorgdienst, van assortiment tot bezorgd: de zaak zet producten en de dienst aan; het lid bestelt (ophalen of bezorgen) en betaalt vooraf; de bezorger neemt meerdere leveringen op eigen naam, deelt GPS... |
@@ -120,6 +120,7 @@ toets omvalt.
 | `borden.test.js` | 4 | gezakt op `liegpoort /api/` | Borden: het gedeelde werkbord. De zaak maakt borden met lijsten en kaarten, kiest per bord de collega's (leeg = hele team), en alleen bord-leden zien een besloten bord. |
 | `bouw.test.js` | 4 | gezakt op `liegpoort /api/` | Het bouw-genre (timmerman, loodgieter, elektricien op de vakwerk-motor) en het Dienstenplein in de RTG Mall: elke dienstverlener biedt er zijn aanbod aan, elk leverancier-genre heeft een plek in de gids, en boeken... |
 | `bugjacht.test.js` | 28 | gezakt op `liegpoort /api/` | De bugjacht: de defecten die uit de gerichte doorlichting kwamen, elk met een toets die ZAKT als de reparatie eruit gaat. Ze staan hier bij elkaar en niet verspreid over de bestaande bestanden, omdat ze een... |
+| `bundeldelen.test.js` | 4 | -- | De bundels en hun losse delen mogen niet uit elkaar lopen. DIT KOMT UIT EEN ECHTE FOUT, en uit de duurste soort: eentje die niets liet zakken. |
 | `bureau.test.js` | 21 | gezakt op `liegpoort /api/` | Integratietests voor Het Privekantoor: de ENE app van de Lifestyle Pass. Wat hier bewezen wordt, en waarom juist dit: de poort een RTG-pas komt er niet in, op geen enkele route de projectie de Life Graph LEEST de... |
 | `ca.test.js` | 4 | gezakt op `===->!==` | Bewijst onze eigen interne CA (server/lib/ca.js): een root-CA die als CA geldt, server- en client-certificaten uitgeeft die via ONS CA-cert vertrouwd worden (niet via rejectUnauthorized:false),... |
 | `cache.test.js` | 6 | gezakt op `===->!==` | De eigen in-memory cache (server/lib/cache.js): TTL-verval, LRU-uitzetting, treffer/misser-telling, en de response-cache-middleware die een publiek JSON- antwoord memoiseert (miss -> hit) en een niet-200 juist NIET... |
@@ -133,6 +134,13 @@ toets omvalt.
 | `clubs.test.js` | 8 | gezakt op `liegpoort /api/` | RTG Clubs: de golf- en countryclub (Sa Roca) en de sport- en fitnessclub (Fortia). Bewaakt de tee sheet zonder dubbele flights, de lessen van de pro's, de maandbeker met vol-is-vol, de baanstatus, de ledenpas met... |
 | `collega-namen.test.js` | 4 | gezakt op `liegpoort /api/` | De namenregel op de werkvloer: COLLEGA'S zien elkaar overal met de echte naam: het eigen rooster en team, het personeelsnetwerk tussen zaken van elk genre, en de ketenchat van de hulpdiensten. KLANTEN blijven op... |
 | `collegachat.test.js` | 2 | gezakt op `liegpoort /api/` | De interne lijn tussen collega's: het directe chatbericht (1-op-1, met ongelezen-tellers) en de interne call (signalering; alleen ingeklokte collega's zijn belbaar). Draai los: node --experimental-sqlite --test... |
+| `comm-actor.test.js` | 12 | -- | Het actormodel van de communicatiekern (server/kern/comm/wie.js). WAAROM DIT DE TOETS IS DIE VOOR DE CODE UIT GING. |
+| `comm-collega.test.js` | 8 | -- | De verhuizing van de collegaberichten naar de communicatiekern (server/kern/comm/collega.js). DE TWEEDE VOORRAAD DIE OVERGAAT, en de eerste die dat kan doordat een deelnemer niet meer per se een lid is... |
+| `comm-deelnemer.test.js` | 10 | -- | Wat een deelnemer met een gesprek doet nadat het bericht er staat (server/kern/comm/deelnemer.js). DIT WAS EEN GAT, en het viel pas op toen de kern werd opgeknipt. |
+| `comm-dm.test.js` | 6 | -- | De verhuizing van de priveberichten naar de communicatiekern (server/kern/comm/dm.js). WAAROM DIT EEN EIGEN TOETS HEEFT. |
+| `comm-gast.test.js` | 12 | -- | De verhuizing van het gastcontact naar de communicatiekern (server/kern/comm/gast.js). DE DERDE VOORRAAD, en de eerste waarin een LID en een ZAAK in hetzelfde gesprek zitten. |
+| `comm-vergeten.test.js` | 6 | -- | Het wisrecht op de gesprekken van de communicatiekern (server/kern/vergeten/gesprekken.js). WAAROM DEZE TOETS ER IS, en waarom hij er niet was. |
+| `comm-werk.test.js` | 8 | -- | De verhuizing van de sollicitatiechat naar de communicatiekern (server/kern/comm/werk.js). DE VIERDE EN LAATSTE GROTE VOORRAAD. |
 | `contact.test.js` | 6 | gezakt op `liegpoort /api/` | Nooit meer vreemden: zodra een lid echt in contact komt met een partner (hier: een bezorgaanvraag) opent er automatisch een open chatlijn. Beide kanten zien die lijn, de partner mag vooraf de Salon van het lid... |
 | `context-lijn.test.js` | 5 | gezakt op `liegpoort /api/` | De dagcontext (tijd, seizoen, temperatuur voor elke AI) en de lijnbezetting (aanmelden per kant; de schermen en de coach rekenen met het aantal aangemelde koks). |
 | `contract.test.js` | 5 | gezakt op `liegpoort /api/` | Contracten: elke zaak stelt een contract op (verhuur of personeel), gericht aan een lid (op codenaam) of een personeelslid. Beide partijen tekenen digitaal; pas als beide handtekeningen staan is het contract... |
@@ -648,20 +656,23 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-80 bestanden, 136 beweringen.
+83 bestanden, 150 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
 | `agenda.e2e.js` | 1 | -- | Scherm-test voor RTG Agenda: het maandraster, Rahul die in gewone taal plant, een afspraak met het paneel, uitnodigen op codenaam en het ja-zeggen door de ander, en de ICS-export. Echte namen horen nergens in beeld... |
+| `appmenu.e2e.js` | 6 | genoemd | Het app-menu (public/shared/appmenu.js) en de belofte dat Rahul ÉÉN balk heeft. TWEE BELOFTES, EN ALLEBEI ZIJN ZE HIER AL EEN KEER GEBROKEN. |
 | `apps-ui.e2e.js` | 11 | -- | Scherm-tests voor de overige vlaggenschip-apps: leverancier, lid en backoffice. Elk logt in via een API-token in localStorage (net als de PDA- test), opent de app in een echte browser en controleert dat de beveiligde... |
 | `bankscherm.e2e.js` | 3 | -- | Scherm-toets op de bank: legt een toets de weg van deze app werkelijk af? WAAROM JUIST DEZE APP EERST scripts/schermen.js telde 105 van de 188 schermen waar geen enkele toets de weg aflegt -- ze worden wel geopend... |
-| `berichten.e2e.js` | 1 | -- | Scherm-test voor de Berichten-app. De unit-toetsen (test/berichten.test.js) bewijzen de server-kant; deze bewijst dat de APP het ook echt doet in een browser: de lijst komt op, een gesprek opent IN de app (dat was... |
+| `berichten.e2e.js` | 1 | -- | Scherm-test voor de communicatie-app. De unit-toetsen (test/berichten.test.js, test/comm-dm.test.js) bewijzen de server-kant; deze bewijst dat de APP het ook echt doet in een browser: de lijst komt op, een gesprek... |
 | `bestanden.e2e.js` | 1 | -- | Scherm-test voor RTG Bestanden: uploaden via de kiezer, het paneel met voorvertoning, delen op codenaam, de nieuwe versie van de andere kant, en de prullenbak met herstel. Draait alleen waar een browser is. |
 | `boeken.e2e.js` | 1 | -- | Scherm-test voor RTG Boeken: de plank (huisbibliotheek + een .txt uit de kluis), lezen in de eigen lezer, en de leesplek die na scrollen bewaard is en bij heropenen terugkomt. Draait alleen waar een browser is. |
 | `browserpoort.e2e.js` | 1 | overleefd | DE BROWSERPOORT -- de enige schermtoets die ZICHZELF niet mag overslaan. Elke andere e2e in deze map begint met dezelfde regel: { skip: pw ? |
 | `camerascherm.e2e.js` | 1 | gezakt op `&&->||#7` | SCHERM-TOETS VOOR /apps/camera.html -- de app uit de oorspronkelijke klacht. WAAROM DEZE ER NOG NIET WAS, EN WAAROM DAT ERG IS. |
 | `clipdeler.e2e.js` | 1 | -- | GAAT ER OOK ECHT BEELD OVER? -- de clipdeler tussen twee browsers. |
 | `clips-studio.e2e.js` | 1 | -- | Scherm-test voor de Clips-studio: knippen, geluid en ondertitels, en het toegangsfilter in de kop. test/clips.test.js bewijst de server-kant; deze bewijst dat de studio op het scherm werkt en dat de feed de standen... |
+| `comm-zaak.e2e.js` | 3 | -- | De zakelijke deur van het communicatieplatform (routes/supplier/comm.js). comm-actor.test.js toetst het MODEL: de sleutels, de naamruimtes, de poort. |
+| `comm.e2e.js` | 5 | -- | Het communicatieplatform (server/kern/comm + apps/comm.html). WAT HIER BEWAAKT WORDT, en waarom juist dit. |
 | `csp.e2e.js` | 1 | -- | DE CSP ZOALS EEN BROWSER HEM ERVAART. Een Content-Security-Policy is de enige beveiliging in dit huis die je niet kunt aantonen door de code te lezen. |
 | `deelmenu.e2e.js` | 3 | genoemd | Scherm-test voor het deelmenu (shared/deelmenu.js): een app met veel delen wordt een menu met een deel tegelijk, in plaats van een lange rol. Het contract, op de eerste pagina die meedoet (rtgschool.html): 1. |
 | `deelmenuronde.e2e.js` | 5 | genoemd | DE TWEEDE RONDE VAN HET DEELMENU: WAT ER GEBEURT ALS DE APP HERTEKENT. test/deelmenuwacht.e2e.js bewaakt de EERSTE ronde: komt er een menu zodra de app zijn schermen neerzet. |

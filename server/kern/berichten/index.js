@@ -18,7 +18,17 @@
 
    De vlaggen (vast/stil/weg) staan per lid in db.data.berichtVlaggen. Gedeelde
    context vanuit server.js, volgens het vaste kern-patroon. */
-module.exports = ({ db, save, socialConnecties, dmSleutel, codenaamVan, rtmail, overheid, anthropic }) => {
+/* De priveberichten staan sinds de verhuizing in de communicatiekern
+   (kern/comm + kern/comm/dm) en niet meer in db.data.memberChats. Deze laag
+   leest ze daar op; hij komt binnen als een functie omdat de kern later wordt
+   opgebouwd dan deze module. Zonder dit vond het zoeken over "alle kanalen"
+   precies de kanalen die verhuisd waren niet meer -- en dat is de stilste fout
+   van allemaal: een zoekopdracht die niets vindt ziet er hetzelfde uit als een
+   zoekopdracht zonder treffers. */
+module.exports = ({ db, save, socialConnecties, dmSleutel, codenaamVan, rtmail, overheid, anthropic, commDm, commWerk }) => {
+  const DM = () => (typeof commDm === 'function' ? commDm() : null);
+  // zelfde late binding als DM: de kern bestaat nog niet op het moment van mounten
+  const WERK = () => (typeof commWerk === 'function' ? commWerk() : null);
     const MAX_TREFFERS = 40;
   const MAX_KANALEN = 100;       // gesprekken die een zoekopdracht doorloopt
   const MAX_PER_KANAAL = 300;    // berichten per gesprek (dat is ook de bewaargrens)
@@ -67,14 +77,14 @@ module.exports = ({ db, save, socialConnecties, dmSleutel, codenaamVan, rtmail, 
        met honderden connecties mag met een zoekopdracht niet de event-loop
        vasthouden. Wie verder terug wil, gebruikt het gesprek zelf. */
     try {
+      const brug = DM();
       for (const c of (socialConnecties(mij).connections || []).slice(0, MAX_KANALEN)) {
-        const chat = (db.data.memberChats || {})[dmSleutel(mij, c.key)];
-        if (!chat) continue;
+        if (!brug) break;
         const naam = c.codename || codenaamVan(c.key);
-        for (const m of chat.messages.slice(-MAX_PER_KANAAL)) {
+        for (const m of brug.berichten(mij, c.key, MAX_PER_KANAAL)) {
           if (!raak(m.text, naald)) continue;
           uit.push({ soort: 'dm', id: 'dm:' + c.key, titel: naam, tekst: snip(m.text, naald),
-            at: m.at, vanMij: m.from === mij, link: '/apps/berichten.html?met=' + encodeURIComponent(c.key) });
+            at: m.at, vanMij: m.from === mij, link: '/apps/comm.html?met=' + encodeURIComponent(c.key) });
         }
       }
     } catch (e) {}
@@ -93,7 +103,9 @@ module.exports = ({ db, save, socialConnecties, dmSleutel, codenaamVan, rtmail, 
     try {
       for (const c of Object.values(db.data.applyChats || {})) {
         if (!c.applicant || c.applicant.kind !== 'rtg' || c.applicant.key !== mij) continue;
-        for (const b of (c.berichten || [])) {
+        // de berichten staan sinds de verhuizing in de kern (kern/comm/werk.js)
+        const W = WERK();
+        for (const b of (W ? W.berichten(c.id) : [])) {
           if (!raak(b.tekst, naald)) continue;
           uit.push({ soort: 'werk', id: 'werk:' + (c.id || c.vacId), titel: c.bedrijf + ' - ' + c.func,
             tekst: snip(b.tekst, naald), at: b.at, vanMij: b.van === 'sollicitant', link: '/apps/app.html' });
@@ -118,17 +130,19 @@ module.exports = ({ db, save, socialConnecties, dmSleutel, codenaamVan, rtmail, 
   function draad(mij, id) {
     const [soort, sleutel] = String(id || '').split(':');
     if (soort === 'dm') {
-      const chat = (db.data.memberChats || {})[dmSleutel(mij, sleutel)];
-      if (!chat || !chat.messages.length) return null;
+      const brug = DM();
+      const berichten = brug ? brug.berichten(mij, sleutel, DRAAD_MAX) : [];
+      if (!berichten.length) return null;
       const naam = codenaamVan(sleutel) || 'de ander';
-      return { titel: naam, regels: chat.messages.slice(-DRAAD_MAX)
+      return { titel: naam, regels: berichten
         .map(m => (m.from === mij ? 'Ik' : naam) + ': ' + String(m.text || '(gedeelde post)')) };
     }
     if (soort === 'werk') {
       const c = Object.values(db.data.applyChats || {})
         .find(x => String(x.id || x.vacId) === sleutel && x.applicant && x.applicant.key === mij);
       if (!c) return null;
-      return { titel: c.bedrijf + ' - ' + c.func, regels: (c.berichten || []).slice(-DRAAD_MAX)
+      const W = WERK();
+      return { titel: c.bedrijf + ' - ' + c.func, regels: (W ? W.berichten(c.id) : []).slice(-DRAAD_MAX)
         .map(b => (b.van === 'sollicitant' ? 'Ik' : c.bedrijf) + ': ' + String(b.tekst || '')) };
     }
     return null;

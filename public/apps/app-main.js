@@ -12,7 +12,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '547fa9d4';
+var RTG_BOUW = '293b0689';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -1627,6 +1627,12 @@ var RTG_BOUW = '547fa9d4';
     const badge = $('#bellBadge');
     badge.style.display = n > 0 ? 'flex' : 'none';
     badge.textContent = n > 9 ? '9+' : n;
+    /* De bel zelf staat verborgen (de statusbalk is leeg); zijn teller staat op
+       de tegel in het bedieningspaneel. Hier bijgewerkt en niet daar, want dit
+       is de plek die weet hoeveel er ligt -- twee tellers die elkaar naschrijven
+       is precies hoe ze uit elkaar gaan lopen. */
+    const ccTel = $('#osCcBelTel');
+    if (ccTel){ ccTel.hidden = n <= 0; ccTel.textContent = n > 0 ? (n > 9 ? '9+' : n) : ''; }
     const list = $('#notifList');
     list.innerHTML = R.notifications.length
       ? R.notifications.map(x =>
@@ -3134,6 +3140,12 @@ var RTG_BOUW = '547fa9d4';
     sport:       { naam: 'Sport',         url: '/apps/sport.html' },
     school:      { naam: 'School',    url: '/apps/rtgschool.html' },
     berichten:   { naam: 'Berichten',     url: '/apps/berichten.html' },
+    /* EEN app voor alle communicatie (kern/comm + apps/comm.html). Hier
+       stonden er vier op het beginscherm -- Berichten, Bellen, Videobellen en
+       Snaps -- voor iets dat een mens als EEN ding ziet: contact met iemand.
+       Bellen en videobellen zijn nu twee knoppen in de kop van het gesprek
+       waar je toch al bent; de oude /apps/berichten.html blijft bestaan als
+       pad, want er kan naar gelinkt zijn. */
     hangar:      { naam: 'Hangar',        url: '/apps/hangar.html' },
     entourage:   { naam: 'Entourage',     url: '/apps/entourage.html' },
     attenties:   { naam: 'Attenties',     url: '/apps/attenties.html' },
@@ -3172,63 +3184,91 @@ var RTG_BOUW = '547fa9d4';
      Een map heeft een vaste sleutel (waar je eigen naam onder bewaard wordt),
      een standaardnaam en zijn apps. Apps die voor jouw pas niet bestaan
      vallen er vanzelf uit (itemZichtbaar). */
-  /* DE MAPPEN VAN HET BEGINSCHERM -- afgesplitst uit ./app-main-24.js.
 
-     Dat deel droeg twee dingen: WELKE apps er zijn (OSAPPS/LINKS) en HOE ze op
-     het beginscherm in mappen liggen. Samen gingen ze over de 10 KB-lat, en de
-     knip loopt langs die grens: hierboven de catalogus, hier de indeling.
+  /* Afgesplitst van app-main-24.js, dat over de 10 KB ging. De snede loopt
+     langs een echte grens: hierboven staat de registry van alle apps en de
+     vaste functierij, hieronder de MAPPEN waarin die apps vallen en de vraag
+     welke ervan bij welke pas horen. */
+  /* ---------- de mappen, boven de klok ----------
+     Zeven mappen, een rij van vier en een rij van drie, en daar zit alles in
+     waar je pas je recht op geeft. Niets installeren: het staat er al. Wil je
+     iets niet zien, dan zet je het uit in de Boardroom (die zet het uit, hij
+     hoeft het niet aan te zetten).
 
-     Dit deel deelt de scope van de bundel (zie scripts/bundel.js). */
+     WAAROM ZEVEN, EN NIET VIER OF ACHT.
+
+     Het waren er VIER, en dat leek rustig tot je ze opendeed: De Salon droeg
+     eenentwintig apps en Het Huis zeventien. Een map met eenentwintig tegels
+     is geen map maar een lade waar je in graait, en het verschil tussen
+     "muziek" en "een vriend appen" was er niet meer aan af te zien.
+
+     Toen werden het er ACHT, en dat was één te veel -- maar dat zag je alleen
+     als je op de goede pas keek. De tegels tellen namelijk niet voor iedereen
+     hetzelfde: veertien apps zijn Lifestyle/Business (zie PREMIUM hieronder)
+     en vallen voor een RTG-pas vanzelf weg. Het Huis had ik gevuld met Maison,
+     Table, Cellier, Garde-robe en De Rechterhand -- alle vijf premium -- dus
+     een Business-lid zag daar acht tegels en een RTG-lid drie. Dezelfde map,
+     half zo vol, precies onderaan. Dat is exact wat de merkregel verbiedt: de
+     instappas mag nooit budget aanvoelen.
+
+     Nageteld over alle 62 items is er materiaal voor ZEVEN mappen die op
+     allebei de passen gevuld staan, en niet voor acht. De zorgkant is daarom
+     terug in Het Huis -- waar zorg, gezin en rust ook horen -- en de tweede
+     rij telt drie mappen in plaats van vier. Een rij van drie is geen
+     halfvolle rij van vier: hij staat gecentreerd onder de eerste (zie
+     .os-mappen in apps/app.html), dus het leest als een vorm en niet als een
+     gat.
+
+     Tellingen per pas, gemeten en niet geschat (RTG / Business):
+     Reizen 8/10, Geld 7/10, De Salon 6/10, Het Huis 6/12,
+     Media 8/8, Werk 7/7, Veilig 4/4.
+
+     Een map heeft een vaste sleutel (waar je eigen naam onder bewaard wordt),
+     een standaardnaam en zijn apps. Apps die voor jouw pas niet bestaan
+     vallen er vanzelf uit (itemZichtbaar). Een app staat in precies EEN map:
+     twee plekken voor hetzelfde is precies waarom je hem nergens meer vindt. */
   const MAPPEN = [
-    { sleutel: 'map-reizen', naam: 'Reizen', secties: [
-      { naam: 'Plannen', items: ['tab:reizen', 'link:vluchten', 'link:residentie'] },
-      { naam: 'Onderweg', items: ['tab:terplaatse', 'link:navigatie', 'link:ov', 'link:flits', 'link:stad'] }
-    ] },
-    { sleutel: 'map-geld', naam: 'Geld', secties: [
-      { naam: 'Betalen', items: ['tab:betalen', 'link:wallet', 'link:rtgcode', 'tab:bestellen'] },
-      { naam: 'Rekeningen', items: ['link:bank', 'link:balans', 'link:loonstrook'] },
-      { naam: 'Samen en bezit', items: ['link:wbw', 'tab:assets', 'link:labfonds'] }
-    ] },
-    { sleutel: 'map-salon', naam: 'De Salon', secties: [
-      { naam: 'Delen', items: ['tab:salon', 'link:pulse', 'os:snaps', 'link:camera', 'link:mediaos', 'link:clips'] },
-      { naam: 'Mensen', items: ['link:vrienden', 'link:vonk'] },
-      { naam: 'Kijken en luisteren', items: ['link:muziek', 'link:theater', 'link:podium', 'link:spelen'] },
-      { naam: 'Lezen', items: ['link:nieuws', 'link:krant', 'link:sport'] }
-    ] },
-    { sleutel: 'map-huis', naam: 'Het Huis', secties: [
-      { naam: 'Thuis', items: ['link:ontdek', 'tab:zorg', 'tab:gezin', 'link:thuiswacht', 'link:thuisrust', 'link:vitaal'] },
-      { naam: 'Leren', items: ['os:rtf', 'link:school'] },
-      { naam: 'Werken', items: ['os:werk', 'link:office', 'link:sitemaker', 'link:browser'] },
-      { naam: 'Uzelf', items: ['link:ik', 'link:passkeys', 'link:codewoord', 'link:juridisch'] }
-    ] },
-    /* Het Privekantoor staat als VIJFDE brede app op het beginscherm en niet
-       meer als tegel binnen Het Huis. Bij twintigduizend euro per maand is het
-       geen onderdeel van je huis; het is de reden dat je die pas hebt. Voor een
-       RTG-pas valt hij vanzelf weg (PREMIUM + itemZichtbaar), en dan staan er
-       vier. */
-    { sleutel: 'map-kantoor', naam: 'Privekantoor', secties: [
-      { naam: 'Uw kantoor', items: ['link:rechterhand'] }
-    ] }
+    /* --- eerste rij --- */
+    { sleutel: 'map-reizen', naam: 'Reizen', items: [
+      'tab:reizen', 'tab:terplaatse', 'link:vluchten', 'link:ov', 'link:navigatie',
+      'link:flits', 'link:stad', 'link:reisboek', 'link:hangar', 'link:residentie'] },
+    { sleutel: 'map-geld', naam: 'Geld', items: [
+      'tab:betalen', 'link:wallet', 'link:bank', 'link:wbw', 'link:rtgcode',
+      'link:balans', 'tab:assets', 'link:labfonds', 'link:mecenaat',
+      'link:nalatenschap', 'link:logboek'] },
+    /* De Salon is weer De Salon: mensen en wat je met ze deelt. Wat je in je
+       eentje kijkt of luistert staat bij Media. */
+    { sleutel: 'map-salon', naam: 'De Salon', items: [
+      'tab:salon', 'link:pulse', 'link:vrienden', 'os:snaps', 'link:camera',
+      'link:vonk', 'link:cercle', 'link:entourage', 'link:rendezvous', 'link:attenties'] },
+    /* Het Huis is het huishouden in de brede zin: waar je woont, wat er op
+       tafel komt, wat er in de kast hangt -- en hoe het met de mensen erin
+       gaat. Die laatste helft (zorg, gezin, vitaal, rust) stond even in een
+       eigen map Zorg; die is hier terug, want zonder haar was Het Huis op een
+       RTG-pas een map met drie tegels. De kantoorkant zit bij Werk. */
+    { sleutel: 'map-huis', naam: 'Het Huis', items: [
+      'link:ontdek', 'os:rtf', 'tab:bestellen', 'tab:zorg', 'tab:gezin',
+      'link:vitaal', 'link:thuisrust', 'link:rechterhand',
+      'link:maison', 'link:table', 'link:cellier', 'link:garderobe'] },
+
+    /* --- tweede rij, gecentreerd --- */
+    { sleutel: 'map-media', naam: 'Media', items: [
+      'link:muziek', 'link:podium', 'link:theater', 'link:clips', 'link:spelen',
+      'link:nieuws', 'link:krant', 'link:sport'] },
+    { sleutel: 'map-werk', naam: 'Werk', items: [
+      'link:office', 'os:werk', 'link:loonstrook', 'link:school',
+      'link:browser', 'link:sitemaker', 'link:juridisch'] },
+    /* Veilig: wie je bent en wie er over je waakt. Vier apps op dezelfde kern
+       (zie de opmerking bij LINKS), plus de sleutels waarmee je binnenkomt.
+       Vier is hier geen tekort maar de hele set -- dit is de enige map die op
+       elke pas even groot is. */
+    { sleutel: 'map-veilig', naam: 'Veilig', items: [
+      'link:ik', 'link:thuiswacht', 'link:codewoord', 'link:passkeys'] }
   ];
 
-  /* De vlakke itemlijst per map wordt AFGELEID uit de secties en niet apart
-     bijgehouden. Spotlight, de zijpanelen en de volgorde-bewaring lezen
-     `map.items`; zou die naast `secties` bestaan, dan vergeet iemand op een dag
-     de ene bij te werken en verdwijnt een app stil uit het zoeken terwijl hij op
-     het scherm staat. Regel 4 van de lat, op een plek waar het echt gebeurt. */
-  for (const mp of MAPPEN) mp.items = mp.secties.reduce((a, s) => a.concat(s.items), []);
-
-  /* De premium-suite bestaat alleen voor Lifestyle en Business. De registry kent
-     de apps voor iedereen; hier staat wie ze mag zien, zodat een RTG-pas ze niet
-     in zijn mappen of in Spotlight tegenkomt.
-
-     Sinds Het Privekantoor staat hiervan nog EEN in de mappen: 'rechterhand',
-     dat /apps/lifestyle.html opent. De andere dertien zijn geen tegels meer maar
-     KAMERS binnen die app -- je komt er via de plattegrond, en de app legt de
-     verbanden die je zelf moest leggen toen het dertien losse tegels waren.
-     Ze blijven wel in deze lijst: de pagina's bestaan nog, worden gelinkt vanuit
-     het kantoor en zijn nog in Spotlight te vinden. Een oude link mag niets
-     opleveren is de regel; uit de mappen halen is iets anders dan opheffen. */
+  /* De premium-suite (De Rechterhand) bestaat alleen voor Lifestyle en
+     Business. De registry kent de apps voor iedereen; hier staat wie ze mag
+     zien, zodat een RTG-pas ze niet in zijn mappen of in Spotlight tegenkomt. */
   const PREMIUM = new Set(['rechterhand', 'reisboek', 'cellier', 'table', 'maison', 'garderobe',
     'mecenaat', 'nalatenschap', 'logboek', 'cercle', 'hangar', 'entourage', 'attenties', 'rendezvous']);
   const premiumPas = pas === 'lifestyle' || pas === 'business';
@@ -3862,6 +3902,10 @@ var RTG_BOUW = '547fa9d4';
   function openZoek() { sluitScrims(); zoekScrim.classList.add('open'); zoekInput.value = ''; zoek(); zoekInput.focus(); }
   if (zoekInput) zoekInput.addEventListener('input', zoek);
 
+
+  /* Afgesplitst van app-main-27.js, dat over de 10 KB ging. De snede loopt
+     langs de grens tussen ZOEKEN (Spotlight: wat staat er op dit OS) en
+     BEDIENEN (het paneel, de helderheid, de wiebel-modus). */
   /* ---------- bedieningspaneel ---------- */
   const ccScrim = $('#osCcScrim');
   const ccBtn = $('#osCcBtn');
@@ -3884,10 +3928,17 @@ var RTG_BOUW = '547fa9d4';
   if (ccPush) ccPush.addEventListener('click', async () => { if (window.RTGRealtime) { await RTGRealtime.enablePush(); ccSync(); } });
   const ccZoek = $('#osCcZoek');
   if (ccZoek) ccZoek.addEventListener('click', openZoek);
-  /* Scannen, je Zegel en je backoffice zaten als losse knopjes in de
-     statusbalk; die staat nu leeg op de bel en dit paneel na. De knoppen zelf
-     blijven het model -- we klikken ze hier gewoon aan. */
-  [['#osCcScan', '#scanBtn'], ['#osCcZegel', '#zegelBtn'], ['#osCcBo', '#boBtn']].forEach(([tegel, knop]) => {
+  /* Scannen, je Zegel, je backoffice en de bel zaten als losse knopjes in de
+     statusbalk; die staat nu helemaal leeg. Het beginscherm is mappen, klok,
+     functies en de balk van Rahul -- en verder niets. De knoppen zelf blijven
+     het model (verborgen in de HTML): we klikken ze hier gewoon aan, zodat het
+     gedrag op EEN plek blijft wonen.
+
+     De bel hoorde er per se bij. Zonder deze tegel was er na het leegmaken van
+     de balk geen enkele ingang meer naar wat er voor je klaarligt, en dat merk
+     je pas als je iets mist -- de stilste storing die er is. */
+  [['#osCcScan', '#scanBtn'], ['#osCcZegel', '#zegelBtn'], ['#osCcBo', '#boBtn'],
+   ['#osCcBel', '#bell']].forEach(([tegel, knop]) => {
     const t = $(tegel), k = $(knop);
     if (t && k) t.addEventListener('click', () => { sluitScrims(); k.click(); });
     else if (t) t.hidden = true;
@@ -6041,11 +6092,9 @@ var RTG_BOUW = '547fa9d4';
     // de stem volgt de pas van het ingelogde lid (niet alleen de ingang)
     document.documentElement.setAttribute('data-stem', user.tier);
     stemKoppen();
-    $('#homeGreeting').textContent = stem(
-      'Ha ' + first + ', goed je te zien.',
-      'Dag ' + first + '. Alles onder controle.',
-      'Welkom terug, ' + first + '. Alles staat voor u klaar.'
-    ) || (T('app.welcome','Welkom,') + ' ' + first + '.');
+    /* De begroeting ("Ha <naam>, goed je te zien.") is van het beginscherm af:
+       zie de opmerking bij .os-thuisscherm in apps/app.html. De regel eronder
+       blijft -- die groet niet, die zegt welke pas je hebt en sinds wanneer. */
     $('#homeSub').textContent = TIER_LABEL[user.tier] + ' · ' + T('app.membersince','lid sinds') + ' ' + user.since;
 
     // De ledenpas staat niet meer op het beginscherm: daar staat de klok, en
@@ -6088,7 +6137,6 @@ var RTG_BOUW = '547fa9d4';
   function renderHomeGuest(){
     document.documentElement.setAttribute('data-stem', 'rtg');
     stemKoppen();
-    $('#homeGreeting').textContent = stem('Ha, fijn dat je er bent.', '', '') || (T('app.welcome','Welkom,') + '.');
     $('#homeSub').textContent = T('app.guestsub','Gratis, zonder pas');
     const gastKaart = $('#homeGast');
     if (gastKaart){

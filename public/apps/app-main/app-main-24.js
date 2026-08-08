@@ -51,6 +51,12 @@
     sport:       { naam: 'Sport',         url: '/apps/sport.html' },
     school:      { naam: 'School',    url: '/apps/rtgschool.html' },
     berichten:   { naam: 'Berichten',     url: '/apps/berichten.html' },
+    /* EEN app voor alle communicatie (kern/comm + apps/comm.html). Hier
+       stonden er vier op het beginscherm -- Berichten, Bellen, Videobellen en
+       Snaps -- voor iets dat een mens als EEN ding ziet: contact met iemand.
+       Bellen en videobellen zijn nu twee knoppen in de kop van het gesprek
+       waar je toch al bent; de oude /apps/berichten.html blijft bestaan als
+       pad, want er kan naar gelinkt zijn. */
     hangar:      { naam: 'Hangar',        url: '/apps/hangar.html' },
     entourage:   { naam: 'Entourage',     url: '/apps/entourage.html' },
     attenties:   { naam: 'Attenties',     url: '/apps/attenties.html' },

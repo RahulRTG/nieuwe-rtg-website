@@ -1,0 +1,719 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Berichten</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<style>
+  /* ================== RTG BERICHTEN: EEN APP VOOR ALLE COMMUNICATIE ==========
+
+     Hier stonden er vier naast elkaar op het beginscherm -- Berichten, Bellen,
+     Videobellen en Snaps -- plus Meet als vijfde app en een gesprek per module
+     dat je alleen vond als je al in die module was. Vier iconen voor een ding
+     dat een mens als EEN ding ziet: contact met iemand. En de Berichten-app
+     zelf was een leeslijst: hij toonde dat er iets was en stuurde je naar de
+     app waar het woonde.
+
+     Dit is die ene app. De lijst links is de Universal Inbox (mensen, zaken,
+     onderweg, officieel, Rahul); rechts staat het gesprek, en bellen en
+     videobellen zijn geen aparte apps meer maar twee knoppen in de kop van het
+     gesprek waar je toch al bent.
+
+     De vormtaal komt van de UI-kit (/shared/rtg-ui.css); wat hier staat is
+     alleen wat een gesprekscherm echt eigen heeft: de twee panelen, de
+     bellenlijst en de invoerbalk. */
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--rtg-bg);color:var(--rtg-txt);font-family:Inter,system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;line-height:1.5;height:100dvh;overflow:hidden;}
+
+  /* Twee panelen op een breed scherm, een tegelijk op een telefoon. Dat is
+     geen keuze van smaak: een lijst en een gesprek naast elkaar op 390 punten
+     maakt allebei onleesbaar. */
+  /* minmax(0,1fr) en niet 1fr, en dat is geen smaakkwestie. Een rasterkolom
+     krimpt standaard niet onder de min-content-breedte van wat erin staat: de
+     zoekrij duwde de kolom op een telefoon naar 497 punten in een venster van
+     393, en de +-knop stond dus buiten beeld -- zonder schuifbalk, zonder
+     foutmelding, gewoon weg. Dezelfde reden voor min-width:0 op de panelen. */
+  .comm{display:grid;grid-template-columns:minmax(0,1fr);height:100dvh;}
+  @media (min-width:900px){ .comm{grid-template-columns:22rem minmax(0,1fr);} }
+  .lijst,.draad{min-width:0;}
+
+  /* ---------------- links: de inbox ---------------- */
+  .lijst{display:flex;flex-direction:column;min-height:0;border-right:1px solid var(--rtg-line);}
+  .lijst-kop{padding:calc(env(safe-area-inset-top,0px) + .9rem) 3.2rem .6rem 1rem;flex-shrink:0;}
+  .lijst-kop h1{font-family:'Bodoni Moda',Georgia,serif;font-weight:500;font-size:1.35rem;letter-spacing:-.01em;}
+  .zoekrij{display:flex;gap:.5rem;margin-top:.7rem;}
+  .zoekrij input{flex:1;min-width:0;background:var(--rtg-card);border:1px solid var(--rtg-line);
+    border-radius:999px;padding:.5rem .9rem;color:var(--rtg-txt);font:inherit;font-size:.85rem;outline:none;}
+  .zoekrij input:focus{border-color:var(--rtg-goud);}
+  .nieuwknop{flex-shrink:0;width:2.2rem;height:2.2rem;border-radius:50%;border:1px solid var(--rtg-line);
+    background:var(--rtg-card);color:var(--rtg-txt);font-size:1.1rem;cursor:pointer;line-height:1;}
+  .nieuwknop:hover{border-color:var(--rtg-goud);}
+
+  /* de laden van de inbox: mensen / zaken / onderweg / officieel / Rahul */
+  .laden{display:flex;gap:.1rem;padding:0 1rem;overflow-x:auto;flex-shrink:0;
+    border-bottom:1px solid var(--rtg-line);scrollbar-width:none;}
+  .laden::-webkit-scrollbar{display:none;}
+  .laden button{background:none;border:0;border-bottom:2px solid transparent;margin-bottom:-1px;
+    padding:.55rem .7rem .6rem;font:inherit;font-size:.7rem;font-weight:600;letter-spacing:.1em;
+    text-transform:uppercase;color:var(--rtg-muted);white-space:nowrap;cursor:pointer;}
+  .laden button[aria-current="true"]{color:var(--rtg-txt);border-bottom-color:var(--rtg-goud);}
+
+  .gesprekken{flex:1;min-height:0;overflow-y:auto;padding:.4rem 0 1rem;}
+  .gsp{display:flex;gap:.7rem;align-items:flex-start;width:100%;text-align:left;background:none;
+    border:0;border-bottom:1px solid var(--rtg-line);padding:.75rem 1rem;color:inherit;font:inherit;cursor:pointer;}
+  .gsp:hover{background:rgba(255,255,255,.03);}
+  .gsp[aria-current="true"]{background:rgba(255,255,255,.05);}
+  .gsp .rond{width:2.4rem;height:2.4rem;border-radius:50%;flex-shrink:0;position:relative;
+    background:linear-gradient(150deg,#2A2724,#151312);border:1px solid var(--rtg-line);
+    display:flex;align-items:center;justify-content:center;font-size:.78rem;font-weight:700;color:var(--rtg-goud);}
+  .gsp .stip{position:absolute;right:-1px;bottom:-1px;width:.62rem;height:.62rem;border-radius:50%;
+    background:#3E8E5A;border:2px solid var(--rtg-bg);}
+  .gsp .mid{min-width:0;flex:1;}
+  .gsp .mid b{display:block;font-size:.88rem;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .gsp .mid span{display:block;font-size:.78rem;color:var(--rtg-muted);overflow:hidden;
+    text-overflow:ellipsis;white-space:nowrap;}
+  .gsp .rechts{flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:.25rem;}
+  .gsp time{font-size:.66rem;color:var(--rtg-muted);font-variant-numeric:tabular-nums;}
+  .telbol{min-width:1.15rem;height:1.15rem;padding:0 .3rem;border-radius:999px;background:var(--rtg-rood,#7F1634);
+    color:#fff;font-size:.62rem;font-weight:700;display:flex;align-items:center;justify-content:center;}
+  .merkje{font-size:.58rem;letter-spacing:.1em;text-transform:uppercase;color:var(--rtg-goud);}
+  .leeg{padding:2.5rem 1.2rem;text-align:center;color:var(--rtg-muted);font-size:.85rem;line-height:1.6;}
+
+  /* ---------------- rechts: het gesprek ---------------- */
+  .draad{display:flex;flex-direction:column;min-height:0;height:100dvh;}
+  body[data-pane="lijst"] .draad{display:none;}
+  @media (min-width:900px){ body[data-pane="lijst"] .draad{display:flex;} }
+  @media (max-width:899px){ body[data-pane="draad"] .lijst{display:none;} }
+
+  /* De rechterkant houdt ruimte vrij voor de zwevende hamburger van het
+     app-menu (shared/appmenu.js): die staat rechtsboven in het VENSTER, en
+     zonder deze marge legt hij zich over de belknoppen heen. */
+  .draad-kop{display:flex;align-items:center;gap:.7rem;flex-shrink:0;
+    padding:calc(env(safe-area-inset-top,0px) + .8rem) 3.2rem .8rem 1rem;
+    border-bottom:1px solid var(--rtg-line);}
+  @media (min-width:900px){ .draad-kop{padding-right:3.6rem;} }
+  .draad-kop .terug{background:none;border:0;color:var(--rtg-txt);font-size:1.2rem;cursor:pointer;padding:.1rem .3rem;}
+  @media (min-width:900px){ .draad-kop .terug{display:none;} }
+  .draad-kop .wie{min-width:0;flex:1;}
+  .draad-kop .wie b{display:block;font-size:.95rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+  .draad-kop .wie span{display:block;font-size:.72rem;color:var(--rtg-muted);}
+  .kopknop{background:none;border:1px solid var(--rtg-line);border-radius:999px;width:2.1rem;height:2.1rem;
+    display:flex;align-items:center;justify-content:center;color:var(--rtg-txt);cursor:pointer;flex-shrink:0;}
+  .kopknop:hover{border-color:var(--rtg-goud);color:var(--rtg-goud);}
+  .kopknop svg{width:1.05rem;height:1.05rem;stroke:currentColor;fill:none;stroke-width:1.7;
+    stroke-linecap:round;stroke-linejoin:round;}
+
+  .bubbels{flex:1;min-height:0;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:.45rem;}
+  .bub{max-width:min(34rem,82%);padding:.5rem .8rem;border-radius:1rem;font-size:.88rem;line-height:1.5;
+    white-space:pre-wrap;word-wrap:break-word;position:relative;}
+  .bub.van-ander{align-self:flex-start;background:var(--rtg-card);border:1px solid var(--rtg-line);
+    border-bottom-left-radius:.3rem;}
+  .bub.van-mij{align-self:flex-end;background:color-mix(in srgb, var(--rtg-goud) 20%, transparent);
+    border:1px solid color-mix(in srgb, var(--rtg-goud) 40%, transparent);border-bottom-right-radius:.3rem;}
+  .bub.is-weg{opacity:.55;font-style:italic;}
+  .bub .citaat{display:block;border-left:2px solid var(--rtg-goud);padding:.15rem .5rem;margin:0 0 .35rem;
+    font-size:.78rem;color:var(--rtg-muted);white-space:normal;
+    overflow:hidden;text-overflow:ellipsis;max-height:2.8em;}
+  .bub .onder{display:flex;align-items:center;gap:.4rem;margin-top:.25rem;
+    font-size:.62rem;color:var(--rtg-muted);}
+  .bub .reacties{display:flex;gap:.25rem;margin-top:.3rem;flex-wrap:wrap;}
+  .bub .reacties button{background:rgba(255,255,255,.06);border:1px solid var(--rtg-line);border-radius:999px;
+    padding:.05rem .38rem;font:inherit;font-size:.7rem;color:inherit;cursor:pointer;}
+  .bub .reacties button.mijne{border-color:var(--rtg-goud);}
+  /* De acties horen bij het bericht waar je op staat, niet bij alle vijftig.
+     Zichtbaar bij aanwijzen en bij toetsenbordfocus -- die tweede regel is
+     geen extraatje: zonder hem is de hele draad met een toetsenbord dood. */
+  .bub .acties{display:flex;gap:.5rem;margin-top:.3rem;opacity:0;
+    transition:opacity .12s ease;}
+  .bub:hover .acties,.bub:focus-within .acties{opacity:1;}
+  @media (pointer:coarse){ .bub .acties{opacity:1;} }
+  .bub .acties button{background:none;border:0;color:var(--rtg-muted);font:inherit;font-size:.66rem;
+    cursor:pointer;padding:0;text-decoration:underline;text-underline-offset:2px;}
+  .bub .acties button:hover{color:var(--rtg-goud);}
+  .dagscheiding{align-self:center;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;
+    color:var(--rtg-muted);margin:.6rem 0 .2rem;}
+  .typtregel{align-self:flex-start;font-size:.75rem;color:var(--rtg-muted);font-style:italic;padding:.2rem .3rem;}
+
+  .invoer{flex-shrink:0;border-top:1px solid var(--rtg-line);padding:.6rem 1rem
+    calc(env(safe-area-inset-bottom,0px) + .7rem);}
+  .antwoordop{display:flex;align-items:center;gap:.5rem;font-size:.75rem;color:var(--rtg-muted);
+    padding:.3rem .1rem .45rem;}
+  /* [hidden] verliest het van display:flex hierboven; zonder deze regel staat
+     de antwoord-balk er altijd, ook als je nergens op antwoordt. */
+  .antwoordop[hidden]{display:none;}
+  .antwoordop b{color:var(--rtg-goud);font-weight:600;}
+  .antwoordop button{margin-left:auto;background:none;border:0;color:var(--rtg-muted);cursor:pointer;font-size:.9rem;}
+  .invoerrij{display:flex;align-items:flex-end;gap:.5rem;}
+  .invoerrij textarea{flex:1;min-width:0;resize:none;max-height:8rem;background:var(--rtg-card);
+    border:1px solid var(--rtg-line);border-radius:1.1rem;padding:.55rem .9rem;color:var(--rtg-txt);
+    font:inherit;font-size:.88rem;line-height:1.45;outline:none;}
+  .invoerrij textarea:focus{border-color:var(--rtg-goud);}
+  .stuurknop{flex-shrink:0;width:2.3rem;height:2.3rem;border-radius:50%;border:0;background:var(--rtg-goud);
+    color:#1C1608;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+  .stuurknop svg{width:1.1rem;height:1.1rem;stroke:#1C1608;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+  .stuurknop:disabled{opacity:.45;cursor:default;}
+  .hulprij{display:flex;gap:.4rem;flex-wrap:wrap;padding:.5rem .1rem 0;}
+  .hulprij button{background:none;border:1px solid var(--rtg-line);border-radius:999px;padding:.2rem .6rem;
+    font:inherit;font-size:.7rem;color:var(--rtg-muted);cursor:pointer;}
+  .hulprij button:hover{border-color:var(--rtg-goud);color:var(--rtg-txt);}
+  .wetregel{font-size:.62rem;color:var(--rtg-muted);text-align:center;padding-top:.45rem;}
+
+  /* het blad voor "nieuw gesprek" en voor de AI-uitkomst */
+  .blad-waas{position:fixed;inset:0;background:rgba(6,5,5,.62);backdrop-filter:blur(6px);
+    display:none;align-items:flex-end;justify-content:center;z-index:60;}
+  .blad-waas.open{display:flex;}
+  .blad{width:min(28rem,100%);max-height:80vh;overflow-y:auto;background:linear-gradient(180deg,#151312,#0C0C0B);
+    border:1px solid var(--rtg-line);border-radius:1.2rem 1.2rem 0 0;
+    padding:1rem 1.1rem calc(env(safe-area-inset-bottom,0px) + 1.1rem);}
+  @media (min-width:640px){ .blad-waas{align-items:center;} .blad{border-radius:1.2rem;} }
+  .blad h2{font-family:'Bodoni Moda',Georgia,serif;font-weight:500;font-size:1.15rem;margin-bottom:.2rem;}
+  .blad p.uit{color:var(--rtg-muted);font-size:.78rem;line-height:1.55;margin-bottom:.8rem;}
+  .blad .contact{display:flex;align-items:center;gap:.6rem;width:100%;background:none;border:0;
+    border-top:1px solid var(--rtg-line);padding:.7rem .1rem;color:inherit;font:inherit;text-align:left;cursor:pointer;}
+  .blad .contact:hover{color:var(--rtg-goud);}
+  .blad pre{white-space:pre-wrap;font:inherit;font-size:.85rem;line-height:1.6;color:var(--rtg-txt);}
+  .blad .sluit{background:none;border:1px solid var(--rtg-line);border-radius:999px;padding:.4rem .9rem;
+    font:inherit;font-size:.78rem;color:var(--rtg-txt);cursor:pointer;margin-top:.9rem;}
+</style>
+</head>
+<body class="rtg-stijl" data-pane="lijst" data-eigen-rahul>
+<!-- data-eigen-rahul: deze app HEEFT Rahul al, in het gesprek zelf (de hulprij
+     onder het invoerveld). De metgezel-laag laadt wel -- voor het palet en de
+     wauw-laag -- maar zet zijn eigen chatbalk niet neer; twee invoervelden
+     boven elkaar voor twee verschillende gesprekken is erger dan geen balk. -->
+<main class="comm">
+  <!-- links: de Universal Inbox -->
+  <section class="lijst" aria-label="Gesprekken">
+    <div class="lijst-kop">
+      <h1>Berichten</h1>
+      <div class="zoekrij">
+        <input id="zoek" type="search" placeholder="Zoek in al je gesprekken" aria-label="Zoek in al je gesprekken">
+        <button class="nieuwknop" id="nieuwBtn" type="button" aria-label="Nieuw gesprek">+</button>
+      </div>
+    </div>
+    <nav class="laden" id="laden" aria-label="Soorten gesprekken"></nav>
+    <div class="gesprekken" id="gesprekken"></div>
+  </section>
+
+  <!-- rechts: het gesprek -->
+  <section class="draad" id="draad" aria-label="Gesprek" hidden>
+    <div class="draad-kop">
+      <button class="terug" id="terug" type="button" aria-label="Terug naar de lijst">&#8249;</button>
+      <div class="wie"><b id="draadTitel"></b><span id="draadSub"></span></div>
+      <button class="kopknop" id="belBtn" type="button" aria-label="Bellen" title="Bellen">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.8a16 16 0 0 0 6 6l1.2-1.2a2 2 0 0 1 2.1-.5c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.8 2.1z"/></svg>
+      </button>
+      <button class="kopknop" id="vidBtn" type="button" aria-label="Videobellen" title="Videobellen">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+      </button>
+      <button class="kopknop" id="porBtn" type="button" aria-label="Een por sturen" title="Por">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L4.5 12.5h6L11 22l8.5-10.5h-6L13 2z"/></svg>
+      </button>
+    </div>
+    <div class="bubbels" id="bubbels" role="log" aria-live="polite"></div>
+    <div class="invoer">
+      <div class="antwoordop" id="antwoordop" hidden>
+        <span>Antwoord op <b id="antwoordWie"></b>:</span>
+        <span id="antwoordTekst" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:12rem;"></span>
+        <button type="button" id="antwoordWeg" aria-label="Antwoord annuleren">&#10005;</button>
+      </div>
+      <form class="invoerrij" id="invoerrij" autocomplete="off">
+        <textarea id="veld" rows="1" placeholder="Schrijf een bericht" aria-label="Schrijf een bericht"></textarea>
+        <button class="stuurknop" id="stuur" type="submit" aria-label="Versturen">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13"/><path d="M12 6l6 6-6 6"/></svg>
+        </button>
+      </form>
+      <div class="hulprij">
+        <button type="button" data-ai="samenvat">Vat samen</button>
+        <button type="button" data-ai="concept">Stel een antwoord op</button>
+        <button type="button" data-ai="afspraken">Wat is er afgesproken?</button>
+      </div>
+      <p class="wetregel">Rahul is een AI &middot; hij stelt op, jij verstuurt</p>
+    </div>
+  </section>
+</main>
+
+<div class="blad-waas" id="bladWaas"><div class="blad" id="blad" role="dialog" aria-modal="true"></div></div>
+
+<script src="/shared/glyf.js"></script>
+<script>
+(function () {
+  'use strict';
+  var $ = function (s) { return document.querySelector(s); };
+  var esc = function (t) { return String(t == null ? '' : t)
+    .replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); };
+  var token = null; try { token = localStorage.getItem('rtg_member_token'); } catch (e) {}
+
+  function api(pad, body) {
+    return fetch('/api/comm' + pad, { method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+      body: JSON.stringify(body || {}) })
+      .then(function (r) { return r.json().catch(function () { return {}; })
+        .then(function (d) { if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; }); });
+  }
+
+  var staat = { lade: null, gesprekken: [], open: null, gesprek: null, antwoordOp: null, laden: [] };
+
+  /* ------------------------------------------------------------ de inbox */
+  function tekenLaden() {
+    var n = $('#laden');
+    n.textContent = '';
+    var alles = [{ id: null, naam: 'Alles' }].concat(staat.laden);
+    alles.forEach(function (l) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.textContent = l.naam;
+      b.setAttribute('aria-current', staat.lade === l.id ? 'true' : 'false');
+      b.addEventListener('click', function () { staat.lade = l.id; laadInbox(); });
+      n.appendChild(b);
+    });
+  }
+
+  var klok = function (at) {
+    if (!at) return '';
+    var d = new Date(at), nu = new Date();
+    if (d.toDateString() === nu.toDateString()) {
+      return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+    }
+    return d.getDate() + '/' + (d.getMonth() + 1);
+  };
+  var initialen = function (t) {
+    return String(t || '?').split(/\s+/).slice(0, 2).map(function (w) { return w.charAt(0); }).join('').toUpperCase();
+  };
+
+  function tekenInbox() {
+    var n = $('#gesprekken');
+    n.textContent = '';
+    if (!staat.gesprekken.length) {
+      n.innerHTML = '<p class="leeg">Nog geen gesprekken in deze la.<br>Tik op + om er een te beginnen.</p>';
+      return;
+    }
+    staat.gesprekken.forEach(function (g) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'gsp';
+      b.setAttribute('aria-current', staat.open === g.id ? 'true' : 'false');
+      b.innerHTML =
+        '<span class="rond">' + esc(initialen(g.titel)) + (g.online ? '<i class="stip"></i>' : '') + '</span>' +
+        '<span class="mid"><b>' + esc(g.titel) + (g.vast ? ' &#9679;' : '') + '</b>' +
+        '<span>' + (g.concept ? '<i style="color:var(--rtg-goud);">concept: </i>' + esc(g.concept)
+          : (g.laatsteVanMij ? 'Jij: ' : '') + esc(g.laatste || 'Nog geen bericht')) + '</span></span>' +
+        '<span class="rechts"><time>' + esc(klok(g.at)) + '</time>' +
+        (g.ongelezen ? '<span class="telbol">' + (g.ongelezen > 9 ? '9+' : g.ongelezen) + '</span>' : '') +
+        (g.bron ? '<span class="merkje">' + esc(g.bron) + '</span>' : '') + '</span>';
+      b.addEventListener('click', function () { open(g); });
+      n.appendChild(b);
+    });
+  }
+
+  function laadInbox() {
+    return api('/inbox', { lade: staat.lade }).then(function (d) {
+      staat.laden = d.laden || [];
+      staat.gesprekken = d.gesprekken || [];
+      tekenLaden(); tekenInbox();
+    }).catch(function (e) {
+      $('#gesprekken').innerHTML = '<p class="leeg">' + esc(e.message) + '</p>';
+    });
+  }
+
+  /* --------------------------------------------------------- een gesprek */
+  /* Een gesprek uit een BRON woont nog in zijn eigen module, maar dat is een
+     detail van de opslag: je opent het gewoon hier. Alleen waar antwoorden
+     echt niet kan -- officiele post is eenrichtingsverkeer, Rahul heeft zijn
+     eigen scherm -- sturen we door naar waar het thuishoort. De server zegt
+     welke dat zijn; dit scherm gokt dat niet. */
+  var GEEN_ANTWOORD = /^bron:(rahul|overheid)/;
+  function open(g) {
+    if (g.extern && GEEN_ANTWOORD.test(g.id)) { location.href = g.link || '/apps/app.html'; return; }
+    staat.open = g.id; staat.antwoordOp = null;
+    document.body.setAttribute('data-pane', 'draad');
+    $('#draad').hidden = false;
+    laadGesprek().then(function () {
+      var veld = $('#veld');
+      if (g.concept) veld.value = g.concept;
+      veld.focus();
+    });
+  }
+
+  function laadGesprek() {
+    if (!staat.open) return Promise.resolve();
+    return api('/gesprek', { id: staat.open }).then(function (d) {
+      staat.gesprek = d.gesprek;
+      tekenGesprek(); vulAppMenu();
+      /* Een bron houdt zijn eigen leesstand bij (in zijn module, op het moment
+         dat je hem opent). De kern een leesmelding sturen voor een gesprek dat
+         hij niet kent zou alleen een foutmelding opleveren. */
+      if (staat.gesprek.extern) return null;
+      return api('/lees', { id: staat.open });
+    }).then(function () { return laadInbox(); }).catch(function (e) {
+      $('#bubbels').innerHTML = '<p class="leeg">' + esc(e.message) + '</p>';
+    });
+  }
+
+  function tekenGesprek() {
+    var g = staat.gesprek;
+    $('#draadTitel').textContent = g.titel;
+    $('#draadSub').textContent = g.typt && g.typt.length ? g.typt.join(', ') + ' typt...'
+      : (g.online ? 'online' : (g.aantal > 2 ? g.aantal + ' deelnemers' : 'offline'));
+    var n = $('#bubbels');
+    n.textContent = '';
+    var vorigeDag = '';
+    (g.berichten || []).forEach(function (m) {
+      var dag = new Date(m.at).toDateString();
+      if (dag !== vorigeDag) {
+        vorigeDag = dag;
+        var d = document.createElement('div'); d.className = 'dagscheiding';
+        d.textContent = new Date(m.at).toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long' });
+        n.appendChild(d);
+      }
+      n.appendChild(bubbel(m, g));
+    });
+    if (g.typt && g.typt.length) {
+      var t = document.createElement('div'); t.className = 'typtregel';
+      t.textContent = g.typt.join(', ') + ' typt...';
+      n.appendChild(t);
+    }
+    n.scrollTop = n.scrollHeight;
+  }
+
+  function bubbel(m, g) {
+    var el = document.createElement('div');
+    el.className = 'bub ' + (m.vanMij ? 'van-mij' : 'van-ander') + (m.weg ? ' is-weg' : '');
+    var html = '';
+    if (m.antwoordOp) {
+      var bron = (g.berichten || []).find(function (x) { return x.id === m.antwoordOp; });
+      html += '<span class="citaat">' + esc(bron ? (bron.tekst || 'bericht') : 'een eerder bericht') + '</span>';
+    }
+    if (g.aantal > 2 && !m.vanMij && !m.weg) {
+      html += '<span style="display:block;font-size:.7rem;color:var(--rtg-goud);font-weight:600;">' + esc(m.van) + '</span>';
+    }
+    html += esc(m.weg ? 'Dit bericht is ingetrokken.' : (m.tekst || '(bijlage)'));
+    html += '<span class="onder">' + esc(klok(m.at)) + (m.gewijzigd ? ' &middot; bewerkt' : '') + '</span>';
+    el.innerHTML = html;
+
+    if (!m.weg && !g.extern) {
+      var rea = document.createElement('div'); rea.className = 'reacties';
+      (m.reacties || []).forEach(function (r) {
+        var b = document.createElement('button');
+        b.type = 'button'; b.className = r.vanMij ? 'mijne' : '';
+        /* Een reactie die een GLYFNAAM is, wordt getekend en niet uitgeschreven
+           -- anders staat er letterlijk "emo-duim 3" op het scherm. Alles wat
+           geen naam uit onze set is (een oud bericht, een andere client) blijft
+           gewoon tekst: een onbekende naam hoort terug te vallen, niet te
+           verdwijnen. */
+        if (window.RTGGlyf && RTGGlyf.heeft(r.teken)) {
+          b.innerHTML = RTGGlyf.svgHTML(r.teken, { klasse: 'gl-inline' }) + ' ' + esc(String(r.aantal));
+        } else {
+          b.textContent = r.teken + ' ' + r.aantal;
+        }
+        b.addEventListener('click', function () {
+          api('/reactie', { id: staat.open, berichtId: m.id, teken: r.teken }).then(laadGesprek);
+        });
+        rea.appendChild(b);
+      });
+      el.appendChild(rea);
+
+      var act = document.createElement('div'); act.className = 'acties';
+      /* De duim uit onze eigen glyfenset (shared/glyf.js) en niet uit de
+         emoji-font van het toestel: die ziet er op elk apparaat anders uit, en
+         de rest van dit huis tekent zijn beeld al zelf. De kern bewaart het
+         teken als tekst (hoogstens acht tekens), dus 'emo-duim' past. */
+      act.appendChild(knopje('Reageer', function () {
+        api('/reactie', { id: staat.open, berichtId: m.id, teken: 'emo-duim' }).then(laadGesprek);
+      }));
+      act.appendChild(knopje('Antwoord', function () { zetAntwoord(m); }));
+      if (m.vanMij) {
+        act.appendChild(knopje('Wijzig', function () {
+          var nieuw = window.prompt('Bericht wijzigen', m.tekst || '');
+          if (nieuw == null) return;
+          api('/wijzig', { id: staat.open, berichtId: m.id, tekst: nieuw })
+            .then(laadGesprek).catch(function (e) { alert(e.message); });
+        }));
+        act.appendChild(knopje('Trek in', function () {
+          if (!window.confirm('Dit bericht intrekken? De ander ziet dat er iets stond.')) return;
+          api('/wis', { id: staat.open, berichtId: m.id }).then(laadGesprek);
+        }));
+      }
+      el.appendChild(act);
+    }
+    return el;
+  }
+  function knopje(tekst, doe) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.textContent = tekst;
+    b.addEventListener('click', doe);
+    return b;
+  }
+
+  function zetAntwoord(m) {
+    staat.antwoordOp = m.id;
+    $('#antwoordop').hidden = false;
+    $('#antwoordWie').textContent = m.vanMij ? 'jezelf' : m.van;
+    $('#antwoordTekst').textContent = m.tekst || 'bericht';
+    $('#veld').focus();
+  }
+  $('#antwoordWeg').addEventListener('click', function () {
+    staat.antwoordOp = null; $('#antwoordop').hidden = true;
+  });
+
+  /* ---------------------------------------------------------- versturen */
+  var veld = $('#veld');
+  veld.addEventListener('input', function () {
+    veld.style.height = 'auto';
+    veld.style.height = Math.min(veld.scrollHeight, 128) + 'px';
+    meldTypen();
+  });
+  /* Enter verstuurt, shift+enter maakt een regel. Op een aanraakscherm doet
+     enter gewoon een regel: daar is de verstuurknop de weg, en een toetsenbord
+     dat je bericht wegstuurt terwijl je een alinea maakt is de ergernis die
+     iedereen kent. */
+  veld.addEventListener('keydown', function (e) {
+    if (e.key !== 'Enter' || e.shiftKey) return;
+    if (window.matchMedia('(pointer: coarse)').matches) return;
+    e.preventDefault();
+    $('#invoerrij').requestSubmit();
+  });
+
+  var typTimer = 0;
+  function meldTypen() {
+    if (!staat.open || (staat.gesprek && staat.gesprek.extern)) return;
+    if (Date.now() - typTimer < 3000) return;
+    typTimer = Date.now();
+    api('/typt', { id: staat.open }).catch(function () {});
+  }
+
+  /* Het concept reist mee tussen apparaten. We bewaren het pas als je even
+     stil bent -- bij elke toetsaanslag een verzoek is verkeer zonder winst. */
+  var conceptTimer = null;
+  veld.addEventListener('input', function () {
+    if (!staat.open || (staat.gesprek && staat.gesprek.extern)) return;
+    clearTimeout(conceptTimer);
+    conceptTimer = setTimeout(function () {
+      api('/concept', { id: staat.open, tekst: veld.value }).catch(function () {});
+    }, 1200);
+  });
+
+  $('#invoerrij').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var tekst = veld.value.trim();
+    if (!tekst || !staat.open) return;
+    $('#stuur').disabled = true;
+    /* HIER STOND EEN TWEEDE VERSTUURWEG, voor gesprekken die nog buiten de kern
+       woonden: de server gaf in `antwoord` mee naar welke route van welke
+       module dit bericht moest, en de app postte daar rechtstreeks naartoe.
+       Dat was de goede vorm zolang die voorraden er nog waren.
+
+       Ze zijn er niet meer -- het gastcontact en de sollicitatiechat zijn
+       verhuisd naar de kern (server/kern/comm/gast.js en werk.js), en de twee
+       bronnen die overblijven zijn leeslijsten met een eigen scherm. Er is dus
+       nog EEN verstuurweg, en dat is precies wat "communicatie is
+       infrastructuur" hoort te betekenen. Een tak laten staan die niets meer
+       kan bereiken is een tak die niemand meer nakijkt. */
+    api('/stuur', { id: staat.open, tekst: tekst, antwoordOp: staat.antwoordOp })
+      .then(function () {
+        veld.value = ''; veld.style.height = 'auto';
+        staat.antwoordOp = null; $('#antwoordop').hidden = true;
+        return laadGesprek();
+      })
+      .catch(function (err) { alert(err.message); })
+      .then(function () { $('#stuur').disabled = false; });
+  });
+
+  /* ------------------------------------------------- bellen en de por */
+  /* Bellen en videobellen waren aparte apps op het beginscherm. Ze horen hier:
+     je bent al bij de persoon die je wilt spreken. De verbinding zelf loopt
+     over de sociale laag van de leden-app (WebRTC), dus we openen die met de
+     codenaam erbij -- een tweede belimplementatie zou een tweede plek zijn
+     waar het misgaat. */
+  function bel(video) {
+    if (!staat.gesprek || staat.gesprek.aantal > 2) {
+      alert('Groepsgesprekken bellen loopt via RTG Meet.');
+      location.href = '/apps/meet.html';
+      return;
+    }
+    location.href = '/apps/app.html?bel=' + encodeURIComponent(staat.gesprek.titel) + (video ? '&video=1' : '');
+  }
+  $('#belBtn').addEventListener('click', function () { bel(false); });
+  $('#vidBtn').addEventListener('click', function () { bel(true); });
+  $('#porBtn').addEventListener('click', function () {
+    if (!staat.open) return;
+    api('/por', { id: staat.open })
+      .then(function () { $('#draadSub').textContent = 'por verstuurd'; })
+      .catch(function (e) { alert(e.message); });
+  });
+
+  /* -------------------------------------------------------- meer-menu */
+  function blad(html) {
+    $('#blad').innerHTML = html + '<button class="sluit" type="button" data-sluit>Sluiten</button>';
+    $('#bladWaas').classList.add('open');
+    $('#blad').querySelector('[data-sluit]').addEventListener('click', sluitBlad);
+  }
+  function sluitBlad() { $('#bladWaas').classList.remove('open'); }
+  $('#bladWaas').addEventListener('click', function (e) { if (e.target === $('#bladWaas')) sluitBlad(); });
+
+  /* Wat je met een gesprek kunt (bovenaan houden, stil zetten, uit de lijst)
+     zat hier onder een eigen ⋮-knop. Die is weg: het app-menu (shared/appmenu.js)
+     staat op elk scherm van het OS rechtsboven en IS de plek voor de functies
+     van deze app. Twee menuknoppen naast elkaar is precies de stapeling die
+     hier net overal is opgeruimd -- en dit is waar RTGAppMenu.zet() voor is.
+
+     Het menu leest zijn lijst pas als het opengaat, dus we mogen hem bij elke
+     wissel opnieuw zetten; wat er staat gaat altijd over het gesprek dat NU
+     open is. */
+  function vulAppMenu() {
+    if (!window.RTGAppMenu) return;
+    var g = staat.gesprek;
+    var items = [{ label: 'Nieuw gesprek', doe: function () { $('#nieuwBtn').click(); } }];
+    if (g && !g.extern) {
+      items.push({ label: g.vast ? 'Niet meer bovenaan' : 'Bovenaan houden', doe: function () { zetVlag('vast'); } });
+      items.push({ label: g.stil ? 'Meldingen weer aan' : 'Meldingen uit', doe: function () { zetVlag('stil'); } });
+      items.push({ label: g.weg ? 'Terug in de lijst' : 'Uit de lijst halen', doe: function () { zetVlag('weg'); } });
+      items.push({ label: 'Vat dit gesprek samen', doe: function () { document.querySelector('[data-ai="samenvat"]').click(); } });
+    }
+    RTGAppMenu.zet(items);
+  }
+  function zetVlag(v) {
+    var g = staat.gesprek;
+    if (!g) return;
+    api('/vlag', { id: staat.open, vlag: v, aan: !g[v] }).then(function () {
+      if (v === 'weg') {
+        staat.open = null; staat.gesprek = null;
+        $('#draad').hidden = true;
+        document.body.setAttribute('data-pane', 'lijst');
+        return laadInbox().then(vulAppMenu);
+      }
+      return laadGesprek();
+    });
+  }
+
+  /* ------------------------------------------------------------ @Rahul */
+  /* Drie taken, en alle drie leveren TEKST. Een samenvatting en de afspraken
+     komen in een blad te staan; een concept-antwoord belandt in het
+     invoerveld, want dat is waar jij het afmaakt en zelf verstuurt. */
+  document.querySelectorAll('[data-ai]').forEach(function (b) {
+    b.addEventListener('click', function () {
+      if (!staat.open) return;
+      var taak = b.getAttribute('data-ai');
+      b.disabled = true;
+      api('/ai', { id: staat.open, taak: taak, wens: taak === 'concept' ? veld.value : '' })
+        .then(function (d) {
+          if (taak === 'concept') { veld.value = d.concept || ''; veld.focus(); return; }
+          if (taak === 'samenvat') { blad('<h2>Samenvatting</h2><pre>' + esc(d.samenvatting) + '</pre>'); return; }
+          var lijst = (d.afspraken || []).map(function (a) {
+            return '&bull; ' + esc(a.wat) + (a.datum ? ' (' + esc(a.datum) + (a.tijd ? ' ' + esc(a.tijd) : '') + ')' : '');
+          }).join('<br>');
+          blad('<h2>Afspraken</h2><pre>' + (lijst || 'Er is niets concreets afgesproken.') + '</pre>');
+        })
+        .catch(function (e) { alert(e.message); })
+        .then(function () { b.disabled = false; });
+    });
+  });
+
+  /* --------------------------------------------------- nieuw gesprek */
+  $('#nieuwBtn').addEventListener('click', function () {
+    fetch('/api/member/connections', { method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+      body: '{}' }).then(function (r) { return r.json(); }).then(function (d) {
+      var cs = d.connections || [];
+      if (!cs.length) {
+        blad('<h2>Nieuw gesprek</h2><p class="uit">Je hebt nog geen verbindingen. ' +
+          'Voeg iemand toe op codenaam in Vrienden; daarna kun je hier een gesprek beginnen.</p>');
+        return;
+      }
+      blad('<h2>Nieuw gesprek</h2><p class="uit">Met wie?</p>' + cs.map(function (c) {
+        return '<button class="contact" data-key="' + esc(c.key) + '">' +
+          '<span class="rond" style="width:1.9rem;height:1.9rem;">' + esc(initialen(c.codename)) + '</span>' +
+          esc(c.codename) + '</button>';
+      }).join(''));
+      $('#blad').querySelectorAll('[data-key]').forEach(function (b) {
+        b.addEventListener('click', function () {
+          api('/begin', { met: b.getAttribute('data-key') }).then(function (d2) {
+            sluitBlad();
+            return laadInbox().then(function () { open(d2.gesprek); });
+          }).catch(function (e) { alert(e.message); });
+        });
+      });
+    });
+  });
+
+  /* ------------------------------------------------------------ zoeken */
+  var zoekTimer = null;
+  $('#zoek').addEventListener('input', function () {
+    var q = $('#zoek').value.trim();
+    clearTimeout(zoekTimer);
+    zoekTimer = setTimeout(function () {
+      if (q.length < 2) return laadInbox();
+      api('/zoek', { vraag: q }).then(function (d) {
+        var n = $('#gesprekken');
+        n.textContent = '';
+        if (!d.treffers.length) { n.innerHTML = '<p class="leeg">Niets gevonden voor &ldquo;' + esc(q) + '&rdquo;.</p>'; return; }
+        d.treffers.forEach(function (t) {
+          var b = document.createElement('button');
+          b.type = 'button'; b.className = 'gsp';
+          b.innerHTML = '<span class="rond">' + esc(initialen(t.titel)) + '</span>' +
+            '<span class="mid"><b>' + esc(t.titel) + '</b><span>' + esc(t.tekst) + '</span></span>' +
+            '<span class="rechts"><time>' + esc(klok(t.at)) + '</time></span>';
+          b.addEventListener('click', function () {
+            $('#zoek').value = '';
+            laadInbox().then(function () {
+              open(staat.gesprekken.find(function (g) { return g.id === t.gesprekId; }) || { id: t.gesprekId });
+            });
+          });
+          n.appendChild(b);
+        });
+      });
+    }, 250);
+  });
+
+  $('#terug').addEventListener('click', function () {
+    document.body.setAttribute('data-pane', 'lijst');
+    staat.open = null;
+  });
+
+  /* --------------------------------------------------------- live bij */
+  /* De server seint elke wijziging naar de andere deelnemers (kern/comm:
+     seinNaarDeRest). Zonder deze lijn zou je moeten verversen om een antwoord
+     te zien, en dan is het geen gesprek maar een postbus. */
+  if (window.EventSource && token) {
+    try {
+      var src = new EventSource('/api/stream?token=' + encodeURIComponent(token));
+      src.addEventListener('comm', function (ev) {
+        var d = {}; try { d = JSON.parse(ev.data || '{}'); } catch (e) {}
+        if (staat.open && d.gesprekId === staat.open) laadGesprek();
+        else laadInbox();
+      });
+    } catch (e) {}
+  }
+
+  if (!token) {
+    $('#gesprekken').innerHTML = '<p class="leeg">Log eerst in op de app.</p>';
+  } else {
+    /* Het app-menu wordt door shared/ios.js bijgeladen en is dus niet meteen
+       aanwezig; we zetten onze lijst zodra hij er is. Zonder deze wacht zou de
+       eerste RTGAppMenu.zet() in het niets vallen en stond er in het menu
+       alleen wat de vondstlaag zelf op het scherm vindt. */
+    laadInbox().then(function () {
+      var pogingen = 0;
+      var wacht = setInterval(function () {
+        if (window.RTGAppMenu) { clearInterval(wacht); vulAppMenu(); }
+        else if (++pogingen > 40) clearInterval(wacht);
+      }, 150);
+    });
+  }
+})();
+</script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
+<script src="/shared/ios.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+</body>
+</html>

@@ -2,35 +2,60 @@
    ontvangsten, betaalverzoeken en live verbinden met een gast onderweg.
    Verbatim afgesplitst uit routes/supplier.js; alleen de routes, de helpers
    komen via het kern-object binnen. */
-const { eigenVeld } = require('../../kern/util'); // veilige objecttoegang (geen prototype-pollution)
+const wie = require('../../kern/comm/wie');
 module.exports = (kern) => {
   const { app, db, talen, guestsFor, logActivity, notify, pushLive, save, sseToCustomer, sseToSupplier,
-          supplierAuth, trChat, klantSalon, dpVerzoekMaak, dpVerzoekIntrek, dpOntvangsten } = kern;
+          supplierAuth, trChat, klantSalon, dpVerzoekMaak, dpVerzoekIntrek, dpOntvangsten,
+          comm, commGast } = kern;
 
 
+
+/* De drie routes hieronder lazen de gastchat rechtstreeks uit
+   db.data.guestChats; sinds de verhuizing komt hij uit de communicatiekern
+   (kern/comm/gast.js). De sleutel die het scherm meestuurt draagt nog dezelfde
+   drie delen (CODE|lid|afdeling), zodat de zaak-app niets merkt -- maar de
+   CONTROLE is nu een andere en een strengere: hoort dit gesprek bij MIJN zaak
+   volgens de deelnemerslijst van de kern, in plaats van volgens een veld
+   `supplierCode` in het record. Dezelfde poort als overal, geen tweede lezing. */
+function lijnVan(req, res) {
+  const deel = String(req.body.key || '').replace(/^gast:/, '').split('|');
+  if (deel.length < 3 || deel[0].toUpperCase() !== req.supplier.code) {
+    res.status(404).json({ error: 'Gesprek niet gevonden.' }); return null;
+  }
+  const lijn = { code: req.supplier.code, lidKey: deel[1], dept: deel.slice(2).join('|') };
+  /* bestaand() en niet gesprek(): opzoeken mag de lijn niet aanleggen -- zie
+     de opmerking daar. Zonder dat bestaat elke sleutel die je verzint. */
+  lijn.gesprek = commGast.bestaand(lijn.code, lijn.lidKey, lijn.dept);
+  if (!lijn.gesprek || !comm.magErin(comm.gesprekVan(lijn.gesprek.id), wie.zaak(lijn.code))) {
+    res.status(404).json({ error: 'Gesprek niet gevonden.' }); return null;
+  }
+  return lijn;
+}
 
 app.post('/api/supplier/chat/send', supplierAuth, (req, res) => {
-  const chat = eigenVeld(db.data.guestChats, req.body.key);
-  if (!chat || chat.supplierCode !== req.supplier.code) return res.status(404).json({ error: 'Gesprek niet gevonden.' });
+  const lijn = lijnVan(req, res);
+  if (!lijn) return;
   const text = String(req.body.text || '').trim().slice(0, 500);
   if (!text) return res.status(400).json({ error: 'Leeg bericht.' });
-  chat.messages.push({ from: 'partner', who: req.actor.name, text, lang: talen.taalVan(req.body.lang), at: new Date().toISOString() });
-  chat.messages = chat.messages.slice(-120);
-  chat.unreadGuest += 1;
-  chat.lastAt = new Date().toISOString();
-  save();
-  logActivity(req.supplier.code, req.actor, 'antwoordde ' + chat.codename + ' (' + (chat.dept || 'Team') + ')');
-  notify(chat.tier, { icon: 'berichten', title: req.supplier.name + (chat.dept ? ' · ' + chat.dept : ''), body: text.slice(0, 90), scope: 'gchat' });
-  sseToCustomer(chat.customerKey, 'sync', { scope: 'gchat' });
+  const meta = lijn.gesprek.meta || {};
+  commGast.stuurZaak(lijn.code, lijn.lidKey, lijn.dept, text, req.actor.name,
+    { lang: talen.taalVan(req.body.lang) });
+  logActivity(req.supplier.code, req.actor, 'antwoordde ' + (meta.codename || 'een gast') + ' (' + lijn.dept + ')');
+  notify(meta.tier || 'rtg', { icon: 'berichten', title: req.supplier.name + ' · ' + lijn.dept, body: text.slice(0, 90), scope: 'gchat' });
+  sseToCustomer(lijn.lidKey, 'sync', { scope: 'gchat' });
   sseToSupplier(req.supplier.code, 'sync', { scope: 'gchat' });
-  trChat(chat.messages, talen.taalVan(req.body.lang)).then(messages => res.json({ ok: true, messages }));
+  // 'zaak': het team ziet de hele naam van de collega die antwoordde
+  const alles = commGast.berichten(lijn.code, lijn.lidKey, lijn.dept, 120, 'zaak');
+  trChat(alles, talen.taalVan(req.body.lang)).then(messages => res.json({ ok: true, messages }));
 });
 
 app.post('/api/supplier/chat/history', supplierAuth, (req, res) => {
-  const chat = eigenVeld(db.data.guestChats, req.body.key);
-  if (!chat || chat.supplierCode !== req.supplier.code) return res.status(404).json({ error: 'Gesprek niet gevonden.' });
-  if (chat.unreadPartner) { chat.unreadPartner = 0; save(); }
-  trChat(chat.messages, talen.taalVan(req.body.lang)).then(messages => res.json({ messages, codename: chat.codename }));
+  const lijn = lijnVan(req, res);
+  if (!lijn) return;
+  const messages = commGast.berichten(lijn.code, lijn.lidKey, lijn.dept, 120, 'zaak');
+  if (messages.length) commGast.leesZaak(lijn.code, lijn.lidKey, lijn.dept);
+  trChat(messages, talen.taalVan(req.body.lang))
+    .then(m => res.json({ messages: m, codename: (lijn.gesprek.meta || {}).codename || null }));
 });
 
 /* De Salon van de klant zoals de partner die vooraf mag zien: privacy-first,
@@ -38,9 +63,13 @@ app.post('/api/supplier/chat/history', supplierAuth, (req, res) => {
    Zo bent u geen vreemden van elkaar. Alleen op te vragen als er echt een open
    lijn met deze klant is (het gesprek moet bij deze zaak horen). */
 app.post('/api/supplier/klant/salon', supplierAuth, (req, res) => {
-  const chat = eigenVeld(db.data.guestChats, req.body.key);
-  if (!chat || chat.supplierCode !== req.supplier.code) return res.status(404).json({ error: 'Gesprek niet gevonden.' });
-  res.json(klantSalon(chat.customerKey));
+  /* Dezelfde poort als de twee routes hierboven, en dat is hier extra van
+     belang: dit toont de Salon van een LID aan een bedrijf. Zonder de eis dat
+     er een open lijn is, zou een zaak met een verzonnen sleutel het profiel
+     van elk lid kunnen opvragen. */
+  const lijn = lijnVan(req, res);
+  if (!lijn) return;
+  res.json(klantSalon(lijn.lidKey));
 });
 
 /* Rechtstreekse ontvangsten: wat er direct van klanten binnenkwam, plus het

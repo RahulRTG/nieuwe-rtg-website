@@ -28,6 +28,9 @@
 
     var acties = bedienbaar(kop);
     var titel = kopTitel(kop);
+    /* NU verzamelen, niet straks: de herbouw hieronder haalt de kop uit elkaar
+       en dan is niet meer te zien wat er bij de titel hoorde. */
+    if (titel) titel.bij = bijregelsVan(kop, titel);
     var oudeTerug = zoekTerug(kop);
 
     /* De balk die niets doet: geen terugweg, geen bediening, en niets wat de
@@ -124,80 +127,3 @@
     return svg;
   }
 
-  /* De grote titel: staat boven de inhoud en zakt bij het scrollen terug in
-     de balk. Zonder balk blijft hij gewoon staan.
-
-     Het kop-element wordt VERPLAATST, niet nagemaakt: houdt hij een id vast
-     (en dat komt voor -- #kop, #titel), dan blijft die werken. Draagt de
-     inhoud zijn eigen <h1> al, dan is een tweede er een te veel; dan laten we
-     de kop-titel gewoon vervallen. */
-  function grooteTitel(titel, nav) {
-    var main = d.querySelector('main') || d.getElementById('main');
-    if (!main || main.querySelector('.ios-groot, h1')) {
-      // geen plek voor een grote titel: alleen opruimen wat niets vasthoudt
-      if (titel.element.parentNode && !draagtId(titel.element)) titel.element.remove();
-      return;
-    }
-    var h = titel.element;
-    h.classList.add('ios-groot');
-    main.insertBefore(h, main.firstChild);
-    if (!nav) return;
-
-    nav.setAttribute('data-groot', '');
-    if (!('IntersectionObserver' in w)) { nav.setAttribute('data-titel-vast', ''); return; }
-    var hoogte = parseInt(w.getComputedStyle(nav).height, 10) || 44;
-    new w.IntersectionObserver(function (rijtjes) {
-      for (var i = 0; i < rijtjes.length; i++) {
-        if (rijtjes[i].isIntersecting) nav.removeAttribute('data-titel-vast');
-        else nav.setAttribute('data-titel-vast', '');
-      }
-    }, { rootMargin: '-' + hoogte + 'px 0px 0px 0px' }).observe(h);
-  }
-
-  /* ------------------------------------------------ 3. de home-indicator */
-  function naarThuis() {
-    if (rustig) { location.href = THUIS; return; }
-    body.style.transform = ''; body.style.opacity = '';
-    body.classList.add('ios-weg');
-    setTimeout(function () { location.href = THUIS; }, 200);
-  }
-
-  function homeIndicator() {
-    var pil = el('button', 'ios-thuis');
-    pil.type = 'button';
-    pil.setAttribute('aria-label', 'Omhoog vegen brengt je naar de homescreen');
-    body.appendChild(pil);
-
-    var startY = null, dy = 0, veegde = false;
-    pil.addEventListener('pointerdown', function (e) {
-      startY = e.clientY; dy = 0; veegde = false;
-      try { pil.setPointerCapture(e.pointerId); } catch (x) {}
-    });
-    pil.addEventListener('pointermove', function (e) {
-      if (startY == null) return;
-      dy = Math.max(0, startY - e.clientY);
-      if (dy > 8) veegde = true;
-      if (rustig || !veegde) return;
-      var p = Math.min(dy / 260, 1);
-      body.style.transformOrigin = '50% 85%';
-      body.style.transform = 'scale(' + (1 - p * 0.16).toFixed(4) + ') translateY(' + Math.round(-dy * 0.35) + 'px)';
-      body.style.opacity = String(1 - p * 0.25);
-    });
-    function los() {
-      if (startY == null) return;
-      var afstand = dy; startY = null;
-      if (!veegde) return;
-      if (afstand > 70) { naarThuis(); return; }
-      body.classList.add('ios-veert');
-      body.style.transform = ''; body.style.opacity = '';
-      setTimeout(function () { body.classList.remove('ios-veert'); }, 260);
-    }
-    pil.addEventListener('pointerup', los);
-    pil.addEventListener('pointercancel', los);
-    /* Alleen toetsenbord en hulpmiddelen (detail 0) activeren met een tik;
-       een duim die de pil raakt hoort niets te doen. */
-    pil.addEventListener('click', function (e) {
-      if (veegde) { veegde = false; return; }
-      if (e.detail === 0) naarThuis();
-    });
-  }

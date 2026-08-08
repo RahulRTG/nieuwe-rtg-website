@@ -86,12 +86,21 @@ test('Leden-app: de eigen pas komt beveiligd op na herstel van de sessie',
        hieronder). De reiskaart is verhuisd naar de app Reizen, maar wordt nog
        steeds bij het opstarten gevuld, dus die controleren we hier gewoon. */
     na: async (page) => {
-      await page.waitForSelector('#homeGreeting', { timeout: 5000 });
-      // de begroeting spreekt de taal van de pas: RTG als vriend, Business
-      // zakelijk ("Alles onder controle"), Lifestyle als concierge
-      assert.match(await page.textContent('#homeGreeting'),
-        /Welkom|goed je te zien|Alles onder controle|Alles staat voor u klaar/i,
-        'de begroeting staat er');
+      /* De begroeting ("Ha <naam>, goed je te zien.") stond hier; die is van het
+         beginscherm af (zie de opmerking bij .os-thuisscherm in apps/app.html).
+         Wat er staat is de regel eronder: welke pas, en sinds wanneer. Die is
+         geen begroeting maar een stand van zaken, en hij is nog steeds het
+         eerste dat het scherm zelf invult -- dus nog steeds het teken dat het
+         beginscherm echt is opgebouwd. */
+      await page.waitForSelector('#homeSub', { timeout: 5000 });
+      await page.waitForFunction(() => {
+        const e = document.getElementById('homeSub');
+        return e && e.textContent.trim().length > 0;
+      }, null, { timeout: 5000 });
+      assert.match(await page.textContent('#homeSub'), /lid sinds|member since/i,
+        'de passregel staat er');
+      assert.equal(await page.evaluate(() => !!document.getElementById('homeGreeting')), false,
+        'de begroeting hoort van het beginscherm af te zijn');
       const thuis = await page.evaluate(() => ({
         mappen: document.querySelectorAll('#osMappen .os-app').length,
         functies: [...document.querySelectorAll('#osFuncties .os-app')].map(b => b.getAttribute('aria-label')),
@@ -104,8 +113,17 @@ test('Leden-app: de eigen pas komt beveiligd op na herstel van de sessie',
       assert.ok(thuis.mappen >= 3, 'er staan mappen met apps boven de klok');
       assert.ok(thuis.klok, 'de ronde RTG-klok staat in het midden');
       assert.ok(thuis.balk, 'de balk van Rahul staat onderaan');
-      assert.deepEqual(thuis.functies, ['Bellen', 'Berichten', 'Videobellen', 'Wallet'],
-        'onder de klok staan bellen, chat en de wallet');
+      /* De functierij: vier dingen die je zonder nadenken moet kunnen pakken.
+         Hier stond ['Bellen', 'Berichten', 'Videobellen', 'Wallet'] -- maar
+         bellen en videobellen zijn geen eigen apps meer: ze zijn opgegaan in de
+         ene communicatie-app en staan nu als knop in de kop van het gesprek
+         waar je toch al bent. De EIS is niet veranderd (vier, en Berichten en
+         Wallet horen erbij); de invulling wel. */
+      assert.equal(thuis.functies.length, 4, 'de functierij telt geen vier tegels: ' + thuis.functies.join(', '));
+      assert.ok(thuis.functies.includes('Berichten'), 'Berichten staat niet in de functierij');
+      assert.ok(thuis.functies.includes('Wallet'), 'de Wallet staat niet in de functierij');
+      assert.ok(!thuis.functies.includes('Bellen') && !thuis.functies.includes('Videobellen'),
+        'bellen staat nog als eigen app onder de klok: ' + thuis.functies.join(', '));
       assert.deepEqual(thuis.y.slice().sort((a, b) => a - b), thuis.y,
         'de volgorde is mappen, klok, functies, balk');
       assert.ok((await page.textContent('#homeTrip .big')).trim().length > 0, 'de eerstvolgende reis staat er');
@@ -160,11 +178,18 @@ test('Leden-app: in het Engels is de startpagina echt Engels (i18n-dekking)',
     await page.addInitScript(t => { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_lang', 'en'); localStorage.setItem('rtg_cookieinfo_v1', '1'); }, reg.token);
     await page.goto(base + '/apps/app.html?pas=business', { waitUntil: 'load' });
     await page.waitForSelector('#gate', { state: 'hidden', timeout: 15000 });
-    await page.waitForSelector('#homeGreeting', { timeout: 5000 });
-    // de begroeting is via T('app.welcome',...) uit het EN-woordenboek gekomen
-    const greet = await page.textContent('#homeGreeting');
-    assert.match(greet, /Welcome/i, 'de begroeting is in het Engels');
-    assert.doesNotMatch(greet, /Welkom/i, 'er staat geen Nederlands meer in de begroeting');
+    /* De begroeting stond hier en is van het beginscherm af; de passregel
+       eronder loopt langs dezelfde weg (T('app.membersince',...) uit het
+       EN-woordenboek) en bewijst dus hetzelfde: de door JS gevulde tekst komt
+       vertaald uit het woordenboek en niet in het Nederlands terug. */
+    await page.waitForSelector('#homeSub', { timeout: 5000 });
+    await page.waitForFunction(() => {
+      const e = document.getElementById('homeSub');
+      return e && e.textContent.trim().length > 0;
+    }, null, { timeout: 5000 });
+    const sub = await page.textContent('#homeSub');
+    assert.match(sub, /member since/i, 'de passregel is in het Engels');
+    assert.doesNotMatch(sub, /lid sinds/i, 'er staat geen Nederlands meer in de passregel');
     assert.deepEqual(fouten, [], 'geen JS-fouten tijdens het scherm');
   } finally {
     if (browser) await browser.close();

@@ -16,8 +16,15 @@ module.exports = (ctx) => {
         ['Paniek-voorstellen open', tel(lijst(d().paniekVoorstellen).filter(v => v.status === 'open'))],
         ['Storingen (zekering open)', storingen().length],
         ['Doos-opdrachten open', tel(lijst(d().doosOpdrachten).filter(o => !o.klaar))],
-        ['Gastgesprekken', tel(Object.keys(d().guestChats || {}))],
-        ['Ledengesprekken', tel(Object.keys(d().memberChats || {}))]
+        /* Uit de communicatiekern en niet meer uit guestChats/memberChats: die
+           twee zijn sinds de verhuizing bevroren archieven. Bleven deze
+           tellers daarop staan, dan zouden ze langzaam stilvallen op het
+           aantal van de dag van de verhuizing -- een KPI die niet meer
+           beweegt ziet er hetzelfde uit als een KPI waar niets gebeurt. */
+        ['Gastgesprekken', tel(lijst(d().commGesprekken).filter(g => g.meta && g.meta.bron === 'Zaak'))],
+        ['Ledengesprekken', tel(lijst(d().commGesprekken).filter(g =>
+          (g.soort === 'personal' || g.soort === 'group') &&
+          (g.deelnemers || []).every(x => !String(x).includes(':'))))]
       ],
       lijsten: () => [
         { titel: 'Open paniek-voorstellen (vier ogen)', items: lijst(d().paniekVoorstellen).filter(v => v.status === 'open').slice(0, 8).map(v => String(v.functie || v.tekst || v.id) + (v.reden ? ': ' + String(v.reden).slice(0, 50) : '')) },

@@ -7,17 +7,22 @@ const inzagelog = require('../../inzagelog');
 const maakVergeten = require('../../kern/vergeten');
 
 module.exports = (kern) => {
-  const { app, auth, db, stateFor, myApplications, ordersVanKlant } = kern;
+  const { app, auth, db, stateFor, myApplications, ordersVanKlant, commGast } = kern;
   const { lidBoard, lidBoardLog } = kern.lidboard;
   const { wisLid } = maakVergeten(kern);
 
   app.post('/api/privacy/export', auth, (req, res) => {
     if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
     const key = req.session.key;
-    const chats = {};
-    for (const [k, msgs] of Object.entries(db.data.guestChats || {})) {
-      if (k.split('|')[1] === key) chats[k] = msgs;
-    }
+    /* De gastgesprekken komen sinds de verhuizing uit de communicatiekern
+       (kern/comm/gast.js) en niet meer rechtstreeks uit db.data.guestChats.
+
+       DIT IS DE PLEK WAAR DIE VERHUIZING HET MEEST KOST ALS HIJ MIST. Een
+       uitvoer is een RECHT -- "wat heeft u van mij" -- en een leeg antwoord
+       ziet er niet fout uit: het lijkt gewoon alsof er niets was. Vandaar dat
+       voorLid() zijn eigen oude voorraad eerst binnenhaalt en de toets ervoor
+       (test/comm-gast.test.js) de dag van de verhuizing nabootst. */
+    const chats = commGast ? commGast.voorLid(key) : {};
     const likes = db.data.posts.filter(p => p.likedBy && p.likedBy[key]).map(p => ({ postId: p.id, author: p.author }));
     const state = stateFor(req.session, req.body.lang);
     res.json({

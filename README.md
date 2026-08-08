@@ -149,7 +149,13 @@ provider.
 
 Op elke app-pagina staat onderaan één balk met daarboven het gesprek
 (`public/shared/handenvrij.js` + `-balk.js` + `-chat.js` + `-mond.js`,
-aangehaakt via `shared/metgezel.js`). Daarin typ je of praat je, en er gebeurt
+aangehaakt via `shared/metgezel.js`). **Eén**, en dat is een regel en geen
+toevalligheid: de homescreen heeft zijn eigen chatbalk (`#osAiBalk`), en
+`metgezel.js` houdt zich daar dus stil. Hij herkent dat scherm aan wat het IS
+(`<body data-ios-home>`, `#osAiBalk`) en niet aan zijn pad -- de homescreen
+wordt namelijk op vier paden geserveerd (`/`, `/apps/`, `/apps/index.html`,
+`/apps/bureau.html`) en een padtoets liet er drie doorheen, met twee balken
+onder elkaar tot gevolg. Daarin typ je of praat je, en er gebeurt
 iets. Het leest als een chat met Rahul: jouw beurt rechts in bordeaux, zijn
 beurt links met de signatuurmond ernaast, drie puntjes terwijl hij bezig is.
 
@@ -364,6 +370,29 @@ Dat is allemaal weg. Wat een telefoon heeft, en verder niets:
 - **Een randveeg** van links terug in de geschiedenis.
 - **Bladen in plaats van vensters** (`RTGiOS.blad(...)`): van onder omhoog, met
   een greep, sluiten met een veeg omlaag.
+- **Een hamburger rechtsboven, in elke app** (`shared/appmenu.js`, door
+  `ios.js` binnengehaald). Hij opent een blad met twee delen: *deze app* -- de
+  functies van het scherm waar je staat -- en *overal*: beginscherm, een stap
+  terug, instellingen, Rahul, volledig scherm, delen. Elke rij verschijnt
+  alleen als er op dat scherm ook echt iets achter zit.
+
+  De app-functies worden niet per app opgeschreven (dat zijn honderdenveertig+ bestanden die
+  binnen een week uit elkaar lopen) maar GELEZEN uit wat de pagina al heeft: de
+  delenbalk van `shared/deelmenu.js`, de tab- en filterrij die `ios.js` in de
+  tweede rij van de navigatiebalk heeft gezet, en anders de eerste schakelrij
+  die op vorm te herkennen is (een vakje met drie tot acht knoppen met korte
+  labels -- `.chips`, `.rubrieken`, `.filters`, hoe hij ook heet). Een app die
+  zelf beter weet wat erin hoort, zegt dat met `RTGAppMenu.zet([...])` of
+  `RTGAppMenu.voegToe({...})`.
+
+  **De homescreen krijgt hem niet.** Daar stonden eerst drie losse knopjes in de
+  statusbalk (batterij, bel, bedieningspaneel); die zijn weggehaald, en er een
+  vierde teken voor terugzetten is niet veel beter. Het beginscherm is de
+  rustplek: mappen, klok, functies, de balk van Rahul, en verder niets. Wat er
+  aan systeem achter zit haal je van de bovenrand omlaag (`shared/randen.js`
+  opent daar het bedieningspaneel), en dat paneel draagt zoeken, **meldingen**,
+  scannen, je Zegel en je backoffice. De knoppen zelf blijven in de HTML staan,
+  verborgen: het paneel klikt ze aan, zodat het gedrag op één plek blijft wonen.
 
 Dat alles staat op **een** plek: `public/shared/ios.css` + `public/shared/ios.js`
 (bron in `public/shared/ios/`). De laag LEEST de kopbalk die een pagina al heeft
@@ -1405,12 +1434,18 @@ Elk lid heeft een **notificatiebel**: reacties, likes en privéberichten op je e
 
 ### Het beginscherm: vier lagen, één scherm
 
-De app is een besturingssysteem (het "ROS"). Het beginscherm heeft vier lagen, van boven naar beneden, en verder niets:
+De app is een besturingssysteem (het "ROS"). Het beginscherm heeft vier lagen, van boven naar beneden, en verder niets. Geen begroeting bovenaan (die is aardig de eerste keer en behang de honderdste, en hij kostte precies de hoogte die de mappen nodig hebben), geen knopjes in de statusbalk, geen hamburger: alleen de regel die zegt welke pas je hebt en sinds wanneer, en dan:
 
-1. **De mappen met apps** — vier mappen (Reizen, Geld, De Salon, Het Huis). Alles waar je pas je recht op geeft zit er al in; je hoeft niets te installeren. Een tik opent de map, een tik op een app opent hem schermvullend.
-2. **De ronde RTG-klok**, in het midden — hetzelfde horloge als op het inlogscherm (`shared/klok.js`, `data-rtg-klok="ring"`).
+1. **De mappen met apps** — zeven mappen in twee rijen: Reizen, Geld, De Salon, Het Huis / Media, Werk, Veilig. De tweede rij telt er drie en staat **gecentreerd** onder de eerste; in een raster van vier kolommen schuift zo'n restrij tegen de linkerkolom aan en lees je een halfvolle rij van vier in plaats van een rij van drie. Alles waar je pas je recht op geeft zit er al in; je hoeft niets te installeren. Een tik opent de map, een tik op een app opent hem schermvullend.
+
+   Het waren er **vier**, en dat leek rustig tot je ze opendeed: De Salon droeg eenentwintig apps en Het Huis zeventien. Een map met eenentwintig tegels is geen map maar een lade waar je in graait.
+
+   Toen werden het er **acht**, en dat was er één te veel — maar dat zag je alleen op de goede pas. De tegels tellen namelijk niet voor iedereen hetzelfde: veertien apps zijn Lifestyle/Business en vallen voor een RTG-pas vanzelf weg. Het Huis was gevuld met Maison, Table, Cellier, Garde-robe en De Rechterhand — alle vijf premium — dus een Business-lid zag daar acht tegels en een RTG-lid drie. Dezelfde map, half zo vol, precies op de instappas, en dat is exact wat de merkregel verbiedt. Nageteld over alle 62 items is er materiaal voor **zeven** mappen die op allebei de passen gevuld staan, en niet voor acht; de zorgkant zit daarom weer in Het Huis, waar zorg, gezin en rust ook horen.
+
+   Gemeten per pas (RTG / Business): Reizen 8/10, Geld 7/10, De Salon 6/10, Het Huis 6/11, Media 8/8, Werk 7/7, Veilig 4/4. Een app staat in precies **één** map — twee plekken voor hetzelfde is precies waarom je hem nergens meer vindt.
+2. **De ronde RTG-klok**, in het midden — hetzelfde horloge als op het inlogscherm (`shared/klok.js`, `data-rtg-klok="ring"`). Zijn vak pakt alle ruimte die de andere lagen overlaten en centreert hem daarin: evenveel lucht boven als onder, want een horloge zonder marge wordt een tegel. Hier heeft een bovengrens op gestaan om de klok omhoog te halen; die trok de balk van Rahul mee los van de onderrand en zette er een gat van 155 punten onder. Wil je een laag verschuiven, doe dat met een marge op die laag zelf — het klokvak krimpt dan mee en de onderrand blijft staan.
 3. **De functierij**: Bellen, Berichten, Videobellen en je **Wallet**. Deze vier staan vast en kunnen niet uit.
-4. **De balk van Rahul**. Typ wat je wilt: is het iets dat het OS zelf kan ("open Reizen", "donker", "zoek villa", "hernoem Geld naar Bank"), dan gebeurt het meteen en blijf je thuis; al het andere gaat naar Rahul, wiens app opent met je vraag erin.
+4. **De balk van Rahul**, aan de onderrand — daar zoekt je duim hem. Het gesprek erboven staat er met een ruime marge vanaf, zodat het als gesprek en invoer leest en niet als één blok. Typ wat je wilt: is het iets dat het OS zelf kan ("open Reizen", "donker", "zoek villa", "hernoem Geld naar Bank"), dan gebeurt het meteen en blijf je thuis; al het andere gaat naar Rahul, wiens app opent met je vraag erin.
 
 Het beginscherm scrolt niet en heeft geen tweede blad: de maat-eenheid `--e` groeit met het venster mee, zodat hetzelfde beeld op telefoon, tablet en computer past.
 
@@ -1456,6 +1491,114 @@ De koppeling lid ↔ werkgever zijn de rollen aan het ene RTG-account (`kern/een
 **Taal.** De labels van dit bord komen van de server (ze staan in de catalogus, niet in de pagina), dus `bord()` krijgt de taal mee en `kern/lidboard/talen.js` levert de vertaling; een onbekende taal valt terug op Engels, een ontbrekende sleutel op het Nederlands. De pagina zelf gebruikt de gewone i18n-laag (`window.I18N` + `shared/i18n.js`) en haalt bij een taalwissel (`rtglang`) het bord opnieuw op.
 
 API: `/api/member/boardroom{,/zet,/zetveel,/herstel,/logboek}` en `/api/supplier/werkbeleid{,/zet}`. Getoetst in `test/lidboard.test.js` (21 toetsen: standaarden, handhaving, voogdij, versie-botsing, bulk, herstel, journaal, export, rem, beheerd-door-RTG, vergetelheid, taal en het werkgeversbeleid).
+
+## RTG Communication Core: communicatie is infrastructuur, geen functie
+
+**Wat er misging.** Dit huis had **zes berichtenvoorraden naast elkaar** — `db.data.memberChats` (vrienden), `applyChats` (sollicitaties), `guestChats` (gast en zaak), `collegaChats` (werkvloer), `podiumChat` en `rijkBerichten` (overheid) — en elke module die er een gesprek bij wilde, bouwde de zevende. Elk met een eigen berichtvorm, een eigen verstuurroute en een eigen leesstand; geen van alle met zoiets gewoons als een reactie, een antwoord-op of een correctie. De Berichten-app was daarbovenop een **leeslijst** die naar de bron-app doorverwees: hij kon tonen dát er iets was, en verder niets.
+
+Dat is de fout die je maar één keer moet maken. Een chatfunctie per module betekent dat "verwijderen voor iedereen", "gelezen op dit apparaat" of "zoeken over alles" zes keer gebouwd en zes keer nét anders wordt — en dat de zevende module weer bij nul begint.
+
+**De kern** (`server/kern/comm/`) is één gespreksmodel voor het hele platform. Elke module vraagt het daar aan in plaats van zelf iets te bouwen:
+
+```js
+kern.comm.gesprekMaak({ soort: 'ride', deelnemers: [chauffeur, reiziger],
+                        titel: 'Rit RT-1941', meta: { sleutel: 'rit:RT-1941' } })
+```
+
+Taxi bouwt dus geen berichtenbackend. Horeca ook niet. School ook niet. `meta.sleutel` maakt het **idempotent**: een rit, een bestelling of een ticket vraagt bij elke stap opnieuw om "zijn" gesprek en krijgt er dan niet elke keer een nieuw — zonder dat zou de module zelf moeten onthouden welk gesprek bij welke rit hoort, en dan zit de koppeling weer in de module.
+
+**Het soort is de context**, en dat is meer dan een etiket: het bepaalt in welke la van de inbox een gesprek valt. Twaalf, bewust een gesloten lijst (een vrij tekstveld was binnen een maand een verzameling spelfouten): `personal, group, business, order, ride, school, project, support, marketplace, government, event, ai`. De laden erboven zijn Mensen / Zaken / Onderweg / Officieel / Rahul — dat is de **Universal Inbox**: *Chats → Mobiliteit → Rit #RT-1941*, terwijl het technisch allemaal gesprekken blijven.
+
+**Drie regels die worden afgedwongen, niet alleen beschreven:**
+
+1. **Alles op codenaam.** De kern kent sleutels en codenamen, nooit echte namen; die staan in de gescheiden kluis en komen hier niet langs. Ook niet in een titel, ook niet in een zoekindex.
+2. **Wie er niet in zit, leest niet mee.** Elke weg — lezen, sturen, reageren, wijzigen, wissen, lezen-melden, typen, porren, vlaggen, samenvatten — loopt langs dezelfde poort. Een gesprek-id raden is nooit genoeg. Getoetst met alle tien wegen apart, want een poort die op vier plekken moet staan, wordt op de vijfde vergeten.
+3. **De AI stelt op, de mens verstuurt.** Er is geen enkele weg waarop een model zelf een bericht plaatst; `@Rahul` levert tekst terug en die belandt in het invoerveld. Dezelfde drempel als bij geld.
+
+**De priveberichten zijn verhuisd.** `db.data.memberChats` was de grootste voorraad en stond als enige nog buiten de kern — en zolang dat zo was, was "communicatie is infrastructuur" een belofte en geen feit: de ene app kon die gesprekken alleen lézen. Ze wonen nu in de kern (`kern/comm/dm.js`), en de sociale laag, haar routes en de app schrijven allemaal in dezelfde. De controles blijven staan waar ze stonden — verbonden zijn, blokkade, de 9+-poort, de snelheidslimiet — want die gaan over vriendschap en veiligheid, niet over berichten.
+
+De geschiedenis gaat mee, **per paar en eenmalig**, op het moment dat een gesprek toch al wordt geopend. Niet met een migratiescript over de hele database: dat moet je durven draaien op data die in gebruik is, en het valt om op het eerste rare bericht. Wat daarbij goed moest gaan en apart getoetst is (`test/comm-dm.test.js`): de berichten houden hun **eigen tijdstempels** (via de gewone verstuurweg zou een gesprek van twee jaar er ineens uitzien alsof het vanmiddag gebeurde — geen migratie maar een vervalsing), de **leesstand** verhuist mee (anders springt bij iedereen elk oud gesprek op ongelezen: een stapel rode bolletjes die niemand veroorzaakte), een gedeelde Salon-post overleeft als bijlage, en de import gebeurt **precies één keer**. De oude voorraad blijft staan: hij wordt niet meer gelezen en niet meer geschreven, maar data van mensen weggooien omdat de code er klaar mee is, is de handeling die je niet terug kunt draaien.
+
+**Wat er verder al was, loopt mee — en is nu ook te beantwoorden.** De sollicitatie-chats, de Berichtenbox van MijnOverheid, het gastcontact met een zaak en het doorlopende gesprek met Rahul wonen nog in hun eigen module. `kern/comm/bronnen.js` **leest** ze en laat ze in dezelfde inbox meelopen.
+
+Sinds deze ronde open je een sollicitatie- of zaakgesprek gewoon *in* de ene app en antwoord je daar ook. Niet doordat deze laag in een vreemde voorraad schrijft — dat zou de tweede schrijver zijn — maar doordat `/api/comm/gesprek` bij zo'n gesprek meegeeft **waar** een antwoord heen moet (`antwoord: { pad, vast, veld }`), en de app daar rechtstreeks naartoe post. De route van de module blijft de enige ingang op haar eigen voorraad, met al haar controles, vertaling en meldingen; er staat niets nagebouwd.
+
+Hier stond eerst een doorgeefluik dat `app._router.handle()` aanriep om het verzoek intern door te sturen. Dat gaf een 500 — dit huis heeft zijn eigen router (`server/web/routing.js`), geen Express — maar het was ook zonder die fout de verkeerde vorm: een route die een andere route naspeelt is een tweede plek die moet weten hoe die eerste heet en wat hij verwacht. Officiële post en het Rahul-gesprek blijven doorverwijzen: het eerste is eenrichtingsverkeer, het tweede heeft zijn eigen scherm — en een invoerveld tonen bij iets waar je niet op kunt antwoorden is erger dan geen invoerveld. Vier voorraden tegelijk migreren terwijl hun modules er ook nog in schrijven, is vier keer de kans om berichten kwijt te raken in een ronde waarin niemand dat merkt tot iemand iets terugzoekt. Een bron **schrijft** daarom nooit — dat zou de tweede schrijver op één voorraad zijn, precies de splitsing die we opheffen. Elke bron die later wél overgaat, verdwijnt gewoon uit dat bestand.
+
+**Eén app** (`public/apps/comm.html`). Op het beginscherm stonden er vier — Berichten, Bellen, Videobellen en Snaps — plus Meet als vijfde, voor iets dat een mens als *één* ding ziet: contact met iemand. Nu: links de inbox met zijn laden, rechts het gesprek, en bellen en videobellen zijn twee knoppen in de kop van het gesprek waar je toch al bent (de verbinding zelf loopt over de bestaande WebRTC-laag; een tweede belimplementatie zou een tweede plek zijn waar het misgaat). `/apps/berichten.html` blijft bestaan als pad en leidt erheen.
+
+Wat de app kan: threads met antwoord-op en citaat, reacties, wijzigen binnen een kwartier (met de oorspronkelijke tekst bewaard — "bewerkt" zonder te kunnen zien wat er stond is een uitnodiging om een gesprek achteraf te herschrijven), intrekken dat een spoor achterlaat (de ander heeft het gelezen; doen alsof er nooit iets stond is liegen tegen wie erbij was), ongelezen-tellers, leesbevestiging, `typt…`, aanwezigheid, zoeken over álle gesprekken tegelijk, vastzetten/stilzetten/archiveren, een concept dat meereist tussen apparaten, en de **por** — de buzz van MSN, die door "stil" heen mag omdat dat zijn hele bestaansreden is, en precies daarom begrensd is tot één per minuut per gesprek. Een aandachtsknop zonder rem is een pestknop.
+
+API: `/api/comm/{inbox,gesprek,begin,stuur,wijzig,wis,reactie,lees,vlag,concept,typt,por,zoek,ai}`; de oude `/api/member/dm{,/send}` blijven bestaan en schrijven in dezelfde kern. Getoetst in `test/comm.e2e.js`, `test/comm-dm.test.js` en `test/berichten.e2e.js`.
+
+**Bewaartermijn en wisrecht.** Twee gaten die de verhuizing zelf maakte, en die allebei groen waren:
+
+- Het **bewaarbeleid** wees naar `memberChats` — de tak die leeg achterbleef. De nieuwe takken hadden er geen, dus persoonlijke berichten werden vanaf dat moment voor altijd bewaard. `commGesprekken` en `commBerichten` staan nu in `server/bewaarbeleid.js` met dezelfde twee jaar als daarvoor (een termijn die bij een verhuizing stilletjes ruimer wordt, is hoe "we bewaren niet eindeloos" een dode letter wordt), en `memberChats` blijft als bevroren archief zijn termijn houden — juist omdat er niets meer bij komt.
+- Het **wisrecht** kende de nieuwe takken niet: een lid dat om vergetelheid vroeg, verdween uit zijn account en bleef in zijn gesprekken. `kern/vergeten/gesprekken.js` doet dat nu, met dezelfde lezing van art. 17 als bij de eigen Salon-posts: wat dít lid schreef gaat weg, en blijft er niemand over dan gaat het hele gesprek weg — maar de kant van de ander blijft staan, want dat is zijn inhoud.
+
+Allebei waren ze onzichtbaar, en om dezelfde reden: de bezem in `test/vergeten.test.js` loopt na het verwijderen door de hele database, maar de wandeling ervóór maakt geen gesprek (daar heb je een tweede, verbonden lid voor nodig) — en een tak die nooit is aangeraakt kan een bezem niet vinden. **De dekking van een bezem is de dekking van de wandeling ervoor.** Daarom zijn er nu twee toetsen die de takken écht aanmaken met de kern zelf: `test/bewaartermijnen.test.js` eist dat elke tak die de kern maakt een termijn heeft (met de tak-lijst uit de kern gehaald en niet met de hand overgeschreven), en `test/comm-vergeten.test.js` roept dezelfde functie aan die `wisLid()` aanroept.
+
+Diezelfde toets vond er later nog één, en die was ouder dan de verhuizing: een gesprek draagt in `door` wie het opende, en dat veld is geen deelnemer en geen bericht — dus liep het langs allebei de wislussen heen. Dat het lang groen bleef, kwam doordat `tussen()` de twee sleutels alfabetisch zet en de blijver in de toets toevallig vooraan stond. Het gaat nu op `null` (niet naar de eerstvolgende deelnemer: die heeft het gesprek niet geopend, en een verkeerd antwoord is erger dan geen).
+
+**Een deelnemer is niet meer per se een lid** (`server/kern/comm/wie.js`). Dit was het stuk dat de rest blokkeerde. Zolang alleen leden een sleutel hadden, kon een zaak geen deelnemer zijn — en dus bleven het gastcontact met een restaurant, de collega-DM op de werkvloer en de sollicitatiechat in hun eigen voorraad staan. Niet omdat ze anders waren, maar omdat de andere kant van het gesprek geen naam had in dit model. Er zijn nu vier soorten deelnemer, en de vorm is de hele beveiliging:
+
+| | sleutel | |
+|---|---|---|
+| lid | `user-12` | de kale ledensleutel, **ongewijzigd** |
+| zaak | `zaak:AB12` | de zaak als geheel; het team deelt hem |
+| mens | `mens:AB12:7` | een persoon binnen die zaak |
+| kantoor | `kantoor` | de backoffice van RTG |
+
+Een lid houdt zijn kále sleutel, en dat is de reden dat dit zonder migratie kon: zo staan de bestaande gesprekken, leesstanden en SSE-routering er al in. De prijs staat in `lid()`: omdat een lid geen voorvoegsel draagt, is "geen dubbele punt" het enige wat hem van een actor onderscheidt — dus **gooit** die functie op een ledensleutel met een dubbele punt erin. Vandaag kan dat niet, maar "kan vandaag niet" is geen bewaking.
+
+En de regel die alles draagt: **een sleutel wordt afgeleid, nooit aangeleverd.** `wie.vanZaak(req)` maakt hem uit de sessie die `supplierAuth` al controleerde; er is met opzet geen parameter waarin een verzoek kan zeggen wie het is. Zou die er wél zijn, dan vult een leverancier de sleutel van een lid in en leest hij mee in een gesprek tussen twee mensen die hem niet kennen. `test/comm-zaak.e2e.js` probeert dat expliciet — met alle veldnamen die een programmeur zou kiezen (`alsWie`, `van`, `sleutel`, `key`, `deelnemer`, `actor`, `mij`) — want de andere toetsen meten alleen dat de route de góéde sleutel gebruikt, niet dat er geen weg is om hem te kíézen.
+
+De zakelijke deur is `routes/supplier/comm.js`: `/api/supplier/comm/{inbox,gesprek,stuur,lees,typt,zoek,collega}`, dezelfde kern, geen tweede berichtenmodel. Twee sleutels per sessie, en dat is het hele verschil tussen een gedeelde inbox (een bestelling is van het bedrijf) en eigen berichten (een collega-DM deelt het team juist niet).
+
+**Van wie er namens de zaak antwoordde gaat alleen de voornaam naar buiten.** Het team ziet de hele naam van de collega die typte, de klant zijn voornaam. Dat eerste deel is een besluit: "Marta brengt het zo" is het verschil tussen een dienst en een systeem, en de gastchat deed het vóór de verhuizing ook al. Het tweede deel is de begrenzing erbij — vroeger ging de *hele* naam mee, want het personeelsregister draagt "Marta Colom", en een achternaam maakt iemand vindbaar terwijl een voornaam hem aanspreekbaar maakt. De knipregel staat op één plek (`wie.voornaam`, inclusief titels: "Dr. Elena Roig" → "Dr. Elena", want alleen "Dr." tonen is onbeleefd én onbruikbaar). In de **sollicitatiechat** wordt níét geknipt: daar staat aan de werkgeverskant geen persoon maar de zaak zelf ("Sal de Mar"), en die zou tot "Sal" verminken — dat staat als opmerking in `kern/comm/werk.js`, zodat niemand de drie later "gelijktrekt". Er is bewust géén `/begin` met een lid — een zakelijk gesprek met een klant ontstaat uit iets dat er al is (een bestelling, een rit, een boeking) en de module die dát weet maakt het via `comm.gesprekMaak()`. Wél een `/collega`, met de personeelslijst als poort in plaats van vriendschap.
+
+**De collegaberichten zijn verhuisd** (`kern/comm/collega.js`) — de tweede voorraad, en de eerste die alleen kón verhuizen dankzij het actormodel: een collegachat loopt tussen twee *mensen binnen een zaak* (`mens:AB12:7` ↔ `mens:AB12:9`), en zulke deelnemers bestonden niet. Dezelfde drie regels als bij de privéberichten (een gesprek per paar uit de kern, de geschiedenis eenmalig mee op het moment dat het paar toch al wordt geopend, de oude voorraad blijft staan), maar twee dingen zijn hier anders en allebei zijn het valkuilen:
+
+- **De zaakcode moet in de sleutel.** De oude opslag zette hem in het *pad* (`collegaChats[code][paar]`), dus twee medewerkers met toevallig dezelfde nummers bij twee bedrijven zaten vanzelf in twee bakjes. De kern heeft één platte lijst gesprekken — valt de code uit de sleutel, dan lopen die twee gesprekken in elkaar over, en dat is geen rommelig scherm maar een datalek tussen twee bedrijven. Staat als eigen toets in `test/comm-collega.test.js`.
+- **Ongelezen was een teller, geen tijdstip.** De oude vorm hield `unread[staffId] = 3` bij; de kern rekent met "gelezen tot". Reken je dat niet om, dan springt bij iedereen elk oud gesprek op ongelezen.
+
+De zaaksleutel zit er met opzet **niet** in: elke medewerker draagt hem in zijn sessie, dus zou hij in een collega-DM staan dan las het halve team mee. De routes (`/api/staff/dm/*`) en hun antwoordvorm veranderen niet, zodat `public/shared/collegachat.js`, de PDA en de zaak-app niets merken — een verhuizing van de opslag hoort niet zichtbaar te zijn in een scherm, want dan zijn het twee veranderingen tegelijk en weet je bij een storing niet welke van de twee het deed. `collegaChats` had trouwens **nooit** een bewaartermijn, ook niet vóór de verhuizing; die staat er nu, als bevroren archief.
+
+**Het gastcontact is verhuisd** (`kern/comm/gast.js`) — de derde voorraad, en de eerste waarin een lid en een zaak sámen in één gesprek zitten: aan de ene kant een codenaam, aan de andere kant een bedrijf. Precies het gesprek waarvoor het actormodel bestaat. Drie dingen zijn hier eigen:
+
+- **De afdeling hoort bij het gesprek.** Een hotel heeft Receptie, Roomservice, Housekeeping, Onderhoud en Security — vijf aparte lijnen. Vallen ze samen, dan leest Housekeeping mee met wat je aan Security schreef.
+- **Twee tellers, één per kant** (`unreadGuest`/`unreadPartner`), omgerekend naar twee losse "gelezen tot"-standen.
+- **Het systeembericht heeft geen afzender.** "U heeft nu een open lijn met X" stond er als `from:'systeem'`, maar de kern eist dat een afzender deelnemer is — en die poort zetten we niet open voor een uitzondering. Het komt nu van de zaak, met een eigen soort, en gaat naar buiten nog steeds als `systeem`.
+
+En één ding dat pas bij het schrijven van de toets bleek, en dat de vorige twee verhuizingen niet hadden: **een lijst die uit de kern komt, ziet alleen wat al verhuisd is.** De import gebeurt per lijn, bij het openen — maar het gastenscherm van een zaak (en de gegevensuitvoer van een lid) leest rechtstreeks uit de kern. Zonder maatregel zou dat scherm op de dag van de verhuizing **leeg** staan en elk gesprek weg lijken, zonder weg terug: de lijst ís de manier om een gesprek te openen. `voorZaak()` en `voorLid()` halen daarom eerst hun eigen oude voorraad binnen, begrensd tot déze zaak of dít lid. Twee toetsen bootsen die dag na.
+
+De gastchat verdween hierdoor ook uit `kern/comm/bronnen.js` — hij is nu een echt gesprek in de kern en zou anders dubbel in de inbox staan. Dat is precies wat de kop van dat bestand beloofde: *elke bron die later wel overgaat, verdwijnt gewoon uit dit bestand.* Dit is de eerste. Twee KPI-tellers op het afdelingenbord wezen nog naar de bevroren archieven en zijn meeverhuisd: een teller die stilvalt op het aantal van de verhuisdag ziet er hetzelfde uit als een teller waar niets gebeurt.
+
+**De sollicitatiechat is verhuisd** (`kern/comm/werk.js`) — de vierde en laatste grote voorraad, en degene die als laatste kón. Een sollicitant is namelijk niet altijd een lid: hij kan ook een **profiel binnen een RTF-gezin** zijn (een jongere die via zijn gezin solliciteert, ingelogd op gezinscode en token, zonder ledensleutel en zonder codenaam). Daarvoor kwam er een vierde soort deelnemer bij, `gezin:FAM7:3`. Zonder die soort had deze voorraad maar half kunnen verhuizen — en een halve verhuizing is twee voorraden.
+
+Twee dingen zijn hier eigen. De **kant** is een woord (`werkgever`/`sollicitant`) en geen naam; daar kleurt het scherm zijn bubbels op, dus als dat omklapt lijkt de sollicitant zichzelf te hebben afgewezen. En **zonder sleutel geen gesprek**: wie anoniem solliciteert heeft geen enkele sleutel, en een draad voor iemand die je niet kunt bereiken belandt in een lijst waar de werkgever wél op antwoordt. Anders dan bij het gastcontact blijft `applyChats[id]` wél staan — dat is geen berichtenvoorraad maar de *schakel* tussen een sollicitatie en haar gesprek, en hij draagt wie de sollicitant is. Wat eruit ging zijn de berichten; dat er niets meer bij komt in de oude tak is een eigen toets.
+
+En bij deze tak zaten dezelfde twee gaten als eerder, allebei ouder dan de verhuizing: `applyChats` had **nooit** een bewaartermijn — terwijl de sollicitatie waar hij bij hoort er wel een had, dus het dossier verliep en het gesprek erover bleef eeuwig staan — en het **wisrecht** raakte hem niet: `vergeten/anoniem.js` haalde de persoon netjes uit `db.data.applications`, maar het chatrecord droeg diezelfde sleutel en naam nog een keer.
+
+**`bronnen.js` is nu bijna leeg, en dat was het doel.** Er stonden vier kanalen buiten de kern; twee zijn er echt verhuisd, de andere twee hebben er nooit gestaan. Wat overblijft zijn twee **leeslijsten** — de Berichtenbox van MijnOverheid en het doorlopende gesprek met Rahul — en dat blijft waarschijnlijk zo: officiële post is eenrichtingsverkeer en Rahul heeft zijn eigen scherm. Daarmee verdween ook de tweede verstuurweg uit de app: er is nog één, en dat is precies wat "communicatie is infrastructuur" hoort te betekenen.
+
+**Wat er nog niet in zit** — zodat niemand het hier gaat zoeken: end-to-end encryptie, rollen en rechten binnen een zaak (RBAC), SSO/SCIM, legal hold, eDiscovery, DLP en de publieke API voor externe ontwikkelaars. `podiumChat` staat er ook nog, maar dat is bewust: een livestream-chat is vluchtig en publiek — geen gesprek tussen partijen die elkaar kennen — en hoort niet in een model dat op deelnemerslijsten draait. Het model is op de rest gebouwd, maar het staat er niet. Een half aangezette compliance-laag is gevaarlijker dan een afwezige. Hetzelfde geldt voor groepsbellen met breakout rooms en opname: dat blijft voorlopig RTG Meet.
+
+## De ledenbalie: de derde poort van het kantoor
+
+Het RTG-kantoor is een ongedeelde ruimte die men binnenkomt met een **gedeelde** code, en die code wijst niemand aan. Voor het meeste kantoorwerk is dat prima: een wachtrij bekijken of een partner goedkeuren gaat over een dossier, niet over een mens. Iemand helpen met zijn abonnement of zijn wachtwoord is iets anders — dat raakt zijn *account*, en het is precies het soort handeling waarvan een lid later mag vragen: wie was dat, en waarom?
+
+Vandaar de **zetel**: uitgedeeld vanuit de boardroom, gekoppeld aan een echte persoonlijke inlog — dezelfde constructie die die kamer zelf al gebruikt. Vijf regels, en het zijn allemaal een nee:
+
+1. **Geen zetel, geen dossier** — ook niet met een geldige kantoorcode. De code opent het kantoor, niet de balie. En de zetel komt uit de sessie: er is geen veld waarin een verzoek zegt wie het is.
+2. **Het dossier draagt de codenaam.** Precies acht velden (`codename`, `pas`, `sinds`, `stad`, `land`, `steuncode`, `abo`, `klachten`) en geen een erbij — de toets pint die lijst dicht af, zodat een veld dat er morgen bij wil eerst langs een mens moet. Geen naam, geen adres, geen telefoon, geen document. De steuncode is het handvat voor het gesprek: een kort kenmerk zodat beide kanten naar hetzelfde contact kunnen verwijzen zonder dat er ooit een naam over tafel gaat.
+3. **Een reden van niks is geen reden.** "test", "x", "……" worden geweigerd — en zo'n geweigerde vraag is *geen* inzage, dus komt hij ook niet in het journaal. Anders vult het journaal zich met pogingen in plaats van met inzagen.
+4. **De balie zet geen wachtwoord.** Herstel loopt via de bestaande stroom naar het lid zelf; de balie hoort alleen dát het in gang is gezet. Geen adres terug, geen link, geen code.
+5. **Een abo-voorstel kent niets toe.** De balie mag een aanvraag klaarzetten voor een andere pas; het besluit blijft bij een mens via `/api/aanmelding/beslis` — dezelfde merkregel als overal.
+
+Alles wat de balie wél doet — een dossier openen, een codenaam natrekken — gaat door het **bestaande** inzagejournaal (`server/inzagelog.js`), met de zetel als "wie" en de opgegeven aanleiding als "waarom". Bewust geen eigen logboek: een tweede journaal is een journaal dat bij een audit wordt vergeten. Ook zoeken telt als inzage, ook als er niets uitkomt — wie een codenaam natrekt om te zien óf hij bestaat, doet precies wat het journaal moet vastleggen.
+
+Kern: `server/kern/ledenbalie.js`, routes `/api/office/balie/{zetels,zetel,zoek,dossier,herstel,klacht,klacht/status,abo}`, getoetst in `test/ledenbalie.test.js`.
 
 ## Veiligheid & verbinding: vier apps op één ruggengraat
 

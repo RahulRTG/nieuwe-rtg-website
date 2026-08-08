@@ -169,14 +169,46 @@ test('techniek en boardroom laten een gewoon lid niets schakelen',
       'en zegt dat het beveiligd is: ' + t.tekst.slice(0, 200));
     assert.match(t.tekst, /aanmelden|inloggen/i, 'met een weg naar binnen voor wie er hoort');
 
-    /* DE BOARDROOM is waar de schakelaars van het platform staan. Een gewoon lid
-       hoort daar een aanmelding te zien -- en vooral: geen zichtbare schakelaar
-       die iets omzet. Dat is dezelfde regel die de paniekkamer aan de API-kant
-       bewaakt (test/kantoordienst.test.js), hier aan de schermkant. */
+    /* DE BOARDROOM: EEN PAGINA, TWEE KAMERS -- en hier meten we de muur ertussen.
+
+       Deze toets eiste dat een gewoon lid hier een AANMELDING zag, en dat klopte
+       toen /apps/boardroom.html het schakelbord van het platform was. Dat is het
+       niet meer: het is de EIGEN boardroom van een lid ("zet zelf aan wat je
+       gebruikt en uit wat je niet wilt"), en die hoort een ingelogd lid gewoon
+       te zien. Een inlogscherm eisen op een pagina die van hem is, is de
+       verkeerde belofte -- en de toets zakte er dan ook op.
+
+       Wat er in die pagina WEL achter een deur zit is de eigenaarszetel
+       (apps/boardroom-eigenaar.js): de schakelaars van het platform. Die is er
+       alleen voor de eigenaar, en dat is de bewering die het waard is om te
+       meten. Dus meten we hem, en niet aan de tekst maar aan de DOM: dit scherm
+       vertaalt mee met de browser, en een toets die op een Nederlands woord
+       wacht zakt op een Engelse machine om iets wat niets met de regel te maken
+       heeft.
+
+       Twee kanten, want een van de twee alleen zegt niets: de zetel staat er
+       niet, EN de eigenaars-API weigert. Zou de zetel alleen in CSS verstopt
+       zijn, dan houdt de tweede regel stand; zou de API openstaan en het scherm
+       alleen zwijgen, dan valt de eerste. */
     const b = await toon(o.page, base, 'boardroom', token);
     assert.equal(b.pad, '/apps/boardroom.html', 'de boardroom blijft op zijn eigen adres');
-    assert.match(b.tekst, /aanmelden|log in|sign in/i,
-      'en vraagt om aan te melden: ' + b.tekst.slice(0, 200));
+    assert.ok(b.tekst.trim().length > 200, 'een lid hoort zijn eigen boardroom te zien: ' + b.tekst.slice(0, 200));
+
+    const zetel = await o.page.evaluate(() => {
+      const el = document.querySelector('.ez');
+      return { er: !!el, zichtbaar: !!(el && el.getClientRects().length) };
+    });
+    assert.equal(zetel.er, false, 'de eigenaarszetel staat op het scherm van een gewoon lid');
+
+    const eigenaarsApi = await o.page.evaluate(async () => {
+      const t = localStorage.getItem('rtg_member_token');
+      const r = await fetch('/api/boardroom/status', { method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + t },
+        body: '{}' });
+      return r.status;
+    });
+    assert.ok(eigenaarsApi === 401 || eigenaarsApi === 403,
+      'de eigenaars-API hoort een gewoon lid te weigeren (kreeg ' + eigenaarsApi + ')');
 
     assert.deepEqual(o.fouten, [], 'paginafouten: ' + o.fouten.join(' | '));
   } finally {

@@ -3,8 +3,8 @@
    routes/social.js op de gedeelde kern. */
 module.exports = (sctx) => {
   const { kern, isKindVanGezin, rtfOnbSess, rtfSociaal } = sctx;
-  const { app, express, auth, geenGast, db, save, socialZoek, socialVerbind, socialAntwoord,
-          socialConnecties, liveCodename, connectieTussen, verbActief, dmSleutel, codenaamVan,
+  const { app, express, auth, geenGast, db, socialZoek, socialVerbind, socialAntwoord,
+          socialConnecties, liveCodename, connectieTussen, verbActief, codenaamVan,
           sseToCustomer, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor,
           verhaalBekijken, dagOpdracht, isGeblokkeerd } = kern;
 
@@ -52,11 +52,14 @@ app.post('/api/member/dm', auth, async (req, res) => {
   const ander = String(req.body.withKey || '');
   const c = connectieTussen(req.session.key, ander);
   if (!verbActief(c)) return res.status(403).json({ error: 'Je bent nog niet verbonden met deze codenaam.' });
-  const k = dmSleutel(req.session.key, ander);
-  const chat = db.data.memberChats[k] = db.data.memberChats[k] || { messages: [], read: {} };
-  chat.read[req.session.key] = new Date().toISOString();
-  save();
-  let uit = chat.messages.slice(-80);
+  /* Uit de communicatiekern (kern/comm/dm), niet meer uit een eigen voorraad.
+     De vorm die hieronder de deur uitgaat is ongewijzigd -- schermen die er al
+     waren merken niets -- maar er is nog maar EEN plek waar deze berichten
+     staan. */
+  const brug = kern.commDm;
+  if (!brug) return res.status(503).json({ error: 'De communicatiekern is niet beschikbaar.' });
+  brug.markeerGelezen(req.session.key, ander);
+  let uit = brug.berichten(req.session.key, ander, 80);
   const mijnTaal = (db.data.memberTaal || {})[req.session.key];
   if (mijnTaal) {
     const vertaler = require('../../translate');
@@ -90,16 +93,15 @@ app.post('/api/member/dm/send', auth, (req, res) => {
     if (p) postDeel = { id: p.id, author: p.author, place: p.place, text: String(p.text || '').slice(0, 120), photo: p.photo || null };
   }
   if (!text && !postDeel) return res.status(400).json({ error: 'Leeg bericht.' });
-  const k = dmSleutel(req.session.key, ander);
-  const chat = db.data.memberChats[k] = db.data.memberChats[k] || { messages: [], read: {} };
-  // het bericht draagt zijn brontaal mee (de moedertaal van de schrijver),
-  // zodat de leeskant precies weet waarvandaan te vertalen
-  const msg = { from: req.session.key, text, post: postDeel, at: new Date().toISOString(),
-    lang: (db.data.memberTaal || {})[req.session.key] || null };
-  chat.messages.push(msg);
-  if (chat.messages.length > 300) chat.messages = chat.messages.slice(-300);
-  chat.read[req.session.key] = msg.at;
-  save();
+  /* Het bericht draagt zijn brontaal mee (de moedertaal van de schrijver),
+     zodat de leeskant precies weet waarvandaan te vertalen. Bewaren doet de
+     communicatiekern; de controles hierboven -- verbonden, 9+-poort, lengte --
+     blijven hier, want die gaan over vriendschap en veiligheid en niet over
+     berichten. */
+  const brug = kern.commDm;
+  if (!brug) return res.status(503).json({ error: 'De communicatiekern is niet beschikbaar.' });
+  const msg = brug.stuur(req.session.key, ander, { tekst: text, post: postDeel,
+    lang: (db.data.memberTaal || {})[req.session.key] || null });
   const mijnNaam = liveCodename(req.session);
   sseToCustomer(ander, 'social', { kind: 'dm', from: req.session.key, codename: mijnNaam, text: msg.text, post: msg.post, at: msg.at });
   res.json({ ok: true, message: msg });

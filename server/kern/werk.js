@@ -8,7 +8,7 @@
 
 const VAC_SOORTEN = ['bijbaan', 'fulltime', 'parttime', 'stage', 'vrijwilliger', 'vakantiewerk'];
 
-function maakWerk({ db, save, i18n, mail, LANDEN, findSupplier, sseToSupplier, sseToCustomer, notifySupplier, notify }) {
+function maakWerk({ db, save, i18n, mail, LANDEN, findSupplier, sseToSupplier, sseToCustomer, notifySupplier, notify, commWerk }) {
   /* Chatvertaling: iedereen schrijft in de eigen taal, de ontvanger leest het in
      de zijne. Vertalingen worden per bericht gecachet. */
   async function trChat(messages, to) {
@@ -43,16 +43,29 @@ function maakWerk({ db, save, i18n, mail, LANDEN, findSupplier, sseToSupplier, s
     db.data.applyChats[a.id] = chat;
     return chat;
   }
+  /* DE BERICHTEN KOMEN SINDS DE VERHUIZING UIT DE COMMUNICATIEKERN
+     (kern/comm/werk.js), niet meer uit chat.berichten. De VORM blijft dezelfde
+     ({ van, wie, tekst, at }) zodat de schermen van de sollicitant, de
+     werkgever en de RTF-app niets merken -- een verhuizing van de opslag hoort
+     niet zichtbaar te zijn in een scherm.
+
+     commWerk komt binnen als FUNCTIE en niet als verwijzing: deze laag wordt
+     opgebouwd voor de kern bestaat, dus wordt hij op het moment van aanroepen
+     opgehaald (zelfde constructie als convOf in kern/comm/bronnen.js). */
+  const kernBerichten = (chat) => {
+    const w = commWerk && commWerk();
+    return w ? w.berichten(chat.id) : (chat.berichten || []);
+  };
   function applyChatPubliek(chat) {
     return { id: chat.id, func: chat.func, bedrijf: chat.bedrijf, metWie: chat.applicant.naam,
-      berichten: (chat.berichten || []).map(m => ({ van: m.van, wie: m.wie, tekst: m.tekst, at: m.at })) };
+      berichten: kernBerichten(chat).map(m => ({ van: m.van, wie: m.wie, tekst: m.tekst, at: m.at })) };
   }
   /* Als applyChatPubliek, maar elk bericht vertaald naar de taal van de kijker
      (zelfde per-bericht-cache als trChat). Zo chatten werkgever en sollicitant
      ieder in de eigen taal en leest de ander alles in de zijne. */
   async function applyChatVertaald(chat, to) {
     const pub = applyChatPubliek(chat);
-    const bron = chat.berichten || [];
+    const bron = kernBerichten(chat);
     pub.berichten = [];
     for (const m of bron) {
       const from = m.lang || 'nl';
@@ -71,13 +84,13 @@ function maakWerk({ db, save, i18n, mail, LANDEN, findSupplier, sseToSupplier, s
   }
   // stuur een chatbericht; 'van' is 'werkgever' of 'sollicitant'; lang = de
   // taal waarin de schrijver typt (voor de vertaling naar de andere kant)
+  /* Versturen gaat naar de kern; de seintjes en de controles eromheen blijven
+     hier staan, want die gaan over werk en niet over berichten. */
   function chatStuur(chat, van, wie, tekst, lang) {
-    const t = String(tekst || '').trim().slice(0, 1000);
-    if (!t) return null;
-    const bericht = { van, wie: String(wie || '').slice(0, 60), tekst: t, lang: lang || 'nl', at: new Date().toISOString() };
-    chat.berichten.push(bericht);
-    chat.berichten = chat.berichten.slice(-200);
-    save();
+    const w = commWerk && commWerk();
+    if (!w) return null;
+    const bericht = w.stuur(chat.id, van, wie, tekst, lang || 'nl');
+    if (!bericht) return null;
     // live seintje naar de andere kant
     sseToSupplier(chat.supplierCode, 'sync', { scope: 'team' });
     if (chat.applicant.kind === 'rtg' && chat.applicant.key) sseToCustomer(chat.applicant.key, 'sync', { scope: 'apply' });

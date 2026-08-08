@@ -77,10 +77,28 @@
     for (var i = 0; i < weg.length; i++) weg[i].remove();
   }
 
+  /* .ey STOND HIER, EN DAT WAS EEN VERGISSING. De regel is "geen woordmerk in
+     de chrome van een app", en .ey/.eyebrow/.kicker zijn geen woordmerk maar
+     een typografisch middel: de bovenregel boven een titel. Zevenentachtig
+     app-pagina's gebruiken hem, en vijfenvijftig verschillende teksten lang is
+     er geen woordmerk bij -- wel dingen als "Alleen voor leden",
+     "Belastingdienst · inspecteur" en "Gemeente-medewerker". Precies de zin die
+     zegt wat een scherm is en voor wie.
+
+     Die verdwenen dus van elke pagina waar ze in de kopbalk stonden. Geen
+     foutmelding, geen kapotte pagina, alleen een zin minder. Drie schermtoetsen
+     zakten erop ("zegt niet waar het voor is", "noemt niet voor welke rol dit
+     loket is") en dat was de enige plek waar het opviel.
+
+     Dat het een vergissing was, staat er zelf al bij: MERK_PAGINA hieronder --
+     dezelfde vraag, buiten de balk -- noemt .ey niet. Buiten de kopbalk was een
+     bovenregel altijd al gewoon tekst.
+
+     Hij reist nu mee naar boven de grote titel (zie bovenregelVan in ios-02),
+     dus de balk blijft even kaal als hij was. */
   var MERK_CHROME = [
     '.os-merk', '.os-merk-logo', '.brand', '.merk', '.logo', '.logo-img',
     '.os-chip', '.osbar', '.os-kick',
-    '.ey', '.eyebrow', '.kicker',
     'img[src*="/icon"]', 'img[src*="logo"]', 'img[alt="RTG"]'
   ].join(',');
 
@@ -208,6 +226,9 @@
 
     var acties = bedienbaar(kop);
     var titel = kopTitel(kop);
+    /* NU verzamelen, niet straks: de herbouw hieronder haalt de kop uit elkaar
+       en dan is niet meer te zien wat er bij de titel hoorde. */
+    if (titel) titel.bij = bijregelsVan(kop, titel);
     var oudeTerug = zoekTerug(kop);
 
     /* De balk die niets doet: geen terugweg, geen bediening, en niets wat de
@@ -304,13 +325,74 @@
     return svg;
   }
 
+  /* Afgesplitst van ios-02.js, dat over de 10 KB ging toen de bijregels van de
+     kop meeverhuisden. De snede loopt langs de grens tussen de BALK (wat er
+     bovenin komt te staan) en de GROTE TITEL eronder, met de regels die erbij
+     horen. */
+
+  /* DE BIJREGELS VAN DE KOP: de zinnen die naast de titel in de kopbalk staan.
+
+     Een kop draagt in dit huis vaak meer dan een titel. Boven de titel een
+     bovenregel (.ey: "Alleen voor leden", "Belastingdienst · inspecteur"),
+     ernaast een ondertitel (.stil "dating op codenaam", .badge "Alles in één ·
+     live gps"). Dat is de zin die zegt WAT een scherm is en VOOR WIE.
+
+     De herbouw hieronder gooide uit de kopbalk alles weg wat geen id droeg. Dat
+     was bedoeld voor lege wikkels en opmaak, en trof deze zinnen. Vier
+     schermtoetsen zakten erop -- "zegt niet waar het voor is", "de eigen
+     belofte staat er niet", "noemt niet voor welke rol dit loket is" -- en dat
+     was de enige plek waar het opviel: verder was er geen foutmelding, geen
+     kapotte pagina, alleen een zin minder op tweeëntachtig schermen.
+
+     Ze verhuizen dus mee naar de grote titel, waar ze ook hoorden: de
+     bovenregel erboven, de rest eronder.
+
+     WAT ER NIET IN MEEKOMT, en waarom er zoveel voorwaarden staan:
+     - iets met een id (dat blijft sowieso staan, zie draagtId);
+     - iets met een knop, link of veld erin (dat is bediening en gaat naar de
+       actiebalk, niet naar de titel);
+     - een wikkel om andere elementen -- alleen de kale tekstdrager zelf, anders
+       verhuist een ouder EN zijn kind allebei;
+     - de titel zelf, en alles wat hem bevat. */
+  function bijregelsVan(kop, titel) {
+    var uit = [], alle = kop.querySelectorAll('*');
+    for (var i = 0; i < alle.length; i++) {
+      var n = alle[i];
+      if (titel && (n === titel.element || n.contains(titel.element))) continue;
+      if (n.id || n.querySelector('[id]')) continue;
+      if (n.children.length) continue;
+      if (n.closest('a, button, input, select, textarea, label')) continue;
+      if (!(n.textContent || '').trim()) continue;
+      uit.push(n);
+    }
+    return uit;
+  }
+  function isBoven(n) {
+    return n.classList && (n.classList.contains('ey') ||
+      n.classList.contains('eyebrow') || n.classList.contains('kicker'));
+  }
+
   /* De grote titel: staat boven de inhoud en zakt bij het scrollen terug in
      de balk. Zonder balk blijft hij gewoon staan.
 
      Het kop-element wordt VERPLAATST, niet nagemaakt: houdt hij een id vast
      (en dat komt voor -- #kop, #titel), dan blijft die werken. Draagt de
      inhoud zijn eigen <h1> al, dan is een tweede er een te veel; dan laten we
-     de kop-titel gewoon vervallen. */
+     de kop-titel gewoon vervallen.
+
+     EN DE REGEL ERBOVEN GAAT MEE. Boven de titel staat in dit huis vaak een
+     bovenregel (.ey): "Alleen voor leden", "Overheids-PDA", de naam van de
+     zaak. Zevenentachtig app-pagina's hebben er een. Die stond als broer van de
+     <h1> in een kale wikkel, en de opruiming hieronder gooit uit de kopbalk
+     alles weg wat geen id draagt -- dus verdween hij, samen met de wikkel.
+
+     Dat was bedoeld voor LEGE wikkels ("anders houdt een lege wikkel de balk
+     hoog") en trof hier tekst. Een regel die iets zegt is geen opmaak: op
+     mall.html verdween daarmee "Alleen voor leden", en dat is nu net de zin
+     die vertelt wat die winkel is. Geen foutmelding, geen kapotte pagina --
+     alleen een zin minder, en dat merk je pas als je hem zoekt.
+
+     Hij reist dus mee naar boven de grote titel, waar hij ook stond. */
   function grooteTitel(titel, nav) {
     var main = d.querySelector('main') || d.getElementById('main');
     if (!main || main.querySelector('.ios-groot, h1')) {
@@ -321,6 +403,11 @@
     var h = titel.element;
     h.classList.add('ios-groot');
     main.insertBefore(h, main.firstChild);
+    var bij = titel.bij || [];
+    for (var i = 0; i < bij.length; i++) {
+      if (isBoven(bij[i])) { bij[i].classList.add('ios-boven'); main.insertBefore(bij[i], h); }
+      else { bij[i].classList.add('ios-onder'); main.insertBefore(bij[i], h.nextSibling); }
+    }
     if (!nav) return;
 
     nav.setAttribute('data-groot', '');
@@ -469,4 +556,21 @@
   if (!isThuis && !inPaneel) { homeIndicator(); randveeg(); }
 
   w.RTGiOS = { blad: blad, thuis: naarThuis, THUIS: THUIS };
+
+  /* 6. HET MENU. De hamburger rechtsboven, met de functies van deze app en de
+     vaste weg naar huis en naar de instellingen (shared/appmenu.js). Hij hangt
+     hier om dezelfde reden als al het andere in dit bestand: dit is de laag die
+     al op elke app-pagina staat en die de navigatiebalk net heeft gebouwd, dus
+     dit is de plek waar de knop erbij kan zonder elke pagina te openen.
+
+     Na de balk, want het menu zoekt zijn plek in .ios-nav-acties. In een
+     split-paneel niet: daar hoort één menu bij het scherm eromheen, net als de
+     home-indicator hierboven. */
+  if (!inPaneel && !d.getElementById('rtgAppMenuJs')) {
+    var menuS = d.createElement('script');
+    menuS.id = 'rtgAppMenuJs';
+    menuS.src = '/shared/appmenu.js';
+    menuS.defer = true;
+    (d.head || d.documentElement).appendChild(menuS);
+  }
 })(window, document);

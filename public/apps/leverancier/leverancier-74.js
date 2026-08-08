@@ -59,94 +59,45 @@
     }));
   }
 
-  // ---- gastchat: berichten van gasten beantwoorden ----
-  let gchatKey = null; // open gesprek
-  function renderGChat(){
-    const el = $('#gchatWrap'); if (!el) return;
-    const chats = state.guestChats || [];
-    if (gchatKey && !chats.find(c => c.key === gchatKey)) gchatKey = null;
-    if (!gchatKey){
-      el.innerHTML = '<div class="card">' + (chats.length ? chats.map(c =>
-        '<button class="gc-row" data-gchat="' + c.key + '">' +
-          '<span class="av">' + c.codename.split(' ').map(w=>w[0]).slice(0,2).join('') + '</span>' +
-          '<span class="gt"><b>' + c.codename + ' <em class="gc-dept">' + c.dept + '</em>' + (c.unread ? ' <i class="gc-unread">' + c.unread + '</i>' : '') + '</b>' +
-          '<span>' + (c.lastFrom === 'partner' ? T('gc.you','U: ') : '') + c.last + ' · ' + timeAgo(c.lastAt) + '</span></span>' +
-        '</button>'
-      ).join('') : '<div class="softline">' + T('gc.none','Nog geen gesprekken. Berichten van gasten verschijnen hier live.') + '</div>') + '</div>';
-      el.querySelectorAll('[data-gchat]').forEach(b => b.addEventListener('click', () => { gchatKey = b.dataset.gchat; klantSalonOpen = false; renderGChat(); openTab('gchat'); }));
-      return;
-    }
-    const meta = chats.find(c => c.key === gchatKey);
-    el.innerHTML = '<button class="sp-back" id="gcBack">← ' + T('gc.back','Alle gesprekken') + '</button>' +
-      '<div class="card"><div class="tt-h">' + T('sup.guest','Gast') + ' <span style="color:var(--gold);">' + (meta ? meta.codename : '') + '</span>' + (meta && meta.dept ? ' · ' + meta.dept : '') +
-        ' <button class="gc-salon-btn" id="gcSalonBtn">' + T('gc.salon','Bekijk Salon') + '</button></div>' +
-      '<div id="gcSalon"></div>' +
-      '<div class="tt-chat" id="gcThread"></div>' +
-      '<div class="tt-compose"><input id="gcMsg" placeholder="' + T('gc.ph','Antwoord de gast') + '" autocomplete="off"><button id="gcSend">' + T('team.send','Stuur') + '</button></div></div>';
-    $('#gcBack').addEventListener('click', () => { gchatKey = null; renderGChat(); openTab('gchat'); });
-    $('#gcSalonBtn').addEventListener('click', toggleKlantSalon);
-    $('#gcSend').addEventListener('click', sendGChat);
-    $('#gcMsg').addEventListener('keydown', e => { if (e.key === 'Enter') sendGChat(); });
-    loadGChatThread();
-  }
-  // De partner bekijkt vooraf de Salon van het lid: geen vreemden van elkaar.
-  // Privacy-first: alleen de codenaam, de pas en de eigen posts van het lid.
-  let klantSalonOpen = false;
-  async function toggleKlantSalon(){
-    const box = $('#gcSalon'); if (!box || !gchatKey) return;
-    klantSalonOpen = !klantSalonOpen;
-    if (!klantSalonOpen){ box.innerHTML = ''; return; }
-    box.innerHTML = '<div class="softline">' + T('gc.salonLaad','Salon laden…') + '</div>';
-    try {
-      const d = await API.call('/supplier/klant/salon', { key: gchatKey });
-      const posts = (d.posts || []).map(p =>
-        '<div class="ks-post">' + (p.photo ? '<img src="' + p.photo + '" alt="' + T('gc.salonFoto','Salon-foto van het lid') + '">' : '') +
-          '<div>' + (p.place ? '<em>' + esc(p.place) + '</em> ' : '') + esc(p.text) + '</div></div>'
-      ).join('');
-      box.innerHTML = '<div class="ks-card"><div class="ks-h">' +
-          '<span class="av">' + (d.codename||'?').split(' ').map(w=>w[0]).slice(0,2).join('') + '</span>' +
-          '<b>' + esc(d.codename || '') + '</b> <span class="ks-pas">' + esc(d.tier || '') + '</span></div>' +
-        (posts || '<div class="softline">' + T('gc.salonLeeg','Dit lid heeft nog geen Salon-posts.') + '</div>') + '</div>';
-    } catch(e){ box.innerHTML = '<div class="softline">' + T('gc.salonFout','Salon nu niet te laden.') + '</div>'; }
-  }
-  async function loadGChatThread(){
-    if (!gchatKey) return;
-    try {
-      const d = await API.call('/supplier/chat/history', { key: gchatKey });
-      fillGChatThread(d.messages);
-    } catch(e){}
-  }
-  function fillGChatThread(msgs){
-    const t = $('#gcThread'); if (!t) return;
-    t.innerHTML = (msgs || []).map(m =>
-      '<div class="tt-msg ' + (m.from === 'partner' ? 'me' : (m.from === 'systeem' ? 'sys' : 'other')) + '"><span class="who">' + (m.who || (m.from === 'systeem' ? 'RTG' : '')) + '</span>' +
-      m.text.replace(/&/g,'&amp;').replace(/</g,'&lt;') +
-      (m.orig ? '<span style="display:block;margin-top:0.25rem;font-size:0.68rem;color:var(--soft);font-style:italic;">' + m.orig.replace(/&/g,'&amp;').replace(/</g,'&lt;') + '</span>' : '') +
-      '<time>' + timeAgo(m.at) + '</time></div>'
-    ).join('');
-    t.scrollTop = t.scrollHeight;
-  }
-  async function sendGChat(){
-    const inp = $('#gcMsg');
-    const text = (inp.value || '').trim();
-    if (!text || !gchatKey) return;
-    inp.value = '';
-    try { fillGChatThread((await API.call('/supplier/chat/send', { key: gchatKey, text })).messages); }
-    catch(e){ toast(e.message); }
-  }
+  /* ---- BERICHTEN: EEN LIJST, DRIE SOORTEN DRAAD ----
 
-  // ---- pagina: foto's + publiceren op De Salon ----
-  function fileToDataURL(file, cb){
-    const reader = new FileReader();
-    reader.onload = () => cb(String(reader.result));
-    reader.readAsDataURL(file);
+     Hier stonden drie plekken waar iets kon liggen: de gastchat, de
+     sollicitaties (in het team-tabblad) en de collega's (in een paneel). Voor
+     wie er werkt is dat drie keer kijken of er iets is, terwijl het onderhuids
+     allemaal gesprekken uit dezelfde kern zijn. De LIJST is daarom een: hij
+     komt van /api/supplier/comm/inbox, en die zegt per gesprek zelf welke deur
+     erbij hoort (het veld `open`).
+
+     De DRADEN blijven wel apart, en dat is geen halfheid maar een keuze. De
+     gastchat kan de Salon van de klant tonen en vertaalt per kijker; de
+     sollicitatiechat hangt aan de werk-module met haar eigen controles; de
+     collega-DM is een paneel dat in elke werk-app zit. Die drie samenvoegen
+     zou functies kosten in ruil voor uniformiteit -- en de winst zat in het
+     ZOEKEN, niet in het typen.
+
+     Valt de ene lijst weg (oude server, netwerk), dan staan de gastgesprekken
+     er nog gewoon uit state.guestChats. Een nieuw scherm hoort niet minder te
+     tonen dan het oude als er iets hapert. */
+  let gchatKey = null; // open gesprek
+  let inboxRijen = null; // de ene lijst; null = nog niet opgehaald
+  async function laadInbox(){
+    try {
+      const d = await API.call('/supplier/comm/inbox', {});
+      inboxRijen = (d.gesprekken || []).filter(g => g.open);
+    } catch (e) { inboxRijen = null; }
+    renderGChat();
   }
-  let salonStatus = null;
-  async function laadSalonStatus(){
-    if (!API.live) return;
-    try { salonStatus = await API.call('/supplier/salon/status', {}); } catch(e){ salonStatus = null; }
-    renderPage();
+  /* De terugval: de gastgesprekken zoals ze er altijd stonden. Zo is deze
+     verbouwing omkeerbaar en kost een hapering niets. */
+  const alsRij = c => ({ titel: c.codename, bij: c.dept, laatste: c.last, at: c.lastAt,
+    ongelezen: c.unread, vanMij: c.lastFrom === 'partner', open: { soort: 'gast', sleutel: c.key } });
+  function berichtRijen(){
+    if (inboxRijen && inboxRijen.length) {
+      return inboxRijen.map(g => ({ titel: g.titel, bij: (g.open.dept || SOORTNAAM(g.open.soort)),
+        laatste: g.laatste, at: g.at, ongelezen: g.ongelezen, vanMij: g.laatsteVanMij, open: g.open }));
+    }
+    return (state.guestChats || []).map(alsRij);
   }
-  function renderPage(){
-    const el = $('#pageWrap'); if (!el) return;
-    const photos = state.photos || [];
+  const SOORTNAAM = s => s === 'werk' ? T('gc.s.werk','Sollicitatie')
+    : s === 'collega' ? T('gc.s.collega','Collega') : T('gc.s.gast','Gast');
+

@@ -45,7 +45,7 @@ const MODI = {
 };
 const WERELD_MAX = 60;      // de wereld is eindig, en zegt waar hij ophoudt
 
-function maakMediaOS({ db, save, schoon, codenaamVan, keyVanCodenaam, notify, bronnen }) {
+function maakMediaOS({ db, save, schoon, crypto, codenaamVan, keyVanCodenaam, notify, bronnen }) {
   const catalogus = maakCatalogus({ bronnen });
   const smaak = maakSmaak({ db, save, schoon });
   const hub = maakHub({ catalogus, bronnen, keyVanCodenaam, codenaamVan });
@@ -56,6 +56,11 @@ function maakMediaOS({ db, save, schoon, codenaamVan, keyVanCodenaam, notify, br
      bestand is het enige dat schrijft in eigen tafels. */
   const eigen = require('./eigen')({ db, save, schoon, catalogus });
   const { biebVan, bewaar, bieb, meldZet, meldVan, MELD_SOORTEN } = eigen;
+  /* En het derde eigen ding: AFSPEELLIJSTEN over de vier vormen (./lijsten.js).
+     Zelfde regel als de bibliotheek -- alleen id's, opgelost met de sessie van
+     de lezer, dus wat weg of dicht is, staat er als verdwenen en niet als een
+     kaart die niemand kan spelen. */
+  const lijsten = require('./lijsten')({ db, save, schoon, crypto, catalogus });
   /* En de andere kant van die voorkeur: nieuw werk wekt de volgers die dit
      soort van deze maker aan hebben staan (./wekken.js). De vier domeinen
      roepen dat aan via een laat gebonden haak in ./opzet/kernlaag*.js. */
@@ -146,7 +151,7 @@ function maakMediaOS({ db, save, schoon, codenaamVan, keyVanCodenaam, notify, br
     };
   }
 
-  return {
+  return Object.assign({}, lijsten, {
     mediaWereld: wereld, mediaVolg: volg,
     mediaBieb: bieb, mediaBewaar: bewaar,
     mediaMeldZet: meldZet, mediaMeldVan: meldVan,
@@ -155,7 +160,7 @@ function maakMediaOS({ db, save, schoon, codenaamVan, keyVanCodenaam, notify, br
     mediaStuk: hub.mediaStuk, mediaMaker: hub.mediaMaker, mediaBord: hub.mediaBord,
     mediaNieuwWerk: wekken.mediaNieuwWerk, mediaVolgersVan: wekken.mediaVolgersVan,
     MEDIA_MODI: MODI, MEDIA_MELD_SOORTEN: MELD_SOORTEN
-  };
+  });
 }
 
 module.exports = { maakMediaOS, MODI };

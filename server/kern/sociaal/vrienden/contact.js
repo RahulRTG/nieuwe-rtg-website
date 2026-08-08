@@ -25,7 +25,7 @@ function socialConnecties(mij) {
     const laatst = chat && chat.messages.length ? chat.messages[chat.messages.length - 1] : null;
     const gelezen = chat && chat.read && chat.read[mij] ? chat.read[mij] : '';
     const unread = chat ? chat.messages.filter(m => m.from !== mij && m.at > gelezen).length : 0;
-    return { key: ander, codename: codenaamVan(ander), tier: soortVan(ander), unread, last: laatst ? (laatst.post ? '↗ post' : String(laatst.text || '').slice(0, 48)) : null, lastAt: laatst ? laatst.at : c.acceptedAt };
+    return { key: ander, codename: codenaamVan(ander), tier: soortVan(ander), unread, last: laatst ? (laatst.post ? '↗ post' : laatst.stuk ? '↗ stuk' : String(laatst.text || '').slice(0, 48)) : null, lastAt: laatst ? laatst.at : c.acceptedAt };
   }).sort((x, y) => String(y.lastAt).localeCompare(String(x.lastAt)));
   const requests = db.data.connections.filter(c => (c.a === mij || c.b === mij) && c.status === 'pending' && c.requestedBy !== mij && !isBeschermdHandle(mij)).map(c => ({ key: c.requestedBy, codename: codenaamVan(c.requestedBy), at: c.at }));
   return { connections: conns, requests };

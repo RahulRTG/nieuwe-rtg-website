@@ -13,6 +13,11 @@
    Aangeroepen vanuit ./kernlaag7.js, als laatste, want alle vier de domeinen
    moeten er al zijn. */
 'use strict';
+/* crypto komt hier uit node zelf en niet uit de hulp-bag van kernlaag7: die
+   bag doorgeven duwde dat bestand over de omvangregel voor drie tekens, en een
+   bestand opknippen om een parameter door te geven is de verkeerde reparatie.
+   De lijsten-module (kern/mediaos/lijsten.js) gebruikt hem voor de id's. */
+const crypto = require('crypto');
 
 module.exports = (kern, notify) => {
   /* `notify` komt uit de hulp-bag van kernlaag7 en niet uit de kern: de
@@ -21,7 +26,7 @@ module.exports = (kern, notify) => {
      het Podium dat doen -- inclusief de scope-schakelaar van het lid. */
   const { db, save, schoon, keyVanCodenaam } = kern;
   Object.assign(kern, require('../kern/mediaos').maakMediaOS({
-    db, save, schoon, codenaamVan: kern.codenaamVan, keyVanCodenaam, notify,
+    db, save, schoon, crypto, codenaamVan: kern.codenaamVan, keyVanCodenaam, notify,
     bronnen: {
       // de vier wereldbeelden, elk zoals het domein hem zelf al toont
       tracks: (sess) => kern.muziekZaal(sess, {}),

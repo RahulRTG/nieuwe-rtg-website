@@ -8,7 +8,8 @@
    en bij moderatie is dat de gevaarlijkste soort. */
 module.exports = (kern) => {
   const { app, auth, mediaWereld, mediaStuk, mediaMaker, mediaVolg, mediaMeldZet,
-    mediaBieb, mediaBewaar, mediaSmaakVan, mediaSmaakStuur, mediaBord } = kern;
+    mediaBieb, mediaBewaar, mediaSmaakVan, mediaSmaakStuur, mediaBord,
+    mediaLijsten, mediaLijst, mediaLijstMaak, mediaLijstZet, mediaLijstStuk } = kern;
   if (!mediaWereld) return;
   const stuur = (res, r) => r && r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const geenGast = (req, res) => {
@@ -55,6 +56,31 @@ module.exports = (kern) => {
   app.post('/api/mediaos/bewaar', auth, (req, res) => {
     if (geenGast(req, res)) return;
     stuur(res, mediaBewaar(sess(req), req.body || {}));
+  });
+
+  /* Afspeellijsten over de vier vormen heen. Een lijst bewaart alleen id's en
+     wordt opgelost met de sessie van de LEZER -- er is dus geen weg om via een
+     lijst iets binnen te halen wat de wereld u weigert. Een lijst is van u
+     alleen; delen bestaat hier niet (TAKEN.md). */
+  app.post('/api/mediaos/lijsten', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, mediaLijsten(sess(req)));
+  });
+  app.post('/api/mediaos/lijst', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, mediaLijst(sess(req), String((req.body || {}).id || '')));
+  });
+  app.post('/api/mediaos/lijst/maak', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, mediaLijstMaak(sess(req), req.body || {}));
+  });
+  app.post('/api/mediaos/lijst/zet', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, mediaLijstZet(sess(req), req.body || {}));
+  });
+  app.post('/api/mediaos/lijst/stuk', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, mediaLijstStuk(sess(req), req.body || {}));
   });
 
   /* De regelaars van het eigen profiel: meer, minder, nooit, verras me, wissen.

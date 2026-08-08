@@ -75,8 +75,20 @@ app.post('/api/member/dm', auth, async (req, res) => {
     codename: codenaamVan(ander), taal: mijnTaal || null });
 });
 
-// bericht sturen; optioneel met een gedeelde Salon-post erbij
-app.post('/api/member/dm/send', auth, (req, res) => {
+/* bericht sturen; optioneel met een gedeelde Salon-post of een stuk uit de
+   Media OS erbij.
+
+   HET STUK GAAT MEE ALS ID EN NIET ALS KOPIE, en dat is hier meer dan
+   zuinigheid. De ontvanger lost het op met ZIJN EIGEN sessie (/api/mediaos/
+   stuk), dus zijn eigen deuren gelden: wat achter de 18+-deur staat of door de
+   maker is weggehaald, is via een gesprek niet alsnog binnen te halen. Een
+   bevroren kopie in het bericht zou precies dat wel doen -- en zou bovendien
+   blijven staan nadat de maker hem had weggehaald.
+
+   Aan de verzendkant staat dezelfde controle: je deelt alleen wat je zelf op
+   dit moment kunt zien. Anders is een gesprek een manier om te toetsen welke
+   id's bestaan. */
+app.post('/api/member/dm/send', auth, async (req, res) => {
   if (geenGast(req, res)) return;
   const ander = String(req.body.toKey || '');
   const c = connectieTussen(req.session.key, ander);
@@ -89,19 +101,31 @@ app.post('/api/member/dm/send', auth, (req, res) => {
     const p = db.data.posts.find(x => x.id === Number(req.body.postId));
     if (p) postDeel = { id: p.id, author: p.author, place: p.place, text: String(p.text || '').slice(0, 120), photo: p.photo || null };
   }
-  if (!text && !postDeel) return res.status(400).json({ error: 'Leeg bericht.' });
+  let stukDeel = null;
+  if (req.body.stukId != null) {
+    if (!kern.mediaStuk) return res.status(409).json({ error: 'De Media OS draait hier niet.' });
+    const sid = String(req.body.stukId || '');
+    const bij = await kern.mediaStuk(req.session, sid);
+    if (!bij || bij.error) return res.status(bij && bij.status === 404 ? 404 : 403).json({ error: (bij && bij.error) || 'Dit stuk kunt u niet delen.' });
+    /* Alleen het id, plus de vorm zodat het gesprek een leesbare regel heeft
+       ook als de ontvanger er niet bij kan. Titel en maker komen bij het
+       OPENEN uit de Media OS -- dan klopt het ook nog als de maker de naam
+       verandert of het stuk weghaalt. */
+    stukDeel = { id: sid, vorm: (bij.stuk || {}).vorm || null };
+  }
+  if (!text && !postDeel && !stukDeel) return res.status(400).json({ error: 'Leeg bericht.' });
   const k = dmSleutel(req.session.key, ander);
   const chat = db.data.memberChats[k] = db.data.memberChats[k] || { messages: [], read: {} };
   // het bericht draagt zijn brontaal mee (de moedertaal van de schrijver),
   // zodat de leeskant precies weet waarvandaan te vertalen
-  const msg = { from: req.session.key, text, post: postDeel, at: new Date().toISOString(),
+  const msg = { from: req.session.key, text, post: postDeel, stuk: stukDeel, at: new Date().toISOString(),
     lang: (db.data.memberTaal || {})[req.session.key] || null };
   chat.messages.push(msg);
   if (chat.messages.length > 300) chat.messages = chat.messages.slice(-300);
   chat.read[req.session.key] = msg.at;
   save();
   const mijnNaam = liveCodename(req.session);
-  sseToCustomer(ander, 'social', { kind: 'dm', from: req.session.key, codename: mijnNaam, text: msg.text, post: msg.post, at: msg.at });
+  sseToCustomer(ander, 'social', { kind: 'dm', from: req.session.key, codename: mijnNaam, text: msg.text, post: msg.post, stuk: msg.stuk, at: msg.at });
   res.json({ ok: true, message: msg });
 });
 

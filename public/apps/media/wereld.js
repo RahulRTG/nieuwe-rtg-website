@@ -186,7 +186,12 @@
   /* Wat blad.js (de lade met de hub, de maker en het bord) nodig heeft. Eén
      api-ingang en één speler voor het hele scherm; geen tweede exemplaar. */
   window.RTGMediaOS = { api: api, zeg: zeg, el: el, knop: knop, speel: S.speel, haal: haal,
-    kaart: kaart, stand: function () { return stand; } };
+    kaart: kaart, stand: function () { return stand; },
+    /* De lijsten- en deellaag (./lijst.js) praat ook met de GEWONE
+       gesprekken-endpoints, want er is maar een berichtenweg in dit huis.
+       Daarvoor heeft hij hetzelfde token nodig; een tweede uitlezing van
+       localStorage zou een tweede plek zijn die kan gaan afwijken. */
+    token: function () { return TOKEN; } };
 
   haal();
   /* Een stuk-id in de hash opent meteen de hub: zo kan een link naar één stuk

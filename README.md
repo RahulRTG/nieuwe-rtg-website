@@ -1066,6 +1066,13 @@ Het ontwerpbesluit dat alles draagt: **de Media OS bezit die vier domeinen niet.
 | `POST /api/mediaos/bieb` · `/bewaar` `{id, aan}` | De bibliotheek over de vier vormen heen |
 | `POST /api/mediaos/smaak` · `/stuur` `{richting, maker\|onderwerp}` | Het smaakprofiel lezen en bijsturen |
 | `POST /api/mediaos/bord` | Het makersbord, inclusief wat er niet geteld wordt |
+| `POST /api/mediaos/lijsten` · `/lijst` `{id}` | Uw afspeellijsten, en er een openen (opgelost met uw eigen sessie) |
+| `POST /api/mediaos/lijst/maak` · `/zet` · `/stuk` | Een lijst maken of hernoemen, en er stukken in, uit en op volgorde zetten |
+| `POST /api/member/dm/send` `{toKey, stukId}` | Een stuk delen in een gesprek -- de gewone berichtenweg, met alleen een verwijzing erin |
+
+**Afspeellijsten over de vier vormen.** Een lijst mag muziek, video, korte video en live door elkaar dragen -- dat is het hele punt, want "de rit naar Ibiza" bestond in geen van de vier apps. Net als de bibliotheek bewaart een lijst **alleen id's**: wat een stuk is, blijft van zijn domein. Haalt de maker iets weg, dan speelt het niet meer mee maar staat het er als verdwenen, met uitleg en een knop om het eruit te halen -- geen kaart die niemand kan spelen. Een lijst is van u alleen; hem openen of aanvullen lukt een ander niet, ook niet met het id (`test/medialijsten.test.js`). Lijsten delen, samen aan een lijst werken en publieke lijsten van een maker bestaan hier **niet**, en staan als open punt in `TAKEN.md`.
+
+**Een stuk delen in een gesprek.** Een bericht tussen twee leden kon al een Salon-post meedragen; nu ook een stuk uit de Media OS. Er gaat **alleen een id** mee, geen kopie -- en dat is meer dan zuinigheid: de ontvanger lost het stuk op met zijn *eigen* sessie, dus zijn eigen deuren gelden. Wat de maker weghaalt of wat achter een gesloten deur staat, is via een gesprek niet alsnog te zien; het bericht blijft wel staan, want een gesprek is geschiedenis. Aan de verzendkant staat dezelfde controle: u deelt alleen wat u op dat moment zelf ziet, zodat een gesprek geen manier wordt om te toetsen welke id's bestaan (`test/mediadelen.test.js`).
 
 Wat er nog niet speelt in de Media OS zelf: een **livestream** van het Podium. Dat is een andere stroom (een relay-boom over kijkers, met een betaalde toegangsdeur ervoor) en geen kopie van het clip-protocol; de kaart verwijst daarvoor naar het Podium en zegt waarom. Staat als 4.12 in `TAKEN.md`.
 

@@ -117,6 +117,23 @@ test('de leiding begint een interne bibliotheek, en wie nergens werkt ziet hem n
     await page.waitForFunction(() => /eigen verklaring/.test(document.querySelector('#melding').textContent),
       null, { timeout: 10000 });
 
+    /* En de huisstijl: de leiding zet er zijn eigen naam en kleur op, en dan
+       staat die boven de interne wereld -- niet boven de app. */
+    await page.locator('#zaakBeheer input#mNaam2').fill('Sal de Mar intern');
+    await page.locator('#zaakBeheer input#mAccent').fill('#1b7f5a');
+    await page.locator('#zaakBeheer .knop', { hasText: 'Bewaar de huisstijl' }).click();
+    await page.waitForFunction(() => /Sal de Mar intern/.test(document.querySelector('#zaakKop').textContent),
+      null, { timeout: 10000 });
+    const rand = await page.$eval('#blokZaak', e => e.style.borderLeft);
+    assert.match(rand, /1b7f5a|27, 127, 90/i, 'de eigen kleur staat op het eigen blok: ' + rand);
+    /* En NIET op de rest van het scherm. De balk van RTG blijft van RTG -- dat
+       is geen detail: een tenant die de hele app kan omverven, kan een lid
+       laten denken dat hij ergens anders is. */
+    const kop = await page.$eval('header.kop', e => getComputedStyle(e).backgroundColor + '|' + e.style.cssText);
+    assert.equal(/1b7f5a|27, 127, 90/i.test(kop), false, 'de RTG-balk is niet meegeverfd: ' + kop);
+    assert.match(await page.$eval('#zaakBeheer', e => e.textContent), /eigen domein bestaat hier niet/,
+      'en het scherm zegt zelf waar de huisstijl ophoudt');
+
     // en wie nergens werkt, ziet het hele blok niet
     const kaal = await maakPagina(buiten.body.token);
     const fouten2 = letOpFouten(kaal, []);

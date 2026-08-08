@@ -43,6 +43,8 @@ module.exports = (ctx) => {
     return { id: k.id, naam: k.naam, genre: k.genre, bio: k.bio, status: k.status,
       zaakCode: k.zaakCode, zaakNaam: (zaak && zaak.naam) || k.zaakCode,
       leiding: !!(zaak && zaak.leiding),
+      // de eigen naam en kleur van deze organisatie (./huisstijl.js)
+      huisstijl: ctx.merk ? ctx.merk.huisstijlVan(k, zaak && zaak.naam) : null,
       videos: db.data.theaterVideos.filter(v => v.kanaalId === k.id).map(videoBeeld) };
   }
 

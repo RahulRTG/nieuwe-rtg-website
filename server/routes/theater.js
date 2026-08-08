@@ -10,7 +10,8 @@ module.exports = (kern) => {
     theaterVideoUpload, theaterVerwijder, theaterStreamVan, theaterZaal,
     theaterAbonneer, theaterReactie, theaterReacties, theaterMeld,
     theaterThuisAanwezig, theaterSignaal, theaterZaakMaak, theaterZaakZaal,
-    theaterKijkplichtZet, theaterKijkplichtGedaan, theaterKijkplichtMijn, theaterKijkplichtStand } = kern;
+    theaterKijkplichtZet, theaterKijkplichtGedaan, theaterKijkplichtMijn, theaterKijkplichtStand,
+    theaterHuisstijl } = kern;
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const geenGast = (req, res) => {
     if (req.session.tier === 'guest') { res.status(403).json({ error: 'Het Theater is voor leden.' }); return true; }
@@ -109,6 +110,14 @@ module.exports = (kern) => {
   app.post('/api/theater/zaak/aanmeld', auth, (req, res) => {
     if (geenGast(req, res)) return;
     stuur(res, theaterZaakMaak(req.session.key, req.body || {}));
+  });
+
+  /* De huisstijl van de interne wereld: naam, payoff, kleur, thema en logo van
+     de organisatie. Binnen HAAR eigen blok -- de rest van de app blijft van
+     RTG, en een eigen domein bestaat hier niet (kern/theater/huisstijl.js). */
+  app.post('/api/theater/huisstijl', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, theaterHuisstijl(req.session.key, req.body || {}));
   });
 
   /* Wat uw werk u vraagt te bekijken. De medewerker tekent ZELF af; er wordt

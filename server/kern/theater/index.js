@@ -67,18 +67,10 @@ function maakTheater({ db, save, crypto, schoon, codenaamVan, notify, sseToOffic
     sseToOffice('sync', { scope: 'theater' });
     return { status: 200, ok: true, kanaal: eigenBeeld(k) };
   }
-  function officeLijst() {
-    lijsten();
-    return { wacht: db.data.theaterKanalen.filter(k => k.status === 'wacht').map(k => ({ id: k.id, naam: k.naam, genre: k.genre, bio: k.bio, codenaam: codenaamVan(k.key), at: k.at })),
-      meldingen: db.data.theaterMeldingen.slice(-50).reverse() };
-  }
-  function officeBeslis(kid, besluit) {
-    const k = kanaalMet(kid); if (!k) return { status: 404, error: 'Kanaal niet gevonden.' };
-    if (!['goedgekeurd', 'geweigerd'].includes(besluit)) return { status: 400, error: 'Besluit is goedgekeurd of geweigerd.' };
-    k.status = besluit; save();
-    notify(k.key, { title: 'RTG Theater', body: besluit === 'goedgekeurd' ? 'Uw kanaal "' + k.naam + '" is goedgekeurd.' : 'Uw kanaal "' + k.naam + '" is niet goedgekeurd.', scope: 'theater' });
-    return { status: 200, ok: true };
-  }
+  /* De kantoorkant (de wachtrij en het besluit) staat in ./kantoor.js: dat is
+     wat een MENS VAN RTG doet, en dat is een ander onderwerp dan wat een lid of
+     een zaak met een kanaal doet. */
+  const kantoor = require('./kantoor')({ db, lijsten, kanaalMet, codenaamVan, save, notify });
 
   /* ---- de zaal: chronologisch, abonnementen eerst, geen algoritme ---- */
   function videoBeeld(v) {
@@ -116,6 +108,12 @@ function maakTheater({ db, save, crypto, schoon, codenaamVan, notify, sseToOffic
   const zaak = require('./zaak')(ctx);
   ctx.zaakMagVideo = zaak.zaakMagVideo;
   ctx.zaak = zaak;
+  /* De huisstijl van die interne wereld (./huisstijl.js): naam, payoff, kleur,
+     thema en een klein logo van de organisatie zelf. Eigen bestand omdat het
+     een eigen belofte draagt -- en vooral een eigen GRENS: dit is geen eigen
+     domein, en het antwoord zegt dat er zelf bij. */
+  const merk = require('./huisstijl')(ctx);
+  ctx.merk = merk;
   const v = require('./video')(ctx);
   /* De zaal (chronologisch, abonnementen eerst), abonneren, reageren en melden
      staan in ./zaal.js: dat is WAT DE KIJKER ZIET EN DOET, een ander onderwerp
@@ -149,8 +147,8 @@ function maakTheater({ db, save, crypto, schoon, codenaamVan, notify, sseToOffic
   return {
     theaterKanaalVan: kanaalVanMaker, theaterVideosVan: videosVanMaker, theaterVolgt: volgtMaker,
     theaterVolgersVan: volgersVanMaker,
-    theaterKanaalMaak: kanaalMaak, theaterOfficeLijst: officeLijst,
-    theaterOfficeBeslis: officeBeslis, theaterVideoMaak: v.videoMaak, theaterVideoUpload: v.videoUpload,
+    theaterKanaalMaak: kanaalMaak, theaterOfficeLijst: kantoor.officeLijst,
+    theaterOfficeBeslis: kantoor.officeBeslis, theaterVideoMaak: v.videoMaak, theaterVideoUpload: v.videoUpload,
     theaterVerwijder: v.verwijder, theaterStreamVan: v.streamVan, theaterZaal: z.zaal,
     theaterAbonneer: z.abonneer, theaterReactie: z.reactie, theaterReacties: z.reacties, theaterMeld: z.meld,
     theaterThuisAanwezig: v.thuisAanwezig, theaterSignaal: v.signaal,
@@ -158,7 +156,8 @@ function maakTheater({ db, save, crypto, schoon, codenaamVan, notify, sseToOffic
     theaterZaakMaak: zaak.zaakKanaalMaak, theaterZaakZaal: zaak.zaakZaal,
     theaterZaakVideos: zaak.zaakVideosVoor,
     theaterKijkplichtZet: kp.kijkplichtZet, theaterKijkplichtGedaan: kp.kijkplichtGedaan,
-    theaterKijkplichtMijn: kp.kijkplichtMijn, theaterKijkplichtStand: kp.kijkplichtStand
+    theaterKijkplichtMijn: kp.kijkplichtMijn, theaterKijkplichtStand: kp.kijkplichtStand,
+    theaterHuisstijl: merk.huisstijlZet, theaterZaakMerk: merk.huisstijlMerkVoor
   };
 }
 

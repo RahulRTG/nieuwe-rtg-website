@@ -47,7 +47,10 @@ module.exports = ({ MODI, catalogus, bronnen }) => {
     for (const k of (bronnen.liveZaak ? (bronnen.liveZaak(sess.key) || []) : []))
       uit.push(catalogus.vanLive(k, sess.key));
     return { status: 200, modus: 'zaak', modusNaam: MODI.zaak.naam, mag: true,
-      zaken: zaken.map(z => ({ code: z.code, naam: z.naam, leiding: z.leiding })),
+      /* Elke zaak met haar eigen naam en kleur (kern/theater/huisstijl.js).
+         De Media OS verzint dat merk niet: hij vraagt het aan de bron die het
+         beheert, en die zet er zelf bij waar het ophoudt. */
+      zaken: merkVan(sess.key, zaken),
       stukken: uit, totaal: uit.length,
       leeg: uit.length ? null : { titel: 'Nog niets intern gepubliceerd',
         wat: 'Hier komt het interne werk van uw organisatie te staan: video uit haar eigen bibliotheek en haar interne uitzendingen.',
@@ -62,6 +65,18 @@ module.exports = ({ MODI, catalogus, bronnen }) => {
   /* De standen die DIT lid te zien krijgt. De zakenstand staat er alleen bij
      wie ergens werkt: een lege tab die altijd nee zegt, is geen stand maar een
      deur naar niets. */
+  /* De zaken van dit lid, aangevuld met hun huisstijl. Zonder die bron (of als
+     er nog geen bibliotheek staat) blijft het gewoon naam en code -- geen
+     verzonnen merk. */
+  function merkVan(key, zaken) {
+    const merken = bronnen.merkZaak ? (bronnen.merkZaak(key) || []) : [];
+    return zaken.map(z => {
+      const m = merken.find(x => x.code === z.code);
+      return { code: z.code, naam: z.naam, leiding: z.leiding,
+        huisstijl: (m && m.huisstijl) || null };
+    });
+  }
+
   function modiVoor(sess) {
     const heeftZaak = bronnen.zakenVan ? (bronnen.zakenVan(sess.key) || []).length > 0 : false;
     return Object.keys(MODI).filter(k => k !== 'zaak' || heeftZaak).map(k => ({ id: k, naam: MODI[k].naam }));

@@ -96,7 +96,8 @@
     <p class="stil weg" id="leeg">Nog geen video's in de zaal. Start uw eigen kanaal hieronder.</p>
     <!-- Media for Business: de interne bibliotheek van de zaak waar u werkt -->
     <section id="blokZaak" class="weg">
-      <h2>Van uw werk</h2>
+      <h2 id="zaakKop">Van uw werk</h2>
+      <p class="stil" id="zaakPayoff"></p>
       <p class="stil" id="zaakUitleg"></p>
       <div class="films" id="filmsZaak"></div>
       <!-- wat uw werk u vraagt te bekijken; u tekent zelf af -->
@@ -196,6 +197,7 @@
     blok.classList.toggle('weg', !zaakStand.mag);
     if (!zaakStand.mag) return;
     $('#zaakUitleg').textContent = zaakStand.uitleg || '';
+    tekenMerk();
     const doos = $('#filmsZaak'); doos.innerHTML = '';
     for (const v of (zaakStand.videos || [])) doos.appendChild(filmKnop(v));
     if (!(zaakStand.videos || []).length) {
@@ -206,6 +208,7 @@
     await laadKijkplicht();
     const beheer = $('#zaakBeheer'); beheer.innerHTML = '';
     for (const z of (zaakStand.zaken || [])) {
+      if (z.leiding && z.bibliotheek) beheer.appendChild(merkBeheer(z));
       if (!z.leiding || z.bibliotheek) continue;
       const kaart = document.createElement('div'); kaart.className = 'kaart';
       kaart.innerHTML = '<p class="stil">' + esc(z.naam) + ' heeft nog geen interne bibliotheek. ' +
@@ -302,6 +305,51 @@
       }
       el.appendChild(kaart);
     }
+  }
+
+  /* DE HUISSTIJL VAN DE ORGANISATIE -- binnen haar eigen blok, en verder
+     nergens. De balk, de navigatie en de rest van dit scherm blijven van RTG:
+     een tenant die de hele app kan omverven, kan een lid laten denken dat hij
+     ergens anders is dan hij is. Een eigen DOMEIN bestaat hier niet, en de
+     server zegt dat er zelf bij (server/kern/theater/huisstijl.js) -- dus
+     staat die zin ook op het scherm en niet alleen in een README. */
+  function tekenMerk() {
+    const blok = $('#blokZaak');
+    const k = ((zaakStand && zaakStand.kanalen) || [])[0];
+    const h = k && k.huisstijl;
+    blok.style.removeProperty('--zaakAccent');
+    if (!h) { $('#zaakKop').textContent = 'Van uw werk'; $('#zaakPayoff').textContent = ''; return; }
+    $('#zaakKop').textContent = h.naam;
+    $('#zaakPayoff').textContent = h.payoff || '';
+    blok.style.setProperty('--zaakAccent', h.accent);
+    blok.style.borderLeft = '3px solid ' + h.accent;
+    blok.style.paddingLeft = '0.8rem';
+    if (h.logo) {
+      const beeld = document.createElement('img');
+      beeld.src = h.logo; beeld.alt = h.naam; beeld.style.maxHeight = '2.2rem';
+      beeld.style.display = 'block'; beeld.style.marginBottom = '0.4rem';
+      $('#zaakKop').prepend(beeld);
+    }
+  }
+  /* De leiding stelt hem in. Het veld voor het logo is er met opzet NIET: een
+     beeld uploaden is een eigen weg met een eigen grens, en die staat hier niet.
+     Naam, payoff, kleur en thema zijn wat een scherm eerlijk kan aanbieden. */
+  function merkBeheer(z) {
+    const kaart = document.createElement('div'); kaart.className = 'kaart';
+    const h = (((zaakStand.kanalen || []).find(k => k.zaakCode === z.code) || {}).huisstijl) || {};
+    kaart.innerHTML = '<b>De naam en kleur van ' + esc(z.naam) + '</b>' +
+      '<p class="stil">' + esc(h.let || '') + '</p>' +
+      '<label for="mNaam2">Naam boven uw interne wereld</label><input id="mNaam2" maxlength="60" value="' + esc(h.naam || '') + '">' +
+      '<label for="mPayoff">Payoff</label><input id="mPayoff" maxlength="100" value="' + esc(h.payoff || '') + '">' +
+      '<label for="mAccent">Accentkleur (hexcode)</label><input id="mAccent" maxlength="7" value="' + esc(h.accent || '') + '">' +
+      '<div class="rij"><button class="knop vol" type="button">Bewaar de huisstijl</button></div>';
+    kaart.querySelector('button').addEventListener('click', async () => {
+      const r = await api('huisstijl', { zaakCode: z.code, naam: kaart.querySelector('#mNaam2').value,
+        payoff: kaart.querySelector('#mPayoff').value, accent: kaart.querySelector('#mAccent').value });
+      zeg(r.body.error || 'Bewaard.');
+      if (!r.body.error) laadZaak();
+    });
+    return kaart;
   }
 
   /* Waar publiceert deze video naartoe? Standaard het eigen kanaal; wie de

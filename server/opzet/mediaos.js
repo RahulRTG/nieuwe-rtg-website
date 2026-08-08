@@ -43,6 +43,8 @@ module.exports = (kern, hulp) => {
       zakenVan: (key) => (kern.werkplekken ? kern.werkplekken.zakenVan(key) : []),
       videosZaak: (key) => kern.theaterZaakVideos(key),
       liveZaak: (key) => kern.podiumZaak(key),
+      // de eigen naam en kleur van elke zaak van dit lid
+      merkZaak: (key) => kern.theaterZaakMerk(key),
       // gericht: één maker, en de verbinding tussen een uitgave en de clips eronder
       tracksVan: (mKey, kijker) => kern.muziekUitgavenVan(mKey, kijker),
       videosVan: (mKey) => kern.theaterVideosVan(mKey),

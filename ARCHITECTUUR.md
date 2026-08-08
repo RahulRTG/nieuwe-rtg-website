@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 2749 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 2750 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,10 +18,10 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 2749 |
-| servermodules (`server/**/*.js`) | 1474 |
-| routebestanden (`server/routes/**`) | 340 |
-| kernmodules (`server/kern/**`) | 836 |
+| API-endpoints | 2750 |
+| servermodules (`server/**/*.js`) | 1476 |
+| routebestanden (`server/routes/**`) | 341 |
+| kernmodules (`server/kern/**`) | 837 |
 | schermen (`public/**/*.html`) | 209 |
 | gedeelde browsermodules (`public/shared/*.js`) | 158 |
 | toetsbestanden (`test/*.test.js`) | 600 |
@@ -93,13 +93,13 @@ luister
 Acht domeinen, uit `server/opzet/routes.js`. Met `RTG_DOMAINS=member,social` draait
 een proces alleen die domeinen; een gateway (`server/poort.js`) stuurt de
 padvoorvoegsels dan naar het juiste proces. **Die belofte is nog niet waargemaakt:**
-zie §5 -- er zijn nog 140 kern-namen die meer dan één domein aanraakt.
+zie §5 -- er zijn nog 141 kern-namen die meer dan één domein aanraakt.
 
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
 | `auth` | 19 | 5 | 8 | 44 |
 | `member` | 393 | 49 | 9 | 344 |
-| `supplier` | 481 | 87 | 6 | 272 |
+| `supplier` | 482 | 88 | 6 | 273 |
 | `office` | 33 | 7 | 3 | 53 |
 | `staff` | 26 | 7 | 1 | 39 |
 | `social` | 55 | 6 | 31 | 52 |
@@ -120,8 +120,8 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 | Meting | Nu |
 |---|---|
 | kern-namen die routes aanraken | 1077 |
-| daarvan door **meer dan één** domein (de echte koppeling) | 140 |
-| daarvan door precies één domein | 937 |
+| daarvan door **meer dan één** domein (de echte koppeling) | 141 |
+| daarvan door precies één domein | 936 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 

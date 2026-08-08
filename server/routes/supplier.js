@@ -99,4 +99,7 @@ app.post('/api/supplier/notifications/read', supplierAuth, (req, res) => {
   require('./supplier/kassa')(kern);
   require('./supplier/horeca')(kern); // RTG Horeca OS: rekeningen, keuken, bezorging, club, hotel-folio
   require('./supplier/werving')(kern);
+  /* "Vooruit": dezelfde Control Tower als de ledenkant, op de code van de zaak.
+     Zie de kop van ./supplier/vooruit.js. */
+  require('./supplier/vooruit')(kern);
 };

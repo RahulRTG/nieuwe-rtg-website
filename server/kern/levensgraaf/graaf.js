@@ -41,9 +41,16 @@ const { OPEN, PERSOONLIJK, VERTROUWELIJK, BESLOTEN } = require('./hulp');
    ook, wat de Rechterhand mag zien mag het lid altijd. */
 const KRING = { lid: 0, rechterhand: 1, kantoor: 2 };
 
+/* De motor krijgt zijn BRONNEN mee en kiest ze niet zelf.
+
+   Hij stond hier als `require('./bronnen')`, en dat maakte hem stilzwijgend een
+   leden-graaf: de bronnenlijst bepaalde wie hij kon bedienen. Sinds de zaken
+   dezelfde tower krijgen (bronnen-zaak.js) is dat verkeerd om -- een motor die
+   zijn eigen brandstof kiest, kan er maar een soort verstoken. Nu weet hij niet
+   meer WAT hij projecteert, en dat is precies genoeg. */
 module.exports = (ctx) => {
   const { db, vandaag, paspoortVervalt } = ctx;
-  const bronnen = require('./bronnen');
+  const bronnen = { ALLE: ctx.bronnen || require('./bronnen').ALLE };
 
   /* De enige plek waar een knoop ontstaat. Alles loopt hierdoorheen, en daarom
      kan hier EEN regel staan die overal geldt: besloten (3) betekent alleen het
@@ -76,11 +83,17 @@ module.exports = (ctx) => {
   /* Het dossier van het lid, zonder het aan te maken. De graaf LEEST alleen:
      wie hem opvraagt hoort geen lege lijsten in de database te schrijven, want
      dan groeit db.data.lifestyle met een rij per lid dat een keer heeft gekeken.
-     Vandaar niet L(key) uit de andere modules, maar dit. */
-  function dossierVan(key) {
+     Vandaar niet L(key) uit de andere modules, maar dit.
+
+     WAAROM DIT OOK MEEGEGEVEN KAN WORDEN. Een zaak heeft geen lifestyle-dossier;
+     zijn sleutel is een leverancierscode. `db.data.lifestyle['RTG-0001']` levert
+     nu toevallig niets op, maar "levert toevallig niets op" is geen grens. De
+     zaken-graaf geeft daarom zijn eigen lezer mee, en dan KAN hij niet in een
+     ledendossier kijken -- ook niet als een code ooit op een sleutel lijkt. */
+  const dossierVan = typeof ctx.dossier === 'function' ? ctx.dossier : (key) => {
     const alle = db.data && db.data.lifestyle;
     return (alle && alle[key]) || {};
-  }
+  };
 
   /* De hele graaf van een lid: elke bron levert zijn knopen, wij plakken ze aan
      elkaar en leiden de kanten af uit `ouder`. Kanten zijn dus geen apart

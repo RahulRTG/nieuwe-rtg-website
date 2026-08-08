@@ -22,13 +22,19 @@
     "inlineStijlAttributen": 5656,
     "browserpoortToetsen": 103,
     "kernBreedte": 1077,
-    "kernGedeeld": 140,
+    "kernGedeeld": 141,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
     "toetsenNietGemeten": 146,
     "toetsenOngevoeligPct": 2.3
   },
   "notities": [
+    {
+      "datum": "2026-08-08",
+      "meter": "kernGedeeld 140 -> 141 (met de hand VERHOOGD)",
+      "reden": "`levensgraaf` wordt vanaf nu door TWEE domeinen aangeraakt: member (/api/member/vooruit) en supplier (/api/supplier/vooruit). Dat is geen slordige koppeling maar precies wat deze ronde beoogde: een RTG-kantoor heeft hetzelfde probleem als een lid -- er komen dingen op hem af met een datum, verspreid over zijn eigen schermen -- en de motor die dat voor een lid oplost stond er al. De alternatieven waren allebei slechter: een tweede tower naast de eerste is de dubbeling die regel 4 van de lat verbiedt, en de bestaande tower NIET aansluiten omdat de meter dan een punt stijgt, is de meter dienen in plaats van de lezer. Er is geen kern-naam bijgekomen (kernBreedte blijft 1077); er is er een die nu twee kanten bedient.",
+      "eerlijkheidshalve": "Deze meter bewaakt echte koppeling en het doel staat op onder de 100, dus hem omhoog zetten hoort te steken. Wat het draaglijk maakt is dat de twee kanten elkaar niet kunnen raken: de zaken-graaf krijgt zijn eigen bronnenlijst (kern/levensgraaf/bronnen-zaak.js), zijn eigen lege dossierlezer en GEEN lijn naar de identiteitskluis, en hij staat onder een eigen naam (`levensgraaf.zaak`) zodat niemand per ongeluk de ledengraaf te pakken heeft. Dat is met een mutatie nagetrokken: de lezer weghalen laat een toets zakken. Wat het NIET is: een kantoorscherm dat leden ziet -- de klant staat er op codenaam en alleen als hij bij DEZE zaak heeft geboekt."
+    },
     {
       "datum": "2026-08-07",
       "meter": "kernBreedte 1076 -> 1077",

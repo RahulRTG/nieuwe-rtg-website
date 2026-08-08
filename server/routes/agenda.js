@@ -6,7 +6,7 @@ module.exports = (kern) => {
 
   // ---------- lid ----------
   // de sleutelregel staat in kern/agenda.js, naast de opslag die hem gebruikt
-  const { agendaLidSleutel } = require('../kern/agenda');
+  const { agendaLidSleutel, agendaZaakSleutel } = require('../kern/agenda');
   const lidKey = (req) => agendaLidSleutel(req.session.key);
   app.post('/api/agenda/mijn-lijst', auth, (req, res) => {
     res.json({ items: agenda.lijst(lidKey(req)), telling: agenda.telling(lidKey(req)) });
@@ -63,7 +63,10 @@ module.exports = (kern) => {
   });
 
   // ---------- leverancier ----------
-  const supKey = (req) => 'sup:' + req.supplier.code;
+  /* Ook hier de sleutelregel uit kern/agenda.js en niet nog een keer met de hand:
+     de levensgraaf leest deze agenda (kern/levensgraaf/bronnen-zaak.js), en twee
+     plekken die 'sup:' zeggen lopen vroeg of laat uiteen. */
+  const supKey = (req) => agendaZaakSleutel(req.supplier.code);
   app.post('/api/supplier/agenda/lijst', supplierAuth, (req, res) => {
     res.json({ items: agenda.lijst(supKey(req)), telling: agenda.telling(supKey(req)) });
   });

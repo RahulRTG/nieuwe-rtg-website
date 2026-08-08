@@ -23,6 +23,13 @@
                        Die geven vanzelf niets terug voor wie dat dossier niet
                        heeft -- er is dus GEEN pas-controle in de motor nodig,
                        en die staat er ook niet. De poort zit op de route.
+     bronnen-zaak      dezelfde motor, andere eigenaar: een RTG-kantoor
+                       (leverancier) op zijn code. Aparte lijst, want een zaak is
+                       geen lid -- zie ./bronnen-zaak.js.
+
+   TWEE GRAFEN, EEN MOTOR. `graaf.js` weet niet WAT hij projecteert: hij krijgt
+   zijn bronnenlijst en zijn dossierlezer mee. Daardoor is de tweede graaf hier
+   twaalf regels en geen tweede motor die uit de pas kan gaan lopen (regel 4).
 
    NIETS HIERVAN SCHRIJFT. De graaf is een projectie: hij leest de apps die de
    waarheid beheren en bouwt zijn knopen elke keer opnieuw. Zie de kop van
@@ -36,6 +43,13 @@ module.exports = ({ db, paspoortVervalt }) => {
   const graafMod = require('./graaf')({ db, vandaag, paspoortVervalt });
   const termijnenMod = require('./termijnen')({ graaf: graafMod.graaf });
 
+  /* De zaken-graaf: zelfde motor, eigen bronnen, en met opzet GEEN
+     paspoortVervalt en GEEN lifestyle-dossier. Een leverancierscode hoort niet
+     in de ledenkluis te kunnen kijken, ook niet per ongeluk. */
+  const zaakGraaf = require('./graaf')({ db, vandaag, bronnen: require('./bronnen-zaak'),
+    dossier: () => ({}) });
+  const zaakTermijnen = require('./termijnen')({ graaf: zaakGraaf.graaf });
+
   return {
     levensgraaf: {
       graaf: graafMod.graaf,
@@ -43,7 +57,15 @@ module.exports = ({ db, paspoortVervalt }) => {
       samenvatting: graafMod.samenvatting,
       knoopFabriek: graafMod.knoop,
       tower: termijnenMod.tower,
-      termijnen: termijnenMod.termijnenAlle
+      termijnen: termijnenMod.termijnenAlle,
+      /* De kantoorkant onder een eigen naam: wie hem gebruikt moet expliciet
+         `zaak` typen en kan niet per ongeluk de ledengraaf te pakken hebben. */
+      zaak: {
+        graaf: zaakGraaf.graaf,
+        samenvatting: zaakGraaf.samenvatting,
+        tower: zaakTermijnen.tower,
+        termijnen: zaakTermijnen.termijnenAlle
+      }
     }
   };
 };

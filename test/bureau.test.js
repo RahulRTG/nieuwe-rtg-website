@@ -962,3 +962,165 @@ test('het paspoort uit de kluis wordt een termijn zonder dat iemand hem typt', a
       JSON.stringify(rommel) + ' is geen datum en hoort geen knoop op te leveren');
   }
 });
+
+/* ================= Dezelfde motor, aan de kantoorkant ====================== */
+/* Een RTG-kantoor (partner) heeft precies het probleem van een lid: er komen
+   dingen op hem af met een datum, verspreid over zijn eigen schermen. De motor
+   staat er al, dus /api/supplier/vooruit is dezelfde tower op de code van de
+   zaak. Wat hier bewezen wordt:
+
+     dat hij vult      een boeking die binnenkomt is een regel, zonder dat er
+                       iemand iets typt
+     dat hij scheidt   de zaken-graaf kan het ledendossier niet lezen, ook niet
+                       als een code toevallig op een sleutel lijkt
+     dat hij dicht is  een lid komt er niet in, en een lidtoken al helemaal niet */
+/* De zaken waar een lid ECHT bij kan boeken, met een manager die kan inloggen.
+   Uit de seed opgezocht en niet als code hier neergezet: een vaste code die de
+   seed ooit hernoemt, maakt van deze toets een toets die overslaat. */
+async function zakenMetDienst(lidToken, hoeveel) {
+  const zaken = await json(await raw('/suppliers', {}, lidToken));
+  const uit = [];
+  for (const p of (zaken.suppliers || [])) {
+    if (!(p.services || []).length) continue;
+    const roster = await json(await raw('/supplier/roster', { code: p.code }));
+    const man = (roster.staff || []).find(x => x.role === 'manager');
+    if (!man) continue;
+    const tok = (await json(await raw('/supplier/login', { code: p.code, staffId: man.id, pin: '1234' }))).token;
+    if (!tok) continue;
+    uit.push({ code: p.code, dienst: p.services[0], token: tok });
+    if (uit.length >= hoeveel) return uit;
+  }
+  assert.fail('de seed hoort ' + hoeveel + ' partners met een dienst en een manager te hebben');
+}
+
+test('een zaak ziet wat er op HAAR afkomt, zonder dat iemand iets typt', async () => {
+  const lid = await lidMet('rtg');
+  const [z, ander] = await zakenMetDienst(lid, 2);
+  const voor = await json(await raw('/supplier/vooruit', {}, z.token));
+  assert.equal(voor.status, 200);
+  const begin = voor.totaal;
+
+  // het lid boekt: EEN handeling van de klant, nul van de zaak
+  const geboekt = await json(await raw('/booking/request', { supplierCode: z.code,
+    serviceId: z.dienst.id, date: overDagen(4), time: '20:00' }, lid));
+  assert.equal(geboekt.ok, true);
+
+  const na = await json(await raw('/supplier/vooruit', {}, z.token));
+  assert.equal(na.totaal, begin + 1, 'de boeking staat er vanzelf in');
+  assert.ok(na.bronnen.includes('Boekingen'), 'en het scherm kan tonen waar hij vandaan komt');
+  /* Op de REF en niet "de eerste boeking in het venster": deze zaak kan al
+     boekingen van een eerdere toets hebben, en dan wees dat op iemand anders. */
+  const rij = na.vensters.find(v => v.sleutel === 'week').items
+    .find(r => r.id === 'zboeking:' + geboekt.boeking.ref);
+  assert.ok(rij, 'over vier dagen valt in het weekvenster');
+
+  /* De KLANT staat er op CODENAAM bij: dat is het privacy-ontwerp van dit huis
+     (CLAUDE.md), en het geldt ook op een scherm dat de zaak zelf leest.
+
+     Exact de codenaam, en niet "er staat iets achter een streepje". Die zwakkere
+     vorm stond hier eerst, en de mutatie die de codenaam door de KLANTSLEUTEL
+     verving sloeg er dwars doorheen -- een sleutel heeft ook een streepje voor
+     zich (regel 2 van de lat). Nu moet het de codenaam zijn en niets anders. */
+  const ik = (await json(await raw('/state', {}, lid))).state.user;
+  assert.ok(ik.codename, 'een account hoort een codenaam te hebben');
+  assert.equal(rij.naam, z.dienst.name + ' · ' + ik.codename);
+  assert.ok(!rij.naam.includes(ik.full || ik.name), 'geen echte naam op het kantoorscherm');
+
+  /* EN NIET DE BOEKINGEN VAN DE BUURMAN. Zonder deze regel sloeg de mutatie af
+     die het supplierCode-filter uit de bron haalde: als er verder niets in de
+     agenda van het platform staat, groeit de teller even hard met filter als
+     zonder (regel 2 van de lat). Dus boekt hetzelfde lid nu ook bij een ANDERE
+     zaak, en dan moet deze teller stilstaan. */
+  assert.equal((await raw('/booking/request', { supplierCode: ander.code,
+    serviceId: ander.dienst.id, date: overDagen(5), time: '20:00' }, lid)).status, 200);
+  assert.equal((await json(await raw('/supplier/vooruit', {}, z.token))).totaal, begin + 1,
+    'de boeking bij een andere zaak hoort hier niet te staan');
+  assert.equal((await json(await raw('/supplier/vooruit', {}, ander.token))).totaal, 1,
+    'en bij die andere zaak staat hij wel');
+
+  // en een afspraak die de zaak zelf plant, komt er langs dezelfde weg bij
+  assert.equal((await raw('/supplier/agenda/toevoegen',
+    { titel: 'Keuring afzuiging', datum: overDagen(6) }, z.token)).status, 200);
+  const na2 = await json(await raw('/supplier/vooruit', {}, z.token));
+  assert.equal(na2.totaal, begin + 2);
+  assert.deepEqual(na2.bronnen.sort(), ['Agenda', 'Boekingen']);
+
+  /* EN WAT GEWEEST IS, KOMT ER NIET IN. Een boeking van vorige week is geen
+     achterstand maar een avond die geweest is; hem als "al voorbij" in het rood
+     zetten zou de zaak elke ochtend een lijst laten wegklikken die vanzelf
+     groeit, en dan gelooft niemand de rode teller nog.
+
+     Dit staat er omdat de mutatie die de datumfilter uit de bron haalde AFSLOEG:
+     er was in deze toets nog geen boeking uit het verleden, dus er was niets te
+     zien (regel 2 van de lat). Nu is die er wel. */
+  assert.equal((await json(await raw('/booking/request', { supplierCode: z.code,
+    serviceId: z.dienst.id, date: overDagen(-7), time: '20:00' }, lid))).ok, true);
+  const na3 = await json(await raw('/supplier/vooruit', {}, z.token));
+  assert.equal(na3.totaal, begin + 2, 'een avond die geweest is telt niet mee');
+  assert.equal(na3.achterstallig.length, 0, 'en staat zeker niet in het rood');
+});
+
+test('een graaf met een eigen dossierlezer laat zijn bronnen niets anders zien', () => {
+  /* De motor leest db.data.lifestyle[sleutel] en geeft dat als `l` aan elke
+     bron. Voor een ZAAK hoort daar niets te staan, en dat mag niet aan toeval
+     hangen -- namelijk dat een leverancierscode nooit gelijk is aan een
+     ledensleutel. Vandaar dat een graaf zijn eigen dossierlezer mee kan krijgen.
+
+     Hier draait het mechanisme zelf, met een proefbron die WEL in `l` kijkt.
+     Zonder zo'n bron is er niets te zien: de echte zaak-bronnen raken `l` niet
+     aan, en juist daarom bewaakt deze regel een fout die nog gemaakt moet
+     worden. Dan is dit de enige plek waar hij te beproeven is. */
+  const db = { data: { lifestyle: { X: { bezittingen: [{ id: 'b1', naam: 'Villa' }] } } } };
+  const proef = [{ kamer: 'proef', knopen(l, K) {
+    return (l.bezittingen || []).map(b => K({ id: b.id, soort: 'bezit', naam: b.naam,
+      kamer: 'proef', bron: 'Proef' }));
+  } }];
+  const maak = require('../server/kern/levensgraaf/graaf');
+  const dag = () => overDagen(0);
+  assert.equal(maak({ db, vandaag: dag, bronnen: proef }).graaf('X').knopen.length, 1,
+    'zonder eigen lezer ziet een bron het ledendossier');
+  assert.equal(maak({ db, vandaag: dag, bronnen: proef, dossier: () => ({}) }).graaf('X').knopen.length, 0,
+    'met een eigen lezer niet');
+});
+
+test('de zaken-graaf krijgt die eigen lezer ook echt mee, en geen kluissleutel', () => {
+  /* De bedrading, niet het gedrag -- en dat is hier met opzet.
+
+     De eerste versie van deze toets hing de proef op aan wat je aan de
+     buitenkant ziet: een lifestyle-dossier onder een sleutel die gelijk is aan
+     een leverancierscode, en dan kijken of de zaken-graaf hem opraapte. Die
+     mutatie SLOEG AF -- geen enkele zaak-bron leest `l`, dus de lezer weghalen
+     veranderde niets zichtbaars. Een afgeslagen mutatie is een bevinding en geen
+     geslaagde toets (regel 2 van de lat), en de bevinding was: deze grens is aan
+     de buitenkant niet te zien, dus moet hij aan de bedrading getoetst worden.
+
+     Dat gaat zo: even een dubbelganger voor ./graaf.js in de require-cache, dan
+     ./index.js opnieuw laden, en kijken waarmee hij zijn twee grafen bouwt. */
+  const graafPad = require.resolve('../server/kern/levensgraaf/graaf');
+  const indexPad = require.resolve('../server/kern/levensgraaf');
+  const echt = require(graafPad);
+  const gezien = [];
+  require.cache[graafPad].exports = (ctx) => { gezien.push(ctx); return echt(ctx); };
+  delete require.cache[indexPad];
+  try {
+    require(indexPad)({ db: { data: {} }, paspoortVervalt: () => null });
+  } finally {
+    // de cache weer schoon achterlaten, anders draagt de volgende toets de dubbelganger
+    require.cache[graafPad].exports = echt;
+    delete require.cache[indexPad];
+  }
+  assert.equal(gezien.length, 2, 'twee grafen: die van het lid en die van de zaak');
+  assert.equal(gezien[0].dossier, undefined, 'de ledengraaf leest het ledendossier');
+  assert.equal(typeof gezien[1].dossier, 'function', 'de zaken-graaf krijgt een eigen lezer');
+  assert.deepEqual(gezien[1].dossier('ESVEDRA'), {}, 'en die geeft nooit iets');
+  /* En geen lijn naar de identiteitskluis: een paspoortdatum is van het lid en
+     heeft op een kantoorscherm niets te zoeken. */
+  assert.equal(gezien[1].paspoortVervalt, undefined);
+});
+
+test('een lid komt de kantoortower niet binnen, en een gast al helemaal niet', async () => {
+  const lid = await lidMet('lifestyle');
+  assert.equal((await raw('/supplier/vooruit', {}, lid)).status, 401,
+    'een lidtoken is geen zaaktoken');
+  assert.equal((await raw('/supplier/vooruit', {})).status, 401, 'en zonder token niets');
+});

@@ -123,9 +123,17 @@ async function meet(pwBrowser, base, token, breed, hoog) {
   const uit = await page.evaluate(() => {
     const L = document.getElementById('wingL'), R = document.getElementById('wingR');
     const namen = el => [...el.querySelectorAll('.wing-naam')].map(n => n.textContent.trim());
+    /* De SLEUTEL naast de naam: waarop we toetsen dat een app er staat, is de
+       sleutel (link:office) en niet zijn label. Dat label is beleidsmatig aan
+       verandering onderhevig -- de tegels heten hier functies en geen producten
+       -- en deze toets zakte dan ook op "RTG Office" nadat die "Documenten"
+       ging heten. De namen blijven we wel meten: ze bewaken hieronder dat er
+       geen ruwe sleutel als label in de flank belandt. */
+    const sleutels = el => [...el.querySelectorAll('.wing-widget')].map(w => w.dataset.sleutel || '');
     return {
       display: L ? getComputedStyle(L).display : null,
       links: L ? namen(L) : [], rechts: R ? namen(R) : [],
+      linksK: L ? sleutels(L) : [], rechtsK: R ? sleutels(R) : [],
       instel: !!document.querySelector('.wing-instel'),
       widgets: document.querySelectorAll('.wing-widget').length,
       pijlen: document.querySelectorAll('.wing-vol').length,
@@ -165,8 +173,10 @@ test('wings: weg op de iPad, gevuld op de computer, en aanpasbaar', { skip: pw ?
       assert.equal(uit.display, 'flex', 'boven 1100px horen ze er te zijn');
       assert.ok(uit.links.length >= 3, 'de werkbank is gevuld, maar stond op ' + uit.links.length);
       assert.ok(uit.rechts.length >= 3, 'de administratie is gevuld, maar stond op ' + uit.rechts.length);
-      assert.ok(uit.links.includes('RTG Office'), 'RTG Office (document, rekenblad, presentatie) hoort in de werkbank');
-      assert.ok(uit.rechts.includes('Balans'), 'Balans hoort in de administratie');
+      assert.ok(uit.linksK.includes('link:office'),
+        'RTG Office (document, rekenblad, presentatie) hoort in de werkbank; gevonden: ' + uit.links.join(', '));
+      assert.ok(uit.rechtsK.includes('link:balans'),
+        'Balans hoort in de administratie; gevonden: ' + uit.rechts.join(', '));
       assert.equal(uit.instel, true, 'en er is een aanpasknop');
       /* De naam van een TAB-app komt niet uit de registry maar uit de tabbar.
          Zonder die weg stond hier letterlijk "tab:bestellen" in de flank. */

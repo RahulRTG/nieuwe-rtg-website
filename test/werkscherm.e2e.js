@@ -197,7 +197,18 @@ test('de eigenaar staat meteen in zijn eigen werkruimte, zonder een token over t
        Office naar de map Werk, en stond hij weer rood om een indeling en niet
        om de eis. De eis is: vindbaar op de homescreen, in EEN van de mappen.
        We lopen ze daarom allemaal af. Een indeling mag schuiven; een app die
-       nergens meer staat mag niet. */
+       nergens meer staat mag niet.
+
+       EN NIET MEER OP DE NAAM. Dit is de DERDE keer dat deze toets op een
+       hernoeming zakt: eerst "Werk OS" -> "Mijn werkplekken", nu "RTG Office"
+       -> "Documenten". Dat is geen toeval maar beleid -- de tegels heten
+       bewust functies en geen producten ("Video" en niet "Clips", zie LINKS in
+       app-main-24.js) -- en een toets die het etiket vastpint, staat rood bij
+       elke ronde die dat beleid uitvoert. Hij leest nu `data-sleutel`, de
+       naam die het springboard zelf gebruikt om de app te vinden
+       (`link:office`, `os:werk`). Die verandert alleen als de app echt een
+       andere app wordt. De zichtbare namen gaan wel mee in de foutmelding,
+       want daarmee zoek je hem terug op het scherm. */
     await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(2000);
     const tegels = await page.evaluate(async () => {
@@ -207,17 +218,20 @@ test('de eigenaar staat meteen in zijn eigen werkruimte, zonder een token over t
       for (const map of mappen) {
         map.click();
         await wacht(300);
-        for (const a of document.querySelectorAll('#osMapGrid .os-app')) uit.push((a.textContent || '').trim());
+        for (const a of document.querySelectorAll('#osMapGrid .os-app')) {
+          uit.push({ sleutel: a.dataset.sleutel || '', naam: (a.getAttribute('aria-label') || '').trim() });
+        }
         const scrim = document.getElementById('osMapScrim');
         if (scrim) scrim.classList.remove('open');
         await wacht(120);
       }
       return uit;
     });
-    assert.ok(tegels.some(t => /mijn werkplekken/i.test(t)),
-      'de werkplek heeft een tegel op de homescreen; gevonden: ' + tegels.join(', '));
-    assert.ok(tegels.some(t => /rtg office/i.test(t)),
-      'en RTG Office ook; die had er nooit een. Gevonden: ' + tegels.join(', '));
+    const namen = tegels.map(t => t.naam + ' [' + t.sleutel + ']').join(', ');
+    assert.ok(tegels.some(t => t.sleutel === 'os:werk'),
+      'de werkplek (os:werk) heeft een tegel op de homescreen; gevonden: ' + namen);
+    assert.ok(tegels.some(t => t.sleutel === 'link:office'),
+      'en RTG Office (link:office) ook; die had er nooit een. Gevonden: ' + namen);
 
     await page.goto(base + '/apps/werk.html', { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(900);

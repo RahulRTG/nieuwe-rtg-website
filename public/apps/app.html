@@ -1192,25 +1192,58 @@
   }
   .os-thuisscherm > *{width:100%;max-width:var(--os-kolom);margin-inline:auto;}
 
-  /* de begroeting: één regel, klein, boven de mappen. Geen kop die het
-     halve scherm opeet -- de klok is de kop van dit scherm. */
-  .os-groet{
-    font-family:'Bodoni Moda',serif;font-weight:400;
-    font-size:calc(var(--e) * 1.12);line-height:1.25;color:var(--txt);
-    text-align:center;margin:0;
-    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
-  }
+  /* de passregel: welke pas, en sinds wanneer. Eén dunne regel, en de enige
+     tekst boven de mappen -- de klok is de kop van dit scherm.
+     (.os-groet stond hier, voor de begroeting die van dit scherm af is; een
+     klasse zonder element is de soort rommel waar niemand meer aan durft te
+     komen omdat je niet weet of hij nog ergens vandaan komt.) */
   .os-groet-sub{
     font-size:calc(var(--e) * 0.62);letter-spacing:0.14em;text-transform:uppercase;
-    color:var(--gold);text-align:center;margin:calc(var(--e) * 0.22) 0 0;font-weight:600;
+    color:var(--gold);text-align:center;margin:0;font-weight:600;
     overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
   }
 
-  /* 1. de mappen, bovenaan */
-  .os-mappen{margin-top:calc(var(--e) * 1.15);flex-shrink:0;}
+  /* 1. de mappen, bovenaan -- vier op de eerste rij, drie op de tweede.
 
-  /* 2. de ronde klok, in het midden. Hij pakt de ruimte die de vier lagen
-        overlaten en centreert zichzelf daarin. */
+        DE TWEEDE RIJ STAAT GECENTREERD, en daarvoor moet dit blok uit het
+        raster stappen. Een grid van vier kolommen zet een restrij links tegen
+        de eerste kolom aan en laat rechts een kolom leeg; drie mappen lezen
+        dan als een halfvolle rij van vier -- alsof er eentje ontbreekt.
+        Hetzelfde blok als flexrij die terugvalt en zichzelf centreert, leest
+        als een vorm: vier boven, drie eronder, netjes onder het midden.
+
+        De tegels houden de breedte die ze in het raster hadden (een kwart
+        minus de tussenruimte), anders worden het er op de tweede rij drie
+        brede, en dan is het geen tweede rij meer maar een andere maat.
+
+        De rijen staan ook dichter op elkaar dan de rasterafstand van
+        .os-grid: zeven tegels in twee rijen zijn samen één blok, en met de
+        losse afstand viel dat blok in twee losse rijen uiteen. */
+  .os-mappen{
+    display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;
+    margin-top:calc(var(--e) * 0.9);flex-shrink:0;
+    column-gap:calc(var(--e) * 0.75);row-gap:calc(var(--e) * 1.05);
+  }
+  .os-mappen .os-app{
+    width:calc((100% - var(--e) * 2.25) / 4);
+  }
+
+  /* 2. de ronde klok, in het midden. Dit vak pakt alle ruimte die de andere
+        lagen overlaten en centreert de klok daarin -- dus staat er evenveel
+        lucht boven als onder, en dat is precies wat een horloge nodig heeft
+        om een horloge te blijven en geen tegel te worden.
+
+        HIER HEEFT EEN BOVENGRENS OP GESTAAN, en die is er weer af. Bedoeling
+        was de klok omhoog te halen; gevolg was dat alle overtollige ruimte
+        naar het einde van de kolom zakte, de balk van Rahul los van de
+        onderrand kwam te hangen en er een gat van 155 punten onder het scherm
+        stond. De balk hoort aan de onderrand -- daar zoekt je duim hem -- en
+        de klok hoort lucht om zich heen. Allebei krijg je terug door dit vak
+        gewoon zijn werk te laten doen.
+
+        Wil je de laag ERBOVEN of ERONDER verschuiven, doe dat dan met een
+        marge op die laag zelf (zie .os-aibalk): dit vak krimpt dan mee en de
+        onderrand blijft waar hij staat. */
   .os-klokvak{
     flex:1;min-height:0;display:flex;align-items:center;justify-content:center;
     padding:calc(var(--e) * 0.5) 0;
@@ -1289,9 +1322,26 @@
   .os-aitips button:hover{border-color:color-mix(in srgb, var(--gold) 55%, var(--line));}
   #app.os-gast .os-aidraad,#app.os-gast .os-aitips{display:none;}
 
-  /* de balk van Rahul, onderaan */
+  /* de balk van Rahul, onderaan -- en onderaan is letterlijk: hij hoort aan de
+     onderrand, want daar zoekt je duim hem.
+
+     De marge hierboven doet twee dingen tegelijk, en dat is met opzet. Ze zet
+     de berichten van Rahul op afstand van zijn balk (die stonden er tegenaan
+     en dat las als één blok in plaats van gesprek en invoer), en omdat het
+     klokvak hierboven alle overgebleven ruimte pakt, krimpt dát vak met deze
+     marge mee. Het gesprek schuift dus omhoog terwijl de balk blijft staan
+     waar hij staat -- precies andersom dan een bovengrens op het klokvak, die
+     de balk zelf omhoog trok.
+
+     DEZE 2.8 IS AL DRIE KEER TERUGGEVALLEN NAAR 1.15, samen met de rest van
+     dit beginscherm (de gecentreerde mappenrij, de lege statusbalk, de
+     meldingentegel): takken die vóór 79b5398/f91f056 waren afgesplitst zetten
+     bij het samenvoegen de oude regels terug -- zonder conflict, dus zonder
+     iets om op te letten. De toets die dit bewaakt WAS rood, maar hij zakte
+     een paar regels eerder al op de mappenrij, en een tweede rode bewering in
+     een toets die toch al rood staat ziet niemand. */
   .os-aibalk{
-    flex-shrink:0;margin-top:calc(var(--e) * 1.15);
+    flex-shrink:0;margin-top:calc(var(--e) * 2.8);
     display:flex;align-items:center;gap:calc(var(--e) * 0.5);
     padding:calc(var(--e) * 0.4) calc(var(--e) * 0.45) calc(var(--e) * 0.4) calc(var(--e) * 0.55);
     border-radius:999px;
@@ -1478,6 +1528,16 @@
   .os-cc-tegels button b{font-size:1.05rem;font-weight:400;display:inline-flex;align-items:center;justify-content:center;height:20px;}
   .os-cc-tegels button b svg{display:block;}
   .os-cc-tegels button.aan{border-color:var(--green);color:var(--green);}
+  /* het aantal ongelezen meldingen op de tegel: hetzelfde stipje als de bel-badge
+     had, want hij vertelt hetzelfde */
+  .os-cc-tegels button{position:relative;}
+  .os-cc-tel{
+    position:absolute;top:5px;right:6px;min-width:15px;height:15px;padding:0 4px;
+    background:var(--burgundy);color:#fff;border-radius:999px;
+    font-style:normal;font-size:0.56rem;font-weight:700;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .os-cc-tel[hidden]{display:none;}
 
   /* De Boardroom is een eigen app (/apps/boardroom.html) met de echte,
      server-side schakelaars; hier stond een tweede paneel met een tweede
@@ -1606,20 +1666,33 @@
              is. De plek blijft leeg; osTerug hiernaast vult hem zodra er een
              app open staat. -->
       </div>
-      <!-- De statusbalk houdt drie dingen vast: hoe vol de batterij is, of er
-           iets voor je klaarligt (de bel) en de ingang naar alle instellingen
-           (het paneel). Scannen, je Zegel tonen en je backoffice zaten hier
-           ook als losse knopjes; die staan nu in het paneel, zodat de balk
-           rustig blijft. De knoppen zelf blijven bestaan (verborgen), want de
-           rest van de app klikt ze aan. -->
+      <!-- HIER STONDEN DRIE KNOPJES, EN NU STAAT ER GEEN.
+
+           De batterij, de bel en het bedieningspaneel lagen los naast elkaar
+           boven een scherm dat verder alleen lucht, een klok en zeven mappen
+           is. Drie tekens naast elkaar is een stapeling, en de merkregel zegt:
+           één signatuurelement, geen stapeling van trucjes. Ze zitten nu in
+           het bedieningspaneel, dat je van de bovenrand omlaag haalt
+           (shared/randen.js) -- samen met scannen, je Zegel en je backoffice.
+
+           De knoppen zelf blijven bestaan, verborgen: het paneel en de rest
+           van de app klikken ze aan (app-main-27b.js), en dat blijft de enige
+           plek waar het gedrag staat. Dezelfde afspraak als bij
+           scannen/Zegel/backoffice hieronder. De batterijstand is geen knop en
+           hoort er dus ook niet als knop in.
+
+           Deze regel is een keer teruggedraaid door een merge -- de bel en het
+           paneel stonden weer in beeld terwijl app-main-27b.js ze al als
+           verborgen behandelde. Wie ze hier weer zichtbaar maakt, moet die
+           module dus ook langs. -->
       <div class="os-rechts">
-        <span class="os-bat" id="osBat" hidden aria-hidden="true"><i><b id="osBatVul"></b></i><em id="osBatPct"></em></span>
+        <span class="os-bat os-verborgen-knop" id="osBat" hidden aria-hidden="true"><i><b id="osBatVul"></b></i><em id="osBatPct"></em></span>
         <button class="os-klaar" id="osKlaar" hidden>Klaar</button>
-        <button class="bell" id="bell" aria-label="Meldingen">
+        <button class="bell os-verborgen-knop" id="bell" aria-label="Meldingen" tabindex="-1">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
           <span class="bell-badge" id="bellBadge" style="display:none;">0</span>
         </button>
-        <button class="bell" id="osCcBtn" aria-label="Bedieningspaneel">
+        <button class="bell os-verborgen-knop" id="osCcBtn" aria-label="Bedieningspaneel" tabindex="-1">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/><circle cx="9" cy="7" r="2" fill="var(--bg)"/><circle cx="15" cy="12" r="2" fill="var(--bg)"/><circle cx="7" cy="17" r="2" fill="var(--bg)"/></svg>
         </button>
         <button class="bell os-verborgen-knop" id="scanBtn" aria-label="Scan een tafel- of RTG-code" tabindex="-1">
@@ -1667,7 +1740,17 @@
            waar het hoort (je reis bij Reizen, je betalingen bij Betalen). -->
       <div class="view" data-view="home">
         <div class="os-thuisscherm">
-          <p class="os-groet" id="homeGreeting">Welkom.</p>
+          <!-- HIER STOND "HA KATJA, GOED JE TE ZIEN."
+
+               Een begroeting is aardig de eerste keer en behang de honderdste:
+               je opent dit scherm tientallen keren per dag en dan is een regel
+               die elke keer hetzelfde zegt geen warmte maar ruis -- en hij kost
+               precies de hoogte die de mappen nodig hebben. De stem van de pas
+               (je/u, ingetogen of zakelijk) leeft gewoon door in de balk van
+               Rahul, waar hij ook echt iets te zeggen heeft.
+
+               De regel eronder blijft wel: die staat er niet om je te groeten
+               maar om te tonen welke pas je hebt en sinds wanneer. -->
           <p class="os-groet-sub" id="homeSub"></p>
 
           <nav class="os-grid os-mappen" id="osMappen" aria-label="Mappen met apps"></nav>
@@ -1926,6 +2009,12 @@
           <button id="osCcVol"><b><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M16 21h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg></b><span data-i18n="os.cc.vol">Volledig scherm</span></button>
           <button id="osCcRand" hidden><b><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M8 9h8M8 15h8"/></svg></b><span data-i18n="os.cc.rand">Rand tot rand</span></button>
           <button id="osCcZoek"><b><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg></b><span data-i18n="os.zoek">Zoeken</span></button>
+          <!-- De bel stond als los knopje in de statusbalk; die balk is leeg
+               gemaakt. Scannen, Zegel en backoffice waren die weg al gegaan en
+               staan hier al; meldingen hoorden mee. Zonder deze tegel was er na
+               het leegmaken van de balk geen enkele ingang meer naar wat er voor
+               je klaarligt -- en dat merk je pas als je iets mist. -->
+          <button id="osCcBel"><b><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg></b><span data-i18n="app.notifs">Meldingen</span><i class="os-cc-tel" id="osCcBelTel" hidden></i></button>
           <button id="osCcUit"><b><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M12 3v9"/><path d="M6.6 7a8 8 0 1 0 10.8 0"/></svg></b><span data-i18n="app.logout">Uitloggen</span></button>
         </div>
       </div>

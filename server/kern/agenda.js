@@ -132,4 +132,17 @@ function maakAgenda({ db, save, crypto, anthropic, schoon }) {
   return { lijst, telling, voegToe, wijzig, verwijder, aiVoegToe };
 }
 
-module.exports = { maakAgenda };
+/* DE SLEUTELREGEL, op EEN plek.
+
+   De opslag is per eigenaar-sleutel ('lid:<key>', 'sup:<code>'), en die regel
+   stond tot nu toe alleen als een pijltje in routes/agenda.js. Toen het
+   Privekantoor de agenda van een lid in zijn levensgraaf wilde lezen, moest het
+   die regel overschrijven -- en dan staat dezelfde waarheid op twee plekken. Bij
+   de eerste wijziging van het voorvoegsel leest de graaf een lege lijst en valt
+   de agenda stil uit het kantoor, zonder dat iets klaagt. Regel 4 van de lat.
+
+   Vandaar hier, naast de opslag die hem gebruikt. */
+const agendaLidSleutel = key => 'lid:' + key;
+const agendaZaakSleutel = code => 'sup:' + code;
+
+module.exports = { maakAgenda, agendaLidSleutel, agendaZaakSleutel };

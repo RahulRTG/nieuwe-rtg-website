@@ -5,7 +5,9 @@ module.exports = (kern) => {
   const { app, agenda, auth, geenGast, supplierAuth, managerOnly } = kern;
 
   // ---------- lid ----------
-  const lidKey = (req) => 'lid:' + req.session.key;
+  // de sleutelregel staat in kern/agenda.js, naast de opslag die hem gebruikt
+  const { agendaLidSleutel } = require('../kern/agenda');
+  const lidKey = (req) => agendaLidSleutel(req.session.key);
   app.post('/api/agenda/mijn-lijst', auth, (req, res) => {
     res.json({ items: agenda.lijst(lidKey(req)), telling: agenda.telling(lidKey(req)) });
   });

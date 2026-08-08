@@ -42,6 +42,14 @@ module.exports = (ctx) => {
         detail: 'Deze kamer telt niet mee in het overzicht hieronder. Onze techniek heeft er bericht van.' });
     }
 
+    /* 1b. Wat er wel is maar niet getoond wordt. Geen storing, wel iets wat het
+          lid hoort te weten voordat hij op dit scherm afgaat. */
+    for (const a of (sam.afgekapt || [])) {
+      regels.push({ ernst: MIDDEN, soort: 'afgekapt',
+        tekst: 'Wij tonen de eerste ' + a.dak + ' uit ' + a.bron,
+        detail: 'U heeft er meer dan ' + a.dak + '; wat daarna komt staat hier niet.' });
+    }
+
     /* 2. Wat al te laat is. */
     for (const r of t.achterstallig) {
       regels.push({ ernst: r.zwaar ? HOOG : MIDDEN, soort: 'achterstallig',
@@ -93,6 +101,7 @@ module.exports = (ctx) => {
       kop, ernst, regels: regels.slice(0, 40),
       tellingen: {
         beslissingen, lopend, achterstallig: aandacht, storingen,
+        afgekapt: (sam.afgekapt || []).length,
         dezeWeek: week.length, knopen: sam.knopen, waarde: sam.waarde
       },
       datum: vandaag()

@@ -668,7 +668,8 @@ async function vGraaf(){
   const GEV=['open','persoonlijk','vertrouwelijk','besloten'];
   let h = '<div class="kaart"><h2>Alles wat wij van u weten</h2>'
     + '<div class="sub">'+knopen.length+' zaken uit '+[...new Set(knopen.map(k=>k.bron))].length+' apps. Bij elk staat waar het vandaan komt, '
-    + 'wie het mag zien en wanneer het aandacht vraagt. Dit is geen kopie: het staat in de app waar u het invulde.</div>'
+    + 'wie het mag zien en wanneer het aandacht vraagt. Dit is geen kopie: het staat in de app waar u het invulde '
+    + '\u2014 of waar u het al deed, zoals uw boekingen en uw agenda.</div>'
     + '<div class="niv"><button class="js-kam'+(graafKamer?'':' aan')+'" data-k="">Alles</button>'
     + kamers.map(k=>'<button class="js-kam'+(graafKamer===k?' aan':'')+'" data-k="'+esc(k)+'">'+esc(k)+'</button>').join('')+'</div></div>';
   h += '<div class="kaart">' + (zicht.length ? zicht.slice(0,300).map(k=>

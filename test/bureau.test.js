@@ -749,3 +749,130 @@ test('alle twintig werelden hebben een deur, en de plattegrond beweert dat niet 
     assert.equal(uit.status, kern.bureau.kamerStatus(kamer), kamer.naam);
   }
 });
+
+/* --------------------------------------------- wat het platform al weet ----- */
+test('een leeg dossier is geen leeg kantoor: boekingen en agenda komen vanzelf mee', async () => {
+  /* Dit was de grootste zwakte van dit kantoor: alle bronnen lazen wat het lid
+     zelf had ingetypt, dus wie niets invulde kreeg een Control Tower die
+     opgewekt "alles onder controle" meldde omdat er nul datums in stonden. Een
+     boeking en een agenda-item kosten het lid geen enkele extra handeling. */
+  const tok = await lidMet('lifestyle');
+  const leeg = await json(await bu('graaf', {}, tok));
+  assert.equal(leeg.graaf.knopen.length, 0, 'nog niets: geen dossier, geen boeking');
+
+  // een agenda-item via de gewone agenda-app van het lid
+  assert.equal((await raw('/agenda/toevoegen',
+    { titel: 'Notaris', datum: overDagen(3) }, tok)).status, 200);
+
+  const g = await json(await bu('graaf', {}, tok));
+  const agenda = g.graaf.knopen.find(k => k.bron === 'Agenda');
+  assert.ok(agenda, 'het agenda-item staat in de graaf zonder dat er iets is overgetypt');
+  assert.equal(agenda.naam, 'Notaris');
+  assert.equal(agenda.kamer, 'prive');
+  assert.equal(agenda.vervalt, overDagen(3));
+
+  // en dus ook in de Control Tower, tussen de verzekeringen en de paspoorten
+  const tw = await json(await bu('tower', {}, tok));
+  const week = tw.vensters.find(v => v.sleutel === 'week');
+  assert.equal(week.aantal, 1);
+  assert.equal(week.items[0].bron, 'Agenda');
+
+  /* De agenda van een lid kan letterlijk alles bevatten, dus hij reikt niet
+     verder dan de Rechterhand. Het concierge-bureau krijgt hem niet. */
+  const bureau = await json(await bu('graaf', {}, tok));
+  assert.equal(agenda.deel, 'rechterhand');
+  assert.ok(bureau.graaf.knopen.length >= 1);
+
+  // een afgevinkt item hoort er NIET meer in te staan
+  const lijst = await json(await raw('/agenda/mijn-lijst', {}, tok));
+  await raw('/agenda/wijzig', { id: lijst.items[0].id, gedaan: true }, tok);
+  const na = await json(await bu('graaf', {}, tok));
+  assert.equal(na.graaf.knopen.filter(k => k.bron === 'Agenda').length, 0);
+});
+
+test('de boekingen van EEN lid, niet die van het hele platform', async () => {
+  /* db.data.boekingen is een platte lijst voor iedereen. De bron filtert op
+     customerKey, en deze toets bewijst dat die filter er echt is: twee leden,
+     allebei een boeking, en geen van beiden ziet die van de ander. */
+  const a = await lidMet('lifestyle');
+  const b = await lidMet('lifestyle');
+  /* GEEN ONTSNAPPING ALS ER GEEN PARTNER IS. Hier stond eerst
+     `if (!zaak) return;` -- en die regel vuurde ELKE keer, want de routes heetten
+     anders dan ik dacht (/api/suppliers en /api/booking/request, niet
+     /member/partners). Deze toets deed dus maandenlang niets, en dat viel pas op
+     toen een mutatie die het filter op customerKey sloopte hem NIET liet zakken.
+     Regel 3 en 9 van de lat in een regel code: een toets die zichzelf uitzet bij
+     ontbrekende invoer, hoort te zakken. */
+  const lijstA = await json(await raw('/suppliers', {}, a));
+  const zaak = (lijstA.suppliers || []).find(p => (p.services || []).length);
+  assert.ok(zaak, 'de seed hoort een partner met een dienst te hebben; zonder bewijst deze toets niets');
+  const dienst = zaak.services[0];
+  for (const tok of [a, b]) {
+    const r = await raw('/booking/request', { supplierCode: zaak.code, serviceId: dienst.id,
+      date: overDagen(4), time: '19:30' }, tok);
+    assert.equal(r.status, 200, 'de boeking moet echt zijn aangelegd');
+  }
+  const ga = await json(await bu('graaf', {}, a));
+  const gb = await json(await bu('graaf', {}, b));
+  const boekA = ga.graaf.knopen.filter(k => k.bron === 'Boekingen');
+  const boekB = gb.graaf.knopen.filter(k => k.bron === 'Boekingen');
+  assert.equal(boekA.length, 1, 'precies zijn eigen boeking');
+  assert.equal(boekB.length, 1);
+  assert.notEqual(boekA[0].id, boekB[0].id, 'en niet dezelfde');
+  assert.equal(boekA[0].kamer, 'gelegenheden');
+  assert.equal(boekA[0].deel, 'kantoor', 'de partner weet hier al van; achterhouden beschermt niemand');
+});
+
+test('het dak op de platformbronnen zwijgt niet als het wordt bereikt', async () => {
+  /* Een dak dat stil afkapt op een scherm dat "alles onder controle" durft te
+     zeggen, is de verkeerde stilte. Rechtstreeks op de kern, want er
+     tweehonderd-en-een agenda-items in duwen via HTTP is traag en bewijst
+     hetzelfde. */
+  const { agendaLidSleutel } = require('../server/kern/agenda');
+  const agendas = { [agendaLidSleutel('k1')]: [] };
+  for (let i = 0; i < 260; i++) {
+    agendas[agendaLidSleutel('k1')].push({ id: 'a' + i, titel: 'Item ' + i,
+      datum: new Date(Date.now() + (i + 1) * 86400000).toISOString().slice(0, 10) });
+  }
+  const kern = require('../server/kern/bureau')({ db: { data: { lifestyle: {}, agendas, boekingen: [] } },
+    save: () => {}, crypto, anthropic: null, liveCodename: () => '', notify: null });
+  const sam = kern.bureau.graafSamenvatting('k1');
+  assert.equal(sam.knopen, 200, 'het dak doet wat het belooft');
+  assert.equal(sam.afgekapt.length, 1);
+  assert.equal(sam.afgekapt[0].bron, 'Agenda');
+
+  const nu = kern.bureau.nu('k1');
+  assert.equal(nu.tellingen.afgekapt, 1);
+  const regel = nu.regels.find(r => r.soort === 'afgekapt');
+  assert.ok(regel, 'en het staat op het scherm, niet alleen in de telling');
+  assert.match(regel.tekst, /eerste 200 uit Agenda/);
+
+  // onder het dak zegt hij niets: een melding die er altijd staat, meldt niets
+  const klein = { [agendaLidSleutel('k2')]: agendas[agendaLidSleutel('k1')].slice(0, 5) };
+  const kern2 = require('../server/kern/bureau')({ db: { data: { lifestyle: {}, agendas: klein, boekingen: [] } },
+    save: () => {}, crypto, anthropic: null, liveCodename: () => '', notify: null });
+  assert.equal(kern2.bureau.nu('k2').tellingen.afgekapt, 0);
+});
+
+test('vijftigduizend boekingen op het platform kosten dit scherm geen seconde', async () => {
+  /* De bron loopt db.data.boekingen door om er EEN lid uit te filteren. Dat is
+     een bewering over kosten, en die hoort gemeten te worden en niet aangenomen
+     (regel 10 van de lat). De grens staat ruim: gaat dit ooit over de 250 ms,
+     dan is een index per lid nodig en zakt deze toets voordat een gebruiker het
+     merkt. */
+  const boekingen = [];
+  for (let i = 0; i < 50000; i++) {
+    boekingen.push({ ref: 'B' + i, customerKey: 'lid' + (i % 2000), supplierName: 'Zaak',
+      service: { name: 'Dienst' }, status: 'aangevraagd',
+      wanneer: new Date(Date.now() + ((i % 900) - 300) * 86400000).toISOString().slice(0, 10) + ' 12:00' });
+  }
+  const kern = require('../server/kern/bureau')({ db: { data: { lifestyle: {}, boekingen, agendas: {} } },
+    save: () => {}, crypto, anthropic: null, liveCodename: () => '', notify: null });
+  const g = kern.bureau.graaf('lid7', 'lid');
+  assert.ok(g.knopen.length > 0 && g.knopen.length < 50, 'alleen zijn eigen toekomstige boekingen');
+
+  const t0 = process.hrtime.bigint();
+  for (let i = 0; i < 10; i++) kern.bureau.overzicht('lid7');
+  const ms = Number(process.hrtime.bigint() - t0) / 10 / 1e6;
+  assert.ok(ms < 250, 'een schermbezoek koste ' + ms.toFixed(1) + ' ms bij 50.000 boekingen');
+});

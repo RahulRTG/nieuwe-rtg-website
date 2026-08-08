@@ -95,19 +95,26 @@ module.exports = (ctx) => {
          Cellier de Control Tower stilleggen, en dat is precies het soort stille
          uitval waar regel 5 over gaat. We tellen hem, en ./nu.js zet het op het
          scherm -- niet in een log dat niemand leest. */
-      try { uit = bron.knopen(l, knoop) || []; }
+      /* Een bron krijgt er de SLEUTEL en de database bij. De veertien bronnen
+         die het dossier lezen negeren dat derde argument; ./graaf-platform.js
+         heeft het nodig, want die leest wat het PLATFORM al van dit lid weet en
+         dat staat niet in `l`. Het contract is daarmee uitgebreid en niet
+         gebroken. */
+      try { uit = bron.knopen(l, knoop, { key, db }) || []; }
       catch (e) { uit = [{ __stuk: bron.kamer }]; }
       for (const k of uit) knopen.push(k);
     }
     const stuk = knopen.filter(k => k.__stuk).map(k => k.__stuk);
-    const goed = knopen.filter(k => !k.__stuk);
+    // een bron die op zijn dak stuitte; zie graaf-platform.js
+    const afgekapt = knopen.filter(k => k.__afgekapt).map(k => k.__afgekapt);
+    const goed = knopen.filter(k => !k.__stuk && !k.__afgekapt);
 
     const perId = new Map(goed.map(k => [k.id, k]));
     const kanten = [];
     for (const k of goed) {
       if (k.ouder && perId.has(k.ouder)) kanten.push({ van: k.ouder, naar: k.id, band: k.soort });
     }
-    return { knopen: goed, kanten, stuk, perId };
+    return { knopen: goed, kanten, stuk, afgekapt, perId };
   }
 
   /* De graaf zoals EEN BEPAALDE KRING hem mag zien. Dit is de poort waar de
@@ -125,7 +132,7 @@ module.exports = (ctx) => {
     return {
       knopen,
       kanten: g.kanten.filter(e => zichtbaar.has(e.van) && zichtbaar.has(e.naar)),
-      stuk: g.stuk,
+      stuk: g.stuk, afgekapt: g.afgekapt,
       verborgen: g.knopen.length - knopen.length
     };
   }
@@ -149,7 +156,7 @@ module.exports = (ctx) => {
       metTermijn: g.knopen.filter(k => k.vervalt).length,
       besloten: g.knopen.filter(k => k.gevoelig >= BESLOTEN).length,
       perKamer,
-      stuk: g.stuk
+      stuk: g.stuk, afgekapt: g.afgekapt
     };
   }
 

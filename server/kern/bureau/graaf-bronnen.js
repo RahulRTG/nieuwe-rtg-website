@@ -160,6 +160,9 @@ const DEEL1 = [
     } }
 ];
 
-/* De volledige lijst: deze helft plus de andere. graaf.js kent alleen ALLE en
-   merkt van de knip niets. */
-module.exports = { ALLE: DEEL1.concat(require('./graaf-bronnen2'), require('./graaf-bronnen3')) };
+/* De volledige lijst: de drie helften met wat het LID invulde, plus
+   ./graaf-platform.js met wat het PLATFORM al van hem weet (boekingen, agenda).
+   Die laatste staat achteraan omdat hij als enige buiten het lifestyle-dossier
+   kijkt en daarvoor de sleutel nodig heeft; zie het contract in ./graaf.js. */
+module.exports = { ALLE: DEEL1.concat(require('./graaf-bronnen2'), require('./graaf-bronnen3'),
+  require('./graaf-platform')) };

@@ -15,7 +15,7 @@ const K = (id, naam, wat, kamers, apps) => ({ id, naam, wat, kamers, apps });
 
 const KAMERS = [
   K('prive', 'Private Office', 'Uw zaken, uw beslissingen, uw correspondentie en het logboek van wat er voor u geregeld is.',
-    ['cases'], [{ naam: 'Zaken & beslissingen', url: '/apps/lifestyle.html', pas: 'lifestyle' },
+    ['cases', 'prive'], [{ naam: 'Zaken & beslissingen', url: '/apps/lifestyle.html', pas: 'lifestyle' },
       { naam: 'Logboek', url: '/apps/logboek.html', pas: 'lifestyle' }]),
   K('vermogen', 'Family Office', 'Wat u bezit, wat het waard is, wie het verzekert en wanneer het opnieuw bekeken moet worden.',
     ['vermogen'], [{ naam: 'Bezittingenregister', url: '/apps/lifestyle.html', pas: 'lifestyle' },

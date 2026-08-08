@@ -83,6 +83,27 @@ test('de vier veiligheidsapps staan echt', { skip: pw ? false : 'geen browser be
 
     // Het codewoord mag NERGENS op het scherm terugkomen nadat het is gezet.
     await t.test('het codewoord komt na het instellen nooit meer op het scherm', async () => {
+      /* EERST EEN KRING, WANT ZONDER KRING WEIGERT DE SERVER TERECHT.
+
+         codewoordZetten geeft 400 als er niemand te waarschuwen valt: "een
+         noodsignaal zonder ontvanger is geen noodsignaal", en het instellen is
+         het enige moment waarop je dat nog kunt zeggen -- valt het codewoord
+         eenmaal, dan is het stil met opzet. Deze toets registreerde een vers
+         lid en zette meteen een zin; die werd geweigerd, de kaart bleef op het
+         invulscherm staan en de toets liep in zijn timeout. Niet de app was
+         stuk maar de opzet, en dat kostte 15 seconden zwijgen om te zien.
+
+         Een e-mailadres is de kortste geldige kring (kringLeeg telt contacten
+         EN mails). Een tweede lid zou ook kunnen, maar dan moet je ze eerst in
+         de Salon met elkaar verbinden -- drie stappen extra voor dezelfde
+         voorwaarde. */
+      const kring = await fetch(srv.base + '/api/veiligheid/kring/mail', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + reg.token },
+        body: JSON.stringify({ adres: 'kring' + u + '@x.nl' })
+      }).then(r => r.json());
+      assert.ok(kring.ok, 'de kring moet gevuld zijn voor een codewoord kan: ' + JSON.stringify(kring));
+
       const page = await ctx.newPage();
       await page.goto(srv.base + '/apps/codewoord.html', { waitUntil: 'domcontentloaded' });
       await page.waitForSelector('#zin', { timeout: 15000 });

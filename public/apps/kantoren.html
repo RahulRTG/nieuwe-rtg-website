@@ -3419,45 +3419,23 @@ else uitgelogd();
    computer, niet van een telefoon, en het OS is nu iOS: één scherm tegelijk,
    vol, en je wisselt met de home-indicator. De schermen die hier in vlakken
    naast elkaar lagen zijn gewoon losse apps op de homescreen. */
-/* ---------- het werkblad: meerdere schermen op een scherm ----------
+/* ---------- HIER STOND DE OPSTART VAN HET WERKBLAD ----------
 
-   Een kantoor is geen pagina waar je doorheen scrolt maar een bureau waar
-   dingen naast elkaar liggen. Wie de personeelsplanning naast de weekcijfers
-   wil, hoort niet te hoeven wisselen van tabblad.
+   Meerdere schermen naast elkaar in vlakken, met indelingsknoppen in de
+   kopbalk. Die metafoor is die van een computer en het OS is iOS geworden: één
+   scherm tegelijk, en je wisselt met de home-indicator (zie de alinea
+   hierboven). shared/werkblad.js is bij die ronde verdwenen.
 
-   De indelingsknoppen komen in de kopbalk van deze pagina; shared/werkblad.js
-   doet de rest: vlakken, verslepen van de scheiding, en onthouden. Alleen op
-   een bureaublad; op een telefoon verandert er niets. */
-(function(){
-  const SCHERMEN = [
-    { naam: 'RTG Office', url: '/apps/office.html?werk=kantoor' },
-    { naam: 'RTF-kantoor', url: '/apps/foundation/kantoor.html' },
-    { naam: 'Foundation OS', url: '/apps/foundation/os.html' },
-    { naam: 'Onderzoekslab', url: '/apps/lab.html' },
-    { naam: 'Backoffice', url: '/apps/backoffice.html' },
-    { naam: 'Boardroom', url: '/apps/boardroom.html' }
-  ];
-  const balk = document.createElement('div');
-  balk.className = 'wb-balk';
-  /* De knoppen staan in de KOPBALK van de pagina en niet in de console van
-     Rahul. Dat was de eerste opzet, en die was fout: de console klapt dicht
-     zodra je antwoordt, en dan is de indeling van je eigen scherm onbereikbaar
-     tot je hem weer opent. Iets wat over de pagina gaat, hoort op de pagina te
-     staan; de console is voor Rahul. */
-  function start(){
-    const nav = document.querySelector('header nav');
-    if (nav) nav.insertBefore(balk, nav.firstChild);
-    else document.body.insertBefore(balk, document.body.firstChild);
-    if (window.RTGWerkblad) RTGWerkblad.start({ schermen: SCHERMEN, balk });
-  }
-  /* Hier stond een lus die drie seconden lang wachtte tot shared/werkblad.js
-     zou verschijnen. Dat bestand is er niet meer: de ios-ronde haalde het
-     bureaublad weg ("een homescreen, geen bureaublad eromheen") en niets laadt
-     het nog. Wachten op iets dat nooit komt is geen vangnet maar drie seconden
-     stilte. start() zet de balk gewoon neer; is er ooit weer een werkblad, dan
-     pikt hij hem op via dezelfde controle daarbinnen. */
-  start();
-})();
+   Wat hier overbleef was een lijst van zes schermen en een lege <div
+   class="wb-balk"> die in de kopbalk werd gehangen voor een module die nooit
+   meer komt -- er is geen enkele regel CSS voor die klasse en er zat nooit een
+   knop in. Een balk die niets doet en niets toont, maar die wel iedereen die
+   hier leest laat denken dat het werkblad er nog is. Dat is precies de rommel
+   waar je later niet meer aan durft te komen, dus hij is weg.
+
+   De schermen die in die lijst stonden zijn gewoon losse apps: RTG Office,
+   RTF-kantoor, Foundation OS, het lab, de backoffice en de boardroom staan
+   allemaal op de homescreen. */
 </script>
 <script src="/shared/drie.js"></script>
 <script src="/apps/kantoren-atelier3d.js"></script>

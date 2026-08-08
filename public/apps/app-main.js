@@ -12,7 +12,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '293b0689';
+var RTG_BOUW = '0de92328';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -3172,9 +3172,19 @@ var RTG_BOUW = '293b0689';
     { g: 'volw',   naam: 'RTF Volwassen', sub: 'ouders en verzorgers' }
   ];
   /* ---------- de functierij, onder de klok ----------
-     Bellen, berichten, videobellen en je wallet: de vier dingen die je zonder
-     nadenken moet kunnen pakken. Ze staan vast en kunnen niet uit. */
-  const FUNCTIES = ['os:bellen', 'link:berichten', 'os:videobellen', 'link:wallet'];
+     De vier dingen die je zonder nadenken moet kunnen pakken. Ze staan vast en
+     kunnen niet uit.
+
+     Bellen en videobellen stonden hier als eigen app; ze zitten nu in
+     Berichten, bij het gesprek -- dat waren vier iconen voor iets dat een mens
+     als EEN ding ziet (RTG Communication Core, e67be4d). De vrijgekomen plek
+     gaat naar Camera, de andere manier waarop je iets met iemand deelt, zodat
+     de rij er vier houdt.
+
+     Ook deze regel is door een merge teruggezet naar de oude vier, samen met
+     de rest van het beginscherm; zie de opmerking bij .os-aibalk in
+     apps/app.html. test/comm.e2e.js bewaakt hem. */
+  const FUNCTIES = ['link:berichten', 'os:snaps', 'link:camera', 'link:wallet'];
 
   /* ---------- de mappen, boven de klok ----------
      Vier mappen, en daar zit alles in waar je pas je recht op geeft. Niets

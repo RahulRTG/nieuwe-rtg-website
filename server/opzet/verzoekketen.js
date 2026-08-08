@@ -23,6 +23,7 @@
    een schild dat nog niets weet.
    ========================================================================== */
 'use strict';
+const { lokaalAdres } = require('../lib/lokaaladres');
 
 module.exports = function verzoekketen(deps) {
   const { app, express, log, logboek, db, save, betaal, muntbetaal, opslagKlaar,
@@ -118,11 +119,10 @@ module.exports = function verzoekketen(deps) {
        is ook geen certificaat); wie via een domeinnaam binnenkomt, wordt
        doorgestuurd en krijgt HSTS mee -- ook als NODE_ENV nergens staat. */
     if (!PRODUCTION) {
-      const host = String(req.get('host') || '').split(':')[0].toLowerCase();
-      const lokaal = !host || host === 'localhost' || host.endsWith('.local') ||
-        /^127\./.test(host) || host === '::1' || host === '[::1]' ||
-        /^192\.168\./.test(host) || /^10\./.test(host) ||
-        /^172\.(1[6-9]|2\d|3[01])\./.test(host);
+      /* Welke adressen tellen als lokaal, en waarom, staat in
+         ../lib/lokaaladres.js. Kort: adressen waarvoor niemand een certificaat
+         kan krijgen -- doorsturen naar https is daar doorsturen naar niets. */
+      const lokaal = lokaalAdres(req.get('host'));
       if (!lokaal) {
         const intern2 = req.path === '/api/health' || req.path === '/api/ready' ||
           req.path.indexOf('/api/cluster/') === 0;

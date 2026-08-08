@@ -1,13 +1,24 @@
-/* Het werkblad en de middenconsole in een echte browser.
+/* RTG Kantoren en de middenconsole in een echte browser.
 
    Twee dingen die alleen daar te zien zijn:
 
    1. RTG Kantoren is niet meer stuk. Er stond maandenlang losse JS als platte
       tekst in beeld doordat een ingeplakte scriptregel het inline script van de
       pagina afsloot. Een toets die de PAGINA-tekst nakijkt vangt precies dat.
-   2. Het werkblad doet wat het belooft: meerdere vlakken, met de eigen pagina
-      in het eerste, en een scheiding die je kunt verslepen. En de console van
-      Rahul is te verplaatsen en van maat te veranderen.
+   2. De console van Rahul is te verplaatsen en van maat te veranderen.
+
+   HET WERKBLAD ZELF IS HIER WEG, en dat is geen versoepeling maar het najagen
+   van een besluit. De ios-ronde haalde het bureaublad uit het OS ("een
+   homescreen, en verder niets", zie README) en daarmee verdween
+   shared/werkblad.js. Vier deeltoetsen bleven daarna een feature beweren die
+   niet meer bestaat: ze riepen window.RTGWerkblad aan, dat nooit meer komt.
+   Erger was de wacht op '.wb-balk button' vóór alle deeltoetsen -- daardoor
+   zakte OOK de meting op de losse JS in beeld, de enige reden dat dit bestand
+   ooit is geschreven. Een toets die een verdwenen feature bewaakt, bewaakt
+   niets en verbergt wat hij nog wel kon zien.
+
+   Komt het werkblad terug, dan komen die vier mee terug; ze staan in de
+   git-historie van dit bestand.
 
    Draait alleen waar een browser beschikbaar is; anders overgeslagen.
    Draai: npm run e2e */
@@ -27,7 +38,7 @@ function laadBrowser() {
 }
 const pw = laadBrowser();
 
-test('kantoren: heel scherm, werkblad en een verplaatsbare console', { skip: pw ? false : 'geen browser beschikbaar' }, async (t) => {
+test('kantoren: de pagina draait heel, en de console is te verplaatsen', { skip: pw ? false : 'geen browser beschikbaar' }, async (t) => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-werkblad-e2e-'));
   const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -58,12 +69,12 @@ test('kantoren: heel scherm, werkblad en een verplaatsbare console', { skip: pw 
     const fouten = [];
     letOpFouten(page, fouten);
     await page.goto(srv.base + '/apps/kantoren.html', { waitUntil: 'domcontentloaded' });
-    /* Wachten tot de PAGINA zich heeft aangemeld, niet tot het script bestaat.
-       window.RTGWerkblad staat er zodra shared/werkblad.js is ingelezen, maar
-       de lijst met schermen komt uit kantoren.html zelf. Wie op het eerste
-       wacht, toetst een werkblad zonder schermen -- en dan lijkt "een scherm
-       kiezen" stuk terwijl er alleen niets te kiezen was. */
-    await page.waitForSelector('.wb-balk button', { timeout: 20000 });
+    /* Wachten tot de PAGINA er staat. Hier stond een wacht op '.wb-balk
+       button' -- de knoppenbalk van het werkblad -- en die knoppen komen nooit
+       meer: zie de kop van dit bestand. Die ene regel liet het hele bestand
+       twintig seconden hangen en daarna zakken, inclusief de drie deeltoetsen
+       hieronder die niets met het werkblad te maken hebben. */
+    await page.waitForSelector('main', { timeout: 20000 });
     assert.match(page.url(), /kantoren\.html/, 'we horen op kantoren te staan, niet doorgestuurd te zijn');
 
     await t.test('er staat geen losse JS meer als tekst op de pagina', async () => {
@@ -81,69 +92,28 @@ test('kantoren: heel scherm, werkblad en een verplaatsbare console', { skip: pw 
       assert.deepEqual(fouten.filter(f => !/favicon|manifest|Failed to load resource/i.test(f)), []);
     });
 
-    await t.test('twee vlakken naast elkaar, met de eigen pagina in het eerste', async () => {
-      await page.evaluate(() => window.RTGWerkblad.indeling('naast'));
-      await page.waitForSelector('.wb-blad .wb-vlak', { timeout: 5000 });
-      const d = await page.evaluate(() => {
-        const vlakken = document.querySelectorAll('.wb-blad .wb-vlak');
-        return {
-          aantal: vlakken.length,
-          eigenErin: !!(vlakken[0] && vlakken[0].querySelector('main')),
-          kolommen: getComputedStyle(document.querySelector('.wb-blad')).gridTemplateColumns.split(' ').length,
-          greep: !!document.querySelector('.wb-greep-x')
-        };
-      });
-      assert.equal(d.aantal, 2);
-      assert.equal(d.eigenErin, true, 'de echte pagina hoort in het eerste vlak te staan, geen kopie');
-      assert.equal(d.kolommen, 2);
-      assert.equal(d.greep, true, 'er hoort een greep tussen de vlakken te zitten');
-    });
-
-    await t.test('een scherm in het tweede vlak zetten werkt', async () => {
-      /* Let op de selector. Het eerste vlak bevat de HELE pagina, en die heeft
-         zelf ook keuzelijsten (taal, filters). '.wb-vlak select' pakt die dus
-         mee en dan zet je per ongeluk iets in een lijst van de pagina in
-         plaats van in de kopbalk van het vlak. Alleen '.wb-kopbalk' telt. */
-      const keuzes = await page.evaluate(() =>
-        [...document.querySelectorAll('.wb-blad .wb-vlak')[1].querySelectorAll('.wb-kopbalk option')].map(o => o.value));
-      assert.ok(keuzes.indexOf('/apps/lab.html') >= 0, 'het lab hoort in de lijst te staan: ' + JSON.stringify(keuzes));
-      await page.evaluate(() => {
-        const k = document.querySelectorAll('.wb-blad .wb-vlak > .wb-kopbalk select')[1];
-        k.value = '/apps/lab.html';
-        k.dispatchEvent(new Event('change'));
-      });
-      await page.waitForSelector('.wb-blad iframe', { state: 'attached', timeout: 5000 });
-      const d = await page.evaluate(() => {
-        const f = document.querySelector('.wb-blad iframe');
-        const r = f.getBoundingClientRect();
-        return { src: f.getAttribute('src'), b: Math.round(r.width), h: Math.round(r.height) };
-      });
-      assert.match(d.src, /lab\.html$/);
-      // en hij hoort ook echt RUIMTE te hebben; een vlak van 0 bij 0 is geen vlak
-      assert.ok(d.b > 200 && d.h > 200, 'het tweede vlak hoort echt beeld te krijgen (' + d.b + 'x' + d.h + ')');
-    });
-
-    await t.test('de indeling blijft staan na een verversing', async () => {
-      await page.reload({ waitUntil: 'domcontentloaded' });
-      await page.waitForSelector('.wb-blad .wb-vlak', { timeout: 20000 });
-      const n = await page.evaluate(() => document.querySelectorAll('.wb-blad .wb-vlak').length);
-      assert.equal(n, 2, 'de gekozen indeling hoort onthouden te worden');
-    });
-
-    await t.test('terug naar een vlak zet de pagina weer gewoon terug', async () => {
-      await page.evaluate(() => window.RTGWerkblad.indeling('een'));
-      const d = await page.evaluate(() => ({
-        blad: !!document.querySelector('.wb-blad'),
-        main: !!document.querySelector('body > main, body > .wrap main, main')
-      }));
-      assert.equal(d.blad, false, 'het blad hoort weg te zijn');
-      assert.equal(d.main, true, 'de pagina hoort er gewoon te staan');
-    });
-
     await t.test('de console van Rahul is te verplaatsen en van maat te veranderen', async () => {
       await page.waitForFunction(() => !!window.RTGChatScherm, null, { timeout: 20000 });
       await page.evaluate(() => { window.__handenvrijKamer.beurt('rahul', 'Ik sta hier.'); window.RTGChatScherm.zet('half'); });
       await page.waitForSelector('.hv-maat', { timeout: 5000 });
+      /* EERST DE OPSTART-ANIMATIE LATEN UITLOPEN, en dat is geen "even wachten
+         tot het rustig is" maar een harde voorwaarde.
+
+         ios.js opent elke app met `ios-lanceer`, een animatie die een transform
+         op de BODY zet. Zolang die loopt is body het bevattende blok voor alles
+         wat position:fixed is -- zo werkt CSS -- en dus rekent de console zijn
+         `bottom` af tegen de hele pagina in plaats van tegen het venster. Op
+         kantoren.html is dat een document van 3121px: de greep lag op y=2836
+         terwijl het venster 900 hoog is. De sleep hieronder miste hem daardoor
+         volledig, klikte naast de console, en die klapte dicht -- waarna de
+         meting 0 breed teruggaf en het leek alsof de console stuk was.
+
+         Hij is niet stuk. Een halve seconde later staat hij op 615, precies
+         waar hij hoort. Wachten tot de transform weg is meet dus de app en niet
+         de animatie. */
+      await page.waitForFunction(
+        () => getComputedStyle(document.body).transform === 'none',
+        null, { timeout: 10000 });
       const voor = await page.evaluate(() => document.querySelector('.hv-chat').getBoundingClientRect().toJSON());
 
       // aan de maat-greep trekken: breder en hoger

@@ -92,6 +92,19 @@ test('een lid maakt een lijst en zet er een stuk in',
     const inLijst = await page.$eval('#ladeVlak .stukken .stuk .t', e => e.textContent);
     assert.equal(inLijst, eersteTitel, 'en het is het stuk dat we erin zetten');
 
+    /* 4) en de luisterkamer opent ook echt. Twee browsers tegen elkaar
+       aanzetten hoort in een eigen toets; hier gaat het erom dat samen.js
+       laadt, de lijn opzet en een kamer opent zonder fout -- zonder dit
+       rondje is die hele knop nooit door iets aangeraakt. */
+    await page.locator('#ladeVlak .knop', { hasText: 'Sluit' }).first().click();
+    await page.click('#samenKnop');
+    await page.waitForFunction(() => /Luisterkamers/.test(document.querySelector('#ladeVlak').textContent),
+      null, { timeout: 10000 });
+    await page.locator('#ladeVlak .knop', { hasText: 'Begin een kamer' }).click();
+    await page.waitForFunction(() => /U bent de gastheer/.test(document.querySelector('#ladeVlak').textContent),
+      null, { timeout: 10000 });
+    assert.match(await page.$eval('#ladeVlak h3', e => e.textContent), /Luisterkamer van/);
+
     assert.deepEqual(fouten, [], 'geen fout op de pagina');
   } finally {
     if (browser) await browser.close();

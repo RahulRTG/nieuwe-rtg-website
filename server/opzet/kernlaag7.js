@@ -183,5 +183,5 @@ Object.assign(kern, require('../kern/rtfos')({ db, save, crypto,
 
 // De Media OS hangt HIER, als laatste: hij LEEST de vier media-domeinen en
 // die moeten er dus al zijn. Uitleg: ./mediaos.js.
-require('./mediaos')(kern, notify);
+require('./mediaos')(kern, hulp);
 };

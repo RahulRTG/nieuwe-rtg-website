@@ -49,6 +49,7 @@
            twee knoppen, zodat het bij het stuk staat waar u naar kijkt. */
         rij.appendChild(M.knop('In lijst', '', function () { window.RTGMediaLijst.inLijst(s.id); }));
         rij.appendChild(M.knop('Deel', '', function () { window.RTGMediaLijst.deel(s.id); }));
+        rij.appendChild(M.knop('Samen luisteren', '', function () { window.RTGMediaSamen.start(s.id); }));
         rij.appendChild(M.knop('Kopieer link', '', function () {
           var url = window.location.origin + '/apps/media.html#stuk=' + encodeURIComponent(s.id);
           if (navigator.clipboard) navigator.clipboard.writeText(url).then(function () { M.zeg('Link gekopieerd.'); },

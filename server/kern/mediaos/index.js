@@ -45,7 +45,7 @@ const MODI = {
 };
 const WERELD_MAX = 60;      // de wereld is eindig, en zegt waar hij ophoudt
 
-function maakMediaOS({ db, save, schoon, crypto, codenaamVan, keyVanCodenaam, notify, bronnen }) {
+function maakMediaOS({ db, save, schoon, crypto, codenaamVan, keyVanCodenaam, notify, bronnen, zijnVrienden, sseToCustomer }) {
   const catalogus = maakCatalogus({ bronnen });
   const smaak = maakSmaak({ db, save, schoon });
   const hub = maakHub({ catalogus, bronnen, keyVanCodenaam, codenaamVan });
@@ -60,7 +60,12 @@ function maakMediaOS({ db, save, schoon, crypto, codenaamVan, keyVanCodenaam, no
      Zelfde regel als de bibliotheek -- alleen id's, opgelost met de sessie van
      de lezer, dus wat weg of dicht is, staat er als verdwenen en niet als een
      kaart die niemand kan spelen. */
-  const lijsten = require('./lijsten')({ db, save, schoon, crypto, catalogus });
+  const lijsten = require('./lijsten')({ db, save, schoon, crypto, catalogus, codenaamVan, keyVanCodenaam, zijnVrienden });
+  /* En het vierde: SAMEN LUISTEREN (./samen.js). Een luisterkamer deelt de
+     aanwijzer en niet het geluid -- iedere deelnemer lost het stuk op met zijn
+     eigen sessie, dus de kamer is geen manier om iemand iets te laten horen
+     wat hij zelf niet mag openen. */
+  const samen = require('./samen')({ db, save, crypto, catalogus, codenaamVan, keyVanCodenaam, zijnVrienden, sseToCustomer });
   /* En de andere kant van die voorkeur: nieuw werk wekt de volgers die dit
      soort van deze maker aan hebben staan (./wekken.js). De vier domeinen
      roepen dat aan via een laat gebonden haak in ./opzet/kernlaag*.js. */
@@ -151,7 +156,7 @@ function maakMediaOS({ db, save, schoon, crypto, codenaamVan, keyVanCodenaam, no
     };
   }
 
-  return Object.assign({}, lijsten, {
+  return Object.assign({}, lijsten, samen, {
     mediaWereld: wereld, mediaVolg: volg,
     mediaBieb: bieb, mediaBewaar: bewaar,
     mediaMeldZet: meldZet, mediaMeldVan: meldVan,

@@ -13,20 +13,23 @@
    Aangeroepen vanuit ./kernlaag7.js, als laatste, want alle vier de domeinen
    moeten er al zijn. */
 'use strict';
-/* crypto komt hier uit node zelf en niet uit de hulp-bag van kernlaag7: die
-   bag doorgeven duwde dat bestand over de omvangregel voor drie tekens, en een
-   bestand opknippen om een parameter door te geven is de verkeerde reparatie.
-   De lijsten-module (kern/mediaos/lijsten.js) gebruikt hem voor de id's. */
-const crypto = require('crypto');
-
-module.exports = (kern, notify) => {
+module.exports = (kern, hulp) => {
   /* `notify` komt uit de hulp-bag van kernlaag7 en niet uit de kern: de
      meldingenlaag hangt daar niet in. Hij gaat mee omdat ./wekken.js de
      volgers van een maker wekt langs precies dezelfde weg als het Theater en
      het Podium dat doen -- inclusief de scope-schakelaar van het lid. */
+  /* Dit bestand krijgt de hele hulp-bag van kernlaag7 en niet drie losse
+     parameters: de luisterkamer zit op de live-lijn (sseToCustomer) en de
+     lijsten hebben crypto nodig voor hun id's. Een bag doorgeven is hier
+     goedkoper dan de aanroepregel elke keer verlengen. */
+  const { notify, sseToCustomer, crypto } = hulp;
   const { db, save, schoon, keyVanCodenaam } = kern;
   Object.assign(kern, require('../kern/mediaos').maakMediaOS({
     db, save, schoon, crypto, codenaamVan: kern.codenaamVan, keyVanCodenaam, notify,
+    /* Voor het delen van een lijst en voor de luisterkamer: allebei mogen ze
+       alleen tussen mensen die verbonden zijn, en die relatie woont in de
+       sociale laag -- er komt hier geen tweede vriendenlijst naast. */
+    zijnVrienden: kern.zijnVrienden, sseToCustomer,
     bronnen: {
       // de vier wereldbeelden, elk zoals het domein hem zelf al toont
       tracks: (sess) => kern.muziekZaal(sess, {}),

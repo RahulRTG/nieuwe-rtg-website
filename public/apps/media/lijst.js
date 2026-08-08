@@ -35,14 +35,33 @@
       open(function (vlak) {
         vlak.appendChild(M.el('h3', null, 'Uw lijsten'));
         vlak.appendChild(M.el('p', 'stil', 'Een lijst mag alle vier de vormen door elkaar dragen: muziek, ' +
-          'video, korte video en live. Hij is van u alleen -- lijsten delen bestaat hier niet.'));
+          'video, korte video en live. U kunt hem delen met iemand met wie u verbonden bent -- die LEEST hem, ' +
+          'en ziet er alleen in wat ook voor hem opengaat.'));
         if (!d.lijsten.length) vlak.appendChild(M.el('p', 'stil', 'U heeft nog geen lijst.'));
+        (d.metMij || []).forEach(function (l) {
+          var k = M.el('div', 'kader');
+          k.appendChild(M.el('b', null, l.naam));
+          k.appendChild(M.el('p', 'stil', l.aantal + ' stukken · gedeeld door ' + l.van + ' · u leest hem'));
+          k.appendChild(M.knop('Open', '', function () { lijst(l.id); }));
+          vlak.appendChild(k);
+        });
         d.lijsten.forEach(function (l) {
           var k = M.el('div', 'kader');
           k.appendChild(M.el('b', null, l.naam));
-          k.appendChild(M.el('p', 'stil', l.aantal + ' stukken · bijgewerkt ' + String(l.bijgewerkt).slice(0, 10)));
+          k.appendChild(M.el('p', 'stil', l.aantal + ' stukken · bijgewerkt ' + String(l.bijgewerkt).slice(0, 10) +
+            ((l.gedeeldMet || []).length ? ' · gedeeld met ' + l.gedeeldMet.join(', ') : '')));
           var rij = M.el('div', 'rij');
           rij.appendChild(M.knop('Open', 'vol', function () { lijst(l.id); }));
+          /* Delen is LEZEN, en dat staat er ook: wie de lijst krijgt kan hem
+             niet veranderen, en ziet er alleen in wat voor hem opengaat. */
+          rij.appendChild(M.knop('Deel', '', function () {
+            var wie = prompt('Met welke codenaam wilt u "' + l.naam + '" delen? Hij kan hem alleen lezen.');
+            if (!wie) return;
+            M.api('lijst/deel', { id: l.id, codenaam: wie }).then(function (r) {
+              M.zeg(r.error || 'Gedeeld met ' + wie + '. Hij leest de lijst; veranderen doet u.');
+              if (!r.error) lijsten();
+            });
+          }));
           rij.appendChild(M.knop('Weg', '', function () {
             M.api('lijst/zet', { id: l.id, weg: true }).then(function (r) {
               if (r.error) return M.zeg(r.error);

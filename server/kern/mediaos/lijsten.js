@@ -18,15 +18,25 @@
    stuk op via dezelfde catalogus als de wereld, met uw eigen sessie. Er is
    dus geen weg om via een lijst iets binnen te halen wat de wereld u weigert.
 
-   WAT EEN LIJST NIET IS: hij is van u alleen. Lijsten delen, samen aan een
-   lijst werken en een publieke lijst van een maker bestaan hier niet. Staat in
-   TAKEN.md; zolang het er niet is, belooft het scherm het ook niet. */
+   DELEN IS LEZEN, EN IEDER LEEST MET ZIJN EIGEN OGEN. Een lijst is te delen
+   met iemand met wie u verbonden bent. Die ander LEEST hem: hij kan er niets in
+   zetten, hem niet hernoemen en hem niet weggooien -- samen aan een lijst
+   werken bestaat hier niet, en een publieke lijst van een maker ook niet
+   (TAKEN.md).
+
+   De vraag die onder het delen ligt is wat er gebeurt met een stuk dat voor de
+   EEN wel en voor de ANDER niet opengaat. Het antwoord valt samen met de regel
+   hierboven: de lijst draagt alleen id's, en iedere lezer lost ze op met zijn
+   eigen sessie. Een gedeelde lijst is dus geen doorgeefluik -- wat de ander
+   niet mag zien, ziet hij niet, en hij leest dat er iets stond in plaats van
+   het stilzwijgend te missen. Zie test/medialijstdelen.test.js. */
 'use strict';
 
 const MAX_LIJSTEN = 50;
 const MAX_PER_LIJST = 300;
+const MAX_GEDEELD = 25;
 
-module.exports = ({ db, save, schoon, crypto, catalogus }) => {
+module.exports = ({ db, save, schoon, crypto, catalogus, codenaamVan, keyVanCodenaam, zijnVrienden }) => {
   const nu = () => new Date().toISOString();
   const id = () => 'ml' + crypto.randomBytes(4).toString('hex');
 
@@ -39,8 +49,16 @@ module.exports = ({ db, save, schoon, crypto, catalogus }) => {
     if (!Array.isArray(t[key])) t[key] = [];
     return t[key];
   };
+  // van MIJ: de enige ingang voor alles wat de lijst VERANDERT
   const vind = (key, lid) => mijne(key).find(l => l.id === String(lid || '')) || null;
-  const kort = (l) => ({ id: l.id, naam: l.naam, aantal: (l.stukken || []).length, at: l.at, bijgewerkt: l.bijgewerkt || l.at });
+  const kort = (l) => ({ id: l.id, naam: l.naam, aantal: (l.stukken || []).length, at: l.at, bijgewerkt: l.bijgewerkt || l.at,
+    gedeeldMet: (l.gedeeld || []).map(x => (codenaamVan ? codenaamVan(x) : x)) });
+
+  /* "Wie mag er nog meer bij" is een eigen onderwerp en staat in ./lijstdelen.js:
+     het opzoeken van een lijst die met MIJ gedeeld is, het delen zelf, en de
+     lijst van wat anderen met mij deelden. */
+  const delen = require('./lijstdelen')({ tabel, kort, nu, save, codenaamVan, keyVanCodenaam, zijnVrienden, MAX_GEDEELD });
+  const vindGedeeld = delen.vindGedeeld;
 
   /* ---- de lijst als geheel ---- */
   function maak(sess, opdracht) {
@@ -48,14 +66,25 @@ module.exports = ({ db, save, schoon, crypto, catalogus }) => {
     if (!naam) return { status: 400, error: 'Geef de lijst een naam.' };
     const rij = mijne(sess.key);
     if (rij.length >= MAX_LIJSTEN) return { status: 409, error: 'U heeft de bovengrens van ' + MAX_LIJSTEN + ' lijsten bereikt.' };
-    const l = { id: id(), naam, stukken: [], at: nu(), bijgewerkt: nu() };
+    const l = { id: id(), naam, stukken: [], gedeeld: [], at: nu(), bijgewerkt: nu() };
     rij.unshift(l); save();
     return { status: 200, ok: true, lijst: kort(l) };
   }
+  /* Wie een lijst wil VERANDEREN moet de eigenaar zijn. Het verschil tussen
+     "bestaat niet" en "is met u gedeeld om te lezen" hoort in het antwoord te
+     staan: anders leest een lezer "bestaat niet" over een lijst die hij op dat
+     moment openheeft, en dat is geen fout maar een leugen (LAT.md regel 5). */
+  function vanMij(sess, lid) {
+    const l = vind(sess.key, lid);
+    if (l) return { l };
+    if (vindGedeeld(sess.key, lid))
+      return { fout: { status: 403, error: 'Deze lijst is met u gedeeld om te lezen; alleen de eigenaar wijzigt hem.' } };
+    return { fout: { status: 404, error: 'Deze lijst bestaat niet.' } };
+  }
   function zet(sess, opdracht) {
     const o = opdracht || {};
-    const l = vind(sess.key, o.id);
-    if (!l) return { status: 404, error: 'Deze lijst bestaat niet.' };
+    const m = vanMij(sess, o.id); if (m.fout) return m.fout;
+    const l = m.l;
     if (o.weg === true) {
       tabel()[sess.key] = mijne(sess.key).filter(x => x !== l); save();
       return { status: 200, ok: true, weg: true, lijsten: mijne(sess.key).map(kort) };
@@ -72,8 +101,8 @@ module.exports = ({ db, save, schoon, crypto, catalogus }) => {
      anders van de lijst weten. */
   function stuk(sess, opdracht) {
     const o = opdracht || {};
-    const l = vind(sess.key, o.id);
-    if (!l) return { status: 404, error: 'Deze lijst bestaat niet.' };
+    const m = vanMij(sess, o.id); if (m.fout) return m.fout;
+    const l = m.l;
     const sid = String(o.stukId || '');
     if (!catalogus.deelId(sid)) return { status: 400, error: 'Dit is geen geldig stuk-id.' };
     l.stukken = Array.isArray(l.stukken) ? l.stukken : [];
@@ -103,8 +132,12 @@ module.exports = ({ db, save, schoon, crypto, catalogus }) => {
      niet als kaart terug maar als regel in `verdwenen` -- met de reden die de
      catalogus zelf geeft, niet met een eigen verzinsel. */
   function een(sess, lijstId) {
-    const l = vind(sess.key, lijstId);
-    if (!l) return { status: 404, error: 'Deze lijst bestaat niet.' };
+    let l = vind(sess.key, lijstId), van = null;
+    if (!l) {
+      const g = vindGedeeld(sess.key, lijstId);
+      if (!g) return { status: 404, error: 'Deze lijst bestaat niet.' };
+      l = g.lijst; van = codenaamVan ? codenaamVan(g.eigenaar) : null;
+    }
     const wereld = catalogus.alles(sess);
     const kaart = new Map(wereld.rijen.map(r => [r.id, r]));
     const stukken = [], verdwenen = [];
@@ -114,13 +147,21 @@ module.exports = ({ db, save, schoon, crypto, catalogus }) => {
       else verdwenen.push({ id: x.id, vorm: (catalogus.deelId(x.id) || {}).vorm || null, erinOp: x.at });
     }
     return { status: 200, lijst: kort(l), stukken, verdwenen,
+      ikEigenaar: !van, van,
       buiten: wereld.buiten || [],
       uitleg: verdwenen.length
         ? verdwenen.length + ' stuk(ken) uit deze lijst zijn er niet meer voor u: weggehaald door de maker, of achter een deur die nu dicht staat. Ze blijven staan tot u ze weghaalt.'
         : 'Alles in deze lijst is er nog.' };
   }
-  const alle = (sess) => ({ status: 200, lijsten: mijne(sess.key).map(kort), max: MAX_LIJSTEN, maxPerLijst: MAX_PER_LIJST });
+  /* Mijn lijsten, en de lijsten die iemand MET MIJ deelde. Twee aparte velden
+     en niet een lijst met een vlaggetje: het zijn twee verschillende dingen --
+     de ene mag ik veranderen, de andere alleen lezen. */
+  function alle(sess) {
+    return { status: 200, lijsten: mijne(sess.key).map(kort), metMij: delen.metMij(sess.key), max: MAX_LIJSTEN, maxPerLijst: MAX_PER_LIJST,
+      uitleg: 'Een lijst die met u is gedeeld, leest u: alleen de eigenaar verandert hem. En u ziet er alleen ' +
+        'de stukken in die ook voor u opengaan.' };
+  }
 
   return { mediaLijsten: alle, mediaLijst: een, mediaLijstMaak: maak, mediaLijstZet: zet, mediaLijstStuk: stuk,
-    MEDIA_MAX_LIJSTEN: MAX_LIJSTEN };
+    mediaLijstDeel: (sess, o) => delen.deel(sess, o, vanMij), MEDIA_MAX_LIJSTEN: MAX_LIJSTEN };
 };

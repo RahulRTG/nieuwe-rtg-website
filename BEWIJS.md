@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 685 bestanden en 3816 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 687 bestanden en 3826 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 685 |
-| losse beweringen (`test(...)`) | 3816 |
+| toetsbestanden | 687 |
+| losse beweringen (`test(...)`) | 3826 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 517 |
 | **overleefd**: geen mutatie kreeg hem rood | 12 |
 | niet te meten (al rood, geen module gevonden, ...) | 16 |
 | alleen in de kop *genoemd*, nog niet gemeten | 22 |
-| niets van beide | 118 |
+| niets van beide | 120 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-606 bestanden, 3681 beweringen.
+608 bestanden, 3691 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -303,8 +303,10 @@ toets omvalt.
 | `markt.test.js` | 11 | gezakt op `liegpoort /api/` | Marktplaats in de RTFoundation-app: gezinnen kopen en verkopen, leveranciers kunnen er ook op verkopen. Met de vier pijlers: veiligheid (kinderen kijken alleen, oplichting wordt gemarkeerd, melden/blokkeren), respect... |
 | `media.test.js` | 6 | gezakt op `liegpoort /api/` | De mediastore: foto's van de Salon en snaps staan als losse bestanden (schijf of S3), niet als base64 in db.data. Zo groeit het werkgeheugen en elke db-snapshot niet mee met de foto's. |
 | `mediadelen.test.js` | 4 | -- | EEN STUK DELEN IN EEN GESPREK -- en waarom er alleen een ID meegaat. Een gesprek tussen twee leden kon al een Salon-post meedragen. |
+| `medialijstdelen.test.js` | 4 | -- | EEN LIJST DELEN -- en de vraag die daar onder ligt. Bij het bouwen van de lijsten stond in TAKEN.md dat delen een antwoord vroeg op EEN vraag, en dat die vraag de kern was en niet de bijzaak: wat gebeurt er met een... |
 | `medialijsten.test.js` | 6 | -- | AFSPEELLIJSTEN OVER DE VIER VORMEN HEEN -- en wat een lijst NIET bewaart. Een lijst is het tweede ding dat in geen van de vier media-domeinen bestond (het eerste is de bibliotheek). |
 | `mediaos.test.js` | 19 | -- | De Media OS: één mediawereld over Klankwerk (muziek), Theater (video), Clips (korte video) en Podium (live) heen. Wat hier bewezen moet worden is vooral wat de laag NIET doet: geen tweede administratie naast de vier... |
+| `mediasamen.test.js` | 6 | -- | SAMEN LUISTEREN EN KIJKEN -- de kamer deelt de AANWIJZER, niet het geluid. Een luisterkamer zegt: dit stuk, op deze seconde, spelend of stil. |
 | `meet.test.js` | 3 | gezakt op `liegpoort /api/` | RTG Meet: kamers op codenaam, de toegangsregels (open op code, besloten via de agenda-afspraak), het doorgeefluik voor WebRTC-seinen en de idempotente koppeling met RTG Agenda. |
 | `memo.test.js` | 3 | gezakt op `liegpoort /api/` | RTG Memo: de memo-flow door de Bestanden-kluis (map Memo's, upload, lijst, prullenbak) en de eerlijke Rahul-samenvatting van het transcript -- zonder AI-sleutel een demo die zegt wat hij is, nooit neptekst. |
 | `menselijkebanen.test.js` | 4 | gezakt op `liegpoort /api/` | DE MENSELIJKE BANEN -- kan elk mens in dit huis bij zijn eigen werk? WAAROM DIT ER IS Dit huis kent 60 afdelingen en 157 mensen met een baan: van de kok in KIKUNOI tot de meldkamer van GUARDIA, van de... |

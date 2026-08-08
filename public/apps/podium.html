@@ -32,6 +32,12 @@
   .kop a{color:var(--txt);text-decoration:none;font-size:1.1rem;}
   main{padding:0 1.1rem calc(env(safe-area-inset-bottom,0px) + 3rem);max-width:760px;margin:0 auto;}
   h2{font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);margin:1.1rem 0 0.6rem;}
+  .zones{display:flex;gap:0.15rem;overflow-x:auto;border-bottom:1px solid var(--line);margin:0 0 0.6rem;}
+  .zones button{background:none;border:0;padding:0.55rem 0.8rem 0.6rem;margin-bottom:-1px;color:var(--soft);
+    font:inherit;font-size:0.72rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;
+    white-space:nowrap;border-bottom:2px solid transparent;cursor:pointer;}
+  .zones button[aria-current="true"]{color:var(--txt);border-bottom-color:var(--gold);}
+  .zones button.dicht{opacity:0.5;}
   .stil{color:var(--soft);font-size:0.82rem;line-height:1.55;}
   button{font:inherit;cursor:pointer;}
   .knop{background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--txt);
@@ -105,6 +111,9 @@
 
   <!-- de zaal: kanalen, live eerst -->
   <section id="vZaal" class="weg">
+    <!-- de werelden: een eigen deur, een eigen lijst en eigen betaalregels per zone -->
+    <nav id="zoneBalk" class="zones" aria-label="Werelden"></nav>
+    <p class="stil" id="zoneUitleg"></p>
     <h2>Nu live</h2>
     <div id="lijstLive"><p class="stil">Er is nu niemand live. Kom straks terug, of start zelf een kanaal.</p></div>
     <h2>Alle kanalen</h2>
@@ -214,10 +223,43 @@
     else b.addEventListener('click', () => zeg(k.live ? 'Dit is uw eigen kanaal: open de studio.' : 'Dit kanaal is nu niet live.'));
     return b;
   }
+  /* De zone die u nu bekijkt. Het Podium is geen lijst meer maar een aantal
+     werelden op dezelfde motor: Live, Creator, Events, Besloten en 18+. Elke
+     wereld heeft een eigen deur, een eigen lijst en eigen betaalregels; wat in
+     de ene staat, komt in de andere niet voorbij. */
+  let zone = 'open';
+  try { zone = localStorage.getItem('rtg_podium_zone') || 'open'; } catch (e) {}
+
+  function tekenZones(lijst, huidig) {
+    const balk = $('#zoneBalk'); if (!balk) return;
+    balk.textContent = '';
+    for (const z of (lijst || [])) {
+      const b = document.createElement('button');
+      b.type = 'button'; b.textContent = z.naam;
+      b.setAttribute('aria-current', z.id === huidig ? 'true' : 'false');
+      if (!z.kijken) { b.title = z.kijkReden || ''; b.classList.add('dicht'); }
+      b.addEventListener('click', () => {
+        zone = z.id; try { localStorage.setItem('rtg_podium_zone', zone); } catch (e) {}
+        laadZaal();
+      });
+      balk.appendChild(b);
+    }
+  }
+
   async function laadZaal() {
-    const r = await api('kanalen');
-    if (r.status === 403) { $('#poortReden').textContent = r.body.error + ' Het Podium is de live-zaal van De Salon: strikt 18+, op codenaam, met melden en blokkeren ingebouwd.'; toon('vPoort'); return; }
+    const r = await api('kanalen', { zone });
+    if (r.status === 403) {
+      $('#poortReden').textContent = r.body.error;
+      tekenZones(r.body.zones, zone);
+      const balk = $('#zoneBalk');
+      if (balk && balk.parentNode !== $('#vPoort')) $('#vPoort').insertBefore(balk, $('#vPoort').firstChild);
+      toon('vPoort'); return;
+    }
     zaal = r.body; cadeaus = zaal.cadeaus || [];
+    tekenZones(zaal.zones, zaal.zone);
+    const uitleg = $('#zoneUitleg');
+    if (uitleg) uitleg.textContent = zaal.zoneUitleg + ' In deze wereld loopt: ' +
+      ((zaal.geld || []).join(', ') || 'geen geld') + '.';
     const liveEl = $('#lijstLive'), alleEl = $('#lijstAlle');
     liveEl.innerHTML = ''; alleEl.innerHTML = '';
     const rijen = zaal.kanalen || [];
@@ -235,7 +277,8 @@
     const kaart = document.createElement('div'); kaart.className = 'kaart';
     if (!m) {
       kaart.innerHTML = '<p class="stil">Start uw eigen kanaal. RTG-kantoor keurt elk kanaal eerst persoonlijk goed; ' +
-        'daarna zendt u live uit, praat de zaal mee en verdient u via cadeautjes en abonnementen (RTG Pay).</p>' +
+        'daarna zendt u live uit. Uw kanaal komt in de wereld die u nu bekijkt te staan, met de regels van die wereld; ' +
+        'verhuizen kan later alleen via het kantoor.</p>' +
         '<label for="mNaam">Naam van het kanaal</label><input id="mNaam" maxlength="40">' +
         '<label for="mGenre">Genre</label><select id="mGenre"></select>' +
         '<label for="mBio">Waar gaat het over?</label><input id="mBio" maxlength="300">' +
@@ -243,7 +286,7 @@
       el.appendChild(kaart);
       for (const g of (zaal.genres || [])) { const o = document.createElement('option'); o.value = g; o.textContent = g; kaart.querySelector('#mGenre').appendChild(o); }
       kaart.querySelector('#mStart').addEventListener('click', async () => {
-        const r = await api('kanaal/aanmeld', { naam: $('#mNaam').value, genre: $('#mGenre').value, bio: $('#mBio').value });
+        const r = await api('kanaal/aanmeld', { naam: $('#mNaam').value, zone, genre: $('#mGenre').value, bio: $('#mBio').value });
         if (r.body.error) return zeg(r.body.error);
         zeg('Aangemeld. RTG-kantoor kijkt er persoonlijk naar.'); laadZaal();
       });

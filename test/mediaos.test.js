@@ -144,20 +144,36 @@ test('2c. volgen zet nu ook het Theaterkanaal, in het domein zelf', async () => 
   assert.equal(s.band, 0, 'wie u volgt staat vooraan');
 });
 
-test('3. een bron die dicht is, valt niet stil weg maar staat erbij met reden', async () => {
-  // het Podium eist 18+ en verificatie; dit lid heeft dat niet
-  const podium = await api('/api/podium/kanalen', {}, kijker);
-  assert.equal(podium.status, 403, 'het Podium weigert dit lid');
-  assert.ok(podium.body.error, 'met een reden');
-  const w = await api('/api/mediaos/wereld', { modus: 'kijk' }, kijker);
-  const buiten = w.body.buiten.find(b => b.vorm === 'live');
-  assert.ok(buiten, 'de wereld meldt dat de live-bron buiten staat');
-  assert.equal(buiten.reden, podium.body.error, 'met exact de reden van het Podium zelf');
-  /* Maar alleen in de stand waar live IN zit. Onder FLOW hoort die melding niet
-     te staan -- daar gaat het over clips, en een dichte deur van een ander
-     domein noemen stuurt de lezer de verkeerde kant op. */
-  const flow = await api('/api/mediaos/wereld', { modus: 'flow' }, kijker);
-  assert.deepEqual(flow.body.buiten, [], 'FLOW noemt de live-deur niet');
+test('3. een bron die dicht of stuk is, valt niet stil weg maar staat erbij met reden', () => {
+  /* DIT WAS EEN ROUTETOETS EN IS NU EEN DIRECTE. De reden: het Podium is sinds
+     de zone-indeling niet meer als geheel dicht (kern/podium/zones.js) -- de
+     open wereld staat open voor elk lid, en alleen de 18+-zone heeft nog de
+     oude deur. Daarmee was er via de route geen dichte bron meer om deze
+     eigenschap op te hangen, en een toets die niets meer kan aantonen hoort
+     niet blijven staan omdat hij groen is.
+
+     Wat bewezen moet blijven is de eigenschap zelf: valt een bron weg, dan
+     verdwijnt hij niet stil uit de wereld maar staat hij eronder met de reden
+     van dat domein zelf (LAT.md regel 5). Dat is hier met een kapotte en een
+     weigerende bron nagegaan. */
+  const { maakCatalogus } = require('../server/kern/mediaos/catalogus');
+  const sess = { key: 'user-1' };
+  const leeg = { uitgaven: [] };
+  const cat = maakCatalogus({ bronnen: {
+    tracks: () => leeg,
+    videos: () => ({ error: 'Activeer eerst uw RTG-geverifieerde paspoort.' }),
+    clips: () => { throw new Error('de clipsdienst antwoordt niet'); },
+    live: () => ({ kanalen: [] })
+  } });
+  const uit = cat.alles(sess);
+  assert.deepEqual(uit.rijen, [], 'er is niets te tonen');
+  const video = uit.buiten.find(b => b.vorm === 'video');
+  assert.ok(video, 'een weigerende bron staat erbij');
+  assert.equal(video.reden, 'Activeer eerst uw RTG-geverifieerde paspoort.', 'met exact de reden van dat domein');
+  const clip = uit.buiten.find(b => b.vorm === 'clip');
+  assert.ok(clip, 'en een bron die stuk gaat ook');
+  assert.match(clip.reden, /antwoordt niet/, 'met de fout erin, in plaats van een lege lijst');
+  assert.ok(!uit.buiten.some(b => b.vorm === 'track' || b.vorm === 'live'), 'wat het wel doet, staat er niet bij');
 });
 
 test('4. volgen schrijft in het domein zelf, niet in een tweede lijst', async () => {

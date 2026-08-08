@@ -27,7 +27,8 @@ module.exports = (kern, notify) => {
       tracks: (sess) => kern.muziekZaal(sess, {}),
       videos: (key) => kern.theaterZaal(key),
       clips: (key) => kern.clipsFeed(key, {}),
-      live: (key) => kern.podiumKanalen(key),
+      // alleen de zones die in de gedeelde index horen; 18+ en besloten niet
+      live: (key) => kern.podiumGedeeld(key),
       // gericht: één maker, en de verbinding tussen een uitgave en de clips eronder
       tracksVan: (mKey, kijker) => kern.muziekUitgavenVan(mKey, kijker),
       videosVan: (mKey) => kern.theaterVideosVan(mKey),

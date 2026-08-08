@@ -1012,6 +1012,28 @@ wordt uitgerekend uit de einddatum en de opzegtermijn; stemmen kan pas na de
 adviesronde en het beheer-token stemt niet; en wat niet gemeten wordt staat
 overal als **niet gemeten** in plaats van als nul.
 
+### RTG Podium: werelden op één motor
+
+Het Podium was één product achter één deur: geverifieerd paspoort en 18 jaar, voor iedereen die wilde kijken. Dat maakte de voorziening onbruikbaar voor alles wat die deur niet nodig heeft — een schoolstream, een productlancering, een concert — terwijl de techniek eronder (de relay-boom over kijkers, de chat, RTG Pay, de goedkeuring door een mens) voor al die dingen dezelfde is.
+
+Een kanaal hoort nu in precies één **zone**, en de zone draagt het beleid (`server/kern/podium/zones.js`): wie mag kijken, wie mag zenden, hoe er geld mag lopen, of hij in de gedeelde index staat, en welke wachtrij van het kantoor hem behandelt.
+
+| Zone | Deur | Geld | Index |
+|---|---|---|---|
+| **Live** (`open`) | elk lid | cadeaus | gedeeld |
+| **Creator** | elk lid | cadeaus + maandabonnement | gedeeld |
+| **Events** | lid met een kaartje | kaartje + cadeaus | gedeeld |
+| **Besloten** | alleen wie de maker uitnodigt | cadeaus | geen |
+| **18+** (`beperkt`) | geverifieerd paspoort, 18 jaar | cadeaus + abonnement | apart |
+| **Business** (`zaak`) | — dicht, zie `TAKEN.md` 4.14 | — | geen |
+| **Commerce** (`handel`) | — dicht, zie `TAKEN.md` 4.14 | — | gedeeld |
+
+**Waarom 18+ een eigen zone is en geen categorie.** Als "18+" een genre naast "koken" is, lekt het overal doorheen: in de lijst, in de zoekresultaten, in een aanbeveling, in een profielkaart. Als het een eigen zone met een eigen index is, is "niet lekken" een eigenschap van de code. `test/podiumzones.test.js` probeert precies dat: het kanaal is niet te zien in een andere zone, niet te openen met een geraden id, niet te bechatten, er gaat geen cadeau heen, en het staat niet in de gedeelde mediawereld — ook niet bij iemand die er wél in mag.
+
+**De verhuizing van wat er al stond.** Elk bestaand kanaal is aangemeld toen het Podium als geheel achter de 18+-deur zat; die kanalen staan daarom in zone `beperkt`. Niet omdat hun inhoud dat is, maar omdat dat de deur is waar ze achter staan — **niemand wint of verliest toegang**. Verhuizen naar een andere zone is een besluit van een mens bij het kantoor.
+
+Een **kaartje** (Events) is een eenmalige betaling via RTG Pay die voor een periode binnenlaat: geen abonnement dat doorloopt, geen incasso. Een **uitnodiging** (Besloten) is een handeling van de maker op codenaam; de genodigdenlijst komt niet naar buiten.
+
 ### RTG Media OS (één mediawereld over vier apps)
 
 Er waren vier media-apps die niets van elkaar wisten: **RTG Klankwerk** (zelf muziek maken en uitgeven), **RTG Theater** (video), **RTG Clips** (korte verticale video) en **RTG Podium** (live). Voor een lid was dat vier keer dezelfde maker, vier keer een volgknop en vier keer zoeken; voor een maker vier keer publiceren en vier keer bijhouden hoe het gaat.

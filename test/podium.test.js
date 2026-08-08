@@ -54,26 +54,43 @@ test.before(async () => {
 });
 test.after(() => stop(srv && srv.child));
 
-test('1. de poort: zonder geverifieerd paspoort of onder de 18 blijft het Podium dicht', async () => {
+test('1. de poort: de 18+-zone blijft dicht zonder paspoort of onder de 18', async () => {
+  /* HET PODIUM IS NIET MEER EEN DEUR MAAR EEN AANTAL WERELDEN op dezelfde
+     motor (kern/podium/zones.js). Die van 18+ heeft precies de deur die het
+     hele Podium eerst had: geverifieerd paspoort en minstens achttien. Deze
+     toets bewaakt die deur, en niet meer de aanname dat ALLES erachter zit --
+     want dat was juist wat het Podium onbruikbaar maakte voor een school, een
+     bedrijf of een concert. */
   const groen = await nieuwLid('1990-05-05', false);          // niet geverifieerd
-  const r1 = await api(base, '/api/podium/kanalen', {}, groen.token);
+  const r1 = await api(base, '/api/podium/kanalen', { zone: 'beperkt' }, groen.token);
   assert.equal(r1.status, 403);
   assert.equal(r1.body.mag, false);
-  const r2 = await api(base, '/api/podium/kanaal/aanmeld', { naam: 'Test' }, groen.token);
-  assert.equal(r2.status, 403, 'ook een kanaal aanmelden kan niet zonder paspoort');
+  const r2 = await api(base, '/api/podium/kanaal/aanmeld', { naam: 'Test', zone: 'beperkt' }, groen.token);
+  assert.equal(r2.status, 403, 'ook zenden in die zone kan niet zonder paspoort');
   const jong = await nieuwLid('2010-01-01', true);            // geverifieerd maar minderjarig
-  const r3 = await api(base, '/api/podium/kanalen', {}, jong.token);
-  assert.equal(r3.status, 403, 'onder de 18 blijft het Podium dicht, ook met paspoort');
+  const r3 = await api(base, '/api/podium/kanalen', { zone: 'beperkt' }, jong.token);
+  assert.equal(r3.status, 403, 'onder de 18 blijft die zone dicht, ook met paspoort');
   assert.ok(/18/.test(r3.body.error));
+
+  /* En de andere kant, want zonder deze helft zou een zone die IEDEREEN
+     weigert er net zo goed uitzien: de open wereld gaat wel open voor een
+     gewoon lid, en hij is leeg -- er staat geen enkel bestaand kanaal in. */
+  const open = await api(base, '/api/podium/kanalen', { zone: 'open' }, groen.token);
+  assert.equal(open.status, 200, 'de open wereld vraagt geen paspoort');
+  assert.deepEqual(open.body.kanalen, [], 'en er is niets uit een andere zone in gelekt');
 });
 
 test('2. een kanaal gaat pas open nadat een mens van kantoor het goedkeurt', async () => {
-  const aan = await api(base, '/api/podium/kanaal/aanmeld', { naam: 'Avond met Vega', genre: 'lifestyle', bio: 'Muziek en verhalen.' }, maker.token);
+  /* In de CREATOR-zone, want dit kanaal verkoopt hieronder een maandabonnement
+     en dat bestaat niet in elke wereld: de open zone kent alleen cadeaus, een
+     zakelijke uitzending kent helemaal geen geld. Welke vorm waar mag staat in
+     kern/podium/zones.js en wordt bij elke betaalroute gevraagd. */
+  const aan = await api(base, '/api/podium/kanaal/aanmeld', { naam: 'Avond met Vega', zone: 'creator', genre: 'lifestyle', bio: 'Muziek en verhalen.' }, maker.token);
   assert.equal(aan.status, 200);
   assert.equal(aan.body.kanaal.status, 'wacht');
   kanaalId = aan.body.kanaal.id;
   // nog niet zichtbaar en nog niet live te zetten
-  const lijst = await api(base, '/api/podium/kanalen', {}, kijker.token);
+  const lijst = await api(base, '/api/podium/kanalen', { zone: 'creator' }, kijker.token);
   assert.ok(!(lijst.body.kanalen || []).some(k => k.id === kanaalId), 'een wachtend kanaal staat niet in de zaal');
   const live = await api(base, '/api/podium/live', { aan: true }, maker.token);
   assert.equal(live.status, 403, 'live zetten kan pas na goedkeuring');
@@ -83,8 +100,13 @@ test('2. een kanaal gaat pas open nadat een mens van kantoor het goedkeurt', asy
   assert.ok((wacht.body.wacht || []).some(k => k.id === kanaalId));
   const ok = await api(base, '/api/office/podium/beslis', { id: kanaalId, besluit: 'goedgekeurd' }, office);
   assert.equal(ok.status, 200);
-  const lijst2 = await api(base, '/api/podium/kanalen', {}, kijker.token);
+  const lijst2 = await api(base, '/api/podium/kanalen', { zone: 'creator' }, kijker.token);
   assert.ok((lijst2.body.kanalen || []).some(k => k.id === kanaalId), 'na goedkeuring staat het kanaal in de zaal');
+  /* En niet in een andere wereld: dat is de hele reden dat zones bestaan. Een
+     kanaal hoort in precies een lijst thuis, ook als de kijker in beide zones
+     mag komen. */
+  const elders = await api(base, '/api/podium/kanalen', { zone: 'open' }, kijker.token);
+  assert.ok(!(elders.body.kanalen || []).some(k => k.id === kanaalId), 'en nergens anders');
 });
 
 test('3. live: kijker komt binnen, chat komt aan en het WebRTC-doorgeefluik werkt', async () => {

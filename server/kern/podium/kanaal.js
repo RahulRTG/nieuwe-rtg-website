@@ -6,17 +6,27 @@
 module.exports = (ctx) => {
   const { db, save, schoon, id, nu, mag, lijsten, kanaalMet, kanaalVan, isAbonnee, verseKijkers,
     stuurRond, kijkBeeld, eigenBeeld, codenaamVan, sseToCustomer, sseToOffice, notify, nieuwWerk,
-    koppel, herstelBoom, ouderKeyVan, GENRES, CADEAUS, SIGNALEN } = ctx;
+    koppel, herstelBoom, ouderKeyVan, GENRES, CADEAUS, SIGNALEN, zones, poort } = ctx;
+
+  /* De lijsten (de zaal van een zone, de gedeelde index voor de Media OS en het
+     eigen kanaal) staan in ./lijsten.js: dat is een eigen onderwerp -- WAT
+     iemand te zien krijgt, los van wat een kanaal doet -- en dit bestand blijft
+     er onder de omvangregel mee. */
+  const lijstjes = require('./lijsten')(ctx);
 
   /* ---- het kanaal: aanmelden, en pas open na een mens van kantoor ---- */
   function kanaalMaak(key, data) {
-    const m = mag(key); if (!m.ok) return { status: 403, error: m.reden };
+    /* De zone kiest de maker BIJ HET AANMELDEN, en daarna niet meer zelf: een
+       kanaal dat van zone wisselt, wisselt van publiek en van beleid, en dat is
+       een besluit van een mens bij het kantoor. */
+    const zone = zones.ZONES[data.zone] ? data.zone : zones.STANDAARD;
+    const m = poort.magZenden(key, zone); if (!m.ok) return { status: 403, error: m.reden };
     lijsten();
     if (kanaalVan(key)) return { status: 409, error: 'U heeft al een kanaal.' };
     const naam = schoon(data.naam, 40); if (!naam) return { status: 400, error: 'Geef het kanaal een naam.' };
-    const k = { id: id(), key, naam, genre: GENRES.includes(data.genre) ? data.genre : 'salon',
+    const k = { id: id(), key, naam, zone, genre: GENRES.includes(data.genre) ? data.genre : 'salon',
       bio: schoon(data.bio, 300), status: 'wacht', abbCenten: 0, verdiend: 0,
-      live: null, kijkers: {}, abonnees: {}, geblokkeerd: [], at: nu() };
+      live: null, kijkers: {}, abonnees: {}, kaartjes: {}, genodigd: [], geblokkeerd: [], at: nu() };
     db.data.podiumKanalen.push(k); save();
     sseToOffice('sync', { scope: 'podium' });
     return { status: 200, ok: true, kanaal: eigenBeeld(k) };
@@ -27,12 +37,24 @@ module.exports = (ctx) => {
     if (data.bio != null) k.bio = schoon(data.bio, 300);
     if (data.genre != null && GENRES.includes(data.genre)) k.genre = data.genre;
     if (data.abbCenten != null) { const c = Math.round(Number(data.abbCenten)); k.abbCenten = Number.isFinite(c) ? Math.min(Math.max(c, 0), 50000) : 0; }
+    // de kaartprijs (zone 'evenement'); zelfde begrenzing als het abonnement
+    if (data.kaartCenten != null) { const c = Math.round(Number(data.kaartCenten)); k.kaartCenten = Number.isFinite(c) ? Math.min(Math.max(c, 0), 50000) : 0; }
     save(); return { status: 200, ok: true, kanaal: eigenBeeld(k) };
   }
-  function officeLijst() {
+  /* De wachtrij van het kantoor staat PER ZONE. Een 18+-aanmelding en een
+     schoolstream horen niet in dezelfde rij: ze vragen een ander oordeel, van
+     mogelijk een ander mens, met andere regels. Zonder zone komt alles, zoals
+     het kantoor het altijd kreeg. */
+  function officeLijst(zone) {
     lijsten();
-    return { wacht: db.data.podiumKanalen.filter(k => k.status === 'wacht').map(k => ({ id: k.id, naam: k.naam, genre: k.genre, bio: k.bio, codenaam: codenaamVan(k.key), at: k.at })),
-      meldingen: db.data.podiumMeldingen.slice(-50).reverse() };
+    const rij = db.data.podiumKanalen.filter(k => k.status === 'wacht' && (!zone || zones.zoneVan(k) === zone));
+    const meldingen = db.data.podiumMeldingen.filter(m => !zone || m.zone === zone);
+    return { zone: zone || null,
+      wachtrijen: Object.keys(zones.ZONES).map(z => ({ zone: z, naam: zones.ZONES[z].naam,
+        wacht: db.data.podiumKanalen.filter(k => k.status === 'wacht' && zones.zoneVan(k) === z).length })),
+      wacht: rij.map(k => ({ id: k.id, naam: k.naam, zone: zones.zoneVan(k), genre: k.genre, bio: k.bio,
+        codenaam: codenaamVan(k.key), at: k.at })),
+      meldingen: meldingen.slice(-50).reverse() };
   }
   function officeBeslis(kid, besluit) {
     const k = kanaalMet(kid); if (!k) return { status: 404, error: 'Kanaal niet gevonden.' };
@@ -46,7 +68,7 @@ module.exports = (ctx) => {
   function liveZet(key, aan, data) {
     const k = kanaalVan(key); if (!k) return { status: 404, error: 'U heeft nog geen kanaal.' };
     if (aan) {
-      const m = mag(key); if (!m.ok) return { status: 403, error: m.reden };
+      const m = poort.magZenden(key, zones.zoneVan(k)); if (!m.ok) return { status: 403, error: m.reden };
       if (k.status !== 'goedgekeurd') return { status: 403, error: 'Uw kanaal wacht nog op goedkeuring door RTG-kantoor.' };
       k.live = { sinds: nu(), titel: schoon(data && data.titel, 80) || k.naam, alleenAbonnees: !!(data && data.alleenAbonnees) };
     } else {
@@ -59,8 +81,10 @@ module.exports = (ctx) => {
     return { status: 200, ok: true, kanaal: eigenBeeld(k) };
   }
   function kijk(key, kid) {
-    const m = mag(key); if (!m.ok) return { status: 403, error: m.reden };
     const k = kanaalMet(kid); if (!k || k.status !== 'goedgekeurd') return { status: 404, error: 'Kanaal niet gevonden.' };
+    /* De deur van DIT kanaal, niet die van het Podium als geheel: de eisen van
+       de zone plus wat alleen dit kanaal weet (een kaartje, een uitnodiging). */
+    const m = poort.magKanaal(key, k); if (!m.ok) return { status: 403, error: m.reden, kaartje: !!m.kaartje };
     if (k.key === key) return { status: 400, error: 'Dit is uw eigen kanaal.' };
     if ((k.geblokkeerd || []).includes(key)) return { status: 403, error: 'Dit kanaal is niet beschikbaar.' };
     if (!k.live) return { status: 409, error: 'Dit kanaal is nu niet live.' };
@@ -108,23 +132,10 @@ module.exports = (ctx) => {
     return { status: 200, ok: true };
   }
 
-  /* ---- de lijsten: wat kijker en maker zien ---- */
-  function kanalen(key) {
-    const m = mag(key); if (!m.ok) return { status: 403, error: m.reden, mag: false };
-    lijsten();
-    const rijen = db.data.podiumKanalen.filter(k => k.status === 'goedgekeurd').map(k => kijkBeeld(k, key))
-      .sort((a, b) => (b.live ? 1 : 0) - (a.live ? 1 : 0) || b.kijkers - a.kijkers);
-    const eigen = kanaalVan(key);
-    return { status: 200, mag: true, cadeaus: CADEAUS, genres: GENRES, kanalen: rijen, mijn: eigen ? eigenBeeld(eigen) : null };
-  }
-  function mijnPodium(key) {
-    const k = kanaalVan(key);
-    return { status: 200, mag: mag(key).ok, kanaal: k ? eigenBeeld(k) : null, chat: k ? (db.data.podiumChat[k.id] || []).slice(-40) : [] };
-  }
-
   return {
     podiumKanaalMaak: kanaalMaak, podiumKanaalZet: kanaalZet,
-    podiumKanalen: kanalen, podiumMijn: mijnPodium, podiumLiveZet: liveZet,
+    podiumKanalen: lijstjes.kanalen, podiumGedeeld: lijstjes.gedeeld, podiumMijn: lijstjes.mijnPodium,
+    podiumLiveZet: liveZet,
     podiumKijk: kijk, podiumWeg: weg, podiumSignaal: signaal,
     podiumOfficeLijst: officeLijst, podiumOfficeBeslis: officeBeslis
   };

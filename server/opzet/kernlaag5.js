@@ -110,7 +110,7 @@ Object.assign(kern, maakOntmoeting({
    na menselijke goedkeuring door kantoor; cadeautjes en abonnementen lopen
    via RTG Pay. Na pay en sociaal gemount (gebruikt beide). */
 Object.assign(kern, require('../kern/podium').maakPodium({
-  db, save, crypto, accounts, leeftijdVan, codenaamVan: kern.codenaamVan,
+  db, save, crypto, accounts, leeftijdVan, codenaamVan: kern.codenaamVan, keyVanCodenaam,
   sseToCustomer, sseToOffice, notify, pay: kern.pay, schoon,
   // de haak van de Media OS: nieuw werk wekt volgers (zie ./mediaos.js)
   nieuwWerk: (key, soort, titel) => (kern.mediaNieuwWerk ? kern.mediaNieuwWerk(key, soort, titel) : null)

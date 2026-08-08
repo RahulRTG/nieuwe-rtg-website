@@ -445,6 +445,21 @@ De schermen halen hun cyclus, methoden en bewijsgraden op bij
 `/api/lab2/kader` en bouwen niets van dat alles zelf na, zodat er geen stap in
 beeld kan staan die de server weigert.
 
+**Het dossier wordt door zeven modules samen opgebouwd** (`livinglab-vormen`,
+`-ethiek`, `-mensen`, `-bewijs`, `-uitgang`, `-werkplaats`, `-apparatuur`), elk
+met een blok dat bij de HUIDIGE stap hoort. Ze delen één `doe()`-helper, zodat
+er één manier is waarop een handeling het blad sluit, herlaadt en heropent.
+Omdat ze samen in één document staan, mag geen enkel `data-`attribuut door twee
+van hen worden getekend -- `test/livinglab.test.js` scant daarop, want die
+botsing heeft hier twee keer een knop aan de verkeerde bedrading gehangen.
+
+**Wat de app NIET doet, en waarom dat een keuze is.** Zonder tekenbevoegde in
+het labregister kan er niets ondertekend worden: geen risicoklasse, geen review,
+geen bewijsgraad boven een indicatie. Dat is de bedoeling, en daarom zegt het
+beheerscherm dat het de eerste stap is in plaats van een leeg keuzemenu te tonen.
+Wie dat overslaat, loopt bij de deelnemersstap tegen vijf openstaande waarborgen
+aan -- met bij elk de knop die hem oplost.
+
 ## Tests
 
 ```bash

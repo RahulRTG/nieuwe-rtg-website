@@ -59,7 +59,7 @@
      zijn vraag echt is opgepakt. */
   function tekenThemas(themas) {
     $('#themas').innerHTML = themas.length ? themas.slice(0, 12).map(function (t) {
-      return '<div class="log" data-t="' + esc(t.id) + '">' +
+      return '<div class="log" data-thema="' + esc(t.id) + '">' +
         '<b>' + esc(t.vraag) + '</b><br>' + t.stemmen + ' stem' + (t.stemmen === 1 ? '' : 'men') +
         ' &middot; van ' + esc(t.door) +
         (t.studieId ? ' &middot; <span class="pil ok">wordt onderzocht</span>'
@@ -68,7 +68,7 @@
     }).join('') : '<div class="leeg">Nog geen vragen uit de buurt. Bewoners dragen ze aan via de labpas-app.</div>';
     Array.prototype.forEach.call(document.querySelectorAll('[data-naar]'), function (b) {
       b.addEventListener('click', function () {
-        var t = themas.filter(function (x) { return x.id === b.closest('[data-t]').dataset.t; })[0];
+        var t = themas.filter(function (x) { return x.id === b.closest('[data-thema]').dataset.t; })[0];
         if (!t) return;
         $('#nTitel').value = t.vraag.slice(0, 60);
         $('#nVraag').value = t.vraag;

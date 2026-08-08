@@ -365,6 +365,59 @@ test('de koppeling alias->sleutel bestaat alleen bij een niet-gescheiden studie'
   assert.notEqual(a.deelnemer.alias, b.deelnemer.alias, 'aliassen zijn per studie en niet per persoon');
 });
 
+/* GEEN TWEE MODULES DIE HETZELFDE data-ATTRIBUUT TEKENEN.
+
+   Deze toets komt uit twee echte fouten in dezelfde ronde. Het dossierblad wordt
+   door zes modules samen opgebouwd, en twee ervan gebruikten per ongeluk dezelfde
+   naam voor iets anders:
+
+     data-conc  het INVOERVELD voor een nieuwe conclusie (vormen.js) én de RIJ
+                van een bestaande conclusie (bewijs.js)
+     data-rzet  de knop "leg een reflectie vast" (vormen.js) én de knop
+                "reserveer een apparaat" (apparatuur.js)
+
+   De tweede was geen schoonheidsfoutje: beide blokken staan in hetzelfde blad,
+   dus bij de stap `reflectie` haakte de reserveringsbedrading zich aan de
+   reflectieknop. Eén klik op "Leg vast" zocht daarna een apparaat dat er niet
+   was -- "Cannot read properties of null". Zelfde naam, twee betekenissen, in
+   één document: regel 4 van de lat, en hij bijt direct.
+
+   De scan strip COMMENTAAR voordat hij telt. Zonder dat sloeg hij aan op de
+   uitleg hierboven, waarin die namen letterlijk staan -- de vierde keer in dit
+   huis dat een meter tekst voor code aanzag. */
+test('geen twee schermmodules tekenen hetzelfde data-attribuut', () => {
+  const zonderCommentaar = (src) =>
+    src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+  /* Getekend = `data-x` in een HTML-string. Bevraagd = `[data-x]` in een
+     selector, en dat mag juist wel in meerdere modules: vormen.js tekent en
+     studie.js bedraadt. De negatieve lookbehind scheidt die twee. */
+  const getekend = new Map();
+  const map = path.join(__dirname, '..', 'public', 'apps');
+  for (const naam of fs.readdirSync(map).filter(n => /^(livinglab|labpas).*\.js$/.test(n))) {
+    const src = zonderCommentaar(fs.readFileSync(path.join(map, naam), 'utf8'));
+    for (const m of src.matchAll(/(?<!\[)data-([a-z0-9]+)/g)) {
+      if (!getekend.has(m[1])) getekend.set(m[1], new Set());
+      getekend.get(m[1]).add(naam);
+    }
+  }
+
+  /* Toegestaan met reden: twee modules die elkaar nooit in één document
+     tegenkomen. labpas-buurt.js draait alleen op /apps/labpas.html en
+     livinglab-beeld.js alleen op /apps/livinglab.html. */
+  const MAG = new Map([['thema', 'labpas-buurt en livinglab-beeld staan op verschillende pagina\'s']]);
+
+  const botsend = [...getekend.entries()]
+    .filter(([a, fs2]) => fs2.size > 1 && !MAG.has(a))
+    .map(([a, fs2]) => 'data-' + a + ' in ' + [...fs2].sort().join(' + '));
+  assert.deepEqual(botsend, [], 'deze attributen worden door meer dan één module getekend:\n  ' + botsend.join('\n  '));
+
+  // en de meter moet zelf kunnen uitslaan: een verzonnen botsing hoort hij te zien
+  const proef = new Map(getekend);
+  proef.set('verzonnenbotsing', new Set(['a.js', 'b.js']));
+  assert.equal([...proef.entries()].filter(([a, fs2]) => fs2.size > 1 && !MAG.has(a)).length, 1,
+    'de scan ziet een botsing als er een is (anders meet hij niets)');
+});
+
 test('het spel beloont kwaliteit en niet volume', async () => {
   const k = await moet('kader', {}, 'kader');
   const p = k.spel.punten;

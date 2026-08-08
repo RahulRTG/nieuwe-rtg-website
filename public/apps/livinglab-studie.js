@@ -12,18 +12,39 @@
 (function () {
   'use strict';
   var api, KADER, esc, meld, route, herlaad, S = null;
-  var V = null;   // de vormen (livinglab-vormen.js), gezet bij init
+  var V = null, E = null, M = null, B = null, U = null, W = null, A = null;   // vormen, ethiek, mensen, bewijs, uitgang, werkplaats, apparatuur
+  var APPARATUUR = [];   // het register van dit lab, voor de reserveringsknop
 
   function init(o) {
     api = o.api; KADER = o.kader; esc = o.esc; meld = o.meld; route = o.route; herlaad = o.herlaad;
     V = window.LivingLabVormen;
     V.init({ kader: KADER, esc: esc });
+    /* De ethiek- en bewijsblokken staan in eigen bestanden omdat ze samen ruim
+       over de 10 KB gaan, maar ze horen bij dit dossier: ze krijgen hetzelfde
+       gereedschap en dezelfde doe()-helper, zodat er één manier is waarop een
+       handeling het blad sluit, herlaadt en weer opent. */
+    E = window.LivingLabEthiek;
+    E.init({ api: api, kader: KADER, esc: esc, meld: meld, huidigLab: o.huidigLab });
+    M = window.LivingLabMensen;
+    M.init({ api: api, kader: KADER, esc: esc, meld: meld });
+    B = window.LivingLabBewijs;
+    B.init({ api: api, kader: KADER, esc: esc, meld: meld, huidigLab: o.huidigLab });
+    U = window.LivingLabUitgang;
+    U.init({ api: api, kader: KADER, esc: esc, meld: meld });
+    W = window.LivingLabWerkplaats;
+    W.init({ api: api, esc: esc, meld: meld });
+    A = window.LivingLabApparatuur;
   }
 
   function open(id) {
     Promise.all([api('studie', { id: id }), api('studie/watnu', { id: id })]).then(function (r) {
       S = r[0].studie;
-      teken(S, r[1]);
+      /* Het apparatuurregister hoort bij het LAB en niet bij de studie, dus het
+         komt als eigen verzoek mee. Faalt dat, dan valt alleen de
+         reserveringsknop weg -- het dossier zelf hoort daar niet op te wachten. */
+      return api('app/lijst', { id: S.labId })
+        .then(function (a) { APPARATUUR = a.apparatuur || []; }, function () { APPARATUUR = []; })
+        .then(function () { teken(S, r[1]); });
     }).catch(function (e) { meld(e.message); });
   }
 
@@ -55,6 +76,9 @@
     return { element: d, sluit: function () { d.remove(); } };
   }
 
+  // hoort dit blok bij de stap waar de studie nu staat?
+  var hoort = function (s, stappen) { return stappen.indexOf(s.stap) >= 0; };
+
   function teken(s, nu) {
     var el = blad(
       '<div style="padding:1rem;display:flex;flex-direction:column;gap:.7rem;">' +
@@ -66,7 +90,18 @@
         route(s.stap) +
         V.watNuBlok(nu) +
         V.stapBlok(s) +
-        V.conclusieBlok(s) +
+        /* De blokken die bij de HUIDIGE stap horen, en alleen die. De ethiek
+           verschijnt zodra het plan er is (want dat is wat de deelnemersstap
+           blokkeert), de deelnemers zodra de ethiek rond mag zijn, het bewijs
+           bij de resultaten en de uitgangen bij het besluit. Alles altijd tonen
+           maakt er weer een formulier van dertig velden van. */
+        (hoort(s, ['plan', 'deelnemers']) ? E.ethiekBlok(s) : '') +
+        (hoort(s, ['deelnemers', 'experiment', 'observaties']) ? M.mensenBlok(s) : '') +
+        (hoort(s, ['observaties', 'reflectie', 'resultaten', 'besluit']) ? B.materiaalBlok(s) : '') +
+        (hoort(s, ['resultaten', 'besluit', 'vervolg']) ? B.conclusieBlok(s) : V.conclusieBlok(s)) +
+        U.uitgangBlok(s) +
+        (hoort(s, ['experiment', 'observaties']) ? A.reserveerBlok(s, APPARATUUR) : '') +
+        W.blok(s) +
         '<div class="sec">Onderzoekscoach</div>' +
         '<div class="rij"><input class="veld" data-cvraag placeholder="Vraag de coach mee te denken" maxlength="400">' +
           '<button class="knop stil" data-coach type="button">Vraag</button></div>' +
@@ -85,6 +120,13 @@
       }).then(function () { open(s.id); }).catch(function (e) { meld(e.message); });
     };
     q('[data-dicht]').addEventListener('click', vel.sluit);
+    // de ethiek- en bewijsblokken bedraden zichzelf, met dezelfde doe()
+    E.bind(el, s, doe);
+    M.bind(el, s, doe);
+    B.bind(el, s, doe);
+    U.bind(el, s, doe);
+    W.bind(el, s, doe);
+    A.bindReservering(el, s, doe);
 
     if (q('[data-stap]')) q('[data-stap]').addEventListener('click', function () {
       doe(api('studie/stap', { id: s.id, stap: nu.volgende }));

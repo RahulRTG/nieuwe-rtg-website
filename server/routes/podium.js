@@ -6,7 +6,7 @@ module.exports = (kern) => {
   const { app, auth, officeAuth, podiumKanalen, podiumKanaalMaak, podiumKanaalZet, podiumMijn,
     podiumLiveZet, podiumKijk, podiumWeg, podiumSignaal, podiumChatStuur, podiumCadeau,
     podiumAbonneer, podiumBlokkeer, podiumMeld, podiumOfficeLijst, podiumOfficeBeslis,
-    podiumKaartje, podiumNodig } = kern;
+    podiumKaartje, podiumNodig, podiumWaarZet, podiumKoop } = kern;
   /* Bij een weigering gaat er meer mee dan de tekst: `mag` (mag ik in deze
      wereld), `kaartje` (het ligt aan een kaartje en niet aan de deur) en de
      zonelijst. Zonder die velden moet het scherm de reden uit de zin raden, en
@@ -77,6 +77,17 @@ module.exports = (kern) => {
   app.post('/api/podium/kaartje', auth, async (req, res) => {
     if (geenGast(req, res)) return;
     stuur(res, await podiumKaartje(req.session.key, String(req.body.id || ''), req.body.idem));
+  });
+  /* De kraam van de verkoopwereld: de maker legt productkaarten klaar, een
+     kijker rekent tijdens de uitzending af. Zelfde RTG Pay-route als een cadeau
+     en een kaartje -- er is hier geen tweede betaalweg. */
+  app.post('/api/podium/waar', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, podiumWaarZet(req.session.key, req.body || {}));
+  });
+  app.post('/api/podium/koop', auth, async (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, await podiumKoop(req.session.key, String(req.body.id || ''), String(req.body.waarId || ''), req.body.idem));
   });
   // uitnodigen voor een besloten kanaal (alleen de maker, op codenaam)
   app.post('/api/podium/nodig', auth, async (req, res) => {

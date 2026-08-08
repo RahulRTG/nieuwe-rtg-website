@@ -112,6 +112,8 @@ Object.assign(kern, maakOntmoeting({
 Object.assign(kern, require('../kern/podium').maakPodium({
   db, save, crypto, accounts, leeftijdVan, codenaamVan: kern.codenaamVan, keyVanCodenaam,
   sseToCustomer, sseToOffice, notify, pay: kern.pay, schoon,
+  // de zakenwereld hangt aan de personeelsadministratie; findSupplier levert de zaaknaam
+  findSupplier,
   // de haak van de Media OS: nieuw werk wekt volgers (zie ./mediaos.js)
   nieuwWerk: (key, soort, titel) => (kern.mediaNieuwWerk ? kern.mediaNieuwWerk(key, soort, titel) : null)
 }));

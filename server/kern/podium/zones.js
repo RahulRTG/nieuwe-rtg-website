@@ -26,12 +26,20 @@
    test/podiumzones.test.js als eerste vastlegt. Verhuizen naar een andere zone
    is een besluit van een mens bij het kantoor, zoals alles hier.
 
-   NIET ELKE ZONE IS OPEN. 'zaak' en 'handel' staan hier wel beschreven maar
-   zijn dicht: hun deur hangt aan iets dat nog niet bestaat (de koppeling met
-   een organisatie, en productkaarten met voorraad). Dat is met opzet een
-   gesloten deur met een reden en geen half werkende: een zone die zegt dat hij
-   bedrijfsstreams aankan terwijl niemand de organisatie kan controleren, is
-   erger dan een zone die zegt dat hij er nog niet is. Staat in TAKEN.md. */
+   WAAR DE ZAKENWERELD AAN HANGT. Zone 'zaak' controleert niet zelf wie waar
+   werkt: dat weet de personeelsadministratie al (accounts.staffPositions, de
+   koppeling waarmee ook de werk-app meekomt bij het inloggen). Er is hier geen
+   tweede ledenlijst per bedrijf gebouwd, en dus ook geen lijst die kan gaan
+   afwijken (LAT.md regel 4). Zie test/podiumzaak.test.js: wie nergens werkt,
+   wie ergens ANDERS werkt en wie geen leiding heeft, krijgen alle drie een
+   ander antwoord -- en dat verschil is het bewijs dat de controle op het
+   kanaal zit en niet alleen op de deur van de wereld.
+
+   EN WAT DE VERKOOPWERELD NIET DOET. Zone 'handel' verplaatst geld (RTG Pay,
+   dezelfde route als een cadeau) en legt een bestelling bij de maker neer. RTG
+   bezorgt niets: geen adres, geen verzending, geen retourregeling. De maker zet
+   daarom op elke productkaart hoe de koper het krijgt. Zolang dat zo is, mag
+   het scherm ook niets anders beloven (LAT.md regel 6). Staat in TAKEN.md. */
 'use strict';
 
 const ZONES = {
@@ -62,16 +70,17 @@ const ZONES = {
     geld: ['cadeau', 'abonnement'], index: 'apart', wachtrij: 'beperkt'
   },
   zaak: {
-    naam: 'Business', omschrijving: 'Interne uitzending van een organisatie: town hall, training, aandeelhouders.',
-    kijken: { lid: true, organisatie: true }, zenden: { organisatie: true },
-    geld: [], index: 'geen', wachtrij: 'zaak',
-    dicht: 'De koppeling met een organisatie loopt via de werkplek, en die haak ligt hier nog niet. Zolang niemand kan controleren of u bij die zaak hoort, gaat deze deur niet open.'
+    naam: 'Business', omschrijving: 'Interne uitzending van een organisatie: town hall, training, aandeelhouders. Alleen wie er werkt komt binnen.',
+    kijken: { lid: true, organisatie: true }, zenden: { organisatie: true, leiding: true },
+    /* Geen geld. Een town hall die fooien aanneemt van het eigen personeel is
+       geen town hall; en een training verkoopt hier geen kaartjes -- dat is
+       een evenement en dus een andere zone. */
+    geld: [], index: 'geen', wachtrij: 'zaak'
   },
   handel: {
-    naam: 'Commerce', omschrijving: 'Live verkopen met productkaarten, voorraad en afrekenen tijdens de uitzending.',
+    naam: 'Commerce', omschrijving: 'Live verkopen: productkaarten met een prijs en voorraad, afrekenen tijdens de uitzending.',
     kijken: { lid: true }, zenden: { goedkeuring: true },
-    geld: ['cadeau', 'verkoop'], index: 'gedeeld', wachtrij: 'open',
-    dicht: 'Productkaarten met voorraad en afrekenen in de stream bestaan nog niet. Een verkoopzone zonder kassa belooft iets wat er niet is.'
+    geld: ['cadeau', 'verkoop'], index: 'gedeeld', wachtrij: 'open'
   }
 };
 
@@ -86,7 +95,11 @@ const zoneMag = (zoneId) => (ZONES[zoneId] && !ZONES[zoneId].dicht ? ZONES[zoneI
    is dit een echt account, en is het geverifieerd en oud genoeg. De rest van de
    eisen (kaartje, uitnodiging) hangt aan het KANAAL en staat daarom in
    magKanaal hieronder. */
-function maakZonePoort({ lat }) {
+function maakZonePoort({ lat, zakenVan }) {
+  /* Bij welke organisaties hoort dit lid, en waar heeft hij de leiding? Komt
+     uit de personeelsadministratie die het huis al heeft (accounts.
+     staffPositions via kern/podium/index.js) -- geen tweede lijst hier. */
+  const zaken = (key) => (zakenVan ? zakenVan(key) : []);
   function magZone(key, zoneId) {
     const z = ZONES[zoneId];
     if (!z) return { ok: false, reden: 'Deze zone bestaat niet.' };
@@ -99,6 +112,8 @@ function maakZonePoort({ lat }) {
       const p = lat(key, 0, { alleenAccount: true });
       if (!p.ok) return p;
     }
+    if (eis.organisatie && !zaken(key).length)
+      return { ok: false, reden: 'Deze wereld is van organisaties; u werkt nergens waar RTG van weet.' };
     return { ok: true };
   }
 
@@ -117,6 +132,15 @@ function maakZonePoort({ lat }) {
       const p = lat(key, 0, { alleenAccount: true });
       if (!p.ok) return p;
     }
+    if (eis.organisatie) {
+      const mijne = zaken(key);
+      if (!mijne.length) return { ok: false, reden: 'Alleen vanuit een organisatie waar u werkt.' };
+      /* Een interne uitzending start niet zomaar iemand: dat is de leiding.
+         Anders kan elke medewerker een "town hall" beginnen waar de hele zaak
+         in kan kijken. */
+      if (eis.leiding && !mijne.some(z2 => z2.leiding))
+        return { ok: false, reden: 'Een interne uitzending start de leiding van de zaak.' };
+    }
     return { ok: true };
   }
 
@@ -133,6 +157,8 @@ function maakZonePoort({ lat }) {
       return { ok: false, reden: 'Dit is een besloten kanaal; de maker nodigt uit.' };
     if (eis.kaartje && !kaartjeGeldig(k, key))
       return { ok: false, reden: 'Hiervoor heeft u een kaartje nodig.', kaartje: true };
+    if (eis.organisatie && !zaken(key).some(z2 => z2.code === k.zaakCode))
+      return { ok: false, reden: 'Deze uitzending is van een organisatie waar u niet werkt.' };
     return { ok: true };
   }
 

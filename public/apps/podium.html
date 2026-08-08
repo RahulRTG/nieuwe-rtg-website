@@ -138,6 +138,8 @@
       <button class="knop vol" type="submit">Stuur</button>
     </form>
     <div class="cadeaus" id="cadeauRij" role="group" aria-label="Cadeautjes via RTG Pay"></div>
+    <!-- de kraam (wereld Commerce): productkaarten met een echte voorraad -->
+    <section id="kraam" class="weg" aria-label="Te koop tijdens deze uitzending"></section>
     <div class="rij">
       <button class="knop" id="abbKnop" type="button"></button>
       <button class="knop rood" id="meldKnop" type="button">Melden bij RTG-kantoor</button>
@@ -164,6 +166,8 @@
       <input id="chatVeldStudio" maxlength="300" placeholder="Praat met de zaal" autocomplete="off">
       <button class="knop vol" type="submit">Stuur</button>
     </form>
+    <!-- de kraam beheren: alleen zichtbaar in de wereld waar verkocht mag worden -->
+    <section id="kraamBeheer" class="weg" aria-label="Uw kraam"></section>
     <h2>Kijkers</h2>
     <p class="stil" style="margin-top:-0.3rem;">Uw uitzending draagt onbeperkt veel kijkers: elke kijker geeft het beeld door aan een paar volgende, dus u zendt zelf maar naar een handvol.</p>
     <div id="kijkerLijst"><p class="stil">Nog geen kijkers.</p></div>
@@ -282,11 +286,18 @@
         '<label for="mNaam">Naam van het kanaal</label><input id="mNaam" maxlength="40">' +
         '<label for="mGenre">Genre</label><select id="mGenre"></select>' +
         '<label for="mBio">Waar gaat het over?</label><input id="mBio" maxlength="300">' +
+        /* De zakenwereld vraagt er een ding bij: namens WELKE zaak. Alleen de
+           zaken waar u de leiding heeft staan erin; wie er geen heeft, ziet
+           geen keuze en krijgt van de server hetzelfde antwoord terug. */
+        (zone === 'zaak' ? '<label for="mZaak">Namens welke zaak?</label><select id="mZaak">' +
+          (zaal.zaken || []).map(z => '<option value="' + esc(z.code) + '">' + esc(z.naam) + '</option>').join('') + '</select>' : '') +
         '<div class="rij"><button class="knop vol" id="mStart" type="button">Kanaal aanmelden</button></div>';
       el.appendChild(kaart);
       for (const g of (zaal.genres || [])) { const o = document.createElement('option'); o.value = g; o.textContent = g; kaart.querySelector('#mGenre').appendChild(o); }
       kaart.querySelector('#mStart').addEventListener('click', async () => {
-        const r = await api('kanaal/aanmeld', { naam: $('#mNaam').value, zone, genre: $('#mGenre').value, bio: $('#mBio').value });
+        const zk = kaart.querySelector('#mZaak');
+        const r = await api('kanaal/aanmeld', { naam: $('#mNaam').value, zone, genre: $('#mGenre').value, bio: $('#mBio').value,
+          zaakCode: zk ? zk.value : undefined });
         if (r.body.error) return zeg(r.body.error);
         zeg('Aangemeld. RTG-kantoor kijkt er persoonlijk naar.'); laadZaal();
       });
@@ -411,11 +422,49 @@
       });
       rij.appendChild(b);
     }
+    tekenKraam();
     chatToon($('#chatKijk'), r.body.chat);
     toon('vKijk');
     clearInterval(hartslag);
     hartslag = setInterval(() => { if (open) api('kijk', { id: open.id }); }, 45000);
   }
+  /* ---------- de kraam (kijkerkant) ----------
+     De voorraad staat er echt bij, en dat is met opzet: "nog een" is het
+     antwoord op de vraag of kopen nog zin heeft. Wat hier NIET staat is een
+     aftelklok of een "12 mensen kijken hiernaar" -- dat zijn verzonnen
+     urgenties. RTG verplaatst het geld en legt de bestelling bij de maker
+     neer; bezorgen doet RTG niet, dus staat de leveringsafspraak van de maker
+     bij elke kaart en belooft dit scherm verder niets. */
+  function tekenKraam() {
+    const el = $('#kraam'); if (!el) return;
+    const waren = (open && open.waren) || [];
+    el.innerHTML = ''; el.classList.toggle('weg', !waren.length);
+    if (!waren.length) return;
+    const kop = document.createElement('h2'); kop.textContent = 'Te koop tijdens deze uitzending';
+    el.appendChild(kop);
+    for (const w of waren) {
+      const kaart = document.createElement('div'); kaart.className = 'kaart';
+      kaart.innerHTML = '<p><strong>' + esc(w.naam) + '</strong> · ' + eur(w.centen) + '</p>' +
+        '<p class="stil" data-voorraad="' + esc(w.id) + '">' + (w.uitverkocht ? 'Uitverkocht.' : 'Nog ' + w.voorraad + ' beschikbaar.') + '</p>' +
+        (w.levering ? '<p class="stil">Levering: ' + esc(w.levering) + '</p>' : '') +
+        '<div class="rij"><button class="knop vol" type="button"' + (w.uitverkocht ? ' disabled' : '') + '>Koop · ' + eur(w.centen) + '</button></div>';
+      kaart.querySelector('button').addEventListener('click', async (ev) => {
+        const b = ev.currentTarget; b.disabled = true;
+        const r = await api('koop', { id: open.id, waarId: w.id, idem: idem() });
+        if (r.body.error) { zeg(r.body.error); b.disabled = !!r.body.uitverkocht; return; }
+        zeg('Gekocht via RTG Pay.' + (w.levering ? ' ' + w.levering : ''));
+        b.disabled = r.body.voorraad <= 0;
+        zetVoorraad(w.id, r.body.voorraad);
+      });
+      el.appendChild(kaart);
+    }
+  }
+  function zetVoorraad(waarId, voorraad) {
+    for (const w of ((open && open.waren) || [])) if (w.id === waarId) { w.voorraad = voorraad; w.uitverkocht = !(voorraad > 0); }
+    const p = $('#kraam [data-voorraad="' + waarId + '"]');
+    if (p) p.textContent = voorraad > 0 ? 'Nog ' + voorraad + ' beschikbaar.' : 'Uitverkocht.';
+  }
+
   async function kijkStop() {
     clearInterval(hartslag); hartslag = null;
     relaisSluit();
@@ -442,7 +491,64 @@
     const eigen = await api('mijn');
     chatToon($('#chatStudio'), eigen.body.chat);
     tekenKijkers((eigen.body.kanaal || {}).kijkerLijst || []);
+    tekenKraamBeheer(eigen.body.kanaal);
     toon('vStudio');
+  }
+  /* De kraam van de maker. Alleen in de wereld waar verkopen mag: het kanaal
+     draagt zijn zone, en de server weigert het anders toch (kern/podium/
+     handel.js). Verhuist een kanaal, dan verdwijnt dit blok vanzelf. */
+  function tekenKraamBeheer(k) {
+    const el = $('#kraamBeheer'); if (!el) return;
+    const mag = !!k && k.zone === 'handel';
+    el.classList.toggle('weg', !mag); el.innerHTML = '';
+    if (!mag) return;
+    const kop = document.createElement('h2'); kop.textContent = 'Uw kraam';
+    el.appendChild(kop);
+    const uitleg = document.createElement('p'); uitleg.className = 'stil';
+    uitleg.textContent = 'RTG verplaatst het geld en legt de bestelling bij u neer, op codenaam. ' +
+      'Bezorgen doet RTG niet: zet daarom bij elke kaart hoe de koper het krijgt.';
+    el.appendChild(uitleg);
+    for (const w of (k.mijnWaren || [])) {
+      const kaart = document.createElement('div'); kaart.className = 'kaart';
+      kaart.innerHTML = '<p><strong>' + esc(w.naam) + '</strong> · ' + eur(w.centen) + ' · voorraad ' + w.voorraad +
+        (w.aan === false ? ' · staat uit' : '') + '</p>' +
+        '<div class="rij"><label for="v' + esc(w.id) + '">Voorraad</label>' +
+        '<input id="v' + esc(w.id) + '" inputmode="numeric" value="' + w.voorraad + '">' +
+        '<button class="knop" type="button" data-doe="zet">Bewaar</button>' +
+        '<button class="knop" type="button" data-doe="aan">' + (w.aan === false ? 'Zet aan' : 'Zet uit') + '</button>' +
+        '<button class="knop rood" type="button" data-doe="weg">Weg</button></div>';
+      kaart.querySelector('[data-doe="zet"]').addEventListener('click', () => waarZet({ id: w.id, voorraad: kaart.querySelector('input').value }));
+      kaart.querySelector('[data-doe="aan"]').addEventListener('click', () => waarZet({ id: w.id, aan: w.aan === false }));
+      kaart.querySelector('[data-doe="weg"]').addEventListener('click', () => waarZet({ id: w.id, weg: true }));
+      el.appendChild(kaart);
+    }
+    const nieuw = document.createElement('div'); nieuw.className = 'kaart';
+    nieuw.innerHTML = '<label for="wNaam">Wat verkoopt u?</label><input id="wNaam" maxlength="60">' +
+      '<label for="wPrijs">Prijs in euro</label><input id="wPrijs" inputmode="decimal">' +
+      '<label for="wVoorraad">Voorraad</label><input id="wVoorraad" inputmode="numeric" value="1">' +
+      '<label for="wLev">Hoe krijgt de koper het?</label><input id="wLev" maxlength="120" placeholder="Afhalen, link in de chat, per post na bericht">' +
+      '<div class="rij"><button class="knop vol" id="wNieuw" type="button">Zet op de kraam</button></div>';
+    nieuw.querySelector('#wNieuw').addEventListener('click', () => waarZet({
+      naam: $('#wNaam').value, centen: Math.round(parseFloat(String($('#wPrijs').value).replace(',', '.')) * 100) || 0,
+      voorraad: $('#wVoorraad').value, levering: $('#wLev').value
+    }));
+    el.appendChild(nieuw);
+    const best = (k.bestellingen || []);
+    const kop2 = document.createElement('h2'); kop2.textContent = 'Bestellingen';
+    el.appendChild(kop2);
+    const lijst = document.createElement('div');
+    lijst.innerHTML = best.length
+      ? best.map(b => '<p class="stil">' + esc(b.codenaam) + ' · ' + esc(b.naam) + ' · ' + eur(b.centen) +
+          (b.levering ? ' · ' + esc(b.levering) : '') + '</p>').join('')
+      : '<p class="stil">Nog geen bestellingen.</p>';
+    el.appendChild(lijst);
+  }
+  async function waarZet(data) {
+    const r = await api('waar', data);
+    if (r.body.error) return zeg(r.body.error);
+    zeg('Kraam bijgewerkt.');
+    const eigen = await api('mijn');
+    tekenKraamBeheer(eigen.body.kanaal);
   }
   function tekenStudio() {
     $('#studioKnop').textContent = studioLive ? 'Stop de uitzending' : 'Ga live';
@@ -490,6 +596,10 @@
       else if (d.kind === 'ice') { const pc = (ouderKey && d.van === ouderKey) ? ouderPc : kinderPcs.get(d.van); if (pc) try { await pc.addIceCandidate(d.payload); } catch (e2) {} }
       else if (d.kind === 'einde') { if (open && d.kanaalId === open.id) { zeg('De uitzending is afgelopen.'); kijkStop(); } }
       else if (d.kind === 'abonnee') zeg(d.codenaam + ' is nu abonnee.');
+      /* De zaal hoort alleen dat de voorraad veranderde; wie er kocht staat er
+         niet in (kern/podium/handel.js). De maker krijgt de bestelling apart. */
+      else if (d.kind === 'waar') { if (open && d.kanaalId === open.id) zetVoorraad(d.waarId, d.voorraad); }
+      else if (d.kind === 'bestelling') { zeg(d.bestelling.codenaam + ' kocht ' + d.bestelling.naam + '.'); if (!$('#vStudio').classList.contains('weg')) api('mijn').then(r => tekenKraamBeheer(r.body.kanaal)); }
     });
   }
 

@@ -81,14 +81,22 @@ test('1. de zonelijst zegt per wereld of u erin mag, en waarom niet', async () =
   const open = zones.find(z => z.id === 'open');
   assert.equal(open.kijken, true);
 
-  /* Een zone die nog niet bestaat, staat er als DICHT met de reden -- niet als
-     werkende deur en niet als stilte. Een zakenzone die zegt dat hij interne
-     uitzendingen aankan terwijl niemand de organisatie kan controleren, is
-     erger dan een zone die zegt dat hij er nog niet is. */
+  /* De zakenwereld staat OPEN, maar niet voor iemand die nergens werkt: dat is
+     een andere weigering dan "deze zone bestaat niet" en dan "u bent te jong".
+     De reden hoort dat verschil te dragen, anders gaat iemand de verkeerde
+     deur openzetten. */
   const zaak = zones.find(z => z.id === 'zaak');
-  assert.equal(zaak.dicht, true);
+  assert.ok(!zaak.dicht, 'de zakenwereld is er');
+  assert.equal(zaak.kijken, false, 'maar niet voor wie nergens werkt');
+  assert.match(zaak.kijkReden, /organisaties/);
   assert.equal(zaak.zenden, false);
-  assert.match(zaak.zendReden, /werkplek/, 'en zegt waar het op wacht');
+  assert.match(zaak.zendReden, /organisatie waar u werkt/);
+  assert.deepEqual(zaak.geld, [], 'en er loopt geen geld in een town hall');
+
+  const handel = zones.find(z => z.id === 'handel');
+  assert.ok(!handel.dicht, 'de verkoopwereld is er ook');
+  assert.equal(handel.kijken, true);
+  assert.ok(handel.geld.includes('verkoop'));
 });
 
 test('2. de 18+-wereld: eigen deur voor kijken EN zenden', async () => {

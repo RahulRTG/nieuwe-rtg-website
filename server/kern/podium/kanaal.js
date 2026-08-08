@@ -24,7 +24,17 @@ module.exports = (ctx) => {
     lijsten();
     if (kanaalVan(key)) return { status: 409, error: 'U heeft al een kanaal.' };
     const naam = schoon(data.naam, 40); if (!naam) return { status: 400, error: 'Geef het kanaal een naam.' };
-    const k = { id: id(), key, naam, zone, genre: GENRES.includes(data.genre) ? data.genre : 'salon',
+    /* Een interne uitzending hoort BIJ EEN ZAAK, en bij welke moet vaststaan
+       voordat er iemand kijkt: de deur van die wereld vergelijkt hem met de
+       werkplekken van de kijker. Wie bij twee zaken de leiding heeft, kiest. */
+    let zaakCode = null;
+    if (zone === 'zaak') {
+      const mijne = ctx.zakenVan(key).filter(z => z.leiding);
+      zaakCode = String(data.zaakCode || (mijne[0] || {}).code || '');
+      if (!mijne.some(z => z.code === zaakCode))
+        return { status: 403, error: 'Kies een zaak waar u de leiding heeft.' };
+    }
+    const k = { id: id(), key, naam, zone, zaakCode, genre: GENRES.includes(data.genre) ? data.genre : 'salon',
       bio: schoon(data.bio, 300), status: 'wacht', abbCenten: 0, verdiend: 0,
       live: null, kijkers: {}, abonnees: {}, kaartjes: {}, genodigd: [], geblokkeerd: [], at: nu() };
     db.data.podiumKanalen.push(k); save();

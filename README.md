@@ -1025,14 +1025,18 @@ Een kanaal hoort nu in precies één **zone**, en de zone draagt het beleid (`se
 | **Events** | lid met een kaartje | kaartje + cadeaus | gedeeld |
 | **Besloten** | alleen wie de maker uitnodigt | cadeaus | geen |
 | **18+** (`beperkt`) | geverifieerd paspoort, 18 jaar | cadeaus + abonnement | apart |
-| **Business** (`zaak`) | — dicht, zie `TAKEN.md` 4.14 | — | geen |
-| **Commerce** (`handel`) | — dicht, zie `TAKEN.md` 4.14 | — | gedeeld |
+| **Business** (`zaak`) | alleen wie bij die organisatie werkt | geen | geen |
+| **Commerce** (`handel`) | elk lid | cadeaus + verkoop | gedeeld |
 
 **Waarom 18+ een eigen zone is en geen categorie.** Als "18+" een genre naast "koken" is, lekt het overal doorheen: in de lijst, in de zoekresultaten, in een aanbeveling, in een profielkaart. Als het een eigen zone met een eigen index is, is "niet lekken" een eigenschap van de code. `test/podiumzones.test.js` probeert precies dat: het kanaal is niet te zien in een andere zone, niet te openen met een geraden id, niet te bechatten, er gaat geen cadeau heen, en het staat niet in de gedeelde mediawereld — ook niet bij iemand die er wél in mag.
 
 **De verhuizing van wat er al stond.** Elk bestaand kanaal is aangemeld toen het Podium als geheel achter de 18+-deur zat; die kanalen staan daarom in zone `beperkt`. Niet omdat hun inhoud dat is, maar omdat dat de deur is waar ze achter staan — **niemand wint of verliest toegang**. Verhuizen naar een andere zone is een besluit van een mens bij het kantoor.
 
 Een **kaartje** (Events) is een eenmalige betaling via RTG Pay die voor een periode binnenlaat: geen abonnement dat doorloopt, geen incasso. Een **uitnodiging** (Besloten) is een handeling van de maker op codenaam; de genodigdenlijst komt niet naar buiten.
+
+**Business hangt aan de personeelsadministratie die er al was.** Wie ergens werkt, staat als personeelsrij aan zijn RTG-account gekoppeld (`accounts.staffPositions` — dezelfde koppeling waarmee de werk-app meekomt bij het inloggen). Er is dus geen tweede ledenlijst per bedrijf gebouwd. Een interne uitzending start alleen de **leiding**, op naam van een zaak waar die leiding ook werkelijk zit, en het kanaal draagt die `zaakCode`. `test/podiumzaak.test.js` legt drie verschillende weigeringen vast: wie nergens werkt komt de wereld niet in, wie ergens ánders werkt komt de wereld wél in maar deze uitzending niet, en wie er werkt zonder leiding mag kijken en niet zenden. Er loopt geen geld: een town hall die fooien aanneemt van het eigen personeel is geen town hall, en een training met kaartverkoop is een evenement (dus een andere zone).
+
+**Commerce verplaatst geld, geen dozen.** De maker zet productkaarten klaar (naam, prijs, voorraad, en zelf ingevuld hoe de koper het krijgt); een kijker rekent tijdens de uitzending af langs precies dezelfde RTG Pay-route als een cadeau — geen tweede betaalweg, geen tweede saldo. De voorraad daalt echt, uitverkocht is uitverkocht, en een dubbeltik met dezelfde idempotentiesleutel koopt er geen twee. De zaal hoort **dat** er een weg is (dat is het antwoord op "heeft kopen nog zin"), niet **wie** hem kocht; de bestelling gaat op codenaam naar de maker. Wat er níét is: RTG bezorgt niets — geen adres, geen verzending, geen retourregeling, en dus ook geen belofte daarover op het scherm. Staat als open punt in `TAKEN.md`.
 
 ### RTG Media OS (één mediawereld over vier apps)
 

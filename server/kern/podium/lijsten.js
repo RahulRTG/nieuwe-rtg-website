@@ -31,6 +31,10 @@ module.exports = (ctx) => {
     return { status: 200, mag: true, zone, zoneNaam: zones.ZONES[zone].naam,
       zoneUitleg: zones.ZONES[zone].omschrijving, zones: zones.zoneLijst(key, poort),
       geld: zones.ZONES[zone].geld,
+      /* De zaken waar dit lid de leiding heeft. Alleen daarmee kan het scherm
+         de vraag stellen die de zakenwereld nodig heeft ("namens welke zaak?");
+         wie nergens leidt, krijgt een lege lijst en dus geen keuze. */
+      zaken: (ctx.zakenVan ? ctx.zakenVan(key) : []).filter(z => z.leiding).map(z => ({ code: z.code, naam: z.naam })),
       cadeaus: CADEAUS, genres: GENRES, kanalen: rijen, mijn: eigen ? eigenBeeld(eigen) : null };
   }
 

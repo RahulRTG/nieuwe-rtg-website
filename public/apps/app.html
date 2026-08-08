@@ -6,7 +6,7 @@
      en bouwt het beginscherm zichzelf niet meer op: een zwart scherm zonder
      foutmelding. app-main-01.js vergelijkt de twee en haalt zichzelf dan een
      keer vers op. -->
-<meta name="rtg-bouw" content="0de92328">
+<meta name="rtg-bouw" content="61decedb">
 <!-- De foutmelder staat bewust VOORAAN: hij moet de fouten van het opstarten
      kunnen zien, en die gebeuren voordat de rest geladen is. -->
 <script src="/shared/foutmelder.js"></script>
@@ -1399,14 +1399,25 @@
     text-align:center;font-family:'Inter',sans-serif;font-weight:600;
     font-size:0.85rem;letter-spacing:0.08em;margin-bottom:0.9rem;color:var(--txt);
   }
-  /* Het vel waarop de secties liggen is een STAPEL en geen raster. Het raster
-     zit op de rij (.os-map-grid), en openMap hangt zulke rijen in dit vel.
-     Stond het raster ook hier, dan viel elke rij in een van de drie kolommen
-     van het vel -- 87px van de 282px -- en moesten daar nog eens drie tegels
-     van 62px in. Dat was precies de meldingsfoto: tegels over elkaar heen,
-     labels afgekapt tot "MU..." en tweederde van het paneel leeg. */
-  .os-mapvel{display:flex;flex-direction:column;gap:calc(var(--e) * 1.2);}
+  /* EEN raster, met de tegels er direct in. Hier hingen rijen in die zelf ook
+     `os-grid os-map-grid` heetten (de sectie-lus in app-main-26b.js, inmiddels
+     weg): elke rij viel dan in een van deze drie kolommen -- 87px van de 282px
+     -- en daar moesten opnieuw drie tegels van 62px in. Dat was de melding:
+     tegels over elkaar heen, labels afgekapt tot "MU..." en tweederde van het
+     paneel leeg. Hang hier dus nooit iets tussen dat zelf een raster is. */
   .os-map-grid{grid-template-columns:repeat(3,1fr);margin-top:0;}
+  /* De naam mag hier over TWEE regels. Op het springboard staan mapnamen
+     (Reizen, Media) en die passen altijd; hier staan app-namen in kolommen van
+     87px, en "Mijn werkplekken" is op een regel niet te doen -- ook niet zonder
+     letterspatiering (90px kaal). Het werd "MIJN WERKPL...", en dat is precies
+     de plek waar je de naam nodig hebt. Twee regels en dan pas afkappen.
+     `min-height` houdt de rijen recht: een tegel met een naam van een regel
+     zakt anders omhoog naast zijn buurman van twee. */
+  .os-map-grid .os-naam{
+    white-space:normal;overflow-wrap:anywhere;line-height:1.25;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+    min-height:calc(var(--e) * 0.6 * 1.25 * 2);
+  }
   /* de map-tegel op het springboard: 3x3 voorproefje van de inhoud */
   .os-app .os-tegel.os-map-tegel{
     background:color-mix(in srgb, var(--card2) 70%, transparent);
@@ -1924,7 +1935,7 @@
     <div class="os-scrim" id="osMapScrim">
       <div class="os-map-paneel" role="dialog" aria-modal="true" aria-labelledby="osMapTitel">
         <h3 id="osMapTitel"></h3>
-        <div class="os-mapvel" id="osMapGrid"></div>
+        <div class="os-grid os-map-grid" id="osMapGrid"></div>
       </div>
     </div>
 

@@ -12,7 +12,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '0de92328';
+var RTG_BOUW = '61decedb';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -3742,47 +3742,41 @@ var RTG_BOUW = '0de92328';
 
   /* ---------- mappen openen ---------- */
   const mapScrim = $('#osMapScrim'), mapGrid = $('#osMapGrid'), mapTitel = $('#osMapTitel');
-  /* Een brede app opent in SECTIES en niet als een raster losse merknamen.
+  /* HIER STOND EEN SECTIE-INDELING, EN DIE WERD NOOIT GEBRUIKT.
 
-     Dat is het verschil tussen honderd apps en vijf. Wie "Geld" opende zag
-     tien tegels met ieder een eigen naam -- Wallet, RTG-code, Lab-fonds -- en
-     moest zelf uitzoeken welke hij nodig had. Nu staat er "Betalen",
-     "Rekeningen", "Samen en bezit", en daaronder wat je daar doet. De namen
-     eronder zijn functies geworden en geen producten (zie LINKS in 24.js).
+     De opzet was: een brede map opent in kopjes ("Betalen", "Rekeningen")
+     in plaats van een raster losse merknamen. Alleen las deze functie
+     `map.secties` en zette NIEMAND dat ooit -- MAPPEN in 24a2.js draagt alleen
+     `items`, van de bewaarde indeling wordt alleen de NAAM onthouden
+     (rtg_os_mapnamen_*), en de server bemoeit zich er niet mee. Elke map liep
+     dus altijd door de terugvaltak. `.os-sectiekop` had bovendien nergens CSS:
+     was er ooit een kopje verschenen, dan als kale h4 met browsermarges.
 
-     Een sectie waarvan geen enkel onderdeel zichtbaar is (pas, boardroom, gast)
-     verdwijnt hier helemaal: een kopje boven een leeg vak is erger dan geen
-     kopje, want het suggereert dat er iets weg is. */
+     Dat is precies de rommel waar deze codebase elders een naam voor heeft: een
+     klasse zonder element, en hier een tak zonder aanroeper. Hij leest als een
+     feature die bestaat, dus niemand durft eraan te komen. Weg dus -- en met
+     hem de reden dat de tegels over elkaar heen lagen: de sectie-lus maakte
+     RIJEN, die rijen kregen zelf een raster, en ze hingen in een #osMapGrid dat
+     ook al een raster was. Nu is er een raster en liggen de tegels er direct
+     in.
+
+     Komt de indeling terug, geef de rijen dan een eigen wikkel en haal het
+     raster van #osMapGrid af -- niet twee rasters in elkaar.
+     test/appmenu.e2e.js meet de meetkunde en zakt als dat weer gebeurt. */
   function openMap(map) {
     mapTitel.textContent = mapNaam(map);
     mapGrid.textContent = '';
-    // oudere bewaarde indelingen kennen alleen een vlakke lijst; die krijgt
-    // hier een naamloze sectie, zodat een map altijd te openen is
-    const secties = map.secties || [{ naam: '', items: map.items }];
+    const zicht = map.items.filter(itemZichtbaar);
     /* Een brede app met maar EEN deur opent die deur. Het Privekantoor is zo'n
        geval -- het is zelf al een app met kamers, dus een tussenscherm met een
        enkele tegel erop zou een extra tik zijn die niets kiest. Dit geldt ook
        als een lid de rest van een map heeft uitgezet in zijn boardroom. */
-    const zichtbaar = secties.reduce((a, x) => a.concat(x.items.filter(itemZichtbaar)), []);
-    if (zichtbaar.length === 1) { openItem(zichtbaar[0]); return; }
-    for (const sectie of secties) {
-      const zicht = sectie.items.filter(itemZichtbaar);
-      if (!zicht.length) continue;
-      if (sectie.naam) {
-        const kop = document.createElement('h4');
-        kop.className = 'os-sectiekop';
-        kop.textContent = T('os.sectie.' + sectie.naam.toLowerCase().replace(/[^a-z]+/g, ''), sectie.naam);
-        mapGrid.appendChild(kop);
-      }
-      const rij = document.createElement('div');
-      rij.className = 'os-grid os-map-grid';
-      for (const item of zicht) {
-        const el = maakAppIcoon(item);
-        // alleen de map zelf dicht: een os-app (Bellen) opent hierna zijn kiezer
-        el.addEventListener('click', () => mapScrim.classList.remove('open'));
-        rij.appendChild(el);
-      }
-      mapGrid.appendChild(rij);
+    if (zicht.length === 1) { openItem(zicht[0]); return; }
+    for (const item of zicht) {
+      const el = maakAppIcoon(item);
+      // alleen de map zelf dicht: een os-app (Bellen) opent hierna zijn kiezer
+      el.addEventListener('click', () => mapScrim.classList.remove('open'));
+      mapGrid.appendChild(el);
     }
     mapScrim.classList.add('open');
   }

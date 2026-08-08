@@ -11,7 +11,9 @@
    naam tegen het tekenaarsregister van het lab. Is dat register leeg, dan zegt
    dit scherm dát -- met de weg ernaartoe.
 
-   De deelnemers staan in ./livinglab-mensen.js. */
+   De deelnemers staan in ./livinglab-mensen.js, het INGRIJPEN (stilleggen,
+   klachten afhandelen) in ./livinglab-toezicht.js: dat gaat over een lopend
+   onderzoek en niet over de waarborgen die je vooraf invult. */
 (function () {
   'use strict';
   var api, KADER, esc, meld, huidigLab;
@@ -116,16 +118,6 @@
       '<div class="rij" style="margin-top:.35rem;"><input class="veld" data-sctekst placeholder="Waarbij stopt dit onderzoek direct?" maxlength="300">' +
         '<button class="knop stil" data-sczet type="button">Voeg toe</button></div>' +
 
-      // stilleggen, alleen door de toezichthouder
-      (tekenaarKeuze(['toezichthouder'])
-        ? '<div class="sec" style="margin-top:.9rem;">Toezicht</div>' +
-          (e.stilgelegd
-            ? '<div class="gebrek">STILGELEGD door ' + esc(e.stilgelegd.door) + ': ' + esc(e.stilgelegd.reden) + '</div>'
-            : '') +
-          '<div class="rij"><select class="veld" data-stdoor aria-label="Toezichthouder">' + tekenaarKeuze(['toezichthouder']) + '</select>' +
-          '<input class="veld" data-streden placeholder="Reden" maxlength="300"></div>' +
-          '<button class="knop stil" data-stzet type="button">' + (e.stilgelegd ? 'Hervat het onderzoek' : 'Leg het onderzoek stil') + '</button>'
-        : '') +
       '</div>';
   }
 
@@ -150,10 +142,6 @@
     });
     if (q('[data-sczet]')) q('[data-sczet]').addEventListener('click', function () {
       doe(api('ethiek/stopcriterium', { id: s.id, tekst: w('[data-sctekst]') }));
-    });
-    if (q('[data-stzet]')) q('[data-stzet]').addEventListener('click', function () {
-      doe(api('ethiek/stilleggen', { id: s.id, door: w('[data-stdoor]'), reden: w('[data-streden]'),
-        hervat: !!(s.ethiek && s.ethiek.stilgelegd) }));
     });
 
   }

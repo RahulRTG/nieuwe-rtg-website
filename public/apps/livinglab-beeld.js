@@ -10,12 +10,12 @@
    Afgesplitst uit ./livinglab-kern.js toen die de 10 KB passeerde. */
 (function () {
   'use strict';
-  var esc, meld, route, soortNaam, herteken, zetFilter, filter;
+  var api, esc, meld, route, soortNaam, herteken, zetFilter, filter;
 
   var $ = function (s) { return document.querySelector(s); };
 
   function init(o) {
-    esc = o.esc; meld = o.meld; route = o.route;
+    api = o.api; esc = o.esc; meld = o.meld; route = o.route;
     soortNaam = o.soortNaam; herteken = o.herteken; zetFilter = o.zetFilter; filter = o.filter;
   }
 
@@ -114,6 +114,42 @@
       '<div><b>' + k.nagetrokken + '/' + k.bronnen + '</b><span>bronnen nagetrokken</span></div>';
   }
 
-  window.LivingLabBeeld = { init: init, tekenFilters: tekenFilters, tekenLijst: tekenLijst,
+  /* DE ENIGE RANGLIJST DIE HIER MAG BESTAAN. Niet wie de meeste data leverde,
+     maar welke onderzoeken het meeste hebben teruggegeven: uitgevoerde
+     voorstellen eerst, daarna herziene conclusies. Een bewust gestopte studie
+     staat er gewoon tussen en niet onderaan -- zie kern/livinglab/impact.js. */
+  function tekenOpbrengst(doel, labId) {
+    api('opbrengst', { id: labId, max: 15 }).then(function (r) {
+      doel.innerHTML = '<div class="sec">Wat het heeft opgeleverd</div>' +
+        (r.studies.length
+          ? r.studies.map(function (x) {
+              return '<div class="log"><b>' + esc(x.titel) + '</b> &middot; ' + esc(soortNaam(x.soort)) +
+                (x.besluit ? ' &middot; <span class="pil' + (x.besluit === 'gestopt' ? '' : ' ok') + '">' +
+                  esc(x.besluit) + '</span>' : ' &middot; ' + esc(x.stap)) +
+                '<br>' + x.uitgevoerd + ' uitgevoerd &middot; ' + x.conclusies + ' conclusies &middot; ' +
+                x.herzien + ' herzien &middot; ' + x.deelnames + ' deelnames</div>';
+            }).join('')
+          : '<div class="leeg">Nog geen onderzoek afgerond.</div>');
+    }).catch(function (e) { doel.innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; });
+  }
+
+  /* De agenda over alle onderzoeken van een lab heen: wat er deze week moet
+     gebeuren. Het enige overzicht dat NIET per studie is, want een
+     projectleider met vier onderzoeken wil één lijst. */
+  function agenda(doel, labId) {
+    api('werk/agenda', { id: labId }).then(function (r) {
+      doel.innerHTML = '<div class="sec">Wat er open staat' +
+        (r.verlopen ? ' &middot; <span class="pil let">' + r.verlopen + ' verlopen</span>' : '') + '</div>' +
+        (r.taken.length
+          ? r.taken.slice(0, 20).map(function (t) {
+              return '<div class="log"><b>' + esc(t.taak) + '</b> &middot; ' + esc(t.studie) +
+                ' &middot; <span class="pil' + (t.verlopen ? ' let' : '') + '">' + esc(t.deadline) + '</span>' +
+                (t.voor ? ' &middot; ' + esc(t.voor) : '') + '</div>';
+            }).join('')
+          : '<div class="leeg">Niets met een deadline open.</div>');
+    }).catch(function (e) { doel.innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; });
+  }
+
+  window.LivingLabBeeld = { init: init, tekenOpbrengst: tekenOpbrengst, agenda: agenda, tekenFilters: tekenFilters, tekenLijst: tekenLijst,
     tekenThemas: tekenThemas, tekenPijplijn: tekenPijplijn, tekenImpact: tekenImpact };
 })();

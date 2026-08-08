@@ -34,7 +34,15 @@
         ? d.slice(0, 40).map(function (p) {
             return '<div class="log" data-alias="' + esc(p.alias) + '"><b>' + esc(p.alias) + '</b> &middot; ' +
               esc(rolNaam(p.rol)) + ' &middot; toestemming: ' + esc(p.toestemming) +
-              ' <button class="knop stil" data-mweg type="button" style="font-size:.7rem;padding:.15rem .5rem;">terugtrekken</button></div>';
+              '<div class="rij" style="margin-top:.25rem;">' +
+                '<select class="veld" data-mrolzet aria-label="Rol wijzigen" style="font-size:.75rem;max-width:12rem;">' +
+                  KADER.rollen.map(function (r) {
+                    return '<option value="' + esc(r.rol) + '"' + (r.rol === p.rol ? ' selected' : '') + '>' +
+                      esc(r.naam) + '</option>';
+                  }).join('') + '</select>' +
+                '<button class="knop stil" data-mrolknop type="button" style="font-size:.7rem;padding:.15rem .5rem;">Wijzig rol</button>' +
+                '<button class="knop stil" data-mweg type="button" style="font-size:.7rem;padding:.15rem .5rem;">terugtrekken</button>' +
+              '</div></div>';
           }).join('')
         : '<div class="leeg">Nog niemand. Een deelnemer krijgt een pseudoniem en een eigen labpas; met die pas opent hij zijn onderzoek op /apps/labpas.html.</div>') +
       '<div class="rij" style="margin-top:.5rem;">' +
@@ -47,11 +55,6 @@
       '<input class="veld" data-mpas placeholder="Labpaspoort-code (optioneel; niet bij een gescheiden studie)" maxlength="40" style="margin-top:.35rem;">' +
       '<button class="knop" data-mbij type="button" style="margin-top:.35rem;">Voeg deelnemer toe</button>' +
       '<div data-mnieuw></div></div>';
-  }
-
-  function rolNaam(r) {
-    var x = KADER.rollen.filter(function (y) { return y.rol === r; })[0];
-    return x ? x.naam : r;
   }
 
   function bind(el, s, doe) {
@@ -70,6 +73,15 @@
             'niet meer op te vragen -- noteer hem nu.</div></div>';
           meld('Deelnemer toegevoegd als ' + r.deelnemer.alias + '.');
         }).catch(function (e) { meld(e.message); });
+    });
+    /* De rol komt uit dezelfde lijst als het kader, en tekenbevoegdheid volgt er
+       NIET uit: wie hier "toezichthouder" wordt zonder in het labregister te
+       staan, kan nog steeds niets tekenen (kern/livinglab/mensen.js zegt het ook). */
+    Array.prototype.forEach.call(el.querySelectorAll('[data-mrolknop]'), function (b) {
+      b.addEventListener('click', function () {
+        var rij = b.closest('[data-alias]');
+        doe(api('mens/rol', { id: s.id, alias: rij.dataset.alias, rol: rij.querySelector('[data-mrolzet]').value }));
+      });
     });
     Array.prototype.forEach.call(el.querySelectorAll('[data-mweg]'), function (b) {
       b.addEventListener('click', function () {

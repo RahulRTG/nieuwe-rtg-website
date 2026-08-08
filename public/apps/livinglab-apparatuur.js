@@ -9,9 +9,9 @@
    apparaat, en dit scherm zegt vooraf waarom -- anders leest die weigering als
    een storing in plaats van als de bedoeling.
 
-   Reserveren gebeurt vanuit een ONDERZOEK (het apparaat wordt aan een studie
-   gekoppeld), dus die knop staat in het dossier; het register staat hier, op
-   labniveau, want een sensor is niet van één onderzoek. */
+   Dit bestand is het REGISTER, op labniveau: een sensor is niet van één
+   onderzoek. Het reserveren gebeurt vanuit een studie en staat daarom in
+   ./livinglab-werkplaats.js, bij de rest van het werk rond een dossier. */
 (function () {
   'use strict';
   var api, KADER, esc, meld, huidigLab, herlaad;
@@ -72,6 +72,14 @@
           ? '<button class="knop stil" data-aopzet type="button" style="font-size:.7rem;padding:.15rem .5rem;">Storing opgelost</button>'
           : '<input class="veld" data-astoring placeholder="storing melden" style="font-size:.75rem;max-width:10rem;">' +
             '<button class="knop stil" data-aszet type="button" style="font-size:.7rem;padding:.15rem .5rem;">Meld storing</button>') +
+      '</div>' +
+      /* Uitgifte staat los van reserveren: een gereserveerde laptop die nog in
+         de kast ligt is iets anders dan een laptop die iemand meenam. */
+      '<div class="rij" style="margin-top:.3rem;">' +
+        (x.uit
+          ? '<button class="knop stil" data-aterug type="button" style="font-size:.7rem;padding:.15rem .5rem;">Ingenomen</button>'
+          : '<input class="veld" data-auitaan placeholder="uitgeven aan" style="font-size:.75rem;max-width:9rem;">' +
+            '<button class="knop stil" data-auit type="button" style="font-size:.7rem;padding:.15rem .5rem;">Geef uit</button>') +
       '</div></div>';
   }
 
@@ -101,6 +109,12 @@
     perRij('[data-aszet]', function (id, r) {
       return api('app/onderhoud', { id: id, wat: r.querySelector('[data-astoring]').value, soort: 'storing' });
     });
+    perRij('[data-auit]', function (id, r) {
+      return api('app/uitgifte', { id: id, aan: r.querySelector('[data-auitaan]').value });
+    });
+    perRij('[data-aterug]', function (id) {
+      return api('app/uitgifte', { id: id, terug: true });
+    });
     perRij('[data-aopzet]', function (id) {
       // de open storing van dit apparaat opzoeken en sluiten
       return api('app/lijst', { id: lab.id }).then(function (r) {
@@ -112,45 +126,5 @@
     });
   }
 
-  /* De reserveringsknop in het dossier van een onderzoek: het apparaat hangt
-     aan DEZE studie, en de kalibratiestand van dit moment gaat mee de
-     reservering in. */
-  function reserveerBlok(s, apparatuur) {
-    if (!apparatuur || !apparatuur.length) return '';
-    return '<div class="kaart"><div class="sec">Apparatuur voor dit onderzoek</div>' +
-      ((s.reserveringen || []).filter(function (r) { return !r.weg; }).length
-        ? s.reserveringen.filter(function (r) { return !r.weg; }).map(function (r) {
-            return '<div class="log"><b>' + esc(r.apparaat) + '</b> &middot; ' + esc(r.van) + ' t/m ' + esc(r.tot) +
-              ' &middot; door ' + esc(r.door) +
-              '<br>kalibratie bij gebruik: ' + (r.kalibratie && r.kalibratie.op ? esc(r.kalibratie.op) +
-                (r.kalibratie.stand ? ' (' + esc(r.kalibratie.stand) + ')' : '') : 'n.v.t.') + '</div>';
-          }).join('')
-        : '<div class="leeg">Nog niets gereserveerd.</div>') +
-      '<div class="rij" style="margin-top:.35rem;">' +
-        '<select class="veld" data-resvapp aria-label="Apparaat">' +
-          apparatuur.filter(function (a) { return a.actief; }).map(function (a) {
-            return '<option value="' + esc(a.id) + '">' + esc(a.naam) + '</option>';
-          }).join('') + '</select>' +
-        '<input class="veld" data-resvvan type="date" aria-label="van" style="max-width:9.5rem;">' +
-        '<input class="veld" data-resvtot type="date" aria-label="tot" style="max-width:9.5rem;">' +
-        '<input class="veld" data-resvdoor placeholder="op naam van" style="max-width:9rem;">' +
-        '<button class="knop stil" data-resvzet type="button">Reserveer</button></div></div>';
-  }
-
-  /* De reserveringsvelden dragen een EIGEN voorvoegsel (resv). Ze heetten eerst
-     data-rzet, en dat is in ./livinglab-vormen.js de knop waarmee je een
-     REFLECTIE vastlegt. Beide blokken staan in hetzelfde blad, dus bij de stap
-     `reflectie` haakte deze bedrading zich aan die knop: één klik op "Leg vast"
-     zocht daarna een apparaat dat er niet was. Zelfde naam, twee betekenissen,
-     in één document -- regel 4 van de lat, en hij bijt hier meteen. */
-  function bindReservering(el, s, doe) {
-    var q = function (x) { return el.querySelector(x); };
-    if (!q('[data-resvzet]')) return;
-    q('[data-resvzet]').addEventListener('click', function () {
-      doe(api('app/reserveer', { id: q('[data-resvapp]').value, studieId: s.id,
-        van: q('[data-resvvan]').value, tot: q('[data-resvtot]').value, door: q('[data-resvdoor]').value }));
-    });
-  }
-
-  window.LivingLabApparatuur = { init: init, teken: teken, reserveerBlok: reserveerBlok, bindReservering: bindReservering };
+  window.LivingLabApparatuur = { init: init, teken: teken };
 })();

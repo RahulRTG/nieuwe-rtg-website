@@ -10,7 +10,12 @@
    Een taak kan aan een DEELNEMER hangen, en dan verschijnt hij bij die persoon
    in de bewonersapp (/apps/labpas.html). Daarom is dat een keuzelijst met de
    aliassen van dit onderzoek en geen vrij tekstveld: een taak voor "Jan" komt
-   bij niemand terecht. */
+   bij niemand terecht.
+
+   HET RESERVEREN VAN APPARATUUR staat hier ook, en dat is geen verdwaalde code:
+   een reservering hangt aan DEZE studie en schrijft de kalibratiestand van dit
+   moment mee. Het register zelf (wat er is, wie bevoegd is) staat op labniveau
+   in ./livinglab-apparatuur.js. */
 (function () {
   'use strict';
   var api, esc, meld;
@@ -107,22 +112,53 @@
     });
   }
 
-  /* De agenda over alle onderzoeken van een lab heen: wat er deze week moet
-     gebeuren. Het enige overzicht dat NIET per studie is, want een
-     projectleider met vier onderzoeken wil één lijst. */
-  function agenda(doel, labId) {
-    api('werk/agenda', { id: labId }).then(function (r) {
-      doel.innerHTML = '<div class="sec">Wat er open staat' +
-        (r.verlopen ? ' &middot; <span class="pil let">' + r.verlopen + ' verlopen</span>' : '') + '</div>' +
-        (r.taken.length
-          ? r.taken.slice(0, 20).map(function (t) {
-              return '<div class="log"><b>' + esc(t.taak) + '</b> &middot; ' + esc(t.studie) +
-                ' &middot; <span class="pil' + (t.verlopen ? ' let' : '') + '">' + esc(t.deadline) + '</span>' +
-                (t.voor ? ' &middot; ' + esc(t.voor) : '') + '</div>';
-            }).join('')
-          : '<div class="leeg">Niets met een deadline open.</div>');
-    }).catch(function (e) { doel.innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; });
+  /* De reserveringsknop in het dossier van een onderzoek: het apparaat hangt
+     aan DEZE studie, en de kalibratiestand van dit moment gaat mee de
+     reservering in. */
+  function reserveerBlok(s, apparatuur) {
+    if (!apparatuur || !apparatuur.length) return '';
+    return '<div class="kaart"><div class="sec">Apparatuur voor dit onderzoek</div>' +
+      ((s.reserveringen || []).filter(function (r) { return !r.weg; }).length
+        ? s.reserveringen.filter(function (r) { return !r.weg; }).map(function (r) {
+            return '<div class="log" data-resv="' + esc(r.id) + '|' + esc(r.apparaatId) + '"><b>' + esc(r.apparaat) +
+              '</b> &middot; ' + esc(r.van) + ' t/m ' + esc(r.tot) + ' &middot; door ' + esc(r.door) +
+              ' <button class="knop stil" data-resvweg type="button" style="font-size:.7rem;padding:.15rem .5rem;">intrekken</button>' +
+              '<br>kalibratie bij gebruik: ' + (r.kalibratie && r.kalibratie.op ? esc(r.kalibratie.op) +
+                (r.kalibratie.stand ? ' (' + esc(r.kalibratie.stand) + ')' : '') : 'n.v.t.') + '</div>';
+          }).join('')
+        : '<div class="leeg">Nog niets gereserveerd.</div>') +
+      '<div class="rij" style="margin-top:.35rem;">' +
+        '<select class="veld" data-resvapp aria-label="Apparaat">' +
+          apparatuur.filter(function (a) { return a.actief; }).map(function (a) {
+            return '<option value="' + esc(a.id) + '">' + esc(a.naam) + '</option>';
+          }).join('') + '</select>' +
+        '<input class="veld" data-resvvan type="date" aria-label="van" style="max-width:9.5rem;">' +
+        '<input class="veld" data-resvtot type="date" aria-label="tot" style="max-width:9.5rem;">' +
+        '<input class="veld" data-resvdoor placeholder="op naam van" style="max-width:9rem;">' +
+        '<button class="knop stil" data-resvzet type="button">Reserveer</button></div></div>';
   }
 
-  window.LivingLabWerkplaats = { init: init, blok: blok, bind: bind, agenda: agenda };
+  /* De reserveringsvelden dragen een EIGEN voorvoegsel (resv). Ze heetten eerst
+     data-rzet, en dat is in ./livinglab-vormen.js de knop waarmee je een
+     REFLECTIE vastlegt. Beide blokken staan in hetzelfde blad, dus bij de stap
+     `reflectie` haakte deze bedrading zich aan die knop: één klik op "Leg vast"
+     zocht daarna een apparaat dat er niet was. Zelfde naam, twee betekenissen,
+     in één document -- regel 4 van de lat, en hij bijt hier meteen. */
+  function bindReservering(el, s, doe) {
+    var q = function (x) { return el.querySelector(x); };
+    if (!q('[data-resvzet]')) return;
+    q('[data-resvzet]').addEventListener('click', function () {
+      doe(api('app/reserveer', { id: q('[data-resvapp]').value, studieId: s.id,
+        van: q('[data-resvvan]').value, tot: q('[data-resvtot]').value, door: q('[data-resvdoor]').value }));
+    });
+    Array.prototype.forEach.call(el.querySelectorAll('[data-resvweg]'), function (b) {
+      b.addEventListener('click', function () {
+        var stuk = b.closest('[data-resv]').dataset.resv.split('|');
+        doe(api('app/reservering-weg', { id: stuk[1], reserveringId: stuk[0] }));
+      });
+    });
+  }
+
+  window.LivingLabWerkplaats = { init: init, blok: blok, bind: bind,
+    reserveerBlok: reserveerBlok, bindReservering: bindReservering };
 })();

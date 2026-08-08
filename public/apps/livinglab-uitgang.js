@@ -48,6 +48,12 @@
           '<input class="veld" data-uoms placeholder="Waar gaat het om?" maxlength="600" style="margin-top:.35rem;">' +
           '<button class="knop" data-umaak type="button" style="margin-top:.35rem;">Zet dit door</button>'
         : '<div class="leeg">Er is nog geen conclusie om iets uit voort te laten komen.</div>') +
+      '<div class="sec" style="margin-top:.9rem;">Vervolgonderzoek</div>' +
+      '<div class="leeg">De keten van onderzoek naar onderzoek is wat een Living Lab onderscheidt van ' +
+        'een reeks losse projecten: op het nieuwe dossier blijft staan waar de vraag vandaan kwam.</div>' +
+      '<div class="rij"><input class="veld" data-vvtitel placeholder="Titel van het vervolgonderzoek" maxlength="120">' +
+        '<button class="knop stil" data-vvmaak type="button">Start vervolg</button></div>' +
+      '<input class="veld" data-vvvraag placeholder="Het nieuwe vraagstuk" maxlength="600" style="margin-top:.35rem;">' +
       '</div>';
   }
 
@@ -58,6 +64,9 @@
     if (q('[data-umaak]')) q('[data-umaak]').addEventListener('click', function () {
       doe(api('uit/maak', { id: s.id, uitgang: w('[data-unieuw]'), conclusieId: w('[data-uconc]'),
         titel: w('[data-utitel]'), omschrijving: w('[data-uoms]') }));
+    });
+    if (q('[data-vvmaak]')) q('[data-vvmaak]').addEventListener('click', function () {
+      doe(api('uit/vervolg', { id: s.id, titel: w('[data-vvtitel]'), vraagstuk: w('[data-vvvraag]') }));
     });
     Array.prototype.forEach.call(el.querySelectorAll('[data-uzet]'), function (b) {
       b.addEventListener('click', function () {

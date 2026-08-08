@@ -62,7 +62,10 @@ test('het lab is dicht zonder inlog, en het kader komt uit één tabel', async (
   for (const s of ['welzijn', 'cohesie', 'gedrag', 'kunst', 'mobiliteit', 'economie'])
     assert.ok(k.soorten.some(x => x.soort === s), s + ' is een projectsoort');
 
-  LAB = (await moet('lab/maak', { stad: 'Haarlem', naam: 'Living Lab Haarlem' }, 'lab aanmaken')).lab.id;
+  /* Een EIGEN stad, want de startdata zet zelf al een lab in Haarlem neer en
+     er is per stad precies één lab. Dat die regel hier bijt is geen hinder maar
+     het bewijs dat de seed echte data is (test 'de startdata ...'). */
+  LAB = (await moet('lab/maak', { stad: 'Toetsstad', naam: 'Living Lab Toetsstad' }, 'lab aanmaken')).lab.id;
   await moet('lab/tekenaar', { id: LAB, naam: 'Dr. Vermeer', rol: 'professional' }, 'tekenaar');
   await moet('lab/tekenaar', { id: LAB, naam: 'Prof. Aziz', rol: 'reviewer', onafhankelijk: true }, 'onafhankelijke reviewer');
   await moet('lab/tekenaar', { id: LAB, naam: 'M. de Wit', rol: 'toezichthouder' }, 'toezichthouder');
@@ -325,7 +328,7 @@ test('de koppeling alias->sleutel bestaat alleen bij een niet-gescheiden studie'
   const crypto = require('crypto');
   const db = { data: {} };
   const L = require('../server/kern/livinglab')({ db, save: () => {}, crypto, anthropic: null, lab: null }).livinglab;
-  const lab = L.bestuur.labMaak({ stad: 'Delft', naam: 'Living Lab Delft' }, 'toets').lab;
+  const lab = L.bestuur.labMaak({ stad: 'Toetsdorp', naam: 'Living Lab Toetsdorp' }, 'toets').lab;
   L.bestuur.tekenaarZet(lab.id, { naam: 'Dr. K', rol: 'professional' }, 'toets');
 
   const opzetten = (titel, soort, vraagstuk) => {
@@ -416,6 +419,54 @@ test('geen twee schermmodules tekenen hetzelfde data-attribuut', () => {
   proef.set('verzonnenbotsing', new Set(['a.js', 'b.js']));
   assert.equal([...proef.entries()].filter(([a, fs2]) => fs2.size > 1 && !MAG.has(a)).length, 1,
     'de scan ziet een botsing als er een is (anders meet hij niets)');
+});
+
+/* DE STARTDATA. Twee dingen die allebei moeten kloppen, en het tweede is het
+   belangrijkste: de demostand geeft een BRUIKBAAR lab (met tekenbevoegden,
+   want zonder die kan er niets ondertekend worden), en er staat GEEN enkel
+   verzonnen onderzoeksresultaat in. Een lab dat opstart met nepbevindingen
+   leert zijn gebruikers precies het omgekeerde van wat de bewijsmotor
+   probeert af te dwingen.
+
+   In productie start het Living Lab leeg -- een echt lab hoort door de RTF zelf
+   te worden neergezet. */
+test('de startdata geeft een bruikbaar lab, en verzint geen onderzoeksresultaten', () => {
+  const laad = (stand) => {
+    const oud = process.env.NODE_ENV, oudDemo = process.env.RTG_DEMO;
+    process.env.NODE_ENV = stand;
+    delete process.env.RTG_DEMO;
+    delete require.cache[require.resolve('../server/seed')];
+    delete require.cache[require.resolve('../server/seed/livinglab')];
+    const uit = require('../server/seed')();
+    process.env.NODE_ENV = oud; if (oudDemo != null) process.env.RTG_DEMO = oudDemo;
+    delete require.cache[require.resolve('../server/seed')];
+    return uit;
+  };
+
+  const demo = laad('development').livingLab;
+  assert.equal(demo.labs.length, 1, 'de demostand geeft één lab');
+  const tek = demo.labs[0].tekenaars.map(t => t.rol);
+  for (const rol of ['professional', 'reviewer', 'toezichthouder'])
+    assert.ok(tek.includes(rol), 'er is een ' + rol + ' -- zonder register kan er niets ondertekend worden');
+  assert.ok(demo.labs[0].tekenaars.some(t => t.onafhankelijk),
+    'er is een ONAFHANKELIJKE tekenaar; klasse hoog vraagt er een');
+  assert.ok(demo.themas.length >= 2, 'er staan vragen uit de buurt klaar');
+  assert.ok(demo.apparatuur.some(a => a.kalibratie.geldigMaanden > 0 && !a.kalibratie.op),
+    'er staat een nooit-gekalibreerd apparaat bij: dat weigert een reservering en legt uit waarom');
+
+  /* Geen verzonnen resultaten. De ene studie staat bij de eerste stap en haar
+     dossier is leeg -- geen conclusie, geen bewijsgraad, geen deelnemer. */
+  for (const s of demo.studies) {
+    assert.equal(s.stap, 'vraagstuk', 'een seed-studie staat bij het vraagstuk');
+    assert.deepEqual(s.dossier.conclusies, [], 'geen verzonnen conclusies in de startdata');
+    assert.deepEqual(s.dossier.deelnemers, [], 'geen verzonnen deelnemers');
+    assert.deepEqual(s.dossier.observaties, [], 'geen verzonnen observaties');
+    assert.equal(s.besluit, null, 'geen verzonnen besluit');
+  }
+
+  const prod = laad('production').livingLab;
+  assert.deepEqual(prod.labs, [], 'in productie start het Living Lab leeg');
+  assert.deepEqual(prod.studies, [], 'en zonder studies');
 });
 
 test('het spel beloont kwaliteit en niet volume', async () => {

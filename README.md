@@ -460,6 +460,23 @@ beheerscherm dat het de eerste stap is in plaats van een leeg keuzemenu te tonen
 Wie dat overslaat, loopt bij de deelnemersstap tegen vijf openstaande waarborgen
 aan -- met bij elk de knop die hem oplost.
 
+**Elk van de 77 endpoints is vanuit een scherm te bereiken.** Dat is geen
+streefgetal maar een gemeten eigenschap: de eerste versie had er 29, en de app
+liep daardoor dood bij stap vier van de tien. De kantoorkant verdeelt het werk
+over dertien modules (`livinglab-kern`, `-beeld`, `-vormen`, `-studie`,
+`-ethiek`, `-mensen`, `-bewijs`, `-uitgang`, `-werkplaats`, `-apparatuur`,
+`-beheer`, `-toezicht`, `-coach`), de bewonerskant over drie (`labpas`,
+`-buurt`, `-ontdek`).
+
+**De startdata** (`server/seed/livinglab.js`) zet in de DEMOSTAND één lab in
+Haarlem neer met zijn tekenbevoegden, wat apparatuur en drie vragen uit de
+buurt -- de steiger die een leeg lab onbruikbaar maakt. Er staat met opzet geen
+enkel verzonnen onderzoeksresultaat in: geen conclusies, geen bewijsgraden, geen
+deelnemers. Een lab dat opstart met nepbevindingen leert zijn gebruikers precies
+het omgekeerde van wat de bewijsmotor afdwingt. In productie start het Living Lab
+leeg. Eén sensor is bewust nooit gekalibreerd: die weigert een reservering en
+legt uit waarom.
+
 ## Tests
 
 ```bash

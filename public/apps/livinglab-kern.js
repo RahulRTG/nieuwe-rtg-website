@@ -89,7 +89,7 @@
       $('#lijst').innerHTML = '<div class="leeg">Er is nog geen Living Lab. Maak er een aan voor de stad waar u begint.</div>';
       $('#kpi').innerHTML = ''; $('#themas').innerHTML = ''; $('#pijplijn').innerHTML = ''; $('#impact').innerHTML = '';
       $('#beheer').innerHTML = '<div class="leeg">Kies of maak eerst een lab.</div>';
-      $('#apparatuur').innerHTML = ''; $('#agenda').innerHTML = '';
+      $('#apparatuur').innerHTML = ''; $('#agenda').innerHTML = ''; $('#opbrengst').innerHTML = '';
       return Promise.resolve();
     }
     return Promise.all([
@@ -106,7 +106,8 @@
       B.tekenImpact(r[3]);
       window.LivingLabBeheer.teken($('#beheer'));
       window.LivingLabApparatuur.teken($('#apparatuur'));
-      window.LivingLabWerkplaats.agenda($('#agenda'), LAB);
+      B.tekenOpbrengst($('#opbrengst'), LAB);
+      B.agenda($('#agenda'), LAB);
     }).catch(function (e) { $('#lijst').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; });
   }
 

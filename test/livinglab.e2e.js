@@ -49,7 +49,7 @@ test('Living Lab: de onderzoekscyclus op het scherm, en de bewoner zonder accoun
   try {
     const login = await api(base, '/api/office/login', { code: 'LIVINGLAB-E2E-1' });
     assert.ok(login.token, 'het kantoor logt in');
-    const lab = await api(base, '/api/lab2/lab/maak', { stad: 'Haarlem', naam: 'Living Lab Haarlem' }, login.token);
+    const lab = await api(base, '/api/lab2/lab/maak', { stad: 'Toetsstad', naam: 'Living Lab Toetsstad' }, login.token);
     assert.ok(lab.lab, 'er is een lab');
 
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
@@ -129,6 +129,11 @@ test('Living Lab: de onderzoekscyclus op het scherm, en de bewoner zonder accoun
     await bew.goto(base + '/apps/labpas.html', { waitUntil: 'domcontentloaded' });
     await bew.waitForTimeout(800);
 
+    /* Ook dit scherm is een menu met één deel tegelijk (shared/deelmenu.js),
+       dus openen wat je nodig hebt -- net als een bewoner zou doen. */
+    const bewDeel = async (n) => { await bew.evaluate(x => window.RTGDeel && RTGDeel.open(x), n); await bew.waitForTimeout(350); };
+
+    await bewDeel('vragen-uit-de-buurt');
     assert.ok((await bew.locator('#bLab option').count()) > 0, 'de bewoner ziet welke labs er zijn');
     await bew.fill('#bVraag', 'Kan de speeltuin veiliger tijdens het spitsuur?');
     await bew.click('#bStuur');
@@ -136,7 +141,24 @@ test('Living Lab: de onderzoekscyclus op het scherm, en de bewoner zonder accoun
     assert.match(await bew.textContent('#bLijst'), /speeltuin/i,
       'een bewoner draagt een onderzoeksvraag aan zonder account');
 
+    /* Het publieke onderzoeksoverzicht: de BUITENSTE ring. De studie die deze
+       toets hierboven aanmaakte staat erin, met haar vraag -- want die is niet
+       gescheiden. Deelnemers en ruwe data horen er juist NIET in te staan. */
+    await bewDeel('wat-er-in-dit-lab-onderzocht-wordt');
+    await bew.waitForTimeout(600);
+    const publiek = await bew.textContent('#oLijst');
+    assert.match(publiek, /Water op straat/i, 'de bewoner ziet waar het lab aan werkt');
+    assert.ok(!/BW-/.test(publiek), 'maar geen deelnemers: dat is de buitenste ring');
+
+    // het labpaspoort: aanmaken levert een code die de drager zelf houdt
+    await bewDeel('uw-labpaspoort');
+    await bew.fill('#paspNaam', 'Sam');
+    await bew.click('#paspMaak');
+    await bew.waitForTimeout(900);
+    assert.match(await bew.textContent('#pasp'), /LABPAS-/, 'het labpaspoort krijgt een eigen code');
+
     // een onbekende pas geeft een nette melding en geen stilte
+    await bewDeel('uw-labpas');
     await bew.fill('#pasVeld', 'LABPAS-ZZZZZZZ');
     await bew.click('#pasOpen');
     await bew.waitForTimeout(600);
@@ -178,7 +200,7 @@ test('Living Lab: een mens loopt de hele cyclus af in de app zelf',
     const page = await browser.newPage();
     const fouten = [];
     letOpFouten(page, fouten);
-    page.on('dialog', d => d.accept('Haarlem'));
+    page.on('dialog', d => d.accept('Toetsstad'));
 
     await page.goto(base + '/apps/livinglab.html', { waitUntil: 'domcontentloaded' });
     await page.evaluate((tok) => {

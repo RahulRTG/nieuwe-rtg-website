@@ -12,7 +12,7 @@
 (function () {
   'use strict';
   var api, KADER, esc, meld, route, herlaad, S = null;
-  var V = null, E = null, M = null, B = null, U = null, W = null, A = null;   // vormen, ethiek, mensen, bewijs, uitgang, werkplaats, apparatuur
+  var V = null, E = null, M = null, B = null, U = null, W = null, T = null, C = null;
   var APPARATUUR = [];   // het register van dit lab, voor de reserveringsknop
 
   function init(o) {
@@ -33,7 +33,10 @@
     U.init({ api: api, kader: KADER, esc: esc, meld: meld });
     W = window.LivingLabWerkplaats;
     W.init({ api: api, esc: esc, meld: meld });
-    A = window.LivingLabApparatuur;
+    T = window.LivingLabToezicht;
+    T.init({ api: api, esc: esc, meld: meld, huidigLab: o.huidigLab });
+    C = window.LivingLabCoach;
+    C.init({ api: api, kader: KADER, esc: esc, meld: meld });
   }
 
   function open(id) {
@@ -100,12 +103,11 @@
         (hoort(s, ['observaties', 'reflectie', 'resultaten', 'besluit']) ? B.materiaalBlok(s) : '') +
         (hoort(s, ['resultaten', 'besluit', 'vervolg']) ? B.conclusieBlok(s) : V.conclusieBlok(s)) +
         U.uitgangBlok(s) +
-        (hoort(s, ['experiment', 'observaties']) ? A.reserveerBlok(s, APPARATUUR) : '') +
+        (hoort(s, ['experiment', 'observaties']) ? W.reserveerBlok(s, APPARATUUR) : '') +
         W.blok(s) +
-        '<div class="sec">Onderzoekscoach</div>' +
-        '<div class="rij"><input class="veld" data-cvraag placeholder="Vraag de coach mee te denken" maxlength="400">' +
-          '<button class="knop stil" data-coach type="button">Vraag</button></div>' +
-        '<div class="ai" data-cuit hidden></div>' +
+        (hoort(s, ['plan', 'deelnemers', 'experiment', 'observaties', 'reflectie', 'resultaten'])
+          ? T.blok(s) : '') +
+        C.blok(s) +
       '</div>');
     bind(el, s, nu);
   }
@@ -126,10 +128,15 @@
     B.bind(el, s, doe);
     U.bind(el, s, doe);
     W.bind(el, s, doe);
-    A.bindReservering(el, s, doe);
+    W.bindReservering(el, s, doe);
+    T.bind(el, s, doe);
+    C.bind(el, s, doe);
 
     if (q('[data-stap]')) q('[data-stap]').addEventListener('click', function () {
       doe(api('studie/stap', { id: s.id, stap: nu.volgende }));
+    });
+    if (q('[data-vszet]')) q('[data-vszet]').addEventListener('click', function () {
+      doe(api('studie/vraagstuk', { id: s.id, vraagstuk: q('[data-vsvraag]').value, doel: q('[data-vsdoel]').value }));
     });
     if (q('[data-hypzet]')) q('[data-hypzet]').addEventListener('click', function () {
       doe(api('plan/hypothese', { id: s.id, tekst: q('[data-hyp]').value, tegendeel: q('[data-hypteg]').value }));
@@ -170,13 +177,6 @@
     });
     if (q('[data-bzet]')) q('[data-bzet]').addEventListener('click', function () {
       doe(api('studie/besluit', { id: s.id, soort: q('[data-bs]').value, door: q('[data-bd]').value, reden: q('[data-br]').value }));
-    });
-    q('[data-coach]').addEventListener('click', function () {
-      var v = q('[data-cvraag]').value.trim(); if (!v) return;
-      q('[data-cuit]').hidden = false; q('[data-cuit]').textContent = 'Rahul denkt mee...';
-      api('coach', { id: s.id, vraag: v })
-        .then(function (r) { q('[data-cuit]').textContent = r.antwoord; })
-        .catch(function (e) { q('[data-cuit]').textContent = e.message; });
     });
   }
 

@@ -154,7 +154,7 @@ function toonLeeg(){
 function teken(){
   const o=ONDS.find(x=>x.id===HUIDIG)||{};
   zetTitel(DAG.naam||'Mijn onderneming');
-  $('#hoofd').innerHTML=[vakGroet(),vakGezond(),vakActies(),vakIntake(),vakKans(),vakSimulatie(),vakStress(),vakPlan(o),vakRechtsvorm(o),vakOprichting(),vakZaak(o),vakEersteKlant(),vakMall(),vakRelaties(),vakDebiteuren(),vakCrediteuren(),vakContracten(),vakBelasting(),vakKas(),vakCapaciteit(),vakWerving()].join('');
+  $('#hoofd').innerHTML=[vakGroet(),vakGezond(),vakActies(),vakIntake(),vakKans(),vakSimulatie(),vakStress(),vakPlan(o),vakRechtsvorm(o),vakOprichting(),vakZaak(o),vakEersteKlant(),vakMall(),vakRelaties(),vakPijplijn(),vakDebiteuren(),vakCrediteuren(),vakContracten(),vakBelasting(),vakKas(),vakCapaciteit(),vakWerving()].join('');
   haakKnoppen();
 }
 
@@ -530,6 +530,37 @@ function vakKas(){
       '<label class="veld" style="flex:1 1 10rem;">Uw banksaldo<input id="kasSaldo" type="number"></label>'+
       '</div><div class="rij" style="margin-top:.5rem;"><button class="knop" id="kasKnop">Reken door op mijn saldo</button></div>')+
     '<p class="subtxt" style="margin-top:.9rem;">'+esc(k.voorbehoud)+'</p></div>';
+}
+
+
+/* De pijplijn. Twee dingen die het scherm niet mag doen: een bedrag zetten bij
+   een stadium dat er geen heeft, en een verwachting tonen zonder gemeten
+   scoringskans. In beide gevallen staat er de reden en geen getal. */
+function vakPijplijn(){
+  const p=DAG&&DAG.pijplijn;
+  if(!p) return '';
+  const iets=(p.stadia||[]).some(s=>s.aantal>0);
+  if(!iets) return '';
+  const stadia=(p.stadia||[]).filter(s=>s.aantal>0).map(s=>
+    '<div class="cijfer"><div class="lbl">'+esc(s.label)+'</div><div class="wrd">'+s.aantal+'</div>'+
+    '<div class="eh">'+(s.bedrag===null?'geen bedrag':euro(s.bedrag))+'</div></div>').join('');
+  const verwacht=p.verwacht.bedrag===null
+    ? '<div class="bron niet"><span>Gewogen verwachting<br><span class="bu">'+esc(p.verwacht.reden)+'</span></span></div>'
+    : '<div class="bron"><span><strong>'+euro(p.verwacht.bedrag)+'</strong> verwacht<br>'+
+      '<span class="bu">'+esc(p.verwacht.let)+'</span></span><span>'+p.verwacht.percentage+'%</span></div>';
+  const rijen=(p.rijen||[]).map(r=>
+    '<div class="bron'+(r.dagen>=p.stil.drempel&&r.stadium==='aangeboden'?'':' niet')+'">'+
+    '<span>'+esc(r.klant||'onbekend')+' &middot; '+esc(r.omschrijving)+'<br>'+
+    '<span class="bu">'+esc(r.stadium)+'</span></span>'+
+    '<span>'+(r.bedrag===null?'-':euro(r.bedrag))+'<br><span class="bu">'+
+    (r.dagen===null?'':r.dagen+' dagen')+'</span></span></div>').join('');
+  return '<div class="vak"><h2>Pijplijn</h2>'+
+    '<div class="cijfers">'+stadia+'</div>'+
+    '<div style="margin-top:.9rem;">'+verwacht+'</div>'+
+    (p.doorlooptijd.naarPrijs===null?'':'<p class="subtxt" style="margin-top:.7rem;">'+
+      esc(p.doorlooptijd.uitleg)+' Nu '+p.doorlooptijd.naarPrijs+' dag(en).</p>')+
+    (rijen?'<div style="margin-top:.8rem;">'+rijen+'</div>':'')+
+    '<p class="subtxt" style="margin-top:.9rem;">'+esc(p.nietGemeten)+'</p></div>';
 }
 
 

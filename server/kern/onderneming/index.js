@@ -40,7 +40,7 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boeki
   /* Alle deellagen worden in ./lagen.js opgebouwd -- dit bestand ging over de
      10 kB van het modulebeleid, en dat is de goede naad: daar de
      gereedschapskist, hier het object zelf. */
-  const { intake, kans, sim, stress, plan, dag, opr, ek, mp, boek, rel, deb, cred, con, bel, kas, cap, wrv, regie } =
+  const { intake, kans, sim, stress, plan, dag, opr, ek, mp, boek, rel, deb, cred, con, bel, kas, cap, wrv, pij, regie } =
     require('./lagen')({ db, save, schoon, ordersVanZaak, boekingenVanZaak, ondernemerpoort });
 
   const bak = () => {
@@ -136,7 +136,8 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boeki
       const cp = cap.capaciteit(o, t);
       return dag.dagbeeld(o, ondernemingBeeld(o), ondernemingVerkenning(o),
         opr.oprichtingsproject(o), ek.eersteKlant(o), mp.ondernemingMallProfiel(o),
-        rel.relaties(o, t), d, c, con.contracten(o, vandaag), b, kas.kas(o, d, c, b, t), cp, wrv.werving(o, cp, t));
+        rel.relaties(o, t), d, c, con.contracten(o, vandaag), b, kas.kas(o, d, c, b, t), cp, wrv.werving(o, cp, t),
+        pij.pijplijn(o, t));
     },
     ondernemingEersteKlant: ek.eersteKlant,
     ondernemingMallProfiel: mp.ondernemingMallProfiel,
@@ -151,6 +152,7 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boeki
     },
     ondernemingKasSaldo: kas.kasSaldoZet,
     ondernemingCapaciteit: cap.capaciteit,
+    ondernemingPijplijn: pij.pijplijn,
     ondernemingRegie: regie.regieBeeld,
     ondernemingProvisioningStand: regie.provisioningStand,
     ondernemingProvisioningZet: regie.provisioningZet,

@@ -18,10 +18,11 @@ const BELASTING = require('./belasting');
 const KAS = require('./kas');
 const CAPACITEIT = require('./capaciteit');
 const WERVING = require('./werving');
+const PIJPLIJN = require('./pijplijn-opvolging');
 
 module.exports = ({ boekingenVanZaak, intakeOntbreekt }) => {
 
-  function acties(o, feiten, verk, project, eersteklant, mall, rel, deb, cred, con, bel, kas, cap, wrv) {
+  function acties(o, feiten, verk, project, eersteklant, mall, rel, deb, cred, con, bel, kas, cap, wrv, pij) {
     const uit = [];
     const zet = (id, kop, waarom, waarheen) => uit.push({ id, kop, waarom, waarheen });
 
@@ -134,21 +135,29 @@ module.exports = ({ boekingenVanZaak, intakeOntbreekt }) => {
     if (wrv) {
       for (const v of WERVING.wervingOpvolging(wrv, cap)) zet('werving:' + v.id, v.kop, v.waarom, 'werving');
     }
-    /* 16. de opvolging. Dit gaat VOOR de Mall-pagina en voor de losse
+    /* 16. de pijplijn. Vlak voor de gewone opvolging, en met opzet ervoor: een
+       uitgebrachte offerte is werk dat al is gedaan en dat staat te verdampen,
+       waar de opvolging hieronder over aanvragen gaat waar nog niets in zit.
+       De aanvragen zonder prijs noemt ./relaties.js al; ./pijplijn.js herhaalt
+       die regel niet. */
+    if (pij) {
+      for (const v of PIJPLIJN.pijplijnOpvolging(pij)) zet('pijplijn:' + v.id, v.kop, v.waarom, 'pijplijn');
+    }
+    /* 17. de opvolging. Dit gaat VOOR de Mall-pagina en voor de losse
        aanvragen: het is het enige wat over geld gaat dat al binnen handbereik
        ligt. De losse aanvragen-actie hieronder valt weg zodra de opvolging hem
        al noemt -- twee keer hetzelfde vragen leest als een storing. */
     if (rel && rel.opvolging.length) {
       for (const v of rel.opvolging) zet('opvolging:' + v.id, v.kop, v.waarom, 'relaties');
     }
-    /* 17. de Mall-pagina. Na de etalage-check, want online staan gaat voor een
+    /* 18. de Mall-pagina. Na de etalage-check, want online staan gaat voor een
        mooie pagina: een pagina die niemand ziet is geen pagina. */
     if (mall && mall.open.length) {
       const m = mall.open[0];
       zet('mallprofiel', 'Uw Mall-pagina is ' + mall.percentage + '% ingevuld',
         m.label + ': ' + m.wat, 'mall');
     }
-    // 18. wat er ligt
+    // 19. wat er ligt
     const alGenoemd = !!(rel && rel.opvolging.some(v => v.id === 'aanvragen'));
     if (o.supplierCode && !alGenoemd) {
       const wacht = (boekingenVanZaak(o.supplierCode) || []).filter(b => b && b.status === 'aangevraagd').length;

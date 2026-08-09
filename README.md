@@ -1780,6 +1780,49 @@ soepeler zetten zonder naam toestaan, strenger zetten óók een naam laten vrage
 de bovengrens van 5% weghalen, de drempel negeren, aanzetten op nul procent
 toestaan, en de bijdrage van de netto reissom afhalen in plaats van van de service.
 
+### Sales OS: de pijplijn
+
+`server/kern/onderneming/pijplijn.js` + `pijplijn-opvolging.js` +
+`/api/onderneming/pijplijn`. Offertes bestonden al (`db.data.vakOffertes`, gevuld
+door `kern/vakwerk/pro.js`); deze laag bouwt er geen tweede stroom naast, maar
+leest hem, groepeert hem in stadia en rekent uit wat er echt openstaat. Er staat
+nergens een schrijfactie op die stroom: antwoorden, weigeren en akkoord geven
+blijft waar de klant het ziet.
+
+**Twee open stadia, en ze zijn niet hetzelfde.** Bij `aangevraagd` ligt de bal
+bij de ondernemer -- en omdat er nog geen prijs op staat, heeft dat stadium
+**geen bedrag**. Er komt daar geen schatting uit eerdere klussen: dat zou een
+omzetverwachting zijn die de ondernemer nooit heeft uitgesproken. Bij
+`aangeboden` ligt de bal bij de klant, en dat is het enige bedrag dat de pijplijn
+kent.
+
+**De forecast is een meting of hij is er niet** (lat-regel 10). De gewogen
+verwachting is het openstaande bedrag maal de scoringskans, en die kans komt uit
+de eigen beslissingsgeschiedenis van deze zaak. Onder vijf afgeronde offertes is
+er geen kans en dus geen verwachting -- dan staat er `null` met de reden erbij, en
+geen brancheaanname of vrolijke 50%.
+
+**Wat de zaak zelf afwees, is geen verloren verkoop.** Een offerte die de
+ondernemer weigerde en een offerte die de klant introk zijn twee verschillende
+gebeurtenissen; opgeteld leest een volle agenda als een slecht verkoopjaar. Alleen
+het tweede telt mee in de scoringskans, en beide worden apart geteld.
+
+De wachttijd van een uitgebrachte offerte loopt vanaf de **prijs** en niet vanaf
+de aanvraag: een klant die drie dagen nadenkt over een offerte van veertig dagen
+oud, laat niets liggen. De doorlooptijd naar een prijs is een mediaan -- één
+offerte die een half jaar bleef liggen laat een gemiddelde de hele zaak traag
+maken. Op het dagbeeld staat de pijplijn vóór de gewone opvolging: een
+uitgebrachte offerte is verricht werk dat staat te verdampen, waar een aanvraag
+nog niets in zich heeft. Aanvragen zonder prijs noemt `relaties.js` al; de
+pijplijn herhaalt die regel niet. Alles op codenaam.
+
+Getoetst in `test/onderneming-pijplijn.test.js` (14). Zeven mutaties, alle zeven
+raak: aanvragen tóch een bedrag van 0 geven, eigen weigeringen als verlies
+meetellen, de drempel van vijf beslissingen weghalen, de stiltijd vanaf de
+aanvraag klokken, de mediaan door een gemiddelde vervangen, het scorings-verwijt
+ook zonder meting laten verschijnen, en de pijplijn-acties achter die van de
+relaties zetten.
+
 ### RTG Werk OS (de werkplek van een organisatie)
 
 `server/bedrijf/` + `/api/bedrijf/...` + `/apps/werk.html`. Een **werkruimte**

@@ -9,7 +9,8 @@
 module.exports = (kern, mijn, stuur, nietGevonden) => {
   const { app, auth, ondernemingRelaties, ondernemingKlantNotitie,
     ondernemingDebiteuren, ondernemingCrediteuren, ondernemingContracten,
-    ondernemingWerkruimte, ondernemingBelasting, ondernemingKas, ondernemingKasSaldo, ondernemingCapaciteit, ondernemingWerving } = kern;
+    ondernemingWerkruimte, ondernemingBelasting, ondernemingKas, ondernemingKasSaldo, ondernemingCapaciteit,
+    ondernemingWerving, ondernemingPijplijn } = kern;
 
   /* Het klantenboek en de opvolging. Alles op codenaam: dit boek kent geen
      echte namen, en dat is het ontwerp en geen tekortkoming. */
@@ -94,5 +95,15 @@ module.exports = (kern, mijn, stuur, nietGevonden) => {
     const o = mijn(req);
     if (!o) return stuur(res, nietGevonden);
     res.json({ ok: true, werving: ondernemingWerving(o) });
+  });
+
+  /* De verkooppijplijn: de bestaande offertestroom in stadia, met een gewogen
+     verwachting op wat er echt openstaat. Leest alleen; antwoorden, weigeren
+     en akkoord geven blijft in de offertestroom zelf, waar de klant hem ziet.
+     Zie kern/onderneming/pijplijn.js. */
+  app.post('/api/onderneming/pijplijn', auth, (req, res) => {
+    const o = mijn(req);
+    if (!o) return stuur(res, nietGevonden);
+    res.json({ ok: true, pijplijn: ondernemingPijplijn(o) });
   });
 };

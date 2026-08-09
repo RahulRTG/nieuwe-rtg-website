@@ -36,7 +36,10 @@ module.exports = (ctx) => {
   const kas = require('./kas')({ save });
   const cap = require('./capaciteit')({ db, boekingenVanZaak });
   const wrv = require('./werving')({ db });
+  /* De pijplijn LEEST de bestaande offertestroom (kern/vakwerk/pro.js) en
+     schrijft er niets in; vandaar alleen db. */
+  const pij = require('./pijplijn')({ db });
   const regie = require('./regie')({ db, save });
 
-  return { intake, kans, sim, stress, plan, dag, opr, ek, mp, boek, rel, deb, cred, con, bel, kas, cap, wrv, regie };
+  return { intake, kans, sim, stress, plan, dag, opr, ek, mp, boek, rel, deb, cred, con, bel, kas, cap, wrv, pij, regie };
 };

@@ -189,6 +189,13 @@
       "gemoedWeg",
       "gemoedZet"
     ],
+    "gewoonten": [
+      "gewoonteMaak",
+      "gewoonteReeks",
+      "gewoonteStop",
+      "gewoonteTik",
+      "gewoontenVan"
+    ],
     "ghost": [
       "ghostKantoor",
       "ghostSimuleer"

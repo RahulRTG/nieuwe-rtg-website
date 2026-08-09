@@ -72,6 +72,14 @@
     <div id="invullen"></div>
   </section>
 
+  <section aria-label="Gewoonten">
+    <h2>Gewoonten</h2>
+    <p class="stil">Kleine dingen die u vaker wilt doen. De dagenteller staat uit; zet hem aan als
+    hij u helpt, en uit als hij u opjaagt. Een dag overslaan is geen gebeurtenis: er komt geen
+    melding en er gaat niets verloren.</p>
+    <div id="gewoonten"></div>
+  </section>
+
   <section aria-label="Gekoppelde toestellen">
     <h2>Toestellen</h2>
     <p class="stil">Een horloge of weegschaal die zelf meet, mag dagmetingen wegschrijven. Zo'n
@@ -226,6 +234,47 @@
     });
   }
 
+  function tekenGewoonten(d) {
+    const el = $('#gewoonten'); if (!el) return;
+    const lijst = d.gewoonten || [];
+    el.innerHTML = (lijst.length ? lijst.map(g =>
+      '<div class="kaartje"><b>' + esc(g.naam) + '</b>' +
+      (g.waarom ? '<span class="m">' + esc(g.waarom) + '</span>' : '') +
+      '<div class="rij">' +
+        '<button class="knop mini' + (g.vandaagGedaan ? ' on' : '') + '" data-gtik="' + esc(g.id) + '"' +
+        ' aria-pressed="' + (g.vandaagGedaan) + '">' + (g.vandaagGedaan ? 'Vandaag gedaan' : 'Vandaag doen') + '</button>' +
+        '<button class="knop mini" data-greeks="' + esc(g.id) + '" data-aan="' + (!g.reeksAan) + '">' +
+          (g.reeksAan ? 'Teller uit' : 'Teller aan') + '</button>' +
+        '<button class="knop mini" data-gweg="' + esc(g.id) + '">Weg</button>' +
+      '</div>' +
+      (g.reeksAan ? '<span class="m">' + esc(g.reeks) + ' dagen op rij</span>' : '') +
+      '<span class="m">' + esc(g.dagen.length) + ' van de laatste ' + esc(g.venster) + ' dagen</span>' +
+      '</div>').join('') : '<p class="stil">U heeft nog geen gewoonte staan.</p>') +
+      '<div class="kaartje"><b>Een gewoonte erbij</b>' +
+      '<div class="rij"><input maxlength="60" placeholder="Bijv. elke dag even buiten" aria-label="Wat wilt u vaker doen?" id="gwNaam">' +
+      '<button class="knop mini" id="gwMaak">Toevoegen</button></div></div>';
+
+    el.querySelectorAll('[data-gtik]').forEach(b => b.addEventListener('click', async () => {
+      try { await Veilig.api('/api/gewoonten/tik', { id: b.dataset.gtik }); await laad(); }
+      catch (e) { Veilig.melding(e.message); }
+    }));
+    el.querySelectorAll('[data-greeks]').forEach(b => b.addEventListener('click', async () => {
+      try { await Veilig.api('/api/gewoonten/reeks', { id: b.dataset.greeks, aan: b.dataset.aan === 'true' });
+        await laad(); }
+      catch (e) { Veilig.melding(e.message); }
+    }));
+    el.querySelectorAll('[data-gweg]').forEach(b => b.addEventListener('click', async () => {
+      try { await Veilig.api('/api/gewoonten/stop', { id: b.dataset.gweg }); await laad(); Veilig.melding('Weg.'); }
+      catch (e) { Veilig.melding(e.message); }
+    }));
+    const mk = $('#gwMaak');
+    if (mk) mk.addEventListener('click', async () => {
+      try { await Veilig.api('/api/gewoonten/maak', { naam: $('#gwNaam').value }); await laad();
+        Veilig.melding('Toegevoegd.'); }
+      catch (e) { Veilig.melding(e.message); }
+    });
+  }
+
   function tekenToestellen(d) {
     const el = $('#toestellen'); if (!el) return;
     const lijst = d.toestellen || [];
@@ -300,10 +349,11 @@
 
   async function laad() {
     try {
-      const [d, m, t, g] = await Promise.all([
+      const [d, m, t, g, w] = await Promise.all([
         Veilig.api('/api/life'), Veilig.api('/api/metingen'), Veilig.api('/api/toestellen'),
-        Veilig.api('/api/gemoed')]);
+        Veilig.api('/api/gemoed'), Veilig.api('/api/gewoonten')]);
       tekenGemoed(g, null);
+      tekenGewoonten(w);
       tekenInvullen(m);
       tekenToestellen(t);
       tekenWinst(d.winst);

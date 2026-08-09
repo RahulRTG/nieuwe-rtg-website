@@ -46,6 +46,7 @@ klinkt.
 | Behandelaar legt vast | `server/kern/care/vastleggen.js` | een zorgaanbieder mag met aparte toestemming een meting in het dossier zetten, via een afspraak bij zichzelf |
 | De grens (drie niveaus) | `server/kern/zorgniveau.js` | lifestyle, professioneel, klinisch; bij crisis en medicatie houdt RTG op en wijst het de weg naar echte hulp |
 | Dagcheck-in | `server/kern/gemoed.js`, blok op `apps/life.html` | hoe zit u erbij, met de keuze tussen erover schrijven of gewoon iets doen |
+| Gewoonten | `server/kern/gewoonten.js`, blok op `apps/life.html` | kleine dingen die u vaker wilt doen; de dagenteller staat uit tot u hem aanzet |
 | Inzage-audit | `server/inzagelog.js` | wie welke identiteitsgegevens opvroeg, en waarom |
 | Identiteitskluis | `server/accounts.js` | echte namen apart; alles daarbuiten draait op codenamen |
 
@@ -92,8 +93,7 @@ week genegeerd.
 Niet gebouwd, en dus ook niet half. Voor elk hiervan geldt: er is geen module,
 geen route en geen toets.
 
-- **Gewoonten, stress, herstel, trainingsbelasting.** Geen van deze bestaat als
-  laag.
+- **Stress, herstel, trainingsbelasting.** Geen van deze bestaat als laag.
 - **Voeding als getal.** Er wordt niets gevraagd, want een lid kan zijn voeding
   niet in een eerlijk getal zetten. RTG Life leidt er iets naast af (hoe vaak er
   buiten de deur gegeten is, uit het grootboek) en zegt erbij dat het een
@@ -417,6 +417,28 @@ niet-pratende helft werkt; een gesprek is een veel groter oppervlak en hoort pas
 te komen als het door deze grens heen moet. Elke toekomstige AI-ingang op dit
 onderwerp gaat langs `zorgniveau.js` of hij hoort er niet te zijn.
 
+## Gewoonten, en de teller die uit staat
+
+Kleine dingen die u vaker wilt doen. Eén tik zet vandaag aan, dezelfde tik zet
+hem weer uit -- een vergissing hoort geen handeling in een apart menu te zijn.
+
+**De reeksteller is een keuze, en hij staat uit.** Voor sommige mensen werkt
+dagen-op-rij geweldig; voor anderen is hij precies de reden om te stoppen zodra
+hij breekt. Hij gaat per gewoonte aan als het lid dat zelf wil, en weer uit
+zonder dat er iets verdwijnt: de afvinkjes blijven, alleen het getal gaat weg.
+Wat uit staat komt ook niet mee in het antwoord -- wat er niet is, kan niet
+opduiken.
+
+**Een gebroken reeks is geen gebeurtenis.** Geen melding, geen rood, geen "u
+heeft uw reeks van twaalf verspeeld". Er staat een toets op die faalt zodra er
+ook maar één woord in kruipt dat er een gebeurtenis van maakt. En vandaag telt
+pas mee als hij af is: wie nog niet heeft afgevinkt, hoort niet te lezen dat
+zijn reeks op nul staat terwijl de dag nog loopt.
+
+Geen percentage, geen score, geen ranglijst, geen beste week ooit. De vorm van
+een gewoonte ligt in een toets vast, zodat daar niets bij kan sluipen zonder dat
+die zakt.
+
 ## De grenzen die vast moeten staan vóór de bouw
 
 Deze horen in de architectuur en niet in een latere ronde, want ze bepalen hoe
@@ -476,7 +498,9 @@ In deze volgorde, want elke stap heeft de vorige nodig:
 8. ~~De mentale laag, beginnend bij de **grens**.~~ Gedaan; zie hieronder. De
    check-in en de doe-kant staan er; een AI-gesprek bewust nog niet.
 
-Wat daarna komt hangt aan deze acht: gewoonten, de dagcoach, sport- en
-voedingslagen, de coachmarktplaats, en de zaakkant van de zorg
-(multi-vestiging, wachtlijst, no-show). En als er ooit een gesprek komt op het
+9. ~~**Gewoonten**, met de teller uit.~~ Gedaan; zie hierboven.
+
+Wat daarna komt: de dagcoach, sport- en voedingslagen, de coachmarktplaats, en
+de zaakkant van de zorg (multi-vestiging, wachtlijst, no-show). En het
+gedachtenboek, dat bij de check-in hoort maar er nog niet is. En als er ooit een gesprek komt op het
 mentale onderwerp, dan door `zorgniveau.js` heen.

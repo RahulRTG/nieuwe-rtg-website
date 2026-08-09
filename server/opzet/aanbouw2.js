@@ -86,6 +86,11 @@ module.exports = function bouwKernAanTwee(kern, grens) {
      zelf ingevuld. De bron die RTG Life miste; herkomst blijft zichtbaar. */
   Object.assign(kern, require('../kern/metingen')({ db, save }));
   require('../routes/metingen')(grens('metingen'));
+  /* Gewoonten (kern/gewoonten.js): kleine dingen die u vaker wilt doen. De
+     reeksteller staat UIT tot het lid hem zelf aanzet, en een gebroken reeks is
+     geen gebeurtenis -- geen melding, geen rood. */
+  Object.assign(kern, require('../kern/gewoonten')({ db, save, schoon, crypto }));
+  require('../routes/gewoonten')(grens('gewoonten'));
   /* De dagcheck-in (kern/gemoed.js) op de grens uit kern/zorgniveau.js. De
      grens staat er eerder dan de functie: elke vrije tekst gaat er langs voor
      er iets terugkomt, en slaat hij aan, dan is er geen tip maar een weg naar

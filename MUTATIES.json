@@ -883,6 +883,13 @@
       "gezakt": 2,
       "scherp": "gezakt"
     },
+    "factuursaldo.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
+      "scherp": "gezakt"
+    },
     "fases.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -2493,6 +2500,13 @@
       "gezakt": 7,
       "scherp": "gezakt"
     },
+    "reisagenda.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 7,
+      "scherp": "gezakt"
+    },
     "reisbieb.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -3216,6 +3230,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "scherp": "gezakt"
+    },
+    "tafeldek.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
       "scherp": "gezakt"
     },
     "tafelticket.test.js": {

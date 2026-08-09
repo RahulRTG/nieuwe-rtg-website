@@ -881,6 +881,7 @@
     ],
     "papieren-deur": [],
     "pay": [
+      "factuurSaldo",
       "onboarding",
       "pay"
     ],

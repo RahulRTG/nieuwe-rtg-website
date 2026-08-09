@@ -40,7 +40,8 @@ module.exports = (kern, hulp) => {
 /* RTG Airport (kern/luchthaven.js): de gehele luchthavenoperatie ·
    vluchtleiding, passagiersketen (boeken/inchecken op codenaam), de draai op
    het platform, de toren (baanklaring), de bagagekelder en security. */
-Object.assign(kern, require('../kern/luchthaven').maakLuchthaven({ db, save, crypto, anthropic }));
+Object.assign(kern, require('../kern/luchthaven').maakLuchthaven({ db, save, crypto, anthropic,
+  visumtaakVan: () => kern.visumtaak }));
 kern.lucht.seed();
 /* De Brigade RTG Airport (kern/marechaussee.js): de Koninklijke Marechaussee
    op het veld · grensbalie (passagierslijst op codenaam), patrouilles,

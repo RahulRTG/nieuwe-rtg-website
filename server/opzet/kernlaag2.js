@@ -130,8 +130,10 @@ Object.assign(kern, require('../kern/foodcourt').maakFoodcourt({ db, save, crypt
 /* Het RTG-reisbureau (kern/reisbureau.js): een echt reisbureau in de leden-app;
    leden bladeren door de samengestelde reizen en vragen er een aan tegen de
    nettoprijs. De aanvraag landt bij een RTG-reisadviseur (aangevraagd, mens
-   bevestigt). */
-Object.assign(kern, require('../kern/reisbureau').maakReisbureau({ db, save, crypto, anthropic }));
+   bevestigt). De visumtaak-haak is laat gebonden (kern/visumtaak.js komt in
+   kernlaag7) en optioneel. */
+Object.assign(kern, require('../kern/reisbureau').maakReisbureau({ db, save, crypto, anthropic,
+  visumtaakVan: () => kern.visumtaak }));
 /* De losse verblijf-pagina (kern/logies.js): hotels, appartementen en villa's
    op een rij met hun vrije kamers; boeken loopt via /api/verblijf. */
 Object.assign(kern, require('../kern/logies').maakLogies({ db }));

@@ -56,6 +56,13 @@ Object.assign(kern, require('../kern/thuis')({ db, save, crypto, schoon, reiswij
 Object.assign(kern, require('../kern/koppel')({ db, save, crypto, schoon, dyncode: kern.dyncode, sseToSupplier }));
 Object.assign(kern, require('../kern/tafelwensen')({ db, save, crypto, schoon }));
 Object.assign(kern, require('../kern/checklijst')({ db, save, crypto, schoon }));
+/* De visumtaak (kern/visumtaak.js) en de gedekte tafel (kern/tafeldek.js):
+   dwarsverbindingen op wat hierboven al staat (reiswijzer, tafelwensen, de
+   agenda en het zorgprofiel). De domeinen kennen deze lagen niet: luchthaven,
+   reisbureau en de tafelplanning roepen de laat gebonden, optionele haken
+   visumtaakVan/tafeldekVan aan, die vanaf hier iets teruggeven. */
+Object.assign(kern, require('../kern/visumtaak').maakVisumtaak({ agenda: kern.agenda, reiswijzer: kern.reiswijzer }));
+Object.assign(kern, require('../kern/tafeldek').maakTafeldek({ tafelwensen: kern.tafelwensen, zorgVoor: kern.zorgVoor }));
 /* De werkvormen (kern/werkvormen.js): elke zaak krijgt automatisch elke
    gereedschapskist die bij haar past -- een zzp'er die ritten rijdt heeft
    de vervoerstools EN de zzp-tools. De afleiding zelf hangt al aan db

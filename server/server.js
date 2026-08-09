@@ -1280,7 +1280,9 @@ const {
   puntenVan, verdienPunten, verzilverPunten, pasTegoedToe, voorkeurVan, zetVoorkeur
 } = maakErvaring({
   db, save, crypto, findSupplier, notify, notifySupplier, sseToCustomer,
-  sseToSupplier, sseToOffice, zijnVrienden, ticketsVoorSlot, optieAan
+  sseToSupplier, sseToOffice, zijnVrienden, ticketsVoorSlot, optieAan,
+  // de gedekte tafel (kern/tafeldek.js) wordt pas in kernlaag7 gebouwd; laat gebonden
+  tafeldekVan: () => kern.tafeldek
 });
 
 /* De retail-/mode-laag (kern/retail.js): collecties, artikelen met varianten,
@@ -1467,6 +1469,15 @@ const { maakSettlement } = require('./kern/settlement');
    niet bijgeschreven, webhook antwoordde 200 ok. */
 const settleFactuur = maakSettlement({ db, save, accounts, fonds, log, dpRegistreerMunt,
   payOplaadAfronden: (a) => (kern.pay && kern.pay.oplaadAfronden ? kern.pay.oplaadAfronden(a) : null) });
+
+/* De maandfactuur uit het eigen RTG Pay-saldo (kern/factuursaldo.js): de derde
+   betaalweg naast kaart en munten. De afschrijving loopt via pay.huisIn en de
+   afwikkeling via DEZELFDE settleFactuur als hierboven, dus de bedragcontrole
+   en de 30%-afdracht staan nergens een tweede keer. De betaalkern komt pas in
+   de kernlaag; vandaar dezelfde late binding als payOplaadAfronden. */
+const { factuurSaldo } = require('./kern/factuursaldo').maakFactuurSaldo({
+  db, accounts, settleFactuur, broadcastSync,
+  payVan: () => kern.pay });
 
 /* De paspoort-/identiteitslaag (kern/paspoort.js): een gecontroleerd, veilig
    en toestemmingsgestuurd kanaal waarlangs een partner de identiteit achter een
@@ -1793,7 +1804,7 @@ const kern = {
   findSupplier, forgetSession, fs, gcCode, geborenVan, geenGast, idGeverifieerd, generateAiReply,
   guestsFor, hasContact, hasCred, haversine, i18n, initRealtime, klokVan, ledenPrijs,
   leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename, liveStateFor, load, logActivity, loginFails,
-  mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, noteerBeurt, memberTemplate, myApplications, nextSseId, onboarding, boerderij, journalistiek, creator, samenwerking, handelsketen, agenda, notities, bestanden, meet, galerij, klok, boeken, onderwijs, leerstof, bijles, vervolg, facturatie, markt,
+  mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, noteerBeurt, memberTemplate, myApplications, nextSseId, onboarding, boerderij, journalistiek, creator, samenwerking, handelsketen, agenda, notities, bestanden, meet, galerij, klok, boeken, onderwijs, leerstof, bijles, vervolg, facturatie, factuurSaldo, markt,
   noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, openVacatures, optieAan,
   entreeCode, keyVanCodenaam, gidsHaal, gidsZoekCodenaam, gidsWeg, magBezorgen, parseRunsheetText, path, pendingVerifications, pickupCode, pinSlot, posDay, publicPartner, publicSupplier, ticketsVoorSlot,
   publicTrip, pushLive, registerContact, rememberSession, resolveSession, ritBezetting, ritVerder, rtf,

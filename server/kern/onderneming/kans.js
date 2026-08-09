@@ -22,6 +22,8 @@
    stadsweefsel als een stad die heeft ingevuld. */
 'use strict';
 
+const meter = require('./meter');
+
 /* Onder dit aantal gemeten bronnen geven we geen cijfer. Twee is laag, en
    bewust: het is het punt waarop een cijfer nog íets zegt. */
 const MIN_BRONNEN = 2;
@@ -127,37 +129,27 @@ module.exports = ({ db, ordersVanZaak, boekingenVanZaak }) => {
     if (!branche) return { status: 400, error: 'Voor welke branche wilt u de kans verkennen?' };
     const bronnen = [bronConcurrentie(branche, plaats), bronVraag(branche),
       bronPersoneel(branche), bronRuimte(plaats)];
-    const gemeten = bronnen.filter(b => b.gemeten);
 
-    const grondslag = {
-      gemeten: gemeten.length, totaal: bronnen.length,
-      ontbreekt: bronnen.filter(b => !b.gemeten).map(b => ({ id: b.id, reden: b.reden }))
-    };
-
-    if (gemeten.length < MIN_BRONNEN) {
-      /* Geen cijfer. Zie de kop: een getal met een voorbehoud eronder wordt een
-         getal zodra iemand het overtypt. */
-      return {
-        ok: true, branche, plaats: plaats || null, score: null, bronnen, grondslag,
-        oordeel: 'Te weinig gegevens voor een kansscore.',
-        uitleg: 'Er zijn ' + gemeten.length + ' van de ' + bronnen.length + ' bronnen meetbaar, en we geven pas een cijfer vanaf ' + MIN_BRONNEN + '. Een score op minder zou eerder een indruk zijn dan een meting.'
-      };
+    /* De rekenwijze staat in ./meter.js, gedeeld met de gezondheidsscore van
+       het dagbeeld: hoe je met ontbrekende bronnen omgaat is precies het stuk
+       dat je twee keer net anders opschrijft. */
+    const uit = meter.scoreUit(bronnen, MIN_BRONNEN);
+    if (uit.score === null) {
+      return Object.assign({ ok: true, branche, plaats: plaats || null, bronnen,
+        oordeel: 'Te weinig gegevens voor een kansscore.' }, uit);
     }
-
-    const behaald = gemeten.reduce((s, b) => s + b.punten, 0);
-    const mogelijk = gemeten.reduce((s, b) => s + b.max, 0);
-    const score = Math.round((behaald / mogelijk) * 100);
+    const score = uit.score;
     const oordeel = score >= 75 ? 'Kansrijk op wat wij kunnen meten.'
       : score >= 50 ? 'Redelijk, met aandachtspunten.'
       : score >= 30 ? 'Moeilijk. Er is een scherp onderscheid nodig.'
       : 'Ongunstig op wat wij kunnen meten.';
 
     return {
-      ok: true, branche, plaats: plaats || null, score, bronnen, grondslag, oordeel,
+      ok: true, branche, plaats: plaats || null, score, bronnen,
+      grondslag: uit.grondslag, oordeel,
       /* Wat dit cijfer NIET is. Het staat in het antwoord en niet alleen in de
          documentatie, want het reist mee naar elk scherm dat de score toont. */
-      voorbehoud: 'Dit cijfer rust op ' + gemeten.length + ' van de ' + bronnen.length +
-        ' bronnen, en alleen op data binnen RTG. Het weet niets van de markt daarbuiten en is geen voorspelling.'
+      voorbehoud: uit.voorbehoud + ' Het weet niets van de markt daarbuiten en is geen voorspelling.'
     };
   }
 

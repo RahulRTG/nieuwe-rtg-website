@@ -16,7 +16,7 @@ module.exports = (kern) => {
   const { app, auth, save, ONDERNEMING_RECHTSVORMEN, ondernemingVind, ondernemingVanEigenaar,
     ondernemingBeeld, ondernemingNieuw, ondernemingRechtsvorm, ondernemingKoppel,
     ondernemingIngeschreven, ondernemingIntakeZet, ondernemingIntakeBeeld,
-    ondernemingVerkenning, ondernemingPlanVastleggen } = kern;
+    ondernemingVerkenning, ondernemingPlanVastleggen, ondernemingDagbeeld } = kern;
 
   const stuur = (res, r) => res.status(r && r.status ? r.status : 200).json(r);
 
@@ -73,6 +73,14 @@ module.exports = (kern) => {
     const o = mijn(req);
     if (!o) return stuur(res, nietGevonden);
     stuur(res, ondernemingIngeschreven(o, (req.body || {}).kvk));
+  });
+
+  /* Het ene scherm: waar sta ik, wat doet er vandaag toe, wat kan ik doen.
+     Fase-bewust -- een idee krijgt geen debiteurenbeheer te zien. */
+  app.post('/api/onderneming/dagbeeld', auth, (req, res) => {
+    const o = mijn(req);
+    if (!o) return stuur(res, nietGevonden);
+    stuur(res, ondernemingDagbeeld(o));
   });
 
   /* ---- de verkenning: intake -> kans -> simulatie -> stress -> plan ---- */

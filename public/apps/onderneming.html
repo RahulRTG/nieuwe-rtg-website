@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<!-- id.js zonder defer en vooraan: RTGId levert id's die al tijdens het parsen nodig zijn -->
+<script src="/shared/id.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mijn onderneming &middot; RTG</title>
+<link rel="icon" href="/icon.svg">
+<meta name="theme-color" content="#0C0C0B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Onderneming">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<style>
+  :root{ --bg:var(--rtg-bg); --card:var(--rtg-card); --card2:var(--rtg-card2); --line:var(--rtg-line);
+    --txt:var(--rtg-txt); --muted:var(--rtg-muted); --soft:var(--rtg-soft);
+    --burgundy:#C23A5E; --gold:#A98F1C; --green:#4C9A75; }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:7rem;}
+  h1,h2,.groot{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  header{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.92));
+    backdrop-filter:blur(8px);border-bottom:1px solid var(--line);
+    display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;padding:calc(env(safe-area-inset-top) + .7rem) 1rem .7rem;}
+  header .ey{font-size:.6rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header h1{font-size:1.05rem;}
+  .sp{flex:1 1 auto;}
+  main{max-width:56rem;margin:0 auto;padding:1.3rem 1rem;display:flex;flex-direction:column;gap:1.4rem;}
+  .vak{background:var(--card);border:1px solid var(--line);border-radius:var(--rtg-rond,14px);padding:1.1rem 1.15rem;}
+  .vak > h2{font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);
+    font-family:'Inter',sans-serif;font-weight:700;margin-bottom:.8rem;}
+  .groet{font-size:1.35rem;line-height:1.3;margin-bottom:.35rem;}
+  .subtxt{color:var(--soft);font-size:.85rem;line-height:1.5;}
+  .ladder{display:flex;flex-wrap:wrap;gap:.3rem;margin-top:.9rem;}
+  .stap{font-size:.68rem;padding:.25rem .55rem;border-radius:999px;border:1px solid var(--line);color:var(--soft);}
+  .stap.bereikt{border-color:var(--gold);color:var(--gold);}
+  .stap.nu{background:var(--gold);border-color:var(--gold);color:#0C0C0B;font-weight:700;}
+  .cijfers{display:grid;grid-template-columns:repeat(auto-fit,minmax(8.5rem,1fr));gap:.7rem;}
+  .cijfer{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:.7rem .8rem;}
+  .cijfer .lbl{font-size:.62rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);}
+  .cijfer .wrd{font-size:1.4rem;margin-top:.25rem;}
+  .cijfer .eh{font-size:.7rem;color:var(--soft);}
+  .score{display:flex;align-items:baseline;gap:.6rem;}
+  .score .n{font-size:2.6rem;}
+  .geenscore{color:var(--soft);font-size:.9rem;line-height:1.55;}
+  .actie{border-top:1px solid var(--line);padding:.8rem 0;}
+  .actie:first-of-type{border-top:0;padding-top:0;}
+  .actie .kop{font-weight:650;font-size:.95rem;}
+  .actie .waarom{color:var(--soft);font-size:.82rem;margin-top:.2rem;line-height:1.5;}
+  .knop{background:var(--card2);border:1px solid var(--line);color:var(--txt);font:inherit;font-size:.82rem;
+    font-weight:600;border-radius:10px;padding:.5rem .85rem;cursor:pointer;}
+  .knop:hover{border-color:var(--gold);}
+  .knop.prim{background:var(--burgundy);border-color:var(--burgundy);color:#fff;}
+  .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
+  label.veld{display:flex;flex-direction:column;gap:.25rem;font-size:.68rem;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--soft);}
+  label.veld input,label.veld select,label.veld textarea{background:var(--card2);border:1px solid var(--line);
+    color:var(--txt);font:inherit;font-size:.88rem;border-radius:10px;padding:.5rem .6rem;text-transform:none;letter-spacing:0;}
+  .raster{display:grid;grid-template-columns:repeat(auto-fit,minmax(11rem,1fr));gap:.7rem;}
+  .bevinding{border-left:3px solid var(--line);padding:.55rem .8rem;margin-top:.6rem;background:var(--card2);border-radius:0 10px 10px 0;}
+  .bevinding.blokkerend{border-left-color:var(--burgundy);}
+  .bevinding.zwaar{border-left-color:var(--gold);}
+  .bevinding .bk{font-weight:650;font-size:.9rem;}
+  .bevinding .bw{color:var(--soft);font-size:.82rem;margin-top:.25rem;line-height:1.5;}
+  .oordeel{font-size:1.05rem;font-weight:650;}
+  .oordeel.niet{color:var(--burgundy);}
+  .oordeel.pas{color:var(--gold);}
+  .oordeel.ga{color:var(--green);}
+  .bron{display:flex;justify-content:space-between;gap:.8rem;padding:.45rem 0;border-top:1px solid var(--line);font-size:.82rem;}
+  .bron:first-of-type{border-top:0;}
+  .bron .bu{color:var(--soft);font-size:.76rem;}
+  .bron.niet{opacity:.65;}
+  table.mnd{width:100%;border-collapse:collapse;font-size:.78rem;}
+  table.mnd th,table.mnd td{padding:.35rem .4rem;text-align:right;border-top:1px solid var(--line);}
+  table.mnd th:first-child,table.mnd td:first-child{text-align:left;}
+  table.mnd th{color:var(--soft);font-weight:600;font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;}
+  .melding{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom) + 5.5rem);
+    background:var(--card2);border:1px solid var(--gold);color:var(--txt);padding:.6rem 1rem;border-radius:12px;
+    font-size:.85rem;opacity:0;transition:opacity .25s;pointer-events:none;z-index:40;max-width:90vw;}
+  .stil{color:var(--soft);font-size:.85rem;line-height:1.55;}
+</style>
+</head>
+<body class="rtg-stijl">
+
+<header>
+  <div>
+    <div class="ey">RTG Ondernemers-OS</div>
+    <h1 id="titel">Mijn onderneming</h1>
+  </div>
+  <div class="sp"></div>
+  <select id="kiezer" class="knop" hidden aria-label="Kies onderneming"></select>
+</header>
+
+<main id="hoofd">
+  <div class="vak" id="laden"><p class="stil">Bezig met laden...</p></div>
+</main>
+
+<div class="melding" id="melding" role="status"></div>
+
+<script>
+const $=s=>document.querySelector(s);
+const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let TOKEN=null; try{ TOKEN=localStorage.getItem('rtg_member_token'); }catch(e){}
+
+const api=(pad,body)=>fetch('/api/onderneming/'+pad,{method:'POST',
+  headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},
+  body:JSON.stringify(body||{})}).then(async r=>{
+    const d=await r.json().catch(()=>({}));
+    if(!r.ok){const e=new Error(d.error||'Er ging iets mis.');e.data=d;e.status=r.status;throw e;}
+    return d;});
+
+function meld(t){const m=$('#melding');if(!m)return;m.textContent=t;m.style.opacity='1';
+  clearTimeout(m._t);m._t=setTimeout(()=>{m.style.opacity='0';},3200);}
+
+/* De iOS-laag (shared/ios.js) bouwt de kopbalk om: hij leest de header die deze
+   pagina meebrengt en zet er zijn eigen navigatiebalk voor in de plaats. Onze
+   eigen kop kan daardoor verplaatst of vervangen zijn tegen de tijd dat wij hem
+   willen vullen. Dat is geen fout van die laag maar van een aanname hier, dus
+   schrijven we naar de chrome alleen als hij er nog staat. */
+function zetTitel(t){const el=$('#titel');if(el)el.textContent=t;document.title=t+' \u00b7 RTG';}
+
+let ONDS=[], HUIDIG=null, DAG=null, VERK=null, INTAKE=null;
+const euro=n=>'€'+Number(n||0).toLocaleString('nl-NL');
+
+function vulKiezer(){
+  const k=$('#kiezer');
+  if(!k)return;
+  if(ONDS.length<2){k.hidden=true;return;}
+  k.hidden=false;
+  k.innerHTML=ONDS.map(o=>'<option value="'+esc(o.id)+'"'+(o.id===HUIDIG?' selected':'')+'>'+esc(o.naam||'Naamloos')+'</option>').join('');
+}
+
+/* ---------- het lege begin ---------- */
+function toonLeeg(){
+  $('#hoofd').innerHTML=
+    '<div class="vak"><h2>Beginnen</h2>'+
+    '<p class="groot groet">Ik denk erover na.</p>'+
+    '<p class="subtxt">Een onderneming begint hier voordat er iets bestaat. U hoeft nog niets te weten: '+
+    'een werktitel is genoeg, en alles daarna kan wijzigen.</p>'+
+    '<div class="rij" style="margin-top:1rem;">'+
+    '<label class="veld" style="flex:1 1 14rem;">Werktitel<input id="nieuwNaam" placeholder="Bijvoorbeeld: iets met ramen wassen"></label>'+
+    '</div><div class="rij" style="margin-top:.8rem;"><button class="knop prim" id="nieuwKnop">Begin een onderneming</button></div></div>';
+  $('#nieuwKnop').addEventListener('click',async()=>{
+    const naam=$('#nieuwNaam').value.trim();
+    if(!naam){meld('Geef een werktitel.');return;}
+    try{ const r=await api('nieuw',{naam}); meld('Aangemaakt.'); HUIDIG=r.onderneming.id;
+      ONDS=(await api('mijn')).ondernemingen||[]; vulKiezer(); await herlaad(); }
+    catch(e){ meld(e.message); }
+  });
+}
+
+/* ---------- het scherm ---------- */
+function teken(){
+  const o=ONDS.find(x=>x.id===HUIDIG)||{};
+  zetTitel(DAG.naam||'Mijn onderneming');
+  $('#hoofd').innerHTML=[vakGroet(),vakGezond(),vakActies(),vakIntake(),vakKans(),vakSimulatie(),vakStress(),vakPlan(o)].join('');
+  haakKnoppen();
+}
+
+function vakGroet(){
+  const ladder=(DAG.ladder||[]).map(s=>'<span class="stap'+(s.id===DAG.fase?' nu':(s.bereikt?' bereikt':''))+'">'+esc(s.label)+'</span>').join('');
+  const v=DAG.volgende?'<p class="subtxt" style="margin-top:.8rem;"><strong>Volgende mijlpaal:</strong> '+esc(DAG.volgende.label)+' &mdash; '+esc(DAG.volgende.vraag)+'</p>':'';
+  return '<div class="vak"><p class="groot groet">'+esc(DAG.groet||'')+'</p>'+
+    '<div class="ladder">'+ladder+'</div>'+v+'</div>';
+}
+
+function vakGezond(){
+  const g=DAG.gezondheid||{};
+  const cij=(DAG.cijfers||[]).filter(c=>c.gemeten);
+  const cijHtml=cij.length?'<div class="cijfers" style="margin-top:1rem;">'+cij.map(c=>
+    '<div class="cijfer"><div class="lbl">'+esc(c.label)+'</div><div class="wrd">'+
+    (c.eenheid==='euro'?euro(c.waarde):esc(String(c.waarde)))+'</div>'+
+    (c.eenheid&&c.eenheid!=='euro'?'<div class="eh">'+esc(c.eenheid)+'</div>':'')+'</div>').join('')+'</div>':'';
+  let kop;
+  if(g.score===null||g.score===undefined){
+    kop='<p class="geenscore">'+esc(g.uitleg||'Nog geen cijfer te geven.')+'</p>';
+  }else{
+    kop='<div class="score"><span class="n groot">'+g.score+'</span><span class="subtxt">van de 100</span></div>'+
+      '<p class="subtxt" style="margin-top:.4rem;">'+esc(g.voorbehoud||'')+'</p>';
+  }
+  const ontbreekt=(g.grondslag&&g.grondslag.ontbreekt||[]).map(b=>
+    '<div class="bron niet"><span>'+esc(b.id)+'</span><span class="bu">'+esc(b.reden||'')+'</span></div>').join('');
+  return '<div class="vak"><h2>Gezondheid</h2>'+kop+cijHtml+
+    (ontbreekt?'<div style="margin-top:.9rem;"><p class="subtxt" style="margin-bottom:.3rem;">Niet gemeten:</p>'+ontbreekt+'</div>':'')+
+    '</div>';
+}
+
+function vakActies(){
+  const a=DAG.acties||[];
+  if(!a.length) return '<div class="vak"><h2>Vandaag belangrijk</h2><p class="stil">Er ligt niets dringends. Dat is ook een uitkomst.</p></div>';
+  return '<div class="vak"><h2>Vandaag belangrijk</h2>'+a.map(x=>
+    '<div class="actie"><div class="kop">'+esc(x.kop)+'</div><div class="waarom">'+esc(x.waarom)+'</div></div>').join('')+'</div>';
+}
+
+function vakIntake(){
+  const d=(INTAKE&&INTAKE.idee)||{}, p=(INTAKE&&INTAKE.persoon)||{};
+  const br=(INTAKE&&INTAKE.branches||[]).map(b=>'<option value="'+esc(b)+'"'+(d.branche===b?' selected':'')+'>'+esc(b)+'</option>').join('');
+  const vm=(INTAKE&&INTAKE.verkoopmodellen||[]).map(b=>'<option value="'+esc(b)+'"'+(d.verkoopmodel===b?' selected':'')+'>'+esc(b)+'</option>').join('');
+  const w=(v)=>v===undefined||v===null?'':String(v);
+  return '<div class="vak"><h2>Uw idee en uw cijfers</h2>'+
+    '<p class="subtxt">De getallen hieronder zijn van u. Wij rekenen ze door en proberen ze daarna te breken.</p>'+
+    '<div class="raster" style="margin-top:.9rem;">'+
+    '<label class="veld">Branche<select id="f_branche"><option value="">kies...</option>'+br+'</select></label>'+
+    '<label class="veld">Plaats<input id="f_plaats" value="'+esc(w(d.plaats))+'"></label>'+
+    '<label class="veld">Verkoopmodel<select id="f_verkoopmodel"><option value="">kies...</option>'+vm+'</select></label>'+
+    '<label class="veld">Prijs per eenheid<input id="f_prijs" type="number" min="0" value="'+esc(w(d.prijs))+'"></label>'+
+    '<label class="veld">Kostprijs per eenheid<input id="f_kostprijs" type="number" min="0" value="'+esc(w(d.kostprijs))+'"></label>'+
+    '<label class="veld">Verwacht per maand<input id="f_verwachtPerMaand" type="number" min="0" value="'+esc(w(d.verwachtPerMaand))+'"></label>'+
+    '<label class="veld">Vaste lasten per maand<input id="f_vasteLasten" type="number" min="0" value="'+esc(w(d.vasteLasten))+'"></label>'+
+    '<label class="veld">Uren per week<input id="f_urenPerWeek" type="number" min="0" value="'+esc(w(p.urenPerWeek))+'"></label>'+
+    '<label class="veld">Jaren ervaring<input id="f_ervaringJaren" type="number" min="0" value="'+esc(w(p.ervaringJaren))+'"></label>'+
+    '<label class="veld">Startkapitaal<input id="f_startkapitaal" type="number" min="0" value="'+esc(w(p.startkapitaal))+'"></label>'+
+    '</div>'+
+    '<div class="raster" style="margin-top:.7rem;">'+
+    '<label class="veld">Wat doet u<input id="f_wat" value="'+esc(w(d.wat))+'"></label>'+
+    '<label class="veld">Voor wie<input id="f_doelgroep" value="'+esc(w(d.doelgroep))+'"></label>'+
+    '<label class="veld">Waarom u<input id="f_onderscheid" value="'+esc(w(d.onderscheid))+'"></label>'+
+    '</div>'+
+    '<div class="rij" style="margin-top:.9rem;"><button class="knop prim" id="bewaarKnop">Bewaar en reken door</button></div></div>';
+}
+
+function vakKans(){
+  const k=VERK&&VERK.kans;
+  if(!k) return '<div class="vak"><h2>Kansverkenning</h2><p class="stil">Vul een branche in, dan kijken we wat onze eigen data erover zegt.</p></div>';
+  let kop;
+  if(k.score===null){
+    kop='<p class="geenscore">'+esc(k.uitleg||'')+'</p>';
+  }else{
+    kop='<div class="score"><span class="n groot">'+k.score+'</span><span class="subtxt">van de 100</span></div>'+
+      '<p class="subtxt" style="margin-top:.35rem;">'+esc(k.oordeel||'')+'</p>'+
+      '<p class="subtxt" style="margin-top:.35rem;">'+esc(k.voorbehoud||'')+'</p>';
+  }
+  const bronnen=(k.bronnen||[]).map(b=>b.gemeten
+    ? '<div class="bron"><span><strong>'+esc(b.label)+'</strong><br><span class="bu">'+esc(b.uitleg||'')+'</span></span><span>'+esc(String(b.waarde))+' '+esc(b.eenheid||'')+'</span></div>'
+    : '<div class="bron niet"><span><strong>'+esc(b.label)+'</strong><br><span class="bu">'+esc(b.reden||'')+'</span></span><span class="bu">niet gemeten</span></div>').join('');
+  return '<div class="vak"><h2>Kansverkenning</h2>'+kop+'<div style="margin-top:.9rem;">'+bronnen+'</div></div>';
+}
+
+function vakSimulatie(){
+  const s=VERK&&VERK.simulatie;
+  if(!s||!s.ok){
+    const mist=(s&&s.ontbreekt||[]).map(x=>esc(x)).join(', ');
+    return '<div class="vak"><h2>Twaalf maanden vooruit</h2><p class="stil">'+
+      (mist?'Nog niet door te rekenen. Ontbreekt: '+mist+'.':'Nog niet door te rekenen.')+'</p></div>';
+  }
+  const rijen=['slecht','basis','groei'].map(id=>{
+    const x=s.scenarios[id];
+    return '<tr><td>'+esc(x.label)+'</td><td>'+euro(x.jaar.omzet)+'</td><td>'+euro(x.jaar.resultaat)+'</td>'+
+      '<td>'+(x.jaar.margePercentage===null?'&mdash;':x.jaar.margePercentage+'%')+'</td>'+
+      '<td>'+euro(x.eindkas)+'</td><td>'+(x.runwayMaanden===null?'houdt vol':'maand '+x.runwayMaanden)+'</td></tr>';
+  }).join('');
+  const aannames=(s.aannames||[]).map(a=>
+    '<div class="bron"><span>'+esc(a.naam)+'</span><span>'+esc(String(a.waarde))+
+    ' <span class="bu">'+esc(a.herkomst)+'</span></span></div>').join('');
+  return '<div class="vak"><h2>Twaalf maanden vooruit</h2>'+
+    '<table class="mnd"><thead><tr><th>Scenario</th><th>Jaaromzet</th><th>Resultaat</th><th>Marge</th><th>Eindkas</th><th>Kas op</th></tr></thead>'+
+    '<tbody>'+rijen+'</tbody></table>'+
+    '<p class="subtxt" style="margin-top:.8rem;">'+esc(s.voorbehoud||'')+'</p>'+
+    '<div style="margin-top:.8rem;"><p class="subtxt" style="margin-bottom:.3rem;">Waar dit op rust:</p>'+aannames+'</div></div>';
+}
+
+function vakStress(){
+  const st=VERK&&VERK.stress;
+  if(!st||!st.ok) return '<div class="vak"><h2>Stress test</h2><p class="stil">Er is nog geen doorgerekend plan om te toetsen.</p></div>';
+  const kl=st.oordeel==='niet starten'?'niet':(st.oordeel==='pas aan'?'pas':'ga');
+  const bev=(st.bevindingen||[]).map(b=>
+    '<div class="bevinding '+esc(b.zwaarte)+'"><div class="bk">'+esc(b.kop)+'</div>'+
+    '<div class="bw">'+esc(b.wat)+'</div><div class="bw"><strong>Doen:</strong> '+esc(b.doen)+'</div></div>').join('');
+  const sterk=(st.sterk||[]).map(x=>'<div class="bw" style="margin-top:.3rem;">&middot; '+esc(x)+'</div>').join('');
+  return '<div class="vak"><h2>Stress test</h2>'+
+    '<p class="oordeel '+kl+'">'+esc(st.oordeel)+'</p>'+
+    '<p class="subtxt" style="margin-top:.3rem;">'+esc(st.toelichting)+'</p>'+bev+
+    (sterk?'<div style="margin-top:1rem;"><p class="subtxt"><strong>Wat wel houdt</strong></p>'+sterk+'</div>':'')+
+    '<p class="subtxt" style="margin-top:.9rem;">'+esc(st.nietGetoetst)+'</p></div>';
+}
+
+function vakPlan(o){
+  const p=VERK&&VERK.plan;
+  const vast=p&&p.hoofdstukken&&p.hoofdstukken.besluit&&p.hoofdstukken.besluit.vastgelegd;
+  const mist=(p&&p.ontbreekt||[]).map(x=>esc(x)).join(', ');
+  let body;
+  if(vast){
+    const n=p.hoofdstukken.besluit.versies;
+    body='<p class="subtxt">Vastgelegd. Versie '+n+' staat in het archief; wijzigt u iets, dan verandert het levende plan mee maar de vastgelegde versie niet.</p>';
+  }else if(mist){
+    body='<p class="stil">Nog niet compleet. Ontbreekt: '+mist+'.</p>';
+  }else{
+    body='<p class="subtxt">Uw plan is compleet. Vastleggen bevriest deze versie en brengt u naar de volgende fase.</p>';
+  }
+  const knop=(!vast&&!mist)?'<div class="rij" style="margin-top:.9rem;"><button class="knop prim" id="planKnop">Leg mijn ondernemingsplan vast</button></div>':'';
+  return '<div class="vak"><h2>Ondernemingsplan</h2>'+body+knop+'</div>';
+}
+
+/* ---------- handelingen ---------- */
+function haakKnoppen(){
+  const b=$('#bewaarKnop'); if(b) b.addEventListener('click',bewaar);
+  const p=$('#planKnop'); if(p) p.addEventListener('click',legVast);
+}
+
+const NUM=['prijs','kostprijs','verwachtPerMaand','vasteLasten'];
+const PNUM=['urenPerWeek','ervaringJaren','startkapitaal'];
+const TXT=['plaats','wat','doelgroep','onderscheid','branche','verkoopmodel'];
+
+async function bewaar(){
+  const idee={},persoon={};
+  for(const k of NUM){const el=$('#f_'+k); if(el&&el.value!=='') idee[k]=Number(el.value);}
+  for(const k of TXT){const el=$('#f_'+k); if(el) idee[k]=el.value;}
+  for(const k of PNUM){const el=$('#f_'+k); if(el&&el.value!=='') persoon[k]=Number(el.value);}
+  try{
+    const d=await api('intake',{id:HUIDIG,idee,persoon});
+    INTAKE=d.intake;
+    const [dag,verk]=await Promise.all([api('dagbeeld',{id:HUIDIG}),api('verkenning',{id:HUIDIG})]);
+    DAG=dag;VERK=verk;teken();
+    meld('Doorgerekend.');
+  }catch(e){meld(e.message);}
+}
+
+async function legVast(){
+  try{
+    await api('plan/vastleggen',{id:HUIDIG});
+    meld('Plan vastgelegd.');
+    await herlaad();
+  }catch(e){
+    if(e.status===409&&e.data){
+      const blok=(e.data.blokkerend||[]).map(b=>'- '+b.kop).join('\n');
+      const ja=window.confirm(e.data.error+'\n\n'+blok+'\n\n'+e.data.uitleg+'\n\nToch vastleggen? Deze keuze wordt met het advies vastgelegd.');
+      if(!ja) return;
+      try{ await api('plan/vastleggen',{id:HUIDIG,tochDoorzetten:true}); meld('Vastgelegd, met het advies erbij.'); await herlaad(); }
+      catch(e2){ meld(e2.message); }
+    }else meld(e.message);
+  }
+}
+
+async function herlaad(){
+  const [dag,verk,intake]=await Promise.all([api('dagbeeld',{id:HUIDIG}),api('verkenning',{id:HUIDIG}),api('intake',{id:HUIDIG})]);
+  DAG=dag;VERK=verk;INTAKE=intake.intake;teken();
+}
+
+const kz=$('#kiezer');
+if(kz)kz.addEventListener('change',async e=>{HUIDIG=e.target.value;await herlaad();});
+
+(async function start(){
+  if(!TOKEN){ $('#hoofd').innerHTML='<div class="vak"><p class="stil">Log eerst in met uw RTG-account.</p></div>'; return; }
+  try{
+    const d=await api('mijn');
+    ONDS=d.ondernemingen||[];
+    if(!ONDS.length){ toonLeeg(); return; }
+    HUIDIG=ONDS[0].id;
+    vulKiezer();
+    await herlaad();
+  }catch(e){
+    $('#hoofd').innerHTML='<div class="vak"><p class="stil">'+esc(e.message)+'</p></div>';
+  }
+})();
+</script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
+<script src="/shared/ios.js" defer></script>
+</body>
+</html>

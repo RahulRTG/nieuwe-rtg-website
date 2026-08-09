@@ -42,6 +42,8 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boeki
   const sim = require('./simulatie')({ intakeOntbreekt: intake.intakeOntbreekt });
   const stress = require('./stress')();
   const plan = require('./plan')({ intakeOntbreekt: intake.intakeOntbreekt, save });
+  const dag = require('./dagbeeld')({ db, boekingenVanZaak, ordersVanZaak,
+    intakeOntbreekt: intake.intakeOntbreekt });
 
   const bak = () => {
     if (!Array.isArray(db.data.ondernemingen)) db.data.ondernemingen = [];
@@ -164,7 +166,11 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boeki
     ondernemingSimuleer: (o, over) => sim.simuleer(o, over),
     ondernemingStress: (o, s, k) => stress.stresstest(o, s, k),
     ondernemingPlan: plan.planBouw,
-    ondernemingPlanVastleggen: plan.planVastleggen
+    ondernemingPlanVastleggen: plan.planVastleggen,
+    /* Het dagbeeld krijgt de verkenning MEE en draait hem niet zelf: de route
+       heeft hem toch al, en twee keer rekenen kan twee antwoorden geven op
+       dezelfde vraag. */
+    ondernemingDagbeeld: (o) => dag.dagbeeld(o, ondernemingBeeld(o), ondernemingVerkenning(o))
   };
 };
 

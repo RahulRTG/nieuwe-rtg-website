@@ -1224,6 +1224,47 @@ bronnendrempel weghalen, 'onder de kostprijs' van blokkerend naar zwaar zetten,
 de simulatie op halve invoer laten rekenen, en de bevestiging bij 'niet starten'
 overslaan.
 
+### De schil: één scherm dat met het bedrijf meegroeit
+
+`server/kern/onderneming/dagbeeld.js` + `/api/onderneming/dagbeeld` +
+`/apps/onderneming.html`. De ondernemer hoort geen modules te zien. Hij opent
+zijn bedrijf en ziet waar hij staat, wat er vandaag toe doet, en wat hij eraan
+kan doen -- en dat scherm is **fase-bewust**, want dat is de hele belofte: een
+idee krijgt geen debiteurenbeheer, een groep krijgt geen intakevragen meer.
+
+**Het scherm verzint geen cijfers om zichzelf te vullen.** Een onderneming in de
+ideefase heeft geen omzet, en dan staat er geen "€0" maar niets: nul is een
+gemeten waarde en die suggereert dat er verkocht had kunnen worden. Elk cijfer
+draagt `gemeten`, en wat niet gemeten is, staat als **reden** onder "niet
+gemeten" in plaats van als getal.
+
+**De gezondheidsscore loopt via dezelfde meter als de kansverkenning**
+(`onderneming/meter.js`). Hoe je met ontbrekende bronnen omgaat is precies het
+stuk dat je twee keer nét anders opschrijft, dus staat het één keer: niet-gemeten
+telt ook niet mee in de noemer, onder twee bronnen komt er geen cijfer, en de
+grondslag reist mee. Gevolg, en het is de bedoeling: **een onderneming zonder
+zaak heeft één meetbare bron en krijgt dus geen cijfer.** Een bedrijf dat
+gisteren begon en vandaag een 60 krijgt, heeft een cijfer over niets.
+
+**De acties staan op gewicht, met een reden per stuk.** Wat het plan breekt
+(een blokkerende bevinding) gaat vóór een ontbrekend intakeveld, en dat gaat vóór
+"kies eens een rechtsvorm". Elke actie zegt waaróm hij er staat: een lijst
+opdrachten zonder reden wordt een afvinklijst, en daarin verdwijnt ook de
+belangrijke.
+
+Eén ding dat het scherm bewust *niet* aanneemt: dat zijn eigen kopbalk blijft
+staan. `shared/ios.js` bouwt de chrome om, en de eerste versie hier ging ervan
+uit dat haar `<h1>` er daarna nog was -- waarop het hele scherm bleef hangen op
+een `null`. Dat is geen fout van die laag maar van de aanname; er wordt nu alleen
+naar de chrome geschreven als hij er nog is.
+
+Getoetst in `test/onderneming-dagbeeld.test.js` (10) en
+`test/onderneming-scherm.e2e.js` (4, in een echte browser). Zes mutaties, alle
+zes raak: ontbrekende bronnen als nul meetellen, de bronnendrempel verlagen, een
+omzet van nul tonen in plaats van niets, de acties niet meer op gewicht zetten,
+de schil de 409 laten wegpoetsen door meteen `tochDoorzetten` mee te sturen, en
+de schil ook de niet-gemeten cijfers laten tekenen.
+
 ### RTG Werk OS (de werkplek van een organisatie)
 
 `server/bedrijf/` + `/api/bedrijf/...` + `/apps/werk.html`. Een **werkruimte**

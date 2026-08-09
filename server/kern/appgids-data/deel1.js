@@ -19,6 +19,14 @@ module.exports = {
     ['Tik een app; omhoog vegen op het streepje onderin brengt je terug',
       'Kom je hier via een oude link of bladwijzer, vervang die dan door /'],
     'Een oude ingang uit de tijd dat er nog een apart bureaublad was.'),
+  /* comm.html en berichten.html zijn HETZELFDE scherm: comm is de ene app
+     waar Berichten, Bellen, Videobellen, Snaps en Meet in zijn opgegaan, en
+     berichten.html is de oude naam die er nog heen wijst. Twee ingangen, dus
+     twee sleutels -- maar de uitleg mag niet uiteenlopen, dus hij staat er
+     letterlijk twee keer met hetzelfde verhaal. */
+  '/apps/comm.html': G('Berichten: al je contact in een app. Sturen, bellen, videobellen, snaps en afspraken in een gesprekslijst.',
+    ['Open een gesprek en kies daar wat het wordt: tekst, bellen of videobellen', 'Deel een snap of plan een afspraak vanuit hetzelfde gesprek', 'Zoek op codenaam om een nieuw gesprek te beginnen'],
+    'Contact met iemand is EEN ding, geen vier apps: alles van dezelfde persoon staat in hetzelfde gesprek, ook wat vroeger in Bellen of Snaps woonde.'),
   '/apps/berichten.html': G('Je berichten met vrienden en partners, automatisch vertaald als dat nodig is.',
     ['Stuur een bericht op codenaam', 'Bel of videobel vanuit het gesprek', 'Deel een snap of verhaal met wie jij kiest'],
     'Berichten in een andere taal worden voor je vertaald; jij leest en schrijft gewoon in je eigen taal.'),

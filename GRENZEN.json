@@ -1530,6 +1530,13 @@
     "tiener": [
       "tiener"
     ],
+    "training": [
+      "trainingDeed",
+      "trainingVan",
+      "trainingWeg",
+      "trainingWegGedaan",
+      "trainingZet"
+    ],
     "toestellen": [
       "toestelIntrek",
       "toestelKoppel",

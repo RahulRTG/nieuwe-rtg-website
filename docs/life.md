@@ -49,6 +49,8 @@ klinkt.
 | Gewoonten | `server/kern/gewoonten.js`, blok op `apps/life.html` | kleine dingen die u vaker wilt doen; de dagenteller staat uit tot u hem aanzet |
 | Wachtlijst en gemiste afspraak | `server/kern/care/wachtlijst.js` | eerder aan de beurt als er iets vrijkomt (u boekt zelf), en een no-show die niet met u meereist |
 | Noodkaart | `server/kern/noodkaart.js`, blok op `apps/life.html` | een noodcontact en, als u dat wilt, uw allergenen en middelen: gelezen uit het zorgprofiel en het medicatieschema, niet gekopieerd; u toont hem zelf |
+| Training | `server/kern/training.js`, `public/apps/training.html` | uw eigen trainingsschema en wat u ervan deed; aftekenen landt als beweging-meting, RTG schrijft geen training voor |
+| Schakelbaar in de boardroom | `server/functies/register/cat-apps.js`, `server/kern/lidboard/catalogus.js` | elke laag hierboven is door het lid zelf uit te zetten; het toestemmingsscherm met reden niet |
 | Gedachtenboek | `server/kern/gedachten.js`, `public/apps/gedachten.html` | opschrijven voor uzelf; geen model leest mee, niets wordt samengevat, en de crisisregel bewaart hier wel |
 | De dagcoach | `server/kern/dagcoach.js`, blok bovenaan `apps/life.html` | alles wat vandaag ergens staat, op volgorde van de klok; hij plant niets en bezit niets |
 | Medicatieschema | `server/kern/medicatie.js`, `public/apps/medicijnen.html` | wat u gebruikt, op welke tijden, en hoeveel er nog in huis is; RTG bepaalt nooit een dosering en controleert geen combinaties |
@@ -98,7 +100,11 @@ week genegeerd.
 Niet gebouwd, en dus ook niet half. Voor elk hiervan geldt: er is geen module,
 geen route en geen toets.
 
-- **Stress, herstel, trainingsbelasting.** Geen van deze bestaat als laag.
+- **Trainingsbelasting.** Er is een trainingsschema (zie hieronder), maar geen
+  belastingsmodel: geen ACWR, geen "u traint te hard", geen hartslagzones. Dat
+  vraagt hartslag, slaap, herstel en een normgroep, en het is een uitspraak over
+  uw gezondheid.
+- **Stress en herstel.** Bestaan niet als laag.
 - **Voeding als getal.** Er wordt niets gevraagd, want een lid kan zijn voeding
   niet in een eerlijk getal zetten. RTG Life leidt er iets naast af (hoe vaak er
   buiten de deur gegeten is, uit het grootboek) en zegt erbij dat het een
@@ -617,6 +623,68 @@ een index is een tweede kopie van precies deze tekst) en delen. De lijst geeft d
 zestig nieuwste terug en zegt hoeveel er ouder zijn — een lijst die stilletjes
 afkapt, leest als een lijst die compleet is.
 
+## Training, en waarom het een briefje is en geen bibliotheek
+
+`server/kern/training.js`, met een eigen pagina `apps/training.html`.
+
+Precies dezelfde vorm als het medicatieschema, en om dezelfde reden: **RTG
+schrijft geen training voor.** Geen sets, geen herhalingen, geen gewichten, geen
+opbouw van 5 naar 10 kilometer, geen hartslagzones en geen belastingscore. Dat is
+werk voor een coach of een fysiotherapeut die u kent en u heeft zien bewegen —
+het "professional-supported" niveau uit `kern/zorgniveau.js`.
+
+Wat er wel is: u of uw coach zet het schema erin, RTG houdt het vast, en u tekent
+af wat u deed. Wie het schema maakte staat er ook bij, want dat is meestal niet
+RTG.
+
+**Aftekenen schrijft naar de bestaande beweegmeting.** De minuten gaan via
+`kern/metingen.js` naar het onderwerp `beweging`, met herkomst "zelf" — u bent
+degene die zegt dat u het deed. Er komt dus geen tweede beweegcijfer naast het
+cijfer dat al op RTG Life staat (LAT.md regel 4). Het totaal wordt elke keer
+**herteld** uit het logboek van die dag en niet opgeteld of afgetrokken: wie twee
+keer aftekent en er een weghaalt, houdt anders een cijfer over dat nergens meer
+op slaat. Mislukt dat wegschrijven, dan staat dat in het antwoord en niet alleen
+in de logs (regel 5) — een beweegcijfer dat stilletjes niet klopt is erger dan
+een foutmelding.
+
+De laatste training van een dag weghalen zet uw beweging **niet op nul**. Nul zou
+een bewering zijn die RTG niet kan doen: u kunt die dag ook zonder training
+hebben bewogen. Er staat waarom.
+
+Er is geen oefeningenbibliotheek met voorgeschreven uitvoering. Verkeerd
+uitgevoerd krachtwerk is een blessure, en een plaatje is geen begeleiding.
+
+## De boardroom: eenenveertig deuren die niemand kon uitzetten
+
+Dit is geen functie maar een reparatie, en ze hoort hier omdat ze precies laat
+zien hoe dit soort gaten ontstaat.
+
+De hele RTG Life-stapel is gebouwd zonder ooit in de functiecatalogus te worden
+gezet. Gevolg: eenenveertig routes die vanuit de boardroom **onzichtbaar** waren
+— niet uit te zetten, niet per pas fijn te regelen, en de storingswachter greep
+er nooit op in. Ze waren er gewoon, altijd, voor iedereen. Dat is er niet
+uitgekomen door nadenken maar doordat `routesNietSchakelbaar` in `NORM.json`
+omhoog liep en `test/schakelkast-dekking.test.js` ging piepen.
+
+Er zijn twee registers, en dat verschil kostte een ronde: `server/functies` is de
+platform-schakelkast (wat RTG breed kan sluiten), en `server/kern/lidboard/` is
+het bord van het lid zelf — dat laatste is wat de auth-laag echt handhaaft. Een
+laag alleen in het eerste zetten levert een regel in een catalogus op zonder dat
+er iets dichtgaat: een knop zonder draad. Beide zijn nu bijgewerkt, en
+`test/life-schakelbaar.test.js` **drukt de knop ook echt om** in plaats van hem
+te tellen.
+
+Twee deuren staan er met reden buiten:
+
+- **`/api/toestemming`** — een knop waarmee u uw eigen intrekscherm dichtzet
+  hoort niet te bestaan. De toestemmingen lopen door en de weg om ze te stoppen
+  is weg. Dezelfde redenering als bij `/api/privacy` en de AVG-rechten.
+- **`/api/toestel/meting`** — die komt binnen op een toestelsleutel en niet op een
+  ledensessie, dus de boardroom-controle in de auth-laag raakt hem sowieso niet.
+  Hem toch onder een schakelaar zetten zou schakelbaarheid *beweren* die er niet
+  is. Het lid schakelt hem wel degelijk: door de sleutel in te trekken, en dat
+  wordt in de toets ook echt nagespeeld.
+
 ## De grenzen die vast moeten staan vóór de bouw
 
 Deze horen in de architectuur en niet in een latere ronde, want ze bepalen hoe
@@ -690,7 +758,11 @@ In deze volgorde, want elke stap heeft de vorige nodig:
 
 14. ~~Het **gedachtenboek**, waar geen model in meeleest.~~ Gedaan; zie hieronder.
 
-Wat daarna komt: sport- en voedingslagen, de coachmarktplaats, multi-vestiging
+15. ~~De **sportlaag**: een eigen trainingsschema, zonder belastingsmodel.~~
+    Gedaan; zie hieronder. In dezelfde ronde zijn de eenenveertig RTG
+    Life-routes alsnog in de boardroom gezet.
+
+Wat daarna komt: de voedingslaag, de coachmarktplaats, multi-vestiging
 en resource-planning voor zorgorganisaties, en de langere staart uit het oorspronkelijke voorstel (health
 timeline, ADHD- en autismemodus, energiemanagement, mantelzorg, corporate
 wellbeing, Life Wallet, lifestyle-marktplaats). En als er ooit een gesprek komt

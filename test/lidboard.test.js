@@ -1,6 +1,7 @@
 /* De eigen boardroom van elk lid (kern/lidboard/ + routes):
-   1. een lid ziet zijn bord met vier groepen en zet er functies aan/uit; de
-      stand blijft server-side bewaard.
+   1. een lid ziet zijn bord met vijf groepen en zet er functies aan/uit; de
+      stand blijft server-side bewaard. (Vijf sinds de RTG Life-stapel er als
+      eigen groep "Leven & gezondheid" bij kwam; zie docs/life.md.)
    2. privacy by design: gevoelige deel-functies staan standaard uit.
    3. een ouder/beheerder stuurt de boardroom van zijn beschermde kind bij; de
       voogd-check houdt een vreemde ouder buiten, en kind-functies (paspoort,
@@ -56,11 +57,12 @@ async function gezinMetKind(naam) {
   return { g, kidHandle: conn.me };
 }
 
-test('een lid ziet zijn boardroom met vier groepen en de juiste standaarden', async () => {
+test('een lid ziet zijn boardroom met vijf groepen en de juiste standaarden', async () => {
   const l = await lid('Board Lid');
   const r = await json(await l.call('/member/boardroom', {}));
   const cats = r.bord.categorieen.map(c => c.id);
-  assert.deepEqual(cats, ['app', 'privacy', 'ai', 'verbinding'], 'vier groepen in de juiste volgorde');
+  assert.deepEqual(cats, ['app', 'leven', 'privacy', 'ai', 'verbinding'],
+    'vijf groepen in de juiste volgorde');
   const alle = r.bord.categorieen.flatMap(c => c.functies);
   const vind = id => alle.find(f => f.id === id);
   assert.equal(vind('salon').aan, true, 'De Salon staat standaard aan');

@@ -50,6 +50,16 @@ const BUITEN = new Map([
      de enige regel in deze lijst die er staat omdat schakelbaarheid ZELF
      verkeerd zou zijn, en niet omdat de deur technisch open moet blijven. */
   ['/api/privacy', 'inzage, export en verwijdering zijn AVG-rechten; die mag niemand kunnen uitzetten'],
+  /* Om precies dezelfde reden als hierboven: het Consent Center is het scherm
+     waar een lid toestemmingen INTREKT. Een schakelaar waarmee dat scherm dicht
+     kan, is een schakelaar waarmee je iemand zijn intrekknop afneemt terwijl de
+     toestemmingen doorlopen. Dat hoort niet te bestaan. */
+  ['/api/toestemming', 'intrekken van toestemming is een recht; een knop die dat scherm uitzet hoort niet te bestaan'],
+  /* De toesteldeur draagt geen ledensessie (hij komt binnen op een eigen smalle
+     sleutel), dus de boardroom-controle in de auth-laag raakt hem sowieso niet.
+     Hem toch onder een schakelaar zetten zou schakelbaarheid BEWEREN die er niet
+     is. Het lid schakelt hem wel degelijk: door de sleutel in te trekken. */
+  ['/api/toestel/meting', 'komt binnen op een toestelsleutel en niet op een ledensessie; het lid schakelt hem door die sleutel in te trekken'],
   ['/api/metrics', 'de meetlijn voor monitoring: dicht betekent blind, en blind lijkt van buiten op gezond'],
   ['/api/cluster', 'de clusterlaag stuurt de instances aan; die hoort niet aan een schakelaar van een instance'],
   ['/api/sat', 'de satellietping waarmee een zaakdoos de wolk zoekt; zonder antwoord denkt de doos dat hij offline is'],

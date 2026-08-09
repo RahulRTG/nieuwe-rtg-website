@@ -27,6 +27,7 @@
 // De categorieen in de volgorde waarin ze op het bord verschijnen.
 const CATEGORIEEN = [
   { id: 'app', naam: 'App-onderdelen', uitleg: 'De hoofdmodules van je app.' },
+  { id: 'leven', naam: 'Leven & gezondheid', uitleg: 'Wat over jou zelf gaat: ritme, doelen, gezondheid.' },
   { id: 'privacy', naam: 'Privacy & sociaal', uitleg: 'Wie mag wat zien en vragen.' },
   { id: 'ai', naam: 'AI & meldingen', uitleg: 'De slimme en attente laag.' },
   { id: 'verbinding', naam: 'Verbindingen', uitleg: 'De toestel- en verbindingskant.' }
@@ -44,6 +45,24 @@ const CAPS = [
   { id: 'vervoer', cat: 'app', naam: 'Vervoer & ritten', uitleg: 'Ritten en transfers.' },
   { id: 'pay', cat: 'app', naam: 'RTG Pay', uitleg: 'Betalen en tikken tussen vrienden.', kind: false },
   { id: 'wallet', cat: 'app', naam: 'Wallet & ledenpas', uitleg: 'Je pas, tickets, sleutels en munten.', vast: true },
+  /* --- Leven & gezondheid (de RTG Life-stapel, docs/life.md) ---
+     Los schakelbaar en niet als blok: wie zijn medicatieschema wil en zijn
+     stemming niet, hoort dat te kunnen kiezen. Alles staat AAN, want deze lagen
+     delen niets -- ze staan hier om uit te kunnen, niet omdat ze riskant zijn.
+
+     Wat hier NIET staat is het toestemmingsscherm. Een knop waarmee je je eigen
+     intrekscherm dichtzet, hoort niet te bestaan: de toestemmingen lopen door en
+     de weg om ze te stoppen is weg. Zie de reden in scripts/schakelbaar.js. */
+  { id: 'life', cat: 'leven', naam: 'RTG Life', uitleg: 'Het overzichtsscherm en de dagcoach. Ze meten zelf niets, dus uitzetten haalt geen gegevens weg.' },
+  { id: 'doelen', cat: 'leven', naam: 'Doelen', uitleg: 'Waar je begon, waar je heen wilt en waarom.' },
+  { id: 'dagmetingen', cat: 'leven', naam: 'Dagmetingen en toestellen', uitleg: 'Slaap, beweging, water en gewicht, en de toestellen die ze wegschrijven.' },
+  { id: 'gemoed', cat: 'leven', naam: 'Dagcheck-in', uitleg: 'Een tik per dag, met de keuze er iets bij te schrijven.' },
+  { id: 'gewoonten', cat: 'leven', naam: 'Gewoonten', uitleg: 'Kleine dingen die je vaker wilt doen; de dagenteller staat uit.' },
+  { id: 'gedachten', cat: 'leven', naam: 'Gedachtenboek', uitleg: 'Opschrijven voor jezelf. Er leest geen model mee.' },
+  { id: 'medicijnen', cat: 'leven', naam: 'Medicijnen', uitleg: 'Je eigen medicatieschema en voorraad. RTG bepaalt nooit een dosering.', kind: false },
+  { id: 'training', cat: 'leven', naam: 'Training', uitleg: 'Je eigen trainingsschema en wat je ervan deed.' },
+  { id: 'noodkaart', cat: 'leven', naam: 'Noodkaart', uitleg: 'Een noodcontact en, als je dat wilt, je allergenen en middelen.' },
+  { id: 'verzorging', cat: 'leven', naam: 'Verzorging', uitleg: 'Kapper, barbier en nagelstudio, op codenaam.' },
   // --- Privacy & sociaal (gevoelige deel-functies standaard uit) ---
   { id: 'gids', cat: 'privacy', naam: 'Zichtbaar in de gids', uitleg: 'Vindbaar voor andere leden.' },
   { id: 'verzoeken', cat: 'privacy', naam: 'Vriendschapsverzoeken', uitleg: 'Anderen mogen je een verzoek sturen.' },
@@ -80,7 +99,22 @@ const PAD_FUNCTIE = [
   ['/api/charter', 'vervoer'],
   ['/api/book', 'reizen'],
   ['/api/reserveer', 'reizen'],
-  ['/api/reservering', 'reizen']
+  ['/api/reservering', 'reizen'],
+  /* De RTG Life-stapel. Alleen ondubbelzinnige prefixen, dus /api/dag en niet
+     /api/da: langste prefix wint, maar een te korte prefix zou hier andermans
+     routes meenemen. */
+  ['/api/life', 'life'],
+  ['/api/dag', 'life'],
+  ['/api/doelen', 'doelen'],
+  ['/api/metingen', 'dagmetingen'],
+  ['/api/toestellen', 'dagmetingen'],
+  ['/api/gemoed', 'gemoed'],
+  ['/api/gewoonten', 'gewoonten'],
+  ['/api/gedachten', 'gedachten'],
+  ['/api/medicatie', 'medicijnen'],
+  ['/api/training', 'training'],
+  ['/api/noodkaart', 'noodkaart'],
+  ['/api/verzorging', 'verzorging']
 ].sort((a, b) => b[0].length - a[0].length);
 
 function padFunctie(pad) {
@@ -106,7 +140,20 @@ const PLATFORM = {
   pay: 'betalen',
   paspoort: 'paspoort',
   spelen: 'spellen',
-  locatie: 'onderweg'
+  locatie: 'onderweg',
+  /* De RTG Life-stapel heeft aan beide kanten dezelfde naam, dus zet RTG een
+     laag platform-breed uit, dan toont het bord de knop als BEHEERD in plaats
+     van als een knop naar niets. */
+  life: 'life',
+  doelen: 'doelen',
+  dagmetingen: 'dagmetingen',
+  gemoed: 'gemoed',
+  gewoonten: 'gewoonten',
+  gedachten: 'gedachten',
+  medicijnen: 'medicijnen',
+  training: 'training',
+  noodkaart: 'noodkaart',
+  verzorging: 'verzorging'
 };
 
 module.exports = { CATEGORIEEN, CAPS, OP_ID, standaardAan, PAD_FUNCTIE, padFunctie, PLATFORM };

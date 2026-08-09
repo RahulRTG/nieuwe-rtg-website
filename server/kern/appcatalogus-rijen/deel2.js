@@ -18,6 +18,7 @@ module.exports = [
   ['life', 'RTG Life', 'leven', '/apps/life.html', 'Een scherm voor je hele leven bij RTG: ritme, doelen, afspraken, check-in en je noodkaart bij elkaar. Wat niet gemeten wordt, staat er als niet gemeten.'],
   ['doelen', 'Doelen', 'leven', '/apps/doelen.html', 'Waar je begon, waar je heen wilt en waarom; de stappen ertussen rekent RTG opnieuw uit vanaf waar je nu staat.'],
   ['sport', 'Sport', 'leven', '/apps/sport.html', 'Je sportactiviteiten en clubs.'],
+  ['training', 'Training', 'leven', '/apps/training.html', 'Je eigen trainingsschema en wat je er echt van deed. RTG schrijft geen training voor en rekent geen belasting uit.'],
   ['balans', 'Balans', 'leven', '/apps/balans.html', 'Je week op rust en ritme: Rahul adviseert ook eens niks, zonder streaks of schuldgevoel.'],
   ['vitaal', 'Vitaal', 'leven', '/apps/vitaal.html', 'Een knop per dag: het gaat goed. Voor medicijnen, en voor wie alleen woont.'],
   ['gedachten', 'Gedachtenboek', 'leven', '/apps/gedachten.html', 'Een plek om iets op te schrijven, voor jezelf. Er leest geen model mee en er wordt niets samengevat.'],

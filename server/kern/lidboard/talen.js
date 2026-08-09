@@ -47,6 +47,7 @@ const EN = {
     land: 'Switched off by RTG in your country.',
     persoon: 'Switched off by RTG for your account.',
     genre: 'Switched off by RTG for this kind of business.',
+    canary: 'This feature is being rolled out in stages and is not open to everyone yet.',
     werk: 'Switched off by your employer',
     vast: 'Part of the basics of your device.'
   }
@@ -58,6 +59,7 @@ const NL_ZIN = {
   land: 'In jouw land uitgeschakeld door RTG.',
   persoon: 'Voor jouw account uitgeschakeld door RTG.',
   genre: 'Voor dit genre uitgeschakeld door RTG.',
+  canary: 'Wordt stap voor stap uitgerold; nog niet voor iedereen.',
   werk: 'Uitgezet door je werkgever',
   vast: 'Hoort bij de basis van je toestel.'
 };

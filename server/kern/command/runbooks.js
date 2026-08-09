@@ -28,7 +28,13 @@ const { RUNBOOKS, OP_ID, BEVROREN } = require('./runbookcatalogus');
 function maakRunbooks({ db, save, crypto, journaal, risico, beleid, register, catalogus, vak }) {
   const reg = register;
   const BOEKEN = (catalogus && catalogus.RUNBOOKS) || RUNBOOKS;
-  const OPID = (catalogus && catalogus.OP_ID) || OP_ID;
+  /* De id-kaart hoort bij de BOEKEN die we net gekozen hebben. Hier stond
+     `catalogus.OP_ID || OP_ID`, en dat is een val: een receptenboek dat wel
+     RUNBOOKS meegeeft maar geen eigen id-kaart, kreeg stilzwijgend de kaart van
+     RTG. Lijst() toonde dan de eigen recepten en voer() vond ze niet -- een
+     404 op precies de knop die er stond. Afgeleid uit BOEKEN kan dat niet. */
+  const OPID = (catalogus && catalogus.OP_ID) ||
+    (catalogus ? new Map(BOEKEN.map(b => [b.id, b])) : OP_ID);
   const V = typeof vak === 'function' ? vak : (() => db.data);
   function draaien() {
     const v = V();

@@ -62,6 +62,18 @@ function maakCommand({ db, save, crypto, anthropic }) {
      meter de sonde erbij zet en niet andersom. De reizen komen uit dezelfde
      SLO.json als de doelen, via slo.laadNorm() -- dus één bestand met de norm,
      en geen tweede lijstje reizen dat langzaam iets anders gaat toetsen. */
+  /* De zandbak: dezelfde motoren op een DB-VENSTER met zaaigegevens. Er is geen
+     aanroep waarlangs een handeling daarbinnen bij een productiecollectie komt,
+     want het object dat die motoren zien heeft die collecties niet. */
+  const zandbak = require('./zandbak').maakZandbak({ db, save, crypto, register,
+    zaai: require('../../seed') });
+  /* De canary: een functie uit de schakelkast stap voor stap openzetten, met
+     een terugroldrempel die op DEZELFDE tellers rekent als de servicedoelen.
+     De verdeling zelf woont niet hier maar in server/functies/toegang.js, bij
+     de code die al beslist of een pad open is -- één beslisser, geen tweede. */
+  const canary = require('./canary').maakCanary({ db, save, journaal,
+    meting: require('../../meting'), functies: require('../../functies/register') });
+  canary.tikker();
   const slolaag = require('./slo');
   const sonde = require('./sonde').maakSonde({ db, save,
     reizen: () => slolaag.laadNorm().reizen || [] });
@@ -126,8 +138,8 @@ function maakCommand({ db, save, crypto, anthropic }) {
   }
 
   return { journaal, beleid, risico, toegang, zaken, runbooks, toezicht, operator, puls,
-    simulatie, werkbesparing, kwaliteit, graaf, herkomst, slo, sonde, zoek, bereik, dossier,
-    actiesVoor, start, register };
+    simulatie, werkbesparing, kwaliteit, graaf, herkomst, slo, sonde, canary, zandbak,
+    zoek, bereik, dossier, actiesVoor, start, register };
 }
 
 module.exports = { maakCommand };

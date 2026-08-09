@@ -8,8 +8,8 @@ Dit register beoordeelt geen kwaliteit. Dat een bestand bestaat, zegt niet dat d
 
 | stand | aantal | wat het betekent |
 | --- | --- | --- |
-| gedekt | 57 | elk bewijsstuk bestaat |
-| open | 8 | nog geen dekking opgeschreven: werkvoorraad |
+| gedekt | 59 | elk bewijsstuk bestaat |
+| open | 6 | nog geen dekking opgeschreven: werkvoorraad |
 | gebroken | 0 | er wordt naar iets verwezen dat er niet (meer) is |
 
 ## De werkplek (Microsoft 365-achtig)
@@ -73,6 +73,8 @@ Dit register beoordeelt geen kwaliteit. Dat een bestand bestaat, zegt niet dat d
 | Data quality engine: duplicaten en inconsistenties vinden<br><sub>Zeker (dubbele sleutel, wees) en vermoed (zeldzame waarde) staan apart; een meter die vermoedens als feiten telt, wordt terecht genegeerd.</sub> | gedekt | `server/kern/command/kwaliteit.js`<br>`/api/command/kwaliteit`<br>`test/kwaliteit.test.js` |
 | SLO- en error-budgetbeheer per dienst<br><sub>De norm staat in SLO.json en de tabel in SLO.md is daar een afdruk van (npm run check regel 43). De meter zegt 'onvoldoende gemeten' zolang er te weinig verkeer of te kort gemeten is; het uitrolslot slaat bewust niet aan op zulke doelen.</sub> | gedekt | `SLO.json`<br>`server/kern/command/slo.js`<br>`/api/command/slo`<br>`public/apps/command/command-10.js`<br>`scripts/slo.js` |
 | Synthetic monitoring: nepgebruikers die continu de keten lopen<br><sub>Binnen en buiten staan apart en worden nergens opgeteld. Wat er NIET is: een cron die scripts/sonde.js elke minuut van buitenaf start -- dat is een inrichtingsbesluit op een machine buiten deze repo, en het staat als punt 1 in SLO.md.</sub> | gedekt | `server/kern/command/sonde.js`<br>`/api/command/sonde`<br>`/api/sonde/melding`<br>`scripts/sonde.js` |
+| Canary deployments met automatische terugroldrempels<br><sub>Rolt een FUNCTIE uit de schakelkast gefaseerd uit, niet een build. De drempel rekent op dezelfde tellers als de servicedoelen, op het verschil sinds de nulmeting; na een herstart is die nulmeting kwijt en weegt hij bewust niet. Anoniem verkeer valt nooit in een canary.</sub> | gedekt | `server/kern/command/canary.js`<br>`server/functies/canaryas.js`<br>`/api/command/canary` |
+| Sandbox-omgevingen om processen te testen zonder productiedata<br><sub>De inhoud komt uit de zaaiset en nooit uit db.data; de motoren zien een DB-venster op het vak van de zandbak, dus er is geen pad naar een productiecollectie. Wat het NIET is: een tweede installatie -- alleen de motoren van Command draaien erop, niet de gewone app-routes.</sub> | gedekt | `server/kern/command/zandbak.js`<br>`/api/command/zandbak` |
 
 ## De zaak: dezelfde regie, eigen scope
 
@@ -90,10 +92,8 @@ Dit register beoordeelt geen kwaliteit. Dat een bestand bestaat, zegt niet dat d
 | --- | --- | --- |
 | Master data management: één authoritative record per klant/bedrijf<br><sub>kern/eenaccount doet dit voor het lid; voor bedrijven en locaties niet.</sub> | open | _nog niet gebouwd_ |
 | Chaos testing: gecontroleerd uitschakelen om failover te bewijzen | open | _nog niet gebouwd_ |
-| Canary deployments met automatische terugroldrempels | open | _nog niet gebouwd_ |
 | Country packs: een nieuw land activeren als configuratiebundel | open | _nog niet gebouwd_ |
 | City bootstrap: een nieuwe stad automatisch inrichten | open | _nog niet gebouwd_ |
 | Acquisition mode: een overgenomen bedrijf importeren en migreren | open | _nog niet gebouwd_ |
 | Enterprise API gateway met scopes, quota en contractregels | open | _nog niet gebouwd_ |
-| Sandbox-omgevingen om processen te testen zonder productiedata | open | _nog niet gebouwd_ |
 

@@ -43,6 +43,51 @@ module.exports = ({ app, officeAuth, veilig, wie, command }) => {
     }
   });
 
+  /* De canary. Zit bij "besturen" in de schakelkast en niet bij "zien": dit
+     verandert wie een functie krijgt, en dat is een uitrolbesluit. */
+  app.post('/api/command/canary', officeAuth, (req, res) => veilig(res, () => command.canary.stand()));
+  app.post('/api/command/canary/start', officeAuth, (req, res) => veilig(res, () =>
+    command.canary.start(String(req.body.id || ''), req.body.deel,
+      { door: wie(req), drempel: req.body.drempel, minimum: req.body.minimum })));
+  app.post('/api/command/canary/breder', officeAuth, (req, res) => veilig(res, () =>
+    command.canary.breder(String(req.body.id || ''), req.body.deel, wie(req))));
+  app.post('/api/command/canary/terug', officeAuth, (req, res) => veilig(res, () =>
+    command.canary.terug(String(req.body.id || ''), req.body.reden, wie(req), false)));
+  app.post('/api/command/canary/af', officeAuth, (req, res) => veilig(res, () =>
+    command.canary.af(String(req.body.id || ''), wie(req))));
+
+  /* De zandbak. Zoeken en recepten draaien hier op een DB-VENSTER met
+     zaaigegevens; er is geen pad waarlangs zo'n handeling bij een
+     productiecollectie komt. De uitslag draagt altijd `zandbak: true`, zodat
+     een scherm hem nooit als productie kan tonen. */
+  app.post('/api/command/zandbak', officeAuth, (req, res) => veilig(res, () => command.zandbak.lijst()));
+  app.post('/api/command/zandbak/maak', officeAuth, (req, res) => veilig(res, () =>
+    command.zandbak.maak(String(req.body.naam || ''), { door: wie(req), dagen: req.body.dagen,
+      waarvoor: req.body.waarvoor })));
+  app.post('/api/command/zandbak/weg', officeAuth, (req, res) => veilig(res, () =>
+    command.zandbak.weg(String(req.body.naam || ''), wie(req))));
+
+  app.post('/api/command/zandbak/zoek', officeAuth, (req, res) => veilig(res, () => {
+    const l = command.zandbak.laag(String(req.body.naam || ''));
+    if (!l) return { error: 'Die zandbak bestaat niet.', status: 404 };
+    return Object.assign({ zandbak: l.naam }, l.zoek(req.body.q, { type: req.body.type }));
+  }));
+
+  app.post('/api/command/zandbak/runbook', officeAuth, (req, res) => veilig(res, () => {
+    const l = command.zandbak.laag(String(req.body.naam || ''));
+    if (!l) return { error: 'Die zandbak bestaat niet.', status: 404 };
+    /* Droog is hier de KEUZE van de bediener en niet de veiligheid: nat draaien
+       raakt alleen de zandbak. Dat is het hele punt ervan. */
+    return Object.assign({ zandbak: l.naam }, l.runbooks.voer(String(req.body.runbook || ''),
+      { droog: req.body.droog !== false, door: wie(req), reden: req.body.reden, alleen: req.body.alleen }));
+  }));
+
+  app.post('/api/command/zandbak/kwaliteit', officeAuth, (req, res) => veilig(res, () => {
+    const l = command.zandbak.laag(String(req.body.naam || ''));
+    if (!l) return { error: 'Die zandbak bestaat niet.', status: 404 };
+    return Object.assign({ zandbak: l.naam }, l.kwaliteit.meet());
+  }));
+
   /* De melding van buitenaf. Zie de kop hierboven voor de twee sloten. */
   app.post('/api/sonde/melding', meetpoort, (req, res) => {
     const r = command.sonde.meld(req.body || {});

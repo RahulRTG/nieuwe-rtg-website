@@ -549,8 +549,13 @@
     {
       "id": "canary",
       "wat": "Canary deployments met automatische terugroldrempels",
-      "groep": "Nog open",
-      "dekking": []
+      "groep": "Command: zien, besturen, automatiseren",
+      "dekking": [
+        "server/kern/command/canary.js",
+        "server/functies/canaryas.js",
+        "/api/command/canary"
+      ],
+      "let": "Rolt een FUNCTIE uit de schakelkast gefaseerd uit, niet een build. De drempel rekent op dezelfde tellers als de servicedoelen, op het verschil sinds de nulmeting; na een herstart is die nulmeting kwijt en weegt hij bewust niet. Anoniem verkeer valt nooit in een canary."
     },
     {
       "id": "countrypack",
@@ -579,8 +584,12 @@
     {
       "id": "sandbox",
       "wat": "Sandbox-omgevingen om processen te testen zonder productiedata",
-      "groep": "Nog open",
-      "dekking": []
+      "groep": "Command: zien, besturen, automatiseren",
+      "dekking": [
+        "server/kern/command/zandbak.js",
+        "/api/command/zandbak"
+      ],
+      "let": "De inhoud komt uit de zaaiset en nooit uit db.data; de motoren zien een DB-venster op het vak van de zandbak, dus er is geen pad naar een productiecollectie. Wat het NIET is: een tweede installatie -- alleen de motoren van Command draaien erop, niet de gewone app-routes."
     }
   ]
 }

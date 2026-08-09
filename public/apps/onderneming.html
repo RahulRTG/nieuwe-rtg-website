@@ -154,7 +154,7 @@ function toonLeeg(){
 function teken(){
   const o=ONDS.find(x=>x.id===HUIDIG)||{};
   zetTitel(DAG.naam||'Mijn onderneming');
-  $('#hoofd').innerHTML=[vakGroet(),vakGezond(),vakActies(),vakIntake(),vakKans(),vakSimulatie(),vakStress(),vakPlan(o),vakRechtsvorm(o),vakOprichting(),vakZaak(o),vakEersteKlant(),vakMall(),vakRelaties(),vakDebiteuren(),vakCrediteuren(),vakContracten()].join('');
+  $('#hoofd').innerHTML=[vakGroet(),vakGezond(),vakActies(),vakIntake(),vakKans(),vakSimulatie(),vakStress(),vakPlan(o),vakRechtsvorm(o),vakOprichting(),vakZaak(o),vakEersteKlant(),vakMall(),vakRelaties(),vakDebiteuren(),vakCrediteuren(),vakContracten(),vakBelasting()].join('');
   haakKnoppen();
 }
 
@@ -473,6 +473,35 @@ function vakContracten(){
     (c.binnenkortOpzeggen.length?'<div style="margin-top:.8rem;"><p class="subtxt"><strong>Opzegdag nadert</strong></p>'+let2(c.binnenkortOpzeggen,'zwaar')+'</div>':'')+
     (rest?'<div style="margin-top:1rem;">'+rest+'</div>':'')+
     '<p class="subtxt" style="margin-top:.9rem;">'+esc(c.let||'')+'</p></div>';
+}
+
+
+function vakBelasting(){
+  const b=DAG&&DAG.belasting;
+  if(!b) return '';
+  const btw='<div class="score"><span class="n groot">'+euro(b.btw.afTeDragen)+'</span>'+
+    '<span class="subtxt">btw af te dragen over '+b.jaar+'</span></div>'+
+    '<div class="bron"><span>In rekening gebracht</span><span>'+euro(b.btw.gefactureerd)+'</span></div>'+
+    '<div class="bron"><span>Voorbelasting</span><span>'+euro(b.btw.voorbelasting)+'</span></div>'+
+    '<p class="subtxt" style="margin-top:.5rem;">'+esc(b.btw.uitleg)+'</p>';
+  let res;
+  if(!b.reservering||!b.reservering.kan){
+    res='<p class="geenscore" style="margin-top:1rem;">'+esc((b.reservering&&b.reservering.reden)||'')+'</p>';
+  }else{
+    const r=b.reservering;
+    res='<div style="margin-top:1rem;"><p class="subtxt" style="margin-bottom:.3rem;"><strong>Winstreservering</strong></p>'+
+      '<div class="cijfers">'+
+      '<div class="cijfer"><div class="lbl">Nu opzij zetten</div><div class="wrd">'+euro(r.nu.bedrag)+'</div>'+
+      '<div class="eh">'+r.nu.percentage+'% van '+euro(r.nu.winst)+'</div></div>'+
+      '<div class="cijfer"><div class="lbl">Bij dit tempo (extrapolatie)</div><div class="wrd">'+euro(r.extrapolatie.bedrag)+'</div>'+
+      '<div class="eh">jaarwinst '+euro(r.extrapolatie.jaarwinst)+'</div></div>'+
+      '</div><p class="subtxt" style="margin-top:.4rem;">'+esc(r.extrapolatie.let)+'</p>'+
+      '<div style="margin-top:.7rem;">'+(r.aannames||[]).map(a=>
+        '<div class="bron"><span>'+esc(a.naam)+'<br><span class="bu">'+esc(a.uitleg)+'</span></span>'+
+        '<span class="bu">'+(a.waarde?'ja':'nee')+'</span></div>').join('')+'</div></div>';
+  }
+  return '<div class="vak"><h2>Opzij zetten</h2>'+btw+res+
+    '<p class="subtxt" style="margin-top:.9rem;">'+esc(b.voorbehoud)+'</p></div>';
 }
 
 /* ---------- handelingen ---------- */

@@ -14,10 +14,11 @@
 const DEBITEUREN = require('./debiteuren');
 const CREDITEUREN = require('./crediteuren');
 const CONTRACTEN = require('./contracten');
+const BELASTING = require('./belasting');
 
 module.exports = ({ boekingenVanZaak, intakeOntbreekt }) => {
 
-  function acties(o, feiten, verk, project, eersteklant, mall, rel, deb, cred, con) {
+  function acties(o, feiten, verk, project, eersteklant, mall, rel, deb, cred, con, bel) {
     const uit = [];
     const zet = (id, kop, waarom, waarheen) => uit.push({ id, kop, waarom, waarheen });
 
@@ -95,27 +96,35 @@ module.exports = ({ boekingenVanZaak, intakeOntbreekt }) => {
       const v = CREDITEUREN.crediteurenOpvolging(cred);
       if (v) zet('crediteuren', v.kop, v.waarom, 'crediteuren');
     }
-    /* 11. de contractklok. Na het geld dat vaststaat, maar VOOR de gewone
+    /* 11. de btw. Direct na het geld dat vaststaat: dit IS geld dat vaststaat,
+       alleen andersom -- het staat op de rekening en is niet van de zaak. Voor
+       de contractklok, want een verkeerd besteed btw-bedrag merk je pas bij de
+       aangifte en dan is het op. */
+    if (bel) {
+      const v = BELASTING.belastingOpvolging(bel);
+      if (v) zet('btw', v.kop, v.waarom, 'belasting');
+    }
+    /* 12. de contractklok. Na het geld dat vaststaat, maar VOOR de gewone
        opvolging: een gemiste opzegdag kost een heel jaar en is daarna niet
        meer te repareren, waar een klant die niet terugbelt dat wel is. */
     if (con) {
       for (const v of CONTRACTEN.contractenOpvolging(con)) zet('contract:' + v.id, v.kop, v.waarom, 'contracten');
     }
-    /* 12. de opvolging. Dit gaat VOOR de Mall-pagina en voor de losse
+    /* 13. de opvolging. Dit gaat VOOR de Mall-pagina en voor de losse
        aanvragen: het is het enige wat over geld gaat dat al binnen handbereik
        ligt. De losse aanvragen-actie hieronder valt weg zodra de opvolging hem
        al noemt -- twee keer hetzelfde vragen leest als een storing. */
     if (rel && rel.opvolging.length) {
       for (const v of rel.opvolging) zet('opvolging:' + v.id, v.kop, v.waarom, 'relaties');
     }
-    /* 13. de Mall-pagina. Na de etalage-check, want online staan gaat voor een
+    /* 14. de Mall-pagina. Na de etalage-check, want online staan gaat voor een
        mooie pagina: een pagina die niemand ziet is geen pagina. */
     if (mall && mall.open.length) {
       const m = mall.open[0];
       zet('mallprofiel', 'Uw Mall-pagina is ' + mall.percentage + '% ingevuld',
         m.label + ': ' + m.wat, 'mall');
     }
-    // 14. wat er ligt
+    // 15. wat er ligt
     const alGenoemd = !!(rel && rel.opvolging.some(v => v.id === 'aanvragen'));
     if (o.supplierCode && !alGenoemd) {
       const wacht = (boekingenVanZaak(o.supplierCode) || []).filter(b => b && b.status === 'aangevraagd').length;

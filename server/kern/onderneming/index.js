@@ -40,7 +40,7 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boeki
   /* Alle deellagen worden in ./lagen.js opgebouwd -- dit bestand ging over de
      10 kB van het modulebeleid, en dat is de goede naad: daar de
      gereedschapskist, hier het object zelf. */
-  const { intake, kans, sim, stress, plan, dag, opr, ek, mp, boek, rel, deb, cred, con } =
+  const { intake, kans, sim, stress, plan, dag, opr, ek, mp, boek, rel, deb, cred, con, bel } =
     require('./lagen')({ db, save, schoon, ordersVanZaak, boekingenVanZaak, ondernemerpoort });
 
   const bak = () => {
@@ -186,7 +186,8 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boeki
       const vandaag = new Date(t).toISOString().slice(0, 10);
       return dag.dagbeeld(o, ondernemingBeeld(o), ondernemingVerkenning(o),
         opr.oprichtingsproject(o), ek.eersteKlant(o), mp.ondernemingMallProfiel(o),
-        rel.relaties(o, t), deb.debiteuren(o, t), cred.crediteuren(o, t), con.contracten(o, vandaag));
+        rel.relaties(o, t), deb.debiteuren(o, t), cred.crediteuren(o, t), con.contracten(o, vandaag),
+        bel.belasting(o, t));
     },
     ondernemingEersteKlant: ek.eersteKlant,
     ondernemingMallProfiel: mp.ondernemingMallProfiel,
@@ -194,6 +195,7 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boeki
     ondernemingDebiteuren: deb.debiteuren,
     ondernemingCrediteuren: cred.crediteuren,
     ondernemingContracten: con.contracten,
+    ondernemingBelasting: bel.belasting,
     ondernemingWerkruimte: (o, code) => con.ondernemingWerkruimte(o, code, save),
     ondernemingKlantNotitie: boek.klantNotitie,
     ondernemingOprichting: opr.oprichtingsproject,

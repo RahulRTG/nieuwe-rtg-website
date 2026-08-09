@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 728 bestanden en 4202 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 729 bestanden en 4218 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 728 |
-| losse beweringen (`test(...)`) | 4202 |
+| toetsbestanden | 729 |
+| losse beweringen (`test(...)`) | 4218 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 521 |
 | **overleefd**: geen mutatie kreeg hem rood | 12 |
 | niet te meten (al rood, geen module gevonden, ...) | 16 |
 | alleen in de kop *genoemd*, nog niet gemeten | 26 |
-| niets van beide | 153 |
+| niets van beide | 154 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-640 bestanden, 4041 beweringen.
+641 bestanden, 4057 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -365,6 +365,7 @@ toets omvalt.
 | `onboarding.test.js` | 11 | gezakt op `liegpoort /api/` | De verplichte onboarding + het contract: elk account vult de standaardgegevens in (paspoort, e-mail, telefoon, adres, ...) en tekent het contract. De eigenaar past de eisen en het contract aan (met AI in gewone taal,... |
 | `ondernemerpoort-e2e.test.js` | 4 | gezakt op `liegpoort /api/` | Ondernemer-poort, end-to-end: een zaak die offline staat is niet zichtbaar voor leden; pas na de poort (Salon-pagina + rondleiding kassa en werk-apps) kan de manager de zaak online zetten en verschijnt hij weer. npm test |
 | `ondernemerpoort.test.js` | 6 | gezakt op `true->false#0` | Ondernemer-poort (kern/ondernemerpoort.js): een nieuwe zaak loopt eerst de basis door (Salon-pagina + rondleiding kassa en werk-apps) voordat hij online mag. Bestaande zaken zijn grandfathered (online tenzij... |
+| `onderneming-belasting.test.js` | 16 | -- | Ronde: de belastingreservering. Vier beweringen, en ze gaan alle vier over het verschil tussen een HARD getal en een INDICATIE: 1. |
 | `onderneming-contracten.test.js` | 14 | -- | Ronde: de contractklok op het dagbeeld. Vier beweringen: 1. |
 | `onderneming-crediteuren.test.js` | 11 | -- | Ronde: de crediteuren -- wat er nog uit moet, en wanneer. Vier beweringen: 1. |
 | `onderneming-dagbeeld.test.js` | 11 | -- | Ronde: het dagbeeld -- de schil die de drie assen als één scherm toont. De twee beloftes die hier worden vastgehouden: 1. |

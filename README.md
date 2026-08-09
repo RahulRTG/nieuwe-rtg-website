@@ -1553,6 +1553,57 @@ raak: geen werkruimte als lege lijst tonen, een onbekende werkruimtecode aanneme
 ook concepten stilzwijgend laten verlengen, de opzegdag gelijkstellen aan de
 einddatum, en een naderende opzegdag boven een gemiste zetten.
 
+### Opzij zetten: de btw en de winstreservering
+
+`server/kern/onderneming/belasting.js` + `/api/onderneming/belasting`.
+
+De belastingtool bestond al (`kern/fiscaal/zzp.js`): een indicatieve
+jaarberekening per land met een reserveringspercentage. Wat ontbrak was de
+koppeling aan wat er **echt is gefactureerd** -- de ondernemer moest zelf een
+verwachte jaarwinst intypen, en precies dat getal is het getal dat hij niet weet.
+Deze laag rekent op de facturen die er staan, en houdt twee dingen streng uit
+elkaar.
+
+**De btw is geen schatting.** Wat u in rekening bracht min uw voorbelasting is een
+optelsom uit uw eigen facturen. Dat geld is nooit van u geweest; het staat alleen
+even op uw rekening. Het is het enige harde getal hier, en daarom het enige dat
+een actie op het dagbeeld oplevert -- een herinnering hangen aan een indicatie zou
+een schatting tot een schuld maken.
+
+**Voor een rechtspersoon wordt er niets uitgerekend.** `zzpBerekening` is de
+inkomstenbelasting van een IB-ondernemer; een B.V. betaalt vennootschapsbelasting
+en kent DGA-loon, een stichting heeft geen winstoogmerk. Datzelfde sommetje op een
+rechtspersoon loslaten geeft een getal dat er precies zo uitziet als een goed getal
+en het niet is. Er komt dus geen bedrag maar de reden -- de rechtsvorm-as weet dat
+al. De btw geldt intussen gewoon: die hangt niet aan de rechtsvorm.
+
+**Extrapolatie heet extrapolatie.** Naast de reservering op wat er nu al staat
+(een tarief toegepast op geld dat al verdiend is) staat wat het wordt als dit
+tempo het hele jaar doorzet, met het aantal verstreken dagen erbij en het woord
+"doortrekking van vandaag, geen prognose".
+
+**De aannames staan in het antwoord, en waar wij iets niet weten kiezen we de
+kant die de reservering hóger maakt.** Het urencriterium wordt afgeleid uit de
+opgegeven uren (1225 uur per jaar is ruwweg 24 uur per week); staat er niets, dan
+nemen we aan dat het gehaald wordt en zeggen we dat. De **startersaftrek rekenen
+we niet mee**: die hangt af van hoe vaak iemand hem al gebruikte, en meenemen zou
+de reservering te laag maken.
+
+Getoetst in `test/onderneming-belasting.test.js` (16). Vijf mutaties; drie beten
+meteen. **Twee sloegen af, en dat waren allebei echte bevindingen over mijn eigen
+werk:**
+
+- Er stond een `Math.max(percentage, berekende belasting)` "voor de zekerheid",
+  met een comment dat bescherming beloofde bij hoge winsten. Nagemeten over elke
+  winst van 1.000 tot een miljoen: die max bond **nul keer**. `reserveerPct` is het
+  tarief plus vijf punten met een bodem van 20%, dus hij dekt de indicatie altijd
+  al. Dode code met een belofte eraan is erger dan geen code; hij is weg, en de
+  toets bewaakt nu de eigenschap die er wél is.
+- De toets op "startersaftrek telt niet mee" las een hardgecodeerde `false` uit
+  het antwoord in plaats van de werkelijk gebruikte optie. Die kon dus nooit
+  zakken (regel 9). De waarde komt nu uit de opties, en de toets vergelijkt de
+  uitkomst mét en zónder die aftrek.
+
 ### RTG Werk OS (de werkplek van een organisatie)
 
 `server/bedrijf/` + `/api/bedrijf/...` + `/apps/werk.html`. Een **werkruimte**

@@ -18,9 +18,7 @@ module.exports = (kern) => {
     ondernemingIngeschreven, ondernemingIntakeZet, ondernemingIntakeBeeld,
     ondernemingVerkenning, ondernemingPlanVastleggen, ondernemingDagbeeld,
     ondernemingOprichting, ondernemingOprichtingZet, ondernemingAanvraag,
-    ondernemingAanvraagStand, ondernemingEersteKlant, ondernemingMallProfiel, ondernemingRelaties,
-    ondernemingKlantNotitie, ondernemingDebiteuren, ondernemingCrediteuren, ondernemingContracten,
-    ondernemingWerkruimte } = kern;
+    ondernemingAanvraagStand, ondernemingEersteKlant, ondernemingMallProfiel } = kern;
 
   /* `status` betekent in dit huis de HTTP-code, maar een kernmodule kan een
      domeinstand in datzelfde veld zetten ('geen-aanvraag'). Dat gebeurde hier
@@ -126,50 +124,11 @@ module.exports = (kern) => {
     res.json({ ok: true, mall: ondernemingMallProfiel(o) });
   });
 
-  /* Het klantenboek en de opvolging. Alles op codenaam: dit boek kent geen
-     echte namen, en dat is het ontwerp en geen tekortkoming. */
-  app.post('/api/onderneming/relaties', auth, (req, res) => {
-    const o = mijn(req);
-    if (!o) return stuur(res, nietGevonden);
-    res.json({ ok: true, relaties: ondernemingRelaties(o) });
-  });
-
-  app.post('/api/onderneming/relaties/notitie', auth, (req, res) => {
-    const o = mijn(req);
-    if (!o) return stuur(res, nietGevonden);
-    if (!o.supplierCode) return stuur(res, { status: 409, error: 'Er is nog geen zaak gekoppeld.' });
-    stuur(res, ondernemingKlantNotitie(o.supplierCode, req.body || {}));
-  });
-
-  /* Wat er nog openstaat, in ouderdomsgroepen. Alleen facturen die als
-     onbetaald zijn aangemerkt; zie kern/onderneming/debiteuren.js. */
-  app.post('/api/onderneming/debiteuren', auth, (req, res) => {
-    const o = mijn(req);
-    if (!o) return stuur(res, nietGevonden);
-    res.json({ ok: true, debiteuren: ondernemingDebiteuren(o) });
-  });
-
-  /* De andere kant: wat u zelf nog moet betalen, met de vooruitblik op wat er
-     de komende week en maand uit moet. */
-  app.post('/api/onderneming/crediteuren', auth, (req, res) => {
-    const o = mijn(req);
-    if (!o) return stuur(res, nietGevonden);
-    res.json({ ok: true, crediteuren: ondernemingCrediteuren(o) });
-  });
-
-  /* De contractklok. LEEST alleen: aanmaken, tekenen en opzeggen blijft in
-     RTG Werk OS, achter zijn eigen poort. Zie kern/onderneming/contracten.js. */
-  app.post('/api/onderneming/contracten', auth, (req, res) => {
-    const o = mijn(req);
-    if (!o) return stuur(res, nietGevonden);
-    res.json({ ok: true, contracten: ondernemingContracten(o) });
-  });
-
-  app.post('/api/onderneming/werkruimte', auth, (req, res) => {
-    const o = mijn(req);
-    if (!o) return stuur(res, nietGevonden);
-    stuur(res, ondernemingWerkruimte(o, (req.body || {}).code));
-  });
+  /* De geldkant (klanten, openstaand, te betalen, contracten, belasting) staat
+     in ./onderneming-geld.js: dit bestand ging over de 10 kB van het
+     modulebeleid. Hij krijgt dezelfde eigendomscontrole mee, zodat er maar een
+     poort is. */
+  require('./onderneming-geld')(kern, mijn, stuur, nietGevonden);
 
   /* ---- de zaak aanvragen ----
      Loopt langs de bestaande aanmeldingsstroom: RTG-personeel beslist, wij

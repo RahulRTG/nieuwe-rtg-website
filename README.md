@@ -1163,6 +1163,67 @@ fase stil op 'idee' laten vallen, de ladder bij het eerste gat laten stoppen, de
 naam kopiëren in plaats van weggooien, en de eigendomscontrole op de routes
 weghalen.
 
+### De pre-oprichtingsfase: verkennen, doorrekenen, en mogen afraden
+
+`server/kern/onderneming/{intake,kans,simulatie,stress,stress-toetsen,plan}.js`
++ `/api/onderneming/{intake,verkenning,plan/vastleggen}`. De vier stappen vóór
+de oprichting, gebouwd op het ondernemingsobject hierboven. Ze leunen op elkaar
+in één volgorde en worden daarom als één ketting aangeroepen
+(`ondernemingVerkenning`) -- een scherm dat ze zelf moet ordenen, ordent ze ooit
+verkeerd.
+
+**De kansverkenning is een meter, en regel 10 gaat over meters.** Een score van
+87/100 ziet eruit als een feit, wordt overgeschreven in een ondernemingsplan en
+daarna aan een bank getoond. Drie dingen liggen daarom vast:
+
+- **Niet gemeten is niet nul.** Een bron zonder data levert geen punten én telt
+  niet mee in de noemer. Zou hij als nul meetellen, dan krijgt een leeg platform
+  vanzelf een lage score en leest een gebrek aan méting als een gebrek aan kans.
+- **Onder twee gemeten bronnen komt er geen cijfer**, maar `null` met de reden.
+  Een getal met een voorbehoud eronder wordt een getal zodra iemand het overtypt.
+- **De grondslag reist mee**: per bron of hij gemeten is, welke waarde eruit
+  kwam en hoeveel punten dat gaf.
+
+De vier bronnen zijn bestaande data en er komt geen register bij: concurrentie
+(zaken van dezelfde soort in dezelfde plaats), vraag (hun boekingen en bonnen),
+personeel (open vacatures in de branche -- een tekort is voor een starter een
+risico) en bedrijfsruimte (leegstand uit het stadsweefsel, de bron die in de
+praktijk het vaakst eerlijk 'niet gemeten' meldt). Nul concurrenten is bewust
+**niet** de topscore: een markt waar niemand zit, is vaker geen markt dan een gat.
+
+**Het volume komt van de ondernemer, niet van ons.** De simulatie rekent zijn
+eigen aannames door over twaalf maanden in drie scenario's, en elke aanname staat
+met **naam, getal en herkomst** in het antwoord -- `opgegeven` of `aanname`.
+Zonder dat onderscheid lijkt onze startwaarde net zo hard als zijn eigen cijfer,
+en zo wisselt een prognose ongemerkt van eigenaar. Ontbreekt er invoer, dan komt
+er een fout met de ontbrekende velden en geen half doorgerekende maand.
+
+**De stress test mag 'niet starten' zeggen.** Netjes doorgerekende aannames zien
+er altijd goed uit, en dat is het probleem; deze module gaat er met opzet tegenin.
+Verkopen onder de kostprijs is blokkerend (meer verkopen maakt het verlies
+groter), net als een kas die in het *basisscenario* onder nul duikt -- niet in een
+somber geval dat wij erbij verzinnen, maar in wat de ondernemer zelf verwacht. Er
+staat ook in wat juist wél houdt: een lijst die alleen problemen noemt, wordt na
+twee keer weggeklikt, en dan doet ook de blokkerende bevinding er niet meer toe.
+
+**Het advies is geen slot.** Het levende ondernemingsplan wordt elke keer opnieuw
+gebouwd en nergens bewaard (een kopie zou verouderen zodra de intake wijzigt).
+Wat wél wordt bewaard is de **beslissing**: vastleggen zet een bevroren versie in
+het archief, en bij een 'niet starten' gaat dat alleen door met een
+uitdrukkelijke `tochDoorzetten` die mét het advies wordt opgeschreven. Software
+die een mens verbiedt te ondernemen omdat een rekensom dat vindt, is niet aan
+ons; zorgen dat niemand kan zeggen dat hij het niet wist, wel. Dat vastleggen is
+tegelijk de fase-overgang van 'idee' naar 'validatie' -- geen knop die een fase
+zet, maar het feit waar `fase.js` op kijkt.
+
+Getoetst in `test/onderneming-verkenning.test.js` (20 toetsen). Zes mutaties
+gedaan; vijf beten meteen. De zesde sloeg af en bleek een kapotte mutatie te zijn
+(de cache die hij moest zetten werd nooit gevuld) -- opnieuw gedaan, en toen zakte
+de juiste toets. De vijf andere: ontbrekende bronnen als nul meetellen, de
+bronnendrempel weghalen, 'onder de kostprijs' van blokkerend naar zwaar zetten,
+de simulatie op halve invoer laten rekenen, en de bevestiging bij 'niet starten'
+overslaan.
+
 ### RTG Werk OS (de werkplek van een organisatie)
 
 `server/bedrijf/` + `/api/bedrijf/...` + `/apps/werk.html`. Een **werkruimte**

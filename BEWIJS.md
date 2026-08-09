@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 718 bestanden en 4077 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 719 bestanden en 4097 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,13 +12,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 718 |
-| losse beweringen (`test(...)`) | 4077 |
+| toetsbestanden | 719 |
+| losse beweringen (`test(...)`) | 4097 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 521 |
 | **overleefd**: geen mutatie kreeg hem rood | 12 |
 | niet te meten (al rood, geen module gevonden, ...) | 16 |
-| alleen in de kop *genoemd*, nog niet gemeten | 25 |
+| alleen in de kop *genoemd*, nog niet gemeten | 26 |
 | niets van beide | 144 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-631 bestanden, 3921 beweringen.
+632 bestanden, 3941 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -365,6 +365,7 @@ toets omvalt.
 | `onboarding.test.js` | 11 | gezakt op `liegpoort /api/` | De verplichte onboarding + het contract: elk account vult de standaardgegevens in (paspoort, e-mail, telefoon, adres, ...) en tekent het contract. De eigenaar past de eisen en het contract aan (met AI in gewone taal,... |
 | `ondernemerpoort-e2e.test.js` | 4 | gezakt op `liegpoort /api/` | Ondernemer-poort, end-to-end: een zaak die offline staat is niet zichtbaar voor leden; pas na de poort (Salon-pagina + rondleiding kassa en werk-apps) kan de manager de zaak online zetten en verschijnt hij weer. npm test |
 | `ondernemerpoort.test.js` | 6 | gezakt op `true->false#0` | Ondernemer-poort (kern/ondernemerpoort.js): een nieuwe zaak loopt eerst de basis door (Salon-pagina + rondleiding kassa en werk-apps) voordat hij online mag. Bestaande zaken zijn grandfathered (online tenzij... |
+| `onderneming-verkenning.test.js` | 20 | genoemd | Ronde: de pre-oprichtingsfase -- intake, kansverkenning, simulatie, stress test en het ondernemingsplan. De zwaartepunten liggen op de twee plekken waar dit soort software liegt: 1. |
 | `onderneming.test.js` | 22 | genoemd | Ronde: het Ondernemers-OS -- de drie assen van één bedrijfsobject. 1. |
 | `onderwijs.test.js` | 3 | gezakt op `liegpoort /api/` | RTG School golf 1: de officiële ladder, het leerpaspoort dat een leven lang meegaat, de doorstroomkaart die rare sprongen tegenhoudt, en de eerlijkheid (geen accreditatieclaims, geen echte namen in het dossier). |
 | `onderwijsstuur.test.js` | 3 | gezakt op `liegpoort /api/` | Golf 6 van de onderwijs-toren: Rahul kan de hele leerlaag bedienen via het stuur (een codepad: dezelfde routes, dezelfde inlog, dezelfde regels). "Schrijf me in op groep 3", "overhoor me", "vraag bijles" -- alles... |

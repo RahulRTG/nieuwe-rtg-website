@@ -16,8 +16,12 @@
    af uit wat er al gemeten wordt (hoe vaak er buiten de deur gegeten is), met
    herkomst 'afgeleid'. Dat is minder, maar het is waar.
 
-   EEN DAG HEEFT EEN WAARDE, geen stapel. Twee keer invullen overschrijft; anders
-   telt een correctie als een tweede nacht en klopt het gemiddelde niet meer. */
+   EEN DAG HEEFT EEN WAARDE PER HERKOMST, geen stapel. Twee keer zelf invullen
+   overschrijft; anders telt een correctie als een tweede nacht en klopt het
+   gemiddelde niet meer. Maar een apparaatmeting overschrijft NIET wat u zelf
+   zei, en andersom ook niet: dat zijn twee verschillende beweringen over
+   dezelfde nacht, en ze door elkaar laten lopen is precies wat de herkomst moet
+   voorkomen. Het beeld kiest per dag welke het gebruikt, en zegt welke. */
 
 const { magHerkomst } = require('./herkomst');
 
@@ -45,14 +49,34 @@ function beeldVan(rijen, onderwerp, nu = new Date()) {
   const vanaf = dagVan(new Date(nu.getTime() - (VENSTER - 1) * DAG));
   const vandaag = dagVan(nu);
   const inVenster = rijen.filter(r => r.op >= vanaf && r.op <= vandaag);
-  if (!inVenster.length) return { gemeten: false, dagen: 0, vandaag: null };
-  const som = inVenster.reduce((t, r) => t + r.waarde, 0);
-  const vanVandaag = inVenster.find(r => r.op === vandaag);
+  if (!inVenster.length) return { gemeten: false, dagen: 0, vandaag: null, herkomsten: [], naast: [] };
+
+  /* Per dag een waarde. Staat er zowel een eigen invulling als een
+     apparaatmeting, dan telt het apparaat -- die heeft gemeten en u heeft
+     geschat. Wat er niet gebeurt, is de ander weggooien: hij staat er nog en de
+     herkomst blijft zichtbaar, zodat "het apparaat zegt 6 en ik zei 8" een
+     verschil is dat je kunt zien in plaats van een getal dat is verdwenen. */
+  const perDag = new Map();
+  for (const r of inVenster) {
+    const staand = perDag.get(r.op);
+    if (!staand || (r.bron === 'apparaat' && staand.bron !== 'apparaat')) perDag.set(r.op, r);
+  }
+  const gekozen = [...perDag.values()];
+  const som = gekozen.reduce((t, r) => t + r.waarde, 0);
+  const vanVandaag = perDag.get(vandaag);
+  /* Twee lijstjes, en het onderscheid is de reden dat ze er allebei zijn.
+     'herkomsten' hoort bij het GETAL: waar komt dit gemiddelde vandaan. 'naast'
+     is wat er nog meer staat maar niet is meegeteld -- uw eigen 8 uur naast de
+     6,5 van het horloge. Ze samenvoegen zou het gemiddelde een herkomst geven
+     die er niet in zit; het tweede weglaten zou uw invulling laten verdwijnen. */
+  const gebruikt = new Set(gekozen.map(r => r.bron));
   return {
     gemeten: true,
-    dagen: inVenster.length,
-    gemiddelde: Math.round((som / inVenster.length) * 10) / 10,
+    dagen: gekozen.length,
+    gemiddelde: Math.round((som / gekozen.length) * 10) / 10,
     vandaag: vanVandaag ? vanVandaag.waarde : null,
+    herkomsten: [...gebruikt].sort(),
+    naast: [...new Set(inVenster.map(r => r.bron))].filter(b => !gebruikt.has(b)).sort(),
     eenheid: ONDERWERPEN[onderwerp].eenheid
   };
 }
@@ -68,14 +92,15 @@ module.exports = ({ db, save }) => {
     return { ok: true, onderwerpen: ONDERWERPEN, beeld: uit, vandaag: dagVan(nu) };
   }
 
-  function metingZet(key, body, nu = new Date()) {
+  /* De schrijver, gedeeld door de twee deuren: het lid dat zelf invult en het
+     gekoppelde apparaat. De herkomst komt van de DEUR en nooit uit de body --
+     anders kan wie zelf invult zijn eigen schatting als apparaatmeting boeken,
+     en dan is het hele onderscheid weg. */
+  function metingSchrijf(key, body, bron, nu = new Date()) {
     const onderwerp = String(body.onderwerp || '');
     const def = ONDERWERPEN[onderwerp];
     if (!def) return { status: 404, error: 'Dit meet RTG niet.' };
-
-    const bron = String(body.bron || 'zelf');
     if (!magHerkomst(bron)) return { status: 400, error: 'Onbekende herkomst voor deze meting.' };
-    if (bron !== 'zelf') return { status: 400, error: 'Deze meting vult u zelf in.' };
 
     const waarde = Number(body.waarde);
     if (!Number.isFinite(waarde) || waarde < 0) return { status: 400, error: 'Vul een getal in.' };
@@ -84,17 +109,24 @@ module.exports = ({ db, save }) => {
     const op = /^\d{4}-\d{2}-\d{2}$/.test(String(body.op || '')) ? String(body.op) : dagVan(nu);
     if (op > dagVan(nu)) return { status: 400, error: 'Een ' + def.per + ' die nog moet komen, valt niet in te vullen.' };
 
+    /* De sleutel is dag EN herkomst. Alleen op de dag zou betekenen dat een
+       apparaat uw eigen invulling overschrijft (of andersom), en dat is geen
+       correctie maar het wissen van een andere bewering. */
     const rijen = rijenVan(key, onderwerp);
-    const bestaat = rijen.find(r => r.op === op);
-    if (bestaat) { bestaat.waarde = Math.round(waarde * 10) / 10; bestaat.bron = bron; bestaat.at = nu.toISOString(); }
+    const bestaat = rijen.find(r => r.op === op && r.bron === bron);
+    if (bestaat) { bestaat.waarde = Math.round(waarde * 10) / 10; bestaat.at = nu.toISOString(); }
     else {
       rijen.push({ op, waarde: Math.round(waarde * 10) / 10, bron, at: nu.toISOString() });
-      rijen.sort((a, b) => a.op.localeCompare(b.op));
+      rijen.sort((a, b) => (a.op + a.bron).localeCompare(b.op + b.bron));
       if (rijen.length > MAX_DAGEN) rijen.splice(0, rijen.length - MAX_DAGEN);
     }
     save();
-    return { ok: true, onderwerp, beeld: beeldVan(rijen, onderwerp, nu) };
+    return { ok: true, onderwerp, bron, beeld: beeldVan(rijen, onderwerp, nu) };
   }
+
+  // de twee deuren; de herkomst zit in de deur en niet in het verzoek
+  const metingZet = (key, body, nu = new Date()) => metingSchrijf(key, body, 'zelf', nu);
+  const metingVanToestel = (key, body, nu = new Date()) => metingSchrijf(key, body, 'apparaat', nu);
 
   /* Weghalen hoort erbij: wie een verkeerde nacht invult, moet hem kunnen
      wissen en niet alleen kunnen overschrijven met een leugen. */
@@ -109,7 +141,7 @@ module.exports = ({ db, save }) => {
     return { ok: true, onderwerp, beeld: beeldVan(rijen, onderwerp, nu) };
   }
 
-  return { metingenVan, metingZet, metingWeg };
+  return { metingenVan, metingZet, metingVanToestel, metingWeg };
 };
 
 module.exports.ONDERWERPEN = ONDERWERPEN;

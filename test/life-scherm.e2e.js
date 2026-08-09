@@ -99,6 +99,36 @@ test('RTG Life: een doel uit Doelen staat er, en wat niet gemeten wordt zegt dat
     assert.match(naInvullen, /over 1 nacht/i,
       'en het scherm zegt hoe weinig het er zijn: een gemiddelde over een nacht is geen weekbeeld');
 
+    /* 1c. een toestel koppelen: de sleutel komt een keer op het scherm, en de
+       lijst laat hem daarna niet nog eens zien. */
+    await openDeel(page, 'Toestellen');
+    await page.locator('#tNaam').fill('Horloge');
+    const koppel = page.locator('#tKoppel');
+    await koppel.scrollIntoViewIfNeeded();
+    await koppel.click();
+    await page.waitForFunction(() => {
+      const e = document.getElementById('tSleutel');
+      return e && /[0-9a-f]{48}/.test(e.textContent);
+    }, null, { timeout: 10000 });
+    const sleutel = (await page.textContent('#tSleutel')).match(/[0-9a-f]{48}/)[0];
+    assert.match(await page.textContent('#tSleutel'), /nooit meer/i,
+      'het scherm zegt dat dit het enige moment is');
+    assert.match(await page.textContent('#toestellen'), /Horloge/);
+
+    // en het toestel schrijft echt: een meting via zijn eigen deur komt op het scherm
+    const gemeten = await fetch(base + '/api/toestel/meting', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', 'x-rtg-toestel': sleutel },
+      body: JSON.stringify({ onderwerp: 'beweging', waarde: 45 })
+    }).then(r => r.json());
+    assert.equal(gemeten.bron, 'apparaat');
+    await page.reload({ waitUntil: 'load' });
+    await page.waitForFunction(() => {
+      const e = document.getElementById('signalen');
+      return e && /uw toestel mat/i.test(e.textContent);
+    }, null, { timeout: 15000 });
+    assert.ok(!(await page.textContent('#toestellen')).includes(sleutel),
+      'na een herlaadbeurt staat de sleutel nergens meer op het scherm');
+
     /* 2. het doel uit Doelen staat hier, zonder dat het lid Doelen heeft
        geopend in deze sessie. */
     await openDeel(page, 'Waar u naartoe werkt');

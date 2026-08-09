@@ -137,14 +137,15 @@ test('een doel maken vraagt om een reden, en niet alleen om een getal', async ()
 test('meten draagt een herkomst, en een verzonnen herkomst wordt geweigerd', async () => {
   const id = (await api('doelen', {}, lid)).body.doelen[0].id;
 
-  const raar = await api('doelen/meet', { id, waarde: 4, bron: 'horoscoop' }, lid);
-  assert.equal(raar.status, 400, 'een onbekende herkomst hoort niet stil als "zelf" te tellen');
-
-  /* En de scherpere: een herkomst die WEL bestaat maar nog niet beschikbaar is.
-     Sinds kern/herkomst.js gedeeld wordt met de metingenlaag hoort die regel
-     aan beide kanten te bijten, dus wordt hij ook aan beide kanten getoetst. */
-  const nogniet = await api('doelen/meet', { id, waarde: 4, bron: 'apparaat' }, lid);
-  assert.equal(nogniet.status, 400, 'een apparaatmeting bestaat nog niet en gaat niet door voor eigen woord');
+  /* De herkomst komt uit de DEUR. Wie via deze route meet, vult zelf in, en
+     een meegestuurde bron verandert daar niets aan. Dat werd scherp toen
+     'apparaat' een echte herkomst werd: body.bron lezen zou betekenen dat een
+     lid zijn eigen schatting als apparaatmeting kan boeken. */
+  const geclaimd = await api('doelen/meet', { id, waarde: 4, bron: 'apparaat' }, lid);
+  assert.equal(geclaimd.status, 200, 'de meting gaat gewoon door');
+  assert.equal(geclaimd.body.doel.stand.bron, 'zelf', 'maar hij staat als zelf ingevuld, niet als apparaat');
+  assert.equal((await api('doelen/meet', { id, waarde: 4, bron: 'horoscoop' }, lid)).body.doel.stand.bron, 'zelf',
+    'en onzin in het veld verandert er ook niets aan');
 
   const morgen = await api('doelen/meet', { id, waarde: 4, op: overDagen(1) }, lid);
   assert.equal(morgen.status, 400, 'een meting van morgen bestaat nog niet');

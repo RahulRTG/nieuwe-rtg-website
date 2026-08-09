@@ -41,6 +41,7 @@ klinkt.
 | Het ene scherm | `server/kern/life.js`, `public/apps/life.html` | leest ritme, doelen, afspraken en check-in bij elkaar; meet zelf niets en legt niets vast |
 | Dagmetingen | `server/kern/metingen.js`, invulvak op `apps/life.html` | slaap, beweging en water, door het lid zelf ingevuld; een dag heeft één waarde |
 | Herkomst van gegevens | `server/kern/herkomst.js` | vier soorten, en alleen wat er echt is staat aan; gedeeld door de doelenmotor en de metingen |
+| Gekoppelde toestellen | `server/kern/toestellen.js`, vak op `apps/life.html` | een horloge of weegschaal schrijft dagmetingen weg met een eigen smalle sleutel, altijd in te trekken |
 | Inzage-audit | `server/inzagelog.js` | wie welke identiteitsgegevens opvroeg, en waarom |
 | Identiteitskluis | `server/accounts.js` | echte namen apart; alles daarbuiten draait op codenamen |
 
@@ -96,7 +97,6 @@ geen route en geen toets.
   dingen (zie hieronder); eenvoudige taal, een taak per scherm,
   schermlezer-teksten en spraakbesturing staan er bewust niet in, want die zijn
   per pagina werk en geen schakelaar. ADHD- en autismemodus bestaan niet.
-- **Wearables en apparaatkoppelingen.**
 - **Coach-marktplaats en coachportaal.**
 - **Multi-vestiging voor zorgorganisaties, resource-planning, wachtlijstmotor.**
 
@@ -230,6 +230,48 @@ beschikbaar is (`apparaat`) wordt geweigerd en valt niet stil terug op `zelf` --
 anders staat een apparaatmeting die nog niet bestaat straks als eigen woord van
 het lid in de boeken. Beide kanten toetsen die regel.
 
+## Toestellen: de tweede herkomst
+
+Een horloge, weegschaal of band die zelf meet, mag dagmetingen wegschrijven. Dat
+maakt `apparaat` de tweede beschikbare herkomst naast `zelf`; `behandelaar`
+blijft uit, want er is geen deur waardoor een behandelaar iets vastlegt.
+
+**De sleutel is smal, en dat is de hele veiligheidsgedachte.** Een toestel krijgt
+géén ledentoken maar een eigen sleutel die precies één ding kan: een dagmeting
+wegschrijven voor het lid dat hem aanmaakte. Geen agenda, geen betalingen, geen
+dossier. Een gestolen horloge kost daarmee hooguit verzonnen slaapuren, en niet
+een sessie. `test/toestellen.test.js` loopt vijf ledenroutes langs en eist op elk
+een 401.
+
+**De sleutel staat niet in de database.** Bewaard wordt een sha256-afdruk; het
+lid ziet de sleutel één keer bij het koppelen en daarna nooit meer. Op het scherm
+overleeft hij het hertekenen maar niet het herladen, en dat staat er ook bij.
+
+**Voor wie er geschreven wordt, volgt uit de sleutel** en staat niet in het
+verzoek. Anders zet het toestel van de een een nacht bij de ander in de boeken.
+
+**Geen slot met een teller, met reden.** `LAT.md` regel 7 zegt dat een grendel
+aan het doel hangt, en `pinslot.js` is het gedeelde slot voor ráádbare geheimen
+-- een pin van vier cijfers loopt in een uur af. Deze sleutel is 24 willekeurige
+bytes uit de CSPRNG; die valt niet af te lopen, en een teller eromheen sluit
+vooral een toestel met een slecht netwerk buiten. Wat er wél is: intrekken, en
+dat werkt meteen.
+
+**Intrekken wist geen geschiedenis.** Wat het toestel mat, is echt gemeten; die
+metingen blijven staan met hun herkomst. Alleen schrijven stopt.
+
+**Twee beweringen over dezelfde nacht botsen niet.** Zegt u zelf acht uur en meet
+het horloge zes en een half, dan staan ze er allebei. Het gemiddelde gebruikt het
+apparaat -- die heeft gemeten, u heeft geschat -- en het beeld draagt twee
+lijstjes: `herkomsten` (waar dit getal vandaan komt) en `naast` (wat er nog meer
+staat maar niet is meegeteld). Ze samenvoegen zou het gemiddelde een herkomst
+geven die er niet in zit; het tweede weglaten zou uw invulling laten verdwijnen.
+
+**En de herkomst komt uit de deur, nooit uit het verzoek.** Toen `apparaat` een
+echte herkomst werd, bleek de doelenmotor `body.bron` te lezen -- een lid had
+zijn eigen schatting als apparaatmeting kunnen boeken. Beide schrijvers krijgen
+de herkomst nu van de route mee.
+
 ## De grenzen die vast moeten staan vóór de bouw
 
 Deze horen in de architectuur en niet in een latere ronde, want ze bepalen hoe
@@ -277,7 +319,9 @@ In deze volgorde, want elke stap heeft de vorige nodig:
 
 4. ~~Een **bron** voor de lege signalen.~~ Gedaan: de dagmetingen, zie hieronder.
 
-Wat daarna komt (gewoonten, stress, coach, marktplaats) hangt aan deze vier en
-hoort pas daarna aan de beurt. Een apparaat als bron is het volgende dat de
-signalen echt verandert; dat is geen laag erbij maar een tweede herkomst, en
-`kern/herkomst.js` staat er klaar voor.
+5. ~~Een **apparaat** als tweede herkomst.~~ Gedaan: zie Toestellen hieronder.
+
+Wat daarna komt (gewoonten, stress, coach, marktplaats) hangt aan deze vijf en
+hoort pas daarna aan de beurt. De derde herkomst (`behandelaar`) is de
+eerstvolgende die iets fundamenteels toevoegt, en die hoort samen te gaan met het
+Consent Center: een behandelaar die iets vastlegt, is een partij die iets ziet.

@@ -118,13 +118,20 @@ module.exports = ({ kern }) => {
     const dagbeeld = (mt.waarde && mt.waarde.beeld) || {};
     for (const [id, naam, ev, mv] of ZELF) {
       const b = dagbeeld[id];
+      const h = (b && b.herkomsten) || [];
+      /* Waar het getal vandaan komt, staat in de tekst en niet alleen in een
+         veld: "u vulde in" en "uw toestel mat" zijn twee verschillende
+         beweringen over dezelfde nacht, en een gemiddelde dat ze mengt hoort
+         dat te zeggen. */
+      const wie = h.length > 1 ? 'die u invulde en uw toestel mat'
+        : h[0] === 'apparaat' ? 'die uw toestel mat' : 'die u zelf invulde';
       signalen.push({
-        id, naam, herkomst: 'zelf',
+        id, naam, herkomsten: h,
         ...(b && b.gemeten
           ? gemeten(b.gemiddelde, 'gemiddeld per ' + ev + ', ' + b.eenheid,
-            'Over ' + b.dagen + ' ' + (b.dagen === 1 ? ev : mv) + ' die u zelf invulde.' +
-            (b.vandaag == null ? ' Vandaag nog niet ingevuld.' : ''))
-          : ongemeten('U heeft dit nog niet ingevuld. Dat kan hieronder.'))
+            'Over ' + b.dagen + ' ' + (b.dagen === 1 ? ev : mv) + ' ' + wie + '.' +
+            (b.vandaag == null ? ' Vandaag nog niets.' : ''))
+          : ongemeten('Hier staat nog niets. Vul het hieronder in, of koppel een toestel.'))
       });
     }
 
@@ -134,7 +141,7 @@ module.exports = ({ kern }) => {
        gegeten is; dat rekent kern/balans.js al uit het grootboek. Dat is een
        afgeleide en geen meting, en het signaal zegt dat ook. */
     signalen.push({
-      id: 'voeding', naam: 'Voeding', herkomst: 'afgeleid',
+      id: 'voeding', naam: 'Voeding', herkomsten: ['afgeleid'],
       ...(beeld && typeof beeld.uitPerWeek === 'number'
         ? gemeten(beeld.uitPerWeek, 'keer per week buiten de deur',
           'Afgeleid uit uw bestellingen bij partners, niet uit wat u at.')

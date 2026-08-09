@@ -1485,6 +1485,13 @@
     "tiener": [
       "tiener"
     ],
+    "toestellen": [
+      "toestelIntrek",
+      "toestelKoppel",
+      "toestelMeting",
+      "toestelVanSleutel",
+      "toestellenVan"
+    ],
     "uitgifte": [
       "overheid",
       "uitgifte"

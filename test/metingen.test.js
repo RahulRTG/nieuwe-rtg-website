@@ -40,9 +40,10 @@ test.after(() => {
 
 test('de herkomst staat op een plek, en wat er niet is wordt geweigerd', () => {
   assert.ok(magHerkomst('zelf'));
-  assert.ok(!magHerkomst('apparaat'), 'een apparaatmeting bestaat nog niet en mag niet stil doorgaan voor zelf');
+  assert.ok(magHerkomst('apparaat'), 'sinds er toestellen zijn, is dit een echte herkomst');
   assert.ok(!magHerkomst('horoscoop'));
-  assert.ok(!BESCHIKBAAR.includes('behandelaar'), 'wat niet gebouwd is, staat niet als beschikbaar');
+  assert.ok(!BESCHIKBAAR.includes('behandelaar'),
+    'wat niet gebouwd is, staat niet als beschikbaar: er is geen deur waardoor een behandelaar iets vastlegt');
 });
 
 /* ---- het beeld, puur ---- */
@@ -97,12 +98,19 @@ test('onmogelijke invoer wordt geweigerd in plaats van bewaard', async () => {
   assert.equal((await api('metingen/zet', { onderwerp: 'slaap', waarde: 'veel' }, lid)).status, 400);
   assert.equal((await api('metingen/zet', { onderwerp: 'slaap', waarde: 7, op: overDagen(1) }, lid)).status, 400,
     'een nacht die nog moet komen valt niet in te vullen');
-  assert.equal((await api('metingen/zet', { onderwerp: 'slaap', waarde: 7, bron: 'apparaat' }, lid)).status, 400,
-    'een herkomst die nog niet bestaat wordt geweigerd en telt niet stil als zelf');
-
   const b = (await api('metingen', {}, lid)).body.beeld.slaap;
-  assert.equal(b.dagen, 3, 'na zes mislukte pogingen staan er nog steeds drie nachten');
+  assert.equal(b.dagen, 3, 'na vijf mislukte pogingen staan er nog steeds drie nachten');
   assert.equal(b.vandaag, 8, 'en die van vandaag is niet stilletjes veranderd');
+});
+
+test('de herkomst komt uit de deur: zelf invullen blijft zelf, wat je ook meestuurt', async () => {
+  /* Dit is de scherpste regel van deze laag. Wie via de eigen-invoerdeur een
+     bron meestuurt, krijgt die niet: anders kan een lid zijn schatting als
+     apparaatmeting boeken en is het hele onderscheid weg. */
+  const r = await api('metingen/zet', { onderwerp: 'water', waarde: 5, bron: 'apparaat' }, lid);
+  assert.equal(r.status, 200, 'de meting gaat gewoon door');
+  assert.equal(r.body.bron, 'zelf', 'maar hij staat als zelf ingevuld');
+  assert.deepEqual(r.body.beeld.herkomsten, ['zelf'], 'en het beeld kent geen apparaat');
 });
 
 test('weghalen kan, en raakt alleen die ene dag', async () => {

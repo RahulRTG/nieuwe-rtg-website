@@ -65,6 +65,14 @@
     <div id="invullen"></div>
   </section>
 
+  <section aria-label="Gekoppelde toestellen">
+    <h2>Toestellen</h2>
+    <p class="stil">Een horloge of weegschaal die zelf meet, mag dagmetingen wegschrijven. Zo'n
+    toestel krijgt een eigen sleutel die precies dat ene kan: meten. Geen agenda, geen betalingen,
+    geen dossier. U kunt hem altijd intrekken; wat er gemeten is blijft dan gewoon staan.</p>
+    <div id="toestellen"></div>
+  </section>
+
   <section aria-label="Uw doelen">
     <h2>Waar u naartoe werkt</h2>
     <div id="doelen"></div>
@@ -142,6 +150,45 @@
     }));
   }
 
+  /* De sleutel van een net gekoppeld toestel blijft op het scherm staan tot het
+     lid de pagina verlaat. Hij komt maar EEN keer terug van de server en wordt
+     nergens bewaard, dus een herteken die hem wegpoetst zou hem echt kwijt
+     maken. Bij het herladen is hij weg, en dat hoort ook. */
+  let versSleutel = null;
+
+  function tekenToestellen(d) {
+    const el = $('#toestellen'); if (!el) return;
+    const lijst = d.toestellen || [];
+    el.innerHTML = (lijst.length
+      ? lijst.map(t => '<div class="kaartje"><b>' + esc(t.naam) + '</b>' +
+          '<span class="m">Gekoppeld op ' + esc((t.gekoppeldOp || '').slice(0, 10)) +
+          ' &middot; ' + esc(t.geschreven) + ' metingen' +
+          (t.laatstGezien ? ' &middot; laatst gezien ' + esc(t.laatstGezien.slice(0, 10)) : ' &middot; nog niets ontvangen') +
+          '</span><div class="rij"><button class="knop mini" data-tweg="' + esc(t.id) + '">Intrekken</button></div></div>').join('')
+      : '<p class="stil">Er is nog geen toestel gekoppeld.</p>') +
+      '<div class="kaartje"><b>Een toestel koppelen</b>' +
+      '<div class="rij"><input maxlength="60" placeholder="Bijv. Horloge" aria-label="Naam van het toestel" id="tNaam">' +
+      '<button class="knop mini" id="tKoppel">Koppelen</button></div>' +
+      '<div id="tSleutel">' + (versSleutel
+        ? '<div class="storing" role="status"><b>' + esc(versSleutel.sleutel) + '</b><br>' +
+          esc(versSleutel.uitleg) + '</div>'
+        : '') + '</div></div>';
+    el.querySelectorAll('[data-tweg]').forEach(k => k.addEventListener('click', async () => {
+      try { const r = await Veilig.api('/api/toestellen/intrek', { id: k.dataset.tweg });
+        await laad(); Veilig.melding(r.uitleg || 'Ingetrokken.'); }
+      catch (e) { Veilig.melding(e.message); }
+    }));
+    const kop = $('#tKoppel');
+    if (kop) kop.addEventListener('click', async () => {
+      try {
+        const r = await Veilig.api('/api/toestellen/koppel', { naam: $('#tNaam').value });
+        versSleutel = { sleutel: r.sleutel, uitleg: r.sleutelUitleg };
+        tekenToestellen(await Veilig.api('/api/toestellen'));
+        Veilig.melding('Gekoppeld.');
+      } catch (e) { Veilig.melding(e.message); }
+    });
+  }
+
   function tekenDoelen(d) {
     if (!d.length) {
       $('#doelen').innerHTML = '<p class="stil">U heeft nog geen doel staan.</p>';
@@ -183,8 +230,10 @@
 
   async function laad() {
     try {
-      const [d, m] = await Promise.all([Veilig.api('/api/life'), Veilig.api('/api/metingen')]);
+      const [d, m, t] = await Promise.all([
+        Veilig.api('/api/life'), Veilig.api('/api/metingen'), Veilig.api('/api/toestellen')]);
       tekenInvullen(m);
+      tekenToestellen(t);
       tekenWinst(d.winst);
       tekenSignalen(d.signalen || []);
       tekenDoelen(d.doelen || []);

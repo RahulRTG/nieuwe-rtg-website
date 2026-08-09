@@ -10,13 +10,19 @@
    tweede krijgen. Twee lijstjes met dezelfde waarheid lopen uiteen, en meestal
    zonder dat iets klaagt (LAT.md regel 4).
 
-   BESCHIKBAAR is bewust kort. Alleen wat er echt is, staat aan; de andere drie
-   staan er met naam bij zodat zichtbaar blijft wat er nog niet is, in plaats van
-   dat ze pas bestaan als iemand ze verzint. */
+   BESCHIKBAAR is bewust kort. Alleen wat er echt is, staat aan; de rest staat er
+   met naam bij zodat zichtbaar blijft wat er nog niet is, in plaats van dat ze
+   pas bestaan als iemand ze verzint. 'apparaat' staat sinds kern/toestellen.js
+   aan; 'behandelaar' niet, want er is geen deur waardoor een behandelaar iets
+   vastlegt.
+
+   EN DE HERKOMST KOMT UIT DE DEUR, NOOIT UIT HET VERZOEK. Wie zelf invult kan
+   zijn schatting niet als apparaatmeting boeken, want de schrijver krijgt de
+   herkomst van de route mee en leest hem niet uit de body. */
 
 const SOORTEN = {
   zelf: { label: 'zelf ingevuld', beschikbaar: true },
-  apparaat: { label: 'door een apparaat gemeten', beschikbaar: false },
+  apparaat: { label: 'door een apparaat gemeten', beschikbaar: true },
   behandelaar: { label: 'door een behandelaar vastgelegd', beschikbaar: false },
   afgeleid: { label: 'door RTG afgeleid', beschikbaar: true }
 };

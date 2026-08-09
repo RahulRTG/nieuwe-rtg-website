@@ -45,8 +45,8 @@ test('nog niets ingevuld is "niet gemeten" en geen nul', async () => {
     assert.ok(s, id + ' staat op het scherm en wordt niet weggelaten');
     assert.equal(s.gemeten, false);
     assert.equal(s.waarde, undefined, 'een ongemeten signaal draagt geen getal, ook geen 0');
-    assert.match(s.reden, /nog niet ingevuld/i, 'en er staat bij waarom er niets is');
-    assert.equal(s.herkomst, 'zelf', 'het scherm weet van wie dit getal straks komt');
+    assert.match(s.reden, /staat nog niets/i, 'en er staat bij waarom er niets is');
+    assert.deepEqual(s.herkomsten, [], 'zonder gegevens is er ook geen herkomst om te tonen');
   }
 });
 
@@ -59,7 +59,7 @@ test('voeding is afgeleid, en zegt dat ook; nul keer uit eten IS een meting', as
   const s = sig((await api('life', {}, lid)).body, 'voeding');
   assert.equal(s.gemeten, true);
   assert.equal(s.waarde, 0, 'nul keer buiten de deur is een uitkomst, geen leegte');
-  assert.equal(s.herkomst, 'afgeleid');
+  assert.deepEqual(s.herkomsten, ['afgeleid']);
   assert.match(s.uitleg, /afgeleid/i, 'en het scherm krijgt te horen dat dit geen meting is');
 });
 

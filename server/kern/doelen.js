@@ -145,8 +145,13 @@ module.exports = ({ db, save, crypto, schoon }) => {
     if (!doel) return { status: 404, error: 'Dit doel staat niet op uw naam.' };
     const waarde = getal(body.waarde);
     if (waarde === null) return { status: 400, error: 'Wat is de meting?' };
-    const bron = String(body.bron || 'zelf');
-    if (!magHerkomst(bron)) return { status: 400, error: 'Onbekende herkomst voor deze meting.' };
+    /* De herkomst komt uit de DEUR en niet uit het verzoek. Deze route is de
+       deur waardoor het lid zelf iets invult, dus staat er 'zelf' -- ook als er
+       iets anders wordt meegestuurd. Toen 'apparaat' een beschikbare herkomst
+       werd (kern/toestellen.js), zou body.bron lezen betekenen dat een lid zijn
+       eigen schatting als apparaatmeting kan boeken. */
+    const bron = 'zelf';
+    if (!magHerkomst(bron)) return { status: 500, error: 'De eigen invoer is geen geldige herkomst meer.' };
     const op = datum(body.op) || dagVan(nu);
     if (op > dagVan(nu)) return { status: 400, error: 'Een meting van morgen bestaat nog niet.' };
     doel.metingen.push({ waarde, op, bron, at: new Date(nu).toISOString() });

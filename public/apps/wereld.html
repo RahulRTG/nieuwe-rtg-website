@@ -459,6 +459,12 @@
     .then(function (d) {
       staat.modus = d.modus; staat.modi = d.modi; staat.kaart = d.koppelkaart || {};
       staat.vermogens = d.vermogens || [];
+      /* De modus reist mee naar de aparte berichten-app: de la die bij deze
+         wereld hoort komt van de SERVER (kern/wereld/koppel.js), zodat dit
+         scherm geen eigen kaart bijhoudt. Is er geen la voor deze wereld, dan
+         blijft de link gewoon de inbox openen. */
+      var chat = document.querySelector('.balk a[href="/apps/comm.html"]');
+      if (chat) chat.href = '/apps/comm.html' + (d.chatLade ? '?lade=' + encodeURIComponent(d.chatLade) : '');
       $('#wie').innerHTML = esc(d.ik.codenaam) + ' · <b>' + esc(d.ik.pas.toUpperCase()) + ' Pass</b>';
       tekenWerelden();
       return laad();

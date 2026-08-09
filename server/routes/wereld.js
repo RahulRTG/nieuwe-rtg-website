@@ -97,7 +97,12 @@ module.exports = (kern) => {
       /* De koppelkaart, één keer meegegeven in plaats van per verwijzing
          bevraagd (zie de kop). Het scherm zoekt hierin op waar een rtg://-ding
          woont; de kaart zelf blijft van de server. */
-      koppelkaart: koppel.KAART
+      koppelkaart: koppel.KAART,
+      /* De la in de berichten-app die bij je huidige wereld hoort (of null).
+         Het scherm hangt hem aan de Chat-link, zodat de modus meereist naar de
+         andere app -- zie de kop van kern/wereld/koppel.js voor waarom die
+         kaart bijna leeg is. */
+      chatLade: koppel.ladeVoorModus(mijnModus(req))
     });
   });
 

@@ -705,7 +705,20 @@
      niets. Stil de inbox tonen zou lijken alsof de knop kapot is (regel 5). */
   function uitDeWereld() {
     var q = new URLSearchParams(location.search);
-    var met = q.get('met'), over = q.get('over');
+    var met = q.get('met'), over = q.get('over'), lade = q.get('lade');
+    /* ?lade= komt van de wereldschakelaar: kies je daar Business, dan opent de
+       inbox in de la die daarbij hoort. We controleren hem tegen de laden die
+       de SERVER meegaf -- een onbekende la stil accepteren zou een lege inbox
+       geven die eruitziet als "je hebt geen berichten". */
+    if (lade && staat.laden.some(function (l) { return l.id === lade; })) {
+      staat.lade = lade;
+      return laadInbox().then(function () { if (met) return uitDeWereldMet(met, over); });
+    }
+    if (!met) return Promise.resolve();
+    return uitDeWereldMet(met, over);
+  }
+
+  function uitDeWereldMet(met, over) {
     if (!met) return Promise.resolve();
     return fetch('/api/member/connections', { method: 'POST',
       headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }, body: '{}' })

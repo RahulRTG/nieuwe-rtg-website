@@ -326,6 +326,31 @@ test('de trap is cumulatief: elke pas heeft alles van de pas eronder', () => {
   assert.deepEqual(rechten.modiVoor('guest'), [], 'en dus ook geen enkele wereld');
 });
 
+test('de modus reist mee naar de inbox, en wijst naar een la die echt bestaat', async () => {
+  /* De kaart modus->la staat in kern/wereld/koppel.js en noemt een la van de
+     berichten-app. Die twee bestanden kennen elkaar niet, dus zonder deze toets
+     zou een hernoemde la hier stil blijven staan en een lege inbox opleveren
+     die eruitziet als "je hebt geen berichten" (LAT-regel 4 over een grens
+     heen). We halen de ECHTE ladenlijst op bij de server, niet uit een kopie. */
+  const l = await lid('Lade Lid', 'ld1@x.nl', 'business');
+  const inbox = await json(await post('/api/comm/inbox', {}, l.token));
+  const laden = (inbox.laden || []).map(x => x.id);
+  assert.ok(laden.length, 'de inbox geeft zijn laden terug: ' + JSON.stringify(inbox).slice(0, 120));
+
+  for (const [modus, lade] of Object.entries(koppel.MODUS_LADE)) {
+    assert.ok(laden.includes(lade),
+      'de kaart wijst modus ' + modus + ' naar la "' + lade + '", maar die bestaat niet meer: ' + laden.join(', '));
+  }
+
+  // en de staat draagt hem mee zodra je in die wereld staat
+  await post('/api/wereld/modus', { modus: 'business' }, l.token);
+  assert.equal((await json(await post('/api/wereld/state', {}, l.token))).chatLade, 'zaken',
+    'in Business wijst de chat-link naar de zakelijke la');
+  await post('/api/wereld/modus', { modus: 'lifestyle' }, l.token);
+  assert.equal((await json(await post('/api/wereld/state', {}, l.token))).chatLade, null,
+    'in Lifestyle staat er GEEN la: die zou hetzelfde zijn als Privé en Communities');
+});
+
 test('elke soort in de koppelkaart beantwoordt de deelvraag bewust', () => {
   for (const [soort, k] of Object.entries(koppel.KAART)) {
     assert.equal(typeof k.deel, 'boolean', soort + ' zegt niet of hij gedeeld mag worden');

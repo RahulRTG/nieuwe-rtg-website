@@ -63,6 +63,27 @@ function open(ref) {
 
 const magDelen = (ref) => { const d = ontleed(ref); return !!(d && KAART[d.soort].deel); };
 
+/* DE MODUS DIE MEEREIST NAAR DE INBOX.
+
+   "Wanneer je Business kiest, worden ook je berichten zakelijk" -- dat is de
+   belofte van de contextschakelaar, en zonder deze kaart zou hij bij de deur
+   van de berichten-app ophouden.
+
+   Maar hij is met opzet BIJNA LEEG, en dat is het eerlijke antwoord op iets wat
+   niet klopt zodra je het uitschrijft. De inbox is geordend naar de BRON van een
+   gesprek (mensen, zaken, onderweg, officieel, Rahul); de wereldschakelaar gaat
+   over CONTEXT. Die twee vallen vandaag op precies EEN plek samen: Business
+   hoort bij de la 'zaken'. Lifestyle, Communities en Privé zouden alle drie op
+   'mensen' uitkomen -- drie knoppen met hetzelfde gevolg, en dat is dezelfde
+   leugen in de interface als de zichtbaarheid 'vrienden' naast 'contacten' was.
+
+   Dus: Business filtert, de rest laat de inbox met rust. Komt er ooit een la
+   bij die wel onderscheidt, dan komt hij hier -- en test/wereldlaag.test.js
+   houdt deze kaart tegen de ECHTE ladenlijst van kern/comm aan, zodat een la die
+   daar hernoemd wordt hier niet stil blijft staan. */
+const MODUS_LADE = { business: 'zaken' };
+const ladeVoorModus = (modus) => MODUS_LADE[modus] || null;
+
 /* DE NAAD NAAR DE BERICHTEN-APP. Overal in de wereld waar een mens staat, staat
    "Bericht" -- en die knop doet hier zijn werk. We geven de CODENAAM mee en
    nooit een sleutel: de identiteitskluis blijft gescheiden (CLAUDE.md), en een
@@ -80,4 +101,4 @@ function naarGesprek(codenaam, bij) {
   return url;
 }
 
-module.exports = { KAART, ontleed, open, magDelen, naarGesprek };
+module.exports = { KAART, MODUS_LADE, ontleed, open, magDelen, naarGesprek, ladeVoorModus };

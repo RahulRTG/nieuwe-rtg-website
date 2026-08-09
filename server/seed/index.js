@@ -7,9 +7,11 @@
    echte leden via hun eigen account. De demo-inhoud blijft volledig
    beschikbaar voor lokaal en demogebruik.
 
-   De volledige startset is opgesplitst in drie datamodules: ./leden (Salon,
-   facturen, reis), ./partners (partnerkanaal + grootboeken) en ./leveranciers
-   (typen + voorbeeldzaken). */
+   De volledige startset is opgesplitst in vier datamodules: ./leden (Salon,
+   facturen, reis), ./partners (partnerkanaal + grootboeken), ./leveranciers
+   (typen + voorbeeldzaken) en ./livinglab (het RTF Living Lab: één lab met zijn
+   tekenbevoegden, apparatuur en buurtvragen -- en met opzet geen verzonnen
+   onderzoeksresultaten). */
 
 module.exports = function seed() {
   const demo = process.env.NODE_ENV !== 'production' || process.env.RTG_DEMO === '1';
@@ -21,7 +23,12 @@ module.exports = function seed() {
     partners: [],       // geen demo-partnerkanalen (influencer/bedrijf)
     partnerTrips: [],   // geen fictieve reizen op boeken.html
     invoices: [],
-    contacts: []
+    contacts: [],
+    /* Het Living Lab start in productie leeg: een echt lab hoort door de RTF
+       zelf te worden neergezet, met echte tekenbevoegden. De demostand krijgt
+       de steiger (lab, tekenaars, apparatuur, buurtvragen) maar nooit verzonnen
+       onderzoeksresultaten -- zie de kop van ./livinglab.js. */
+    livingLab: { labs: [], studies: [], themas: [], apparatuur: [], audit: [], paspoorten: [] }
   });
 };
 
@@ -30,6 +37,7 @@ function maakVolledigeSeed() {
     {},
     require('./leden'),
     require('./partners'),
-    require('./leveranciers')
+    require('./leveranciers'),
+    require('./livinglab')
   );
 }

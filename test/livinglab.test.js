@@ -62,7 +62,10 @@ test('het lab is dicht zonder inlog, en het kader komt uit één tabel', async (
   for (const s of ['welzijn', 'cohesie', 'gedrag', 'kunst', 'mobiliteit', 'economie'])
     assert.ok(k.soorten.some(x => x.soort === s), s + ' is een projectsoort');
 
-  LAB = (await moet('lab/maak', { stad: 'Haarlem', naam: 'Living Lab Haarlem' }, 'lab aanmaken')).lab.id;
+  /* Een EIGEN stad, want de startdata zet zelf al een lab in Haarlem neer en
+     er is per stad precies één lab. Dat die regel hier bijt is geen hinder maar
+     het bewijs dat de seed echte data is (test 'de startdata ...'). */
+  LAB = (await moet('lab/maak', { stad: 'Toetsstad', naam: 'Living Lab Toetsstad' }, 'lab aanmaken')).lab.id;
   await moet('lab/tekenaar', { id: LAB, naam: 'Dr. Vermeer', rol: 'professional' }, 'tekenaar');
   await moet('lab/tekenaar', { id: LAB, naam: 'Prof. Aziz', rol: 'reviewer', onafhankelijk: true }, 'onafhankelijke reviewer');
   await moet('lab/tekenaar', { id: LAB, naam: 'M. de Wit', rol: 'toezichthouder' }, 'toezichthouder');
@@ -325,7 +328,7 @@ test('de koppeling alias->sleutel bestaat alleen bij een niet-gescheiden studie'
   const crypto = require('crypto');
   const db = { data: {} };
   const L = require('../server/kern/livinglab')({ db, save: () => {}, crypto, anthropic: null, lab: null }).livinglab;
-  const lab = L.bestuur.labMaak({ stad: 'Delft', naam: 'Living Lab Delft' }, 'toets').lab;
+  const lab = L.bestuur.labMaak({ stad: 'Toetsdorp', naam: 'Living Lab Toetsdorp' }, 'toets').lab;
   L.bestuur.tekenaarZet(lab.id, { naam: 'Dr. K', rol: 'professional' }, 'toets');
 
   const opzetten = (titel, soort, vraagstuk) => {
@@ -363,6 +366,107 @@ test('de koppeling alias->sleutel bestaat alleen bij een niet-gescheiden studie'
   // 3. dezelfde persoon krijgt in twee studies twee verschillende aliassen, dus
   //    de dossiers zijn niet naast elkaar te leggen
   assert.notEqual(a.deelnemer.alias, b.deelnemer.alias, 'aliassen zijn per studie en niet per persoon');
+});
+
+/* GEEN TWEE MODULES DIE HETZELFDE data-ATTRIBUUT TEKENEN.
+
+   Deze toets komt uit twee echte fouten in dezelfde ronde. Het dossierblad wordt
+   door zes modules samen opgebouwd, en twee ervan gebruikten per ongeluk dezelfde
+   naam voor iets anders:
+
+     data-conc  het INVOERVELD voor een nieuwe conclusie (vormen.js) én de RIJ
+                van een bestaande conclusie (bewijs.js)
+     data-rzet  de knop "leg een reflectie vast" (vormen.js) én de knop
+                "reserveer een apparaat" (apparatuur.js)
+
+   De tweede was geen schoonheidsfoutje: beide blokken staan in hetzelfde blad,
+   dus bij de stap `reflectie` haakte de reserveringsbedrading zich aan de
+   reflectieknop. Eén klik op "Leg vast" zocht daarna een apparaat dat er niet
+   was -- "Cannot read properties of null". Zelfde naam, twee betekenissen, in
+   één document: regel 4 van de lat, en hij bijt direct.
+
+   De scan strip COMMENTAAR voordat hij telt. Zonder dat sloeg hij aan op de
+   uitleg hierboven, waarin die namen letterlijk staan -- de vierde keer in dit
+   huis dat een meter tekst voor code aanzag. */
+test('geen twee schermmodules tekenen hetzelfde data-attribuut', () => {
+  const zonderCommentaar = (src) =>
+    src.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
+  /* Getekend = `data-x` in een HTML-string. Bevraagd = `[data-x]` in een
+     selector, en dat mag juist wel in meerdere modules: vormen.js tekent en
+     studie.js bedraadt. De negatieve lookbehind scheidt die twee. */
+  const getekend = new Map();
+  const map = path.join(__dirname, '..', 'public', 'apps');
+  for (const naam of fs.readdirSync(map).filter(n => /^(livinglab|labpas).*\.js$/.test(n))) {
+    const src = zonderCommentaar(fs.readFileSync(path.join(map, naam), 'utf8'));
+    for (const m of src.matchAll(/(?<!\[)data-([a-z0-9]+)/g)) {
+      if (!getekend.has(m[1])) getekend.set(m[1], new Set());
+      getekend.get(m[1]).add(naam);
+    }
+  }
+
+  /* Toegestaan met reden: twee modules die elkaar nooit in één document
+     tegenkomen. labpas-buurt.js draait alleen op /apps/labpas.html en
+     livinglab-beeld.js alleen op /apps/livinglab.html. */
+  const MAG = new Map([['thema', 'labpas-buurt en livinglab-beeld staan op verschillende pagina\'s']]);
+
+  const botsend = [...getekend.entries()]
+    .filter(([a, fs2]) => fs2.size > 1 && !MAG.has(a))
+    .map(([a, fs2]) => 'data-' + a + ' in ' + [...fs2].sort().join(' + '));
+  assert.deepEqual(botsend, [], 'deze attributen worden door meer dan één module getekend:\n  ' + botsend.join('\n  '));
+
+  // en de meter moet zelf kunnen uitslaan: een verzonnen botsing hoort hij te zien
+  const proef = new Map(getekend);
+  proef.set('verzonnenbotsing', new Set(['a.js', 'b.js']));
+  assert.equal([...proef.entries()].filter(([a, fs2]) => fs2.size > 1 && !MAG.has(a)).length, 1,
+    'de scan ziet een botsing als er een is (anders meet hij niets)');
+});
+
+/* DE STARTDATA. Twee dingen die allebei moeten kloppen, en het tweede is het
+   belangrijkste: de demostand geeft een BRUIKBAAR lab (met tekenbevoegden,
+   want zonder die kan er niets ondertekend worden), en er staat GEEN enkel
+   verzonnen onderzoeksresultaat in. Een lab dat opstart met nepbevindingen
+   leert zijn gebruikers precies het omgekeerde van wat de bewijsmotor
+   probeert af te dwingen.
+
+   In productie start het Living Lab leeg -- een echt lab hoort door de RTF zelf
+   te worden neergezet. */
+test('de startdata geeft een bruikbaar lab, en verzint geen onderzoeksresultaten', () => {
+  const laad = (stand) => {
+    const oud = process.env.NODE_ENV, oudDemo = process.env.RTG_DEMO;
+    process.env.NODE_ENV = stand;
+    delete process.env.RTG_DEMO;
+    delete require.cache[require.resolve('../server/seed')];
+    delete require.cache[require.resolve('../server/seed/livinglab')];
+    const uit = require('../server/seed')();
+    process.env.NODE_ENV = oud; if (oudDemo != null) process.env.RTG_DEMO = oudDemo;
+    delete require.cache[require.resolve('../server/seed')];
+    return uit;
+  };
+
+  const demo = laad('development').livingLab;
+  assert.equal(demo.labs.length, 1, 'de demostand geeft één lab');
+  const tek = demo.labs[0].tekenaars.map(t => t.rol);
+  for (const rol of ['professional', 'reviewer', 'toezichthouder'])
+    assert.ok(tek.includes(rol), 'er is een ' + rol + ' -- zonder register kan er niets ondertekend worden');
+  assert.ok(demo.labs[0].tekenaars.some(t => t.onafhankelijk),
+    'er is een ONAFHANKELIJKE tekenaar; klasse hoog vraagt er een');
+  assert.ok(demo.themas.length >= 2, 'er staan vragen uit de buurt klaar');
+  assert.ok(demo.apparatuur.some(a => a.kalibratie.geldigMaanden > 0 && !a.kalibratie.op),
+    'er staat een nooit-gekalibreerd apparaat bij: dat weigert een reservering en legt uit waarom');
+
+  /* Geen verzonnen resultaten. De ene studie staat bij de eerste stap en haar
+     dossier is leeg -- geen conclusie, geen bewijsgraad, geen deelnemer. */
+  for (const s of demo.studies) {
+    assert.equal(s.stap, 'vraagstuk', 'een seed-studie staat bij het vraagstuk');
+    assert.deepEqual(s.dossier.conclusies, [], 'geen verzonnen conclusies in de startdata');
+    assert.deepEqual(s.dossier.deelnemers, [], 'geen verzonnen deelnemers');
+    assert.deepEqual(s.dossier.observaties, [], 'geen verzonnen observaties');
+    assert.equal(s.besluit, null, 'geen verzonnen besluit');
+  }
+
+  const prod = laad('production').livingLab;
+  assert.deepEqual(prod.labs, [], 'in productie start het Living Lab leeg');
+  assert.deepEqual(prod.studies, [], 'en zonder studies');
 });
 
 test('het spel beloont kwaliteit en niet volume', async () => {

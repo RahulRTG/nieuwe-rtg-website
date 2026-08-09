@@ -47,9 +47,19 @@ module.exports = (ctx) => {
         ? s.dossier.conclusies.map(c => ({ id: c.id, tekst: c.tekst, graad: c.graad })) : [],
       besluit: s.besluit || null });
   }
-  function beeldTeam(s) {
+  /* Het teambeeld, met een vierde ring erin verstopt: `staf`.
+
+     De KLACHTTEKSTEN gaan alleen naar de RTF-staf en niet naar het team. Een
+     klacht kan namelijk over het team zelf gaan -- over hoe de projectleider met
+     iemand omging -- en die dan aan datzelfde team tonen, is de klachtprocedure
+     omdraaien. Het AANTAL ziet iedereen wel, want dat is de reden dat de studie
+     stilstaat en dat mag geen raadsel zijn. */
+  function beeldTeam(s, staf) {
     const d = s.dossier;
-    return Object.assign(beeldPubliek(s), {
+    return Object.assign(beeldPubliek(s), staf ? {
+      klachtenLijst: d.ethiek.klachten.map(k => ({ id: k.id, tekst: k.tekst, van: k.van,
+        status: k.status, antwoord: k.antwoord, at: k.at }))
+    } : {}, {
       vraagstuk: s.vraagstuk, doel: s.doel, hypothese: d.hypothese, plan: d.plan,
       deelnemers: d.deelnemers.map(p => ({ id: p.id, alias: p.alias, rol: p.rol, toestemming: p.toestemming, at: p.at })),
       ethiek: { klasse: d.ethiek.klasse, vastgesteld: d.ethiek.vastgesteld, privacytoets: d.ethiek.privacytoets,
@@ -68,7 +78,7 @@ module.exports = (ctx) => {
   const opTeam = (s, kijker) => !!kijker && !!kijker.alias && s.dossier.deelnemers.some(p => p.alias === kijker.alias);
   const magTeam = (s, kijker) => !!kijker && (!!kijker.staf || opTeam(s, kijker));
 
-  function beeldVoor(s, kijker) { return magTeam(s, kijker) ? beeldTeam(s) : beeldPubliek(s); }
+  function beeldVoor(s, kijker) { return magTeam(s, kijker) ? beeldTeam(s, !!(kijker && kijker.staf)) : beeldPubliek(s); }
 
   function studieMaak(b, wie) {
     b = b || {};
@@ -92,7 +102,7 @@ module.exports = (ctx) => {
     S().studies.unshift(s);
     audit(lab.id, 'studie.maak', wie, s.id, titel);
     save();
-    return { ok: true, studie: beeldTeam(s) };
+    return { ok: true, studie: beeldTeam(s, true) };
   }
 
   /* Het vraagstuk mag nog scherper worden zolang de studie er nog in staat.
@@ -118,7 +128,7 @@ module.exports = (ctx) => {
     }
     audit(s.labId, 'studie.vraagstuk', wie, s.id, '');
     save();
-    return { ok: true, studie: beeldTeam(s) };
+    return { ok: true, studie: beeldTeam(s, true) };
   }
 
   function overzicht(labId, kijker) {

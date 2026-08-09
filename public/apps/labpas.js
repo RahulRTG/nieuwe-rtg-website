@@ -160,12 +160,17 @@
     // de buurtkant krijgt hetzelfde gereedschap mee in plaats van een eigen kopie
     window.LabpasBuurt.init({ api: api, esc: esc, meld: meld });
     window.LabpasBuurt.zetLab(LAB);
+    window.LabpasOntdek.init({ api: api, esc: esc, meld: meld, kader: KADER });
+    window.LabpasOntdek.zetLab(LAB);
+    window.LabpasOntdek.bind();
     $('#bLab').addEventListener('change', function () {
       LAB = $('#bLab').value;
       window.LabpasBuurt.zetLab(LAB);
       window.LabpasBuurt.laadThemas();
+      window.LabpasOntdek.zetLab(LAB);
+      window.LabpasOntdek.laadOnderzoek();
     });
-    return window.LabpasBuurt.laadThemas();
+    return Promise.all([window.LabpasBuurt.laadThemas(), window.LabpasOntdek.laadOnderzoek()]);
   }).catch(function (e) { $('#pasFout').textContent = e.message; });
 
   $('#pasOpen').addEventListener('click', function () { openPas($('#pasVeld').value.trim().toUpperCase()); });

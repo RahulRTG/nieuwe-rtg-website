@@ -45,7 +45,13 @@
   function stapBlok(s) {
     var k = '<div class="kaart">';
     if (s.stap === 'vraagstuk')
-      return k + '<div class="sec">Hypothese</div>' +
+      return k + '<div class="sec">Het vraagstuk scherper maken</div>' +
+        '<input class="veld" data-vsvraag placeholder="Wat speelt er werkelijk?" maxlength="600" value="' + esc(s.vraagstuk || '') + '">' +
+        '<input class="veld" data-vsdoel placeholder="Doel (optioneel)" maxlength="400" value="' + esc(s.doel || '') + '" style="margin-top:.35rem;">' +
+        '<div class="leeg">Dit kan alleen NU. Zodra de hypothese er is staat het vraagstuk vast: ' +
+          'een vraag die je bijstelt nadat je de uitkomst kent, is de oudste manier om jezelf gelijk te geven.</div>' +
+        '<button class="knop stil" data-vszet type="button">Werk het vraagstuk bij</button>' +
+        '<div class="sec" style="margin-top:.9rem;">Hypothese</div>' +
         '<input class="veld" data-hyp placeholder="Wat verwachten we?" maxlength="500">' +
         '<input class="veld" data-hypteg placeholder="Wat zou het TEGENDEEL bewijzen?" maxlength="500" style="margin-top:.4rem;">' +
         '<div class="leeg">Zonder het tegendeel is dit een wens en geen hypothese; de server weigert hem dan ook.</div>' +

@@ -26,7 +26,7 @@
     if (!LAB) return Promise.resolve();
     return api('bewoner/themas', { labId: LAB }).then(function (d) {
       $('#bLijst').innerHTML = (d.themas || []).slice(0, 15).map(function (t) {
-        return '<div class="log" data-t="' + esc(t.id) + '"><b>' + esc(t.vraag) + '</b><br>' +
+        return '<div class="log" data-thema="' + esc(t.id) + '"><b>' + esc(t.vraag) + '</b><br>' +
           t.stemmen + ' stem' + (t.stemmen === 1 ? '' : 'men') +
           (t.studieId ? ' &middot; <span class="pil ok">wordt onderzocht</span>'
             : ' &middot; <button class="knop stil" data-stem type="button" style="font-size:.72rem;padding:.2rem .55rem;">Ik ook</button>') +
@@ -34,7 +34,7 @@
       }).join('') || '<div class="leeg">Nog geen vragen. Dien de eerste in.</div>';
       Array.prototype.forEach.call(document.querySelectorAll('[data-stem]'), function (b) {
         b.addEventListener('click', function () {
-          api('bewoner/stem', { id: b.closest('[data-t]').dataset.t, alias: stemNaam() })
+          api('bewoner/stem', { id: b.closest('[data-thema]').dataset.t, alias: stemNaam() })
             .then(function () { meld('Uw stem is geteld.'); return laadThemas(); })
             .catch(function (e) { meld(e.message); });
         });

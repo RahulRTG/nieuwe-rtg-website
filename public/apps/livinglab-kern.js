@@ -63,6 +63,10 @@
     }).join('') + '</div>';
   }
 
+  // het lab zoals het nu gekozen is; de ethiek- en beheerschermen lezen hier
+  // de tekenbevoegden uit, want zonder die lijst kan er niets ondertekend worden
+  function huidigLab() { return LABS.filter(function (l) { return l.id === LAB; })[0] || null; }
+
   function soortNaam(s) {
     var x = KADER.soorten.filter(function (y) { return y.soort === s; })[0];
     return x ? x.naam : s;
@@ -84,6 +88,8 @@
     if (!LAB) {
       $('#lijst').innerHTML = '<div class="leeg">Er is nog geen Living Lab. Maak er een aan voor de stad waar u begint.</div>';
       $('#kpi').innerHTML = ''; $('#themas').innerHTML = ''; $('#pijplijn').innerHTML = ''; $('#impact').innerHTML = '';
+      $('#beheer').innerHTML = '<div class="leeg">Kies of maak eerst een lab.</div>';
+      $('#apparatuur').innerHTML = ''; $('#agenda').innerHTML = ''; $('#opbrengst').innerHTML = '';
       return Promise.resolve();
     }
     return Promise.all([
@@ -98,6 +104,10 @@
       B.tekenThemas(r[1].themas || []);
       B.tekenPijplijn(r[2]);
       B.tekenImpact(r[3]);
+      window.LivingLabBeheer.teken($('#beheer'));
+      window.LivingLabApparatuur.teken($('#apparatuur'));
+      B.tekenOpbrengst($('#opbrengst'), LAB);
+      B.agenda($('#agenda'), LAB);
     }).catch(function (e) { $('#lijst').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>'; });
   }
 
@@ -115,7 +125,13 @@
       B.init({ api: api, kader: KADER, esc: esc, meld: meld, route: route,
         soortNaam: soortNaam, herteken: function () { B.tekenLijst(STUDIES, FILTER); },
         zetFilter: function (f) { FILTER = f; }, filter: function () { return FILTER; } });
-      window.LivingLabStudie.init({ api: api, kader: KADER, esc: esc, meld: meld, route: route, herlaad: laad });
+      window.LivingLabStudie.init({ api: api, kader: KADER, esc: esc, meld: meld, route: route,
+        herlaad: laad, huidigLab: huidigLab });
+      window.LivingLabBeheer.init({ api: api, kader: KADER, esc: esc, meld: meld,
+        huidigLab: huidigLab, herlaad: laadLabs });
+      window.LivingLabApparatuur.init({ api: api, kader: KADER, esc: esc, meld: meld,
+        huidigLab: huidigLab, herlaad: laadLabs });
+      window.LivingLabWerkplaats.init({ api: api, esc: esc, meld: meld });
       return laadLabs();
     }).then(laad).catch(function (e) {
       $('#lijst').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>';

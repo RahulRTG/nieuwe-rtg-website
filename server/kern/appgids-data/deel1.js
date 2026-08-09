@@ -11,33 +11,17 @@ module.exports = {
   '/apps/app.html': G('Je homescreen: mappen boven de klok, bellen en je wallet eronder, Rahul in de balk.',
     ['Tik een app; omhoog vegen op het streepje onderin brengt je terug op de homescreen', 'Typ in de balk onderaan: het OS doet het zelf of Rahul pakt het op', 'Je ledenpas ligt in je wallet, de tegel rechts onder de klok'],
     'Je echte naam blijft in de kluis; partners zien alleen je codenaam. Dat is bewust ons ontwerp.'),
-  /* Deze gids stond te liegen, en de toets ving alleen de helft ervan. Er
-     stond dat dit bureaublad "niet meer bestaat" -- terwijl de pagina er
-     gewoon is en werkt: alle werelden onder elkaar (leden, RTFoundation,
-     personeel en werkgevers, en de zaken per soort), met de accounts die op
-     dit toestel bekend zijn. test/negenplus.test.js zakte er alleen op het
-     AANTAL stappen; dat er ondertussen iets onwaars stond, telde niemand.
-     Nu staat er wat het scherm echt doet (LAT.md regel 6). */
-  '/apps/index.html': G('Het RTG OS-bureaublad: alle werelden van het platform onder elkaar, met de accounts die op dit toestel bekend zijn.',
-    ['Kies een wereld: leden, RTFoundation, personeel en werkgevers, of een zaak per soort',
-     'Tik een app om hem te openen; het beginscherm van de leden-app blijft /apps/app.html',
-     'Wissel bovenin van account als er meer dan een op dit toestel staat'],
-    'Dit is de brede ingang naast het beginscherm: handig op een groot scherm, en de enige plek waar de werelden naast elkaar staan.'),
+  '/apps/index.html': G('De homescreen (dit pad brengt je daarheen).',
+    ['Tik een app; omhoog vegen op het streepje onderin brengt je terug',
+      'Bewaar liever / als bladwijzer: dit pad is een doorverwijzing en geen eigen scherm'],
+    'Het scrollende bureaublad met alle apps in secties bestaat niet meer: een OS heeft een beginscherm, geen tweede.'),
   '/apps/bureau.html': G('De homescreen (dit pad brengt je daarheen).',
-    ['Tik een app; omhoog vegen op het streepje onderin brengt je terug'],
+    ['Tik een app; omhoog vegen op het streepje onderin brengt je terug',
+      'Kom je hier via een oude link of bladwijzer, vervang die dan door /'],
     'Een oude ingang uit de tijd dat er nog een apart bureaublad was.'),
-  '/apps/comm.html': G('Je berichten met vrienden en partners, automatisch vertaald als dat nodig is.',
+  '/apps/berichten.html': G('Je berichten met vrienden en partners, automatisch vertaald als dat nodig is.',
     ['Stuur een bericht op codenaam', 'Bel of videobel vanuit het gesprek', 'Deel een snap of verhaal met wie jij kiest'],
     'Berichten in een andere taal worden voor je vertaald; jij leest en schrijft gewoon in je eigen taal.'),
-  /* Berichten is opgegaan in comm.html, maar het PAD bestaat nog: er kan van
-     buiten naar gelinkt zijn (een melding, een bladwijzer), dus staat er een
-     omleiding. Een pagina die bestaat hoort een eigen uitleg te hebben -- de
-     algemene terugval zegt niets en de gids belooft dekking van elke pagina.
-     Dit ontbrak doordat de ingang bij de verhuizing HERNOEMD werd in plaats
-     van bijgezet: comm.html kreeg er een, berichten.html raakte de zijne kwijt. */
-  '/apps/berichten.html': G('De oude ingang van Berichten. Hij brengt je meteen naar de communicatie-app, waar al je gesprekken in een lijst staan.',
-    ['Je wordt vanzelf doorgestuurd naar de communicatie-app', 'Werk je bladwijzer bij naar de nieuwe app'],
-    'Oude links blijven werken: RTG gooit een pad nooit zomaar weg, want een dood pad is erger dan een omleiding.'),
   '/apps/genootschap.html': G('Genootschap: je besloten groepen binnen RTG, met een prikbord en bijeenkomsten.',
     ['Richt er een op en kies wie erbij mag: openbaar, besloten of geheim', 'Zet iets op het prikbord, of stel een peiling voor met een paar keuzes', 'Roep een bijeenkomst uit en zie wie ja, misschien of nee zegt'],
     'Geheim is hier echt geheim: zo\'n genootschap staat in geen enkele lijst en is alleen met een uitnodiging te vinden.'),

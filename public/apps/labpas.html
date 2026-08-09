@@ -98,6 +98,28 @@
     </div>
     <div id="bLijst"></div>
   </div>
+
+  <div class="kaart" id="ontdek">
+    <div class="sec">Wat er in dit lab onderzocht wordt</div>
+    <div class="leeg">Open voor iedereen. U ziet de vraag en waar het onderzoek staat -- geen deelnemers
+      en geen ruwe gegevens. Een onderzoek dat zijn data gescheiden houdt, toont ook zijn vraagstelling niet.</div>
+    <div id="oLijst"><div class="leeg">Laden...</div></div>
+  </div>
+
+  <div class="kaart" id="pasKaart">
+    <div class="sec">Uw labpaspoort</div>
+    <div class="leeg">Punten en badges over onderzoeken heen, op een code die u zelf houdt. U verdient ze
+      niet met veel insturen maar met goed werk.</div>
+    <div class="rij">
+      <input class="veld" id="paspVeld" placeholder="LABPAS-XXXXXXX" maxlength="20" autocomplete="off">
+      <button class="knop stil" id="paspOpen" type="button">Open</button>
+    </div>
+    <div class="rij" style="margin-top:.4rem;">
+      <input class="veld" id="paspNaam" placeholder="Nog geen paspoort? Kies een roepnaam" maxlength="40">
+      <button class="knop stil" id="paspMaak" type="button">Maak paspoort</button>
+    </div>
+    <div id="pasp"></div>
+  </div>
 </main>
 
 <script src="/shared/deur.js"></script>
@@ -105,6 +127,7 @@
      bezoeker zonder labpas op een buurtvraag stemt. -->
 <script src="/shared/id.js"></script>
 <script src="/apps/labpas-buurt.js"></script>
+<script src="/apps/labpas-ontdek.js"></script>
 <script src="/apps/labpas.js"></script>
 <script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/sneltoets.js" defer></script>

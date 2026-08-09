@@ -33,6 +33,7 @@ module.exports = (ctx) => {
   const cred = require('./crediteuren')({ db });
   const con = require('./contracten')({ db });
   const bel = require('./belasting')({ db });
+  const kas = require('./kas')({ save });
 
-  return { intake, kans, sim, stress, plan, dag, opr, ek, mp, boek, rel, deb, cred, con, bel };
+  return { intake, kans, sim, stress, plan, dag, opr, ek, mp, boek, rel, deb, cred, con, bel, kas };
 };

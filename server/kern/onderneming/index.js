@@ -40,7 +40,7 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boeki
   /* Alle deellagen worden in ./lagen.js opgebouwd -- dit bestand ging over de
      10 kB van het modulebeleid, en dat is de goede naad: daar de
      gereedschapskist, hier het object zelf. */
-  const { intake, kans, sim, stress, plan, dag, opr, ek, mp, boek, rel, deb, cred, con, bel } =
+  const { intake, kans, sim, stress, plan, dag, opr, ek, mp, boek, rel, deb, cred, con, bel, kas } =
     require('./lagen')({ db, save, schoon, ordersVanZaak, boekingenVanZaak, ondernemerpoort });
 
   const bak = () => {
@@ -60,67 +60,12 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boeki
   const { ondernemingNaam, ondernemingFeiten, ondernemingBeeld } =
     require('./beeld')({ db, findSupplier, ordersVanZaak, boekingenVanZaak, vanEigenaar });
 
-  /* ---- aanmaken: de onderneming bestaat vanaf "misschien" ----
-     Rechtsvorm mag leeg blijven. "Ik weet nog niet wat ik word" is een echte
-     stand in de ideefase en krijgt hier geen standaardwaarde aangemeten. */
-  function ondernemingNieuw(eigenaar, body) {
-    if (!eigenaar) return { status: 401, error: 'Log in om een onderneming te beginnen.' };
-    const naam = scho((body || {}).naam, 80);
-    if (!naam) return { status: 400, error: 'Hoe zou de onderneming heten? Een werktitel is genoeg.' };
-    const rvIn = (body || {}).rechtsvorm;
-    if (rvIn && !RV.isRechtsvorm(rvIn)) return { status: 400, error: 'Deze rechtsvorm kennen we niet.' };
-    const o = {
-      id: 'ond_' + crypto.randomBytes(6).toString('hex'),
-      eigenaar, naam,
-      rechtsvorm: rvIn || null,
-      supplierCode: null, kvk: null, plan: null,
-      gestart: nu()
-    };
-    bak().push(o);
-    save();
-    return { ok: true, onderneming: ondernemingBeeld(o) };
-  }
-
-  /* De rechtsvorm zetten of wijzigen. Wijzigen mag: een eenmanszaak die een
-     B.V. wordt is een normale stap, geen fout. Wat er niet mag is een vorm
-     verzinnen. */
-  function ondernemingRechtsvorm(o, id) {
-    if (!RV.isRechtsvorm(id)) return { status: 400, error: 'Deze rechtsvorm kennen we niet.' };
-    o.rechtsvorm = id;
-    save();
-    return { ok: true, onderneming: ondernemingBeeld(o) };
-  }
-
-  /* ---- de naad dicht: de onderneming wijst de bestaande zaak aan ----
-     Idempotent voor dezelfde zaak. Een zaak hoort bij precies één onderneming;
-     twee ondernemingen op dezelfde zaak zou de tweede waarheid terugzetten die
-     deze module juist opruimt. */
-  function ondernemingKoppel(o, code) {
-    const s = findSupplier(code);
-    if (!s) return { status: 404, error: 'Deze zaak bestaat niet.' };
-    if (o.supplierCode === s.code) return { ok: true, onderneming: ondernemingBeeld(o) };
-    if (o.supplierCode) return { status: 409, error: 'Deze onderneming is al aan een zaak gekoppeld.' };
-    const bezet = vanZaak(s.code);
-    if (bezet) return { status: 409, error: 'Deze zaak hoort al bij een andere onderneming.' };
-    o.supplierCode = s.code;
-    /* De lokale naam gaat WEG en wordt niet gekopieerd: vanaf nu is de zaak
-       de waarheid over hoe dit bedrijf heet. Zie de kop. */
-    delete o.naam;
-    o.gekoppeld = nu();
-    save();
-    return { ok: true, onderneming: ondernemingBeeld(o) };
-  }
-
-  /* De KvK-inschrijving vastleggen. Alleen het feit -- het inschrijven zelf
-     loopt via kern/overheid/onderneming.js, en die blijft de plek waar dat
-     gebeurt. */
-  function ondernemingIngeschreven(o, kvk) {
-    const n = scho(kvk, 20);
-    if (!n) return { status: 400, error: 'Welk KvK-nummer hoort bij deze onderneming?' };
-    o.kvk = n;
-    save();
-    return { ok: true, onderneming: ondernemingBeeld(o) };
-  }
+  /* De vier handelingen die het object zelf veranderen staan in
+     ./levensloop.js -- dit bestand ging over de 10 kB van het modulebeleid, en
+     de naad loopt langs de vraag wie er SCHRIJFT. */
+  const { ondernemingNieuw, ondernemingRechtsvorm, ondernemingKoppel, ondernemingIngeschreven } =
+    require('./levensloop')({ bak, vanZaak, findSupplier, crypto, scho, save, nu,
+      ondernemingBeeld, ondernemingNaam });
 
   /* De overgang naar een echte zaak staat in ./aanvraag.js -- dit bestand ging
      over de 10 kB van het modulebeleid. Hij loopt langs de BESTAANDE
@@ -184,10 +129,13 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boeki
     ondernemingDagbeeld: (o, nu) => {
       const t = Number.isFinite(nu) ? nu : Date.now();
       const vandaag = new Date(t).toISOString().slice(0, 10);
+      /* De drie geldbeelden worden EEN keer gemaakt en daarna doorgegeven aan
+         de kasvooruitblik. Zou die ze zelf opnieuw opvragen, dan kunnen er
+         twee antwoorden op dezelfde vraag ontstaan. */
+      const d = deb.debiteuren(o, t), c = cred.crediteuren(o, t), b = bel.belasting(o, t);
       return dag.dagbeeld(o, ondernemingBeeld(o), ondernemingVerkenning(o),
         opr.oprichtingsproject(o), ek.eersteKlant(o), mp.ondernemingMallProfiel(o),
-        rel.relaties(o, t), deb.debiteuren(o, t), cred.crediteuren(o, t), con.contracten(o, vandaag),
-        bel.belasting(o, t));
+        rel.relaties(o, t), d, c, con.contracten(o, vandaag), b, kas.kas(o, d, c, b, t));
     },
     ondernemingEersteKlant: ek.eersteKlant,
     ondernemingMallProfiel: mp.ondernemingMallProfiel,
@@ -196,6 +144,11 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boeki
     ondernemingCrediteuren: cred.crediteuren,
     ondernemingContracten: con.contracten,
     ondernemingBelasting: bel.belasting,
+    ondernemingKas: (o, nu, dagen) => {
+      const t = Number.isFinite(nu) ? nu : Date.now();
+      return kas.kas(o, deb.debiteuren(o, t), cred.crediteuren(o, t), bel.belasting(o, t), t, dagen);
+    },
+    ondernemingKasSaldo: kas.kasSaldoZet,
     ondernemingWerkruimte: (o, code) => con.ondernemingWerkruimte(o, code, save),
     ondernemingKlantNotitie: boek.klantNotitie,
     ondernemingOprichting: opr.oprichtingsproject,

@@ -15,10 +15,11 @@ const DEBITEUREN = require('./debiteuren');
 const CREDITEUREN = require('./crediteuren');
 const CONTRACTEN = require('./contracten');
 const BELASTING = require('./belasting');
+const KAS = require('./kas');
 
 module.exports = ({ boekingenVanZaak, intakeOntbreekt }) => {
 
-  function acties(o, feiten, verk, project, eersteklant, mall, rel, deb, cred, con, bel) {
+  function acties(o, feiten, verk, project, eersteklant, mall, rel, deb, cred, con, bel, kas) {
     const uit = [];
     const zet = (id, kop, waarom, waarheen) => uit.push({ id, kop, waarom, waarheen });
 
@@ -82,21 +83,28 @@ module.exports = ({ boekingenVanZaak, intakeOntbreekt }) => {
       zet('mijlpaal', 'Nog ' + eersteklant.volgende.teGaan + ' tot ' + eersteklant.volgende.label.toLowerCase(),
         eersteklant.volgende.wat, 'eersteklant');
     }
-    /* 9. vervallen facturen. Dit is het meest concrete geld dat er ligt: al
+    /* 9. de kasvooruitblik. Bovenaan het geldblok, want dit is de optelsom
+       van de rest: een tekort over dertig dagen zegt meer dan elke losse post
+       eronder. */
+    if (kas) {
+      const v = KAS.kasOpvolging(kas);
+      if (v) zet('kas', v.kop, v.waarom, 'kas');
+    }
+    /* 10. vervallen facturen. Dit is het meest concrete geld dat er ligt: al
        verdiend, alleen nog niet binnen. Het gaat daarom voor de rest van de
        opvolging. */
     if (deb) {
       const v = DEBITEUREN.debiteurenOpvolging(deb);
       if (v) zet('debiteuren', v.kop, v.waarom, 'debiteuren');
     }
-    /* 10. wat u zelf te laat betaalt. Direct na de debiteuren: allebei geld
+    /* 11. wat u zelf te laat betaalt. Direct na de debiteuren: allebei geld
        dat al vaststaat, maar geld dat binnen moet komen gaat voor geld dat
        eruit moet -- het eerste betaalt het tweede. */
     if (cred) {
       const v = CREDITEUREN.crediteurenOpvolging(cred);
       if (v) zet('crediteuren', v.kop, v.waarom, 'crediteuren');
     }
-    /* 11. de btw. Direct na het geld dat vaststaat: dit IS geld dat vaststaat,
+    /* 12. de btw. Direct na het geld dat vaststaat: dit IS geld dat vaststaat,
        alleen andersom -- het staat op de rekening en is niet van de zaak. Voor
        de contractklok, want een verkeerd besteed btw-bedrag merk je pas bij de
        aangifte en dan is het op. */
@@ -104,27 +112,27 @@ module.exports = ({ boekingenVanZaak, intakeOntbreekt }) => {
       const v = BELASTING.belastingOpvolging(bel);
       if (v) zet('btw', v.kop, v.waarom, 'belasting');
     }
-    /* 12. de contractklok. Na het geld dat vaststaat, maar VOOR de gewone
+    /* 13. de contractklok. Na het geld dat vaststaat, maar VOOR de gewone
        opvolging: een gemiste opzegdag kost een heel jaar en is daarna niet
        meer te repareren, waar een klant die niet terugbelt dat wel is. */
     if (con) {
       for (const v of CONTRACTEN.contractenOpvolging(con)) zet('contract:' + v.id, v.kop, v.waarom, 'contracten');
     }
-    /* 13. de opvolging. Dit gaat VOOR de Mall-pagina en voor de losse
+    /* 14. de opvolging. Dit gaat VOOR de Mall-pagina en voor de losse
        aanvragen: het is het enige wat over geld gaat dat al binnen handbereik
        ligt. De losse aanvragen-actie hieronder valt weg zodra de opvolging hem
        al noemt -- twee keer hetzelfde vragen leest als een storing. */
     if (rel && rel.opvolging.length) {
       for (const v of rel.opvolging) zet('opvolging:' + v.id, v.kop, v.waarom, 'relaties');
     }
-    /* 14. de Mall-pagina. Na de etalage-check, want online staan gaat voor een
+    /* 15. de Mall-pagina. Na de etalage-check, want online staan gaat voor een
        mooie pagina: een pagina die niemand ziet is geen pagina. */
     if (mall && mall.open.length) {
       const m = mall.open[0];
       zet('mallprofiel', 'Uw Mall-pagina is ' + mall.percentage + '% ingevuld',
         m.label + ': ' + m.wat, 'mall');
     }
-    // 15. wat er ligt
+    // 16. wat er ligt
     const alGenoemd = !!(rel && rel.opvolging.some(v => v.id === 'aanvragen'));
     if (o.supplierCode && !alGenoemd) {
       const wacht = (boekingenVanZaak(o.supplierCode) || []).filter(b => b && b.status === 'aangevraagd').length;

@@ -1604,6 +1604,48 @@ werk:**
   zakken (regel 9). De waarde komt nu uit de opties, en de toets vergelijkt de
   uitkomst mét en zónder die aftrek.
 
+### De kasvooruitblik: waar kom ik uit over dertig dagen
+
+`server/kern/onderneming/kas.js` + `/api/onderneming/kas{,/saldo}`. Drie beelden
+die er al waren, bij elkaar gelegd: wat er binnenkomt (debiteuren), wat eruit moet
+(crediteuren) en wat er niet van u is (btw). Ze worden **meegegeven** en niet
+opnieuw uitgerekend -- twee keer dezelfde vraag stellen kan twee antwoorden geven.
+
+**Het grootste probleem is wat wij niet weten: het banksaldo.** RTG ziet facturen,
+geen bankrekening. Een kaspositie zonder beginsaldo is dus geen positie maar een
+som van bewegingen, en die twee door elkaar halen is precies hoe iemand denkt dat
+het goed komt terwijl de rekening leeg is. Daarom staat er standaard een
+**beweging**, en pas een stand zodra de ondernemer zelf een saldo opgeeft -- met
+de datum erbij, want een saldo van drie maanden geleden is geen saldo. Boven de
+31 dagen heet het verouderd, met de reden erbij.
+
+**De onzekerheid ligt niet symmetrisch, en dat is expres.** Geld dat u nog moet
+krijgen en al te laat is, telt **niet** mee als inkomend: te laat is precies de
+reden om er niet op te rekenen. Geld dat u moet betalen en al te laat is, telt
+**wel** mee: dat moet u sowieso voldoen. Beide keuzes maken het beeld somberder,
+en dat is de kant waarop een kasprognose hoort te leunen. Een toets legt dat vast
+met een geval waar de optimistische lezing +7.000 zou zeggen en de eerlijke -3.000.
+
+Wat te laat openstaat verdwijnt daarmee niet uit beeld: het staat apart als
+**onzeker**, met bedrag en aantal. Het is geen nul (het bestaat) en geen inkomen
+(het had er al moeten zijn).
+
+**Er zit geen voorspelling in.** Wat er de komende maand nog aan nieuwe omzet bij
+komt, weten wij niet en verzinnen wij niet. Dit is een optelsom van wat er nu ligt,
+met de vervaldata die er nu op staan; loon, huur en abonnementen buiten RTG zitten
+er niet in, en dat staat in het antwoord.
+
+Op het dagbeeld staat de kasvooruitblik bovenaan het geldblok -- de optelsom zegt
+meer dan elke losse post eronder -- en alleen een negatieve beweging levert een
+waarschuwing op. Een positieve maand is geen actie, en een waarschuwing die elke
+maand komt is geen waarschuwing.
+
+Getoetst in `test/onderneming-kas.test.js` (14). Zes mutaties, alle zes raak: te
+late debiteuren tóch meetellen, te late crediteuren laten wegvallen, een
+beginsaldo van nul verzinnen, een oud saldo niet laten verouderen, ook een
+positieve maand laten waarschuwen, en de kasregel onder de losse posten laten
+zakken.
+
 ### RTG Werk OS (de werkplek van een organisatie)
 
 `server/bedrijf/` + `/api/bedrijf/...` + `/apps/werk.html`. Een **werkruimte**

@@ -154,7 +154,7 @@ function toonLeeg(){
 function teken(){
   const o=ONDS.find(x=>x.id===HUIDIG)||{};
   zetTitel(DAG.naam||'Mijn onderneming');
-  $('#hoofd').innerHTML=[vakGroet(),vakGezond(),vakActies(),vakIntake(),vakKans(),vakSimulatie(),vakStress(),vakPlan(o),vakRechtsvorm(o),vakOprichting(),vakZaak(o),vakEersteKlant(),vakMall(),vakRelaties(),vakDebiteuren(),vakCrediteuren(),vakContracten(),vakBelasting()].join('');
+  $('#hoofd').innerHTML=[vakGroet(),vakGezond(),vakActies(),vakIntake(),vakKans(),vakSimulatie(),vakStress(),vakPlan(o),vakRechtsvorm(o),vakOprichting(),vakZaak(o),vakEersteKlant(),vakMall(),vakRelaties(),vakDebiteuren(),vakCrediteuren(),vakContracten(),vakBelasting(),vakKas()].join('');
   haakKnoppen();
 }
 
@@ -504,6 +504,34 @@ function vakBelasting(){
     '<p class="subtxt" style="margin-top:.9rem;">'+esc(b.voorbehoud)+'</p></div>';
 }
 
+
+function vakKas(){
+  const k=DAG&&DAG.kas;
+  if(!k) return '';
+  const teken=k.beweging<0?'':'+';
+  const stand=k.stand
+    ? '<div class="cijfer"><div class="lbl">Saldo nu (opgegeven)</div><div class="wrd">'+euro(k.stand.start)+'</div>'+
+      '<div class="eh">'+esc(k.stand.opgegeven)+'</div></div>'+
+      '<div class="cijfer"><div class="lbl">Over '+k.venster+' dagen</div><div class="wrd">'+euro(k.stand.eind)+'</div>'+
+      '<div class="eh">'+(k.stand.verouderd?'saldo is verouderd':'op uw saldo')+'</div></div>'
+    : '';
+  return '<div class="vak"><h2>Kasvooruitblik</h2>'+
+    '<div class="score"><span class="n groot">'+teken+euro(k.beweging)+'</span>'+
+    '<span class="subtxt">beweging over '+k.venster+' dagen</span></div>'+
+    (k.stand&&k.stand.let?'<p class="subtxt" style="margin-top:.4rem;">'+esc(k.stand.let)+'</p>':'')+
+    '<div class="cijfers" style="margin-top:.9rem;">'+
+    '<div class="cijfer"><div class="lbl">Komt binnen</div><div class="wrd">'+euro(k.inkomend.bedrag)+'</div><div class="eh">'+k.inkomend.aantal+' facturen</div></div>'+
+    '<div class="cijfer"><div class="lbl">Gaat eruit</div><div class="wrd">'+euro(k.uitgaand.bedrag)+'</div><div class="eh">'+k.uitgaand.aantal+' facturen</div></div>'+
+    '<div class="cijfer"><div class="lbl">Btw opzij</div><div class="wrd">'+euro(k.btwOpzij.bedrag)+'</div><div class="eh">niet van u</div></div>'+
+    stand+'</div>'+
+    '<div style="margin-top:.9rem;"><div class="bron niet"><span><strong>Onzeker: '+euro(k.onzeker.bedrag)+'</strong><br>'+
+    '<span class="bu">'+esc(k.onzeker.uitleg)+'</span></span><span class="bu">'+k.onzeker.aantal+' te laat</span></div></div>'+
+    (k.stand?'':'<div class="rij" style="margin-top:.9rem;">'+
+      '<label class="veld" style="flex:1 1 10rem;">Uw banksaldo<input id="kasSaldo" type="number"></label>'+
+      '</div><div class="rij" style="margin-top:.5rem;"><button class="knop" id="kasKnop">Reken door op mijn saldo</button></div>')+
+    '<p class="subtxt" style="margin-top:.9rem;">'+esc(k.voorbehoud)+'</p></div>';
+}
+
 /* ---------- handelingen ---------- */
 function haakKnoppen(){
   const b=$('#bewaarKnop'); if(b) b.addEventListener('click',bewaar);
@@ -520,6 +548,11 @@ function haakKnoppen(){
     if(!naam.trim()){meld('Vul uw naam in.');return;}
     try{ await api('aanvraag',{id:HUIDIG,naam,contact:($('#aanvContact')||{}).value||''});
       meld('Aanvraag ingediend. Een mens beoordeelt hem.'); await herlaad(); }
+    catch(err){ meld(err.message); }});
+  const ks=$('#kasKnop'); if(ks) ks.addEventListener('click',async()=>{
+    const bedrag=($('#kasSaldo')||{}).value;
+    if(bedrag==='') {meld('Vul uw banksaldo in.');return;}
+    try{ await api('kas/saldo',{id:HUIDIG,bedrag:Number(bedrag)}); meld('Doorgerekend op uw saldo.'); await herlaad(); }
     catch(err){ meld(err.message); }});
   const wr=$('#wrKnop'); if(wr) wr.addEventListener('click',async()=>{
     const code=($('#wrCode')||{}).value||'';

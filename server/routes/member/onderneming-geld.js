@@ -9,7 +9,7 @@
 module.exports = (kern, mijn, stuur, nietGevonden) => {
   const { app, auth, ondernemingRelaties, ondernemingKlantNotitie,
     ondernemingDebiteuren, ondernemingCrediteuren, ondernemingContracten,
-    ondernemingWerkruimte, ondernemingBelasting } = kern;
+    ondernemingWerkruimte, ondernemingBelasting, ondernemingKas, ondernemingKasSaldo } = kern;
 
   /* Het klantenboek en de opvolging. Alles op codenaam: dit boek kent geen
      echte namen, en dat is het ontwerp en geen tekortkoming. */
@@ -62,5 +62,21 @@ module.exports = (kern, mijn, stuur, nietGevonden) => {
     const o = mijn(req);
     if (!o) return stuur(res, nietGevonden);
     res.json({ ok: true, belasting: ondernemingBelasting(o) });
+  });
+
+  /* De kasvooruitblik: wat er binnenkomt, wat eruit moet en wat er opzij hoort,
+     over een venster van dagen (standaard 30). */
+  app.post('/api/onderneming/kas', auth, (req, res) => {
+    const o = mijn(req);
+    if (!o) return stuur(res, nietGevonden);
+    res.json({ ok: true, kas: ondernemingKas(o, undefined, Number((req.body || {}).dagen)) });
+  });
+
+  /* Het banksaldo dat de ondernemer zelf opgeeft. RTG ziet geen bankrekening;
+     zonder dit getal is er alleen een beweging en geen stand. */
+  app.post('/api/onderneming/kas/saldo', auth, (req, res) => {
+    const o = mijn(req);
+    if (!o) return stuur(res, nietGevonden);
+    stuur(res, ondernemingKasSaldo(o, (req.body || {}).bedrag));
   });
 };

@@ -1777,6 +1777,25 @@ De drempel ligt op 80%: een veld dat vier van de vijf keer een bestaande sleutel
 
 Beide lagen draaien op het register dat ze meekrijgen, dus de zaak-kant krijgt ze gratis en volledig gescoped: de graaf loopt juist wél door en zou ongescoped het gevaarlijkste stuk zijn. In RTG Command staan ze als werkplekken **Kwaliteit** en **Kennisgraaf**; in de zaak achter de managergrens.
 
+### De laatste acht beloften, en wat ze bewust níet doen
+
+Het belofteregister staat op **65 gedekt, 0 open, 0 gebroken**. De acht die als laatste dichtgingen raken uitrol, migratie en meerdere omgevingen — precies het gebied waar een knop makkelijk mooier is dan de werkelijkheid. Wat elk van ze weigert te doen is daarom net zo belangrijk als wat het doet.
+
+| Laag | Wat het doet | Wat het bewust niet doet |
+|---|---|---|
+| **Canary** (`kern/command/canary.js`) | een functie uit de schakelkast gefaseerd openzetten, met een terugroldrempel op dezelfde tellers als de servicedoelen | niet wegen als de nulmeting kwijt is (na een herstart); anoniem verkeer valt nooit in een canary |
+| **Zandbak** (`zandbak.js`) | dezelfde motoren op een DB-venster met zaaigegevens, met eigen journaal en beleid | geen productierijen kopiëren; geen tweede installatie — alleen de motoren van Command, niet de app-routes |
+| **Master data** (`mdm.js`, `mdmsamen.js`) | gemeten dubbelen over bedrijven en locaties, met een gouden record per veld | nooit vanzelf samenvoegen; nooit iets wissen (verliezers houden een verwijzing) |
+| **Overname** (`overname.js`) | inlezen → afbeelden → droogloop → uitvoeren, met terugdraaien per partij | niets overschrijven (een bestaande sleutel is een botsing); niet uitvoeren zonder het zegel van de bekeken droogloop |
+| **API-poort** (`apipoort.js`) | sleutels, scopes, quota en uitfasering op `/api/extern/` | niets ontsluiten: de toelating begint leeg; scopes buiten de toelating worden geweigerd en niet stil ingeperkt |
+| **Landpakketten** (`LANDEN.json`, `landpakket.js`) | munt, voertaal en schakelkaststand per land, geleund op wat het huis al weet | geen naleving: btw-registratie en loonaangifte blijven mensenwerk, en die lijst wordt niet korter door te activeren |
+| **Stadsstart** (`stadstart.js`) | een stad met land, genormaliseerde naam en per-plaats-standen | niet doen alsof het weefsel meerdere steden draagt; die stap blijft openstaan met de reden erbij |
+| **Chaosproef** (`scripts/chaos.js`) | een eigen trio starten en de **actieve** server met SIGKILL omleggen, en meten | niet op productie te richten; "geen onderbreking gemeten" nooit als "geen onderbreking" tonen |
+
+Twee dingen die door deze ronde heen lopen. **Een nulmeting die je kwijt bent, is geen nul** — de canary weigert te wegen na een herstart, want doorrekenen zou een negatief foutaantal geven en dus altijd groen. En **een grens weigert, hij perkt niet stil in** — de API-poort maakt geen half-ingeperkte sleutel, want dan denkt een koppeling ergens bij te mogen en merkt hij pas in productie van niet.
+
+De chaosproef leverde het eerste gemeten failover-cijfer op: SIGKILL op de actieve server, 535 verzoeken op 25 ms, **0 mislukt**. Dat staat in `SLO.md` naast de herstelmeting, met het voorbehoud erbij dat "geen onderbreking gemeten" iets anders is dan "geen onderbreking".
+
 ### Herkomst: dezelfde meting, en bij elk antwoord hoe hard het is
 
 `kern/command/herkomst.js` is de derde vraag op die ene meting. Per soort: waar het naartoe wijst, wie eraan mag schrijven (de runbookcatalogus), wie het werkelijk deed (het journaal), hoe lang het blijft (`server/bewaarbeleid.js`) en wat er wees wordt als het verdwijnt.

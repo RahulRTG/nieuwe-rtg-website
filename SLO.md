@@ -126,6 +126,25 @@ Gemeten op 2 augustus 2026 met `scripts/hersteltijd.js`; zie `PRODUCTION.md` voo
 de voorbehouden (lokale schijf, en de tijd tot het BESLUIT om te herstellen zit
 er niet in -- dat is meestal het langste deel).
 
+### Failover: gemeten
+
+| Proef | Uitkomst |
+|---|---|
+| SIGKILL op de **actieve** server van het trio, 535 verzoeken op 25 ms | 0 mislukt, geen onderbreking gemeten |
+
+Gemeten op 9 augustus 2026 met `node scripts/chaos.js`, op een eigen trio met
+een eigen datamap (het script raakt nooit productie, en er is geen vlag om hem
+daarheen te richten). Het gaat om **SIGKILL en niet SIGTERM**: bij een nette
+afsluiting bewijs je dat gepland onderhoud werkt, en een storing kondigt zich
+niet aan. De actieve server wordt aangewezen via `/api/health`, dat de pid
+draagt van wie het verzoek afhandelde -- een standby omleggen zou vooral
+bewijzen dat een reserve gemist kan worden.
+
+Wat deze uitslag **niet** zegt: dat er geen onderbreking wás. Tussen twee
+metingen van 25 ms kan een korte hapering vallen. De uitslag heet daarom "geen
+onderbreking gemeten", en dat onderscheid staat ook in de meetmodule zelf
+(`scripts/lib/chaosmeet.js`, met een toets erop).
+
 De RPO van 24 uur is de zwakste schakel in dit document. Hij volgt uit het
 dagelijkse back-upritme, en hij is niet met code op te lossen: er moet vaker
 een back-up gemaakt worden, of de opslag moet naar Postgres met point-in-time

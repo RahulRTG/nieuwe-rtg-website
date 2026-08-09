@@ -547,8 +547,12 @@
     {
       "id": "chaos",
       "wat": "Chaos testing: gecontroleerd uitschakelen om failover te bewijzen",
-      "groep": "Nog open",
-      "dekking": []
+      "groep": "Command: zien, besturen, automatiseren",
+      "dekking": [
+        "scripts/chaos.js",
+        "scripts/lib/chaosmeet.js"
+      ],
+      "let": "Start een EIGEN trio met een eigen datamap en schiet de ACTIEVE server om met SIGKILL (een nette afsluiting bewijst alleen dat gepland onderhoud werkt). Raakt nooit productie en er is geen vlag om hem daarheen te richten. De uitslag staat in SLO.md: 535 verzoeken op 25 ms, 0 mislukt, geen onderbreking gemeten -- en dat is expliciet iets anders dan geen onderbreking."
     },
     {
       "id": "canary",

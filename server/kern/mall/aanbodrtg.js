@@ -100,6 +100,11 @@ module.exports = (ctx, hulp) => {
           plek: plekVan({ stad: stad.stad }), bereik: { soort: 'adres', km: 0 },
           prijs: prijs(h.prijs, 'per nacht'),
           beschikbaar: { tekst: 'Tot ' + h.maxGasten + ' gasten', hard: false },
+          /* RTG Thuis houdt reviews per HUIS bij, niet per zaak: een zaak met
+             vier huizen heeft vier cijfers. Daarom geeft deze bron zijn eigen
+             waardering mee in plaats van die van de zaak te lenen. */
+          waardering: (h.rating && h.rating.sterren)
+            ? { score: h.rating.sterren, aantal: h.rating.aantal } : null,
           pagina: '/apps/thuis.html?huis=' + encodeURIComponent(h.id),
           genre: 'vastgoed', genreLabel: 'Verblijf', verdieping: 'wonen'
         }));

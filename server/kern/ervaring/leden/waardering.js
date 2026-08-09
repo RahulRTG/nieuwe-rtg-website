@@ -60,10 +60,8 @@ module.exports = (ctx) => {
     sseToSupplier(s.code, 'sync', { scope: 'reviews' });
     return { ok: true, review: { id: r.id, reactie: r.reactie } };
   }
-  function ratingVan(code) {
-    const st = (db.data.reviewStats || {})[code];
-    return st && st.aantal ? { score: Math.round((st.som / st.aantal) * 10) / 10, aantal: st.aantal } : null;
-  }
+  // de som staat een keer, in ../../rating.js; de Mall leest hem daar ook
+  const ratingVan = (code) => require('../rating').ratingVanZaak(db, code);
 
   /* ---- 4. favorieten ---- */
   function toggleFavoriet(key, code) {

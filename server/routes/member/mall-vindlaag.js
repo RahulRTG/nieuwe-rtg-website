@@ -45,8 +45,13 @@ module.exports = (kern) => {
       zakelijk: req.session.tier === 'business',
       verdieping: req.body.verdieping, type: req.body.type, aanbieder: req.body.aanbieder,
       maxPrijs: req.body.maxPrijs, binnenKm: req.body.binnenKm,
+      // het land: de stap van een stad naar heel Europa
+      land: req.body.land, minCijfer: req.body.minCijfer,
       // de live stand uit de Supplier OS: alleen wat nu open is / op voorraad ligt
       openNu: req.body.openNu === true, opVoorraad: req.body.opVoorraad === true,
+      bezorgt: req.body.bezorgt === true, zakelijkAlleen: req.body.zakelijkAlleen === true,
+      // de kaart kost werk over alle treffers, dus alleen als het scherm hem toont
+      kaart: req.body.kaart === true,
       pagina: req.body.pagina, per: req.body.per,
       // dit is een mens die zoekt: tel de woorden mee voor het vraagbeeld
       noteer: true

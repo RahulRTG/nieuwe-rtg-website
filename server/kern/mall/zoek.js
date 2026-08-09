@@ -20,6 +20,8 @@
 
 const { coordPaar } = require('../util');
 const { lees, relevantie, boost } = require('./zoekweging');
+const { filter } = require('./zoekfilters');
+const { kaartVan } = require('./kaart');
 const { VERDIEPINGEN } = require('./aanbodvorm');
 
 module.exports = (ctx) => {
@@ -53,25 +55,23 @@ module.exports = (ctx) => {
     const periode = (isDatum(opt.van) || isDatum(opt.tot))
       ? { van: isDatum(opt.van) ? opt.van : null, tot: isDatum(opt.tot) ? opt.tot : null } : null;
 
-    let res = aanbod;
-    const totaalVoorFilter = res.length;
-    if (gekozen) res = res.filter(a => bedient(a, gekozen));
-    if (opt.verdieping) res = res.filter(a => a.verdieping === String(opt.verdieping));
-    if (opt.type) res = res.filter(a => a.type === String(opt.type));
-    if (opt.aanbieder) res = res.filter(a => a.aanbieder.soort === String(opt.aanbieder));
-    if (Number(opt.maxPrijs) > 0) res = res.filter(a => a.prijs && a.prijs.bedrag <= Number(opt.maxPrijs));
-    /* "Nu open": alleen wat de zaak zelf als open opgeeft. Een zaak zonder
-       vastgelegde openingstijden (open === null) valt hier weg en wordt NIET
-       als open meegeteld -- iemand voor niets door de regen sturen is erger
-       dan een treffer missen. */
-    if (opt.openNu) res = res.filter(a => a.open && a.open.open === true);
-    // en "uitverkocht" hoort niet in een lijst waar je iets wilt kopen
-    if (opt.opVoorraad) res = res.filter(a => a.beschikbaar && !a.beschikbaar.uit);
+    const totaalVoorFilter = aanbod.length;
+    // alle filters staan bij elkaar in ./zoekfilters.js, met wat elk wegnam
+    const gefilterd = filter(aanbod, opt, {
+      bedient, gekozen,
+      bewaardeIds: opt.bewaardeIds || null,
+      collectieIds: opt.collectieIds || null
+    });
+    const res = gefilterd.res;
 
     // hyperlocal: alleen wat binnen zoveel kilometer van het punt ligt
     const binnen = Number(opt.binnenKm) > 0 ? Number(opt.binnenKm) : null;
     let uit = res.map(a => ({ ...a, afstand: afstandTot(a, punt) }));
-    if (binnen && punt) uit = uit.filter(a => a.afstand != null && a.afstand <= binnen * 1000);
+    if (binnen && punt) {
+      const voor = uit.length;
+      uit = uit.filter(a => a.afstand != null && a.afstand <= binnen * 1000);
+      if (uit.length !== voor) gefilterd.toegepast.push({ filter: 'binnenKm', weggevallen: voor - uit.length });
+    }
 
     const dichtstbij = (a, b) => (a.afstand == null ? 1 : b.afstand == null ? -1 : a.afstand - b.afstand);
     const zoekend = gelezen.woorden.length > 0 || gelezen.typen.length > 0;
@@ -133,8 +133,30 @@ module.exports = (ctx) => {
       perVerdieping: VERDIEPINGEN.map(v => ({ ...v, aantal: uit.filter(a => a.verdieping === v.id).length }))
         .filter(v => v.aantal > 0),
       periode, zakelijk,
+      /* De landen waarin deze treffers liggen. Dit is de stap van een stad
+         naar een werelddeel: zonder deze lijst kan een scherm geen landkeuze
+         tonen zonder er zelf een te verzinnen. */
+      landen: landenUit(uit),
+      /* De kaart hoort bij de HELE trefferlijst, niet bij de zichtbare pagina:
+         je wilt zien waar de veertig treffers liggen, niet waar de eerste
+         vierentwintig liggen. Het is een projectie zonder straatkaart -- zie
+         de kop van ./kaart.js. */
+      kaart: opt.kaart ? kaartVan(uit, punt) : null,
+      // wat elk filter wegnam, zodat een lege Mall zichzelf verklaart
+      filters: gefilterd.toegepast,
       totaalVoorFilter, stuk, geweigerd, standbron: stand.bronnen(), valuta: 'EUR'
     };
+  }
+
+  // de landen in een trefferlijst, met hun aantal; aanbod zonder land telt niet mee
+  function landenUit(lijst) {
+    const per = new Map();
+    for (const a of lijst) {
+      if (!a.plek.land) continue;
+      per.set(a.plek.land, (per.get(a.plek.land) || 0) + 1);
+    }
+    return [...per.entries()].map(([land, aantal]) => ({ land, aantal }))
+      .sort((a, b) => b.aantal - a.aantal || a.land.localeCompare(b.land));
   }
 
   // de plekken waar iets te doen is, met hun aantal

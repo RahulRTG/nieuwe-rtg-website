@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 723 bestanden en 4125 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 724 bestanden en 4138 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,13 +12,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 723 |
-| losse beweringen (`test(...)`) | 4125 |
+| toetsbestanden | 724 |
+| losse beweringen (`test(...)`) | 4138 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 527 |
 | **overleefd**: geen mutatie kreeg hem rood | 12 |
 | niet te meten (al rood, geen module gevonden, ...) | 16 |
-| alleen in de kop *genoemd*, nog niet gemeten | 24 |
+| alleen in de kop *genoemd*, nog niet gemeten | 25 |
 | niets van beide | 144 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-636 bestanden, 3969 beweringen.
+637 bestanden, 3982 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -316,6 +316,7 @@ toets omvalt.
 | `mailpost.test.js` | 11 | gezakt op `liegpoort /api/` | De MAILINFRASTRUCTUUR: de verzendwachtrij en de buitenpoort. Vier beweringen, en ze gaan alle vier over wat er gebeurt als het MISGAAT -- want dat is waar een mailsysteem zich onderscheidt van een verzendknop: 1. |
 | `mall-context.test.js` | 10 | gezakt op `liegpoort /api/` | De laatste twee van de lijst: TIJD ALS CONTEXT en de ZAKELIJKE PRIJS. Waar EN wanneer: een zaak die pas na jouw vertrek weer plek heeft, hoort niet als beschikbaar te gelden. |
 | `mall-extern.test.js` | 13 | gezakt op `liegpoort /api/` | De twee gaten die met naam openstonden na de Supplier OS-koppeling: 1. DE KLOK. |
+| `mall-kaart.test.js` | 13 | genoemd | De kaartlaag, het landfilter en de gedeelde waardering van de RTG Mall. Drie dingen die makkelijk mooi lijken en stiekem liegen, en waar deze toetsen daarom op mikken: 1. |
 | `mall-lijsten.test.js` | 12 | gezakt op `liegpoort /api/` | Bewaren, een reis bouwen, en de vraagkant van de Mall. Twee dingen die als aparte functies waren bedacht en er een zijn (een verlanglijst en "voeg toe aan mijn reis"), plus de aanvraagmarkt: wat niemand aanbiedt, kun... |
 | `mall-supplieros.test.js` | 9 | gezakt op `liegpoort /api/` | De Supplier OS-koppeling: wat de ondernemer in zijn eigen systeem verandert, verandert in de Mall mee. Geen tweede administratie, en geen stand die de Mall zelf verzint. |
 | `mall-vindlaag.test.js` | 17 | gezakt op `liegpoort /api/` | De vindlaag van de RTG Mall: het universele aanbod-object, het locatiemodel met servicegebied, en de zoek-/ontdeklaag daarboven. De Mall is hiermee niet langer een winkel met spullen maar de commerciele voorkant van... |

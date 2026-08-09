@@ -40,6 +40,27 @@ module.exports = (ctx) => {
      type is een fout in de bron en wordt geweigerd -- niet stil overgeslagen:
      de weigeringen komen als `geweigerd` mee terug (LAT-regel 5). */
   const geweigerd = [];
+
+  /* Het cijfer van een zaak en haar bezorgschakelaar, uit de modules die er al
+     over gaan. Beide zijn per zoekopdracht duizenden keren nodig, vandaar de
+     cache -- die leeft alleen binnen een aanroep van alles(). */
+  const cacheWaardering = new Map(), cacheBezorg = new Map();
+  const zaakMet = (code) => (db.data.suppliers || []).find(s => s.code === code) || null;
+  function waarderingVan(code) {
+    if (!code) return null;
+    if (!cacheWaardering.has(code)) {
+      cacheWaardering.set(code, require('../ervaring/rating').ratingVanZaak(db, code));
+    }
+    return cacheWaardering.get(code);
+  }
+  function bezorgtVan(code) {
+    if (!code) return false;
+    if (!cacheBezorg.has(code)) {
+      cacheBezorg.set(code, require('../leverancier/bezorgregel').bezorgtNu(db, zaakMet(code)));
+    }
+    return cacheBezorg.get(code);
+  }
+
   function aanbod(o) {
     const type = TYPEN[o.type] ? o.type : null;
     const id = tekst(o.id, 80);
@@ -63,6 +84,14 @@ module.exports = (ctx) => {
       /* `open` is de stand uit de Supplier OS: true, false of null. Null is met
          opzet geen "open" -- zie de kop van ./stand.js. */
       open: o.open || null,
+      /* Waardering en bezorging worden HIER afgeleid uit de code van de
+         aanbieder en niet door elke bron apart meegegeven: zo kan geen enkele
+         bron ze vergeten, en komt er nooit een tweede som naast die van
+         kern/ervaring/rating.js te staan. Een bron met een eigen bron van
+         waarheid (RTG Thuis heeft reviews per huis, niet per zaak) mag hem
+         meegeven en wint dan. */
+      waardering: o.waardering || waarderingVan(o.aanbieder.code),
+      bezorgt: o.bezorgt != null ? !!o.bezorgt : bezorgtVan(o.aanbieder.code),
       beschikbaar: o.beschikbaar || null,
       cta: o.cta || TYPEN[type].cta,
       pagina: o.pagina,
@@ -106,6 +135,7 @@ module.exports = (ctx) => {
      verdwijnen: de fout komt als `stuk` mee terug en de Mall toont hem. */
   function alles() {
     geweigerd.length = 0;
+    cacheWaardering.clear(); cacheBezorg.clear();
     const out = [], stuk = [];
     for (const [naam, fn] of BRONNEN) {
       try { out.push(...fn()); }

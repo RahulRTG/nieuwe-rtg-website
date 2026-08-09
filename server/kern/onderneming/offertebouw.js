@@ -79,16 +79,22 @@ function offerteBouw(zaak, regelsIn, scho) {
       if (!(stuk > 0)) {
         return { status: 409, error: 'De dienst "' + String(d.name).slice(0, 40) + '" heeft geen prijs. Zet die eerst in uw aanbod.' };
       }
+      /* Het tarief van de dienst als hij er een draagt, anders dat van de zaak.
+         `tariefVan` komt uit kern/regelsom.js en wordt hier NIET nagebouwd: een
+         eigen kopie van die regel liet `null` en `''` als 0% door, en dan staat
+         er een offerte zonder btw met een totaal dat er normaal uitziet. */
+      const eigenBtw = REGELSOM.tariefVan(d.btw);
       uit.push({ omschrijving: schoon(r.omschrijving, 120) || String(d.name || 'Dienst'),
-        aantal, stuk, btw: Number.isFinite(Number(d.btw)) ? Number(d.btw) : btwStd,
+        aantal, stuk, btw: eigenBtw !== null ? eigenBtw : btwStd,
         bron: 'dienst', dienstId });
     } else {
       const stuk = Math.round((Number((r || {}).stuk) || 0) * 100) / 100;
       if (!(stuk > 0)) return { status: 400, error: 'Elke losse regel heeft een prijs boven nul nodig.' };
       const oms = schoon((r || {}).omschrijving, 120);
       if (!oms) return { status: 400, error: 'Elke losse regel heeft een omschrijving nodig; anders leest de klant een bedrag zonder reden.' };
+      const losBtw = REGELSOM.tariefVan((r || {}).btw);
       uit.push({ omschrijving: oms, aantal, stuk,
-        btw: Number.isFinite(Number(r.btw)) ? Number(r.btw) : btwStd, bron: 'los' });
+        btw: losBtw !== null ? losBtw : btwStd, bron: 'los' });
     }
   }
 

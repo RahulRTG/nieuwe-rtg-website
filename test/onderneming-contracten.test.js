@@ -17,6 +17,14 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
+/* Koppelen vraagt sinds deze ronde BEWIJS dat de zaak van de aanvrager is: in
+   de route komt dat uit de sessie (een actieve beheerplek in het
+   personeelsregister), of uit de eigen aanvraag waar RTG de zaak uit maakte.
+   Een toets heeft geen sessie, dus zegt hij het hier met zoveel woorden: in
+   deze opzet IS de zaak van dit lid. Zonder deze regel zou een toets stil
+   uitgaan van een recht dat de code niet meer geeft. */
+const MIJN_ZAAK = () => true;
+
 const maakOnderneming = require('../server/kern/onderneming');
 const CON = require('../server/kern/onderneming/contracten');
 const KLOK = require('../server/bedrijf/contractklok');
@@ -61,7 +69,7 @@ function stubKern(contracten, werkruimteCode) {
 
 function ond(K, koppel) {
   const o = K.ondernemingVind(K.ondernemingNieuw('LID1', { naam: 'Proef' }).onderneming.id);
-  K.ondernemingKoppel(o, 'GLAS');
+  K.ondernemingKoppel(o, 'GLAS', MIJN_ZAAK);
   if (koppel) K.ondernemingWerkruimte(o, koppel);
   return o;
 }

@@ -13,7 +13,7 @@
    ingelogde eigenaar zijn. Dat is een eigendomscontrole op het doel en niet op
    de aanvrager (lat-regel 7); een id uit het lichaam is nooit een bewijs. */
 module.exports = (kern) => {
-  const { app, auth, save, ONDERNEMING_RECHTSVORMEN, ondernemingRechtsvormenVanLand,
+  const { accounts, app, auth, save, ONDERNEMING_RECHTSVORMEN, ondernemingRechtsvormenVanLand,
     ondernemingRechtsvormLanden, ondernemingVind, ondernemingVanEigenaar,
     ondernemingBeeld, ondernemingNieuw, ondernemingRechtsvorm, ondernemingKoppel,
     ondernemingIngeschreven, ondernemingIntakeZet, ondernemingIntakeBeeld,
@@ -84,11 +84,24 @@ module.exports = (kern) => {
   });
 
   /* De koppeling aan de bestaande zaak: hier verdwijnt de naad tussen
-     "aanmelding" en "supplier". */
+     "aanmelding" en "supplier".
+
+     HET BEWIJS KOMT UIT DE SESSIE EN NIET UIT HET LICHAAM. De kern weet WELK
+     bewijs nodig is (zie kern/onderneming/levensloop.js); deze route weet WIE
+     er klopt. Een lid dat als actieve beheerder in het personeelsregister van
+     die zaak staat, mag koppelen -- verder niemand. Zonder identiteitskluis
+     (in een toets) is er geen bewijs, en dan wint de aanvraagweg of niets. */
+  const beheertZaak = (req) => (code) => {
+    const acc = req.session && req.session.account;
+    if (!acc || acc.id == null || !accounts || !accounts.staffByMember) return false;
+    const rij = accounts.staffByMember(code, acc.id);
+    return !!(rij && rij.role === 'manager');
+  };
+
   app.post('/api/onderneming/koppel', auth, (req, res) => {
     const o = mijn(req);
     if (!o) return stuur(res, nietGevonden);
-    stuur(res, ondernemingKoppel(o, (req.body || {}).code));
+    stuur(res, ondernemingKoppel(o, (req.body || {}).code, beheertZaak(req)));
   });
 
   app.post('/api/onderneming/ingeschreven', auth, (req, res) => {

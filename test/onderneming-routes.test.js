@@ -165,6 +165,49 @@ test('de deuren van het Ondernemers-OS: dicht, van u alleen, en heel', async () 
   }
 });
 
+/* DE ERNSTIGSTE VAN DEZE RONDE. Koppelen vroeg nergens om bewijs dat de zaak
+   van de aanvrager was: er werd alleen gekeken of hij bestaat en nog vrij is.
+   Elk ingelogd lid kan codes opvragen (POST /api/suppliers geeft ze), dus wie
+   een vrije code vond, koppelde hem aan zijn eigen onderneming en las daarna
+   via precies dezelfde eigendomscontrole het klantenboek, de debiteuren, de
+   kas, de belasting en het dagbeeld van een ander bedrijf -- en schreef via
+   /relaties/notitie zelfs in diens klantenboek. */
+test('een vreemde zaak is niet te koppelen, en dus ook niet uit te lezen', async () => {
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-ond-koppel-'));
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  try {
+    const A = await lid(base, 7);
+
+    /* Precies de weg van een aanvaller: de codes zijn gewoon op te vragen. */
+    const zaken = await post(base, '/api/suppliers', {}, A);
+    const lijst = zaken.body.suppliers || zaken.body.partners || [];
+    const code = (lijst.find(z => z && z.code) || {}).code;
+    assert.ok(code, 'een ingelogd lid kan zaakcodes opvragen: ' +
+      JSON.stringify(zaken.body).slice(0, 160));
+
+    const nieuw = await post(base, '/api/onderneming/nieuw', { naam: 'Stiekem' }, A);
+    const id = nieuw.body.onderneming.id;
+
+    const koppel = await post(base, '/api/onderneming/koppel', { id, code }, A);
+    assert.equal(koppel.status, 403,
+      'koppelen aan een zaak die niet van u is, hoort geweigerd te worden (gaf ' +
+      koppel.status + ' ' + JSON.stringify(koppel.body).slice(0, 160) + ')');
+    assert.ok(/niet van u/i.test(koppel.body.error || ''));
+
+    /* En de gevolgschade blijft dus uit: het dagbeeld van die zaak is niet te
+       lezen en er is niets in haar klantenboek te schrijven. */
+    const beeld = await post(base, '/api/onderneming/beeld', { id }, A);
+    assert.equal(beeld.body.onderneming.zaak, null, 'er hangt geen zaak aan');
+    const notitie = await post(base, '/api/onderneming/relaties/notitie',
+      { id, codenaam: 'Reiger', tekst: 'x' }, A);
+    assert.equal(notitie.status, 409, 'en schrijven kan al helemaal niet: ' +
+      JSON.stringify(notitie.body).slice(0, 120));
+  } finally {
+    try { child.kill('SIGKILL'); } catch (e) { /* al weg */ }
+    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) { /* niets */ }
+  }
+});
+
 /* De kantoordeuren van de rechtsvormwacht en de ondernemersregie. Apart, want
    ze horen achter de KANTOORPOORT en niet achter een lidsessie -- en dat is
    precies wat hier wordt nagetrokken. */

@@ -14,6 +14,14 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
+/* Koppelen vraagt sinds deze ronde BEWIJS dat de zaak van de aanvrager is: in
+   de route komt dat uit de sessie (een actieve beheerplek in het
+   personeelsregister), of uit de eigen aanvraag waar RTG de zaak uit maakte.
+   Een toets heeft geen sessie, dus zegt hij het hier met zoveel woorden: in
+   deze opzet IS de zaak van dit lid. Zonder deze regel zou een toets stil
+   uitgaan van een recht dat de code niet meer geeft. */
+const MIJN_ZAAK = () => true;
+
 const maakOnderneming = require('../server/kern/onderneming');
 const METER = require('../server/kern/onderneming/meter');
 
@@ -162,7 +170,7 @@ test('een draaiende zaak levert wél cijfers en wél een gezondheidsscore', () =
   ] };
   const K = stubKern([zaak]);
   const o = maakOnd(K, GEZOND);
-  K.ondernemingKoppel(o, 'GLAS');
+  K.ondernemingKoppel(o, 'GLAS', MIJN_ZAAK);
   const d = K.ondernemingDagbeeld(o);
 
   const omzet = d.cijfers.find(c => c.id === 'omzet');
@@ -185,7 +193,7 @@ test('zonder betaalde omzet deze maand blijft die bron onmeetbaar, en zakt de sc
   ] };
   const K = stubKern([zaak]);
   const o = maakOnd(K, GEZOND);
-  K.ondernemingKoppel(o, 'GLAS');
+  K.ondernemingKoppel(o, 'GLAS', MIJN_ZAAK);
   const g = K.ondernemingDagbeeld(o).gezondheid;
   const omzetBron = g.grondslag.ontbreekt.find(b => b.id === 'omzet');
   assert.ok(omzetBron, 'oude omzet telt niet als omzet van deze maand');

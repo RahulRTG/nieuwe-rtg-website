@@ -64,11 +64,14 @@ module.exports = ({ save }) => {
     const nuT = Number.isFinite(nuMs) ? nuMs : Date.now();
     const venster = Number.isFinite(dagen) && dagen > 0 && dagen <= 365 ? Math.round(dagen) : 30;
 
-    const inkomend = binnen(deb.posten, venster, false);
-    const uitgaand = binnen(cred.posten, venster, true);
+    /* `alle` en niet `posten`: dat tweede is de schermlijst van vijftig. Zie de
+       kop van ./debiteuren.js -- hier telde de vooruitblik over een afgekapte
+       lijst, en de posten die er nog netjes bij liepen vielen er als eerste af. */
+    const inkomend = binnen(deb.alle || deb.posten, venster, false);
+    const uitgaand = binnen(cred.alle || cred.posten, venster, true);
     /* Wat te laat is en dus onzeker. Apart getoond en niet meegeteld: het is
        geen nul (het bestaat) en geen inkomen (het had er al moeten zijn). */
-    const teLaat = (deb.posten || []).filter(p => p.dagenOver > 0);
+    const teLaat = (deb.alle || deb.posten || []).filter(p => p.dagenOver > 0);
 
     const binnenkomt = som(inkomend);
     const eruit = som(uitgaand);

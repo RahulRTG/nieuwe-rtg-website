@@ -11,7 +11,7 @@
 
 const RV = require('./rechtsvorm');
 
-module.exports = ({ bak, vanZaak, findSupplier, crypto, scho, save, nu, ondernemingBeeld, ondernemingNaam }) => {
+module.exports = ({ bak, vanZaak, findSupplier, crypto, scho, save, nu, ondernemingBeeld, ondernemingNaam, aanmeldingen }) => {
 
   /* ---- aanmaken: de onderneming bestaat vanaf "misschien" ----
      Rechtsvorm mag leeg blijven. "Ik weet nog niet wat ik word" is een echte
@@ -44,17 +44,55 @@ module.exports = ({ bak, vanZaak, findSupplier, crypto, scho, save, nu, ondernem
     return { ok: true, onderneming: ondernemingBeeld(o) };
   }
 
+  /* De zaak die RTG uit de eigen aanvraag van deze onderneming heeft gemaakt,
+     of null. Gelezen uit de aanmeldingslaag en niet hier bijgehouden: die laag
+     is de waarheid over wat er uit een aanvraag is voortgekomen. */
+  function zaakVanAanvraag(o) {
+    if (!o.aanmeldingId || !aanmeldingen || !aanmeldingen.een) return null;
+    const r = aanmeldingen.een(o.aanmeldingId);
+    const a = r && r.ok ? r.aanmelding : null;
+    return (a && a.gezaakt && a.gezaakt.code) || null;
+  }
+
   /* ---- de naad dicht: de onderneming wijst de bestaande zaak aan ----
      Idempotent voor dezelfde zaak. Een zaak hoort bij precies één onderneming;
      twee ondernemingen op dezelfde zaak zou de tweede waarheid terugzetten die
-     deze module juist opruimt. */
-  function ondernemingKoppel(o, code) {
+     deze module juist opruimt.
+
+     KOPPELEN VRAAGT BEWIJS DAT DE ZAAK VAN U IS. Dat stond hier eerst NIET, en
+     dat was een gat waar het hele OS doorheen lekte: er werd alleen gekeken of
+     de zaak bestaat en nog vrij is. Elk ingelogd lid kan codes opvragen
+     (POST /api/suppliers geeft ze), dus wie een vrije code vond, koppelde hem
+     aan zijn eigen onderneming en las daarna via precies dezelfde
+     eigendomscontrole het klantenboek, de debiteuren, de kas, de belasting en
+     het dagbeeld van die zaak -- en schreef via /relaties/notitie zelfs in het
+     klantenboek van een ander.
+
+     Er zijn precies TWEE bewijzen, en allebei bestonden ze al:
+
+       1. DE EIGEN AANVRAAG. RTG heeft deze zaak gemaakt uit de aanmelding die
+          bij deze onderneming hoort (a.gezaakt.code). Dat is de normale weg.
+       2. EEN BEHEERPLEK OP DIE ZAAK. De aanvrager staat als actieve manager in
+          het personeelsregister van die zaak. Dat is de weg voor een zaak die
+          al bestond voordat de onderneming werd aangemaakt.
+
+     Geen bewijs betekent 403 en niet 404: hier verklapt een eerlijke weigering
+     niets: dat de zaak bestaat, wist de aanvrager al -- hij typte de code. */
+  function ondernemingKoppel(o, code, bewijs) {
     const s = findSupplier(code);
     if (!s) return { status: 404, error: 'Deze zaak bestaat niet.' };
     if (o.supplierCode === s.code) return { ok: true, onderneming: ondernemingBeeld(o) };
     if (o.supplierCode) return { status: 409, error: 'Deze onderneming is al aan een zaak gekoppeld.' };
     const bezet = vanZaak(s.code);
     if (bezet) return { status: 409, error: 'Deze zaak hoort al bij een andere onderneming.' };
+
+    const uitAanvraag = zaakVanAanvraag(o) === s.code;
+    const alsBeheerder = typeof bewijs === 'function' ? bewijs(s.code) === true : false;
+    if (!uitAanvraag && !alsBeheerder) {
+      return { status: 403,
+        error: 'Deze zaak is niet van u.',
+        uitleg: 'Koppelen kan met een zaak die RTG uit uw eigen aanvraag heeft gemaakt, of met een zaak waar u als beheerder in het personeelsregister staat. Anders zou iedereen die een code kent de boekhouding van een ander kunnen openen.' };
+    }
     o.supplierCode = s.code;
     /* De lokale naam gaat WEG en wordt niet gekopieerd: vanaf nu is de zaak
        de waarheid over hoe dit bedrijf heet. Zie de kop. */

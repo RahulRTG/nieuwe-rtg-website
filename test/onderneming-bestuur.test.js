@@ -20,6 +20,14 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
+/* Koppelen vraagt sinds deze ronde BEWIJS dat de zaak van de aanvrager is: in
+   de route komt dat uit de sessie (een actieve beheerplek in het
+   personeelsregister), of uit de eigen aanvraag waar RTG de zaak uit maakte.
+   Een toets heeft geen sessie, dus zegt hij het hier met zoveel woorden: in
+   deze opzet IS de zaak van dit lid. Zonder deze regel zou een toets stil
+   uitgaan van een recht dat de code niet meer geeft. */
+const MIJN_ZAAK = () => true;
+
 const maakOnderneming = require('../server/kern/onderneming');
 const BST = require('../server/kern/onderneming/bestuur');
 
@@ -117,7 +125,7 @@ test('een werkvorm die aandeelhouders meebrengt, wint het niet van het verbod', 
     aanmeldingen: { aanvraag: () => ({ ok: true }), een: () => ({ status: 404 }) }
   });
   const o = K.ondernemingVind(K.ondernemingNieuw('LID1', { naam: 'Proef' }).onderneming.id);
-  K.ondernemingKoppel(o, 'STG');
+  K.ondernemingKoppel(o, 'STG', MIJN_ZAAK);
   K.ondernemingRechtsvorm(o, 'stichting');
 
   assert.ok(db.capsVan(zaak).includes('aandeelhouders'), 'de werkvorm brengt hem echt mee');

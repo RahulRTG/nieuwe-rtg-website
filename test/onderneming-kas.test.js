@@ -17,6 +17,14 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
+/* Koppelen vraagt sinds deze ronde BEWIJS dat de zaak van de aanvrager is: in
+   de route komt dat uit de sessie (een actieve beheerplek in het
+   personeelsregister), of uit de eigen aanvraag waar RTG de zaak uit maakte.
+   Een toets heeft geen sessie, dus zegt hij het hier met zoveel woorden: in
+   deze opzet IS de zaak van dit lid. Zonder deze regel zou een toets stil
+   uitgaan van een recht dat de code niet meer geeft. */
+const MIJN_ZAAK = () => true;
+
 const maakOnderneming = require('../server/kern/onderneming');
 const KAS = require('../server/kern/onderneming/kas');
 
@@ -61,7 +69,7 @@ function stubKern(facturen) {
 
 function ond(K, koppel) {
   const o = K.ondernemingVind(K.ondernemingNieuw('LID1', { naam: 'Proef' }).onderneming.id);
-  if (koppel !== false) K.ondernemingKoppel(o, 'GLAS');
+  if (koppel !== false) K.ondernemingKoppel(o, 'GLAS', MIJN_ZAAK);
   return o;
 }
 
@@ -79,6 +87,34 @@ test('inkomend min uitgaand min btw is de beweging', () => {
   assert.equal(k.uitgaand.bedrag, 1000);
   assert.equal(k.btwOpzij.bedrag, 200, 'de btw van alle facturen van dit jaar');
   assert.equal(k.beweging, 1800);
+});
+
+/* GEVONDEN DOOR EEN ADVERSARIELE KEURING VAN DEZE TAK. De vooruitblik rekende
+   over `deb.posten` en `cred.posten`, en dat is de SCHERMLIJST van vijftig --
+   gesorteerd op meest vervallen, dus wat er nog netjes bij liep viel er als
+   eerste af. Precies wat de kas als inkomend zoekt. Een zaak met meer dan
+   vijftig openstaande facturen kreeg een te lage beweging, en daar hangt een
+   waarschuwing aan waar iemand een besluit op neemt. */
+test('de vooruitblik telt over ALLE posten en niet over de schermlijst van vijftig', () => {
+  const facturen = [];
+  /* Vijftig die allang vervallen zijn: die vullen de schermlijst helemaal. */
+  for (let i = 0; i < 50; i++) {
+    facturen.push(uit({ vervaldatum: dag(-90 - i), totaal: 100 }));
+  }
+  /* En vijf die netjes binnen het venster vervallen -- het geld dat er echt
+     aankomt. Zij staan achteraan en vielen dus buiten de vijftig. */
+  for (let i = 0; i < 5; i++) {
+    facturen.push(uit({ vervaldatum: dag(5), totaal: 1000 }));
+  }
+  const K = stubKern(facturen);
+  const o = ond(K);
+  const d = K.ondernemingDebiteuren(o, NU);
+  assert.equal(d.posten.length, 50, 'de schermlijst blijft vijftig lang');
+  assert.equal(d.alle.length, 55, 'maar er is een volledige lijst om mee te rekenen');
+
+  const k = K.ondernemingKas(o, NU, 30);
+  assert.equal(k.inkomend.aantal, 5, 'alle vijf de lopende facturen tellen mee');
+  assert.equal(k.inkomend.bedrag, 5000);
 });
 
 test('wat buiten het venster valt telt niet mee', () => {

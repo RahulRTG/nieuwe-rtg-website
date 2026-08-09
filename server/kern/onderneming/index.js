@@ -71,7 +71,7 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boeki
      de naad loopt langs de vraag wie er SCHRIJFT. */
   const { ondernemingNieuw, ondernemingRechtsvorm, ondernemingKoppel, ondernemingIngeschreven } =
     require('./levensloop')({ bak, vanZaak, findSupplier, crypto, scho, save, nu,
-      ondernemingBeeld, ondernemingNaam });
+      ondernemingBeeld, ondernemingNaam, aanmeldingen });
 
   /* De overgang naar een echte zaak staat in ./aanvraag.js -- dit bestand ging
      over de 10 kB van het modulebeleid. Hij loopt langs de BESTAANDE

@@ -84,7 +84,16 @@ module.exports = ({ db }) => {
       vervallenBedrag: ing.vervallenBedrag,
       groepen: ing.groepen,
       oudste: ing.oudste,
+      /* `posten` is de SCHERMLIJST en op vijftig afgekapt; `alle` is de
+         volledige verzameling om mee te REKENEN. Dat onderscheid ontbrak, en
+         kern/onderneming/kas.js telde daardoor over de afgekapte lijst. Erger
+         nog: die lijst staat gesorteerd op meest vervallen, dus wat er nog
+         netjes bij loopt viel er als eerste af -- precies wat de kas als
+         inkomend zoekt. Een zaak met meer dan vijftig openstaande facturen
+         kreeg zo een te lage kasbeweging, en daar hangt een waarschuwing aan
+         waar iemand een besluit op neemt. */
       posten: ing.rijen.slice(0, 50),
+      alle: ing.rijen,
       zonderVervaldatum: ing.zonderVervaldatum,
       /* De vooruitblik: wat er de komende week en maand uit moet. Een optelsom
          van wat er al ligt -- zie de kop. */

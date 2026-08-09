@@ -12,6 +12,14 @@
    Draai los: node --experimental-sqlite --test test/onderneming.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
+
+/* Koppelen vraagt sinds deze ronde BEWIJS dat de zaak van de aanvrager is: in
+   de route komt dat uit de sessie (een actieve beheerplek in het
+   personeelsregister), of uit de eigen aanvraag waar RTG de zaak uit maakte.
+   Een toets heeft geen sessie, dus zegt hij het hier met zoveel woorden: in
+   deze opzet IS de zaak van dit lid. Zonder deze regel zou een toets stil
+   uitgaan van een recht dat de code niet meer geeft. */
+const MIJN_ZAAK = () => true;
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -173,7 +181,7 @@ test('koppelen dicht de naad: de naam woont daarna op precies één plek', () =>
   const o = K.ondernemingVind(K.ondernemingNieuw('LID1', { naam: 'Werktitel' }).onderneming.id);
   assert.equal(K.ondernemingNaam(o), 'Werktitel', 'zolang er geen zaak is, is de onderneming de enige naam');
 
-  const k = K.ondernemingKoppel(o, 'GLAS');
+  const k = K.ondernemingKoppel(o, 'GLAS', MIJN_ZAAK);
   assert.ok(k.ok);
   assert.equal(k.onderneming.naam, 'Jansen Glasheldere Ramen', 'na koppelen wint de zaak');
   assert.equal(o.naam, undefined, 'en de lokale naam is echt weg, niet stil blijven staan');
@@ -189,10 +197,10 @@ test('een zaak hoort bij precies één onderneming', () => {
   const K = stubKern([zaak]);
   const a = K.ondernemingVind(K.ondernemingNieuw('LID1', { naam: 'A' }).onderneming.id);
   const b = K.ondernemingVind(K.ondernemingNieuw('LID2', { naam: 'B' }).onderneming.id);
-  assert.ok(K.ondernemingKoppel(a, 'GLAS').ok);
-  assert.equal(K.ondernemingKoppel(a, 'GLAS').ok, true, 'nogmaals koppelen aan dezelfde zaak is een no-op');
-  assert.equal(K.ondernemingKoppel(b, 'GLAS').status, 409, 'maar een tweede onderneming op dezelfde zaak niet');
-  assert.equal(K.ondernemingKoppel(a, 'BESTAATNIET').status, 404);
+  assert.ok(K.ondernemingKoppel(a, 'GLAS', MIJN_ZAAK).ok);
+  assert.equal(K.ondernemingKoppel(a, 'GLAS', MIJN_ZAAK).ok, true, 'nogmaals koppelen aan dezelfde zaak is een no-op');
+  assert.equal(K.ondernemingKoppel(b, 'GLAS', MIJN_ZAAK).status, 409, 'maar een tweede onderneming op dezelfde zaak niet');
+  assert.equal(K.ondernemingKoppel(a, 'BESTAATNIET', MIJN_ZAAK).status, 404);
 });
 
 test('de drie assen komen samen in één capslijst, met het verbod erover', () => {
@@ -200,7 +208,7 @@ test('de drie assen komen samen in één capslijst, met het verbod erover', () =
     fleet: [{ id: 'A' }] }; // een busje: de vervoers-werkvorm komt erbij
   const K = stubKern([zaak]);
   const o = K.ondernemingVind(K.ondernemingNieuw('LID1', { naam: 'A' }).onderneming.id);
-  K.ondernemingKoppel(o, 'GLAS');
+  K.ondernemingKoppel(o, 'GLAS', MIJN_ZAAK);
   K.ondernemingRechtsvorm(o, 'bv');
   const beeld = K.ondernemingBeeld(o);
   assert.ok(beeld.caps.includes('rides'), 'de werkvorm-as levert de rittools (er staat een busje)');
@@ -220,7 +228,7 @@ test('de fase van een echte onderneming telt klanten op codenaam', () => {
   const zaak = { code: 'GLAS', name: 'Glas', type: 'zzp', staff: [{ id: 1 }], boekingen: [] };
   const K = stubKern([zaak]);
   const o = K.ondernemingVind(K.ondernemingNieuw('LID1', { naam: 'A' }).onderneming.id);
-  K.ondernemingKoppel(o, 'GLAS');
+  K.ondernemingKoppel(o, 'GLAS', MIJN_ZAAK);
   K.ondernemingIngeschreven(o, '12345678');
   assert.equal(K.ondernemingBeeld(o).fase, 'oprichting');
 
@@ -241,7 +249,7 @@ test('de eigenaar telt niet als personeel', () => {
   const zaak = { code: 'GLAS', name: 'Glas', type: 'zzp', staff: [{ id: 1 }] };
   const K = stubKern([zaak]);
   const o = K.ondernemingVind(K.ondernemingNieuw('LID1', { naam: 'A' }).onderneming.id);
-  K.ondernemingKoppel(o, 'GLAS');
+  K.ondernemingKoppel(o, 'GLAS', MIJN_ZAAK);
   assert.equal(K.ondernemingFeiten(o).personeel, 0, 'in zijn eentje is hij geen werkgever');
   zaak.staff.push({ id: 2 });
   assert.equal(K.ondernemingFeiten(o).personeel, 1, 'de eerste medewerker naast de eigenaar telt');

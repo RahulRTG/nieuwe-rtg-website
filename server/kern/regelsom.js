@@ -21,6 +21,28 @@
 
 const rond = (n) => Math.round((Number(n) || 0) * 100) / 100;
 
+/* HET HOOGSTE BTW-TARIEF DAT WIJ ACCEPTEREN. Honderd procent is al absurd, maar
+   het is de grens waarboven de terugrekening geen betekenis meer heeft. De
+   ondergrens is nul: een negatief tarief bestaat niet, en precies -100 liet de
+   deling hieronder door nul gaan -- dan werd het subtotaal Infinity, ging dat
+   als `null` de opslag in, en telde de btw-aangifte van die zaak vanaf dat
+   moment een gat mee. Het totaal bleef intussen gewoon kloppen, dus er viel
+   niets op. */
+const MAX_BTW = 100;
+
+/* Het tarief van een regel, of null als er geen bruikbaar tarief is opgegeven.
+   `null` en `''` tellen als NIET opgegeven en niet als nul procent: dat is
+   precies wat een leeg formulierveld over JSON stuurt, en `Number(null)` is 0
+   en eindig -- daar liep de oude controle op stuk. De factuurmotor deed het
+   voor het zaaksbrede tarief al goed (`data.btw != null`); per regel bleef die
+   bedoeling liggen. */
+function tariefVan(waarde) {
+  if (waarde === null || waarde === undefined || waarde === '') return null;
+  const n = Number(waarde);
+  if (!Number.isFinite(n) || n < 0 || n > MAX_BTW) return null;
+  return n;
+}
+
 /* `scho` mag mee omdat de aanroepers hun eigen schoonmaakregels hebben; zonder
    valt hij terug op knippen en trimmen. */
 function verwerkRegels(regels, btwStandaard, scho) {
@@ -29,7 +51,12 @@ function verwerkRegels(regels, btwStandaard, scho) {
   const uit = (Array.isArray(regels) ? regels : []).slice(0, 60).map(r => {
     const aantal = Math.max(1, Number(r.aantal) || 1);
     const stuk = rond(r.stuk);
-    const btw = Number.isFinite(Number(r.btw)) ? Number(r.btw) : btwStandaard;
+    const eigen = tariefVan(r.btw);
+    const standaard = tariefVan(btwStandaard);
+    /* Valt allebei weg, dan 0%: dat is het enige tarief dat wij zonder
+       aanname kunnen toepassen, en het staat als tarief in de regel zodat het
+       zichtbaar is in plaats van verstopt. */
+    const btw = eigen !== null ? eigen : (standaard !== null ? standaard : 0);
     const regelIncl = rond(aantal * stuk);
     const regelExcl = rond(regelIncl / (1 + btw / 100));
     subtotaal += regelExcl; btwBedrag += rond(regelIncl - regelExcl); totaal += regelIncl;
@@ -38,4 +65,4 @@ function verwerkRegels(regels, btwStandaard, scho) {
   return { regels: uit, subtotaal: rond(subtotaal), btwBedrag: rond(btwBedrag), totaal: rond(totaal) };
 }
 
-module.exports = { verwerkRegels, rond };
+module.exports = { verwerkRegels, rond, tariefVan, MAX_BTW };

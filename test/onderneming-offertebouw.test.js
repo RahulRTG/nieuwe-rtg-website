@@ -116,6 +116,41 @@ test('twee tarieven in een offerte blijven twee tarieven', () => {
   assert.equal(uit.totaal, 230);
 });
 
+/* DRIE RANDGEVALLEN DIE HIER ECHT ZIJN MISGEGAAN. Een adversariële keuring van
+   deze tak vond ze; de toetsen hierboven liepen er allemaal langs. */
+test('een onmogelijk btw-tarief kan de som niet slopen', () => {
+  /* -100 liet `regelIncl / (1 + btw/100)` door nul delen. Het subtotaal werd
+     Infinity, ging als `null` de opslag in en de btw-aangifte van die zaak
+     telde vanaf dat moment een gat mee -- terwijl het TOTAAL gewoon bleef
+     kloppen, dus er viel niets op. */
+  const stuk = OB.offerteBouw(zaak(), [{ omschrijving: 'Post', stuk: 100, btw: -100 }]);
+  assert.equal(stuk.ok, true);
+  assert.ok(Number.isFinite(stuk.subtotaal) && Number.isFinite(stuk.btwBedrag),
+    'geen Infinity in de opbouw: ' + JSON.stringify(stuk).slice(0, 160));
+  assert.equal(stuk.regels[0].btw, 21, 'een onmogelijk tarief valt terug op het standaardtarief');
+  assert.equal(Math.round((stuk.subtotaal + stuk.btwBedrag) * 100) / 100, stuk.totaal);
+
+  const hoog = OB.offerteBouw(zaak(), [{ omschrijving: 'Post', stuk: 100, btw: 500 }]);
+  assert.equal(hoog.regels[0].btw, 21, 'en een tarief boven de honderd procent ook');
+});
+
+test('een leeg btw-veld is niet hetzelfde als nul procent', () => {
+  /* Dit is precies wat een leeg formulierveld over JSON stuurt. `Number(null)`
+     is 0 en eindig, dus de oude controle liet het door als 0% -- een offerte en
+     straks een factuur zonder btw, terwijl het totaal er normaal uitzag. */
+  const leeg = OB.offerteBouw(zaak(), [{ omschrijving: 'Post', stuk: 121, btw: null }]);
+  const leger = OB.offerteBouw(zaak(), [{ omschrijving: 'Post', stuk: 121, btw: '' }]);
+  const zonder = OB.offerteBouw(zaak(), [{ omschrijving: 'Post', stuk: 121 }]);
+  for (const [naam, u] of [['null', leeg], ["''", leger], ['ontbrekend', zonder]]) {
+    assert.equal(u.regels[0].btw, 21, 'btw ' + naam + ' hoort het standaardtarief te krijgen');
+    assert.equal(u.btwBedrag, 21, 'btw ' + naam);
+  }
+  /* En nul procent MAG nog steeds, als iemand het echt opgeeft. */
+  const echt = OB.offerteBouw(zaak(), [{ omschrijving: 'Post', stuk: 121, btw: 0 }]);
+  assert.equal(echt.regels[0].btw, 0);
+  assert.equal(echt.btwBedrag, 0);
+});
+
 test('de bouwer rekent met dezelfde som als de factuurmotor', () => {
   const regels = [{ omschrijving: 'A', aantal: 3, stuk: 33.33, btw: 21 },
     { omschrijving: 'B', aantal: 1, stuk: 19.99, btw: 9 }];

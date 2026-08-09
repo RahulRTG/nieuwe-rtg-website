@@ -24,9 +24,14 @@
    resultaat. De veger meldt zich in het logboek maar vraagt niemand om
    bevestiging: dit zijn de regels die de eigenaar al bevestigd HEEFT. */
 const DAG = 86400000;
+/* De standaardtermijnen, gedeeld en niet overgeschreven. Het papierwerk toont
+   bij de bewaartermijn-vragen wat het systeem VANDAAG doet; die tekst hoort uit
+   deze getallen te komen en niet uit een tweede versie ervan, want dan gaat het
+   register liegen zodra hier iets verandert (LAT-regel 4). */
+const STANDAARD = { locatieDagen: 7, idDagen: 365 };
 
 function maakBewaarveger({ db, save, accounts, identiteitsmap, lidmaatschapTot, log, nu, instel }) {
-  const I = Object.assign({ locatieDagen: 7, idDagen: 365 }, instel || {});
+  const I = Object.assign({}, STANDAARD, instel || {});
   const klok = nu || (() => Date.now());
   const lidTot = lidmaatschapTot || (() => 0);
 
@@ -108,4 +113,4 @@ function maakBewaarveger({ db, save, accounts, identiteitsmap, lidmaatschapTot, 
   return { veeg, start, instel: I };
 }
 
-module.exports = { maakBewaarveger };
+module.exports = { maakBewaarveger, STANDAARD };

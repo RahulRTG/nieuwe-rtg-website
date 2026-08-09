@@ -127,6 +127,10 @@ function volgende() {
   return {
     id: v.id, groep: v.groep, soort: v.soort,
     vraag: v.vraag, waarom: v.waarom,
+    /* Wat het systeem VANDAAG doet, uit de code. Geen antwoord -- invullen doet
+       de mens (zie de kop van ./vragen.js) -- maar wel het feit dat je nodig
+       hebt om te kunnen antwoorden, op het moment dat de vraag valt. */
+    huidig: v.huidig || null,
     voorbeeld: v.voorbeeld || null,
     jaVraag: v.jaVraag || null, neeVraag: v.neeVraag || null,
     eerderGeparkeerd: !!(eerder && eerder.parkeer),

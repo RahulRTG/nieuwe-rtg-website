@@ -28,9 +28,9 @@
           '</div>';
 
         u += '<div class="kaart"><h3>Een pad toelaten</h3><div class="crij">' +
-          '<input class="veld" id="apPad" placeholder="/api/extern/..." style="width:16rem;">' +
-          '<input class="veld" id="apVer" value="v1" style="width:5rem;" aria-label="versie">' +
-          '<input class="veld" id="apUit2" placeholder="uitfasering (ISO-datum, optioneel)" style="width:14rem;">' +
+          '<input class="veld breed" id="apPad" placeholder="/api/extern/...">' +
+          '<input class="veld kort" id="apVer" value="v1" aria-label="versie">' +
+          '<input class="veld mid" id="apUit2" placeholder="uitfasering (ISO-datum, optioneel)">' +
           '<button class="knop vol" id="apGa">Toelaten</button></div></div>';
 
         if (d.toelating.length) {
@@ -44,9 +44,9 @@
         }
 
         u += '<div class="kaart"><h3>Een sleutel maken</h3><div class="crij">' +
-          '<input class="veld" id="apN" placeholder="naam van de koppeling" style="width:14rem;">' +
-          '<input class="veld" id="apS" placeholder="scope-pad" style="width:14rem;">' +
-          '<input class="veld" id="apQ" value="1000" style="width:6rem;" aria-label="quotum per uur">' +
+          '<input class="veld mid" id="apN" placeholder="naam van de koppeling">' +
+          '<input class="veld mid" id="apS" placeholder="scope-pad">' +
+          '<input class="veld kort" id="apQ" value="1000" aria-label="quotum per uur">' +
           '<button class="knop vol" id="apMaak">Maken</button></div>' +
           '<p class="meta">Een scope buiten de toelating wordt geweigerd en niet stil ingeperkt.</p>' +
           '<div id="apGeheim"></div></div>';
@@ -74,7 +74,7 @@
             scopes: [{ pad: document.querySelector('#apS').value }],
             quotaPerUur: Number(document.querySelector('#apQ').value || 1000) })
             .then(function (r) {
-              document.querySelector('#apGeheim').innerHTML = '<p class="meta" style="margin-top:.6rem;">' +
+              document.querySelector('#apGeheim').innerHTML = '<p class="meta" class="mt">' +
                 '<b>' + esc(r.geheim) + '</b><br>' + esc(r.let) + '</p>';
             }).catch(function (e) { if (!e.stil) C.meld(e.message); });
         };
@@ -112,7 +112,7 @@
                 (o.ligt ? 'ok' : 'mis') + '">' + (o.ligt ? 'ligt er' : 'ontbreekt') + '</span>' +
                 '<div class="meta">' + esc(o.uitleg) + ' <i>(' + esc(o.bron) + ')</i></div></div>';
             }).join('') +
-            '<div class="crij" style="margin-top:.7rem;">' +
+            '<div class="crij" class="mt">' +
             '<button class="knop vol" data-laaan="' + esc(d.land) + '">Activeren</button>' +
             '<button class="knop" data-lauit="' + esc(d.land) + '">Terugdraaien</button>' +
             '<button class="knop" data-lakijk="">Terug naar de lijst</button></div></div>' +

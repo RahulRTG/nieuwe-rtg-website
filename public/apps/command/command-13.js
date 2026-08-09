@@ -54,7 +54,7 @@
             var sl = b.getAttribute('data-goud');
             api('mdm/gouden', { sleutel: sl }).then(function (r) {
               document.querySelector('#mg-' + sl.replace(/[^a-z0-9]/g, '')).innerHTML =
-                '<p class="meta" style="margin-top:.6rem;">' + esc(r.uitleg) + '</p>' +
+                '<p class="meta" class="mt">' + esc(r.uitleg) + '</p>' +
                 '<div class="schuif"><table class="ctab"><thead><tr><th>Veld</th><th>Wint</th><th>Van</th><th>Alternatieven</th></tr></thead><tbody>' +
                 Object.keys(r.velden).slice(0, 20).map(function (k) {
                   var v = r.velden[k];

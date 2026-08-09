@@ -28,8 +28,8 @@
           '</div>';
 
         u += '<div class="kaart"><h3>Nieuwe uitrol</h3>' +
-          '<div class="crij"><input class="veld" id="caId" placeholder="functie-id (bv. command-zien)" style="width:16rem;">' +
-          '<input class="veld" id="caDeel" value="0.1" style="width:5rem;" aria-label="deel">' +
+          '<div class="crij"><input class="veld breed" id="caId" placeholder="functie-id (bv. command-zien)">' +
+          '<input class="veld kort" id="caDeel" value="0.1" aria-label="deel">' +
           '<button class="knop vol" id="caGa">Starten</button></div>' +
           '<p class="meta">Een canary verdeelt een OPEN functie over de mensen; hij opent geen dichte. ' +
           'Standaard: ' + Math.round(d.standaard.drempel * 1000) / 10 + '% serverfouten is de drempel, ' +
@@ -95,8 +95,8 @@
       api('zandbak').then(function (d) {
         var u = '<div class="kaart"><h3>Wat een zandbak niet is</h3><p>' + esc(d.let) + '</p></div>';
         u += '<div class="kaart"><h3>Nieuwe zandbak</h3><div class="crij">' +
-          '<input class="veld" id="zaN" placeholder="naam" style="width:12rem;">' +
-          '<input class="veld" id="zaW" placeholder="waarvoor (optioneel)" style="width:18rem;">' +
+          '<input class="veld mid" id="zaN" placeholder="naam">' +
+          '<input class="veld breed" id="zaW" placeholder="waarvoor (optioneel)">' +
           '<button class="knop vol" id="zaGa">Maken</button></div>' +
           '<p class="meta">' + d.zandbakken.length + ' van maximaal ' + d.max + '; standaard ' +
           d.standaardDagen + ' dagen houdbaar. ' + esc(d.uitleg) + '</p></div>';
@@ -107,7 +107,7 @@
             '<p class="meta">Gemaakt ' + esc(z.gemaakt) + ' door ' + esc(z.door) + ', vervalt ' + esc(z.vervalt) + '.' +
             (z.waarvoor ? ' ' + esc(z.waarvoor) : '') + '</p>' +
             (z.let ? '<p class="meta">' + esc(z.let) + '</p>' : '') +
-            '<div class="crij"><input class="veld" data-zoek="' + esc(z.naam) + '" placeholder="zoek in deze zandbak" style="width:14rem;">' +
+            '<div class="crij"><input class="veld mid" data-zoek="' + esc(z.naam) + '" placeholder="zoek in deze zandbak">' +
             '<button class="knop" data-zzoek="' + esc(z.naam) + '">Zoeken</button>' +
             '<button class="knop" data-zkwal="' + esc(z.naam) + '">Kwaliteit meten</button>' +
             '<button class="knop" data-zweg="' + esc(z.naam) + '">Opruimen</button></div>' +

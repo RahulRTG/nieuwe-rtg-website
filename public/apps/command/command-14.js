@@ -23,7 +23,7 @@
     function teken() {
       api('overname').then(function (d) {
         var u = '<div class="kaart"><h3>Nieuwe partij inlezen</h3>' +
-          '<div class="crij"><input class="veld" id="ovN" placeholder="naam van de partij" style="width:14rem;">' +
+          '<div class="crij"><input class="veld mid" id="ovN" placeholder="naam van de partij">' +
           '<select class="veld" id="ovS">' + d.soorten.map(function (s2) {
             return '<option value="' + esc(s2.type) + '">' + esc(s2.label) + ' (sleutel: ' + esc(s2.sleutel) + ')</option>';
           }).join('') + '</select></div>' +
@@ -71,7 +71,7 @@
       var u = '<div class="kaart"><h3>' + esc(p.naam) + ' <span class="meta">' + esc(p.soort) + ' · ' +
         p.rijen + ' rijen · ' + esc(p.stand) + '</span></h3>';
       u += '<label class="lb" for="ova-' + esc(p.id) + '">Afbeelding: ons veld naar hun veld</label>' +
-        '<div class="crij"><input class="veld" id="ova-' + esc(p.id) + '" style="width:22rem;" value=\'' +
+        '<div class="crij"><input class="veld breed" id="ova-' + esc(p.id) + '" value=\'' +
         esc(JSON.stringify(p.afbeelding || {})) + '\'>' +
         '<button class="knop" data-ova="' + esc(p.id) + '">Afbeelden</button>' +
         '<button class="knop" data-ovd="' + esc(p.id) + '">Droogloop</button></div>';

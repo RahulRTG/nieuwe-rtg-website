@@ -98,9 +98,14 @@ function maakStadstart({ db, save, journaal, landpakket, functies, plaatsNorm, w
     const land = String(o.land || '').toUpperCase();
     let pak = null;
     try { pak = landpakket ? landpakket.stand(land) : null; } catch (e) { pak = null; }
-    if (!land || !pak || pak.error) {
-      return { error: 'Kies eerst een land waarvoor een landpakket ligt. Een stad in een land dat niet ' +
-        'is ingericht, is een stad zonder munt, zonder tarieven en zonder loonregels.', status: 409 };
+    /* HET PAKKET MOET AANSTAAN en niet alleen bestaan. Hier stond `!pak.error`,
+       en dat was lakser dan de melding eronder belooft: een land waarvan het
+       pakket klaarligt maar uitstaat, is precies het geval dat die zin
+       beschrijft -- geen munt, geen tarieven, geen loonregels. Gevonden door de
+       routetoets, die de melding las en het gedrag ernaast legde. */
+    if (!land || !pak || pak.error || !pak.actief) {
+      return { error: 'Zet eerst het landpakket van ' + (land || 'dat land') + ' aan. Een stad in een land ' +
+        'dat niet is ingericht, is een stad zonder munt, zonder tarieven en zonder loonregels.', status: 409 };
     }
 
     lijst[sleutel] = { naam: String(naam).slice(0, 60), sleutel, land,

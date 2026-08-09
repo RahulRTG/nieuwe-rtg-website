@@ -49,6 +49,14 @@ test('een stad zonder ingericht land gaat niet door', () => {
   assert.equal(r.status, 409);
   assert.match(r.error, /zonder munt/);
   assert.equal(stad.start('Antwerpen', { door: 'ik' }).status, 409, 'en zonder land ook niet');
+
+  /* EN EEN PAKKET DAT WEL BESTAAT MAAR UITSTAAT IS OOK NIET GENOEG. Dit geval
+     stond er eerst niet, en de code was daardoor lakser dan zijn eigen melding:
+     hij liet elk land door waarvoor een pakket in LANDEN.json stond, ook als
+     niemand het had aangezet. */
+  const uit = stad.start('Antwerpen', { land: 'BE', door: 'ik' });
+  assert.equal(uit.status, 409);
+  assert.match(uit.error, /Zet eerst het landpakket/);
   assert.equal(stad.stand().steden.length, 0, 'er is geen halve stad blijven staan');
 });
 

@@ -23,8 +23,8 @@
       api('stad').then(function (d) {
         var u = '<div class="kaart"><h3>Wat een knop hier niet kan</h3><p>' + esc(d.let) + '</p></div>' +
           '<div class="kaart"><h3>Nieuwe stad</h3><div class="crij">' +
-          '<input class="veld" id="stN" placeholder="naam" style="width:12rem;">' +
-          '<input class="veld" id="stL" placeholder="landcode (bv. NL)" style="width:8rem;">' +
+          '<input class="veld mid" id="stN" placeholder="naam">' +
+          '<input class="veld smal" id="stL" placeholder="landcode (bv. NL)">' +
           '<button class="knop vol" id="stGa">Starten</button></div>' +
           '<p class="meta">Het landpakket van dat land moet aanstaan.</p></div>';
 
@@ -36,7 +36,7 @@
                 (p.gedaan ? 'ok' : 'onbekend') + '">' + (p.gedaan ? 'gedaan' : 'staat open') + '</span>' +
                 '<div class="meta">' + esc(p.uitleg) + '</div></div>';
             }).join('') +
-            '<div class="crij" style="margin-top:.7rem;"><button class="knop" data-stweg="' + esc(s2.naam) +
+            '<div class="crij" class="mt"><button class="knop" data-stweg="' + esc(s2.naam) +
             '">Stoppen</button></div></div>';
         }
         document.querySelector('#stUit').innerHTML = u;

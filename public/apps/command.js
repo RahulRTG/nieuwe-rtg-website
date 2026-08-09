@@ -1407,8 +1407,8 @@
         '</div>';
 
       u += '<div class="kaart"><h3>Zoek de herkomst van één object</h3>' +
-        '<div class="crij"><input class="veld" id="hkT" placeholder="soort (bv. zaak)" style="width:9rem;">' +
-        '<input class="veld" id="hkI" placeholder="id" style="width:9rem;">' +
+        '<div class="crij"><input class="veld smal" id="hkT" placeholder="soort (bv. zaak)">' +
+        '<input class="veld smal" id="hkI" placeholder="id">' +
         '<button class="knop vol" id="hkGa">Spoor</button></div><div id="hkSpoor"></div></div>';
 
       for (var i = 0; i < d.soorten.length; i++) u += soortKaart(d.soorten[i]);
@@ -1453,7 +1453,7 @@
   }
 
   function teken(w) {
-    var u = '<p class="meta" style="margin-top:.7rem;"><b>' + esc(w.object.titel) + '</b></p>';
+    var u = '<p class="meta" class="mt"><b>' + esc(w.object.titel) + '</b></p>';
     u += rij('Wijst naar', w.wijstNaar.map(function (x) { return x.type + ' ' + x.id + ' (via ' + x.via + ')'; }));
     u += rij('Wordt genoemd door', w.wordtGenoemdDoor.map(function (x) { return x.type + ' ' + x.id; }));
     u += rij('In het journaal', w.journaal.map(function (r) { return r.at + ' ' + r.actie + ' (' + r.actor + ')'; }));
@@ -1507,8 +1507,8 @@
           '</div>';
 
         u += '<div class="kaart"><h3>Nieuwe uitrol</h3>' +
-          '<div class="crij"><input class="veld" id="caId" placeholder="functie-id (bv. command-zien)" style="width:16rem;">' +
-          '<input class="veld" id="caDeel" value="0.1" style="width:5rem;" aria-label="deel">' +
+          '<div class="crij"><input class="veld breed" id="caId" placeholder="functie-id (bv. command-zien)">' +
+          '<input class="veld kort" id="caDeel" value="0.1" aria-label="deel">' +
           '<button class="knop vol" id="caGa">Starten</button></div>' +
           '<p class="meta">Een canary verdeelt een OPEN functie over de mensen; hij opent geen dichte. ' +
           'Standaard: ' + Math.round(d.standaard.drempel * 1000) / 10 + '% serverfouten is de drempel, ' +
@@ -1574,8 +1574,8 @@
       api('zandbak').then(function (d) {
         var u = '<div class="kaart"><h3>Wat een zandbak niet is</h3><p>' + esc(d.let) + '</p></div>';
         u += '<div class="kaart"><h3>Nieuwe zandbak</h3><div class="crij">' +
-          '<input class="veld" id="zaN" placeholder="naam" style="width:12rem;">' +
-          '<input class="veld" id="zaW" placeholder="waarvoor (optioneel)" style="width:18rem;">' +
+          '<input class="veld mid" id="zaN" placeholder="naam">' +
+          '<input class="veld breed" id="zaW" placeholder="waarvoor (optioneel)">' +
           '<button class="knop vol" id="zaGa">Maken</button></div>' +
           '<p class="meta">' + d.zandbakken.length + ' van maximaal ' + d.max + '; standaard ' +
           d.standaardDagen + ' dagen houdbaar. ' + esc(d.uitleg) + '</p></div>';
@@ -1586,7 +1586,7 @@
             '<p class="meta">Gemaakt ' + esc(z.gemaakt) + ' door ' + esc(z.door) + ', vervalt ' + esc(z.vervalt) + '.' +
             (z.waarvoor ? ' ' + esc(z.waarvoor) : '') + '</p>' +
             (z.let ? '<p class="meta">' + esc(z.let) + '</p>' : '') +
-            '<div class="crij"><input class="veld" data-zoek="' + esc(z.naam) + '" placeholder="zoek in deze zandbak" style="width:14rem;">' +
+            '<div class="crij"><input class="veld mid" data-zoek="' + esc(z.naam) + '" placeholder="zoek in deze zandbak">' +
             '<button class="knop" data-zzoek="' + esc(z.naam) + '">Zoeken</button>' +
             '<button class="knop" data-zkwal="' + esc(z.naam) + '">Kwaliteit meten</button>' +
             '<button class="knop" data-zweg="' + esc(z.naam) + '">Opruimen</button></div>' +
@@ -1691,7 +1691,7 @@
             var sl = b.getAttribute('data-goud');
             api('mdm/gouden', { sleutel: sl }).then(function (r) {
               document.querySelector('#mg-' + sl.replace(/[^a-z0-9]/g, '')).innerHTML =
-                '<p class="meta" style="margin-top:.6rem;">' + esc(r.uitleg) + '</p>' +
+                '<p class="meta" class="mt">' + esc(r.uitleg) + '</p>' +
                 '<div class="schuif"><table class="ctab"><thead><tr><th>Veld</th><th>Wint</th><th>Van</th><th>Alternatieven</th></tr></thead><tbody>' +
                 Object.keys(r.velden).slice(0, 20).map(function (k) {
                   var v = r.velden[k];
@@ -1745,7 +1745,7 @@
     function teken() {
       api('overname').then(function (d) {
         var u = '<div class="kaart"><h3>Nieuwe partij inlezen</h3>' +
-          '<div class="crij"><input class="veld" id="ovN" placeholder="naam van de partij" style="width:14rem;">' +
+          '<div class="crij"><input class="veld mid" id="ovN" placeholder="naam van de partij">' +
           '<select class="veld" id="ovS">' + d.soorten.map(function (s2) {
             return '<option value="' + esc(s2.type) + '">' + esc(s2.label) + ' (sleutel: ' + esc(s2.sleutel) + ')</option>';
           }).join('') + '</select></div>' +
@@ -1793,7 +1793,7 @@
       var u = '<div class="kaart"><h3>' + esc(p.naam) + ' <span class="meta">' + esc(p.soort) + ' · ' +
         p.rijen + ' rijen · ' + esc(p.stand) + '</span></h3>';
       u += '<label class="lb" for="ova-' + esc(p.id) + '">Afbeelding: ons veld naar hun veld</label>' +
-        '<div class="crij"><input class="veld" id="ova-' + esc(p.id) + '" style="width:22rem;" value=\'' +
+        '<div class="crij"><input class="veld breed" id="ova-' + esc(p.id) + '" value=\'' +
         esc(JSON.stringify(p.afbeelding || {})) + '\'>' +
         '<button class="knop" data-ova="' + esc(p.id) + '">Afbeelden</button>' +
         '<button class="knop" data-ovd="' + esc(p.id) + '">Droogloop</button></div>';
@@ -1865,9 +1865,9 @@
           '</div>';
 
         u += '<div class="kaart"><h3>Een pad toelaten</h3><div class="crij">' +
-          '<input class="veld" id="apPad" placeholder="/api/extern/..." style="width:16rem;">' +
-          '<input class="veld" id="apVer" value="v1" style="width:5rem;" aria-label="versie">' +
-          '<input class="veld" id="apUit2" placeholder="uitfasering (ISO-datum, optioneel)" style="width:14rem;">' +
+          '<input class="veld breed" id="apPad" placeholder="/api/extern/...">' +
+          '<input class="veld kort" id="apVer" value="v1" aria-label="versie">' +
+          '<input class="veld mid" id="apUit2" placeholder="uitfasering (ISO-datum, optioneel)">' +
           '<button class="knop vol" id="apGa">Toelaten</button></div></div>';
 
         if (d.toelating.length) {
@@ -1881,9 +1881,9 @@
         }
 
         u += '<div class="kaart"><h3>Een sleutel maken</h3><div class="crij">' +
-          '<input class="veld" id="apN" placeholder="naam van de koppeling" style="width:14rem;">' +
-          '<input class="veld" id="apS" placeholder="scope-pad" style="width:14rem;">' +
-          '<input class="veld" id="apQ" value="1000" style="width:6rem;" aria-label="quotum per uur">' +
+          '<input class="veld mid" id="apN" placeholder="naam van de koppeling">' +
+          '<input class="veld mid" id="apS" placeholder="scope-pad">' +
+          '<input class="veld kort" id="apQ" value="1000" aria-label="quotum per uur">' +
           '<button class="knop vol" id="apMaak">Maken</button></div>' +
           '<p class="meta">Een scope buiten de toelating wordt geweigerd en niet stil ingeperkt.</p>' +
           '<div id="apGeheim"></div></div>';
@@ -1911,7 +1911,7 @@
             scopes: [{ pad: document.querySelector('#apS').value }],
             quotaPerUur: Number(document.querySelector('#apQ').value || 1000) })
             .then(function (r) {
-              document.querySelector('#apGeheim').innerHTML = '<p class="meta" style="margin-top:.6rem;">' +
+              document.querySelector('#apGeheim').innerHTML = '<p class="meta" class="mt">' +
                 '<b>' + esc(r.geheim) + '</b><br>' + esc(r.let) + '</p>';
             }).catch(function (e) { if (!e.stil) C.meld(e.message); });
         };
@@ -1949,7 +1949,7 @@
                 (o.ligt ? 'ok' : 'mis') + '">' + (o.ligt ? 'ligt er' : 'ontbreekt') + '</span>' +
                 '<div class="meta">' + esc(o.uitleg) + ' <i>(' + esc(o.bron) + ')</i></div></div>';
             }).join('') +
-            '<div class="crij" style="margin-top:.7rem;">' +
+            '<div class="crij" class="mt">' +
             '<button class="knop vol" data-laaan="' + esc(d.land) + '">Activeren</button>' +
             '<button class="knop" data-lauit="' + esc(d.land) + '">Terugdraaien</button>' +
             '<button class="knop" data-lakijk="">Terug naar de lijst</button></div></div>' +
@@ -2007,8 +2007,8 @@
       api('stad').then(function (d) {
         var u = '<div class="kaart"><h3>Wat een knop hier niet kan</h3><p>' + esc(d.let) + '</p></div>' +
           '<div class="kaart"><h3>Nieuwe stad</h3><div class="crij">' +
-          '<input class="veld" id="stN" placeholder="naam" style="width:12rem;">' +
-          '<input class="veld" id="stL" placeholder="landcode (bv. NL)" style="width:8rem;">' +
+          '<input class="veld mid" id="stN" placeholder="naam">' +
+          '<input class="veld smal" id="stL" placeholder="landcode (bv. NL)">' +
           '<button class="knop vol" id="stGa">Starten</button></div>' +
           '<p class="meta">Het landpakket van dat land moet aanstaan.</p></div>';
 
@@ -2020,7 +2020,7 @@
                 (p.gedaan ? 'ok' : 'onbekend') + '">' + (p.gedaan ? 'gedaan' : 'staat open') + '</span>' +
                 '<div class="meta">' + esc(p.uitleg) + '</div></div>';
             }).join('') +
-            '<div class="crij" style="margin-top:.7rem;"><button class="knop" data-stweg="' + esc(s2.naam) +
+            '<div class="crij" class="mt"><button class="knop" data-stweg="' + esc(s2.naam) +
             '">Stoppen</button></div></div>';
         }
         document.querySelector('#stUit').innerHTML = u;

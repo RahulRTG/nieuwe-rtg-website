@@ -1796,6 +1796,17 @@ Twee dingen die door deze ronde heen lopen. **Een nulmeting die je kwijt bent, i
 
 De chaosproef leverde het eerste gemeten failover-cijfer op: SIGKILL op de actieve server, 535 verzoeken op 25 ms, **0 mislukt**. Dat staat in `SLO.md` naast de herstelmeting, met het voorbehoud erbij dat "geen onderbreking gemeten" iets anders is dan "geen onderbreking".
 
+### De norm is weer een norm
+
+`npm run norm` stond rood: elf meters waren weggelopen sinds 8 augustus, terwijl er een hele bestuurslaag bij kwam. Ze zijn met de hand vastgezet in `NORM.json` — niet met `--vastleggen`, want dat tilt ook meters op die niemand heeft aangeraakt — en met een geschreven reden per post, zoals dat bestand zelf voorschrijft: *"Herstel het, of verlaag de norm met de hand — dan staat het als bewuste keuze in de historie."*
+
+Eerst gerepareerd wat te repareren was:
+
+- **`endpointsZonderTest` 1188 → 1158** door `test/commandlagen.test.js`: elke nieuwe laag krijgt daar een echte route-aanroep plus een 401-controle zonder sessie. Die toets vond meteen een fout die geen enkele motortoets kon zien — `stadstart` eiste alleen dat er een landpakket *bestond*, terwijl zijn eigen foutmelding belooft dat het land is *ingericht*.
+- **`inlineStijlAttributen` 5871 → 5850** door de `style=""`-attributen uit de nieuwe schermen te halen; er staan nu vier veldbreedte-klassen in `command.html`. Dat is geen smaak: elk style-attribuut houdt `style-src-attr` open in de CSP.
+
+Bewust vastgelegd en niet gerepareerd: negen servermodules staan echt over de 10 kB-grens, en **geen ervan is in dit werk ontstaan** (`server.js`, `kern/comm/`, `opzet/kernlaag4.js`, `livinglab/kader.js`, `routes/auth.js`, …). Vastleggen is daar geen goedkeuring maar het weer laten werken van de meter; ze blijven werkvoorraad. Datzelfde geldt voor `toetsenNietGemeten`: de veertien nieuwe toetsbestanden zijn wél met de hand gemuteerd (27 mutaties, alle 27 raak, per bestand in de kop genoteerd), maar de mutatiemotor is er niet langs geweest — en dat wordt hier niet als hetzelfde geteld.
+
 ### Het alarm: piepen op verandering, niet elke ronde
 
 `SLO.md` noemde het sinds de eerste versie als zijn tweede gat: de cijfers worden gemeten en het foutbudget wordt bijgehouden, maar er gaat niemand piepen. `kern/command/alarm.js` is die piep, en hij **meet niets zelf** — elke controle leest een laag die er al is (servicedoelen, sonde, canary, gegevenskwaliteit, de hashketen van het journaal). Een alarm met een eigen meting zegt op een dag iets anders dan het scherm waar het over gaat, en dan gelooft niemand meer welk van de twee.

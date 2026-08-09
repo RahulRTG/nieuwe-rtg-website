@@ -37,8 +37,8 @@
         '</div>';
 
       u += '<div class="kaart"><h3>Zoek de herkomst van één object</h3>' +
-        '<div class="crij"><input class="veld" id="hkT" placeholder="soort (bv. zaak)" style="width:9rem;">' +
-        '<input class="veld" id="hkI" placeholder="id" style="width:9rem;">' +
+        '<div class="crij"><input class="veld smal" id="hkT" placeholder="soort (bv. zaak)">' +
+        '<input class="veld smal" id="hkI" placeholder="id">' +
         '<button class="knop vol" id="hkGa">Spoor</button></div><div id="hkSpoor"></div></div>';
 
       for (var i = 0; i < d.soorten.length; i++) u += soortKaart(d.soorten[i]);
@@ -83,7 +83,7 @@
   }
 
   function teken(w) {
-    var u = '<p class="meta" style="margin-top:.7rem;"><b>' + esc(w.object.titel) + '</b></p>';
+    var u = '<p class="meta" class="mt"><b>' + esc(w.object.titel) + '</b></p>';
     u += rij('Wijst naar', w.wijstNaar.map(function (x) { return x.type + ' ' + x.id + ' (via ' + x.via + ')'; }));
     u += rij('Wordt genoemd door', w.wordtGenoemdDoor.map(function (x) { return x.type + ' ' + x.id; }));
     u += rij('In het journaal', w.journaal.map(function (r) { return r.at + ' ' + r.actie + ' (' + r.actor + ')'; }));

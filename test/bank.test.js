@@ -330,7 +330,20 @@ test('salarisrun uit de klokuren: het voorstel matcht op de lid-koppeling en de 
   const pak = await oapi('payroll/regels', { land: 'NL' }, 'RTG');
   const versie = (pak.body.pakketten || []).map(p => p.versie)[0];
   assert.ok(versie, 'er is een meegeleverde jaargang: ' + JSON.stringify(pak.body).slice(0, 160));
-  assert.equal((await bapi('payroll/regels/keur', { land: 'NL', versie }, baas)).status, 200, 'het kantoor merkt de jaargang aan');
+  /* AANMERKEN IS EEN UITSPRAAK EN GEEN VINKJE. De meegeleverde jaargang meldt
+     zelf dat de cijfers niet tegen het Handboek zijn gelegd; hem zomaar
+     aanmerken kan daarom niet meer. Deze toets doet het uitdrukkelijk, en dat
+     is precies wat een echte installatie ook moet doen -- of, beter, een
+     gecontroleerde jaargang laden. */
+  const zomaar = await bapi('payroll/regels/keur', { land: 'NL', versie }, baas);
+  assert.equal(zomaar.status, 409, 'een pakket dat zichzelf ongecontroleerd noemt gaat niet zomaar aan');
+  assert.match(zomaar.body.waarschuwing, /Handboek Loonheffingen/, 'en de reden komt uit het pakket zelf');
+  assert.equal((await bapi('payroll/regels/keur', { land: 'NL', versie, ondanks: true }, baas)).status, 400,
+    'ook uitdrukkelijk niet zonder reden');
+  const keur = await bapi('payroll/regels/keur', { land: 'NL', versie, ondanks: true,
+    reden: 'Toetsopstelling: demo-tabellen, geen echte loonstroken' }, baas);
+  assert.equal(keur.status, 200, 'met reden mag het: ' + JSON.stringify(keur.body).slice(0, 140));
+  assert.equal(keur.body.opDemoTabellen, true, 'en het pakket draagt dat het demo-tabellen zijn');
 
   /* HET LAND VAN DE ZAAK BEPAALT DE LOONREGELS, en Sal de Mar staat in Ibiza:
      supplierdefaults zet die op ES. Er is alleen een Nederlandse jaargang
@@ -364,6 +377,7 @@ test('salarisrun uit de klokuren: het voorstel matcht op de lid-koppeling en de 
   assert.equal(def.status, 200, 'de run is definitief: ' + JSON.stringify(def.body).slice(0, 200));
 
   const run = (await oapi('payroll/run/een', { runId }, 'RTG')).body.run;
+  assert.equal(run.opDemoTabellen, true, 'de run draagt waarop hij berust, tot na definitief');
   const netto = run.stroken.reduce((s, x) => s + Math.max(0, x.strook.nettoCenten), 0);
   const brutoRun = run.stroken.reduce((s, x) => s + (x.strook.brutoCenten || 0), 0);
   assert.ok(netto > 0 && netto < brutoRun, 'netto is minder dan bruto -- er wordt echt ingehouden: ' + netto + ' van ' + brutoRun);

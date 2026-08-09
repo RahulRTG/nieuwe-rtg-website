@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 719 bestanden en 4084 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 719 bestanden en 4087 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 719 |
-| losse beweringen (`test(...)`) | 4084 |
+| losse beweringen (`test(...)`) | 4087 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 522 |
 | **overleefd**: geen mutatie kreeg hem rood | 12 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-631 bestanden, 3927 beweringen.
+631 bestanden, 3930 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -398,7 +398,7 @@ toets omvalt.
 | `payroll-loonheffing.test.js` | 12 | -- | Payroll OS: de loonheffing als TABEL -- schijven, heffingskortingen en het bijzondere tarief. WAT HIER OP HET SPEL STAAT. |
 | `payroll-motor.test.js` | 10 | -- | Payroll OS: de loonmotor, het regelpakket en het componentenregister. DE BELOFTE DIE HIER WORDT BEWAAKT is de belofte waar de hele opzet op rust: een oude loonstrook verandert nooit stilletjes mee met een... |
 | `payroll-register-verzuim.test.js` | 10 | -- | Drie lagen die WEL bestonden en door NIEMAND werden aangeroepen. Ik heb de payrolllaag nagelopen op publieke functies die nergens vandaan worden gebruikt. |
-| `payroll-run.test.js` | 10 | -- | Payroll OS: de loonrun (vier ogen, definitief, correctie) en de contracten. WAT HIER OP HET SPEL STAAT. |
+| `payroll-run.test.js` | 13 | -- | Payroll OS: de loonrun (vier ogen, definitief, correctie) en de contracten. WAT HIER OP HET SPEL STAAT. |
 | `payroll-samenstellen.test.js` | 12 | genoemd | Payroll OS: de invoer van een loonrun samenstellen -- vast loon en verzuim. TWEE FOUTEN DIE HIER WORDEN RECHTGEZET, en ze waren allebei stil. |
 | `payroll-uren-controles.test.js` | 12 | -- | Payroll OS: de uren uit de klok en de automatische controles. HIER SLUIT DE KETEN: dienst plannen, inklokken, toeslagen berekenen, afwijkingen zien, en dan pas de loonrun. |
 | `payroll-valuta.test.js` | 7 | -- | Payroll OS: VALUTA -- want "centen" is niet overal honderdsten. WAT HIER OP HET SPEL STAAT, en het is geen opsmuk. |

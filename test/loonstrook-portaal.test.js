@@ -112,8 +112,14 @@ test('van de wervingslink tot de loonstrook van de medewerker', async () => {
     const pakket = (regels.pakketten || []).find(p => p.geldigVan <= PERIODE + '-01' &&
       (!p.geldigTot || p.geldigTot >= PERIODE + '-01'));
     assert.ok(pakket, 'er ligt een regelpakket dat geldt in ' + PERIODE);
+    /* UITDRUKKELIJK, want de meegeleverde jaargang meldt zelf dat de cijfers
+       niet tegen het Handboek zijn gelegd. Zonder `ondanks` en een reden gaat
+       hij niet aan -- zie kern/payroll/regelpakket.js. Dat een toets dit moet
+       uitspreken is de bedoeling: op deze tabellen hoort geen echte loonstrook
+       te staan, en wie ze toch aanmerkt zegt dat met zoveel woorden. */
     assert.equal((await post(base, '/api/office/payroll/regels/keur',
-      { land: 'NL', versie: pakket.versie }, kantoor)).data.stand, 'goedgekeurd');
+      { land: 'NL', versie: pakket.versie, ondanks: true,
+        reden: 'Toetsopstelling: demo-tabellen, geen echte loonstroken' }, kantoor)).data.stand, 'goedgekeurd');
 
     // de werkgever legt het contract vast -- de stap die ontbrak
     zaakTok = (await post(base, '/api/supplier/login',

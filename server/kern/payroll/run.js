@@ -71,6 +71,11 @@ function maakRun({ db, save, nu, crypto, motor, regelpakket, componenten }) {
 
     const run = {
       id: id(), code, zaak: zaak || code, periode, land: (land || 'NL').toUpperCase(),
+      /* WAAROP DEZE RUN BERUST, en dat reist mee tot in de loonstrook. Een run
+         op zelfverklaard ongecontroleerde tabellen is een geldige run -- een
+         mens heeft ze uitdrukkelijk aangemerkt -- maar wie hem later leest,
+         hoort dat te kunnen zien zonder het regelpakket erbij te halen. */
+      opDemoTabellen: !!pakket.opDemoTabellen,
       regelversie: pakket.versie, regelstand: pakket.stand,
       stand: 'concept', stroken,
       totaalNettoCenten: stroken.reduce((s, x) => s + x.strook.nettoCenten, 0),
@@ -134,7 +139,7 @@ function maakRun({ db, save, nu, crypto, motor, regelpakket, componenten }) {
      bedrag dat naar iemands rekening gaat. */
   const kort = (r) => ({ id: r.id, code: r.code, zaak: r.zaak, periode: r.periode, stand: r.stand,
     valuta: ((r.stroken[0] || {}).strook || {}).valuta ? r.stroken[0].strook.valuta.code : null,
-    regelversie: r.regelversie, regelstand: r.regelstand, correctieVan: r.correctieVan || null,
+    regelversie: r.regelversie, regelstand: r.regelstand, opDemoTabellen: !!r.opDemoTabellen, correctieVan: r.correctieVan || null,
     reden: r.reden || null, aantal: r.stroken.length, totaalNettoCenten: r.totaalNettoCenten,
     totaalVerschilCenten: r.totaalVerschilCenten, goedkeuringen: r.goedkeuringen, at: r.at });
 

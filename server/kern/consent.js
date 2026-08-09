@@ -22,6 +22,7 @@
    scherm: het zwaarste bovenaan. */
 const LAGEN = [
   { id: 'care-intake', naam: 'Medische context bij een zorgaanbieder', richting: 'ziet', gedekt: true },
+  { id: 'care-vastlegging', naam: 'Zorgaanbieders die iets in uw dossier mogen vastleggen', richting: 'schrijft', gedekt: true },
   { id: 'rtgid-sessie', naam: 'Diensten die met RTG iD uw gegevens ophalen', richting: 'ziet', gedekt: true },
   { id: 'rtgid-machtiging', naam: 'Mensen die namens u mogen inloggen', richting: 'doet', gedekt: true },
   { id: 'locatie', naam: 'Zaken die live met u meekijken', richting: 'ziet', gedekt: true },
@@ -61,6 +62,13 @@ module.exports = ({ kern }) => {
       uit.push({ laag: 'care-intake', id: i.id, wie: i.aanbiederNaam,
         wat: 'De medische context die u apart met deze aanbieder deelde',
         tot: i.vervaltOp, richting: 'ziet', intrekbaar: true });
+    }
+
+    const vast = pak('Vastleggen', kern.vastleggingenVan && (() => kern.vastleggingenVan(key)));
+    for (const v of (vast && vast.vastleggingen) || []) {
+      uit.push({ laag: 'care-vastlegging', id: v.id, wie: v.aanbiederNaam,
+        wat: 'Mag metingen in uw dossier vastleggen (bij een afspraak)',
+        tot: null, richting: 'schrijft', intrekbaar: true });
     }
 
     const id = pak('RTG iD', kern.rtgid && kern.rtgid.inzage && (() => kern.rtgid.inzage(key)));
@@ -115,6 +123,7 @@ module.exports = ({ kern }) => {
     if (!def) return { status: 404, error: 'Dit soort toestemming kent RTG niet.' };
 
     if (laag === 'care-intake') return kern.careIntakeStop(key, id);
+    if (laag === 'care-vastlegging') return kern.vastleggingStop(key, id);
     if (laag === 'rtgid-sessie') return kern.rtgid.intrek(key, id);
     if (laag === 'rtgid-machtiging') return kern.rtgid.machtigIntrek(key, id);
     if (laag === 'locatie') return kern.locStopKlant(key, id);

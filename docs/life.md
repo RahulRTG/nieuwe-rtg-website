@@ -42,7 +42,8 @@ klinkt.
 | Dagmetingen | `server/kern/metingen.js`, invulvak op `apps/life.html` | slaap, beweging en water, door het lid zelf ingevuld; een dag heeft één waarde |
 | Herkomst van gegevens | `server/kern/herkomst.js` | vier soorten, en alleen wat er echt is staat aan; gedeeld door de doelenmotor en de metingen |
 | Gekoppelde toestellen | `server/kern/toestellen.js`, vak op `apps/life.html` | een horloge of weegschaal schrijft dagmetingen weg met een eigen smalle sleutel, altijd in te trekken |
-| Consent Center | `server/kern/consent.js`, `public/apps/toestemming.html` | zes lagen toestemming op één scherm; intrekken gaat naar de bron |
+| Consent Center | `server/kern/consent.js`, `public/apps/toestemming.html` | zeven lagen toestemming op één scherm; intrekken gaat naar de bron |
+| Behandelaar legt vast | `server/kern/care/vastleggen.js` | een zorgaanbieder mag met aparte toestemming een meting in het dossier zetten, via een afspraak bij zichzelf |
 | Inzage-audit | `server/inzagelog.js` | wie welke identiteitsgegevens opvroeg, en waarom |
 | Identiteitskluis | `server/accounts.js` | echte namen apart; alles daarbuiten draait op codenamen |
 
@@ -275,10 +276,11 @@ de herkomst nu van de route mee.
 
 ## Het Consent Center
 
-`apps/toestemming.html` zet zes lagen naast elkaar: medische context bij een
-zorgaanbieder, diensten die met RTG iD gegevens ophalen, mensen die namens u
-mogen inloggen, zaken die live meekijken, het zorgprofiel dat meereist met
-bestellingen, en toestellen die metingen wegschrijven.
+`apps/toestemming.html` zet zeven lagen naast elkaar: medische context bij een
+zorgaanbieder, zorgaanbieders die iets in uw dossier mogen vastleggen, diensten
+die met RTG iD gegevens ophalen, mensen die namens u mogen inloggen, zaken die
+live meekijken, het zorgprofiel dat meereist met bestellingen, en toestellen die
+metingen wegschrijven.
 
 **Het bewaart niets, en trekt in bij de bron.** Er staat hier geen eigen
 vlaggetje dat zegt of iets nog mag; intrekken roept de stopfunctie van de laag
@@ -306,6 +308,44 @@ dus niet bij.
 het profiel zelf staan; anders raakt u uw eigen allergenenlijst kwijt bij het
 uitzetten van een deling. Hetzelfde geldt voor een ingetrokken toestel: wat het
 mat, blijft staan.
+
+## De derde herkomst: een behandelaar legt vast
+
+De eerste laag waarin iemand anders dan het lid in het dossier van dat lid
+schrijft. Een zorgaanbieder kan bij een afspraak een meting vastleggen -- het
+gewicht bij een consult -- en die draagt herkomst `behandelaar` én de naam van
+wie hem vastlegde. Niet "een behandelaar" maar wélke.
+
+**Het is een APARTE toestemming, en met opzet niet de intake.** De intake gaat de
+andere kant op: daar deelt het lid iets mét de aanbieder. Hier legt de aanbieder
+iets vast ín het dossier. Dat een kliniek uw bloedverdunner mag weten, betekent
+niet dat ze uw gewicht in uw dossier mag zetten. Wie die twee op één schakelaar
+zet, zegt het ene en doet het andere; er staat een toets op dat de intake géén
+schrijfrecht geeft.
+
+**De afspraak is de ingang.** Een behandelaar schrijft nooit op codenaam maar
+altijd op de referentie van een afspraak bij zijn eigen aanbieder. Er valt dus
+niets te raden en niets op te zoeken, en een kliniek kan niet schrijven op een
+afspraak bij de spa -- ook niet als dat lid de spá toestemming gaf.
+
+**Gewicht is er als onderwerp bij gekomen**, en dat is geen toeval: het is het
+enige waar alle drie de schrijvers samenkomen. U stapt zelf op de weegschaal,
+een slimme weegschaal meldt het, en een kliniek weegt u. Daarmee is de rangorde
+uit `kern/herkomst.js` op één onderwerp te zien: de behandelaar gaat voor het
+apparaat, het apparaat voor uw eigen schatting. De andere twee verdwijnen niet
+-- ze staan in `naast`.
+
+**Het lid krijgt bericht.** Iets in uw dossier dat er stil bij komt, is het
+tegenovergestelde van wat deze laag moet zijn.
+
+**Intrekken stopt het schrijven en wist niets.** Wat de behandelaar mat, is echt
+gemeten en blijft staan met zijn naam erbij -- net als bij een ingetrokken
+toestel.
+
+Het herkomstregister heeft nu vier beschikbare soorten en dus vier deuren. De
+toets somt ze letterlijk op, zodat een vijfde soort die iemand op beschikbaar
+zet zonder deur er meteen doorheen zakt. Dat is de enige manier waarop dat
+register een belofte blijft en geen lijstje wordt.
 
 ## De grenzen die vast moeten staan vóór de bouw
 
@@ -359,8 +399,13 @@ In deze volgorde, want elke stap heeft de vorige nodig:
 
 6. ~~Het **Consent Center**.~~ Gedaan; zie hieronder.
 
-Wat daarna komt (gewoonten, stress, coach, marktplaats) hangt aan deze zes en
-hoort pas daarna aan de beurt. De derde herkomst (`behandelaar`) is de
-eerstvolgende die iets fundamenteels toevoegt: een behandelaar die iets
-vastlegt, is een partij die iets ziet, en die hoort dus meteen als zevende laag
-in het Consent Center te verschijnen.
+7. ~~De derde herkomst (`behandelaar`), met de zevende consent-laag.~~ Gedaan;
+   zie hieronder.
+
+Wat daarna komt hangt aan deze zeven. De zwaarste openstaande is de mentale
+laag (dagcheck-in, gedachtenboek, stress), en die hoort te beginnen bij zijn
+veiligheidsgrens en niet bij zijn functie: een chatbot is geen behandelaar, en
+dat model hoort in de architectuur te zitten voordat er iets is om mee te
+praten. Daarnaast: gewoonten, de dagcoach, sport- en voedingslagen, de
+coachmarktplaats, en de zaakkant van de zorg (multi-vestiging, wachtlijst,
+no-show).

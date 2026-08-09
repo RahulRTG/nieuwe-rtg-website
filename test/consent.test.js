@@ -132,6 +132,7 @@ test('het register en het scherm lopen niet uiteen', () => {
           { id: 'm2', naar: 'IK', dienst: 'Gemeente', tot: '2026-12-01T00:00:00.000Z', ik: 'krijg' }]
       })
     },
+    vastleggingenVan: () => ({ vastleggingen: [{ id: 'v1', aanbiederNaam: 'Kliniek Clara', sinds: '2026-08-01' }] }),
     locMijn: () => ({ actief: [{ id: 'l1', supplierName: 'Kikunoi' }] }),
     zorgVan: () => ({ allergenen: ['noten'], dieet: '', medisch: '', delen: true }),
     toestellenVan: () => ({ toestellen: [{ id: 't1', naam: 'Horloge', geschreven: 3 }] })
@@ -158,5 +159,5 @@ test('een laag die het niet doet, wordt gemeld en niet als leegte getoond', () =
   const d = stuk.consentVan('sleutel');
   assert.ok(d.storingen.length >= 1);
   assert.match(d.storingen[0], /Zorg/i, 'de laag die stukging staat met naam in de melding');
-  assert.equal(d.storingen.length, 5, 'en de vier lagen die ontbreken melden zich ook, geen stilte');
+  assert.equal(d.storingen.length, 6, 'en de vijf lagen die ontbreken melden zich ook, geen stilte');
 });

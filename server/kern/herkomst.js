@@ -13,8 +13,8 @@
    BESCHIKBAAR is bewust kort. Alleen wat er echt is, staat aan; de rest staat er
    met naam bij zodat zichtbaar blijft wat er nog niet is, in plaats van dat ze
    pas bestaan als iemand ze verzint. 'apparaat' staat sinds kern/toestellen.js
-   aan; 'behandelaar' niet, want er is geen deur waardoor een behandelaar iets
-   vastlegt.
+   aan, 'behandelaar' sinds kern/care/vastleggen.js -- en die laatste alleen als
+   het lid die aanbieder er uitdrukkelijk toestemming voor heeft gegeven.
 
    EN DE HERKOMST KOMT UIT DE DEUR, NOOIT UIT HET VERZOEK. Wie zelf invult kan
    zijn schatting niet als apparaatmeting boeken, want de schrijver krijgt de
@@ -23,11 +23,19 @@
 const SOORTEN = {
   zelf: { label: 'zelf ingevuld', beschikbaar: true },
   apparaat: { label: 'door een apparaat gemeten', beschikbaar: true },
-  behandelaar: { label: 'door een behandelaar vastgelegd', beschikbaar: false },
+  behandelaar: { label: 'door een behandelaar vastgelegd', beschikbaar: true },
   afgeleid: { label: 'door RTG afgeleid', beschikbaar: true }
 };
 
 const BESCHIKBAAR = Object.keys(SOORTEN).filter(k => SOORTEN[k].beschikbaar);
+
+/* De rangorde als er meer dan een bron iets zegt over dezelfde dag. Wie heeft
+   GEMETEN gaat voor wie heeft geschat, en een behandelaar met een geijkt
+   apparaat in de hand gaat voor een horloge om een pols. Dit is een rangorde
+   voor het TONEN van een getal; er wordt niets weggegooid, en wat niet is
+   meegeteld blijft zichtbaar (zie kern/metingen.js). */
+const RANG = { behandelaar: 3, apparaat: 2, zelf: 1, afgeleid: 0 };
+const rangVan = b => RANG[b] || 0;
 
 /* Een herkomst die niet beschikbaar is, wordt geweigerd en valt NIET stil terug
    op 'zelf'. Stil terugvallen zou betekenen dat een apparaatmeting die nog niet
@@ -35,4 +43,4 @@ const BESCHIKBAAR = Object.keys(SOORTEN).filter(k => SOORTEN[k].beschikbaar);
 const magHerkomst = b => BESCHIKBAAR.includes(String(b || ''));
 const labelVan = b => (SOORTEN[b] || {}).label || b;
 
-module.exports = { SOORTEN, BESCHIKBAAR, magHerkomst, labelVan };
+module.exports = { SOORTEN, BESCHIKBAAR, RANG, rangVan, magHerkomst, labelVan };

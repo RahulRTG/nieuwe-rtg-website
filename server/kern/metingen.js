@@ -23,7 +23,7 @@
    dezelfde nacht, en ze door elkaar laten lopen is precies wat de herkomst moet
    voorkomen. Het beeld kiest per dag welke het gebruikt, en zegt welke. */
 
-const { magHerkomst } = require('./herkomst');
+const { magHerkomst, rangVan } = require('./herkomst');
 
 const DAG = 86400000;
 const VENSTER = 7;          // waarover we een gemiddelde tonen
@@ -37,7 +37,12 @@ const ONDERWERPEN = {
   beweging: { label: 'Beweging', eenheid: 'minuten', stap: 5, max: 1440,
     vraag: 'Hoeveel minuten heeft u bewogen?', per: 'dag' },
   water: { label: 'Water', eenheid: 'glazen', stap: 1, max: 40,
-    vraag: 'Hoeveel glazen water heeft u gedronken?', per: 'dag' }
+    vraag: 'Hoeveel glazen water heeft u gedronken?', per: 'dag' },
+  /* Gewicht is het enige onderwerp waar alle drie de herkomsten samenkomen: u
+     stapt zelf op de weegschaal, een slimme weegschaal meldt het, en een kliniek
+     weegt u bij een consult. Precies daarom staat het erbij. */
+  gewicht: { label: 'Gewicht', eenheid: 'kg', stap: 0.1, max: 500,
+    vraag: 'Hoeveel weegt u?', per: 'dag' }
 };
 
 const dagVan = d => new Date(d).toISOString().slice(0, 10);
@@ -51,15 +56,15 @@ function beeldVan(rijen, onderwerp, nu = new Date()) {
   const inVenster = rijen.filter(r => r.op >= vanaf && r.op <= vandaag);
   if (!inVenster.length) return { gemeten: false, dagen: 0, vandaag: null, herkomsten: [], naast: [] };
 
-  /* Per dag een waarde. Staat er zowel een eigen invulling als een
-     apparaatmeting, dan telt het apparaat -- die heeft gemeten en u heeft
-     geschat. Wat er niet gebeurt, is de ander weggooien: hij staat er nog en de
+  /* Per dag een waarde, gekozen op de rangorde uit kern/herkomst.js: een
+     behandelaar gaat voor een apparaat, en een apparaat voor uw eigen schatting.
+     Wie heeft gemeten gaat voor wie heeft geschat. Wat er niet gebeurt, is de ander weggooien: hij staat er nog en de
      herkomst blijft zichtbaar, zodat "het apparaat zegt 6 en ik zei 8" een
      verschil is dat je kunt zien in plaats van een getal dat is verdwenen. */
   const perDag = new Map();
   for (const r of inVenster) {
     const staand = perDag.get(r.op);
-    if (!staand || (r.bron === 'apparaat' && staand.bron !== 'apparaat')) perDag.set(r.op, r);
+    if (!staand || rangVan(r.bron) > rangVan(staand.bron)) perDag.set(r.op, r);
   }
   const gekozen = [...perDag.values()];
   const som = gekozen.reduce((t, r) => t + r.waarde, 0);
@@ -75,6 +80,7 @@ function beeldVan(rijen, onderwerp, nu = new Date()) {
     dagen: gekozen.length,
     gemiddelde: Math.round((som / gekozen.length) * 10) / 10,
     vandaag: vanVandaag ? vanVandaag.waarde : null,
+    vandaagDoor: (vanVandaag && vanVandaag.door) || null,
     herkomsten: [...gebruikt].sort(),
     naast: [...new Set(inVenster.map(r => r.bron))].filter(b => !gebruikt.has(b)).sort(),
     eenheid: ONDERWERPEN[onderwerp].eenheid
@@ -96,7 +102,7 @@ module.exports = ({ db, save }) => {
      gekoppelde apparaat. De herkomst komt van de DEUR en nooit uit de body --
      anders kan wie zelf invult zijn eigen schatting als apparaatmeting boeken,
      en dan is het hele onderscheid weg. */
-  function metingSchrijf(key, body, bron, nu = new Date()) {
+  function metingSchrijf(key, body, bron, nu = new Date(), door = null) {
     const onderwerp = String(body.onderwerp || '');
     const def = ONDERWERPEN[onderwerp];
     if (!def) return { status: 404, error: 'Dit meet RTG niet.' };
@@ -114,9 +120,9 @@ module.exports = ({ db, save }) => {
        correctie maar het wissen van een andere bewering. */
     const rijen = rijenVan(key, onderwerp);
     const bestaat = rijen.find(r => r.op === op && r.bron === bron);
-    if (bestaat) { bestaat.waarde = Math.round(waarde * 10) / 10; bestaat.at = nu.toISOString(); }
+    if (bestaat) { bestaat.waarde = Math.round(waarde * 10) / 10; bestaat.at = nu.toISOString(); bestaat.door = door; }
     else {
-      rijen.push({ op, waarde: Math.round(waarde * 10) / 10, bron, at: nu.toISOString() });
+      rijen.push({ op, waarde: Math.round(waarde * 10) / 10, bron, door, at: nu.toISOString() });
       rijen.sort((a, b) => (a.op + a.bron).localeCompare(b.op + b.bron));
       if (rijen.length > MAX_DAGEN) rijen.splice(0, rijen.length - MAX_DAGEN);
     }
@@ -127,6 +133,7 @@ module.exports = ({ db, save }) => {
   // de twee deuren; de herkomst zit in de deur en niet in het verzoek
   const metingZet = (key, body, nu = new Date()) => metingSchrijf(key, body, 'zelf', nu);
   const metingVanToestel = (key, body, nu = new Date()) => metingSchrijf(key, body, 'apparaat', nu);
+  const metingVanBehandelaar = (key, body, door, nu = new Date()) => metingSchrijf(key, body, 'behandelaar', nu, door);
 
   /* Weghalen hoort erbij: wie een verkeerde nacht invult, moet hem kunnen
      wissen en niet alleen kunnen overschrijven met een leugen. */
@@ -141,7 +148,7 @@ module.exports = ({ db, save }) => {
     return { ok: true, onderwerp, beeld: beeldVan(rijen, onderwerp, nu) };
   }
 
-  return { metingenVan, metingZet, metingVanToestel, metingWeg };
+  return { metingenVan, metingZet, metingVanToestel, metingVanBehandelaar, metingWeg };
 };
 
 module.exports.ONDERWERPEN = ONDERWERPEN;

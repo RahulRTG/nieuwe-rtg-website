@@ -38,12 +38,20 @@ test.after(() => {
 
 /* ---- de herkomst, want die is nu gedeeld met de doelenmotor ---- */
 
-test('de herkomst staat op een plek, en wat er niet is wordt geweigerd', () => {
-  assert.ok(magHerkomst('zelf'));
-  assert.ok(magHerkomst('apparaat'), 'sinds er toestellen zijn, is dit een echte herkomst');
-  assert.ok(!magHerkomst('horoscoop'));
-  assert.ok(!BESCHIKBAAR.includes('behandelaar'),
-    'wat niet gebouwd is, staat niet als beschikbaar: er is geen deur waardoor een behandelaar iets vastlegt');
+test('elke beschikbare herkomst heeft een deur, en onbekende worden geweigerd', () => {
+  /* De regel achter dit register is dat 'beschikbaar' betekent: er is een deur
+     waardoor deze soort binnenkomt. Alle vier hebben er nu een --
+     zelf (metingen/zet), apparaat (toestel/meting), behandelaar
+     (supplier/care/vastleggen) en afgeleid (kern/life.js, uit het grootboek).
+
+     Deze opsomming staat er letterlijk zodat een VIJFDE soort die iemand op
+     beschikbaar zet zonder deur, hier meteen zakt. Dat is de enige manier
+     waarop dit register een belofte blijft en geen lijstje wordt. */
+  assert.deepEqual(BESCHIKBAAR.slice().sort(), ['afgeleid', 'apparaat', 'behandelaar', 'zelf'],
+    'wie hier iets bij zet, bouwt er ook een deur bij (en past deze toets aan)');
+  for (const b of BESCHIKBAAR) assert.ok(magHerkomst(b));
+  assert.ok(!magHerkomst('horoscoop'), 'een soort die niet bestaat komt er niet in');
+  assert.ok(!magHerkomst(''), 'en een lege herkomst ook niet');
 });
 
 /* ---- het beeld, puur ---- */

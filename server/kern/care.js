@@ -18,7 +18,7 @@
       niets zonder een "ja", en niet langer dan nodig.
 
    Alleen voor leden (geen gasten). */
-module.exports = ({ db, save, crypto, schoon, notify, zorgVoor }) => {
+module.exports = ({ db, save, crypto, schoon, notify, zorgVoor, metingVanBehandelaar }) => {
   const nu = () => new Date().toISOString();
   const vandaag = () => new Date().toISOString().slice(0, 10);
   const eur = c => '€ ' + (c / 100).toFixed(2).replace('.', ',');
@@ -82,6 +82,11 @@ module.exports = ({ db, save, crypto, schoon, notify, zorgVoor }) => {
   const deelLeden = require('./care/leden')(ctx);
   Object.assign(ctx, deelLeden);
   const deelZaak = require('./care/zaak')(ctx);
+  Object.assign(ctx, deelZaak);
+  /* De derde herkomst: een behandelaar die iets vastlegt. Staat NA de zaaklaag
+     omdat hij aanbiedersVanSupplier gebruikt. De metingen-deur komt laat
+     gebonden binnen (zie opzet/kernlaag4.js): die laag hangt verderop. */
+  const deelVast = require('./care/vastleggen')({ ...ctx, metingVanBehandelaar });
   const { careIntakeDeel, careIntakeStop, careOverzicht, careBoek, careBetaal, careAnnuleer, careMijn, aanbiedersVanSupplier } = deelLeden;
   const { careAgenda, careAfronden, carePakketOverzicht, carePakketBoek, carePakketBetaal, carePakketMijn, boekBehandelingActie } = deelZaak;
 
@@ -90,6 +95,6 @@ module.exports = ({ db, save, crypto, schoon, notify, zorgVoor }) => {
     careIntakeDeel, careIntakeStop, boekBehandelingActie,
     careAgenda, careAfronden, aanbiedersVanSupplier,
     carePakketOverzicht, carePakketBoek, carePakketBetaal, carePakketMijn,
-    aanbiederVan
+    aanbiederVan, ...deelVast
   };
 };

@@ -26,13 +26,11 @@ const dagVan = d => new Date(d).toISOString().slice(0, 10);
 const gemeten = (waarde, eenheid, uitleg) => ({ gemeten: true, waarde, eenheid, uitleg });
 const ongemeten = reden => ({ gemeten: false, reden });
 
-/* De dagmetingen die het lid zelf invult (kern/metingen.js). De volgorde hier is
-   de volgorde op het scherm. */
-const ZELF = [
-  ['slaap', 'Slaap', 'nacht', 'nachten'],
-  ['beweging', 'Beweging', 'dag', 'dagen'],
-  ['water', 'Water', 'dag', 'dagen']
-];
+/* De dagmetingen. WELKE er zijn staat in kern/metingen.js en nergens anders --
+   een onderwerp erbij is daar een regel en hier niets. Alleen het woord voor
+   "per nacht" of "per dag" staat hier, want dat is taal voor het scherm. */
+const { ONDERWERPEN } = require('./metingen');
+const MEERVOUD = { nacht: 'nachten', dag: 'dagen' };
 
 module.exports = ({ kern }) => {
   /* Elke laag apart aanroepen, en een kapotte laag als kapot melden in plaats
@@ -116,15 +114,18 @@ module.exports = ({ kern }) => {
     const mt = lees('Metingen', kern.metingenVan && (() => kern.metingenVan(key, nu)));
     if (mt.fout) storingen.push(mt.fout);
     const dagbeeld = (mt.waarde && mt.waarde.beeld) || {};
-    for (const [id, naam, ev, mv] of ZELF) {
+    for (const [id, def] of Object.entries(ONDERWERPEN)) {
+      const ev = def.per, mv = MEERVOUD[def.per] || def.per + 'en';
+      const naam = def.label;
       const b = dagbeeld[id];
       const h = (b && b.herkomsten) || [];
       /* Waar het getal vandaan komt, staat in de tekst en niet alleen in een
          veld: "u vulde in" en "uw toestel mat" zijn twee verschillende
          beweringen over dezelfde nacht, en een gemiddelde dat ze mengt hoort
          dat te zeggen. */
-      const wie = h.length > 1 ? 'die u invulde en uw toestel mat'
-        : h[0] === 'apparaat' ? 'die uw toestel mat' : 'die u zelf invulde';
+      const ENKEL = { apparaat: 'die uw toestel mat', behandelaar: 'die uw behandelaar vastlegde',
+        zelf: 'die u zelf invulde' };
+      const wie = h.length > 1 ? 'uit meer dan een bron' : (ENKEL[h[0]] || 'die u zelf invulde');
       signalen.push({
         id, naam, herkomsten: h,
         ...(b && b.gemeten

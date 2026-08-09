@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 729 bestanden en 4105 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 730 bestanden en 4111 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 729 |
-| losse beweringen (`test(...)`) | 4105 |
+| toetsbestanden | 730 |
+| losse beweringen (`test(...)`) | 4111 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 521 |
 | **overleefd**: geen mutatie kreeg hem rood | 12 |
 | niet te meten (al rood, geen module gevonden, ...) | 16 |
 | alleen in de kop *genoemd*, nog niet gemeten | 25 |
-| niets van beide | 155 |
+| niets van beide | 156 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-637 bestanden, 3944 beweringen.
+638 bestanden, 3950 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -607,6 +607,7 @@ toets omvalt.
 | `vakwerk-pro.test.js` | 6 | gezakt op `liegpoort /api/` | DE PRO-LAAG VAN EEN VAKZAAK -- 5 endpoints, met een zaak die niet bestond. vak/offerte/weiger, vak/wachtlijst/uitnodig, vak/ritme/stop, vak/uren en vak/onderhoud/herinner stonden als nooit aangeroepen in de... |
 | `vakwerk.test.js` | 7 | gezakt op `liegpoort /api/` | Vakwerk: het slimme dashboard voor de dienstverlenende genres (zzp, chef, wellness). Zelfde aanbod-/boekingsmodel als voorheen, maar met een vandaag-bord, de aanvragen die op bevestiging wachten, het aanbod met... |
 | `vastgoed.test.js` | 6 | gezakt op `liegpoort /api/` | Vastgoed: de makelaar biedt panden aan GERICHTE leden aan (of publiek), leden tonen interesse (bezichtiging) en doen een bod, de makelaar bevestigt met keyless toegang die alleen binnen het venster werkt, en... |
+| `vastleggen.test.js` | 6 | -- | De derde herkomst: een behandelaar die iets vastlegt (kern/care/vastleggen.js). Dit is de eerste laag waarin iemand ANDERS dan het lid in het dossier van dat lid schrijft, en daarom staan hier vooral de grenzen: -... |
 | `veiligadres.test.js` | 5 | gezakt op `===->!==#0` | DE WAARSCHUWING OVER HET ONVEILIGE ADRES: ZEGT HIJ HET, EN ZWIJGT HIJ OOK? Waar dit over gaat: een browser geeft camera, microfoon en locatie alleen vrij op https of localhost. |
 | `veiligheid-kring-rust.test.js` | 6 | gezakt op `liegpoort /api/` | DE KRING, HET CODEWOORD EN DE RUST -- 6 endpoints van RTG Veilig. Deze zes wees de waargenomen dekkingsmeting aan als nooit aangeroepen: kring/aanpassen, kring/mail, alarm/afsluiten, codewoord/schakel, codewoord/wis... |
 | `veiligheid.test.js` | 1 | gezakt op `liegpoort /api/` | RTG Veilig: de vier apps op een ruggengraat. De belangrijkste toets staat in toets 4 en 5, en die is de reden dat dit zo gebouwd is: de dodemansknop moet aflopen ZONDER dat de telefoon nog iets doet. |

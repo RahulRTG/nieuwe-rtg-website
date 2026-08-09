@@ -170,9 +170,14 @@ kern.commAi = require('../kern/berichten/ai')({
   // de kern gooit als een gesprek niet van jou is; de AI-laag verwacht null
   draad: (mijKey, gesprekId) => { try { return kern.comm.draad(mijKey, gesprekId); } catch (e) { return null; } },
   anthropic });
-// Toren 4: RTG Care (zorg & welzijn). Behandelingen boeken met het zorgprofiel
-// dat meereist en een aparte, veilige intake-deling per aanbieder.
-Object.assign(kern, require('../kern/care')({ db, save, crypto, schoon, notify, zorgVoor: kern.zorgVoor }));
+/* Toren 4: RTG Care (zorg & welzijn). Behandelingen boeken met het zorgprofiel
+   dat meereist en een aparte, veilige intake-deling per aanbieder.
+
+   De metingen-deur gaat LAAT GEBONDEN mee: kern/metingen.js hangt verderop in
+   de bouw (aanbouw2), en een kopie op dit moment zou undefined bevriezen -- de
+   stille breuk waar opzet/domeingrens.js over gaat. */
+Object.assign(kern, require('../kern/care')({ db, save, crypto, schoon, notify, zorgVoor: kern.zorgVoor,
+  metingVanBehandelaar: (...a) => kern.metingVanBehandelaar(...a) }));
 // Fluister: de persoonlijke assistent met geheugen (weetjes + focus)
 /* Geldregie (kern/geldregie.js): RTG bepaalt de geldkant vanuit de boardroom:
    pasprijzen (publiek zichtbaar), de interne partnervergoeding per genre of

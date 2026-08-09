@@ -1470,6 +1470,47 @@ groepsgrenzen. Vijf mutaties, alle vijf raak: "geen betaalstatus" als open lezen
 op de vervaldag al vervallen zijn, een factuur zonder vervaldatum in "loopt"
 gooien, iedereen laten afboeken, en ook lopende facturen een actie laten worden.
 
+### Crediteuren: wat er nog uit moet, en wanneer
+
+`server/kern/onderneming/crediteuren.js` + `/api/onderneming/crediteuren`, met het
+gedeelde rekenwerk in `server/kern/onderneming/ouderdom.js`.
+
+De spiegel van de debiteuren, op dezelfde facturenlijst: waar de ene kant kijkt
+naar wat deze zaak heeft **verstuurd** en nog niet binnen is, kijkt deze naar wat
+zij heeft **ontvangen** en nog niet betaald.
+
+**Het rekenwerk is gedeeld, de teksten niet.** Of iets twintig dagen over is, is
+rekenkunde en aan beide kanten hetzelfde; dat staat nu één keer in `ouderdom.js`
+(grenzen, `dagenOver`, `groepVan`, `deelIn`). Wat je eraan dóét verschilt wél: bij
+een debiteur is "bel de klant" het advies, bij een crediteur "betaal, of uw
+leverancier stopt met leveren". Die teksten wonen daarom bij de kant zelf --
+zouden ze gedeeld zijn, dan stond er binnen een maand aan één van beide kanten een
+zin die er niet hoort.
+
+**Een asymmetrie die er echt is, en die niet wordt weggepoetst.** Een factuur
+wordt afgeboekt door de **verkoper**, want alleen hij ziet of het geld binnen is.
+Voor de koper betekent dat: een factuur die hij vandaag betaalt, blijft op zijn
+lijst staan tot de verkoper hem afboekt. Dat is ongemakkelijk, maar het
+alternatief is erger: een tweede vlag "ik heb betaald" naast de eerste maakt twee
+waarheden over één factuur, en dan is niet meer te zeggen welke telt. Het staat
+daarom in het antwoord, zodat een scherm het kan uitleggen in plaats van dat
+iemand denkt dat de lijst kapot is.
+
+**De vooruitblik is een optelsom, geen prognose.** Wat er de komende week en maand
+uit moet, is de som van de vervaldata die er al liggen -- posten zónder
+vervaldatum tellen niet mee, want dat zou een bedrag suggereren dat op een datum
+rust die er niet is. Er zit geen voorspelling in van wat er nog bij komt, en dat
+staat er ook bij: een liquiditeitsprognose die doet alsof zij de toekomst kent, is
+precies het soort getal waar iemand een beslissing op neemt.
+
+In het dagbeeld komen vervallen crediteuren direct ná de debiteuren: allebei geld
+dat al vaststaat, maar wat binnenkomt betaalt wat eruit moet.
+
+Getoetst in `test/onderneming-crediteuren.test.js` (11). Vijf mutaties, alle vijf
+raak: de spiegel omdraaien, de debiteuren-teksten aan de crediteuren geven, de
+vooruitblik posten zonder vervaldatum laten meetellen, van de gedeelde rekenkern
+een eigen kopie maken, en uitgaand geld boven binnenkomend geld zetten.
+
 ### RTG Werk OS (de werkplek van een organisatie)
 
 `server/bedrijf/` + `/api/bedrijf/...` + `/apps/werk.html`. Een **werkruimte**

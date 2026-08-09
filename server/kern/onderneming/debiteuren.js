@@ -23,38 +23,22 @@
    de plek waar iemand een echte naam zou willen zetten. */
 'use strict';
 
-const DAG = 86400000;
+/* Het rekenwerk (dagen over, de groepsgrenzen, het indelen) staat in
+   ./ouderdom.js, gedeeld met de crediteuren. Wat WEL hier hoort zijn de
+   teksten: bij een debiteur is "bel de klant" het advies, bij een crediteur
+   dreigt de levering stil te vallen. De grenzen zijn rekenkunde en dus
+   gedeeld; het advies is dat niet. */
+const OUD = require('./ouderdom');
 
-/* De groepen, van jong naar oud. `tot` is het aantal dagen over de vervaldatum;
-   null is "alles daarboven". */
-const GROEPEN = [
-  { id: 'loopt', tot: 0, label: 'Loopt nog', wat: 'Nog niet vervallen.' },
-  { id: 'net', tot: 14, label: '1 tot 14 dagen over', wat: 'Een vriendelijke herinnering is meestal genoeg.' },
-  { id: 'lang', tot: 30, label: '15 tot 30 dagen over', wat: 'Bel. Een tweede mail leest niemand.' },
-  { id: 'zeer', tot: 60, label: '31 tot 60 dagen over', wat: 'Spreek een regeling af, of zet de levering stil.' },
-  { id: 'oud', tot: null, label: 'Meer dan 60 dagen over', wat: 'Hoe ouder, hoe kleiner de kans. Handel nu.' }
-];
+const TEKSTEN = {
+  loopt: { label: 'Loopt nog', wat: 'Nog niet vervallen.' },
+  net: { label: '1 tot 14 dagen over', wat: 'Een vriendelijke herinnering is meestal genoeg.' },
+  lang: { label: '15 tot 30 dagen over', wat: 'Bel. Een tweede mail leest niemand.' },
+  zeer: { label: '31 tot 60 dagen over', wat: 'Spreek een regeling af, of zet de levering stil.' },
+  oud: { label: 'Meer dan 60 dagen over', wat: 'Hoe ouder, hoe kleiner de kans. Handel nu.' }
+};
 
 const rond = (n) => Math.round(n * 100) / 100;
-
-/* Hoeveel dagen is deze factuur over zijn vervaldatum. Negatief betekent: hij
-   loopt nog. Null als er geen vervaldatum is -- dan valt er niets te zeggen en
-   wordt hij niet ingedeeld in plaats van in de jongste groep gegooid. */
-function dagenOver(f, nuMs) {
-  if (!f || !f.vervaldatum) return null;
-  const t = Date.parse(f.vervaldatum + 'T12:00:00Z');
-  return Number.isFinite(t) ? Math.floor((nuMs - t) / DAG) : null;
-}
-
-function groepVan(dagen) {
-  if (dagen === null) return null;
-  if (dagen <= 0) return 'loopt';
-  for (const g of GROEPEN) {
-    if (g.id === 'loopt') continue;
-    if (g.tot === null || dagen <= g.tot) return g.id;
-  }
-  return 'oud';
-}
 
 /* De opvolgregel voor het dagbeeld. Alleen als er echt iets vervallen is:
    openstaande facturen die nog gewoon lopen zijn geen actie maar de normale
@@ -88,48 +72,32 @@ module.exports = ({ db }) => {
     if (!s) return null;
     const nuT = Number.isFinite(nuMs) ? nuMs : Date.now();
 
-    const open = openVan(s.code);
-    const perGroep = Object.fromEntries(GROEPEN.map(g => [g.id, { aantal: 0, bedrag: 0 }]));
-    const zonderDatum = [];
-    const rijen = [];
-
-    for (const f of open) {
-      const d = dagenOver(f, nuT);
-      const g = groepVan(d);
-      const rij = { id: f.id, nummer: f.nummer, klant: f.koper.codenaam || f.koper.naam || null,
-        totaal: f.totaal, datum: f.datum, vervaldatum: f.vervaldatum || null,
-        dagenOver: d, groep: g };
-      rijen.push(rij);
-      if (!g) { zonderDatum.push(rij); continue; }
-      perGroep[g].aantal++;
-      perGroep[g].bedrag = rond(perGroep[g].bedrag + (Number(f.totaal) || 0));
-    }
-
-    const vervallen = rijen.filter(r => r.groep && r.groep !== 'loopt');
-    const openBedrag = rond(open.reduce((n, f) => n + (Number(f.totaal) || 0), 0));
-    const vervallenBedrag = rond(vervallen.reduce((n, r) => n + (Number(r.totaal) || 0), 0));
+    const open = openVan(s.code).map(f => ({
+      id: f.id, nummer: f.nummer, klant: f.koper.codenaam || f.koper.naam || null,
+      totaal: f.totaal, datum: f.datum, vervaldatum: f.vervaldatum || null
+    }));
+    const ing = OUD.deelIn(open, nuT, TEKSTEN);
 
     return {
       zaak: s.code,
-      aantal: open.length, bedrag: openBedrag,
-      vervallenAantal: vervallen.length, vervallenBedrag,
-      groepen: GROEPEN.map(g => Object.assign({ id: g.id, label: g.label, wat: g.wat }, perGroep[g.id])),
-      /* De oudste openstaande post. Dat ene getal zegt meer dan het totaal:
-         een groot bedrag dat net vervalt is iets anders dan een klein bedrag
-         van vier maanden oud. */
-      oudste: vervallen.length
-        ? vervallen.reduce((a, b) => (b.dagenOver > a.dagenOver ? b : a))
-        : null,
-      posten: rijen.sort((a, b) => (b.dagenOver || 0) - (a.dagenOver || 0)).slice(0, 50),
-      zonderVervaldatum: zonderDatum.length,
+      aantal: open.length,
+      bedrag: rond(open.reduce((n, f) => n + (Number(f.totaal) || 0), 0)),
+      vervallenAantal: ing.vervallen.length,
+      vervallenBedrag: ing.vervallenBedrag,
+      groepen: ing.groepen,
+      oudste: ing.oudste,
+      posten: ing.rijen.slice(0, 50),
+      zonderVervaldatum: ing.zonderVervaldatum,
       voorbehoud: 'Alleen facturen die als onbetaald zijn aangemerkt tellen mee. Facturen van voor deze laag dragen geen betaalstatus en gelden als betaald.'
     };
   }
 
-  return { DEBITEUREN_GROEPEN: GROEPEN, debiteuren, debiteurenOpvolging };
+  return { DEBITEUREN_TEKSTEN: TEKSTEN, debiteuren, debiteurenOpvolging };
 };
 
-module.exports.GROEPEN = GROEPEN;
+module.exports.TEKSTEN = TEKSTEN;
 module.exports.debiteurenOpvolging = debiteurenOpvolging;
-module.exports.dagenOver = dagenOver;
-module.exports.groepVan = groepVan;
+/* Doorgegeven vanuit ./ouderdom.js: de toetsen en de crediteuren gebruiken
+   dezelfde rekenkern, en die hoort maar op een plek te staan. */
+module.exports.dagenOver = OUD.dagenOver;
+module.exports.groepVan = OUD.groepVan;

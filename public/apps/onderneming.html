@@ -154,7 +154,7 @@ function toonLeeg(){
 function teken(){
   const o=ONDS.find(x=>x.id===HUIDIG)||{};
   zetTitel(DAG.naam||'Mijn onderneming');
-  $('#hoofd').innerHTML=[vakGroet(),vakGezond(),vakActies(),vakIntake(),vakKans(),vakSimulatie(),vakStress(),vakPlan(o),vakRechtsvorm(o),vakOprichting(),vakZaak(o),vakEersteKlant(),vakMall(),vakRelaties(),vakDebiteuren()].join('');
+  $('#hoofd').innerHTML=[vakGroet(),vakGezond(),vakActies(),vakIntake(),vakKans(),vakSimulatie(),vakStress(),vakPlan(o),vakRechtsvorm(o),vakOprichting(),vakZaak(o),vakEersteKlant(),vakMall(),vakRelaties(),vakDebiteuren(),vakCrediteuren()].join('');
   haakKnoppen();
 }
 
@@ -421,6 +421,31 @@ function vakDebiteuren(){
     (post?'<div style="margin-top:1rem;"><p class="subtxt" style="margin-bottom:.2rem;">Posten:</p>'+post+'</div>':'')+
     (d.zonderVervaldatum?'<p class="subtxt" style="margin-top:.7rem;">'+d.zonderVervaldatum+' factu'+(d.zonderVervaldatum===1?'ur heeft':'ren hebben')+' geen vervaldatum.</p>':'')+
     '<p class="subtxt" style="margin-top:.9rem;">'+esc(d.voorbehoud)+'</p></div>';
+}
+
+
+function vakCrediteuren(){
+  const c=DAG&&DAG.crediteuren;
+  if(!c) return '';
+  if(!c.aantal) return '<div class="vak"><h2>Te betalen</h2><p class="stil">U heeft niets openstaan.</p></div>';
+  const gr=(c.groepen||[]).filter(g=>g.aantal).map(g=>
+    '<div class="bron"><span><strong>'+esc(g.label)+'</strong><br><span class="bu">'+esc(g.wat)+'</span></span>'+
+    '<span>'+g.aantal+'x &middot; '+euro(g.bedrag)+'</span></div>').join('');
+  const post=(c.posten||[]).slice(0,10).map(p=>
+    '<div class="bron'+(p.groep&&p.groep!=='loopt'?'':' niet')+'"><span><strong>'+esc(p.leverancier||'-')+'</strong> &middot; '+esc(p.nummer||'-')+
+    '<br><span class="bu">'+(p.dagenOver===null?'geen vervaldatum':(p.dagenOver>0?p.dagenOver+' dagen te laat':'loopt nog'))+'</span></span>'+
+    '<span>'+euro(p.totaal)+'</span></div>').join('');
+  return '<div class="vak"><h2>Te betalen</h2>'+
+    '<div class="score"><span class="n groot">'+euro(c.bedrag)+'</span>'+
+    '<span class="subtxt">'+c.aantal+' factu'+(c.aantal===1?'ur':'ren')+
+    (c.vervallenAantal?', waarvan '+c.vervallenAantal+' te laat ('+euro(c.vervallenBedrag)+')':'')+'</span></div>'+
+    '<div class="cijfers" style="margin-top:.9rem;">'+
+    '<div class="cijfer"><div class="lbl">Komende week</div><div class="wrd">'+euro(c.vooruit.week.bedrag)+'</div><div class="eh">'+c.vooruit.week.aantal+' facturen</div></div>'+
+    '<div class="cijfer"><div class="lbl">Komende maand</div><div class="wrd">'+euro(c.vooruit.maand.bedrag)+'</div><div class="eh">'+c.vooruit.maand.aantal+' facturen</div></div>'+
+    '</div>'+
+    '<div style="margin-top:.9rem;">'+gr+'</div>'+
+    (post?'<div style="margin-top:1rem;"><p class="subtxt" style="margin-bottom:.2rem;">Posten:</p>'+post+'</div>':'')+
+    '<p class="subtxt" style="margin-top:.9rem;">'+esc(c.voorbehoud)+'</p></div>';
 }
 
 /* ---------- handelingen ---------- */

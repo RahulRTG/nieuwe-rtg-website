@@ -19,7 +19,7 @@ module.exports = (kern) => {
     ondernemingVerkenning, ondernemingPlanVastleggen, ondernemingDagbeeld,
     ondernemingOprichting, ondernemingOprichtingZet, ondernemingAanvraag,
     ondernemingAanvraagStand, ondernemingEersteKlant, ondernemingMallProfiel, ondernemingRelaties,
-    ondernemingKlantNotitie, ondernemingDebiteuren } = kern;
+    ondernemingKlantNotitie, ondernemingDebiteuren, ondernemingCrediteuren } = kern;
 
   /* `status` betekent in dit huis de HTTP-code, maar een kernmodule kan een
      domeinstand in datzelfde veld zetten ('geen-aanvraag'). Dat gebeurde hier
@@ -146,6 +146,14 @@ module.exports = (kern) => {
     const o = mijn(req);
     if (!o) return stuur(res, nietGevonden);
     res.json({ ok: true, debiteuren: ondernemingDebiteuren(o) });
+  });
+
+  /* De andere kant: wat u zelf nog moet betalen, met de vooruitblik op wat er
+     de komende week en maand uit moet. */
+  app.post('/api/onderneming/crediteuren', auth, (req, res) => {
+    const o = mijn(req);
+    if (!o) return stuur(res, nietGevonden);
+    res.json({ ok: true, crediteuren: ondernemingCrediteuren(o) });
   });
 
   /* ---- de zaak aanvragen ----

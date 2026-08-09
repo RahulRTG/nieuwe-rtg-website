@@ -17,7 +17,7 @@ module.exports = ({ app, auth, save, eist, mag, inzicht, lijsten, wereldAi,
   /* ---------- inzicht ---------- */
 
   app.post('/api/wereld/bereik', auth, eist('inzicht.bereik'), (req, res) => {
-    res.json(inzicht.bereik(req.session.key));
+    res.json(inzicht.mijnBereik(req.session.key));
   });
 
   app.post('/api/wereld/bedrijf', auth, eist('inzicht.bedrijf'), (req, res) => {

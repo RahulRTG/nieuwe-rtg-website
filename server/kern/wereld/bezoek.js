@@ -42,7 +42,7 @@ module.exports = ({ db, codenaamVan }) => {
      eigen lijst en zegt het niets meer. Geeft terug of er echt iets is
      genoteerd, zodat de route de kijker eerlijk kan vertellen wat er gebeurde
      in plaats van dat stil te doen (LAT-regel 5). */
-  function noteer(kijker, doel) {
+  function noteerBezoek(kijker, doel) {
     if (!kijker || !doel || kijker === doel) return { genoteerd: false };
     const b = B();
     if (!Array.isArray(b[doel])) b[doel] = [];
@@ -76,5 +76,5 @@ module.exports = ({ db, codenaamVan }) => {
     };
   }
 
-  return { noteer, bezoekers, TTL_MS, MAX_PER_LID };
+  return { noteerBezoek, bezoekers, TTL_MS, MAX_PER_LID };
 };

@@ -268,6 +268,28 @@ test('bereik telt je eigen posts over de bronnen heen, en belooft geen vertoning
     'er staat een groei- of trendmaat in het bereik, en die hoort er niet te zijn');
 });
 
+test('het bedrijfsbeeld zegt ook wat we NIET weten', async () => {
+  /* Deze toets ontbrak, en de keuring wees hem aan: van de vijftien
+     wereld-endpoints was `/api/wereld/bedrijf` de enige die in geen enkele
+     toets voorkwam. Een endpoint zonder toets is geen defect, maar wel een
+     stuk code waarvan niemand kan zeggen wat het doet. */
+  const b = await lid('Bedrijf Baas', 'bd1@x.nl', 'business');
+
+  const leeg = await post('/api/wereld/bedrijf', {}, b.token);
+  assert.equal(leeg.status, 400, 'zonder zoekterm: geweigerd');
+
+  const r = await json(await post('/api/wereld/bedrijf', { q: 'zzz-bestaat-niet' }, b.token));
+  assert.deepEqual(r.treffers, [], 'een onbekende naam geeft een lege lijst, geen gok');
+
+  /* En de eigenschap die het ontwerp draagt: wat RTG niet weet, staat er als
+     zodanig bij. Een lege regel leest anders als een nul (LAT-regel 5). */
+  const demo = await json(await post('/api/wereld/bedrijf', { q: 'a' }, b.token));
+  if (demo.treffers.length) {
+    assert.ok(Array.isArray(demo.treffers[0].onbekend) && demo.treffers[0].onbekend.includes('omzet'),
+      'het bedrijfsbeeld zegt niet welke gegevens het NIET heeft: ' + JSON.stringify(demo.treffers[0]));
+  }
+});
+
 /* ---------- de bewaarde lijsten ---------- */
 
 test('de talentpool bewaart een codenaam, nooit een sleutel, en alleen wie je mag zien', async () => {

@@ -96,31 +96,9 @@ module.exports = ({ db, zijnVrienden }) => {
     }
   }
 
-  /* ---------- de vijf zichtbaarheden, elk een andere groep ----------
-     Er staat bewust geen 'vrienden' meer naast 'contacten': zie de kop. */
-  // de groepen staan in db.data.genootschap.GROEPEN (zie kern/genootschap/index.js);
-  // dat leest hier bewust letterlijk zo, want de vorm raden ging al een keer mis
-  const deeltGenootschap = (a, b) => ((db.data.genootschap || {}).groepen || [])
-    .some(gr => {
-      const leden = (gr.leden || []).map(l => (typeof l === 'string' ? l : l && l.key));
-      return leden.includes(a) && leden.includes(b);
-    });
-
-  function magZien(niveau, kijker, doel) {
-    if (kijker === doel) return true;              // je eigen profiel: altijd
-    switch (niveau) {
-      case 'iedereen': return true;
-      case 'contacten': return !!(zijnVrienden && zijnVrienden(kijker, doel));
-      // de professionele kant van diezelfde graaf: verbonden EN allebei een
-      // zakelijk profiel. Zonder dat tweede deel zou 'zakelijk' hetzelfde
-      // betekenen als 'contacten', en dan is het geen aparte keuze.
-      case 'zakelijk': return !!(zijnVrienden && zijnVrienden(kijker, doel))
-        && !!zakProfiel(kijker) && !!zakProfiel(doel);
-      case 'genootschap': return deeltGenootschap(kijker, doel);
-      case 'alleenik': return false;
-      default: return false;                        // onbekend niveau: dicht
-    }
-  }
+  /* De vijf zichtbaarheden staan in ./zicht.js -- wie welke groep aanwijst is
+     een vraag op zichzelf, en dit bestand zat vlak onder de 10 kB-grens. */
+  const { magZien } = require('./zicht')({ db, zijnVrienden, zakProfiel });
 
   /* ---------- de eigen opslag: wie mag wat zien ---------- */
   const zichtVan = (key, pad) => {

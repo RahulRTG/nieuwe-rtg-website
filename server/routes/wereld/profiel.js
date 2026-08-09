@@ -50,7 +50,7 @@ module.exports = ({ app, auth, save, rechten, profiel, netwerk, bezoek,
        sluipstand -- zie de kop van kern/wereld/bezoek.js. Dat dit in het
        antwoord staat is de handhaving van die belofte: het scherm kan het niet
        tonen als de server het niet meegeeft, en het staat er altijd. */
-    const bezoekje = bezoek.noteer(req.session.key, doel);
+    const bezoekje = bezoek.noteerBezoek(req.session.key, doel);
     if (bezoekje.genoteerd) save();
     res.json({
       codenaam,

@@ -31,7 +31,7 @@ module.exports = ({ db, codenaamVan }) => {
      zakelijke prikbord. Per bron wat er staat en wat het deed; daarnaast de
      stukken die het meest zijn gelezen, zodat je ziet WAT aansloeg in plaats
      van alleen DAT er iets aansloeg. */
-  function bereik(key) {
+  function mijnBereik(key) {
     const codenaam = codenaamVan(key);
 
     const salon = (db.data.posts || [])
@@ -120,5 +120,5 @@ module.exports = ({ db, codenaamVan }) => {
     };
   }
 
-  return { bereik, bedrijf };
+  return { mijnBereik, bedrijf };
 };

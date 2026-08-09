@@ -21,7 +21,12 @@
     tekst: { groot: 'rtg-tekst-groot', groter: 'rtg-tekst-groter' },
     contrast: { hoog: 'rtg-contrast' },
     beweging: { stil: 'rtg-stil' },
-    links: { streep: 'rtg-linkstreep' }
+    links: { streep: 'rtg-linkstreep' },
+    nadruk: { rustig: 'rtg-rustig' },
+    /* rtg-eending zet geen opmaak maar verlaagt de drempel van
+       shared/deelmenu.js: die leest de klas van <html>. Hij hoort daarom hier en
+       niet apart, anders zou "terug naar normaal" hem laten staan. */
+    eenDing: { altijd: 'rtg-eending' }
   };
 
   function lees() {

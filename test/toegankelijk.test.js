@@ -38,7 +38,8 @@ test.after(() => {
 test('een vers lid staat op normaal, en /api/ik draagt de keuzelijst', async () => {
   const r = await api('ik/toegankelijk', {}, lid);
   assert.equal(r.status, 200);
-  assert.deepEqual(r.body.toegankelijk, { tekst: 'normaal', contrast: 'normaal', beweging: 'normaal', links: 'normaal' });
+  assert.deepEqual(r.body.toegankelijk, { tekst: 'normaal', contrast: 'normaal', beweging: 'normaal',
+    links: 'normaal', eenDing: 'normaal', nadruk: 'normaal' });
 
   /* Het scherm bouwt de schakelaars uit deze lijst. Staat hij er niet, dan
      tekent ik.html niets en is de instelling onbereikbaar zonder dat er iets
@@ -46,7 +47,8 @@ test('een vers lid staat op normaal, en /api/ik draagt de keuzelijst', async () 
   const ik = await api('ik', {}, lid);
   assert.equal(ik.status, 200);
   const velden = ik.body.keuzes.toegankelijk;
-  assert.deepEqual(Object.keys(velden).sort(), ['beweging', 'contrast', 'links', 'tekst']);
+  assert.deepEqual(Object.keys(velden).sort(),
+    ['beweging', 'contrast', 'eenDing', 'links', 'nadruk', 'tekst']);
   assert.ok(velden.tekst.opties.some(o => o.id === 'groter'), 'de grootste tekstmaat staat in de lijst');
   assert.deepEqual(ik.body.toegankelijk, r.body.toegankelijk, 'beide wegen geven dezelfde stand');
 });
@@ -80,9 +82,45 @@ test('een onbekende waarde valt terug op normaal en wordt niet bewaard', async (
 test('terugzetten naar normaal werkt echt (staatAan gaat weer uit)', async () => {
   await api('ik/toegankelijk/zet', { tekst: 'normaal', beweging: 'normaal' }, lid);
   const r = await api('ik/toegankelijk', {}, lid);
-  assert.deepEqual(r.body.toegankelijk, { tekst: 'normaal', contrast: 'normaal', beweging: 'normaal', links: 'normaal' });
+  assert.deepEqual(r.body.toegankelijk, { tekst: 'normaal', contrast: 'normaal', beweging: 'normaal',
+    links: 'normaal', eenDing: 'normaal', nadruk: 'normaal' });
   const opnieuw = await api('ik/toegankelijk/zet', {}, lid);
   assert.equal(opnieuw.body.staatAan, false, 'niets aan is ook echt niets aan');
+});
+
+test('de twee nieuwe keuzes zijn gedrag en geen diagnose, en de laag maakt ze waar', async () => {
+  /* Er staat met opzet geen "ADHD-modus" of "autismemodus" op dit scherm: zo'n
+     knop zegt iets OVER de persoon en vraagt om een diagnose als toegangsbewijs
+     tot instellingen die niemand hoeft te verdienen. Ze staan er als wat ze DOEN.
+     Zie de kop van server/kern/toegankelijk.js. */
+  const ik = await api('ik', {}, lid);
+  const velden = ik.body.keuzes.toegankelijk;
+  const namen = JSON.stringify(velden);
+  assert.ok(!/adhd|autis|autism|dyslex|diagnose|stoornis/i.test(namen),
+    'geen enkele schakelaar draagt de naam van een diagnose');
+  assert.ok(!/energiemanagement/i.test(namen),
+    'en geen "energiemanagement": RTG meet geen energie, en dat woord belooft een meting');
+
+  const gezet = await api('ik/toegankelijk/zet', { eenDing: 'altijd', nadruk: 'rustig' }, lid);
+  assert.equal(gezet.body.toegankelijk.eenDing, 'altijd');
+  assert.equal(gezet.body.toegankelijk.nadruk, 'rustig');
+  assert.equal(gezet.body.staatAan, true);
+  assert.equal((await api('ik/toegankelijk/zet', { eenDing: 'ietsverzonnens' }, lid)).body.toegankelijk.eenDing,
+    'normaal', 'een onbekende waarde valt terug op normaal en wordt niet stil bewaard');
+
+  /* En de gedeelde laag maakt ze ook echt waar: de klassen staan in
+     shared/toegankelijk.js en de opmaak in de kop van shared/basis.js. Een
+     instelling zonder uitvoering is een belofte in tekst (LAT.md regel 6). */
+  const fs = require('fs');
+  const path = require('path');
+  const lees = (...p) => fs.readFileSync(path.join(__dirname, '..', 'public', 'shared', ...p), 'utf8');
+  const pas = lees('toegankelijk.js');
+  assert.match(pas, /nadruk:\s*\{\s*rustig:\s*'rtg-rustig'/, 'rtg-rustig wordt gezet en weer weggehaald');
+  assert.match(pas, /eenDing:\s*\{\s*altijd:\s*'rtg-eending'/);
+  assert.match(lees('basis.js'), /html\.rtg-rustig\{/, 'en rtg-rustig heeft echte opmaak');
+  assert.match(lees('deelmenu.js'), /rtg-eending/, 'en rtg-eending verlaagt de drempel van het deelmenu');
+
+  await api('ik/toegankelijk/zet', { eenDing: 'normaal', nadruk: 'normaal' }, lid);
 });
 
 test('zonder eigen account valt er niets in te stellen', async () => {

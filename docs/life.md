@@ -36,7 +36,7 @@ klinkt.
 | Dagelijkse check-in | `public/apps/vitaal.html` + de veiligheidskern | één knop per dag; de klok loopt op de server, dus stilte is het signaal |
 | Sport | `public/apps/sport.html`, `sportclub.html`, `server/kern/clubs.js` | activiteiten, clubs, lessen, banen |
 | Gezin | `public/apps/foundation/gezondheid.html`, `gevoel.html`, `rust.html` | gezinsgezondheidsboekje, hoe voel je je, even rust |
-| Toegankelijkheidsprofiel | `server/kern/toegankelijk.js`, `public/shared/toegankelijk.js`, kop van `shared/basis.js` | tekstgrootte, contrast, beweging en onderstreepte links, op elke pagina die `shared/basis.js` laadt |
+| Toegankelijkheidsprofiel | `server/kern/toegankelijk.js`, `public/shared/toegankelijk.js`, kop van `shared/basis.js` | zes instellingen (tekstgrootte, contrast, beweging, links, één ding tegelijk, nadruk) op elke pagina die `shared/basis.js` laadt |
 | Doelenmotor | `server/kern/doelen.js`, `public/apps/doelen.html` | beginpunt, streefpunt, datum en reden; mijlpalen worden afgeleid, dus een gemiste week is een ander pad en geen mislukking |
 | Het ene scherm | `server/kern/life.js`, `public/apps/life.html` | leest ritme, doelen, afspraken en check-in bij elkaar; meet zelf niets en legt niets vast |
 | Dagmetingen | `server/kern/metingen.js`, invulvak op `apps/life.html` | slaap, beweging en water, door het lid zelf ingevuld; een dag heeft één waarde |
@@ -118,10 +118,11 @@ geen route en geen toets.
 - **Een dag die RTG indeelt** (ontbijt, wandeling, training, avondroutine). De
   dagcoach die er nu staat legt alleen naast elkaar wat het lid al ergens heeft
   staan; hij verzint geen tijdstippen. Zie hieronder waarom.
-- **De rest van de toegankelijkheid.** Het profiel dat er nu is doet vier
-  dingen (zie hieronder); eenvoudige taal, een taak per scherm,
-  schermlezer-teksten en spraakbesturing staan er bewust niet in, want die zijn
-  per pagina werk en geen schakelaar. ADHD- en autismemodus bestaan niet.
+- **De rest van de toegankelijkheid.** Het profiel doet nu zes dingen (zie
+  hieronder); eenvoudige taal, een taak per scherm, schermlezer-teksten en
+  spraakbesturing staan er bewust niet in, want die zijn per pagina werk en geen
+  schakelaar. Een ADHD- of autismemodus bestaat niet en komt er ook niet, en dat
+  is een keuze met een reden — zie hieronder.
 - **Coach-marktplaats en coachportaal.**
 - **Multi-vestiging voor zorgorganisaties, resource-planning, wachtlijstmotor.**
 
@@ -157,6 +158,38 @@ snijdt nu de server-weg af en meet wat er dan nog staat.
 die haar grijstinten hard invult, verandert niet mee. Tekstgrootte en beweging
 raken alles. En zonder eigen account is er niets om bij de server te bewaren:
 de instelling blijft dan op dat ene toestel staan.
+
+## Waarom er geen ADHD- of autismemodus is
+
+Het oorspronkelijke voorstel vroeg om een ADHD- en een autismemodus, en om
+energiemanagement. Wat er in plaats daarvan staat, zijn twee instellingen erbij
+in het gewone toegankelijkheidsprofiel: **"Eén ding tegelijk"** (elke app wordt
+opgesplitst in delen met een menu erboven, ook de korte) en **"Nadruk: rustig"**
+(minder kleur, dunnere randen, geen schaduwen — alles even luid).
+
+Twee redenen om ze niet naar een diagnose te noemen.
+
+**Een knop met een diagnose erop zegt iets over de persoon.** Hij vraagt in feite
+om een label als toegangsbewijs tot instellingen die niemand hoeft te verdienen.
+Wie hem aanzet, heeft iets over zichzelf verklaard aan een reisbureau.
+
+**En de koppeling klopt niet.** De dingen die mensen met ADHD of autisme hier
+vaak willen — minder prikkels, één ding tegelijk, geen beweging,
+voorspelbaarheid — helpen net zo goed iemand met migraine, iemand die moe is, of
+iemand die in een schuddende trein zit. Ze staan er daarom als wat ze *doen*, en
+iedereen kan ze aanzetten zonder iets uit te leggen.
+
+Om dezelfde reden staat er geen **"energiemanagement"**: RTG meet geen energie,
+en een schakelaar die dat woord draagt belooft een meting die er niet is. Wat er
+wel is, is per dag kiezen hoe druk het scherm mag zijn.
+
+Beide nieuwe instellingen worden door de **gedeelde laag** waargemaakt, net als
+de vier die er al stonden — dat was ook de voorwaarde om ze aan te bieden.
+`rtg-rustig` heeft echte opmaak in de kop van `shared/basis.js`; `rtg-eending`
+zet geen opmaak maar verlaagt de drempel van `shared/deelmenu.js` van drie delen
+naar twee. Dat laatste is het soort belofte dat op een echt scherm nagekeken moet
+worden, en dat gebeurt ook: de schermtoets telt de knoppen van het deelmenu op
+een pagina met precies twee delen, met en zonder de instelling.
 
 ## De doelenmotor, zoals hij nu werkt
 

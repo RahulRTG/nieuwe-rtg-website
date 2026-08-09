@@ -51,6 +51,11 @@
     if (tg.contrast === 'hoog') el.classList.add('rtg-contrast');
     if (tg.beweging === 'stil') el.classList.add('rtg-stil');
     if (tg.links === 'streep') el.classList.add('rtg-linkstreep');
+    /* Twee die de gedeelde laag ook echt waarmaakt: rtg-rustig dempt de nadruk
+       hieronder, en rtg-eending laat shared/deelmenu.js ook korte apps
+       opsplitsen. */
+    if (tg.nadruk === 'rustig') el.classList.add('rtg-rustig');
+    if (tg.eenDing === 'altijd') el.classList.add('rtg-eending');
   } catch (e) {}
 
 
@@ -74,6 +79,12 @@
     'html.rtg-tekst-groter{font-size:135%;}' +
     'html.rtg-contrast{--rtg-txt:#FFFFFF;--rtg-muted:rgba(244,241,236,0.94);--rtg-soft:rgba(244,241,236,0.88);--rtg-line:rgba(255,255,255,0.32);}' +
     'html.rtg-stil *,html.rtg-stil *::before,html.rtg-stil *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important;}' +
+    /* Rustig: alles even luid. De accentkleuren van het huis worden de gewone
+       tekstkleur, en dikke randen worden dunne lijnen -- zodat niets aan de
+       aandacht trekt dat dat niet verdient. */
+    'html.rtg-rustig{--gold:var(--txt);--goud:var(--txt);--goldlicht:var(--muted,var(--soft));}' +
+    'html.rtg-rustig [class*="badge"],html.rtg-rustig [class*="pill"]{filter:saturate(.35);}' +
+    'html.rtg-rustig *{border-width:1px!important;box-shadow:none!important;}' +
     'html.rtg-linkstreep a{text-decoration:underline!important;text-underline-offset:.18em;}' +
     '.bss-net{position:fixed;left:50%;transform:translateX(-50%);top:.6rem;z-index:60;background:#0C0C0B;border:1px solid #444;border-radius:10px;color:#eee;font:500 .8rem Inter,system-ui,sans-serif;padding:.45rem .8rem;box-shadow:0 8px 24px rgba(0,0,0,.5);max-width:92vw;}' +
     '.bss-sheet{position:fixed;left:1rem;bottom:1rem;z-index:38;width:min(340px,92vw);background:#151312;border:1px solid var(--gold,#A98F1C);border-radius:16px;padding:1rem;color:#eee;font-family:Inter,system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.5);display:flex;flex-direction:column;gap:.55rem;}' +

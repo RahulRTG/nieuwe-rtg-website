@@ -10,6 +10,18 @@
    belofte zijn die de code niet waarmaakt, en dat is precies de fout die
    LAT.md regel 6 beschrijft. Ze komen erbij als ze gebouwd zijn, niet eerder.
 
+   EN ER STAAT GEEN "ADHD-MODUS" OF "AUTISMEMODUS" IN, met opzet. Twee redenen.
+   Ten eerste zegt zo'n knop iets OVER de persoon: hij vraagt om een diagnose als
+   toegangsbewijs tot instellingen die niemand hoeft te verdienen. Ten tweede
+   klopt de koppeling niet -- de dingen die mensen met ADHD of autisme hier vaak
+   willen (minder prikkels, een ding tegelijk, geen beweging, voorspelbaarheid)
+   helpen net zo goed iemand met migraine, iemand die moe is, of iemand die in de
+   trein zit. Ze staan er daarom als wat ze DOEN, en iedereen kan ze aanzetten.
+
+   Om dezelfde reden staat er geen "energiemanagement": RTG meet geen energie, en
+   een schakelaar die dat woord draagt belooft een meting die er niet is. Wat er
+   wel is, is per dag te kiezen hoe druk het scherm mag zijn.
+
    Het profiel hoort bij het lid en gaat NOOIT mee naar een partner: dat iemand
    groot contrast nodig heeft is iets over hem, niet iets wat een zaak moet
    weten. Opslag hangt daarom aan de memberState van het account (dezelfde bak
@@ -50,10 +62,32 @@ const KEUZES = {
       { id: 'normaal', naam: 'Zoals het huis ze zet' },
       { id: 'streep', naam: 'Altijd onderstreept' }
     ]
+  },
+  /* De twee hieronder zijn er bij gekomen omdat ze, net als de vier erboven,
+     door de GEDEELDE laag zijn waar te maken. Ze heten naar wat ze doen en niet
+     naar een diagnose: zie de kop van dit bestand. */
+  eenDing: {
+    label: 'Eén ding tegelijk',
+    uitleg: 'Elke app wordt opgesplitst in delen met een menu erboven, ook de korte. '
+      + 'U ziet dan één deel per keer in plaats van een lange rol.',
+    opties: [
+      { id: 'normaal', naam: 'Alleen bij lange apps' },
+      { id: 'altijd', naam: 'Altijd opsplitsen' }
+    ]
+  },
+  nadruk: {
+    label: 'Nadruk',
+    uitleg: 'Minder kleur en minder dikke randen; alles even luid, zodat niets aan uw '
+      + 'aandacht trekt dat dat niet verdient.',
+    opties: [
+      { id: 'normaal', naam: 'Zoals het huis het zet' },
+      { id: 'rustig', naam: 'Rustig' }
+    ]
   }
 };
 
-const STANDAARD = { tekst: 'normaal', contrast: 'normaal', beweging: 'normaal', links: 'normaal' };
+const STANDAARD = { tekst: 'normaal', contrast: 'normaal', beweging: 'normaal', links: 'normaal',
+  eenDing: 'normaal', nadruk: 'normaal' };
 
 /* Een onbekende waarde valt terug op de standaard en wordt niet stil bewaard:
    wie een veld meestuurt dat niet bestaat, krijgt zijn oude waarde terug en

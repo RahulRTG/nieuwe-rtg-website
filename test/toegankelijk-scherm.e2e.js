@@ -134,6 +134,45 @@ test('een instelling op ik.html werkt door op een app die er niets van weet',
     await page.waitForFunction(() => !!window.__rtgBasis, null, { timeout: 10000 });
     assert.equal(await wortelMaat(page), voor, 'terug op de oorspronkelijke maat');
 
+    /* 5. "Een ding tegelijk" is de enige instelling die geen OPMAAK zet maar
+       GEDRAG verandert: shared/deelmenu.js knipt een pagina normaal pas op vanaf
+       drie delen, en met deze klas al vanaf twee. Dat is precies het soort
+       belofte dat op een echt scherm nagekeken moet worden -- een klas die
+       nergens gelezen wordt, is een knop naar niets. */
+    await page.goto(base + '/apps/ik.html', { waitUntil: 'load' });
+    await openHetDeel(page);
+    const eenDing = page.locator('#toegankelijk [data-tgveld="eenDing"][data-tgwaarde="altijd"]');
+    await eenDing.scrollIntoViewIfNeeded();
+    await eenDing.click();
+    await page.waitForFunction(() => {
+      const b = document.querySelector('#toegankelijk [data-tgveld="eenDing"][data-tgwaarde="altijd"]');
+      return b && b.getAttribute('aria-pressed') === 'true';
+    }, null, { timeout: 10000 });
+
+    /* apps/tijdlijn.html heeft precies TWEE delen: normaal geen menu, met deze
+       stand wel. */
+    await page.goto(base + '/apps/tijdlijn.html', { waitUntil: 'load' });
+    await page.waitForFunction(() => document.documentElement.classList.contains('rtg-eending'),
+      null, { timeout: 10000 });
+    const metMenu = await page.locator('.rtgdeel-balk button').count();
+
+    await page.goto(base + '/apps/ik.html', { waitUntil: 'load' });
+    await openHetDeel(page);
+    const terugEen = page.locator('#toegankelijk [data-tgveld="eenDing"][data-tgwaarde="normaal"]');
+    await terugEen.scrollIntoViewIfNeeded();
+    await terugEen.click();
+    await page.waitForFunction(() => {
+      const b = document.querySelector('#toegankelijk [data-tgveld="eenDing"][data-tgwaarde="normaal"]');
+      return b && b.getAttribute('aria-pressed') === 'true';
+    }, null, { timeout: 10000 });
+    await page.goto(base + '/apps/tijdlijn.html', { waitUntil: 'load' });
+    await page.waitForFunction(() => !document.documentElement.classList.contains('rtg-eending'),
+      null, { timeout: 10000 });
+    const zonderMenu = await page.locator('.rtgdeel-balk button').count();
+    assert.ok(metMenu > zonderMenu,
+      'met "een ding tegelijk" verschijnt er een deelmenu waar er anders geen is (' +
+      zonderMenu + ' -> ' + metMenu + ')');
+
     assert.deepEqual(paginaFouten, [], 'geen JS-fouten tijdens de schermen');
   } finally {
     if (browser) await browser.close();

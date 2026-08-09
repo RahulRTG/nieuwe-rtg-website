@@ -70,6 +70,13 @@
       "gezakt": 5,
       "scherp": "gezakt"
     },
+    "agenda.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "agenda.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -181,6 +188,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "scherp": "gezakt"
+    },
+    "apps-ui.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 8,
       "scherp": "gezakt"
     },
     "archief.test.js": {
@@ -302,6 +316,13 @@
       "gezakt": 8,
       "scherp": "gezakt"
     },
+    "bankscherm.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
+    },
     "bedrijfbeeld.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -372,6 +393,13 @@
       "gezakt": 6,
       "scherp": "gezakt"
     },
+    "berichten.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "berichten.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -400,6 +428,13 @@
       "operator": "+->-#1",
       "gezakt": 1,
       "geprobeerd": 4
+    },
+    "bestanden.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
     },
     "bestanden.test.js": {
       "soort": "server",
@@ -521,6 +556,13 @@
       "gezakt": 11,
       "scherp": "gezakt"
     },
+    "boeken.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "boeken.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -625,6 +667,13 @@
       "gezakt": 8,
       "scherp": "gezakt"
     },
+    "clips-studio.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "clips.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -702,6 +751,11 @@
       "gezakt": 5,
       "scherp": "vastgelopen"
     },
+    "csp.e2e.js": {
+      "soort": "server",
+      "staat": "overleefd",
+      "operator": "liegpoort /api/"
+    },
     "dealkans.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -716,6 +770,18 @@
       "gezakt": 5,
       "scherp": "gezakt"
     },
+    "deelmenu.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "deelmenuwacht.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 2
+    },
     "defensie.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -725,10 +791,8 @@
     },
     "deur.e2e.js": {
       "soort": "server",
-      "staat": "gezakt",
-      "operator": "liegpoort /api/",
-      "gezakt": 2,
-      "scherp": "gezakt"
+      "staat": "al rood",
+      "gezakteZonderMutatie": 2
     },
     "directpay.test.js": {
       "soort": "server",
@@ -841,6 +905,11 @@
       "operator": "liegpoort /api/",
       "gezakt": 8,
       "scherp": "gezakt"
+    },
+    "eigensessieschermen.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 3
     },
     "ervaring.test.js": {
       "soort": "server",
@@ -969,6 +1038,11 @@
       "gezakt": 4,
       "scherp": "gezakt"
     },
+    "galerij.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
+    },
     "galerij.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -1053,6 +1127,11 @@
       "gezakt": 4,
       "scherp": "gezakt"
     },
+    "genootschap.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
+    },
     "genootschap.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -1080,6 +1159,11 @@
       "operator": "liegpoort /api/",
       "gezakt": 5,
       "scherp": "gezakt"
+    },
+    "gereedschap.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
     },
     "gereedschap.test.js": {
       "soort": "puur",
@@ -1166,6 +1250,11 @@
       "gezakt": 1,
       "geprobeerd": 3
     },
+    "gpsschakelaar.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
+    },
     "grand-integratie.pg.test.js": {
       "soort": "server",
       "staat": "slaat zichzelf over",
@@ -1191,6 +1280,11 @@
       "operator": "liegpoort /api/",
       "gezakt": 9,
       "scherp": "gezakt"
+    },
+    "handenvrij.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
     },
     "handenvrij.test.js": {
       "soort": "puur",
@@ -1269,6 +1363,16 @@
       "gezakt": 9,
       "scherp": "gezakt"
     },
+    "horecascherm.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
+    },
+    "horecaschermen.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 3
+    },
     "horlogewerk.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -1304,6 +1408,11 @@
       "operator": "&&->||",
       "gezakt": 1
     },
+    "huis.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
+    },
     "huis.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -1331,6 +1440,11 @@
       "operator": "liegpoort /api/",
       "gezakt": 4,
       "scherp": "gezakt"
+    },
+    "identiteitschermen.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 2
     },
     "imap.test.js": {
       "soort": "puur",
@@ -1360,6 +1474,11 @@
       "gezakt": 11,
       "scherp": "gezakt"
     },
+    "juridischeschermen.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
+    },
     "kaart.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -1367,12 +1486,22 @@
       "operator": "===->!==",
       "gezakt": 2
     },
+    "kantoordeuren.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
+    },
     "kantoordienst.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
       "scherp": "gezakt"
+    },
+    "kantoorgesprek.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
     },
     "kantoorgesprek.test.js": {
       "soort": "server",
@@ -1474,6 +1603,11 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "klankwerk.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
+    },
     "kleine-grendels.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -1534,6 +1668,11 @@
       "gezakt": 6,
       "scherp": "gezakt"
     },
+    "laatstedrie.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
+    },
     "lab-geheim.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -1586,6 +1725,11 @@
       "gezakt": 3,
       "geprobeerd": 1
     },
+    "ledenschermen.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 3
+    },
     "leerstof.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -1621,6 +1765,11 @@
       "operator": "liegpoort /api/",
       "gezakt": 5,
       "scherp": "gezakt"
+    },
+    "leven.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
     },
     "levensloop.test.js": {
       "soort": "server",
@@ -1658,6 +1807,11 @@
       "operator": "liegpoort /api/",
       "gezakt": 7,
       "scherp": "gezakt"
+    },
+    "lifestyleschermen.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 2
     },
     "livegang.test.js": {
       "soort": "server",
@@ -1772,6 +1926,11 @@
       "gezakt": 11,
       "scherp": "gezakt"
     },
+    "media.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
+    },
     "media.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -1779,12 +1938,22 @@
       "gezakt": 1,
       "scherp": "gezakt"
     },
+    "meet.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
+    },
     "meet.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
       "scherp": "gezakt"
+    },
+    "memo.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
     },
     "memo.test.js": {
       "soort": "server",
@@ -1820,6 +1989,11 @@
       "soort": "puur",
       "staat": "muteert zelf",
       "reden": "muteert zelf echte bestanden (waaronder MUTATIES.json) om meters te ijken"
+    },
+    "metier.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
     },
     "metier.test.js": {
       "soort": "server",
@@ -1974,6 +2148,11 @@
       "gezakt": 4,
       "scherp": "gezakt"
     },
+    "notities.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
+    },
     "notities.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -1995,6 +2174,11 @@
       "gezakt": 8,
       "scherp": "gezakt"
     },
+    "office-blad.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
+    },
     "office-blad.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -2002,6 +2186,16 @@
       "operator": "true->false#0",
       "gezakt": 3,
       "geprobeerd": 1
+    },
+    "office-formschets.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
+    },
+    "office-suite.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
     },
     "office-tweede-helft.test.js": {
       "soort": "server",
@@ -2140,6 +2334,16 @@
       "gezakt": 18,
       "scherp": "gezakt"
     },
+    "overheidschermen.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 2
+    },
+    "paginas.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
+    },
     "pakket.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -2233,6 +2437,11 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
+    "pda-ui.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 3
+    },
     "pdf.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -2298,6 +2507,11 @@
       "gezakt": 7,
       "scherp": "gezakt"
     },
+    "poortgesprek.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
+    },
     "poortrace.test.js": {
       "soort": "puur",
       "staat": "geen bronmutatie mogelijk",
@@ -2317,6 +2531,11 @@
       "operator": "liegpoort /api/",
       "gezakt": 5,
       "scherp": "gezakt"
+    },
+    "premium.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 5
     },
     "productie.test.js": {
       "soort": "puur",
@@ -2418,6 +2637,11 @@
       "gezakt": 6,
       "scherp": "gezakt"
     },
+    "rahulscherm.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
+    },
     "rampbeeld.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -2500,6 +2724,11 @@
       "operator": "liegpoort /api/",
       "gezakt": 6,
       "scherp": "gezakt"
+    },
+    "reisschermen.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 3
     },
     "reiswijzer.test.js": {
       "soort": "server",
@@ -2618,12 +2847,22 @@
       "gezakt": 11,
       "scherp": "gezakt"
     },
+    "rtfagenda.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
+    },
     "rtfagenda.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
       "scherp": "gezakt"
+    },
+    "rtfalbum.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
     },
     "rtfalbum.test.js": {
       "soort": "server",
@@ -2646,12 +2885,22 @@
       "gezakt": 4,
       "scherp": "gezakt"
     },
+    "rtfcurve.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
+    },
     "rtfcurve.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
       "scherp": "gezakt"
+    },
+    "rtfgeld.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
     },
     "rtfgeld.test.js": {
       "soort": "server",
@@ -2660,12 +2909,27 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
+    "rtfhulpwijzer.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
+    },
     "rtfkantoor.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
       "scherp": "gezakt"
+    },
+    "rtfkinderschermen.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 4
+    },
+    "rtfrust.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
     },
     "rtfschool.test.js": {
       "soort": "server",
@@ -2674,12 +2938,27 @@
       "gezakt": 6,
       "scherp": "gezakt"
     },
+    "rtfschool2.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
+    },
     "rtfschool2.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
       "scherp": "gezakt"
+    },
+    "rtfspeelhoek.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
+    },
+    "rtfwelzijn.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
     },
     "rtfwelzijn.test.js": {
       "soort": "server",
@@ -2760,12 +3039,22 @@
       "gezakt": 10,
       "scherp": "gezakt"
     },
+    "rtmail-team.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
+    },
     "rtmail-team.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 9,
       "scherp": "gezakt"
+    },
+    "rtmail-vak.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
     },
     "rtmail-vak.test.js": {
       "soort": "server",
@@ -2802,6 +3091,11 @@
       "operator": "liegpoort /api/",
       "gezakt": 3,
       "scherp": "gezakt"
+    },
+    "salon-app.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
     },
     "salon-app.test.js": {
       "soort": "server",
@@ -2866,6 +3160,16 @@
       "operator": "liegpoort /api/",
       "gezakt": 2,
       "scherp": "gezakt"
+    },
+    "scan-tafel.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
+    },
+    "scanner.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
     },
     "scanner.test.js": {
       "soort": "puur",
@@ -3485,6 +3789,11 @@
       "gezakt": 6,
       "scherp": "gezakt"
     },
+    "veiligheid.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
+    },
     "veiligheid.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -3540,6 +3849,11 @@
       "operator": "liegpoort /api/",
       "gezakt": 3,
       "scherp": "gezakt"
+    },
+    "vertaler.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
     },
     "verzadiging.test.js": {
       "soort": "puur",
@@ -3720,6 +4034,11 @@
       "gezakt": 6,
       "scherp": "gezakt"
     },
+    "werkblad.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
+    },
     "werkmail.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -3748,6 +4067,16 @@
       "gezakt": 13,
       "scherp": "gezakt"
     },
+    "werkscherm.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 3
+    },
+    "werkschermen.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 4
+    },
     "werkvenster.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -3768,6 +4097,11 @@
       "operator": "liegpoort /api/",
       "gezakt": 11,
       "scherp": "gezakt"
+    },
+    "wings.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
     },
     "wiring-contract.test.js": {
       "soort": "puur",
@@ -3857,12 +4191,22 @@
       "gezakt": 2,
       "scherp": "gezakt"
     },
+    "zaal.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
+    },
     "zakelijk.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
       "scherp": "gezakt"
+    },
+    "zegel-ui.e2e.js": {
+      "soort": "server",
+      "staat": "al rood",
+      "gezakteZonderMutatie": 1
     },
     "zegel.test.js": {
       "soort": "puur",

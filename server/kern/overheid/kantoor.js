@@ -2,7 +2,8 @@
    en slimme werkplek van de Belastingdienst. De inspecteurscockpit ziet alles in
    een oogopslag (ontvangen, te ontvangen, teruggaven, toeslagen, btw-beeld), de
    invordering loopt netjes via de Berichtenbox (herinnering, betalingsregeling,
-   kwijtschelding -- altijd een mens die beslist), en het kantoor werkt samen met
+   kwijtschelding -- altijd een mens die beslist, en bij kwijtschelding TWEE
+   mensen; die drie wonen in ./kantoor-invordering.js), en het kantoor werkt samen met
    alles wat moet: de facturatiemotor (btw per onderneming), het KVK-handelsregister
    en de Dienst Toeslagen. De slimme signalen wijzen de inspecteur op wat aandacht
    vraagt; de AI-chef-inspecteur (Rahul) denkt mee op het hele beeld. Beslissen
@@ -92,43 +93,18 @@ module.exports = (ctx) => {
       ref: a.ref, wie: a.codenaam, jaar: a.jaar, inkomen: a.inkomen, aftrek: a.aftrek, saldo: a.saldo,
       betaald: !!a.betaald, kwijtgescholden: !!a.kwijtgescholden, herinnerd: a.herinnerd || null,
       regeling: a.regeling ? { maanden: a.regeling.maanden, per: a.regeling.per } : null,
+      /* De lopende voordracht tot kwijtschelding gaat MEE naar het scherm, met
+         de naam erbij. Zonder die naam kan de tweede inspecteur niet zien of
+         hij zelf de voordrager was, en dan botst hij pas op de vier-ogen-regel
+         nadat hij op de knop heeft gedrukt. */
+      kwijtVoorstel: a.kwijtVoorstel ? { door: a.kwijtVoorstel.door, reden: a.kwijtVoorstel.reden, at: a.kwijtVoorstel.at } : null,
       dagenOpen: open(a) ? dagen(a.ingediend || a.at) : 0 })) };
   }
 
-  /* ---- invordering: een mens beslist, de Berichtenbox draagt het besluit ---- */
-  function pak(r) { return aanslagen().find(x => x.ref === String(r || '')); }
-  function bdHerinnering(actor, r) {
-    const a = pak(r);
-    if (!a) return { status: 404, error: 'Aanslag niet gevonden.' };
-    if (!open(a)) return { status: 409, error: 'Voor deze aanslag staat niets open.' };
-    a.herinnerd = nu();
-    bericht(a.key, 'Belastingdienst', 'Betalingsherinnering ' + a.jaar,
-      'Er staat nog € ' + a.saldo + ' open voor je aanslag ' + a.jaar + ' (' + a.ref + '). Betaal via MijnOverheid, of vraag een betalingsregeling aan.', 'belasting');
-    save();
-    return { ok: true };
-  }
-  function bdRegeling(actor, r, maanden) {
-    const a = pak(r);
-    if (!a) return { status: 404, error: 'Aanslag niet gevonden.' };
-    if (!open(a)) return { status: 409, error: 'Voor deze aanslag staat niets open.' };
-    const m = Math.round(Number(maanden) || 0);
-    if (m < 2 || m > 24) return { status: 400, error: 'Kies een regeling van 2 tot 24 maanden.' };
-    a.regeling = { maanden: m, per: Math.ceil(a.saldo / m), door: actor || 'inspecteur', at: nu() };
-    bericht(a.key, 'Belastingdienst', 'Betalingsregeling toegekend',
-      'Voor je aanslag ' + a.jaar + ' is een regeling getroffen: ' + m + ' maanden van € ' + a.regeling.per + '.', 'belasting');
-    save();
-    return { ok: true, regeling: a.regeling };
-  }
-  function bdKwijtschelding(actor, r, reden) {
-    const a = pak(r);
-    if (!a) return { status: 404, error: 'Aanslag niet gevonden.' };
-    if (!open(a)) return { status: 409, error: 'Voor deze aanslag staat niets open.' };
-    a.kwijtgescholden = true; a.kwijt = { reden: schoon(reden, 200) || 'op besluit van de inspecteur', door: actor || 'inspecteur', at: nu() };
-    bericht(a.key, 'Belastingdienst', 'Kwijtschelding',
-      'De openstaande € ' + a.saldo + ' van je aanslag ' + a.jaar + ' is kwijtgescholden (' + a.kwijt.reden + '). Je hoeft niets meer te betalen.', 'belasting');
-    save();
-    return { ok: true };
-  }
+  /* ---- invordering: een mens beslist, de Berichtenbox draagt het besluit ----
+     Woont in ./kantoor-invordering.js. Daar staat ook waarom de kwijtschelding
+     sinds deze ronde door TWEE inspecteurs gaat en de andere twee niet. */
+  const deelInvordering = require('./kantoor-invordering')({ nu, save, schoon, bericht, aanslagen, open });
 
   /* ---- de AI-chef-inspecteur: Rahul denkt mee op het hele beeld ----
      Adviserend, nooit beslissend: elke herinnering, regeling of kwijtschelding
@@ -155,5 +131,5 @@ module.exports = (ctx) => {
     return { ok: true, demo: true, antwoord: 'Het beeld van vandaag: ' + beeld + ' Mijn advies: pak eerst de invorderingssignalen op (herinnering sturen kost niets), en kijk daarna naar de controle-signalen. Beslissen doet u zelf.' };
   }
 
-  return { bdCockpit, bdAanslagen, bdHerinnering, bdRegeling, bdKwijtschelding, bdBtwBeeld: btwBeeld, bdAI };
+  return Object.assign({ bdCockpit, bdAanslagen, bdBtwBeeld: btwBeeld, bdAI }, deelInvordering);
 };

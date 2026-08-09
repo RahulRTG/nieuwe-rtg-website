@@ -30,6 +30,12 @@
   },
   "notities": [
     {
+      "datum": "2026-08-09",
+      "meter": "kernBreedte 1121 -> 1122 op deze tak (met de hand vastgelegd als afweging, NIET als nieuwe grondwaarde)",
+      "reden": "De btw-keten (aangifte, toezicht, aansluiting, naheffing, bezwaar, betalen, invordering) heeft precies EEN kern-naam toegevoegd: `btwAangifte`. Er is EEN manier om hem weg te werken en die is afgewezen: hem onder `overheid` hangen. routes/supplier/btw.js pakt die naam al, dus het zou meteen een omlaag geven -- maar de btw-aangifte is van de ONDERNEMER en niet van de dienst, en de kop van datzelfde bestand belooft met zoveel woorden dat er GEEN kantoorroute is die het indienen overneemt. Die belofte in de structuur tegenspreken om een meter te plezieren is de meter dienen in plaats van de lezer; dezelfde afweging als bij kernGedeeld 140 -> 141 hieronder. Staat als 4.25 in TAKEN.md met wat er wel moet gebeuren: een echte fiscale groepering in de kern, waar ook financeVoor, dagrapport en regelwacht in horen.",
+      "eerlijkheidshalve": "Deze notitie legt GEEN nieuwe grondwaarde vast, en dat kan ook niet zinnig: NORM.json loopt op zes meters achter op `main` zelf (kernBreedte staat op 1078 terwijl main op 1121 staat; ook keuringOmvang, keuringTeGroot, keuringDubbeling, toetsenNietGemeten en inlineStijlAttributen). `npm run norm` staat daardoor rood ongeacht wat deze tak doet, en dat is dus geen oordeel over deze tak. Nagemeten met een worktree op origin/main naast de werkboom, zodat het niet bij vermoeden blijft: van HEAD naar de werkboom is geen enkele meter slechter geworden en staat keuringOmvang er twee beter voor (kern/lidacties/bestellen.js en kern/overheid/kantoor.js zijn op hun naad geknipt in plaats van over de grens geduwd). De achterstand van NORM.json staat als 4.26 in TAKEN.md; hem hier stilzwijgend gladstrijken zou de ratel opheffen op precies het moment dat iemand hem nodig heeft."
+    },
+    {
       "datum": "2026-08-08",
       "meter": "toetsenNietGemeten 148 -> 147 (BETER, en met de hand vastgezet)",
       "reden": "De mutatiemotor is alsnog over test/postdatum.test.js en test/smtp-in.test.js gegaan: allebei GEZAKT, en allebei ook in de scherpe ronde (waarin alleen het eigen domein liegt en de deuren open blijven). Daar staat een nieuw toetsbestand tegenover dat de motor NIET kan meten -- test/vooruitscherm.e2e.js heeft een browser nodig. Netto een omlaag. Ik zet hem met de hand op 147 en gebruik --vastleggen niet: dat tilt ook meters op die deze ronde niet zijn aangeraakt.",

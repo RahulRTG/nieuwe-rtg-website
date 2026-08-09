@@ -545,6 +545,18 @@ packages). Ze bewaken de plekken waar geld en wet aan hangen:
   klok), dat beslag andere ogen vraagt en nooit meer pakt dan de schuld, dat een
   deelbeslag de rest laat staan, en dat de regeling en de stopknop de keten
   echt tegenhouden;
+- dat elke betaalde lidtransactie ook echt een factuur oplevert
+  (`test/lidfactuur.test.js`): zes betaalwegen — in de app, de gezamenlijke
+  rekening, een boeking, een rit, de balie op de ophaalcode en het tafelticket
+  — elk precies één factuur op de ref van de bon, nooit twee voor dezelfde bon,
+  en als sluitstuk dat de btw-aangifte op de cent uitkomt op de omzet die de
+  maandboekhouding van diezelfde zaak telt, over twee tarieven tegelijk. Plus
+  dat een factuur die niet lukt de betaling niet omvertrekt maar wél op het
+  techniekbord komt;
+- dat de kwijtschelding van een aanslag door twee inspecteurs gaat
+  (`test/belastingkantoor.test.js` en `test/kwijtschelding-scherm.e2e.js`):
+  voordragen met een grond, beslissen door een ander, en de inwoner hoort er
+  pas van als er écht is besloten;
 - De Salon-rechten (gast liket wel, reageert niet), de bestel- en betaalflow
   en de AVG-rechten (inzage en definitieve verwijdering).
 
@@ -691,6 +703,43 @@ De HTML-bestanden werken ook los (dubbelklikken of statische hosting): het porta
 | `POST /api/cv/get` / `POST /api/cv/save` | Het RTG-cv van het lid (de cv-builder in de leden-app) |
 | `POST /api/member/apply` `{supplierCode, func}` | Solliciteren bij een partner; kan pas met een afgerond cv |
 | `POST /api/supplier/apply` `{code, name, func, contact}` | Open sollicitatie via het startscherm van een partner-app |
+
+### Waar de omzet vandaan komt, en tegen welk tarief
+
+Twee dingen zaten hier los van elkaar terwijl ze over dezelfde transactie gaan,
+en allebei zijn ze rechtgezet.
+
+**1. Elke betaalde lidtransactie boekt nu een factuur** (`kern/lidacties/factuur.js`).
+De kassa, de retail, de verhuur en het vastgoed deden dat al; de transacties van
+het lid — een bestelling, de gezamenlijke rekening, een boeking, een rit — niet,
+en de twee kassawegen waarlangs zo'n bestelling alsnog wordt afgerekend (de
+ophaalcode aan de balie en het tafelticket) evenmin. Dat viel niemand op tot de
+btw-aangifte kwam: die telt het **factuurregister**, dus omzet zonder factuur
+stond er niet in, terwijl de maandboekhouding van diezelfde zaak hem wel telde.
+Er staat nu één routine die weet hoe een lidtransactie een factuur wordt, en de
+zes wegen roepen die aan — precies één keer, op het moment dat er écht is
+betaald. Een factuur die niet lukt draait de betaling nooit terug, maar valt ook
+niet stil: hij gaat naar de fout-aggregatie en dus naar het techniekbord.
+
+**2. Het btw-tarief stond op twee plekken en die twee waren het oneens**
+(`kern/fiscaal/tarief.js`). De maandboekhouding zocht een percentage op in de
+landentabel van de zaak; de facturatiemotor had `restaurant/bar/hotel/
+groothandel/boerderij → 9%, de rest → 21%` in zijn kop staan, zonder ooit naar
+het land te kijken. Voor een Nederlandse zaak viel dat samen. Voor Sal de Mar op
+Ibiza (land `ES`) niet: de boekhouding rekende 10%, de bon van de gast zei 9%.
+En het was niet bij te houden — de landentabel is levend, want de Regelwacht
+legt er een overlay overheen zodra een tarief verandert, en twee vaste getallen
+elders lopen daar per definitie op achter.
+
+Beide kanten vragen het nu aan dezelfde routine, dus ze **kunnen** niet meer
+uiteenlopen. Twee gevolgen die het waard zijn om te noemen:
+
+- de bon van de gast draagt per regel het juiste tarief, dus een glas wijn in
+  een restaurant staat op het standaardtarief en niet op het lage;
+- **een zaak zonder kaart, kamers of ritten valt nu onder `standaard` in plaats
+  van `eten`.** De boekhouding zette elke zaak zonder kamers of ritten op
+  `eten`, dus een kledingwinkel rekende het verlaagde tarief over een jas. Dat
+  cijfer verandert daardoor, en dat is de bedoeling.
 
 ### De btw-aangifte van een zaak (`kern/fiscaal/btwaangifte.js`)
 
@@ -857,6 +906,34 @@ die verzin je er niet even bij.
 | `POST /api/supplier/btw/naheffingen` | De zaak leest zijn eigen (geen concepten) |
 | `POST /api/supplier/btw/naheffing/bezwaar` `{id, reden}` | De zaak maakt bezwaar |
 | `POST /api/supplier/btw/naheffing/betaal` `{id}` | De zaak betaalt: een echte boeking van zijn zakelijke rekening |
+
+#### En de oudere kant van hetzelfde kantoor: de IB-aanslag (`kern/overheid/kantoor-invordering.js`)
+
+Er draaiden **twee invorderingsregimes naast elkaar in hetzelfde kantoor**. De
+naheffing hierboven heeft vier ogen op elke stap die geld raakt; de oudere
+IB-kant (herinnering, betalingsregeling, kwijtschelding) had er nul — één
+inspecteur kon in zijn eentje een schuld wegstrepen. Dat is nu gelijkgetrokken
+op het punt waar het ertoe doet: **kwijtschelden is de enige onomkeerbare
+handeling in dat rijtje**, en die gaat in twee stappen door twee mensen. Een
+herinnering kun je opnieuw sturen en een regeling kun je intrekken; een
+kwijtgescholden aanslag komt niet terug.
+
+De burger hoort pas van een kwijtschelding als er écht is besloten — een
+voordracht is geen besluit, dus er valt nog niets mee te delen.
+
+| Endpoint | Doel |
+|---|---|
+| `POST /api/overheid/bd/herinnering` `{ref}` | Betalingsherinnering via de Berichtenbox, op naam |
+| `POST /api/overheid/bd/regeling` `{ref, maanden}` | 2–24 maanden, op naam |
+| `POST /api/overheid/bd/kwijt/voordracht` `{ref, reden}` | Voordragen, met een verplichte grond; de burger hoort nog niets |
+| `POST /api/overheid/bd/kwijt/besluit` `{ref, akkoord}` | Beslissen — moet een ándere inspecteur zijn; afwijzen laat de aanslag gewoon openstaan |
+
+**Wat er aan deze kant (nog) niet is: termijnen.** De naheffing rekent na of een
+vervaldatum echt is verstreken voordat de volgende stap mag, en kent aanmaning,
+dwangbevel en beslag; de IB-kant kent alleen een herinnering zonder klok
+erachter. Dat is met opzet niet half nagebootst — knoppen die een volgorde
+suggereren zonder de datums na te rekenen zijn misleidender dan geen. Het staat
+als 4.23 in `TAKEN.md`.
 
 #### De herinnering rekent ook zelf (`kern/automatisering.js`)
 

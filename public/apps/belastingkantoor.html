@@ -293,10 +293,19 @@ async function laadAanslagen(){
         : '<span class="status open">open '+euro(a.saldo)+(a.dagenOpen?' · '+a.dagenOpen+'d':'')+'</span>';
       const reg = a.regeling ? ' <span class="status">regeling '+a.regeling.maanden+'×'+euro(a.regeling.per)+'</span>' : '';
       const her = a.herinnerd ? ' <span class="status">herinnerd</span>' : '';
+      /* Kwijtschelden gaat door TWEE inspecteurs. Ligt er nog niets, dan staat
+         er "Voordragen"; ligt er een voordracht, dan staat die er met naam en
+         reden bij en zijn de twee besluitknoppen zichtbaar. */
+      const vs = a.kwijtVoorstel;
+      const kwijtKnop = vs
+        ? '<button class="knop rood" data-kwijtja="'+a.ref+'">Kwijtschelden</button><button class="knop stil" data-kwijtnee="'+a.ref+'">Voordracht afwijzen</button>'
+        : '<button class="knop stil" data-kwijt="'+a.ref+'">Voordragen voor kwijtschelding</button>';
       const acties = (!a.betaald && !a.kwijtgescholden && a.saldo > 0)
-        ? '<div class="rij"><button class="knop stil" data-her="'+a.ref+'">Herinnering</button><button class="knop stil" data-reg="'+a.ref+'">Regeling</button><button class="knop rood" data-kwijt="'+a.ref+'">Kwijtschelden</button></div>' : '';
+        ? '<div class="rij"><button class="knop stil" data-her="'+a.ref+'">Herinnering</button><button class="knop stil" data-reg="'+a.ref+'">Regeling</button>'+kwijtKnop+'</div>' : '';
+      const vsRegel = vs && !a.kwijtgescholden
+        ? '<div class="meta">Voorgedragen voor kwijtschelding door '+esc(vs.door)+' ('+esc(String(vs.at).slice(0,10))+'): '+esc(vs.reden)+'. Een ANDERE inspecteur beslist.</div>' : '';
       return '<div class="item"><h4>'+esc(a.wie)+' · '+a.jaar+' <small style="color:var(--soft);font-family:Inter;">'+esc(a.ref)+'</small></h4>'+
-        '<div class="meta">Inkomen '+euro(a.inkomen)+' · aftrek '+euro(a.aftrek)+' · '+st+reg+her+'</div>'+acties+'</div>';
+        '<div class="meta">Inkomen '+euro(a.inkomen)+' · aftrek '+euro(a.aftrek)+' · '+st+reg+her+'</div>'+vsRegel+acties+'</div>';
     }).join('') : '<div class="leeg">Geen aanslagen in deze selectie.</div>';
     $('#aanLijst').querySelectorAll('[data-her]').forEach(b => b.addEventListener('click', async () => {
       try { await api('/api/overheid/bd/herinnering', { ref: b.dataset.her }); meld('Herinnering verstuurd via de Berichtenbox.'); laadAanslagen(); laadCockpit(); } catch(e){ meld(e.message); } }));
@@ -304,9 +313,14 @@ async function laadAanslagen(){
       const m = prompt('Betalingsregeling: in hoeveel maanden (2-24)?', '6'); if (!m) return;
       try { const r = await api('/api/overheid/bd/regeling', { ref: b.dataset.reg, maanden: m }); meld('Regeling: '+r.regeling.maanden+' maanden van '+euro(r.regeling.per)+'.'); laadAanslagen(); laadCockpit(); } catch(e){ meld(e.message); } }));
     $('#aanLijst').querySelectorAll('[data-kwijt]').forEach(b => b.addEventListener('click', async () => {
-      if (!confirm('Deze openstaande aanslag kwijtschelden?')) return;
-      const reden = prompt('Reden (komt in de Berichtenbox van de inwoner):', '') || '';
-      try { await api('/api/overheid/bd/kwijt', { ref: b.dataset.kwijt, reden }); meld('Kwijtgescholden.'); laadAanslagen(); laadCockpit(); } catch(e){ meld(e.message); } }));
+      const reden = prompt('Grond voor de kwijtschelding (een ander beslist erop; komt daarna in de Berichtenbox):', '') || '';
+      if (!reden.trim()) return;
+      try { const r = await api('/api/overheid/bd/kwijt/voordracht', { ref: b.dataset.kwijt, reden }); meld(r.let || 'Voorgedragen.'); laadAanslagen(); laadCockpit(); } catch(e){ meld(e.message); } }));
+    $('#aanLijst').querySelectorAll('[data-kwijtja]').forEach(b => b.addEventListener('click', async () => {
+      if (!confirm('Deze aanslag definitief kwijtschelden? Dit is niet terug te draaien.')) return;
+      try { await api('/api/overheid/bd/kwijt/besluit', { ref: b.dataset.kwijtja, akkoord: true }); meld('Kwijtgescholden; de inwoner heeft bericht.'); laadAanslagen(); laadCockpit(); } catch(e){ meld(e.message); } }));
+    $('#aanLijst').querySelectorAll('[data-kwijtnee]').forEach(b => b.addEventListener('click', async () => {
+      try { const r = await api('/api/overheid/bd/kwijt/besluit', { ref: b.dataset.kwijtnee, akkoord: false }); meld(r.let || 'Afgewezen.'); laadAanslagen(); laadCockpit(); } catch(e){ meld(e.message); } }));
   } catch(e){ meld(e.message); }
 }
 $('#stand').addEventListener('change', laadAanslagen);

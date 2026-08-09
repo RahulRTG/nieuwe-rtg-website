@@ -44,7 +44,13 @@
     const eerder = ((btwData && btwData.aangiftes) || []).slice().sort((a, b) => (a.periode < b.periode ? 1 : -1));
     const toon = btwOpen || eerder[0] || null;
     return '<div class="tkc h-volbreed"><h3>'+T('fn.btwaan','Btw-aangifte')+'</h3>'+
-      '<div class="tkc-who">'+T('fn.btwaan.s','Opgemaakt uit uw factuurregister: elke regel telt mee met het tarief dat erop staat. Omzet zonder factuur staat er niet in. Controleren en indienen doet u zelf; RTG dient nooit voor u in en verzendt niets.')+'</div>'+
+      /* Deze zin ZEI eerst "omzet zonder factuur staat er niet in". Dat was
+         waar en het was een pleister: een betaalde bestelling, boeking of rit
+         boekte helemaal geen factuur, dus die omzet viel buiten de aangifte.
+         Sinds kern/lidacties/factuur.js boekt elke betaalde transactie er een,
+         langs welke weg hij ook wordt afgerekend -- dus staat er nu wat er
+         gebeurt, en niet meer waar de lezer op moest letten. */
+      '<div class="tkc-who">'+T('fn.btwaan.s','Opgemaakt uit uw factuurregister: elke regel telt mee met het tarief dat erop staat. Elke betaalde transactie boekt zelf een factuur, ook een bestelling die aan de balie wordt afgerekend. Controleren en indienen doet u zelf; RTG dient nooit voor u in en verzendt niets.')+'</div>'+
       '<div class="btw-rij">'+
       '<select class="st-in btw-per" id="btwPer">'+
       btwPeriodes().map(p => '<option value="'+p+'"'+(toon && toon.periode === p ? ' selected' : '')+'>'+p+'</option>').join('')+'</select>'+

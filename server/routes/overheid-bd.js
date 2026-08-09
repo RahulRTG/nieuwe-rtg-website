@@ -75,7 +75,14 @@ module.exports = (kern, { rijk, stuur, wie }) => {
 
   app.post('/api/overheid/bd/herinnering', supplierAuth, rijk, (req, res) => stuur(res, overheid.bdHerinnering(wie(req), String(req.body.ref || ''))));
   app.post('/api/overheid/bd/regeling', supplierAuth, rijk, (req, res) => stuur(res, overheid.bdRegeling(wie(req), String(req.body.ref || ''), req.body.maanden)));
-  app.post('/api/overheid/bd/kwijt', supplierAuth, rijk, (req, res) => stuur(res, overheid.bdKwijtschelding(wie(req), String(req.body.ref || ''), req.body.reden)));
+  /* Kwijtschelden gaat in TWEE stappen door TWEE inspecteurs -- voordragen en
+     beslissen. Zie de kop van kern/overheid/kantoor-invordering.js: dit is de
+     enige handeling hier die onomkeerbaar geld weggeeft, en die stond als enige
+     invorderingsweg in dit kantoor zonder vier ogen. */
+  app.post('/api/overheid/bd/kwijt/voordracht', supplierAuth, rijk, (req, res) =>
+    stuur(res, overheid.bdKwijtVoorstel(wie(req), String(req.body.ref || ''), req.body.reden)));
+  app.post('/api/overheid/bd/kwijt/besluit', supplierAuth, rijk, (req, res) =>
+    stuur(res, overheid.bdKwijtBesluit(wie(req), String(req.body.ref || ''), req.body.akkoord === true)));
   app.post('/api/overheid/bd/ai', supplierAuth, rijk, async (req, res) => {
     try { res.json(await overheid.bdAI(String(req.body.vraag || ''))); }
     catch (e) { res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }

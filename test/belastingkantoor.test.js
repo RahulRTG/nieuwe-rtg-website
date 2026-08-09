@@ -66,17 +66,87 @@ test('2. invordering: herinnering en betalingsregeling landen in de Berichtenbox
   assert.ok(box.body.berichten.some(b => /regeling/i.test(b.titel)), 'de regeling is bezorgd');
 });
 
-test('3. kwijtschelding maakt de aanslag dicht en meldt het de inwoner', async () => {
-  // de tweede inwoner heeft door de hoge aftrek en lage inhouding ook een openstaand saldo
+test('3. kwijtschelding gaat door TWEE inspecteurs, en pas dan hoort de inwoner het', async () => {
+  /* Dit was een handeling van EEN inspecteur: hij streepte in zijn eentje een
+     schuld weg en de inwoner kreeg meteen bericht. In hetzelfde kantoor had de
+     naheffing omzetbelasting wel vier ogen op elke stap die geld raakt. Twee
+     regimes naast elkaar, en het lakste zat op de enige ONOMKEERBARE handeling.
+     Zie de kop van kern/overheid/kantoor-invordering.js.
+
+     Er is precies EEN openstaande aanslag in deze opzet, dus de afwijzing en de
+     toekenning lopen achter elkaar over dezelfde zaak -- wat meteen laat zien
+     dat een afwijzing de deur niet dichtgooit. */
   const a = await api(base, '/api/overheid/bd/aanslagen', { stand: 'open' }, rijk);
   const open = a.body.aanslagen[0];
   assert.ok(open, 'er staat nog een aanslag open');
-  const k = await api(base, '/api/overheid/bd/kwijt', { ref: open.ref, reden: 'schrijnend geval' }, rijk);
+
+  // een tweede inspecteur, want anders valt hier niets te toetsen
+  const tweede = await api(base, '/api/supplier/staff/add', { name: 'Inspecteur De Wit', role: 'manager' }, rijk);
+  assert.equal(tweede.status, 200);
+  const rijk2 = (await api(base, '/api/supplier/login',
+    { code: 'RIJK', staffId: tweede.body.staff.id, pin: tweede.body.pin })).body.token;
+  const stand = async () => (await api(base, '/api/overheid/bd/aanslagen', {}, rijk))
+    .body.aanslagen.find(x => x.ref === open.ref);
+
+  // zonder voordracht is er niets te beslissen
+  assert.equal((await api(base, '/api/overheid/bd/kwijt/besluit', { ref: open.ref, akkoord: true }, rijk2)).status, 409);
+  // en een voordracht zonder grond bestaat niet
+  assert.equal((await api(base, '/api/overheid/bd/kwijt/voordracht', { ref: open.ref, reden: '' }, rijk)).status, 400);
+
+  // ---- ronde 1: voorgedragen en AFGEWEZEN ----
+  assert.equal((await api(base, '/api/overheid/bd/kwijt/voordracht',
+    { ref: open.ref, reden: 'twijfelgeval' }, rijk)).status, 200);
+  const nee = await api(base, '/api/overheid/bd/kwijt/besluit', { ref: open.ref, akkoord: false }, rijk2);
+  assert.equal(nee.status, 200);
+  assert.equal(nee.body.kwijtgescholden, false);
+  const naNee = await stand();
+  assert.equal(naNee.kwijtgescholden, false, 'de schuld staat er nog');
+  assert.equal(naNee.kwijtVoorstel, null, 'en de voordracht hangt niet blijvend boven de zaak');
+
+  // ---- ronde 2: opnieuw voorgedragen, nu toegekend ----
+  const v = await api(base, '/api/overheid/bd/kwijt/voordracht',
+    { ref: open.ref, reden: 'schrijnend geval' }, rijk);
+  assert.equal(v.status, 200, 'na een afwijzing kan er opnieuw worden voorgedragen');
+  const hangend = await stand();
+  assert.equal(hangend.kwijtgescholden, false, 'een voorstel is geen besluit');
+  assert.ok(hangend.kwijtVoorstel && hangend.kwijtVoorstel.door.length > 1,
+    'de voordracht staat met naam op het scherm, zodat de tweede ziet of hij het zelf was');
+  /* En de burger hoort van een VOORDRACHT nog niets. Dit stond eerst alleen in
+     de titel van deze toets en niet in de toets zelf: een mutatie die het
+     bericht al bij het voordragen liet uitgaan, kwam er ongestraft doorheen.
+     Het is precies de belofte die deze twee stappen dragen -- een voorstel is
+     geen besluit, dus er valt nog niets mee te delen. */
+  const stil = await Promise.all([lid, lid2].map(t => api(base, '/api/overheid/berichten', {}, t)));
+  assert.ok(!stil.flatMap(b => b.body.berichten).some(b => /kwijtschelding/i.test(b.titel)),
+    'nog geen bericht in welke Berichtenbox dan ook: er is nog niets besloten');
+
+  // DEZELFDE ogen beslissen niet
+  const zelf = await api(base, '/api/overheid/bd/kwijt/besluit', { ref: open.ref, akkoord: true }, rijk);
+  assert.equal(zelf.status, 409);
+  assert.match(zelf.body.error, /dezelfde ogen/i);
+  // en er ligt al een voordracht, dus een tweede kan niet
+  assert.equal((await api(base, '/api/overheid/bd/kwijt/voordracht',
+    { ref: open.ref, reden: 'nogmaals' }, rijk2)).status, 409);
+
+  const k = await api(base, '/api/overheid/bd/kwijt/besluit', { ref: open.ref, akkoord: true }, rijk2);
   assert.equal(k.status, 200);
-  // dubbel kwijtschelden kan niet
-  assert.equal((await api(base, '/api/overheid/bd/kwijt', { ref: open.ref }, rijk)).status, 409);
-  const na = await api(base, '/api/overheid/bd/aanslagen', {}, rijk);
-  assert.ok(na.body.aanslagen.find(x => x.ref === open.ref).kwijtgescholden);
+  assert.equal(k.body.kwijtgescholden, true);
+  const dicht = await stand();
+  assert.ok(dicht.kwijtgescholden);
+  assert.equal(dicht.kwijtVoorstel, null, 'de voordracht is verbruikt');
+
+  /* PAS NU hoort de inwoner het, met de grond erbij. Welke van de twee inwoners
+     deze aanslag heeft, ligt aan de volgorde in de lijst; het gaat erom dat het
+     bericht ergens LIGT en dat er tot dit moment niets lag. */
+  const boxen = await Promise.all([lid, lid2].map(t => api(base, '/api/overheid/berichten', {}, t)));
+  const bericht = boxen.flatMap(b => b.body.berichten).find(b => /kwijtschelding/i.test(b.titel));
+  assert.ok(bericht, 'de kwijtschelding is bezorgd');
+  assert.match(bericht.tekst, /schrijnend geval/, 'met de grond erbij, en met die van de TOEGEKENDE voordracht');
+  assert.ok(!/twijfelgeval/.test(bericht.tekst), 'niet met de grond van de afgewezen voordracht');
+
+  // er staat niets meer open, dus er valt niets meer te beslissen
+  assert.equal((await api(base, '/api/overheid/bd/kwijt/voordracht',
+    { ref: open.ref, reden: 'nog eens' }, rijk)).status, 409);
 });
 
 test('4. het btw-beeld komt uit de facturatiemotor, gekoppeld aan het KVK-register', async () => {

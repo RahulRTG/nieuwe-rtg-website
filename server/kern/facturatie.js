@@ -15,8 +15,11 @@
    (inclusief btw); de btw wordt teruggerekend. */
 
 const SOORTEN = ['verkoop', 'dienst', 'huur'];
-// Standaard-btw per genre: eten/drinken en agrarisch 9%, de rest 21%.
-const LAAG_BTW_TYPES = ['restaurant', 'bar', 'hotel', 'groothandel', 'boerderij'];
+/* Het btw-tarief stond hier als een lijstje genres met twee vaste percentages.
+   Dat is weg: het percentage hoort bij het LAND van de zaak en staat samen met
+   de categorie in kern/fiscaal/tarief.js, waar de maandboekhouding het ook
+   vandaan haalt. Twee lijstjes die hetzelfde bedoelen lopen uiteen -- en dat
+   deden ze ook. */
 
 function maakFacturatie({ db, save, crypto, findSupplier, keyVanCodenaam, notify, notifySupplier, sseToCustomer, sseToSupplier, factuur, anthropic, schoon, automatisering }) {
   const nu = () => new Date().toISOString();
@@ -27,7 +30,7 @@ function maakFacturatie({ db, save, crypto, findSupplier, keyVanCodenaam, notify
      een keer opgebouwd bij het opstarten; de motor gaat eerst de context
      in omdat het loket (o.a. de AI) boekMetCodenaam gebruikt. */
   const ctx = { db, save, crypto, findSupplier, keyVanCodenaam, notify, notifySupplier, sseToCustomer, sseToSupplier, factuur, anthropic, schoon, automatisering,
-    SOORTEN, LAAG_BTW_TYPES, nu, scho, rond };
+    SOORTEN, nu, scho, rond };
   const deelMotor = require('./facturatie/motor')(ctx);
   Object.assign(ctx, deelMotor);
   const deelLoket = require('./facturatie/loket')(ctx);

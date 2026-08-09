@@ -1,10 +1,11 @@
 /* Facturatie (deelmodule): de factuurmotor: de opslag, nummering, het
-   standaard btw-tarief per genre, regels verwerken en het tweezijdige
-   boeken (op code of codenaam). Krijgt de gedeelde context een keer bij
-   het opstarten vanuit kern/facturatie.js. */
+   btw-tarief (uit kern/fiscaal/tarief.js, dezelfde bron als de boekhouding
+   van de zaak), regels verwerken en het tweezijdige boeken (op code of
+   codenaam). Krijgt de gedeelde context een keer bij het opstarten vanuit
+   kern/facturatie.js. */
 module.exports = (ctx) => {
   const { db, save, crypto, findSupplier, keyVanCodenaam, notify, notifySupplier, sseToCustomer, sseToSupplier, factuur, anthropic, schoon,
-    SOORTEN, LAAG_BTW_TYPES, nu, scho, rond } = ctx;
+    SOORTEN, nu, scho, rond } = ctx;
   const publiek = (f) => ctx.publiek(f);
   function store() {
     if (!Array.isArray(db.data.facturen)) db.data.facturen = [];
@@ -16,18 +17,33 @@ module.exports = (ctx) => {
     s.factuurTeller += 1;
     return 'RTG-' + new Date().getFullYear() + '-' + String(s.factuurTeller).padStart(6, '0');
   }
+  /* HET TARIEF KOMT UIT DE FISCALE LAAG, niet uit een lijstje hier.
+     Hier stond `LAAG_BTW_TYPES.includes(type) ? 9 : 21` -- twee vaste getallen
+     die nergens naar het LAND van de zaak keken, terwijl de maandboekhouding
+     van diezelfde zaak wel de landentabel gebruikte. Sal de Mar op Ibiza (land
+     ES) boekte 10% en factureerde 9%. Zie de kop van kern/fiscaal/tarief.js. */
+  const tarief = require('../fiscaal/tarief');
+  const capsVan = (s) => { try { return db.capsVan(s); } catch (e) { return []; } };
   function standaardBtw(supplier) {
-    if (!supplier) return 21;
-    return LAAG_BTW_TYPES.includes(supplier.type) ? 9 : 21;
+    if (!supplier) return tarief.tariefVan(null, 'standaard');
+    return tarief.tariefVan(supplier, tarief.basisCat(supplier, capsVan(supplier)));
+  }
+  /* En PER REGEL, want een glas wijn in een restaurant is geen eten. Zonder
+     deze stap zou de bon alles op het lage tarief zetten terwijl de boekhouding
+     de bar apart telt -- dan lopen ze alsnog uiteen, alleen subtieler. */
+  function regelBtw(supplier, omschrijving, basis) {
+    return tarief.tariefVan(supplier, tarief.catVanItem(supplier, omschrijving, basis));
   }
 
   // Reken de regels door: elk stuk is een prijs INCLUSIEF btw.
-  function verwerkRegels(regels, btwStandaard) {
+  function verwerkRegels(regels, btwStandaard, verkoper) {
+    const basis = verkoper ? tarief.basisCat(verkoper, capsVan(verkoper)) : null;
     let subtotaal = 0, btwBedrag = 0, totaal = 0;
     const uit = (Array.isArray(regels) ? regels : []).slice(0, 60).map(r => {
       const aantal = Math.max(1, Number(r.aantal) || 1);
       const stuk = rond(r.stuk);
-      const btw = Number.isFinite(Number(r.btw)) ? Number(r.btw) : btwStandaard;
+      const btw = Number.isFinite(Number(r.btw)) ? Number(r.btw)
+        : basis ? regelBtw(verkoper, r.omschrijving, basis) : btwStandaard;
       const regelIncl = rond(aantal * stuk);
       const regelExcl = rond(regelIncl / (1 + btw / 100));
       subtotaal += regelExcl; btwBedrag += rond(regelIncl - regelExcl); totaal += regelIncl;
@@ -45,7 +61,10 @@ module.exports = (ctx) => {
     const btwStd = data.btw != null ? Number(data.btw) : standaardBtw(verkoper);
     let regels = data.regels;
     if ((!regels || !regels.length) && data.totaal != null) regels = [{ omschrijving: data.omschrijving || 'Transactie', aantal: 1, stuk: data.totaal, btw: btwStd }];
-    const v = verwerkRegels(regels, btwStd);
+    /* De verkoper gaat MEE, zodat elke regel zijn eigen tarief krijgt. Gaf de
+       aanroeper zelf een `btw` mee, dan telt die: dan is het een bewuste keuze
+       van de boekende laag en niet iets om te overrulen. */
+    const v = verwerkRegels(regels, btwStd, data.btw != null ? null : verkoper);
     if (!(v.totaal > 0)) return { error: 'Geen bedrag om te factureren.' };
     const koper = data.koper || {};
     const f = {

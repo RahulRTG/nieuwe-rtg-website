@@ -11,7 +11,8 @@
    blijven; de gedeelde context komt een keer bij het opstarten binnen. */
 module.exports = (ctx) => {
   const { save, findSupplier, ordersVanKlant, fooiUit, pasTegoedToe, verdienPunten,
-    ledenvoordeelVoor, keuken, notifySupplier, sseToSupplier, sseToOffice } = ctx;
+    ledenvoordeelVoor, keuken, notifySupplier, sseToSupplier, sseToOffice, factuurVoorLid } = ctx;
+  const { regelsVanItems } = require('./factuur');
 
   function lopendeBonnen(session, code) {
     const s = findSupplier(code);
@@ -61,6 +62,14 @@ module.exports = (ctx) => {
       verdienPunten(session.key, o.total - k - v, o.supplierName);
       // betaald = definitief: het keukenbrein boekt de ingredienten af
       try { keuken.boekVerkoopAf(s, o.items || [], 'rekening ' + o.ref); } catch (e) {}
+      /* EEN FACTUUR PER BON, niet een per rekening. De bon is wat de
+         boekhouding telt (elke order apart, op zijn eigen ref), dus een
+         verzamelfactuur zou de omzet wel goed optellen maar niet meer
+         terug te leiden zijn naar de bestelling die hem veroorzaakte.
+         De fooi staat er bewust NIET op: die gaat naar het team en is geen
+         omzet van de zaak -- de maandboekhouding telt hem ook niet mee. */
+      factuurVoorLid({ supplierCode: o.supplierCode, supplierNaam: o.supplierName,
+        codenaam: o.customerCodename, ref: o.ref, methode: 'rtg', regels: regelsVanItems(o.items) });
     });
     save();
     const aantalItems = bonnen.reduce((n, o) => n + (o.items || []).reduce((m, it) => m + it.qty, 0), 0);

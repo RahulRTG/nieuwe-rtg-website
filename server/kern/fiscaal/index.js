@@ -11,19 +11,25 @@
 
 const { FISCAAL_PEILJAAR, LANDEN, FIN_CAT, ZZP } = require('./landen');
 const { zzpBerekening } = require('./zzp');
+// welke categorie en welk percentage bij deze zaak horen -- op EEN plek, want
+// de factuur van de klant vraagt het aan dezelfde routine; zie ./tarief.js
+const tarief = require('./tarief');
 
 function maakFiscaal({ db, centen, btwSplit }) {
   function financeVoor(s) {
-    const landCode = (s.settings && LANDEN[s.settings.land]) ? s.settings.land : 'NL';
+    const landCode = tarief.landVan(s);
     const L = LANDEN[landCode];
     const maand = new Date().toISOString().slice(0, 7);
     const inMaand = iso => String(iso || '').slice(0, 7) === maand;
-    const caps = db.capsVan(s);
-    const basisCat = caps.includes('rides') ? (s.type === 'jet' ? 'jet' : 'vervoer') : caps.includes('rooms') ? 'logies' : 'eten';
+    /* De categorie en het tarief komen uit ./tarief.js -- DEZELFDE routine als
+       waarmee kern/facturatie/motor.js de bon van de klant opmaakt. Ze stonden
+       hier los van elkaar en liepen uiteen zodra de zaak buiten Nederland zat;
+       zie de kop daar. */
+    const basisCat = tarief.basisCat(s, db.capsVan(s));
     // omzet per belastingcategorie: bar-items zijn drank, keuken-items eten
     const potten = {};
     const tel = (cat, bedrag) => { if (bedrag > 0) potten[cat] = (potten[cat] || 0) + bedrag; };
-    const catVan = naam => { const m = (s.menu || []).find(x => x.name === naam); return m && m.station === 'bar' ? 'drank' : basisCat === 'eten' ? 'eten' : basisCat; };
+    const catVan = naam => tarief.catVanItem(s, naam, basisCat);
     for (const o of db.data.orders) {
       if (o.supplierCode !== s.code || !o.paid || !inMaand(o.paidAt || o.at)) continue;
       for (const it of o.items || []) tel(catVan(it.name), (it.price || 0) * (it.qty || 1));
@@ -48,10 +54,9 @@ function maakFiscaal({ db, centen, btwSplit }) {
     for (const g of kaarten) for (const w of g.verzilveringen || []) if (inMaand(w.at)) gcIngewisseld += w.bedrag;
     if (gcIngewisseld) tel(basisCat, gcIngewisseld);
     const gcOpen = centen(kaarten.reduce((x, g) => x + g.saldo, 0));
-    const btw = Object.entries(potten).map(([cat, omzet]) => {
-      const t = L.tarieven[cat] != null ? L.tarieven[cat] : L.tarieven.standaard;
-      return { cat, label: FIN_CAT[cat] || cat, ...btwSplit(omzet, t) };
-    }).sort((a, b) => b.omzet - a.omzet);
+    const btw = Object.entries(potten).map(([cat, omzet]) =>
+      ({ cat, label: FIN_CAT[cat] || cat, ...btwSplit(omzet, tarief.tariefVan(s, cat)) }))
+      .sort((a, b) => b.omzet - a.omzet);
     // personeelskosten uit de klokuren van deze maand
     const uurloon = (s.settings && Number(s.settings.uurloon)) || 16;
     const duurUur = e => ((e.out ? new Date(e.out) : new Date()) - new Date(e.in)) / 3600000;

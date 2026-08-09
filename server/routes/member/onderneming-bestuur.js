@@ -12,7 +12,8 @@
    precies op het moment dat het ertoe doet niet meer. */
 module.exports = (kern, mijn, stuur, nietGevonden) => {
   const { app, auth, ondernemingBestuur, ondernemingBestuurderZet,
-    ondernemingBestuurderAf, ondernemingAandeelZet, ondernemingAandeelWeg } = kern;
+    ondernemingBestuurderAf, ondernemingAandeelZet, ondernemingAandeelWeg,
+    ondernemingToegang, ondernemingOntwerp, ONDERNEMING_ONTWERPER } = kern;
 
   app.post('/api/onderneming/bestuur', auth, (req, res) => {
     const o = mijn(req);
@@ -44,5 +45,31 @@ module.exports = (kern, mijn, stuur, nietGevonden) => {
     const o = mijn(req);
     if (!o) return stuur(res, nietGevonden);
     stuur(res, ondernemingAandeelWeg(o, (req.body || {}).id));
+  });
+
+  /* Wie er bij de onderneming kan, over de twee rechtenmodellen die er al zijn.
+     LEEST alleen: toegang verlenen gebeurt waar de rol woont -- in de zaak-app
+     of in RTG Werk OS, allebei met hun eigen journaal. Zie
+     kern/onderneming/toegang.js. */
+  app.post('/api/onderneming/toegang', auth, (req, res) => {
+    const o = mijn(req);
+    if (!o) return stuur(res, nietGevonden);
+    res.json({ ok: true, toegang: ondernemingToegang(o) });
+  });
+
+  /* De AI-laag: de bedrijfsontwerper en de Mall-bouwer. Er wordt NIETS
+     opgeslagen -- de uitkomst is tekst die de ondernemer zelf overneemt. Zie
+     kern/onderneming/ontwerper.js voor de drie grenzen die in de prompt staan
+     en ook in de uitwijk gelden. */
+  app.post('/api/onderneming/ontwerp', auth, async (req, res) => {
+    const o = mijn(req);
+    if (!o) return stuur(res, nietGevonden);
+    const b = req.body || {};
+    stuur(res, await ondernemingOntwerp(req, o, String(b.opdracht || 'ontwerp'), b.vraag));
+  });
+
+  app.post('/api/onderneming/ontwerp/opdrachten', auth, (req, res) => {
+    res.json({ ok: true, opdrachten: Object.entries(ONDERNEMING_ONTWERPER)
+      .map(([id, x]) => ({ id, label: x.label, wat: x.wat })) });
   });
 };

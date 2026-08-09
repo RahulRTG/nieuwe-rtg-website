@@ -32,7 +32,7 @@
 const RV = require('./rechtsvorm');
 const FASE = require('./fase');
 
-module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boekingenVanZaak, aanmeldingen, ondernemerpoort }) => {
+module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boekingenVanZaak, aanmeldingen, ondernemerpoort, staffLijst, anthropic, magAi }) => {
 
   /* De verkenningslaag: intake -> kansverkenning -> simulatie -> stress test ->
      ondernemingsplan. Vier modules die op elkaar leunen in precies die
@@ -40,8 +40,8 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boeki
   /* Alle deellagen worden in ./lagen.js opgebouwd -- dit bestand ging over de
      10 kB van het modulebeleid, en dat is de goede naad: daar de
      gereedschapskist, hier het object zelf. */
-  const { intake, kans, sim, stress, plan, dag, opr, ek, mp, boek, rel, deb, cred, con, bel, kas, cap, wrv, pij, vrd, regie } =
-    require('./lagen')({ db, save, schoon, ordersVanZaak, boekingenVanZaak, ondernemerpoort });
+  const { intake, kans, sim, stress, plan, dag, opr, ek, mp, boek, rel, deb, cred, con, bel, kas, cap, wrv, pij, vrd, klu, tgn, ontw, regie } =
+    require('./lagen')({ db, save, schoon, ordersVanZaak, boekingenVanZaak, ondernemerpoort, staffLijst, anthropic, magAi });
 
   const bak = () => {
     if (!Array.isArray(db.data.ondernemingen)) db.data.ondernemingen = [];
@@ -104,7 +104,11 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boeki
     };
   }
 
-  return {
+  const draaiend = require('./draaiend')(
+    { rel, deb, cred, con, bel, kas, cap, pij, vrd, klu, tgn, ontw, bst, regie, wrv, boek, opr, mp },
+    { save, ondernemingBeeld, ondernemingVerkenning });
+
+  return Object.assign({
     /* Het levende register: Nederland en het buitenland samen. Bewust de
        tabel zelf en geen kopie -- de Rechtsvormwacht werkt hem in place bij,
        en een kopie zou de oude stand blijven tonen. */
@@ -148,44 +152,16 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boeki
       return dag.dagbeeld(o, ondernemingBeeld(o), ondernemingVerkenning(o),
         opr.oprichtingsproject(o), ek.eersteKlant(o), mp.ondernemingMallProfiel(o),
         rel.relaties(o, t), d, c, con.contracten(o, vandaag), b, kas.kas(o, d, c, b, t), cp, wrv.werving(o, cp, t),
-        pij.pijplijn(o, t), bst.bestuur(o), vrd.voorraad(o));
+        pij.pijplijn(o, t), bst.bestuur(o), vrd.voorraad(o), klu.klussen(o, t), tgn.toegang(o, t));
     },
     ondernemingEersteKlant: ek.eersteKlant,
     ondernemingMallProfiel: mp.ondernemingMallProfiel,
-    ondernemingRelaties: rel.relaties,
-    ondernemingDebiteuren: deb.debiteuren,
-    ondernemingCrediteuren: cred.crediteuren,
-    ondernemingContracten: con.contracten,
-    ondernemingBelasting: bel.belasting,
-    ondernemingKas: (o, nu, dagen) => {
-      const t = Number.isFinite(nu) ? nu : Date.now();
-      return kas.kas(o, deb.debiteuren(o, t), cred.crediteuren(o, t), bel.belasting(o, t), t, dagen);
-    },
-    ondernemingKasSaldo: kas.kasSaldoZet,
-    ondernemingCapaciteit: cap.capaciteit,
-    ondernemingPijplijn: pij.pijplijn,
-    ondernemingVoorraad: vrd.voorraad,
-    ondernemingBestuur: bst.bestuur,
-    ondernemingBestuurderZet: bst.bestuurderZet,
-    ondernemingBestuurderAf: bst.bestuurderAf,
-    ondernemingAandeelZet: bst.aandeelZet,
-    ondernemingAandeelWeg: bst.aandeelWeg,
-    ondernemingRegie: regie.regieBeeld,
-    ondernemingProvisioningStand: regie.provisioningStand,
-    ondernemingProvisioningZet: regie.provisioningZet,
-    ondernemingBijdrageZet: regie.bijdrageZet,
-    ondernemingBijdrageOver: regie.bijdrageOver,
-    ondernemingWerving: (o, nu) => {
-      const t = Number.isFinite(nu) ? nu : Date.now();
-      return wrv.werving(o, cap.capaciteit(o, t), t);
-    },
-    ondernemingWerkruimte: (o, code) => con.ondernemingWerkruimte(o, code, save),
-    ondernemingKlantNotitie: boek.klantNotitie,
-    ondernemingOprichting: opr.oprichtingsproject,
-    ondernemingOprichtingZet: opr.oprichtingZet,
+    /* De ingangen van een bedrijf dat AL DRAAIT staan in ./draaiend.js -- dit
+       bestand ging over de 10 kB van het modulebeleid, en de naad loopt langs
+       de levensfase. */
     ondernemingAanvraag,
     ondernemingAanvraagStand
-  };
+  }, draaiend);
 };
 
 module.exports.rechtsvorm = RV;

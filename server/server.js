@@ -1881,7 +1881,11 @@ const hulp = {
   mail, media, noteFailedTry, notify, notifySupplier, onboarding, openVacatures, optieAan,
   ordersVanKlant, ordersVanZaak, pasTegoedToe, path, pickupCode, pinSlot, pushLive, rememberSession,
   reserveerTafel, rtf, rtmail, save, schoon, sendPush, sendPushToUser, sociaal, sseToCustomer,
-  sseToOffice, sseToSupplier, supplierState, ticketsVoorSlot, verdienPunten, zetRtgai, zorgContact
+  sseToOffice, sseToSupplier, supplierState, ticketsVoorSlot, verdienPunten, zetRtgai, zorgContact,
+  /* De AI-poort (kern/aipoort.js) gaat mee de kern in: het Ondernemers-OS heeft
+     hem nodig en hoort hem niet na te bouwen -- een tweede poort naar dezelfde
+     AI is een poort die niemand bewaakt. */
+  magAi: (req) => aiPoort.magAi(req)
 };
 
 /* De samenstelling van de kern staat in ./opzet/kernlaag1..7.js --

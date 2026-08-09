@@ -18,7 +18,7 @@
 /* `bankregie` wordt hier verklaard en tot onderaan dit deel gebruikt; daarom
    loopt de grens met deel 4a ervoor en niet erin. */
 module.exports = (kern, hulp) => {
-  const { FISCAAL_PEILJAAR, LANDEN, accounts, anthropic, betaal, centen, crypto, db, findSupplier, fonds, keyVanCodenaam, ledenAantal, log, ondernemerpoort, save, schoon, sseToCustomer, sseToOffice, sseToSupplier } = hulp;
+  const { FISCAAL_PEILJAAR, LANDEN, accounts, anthropic, betaal, centen, crypto, db, findSupplier, fonds, keyVanCodenaam, ledenAantal, log, magAi, ondernemerpoort, save, schoon, sseToCustomer, sseToOffice, sseToSupplier } = hulp;
 
 /* Bankregie (kern/bankregie.js): de geldinfrastructuur-knop van de boardroom --
    een schakelaar met DRIE standen (partner -> hybride -> eigen) die bepaalt hoe
@@ -76,7 +76,15 @@ Object.assign(kern, require('../kern/onderneming')({ db, save, crypto, schoon, f
   /* De poort die elke nieuwe zaak al door de basis loodst. Gelezen en niet
      nagebouwd: twee lijsten die allebei "is deze zaak er klaar voor" beweren,
      lopen uiteen. */
-  ondernemerpoort }));
+  ondernemerpoort,
+  /* Het personeel van een zaak woont in de identiteitskluis (SQLite), niet in
+     db.data. De toegangslaag telt en klokt het; namen worden hier niet
+     opgehaald. Zie kern/onderneming/toegang.js. */
+  staffLijst: (code) => accounts.listStaff(code),
+  /* De AI-laag van het Ondernemers-OS draait op dezelfde client en dezelfde
+     poort als de rest van het huis; zonder sleutel valt hij terug op de eigen
+     data. Zie kern/onderneming/ontwerper.js. */
+  anthropic, magAi }));
 /* De Rechtsvormwacht (kern/onderneming/rechtsvormwacht.js): rechtsvormen --
    Nederlandse en buitenlandse in een register -- worden automatisch bijgewerkt
    in plaats van overgetypt. Zelfde ontwerp als de Regelwacht hierboven: een

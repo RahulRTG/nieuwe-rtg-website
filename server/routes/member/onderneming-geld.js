@@ -10,7 +10,7 @@ module.exports = (kern, mijn, stuur, nietGevonden) => {
   const { app, auth, ondernemingRelaties, ondernemingKlantNotitie,
     ondernemingDebiteuren, ondernemingCrediteuren, ondernemingContracten,
     ondernemingWerkruimte, ondernemingBelasting, ondernemingKas, ondernemingKasSaldo, ondernemingCapaciteit,
-    ondernemingWerving, ondernemingPijplijn, ondernemingVoorraad } = kern;
+    ondernemingWerving, ondernemingPijplijn, ondernemingVoorraad, ondernemingKlussen } = kern;
 
   /* Het klantenboek en de opvolging. Alles op codenaam: dit boek kent geen
      echte namen, en dat is het ontwerp en geen tekortkoming. */
@@ -114,5 +114,13 @@ module.exports = (kern, mijn, stuur, nietGevonden) => {
     const o = mijn(req);
     if (!o) return stuur(res, nietGevonden);
     res.json({ ok: true, voorraad: ondernemingVoorraad(o) });
+  });
+
+  /* De klusketen: offerte -> boeking -> factuur, gevolgd op de referenties die
+     ze al aan elkaar knopen. Zie kern/onderneming/klussen.js. */
+  app.post('/api/onderneming/klussen', auth, (req, res) => {
+    const o = mijn(req);
+    if (!o) return stuur(res, nietGevonden);
+    res.json({ ok: true, klussen: ondernemingKlussen(o) });
   });
 };

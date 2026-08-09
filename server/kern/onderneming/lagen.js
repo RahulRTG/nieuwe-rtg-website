@@ -11,7 +11,7 @@
 'use strict';
 
 module.exports = (ctx) => {
-  const { db, save, schoon, ordersVanZaak, boekingenVanZaak, ondernemerpoort } = ctx;
+  const { db, save, schoon, ordersVanZaak, boekingenVanZaak, ondernemerpoort, staffLijst, anthropic, magAi } = ctx;
 
   const intake = require('./intake')({ schoon });
   const kans = require('./kans')({ db, ordersVanZaak, boekingenVanZaak });
@@ -42,7 +42,19 @@ module.exports = (ctx) => {
   /* De voorraad LEEST de vier registers die er al zijn (keuken, retail,
      boerderij, groothandel) en bouwt er geen vijfde bij. Vandaar alleen db. */
   const vrd = require('./voorraad')({ db });
+  /* De klusketen VOLGT de referenties die offerte, boeking en factuur al aan
+     elkaar knopen; er komt geen projectenregister bij. */
+  const klu = require('./klussen')({ db, boekingenVanZaak });
+  /* De toegang LEEST de twee rechtenmodellen die er al zijn -- de zaak
+     (supplier_staff) en de werkruimte (bedrijf/rollen.js) -- en zet er geen
+     derde bij. `staffLijst` komt van de accountslaag; zonder die lijst blijft
+     de zaak-kant leeg in plaats van te gokken. */
+  const tgn = require('./toegang')({ db, staffLijst });
+  /* De AI-laag: de bedrijfsontwerper en de Mall-bouwer. Hij krijgt de bestaande
+     poort (kern/aipoort.js) mee en bouwt die niet na; zonder sleutel valt hij
+     terug op een antwoord uit de eigen data. */
+  const ontw = require('./ontwerper')({ anthropic, schoon, magAi });
   const regie = require('./regie')({ db, save });
 
-  return { intake, kans, sim, stress, plan, dag, opr, ek, mp, boek, rel, deb, cred, con, bel, kas, cap, wrv, pij, vrd, regie };
+  return { intake, kans, sim, stress, plan, dag, opr, ek, mp, boek, rel, deb, cred, con, bel, kas, cap, wrv, pij, vrd, klu, tgn, ontw, regie };
 };

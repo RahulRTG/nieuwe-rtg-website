@@ -154,7 +154,7 @@ function toonLeeg(){
 function teken(){
   const o=ONDS.find(x=>x.id===HUIDIG)||{};
   zetTitel(DAG.naam||'Mijn onderneming');
-  $('#hoofd').innerHTML=[vakGroet(),vakGezond(),vakActies(),vakIntake(),vakKans(),vakSimulatie(),vakStress(),vakPlan(o),vakRechtsvorm(o),vakOprichting(),vakZaak(o),vakEersteKlant(),vakMall(),vakRelaties(),vakBestuur(),vakPijplijn(),vakDebiteuren(),vakCrediteuren(),vakContracten(),vakBelasting(),vakKas(),vakCapaciteit(),vakWerving(),vakVoorraad()].join('');
+  $('#hoofd').innerHTML=[vakGroet(),vakGezond(),vakActies(),vakIntake(),vakKans(),vakSimulatie(),vakStress(),vakPlan(o),vakRechtsvorm(o),vakOprichting(),vakZaak(o),vakEersteKlant(),vakMall(),vakRelaties(),vakBestuur(),vakToegang(),vakKlussen(),vakPijplijn(),vakDebiteuren(),vakCrediteuren(),vakContracten(),vakBelasting(),vakKas(),vakCapaciteit(),vakWerving(),vakVoorraad()].join('');
   haakKnoppen();
 }
 
@@ -570,6 +570,53 @@ function vakVoorraad(){
        '<span class="subtxt">voorraadwaarde op inkoopprijs</span></div>')+
     '<div style="margin-top:.9rem;">'+delen+'</div>'+buiten+
     '<p class="subtxt" style="margin-top:.9rem;">'+esc(v.nietGemeten)+'</p></div>';
+}
+
+
+/* De klusketen. Het bedrag onder "buiten" telt met opzet geen ingepland werk
+   mee; het scherm herhaalt die zin, want een groot getal zonder die uitleg
+   leest als achterstallige incasso. */
+/* De toegang. Toont wat er is en waar het gat zit; er staat geen enkele knop
+   die toegang verleent -- dat gebeurt waar de rol woont. */
+function vakToegang(){
+  const t=DAG&&DAG.toegang;
+  if(!t||t.stand!=='bestaat') return '';
+  const delen=(t.delen||[]).map(d=>{
+    const rollen=(d.rollen||[]).filter(r=>r.aantal>0).map(r=>
+      '<div class="bron"><span>'+esc(r.label)+(r.alleenLezen?' <span class="bu">(leest alleen)</span>':'')+
+      (r.wat?'<br><span class="bu">'+esc(r.wat)+'</span>':'')+'</span><span>'+r.aantal+'</span></div>').join('');
+    return '<p class="subtxt" style="margin:.9rem 0 .3rem;">'+
+      (d.soort==='zaak'?'Op de zaak':'In uw werkruimte')+'</p>'+rollen+
+      (d.let?'<p class="stil" style="margin-top:.4rem;">'+esc(d.let)+'</p>':'')+
+      (d.verlopen?'<p class="subtxt" style="margin-top:.4rem;">'+d.verlopen+
+        ' verlopen rol(len); die geven geen toegang meer.</p>':'');
+  }).join('');
+  return '<div class="vak"><h2>Toegang</h2>'+delen+
+    (t.werkruimteUitleg?'<p class="subtxt" style="margin-top:.9rem;">'+esc(t.werkruimteUitleg)+'</p>':'')+
+    '<p class="subtxt" style="margin-top:.6rem;">'+esc(t.geenTweedeDeur)+'</p>'+
+    '<p class="subtxt" style="margin-top:.4rem;">'+esc(t.nietGemeten)+'</p></div>';
+}
+
+
+function vakKlussen(){
+  const k=DAG&&DAG.klussen;
+  if(!k) return '';
+  const st=(k.stadia||[]).filter(s=>s.aantal>0&&s.id!=='klaar').map(s=>
+    '<div class="cijfer"><div class="lbl">'+esc(s.label)+'</div><div class="wrd">'+s.aantal+'</div>'+
+    '<div class="eh">'+(s.bedrag===null?'geen bedrag':euro(s.bedrag))+'</div></div>').join('');
+  const rijen=(k.rijen||[]).slice(0,10).map(r=>
+    '<div class="bron'+(r.stadium==='uitgevoerd'||r.stadium==='gefactureerd'?'':' niet')+'">'+
+    '<span>'+esc(r.klant||'onbekend')+' &middot; '+esc(r.omschrijving)+'<br>'+
+    '<span class="bu">'+esc(r.stadium)+(r.let?' &middot; '+esc(r.let):'')+'</span></span>'+
+    '<span>'+(r.bedrag===null?'-':euro(r.bedrag))+'<br><span class="bu">'+
+    (r.dagen===null?'':r.dagen+' dagen')+'</span></span></div>').join('');
+  return '<div class="vak"><h2>Klussen</h2>'+
+    '<div class="score"><span class="n groot">'+euro(k.buiten.bedrag)+'</span>'+
+    '<span class="subtxt">van uw werk staat buiten</span></div>'+
+    '<p class="subtxt" style="margin-top:.3rem;">'+esc(k.buiten.uitleg)+'</p>'+
+    '<div class="cijfers" style="margin-top:.9rem;">'+st+'</div>'+
+    (rijen?'<div style="margin-top:.8rem;">'+rijen+'</div>':'')+
+    '<p class="subtxt" style="margin-top:.9rem;">'+esc(k.nietGemeten)+'</p></div>';
 }
 
 

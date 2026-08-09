@@ -2005,6 +2005,110 @@ gebruiken, retail op het artikel in plaats van de variant tellen, een artikel
 zonder minimum toch laag noemen, de eigen drempel negeren, een totaal geven
 zonder enige bron, en inactieve groothandelsproducten meetellen.
 
+### De klusketen: van akkoord tot geld, en waar hij blijft steken
+
+`server/kern/onderneming/klussen.js` + `/api/onderneming/klussen`.
+
+De keten bestond al, in drie objecten die elkaar met een **referentie**
+vasthouden: een offerte krijgt bij akkoord een `boekingRef`, de boeking draagt
+die `ref`, en een factuur draagt `ref`. Wat er niet was, is code die hem volgt —
+`boekingRef` kwam nergens anders voor dan op de plek waar hij werd gezet. Deze
+laag volgt hem, en zet er geen vierde object naast dat "project" heet: dat zou
+met de hand bijgehouden moeten worden en loopt na twee weken achter op de drie
+die vanzelf meebewegen.
+
+**Vier plekken waar een klus blijft steken**, en alleen de laatste twee zijn "uw
+geld ligt ergens anders": akkoord maar niet ingepland, ingepland, uitgevoerd
+maar niet gefactureerd, en gefactureerd maar niet betaald. Ingepland werk telt
+daarom **niet** mee in het openstaande bedrag — dat als openstaand geld tonen
+maakt een drukke maand tot een incassoprobleem.
+
+Drie dingen die het niet beweert:
+
+- **geen factuur betekent niet dat er niet is gefactureerd.** Het betekent dat
+  wij binnen RTG geen factuur met deze referentie zien; wie buiten RTG
+  factureert doet dat gewoon;
+- **de factuur wordt op referentie gevonden**, nooit op bedrag of klant — twee
+  klussen van dezelfde klant voor hetzelfde bedrag zouden anders elkaars factuur
+  opeisen;
+- **geen doorlooptijd van klus tot geld.** Oplevering en goedkeuring meten wij
+  niet; wat er wel staat is hoe lang elke stap nu open staat, en dat is een
+  meting.
+
+Betaald is betaald langs welke van de twee wegen dan ook: de boeking kent `paid`
+(de kassa) en de factuur `betaald` (de facturatielaag). Eisen dat ze allebei
+staan, toont een betaalde klus als onbetaald. Elke stap heeft zijn eigen
+traagheidsdrempel, want ze betekenen iets anders.
+
+Getoetst in `test/onderneming-klussen.test.js` (13). Zeven mutaties; zes beten
+meteen. **De zevende sloeg af en legde een gat in mijn toets bloot:** één
+drempel voor alle stappen liet niets zakken, omdat mijn gevallen toevallig aan
+beide kanten van elke drempel hetzelfde uitvielen. Er staat nu een geval dat ze
+scheidt — negen dagen is traag voor een onbetaalde uitvoering en juist niet voor
+een factuur — en daarna beet de mutatie wel.
+
+### De toegang: wie kan wat, over de twee werelden die er al zijn
+
+`server/kern/onderneming/toegang.js` + `/api/onderneming/toegang`.
+
+Toegang is in dit huis op twee plekken geregeld, en die twee zijn met opzet
+verschillend: de **zaak** kent precies twee rollen (manager en staff — genoeg
+voor een vloer waar iemand kassa draait), de **werkruimte** in RTG Werk OS kent
+achttien rechten, veertien rollen, rollen met een einddatum, vier soorten inzage
+die een *reden* vragen, en een journaal. Een derde model hierboven zou een derde
+waarheid zijn over dezelfde vraag. Deze laag leest ze allebei en legt ze naast
+elkaar.
+
+**Het gat wordt benoemd en niet gedicht:** op de zaak kan een beheerder alles,
+en dat staat er — een scherm dat nuance suggereert geeft schijnzekerheid.
+**Er wordt niets gezet:** toegang verlenen gebeurt waar de rol woont, allebei
+achter hun eigen poort met hun eigen journaal; een tweede deur naar hetzelfde
+slot is een deur die niemand bewaakt. Het venster is precies dat van de poort:
+een verlopen rol telt niet mee, een rol die nog moet ingaan ook niet, en een rol
+die vandaag afloopt geldt vandaag nog. Geen namen — alleen aantallen, rollen en
+vensters.
+
+Onderweg bleek `server/bedrijf/rollen.js` zijn tabellen alleen binnen de factory
+terug te geven. Ze staan nu ook op de module zelf, zodat deze laag ze kan lezen
+in plaats van overtypen.
+
+Getoetst in `test/onderneming-toegang.test.js` (12). Zeven mutaties, alle zeven
+raak.
+
+### De bedrijfsontwerper en de Mall-bouwer: AI die meedenkt en nergens over beslist
+
+`server/kern/onderneming/ontwerper.js` +
+`/api/onderneming/ontwerp{,/opdrachten}`.
+
+Twee opdrachten met dezelfde grenzen: **ontwerp** (meedenken over het idee) en
+**mall** (meeschrijven aan de Mall-pagina). Het model krijgt alleen wat er echt
+staat — de eigen intake, de eigen kansverkenning en stress test, het eigen
+mallprofiel — en wat ontbreekt heet **ONBEKEND** in de prompt, zodat het model
+ernaar vraagt in plaats van het in te vullen. Een leeg veld leest een model als
+"niet van toepassing".
+
+**Het model schrijft niets weg.** De uitkomst is tekst die de ondernemer zelf
+overneemt; een AI die zijn eigen voorstel opslaat, maakt van een suggestie een
+feit en dan weet niemand later meer wie wat bedacht. Zelfde regel als bij
+`kern/agent.js`: een voorstel wacht op een mens.
+
+**Drie merkregels staan letterlijk in de systeemprompt, en gelden ook in de
+uitwijk:** geen toegang beloven (Lifestyle en Business gaan uitsluitend na
+menselijke goedkeuring), geen echt merk als bevestigde partner en nooit claimen
+dat een boeking is verwerkt, en afwegingen in plaats van juridische of fiscale
+zekerheid.
+
+**Zonder sleutel komt er geen leeg scherm**, maar een antwoord uit de eigen data
+met `demo: true` erbij — een demostand die doet alsof er een model meekeek is
+erger dan geen demostand. Een kapot of leeg antwoordend model valt op diezelfde
+uitwijk terug. Wie er op mag beslist de bestaande `kern/aipoort.js`; die poort
+wordt hier niet nagebouwd.
+
+Getoetst in `test/onderneming-ontwerper.test.js` (11). Acht mutaties, alle acht
+raak. Eén toetsfout onderweg gerepareerd: de intake is genest (`persoon`/`idee`)
+en werd plat aangeleverd, waardoor de prompt in twee toetsen over lege feiten
+ging. De helper rekent nu na dat de intake echt is gezet.
+
 ### RTG Werk OS (de werkplek van een organisatie)
 
 `server/bedrijf/` + `/api/bedrijf/...` + `/apps/werk.html`. Een **werkruimte**

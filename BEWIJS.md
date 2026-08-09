@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 738 bestanden en 4359 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 741 bestanden en 4395 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 738 |
-| losse beweringen (`test(...)`) | 4359 |
+| toetsbestanden | 741 |
+| losse beweringen (`test(...)`) | 4395 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 521 |
 | **overleefd**: geen mutatie kreeg hem rood | 12 |
 | niet te meten (al rood, geen module gevonden, ...) | 16 |
-| alleen in de kop *genoemd*, nog niet gemeten | 30 |
-| niets van beide | 159 |
+| alleen in de kop *genoemd*, nog niet gemeten | 31 |
+| niets van beide | 161 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-650 bestanden, 4198 beweringen.
+653 bestanden, 4234 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -374,13 +374,16 @@ toets omvalt.
 | `onderneming-debiteuren.test.js` | 12 | -- | Ronde: de debiteuren -- wat er nog open staat, en hoe lang al. Vier beweringen: 1. |
 | `onderneming-eersteklant.test.js` | 16 | -- | Ronde: de eerste klant, en de honderd daarna. Drie beweringen die hier het zwaarst wegen: 1. |
 | `onderneming-kas.test.js` | 14 | -- | Ronde: de kasvooruitblik. Vier beweringen: 1. |
+| `onderneming-klussen.test.js` | 13 | genoemd | Ronde: de klusketen -- van akkoord tot geld, en waar hij blijft steken. Vijf beweringen: 1. |
 | `onderneming-mallprofiel.test.js` | 10 | -- | Ronde: het Mall-profiel -- hoe de pagina van een zaak is opgebouwd. Drie beweringen: 1. |
 | `onderneming-offertebouw.test.js` | 15 | -- | Ronde: de offertebouwer -- een prijs die is opgebouwd in plaats van bedacht. Vijf beweringen: 1. |
+| `onderneming-ontwerper.test.js` | 11 | -- | Ronde: de bedrijfsontwerper en de Mall-bouwer -- de AI die meedenkt en nergens over beslist. Zes beweringen: 1. |
 | `onderneming-oprichting.test.js` | 14 | -- | Ronde: het oprichtingsproject en de aanvraag van de zaak -- het laatste stuk van de reis, van vastgelegd plan naar draaiende onderneming. De twee beweringen die hier het zwaarst wegen: 1. |
 | `onderneming-pijplijn.test.js` | 15 | -- | Ronde: de pijplijn -- wat er nog kan worden, en wat het waard is. Vijf beweringen: 1. |
 | `onderneming-rechtsvormen.test.js` | 21 | genoemd | Ronde: rechtsvormen -- Nederland en het buitenland in een register, en een wacht die ze bijwerkt zonder de grendels te openen. Zes beweringen: 1. |
 | `onderneming-regie.test.js` | 14 | -- | Ronde: de ondernemersregie -- twee knoppen van de boardroom. Vier beweringen: 1. |
 | `onderneming-relaties.test.js` | 12 | -- | Ronde: het klantenboek en de relaties -- het CRM van het Ondernemers-OS. Vier beweringen: 1. |
+| `onderneming-toegang.test.js` | 12 | -- | Ronde: de toegang -- wie kan wat, over de twee werelden die er al zijn. Vijf beweringen: 1. |
 | `onderneming-verkenning.test.js` | 20 | genoemd | Ronde: de pre-oprichtingsfase -- intake, kansverkenning, simulatie, stress test en het ondernemingsplan. De zwaartepunten liggen op de twee plekken waar dit soort software liegt: 1. |
 | `onderneming-voorraad.test.js` | 13 | genoemd | Ronde: de voorraad -- wat er ligt, en wat wij niet kunnen zien. Vijf beweringen: 1. |
 | `onderneming-werving.test.js` | 15 | genoemd | Ronde: de werving -- staat er iemand te wachten. Vier beweringen: 1. |

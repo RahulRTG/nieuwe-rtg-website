@@ -70,15 +70,34 @@ test('RTG Life: een doel uit Doelen staat er, en wat niet gemeten wordt zegt dat
     /* 1. de kernbelofte: geen verzonnen cijfers. Slaap, beweging en voeding
        staan er MET hun reden en zonder getal. */
     const signalen = await page.textContent('#signalen');
-    for (const naam of ['Slaap', 'Beweging', 'Voeding']) {
+    for (const naam of ['Slaap', 'Beweging', 'Water']) {
       assert.ok(signalen.includes(naam), naam + ' staat op het scherm');
     }
     const aantalNietGemeten = (signalen.match(/niet gemeten/g) || []).length;
-    assert.ok(aantalNietGemeten >= 3, 'de drie bronloze signalen zeggen zelf dat ze niet gemeten zijn');
+    assert.ok(aantalNietGemeten >= 3, 'de drie nog niet ingevulde signalen zeggen zelf dat ze niet gemeten zijn');
     assert.ok(!/\b0\b/.test(await page.evaluate(() => {
       // alleen de waardekolom van de ongemeten regels: daar hoort geen cijfer te staan
       return [...document.querySelectorAll('#signalen .sig.leeg .waarde')].map(e => e.textContent).join(' ');
     })), 'in de waardekolom van een ongemeten signaal staat geen nul');
+
+    /* 1b. de bron zelf: invullen op dit scherm, en het signaal verandert mee.
+       Dit is het verschil tussen een rij die eerlijk leeg is en een rij die
+       eerlijk leeg BLIJFT omdat je er niets aan kunt doen. */
+    await openDeel(page, 'Vandaag invullen');
+    const slaapveld = page.locator('[data-mveld="slaap"]');
+    await slaapveld.scrollIntoViewIfNeeded();
+    await slaapveld.fill('7');
+    const bewaar = page.locator('[data-mzet="slaap"]');
+    await bewaar.scrollIntoViewIfNeeded();
+    await bewaar.click();
+    await page.waitForFunction(() => {
+      const e = document.getElementById('signalen');
+      return e && /1 nacht/i.test(e.textContent);
+    }, null, { timeout: 10000 });
+    const naInvullen = await page.textContent('#signalen');
+    assert.match(naInvullen, /7/, 'de ingevulde nacht staat als waarde op het scherm');
+    assert.match(naInvullen, /over 1 nacht/i,
+      'en het scherm zegt hoe weinig het er zijn: een gemiddelde over een nacht is geen weekbeeld');
 
     /* 2. het doel uit Doelen staat hier, zonder dat het lid Doelen heeft
        geopend in deze sessie. */

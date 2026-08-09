@@ -140,6 +140,12 @@ test('meten draagt een herkomst, en een verzonnen herkomst wordt geweigerd', asy
   const raar = await api('doelen/meet', { id, waarde: 4, bron: 'horoscoop' }, lid);
   assert.equal(raar.status, 400, 'een onbekende herkomst hoort niet stil als "zelf" te tellen');
 
+  /* En de scherpere: een herkomst die WEL bestaat maar nog niet beschikbaar is.
+     Sinds kern/herkomst.js gedeeld wordt met de metingenlaag hoort die regel
+     aan beide kanten te bijten, dus wordt hij ook aan beide kanten getoetst. */
+  const nogniet = await api('doelen/meet', { id, waarde: 4, bron: 'apparaat' }, lid);
+  assert.equal(nogniet.status, 400, 'een apparaatmeting bestaat nog niet en gaat niet door voor eigen woord');
+
   const morgen = await api('doelen/meet', { id, waarde: 4, op: overDagen(1) }, lid);
   assert.equal(morgen.status, 400, 'een meting van morgen bestaat nog niet');
 

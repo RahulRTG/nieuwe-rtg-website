@@ -26,13 +26,12 @@ const dagVan = d => new Date(d).toISOString().slice(0, 10);
 const gemeten = (waarde, eenheid, uitleg) => ({ gemeten: true, waarde, eenheid, uitleg });
 const ongemeten = reden => ({ gemeten: false, reden });
 
-/* De bronnen die er (nog) niet zijn. Ze staan met naam op het scherm, want een
-   lege plek zonder uitleg leest als een scherm dat stuk is, en een weggelaten
-   regel leest als "hier valt niets te halen". */
-const GEEN_BRON = [
-  ['slaap', 'Slaap', 'Er is geen bron aangesloten die uw slaap meet.'],
-  ['beweging', 'Beweging', 'Er is geen bron aangesloten die uw beweging meet.'],
-  ['voeding', 'Voeding', 'Er is geen bron aangesloten die uw voeding bijhoudt.']
+/* De dagmetingen die het lid zelf invult (kern/metingen.js). De volgorde hier is
+   de volgorde op het scherm. */
+const ZELF = [
+  ['slaap', 'Slaap', 'nacht', 'nachten'],
+  ['beweging', 'Beweging', 'dag', 'dagen'],
+  ['water', 'Water', 'dag', 'dagen']
 ];
 
 module.exports = ({ kern }) => {
@@ -111,7 +110,36 @@ module.exports = ({ kern }) => {
         : ongemeten('U gebruikt de dagelijkse check-in niet.'))
     });
 
-    for (const [id, naam, reden] of GEEN_BRON) signalen.push({ id, naam, ...ongemeten(reden) });
+    /* ---- slaap, beweging en water: wat het lid zelf invulde ----
+       Het aantal ingevulde dagen gaat mee de tekst in. Een gemiddelde over een
+       enkele nacht is geen weekbeeld, en dat hoort een lezer te zien. */
+    const mt = lees('Metingen', kern.metingenVan && (() => kern.metingenVan(key, nu)));
+    if (mt.fout) storingen.push(mt.fout);
+    const dagbeeld = (mt.waarde && mt.waarde.beeld) || {};
+    for (const [id, naam, ev, mv] of ZELF) {
+      const b = dagbeeld[id];
+      signalen.push({
+        id, naam, herkomst: 'zelf',
+        ...(b && b.gemeten
+          ? gemeten(b.gemiddelde, 'gemiddeld per ' + ev + ', ' + b.eenheid,
+            'Over ' + b.dagen + ' ' + (b.dagen === 1 ? ev : mv) + ' die u zelf invulde.' +
+            (b.vandaag == null ? ' Vandaag nog niet ingevuld.' : ''))
+          : ongemeten('U heeft dit nog niet ingevuld. Dat kan hieronder.'))
+      });
+    }
+
+    /* ---- voeding: afgeleid, en dat staat erbij ----
+       Er is geen manier waarop een lid zijn voeding in een eerlijk getal zet, dus
+       er wordt niets gevraagd. Wat er WEL is, is hoe vaak er buiten de deur
+       gegeten is; dat rekent kern/balans.js al uit het grootboek. Dat is een
+       afgeleide en geen meting, en het signaal zegt dat ook. */
+    signalen.push({
+      id: 'voeding', naam: 'Voeding', herkomst: 'afgeleid',
+      ...(beeld && typeof beeld.uitPerWeek === 'number'
+        ? gemeten(beeld.uitPerWeek, 'keer per week buiten de deur',
+          'Afgeleid uit uw bestellingen bij partners, niet uit wat u at.')
+        : ongemeten('Hier meet RTG niets. Een eerlijk getal voor voeding valt niet te geven zonder te verzinnen.'))
+    });
 
     return {
       ok: true, vandaag,

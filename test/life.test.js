@@ -37,16 +37,30 @@ test.after(() => {
   try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
 });
 
-test('waar geen bron is, staat "niet gemeten" en geen nul', async () => {
+test('nog niets ingevuld is "niet gemeten" en geen nul', async () => {
   const r = await api('life', {}, lid);
   assert.equal(r.status, 200);
-  for (const id of ['slaap', 'beweging', 'voeding']) {
+  for (const id of ['slaap', 'beweging', 'water']) {
     const s = sig(r.body, id);
     assert.ok(s, id + ' staat op het scherm en wordt niet weggelaten');
     assert.equal(s.gemeten, false);
     assert.equal(s.waarde, undefined, 'een ongemeten signaal draagt geen getal, ook geen 0');
-    assert.match(s.reden, /geen bron/i, 'en er staat bij waarom er niets is');
+    assert.match(s.reden, /nog niet ingevuld/i, 'en er staat bij waarom er niets is');
+    assert.equal(s.herkomst, 'zelf', 'het scherm weet van wie dit getal straks komt');
   }
+});
+
+test('voeding is afgeleid, en zegt dat ook; nul keer uit eten IS een meting', async () => {
+  /* Hier ligt het onderscheid dat er in deze ronde toe doet. Slaap zonder
+     invulling is "niet gemeten": er is geen bron. Voeding is anders -- het
+     grootboek is compleet, dus nul bestellingen bij partners is een echte nul en
+     geen ontbrekend gegeven. Een scherm dat die twee hetzelfde toont, liegt in
+     een van beide richtingen. */
+  const s = sig((await api('life', {}, lid)).body, 'voeding');
+  assert.equal(s.gemeten, true);
+  assert.equal(s.waarde, 0, 'nul keer buiten de deur is een uitkomst, geen leegte');
+  assert.equal(s.herkomst, 'afgeleid');
+  assert.match(s.uitleg, /afgeleid/i, 'en het scherm krijgt te horen dat dit geen meting is');
 });
 
 test('een vers lid krijgt geen verzonnen drukte', async () => {
@@ -140,7 +154,8 @@ test('een laag die het niet doet, wordt gemeld en niet stil overgeslagen', () =>
     doelenVan: () => ({ doelen: [] }),
     careMijn: () => { throw new Error('kapot'); },
     verzorgingLeden: { mijn: () => ({ afspraken: [] }) },
-    wachtenVan: () => ({ lopend: [] })
+    wachtenVan: () => ({ lopend: [] }),
+    metingenVan: () => ({ beeld: {} })
   } });
   const b = stuk.lifeVoor('sleutel', 'CODENAAM', new Date('2026-08-09T12:00:00Z'));
   assert.equal(b.storingen.length, 1);
@@ -148,6 +163,6 @@ test('een laag die het niet doet, wordt gemeld en niet stil overgeslagen', () =>
 
   const heel = maak({ kern: {} });
   const leeg = heel.lifeVoor('sleutel', 'CODENAAM', new Date('2026-08-09T12:00:00Z'));
-  assert.equal(leeg.storingen.length, 5, 'vijf ontbrekende lagen geven vijf meldingen, geen stilte');
+  assert.equal(leeg.storingen.length, 6, 'zes ontbrekende lagen geven zes meldingen, geen stilte');
   assert.equal(sig(leeg, 'ritme').gemeten, false, 'en het signaal zelf doet ook niet alsof');
 });

@@ -13,13 +13,14 @@
    heeft gekozen. Wat je moet DOEN om er te komen is werk voor een mens of voor
    een laag die er nog niet is (zie docs/life.md, de drie niveaus).
 
-   Elke meting draagt haar herkomst. Vandaag kan die maar een ding zijn ('zelf'),
-   want er is nog geen apparaat dat meet en geen behandelaar die vastlegt. Het
-   veld staat er nu al in omdat een meting zonder herkomst later niet meer te
-   onderscheiden is van een gemeten of afgeleide waarde, en dan is het te laat. */
+   Elke meting draagt haar herkomst; welke er bestaan en welke er beschikbaar
+   zijn staat in ./herkomst.js, en daar alleen. Een meting zonder herkomst is
+   later niet meer te onderscheiden van een gemeten of afgeleide waarde, en dan
+   is het te laat. */
+
+const { magHerkomst, BESCHIKBAAR } = require('./herkomst');
 
 const DAG = 86400000;
-const BRONNEN = ['zelf'];             // groeit pas mee als er echt een bron bij komt
 const MAX_DOELEN = 12;                // per lid; een doelenlijst die niet past, wordt genegeerd
 const MAX_METINGEN = 400;
 
@@ -106,7 +107,7 @@ module.exports = ({ db, save, crypto, schoon }) => {
   const datum = v => /^\d{4}-\d{2}-\d{2}$/.test(String(v || '')) ? String(v) : null;
 
   function doelenVan(key, nu = new Date()) {
-    return { ok: true, doelen: mijne(key).map(d => planVan(d, nu)), bronnen: BRONNEN };
+    return { ok: true, doelen: mijne(key).map(d => planVan(d, nu)), bronnen: BESCHIKBAAR };
   }
 
   function doelMaak(key, body, nu = new Date()) {
@@ -144,8 +145,8 @@ module.exports = ({ db, save, crypto, schoon }) => {
     if (!doel) return { status: 404, error: 'Dit doel staat niet op uw naam.' };
     const waarde = getal(body.waarde);
     if (waarde === null) return { status: 400, error: 'Wat is de meting?' };
-    const bron = BRONNEN.includes(String(body.bron || 'zelf')) ? String(body.bron || 'zelf') : null;
-    if (!bron) return { status: 400, error: 'Onbekende herkomst voor deze meting.' };
+    const bron = String(body.bron || 'zelf');
+    if (!magHerkomst(bron)) return { status: 400, error: 'Onbekende herkomst voor deze meting.' };
     const op = datum(body.op) || dagVan(nu);
     if (op > dagVan(nu)) return { status: 400, error: 'Een meting van morgen bestaat nog niet.' };
     doel.metingen.push({ waarde, op, bron, at: new Date(nu).toISOString() });

@@ -724,6 +724,11 @@
     ],
     "memo": [],
     "meting": [],
+    "metingen": [
+      "metingWeg",
+      "metingZet",
+      "metingenVan"
+    ],
     "mobiliteit": [
       "aboAanbod",
       "aboKoop",

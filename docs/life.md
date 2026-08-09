@@ -39,6 +39,8 @@ klinkt.
 | Toegankelijkheidsprofiel | `server/kern/toegankelijk.js`, `public/shared/toegankelijk.js`, kop van `shared/basis.js` | tekstgrootte, contrast, beweging en onderstreepte links, op elke pagina die `shared/basis.js` laadt |
 | Doelenmotor | `server/kern/doelen.js`, `public/apps/doelen.html` | beginpunt, streefpunt, datum en reden; mijlpalen worden afgeleid, dus een gemiste week is een ander pad en geen mislukking |
 | Het ene scherm | `server/kern/life.js`, `public/apps/life.html` | leest ritme, doelen, afspraken en check-in bij elkaar; meet zelf niets en legt niets vast |
+| Dagmetingen | `server/kern/metingen.js`, invulvak op `apps/life.html` | slaap, beweging en water, door het lid zelf ingevuld; een dag heeft één waarde |
+| Herkomst van gegevens | `server/kern/herkomst.js` | vier soorten, en alleen wat er echt is staat aan; gedeeld door de doelenmotor en de metingen |
 | Inzage-audit | `server/inzagelog.js` | wie welke identiteitsgegevens opvroeg, en waarom |
 | Identiteitskluis | `server/accounts.js` | echte namen apart; alles daarbuiten draait op codenamen |
 
@@ -78,8 +80,12 @@ gevonden en met de hand hersteld, en kan met de hand terugkomen.
 Niet gebouwd, en dus ook niet half. Voor elk hiervan geldt: er is geen module,
 geen route en geen toets.
 
-- **Gewoonten, slaap, voeding, water, stress, herstel, trainingsbelasting.**
-  Geen van deze bestaat als laag.
+- **Gewoonten, stress, herstel, trainingsbelasting.** Geen van deze bestaat als
+  laag.
+- **Voeding als getal.** Er wordt niets gevraagd, want een lid kan zijn voeding
+  niet in een eerlijk getal zetten. RTG Life leidt er iets naast af (hoe vaak er
+  buiten de deur gegeten is, uit het grootboek) en zegt erbij dat het een
+  afgeleide is.
 - **Wat je moet DOEN om een doel te halen.** De doelenmotor rekent een pad uit
   tussen twee getallen; hij zegt niets over trainen, eten of gezondheid. Dat is
   geen tekort maar de grens uit deze notitie: dat is professional-supported of
@@ -192,6 +198,38 @@ duur; dat is precies het engagement-patroon dat `CLAUDE.md` verbiedt. Ook hier
 leerde een mutatie iets: de tak die dat zegt stond onder geen enkele toets, dus
 "Er is vandaag veel te doen" eronder schuiven bleef groen. Nu niet meer.
 
+## De dagmetingen, en waarom er drie zijn
+
+Slaap, beweging en water: drie dingen die alleen het lid weet en die hij in een
+eerlijk getal kan zetten. Ze staan in het invulvak op RTG Life zelf, want daar
+staan ook de signalen die ze voeden -- een lege rij met een invulveld eronder is
+iets anders dan een lege rij waar je niets aan kunt doen.
+
+**Waarom voeding er niet bij staat.** Een lid kan niet zeggen "mijn voeding was
+vandaag een 7" zonder dat dat getal verzonnen is, en een cijfer dat eruitziet als
+een meting is precies wat dit huis niet doet. Wat er wel is, is hoe vaak er
+buiten de deur gegeten is; dat rekende `kern/balans.js` al uit het grootboek.
+Dat signaal staat er dus met herkomst `afgeleid` en met die zin erbij.
+
+**En daar zit meteen het onderscheid dat deze ronde draagt.** Slaap zonder
+invulling is "niet gemeten": er is geen bron. Voeding met nul bestellingen is
+een échte nul: het grootboek is compleet. Een scherm dat die twee hetzelfde
+toont, liegt in een van beide richtingen. `test/life.test.js` houdt allebei vast.
+
+**Een dag heeft één waarde.** Twee keer invullen overschrijft. Anders telt een
+correctie als een tweede nacht en klopt het gemiddelde niet meer. Het aantal
+dagen dat echt is ingevuld gaat mee naar het scherm: een gemiddelde over één
+nacht is geen weekbeeld, en dat hoort een lezer te zien.
+
+**De herkomst staat nu op één plek.** `kern/herkomst.js` kent de vier soorten
+uit deze notitie (zelf, apparaat, behandelaar, afgeleid) en zegt welke er
+beschikbaar zijn. De doelenmotor had zijn eigen lijstje en de metingenlaag zou
+er een tweede krijgen; twee lijstjes met dezelfde waarheid lopen uiteen, meestal
+zonder dat iets klaagt (`LAT.md` regel 4). Een herkomst die bestaat maar nog niet
+beschikbaar is (`apparaat`) wordt geweigerd en valt niet stil terug op `zelf` --
+anders staat een apparaatmeting die nog niet bestaat straks als eigen woord van
+het lid in de boeken. Beide kanten toetsen die regel.
+
 ## De grenzen die vast moeten staan vóór de bouw
 
 Deze horen in de architectuur en niet in een latere ronde, want ze bepalen hoe
@@ -237,7 +275,9 @@ In deze volgorde, want elke stap heeft de vorige nodig:
 2. ~~De **doelenmotor**.~~ Gedaan; zie hierboven.
 3. ~~Het **Life Compass**-scherm.~~ Gedaan; zie hieronder.
 
-Wat daarna komt (slaap, voeding, stress, coach, marktplaats) hangt aan deze drie
-en hoort pas daarna aan de beurt. De eerstvolgende die iets toevoegt is een
-BRON: zolang er niets meet, blijven slaap, beweging en voeding op RTG Life staan
-als "niet gemeten", en dat is precies wat ze zijn.
+4. ~~Een **bron** voor de lege signalen.~~ Gedaan: de dagmetingen, zie hieronder.
+
+Wat daarna komt (gewoonten, stress, coach, marktplaats) hangt aan deze vier en
+hoort pas daarna aan de beurt. Een apparaat als bron is het volgende dat de
+signalen echt verandert; dat is geen laag erbij maar een tweede herkomst, en
+`kern/herkomst.js` staat er klaar voor.

@@ -32,6 +32,9 @@
   .storing{border:1px solid var(--rood,#DE6E92);border-radius:10px;padding:.7rem .9rem;
     margin:.6rem 0;font-size:.82rem;color:var(--soft);}
   .heen{display:inline-block;margin:.35rem .5rem 0 0;font-size:.82rem;}
+  .rij{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;margin-top:.7rem;}
+  .rij input{width:6rem;}
+  .knop.mini{padding:.4rem .7rem;font-size:.8rem;}
 </style>
 <script src="/shared/seizoen.js" defer></script>
 <script src="/shared/veiligheid.js" defer></script>
@@ -53,6 +56,13 @@
     <div id="signalen"><p class="stil">Laden...</p></div>
     <p class="stil" style="margin-top:.8rem;">Wat hier niet gemeten wordt, staat er als niet
     gemeten. RTG vult geen nul in waar niets bekend is, en verzint geen score.</p>
+  </section>
+
+  <section aria-label="Vandaag invullen">
+    <h2>Vandaag invullen</h2>
+    <p class="stil">Drie dingen die alleen u weet. Ze blijven van u: ze gaan naar geen partner,
+    geen zaak en geen coach, en er staat altijd bij dat u ze zelf heeft ingevuld.</p>
+    <div id="invullen"></div>
   </section>
 
   <section aria-label="Uw doelen">
@@ -100,6 +110,38 @@
         '<span class="waarde">niet gemeten</span></div>').join('');
   }
 
+  /* De invulvelden komen uit de server-lijst (kern/metingen.js), zodat een
+     onderwerp erbij daar een regel is en hier niets. */
+  function tekenInvullen(d) {
+    const el = $('#invullen'); if (!el) return;
+    const namen = Object.keys(d.onderwerpen || {});
+    el.innerHTML = namen.map(naam => {
+      const o = d.onderwerpen[naam];
+      const b = (d.beeld || {})[naam] || {};
+      return '<div class="kaartje"><b>' + esc(o.label) + '</b>' +
+        '<span class="m">' + esc(o.vraag) + '</span>' +
+        '<div class="rij">' +
+          '<input type="number" step="' + esc(o.stap) + '" min="0" max="' + esc(o.max) + '" inputmode="decimal"' +
+            ' aria-label="' + esc(o.vraag) + '" data-mveld="' + esc(naam) + '"' +
+            (b.vandaag == null ? '' : ' value="' + esc(b.vandaag) + '"') + '>' +
+          '<span class="stil">' + esc(o.eenheid) + '</span>' +
+          '<button class="knop mini" data-mzet="' + esc(naam) + '">Bewaren</button>' +
+          (b.vandaag == null ? '' : '<button class="knop mini" data-mweg="' + esc(naam) + '">Wissen</button>') +
+        '</div></div>';
+    }).join('');
+    el.querySelectorAll('[data-mzet]').forEach(k => k.addEventListener('click', async () => {
+      const veld = el.querySelector('[data-mveld="' + k.dataset.mzet + '"]');
+      try { await Veilig.api('/api/metingen/zet', { onderwerp: k.dataset.mzet, waarde: veld.value });
+        await laad(); Veilig.melding('Genoteerd.'); }
+      catch (e) { Veilig.melding(e.message); }
+    }));
+    el.querySelectorAll('[data-mweg]').forEach(k => k.addEventListener('click', async () => {
+      try { await Veilig.api('/api/metingen/weg', { onderwerp: k.dataset.mweg });
+        await laad(); Veilig.melding('Gewist.'); }
+      catch (e) { Veilig.melding(e.message); }
+    }));
+  }
+
   function tekenDoelen(d) {
     if (!d.length) {
       $('#doelen').innerHTML = '<p class="stil">U heeft nog geen doel staan.</p>';
@@ -141,7 +183,8 @@
 
   async function laad() {
     try {
-      const d = await Veilig.api('/api/life');
+      const [d, m] = await Promise.all([Veilig.api('/api/life'), Veilig.api('/api/metingen')]);
+      tekenInvullen(m);
       tekenWinst(d.winst);
       tekenSignalen(d.signalen || []);
       tekenDoelen(d.doelen || []);

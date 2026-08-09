@@ -82,6 +82,10 @@ module.exports = function bouwKernAanTwee(kern, grens) {
      week geen mislukking is maar gewoon een ander pad. */
   Object.assign(kern, require('../kern/doelen')({ db, save, crypto, schoon }));
   require('../routes/doelen')(grens('doelen'));
+  /* De dagmetingen (kern/metingen.js): slaap, beweging en water, door het lid
+     zelf ingevuld. De bron die RTG Life miste; herkomst blijft zichtbaar. */
+  Object.assign(kern, require('../kern/metingen')({ db, save }));
+  require('../routes/metingen')(grens('metingen'));
   /* Het toegankelijkheidsprofiel (kern/toegankelijk.js): hoe het scherm zich
      hoort te gedragen. Hangt aan het ik-domein, want het is een instelling van
      het lid over zichzelf; shared/basis.js voert hem uit op elke pagina. */

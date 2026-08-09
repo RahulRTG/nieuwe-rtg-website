@@ -717,6 +717,8 @@ const webmaker = require('./kern/webmaker')({ db, save, crypto, schoon, media })
    van de leiding, geen veld in de personeelsadministratie. */
 const webmakerTeam = require('./kern/webmaker-team')({ db, save, listStaff: accounts.listStaff });
 const webplatform = require('./kern/webplatform')({ db, team: webmakerTeam });
+/* Een site lezen in je eigen taal: dezelfde vertaallaag als de berichten. */
+const webplatformTaal = require('./kern/webplatform-taal')({ vertaler: require('./translate') });
 // AI in de Website-maker: past een ontwerp aan op een opdracht; bewaart niets zelf
 const webmakerAi = require('./kern/webmaker-ai')({ anthropic, schoon });
 app.get('/media/:naam', (req, res) => { media.serveer(req, res).catch(() => { if (!res.headersSent) res.status(500).end(); }); });
@@ -1792,7 +1794,7 @@ const kern = {
   DEMO_PASS, DEMO_SUPPLIER, DEMO_USER, DOOR_RELOCK_MS, FIN_CAT, FISCAAL_PEILJAAR, HK_STATUSES, LANDEN,
   OFFICE_CODE, PERSONAS, POS_METHODS, PRODUCTION, PUBLIC_DIR, RIT_KETEN, RIT_LEGACY, RIT_MELDING,
   RUN_STATIONS, SHIFT_NAMES, SSE_BUFFER_TTL, STAFF_SEED, TABLE_STATUSES, TOKEN_TTL_MS, UPLOAD_DIR, VAC_SOORTEN,
-  ZAAK_OPTIES, ZZP, accounts, addContact, addTicket, aiFindDoor, aiFindRoom, archief, beveilig, wacht, mailQ, mailIn, mailAuth, mailBijlage, mailSleutel, rtmailAi, rtmail, rtmailTeam, automatisering, werkmail, antivirus, atelierweb, webmaker, webplatform, webmakerAi, webmakerTeam, eigenaar, zaakdoos, rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels, rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar, mailAanname, naamlaag,
+  ZAAK_OPTIES, ZZP, accounts, addContact, addTicket, aiFindDoor, aiFindRoom, archief, beveilig, wacht, mailQ, mailIn, mailAuth, mailBijlage, mailSleutel, rtmailAi, rtmail, rtmailTeam, automatisering, werkmail, antivirus, atelierweb, webmaker, webplatform, webplatformTaal, webmakerAi, webmakerTeam, eigenaar, zaakdoos, rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels, rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar, mailAanname, naamlaag,
   aiSystemPrompt, alcoholGrensVan, anthropic, app, appUrl, applyChatPubliek, applyChatVertaald, auth, betaal, broadcastSync,
   bufferEvent, bus, canEngage, cannedAnswer, cannedBoekhouder, cateringDishes, centen, chatApplicant,
   chatKeyOf, chatStuur, checkCred, coachCache, coachRules, conciergeInbox, connectedSupplierCodes, convOf,

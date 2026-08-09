@@ -68,6 +68,8 @@
   .zaakbalk a.chip{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:.28rem .7rem;font-size:.75rem;color:var(--txt);text-decoration:none;background:var(--card2);}
   .zaakbalk a.chip:hover{border-color:var(--gold);}
   .zaakbalk a.chip.hoofd{background:var(--burgundy);border-color:transparent;color:#fff;font-weight:600;}
+  /* de melding dat een site machinevertaald is */
+  .vertaallint{padding:.4rem .9rem;background:var(--card2);border-bottom:1px solid var(--line);color:var(--soft);font-size:.72rem;}
   /* de paginabalk van een site met meerdere pagina's */
   .paginanav{display:flex;gap:.4rem;flex-wrap:wrap;padding:.55rem .9rem;background:var(--card);border-bottom:1px solid var(--line);}
   .paginanav button{border:1px solid var(--line);border-radius:999px;background:var(--card2);color:var(--muted);font:inherit;font-size:.75rem;padding:.28rem .7rem;cursor:pointer;}
@@ -376,6 +378,13 @@ async function toonSite(adres,pad){
       const kn=document.createElement('span');kn.className='zk';
       const c=document.createElement('a');c.className='chip hoofd';c.href='/apps/app.html';c.textContent='Verbind & chat in de leden-app';kn.appendChild(c);
       balk.appendChild(kn); wrap.appendChild(balk);
+    }
+    /* eerlijk zijn over een vertaling: dit is niet wat de maker schreef */
+    if(d.vertaald){
+      const l=document.createElement('div'); l.className='vertaallint';
+      const TAAL={nl:'het Nederlands',en:'het Engels',es:'het Spaans',de:'het Duits',fr:'het Frans',it:'het Italiaans'};
+      l.textContent='Machinevertaald'+(d.vertaald.van?' uit '+(TAAL[d.vertaald.van]||d.vertaald.van):'')+'. Namen, prijzen en citaatbronnen blijven zoals de maker ze schreef.';
+      wrap.appendChild(l);
     }
     // de paginabalk: Home plus de extra pagina's van de site
     if(paginas.length){

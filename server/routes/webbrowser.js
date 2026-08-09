@@ -2,13 +2,13 @@
    van routes/webmaker.js (de maker) omdat dit de LEESKANT is: elk ingelogd
    lid mag bladeren, en het enige wat hier binnenkomt is een formulierbericht. */
 module.exports = (kern) => {
-  const { app, auth, webmaker, webplatform, findSupplier, addTicket, liveCodename,
+  const { app, auth, db, webmaker, webplatform, webplatformTaal, findSupplier, addTicket, liveCodename,
           codenaamVan, connectieTussen, verbActief, sseToCustomer, save } = kern;
   const stuur = (res, r) => r && r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
 
   app.post('/api/browser/gids', auth, (req, res) => { res.json({ lijst: webmaker.gids() }); });
 
-  app.post('/api/browser/open', auth, (req, res) => {
+  app.post('/api/browser/open', auth, async (req, res) => {
     const r = webmaker.open((req.body || {}).adres);
     if (r.error) return stuur(res, r);
     /* hoort de site bij een zaak, dan worden de live blokken nu uit het
@@ -26,7 +26,19 @@ module.exports = (kern) => {
       const cn = codenaamVan(r.site.eigenaar || '');
       if (cn) persoon = { codenaam: cn };
     }
-    res.json({ ok: true, site: r.site, zaak: s ? webplatform.zaakInfo(s) : null, persoon });
+    /* Heeft dit lid een vaste taal, dan leest hij de site in die taal --
+       dezelfde afspraak als bij berichten. Het antwoord zegt erbij dat het
+       machinevertaald is; een vertaling die zich voordoet als het origineel
+       is een bewering die de maker niet heeft gedaan. */
+    let vertaald = null;
+    const mijnTaal = (db.data.memberTaal || {})[req.session.key];
+    if (mijnTaal) {
+      try {
+        const v = await webplatformTaal.vertaalSite(r.site, mijnTaal);
+        r.site = v.site; vertaald = v.vertaald;
+      } catch (e) { /* onvertaald tonen is beter dan niet tonen */ }
+    }
+    res.json({ ok: true, site: r.site, zaak: s ? webplatform.zaakInfo(s) : null, persoon, vertaald });
   });
 
   /* het formulier: bij een zaak landt het bericht als klus (ticket) in de

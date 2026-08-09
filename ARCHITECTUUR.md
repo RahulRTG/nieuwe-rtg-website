@@ -19,9 +19,9 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 | Wat | Aantal |
 |---|---|
 | API-endpoints | 2923 |
-| servermodules (`server/**/*.js`) | 1578 |
+| servermodules (`server/**/*.js`) | 1579 |
 | routebestanden (`server/routes/**`) | 351 |
-| kernmodules (`server/kern/**`) | 916 |
+| kernmodules (`server/kern/**`) | 917 |
 | schermen (`public/**/*.html`) | 214 |
 | gedeelde browsermodules (`public/shared/*.js`) | 171 |
 | toetsbestanden (`test/*.test.js`) | 631 |
@@ -120,9 +120,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1124 |
+| kern-namen die routes aanraken | 1125 |
 | daarvan door **meer dan één** domein (de echte koppeling) | 151 |
-| daarvan door precies één domein | 973 |
+| daarvan door precies één domein | 974 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 
@@ -134,7 +134,7 @@ domein. Alle vijf getallen staan in `NORM.json` aan een ratel en mogen alleen za
 domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 
 ```
-app(128) auth(72) supplierAuth(47) db(30) officeAuth(29) liveCodename(19) accounts(18)
+app(128) auth(72) supplierAuth(47) db(31) officeAuth(29) liveCodename(19) accounts(18)
 status(16) schoon(14) managerOnly(13) save(11) rtf(11) codenaamVan(11) express(10)
 tooManyTries(9) crypto(9) anthropic(9) rtmail(9) boardroomWie(7) logActivity(7)
 sseToOffice(7) keyVanCodenaam(7) payrollOS(7) geenGast(6) noteFailedTry(6) kern(6)

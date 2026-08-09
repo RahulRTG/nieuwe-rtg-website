@@ -527,6 +527,50 @@ test('18. het spoor: wie deed wat, wanneer -- en bij een zaak staat de naam erbi
   assert.equal((await api('/api/site/spoor', { id }, lid)).status, 404);
 });
 
+test('19. een site lezen in je eigen taal: wel de tekst, niet de naam', async () => {
+  /* Dezelfde zin staat in velden die WEL en velden die NIET vertaald mogen
+     worden. Zo toetsen we onze eigen regel en niet de kwaliteit van het
+     woordenboek: wat overblijft moet verschillen van wat verandert. */
+  const Z = 'Neem contact op';
+  const mk = await api('/api/site/bewaar', { design: { titel: 'Atelier Nora Vertaal',
+    blokken: [
+      { type: 'hero', kop: Z, sub: Z, knop: 'Contact' },
+      { type: 'tekst', tekst: Z },
+      { type: 'citaat', tekst: Z, bron: Z },
+      { type: 'prijzen', regels: [{ naam: 'Sessie', prijs: Z, wat: Z }] }
+    ] } }, lid);
+  const id = mk.body.design.id;
+  await api('/api/site/publiceer', { id, adres: 'atelier-nora-vertaal' }, lid);
+
+  // zonder taalkeuze verandert er niets
+  const kaal = await api('/api/browser/open', { adres: 'atelier-nora-vertaal' }, lid);
+  assert.equal(kaal.body.vertaald, null);
+  assert.equal(kaal.body.site.blokken[1].tekst, Z);
+
+  // een tweede lid dat Engels leest
+  const reg = await api('/api/auth/register', { name: 'Taal Lid', email: 'taallid@voorbeeld.test',
+    password: 'webgeheim78', geboortedatum: '1995-05-05', tier: 'rtg', pasApp: 'rtg' });
+  const eng = reg.body.token;
+  assert.equal((await api('/api/member/taal/zet', { code: 'en' }, eng)).status, 200);
+
+  const v = await api('/api/browser/open', { adres: 'atelier-nora-vertaal' }, eng);
+  assert.equal(v.status, 200);
+  assert.ok(v.body.vertaald, 'het antwoord zegt dat het vertaald is');
+  assert.equal(v.body.vertaald.naar, 'en');
+
+  const b = v.body.site.blokken;
+  assert.notEqual(b[1].tekst, Z, 'lopende tekst wordt vertaald');
+  assert.notEqual(b[2].tekst, Z, 'de tekst van een citaat ook');
+  assert.notEqual(b[3].regels[0].wat, Z, 'en de omschrijving bij een prijs');
+  // EEN NAAM IS GEEN ZIN: identiteit, bronvermelding en prijs blijven staan
+  assert.equal(b[0].kop, Z, 'de hero-kop is de naam en blijft staan');
+  assert.equal(b[2].bron, Z, 'de bron van een citaat is een mens');
+  assert.equal(b[3].regels[0].prijs, Z, 'een prijs is geen zin');
+  // en het origineel is niet aangetast: de maker leest zijn eigen tekst nog
+  const eigen = await api('/api/site/haal', { id }, lid);
+  assert.equal(eigen.body.design.blokken[1].tekst, Z);
+});
+
 test('5. zoeken vindt sites en bedrijven in een adem', async () => {
   const z = await api('/api/browser/zoek', { q: 'vedra' }, lid);
   assert.equal(z.status, 200);

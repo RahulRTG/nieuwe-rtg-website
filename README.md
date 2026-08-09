@@ -1597,7 +1597,17 @@ De Mall las tot nu toe alleen wat een zaak **is** (naam, adres, artikelen, prijz
 
 **De andere kant: `POST /api/supplier/mall`.** Een ondernemer werkt in zijn eigen systeem en zag nooit wat daar aan de Mall-kant van terechtkomt — precies waar stille drift ontstaat. Deze weergave is een spiegel, geen dashboard: welk aanbod van u staat er, welke stand leest de Mall uit uw agenda en voorraad, en wat ontbreekt er nog (geen uren = niet in *Nu open*; geen werkgebied = de Mall neemt aan wat uw genre meebrengt). Bewust géén zoekvragen, bezoekersaantallen of conversie: dat is een leverancierdashboard en een eigen beslissing met een eigen privacyvraag.
 
-**Bekende gaten, met naam:** alles rekent in de tijd van de server, en een zaak draagt nog geen tijdzone — voor een Mall die van Haarlem tot Ibiza loopt is dat niet goed genoeg zodra die twee uit elkaar lopen. En een partner met een **extern** kassa- of boekingssysteem heeft nog geen weg naar binnen; de leeslaag werkt omdat alles in één database staat. Dat is de volgende architectuurkeuze, geen detail.
+**De klok is die van de zaak** (`server/kern/tijdzone.js`). Zolang alles op servertijd rekende was *Nu open* in Ibiza een uur mis — de stilste fout die er is, want de klant staat voor een dichte deur en denkt dat de zaak gesloten is. De zone komt uit `s.tijdzone` (IANA), anders uit de hoofdzone van het land, en die tweede zegt van zichzelf dat het een aanname is. `POST /api/supplier/tijdzone` zet hem; `auto` zet hem terug. Er wordt niets zelf uitgerekend: `Intl` heeft de volledige zonedatabase inclusief zomertijd aan boord.
+
+**Een kassasysteem van buiten** (`server/kern/mall/extern.js`, `POST /api/supplier/mall/sync`). Twee dingen mogen naar binnen en met opzet niet meer: **voorraad** per sku en **open/dicht**. Geen prijzen, geen artikelen, geen teksten — een koppeling die stilletjes productnamen kan overschrijven is een veel groter ding, met een eigen gesprek over wie wat mag.
+
+Drie regels die de koppeling veilig maken:
+
+1. **Houdbaarheid.** Een melding telt 30 minuten als actueel; daarna valt de Mall terug op wat zij zelf weet. Een kassa die stopt met melden is namelijk niet te onderscheiden van een kassa die "alles nog steeds op voorraad" bedoelt — behalve door de tijd. Zo houdt een uitgevallen koppeling nooit een winkel dagenlang open en gevuld.
+2. **De zaak wint van de kassa.** Zet de ondernemer zijn zaak in RTG op "neemt geen reserveringen aan", dan telt dat zwaarder dan wat het kassasysteem meldt. Een schakelaar die je omzet en die niets doet is erger dan geen schakelaar. Voorraad werkt andersom: daar is het externe getal het meest actueel, want daar loopt de verkoop.
+3. **Wat niet is aangenomen, wordt teruggemeld.** Regels zonder sku, een `open` die geen ja/nee is, sku's die hier niet bestaan: allemaal in het antwoord. Een koppeling die stil iets weggooit is niet te bouwen tegen.
+
+De kassa overschrijft de **weergave**, niet de administratie: de eigen voorraadrij van de zaak blijft staan zoals hij stond.
 
 ### De wallet en de ledenpas
 

@@ -57,7 +57,7 @@ module.exports = (ctx, hulp) => {
           plek: zaakPlek(s), bereik: bereikVan(s),
           prijs: p ? prijs(p, 'per stuk') : null,
           open: stand.openNu(s),
-          beschikbaar: stand.voorraad(a.varianten),
+          beschikbaar: stand.voorraad(a.varianten, s, a),
           pagina: '/apps/mall.html', genre: s.type, genreLabel: genreLabel(s.type),
           verdieping: 'winkelen', kenmerken: [a.categorie].filter(Boolean)
         }));
@@ -93,7 +93,7 @@ module.exports = (ctx, hulp) => {
           aanbieder: { soort: 'zaak', code: s.code, naam: s.name, status: status(s) },
           plek: zaakPlek(s), bereik: bereikVan(s),
           prijs: prijs(p.prijs, p.eenheid || 'per stuk'),
-          beschikbaar: stand.voorraad([{ voorraad: p.voorraad }]),
+          beschikbaar: stand.voorraad([{ voorraad: p.voorraad }], s, p),
           pagina: '/apps/mall.html', genre: 'boerderij', genreLabel: genreLabel('boerderij'),
           verdieping: 'eten'
         }));

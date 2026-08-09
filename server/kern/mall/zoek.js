@@ -158,6 +158,8 @@ module.exports = (ctx) => {
     if (!mijn.length) ontbreekt.push({ wat: 'aanbod', gevolg: 'U staat wel in de Mall, maar zonder iets dat te vinden is.', waar: 'uw kaart, artikelen of diensten' });
     if (uit.length) ontbreekt.push({ wat: 'voorraad', gevolg: uit.length + (uit.length === 1 ? ' artikel staat' : ' artikelen staan') + ' als uitverkocht in de Mall.', waar: 'uw voorraad' });
     if (!(s.mall && s.mall.bereik)) ontbreekt.push({ wat: 'werkgebied', gevolg: 'De Mall neemt aan wat uw genre meebrengt; u staat mogelijk in te weinig of te veel plaatsen.', waar: 'uw Mall-instellingen' });
+    const zone = stand.zoneVoor(s);
+    if (zone.aangenomen) ontbreekt.push({ wat: 'tijdzone', gevolg: 'De Mall rekent met ' + zone.zone + '; staat u elders, dan klopt "Nu open" niet.', waar: 'uw zaakinstellingen' });
 
     return {
       ok: true,
@@ -166,6 +168,8 @@ module.exports = (ctx) => {
         verdieping: a.verdieping, prijs: a.prijs, beschikbaar: a.beschikbaar, pagina: a.pagina })),
       aantal: mijn.length,
       stand: { open: st, uren: uren || null, neemtBestellingen: stand.neemtAan(s, 'orders'), neemtReserveringen: stand.neemtAan(s, 'reserveren') },
+      tijdzone: stand.zoneVoor(s),
+      extern: stand.extern.stand(s),
       bereik: P.bereikVan(s),
       ontbreekt,
       bron: stand.bronnen(),

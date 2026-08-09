@@ -61,6 +61,28 @@ app.post('/api/supplier/mall', supplierAuth, (req, res) => {
   res.json(r);
 });
 
+/* De koppeling voor een EXTERN kassa- of boekingssysteem: voorraad en
+   open/dicht melden. Alleen die twee, en alleen voor de eigen zaak. Een
+   melding telt een half uur als actueel en vervalt daarna vanzelf, zodat een
+   uitgevallen koppeling geen winkel ten onrechte open en gevuld houdt. Zie de
+   kop van kern/mall/extern.js. */
+app.post('/api/supplier/mall/sync', supplierAuth, (req, res) => {
+  res.json(kern.mall.mallStand.extern.meld(req.supplier, req.body || {}));
+});
+
+/* De tijdzone van de zaak. Zonder deze is "Nu open" de tijd van de server, en
+   dat is voor een zaak op Ibiza een uur mis. Leeg maken kan door 'auto' te
+   sturen: dan geldt weer de hoofdzone van het land. */
+app.post('/api/supplier/tijdzone', supplierAuth, (req, res) => {
+  const wens = String((req.body || {}).tijdzone || '').trim();
+  const { geldigeZone } = require('../kern/tijdzone');
+  if (wens && wens !== 'auto' && !geldigeZone(wens))
+    return res.status(400).json({ error: 'Onbekende tijdzone. Gebruik een IANA-naam, bijvoorbeeld Europe/Madrid.' });
+  if (!wens || wens === 'auto') delete req.supplier.tijdzone; else req.supplier.tijdzone = wens;
+  save();
+  res.json({ ok: true, tijdzone: kern.mall.mallStand.zoneVoor(req.supplier) });
+});
+
 app.post('/api/supplier/notifications/read', supplierAuth, (req, res) => {
   (db.data.supplierNotifications[req.supplier.code] || []).forEach(n => n.read = true);
   save();

@@ -3,6 +3,8 @@
    diepe link naar waar je boekt), en het boardroom-beheer waarmee het kantoor een
    partner verbergt of zijn etage/tagline/actie bijstelt. De boutiekweergaven komen
    als gedeelde helper uit de catalogus. Krijgt de gedeelde ctx van kern/mall/index.js. */
+const { BEREIK_IDS, BEREIKEN, GENRE_BEREIK } = require('./plek');
+
 module.exports = (ctx) => {
   const { db, save, seed, isRetail, isBoer, verborgen, boutiek, eigenBoutiek, farmBoutieks,
     dienstenplein, thuisplein, ETAGES, ETAGE_IDS, GIDS_GENRES, GENRE_PAGINA } = ctx;
@@ -78,12 +80,22 @@ module.exports = (ctx) => {
         deal: (s.mall && s.mall.deal) || '',
         verborgen: verborgen(s),
         koopetage: isRetail(s) || isBoer(s),
+        // het servicegebied zoals het nu geldt; `aangenomen` zegt of het uit
+        // het genre komt in plaats van uit een keuze van de ondernemer
+        bereik: (() => {
+          const eigen = s.mall && s.mall.bereik;
+          const soort = eigen && BEREIK_IDS.includes(eigen.soort) ? eigen.soort : (GENRE_BEREIK[s.type] || 'adres');
+          const km = eigen && Number.isFinite(Number(eigen.km)) ? Number(eigen.km) : BEREIKEN[soort].km;
+          return { soort, km, label: BEREIKEN[soort].label, aangenomen: !(eigen && BEREIK_IDS.includes(eigen.soort)) };
+        })(),
         pagina: GENRE_PAGINA[s.type] || '/apps/app.html'
       }));
   }
   function beheer() {
     seed();
-    return { ok: true, etages: ETAGES.filter(e => ETAGE_IDS.includes(e.id)), leveranciers: beheerLijst() };
+    return { ok: true, etages: ETAGES.filter(e => ETAGE_IDS.includes(e.id)),
+      bereiken: BEREIK_IDS.map(id => ({ id, label: BEREIKEN[id].label, km: BEREIKEN[id].km })),
+      leveranciers: beheerLijst() };
   }
   function beheerZet(code, patch) {
     patch = patch || {};
@@ -91,6 +103,15 @@ module.exports = (ctx) => {
     if (!s) return { status: 404, error: 'Leverancier niet gevonden.' };
     if (!s.mall) s.mall = {};
     if (typeof patch.verborgen === 'boolean') s.mall.verborgen = patch.verborgen;
+    /* Het servicegebied. Zonder dit veld staat een zaak alleen op haar eigen
+       adres in de Mall, en verdwijnt elke dienstverlener die naar de klant toe
+       komt uit "in de buurt". De ondernemer zet hem zelf; staat hij niet, dan
+       geldt de aanname van zijn genre (kern/mall/plek.js). */
+    if (patch.bereik && BEREIK_IDS.includes(patch.bereik.soort)) {
+      const km = Number(patch.bereik.km);
+      s.mall.bereik = { soort: patch.bereik.soort };
+      if (Number.isFinite(km)) s.mall.bereik.km = Math.max(0, Math.min(2000, Math.round(km)));
+    }
     if (typeof patch.etage === 'string' && ETAGE_IDS.includes(patch.etage)) s.mall.etage = patch.etage;
     if (typeof patch.tagline === 'string') s.mall.tagline = patch.tagline.replace(/[<>]/g, '').trim().slice(0, 140);
     if (typeof patch.deal === 'string') s.mall.deal = patch.deal.replace(/[<>]/g, '').trim().slice(0, 120);

@@ -37,17 +37,29 @@ const GIDS_GENRES = [
   'boerderij', 'activiteit', 'events', 'taxi', 'jet', 'helikopter', 'verhuur',
   'tweewielers', 'charter', 'vastgoed', 'zorg'
 ];
-// waar je een genre boekt/reserveert in de app (de diepe link vanuit de gids);
-// de dienstverlenende genres landen op het Dienstenplein in de Mall zelf
+/* Waar je een genre boekt/reserveert in de app (de diepe link vanuit de gids);
+   de dienstverlenende genres landen op het Dienstenplein in de Mall zelf.
+
+   De vervoergenres stonden hier lang NIET in. Ze kwamen wel in de gids, maar
+   zonder pagina, en vielen dus terug op /apps/app.html met `boekbaar: false`:
+   een privejet en een scooterverhuur waren zichtbaar en tegelijk doodlopend,
+   terwijl /apps/hangar.html en /apps/ov.html gewoon bestonden. Dat is precies
+   het symptoom-gat waar LAT-regel 1 over gaat -- de oorzaak was dat er twee
+   plaatsen waren waar "waar boek je dit genre" werd bepaald (deze tabel en de
+   fallback in gidsen()). De tabel is nu de enige, en test/mall-vindlaag.test.js
+   eist dat elk genre dat in de Mall aanbod heeft hier een pagina heeft. */
 const GENRE_PAGINA = {
-  restaurant: '/apps/foodcourt.html',
+  restaurant: '/apps/foodcourt.html', koffie: '/apps/foodcourt.html',
   hotel: '/apps/hotels.html', apartment: '/apps/hotels.html', villa: '/apps/hotels.html',
   bar: '/apps/uitgaan.html', club: '/apps/uitgaan.html', beachclub: '/apps/uitgaan.html',
   retail: '/apps/mall.html', juwelier: '/apps/mall.html', boerderij: '/apps/mall.html',
-  zzp: '/apps/mall.html', chef: '/apps/mall.html', wellness: '/apps/mall.html', bouw: '/apps/mall.html'
+  zzp: '/apps/mall.html', chef: '/apps/mall.html', wellness: '/apps/mall.html', bouw: '/apps/mall.html',
+  // vervoer en verhuur: elk genre naar de plek waar je hem werkelijk aanvraagt
+  jet: '/apps/hangar.html', helikopter: '/apps/hangar.html', charter: '/apps/hangar.html',
+  taxi: '/apps/ov.html', verhuur: '/apps/mall.html', tweewielers: '/apps/mall.html'
 };
 
-function maakMall({ db, save, crypto, isRetail, haalThuis }) {
+function maakMall({ db, save, crypto, isRetail, haalThuis, haalLandVind }) {
   const nu = () => new Date().toISOString();
   const va = (sku, kleuren, maten, v) => {
     const out = [];
@@ -126,7 +138,7 @@ function maakMall({ db, save, crypto, isRetail, haalThuis }) {
 
   // de gedeelde ctx voor de deelbestanden
   const ctx = {
-    db, save, crypto, isRetail, haalThuis, nu, va, seed, isBoer, farmTeKoop, verborgen, winkelCatalogus,
+    db, save, crypto, isRetail, haalThuis, haalLandVind, nu, va, seed, isBoer, farmTeKoop, verborgen, winkelCatalogus,
     ETAGES, ETAGE_IDS, GIDS_GENRES, GENRE_PAGINA
   };
   const api = { ETAGES, seed };
@@ -134,6 +146,13 @@ function maakMall({ db, save, crypto, isRetail, haalThuis }) {
   Object.assign(api, require('./diensten')(ctx)); // vult ctx met het Dienstenplein
   Object.assign(api, require('./thuisplein')(ctx)); // vult ctx met de verdieping RTG Thuis
   Object.assign(api, require('./etalage')(ctx));
+  /* De commerciele voorkant van heel RTG: het locatiemodel, het universele
+     aanbod-object over alle domeinen heen, en de zoek-/ontdeklaag erboven.
+     Staat NA de etalage omdat de aanbod-bronnen haar helpers (thuisplein,
+     verborgen, farmTeKoop) uit dezelfde ctx halen. */
+  Object.assign(api, require('./plek')(ctx));   // vult ctx.plek
+  Object.assign(api, require('./aanbod')(ctx)); // vult ctx.aanbodAlles
+  Object.assign(api, require('./zoek')(ctx));
   return { mall: api };
 }
 

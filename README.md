@@ -1552,6 +1552,32 @@ Wat je niet wilt zien, zet je uit in de **Boardroom** (bedieningspaneel → Boar
 
 De statusbalk houdt drie dingen vast: batterij, de bel en het bedieningspaneel. Scannen, je Zegel tonen en je backoffice zitten in dat paneel.
 
+### De Mall: de commerciële voorkant van heel RTG
+
+**apps/mall.html** was een winkel met spullen: zeven etages met boutieks, plus drie bibliotheken. Alles wat je verder bij RTG kon boeken, huren of aanvragen zat in zijn eigen app, en het reisbureau stond er zelfs helemaal niet in — het enige wat de Mall over reizen liet zien was een boekenkast met reisgidsen.
+
+De Mall is nu een **discovery-laag boven op alle bestaande domeinen**. Die domeinen houden hun eigen systemen; de Mall maakt ze gezamenlijk vindbaar.
+
+**Locatie en intentie eerst, type aanbieder daarna.** Bovenaan staat één zoekbalk en de plek waar je staat. "scooter huren Ibiza" zoekt tegelijk door leveranciers, verhuurbedrijven, marktplaats-aanbod en reisaanbod; wie de aanbieder is (professioneel, particulier, RTG) staat op elke kaart, zodat het verschil nooit hoeft te worden uitgelegd.
+
+| deel | waar | wat |
+|---|---|---|
+| het aanbod-object | `kern/mall/aanbod.js` + `aanbodvorm.js` | twaalf typen (product, dienst, boeking, huur, ticket, reis, verblijf, eten, vervoer, marktplaats, abonnement, offerte) in één vorm, met elf verdiepingen |
+| de bronnen | `kern/mall/aanbodzaken.js` (uit de zaken) + `aanbodrtg.js` (RTG-breed) | tien bronnen: reisbureau, logies, foodcourt, retail, eigen-merk, boerderij, dienstenplein, mobiliteit, marktplaats, thuis |
+| locatie & servicegebied | `kern/mall/plek.js` | de plekken worden afgeleid uit het aanbod dat er echt is; per zaak een bereik (adres, straal, stad, land, Europa, online) |
+| zoeken & rangschikken | `kern/mall/zoek.js` + `zoekweging.js` | `POST /api/mall/zoek`, `/api/mall/home`, `/api/mall/plekken` |
+
+**Vier regels die in de code staan en niet alleen hier:**
+
+1. **Rangschikken gebeurt niet op geld.** Een RTG Partner komt niet hoger omdat hij partner is; er is met opzet geen partner-term in de weging. Partners krijgen hun voordeel in integratie, niet in ranking. `test/mall-vindlaag.test.js` leest de weging en zakt zodra iemand er een aanbieder-term in zet.
+2. **Relevantie en volgorde zijn niet hetzelfde.** Beschikbaarheid sorteert, maar laat niets toe dat niet gevraagd is. Toen dat één som was, gaf "scooter huren Ibiza" negen resultaten: vier ringen, drie potten honing en twee villa's, puur omdat die op voorraad stonden.
+3. **De projectie wordt gedeeld, niet overgeschreven.** De prijs van een reis komt uit `reisAanbod(db)` in `kern/reisbureau.js`, de zichtbaarheid van een advertentie uit `kern/markt/openbaar.js`. Een reis die bij het bureau € 2.200 kost en in de Mall € 22 is precies het soort verschil dat niemand ziet aankomen.
+4. **Een status is geen keurmerk.** RTG Partner, RTG Verified, RTG Business en Marktplaats-lid zeggen wat RTG over de aanbieder wéét. De Mall zegt er zelf bij dat RTG niet garant staat voor wat een ander levert.
+
+**Wat er onderweg is gerepareerd:** de genres `jet`, `helikopter`, `taxi`, `charter`, `verhuur` en `tweewielers` stonden wel in de leveranciersgids maar hadden geen pagina, dus ze vielen terug op `/apps/app.html` met `boekbaar: false` — zichtbaar en tegelijk doodlopend, terwijl `hangar.html` en `ov.html` gewoon bestonden. Ze wijzen nu elk naar de plek waar je ze werkelijk aanvraagt.
+
+**Wat er nog niet is** (bewust, en met naam in plaats van als stilte): één winkelmand over ordertypes heen, de trip-cart ("voeg toe aan reis"), personalisatie en tijd als context, de aanvraagmarkt ("ik zoek morgen een fotograaf"), de B2B-modus met zakelijke prijzen, het leverancierdashboard met zoekvragen, en de terugkoppeling van tekorten naar de Kansenlaag. De laag waar die allemaal op staan — één aanbod-object, één plek, één zoekingang — ligt er nu.
+
 ### De wallet en de ledenpas
 
 **apps/wallet.html** is alles wat je bij je draagt. Bovenaan ligt je **ledenpas**: codenaam, lidnummer, welke pas en een QR met je lidnummer (onze eigen codec, `shared/qr.js` + `shared/qrteken.js`). Daaronder je passen, tickets, sleutels, feestmunten en klantenkaarten (`/api/wallet`, `server/kern/wallet.js`). De pas stond vroeger op het beginscherm van de app; daar staat nu de klok.

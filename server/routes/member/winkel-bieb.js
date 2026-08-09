@@ -24,6 +24,25 @@ module.exports = (kern) => {
     res.json(r);
   });
 
+  /* ---- de RTG Mall als commerciele voorkant van heel RTG ----
+     Drie ingangen boven op de bestaande etages: waar sta je (plekken), wat
+     staat daar (home) en wat zoek je (zoek). De zoekroute gaat dwars door
+     alle domeinen heen -- reizen, verblijven, eten, retail, diensten,
+     vervoer, marktplaats -- en is een LEESLAAG: er wordt hier niets besteld
+     of geboekt, de knop wijst naar de plek waar dat al gebeurt. Vandaar geen
+     gegevenspoort op deze drie: er gaat geen enkel gegeven naar een derde. */
+  app.post('/api/mall/plekken', auth, (req, res) => res.json(mall.mallPlekken()));
+  app.post('/api/mall/home', auth, (req, res) => res.json(mall.mallHome({
+    plek: req.body.plek, punt: req.body.punt
+  })));
+  app.post('/api/mall/zoek', auth, (req, res) => res.json(mall.mallZoek({
+    q: String(req.body.q || '').slice(0, 120),
+    plek: req.body.plek, punt: req.body.punt,
+    verdieping: req.body.verdieping, type: req.body.type, aanbieder: req.body.aanbieder,
+    maxPrijs: req.body.maxPrijs, binnenKm: req.body.binnenKm,
+    pagina: req.body.pagina, per: req.body.per
+  })));
+
   /* ---- de RTG Mall: de enige plek waar je bij RTG koopt ---- */
   app.post('/api/mall', auth, (req, res) => res.json(mall.overzicht()));
   // de catalogus van het RTG eigen-merk (hardware + de Hardwarelab-ontwerpen)

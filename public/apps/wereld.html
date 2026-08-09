@@ -111,6 +111,17 @@
     font-size:0.74rem;border:1px solid var(--rtg-line);
     border-radius:999px;padding:0.28rem 0.6rem;cursor:pointer;}
 
+  /* zoeken: een veld en een lijst treffers. De regel "gedeelde connecties"
+     staat op de kaart, want dat is wat een introductie mogelijk maakt. */
+  #zoekform{display:flex;gap:0.5rem;margin-bottom:1rem;}
+  #zoekform input{flex:1;background:var(--rtg-card2);color:var(--rtg-txt);
+    font:inherit;font-size:0.85rem;border:1px solid var(--rtg-line);
+    border-radius:999px;padding:0.5rem 0.95rem;}
+  #zoekform button{background:var(--rtg-acc);color:#0C0C0B;font:inherit;
+    font-size:0.8rem;font-weight:600;border:0;border-radius:999px;
+    padding:0.5rem 1.1rem;cursor:pointer;}
+  .via{font-size:0.72rem;color:var(--rtg-acc);margin-top:0.35rem;}
+
   /* DE NAVIGATIE: vijf, en niet meer. Home, Ontdek, Chat, Activiteit, Profiel.
      Alle diepte zit erachter; de app hoort klein te voelen. Chat is bewust een
      LINK en geen tab: berichten is een eigen app (/apps/comm.html) en blijft
@@ -139,11 +150,18 @@
   <div id="fout" hidden></div>
   <div id="feed"></div>
   <div id="profiel" hidden></div>
+  <div id="ontdek" hidden>
+    <form id="zoekform" autocomplete="off">
+      <input id="zoekq" type="search" placeholder="Zoek op naam, functie, sector of vaardigheid">
+      <button type="submit">Zoeken</button>
+    </form>
+    <div id="zoekuit"></div>
+  </div>
 </main>
 
 <nav class="balk" aria-label="Hoofdnavigatie">
-  <a href="/apps/wereld.html" aria-current="page"><span>◎</span>Home</a>
-  <a href="/apps/app.html"><span>◈</span>Ontdek</a>
+  <a href="/apps/wereld.html" id="homeTab" aria-current="page"><span>◎</span>Home</a>
+  <a href="#ontdek" id="ontdekTab"><span>◈</span>Ontdek</a>
   <a href="/apps/comm.html"><span>◇</span>Chat</a>
   <a href="/apps/attenties.html"><span>◉</span>Activiteit</a>
   <a href="#profiel" id="profielTab"><span>○</span>Profiel</a>
@@ -167,7 +185,8 @@
   }
 
   var staat = { modus: 'alles', modi: [], vanaf: 0, items: [], kaart: {},
-    weergave: 'feed', zichtbaarheden: [] };
+    weergave: 'feed', zichtbaarheden: [], vermogens: [] };
+  var mag = function (v) { return staat.vermogens.indexOf(v) >= 0; };
 
   function toon(bericht) {
     var n = $('#fout');
@@ -297,6 +316,24 @@
   function tekenProfiel(lagen) {
     var n = $('#profiel');
     n.textContent = '';
+    if (mag('inzicht.profielbezoek')) {
+      var bez = document.createElement('section');
+      bez.className = 'laag'; bez.id = 'bezoekers';
+      bez.innerHTML = '<h2>Wie bekeek jouw profiel</h2>'
+        + '<p class="bron">Bezoeken blijven 90 dagen staan. Kijk jij bij een ander, '
+        + 'dan ziet die jou hier ook: er is geen onzichtbare stand.</p>';
+      n.appendChild(bez);
+      api('/bezoekers', {})
+        .then(function (d) {
+          bez.innerHTML += d.totaal
+            ? d.bezoekers.map(function (b) {
+              return '<div class="veld"><span class="nm">' + esc(b.codenaam) + '</span>'
+                + '<span class="wa">' + esc(klok(b.at)) + ' &middot; ' + b.keer + 'x</span></div>';
+            }).join('')
+            : '<div class="veld"><span class="wa leeg">Nog niemand.</span></div>';
+        })
+        .catch(function (e) { toon(e.message); });
+    }
     lagen.forEach(function (l) {
       var kaart = document.createElement('section');
       kaart.className = 'laag';
@@ -330,17 +367,69 @@
     });
   }
 
+  /* ZOEKEN. Het scherm toont hier geen enkele regel over wie wat mag zien: de
+     server geeft per treffer alleen de velden terug die deze zoeker mag zien
+     (kern/wereld/netwerk.js). Wat hier binnenkomt, mag dus getoond worden --
+     het filteren gebeurt aan de kant waar de gegevens staan. */
+  function tekenTreffers(d) {
+    var n = $('#zoekuit');
+    n.textContent = '';
+    if (!d.treffers.length) {
+      n.innerHTML = '<p class="leeg">Niemand gevonden.<br>'
+        + 'Let op: je vindt alleen wat leden voor jou zichtbaar hebben gezet.</p>';
+      return;
+    }
+    d.treffers.forEach(function (t) {
+      var k = document.createElement('article');
+      k.className = 'kaart';
+      var regels = t.velden.map(function (v) {
+        var w = toonWaarde(v.waarde);
+        return w ? '<p>' + esc(w) + '</p>' : '';
+      }).join('');
+      k.innerHTML = '<div class="r1"><span class="auteur">' + esc(t.codenaam) + '</span>'
+        + '<span class="bron">' + esc(t.pas) + '</span></div>' + regels
+        + (t.gedeeld
+          ? '<p class="via">' + t.gedeeld + ' gedeelde connectie(s)'
+            + (t.via.length ? ' &middot; via ' + esc(t.via.join(', ')) : '') + '</p>'
+          : '')
+        + '<div class="acties"><button type="button" data-chat="' + esc(t.codenaam)
+        + '" data-over="">Bericht</button></div>';
+      n.appendChild(k);
+    });
+  }
+
+  $('#zoekform').addEventListener('submit', function (e) {
+    e.preventDefault();
+    api('/zoek', { q: $('#zoekq').value })
+      .then(function (d) { toon(null); tekenTreffers(d); })
+      .catch(function (err) { toon(err.message); });
+  });
+
+  $('#homeTab').addEventListener('click', function (e) {
+    e.preventDefault();
+    toonWeergave('feed');
+  });
+
+  $('#ontdekTab').addEventListener('click', function (e) {
+    e.preventDefault();
+    /* Zonder het vermogen is er hier niets te doen, en dan sturen we je naar
+       het beginscherm in plaats van een leeg paneel te tonen. Het scherm
+       verzint die regel niet zelf -- hij komt uit /api/wereld/state. */
+    if (!mag('zoeken.geavanceerd')) { location.href = '/apps/app.html'; return; }
+    toonWeergave(staat.weergave === 'ontdek' ? 'feed' : 'ontdek');
+  });
+
   /* Wisselen tussen de feed en het profiel. Bewust binnen dezelfde app: het
      profiel is een KANT van dezelfde identiteit, niet een andere plek. */
   function toonWeergave(welke) {
     staat.weergave = welke;
     $('#feed').hidden = welke !== 'feed';
     $('#profiel').hidden = welke !== 'profiel';
+    $('#ontdek').hidden = welke !== 'ontdek';
     $('#werelden').hidden = welke !== 'feed';
+    var bij = { feed: 'homeTab', profiel: 'profielTab', ontdek: 'ontdekTab' };
     document.querySelectorAll('.balk a').forEach(function (a) {
-      a.setAttribute('aria-current', a.id === 'profielTab'
-        ? (welke === 'profiel' ? 'page' : 'false')
-        : (welke === 'feed' && a.getAttribute('href') === '/apps/wereld.html' ? 'page' : 'false'));
+      a.setAttribute('aria-current', a.id === bij[welke] ? 'page' : 'false');
     });
   }
 
@@ -369,6 +458,7 @@
   api('/state', {})
     .then(function (d) {
       staat.modus = d.modus; staat.modi = d.modi; staat.kaart = d.koppelkaart || {};
+      staat.vermogens = d.vermogens || [];
       $('#wie').innerHTML = esc(d.ik.codenaam) + ' · <b>' + esc(d.ik.pas.toUpperCase()) + ' Pass</b>';
       tekenWerelden();
       return laad();

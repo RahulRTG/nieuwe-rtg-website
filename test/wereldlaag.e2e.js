@@ -144,6 +144,45 @@ test('RTG Wereld: de schakelaar, de ene feed, en de sprong naar de berichten-app
     assert.equal(zicht, 'alleenik',
       'de keuze uit het scherm is niet op de server geland (stond op ' + zicht + ')');
 
+    /* 6. de Ontdek-tab. A is een GRATIS lid en heeft `zoeken.geavanceerd` niet;
+       het scherm hoort hem dan naar het beginscherm te sturen in plaats van een
+       leeg paneel te tonen. Die regel komt uit /api/wereld/state en staat niet
+       in de HTML -- dat is precies wat hier wordt nagetrokken. */
+    await page.click('#ontdekTab');
+    await page.waitForURL(/\/apps\/app\.html/, { timeout: 10000 });
+
+    /* 7. dezelfde tab met een pas die het WEL heeft: zoeken werkt, en de
+       treffer toont alleen wat zichtbaar is. B is Lifestyle en heeft eerder een
+       Salon-post geplaatst; we geven hem een zakelijke kop om op te zoeken. */
+    await api(base, '/api/zakelijk/profiel/zet', { naam: 'B', kop: 'Zeilmaker' }, b);
+    const page2 = await browser.newPage();
+    letOpFouten(page2, fouten);
+    await page2.addInitScript((tok) => {
+      localStorage.setItem('rtg_member_token', tok);
+      localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
+    }, b);
+    await page2.goto(base + '/apps/wereld.html', { waitUntil: 'load' });
+    await page2.waitForSelector('#werelden button', { timeout: 15000 });
+    await page2.click('#ontdekTab');
+    await page2.waitForSelector('#zoekform', { timeout: 10000 });
+    assert.equal(await page2.evaluate(() => location.pathname), '/apps/wereld.html',
+      'met het vermogen hoort Ontdek IN de app te blijven');
+
+    // A heeft geen zakelijk profiel, dus B vindt hem niet op deze term
+    await page2.fill('#zoekq', 'zeilmaker');
+    await page2.click('#zoekform button');
+    await page2.waitForSelector('#zoekuit .kaart, #zoekuit .leeg', { timeout: 10000 });
+    const uitslag = await page2.evaluate(() => document.getElementById('zoekuit').textContent);
+    assert.match(uitslag, /Niemand gevonden|zeilmaker/i,
+      'de zoekuitslag zegt iets zinnigs: ' + uitslag.slice(0, 120));
+
+    // 8. en "wie bekeek mijn profiel" staat op de Profiel-tab van B
+    await page2.click('#profielTab');
+    await page2.waitForSelector('#bezoekers', { timeout: 10000 });
+    const bez = await page2.evaluate(() => document.getElementById('bezoekers').textContent);
+    assert.match(bez, /geen onzichtbare stand/i,
+      'het scherm zegt niet dat er geen sluipstand is: ' + bez.slice(0, 120));
+
     assert.deepEqual(fouten, [], 'geen JS-fouten tijdens het scherm');
   } finally {
     if (browser) await browser.close();

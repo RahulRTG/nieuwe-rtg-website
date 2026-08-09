@@ -4,7 +4,7 @@
    context een keer bij het opstarten vanuit routes/zakelijk.js. */
 module.exports = (zctx) => {
   const { app, auth, crypto, db, save, schoon, liveCodename, openVacatures, gidsHaal, talen,
-    socialVerbind, connectieTussen, statusVan, zijnVrienden, verbActief, codenaamVan, sseToCustomer,
+    socialVerbind, connectieTussen, statusVan, zijnVrienden, codenaamVan, sseToCustomer,
     Z, nu, rid, pro, mijnProfiel, pasVan, connectiesVan, gedeeldeConnecties, publiek } = zctx;
   /* ---------- de zakelijke feed ---------- */
   app.post('/api/zakelijk/post', auth, pro, (req, res) => {

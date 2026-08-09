@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 2904 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 2907 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,13 +18,13 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 2904 |
-| servermodules (`server/**/*.js`) | 1571 |
-| routebestanden (`server/routes/**`) | 350 |
-| kernmodules (`server/kern/**`) | 910 |
+| API-endpoints | 2907 |
+| servermodules (`server/**/*.js`) | 1574 |
+| routebestanden (`server/routes/**`) | 351 |
+| kernmodules (`server/kern/**`) | 912 |
 | schermen (`public/**/*.html`) | 214 |
 | gedeelde browsermodules (`public/shared/*.js`) | 171 |
-| toetsbestanden (`test/*.test.js`) | 632 |
+| toetsbestanden (`test/*.test.js`) | 633 |
 | schermtoetsen (`test/*.e2e.js`) | 88 |
 
 ## 2. De weg van een verzoek
@@ -94,7 +94,7 @@ luister
 Acht domeinen, uit `server/opzet/routes.js`. Met `RTG_DOMAINS=member,social` draait
 een proces alleen die domeinen; een gateway (`server/poort.js`) stuurt de
 padvoorvoegsels dan naar het juiste proces. **Die belofte is nog niet waargemaakt:**
-zie §5 -- er zijn nog 147 kern-namen die meer dan één domein aanraakt.
+zie §5 -- er zijn nog 146 kern-namen die meer dan één domein aanraakt.
 
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
@@ -105,8 +105,8 @@ zie §5 -- er zijn nog 147 kern-namen die meer dan één domein aanraakt.
 | `staff` | 26 | 7 | 1 | 40 |
 | `social` | 55 | 7 | 31 | 52 |
 | `techniek` | 42 | 11 | 1 | 49 |
-| `zakelijk` | 13 | 2 | 0 | 26 |
-| `wereld` | 7 | 1 | 0 | 0 |
+| `zakelijk` | 13 | 2 | 0 | 25 |
+| `wereld` | 10 | 2 | 0 | 0 |
 
 "Zonder bewaker" betekent: geen `auth`/`supplierAuth`/`officeAuth`-achtige middleware
 op de regel zelf. Dat is niet hetzelfde als onbeveiligd -- regel 28 van de keuring eist
@@ -122,8 +122,8 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 | Meting | Nu |
 |---|---|
 | kern-namen die routes aanraken | 1120 |
-| daarvan door **meer dan één** domein (de echte koppeling) | 147 |
-| daarvan door precies één domein | 973 |
+| daarvan door **meer dan één** domein (de echte koppeling) | 146 |
+| daarvan door precies één domein | 974 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 

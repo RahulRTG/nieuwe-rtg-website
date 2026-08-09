@@ -14,7 +14,7 @@
    gids zonder er zelf voor te kiezen. */
 module.exports = (kern) => {
   const { app, auth, crypto, db, save, schoon, liveCodename, openVacatures, gidsHaal, talen,
-    socialVerbind, connectieTussen, statusVan, zijnVrienden, verbActief, codenaamVan, sseToCustomer } = kern;
+    socialVerbind, connectieTussen, statusVan, zijnVrienden, codenaamVan, sseToCustomer } = kern;
 
   function Z() {
     if (!db.data.zakelijk) db.data.zakelijk = { profielen: {}, posts: [], kansen: [] };
@@ -49,16 +49,17 @@ module.exports = (kern) => {
   const mijnProfiel = (req) => Z().profielen[req.session.key] || null;
   const pasVan = (key) => (gidsHaal(key) || {}).tier || null;
 
-  // actieve connecties van een lid; daarmee tellen we gedeelde connecties
-  // ("via wie ken ik deze persoon"), het netwerkgevoel van de gids
-  function connectiesVan(key) {
-    return db.data.connections.filter(c => (c.a === key || c.b === key) && verbActief(c))
-      .map(c => (c.a === key ? c.b : c.a));
-  }
-  function gedeeldeConnecties(mij, ander) {
-    const set = new Set(connectiesVan(mij));
-    return connectiesVan(ander).filter(k => set.has(k));
-  }
+  /* Actieve connecties en gedeelde connecties ("via wie ken ik deze persoon"),
+     het netwerkgevoel van de gids.
+
+     DEZE SOM STOND HIER, EN STAAT NU IN kern/wereld/netwerk.js. Toen de
+     wereldlaag netwerkanalyse kreeg ("wie kan mij introduceren") was dat exact
+     dezelfde berekening op dezelfde graaf. Hem daar opnieuw schrijven zou
+     dezelfde waarheid op twee plekken zetten (LAT-regel 4) -- en dat is precies
+     wat er hierboven met de PRO-lijst gebeurde. Eén implementatie, twee
+     gebruikers: de gids hier, de introducties daar. */
+  const netwerk = require('../kern/wereld/netwerk')({ db, codenaamVan, profiel: null });
+  const { connectiesVan, gedeeldeConnecties } = netwerk;
 
   // publieke weergave van een profiel (voor de gids en de feed)
   function publiek(p, mij) {
@@ -80,7 +81,7 @@ module.exports = (kern) => {
   /* De netwerk- en prikbordlaag draaien als submodules op een gedeelde
      context, een keer opgebouwd bij het opstarten. */
   const zctx = { app, auth, crypto, db, save, schoon, liveCodename, openVacatures, gidsHaal, talen,
-    socialVerbind, connectieTussen, statusVan, zijnVrienden, verbActief, codenaamVan, sseToCustomer,
+    socialVerbind, connectieTussen, statusVan, zijnVrienden, codenaamVan, sseToCustomer,
     Z, nu, rid, pro, mijnProfiel, pasVan, connectiesVan, gedeeldeConnecties, publiek };
   require('./zakelijk/netwerk')(zctx);
   require('./zakelijk/prikbord')(zctx);

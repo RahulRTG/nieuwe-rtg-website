@@ -37,24 +37,11 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boeki
   /* De verkenningslaag: intake -> kansverkenning -> simulatie -> stress test ->
      ondernemingsplan. Vier modules die op elkaar leunen in precies die
      volgorde, en die hier één keer worden opgebouwd. */
-  const intake = require('./intake')({ schoon });
-  const kans = require('./kans')({ db, ordersVanZaak, boekingenVanZaak });
-  const sim = require('./simulatie')({ intakeOntbreekt: intake.intakeOntbreekt });
-  const stress = require('./stress')();
-  const plan = require('./plan')({ intakeOntbreekt: intake.intakeOntbreekt, save });
-  const dag = require('./dagbeeld')({ db, boekingenVanZaak, ordersVanZaak,
-    intakeOntbreekt: intake.intakeOntbreekt });
-  const opr = require('./oprichting')({ save });
-  const ek = require('./eersteklant')({ db, ondernemerpoort, boekingenVanZaak, ordersVanZaak });
-  const mp = require('./mallprofiel')({ db });
-  /* Het gedeelde klantenboek, hetzelfde dat Vakwerk gebruikt. Twee boeken
-     naast elkaar lopen uiteen (lat-regel 4). */
-  /* `schoon` en niet `scho`: die laatste wordt verderop in dit bestand pas
-     verklaard, en een const lezen voor zijn declaratie gooit. Zelfde functie. */
-  const boek = require('../klantenboek')({ db, save, scho: schoon, boekingenVanZaak, ordersVanZaak });
-  const rel = require('./relaties')({ db, klantenboek: boek.klantenboek, boekingenVanZaak });
-  const deb = require('./debiteuren')({ db });
-  const cred = require('./crediteuren')({ db });
+  /* Alle deellagen worden in ./lagen.js opgebouwd -- dit bestand ging over de
+     10 kB van het modulebeleid, en dat is de goede naad: daar de
+     gereedschapskist, hier het object zelf. */
+  const { intake, kans, sim, stress, plan, dag, opr, ek, mp, boek, rel, deb, cred, con } =
+    require('./lagen')({ db, save, schoon, ordersVanZaak, boekingenVanZaak, ondernemerpoort });
 
   const bak = () => {
     if (!Array.isArray(db.data.ondernemingen)) db.data.ondernemingen = [];
@@ -189,13 +176,25 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boeki
     /* Het dagbeeld krijgt de verkenning MEE en draait hem niet zelf: de route
        heeft hem toch al, en twee keer rekenen kan twee antwoorden geven op
        dezelfde vraag. */
-    ondernemingDagbeeld: (o) => dag.dagbeeld(o, ondernemingBeeld(o), ondernemingVerkenning(o),
-      opr.oprichtingsproject(o), ek.eersteKlant(o), mp.ondernemingMallProfiel(o), rel.relaties(o), deb.debiteuren(o), cred.crediteuren(o)),
+    /* `nu` is optioneel en in milliseconden. Hij bestaat omdat het dagbeeld
+       vier lagen draagt die op de klok leunen (relaties, debiteuren,
+       crediteuren, contracten): zonder een te zetten moment is dat scherm niet
+       te toetsen, en een klok die je niet kunt zetten is een klok die je niet
+       kunt toetsen. In productie geeft niemand hem mee en geldt gewoon nu. */
+    ondernemingDagbeeld: (o, nu) => {
+      const t = Number.isFinite(nu) ? nu : Date.now();
+      const vandaag = new Date(t).toISOString().slice(0, 10);
+      return dag.dagbeeld(o, ondernemingBeeld(o), ondernemingVerkenning(o),
+        opr.oprichtingsproject(o), ek.eersteKlant(o), mp.ondernemingMallProfiel(o),
+        rel.relaties(o, t), deb.debiteuren(o, t), cred.crediteuren(o, t), con.contracten(o, vandaag));
+    },
     ondernemingEersteKlant: ek.eersteKlant,
     ondernemingMallProfiel: mp.ondernemingMallProfiel,
     ondernemingRelaties: rel.relaties,
     ondernemingDebiteuren: deb.debiteuren,
     ondernemingCrediteuren: cred.crediteuren,
+    ondernemingContracten: con.contracten,
+    ondernemingWerkruimte: (o, code) => con.ondernemingWerkruimte(o, code, save),
     ondernemingKlantNotitie: boek.klantNotitie,
     ondernemingOprichting: opr.oprichtingsproject,
     ondernemingOprichtingZet: opr.oprichtingZet,

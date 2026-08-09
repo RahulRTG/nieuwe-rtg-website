@@ -1511,6 +1511,48 @@ raak: de spiegel omdraaien, de debiteuren-teksten aan de crediteuren geven, de
 vooruitblik posten zonder vervaldatum laten meetellen, van de gedeelde rekenkern
 een eigen kopie maken, en uitgaand geld boven binnenkomend geld zetten.
 
+### De contractklok op het dagbeeld
+
+`server/kern/onderneming/contracten.js` + `/api/onderneming/{contracten,werkruimte}`,
+met de gedeelde klok in `server/bedrijf/contractklok.js`.
+
+**Hier is geen contractregister gebouwd, en dat is het hele punt.** RTG Werk OS
+heeft er al een (`server/bedrijf/contract.js`): soorten, tekenen met twee namen,
+opzeggen, en een klok die de laatste opzegdag **uitrekent** uit de einddatum en de
+opzegtermijn in plaats van hem te laten overtypen. Dat is beter dan wat hier in
+een middag zou ontstaan, en een tweede register zou vooral betekenen dat een
+ondernemer twee lijsten heeft en niet weet welke telt.
+
+Wat er wél ontbrak was de **brug**. De contractbibliotheek hangt aan een
+werkruimte -- een eigen wereld met een eigen code en inlog -- en een onderneming
+wist daar niets van. Een verzekering die stil afliep, stond dus in een systeem dat
+de ondernemer op zijn dagbeeld niet zag. Die koppeling is er nu, en deze laag
+**leest alleen**: aanmaken, tekenen en opzeggen blijft in het Werk OS achter zijn
+eigen poort. De klok zelf is uit `contract.js` gelicht naar `contractklok.js`,
+zodat beide kanten dezelfde berekening gebruiken (zelfde patroon als
+`ouderdom.js` bij de debiteuren).
+
+**Geen werkruimte is een eigen stand, geen lege lijst.** Wie niets koppelde, heeft
+geen "nul contracten" maar een register dat wij niet kunnen zien -- `aantal` is
+`null`, met de zin erbij dat dit géén bevestiging is dat er niets loopt. Een
+ontbrekende koppeling die als "alles in orde" leest, is precies het soort stilte
+waar deze module tegen bedoeld is.
+
+**De klok is te zetten, want anders is hij niet te toetsen.** `contractklok.js`
+neemt de dag als parameter, en `ondernemingDagbeeld(o, nu)` geeft hem door aan de
+vier lagen die op de klok leunen (relaties, debiteuren, crediteuren, contracten).
+In productie geeft niemand hem mee en geldt gewoon nu.
+
+In het dagbeeld staat de contractklok ná het geld dat vaststaat, maar vóór de
+gewone opvolging: een gemiste opzegdag is al gebeurd en kost een jaar, waar een
+klant die niet terugbelt nog te bereiken is. En een gemiste opzegdag gaat voor een
+naderende, om dezelfde reden.
+
+Getoetst in `test/onderneming-contracten.test.js` (14). Vijf mutaties, alle vijf
+raak: geen werkruimte als lege lijst tonen, een onbekende werkruimtecode aannemen,
+ook concepten stilzwijgend laten verlengen, de opzegdag gelijkstellen aan de
+einddatum, en een naderende opzegdag boven een gemiste zetten.
+
 ### RTG Werk OS (de werkplek van een organisatie)
 
 `server/bedrijf/` + `/api/bedrijf/...` + `/apps/werk.html`. Een **werkruimte**

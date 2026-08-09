@@ -154,7 +154,7 @@ function toonLeeg(){
 function teken(){
   const o=ONDS.find(x=>x.id===HUIDIG)||{};
   zetTitel(DAG.naam||'Mijn onderneming');
-  $('#hoofd').innerHTML=[vakGroet(),vakGezond(),vakActies(),vakIntake(),vakKans(),vakSimulatie(),vakStress(),vakPlan(o),vakRechtsvorm(o),vakOprichting(),vakZaak(o),vakEersteKlant(),vakMall(),vakRelaties(),vakDebiteuren(),vakCrediteuren()].join('');
+  $('#hoofd').innerHTML=[vakGroet(),vakGezond(),vakActies(),vakIntake(),vakKans(),vakSimulatie(),vakStress(),vakPlan(o),vakRechtsvorm(o),vakOprichting(),vakZaak(o),vakEersteKlant(),vakMall(),vakRelaties(),vakDebiteuren(),vakCrediteuren(),vakContracten()].join('');
   haakKnoppen();
 }
 
@@ -448,6 +448,33 @@ function vakCrediteuren(){
     '<p class="subtxt" style="margin-top:.9rem;">'+esc(c.voorbehoud)+'</p></div>';
 }
 
+
+function vakContracten(){
+  const c=DAG&&DAG.contracten;
+  if(!c) return '';
+  if(c.stand!=='gekoppeld'){
+    return '<div class="vak"><h2>Contracten</h2><p class="subtxt">'+esc(c.uitleg||'')+'</p>'+
+      (c.let?'<p class="stil" style="margin-top:.4rem;">'+esc(c.let)+'</p>':'')+
+      '<div class="rij" style="margin-top:.8rem;">'+
+      '<label class="veld" style="flex:1 1 12rem;">Werkruimtecode<input id="wrCode" placeholder="W12AB"></label>'+
+      '</div><div class="rij" style="margin-top:.6rem;"><button class="knop" id="wrKnop">Koppel werkruimte</button></div></div>';
+  }
+  const let2=(rij,kl)=>rij.map(x=>'<div class="bevinding '+kl+'"><div class="bk">'+esc(x.titel||'Contract')+
+    (x.wederpartij?' &middot; '+esc(x.wederpartij):'')+'</div><div class="bw">'+esc(x.stand)+
+    (x.laatsteOpzegdag?' &middot; laatste opzegdag '+esc(x.laatsteOpzegdag):'')+'</div></div>').join('');
+  const rest=(c.contracten||[]).slice(0,10).map(x=>
+    '<div class="bron"><span><strong>'+esc(x.titel||'-')+'</strong><br><span class="bu">'+esc(x.soort||'')+' &middot; '+esc(x.stand)+'</span></span>'+
+    '<span class="bu">'+(x.eindigt?esc(x.eindigt):'geen einddatum')+'</span></div>').join('');
+  return '<div class="vak"><h2>Contracten</h2>'+
+    '<p class="subtxt">'+c.aantal+' contract'+(c.aantal===1?'':'en')+' in werkruimte '+esc(c.werkruimte)+
+    (c.verlopen?', '+c.verlopen+' verlopen':'')+
+    (c.zonderEinddatum?', '+c.zonderEinddatum+' zonder einddatum':'')+'.</p>'+
+    (c.opzegdagVoorbij.length?'<div style="margin-top:.8rem;"><p class="subtxt"><strong>Opzegdag voorbij</strong></p>'+let2(c.opzegdagVoorbij,'blokkerend')+'</div>':'')+
+    (c.binnenkortOpzeggen.length?'<div style="margin-top:.8rem;"><p class="subtxt"><strong>Opzegdag nadert</strong></p>'+let2(c.binnenkortOpzeggen,'zwaar')+'</div>':'')+
+    (rest?'<div style="margin-top:1rem;">'+rest+'</div>':'')+
+    '<p class="subtxt" style="margin-top:.9rem;">'+esc(c.let||'')+'</p></div>';
+}
+
 /* ---------- handelingen ---------- */
 function haakKnoppen(){
   const b=$('#bewaarKnop'); if(b) b.addEventListener('click',bewaar);
@@ -464,6 +491,10 @@ function haakKnoppen(){
     if(!naam.trim()){meld('Vul uw naam in.');return;}
     try{ await api('aanvraag',{id:HUIDIG,naam,contact:($('#aanvContact')||{}).value||''});
       meld('Aanvraag ingediend. Een mens beoordeelt hem.'); await herlaad(); }
+    catch(err){ meld(err.message); }});
+  const wr=$('#wrKnop'); if(wr) wr.addEventListener('click',async()=>{
+    const code=($('#wrCode')||{}).value||'';
+    try{ await api('werkruimte',{id:HUIDIG,code}); meld('Werkruimte gekoppeld.'); await herlaad(); }
     catch(err){ meld(err.message); }});
   const st=$('#standKnop'); if(st) st.addEventListener('click',async()=>{
     try{ const r=await api('aanvraag/stand',{id:HUIDIG});

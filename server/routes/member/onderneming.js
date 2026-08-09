@@ -19,7 +19,8 @@ module.exports = (kern) => {
     ondernemingVerkenning, ondernemingPlanVastleggen, ondernemingDagbeeld,
     ondernemingOprichting, ondernemingOprichtingZet, ondernemingAanvraag,
     ondernemingAanvraagStand, ondernemingEersteKlant, ondernemingMallProfiel, ondernemingRelaties,
-    ondernemingKlantNotitie, ondernemingDebiteuren, ondernemingCrediteuren } = kern;
+    ondernemingKlantNotitie, ondernemingDebiteuren, ondernemingCrediteuren, ondernemingContracten,
+    ondernemingWerkruimte } = kern;
 
   /* `status` betekent in dit huis de HTTP-code, maar een kernmodule kan een
      domeinstand in datzelfde veld zetten ('geen-aanvraag'). Dat gebeurde hier
@@ -154,6 +155,20 @@ module.exports = (kern) => {
     const o = mijn(req);
     if (!o) return stuur(res, nietGevonden);
     res.json({ ok: true, crediteuren: ondernemingCrediteuren(o) });
+  });
+
+  /* De contractklok. LEEST alleen: aanmaken, tekenen en opzeggen blijft in
+     RTG Werk OS, achter zijn eigen poort. Zie kern/onderneming/contracten.js. */
+  app.post('/api/onderneming/contracten', auth, (req, res) => {
+    const o = mijn(req);
+    if (!o) return stuur(res, nietGevonden);
+    res.json({ ok: true, contracten: ondernemingContracten(o) });
+  });
+
+  app.post('/api/onderneming/werkruimte', auth, (req, res) => {
+    const o = mijn(req);
+    if (!o) return stuur(res, nietGevonden);
+    stuur(res, ondernemingWerkruimte(o, (req.body || {}).code));
   });
 
   /* ---- de zaak aanvragen ----

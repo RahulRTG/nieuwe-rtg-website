@@ -275,6 +275,9 @@ function ordenSite(site,ver){
   }
   return (site.blokken||[]).slice();
 }
+/* Waar een formulier over gaat: de soort bepaalt wat er gevraagd wordt. */
+const SOORTTEKST={vraag:'Uw vraag',offerte:'Waar wilt u een offerte voor',sollicitatie:'Vertel kort over uzelf',
+  reservering:'Voor hoeveel personen, en wanneer',klacht:'Wat ging er mis',feedback:'Wat wilt u ons meegeven'};
 function tekenBlok(blok,ver){
   const T=toonBlok(blok,ver); const s=document.createElement('section'); s.className='blok'; const t=blok.type;
   const tekst=(el,v)=>{el.textContent=v||'';return el;};
@@ -290,13 +293,13 @@ function tekenBlok(blok,ver){
     s.classList.add('b-tekst');
     const h2=document.createElement('h2');h2.style.cssText='font-family:\'Bodoni Moda\',serif;margin-bottom:.6rem;';tekst(h2,T.kop);s.appendChild(h2);
     const f=document.createElement('form');
-    const ta=document.createElement('textarea');ta.rows=4;ta.maxLength=500;ta.placeholder='Uw bericht aan '+(HUIDIGE&&HUIDIGE.zaak?HUIDIGE.zaak.naam:(HUIDIGE&&HUIDIGE.persoon?HUIDIGE.persoon.codenaam:'de maker'))+'…';
+    const ta=document.createElement('textarea');ta.rows=4;ta.maxLength=500;ta.placeholder=(SOORTTEKST[blok.soort||'vraag']||'Uw bericht')+' aan '+(HUIDIGE&&HUIDIGE.zaak?HUIDIGE.zaak.naam:(HUIDIGE&&HUIDIGE.persoon?HUIDIGE.persoon.codenaam:'de maker'))+'…';
     ta.style.cssText='width:100%;background:transparent;border:1px solid currentColor;border-radius:10px;padding:.7rem;color:inherit;font:inherit;opacity:.9;';
     const kn=document.createElement('button');kn.type='submit';kn.className='b-knop';tekst(kn,T.knop);kn.style.cssText='margin-top:.6rem;cursor:pointer;border:0;';
     f.appendChild(ta);f.appendChild(kn);
     f.addEventListener('submit',async ev=>{ev.preventDefault();
       const tk=ta.value.trim(); if(tk.length<3){meld('Schrijf eerst een bericht.');return;}
-      try{ const r=await api('bericht',{adres:HUIDIGE.site.adres,tekst:tk}); ta.value='';
+      try{ const r=await api('bericht',{adres:HUIDIGE.site.adres,tekst:tk,soort:blok.soort||'vraag'}); ta.value='';
         meld(r.via==='chat'?'Verstuurd als gesprek in de leden-app, op uw codenaam.':'Verstuurd. Het bedrijf ziet uw bericht in zijn werklijst, op uw codenaam.'); }
       catch(e){ meld(e.message); }
     });

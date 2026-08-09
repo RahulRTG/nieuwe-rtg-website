@@ -11,6 +11,10 @@ module.exports = ({ scho, crypto }) => {
   // de bronnen die een live zaakdata-blok mag aanwijzen (opgelost in kern/webplatform.js)
   const ZAAKBRONNEN = ['menu', 'diensten', 'kamers', 'agenda', 'events', 'vacatures', 'openingstijden', 'team', 'fotos', 'reviews', 'contact'];
   const RIJ_MAX = 12;   // hoeveel vragen of prijsregels een blok mag dragen
+  /* Waar een formulier over gaat. De soort bepaalt wat er gevraagd wordt en
+     hoe het bericht bij de ontvanger heet -- "Klacht" hoort niet als "Vraag"
+     in een werklijst te belanden. */
+  const FORMSOORTEN = ['vraag', 'offerte', 'sollicitatie', 'reservering', 'klacht', 'feedback'];
   const VERSIES = ['telefoon', 'tablet', 'desktop'];
 
   function slug(v) {
@@ -35,7 +39,10 @@ module.exports = ({ scho, crypto }) => {
     else if (t === 'ruimte') { o.hoogte = Math.max(8, Math.min(240, Number(b.hoogte) || 40)); }
     else if (t === 'voettekst') { o.tekst = T(b.tekst, 400); }
     else if (t === 'zaakdata') { o.bron = ZAAKBRONNEN.includes(b.bron) ? b.bron : 'contact'; }
-    else if (t === 'formulier') { o.kop = T(b.kop, 120) || 'Stel ons een vraag'; o.knop = T(b.knop, 40) || 'Verstuur'; }
+    else if (t === 'formulier') {
+      o.soort = FORMSOORTEN.includes(b.soort) ? b.soort : 'vraag';
+      o.kop = T(b.kop, 120) || 'Stel ons een vraag'; o.knop = T(b.knop, 40) || 'Verstuur';
+    }
     /* Blokken met rijen: elke rij wordt afzonderlijk geschoond en begrensd, en
        een rij zonder inhoud valt weg -- anders staat er een lege regel op de
        site die niemand kan zien zitten. */
@@ -103,5 +110,5 @@ module.exports = ({ scho, crypto }) => {
     return Object.keys(uit).length ? uit : null;
   }
 
-  return { TYPES, slug, schoonBlok, schoonVolgorde, schoonKleuren };
+  return { TYPES, FORMSOORTEN, slug, schoonBlok, schoonVolgorde, schoonKleuren };
 };

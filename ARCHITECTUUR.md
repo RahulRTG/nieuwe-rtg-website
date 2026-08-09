@@ -139,7 +139,7 @@ status(16) schoon(14) managerOnly(13) save(11) rtf(11) codenaamVan(11) express(1
 tooManyTries(9) crypto(9) anthropic(9) rtmail(9) boardroomWie(7) logActivity(7)
 sseToOffice(7) keyVanCodenaam(7) payrollOS(7) geenGast(6) noteFailedTry(6) kern(6)
 gegevensStop(6) talen(6) mail(5) loginFails(5) sseToSupplier(5) findSupplier(5)
-sseToCustomer(5)
+notifySupplier(5) sseToCustomer(5)
 ```
 
 **De breedste routebestanden** -- hier zou je beginnen:

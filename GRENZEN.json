@@ -1533,6 +1533,8 @@
     ],
     "webbrowser": [
       "addTicket",
+      "notify",
+      "notifySupplier",
       "webplatformTaal",
       "codenaamVan",
       "commDm",

@@ -216,8 +216,8 @@ test('10. de persoonlijke site: op codenaam, en het formulier wordt een gesprek 
   assert.equal(warm.status, 200, JSON.stringify(warm.body));
   assert.equal(warm.body.via, 'chat');
   const dm = await api('/api/member/dm', { withKey: mijnKey }, lid2);
-  assert.ok((dm.body.messages || []).some(m => /Via jouw site: Hallo, mooi werk hier\./.test(m.text)),
-    'het bericht staat in het gesprek van de ontvanger');
+  assert.ok((dm.body.messages || []).some(m => /Via jouw site \(vraag\): Hallo, mooi werk hier\./.test(m.text)),
+    'het bericht staat in het gesprek van de ontvanger, met de soort erbij');
 });
 
 test('8. een lid bouwt een site met meerdere pagina\'s, met dezelfde schoonmaak en grenzen', async () => {
@@ -700,6 +700,39 @@ test('23. een vestiging beheert haar inhoud, maar kan de huisstijl van het merk 
   const vrij = await api('/api/site/bewaar', { design: { titel: 'Vrije Site', accent: '#00FF00',
     blokken: [{ type: 'kop', tekst: 'Hoi' }] } }, lid);
   assert.equal(vrij.body.design.accent, '#00FF00', 'wie bij geen merk hoort kiest zelf');
+});
+
+test('24. een formulier heeft een soort, en het bericht komt echt aan bij beide kanten', async () => {
+  /* De soort bepaalt hoe het bericht bij de ontvanger HEET. Een klacht die als
+     "vraag" in een werklijst belandt, wordt ook als vraag behandeld. */
+  const mk = await api('/api/site/bewaar', { design: { titel: 'Soorten',
+    blokken: [{ type: 'formulier', soort: 'klacht' }, { type: 'formulier', soort: 'hackpoging' }] } }, lid);
+  assert.equal(mk.body.design.blokken[0].soort, 'klacht');
+  assert.equal(mk.body.design.blokken[1].soort, 'vraag', 'een onbekende soort valt terug op vraag');
+
+  const voorK = (await api('/api/supplier/state', {}, zaak)).body.state.tickets.length;
+  const st = await api('/api/browser/bericht', { adres: 'es-vedra-cruises',
+    soort: 'klacht', tekst: 'De boot vertrok een half uur te laat.' }, lid);
+  assert.equal(st.status, 200, JSON.stringify(st.body));
+  assert.equal(st.body.soort, 'klacht');
+
+  // bij de zaak staat het als klacht, niet als vraag
+  const state = (await api('/api/supplier/state', {}, zaak)).body.state;
+  assert.equal(state.tickets.length, voorK + 1);
+  assert.match(state.tickets[0].text, /^Klacht via de website:/);
+  // en de zaak krijgt een seintje: een klus in een lijst is nog geen bericht
+  assert.ok((state.notifications || []).some(n => /Klacht via uw website/.test(n.title || '')),
+    'de zaak wordt gewekt, anders wacht iemand dagen voor niets');
+
+  /* En de inzender krijgt een bevestiging -- anders stuurt hij het over een uur
+     nog eens, of belt hij. */
+  const mij = await api('/api/privacy/export', {}, lid);
+  assert.ok((mij.body.notifications || []).some(n => /Verstuurd naar Es Vedra Cruises/.test(n.title || '')),
+    'de inzender hoort dat het aankwam');
+
+  // een verzonnen soort in het verzoek valt ook hier terug op vraag
+  const raar = await api('/api/browser/bericht', { adres: 'es-vedra-cruises', soort: 'x', tekst: 'Gewone vraag hoor.' }, lid);
+  assert.equal(raar.body.soort, 'vraag');
 });
 
 test('5. zoeken vindt sites en bedrijven in een adem', async () => {

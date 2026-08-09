@@ -1738,6 +1738,16 @@ RTG Command bestuurt het platform. Een partner heeft dat niet nodig en mag het n
 
 Kern: `server/kern/zaakcommand/` (register, runbooks, signalen, index), routes `/api/supplier/command/*` in `server/routes/zaakcommand/`, scherm `public/shared/zaakcommand/` (gebundeld naar `public/shared/zaakcommand.js`, gedeeld door beide apps), schakelbaar als `zaakregie` en `zaakregie-beheer`. Getoetst in `test/zaakcommand.test.js` (acht beweringen, vier mutaties) en `test/zaakregie.e2e.js` (beide schermen in een echte browser).
 
+### De drie bureau-PDA's draaien op één werking
+
+`studio-pda.html` (198 regels), `hardware-pda.html` (199) en `architect-pda.html` (184) waren drie kopieën van hetzelfde ontwerp. Na het normaliseren van de bureaunaam verschilden ze 54 tot 73 regels — en dat waren geen drie ontwerpen maar één dat uit elkaar was gelopen: de studio kreeg de nieuwe deelmenu-stijl voor de disciplinerij, de architect bleef op de oude pillen; de studio nam elf kolommen mee bij het uitvoeren, de hardware zeven en de architect acht, met verschillende namen voor hetzelfde; de architect laadde `deur.js` in de kop en de andere twee in de body. Zo'n verschil merkt niemand, want niemand opent drie apps naast elkaar.
+
+De werking staat nu één keer in **`public/shared/bureaupda.js`**. Wat per bureau verschilt — de naam, de brief-hint, de twee velden waarmee een concept wordt samengevat (silhouet/aandrijving, behuizing/chip, typologie/constructie) en de kolommen van het register — staat daar als **gegeven** in één tabel. Een vierde bureau is een regel in die tabel plus een pagina van tachtig regels.
+
+De drie paden blijven bestaan als echte apps met hun eigen gids-ingang en hun eigen deur: er wordt vanuit `kantoren.html` drie keer naar gelinkt en er staat een toets op hun deur (`test/kantoordeuren.e2e.js`). Ze vervangen door een doorverwijzing zou werk kapotmaken om iets op te ruimen wat niemand stoorde.
+
+Getoetst in `test/bureaupda.e2e.js`: alle drie komen op met hun eigen bureau, elk spreekt alleen zijn eigen endpoints aan (de fout die je bij een samengevoegde werking het eerst zou maken), en alle drie dragen nu dezelfde disciplinerij.
+
 ## Veiligheid & verbinding: vier apps op één ruggengraat
 
 Vier losse apps (elk met eigen PWA-manifest), die onderhuids dezelfde kern delen

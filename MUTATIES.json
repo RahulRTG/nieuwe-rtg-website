@@ -2149,6 +2149,13 @@
       "gezakt": 11,
       "geprobeerd": 1
     },
+    "onderneming-oprichting.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "onderneming-pijplijn.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -2181,6 +2188,13 @@
       "gezakt": 10,
       "geprobeerd": 1
     },
+    "onderneming-routes.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
+    },
     "onderneming-toegang.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -2212,6 +2226,13 @@
       "operator": "===->!==#0",
       "gezakt": 14,
       "geprobeerd": 1
+    },
+    "onderneming.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
+      "scherp": "gezakt"
     },
     "onderwijs.test.js": {
       "soort": "server",

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 741 bestanden en 4395 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 742 bestanden en 4397 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 741 |
-| losse beweringen (`test(...)`) | 4395 |
+| toetsbestanden | 742 |
+| losse beweringen (`test(...)`) | 4397 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 521 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 545 |
 | **overleefd**: geen mutatie kreeg hem rood | 12 |
 | niet te meten (al rood, geen module gevonden, ...) | 16 |
-| alleen in de kop *genoemd*, nog niet gemeten | 31 |
-| niets van beide | 161 |
+| alleen in de kop *genoemd*, nog niet gemeten | 24 |
+| niets van beide | 145 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-653 bestanden, 4234 beweringen.
+654 bestanden, 4236 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -365,29 +365,30 @@ toets omvalt.
 | `onboarding.test.js` | 11 | gezakt op `liegpoort /api/` | De verplichte onboarding + het contract: elk account vult de standaardgegevens in (paspoort, e-mail, telefoon, adres, ...) en tekent het contract. De eigenaar past de eisen en het contract aan (met AI in gewone taal,... |
 | `ondernemerpoort-e2e.test.js` | 4 | gezakt op `liegpoort /api/` | Ondernemer-poort, end-to-end: een zaak die offline staat is niet zichtbaar voor leden; pas na de poort (Salon-pagina + rondleiding kassa en werk-apps) kan de manager de zaak online zetten en verschijnt hij weer. npm test |
 | `ondernemerpoort.test.js` | 6 | gezakt op `true->false#0` | Ondernemer-poort (kern/ondernemerpoort.js): een nieuwe zaak loopt eerst de basis door (Salon-pagina + rondleiding kassa en werk-apps) voordat hij online mag. Bestaande zaken zijn grandfathered (online tenzij... |
-| `onderneming-belasting.test.js` | 16 | -- | Ronde: de belastingreservering. Vier beweringen, en ze gaan alle vier over het verschil tussen een HARD getal en een INDICATIE: 1. |
-| `onderneming-bestuur.test.js` | 19 | genoemd | Ronde: het bestuur -- wie beslist, wie bezit, en wie er als UBO uit volgt. Vijf beweringen: 1. |
-| `onderneming-capaciteit.test.js` | 15 | -- | Ronde: de capaciteit -- kan er nog iets bij. Vier beweringen: 1. |
-| `onderneming-contracten.test.js` | 14 | -- | Ronde: de contractklok op het dagbeeld. Vier beweringen: 1. |
-| `onderneming-crediteuren.test.js` | 11 | -- | Ronde: de crediteuren -- wat er nog uit moet, en wanneer. Vier beweringen: 1. |
-| `onderneming-dagbeeld.test.js` | 11 | -- | Ronde: het dagbeeld -- de schil die de drie assen als één scherm toont. De twee beloftes die hier worden vastgehouden: 1. |
-| `onderneming-debiteuren.test.js` | 12 | -- | Ronde: de debiteuren -- wat er nog open staat, en hoe lang al. Vier beweringen: 1. |
-| `onderneming-eersteklant.test.js` | 16 | -- | Ronde: de eerste klant, en de honderd daarna. Drie beweringen die hier het zwaarst wegen: 1. |
-| `onderneming-kas.test.js` | 14 | -- | Ronde: de kasvooruitblik. Vier beweringen: 1. |
-| `onderneming-klussen.test.js` | 13 | genoemd | Ronde: de klusketen -- van akkoord tot geld, en waar hij blijft steken. Vijf beweringen: 1. |
-| `onderneming-mallprofiel.test.js` | 10 | -- | Ronde: het Mall-profiel -- hoe de pagina van een zaak is opgebouwd. Drie beweringen: 1. |
-| `onderneming-offertebouw.test.js` | 15 | -- | Ronde: de offertebouwer -- een prijs die is opgebouwd in plaats van bedacht. Vijf beweringen: 1. |
-| `onderneming-ontwerper.test.js` | 11 | -- | Ronde: de bedrijfsontwerper en de Mall-bouwer -- de AI die meedenkt en nergens over beslist. Zes beweringen: 1. |
-| `onderneming-oprichting.test.js` | 14 | -- | Ronde: het oprichtingsproject en de aanvraag van de zaak -- het laatste stuk van de reis, van vastgelegd plan naar draaiende onderneming. De twee beweringen die hier het zwaarst wegen: 1. |
-| `onderneming-pijplijn.test.js` | 15 | -- | Ronde: de pijplijn -- wat er nog kan worden, en wat het waard is. Vijf beweringen: 1. |
-| `onderneming-rechtsvormen.test.js` | 21 | genoemd | Ronde: rechtsvormen -- Nederland en het buitenland in een register, en een wacht die ze bijwerkt zonder de grendels te openen. Zes beweringen: 1. |
-| `onderneming-regie.test.js` | 14 | -- | Ronde: de ondernemersregie -- twee knoppen van de boardroom. Vier beweringen: 1. |
-| `onderneming-relaties.test.js` | 12 | -- | Ronde: het klantenboek en de relaties -- het CRM van het Ondernemers-OS. Vier beweringen: 1. |
-| `onderneming-toegang.test.js` | 12 | -- | Ronde: de toegang -- wie kan wat, over de twee werelden die er al zijn. Vijf beweringen: 1. |
-| `onderneming-verkenning.test.js` | 20 | genoemd | Ronde: de pre-oprichtingsfase -- intake, kansverkenning, simulatie, stress test en het ondernemingsplan. De zwaartepunten liggen op de twee plekken waar dit soort software liegt: 1. |
-| `onderneming-voorraad.test.js` | 13 | genoemd | Ronde: de voorraad -- wat er ligt, en wat wij niet kunnen zien. Vijf beweringen: 1. |
-| `onderneming-werving.test.js` | 15 | genoemd | Ronde: de werving -- staat er iemand te wachten. Vier beweringen: 1. |
-| `onderneming.test.js` | 22 | genoemd | Ronde: het Ondernemers-OS -- de drie assen van één bedrijfsobject. 1. |
+| `onderneming-belasting.test.js` | 16 | gezakt op `===->!==#0` | Ronde: de belastingreservering. Vier beweringen, en ze gaan alle vier over het verschil tussen een HARD getal en een INDICATIE: 1. |
+| `onderneming-bestuur.test.js` | 19 | gezakt op `===->!==#0` | Ronde: het bestuur -- wie beslist, wie bezit, en wie er als UBO uit volgt. Vijf beweringen: 1. |
+| `onderneming-capaciteit.test.js` | 15 | gezakt op `===->!==#0` | Ronde: de capaciteit -- kan er nog iets bij. Vier beweringen: 1. |
+| `onderneming-contracten.test.js` | 14 | gezakt op `===->!==#0` | Ronde: de contractklok op het dagbeeld. Vier beweringen: 1. |
+| `onderneming-crediteuren.test.js` | 11 | gezakt op `===->!==#0` | Ronde: de crediteuren -- wat er nog uit moet, en wanneer. Vier beweringen: 1. |
+| `onderneming-dagbeeld.test.js` | 11 | gezakt op `===->!==#0` | Ronde: het dagbeeld -- de schil die de drie assen als één scherm toont. De twee beloftes die hier worden vastgehouden: 1. |
+| `onderneming-debiteuren.test.js` | 12 | gezakt op `===->!==#0` | Ronde: de debiteuren -- wat er nog open staat, en hoe lang al. Vier beweringen: 1. |
+| `onderneming-eersteklant.test.js` | 16 | gezakt op `===->!==#0` | Ronde: de eerste klant, en de honderd daarna. Drie beweringen die hier het zwaarst wegen: 1. |
+| `onderneming-kas.test.js` | 14 | gezakt op `===->!==#0` | Ronde: de kasvooruitblik. Vier beweringen: 1. |
+| `onderneming-klussen.test.js` | 13 | gezakt op `===->!==#0` | Ronde: de klusketen -- van akkoord tot geld, en waar hij blijft steken. Vijf beweringen: 1. |
+| `onderneming-mallprofiel.test.js` | 10 | gezakt op `===->!==#0` | Ronde: het Mall-profiel -- hoe de pagina van een zaak is opgebouwd. Drie beweringen: 1. |
+| `onderneming-offertebouw.test.js` | 15 | gezakt op `===->!==#0` | Ronde: de offertebouwer -- een prijs die is opgebouwd in plaats van bedacht. Vijf beweringen: 1. |
+| `onderneming-ontwerper.test.js` | 11 | gezakt op `===->!==#0` | Ronde: de bedrijfsontwerper en de Mall-bouwer -- de AI die meedenkt en nergens over beslist. Zes beweringen: 1. |
+| `onderneming-oprichting.test.js` | 14 | gezakt op `liegpoort /api/` | Ronde: het oprichtingsproject en de aanvraag van de zaak -- het laatste stuk van de reis, van vastgelegd plan naar draaiende onderneming. De twee beweringen die hier het zwaarst wegen: 1. |
+| `onderneming-pijplijn.test.js` | 15 | gezakt op `===->!==#0` | Ronde: de pijplijn -- wat er nog kan worden, en wat het waard is. Vijf beweringen: 1. |
+| `onderneming-rechtsvormen.test.js` | 21 | gezakt op `===->!==#0` | Ronde: rechtsvormen -- Nederland en het buitenland in een register, en een wacht die ze bijwerkt zonder de grendels te openen. Zes beweringen: 1. |
+| `onderneming-regie.test.js` | 14 | gezakt op `===->!==#0` | Ronde: de ondernemersregie -- twee knoppen van de boardroom. Vier beweringen: 1. |
+| `onderneming-relaties.test.js` | 12 | gezakt op `===->!==#0` | Ronde: het klantenboek en de relaties -- het CRM van het Ondernemers-OS. Vier beweringen: 1. |
+| `onderneming-routes.test.js` | 2 | gezakt op `liegpoort /api/` | Ronde: de DEUREN van het Ondernemers-OS. Waarom dit naast alle andere onderneming-toetsen staat: die roepen de kern rechtstreeks aan. |
+| `onderneming-toegang.test.js` | 12 | gezakt op `===->!==#0` | Ronde: de toegang -- wie kan wat, over de twee werelden die er al zijn. Vijf beweringen: 1. |
+| `onderneming-verkenning.test.js` | 20 | gezakt op `===->!==#0` | Ronde: de pre-oprichtingsfase -- intake, kansverkenning, simulatie, stress test en het ondernemingsplan. De zwaartepunten liggen op de twee plekken waar dit soort software liegt: 1. |
+| `onderneming-voorraad.test.js` | 13 | gezakt op `===->!==#0` | Ronde: de voorraad -- wat er ligt, en wat wij niet kunnen zien. Vijf beweringen: 1. |
+| `onderneming-werving.test.js` | 15 | gezakt op `===->!==#0` | Ronde: de werving -- staat er iemand te wachten. Vier beweringen: 1. |
+| `onderneming.test.js` | 22 | gezakt op `liegpoort /api/` | Ronde: het Ondernemers-OS -- de drie assen van één bedrijfsobject. 1. |
 | `onderwijs.test.js` | 3 | gezakt op `liegpoort /api/` | RTG School golf 1: de officiële ladder, het leerpaspoort dat een leven lang meegaat, de doorstroomkaart die rare sprongen tegenhoudt, en de eerlijkheid (geen accreditatieclaims, geen echte namen in het dossier). |
 | `onderwijsstuur.test.js` | 3 | gezakt op `liegpoort /api/` | Golf 6 van de onderwijs-toren: Rahul kan de hele leerlaag bedienen via het stuur (een codepad: dezelfde routes, dezelfde inlog, dezelfde regels). "Schrijf me in op groep 3", "overhoor me", "vraag bijles" -- alles... |
 | `onderzoeker.test.js` | 4 | gezakt op `liegpoort /api/` | De Onderzoeker: de tweede AI van het RTG Kantoor. De RTG AI bouwt hem met zijn meelees-kennis als leerstof; daarna doet hij agentisch onderzoek (plan, bronnen, analyse, rapport) en adviseert hij alleen. |

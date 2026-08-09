@@ -19,7 +19,7 @@
       rijen -- dezelfde eerlijkheid die de backoffice met `totals` al doet. */
 'use strict';
 
-const { SOORTEN, rijen, kort, s } = require('./register');
+const { s } = require('./register');
 
 const PER_SOORT = 12;      // wat je van één soort ziet
 const MAX_SCAN = 20000;    // hoe ver we per collectie kijken; daarboven meldt hij het
@@ -37,8 +37,8 @@ function weeg(waarde, term) {
   return 0;
 }
 
-function zoekSoort(db, soort, term) {
-  const alle = rijen(db, soort);
+function zoekSoort(reg, db, soort, term) {
+  const alle = reg.rijen(db, soort);
   const gekeken = Math.min(alle.length, MAX_SCAN);
   const treffers = [];
   for (let i = 0; i < gekeken; i++) {
@@ -56,21 +56,21 @@ function zoekSoort(db, soort, term) {
     type: soort.type, label: soort.label, meervoud: soort.meervoud, domein: soort.domein,
     totaal: treffers.length,
     afgekapt: alle.length > gekeken ? alle.length : 0,
-    rijen: treffers.slice(0, PER_SOORT).map(t => Object.assign(kort(soort, t.r), { veld: t.waarom }))
+    rijen: treffers.slice(0, PER_SOORT).map(t => Object.assign(reg.kort(soort, t.r), { veld: t.waarom }))
   };
 }
 
 /* De zoekopdracht zelf. Leeg antwoord is geen fout: een lege balk hoort niets
    te vinden en niet alles te tonen. */
-function zoek(db, vraag, opties) {
+function zoek(reg, db, vraag, opties) {
   const term = String(vraag == null ? '' : vraag).trim().toLowerCase();
   if (term.length < 2) return { term, groepen: [], totaal: 0, kort: true };
   const alleen = opties && opties.type ? String(opties.type) : '';
   const groepen = [];
   let totaal = 0, geraakteDomeinen = new Set();
-  for (const soort of SOORTEN) {
+  for (const soort of reg.SOORTEN) {
     if (alleen && soort.type !== alleen) continue;
-    const g = zoekSoort(db, soort, term);
+    const g = zoekSoort(reg, db, soort, term);
     if (!g.totaal) continue;
     groepen.push(g);
     totaal += g.totaal;
@@ -87,8 +87,8 @@ function zoek(db, vraag, opties) {
 /* Waar zou deze term nog meer iets kunnen betekenen? De balk zegt niet alleen
    WAT hij vond maar ook waar hij keek, zodat "niets gevonden" een uitslag is
    en geen stilte. */
-function bereik() {
-  return SOORTEN.map(k => ({ type: k.type, label: k.label, meervoud: k.meervoud, domein: k.domein, velden: k.zoek }));
+function bereik(reg) {
+  return reg.SOORTEN.map(k => ({ type: k.type, label: k.label, meervoud: k.meervoud, domein: k.domein, velden: k.zoek }));
 }
 
 module.exports = { zoek, bereik, PER_SOORT };

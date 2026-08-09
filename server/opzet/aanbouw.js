@@ -81,6 +81,16 @@ module.exports = function bouwKernAan(kern, grens) {
      leest verder alleen db.data, dus hij hoeft niet op een motor te wachten. */
   Object.assign(kern, { command: require('../kern/command').maakCommand({ db, save, crypto, anthropic }) });
   require('../routes/command')(grens('command'));
+  /* Zaak Command (kern/zaakcommand/): dezelfde logica als hierboven, maar dan
+     van EEN zaak en uitsluitend over die zaak -- voor de leverancier-app en de
+     PDA's van diezelfde zaak. Hij hangt hier omdat hij findSupplier nodig heeft
+     en verder alleen db.data leest. Het register dat hij bouwt kent alleen de
+     soorten van de zaak; er is geen aanroep die iets van RTG of van een andere
+     zaak kan opleveren. */
+  Object.assign(kern, { zaakcommand: require('../kern/zaakcommand').maakZaakCommand({
+    db, save, crypto, anthropic, findSupplier: kern.findSupplier,
+    commGast: kern.commGast }) });
+  require('../routes/zaakcommand')(grens('zaakcommand'));
   require('../routes/gemeente')(grens('gemeente'));
   /* De Rijks-Bibliotheek (kern/rijksbieb.js): 10.000 werk-apps voor elke
      overheidsafdeling, inbegrepen voor rijksambtenaren; routes in overheid. */

@@ -20,7 +20,7 @@
    simulatie -- dan wordt er beleid op gemaakt. */
 'use strict';
 
-const { SOORTEN, rijen, s } = require('./register');
+const { s } = require('./register');
 
 /* De vaste aannames van het model, benoemd zodat ze bespreekbaar zijn. Ze
    staan hier en niet verspreid door de formules. */
@@ -31,7 +31,9 @@ const AANNAMES = [
   { id: 'wachttijdKwadratisch', wat: 'Boven 85% bezetting groeit de wachttijd kwadratisch, niet lineair', gevolg: 'de knik zit bij 85%, niet bij 100%' }
 ];
 
-function maakSimulatie({ db, runbooks, zaken, beleid, risico }) {
+function maakSimulatie({ db, runbooks, zaken, beleid, risico, register }) {
+  const SOORTEN = register.SOORTEN;
+  const rijen = (d, so) => register.rijen(d, so);
   /* De huidige stand waarop gesimuleerd wordt: per domein het volume en de
      gemeten foutkans (aandeel objecten dat nu een runbook-kandidaat is). */
   function grondslag(plaats) {

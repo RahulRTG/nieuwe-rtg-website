@@ -2,7 +2,13 @@
    (dagcijfers, weektrend, toppers, actiecentrum en briefing). Krijgt de
    gedeelde kern een keer bij het opstarten vanuit routes/supplier.js. */
 module.exports = (kern) => {
-  const { app, db, supplierAuth, ordersVanZaak, boekingenVanZaak, commGast } = kern;
+  const { app, db, supplierAuth, ordersVanZaak, boekingenVanZaak } = kern;
+  /* zaakcommand OP AANROEPMOMENT uit de kern, en niet hierboven uit de
+     destructurering. Deze router wordt opgehangen vóórdat opzet/aanbouw.js de
+     zaak-commandolaag aan de kern hangt; wie hem hier vastpakt, pakt undefined
+     en krijgt een 500 op het moment dat een echte zaak zijn backoffice opent.
+     Dezelfde late binding die routes/supplier/genrepuls.js met zijn motoren
+     doet, en om precies dezelfde reden. */
 
 
 app.post('/api/supplier/backoffice', supplierAuth, (req, res) => {
@@ -45,45 +51,16 @@ app.post('/api/supplier/backoffice', supplierAuth, (req, res) => {
   for (const v of kassa) telItems(v.items);
   for (const b of boekingen) { const bn = boekNaam(b); const t2 = teller[bn] = teller[bn] || { naam: bn, aantal: 0, omzet: 0 }; t2.aantal += 1; t2.omzet += b.price || 0; }
   const toppers = Object.values(teller).sort((a, b) => b.omzet - a.omzet).slice(0, 8);
-  // actiecentrum van de zaak
-  const alerts = [];
-  const minGeleden = iso => Math.round((nu - new Date(iso)) / 60000);
-  for (const o of ordersVanZaak(s.code)) {
-    if (!o.paid || o.status !== 'nieuw') continue;
-    const m = minGeleden(o.paidAt || o.at);
-    if (m >= 10) alerts.push({ level: 'rood', text: en
-      ? 'Order ' + o.ref + ' has been untouched for ' + m + ' min (' + o.customerCodename + ').'
-      : 'Bestelling ' + o.ref + ' staat al ' + m + ' min onaangeroerd (' + o.customerCodename + ').' });
-  }
-  for (const r of db.data.rides) {
-    if (r.supplierCode !== s.code || !r.paid || r.status !== 'aangevraagd' || r.driver) continue;
-    const straks = r.plannedFor && (new Date(r.plannedFor) - nu) > 45 * 60000;
-    if (!straks && minGeleden(r.paidAt || r.at) >= 10)
-      alerts.push({ level: 'rood', text: en ? 'Ride ' + r.ref + ' is still waiting for a driver.' : 'Rit ' + r.ref + ' wacht nog op een chauffeur.' });
-    else if (straks && (new Date(r.plannedFor) - nu) < 24 * 3600000)
-      alerts.push({ level: 'amber', text: en
-        ? 'Scheduled ride ' + r.ref + ' (' + String(r.plannedFor).slice(0, 16).replace('T', ' ') + ') has no driver yet.'
-        : 'Geplande rit ' + r.ref + ' (' + String(r.plannedFor).slice(0, 16).replace('T', ' ') + ') heeft nog geen chauffeur.' });
-  }
-  for (const b of db.data.boekingen) {
-    if (b.supplierCode !== s.code || !b.paid || b.status !== 'aangevraagd') continue;
-    if (minGeleden(b.paidAt || b.at) >= 30) alerts.push({ level: 'amber', text: en
-      ? 'Booking ' + b.ref + ' (' + boekNaam(b) + ') is still waiting for your confirmation.'
-      : 'Boeking ' + b.ref + ' (' + boekNaam(b) + ') wacht nog op uw bevestiging.' });
-  }
-  const verlofN = (db.data.verlof[s.code] || []).filter(v => v.status === 'nieuw').length;
-  if (verlofN) alerts.push({ level: 'amber', text: en ? verlofN + ' leave request(s) await your decision (HR & team).' : verlofN + ' verlofaanvraag/aanvragen wachten op uw besluit (HR & team).' });
-  const sollN = (db.data.applications[s.code] || []).filter(a => a.status === 'nieuw').length;
-  if (sollN) alerts.push({ level: 'info', text: en ? sollN + ' open application(s) (HR & team).' : sollN + ' open sollicitatie(s) (HR & team).' });
-  // sinds de verhuizing uit de communicatiekern (kern/comm/gast.js)
-  const chatsN = (commGast ? commGast.voorZaak(s.code) : []).filter(c => c.unread).length;
-  if (chatsN) alerts.push({ level: 'amber', text: en ? chatsN + ' guest chat(s) waiting for a reply.' : chatsN + ' gastchat(s) wachten op een antwoord.' });
-  const klussenN = (db.data.tickets[s.code] || []).filter(t => t.status !== 'klaar').length;
-  if (klussenN) alerts.push({ level: 'info', text: en ? klussenN + ' open job(s) or maintenance.' : klussenN + ' open klus(sen) of onderhoud.' });
-  const vuilN = (s.rooms || []).filter(r => r.hk && r.hk.status === 'vuil').length;
-  if (vuilN) alerts.push({ level: 'amber', text: en ? vuilN + ' room(s) still to clean.' : vuilN + ' kamer(s) nog schoon te maken.' });
-  const volg = { rood: 0, amber: 1, info: 2 };
-  alerts.sort((a, b) => volg[a.level] - volg[b.level]);
+  /* HET ACTIECENTRUM KOMT UIT EEN GEDEELDE BRON, en stond hier tot vandaag met
+     de hand geschreven. Dat werkte prima zolang dit het enige scherm was dat
+     het toonde. Zodra de commandolaag van de zaak erbij kwam, zouden er twee
+     bijna-gelijke lijsten zijn -- en die lopen uiteen, niet misschien maar
+     zeker (LAT.md regel 4). Nu staat hij één keer, in kern/zaakcommand/signalen.js,
+     en leest dit scherm hem net zo goed als de assistent.
+
+     De vorm van het antwoord verandert niet: nog steeds { level, text } in de
+     taal van het scherm. */
+  const alerts = kern.zaakcommand.voor(s, { leiding: true }).signalen.alerts(s, en, { leiding: true });
   const kassaVandaag = kassa.filter(v => dag(v.at) === vandaag).reduce((x, v) => x + (v.total || 0), 0);
   const stats = {
     omzetVandaag: week[6].omzet,

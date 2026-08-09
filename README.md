@@ -1722,6 +1722,22 @@ De werkplek-tab opent de bestaande apps (Office, RTMail, Agenda, Meet, Bestanden
 
 Kern: `server/kern/command/` (register, zoek, object, oorzaak, operator, risico, runbooks, beleid, journaal, zaken, toezicht, toegang, puls, simulatie, werkbesparing), routes `/api/command/*` in `server/routes/command/`, frontend `public/apps/command/` (gebundeld naar `public/apps/command.js`), getoetst in `test/command.test.js`.
 
+## De Regie van de zaak: dezelfde logica, maar alleen over de eigen zaak
+
+RTG Command bestuurt het platform. Een partner heeft dat niet nodig en mag het niet zien -- hij heeft dezelfde soort laag nodig over **zijn eigen zaak**. Die staat in `server/kern/zaakcommand/` en hangt als werkgebied **Regie** in de zaak-app (`/apps/leverancier.html`) en als tegel **Regie** in de personeels-PDA (`/apps/personeel.html`).
+
+**De motoren zijn dezelfde, de gegevens niet.** Journaal, beleid, risico, uitzonderingen, runbooks, operator en werkbesparing komen uit `kern/command/`; ze kregen daarvoor twee haken. De eerste is het **register als parameter**: `zoek.js` en `object.js` importeren geen register meer maar krijgen er een. De tweede is het **vak**: elke motor slaat op in een object dat de aanroeper aanwijst. Zo heeft elke zaak zijn eigen hashketen, zijn eigen grenzen en zijn eigen lijst, met één implementatie eronder.
+
+**De scope heeft twee assen, en de tweede kwam er door een lek.** De eerste versie scoopte alleen op de zaak — en toen kon een ober via de zoekbalk de verlofaanvragen en sollicitaties van zijn collega's lezen, gegevens die overal elders achter `managerOnly` staan. De reparatie is **weglaten en niet filteren**: een soort met `as: 'leiding'` staat niet in het register van een medewerker. Hij is er niet, dus geen enkele lezer kan hem vinden — ook de afhankelijkhedenscan niet, die álle soorten langsloopt. Een filter had op één van die lezers vergeten kunnen worden. `leiding` staat standaard op false: wie de vlag vergeet ziet te weinig, en dat is de goede kant om fout te gaan.
+
+**Isolatie is bouw, geen belofte.** De zaakcode komt uitsluitend uit de sessie (`supplierAuth` zet `req.supplier` uit `sess.code`); geen enkele route in dit domein leest een code uit de body. Het register van een zaak kent alleen de eigen soorten, en elk van die soorten draagt zijn eigen `lees()` die op de zaakcode sluit. Zoeken op de code van de buurman levert daarom niet "niets gevonden na filtering" op maar niets, omdat er niets te vinden is.
+
+**De recepten verzinnen geen werkelijkheid.** Dat is bij een zaak een scherpere eis dan bij het platform: een bestelling op "in bereiding" zetten omdat hij te lang op "nieuw" staat, zou betekenen dat het systeem zegt dat de keuken begonnen is terwijl niemand iets deed. Wat de vier recepten wél doen is administratieve drift rechtzetten: een bestelling waarvan alle stations "klaar" melden maar de status achterliep, een ritstatus van vóór de huidige keten (`rijdt` → `aan-boord`), een bevestigde boeking waarvan de datum allang voorbij is, een klus die als opgelost is gemarkeerd maar nog openstaat. Alles wat de zaak moet *beslissen* — een boeking bevestigen, een chauffeur toewijzen, verlof toekennen — is geen recept maar een **signaal** dat een uitzondering wordt met eigenaar, termijn en bewijs.
+
+**Die signalen bestonden al, met de hand geschreven.** Ze stonden als `alerts` in `routes/supplier/backoffice.js`. Dat werkte zolang er één lezer was; met de Regie erbij zouden er twee bijna-gelijke lijsten zijn geweest. Ze staan nu één keer, in `kern/zaakcommand/signalen.js`, en de backoffice leest dezelfde bron — met hetzelfde antwoord als voorheen, tweetalig en al.
+
+Kern: `server/kern/zaakcommand/` (register, runbooks, signalen, index), routes `/api/supplier/command/*` in `server/routes/zaakcommand/`, scherm `public/shared/zaakcommand/` (gebundeld naar `public/shared/zaakcommand.js`, gedeeld door beide apps), schakelbaar als `zaakregie` en `zaakregie-beheer`. Getoetst in `test/zaakcommand.test.js` (acht beweringen, vier mutaties) en `test/zaakregie.e2e.js` (beide schermen in een echte browser).
+
 ## Veiligheid & verbinding: vier apps op één ruggengraat
 
 Vier losse apps (elk met eigen PWA-manifest), die onderhuids dezelfde kern delen

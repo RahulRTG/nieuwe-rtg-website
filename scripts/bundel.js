@@ -60,6 +60,10 @@ const bundels = {
   // delen omdat elke werkplek zijn eigen tekenaar heeft en die niet in elkaars
   // bestand horen te wonen
   'apps/command.js': 'apps/command',
+  // De Regie van de zaak: één scherm dat zowel in de zaak-app als in de
+  // personeels-PDA hangt. Drie delen: de vorm, de werkplekken Nu/Lijst, en de
+  // rest (zoeken, dossier, rechtzetten, regels).
+  'shared/zaakcommand.js': 'shared/zaakcommand',
   'apps/techniek.js': 'apps/techniek',
   'apps/meldkamer.js': 'apps/meldkamer',
   'apps/foundation/gezin-rt.js': 'apps/foundation/gezin-rt',

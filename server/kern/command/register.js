@@ -100,6 +100,13 @@ const OP_TYPE = new Map(SOORTEN.map(k => [k.type, k]));
    is. Een collectie ontstaat hier pas als er iets in komt; een commandolaag die
    daarop crasht zou op een verse installatie niet opstarten. */
 function rijen(db, soort) {
+  /* Een soort MAG zijn eigen leesfunctie meebrengen. Dat lijkt een detail en is
+     het scharnier van de hele scoping: een register waarvan de soorten zelf
+     zeggen waar hun rijen vandaan komen, kan een BEPERKT venster op db.data
+     zijn. De zaak-kant gebruikt dat om nooit iets buiten de eigen zaak te
+     kunnen teruggeven -- niet doordat de aanroeper netjes filtert, maar doordat
+     er geen pad bestaat waarlangs een ongefilterde rij naar buiten komt. */
+  if (typeof soort.lees === 'function') { const v = soort.lees(db); return Array.isArray(v) ? v : []; }
   const v = db && db.data ? db.data[soort.collectie] : null;
   return Array.isArray(v) ? v : [];
 }
@@ -109,6 +116,32 @@ function vindRij(db, type, id) {
   if (!soort) return null;
   const sleutel = String(id);
   return rijen(db, soort).find(r => r && s(r[soort.sleutel]) === sleutel) || null;
+}
+
+/* EEN REGISTER ALS OBJECT, en niet als module met vaste inhoud.
+
+   Dit is wat het mogelijk maakt om dezelfde zoekbalk, hetzelfde objectdossier
+   en dezelfde afhankelijkhedenscan op een ANDER stel soorten te draaien --
+   bijvoorbeeld op alleen de objecten van een enkele zaak. zoek.js en object.js
+   krijgen een register mee en importeren er geen; wie ze een beperkt register
+   geeft, krijgt gegarandeerd een beperkt antwoord.
+
+   Het RTG-register hieronder is er daar precies een van, en heeft verder geen
+   voorrang. */
+function maakRegister(soorten) {
+  const perType = new Map(soorten.map(k => [k.type, k]));
+  return {
+    SOORTEN: soorten,
+    OP_TYPE: perType,
+    rijen: (db, soort) => rijen(db, soort),
+    vindRij: (db, type, id) => {
+      const soort = perType.get(String(type));
+      if (!soort) return null;
+      const sleutel = String(id);
+      return rijen(db, soort).find(r => r && s(r[soort.sleutel]) === sleutel) || null;
+    },
+    kort, verwijzingen
+  };
 }
 
 /* De korte vorm waarin een object overal in Command verschijnt: in de
@@ -137,4 +170,6 @@ function verwijzingen(soort, r) {
   return [...w];
 }
 
-module.exports = { SOORTEN, OP_TYPE, rijen, vindRij, kort, verwijzingen, s, eerste };
+const RTG = maakRegister(SOORTEN);
+
+module.exports = { SOORTEN, OP_TYPE, rijen, vindRij, kort, verwijzingen, s, eerste, maakRegister, RTG };

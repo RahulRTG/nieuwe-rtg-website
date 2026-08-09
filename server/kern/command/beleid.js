@@ -38,19 +38,23 @@ const START = [
   { id: 'zaak.termijnUren', wat: 'Binnen hoeveel uur een uitzondering een eigenaar en besluit hoort te hebben', waarde: 48, eenheid: 'uur', vierOgen: false }
 ];
 
-function maakBeleid({ db, save, crypto, journaal }) {
+function maakBeleid({ db, save, crypto, journaal, vak, start }) {
+  const V = typeof vak === 'function' ? vak : (() => db.data);
+  const REGELS = Array.isArray(start) ? start : START;
   function reg() {
-    if (!db.data.commandBeleid) db.data.commandBeleid = {};
-    const r = db.data.commandBeleid;
-    for (const b of START) {
+    const v = V();
+    if (!v.commandBeleid) v.commandBeleid = {};
+    const r = v.commandBeleid;
+    for (const b of REGELS) {
       if (!r[b.id]) r[b.id] = { id: b.id, wat: b.wat, eenheid: b.eenheid, vierOgen: b.vierOgen, bereik: 'globaal',
         versies: [{ v: 1, waarde: b.waarde, at: null, door: 'startwaarde', reden: 'de regel zoals hij is opgezet' }] };
     }
     return r;
   }
   function voorstellen() {
-    if (!Array.isArray(db.data.commandVoorstellen)) db.data.commandVoorstellen = [];
-    return db.data.commandVoorstellen;
+    const v = V();
+    if (!Array.isArray(v.commandVoorstellen)) v.commandVoorstellen = [];
+    return v.commandVoorstellen;
   }
 
   const nu = () => new Date().toISOString();
@@ -149,7 +153,7 @@ function maakBeleid({ db, save, crypto, journaal }) {
   const openVoorstellen = () => voorstellen().filter(v => v.status === 'wacht');
 
   return { alles, waarde, getal, zet, keur, terug, geschiedenis, openVoorstellen,
-    voorstellen: () => voorstellen().slice().reverse().slice(0, 50), START };
+    voorstellen: () => voorstellen().slice().reverse().slice(0, 50), START: REGELS };
 }
 
 module.exports = { maakBeleid, START };

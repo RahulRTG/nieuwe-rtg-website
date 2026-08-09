@@ -20,7 +20,7 @@
    risico-oordeel op twee plekken staan. */
 'use strict';
 
-const { SOORTEN, OP_TYPE, rijen, vindRij, kort, verwijzingen, s } = require('./register');
+const { s } = require('./register');
 
 const MAX_SCAN = 20000;
 const MAX_PER_SOORT = 8;
@@ -45,13 +45,13 @@ function feiten(r) {
 }
 
 /* De afhankelijkhedengraaf van één object: wie noemt hem, en waar. */
-function afhankelijkheden(db, soort, r) {
-  const sleutels = new Set(verwijzingen(soort, r).map(v => v.toLowerCase()).filter(v => v.length >= 3));
+function afhankelijkheden(reg, db, soort, r) {
+  const sleutels = new Set(reg.verwijzingen(soort, r).map(v => v.toLowerCase()).filter(v => v.length >= 3));
   if (!sleutels.size) return { groepen: [], onvolledig: false };
   const groepen = [];
   let onvolledig = false;
-  for (const ander of SOORTEN) {
-    const alle = rijen(db, ander);
+  for (const ander of reg.SOORTEN) {
+    const alle = reg.rijen(db, ander);
     const gekeken = Math.min(alle.length, MAX_SCAN);
     if (alle.length > gekeken) onvolledig = true;
     const raak = [];
@@ -63,7 +63,7 @@ function afhankelijkheden(db, soort, r) {
         if (v == null || typeof v === 'object') continue;
         if (sleutels.has(s(v).toLowerCase())) { veld = k; break; }
       }
-      if (veld) raak.push(Object.assign(kort(ander, q), { via: veld }));
+      if (veld) raak.push(Object.assign(reg.kort(ander, q), { via: veld }));
     }
     if (raak.length) groepen.push({ type: ander.type, label: ander.label, meervoud: ander.meervoud,
       domein: ander.domein, totaal: raak.length, rijen: raak.slice(0, MAX_PER_SOORT) });
@@ -79,7 +79,7 @@ const TIJDVELDEN = [['at', 'aangemaakt'], ['created_at', 'aangemaakt'], ['create
   ['paidAt', 'betaald'], ['betaaldOp', 'betaald'], ['updatedAt', 'gewijzigd'], ['bijgewerkt', 'gewijzigd'],
   ['afgerondOp', 'afgerond'], ['annuleerdOp', 'geannuleerd']];
 
-function tijdlijn(db, soort, r, journaal) {
+function tijdlijn(soort, r, journaal) {
   const lijn = [];
   for (const [veld, wat] of TIJDVELDEN) {
     const v = r[veld];
@@ -95,19 +95,19 @@ function tijdlijn(db, soort, r, journaal) {
 
 /* Het complete dossier. `acties` komt van buiten (risico.js kent het beleid),
    zodat dit bestand niets over risico hoeft te weten. */
-function dossier(db, type, id, { journaal, actiesVoor }) {
-  const soort = OP_TYPE.get(String(type));
+function dossier(reg, db, type, id, { journaal, actiesVoor }) {
+  const soort = reg.OP_TYPE.get(String(type));
   if (!soort) return { error: 'Onbekende soort: ' + type, status: 404 };
-  const r = vindRij(db, soort.type, id);
+  const r = reg.vindRij(db, soort.type, id);
   if (!r) return { error: 'Niet gevonden: ' + type + ' ' + id, status: 404 };
-  const k = kort(soort, r);
-  const afh = afhankelijkheden(db, soort, r);
+  const k = reg.kort(soort, r);
+  const afh = afhankelijkheden(reg, db, soort, r);
   return {
     object: k,
     feiten: feiten(r),
     afhankelijkheden: afh.groepen,
     afhankelijkhedenOnvolledig: afh.onvolledig,
-    tijdlijn: tijdlijn(db, soort, r, journaal),
+    tijdlijn: tijdlijn(soort, r, journaal),
     acties: actiesVoor ? actiesVoor(k, r) : []
   };
 }

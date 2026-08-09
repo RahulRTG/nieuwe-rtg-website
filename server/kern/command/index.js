@@ -26,16 +26,22 @@
 'use strict';
 
 function maakCommand({ db, save, crypto, anthropic }) {
+  /* HET RTG-REGISTER, en het gaat er expliciet in. Elke laag die gegevens leest
+     krijgt hem mee in plaats van hem te importeren; dat is wat het mogelijk
+     maakt om dezelfde motoren op een BEPERKT register te draaien (de zaak-kant,
+     server/kern/zaak/). Wie een beperkt register geeft, krijgt gegarandeerd een
+     beperkt antwoord -- er is geen pad omheen. */
+  const register = require('./register').RTG;
   const journaal = require('./journaal').maakJournaal({ db, save, crypto });
   const beleid = require('./beleid').maakBeleid({ db, save, crypto, journaal });
   const risico = require('./risico').maakRisico({ beleid });
   const toegang = require('./toegang').maakToegang({ db, save, crypto, journaal });
   const zaken = require('./zaken').maakZaken({ db, save, crypto, journaal, beleid });
-  const runbooks = require('./runbooks').maakRunbooks({ db, save, crypto, journaal, risico, beleid });
+  const runbooks = require('./runbooks').maakRunbooks({ db, save, crypto, journaal, risico, beleid, register });
   const toezicht = require('./toezicht').maakToezicht({ db, save, journaal, beleid });
-  const operator = require('./operator').maakOperator({ db, save, crypto, journaal, risico, runbooks, zaken, beleid, anthropic });
-  const puls = require('./puls').maakPuls({ db, runbooks, zaken, toezicht, journaal, beleid });
-  const simulatie = require('./simulatie').maakSimulatie({ db, runbooks, zaken, beleid, risico });
+  const operator = require('./operator').maakOperator({ db, save, crypto, journaal, risico, runbooks, zaken, beleid, anthropic, register });
+  const puls = require('./puls').maakPuls({ db, runbooks, zaken, toezicht, journaal, beleid, register });
+  const simulatie = require('./simulatie').maakSimulatie({ db, runbooks, zaken, beleid, risico, register });
   const werkbesparing = require('./werkbesparing').maakWerkbesparing({ journaal, zaken, runbooks });
   const zoeklaag = require('./zoek');
   const objectlaag = require('./object');
@@ -61,9 +67,9 @@ function maakCommand({ db, save, crypto, anthropic }) {
     return uit;
   }
 
-  const zoek = (vraag, opties) => zoeklaag.zoek(db, vraag, opties);
-  const bereik = () => zoeklaag.bereik();
-  const dossier = (type, id) => objectlaag.dossier(db, type, id, { journaal, actiesVoor });
+  const zoek = (vraag, opties) => zoeklaag.zoek(register, db, vraag, opties);
+  const bereik = () => zoeklaag.bereik(register);
+  const dossier = (type, id) => objectlaag.dossier(register, db, type, id, { journaal, actiesVoor });
 
   /* Het beginscherm van de app in één aanroep: de puls, de open uitzonderingen,
      wat er te herstellen valt en waar het handwerk zit. Eén verzoek, omdat vier
@@ -83,7 +89,7 @@ function maakCommand({ db, save, crypto, anthropic }) {
   }
 
   return { journaal, beleid, risico, toegang, zaken, runbooks, toezicht, operator, puls,
-    simulatie, werkbesparing, zoek, bereik, dossier, actiesVoor, start };
+    simulatie, werkbesparing, zoek, bereik, dossier, actiesVoor, start, register };
 }
 
 module.exports = { maakCommand };

@@ -21,12 +21,23 @@
 
 const MAX = 5000;
 
-function maakJournaal({ db, save, crypto }) {
+/* HET VAK. Standaard schrijft het journaal in db.data zelf -- dat is het
+   RTG-journaal. Een aanroeper mag een ander vak meegeven: een object waarin
+   dezelfde sleutels worden bijgehouden. Zo krijgt elke zaak zijn EIGEN keten,
+   met zijn eigen zegel, in plaats van dat alle zaken in één lijst schrijven
+   waar ze elkaars regels in zouden zien staan.
+
+   Dit is geen tweede journaal: het is dezelfde module, één keer per eigenaar.
+   De waarheid "wat is er in zaak X gebeurd" staat daarmee op precies één
+   plek -- wat LAT.md regel 4 vraagt. */
+function maakJournaal({ db, save, crypto, vak }) {
+  const V = typeof vak === 'function' ? vak : (() => db.data);
   function lijst() {
-    if (!Array.isArray(db.data.commandJournaal)) db.data.commandJournaal = [];
-    return db.data.commandJournaal;
+    const v = V();
+    if (!Array.isArray(v.commandJournaal)) v.commandJournaal = [];
+    return v.commandJournaal;
   }
-  function tellerLees() { return Number(db.data.commandJournaalTotaal || 0); }
+  function tellerLees() { return Number(V().commandJournaalTotaal || 0); }
 
   function hash(v) {
     return crypto.createHash('sha256').update(JSON.stringify(v)).digest('hex').slice(0, 32);
@@ -68,7 +79,7 @@ function maakJournaal({ db, save, crypto }) {
     };
     kern.zegel = hash(kern);
     rij.push(kern);
-    db.data.commandJournaalTotaal = tellerLees() + 1;
+    V().commandJournaalTotaal = tellerLees() + 1;
     /* De staart afkappen mag, de teller niet: `aantal` blijft het echte
        totaal. Zo weet een scherm dat het naar een venster kijkt. */
     if (rij.length > MAX) rij.splice(0, rij.length - MAX);

@@ -21,16 +21,19 @@
    zeggen. Dat is erger dan niets zeggen. */
 'use strict';
 
-const { OP_TYPE, kort, s } = require('./register');
+const { s } = require('./register');
 /* De oorzaakmeting staat apart in ./oorzaak.js: een andere vraag (wat is er
    aan de hand) dan de rest van dit bestand (wat moet er gebeuren), en los te
    toetsen. */
 const { groepeer, GEEN_OORZAAK } = require('./oorzaak');
 
-function maakOperator({ db, save, crypto, journaal, risico, runbooks, zaken, beleid, anthropic }) {
+function maakOperator({ db, save, crypto, journaal, risico, runbooks, zaken, beleid, anthropic, register, vak }) {
+  const reg = register;
+  const V = typeof vak === 'function' ? vak : (() => db.data);
   function plannen() {
-    if (!Array.isArray(db.data.commandPlannen)) db.data.commandPlannen = [];
-    return db.data.commandPlannen;
+    const v = V();
+    if (!Array.isArray(v.commandPlannen)) v.commandPlannen = [];
+    return v.commandPlannen;
   }
 
   /* Welke runbooks gaan over deze vraag? Op woorden in de vraag tegen de naam,
@@ -41,7 +44,7 @@ function maakOperator({ db, save, crypto, journaal, risico, runbooks, zaken, bel
     const t = String(vraag || '').toLowerCase();
     const alle = runbooks.lijst();
     const raak = alle.filter(rb => {
-      const soort = OP_TYPE.get(rb.type);
+      const soort = reg.OP_TYPE.get(rb.type);
       const woorden = [rb.naam, rb.oorzaak, rb.type, soort ? soort.domein : '', soort ? soort.meervoud : '']
         .join(' ').toLowerCase();
       return woorden.split(/[^a-zà-ÿ]+/).filter(w => w.length > 3).some(w => t.includes(w));
@@ -58,8 +61,8 @@ function maakOperator({ db, save, crypto, journaal, risico, runbooks, zaken, bel
     for (const rb of gekozen) {
       const rbVol = runbooks.OP_ID.get(rb.id);
       const kand = runbooks.kandidaten(rbVol, beleid.getal('herstel.maxPerRonde', 50) * 4);
-      const soort = OP_TYPE.get(rb.type);
-      const gevallen = kand.rijen.map(r => ({ id: s(r[soort.sleutel]), titel: kort(soort, r).titel, rij: r,
+      const soort = reg.OP_TYPE.get(rb.type);
+      const gevallen = kand.rijen.map(r => ({ id: s(r[soort.sleutel]), titel: reg.kort(soort, r).titel, rij: r,
         ctx: { klantImpact: rbVol.klantImpact, onomkeerbaar: !rbVol.terugDraaibaar, zekerheid: 0.95 } }));
       const g = groepeer(gevallen);
       const route = risico.routeer(gevallen, rbVol.actie, { klantImpact: rbVol.klantImpact });

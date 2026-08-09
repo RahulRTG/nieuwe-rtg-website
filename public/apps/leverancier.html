@@ -850,6 +850,15 @@
         <p class="sub" data-i18n="sup.v.sw.sub">Werk met EGn knop samen: creators en leveranciers vinden elkaar.</p>
         <div id="swWrap"></div>
       </div>
+      <!-- De Regie van de zaak. Het scherm zelf staat in /shared/zaakcommand.js,
+           want de personeels-PDA toont exact dezelfde lijst: de uitzondering die
+           een medewerker op de vloer ziet MOET dezelfde zijn als die de manager
+           hier ziet. Twee implementaties zouden uiteenlopen. -->
+      <div class="view" data-view="regie">
+        <h2 data-i18n="sup.v.regie">Regie</h2>
+        <p class="sub" data-i18n="sup.v.regie.sub">Wat er op u wacht, wat er scheef staat en wat de assistent zelf mag rechtzetten. Alleen uw eigen zaak.</p>
+        <div id="regieWrap"></div>
+      </div>
       <div class="view" data-view="facturen">
         <h2 data-i18n="sup.v.fact">Facturen</h2>
         <p class="sub" data-i18n="sup.v.fact.sub">Elke verkoop wordt automatisch gefactureerd. Download de PDF of maak er een met AI.</p>
@@ -1753,6 +1762,7 @@ window.I18N = { en: {
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/ondernemerpoort.js" defer></script>
 <script src="/shared/rahul-mond.js" defer></script>
+<script src="/shared/zaakcommand.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 <script src="/shared/bediening.js" defer></script>

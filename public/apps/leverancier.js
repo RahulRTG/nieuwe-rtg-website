@@ -153,6 +153,11 @@
 
   const TABDEF = {
     home:     { label:'Overzicht', svg:'<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/>' },
+    /* Regie heeft bewust GEEN cap: elke zaak, van eenmanszaak tot resort, heeft
+       baat bij zien wat er op hem wacht en wat er scheef staat. Een cap zou
+       betekenen dat de kleinste zaken -- die het minste personeel hebben om het
+       zelf bij te houden -- hem als eerste missen. */
+    regie:    { label:'Regie',     svg:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1"/>' },
     orders:   { label:'Orders',    svg:'<path d="M6 2h9l3 3v17H6z"/><path d="M9 8h6M9 12h6M9 16h4"/>', cap:'orders' },
     rides:    { label:'Ritten',    svg:'<path d="M5 11l1.5-4.5A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.9 1.5L19 11"/><rect x="3" y="11" width="18" height="6" rx="2"/><circle cx="7.5" cy="17.5" r="1.5"/><circle cx="16.5" cy="17.5" r="1.5"/>', cap:'rides' },
     menu:     { label:'Menu',      svg:'<path d="M4 3v18M8 3v6a2 2 0 0 1-4 0M18 3c-2 0-3 2-3 5s1 4 3 4v9"/>', cap:'menu' },
@@ -5896,7 +5901,7 @@
     $('#supType').textContent = tType(S.typeLabel) + ' · ' + S.city;
     renderActor();
     if (stationMode){ renderStation(); return; }
-    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderBezorg(); renderTickets(); renderVerhuur(); renderCharter(); renderVastgoed(); renderVracht(); renderGebouw(); renderGolf(); renderFitclub(); renderBeauty(); renderPetcare(); renderOpvang(); renderMarina(); renderWeddings(); renderAdvies(); renderPolis(); renderZorgpolis(); renderAlpine(); renderBoerderij(); renderCreator(); renderSamenwerking(); renderFacturen(); renderRtfMarkt(); renderRetail(); renderModeBezorg(); renderWinkelvloer(); renderZorgbalieLev(); renderVerkoop(); renderGroothandel(); renderInkoop(); renderZaakBoard(); renderBeveiliging(); renderPaspoort(); renderContracten(); renderOnbCfg(); renderRooms(); renderDorp(); renderMinibar(); renderKlussen(); renderTafels(); renderBeheer(); renderDoors(); renderGasten(); renderGChat(); laadInbox(); renderPage(); renderTeam(); renderBorden(); renderReviews(); renderVoorraad(); renderMeer(); renderAIChips();
+    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderBezorg(); renderTickets(); renderVerhuur(); renderCharter(); renderVastgoed(); renderVracht(); renderGebouw(); renderGolf(); renderFitclub(); renderBeauty(); renderPetcare(); renderOpvang(); renderMarina(); renderWeddings(); renderAdvies(); renderPolis(); renderZorgpolis(); renderAlpine(); renderBoerderij(); renderCreator(); renderSamenwerking(); renderFacturen(); renderRtfMarkt(); renderRetail(); renderModeBezorg(); renderWinkelvloer(); renderZorgbalieLev(); renderVerkoop(); renderGroothandel(); renderInkoop(); renderZaakBoard(); renderBeveiliging(); renderPaspoort(); renderContracten(); renderOnbCfg(); renderRooms(); renderDorp(); renderMinibar(); renderKlussen(); renderTafels(); renderBeheer(); renderDoors(); renderGasten(); renderGChat(); laadInbox(); renderPage(); renderTeam(); renderBorden(); renderReviews(); renderRegie(); renderVoorraad(); renderMeer(); renderAIChips();
     // Zorg dat het actieve tabblad ook echt zichtbaar is: de tabbar-knop staat al
     // op 'active', maar zonder deze aanroep krijgt geen enkele .view de active-klasse
     // en blijft het overzicht leeg bij de eerste render.
@@ -8499,6 +8504,25 @@
       teamleden: () => (state && state.staff || []).map(m => ({ id: m.id, name: m.name })),
       kanBeheren: () => { const a = actor(); return !!(a.manager || a.role === 'manager' || !a.staffId); },
       T, toast
+    });
+  }
+
+  /* ---- De Regie van de zaak ----
+     Het scherm komt uit /shared/zaakcommand.js en hangt ook in de
+     personeels-PDA. Hier geven we hem alleen zijn api en of deze persoon mag
+     beheren; de grendel zelf zit op de server (managerOnly), dus dit is
+     netheid en geen beveiliging. */
+  let regieUI = null;
+  function renderRegie(){
+    const wrap = $('#regieWrap');
+    if (!wrap || !window.RTGZaakCommand) return;
+    if (regieUI) { regieUI.ververs(); return; }
+    const a = actor();
+    regieUI = RTGZaakCommand.toon(wrap, {
+      api: (pad, body) => API.call('/supplier/command/' + pad, body),
+      compact: false,
+      mag: !!(a.manager || a.role === 'manager' || !a.staffId),
+      meld: toast
     });
   }
 

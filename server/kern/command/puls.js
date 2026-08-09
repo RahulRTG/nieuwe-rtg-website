@@ -14,11 +14,13 @@
    over gaat. Niet gemeten is geen groen. */
 'use strict';
 
-const { SOORTEN, rijen } = require('./register');
+
 
 const OK = 'in orde', LET = 'let op', STORING = 'storing', LEEG = 'leeg';
 
-function maakPuls({ db, runbooks, zaken, toezicht, journaal, beleid }) {
+function maakPuls({ db, runbooks, zaken, toezicht, journaal, beleid, register }) {
+  const SOORTEN = register.SOORTEN;
+  const rijen = (d, s) => register.rijen(d, s);
   /* De domeinen komen uit het register, zodat er geen tweede lijst met
      domeinnamen ontstaat die na de eerste uitbreiding uit de pas loopt. */
   function domeinen() {

@@ -21,23 +21,28 @@
    gecontroleerd, niet bij het opschrijven. */
 'use strict';
 
-const { OP_TYPE, rijen, kort, s } = require('./register');
+const { s } = require('./register');
 /* De recepten zelf staan in ./runbookcatalogus.js: gegevens, geen werking. */
 const { RUNBOOKS, OP_ID, BEVROREN } = require('./runbookcatalogus');
 
-function maakRunbooks({ db, save, crypto, journaal, risico, beleid }) {
+function maakRunbooks({ db, save, crypto, journaal, risico, beleid, register, catalogus, vak }) {
+  const reg = register;
+  const BOEKEN = (catalogus && catalogus.RUNBOOKS) || RUNBOOKS;
+  const OPID = (catalogus && catalogus.OP_ID) || OP_ID;
+  const V = typeof vak === 'function' ? vak : (() => db.data);
   function draaien() {
-    if (!Array.isArray(db.data.commandRuns)) db.data.commandRuns = [];
-    return db.data.commandRuns;
+    const v = V();
+    if (!Array.isArray(v.commandRuns)) v.commandRuns = [];
+    return v.commandRuns;
   }
 
   /* Welke objecten past dit runbook nu? Begrensd, en het echte aantal staat
      erbij -- een herstelronde die "39 gevallen" zegt terwijl er 400 zijn, is
      een leugen met een geruststellend gezicht. */
   function kandidaten(rb, max) {
-    const soort = OP_TYPE.get(rb.type);
+    const soort = reg.OP_TYPE.get(rb.type);
     if (!soort) return { rijen: [], totaal: 0 };
-    const alle = rijen(db, soort).filter(r => r && rb.past(r));
+    const alle = reg.rijen(db, soort).filter(r => r && rb.past(r));
     const grens = Number(max || beleid.getal('herstel.maxPerRonde', 50));
     return { rijen: alle.slice(0, grens), totaal: alle.length, soort };
   }
@@ -65,10 +70,11 @@ function maakRunbooks({ db, save, crypto, journaal, risico, beleid }) {
   }
 
   function lijst() {
-    return RUNBOOKS.map(rb => {
+    return BOEKEN.map(rb => {
       const k = kandidaten(rb);
       const o = oordeel(rb, k.totaal || 1);
-      return { id: rb.id, naam: rb.naam, wat: rb.wat, type: rb.type, veld: rb.veld, naar: rb.naar,
+      return { id: rb.id, naam: rb.naam, wat: rb.wat, type: rb.type, veld: rb.veld,
+        naar: rb.naar == null && typeof rb.naarVoor === 'function' ? 'per geval' : rb.naar,
         oorzaak: rb.oorzaak, terugDraaibaar: rb.terugDraaibaar, klantImpact: rb.klantImpact,
         kandidaten: k.totaal, oordeel: o };
     });
@@ -77,7 +83,7 @@ function maakRunbooks({ db, save, crypto, journaal, risico, beleid }) {
   /* Uitvoeren. Droog: alleen vertellen. Echt: schrijven, met de oude waarde per
      object in de run, zodat draaiTerug() geen gok is. */
   function voer(id, opties) {
-    const rb = OP_ID.get(String(id));
+    const rb = OPID.get(String(id));
     if (!rb) return { error: 'Dat runbook bestaat niet: ' + id, status: 404 };
     if (BEVROREN.has(rb.veld)) return { error: 'Dat veld mag een runbook niet aanraken: ' + rb.veld, status: 403 };
     const o = opties || {};
@@ -102,8 +108,15 @@ function maakRunbooks({ db, save, crypto, journaal, risico, beleid }) {
 
     for (const r of doelen) {
       const was = s(r[rb.veld]);
-      run.geraakt.push({ type: rb.type, id: s(r[soort.sleutel]), titel: kort(soort, r).titel, veld: rb.veld, van: was, naar: rb.naar });
-      if (!droog) r[rb.veld] = rb.naar;
+      /* DE DOELWAARDE MAG PER GEVAL VERSCHILLEN. Een runbook dat een oude
+         statusnaam omzet, heeft geen vaste bestemming maar een vertaaltabel;
+         zonder deze haak zou zo'n recept alle gevallen op dezelfde waarde
+         zetten en daarmee informatie weggooien. Wat er per object gebeurde
+         staat hoe dan ook in `geraakt`, dus terugdraaien blijft exact. */
+      const doel = typeof rb.naarVoor === 'function' ? rb.naarVoor(r) : rb.naar;
+      if (doel == null || doel === was) continue;
+      run.geraakt.push({ type: rb.type, id: s(r[soort.sleutel]), titel: reg.kort(soort, r).titel, veld: rb.veld, van: was, naar: doel });
+      if (!droog) r[rb.veld] = doel;
     }
     /* Ook een droogloop wordt bewaard: hij is het bewijs dat iemand heeft
        gekeken vóór hij drukte, en hij hoort dus in dezelfde lijst als de echte
@@ -128,12 +141,12 @@ function maakRunbooks({ db, save, crypto, journaal, risico, beleid }) {
     if (run.droog) return { error: 'Een droogloop heeft niets veranderd; er valt niets terug te draaien.', status: 409 };
     if (run.teruggedraaid) return { error: 'Die ronde is al teruggedraaid.', status: 409 };
     if (!door) return { error: 'Zonder herleidbare actor wordt er niets teruggedraaid.', status: 403 };
-    const rb = OP_ID.get(run.runbook);
-    const soort = OP_TYPE.get(rb ? rb.type : '');
+    const rb = OPID.get(run.runbook);
+    const soort = reg.OP_TYPE.get(rb ? rb.type : '');
     if (!soort) return { error: 'De soort van die ronde bestaat niet meer.', status: 409 };
     let terug = 0, overgeslagen = 0;
     for (const g of run.geraakt) {
-      const r = rijen(db, soort).find(x => x && s(x[soort.sleutel]) === g.id);
+      const r = reg.rijen(db, soort).find(x => x && s(x[soort.sleutel]) === g.id);
       if (!r) { overgeslagen++; continue; }
       if (s(r[g.veld]) !== g.naar) { overgeslagen++; continue; }
       r[g.veld] = g.van; terug++;
@@ -157,7 +170,7 @@ function maakRunbooks({ db, save, crypto, journaal, risico, beleid }) {
   const runs = (n) => draaien().slice().reverse().slice(0, n || 25).map(samenvatting);
   const run = (id) => { const r = draaien().find(x => x.id === String(id)); return r ? Object.assign(samenvatting(r), { geraaktVolledig: r.geraakt }) : null; };
 
-  return { lijst, voer, draaiTerug, runs, run, kandidaten, RUNBOOKS, OP_ID, BEVROREN };
+  return { lijst, voer, draaiTerug, runs, run, kandidaten, RUNBOOKS: BOEKEN, OP_ID: OPID, BEVROREN };
 }
 
 module.exports = { maakRunbooks, RUNBOOKS, BEVROREN };

@@ -18,10 +18,12 @@
 
 const OPEN = 'open', BEZIG = 'in behandeling', KLAAR = 'afgehandeld';
 
-function maakZaken({ db, save, crypto, journaal, beleid }) {
+function maakZaken({ db, save, crypto, journaal, beleid, vak }) {
+  const V = typeof vak === 'function' ? vak : (() => db.data);
   function rij() {
-    if (!Array.isArray(db.data.commandZaken)) db.data.commandZaken = [];
-    return db.data.commandZaken;
+    const v = V();
+    if (!Array.isArray(v.commandZaken)) v.commandZaken = [];
+    return v.commandZaken;
   }
   const nu = () => new Date().toISOString();
 

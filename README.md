@@ -1600,6 +1600,16 @@ Drie dingen die dit bewust niet doet:
 
 Wie welke aanvraag ziet, hangt aan twee dingen: het genre moet bij de gevraagde verdieping horen, en de plek moet binnen het servicegebied van de zaak vallen. Een kapper in Haarlem krijgt geen loodgietersklus op Ibiza in beeld — en een wellness-zaak in Ibiza geen loodgietersklus in Ibiza.
 
+### De schermen: Mijn Mall en de vraagkant van een zaak
+
+**apps/mijnmall.html** is waar een lid zijn lijsten, zijn reismanden en zijn eigen aanvragen bij elkaar ziet. Een reismand toont vier vakjes — verblijf, vervoer ter plaatse, tafel, iets te doen — die aanvinken zodra er iets in zit, met de knop *Zoeken voor deze reis*: die opent de Mall met de plek en de periode van die reis al ingevuld. Een regel waarvan het aanbod verdwenen is blijft staan, doorzichtig, met de reden erbij; is de prijs veranderd sinds je hem bewaarde, dan staat het verschil erachter.
+
+Er staat nergens een knop die doet alsof dit afrekent, en nergens een aftelklok of een "nog 2 beschikbaar". Een lijst is een geheugensteun.
+
+**apps/leverancier-aanvragen.html** is de andere kant: een zaak ziet de vragen die bij haar vak en werkgebied passen, en reageert met wat zij kan bieden en wat het kost. Wie zich bedenkt werkt zijn eigen reactie bij in plaats van er een tweede naast te zetten. Staat er niets, dan zegt het scherm wat het werkgebied nu is en of dat een aanname is — want dat bepaalt precies welke vragen binnenkomen.
+
+Wat de zaak ziet is beperkt en dat is met opzet: de vraag, de plaats, de dag, een eventueel budget en de codenaam. Geen adres.
+
 ### Het vraagbeeld: wat gevraagd wordt en niet geleverd
 
 De Mall weet iets wat niemand anders weet: waar mensen naar zoeken en **niets vinden**. Dat is de eerlijkste marktinformatie die er is — iemand heeft de moeite genomen het te vragen en kreeg niets terug. Voor een ondernemer is dat een kans, voor een stad een tekort.

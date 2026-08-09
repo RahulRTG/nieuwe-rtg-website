@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 723 bestanden en 4123 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 723 bestanden en 4125 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 723 |
-| losse beweringen (`test(...)`) | 4123 |
+| losse beweringen (`test(...)`) | 4125 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 521 |
 | **overleefd**: geen mutatie kreeg hem rood | 12 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-636 bestanden, 3967 beweringen.
+636 bestanden, 3969 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -316,7 +316,7 @@ toets omvalt.
 | `mailpost.test.js` | 11 | gezakt op `liegpoort /api/` | De MAILINFRASTRUCTUUR: de verzendwachtrij en de buitenpoort. Vier beweringen, en ze gaan alle vier over wat er gebeurt als het MISGAAT -- want dat is waar een mailsysteem zich onderscheidt van een verzendknop: 1. |
 | `mall-context.test.js` | 10 | -- | De laatste twee van de lijst: TIJD ALS CONTEXT en de ZAKELIJKE PRIJS. Waar EN wanneer: een zaak die pas na jouw vertrek weer plek heeft, hoort niet als beschikbaar te gelden. |
 | `mall-extern.test.js` | 13 | genoemd | De twee gaten die met naam openstonden na de Supplier OS-koppeling: 1. DE KLOK. |
-| `mall-lijsten.test.js` | 10 | genoemd | Bewaren, een reis bouwen, en de vraagkant van de Mall. Twee dingen die als aparte functies waren bedacht en er een zijn (een verlanglijst en "voeg toe aan mijn reis"), plus de aanvraagmarkt: wat niemand aanbiedt, kun... |
+| `mall-lijsten.test.js` | 12 | genoemd | Bewaren, een reis bouwen, en de vraagkant van de Mall. Twee dingen die als aparte functies waren bedacht en er een zijn (een verlanglijst en "voeg toe aan mijn reis"), plus de aanvraagmarkt: wat niemand aanbiedt, kun... |
 | `mall-supplieros.test.js` | 9 | genoemd | De Supplier OS-koppeling: wat de ondernemer in zijn eigen systeem verandert, verandert in de Mall mee. Geen tweede administratie, en geen stand die de Mall zelf verzint. |
 | `mall-vindlaag.test.js` | 17 | genoemd | De vindlaag van de RTG Mall: het universele aanbod-object, het locatiemodel met servicegebied, en de zoek-/ontdeklaag daarboven. De Mall is hiermee niet langer een winkel met spullen maar de commerciele voorkant van... |
 | `mall-vraagbeeld.test.js` | 9 | -- | Het vraagbeeld: wat er gevraagd wordt en niet geleverd, en de lus naar de Kansenlaag van het stadsweefsel. Dit is het onderdeel met de grootste kans om verkeerd gebouwd te worden. |

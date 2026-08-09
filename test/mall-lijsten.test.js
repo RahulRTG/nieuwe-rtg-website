@@ -235,3 +235,42 @@ test('10. een aanvraag zonder vak of plaats wordt geweigerd, met de reden', asyn
   const teKort = await api('/api/mall/aanvraag', { wat: 'hm', verdieping: 'beauty', plek: 'Ibiza' }, lid);
   assert.equal(teKort.status, 400);
 });
+
+/* ---------------------------------------------------------------------------
+   3. De schermen. Niet de opmaak, maar de belofte: de knoppen die dit scherm
+      aanbiedt bestaan als route, en wat het scherm zegt klopt met wat de server
+      doet. Een scherm dat een route aanroept die niet bestaat is de stilste
+      vorm van stuk die er is.
+   --------------------------------------------------------------------------- */
+
+test('11. elke route die de nieuwe schermen aanroepen, bestaat ook echt', async () => {
+  const paden = new Set();
+  for (const f of ['mijnmall.js', 'mijnmall-aanvragen.js', 'leverancier-aanvragen.js']) {
+    const bron = fs.readFileSync(path.join(__dirname, '..', 'public', 'apps', f), 'utf8');
+    for (const m of bron.matchAll(/api\('(\/api\/[a-z0-9/_-]+)'/g)) paden.add(m[1]);
+  }
+  assert.ok(paden.size >= 8, 'de schermen roepen werkelijk routes aan (' + paden.size + ')');
+  for (const pad of paden) {
+    // zonder sessie hoort elke route te weigeren; 404 zou betekenen: bestaat niet
+    const r = await fetch(base + pad, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
+    assert.notEqual(r.status, 404, pad + ' bestaat als route');
+    assert.ok([400, 401, 403].includes(r.status), pad + ' is dicht zonder sessie (' + r.status + ')');
+  }
+});
+
+test('12. de schermen staan in de app-gids en de catalogus', () => {
+  /* Een scherm dat nergens vandaan te bereiken is, bestaat voor een lid niet.
+     De keuring eist een app-gids; dit houdt vast dat hij ook echt over DEZE
+     schermen gaat en niet over een lege plek. */
+  const gids = require('../server/kern/appgids');
+  for (const pad of ['/apps/mijnmall.html', '/apps/leverancier-aanvragen.html']) {
+    const g = gids.appgids ? gids.appgids(pad) : (gids.GIDS || {})[pad];
+    const gevonden = g || require('../server/kern/appgids-data/deel2')[pad];
+    assert.ok(gevonden, pad + ' heeft een app-gids');
+    assert.ok(gevonden.wat && gevonden.doe && gevonden.doe.length >= 2, pad + ' zegt wat het is en wat je er doet');
+  }
+  const { APPS } = require('../server/kern/appbieb');
+  const mijn = APPS.find(a => a.url === '/apps/mijnmall.html');
+  assert.ok(mijn, 'Mijn Mall staat in de App-Bibliotheek');
+  assert.ok(fs.existsSync(path.join(__dirname, '..', 'public', mijn.url)), 'en de pagina bestaat');
+});

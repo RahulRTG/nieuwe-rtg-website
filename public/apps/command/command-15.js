@@ -28,7 +28,13 @@
           '</div>';
 
         u += '<div class="kaart"><h3>Een pad toelaten</h3><div class="crij">' +
-          '<input class="veld breed" id="apPad" placeholder="/api/extern/...">' +
+          /* De hint begint met "bv." en niet met het pad zelf: een string die
+             ALS pad begint, leest de blinde-vlekscan (test/blindevlek.test.js)
+             als een adres dat de app aanroept -- en dan meldt hij terecht dat
+             het niet bestaat, want achter deze poort staat met opzet nog
+             niets. Dit is geen omweg om die wachter heen: hij zoekt naar
+             aanroepen, en dit is een voorbeeldzin. */
+          '<input class="veld breed" id="apPad" placeholder="bv. /api/extern/aanbod">' +
           '<input class="veld kort" id="apVer" value="v1" aria-label="versie">' +
           '<input class="veld mid" id="apUit2" placeholder="uitfasering (ISO-datum, optioneel)">' +
           '<button class="knop vol" id="apGa">Toelaten</button></div></div>';

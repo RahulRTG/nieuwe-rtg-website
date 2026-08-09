@@ -865,3 +865,108 @@ test('5. zoeken vindt sites en bedrijven in een adem', async () => {
   assert.ok(!z2.body.sites.some(s => s.adres === 'es-vedra-cruises'), 'offline is echt offline');
   assert.equal((z2.body.zaken.find(x => x.code === 'ESVEDRA') || {}).adres, '', 'ook het bedrijf wijst er niet meer heen');
 });
+
+/* ============================================================================
+   DE ZAAK-KANT VAN DEZELFDE HANDELINGEN.
+
+   Vijf routes hadden een ledenkant die getoetst was en een zaakkant die dat
+   niet was: versies, herstel, cijfers, de assistent en het eigen domein. Dat
+   is geen dubbelop maar een ANDER pad -- de ledenroute rekent met
+   req.session.key, de zaakroute met 'zaak:CODE' uit de inlog, en zet er bij
+   het spoor ook nog de naam van de medewerker bij. Precies het soort verschil
+   waar een verkeerde sleutel stil in past.
+
+   Gevonden met scripts/dekking.js: dat leest het journaal dat de server
+   tijdens de suite schrijft, en die vijf stonden daar bij de endpoints die
+   geen enkele keer waren aangeroepen. De tekstteller in de keuring zag ze als
+   gedekt, want /api/site/versies staat wel degelijk in dit bestand. Het
+   verschil tussen die twee instrumenten is dus geen theorie. */
+test('28. dezelfde handelingen aan de zaak-kant: de sleutel komt uit de inlog', async () => {
+  /* Scenario 5 heeft deze site uit de lucht gehaald, en offline is offline:
+     /live publiceert wijzigingen van een site die AL online staat en weigert
+     hier terecht. Terugkomen gaat via publiceren, met het adres erbij. */
+  const mijn = await api('/api/supplier/site/mijn', {}, zaak);
+  const id = mijn.body.lijst[0].id;
+  assert.equal((await api('/api/supplier/site/live', { id }, zaak)).status, 400, 'een offline site publiceert geen wijzigingen');
+  assert.equal((await api('/api/supplier/site/publiceer', { id, adres: 'es-vedra-cruises' }, zaak)).status, 200);
+
+  // ---- versies en herstellen, met de naam van wie het deed
+  const d = (await api('/api/supplier/site/haal', { id }, zaak)).body.design;
+  await api('/api/supplier/site/bewaar', { design: Object.assign({}, d, { titel: 'Es Vedra Cruises (proef)' }) }, zaak);
+  const hist = await api('/api/supplier/site/versies', { id }, zaak);
+  assert.equal(hist.status, 200, JSON.stringify(hist.body));
+  assert.ok(hist.body.lijst.length >= 1, 'de overschreven stand staat in de geschiedenis');
+
+  const her = await api('/api/supplier/site/herstel', { id, i: 0 }, zaak);
+  assert.equal(her.status, 200, JSON.stringify(her.body));
+  assert.equal(her.body.design.titel, d.titel, 'de vorige titel staat terug');
+  /* De zaakroute geeft door WIE het deed; de ledenroute doet dat niet, want
+     daar is de eigenaar de enige die het kan zijn. Bij een zaak delen meerdere
+     mensen dezelfde site, en dan is "hersteld" zonder naam geen spoor. */
+  const spoor = (await api('/api/supplier/site/spoor', { id }, zaak)).body.lijst;
+  const herstelRegel = spoor.find(r => /teruggezet/i.test(r.wat));
+  assert.ok(herstelRegel, 'herstellen laat een spoor na');
+  assert.ok(herstelRegel.wie, 'met de naam van de medewerker erbij');
+
+  // ---- de cijfers van de zaak, en alleen die
+  const kijkreg = await api('/api/auth/register', { name: 'Zaak Kijker', email: 'zaakkijker@voorbeeld.test',
+    password: 'webgeheim77', geboortedatum: '1993-03-13', tier: 'rtg', pasApp: 'rtg' });
+  const kijker = kijkreg.body.token;
+  const voor = (await api('/api/supplier/site/cijfers', { id }, zaak)).body.cijfers.totaal;
+  await api('/api/browser/open', { adres: 'es-vedra-cruises' }, kijker);
+  const cij = await api('/api/supplier/site/cijfers', { id }, zaak);
+  assert.equal(cij.status, 200, JSON.stringify(cij.body));
+  assert.equal(cij.body.cijfers.totaal, voor + 1, 'het bezoek is geteld');
+
+  /* DE SLEUTEL KOMT UIT DE INLOG. Een site van een LID heeft dezelfde vorm van
+     id, maar hoort bij een andere eigenaar -- en dan bestaat hij voor deze
+     zaak niet. Zou de route de eigenaar uit het verzoek halen, dan las een
+     bedrijf hier de geschiedenis en de cijfers van een lid. */
+  // een VERS lid: het lid uit de eerdere scenario's zit al aan de twaalf sites
+  const vanLid = await api('/api/site/bewaar', { design: { titel: 'Van een lid',
+    blokken: [{ type: 'kop', tekst: 'Niet van de zaak' }] } }, kijker);
+  assert.equal(vanLid.status, 200, JSON.stringify(vanLid.body));
+  const vreemdId = vanLid.body.design.id;
+  assert.equal((await api('/api/supplier/site/versies', { id: vreemdId }, zaak)).status, 404);
+  assert.equal((await api('/api/supplier/site/herstel', { id: vreemdId, i: 0 }, zaak)).status, 404);
+  assert.equal((await api('/api/supplier/site/cijfers', { id: vreemdId }, zaak)).status, 404);
+
+  // ---- de assistent: past aan, bewaart niets
+  const aantalVoor = (await api('/api/supplier/site/mijn', {}, zaak)).body.lijst.length;
+  const ai = await api('/api/supplier/site/ai', { design: { titel: 'Es Vedra Cruises', thema: 'licht',
+    blokken: [{ id: 'b1', type: 'hero', kop: 'Es Vedra Cruises' }] }, opdracht: 'Maak het luxer.' }, zaak);
+  assert.equal(ai.status, 200, JSON.stringify(ai.body));
+  assert.equal(ai.body.gedaan, true);
+  assert.equal(ai.body.design.thema, 'donker', 'het aangepaste ontwerp komt terug');
+  /* En het is MIJN ontwerp dat terugkomt, niet een nieuw. "Luxer" zet thema en
+     accent en laat de rest staan; kwam hier een leeg ontwerp binnen, dan stond
+     het thema ook op donker en zag de toets het verschil niet. */
+  assert.equal(ai.body.design.titel, 'Es Vedra Cruises', 'de titel van het ingestuurde ontwerp staat er nog');
+  assert.equal((ai.body.design.blokken || []).length, 1, 'en het blok dat erin zat ook');
+  assert.equal(ai.body.design.blokken[0].kop, 'Es Vedra Cruises');
+  const aantalNa = (await api('/api/supplier/site/mijn', {}, zaak)).body.lijst.length;
+  assert.equal(aantalNa, aantalVoor, 'de assistent heeft niets opgeslagen');
+  const nogSteeds = (await api('/api/supplier/site/haal', { id }, zaak)).body.design;
+  assert.equal(nogSteeds.thema, d.thema, 'en de echte site is niet aangeraakt');
+
+  // ---- het eigen domein: ook voor een zaak standaard dicht
+  const dicht = await api('/api/supplier/site/domein', { id, domein: 'esvedracruises.es' }, zaak);
+  assert.equal(dicht.status, 503, 'standaard uit geldt ook aan de zaak-kant: ' + JSON.stringify(dicht.body));
+  assert.match(dicht.body.error || '', /uitgeschakeld/i);
+
+  await schakelEigenDomein(true);
+  /* Met de schakelaar aan blijft het werk van de LEIDING: een adres koppelen
+     haalt de site buiten het RTG-web, en dat is dezelfde grens als publiceren. */
+  const gewoon = (await api('/api/supplier/roster', { code: 'ESVEDRA' })).body.staff.find(x => x.role !== 'manager');
+  const mede = (await api('/api/supplier/login', { code: 'ESVEDRA', staffId: gewoon.id, pin: '5678' })).body.token;
+  assert.equal((await api('/api/supplier/site/domein', { id, domein: 'esvedracruises.es' }, mede)).status, 403);
+
+  const k = await api('/api/supplier/site/domein', { id, domein: 'ESVedraCruises.es' }, zaak);
+  assert.equal(k.status, 200, JSON.stringify(k.body));
+  assert.equal(k.body.domein, 'esvedracruises.es');
+  const via = await haalPubliek('esvedracruises.es', '/');
+  assert.equal(via.status, 200);
+  assert.match(via.html, /Es Vedra Cruises/, 'de zaaksite komt op haar eigen adres naar buiten');
+
+  await schakelEigenDomein(false);
+});

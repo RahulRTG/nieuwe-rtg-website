@@ -111,3 +111,57 @@ test('de client verbergt kop en lijst zodra de server zegt dat er geen ranglijst
   assert.equal(aan.kop.hidden, false);
   assert.ok(/Zilveren Reiger/.test(aan.lijst.innerHTML), 'en de scores staan erin');
 });
+
+/* Aanwezigheid in de lobby. De server beslist WIE er in de stand staat; deze
+   pagina beslist hoe dat oogt, en daar zitten twee regels in die anders stil
+   wegvallen: bij nul vrienden staat er niets (een regel "0 vrienden zijn er
+   nu" is een por, geen bericht), en er komt nooit een tijd in beeld. */
+test('de lobby toont aanwezigheid zonder tijden, en zwijgt als er niemand is', async () => {
+  const bron = knip('let ONLINE = new Set();', 'async function laadLobby');
+  const maak = () => ({ hidden: false, innerHTML: '' });
+
+  async function draai(antwoord) {
+    const lijn = maak();
+    const laad = new Function('api', '$', 'esc', bron + '; return { laadOnline, geefOnline: () => ONLINE };')(
+      async () => antwoord, () => lijn, (x) => String(x));
+    await laad.laadOnline();
+    return { lijn, online: laad.geefOnline() };
+  }
+
+  const leeg = await draai({ online: [], aantal: 0, stand: 'nu' });
+  assert.equal(leeg.lijn.hidden, true, 'bij niemand hoort de regel weg te zijn');
+  assert.equal(leeg.lijn.innerHTML, '', 'en niet "0 vrienden"');
+
+  const een = await draai({ online: [{ codenaam: 'Zilveren Reiger', key: 'user-9' }], aantal: 1, stand: 'nu' });
+  assert.equal(een.lijn.hidden, false);
+  assert.match(een.lijn.innerHTML, /1 vriend is er nu/, 'enkelvoud bij een');
+  assert.ok(een.online.has('user-9'), 'de sleutel is onthouden, zodat de vriendenkiezer hem kan markeren');
+
+  const drie = await draai({ online: [{ key: 'a' }, { key: 'b' }, { key: 'c' }], aantal: 3, stand: 'nu' });
+  assert.match(drie.lijn.innerHTML, /3 vrienden zijn er nu/, 'meervoud bij meer');
+  assert.doesNotMatch(drie.lijn.innerHTML, /geleden|minuut|minuten|uur|sinds/,
+    'er hoort geen tijd of "laatst gezien" in beeld te komen');
+
+  /* Mislukt de vraag, dan blijft de vorige stand staan. Anders zou een
+     hikje in het netwerk "iedereen is weg" tonen. */
+  const lijn = maak();
+  const laad = new Function('api', '$', 'esc',
+    bron + '; return { laadOnline, zet: (s) => { ONLINE = s; }, geefOnline: () => ONLINE };')(
+    async () => { throw new Error('netwerk'); }, () => lijn, (x) => String(x));
+  laad.zet(new Set(['user-9']));
+  await laad.laadOnline();
+  assert.ok(laad.geefOnline().has('user-9'), 'een mislukte vraag hoort de stand niet leeg te maken');
+});
+
+/* De toets hierboven geeft `laadOnline` een nagemaakte `$`, dus een id dat in
+   de pagina niet bestaat zou hij niet zien -- de functie zou pas in de browser
+   klappen op `lijn.hidden`. Daarom apart: elk id dat deze functies opzoeken
+   moet ook echt in de HTML staan. */
+test('de ids die de lobby opzoekt bestaan ook in de pagina', () => {
+  const bron = knip('let ONLINE = new Set();', 'async function laadLobby') +
+    knip('async function tekenVrienden', '$(\'#nStart\').addEventListener');
+  const ids = [...new Set([...bron.matchAll(/\$\('#([A-Za-z0-9_-]+)'\)/g)].map(m => m[1]))];
+  assert.ok(ids.includes('onlineLijn'), 'de aanwezigheidsregel hoort opgezocht te worden');
+  for (const id of ids)
+    assert.ok(new RegExp('id="' + id + '"').test(html), 'de pagina mist een element met id="' + id + '"');
+});

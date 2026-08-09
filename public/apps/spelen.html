@@ -25,6 +25,12 @@
   .rij .nm{flex:1;min-width:0;font-size:.9rem;font-weight:600;}
   .rij .nm small{display:block;font-weight:400;color:var(--zacht);font-size:.72rem;}
   .beurtstip{width:9px;height:9px;border-radius:50%;background:var(--groen);box-shadow:0 0 8px rgba(95,165,106,.8);}
+  /* Aanwezigheid: dezelfde stip als de beurt, kleiner en zonder gloed. Geen
+     eigen visueel trucje erbij -- er is er al een voor "hier moet je kijken",
+     en die betekenis lenen we. Niets knippert: aanwezig is een feit, geen
+     aansporing. */
+  .onlinestip{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--groen);margin-right:.4rem;vertical-align:middle;}
+  .onlinelijn{color:var(--zacht);font-size:.8rem;margin:.2rem 0 0;}
   .blok{padding:1rem;margin-bottom:.8rem;}
   .keuzerij{display:flex;gap:.5rem;flex-wrap:wrap;margin:.5rem 0;}
   .chip{background:var(--paneel2);border:2px solid var(--lijn);color:var(--txt);border-radius:999px;padding:.35rem .8rem;font-size:.85rem;cursor:pointer;}
@@ -119,6 +125,7 @@
       <div class="kaart spelkaart" data-spel="vlek"><div class="ic"></div><h2>Vingerroulette</h2></div>
     </div>
     <div id="uitnodigingen"></div>
+    <div class="onlinelijn" id="onlineLijn" hidden></div>
     <div class="sec">Jouw potjes</div>
     <div id="potjes"><div class="leeg">Nog geen potjes. Kies hierboven een spel.</div></div>
   </section>
@@ -315,8 +322,27 @@ document.querySelectorAll('[data-terug]').forEach(a => a.addEventListener('click
 const SPELNAAM = { mejn:'Mens erger je niet', schaak:'Schaken', woord:'Woordduel', pesten:'Pesten',
   dam:'Dammen', rummi:'Rummi', magnaat:'Magnaat', seconden:'30 Seconden', waarheid:'Doen of Waarheid', proost:'Proost (18+)' };
 const MAXG = { mejn:4, pesten:4, rummi:4, magnaat:6, waarheid:6, proost:6 };
+/* ---------- wie er nu is ----------
+   De server beslist wie hierin staat (eigen vrienden, geblokkeerd eruit, en
+   wie "spelen" heeft uitgezet telt als offline). Deze pagina toont het alleen.
+   Bewust geen tijden en geen "laatst gezien": aanwezig is aan of niet aan, en
+   een lege lijst zeggen we gewoon niet -- "niemand is er" is geen bericht dat
+   iemand nodig heeft. Mislukt de vraag, dan blijft de vorige stand staan in
+   plaats van dat er valselijk "niemand" komt te staan. */
+let ONLINE = new Set();
+async function laadOnline(){
+  let d; try{ d = await api('online'); }catch(e){ return; }
+  ONLINE = new Set((d.online||[]).map(o => o.key));
+  const n = d.aantal || 0;
+  const lijn = $('#onlineLijn');
+  lijn.hidden = n === 0;
+  lijn.innerHTML = n === 0 ? ''
+    : '<span class="onlinestip"></span>' + n + (n === 1 ? ' vriend is er nu' : ' vrienden zijn er nu');
+}
+
 async function laadLobby(){
   let d; try{ d = await api('mijn'); }catch(e){ return; }
+  laadOnline();
   const u = d.uitnodigingen||[];
   $('#uitnodigingen').innerHTML = u.length ? '<div class="sec">Uitnodigingen</div>' + u.map(x =>
     '<div class="rij"><div class="nm">'+esc(x.naam)+(x.modus==='teams'?' · 2 tegen 2':'')+'<small>van '+esc(x.van)+' · met '+x.spelers.map(esc).join(', ')+'</small></div>'+
@@ -364,7 +390,15 @@ function tekenTalen(){
 async function tekenVrienden(){
   const max = MAXG[nSpel] ? nGrootte-1 : 1;
   let vr = []; try{ vr = await vriendenLijst(); }catch(e){}
-  $('#nVrienden').innerHTML = vr.length ? vr.map(v => '<button type="button" class="chip'+(nGekozen.includes(v.key)?' aan':'')+'" data-k="'+esc(v.key)+'">'+esc(v.codename)+'</button>').join('')
+  await laadOnline();
+  /* Wie er nu is komt bovenaan, met een stip. Verder verandert er niets: wie
+     offline is blijft gewoon te kiezen -- een uitnodiging mag blijven staan
+     tot iemand hem opent, en dat is precies waarom een potje op uitnodiging
+     bestaat naast de random wachtrij. De volgorde is een hulp, geen poort. */
+  const gesorteerd = vr.slice().sort((x, y) => (ONLINE.has(y.key) ? 1 : 0) - (ONLINE.has(x.key) ? 1 : 0));
+  $('#nVrienden').innerHTML = gesorteerd.length ? gesorteerd.map(v =>
+      '<button type="button" class="chip'+(nGekozen.includes(v.key)?' aan':'')+'" data-k="'+esc(v.key)+'">'+
+      (ONLINE.has(v.key) ? '<span class="onlinestip"></span>' : '')+esc(v.codename)+'</button>').join('')
     : '<span class="leeg">Nog geen vrienden; speel random of voeg eerst vrienden toe.</span>';
   $('#nVrienden').querySelectorAll('[data-k]').forEach(b => b.addEventListener('click', ()=>{
     const k = b.dataset.k;

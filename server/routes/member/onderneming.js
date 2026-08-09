@@ -16,9 +16,20 @@ module.exports = (kern) => {
   const { app, auth, save, ONDERNEMING_RECHTSVORMEN, ondernemingVind, ondernemingVanEigenaar,
     ondernemingBeeld, ondernemingNieuw, ondernemingRechtsvorm, ondernemingKoppel,
     ondernemingIngeschreven, ondernemingIntakeZet, ondernemingIntakeBeeld,
-    ondernemingVerkenning, ondernemingPlanVastleggen, ondernemingDagbeeld } = kern;
+    ondernemingVerkenning, ondernemingPlanVastleggen, ondernemingDagbeeld,
+    ondernemingOprichting, ondernemingOprichtingZet, ondernemingAanvraag,
+    ondernemingAanvraagStand } = kern;
 
-  const stuur = (res, r) => res.status(r && r.status ? r.status : 200).json(r);
+  /* `status` betekent in dit huis de HTTP-code, maar een kernmodule kan een
+     domeinstand in datzelfde veld zetten ('geen-aanvraag'). Dat gebeurde hier
+     twee keer, en beide keren viel een verder volstrekt correct verzoek om met
+     een 500: res.status() weigert een niet-numerieke code. Alleen een echte
+     code telt dus als code; al het andere reist gewoon mee in het lichaam.
+     De veldnamen zijn daarnaast uit elkaar gehaald (de kern geeft `stand`),
+     maar dit is de grendel: hij maakt de hele klasse fouten onmogelijk in
+     plaats van hem per aanroep te repareren. */
+  const httpCode = (v) => (Number.isInteger(v) && v >= 100 && v <= 599 ? v : 200);
+  const stuur = (res, r) => res.status(httpCode(r && r.status)).json(r);
 
   /* De onderneming van deze aanvrager, of een fout. Bewust één 404 voor
      "bestaat niet" en "niet van jou": het verschil zou verklappen welke id's
@@ -81,6 +92,37 @@ module.exports = (kern) => {
     const o = mijn(req);
     if (!o) return stuur(res, nietGevonden);
     stuur(res, ondernemingDagbeeld(o));
+  });
+
+  /* ---- het oprichtingsproject ---- */
+
+  app.post('/api/onderneming/oprichting', auth, (req, res) => {
+    const o = mijn(req);
+    if (!o) return stuur(res, nietGevonden);
+    stuur(res, ondernemingOprichting(o));
+  });
+
+  app.post('/api/onderneming/oprichting/zet', auth, (req, res) => {
+    const o = mijn(req);
+    if (!o) return stuur(res, nietGevonden);
+    stuur(res, ondernemingOprichtingZet(o, String((req.body || {}).stap || ''), (req.body || {}).klaar));
+  });
+
+  /* ---- de zaak aanvragen ----
+     Loopt langs de bestaande aanmeldingsstroom: RTG-personeel beslist, wij
+     kennen niets toe. Het account-id komt uit de GEVERIFIEERDE sessie en nooit
+     uit het lichaam -- anders koppelde je andermans account aan je aanvraag. */
+  app.post('/api/onderneming/aanvraag', auth, (req, res) => {
+    const o = mijn(req);
+    if (!o) return stuur(res, nietGevonden);
+    const accountId = (req.session.account && req.session.account.id) || null;
+    stuur(res, ondernemingAanvraag(o, accountId, req.body || {}));
+  });
+
+  app.post('/api/onderneming/aanvraag/stand', auth, (req, res) => {
+    const o = mijn(req);
+    if (!o) return stuur(res, nietGevonden);
+    stuur(res, ondernemingAanvraagStand(o));
   });
 
   /* ---- de verkenning: intake -> kans -> simulatie -> stress -> plan ---- */

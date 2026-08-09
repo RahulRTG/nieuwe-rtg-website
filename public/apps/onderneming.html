@@ -120,7 +120,7 @@ function meld(t){const m=$('#melding');if(!m)return;m.textContent=t;m.style.opac
    schrijven we naar de chrome alleen als hij er nog staat. */
 function zetTitel(t){const el=$('#titel');if(el)el.textContent=t;document.title=t+' \u00b7 RTG';}
 
-let ONDS=[], HUIDIG=null, DAG=null, VERK=null, INTAKE=null;
+let ONDS=[], HUIDIG=null, DAG=null, VERK=null, INTAKE=null, RECHTSVORMEN=null, AANVRAAG=null;
 const euro=n=>'€'+Number(n||0).toLocaleString('nl-NL');
 
 function vulKiezer(){
@@ -154,7 +154,7 @@ function toonLeeg(){
 function teken(){
   const o=ONDS.find(x=>x.id===HUIDIG)||{};
   zetTitel(DAG.naam||'Mijn onderneming');
-  $('#hoofd').innerHTML=[vakGroet(),vakGezond(),vakActies(),vakIntake(),vakKans(),vakSimulatie(),vakStress(),vakPlan(o)].join('');
+  $('#hoofd').innerHTML=[vakGroet(),vakGezond(),vakActies(),vakIntake(),vakKans(),vakSimulatie(),vakStress(),vakPlan(o),vakRechtsvorm(o),vakOprichting(),vakZaak(o)].join('');
   haakKnoppen();
 }
 
@@ -292,10 +292,80 @@ function vakPlan(o){
   return '<div class="vak"><h2>Ondernemingsplan</h2>'+body+knop+'</div>';
 }
 
+
+function vakRechtsvorm(o){
+  const huidig=(o.rechtsvorm&&o.rechtsvorm.id)||'';
+  const opts=(RECHTSVORMEN||[]).map(r=>'<option value="'+esc(r.id)+'"'+(r.id===huidig?' selected':'')+'>'+esc(r.label)+'</option>').join('');
+  const uitleg=o.rechtsvorm?'<p class="subtxt" style="margin-top:.6rem;">'+esc(o.rechtsvorm.aansprakelijk)+'</p>':
+    '<p class="stil" style="margin-top:.6rem;">Zolang u niets kiest, kunnen we niet zeggen wat u moet regelen: de helft daarvan hangt hiervan af.</p>';
+  const gew=(o.geweerd||[]).map(g=>'<div class="bron niet"><span>'+esc(g.cap)+'</span><span class="bu">'+esc(g.reden)+'</span></div>').join('');
+  return '<div class="vak"><h2>Rechtsvorm</h2>'+
+    '<div class="rij"><label class="veld" style="flex:1 1 14rem;">Wat wordt het'+
+    '<select id="rvKies"><option value="">kies...</option>'+opts+'</select></label></div>'+uitleg+
+    (gew?'<div style="margin-top:.8rem;"><p class="subtxt" style="margin-bottom:.3rem;">Wat deze rechtsvorm niet toestaat:</p>'+gew+'</div>':'')+
+    '</div>';
+}
+
+function vakOprichting(){
+  const p=DAG&&DAG.oprichting;
+  if(!p) return '';
+  if(p.stand==='geen-rechtsvorm'){
+    return '<div class="vak"><h2>Wat u moet regelen</h2><p class="groot" style="font-size:1.05rem;">'+esc(p.vraag)+'</p>'+
+      '<p class="subtxt" style="margin-top:.4rem;">'+esc(p.uitleg)+'</p></div>';
+  }
+  const perBron={rechtsvorm:'Uit uw rechtsvorm',branche:'Uit uw branche',situatie:'Uit uw plan'};
+  const groepen=['rechtsvorm','branche','situatie'].map(b=>{
+    const rij=(p.stappen||[]).filter(s=>s.bron===b);
+    if(!rij.length) return '';
+    return '<p class="subtxt" style="margin:.9rem 0 .2rem;"><strong>'+esc(perBron[b])+'</strong></p>'+
+      rij.map(s=>'<div class="actie" style="padding:.5rem 0;"><label style="display:flex;gap:.6rem;align-items:flex-start;cursor:pointer;">'+
+        '<input type="checkbox" class="oprVink" data-stap="'+esc(s.id)+'"'+(s.klaar?' checked':'')+'>'+
+        '<span><span class="kop">'+esc(s.stap)+'</span><span class="waarom" style="display:block;">'+esc(s.waarom)+'</span></span></label></div>').join('');
+  }).join('');
+  return '<div class="vak"><h2>Wat u moet regelen</h2>'+
+    '<p class="subtxt">'+p.gedaan+' van de '+p.totaal+' gedaan.</p>'+groepen+
+    '<p class="subtxt" style="margin-top:1rem;">'+esc(p.voorbehoud)+'</p></div>';
+}
+
+function vakZaak(o){
+  if(o.zaak) return '<div class="vak"><h2>Uw zaak</h2><p class="subtxt">Gekoppeld: <strong>'+esc(o.zaak.code)+'</strong>. Vanaf hier draait uw onderneming op de gewone zaak-apps.</p></div>';
+  if(!o.kvk) return '<div class="vak"><h2>Uw zaak</h2><p class="stil">Zodra u bent ingeschreven, kunt u hier uw zaak aanvragen.</p></div>';
+  const loopt=AANVRAAG&&AANVRAAG.stand&&AANVRAAG.stand!=='geen-aanvraag';
+  if(loopt){
+    return '<div class="vak"><h2>Uw zaak</h2><p class="subtxt">Stand van uw aanvraag: <strong>'+esc(AANVRAAG.stand)+'</strong>. '+
+      'Een medewerker van RTG beoordeelt hem; wij kennen zelf geen toegang toe.</p>'+
+      '<div class="rij" style="margin-top:.8rem;"><button class="knop" id="standKnop">Kijk of mijn zaak klaarstaat</button></div></div>';
+  }
+  return '<div class="vak"><h2>Uw zaak</h2>'+
+    '<p class="subtxt">Met een zaak kunt u verkopen, factureren en in de Mall staan. De aanvraag gaat naar RTG; een mens beslist erover.</p>'+
+    '<div class="raster" style="margin-top:.8rem;">'+
+    '<label class="veld">Uw naam<input id="aanvNaam"></label>'+
+    '<label class="veld">Contact (e-mail of telefoon)<input id="aanvContact"></label>'+
+    '</div><div class="rij" style="margin-top:.8rem;"><button class="knop prim" id="aanvKnop">Vraag mijn zaak aan</button></div></div>';
+}
+
 /* ---------- handelingen ---------- */
 function haakKnoppen(){
   const b=$('#bewaarKnop'); if(b) b.addEventListener('click',bewaar);
   const p=$('#planKnop'); if(p) p.addEventListener('click',legVast);
+  const rv=$('#rvKies'); if(rv) rv.addEventListener('change',async e=>{
+    if(!e.target.value) return;
+    try{ await api('rechtsvorm',{id:HUIDIG,rechtsvorm:e.target.value}); meld('Rechtsvorm gezet.'); await herlaad(); }
+    catch(err){ meld(err.message); }});
+  document.querySelectorAll('.oprVink').forEach(el=>el.addEventListener('change',async e=>{
+    try{ await api('oprichting/zet',{id:HUIDIG,stap:e.target.dataset.stap,klaar:e.target.checked}); await herlaad(); }
+    catch(err){ meld(err.message); e.target.checked=!e.target.checked; }}));
+  const av=$('#aanvKnop'); if(av) av.addEventListener('click',async()=>{
+    const naam=($('#aanvNaam')||{}).value||'';
+    if(!naam.trim()){meld('Vul uw naam in.');return;}
+    try{ await api('aanvraag',{id:HUIDIG,naam,contact:($('#aanvContact')||{}).value||''});
+      meld('Aanvraag ingediend. Een mens beoordeelt hem.'); await herlaad(); }
+    catch(err){ meld(err.message); }});
+  const st=$('#standKnop'); if(st) st.addEventListener('click',async()=>{
+    try{ const r=await api('aanvraag/stand',{id:HUIDIG});
+      meld(r.stand==='gekoppeld'?'Uw zaak staat klaar en is gekoppeld.':'Stand: '+r.stand);
+      await herlaad(); }
+    catch(err){ meld(err.message); }});
 }
 
 const NUM=['prijs','kostprijs','verwachtPerMaand','vasteLasten'];
@@ -308,10 +378,8 @@ async function bewaar(){
   for(const k of TXT){const el=$('#f_'+k); if(el) idee[k]=el.value;}
   for(const k of PNUM){const el=$('#f_'+k); if(el&&el.value!=='') persoon[k]=Number(el.value);}
   try{
-    const d=await api('intake',{id:HUIDIG,idee,persoon});
-    INTAKE=d.intake;
-    const [dag,verk]=await Promise.all([api('dagbeeld',{id:HUIDIG}),api('verkenning',{id:HUIDIG})]);
-    DAG=dag;VERK=verk;teken();
+    await api('intake',{id:HUIDIG,idee,persoon});
+    await herlaad();
     meld('Doorgerekend.');
   }catch(e){meld(e.message);}
 }
@@ -333,8 +401,16 @@ async function legVast(){
 }
 
 async function herlaad(){
-  const [dag,verk,intake]=await Promise.all([api('dagbeeld',{id:HUIDIG}),api('verkenning',{id:HUIDIG}),api('intake',{id:HUIDIG})]);
-  DAG=dag;VERK=verk;INTAKE=intake.intake;teken();
+  const [dag,verk,intake,stand]=await Promise.all([api('dagbeeld',{id:HUIDIG}),api('verkenning',{id:HUIDIG}),
+    api('intake',{id:HUIDIG}),api('aanvraag/stand',{id:HUIDIG})]);
+  DAG=dag;VERK=verk;INTAKE=intake.intake;AANVRAAG=stand;
+  if(!RECHTSVORMEN){
+    try{ RECHTSVORMEN=(await (await fetch('/api/onderneming/rechtsvormen')).json()).rechtsvormen; }
+    catch(e){ RECHTSVORMEN=[]; }
+  }
+  // de lijst met ondernemingen draagt de naam in de kiezer; die kan net gewijzigd zijn
+  try{ ONDS=(await api('mijn')).ondernemingen||ONDS; }catch(e){}
+  teken();
 }
 
 const kz=$('#kiezer');

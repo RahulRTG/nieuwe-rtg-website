@@ -135,6 +135,56 @@ test('cijfers invullen levert de scenario-tabel en het oordeel van de stress tes
   } finally { await t.op(); }
 });
 
+test('de hele weg: rechtsvorm kiezen, de lijst zien, afvinken en de zaak aanvragen',
+  { skip }, async () => {
+  const t = await open();
+  try {
+    await t.page.waitForSelector('#nieuwKnop', { timeout: 15000 });
+    await t.page.fill('#nieuwNaam', 'Glasheldere Ramen');
+    await t.page.click('#nieuwKnop');
+    await t.page.waitForSelector('#bewaarKnop', { timeout: 15000 });
+
+    // zonder rechtsvorm staat er geen lijst maar een vraag
+    assert.ok((await t.page.textContent('#hoofd')).includes('Welke rechtsvorm wordt het'),
+      'de helft van de stappen hangt van die keuze af, dus komt er geen halve lijst');
+
+    await vul(t.page, GOED);
+    await t.page.click('#bewaarKnop');
+    await t.page.waitForSelector('table.mnd', { timeout: 15000 });
+
+    await t.page.selectOption('#rvKies', 'eenmanszaak');
+    await t.page.waitForSelector('.oprVink', { timeout: 15000 });
+    const stappen = await t.page.$$eval('.oprVink', els => els.length);
+    assert.ok(stappen > 3, 'de lijst staat er nu wel, met stappen uit drie bronnen');
+
+    const tekst = await t.page.textContent('#hoofd');
+    assert.ok(tekst.includes('geen juridisch volledige checklist'),
+      'en zegt zelf dat hij niet volledig is');
+
+    await t.page.click('.oprVink');
+    await t.page.waitForFunction(() => document.querySelector('#hoofd').textContent.includes('1 van de'),
+      null, { timeout: 15000 });
+
+    // het plan vastleggen en inschrijven, dan pas kan de zaak worden aangevraagd
+    await t.page.click('#planKnop');
+    await t.page.waitForTimeout(1500);
+    await post(t.base, '/api/onderneming/ingeschreven', { id: (await post(t.base, '/api/onderneming/mijn', {}, t.token)).ondernemingen[0].id, kvk: '12345678' }, t.token);
+    await t.page.reload({ waitUntil: 'domcontentloaded' });
+    await t.page.waitForSelector('#aanvKnop', { timeout: 15000 });
+
+    await t.page.fill('#aanvNaam', 'Aisha');
+    await t.page.fill('#aanvContact', 'aisha@example.com');
+    await t.page.click('#aanvKnop');
+    await t.page.waitForFunction(() => document.querySelector('#hoofd').textContent.includes('Stand van uw aanvraag'),
+      null, { timeout: 15000 });
+
+    // en de kern van de zaak: er is GEEN supplier aangemaakt
+    const ond = (await post(t.base, '/api/onderneming/mijn', {}, t.token)).ondernemingen[0];
+    assert.equal(ond.zaak, null, 'de aanvraag ligt bij een mens; er is niets zelf aangemaakt');
+    assert.deepEqual(t.fouten, []);
+  } finally { await t.op(); }
+});
+
 /* DE BELANGRIJKSTE. Een frontend die de 409 negeert en gewoon nog een keer
    verstuurt, zou dit advies stilzwijgend wegpoetsen. */
 test('een afgeraden plan wordt niet stilzwijgend vastgelegd', { skip }, async () => {

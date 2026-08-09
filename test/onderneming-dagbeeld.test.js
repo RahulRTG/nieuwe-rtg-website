@@ -132,8 +132,19 @@ test('de vervolgacties volgen de werkelijke staat', () => {
   assert.ok(K.ondernemingDagbeeld(o).acties.some(a => a.id === 'inschrijven'),
     'met een vastgelegd plan en zonder KvK komt de inschrijving op');
   K.ondernemingIngeschreven(o, '12345678');
-  assert.ok(K.ondernemingDagbeeld(o).acties.some(a => a.id === 'koppel-zaak'),
-    'en daarna het koppelen van de zaak');
+  assert.ok(K.ondernemingDagbeeld(o).acties.some(a => a.id === 'vraag-zaak-aan'),
+    'en daarna het aanvragen van de zaak');
+});
+
+test('het oprichtingsproject komt op zodra er een rechtsvorm is om het op te bouwen', () => {
+  const K = stubKern();
+  const o = maakOnd(K, GEZOND);
+  assert.ok(!K.ondernemingDagbeeld(o).acties.some(a => a.id === 'oprichtingsproject'),
+    'zonder rechtsvorm valt er geen lijst te maken');
+  K.ondernemingRechtsvorm(o, 'bv');
+  const d = K.ondernemingDagbeeld(o);
+  assert.ok(d.acties.some(a => a.id === 'oprichtingsproject'), 'met een rechtsvorm wel');
+  assert.ok(d.oprichting.totaal > 0, 'en het project hangt aan het dagbeeld');
 });
 
 /* ---------------- met een draaiende zaak ---------------- */

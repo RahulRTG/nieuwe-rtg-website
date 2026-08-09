@@ -32,7 +32,7 @@
 const RV = require('./rechtsvorm');
 const FASE = require('./fase');
 
-module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boekingenVanZaak }) => {
+module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boekingenVanZaak, aanmeldingen }) => {
 
   /* De verkenningslaag: intake -> kansverkenning -> simulatie -> stress test ->
      ondernemingsplan. Vier modules die op elkaar leunen in precies die
@@ -44,6 +44,7 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boeki
   const plan = require('./plan')({ intakeOntbreekt: intake.intakeOntbreekt, save });
   const dag = require('./dagbeeld')({ db, boekingenVanZaak, ordersVanZaak,
     intakeOntbreekt: intake.intakeOntbreekt });
+  const opr = require('./oprichting')({ save });
 
   const bak = () => {
     if (!Array.isArray(db.data.ondernemingen)) db.data.ondernemingen = [];
@@ -124,6 +125,14 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boeki
     return { ok: true, onderneming: ondernemingBeeld(o) };
   }
 
+  /* De overgang naar een echte zaak staat in ./aanvraag.js -- dit bestand ging
+     over de 10 kB van het modulebeleid. Hij loopt langs de BESTAANDE
+     aanmeldingsstroom, zodat er geen tweede deur ontstaat naast de deur waar
+     een mens voor staat. */
+  const { ondernemingAanvraag, ondernemingAanvraagStand } = require('./aanvraag')({
+    save, scho, aanmeldingen, oprichtingsproject: opr.oprichtingsproject,
+    ondernemingNaam, ondernemingKoppel });
+
   /* ---- de verkenning in één keer ----
      De vier stappen leunen op elkaar (de stress test kan niets zonder de
      simulatie, het plan niets zonder allebei), en dat is precies waarom ze hier
@@ -170,7 +179,12 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boeki
     /* Het dagbeeld krijgt de verkenning MEE en draait hem niet zelf: de route
        heeft hem toch al, en twee keer rekenen kan twee antwoorden geven op
        dezelfde vraag. */
-    ondernemingDagbeeld: (o) => dag.dagbeeld(o, ondernemingBeeld(o), ondernemingVerkenning(o))
+    ondernemingDagbeeld: (o) => dag.dagbeeld(o, ondernemingBeeld(o), ondernemingVerkenning(o),
+      opr.oprichtingsproject(o)),
+    ondernemingOprichting: opr.oprichtingsproject,
+    ondernemingOprichtingZet: opr.oprichtingZet,
+    ondernemingAanvraag,
+    ondernemingAanvraagStand
   };
 };
 

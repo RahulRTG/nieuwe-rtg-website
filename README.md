@@ -1265,6 +1265,50 @@ omzet van nul tonen in plaats van niets, de acties niet meer op gewicht zetten,
 de schil de 409 laten wegpoetsen door meteen `tochDoorzetten` mee te sturen, en
 de schil ook de niet-gemeten cijfers laten tekenen.
 
+### Het oprichtingsproject en de zaak: de reis afgemaakt
+
+`server/kern/onderneming/{oprichting,aanvraag}.js` +
+`/api/onderneming/{oprichting,oprichting/zet,aanvraag,aanvraag/stand}`. Het laatste
+stuk: van een vastgelegd plan naar een zaak die draait.
+
+**Zonder rechtsvorm geen lijst.** De oprichtingsstappen komen uit drie bronnen --
+de rechtsvorm (gelezen uit `rechtsvorm.js`, niet overgetypt), de branche
+(een restaurant heeft een alcoholvergunning nodig, een rijschool een
+instructeurspas) en de situatie (samen ondernemen vraagt afspraken op papier,
+geen startkapitaal vraagt een buffer). Omdat de helft van die stappen van de
+rechtsvorm afhangt, geeft het project zonder die keuze géén halve lijst maar de
+vraag: een lijst die compleet lijkt en het niet is, laat iemand langs de notaris
+fietsen. En de lijst zegt zelf dat hij niet juridisch volledig is -- wie een
+lijst afvinkt die zich compleet voordoet, controleert daarna niets meer.
+
+**Er is geen tweede deur naar een zaak.** Een zaak aanmaken betekent partner
+worden, en dat besluit is mensenwerk ("er is geen automatische toekenning",
+`kern/aanmeldingen.js`). Het Ondernemers-OS maakt daarom **geen supplier** maar
+een gewone aanmelding, precies zoals het aanmeldformulier -- alleen al ingevuld
+met wat de intake weet. Zou het OS zelf provisioneren, dan stond er een deur
+naast de deur waar een mens voor staat, en dat is de deur die niemand meer
+bewaakt. De nog openstaande oprichtingsstappen gaan mee als `behoeften`, zodat de
+bestaande provisioning ze omzet in de wensenlijst van de nieuwe zaak: wat hier
+nog te doen stond, staat straks als startlijstje in de zaak zelf.
+
+**Een fout die twee keer moest afgaan voordat hij goed gerepareerd was.** Beide
+modules gaven een domeinstand terug in een veld `status` -- en `status` betekent
+in elke route van dit huis de HTTP-code. `res.status('geen-rechtsvorm')` gooit,
+dus een volstrekt correct verzoek viel om met een 500. De eerste reparatie
+hernoemde het veld in één bestand; toen ging dezelfde fout af in het tweede. Dat
+was symptoombestrijding (regel 1). De echte reparatie is nu tweeledig: de
+kernmodules geven `stand`, én `stuur()` in de route leest alleen een écht
+geheel getal tussen 100 en 599 als HTTP-code. Dat tweede maakt de hele klasse
+onmogelijk in plaats van hem per aanroep te repareren. Die guard heeft zelf geen
+eigen toets, want er is nu geen aanroeper meer die hem kan bereiken -- hij staat
+hier genoemd zodat dat bekend is en geen belofte in tekst blijft.
+
+Getoetst in `test/onderneming-oprichting.test.js` (14) en in de schermronde. Vier
+mutaties, alle vier raak: zonder rechtsvorm tóch een lijst geven, een verzonnen
+stap aannemen, het OS zelf een zaak laten aanmaken, en de aanvraag zonder
+vastgelegd plan toelaten. De twee 500's hierboven zijn niet met een mutatie
+gevonden maar in een echte ronde -- dat is sterker bewijs, geen zwakker.
+
 ### RTG Werk OS (de werkplek van een organisatie)
 
 `server/bedrijf/` + `/api/bedrijf/...` + `/apps/werk.html`. Een **werkruimte**

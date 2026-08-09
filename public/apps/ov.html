@@ -131,7 +131,7 @@
         <select id="velVan"><option value="hier">Huidige locatie</option></select>
         <label for="velZoek">Bestemming</label>
         <input id="velZoek" type="search" placeholder="Zoek een zaak, hotel of halte" autocomplete="off">
-        <select id="velNaar" style="margin-top:0.4rem;"><option value="">Kies een plek</option></select>
+        <select id="velNaar" aria-label="Kies een plek uit de zoekresultaten" style="margin-top:0.4rem;"><option value="">Kies een plek</option></select>
         <p class="stil" id="velMeer"></p>
         <div class="duo">
           <div><label for="velReizigers">Reizigers</label><input id="velReizigers" type="number" min="1" max="60" value="1"></div>
@@ -143,7 +143,7 @@
         <label for="velZakOrg">Op rekening van (code van uw werkgever)</label>
         <div class="duo">
           <input id="velZakOrg" type="text" placeholder="Laat leeg voor prive" autocomplete="off">
-          <input id="velKostenplaats" type="text" placeholder="Kostenplaats" autocomplete="off">
+          <input id="velKostenplaats" type="text" aria-label="Kostenplaats" placeholder="Kostenplaats" autocomplete="off">
         </div>
         <div id="beleidKaart" class="weg" style="margin-top:0.6rem;border-top:1px solid var(--line);padding-top:0.6rem;">
           <p class="stil" id="beleidUit"></p>

@@ -77,6 +77,11 @@ module.exports = function bouwKernAanTwee(kern, grens) {
   require('../routes/code')(grens('code'));
   // RTG Veilig: Thuiswacht, Codewoord, Vitale check-in en Thuisrust.
   require('../routes/veiligheid')(grens('veiligheid'));
+  /* De doelenmotor (kern/doelen.js): waar u begon, waar u heen wilt, wanneer
+     en waarom. De mijlpalen worden afgeleid en niet bewaard, zodat een gemiste
+     week geen mislukking is maar gewoon een ander pad. */
+  Object.assign(kern, require('../kern/doelen')({ db, save, crypto, schoon }));
+  require('../routes/doelen')(grens('doelen'));
   /* Het toegankelijkheidsprofiel (kern/toegankelijk.js): hoe het scherm zich
      hoort te gedragen. Hangt aan het ik-domein, want het is een instelling van
      het lid over zichzelf; shared/basis.js voert hem uit op elke pagina. */

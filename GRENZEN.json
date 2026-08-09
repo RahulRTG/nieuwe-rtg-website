@@ -140,6 +140,13 @@
       "resolveSession",
       "sessionFor"
     ],
+    "doelen": [
+      "doelMaak",
+      "doelMeet",
+      "doelStop",
+      "doelVerzet",
+      "doelenVan"
+    ],
     "doos": [
       "afdelingen",
       "beveilig",

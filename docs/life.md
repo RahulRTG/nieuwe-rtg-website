@@ -37,6 +37,7 @@ klinkt.
 | Sport | `public/apps/sport.html`, `sportclub.html`, `server/kern/clubs.js` | activiteiten, clubs, lessen, banen |
 | Gezin | `public/apps/foundation/gezondheid.html`, `gevoel.html`, `rust.html` | gezinsgezondheidsboekje, hoe voel je je, even rust |
 | Toegankelijkheidsprofiel | `server/kern/toegankelijk.js`, `public/shared/toegankelijk.js`, kop van `shared/basis.js` | tekstgrootte, contrast, beweging en onderstreepte links, op elke pagina die `shared/basis.js` laadt |
+| Doelenmotor | `server/kern/doelen.js`, `public/apps/doelen.html` | beginpunt, streefpunt, datum en reden; mijlpalen worden afgeleid, dus een gemiste week is een ander pad en geen mislukking |
 | Inzage-audit | `server/inzagelog.js` | wie welke identiteitsgegevens opvroeg, en waarom |
 | Identiteitskluis | `server/accounts.js` | echte namen apart; alles daarbuiten draait op codenamen |
 
@@ -76,11 +77,12 @@ gevonden en met de hand hersteld, en kan met de hand terugkomen.
 Niet gebouwd, en dus ook niet half. Voor elk hiervan geldt: er is geen module,
 geen route en geen toets.
 
-- **Doelenmotor** (doel, reden, nulmeting, mijlpalen, aanpassing bij een gemiste
-  week). Er zijn spaardoelen in bank en zakgeld en gezinsdromen in de
-  foundation, maar geen algemene motor.
 - **Gewoonten, slaap, voeding, water, stress, herstel, trainingsbelasting.**
   Geen van deze bestaat als laag.
+- **Wat je moet DOEN om een doel te halen.** De doelenmotor rekent een pad uit
+  tussen twee getallen; hij zegt niets over trainen, eten of gezondheid. Dat is
+  geen tekort maar de grens uit deze notitie: dat is professional-supported of
+  clinical werk, en dat staat er niet.
 - **Life Compass** (de zes signalen op één scherm) en de **dagcoach**.
 - **De rest van de toegankelijkheid.** Het profiel dat er nu is doet vier
   dingen (zie hieronder); eenvoudige taal, een taak per scherm,
@@ -122,6 +124,41 @@ snijdt nu de server-weg af en meet wat er dan nog staat.
 die haar grijstinten hard invult, verandert niet mee. Tekstgrootte en beweging
 raken alles. En zonder eigen account is er niets om bij de server te bewaren:
 de instelling blijft dan op dat ene toestel staan.
+
+## De doelenmotor, zoals hij nu werkt
+
+Een doel is vier dingen: waar u begon, waar u heen wilt, wanneer, en waarom. De
+reden is verplicht, en dat is een keuze: een doel zonder waarom is het eerste
+dat sneuvelt in een drukke week.
+
+**Mijlpalen worden afgeleid, niet bewaard.** Dat is de hele motor. Een lijstje
+mijlpalen dat vastligt, loopt uit de pas zodra het leven anders loopt, en dan is
+er een "programma aanpassen"-knop nodig die niemand indrukt -- waarna het lijstje
+liegt. Hier wordt het pad elke keer opnieuw berekend vanaf waar u NU staat en
+hoeveel tijd er nog is. Een gemiste week is dan geen mislukking en ook geen
+ingreep: het pad dat overblijft is gewoon een ander pad. Uw beginpunt schuift
+daarbij nooit mee, dus u begint ook nooit opnieuw.
+
+**Geen meting is niet nul.** Zonder meting staat er "nog niets gemeten" en geen
+0%. Bij een doel is het verschil tussen geen gegevens en slecht geen detail
+(`LAT.md` regel 3).
+
+**Elke meting draagt haar herkomst.** Vandaag kan die er maar één zijn (`zelf`),
+want er is geen apparaat dat meet en geen behandelaar die vastlegt. Het veld
+staat er nu al in omdat een meting zonder herkomst later niet meer te
+onderscheiden is van een gemeten of afgeleide waarde -- en dan is het te laat.
+Een verzonnen herkomst wordt geweigerd en telt niet stil als `zelf`.
+
+**De uitweg is een knop, geen mislukking.** De streefdatum verzetten rekent het
+pad opnieuw uit vanaf waar u staat. Zonder die knop is de enige uitweg uit een
+doel dat niet meer past, het doel weggooien -- en dat is dan ook precies wat
+mensen doen.
+
+Wat een toets hier heeft geleerd: de eerste versie beweerde dat het pad steiler
+wordt als er minder tijd over is, en bleef groen toen de mijlpalen vanaf de
+nulmeting werden gerekend in plaats van vanaf de meting -- een pad dat bij 3 km
+begint terwijl je 4 km loopt, oftewel precies "opnieuw beginnen". De bewering is
+nu dat elke mijlpaal VOOR je ligt en nooit achter je, en dat ziet het wel.
 
 ## De grenzen die vast moeten staan vóór de bouw
 
@@ -165,8 +202,7 @@ In deze volgorde, want elke stap heeft de vorige nodig:
 
 1. ~~Het **toegankelijkheidsprofiel**, platformbreed.~~ Gedaan; zie hierboven
    wat het wel en niet doet.
-2. De **doelenmotor**, want die is de ruggengraat onder sport, slaap, voeding en
-   coach; los gebouwd krijgt elk daarvan zijn eigen halve versie.
+2. ~~De **doelenmotor**.~~ Gedaan; zie hierboven.
 3. Het **Life Compass**-scherm dat leest uit wat er dan is -- met "niet gemeten"
    waar niets gemeten is, en niet met een nul. Dat is `LAT.md` regel 3 toegepast
    op een gezondheidsscherm, en bij welzijnscijfers is het verschil tussen "geen

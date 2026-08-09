@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 2920 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 2928 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,13 +18,13 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 2920 |
-| servermodules (`server/**/*.js`) | 1589 |
+| API-endpoints | 2928 |
+| servermodules (`server/**/*.js`) | 1591 |
 | routebestanden (`server/routes/**`) | 350 |
-| kernmodules (`server/kern/**`) | 925 |
+| kernmodules (`server/kern/**`) | 927 |
 | schermen (`public/**/*.html`) | 215 |
 | gedeelde browsermodules (`public/shared/*.js`) | 171 |
-| toetsbestanden (`test/*.test.js`) | 638 |
+| toetsbestanden (`test/*.test.js`) | 639 |
 | schermtoetsen (`test/*.e2e.js`) | 87 |
 
 ## 2. De weg van een verzoek
@@ -99,8 +99,8 @@ zie §5 -- er zijn nog 146 kern-namen die meer dan één domein aanraakt.
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
 | `auth` | 19 | 5 | 8 | 45 |
-| `member` | 427 | 51 | 9 | 348 |
-| `supplier` | 507 | 90 | 6 | 279 |
+| `member` | 429 | 51 | 9 | 348 |
+| `supplier` | 510 | 90 | 6 | 279 |
 | `office` | 33 | 7 | 3 | 53 |
 | `staff` | 26 | 7 | 1 | 40 |
 | `social` | 55 | 7 | 31 | 52 |
@@ -112,7 +112,7 @@ op de regel zelf. Dat is niet hetzelfde als onbeveiligd -- regel 28 van de keuri
 per route een poort **of** een plek op de publieke lijst met reden. Deze kolom is een
 wegwijzer, geen verdict.
 
-Daarnaast 1509 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 1512 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 

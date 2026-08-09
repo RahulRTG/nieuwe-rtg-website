@@ -82,6 +82,23 @@ app.post('/api/supplier/mall/aanvraag/reageer', supplierAuth, (req, res) => {
   res.json(r);
 });
 
+/* Samengesteld aanbod van de zaak zelf: een bundel, een evenement of een
+   seizoensaanbod uit haar EIGEN aanbod. Andermans aanbod erin bundelen wordt
+   geweigerd -- dat is een belofte die zij niet kan waarmaken. */
+app.post('/api/supplier/mall/collecties', supplierAuth, (req, res) => {
+  res.json(kern.mall.mallCollecties.vanZaak(req.supplier.code));
+});
+app.post('/api/supplier/mall/collectie/zet', supplierAuth, (req, res) => {
+  const r = kern.mall.mallCollecties.zet(req.supplier.code, req.supplier.name, req.body || {});
+  if (r.error) return res.status(r.status || 400).json({ error: r.error });
+  res.json(r);
+});
+app.post('/api/supplier/mall/collectie/weg', supplierAuth, (req, res) => {
+  const r = kern.mall.mallCollecties.verwijder(req.supplier.code, (req.body || {}).id);
+  if (r.error) return res.status(r.status || 400).json({ error: r.error });
+  res.json(r);
+});
+
 /* De tijdzone van de zaak. Zonder deze is "Nu open" de tijd van de server, en
    dat is voor een zaak op Ibiza een uur mis. Leeg maken kan door 'auto' te
    sturen: dan geldt weer de hoofdzone van het land. */

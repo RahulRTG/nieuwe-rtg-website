@@ -79,6 +79,14 @@ module.exports = (kern) => {
   app.post('/api/mall/bewaard', auth, (req, res) => lijstStuur(res, mall.mallLijsten.toon(req.session.key, mall.mallLijsten.bewaardLijst(req.session.key).id)));
   app.post('/api/mall/wijzigingen', auth, (req, res) => res.json(mall.mallLijsten.mallWijzigingen(req.session.key)));
 
+  /* ---- samengesteld aanbod: collectie, bundel, evenement, seizoen ----
+     Wat er geldt wordt met de DATUM bepaald en niet met een vinkje dat iemand
+     moet omzetten; zie de kop van kern/mall/collecties.js. */
+  app.post('/api/mall/collecties', auth, (req, res) => res.json(mall.mallCollecties.collecties({
+    plek: req.body.plek, soort: req.body.soort, van: req.body.van, tot: req.body.tot
+  })));
+  app.post('/api/mall/collectie', auth, (req, res) => lijstStuur(res, mall.mallCollecties.toon(req.body.id)));
+
   /* ---- de vraagkant: wat niemand aanbiedt, kun je vragen ----
      Alleen leden plaatsen een aanvraag: een open vraagmarkt voor iedereen die
      een gratis account maakt is binnen een week een prikbord met troep. */

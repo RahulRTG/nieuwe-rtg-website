@@ -49,6 +49,7 @@ klinkt.
 | Gewoonten | `server/kern/gewoonten.js`, blok op `apps/life.html` | kleine dingen die u vaker wilt doen; de dagenteller staat uit tot u hem aanzet |
 | Wachtlijst en gemiste afspraak | `server/kern/care/wachtlijst.js` | eerder aan de beurt als er iets vrijkomt (u boekt zelf), en een no-show die niet met u meereist |
 | Noodkaart | `server/kern/noodkaart.js`, blok op `apps/life.html` | een noodcontact en, als u dat wilt, uw allergenen en middelen: gelezen uit het zorgprofiel en het medicatieschema, niet gekopieerd; u toont hem zelf |
+| Gedachtenboek | `server/kern/gedachten.js`, `public/apps/gedachten.html` | opschrijven voor uzelf; geen model leest mee, niets wordt samengevat, en de crisisregel bewaart hier wel |
 | De dagcoach | `server/kern/dagcoach.js`, blok bovenaan `apps/life.html` | alles wat vandaag ergens staat, op volgorde van de klok; hij plant niets en bezit niets |
 | Medicatieschema | `server/kern/medicatie.js`, `public/apps/medicijnen.html` | wat u gebruikt, op welke tijden, en hoeveel er nog in huis is; RTG bepaalt nooit een dosering en controleert geen combinaties |
 | Inzage-audit | `server/inzagelog.js` | wie welke identiteitsgegevens opvroeg, en waarom |
@@ -584,6 +585,38 @@ tekstcontrole alleen een `voortgang: "2 van de 5"` er ongezien doorheen liet.
 Rust komt uit `kern/balans.js` en niet uit dit bestand: zegt de agenda dat er
 deze week geen lege dag is, dan mag dat er staan. Verzinnen doet hij het niet.
 
+## Het gedachtenboek, en waarom de grens hier andersom staat
+
+`server/kern/gedachten.js`, met een eigen pagina `apps/gedachten.html`.
+
+Een plek om iets op te schrijven, voor uzelf. Wat het **niet** is: materiaal. Er
+leest geen model mee, er wordt niets samengevat, er komt geen stemmingsgrafiek
+uit en er verschijnt nergens een "inzicht" dat op iemands eigen woorden is
+gebaseerd. Een dagboek dat geanalyseerd wordt, is geen dagboek.
+
+Dat is geen belofte in een tekstje maar de bouw: er zijn drie routes (lezen,
+opschrijven, weggooien) en er is er geen vierde. De toets kijkt daar ook op twee
+manieren naar — de routes die niet bestaan, én de bron zelf, want een route
+erbij is makkelijker toegevoegd dan een toets is aangepast.
+
+**De crisisregel bewaart hier wél, en dat is het omgekeerde van de check-in.**
+In `kern/gemoed.js` wordt bij een crisiszin niets bewaard: dat is een gesprek
+waarin RTG antwoordt, en RTG hoort niet over die grens heen te antwoorden. Hier
+antwoordt RTG helemaal niet. Iemand die op zijn zwaarste moment iets opschrijft
+en zijn woorden ziet verdwijnen, wordt gestraft voor eerlijkheid — en raakt kwijt
+wat hij net moest opschrijven. De notitie blijft dus staan, en de weg naar echte
+hulp komt ernaast, met erbij dat RTG de tekst niet leest en niet beoordeelt: de
+kaart verschijnt omdat er woorden in staan die een woordenlijst herkent.
+
+**Versleuteling komt van beneden.** De hele database gaat door `server/kluis.js`
+zodra `RTG_ENC_KEY` gezet is; dit onderdeel doet daar niets bovenop. Een tweede
+eigen slot zou een tweede sleutelbeheer betekenen (LAT.md regel 4).
+
+Wat er bewust niet is: doorzoeken over de hele historie (dat vraagt een index, en
+een index is een tweede kopie van precies deze tekst) en delen. De lijst geeft de
+zestig nieuwste terug en zegt hoeveel er ouder zijn — een lijst die stilletjes
+afkapt, leest als een lijst die compleet is.
+
 ## De grenzen die vast moeten staan vóór de bouw
 
 Deze horen in de architectuur en niet in een latere ronde, want ze bepalen hoe
@@ -655,9 +688,10 @@ In deze volgorde, want elke stap heeft de vorige nodig:
 
 13. ~~De **dagcoach**, die niets plant.~~ Gedaan; zie hieronder.
 
+14. ~~Het **gedachtenboek**, waar geen model in meeleest.~~ Gedaan; zie hieronder.
+
 Wat daarna komt: sport- en voedingslagen, de coachmarktplaats, multi-vestiging
-en resource-planning voor zorgorganisaties, het gedachtenboek, en de langere
-staart uit het oorspronkelijke voorstel (health
+en resource-planning voor zorgorganisaties, en de langere staart uit het oorspronkelijke voorstel (health
 timeline, ADHD- en autismemodus, energiemanagement, mantelzorg, corporate
 wellbeing, Life Wallet, lifestyle-marktplaats). En als er ooit een gesprek komt
 op het mentale onderwerp, dan door `zorgniveau.js` heen.

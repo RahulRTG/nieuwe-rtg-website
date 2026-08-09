@@ -49,6 +49,8 @@ const NIET_GEDEKT = [
     reden: 'Dat is uw eigen lijst. Niemand anders kan hem opvragen of aanpassen -- ook een behandelaar niet, want die schrijft voor in zijn eigen systeem.' },
   { naam: 'Uw dagcheck-in en wat u daarbij opschreef',
     reden: 'Daar valt niets te delen: die notities verlaten uw account niet, en er is geen knop die dat wel zou doen.' },
+  { naam: 'Uw gedachtenboek',
+    reden: 'Daar leest niemand in mee, ook geen model: er bestaat geen route die die tekst ergens anders heen stuurt, dus er valt niets in te trekken.' },
   { naam: 'Wat een zaak van een boeking weet',
     reden: 'Dat hoort bij de boeking en verdwijnt met de boeking; het is geen losse toestemming.' }
 ];

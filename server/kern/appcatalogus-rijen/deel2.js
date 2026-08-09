@@ -20,6 +20,7 @@ module.exports = [
   ['sport', 'Sport', 'leven', '/apps/sport.html', 'Je sportactiviteiten en clubs.'],
   ['balans', 'Balans', 'leven', '/apps/balans.html', 'Je week op rust en ritme: Rahul adviseert ook eens niks, zonder streaks of schuldgevoel.'],
   ['vitaal', 'Vitaal', 'leven', '/apps/vitaal.html', 'Een knop per dag: het gaat goed. Voor medicijnen, en voor wie alleen woont.'],
+  ['gedachten', 'Gedachtenboek', 'leven', '/apps/gedachten.html', 'Een plek om iets op te schrijven, voor jezelf. Er leest geen model mee en er wordt niets samengevat.'],
   ['medicijnen', 'Medicijnen', 'leven', '/apps/medicijnen.html', 'Je eigen medicatieschema: wat je gebruikt, op welke tijden, en hoeveel er nog in huis is. RTG bepaalt nooit een dosering.'],
 
   // ---- veiligheid & identiteit ----

@@ -109,6 +109,12 @@ module.exports = function bouwKernAanTwee(kern, grens) {
      echte hulp. */
   Object.assign(kern, require('../kern/gemoed')({ db, save, schoon }));
   require('../routes/gemoed')(grens('gemoed'));
+  /* Het gedachtenboek (kern/gedachten.js): opschrijven voor uzelf. Er leest geen
+     model mee en er wordt niets samengevat; de crisisregel bewaart hier WEL en
+     zet de weg naar hulp ernaast, want woorden laten verdwijnen straft eerlijk
+     zijn. */
+  Object.assign(kern, require('../kern/gedachten')({ db, save, schoon, crypto }));
+  require('../routes/gedachten')(grens('gedachten'));
   /* Gekoppelde toestellen (kern/toestellen.js): de tweede herkomst. Een eigen
      smalle sleutel per toestel die precies een ding kan -- een dagmeting
      wegschrijven -- en die het lid altijd kan intrekken. */

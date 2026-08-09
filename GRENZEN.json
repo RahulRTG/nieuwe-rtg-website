@@ -184,6 +184,11 @@
       "geloofbieb",
       "status"
     ],
+    "gedachten": [
+      "gedachteWeg",
+      "gedachteZet",
+      "gedachtenVan"
+    ],
     "gemeente": [
       "gemeente"
     ],

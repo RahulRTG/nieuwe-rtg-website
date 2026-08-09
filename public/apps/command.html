@@ -93,6 +93,12 @@
   .cniveau.auto{border-color:var(--groen);color:var(--groen);}
   .cniveau.assist{border-color:var(--amber);color:var(--amber);}
   .cniveau.hand{border-color:var(--acc);color:var(--acc);}
+  /* De drie standen van een servicedoel (command-10.js). "Onbekend" heeft een
+     eigen kleur en niet de groene: een leeg venster mag hier nooit lezen als
+     een gehaald doel. */
+  .cniveau.ok{border-color:var(--groen);color:var(--groen);}
+  .cniveau.mis{border-color:var(--acc);color:var(--acc);}
+  .cniveau.onbekend{border-color:var(--amber);color:var(--amber);}
   .staaf{height:.4rem;background:var(--card2);border-radius:999px;overflow:hidden;margin-top:.45rem;}
   .staaf i{display:block;height:100%;background:var(--gold);}
   .cmelding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:var(--card2);

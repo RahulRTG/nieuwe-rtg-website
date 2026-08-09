@@ -16,9 +16,11 @@
    vallen daarmee vanzelf om, want de kern eist twee VERSCHILLENDE actoren. Wie
    die dingen wil doen, logt in met zijn eigen RTG-account.
 
-   De routes staan verdeeld over vier delen: het beeld en het zoeken hier, het
-   herstel in ./herstel.js, het bestuur in ./bestuur.js en het toezicht in
-   ./toezicht.js. */
+   De routes staan verdeeld over vijf delen: het beeld en het zoeken hier, het
+   herstel in ./herstel.js, het bestuur in ./bestuur.js, het toezicht in
+   ./toezicht.js en de servicedoelen met de sonde in ./meten.js. Dat laatste
+   deel heeft één ingang die NIET achter officeAuth zit (/api/sonde/melding),
+   met de reden erbij in de kop daar. */
 module.exports = (kern) => {
   const { app, officeAuth, boardroomWie, command } = kern;
 
@@ -69,4 +71,5 @@ module.exports = (kern) => {
   require('./herstel')(ctx);
   require('./bestuur')(ctx);
   require('./toezicht')(ctx);
+  require('./meten')(ctx);
 };

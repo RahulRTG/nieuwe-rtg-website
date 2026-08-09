@@ -1777,6 +1777,31 @@ De drempel ligt op 80%: een veld dat vier van de vijf keer een bestaande sleutel
 
 Beide lagen draaien op het register dat ze meekrijgen, dus de zaak-kant krijgt ze gratis en volledig gescoped: de graaf loopt juist wél door en zou ongescoped het gevaarlijkste stuk zijn. In RTG Command staan ze als werkplekken **Kwaliteit** en **Kennisgraaf**; in de zaak achter de managergrens.
 
+### Servicedoelen en de sonde: de meter die niet geruststelt
+
+`SLO.md` beschreef sinds de eerste versie wát wij onszelf opleggen, en noemde er even eerlijk bij wat eronder ontbrak. Twee van die gaten zijn nu dicht.
+
+**De norm staat in `SLO.json`.** Daar leest `kern/command/slo.js` hem, en de tabel in `SLO.md` is een afdruk die door `npm run slo` wordt geschreven; `npm run check` regel 43 maakt de keuring rood zodra die afdruk achterloopt. Een streefwaarde die op twee plaatsen staat, staat er binnen een maand twee keer anders — en dan is het document dat een mens leest het verkeerde van de twee.
+
+**Het foutbudget wordt bijgehouden**, per doel: hoeveel storingsminuten er in de marge tussen streefwaarde en 100% passen, hoeveel daarvan verbruikt is, en de brandsnelheid. Boven de 1 is het budget op vóórdat het venster om is. Zolang er budget over is mag er uitgerold worden; is het op, dan gaat de aandacht naar stabiliteit. Dat is de hele reden dat een foutbudget bestaat: het maakt de afweging tussen snelheid en stabiliteit een cijfer in plaats van een discussie.
+
+**Maar het gevaarlijkste geval is niet "niet gehaald", het is "niets gemeten".** De tellers in `server/meting.js` beginnen bij elke herstart op nul. Een vers proces met drie verzoeken en nul fouten staat rekenkundig op 100% beschikbaar, en dát als "doel gehaald" tonen is de duurste leugen die dit scherm kan vertellen. Vandaar een derde uitslag naast gehaald en niet gehaald: **onvoldoende gemeten**, met een eigen kleur en de reden erbij, zolang er minder dan 200 verzoeken zijn of over minder dan 5% van het venster is gemeten. Die uitslag houdt de uitrol bewust *niet* tegen — een slot dat na elke herstart een dag dichtzit, wordt omzeild in plaats van gebruikt.
+
+Snelheidsdoelen geven om dezelfde reden een **bovengrens en geen punt**: de duur zit in een histogram met vaste emmers, dus het eerlijke antwoord is "p90 ligt op of onder 0,25 s" en niet een kommagetal dat er niet in zit.
+
+**De sonde** (`kern/command/sonde.js`) loopt de reizen uit `SLO.json`: `/api/health`, `/api/ready`, de voordeur, het publieke aanbod, en een inlogpoging die **met opzet verkeerd inlogt** en een afwijzing verwacht — de sonde toetst dat het pad antwoordt, niet dat hij binnenkomt. Een 200 daar zou een bevinding zijn en geen succes.
+
+Binnen en buiten staan apart en worden nergens opgeteld:
+
+| Kant | Hoe | Wat het bewijst |
+|---|---|---|
+| **binnen** | `POST /api/command/sonde/draai` | de HTTP-laag antwoordt — niet dat een klant erbij kan |
+| **buiten** | `node scripts/sonde.js https://host --melden --token=…` op een andere machine, terug via `POST /api/sonde/melding` | TLS, DNS, de reverse proxy en het netwerk zitten erin |
+
+Die meldingsingang is de enige route in Command zonder kantoorinlog, want hij bestaat juist voor een machine waar geen sessie is. Hij zit achter **dezelfde poort als `/api/metrics`** (`server/meetpoort.js`, token of intern adres, 404 in plaats van 403) — die poort stond in `routes/meting.js` met het commentaar "zodat er niet per ongeluk een tweede, lossere deur ontstaat", en dit wás die tweede deur, dus staat hij nu op één plek. En de kant van een melding staat vast op *buiten*: een melder die zijn eigen kant mag kiezen, kan het strenge cijfer opvullen met makkelijke metingen.
+
+Wat er **niet** is en in `SLO.md` blijft staan: een cron die de sonde elke minuut van buitenaf start (een inrichtingsbesluit op een machine buiten deze repo), alertregels, en een gemeten basislijn in plaats van verstandig gekozen streefwaarden.
+
 ## Veiligheid & verbinding: vier apps op één ruggengraat
 
 Vier losse apps (elk met eigen PWA-manifest), die onderhuids dezelfde kern delen

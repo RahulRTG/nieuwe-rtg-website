@@ -13,6 +13,7 @@
      3 Automate   zelf laten doen ./operator.js, ./risico.js (auto-route)
      4 Predict    aan zien komen  ./simulatie.js
      5 Prevent    vóór zijn      ./risico.js + ./toezicht.js (grenzen, budgetten)
+                                 ./slo.js + ./sonde.js (foutbudget, van buitenaf)
      6 Autonomous mensen sturen alleen beleid en uitzonderingen
 
    Wat er van 5 en 6 staat, is de MACHINERIE en niet de eindtoestand: de
@@ -49,6 +50,15 @@ function maakCommand({ db, save, crypto, anthropic }) {
      zou twee keer iets anders kunnen zeggen over dezelfde gegevens. */
   const kwaliteit = require('./kwaliteit').maakKwaliteit({ db, register });
   const graaf = require('./graaf').maakGraaf({ db, register, kwaliteit });
+  /* De meetkant van niveau 5. De sonde levert de metingen van BUITENAF en de
+     SLO-meter houdt het foutbudget bij; ze staan in deze volgorde omdat de
+     meter de sonde erbij zet en niet andersom. De reizen komen uit dezelfde
+     SLO.json als de doelen, via slo.laadNorm() -- dus één bestand met de norm,
+     en geen tweede lijstje reizen dat langzaam iets anders gaat toetsen. */
+  const slolaag = require('./slo');
+  const sonde = require('./sonde').maakSonde({ db, save,
+    reizen: () => slolaag.laadNorm().reizen || [] });
+  const slo = slolaag.maakSlo({ meting: require('../../meting'), sonde });
   const zoeklaag = require('./zoek');
   const objectlaag = require('./object');
 
@@ -91,12 +101,25 @@ function maakCommand({ db, save, crypto, anthropic }) {
       rechten: toegang.graaf(),
       plannen: operator.recent(5),
       runs: runbooks.runs(8),
-      kwaliteit: kwaliteit.meet().tel
+      kwaliteit: kwaliteit.meet().tel,
+      /* De SLO-stand hoort op het beginscherm omdat een foutbudget dat je moet
+         opzoeken geen rem is. Hij staat hier wel INGEPAKT: ontbreekt SLO.json,
+         dan hoort dat één luide tegel te zijn en niet een leeg beginscherm. */
+      slo: sloKort()
     };
   }
 
+  function sloKort() {
+    try {
+      const st = slo.stand();
+      return { tel: st.tel, uitrol: st.uitrol };
+    } catch (e) {
+      return { fout: String(e.message).slice(0, 200) };
+    }
+  }
+
   return { journaal, beleid, risico, toegang, zaken, runbooks, toezicht, operator, puls,
-    simulatie, werkbesparing, kwaliteit, graaf, zoek, bereik, dossier, actiesVoor, start, register };
+    simulatie, werkbesparing, kwaliteit, graaf, slo, sonde, zoek, bereik, dossier, actiesVoor, start, register };
 }
 
 module.exports = { maakCommand };

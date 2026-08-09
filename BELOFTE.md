@@ -8,8 +8,8 @@ Dit register beoordeelt geen kwaliteit. Dat een bestand bestaat, zegt niet dat d
 
 | stand | aantal | wat het betekent |
 | --- | --- | --- |
-| gedekt | 54 | elk bewijsstuk bestaat |
-| open | 11 | nog geen dekking opgeschreven: werkvoorraad |
+| gedekt | 56 | elk bewijsstuk bestaat |
+| open | 9 | nog geen dekking opgeschreven: werkvoorraad |
 | gebroken | 0 | er wordt naar iets verwezen dat er niet (meer) is |
 
 ## De werkplek (Microsoft 365-achtig)
@@ -70,6 +70,8 @@ Dit register beoordeelt geen kwaliteit. Dat een bestand bestaat, zegt niet dat d
 | RTG Command als één app | gedekt | `public/apps/command.html`<br>`public/apps/command` |
 | Knowledge graph over personen, bedrijven, contracten en gebeurtenissen<br><sub>De randen worden gemeten uit de gegevens, niet uit een schema; de wandeling zegt het als hij tegen zijn grens loopt.</sub> | gedekt | `server/kern/command/graaf.js`<br>`/api/command/graaf`<br>`test/kwaliteit.test.js` |
 | Data quality engine: duplicaten en inconsistenties vinden<br><sub>Zeker (dubbele sleutel, wees) en vermoed (zeldzame waarde) staan apart; een meter die vermoedens als feiten telt, wordt terecht genegeerd.</sub> | gedekt | `server/kern/command/kwaliteit.js`<br>`/api/command/kwaliteit`<br>`test/kwaliteit.test.js` |
+| SLO- en error-budgetbeheer per dienst<br><sub>De norm staat in SLO.json en de tabel in SLO.md is daar een afdruk van (npm run check regel 43). De meter zegt 'onvoldoende gemeten' zolang er te weinig verkeer of te kort gemeten is; het uitrolslot slaat bewust niet aan op zulke doelen.</sub> | gedekt | `SLO.json`<br>`server/kern/command/slo.js`<br>`/api/command/slo`<br>`public/apps/command/command-10.js`<br>`scripts/slo.js` |
+| Synthetic monitoring: nepgebruikers die continu de keten lopen<br><sub>Binnen en buiten staan apart en worden nergens opgeteld. Wat er NIET is: een cron die scripts/sonde.js elke minuut van buitenaf start -- dat is een inrichtingsbesluit op een machine buiten deze repo, en het staat als punt 1 in SLO.md.</sub> | gedekt | `server/kern/command/sonde.js`<br>`/api/command/sonde`<br>`/api/sonde/melding`<br>`scripts/sonde.js` |
 
 ## De zaak: dezelfde regie, eigen scope
 
@@ -87,8 +89,6 @@ Dit register beoordeelt geen kwaliteit. Dat een bestand bestaat, zegt niet dat d
 | --- | --- | --- |
 | Data lineage: waar komt een gegeven vandaan en wie hangt ervan af | open | _nog niet gebouwd_ |
 | Master data management: één authoritative record per klant/bedrijf<br><sub>kern/eenaccount doet dit voor het lid; voor bedrijven en locaties niet.</sub> | open | _nog niet gebouwd_ |
-| SLO- en error-budgetbeheer per dienst<br><sub>SLO.md beschrijft de norm; er is geen laag die het budget bijhoudt.</sub> | open | _nog niet gebouwd_ |
-| Synthetic monitoring: nepgebruikers die continu de keten lopen | open | _nog niet gebouwd_ |
 | Chaos testing: gecontroleerd uitschakelen om failover te bewijzen | open | _nog niet gebouwd_ |
 | Canary deployments met automatische terugroldrempels | open | _nog niet gebouwd_ |
 | Country packs: een nieuw land activeren als configuratiebundel | open | _nog niet gebouwd_ |

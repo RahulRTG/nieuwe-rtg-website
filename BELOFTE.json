@@ -512,15 +512,27 @@
     {
       "id": "slo",
       "wat": "SLO- en error-budgetbeheer per dienst",
-      "groep": "Nog open",
-      "dekking": [],
-      "let": "SLO.md beschrijft de norm; er is geen laag die het budget bijhoudt."
+      "groep": "Command: zien, besturen, automatiseren",
+      "dekking": [
+        "SLO.json",
+        "server/kern/command/slo.js",
+        "/api/command/slo",
+        "public/apps/command/command-10.js",
+        "scripts/slo.js"
+      ],
+      "let": "De norm staat in SLO.json en de tabel in SLO.md is daar een afdruk van (npm run check regel 43). De meter zegt 'onvoldoende gemeten' zolang er te weinig verkeer of te kort gemeten is; het uitrolslot slaat bewust niet aan op zulke doelen."
     },
     {
       "id": "synthetic",
       "wat": "Synthetic monitoring: nepgebruikers die continu de keten lopen",
-      "groep": "Nog open",
-      "dekking": []
+      "groep": "Command: zien, besturen, automatiseren",
+      "dekking": [
+        "server/kern/command/sonde.js",
+        "/api/command/sonde",
+        "/api/sonde/melding",
+        "scripts/sonde.js"
+      ],
+      "let": "Binnen en buiten staan apart en worden nergens opgeteld. Wat er NIET is: een cron die scripts/sonde.js elke minuut van buitenaf start -- dat is een inrichtingsbesluit op een machine buiten deze repo, en het staat als punt 1 in SLO.md."
     },
     {
       "id": "chaos",

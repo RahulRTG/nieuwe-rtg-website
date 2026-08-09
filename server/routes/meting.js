@@ -18,57 +18,17 @@
      vergeten token het endpoint per ongeluk publiek maakt.
 
    Er staat nooit iets persoonsgebonden in; zie de kop van server/meting.js.
+
+   DE POORT ZELF STAAT IN server/meetpoort.js. Hij stond hier, tot de sonde een
+   tweede endpoint met dezelfde eis kreeg (routes/command/meten.js). Twee keer
+   dezelfde deur bouwen is precies hoe er één van de twee losser wordt.
    ========================================================================== */
 const meting = require('../meting');
 const rem = require('../rem');
-const { veiligGelijk } = require('../kern/util');
-
-/* Zelfde vorm als in web/verrijk.js en sso/haal.js: wat niet op het open
-   internet hoort. */
-const INTERN = /^(::1|127\.|10\.|192\.168\.|169\.254\.|172\.(1[6-9]|2\d|3[01])\.|::ffff:(10\.|127\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.)|f[cd])/i;
-/* Staat er een poortwachter voor ons? Dezelfde voorwaarde waarop de server zich
-   tot de loopback beperkt. In die stand komt al het verkeer via 127.0.0.1
-   binnen en zegt het socketadres niets meer over wie er belt. */
-const ACHTER_POORT = !!(process.env.RTG_CLUSTER_KEY || process.env.RTG_DOMAINS);
+const { magMeten } = require('../meetpoort');
 
 module.exports = (kern) => {
   const { app } = kern;
-  const TOKEN = process.env.RTG_METRICS_TOKEN || '';
-
-  function magMeten(req) {
-    if (TOKEN) {
-      const kop = req.get('authorization') || '';
-      const aangeboden = kop.startsWith('Bearer ') ? kop.slice(7).trim() : '';
-      /* HIER STOND `aangeboden === TOKEN` met de redenering dat een vaste
-         lengte-vergelijking niet nodig is "want het token wordt niet geraden
-         maar meegegeven door onze eigen scraper". Dat beschrijft het gelukkige
-         pad en niet de aanvaller: wie dit endpoint vindt kan het token wel
-         degelijk proberen te raden, en === stopt bij het eerste verschillende
-         teken. Overal elders in dit huis staat veiligGelijk; vanochtend zat
-         dezelfde fout op de clustersleutel. Nu ook hier. */
-      return !!aangeboden && veiligGelijk(aangeboden, TOKEN);
-    }
-    /* Zonder token: alleen van dichtbij. Let op dat we het SOCKETADRES gebruiken
-       en niet req.ip -- die kan van een X-Forwarded-For komen, en dan zou een
-       bezoeker zich met een kop tot "intern" kunnen verklaren.
-
-       MAAR ACHTER EEN POORTWACHTER DEUGT DAT SIGNAAL NIET MEER, en juist daar
-       werkt het averechts. Draait deze server als kind van server/trio.js of de
-       vloot -- of achter welke reverse proxy dan ook -- dan komt ELK verzoek
-       binnen via de loopback. Het socketadres is dan altijd 127.0.0.1, dus
-       INTERN klopt voor de hele wereld en /api/metrics staat open voor iedereen
-       die het pad kent. Precies de opstelling die je in productie gebruikt,
-       maakte de deur dus wagenwijd open in plaats van dicht.
-
-       Dat de app achter een poortwachter staat, weten we al: het is dezelfde
-       voorwaarde waarop hij zich tot de loopback beperkt (RTG_CLUSTER_KEY of
-       RTG_DOMAINS, zie de HOST-keuze in server.js). In die stand is nabijheid
-       geen bewijs meer en is een token de enige geldige sleutel. Zonder token
-       gaat de deur dan dicht -- liever geen meting dan een publieke. */
-    if (ACHTER_POORT) return false;
-    const bron = (req.socket && req.socket.remoteAddress) || '';
-    return INTERN.test(bron);
-  }
 
   app.get('/api/metrics', rem({ windowMs: 60000, limit: 120 }), (req, res) => {
     if (!magMeten(req)) {

@@ -488,8 +488,14 @@
     {
       "id": "data-lineage",
       "wat": "Data lineage: waar komt een gegeven vandaan en wie hangt ervan af",
-      "groep": "Nog open",
-      "dekking": []
+      "groep": "Command: zien, besturen, automatiseren",
+      "dekking": [
+        "server/kern/command/herkomst.js",
+        "/api/command/herkomst",
+        "/api/supplier/command/herkomst",
+        "public/apps/command/command-11.js"
+      ],
+      "let": "Elk antwoord draagt zijn aard: gemeten, aangegeven of afgeleid. De blinde vlek staat in de uitslag -- het journaal ziet alleen wat via Command ging, dus 'geen schrijver' betekent hier niet 'hier schrijft niemand in'."
     },
     {
       "id": "mdm",

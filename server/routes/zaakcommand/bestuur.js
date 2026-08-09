@@ -45,6 +45,15 @@ module.exports = ({ app, supplierAuth, managerOnly, veilig, laag, wie }) => {
     return laag(req).graaf.vorm();
   }));
 
+  /* De herkomst van de zaak. Zonder bewaartermijnen, en dat is geen omissie:
+     het bewaarbeleid in server/bewaarbeleid.js is dat van RTG. Een ondernemer
+     een termijn tonen die hij nooit heeft afgesproken, is erger dan hem geen
+     termijn tonen. */
+  app.post('/api/supplier/command/herkomst', supplierAuth, (req, res) => veilig(res, () => {
+    if (!managerOnly(req, res)) return null;
+    return laag(req).herkomst.kaart();
+  }));
+
   /* Het journaal, met de ketencontrole erbij. Een spoor waarvan je de heelheid
      niet kunt nakijken, is een lijst die je op zijn woord moet geloven. */
   app.post('/api/supplier/command/journaal', supplierAuth, (req, res) => veilig(res, () => {

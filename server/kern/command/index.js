@@ -50,6 +50,13 @@ function maakCommand({ db, save, crypto, anthropic }) {
      zou twee keer iets anders kunnen zeggen over dezelfde gegevens. */
   const kwaliteit = require('./kwaliteit').maakKwaliteit({ db, register });
   const graaf = require('./graaf').maakGraaf({ db, register, kwaliteit });
+  /* De herkomst is de DERDE vraag op diezelfde meting: de kwaliteitslaag levert
+     de wezen, de graaf de randen en deze laag de afhankelijkheden. Hij krijgt
+     het bewaarbeleid mee in plaats van het te importeren, want de zaak-kant
+     draait dezelfde module en heeft dat beleid niet -- daar hoort dan "geen
+     termijn" uit te komen en niet stilzwijgend dat van RTG. */
+  const herkomst = require('./herkomst').maakHerkomst({ db, register, graaf, journaal, runbooks,
+    bewaarbeleid: require('../../bewaarbeleid').BELEID });
   /* De meetkant van niveau 5. De sonde levert de metingen van BUITENAF en de
      SLO-meter houdt het foutbudget bij; ze staan in deze volgorde omdat de
      meter de sonde erbij zet en niet andersom. De reizen komen uit dezelfde
@@ -119,7 +126,8 @@ function maakCommand({ db, save, crypto, anthropic }) {
   }
 
   return { journaal, beleid, risico, toegang, zaken, runbooks, toezicht, operator, puls,
-    simulatie, werkbesparing, kwaliteit, graaf, slo, sonde, zoek, bereik, dossier, actiesVoor, start, register };
+    simulatie, werkbesparing, kwaliteit, graaf, herkomst, slo, sonde, zoek, bereik, dossier,
+    actiesVoor, start, register };
 }
 
 module.exports = { maakCommand };

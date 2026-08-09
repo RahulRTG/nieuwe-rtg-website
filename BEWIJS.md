@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 726 bestanden en 4112 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 727 bestanden en 4119 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,13 +12,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 726 |
-| losse beweringen (`test(...)`) | 4112 |
+| toetsbestanden | 727 |
+| losse beweringen (`test(...)`) | 4119 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 521 |
 | **overleefd**: geen mutatie kreeg hem rood | 12 |
 | niet te meten (al rood, geen module gevonden, ...) | 16 |
-| alleen in de kop *genoemd*, nog niet gemeten | 30 |
+| alleen in de kop *genoemd*, nog niet gemeten | 31 |
 | niets van beide | 147 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-636 bestanden, 3952 beweringen.
+637 bestanden, 3959 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -230,6 +230,7 @@ toets omvalt.
 | `handenvrij.test.js` | 15 | gezakt op `false->true` | Muisvrij bedienen (public/shared/handenvrij.js): de zinsontleding. De balk, de microfoon en de stem leven in de browser; de bedoeling-uit-een-zin is een pure functie en die is hier los getoetst. |
 | `hardware.test.js` | 8 | gezakt op `liegpoort /api/` | RTG Hardwarelab: het eigen hardware-ontwerpbureau van de kantoren (apparaten, schermen, sensoren, edge & servers, accessoires). Een AI tekent het concept uit (behuizing, chip, materialen, gedempt palet, poorten,... |
 | `helikopter.test.js` | 4 | gezakt op `liegpoort /api/` | Helikopter transfers: het nieuwe vervoersgenre. Een lid vraagt een helikoptervlucht aan bij Ibiza Sky Charter, betaalt vooraf, en de zaak (Operations + piloot) wijst piloot en toestel toe en rijdt de ritketen af. |
+| `herkomst.test.js` | 7 | genoemd | De herkomstlaag (kern/command/herkomst.js): waar komt een gegeven vandaan, wie hangt ervan af, en -- het belangrijkste -- hoe zeker is elk van die antwoorden. WAT DEZE TOETS VOORAL BEWAAKT zijn twee dingen die... |
 | `herstel2fa.test.js` | 3 | gezakt op `liegpoort /api/` | Integratietests voor wachtwoordherstel met tweestapsverificatie (link per e-mail + code op de telefoon) en wachtwoord wijzigen vanuit de eigen backoffice. Zonder SMTP geeft de server dev-velden terug zodat de flow... |
 | `herstelgat.test.js` | 2 | -- | Het gat in de herstelroute: dev-velden aan een vreemde. WAT ER MIS WAS. |
 | `herstelproef.test.js` | 3 | gezakt op `liegpoort /api/` | HERSTELPROEF -- werkt de backup echt, of nemen we dat aan? Een backup die je nooit hebt teruggezet is geen backup maar een aanname. |

@@ -22,5 +22,5 @@ module.exports = [
     uitleg: 'Administratieve drift rechtzetten, een ronde terugdraaien, de eigen grenzen zetten en het spoor van de zaak lezen.',
     paden: ['/api/supplier/command/runbook', '/api/supplier/command/beleid', '/api/supplier/command/journaal',
       '/api/supplier/command/operator', '/api/supplier/command/werk',
-      '/api/supplier/command/kwaliteit', '/api/supplier/command/graaf'] }
+      '/api/supplier/command/kwaliteit', '/api/supplier/command/graaf', '/api/supplier/command/herkomst'] }
 ];

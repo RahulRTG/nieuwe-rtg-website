@@ -1777,6 +1777,18 @@ De drempel ligt op 80%: een veld dat vier van de vijf keer een bestaande sleutel
 
 Beide lagen draaien op het register dat ze meekrijgen, dus de zaak-kant krijgt ze gratis en volledig gescoped: de graaf loopt juist wél door en zou ongescoped het gevaarlijkste stuk zijn. In RTG Command staan ze als werkplekken **Kwaliteit** en **Kennisgraaf**; in de zaak achter de managergrens.
 
+### Herkomst: dezelfde meting, en bij elk antwoord hoe hard het is
+
+`kern/command/herkomst.js` is de derde vraag op die ene meting. Per soort: waar het naartoe wijst, wie eraan mag schrijven (de runbookcatalogus), wie het werkelijk deed (het journaal), hoe lang het blijft (`server/bewaarbeleid.js`) en wat er wees wordt als het verdwijnt.
+
+Twee dingen maken het meer dan een plaatje.
+
+**Elk antwoord draagt zijn aard** — *gemeten* (uit de gegevens zelf), *aangegeven* (uit een tabel die een mens schreef, met erbij wélke tabel) of *afgeleid* (gerekend uit die twee). Door elkaar getoond krijgt het geheel de betrouwbaarheid van het zwakste deel, en kan niemand zien welk deel dat is.
+
+**Stilte is geen bewijs.** Het journaal ziet alleen wat via RTG Command is gegaan; de gewone app-routes en de leverancierskant lopen er niet doorheen. "Geen schrijver" betekent hier dus niet "hier schrijft niemand in" — en precies die verwarring is hoe iemand iets weggooit waar wel degelijk aan wordt geschreven. Die zin staat bovenaan het scherm, niet in een voetnoot.
+
+De zaak-kant draait dezelfde module op haar eigen register, journaal en receptenboek, maar **zonder bewaarbeleid**: die tabel is van RTG. Een ondernemer een termijn tonen die hij nooit heeft afgesproken is erger dan hem geen termijn tonen, dus staat er dan "geen termijn" — en dat is waar. Werkplek **Herkomst** onder Zien; in de zaak achter de managergrens.
+
 ### Servicedoelen en de sonde: de meter die niet geruststelt
 
 `SLO.md` beschreef sinds de eerste versie wát wij onszelf opleggen, en noemde er even eerlijk bij wat eronder ontbrak. Twee van die gaten zijn nu dicht.

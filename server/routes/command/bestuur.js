@@ -62,6 +62,13 @@ module.exports = ({ app, officeAuth, veilig, wie, command }) => {
   app.post('/api/command/graaf/wandel', officeAuth, (req, res) => veilig(res, () =>
     command.graaf.wandel(String(req.body.type || ''), String(req.body.id || ''), req.body.diepte)));
 
+  /* De herkomst: waar komt een gegeven vandaan en wie hangt ervan af. Derde
+     vraag op dezelfde meting, en het enige scherm waar naast elk antwoord staat
+     hoe hard het is: gemeten, aangegeven of daaruit gerekend. */
+  app.post('/api/command/herkomst', officeAuth, (req, res) => veilig(res, () => command.herkomst.kaart()));
+  app.post('/api/command/herkomst/spoor', officeAuth, (req, res) => veilig(res, () =>
+    command.herkomst.spoor(String(req.body.type || ''), String(req.body.id || ''))));
+
   /* Forensic replay: achteraf reconstrueren wat er tussen twee momenten
      gebeurde, met per stap de toestand ervoor en erna. */
   app.post('/api/command/journaal/herbeleef', officeAuth, (req, res) => veilig(res, () =>

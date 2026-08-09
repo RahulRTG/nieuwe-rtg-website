@@ -64,7 +64,7 @@ const ERBIJ = {
    WAAROM DEZE LIJST BESTAAT. Een vermogen dat in ERBIJ staat en nergens iets
    doet, is een belofte in tekst (LAT-regel 6) -- en die stonden hier: elf
    stuks, waarvan een deel iets beloofde achter een pas dat elders GRATIS al
-   bestond. Wat er weg is en waarom, staat in TAKEN.md 5.18.
+   bestond. Wat er weg is en waarom, staat in TAKEN.md 5.22.
 
    Maar niet elk vermogen hoort een poort te zijn. De gratis trap hierboven is
    er om te ZEGGEN wat je krijgt -- het scherm gebruikt hem om te laten zien dat

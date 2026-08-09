@@ -33,7 +33,7 @@ module.exports = (kern) => {
      twee plekken: dit domein besliste zelf wie er binnenkomt, en de wereldlaag
      besliste hetzelfde nog een keer. Dat is LAT-regel 4, en het werd voorlopig
      gelijkgehouden door een toets die beide kanten tegen elkaar aanhield -- een
-     pleister, met naam, in TAKEN.md 5.18 (e).
+     pleister, met naam, in TAKEN.md 5.22 (e).
 
      Nu leest dit domein de rechtenmodule. De pleister is daarmee weg: er valt
      niets meer uiteen te lopen, want er is nog maar één lijst. De toets in

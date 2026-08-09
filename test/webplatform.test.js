@@ -756,6 +756,98 @@ test('25. Salonbeeld draagt altijd de naam van de maker, en werkt ook zonder zaa
   beelden.forEach(x => assert.match(x.bijschrift || '', /^Uit De Salon · .+/, 'naamsvermelding bij elk beeld'));
 });
 
+/* Een bezoeker van buiten: op een eigen hostnaam en zonder inlog. De
+   X-Forwarded-Proto zegt dat er TLS voor staat -- zonder die header stuurt de
+   server een echt domein terecht door naar https. */
+function haalPubliek(host, pad) {
+  /* Met node:http en niet met fetch: de fetch-spec verbiedt het zetten van de
+     Host-header, en undici laat hem stil vallen. Dan komt het verzoek binnen op
+     127.0.0.1 en toetsen we niets. */
+  const http = require('http');
+  const u = new URL(base);
+  return new Promise((res, rej) => {
+    const req = http.request({ hostname: u.hostname, port: u.port, path: pad, method: 'GET',
+      headers: { Host: host, 'X-Forwarded-Proto': 'https' } }, r => {
+      let body = '';
+      r.on('data', c => { body += c; });
+      r.on('end', () => res({ status: r.statusCode, html: body }));
+    });
+    req.on('error', rej);
+    req.end();
+  });
+}
+
+// een vers lid: de eerdere scenario's hebben de twaalf-sites-grens al geraakt
+let domeinLid = null;
+test('26. een eigen domein staat STANDAARD UIT, en uit betekent echt uit', async () => {
+  const reg = await api('/api/auth/register', { name: 'Domein Lid', email: 'domeinlid@voorbeeld.test',
+    password: 'webgeheim99', geboortedatum: '1991-01-01', tier: 'rtg', pasApp: 'rtg' });
+  domeinLid = reg.body.token;
+  const mk = await api('/api/site/bewaar', { design: { titel: 'Hotel Azur',
+    blokken: [{ type: 'kop', tekst: 'Welkom bij Hotel Azur' }] } }, domeinLid);
+  const id = mk.body.design.id;
+  await api('/api/site/publiceer', { id, adres: 'hotel-azur' }, domeinLid);
+
+  /* De boardroom heeft niets aangezet, en op een verse installatie is er ook
+     nog nooit iets geschakeld. Juist dan moet de deur dicht zitten: dat is de
+     hele betekenis van "standaard uit". */
+  const dicht = await api('/api/site/domein', { id, domein: 'hotelazur.nl' }, domeinLid);
+  assert.equal(dicht.status, 503, 'de functie is dicht: ' + JSON.stringify(dicht.body));
+  assert.match(dicht.body.error || '', /uitgeschakeld/i, 'met uitleg, geen kale foutcode');
+
+  // en er staat dus ook niets op dat adres
+  const via = await haalPubliek('hotelazur.nl', '/');
+  assert.ok(!/Welkom bij Hotel Azur/.test(via.html), 'zolang de schakelaar uit staat komt de site niet naar buiten');
+});
+
+/* De schakelaar omzetten is werk van de eigenaar en gaat in twee stappen: hij
+   dient de schakeling in en accepteert hem daarna. Precies goed voor een knop
+   die een site buiten het huis kan brengen. */
+async function schakelEigenDomein(aan) {
+  const login = (await api('/api/techniek/inloggen', { login: 'roellie.i@gmail.com', wachtwoord: 'Imran' })).body;
+  assert.ok(login.token && login.eigenaar, 'de eigenaar kan op de technische pagina');
+  const vz = (await api('/api/techniek/functie', { id: 'dom-eigendomein', aan }, login.token)).body;
+  if (vz.status === 'wacht') {
+    const b = (await api('/api/techniek/functie/besluit', { verzoekId: vz.verzoekId }, login.token)).body;
+    assert.equal(b.status, 'akkoord');
+  }
+}
+
+test('27. met de boardroom-schakelaar aan: een adres koppelen en de site publiek serveren', async () => {
+  await schakelEigenDomein(true);
+
+  const mijn = (await api('/api/site/mijn', {}, domeinLid)).body.lijst.find(x => x.adres === 'hotel-azur');
+  const id = mijn.id;
+
+  // rommel komt er niet in, en adressen van het huis zelf ook niet
+  assert.equal((await api('/api/site/domein', { id, domein: 'geen adres' }, domeinLid)).status, 400);
+  assert.equal((await api('/api/site/domein', { id, domein: 'vanmij.rtg' }, domeinLid)).status, 400);
+
+  const k = await api('/api/site/domein', { id, domein: 'https://WWW.HotelAzur.nl/pad' }, domeinLid);
+  assert.equal(k.status, 200, JSON.stringify(k.body));
+  assert.equal(k.body.domein, 'hotelazur.nl', 'genormaliseerd: geen protocol, geen www, geen pad');
+
+  // en nu komt de site er echt uit, als gewone HTML voor iemand zonder app
+  const via = await haalPubliek('hotelazur.nl', '/');
+  assert.equal(via.status, 200);
+  assert.match(via.html, /Welkom bij Hotel Azur/);
+  assert.match(via.html, /<!doctype html>/i, 'echte HTML, niet de JSON van de leden-app');
+
+  // hetzelfde adres kan niet aan een tweede site
+  const ander = await api('/api/site/bewaar', { design: { titel: 'Tweede', blokken: [{ type: 'kop', tekst: 'x' }] } }, domeinLid);
+  await api('/api/site/publiceer', { id: ander.body.design.id, adres: 'tweede-site' }, domeinLid);
+  assert.equal((await api('/api/site/domein', { id: ander.body.design.id, domein: 'hotelazur.nl' }, domeinLid)).status, 409);
+
+  /* Offline op het RTG-web is ook offline op het eigen adres -- anders is
+     "uit de lucht" maar de helft waar. */
+  await api('/api/site/offline', { id }, domeinLid);
+  const na = await haalPubliek('hotelazur.nl', '/');
+  assert.ok(!/Welkom bij Hotel Azur/.test(na.html), 'offline is overal offline');
+
+  // de schakelaar weer terug, zodat de rest van de toetsen de standaard ziet
+  await schakelEigenDomein(false);
+});
+
 test('5. zoeken vindt sites en bedrijven in een adem', async () => {
   const z = await api('/api/browser/zoek', { q: 'vedra' }, lid);
   assert.equal(z.status, 200);

@@ -38,6 +38,14 @@ module.exports = ({ db, save, crypto, schoon, media, merkHuisstijl }) => {
   /* Cijfers over een site (./webmaker-meting.js): tellingen van gebeurtenissen,
      nooit van mensen. */
   const meting = require('./webmaker-meting')({ store, save });
+  /* Een eigen adres buiten het RTG-web (./webdomein.js). Staat standaard uit;
+     de boardroom-schakelaar zit op de functie 'dom-eigendomein'. */
+  const domeinlaag = require('./webdomein')({ store, save, scho, spoor });
+  /* Hoe een bewaard ontwerp eruitziet -- en vooral: WAT EEN BEWARING OVERLEEFT.
+     Dat laatste is drie keer misgegaan (de bevroren stand, het geplande moment
+     en het gekoppelde domein verdwenen elk stilletjes bij de eerstvolgende
+     opslag), dus het staat op een eigen plek: ./webmaker-ontwerp.js. */
+  const bouwOntwerp = require('./webmaker-ontwerp')({ scho, crypto, schoonBlok, schoonKleuren });
 
   /* ---- concept en wat er online staat ----
 
@@ -51,7 +59,7 @@ module.exports = ({ db, save, crypto, schoon, media, merkHuisstijl }) => {
   function bevries(d) { d.live = versielaag.ontwerpVan(d); d.liveOp = new Date().toISOString(); }
   const wacht = d => !!d.online && !!d.liveOp && new Date(d.bij) > new Date(d.liveOp);
 
-  const kort = d => ({ id: d.id, titel: d.titel, adres: d.adres || '', online: !!d.online, bezoeken: d.bezoeken || 0, bij: d.bij, blokken: (d.blokken || []).length, wacht: wacht(d), merk: d.merk || '' });
+  const kort = d => ({ id: d.id, titel: d.titel, adres: d.adres || '', online: !!d.online, bezoeken: d.bezoeken || 0, bij: d.bij, blokken: (d.blokken || []).length, wacht: wacht(d), merk: d.merk || '', domein: d.domein || '' });
   const publiek = d => {
     const o = d.live || d;   // geen bevroren stand (oude site): dan het concept
     return { titel: o.titel, thema: o.thema, accent: o.accent, kleuren: o.kleuren || null, blokken: o.blokken || [], paginas: o.paginas || [], volgorde: o.volgorde || null, adres: d.adres, eigenaar: d.eigenaar, zaakCode: d.zaakCode || '' };
@@ -72,29 +80,7 @@ module.exports = ({ db, save, crypto, schoon, media, merkHuisstijl }) => {
     if (!bestaand && s.lijst.filter(x => x.eigenaar === key).length >= PER_LID) {
       return { error: 'Je hebt het maximum aantal websites bereikt. Verwijder er eerst een.', status: 400 };
     }
-    const design = {
-      id: bestaand ? bestaand.id : ('w' + crypto.randomBytes(5).toString('hex')),
-      eigenaar: key,
-      titel: scho(d.titel, 80) || 'Mijn website',
-      thema: ['licht', 'donker'].includes(d.thema) ? d.thema : 'donker',
-      accent: /^#[0-9a-fA-F]{6}$/.test(String(d.accent || '')) ? d.accent : '#7F1634',
-      kleuren: schoonKleuren(d.kleuren),
-      blokken: (Array.isArray(d.blokken) ? d.blokken : []).slice(0, 60).map(schoonBlok),
-      zaakCode: (opts && opts.zaakCode) ? scho(opts.zaakCode, 30) : (bestaand ? (bestaand.zaakCode || '') : ''),
-      adres: bestaand ? (bestaand.adres || '') : '',
-      online: bestaand ? !!bestaand.online : false,
-      bezoeken: bestaand ? (bestaand.bezoeken || 0) : 0,
-      /* De stand die ONLINE staat overleeft een bewaring: bewaren verandert
-         het concept en niet het web. Vergeten we dit, dan valt de site bij de
-         eerstvolgende opslag terug op het concept en staat elke halve zin
-         alsnog buiten -- precies wat deze laag moet voorkomen. */
-      live: bestaand ? (bestaand.live || null) : null,
-      liveOp: bestaand ? (bestaand.liveOp || null) : null,
-      // een gepland publicatiemoment overleeft een bewaring om dezelfde reden
-      plan: bestaand ? (bestaand.plan || undefined) : undefined,
-      gemaakt: bestaand ? bestaand.gemaakt : new Date().toISOString(),
-      bij: new Date().toISOString()
-    };
+    const design = bouwOntwerp({ d, key, opts, bestaand });
     const vg = schoonVolgorde(d, design.blokken); if (vg) design.volgorde = vg;
     const pg = paginalaag.schoonPaginas(d); if (pg) design.paginas = pg;
     /* Hoort deze site bij een vestiging van een merk, dan komt de HUISSTIJL van
@@ -127,26 +113,19 @@ module.exports = ({ db, save, crypto, schoon, media, merkHuisstijl }) => {
     save();
     return { ok: true };
   }
-  /* De geschiedenis is van de eigenaar van de site: haal() controleert dat,
-     en zonder site is er ook geen geschiedenis om in te kijken. */
-  function versies(key, id) {
-    const d = haal(key, id);
-    if (!d) return { error: 'Website niet gevonden.', status: 404 };
-    return { ok: true, lijst: versielaag.lijst(d) };
-  }
-  /* De cijfers van een site: tellingen, geen mensen (./webmaker-meting.js). */
-  function cijfers(key, id) {
-    const d = haal(key, id);
-    if (!d) return { error: 'Website niet gevonden.', status: 404 };
-    return { ok: true, cijfers: meting.cijfers(d) };
-  }
-  function herstel(key, id, i, wie) {
-    const d = haal(key, id);
-    if (!d) return { error: 'Website niet gevonden.', status: 404 };
+  /* Vier vragen die allemaal eerst "is deze site van jou?" stellen. Die
+     controle staat in haal(); hem vier keer overschrijven is vier plekken waar
+     hij kan gaan afwijken. */
+  const vanMij = (key, id, doe) => { const d = haal(key, id); return d ? doe(d) : { error: 'Website niet gevonden.', status: 404 }; };
+  const versies = (key, id) => vanMij(key, id, d => ({ ok: true, lijst: versielaag.lijst(d) }));
+  const herstel = (key, id, i, wie) => vanMij(key, id, d => {
     const r = versielaag.herstel(d, i);
     if (!r.error) { spoor.noteer(d.id, 'oudere versie teruggezet', wie); save(); }
     return r;
-  }
+  });
+  // een eigen adres buiten het RTG-web, en de cijfers over deze site
+  const domein = (key, id, host, wie) => vanMij(key, id, d => domeinlaag.koppel(d, host, wie));
+  const cijfers = (key, id) => vanMij(key, id, d => ({ ok: true, cijfers: meting.cijfers(d) }));
 
   /* Alles wat bepaalt WAT ER BUITEN STAAT -- online gaan, wijzigingen
      publiceren, een moment plannen, uit de lucht halen, en het spoor daarvan --
@@ -162,7 +141,7 @@ module.exports = ({ db, save, crypto, schoon, media, merkHuisstijl }) => {
      zetLive schrijven erin), dus de afgeleide "wacht"-vlag hangen we er niet
      aan vast maar reiken we los aan -- zo staat de regel nog steeds op een
      plek en breken we het schrijven niet. */
-  return { mijn, haal, bewaar, verwijder, slug, versies, herstel, wacht, cijfers, webOverzicht: meting.overzicht, telFormulier: meting.formulier,
+  return { mijn, haal, bewaar, verwijder, slug, versies, herstel, wacht, cijfers, domein, publiekeStand: publiek, siteVoorHost: domeinlaag.siteVoorHost, webOverzicht: meting.overzicht, telFormulier: meting.formulier,
            publiceer: pub.publiceer, zetLive: pub.zetLive, offline: pub.offline, plan: pub.plan, spoorVan: pub.spoorVan, planVeeg: pub.veeg,
            gids: blader.gids, open: blader.open, zoek: blader.zoek, adresVanZaak: blader.adresVanZaak, zaakVanAdres: blader.zaakVanAdres, eigenaarVanAdres: blader.eigenaarVanAdres, idVanAdres: blader.idVanAdres,
            fotos, fotoBewaar, fotoWeg, TYPES };

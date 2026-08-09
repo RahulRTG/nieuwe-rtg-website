@@ -49,6 +49,12 @@ module.exports = [
     uitleg: 'De notitie-app: losse aantekeningen en lijstjes van een lid.', paden: ['/api/notities'] },
   { id: 'dom-site', categorie: 'Winkel en media', naam: 'Leden-website', standaard: true, doelgroepen: LEDEN,
     uitleg: 'De eigen website die een lid of zaak kan bouwen.', paden: ['/api/site'] },
+  /* STANDAARD UIT, en dat is de hele reden dat hij bestaat. Een eigen extern
+     domein haalt een site buiten het RTG-web: hij wordt dan leesbaar voor
+     iedereen, ook zonder RTG-account. Dat is een besluit van de boardroom en
+     niet van een lid, dus deze knop staat uit tot iemand hem bewust omzet. */
+  { id: 'dom-eigendomein', categorie: 'Winkel en media', naam: 'Eigen domein (buiten het RTG-web)', standaard: false, doelgroepen: LEDEN,
+    uitleg: 'Een eigen adres zoals hotelazur.nl naast hotelazur.rtg. Zet dit aan en een site kan buiten het RTG-web leesbaar worden -- ook voor wie geen lid is.', paden: ['/api/site/domein', '/api/supplier/site/domein'] },
   { id: 'dom-asset', categorie: 'Winkel en media', naam: 'Media-assets', standaard: true, doelgroepen: ALLE,
     uitleg: 'Het uitleveren van geuploade media.', paden: ['/api/asset'] },
   { id: 'dom-home', categorie: 'Winkel en media', naam: 'Home Kit (slim huis)', standaard: true, doelgroepen: LEDEN,

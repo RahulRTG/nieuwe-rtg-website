@@ -51,8 +51,12 @@ function schakelaars({ db, accounts, functies, sessionFor, findSupplier, wachter
        zelf hierlangs 503's produceert is veilig: meet() telt een 503 bewust
        nooit mee (dat is de taal van "bewust dicht", geen storing). */
     if (wachter) res.on('finish', () => { try { wachter.meet(p, res.statusCode); } catch (e) {} });
-    const staat = db.data && db.data.techniek && db.data.techniek.functies;
-    if (!staat) return next(); // niets uitgezet: alles staat aan
+    const staat = (db.data && db.data.techniek && db.data.techniek.functies) || null;
+    /* De snelle uitgang: is er nog nooit iets geschakeld, dan staat alles aan
+       -- maar alleen zolang elke functie standaard AAN is. Een functie die
+       standaard UIT hoort te staan moet ook op een verse installatie dicht
+       zitten, anders betekent "standaard uit" niets. */
+    if (!staat && !functies.HEEFT_UIT_STANDAARD) return next();
 
     // De doelgroep van dit verzoek: uit het pad (leverancier/personeel/intern/
     // foundation) of uit de pas van het ingelogde lid (RTG/Lifestyle/Business).

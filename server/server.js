@@ -394,8 +394,11 @@ const { schild, ssrf, zetWacht, zetRtgai } = require('./opzet/verzoekketen')({
    bestanden. Ook hier een late binding: het scan-net wordt pas gebouwd als
    `beveilig` en `wacht` er zijn (zetScanNet). */
 const PUBLIC_DIR = path.join(__dirname, '..', 'public');
-const { rtf, CSP_NONCE, zetScanNet } = require('./opzet/poortwachters')({
-  app, express, db, save, log, accounts, eigenaar, PUBLIC_DIR, PRODUCTION, opslagKlaar,
+/* De haak voor eigen domeinen: hij wordt hier leeg meegegeven en pas gevuld
+   zodra de webmaker bestaat. Zolang hij leeg is, verandert er niets. */
+const eigenWeb = {};
+const { rtf, CSP_NONCE, zetScanNet, functies } = require('./opzet/poortwachters')({
+  app, express, db, save, log, accounts, eigenaar, PUBLIC_DIR, PRODUCTION, opslagKlaar, eigenWeb,
   // hoisted of verderop in dit bestand; lui doorgegeven
   sseToOffice: (ev, data) => sseToOffice(ev, data),
   sessionFor: t => sessionFor(t),
@@ -718,6 +721,27 @@ let webmerk = null;
 const webmaker = require('./kern/webmaker')({ db, save, crypto, schoon, media,
   merkHuisstijl: z => webmerk && webmerk.huisstijlVoorZaak(z) });
 webmerk = require('./kern/webmerk')({ db, save, scho: schoon, webmaker, findSupplier });
+/* De haak vullen die de poortwachters boven express.static hebben gezet: een
+   verzoek op een gekoppelde hostnaam krijgt de GEPUBLICEERDE site als HTML.
+   De boardroom-schakelaar staat standaard uit; zolang die dicht is gebeurt hier
+   niets en valt het verzoek gewoon door naar de site van het huis. */
+const webdomeinHtml = require('./kern/webdomein-html');
+eigenWeb.serveer = (req, res, next) => {
+  try {
+    const staat = db.data && db.data.techniek && db.data.techniek.functies;
+    if (!functies.functieAan('dom-eigendomein', staat)) return next();
+    const host = String(req.headers.host || '').split(':')[0];
+    const d = webmaker.siteVoorHost(host);
+    if (!d) return next();
+    const s = d.zaakCode ? findSupplier(d.zaakCode) : null;
+    // wat er BUITEN staat is de gepubliceerde stand, nooit het concept
+    const site = webplatform.losSite(webmaker.publiekeStand(d), s, true);
+    const pad = req.path === '/' ? '' : req.path.replace(/^\//, '').replace(/\/$/, '');
+    const html = webdomeinHtml.render(site, pad);
+    if (html == null) return res.status(404).type('text/plain').send('Deze pagina bestaat niet.');
+    res.type('html').send(html);
+  } catch (e) { next(); }
+};
 /* RTG Web Platform (kern/webplatform.js): genereert bedrijfssites uit het
    zaakprofiel en lost de live zaakdata-blokken op bij het openen. */
 /* Wie van het personeel op de bedrijfssite mag staan: een publicatiebesluit

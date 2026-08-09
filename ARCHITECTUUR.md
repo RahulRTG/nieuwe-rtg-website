@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 2932 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 2934 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,10 +18,10 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 2932 |
-| servermodules (`server/**/*.js`) | 1583 |
+| API-endpoints | 2934 |
+| servermodules (`server/**/*.js`) | 1586 |
 | routebestanden (`server/routes/**`) | 353 |
-| kernmodules (`server/kern/**`) | 919 |
+| kernmodules (`server/kern/**`) | 922 |
 | schermen (`public/**/*.html`) | 215 |
 | gedeelde browsermodules (`public/shared/*.js`) | 171 |
 | toetsbestanden (`test/*.test.js`) | 631 |
@@ -112,7 +112,7 @@ op de regel zelf. Dat is niet hetzelfde als onbeveiligd -- regel 28 van de keuri
 per route een poort **of** een plek op de publieke lijst met reden. Deze kolom is een
 wegwijzer, geen verdict.
 
-Daarnaast 1543 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 1545 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 
@@ -135,7 +135,7 @@ domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 
 ```
 app(130) auth(73) supplierAuth(48) officeAuth(31) db(31) liveCodename(19) accounts(18)
-status(16) schoon(14) managerOnly(13) save(11) rtf(11) codenaamVan(11) express(10)
+status(16) managerOnly(14) schoon(14) save(11) rtf(11) codenaamVan(11) express(10)
 tooManyTries(9) crypto(9) anthropic(9) rtmail(9) boardroomWie(7) logActivity(7)
 sseToOffice(7) keyVanCodenaam(7) payrollOS(7) geenGast(6) noteFailedTry(6) kern(6)
 gegevensStop(6) talen(6) mail(5) loginFails(5) sseToSupplier(5) findSupplier(5)

@@ -131,7 +131,11 @@
         <select id="velVan"><option value="hier">Huidige locatie</option></select>
         <label for="velZoek">Bestemming</label>
         <input id="velZoek" type="search" placeholder="Zoek een zaak, hotel of halte" autocomplete="off">
-        <select id="velNaar" style="margin-top:0.4rem;"><option value="">Kies een plek</option></select>
+        <!-- Deze keuzelijst hoort bij het zoekveld erboven en heeft daarom geen
+             eigen zichtbaar label. Zonder aria-label kondigt een schermlezer hem
+             als naamloos aan; de a11y-keuring meldde dat terecht als enige
+             structurele overtreding van dit scherm. -->
+        <select id="velNaar" aria-label="Gevonden bestemmingen" style="margin-top:0.4rem;"><option value="">Kies een plek</option></select>
         <p class="stil" id="velMeer"></p>
         <div class="duo">
           <div><label for="velReizigers">Reizigers</label><input id="velReizigers" type="number" min="1" max="60" value="1"></div>

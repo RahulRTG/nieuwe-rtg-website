@@ -541,6 +541,10 @@ packages). Ze bewaken de plekken waar geld en wet aan hangen:
   dat een mislukte boeking niets achterlaat, en dat een toegewezen bezwaar op
   een betaalde naheffing terugstort — met een nepbank die op commando weigert,
   want met de echte bank zou alleen de gelukkige helft getoetst worden;
+- de invordering: dat elke stap op de termijn van de vorige wacht (verzetbare
+  klok), dat beslag andere ogen vraagt en nooit meer pakt dan de schuld, dat een
+  deelbeslag de rest laat staan, en dat de regeling en de stopknop de keten
+  echt tegenhouden;
 - De Salon-rechten (gast liket wel, reageert niet), de bestel- en betaalflow
   en de AVG-rechten (inzage en definitieve verwijdering).
 
@@ -801,7 +805,47 @@ met het tekort erbij en de mededeling dat er niets is afgeschreven.
 
 Wordt een bezwaar tegen een al betaalde naheffing toegewezen, dan komt het geld
 terug — een besluit dat de aanslag vernietigt en het bedrag laat staan, doet
-niets. Wat er nog steeds niet is: aanmanen, invorderen, beslag.
+niets.
+
+#### En als er niet betaald wordt: de invordering (`kern/overheid/naheffing-invordering.js`)
+
+De keten is één kant op en **elke stap wacht op de termijn van de vorige**:
+vervallen → aanmaning → dwangbevel → beslag. Niet "na een dag of wat": de datum
+staat op de naheffing en wordt nagerekend. Een invorderingsstap die te vroeg mag,
+is een dwangmiddel zonder grond. Aanmaning en dwangbevel leggen kosten op (art.
+63a IW en de Kostenwet, demo-peiljaar) en die tellen mee in wat er te betalen is
+— een aanmaning die kosten oplegt maar het bedrag niet meebeweegt, houdt de
+invordering aan de gang om acht euro.
+
+**Beslag is de enige stap met vier ogen**, en met opzet de enige: hier gaat er
+geld van een rekening af zonder dat de rekeninghouder tekent. Wie het dwangbevel
+uitvaardigde, legt het beslag niet. Er wordt **nooit meer gepakt dan de schuld**;
+staat er minder op de rekening, dan is het een deelbetaling en blijft de rest
+openstaan. Een lege rekening levert een nette weigering op, geen mislukte
+boeking.
+
+**Er zit een rem en een stopknop in** (`kern/overheid/naheffing-rem.js`), en dat
+is geen vriendelijkheid maar een voorwaarde. Een betalingsregeling schort de
+invordering op zolang hij loopt; een ontvanger kan de invordering stopzetten met
+een reden, in élke stand — ook na een beslag, want juist dan is er iets
+misgegaan. Zonder die twee is dit een ratel die maar één kant op kan, en dat is
+precies het soort systeem dat mensen kapotmaakt omdat niemand meer aan de
+noodrem kon. De stopknop belooft níét dat het geld terugkomt: wat er al is
+afgeschreven loopt via een besluit op bezwaar, niet via een pennenstreek van de
+ontvanger.
+
+**Wat er niet is, en niet komt:** beslag op iets anders dan de zakelijke rekening
+waarop de aanslag is opgelegd. Geen loonbeslag, geen bodembeslag, geen
+derdenbeslag. Dat zijn bevoegdheden met eigen waarborgen en eigen rechters, en
+die verzin je er niet even bij.
+
+| Endpoint | Doel |
+|---|---|
+| `POST /api/overheid/bd/naheffing/aanmaning` `{id}` | Na de betaaltermijn; legt aanmaningskosten op |
+| `POST /api/overheid/bd/naheffing/dwangbevel` `{id}` | Na de aanmaningstermijn; betekeningskosten |
+| `POST /api/overheid/bd/naheffing/beslag` `{id}` | Na het dwangbevel, door ándere ogen; nooit meer dan de schuld |
+| `POST /api/overheid/bd/naheffing/regeling` `{id, maanden}` | De rem: 1–12 maanden, zet de invordering stil |
+| `POST /api/overheid/bd/naheffing/stop` `{id, reden}` | De stopknop, in elke stand, met een reden |
 
 | Endpoint | Doel |
 |---|---|

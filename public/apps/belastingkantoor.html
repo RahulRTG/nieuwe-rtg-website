@@ -392,6 +392,15 @@ async function laadNaheffingen(){
         (n.vastgesteldDoor ? ' · vastgesteld door ' + esc(n.vastgesteldDoor) : '') +
         (n.vervaltOp ? ' · vervalt ' + esc(n.vervaltOp) : '') + '</div>' +
         (n.boeteGrond ? '<div class="meta">Grond voor de boete: ' + esc(n.boeteGrond) + '</div>' : '') +
+        (n.kostenCenten ? '<div class="meta">Invordering: ' +
+          (n.aanmaningOp ? 'aangemaand ' + esc(String(n.aanmaningOp).slice(0,10)) : '') +
+          (n.dwangbevelOp ? ' · dwangbevel ' + esc(String(n.dwangbevelOp).slice(0,10)) : '') +
+          (n.beslagOp ? ' · beslag ' + esc(String(n.beslagOp).slice(0,10)) + ' (' + euro(n.beslagCenten/100) + ')' : '') +
+          ' · kosten ' + euro(n.kostenCenten/100) + ' · openstaand <b>' + euro(n.openstaandCenten/100) + '</b></div>' : '') +
+        (n.regeling ? '<div class="meta">Regeling: ' + n.regeling.maanden + ' maanden à ' +
+          euro(n.regeling.perCenten/100) + ', tot ' + esc(n.regeling.totOp) + ' (door ' + esc(n.regeling.door) + ')</div>' : '') +
+        (n.invorderingGestopt ? '<div class="meta">Invordering stopgezet door ' + esc(n.invorderingGestopt.door) +
+          ': ' + esc(n.invorderingGestopt.reden) + '</div>' : '') +
         (n.bezwaar ? '<div class="meta">Bezwaar: ' + esc(n.bezwaar.reden) +
           (n.bezwaar.besluit ? ' · ' + esc(n.bezwaar.besluit) + ' door ' + esc(n.bezwaar.door) + ': ' + esc(n.bezwaar.motivering) : '') +
           '</div>' : '') +
@@ -402,7 +411,23 @@ async function laadNaheffingen(){
         (n.status === 'bezwaar' ? '<input class="veld" data-nhmot="' + esc(n.id) + '" maxlength="600" placeholder="Motivering van het besluit">' +
           '<button class="knop" data-nhtoe="' + esc(n.id) + '">Bezwaar toewijzen</button>' +
           '<button class="knop rood" data-nhaf="' + esc(n.id) + '">Bezwaar afwijzen</button>' : '') +
-        '</div></div>';
+        '</div>' +
+        /* De invorderingsknoppen. Ze staan er ALLEMAAL zodra een naheffing
+           openstaat; de server zegt zelf welke stap nu mag en waarom niet. Een
+           knop verbergen omdat het scherm denkt te weten dat hij niet mag, is
+           het oordeel van de server naar de opmaak verplaatsen -- en dan lopen
+           die twee uiteen. */
+        (n.openstaandCenten > 0 && !n.invorderingGestopt && ['vastgesteld','bezwaar','gehandhaafd'].includes(n.status)
+          ? '<div class="rij">' +
+            '<button class="knop stil" data-nhaanm="' + esc(n.id) + '">Aanmanen</button>' +
+            '<button class="knop stil" data-nhdwang="' + esc(n.id) + '">Dwangbevel</button>' +
+            '<button class="knop rood" data-nhbeslag="' + esc(n.id) + '">Beslag (andere ogen)</button>' +
+            '<input class="veld kort" data-nhmnd="' + esc(n.id) + '" type="number" min="1" max="12" placeholder="mnd">' +
+            '<button class="knop stil" data-nhreg="' + esc(n.id) + '">Regeling</button>' +
+            '<input class="veld" data-nhstopr="' + esc(n.id) + '" maxlength="300" placeholder="Reden van stopzetten">' +
+            '<button class="knop stil" data-nhstop="' + esc(n.id) + '">Invordering stopzetten</button>' +
+            '</div>' : '') +
+        '</div>';
     }).join('') : '<div class="leeg">Geen naheffingen.</div>');
     bindNaheffingen();
   } catch(e){ meld(e.message); }
@@ -425,6 +450,20 @@ function bindNaheffingen(){
   };
   $('#nhLijst').querySelectorAll('[data-nhtoe]').forEach(b => b.addEventListener('click', () => beslis(b, true)));
   $('#nhLijst').querySelectorAll('[data-nhaf]').forEach(b => b.addEventListener('click', () => beslis(b, false)));
+  const stap = (attr, pad, extra) => $('#nhLijst').querySelectorAll('[data-' + attr + ']').forEach(b =>
+    b.addEventListener('click', () => doe(pad, Object.assign({ id: b.dataset[attr.replace('data-', '')] },
+      extra ? extra(b.dataset[attr.replace('data-', '')]) : {}))));
+  stap('nhaanm', '/api/overheid/bd/naheffing/aanmaning');
+  stap('nhdwang', '/api/overheid/bd/naheffing/dwangbevel');
+  stap('nhbeslag', '/api/overheid/bd/naheffing/beslag');
+  stap('nhreg', '/api/overheid/bd/naheffing/regeling', id => {
+    const v = $('#nhLijst').querySelector('[data-nhmnd="' + id + '"]');
+    return { maanden: v ? Number(v.value) : 0 };
+  });
+  stap('nhstop', '/api/overheid/bd/naheffing/stop', id => {
+    const v = $('#nhLijst').querySelector('[data-nhstopr="' + id + '"]');
+    return { reden: v ? v.value : '' };
+  });
 }
 $('#nhMaak').addEventListener('click', async () => {
   try {

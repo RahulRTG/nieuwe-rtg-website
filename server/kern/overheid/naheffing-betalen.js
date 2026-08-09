@@ -35,7 +35,11 @@ const NAAR = 'extern:belastingdienst';
 module.exports = (ctx, { vind, publiek }) => {
   const { db, save, nu, schoon, notifySupplier, bankLive, bankBoek, bankSaldo } = ctx;
   const euro = (centen) => (centen / 100).toFixed(2).replace('.', ',');
-  const teBetalen = (n) => n.naheffingCenten + n.boeteCenten;
+  /* Wat er te betalen is: de aanslag, de boete EN de invorderingskosten die er
+     onderweg bij zijn gekomen (./naheffing-invordering.js). Een aanmaning die
+     kosten oplegt maar het te betalen bedrag niet meebeweegt, laat de zaak te
+     weinig overmaken en houdt de invordering aan de gang om acht euro. */
+  const teBetalen = (n) => n.naheffingCenten + n.boeteCenten + (n.kostenCenten || 0);
 
   /* De zakelijke rekening van een zaak. Dezelfde vlag als waaronder
      routes/bankhart.js hem opent ('zaak:<code>'); die twee moeten hetzelfde
@@ -67,7 +71,9 @@ module.exports = (ctx, { vind, publiek }) => {
     if (!['vastgesteld', 'bezwaar', 'gehandhaafd'].includes(n.status)) return { status: 409,
       error: n.status === 'concept' ? 'Deze naheffing is nog een concept en dus geen besluit; er valt niets te betalen.'
         : 'Een naheffing met de stand "' + n.status + '" hoeft niet te worden betaald.' };
-    const bedrag = teBetalen(n);
+    /* Min wat er al binnen is: na een DEELBESLAG staat er nog een rest open, en
+       die -- en niet het hele bedrag -- is wat de zaak nu overmaakt. */
+    const bedrag = teBetalen(n) - (n.betaalCenten || 0);
     if (bedrag <= 0) return { status: 409, error: 'Er staat niets open op deze naheffing.' };
 
     const weg = betaalweg(n.code);
@@ -86,7 +92,7 @@ module.exports = (ctx, { vind, publiek }) => {
 
     n.betaaldOp = nu();
     n.betaalIban = weg.rek.iban;
-    n.betaalCenten = bedrag;
+    n.betaalCenten = (n.betaalCenten || 0) + bedrag;
     save();
     return { ok: true, naheffing: publiek(n),
       let: 'Betaald: € ' + euro(bedrag) + ' is van uw zakelijke rekening afgeschreven naar de Belastingdienst.' };
@@ -120,9 +126,10 @@ module.exports = (ctx, { vind, publiek }) => {
     const open = (db.data.rijkNaheffingen || []).filter(n => n.code === c && !n.betaaldOp &&
       ['vastgesteld', 'bezwaar', 'gehandhaafd'].includes(n.status));
     return { ok: true, aantal: open.length,
-      centen: open.reduce((s, n) => s + teBetalen(n), 0),
+      centen: open.reduce((s, n) => s + teBetalen(n) - (n.betaalCenten || 0), 0),
       kenmerken: open.map(n => n.kenmerk) };
   }
 
-  return { naheffingBetaal, naheffingTerugbetaal, naheffingOpenstaand, NAHEFFING_TEGENREKENING: NAAR };
+  return { naheffingBetaal, naheffingTerugbetaal, naheffingOpenstaand,
+    NAHEFFING_TEGENREKENING: NAAR, rekeningVan };
 };

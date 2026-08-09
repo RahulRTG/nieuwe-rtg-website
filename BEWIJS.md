@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 724 bestanden en 4115 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 724 bestanden en 4125 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 724 |
-| losse beweringen (`test(...)`) | 4115 |
+| losse beweringen (`test(...)`) | 4125 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 528 |
 | **overleefd**: geen mutatie kreeg hem rood | 12 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-634 bestanden, 3956 beweringen.
+634 bestanden, 3966 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -121,7 +121,7 @@ toets omvalt.
 | `bouw.test.js` | 4 | gezakt op `liegpoort /api/` | Het bouw-genre (timmerman, loodgieter, elektricien op de vakwerk-motor) en het Dienstenplein in de RTG Mall: elke dienstverlener biedt er zijn aanbod aan, elk leverancier-genre heeft een plek in de gids, en boeken... |
 | `btw-aangifte.test.js` | 17 | gezakt op `liegpoort /api/` | De btw-aangifte van een zaak: de periodevakken, de telling over het factuurregister, de twee controles die weigeren, de correctie en de poorten van de leverancier-endpoints. |
 | `btw-naheffing-keten.test.js` | 2 | gezakt op `liegpoort /api/` | DE HELE KETEN VAN EEN NAHEFFING OVER ECHTE ROUTES, met echte ambtenaren. test/btw-naheffing.test.js toetst het gedrag op de laag zelf, met een verzetbare klok. |
-| `btw-naheffing.test.js` | 24 | gezakt op `===->!==#0` | De naheffingsaanslag omzetbelasting (kern/overheid/naheffing.js + naheffing-daarna.js): het bedrag dat uit de aansluiting komt en niet uit een invulveld, de vier ogen bij vaststellen, de derde ogen bij bezwaar, en de... |
+| `btw-naheffing.test.js` | 34 | gezakt op `===->!==#0` | De naheffingsaanslag omzetbelasting (kern/overheid/naheffing.js + naheffing-daarna.js): het bedrag dat uit de aansluiting komt en niet uit een invulveld, de vier ogen bij vaststellen, de derde ogen bij bezwaar, en de... |
 | `btw-toezicht.test.js` | 9 | gezakt op `===->!==#0` | Het btw-toezicht van het Belastingkantoor (kern/overheid/btwtoezicht.js): de aansluiting tussen het factuurregister en wat er is aangegeven, de vier standen die daaruit volgen, en de signalen die alleen over een... |
 | `bugjacht.test.js` | 28 | gezakt op `liegpoort /api/` | De bugjacht: de defecten die uit de gerichte doorlichting kwamen, elk met een toets die ZAKT als de reparatie eruit gaat. Ze staan hier bij elkaar en niet verspreid over de bestaande bestanden, omdat ze een... |
 | `bundeldelen.test.js` | 4 | -- | De bundels en hun losse delen mogen niet uit elkaar lopen. DIT KOMT UIT EEN ECHTE FOUT, en uit de duurste soort: eentje die niets liet zakken. |

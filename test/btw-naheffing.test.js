@@ -275,7 +275,9 @@ test('de lijst filtert, en telt de openstaande bezwaren', () => {
    weigert is de enige manier om dat tweede te zien; met de echte bank zou ik
    alleen de gelukkige helft toetsen. */
 function metBank(facturen, opzetOpties) {
-  const o = opzet(facturen);
+  return metBankOp(opzet(facturen), opzetOpties);
+}
+function metBankOp(o, opzetOpties) {
   const geboekt = [];
   let saldo = (opzetOpties && opzetOpties.saldo != null) ? opzetOpties.saldo : 1000000;
   const bank = {
@@ -295,7 +297,8 @@ function metBank(facturen, opzetOpties) {
     return { ok: true, boeking: { id: 'BB1' } };
   };
   const nh = maakNaheffing(o.ctx);
-  return { nh, aangifte: o.aangifte, geboekt, bank, saldoNu: () => saldo, seinen: o.seinen, db: o.db };
+  return { nh, aangifte: o.aangifte, geboekt, bank, saldoNu: () => saldo, bankSaldoZet: (v) => { saldo = v; },
+    seinen: o.seinen, db: o.db, klok: o.klok };
 }
 
 async function vastgesteld(h) {
@@ -420,4 +423,206 @@ test('zonder zakelijke rekening kan er niet betaald worden, en dat wordt gezegd'
   assert.equal(r.status, 409);
   assert.match(r.error, /nog geen zakelijke rekening/);
   assert.equal(h.geboekt.length, 0);
+});
+
+/* ------------------------------------------------------- 7. de invordering
+   De zwaarste bevoegdheid in deze laag, dus de meeste weigeringen. De klok is
+   verzetbaar: elke stap mag pas als de TERMIJN van de vorige echt voorbij is, en
+   dat is met de kalender niet na te lopen. */
+async function totVervallen(h, klok) {
+  const n = await vastgesteld(h);
+  klok.nu = '2026-09-01T12:00:00.000Z';   // ruim na de betaaltermijn van 14 dagen
+  return n;
+}
+
+test('elke invorderingsstap wacht op de termijn van de vorige', async () => {
+  const o = opzet([factuur({ nummer: 301, datum: '2026-04-10', verkoper: 'SAL', regels: [[242, 21]] })]);
+  const h = metBankOp(o);
+  const n = await vastgesteld(h);
+
+  // de betaaltermijn loopt nog
+  const teVroeg = h.nh.naheffingAanmaning(n.id, 'Ontvanger Smit');
+  assert.equal(teVroeg.status, 409);
+  assert.match(teVroeg.error, /termijn loopt nog/);
+
+  o.klok.nu = '2026-09-01T12:00:00.000Z';
+  const aan = h.nh.naheffingAanmaning(n.id, 'Ontvanger Smit');
+  assert.equal(aan.ok, true);
+  assert.equal(aan.naheffing.kostenCenten, 800, 'aanmaningskosten bij een klein bedrag');
+  assert.equal(aan.naheffing.openstaandCenten, 4200 + 800, 'de kosten tellen mee in wat er open staat');
+  assert.equal(h.nh.naheffingAanmaning(n.id, 'Smit').status, 409, 'niet twee keer aanmanen');
+
+  // het dwangbevel moet op de aanmaningstermijn wachten
+  const dwTeVroeg = h.nh.naheffingDwangbevel(n.id, 'Ontvanger Smit');
+  assert.equal(dwTeVroeg.status, 409);
+  assert.match(dwTeVroeg.error, /termijn loopt nog/);
+
+  o.klok.nu = '2026-09-20T12:00:00.000Z';
+  const dw = h.nh.naheffingDwangbevel(n.id, 'Ontvanger Smit');
+  assert.equal(dw.ok, true);
+  assert.equal(dw.naheffing.kostenCenten, 800 + 5000, 'betekeningskosten erbij');
+
+  // en beslag op de dwangbeveltermijn
+  const besTeVroeg = await h.nh.naheffingBeslag(n.id, 'Deurwaarder Peters');
+  assert.equal(besTeVroeg.status, 409);
+  assert.match(besTeVroeg.error, /termijn loopt nog/);
+});
+
+test('een dwangbevel zonder aanmaning bestaat niet', async () => {
+  const o = opzet([factuur({ nummer: 311, datum: '2026-04-10', verkoper: 'SAL', regels: [[242, 21]] })]);
+  const h = metBankOp(o);
+  const n = await totVervallen(h, o.klok);
+  const r = h.nh.naheffingDwangbevel(n.id, 'Smit');
+  assert.equal(r.status, 409);
+  assert.match(r.error, /nog niet aangemaand/);
+  assert.equal((await h.nh.naheffingBeslag(n.id, 'Peters')).status, 409, 'en beslag zonder titel al helemaal niet');
+});
+
+test('beslag: vier ogen, en nooit meer dan de schuld', async () => {
+  const o = opzet([factuur({ nummer: 321, datum: '2026-04-10', verkoper: 'SAL', regels: [[242, 21]] })]);
+  const h = metBankOp(o, { saldo: 1000000 });
+  const n = await totVervallen(h, o.klok);
+  h.nh.naheffingAanmaning(n.id, 'Ontvanger Smit');
+  o.klok.nu = '2026-09-20T12:00:00.000Z';
+  h.nh.naheffingDwangbevel(n.id, 'Ontvanger Smit');
+  o.klok.nu = '2026-09-25T12:00:00.000Z';
+
+  const zelf = await h.nh.naheffingBeslag(n.id, 'Ontvanger Smit');
+  assert.equal(zelf.status, 409, 'wie het dwangbevel uitvaardigde legt het beslag niet');
+  assert.match(zelf.error, /Dezelfde ogen/);
+  assert.equal(h.geboekt.length, 0);
+
+  const bes = await h.nh.naheffingBeslag(n.id, 'Deurwaarder Peters');
+  assert.equal(bes.ok, true);
+  assert.equal(bes.volledig, true);
+  assert.equal(h.geboekt.length, 1);
+  assert.equal(h.geboekt[0].centen, 4200 + 800 + 5000, 'de schuld inclusief kosten, en geen cent meer');
+  assert.equal(h.saldoNu(), 1000000 - 10000, 'de rest van het saldo blijft staan');
+  assert.ok(bes.naheffing.betaaldOp, 'daarmee is hij voldaan');
+});
+
+test('staat er te weinig, dan is beslag een DEELbetaling en blijft de rest open', async () => {
+  const o = opzet([factuur({ nummer: 331, datum: '2026-04-10', verkoper: 'SAL', regels: [[242, 21]] })]);
+  const h = metBankOp(o, { saldo: 3000 });
+  const n = await totVervallen(h, o.klok);
+  h.nh.naheffingAanmaning(n.id, 'Smit');
+  o.klok.nu = '2026-09-20T12:00:00.000Z';
+  h.nh.naheffingDwangbevel(n.id, 'Smit');
+  o.klok.nu = '2026-09-25T12:00:00.000Z';
+
+  const bes = await h.nh.naheffingBeslag(n.id, 'Peters');
+  assert.equal(bes.ok, true);
+  assert.equal(bes.volledig, false);
+  assert.equal(h.geboekt[0].centen, 3000, 'alles wat er stond');
+  assert.equal(h.saldoNu(), 0);
+  assert.equal(bes.naheffing.betaaldOp, null, 'en hij is dus NIET voldaan');
+  assert.equal(bes.naheffing.openstaandCenten, 10000 - 3000);
+  assert.match(bes.let, /Deelbeslag/);
+
+  /* EN DE REST BETALEN. Deze bewering komt uit een mutatie die AFSLOEG: de
+     rest-berekening (te betalen MIN wat er al binnen is) eruit slopen veranderde
+     niets, omdat er in geen enkele toets na een deelbeslag nog werd betaald. Als
+     hij weg is, betaalt de zaak het hele bedrag nog een keer -- inclusief de
+     3000 die al met beslag zijn gepakt. */
+  h.bankSaldoZet(20000);
+  const rest = await h.nh.naheffingBetaal('SAL', n.id);
+  assert.equal(rest.ok, true);
+  assert.equal(h.geboekt.length, 2);
+  assert.equal(h.geboekt[1].centen, 10000 - 3000, 'alleen de rest, niet het hele bedrag opnieuw');
+  assert.equal(rest.naheffing.openstaandCenten, 0);
+  assert.ok(rest.naheffing.betaaldOp);
+});
+
+test('op een lege rekening valt niets te halen, en dat wordt gezegd', async () => {
+  const o = opzet([factuur({ nummer: 341, datum: '2026-04-10', verkoper: 'SAL', regels: [[242, 21]] })]);
+  const h = metBankOp(o, { saldo: 0 });
+  const n = await totVervallen(h, o.klok);
+  h.nh.naheffingAanmaning(n.id, 'Smit');
+  o.klok.nu = '2026-09-20T12:00:00.000Z';
+  h.nh.naheffingDwangbevel(n.id, 'Smit');
+  o.klok.nu = '2026-09-25T12:00:00.000Z';
+  const r = await h.nh.naheffingBeslag(n.id, 'Peters');
+  assert.equal(r.status, 409);
+  assert.match(r.error, /staat niets op de zakelijke rekening/);
+  assert.match(r.error, /blijft openstaan/);
+  assert.equal(h.geboekt.length, 0);
+});
+
+test('een betalingsregeling zet de invordering stil', async () => {
+  const o = opzet([factuur({ nummer: 351, datum: '2026-04-10', verkoper: 'SAL', regels: [[242, 21]] })]);
+  const h = metBankOp(o);
+  const n = await totVervallen(h, o.klok);
+  assert.equal(h.nh.naheffingRegeling(n.id, 'Smit', 0).status, 400, 'nul maanden is geen regeling');
+  assert.equal(h.nh.naheffingRegeling(n.id, 'Smit', 99).status, 400, 'en eindeloos ook niet');
+
+  const reg = h.nh.naheffingRegeling(n.id, 'Ontvanger Smit', 4);
+  assert.equal(reg.ok, true);
+  assert.equal(reg.naheffing.regeling.maanden, 4);
+  assert.equal(reg.naheffing.regeling.perCenten, Math.ceil(4200 / 4));
+
+  o.klok.nu = '2027-01-01T12:00:00.000Z';
+  const aan = h.nh.naheffingAanmaning(n.id, 'Smit');
+  assert.equal(aan.status, 409, 'zolang de regeling loopt geen aanmaning');
+  assert.match(aan.error, /betalingsregeling/);
+  assert.equal(h.nh.naheffingRegeling(n.id, 'Smit', 3).status, 409, 'en niet twee regelingen');
+});
+
+test('de stopknop werkt in elke stand, en doet geen beloftes over het geld', async () => {
+  const o = opzet([factuur({ nummer: 361, datum: '2026-04-10', verkoper: 'SAL', regels: [[242, 21]] })]);
+  const h = metBankOp(o, { saldo: 1000000 });
+  const n = await totVervallen(h, o.klok);
+  assert.equal(h.nh.naheffingStopInvordering(n.id, 'Smit', 'kort').status, 400, 'een reden is verplicht');
+
+  h.nh.naheffingAanmaning(n.id, 'Smit');
+  const stop = h.nh.naheffingStopInvordering(n.id, 'Ontvanger Smit', 'de zaak is failliet verklaard');
+  assert.equal(stop.ok, true);
+  assert.match(stop.let, /stopgezet/);
+  o.klok.nu = '2027-01-01T12:00:00.000Z';
+  const dw = h.nh.naheffingDwangbevel(n.id, 'Smit');
+  assert.equal(dw.status, 409, 'daarna geen enkele stap meer');
+  assert.match(dw.error, /stopgezet/);
+  assert.equal((await h.nh.naheffingBeslag(n.id, 'Peters')).status, 409);
+  assert.equal(h.nh.naheffingStopInvordering(n.id, 'Smit', 'nogmaals dan').status, 409, 'en niet twee keer');
+});
+
+test('stopzetten na een beslag belooft niet dat het geld terugkomt', async () => {
+  const o = opzet([factuur({ nummer: 371, datum: '2026-04-10', verkoper: 'SAL', regels: [[242, 21]] })]);
+  const h = metBankOp(o, { saldo: 3000 });
+  const n = await totVervallen(h, o.klok);
+  h.nh.naheffingAanmaning(n.id, 'Smit');
+  o.klok.nu = '2026-09-20T12:00:00.000Z';
+  h.nh.naheffingDwangbevel(n.id, 'Smit');
+  o.klok.nu = '2026-09-25T12:00:00.000Z';
+  await h.nh.naheffingBeslag(n.id, 'Peters');
+
+  const stop = h.nh.naheffingStopInvordering(n.id, 'Smit', 'de zaak heeft alsnog bezwaar gemaakt');
+  assert.equal(stop.ok, true);
+  assert.match(stop.let, /komt hier niet vanzelf mee terug/,
+    'het scherm mag niet suggereren dat het beslag ongedaan is');
+  assert.equal(h.saldoNu(), 0, 'en het geld is er inderdaad nog steeds af');
+});
+
+test('een betaalde of vernietigde naheffing wordt niet ingevorderd', async () => {
+  const o = opzet([factuur({ nummer: 381, datum: '2026-04-10', verkoper: 'SAL', regels: [[242, 21]] })]);
+  const h = metBankOp(o);
+  const n = await totVervallen(h, o.klok);
+  await h.nh.naheffingBetaal('SAL', n.id);
+  const r = h.nh.naheffingAanmaning(n.id, 'Smit');
+  assert.equal(r.status, 409);
+  /* "staat niets meer open" en niet "is betaald": de keuring wijst teksten aan
+     die beweren dat er betaald is, en die regel staat er niet voor niets --
+     alleen weet zij niet dat het hier om onze eigen boeking gaat. De zin is nu
+     waar EN blijft van de verkeerde belofte af. */
+  assert.match(r.error, /staat niets meer open/);
+});
+
+test('na een aanmaning betaalt de zaak de KOSTEN mee', async () => {
+  const o = opzet([factuur({ nummer: 391, datum: '2026-04-10', verkoper: 'SAL', regels: [[242, 21]] })]);
+  const h = metBankOp(o, { saldo: 1000000 });
+  const n = await totVervallen(h, o.klok);
+  h.nh.naheffingAanmaning(n.id, 'Smit');
+  const r = await h.nh.naheffingBetaal('SAL', n.id);
+  assert.equal(r.ok, true);
+  assert.equal(h.geboekt[0].centen, 4200 + 800, 'de aanslag plus de aanmaningskosten');
+  assert.equal(r.naheffing.openstaandCenten, 0);
 });

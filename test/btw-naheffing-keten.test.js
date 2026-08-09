@@ -279,6 +279,51 @@ test('betalen en terugbetalen: het geld beweegt echt, over de echte routes', asy
     const naTerug = await api(srv.base, '/api/supplier/bank/zakelijk', {}, zaak);
     assert.equal(naTerug.body.saldoCenten, 50000, 'de zaak staat weer waar hij stond');
 
+    /* ---- en de invordering, over dezelfde routes ----
+     Wat hier op een server-van-vandaag te bewijzen valt: de KETEN weigert in de
+     goede volgorde. Een vastgestelde naheffing heeft een betaaltermijn van twee
+     weken, dus aanmanen kan vandaag nog niet -- en een dwangbevel zonder
+     aanmaning en beslag zonder dwangbevel al helemaal niet. De termijnen zelf
+     staan in test/btw-naheffing.test.js, met een verzetbare klok. */
+    const nh2 = (await api(srv.base, '/api/overheid/bd/naheffing/maak',
+      { periode: K.periode, code: 'KIKUNOI' }, t1)).body.naheffing;
+    assert.ok(nh2, 'na de vernietiging mag er een nieuwe worden opgemaakt');
+    await api(srv.base, '/api/overheid/bd/naheffing/stelvast', { id: nh2.id }, t2);
+
+    const aanTeVroeg = await api(srv.base, '/api/overheid/bd/naheffing/aanmaning', { id: nh2.id }, t1);
+    assert.equal(aanTeVroeg.status, 409, 'de betaaltermijn loopt nog');
+    assert.match(aanTeVroeg.body.error, /termijn loopt nog/);
+    const dwZonder = await api(srv.base, '/api/overheid/bd/naheffing/dwangbevel', { id: nh2.id }, t1);
+    assert.equal(dwZonder.status, 409, 'en zonder aanmaning geen dwangbevel');
+    const beslagZonder = await api(srv.base, '/api/overheid/bd/naheffing/beslag', { id: nh2.id }, t3);
+    assert.equal(beslagZonder.status, 409, 'en zonder dwangbevel geen beslag');
+
+    // de rem werkt wel meteen: een regeling mag zolang er nog niets is ingevorderd
+    const reg = await api(srv.base, '/api/overheid/bd/naheffing/regeling', { id: nh2.id, maanden: 3 }, t1);
+    assert.equal(reg.status, 200, JSON.stringify(reg.body));
+    assert.equal(reg.body.naheffing.regeling.maanden, 3);
+    const naReg = await api(srv.base, '/api/overheid/bd/naheffing/aanmaning', { id: nh2.id }, t1);
+    assert.equal(naReg.status, 409, 'en zet de invordering stil');
+    assert.match(naReg.body.error, /betalingsregeling/);
+
+    // en de stopknop, met een reden
+    assert.equal((await api(srv.base, '/api/overheid/bd/naheffing/stop', { id: nh2.id, reden: 'x' }, t1)).status, 400);
+    /* `stopInv` en niet `stop`: dat laatste is de helper die de server afsluit,
+       en die staat in dit bestand al boven aan. Twee dezelfde namen naast elkaar
+       is precies hoe je later de verkeerde te pakken hebt. */
+    const stopInv = await api(srv.base, '/api/overheid/bd/naheffing/stop',
+      { id: nh2.id, reden: 'de zaak is in surseance' }, t1);
+    assert.equal(stopInv.status, 200);
+    assert.ok(stopInv.body.naheffing.invorderingGestopt, 'de invordering staat stil');
+
+    // de poorten: een gewone zaak komt aan geen enkele invorderingsknop
+    for (const pad of ['/api/overheid/bd/naheffing/aanmaning', '/api/overheid/bd/naheffing/dwangbevel',
+      '/api/overheid/bd/naheffing/beslag', '/api/overheid/bd/naheffing/regeling',
+      '/api/overheid/bd/naheffing/stop']) {
+      assert.equal((await api(srv.base, pad, { id: nh2.id }, zaak)).status, 403, pad + ' voor een zaak');
+      assert.equal((await api(srv.base, pad, { id: nh2.id }, null)).status, 401, pad + ' anoniem');
+    }
+
     /* En de tucht van het grootboek: de som van alle saldi is nog steeds exact
        nul. Als betalen of terugbetalen ergens geld had laten ontstaan of
        verdwijnen, staat het hier. */

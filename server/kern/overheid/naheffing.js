@@ -50,16 +50,7 @@ module.exports = (ctx) => {
   }
   const vind = (id) => bak().find(n => n.id === String(id || '')) || null;
   const gelijk = (a, b) => String(a || '').trim().toLowerCase() === String(b || '').trim().toLowerCase();
-  const publiek = (n) => ({ id: n.id, kenmerk: n.kenmerk, code: n.code, zaak: n.zaak, periode: n.periode,
-    grondslagCenten: n.grondslagCenten, aangegevenCenten: n.aangegevenCenten, naheffingCenten: n.naheffingCenten,
-    boetePct: n.boetePct, boeteCenten: n.boeteCenten, boeteGrond: n.boeteGrond,
-    totaalCenten: n.naheffingCenten + n.boeteCenten, aanleiding: n.aanleiding,
-    status: n.status, opgemaaktDoor: n.opgemaaktDoor, opgemaaktOp: n.opgemaaktOp,
-    vastgesteldDoor: n.vastgesteldDoor || null, vastgesteldOp: n.vastgesteldOp || null,
-    vervaltOp: n.vervaltOp || null, ingetrokkenDoor: n.ingetrokkenDoor || null, reden: n.reden || null,
-    betaaldOp: n.betaaldOp || null, betaalCenten: n.betaalCenten || 0, terugbetaaldOp: n.terugbetaaldOp || null,
-    bezwaar: n.bezwaar ? { reden: n.bezwaar.reden, at: n.bezwaar.at, besluit: n.bezwaar.besluit || null,
-      motivering: n.bezwaar.motivering || null, door: n.bezwaar.door || null } : null });
+  const { publiek } = require('./naheffing-vorm')();
 
   /* Wat er over een periode bij een zaak valt na te heffen, uit de aansluiting
      en nergens anders vandaan. Geeft de reden mee waarom er wel of niets is. */
@@ -151,8 +142,14 @@ module.exports = (ctx) => {
      een ander soort code dan een besluit vastleggen. ./naheffing-daarna.js
      gebruikt de terugbetaling bij een toegewezen bezwaar. */
   const deelBetalen = require('./naheffing-betalen')(ctx, { vind, publiek });
+  /* De invordering leunt op de betaalweg (dezelfde rekening, dezelfde
+     tegenrekening) en gaat er dus achteraan. */
+  const deelInvordering = require('./naheffing-invordering')(Object.assign({}, ctx,
+    { rekeningVan: deelBetalen.rekeningVan, TEGENREKENING: deelBetalen.NAHEFFING_TEGENREKENING }),
+    { vind, publiek, gelijk, teBetalen: (n) => n.naheffingCenten + n.boeteCenten + (n.kostenCenten || 0) });
   const deelDaarna = require('./naheffing-daarna')(ctx, { bak, vind, publiek, gelijk,
     naheffingTerugbetaal: deelBetalen.naheffingTerugbetaal });
 
-  return Object.assign({ naheffingMaak, naheffingStelVast, BOETE_MAX_CENTEN }, deelBetalen, deelDaarna);
+  return Object.assign({ naheffingMaak, naheffingStelVast, BOETE_MAX_CENTEN },
+    deelBetalen, deelInvordering, deelDaarna);
 };

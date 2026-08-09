@@ -51,6 +51,25 @@ module.exports = (kern, { rijk, stuur, wie }) => {
     try { stuur(res, await overheid.naheffingBeslisBezwaar(wie(req), String((req.body || {}).id || ''), req.body || {})); }
     catch (e) { console.error('[naheffing-bezwaar]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
   });
+  /* ---- de invordering ----
+     De keten is een kant op en elke stap wacht op de termijn van de vorige; de
+     motor bewaakt dat (kern/overheid/naheffing-invordering.js). BESLAG is async
+     en heeft eigen ogen: wie het dwangbevel uitvaardigde legt het niet. Ook die
+     naam komt uit `wie(req)` en dus uit de personeelslogin -- een naam uit het
+     lijf zou betekenen dat dezelfde ambtenaar de hele keten alleen afloopt. */
+  app.post('/api/overheid/bd/naheffing/aanmaning', supplierAuth, rijk, (req, res) =>
+    stuur(res, overheid.naheffingAanmaning(String((req.body || {}).id || ''), wie(req))));
+  app.post('/api/overheid/bd/naheffing/dwangbevel', supplierAuth, rijk, (req, res) =>
+    stuur(res, overheid.naheffingDwangbevel(String((req.body || {}).id || ''), wie(req))));
+  app.post('/api/overheid/bd/naheffing/beslag', supplierAuth, rijk, async (req, res) => {
+    try { stuur(res, await overheid.naheffingBeslag(String((req.body || {}).id || ''), wie(req))); }
+    catch (e) { console.error('[naheffing-beslag]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
+  });
+  app.post('/api/overheid/bd/naheffing/regeling', supplierAuth, rijk, (req, res) =>
+    stuur(res, overheid.naheffingRegeling(String((req.body || {}).id || ''), wie(req), (req.body || {}).maanden)));
+  app.post('/api/overheid/bd/naheffing/stop', supplierAuth, rijk, (req, res) =>
+    stuur(res, overheid.naheffingStopInvordering(String((req.body || {}).id || ''), wie(req), (req.body || {}).reden)));
+
   app.post('/api/overheid/bd/naheffingen', supplierAuth, rijk, (req, res) =>
     res.json(overheid.naheffingenLijst(req.body || {})));
 

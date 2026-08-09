@@ -131,7 +131,7 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
      toernooien. Deelnemers buiten de progressiegrens staan er zonder codenaam
      in; speelde niemand binnen de grens mee, dan wordt er niets bewaard. Zie
      spellen/uitslagen.js. */
-  const { noteerUitslag, spelUitslagen } = require('./spellen/uitslagen')({
+  const { noteerUitslag, spelUitslagen, spelStand } = require('./spellen/uitslagen')({
     db, save, codenaamVan, nu, progressieMag
   });
 
@@ -186,7 +186,7 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
   const sneekScore = (mij, punten) => arcadeScore(mij, 'sneek', punten);
   const sneekBord = (mij, vrienden) => arcadeBord(mij, 'sneek', vrienden);
 
-  return { spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelRahul, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, spelUitslagen, sneekScore, sneekBord, arcadeScore, arcadeBord, SPEL_SOORTEN: SOORTEN,
+  return { spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelRahul, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, spelUitslagen, spelStand, sneekScore, sneekBord, arcadeScore, arcadeBord, SPEL_SOORTEN: SOORTEN,
     // alleen voor de drift-test: de client heeft een eigen kopie van deze
     // regels (directe feedback); de test houdt beide kopieën tegen elkaar
     _spelregels: { rummiSet: ruw.rummiSet, W_PREMIE: ruw.W_PREMIE, SPEL, ARCADE } };

@@ -188,3 +188,34 @@ test('de spellen van de lobby staan in de app die ze mag starten', () => {
       'de lobby zet "' + sleutel + '" in de andere app dan de server toestaat');
   }
 });
+
+/* De stand in de lobby. Twee regels die anders stil wegvallen: het VENSTER
+   staat er altijd bij (een getal zonder tijdsaanduiding leest als een
+   totaal-voor-altijd), en onder de progressiegrens blijft het hele blok weg in
+   plaats van dat er een lege kop met nul partijen staat. */
+test('de lobby toont de stand met zijn venster, en zwijgt onder de grens', async () => {
+  const bron = knip('async function laadStand()', 'async function laadLobby');
+  const maak = () => ({ hidden: false, innerHTML: '' });
+
+  async function draai(antwoord) {
+    const el = { '#standKop': maak(), '#stand': maak() };
+    const laad = new Function('api', '$', 'esc', 'SPELNAAM',
+      bron + '; return laadStand;')(async () => antwoord, (sel) => el[sel], (x) => String(x), { schaak: 'Schaken' });
+    await laad();
+    return el;
+  }
+
+  const uit = await draai({ progressie: false, stand: [], totaal: null });
+  assert.equal(uit['#stand'].hidden, true, 'onder de grens hoort het blok weg te zijn');
+  assert.equal(uit['#standKop'].hidden, true, 'kop en al');
+
+  const leeg = await draai({ progressie: true, stand: [], vensterDagen: 365 });
+  assert.equal(leeg['#stand'].hidden, true, 'nul partijen is ook geen blok waard');
+
+  const vol = await draai({ progressie: true, vensterDagen: 365,
+    stand: [{ soort: 'schaak', gespeeld: 3, gewonnen: 1, gelijk: 1, verloren: 1 }] });
+  assert.equal(vol['#stand'].hidden, false);
+  assert.match(vol['#stand'].innerHTML, /Schaken/, 'het spel staat er op naam');
+  assert.match(vol['#stand'].innerHTML, /3 gespeeld/);
+  assert.match(vol['#stand'].innerHTML, /afgelopen jaar/, 'het venster hoort erbij te staan');
+});

@@ -32,8 +32,16 @@
    (server/bewaartermijnen.js) leest `db.data[tak]`, dus een genest lijstje zou
    buiten het bewaarbeleid vallen en op de lijst `zonderBeleid()` belanden. De
    termijn staat in server/bewaarbeleid.js. */
+const { BELEID } = require('../../bewaarbeleid');
+
 module.exports = (ctx) => {
   const { db, save, codenaamVan, progressieMag, nu } = ctx;
+
+  /* Het VENSTER waarover een stand gaat is de bewaartermijn van de log, en
+     niet iets aparts. Daarom halen we hem daar op in plaats van hem hier over
+     te schrijven: gaat de termijn omlaag, dan zegt de stand vanzelf het goede
+     aantal dagen en niet een getal dat er niet meer bij past. */
+  const VENSTER = ((BELEID.find(r => r.tak === 'spelUitslagen') || {}).dagen) || null;
 
   // harde bovengrens op schijf, los van de bewaartermijn: een database die
   // volloopt is een storing, en die willen we niet van een termijn af laten hangen
@@ -104,5 +112,44 @@ module.exports = (ctx) => {
     return { status: 200, uitslagen: uit, progressie: true };
   }
 
-  return { noteerUitslag, spelUitslagen, _winnaarsVan: winnaarsVan };
+  /* Je eigen stand, AFGELEID uit de log en niet apart bijgehouden.
+
+     Dat is een ontwerpkeuze met gevolgen, dus die staat hier. Een teller per
+     speler zou blijvend zijn en dus buiten de bewaartermijn vallen -- en het
+     bewaarbeleid kent alleen takken met een datum per item, dus zo'n teller
+     zou permanent op de lijst `zonderBeleid()` staan (een gat dat we zelf
+     zouden slaan). Afleiden kost niets extra's aan opslag, heeft geen tweede
+     wispad nodig, en verloopt vanzelf mee.
+
+     Het gevolg: een stand gaat over het VENSTER van de log en niet over
+     altijd. Dat reist mee in het antwoord, want "12 gewonnen" dat stilzwijgend
+     "in het afgelopen jaar" betekent leest als een totaal-voor-altijd. En het
+     past bij dit huis: een stand die kan zakken is iets anders dan een ratel
+     die alleen omhoog gaat. */
+  function spelStand(mij) {
+    if (!progressieMag(mij)) {
+      return { status: 200, stand: [], totaal: null, progressie: false,
+        reden: 'Een stand bestaat voor leden met een geverifieerde volwassen leeftijd. Het spel zelf speel je gewoon.' };
+    }
+    const per = new Map();
+    let g = 0, w = 0, q = 0;
+    for (const r of U()) {
+      const ik = (r.spelers || []).find(s => s.key === mij);
+      if (!ik) continue;
+      if (!per.has(r.soort)) per.set(r.soort, { soort: r.soort, gespeeld: 0, gewonnen: 0, gelijk: 0, verloren: 0 });
+      const rij = per.get(r.soort);
+      rij.gespeeld++; g++;
+      if (r.gelijk) { rij.gelijk++; q++; }
+      else if (ik.won) { rij.gewonnen++; w++; }
+      else rij.verloren++;
+    }
+    return {
+      status: 200, progressie: true,
+      vensterDagen: VENSTER,
+      stand: [...per.values()].sort((a, b) => b.gespeeld - a.gespeeld),
+      totaal: { gespeeld: g, gewonnen: w, gelijk: q, verloren: g - w - q }
+    };
+  }
+
+  return { noteerUitslag, spelUitslagen, spelStand, _winnaarsVan: winnaarsVan };
 };

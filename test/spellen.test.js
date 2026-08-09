@@ -219,6 +219,22 @@ test('uitslagen: een afgelopen potje levert een uitslag op, en die is van jou', 
   assert.equal((bijB.uitslagen[0] || {}).ik, true, 'b heeft gewonnen');
 });
 
+test('stand: een gewonnen en een verloren partij komen in beider stand terecht', async () => {
+  const { a, b } = await tweeVrienden();
+  const nieuw = await json(await raw('/member/spel/nieuw', { soort: 'schaak', vrienden: [b.key] }, a.tok));
+  await raw('/member/spel/antwoord', { id: nieuw.id, akkoord: true }, b.tok);
+  await raw('/member/spel/opgeven', { id: nieuw.id }, a.tok);
+
+  const sa = await json(await raw('/member/spel/stand', {}, a.tok));
+  const schaakA = sa.stand.find(x => x.soort === 'schaak');
+  assert.ok(schaakA && schaakA.gespeeld >= 1, 'a heeft een schaakpartij gespeeld');
+  assert.equal(schaakA.verloren, 1, 'en die verloren door op te geven');
+  assert.equal(sa.vensterDagen, 365, 'de stand zegt over welk venster hij gaat');
+
+  const sb = await json(await raw('/member/spel/stand', {}, b.tok));
+  assert.equal(sb.stand.find(x => x.soort === 'schaak').gewonnen, 1, 'b won er een');
+});
+
 test('uitslagen: onder de 18+-grens bestaat er geen historie', async () => {
   const t = Date.now() + '' + (teller++);
   const jong = await json(await raw('/auth/register', { name: 'Jong U' + t, email: 'ju' + t + '@v.test', phone: '0679' + String(t).slice(-6), password: 'geheim123', geboortedatum: '2010-01-01', tier: 'rtg' }));

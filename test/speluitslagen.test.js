@@ -213,3 +213,67 @@ test('het wissen van het ene lid raakt de partijen van een ander niet', () => {
   assert.deepEqual(u.spelUitslagen('chris').uitslagen.map(x => x.id), ['p2'], 'chris houdt zijn historie');
   assert.deepEqual(u.spelUitslagen('boris').uitslagen.map(x => x.id), ['p1'], 'en boris ook');
 });
+
+/* ---------- de stand: afgeleid, niet bijgehouden ---------- */
+
+test('de stand telt per spel wat je speelde, won, verloor en gelijk hield', () => {
+  const u = maak();
+  u.noteerUitslag(potje({ id: '1', soort: 'schaak', winnaar: 'CN-anna' }));
+  u.noteerUitslag(potje({ id: '2', soort: 'schaak', winnaar: 'CN-boris' }));
+  u.noteerUitslag(potje({ id: '3', soort: 'schaak', winnaar: null, gelijk: true }));
+  u.noteerUitslag(potje({ id: '4', soort: 'woord', winnaar: 'CN-anna' }));
+
+  const s = u.spelStand('anna');
+  assert.deepEqual(s.stand.find(x => x.soort === 'schaak'),
+    { soort: 'schaak', gespeeld: 3, gewonnen: 1, gelijk: 1, verloren: 1 });
+  assert.deepEqual(s.totaal, { gespeeld: 4, gewonnen: 2, gelijk: 1, verloren: 1 });
+  assert.equal(s.stand[0].soort, 'schaak', 'het meest gespeelde spel staat bovenaan');
+
+  // en van de andere kant gezien klopt hij ook
+  const b = u.spelStand('boris');
+  assert.deepEqual(b.totaal, { gespeeld: 4, gewonnen: 1, gelijk: 1, verloren: 2 });
+});
+
+test('een gelijkspel is voor niemand een overwinning', () => {
+  const u = maak();
+  u.noteerUitslag(potje({ winnaar: null, gelijk: true }));
+  for (const wie of ['anna', 'boris'])
+    assert.deepEqual(u.spelStand(wie).totaal, { gespeeld: 1, gewonnen: 0, gelijk: 1, verloren: 0 }, wie);
+});
+
+test('de stand noemt het venster, en haalt dat uit de bewaartermijn', () => {
+  /* "12 gewonnen" dat stilzwijgend "in het afgelopen jaar" betekent leest als
+     een totaal-voor-altijd. Het getal komt uit het bewaarbeleid en staat hier
+     niet apart, zodat een kortere termijn niet stil een verkeerd venster
+     oplevert. */
+  const u = maak();
+  const regel = BELEID.find(r => r.tak === 'spelUitslagen');
+  assert.equal(u.spelStand('anna').vensterDagen, regel.dagen,
+    'het venster hoort gelijk te zijn aan de bewaartermijn van de log');
+});
+
+test('onder de grens bestaat er geen stand', () => {
+  const u = maak();
+  u.noteerUitslag(potje({ spelers: ['anna', 'kind1'] }));
+  const s = u.spelStand('kind1');
+  assert.deepEqual(s.stand, []);
+  assert.equal(s.totaal, null);
+  assert.equal(s.progressie, false);
+});
+
+test('een partij waar je niet in meespeelde telt niet mee', () => {
+  const u = maak();
+  u.noteerUitslag(potje({ id: 'vanAnderen', spelers: ['chris', 'dana'], winnaar: 'CN-chris' }));
+  assert.deepEqual(u.spelStand('anna').totaal, { gespeeld: 0, gewonnen: 0, gelijk: 0, verloren: 0 });
+});
+
+test('wie zich laat verwijderen verdwijnt ook uit zijn eigen stand', () => {
+  // de stand is afgeleid, dus het wispad hoeft hem niet apart te kennen -- die
+  // eenvoud is precies waarom hij niet apart wordt bijgehouden
+  const u = maak();
+  u.noteerUitslag(potje({ id: 'p1', spelers: ['anna', 'boris'] }));
+  assert.equal(u.spelStand('anna').totaal.gespeeld, 1);
+  maakAnoniem({ db: u.db, accounts: {} }).anonimiseer('anna', 'CN-anna', null);
+  assert.equal(u.spelStand('anna').totaal.gespeeld, 0, 'niets meer van anna');
+  assert.equal(u.spelStand('boris').totaal.gespeeld, 1, 'boris houdt de zijne');
+});

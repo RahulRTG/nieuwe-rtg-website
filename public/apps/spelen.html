@@ -134,6 +134,8 @@
     <div><button type="button" class="zichtbaarknop" id="zichtbaarKnop"></button></div>
     <div class="sec">Jouw potjes</div>
     <div id="potjes"><div class="leeg">Nog geen potjes. Kies hierboven een spel.</div></div>
+    <div class="sec" id="standKop" hidden>Jouw partijen</div>
+    <div id="stand" hidden></div>
   </section>
 
   <!-- nieuw potje -->
@@ -367,9 +369,28 @@ $('#zichtbaarKnop').addEventListener('click', async ()=>{
   }catch(e){ meld(e.message); }
 });
 
+/* Jouw partijen: afgeleid uit de uitslagen, dus over hetzelfde venster als de
+   bewaartermijn. Dat venster staat er met zoveel woorden bij -- "7 gewonnen"
+   zonder tijdsaanduiding leest als een totaal-voor-altijd. Onder de
+   progressiegrens bestaat er geen stand en blijft het blok gewoon weg. */
+async function laadStand(){
+  let d; try{ d = await api('stand'); }catch(e){ return; }
+  const rijen = d.stand || [];
+  const leeg = !d.progressie || !rijen.length;
+  $('#standKop').hidden = leeg; $('#stand').hidden = leeg;
+  if (leeg) return;
+  const jaar = Math.round((d.vensterDagen || 365) / 365);
+  const venster = jaar <= 1 ? 'het afgelopen jaar' : 'de afgelopen ' + jaar + ' jaar';
+  $('#stand').innerHTML = rijen.map(r =>
+    '<div class="rij"><div class="nm">'+esc(SPELNAAM[r.soort]||r.soort)+
+    '<small>'+r.gespeeld+' gespeeld · '+r.gewonnen+' gewonnen'+
+    (r.gelijk ? ' · '+r.gelijk+' gelijk' : '')+'</small></div></div>').join('') +
+    '<div class="leeg">Over '+venster+'; oudere partijen tellen niet meer mee.</div>';
+}
+
 async function laadLobby(){
   let d; try{ d = await api('mijn'); }catch(e){ return; }
-  laadOnline(); laadZichtbaar();
+  laadOnline(); laadZichtbaar(); laadStand();
   const u = d.uitnodigingen||[];
   $('#uitnodigingen').innerHTML = u.length ? '<div class="sec">Uitnodigingen</div>' + u.map(x =>
     '<div class="rij"><div class="nm">'+esc(x.naam)+(x.modus==='teams'?' · 2 tegen 2':'')+'<small>van '+esc(x.van)+' · met '+x.spelers.map(esc).join(', ')+'</small></div>'+

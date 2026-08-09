@@ -3087,12 +3087,15 @@ var RTG_BOUW = '1b06c62c';
     residentie:  { naam: 'Verblijven', url: '/apps/residentie.html' },
     wbw:         { naam: 'Samen betalen', url: '/apps/wbw.html' },
     passkeys:    { naam: 'Passkeys',     url: '/apps/passkeys.html' },
-    // veiligheid en verbinding: vier apps op een gedeelde kern
+    /* Veiligheid en verbinding. Hier stonden VIER tegels -- Thuiswacht,
+       Codewoord, Vitaal en Thuisrust -- op een gedeelde kern. Ze zijn nu vier
+       standen van een app (/apps/veilig.html), want een systeem dat een systeem
+       is, hoort niet als vier losse deuren op een beginscherm te staan: wie de
+       Thuiswacht kende, had het Codewoord daardoor vaak nooit gezien. De oude
+       paden leiden met een hash naar hun eigen stand, dus een bladwijzer of een
+       geinstalleerde PWA komt nog steeds uit waar hij hoort. */
     ik:          { naam: 'Wie ben ik',   url: '/apps/ik.html' },
-    thuiswacht:  { naam: 'Thuiswacht',   url: '/apps/thuiswacht.html' },
-    codewoord:   { naam: 'Codewoord',    url: '/apps/codewoord.html' },
-    vitaal:      { naam: 'Vitaal',       url: '/apps/vitaal.html' },
-    thuisrust:   { naam: 'Thuisrust',    url: '/apps/thuisrust.html' },
+    veilig:      { naam: 'RTG Veilig',   url: '/apps/veilig.html' },
     ov:          { naam: 'Openbaar vervoer',           url: '/apps/ov.html' },
     stad:        { naam: 'Stad',    url: '/apps/stad.html' },
     clips:       { naam: 'Video',        url: '/apps/clips.html' },
@@ -3258,7 +3261,7 @@ var RTG_BOUW = '1b06c62c';
        RTG-pas een map met drie tegels. De kantoorkant zit bij Werk. */
     { sleutel: 'map-huis', naam: 'Het Huis', items: [
       'link:ontdek', 'os:rtf', 'tab:bestellen', 'tab:zorg', 'tab:gezin',
-      'link:vitaal', 'link:thuisrust', 'link:rechterhand',
+      'link:rechterhand',
       'link:maison', 'link:table', 'link:cellier', 'link:garderobe'] },
 
     /* --- tweede rij, gecentreerd --- */
@@ -3267,13 +3270,28 @@ var RTG_BOUW = '1b06c62c';
       'link:nieuws', 'link:krant', 'link:sport'] },
     { sleutel: 'map-werk', naam: 'Werk', items: [
       'link:office', 'os:werk', 'link:loonstrook', 'link:school',
-      'link:browser', 'link:sitemaker', 'link:juridisch'] },
-    /* Veilig: wie je bent en wie er over je waakt. Vier apps op dezelfde kern
-       (zie de opmerking bij LINKS), plus de sleutels waarmee je binnenkomt.
-       Vier is hier geen tekort maar de hele set -- dit is de enige map die op
-       elke pas even groot is. */
+      'link:browser', 'link:sitemaker'] },
+    /* Veilig: wie je bent en wie er over je waakt. De vier apps op dezelfde
+       kern zijn een app met vier standen geworden (zie de opmerking bij LINKS),
+       plus de sleutels waarmee je binnenkomt. Drie is hier geen tekort maar de
+       hele set -- dit is de enige map die op elke pas even groot is.
+
+       Vitaal en Thuisrust stonden bij Het Huis en niet hier, omdat ze over zorg
+       en huishouden gingen. Nu ze standen zijn van een app, kan die app maar in
+       een map staan (geen enkel item staat in twee mappen) en dat is deze:
+       waar de andere twee standen ook al woonden. Het Huis houdt zorg en gezin
+       als eigen tabbladen, dus daar verdwijnt het onderwerp niet.
+
+       Juridisch komt hier vandaan uit de map Werk. Vier tegels werden een, en
+       daarmee zakte deze map naar drie -- onder de ondergrens die
+       test/appmenu.e2e.js bewaakt, en die ondergrens is er niet voor niets: een
+       bijna lege map op de instappas is precies waar de merkregel over gaat.
+       Juridisch is geen noodgreep om een gat te vullen maar hoort hier: de
+       app-bibliotheek zet hem zelf al in de categorie "Veiligheid & identiteit"
+       naast Wie ben ik en Passkeys, en het gaat over jouw voorwaarden en jouw
+       akkoorden -- wie je bent, niet waar je werkt. Werk houdt zes tegels. */
     { sleutel: 'map-veilig', naam: 'Veilig', items: [
-      'link:ik', 'link:thuiswacht', 'link:codewoord', 'link:passkeys'] }
+      'link:ik', 'link:veilig', 'link:passkeys', 'link:juridisch'] }
   ];
 
   /* De premium-suite (De Rechterhand) bestaat alleen voor Lifestyle en

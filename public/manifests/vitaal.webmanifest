@@ -4,7 +4,7 @@
   "id": "/apps/vitaal",
   "description": "Een knop per dag: het gaat goed. Meldt u zich niet, dan gaat er iemand kijken. Voor medicijnen en voor alleenwonenden.",
   "lang": "nl",
-  "start_url": "/apps/vitaal.html",
+  "start_url": "/apps/veilig.html#vitaal",
   "scope": "/",
   "display": "standalone",
   "background_color": "#0C0C0B",

@@ -50,6 +50,16 @@ module.exports = {
   '/apps/vluchten.html': G('RTG Vluchten: je vluchten en de private aviation van partners.',
     ['Bekijk vluchten en beschikbaarheid', 'Vraag een boeking aan; de partner bevestigt', 'Volg je reis in de app'],
     'Boekingen zijn pas definitief na bevestiging; de app zegt dat ook eerlijk.'),
+  /* RTG Veilig draagt de vier standen; de vier oude paden houden hun EIGEN
+     uitleg, want daar komt iemand nog steeds binnen (een alarmmail, een oude
+     bladwijzer, een geinstalleerde PWA) en die wordt met een hash naar de
+     juiste stand gestuurd. Een omleiding die onderweg zijn uitleg kwijtraakt,
+     zou de leerlaag stiller maken dan hij was. */
+  '/apps/veilig.html': G('RTG Veilig: Thuiswacht, Codewoord, Vitaal en Thuisrust als vier standen van een app, op een kring die je een keer instelt.',
+    ['Wissel bovenin van stand: onderweg, stil om hulp vragen, dagelijks melden, of rust',
+     'Vul je kring een keer; alle vier de standen gebruiken dezelfde mensen',
+     'Stuur een keer een proefalarm, zodat je weet dat de keten echt werkt'],
+    'De klok tikt op de server en niet in de app, dus het werkt juist wel als je telefoon uitvalt. Wat het niet is: een alarmcentrale -- er wordt niemand gebeld en er kijkt geen mens mee.'),
   '/apps/thuiswacht.html': G('De Thuiswacht: je zegt hoe lang je onderweg bent, en meld je je niet, dan krijgt je kring bericht met je laatst bekende plek.',
     ['Kies hoe lang je onderweg bent en start de wacht', 'Druk op "Ik ben thuis" zodra je binnen bent', 'Stuur je kring een keer een proefalarm, zodat je weet dat het werkt'],
     'De klok loopt op de server, niet in de app: valt je telefoon uit, dan gaat het alarm juist wel af. Stilte is hier het signaal.'),

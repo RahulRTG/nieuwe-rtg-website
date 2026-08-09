@@ -1,9 +1,12 @@
-    // veiligheid en verbinding: vier apps op een gedeelde kern
+    /* Veiligheid en verbinding. Hier stonden VIER tegels -- Thuiswacht,
+       Codewoord, Vitaal en Thuisrust -- op een gedeelde kern. Ze zijn nu vier
+       standen van een app (/apps/veilig.html), want een systeem dat een systeem
+       is, hoort niet als vier losse deuren op een beginscherm te staan: wie de
+       Thuiswacht kende, had het Codewoord daardoor vaak nooit gezien. De oude
+       paden leiden met een hash naar hun eigen stand, dus een bladwijzer of een
+       geinstalleerde PWA komt nog steeds uit waar hij hoort. */
     ik:          { naam: 'Wie ben ik',   url: '/apps/ik.html' },
-    thuiswacht:  { naam: 'Thuiswacht',   url: '/apps/thuiswacht.html' },
-    codewoord:   { naam: 'Codewoord',    url: '/apps/codewoord.html' },
-    vitaal:      { naam: 'Vitaal',       url: '/apps/vitaal.html' },
-    thuisrust:   { naam: 'Thuisrust',    url: '/apps/thuisrust.html' },
+    veilig:      { naam: 'RTG Veilig',   url: '/apps/veilig.html' },
     ov:          { naam: 'Openbaar vervoer',           url: '/apps/ov.html' },
     stad:        { naam: 'Stad',    url: '/apps/stad.html' },
     clips:       { naam: 'Video',        url: '/apps/clips.html' },

@@ -15,13 +15,15 @@ module.exports = [
   ['sport', 'Sport', 'spelen', '/apps/sport.html', 'Je sportactiviteiten en clubs.'],
 
   // ---- veiligheid & identiteit ----
-  // De vier veiligheidsapps draaien op een gedeelde kern (kern/veiligheid/):
-  // een kring van codenamen, je laatst bekende plek, en een dodemansknop die
-  // op de SERVER tikt, zodat hij ook afgaat als je telefoon uitvalt.
-  ['thuiswacht', 'Thuiswacht', 'veiligheid', '/apps/thuiswacht.html', 'Zeg hoe lang je onderweg bent; meld je je niet, dan krijgt je kring bericht met je laatst bekende plek.'],
-  ['codewoord', 'Codewoord', 'veiligheid', '/apps/codewoord.html', 'Een gewone zin die je kring stil waarschuwt met je plek; op je scherm gebeurt er niets zichtbaars.'],
-  ['vitaal', 'Vitaal', 'veiligheid', '/apps/vitaal.html', 'Een knop per dag: het gaat goed. Voor medicijnen, en voor wie alleen woont.'],
-  ['thuisrust', 'Thuisrust', 'veiligheid', '/apps/thuisrust.html', 'Niet storen tot je thuis bent; je eigen kring komt er altijd doorheen.'],
+  // De vier veiligheidsapps draaiden altijd al op een gedeelde kern
+  // (kern/veiligheid/): een kring van codenamen, je laatst bekende plek, en een
+  // dodemansknop die op de SERVER tikt, zodat hij ook afgaat als je telefoon
+  // uitvalt. Ze deelden ook de clientlaag (shared/veiligheid.js) en verschilden
+  // alleen in de vraag die ze stelden -- maar ze stonden hier als vier tegels,
+  // en dat betekende in de praktijk dat iemand de Thuiswacht kende en het
+  // Codewoord nooit had gezien. Ze zijn nu vier standen van een app; de oude
+  // paden leiden er met een hash naartoe, dus geen enkele link is dood.
+  ['veilig', 'RTG Veilig', 'veiligheid', '/apps/veilig.html', 'Thuiswacht, Codewoord, Vitaal en Thuisrust in een app: zeggen hoe lang je onderweg bent, je kring stil waarschuwen, dagelijks laten weten dat het goed gaat, en stil zijn zonder onbereikbaar te worden. De klok tikt op de server, dus het werkt ook als je telefoon uitvalt.'],
   ['ik', 'Wie ben ik', 'veiligheid', '/apps/ik.html', 'Wat Rahul over je mag weten: hoe hij tegen je doet, je voornaamwoorden en je eigen geloofskeuze. Alles optioneel.'],
   ['passkeys', 'Passkeys', 'veiligheid', '/apps/passkeys.html', 'Inloggen met vingerafdruk, gezicht of een fysieke sleutel.'],
   ['juridisch', 'Juridisch', 'veiligheid', '/apps/juridisch.html', 'Voorwaarden, contracten en je eigen akkoorden.'],

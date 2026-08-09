@@ -388,9 +388,14 @@ test('geen enkele map loopt leeg op de instappas',
      pas die alles ziet. Je ziet het alleen door de mappen echt open te klikken
      mét de kleinste pas. Vandaar deze toets.
 
-     De mutatie die hem hoort te laten zakken: zet de zorg-apps (tab:zorg,
-     tab:gezin, link:vitaal, link:thuisrust) uit Het Huis terug in een eigen
-     map. */
+     De mutatie die hem hoort te laten zakken: zet de zorg-tabbladen (tab:zorg,
+     tab:gezin) uit Het Huis terug in een eigen map.
+
+     Hier stonden ook link:vitaal en link:thuisrust bij. Die twee zijn standen
+     van RTG Veilig geworden (een app kan maar in een map staan, en die map is
+     Veilig), dus Het Huis draagt zijn ondergrens nu op de twee tabbladen plus
+     link:ontdek en os:rtf. Dat is krapper dan het was: gaat er nog iets uit
+     Het Huis weg, dan zakt deze toets -- en dat is precies de bedoeling. */
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-mappen-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;

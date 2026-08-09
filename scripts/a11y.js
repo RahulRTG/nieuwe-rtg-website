@@ -39,6 +39,11 @@ const PAGINAS = [
   '/apps/theater.html',
   '/apps/wbw.html',
   '/apps/passkeys.html',
+  /* RTG Veilig staat hier omdat het de app is waarin iemand onder spanning iets
+     moet kunnen invullen: een zin typen terwijl er iemand meekijkt, een knop
+     vinden terwijl de klok loopt. De vier schermen die hierin opgingen stonden
+     nooit in deze lijst; dat was een gat, niet een keuze. */
+  '/apps/veilig.html',
   '/apps/ov.html',
   '/apps/ovdienst.html',
   '/apps/ovroutes.html',

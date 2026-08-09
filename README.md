@@ -1697,17 +1697,44 @@ Alles wat de balie wél doet — een dossier openen, een codenaam natrekken — 
 
 Kern: `server/kern/ledenbalie.js`, routes `/api/office/balie/{zetels,zetel,zoek,dossier,herstel,klacht,klacht/status,abo}`, getoetst in `test/ledenbalie.test.js`.
 
-## Veiligheid & verbinding: vier apps op één ruggengraat
+## RTG Veilig: vier standen op één ruggengraat
 
-Vier losse apps (elk met eigen PWA-manifest), die onderhuids dezelfde kern delen
+Eén app (`/apps/veilig.html`) met vier standen, op één kern
 (`server/kern/veiligheid/`, routes onder `/api/veiligheid/*`):
 
-| App | Wat het doet |
+| Stand | Wat het doet |
 |---|---|
-| **Thuiswacht** (`/apps/thuiswacht.html`) | "Ik ben over X minuten thuis." Meld je je niet, dan krijgt je kring bericht met je laatst bekende plek |
-| **Codewoord** (`/apps/codewoord.html`) | Een gewone zin tegen Rahul waarschuwt je kring stil; op je scherm gebeurt er zichtbaar niets |
-| **Vitaal** (`/apps/vitaal.html`) | Dagelijkse check-in voor medicijnen of voor wie alleen woont |
-| **Thuisrust** (`/apps/thuisrust.html`) | Niet storen tot je thuis bent, met een veiligheidsbaan die je kring altijd doorlaat |
+| **Thuiswacht** (`#wacht`) | "Ik ben over X minuten thuis." Meld je je niet, dan krijgt je kring bericht met je laatst bekende plek |
+| **Codewoord** (`#codewoord`) | Een gewone zin tegen Rahul waarschuwt je kring stil; op je scherm gebeurt er zichtbaar niets |
+| **Vitaal** (`#vitaal`) | Dagelijkse check-in voor medicijnen of voor wie alleen woont |
+| **Thuisrust** (`#rust`) | Niet storen tot je thuis bent, met een veiligheidsbaan die je kring altijd doorlaat |
+
+**Waarom dit één app werd.** Dit waren vier losse apps met elk een eigen
+PWA-manifest en een eigen tegel. Ze deelden alleen niet "onderhuids iets" — ze
+deelden *alles*: dezelfde serverkern, dezelfde clientlaag
+(`shared/veiligheid.js`), dezelfde kring en dezelfde eerlijke grens. Wat ze
+onderscheidde was de vraag die ze stelden, en dat is een tabblad, geen app. Vier
+deuren naar één systeem betekende in de praktijk dat iemand de Thuiswacht kende
+en het Codewoord nooit had gezien.
+
+Wat de samenvoeging **niet** doet: er komt geen tweede administratie naast de
+kern (LAT.md regel 4). Elke stand roept exact dezelfde routes aan als zijn app
+dat deed. De winst zit in wat nu één keer bestaat in plaats van vier keer — de
+kring (één verzoek in plaats van vier) en de grens — en in wat nu vindbaar is.
+
+De vier oude paden blijven bestaan als omleiding naar hun eigen stand
+(`/apps/thuiswacht.html` → `/apps/veilig.html#wacht`), inclusief de
+querystring, want er wordt van buiten naar gelinkt: uit een alarmmail, uit een
+bladwijzer, en vanaf een toestel waar zo'n app als PWA geïnstalleerd staat. Die
+vier manifesten blijven daarom ook staan, met hun `start_url` naar de juiste
+stand; een geïnstalleerde Thuiswacht opent nog steeds de Thuiswacht.
+
+`test/veiligheid.e2e.js` loopt de vier standen binnen één pagina af en meet twee
+dingen die je aan de bron niet ziet: dat de seconde-teller van een lopende wacht
+**stopt** zodra je de stand verlaat (geteld op tikduur, want schrijven naar een
+losgekoppelde DOM-knoop gooit geen fout — een lekkende teller is volkomen stil),
+en dat het levensteken van twee minuten juist **doorloopt**, want de wacht loopt
+op de server en niet op het scherm waar je toevallig naar kijkt.
 
 Drie ontwerpkeuzes die de rest verklaren:
 

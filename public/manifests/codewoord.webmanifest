@@ -4,7 +4,7 @@
   "id": "/apps/codewoord",
   "description": "Een gewone zin die uw kring stil waarschuwt met uw plek. Op uw scherm gebeurt er niets.",
   "lang": "nl",
-  "start_url": "/apps/codewoord.html",
+  "start_url": "/apps/veilig.html#codewoord",
   "scope": "/",
   "display": "standalone",
   "background_color": "#0C0C0B",

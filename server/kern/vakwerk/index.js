@@ -20,18 +20,15 @@ function maakVakwerk({ db, save, anthropic, findSupplier, boekingenVanZaak, orde
   const scho = schoon || ((v, n) => String(v == null ? '' : v).trim().slice(0, n || 200));
   const vandaagStr = () => new Date().toISOString().slice(0, 10);
   const rond = n => Math.round((Number(n) || 0) * 100) / 100;
-  const datumVan = b => (b.wanneer ? String(b.wanneer).slice(0, 10) : null);
-  const tijdVan = b => (b.wanneer && String(b.wanneer).length > 10 ? String(b.wanneer).slice(11, 16) : null);
+  // datum, tijd en het rekenen met minuten staan in kern/agendatijd.js, gedeeld
+  // met de capaciteitslaag: waar "wanneer" vandaan komt hoort op een plek
+  const { datumVan, tijdVan, geldigeTijd, naarMin, naarTijd } = require('../agendatijd');
   // de dag waarop de omzet valt: betaald -> betaaldatum, anders de aanmaakdatum
   // dezelfde definitie als het gedeelde klantenboek; niet twee keer opschrijven
   const geldDag = require('../klantenboek').geldDag;
 
   function genreVan(s) { return s ? VAK_GENRES[s.type] : null; }
   function isVak(s) { return !!genreVan(s); }
-
-  const geldigeTijd = t => /^([01]\d|2[0-3]):[0-5]\d$/.test(String(t || ''));
-  const naarMin = t => { const m = String(t).match(/^(\d{2}):(\d{2})$/); return m ? (+m[1]) * 60 + (+m[2]) : null; };
-  const naarTijd = m => String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0');
 
   function publiek(b) {
     return {

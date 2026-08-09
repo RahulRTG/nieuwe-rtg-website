@@ -154,7 +154,7 @@ function toonLeeg(){
 function teken(){
   const o=ONDS.find(x=>x.id===HUIDIG)||{};
   zetTitel(DAG.naam||'Mijn onderneming');
-  $('#hoofd').innerHTML=[vakGroet(),vakGezond(),vakActies(),vakIntake(),vakKans(),vakSimulatie(),vakStress(),vakPlan(o),vakRechtsvorm(o),vakOprichting(),vakZaak(o),vakEersteKlant(),vakMall(),vakRelaties(),vakDebiteuren(),vakCrediteuren(),vakContracten(),vakBelasting(),vakKas()].join('');
+  $('#hoofd').innerHTML=[vakGroet(),vakGezond(),vakActies(),vakIntake(),vakKans(),vakSimulatie(),vakStress(),vakPlan(o),vakRechtsvorm(o),vakOprichting(),vakZaak(o),vakEersteKlant(),vakMall(),vakRelaties(),vakDebiteuren(),vakCrediteuren(),vakContracten(),vakBelasting(),vakKas(),vakCapaciteit()].join('');
   haakKnoppen();
 }
 
@@ -530,6 +530,32 @@ function vakKas(){
       '<label class="veld" style="flex:1 1 10rem;">Uw banksaldo<input id="kasSaldo" type="number"></label>'+
       '</div><div class="rij" style="margin-top:.5rem;"><button class="knop" id="kasKnop">Reken door op mijn saldo</button></div>')+
     '<p class="subtxt" style="margin-top:.9rem;">'+esc(k.voorbehoud)+'</p></div>';
+}
+
+
+function vakCapaciteit(){
+  const c=DAG&&DAG.capaciteit;
+  if(!c) return '';
+  if(c.stand!=='gemeten'){
+    return '<div class="vak"><h2>Capaciteit</h2><p class="subtxt">'+esc(c.uitleg||'')+'</p>'+
+      (c.let?'<p class="stil" style="margin-top:.4rem;">'+esc(c.let)+'</p>':'')+'</div>';
+  }
+  const balk=(c.dagen||[]).filter(d=>d.werkdag||d.bezetting!==null).slice(0,28).map(d=>{
+    const p=d.bezetting===null?0:Math.min(100,d.bezetting);
+    const kl=d.bezetting!==null&&d.bezetting>=85?'var(--burgundy)':(d.bezetting>=60?'var(--gold)':'var(--line)');
+    return '<span title="'+esc(d.datum)+': '+(d.bezetting===null?'-':d.bezetting+'%')+'" style="display:inline-block;width:.7rem;height:'+
+      Math.max(3,Math.round(p*0.28))+'px;background:'+kl+';margin-right:2px;vertical-align:bottom;border-radius:2px;"></span>';
+  }).join('');
+  return '<div class="vak"><h2>Capaciteit</h2>'+
+    '<div class="score"><span class="n groot">'+c.bezetting+'%</span>'+
+    '<span class="subtxt">van uw tijd bezet, komende '+c.venster+' dagen</span></div>'+
+    '<p class="subtxt" style="margin-top:.3rem;">'+c.bezetteUren+' van de '+c.beschikbareUren+' uur over '+
+    c.werkdagen+' werkdagen'+(c.volleDagen?', '+c.volleDagen+' dagen praktisch vol':'')+'.</p>'+
+    (c.uren.let?'<p class="stil" style="margin-top:.4rem;">'+esc(c.uren.let)+'</p>':'')+
+    '<div style="margin-top:.9rem;line-height:1;">'+balk+'</div>'+
+    (c.buitenUrenDagen?'<p class="subtxt" style="margin-top:.7rem;">U werkt op '+c.buitenUrenDagen+
+      ' dag(en) buiten uw eigen werktijden.</p>':'')+
+    '<p class="subtxt" style="margin-top:.9rem;">'+esc(c.nietGemeten)+'</p></div>';
 }
 
 /* ---------- handelingen ---------- */

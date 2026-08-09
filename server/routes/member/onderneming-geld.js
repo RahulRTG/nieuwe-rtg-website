@@ -9,7 +9,7 @@
 module.exports = (kern, mijn, stuur, nietGevonden) => {
   const { app, auth, ondernemingRelaties, ondernemingKlantNotitie,
     ondernemingDebiteuren, ondernemingCrediteuren, ondernemingContracten,
-    ondernemingWerkruimte, ondernemingBelasting, ondernemingKas, ondernemingKasSaldo } = kern;
+    ondernemingWerkruimte, ondernemingBelasting, ondernemingKas, ondernemingKasSaldo, ondernemingCapaciteit } = kern;
 
   /* Het klantenboek en de opvolging. Alles op codenaam: dit boek kent geen
      echte namen, en dat is het ontwerp en geen tekortkoming. */
@@ -78,5 +78,13 @@ module.exports = (kern, mijn, stuur, nietGevonden) => {
     const o = mijn(req);
     if (!o) return stuur(res, nietGevonden);
     stuur(res, ondernemingKasSaldo(o, (req.body || {}).bedrag));
+  });
+
+  /* De bezetting van de agenda over een venster van dagen (standaard 28).
+     Geen gemiste omzet: zie kern/onderneming/capaciteit.js. */
+  app.post('/api/onderneming/capaciteit', auth, (req, res) => {
+    const o = mijn(req);
+    if (!o) return stuur(res, nietGevonden);
+    res.json({ ok: true, capaciteit: ondernemingCapaciteit(o, undefined, Number((req.body || {}).dagen)) });
   });
 };

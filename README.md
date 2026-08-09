@@ -1646,6 +1646,53 @@ beginsaldo van nul verzinnen, een oud saldo niet laten verouderen, ook een
 positieve maand laten waarschuwen, en de kasregel onder de losse posten laten
 zakken.
 
+### Capaciteit: kan er nog iets bij
+
+`server/kern/onderneming/capaciteit.js` + `/api/onderneming/capaciteit`, met de
+tijdhelpers in `server/kern/agendatijd.js`. Na het geld is dit wat een ondernemer
+als eerste raakt. De gegevens stonden er al: werkdagen en openingstijden
+(`vakUren`), de teamgrootte, en de boekingen met de duur van de dienst erbij.
+
+**Wat hier niet wordt uitgerekend: gemiste omzet.** Het is verleidelijk om te
+zeggen "u loopt 6.800 euro per maand mis door capaciteitsgebrek", en het klinkt
+precies als het soort inzicht waar software voor is. Maar wij zien geen vraag die
+nooit is gesteld: iemand die de agenda vol zag en wegklikte, staat nergens. Zo'n
+bedrag zou een verzinsel zijn met een euroteken ervoor -- en juist dat wordt
+overgeschreven in een besluit om iemand aan te nemen. Wat er wél staat is wat er
+is: hoeveel dagen zaten vol, hoeveel procent van uw tijd is bezet, hoeveel
+aanvragen bleven liggen. Een toets bewaakt dat de module nergens een bedrag
+uitleest.
+
+**De bezetting is een exacte deling** -- geboekte minuten door beschikbare minuten
+-- en daarmee iets anders dan de scores elders in dit OS, die bronnen van ongelijk
+gewicht optellen. Werk op een niet-werkdag telt wel als bezette tijd maar niet als
+beschikbare; de uitkomst kan dus boven de 100% uitkomen, en dat is de eerlijke
+uitkomst: u werkt dan meer dan u zelf hebt opgegeven.
+
+**Zonder agenda geen bezetting.** Een winkel of restaurant heeft geen `vakUren`,
+en daar betekent capaciteit iets heel anders (stoelen, voorraad, vierkante
+meters). Dan komt er een eigen stand en geen 0%: een winkel die als "0% bezet"
+leest, is een verkeerd antwoord op een vraag die niet is gesteld.
+
+**Buiten de eigen uren werken weegt zwaarder dan een volle agenda.** Dat is al
+gebeurd en het is de stille manier waarop iemand zichzelf opbrandt; een volle
+agenda is nog te sturen. Op het dagbeeld staat capaciteit ná het geld en de klok,
+maar vóór de gewone opvolging: meer klanten werven terwijl de agenda vol staat, is
+werk dat u daarna moet weigeren.
+
+De vier tijdhelpers (`datumVan`, `tijdVan`, `naarMin`, `naarTijd`) stonden inline
+in `kern/vakwerk/index.js` en staan nu in `kern/agendatijd.js`. Ze zijn klein, maar
+dragen een gedeelde waarheid: waar de datum en tijd van een boeking vandaan komen.
+
+Getoetst in `test/onderneming-capaciteit.test.js` (15). Zes mutaties, alle zes
+raak. Drie toetsen zakten eerst op mijn eigen aannames, niet op de code: `dag(5)`
+bleek een zaterdag en geen vrijdag (nagerekend in plaats van aangenomen, en de
+weekdagen staan nu als constante in de toets), een winkel van één persoon ís
+volgens `werkvormen.js` ook zelfstandige en krijgt dus wél een agenda, en mijn
+regex tegen "gemiste omzet" sloeg aan op mijn eigen voorbehoud en op het woord
+"prijs" in een adviestekst -- die zoekt nu naar het uitlezen van een bedrag, wat
+de eigenlijke vraag was.
+
 ### RTG Werk OS (de werkplek van een organisatie)
 
 `server/bedrijf/` + `/api/bedrijf/...` + `/apps/werk.html`. Een **werkruimte**

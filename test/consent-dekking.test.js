@@ -33,6 +33,7 @@ const KERN = path.join(__dirname, '..', 'server', 'kern');
 const DEKKING = {
   'care/leden.js': { laag: 'care-intake' },
   'care/vastleggen.js': { laag: 'care-vastlegging' },
+  'care/wachtlijst.js': { laag: 'wachtlijst' },
   'toestellen.js': { laag: 'toestel' },
   'gastzorg.js': { laag: 'locatie' },
   'assets/winkel.js': { reden: 'een ticket op een object; geen toestemming maar bezit' }

@@ -93,6 +93,11 @@ test('intrekken raakt de bron zelf, en niet alleen deze lijst', async () => {
      deze lijst opschoont, zou hier groen blijven en toch liegen. */
   const voor = await lijst();
   assert.equal(voor.toestemmingen.length, 3);
+  let kliniek;
+  {
+    const care = (await api('care', {}, lid)).body;
+    kliniek = care.aanbieders.find(a => a.soort === 'kliniek');
+  }
 
   const intake = vanLaag(voor, 'care-intake')[0];
   assert.equal((await api('toestemming/intrek', { laag: 'care-intake', id: intake.id }, lid)).status, 200);
@@ -103,6 +108,19 @@ test('intrekken raakt de bron zelf, en niet alleen deze lijst', async () => {
   assert.equal((await api('toestemming/intrek', { laag: 'toestel', id: toestel.id }, lid)).status, 200);
   assert.equal((await api('toestellen', {}, lid)).body.toestellen.length, 0,
     'het toestel is ook bij Toestellen zelf weg');
+
+  /* De wachtlijst is de achtste laag, en de handhaver heeft hem zelf
+     aangewezen: hij verscheen als nieuwe toestemmingsvorm in kern/, en toen was
+     de vraag of hij op dit scherm hoort. Hij hoort er, en dus wordt hij hier op
+     dezelfde manier nagelopen als de rest: intrekken raakt de BRON. */
+  const opWacht = await api('care/wachtlijst/zet', { aanbiederId: kliniek.id }, lid);
+  assert.equal(opWacht.status, 200);
+  const wachtRij = (await lijst()).toestemmingen.find(t => t.laag === 'wachtlijst');
+  assert.ok(wachtRij, 'de wachtlijst staat op het toestemmingsscherm');
+  assert.equal(wachtRij.richting, 'seint', 'seinen is niet zien en niet schrijven');
+  assert.equal((await api('toestemming/intrek', { laag: 'wachtlijst', id: wachtRij.id }, lid)).status, 200);
+  assert.equal((await api('care/wachtlijst', {}, lid)).body.lijsten.length, 0,
+    'en hij is ook bij de wachtlijst zelf weg');
 
   assert.equal((await api('toestemming/intrek', { laag: 'zorgprofiel', id: 'profiel' }, lid)).status, 200);
   const profiel = (await api('zorgprofiel', {}, lid)).body.zorg;
@@ -135,6 +153,7 @@ test('het register en het scherm lopen niet uiteen', () => {
       })
     },
     vastleggingenVan: () => ({ vastleggingen: [{ id: 'v1', aanbiederNaam: 'Kliniek Clara', sinds: '2026-08-01' }] }),
+    wachtlijstVan: () => ({ lijsten: [{ id: 'w1', aanbiederNaam: 'Zenith Spa', sinds: '2026-08-01' }] }),
     locMijn: () => ({ actief: [{ id: 'l1', supplierName: 'Kikunoi' }] }),
     zorgVan: () => ({ allergenen: ['noten'], dieet: '', medisch: '', delen: true }),
     toestellenVan: () => ({ toestellen: [{ id: 't1', naam: 'Horloge', geschreven: 3 }] })
@@ -161,5 +180,5 @@ test('een laag die het niet doet, wordt gemeld en niet als leegte getoond', () =
   const d = stuk.consentVan('sleutel');
   assert.ok(d.storingen.length >= 1);
   assert.match(d.storingen[0], /Zorg/i, 'de laag die stukging staat met naam in de melding');
-  assert.equal(d.storingen.length, 6, 'en de vijf lagen die ontbreken melden zich ook, geen stilte');
+  assert.equal(d.storingen.length, 7, 'en de zes lagen die ontbreken melden zich ook, geen stilte');
 });

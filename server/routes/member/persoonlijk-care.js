@@ -8,7 +8,8 @@ module.exports = (kern) => {
   const { app, auth, liveCodename, verdienPunten,
     careOverzicht, careBoek, careBetaal, careAnnuleer, careMijn, careIntakeDeel, careIntakeStop,
     carePakketOverzicht, carePakketBoek, carePakketBetaal, carePakketMijn, gegevensStop,
-    vastleggingDeel, vastleggingStop, vastleggingenVan } = kern;
+    vastleggingDeel, vastleggingStop, vastleggingenVan,
+    wachtlijstZet, wachtlijstAf, wachtlijstVan } = kern;
 
   app.post('/api/care', auth, (req, res) => res.json(careOverzicht(req.session.key)));
   app.post('/api/care/boek', auth, (req, res) => {
@@ -56,6 +57,21 @@ module.exports = (kern) => {
     res.json(r);
   });
   app.post('/api/care/vastleggen/mijn', auth, (req, res) => res.json(vastleggingenVan(req.session.key)));
+
+  /* De wachtlijst: eerder aan de beurt als er iets vrijkomt. Er wordt niets
+     voor u ingeboekt -- u krijgt bericht en boekt zelf. */
+  app.post('/api/care/wachtlijst', auth, (req, res) => res.json(wachtlijstVan(req.session.key)));
+  app.post('/api/care/wachtlijst/zet', auth, (req, res) => {
+    if (req.session.tier === 'guest') return res.status(403).json({ error: 'Alleen voor leden.' });
+    const r = wachtlijstZet(req.session.key, req.body || {});
+    if (r.error) return res.status(r.status).json({ error: r.error });
+    res.json(r);
+  });
+  app.post('/api/care/wachtlijst/af', auth, (req, res) => {
+    const r = wachtlijstAf(req.session.key, req.body || {});
+    if (r.error) return res.status(r.status).json({ error: r.error });
+    res.json(r);
+  });
 
   /* Herstel- & verblijfpakketten: een behandeling gekoppeld aan een hotelverblijf,
      als een pakket met een prijs. De behandeling boekt gewoon in de agenda. */

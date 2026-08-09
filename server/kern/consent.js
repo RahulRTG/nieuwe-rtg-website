@@ -32,7 +32,8 @@ const LAGEN = [
   { id: 'rtgid-machtiging', naam: 'Mensen die namens u mogen inloggen', richting: 'doet', gedekt: true },
   { id: 'locatie', naam: 'Zaken die live met u meekijken', richting: 'ziet', gedekt: true },
   { id: 'zorgprofiel', naam: 'Uw zorgprofiel dat meereist met bestellingen', richting: 'ziet', gedekt: true },
-  { id: 'toestel', naam: 'Toestellen die metingen wegschrijven', richting: 'schrijft', gedekt: true }
+  { id: 'toestel', naam: 'Toestellen die metingen wegschrijven', richting: 'schrijft', gedekt: true },
+  { id: 'wachtlijst', naam: 'Zorgaanbieders die u mogen seinen als er iets vrijkomt', richting: 'seint', gedekt: true }
 ];
 
 /* Wat dit scherm NIET dekt, met reden. Deze regels gaan mee naar het scherm,
@@ -106,6 +107,13 @@ module.exports = ({ kern }) => {
         tot: null, richting: 'ziet', intrekbaar: true });
     }
 
+    const wacht = pak('Wachtlijst', kern.wachtlijstVan && (() => kern.wachtlijstVan(key)));
+    for (const w of (wacht && wacht.lijsten) || []) {
+      uit.push({ laag: 'wachtlijst', id: w.id, wie: w.aanbiederNaam,
+        wat: 'Mag u een seintje geven als er een plek vrijkomt; er wordt niets voor u ingeboekt',
+        tot: null, richting: 'seint', intrekbaar: true });
+    }
+
     const toe = pak('Toestellen', kern.toestellenVan && (() => kern.toestellenVan(key)));
     for (const t of (toe && toe.toestellen) || []) {
       uit.push({ laag: 'toestel', id: t.id, wie: t.naam,
@@ -136,6 +144,7 @@ module.exports = ({ kern }) => {
     if (laag === 'rtgid-machtiging') return kern.rtgid.machtigIntrek(key, id);
     if (laag === 'locatie') return kern.locStopKlant(key, id);
     if (laag === 'toestel') return kern.toestelIntrek(key, { id });
+    if (laag === 'wachtlijst') return kern.wachtlijstAf(key, { id });
     if (laag === 'zorgprofiel') {
       /* Het profiel zelf blijft staan; alleen het MEEREIZEN gaat uit. Het
          weggooien zou meer doen dan er gevraagd is, en het lid raakt dan zijn

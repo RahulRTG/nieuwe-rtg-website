@@ -42,11 +42,12 @@ klinkt.
 | Dagmetingen | `server/kern/metingen.js`, invulvak op `apps/life.html` | slaap, beweging en water, door het lid zelf ingevuld; een dag heeft één waarde |
 | Herkomst van gegevens | `server/kern/herkomst.js` | vier soorten, en alleen wat er echt is staat aan; gedeeld door de doelenmotor en de metingen |
 | Gekoppelde toestellen | `server/kern/toestellen.js`, vak op `apps/life.html` | een horloge of weegschaal schrijft dagmetingen weg met een eigen smalle sleutel, altijd in te trekken |
-| Consent Center | `server/kern/consent.js`, `public/apps/toestemming.html` | zeven lagen toestemming op één scherm; intrekken gaat naar de bron |
+| Consent Center | `server/kern/consent.js`, `public/apps/toestemming.html` | acht lagen toestemming op één scherm; intrekken gaat naar de bron |
 | Behandelaar legt vast | `server/kern/care/vastleggen.js` | een zorgaanbieder mag met aparte toestemming een meting in het dossier zetten, via een afspraak bij zichzelf |
 | De grens (drie niveaus) | `server/kern/zorgniveau.js` | lifestyle, professioneel, klinisch; bij crisis en medicatie houdt RTG op en wijst het de weg naar echte hulp |
 | Dagcheck-in | `server/kern/gemoed.js`, blok op `apps/life.html` | hoe zit u erbij, met de keuze tussen erover schrijven of gewoon iets doen |
 | Gewoonten | `server/kern/gewoonten.js`, blok op `apps/life.html` | kleine dingen die u vaker wilt doen; de dagenteller staat uit tot u hem aanzet |
+| Wachtlijst en gemiste afspraak | `server/kern/care/wachtlijst.js` | eerder aan de beurt als er iets vrijkomt (u boekt zelf), en een no-show die niet met u meereist |
 | Inzage-audit | `server/inzagelog.js` | wie welke identiteitsgegevens opvroeg, en waarom |
 | Identiteitskluis | `server/accounts.js` | echte namen apart; alles daarbuiten draait op codenamen |
 
@@ -285,11 +286,16 @@ de herkomst nu van de route mee.
 
 ## Het Consent Center
 
-`apps/toestemming.html` zet zeven lagen naast elkaar: medische context bij een
+`apps/toestemming.html` zet acht lagen naast elkaar: medische context bij een
 zorgaanbieder, zorgaanbieders die iets in uw dossier mogen vastleggen, diensten
 die met RTG iD gegevens ophalen, mensen die namens u mogen inloggen, zaken die
-live meekijken, het zorgprofiel dat meereist met bestellingen, en toestellen die
-metingen wegschrijven.
+live meekijken, het zorgprofiel dat meereist met bestellingen, toestellen die
+metingen wegschrijven, en zorgaanbieders die u mogen seinen als er iets vrijkomt.
+
+Die achtste is er gekomen doordat de handhaver hem aanwees. De wachtlijst werd
+gebouwd, de scan zag een nieuwe toestemmingsvorm in `server/kern/`, en de toets
+zakte met de bestandsnaam erbij. Dat is precies waar hij voor is: hij besliste
+niets, hij dwong een besluit af.
 
 **Het bewaart niets, en trekt in bij de bron.** Er staat hier geen eigen
 vlaggetje dat zegt of iets nog mag; intrekken roept de stopfunctie van de laag
@@ -439,6 +445,26 @@ Geen percentage, geen score, geen ranglijst, geen beste week ooit. De vorm van
 een gewoonte ligt in een toets vast, zodat daar niets bij kan sluipen zonder dat
 die zakt.
 
+## De wachtlijst en de gemiste afspraak
+
+**Er wordt niemand automatisch ingeboekt.** Komt er een slot vrij doordat iemand
+annuleert, dan krijgt de wachtlijst bericht en boekt wie wil het zelf. "Met
+toestemming kan het automatisch" klinkt aardig, maar die toestemming zou weken
+eerder zijn gegeven voor een moment dat u nog niet kende. Een seintje en een knop
+is eerlijker dan een afspraak die u moet afzeggen.
+
+**Een gemiste afspraak is geen cijfer dat met u meereist.** Een aanbieder kan
+noteren dat iemand niet kwam -- dat hoort bij zijn eigen agenda -- maar er
+ontstaat geen no-show-score die door het huis loopt. Dat zou een strafblad zijn
+met een vriendelijke naam. De toets kijkt daarvoor aan de kant waar zo'n cijfer
+wáárde zou hebben: het antwoord aan de aanbieder. Een eerdere versie keek alleen
+in het overzicht van het lid en bleef groen terwijl er een telling aan de
+aanbieder werd teruggegeven.
+
+**En wat het lid krijgt is geen berisping maar een aanbod:** wilt u uw
+herinnering voortaan eerder? Dat is het enige dat een gemiste ochtend echt
+oplost.
+
 ## De grenzen die vast moeten staan vóór de bouw
 
 Deze horen in de architectuur en niet in een latere ronde, want ze bepalen hoe
@@ -500,7 +526,12 @@ In deze volgorde, want elke stap heeft de vorige nodig:
 
 9. ~~**Gewoonten**, met de teller uit.~~ Gedaan; zie hierboven.
 
-Wat daarna komt: de dagcoach, sport- en voedingslagen, de coachmarktplaats, en
-de zaakkant van de zorg (multi-vestiging, wachtlijst, no-show). En het
-gedachtenboek, dat bij de check-in hoort maar er nog niet is. En als er ooit een gesprek komt op het
+10. ~~**Wachtlijst en no-show**, met de grens dat een gemiste afspraak niet
+    meereist.~~ Gedaan; zie hierboven.
+
+Wat daarna komt: de dagcoach, sport- en voedingslagen, de coachmarktplaats,
+multi-vestiging en resource-planning voor zorgorganisaties, het gedachtenboek,
+en de langere staart uit het oorspronkelijke voorstel (noodprofiel,
+medicatieschema, health timeline, ADHD- en autismemodus, energiemanagement,
+mantelzorg, corporate wellbeing, Life Wallet, lifestyle-marktplaats). En als er ooit een gesprek komt op het
 mentale onderwerp, dan door `zorgniveau.js` heen.

@@ -79,6 +79,10 @@ module.exports = ({ db, save, crypto, schoon, notify, zorgVoor, metingVanBehande
      hergebruikt. */
   const ctx = { db, save, crypto, schoon, notify, zorgVoor,
     nu, vandaag, eur, INTAKE_DAGEN, lijsten, aanbiederVan, behandelingVan, intakeActief };
+  /* De wachtlijst gaat VOOR de ledenlaag de context in: careAnnuleer meldt een
+     vrijgekomen slot en pakt slotVrij op aanroepmoment uit diezelfde context. */
+  const deelWacht = require('./care/wachtlijst')(ctx);
+  Object.assign(ctx, deelWacht);
   const deelLeden = require('./care/leden')(ctx);
   Object.assign(ctx, deelLeden);
   const deelZaak = require('./care/zaak')(ctx);
@@ -95,6 +99,6 @@ module.exports = ({ db, save, crypto, schoon, notify, zorgVoor, metingVanBehande
     careIntakeDeel, careIntakeStop, boekBehandelingActie,
     careAgenda, careAfronden, aanbiedersVanSupplier,
     carePakketOverzicht, carePakketBoek, carePakketBetaal, carePakketMijn,
-    aanbiederVan, ...deelVast
+    aanbiederVan, ...deelVast, ...deelWacht
   };
 };

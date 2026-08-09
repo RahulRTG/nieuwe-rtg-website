@@ -5,7 +5,7 @@
 const { log } = require('../log');
 
 module.exports = (kern) => {
-  const { app, auth, geenGast, rtf, spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelRahul, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, spelUitslagen, spelStand, spelPrestaties, sneekScore, sneekBord, arcadeScore, arcadeBord, socialConnecties } = kern;
+  const { app, auth, geenGast, rtf, spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelRahul, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, spelUitslagen, spelStand, spelPrestaties, toernooiNieuw, toernooiAntwoord, mijnToernooien, toernooiStaat, sneekScore, sneekBord, arcadeScore, arcadeBord, socialConnecties } = kern;
 
   function rtfSpeler(req, res) {
     const sess = rtf.verifieerProfiel(req.body.code, req.body.token);
@@ -55,6 +55,14 @@ module.exports = (kern) => {
     stand: (mij) => spelStand(mij),
     // behaalde prestaties; wat je nog NIET hebt reist bewust niet mee
     prestaties: (mij) => spelPrestaties(mij),
+    /* Toernooien: een knockout waarvan elke wedstrijd een gewoon potje is. De
+       deelnemers komen uit dezelfde kring als een potje (vrienden en
+       klasgenoten), dus de kring wordt hier bepaald en niet in het verzoek. */
+    'toernooi-nieuw': (mij, b) => toernooiNieuw(mij, { soort: b.soort, naam: b.naam, maat: b.maat,
+      spelers: (Array.isArray(b.spelers) ? b.spelers : []).filter(k => kringVan(mij).includes(k)) }),
+    'toernooi-antwoord': (mij, b) => toernooiAntwoord(mij, String(b.id || ''), b.akkoord === true),
+    'toernooi-mijn': (mij) => mijnToernooien(mij),
+    'toernooi-staat': (mij, b) => toernooiStaat(mij, String(b.id || '')),
     // de eigen opt-out: wel spelen, niet gezien worden
     zichtbaar: (mij) => spelZichtbaar(mij),
     'zichtbaar-zet': (mij, b) => spelZichtbaarZet(mij, b.aan !== false),

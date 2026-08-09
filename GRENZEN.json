@@ -1060,6 +1060,7 @@
       "arcadeBord",
       "arcadeScore",
       "mijnSpellen",
+      "mijnToernooien",
       "sneekBord",
       "sneekScore",
       "socialConnecties",
@@ -1076,7 +1077,10 @@
       "spelUitslagen",
       "spelZet",
       "spelZichtbaar",
-      "spelZichtbaarZet"
+      "spelZichtbaarZet",
+      "toernooiAntwoord",
+      "toernooiNieuw",
+      "toernooiStaat"
     ],
     "sportclub": [
       "sport"

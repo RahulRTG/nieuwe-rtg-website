@@ -4,6 +4,9 @@
    kern/spellen.js. */
 module.exports = (ctx) => {
   const { db, save, crypto, codenaamVan, nu, S, SPEL, SOORTEN, nudge, VIEWS, ZETTEN, STATISCH, noteerUitslag } = ctx;
+  // het toernooi hangt aan dezelfde plek als de uitslag: zo is er geen tweede
+  // moment waarop een ronde kan blijven hangen (late binding, zie spellen.js)
+  const naPotje = (p) => { noteerUitslag(p); if (ctx.toernooiPotjeKlaar) ctx.toernooiPotjeKlaar(p); };
   /* De weergave per spel (de staat zoals EEN speler hem mag zien: handen en
      rekken van anderen blijven verborgen) staat in het spel zelf en komt via
      het register mee in VIEWS. Een spel zonder eigen weergave komt het
@@ -48,7 +51,7 @@ module.exports = (ctx) => {
        motoren die er elk aan moeten denken is zestien kansen om het te
        vergeten, en dat merk je pas als een uitslag ontbreekt. noteerUitslag is
        idempotent, dus een dubbele aanroep kan geen kwaad. */
-    if (p.status === 'klaar') noteerUitslag(p);
+    if (p.status === 'klaar') naPotje(p);
     return r;
   }
   function spelOpgeven(mij, id) {
@@ -58,7 +61,7 @@ module.exports = (ctx) => {
     p.status = 'klaar';
     const rest = p.spelers.filter(sp => sp !== mij);
     p.winnaar = rest.length === 1 ? codenaamVan(rest[0]) : rest.map(codenaamVan).join(' & ');
-    noteerUitslag(p);   // opgeven is ook een uitslag: de rest heeft gewonnen
+    naPotje(p);   // opgeven is ook een uitslag: de rest heeft gewonnen
     save();
     rest.forEach(sp => nudge(sp, p));
     return { status: 200, ok: true };

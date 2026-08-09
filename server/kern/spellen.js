@@ -170,6 +170,7 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
   function spelVergeet(key) {
     if (!key) return { status: 200, ok: true, potjes: 0 };
     const s = S();
+    toernooiVergeet(key);
     for (const [sleutel, rij] of Object.entries(s.wachtrij || {})) {
       const over = (rij || []).filter(x => x !== key);
       if (over.length) s.wachtrij[sleutel] = over; else delete s.wachtrij[sleutel];
@@ -203,7 +204,14 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
   const ctx = { db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, isGeblokkeerd, socialZoek, sociaalRate, volwassen,
     rid, nu, S, SPEL, SOORTEN, TEAMS, wereldFout, leeftijdFout, nudge, schud, beurtDoor, opschonen,
     INITS, ZETTEN, VIEWS, STATISCH, klasgenotenVan, noteerUitslag };
-  const { spelStart, spelGrootte, spelNieuw, spelAntwoord, spelRandom, mijnSpellen } = require('./spellen/lobby')(ctx);
+  const { spelStart, spelGrootte, potjeDirect, spelNieuw, spelAntwoord, spelRandom, mijnSpellen } = require('./spellen/lobby')(ctx);
+  /* Toernooien: een knockout waarvan elke wedstrijd een GEWOON potje is. Staat
+     bewust NIET achter de progressiegrens -- een toernooi is een begrensd
+     evenement en geen blijvende stand; zie de kop van spellen/toernooi.js. */
+  const { toernooiNieuw, toernooiAntwoord, toernooiPotjeKlaar, mijnToernooien, toernooiStaat, toernooiVergeet } =
+    require('./spellen/toernooi')({ db, save, rid, nu, codenaamVan, isGeblokkeerd, SPEL, SOORTEN, schud,
+      potjeDirect, leeftijdFout, nudge });
+  ctx.toernooiPotjeKlaar = toernooiPotjeKlaar;
   const { spelStaat, spelZet, spelOpgeven } = require('./spellen/partij')(ctx);
   // Rahul als spelmaatje: in elk potje op te roepen voor hints, regels of een peptalk
   const { spelRahul } = require('./spellen/rahul')(Object.assign({ anthropic }, ctx));
@@ -249,7 +257,7 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
   const sneekScore = (mij, punten) => arcadeScore(mij, 'sneek', punten);
   const sneekBord = (mij, vrienden) => arcadeBord(mij, 'sneek', vrienden);
 
-  return { spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelRahul, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, spelUitslagen, spelStand, spelPrestaties, spelVergeet, sneekScore, sneekBord, arcadeScore, arcadeBord, SPEL_SOORTEN: SOORTEN,
+  return { spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelRahul, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, spelUitslagen, spelStand, spelPrestaties, spelVergeet, toernooiNieuw, toernooiAntwoord, mijnToernooien, toernooiStaat, sneekScore, sneekBord, arcadeScore, arcadeBord, SPEL_SOORTEN: SOORTEN,
     // alleen voor de drift-test: de client heeft een eigen kopie van deze
     // regels (directe feedback); de test houdt beide kopieën tegen elkaar
     _spelregels: { rummiSet: ruw.rummiSet, W_PREMIE: ruw.W_PREMIE, SPEL, ARCADE } };

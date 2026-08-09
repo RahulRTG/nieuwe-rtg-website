@@ -97,6 +97,11 @@ const BELEID = [
      stand, terwijl niemand daar nog om vroeg. Deelnemers onder de
      progressiegrens staan er zonder codenaam in (kern/spellen/uitslagen.js),
      dus wat hier verloopt is de historie van volwassen leden. */
+  /* Toernooien: een begrensd evenement, dus korter dan de uitslagen zelf. Wie
+     het gewonnen heeft blijft als partij in spelUitslagen staan; het bord met
+     de loting hoeft niet een jaar te blijven hangen. */
+  { tak: 'spelToernooien', label: 'toernooien', dagen: 90, grond: 'nodig',
+    vorm: 'lijst', datum: 'at', waarom: 'draagt codenamen; een afgelopen toernooi is na een kwartaal geen nieuws meer' },
   { tak: 'spelUitslagen', label: 'uitslagen van potjes', dagen: JAAR / DAG, grond: 'nodig',
     vorm: 'lijst', datum: 'at', waarom: 'draagt codenamen; een partij van meer dan een jaar terug hoeft geen stand meer te bepalen' },
   /* Stadsweefsel: gebeurtenissen verlopen, het register (db.data.weefsel) niet --

@@ -131,7 +131,26 @@ module.exports = (ctx) => {
     }));
     return { potjes: mijnPotjes, uitnodigingen };
   }
+  /* Een potje dat METEEN begint tussen spelers die al ja hebben gezegd. Dat is
+     het pad voor een toernooiwedstrijd: daar is de uitnodiging al gedaan bij
+     het toernooi zelf, dus een tweede ronde accepteren zou een lege plichtpleging
+     zijn. Hij loopt bewust langs dezelfde spelStart als elk ander potje -- een
+     toernooipartij is een gewone partij, met alle spelregels en poorten die
+     daarbij horen, en niet een tweede soort potje. */
+  function potjeDirect(soort, spelers, extra) {
+    const potje = Object.assign({
+      id: rid(5), soort, grootte: spelers.length, modus: teamModus(soort, spelers.length),
+      taal: 'nl', teams: TEAMS, spelers: spelers.slice(), uitgenodigd: [],
+      status: 'wacht', beurt: 0, winnaar: null, at: nu(), door: 'toernooi'
+    }, extra || {});
+    S().potjes[potje.id] = potje;
+    spelStart(potje);
+    save();
+    spelers.forEach(sp => nudge(sp, potje));
+    return potje;
+  }
+
   // teamModus reist mee naar buiten zodat de toets hem los kan aanspreken:
   // via de API is "vier spelers, wel of geen teams" een dure opstelling
-  return { spelStart, spelGrootte, teamModus, spelNieuw, spelAntwoord, spelRandom, mijnSpellen };
+  return { spelStart, spelGrootte, teamModus, potjeDirect, spelNieuw, spelAntwoord, spelRandom, mijnSpellen };
 };

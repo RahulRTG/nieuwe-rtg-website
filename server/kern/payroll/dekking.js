@@ -110,12 +110,19 @@ function maakDekking({ db, save, nu, regelpakket, LANDEN, accounts }) {
     let stand = 'geen_tabel';
     if (geldend && geldend.stand === 'goedgekeurd') stand = 'draait';
     else if (geldend) stand = 'wacht_op_mens';
+    /* 'draait' zegt niet WAAROP. Een land kan draaien op tabellen die zelf
+       melden dat ze niet tegen de bron zijn gelegd; iemand heeft ze
+       uitdrukkelijk aangemerkt en dat mag, maar op een dekkingsoverzicht is
+       "draait" dan een half antwoord. Geen vierde stand -- die zou elke lezer
+       van deze lijst opnieuw moeten leren -- maar een vlag naast de stand. */
+    const opDemoTabellen = !!(geldend && geldend.opDemoTabellen);
 
     return {
-      land: l, naam: (f && f.naam) || l, stand,
+      land: l, naam: (f && f.naam) || l, stand, opDemoTabellen,
       pakket: geldend ? { versie: geldend.versie, geldigVan: geldend.geldigVan,
         geldigTot: geldend.geldigTot, stand: geldend.stand,
-        goedgekeurdDoor: geldend.goedgekeurdDoor, bron: geldend.bron } : null,
+        goedgekeurdDoor: geldend.goedgekeurdDoor, bron: geldend.bron,
+        waarschuwing: geldend.waarschuwing || null, ondanksWaarschuwing: geldend.ondanksWaarschuwing || null } : null,
       pakketten: alle.length,
       bronnen: bronnenVan(l).map(b => ({ naam: b.naam, url: b.url, laatst: b.laatst, laatsteFout: b.laatsteFout })),
       /* Alleen invullen als er GEEN pakket is. Ligt er wel een, dan is de

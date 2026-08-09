@@ -87,9 +87,13 @@
     if (!STROKEN.length) return null;
     return {
       naam: 'loonstroken',
-      kolommen: ['periode', 'werkgever', 'bruto', 'loonheffing', 'netto', 'regelversie'],
+      /* De export gaat naar een hypotheekadviseur of de gemeente. Juist daar
+         mag niet wegvallen waarop de cijfers berusten -- vandaar een kolom en
+         geen voetnoot. */
+      kolommen: ['periode', 'werkgever', 'bruto', 'loonheffing', 'netto', 'regelversie', 'tabellen'],
       rijen: STROKEN.map((s) => [s.periode, s.zaak, (s.strook.brutoCenten / 100).toFixed(2),
-        (s.strook.loonheffingCenten / 100).toFixed(2), (s.strook.nettoCenten / 100).toFixed(2), s.regelversie])
+        (s.strook.loonheffingCenten / 100).toFixed(2), (s.strook.nettoCenten / 100).toFixed(2), s.regelversie,
+        s.opDemoTabellen ? 'ongecontroleerd' : 'gecontroleerd'])
     };
   });
 
@@ -140,6 +144,15 @@
         '<div class="strookkop"><b>' + esc(s.periode) + '<br><span class="stil">' + esc(s.zaak) + '</span></b>' +
         '<span class="netto">' + eur(st.nettoCenten) + '</span></div>' +
         (s.correctieVan ? '<p class="stil" style="margin-top:0.4rem;">Dit is een correctie op een eerdere periode. De oorspronkelijke strook blijft staan; deze zet het verschil recht.</p>' : '') +
+        /* WAAROP DEZE STROOK BERUST, en dat hoort HIER te staan en niet alleen
+           in de backoffice. De administrateur kan het regelpakket erbij halen;
+           de medewerker die naar zijn eigen bedrag kijkt, kan dat niet. Draait
+           de run op tabellen die zelf melden dat ze niet tegen de bron zijn
+           gelegd, dan is dat iets wat hij hoort te weten voordat hij ermee naar
+           de bank of de gemeente stapt. */
+        (s.opDemoTabellen ? '<p class="uitleg" style="margin-top:0.4rem;border-left:2px solid var(--burgundy);padding-left:0.6rem;">' +
+          'Deze berekening staat op belastingtabellen die nog niet tegen de officiële bron zijn gelegd. ' +
+          'De bedragen kunnen daardoor afwijken. Gebruik deze strook niet als bewijs van inkomen; vraag uw werkgever om een gecontroleerde versie.</p>' : '') +
         '<p class="uitleg">' + esc(s.uitleg) + '</p>' +
         '<div style="margin-top:0.7rem;">' +
         bruto.map(regelRij).join('') +

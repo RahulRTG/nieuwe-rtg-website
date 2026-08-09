@@ -206,3 +206,32 @@ test('de ronde kijkt vooruit naar wat afloopt', async () => {
   assert.ok(gemeld.some(t => /loopt af op 2026-12-31/.test(t)),
     'en zegt het hardop: ' + gemeld.join(' | '));
 });
+
+/* "DRAAIT" ZEGT NIET WAAROP. Een land kan draaien op tabellen die zelf melden
+   dat ze niet tegen de bron zijn gelegd -- iemand heeft ze uitdrukkelijk
+   aangemerkt, dat mag, maar op een dekkingsoverzicht is "draait" dan een half
+   antwoord. Geen vierde stand (die zou elke lezer opnieuw moeten leren) maar
+   een vlag ernaast, met de reden die bij het aanmerken is opgeschreven. */
+test('een land dat draait op ongecontroleerde tabellen zegt dat erbij', () => {
+  const k = opzet();
+  const demo = Object.assign(pakket('NL', 'nl-demo.1'),
+    { _let_op: 'ONGECONTROLEERD. Niet tegen het Handboek Loonheffingen gelegd.' });
+  k.regelpakket.neemOp(demo, { soort: 'meegeleverd' });
+  k.regelpakket.merkAan('NL', 'nl-demo.1', 'R. Sardjoe', { ondanks: true, reden: 'demo-opstelling' });
+
+  const d = k.dekking.voorLand('NL');
+  assert.equal(d.stand, 'draait', 'hij draait -- een mens heeft getekend');
+  assert.equal(d.opDemoTabellen, true, 'maar wel op ongecontroleerde tabellen');
+  assert.equal(d.pakket.ondanksWaarschuwing, 'demo-opstelling', 'met de reden die toen is opgeschreven');
+  assert.match(d.pakket.waarschuwing, /Handboek/, 'en de zelfverklaring van het pakket zelf');
+});
+
+test('een gecontroleerd pakket draagt die vlag juist niet', () => {
+  const k = opzet();
+  k.regelpakket.neemOp(pakket('NL', 'nl-2026.1'), { soort: 'test' });
+  k.regelpakket.merkAan('NL', 'nl-2026.1', 'R. Sardjoe');
+  const d = k.dekking.voorLand('NL');
+  assert.equal(d.stand, 'draait');
+  assert.equal(d.opDemoTabellen, false, 'anders zou de vlag betekenisloos worden');
+  assert.equal(d.pakket.waarschuwing, null);
+});

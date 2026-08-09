@@ -727,10 +727,18 @@ async function laadWereld(){
   const rijen = d.landen.slice().sort((a, b) =>
     (orde[a.stand] - orde[b.stand]) || (b.personeel - a.personeel));
   $('#wlLanden').innerHTML = rijen.map(r =>
-    '<div class="regel"><b>' + wPil(r.stand) + ' ' + esc(r.naam) + ' (' + esc(r.land) + ')</b>' +
+    /* "draait" zegt niet WAAROP. Een land kan draaien op tabellen die zelf
+       melden dat ze niet tegen de bron zijn gelegd -- iemand heeft ze
+       uitdrukkelijk aangemerkt, dat mag, maar dan is "draait" een half
+       antwoord. De pil erachter maakt het hele antwoord zichtbaar zonder een
+       vierde stand te verzinnen die elke lezer opnieuw moet leren. */
+    '<div class="regel"><b>' + wPil(r.stand) + ' ' + esc(r.naam) + ' (' + esc(r.land) + ')' +
+    (r.opDemoTabellen ? ' <span class="pil goud">op ongecontroleerde tabellen</span>' : '') + '</b>' +
     '<span class="kpi">' + r.zaken + ' zaak/zaken · ' + r.personeel + ' medewerker(s)' +
     (r.pakket ? ' · pakket ' + esc(r.pakket.versie) + ' t/m ' + esc(r.pakket.geldigTot || 'onbepaald') : '') +
     (r.bronnen.length ? ' · ' + r.bronnen.length + ' bron(nen)' : ' · geen bron') +
+    (r.pakket && r.pakket.ondanksWaarschuwing
+      ? '<br>uitdrukkelijk aangemerkt door ' + esc(r.pakket.goedgekeurdDoor || 'onbekend') + ': ' + esc(r.pakket.ondanksWaarschuwing) : '') +
     (r.ontbreekt.length ? '<br>nog nodig: <b>' + r.ontbreekt.map(esc).join(', ') + '</b>' : '') +
     (r.fiscaal ? '<br>wel bekend uit de fiscaal-tabel (richtgetallen, omgerekend in euro\'s -- geen wettelijke waarden in de eigen munt): ' +
       (r.fiscaal.minimumUurloonCenten != null ? 'minimumuurloon ' + bedrag(r.fiscaal.minimumUurloonCenten, 'EUR') : 'geen minimumuurloon') +

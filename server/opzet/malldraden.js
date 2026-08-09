@@ -27,6 +27,9 @@ module.exports = function mallDraden(kern) {
     // de Supplier OS-koppeling: agenda, tafels en de schakelaars van de zaak
     haalVakwerk: () => (kern.vakwerk && typeof kern.vakwerk.slots === 'function' ? kern.vakwerk : null),
     haalFoodcourt: () => (kern.foodcourt && typeof kern.foodcourt.tijden === 'function' ? kern.foodcourt : null),
-    haalZaakFunctie: () => (typeof kern.zaakFunctieAan === 'function' ? kern.zaakFunctieAan : null)
+    haalZaakFunctie: () => (typeof kern.zaakFunctieAan === 'function' ? kern.zaakFunctieAan : null),
+    // de groothandel: dezelfde producten met een consument- en een inkoopprijs
+    haalGroothandel: () => (typeof kern.ghIsGroothandel === 'function' && typeof kern.ghPrijsVoor === 'function'
+      ? { ghIsGroothandel: kern.ghIsGroothandel, prijsVoor: kern.ghPrijsVoor } : null)
   };
 };

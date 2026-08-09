@@ -1576,7 +1576,11 @@ De Mall is nu een **discovery-laag boven op alle bestaande domeinen**. Die domei
 
 **Wat er onderweg is gerepareerd:** de genres `jet`, `helikopter`, `taxi`, `charter`, `verhuur` en `tweewielers` stonden wel in de leveranciersgids maar hadden geen pagina, dus ze vielen terug op `/apps/app.html` met `boekbaar: false` — zichtbaar en tegelijk doodlopend, terwijl `hangar.html` en `ov.html` gewoon bestonden. Ze wijzen nu elk naar de plek waar je ze werkelijk aanvraagt.
 
-**Wat er nog niet is** (bewust, en met naam in plaats van als stilte): één winkelmand over ordertypes heen, de trip-cart ("voeg toe aan reis"), personalisatie en tijd als context, de aanvraagmarkt ("ik zoek morgen een fotograaf"), de B2B-modus met zakelijke prijzen, het leverancierdashboard met zoekvragen, en de terugkoppeling van tekorten naar de Kansenlaag. De laag waar die allemaal op staan — één aanbod-object, één plek, één zoekingang — ligt er nu.
+**Tijd als context.** Zoeken kent naast een plek ook een periode (`van`/`tot`). Die stuurt de agenda-vraag aan: het eerstvolgende vrije tijdvak wordt binnen die periode gezocht in plaats van "de eerstvolgende week". Er wordt níéts weggefilterd — "niets vrij in deze periode" is een antwoord dat je wilt zien, geen reden om een zaak te verbergen. Een reismand (`lijst: <id>`) geeft haar plek en periode door, zodat zoeken vanuit een reis vanzelf de goede context heeft.
+
+Dat is ook waar de **personalisatie** zit, en bewust niet verder: context die het lid zélf zet — een gekozen plek, een gekozen periode, de reismand waarin hij werkt. Er wordt niets onthouden om later mee te raden. Een gedragsprofiel opbouwen is precies wat dit huis niet doet.
+
+**De zakelijke prijs.** Een Business Pass koopt op inkoopprijs waar die bestaat. Die prijs komt uit `prijsVoor()` van `kern/groothandel.js` zelf; de Mall *kiest* welke van de twee hij toont en rekent er geen. Zakelijk zien betekent ook `btw: 'ex'` erbij, want een inkoopprijs zonder die vermelding is een verkeerd getal. De pas komt van een mens: geen enkele registratie geeft zichzelf een Business Pass, dus niemand geeft zichzelf inkoopprijzen.
 
 ### Bewaren, een reis bouwen, en de vraagkant
 

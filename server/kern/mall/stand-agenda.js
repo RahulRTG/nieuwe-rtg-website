@@ -40,12 +40,15 @@ module.exports = (ctx, hulp) => {
   /* Het eerstvolgende vrije tijdvak van een dienstverlener. Kijkt maximaal een
      week vooruit; verder dan dat is "bel even" een eerlijker antwoord dan een
      datum. */
-  function eerstVrij(s, dienstId) {
+  function eerstVrij(s, dienstId, periode) {
     const vw = vakwerk();
     if (!vw || !vw.isVak(s) || !neemtAan(s, 'reserveren')) return null;
     const nu = nuBij(s);
-    for (let i = 0; i < 7; i++) {
+    const dagen = periode ? 14 : 7;
+    for (let i = 0; i < dagen; i++) {
       const datum = datumBij(s, i);
+      if (periode && periode.van && datum < periode.van) continue;
+      if (periode && periode.tot && datum > periode.tot) break;
       const r = vw.slots(s.code, dienstId, datum);
       if (!r || !r.ok || !r.tijden.length) continue;
       // op de eigen dag van de zaak tellen alleen de tijden die daar nog komen
@@ -58,12 +61,15 @@ module.exports = (ctx, hulp) => {
 
   /* De eerstvolgende vrije tafel, uit dezelfde tijdslotenlijst waarmee je ook
      werkelijk reserveert. */
-  function eersteTafel(s, personen) {
+  function eersteTafel(s, personen, periode) {
     const fc = foodcourt();
     if (!fc || !fc.isEetgelegenheid(s) || !neemtAan(s, 'reserveren')) return null;
     const nu = nuBij(s);
-    for (let i = 0; i < 3; i++) {
+    const dagen = periode ? 14 : 3;
+    for (let i = 0; i < dagen; i++) {
       const datum = datumBij(s, i);
+      if (periode && periode.van && datum < periode.van) continue;
+      if (periode && periode.tot && datum > periode.tot) break;
       const r = fc.tijden(s.code, datum, personen || 2);
       if (!r || !r.ok || !r.open) continue;
       const vrij = (r.slots || []).find(x => !x.vol && (i > 0 || naarMin(x.tijd) > nu.minuten));
@@ -75,16 +81,24 @@ module.exports = (ctx, hulp) => {
 
   /* De zichtbare pagina verrijken. Krijgt hoogstens een pagina aan aanbod en
      vult daar het eerstvolgende vrije moment in. */
-  function verrijk(items) {
+  function verrijk(items, periode) {
     const zaken = new Map((db.data.suppliers || []).map(s => [s.code, s]));
+    const agenda = (a) => a.type === 'dienst' || a.type === 'offerte' || a.type === 'eten';
     return items.map(a => {
       if (!a.aanbieder.code) return a;
       const s = zaken.get(a.aanbieder.code);
       if (!s) return a;
       let beter = null;
-      if (a.type === 'dienst' || a.type === 'offerte') beter = eerstVrij(s, (a.id.split(':')[2] || null));
-      else if (a.type === 'eten') beter = eersteTafel(s, 2);
-      return beter ? { ...a, beschikbaar: beter } : a;
+      if (a.type === 'dienst' || a.type === 'offerte') beter = eerstVrij(s, (a.id.split(':')[2] || null), periode);
+      else if (a.type === 'eten') beter = eersteTafel(s, 2, periode);
+      if (beter) return { ...a, beschikbaar: beter };
+      /* Niets vrij binnen de gevraagde periode is een ANTWOORD. Zonder deze
+         regel zag "geen plek tussen 13 en 19 augustus" er precies zo uit als
+         "deze zaak houdt geen agenda bij". */
+      if (periode && agenda(a)) {
+        return { ...a, beschikbaar: { tekst: 'Niets vrij in deze periode', hard: false, buitenPeriode: true } };
+      }
+      return a;
     });
   }
 

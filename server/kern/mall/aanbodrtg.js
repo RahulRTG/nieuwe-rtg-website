@@ -108,5 +108,35 @@ module.exports = (ctx, hulp) => {
     return out.filter(Boolean);
   }
 
-  return { bronReizen, bronVerblijven, bronMarkt, bronThuis };
+  /* De groothandel: dezelfde producten voor een lid (consumentprijs) en voor
+     een zaak (inkoopprijs). De prijs komt uit prijsVoor() van kern/groothandel
+     zelf -- twee prijstabellen naast elkaar is precies waar LAT-regel 4 over
+     gaat. Welke van de twee je ziet, hangt aan je rol en wordt in zoek.js
+     bepaald; hier gaan ze allebei mee. */
+  function bronGroothandel() {
+    const gh = typeof ctx.haalGroothandel === 'function' ? ctx.haalGroothandel() : null;
+    if (!gh) return [];
+    const out = [];
+    for (const s of (db.data.suppliers || [])) {
+      if (!gh.ghIsGroothandel(s) || (s.mall && s.mall.verborgen)) continue;
+      for (const p of ((s.groothandel && s.groothandel.producten) || [])) {
+        const consument = gh.prijsVoor(p, 'lid');
+        const zakelijk = gh.prijsVoor(p, 'partner');
+        out.push(aanbod({
+          id: 'gh:' + s.code + ':' + p.id, bron: 'groothandel', type: 'product',
+          titel: p.naam, uitleg: p.omschrijving || null,
+          aanbieder: { soort: 'zaak', code: s.code, naam: s.name, status: status(s) },
+          plek: zaakPlek(s), bereik: hulp.bereikVan(s),
+          prijs: consument ? prijs(consument, p.eenheid || 'per stuk') : null,
+          zakelijkePrijs: zakelijk ? prijs(zakelijk, p.eenheid || 'per stuk') : null,
+          beschikbaar: (p.voorraad || 0) > 0 ? { tekst: 'Op voorraad', hard: true } : { tekst: 'Uitverkocht', hard: false, uit: true },
+          pagina: '/apps/handel.html', genre: 'groothandel', genreLabel: 'Groothandel',
+          verdieping: 'winkelen'
+        }));
+      }
+    }
+    return out.filter(Boolean);
+  }
+
+  return { bronReizen, bronVerblijven, bronMarkt, bronThuis, bronGroothandel };
 };

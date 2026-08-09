@@ -44,6 +44,15 @@ module.exports = (ctx) => {
     const punt = coordPaar((opt.punt || {}).lat, (opt.punt || {}).lng)
       || (gekozen ? gekozen.punt : null);
 
+    /* Tijd als context: waar EN wanneer. Een zaak die pas na jouw vertrek weer
+       plek heeft, hoort niet als "beschikbaar" te gelden. De periode stuurt de
+       agenda-vraag aan (./stand-agenda.js) en niets anders: er wordt niets
+       weggefilterd, want "in deze periode niets vrij" is een antwoord dat je
+       wilt zien, geen reden om een zaak te verbergen. */
+    const isDatum = (d) => /^\d{4}-\d{2}-\d{2}$/.test(String(d || ''));
+    const periode = (isDatum(opt.van) || isDatum(opt.tot))
+      ? { van: isDatum(opt.van) ? opt.van : null, tot: isDatum(opt.tot) ? opt.tot : null } : null;
+
     let res = aanbod;
     const totaalVoorFilter = res.length;
     if (gekozen) res = res.filter(a => bedient(a, gekozen));
@@ -84,7 +93,21 @@ module.exports = (ctx) => {
        en de eerstvolgende tafel komen uit de agenda van de zaak zelf, en die
        vraag je niet duizend keer per zoekopdracht maar hoogstens zestig keer
        (zie de kostenafweging in ./stand.js). */
-    const bladzijde = stand.verrijk(uit.slice((pagina - 1) * per, (pagina - 1) * per + per));
+    /* De zakelijke weergave. Een Business Pass en een zaak kopen op inkoopprijs;
+       die staat al in de groothandel en komt via prijsVoor() mee als
+       `zakelijkePrijs`. Hier wordt alleen GEKOZEN welke van de twee je ziet --
+       er wordt geen tweede prijs berekend (LAT-regel 4). Wie zakelijk kijkt
+       ziet het er ook aan: `btw: 'ex'`, want een inkoopprijs zonder die
+       vermelding is een verkeerd getal. */
+    const zakelijk = !!opt.zakelijk;
+    const metPrijs = (a) => (zakelijk && a.zakelijkePrijs)
+      ? { ...a, prijs: { ...a.zakelijkePrijs, btw: 'ex' }, consumentPrijs: a.prijs, zakelijk: true }
+      : a;
+
+    const bladzijde = stand.verrijk(
+      uit.slice((pagina - 1) * per, (pagina - 1) * per + per).map(metPrijs),
+      periode
+    );
 
     /* Het vraagbeeld. Alleen bij een ECHTE zoekopdracht van een mens (de route
        zet `noteer`), nooit bij een interne aanroep: anders telt de Mall zijn
@@ -109,6 +132,7 @@ module.exports = (ctx) => {
       // per verdieping tellen, zodat het scherm "ook gevonden in" kan tonen
       perVerdieping: VERDIEPINGEN.map(v => ({ ...v, aantal: uit.filter(a => a.verdieping === v.id).length }))
         .filter(v => v.aantal > 0),
+      periode, zakelijk,
       totaalVoorFilter, stuk, geweigerd, standbron: stand.bronnen(), valuta: 'EUR'
     };
   }

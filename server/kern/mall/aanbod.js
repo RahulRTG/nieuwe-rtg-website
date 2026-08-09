@@ -58,6 +58,8 @@ module.exports = (ctx) => {
       },
       plek: o.plek, bereik: o.bereik,
       prijs: o.prijs || null,
+      // de zakelijke prijs reist mee; zoek.js kiest welke er getoond wordt
+      zakelijkePrijs: o.zakelijkePrijs || null,
       /* `open` is de stand uit de Supplier OS: true, false of null. Null is met
          opzet geen "open" -- zie de kop van ./stand.js. */
       open: o.open || null,
@@ -97,7 +99,7 @@ module.exports = (ctx) => {
     ['reisbureau', breed.bronReizen], ['logies', breed.bronVerblijven], ['foodcourt', zaken.bronEten],
     ['retail', zaken.bronRetail], ['eigen-merk', zaken.bronEigenMerk], ['boerderij', zaken.bronBoerderij],
     ['dienstenplein', zaken.bronDiensten], ['mobiliteit', zaken.bronVervoer], ['marktplaats', breed.bronMarkt],
-    ['thuis', breed.bronThuis]
+    ['thuis', breed.bronThuis], ['groothandel', breed.bronGroothandel]
   ];
 
   /* Een bron die omvalt mag de Mall niet meenemen, maar ook niet stil

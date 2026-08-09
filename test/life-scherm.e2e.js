@@ -162,6 +162,59 @@ test('RTG Life: een doel uit Doelen staat er, en wat niet gemeten wordt zegt dat
     assert.ok(!(await page.textContent('#toestellen')).includes(sleutel),
       'na een herlaadbeurt staat de sleutel nergens meer op het scherm');
 
+    /* 1d. de noodkaart. Twee dingen worden hier op het scherm nagekeken: dat er
+       niets staat zolang hij uit staat (een grijze voorvertoning leest als
+       bijna aan), en dat de allergenen uit het zorgprofiel worden GELEZEN --
+       ze worden hier nooit ingetikt, ze komen uit een profiel dat via een
+       andere deur is gezet. */
+    await api('zorgprofiel/zet', { allergenen: ['penicilline'], dieet: '', medisch: '', delen: false });
+    await openDeel(page, 'Als u het zelf niet kunt vertellen');
+    await page.waitForSelector('#nBewaar', { timeout: 10000 });
+    assert.match(await page.textContent('#nood'), /staat uit/i,
+      'een kaart die uit staat toont niets, ook niet half');
+    assert.equal(await page.locator('#nood .nkaart').count(), 0);
+
+    /* Een middel in het schema, zodat de kaart ook DAAR iets uit kan lezen. Het
+       wordt via de medicatie-deur gezet en nergens op deze pagina ingetikt. */
+    await api('medicatie/zet', { naam: 'Metoprolol', sterkte: '50 mg', momenten: '08:00' });
+
+    await page.locator('#nNaam').fill('Mijn zus');
+    await page.locator('#nTel').fill('0612345678');
+    await page.locator('#nZorg').check();
+    await page.locator('#nMeds').check();
+    await page.locator('#nAan').check();
+    const nBewaar = page.locator('#nBewaar');
+    await nBewaar.scrollIntoViewIfNeeded();
+    await nBewaar.click();
+    await page.waitForSelector('#nood .nkaart', { timeout: 10000 });
+    const kaart = await page.textContent('#nood .nkaart');
+    assert.match(kaart, /Mijn zus/, 'wie er gebeld moet worden staat op de kaart');
+    assert.match(kaart, /penicilline/i,
+      'en de allergie uit het zorgprofiel staat erbij, zonder dat hij hier is ingetikt');
+    assert.match(kaart, /Metoprolol 50 mg/,
+      'en het middel uit het medicatieschema, ook zonder dat het hier is ingetikt');
+
+    /* En de harde kant ervan: haal hem uit het profiel, en hij is ook van de
+       kaart. Bij een kopie zou hij hier blijven staan. */
+    await api('zorgprofiel/zet', { allergenen: [], dieet: '', medisch: '', delen: false });
+    await page.reload({ waitUntil: 'load' });
+    await openDeel(page, 'Als u het zelf niet kunt vertellen');
+    await page.waitForSelector('#nood .nkaart', { timeout: 10000 });
+    const naProfiel = await page.textContent('#nood .nkaart');
+    assert.ok(!/penicilline/i.test(naProfiel), 'weg uit het profiel is weg van de kaart');
+    assert.match(naProfiel, /Mijn zus/, 'en wat van de kaart zelf is, blijft staan');
+
+    /* 1e. het medicatieblok op Life: leesbaar, en zonder opdracht. Het middel
+       is via de medicatie-deur gezet en niet op deze pagina; dat is precies de
+       belofte van dit scherm. */
+    await openDeel(page, 'Vandaag in te nemen');
+    await page.waitForFunction(() => /Metoprolol/.test(document.getElementById('medicatie').textContent),
+      { timeout: 10000 });
+    const medblok = await page.textContent('#medicatie');
+    assert.match(medblok, /08:00/, 'met het moment uit het schema');
+    assert.ok(!/\bneem\b|moet u innemen/i.test(medblok),
+      'Life zegt wat er staat, niet wat u moet innemen: ' + medblok.slice(0, 120));
+
     /* 2. het doel uit Doelen staat hier, zonder dat het lid Doelen heeft
        geopend in deze sessie. */
     await openDeel(page, 'Waar u naartoe werkt');

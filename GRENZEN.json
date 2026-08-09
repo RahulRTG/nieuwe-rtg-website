@@ -744,6 +744,13 @@
       "zorgVoor",
       "zorgZet"
     ],
+    "medicatie": [
+      "medicatieAf",
+      "medicatieVan",
+      "medicatieVoorraad",
+      "medicatieWeg",
+      "medicatieZet"
+    ],
     "memo": [],
     "meting": [],
     "metingen": [
@@ -850,6 +857,11 @@
       "navMeld",
       "navPoi",
       "navRoute"
+    ],
+    "noodkaart": [
+      "noodkaartVan",
+      "noodkaartWeg",
+      "noodkaartZet"
     ],
     "notities": [
       "notities"

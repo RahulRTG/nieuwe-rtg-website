@@ -48,6 +48,8 @@ klinkt.
 | Dagcheck-in | `server/kern/gemoed.js`, blok op `apps/life.html` | hoe zit u erbij, met de keuze tussen erover schrijven of gewoon iets doen |
 | Gewoonten | `server/kern/gewoonten.js`, blok op `apps/life.html` | kleine dingen die u vaker wilt doen; de dagenteller staat uit tot u hem aanzet |
 | Wachtlijst en gemiste afspraak | `server/kern/care/wachtlijst.js` | eerder aan de beurt als er iets vrijkomt (u boekt zelf), en een no-show die niet met u meereist |
+| Noodkaart | `server/kern/noodkaart.js`, blok op `apps/life.html` | een noodcontact en, als u dat wilt, uw allergenen en middelen: gelezen uit het zorgprofiel en het medicatieschema, niet gekopieerd; u toont hem zelf |
+| Medicatieschema | `server/kern/medicatie.js`, `public/apps/medicijnen.html` | wat u gebruikt, op welke tijden, en hoeveel er nog in huis is; RTG bepaalt nooit een dosering en controleert geen combinaties |
 | Inzage-audit | `server/inzagelog.js` | wie welke identiteitsgegevens opvroeg, en waarom |
 | Identiteitskluis | `server/accounts.js` | echte namen apart; alles daarbuiten draait op codenamen |
 
@@ -465,6 +467,84 @@ aanbieder werd teruggegeven.
 herinnering voortaan eerder? Dat is het enige dat een gemiste ochtend echt
 oplost.
 
+## De noodkaart, en waarom er geen break-glass is
+
+`server/kern/noodkaart.js`, met een blok onderaan `apps/life.html`.
+
+Wat erop staat: wie er gebeld moet worden, één zin over wat iemand meteen moet
+weten (maximaal 200 tekens), en desgewenst de allergenen en aandachtspunten uit
+het zorgprofiel. De kaart staat standaard **uit**, en zolang hij uit staat toont
+het scherm ook niets — geen grijze voorvertoning, want half getoond leest als
+bijna aan.
+
+**Hij dupliceert het zorgprofiel niet.** De allergenen worden op het moment van
+tonen gelezen uit `kern/gastzorg.js`. Haalt het lid er daar één weg, dan staat
+hij ook niet meer op de kaart. Een kopie zou uit de pas lopen met het origineel,
+en dan leest iemand in een ambulance een allergie die vorig jaar is geschrapt —
+LAT.md regel 4, en hier met de scherpste denkbare gevolgen. Wat het lid wél zelf
+kiest is óf ze op de kaart mogen (`zorgErbij`), niet wat erin staat.
+
+**Niemand kan hem opvragen.** Er zijn drie routes en die zijn alle drie van het
+lid zelf. Er is met opzet geen vierde waarmee een zaak, een kantoor of een
+hulpverlener de kaart van iemand anders ophaalt. Een kaart die op afstand op te
+vragen is, is een dossier dat toevallig klein is.
+
+**Wat er daarom niet is: break-glass.** Een hulpverlener die in een noodgeval
+bijzondere toegang aanvraagt hoort bij een keten die hier niet bestaat:
+geverifieerde professionals, een vastgelegde reden, een melding achteraf aan het
+lid, en een compliance-review die de gevallen nakijkt. Een knop die "break-glass"
+heet zonder die keten eronder is theater — en gevaarlijker dan geen knop, want
+hij wekt de indruk dat er toezicht is. Komt die keten er ooit, dan is dat een
+eigen ronde met een eigen consent-laag, geen uitbreiding van dit bestand.
+
+Op het toestemmingsscherm staat de noodkaart daarom bij **wat dit scherm niet
+dekt**, met de reden erbij: er valt niets in te trekken omdat er niemand is die
+hem kan opvragen. Zonder die regel zou een lezer denken dat we hem vergeten zijn.
+
+## Het medicatieschema, en waarom het zo saai is
+
+`server/kern/medicatie.js`, met een eigen pagina `apps/medicijnen.html` en een
+leesblok op Life.
+
+**RTG bepaalt nooit een dosering.** Er is geen middelenlijst om uit te kiezen,
+geen aanvulling op de naam, geen voorgestelde sterkte, geen maximum en geen
+bijwerkingentekst. Alles wat er staat heeft het lid overgetikt van het doosje of
+van de apotheek. RTG is de agenda, niet de apotheker.
+
+**Er is geen interactiecontrole, en dat is een keuze.** "Mag dit samen met dat?"
+is klinisch werk: het vraagt een onderhouden databank, aansprakelijkheid en een
+beroepsgroep. Een half werkende versie is gevaarlijker dan geen, want hij wekt
+vertrouwen waar niets onder ligt. Wie dit ooit bouwt, bouwt een ander product.
+
+**Er staat nergens "neem dit nu in".** Dat is een doseerinstructie. Het scherm
+zegt wat er in het eigen schema staat en wat er nog niet is afgetekend; wat
+daarmee gebeurt is aan het lid en aan de arts. "Geweest en niet afgetekend" is
+dan ook een constatering en geen verwijt: geen rood, geen uitroepteken, en geen
+teller die bijhoudt hoe vaak het al is gebeurd.
+
+**De voorraad is een meting, geen aanname.** Is er geen aantal ingevuld, dan
+staat er niet nul maar "niet ingevuld", met de reden erbij. Is er wel een aantal,
+dan telt hij af op wat het lid *aftekent* — en het scherm zegt er zelf bij dat
+het zo werkt, want wie niet aftekent ziet een voorraad die te hoog staat. Liever
+een eerlijk onvolledige telling dan een verzonnen volledige (LAT.md regel 3). Om
+dezelfde reden valt een vertypte tijd niet stilletjes weg: de aanroeper hoort
+hoeveel er is afgevallen, anders leest "08:00, halfelf" als twee ingevulde
+momenten.
+
+**De grens staat er permanent, niet als reactie.** `kern/zorgniveau.js` markeert
+elk medicijnwoord als klinisch — dat filter beschermt een *gesprek*, en zou hier
+de app blokkeren die het beschrijft. Daarom staat de verwijzing naar arts en
+apotheek hier als een bordje aan de muur, ook op een dag dat er niets aan de hand
+is. De **crisisregel** loopt er wel doorheen: wat iemand in een notitieveld
+schrijft, schrijft hij ergens, en dan wordt er niets bewaard en komt de weg naar
+hulp terug.
+
+**Wat er nog niet is: een herinnering die afgaat.** Het schema kent de tijden,
+maar er gaat geen melding af. Dat vraagt de serverklok en het meldingenkanaal —
+zoals de Vitale check-in dat doet — en dat is een eigen ronde. Er staat daarom
+ook nergens op het scherm dat RTG u zal herinneren; een belofte in tekst is een
+belofte in code (LAT.md regel 6).
+
 ## De grenzen die vast moeten staan vóór de bouw
 
 Deze horen in de architectuur en niet in een latere ronde, want ze bepalen hoe
@@ -529,9 +609,14 @@ In deze volgorde, want elke stap heeft de vorige nodig:
 10. ~~**Wachtlijst en no-show**, met de grens dat een gemiste afspraak niet
     meereist.~~ Gedaan; zie hierboven.
 
-Wat daarna komt: de dagcoach, sport- en voedingslagen, de coachmarktplaats,
-multi-vestiging en resource-planning voor zorgorganisaties, het gedachtenboek,
-en de langere staart uit het oorspronkelijke voorstel (noodprofiel,
-medicatieschema, health timeline, ADHD- en autismemodus, energiemanagement,
-mantelzorg, corporate wellbeing, Life Wallet, lifestyle-marktplaats). En als er ooit een gesprek komt op het
-mentale onderwerp, dan door `zorgniveau.js` heen.
+11. ~~De **noodkaart**, zonder break-glass.~~ Gedaan; zie hierboven.
+
+12. ~~Het **medicatieschema**, zonder interactiecontrole.~~ Gedaan; zie
+    hierboven. De herinnering die afgaat staat er bewust nog niet.
+
+Wat daarna komt: de dagcoach, sport- en voedingslagen, de
+coachmarktplaats, multi-vestiging en resource-planning voor zorgorganisaties,
+het gedachtenboek, en de langere staart uit het oorspronkelijke voorstel (health
+timeline, ADHD- en autismemodus, energiemanagement, mantelzorg, corporate
+wellbeing, Life Wallet, lifestyle-marktplaats). En als er ooit een gesprek komt
+op het mentale onderwerp, dan door `zorgniveau.js` heen.

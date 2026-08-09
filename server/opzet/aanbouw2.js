@@ -86,6 +86,18 @@ module.exports = function bouwKernAanTwee(kern, grens) {
      zelf ingevuld. De bron die RTG Life miste; herkomst blijft zichtbaar. */
   Object.assign(kern, require('../kern/metingen')({ db, save }));
   require('../routes/metingen')(grens('metingen'));
+  /* Het medicatieschema (kern/medicatie.js): uw eigen lijst en uw eigen wekker.
+     RTG bepaalt nooit een dosering en controleert geen combinaties; wat er staat
+     heeft het lid overgetikt van het doosje. Staat hier BOVEN de noodkaart, want
+     die leest de lijst eruit. */
+  Object.assign(kern, require('../kern/medicatie')({ db, save, schoon, crypto }));
+  require('../routes/medicatie')(grens('medicatie'));
+  /* De noodkaart (kern/noodkaart.js): een noodcontact en, als u dat wilt, uw
+     allergenen en uw medicijnen -- gelezen uit het zorgprofiel en het
+     medicatieschema, niet gekopieerd. Niemand kan hem opvragen; u toont hem zelf. */
+  Object.assign(kern, require('../kern/noodkaart')({ db, save, schoon,
+    zorgVan: kern.zorgVan, medicijnenVan: kern.medicatieVoorNoodkaart }));
+  require('../routes/noodkaart')(grens('noodkaart'));
   /* Gewoonten (kern/gewoonten.js): kleine dingen die u vaker wilt doen. De
      reeksteller staat UIT tot het lid hem zelf aanzet, en een gebroken reeks is
      geen gebeurtenis -- geen melding, geen rood. */

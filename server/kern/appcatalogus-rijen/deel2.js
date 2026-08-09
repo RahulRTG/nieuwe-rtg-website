@@ -15,11 +15,12 @@ module.exports = [
   // ---- leven & gezondheid ----
   // Waar iemand zoekt, niet waar de code woont: Vitaal draait op de gedeelde
   // veiligheidskern en Balans op de agenda, maar je zoekt ze allebei hier.
-  ['life', 'RTG Life', 'leven', '/apps/life.html', 'Een scherm voor je hele leven bij RTG: ritme, doelen, afspraken en check-in bij elkaar. Wat niet gemeten wordt, staat er als niet gemeten.'],
+  ['life', 'RTG Life', 'leven', '/apps/life.html', 'Een scherm voor je hele leven bij RTG: ritme, doelen, afspraken, check-in en je noodkaart bij elkaar. Wat niet gemeten wordt, staat er als niet gemeten.'],
   ['doelen', 'Doelen', 'leven', '/apps/doelen.html', 'Waar je begon, waar je heen wilt en waarom; de stappen ertussen rekent RTG opnieuw uit vanaf waar je nu staat.'],
   ['sport', 'Sport', 'leven', '/apps/sport.html', 'Je sportactiviteiten en clubs.'],
   ['balans', 'Balans', 'leven', '/apps/balans.html', 'Je week op rust en ritme: Rahul adviseert ook eens niks, zonder streaks of schuldgevoel.'],
   ['vitaal', 'Vitaal', 'leven', '/apps/vitaal.html', 'Een knop per dag: het gaat goed. Voor medicijnen, en voor wie alleen woont.'],
+  ['medicijnen', 'Medicijnen', 'leven', '/apps/medicijnen.html', 'Je eigen medicatieschema: wat je gebruikt, op welke tijden, en hoeveel er nog in huis is. RTG bepaalt nooit een dosering.'],
 
   // ---- veiligheid & identiteit ----
   // Thuiswacht, Codewoord, Vitaal en Thuisrust draaien op een gedeelde kern

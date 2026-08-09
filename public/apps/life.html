@@ -35,6 +35,15 @@
   .rij{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;margin-top:.7rem;}
   .rij input{width:6rem;}
   .knop.mini{padding:.4rem .7rem;font-size:.8rem;}
+  /* De noodkaart wordt gelezen door iemand die haast heeft en u niet kent:
+     groot, rustig, en niets eromheen dat om aandacht vraagt. */
+  .nkaart{border:1px solid var(--line);border-left:2px solid var(--goldlicht);padding:1.1rem 1.2rem;}
+  .nkaart p{font-family:'Bodoni Moda',Georgia,serif;font-size:1.15rem;line-height:1.5;margin:0 0 .5rem;}
+  .nkaart p:last-child{margin-bottom:0;}
+  .nkaart p.leeg{font-family:'Inter',system-ui,sans-serif;font-size:.85rem;color:var(--soft);}
+  .keus{display:flex;gap:.5rem;align-items:flex-start;margin-top:.6rem;font-size:.82rem;line-height:1.5;}
+  .keus input{margin-top:.2rem;flex:none;}
+  #nood .rij input{width:auto;flex:1 1 8rem;min-width:8rem;}
 </style>
 <script src="/shared/seizoen.js" defer></script>
 <script src="/shared/veiligheid.js" defer></script>
@@ -104,6 +113,24 @@
     <h2>Rust en ritme</h2>
     <div id="adviezen"></div>
     <a class="heen" href="/apps/balans.html">Naar Balans &#8594;</a>
+  </section>
+
+  <section aria-label="Medicijnen">
+    <h2>Vandaag in te nemen</h2>
+    <p class="stil">Wat er in uw eigen medicatieschema staat. Aftekenen doet u in Medicijnen; RTG
+    zegt niet dat u iets moet innemen en gaat niet over dosering.</p>
+    <div id="medicatie"></div>
+    <a class="heen" href="/apps/medicijnen.html">Naar Medicijnen &#8594;</a>
+  </section>
+
+  <section aria-label="Noodkaart">
+    <h2>Als u het zelf niet kunt vertellen</h2>
+    <p class="stil">Het kleinste beetje dat een vreemde over u moet weten: wie er gebeld moet worden,
+    en als u dat wilt uw allergenen en uw medicijnen. Die worden gelezen uit uw zorgprofiel en uw
+    medicatieschema en niet gekopieerd &mdash; haalt u er daar iets weg, dan staat het hier ook niet
+    meer. U toont deze kaart zelf op uw scherm. Niemand kan hem op afstand opvragen, ook een
+    hulpverlener niet.</p>
+    <div id="nood"></div>
   </section>
 
   <div id="grens" class="rtgdeel-vast"></div>
@@ -338,6 +365,86 @@
       : '<p class="stil">Uw week geeft op dit moment geen aanleiding tot advies.</p>';
   }
 
+  /* Alleen wat er vandaag staat, en alleen lezen: aftekenen gebeurt in
+     Medicijnen. Staat er niets in het schema, dan staat hier geen nul en geen
+     lege balk maar een zin die zegt dat er niets is. En nergens "neem dit in":
+     dat is een doseerinstructie en daar gaat RTG niet over. */
+  function tekenMedicatie(d) {
+    const el = $('#medicatie'); if (!el) return;
+    const p = d.vandaag || [];
+    if (!p.length) {
+      el.innerHTML = (d.middelen || []).length
+        ? '<p class="stil">Er staan geen tijden in uw schema.</p>'
+        : '<p class="stil">U heeft nog geen medicatieschema.</p>';
+      return;
+    }
+    const open = p.filter(x => !x.afgetekend).length;
+    el.innerHTML = '<p class="stil">' + p.length + ' moment' + (p.length === 1 ? '' : 'en') +
+      ' vandaag, waarvan ' + open + ' nog niet afgetekend.</p>' +
+      p.map(x => '<div class="sig' + (x.afgetekend ? ' leeg' : '') + '">' +
+        '<span class="naam">' + esc(x.naam) + (x.sterkte ? ' ' + esc(x.sterkte) : '') +
+          '<span class="uit">' + (x.afgetekend ? 'afgetekend' :
+            (x.geweest ? 'stond gepland, nog niet afgetekend' : 'komt nog')) + '</span></span>' +
+        '<span class="waarde">' + esc(x.moment) + '</span></div>').join('');
+  }
+
+  /* De kaart staat BOVEN het formulier, want wat u invult is precies wat een
+     vreemde straks leest. Staat hij uit, dan staat er ook geen kaart -- geen
+     grijze voorvertoning, want half getoond leest als bijna aan. */
+  function tekenNood(d) {
+    const el = $('#nood'); if (!el) return;
+    const k = d.kaart || {};
+    const regels = [];
+    if (k.contactNaam) regels.push('<b>Bel ' + esc(k.contactNaam) + '</b>' +
+      (k.contactTel ? ' &middot; ' + esc(k.contactTel) : ''));
+    if (k.watNodig) regels.push(esc(k.watNodig));
+    if (k.zorgErbij && (k.allergenen || []).length) regels.push('Allergisch voor ' + esc(k.allergenen.join(', ')));
+    if (k.zorgErbij && k.medisch) regels.push('Let op: ' + esc(k.medisch));
+    if (k.medicijnenErbij && (k.medicijnen || []).length) regels.push('Gebruikt ' + esc(k.medicijnen.join(', ')));
+
+    el.innerHTML =
+      (k.aan
+        ? '<div class="nkaart">' + (regels.length
+            ? regels.map(r => '<p>' + r + '</p>').join('')
+            : '<p class="leeg">Uw kaart staat aan, maar er staat nog niets op.</p>') + '</div>'
+        : '<p class="stil">Uw noodkaart staat uit. Er is niets te tonen.</p>') +
+      '<div class="kaartje">' +
+        '<div class="rij">' +
+          '<input maxlength="60" id="nNaam" aria-label="Wie moet er gebeld worden" ' +
+            'placeholder="Wie moet er gebeld worden?" value="' + esc(k.contactNaam) + '">' +
+          '<input maxlength="30" id="nTel" aria-label="Telefoonnummer" ' +
+            'placeholder="Telefoonnummer" value="' + esc(k.contactTel) + '">' +
+        '</div>' +
+        '<textarea id="nNodig" rows="2" maxlength="200" aria-label="Wat moet iemand meteen weten"' +
+          ' placeholder="Wat moet iemand meteen weten? Houd het kort."' +
+          ' style="width:100%;margin-top:.5rem;">' + esc(k.watNodig) + '</textarea>' +
+        '<label class="keus"><input type="checkbox" id="nZorg"' + (k.zorgErbij ? ' checked' : '') +
+          '> Zet mijn allergenen en aandachtspunten uit mijn zorgprofiel erbij</label>' +
+        '<label class="keus"><input type="checkbox" id="nMeds"' + (k.medicijnenErbij ? ' checked' : '') +
+          '> Zet de middelen uit mijn medicatieschema erbij</label>' +
+        '<label class="keus"><input type="checkbox" id="nAan"' + (k.aan ? ' checked' : '') +
+          '> De kaart staat aan</label>' +
+        '<div class="rij"><button class="knop mini" id="nBewaar">Bewaren</button>' +
+        (d.bestaat ? '<button class="knop mini" id="nWeg">Kaart weggooien</button>' : '') +
+        '</div></div>';
+
+    $('#nBewaar').addEventListener('click', async () => {
+      try {
+        tekenNood(await Veilig.api('/api/noodkaart/zet', {
+          contactNaam: $('#nNaam').value, contactTel: $('#nTel').value,
+          watNodig: $('#nNodig').value, zorgErbij: $('#nZorg').checked,
+          medicijnenErbij: $('#nMeds').checked, aan: $('#nAan').checked }));
+        Veilig.melding('Bewaard.');
+      } catch (e) { Veilig.melding(e.message); }
+    });
+    const weg = $('#nWeg');
+    if (weg) weg.addEventListener('click', async () => {
+      try { await Veilig.api('/api/noodkaart/weg', {});
+        tekenNood(await Veilig.api('/api/noodkaart')); Veilig.melding('Weggegooid.'); }
+      catch (e) { Veilig.melding(e.message); }
+    });
+  }
+
   /* Een laag die het niet doet, staat op het scherm. Stil overslaan zou hier
      betekenen dat "geen afspraken" en "de zorglaag is stuk" er hetzelfde
      uitzien, en dat is precies het verschil dat je wilt zien. */
@@ -349,10 +456,13 @@
 
   async function laad() {
     try {
-      const [d, m, t, g, w] = await Promise.all([
+      const [d, m, t, g, w, n, med] = await Promise.all([
         Veilig.api('/api/life'), Veilig.api('/api/metingen'), Veilig.api('/api/toestellen'),
-        Veilig.api('/api/gemoed'), Veilig.api('/api/gewoonten')]);
+        Veilig.api('/api/gemoed'), Veilig.api('/api/gewoonten'), Veilig.api('/api/noodkaart'),
+        Veilig.api('/api/medicatie')]);
       tekenGemoed(g, null);
+      tekenNood(n);
+      tekenMedicatie(med);
       tekenGewoonten(w);
       tekenInvullen(m);
       tekenToestellen(t);

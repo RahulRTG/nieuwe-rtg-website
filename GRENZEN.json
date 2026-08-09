@@ -184,6 +184,11 @@
     "gemeente": [
       "gemeente"
     ],
+    "gemoed": [
+      "gemoedVan",
+      "gemoedWeg",
+      "gemoedZet"
+    ],
     "ghost": [
       "ghostKantoor",
       "ghostSimuleer"

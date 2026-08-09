@@ -99,6 +99,39 @@ test('RTG Life: een doel uit Doelen staat er, en wat niet gemeten wordt zegt dat
     assert.match(naInvullen, /over 1 nacht/i,
       'en het scherm zegt hoe weinig het er zijn: een gemiddelde over een nacht is geen weekbeeld');
 
+    /* 1b2. de dagcheck-in, en de grens erop. Eerst een gewone check-in: dan
+       staan er praktische dingen. Daarna een notitie waar de grens op aanslaat:
+       dan hoort die lijst WEG te zijn en er alleen hulp te staan. Een
+       telefoonnummer onder een verder vrolijk lijstje is geen grens. */
+    await openDeel(page, 'Hoe zit u erbij');
+    const gemiddeld = page.locator('#gemoed [data-stem="gemiddeld"]');
+    await gemiddeld.scrollIntoViewIfNeeded();
+    await gemiddeld.click();
+    /* Wachten op iets dat er ALLEEN NA de klik is. "Rustig ademen" stond er al
+       voor de tik (de doe-lijst komt met het eerste beeld mee), dus daarop
+       wachten wachtte nergens op -- en de notitie hieronder werd dan ingevuld
+       terwijl het blok nog aan het hertekenen was, waarna hij leeg werd
+       meegestuurd. De wisknop bestaat pas als er een check-in van vandaag is. */
+    await page.waitForSelector('#gWeg', { timeout: 10000 });
+    assert.match(await page.textContent('#gemoed'), /rustig ademen/i,
+      'een gewone check-in geeft praktische dingen om te doen');
+
+    await page.locator('#gNotitie').fill('ik wil niet meer leven');
+    const bewaren = page.locator('#gBewaar');
+    await bewaren.scrollIntoViewIfNeeded();
+    await bewaren.click();
+    await page.waitForFunction(() => /0800-0113/.test(document.getElementById('gemoed').textContent),
+      null, { timeout: 10000 });
+    const naGrens = await page.textContent('#gemoed');
+    assert.ok(!/rustig ademen/i.test(naGrens),
+      'bij een crisis staat er GEEN ademhalingsoefening meer op het scherm');
+    assert.match(naGrens, /geen hulpverlener/i, 'en RTG zegt zelf dat het dit niet is');
+
+    // opruimen, zodat de rest van de toets een gewoon scherm ziet
+    await page.locator('#gWeg').click();
+    await page.waitForFunction(() => !/0800-0113/.test(document.getElementById('gemoed').textContent),
+      null, { timeout: 10000 });
+
     /* 1c. een toestel koppelen: de sleutel komt een keer op het scherm, en de
        lijst laat hem daarna niet nog eens zien. */
     await openDeel(page, 'Toestellen');

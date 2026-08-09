@@ -37,6 +37,8 @@ const NIET_GEDEKT = [
     reden: 'Dat is publiceren en geen toestemming: u haalt het weg bij de post zelf.' },
   { naam: 'Uw veiligheidskring (Thuiswacht, Codewoord, Vitaal)',
     reden: 'Die kring krijgt pas iets te zien als er een alarm afgaat; u beheert hem in de veiligheidsapps.' },
+  { naam: 'Uw dagcheck-in en wat u daarbij opschreef',
+    reden: 'Daar valt niets te delen: die notities verlaten uw account niet, en er is geen knop die dat wel zou doen.' },
   { naam: 'Wat een zaak van een boeking weet',
     reden: 'Dat hoort bij de boeking en verdwijnt met de boeking; het is geen losse toestemming.' }
 ];

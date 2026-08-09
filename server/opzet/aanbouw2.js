@@ -86,6 +86,12 @@ module.exports = function bouwKernAanTwee(kern, grens) {
      zelf ingevuld. De bron die RTG Life miste; herkomst blijft zichtbaar. */
   Object.assign(kern, require('../kern/metingen')({ db, save }));
   require('../routes/metingen')(grens('metingen'));
+  /* De dagcheck-in (kern/gemoed.js) op de grens uit kern/zorgniveau.js. De
+     grens staat er eerder dan de functie: elke vrije tekst gaat er langs voor
+     er iets terugkomt, en slaat hij aan, dan is er geen tip maar een weg naar
+     echte hulp. */
+  Object.assign(kern, require('../kern/gemoed')({ db, save, schoon }));
+  require('../routes/gemoed')(grens('gemoed'));
   /* Gekoppelde toestellen (kern/toestellen.js): de tweede herkomst. Een eigen
      smalle sleutel per toestel die precies een ding kan -- een dagmeting
      wegschrijven -- en die het lid altijd kan intrekken. */

@@ -58,6 +58,13 @@
     gemeten. RTG vult geen nul in waar niets bekend is, en verzint geen score.</p>
   </section>
 
+  <section aria-label="Hoe zit u erbij">
+    <h2>Hoe zit u erbij</h2>
+    <p class="stil">Een tik, meer hoeft niet. Wilt u er iets bij schrijven, dan blijft dat van u:
+    het verlaat uw account niet en er is geen knop die dat wel zou doen. Geen reeksen, geen score.</p>
+    <div id="gemoed"></div>
+  </section>
+
   <section aria-label="Vandaag invullen">
     <h2>Vandaag invullen</h2>
     <p class="stil">Drie dingen die alleen u weet. Ze blijven van u: ze gaan naar geen partner,
@@ -156,6 +163,69 @@
      maken. Bij het herladen is hij weg, en dat hoort ook. */
   let versSleutel = null;
 
+  /* De dagcheck-in. Slaat de grens uit kern/zorgniveau.js aan, dan komt er GEEN
+     tiplijst terug maar een weg naar echte hulp -- en dan tekent dit scherm die
+     ook alleen. Een telefoonnummer onder een verder vrolijk lijstje zetten zou
+     precies de grens zijn die geen grens is. */
+  function tekenGemoed(d, antwoord) {
+    const el = $('#gemoed'); if (!el) return;
+    const nu = (d.vandaagIngevuld || {}).stemming || null;
+    let html = '<div class="rij">' + (d.stemmingen || []).map(s =>
+      '<button class="knop mini' + (nu === s.id ? ' on' : '') + '" data-stem="' + esc(s.id) + '"' +
+      ' aria-pressed="' + (nu === s.id) + '">' + esc(s.label) + '</button>').join('') + '</div>';
+
+    html += '<div class="kaartje"><b>Wilt u er iets bij schrijven?</b>' +
+      '<span class="m">Hoeft niet. Het is voor uzelf.</span>' +
+      '<textarea id="gNotitie" rows="3" maxlength="1000" aria-label="Voor uzelf"' +
+      ' style="width:100%;margin-top:.5rem;">' + esc((d.vandaagIngevuld || {}).notitie || '') + '</textarea>' +
+      '<div class="rij"><button class="knop mini" id="gBewaar">Bewaren</button>' +
+      (d.vandaagIngevuld ? '<button class="knop mini" id="gWeg">Wissen</button>' : '') + '</div></div>';
+
+    const esc2 = x => '<div class="kaartje"><b>' + esc(x.kop) + '</b><span class="m">' + esc(x.tekst) + '</span>' +
+      '<ul style="margin:.5rem 0 0 1rem;padding:0;">' + (x.wegen || []).map(w =>
+        '<li style="font-size:.85rem;line-height:1.6;"><b>' + esc(w.naam) + '</b> &middot; ' + esc(w.hoe) + '</li>').join('') +
+      '</ul></div>';
+
+    if (antwoord && antwoord.mag === false) {
+      html += '<div class="storing" role="status">' + esc(antwoord.uitleg || '') + '</div>' + esc2(antwoord.escalatie);
+    } else {
+      const aanhoudend = (antwoord && antwoord.aanhoudend) || d.aanhoudend;
+      if (aanhoudend) html += esc2(aanhoudend);
+      const doen = (antwoord && antwoord.doen) || d.doen || [];
+      if (doen.length) {
+        html += '<div style="font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin:1rem 0 .3rem;">' +
+          'Of doe gewoon iets</div>' + doen.map(x =>
+          '<div class="kaartje"><b>' + esc(x.naam) + '</b><span class="m">' + esc(x.hoe) + '</span></div>').join('');
+      }
+    }
+    el.innerHTML = html;
+
+    let gekozen = nu;
+    el.querySelectorAll('[data-stem]').forEach(b => b.addEventListener('click', async () => {
+      gekozen = b.dataset.stem;
+      try {
+        const r = await Veilig.api('/api/gemoed/zet',
+          { stemming: gekozen, notitie: ($('#gNotitie') || {}).value || '' });
+        tekenGemoed(await Veilig.api('/api/gemoed'), r);
+      } catch (e) { Veilig.melding(e.message); }
+    }));
+    const bew = $('#gBewaar');
+    if (bew) bew.addEventListener('click', async () => {
+      if (!gekozen) { Veilig.melding('Kies eerst hoe u erbij zit.'); return; }
+      try {
+        const r = await Veilig.api('/api/gemoed/zet', { stemming: gekozen, notitie: $('#gNotitie').value });
+        tekenGemoed(await Veilig.api('/api/gemoed'), r);
+        Veilig.melding('Genoteerd.');
+      } catch (e) { Veilig.melding(e.message); }
+    });
+    const weg = $('#gWeg');
+    if (weg) weg.addEventListener('click', async () => {
+      try { await Veilig.api('/api/gemoed/weg', {}); tekenGemoed(await Veilig.api('/api/gemoed'), null);
+        Veilig.melding('Gewist.'); }
+      catch (e) { Veilig.melding(e.message); }
+    });
+  }
+
   function tekenToestellen(d) {
     const el = $('#toestellen'); if (!el) return;
     const lijst = d.toestellen || [];
@@ -230,8 +300,10 @@
 
   async function laad() {
     try {
-      const [d, m, t] = await Promise.all([
-        Veilig.api('/api/life'), Veilig.api('/api/metingen'), Veilig.api('/api/toestellen')]);
+      const [d, m, t, g] = await Promise.all([
+        Veilig.api('/api/life'), Veilig.api('/api/metingen'), Veilig.api('/api/toestellen'),
+        Veilig.api('/api/gemoed')]);
+      tekenGemoed(g, null);
       tekenInvullen(m);
       tekenToestellen(t);
       tekenWinst(d.winst);

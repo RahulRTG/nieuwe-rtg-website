@@ -44,6 +44,8 @@ klinkt.
 | Gekoppelde toestellen | `server/kern/toestellen.js`, vak op `apps/life.html` | een horloge of weegschaal schrijft dagmetingen weg met een eigen smalle sleutel, altijd in te trekken |
 | Consent Center | `server/kern/consent.js`, `public/apps/toestemming.html` | zeven lagen toestemming op één scherm; intrekken gaat naar de bron |
 | Behandelaar legt vast | `server/kern/care/vastleggen.js` | een zorgaanbieder mag met aparte toestemming een meting in het dossier zetten, via een afspraak bij zichzelf |
+| De grens (drie niveaus) | `server/kern/zorgniveau.js` | lifestyle, professioneel, klinisch; bij crisis en medicatie houdt RTG op en wijst het de weg naar echte hulp |
+| Dagcheck-in | `server/kern/gemoed.js`, blok op `apps/life.html` | hoe zit u erbij, met de keuze tussen erover schrijven of gewoon iets doen |
 | Inzage-audit | `server/inzagelog.js` | wie welke identiteitsgegevens opvroeg, en waarom |
 | Identiteitskluis | `server/accounts.js` | echte namen apart; alles daarbuiten draait op codenamen |
 
@@ -347,12 +349,67 @@ toets somt ze letterlijk op, zodat een vijfde soort die iemand op beschikbaar
 zet zonder deur er meteen doorheen zakt. Dat is de enige manier waarop dat
 register een belofte blijft en geen lijstje wordt.
 
+## De grens, en waarom hij er eerder is dan het gesprek
+
+`kern/zorgniveau.js` bestaat vóór er iets is om mee te praten. Dat is de hele
+volgorde: het veiligheidsmodel hoort in de architectuur en niet in een latere
+ronde, want een grens die je achteraf om een werkende functie heen bouwt, wordt
+een tekstje onderaan.
+
+**Drie niveaus.** *Lifestyle* -- ritme, rust, structuur; hier mag RTG meedenken.
+*Professioneel* -- iets waar een mens bij hoort; RTG mag de weg wijzen, niet de
+inhoud geven. *Klinisch* -- crisis, zelfbeschadiging, medicatie, diagnose; hier
+houdt RTG op. Geen advies, geen geruststelling, geen "even samen kijken".
+
+**De grens is code en geen prompt.** Wat wordt aangewezen levert `mag: false` op
+en er is geen veld waarmee een aanroeper dat omzet. Een taalmodel dat zijn eigen
+veiligheidsregel mag uitleggen, is geen veiligheidsregel. Er staat een toets op
+die `mag: true` meestuurt en toch `mag: false` terugkrijgt.
+
+**En bij een crisis verdwijnt de rest.** Geen ademhalingsoefening, geen
+doe-lijst, geen patroonpraatje -- alleen de weg naar hulp, met een nummer dat
+een mens opneemt (113 Zelfmoordpreventie, de huisartsenpost, 112). Dat is de
+scherpste bewering van deze laag en hij wordt aan twee kanten getoetst: in de
+motor én op het scherm.
+
+**Dit is een vloer, geen filter.** Wat er doorheen komt is niet "veilig
+bevonden" -- het is alleen niet herkend. Een woordenlijst mist omschrijvingen,
+understatement, ironie en elke taal die er niet in staat. Wie hem ooit als
+filter gebruikt ("het sloeg niet aan, dus het mag"), gebruikt hem verkeerd. Dat
+staat zo in het bestand.
+
+**Aanhoudend zwaar is geen crisis en geen diagnose.** Vijf dagen op rij is lang
+genoeg om een mens te noemen, meer niet. Een goede dag ertussen breekt de reeks:
+het gaat om aanhoudend, niet om optellen.
+
+## De dagcheck-in
+
+Eén tik, en dan de keuze die ertoe doet: er iets over schrijven, of gewoon iets
+doen. Iemand die moe is wil niet altijd een gesprek; soms wil hij tien minuten
+rust en verder niets. Een app die op elk gevoel met een vraag reageert, wordt
+iets dat je gaat vermijden.
+
+**Wat u opschrijft gaat nergens heen.** Er is geen deelroute, geen partnerkant
+en geen kantoorkant -- dat is geen omissie maar het ontwerp. Daarom staat deze
+laag in het Consent Center bij *wat dat scherm niet dekt*, met de reden erbij:
+er valt niets te delen.
+
+**Geen score, geen reeks, geen gemiddelde stemming.** Er staat een toets op die
+faalt zodra er een cijfer, gemiddelde of streak in kruipt, ook onder een andere
+naam. Wie zich een week niet meldt, mist niets.
+
+**Wat er NIET is: een AI-gesprek.** Bewust. De grens staat er nu, de
+niet-pratende helft werkt; een gesprek is een veel groter oppervlak en hoort pas
+te komen als het door deze grens heen moet. Elke toekomstige AI-ingang op dit
+onderwerp gaat langs `zorgniveau.js` of hij hoort er niet te zijn.
+
 ## De grenzen die vast moeten staan vóór de bouw
 
 Deze horen in de architectuur en niet in een latere ronde, want ze bepalen hoe
 de motoren hierboven eruit mogen zien.
 
-**Drie niveaus, en de AI weet altijd in welk niveau hij staat.**
+**Drie niveaus, en de AI weet altijd in welk niveau hij staat.** Dit staat sinds
+deze ronde in code: `server/kern/zorgniveau.js`. Zie "De grens" hieronder.
 
 1. *Lifestyle* -- algemene ondersteuning: ritme, beweging, structuur, rust. Dit
    is waar Balans nu al staat.
@@ -402,10 +459,10 @@ In deze volgorde, want elke stap heeft de vorige nodig:
 7. ~~De derde herkomst (`behandelaar`), met de zevende consent-laag.~~ Gedaan;
    zie hieronder.
 
-Wat daarna komt hangt aan deze zeven. De zwaarste openstaande is de mentale
-laag (dagcheck-in, gedachtenboek, stress), en die hoort te beginnen bij zijn
-veiligheidsgrens en niet bij zijn functie: een chatbot is geen behandelaar, en
-dat model hoort in de architectuur te zitten voordat er iets is om mee te
-praten. Daarnaast: gewoonten, de dagcoach, sport- en voedingslagen, de
-coachmarktplaats, en de zaakkant van de zorg (multi-vestiging, wachtlijst,
-no-show).
+8. ~~De mentale laag, beginnend bij de **grens**.~~ Gedaan; zie hieronder. De
+   check-in en de doe-kant staan er; een AI-gesprek bewust nog niet.
+
+Wat daarna komt hangt aan deze acht: gewoonten, de dagcoach, sport- en
+voedingslagen, de coachmarktplaats, en de zaakkant van de zorg
+(multi-vestiging, wachtlijst, no-show). En als er ooit een gesprek komt op het
+mentale onderwerp, dan door `zorgniveau.js` heen.

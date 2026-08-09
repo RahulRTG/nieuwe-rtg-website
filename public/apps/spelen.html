@@ -137,6 +137,7 @@
     <div class="sec" id="standKop" hidden>Jouw partijen</div>
     <div id="stand" hidden></div>
     <div id="recent" hidden></div>
+    <div id="prestaties" hidden></div>
   </section>
 
   <!-- nieuw potje -->
@@ -410,9 +411,23 @@ async function laadRecent(){
   }).join('');
 }
 
+/* Behaalde prestaties. Alleen wat er IS: de server stuurt niet mee wat je nog
+   kunt halen, en deze pagina verzint dat er ook niet bij. Geen teller, geen
+   balk, geen "nog twee te gaan". */
+async function laadPrestaties(){
+  let d; try{ d = await api('prestaties'); }catch(e){ return; }
+  const lijst = d.prestaties || [];
+  const leeg = !d.progressie || !lijst.length;
+  $('#prestaties').hidden = leeg;
+  if (leeg) return;
+  $('#prestaties').innerHTML = '<div class="sec">Behaald</div>' + lijst.map(p =>
+    '<div class="rij"><div class="nm">'+esc(p.naam)+(p.spel ? ' · '+esc(p.spel) : '')+
+    '<small>'+esc(p.uitleg||'')+'</small></div></div>').join('');
+}
+
 async function laadLobby(){
   let d; try{ d = await api('mijn'); }catch(e){ return; }
-  laadOnline(); laadZichtbaar(); laadStand(); laadRecent();
+  laadOnline(); laadZichtbaar(); laadStand(); laadRecent(); laadPrestaties();
   const u = d.uitnodigingen||[];
   $('#uitnodigingen').innerHTML = u.length ? '<div class="sec">Uitnodigingen</div>' + u.map(x =>
     '<div class="rij"><div class="nm">'+esc(x.naam)+(x.modus==='teams'?' · 2 tegen 2':'')+'<small>van '+esc(x.van)+' · met '+x.spelers.map(esc).join(', ')+'</small></div>'+

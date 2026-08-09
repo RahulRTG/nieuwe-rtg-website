@@ -5,7 +5,7 @@
 const { log } = require('../log');
 
 module.exports = (kern) => {
-  const { app, auth, geenGast, rtf, spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelRahul, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, spelUitslagen, spelStand, sneekScore, sneekBord, arcadeScore, arcadeBord, socialConnecties } = kern;
+  const { app, auth, geenGast, rtf, spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelRahul, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, spelUitslagen, spelStand, spelPrestaties, sneekScore, sneekBord, arcadeScore, arcadeBord, socialConnecties } = kern;
 
   function rtfSpeler(req, res) {
     const sess = rtf.verifieerProfiel(req.body.code, req.body.token);
@@ -53,6 +53,8 @@ module.exports = (kern) => {
     uitslagen: (mij, b) => spelUitslagen(mij, b.hoeveel),
     // je stand per spel, afgeleid uit de uitslagen (dus over hetzelfde venster)
     stand: (mij) => spelStand(mij),
+    // behaalde prestaties; wat je nog NIET hebt reist bewust niet mee
+    prestaties: (mij) => spelPrestaties(mij),
     // de eigen opt-out: wel spelen, niet gezien worden
     zichtbaar: (mij) => spelZichtbaar(mij),
     'zichtbaar-zet': (mij, b) => spelZichtbaarZet(mij, b.aan !== false),

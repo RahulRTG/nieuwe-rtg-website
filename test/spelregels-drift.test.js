@@ -250,3 +250,31 @@ test('de lobby toont recente partijen, met een naamloze tegenstander als medespe
   assert.match(vol.innerHTML, /gelijkspel/, 'en een gelijkspel heet geen winst of verlies');
   assert.doesNotMatch(vol.innerHTML, /tegen\s*<\/small>/, 'nooit "tegen" met niets erachter');
 });
+
+/* Behaalde prestaties in de lobby. Het punt dat anders wegvalt: deze pagina
+   mag er GEEN voortgang bij verzinnen. De server stuurt alleen wat behaald is;
+   een teller of een balk zou het patroon terugbrengen dat er bewust uit is. */
+test('de lobby toont alleen behaalde prestaties, zonder teller of voortgang', async () => {
+  const bron = knip('async function laadPrestaties()', 'async function laadLobby');
+  const maak = () => ({ hidden: false, innerHTML: '' });
+
+  async function draai(antwoord) {
+    const el = maak();
+    const laad = new Function('api', '$', 'esc', bron + '; return laadPrestaties;')(
+      async () => antwoord, () => el, (x) => String(x));
+    await laad();
+    return el;
+  }
+
+  assert.equal((await draai({ progressie: false, prestaties: [] })).hidden, true, 'onder de grens: weg');
+  assert.equal((await draai({ progressie: true, prestaties: [] })).hidden, true, 'niets behaald: ook weg');
+
+  const vol = await draai({ progressie: true, vensterDagen: 365, prestaties: [
+    { sleutel: 'eerste-winst:schaak', naam: 'Eerste overwinning', spel: 'Schaken', uitleg: 'Je eerste gewonnen partij in dit spel.' }
+  ] });
+  assert.equal(vol.hidden, false);
+  assert.match(vol.innerHTML, /Eerste overwinning/);
+  assert.match(vol.innerHTML, /Schaken/);
+  assert.equal(/van de|nog\b|te gaan|\d+\s*\/\s*\d+/i.test(vol.innerHTML), false,
+    'geen teller en geen voortgang: ' + vol.innerHTML);
+});

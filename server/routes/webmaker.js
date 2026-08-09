@@ -1,9 +1,13 @@
 /* Routes voor de Website-maker: de bouwkant, voor leden en zaken. De
    leeskant (de RTG-browser) staat in routes/webbrowser.js. */
 module.exports = (kern) => {
-  const { app, auth, webmaker, webplatform, webmakerAi, atelierweb, antivirus, media, supplierAuth, liveCodename } = kern;
+  const { app, auth, webmaker, webplatform, webmakerAi, atelierweb, antivirus, media, liveCodename } = kern;
   const FOTO_MAX_BYTES = 2 * 1024 * 1024; // ~2 MB per foto
   const stuur = (res, r) => r && r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
+  /* Het scherm moet weten of er bewaarde wijzigingen klaarstaan die nog niet
+     online zijn; de regel daarvoor staat in de kern, hier hangen we hem er
+     alleen bij (haal() geeft de levende regel terug, die kopieren we niet). */
+  const metWacht = d => Object.assign({}, d, { wacht: webmaker.wacht(d) });
   const geenGast = (req, res) => {
     if (req.session.tier === 'guest') { res.status(403).json({ error: 'Een eigen website maken is voor leden. Word lid om te beginnen.' }); return true; }
     return false;
@@ -15,7 +19,7 @@ module.exports = (kern) => {
     if (geenGast(req, res)) return;
     const d = webmaker.haal(req.session.key, (req.body || {}).id);
     if (!d) return res.status(404).json({ error: 'Website niet gevonden.' });
-    res.json({ design: d });
+    res.json({ design: metWacht(d) });
   });
   app.post('/api/site/bewaar', auth, (req, res) => { if (geenGast(req, res)) return; const b = req.body || {}; stuur(res, webmaker.bewaar(req.session.key, b.design || b)); });
   app.post('/api/site/verwijder', auth, (req, res) => { if (geenGast(req, res)) return; stuur(res, webmaker.verwijder(req.session.key, (req.body || {}).id)); });
@@ -24,6 +28,8 @@ module.exports = (kern) => {
   app.post('/api/site/versies', auth, (req, res) => { if (geenGast(req, res)) return; stuur(res, webmaker.versies(req.session.key, (req.body || {}).id)); });
   app.post('/api/site/herstel', auth, (req, res) => { if (geenGast(req, res)) return; const b = req.body || {}; stuur(res, webmaker.herstel(req.session.key, b.id, b.i)); });
   app.post('/api/site/publiceer', auth, (req, res) => { if (geenGast(req, res)) return; const b = req.body || {}; stuur(res, webmaker.publiceer(req.session.key, b.id, b.adres)); });
+  // wat je bewaarde staat in je concept; hiermee gaat het naar buiten
+  app.post('/api/site/live', auth, (req, res) => { if (geenGast(req, res)) return; stuur(res, webmaker.zetLive(req.session.key, (req.body || {}).id)); });
   app.post('/api/site/offline', auth, (req, res) => { if (geenGast(req, res)) return; stuur(res, webmaker.offline(req.session.key, (req.body || {}).id)); });
 
   /* ---- de persoonlijke site: ieders eigen plek op het RTG-web ----
@@ -35,12 +41,12 @@ module.exports = (kern) => {
     const adres = webmaker.slug(codenaam);
     // bestaat je persoonlijke site al, dan krijg je hem terug in plaats van een tweede
     const bestaande = webmaker.mijn(req.session.key).find(d => d.adres === adres);
-    if (bestaande) return res.json({ ok: true, bestond: true, design: webmaker.haal(req.session.key, bestaande.id), adres });
+    if (bestaande) return res.json({ ok: true, bestond: true, design: metWacht(webmaker.haal(req.session.key, bestaande.id)), adres });
     const r = webmaker.bewaar(req.session.key, webplatform.genereerPersoon(codenaam));
     if (r.error) return stuur(res, r);
     const p = webmaker.publiceer(req.session.key, r.design.id, adres);
     if (p.error) return stuur(res, p);
-    res.json({ ok: true, design: webmaker.haal(req.session.key, r.design.id), adres: p.adres });
+    res.json({ ok: true, design: metWacht(webmaker.haal(req.session.key, r.design.id)), adres: p.adres });
   });
 
   /* ---- AI in de maker ----
@@ -50,10 +56,6 @@ module.exports = (kern) => {
      zelf, en dan pas loopt het langs de gewone schoonmaak. */
   app.post('/api/site/ai', auth, async (req, res) => {
     if (geenGast(req, res)) return;
-    const b = req.body || {};
-    res.json(await webmakerAi.schrijf(b.design || {}, b.opdracht));
-  });
-  app.post('/api/supplier/site/ai', supplierAuth, async (req, res) => {
     const b = req.body || {};
     res.json(await webmakerAi.schrijf(b.design || {}, b.opdracht));
   });
@@ -92,47 +94,5 @@ module.exports = (kern) => {
     stuur(res, webmaker.fotoBewaar(req.session.key, url));
   });
   app.post('/api/site/foto-weg', auth, (req, res) => { if (geenGast(req, res)) return; stuur(res, webmaker.fotoWeg(req.session.key, String((req.body || {}).url || ''))); });
-
-  /* ---- de bedrijfssite (RTG Web Platform) ----
-
-     De zaak zelf, achter supplierAuth. De site leeft in dezelfde opslag als
-     ledensites, met eigenaar 'zaak:CODE' -- dat een site bij een bedrijf
-     hoort komt uit de inlog, niet uit het verzoek. "Automatic first":
-     genereren maakt in een keer een complete site uit het zaakprofiel en zet
-     hem online; "customizable forever": daarna bewerkt de ondernemer hem met
-     dezelfde maker als ieder lid. */
-  const zaakKey = req => 'zaak:' + req.supplier.code;
-  app.post('/api/supplier/site/genereer', supplierAuth, (req, res) => {
-    const key = zaakKey(req);
-    const bestaande = webmaker.mijn(key);
-    const opnieuw = !!(req.body || {}).opnieuw;
-    if (bestaande.length && !opnieuw) {
-      // niet stil overschrijven wat de ondernemer zelf heeft aangepast
-      return res.json({ ok: true, bestond: true, design: webmaker.haal(key, bestaande[0].id) });
-    }
-    const ontwerp = webplatform.genereer(req.supplier);
-    if (bestaande.length) ontwerp.id = bestaande[0].id;
-    const r = webmaker.bewaar(key, ontwerp, { zaakCode: req.supplier.code, reden: 'opnieuw uit profiel' });
-    if (r.error) return stuur(res, r);
-    // meteen online op de bedrijfsnaam; is dat adres van een ander, dan naam-code
-    let p = webmaker.publiceer(key, r.design.id, webmaker.slug(req.supplier.name));
-    if (p.error && p.status === 409) p = webmaker.publiceer(key, r.design.id, webmaker.slug(req.supplier.name + '-' + req.supplier.code));
-    if (p.error) return stuur(res, p);
-    res.json({ ok: true, design: webmaker.haal(key, r.design.id), adres: p.adres });
-  });
-  app.post('/api/supplier/site/mijn', supplierAuth, (req, res) => res.json({ lijst: webmaker.mijn(zaakKey(req)) }));
-  app.post('/api/supplier/site/haal', supplierAuth, (req, res) => {
-    const d = webmaker.haal(zaakKey(req), (req.body || {}).id);
-    if (!d) return res.status(404).json({ error: 'Website niet gevonden.' });
-    res.json({ design: d });
-  });
-  app.post('/api/supplier/site/bewaar', supplierAuth, (req, res) => {
-    const b = req.body || {};
-    stuur(res, webmaker.bewaar(zaakKey(req), b.design || b, { zaakCode: req.supplier.code }));
-  });
-  app.post('/api/supplier/site/publiceer', supplierAuth, (req, res) => { const b = req.body || {}; stuur(res, webmaker.publiceer(zaakKey(req), b.id, b.adres)); });
-  app.post('/api/supplier/site/offline', supplierAuth, (req, res) => { stuur(res, webmaker.offline(zaakKey(req), (req.body || {}).id)); });
-  app.post('/api/supplier/site/versies', supplierAuth, (req, res) => stuur(res, webmaker.versies(zaakKey(req), (req.body || {}).id)));
-  app.post('/api/supplier/site/herstel', supplierAuth, (req, res) => { const b = req.body || {}; stuur(res, webmaker.herstel(zaakKey(req), b.id, b.i)); });
 
 };

@@ -112,6 +112,7 @@ module.exports = function hangRoutesOp(kern) {
   require('../routes/atelierweb')(grens('atelierweb'));
   require('../routes/webmaker')(grens('webmaker'));
   require('../routes/webbrowser')(grens('webbrowser'));
+  require('../routes/zaakweb')(grens('zaakweb'));
   require('../routes/journalistiek')(grens('journalistiek'));
   require('../routes/markt')(grens('markt'));
   require('../routes/borden')(grens('borden'));

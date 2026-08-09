@@ -71,5 +71,5 @@ module.exports = ({ store, save, scho }) => {
   // een site die weg is, laat geen geschiedenis achter
   function wis(id) { const p = pot(); delete p[id]; }
 
-  return { leg, lijst, herstel, wis, MAX };
+  return { leg, lijst, herstel, wis, ontwerpVan, MAX };
 };

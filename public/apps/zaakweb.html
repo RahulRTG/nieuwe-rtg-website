@@ -67,16 +67,18 @@ async function toon(){
   }
   const d=lijst[0];
   el.innerHTML='<h2 style="font-size:1.2rem;">'+esc(d.titel)+'</h2>'+
-    '<div class="mt"><span class="stip'+(d.online?' aan':'')+'"></span>'+(d.online?'Online op ':'Offline · adres ')+'<span class="adres">'+esc(d.adres||'--')+(d.adres?'.rtg':'')+'</span> · '+d.bezoeken+' bezoek'+(d.bezoeken===1?'':'en')+' · '+d.blokken+' blokken</div>'+
+    '<div class="mt"><span class="stip'+(d.online?' aan':'')+'"></span>'+(d.online?'Online op ':'Offline · adres ')+'<span class="adres">'+esc(d.adres||'--')+(d.adres?'.rtg':'')+'</span> · '+d.bezoeken+' bezoek'+(d.bezoeken===1?'':'en')+' · '+d.blokken+' blokken'+(d.wacht?' · <b>er staan wijzigingen klaar die nog niet online zijn</b>':'')+'</div>'+
     '<div class="rij">'+
     (d.online&&d.adres?'<a class="knop" href="/apps/browser.html?adres='+encodeURIComponent(d.adres)+'">Bekijk in de RTG-browser</a>':'')+
     '<button id="'+(d.online?'uit':'aan')+'">'+(d.online?'Zet offline':'Zet online')+'</button>'+
     '<button id="vers">Opnieuw uit mijn profiel</button>'+
+    (d.wacht?'<button class="prim" id="live">Zet wijzigingen online</button>':'')+
     '<button id="hist">Eerdere versies</button>'+
     '</div>'+
     '<div id="histvak"></div>'+
     '<p class="mt" style="line-height:1.6;">De live blokken (menu, aanbod, foto&#39;s, reviews, contact) volgen uw bedrijfsprofiel vanzelf. "Opnieuw uit mijn profiel" gooit uw eigen aanpassingen aan de site weg en bouwt hem vers op -- dat vraagt hij niet nog een keer, dus wees er zeker van.</p>';
-  const uit=$('#uit'),aan=$('#aan'),vers=$('#vers');
+  const uit=$('#uit'),aan=$('#aan'),vers=$('#vers'),live=$('#live');
+  if(live)live.addEventListener('click',async()=>{ try{ await api('live',{id:d.id}); meld('De wijzigingen staan online.'); toon(); }catch(e){ meld(e.message);} });
   if(uit)uit.addEventListener('click',async()=>{ try{ await api('offline',{id:d.id}); meld('De site staat offline.'); toon(); }catch(e){ meld(e.message);} });
   if(aan)aan.addEventListener('click',async()=>{ try{ const r=await api('publiceer',{id:d.id,adres:d.adres||d.titel}); meld('Online op '+r.adres+'.rtg'); toon(); }catch(e){ meld(e.message);} });
   vers.addEventListener('click',async()=>{ try{ const r=await api('genereer',{opnieuw:true}); meld('Opnieuw gebouwd uit uw profiel'+(r.adres?' -- online op '+r.adres+'.rtg':'')+'. De vorige stand staat onder "Eerdere versies".'); toon(); }catch(e){ meld(e.message);} });

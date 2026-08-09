@@ -131,6 +131,7 @@
 <div class="lint" id="lint" hidden>
   <span class="stip" id="lintStip"></span>
   <span id="lintTekst">Nog niet online. Klik op "Ga online" om je site een RTG-adres te geven.</span>
+  <button class="knop" id="liveKnop" hidden>Zet wijzigingen online</button>
 </div>
 <div class="lint" id="versienoot" hidden></div>
 <main id="hoofd">
@@ -435,8 +436,13 @@ function zetBewerk(aan){BEWERK=aan;$('#bewerkKnop').textContent=aan?'Voorbeeld':
 function lintBij(){
   const l=$('#lint'); l.hidden=false;
   const stip=$('#lintStip'); stip.classList.toggle('aan',!!DESIGN.online);
+  /* Bewaren verandert je CONCEPT; bezoekers zien de stand van het laatste
+     publiceren. Dat moet hier staan, anders bewaart iemand tien keer en
+     vraagt zich af waarom het web niet meebeweegt. */
+  $('#liveKnop').hidden=!DESIGN.wacht;
   if(DESIGN.online && DESIGN.adres){
-    $('#lintTekst').innerHTML='Online op <span class="adres">'+esc(DESIGN.adres)+'.rtg</span> · <a href="/apps/browser.html?adres='+encodeURIComponent(DESIGN.adres)+'" target="_blank" rel="noopener">bekijk in de RTG-browser →</a>';
+    $('#lintTekst').innerHTML='Online op <span class="adres">'+esc(DESIGN.adres)+'.rtg</span> · <a href="/apps/browser.html?adres='+encodeURIComponent(DESIGN.adres)+'" target="_blank" rel="noopener">bekijk in de RTG-browser →</a>'+
+      (DESIGN.wacht?' · <b>je hebt bewaarde wijzigingen die nog niet online staan</b>':'');
   } else {
     $('#lintTekst').textContent='Nog niet online. Klik op "Ga online" om je site een RTG-adres te geven.';
   }
@@ -450,6 +456,8 @@ async function bewaar(stil){
   const payload=Object.assign({},DESIGN,{blokken:HOMEBLOK});
   try{ const d=await api('bewaar',{design:payload});
     DESIGN.id=d.design.id; DESIGN.adres=d.design.adres||''; DESIGN.online=!!d.design.online;
+    // bewaren verandert het concept: staat de site online, dan wacht dit op publiceren
+    DESIGN.wacht=!!DESIGN.online;
     // de geschoonde pagina's van de server overnemen (slugs, begrenzing)
     DESIGN.paginas=d.design.paginas||[]; HOMEBLOK=d.design.blokken||[];
     if(PAG>=DESIGN.paginas.length) PAG=-1;
@@ -486,6 +494,12 @@ function laadOntwerp(d,bericht){
   $('#openSheet').classList.remove('open');zetBewerk(true);lintBij();
   if(bericht)meld(bericht);
 }
+/* wat je bewaarde staat in je concept; hiermee gaat het naar buiten */
+$('#liveKnop').addEventListener('click',async()=>{
+  if(!DESIGN.id)return;
+  try{ await api('live',{id:DESIGN.id}); DESIGN.wacht=false; lintBij(); meld('Je wijzigingen staan online.'); }
+  catch(e){ meld(e.message); }
+});
 $('#terugKnop').addEventListener('click',async()=>{
   if(!DESIGN.id){ meld('Bewaar je site eerst; daarna houdt hij zijn geschiedenis bij.'); return; }
   const vak=$('#versievak'),l=$('#versielijst');
@@ -551,7 +565,7 @@ function onlineSheet(){
 }
 async function publiceer(){
   const adres=$('#adresIn').value.trim();
-  try{ const r=await api('publiceer',{id:DESIGN.id,adres}); DESIGN.adres=r.adres; DESIGN.online=true; $('#onlineSheet').classList.remove('open'); lintBij(); meld('Je staat online op '+r.adres+'.rtg'); }
+  try{ const r=await api('publiceer',{id:DESIGN.id,adres}); DESIGN.adres=r.adres; DESIGN.online=true; DESIGN.wacht=false; $('#onlineSheet').classList.remove('open'); lintBij(); meld('Je staat online op '+r.adres+'.rtg'); }
   catch(e){ meld(e.message); }
 }
 async function offline(){

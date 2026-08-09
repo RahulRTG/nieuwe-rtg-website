@@ -34,8 +34,23 @@ module.exports = ({ db, save, crypto, schoon, media }) => {
      een weg terug hebben. */
   const versielaag = require('./webmaker-versies')({ store, save, scho });
 
-  const kort = d => ({ id: d.id, titel: d.titel, adres: d.adres || '', online: !!d.online, bezoeken: d.bezoeken || 0, bij: d.bij, blokken: (d.blokken || []).length });
-  const publiek = d => ({ titel: d.titel, thema: d.thema, accent: d.accent, kleuren: d.kleuren || null, blokken: d.blokken || [], paginas: d.paginas || [], volgorde: d.volgorde || null, adres: d.adres, eigenaar: d.eigenaar, zaakCode: d.zaakCode || '' });
+  /* ---- concept en wat er online staat ----
+
+     Wat de maker bewerkt is het CONCEPT; wat bezoekers zien is de bevroren
+     stand van het laatste publiceren (d.live). Zonder dat onderscheid gaat
+     elke halve zin die iemand intypt meteen het web op, en dat is voor een
+     bedrijfssite geen werkbare manier van werken.
+
+     Een site van voor deze laag heeft nog geen bevroren stand; die serveert
+     gewoon zijn concept, zodat er niets omvalt en niemand zijn site kwijt is. */
+  function bevries(d) { d.live = versielaag.ontwerpVan(d); d.liveOp = new Date().toISOString(); }
+  const wacht = d => !!d.online && !!d.liveOp && new Date(d.bij) > new Date(d.liveOp);
+
+  const kort = d => ({ id: d.id, titel: d.titel, adres: d.adres || '', online: !!d.online, bezoeken: d.bezoeken || 0, bij: d.bij, blokken: (d.blokken || []).length, wacht: wacht(d) });
+  const publiek = d => {
+    const o = d.live || d;   // geen bevroren stand (oude site): dan het concept
+    return { titel: o.titel, thema: o.thema, accent: o.accent, kleuren: o.kleuren || null, blokken: o.blokken || [], paginas: o.paginas || [], volgorde: o.volgorde || null, adres: d.adres, eigenaar: d.eigenaar, zaakCode: d.zaakCode || '' };
+  };
 
   function mijn(key) { return store().lijst.filter(d => d.eigenaar === key).map(kort); }
   function haal(key, id) { const d = store().lijst.find(x => x.id === scho(id, 20) && x.eigenaar === key); return d || null; }
@@ -64,6 +79,12 @@ module.exports = ({ db, save, crypto, schoon, media }) => {
       adres: bestaand ? (bestaand.adres || '') : '',
       online: bestaand ? !!bestaand.online : false,
       bezoeken: bestaand ? (bestaand.bezoeken || 0) : 0,
+      /* De stand die ONLINE staat overleeft een bewaring: bewaren verandert
+         het concept en niet het web. Vergeten we dit, dan valt de site bij de
+         eerstvolgende opslag terug op het concept en staat elke halve zin
+         alsnog buiten -- precies wat deze laag moet voorkomen. */
+      live: bestaand ? (bestaand.live || null) : null,
+      liveOp: bestaand ? (bestaand.liveOp || null) : null,
       gemaakt: bestaand ? bestaand.gemaakt : new Date().toISOString(),
       bij: new Date().toISOString()
     };
@@ -105,8 +126,20 @@ module.exports = ({ db, save, crypto, schoon, media }) => {
     if (a.length < 2) return { error: 'Kies een adres van minstens twee tekens (letters, cijfers, koppelteken).', status: 400 };
     const bezet = store().lijst.find(x => x.adres === a && x.id !== d.id);
     if (bezet) return { error: 'Dit adres is al bezet. Kies een ander.', status: 409 };
-    d.adres = a; d.online = true; d.bij = new Date().toISOString(); save();
+    d.adres = a; d.online = true; d.bij = new Date().toISOString();
+    bevries(d);              // online gaan is ook het eerste publiceren
+    save();
     return { ok: true, adres: a, online: true };
+  }
+  /* De wijzigingen die in het concept staan naar buiten brengen. Een aparte
+     handeling, want dit is het moment waarop het web verandert -- bij een zaak
+     is dat werk van de leiding (zie routes/webmaker.js). */
+  function zetLive(key, id) {
+    const d = haal(key, id);
+    if (!d) return { error: 'Website niet gevonden.', status: 404 };
+    if (!d.online || !d.adres) return { error: 'Zet de site eerst online; dan kun je wijzigingen publiceren.', status: 400 };
+    bevries(d); save();
+    return { ok: true, op: d.liveOp };
   }
   function offline(key, id) {
     const d = haal(key, id);
@@ -119,7 +152,11 @@ module.exports = ({ db, save, crypto, schoon, media }) => {
      bekijken is ander werk dan bouwen. */
   const blader = require('./webmaker-blader')({ store, save, slug, publiek });
 
-  return { mijn, haal, bewaar, verwijder, publiceer, offline, slug, versies, herstel,
+  /* haal() geeft met opzet de LEVENDE regel terug (publiceer, herstel en
+     zetLive schrijven erin), dus de afgeleide "wacht"-vlag hangen we er niet
+     aan vast maar reiken we los aan -- zo staat de regel nog steeds op een
+     plek en breken we het schrijven niet. */
+  return { mijn, haal, bewaar, verwijder, publiceer, zetLive, offline, slug, versies, herstel, wacht,
            gids: blader.gids, open: blader.open, zoek: blader.zoek, adresVanZaak: blader.adresVanZaak, zaakVanAdres: blader.zaakVanAdres, eigenaarVanAdres: blader.eigenaarVanAdres,
            fotos, fotoBewaar, fotoWeg, TYPES };
 };

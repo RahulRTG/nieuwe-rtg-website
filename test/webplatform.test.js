@@ -298,7 +298,13 @@ test('11. de versiegeschiedenis: een weg terug, zonder het adres mee te slepen',
   assert.equal(her.body.design.online, true, 'de site blijft online');
   const bezoek = await api('/api/browser/open', { adres: 'kaarsen-nora' }, lid);
   assert.equal(bezoek.status, 200, 'en is dus gewoon te bezoeken');
-  assert.equal(bezoek.body.site.blokken[0].tekst, 'Eerste stand');
+  /* Herstellen is een ontwerp-handeling: het zet je CONCEPT terug en laat het
+     web met rust. Wie terugkijkt duwt daarmee niet meteen iets naar buiten;
+     dat blijft een eigen, bewuste stap. */
+  assert.equal(bezoek.body.site.blokken[0].tekst, 'Tweede stand', 'online staat nog wat er gepubliceerd was');
+  assert.equal((await api('/api/site/live', { id }, lid)).status, 200);
+  const naLive = await api('/api/browser/open', { adres: 'kaarsen-nora' }, lid);
+  assert.equal(naLive.body.site.blokken[0].tekst, 'Eerste stand', 'en pas na publiceren staat de herstelde stand buiten');
 
   // herstellen is zelf ook een bewaring: de derde stand is niet verloren
   const na = await api('/api/site/versies', { id }, lid);
@@ -312,6 +318,67 @@ test('11. de versiegeschiedenis: een weg terug, zonder het adres mee te slepen',
   const vreemd = await api('/api/site/versies', { id }, buur.body.token);
   assert.equal(vreemd.status, 404);
   assert.equal((await api('/api/site/herstel', { id, i: 0 }, buur.body.token)).status, 404);
+});
+
+test('12. concept en online zijn twee dingen: bewaren verandert het web niet, publiceren wel', async () => {
+  const mk = await api('/api/site/bewaar', { design: { titel: 'Bakkerij Lume',
+    blokken: [{ type: 'kop', tekst: 'Zoals het online staat' }] } }, lid);
+  const id = mk.body.design.id;
+  await api('/api/site/publiceer', { id, adres: 'bakkerij-lume' }, lid);
+
+  // het concept aanpassen -- de bezoeker mag daar nog niets van merken
+  await api('/api/site/bewaar', { design: { id, titel: 'Bakkerij Lume', blokken: [{ type: 'kop', tekst: 'Halve zin waar ik nog aan werk' }] } }, lid);
+  const tijdens = await api('/api/browser/open', { adres: 'bakkerij-lume' }, lid);
+  assert.equal(tijdens.body.site.blokken[0].tekst, 'Zoals het online staat',
+    'wat bezoekers zien is de stand van het laatste publiceren');
+
+  // de maker ziet wel zijn eigen concept, met de melding dat er iets klaarstaat
+  const mijn = (await api('/api/site/mijn', {}, lid)).body.lijst.find(x => x.id === id);
+  assert.equal(mijn.wacht, true, 'de maker weet dat er wijzigingen wachten');
+  const concept = await api('/api/site/haal', { id }, lid);
+  assert.equal(concept.body.design.blokken[0].tekst, 'Halve zin waar ik nog aan werk');
+
+  // en pas met publiceren gaat het naar buiten
+  assert.equal((await api('/api/site/live', { id }, lid)).status, 200);
+  const na = await api('/api/browser/open', { adres: 'bakkerij-lume' }, lid);
+  assert.equal(na.body.site.blokken[0].tekst, 'Halve zin waar ik nog aan werk');
+  const mijn2 = (await api('/api/site/mijn', {}, lid)).body.lijst.find(x => x.id === id);
+  assert.equal(mijn2.wacht, false, 'niets meer in de wacht');
+
+  // en een bewaring daarna gooit de online stand niet stiekem weg
+  await api('/api/site/bewaar', { design: { id, titel: 'Bakkerij Lume', blokken: [{ type: 'kop', tekst: 'Nog een gedachte' }] } }, lid);
+  const daarna = await api('/api/browser/open', { adres: 'bakkerij-lume' }, lid);
+  assert.equal(daarna.body.site.blokken[0].tekst, 'Halve zin waar ik nog aan werk',
+    'de bevroren stand overleeft een bewaring');
+});
+
+test('13. bij een zaak is naar buiten brengen werk van de leiding', async () => {
+  const roster = await api('/api/supplier/roster', { code: 'ESVEDRA' });
+  const gewoon = (roster.body.staff || []).find(x => x.role !== 'manager');
+  assert.ok(gewoon, 'ESVEDRA heeft ook niet-managers');
+  const mede = (await api('/api/supplier/login', { code: 'ESVEDRA', staffId: gewoon.id, pin: '5678' })).body.token;
+  assert.ok(mede, 'de medewerker kan inloggen');
+
+  const mijn = await api('/api/supplier/site/mijn', {}, mede);
+  const id = mijn.body.lijst[0].id;
+
+  // bewerken mag hij wel: dat raakt het concept en niet het web
+  const bw = await api('/api/supplier/site/bewaar', { design: { id, titel: 'Es Vedra Cruises', blokken: [{ type: 'kop', tekst: 'Voorstel van de balie' }] } }, mede);
+  assert.equal(bw.status, 200, JSON.stringify(bw.body));
+
+  // maar het naar buiten brengen niet -- drie deuren, alle drie dicht
+  for (const pad of ['live', 'publiceer', 'offline']) {
+    const r = await api('/api/supplier/site/' + pad, { id, adres: 'es-vedra-cruises' }, mede);
+    assert.equal(r.status, 403, pad + ' hoort werk van de leiding te zijn');
+  }
+  // het web is dus ook echt niet veranderd
+  const bezoek = await api('/api/browser/open', { adres: 'es-vedra-cruises' }, lid);
+  assert.ok(!/Voorstel van de balie/.test(JSON.stringify(alleBlokken(bezoek.body.site))), 'het voorstel staat niet buiten');
+
+  // de leiding kan het wel, en dan staat het er
+  assert.equal((await api('/api/supplier/site/live', { id }, zaak)).status, 200);
+  const na = await api('/api/browser/open', { adres: 'es-vedra-cruises' }, lid);
+  assert.ok(/Voorstel van de balie/.test(JSON.stringify(alleBlokken(na.body.site))), 'na akkoord van de leiding wel');
 });
 
 test('5. zoeken vindt sites en bedrijven in een adem', async () => {

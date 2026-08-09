@@ -1578,6 +1578,27 @@ De Mall is nu een **discovery-laag boven op alle bestaande domeinen**. Die domei
 
 **Wat er nog niet is** (bewust, en met naam in plaats van als stilte): één winkelmand over ordertypes heen, de trip-cart ("voeg toe aan reis"), personalisatie en tijd als context, de aanvraagmarkt ("ik zoek morgen een fotograaf"), de B2B-modus met zakelijke prijzen, het leverancierdashboard met zoekvragen, en de terugkoppeling van tekorten naar de Kansenlaag. De laag waar die allemaal op staan — één aanbod-object, één plek, één zoekingang — ligt er nu.
 
+### De Supplier OS ↔ Mall-koppeling
+
+De Mall las tot nu toe alleen wat een zaak **is** (naam, adres, artikelen, prijzen) en niet wat zij op dit moment **doet**. Een gesloten kapper stond er net zo bij als een open kapper, een woensdagmiddag die de ondernemer in zijn eigen agenda blokkeerde was in de Mall niet te zien, en een artikel met voorraad nul verschilde in niets van een artikel dat op de plank ligt.
+
+`server/kern/mall/stand.js` haalt die stand op uit de systemen waar de ondernemer al werkt. Er wordt niets opgeslagen en geen enkele openingstijd opnieuw gedefinieerd: het is dezelfde rij.
+
+| wat | uit welk systeem |
+|---|---|
+| openingstijden, werkdagen, geblokkeerde dagen | `kern/vakwerk/agenda.js` (`s.vakUren`) |
+| vrije tijdvakken en tafels | `vakwerk.slots` en `foodcourt.tijden` |
+| aan/uit voor bestellen en reserveren | `kern/zaak.js` (`zaakFunctieAan`) |
+| voorraad | de varianten van de zaak zelf |
+
+**Wat we niet weten, zeggen we niet.** `openNu` geeft drie antwoorden: `true`, `false` en `null`. Null betekent "deze zaak heeft geen openingstijden vastgelegd" en is met opzet géén "open" — het filter *Nu open* laat zo'n zaak dus weg. Dat is eerlijker dan gokken, en voor de ondernemer meteen de reden om zijn uren wél in te vullen: iemand voor niets door de regen sturen is erger dan een treffer missen.
+
+**Kosten.** `openNu` is goedkoop en wordt voor de hele Mall berekend, zodat het filter over álles kan werken. Het eerstvolgende vrije tijdvak vraagt per zaak per dag de agenda op en wordt daarom alleen voor de zichtbare pagina opgehaald (hoogstens zestig kaarten), niet voor duizenden aanbod-objecten.
+
+**De andere kant: `POST /api/supplier/mall`.** Een ondernemer werkt in zijn eigen systeem en zag nooit wat daar aan de Mall-kant van terechtkomt — precies waar stille drift ontstaat. Deze weergave is een spiegel, geen dashboard: welk aanbod van u staat er, welke stand leest de Mall uit uw agenda en voorraad, en wat ontbreekt er nog (geen uren = niet in *Nu open*; geen werkgebied = de Mall neemt aan wat uw genre meebrengt). Bewust géén zoekvragen, bezoekersaantallen of conversie: dat is een leverancierdashboard en een eigen beslissing met een eigen privacyvraag.
+
+**Bekende gaten, met naam:** alles rekent in de tijd van de server, en een zaak draagt nog geen tijdzone — voor een Mall die van Haarlem tot Ibiza loopt is dat niet goed genoeg zodra die twee uit elkaar lopen. En een partner met een **extern** kassa- of boekingssysteem heeft nog geen weg naar binnen; de leeslaag werkt omdat alles in één database staat. Dat is de volgende architectuurkeuze, geen detail.
+
 ### De wallet en de ledenpas
 
 **apps/wallet.html** is alles wat je bij je draagt. Bovenaan ligt je **ledenpas**: codenaam, lidnummer, welke pas en een QR met je lidnummer (onze eigen codec, `shared/qr.js` + `shared/qrteken.js`). Daaronder je passen, tickets, sleutels, feestmunten en klantenkaarten (`/api/wallet`, `server/kern/wallet.js`). De pas stond vroeger op het beginscherm van de app; daar staat nu de klok.

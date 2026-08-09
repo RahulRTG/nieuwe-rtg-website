@@ -40,6 +40,8 @@ module.exports = (kern) => {
     plek: req.body.plek, punt: req.body.punt,
     verdieping: req.body.verdieping, type: req.body.type, aanbieder: req.body.aanbieder,
     maxPrijs: req.body.maxPrijs, binnenKm: req.body.binnenKm,
+    // de live stand uit de Supplier OS: alleen wat nu open is / op voorraad ligt
+    openNu: req.body.openNu === true, opVoorraad: req.body.opVoorraad === true,
     pagina: req.body.pagina, per: req.body.per
   })));
 

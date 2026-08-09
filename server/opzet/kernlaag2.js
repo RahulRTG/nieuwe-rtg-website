@@ -38,12 +38,10 @@ Object.assign(kern, require('../kern/architect').maakArchitect({ db, save, crypt
 Object.assign(kern, require('../kern/werkplaats').maakWerkplaats({ db, save, crypto, anthropic, schoon }));
 /* De RTG Mall (kern/mall.js): de luxe shoppingmall in de leden-app; een
    gecureerde etagelijst van de retail-partners, elk met een eigen catalogus. */
-Object.assign(kern, require('../kern/mall').maakMall({ db, save, crypto, isRetail: kern.retailIsRetail,
-  // de verdieping RTG Thuis; laat opgehaald omdat Thuis verderop wordt gebouwd
-  haalThuis: () => (kern.thuis && typeof kern.thuis.thuisMallAanbod === 'function' ? kern.thuis.thuisMallAanbod() : null),
-  // de landbepaling van de Reiswijzer (kernlaag4b), zodat de Mall van een
-  // bestemming weet in welk land hij ligt zonder een tweede plaatsentabel
-  haalLandVind: () => (typeof kern.landVind === 'function' ? kern.landVind : null) }));
+Object.assign(kern, require('../kern/mall').maakMall(Object.assign(
+  { db, save, crypto, isRetail: kern.retailIsRetail },
+  // de vier late bindingen (Thuis, Reiswijzer, Supplier OS): ./malldraden.js
+  require('./malldraden')(kern))));
 /* De App-Bibliotheek (kern/appbieb.js): 20.000 professionele apps in de Mall,
    elk rond de duizend euro winkelwaarde, voor leden inbegrepen bij de pas. */
 Object.assign(kern, require('../kern/appbieb').maakAppbieb({ db, save }));

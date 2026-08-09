@@ -58,6 +58,9 @@ module.exports = (ctx) => {
       },
       plek: o.plek, bereik: o.bereik,
       prijs: o.prijs || null,
+      /* `open` is de stand uit de Supplier OS: true, false of null. Null is met
+         opzet geen "open" -- zie de kop van ./stand.js. */
+      open: o.open || null,
       beschikbaar: o.beschikbaar || null,
       cta: o.cta || TYPEN[type].cta,
       pagina: o.pagina,

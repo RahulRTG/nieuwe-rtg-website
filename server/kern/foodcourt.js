@@ -90,7 +90,7 @@ function maakFoodcourt({ db, save, crypto }) {
     };
   }
 
-  return { foodcourt: { KEUKENS, overzicht, tijden, seed, isEetgelegenheid } };
+  return { foodcourt: { KEUKENS, LUNCH, DINER, overzicht, tijden, seed, isEetgelegenheid } };
 }
 
-module.exports = { maakFoodcourt };
+module.exports = { maakFoodcourt, LUNCH, DINER };

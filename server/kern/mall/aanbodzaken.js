@@ -19,7 +19,7 @@ const VERVOER_PAGINA = {
 };
 
 module.exports = (ctx, hulp) => {
-  const { db, isBoer, farmTeKoop, isRetail, winkelCatalogus } = ctx;
+  const { db, isBoer, farmTeKoop, isRetail, winkelCatalogus, stand } = ctx;
   const { aanbod, prijs, getal, status, zaakPlek, zichtbareZaken, genreLabel, bereikVan, plekVan, RTG_BEREIK } = hulp;
 
   // restaurants en andere eetgelegenheden
@@ -34,7 +34,10 @@ module.exports = (ctx, hulp) => {
           aanbieder: { soort: 'zaak', code: s.code, naam: s.name, status: status(s) },
           plek: zaakPlek(s), bereik: bereikVan(s),
           prijs: prijzen.length ? prijs(Math.min(...prijzen), 'per gerecht', true) : null,
-          beschikbaar: (s.settings && s.settings.reservationsOpen === false) ? null : { tekst: 'Reserveren mogelijk', hard: false },
+          // de stand komt uit de systemen van de zaak zelf; de losse
+          // settings-vlag stond hier eerder rechtstreeks uitgelezen
+          open: stand.openNu(s),
+          beschikbaar: stand.neemtAan(s, 'reserveren') ? { tekst: 'Reserveren mogelijk', hard: false } : null,
           pagina: '/apps/foodcourt.html', genre: s.type, genreLabel: genreLabel(s.type),
           kenmerken: [...new Set((s.menu || []).map(m => m.cat).filter(Boolean))].slice(0, 3)
         });
@@ -53,7 +56,8 @@ module.exports = (ctx, hulp) => {
           aanbieder: { soort: 'zaak', code: s.code, naam: s.name, status: status(s) },
           plek: zaakPlek(s), bereik: bereikVan(s),
           prijs: p ? prijs(p, 'per stuk') : null,
-          beschikbaar: (a.varianten || []).some(v => (v.voorraad || 0) > 0) ? { tekst: 'Op voorraad', hard: true } : null,
+          open: stand.openNu(s),
+          beschikbaar: stand.voorraad(a.varianten),
           pagina: '/apps/mall.html', genre: s.type, genreLabel: genreLabel(s.type),
           verdieping: 'winkelen', kenmerken: [a.categorie].filter(Boolean)
         }));
@@ -89,7 +93,7 @@ module.exports = (ctx, hulp) => {
           aanbieder: { soort: 'zaak', code: s.code, naam: s.name, status: status(s) },
           plek: zaakPlek(s), bereik: bereikVan(s),
           prijs: prijs(p.prijs, p.eenheid || 'per stuk'),
-          beschikbaar: { tekst: p.voorraad + ' op voorraad', hard: true },
+          beschikbaar: stand.voorraad([{ voorraad: p.voorraad }]),
           pagina: '/apps/mall.html', genre: 'boerderij', genreLabel: genreLabel('boerderij'),
           verdieping: 'eten'
         }));
@@ -114,6 +118,9 @@ module.exports = (ctx, hulp) => {
           aanbieder: { soort: 'zaak', code: s.code, naam: s.name, status: status(s) },
           plek: zaakPlek(s), bereik: bereikVan(s),
           prijs: getal(d.price) ? prijs(d.price, d.duurMin ? 'per ' + d.duurMin + ' min' : 'per dienst') : null,
+          // het eerstvolgende vrije tijdvak is te duur voor de hele Mall en
+          // wordt pas voor de zichtbare pagina opgehaald (kern/mall/stand.js)
+          open: stand.openNu(s),
           pagina: '/apps/mall.html', genre: s.type, genreLabel: genreLabel(s.type),
           kenmerken: [s.vak].filter(Boolean)
         }));

@@ -50,6 +50,17 @@ app.get('/api/supplier/stream', (req, res) => {
 
 app.post('/api/supplier/state', supplierAuth, (req, res) => res.json({ state: supplierState(req.supplier, req.actor) }));
 
+/* "Zo staat u in de Mall": de andere kant van de Supplier OS-koppeling. De
+   zaak ziet welk aanbod van haar in de Mall staat, welke stand de Mall daarbij
+   uit haar eigen agenda en voorraad leest, en wat er nog ontbreekt (geen uren
+   = niet in "Nu open"). Alleen de eigen zaak; er is geen code-parameter, zodat
+   niemand hiermee bij een ander kan kijken. */
+app.post('/api/supplier/mall', supplierAuth, (req, res) => {
+  const r = kern.mall.mallVoorZaak(req.supplier.code);
+  if (r.error) return res.status(r.status || 400).json({ error: r.error });
+  res.json(r);
+});
+
 app.post('/api/supplier/notifications/read', supplierAuth, (req, res) => {
   (db.data.supplierNotifications[req.supplier.code] || []).forEach(n => n.read = true);
   save();

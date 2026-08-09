@@ -59,7 +59,7 @@ const GENRE_PAGINA = {
   taxi: '/apps/ov.html', verhuur: '/apps/mall.html', tweewielers: '/apps/mall.html'
 };
 
-function maakMall({ db, save, crypto, isRetail, haalThuis, haalLandVind }) {
+function maakMall({ db, save, crypto, isRetail, haalThuis, haalLandVind, haalVakwerk, haalFoodcourt, haalZaakFunctie }) {
   const nu = () => new Date().toISOString();
   const va = (sku, kleuren, maten, v) => {
     const out = [];
@@ -138,7 +138,8 @@ function maakMall({ db, save, crypto, isRetail, haalThuis, haalLandVind }) {
 
   // de gedeelde ctx voor de deelbestanden
   const ctx = {
-    db, save, crypto, isRetail, haalThuis, haalLandVind, nu, va, seed, isBoer, farmTeKoop, verborgen, winkelCatalogus,
+    db, save, crypto, isRetail, haalThuis, haalLandVind, haalVakwerk, haalFoodcourt, haalZaakFunctie,
+    nu, va, seed, isBoer, farmTeKoop, verborgen, winkelCatalogus,
     ETAGES, ETAGE_IDS, GIDS_GENRES, GENRE_PAGINA
   };
   const api = { ETAGES, seed };
@@ -151,6 +152,7 @@ function maakMall({ db, save, crypto, isRetail, haalThuis, haalLandVind }) {
      Staat NA de etalage omdat de aanbod-bronnen haar helpers (thuisplein,
      verborgen, farmTeKoop) uit dezelfde ctx halen. */
   Object.assign(api, require('./plek')(ctx));   // vult ctx.plek
+  Object.assign(api, require('./stand')(ctx));  // vult ctx.stand: de Supplier OS-koppeling
   Object.assign(api, require('./aanbod')(ctx)); // vult ctx.aanbodAlles
   Object.assign(api, require('./zoek')(ctx));
   return { mall: api };

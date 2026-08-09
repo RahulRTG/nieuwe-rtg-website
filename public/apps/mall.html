@@ -100,6 +100,7 @@
   .tref .waar{font-size:.74rem;color:var(--soft);}
   .tref .prijs{font-size:.92rem;margin-top:.2rem;font-variant-numeric:tabular-nums;}
   .tref .vrij{font-size:.74rem;color:var(--green,#4C9A75);}
+  .tref .dicht{font-size:.74rem;color:var(--soft);}
   .tref .ga{margin-top:.5rem;align-self:flex-start;text-decoration:none;}
   .stukmelding{border:1px solid var(--burgundy);border-radius:12px;padding:.7rem .9rem;margin-top:.9rem;font-size:.82rem;color:var(--muted);}
 </style>
@@ -125,6 +126,8 @@
       <span>In de buurt van</span>
       <select id="plek" aria-label="Plek"><option value="">Overal</option></select>
       <span id="plekTel"></span>
+      <button class="knop stil" id="nuOpen" type="button">Nu open</button>
+      <button class="knop stil" id="opVoorraad" type="button">Op voorraad</button>
       <button class="knop stil" id="wisZoek" type="button" hidden>Alles tonen</button>
     </div>
     <div class="verdiepingen" id="verdiepingen"></div>
@@ -207,7 +210,7 @@ if (!TOKEN) {
    winkels, diensten, vervoer en de Marktplaats staan in EEN zoekresultaat,
    met een duidelijk verschil tussen een zaak en een particulier. Deze laag
    toont; boeken en kopen gebeurt op de pagina waar dat al gebeurde. */
-const V = { q: '', plek: '', verdieping: '', pagina: 1 };
+const V = { q: '', plek: '', verdieping: '', pagina: 1, openNu: false, opVoorraad: false };
 const WIE = { zaak: 'Professioneel', particulier: 'Particulier', rtg: 'RTG' };
 
 async function startVind(){
@@ -223,8 +226,20 @@ async function startVind(){
   let zt; $('#zoek').addEventListener('input', () => { clearTimeout(zt); zt = setTimeout(() => { V.q = $('#zoek').value.trim(); V.pagina = 1; tekenTreffers(); }, 320); });
   $('#zoek').addEventListener('keydown', e => { if (e.key === 'Enter'){ V.q = $('#zoek').value.trim(); V.pagina = 1; tekenTreffers(); } });
   $('#zoekKnop').addEventListener('click', () => { V.q = $('#zoek').value.trim(); V.pagina = 1; tekenTreffers(); });
-  $('#wisZoek').addEventListener('click', () => { V.q = ''; V.verdieping = ''; V.pagina = 1; $('#zoek').value = ''; tekenTreffers(); });
+  $('#wisZoek').addEventListener('click', () => { V.q = ''; V.verdieping = ''; V.openNu = false; V.opVoorraad = false; V.pagina = 1; $('#zoek').value = ''; standknoppen(); tekenTreffers(); });
+  /* De twee live filters. Ze staan op de stand die de zaak zelf bijhoudt: "Nu
+     open" komt uit haar agenda of haar schakelaar, "Op voorraad" uit haar
+     voorraad. Een zaak die geen openingstijden heeft vastgelegd valt hier weg;
+     dat is eerlijker dan gokken. */
+  $('#nuOpen').addEventListener('click', () => { V.openNu = !V.openNu; V.pagina = 1; standknoppen(); tekenTreffers(); });
+  $('#opVoorraad').addEventListener('click', () => { V.opVoorraad = !V.opVoorraad; V.pagina = 1; standknoppen(); tekenTreffers(); });
+  standknoppen();
   tekenHome();
+}
+
+function standknoppen(){
+  $('#nuOpen').classList.toggle('aan', V.openNu);
+  $('#opVoorraad').classList.toggle('aan', V.opVoorraad);
 }
 
 function toonStuk(stuk){
@@ -263,25 +278,29 @@ function trefKaart(a){
     (a.uitleg ? '<span class="oms">'+esc(a.uitleg)+'</span>' : '')+
     '<span class="waar">'+esc(a.aanbieder.naam)+(a.plek.stad?' · '+esc(a.plek.stad):'')+(afst?' · '+afst:'')+'</span>'+
     (a.prijs ? '<span class="prijs">'+(a.prijs.vanaf?'vanaf ':'')+euro(a.prijs.bedrag)+' <span class="waar">'+esc(a.prijs.eenheid)+'</span></span>' : '')+
-    (a.beschikbaar ? '<span class="vrij">'+esc(a.beschikbaar.tekst)+'</span>' : '')+
+    (a.open && a.open.open !== null
+      ? '<span class="'+(a.open.open?'vrij':'dicht')+'">'+(a.open.open?'&#9679; ':'')+esc(a.open.tekst)+'</span>' : '')+
+    (a.beschikbaar ? '<span class="'+(a.beschikbaar.uit?'dicht':'vrij')+'">'+esc(a.beschikbaar.tekst)+'</span>' : '')+
     '<a class="knop ga" href="'+esc(a.pagina)+'">'+esc(a.cta)+' →</a>'+
   '</div>';
 }
 
 async function tekenTreffers(){
-  const zoekt = !!(V.q || V.verdieping);
+  const zoekt = !!(V.q || V.verdieping || V.openNu || V.opVoorraad);
   $('#trefWrap').hidden = !zoekt;
   $('#vast').hidden = zoekt;
   $('#wisZoek').hidden = !zoekt;
   if (!zoekt) return;
   let d;
-  try { d = await api('/api/mall/zoek', { q: V.q, plek: V.plek, verdieping: V.verdieping, pagina: V.pagina }); }
+  try { d = await api('/api/mall/zoek', { q: V.q, plek: V.plek, verdieping: V.verdieping, openNu: V.openNu, opVoorraad: V.opVoorraad, pagina: V.pagina }); }
   catch(e){ $('#treffers').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; return; }
   $('#trefKop').textContent = V.q ? 'Gevonden voor "'+V.q+'"' : 'Alles op deze verdieping';
   $('#trefTel').textContent = d.totaal + (d.plek ? ' · '+d.plek.stad : '') + (d.totaal ? '' : ' · niets gevonden');
   $('#treffers').innerHTML = d.items.length
     ? '<div class="treffers">'+d.items.map(trefKaart).join('')+'</div>'
-    : '<div class="leeg">Niets gevonden. Probeer een ander woord, of zet de plek op Overal; er staan '+d.totaalVoorFilter+' dingen in de Mall.</div>';
+    : '<div class="leeg">'+(V.openNu||V.opVoorraad
+        ? 'Niets dat hieraan voldoet. "Nu open" en "Op voorraad" komen uit wat de zaken zelf bijhouden; een zaak zonder vastgelegde openingstijden staat er bewust niet bij.'
+        : 'Niets gevonden. Probeer een ander woord, of zet de plek op Overal; er staan '+d.totaalVoorFilter+' dingen in de Mall.')+'</div>';
   $('#trefBlader').innerHTML = d.paginas > 1
     ? '<button class="knop stil" id="tVorig"'+(d.pagina<=1?' disabled':'')+'>← Vorige</button>'+
       '<span style="font-size:.78rem;color:var(--muted);">pagina '+d.pagina+' van '+d.paginas+'</span>'+

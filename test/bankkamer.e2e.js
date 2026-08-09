@@ -163,6 +163,36 @@ test('de bankkamer toont de reconciliatie en de bevoegdheid, en liegt daar niet 
         'en niet met een reden die onwaar is zodra er wel een vergunning ligt');
     });
 
+    /* DE RAMING EN DE UITBETALING ZIJN TWEE DINGEN, en dit deel van het scherm
+       brak stil toen de server ze uit elkaar haalde: het las `v.posten.length`
+       uit het antwoord, dat veld verdween, en sindsdien viel de knop "Maak
+       raming" in zijn catch. Geen enkele toets opende dit stuk scherm. Nu wel,
+       en de bewering is precies wat er toen misging: er komt een raming en er
+       komt GEEN foutmelding. */
+    await t.test('de salarissectie toont een raming, en uitbetalen vraagt om een loonrun', async () => {
+      // de meldingsbalk eerst leegmaken: hij draagt nog de tekst van de vorige
+      // deeltoets, en dan meet je het verkeerde moment in plaats van deze klik
+      await page.evaluate(() => { document.querySelector('#melding').textContent = ''; });
+      await page.fill('#bankSalZaak', 'KIKUNOI');
+      await page.click('#bankSalMaak');
+      await page.waitForFunction(() => {
+        const e = document.querySelector('#bankSalUit');
+        return e && e.innerText.trim().length > 0;
+      }, null, { timeout: 15000 });
+
+      const uit = await page.$eval('#bankSalUit', el => el.innerText);
+      assert.match(uit, /uurloon/, 'de raming staat er: ' + uit.slice(0, 160));
+      assert.match(uit, /bruto/, 'en zegt dat het om brutobedragen gaat');
+      assert.equal(await page.$eval('#melding', el => el.textContent.trim()), '',
+        'en er is geen foutmelding -- dat was het gedrag toen `posten` verdween');
+
+      /* Er is in deze opstelling geen definitieve loonrun, dus de knop hoort
+         WEG te zijn met een zin die zegt waarom. Een knop die pas bij het
+         indrukken uitlegt dat hij niet kan, is geen knop maar een val. */
+      assert.equal(await page.isHidden('#bankSalRun'), true, 'zonder loonrun geen uitbetaalknop');
+      assert.match(uit, /nog geen definitieve loonrun/i, 'met de reden erbij');
+    });
+
     assert.deepEqual(fouten, [], 'geen paginafouten onderweg');
   } finally {
     if (browser) await browser.close();

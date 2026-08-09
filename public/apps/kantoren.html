@@ -2509,22 +2509,34 @@ function bankRenderKrediet(rij){
 async function bankBesluit(id, akkoord){
   try { await api('bank/krediet/besluit', { id, akkoord }); meld(akkoord ? 'Goedgekeurd en gestort.' : 'Afgewezen.'); bankVervers(); } catch (e) { meld(e.message); }
 }
-/* De salarisrun uit de klokuren: het voorstel komt van de server (zelfde uren
-   en uurloon als het fiscale bord van de zaak, gematcht op de lid-koppeling
-   van het personeel); de boardroom kiest de bronrekening en voert de run uit.
-   Het formulier wordt maar één keer opgebouwd, zodat een live-verversing
-   (SSE) de ingevulde zaak-code en het voorstel niet wist. */
+/* TWEE DINGEN DIE HIER VROEGER EEN KNOP WAREN.
+
+   Er stond: maak een voorstel uit de geklokte uren, en betaal die posten uit.
+   Die posten waren BRUTO -- uren maal het uurloon van de zaak -- dus er ging
+   loon de deur uit zonder ingehouden loonheffing, zonder loonstrook, zonder
+   vier ogen en zonder aangifte, terwijl de Payroll OS ondertussen het goede
+   netto betaalbestand maakte dat niemand uitbetaalde.
+
+   Nu zijn het twee dingen op één scherm, en dat is precies wat ze zijn:
+     de RAMING   wat kost dit personeel deze maand (bruto, plus lasten). Om
+                 mee te plannen; er zit geen knop aan.
+     de UITBETALING  kiest een DEFINITIEVE loonrun en betaalt het netto
+                 daarvan uit. Geen run, geen knop.
+
+   Het formulier wordt maar één keer opgebouwd, zodat een live-verversing (SSE)
+   de ingevulde zaak-code en de gekozen run niet wist. */
 function bankRenderSalaris(reks){
   const doos = $('#bankSalaris');
   if (!doos.dataset.gewired){
     doos.dataset.gewired = '1';
     doos.innerHTML =
-      '<p style="margin:.2rem 0 .6rem;color:var(--soft);font-size:.85rem;">Van klokuren naar loon: het voorstel rekent de geklokte maanduren van een zaak om naar loonbetalingen (zelfde uurloon als het fiscale bord) en betaalt uit op de gekoppelde betaalrekening van elk personeelslid.</p>' +
+      '<p style="margin:.2rem 0 .6rem;color:var(--soft);font-size:.85rem;">De <strong>raming</strong> rekent de geklokte maanduren om naar brutoloon plus werkgeverslasten &mdash; om mee te plannen, niet om mee te betalen. <strong>Uitbetalen</strong> gaat via een definitieve loonrun uit de Payroll OS: die houdt loonheffing in, is door twee mensen getekend en levert het nettobedrag per medewerker.</p>' +
       '<div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;">' +
       '<span><label for="bankSalZaak" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Zaak (code)</label><input id="bankSalZaak" placeholder="bijv. TOREN" style="width:9rem;"></span>' +
       '<span><label for="bankSalVan" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Betaal vanaf</label><select id="bankSalVan" style="min-width:14rem;"></select></span>' +
-      '<button class="knop stil" id="bankSalMaak" type="button">Maak voorstel</button>' +
-      '<button class="knop" id="bankSalRun" type="button" hidden>Voer de run uit</button></div>' +
+      '<button class="knop stil" id="bankSalMaak" type="button">Maak raming</button>' +
+      '<span id="bankSalRunWrap" hidden><label for="bankSalRunId" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Definitieve loonrun</label><select id="bankSalRunId" style="min-width:15rem;"></select></span>' +
+      '<button class="knop" id="bankSalRun" type="button" hidden>Betaal deze loonrun uit</button></div>' +
       '<div id="bankSalUit" style="margin-top:.6rem;font-size:.85rem;"></div>';
     $('#bankSalMaak').addEventListener('click', async () => {
       try {
@@ -2535,19 +2547,42 @@ function bankRenderSalaris(reks){
             (r.iban ? '<span style="font-size:.75rem;color:var(--soft);">→ ' + esc(r.iban) + '</span>' : '<span style="color:var(--burgundy-on-dark,#C23A5E);font-size:.78rem;">geen rekening</span>') + '</div>').join('') +
           (v.zonderRekening.length ? '<div style="margin-top:.35rem;color:var(--soft);">Nog niet uitbetaalbaar: ' + v.zonderRekening.map(z => esc(z.naam) + ' (' + esc(z.reden) + ')').join(' · ') + '</div>' : '') +
           '<div style="margin-top:.45rem;">Uitbetaalbaar: <strong style="color:var(--gold);">' + bkEuro(v.totaalCenten) + '</strong> van ' + bkEuro(v.brutoCenten) + ' bruto · daarbovenop ~' + v.lastenPct + '% werkgeverslasten (' + bkEuro(v.lastenCenten) + ') en vakantiegeldreserve ' + bkEuro(v.vakantiegeldCenten) + '</div>';
-        $('#bankSalRun').hidden = !v.posten.length;
+        /* Geen knop aan de raming. Het antwoord zegt zelf uitbetaalbaar:false,
+           en dat hoort het scherm te volgen in plaats van er een postenlijst
+           uit te destilleren -- dat was nu juist de verleiding. */
+        await bankSalRuns($('#bankSalZaak').value);
       } catch (e) { meld(e.message); }
     });
     $('#bankSalRun').addEventListener('click', async () => {
+      const runId = $('#bankSalRunId').value;
+      if (!runId) { meld('Kies eerst een definitieve loonrun.'); return; }
       try {
-        const d = await api('bank/salaris/run', { zaak: $('#bankSalZaak').value, vanIban: $('#bankSalVan').value });
-        meld(d.geboekt + ' loonbetaling(en) geboekt: ' + bkEuro(d.totaalCenten));
+        const d = await api('bank/salaris/run', { runId, vanIban: $('#bankSalVan').value });
+        meld(d.geboekt + ' netto loonbetaling(en) geboekt: ' + bkEuro(d.totaalCenten));
         $('#bankSalRun').hidden = true;
-        $('#bankSalUit').innerHTML = '<div style="color:var(--gold);">✓ Salarisrun ' + esc(d.maand) + ' uitgevoerd: ' + d.geboekt + ' betaling(en), ' + bkEuro(d.totaalCenten) + '.</div>';
+        $('#bankSalUit').innerHTML = '<div style="color:var(--gold);">✓ Loonrun ' + esc(d.periode) + ' uitbetaald: ' +
+          d.geboekt + ' betaling(en), ' + bkEuro(d.totaalCenten) + ' netto.</div>' +
+          (d.terugtevorderenCenten ? '<div style="color:var(--soft);margin-top:.3rem;">Nog terug te vorderen: ' + bkEuro(d.terugtevorderenCenten) + ' (die maken we niet over).</div>' : '');
         bankVervers();
       } catch (e) { meld(e.message); }
     });
   }
+  /* De DEFINITIEVE loonruns van deze zaak. Alleen die: een concept of een run
+     die nog op een handtekening wacht, is geen betaalopdracht. Staat er geen
+     enkele, dan zegt het scherm dat en blijft de knop weg -- dat is duidelijker
+     dan een knop die bij het indrukken uitlegt waarom hij niet kan. */
+  async function bankSalRuns(zaak){
+    const wrap = $('#bankSalRunWrap'), knop = $('#bankSalRun'), sel = $('#bankSalRunId');
+    try {
+      const d = await api('payroll/run/lijst', { code: String(zaak || '').toUpperCase() });
+      const runs = (d.runs || []).filter(r => r.stand === 'definitief');
+      sel.innerHTML = runs.map(r => '<option value="' + esc(r.id) + '">' + esc(r.periode) +
+        (r.correctieVan ? ' (correctie)' : '') + (r.opDemoTabellen ? ' - op ongecontroleerde tabellen' : '') + '</option>').join('');
+      wrap.hidden = knop.hidden = !runs.length;
+      if (!runs.length) $('#bankSalUit').innerHTML += '<div style="margin-top:.45rem;color:var(--soft);">Er is nog geen definitieve loonrun voor deze zaak. Uitbetalen kan pas daarna &mdash; open er een in de Payroll OS.</div>';
+    } catch (e) { wrap.hidden = knop.hidden = true; meld(e.message); }
+  }
+
   // de bronrekening-lijst vers houden, met behoud van de gemaakte keuze
   const sel = $('#bankSalVan'); const keuze = sel.value;
   sel.innerHTML = (reks || []).map(m => '<option value="' + m.iban + '">' + esc(m.codenaam) + ' · ' + esc(m.soort) + ' · ' + bkEuro(m.saldoCenten) + '</option>').join('');

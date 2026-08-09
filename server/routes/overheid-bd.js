@@ -44,8 +44,13 @@ module.exports = (kern, { rijk, stuur, wie }) => {
     stuur(res, overheid.naheffingStelVast(String((req.body || {}).id || ''), wie(req))));
   app.post('/api/overheid/bd/naheffing/intrek', supplierAuth, rijk, (req, res) =>
     stuur(res, overheid.naheffingIntrek(String((req.body || {}).id || ''), wie(req), (req.body || {}).reden)));
-  app.post('/api/overheid/bd/naheffing/bezwaar/beslis', supplierAuth, rijk, (req, res) =>
-    stuur(res, overheid.naheffingBeslisBezwaar(wie(req), String((req.body || {}).id || ''), req.body || {})));
+  /* Het besluit op bezwaar is ASYNC: wijst hij het toe en was er al betaald, dan
+     boekt hij het geld terug (kern/overheid/naheffing-betalen.js). Een besluit
+     dat de aanslag vernietigt en het bedrag laat staan, doet niets. */
+  app.post('/api/overheid/bd/naheffing/bezwaar/beslis', supplierAuth, rijk, async (req, res) => {
+    try { stuur(res, await overheid.naheffingBeslisBezwaar(wie(req), String((req.body || {}).id || ''), req.body || {})); }
+    catch (e) { console.error('[naheffing-bezwaar]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
+  });
   app.post('/api/overheid/bd/naheffingen', supplierAuth, rijk, (req, res) =>
     res.json(overheid.naheffingenLijst(req.body || {})));
 

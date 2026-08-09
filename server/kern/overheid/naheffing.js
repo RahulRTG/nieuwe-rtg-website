@@ -18,19 +18,17 @@
    kloppen de facturen niet -- en dat is een ander gesprek dan dit.
 
    VIER OGEN, en dezelfde ogen tellen nooit dubbel (net als kern/uitgifte.js):
-   wie hem opmaakt stelt hem niet vast, en wie hem opmaakte of vaststelde beslist
-   niet op het bezwaar ertegen. Dat laatste is geen formaliteit maar de kern van
-   bezwaar: een besluit laten heroverwegen door dezelfde persoon is geen
-   heroverweging.
+   wie hem opmaakt stelt hem niet vast. De derde ogen op het bezwaar staan in
+   ./naheffing-daarna.js.
 
    DE BOETE IS NOOIT AUTOMATISCH. Geen enkele stand levert er zelf een op; een
    mens zet een percentage en schrijft erbij waarom. Zonder grond geen boete.
 
-   WAT HIER NIET GEBEURT: innen. Er beweegt geen geld. De naheffing is een
-   besluit met een vervaldatum en een rechtsmiddel; de invordering is een eigen
-   onderwerp (zie bdHerinnering/bdRegeling in ./kantoor.js voor hoe dit huis dat
-   bij aanslagen doet). Dat staat er met zoveel woorden bij, zodat niemand denkt
-   dat er betaald is omdat het hier op 'vastgesteld' staat.
+   BETALEN IS EEN ECHTE BOEKING, en staat in ./naheffing-betalen.js: van de
+   zakelijke rekening van de zaak naar `extern:belastingdienst`, in het grootboek
+   van RTG Bank. 'Vastgesteld' betekent hier dus niet 'betaald' -- dat is een
+   eigen veld dat pas wordt gezet als het geld ECHT is geboekt. Wat er nog steeds
+   niet is: aanmanen en invorderen.
 
    Krijgt de gedeelde ctx van kern/overheid/index.js. */
 'use strict';
@@ -59,6 +57,7 @@ module.exports = (ctx) => {
     status: n.status, opgemaaktDoor: n.opgemaaktDoor, opgemaaktOp: n.opgemaaktOp,
     vastgesteldDoor: n.vastgesteldDoor || null, vastgesteldOp: n.vastgesteldOp || null,
     vervaltOp: n.vervaltOp || null, ingetrokkenDoor: n.ingetrokkenDoor || null, reden: n.reden || null,
+    betaaldOp: n.betaaldOp || null, betaalCenten: n.betaalCenten || 0, terugbetaaldOp: n.terugbetaaldOp || null,
     bezwaar: n.bezwaar ? { reden: n.bezwaar.reden, at: n.bezwaar.at, besluit: n.bezwaar.besluit || null,
       motivering: n.bezwaar.motivering || null, door: n.bezwaar.door || null } : null });
 
@@ -148,7 +147,12 @@ module.exports = (ctx) => {
   /* Alles wat er NA het opmaken met een naheffing gebeurt -- intrekken,
      bezwaar, het besluit daarop en het teruglezen -- woont in
      ./naheffing-daarna.js. De opslag gaat mee zodat er maar EEN is. */
-  const deelDaarna = require('./naheffing-daarna')(ctx, { bak, vind, publiek, gelijk });
+  /* Betalen en terugbetalen staan apart, want daar beweegt echt geld en dat is
+     een ander soort code dan een besluit vastleggen. ./naheffing-daarna.js
+     gebruikt de terugbetaling bij een toegewezen bezwaar. */
+  const deelBetalen = require('./naheffing-betalen')(ctx, { vind, publiek });
+  const deelDaarna = require('./naheffing-daarna')(ctx, { bak, vind, publiek, gelijk,
+    naheffingTerugbetaal: deelBetalen.naheffingTerugbetaal });
 
-  return Object.assign({ naheffingMaak, naheffingStelVast, BOETE_MAX_CENTEN }, deelDaarna);
+  return Object.assign({ naheffingMaak, naheffingStelVast, BOETE_MAX_CENTEN }, deelBetalen, deelDaarna);
 };

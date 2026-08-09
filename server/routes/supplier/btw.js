@@ -85,6 +85,19 @@ module.exports = (kern) => {
     res.json(overheid.naheffingVanZaak(req.supplier.code));
   });
 
+  /* Betalen. Hier beweegt ECHT geld: van de zakelijke rekening van de zaak naar
+     de Belastingdienst, als dubbele boeking in het grootboek van RTG Bank. De
+     naheffing gaat pas op betaald als die boeking is gelukt -- en de motor zegt
+     zelf waarom het niet lukte (bank nog niet live, geen zakelijke rekening, te
+     weinig saldo). Die tekst geven we ongeschonden door: dat is precies wat de
+     ondernemer moet lezen. */
+  app.post('/api/supplier/btw/naheffing/betaal', supplierAuth, async (req, res) => {
+    const door = managerOf(req, res); if (!door) return;
+    if (!overheid) return res.status(503).json({ error: 'De overheidslaag draait niet.' });
+    try { antwoord(res, await overheid.naheffingBetaal(req.supplier.code, String((req.body || {}).id || ''))); }
+    catch (e) { console.error('[naheffing-betaal]', e); res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
+  });
+
   app.post('/api/supplier/btw/naheffing/bezwaar', supplierAuth, (req, res) => {
     const door = managerOf(req, res); if (!door) return;
     if (!overheid) return res.status(503).json({ error: 'De overheidslaag draait niet.' });

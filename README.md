@@ -535,7 +535,12 @@ packages). Ze bewaken de plekken waar geld en wet aan hangen:
   over de échte routes met drie echte ambtenaren
   (`test/btw-naheffing-keten.test.js`, inclusief de poging om de vier ogen te
   omzeilen door een collega's naam mee te sturen) en het scherm van de zaak
-  waar het bezwaar vandaan gaat (`test/btw-naheffing-scherm.e2e.js`);
+  waar het bezwaar en de betaling vandaan gaan
+  (`test/btw-naheffing-scherm.e2e.js`);
+- het betalen zelf: dat er eerst wordt geboekt en pas daarna op betaald gezet,
+  dat een mislukte boeking niets achterlaat, en dat een toegewezen bezwaar op
+  een betaalde naheffing terugstort — met een nepbank die op commando weigert,
+  want met de echte bank zou alleen de gelukkige helft getoetst worden;
 - De Salon-rechten (gast liket wel, reageert niet), de bestel- en betaalflow
   en de AVG-rechten (inzage en definitieve verwijdering).
 
@@ -780,10 +785,23 @@ bezwaar tegen open), een vastgestelde naheffing trek je niet stilletjes in, en
 vaststellen hertelt eerst — zijn de cijfers sinds het opmaken veranderd, dan
 weigert hij.
 
-**Wat hier niet gebeurt: innen.** Er beweegt geen geld. De naheffing is een
-besluit met een vervaldatum en een rechtsmiddel; de invordering is een eigen
-onderwerp (zie `bdHerinnering`/`bdRegeling` voor hoe dit huis dat bij aanslagen
-doet).
+**En betalen is een echte boeking** (`kern/overheid/naheffing-betalen.js`). Hier
+stond drie commits lang dat innen er níét was, met de reden erbij: een
+`betaald = true` zonder boeking is een leugen in de database. Nu gebeurt het
+zoals het hoort — een dubbele boeking in het grootboek van RTG Bank, van de
+zakelijke rekening van de zaak naar `extern:belastingdienst`. Dat laatste is de
+eerlijke tegenrekening: de Belastingdienst bankiert niet bij RTG, dus het geld
+verlaat het platform. De som van alle saldi blijft exact nul.
+
+**De volgorde is de hele zaak:** eerst boeken, dan pas op betaald. Andersom zou
+een mislukte boeking een betaalde naheffing opleveren, en dat is het ergste van
+de twee — dan denkt iedereen dat het klaar is. Wat de bank weigert (nog niet
+live, geen zakelijke rekening, te weinig saldo) wordt ongeschonden doorgegeven,
+met het tekort erbij en de mededeling dat er niets is afgeschreven.
+
+Wordt een bezwaar tegen een al betaalde naheffing toegewezen, dan komt het geld
+terug — een besluit dat de aanslag vernietigt en het bedrag laat staan, doet
+niets. Wat er nog steeds niet is: aanmanen, invorderen, beslag.
 
 | Endpoint | Doel |
 |---|---|
@@ -794,6 +812,7 @@ doet).
 | `POST /api/overheid/bd/naheffingen` `{status?, periode?}` | De lijst voor het kantoor |
 | `POST /api/supplier/btw/naheffingen` | De zaak leest zijn eigen (geen concepten) |
 | `POST /api/supplier/btw/naheffing/bezwaar` `{id, reden}` | De zaak maakt bezwaar |
+| `POST /api/supplier/btw/naheffing/betaal` `{id}` | De zaak betaalt: een echte boeking van zijn zakelijke rekening |
 
 #### De herinnering rekent ook zelf (`kern/automatisering.js`)
 

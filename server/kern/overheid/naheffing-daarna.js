@@ -20,7 +20,7 @@
    waarheid vasthouden (LAT.md regel 4). */
 'use strict';
 
-module.exports = (ctx, { bak, vind, publiek, gelijk }) => {
+module.exports = (ctx, { bak, vind, publiek, gelijk, naheffingTerugbetaal }) => {
   const { save, nu, schoon, notifySupplier } = ctx;
 
   /* ---- intrekken: alleen een concept ---- */
@@ -54,7 +54,7 @@ module.exports = (ctx, { bak, vind, publiek, gelijk }) => {
   }
 
   /* ---- op het bezwaar beslissen: de derde ogen ---- */
-  function naheffingBeslisBezwaar(door, id, data) {
+  async function naheffingBeslisBezwaar(door, id, data) {
     data = data || {};
     const n = vind(id);
     if (!n) return { status: 404, error: 'Deze naheffing kennen we niet.' };
@@ -74,9 +74,15 @@ module.exports = (ctx, { bak, vind, publiek, gelijk }) => {
        dat er een bedrag blijft hangen waar geen besluit meer onder ligt. */
     if (toe) { n.naheffingCenten = 0; n.boeteCenten = 0; }
     save();
+    /* En als er al BETAALD was, moet het geld terug. Een besluit dat de aanslag
+       vernietigt en het bedrag laat staan, is een besluit dat niets doet. Het
+       besluit zelf staat ook als de terugboeking hapert; dat wordt dan gemeld en
+       niet verzwegen (./naheffing-betalen.js). */
+    let geld = null;
+    if (toe && naheffingTerugbetaal) geld = await naheffingTerugbetaal(n);
     if (notifySupplier) notifySupplier(n.code, { icon: 'overheid', title: 'Besluit op uw bezwaar',
       body: n.kenmerk + ': het bezwaar is ' + n.bezwaar.besluit + '. ' + motivering.slice(0, 160), scope: 'overheid' });
-    return { ok: true, naheffing: publiek(n) };
+    return Object.assign({ ok: true, naheffing: publiek(n) }, geld ? { let: geld } : {});
   }
 
   /* ---- teruglezen ---- */

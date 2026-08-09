@@ -38,7 +38,7 @@ function opzet(facturen, nuIso) {
   Object.assign(ctx, maakToezicht(ctx));
   const nh = maakNaheffing(ctx);
   const aangifte = maakBtwAangifte({ db, save: () => {}, crypto, nu }).btwAangifte;
-  return { db, klok, nh, aangifte, seinen };
+  return { db, klok, nh, aangifte, seinen, ctx };
 }
 const ZAAK = { code: 'SAL', name: 'Sal de Mar', settings: { land: 'NL' } };
 const K2 = '2026K2';
@@ -192,7 +192,7 @@ test('een vastgestelde naheffing trek je niet stilletjes in', () => {
 });
 
 // ----------------------------------------------------------- 4. bezwaar
-test('de zaak maakt bezwaar, en een DERDE beslist erop', () => {
+test('de zaak maakt bezwaar, en een DERDE beslist erop', async () => {
   const { nh, seinen } = opzet([factuur({ nummer: 101, datum: '2026-04-10', verkoper: 'SAL', regels: [[242, 21]] })]);
   const n = nh.naheffingMaak(K2, 'SAL', 'Jansen').naheffing;
   nh.naheffingStelVast(n.id, 'De Vries');
@@ -207,14 +207,14 @@ test('de zaak maakt bezwaar, en een DERDE beslist erop', () => {
 
   // de opsteller en de vaststeller mogen er allebei niet over beslissen
   for (const wie of ['Jansen', 'De Vries', 'de vries']) {
-    const r = nh.naheffingBeslisBezwaar(wie, n.id, { toewijzen: true, motivering: 'akkoord' });
+    const r = await nh.naheffingBeslisBezwaar(wie, n.id, { toewijzen: true, motivering: 'akkoord' });
     assert.equal(r.status, 409, wie + ' beslist niet op zijn eigen besluit');
     assert.match(r.error, /geen heroverweging/);
   }
-  assert.equal(nh.naheffingBeslisBezwaar('Mevrouw Bakker', n.id, { toewijzen: true }).status, 400,
+  assert.equal((await nh.naheffingBeslisBezwaar('Mevrouw Bakker', n.id, { toewijzen: true })).status, 400,
     'een besluit op bezwaar draagt een motivering');
 
-  const besluit = nh.naheffingBeslisBezwaar('Mevrouw Bakker', n.id,
+  const besluit = await nh.naheffingBeslisBezwaar('Mevrouw Bakker', n.id,
     { toewijzen: true, motivering: 'De dubbele boeking is nagelopen en klopt; de naheffing vervalt.' });
   assert.equal(besluit.ok, true);
   assert.equal(besluit.naheffing.status, 'vernietigd');
@@ -225,12 +225,12 @@ test('de zaak maakt bezwaar, en een DERDE beslist erop', () => {
   assert.match(seinen[1].title, /bezwaar/i);
 });
 
-test('een afgewezen bezwaar laat de naheffing staan, met motivering', () => {
+test('een afgewezen bezwaar laat de naheffing staan, met motivering', async () => {
   const { nh } = opzet([factuur({ nummer: 111, datum: '2026-04-10', verkoper: 'SAL', regels: [[242, 21]] })]);
   const n = nh.naheffingMaak(K2, 'SAL', 'Jansen').naheffing;
   nh.naheffingStelVast(n.id, 'De Vries');
   nh.naheffingBezwaar('SAL', n.id, 'ik ben het er niet mee eens');
-  const r = nh.naheffingBeslisBezwaar('Bakker', n.id, { toewijzen: false, motivering: 'De facturen staan er gewoon.' });
+  const r = await nh.naheffingBeslisBezwaar('Bakker', n.id, { toewijzen: false, motivering: 'De facturen staan er gewoon.' });
   assert.equal(r.naheffing.status, 'gehandhaafd');
   assert.equal(r.naheffing.naheffingCenten, 4200, 'het bedrag blijft staan');
   assert.equal(r.naheffing.bezwaar.besluit, 'afgewezen');
@@ -266,4 +266,158 @@ test('de lijst filtert, en telt de openstaande bezwaren', () => {
   // de zaak ziet alleen zijn eigen, en geen concepten van een ander
   assert.equal(nh.naheffingVanZaak('STIL').naheffingen.length, 0, 'een concept is nog geen besluit');
   assert.equal(nh.naheffingVanZaak('SAL').naheffingen.length, 1);
+});
+
+/* ---------------------------------------------------------- 6. betalen
+   Met een NEP-BANK: de echte staat in kern/bank/ en is hier niet de vraag. Wat
+   hier bewezen moet worden is de volgorde -- eerst boeken, dan pas op betaald --
+   en dat een mislukte boeking NIETS achterlaat. Een nepbank die op commando
+   weigert is de enige manier om dat tweede te zien; met de echte bank zou ik
+   alleen de gelukkige helft toetsen. */
+function metBank(facturen, opzetOpties) {
+  const o = opzet(facturen);
+  const geboekt = [];
+  let saldo = (opzetOpties && opzetOpties.saldo != null) ? opzetOpties.saldo : 1000000;
+  const bank = {
+    live: (opzetOpties && opzetOpties.live) !== false,
+    weiger: (opzetOpties && opzetOpties.weiger) || null
+  };
+  /* De zakelijke rekening van de zaak, met dezelfde vlag als waaronder
+     routes/bankhart.js hem opent. Staat hij er niet, dan weigert de betaalweg --
+     en dat is een van de standen die hieronder wordt getoetst. */
+  o.db.data.bankRekeningen = { NL01RTG0000000001: { iban: 'NL01RTG0000000001', codenaam: 'zaak:SAL', soort: 'zakelijk', naam: 'Zakelijk Sal' } };
+  o.ctx.bankLive = () => bank.live;
+  o.ctx.bankSaldo = () => saldo;
+  o.ctx.bankBoek = async (b) => {
+    if (bank.weiger) return { status: 402, error: bank.weiger };
+    geboekt.push(b);
+    saldo += (b.naar === 'extern:belastingdienst' ? -b.centen : b.centen);
+    return { ok: true, boeking: { id: 'BB1' } };
+  };
+  const nh = maakNaheffing(o.ctx);
+  return { nh, aangifte: o.aangifte, geboekt, bank, saldoNu: () => saldo, seinen: o.seinen, db: o.db };
+}
+
+async function vastgesteld(h) {
+  const n = h.nh.naheffingMaak(K2, 'SAL', 'Jansen').naheffing;
+  h.nh.naheffingStelVast(n.id, 'De Vries');
+  return n;
+}
+
+test('betalen boekt echt, en zet de naheffing pas daarna op betaald', async () => {
+  const h = metBank([factuur({ nummer: 201, datum: '2026-04-10', verkoper: 'SAL', regels: [[242, 21]] })]);
+  const n = await vastgesteld(h);
+
+  const r = await h.nh.naheffingBetaal('SAL', n.id);
+  assert.equal(r.ok, true);
+  assert.equal(h.geboekt.length, 1, 'er is precies een boeking gedaan');
+  assert.equal(h.geboekt[0].naar, 'extern:belastingdienst', 'het geld verlaat het platform');
+  assert.equal(h.geboekt[0].centen, 4200);
+  assert.equal(h.geboekt[0].ref, n.kenmerk, 'met het kenmerk erbij, zodat het terug te vinden is');
+  assert.ok(r.naheffing.betaaldOp, 'en pas daarna staat hij op betaald');
+  assert.equal(r.naheffing.betaalCenten, 4200);
+  assert.match(r.let, /afgeschreven/);
+
+  assert.equal((await h.nh.naheffingBetaal('SAL', n.id)).status, 409, 'niet twee keer');
+  assert.equal(h.geboekt.length, 1, 'en dus ook niet twee keer geboekt');
+});
+
+test('een mislukte boeking laat NIETS achter', async () => {
+  const h = metBank([factuur({ nummer: 211, datum: '2026-04-10', verkoper: 'SAL', regels: [[242, 21]] })],
+    { weiger: 'Onvoldoende saldo of rood-staan-ruimte.' });
+  const n = await vastgesteld(h);
+  const r = await h.nh.naheffingBetaal('SAL', n.id);
+  assert.equal(r.status, 402);
+  assert.match(r.error, /Onvoldoende saldo/, 'de bank zegt het zelf; wij vertalen het niet');
+  assert.equal(h.nh.naheffingenLijst({}).naheffingen[0].betaaldOp, null,
+    'de naheffing staat NIET op betaald na een mislukte boeking');
+});
+
+test('te weinig saldo wordt geweigerd voordat er iets beweegt, met het tekort erbij', async () => {
+  const h = metBank([factuur({ nummer: 221, datum: '2026-04-10', verkoper: 'SAL', regels: [[242, 21]] })], { saldo: 1000 });
+  const n = await vastgesteld(h);
+  const r = await h.nh.naheffingBetaal('SAL', n.id);
+  assert.equal(r.status, 402);
+  assert.match(r.error, /€ 32,00 te weinig/, 'het tekort staat erbij: 42,00 min 10,00');
+  assert.match(r.error, /niets afgeschreven/);
+  assert.equal(h.geboekt.length, 0);
+});
+
+test('zonder bank wordt er niet gedaan alsof', async () => {
+  const h = metBank([factuur({ nummer: 231, datum: '2026-04-10', verkoper: 'SAL', regels: [[242, 21]] })], { live: false });
+  const n = await vastgesteld(h);
+  const r = await h.nh.naheffingBetaal('SAL', n.id);
+  assert.equal(r.status, 503);
+  assert.match(r.error, /nog niet live/);
+  assert.match(r.error, /niets afgeschreven/);
+  assert.equal(h.geboekt.length, 0);
+});
+
+test('een concept en een vernietigde naheffing hoeven niet betaald te worden', async () => {
+  const h = metBank([factuur({ nummer: 241, datum: '2026-04-10', verkoper: 'SAL', regels: [[242, 21]] })]);
+  const n = h.nh.naheffingMaak(K2, 'SAL', 'Jansen').naheffing;
+  const opConcept = await h.nh.naheffingBetaal('SAL', n.id);
+  assert.equal(opConcept.status, 409);
+  assert.match(opConcept.error, /nog een concept/);
+
+  h.nh.naheffingStelVast(n.id, 'De Vries');
+  h.nh.naheffingBezwaar('SAL', n.id, 'hier klopt niets van');
+  await h.nh.naheffingBeslisBezwaar('Bakker', n.id, { toewijzen: true, motivering: 'de zaak heeft gelijk' });
+  const opVernietigd = await h.nh.naheffingBetaal('SAL', n.id);
+  assert.equal(opVernietigd.status, 409);
+  assert.equal(h.geboekt.length, 0, 'er is nooit iets geboekt');
+  // en een andere zaak betaalt hem al helemaal niet
+  assert.equal((await h.nh.naheffingBetaal('ANDERS', n.id)).status, 404);
+});
+
+test('een toegewezen bezwaar op een BETAALDE naheffing stort terug', async () => {
+  const h = metBank([factuur({ nummer: 251, datum: '2026-04-10', verkoper: 'SAL', regels: [[242, 21]] })]);
+  const n = await vastgesteld(h);
+  await h.nh.naheffingBetaal('SAL', n.id);
+  assert.equal(h.saldoNu(), 1000000 - 4200);
+
+  h.nh.naheffingBezwaar('SAL', n.id, 'al aangegeven in het volgende tijdvak');
+  const besluit = await h.nh.naheffingBeslisBezwaar('Bakker', n.id,
+    { toewijzen: true, motivering: 'De aangifte over het volgende tijdvak dekt deze omzet.' });
+  assert.equal(besluit.naheffing.status, 'vernietigd');
+  assert.equal(h.geboekt.length, 2, 'de terugboeking is er echt een');
+  assert.equal(h.geboekt[1].van, 'extern:belastingdienst', 'de andere kant op');
+  assert.equal(h.geboekt[1].centen, 4200);
+  assert.equal(h.saldoNu(), 1000000, 'de zaak staat weer waar hij stond');
+  assert.ok(besluit.naheffing.terugbetaaldOp);
+  assert.match(besluit.let, /teruggestort/);
+  assert.ok(h.seinen.some(s => /terugbetaald/i.test(s.title || '')), 'en de zaak hoort ervan');
+});
+
+test('een AFGEWEZEN bezwaar stort niets terug', async () => {
+  const h = metBank([factuur({ nummer: 261, datum: '2026-04-10', verkoper: 'SAL', regels: [[242, 21]] })]);
+  const n = await vastgesteld(h);
+  await h.nh.naheffingBetaal('SAL', n.id);
+  h.nh.naheffingBezwaar('SAL', n.id, 'ik vind van niet');
+  await h.nh.naheffingBeslisBezwaar('Bakker', n.id, { toewijzen: false, motivering: 'De facturen staan er gewoon.' });
+  assert.equal(h.geboekt.length, 1, 'alleen de betaling');
+  assert.equal(h.saldoNu(), 1000000 - 4200);
+});
+
+test('het openstaande bedrag van een zaak is op te vragen', async () => {
+  const h = metBank([factuur({ nummer: 271, datum: '2026-04-10', verkoper: 'SAL', regels: [[242, 21]] })]);
+  const n = await vastgesteld(h);
+  let o = h.nh.naheffingOpenstaand('SAL');
+  assert.equal(o.aantal, 1);
+  assert.equal(o.centen, 4200);
+  assert.deepEqual(o.kenmerken, [n.kenmerk]);
+  await h.nh.naheffingBetaal('SAL', n.id);
+  o = h.nh.naheffingOpenstaand('SAL');
+  assert.equal(o.aantal, 0);
+  assert.equal(o.centen, 0);
+});
+
+test('zonder zakelijke rekening kan er niet betaald worden, en dat wordt gezegd', async () => {
+  const h = metBank([factuur({ nummer: 281, datum: '2026-04-10', verkoper: 'SAL', regels: [[242, 21]] })]);
+  const n = await vastgesteld(h);
+  h.db.data.bankRekeningen = {};   // de zaak heeft hem nooit geopend
+  const r = await h.nh.naheffingBetaal('SAL', n.id);
+  assert.equal(r.status, 409);
+  assert.match(r.error, /nog geen zakelijke rekening/);
+  assert.equal(h.geboekt.length, 0);
 });

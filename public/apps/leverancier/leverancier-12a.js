@@ -70,6 +70,15 @@
         (n.vervaltOp ? ' · '+T('fn.nh.vervalt','vervalt')+' '+escT(n.vervaltOp) : '')+
         (n.bezwaar && n.bezwaar.besluit ? ' · '+T('fn.nh.besluit','besluit op bezwaar')+': '+escT(n.bezwaar.besluit)+' · '+escT(n.bezwaar.motivering || '') : '')+
         '</span></span><b class="btw-saldo betaal">'+eur(n.totaalCenten/100)+'</b></div>'+
+        (n.betaaldOp
+          ? '<div class="tkc-who">'+T('fn.nh.betaald','Betaald op')+' '+escT(String(n.betaaldOp).slice(0,10))+
+            (n.terugbetaaldOp ? ' · '+T('fn.nh.terug','teruggestort op')+' '+escT(String(n.terugbetaaldOp).slice(0,10)) : '')+'</div>'
+          /* Betalen mag zolang de aanslag staat -- ook tijdens een bezwaar, want
+             bezwaar schort de betaling niet op. Is hij vernietigd, dan valt er
+             niets meer te betalen en staat de knop er dus ook niet. */
+          : ['vastgesteld','bezwaar','gehandhaafd'].includes(n.status)
+            ? '<div class="btw-rij"><button class="obtn primary" data-nhbet="'+escT(n.id)+'">'+
+              T('fn.nh.betaal','Betalen')+' '+eur(n.totaalCenten/100)+'</button></div>' : '')+
         (n.status === 'vastgesteld'
           ? '<div class="btw-rij"><input class="st-in btw-kenmerk" id="nhr'+escT(n.id)+'" placeholder="'+T('fn.nh.reden','Waarom bent u het er niet mee eens?')+'">'+
             '<button class="obtn" data-nhbez="'+escT(n.id)+'">'+T('fn.nh.bezwaar','Bezwaar maken')+'</button></div>'
@@ -88,6 +97,14 @@
     }
     const bO = el.querySelector('#btwOp'); if (bO) bO.addEventListener('click', () => opmaken(el.querySelector('#btwPer').value, false));
     const bC = el.querySelector('#btwCorr'); if (bC) bC.addEventListener('click', () => opmaken(bC.dataset.p, true));
+    el.querySelectorAll('[data-nhbet]').forEach(b => b.addEventListener('click', async () => {
+      btwMsg = '';
+      try {
+        const d = await API.call('/supplier/btw/naheffing/betaal', { id: b.dataset.nhbet });
+        btwMsg = d.let || '';
+        btwData = null; await laadBtw();
+      } catch(e){ toast(e.message); btwMsg = e.message; renderStation(); }
+    }));
     el.querySelectorAll('[data-nhbez]').forEach(b => b.addEventListener('click', async () => {
       const veld = el.querySelector('#nhr' + b.dataset.nhbez);
       btwMsg = '';

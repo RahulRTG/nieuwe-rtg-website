@@ -52,7 +52,8 @@ const WATERHEFFINGEN = [
 const WATERMELD = { verontreiniging: 'Verontreiniging/lozing', wateroverlast: 'Wateroverlast', kade: 'Kade/oever', beschoeiing: 'Beschoeiing/duiker' };
 const WATER_STATUS = ['nieuw', 'in behandeling', 'opgelost', 'afgewezen'];
 
-function maakOverheid({ db, save, crypto, anthropic, findSupplier, notify, notifySupplier, sseToSupplier }) {
+function maakOverheid({ db, save, crypto, anthropic, findSupplier, notify, notifySupplier, sseToSupplier,
+  bankLive, bankBoek, bankSaldo }) {
   const nu = () => new Date().toISOString();
   const jaar = () => new Date().getFullYear();
   const id = () => crypto.randomBytes(4).toString('hex');
@@ -120,6 +121,12 @@ function maakOverheid({ db, save, crypto, anthropic, findSupplier, notify, notif
   const ctx = {
     db, save, crypto, anthropic, findSupplier, notify, notifySupplier, sseToSupplier,
     nu, jaar, id, ref, schoon, eur, hash, seed, bericht,
+    /* De bank, laat opgezocht (zie de kop bij maakOverheid in opzet/kernlaag2.js):
+       een betaalde naheffing is een echte boeking in het grootboek van RTG Bank.
+       Ze staan HIER in de ctx en niet alleen in de parameterlijst -- daar zijn ze
+       eerder stilletjes verdwenen, en dan is de hele betaalweg dood zonder dat
+       iets klaagt. */
+    bankLive, bankBoek, bankSaldo,
     IB, TOESLAGEN, UITKERINGEN, RECHTSVORMEN, SUBSIDIES, WATERHEFFINGEN, WATERMELD, WATER_STATUS
   };
 

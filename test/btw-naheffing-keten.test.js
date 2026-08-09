@@ -179,3 +179,115 @@ test('de hele keten: opleggen, vier ogen, bezwaar en derde ogen -- over de echte
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) { /* opruimen mag falen */ }
   }
 });
+
+/* ---- en de laatste stap: er beweegt echt geld ----
+   De naheffing wordt betaald van de zakelijke rekening van de zaak, als dubbele
+   boeking in het grootboek van RTG Bank, en bij een toegewezen bezwaar komt hij
+   terug. Dat is het stuk waarvan drie commits lang stond dat het er NIET was,
+   met de reden erbij: een `betaald = true` zonder boeking is een leugen.
+
+   Twee dingen worden hier als OPZET geregeld en zijn niet wat er getoetst wordt:
+   de leden-bank live zetten (dat doet de boardroom, hier via zijn eigen route)
+   en een beginsaldo op de rekening. Dat laatste gaat weer buiten de server om,
+   met BEIDE kanten van de boeking, zodat de som van alle saldi exact nul blijft
+   -- geld bijschrijven zonder tegenpost zou de tucht van dit grootboek breken en
+   precies het soort stilte opleveren waar sluitcontrole voor bestaat. */
+test('betalen en terugbetalen: het geld beweegt echt, over de echte routes', async () => {
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-nhgeld-'));
+  const env = { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_STORE: 'json' };
+  const K = vorigKwartaal();
+  let srv = await startServer({ env });
+  try {
+    // ---- opzet: factuur, tweede inspecteur, bank live, rekening met saldo ----
+    const zaak1 = (await api(srv.base, '/api/supplier/login', { username: 'rahul', password: 'Imran' })).body.token;
+    const f = await api(srv.base, '/api/supplier/facturen/maak',
+      { omschrijving: 'Diner', aantal: 1, bedrag: 242, koperNaam: 'Gast' }, zaak1);
+    const btwCenten = Math.round(f.body.factuur.btwBedrag * 100);
+    const roster = await api(srv.base, '/api/supplier/roster', { code: 'RIJK' });
+    const chef = roster.body.staff.find(m => m.role === 'manager');
+    const chefTok1 = (await api(srv.base, '/api/supplier/login', { code: 'RIJK', staffId: chef.id, pin: '1234' })).body.token;
+    const tweede = await api(srv.base, '/api/supplier/staff/add', { name: 'Inspecteur Bakker', role: 'manager' }, chefTok1);
+    /* En een DERDE, want op het bezwaar beslist niet wie de naheffing opmaakte of
+       vaststelde. Dat is geen detail van deze toets: de eerste versie liet de
+       opsteller beslissen en kreeg een 409 terug -- de regel werkte, de toets
+       niet. */
+    const derde = await api(srv.base, '/api/supplier/staff/add', { name: 'Inspecteur Yilmaz', role: 'manager' }, chefTok1);
+
+    // de boardroom zet de leden-bank live, langs zijn eigen route
+    const office = (await api(srv.base, '/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+    assert.ok(office, 'het kantoor is ingelogd');
+    const live = await api(srv.base, '/api/office/bank/leden', { aan: true }, office);
+    assert.equal(live.status, 200, 'de bank staat live');
+
+    // de zaak opent zijn zakelijke rekening
+    const rek = await api(srv.base, '/api/supplier/bank/zakelijk', {}, zaak1);
+    assert.equal(rek.status, 200, 'de zakelijke rekening is open');
+    const iban = rek.body.rekening.iban;
+    assert.equal(rek.body.saldoCenten, 0, 'en staat op nul');
+
+    await wacht(1500);
+    stop(srv.child);
+    await wacht(2500);
+    const pad = path.join(TMP, 'db.json');
+    const db = JSON.parse(fs.readFileSync(pad, 'utf8'));
+    db.facturen[0].datum = K.datum;
+    db.facturen[0].at = K.datum + 'T10:00:00.000Z';
+    db.bankSaldi = Object.assign({}, db.bankSaldi, { [iban]: 50000, 'extern:emissie': (db.bankSaldi || {})['extern:emissie'] ? db.bankSaldi['extern:emissie'] - 50000 : -50000 });
+    fs.writeFileSync(pad, JSON.stringify(db));
+    srv = await startServer({ env });
+
+    const zaak = (await api(srv.base, '/api/supplier/login', { username: 'rahul', password: 'Imran' })).body.token;
+    const t1 = (await api(srv.base, '/api/supplier/login', { code: 'RIJK', staffId: chef.id, pin: '1234' })).body.token;
+    const t2 = (await api(srv.base, '/api/supplier/login',
+      { code: 'RIJK', staffId: tweede.body.staff.id, pin: tweede.body.pin })).body.token;
+    const t3 = (await api(srv.base, '/api/supplier/login',
+      { code: 'RIJK', staffId: derde.body.staff.id, pin: derde.body.pin })).body.token;
+
+    // ---- de naheffing, door twee paar ogen ----
+    const nh = (await api(srv.base, '/api/overheid/bd/naheffing/maak',
+      { periode: K.periode, code: 'KIKUNOI' }, t1)).body.naheffing;
+    assert.equal(nh.naheffingCenten, btwCenten);
+    assert.equal((await api(srv.base, '/api/overheid/bd/naheffing/stelvast', { id: nh.id }, t2)).status, 200);
+
+    // ---- betalen ----
+    const betaal = await api(srv.base, '/api/supplier/btw/naheffing/betaal', { id: nh.id }, zaak);
+    assert.equal(betaal.status, 200, JSON.stringify(betaal.body));
+    assert.ok(betaal.body.naheffing.betaaldOp, 'de naheffing staat op betaald');
+    assert.match(betaal.body.let, /afgeschreven/);
+
+    const naBetaling = await api(srv.base, '/api/supplier/bank/zakelijk', {}, zaak);
+    assert.equal(naBetaling.body.saldoCenten, 50000 - btwCenten, 'het geld is er echt af');
+    assert.ok((naBetaling.body.afschrift || []).some(r => /Naheffing/.test(r.oms || '')),
+      'en het staat op het afschrift van de zaak');
+
+    // twee keer betalen kan niet, en schrijft dus ook geen tweede keer af
+    assert.equal((await api(srv.base, '/api/supplier/btw/naheffing/betaal', { id: nh.id }, zaak)).status, 409);
+    assert.equal((await api(srv.base, '/api/supplier/bank/zakelijk', {}, zaak)).body.saldoCenten, 50000 - btwCenten);
+
+    // ---- bezwaar, toegewezen: het geld komt terug ----
+    assert.equal((await api(srv.base, '/api/supplier/btw/naheffing/bezwaar',
+      { id: nh.id, reden: 'Deze omzet is in het volgende tijdvak aangegeven.' }, zaak)).status, 200);
+    // de opsteller mag er niet over beslissen, ook niet nu er geld mee gemoeid is
+    assert.equal((await api(srv.base, '/api/overheid/bd/naheffing/bezwaar/beslis',
+      { id: nh.id, toewijzen: true, motivering: 'akkoord' }, t1)).status, 409);
+    const besluit = await api(srv.base, '/api/overheid/bd/naheffing/bezwaar/beslis',
+      { id: nh.id, toewijzen: true, motivering: 'De aangifte over het volgende tijdvak dekt deze omzet.' }, t3);
+    assert.equal(besluit.status, 200, JSON.stringify(besluit.body));
+    assert.equal(besluit.body.naheffing.status, 'vernietigd');
+    assert.match(besluit.body.let, /teruggestort/);
+
+    const naTerug = await api(srv.base, '/api/supplier/bank/zakelijk', {}, zaak);
+    assert.equal(naTerug.body.saldoCenten, 50000, 'de zaak staat weer waar hij stond');
+
+    /* En de tucht van het grootboek: de som van alle saldi is nog steeds exact
+       nul. Als betalen of terugbetalen ergens geld had laten ontstaan of
+       verdwijnen, staat het hier. */
+    const gezond = await api(srv.base, '/api/office/bank/overzicht', {}, office);
+    if (gezond.status === 200 && gezond.body.gezondheid) {
+      assert.equal(gezond.body.gezondheid.somCenten || 0, 0, 'de som van alle saldi is nul');
+    }
+  } finally {
+    if (srv && srv.child) stop(srv.child);
+    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) { /* opruimen mag falen */ }
+  }
+});

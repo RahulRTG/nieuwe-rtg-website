@@ -57,6 +57,15 @@ test('Kantoor van de zaak: de naheffing staat op het scherm, en het bezwaar gaat
     const chefTok = (await api(srv.base, '/api/supplier/login', { code: 'RIJK', staffId: chef.id, pin: '1234' })).body.token;
     const tweede = await api(srv.base, '/api/supplier/staff/add', { name: 'Inspecteur Bakker', role: 'manager' }, chefTok);
     assert.equal(tweede.status, 200);
+    /* De bank live en een beginsaldo, zodat de betaalknop op het scherm ook echt
+       iets doet. Dat is OPZET en niet wat hier getoetst wordt; het beginsaldo
+       gaat met BEIDE kanten van de boeking de opslag in, zodat de som van alle
+       saldi exact nul blijft. */
+    const office = (await api(srv.base, '/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+    assert.equal((await api(srv.base, '/api/office/bank/leden', { aan: true }, office)).status, 200);
+    const rek = await api(srv.base, '/api/supplier/bank/zakelijk', {}, zaak);
+    assert.equal(rek.status, 200, 'de zakelijke rekening is open');
+    const iban = rek.body.rekening.iban;
 
     await wacht(1500);
     stop(srv.child);
@@ -65,6 +74,8 @@ test('Kantoor van de zaak: de naheffing staat op het scherm, en het bezwaar gaat
     const db = JSON.parse(fs.readFileSync(pad, 'utf8'));
     db.facturen[0].datum = K.datum;
     db.facturen[0].at = K.datum + 'T10:00:00.000Z';
+    db.bankSaldi = Object.assign({}, db.bankSaldi, { [iban]: 50000,
+      'extern:emissie': ((db.bankSaldi || {})['extern:emissie'] || 0) - 50000 });
     fs.writeFileSync(pad, JSON.stringify(db));
     srv = await startServer({ env });
 
@@ -128,6 +139,23 @@ test('Kantoor van de zaak: de naheffing staat op het scherm, en het bezwaar gaat
     const serverkant = await api(srv.base, '/api/supplier/btw/naheffingen', {}, zaakTok);
     assert.equal(serverkant.body.naheffingen[0].status, 'bezwaar');
     assert.match(serverkant.body.naheffingen[0].bezwaar.reden, /volgende tijdvak/);
+
+    /* ---- en betalen, vanaf datzelfde scherm ----
+       Bezwaar schort de betaling niet op, dus de knop staat er nog. Wat hier
+       telt is dat het geld ECHT beweegt: de zaakrekening wordt lichter en de
+       naheffing gaat pas daarna op betaald. */
+    const betaalKnop = '[data-nhbet="' + maak.body.naheffing.id + '"]';
+    assert.ok(await page.$(betaalKnop), 'de betaalknop staat er, ook tijdens een bezwaar');
+    await page.click(betaalKnop);
+    await page.waitForFunction(() => {
+      const el = document.querySelector('#btwOp');
+      return !!(el && /Betaald op/.test(el.closest('.tkc').textContent));
+    }, null, { timeout: 15000 });
+    assert.equal(await page.$(betaalKnop), null, 'en verdwijnt zodra er betaald is');
+
+    const saldo = await api(srv.base, '/api/supplier/bank/zakelijk', {}, zaakTok);
+    assert.equal(saldo.body.saldoCenten, 50000 - vast.body.naheffing.totaalCenten,
+      'het geld is echt van de zakelijke rekening af');
 
     assert.deepEqual(fouten, [], 'geen JS-fouten tijdens het scherm');
   } finally {

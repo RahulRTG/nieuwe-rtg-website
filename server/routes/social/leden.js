@@ -1,12 +1,11 @@
 /* Sociale laag (deelmodule): de RTG-ledenkant: zoeken en verbinden op
-   codenaam, DM, (video)bellen, snaps en 24-uurs verhalen. Gemount vanuit
-   routes/social.js op de gedeelde kern. */
+   codenaam, DM en (video)bellen. Snaps en 24-uurs verhalen staan in
+   ./snaps.js. Gemount vanuit routes/social.js op de gedeelde kern. */
 module.exports = (sctx) => {
   const { kern, isKindVanGezin, rtfOnbSess, rtfSociaal } = sctx;
-  const { app, express, auth, geenGast, db, socialZoek, socialVerbind, socialAntwoord,
+  const { app, auth, geenGast, db, socialZoek, socialVerbind, socialAntwoord,
           socialConnecties, liveCodename, connectieTussen, verbActief, codenaamVan,
-          sseToCustomer, snapSturen, snapsVoor, snapOpenen, verhaalPlaatsen, verhalenVoor,
-          verhaalBekijken, dagOpdracht, isGeblokkeerd } = kern;
+          sseToCustomer, isGeblokkeerd } = kern;
 
 // leden en RTF-gezinsleden zoeken op codenaam (nooit op echte naam).
 // De eigen naamlaag zoekt mee: wie zijn vriend een eigen naam gaf, vindt
@@ -151,34 +150,6 @@ app.post('/api/member/call', auth, (req, res) => {
   res.json({ ok: true });
 });
 
-/* ---------- snaps en verhalen: RTG-kant (auth) ---------- */
-app.post('/api/member/snap/send', express.json({ limit: '1.5mb' }), auth, async (req, res) => {
-  if (geenGast(req, res)) return;
-  const r = await snapSturen(req.session.key, String(req.body.toKey || ''), req.body.foto, req.body.tekst);
-  if (r.error) return res.status(r.status).json({ error: r.error });
-  res.json({ ok: true });
-});
-app.post('/api/member/snaps', auth, (req, res) => { if (geenGast(req, res)) return; res.json({ snaps: snapsVoor(req.session.key) }); });
-app.post('/api/member/snap/view', auth, async (req, res) => {
-  if (geenGast(req, res)) return;
-  const r = await snapOpenen(req.session.key, String(req.body.id || ''));
-  if (r.error) return res.status(r.status).json({ error: r.error });
-  res.json({ foto: r.foto, tekst: r.tekst, van: r.van });
-});
-app.post('/api/member/story/post', express.json({ limit: '1.5mb' }), auth, async (req, res) => {
-  if (geenGast(req, res)) return;
-  const r = await verhaalPlaatsen(req.session.key, req.body.foto, req.body.tekst, req.body.opdracht === true);
-  if (r.error) return res.status(r.status).json({ error: r.error });
-  res.json({ ok: true });
-});
-// de snap-opdracht van vandaag (voor iedereen dezelfde)
-app.post('/api/member/snap/opdracht', auth, (req, res) => { res.json({ opdracht: dagOpdracht() }); });
-app.post('/api/member/stories', auth, (req, res) => { if (geenGast(req, res)) return; res.json({ stories: verhalenVoor(req.session.key) }); });
-app.post('/api/member/story/view', auth, async (req, res) => {
-  if (geenGast(req, res)) return;
-  const r = await verhaalBekijken(req.session.key, String(req.body.id || ''));
-  if (r.error) return res.status(r.status).json({ error: r.error });
-  res.json({ foto: r.foto, tekst: r.tekst, van: r.van, at: r.at });
-});
-
+/* Snaps en 24-uurs verhalen staan in ./snaps.js (uitgeknipt op de 10 kB-grens,
+   op de naad van het onderwerp). */
 };

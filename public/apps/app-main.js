@@ -12,7 +12,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '61decedb';
+var RTG_BOUW = '1b06c62c';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -7289,6 +7289,7 @@ var RTG_BOUW = '61decedb';
   }
   async function laadAgendaLid(){ if (!API.live || !API.token) return; try { memberAgenda = await API.call('/agenda/mijn-lijst', {}); } catch(e){ return; } agendaBadgeLid(memberAgenda.telling || 0); }
   function agendaToeLid(r){ if (r && r.items){ memberAgenda = r; agendaBadgeLid(r.telling || 0); } renderAgendaLid(); }
+
   function renderAgendaLid(){
     const el = document.getElementById('boAgendaCard'); if (!el) return;
     if (!memberAgenda){ el.innerHTML = '<div class="zak-kaart"><b style="font-size:0.8rem;">' + T('ag.titel','Agenda') + '</b><div class="fineprint">…</div></div>'; laadAgendaLid().then(renderAgendaLid); return; }
@@ -7327,7 +7328,138 @@ var RTG_BOUW = '61decedb';
     renderKluisLid(el);
     const aiGo = document.getElementById('factLidAiGo'); if (aiGo){ const doe = async () => { const opdracht = document.getElementById('factLidAiIn').value.trim(); if (!opdracht) return; const out = document.getElementById('factLidAiOut'); out.innerHTML = '<div class="fineprint">…</div>'; try { const r = await API.call('/facturen/ai', { opdracht }); out.innerHTML = '<div class="fineprint" style="color:var(--txt);white-space:pre-wrap;">'+esc(r.antwoord)+'</div>'; document.getElementById('factLidAiIn').value=''; if (r.overzicht){ memberFacturen = r.overzicht; } } catch(e){ out.innerHTML = '<div class="fineprint" style="color:#E0736A;">'+esc(e.message)+'</div>'; } }; aiGo.addEventListener('click', doe); const i2 = document.getElementById('factLidAiIn'); if (i2) i2.addEventListener('keydown', e => { if (e.key==='Enter') doe(); }); }
   }
+/* DIT SLUITHAAKJE HOORT HIER, EN NIET DRIE BESTANDEN VERDEROP.
 
+   Het stond aan het begin van 54.js, waardoor renderFacturenLid() pas daar
+   dichtging -- en alles wat er in 53b.js en 53c.js tussen stond, kwam daarmee
+   BINNEN die functie te liggen. De Vooruit-kaart en de postvoorstellen waren
+   daardoor niet zichtbaar voor boRender() in 55.js: "renderVooruit is not
+   defined", en dus een lege kaart op het scherm terwijl elke API-toets groen
+   stond. Gevonden door test/vooruitscherm.e2e.js, de eerste toets die die kaart
+   ECHT opende.
+
+   Wie hier weer een deelbestand tussenvoegt: knip op een plek waar de functie
+   AL dicht is. scripts/kruisscan.js ziet dit niet -- die zoekt kale verwijzingen
+   naar top-level namen van een zuster, en deze namen stonden helemaal niet op
+   top-level. */
+  /* De Vooruit-kaart: uw termijnen, voor elke pas. Afgesplitst van 53.js toen
+     dat over de 10 kB ging; de snede loopt langs een echte grens -- 53 gaat over
+     de AGENDA (wat u zelf plant), dit over wat er VANZELF op u afkomt.
+     Deelt de IIFE-scope met 53: API, T, esc, lang komen daarvandaan. */
+  /* ---------- "Vooruit": uw termijnen, voor ELKE pas ----------
+     Alles wat een datum heeft en van u is: uw paspoort uit de kluis, uw
+     boekingen, uw agenda, en -- als u een Lifestyle Pass heeft -- ook uw
+     verzekeringen, keuringen en visa. De motor (kern/levensgraaf) kent geen
+     pas-controle; de bronnen die het premium-dossier lezen geven vanzelf niets
+     terug voor wie dat dossier niet heeft.
+
+     NIEMAND TYPT DIT. Dat is de hele reden dat deze kaart bestaat, en daarom
+     staat er ook bij WAAR het vandaan komt: een lid dat ziet dat zijn paspoort
+     er vanzelf in staat, vertrouwt de rest van de lijst ook. */
+  let vooruitData = null;
+  async function laadVooruit(){
+    if (!API.live || !API.token) return;
+    try { vooruitData = await API.call('/member/vooruit', {}); } catch(e){ vooruitData = { fout: true }; }
+  }
+  function renderVooruit(){
+    const el = document.getElementById('boVooruitCard'); if (!el) return;
+    if (!vooruitData){ el.innerHTML = '<div class="zak-kaart"><b class="vo-kop">' + T('vo.titel','Vooruit') + '</b><div class="fineprint">…</div></div>'; laadVooruit().then(renderVooruit); return; }
+    const d = vooruitData;
+    if (d.fout){ el.innerHTML = ''; return; }
+    const dagLbl = x => { try { return new Date(x+'T12:00:00').toLocaleDateString(lang()==='en'?'en-GB':'nl-NL',{day:'numeric',month:'short'}); } catch(e){ return x; } };
+    const regel = r => '<div class="vo-rij">'
+      + '<span>' + esc((r.waarvan ? r.waarvan + ' · ' : '') + r.naam) + '</span>'
+      + '<span class="vo-dag">' + esc(dagLbl(r.datum)) + '</span></div>';
+    let h = '<div class="zak-kaart"><b class="vo-kop">' + T('vo.titel','Vooruit')
+      + (d.achterstallig.length ? ' <span class="vo-let">(' + d.achterstallig.length + ')</span>' : '') + '</b>';
+    if (!d.totaal){
+      h += '<div class="fineprint vo-mt">' + T('vo.leeg','Er staat nog niets met een datum op uw naam. Zodra u iets boekt of uw paspoort scant, verschijnt het hier vanzelf.') + '</div>';
+    } else {
+      if (d.achterstallig.length){
+        h += '<div class="vo-groep laat">' + T('vo.laat','Al voorbij') + '</div>';
+        h += d.achterstallig.slice(0,4).map(regel).join('');
+      }
+      for (const v of d.vensters){
+        if (!v.aantal) continue;
+        h += '<div class="vo-groep">' + esc(v.label) + '</div>';
+        h += v.items.slice(0,5).map(regel).join('');
+        break;   // alleen het eerstvolgende venster met inhoud; dit is een kaart, geen lijst
+      }
+      h += '<div class="fineprint vo-mt2">'
+        + T('vo.bron','Automatisch verzameld uit') + ': ' + esc(d.bronnen.join(', ')) + '.</div>';
+    }
+    for (const a of (d.afgekapt || [])) h += '<div class="fineprint vo-dak">' + T('vo.dak','Wij tonen de eerste') + ' ' + a.dak + ' ' + T('vo.uit','uit') + ' ' + esc(a.bron) + '.</div>';
+    for (const s2 of (d.stuk || [])) h += '<div class="fineprint vo-let">' + T('vo.stuk','Wij kunnen dit deel nu niet uitlezen') + ': ' + esc(s2) + '.</div>';
+    h += '</div>';
+    el.innerHTML = h;
+  }
+  /* De post-voorstellen: datums die zichzelf aandienen.
+
+     Afgesplitst van 53b, en de snede loopt langs een echte grens: 53b toont wat
+     er AL vaststaat, dit toont wat er nog niet vaststaat en wat u kunt
+     bevestigen.
+
+     WAAROM HIER EEN KNOP ZIT EN GEEN AUTOMAAT. Wat hieronder staat komt uit
+     gewone taal in een bericht -- "uw afspraak staat op 14 september om 19:30".
+     Dat raden gaat vaak goed en soms mis, en een datum die er ongezien in glijdt
+     staat op een dag op de verkeerde dag. Vandaar: de ZIN erbij, uw oordeel
+     erover, en pas dan de agenda in. Zie de kop van server/kern/postdatum.js.
+
+     Deelt de IIFE-scope met 53/53b: API, T, esc, lang komen daarvandaan. */
+  let postData = null;
+  async function laadPostDatums(){
+    if (!API.live || !API.token) return;
+    try { postData = await API.call('/member/vooruit/post', {}); } catch(e){ postData = { fout: true }; }
+  }
+  function renderPostDatums(){
+    const el = document.getElementById('boPostCard'); if (!el) return;
+    if (!postData){ el.innerHTML = ''; laadPostDatums().then(renderPostDatums); return; }
+    const d = postData;
+    if (d.fout || !d.voorstellen || !d.voorstellen.length){
+      /* Niets voor te stellen is GEEN reden om te zwijgen als de lezer wel iets
+         heeft laten liggen: dan hoort er te staan dat er iets is overgeslagen,
+         anders leest een lege kaart als "er stond niets in uw post". */
+      el.innerHTML = (!d.fout && d.overgeslagen)
+        ? '<div class="zak-kaart"><b class="vo-kop">' + T('po.titel','Uit uw post') + '</b>'
+          + '<div class="fineprint vo-mt">' + T('po.niets','Wij vonden geen datum die wij met zekerheid konden lezen.') + ' '
+          + d.overgeslagen + ' ' + T('po.over','stonden er te twijfelachtig bij (bijvoorbeeld 03/04: dat is 3 april of 4 maart).') + '</div></div>'
+        : '';
+      return;
+    }
+    const dagLbl = x => { try { return new Date(x+'T12:00:00').toLocaleDateString(lang()==='en'?'en-GB':'nl-NL',{day:'numeric',month:'short'}); } catch(e){ return x; } };
+    let h = '<div class="zak-kaart"><b class="vo-kop">' + T('po.titel','Uit uw post')
+      + ' <span class="vo-let">(' + d.voorstellen.length + ')</span></b>'
+      + '<div class="fineprint vo-mt">' + T('po.uitleg','Dit vonden wij in uw eigen post. Er gaat niets vanzelf in uw agenda; u bevestigt.') + '</div>';
+    for (const v of d.voorstellen.slice(0,6)){
+      h += '<div class="po-blok">'
+        + '<div class="po-van">' + esc(v.van) + (v.vertrouwd ? '' : ' · <span class="vo-let">' + T('po.buiten','van buiten') + '</span>') + '</div>'
+        + '<div class="po-ond">' + esc(v.onderwerp) + '</div>';
+      for (const dt of v.datums.slice(0,3)){
+        h += '<div class="vo-rij"><span>' + esc(dt.zin) + '</span>'
+          + '<span class="vo-dag">' + esc(dagLbl(dt.datum)) + (dt.tijd ? ' ' + esc(dt.tijd) : '') + '</span></div>'
+          + '<div class="po-knoppen"><button class="po-ja" data-poneem="' + esc(v.id) + '" data-podag="' + esc(dt.datum) + '" data-potitel="' + esc(v.onderwerp) + '">'
+          + T('po.zet','Zet in mijn agenda') + '</button></div>';
+      }
+      h += '<div class="po-knoppen"><button class="po-nee" data-poweg="' + esc(v.id) + '">' + T('po.weg','Niet nodig') + '</button></div>'
+        + '</div>';
+    }
+    if (d.overgeslagen) h += '<div class="fineprint vo-dak">' + d.overgeslagen + ' '
+      + T('po.over2','datums waren te twijfelachtig om voor te stellen.') + '</div>';
+    h += '</div>';
+    el.innerHTML = h;
+
+    const opnieuw = async () => { postData = null; vooruitData = null; renderPostDatums(); renderVooruit(); };
+    el.querySelectorAll('[data-poneem]').forEach(b => b.addEventListener('click', async () => {
+      try {
+        await API.call('/member/vooruit/post/neem', { id: b.dataset.poneem, datum: b.dataset.podag, titel: b.dataset.potitel });
+        opnieuw();
+      } catch(e){ if (typeof toast === 'function') toast(e.message); }
+    }));
+    el.querySelectorAll('[data-poweg]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/member/vooruit/post/negeer', { id: b.dataset.poweg }); opnieuw(); }
+      catch(e){ if (typeof toast === 'function') toast(e.message); }
+    }));
+  }
   /* ---------- de Toestelkluis: eigen kopieen op het eigen toestel ----------
      Elke download (factuur, overzicht) krijgt stil een kopie in de prive
      browseropslag van dit toestel; hier ziet het lid ze, opent of wist ze.
@@ -7395,6 +7527,14 @@ var RTG_BOUW = '61decedb';
       (myApps && myApps.length ? rij(T('bo2.sollicitaties','Sollicitaties'), String(myApps.length)) : ''));
 
     // interactieve AI-agenda
+    /* "Vooruit": uw termijnen, voor ELKE pas -- ook de gratis app. De motor
+       (kern/levensgraaf) zit niet achter een pas, want een gratis lid heeft ook
+       een paspoort dat verloopt en een boeking die komt. Vandaar geen
+       tier-controle op deze regel, in tegenstelling tot de twee eronder. */
+    html += '<div id="boVooruitCard"></div>';
+    /* En de voorstellen uit de eigen post (53c). Wel achter "geen gast": een
+       gast heeft geen postvak, dus die kaart zou voor hem altijd leeg zijn. */
+    if (user.tier !== 'guest') html += '<div id="boPostCard"></div>';
     if (user.tier !== 'guest') html += '<div id="boAgendaCard"></div>';
     // mijn facturen (automatisch bij elke aankoop)
     if (user.tier !== 'guest') html += '<div id="boFacturenCard"></div>';
@@ -7438,6 +7578,8 @@ var RTG_BOUW = '61decedb';
         '<div class="fineprint">' + T('bo2.vr.s','Boeken, betalen, vrienden en De Salon zitten in uw pas. Lifestyle en Business voegen de concierge, de AI-boekhouder en RTG Zakelijk toe.') + '</div>');
     }
     body.innerHTML = html;
+    renderVooruit();
+    renderPostDatums();
     renderAgendaLid();
     renderFacturenLid();
 

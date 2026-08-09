@@ -26,6 +26,7 @@ function rtfSociaal(req, res) {
      plus de sessie-helpers, een keer gemount bij het opstarten. */
   const sctx = { kern, isKindVanGezin, rtfOnbSess, rtfSociaal };
   require('./social/leden')(sctx);
+  require('./social/snaps')(sctx);
   require('./social/naamlaag')(sctx);
   require('./social/gezinnen')(sctx);
   require('./social/klets')(sctx);

@@ -19,6 +19,10 @@ module.exports = (kern) => {
   });
   app.post('/api/site/bewaar', auth, (req, res) => { if (geenGast(req, res)) return; const b = req.body || {}; stuur(res, webmaker.bewaar(req.session.key, b.design || b)); });
   app.post('/api/site/verwijder', auth, (req, res) => { if (geenGast(req, res)) return; stuur(res, webmaker.verwijder(req.session.key, (req.body || {}).id)); });
+  /* de versiegeschiedenis: wat er vandaag staat is niet het enige wat er ooit
+     stond -- de AI-knop en een misser hebben een weg terug */
+  app.post('/api/site/versies', auth, (req, res) => { if (geenGast(req, res)) return; stuur(res, webmaker.versies(req.session.key, (req.body || {}).id)); });
+  app.post('/api/site/herstel', auth, (req, res) => { if (geenGast(req, res)) return; const b = req.body || {}; stuur(res, webmaker.herstel(req.session.key, b.id, b.i)); });
   app.post('/api/site/publiceer', auth, (req, res) => { if (geenGast(req, res)) return; const b = req.body || {}; stuur(res, webmaker.publiceer(req.session.key, b.id, b.adres)); });
   app.post('/api/site/offline', auth, (req, res) => { if (geenGast(req, res)) return; stuur(res, webmaker.offline(req.session.key, (req.body || {}).id)); });
 
@@ -108,7 +112,7 @@ module.exports = (kern) => {
     }
     const ontwerp = webplatform.genereer(req.supplier);
     if (bestaande.length) ontwerp.id = bestaande[0].id;
-    const r = webmaker.bewaar(key, ontwerp, { zaakCode: req.supplier.code });
+    const r = webmaker.bewaar(key, ontwerp, { zaakCode: req.supplier.code, reden: 'opnieuw uit profiel' });
     if (r.error) return stuur(res, r);
     // meteen online op de bedrijfsnaam; is dat adres van een ander, dan naam-code
     let p = webmaker.publiceer(key, r.design.id, webmaker.slug(req.supplier.name));
@@ -128,5 +132,7 @@ module.exports = (kern) => {
   });
   app.post('/api/supplier/site/publiceer', supplierAuth, (req, res) => { const b = req.body || {}; stuur(res, webmaker.publiceer(zaakKey(req), b.id, b.adres)); });
   app.post('/api/supplier/site/offline', supplierAuth, (req, res) => { stuur(res, webmaker.offline(zaakKey(req), (req.body || {}).id)); });
+  app.post('/api/supplier/site/versies', supplierAuth, (req, res) => stuur(res, webmaker.versies(zaakKey(req), (req.body || {}).id)));
+  app.post('/api/supplier/site/herstel', supplierAuth, (req, res) => { const b = req.body || {}; stuur(res, webmaker.herstel(zaakKey(req), b.id, b.i)); });
 
 };

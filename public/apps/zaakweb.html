@@ -72,12 +72,34 @@ async function toon(){
     (d.online&&d.adres?'<a class="knop" href="/apps/browser.html?adres='+encodeURIComponent(d.adres)+'">Bekijk in de RTG-browser</a>':'')+
     '<button id="'+(d.online?'uit':'aan')+'">'+(d.online?'Zet offline':'Zet online')+'</button>'+
     '<button id="vers">Opnieuw uit mijn profiel</button>'+
+    '<button id="hist">Eerdere versies</button>'+
     '</div>'+
+    '<div id="histvak"></div>'+
     '<p class="mt" style="line-height:1.6;">De live blokken (menu, aanbod, foto&#39;s, reviews, contact) volgen uw bedrijfsprofiel vanzelf. "Opnieuw uit mijn profiel" gooit uw eigen aanpassingen aan de site weg en bouwt hem vers op -- dat vraagt hij niet nog een keer, dus wees er zeker van.</p>';
   const uit=$('#uit'),aan=$('#aan'),vers=$('#vers');
   if(uit)uit.addEventListener('click',async()=>{ try{ await api('offline',{id:d.id}); meld('De site staat offline.'); toon(); }catch(e){ meld(e.message);} });
   if(aan)aan.addEventListener('click',async()=>{ try{ const r=await api('publiceer',{id:d.id,adres:d.adres||d.titel}); meld('Online op '+r.adres+'.rtg'); toon(); }catch(e){ meld(e.message);} });
-  vers.addEventListener('click',async()=>{ try{ const r=await api('genereer',{opnieuw:true}); meld('Opnieuw gebouwd uit uw profiel'+(r.adres?' -- online op '+r.adres+'.rtg':'')+'.'); toon(); }catch(e){ meld(e.message);} });
+  vers.addEventListener('click',async()=>{ try{ const r=await api('genereer',{opnieuw:true}); meld('Opnieuw gebouwd uit uw profiel'+(r.adres?' -- online op '+r.adres+'.rtg':'')+'. De vorige stand staat onder "Eerdere versies".'); toon(); }catch(e){ meld(e.message);} });
+  /* eerdere versies: elke bewaring legt de vorige stand weg, dus ook na
+     "opnieuw uit mijn profiel" is er een weg terug */
+  $('#hist').addEventListener('click',async()=>{
+    const vak=$('#histvak');
+    try{
+      const r=await api('versies',{id:d.id}); const lijst=r.lijst||[];
+      vak.textContent='';
+      if(!lijst.length){ vak.innerHTML='<p class="mt">Nog geen eerdere versies. Vanaf uw volgende wijziging staat de vorige stand hier.</p>'; return; }
+      lijst.forEach(v=>{
+        const rij=document.createElement('div'); rij.className='rij'; rij.style.alignItems='center';
+        const t=document.createElement('span'); t.className='mt'; t.style.flex='1';
+        t.textContent=String(v.op||'').replace('T',' ').slice(0,16)+' · '+v.reden+' · '+v.blokken+' blokken';
+        const b=document.createElement('button'); b.textContent='Zet terug';
+        b.addEventListener('click',async()=>{
+          if(!confirm('Deze versie terugzetten? Uw adres en online-stand blijven zoals ze nu zijn.'))return;
+          try{ await api('herstel',{id:d.id,i:v.i}); meld('Teruggezet.'); toon(); }catch(e){ meld(e.message);} });
+        rij.appendChild(t); rij.appendChild(b); vak.appendChild(rij);
+      });
+    }catch(e){ meld(e.message); }
+  });
 }
 toon();
 </script>

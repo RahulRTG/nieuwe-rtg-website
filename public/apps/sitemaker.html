@@ -121,6 +121,7 @@
   </div>
   <span class="sp"></span>
   <button class="knop" id="aiKnop" title="Vraag de assistent het ontwerp aan te passen">AI</button>
+  <button class="knop" id="terugKnop" title="Eerdere versies van deze site">Historie</button>
   <button class="knop" id="blokKnop">+ Blok</button>
   <button class="knop" id="bewerkKnop">Voorbeeld</button>
   <button class="knop" id="openKnop">Mijn sites</button>
@@ -157,6 +158,11 @@
   <div id="openlijst"></div>
   <div style="margin-top:1rem;"><button class="knop" id="persoonlijkKnop">Maak mijn persoonlijke pagina</button>
     <div class="sub" style="margin-top:.35rem;">Je eigen plek op het RTG-web, op je codenaam -- in een keer klaar, daarna van jou.</div></div>
+  <div id="versievak" hidden>
+    <h2 style="margin-top:1.1rem;">Eerdere versies</h2>
+    <div class="sub">De stand van voor elke bewaring. Terugzetten laat je adres en online-stand met rust -- en is zelf ook weer terug te draaien.</div>
+    <div id="versielijst"></div>
+  </div>
   <div id="sjabloonvak" hidden>
     <h2 style="margin-top:1.1rem;">Begin met een sjabloon</h2>
     <div class="sub">Ontwerpen van het RTG Atelier als startpunt -- daarna is het jouw site.</div>
@@ -464,6 +470,7 @@ if(window.RTGUitvoer) RTGUitvoer.bron(()=>{
     rijen:MIJNSITES.map(s=>[s.titel||'', s.adres?s.adres+'.rtg':'', s.online?'ja':'nee', s.blokken, s.bezoeken||0, String(s.bij||'').slice(0,10)]) };
 });
 async function openen(){
+  $('#versievak').hidden=true;   // het sheet doet twee dingen; toon alleen wat je vroeg
   try{ const d=await api('mijn'); MIJNSITES=d.lijst||[]; const l=$('#openlijst'); l.textContent='';
     if(!(d.lijst||[]).length){ l.innerHTML='<div style="color:var(--soft);font-size:.85rem;">Nog geen websites. Bouw je eerste en bewaar hem.</div>'; }
     (d.lijst||[]).forEach(it=>{const r=document.createElement('div');r.className='lijstrij';r.innerHTML='<span class="nm">'+esc(it.titel)+'</span><span class="mt">'+(it.online?esc(it.adres)+'.rtg':it.blokken+' blok'+(it.blokken===1?'':'ken'))+'</span>';const ob=document.createElement('button');ob.textContent='Open';ob.addEventListener('click',async()=>{try{const dd=await api('haal',{id:it.id});DESIGN=dd.design;DESIGN.blokken=DESIGN.blokken||[];DESIGN.kleuren=DESIGN.kleuren||{};paginaReset();$('#titel').value=DESIGN.titel;bouwSwatches();syncKleurInputs();$('#themaKnop').textContent=DESIGN.thema==='licht'?'Licht':'Donker';$('#openSheet').classList.remove('open');zetBewerk(true);lintBij();meld('Geopend.');}catch(e){meld(e.message);}});r.appendChild(ob);l.appendChild(r);});
@@ -471,15 +478,42 @@ async function openen(){
     laadSjablonen();
   }catch(e){ meld(e.message); }
 }
+/* de versiegeschiedenis: de stand van voor elke bewaring, met een weg terug */
+function laadOntwerp(d,bericht){
+  DESIGN=d;DESIGN.blokken=DESIGN.blokken||[];DESIGN.kleuren=DESIGN.kleuren||{};paginaReset();
+  $('#titel').value=DESIGN.titel;bouwSwatches();syncKleurInputs();
+  $('#themaKnop').textContent=DESIGN.thema==='licht'?'Licht':'Donker';
+  $('#openSheet').classList.remove('open');zetBewerk(true);lintBij();
+  if(bericht)meld(bericht);
+}
+$('#terugKnop').addEventListener('click',async()=>{
+  if(!DESIGN.id){ meld('Bewaar je site eerst; daarna houdt hij zijn geschiedenis bij.'); return; }
+  const vak=$('#versievak'),l=$('#versielijst');
+  try{
+    const d=await api('versies',{id:DESIGN.id});
+    const lijst=d.lijst||[];
+    l.textContent='';
+    if(!lijst.length){ l.innerHTML='<div style="color:var(--soft);font-size:.85rem;">Nog geen eerdere versies. Vanaf je volgende bewaring staat de vorige stand hier.</div>'; }
+    lijst.forEach(v=>{
+      const r=document.createElement('div');r.className='lijstrij';
+      const wanneer=String(v.op||'').replace('T',' ').slice(0,16);
+      r.innerHTML='<span class="nm">'+esc(wanneer)+'</span><span class="mt">'+esc(v.reden)+' · '+v.blokken+' blok'+(v.blokken===1?'':'ken')+'</span>';
+      const hb=document.createElement('button');hb.textContent='Zet terug';
+      hb.addEventListener('click',async()=>{
+        if(!confirm('Deze versie terugzetten? Je huidige stand gaat naar de geschiedenis, dus je kunt weer vooruit.'))return;
+        try{ const rr=await api('herstel',{id:DESIGN.id,i:v.i}); laadOntwerp(rr.design,'Teruggezet. Je adres en online-stand zijn ongemoeid gebleven.'); }
+        catch(e){ meld(e.message); }
+      });
+      r.appendChild(hb);l.appendChild(r);
+    });
+    vak.hidden=false;$('#openSheet').classList.add('open');
+  }catch(e){ meld(e.message); }
+});
 /* de persoonlijke pagina: in een keer gegenereerd op je codenaam en meteen online */
 $('#persoonlijkKnop').addEventListener('click',async()=>{
   try{
     const r=await api('persoonlijk');
-    DESIGN=r.design;DESIGN.blokken=DESIGN.blokken||[];DESIGN.kleuren=DESIGN.kleuren||{};paginaReset();
-    $('#titel').value=DESIGN.titel;bouwSwatches();syncKleurInputs();
-    $('#themaKnop').textContent=DESIGN.thema==='licht'?'Licht':'Donker';
-    $('#openSheet').classList.remove('open');zetBewerk(true);lintBij();
-    meld(r.bestond?'Je persoonlijke pagina stond er al -- hier is hij.':'Je pagina staat online op '+r.adres+'.rtg. Maak hem nu van jou.');
+    laadOntwerp(r.design, r.bestond?'Je persoonlijke pagina stond er al -- hier is hij.':'Je pagina staat online op '+r.adres+'.rtg. Maak hem nu van jou.');
   }catch(e){ meld(e.message); }
 });
 /* de etalage van het Atelier: een sjabloon als startpunt voor een NIEUWE site */

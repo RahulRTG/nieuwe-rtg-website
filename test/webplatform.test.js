@@ -269,6 +269,51 @@ test('9. de AI-assistent past aan maar bewaart niets; de demostand is eerlijk ov
   assert.equal(mijnNa.body.lijst.length, mijnVoor.body.lijst.length, 'de assistent bewaart niet zelf');
 });
 
+test('11. de versiegeschiedenis: een weg terug, zonder het adres mee te slepen', async () => {
+  const mk = await api('/api/site/bewaar', { design: { titel: 'Kaarsen van Nora',
+    blokken: [{ type: 'kop', tekst: 'Eerste stand' }] } }, lid);
+  const id = mk.body.design.id;
+
+  // een verse site heeft nog geen geschiedenis: er is niets overschreven
+  const leeg = await api('/api/site/versies', { id }, lid);
+  assert.equal(leeg.body.lijst.length, 0);
+
+  /* De eerste stand wordt weggelegd terwijl de site nog NIET online is en nog
+     geen adres heeft. Dat is met opzet: straks herstellen we juist naar die
+     stand, en dan moet blijken dat het adres en de online-stand van vandaag
+     blijven staan in plaats van mee terug te reizen. */
+  await api('/api/site/bewaar', { design: { id, titel: 'Kaarsen van Nora', blokken: [{ type: 'kop', tekst: 'Tweede stand' }] } }, lid);
+  assert.equal((await api('/api/site/publiceer', { id, adres: 'kaarsen-nora' }, lid)).status, 200);
+  await api('/api/site/bewaar', { design: { id, titel: 'Kaarsen van Nora', blokken: [{ type: 'kop', tekst: 'Derde stand' }] } }, lid);
+  const hist = await api('/api/site/versies', { id }, lid);
+  assert.equal(hist.body.lijst.length, 2, 'twee overschreven standen');
+
+  // terugzetten naar de oudste stand
+  const her = await api('/api/site/herstel', { id, i: 1 }, lid);
+  assert.equal(her.status, 200, JSON.stringify(her.body));
+  assert.equal(her.body.design.blokken[0].tekst, 'Eerste stand');
+  // HET ADRES EN DE ONLINE-STAND REIZEN NIET MEE: herstellen is een
+  // ontwerp-handeling, geen publicatie-handeling
+  assert.equal(her.body.design.adres, 'kaarsen-nora', 'het adres blijft');
+  assert.equal(her.body.design.online, true, 'de site blijft online');
+  const bezoek = await api('/api/browser/open', { adres: 'kaarsen-nora' }, lid);
+  assert.equal(bezoek.status, 200, 'en is dus gewoon te bezoeken');
+  assert.equal(bezoek.body.site.blokken[0].tekst, 'Eerste stand');
+
+  // herstellen is zelf ook een bewaring: de derde stand is niet verloren
+  const na = await api('/api/site/versies', { id }, lid);
+  assert.equal(na.body.lijst[0].reden, 'voor herstel');
+  const terug = await api('/api/site/herstel', { id, i: 0 }, lid);
+  assert.equal(terug.body.design.blokken[0].tekst, 'Derde stand', 'je kunt ook weer vooruit');
+
+  // en de geschiedenis is van de eigenaar: een ander komt er niet in
+  const buur = await api('/api/auth/register', { name: 'Buur Web', email: 'buurweb@voorbeeld.test',
+    password: 'webgeheim56', geboortedatum: '1994-04-04', tier: 'rtg', pasApp: 'rtg' });
+  const vreemd = await api('/api/site/versies', { id }, buur.body.token);
+  assert.equal(vreemd.status, 404);
+  assert.equal((await api('/api/site/herstel', { id, i: 0 }, buur.body.token)).status, 404);
+});
+
 test('5. zoeken vindt sites en bedrijven in een adem', async () => {
   const z = await api('/api/browser/zoek', { q: 'vedra' }, lid);
   assert.equal(z.status, 200);

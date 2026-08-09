@@ -5,13 +5,23 @@ module.exports = (kern) => {
   const { app, agenda, auth, geenGast, supplierAuth, managerOnly } = kern;
 
   // ---------- lid ----------
-  const lidKey = (req) => 'lid:' + req.session.key;
+  // de sleutelregel staat in kern/agenda.js, naast de opslag die hem gebruikt
+  const { agendaLidSleutel, agendaZaakSleutel } = require('../kern/agenda');
+  const lidKey = (req) => agendaLidSleutel(req.session.key);
+
+  /* WAT EEN CLIENT MAG MEEGEVEN, en niets meer. Een agenda-item draagt sinds de
+     postvoorstellen ook een `bron` ("dit komt uit uw post, bericht X"), en die
+     hoort door de SERVER gezet te worden en niet door de pagina. Zou het lijf
+     rechtstreeks doorgaan, dan kon iedereen een zelfgetypte afspraak het etiket
+     "uit uw post" geven -- en dan zegt kern/postdatum.js dat er over een bericht
+     al besloten is terwijl niemand het heeft gezien. */
+  const invoer = (b) => ({ titel: b.titel, datum: b.datum, tijd: b.tijd, notitie: b.notitie });
   app.post('/api/agenda/mijn-lijst', auth, (req, res) => {
     res.json({ items: agenda.lijst(lidKey(req)), telling: agenda.telling(lidKey(req)) });
   });
   app.post('/api/agenda/toevoegen', auth, (req, res) => {
     if (geenGast(req, res)) return;
-    const r = agenda.voegToe(lidKey(req), req.body || {});
+    const r = agenda.voegToe(lidKey(req), invoer(req.body || {}));
     if (r.error) return res.status(400).json(r);
     res.json({ ok: true, items: agenda.lijst(lidKey(req)), telling: agenda.telling(lidKey(req)) });
   });
@@ -61,13 +71,16 @@ module.exports = (kern) => {
   });
 
   // ---------- leverancier ----------
-  const supKey = (req) => 'sup:' + req.supplier.code;
+  /* Ook hier de sleutelregel uit kern/agenda.js en niet nog een keer met de hand:
+     de levensgraaf leest deze agenda (kern/levensgraaf/bronnen-zaak.js), en twee
+     plekken die 'sup:' zeggen lopen vroeg of laat uiteen. */
+  const supKey = (req) => agendaZaakSleutel(req.supplier.code);
   app.post('/api/supplier/agenda/lijst', supplierAuth, (req, res) => {
     res.json({ items: agenda.lijst(supKey(req)), telling: agenda.telling(supKey(req)) });
   });
   app.post('/api/supplier/agenda/toevoegen', supplierAuth, (req, res) => {
     if (!managerOnly(req, res)) return;
-    const r = agenda.voegToe(supKey(req), req.body || {});
+    const r = agenda.voegToe(supKey(req), invoer(req.body || {}));
     if (r.error) return res.status(400).json(r);
     res.json({ ok: true, items: agenda.lijst(supKey(req)), telling: agenda.telling(supKey(req)) });
   });

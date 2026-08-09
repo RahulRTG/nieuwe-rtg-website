@@ -16,7 +16,22 @@
 const OPEN = 0, PERSOONLIJK = 1, VERTROUWELIJK = 2, BESLOTEN = 3;
 
 const vandaag = () => new Date().toISOString().slice(0, 10);
-const isDatum = d => /^\d{4}-\d{2}-\d{2}$/.test(String(d || ''));
+/* EEN VORMCONTROLE IS GEEN CONTROLE (regel 8 van de lat). Dit stond hier als
+   alleen de regex, en daar komt '2027-13-45' vrolijk doorheen: vier cijfers,
+   streepje, twee, streepje, twee. Maand dertien en dag vijfenveertig bestaan
+   niet, en wat er dan gebeurt is erger dan een weigering -- `new Date()` maakt
+   er Invalid Date van, dagenTussen() rekent op NaN, en in de tower staat
+   "over NaN dagen".
+
+   Dus: eerst de vorm, dan de vraag of de datum ECHT bestaat, door hem terug te
+   rollen. Een 31 februari komt er als 3 maart uit en klopt dan niet meer met de
+   invoer, en dat is precies het verschil tussen vorm en waarheid. */
+const isDatum = d => {
+  const t = String(d == null ? '' : d);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(t)) return false;
+  const dt = new Date(t + 'T12:00:00Z');
+  return !Number.isNaN(dt.getTime()) && dt.toISOString().slice(0, 10) === t;
+};
 /* Een gebeurtenis telt alleen mee als hij nog moet komen; een diner van vorig
    jaar is geschiedenis en hoort niet als "achterstallig" in de tower. Een
    TERMIJN (een verzekering, een paspoort) gaat hier NIET doorheen: die hoort

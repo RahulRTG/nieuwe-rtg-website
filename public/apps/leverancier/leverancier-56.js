@@ -1,7 +1,3 @@
-    el.querySelectorAll('[data-bvweg]').forEach(b => b.addEventListener('click', async () => {
-      try { await API.call('/supplier/betaalverzoek/intrek', { ref:b.dataset.bvweg }); renderZaakBoard(); } catch(e){ toast(e.message); }
-    }));
-  }
   function zbCel(n, label, waarschuw){
     return '<div class="b" style="flex:1;min-width:4.5rem;"><div class="v'+(waarschuw?' a':'')+'">'+n+'</div><div class="l">'+label+'</div></div>';
   }

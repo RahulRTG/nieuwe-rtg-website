@@ -1,6 +1,3 @@
-    const d = await API.call('/supplier/mijn/login', { login, password, bedrijf: bedrijf || '' });
-    await landMijn(d);
-  }
   // Land (of wissel) naar een van de eigen werkplekken: sessie zetten en de app openen.
   async function landMijn(d){
     API.token = d.token; state = d.state; code = d.supplier.code;

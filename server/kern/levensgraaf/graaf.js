@@ -29,21 +29,28 @@
    optellen. Dat doet ./termijnen.js, op deze graaf, en daar komt de
    Control Tower vandaan.
 
-   Gemount via ./index.js. De bronnen zelf staan in ./graaf-bronnen.js. */
+   Gemount via ./index.js. De bronnen zelf staan in ./bronnen.js. */
 'use strict';
 
-/* De gevoeligheidstrap komt uit ./graaf-hulp.js en staat hier NIET nog een keer:
+/* De gevoeligheidstrap komt uit ./hulp.js en staat hier NIET nog een keer:
    de bronnen lezen hem daar ook, en twee definities van "besloten" is precies de
    dubbeling die regel 4 van de lat verbiedt. */
-const { OPEN, PERSOONLIJK, VERTROUWELIJK, BESLOTEN } = require('./graaf-hulp');
+const { OPEN, PERSOONLIJK, VERTROUWELIJK, BESLOTEN } = require('./hulp');
 
 /* Wie mag het zien. Oplopend: wat de bureau-kant mag zien mag de Rechterhand
    ook, wat de Rechterhand mag zien mag het lid altijd. */
 const KRING = { lid: 0, rechterhand: 1, kantoor: 2 };
 
+/* De motor krijgt zijn BRONNEN mee en kiest ze niet zelf.
+
+   Hij stond hier als `require('./bronnen')`, en dat maakte hem stilzwijgend een
+   leden-graaf: de bronnenlijst bepaalde wie hij kon bedienen. Sinds de zaken
+   dezelfde tower krijgen (bronnen-zaak.js) is dat verkeerd om -- een motor die
+   zijn eigen brandstof kiest, kan er maar een soort verstoken. Nu weet hij niet
+   meer WAT hij projecteert, en dat is precies genoeg. */
 module.exports = (ctx) => {
-  const { db, vandaag } = ctx;
-  const bronnen = require('./graaf-bronnen');
+  const { db, vandaag, paspoortVervalt } = ctx;
+  const bronnen = { ALLE: ctx.bronnen || require('./bronnen').ALLE };
 
   /* De enige plek waar een knoop ontstaat. Alles loopt hierdoorheen, en daarom
      kan hier EEN regel staan die overal geldt: besloten (3) betekent alleen het
@@ -76,11 +83,17 @@ module.exports = (ctx) => {
   /* Het dossier van het lid, zonder het aan te maken. De graaf LEEST alleen:
      wie hem opvraagt hoort geen lege lijsten in de database te schrijven, want
      dan groeit db.data.lifestyle met een rij per lid dat een keer heeft gekeken.
-     Vandaar niet L(key) uit de andere modules, maar dit. */
-  function dossierVan(key) {
+     Vandaar niet L(key) uit de andere modules, maar dit.
+
+     WAAROM DIT OOK MEEGEGEVEN KAN WORDEN. Een zaak heeft geen lifestyle-dossier;
+     zijn sleutel is een leverancierscode. `db.data.lifestyle['RTG-0001']` levert
+     nu toevallig niets op, maar "levert toevallig niets op" is geen grens. De
+     zaken-graaf geeft daarom zijn eigen lezer mee, en dan KAN hij niet in een
+     ledendossier kijken -- ook niet als een code ooit op een sleutel lijkt. */
+  const dossierVan = typeof ctx.dossier === 'function' ? ctx.dossier : (key) => {
     const alle = db.data && db.data.lifestyle;
     return (alle && alle[key]) || {};
-  }
+  };
 
   /* De hele graaf van een lid: elke bron levert zijn knopen, wij plakken ze aan
      elkaar en leiden de kanten af uit `ouder`. Kanten zijn dus geen apart
@@ -95,19 +108,26 @@ module.exports = (ctx) => {
          Cellier de Control Tower stilleggen, en dat is precies het soort stille
          uitval waar regel 5 over gaat. We tellen hem, en ./nu.js zet het op het
          scherm -- niet in een log dat niemand leest. */
-      try { uit = bron.knopen(l, knoop) || []; }
+      /* Een bron krijgt er de SLEUTEL en de database bij. De veertien bronnen
+         die het dossier lezen negeren dat derde argument; ./bronnen-platform.js
+         heeft het nodig, want die leest wat het PLATFORM al van dit lid weet en
+         dat staat niet in `l`. Het contract is daarmee uitgebreid en niet
+         gebroken. */
+      try { uit = bron.knopen(l, knoop, { key, db, paspoortVervalt }) || []; }
       catch (e) { uit = [{ __stuk: bron.kamer }]; }
       for (const k of uit) knopen.push(k);
     }
     const stuk = knopen.filter(k => k.__stuk).map(k => k.__stuk);
-    const goed = knopen.filter(k => !k.__stuk);
+    // een bron die op zijn dak stuitte; zie graaf-platform.js
+    const afgekapt = knopen.filter(k => k.__afgekapt).map(k => k.__afgekapt);
+    const goed = knopen.filter(k => !k.__stuk && !k.__afgekapt);
 
     const perId = new Map(goed.map(k => [k.id, k]));
     const kanten = [];
     for (const k of goed) {
       if (k.ouder && perId.has(k.ouder)) kanten.push({ van: k.ouder, naar: k.id, band: k.soort });
     }
-    return { knopen: goed, kanten, stuk, perId };
+    return { knopen: goed, kanten, stuk, afgekapt, perId };
   }
 
   /* De graaf zoals EEN BEPAALDE KRING hem mag zien. Dit is de poort waar de
@@ -125,7 +145,7 @@ module.exports = (ctx) => {
     return {
       knopen,
       kanten: g.kanten.filter(e => zichtbaar.has(e.van) && zichtbaar.has(e.naar)),
-      stuk: g.stuk,
+      stuk: g.stuk, afgekapt: g.afgekapt,
       verborgen: g.knopen.length - knopen.length
     };
   }
@@ -149,7 +169,7 @@ module.exports = (ctx) => {
       metTermijn: g.knopen.filter(k => k.vervalt).length,
       besloten: g.knopen.filter(k => k.gevoelig >= BESLOTEN).length,
       perKamer,
-      stuk: g.stuk
+      stuk: g.stuk, afgekapt: g.afgekapt
     };
   }
 

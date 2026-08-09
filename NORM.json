@@ -10,7 +10,7 @@
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 17,
     "e2eBestanden": 69,
-    "keuringOmvang": 106,
+    "keuringOmvang": 107,
     "keuringDubbeling": 67,
     "keuringDekkingAdvies": 50,
     "endpointsNooitAangeraakt": 0,
@@ -21,14 +21,43 @@
     "keuringTeGroot": 2,
     "inlineStijlAttributen": 5656,
     "browserpoortToetsen": 103,
-    "kernBreedte": 1076,
-    "kernGedeeld": 140,
+    "kernBreedte": 1078,
+    "kernGedeeld": 142,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 146,
+    "toetsenNietGemeten": 147,
     "toetsenOngevoeligPct": 2.3
   },
   "notities": [
+    {
+      "datum": "2026-08-08",
+      "meter": "toetsenNietGemeten 148 -> 147 (BETER, en met de hand vastgezet)",
+      "reden": "De mutatiemotor is alsnog over test/postdatum.test.js en test/smtp-in.test.js gegaan: allebei GEZAKT, en allebei ook in de scherpe ronde (waarin alleen het eigen domein liegt en de deuren open blijven). Daar staat een nieuw toetsbestand tegenover dat de motor NIET kan meten -- test/vooruitscherm.e2e.js heeft een browser nodig. Netto een omlaag. Ik zet hem met de hand op 147 en gebruik --vastleggen niet: dat tilt ook meters op die deze ronde niet zijn aangeraakt.",
+      "eerlijkheidshalve": "Die schermtoets is verreweg de nuttigste van de drie geweest, en dat zegt iets over waar de blinde vlek zat. Hij vond namelijk dat de Vooruit-kaart NOOIT heeft gerenderd sinds hij bestaat: renderVooruit() stond binnen renderFacturenLid(), dus gaf het scherm 'renderVooruit is not defined' en een leeg vak -- terwijl elke API-toets groen stond, npm run check zweeg en de kruisscan er niets van kon zien (die zoekt top-level namen, en deze naam stond nergens op top-level). Dezelfde fout stond aan de leverancierskant en, niet door mij gemaakt, in apps/personeel.js: daar was het VANGNET-inlogformulier op die manier onbereikbaar, precies het formulier dat er staat omdat de app zonder inlogscherm onbruikbaar zou zijn. Regel 42 in scripts/check.js vangt de klasse nu af; hij is twee keer fout geweest voordat hij goed was (eerst objecten vergeleken in plaats van posities, daarna te weinig bindingen geteld waardoor hij loze meldingen gaf) en is pas vastgezet nadat ik hem op de echte fout heb zien AFGAAN en na herstel weer zien zwijgen."
+    },
+    {
+      "datum": "2026-08-08",
+      "meter": "toetsenNietGemeten 147 -> 148",
+      "reden": "test/smtp-in.test.js is erbij: de SMTP-ontvanger, de deur die post van buiten AANNEEMT. Noemer en geen kwaliteit -- de mutatiemotor is er nog niet langs. kernBreedte staat stil en dat is geen toeval: `mailAanname` komt erbij als kern-naam, maar `mailAuth` verdwijnt uit routes/mailpost.js omdat de stempelketen nu in kern/mailaanname.js woont. Een naam erbij, een naam eraf.",
+      "eerlijkheidshalve": "Er zijn TIEN mutaties met de hand op deze toetsen losgelaten en alle tien bijten ze. Twee sloegen eerst af, en dat waren de twee belangrijkste bevindingen van deze ronde. (1) kern/mailaanname.js elk adres in ONZE EIGEN domeinen laten accepteren veranderde niets zichtbaars: de socket-toetsen weigerden een VREEMD domein, en dat gaat langs een andere regel. (2) De domeincontrole helemaal weghalen bleef ook onopgemerkt -- terwijl juist die een open relay voorkomt: kern/werkmail.js schrijft UITGAANDE post naar buiten ook als logregel in RTMAIL weg, dus zodra een partner een klant op gmail mailt, LIGT er post op dat gmail-adres. Zonder de domeincontrole zou 'waar post ligt, woont iemand' daarop ja zeggen en namen wij post aan voor gmail-adressen die onze eigen partners ooit hebben gemaild. Beide gaten zijn nu met een toets afgedekt die zakt als de regel verdwijnt. Een derde bevinding kwam van de meter zelf en niet van een mutatie: `mailAanname` was wel in routes/mailpost.js uitgepakt maar nooit in server.js doorgegeven, en scripts/grensmeld.js meldde GEEN gat -- die meldt namen die bestaan maar niet mogen, niet namen die helemaal niet bestaan. De route had bij het eerste verzoek op undefined gestaan."
+    },
+    {
+      "datum": "2026-08-08",
+      "meter": "kernBreedte 1077 -> 1078; kernGedeeld 141 -> 142; keuringOmvang 106 -> 107; toetsenNietGemeten 146 -> 147",
+      "reden": "De postdatums (kern/postdatum.js + kern/postdatum-lezer.js): de datums die per POST binnenkomen, als voorstel. Een kern-naam erbij (`postdatum`), en die wordt meteen door twee domeinen aangeraakt -- member en supplier krijgen dezelfde drie routes, want een zaak heeft dit harder nodig dan een lid (een keuringsafspraak komt vrijwel altijd per mail). Dat is dezelfde afweging als bij `levensgraaf` een commit eerder: een tweede lezer naast de eerste zou de dubbeling zijn die regel 4 verbiedt. keuringOmvang: postdatum-lezer.js staat met 9527 bytes in de waarschuwingsband. Ik heb hem NIET geknipt -- het leeuwendeel is de kop die uitlegt waarom '03/04/2026' wordt OVERGESLAGEN in plaats van geraden, en die uitleg hoort bij de regel te staan die hij verdedigt. Wat ik wel heb geknipt is kernlaag3.js: die kwam door de nieuwe montage in de band en is op een echte naad gesplitst (kernlaag3b.js draagt levensgraaf + bureau + postdatum, die samen een keten zijn). Netto dus een en niet twee. toetsenNietGemeten: test/postdatum.test.js is er nieuw en de mutatiemotor is er nog niet langs -- noemer, geen kwaliteit.",
+      "eerlijkheidshalve": "Dat de motor er nog niet langs is, betekent NIET dat deze toetsen niet zijn uitgedaagd: er zijn er acht met de hand op losgelaten (de twijfelregel weg, de vandaag-controle terug naar een vormcontrole, de datumcontrole bij neem() weg, het lijf weer rechtstreeks door bij agenda/toevoegen, negeer() dat niets bewaart, de managerpoort weg, 'besloten' dat de agenda niet meer leest, geenGast weg) en alle acht bijten. Twee daarvan waren echte bevindingen en geen bevestigingen: de vandaag-controle was een VORMcontrole waar '2026-13-45' doorheen kwam -- precies regel 8, en dezelfde fout die eerder in de graaf zat -- en het lijf van /api/agenda/toevoegen liep rechtstreeks door naar de opslag, waardoor een pagina zelf het etiket 'uit uw post' kon opplakken. Wat hier NIET wordt beweerd: dat de lezer elke datum in elke mail vindt. Hij kent drie vormen en slaat de twijfelgevallen over, en hij telt hardop hoeveel hij liet liggen."
+    },
+    {
+      "datum": "2026-08-08",
+      "meter": "kernGedeeld 140 -> 141 (met de hand VERHOOGD)",
+      "reden": "`levensgraaf` wordt vanaf nu door TWEE domeinen aangeraakt: member (/api/member/vooruit) en supplier (/api/supplier/vooruit). Dat is geen slordige koppeling maar precies wat deze ronde beoogde: een RTG-kantoor heeft hetzelfde probleem als een lid -- er komen dingen op hem af met een datum, verspreid over zijn eigen schermen -- en de motor die dat voor een lid oplost stond er al. De alternatieven waren allebei slechter: een tweede tower naast de eerste is de dubbeling die regel 4 van de lat verbiedt, en de bestaande tower NIET aansluiten omdat de meter dan een punt stijgt, is de meter dienen in plaats van de lezer. Er is geen kern-naam bijgekomen (kernBreedte blijft 1077); er is er een die nu twee kanten bedient.",
+      "eerlijkheidshalve": "Deze meter bewaakt echte koppeling en het doel staat op onder de 100, dus hem omhoog zetten hoort te steken. Wat het draaglijk maakt is dat de twee kanten elkaar niet kunnen raken: de zaken-graaf krijgt zijn eigen bronnenlijst (kern/levensgraaf/bronnen-zaak.js), zijn eigen lege dossierlezer en GEEN lijn naar de identiteitskluis, en hij staat onder een eigen naam (`levensgraaf.zaak`) zodat niemand per ongeluk de ledengraaf te pakken heeft. Dat is met een mutatie nagetrokken: de lezer weghalen laat een toets zakken. Wat het NIET is: een kantoorscherm dat leden ziet -- de klant staat er op codenaam en alleen als hij bij DEZE zaak heeft geboekt."
+    },
+    {
+      "datum": "2026-08-07",
+      "meter": "kernBreedte 1076 -> 1077",
+      "reden": "Een kern-naam erbij: `levensgraaf`. De graaf en de Control Tower zaten in kern/bureau en daarmee achter de Lifestyle Pass; ze staan nu in een eigen kern-module die voor ELKE pas geldt, ook de gratis. Dat is de hele bedoeling van die verhuizing -- een gratis lid heeft ook een paspoort dat verloopt. Het kantoor leunt erop in plaats van hem te bezitten, dus er is geen tweede kopie: kern/bureau geeft de motor door aan zijn eigen onderdelen. Een van de vijfenzeventig functies van dat kantoor is hierdoor GEEN kern-naam meer geworden, dus netto is dit precies een."
+    },
     {
       "datum": "2026-08-07",
       "meter": "kernBreedte 1074 -> 1076",

@@ -16,7 +16,7 @@
    de To-kop van het bericht zelf. Een poort die de ontvanger uit een parameter
    haalt, is een open relay met extra stappen. */
 module.exports = (kern) => {
-  const { app, officeAuth, auth, supplierAuth, db, mailQ, mailIn, mailAuth, mailBijlage, rtmail, rtmailRecht, codenaamVan } = kern;
+  const { app, officeAuth, auth, supplierAuth, db, mailQ, mailIn, mailBijlage, mailAanname, rtmail, rtmailRecht, codenaamVan } = kern;
   const wie = require('../kern/rtmail-wie')({ db, rtmail, codenaamVan });
   const body = (req) => (req && req.body) || {};
 
@@ -40,60 +40,35 @@ module.exports = (kern) => {
 
   /* ---- de buitenpoort ----
      PUBLIEK met opzet: een vreemde mailserver heeft geen inlog. De rem staat
-     hieronder en de baan is altijd de onbetrouwde. */
+     hieronder en de baan is altijd de onbetrouwde.
+
+     DE KETEN ZELF STAAT HIER NIET MEER. Ontleden, stempelen, het origineel
+     bewaren, de ontvanger toetsen, bezorgen en de bijlagen scannen doet
+     kern/mailaanname.js -- want sinds server/smtp-in.js bestaat, zijn er TWEE
+     deuren naar dezelfde kamer, en twee kopieen van die keten lopen uiteen op
+     de plek waar het het meest kost (regel 4 van de lat). Wat hier blijft is
+     wat ALLEEN over deze deur gaat: de rem per minuut, en het antwoord in JSON.
+
+     WAT ER WEL IS VERANDERD voor deze poort: een bericht aan een adres dat hier
+     geen postvak is, wordt nu geweigerd (550) in plaats van bezorgd. Dat was
+     eerder een berg post voor niemand, in een postvak dat vanzelf ontstond. */
   let venster = 0, teller = 0;
   app.post('/api/mail/binnen', async (req, res) => {
     const min = Math.floor(Date.now() / 60000);
     if (min !== venster) { venster = min; teller = 0; }
     if (++teller > 120) return res.status(429).json({ error: 'De buitenpoort staat even dicht; probeer het over een minuut.' });
 
-    const ruw = String(body(req).bericht || '');
-    const ip = String(body(req).ip || '') || req.ip;
-    const d = mailIn.ontleed(ruw, { publiekeSleutel: body(req).publiekeSleutel, ip });
-    if (d.error) return res.status(400).json({ error: d.error });
-
-    /* SPF en DMARC ECHT opzoeken. Dit is de enige plek waar de buitenpoort het
-       netwerk op gaat, en een storing daar mag de bezorging niet tegenhouden:
-       de uitslag valt dan terug op wat er zonder DNS te zeggen valt. Post die
-       binnen is, hoort bezorgd te worden -- de uitslag is een STEMPEL, geen
-       poortwachter. */
-    try {
-      d.controles = await mailIn.stempelVol(d.koppen, ruw.slice(ruw.search(/\r?\n\r?\n/)).replace(/^\r?\n\r?\n/, ''),
-        { publiekeSleutel: body(req).publiekeSleutel, ip, envelopeVan: body(req).envelopeVan, helo: body(req).helo, auth: mailAuth });
-    } catch (e) {
-      d.controles.let = 'De SPF- en DMARC-controle liep vast (' + (e && e.message) + '); het bericht is wel bezorgd.';
+    const b = body(req);
+    const r = await mailAanname.neemAan({ ruw: String(b.bericht || ''),
+      ip: String(b.ip || '') || req.ip, envelopeVan: b.envelopeVan, helo: b.helo,
+      publiekeSleutel: b.publiekeSleutel });
+    if (r.error) {
+      /* 550 is een SMTP-code en geen HTTP-code; over deze deur wordt dat een
+         404 -- het adres bestaat niet. De rest blijft 400. */
+      const status = r.status === 550 ? 404 : (r.status || 400);
+      return res.status(status).json({ error: r.error, ...(r.origineel ? { origineel: r.origineel } : {}) });
     }
-
-    /* Het origineel eerst, de afgeleide daarna. In die volgorde: gaat de
-       bezorging mis, dan hebben we de bytes nog steeds. */
-    const bewaard = mailIn.bewaarOrigineel(ruw, null);
-    const naar = d.naar || '';
-    if (!naar) return res.status(400).json({ error: 'Dit bericht heeft geen ontvanger in de To-kop.', origineel: bewaard.id });
-
-    /* Alles van buiten valt in de onbetrouwde baan -- links blijven onklikbaar.
-       BIJLAGEN GAAN NU WEL DOOR, maar alleen langs de scanner: wat schoon is
-       wordt bewaard, wat dat niet is verdwijnt MET de reden erbij. De regel is
-       niet veranderd, alleen de weg ernaartoe bestaat nu (kern/mailbijlage.js).
-       Dat gebeurt hieronder pas, want een bijlage hangt aan een bericht en dat
-       moet er dus eerst zijn. */
-    const controles = '\n\n[Controles: DKIM ' + d.controles.dkim + '; SPF ' + d.controles.spf + '; DMARC ' + d.controles.dmarc + '.]';
-    const m = rtmail.stuur({ van: d.van, naar, onderwerp: d.onderwerp,
-      tekst: d.tekst + controles, soort: 'extern', bron: 'extern' });
-    if (m && m.error) return res.status(400).json({ error: m.error, origineel: bewaard.id });
-
-    const bijlagen = mailBijlage.verwerk(m.id, d.bijlagen, { van: d.van });
-    const geweigerd = bijlagen.filter(b => !b.bewaard);
-    if (bijlagen.length) {
-      /* De uitkomst gaat in de TEKST van het bericht, niet alleen in het
-         antwoord aan de mailserver. Die server leest dit nooit; de ontvanger
-         wel, en die hoort te weten dat er iets bij zat en wat ermee gebeurd
-         is -- juist als het geweigerd werd. */
-      m.tekst += '\n\n[Bijlagen: ' + bijlagen.map(b => b.naam + (b.bewaard ? '' : ' -- GEWEIGERD: ' + b.waarom)).join('; ') + ']';
-    }
-
-    res.json({ ok: true, id: m.id, origineel: bewaard.id, controles: d.controles,
-      bijlagen, geweigerd: geweigerd.length,
-      let: 'Het originele bericht is onveranderd bewaard; wat in het postvak staat is een afgeleide. Bijlagen zijn door de scanner gegaan; alleen wat schoon was, is bewaard.' });
+    res.json(r);
   });
 
   /* EEN BIJLAGE OPENEN. Twee ingangen (lid en zaak), en beide toetsen eerst of

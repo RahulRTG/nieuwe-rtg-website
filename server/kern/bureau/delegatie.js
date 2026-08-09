@@ -53,6 +53,13 @@ const DOMEINEN = [
   { id: 'gelegenheden', naam: 'Gelegenheden en gasten', dak: 3 },
   { id: 'gezelschap', naam: 'Gezelschap en staf', dak: 3 },
   { id: 'collectie', naam: 'Collecties', dak: 3 },
+  { id: 'dieren', naam: 'Dieren', dak: 4 },
+  { id: 'beveiliging', naam: 'Beveiliging', dak: 3 },
+  /* Reputatie komt niet boven "voorbereiden". Wat er namens u naar buiten gaat,
+     gaat niet zonder u -- ook niet als u ons vertrouwt. Dat is dezelfde soort
+     grens als bij gezondheid en nalatenschap, alleen een trede hoger: wij mogen
+     alles klaarzetten, u zegt het. */
+  { id: 'reputatie', naam: 'Reputatie en pers', dak: 2 },
   { id: 'filantropie', naam: 'Filantropie', dak: 2 },
   { id: 'vermogen', naam: 'Vermogen', dak: 2 },
   { id: 'gezondheid', naam: 'Gezondheid', dak: 1 },

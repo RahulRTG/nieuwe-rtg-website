@@ -28,7 +28,10 @@
      gastzorg
      assets
      lifestyle
-     rechterhand */
+     rechterhand
+
+   Het Privekantoor en wat eromheen hangt (levensgraaf, bureau, postdatum) staat
+   in ./kernlaag3b.js -- zie de kop daar waarom die drie bij elkaar horen. */
 'use strict';
 
 module.exports = (kern, hulp) => {
@@ -129,13 +132,4 @@ Object.assign(kern, require('../kern/assets')({ db, save, crypto, schoon, notify
 Object.assign(kern, require('../kern/lifestyle')({ db, save, crypto, anthropic, liveCodename, notify }));
 // De extra premium ROS-apps van de Lifestyle Pass: Reisboek, Cellier, Table, Maison
 Object.assign(kern, require('../kern/rechterhand')({ db, save, crypto, liveCodename, anthropic, DATA_DIR }));
-/* Het Privékantoor: de ENE app die de veertien premium-apps aan elkaar knoopt.
-   Life Graph, Control Tower, delegatie en zaken. Staat NA de twee hierboven
-   omdat hij op hun dossiers projecteert; hij schrijft er niets in terug. */
-/* bezitZet komt uit de lifestyle-mount hierboven: een inkoopzaak die geregeld
-   is, schrijft zichzelf in het Bezittingenregister via de functie van die app.
-   Vandaar dat deze regel NA die twee moet staan -- kern.bezitZet bestaat pas
-   dan. */
-Object.assign(kern, require('../kern/bureau')({ db, save, crypto, anthropic, liveCodename, notify,
-  bezitZet: kern.bezitZet }));
 };

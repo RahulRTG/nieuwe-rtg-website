@@ -5427,6 +5427,8 @@
 
   async function renderZaakBoard(){
     const el = $('#boardroomWrap'); if (!el) return;
+    renderVooruitSup();   // wat er vanzelf op de zaak afkomt (55c), boven de agenda
+    renderPostSup();      // en wat er uit de post te bevestigen valt (55d)
     renderAgendaSup();
     let d; try { d = await API.call('/supplier/zaak/board'); } catch(e){ return; }
     const zbChips = '<div style="display:flex;flex-wrap:wrap;gap:0.4rem;">'+
@@ -5554,6 +5556,139 @@
     });
     el.querySelectorAll('[data-bvweg]').forEach(b => b.addEventListener('click', async () => {
       try { await API.call('/supplier/betaalverzoek/intrek', { ref:b.dataset.bvweg }); renderZaakBoard(); } catch(e){ toast(e.message); }
+    }));
+  }
+/* DIT SLUITHAAKJE HOORT HIER, EN NIET EEN BESTAND VERDEROP.
+
+   Het stond bovenaan 56.js, waardoor renderZaakBoard() pas daar dichtging en
+   alles wat ertussen stond BINNEN die functie kwam te liggen -- zoals de
+   Vooruit-kaart en de postvoorstellen van deze zaak (55c/55d). Aan deze kant
+   viel dat niet meteen op, want renderZaakBoard roept ze zelf aan en een
+   functieverklaring hijst binnen zijn eigen functie. Kapot was het toch: de
+   `let`-variabelen ernaast werden bij ELKE render opnieuw op null gezet, dus de
+   kaart haalde zijn gegevens elke keer opnieuw op en onthield niets.
+
+   Aan de ledenkant liep dezelfde fout wel meteen stuk ("renderVooruit is not
+   defined"). Zie de gelijkluidende opmerking in apps/app-main/app-main-53.js. */
+  /* ---------- "Vooruit": wat er op de zaak afkomt ----------
+
+     De tegenhanger van de Vooruit-kaart in de ledenapp (app-main/app-main-53b.js),
+     op dezelfde motor: kern/levensgraaf, met de code van de zaak als eigenaar.
+     Boven de agenda, en dat is met opzet -- de agenda is wat u ZELF plant, dit is
+     wat er vanzelf op u afkomt.
+
+     NIEMAND TYPT HIER IETS IN. Elke regel komt uit iets wat de zaak al deed: een
+     boeking die is binnengekomen, een afspraak die in de agenda staat. Daarom
+     staat er ook bij WAAR het vandaan komt; een lijst die zichzelf vult verdient
+     die verantwoording, anders is het een lijst waarvan niemand weet wie hem bijhoudt.
+
+     Deelt de IIFE-scope met 54/55: API, T, esc, lang, $, actor komen daarvandaan. */
+  let vooruitSupData = null;
+  async function laadVooruitSup(){
+    if (!API.live) return;
+    try { vooruitSupData = await API.call('/supplier/vooruit', {}); } catch(e){ vooruitSupData = { fout: true }; }
+  }
+  function renderVooruitSup(){
+    const el = $('#vooruitSupCard'); if (!el) return;
+    /* Alleen de manager, net als de agenda ernaast: hier staan klanten (op
+       codenaam) en verplichtingen van de zaak, en dat is geen dienstrooster. */
+    if (!actor().manager){ el.innerHTML = ''; return; }
+    if (!vooruitSupData){ el.innerHTML = ''; laadVooruitSup().then(renderVooruitSup); return; }
+    const d = vooruitSupData;
+    if (d.fout){ el.innerHTML = ''; return; }
+    const dagLbl = x => { try { return new Date(x+'T12:00:00').toLocaleDateString(lang()==='en'?'en-GB':'nl-NL',{day:'numeric',month:'short'}); } catch(e){ return x; } };
+    const regel = r => '<div class="vo-rij"><span>'+esc((r.waarvan ? r.waarvan+' · ' : '')+r.naam)+'</span>'+
+      '<span class="vo-dag">'+esc(dagLbl(r.datum))+'</span></div>';
+    let h = '<div class="card"><div class="tt-h">'+T('vo.titel','Vooruit')+
+      (d.achterstallig.length ? ' <span class="vo-let">('+d.achterstallig.length+')</span>' : '')+'</div>';
+    if (!d.totaal){
+      h += '<div class="vo-fijn vo-mt">'+T('sup.vo.leeg','Er staat nog niets met een datum op deze zaak. Zodra er een boeking binnenkomt of u iets in de agenda zet, verschijnt het hier vanzelf.')+'</div>';
+    } else {
+      if (d.achterstallig.length){
+        h += '<div class="vo-groep laat">'+T('vo.laat','Al voorbij')+'</div>';
+        h += d.achterstallig.slice(0,4).map(regel).join('');
+      }
+      for (const v of d.vensters){
+        if (!v.aantal) continue;
+        h += '<div class="vo-groep">'+esc(v.label)+'</div>';
+        h += v.items.slice(0,5).map(regel).join('');
+        break;   // alleen het eerstvolgende gevulde venster; dit is een kaart, geen lijst
+      }
+      h += '<div class="vo-fijn vo-mt2">'+T('vo.bron','Automatisch verzameld uit')+': '+esc(d.bronnen.join(', '))+'.</div>';
+    }
+    for (const a of (d.afgekapt || [])) h += '<div class="vo-fijn vo-dak">'+T('vo.dak','Wij tonen de eerste')+' '+a.dak+' '+T('vo.uit','uit')+' '+esc(a.bron)+'.</div>';
+    for (const s2 of (d.stuk || [])) h += '<div class="vo-fijn vo-let">'+T('vo.stuk','Wij kunnen dit deel nu niet uitlezen')+': '+esc(s2)+'.</div>';
+    h += '</div>';
+    el.innerHTML = h;
+  }
+  /* De post-voorstellen van de zaak: datums die zichzelf aandienen.
+
+     Dezelfde kaart als in de ledenapp (app-main/app-main-53c.js), op het postvak
+     van de zaak. Voor een kantoor is dit eerder regel dan uitzondering: een
+     leveringsbevestiging, een keuringsafspraak, een inspectie -- die komen bijna
+     allemaal per post binnen en staan daarna nergens meer.
+
+     ER GAAT NIETS VANZELF. Wat hier staat komt uit gewone taal in een bericht,
+     en dat raden gaat vaak goed en soms mis. Vandaar de ZIN erbij en een knop
+     ervoor. Zie de kop van server/kern/postdatum.js.
+
+     Deelt de IIFE-scope met 54/55: API, T, esc, lang, $, actor komen daarvandaan. */
+  let postSupData = null;
+  async function laadPostSup(){
+    if (!API.live) return;
+    try { postSupData = await API.call('/supplier/vooruit/post', {}); } catch(e){ postSupData = { fout: true }; }
+  }
+  function renderPostSup(){
+    const el = $('#postSupCard'); if (!el) return;
+    // alleen de manager; de route weigert de rest ook, dit voorkomt een lege kaart
+    if (!actor().manager){ el.innerHTML = ''; return; }
+    if (!postSupData){ el.innerHTML = ''; laadPostSup().then(renderPostSup); return; }
+    const d = postSupData;
+    if (d.fout){ el.innerHTML = ''; return; }
+    if (!d.voorstellen || !d.voorstellen.length){
+      /* Een lege kaart mag niet lezen als "er stond niets in de post" terwijl de
+         lezer wel iets heeft laten liggen. */
+      el.innerHTML = d.overgeslagen
+        ? '<div class="card"><div class="tt-h">' + T('po.titel','Uit uw post') + '</div>'
+          + '<div class="vo-fijn vo-mt">' + T('po.niets','Wij vonden geen datum die wij met zekerheid konden lezen.') + ' '
+          + d.overgeslagen + ' ' + T('po.over','stonden er te twijfelachtig bij (bijvoorbeeld 03/04: dat is 3 april of 4 maart).') + '</div></div>'
+        : '';
+      return;
+    }
+    const dagLbl = x => { try { return new Date(x+'T12:00:00').toLocaleDateString(lang()==='en'?'en-GB':'nl-NL',{day:'numeric',month:'short'}); } catch(e){ return x; } };
+    let h = '<div class="card"><div class="tt-h">' + T('po.titel','Uit uw post')
+      + ' <span class="vo-let">(' + d.voorstellen.length + ')</span></div>'
+      + '<div class="vo-fijn vo-mt">' + T('po.uitleg2','Dit vonden wij in de post van deze zaak. Er gaat niets vanzelf in de agenda; u bevestigt.') + '</div>';
+    for (const v of d.voorstellen.slice(0,6)){
+      h += '<div class="po-blok"><div class="po-van">' + esc(v.van)
+        + (v.vertrouwd ? '' : ' · <span class="vo-let">' + T('po.buiten','van buiten') + '</span>') + '</div>'
+        + '<div class="po-ond">' + esc(v.onderwerp) + '</div>';
+      for (const dt of v.datums.slice(0,3)){
+        h += '<div class="vo-rij"><span>' + esc(dt.zin) + '</span><span class="vo-dag">'
+          + esc(dagLbl(dt.datum)) + (dt.tijd ? ' ' + esc(dt.tijd) : '') + '</span></div>'
+          + '<div class="po-knoppen"><button class="obtn primary" data-poneem="' + esc(v.id)
+          + '" data-podag="' + esc(dt.datum) + '" data-potitel="' + esc(v.onderwerp) + '">'
+          + T('po.zet2','Zet in de agenda') + '</button></div>';
+      }
+      h += '<div class="po-knoppen"><button class="obtn" data-poweg="' + esc(v.id) + '">'
+        + T('po.weg','Niet nodig') + '</button></div></div>';
+    }
+    if (d.overgeslagen) h += '<div class="vo-fijn vo-dak">' + d.overgeslagen + ' '
+      + T('po.over2','datums waren te twijfelachtig om voor te stellen.') + '</div>';
+    h += '</div>';
+    el.innerHTML = h;
+
+    // na een besluit opnieuw ophalen: de tower ernaast is er ook door veranderd
+    const opnieuw = () => { postSupData = null; vooruitSupData = null; agendaSupData = null;
+      renderPostSup(); renderVooruitSup(); laadAgendaSup(); };
+    el.querySelectorAll('[data-poneem]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/vooruit/post/neem',
+        { id: b.dataset.poneem, datum: b.dataset.podag, titel: b.dataset.potitel }); opnieuw(); }
+      catch(e){ toast(e.message); }
+    }));
+    el.querySelectorAll('[data-poweg]').forEach(b => b.addEventListener('click', async () => {
+      try { await API.call('/supplier/vooruit/post/negeer', { id: b.dataset.poweg }); opnieuw(); }
+      catch(e){ toast(e.message); }
     }));
   }
   function zbCel(n, label, waarschuw){

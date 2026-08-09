@@ -42,50 +42,8 @@
    Gemount via ./index.js. */
 'use strict';
 
-// de twee kamers die nooit door een ander verzoek worden meegenomen
-const NOOIT = new Set(['gezondheid', 'nalatenschap']);
-
-/* De keten per domein. Elk stuk noemt het domein waaronder het VALT -- niet het
-   domein van het verzoek -- want daar hangt zijn mandaat aan. */
-const K = (domein, wat, waarom) => ({ domein, wat, waarom });
-const KETEN = {
-  reizen: [
-    K('gezelschap', 'Reisdocumenten van uw gezelschap', 'Een paspoort dat tijdens uw reis verloopt, verloopt op de verkeerde plek.'),
-    K('huishouden', 'Het huis tijdens uw afwezigheid', 'Personeel, post, toezicht en de dingen die doorlopen.'),
-    K('vervoer', 'Heen en terug, en wat er blijft staan', 'Ook een wagen die stilstaat heeft zijn keuring.'),
-    K('kring', 'Wat u in die weken zou missen', 'Verjaardagen en afspraken vallen niet stil omdat u weg bent.'),
-    K('gelegenheden', 'Toezeggingen in die periode', 'Wat u al had toegezegd, zegt u liever nu af dan later.')
-  ],
-  gelegenheden: [
-    K('kring', 'Gasten en uitnodigingen', 'Wie komt er, en wat weten wij al van hen?'),
-    K('gezelschap', 'Personeel voor die avond', 'Bediening, keuken en wie er blijft.'),
-    K('collectie', 'Wijn uit uw kelder', 'Wat staat er klaar, en wat drinkt nu op zijn mooist?'),
-    K('huishouden', 'De woning gereed', 'Schoonmaak, inrichting en wat er die dag nog moet gebeuren.'),
-    K('vervoer', 'Vervoer voor uw gasten', 'Halen, brengen en waar iedereen parkeert.')
-  ],
-  huishouden: [
-    K('gezelschap', 'Wie het uitvoert', 'Uw vaste mensen, of iemand die wij erbij halen.'),
-    K('vermogen', 'Wat het aan de woning verandert', 'Verbouwing en onderhoud raken de waarde en de polis.')
-  ],
-  vervoer: [
-    K('vermogen', 'Verzekering en waarde', 'Een aanschaf of ingreep hoort in het register te staan.'),
-    K('gezelschap', 'Wie ermee rijdt', 'Chauffeur, sleutels en de afspraken eromheen.')
-  ],
-  collectie: [
-    K('vermogen', 'Taxatie en polis', 'Wat u toevoegt, hoort verzekerd en getaxeerd te zijn.'),
-    K('huishouden', 'Waar het komt te staan', 'Klimaat, ruimte en beveiliging.')
-  ],
-  kring: [
-    K('gelegenheden', 'Het moment zelf', 'Een attentie is vaak een afspraak in vermomming.')
-  ],
-  vermogen: [
-    K('huishouden', 'Wat het in huis betekent', 'Een aankoop moet ergens staan en verzorgd worden.')
-  ],
-  gezelschap: [
-    K('huishouden', 'Het rooster thuis', 'Wie er komt en wanneer raakt het huishouden.')
-  ],
-  filantropie: []
-};
+// De keten per domein staat als tabel in ./keten.js.
+const { KETEN, NOOIT } = require('./keten');
 
 module.exports = (ctx) => {
   const { graaf, cases, beoordeel, rid, inAanbouw } = ctx;

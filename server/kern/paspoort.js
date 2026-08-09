@@ -55,6 +55,22 @@ function maakPaspoort({ db, save, crypto, accounts, notify, notifySupplier, sseT
     try { return accounts.getUserById(Number(m[1])); } catch (e) { return null; }
   }
   function memberState(u) { try { return accounts.getMemberState(u.id) || {}; } catch (e) { return {}; } }
+
+  /* De vervaldatum van het eigen reisdocument, of null.
+
+     Bestaat omdat de levensgraaf hem nodig heeft en hem NIET zelf moet gaan
+     opzoeken: dan zou er een vijftiende kopie van /^user-(\d+)$/ in de code
+     komen (er zijn er al veertien) en zou de graaf moeten weten hoe het
+     ledendossier heet. De vraag "wanneer verloopt het paspoort van dit lid"
+     hoort in de module die over paspoorten gaat, en het antwoord is een datum
+     -- niet het dossier, niet het nummer, niet de nationaliteit. Wie alleen
+     hoeft te waarschuwen, hoort ook alleen de datum te krijgen. */
+  function vervaldatumVan(key) {
+    const u = accountVanKey(key);
+    if (!u) return null;
+    const p = (memberState(u) || {}).paspoort || {};
+    return /^\d{4}-\d{2}-\d{2}$/.test(String(p.vervaldatum || '')) ? p.vervaldatum : null;
+  }
   function leeftijdVanAccount(u) {
     const geboren = (memberState(u) || {}).geboren || null;
     return geboren ? leeftijdVan(geboren) : null;
@@ -131,7 +147,7 @@ function maakPaspoort({ db, save, crypto, accounts, notify, notifySupplier, sseT
   return {
     NIVEAUS, mijnStatus, vraag, beslis, trekIn, bekijk,
     dienIncidentIn, beoordeelIncident, mijnVerzoeken, partnerVerzoeken,
-    incidentenVoorOffice, vervalOpschonen
+    incidentenVoorOffice, vervalOpschonen, paspoortVervaldatumVan: vervaldatumVan
   };
 }
 

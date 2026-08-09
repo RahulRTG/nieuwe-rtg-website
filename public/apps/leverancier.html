@@ -378,6 +378,22 @@
   .actor-chip .av{width:24px;height:24px;border-radius:50%;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:0.66rem;font-weight:700;color:var(--gold);}
   .actor-chip .nm{font-size:0.72rem;font-weight:600;max-width:88px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 
+  /* "Vooruit": dezelfde kaart als aan de ledenkant (public/apps/app.html) */
+  .vo-kop{font-size:0.8rem;}
+  .vo-groep{font-size:0.68rem;color:var(--soft);margin-top:0.5rem;}
+  .vo-groep.laat{color:#E0736A;}
+  .vo-rij{display:flex;justify-content:space-between;gap:0.5rem;font-size:0.78rem;margin-top:0.4rem;}
+  .vo-dag{color:var(--muted);white-space:nowrap;}
+  .vo-let{color:#E0736A;}
+  .vo-dak{color:#E0B84C;}
+  .vo-fijn{font-size:0.7rem;color:var(--soft);}
+  .vo-mt{margin-top:0.4rem;}
+  .vo-mt2{margin-top:0.5rem;}
+  .po-blok{border-top:1px solid var(--line);margin-top:0.6rem;padding-top:0.5rem;}
+  .po-van{font-size:0.66rem;color:var(--soft);}
+  .po-ond{font-size:0.8rem;font-weight:600;}
+  .po-knoppen{display:flex;gap:0.4rem;margin-top:0.35rem;flex-wrap:wrap;}
+
   /* team-tab */
   .tt-h{font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--soft);}
   .tt-person{display:flex;align-items:center;gap:0.7rem;padding:0.7rem 0;border-bottom:1px solid var(--line);}
@@ -883,6 +899,8 @@
       <div class="view" data-view="boardroom">
         <h2 data-i18n="sup.v.boardroom">Boardroom</h2>
         <p class="sub" data-i18n="sup.v.boardroom.sub">Uw schakelkast: functies, HR en marketing in één blik.</p>
+        <div id="vooruitSupCard"></div>
+        <div id="postSupCard"></div>
         <div id="agendaSupCard"></div>
         <div id="boardroomWrap"></div>
       </div>

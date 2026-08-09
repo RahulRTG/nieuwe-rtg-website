@@ -127,6 +127,10 @@ module.exports = (kern) => {
   require('./member/rendezvous')(kern);
   // Het Privekantoor: de ENE app van de Lifestyle Pass (graaf, tower, delegatie, zaken)
   require('./member/bureau')(kern);
+  /* "Vooruit": dezelfde Control Tower, maar voor ELKE pas -- ook de gratis. De
+     motor (kern/levensgraaf) is niet premium; wat je met een datum kunt is dat
+     wel. Zie de kop van routes/member/vooruit.js. */
+  require('./member/vooruit')(kern);
   // RTG Pulse: het eigen 9+-microblog op codenaam
   require('./member/pulse')(kern);
   // De Berichten-app: alle gesprekken van het platform op een plek (de lijst),

@@ -1,6 +1,3 @@
-    const aiGo = document.getElementById('factLidAiGo'); if (aiGo){ const doe = async () => { const opdracht = document.getElementById('factLidAiIn').value.trim(); if (!opdracht) return; const out = document.getElementById('factLidAiOut'); out.innerHTML = '<div class="fineprint">…</div>'; try { const r = await API.call('/facturen/ai', { opdracht }); out.innerHTML = '<div class="fineprint" style="color:var(--txt);white-space:pre-wrap;">'+esc(r.antwoord)+'</div>'; document.getElementById('factLidAiIn').value=''; if (r.overzicht){ memberFacturen = r.overzicht; } } catch(e){ out.innerHTML = '<div class="fineprint" style="color:#E0736A;">'+esc(e.message)+'</div>'; } }; aiGo.addEventListener('click', doe); const i2 = document.getElementById('factLidAiIn'); if (i2) i2.addEventListener('keydown', e => { if (e.key==='Enter') doe(); }); }
-  }
-
   /* ---------- de Toestelkluis: eigen kopieen op het eigen toestel ----------
      Elke download (factuur, overzicht) krijgt stil een kopie in de prive
      browseropslag van dit toestel; hier ziet het lid ze, opent of wist ze.
@@ -68,6 +65,14 @@
       (myApps && myApps.length ? rij(T('bo2.sollicitaties','Sollicitaties'), String(myApps.length)) : ''));
 
     // interactieve AI-agenda
+    /* "Vooruit": uw termijnen, voor ELKE pas -- ook de gratis app. De motor
+       (kern/levensgraaf) zit niet achter een pas, want een gratis lid heeft ook
+       een paspoort dat verloopt en een boeking die komt. Vandaar geen
+       tier-controle op deze regel, in tegenstelling tot de twee eronder. */
+    html += '<div id="boVooruitCard"></div>';
+    /* En de voorstellen uit de eigen post (53c). Wel achter "geen gast": een
+       gast heeft geen postvak, dus die kaart zou voor hem altijd leeg zijn. */
+    if (user.tier !== 'guest') html += '<div id="boPostCard"></div>';
     if (user.tier !== 'guest') html += '<div id="boAgendaCard"></div>';
     // mijn facturen (automatisch bij elke aankoop)
     if (user.tier !== 'guest') html += '<div id="boFacturenCard"></div>';

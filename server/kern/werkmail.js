@@ -86,6 +86,12 @@ module.exports = ({ db, save, crypto, rtmail, mail, accounts }) => {
   }
   const isZaakAdres = (code, adres) => { const a = vindAdres(adres); return !!(a && a.zaak === code); };
   const isActiefZaakAdres = (code, adres) => { const a = vindAdres(adres); return !!(a && a.zaak === code && a.actief); };
+  /* Bestaat dit zaakadres en staat het aan -- ONGEACHT welke zaak. De regel
+     hierboven vraagt "is dit adres van DEZE zaak"; de SMTP-ontvanger moet bij
+     RCPT TO iets anders weten, namelijk of dit adres hier uberhaupt een postvak
+     is. Een ingetrokken adres telt niet mee: dat is geen postvak meer, en post
+     ervoor aannemen levert een berg op die niemand leest. */
+  const zaakAdresActief = (adres) => { const a = vindAdres(adres); return !!(a && a.actief); };
 
   // extern = een echt e-mailadres buiten het huis (niet @rtmail, niet *.rtg)
   const isExtern = naar => {
@@ -137,5 +143,5 @@ module.exports = ({ db, save, crypto, rtmail, mail, accounts }) => {
     return r.error ? r : { ok: true, bericht: r };
   }
 
-  return { werkmail: { domeinVan, zorgStandaard, lijst, maak, intrek, stuur, buitenIn, isZaakAdres, isActiefZaakAdres, isExtern } };
+  return { werkmail: { domeinVan, zorgStandaard, lijst, maak, intrek, stuur, buitenIn, isZaakAdres, isActiefZaakAdres, zaakAdresActief, isExtern } };
 };

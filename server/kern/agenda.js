@@ -18,7 +18,14 @@ function maakAgenda({ db, save, crypto, anthropic, schoon }) {
   function store() { if (!db.data.agendas || typeof db.data.agendas !== 'object') db.data.agendas = {}; return db.data.agendas; }
   function ruw(ownerKey) { const s = store(); if (!Array.isArray(s[ownerKey])) s[ownerKey] = []; return s[ownerKey]; }
 
-  function itemPubliek(i) { return { id: i.id, titel: i.titel, datum: i.datum, tijd: i.tijd || null, notitie: i.notitie || null, gedaan: !!i.gedaan }; }
+  /* `bron` zegt waar deze afspraak vandaan komt: leeg als iemand hem zelf
+     intypte, 'post:<berichtid>' als hij uit een voorstel uit de eigen post is
+     aangenomen (kern/postdatum.js). Dat veld is meteen het antwoord op "welke
+     voorstellen zijn al gedaan" -- daardoor hoeft er geen tweede lijst naast de
+     agenda te bestaan die precies zolang klopt tot iemand een afspraak weggooit
+     (lat, regel 4). Vandaar dat hij ook naar buiten gaat en niet alleen intern
+     staat. */
+  function itemPubliek(i) { return { id: i.id, titel: i.titel, datum: i.datum, tijd: i.tijd || null, notitie: i.notitie || null, gedaan: !!i.gedaan, bron: i.bron || null }; }
   function lijst(ownerKey) {
     return ruw(ownerKey).slice().sort((a, b) =>
       (a.gedaan - b.gedaan) || String(a.datum).localeCompare(String(b.datum)) || String(a.tijd || '').localeCompare(String(b.tijd || ''))
@@ -39,7 +46,7 @@ function maakAgenda({ db, save, crypto, anthropic, schoon }) {
     if (!geldigeDatum(data.datum)) return { error: 'Kies een geldige datum.' };
     const arr = ruw(ownerKey);
     if (arr.length >= 2000) return { error: 'Uw agenda zit vol; ruim eerst wat op.' };
-    const item = { id: id(), titel, datum: data.datum, tijd: geldigeTijd(data.tijd) ? data.tijd : null, notitie: scho(data.notitie, 300) || null, gedaan: false, at: nu() };
+    const item = { id: id(), titel, datum: data.datum, tijd: geldigeTijd(data.tijd) ? data.tijd : null, notitie: scho(data.notitie, 300) || null, gedaan: false, at: nu(), bron: scho(data.bron, 60) || null };
     arr.push(item);
     save();
     return { ok: true, item: itemPubliek(item) };
@@ -132,4 +139,17 @@ function maakAgenda({ db, save, crypto, anthropic, schoon }) {
   return { lijst, telling, voegToe, wijzig, verwijder, aiVoegToe };
 }
 
-module.exports = { maakAgenda };
+/* DE SLEUTELREGEL, op EEN plek.
+
+   De opslag is per eigenaar-sleutel ('lid:<key>', 'sup:<code>'), en die regel
+   stond tot nu toe alleen als een pijltje in routes/agenda.js. Toen het
+   Privekantoor de agenda van een lid in zijn levensgraaf wilde lezen, moest het
+   die regel overschrijven -- en dan staat dezelfde waarheid op twee plekken. Bij
+   de eerste wijziging van het voorvoegsel leest de graaf een lege lijst en valt
+   de agenda stil uit het kantoor, zonder dat iets klaagt. Regel 4 van de lat.
+
+   Vandaar hier, naast de opslag die hem gebruikt. */
+const agendaLidSleutel = key => 'lid:' + key;
+const agendaZaakSleutel = code => 'sup:' + code;
+
+module.exports = { maakAgenda, agendaLidSleutel, agendaZaakSleutel };

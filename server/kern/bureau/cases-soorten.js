@@ -44,6 +44,9 @@ const SPECIALIST = {
   kring: 'Attenties',
   filantropie: 'Filantropie-adviseur',
   vermogen: 'Family office',
+  dieren: 'Dierenverzorging',
+  beveiliging: 'Beveiliging & risico',
+  reputatie: 'Woordvoering',
   gezondheid: 'Persoonlijk assistent',
   nalatenschap: 'Persoonlijk assistent'
 };

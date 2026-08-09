@@ -127,7 +127,18 @@ function maakOverheid({ db, save, crypto, anthropic, findSupplier, notify, notif
     seed, isRijk, magBehandelen, berichten, berichtGelezen,
     TOESLAGEN, UITKERINGEN, RECHTSVORMEN, RIJBEWIJS_CATS, IB
   };
-  Object.assign(api,
+  /* DE TELLING OVER HET FACTUURREGISTER hoort in de ctx en niet in een slice,
+     want twee slices lezen hem: ./btwtoezicht.js (de aansluiting per zaak) en
+     ./kantoor.js (het btw-beeld van het jaar). Het is dezelfde routine als
+     waarmee de ondernemer zijn aangifte opmaakt -- een inspecteur die anders
+     rekent dan de aangever vindt altijd een verschil. */
+  Object.assign(ctx, { telPerZaak: require('../fiscaal/btwtelling').maakBtwTelling({ db }).telPerZaak });
+  /* Het btw-toezicht gaat EERST en gaat de ctx in, want ./kantoor.js leunt
+     erop: de cockpit-signalen komen eruit. Een slice die een zuster nodig
+     heeft, krijgt hem via de ctx -- dat is de enige weg die deze laag kent. */
+  const toezicht = require('./btwtoezicht')(ctx);
+  Object.assign(ctx, toezicht);
+  Object.assign(api, toezicht,
     require('./belasting')(ctx),
     require('./rdw')(ctx),
     require('./onderneming')(ctx),

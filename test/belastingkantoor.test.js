@@ -80,12 +80,33 @@ test('3. kwijtschelding maakt de aanslag dicht en meldt het de inwoner', async (
 });
 
 test('4. het btw-beeld komt uit de facturatiemotor, gekoppeld aan het KVK-register', async () => {
+  /* Een echte factuur, zodat er iets te tellen valt EN het getal na te rekenen
+     is. De demo-zaak is horeca (9%), dus 121 incl wordt 111,01 grondslag en
+     9,99 btw. */
+  const f = await api(base, '/api/supplier/facturen/maak',
+    { omschrijving: 'Diner', aantal: 1, bedrag: 121, koperNaam: 'Gast' }, partner);
+  assert.equal(f.status, 200, 'de factuur is geboekt');
+  const incl = f.body.factuur.totaal, btwOpFactuur = f.body.factuur.btwBedrag;
+
   const b = await api(base, '/api/overheid/bd/btw', {}, rijk);
   assert.equal(b.status, 200);
   assert.ok(Array.isArray(b.body.zaken));
-  assert.ok('totaalBtw' in b.body && 'totaalOmzet' in b.body);
+  assert.ok('totaalBtw' in b.body && 'totaalGrondslag' in b.body);
   // elke zaak in het beeld draagt de KVK-koppeling (ingeschreven ja/nee)
   for (const z of b.body.zaken) assert.ok('ingeschreven' in z);
+
+  /* HET WOORD MOET HET GETAL DEKKEN. Dit veld heette `omzet` en droeg het
+     factuurbedrag INCLUSIEF btw; wie het naast een aangifte legde, vergeleek
+     twee verschillende dingen. Het heet nu grondslag en moet dus onder het
+     inclusief-bedrag liggen, met precies de btw ertussen. */
+  const zaak = b.body.zaken.find(z => z.btw > 0);
+  assert.ok(zaak, 'er staat een zaak met btw in het beeld');
+  assert.equal('omzet' in zaak, false, 'het oude, misleidende veld is weg');
+  assert.ok(zaak.btw > 0 && zaak.grondslag > 0, 'grondslag en btw staan er allebei');
+  assert.ok(zaak.grondslag + zaak.btw >= Math.round(incl) - 1,
+    'de zojuist geboekte factuur zit in het jaarbeeld');
+  assert.ok(zaak.grondslag < zaak.grondslag + zaak.btw - Math.round(btwOpFactuur) + 1,
+    'de grondslag is EXCLUSIEF btw en niet het factuurbedrag (' + zaak.grondslag + ' bij ' + zaak.btw + ' btw)');
 });
 
 test('5. de AI-chef-inspecteur adviseert op het hele beeld (en beslist niets)', async () => {
@@ -99,4 +120,49 @@ test('6. het kantoor is alleen voor het rijk: partner en anoniem komen er niet i
   assert.equal((await api(base, '/api/overheid/bd/cockpit', {}, partner)).status, 403);
   assert.equal((await api(base, '/api/overheid/bd/cockpit', {}, null)).status, 401);
   assert.equal((await api(base, '/api/overheid/bd/herinnering', { ref: 'x' }, partner)).status, 403);
+});
+
+/* ---- de aansluiting: het toezicht op de btw-aangifte ----
+   De hele reden dat het kantoor en de ondernemer dezelfde telling delen
+   (kern/fiscaal/btwtelling.js): een inspecteur die anders rekent dan de aangever
+   vindt altijd een verschil, en dan zegt een verschil niets meer. */
+test('7. de aansluiting zet het factuurregister naast wat er is aangegeven', async () => {
+  const nu = new Date();
+  const periode = nu.getUTCFullYear() + 'K' + (Math.floor(nu.getUTCMonth() / 3) + 1);
+
+  // de zaak factureert en maakt zijn aangifte op over het lopende kwartaal
+  await api(base, '/api/supplier/facturen/maak',
+    { omschrijving: 'Lunch', aantal: 1, bedrag: 218, koperNaam: 'Gast' }, partner);
+  const eigen = await api(base, '/api/supplier/btw/opmaken', { periode }, partner);
+  assert.equal(eigen.status, 200, 'de zaak maakt zijn aangifte op');
+
+  const r = await api(base, '/api/overheid/bd/btw/aansluiting', { periode }, rijk);
+  assert.equal(r.status, 200);
+  assert.equal(r.body.periode, periode);
+  assert.equal(r.body.periodeLoopt, true, 'het lopende kwartaal loopt nog');
+
+  const z = r.body.zaken.find(x => x.code === eigen.body.aangifte.code);
+  assert.ok(z, 'de zaak staat in de aansluiting');
+  /* DE BEWERING WAAR HET OM DRAAIT: de inspecteur telt exact hetzelfde als de
+     aangever. Niet ongeveer -- op de cent. */
+  assert.equal(z.geteldBtwCenten, eigen.body.aangifte.verschuldigdCenten,
+    'inspecteur en ondernemer komen op dezelfde verschuldigde btw uit');
+  assert.equal(z.stand, 'alleen_concept', 'een concept is niet aangegeven');
+  assert.equal(z.aangegevenBtwCenten, null, 'en telt dus niet als aangifte');
+
+  /* Over een LOPENDE periode geeft het toezicht geen signalen: de aangifte van
+     de ondernemer weigert indienen daar met zoveel woorden, dus "niets
+     ingediend" is daar geen bevinding maar de bedoeling. */
+  const c = await api(base, '/api/overheid/bd/cockpit', {}, rijk);
+  assert.equal(c.body.signalen.filter(s => s.soort === 'btw' && /lopend/.test(s.tekst)).length, 0);
+  assert.ok(c.body.btwPeriode && /^\d{4}K[1-4]$/.test(c.body.btwPeriode),
+    'de cockpit noemt de periode waar het toezicht naar kijkt');
+});
+
+test('8. een periode die niet bestaat wordt geweigerd, en het rijk is de enige lezer', async () => {
+  assert.equal((await api(base, '/api/overheid/bd/btw/aansluiting', { periode: '2026K9' }, rijk)).status, 400);
+  assert.equal((await api(base, '/api/overheid/bd/btw/aansluiting', { periode: 'rommel' }, rijk)).status, 400);
+  assert.equal((await api(base, '/api/overheid/bd/btw/aansluiting', {}, partner)).status, 403,
+    'een gewone zaak leest de aansluiting van iedereen niet');
+  assert.equal((await api(base, '/api/overheid/bd/btw/aansluiting', {}, null)).status, 401);
 });

@@ -44,6 +44,18 @@ function periodeVak(periode) {
 function maakBtwTelling({ db }) {
   const cent = (n) => Math.round((Number(n) || 0) * 100);
 
+  /* De btw op EEN regel, en met opzet de enige plek waar die som staat. Hij
+     wordt door twee lezers gebruikt -- de aangifte van de ondernemer
+     (telFacturen) en het toezicht van de inspecteur (telPerZaak) -- en juist
+     daar hoort geen tweede som te staan: een inspecteur die anders rekent dan
+     de aangever heeft altijd een verschil, en dan weet niemand meer of dat
+     verschil ergens over gaat. */
+  function regelBtwCenten(r) {
+    const inclC = cent(r.incl);
+    const tarief = Number(r.btw) || 0;
+    return { inclC, btwC: inclC - Math.round(inclC / (1 + tarief / 100)), tarief };
+  }
+
   /* De optelling over het factuurregister. Per REGEL, want daar zit het tarief;
      een factuur als geheel heeft geen tarief zodra er 9% en 21% op staat.
 
@@ -67,9 +79,7 @@ function maakBtwTelling({ db }) {
          daarom bij nummer gemeld, en maak() weigert erop. */
       if (!regels.length) { uit.zonderRegels.push(f.nummer || f.id); continue; }
       for (const r of regels) {
-        const inclC = cent(r.incl);
-        const tarief = Number(r.btw) || 0;
-        const btwC = inclC - Math.round(inclC / (1 + tarief / 100));
+        const { inclC, btwC, tarief } = regelBtwCenten(r);
         if (verkocht) {
           const pot = uit.verkoop[tarief] || (uit.verkoop[tarief] = { tarief, omzetCenten: 0, btwCenten: 0 });
           pot.omzetCenten += inclC - btwC; pot.btwCenten += btwC; uit.verkoopSom += btwC;
@@ -81,6 +91,40 @@ function maakBtwTelling({ db }) {
       else { uit.inkoopAantal += 1; uit.inkoopKoppen += cent(f.btwBedrag); }
     }
     return uit;
+  }
+
+  /* DEZELFDE TELLING, MAAR OVER ALLE ZAKEN IN EEN KEER -- voor de inspecteur.
+
+     telFacturen() loopt het register af voor EEN zaak. Het Belastingkantoor wil
+     het beeld over allemaal, en dat honderd keer los tellen is honderd keer het
+     hele register lezen. Hier gebeurt het in een pas, met precies dezelfde som
+     per regel (regelBtwCenten hierboven) -- want een toezichthouder die anders
+     rekent dan de aangever vindt altijd een verschil.
+
+     Alleen de VERKOOPKANT: de uitgaande btw is wat een zaak aangeeft. De
+     voorbelasting van een zaak staat op de facturen van zijn leveranciers, en
+     die zijn per zaak op te halen met telFacturen; hem hier meenemen zou de
+     inspecteur een saldo geven dat hij niet uit dit ene overzicht kan navragen. */
+  function telPerZaak(vak) {
+    const alle = Array.isArray(db.data.facturen) ? db.data.facturen : [];
+    const perZaak = new Map();
+    for (const f of alle) {
+      const datum = String(f.datum || String(f.at || '').slice(0, 10));
+      if (datum < vak.van || datum > vak.tot) continue;
+      const code = f.verkoper && String(f.verkoper.code || '').toUpperCase();
+      if (!code) continue;
+      const regels = Array.isArray(f.regels) ? f.regels : [];
+      const p = perZaak.get(code) || { code, naam: (f.verkoper && f.verkoper.naam) || code,
+        facturen: 0, grondslagCenten: 0, btwCenten: 0, zonderRegels: 0 };
+      if (!regels.length) { p.zonderRegels += 1; perZaak.set(code, p); continue; }
+      for (const r of regels) {
+        const { inclC, btwC } = regelBtwCenten(r);
+        p.grondslagCenten += inclC - btwC; p.btwCenten += btwC;
+      }
+      p.facturen += 1;
+      perZaak.set(code, p);
+    }
+    return perZaak;
   }
 
   /* De potten als een geordende lijst, hoogste tarief eerst, met het
@@ -113,7 +157,7 @@ function maakBtwTelling({ db }) {
     return null;
   }
 
-  return { telFacturen, tarievenPerTarief, controleerRegister };
+  return { telFacturen, telPerZaak, tarievenPerTarief, controleerRegister };
 }
 
 module.exports = { maakBtwTelling, periodeVak, RUBRIEK_NL };

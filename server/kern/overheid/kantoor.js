@@ -8,29 +8,40 @@
    vraagt; de AI-chef-inspecteur (Rahul) denkt mee op het hele beeld. Beslissen
    doet altijd de mens. Krijgt de gedeelde ctx van kern/overheid/index.js. */
 module.exports = (ctx) => {
-  const { db, save, anthropic, nu, jaar, schoon, eur, seed, bericht } = ctx;
+  const { db, save, anthropic, nu, jaar, schoon, eur, seed, bericht, telPerZaak, btwSignalen, vorigeBtwPeriode } = ctx;
 
   const aanslagen = () => db.data.rijkAanslagen || [];
   const dagen = iso => Math.floor((Date.now() - new Date(iso || 0)) / 86400000);
   const open = a => a.saldo > 0 && !a.betaald && !a.kwijtgescholden;
 
-  /* ---- de samenwerking: btw-beeld uit de facturatiemotor + KVK ---- */
+  /* ---- de samenwerking: btw-beeld uit de facturatiemotor + KVK ----
+
+     TWEE DINGEN ZIJN HIER RECHTGEZET toen de aangifte van de ondernemer erbij
+     kwam (kern/fiscaal/btwaangifte.js).
+
+     1. DE TELLING. Dit blok telde zelf op: `omzet += f.totaal` en
+        `btw += f.btwBedrag`. Dat is een tweede optelling naast die van de
+        aangifte, en een inspecteur die anders rekent dan de aangever vindt
+        altijd een verschil. Nu loopt het door telPerZaak() uit
+        kern/fiscaal/btwtelling.js -- dezelfde routine, tot op de regelsom.
+
+     2. HET WOORD OMZET. `f.totaal` is het factuurbedrag INCLUSIEF btw, en dat
+        stond onder de kop "omzet". In fiscale taal is omzet de grondslag, dus
+        exclusief btw -- precies het getal dat in de aangifte staat. Wie de twee
+        naast elkaar legde, vergeleek twee verschillende dingen zonder dat
+        iets dat zei. Het veld heet nu `grondslag` en draagt ook dat getal. */
   function btwBeeld() {
     seed();
     const j = String(jaar());
-    const perZaak = {};
-    for (const f of (db.data.facturen || [])) {
-      if (!f.verkoper || !f.verkoper.code || String(f.datum || '').slice(0, 4) !== j) continue;
-      const p = perZaak[f.verkoper.code] || (perZaak[f.verkoper.code] = { code: f.verkoper.code, naam: f.verkoper.naam, facturen: 0, omzet: 0, btw: 0 });
-      p.facturen += 1; p.omzet += f.totaal || 0; p.btw += f.btwBedrag || 0;
-    }
+    const perZaak = telPerZaak({ van: j + '-01-01', tot: j + '-12-31' });
     const kvk = db.data.rijkKvk || [];
-    const lijst = Object.values(perZaak).map(p => ({ ...p, omzet: Math.round(p.omzet), btw: Math.round(p.btw),
+    const lijst = [...perZaak.values()].map(p => ({ code: p.code, naam: p.naam, facturen: p.facturen,
+      grondslag: Math.round(p.grondslagCenten / 100), btw: Math.round(p.btwCenten / 100),
       ingeschreven: kvk.some(k => k.supplierCode === p.code) }))
       .sort((a, b) => b.btw - a.btw).slice(0, 100);
     return { ok: true, jaar: j, zaken: lijst,
       totaalBtw: Math.round(lijst.reduce((s, p) => s + p.btw, 0)),
-      totaalOmzet: Math.round(lijst.reduce((s, p) => s + p.omzet, 0)) };
+      totaalGrondslag: Math.round(lijst.reduce((s, p) => s + p.grondslag, 0)) };
   }
 
   /* ---- de slimme signalen: wat vraagt de aandacht van de inspecteur ---- */
@@ -43,8 +54,12 @@ module.exports = (ctx) => {
         uit.push({ soort: 'controle', ref: a.ref, wie: a.codenaam, tekst: 'Aftrek (€ ' + a.aftrek + ') is meer dan 40% van het inkomen; een blik waard.' });
     }
     const bb = btwBeeld();
-    for (const z of bb.zaken) if (!z.ingeschreven && z.omzet > 0)
-      uit.push({ soort: 'register', ref: z.code, wie: z.naam, tekst: 'Omzet (€ ' + z.omzet + ') buiten het handelsregister; KVK-inschrijving ontbreekt.' });
+    for (const z of bb.zaken) if (!z.ingeschreven && z.grondslag > 0)
+      uit.push({ soort: 'register', ref: z.code, wie: z.naam, tekst: 'Omzet (€ ' + z.grondslag + ') buiten het handelsregister; KVK-inschrijving ontbreekt.' });
+    /* De btw-signalen over de LAATST AFGESLOTEN periode: niets ingediend,
+       afwijkend ingediend, of blijven hangen in een concept. Zie
+       ./btwtoezicht.js -- daar staat ook waarom het niet de lopende periode is. */
+    uit.push(...btwSignalen(vorigeBtwPeriode()));
     return uit.slice(0, 60);
   }
 
@@ -62,7 +77,8 @@ module.exports = (ctx) => {
       ontvangen: eur(ontvangen), teOntvangen: eur(teOntvangen), teruggaven: eur(teruggaven),
       openstaand: alle.filter(open).length, regelingen: alle.filter(a => a.regeling).length,
       toeslagenLopend: toeslagen.length, toeslagenPerMaand: eur(toeslagen.reduce((s, t) => s + t.maandbedrag, 0)),
-      btwDitJaar: bb.totaalBtw, omzetDitJaar: bb.totaalOmzet, ondernemingen: (db.data.rijkKvk || []).length,
+      btwDitJaar: bb.totaalBtw, grondslagDitJaar: bb.totaalGrondslag, ondernemingen: (db.data.rijkKvk || []).length,
+      btwPeriode: vorigeBtwPeriode(),
       signalen: signalen() };
   }
 
@@ -120,7 +136,7 @@ module.exports = (ctx) => {
   async function bdAI(vraag) {
     const c = bdCockpit();
     const beeld = 'Ontvangen € ' + c.ontvangen + ', te ontvangen € ' + c.teOntvangen + ' (' + c.openstaand + ' open, ' + c.regelingen + ' regelingen), teruggaven € ' + c.teruggaven +
-      '. Toeslagen: ' + c.toeslagenLopend + ' lopend (€ ' + c.toeslagenPerMaand + '/mnd). Btw dit jaar € ' + c.btwDitJaar + ' over € ' + c.omzetDitJaar + ' omzet, ' + c.ondernemingen + ' ondernemingen in het register. ' +
+      '. Toeslagen: ' + c.toeslagenLopend + ' lopend (€ ' + c.toeslagenPerMaand + '/mnd). Btw dit jaar € ' + c.btwDitJaar + ' over € ' + c.grondslagDitJaar + ' omzet (grondslag), ' + c.ondernemingen + ' ondernemingen in het register. ' +
       'Signalen: ' + (c.signalen.length ? c.signalen.slice(0, 5).map(s => s.soort + ': ' + s.tekst).join(' | ') : 'geen') + '.';
     const q = schoon(vraag, 400);
     if (anthropic && q) {

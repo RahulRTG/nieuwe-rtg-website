@@ -61,6 +61,13 @@
   .sig.register{border-left-color:var(--gold);}
   .sig.controle{border-left-color:var(--burgundy);}
   .leeg{color:var(--muted);font-size:.88rem;padding:1rem 0;}
+  /* De aansluiting. Als klassen en niet als style="..." per element: die
+     attributen houden style-src-attr in de CSP open en worden geteld door de
+     meter inlineStijlAttributen, die alleen omlaag mag. */
+  .rij.kop{margin:0 0 .7rem;}
+  .veld.kort{max-width:110px;}
+  .item h4 .code{color:var(--soft);font-family:Inter,system-ui,sans-serif;}
+  .let{color:var(--burgundy);}
   .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;z-index:30;}
   .login{max-width:360px;margin:3rem auto;padding:0 1rem;text-align:center;}
   .login .veld{width:100%;margin-bottom:.6rem;}
@@ -116,6 +123,13 @@
       <div id="aanLijst"></div>
     </section>
     <section class="paneel" id="p-btw"></section>
+    <section class="paneel" id="p-aansl">
+      <div class="rij kop">
+        <input class="veld kort" id="aanslPer" maxlength="7" placeholder="2026K2" aria-label="Periode">
+        <button class="knop stil" id="aanslGa">Toon periode</button>
+      </div>
+      <div id="aanslLijst"></div>
+    </section>
   </div>
 </main>
 <div class="melding" id="melding" role="status"></div>
@@ -169,9 +183,9 @@ $('#loginGo').addEventListener('click', async () => {
   } catch(e){ meld(e.message); }
 });
 
-const TABS = [['sig','Signalen'],['aan','Aanslagen'],['btw','Btw-beeld']];
+const TABS = [['sig','Signalen'],['aan','Aanslagen'],['btw','Btw-beeld'],['aansl','Aansluiting']];
 let HUIDIG = 'sig';
-let SIGNALEN = null, AANSLAGEN = null, BTW = null;
+let SIGNALEN = null, AANSLAGEN = null, BTW = null, AANSL = null;
 /* Meenemen (shared/uitvoer.js): dit kantoor houdt drie registers vast en toont
    er altijd een. Wat u meeneemt is dus het tabblad dat OPEN staat, met de
    velden los -- niet de regel "Inkomen € 42.000 · aftrek € 3.100 · open" die
@@ -187,9 +201,18 @@ if (window.RTGUitvoer) RTGUitvoer.bron(() => {
   };
   if (HUIDIG === 'btw' && BTW) return {
     naam: 'btw-beeld',
-    kolommen: ['zaak','code','jaar','facturen','omzet','btw','in het handelsregister'],
+    kolommen: ['zaak','code','jaar','facturen','grondslag (excl. btw)','btw','in het handelsregister'],
     rijen: (BTW.zaken||[]).map(z => [z.naam||'', z.code||'', BTW.jaar||'', z.facturen||0,
-      z.omzet||0, z.btw||0, z.ingeschreven?'ja':'nee'])
+      z.grondslag||0, z.btw||0, z.ingeschreven?'ja':'nee'])
+  };
+  if (HUIDIG === 'aansl' && AANSL) return {
+    naam: 'btw-aansluiting',
+    kolommen: ['zaak','code','periode','facturen','grondslag (excl. btw)','geteld btw','aangegeven btw','verschil','stand','kenmerk','ingediend op'],
+    rijen: (AANSL.zaken||[]).map(z => [z.naam||'', z.code||'', AANSL.periode||'', z.facturen||0,
+      (z.grondslagCenten||0)/100, (z.geteldBtwCenten||0)/100,
+      z.aangegevenBtwCenten==null?'':z.aangegevenBtwCenten/100,
+      z.verschilCenten==null?'':z.verschilCenten/100, z.stand||'', z.kenmerk||'',
+      z.ingediendOp?String(z.ingediendOp).slice(0,10):''])
   };
   if (HUIDIG === 'sig' && SIGNALEN) return {
     naam: 'signalen',
@@ -201,10 +224,11 @@ if (window.RTGUitvoer) RTGUitvoer.bron(() => {
 function toon(t){
   HUIDIG = t;
   $('#tabs').querySelectorAll('.tab').forEach(b => b.classList.toggle('aan', b.dataset.t === t));
-  ['sig','aan','btw'].forEach(x => $('#p-'+x).classList.toggle('aan', x === t));
+  ['sig','aan','btw','aansl'].forEach(x => $('#p-'+x).classList.toggle('aan', x === t));
   if (t === 'sig') laadCockpit();
   if (t === 'aan') laadAanslagen();
   if (t === 'btw') laadBtw();
+  if (t === 'aansl') laadAansluiting();
 }
 function start(){
   $('#tabs').innerHTML = TABS.map(([t,n]) => '<button class="tab" data-t="'+t+'">'+n+'</button>').join('');
@@ -264,11 +288,49 @@ async function laadBtw(){
   try {
     const r = await api('/api/overheid/bd/btw');
     BTW = r;
-    $('#p-btw').innerHTML = '<div class="item"><h4>Btw-beeld '+r.jaar+'</h4><div class="meta">Rechtstreeks uit de facturatiemotor van het platform, gekoppeld aan het KVK-handelsregister: '+euro(r.totaalBtw)+' btw over '+euro(r.totaalOmzet)+' omzet.</div></div>'+
+    $('#p-btw').innerHTML = '<div class="item"><h4>Btw-beeld '+r.jaar+'</h4><div class="meta">Rechtstreeks uit de facturatiemotor van het platform, gekoppeld aan het KVK-handelsregister: '+euro(r.totaalBtw)+' btw over '+euro(r.totaalGrondslag)+' omzet (grondslag, exclusief btw).</div></div>'+
       (r.zaken.length ? r.zaken.map(z => '<div class="item"><h4>'+esc(z.naam)+' <small style="color:var(--soft);font-family:Inter;">'+esc(z.code)+'</small></h4><div class="meta">'+z.facturen+' facturen · omzet '+euro(z.omzet)+' · btw '+euro(z.btw)+' · '+(z.ingeschreven?'<span class="status ok">KVK ingeschreven</span>':'<span class="status open">niet in het register</span>')+'</div></div>').join('')
       : '<div class="leeg">Nog geen facturen dit jaar.</div>');
   } catch(e){ meld(e.message); }
 }
+
+/* De aansluiting: wat het factuurregister zegt naast wat er is aangegeven.
+   Het scherm rekent hier NIETS uit -- ook het verschil komt van de server, want
+   dat is precies het getal waar een inspecteur een zaak op aanspreekt. Zonder
+   periode kiest de server de laatst AFGESLOTEN: over een lopend kwartaal hoort
+   er nog niets te zijn ingediend. */
+const AANSL_LABEL = { sluit_aan: ['ok','sluit aan'], wijkt_af: ['open','wijkt af'],
+  niet_aangegeven: ['open','niet aangegeven'], alleen_concept: ['goud','alleen concept'] };
+async function laadAansluiting(){
+  try {
+    const r = await api('/api/overheid/bd/btw/aansluiting', { periode: $('#aanslPer').value.trim() });
+    AANSL = r;
+    $('#aanslPer').value = r.periode;
+    const kop = '<div class="item"><h4>Aansluiting ' + esc(r.periode) + '</h4><div class="meta">' +
+      esc(r.van) + ' t/m ' + esc(r.tot) + ' · gefactureerd ' + euro(r.geteldBtwCenten/100) +
+      ' · aangegeven ' + euro(r.aangegevenBtwCenten/100) + ' · ' + r.aangiftes + ' aangifte(n)' +
+      (r.zonderAangifte ? ' · <b class="let">' + r.zonderAangifte + ' zonder aangifte</b>' : '') +
+      '</div>' + (r.periodeLoopt ? '<div class="meta">Deze periode loopt nog: er hoort nog niets te zijn ingediend, ' +
+        'dus "niet aangegeven" is hier geen bevinding.</div>' : '') + '</div>';
+    $('#aanslLijst').innerHTML = kop + (r.zaken.length ? r.zaken.map(z => {
+      const st = AANSL_LABEL[z.stand] || ['','?'];
+      return '<div class="item' + (z.stand === 'sluit_aan' ? '' : ' sig') + '"><h4>' + esc(z.naam) +
+        ' <small class="code">' + esc(z.code) + '</small> ' +
+        '<span class="status ' + st[0] + '">' + st[1] + '</span></h4><div class="meta">' +
+        z.facturen + (z.facturen === 1 ? ' factuur' : ' facturen') + ' · grondslag ' + euro(z.grondslagCenten/100) +
+        ' · gefactureerde btw ' + euro(z.geteldBtwCenten/100) +
+        (z.aangegevenBtwCenten == null ? ' · geen aangifte'
+          : ' · aangegeven ' + euro(z.aangegevenBtwCenten/100) +
+            (z.verschilCenten ? ' · <b class="let">verschil ' + euro(z.verschilCenten/100) + '</b>' : '') +
+            (z.kenmerk ? ' · kenmerk ' + esc(z.kenmerk) : '') +
+            (z.soort === 'correctie' ? ' · correctie' : '')) +
+        (z.ingeschreven ? '' : ' · <span class="status open">niet in het KVK-register</span>') +
+        '</div><div class="meta">' + esc(z.uitleg || '') + '</div></div>';
+    }).join('') : '<div class="leeg">Geen facturen en geen aangiftes in deze periode.</div>');
+  } catch(e){ meld(e.message); }
+}
+$('#aanslGa').addEventListener('click', laadAansluiting);
+$('#aanslPer').addEventListener('keydown', e => { if (e.key === 'Enter') laadAansluiting(); });
 
 $('#aiK').addEventListener('click', async () => {
   const v = $('#aiV').value.trim(); if (!v) return;

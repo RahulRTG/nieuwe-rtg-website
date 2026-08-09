@@ -37,6 +37,11 @@ module.exports = (kern) => {
   app.post('/api/overheid/bd/cockpit', supplierAuth, rijk, (req, res) => res.json(overheid.bdCockpit()));
   app.post('/api/overheid/bd/aanslagen', supplierAuth, rijk, (req, res) => res.json(overheid.bdAanslagen(req.body || {})));
   app.post('/api/overheid/bd/btw', supplierAuth, rijk, (req, res) => res.json(overheid.bdBtwBeeld()));
+  /* De aansluiting: wat het factuurregister zegt naast wat er is aangegeven.
+     Zonder periode de laatst AFGESLOTEN -- over een lopend kwartaal hoort er nog
+     niets te zijn ingediend, dus daarop openen zou loos alarm zijn. */
+  app.post('/api/overheid/bd/btw/aansluiting', supplierAuth, rijk, (req, res) =>
+    stuur(res, overheid.bdBtwAansluiting(String((req.body || {}).periode || '') || overheid.vorigeBtwPeriode())));
   app.post('/api/overheid/bd/herinnering', supplierAuth, rijk, (req, res) => stuur(res, overheid.bdHerinnering(wie(req), String(req.body.ref || ''))));
   app.post('/api/overheid/bd/regeling', supplierAuth, rijk, (req, res) => stuur(res, overheid.bdRegeling(wie(req), String(req.body.ref || ''), req.body.maanden)));
   app.post('/api/overheid/bd/kwijt', supplierAuth, rijk, (req, res) => stuur(res, overheid.bdKwijtschelding(wie(req), String(req.body.ref || ''), req.body.reden)));
@@ -82,23 +87,7 @@ module.exports = (kern) => {
   app.post('/api/supplier/overheid/kvk/inschrijven', supplierAuth, (req, res) =>
     stuur(res, overheid.kvkInschrijven({ supplierCode: req.supplier.code, bedrijf: req.supplier.name }, req.body || {})));
   app.post('/api/supplier/overheid/kvk/mijn', supplierAuth, (req, res) => res.json(overheid.kvkMijn({ supplierCode: req.supplier.code })));
-  /* ---- de Rijks-Bibliotheek: 10.000 werk-apps per overheidsafdeling,
-     inbegrepen voor rijksambtenaren; installaties per ambtenaar ---- */
-  const { rijksbieb } = kern;
-  const ambtenaarSleutel = req => 'RIJK:' + ((req.actor && (req.actor.id || req.actor.name)) || 'balie');
-  app.post('/api/overheid/bieb', supplierAuth, rijk, (req, res) => res.json(rijksbieb.overzicht()));
-  app.post('/api/overheid/bieb/catalogus', supplierAuth, rijk, (req, res) => res.json(rijksbieb.catalogus(req.body || {})));
-  app.post('/api/overheid/bieb/installeer', supplierAuth, rijk, (req, res) => {
-    const r = rijksbieb.installeer(ambtenaarSleutel(req), req.body.id);
-    if (r.error) return res.status(r.status || 400).json({ error: r.error });
-    res.json(r);
-  });
-  app.post('/api/overheid/bieb/weg', supplierAuth, rijk, (req, res) => {
-    const r = rijksbieb.verwijder(ambtenaarSleutel(req), req.body.id);
-    if (r.error) return res.status(r.status || 400).json({ error: r.error });
-    res.json(r);
-  });
-  app.post('/api/overheid/bieb/mijn', supplierAuth, rijk, (req, res) => res.json({ apps: rijksbieb.mijnApps(ambtenaarSleutel(req)) }));
+  require('./overheid-bieb')(kern, { rijk });
 
   // in één tik inschrijven in het handelsregister (idempotent) · de onboarding-koppeling
   app.post('/api/supplier/overheid/kvk/zorg', supplierAuth, (req, res) => stuur(res, overheid.kvkZorg(req.supplier)));

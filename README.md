@@ -523,6 +523,11 @@ packages). Ze bewaken de plekken waar geld en wet aan hangen:
   de telling over het factuurregister, de twee controles die weigeren, de
   correctie na indienen en de poorten van de endpoints — plus een schermtoets
   (`test/btw-scherm.e2e.js`) die de kaart in een echte browser laat rekenen;
+- het btw-toezicht van het Belastingkantoor (`test/btw-toezicht.test.js`): de
+  vier standen van de aansluiting, dat inspecteur en aangever op de cent
+  hetzelfde tellen, en dat er over een lopende periode géén signalen komen —
+  met een schermtoets (`test/btw-aansluiting-scherm.e2e.js`) die hetzelfde
+  bedrag aan beide kanten van de tafel op het scherm zet;
 - De Salon-rechten (gast liket wel, reageert niet), de bestel- en betaalflow
   en de AVG-rechten (inzage en definitieve verwijdering).
 
@@ -709,6 +714,37 @@ nadrukkelijk niet in plaats van) "Btw deze maand": dat bord is de maandstand uit
 de kassa en de boekingen, de aangifte is de periode uit het factuurregister.
 Twee verschillende vragen. Wat er níét in zit is omzet die nooit een factuur
 kreeg; de aangifte verantwoordt daarom uit hoeveel facturen hij komt.
+
+#### De andere kant: het toezicht (`kern/overheid/btwtoezicht.js`)
+
+Het Belastingkantoor had een btw-beeld maar geen enkel besef van wat een zaak
+daarover had **aangegeven** — een cijfer zonder de vraag erachter. De vraag van
+een inspecteur is niet "hoeveel btw zit er in het register", maar "klopt wat er
+is aangegeven met wat er is gefactureerd, en wie heeft niets ingediend".
+
+De aansluiting zet die twee naast elkaar, per zaak per periode, met vier standen:
+`sluit_aan`, `wijkt_af`, `niet_aangegeven`, `alleen_concept`. Daaruit volgen de
+btw-signalen in de inspecteurscockpit — maar **alleen over een afgesloten
+periode**: over een lopend kwartaal weigert de aangifte van de ondernemer het
+indienen met zoveel woorden, dus daar is "niets ingediend" de bedoeling en geen
+bevinding. Het scherm opent om dezelfde reden op het laatst afgesloten kwartaal.
+
+**Eén telling voor beide partijen.** Het geteld-uit-het-register komt bij de
+inspecteur uit dezelfde routine als bij de aangever (`telPerZaak` naast
+`telFacturen`, tot op de regelsom in `regelBtwCenten`). Dat is de kern van de
+zaak en geen zuinigheid: een toezichthouder die anders rekent dan de aangever
+vindt altijd een verschil, en dan zegt een verschil niets meer. Zo betekent een
+verschil precies één ding — er is na het indienen iets aan de facturen veranderd,
+of er is niets aangegeven.
+
+Bij die verbouwing is ook het woord *omzet* in het btw-beeld rechtgezet: dat veld
+droeg het factuurbedrag **inclusief** btw. Wie het naast een aangifte legde,
+vergeleek twee verschillende dingen zonder dat iets dat zei. Het heet nu
+`grondslag` en draagt ook dat getal.
+
+| Endpoint | Doel |
+|---|---|
+| `POST /api/overheid/bd/btw/aansluiting` `{periode?}` | Per zaak: geteld uit het register naast de ingediende aangifte, met verschil en stand; zonder periode de laatst afgesloten |
 
 ### RTG School (de onderwijs-toren)
 

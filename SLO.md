@@ -99,9 +99,14 @@ bovengrens voor de kwaliteit.
 1. **Een doorlopende sonde van buitenaf.** `scripts/sonde.js` bestaat en meldt
    terug, maar niemand start hem elke minuut. Dat is een cron op een machine die
    niet van ons is, en dus een inrichtingsbesluit en geen code in deze repo.
-2. **Alertregels in de repo.** De cijfers worden gemeten en het budget wordt
-   bijgehouden, maar er gaat nog niemand piepen. Een SLO zonder alarm is een
-   rapportcijfer achteraf.
+2. **Een kanaal dat iemand wakker maakt.** Er is nu wél een alarm
+   (`server/kern/command/alarm.js`, werkplek **Alarm** in RTG Command): zeven
+   controles op de lagen die er al zijn, met de drempels in `SLO.json`. Hij
+   piept bij het ontstaan en bij het oplossen -- niet elke ronde, want een
+   melding die steeds terugkomt leert mensen om hem weg te klikken. Wat er
+   ontbreekt is de UITGANG: hij schrijft in het journaal en seint naar het
+   kantoorbord, maar er gaat geen mail en geen telefoonmelding uit. Dat is een
+   kanaalbesluit met punt 4 eraan vast.
 3. **Een gemeten basislijn.** De streefwaarden hierboven zijn verstandig gekozen,
    niet gemeten. Ze horen na een maand echt verkeer bijgesteld te worden naar wat
    het systeem werkelijk doet -- omhoog als het makkelijk gehaald wordt, en

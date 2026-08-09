@@ -48,7 +48,7 @@ module.exports = [
   { id: 'command-zien', categorie: 'RTG-Backoffice', naam: 'RTG Command: zien', standaard: true, doelgroepen: ['intern'],
     uitleg: 'De puls van alle domeinen, de zoekbalk over alles en het objectdossier met zijn tijdlijn.',
     paden: ['/api/command/start', '/api/command/puls', '/api/command/zoek', '/api/command/object', '/api/command/journaal',
-      '/api/command/kwaliteit', '/api/command/graaf', '/api/command/herkomst',
+      '/api/command/kwaliteit', '/api/command/graaf', '/api/command/herkomst', '/api/command/alarm',
       '/api/command/slo', '/api/command/sonde',
       /* De meldingsingang van de sonde hoort bij het zien en niet bij het doen:
          hij verandert niets aan de bedrijfsvoering, hij levert metingen aan. Wie

@@ -28,7 +28,7 @@
    ./risico.js uit het beleid van dat moment. */
 'use strict';
 
-function maakCommand({ db, save, crypto, anthropic }) {
+function maakCommand({ db, save, crypto, anthropic, sseToOffice }) {
   /* HET RTG-REGISTER, en het gaat er expliciet in. Elke laag die gegevens leest
      krijgt hem mee in plaats van hem te importeren; dat is wat het mogelijk
      maakt om dezelfde motoren op een BEPERKT register te draaien (de zaak-kant,
@@ -78,6 +78,14 @@ function maakCommand({ db, save, crypto, anthropic }) {
   const sonde = require('./sonde').maakSonde({ db, save,
     reizen: () => slolaag.laadNorm().reizen || [] });
   const slo = slolaag.maakSlo({ meting: require('../../meting'), sonde });
+  /* HET ALARM. Hij meet niets zelf: elke controle leest een laag die er al is.
+     Een alarm met een eigen meting zegt op een dag iets anders dan het scherm
+     waar het over gaat. De drempels komen uit SLO.json, de controles staan in
+     de module -- een regeltaal in een configuratiebestand is een tweede
+     implementatie die je niet kunt toetsen. */
+  const alarm = require('./alarm').maakAlarm({ db, save, journaal, slo, sonde, canary, kwaliteit,
+    norm: () => slolaag.laadNorm(), sein: sseToOffice });
+  alarm.tikker();
   const zoeklaag = require('./zoek');
   const objectlaag = require('./object');
 
@@ -127,7 +135,10 @@ function maakCommand({ db, save, crypto, anthropic }) {
       slo: sloKort(),
       /* De lopende uitrollen, want een canary die niemand meer bekijkt is
          precies het geval waarvoor de terugroldrempel bestaat. */
-      canary: canary.stand().tel
+      canary: canary.stand().tel,
+      /* De alarmen op het beginscherm, want een alarm dat je moet opzoeken is
+         geen alarm. */
+      alarm: alarm.stand().tel
     };
   }
 
@@ -141,7 +152,7 @@ function maakCommand({ db, save, crypto, anthropic }) {
   }
 
   return { journaal, beleid, risico, toegang, zaken, runbooks, toezicht, operator, puls,
-    simulatie, werkbesparing, kwaliteit, graaf, herkomst, slo, sonde, canary, zandbak, mdm, overname, apipoort, landpakket, stadstart,
+    simulatie, werkbesparing, kwaliteit, graaf, herkomst, slo, sonde, canary, zandbak, mdm, overname, apipoort, landpakket, stadstart, alarm,
     zoek, bereik, dossier, actiesVoor, start, register };
 }
 

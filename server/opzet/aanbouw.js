@@ -79,7 +79,8 @@ module.exports = function bouwKernAan(kern, grens) {
      rekent, de runbooks, het beleidsregister met versies en het onveranderlijke
      journaal. Hij hangt NA kantoren omdat hij op dezelfde kantoordeur zit; hij
      leest verder alleen db.data, dus hij hoeft niet op een motor te wachten. */
-  Object.assign(kern, { command: require('../kern/command').maakCommand({ db, save, crypto, anthropic }) });
+  Object.assign(kern, { command: require('../kern/command').maakCommand({ db, save, crypto, anthropic,
+    sseToOffice: (ev, data) => kern.sseToOffice && kern.sseToOffice(ev, data) }) });
   require('../routes/command')(grens('command'));
   /* Zaak Command (kern/zaakcommand/): dezelfde logica als hierboven, maar dan
      van EEN zaak en uitsluitend over die zaak -- voor de leverancier-app en de

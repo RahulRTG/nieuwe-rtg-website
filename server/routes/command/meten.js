@@ -148,6 +148,12 @@ module.exports = ({ app, officeAuth, veilig, wie, command }) => {
   app.post('/api/command/stad/stop', officeAuth, (req, res) => veilig(res, () =>
     command.stadstart.stop(String(req.body.naam || ''), wie(req))));
 
+  /* Het alarm. Piept op verandering en niet elke ronde; stilzetten kan, met een
+     einde eraan en een reden in het journaal. */
+  app.post('/api/command/alarm', officeAuth, (req, res) => veilig(res, () => command.alarm.stand()));
+  app.post('/api/command/alarm/stil', officeAuth, (req, res) => veilig(res, () =>
+    command.alarm.stilzetten(String(req.body.id || ''), req.body.uren, wie(req), req.body.reden)));
+
   /* De melding van buitenaf. Zie de kop hierboven voor de twee sloten. */
   app.post('/api/sonde/melding', meetpoort, (req, res) => {
     const r = command.sonde.meld(req.body || {});

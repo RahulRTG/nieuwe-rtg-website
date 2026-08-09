@@ -1,4 +1,4 @@
-/* RTG Command, deel 16: de steden.
+/* RTG Command, deel 16: de steden en het alarm.
 
    HET SCHERM TOONT PER STAP OF HIJ GEDAAN IS, en er staat er bewust een tussen
    die dat NOOIT wordt: het stadsweefsel draagt vandaag een geografie zonder
@@ -59,6 +59,55 @@
     });
   }
 
+  /* HET ALARM. Hij hoort bij "Zien" en bovenaan, want een alarm dat je moet
+     opzoeken is geen alarm. */
+  C.TEKENAARS.alarm = function (el) {
+    el.innerHTML = '<h2 class="ckop">Alarm</h2>' +
+      '<p class="lead">Een SLO zonder alarm is een rapportcijfer achteraf. Deze piep meet niets zelf: ' +
+      'elke controle leest een laag die er al is. En hij gaat af bij het ONTSTAAN en bij het OPLOSSEN, ' +
+      'niet elke ronde -- een melding die steeds terugkomt leert mensen om hem weg te klikken.</p>' +
+      '<div id="alUit"><div class="leeg">Meten…</div></div>';
+    teken();
+
+    function teken() {
+      api('alarm').then(function (d) {
+        var u = '<div class="rooster">' +
+          tegel('Actief', d.tel.actief, d.tel.actief ? 'acc' : 'groen', d.tel.hoog + ' met ernst hoog') +
+          tegel('Stilgezet', d.tel.stil, d.tel.stil ? 'gold' : '', 'tijdelijk, met een reden in het journaal') +
+          '</div>';
+        u += '<div class="kaart"><h3>Waar dit alarm uitkomt</h3><ul>' +
+          d.uitgangen.map(function (x) { return '<li class="meta">' + esc(x) + '</li>'; }).join('') +
+          '</ul><p class="meta">' + esc(d.let) + '</p></div>';
+
+        if (!d.alarmen.length) u += '<div class="kaart"><p>Geen enkele bevinding.</p></div>';
+        for (var i = 0; i < d.alarmen.length; i++) {
+          var a = d.alarmen[i];
+          var stil = a.stilTot && Date.parse(a.stilTot) > Date.now();
+          u += '<div class="lijn"><b>' + esc(a.naam) + '</b> ' +
+            '<span class="cniveau ' + (a.actief ? (a.ernst === 'hoog' ? 'mis' : 'onbekend') : 'ok') + '">' +
+            (a.actief ? esc(a.ernst) : 'opgelost') + '</span>' +
+            (stil ? ' <span class="meta">stil tot ' + esc(a.stilTot) + '</span>' : '') +
+            '<div class="meta">' + esc(a.wat) + ' · sinds ' + esc(a.sinds) + '</div>' +
+            (a.actief && !stil ? '<div class="crij"><button class="knop" data-alstil="' + esc(a.id) +
+              '">8 uur stilzetten</button></div>' : '') + '</div>';
+        }
+        document.querySelector('#alUit').innerHTML = u;
+        hang('data-alstil', function (id) {
+          return api('alarm/stil', { id: id, uren: 8, reden: 'stilgezet vanaf het scherm' }).then(teken);
+        });
+      }).catch(function (e) {
+        if (!e.stil) document.querySelector('#alUit').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>';
+      });
+    }
+  };
+
+  function tegel(l, v, k, u) {
+    return '<div class="tegel"><div class="l">' + esc(l) + '</div><div class="v ' + (k || '') + '">' + esc(v) + '</div>' +
+      (u ? '<div class="u">' + esc(u) + '</div>' : '') + '</div>';
+  }
+
+  C.WERKPLEKKEN.unshift({ id: 'alarm', naam: 'Alarm', sec: 'Zien',
+    teller: function (s) { return s.start && s.start.alarm ? s.start.alarm.actief : 0; } });
   C.WERKPLEKKEN.push({ id: 'stad', naam: 'Steden', sec: 'Besturen' });
   void S;
 })();

@@ -1796,6 +1796,16 @@ Twee dingen die door deze ronde heen lopen. **Een nulmeting die je kwijt bent, i
 
 De chaosproef leverde het eerste gemeten failover-cijfer op: SIGKILL op de actieve server, 535 verzoeken op 25 ms, **0 mislukt**. Dat staat in `SLO.md` naast de herstelmeting, met het voorbehoud erbij dat "geen onderbreking gemeten" iets anders is dan "geen onderbreking".
 
+### Het alarm: piepen op verandering, niet elke ronde
+
+`SLO.md` noemde het sinds de eerste versie als zijn tweede gat: de cijfers worden gemeten en het foutbudget wordt bijgehouden, maar er gaat niemand piepen. `kern/command/alarm.js` is die piep, en hij **meet niets zelf** — elke controle leest een laag die er al is (servicedoelen, sonde, canary, gegevenskwaliteit, de hashketen van het journaal). Een alarm met een eigen meting zegt op een dag iets anders dan het scherm waar het over gaat, en dan gelooft niemand meer welk van de twee.
+
+De drempels staan in `SLO.json`, de controles in de module. Dat is een bewuste knip: getallen horen in gegevens, maar een regeltaal in een configuratiebestand is een tweede implementatie die je niet kunt toetsen.
+
+Het belangrijkste is het ritme. Er gaat een regel in het journaal en een sein naar het kantoorbord bij het **ontstaan** en bij het **oplossen**, en daartussen niet meer — een melding die elke dertig seconden terugkomt leert mensen om hem weg te klikken, en dan is de volgende, echte melding ook weg. Stilzetten kan, met een maximum en een reden; die stilte staat zelf ook in het journaal, want anders is achteraf niet te zien dat iemand het heeft weggeklikt.
+
+Wat er **niet** gebeurt: geen mail, geen telefoonmelding. Dat is een kanaalbesluit met een piket eraan vast, en dat hoort niet stilzwijgend ingebouwd te worden. De uitgangen die er zijn, staan in de uitslag.
+
 ### Herkomst: dezelfde meting, en bij elk antwoord hoe hard het is
 
 `kern/command/herkomst.js` is de derde vraag op die ene meting. Per soort: waar het naartoe wijst, wie eraan mag schrijven (de runbookcatalogus), wie het werkelijk deed (het journaal), hoe lang het blijft (`server/bewaarbeleid.js`) en wat er wees wordt als het verdwijnt.

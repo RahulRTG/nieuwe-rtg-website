@@ -68,7 +68,7 @@ test('RTG Command: het Command Center, de operator en een objectdossier komen op
        ziet, dus hij hoort compleet te zijn en niet bij de eerste tien te
        stoppen. */
     for (const w of ['zoek', 'operator', 'zaken', 'herstel', 'beleid', 'simulatie', 'toezicht', 'werk',
-      'journaal', 'werkplek', 'kwaliteit', 'graaf', 'herkomst', 'mdm', 'slo', 'sonde',
+      'journaal', 'werkplek', 'kwaliteit', 'graaf', 'herkomst', 'mdm', 'slo', 'sonde', 'alarm',
       'canary', 'zandbak', 'overname', 'apipoort', 'land', 'stad']) {
       await page.click('#rail button[data-w="' + w + '"]');
       await page.waitForFunction(() => {

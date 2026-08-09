@@ -158,7 +158,7 @@ module.exports = (ctx) => {
      lopen gelijk op. Stopt schaakZet met het bijwerken van potje.beurt, dan
      zakt die toets. */
   const spel = {
-    sleutel: 'schaak', naam: 'Schaken', max: 2, wereld: 'rtg',
+    sleutel: 'schaak', naam: 'Schaken', max: 2, wereld: 'rtg', kijken: true,
     init: schaakInit, zet: schaakZet,
     view: (p, st) => ({ bord: st.bord.join(''), aanZet: st.aanZet, laatste: st.zetten[st.zetten.length - 1] || null })
   };

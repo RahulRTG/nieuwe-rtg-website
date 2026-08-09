@@ -5,7 +5,7 @@
 const { log } = require('../log');
 
 module.exports = (kern) => {
-  const { app, auth, geenGast, rtf, spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelRahul, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, spelUitslagen, spelStand, spelPrestaties, toernooiNieuw, toernooiAntwoord, mijnToernooien, toernooiStaat, sneekScore, sneekBord, arcadeScore, arcadeBord, socialConnecties } = kern;
+  const { app, auth, geenGast, rtf, spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelKijk, spelRahul, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, spelUitslagen, spelStand, spelPrestaties, toernooiNieuw, toernooiAntwoord, mijnToernooien, toernooiStaat, sneekScore, sneekBord, arcadeScore, arcadeBord, socialConnecties } = kern;
 
   function rtfSpeler(req, res) {
     const sess = rtf.verifieerProfiel(req.body.code, req.body.token);
@@ -40,6 +40,8 @@ module.exports = (kern) => {
       return r;
     },
     opgeven: (mij, b) => spelOpgeven(mij, String(b.id || '')),
+    // meekijken: mag dit spel bekeken worden, en hoor jij bij de kring?
+    kijk: (mij, b) => spelKijk(mij, String(b.id || '')),
     // Rahul als spelmaatje: een hint, een regel of een peptalk tijdens het potje
     rahul: (mij, b) => spelRahul(mij, String(b.id || ''), b.vraag),
     // de kieslijst met klasgenoten (De Arena); een RTG-lid heeft geen klas

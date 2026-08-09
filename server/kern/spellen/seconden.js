@@ -45,8 +45,15 @@ module.exports = (ctx) => {
      voor iedereen leuk: niets gemeens, niets wat je niet durft te laten zien. */
 
   const spel = {
-    // teams:'altijd' -- 30 Seconden BESTAAT alleen als twee teams van twee,
-    // vandaar ook min 4. De lobby leest dat hier en kent de spelnaam niet.
+    /* GEEN `kijken`, en dat is het enige spel waar dat zo is. De weergave
+       verbergt de kaart voor de RADER door op zijn spelersindex te kijken --
+       en een kijker heeft geen index, dus die zou de kaart juist wel zien en
+       hem kunnen doorgeven. Nagemeten, niet aangenomen: zie
+       test/spelkijken.test.js. Meekijken kan hier pas als er een eigen
+       kijkweergave is die de kaart weglaat.
+
+       teams:'altijd' -- 30 Seconden BESTAAT alleen als twee teams van twee,
+       vandaar ook min 4. De lobby leest dat hier en kent de spelnaam niet. */
     sleutel: 'seconden', naam: '30 Seconden', max: 4, min: 4, wereld: 'rtg', teams: 'altijd',
     init: secondenInit, zet: secondenZet,
     view: (p, st, mij) => {

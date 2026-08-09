@@ -26,22 +26,22 @@ const stubCtx = { save() {}, crypto: require('crypto'), schud: (a) => a, beurtDo
    overgeschreven uit de spellen zoals ze zijn, niet uit het register
    gegenereerd -- anders toetst hij zichzelf. */
 const GOUD = {
-  mejn:     ['Mens erger je niet', 4, 'rtf', { teams: 'keuze' }],
-  schaak:   ['Schaken', 2, 'rtg', {}],
-  woord:    ['Woordduel', 2, 'rtg', { perTaal: true }],
-  pesten:   ['Pesten', 4, 'rtf', {}],
-  dam:      ['Dammen', 2, 'rtf', {}],
-  rummi:    ['Rummi', 4, 'rtf', {}],
-  magnaat:  ['Magnaat', 6, 'rtg', { buitenBeurt: ['bouw', 'verkoop'] }],
+  mejn:     ['Mens erger je niet', 4, 'rtf', { teams: 'keuze', kijken: true }],
+  schaak:   ['Schaken', 2, 'rtg', { kijken: true }],
+  woord:    ['Woordduel', 2, 'rtg', { perTaal: true, kijken: true }],
+  pesten:   ['Pesten', 4, 'rtf', { kijken: true }],
+  dam:      ['Dammen', 2, 'rtf', { kijken: true }],
+  rummi:    ['Rummi', 4, 'rtf', { kijken: true }],
+  magnaat:  ['Magnaat', 6, 'rtg', { buitenBeurt: ['bouw', 'verkoop'], kijken: true }],
   seconden: ['30 Seconden', 4, 'rtg', { min: 4, teams: 'altijd' }],
-  waarheid: ['Doen of Waarheid', 6, 'rtf', {}],
-  proost:   ['Proost', 6, 'rtg', { volwassen: true }],
-  flits:    ['Flitsduel', 4, 'rtf', { buitenBeurt: ['antwoord'] }],
-  reactie:  ['Reactieduel', 4, 'rtf', { buitenBeurt: ['tik'] }],
-  quiz:     ['Quizduel', 4, 'rtf', { buitenBeurt: ['antwoord'] }],
-  schat:    ['Schatduel', 4, 'rtf', { buitenBeurt: ['schat'] }],
-  geheugen: ['Geheugenduel', 4, 'rtf', { buitenBeurt: ['reeks'] }],
-  orde:     ['Rangschikduel', 4, 'rtf', { buitenBeurt: ['orde'] }]
+  waarheid: ['Doen of Waarheid', 6, 'rtf', { kijken: true }],
+  proost:   ['Proost', 6, 'rtg', { volwassen: true, kijken: true }],
+  flits:    ['Flitsduel', 4, 'rtf', { buitenBeurt: ['antwoord'], kijken: true }],
+  reactie:  ['Reactieduel', 4, 'rtf', { buitenBeurt: ['tik'], kijken: true }],
+  quiz:     ['Quizduel', 4, 'rtf', { buitenBeurt: ['antwoord'], kijken: true }],
+  schat:    ['Schatduel', 4, 'rtf', { buitenBeurt: ['schat'], kijken: true }],
+  geheugen: ['Geheugenduel', 4, 'rtf', { buitenBeurt: ['reeks'], kijken: true }],
+  orde:     ['Rangschikduel', 4, 'rtf', { buitenBeurt: ['orde'], kijken: true }]
 };
 
 /* De arcade is de tweede vorm: geen potje, geen beurten, wel een score. Sneek
@@ -53,6 +53,15 @@ const GOUD_ARCADE = {
   tetris: ['Tetris', ['rtg', 'rtf'], 999999],
   sudoku: ['Sudoku', ['rtf'], 999999]
 };
+
+test('precies een spel mag niet bekeken worden, en dat is 30 Seconden', () => {
+  /* Meekijken is opt-in per spel. Deze regel staat hier apart omdat hij over
+     valsspelen gaat en niet over een lijstje: de weergave van 30 Seconden zou
+     de kaart aan een kijker tonen die de rader niet mag zien. Zie
+     test/spelkijken.test.js voor de meting. */
+  const { SPEL } = maakRegister(stubCtx);
+  assert.deepEqual(Object.keys(SPEL).filter(k => !SPEL[k].kijken), ['seconden']);
+});
 
 test('het register vindt precies de spellen die er zijn', () => {
   const { SPEL, ARCADE } = maakRegister(stubCtx);

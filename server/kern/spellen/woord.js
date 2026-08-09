@@ -144,7 +144,7 @@ module.exports = (ctx) => {
     /* perTaal: de letterzak en de woorden verschillen per taal, dus een
        Nederlandse en een Engelse zoeker horen niet in dezelfde wachtrij. Voor
        elk ander spel doet de taal er voor de matchmaking niet toe. */
-    sleutel: 'woord', naam: 'Woordduel', max: 2, wereld: 'rtg', perTaal: true,
+    sleutel: 'woord', naam: 'Woordduel', max: 2, wereld: 'rtg', perTaal: true, kijken: true,
     init: woordInit, zet: woordZet,
     view: (p, st, mij) => ({ bord: st.bord, scores: p.spelers.map(sp => st.scores[sp]), rek: st.rekken[mij], zak: st.zak.length, passes: st.passes })
   };

@@ -212,7 +212,8 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
     require('./spellen/toernooi')({ db, save, rid, nu, codenaamVan, isGeblokkeerd, SPEL, SOORTEN, schud,
       potjeDirect, leeftijdFout, nudge });
   ctx.toernooiPotjeKlaar = toernooiPotjeKlaar;
-  const { spelStaat, spelZet, spelOpgeven } = require('./spellen/partij')(ctx);
+  ctx.toernooiHeeftSpeler = (id, key) => { const b = toernooiStaat(key, id); return !!(b && b.toernooi && b.toernooi.ikDoeMee); };
+  const { spelStaat, spelZet, spelOpgeven, spelKijk } = require('./spellen/partij')(ctx);
   // Rahul als spelmaatje: in elk potje op te roepen voor hints, regels of een peptalk
   const { spelRahul } = require('./spellen/rahul')(Object.assign({ anthropic }, ctx));
 
@@ -257,7 +258,7 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
   const sneekScore = (mij, punten) => arcadeScore(mij, 'sneek', punten);
   const sneekBord = (mij, vrienden) => arcadeBord(mij, 'sneek', vrienden);
 
-  return { spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelRahul, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, spelUitslagen, spelStand, spelPrestaties, spelVergeet, toernooiNieuw, toernooiAntwoord, mijnToernooien, toernooiStaat, sneekScore, sneekBord, arcadeScore, arcadeBord, SPEL_SOORTEN: SOORTEN,
+  return { spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelKijk, spelRahul, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, spelUitslagen, spelStand, spelPrestaties, spelVergeet, toernooiNieuw, toernooiAntwoord, mijnToernooien, toernooiStaat, sneekScore, sneekBord, arcadeScore, arcadeBord, SPEL_SOORTEN: SOORTEN,
     // alleen voor de drift-test: de client heeft een eigen kopie van deze
     // regels (directe feedback); de test houdt beide kopieën tegen elkaar
     _spelregels: { rummiSet: ruw.rummiSet, W_PREMIE: ruw.W_PREMIE, SPEL, ARCADE } };

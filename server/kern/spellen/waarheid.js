@@ -44,7 +44,7 @@ module.exports = (ctx) => {
      Na 25 kaarten is het potje klaar. Geen winnaar of verliezer. */
 
   const spel = {
-    sleutel: 'waarheid', naam: 'Doen of Waarheid', max: 6, wereld: 'rtf',
+    sleutel: 'waarheid', naam: 'Doen of Waarheid', max: 6, wereld: 'rtf', kijken: true,
     init: waarheidInit, zet: waarheidZet,
     view: (p, st) => ({ punten: p.spelers.map(sp => st.punten[sp]), kaart: st.kaart, wat: st.wat, doel: 8 })
   };

@@ -15,6 +15,10 @@
      buitenBeurt  acties die niet op je beurt hoeven (Magnaat bouwen; de duels)
      teams        'altijd' (30 Seconden) of 'keuze' (2-tegen-2 bij een vol potje)
      perTaal      eigen wachtrij per taal (Woordduel heeft een letterzak per taal)
+     kijken       mag een niet-speler meekijken? STANDAARD NIET. Opt-in, want de
+                  weergave van een spel kan een kijker meer laten zien dan een
+                  speler -- 30 Seconden toont de kaart aan wie geen spelersindex
+                  heeft, en dat is precies de rader die hem niet mag zien
      init/zet/view  de regels zelf; statisch: data die nooit verandert
                   (het Magnaat-bord) en dus niet elke poll mee hoeft
 
@@ -98,6 +102,7 @@ module.exports = (spelCtx, mapOverride) => {
     if (s.volwassen) SPEL[s.sleutel].volwassen = true;
     if (s.buitenBeurt) SPEL[s.sleutel].buitenBeurt = s.buitenBeurt;
     if (s.perTaal) SPEL[s.sleutel].perTaal = true;
+    if (s.kijken) SPEL[s.sleutel].kijken = true;
     if (s.teams) {
       if (s.teams !== 'altijd' && s.teams !== 'keuze')
         throw new Error(`spellen/register: ${naam} heeft teams '${s.teams}'; alleen 'altijd' of 'keuze'.`);

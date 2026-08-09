@@ -131,7 +131,7 @@ module.exports = (ctx) => {
      client erom vraagt (bij openen), niet bij elke poll van 2,5 seconde.
      Stond als "is dit magnaat?" in de centrale dispatch. */
   const spel = {
-    sleutel: 'magnaat', naam: 'Magnaat', max: 6, wereld: 'rtg', buitenBeurt: ['bouw', 'verkoop'],
+    sleutel: 'magnaat', naam: 'Magnaat', max: 6, wereld: 'rtg', buitenBeurt: ['bouw', 'verkoop'], kijken: true,
     init: magnaatInit, zet: magnaatZet,
     statisch: () => ({ velden: M_VELDEN }),
     view: (p, st) => ({ posities: p.spelers.map(sp => st.posities[sp]), geld: p.spelers.map(sp => st.geld[sp]),

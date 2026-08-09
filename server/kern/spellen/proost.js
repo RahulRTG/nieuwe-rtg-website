@@ -38,7 +38,7 @@ module.exports = (ctx) => {
   /* volwassen: de 18+-poort op paspoort-geboortedatum, afgedwongen op ELK
      toetredingsmoment (starten, uitnodigen, accepteren). */
   const spel = {
-    sleutel: 'proost', naam: 'Proost', max: 6, wereld: 'rtg', volwassen: true,
+    sleutel: 'proost', naam: 'Proost', max: 6, wereld: 'rtg', volwassen: true, kijken: true,
     init: proostInit, zet: proostZet,
     view: (p, st) => ({ kaart: st.kaart, teller: st.teller, totaal: st.totaal })
   };

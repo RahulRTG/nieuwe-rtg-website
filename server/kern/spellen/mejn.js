@@ -105,7 +105,7 @@ module.exports = (ctx) => {
   const spel = {
     // teams:'keuze' -- 2-tegen-2 kan, maar alleen als het potje vol is (vier
     // spelers) en de starter erom vraagt; anders speelt iedereen voor zich
-    sleutel: 'mejn', naam: 'Mens erger je niet', max: 4, wereld: 'rtf', teams: 'keuze',
+    sleutel: 'mejn', naam: 'Mens erger je niet', max: 4, wereld: 'rtf', teams: 'keuze', kijken: true,
     init: mejnInit, zet: mejnZetOfGooi,
     view: (p, st, mij) => ({ pionnen: p.spelers.map(sp => st.pionnen[sp].map(x => x.pos)), dobbel: st.dobbel, mag: st.mag,
       zetten: p.spelers[p.beurt] === mij && st.mag === 'zet' ? mejnZetten(p, mij) : [] })

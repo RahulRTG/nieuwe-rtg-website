@@ -3,7 +3,7 @@
    en opgeven. Krijgt de gedeelde context een keer bij het opstarten vanuit
    kern/spellen.js. */
 module.exports = (ctx) => {
-  const { db, save, crypto, codenaamVan, nu, S, SPEL, SOORTEN, nudge, VIEWS, ZETTEN, STATISCH, noteerUitslag } = ctx;
+  const { db, save, crypto, codenaamVan, nu, S, SPEL, SOORTEN, nudge, VIEWS, ZETTEN, STATISCH, noteerUitslag, zijnVrienden, isGeblokkeerd } = ctx;
   // het toernooi hangt aan dezelfde plek als de uitslag: zo is er geen tweede
   // moment waarop een ronde kan blijven hangen (late binding, zie spellen.js)
   const naPotje = (p) => { noteerUitslag(p); if (ctx.toernooiPotjeKlaar) ctx.toernooiPotjeKlaar(p); };
@@ -54,6 +54,44 @@ module.exports = (ctx) => {
     if (p.status === 'klaar') naPotje(p);
     return r;
   }
+  /* MEEKIJKEN. Twee poorten, en ze doen verschillend werk.
+
+     1. MAG DIT SPEL BEKEKEN WORDEN? Dat staat per spel in de descriptor
+        (`kijken`) en staat STANDAARD UIT. Niet uit voorzichtigheid maar omdat
+        het echt misgaat: de weergave van 30 Seconden verbergt de kaart voor de
+        rader door op zijn spelersindex te kijken, en een kijker heeft geen
+        index -- die zou de kaart juist wel zien en hem kunnen doorgeven. Een
+        nieuw spel is dus niet te bekijken tot iemand die vraag beantwoordt.
+
+     2. MAG JIJ DIT POTJE BEKIJKEN? Je bent vriend van een speler, of je doet
+        mee aan hetzelfde toernooi. Blokkades gelden aan beide kanten: wie jou
+        heeft geblokkeerd hoeft niet te dulden dat je zijn partij volgt.
+
+     De kijker krijgt dezelfde weergave als een speler, maar aangeroepen ZONDER
+     speler. Alles wat aan een persoon hangt (je hand, je rek, je zetten) valt
+     daardoor vanzelf weg -- er is geen tweede weergave die apart kan gaan
+     afwijken van de echte. */
+  function magKijken(mij, p) {
+    if (p.spelers.includes(mij)) return 'Je speelt zelf mee in dit potje.';
+    if (!SPEL[p.soort] || !SPEL[p.soort].kijken) return 'Bij dit spel kun je niet meekijken.';
+    if (p.spelers.some(sp => isGeblokkeerd(mij, sp))) return 'Dit potje is niet beschikbaar.';
+    if (p.spelers.some(sp => zijnVrienden(mij, sp))) return null;
+    if (p.toernooi && ctx.toernooiHeeftSpeler && ctx.toernooiHeeftSpeler(p.toernooi, mij)) return null;
+    return 'Je kunt alleen meekijken bij vrienden, of bij een toernooi waar je zelf aan meedoet.';
+  }
+  function spelKijk(mij, id) {
+    const p = S().potjes[id];
+    if (!p) return { status: 404, error: 'Dit potje bestaat niet (meer).' };
+    const fout = magKijken(mij, p);
+    if (fout) return { status: 403, error: fout };
+    const uit = { id: p.id, soort: p.soort, naam: SOORTEN[p.soort], status: p.status, modus: p.modus,
+      spelers: p.spelers.map(codenaamVan), beurt: p.beurt,
+      aanZet: p.status === 'bezig' ? codenaamVan(p.spelers[p.beurt]) : null,
+      winnaar: p.winnaar, gelijk: !!p.gelijk, kijker: true };
+    if (p.status !== 'wacht' && p.staat && VIEWS[p.soort]) uit.staat = VIEWS[p.soort](p, p.staat, null);
+    return { status: 200, potje: uit };
+  }
+
   function spelOpgeven(mij, id) {
     const p = S().potjes[id];
     if (!p || !p.spelers.includes(mij)) return { status: 404, error: 'Dit potje bestaat niet (meer).' };
@@ -66,5 +104,5 @@ module.exports = (ctx) => {
     rest.forEach(sp => nudge(sp, p));
     return { status: 200, ok: true };
   }
-  return { spelStaat, spelZet, spelOpgeven };
+  return { spelStaat, spelZet, spelOpgeven, spelKijk };
 };

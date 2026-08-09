@@ -82,7 +82,7 @@ module.exports = (ctx) => {
      de rest komt uit jouw rek. Kun je niets: pak een steen. */
 
   const spel = {
-    sleutel: 'dam', naam: 'Dammen', max: 2, wereld: 'rtf',
+    sleutel: 'dam', naam: 'Dammen', max: 2, wereld: 'rtf', kijken: true,
     init: damInit, zet: damZet,
     view: (p, st, mij) => ({ bord: st.bord.join(''), ketting: st.ketting,
       zetten: p.status === 'bezig' && p.spelers[p.beurt] === mij ? damZetten(p, mij) : [] })

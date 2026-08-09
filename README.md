@@ -1107,6 +1107,62 @@ meetelt, de drempel die een verbod wordt, en een `werktBij` die niet meer naar
 het bedrijf kijkt -- elk daarvan laat een andere toets zakken. Het scherm van de
 werkgever loopt de weg af in `test/mobiliteitscherm.e2e.js`.
 
+### RTG Ondernemers-OS: drie assen, één bedrijfsobject
+
+`server/kern/onderneming/` + `/api/onderneming/...`. De ruggengraat onder alles
+wat een ondernemer hier kan: **één object dat bestaat vanaf "ik denk erover na"**
+en dat meegroeit tot een groep met meerdere vennootschappen.
+
+**Waarom het er is.** Een bedrijf bestond hier in twee gedaanten. Vóór de
+oprichting was het een `aanmelding` (`kern/aanmeldingen/bedrijf.js`), daarna een
+`supplier`, en `provisioneer()` maakte die tweede op het moment dat het personeel
+de eerste termijn aftekende. Twee objecten voor één bedrijf is regel 4, en de
+naad zat op de slechtst denkbare plek: alles vóór de oprichting -- het idee, de
+verkenning, het plan, de rechtsvormkeuze -- had geen object om aan te hangen, en
+alles erna had geen geheugen van wat er vooraf bedacht was.
+
+De onderneming **wijst de zaak aan** in plaats van hem over te schrijven. De
+supplier blijft wat hij is (het menu, de vloot, het personeel); de onderneming is
+wie hij juridisch en in zijn leven is. De **naam woont daarbij op precies één
+plek, en die plek verhuist**: zolang er geen zaak is staat hij op de onderneming,
+en bij het koppelen wordt de lokale naam wéggegooid -- niet gekopieerd, want een
+tweede naam die niemand meer bijwerkt is precies waar regel 4 over gaat.
+
+**De drie assen komen samen in één capslijst:**
+
+- **Wat zij DOET** -- `kern/werkvormen.js`, ongewijzigd: afgeleid uit vloot, menu,
+  kamers, personeel.
+- **Wat zij IS** -- `onderneming/rechtsvorm.js`: eenmanszaak, vof, bv, holding,
+  stichting, vereniging, coöperatie. Dit wordt als enige **niet** afgeleid, en met
+  reden: een rechtsvorm is een feit van de notaris en de KvK, en gokken zou hier
+  betekenen dat iemand op de verkeerde aangifte belandt. Wat er wél uit volgt
+  (verplichtingen, gereedschap, oprichtingsstappen) staat als data.
+- **Waar zij STAAT** -- `onderneming/fase.js`: idee, validatie, oprichting, eerste
+  klant, tractie, werkgever, vestigingen, groep. Afgeleid uit feiten en nooit
+  gezet, want een opgeslagen fase loopt uiteen met de werkelijkheid en alles wat
+  erop leunt is dan óók fout. Het is de **hoogste bereikte** fase en niet de
+  eerste die zakt: wie eerst inschrijft en pas daarna zijn plan opschrijft blijft
+  niet op 'idee' hangen. En zonder feiten geeft hij `null` en niet 'idee' (regel
+  3: 'idee' is een geldige uitkomst en mag dus nooit het antwoord zijn op
+  ontbrekende invoer).
+
+**`verboden` is geen tweede capslijst maar het tegendeel ervan**, en het bestaat
+apart omdat een verbod anders verliest van een andere as. Een stichting mag geen
+winst uitkeren; zou `winstuitkering` alleen ontbréken in haar caps, dan zet de
+eerste as die hem wél meebrengt de knop alsnog neer. `capsSamen()` trekt de
+verboden er dus ná het samenvoegen af, en geeft terug wat er is geweerd en
+waarom -- een knop die zonder uitleg ontbreekt leest als een storing.
+
+**Geen paslaag op nadenken.** De zzp-belastingtool en de AI-boekhouder blijven
+achter de Business Pass; de onderneming zelf niet. De eerste stand is letterlijk
+"ik denk erover na", en iemand die dat denkt heeft nog geen zakelijke pas.
+
+Getoetst in `test/onderneming.test.js` (22 toetsen). Vijf mutaties gedaan en alle
+vijf zagen we de júiste toets laten zakken: de verboden niet meer aftrekken, de
+fase stil op 'idee' laten vallen, de ladder bij het eerste gat laten stoppen, de
+naam kopiëren in plaats van weggooien, en de eigendomscontrole op de routes
+weghalen.
+
 ### RTG Werk OS (de werkplek van een organisatie)
 
 `server/bedrijf/` + `/api/bedrijf/...` + `/apps/werk.html`. Een **werkruimte**

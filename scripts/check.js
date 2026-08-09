@@ -1613,6 +1613,13 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
     ['/api/vertaal/ui', 'de knopteksten van datzelfde inlogscherm'],
     ['/api/translate', 'het woordenboek is publiek; de AI-tak zit achter kern/aipoort.js'],
     ['/api/push/key', 'de VAPID-sleutel is per definitie de PUBLIEKE helft'],
+    /* De rechtsvormen zijn voorlichting, geen bedrijfsdata: wat een B.V. van
+       een stichting onderscheidt, en waar je met elk van de twee aan vastzit,
+       hoort iemand te kunnen lezen VOORDAT hij een account maakt. Er staat
+       geen enkele onderneming in -- alleen de vaste tabel uit
+       kern/onderneming/rechtsvorm.js. Alles wat wel over een echt bedrijf
+       gaat, zit in dezelfde router achter auth. */
+    ['/api/onderneming/rechtsvormen', 'de rechtsvormtabel is voorlichting; er staat geen enkele onderneming in'],
     /* Het algoritmeregister van de stad. Een register dat alleen achter een
        kantoorinlog te lezen is, geeft een inwoner precies niets -- en dat is
        de enige groep voor wie het bedoeld is. Er staan regels in, geen mensen:

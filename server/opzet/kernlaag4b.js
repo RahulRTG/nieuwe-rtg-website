@@ -61,6 +61,14 @@ Object.assign(kern, require('../kern/checklijst')({ db, save, crypto, schoon }))
    de vervoerstools EN de zzp-tools. De afleiding zelf hangt al aan db
    (db.capsVan); dit is de kern-ingang voor de route. */
 Object.assign(kern, require('../kern/werkvormen')({ db }));
+/* De ONDERNEMING (kern/onderneming): één bedrijfsobject dat bestaat vanaf
+   "ik denk erover na" tot een groep met meerdere vennootschappen. Hij hangt
+   hier, direct achter de werkvormen, omdat hij hun afleiding samenvoegt met
+   twee assen die zij niet kent: de rechtsvorm (zzp, bv, stichting) en de
+   levensfase. De boekingen- en bonnen-index komt rechtstreeks uit ../db,
+   net als in kern/leverancier.js: O(1) per zaak in plaats van een scan. */
+Object.assign(kern, require('../kern/onderneming')({ db, save, crypto, schoon, findSupplier,
+  ordersVanZaak: require('../db').ordersVanZaak, boekingenVanZaak: require('../db').boekingenVanZaak }));
 /* De Opvang-afdeling (AZC/COA), het Regeringskantoor van de
    minister-president en het eigen hotel van elke afdeling -- alle drie
    kamers van RTG Kantoren. */

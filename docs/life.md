@@ -51,6 +51,7 @@ klinkt.
 | Noodkaart | `server/kern/noodkaart.js`, blok op `apps/life.html` | een noodcontact en, als u dat wilt, uw allergenen en middelen: gelezen uit het zorgprofiel en het medicatieschema, niet gekopieerd; u toont hem zelf |
 | Training | `server/kern/training.js`, `public/apps/training.html` | uw eigen trainingsschema en wat u ervan deed; aftekenen landt als beweging-meting, RTG schrijft geen training voor |
 | Schakelbaar in de boardroom | `server/functies/register/cat-apps.js`, `server/kern/lidboard/catalogus.js` | elke laag hierboven is door het lid zelf uit te zetten; het toestemmingsscherm met reden niet |
+| Tijdlijn | `server/kern/tijdlijn.js`, `public/apps/tijdlijn.html` | wat er in de tijd is gebeurd, gelezen uit de bestaande lagen; geen verbanden en geen score |
 | Voeding | `server/kern/voeding.js`, `public/apps/voeding.html` | een weekplan voor wat u wilt eten; er wordt niets geteld en er komt geen oordeel |
 | Gedachtenboek | `server/kern/gedachten.js`, `public/apps/gedachten.html` | opschrijven voor uzelf; geen model leest mee, niets wordt samengevat, en de crisisregel bewaart hier wel |
 | De dagcoach | `server/kern/dagcoach.js`, blok bovenaan `apps/life.html` | alles wat vandaag ergens staat, op volgorde van de klok; hij plant niets en bezit niets |
@@ -655,6 +656,43 @@ hebben bewogen. Er staat waarom.
 Er is geen oefeningenbibliotheek met voorgeschreven uitvoering. Verkeerd
 uitgevoerd krachtwerk is een blessure, en een plaatje is geen begeleiding.
 
+## De tijdlijn, en waarom er geen verbanden in staan
+
+`server/kern/tijdlijn.js`, met een eigen pagina `apps/tijdlijn.html`.
+
+Wat er in de tijd met het lid is gebeurd, op maand gegroepeerd: afspraken bij
+zorg en verzorging die al geweest zijn, doelen die begonnen of gehaald zijn,
+toestellen die gekoppeld werden, en wat een behandelaar heeft vastgelegd. **Hij
+bezit niets** — net als Life en de dagcoach leest hij alleen. Een tijdlijn die
+zelf ging bewaren wordt een tweede dossier naast de lagen waar het vandaan kwam,
+en juist bij gezondheid is een tweede dossier dat uit de pas loopt precies het
+probleem dat je wilt vermijden.
+
+**Er staan geen verbanden in.** "Uw slaap werd slechter na die behandeling" is
+een medische uitspraak, en die doet RTG niet (`kern/zorgniveau.js`). De tijdlijn
+zet dingen naast elkaar; wat dat betekent, bepaalt het lid met iemand die hem
+kent. **En geen score over de tijd**: er bestaat geen getal dat samenvat hoe het
+met iemand gaat, en een lijn door verzonnen punten is een grafiek van niets.
+
+**Alleen wat geweest is.** Wat nog komt staat in de dagcoach en op Life; een
+tijdlijn die de toekomst meeneemt is een agenda die zich voordoet als
+geschiedenis.
+
+**Elke regel draagt zijn herkomst**, en niet als versiering: het verschil tussen
+"u vulde dit zelf in" en "uw behandelaar legde het vast" is bij terugkijken het
+hele verhaal. De eigen dagmetingen staan er met opzet niet in — dat zijn er
+honderden en ze maken van een tijdlijn een logboek.
+
+Voor de historie is er een lezer bij `kern/metingen.js` gekomen
+(`metingenHistorie`), want `beeldVan` geeft een gemiddelde over veertien dagen en
+wie terugkijkt heeft de losse regels nodig. Die lezer woont bij de laag die de
+metingen bezit en niet bij de tijdlijn (LAT.md regel 4).
+
+Een gat weegt hier zwaarder dan elders: het leest als "toen gebeurde er niets".
+Een kapotte laag staat daarom bovenaan het scherm, en de schermtoets laat de
+motor ook echt een storing melden — anders toetste hij alleen dat er op een
+gezond systeem geen storing staat, en dan mag het scherm ze net zo goed weggooien.
+
 ## De voedingslaag, en waarom er niets geteld wordt
 
 `server/kern/voeding.js`, met een eigen pagina `apps/voeding.html`.
@@ -792,8 +830,11 @@ In deze volgorde, want elke stap heeft de vorige nodig:
 16. ~~De **voedingslaag**: een weekplan, zonder telling en zonder filter.~~
     Gedaan; zie hieronder.
 
+17. ~~De **tijdlijn**: terugkijken zonder verbanden en zonder score.~~ Gedaan;
+    zie hieronder.
+
 Wat daarna komt: de coachmarktplaats, multi-vestiging
 en resource-planning voor zorgorganisaties, en de langere staart uit het oorspronkelijke voorstel (health
-timeline, ADHD- en autismemodus, energiemanagement, mantelzorg, corporate
-wellbeing, Life Wallet, lifestyle-marktplaats). En als er ooit een gesprek komt
-op het mentale onderwerp, dan door `zorgniveau.js` heen.
+ADHD- en autismemodus, energiemanagement, mantelzorg, corporate wellbeing, Life
+Wallet, lifestyle-marktplaats). En als er ooit een gesprek komt op het mentale
+onderwerp, dan door `zorgniveau.js` heen.

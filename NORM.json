@@ -6,10 +6,10 @@
     "keuringStuk": 0,
     "keuringScheef": 12,
     "dependencies": 0,
-    "testbestanden": 649,
+    "testbestanden": 650,
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 17,
-    "e2eBestanden": 96,
+    "e2eBestanden": 97,
     "keuringOmvang": 122,
     "keuringDubbeling": 82,
     "keuringDekkingAdvies": 52,
@@ -20,15 +20,21 @@
     "schermenZonderToets": 0,
     "keuringTeGroot": 9,
     "inlineStijlAttributen": 5817,
-    "browserpoortToetsen": 156,
-    "kernBreedte": 1178,
+    "browserpoortToetsen": 157,
+    "kernBreedte": 1179,
     "kernGedeeld": 146,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 195,
+    "toetsenNietGemeten": 196,
     "toetsenOngevoeligPct": 2.4
   },
   "notities": [
+    {
+      "datum": "2026-08-09",
+      "meter": "kernBreedte 1178 -> 1179, toetsenNietGemeten 195 -> 196 (ronde: de tijdlijn)",
+      "reden": "kernBreedte +1 is tijdlijnVoor. toetsenNietGemeten +1 is test/tijdlijn-scherm.e2e.js -- weer een schermtoets die de mutatiemotor structureel niet kan draaien; tijdlijn.test.js zelf is gemeten en GEZAKT, ook scherp. Zie de notitie hieronder van dezelfde dag over wat er aan die meter opvalt.",
+      "watErNIETverzetIs": "keuringOmvang stond even op 124 (norm 122) door twee bestanden die de waarschuwingsband onder de 10 kB in groeiden: kern/metingen.js door de nieuwe metingenHistorie, en functies/register/cat-apps.js door de RTG Life-schakelaars. Allebei OPGELOST in plaats van weggeschreven: metingen.js is teruggebracht onder de band, en de Life-stapel heeft een eigen registerbestand gekregen (functies/register/cat-life.js) -- dat was toch de natuurlijke naad."
+    },
     {
       "datum": "2026-08-09",
       "meter": "kernBreedte 1175 -> 1178, toetsenNietGemeten 194 -> 195 (ronde: de voedingslaag)",

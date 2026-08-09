@@ -89,6 +89,11 @@ module.exports = function bouwKernAanDrie(kern, grens) {
      KERN mee, net als Life, want hij leest lagen die verspreid gemonteerd zijn. */
   Object.assign(kern, require('../kern/consent')({ kern }));
   require('../routes/consent')(grens('consent'));
+  /* De tijdlijn (kern/tijdlijn.js): wat er in de tijd met u gebeurd is. Bezit
+     niets en leidt niets af -- geen verbanden en geen score. Krijgt de KERN mee,
+     net als Life en de dagcoach, en hangt daarom onderaan. */
+  Object.assign(kern, require('../kern/tijdlijn')({ kern }));
+  require('../routes/tijdlijn')(grens('tijdlijn'));
   /* De dagcoach (kern/dagcoach.js): wat er vandaag staat, op volgorde van de
      klok. Hij plant niets en bezit niets -- afvinken gebeurt in de laag die het
      ding wel bezit. Krijgt de KERN mee, net als Life, om dezelfde reden. */

@@ -148,7 +148,23 @@ module.exports = ({ db, save }) => {
     return { ok: true, onderwerp, beeld: beeldVan(rijen, onderwerp, nu) };
   }
 
-  return { metingenVan, metingZet, metingVanToestel, metingVanBehandelaar, metingWeg };
+  /* De HISTORIE, voor wie verder terugkijkt dan het venster van beeldVan (dat
+     geeft een gemiddelde over veertien dagen). Hij woont hier en niet bij de
+     lezer, want deze laag bezit de metingen (LAT.md regel 4); het bron-filter is
+     een filter en geen tweede opslag. */
+  function metingenHistorie(key, opties = {}) {
+    const bron = opties.bron ? String(opties.bron) : null;
+    const uit = [];
+    for (const onderwerp of Object.keys(ONDERWERPEN)) {
+      for (const r of rijenVan(key, onderwerp)) {
+        if (bron && r.bron !== bron) continue;
+        uit.push({ onderwerp, op: r.op, waarde: r.waarde, bron: r.bron, door: r.door || null, at: r.at });
+      }
+    }
+    return uit.sort((a, b) => (b.op || '').localeCompare(a.op || ''));
+  }
+
+  return { metingenVan, metingenHistorie, metingZet, metingVanToestel, metingVanBehandelaar, metingWeg };
 };
 
 module.exports.ONDERWERPEN = ONDERWERPEN;

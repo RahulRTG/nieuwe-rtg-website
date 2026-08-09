@@ -61,6 +61,7 @@ const CAPS = [
   { id: 'gedachten', cat: 'leven', naam: 'Gedachtenboek', uitleg: 'Opschrijven voor jezelf. Er leest geen model mee.' },
   { id: 'medicijnen', cat: 'leven', naam: 'Medicijnen', uitleg: 'Je eigen medicatieschema en voorraad. RTG bepaalt nooit een dosering.', kind: false },
   { id: 'training', cat: 'leven', naam: 'Training', uitleg: 'Je eigen trainingsschema en wat je ervan deed.' },
+  { id: 'tijdlijn', cat: 'leven', naam: 'Tijdlijn', uitleg: 'Terugkijken op wat er is geweest; legt zelf niets vast.' },
   { id: 'voeding', cat: 'leven', naam: 'Voeding', uitleg: 'Je weekplan voor wat je wilt eten; er wordt niets geteld.' },
   { id: 'noodkaart', cat: 'leven', naam: 'Noodkaart', uitleg: 'Een noodcontact en, als je dat wilt, je allergenen en middelen.' },
   { id: 'verzorging', cat: 'leven', naam: 'Verzorging', uitleg: 'Kapper, barbier en nagelstudio, op codenaam.' },
@@ -116,6 +117,7 @@ const PAD_FUNCTIE = [
   ['/api/training', 'training'],
   ['/api/noodkaart', 'noodkaart'],
   ['/api/voeding', 'voeding'],
+  ['/api/tijdlijn', 'tijdlijn'],
   ['/api/verzorging', 'verzorging']
 ].sort((a, b) => b[0].length - a[0].length);
 
@@ -156,6 +158,7 @@ const PLATFORM = {
   training: 'training',
   noodkaart: 'noodkaart',
   voeding: 'voeding',
+  tijdlijn: 'tijdlijn',
   verzorging: 'verzorging'
 };
 

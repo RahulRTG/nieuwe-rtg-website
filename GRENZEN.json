@@ -764,6 +764,7 @@
     "metingen": [
       "metingWeg",
       "metingZet",
+      "metingenHistorie",
       "metingenVan"
     ],
     "mobiliteit": [
@@ -1536,6 +1537,9 @@
       "trainingWeg",
       "trainingWegGedaan",
       "trainingZet"
+    ],
+    "tijdlijn": [
+      "tijdlijnVoor"
     ],
     "toestellen": [
       "toestelIntrek",

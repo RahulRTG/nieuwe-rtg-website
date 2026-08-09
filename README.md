@@ -1247,9 +1247,10 @@ De Website-maker (`/apps/sitemaker.html`, `kern/webmaker.js`) en de RTG-browser 
 
 - **De knop in de zaak-app.** `/apps/zaakweb.html` ("Mijn website" in het Meer-scherm van de leverancier-app, zelfde zaak-inlog): status, online/offline, bekijken in de browser, en opnieuw bouwen uit het profiel -- met de waarschuwing erbij dat dat het eigen handwerk weggooit.
 - **Het formulier-blok.** Een bedrijfssite draagt een contactformulier; het bericht landt als **klus (ticket) in de werklijst die de zaak al heeft**, op de codenaam van het lid -- geen los postvak dat niemand leest, en de echte naam reist niet mee. Op een site zonder zaak erachter staat het formulier er niet: een knop zonder ontvanger is erger dan geen knop (`POST /api/browser/bericht`).
-- **Bladwijzers in de browser.** Op het toestel zelf (localStorage), met een rij op RTG Start -- de server weet niet wat u bewaart.
+- **Bladwijzers en tabs in de browser.** Bladwijzers op het toestel zelf (localStorage), met een rij op RTG Start -- de server weet niet wat u bewaart. Tabs met elk hun eigen geschiedenis, in een eigen tabbalk onder de adresbalk.
+- **De sjabloon-etalage.** De Website-studio van het Atelier kan een sjabloon **in de etalage** zetten (`/api/office/atelierweb/etalage`); leden zien die als startpunt in de Website-maker ("Begin met een sjabloon", `/api/site/sjablonen` + `/api/site/sjabloon`) en maken er met bewaren hun eigen site van. Vrijgeven is een uitdrukkelijke handeling van het kantoor: werk in uitvoering blijft binnen, ook met het id in de hand.
 
-`test/webplatform.test.js` (zes scenario's) legt dit vast; drie mutaties (leden mogen zelf een zaakCode zetten; de live blokken worden niet meer opgelost; het formulier accepteert sites zonder ontvanger), alle drie **RAAK**.
+`test/webplatform.test.js` (zeven scenario's) legt dit vast; vier mutaties (leden mogen zelf een zaakCode zetten; de live blokken worden niet meer opgelost; het formulier accepteert sites zonder ontvanger; de etalage-grendel valt weg), alle vier **RAAK**.
 
 ### RTG Bank & RTG Stad (de eigen infrastructuur)
 

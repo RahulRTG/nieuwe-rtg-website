@@ -49,6 +49,16 @@
   .kaart .mt{color:var(--soft);font-size:.72rem;margin-top:.5rem;}
   .kop2{font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--soft);margin:0 0 .7rem;}
   .leeg{text-align:center;color:var(--soft);padding:2rem;}
+  /* de tabbalk: meerdere plekken tegelijk open, elk met eigen geschiedenis */
+  .tabstrip{display:flex;align-items:center;gap:.3rem;padding:.35rem .7rem;background:var(--bg);border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none;}
+  .tabstrip::-webkit-scrollbar{display:none;}
+  .tabstrip .tb{display:flex;align-items:center;gap:.4rem;flex:0 0 auto;max-width:180px;background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:.28rem .55rem;font-size:.75rem;color:var(--muted);cursor:pointer;}
+  .tabstrip .tb.aan{background:var(--card);color:var(--txt);border-color:var(--gold);}
+  .tabstrip .tb .tt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .tabstrip .tb .x{border:0;background:transparent;color:var(--soft);cursor:pointer;font-size:.8rem;line-height:1;padding:0 .1rem;}
+  .tabstrip .tb .x:hover{color:var(--burgundy);}
+  .tabstrip .plus{flex:0 0 auto;border:1px solid var(--line);background:transparent;color:var(--soft);border-radius:8px;width:26px;height:26px;cursor:pointer;}
+  .tabstrip .plus:hover{border-color:var(--gold);color:var(--gold);}
   /* de actiebalk: de browser weet dat deze pagina een bedrijf is */
   .zaakbalk{position:sticky;top:59px;z-index:15;display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;background:var(--card);border-bottom:1px solid var(--line);padding:.55rem .9rem;}
   .zaakbalk .zn{font-family:'Bodoni Moda',serif;font-size:1rem;}
@@ -81,6 +91,7 @@
     <button class="ga" type="submit">Ga</button>
   </form>
 </header>
+<div class="tabstrip" id="tabstrip"></div>
 <main id="hoofd"></main>
 <div class="melding" id="melding" role="status"></div>
 
@@ -95,10 +106,43 @@ function slug(v){return String(v==null?'':v).toLowerCase().replace(/^rtg:\/\//,'
 
 // geschiedenis voor terug/vooruit; een item is 'start' of {adres}
 let HIST=[], POS=-1;
+/* tabs: elke tab draagt zijn eigen geschiedenis; HIST/POS zijn altijd die
+   van de actieve tab */
+let TABS=[], TAB=0;
+function tabLabel(t){ const it=t.hist[t.pos]; return (!it||it==='start')?'Start':it.adres+'.rtg'; }
+function tabsBij(){
+  if(!TABS.length){ TABS=[{hist:HIST,pos:POS}]; TAB=0; }
+  TABS[TAB].hist=HIST; TABS[TAB].pos=POS;
+  const st=$('#tabstrip'); st.textContent='';
+  TABS.forEach((t,i)=>{
+    const b=document.createElement('span'); b.className='tb'+(i===TAB?' aan':''); b.setAttribute('role','button');
+    const tt=document.createElement('span'); tt.className='tt'; tt.textContent=tabLabel(t); b.appendChild(tt);
+    if(TABS.length>1){ const x=document.createElement('button'); x.className='x'; x.textContent='×'; x.title='Tab sluiten'; x.setAttribute('aria-label','Tab sluiten');
+      x.addEventListener('click',ev=>{ ev.stopPropagation(); sluitTab(i); }); b.appendChild(x); }
+    b.addEventListener('click',()=>wisselTab(i));
+    st.appendChild(b);
+  });
+  const plus=document.createElement('button'); plus.className='plus'; plus.textContent='+'; plus.title='Nieuwe tab'; plus.setAttribute('aria-label','Nieuwe tab');
+  plus.addEventListener('click',nieuwTab); st.appendChild(plus);
+}
+function laadTab(){
+  const t=TABS[TAB]; HIST=t.hist; POS=t.pos; knoppenBij(); bwStand(); tabsBij();
+  const it=HIST[POS];
+  if(!it||it==='start'){ $('#adres').value=''; toonStart(); }
+  else { $('#adres').value=it.adres+'.rtg'; toonSite(it.adres); }
+}
+function wisselTab(i){ if(i===TAB)return; TABS[TAB].hist=HIST; TABS[TAB].pos=POS; TAB=i; laadTab(); }
+function nieuwTab(){ TABS[TAB].hist=HIST; TABS[TAB].pos=POS; TABS.push({hist:['start'],pos:0}); TAB=TABS.length-1; laadTab(); }
+function sluitTab(i){
+  TABS.splice(i,1);
+  if(!TABS.length) TABS=[{hist:['start'],pos:0}];
+  if(TAB>i) TAB--; if(TAB>=TABS.length) TAB=TABS.length-1;
+  laadTab();
+}
 function knoppenBij(){ $('#terugKnop').disabled=POS<=0; $('#vooruitKnop').disabled=POS>=HIST.length-1; }
 function ga(item,duw){
   if(duw!==false){ HIST=HIST.slice(0,POS+1); HIST.push(item); POS=HIST.length-1; }
-  knoppenBij(); bwStand();
+  knoppenBij(); bwStand(); tabsBij();
   if(item==='start'){ $('#adres').value=''; toonStart(); }
   else { $('#adres').value=item.adres+'.rtg'; toonSite(item.adres); }
 }

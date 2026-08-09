@@ -4,7 +4,7 @@
    (geen gast). De browser-gids en het openen van een site mag elk ingelogd lid,
    zodat je door het RTG-web kunt bladeren. */
 module.exports = (kern) => {
-  const { app, auth, webmaker, webplatform, antivirus, media, supplierAuth, findSupplier, addTicket, liveCodename, save } = kern;
+  const { app, auth, webmaker, webplatform, atelierweb, antivirus, media, supplierAuth, findSupplier, addTicket, liveCodename, save } = kern;
   const FOTO_MAX_BYTES = 2 * 1024 * 1024; // ~2 MB per foto
   const stuur = (res, r) => r && r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const geenGast = (req, res) => {
@@ -24,6 +24,17 @@ module.exports = (kern) => {
   app.post('/api/site/verwijder', auth, (req, res) => { if (geenGast(req, res)) return; stuur(res, webmaker.verwijder(req.session.key, (req.body || {}).id)); });
   app.post('/api/site/publiceer', auth, (req, res) => { if (geenGast(req, res)) return; const b = req.body || {}; stuur(res, webmaker.publiceer(req.session.key, b.id, b.adres)); });
   app.post('/api/site/offline', auth, (req, res) => { if (geenGast(req, res)) return; stuur(res, webmaker.offline(req.session.key, (req.body || {}).id)); });
+
+  /* ---- de sjabloon-etalage van het Atelier ----
+     Leden beginnen met een ontwerp van het huis in plaats van vanaf nul; wat
+     het Atelier niet uitdrukkelijk heeft vrijgegeven, bestaat hier niet. */
+  app.post('/api/site/sjablonen', auth, (req, res) => { if (geenGast(req, res)) return; res.json({ lijst: atelierweb.etalage() }); });
+  app.post('/api/site/sjabloon', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    const d = atelierweb.etalageHaal((req.body || {}).id);
+    if (!d) return res.status(404).json({ error: 'Dit sjabloon staat niet in de etalage.' });
+    res.json({ sjabloon: d });
+  });
 
   // ---- eigen foto's: uploaden (na virusscan), tonen en weghalen ----
   app.post('/api/site/fotos', auth, (req, res) => { if (geenGast(req, res)) return; res.json({ fotos: webmaker.fotos(req.session.key) }); });

@@ -153,6 +153,11 @@
 <div class="sheet" id="openSheet"><div class="box">
   <h2>Mijn websites</h2><div class="sub">Open een eerder gemaakte site om verder te werken.</div>
   <div id="openlijst"></div>
+  <div id="sjabloonvak" hidden>
+    <h2 style="margin-top:1.1rem;">Begin met een sjabloon</h2>
+    <div class="sub">Ontwerpen van het RTG Atelier als startpunt -- daarna is het jouw site.</div>
+    <div id="sjabloonlijst"></div>
+  </div>
 </div></div>
 <div class="sheet" id="onlineSheet"><div class="box">
   <h2>Ga online</h2><div class="sub">Kies het RTG-adres waarop bezoekers je site vinden. Alleen letters, cijfers en koppeltekens.</div>
@@ -393,7 +398,32 @@ async function openen(){
     if(!(d.lijst||[]).length){ l.innerHTML='<div style="color:var(--soft);font-size:.85rem;">Nog geen websites. Bouw je eerste en bewaar hem.</div>'; }
     (d.lijst||[]).forEach(it=>{const r=document.createElement('div');r.className='lijstrij';r.innerHTML='<span class="nm">'+esc(it.titel)+'</span><span class="mt">'+(it.online?esc(it.adres)+'.rtg':it.blokken+' blok'+(it.blokken===1?'':'ken'))+'</span>';const ob=document.createElement('button');ob.textContent='Open';ob.addEventListener('click',async()=>{try{const dd=await api('haal',{id:it.id});DESIGN=dd.design;DESIGN.blokken=DESIGN.blokken||[];DESIGN.kleuren=DESIGN.kleuren||{};$('#titel').value=DESIGN.titel;bouwSwatches();syncKleurInputs();$('#themaKnop').textContent=DESIGN.thema==='licht'?'Licht':'Donker';$('#openSheet').classList.remove('open');zetBewerk(true);lintBij();meld('Geopend.');}catch(e){meld(e.message);}});r.appendChild(ob);l.appendChild(r);});
     $('#openSheet').classList.add('open');
+    laadSjablonen();
   }catch(e){ meld(e.message); }
+}
+/* de etalage van het Atelier: een sjabloon als startpunt voor een NIEUWE site */
+async function laadSjablonen(){
+  let d; try{ d=await api('sjablonen'); }catch(e){ return; }
+  const lijst=d.lijst||[]; if(!lijst.length) return;
+  const vak=$('#sjabloonvak'); vak.hidden=false;
+  const l=$('#sjabloonlijst'); l.textContent='';
+  lijst.forEach(it=>{
+    const r=document.createElement('div');r.className='lijstrij';
+    r.innerHTML='<span class="nm">'+esc(it.titel)+'</span><span class="mt">'+it.blokken+' blok'+(it.blokken===1?'':'ken')+' · '+esc(it.thema)+'</span>';
+    const kb=document.createElement('button');kb.textContent='Gebruik';
+    kb.addEventListener('click',async()=>{
+      try{
+        const s=(await api('sjabloon',{id:it.id})).sjabloon;
+        DESIGN={id:null,titel:s.titel,thema:s.thema,accent:s.accent,kleuren:s.kleuren||{},adres:'',online:false,
+          blokken:(s.blokken||[]).map(b=>Object.assign({},b)),volgorde:s.volgorde||undefined};
+        $('#titel').value=DESIGN.titel;bouwSwatches();syncKleurInputs();
+        $('#themaKnop').textContent=DESIGN.thema==='licht'?'Licht':'Donker';
+        $('#openSheet').classList.remove('open');zetBewerk(true);lintBij();
+        meld('Sjabloon geladen als nieuwe site. Bewaar om hem van jou te maken.');
+      }catch(e){ meld(e.message); }
+    });
+    r.appendChild(kb);l.appendChild(r);
+  });
 }
 
 function onlineSheet(){

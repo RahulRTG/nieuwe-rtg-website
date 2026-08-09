@@ -128,6 +128,30 @@ test('4. een lid kan zich niet aan andermans zaak koppelen', async () => {
   assert.ok(!/Sunset cruise/.test(alles), 'geen data van andermans zaak');
 });
 
+test('7. de sjabloon-etalage: alleen wat het Atelier vrijgeeft, komt bij leden', async () => {
+  const office = (await api('/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+  const mk = await api('/api/office/atelierweb/bewaar', { design: { titel: 'Restaurant Luxury 04',
+    blokken: [{ type: 'hero', kop: 'Welkom' }, { type: 'tekst', tekst: 'Een sjabloon van het huis.' }] } }, office);
+  assert.equal(mk.status, 200, JSON.stringify(mk.body));
+  const sjabloonId = mk.body.design.id;
+
+  // werk in uitvoering blijft binnen: zonder etalage ziet een lid niets
+  const leeg = await api('/api/site/sjablonen', {}, lid);
+  assert.ok(!(leeg.body.lijst || []).some(x => x.id === sjabloonId), 'niet vrijgegeven is niet zichtbaar');
+  const dicht = await api('/api/site/sjabloon', { id: sjabloonId }, lid);
+  assert.equal(dicht.status, 404, 'ook niet met het id in de hand');
+
+  // vrijgeven is een uitdrukkelijke handeling van het kantoor
+  const vrij = await api('/api/office/atelierweb/etalage', { id: sjabloonId, aan: true }, office);
+  assert.equal(vrij.status, 200, JSON.stringify(vrij.body));
+  const zicht = await api('/api/site/sjablonen', {}, lid);
+  assert.ok((zicht.body.lijst || []).some(x => x.id === sjabloonId), 'nu wel zichtbaar');
+  const s = await api('/api/site/sjabloon', { id: sjabloonId }, lid);
+  assert.equal(s.status, 200);
+  assert.equal(s.body.sjabloon.titel, 'Restaurant Luxury 04');
+  assert.equal(s.body.sjabloon.blokken.length, 2, 'het hele ontwerp komt mee als startpunt');
+});
+
 test('6. het formulier op de bedrijfssite landt als klus bij de zaak, op codenaam', async () => {
   // op de bedrijfssite staat het formulier; op een ledensite zonder zaak niet
   const open = await api('/api/browser/open', { adres: 'es-vedra-cruises' }, lid);

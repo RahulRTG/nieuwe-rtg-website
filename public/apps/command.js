@@ -242,7 +242,11 @@
       ['/apps/personeel.html', 'Personeel', 'Rooster, taken, verlof en de PDA’s van de werkvloer.'],
       ['/apps/payroll.html', 'Payroll', 'De loonrun, uren, toeslagen en de salarisadministratie.'],
       ['/apps/balans.html', 'Balans', 'Grootboek, debiteuren, crediteuren en de jaarcijfers.'],
-      ['/apps/bank.html', 'RTG Bank', 'De rekeninglaag op het Pay-grootboek.'],
+      /* RTG REKENING. Het b-woord in de eigen productnaam vraagt een
+         vergunning (Wft 3:7), dus heet dit overal RTG Rekening --
+         test/eu-naleving.test.js loopt elk uitgeleverd scherm na om te zien of
+         iemand het toch weer anders noemt, en die pin leest ook commentaar. */
+      ['/apps/bank.html', 'RTG Rekening', 'De eigen rekeninglaag op het Pay-grootboek.'],
       ['/apps/juridisch.html', 'Juridisch', 'Voorwaarden, privacy en de partnerafspraken.']
     ]],
     ['Techniek & dienst', [

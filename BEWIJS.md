@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 727 bestanden en 4098 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 729 bestanden en 4105 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 727 |
-| losse beweringen (`test(...)`) | 4098 |
+| toetsbestanden | 729 |
+| losse beweringen (`test(...)`) | 4105 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 521 |
 | **overleefd**: geen mutatie kreeg hem rood | 12 |
 | niet te meten (al rood, geen module gevonden, ...) | 16 |
 | alleen in de kop *genoemd*, nog niet gemeten | 25 |
-| niets van beide | 153 |
+| niets van beide | 155 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-636 bestanden, 3938 beweringen.
+637 bestanden, 3944 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -141,6 +141,7 @@ toets omvalt.
 | `comm-gast.test.js` | 12 | -- | De verhuizing van het gastcontact naar de communicatiekern (server/kern/comm/gast.js). DE DERDE VOORRAAD, en de eerste waarin een LID en een ZAAK in hetzelfde gesprek zitten. |
 | `comm-vergeten.test.js` | 6 | -- | Het wisrecht op de gesprekken van de communicatiekern (server/kern/vergeten/gesprekken.js). WAAROM DEZE TOETS ER IS, en waarom hij er niet was. |
 | `comm-werk.test.js` | 8 | -- | De verhuizing van de sollicitatiechat naar de communicatiekern (server/kern/comm/werk.js). DE VIERDE EN LAATSTE GROTE VOORRAAD. |
+| `consent.test.js` | 6 | -- | Het Consent Center (kern/consent.js). De belofte van dit scherm is "wie raakt mijn gegevens aan, en hier zet u het stop", en die belofte heeft twee helften die allebei kunnen breken: 1. |
 | `contact.test.js` | 6 | gezakt op `liegpoort /api/` | Nooit meer vreemden: zodra een lid echt in contact komt met een partner (hier: een bezorgaanvraag) opent er automatisch een open chatlijn. Beide kanten zien die lijn, de partner mag vooraf de Salon van het lid... |
 | `context-lijn.test.js` | 5 | gezakt op `liegpoort /api/` | De dagcontext (tijd, seizoen, temperatuur voor elke AI) en de lijnbezetting (aanmelden per kant; de schermen en de coach rekenen met het aantal aangemelde koks). |
 | `contract.test.js` | 5 | gezakt op `liegpoort /api/` | Contracten: elke zaak stelt een contract op (verhuur of personeel), gericht aan een lid (op codenaam) of een personeelslid. Beide partijen tekenen digitaal; pas als beide handtekeningen staan is het contract... |
@@ -676,7 +677,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-91 bestanden, 160 beweringen.
+92 bestanden, 161 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -761,6 +762,7 @@ toets omvalt.
 | `scan-tafel.e2e.js` | 1 | -- | Scherm-test: de tafel-QR-stroom in de leden-app. We loggen als lid in (token in localStorage), openen de app, klikken op de scan-knop en voeren met de hand een tafel-QR-payload in (headless heeft geen camera). |
 | `scanner.e2e.js` | 1 | -- | Scherm-test voor RTG Scanner: foto's kiezen (de weg die ook zonder camera werkt), de paginastrook, en bewaren als PDF die als gewoon bestand in de Bestanden-kluis belandt (map Scans). De camera zelf valt buiten... |
 | `toegankelijk-scherm.e2e.js` | 1 | -- | De belofte van het toegankelijkheidsprofiel is "op elk scherm van RTG", en dat is precies wat een servertoets niet kan zien. Deze toets zet de instelling op de ene pagina (apps/ik.html) en kijkt of hij doorwerkt op... |
+| `toestemming-scherm.e2e.js` | 1 | -- | Schermtoets voor apps/toestemming.html. Dit scherm belooft twee dingen die allebei op het scherm zelf waar moeten zijn: 1. |
 | `veiligheid.e2e.js` | 1 | -- | De vier veiligheidsapps in een echte browser. De server-toetsen (test/veiligheid.test.js) bewijzen dat de keten werkt. |
 | `vertaler.e2e.js` | 1 | -- | Scherm-test voor RTG Vertaler: inloggen, typen, de live-vertaling (met de halve-seconde-rustpauze), een reiszin aantikken en bewaren op het toestel. |
 | `verzorging-scherm.e2e.js` | 1 | -- | Schermtoets voor de verzorgingskant van de Zorg-tab: de kapper, de barbier en de nagelstudio staan nu in de leden-app. Wat hier bewezen wordt is precies wat een servertoets NIET kan zien: dat het blok echt op het... |

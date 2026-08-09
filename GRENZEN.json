@@ -140,6 +140,10 @@
       "resolveSession",
       "sessionFor"
     ],
+    "consent": [
+      "consentIntrek",
+      "consentVan"
+    ],
     "doelen": [
       "doelMaak",
       "doelMeet",

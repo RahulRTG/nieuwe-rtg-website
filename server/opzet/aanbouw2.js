@@ -98,6 +98,11 @@ module.exports = function bouwKernAanTwee(kern, grens) {
   Object.assign(kern, require('../kern/toegankelijk')({ accounts: kern.accounts }));
   // Wie ben ik voor Rahul: omgang, voornaamwoorden en de eigen geloofskeuze.
   require('../routes/ik')(grens('ik'));
+  /* Het Consent Center (kern/consent.js): wie raakt mijn gegevens aan, en waar
+     zet ik dat stop. Bewaart niets en trekt in bij de bron; krijgt daarom de
+     KERN mee, net als Life, want hij leest lagen die verspreid gemonteerd zijn. */
+  Object.assign(kern, require('../kern/consent')({ kern }));
+  require('../routes/consent')(grens('consent'));
   /* RTG Life (kern/life.js): het ene scherm dat de lagen hierboven bij elkaar
      leest -- ritme, doelen, afspraken en de check-in. Hij krijgt de KERN mee en
      geen losse functies, want hij pakt ze op aanroepmoment: hij hangt later in

@@ -42,6 +42,7 @@ klinkt.
 | Dagmetingen | `server/kern/metingen.js`, invulvak op `apps/life.html` | slaap, beweging en water, door het lid zelf ingevuld; een dag heeft één waarde |
 | Herkomst van gegevens | `server/kern/herkomst.js` | vier soorten, en alleen wat er echt is staat aan; gedeeld door de doelenmotor en de metingen |
 | Gekoppelde toestellen | `server/kern/toestellen.js`, vak op `apps/life.html` | een horloge of weegschaal schrijft dagmetingen weg met een eigen smalle sleutel, altijd in te trekken |
+| Consent Center | `server/kern/consent.js`, `public/apps/toestemming.html` | zes lagen toestemming op één scherm; intrekken gaat naar de bron |
 | Inzage-audit | `server/inzagelog.js` | wie welke identiteitsgegevens opvroeg, en waarom |
 | Identiteitskluis | `server/accounts.js` | echte namen apart; alles daarbuiten draait op codenamen |
 
@@ -272,6 +273,40 @@ echte herkomst werd, bleek de doelenmotor `body.bron` te lezen -- een lid had
 zijn eigen schatting als apparaatmeting kunnen boeken. Beide schrijvers krijgen
 de herkomst nu van de route mee.
 
+## Het Consent Center
+
+`apps/toestemming.html` zet zes lagen naast elkaar: medische context bij een
+zorgaanbieder, diensten die met RTG iD gegevens ophalen, mensen die namens u
+mogen inloggen, zaken die live meekijken, het zorgprofiel dat meereist met
+bestellingen, en toestellen die metingen wegschrijven.
+
+**Het bewaart niets, en trekt in bij de bron.** Er staat hier geen eigen
+vlaggetje dat zegt of iets nog mag; intrekken roept de stopfunctie van de laag
+zelf aan. Anders zou dit scherm kunnen melden dat iets uit staat terwijl de laag
+het nog toelaat -- een tweede waarheid over toestemming, en dat is de
+gevaarlijkste soort (`LAT.md` regel 4). De toets kijkt daarom na elke intrek bij
+de **eigen app** van die laag of het er echt af is.
+
+**Het gevaarlijkste aan dit scherm is onvolledigheid.** Een overzicht dat "wie
+ziet wat" heet en er drie vergeet, is erger dan geen overzicht: het geeft
+zekerheid die er niet is. Daarom staat er een register van gedekte lagen in
+`kern/consent.js`, staan de niet-gedekte dingen er **met reden** bij (wat u in De
+Salon plaatst, uw veiligheidskring, wat een zaak van een boeking weet), en zegt
+het scherm zelf dat dit register met de hand wordt bijgehouden. Geen enkele
+machine merkt op dat er ergens in RTG een nieuwe soort toestemming bijkomt. Dat
+is de eerlijke stand, en het staat er als zodanig.
+
+**Zien en schrijven zijn niet hetzelfde.** Een kliniek *ziet* iets; een toestel
+*schrijft* iets; een gemachtigde *handelt namens u*. Die drie staan met een eigen
+label op het scherm, want ze op één hoop gooien maakt "toegang" een woord zonder
+inhoud. Een machtiging die u krijgt is geen toestemming die u geeft en staat er
+dus niet bij.
+
+**Uitzetten is niet weggooien.** Het zorgprofiel niet meer laten meereizen laat
+het profiel zelf staan; anders raakt u uw eigen allergenenlijst kwijt bij het
+uitzetten van een deling. Hetzelfde geldt voor een ingetrokken toestel: wat het
+mat, blijft staan.
+
 ## De grenzen die vast moeten staan vóór de bouw
 
 Deze horen in de architectuur en niet in een latere ronde, want ze bepalen hoe
@@ -301,7 +336,8 @@ schatting later als een meting gelezen. Dit is dezelfde fout die `LAT.md` regel
 einddatum, altijd te stoppen) is het model voor alles wat erbij komt. Een
 masseur hoort niet te zien wat een arts ziet; een coach hoort geen
 mental-coachgesprekken te zien; een werkgever die een sportbudget aanbiedt hoort
-geen individuele gegevens te zien, alleen geaggregeerde.
+geen individuele gegevens te zien, alleen geaggregeerde. Het Consent Center
+(hieronder) is de plek waar dat zichtbaar is.
 
 **De onderkant blijft simpel.** Voor een deel van de leden is RTG Life precies
 één scherm: "medicijnen genomen? ja". Dat is Vitaal, en dat is af. Een
@@ -321,7 +357,10 @@ In deze volgorde, want elke stap heeft de vorige nodig:
 
 5. ~~Een **apparaat** als tweede herkomst.~~ Gedaan: zie Toestellen hieronder.
 
-Wat daarna komt (gewoonten, stress, coach, marktplaats) hangt aan deze vijf en
+6. ~~Het **Consent Center**.~~ Gedaan; zie hieronder.
+
+Wat daarna komt (gewoonten, stress, coach, marktplaats) hangt aan deze zes en
 hoort pas daarna aan de beurt. De derde herkomst (`behandelaar`) is de
-eerstvolgende die iets fundamenteels toevoegt, en die hoort samen te gaan met het
-Consent Center: een behandelaar die iets vastlegt, is een partij die iets ziet.
+eerstvolgende die iets fundamenteels toevoegt: een behandelaar die iets
+vastlegt, is een partij die iets ziet, en die hoort dus meteen als zevende laag
+in het Consent Center te verschijnen.

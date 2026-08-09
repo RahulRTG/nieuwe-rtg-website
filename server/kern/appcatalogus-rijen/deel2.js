@@ -29,6 +29,7 @@ module.exports = [
   ['thuiswacht', 'Thuiswacht', 'veiligheid', '/apps/thuiswacht.html', 'Zeg hoe lang je onderweg bent; meld je je niet, dan krijgt je kring bericht met je laatst bekende plek.'],
   ['codewoord', 'Codewoord', 'veiligheid', '/apps/codewoord.html', 'Een gewone zin die je kring stil waarschuwt met je plek; op je scherm gebeurt er niets zichtbaars.'],
   ['thuisrust', 'Thuisrust', 'veiligheid', '/apps/thuisrust.html', 'Niet storen tot je thuis bent; je eigen kring komt er altijd doorheen.'],
+  ['toestemming', 'Toestemming', 'veiligheid', '/apps/toestemming.html', 'Wie mag iets van je zien en welk toestel schrijft iets weg; intrekken gaat naar de plek waar de toestemming leeft.'],
   ['ik', 'Wie ben ik', 'veiligheid', '/apps/ik.html', 'Wat Rahul over je mag weten: hoe hij tegen je doet, je voornaamwoorden en je eigen geloofskeuze. Alles optioneel.'],
   ['passkeys', 'Passkeys', 'veiligheid', '/apps/passkeys.html', 'Inloggen met vingerafdruk, gezicht of een fysieke sleutel.'],
   ['juridisch', 'Juridisch', 'veiligheid', '/apps/juridisch.html', 'Voorwaarden, contracten en je eigen akkoorden.'],

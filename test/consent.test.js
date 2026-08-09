@@ -1,0 +1,162 @@
+/* Het Consent Center (kern/consent.js). De belofte van dit scherm is "wie raakt
+   mijn gegevens aan, en hier zet u het stop", en die belofte heeft twee helften
+   die allebei kunnen breken:
+
+   1. VOLLEDIGHEID. Een overzicht dat er drie vergeet, geeft zekerheid die er
+      niet is. Elke toestemming die een lid ergens aanzet, hoort hier te
+      verschijnen -- daarom zet deze toets ze een voor een AAN via hun eigen app
+      en kijkt of ze op de lijst komen.
+   2. DE KNOP. Een intrekknop die het scherm groen maakt maar de laag niet
+      raakt, is erger dan geen knop. Daarom wordt elke intrek heen en terug
+      nagelopen: weg uit de lijst EN weg bij de bron zelf.
+
+   Draai los: node --experimental-sqlite --test test/consent.test.js */
+const test = require('node:test');
+const assert = require('node:assert/strict');
+const fs = require('fs');
+const os = require('os');
+const path = require('path');
+const { startServer, stop } = require('./helper');
+const { LAGEN, NIET_GEDEKT } = require('../server/kern/consent');
+
+let srv, base, lid;
+const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-consent-'));
+
+const api = (pad, body, t) => fetch(base + '/api/' + pad, {
+  method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + t },
+  body: JSON.stringify(body || {})
+}).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
+
+const lijst = async () => (await api('toestemming', {}, lid)).body;
+const vanLaag = (d, laag) => d.toestemmingen.filter(t => t.laag === laag);
+
+test.before(async () => {
+  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  base = srv.base;
+  lid = await fetch(base + '/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ tier: 'rtg' }) }).then(r => r.json()).then(d => d.token);
+  assert.ok(lid);
+});
+test.after(() => {
+  stop(srv && srv.child);
+  try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+});
+
+test('een lid dat niets deelt, ziet een lege lijst en geen storing', async () => {
+  const d = await lijst();
+  assert.deepEqual(d.toestemmingen, [], 'niets aangezet is niets op de lijst');
+  assert.deepEqual(d.storingen, [], 'en alle lagen zijn bereikbaar');
+  assert.ok(d.voorbehoud && /met de hand/i.test(d.voorbehoud),
+    'het scherm zegt zelf dat dit register met de hand wordt bijgehouden');
+  assert.ok(d.nietGedekt.length >= 3, 'en het zegt waar de lijst ophoudt');
+  assert.deepEqual(d.nietGedekt.map(x => x.naam), NIET_GEDEKT.map(x => x.naam));
+  for (const x of d.nietGedekt) assert.ok(x.reden, 'elke uitzondering draagt een reden');
+});
+
+test('elke laag in het register komt echt op de lijst als je hem aanzet', async () => {
+  /* 1. het zorgprofiel laten meereizen */
+  await api('zorgprofiel/zet', { allergenen: ['noten'], dieet: '', medisch: '', delen: true }, lid);
+
+  /* 2. medische context delen met een kliniek */
+  const care = (await api('care', {}, lid)).body;
+  const kliniek = care.aanbieders.find(a => a.soort === 'kliniek');
+  assert.ok(kliniek, 'de demo-kliniek staat er');
+  await api('care/intake/deel', { aanbiederId: kliniek.id, medisch: 'bloedverdunner' }, lid);
+
+  /* 3. een toestel koppelen */
+  await api('toestellen/koppel', { naam: 'Horloge' }, lid);
+
+  const d = await lijst();
+  assert.deepEqual(d.storingen, []);
+
+  const zp = vanLaag(d, 'zorgprofiel');
+  assert.equal(zp.length, 1);
+  assert.match(zp[0].wat, /allergenen/, 'er staat bij WAT er meereist, niet alleen dat er iets meereist');
+  assert.equal(zp[0].richting, 'ziet');
+
+  const ci = vanLaag(d, 'care-intake');
+  assert.equal(ci.length, 1);
+  assert.equal(ci[0].wie, kliniek.naam, 'met de naam van de aanbieder die het mag zien');
+  assert.ok(ci[0].tot, 'en tot wanneer');
+
+  const t = vanLaag(d, 'toestel');
+  assert.equal(t.length, 1);
+  assert.equal(t[0].wie, 'Horloge');
+  assert.equal(t[0].richting, 'schrijft', 'een toestel LEEST niet maar schrijft, en dat staat er ook zo');
+});
+
+test('intrekken raakt de bron zelf, en niet alleen deze lijst', async () => {
+  /* Dit is de scherpste bewering van het scherm. Na elke intrek wordt bij de
+     EIGEN app van die laag nagekeken of het er echt af is; een knop die alleen
+     deze lijst opschoont, zou hier groen blijven en toch liegen. */
+  const voor = await lijst();
+  assert.equal(voor.toestemmingen.length, 3);
+
+  const intake = vanLaag(voor, 'care-intake')[0];
+  assert.equal((await api('toestemming/intrek', { laag: 'care-intake', id: intake.id }, lid)).status, 200);
+  assert.equal(((await api('care', {}, lid)).body.intakes || []).length, 0,
+    'de deling is ook bij Zorg zelf weg');
+
+  const toestel = vanLaag(voor, 'toestel')[0];
+  assert.equal((await api('toestemming/intrek', { laag: 'toestel', id: toestel.id }, lid)).status, 200);
+  assert.equal((await api('toestellen', {}, lid)).body.toestellen.length, 0,
+    'het toestel is ook bij Toestellen zelf weg');
+
+  assert.equal((await api('toestemming/intrek', { laag: 'zorgprofiel', id: 'profiel' }, lid)).status, 200);
+  const profiel = (await api('zorgprofiel', {}, lid)).body.zorg;
+  assert.equal(profiel.delen, false, 'het meereizen staat uit');
+  assert.deepEqual(profiel.allergenen, ['noten'],
+    'maar het profiel zelf staat er nog: uitzetten is niet weggooien');
+
+  const na = await lijst();
+  assert.deepEqual(na.toestemmingen, [], 'en de lijst is leeg');
+});
+
+test('een onbekende laag of een vreemd id trekt niets in', async () => {
+  assert.equal((await api('toestemming/intrek', { laag: 'gedachten', id: 'x' }, lid)).status, 404);
+  assert.equal((await api('toestemming/intrek', { laag: 'care-intake', id: 'bestaat-niet' }, lid)).status, 404);
+  assert.equal((await api('toestemming/intrek', { laag: 'toestel', id: 'bestaat-niet' }, lid)).status, 404);
+});
+
+test('het register en het scherm lopen niet uiteen', () => {
+  /* Een laag die in het register staat maar nergens wordt gelezen, is een lege
+     belofte; een laag die wel getoond wordt maar niet in het register staat,
+     ontbreekt in de uitleg op het scherm. Beide kanten worden hier vastgezet. */
+  const maak = require('../server/kern/consent');
+  const alles = maak({ kern: {
+    careOverzicht: () => ({ intakes: [{ id: 'i1', aanbiederNaam: 'Kliniek', vervaltOp: '2026-12-01' }] }),
+    rtgid: {
+      inzage: () => ({
+        sessies: [{ dienst: 'Gemeente', attributen: ['naam'], verloopt: '2026-12-01T00:00:00.000Z' }],
+        machtigingen: [{ id: 'm1', naar: 'ADELAAR', dienst: 'Gemeente', tot: '2026-12-01T00:00:00.000Z', ik: 'geef' },
+          { id: 'm2', naar: 'IK', dienst: 'Gemeente', tot: '2026-12-01T00:00:00.000Z', ik: 'krijg' }]
+      })
+    },
+    locMijn: () => ({ actief: [{ id: 'l1', supplierName: 'Kikunoi' }] }),
+    zorgVan: () => ({ allergenen: ['noten'], dieet: '', medisch: '', delen: true }),
+    toestellenVan: () => ({ toestellen: [{ id: 't1', naam: 'Horloge', geschreven: 3 }] })
+  } });
+  const d = alles.consentVan('sleutel');
+  assert.deepEqual(d.storingen, []);
+
+  const getoond = [...new Set(d.toestemmingen.map(t => t.laag))].sort();
+  const geregistreerd = LAGEN.filter(l => l.gedekt).map(l => l.id).sort();
+  assert.deepEqual(getoond, geregistreerd,
+    'elke gedekte laag levert een regel, en er komt geen laag langs die niet in het register staat');
+
+  assert.equal(d.toestemmingen.filter(t => t.laag === 'rtgid-machtiging').length, 1,
+    'een machtiging die u KRIJGT is geen toestemming die u geeft, en staat er dus niet bij');
+  assert.ok(d.toestemmingen.every(t => t.wie && t.wat && t.richting),
+    'elke regel zegt wie, wat en welke kant het op gaat');
+});
+
+test('een laag die het niet doet, wordt gemeld en niet als leegte getoond', () => {
+  /* Op dit scherm is stilte gevaarlijker dan elders: een ontbrekende regel
+     leest als "niemand kijkt mee". */
+  const maak = require('../server/kern/consent');
+  const stuk = maak({ kern: { careOverzicht: () => { throw new Error('kapot'); } } });
+  const d = stuk.consentVan('sleutel');
+  assert.ok(d.storingen.length >= 1);
+  assert.match(d.storingen[0], /Zorg/i, 'de laag die stukging staat met naam in de melding');
+  assert.equal(d.storingen.length, 5, 'en de vier lagen die ontbreken melden zich ook, geen stilte');
+});

@@ -1,0 +1,136 @@
+/* Het Consent Center: wie raakt mijn gegevens aan, en waar zet ik dat stop.
+
+   Net als RTG Life bewaart deze laag NIETS. Hij leest de lagen die de
+   toestemming zelf beheren en zet ze naast elkaar in een vorm. Intrekken gaat
+   ook via die laag: er staat hier geen tweede knop die zijn eigen vlaggetje
+   omzet, want dan is er een tweede waarheid over of iets nog mag (LAT regel 4).
+
+   HET GEVAARLIJKSTE AAN DIT SCHERM IS ONVOLLEDIGHEID. Een overzicht dat "wie
+   ziet wat" heet en er drie vergeet, is erger dan geen overzicht: het geeft
+   zekerheid die er niet is. Daarom staat hieronder een REGISTER van elke laag
+   die toestemming draagt, met per stuk of hij hier staat. Wat niet gedekt is,
+   staat er MET reden bij en gaat als zodanig naar het scherm. En daarom zegt
+   het scherm ook dat dit register met de hand wordt bijgehouden: geen enkele
+   machine merkt op dat er ergens een nieuwe toestemming is bijgekomen.
+
+   Wat een toets wel bewaakt: dat voor elke gedekte laag de intrekknop echt
+   intrekt (heen en terug), en dat het register en wat het scherm toont niet
+   uiteenlopen. */
+
+/* Het register. Per laag: waar het over gaat, of het LEZEN of SCHRIJVEN is, en
+   welke kern-functies hem lezen en stoppen. De volgorde is de volgorde op het
+   scherm: het zwaarste bovenaan. */
+const LAGEN = [
+  { id: 'care-intake', naam: 'Medische context bij een zorgaanbieder', richting: 'ziet', gedekt: true },
+  { id: 'rtgid-sessie', naam: 'Diensten die met RTG iD uw gegevens ophalen', richting: 'ziet', gedekt: true },
+  { id: 'rtgid-machtiging', naam: 'Mensen die namens u mogen inloggen', richting: 'doet', gedekt: true },
+  { id: 'locatie', naam: 'Zaken die live met u meekijken', richting: 'ziet', gedekt: true },
+  { id: 'zorgprofiel', naam: 'Uw zorgprofiel dat meereist met bestellingen', richting: 'ziet', gedekt: true },
+  { id: 'toestel', naam: 'Toestellen die metingen wegschrijven', richting: 'schrijft', gedekt: true }
+];
+
+/* Wat dit scherm NIET dekt, met reden. Deze regels gaan mee naar het scherm,
+   want een lezer hoort te weten waar de lijst ophoudt. */
+const NIET_GEDEKT = [
+  { naam: 'Wat u in De Salon of een genootschap plaatst',
+    reden: 'Dat is publiceren en geen toestemming: u haalt het weg bij de post zelf.' },
+  { naam: 'Uw veiligheidskring (Thuiswacht, Codewoord, Vitaal)',
+    reden: 'Die kring krijgt pas iets te zien als er een alarm afgaat; u beheert hem in de veiligheidsapps.' },
+  { naam: 'Wat een zaak van een boeking weet',
+    reden: 'Dat hoort bij de boeking en verdwijnt met de boeking; het is geen losse toestemming.' }
+];
+
+const dagVan = d => (d ? String(d).slice(0, 10) : null);
+
+module.exports = ({ kern }) => {
+  /* Elke laag apart, en een laag die het niet doet wordt gemeld en niet stil
+     overgeslagen -- op dit scherm nog harder dan elders: een ontbrekende regel
+     leest hier als "niemand kijkt mee". */
+  function lees(naam, fn) {
+    if (typeof fn !== 'function') return { fout: 'De laag ' + naam + ' is niet aangesloten.' };
+    try { return { waarde: fn() }; } catch (e) { return { fout: 'De laag ' + naam + ' gaf een fout.' }; }
+  }
+
+  function consentVan(key) {
+    const uit = [];
+    const storingen = [];
+    const pak = (naam, fn) => { const r = lees(naam, fn); if (r.fout) storingen.push(r.fout); return r.waarde; };
+
+    const care = pak('Zorg', kern.careOverzicht && (() => kern.careOverzicht(key)));
+    for (const i of (care && care.intakes) || []) {
+      uit.push({ laag: 'care-intake', id: i.id, wie: i.aanbiederNaam,
+        wat: 'De medische context die u apart met deze aanbieder deelde',
+        tot: i.vervaltOp, richting: 'ziet', intrekbaar: true });
+    }
+
+    const id = pak('RTG iD', kern.rtgid && kern.rtgid.inzage && (() => kern.rtgid.inzage(key)));
+    for (const s of (id && id.sessies) || []) {
+      uit.push({ laag: 'rtgid-sessie', id: s.dienst, wie: s.dienst,
+        wat: (s.attributen || []).join(', ') || 'gegevens uit uw RTG iD',
+        tot: dagVan(s.verloopt), richting: 'ziet', intrekbaar: true });
+    }
+    for (const m of (id && id.machtigingen) || []) {
+      if (m.ik !== 'geef') continue;   // wat u KRIJGT is geen toestemming die u geeft
+      uit.push({ laag: 'rtgid-machtiging', id: m.id, wie: m.naar,
+        wat: 'Mag namens u inloggen bij ' + m.dienst,
+        tot: dagVan(m.tot), richting: 'doet', intrekbaar: true });
+    }
+
+    const loc = pak('Locatie', kern.locMijn && (() => kern.locMijn(key)));
+    for (const d of (loc && loc.actief) || []) {
+      uit.push({ laag: 'locatie', id: d.id, wie: d.supplierName || d.supplierCode,
+        wat: 'Kijkt live mee met waar u bent', tot: null, richting: 'ziet', intrekbaar: true });
+    }
+
+    const zorg = pak('Zorgprofiel', kern.zorgVan && (() => kern.zorgVan(key)));
+    if (zorg && zorg.delen) {
+      const stukken = [(zorg.allergenen || []).length ? 'allergenen' : null, zorg.dieet ? 'dieet' : null,
+        zorg.medisch ? 'aandachtspunten' : null].filter(Boolean);
+      uit.push({ laag: 'zorgprofiel', id: 'profiel', wie: 'Zaken waar u bestelt of verblijft',
+        wat: stukken.length ? stukken.join(', ') : 'uw zorgprofiel',
+        tot: null, richting: 'ziet', intrekbaar: true });
+    }
+
+    const toe = pak('Toestellen', kern.toestellenVan && (() => kern.toestellenVan(key)));
+    for (const t of (toe && toe.toestellen) || []) {
+      uit.push({ laag: 'toestel', id: t.id, wie: t.naam,
+        wat: 'Schrijft dagmetingen weg (' + t.geschreven + ' tot nu toe)',
+        tot: null, richting: 'schrijft', intrekbaar: true });
+    }
+
+    return {
+      ok: true, toestemmingen: uit, lagen: LAGEN, nietGedekt: NIET_GEDEKT, storingen,
+      voorbehoud: 'Deze lijst wordt met de hand bijgehouden. Komt er ergens in RTG een nieuwe ' +
+        'soort toestemming bij, dan verschijnt hij hier niet vanzelf.'
+    };
+  }
+
+  /* Intrekken gaat naar de laag die de toestemming beheert. Er staat hier met
+     opzet geen eigen vlaggetje: dan zou dit scherm kunnen zeggen dat iets uit
+     staat terwijl de laag zelf het nog toelaat. */
+  function consentIntrek(key, body) {
+    const laag = String(body.laag || '');
+    const id = String(body.id || '');
+    const def = LAGEN.find(l => l.id === laag);
+    if (!def) return { status: 404, error: 'Dit soort toestemming kent RTG niet.' };
+
+    if (laag === 'care-intake') return kern.careIntakeStop(key, id);
+    if (laag === 'rtgid-sessie') return kern.rtgid.intrek(key, id);
+    if (laag === 'rtgid-machtiging') return kern.rtgid.machtigIntrek(key, id);
+    if (laag === 'locatie') return kern.locStopKlant(key, id);
+    if (laag === 'toestel') return kern.toestelIntrek(key, { id });
+    if (laag === 'zorgprofiel') {
+      /* Het profiel zelf blijft staan; alleen het MEEREIZEN gaat uit. Het
+         weggooien zou meer doen dan er gevraagd is, en het lid raakt dan zijn
+         eigen allergenenlijst kwijt. */
+      const p = kern.zorgVan(key);
+      return kern.zorgZet(key, { ...p, delen: false });
+    }
+    return { status: 500, error: 'Deze laag staat in het register maar heeft geen intrekpad.' };
+  }
+
+  return { consentVan, consentIntrek };
+};
+
+module.exports.LAGEN = LAGEN;
+module.exports.NIET_GEDEKT = NIET_GEDEKT;

@@ -27,6 +27,15 @@ public/dist/
 # idem voor de schermen: invoer voor scripts/schermen.js, geen bronbestand
 .schermjournaal
 
+# de ijkbestanden van test/meterijk.test.js. Die toets controleert of de
+# normmeters echt uitslaan door er even een bestand bij te zetten (een extra
+# toets, een extra route, een extra scherm) en het daarna weer weg te halen.
+# Ze bestaan dus een seconde, midden IN de repo, en wie in dat moment naar
+# `git status` keek zag ze als nieuw werk. Committen zou een wegwerpfixture
+# vastleggen die de volgende run weer opruimt.
+zz-ijk-tijdelijk.*
+**/zz-ijk-tijdelijk.*
+
 # dekkingsdata van de laatste run: invoer voor scripts/samenhang.js, geen bron.
 # Twintig minuten om te maken, dus niet in de repo -- de census meldt netjes
 # NIET GEMETEN als hij er niet is.

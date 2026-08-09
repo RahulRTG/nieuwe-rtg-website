@@ -119,3 +119,81 @@ test('een abo-voorstel naar Business kent niets toe', async () => {
       'de pas van het lid hoort ONVERANDERD te zijn: Lifestyle en Business gaan uitsluitend via een menselijk besluit');
   } finally { stop(o.srv.child); }
 });
+
+/* ---------------------------------------------------------------------------
+   DE ZETELS EN DE KLACHTEN.
+
+   Deze vier deuren (zetels, zetel, klacht, klacht/status) werden door geen
+   enkele toets geopend. Juist hier zit de regel die de rest van dit bestand
+   bewaakt: een zetel hangt aan een PERSOONLIJKE inlog. Zonder die eis is de
+   balie weer een gedeelde code met een extra stap ervoor.
+   --------------------------------------------------------------------------- */
+
+test('een baliezetel hangt aan een persoonlijke inlog en nergens anders aan', async () => {
+  const o = await opzet();
+  try {
+    const lijst = await o.p('/api/office/balie/zetels', {}, o.eigenaar);
+    assert.equal(lijst.status, 200, 'de eigenaar ziet de zetels: ' + JSON.stringify(lijst.body).slice(0, 160));
+    assert.ok(Array.isArray(lijst.body.zetels), 'er is een zetellijst');
+    // de lijst draagt sleutels en momenten, en met opzet geen namen
+    for (const z of lijst.body.zetels)
+      assert.deepEqual(Object.keys(z).sort(), ['key', 'sinds'], 'een zetelregel draagt alleen key en sinds');
+
+    const kantoor = await o.p('/api/office/login', { code: OFFICE_CODE });
+    const gedeeld = await o.p('/api/office/balie/zetels', {}, kantoor.body.token);
+    assert.equal(gedeeld.status, 403, 'de gedeelde kantoorcode deelt geen zetels uit');
+
+    const los = await o.p('/api/office/balie/zetel', { key: 'kantoor' }, o.eigenaar);
+    assert.equal(los.status, 400, 'een sleutel die geen persoon is, krijgt geen zetel');
+    assert.match(String(los.body.error || ''), /persoonlijke/i, los.body.error);
+
+    const spook = await o.p('/api/office/balie/zetel', { key: 'user-999999' }, o.eigenaar);
+    assert.equal(spook.status, 404, 'een account dat niet bestaat, krijgt geen zetel');
+
+    const gegeven = await o.p('/api/office/balie/zetel', { key: 'user-' + o.id }, o.eigenaar);
+    assert.equal(gegeven.status, 200, 'het lid krijgt een zetel: ' + JSON.stringify(gegeven.body).slice(0, 160));
+    assert.ok(gegeven.body.zetels.some(z => z.key === 'user-' + o.id), 'en staat meteen in de verse lijst');
+
+    // twee keer geven is geen tweede regel: anders werkt intrekken maar half
+    await o.p('/api/office/balie/zetel', { key: 'user-' + o.id }, o.eigenaar);
+    const na = await o.p('/api/office/balie/zetels', {}, o.eigenaar);
+    assert.equal(na.body.zetels.filter(z => z.key === 'user-' + o.id).length, 1,
+      'twee keer geven levert een regel op, geen twee');
+
+    const weg = await o.p('/api/office/balie/zetel', { key: 'user-' + o.id, weg: true }, o.eigenaar);
+    assert.equal(weg.status, 200, 'de zetel gaat er weer af');
+    assert.equal(weg.body.zetels.some(z => z.key === 'user-' + o.id), false, 'en is dan echt weg');
+  } finally { stop(o.srv.child); }
+});
+
+test('een klacht draagt de codenaam, een stand en een spoor van wie hem zette', async () => {
+  const o = await opzet();
+  try {
+    const kort = await o.p('/api/office/balie/klacht', { id: o.id, soort: 'reis', tekst: 'x' }, o.eigenaar);
+    assert.equal(kort.status, 400, 'een klacht van niks is ruis en geen klacht');
+
+    const k = await o.p('/api/office/balie/klacht',
+      { id: o.id, soort: 'reis', tekst: 'De heenvlucht werd verzet en er is niemand teruggebeld.' }, o.eigenaar);
+    assert.equal(k.status, 200, 'de klacht wordt vastgelegd: ' + JSON.stringify(k.body).slice(0, 160));
+    assert.equal(k.body.klacht.status, 'open', 'een verse klacht staat open');
+    assert.equal(k.body.klacht.codenaam, o.codenaam, 'de klacht hangt aan de codenaam');
+    const alles = JSON.stringify(k.body);
+    assert.ok(!alles.includes('Balie Lid') && !alles.includes('balielid@x.nl'),
+      'en nergens aan de echte naam of het adres: ' + alles.slice(0, 200));
+
+    const onzin = await o.p('/api/office/balie/klacht/status',
+      { klachtId: k.body.klacht.id, status: 'weggeklikt' }, o.eigenaar);
+    assert.equal(onzin.status, 400, 'een stand die niet bestaat, wordt geweigerd');
+
+    const dicht = await o.p('/api/office/balie/klacht/status',
+      { klachtId: k.body.klacht.id, status: 'opgelost' }, o.eigenaar);
+    assert.equal(dicht.status, 200, 'de stand gaat om: ' + JSON.stringify(dicht.body).slice(0, 160));
+    assert.equal(dicht.body.klacht.status, 'opgelost');
+    assert.ok(dicht.body.klacht.log.length >= 2,
+      'elke standwijziging laat een regel achter, met wie hem zette');
+
+    const spook = await o.p('/api/office/balie/klacht/status',
+      { klachtId: 'bestaat-niet', status: 'gesloten' }, o.eigenaar);
+    assert.equal(spook.status, 404, 'een klacht die er niet is, is 404');
+  } finally { stop(o.srv.child); }
+});

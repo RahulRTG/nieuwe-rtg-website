@@ -19,7 +19,12 @@
    - de teruggedraaid-vlag niet zetten in draaiTerug()
      -> "een teruggedraaide run zegt dat zelf" ZAKT (RAAK)
    - de statuscontrole uit zaken.besluit() gehaald
-     -> "een zaak die niemand oppakte is niet te besluiten" ZAKT (RAAK)
+     -> "een zaak loopt open, in behandeling, afgehandeld" ZAKT (RAAK)
+   - dezelfde controle uit zaken.neem() gehaald
+     -> zakt NU ook, maar bleef eerst groen: die regel staat twee keer in
+        kern/command/zaken.js en de toets raakte er maar een van. Dat is precies
+        wat een mutatieproef hoort te vinden, en de tweede assertie in toets 4
+        staat er sindsdien.
 
    Draai los: node --experimental-sqlite --test test/command-routes-herstel.test.js
    ========================================================================== */
@@ -119,8 +124,15 @@ test('4. een zaak loopt open, in behandeling, afgehandeld -- en niet andersom', 
   assert.equal(besluit.zaak.besluit.keuze, 'opgelost');
   assert.ok(besluit.zaak.stappen.length >= 3, 'alle drie de stappen staan in het spoor');
 
+  /* BEIDE KANTEN VAN DE GRENDEL. Dezelfde regel staat twee keer in
+     kern/command/zaken.js -- een keer in neem() en een keer in besluit() -- en
+     een toets die er maar een van raakt, laat de andere ongemerkt verdwijnen.
+     Dat is hier ook gebeurd: de mutatieproef haalde de bovenste weg en alles
+     bleef groen. Vandaar deze twee regels naast elkaar. */
   const nogmaals = await api('zaak/besluit', { id, keuze: 'opgelost', reden: 'nog een keer' });
-  assert.notEqual(nogmaals.status, 200, 'een afgehandelde zaak is niet nog eens te besluiten');
+  assert.equal(nogmaals.status, 409, 'een afgehandelde zaak is niet nog eens te besluiten');
+  const opnieuwOppakken = await api('zaak/neem', { id });
+  assert.equal(opnieuwOppakken.status, 409, 'en ook niet nog eens op te pakken');
 
   const lijst = await moet('zaken', { max: 50 }, 'de zakenlijst');
   assert.ok(lijst.tellingen && Array.isArray(lijst.leerpunten),

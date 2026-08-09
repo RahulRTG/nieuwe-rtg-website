@@ -24,7 +24,7 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 | kernmodules (`server/kern/**`) | 945 |
 | schermen (`public/**/*.html`) | 214 |
 | gedeelde browsermodules (`public/shared/*.js`) | 179 |
-| toetsbestanden (`test/*.test.js`) | 652 |
+| toetsbestanden (`test/*.test.js`) | 656 |
 | schermtoetsen (`test/*.e2e.js`) | 90 |
 
 ## 2. De weg van een verzoek
@@ -135,8 +135,8 @@ domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 
 ```
 app(128) auth(71) supplierAuth(47) officeAuth(30) db(30) accounts(18) liveCodename(17)
-status(16) schoon(14) managerOnly(13) rtf(11) express(10) save(10) codenaamVan(10)
-tooManyTries(9) crypto(9) anthropic(9) rtmail(9) boardroomWie(8) logActivity(7)
+status(16) schoon(14) managerOnly(13) rtf(11) save(10) codenaamVan(10) tooManyTries(9)
+crypto(9) express(9) anthropic(9) rtmail(9) boardroomWie(8) logActivity(7)
 sseToOffice(7) keyVanCodenaam(7) payrollOS(7) geenGast(6) noteFailedTry(6) kern(6)
 gegevensStop(6) talen(6) mail(5) loginFails(5) sseToSupplier(5)
 ```

@@ -204,6 +204,15 @@ test('7. de teruggave: een keer, door wie erover gaat, en alleen wie het raakte'
     van: tot, tot: van }, pda);
   assert.equal(krom.status, 400);
 
+  /* De storingenlijst: dezelfde melding, van de andere kant gelezen. Deze deur
+     werd door geen enkele toets geopend, terwijl de conducteur er zijn eigen
+     melding in terugziet -- en een lijst die de melding niet toont, laat hem
+     hem twee keer maken. */
+  const lijst = await api('/api/staff/mob/kaart/storingen', {}, pda);
+  assert.equal(lijst.status, 200, lijst.body.error || '');
+  assert.ok((lijst.body.storingen || []).some(x => x.id === st.body.storing.id),
+    'de zojuist gemelde storing staat in de lijst van deze vervoerder');
+
   // uitbetalen is geld verplaatsen: dat doet de manager, niet iedereen met een PDA
   const chauffeur = await api('/api/supplier/mob/kaart/teruggave', { id: st.body.storing.id }, pda);
   assert.equal(chauffeur.status, 403, 'de chauffeur betaalt niet uit');

@@ -128,5 +128,22 @@ test('verkeer landt in het journaal en is via de boardroom te lezen', async () =
     const alles = JSON.stringify(j.body);
     assert.ok(!alles.includes('journaallid@x.nl'),
       'het adres van het lid hoort NERGENS in het journaal te staan: ' + alles.slice(0, 200));
+
+    /* HET BEELD IS EEN SAMENVATTING VAN DEZELFDE LIJST, geen tweede telling.
+       Het bestaat zodat een scherm elke paar seconden kan kijken zonder de hele
+       lijst op te halen; loopt het uiteen, dan kijkt dat scherm naar iets
+       anders dan waar het naartoe klikt. Deze deur werd door geen enkele toets
+       geopend, terwijl juist hier twee tellingen uit elkaar kunnen lopen. */
+    const beeld = await post('/api/office/journaal/beeld', {}, kantoor);
+    assert.equal(beeld.status, 200, 'het beeld hoort leesbaar te zijn: ' + JSON.stringify(beeld.body).slice(0, 160));
+    assert.equal(typeof beeld.body.mislukt, 'number', 'het getal dat telt staat erin');
+    assert.ok(beeld.body.mislukt >= 1, 'de mislukking van hierboven telt mee in het beeld');
+    assert.equal(beeld.body.venster + beeld.body.bewaard >= (j.body.regels || []).length, true,
+      'het beeld telt minstens wat de lijst toont: ' + beeld.body.venster + '/' + beeld.body.bewaard);
+    assert.equal(beeld.body.in + beeld.body.uit, beeld.body.venster,
+      'in en uit samen zijn het hele venster en geen derde categorie');
+
+    const dicht = await post('/api/office/journaal/beeld', {});
+    assert.equal(dicht.status, 401, 'zonder boardroomsessie blijft ook het beeld dicht');
   } finally { stop(srv.child); }
 });

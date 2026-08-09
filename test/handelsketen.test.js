@@ -318,6 +318,41 @@ test('bestellen weigert bij uzelf, bij een onbekende zaak en zonder afgesproken 
   } finally { await stop(srv); }
 });
 
+test('intrekken kan door de koper, en alleen zolang er nog niets gegund is', async () => {
+  /* Deze deur werd door geen enkele toets geopend, terwijl hij de enige is die
+     een aanvraag UIT de markt haalt. Twee dingen horen hier vast te staan: de
+     leverancier trekt de aanvraag van een ander niet in, en na het gunnen is
+     intrekken geen intrekken meer maar een afspraak verbreken. */
+  const srv = await startServer({ env: { SMTP_URL: '' } });
+  try {
+    const club = await beheer(srv.base, KOPER);
+    const was = await beheer(srv.base, WASSERIJ);
+
+    const aan = await post(srv.base, '/supplier/handel/aanvraag', {
+      genre: 'wasserij', titel: 'Linnen dat toch niet nodig was',
+      regels: [{ wat: 'servetten', aantal: 100, eenheid: 'stuk' }]
+    }, club);
+    assert.equal(aan.status, 200, JSON.stringify(aan.body));
+    const id = aan.body.handel.id;
+
+    const doorDeAnder = await post(srv.base, '/supplier/handel/intrekken', { id }, was);
+    assert.notEqual(doorDeAnder.status, 200, 'de leverancier trekt de aanvraag van de koper niet in');
+
+    const weg = await post(srv.base, '/supplier/handel/intrekken', { id }, club);
+    assert.equal(weg.status, 200, JSON.stringify(weg.body));
+    assert.equal(weg.body.handel.status, 'ingetrokken');
+
+    const bijWas = await post(srv.base, '/supplier/handel/mijn', {}, was);
+    assert.equal(vind(bijWas.body.open, id), undefined, 'en staat niet meer open in de markt');
+
+    const nogmaals = await post(srv.base, '/supplier/handel/intrekken', { id }, club);
+    assert.notEqual(nogmaals.status, 200, 'twee keer intrekken is geen stap in de keten');
+
+    const spook = await post(srv.base, '/supplier/handel/intrekken', { id: 'bestaat-niet' }, club);
+    assert.equal(spook.status, 404, 'een aanvraag die er niet is, is 404');
+  } finally { await stop(srv); }
+});
+
 test('elke stap uit de levensloop heeft een endpoint, en het scherm kent geen andere', () => {
   /* HOE DIT ER KWAM. Het scherm leidt zijn pad af uit de STAPNAAM
      (/api/supplier/handel/<stap>), en de route heette 'offerte' terwijl de stap

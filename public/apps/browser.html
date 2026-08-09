@@ -300,6 +300,26 @@ function tekenBlok(blok,ver){
     });
     s.appendChild(f);
   }
+  else if(t==='faq'){ s.classList.add('b-tekst');
+    const h=document.createElement('h2');h.style.cssText='font-family:\'Bodoni Moda\',serif;margin-bottom:.8rem;';tekst(h,T.kop);s.appendChild(h);
+    (blok.vragen||[]).forEach(q=>{
+      const d=document.createElement('div');d.style.cssText='margin-bottom:.9rem;';
+      const v=document.createElement('div');v.style.fontWeight='600';tekst(v,q.v);
+      const a=document.createElement('div');a.style.opacity='.8';tekst(a,q.a);
+      d.appendChild(v);d.appendChild(a);s.appendChild(d);
+    });
+  }
+  else if(t==='prijzen'){ s.classList.add('b-tekst');
+    const h=document.createElement('h2');h.style.cssText='font-family:\'Bodoni Moda\',serif;margin-bottom:.8rem;';tekst(h,T.kop);s.appendChild(h);
+    (blok.regels||[]).forEach(r=>{
+      const d=document.createElement('div');d.style.cssText='display:flex;gap:.8rem;align-items:baseline;border-bottom:1px solid currentColor;padding:.5rem 0;';
+      const n=document.createElement('div');n.style.flex='1';
+      const nm=document.createElement('div');nm.style.fontWeight='600';tekst(nm,r.naam);n.appendChild(nm);
+      if(r.wat){const w=document.createElement('div');w.style.cssText='opacity:.75;font-size:.9em;';tekst(w,r.wat);n.appendChild(w);}
+      const p=document.createElement('div');p.style.whiteSpace='nowrap';tekst(p,r.prijs);
+      d.appendChild(n);d.appendChild(p);s.appendChild(d);
+    });
+  }
   else if(t==='ruimte'){ s.style.height=(blok.hoogte||40)+'px'; }
   else if(t==='voettekst'){ s.classList.add('b-voet'); tekst(s,T.tekst); }
   return s;

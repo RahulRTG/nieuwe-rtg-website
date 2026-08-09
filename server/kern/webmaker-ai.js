@@ -15,7 +15,9 @@ module.exports = ({ anthropic, schoon }) => {
     'Antwoord ALLEEN met het volledige aangepaste ontwerp als JSON-object, zelfde vorm als de invoer: ' +
     '{"titel","thema":"licht|donker","accent":"#rrggbb","kleuren":{"bg","txt","card"}|null,"blokken":[...],"paginas":[{"naam","slug","blokken":[...]}]}. ' +
     'Bloktypen: hero{kop,sub,knop}, kop{tekst}, tekst{tekst}, knop{tekst,href}, beeld{src,bijschrift}, kolommen{lk,lt,rk,rt}, ' +
-    'galerij{beelden:[]}, citaat{tekst,bron}, ruimte{hoogte}, voettekst{tekst}, zaakdata{bron} (live blok, inhoud NIET invullen), formulier{kop,knop}. ' +
+    'galerij{beelden:[]}, citaat{tekst,bron}, ruimte{hoogte}, voettekst{tekst}, formulier{kop,knop}, ' +
+    'faq{kop,vragen:[{v,a}]}, prijzen{kop,regels:[{naam,prijs,wat}]}, ' +
+    'zaakdata{bron} (LIVE blok: bron is een van menu|diensten|kamers|agenda|events|vacatures|openingstijden|fotos|reviews|contact; de inhoud komt bij ieder bezoek uit het bedrijfsprofiel, dus NIET invullen en niet vervangen door vaste tekst). ' +
     'Behoud de id\'s van blokken die je houdt; nieuwe blokken zonder id. Maximaal 60 blokken per pagina en 7 extra pagina\'s. ' +
     'Verzin geen beeld-URL\'s: gebruik alleen src-waarden die al in het ontwerp staan. ' +
     'Schrijfstijl: ingetogen en premium, geen uitroeptekens en geen superlatieven-stapeling. Nederlands, tenzij de opdracht om een andere taal vraagt.';

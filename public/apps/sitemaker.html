@@ -195,7 +195,8 @@ const ACCENTEN=['#7F1634','#9E1C40','#C23A5E','#857007','#A98F1C','#0C0C0B','#2E
 const BLOKTYPES=[
   {t:'hero',n:'Hero',k:'grote kop + knop'},{t:'kop',n:'Kop',k:'sectiekop'},{t:'tekst',n:'Tekst',k:'alinea'},
   {t:'knop',n:'Knop',k:'oproep'},{t:'beeld',n:'Beeld',k:'één afbeelding'},{t:'kolommen',n:'Twee kolommen',k:'naast elkaar'},
-  {t:'galerij',n:'Galerij',k:'meerdere beelden'},{t:'citaat',n:'Citaat',k:'uitspraak'},{t:'ruimte',n:'Ruimte',k:'witruimte'},{t:'voettekst',n:'Voettekst',k:'onderaan'}
+  {t:'galerij',n:'Galerij',k:'meerdere beelden'},{t:'citaat',n:'Citaat',k:'uitspraak'},{t:'ruimte',n:'Ruimte',k:'witruimte'},{t:'voettekst',n:'Voettekst',k:'onderaan'},
+  {t:'faq',n:'Veelgestelde vragen',k:'vraag en antwoord'},{t:'prijzen',n:'Prijzen',k:'wat het kost'}
 ];
 function nieuwBlok(t){
   const id=RTGId('b');
@@ -209,6 +210,8 @@ function nieuwBlok(t){
   if(t==='citaat')return{id,type:t,tekst:'Een tevreden klant zegt iets moois.',bron:'Naam'};
   if(t==='ruimte')return{id,type:t,hoogte:48};
   if(t==='voettekst')return{id,type:t,tekst:'© Mijn bedrijf · via RTG'};
+  if(t==='faq')return{id,type:t,kop:'Veelgestelde vragen',vragen:[{v:'Waar zijn jullie te vinden?',a:'Beschrijf hier waar klanten je vinden.'},{v:'Hoe maak ik een afspraak?',a:'Leg hier uit hoe het werkt.'}]};
+  if(t==='prijzen')return{id,type:t,kop:'Wat het kost',regels:[{naam:'Eerste dienst',prijs:'€ 45',wat:'Korte omschrijving.'},{naam:'Tweede dienst',prijs:'€ 90',wat:'Korte omschrijving.'}]};
   return{id,type:'tekst',tekst:''};
 }
 
@@ -365,6 +368,30 @@ function renderBlok(blok,p){
   } else if(t==='citaat'){ s.classList.add('b-citaat'); const q=document.createElement('div'); q.className='q'; q.appendChild(veld(T.tekst,v=>zetVeld(blok,'tekst',v),true)); const br=document.createElement('div'); br.className='bron'; br.appendChild(veld(T.bron,v=>zetVeld(blok,'bron',v))); s.appendChild(q); s.appendChild(br);
   } else if(t==='ruimte'){ s.style.height=(blok.hoogte||40)+'px';
   } else if(t==='voettekst'){ s.classList.add('b-voet'); s.appendChild(veld(T.tekst,v=>zetVeld(blok,'tekst',v)));
+  } else if(t==='faq'||t==='prijzen'){
+    /* Blokken met rijen. Elk veld is los te bewerken; een rij leeghalen laat
+       hem bij het bewaren vanzelf wegvallen (de schoonmaak gooit lege rijen
+       weg), en met "+ rij" komt er een bij. */
+    s.classList.add('b-tekst');
+    const h=document.createElement('h2'); h.style.cssText='font-family:\'Bodoni Moda\',serif;margin-bottom:.8rem;';
+    h.appendChild(veld(T.kop,v=>zetVeld(blok,'kop',v))); s.appendChild(h);
+    const rijen=t==='faq'?(blok.vragen=blok.vragen||[]):(blok.regels=blok.regels||[]);
+    const velden=t==='faq'?[['v','vraag',false],['a','antwoord',true]]:[['naam','dienst',false],['prijs','prijs',false],['wat','omschrijving',true]];
+    rijen.forEach(r=>{
+      const d=document.createElement('div'); d.style.cssText='border-bottom:1px solid currentColor;padding:.5rem 0;';
+      velden.forEach(([k,,meer])=>{
+        const el=veld(r[k],v=>{r[k]=v;},meer);
+        el.style.display='block'; if(k==='v'||k==='naam')el.style.fontWeight='600'; else el.style.opacity='.8';
+        d.appendChild(el);
+      });
+      s.appendChild(d);
+    });
+    if(BEWERK){
+      const plus=document.createElement('button'); plus.type='button'; plus.textContent='+ rij';
+      plus.style.cssText='margin-top:.6rem;background:transparent;border:1px dashed currentColor;color:inherit;border-radius:8px;padding:.3rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;';
+      plus.addEventListener('click',()=>{ rijen.push(t==='faq'?{v:'Nieuwe vraag',a:'Het antwoord.'}:{naam:'Nieuwe regel',prijs:'€ 0',wat:''}); render(); });
+      s.appendChild(plus);
+    }
   } else if(t==='zaakdata'){ /* live blok van een bedrijfssite: de inhoud komt bij bezoek uit het zaakprofiel */
     s.classList.add('b-tekst'); const d=document.createElement('div');
     d.style.cssText='border:1px dashed currentColor;opacity:.7;padding:1rem;text-align:center;font-size:.85rem;';

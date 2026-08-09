@@ -7,9 +7,10 @@
    AI-assistent, een sjabloon, een extra pagina -- loopt hier langs, en dat is
    precies de reden om het op EEN plek te houden. */
 module.exports = ({ scho, crypto }) => {
-  const TYPES = ['hero', 'kop', 'tekst', 'knop', 'beeld', 'kolommen', 'galerij', 'citaat', 'ruimte', 'voettekst', 'zaakdata', 'formulier'];
+  const TYPES = ['hero', 'kop', 'tekst', 'knop', 'beeld', 'kolommen', 'galerij', 'citaat', 'ruimte', 'voettekst', 'zaakdata', 'formulier', 'faq', 'prijzen'];
   // de bronnen die een live zaakdata-blok mag aanwijzen (opgelost in kern/webplatform.js)
-  const ZAAKBRONNEN = ['menu', 'diensten', 'kamers', 'agenda', 'fotos', 'reviews', 'contact'];
+  const ZAAKBRONNEN = ['menu', 'diensten', 'kamers', 'agenda', 'events', 'vacatures', 'openingstijden', 'fotos', 'reviews', 'contact'];
+  const RIJ_MAX = 12;   // hoeveel vragen of prijsregels een blok mag dragen
   const VERSIES = ['telefoon', 'tablet', 'desktop'];
 
   function slug(v) {
@@ -35,6 +36,22 @@ module.exports = ({ scho, crypto }) => {
     else if (t === 'voettekst') { o.tekst = T(b.tekst, 400); }
     else if (t === 'zaakdata') { o.bron = ZAAKBRONNEN.includes(b.bron) ? b.bron : 'contact'; }
     else if (t === 'formulier') { o.kop = T(b.kop, 120) || 'Stel ons een vraag'; o.knop = T(b.knop, 40) || 'Verstuur'; }
+    /* Blokken met rijen: elke rij wordt afzonderlijk geschoond en begrensd, en
+       een rij zonder inhoud valt weg -- anders staat er een lege regel op de
+       site die niemand kan zien zitten. */
+    /* Eerst de lege rijen eruit, dan pas begrenzen: andersom eet een lege rij
+       in het midden een van de twaalf plekken op en raakt de maker een regel
+       kwijt die hij wel had ingevuld. De eerste slice houdt het werk begrensd
+       voor het geval er duizend rijen worden ingestuurd. */
+    else if (t === 'faq') {
+      o.kop = T(b.kop, 120) || 'Veelgestelde vragen';
+      o.vragen = (Array.isArray(b.vragen) ? b.vragen : []).slice(0, RIJ_MAX * 5)
+        .map(x => ({ v: T(x && x.v, 200), a: T(x && x.a, 1200) })).filter(x => x.v || x.a).slice(0, RIJ_MAX);
+    } else if (t === 'prijzen') {
+      o.kop = T(b.kop, 120) || 'Wat het kost';
+      o.regels = (Array.isArray(b.regels) ? b.regels : []).slice(0, RIJ_MAX * 5)
+        .map(x => ({ naam: T(x && x.naam, 80), prijs: T(x && x.prijs, 40), wat: T(x && x.wat, 300) })).filter(x => x.naam || x.prijs || x.wat).slice(0, RIJ_MAX);
+    }
     if (Array.isArray(b.verberg)) {
       const v = b.verberg.filter(x => VERSIES.includes(x));
       if (v.length) o.verberg = [...new Set(v)];

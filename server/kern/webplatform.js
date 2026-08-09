@@ -19,7 +19,8 @@
    De module kent zelf geen leveranciers; hij krijgt het zaakobject aangereikt
    door de route (die via supplierAuth/findSupplier al weet wie het is). */
 module.exports = ({ db }) => {
-  const BRONNEN = ['menu', 'diensten', 'kamers', 'agenda', 'fotos', 'reviews', 'contact'];
+  const BRONNEN = ['menu', 'diensten', 'kamers', 'agenda', 'events', 'vacatures', 'openingstijden', 'fotos', 'reviews', 'contact'];
+  const DAGEN = ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag'];
 
   const geld = p => (p == null || p === '' ? '' : '€ ' + p);
   // alleen eigen beeld (mediastore of campagne) komt in een galerij terecht
@@ -35,52 +36,14 @@ module.exports = ({ db }) => {
     return { score: Math.round((rs.som / rs.aantal) * 10) / 10, aantal: rs.aantal };
   }
 
-  /* Een zaakdata-blok live oplossen naar gewone blokken. Een bron zonder
-     inhoud lost op naar niets: een lege kop "Menu" op een site is erger dan
-     geen kop. */
-  function los(blok, s) {
-    const uit = [];
-    const kop = t => uit.push({ id: blok.id + '-k', type: 'kop', tekst: t });
-    const item = (id, t) => uit.push({ id: blok.id + '-' + id, type: 'tekst', tekst: t });
-    const regel = x => [x.name, x.desc].filter(Boolean).join(' -- ') + (x.price != null || x.prijs != null ? '  ·  ' + geld(x.price != null ? x.price : x.prijs) : '');
-    const bron = blok.bron;
+  /* Het oplossen van een live blok naar gewone blokken staat in
+     ./webplatform-live.js: dat is per bron een eigen stukje kennis over hoe
+     het zaakprofiel eruitziet, en dat hoort niet door deze laag heen te lopen. */
+  const los = require('./webplatform-live')({ db, geld, veiligBeeld, rating, DAGEN });
 
-    if (bron === 'menu' && (s.menu || []).length) {
-      kop('Menu');
-      s.menu.slice(0, 30).forEach((x, i) => item('m' + i, regel(x)));
-    } else if (bron === 'diensten' && (s.services || []).length) {
-      kop('Diensten');
-      s.services.slice(0, 30).forEach((x, i) => item('d' + i, regel(x)));
-    } else if (bron === 'kamers') {
-      const rooms = (s.rooms || []).filter(r => r.available);
-      if (rooms.length) {
-        kop('Kamers');
-        rooms.slice(0, 30).forEach((x, i) => item('r' + i, regel(x)));
-      }
-    } else if (bron === 'agenda' && (s.activiteiten || []).length) {
-      kop('Activiteiten');
-      s.activiteiten.slice(0, 30).forEach((x, i) =>
-        item('a' + i, regel(x) + (x.duur ? '  ·  ' + x.duur : '') + ((x.tijden || []).length ? '  ·  ' + x.tijden.join(' / ') : '')));
-    } else if (bron === 'fotos') {
-      const beelden = (s.photos || []).filter(veiligBeeld).slice(0, 12);
-      if (beelden.length) uit.push({ id: blok.id + '-g', type: 'galerij', beelden });
-    } else if (bron === 'reviews') {
-      const r = rating(s);
-      if (r) uit.push({ id: blok.id + '-q', type: 'citaat',
-        tekst: r.score + ' gemiddeld, uit ' + r.aantal + ' beoordeling' + (r.aantal === 1 ? '' : 'en') + ' van leden.',
-        bron: 'Geverifieerde RTG-reviews' });
-    } else if (bron === 'contact') {
-      kop('Bezoek ons');
-      uit.push({ id: blok.id + '-c', type: 'kolommen',
-        lk: s.city || 'Locatie', lt: (s.loc && s.loc.label) || s.city || '',
-        rk: 'Via RTG', rt: 'Reserveren, bestellen en contact lopen via de RTG leden-app -- met je RTG-identiteit, zonder losse accounts.' });
-    }
-    return uit;
-  }
-
-  /* Alle zaakdata-blokken in een gepubliceerde site oplossen. Site zonder
-     zaak (of zaak die weg is): de live blokken vallen stil weg in plaats van
-     als lege dozen te blijven staan. */
+  /* Alle zaakdata-blokken van een pagina oplossen. Site zonder zaak (of zaak
+     die weg is): de live blokken vallen stil weg in plaats van als lege dozen
+     te blijven staan. */
   function losBlokken(lijst, s, magFormulier) {
     const blokken = [];
     (lijst || []).forEach(b => {
@@ -93,11 +56,21 @@ module.exports = ({ db }) => {
     });
     return blokken;
   }
+  /* Een pagina die alleen live blokken droeg en waarvan er niets overbleef,
+     verdwijnt uit de site -- anders staat "Werken bij ons" in de navigatie van
+     een zaak zonder vacatures, en dat is een deur naar een lege kamer. Pagina's
+     die de maker zelf heeft gevuld blijven altijd staan, ook als ze leeg zijn:
+     die verdwijnen zou hem overvallen. */
+  const alleenLive = p => (p.blokken || []).length > 0 && (p.blokken || []).every(b => b.type === 'zaakdata');
+
   function losSite(site, s, magFormulier) {
     const mf = magFormulier === undefined ? !!s : magFormulier;
     return Object.assign({}, site, {
       blokken: losBlokken(site.blokken, s, mf),
-      paginas: (site.paginas || []).map(p => Object.assign({}, p, { blokken: losBlokken(p.blokken, s, mf) }))
+      paginas: (site.paginas || [])
+        .map(p => Object.assign({}, p, { blokken: losBlokken(p.blokken, s, mf), _live: alleenLive(p) }))
+        .filter(p => p.blokken.length || !p._live)
+        .map(p => { delete p._live; return p; })
     });
   }
 
@@ -137,13 +110,19 @@ module.exports = ({ db }) => {
       { id: 'g-zr', type: 'zaakdata', bron: 'reviews' },
       voet('h')
     ];
-    // de aanbodpagina: alles wat de zaak vandaag verkoopt, live
-    const aanbod = BRONNEN.filter(b => !['contact', 'fotos', 'reviews'].includes(b))
+    // de aanbodpagina: alles wat de zaak vandaag verkoopt en organiseert, live
+    const aanbod = ['menu', 'diensten', 'kamers', 'agenda', 'events']
       .map((bron, i) => ({ id: 'g-z' + i, type: 'zaakdata', bron }));
     const paginas = [
       { id: 'g-p-aanbod', naam: 'Aanbod', slug: 'aanbod', blokken: [...aanbod, voet('a')] },
+      /* Alleen live blokken, met opzet: heeft de zaak geen openstaande
+         vacatures, dan verdwijnt deze pagina vanzelf uit de navigatie. */
+      { id: 'g-p-werk', naam: 'Werken bij ons', slug: 'werken-bij-ons', blokken: [
+        { id: 'g-zv', type: 'zaakdata', bron: 'vacatures' }
+      ] },
       { id: 'g-p-contact', naam: 'Contact', slug: 'contact', blokken: [
         { id: 'g-zc', type: 'zaakdata', bron: 'contact' },
+        { id: 'g-zu', type: 'zaakdata', bron: 'openingstijden' },
         { id: 'g-form', type: 'formulier', kop: 'Stel ons een vraag', knop: 'Verstuur' },
         voet('c')
       ] }

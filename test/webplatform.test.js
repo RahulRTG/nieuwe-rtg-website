@@ -381,6 +381,54 @@ test('13. bij een zaak is naar buiten brengen werk van de leiding', async () => 
   assert.ok(/Voorstel van de balie/.test(JSON.stringify(alleBlokken(na.body.site))), 'na akkoord van de leiding wel');
 });
 
+test('14. nieuwe live bronnen, en een pagina die niets te zeggen heeft verdwijnt', async () => {
+  /* De gegenereerde site draagt een pagina "Werken bij ons" met alleen een
+     live vacatureblok. Heeft de zaak geen vacatures, dan hoort die pagina NIET
+     in de navigatie te staan: een deur naar een lege kamer is erger dan geen
+     deur. */
+  await api('/api/supplier/site/genereer', { opnieuw: true }, zaak);
+  const zonder = await api('/api/browser/open', { adres: 'es-vedra-cruises' }, lid);
+  assert.ok(!(zonder.body.site.paginas || []).some(p => p.slug === 'werken-bij-ons'),
+    'zonder vacatures geen vacaturepagina');
+
+  // een openstaande vacature -- die stond toch al in de publieke vacaturelijst
+  const vac = await api('/api/supplier/vacature', { func: 'Schipper', uren: '32 uur', plaats: 'Ibiza',
+    omschrijving: 'Varen met gasten langs Es Vedra.' }, zaak);
+  assert.equal(vac.status, 200, JSON.stringify(vac.body));
+
+  // en nu staat de pagina er, met de vacature erop -- zonder de site aan te raken
+  const met = await api('/api/browser/open', { adres: 'es-vedra-cruises' }, lid);
+  const werk = (met.body.site.paginas || []).find(p => p.slug === 'werken-bij-ons');
+  assert.ok(werk, 'met een vacature verschijnt de pagina');
+  assert.match(JSON.stringify(werk.blokken), /Schipper/);
+
+  // een pagina die de maker zelf vulde blijft altijd staan, ook zonder live blok
+  const eigen = await api('/api/site/bewaar', { design: { titel: 'Eigen Hand', blokken: [{ type: 'kop', tekst: 'Hoi' }],
+    paginas: [{ naam: 'Leeg maar van mij', blokken: [{ type: 'ruimte', hoogte: 40 }] }] } }, lid);
+  await api('/api/site/publiceer', { id: eigen.body.design.id, adres: 'eigen-hand' }, lid);
+  const eig = await api('/api/browser/open', { adres: 'eigen-hand' }, lid);
+  assert.equal((eig.body.site.paginas || []).length, 1, 'eigen pagina\'s verdwijnen niet onder je handen');
+});
+
+test('15. de blokken met rijen (faq en prijzen) worden per rij geschoond en begrensd', async () => {
+  const mk = await api('/api/site/bewaar', { design: { titel: 'Studio Rij', blokken: [
+    { type: 'faq', kop: 'Vragen', vragen: [
+      { v: 'Wat kost het?', a: '<b>Vanaf</b> vijftig euro.' },
+      { v: '', a: '' },                                        // lege rij valt weg
+      ...Array.from({ length: 15 }, (_, i) => ({ v: 'v' + i, a: 'a' + i }))
+    ] },
+    { type: 'prijzen', regels: [{ naam: 'Sessie', prijs: '€ 45', wat: 'Een uur' }] }
+  ] } }, lid);
+  assert.equal(mk.status, 200, JSON.stringify(mk.body));
+  const faq = mk.body.design.blokken[0];
+  assert.equal(faq.vragen.length, 12, 'begrensd op twaalf rijen');
+  assert.ok(!/[<>]/.test(faq.vragen[0].a), 'ook binnen een rij wordt de tekst geschoond');
+  assert.ok(!faq.vragen.some(x => !x.v && !x.a), 'lege rijen vallen weg');
+  const prijs = mk.body.design.blokken[1];
+  assert.equal(prijs.kop, 'Wat het kost', 'een ontbrekende kop krijgt een nette standaard');
+  assert.deepEqual(prijs.regels, [{ naam: 'Sessie', prijs: '€ 45', wat: 'Een uur' }]);
+});
+
 test('5. zoeken vindt sites en bedrijven in een adem', async () => {
   const z = await api('/api/browser/zoek', { q: 'vedra' }, lid);
   assert.equal(z.status, 200);

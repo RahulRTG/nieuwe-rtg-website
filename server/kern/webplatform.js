@@ -19,7 +19,7 @@
    De module kent zelf geen leveranciers; hij krijgt het zaakobject aangereikt
    door de route (die via supplierAuth/findSupplier al weet wie het is). */
 module.exports = ({ db, team }) => {
-  const BRONNEN = ['menu', 'diensten', 'kamers', 'agenda', 'events', 'vacatures', 'openingstijden', 'team', 'fotos', 'reviews', 'contact'];
+  const BRONNEN = ['menu', 'diensten', 'kamers', 'agenda', 'events', 'vacatures', 'openingstijden', 'team', 'fotos', 'salon', 'reviews', 'contact'];
   const DAGEN = ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag'];
 
   const geld = p => (p == null || p === '' ? '' : '€ ' + p);
@@ -39,7 +39,10 @@ module.exports = ({ db, team }) => {
   /* Het oplossen van een live blok naar gewone blokken staat in
      ./webplatform-live.js: dat is per bron een eigen stukje kennis over hoe
      het zaakprofiel eruitziet, en dat hoort niet door deze laag heen te lopen. */
-  const los = require('./webplatform-live')({ db, geld, veiligBeeld, rating, DAGEN, team });
+  /* Uitgelicht Salonbeeld komt uit de bestaande promolaag (kern/salonpromo.js):
+     alleen uitgelichte posts, met de naam van de maker erbij. */
+  const salonBeeld = max => { try { return require('./salonpromo').salonPromoFotos(db, max); } catch (e) { return []; } };
+  const los = require('./webplatform-live')({ db, geld, veiligBeeld, rating, DAGEN, team, salonBeeld });
 
   /* Alle zaakdata-blokken van een pagina oplossen. Site zonder zaak (of zaak
      die weg is): de live blokken vallen stil weg in plaats van als lege dozen
@@ -52,7 +55,9 @@ module.exports = ({ db, team }) => {
          knop zijn die stilletjes niets doet, dus dan staat hij er niet */
       if (b.type === 'formulier') { if (magFormulier) blokken.push(b); return; }
       if (b.type !== 'zaakdata') { blokken.push(b); return; }
-      if (s) blokken.push(...los(b, s));
+      /* Salonbeeld is van het huis en niet van een zaak: dat blok lost dus ook
+         op een ledensite op. De rest heeft een zaakprofiel nodig. */
+      if (s || b.bron === 'salon') blokken.push(...los(b, s));
     });
     return blokken;
   }

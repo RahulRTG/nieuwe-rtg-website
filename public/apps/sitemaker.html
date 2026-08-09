@@ -196,7 +196,8 @@ const BLOKTYPES=[
   {t:'hero',n:'Hero',k:'grote kop + knop'},{t:'kop',n:'Kop',k:'sectiekop'},{t:'tekst',n:'Tekst',k:'alinea'},
   {t:'knop',n:'Knop',k:'oproep'},{t:'beeld',n:'Beeld',k:'één afbeelding'},{t:'kolommen',n:'Twee kolommen',k:'naast elkaar'},
   {t:'galerij',n:'Galerij',k:'meerdere beelden'},{t:'citaat',n:'Citaat',k:'uitspraak'},{t:'ruimte',n:'Ruimte',k:'witruimte'},{t:'voettekst',n:'Voettekst',k:'onderaan'},
-  {t:'faq',n:'Veelgestelde vragen',k:'vraag en antwoord'},{t:'prijzen',n:'Prijzen',k:'wat het kost'}
+  {t:'faq',n:'Veelgestelde vragen',k:'vraag en antwoord'},{t:'prijzen',n:'Prijzen',k:'wat het kost'},
+  {t:'salon',n:'Uit De Salon',k:'uitgelicht beeld, met naam'}
 ];
 function nieuwBlok(t){
   const id=RTGId('b');
@@ -211,6 +212,7 @@ function nieuwBlok(t){
   if(t==='ruimte')return{id,type:t,hoogte:48};
   if(t==='voettekst')return{id,type:t,tekst:'© Mijn bedrijf · via RTG'};
   if(t==='faq')return{id,type:t,kop:'Veelgestelde vragen',vragen:[{v:'Waar zijn jullie te vinden?',a:'Beschrijf hier waar klanten je vinden.'},{v:'Hoe maak ik een afspraak?',a:'Leg hier uit hoe het werkt.'}]};
+  if(t==='salon')return{id,type:'zaakdata',bron:'salon'};
   if(t==='prijzen')return{id,type:t,kop:'Wat het kost',regels:[{naam:'Eerste dienst',prijs:'€ 45',wat:'Korte omschrijving.'},{naam:'Tweede dienst',prijs:'€ 90',wat:'Korte omschrijving.'}]};
   return{id,type:'tekst',tekst:''};
 }

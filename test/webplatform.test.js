@@ -735,6 +735,27 @@ test('24. een formulier heeft een soort, en het bericht komt echt aan bij beide 
   assert.equal(raar.body.soort, 'vraag');
 });
 
+test('25. Salonbeeld draagt altijd de naam van de maker, en werkt ook zonder zaak', async () => {
+  /* De merkregel van dit huis is niet alleen DAT Salonbeeld gebruikt wordt maar
+     ook HOE: uitgelicht, en altijd met naamsvermelding. */
+  const mk = await api('/api/site/bewaar', { design: { titel: 'Salonsite',
+    blokken: [{ type: 'kop', tekst: 'Beeld' }, { type: 'zaakdata', bron: 'salon' }] } }, lid);
+  assert.equal(mk.body.design.blokken[1].bron, 'salon', 'de bron overleeft de schoonmaak');
+  await api('/api/site/publiceer', { id: mk.body.design.id, adres: 'salonsite' }, lid);
+
+  const open = await api('/api/browser/open', { adres: 'salonsite' }, lid);
+  assert.equal(open.status, 200);
+  const b = open.body.site.blokken;
+  assert.ok(!b.some(x => x.type === 'zaakdata'), 'het live blok is opgelost, ook al hoort deze site bij geen zaak');
+  const beelden = b.filter(x => x.type === 'beeld');
+  /* Er is altijd beeld: naast uitgelichte posts draagt kern/salonpromo.js het
+     eigen campagnebeeld als vaste huisbron. Een "geen beeld"-uitweg zou deze
+     toets alles laten doorlaten wat niet oplost. */
+  assert.ok(beelden.length, 'er komt beeld uit de Salonbron');
+  // elk beeld draagt de naam; een beeld zonder bronvermelding mag hier niet staan
+  beelden.forEach(x => assert.match(x.bijschrift || '', /^Uit De Salon · .+/, 'naamsvermelding bij elk beeld'));
+});
+
 test('5. zoeken vindt sites en bedrijven in een adem', async () => {
   const z = await api('/api/browser/zoek', { q: 'vedra' }, lid);
   assert.equal(z.status, 200);

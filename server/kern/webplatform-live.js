@@ -5,7 +5,7 @@
    site, want dat is erger dan geen menu. Alles wat hier naar buiten komt,
    stond al buiten: de publieke zaakgegevens, gepubliceerde events, openstaande
    vacatures en het reviewgemiddelde. */
-module.exports = ({ db, geld, veiligBeeld, rating, DAGEN, team }) => {
+module.exports = ({ db, geld, veiligBeeld, rating, DAGEN, team, salonBeeld }) => {
   function los(blok, s) {
     const uit = [];
     const kop = t => uit.push({ id: blok.id + '-k', type: 'kop', tekst: t });
@@ -67,6 +67,14 @@ module.exports = ({ db, geld, veiligBeeld, rating, DAGEN, team }) => {
         kop('Ons team');
         mensen.slice(0, 60).forEach((m, i) => item('t' + i, [m.naam, m.func].filter(Boolean).join(' -- ')));
       }
+    } else if (bron === 'salon') {
+      /* Uitgelicht beeld uit De Salon. De merkregel van dit huis is niet alleen
+         DAT dit beeld gebruikt wordt maar ook HOE: altijd met naamsvermelding.
+         Daarom een beeld-blok per foto met "Uit De Salon · naam" als bijschrift
+         en niet een galerij, want een galerij kan geen naam dragen. */
+      const beelden = salonBeeld ? salonBeeld(6) : [];
+      beelden.forEach((f, i) => uit.push({ id: blok.id + '-s' + i, type: 'beeld',
+        src: f.src, bijschrift: 'Uit De Salon · ' + f.naam }));
     } else if (bron === 'fotos') {
       const beelden = (s.photos || []).filter(veiligBeeld).slice(0, 12);
       if (beelden.length) uit.push({ id: blok.id + '-g', type: 'galerij', beelden });

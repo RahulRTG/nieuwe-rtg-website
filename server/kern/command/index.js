@@ -14,6 +14,8 @@
      4 Predict    aan zien komen  ./simulatie.js
      5 Prevent    vóór zijn      ./risico.js + ./toezicht.js (grenzen, budgetten)
                                  ./slo.js + ./sonde.js (foutbudget, van buitenaf)
+                                 ./canary.js (uitrollen met een terugroldrempel)
+                                 ./zandbak.js (proeven zonder productiegegevens)
      6 Autonomous mensen sturen alleen beleid en uitzonderingen
 
    Wat er van 5 en 6 staat, is de MACHINERIE en niet de eindtoestand: de
@@ -57,11 +59,22 @@ function maakCommand({ db, save, crypto, anthropic }) {
      termijn" uit te komen en niet stilzwijgend dat van RTG. */
   const herkomst = require('./herkomst').maakHerkomst({ db, register, graaf, journaal, runbooks,
     bewaarbeleid: require('../../bewaarbeleid').BELEID });
-  /* De meetkant van niveau 5. De sonde levert de metingen van BUITENAF en de
-     SLO-meter houdt het foutbudget bij; ze staan in deze volgorde omdat de
-     meter de sonde erbij zet en niet andersom. De reizen komen uit dezelfde
-     SLO.json als de doelen, via slo.laadNorm() -- dus één bestand met de norm,
-     en geen tweede lijstje reizen dat langzaam iets anders gaat toetsen. */
+  /* Master data voor bedrijven en locaties. Welke collecties een partij dragen
+     en welk veld de naam en de plaats is, staat HIER en niet in de module: dat
+     is aangegeven en geen meting, en het hoort op één plek te staan. De
+     plaatsnormalisatie komt uit de schakelkast, want die bepaalt al of een
+     functie in jouw woonplaats openstaat -- twee normalisaties zouden betekenen
+     dat die twee schermen het over een andere stad hebben. */
+  const mdm = require('./mdm').maakMdm({ db, save, journaal,
+    plaatsNorm: require('../../functies/toegang').plaatsNorm,
+    partijen: [
+      { type: 'zaak', collectie: 'suppliers', sleutel: 'code', naam: 'name', plaats: 'city', loc: 'loc' },
+      { type: 'partner', collectie: 'partners', sleutel: 'code', naam: 'name', plaats: 'city' }
+    ] });
+  /* Overnamemodus: de administratie van een overgenomen bedrijf inlezen, in
+     vier stappen waarvan de volgorde de veiligheid is. Uitvoeren kan alleen met
+     het zegel van precies de droogloop die is bekeken. */
+  const overname = require('./overname').maakOvername({ db, save, crypto, journaal, register });
   /* De zandbak: dezelfde motoren op een DB-VENSTER met zaaigegevens. Er is geen
      aanroep waarlangs een handeling daarbinnen bij een productiecollectie komt,
      want het object dat die motoren zien heeft die collecties niet. */
@@ -74,6 +87,11 @@ function maakCommand({ db, save, crypto, anthropic }) {
   const canary = require('./canary').maakCanary({ db, save, journaal,
     meting: require('../../meting'), functies: require('../../functies/register') });
   canary.tikker();
+  /* De meetkant van niveau 5. De sonde levert de metingen van BUITENAF en de
+     SLO-meter houdt het foutbudget bij; ze staan in deze volgorde omdat de
+     meter de sonde erbij zet en niet andersom. De reizen komen uit dezelfde
+     SLO.json als de doelen, via slo.laadNorm() -- dus één bestand met de norm,
+     en geen tweede lijstje reizen dat langzaam iets anders gaat toetsen. */
   const slolaag = require('./slo');
   const sonde = require('./sonde').maakSonde({ db, save,
     reizen: () => slolaag.laadNorm().reizen || [] });
@@ -138,7 +156,7 @@ function maakCommand({ db, save, crypto, anthropic }) {
   }
 
   return { journaal, beleid, risico, toegang, zaken, runbooks, toezicht, operator, puls,
-    simulatie, werkbesparing, kwaliteit, graaf, herkomst, slo, sonde, canary, zandbak,
+    simulatie, werkbesparing, kwaliteit, graaf, herkomst, slo, sonde, canary, zandbak, mdm, overname,
     zoek, bereik, dossier, actiesVoor, start, register };
 }
 

@@ -88,6 +88,33 @@ module.exports = ({ app, officeAuth, veilig, wie, command }) => {
     return Object.assign({ zandbak: l.naam }, l.kwaliteit.meet());
   }));
 
+  /* Master data. Meten mag altijd; samenvoegen is mensenwerk en gaat door het
+     journaal, met de oude waarde erin zodat terugdraaien dezelfde handeling
+     omgekeerd is. */
+  app.post('/api/command/mdm', officeAuth, (req, res) => veilig(res, () => command.mdm.meet()));
+  app.post('/api/command/mdm/gouden', officeAuth, (req, res) => veilig(res, () =>
+    command.mdm.gouden(String(req.body.sleutel || ''))));
+  app.post('/api/command/mdm/samen', officeAuth, (req, res) => veilig(res, () =>
+    command.mdm.voegSamen(req.body.doel, req.body.verliezers, wie(req), req.body.reden)));
+  app.post('/api/command/mdm/terug', officeAuth, (req, res) => veilig(res, () =>
+    command.mdm.terug(req.body.verliezers, wie(req))));
+
+  /* Overnamemodus. Vier stappen, en uitvoeren gaat alleen met het zegel van
+     precies de droogloop die is bekeken. */
+  app.post('/api/command/overname', officeAuth, (req, res) => veilig(res, () => command.overname.lijst()));
+  app.post('/api/command/overname/lees', officeAuth, (req, res) => veilig(res, () =>
+    command.overname.lees(req.body.naam, String(req.body.soort || ''), req.body.rijen, wie(req))));
+  app.post('/api/command/overname/voorstel', officeAuth, (req, res) => veilig(res, () =>
+    command.overname.voorstel(String(req.body.id || ''))));
+  app.post('/api/command/overname/afbeelden', officeAuth, (req, res) => veilig(res, () =>
+    command.overname.beeldAf(String(req.body.id || ''), req.body.afbeelding, wie(req))));
+  app.post('/api/command/overname/droogloop', officeAuth, (req, res) => veilig(res, () =>
+    command.overname.droogloop(String(req.body.id || ''))));
+  app.post('/api/command/overname/voer', officeAuth, (req, res) => veilig(res, () =>
+    command.overname.voer(String(req.body.id || ''), req.body.zegel, wie(req), req.body.reden)));
+  app.post('/api/command/overname/terug', officeAuth, (req, res) => veilig(res, () =>
+    command.overname.terug(String(req.body.id || ''), wie(req))));
+
   /* De melding van buitenaf. Zie de kop hierboven voor de twee sloten. */
   app.post('/api/sonde/melding', meetpoort, (req, res) => {
     const r = command.sonde.meld(req.body || {});

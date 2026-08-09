@@ -500,9 +500,13 @@
     {
       "id": "mdm",
       "wat": "Master data management: één authoritative record per klant/bedrijf",
-      "groep": "Nog open",
-      "dekking": [],
-      "let": "kern/eenaccount doet dit voor het lid; voor bedrijven en locaties niet."
+      "groep": "Command: zien, besturen, automatiseren",
+      "dekking": [
+        "server/kern/command/mdm.js",
+        "server/kern/command/mdmsamen.js",
+        "/api/command/mdm"
+      ],
+      "let": "kern/eenaccount doet dit voor het lid; deze laag doet bedrijven en locaties. Er wordt nooit vanzelf samengevoegd -- twee bedrijven met dezelfde naam in dezelfde stad kunnen twee bedrijven zijn, en dat verschil zit niet in de gegevens. Samenvoegen wist niets: de verliezers houden een verwijzing, dus terugdraaien is dezelfde handeling omgekeerd."
     },
     {
       "id": "dataquality",
@@ -572,8 +576,13 @@
     {
       "id": "acquisition",
       "wat": "Acquisition mode: een overgenomen bedrijf importeren en migreren",
-      "groep": "Nog open",
-      "dekking": []
+      "groep": "Command: zien, besturen, automatiseren",
+      "dekking": [
+        "server/kern/command/overname.js",
+        "server/kern/command/overnamevoorstel.js",
+        "/api/command/overname"
+      ],
+      "let": "Vier stappen waarvan de volgorde de veiligheid is: inlezen, afbeelden, droogloop, uitvoeren. Uitvoeren kan alleen met het zegel van precies de bekeken droogloop, er wordt nooit iets overschreven (een bestaande sleutel is een botsing), en elke ingevoerde rij draagt zijn partij zodat terugdraaien exact die rijen weghaalt."
     },
     {
       "id": "apigateway",

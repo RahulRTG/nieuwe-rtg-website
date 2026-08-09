@@ -71,7 +71,7 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
      register haalt ze op en levert de dispatch-tabellen. Dit blok groeit niet
      meer mee met het aantal spellen -- dat was het hele punt. */
   const spelCtx = { save, crypto, schud, beurtDoor, codenaamVan, nudge };
-  const { SPEL, SOORTEN, INITS, ZETTEN, VIEWS, STATISCH, ruw } = require('./spellen/register')(spelCtx);
+  const { SPEL, SOORTEN, INITS, ZETTEN, VIEWS, STATISCH, ARCADE, ruw } = require('./spellen/register')(spelCtx);
   // klasgenoten: het uitnodigingspad voor beschermde tieners (De Arena)
   const { klasgenotenVan, spelKlasgenoten } = require('./spellen/klas')({ db, codenaamVan, isGeblokkeerd });
 
@@ -85,8 +85,31 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
   // Rahul als spelmaatje: in elk potje op te roepen voor hints, regels of een peptalk
   const { spelRahul } = require('./spellen/rahul')(Object.assign({ anthropic }, ctx));
 
-  /* ================= arcade (Sneek en Tetris): ranglijsten onder vrienden ================= */
-  const ARCADE = ['sneek', 'tetris', 'sudoku'];
+  /* ================= arcade: ranglijsten onder vrienden =================
+     Welke arcadespellen er zijn staat niet hier maar in het register: elk
+     heeft een eigen module met een `vorm: 'arcade'`-descriptor. Deze laag
+     kent dus geen spelnamen, alleen de vorm. */
+
+  /* DE PROGRESSIEGRENS. Alles wat een prestatie BUITEN het potje bewaart --
+     highscores, ranglijsten, later niveaus, prestaties en toernooien -- bestaat
+     alleen voor geverifieerd volwassen leden. Dat is dezelfde poort als die van
+     Proost: `volwassen()` betekent "RTG heeft de paspoort-geboortedatum
+     gecontroleerd EN die is 18+", dus een lid zonder gecontroleerd paspoort
+     valt er ook buiten tot dat gedaan is.
+
+     Waarom die grens er is: `CLAUDE.md` verbiedt verslavende
+     engagement-patronen, De Arena belooft tieners met zoveel woorden "alles
+     telt alleen binnen het potje; er bestaat geen ranglijst", en de School-lat
+     zegt "leren is geen wedstrijd". Een scorebord onder vrienden in dezelfde
+     RTF-app sprak dat tegen. Onder de grens blijft elk spel gewoon volledig
+     speelbaar -- er wordt alleen niets van bewaard.
+
+     Deze functie is met opzet de ENIGE plek waar die grens staat: komt er een
+     tweede progressievorm bij (prestaties, toernooien, niveaus), dan hangt die
+     hier aan en niet aan een eigen kopie van de regel. */
+  const progressieMag = (handle) => volwassen(handle);
+  const GEEN_PROGRESSIE = 'Scores en ranglijsten bestaan alleen voor leden met een geverifieerde volwassen leeftijd. Het spel zelf speel je gewoon.';
+
   function A(spel) {
     const s = S();
     if (!s.arcade) {
@@ -97,23 +120,34 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
     return s.arcade[spel];
   }
   function arcadeScore(mij, spel, punten) {
-    if (!ARCADE.includes(spel)) return { status: 400, error: 'Onbekend arcadespel.' };
-    const n = Math.max(0, Math.min(999999, Math.floor(Number(punten) || 0)));
+    if (!ARCADE[spel]) return { status: 400, error: 'Onbekend arcadespel.' };
+    /* Geen 403: je mag dit spel WEL spelen, er wordt alleen niets bewaard. Een
+       fout aan het eind van een potje zou zeggen dat je iets niet mocht, en dat
+       is niet waar. `bewaard: false` zegt precies wat er gebeurt, zodat de
+       client zijn scorebord kan verbergen in plaats van een leeg bord te tonen. */
+    if (!progressieMag(mij)) return { status: 200, ok: true, bewaard: false, ranglijst: false, reden: GEEN_PROGRESSIE };
+    const n = Math.max(0, Math.min(ARCADE[spel].maxPunten, Math.floor(Number(punten) || 0)));
     const s = A(spel);
     if (!s[mij] || n > s[mij].punten) { s[mij] = { punten: n, at: nu() }; save(); }
-    return { status: 200, ok: true, beste: s[mij].punten };
+    return { status: 200, ok: true, bewaard: true, ranglijst: true, beste: s[mij].punten };
   }
   function arcadeBord(mij, spel, vrienden) {
-    if (!ARCADE.includes(spel)) return { status: 400, error: 'Onbekend arcadespel.' };
+    if (!ARCADE[spel]) return { status: 400, error: 'Onbekend arcadespel.' };
+    if (!progressieMag(mij)) return { bord: [], ranglijst: false, reden: GEEN_PROGRESSIE };
     const s = A(spel);
     const rij = [mij, ...vrienden].filter(h => s[h]).map(h => ({ codenaam: codenaamVan(h), ik: h === mij, punten: s[h].punten }));
-    return { bord: rij.sort((a, b) => b.punten - a.punten).slice(0, 20) };
+    return { bord: rij.sort((a, b) => b.punten - a.punten).slice(0, 20), ranglijst: true };
   }
+  /* De twee oude Sneek-routes (`/spel/sneek-score` en `/spel/sneek-bord`)
+     bestonden voordat er een arcade was en staan nog in oudere clients. Ze
+     noemen het spel bij naam omdat de ROUTE dat doet -- dat is een alias, geen
+     tweede dispatch: er valt hier niets te vergeten als er een arcadespel
+     bijkomt. */
   const sneekScore = (mij, punten) => arcadeScore(mij, 'sneek', punten);
   const sneekBord = (mij, vrienden) => arcadeBord(mij, 'sneek', vrienden);
 
   return { spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelRahul, spelKlasgenoten, sneekScore, sneekBord, arcadeScore, arcadeBord, SPEL_SOORTEN: SOORTEN,
     // alleen voor de drift-test: de client heeft een eigen kopie van deze
     // regels (directe feedback); de test houdt beide kopieën tegen elkaar
-    _spelregels: { rummiSet: ruw.rummiSet, W_PREMIE: ruw.W_PREMIE, SPEL } };
+    _spelregels: { rummiSet: ruw.rummiSet, W_PREMIE: ruw.W_PREMIE, SPEL, ARCADE } };
 };

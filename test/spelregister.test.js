@@ -44,10 +44,38 @@ const GOUD = {
   orde:     ['Rangschikduel', 4, 'rtf', { buitenBeurt: ['orde'] }]
 };
 
+/* De arcade is de tweede vorm: geen potje, geen beurten, wel een score. Sneek
+   en Tetris staan in BEIDE apps -- dat is precies waarom een arcadespel
+   `werelden` (lijst) heeft en een potje `wereld` (enkelvoud, en dat betekent
+   daar iets anders: wie mag STARTEN). */
+const GOUD_ARCADE = {
+  sneek:  ['Sneek', ['rtg', 'rtf'], 999999],
+  tetris: ['Tetris', ['rtg', 'rtf'], 999999],
+  sudoku: ['Sudoku', ['rtf'], 999999]
+};
+
 test('het register vindt precies de spellen die er zijn', () => {
-  const { SPEL } = maakRegister(stubCtx);
+  const { SPEL, ARCADE } = maakRegister(stubCtx);
   assert.deepEqual(Object.keys(SPEL).sort(), Object.keys(GOUD).sort(),
-    'een spel is stil uit het register verdwenen of erin geslopen');
+    'een potjes-spel is stil uit het register verdwenen of erin geslopen');
+  assert.deepEqual(Object.keys(ARCADE).sort(), Object.keys(GOUD_ARCADE).sort(),
+    'een arcadespel is stil uit het register verdwenen of erin geslopen');
+});
+
+test('de twee vormen lopen niet door elkaar', () => {
+  const { SPEL, ARCADE, INITS, ZETTEN, VIEWS } = maakRegister(stubCtx);
+  for (const sleutel of Object.keys(ARCADE)) {
+    assert.ok(!SPEL[sleutel], sleutel + ' is arcade en hoort geen potje te kunnen zijn');
+    // anders zou /spel/nieuw of /spel/zet met soort=sneek een open vraag zijn
+    for (const tabel of [INITS, ZETTEN, VIEWS]) assert.equal(tabel[sleutel], undefined);
+  }
+  for (const sleutel of Object.keys(SPEL)) assert.ok(!ARCADE[sleutel], sleutel + ' is een potje en hoort geen arcadescore te hebben');
+});
+
+test('elk arcadespel houdt zijn naam, apps en puntengrens', () => {
+  const { ARCADE } = maakRegister(stubCtx);
+  for (const [sleutel, [naam, werelden, maxPunten]] of Object.entries(GOUD_ARCADE))
+    assert.deepEqual(ARCADE[sleutel], { naam, werelden, maxPunten }, 'arcadespel ' + sleutel);
 });
 
 test('elk spel houdt zijn naam, spelersaantal, wereld en toegangsregels', () => {
@@ -93,7 +121,7 @@ test('een module zonder descriptor laat de server niet opstarten', () => {
 
 test('een descriptor die iets verplichts mist noemt het bestand en wat er mist', () => {
   metMap({ 'half.js': "module.exports = () => ({ spel: { sleutel: 'half', naam: 'Half', wereld: 'rtg', init(){}, zet(){} } });" }, (map) => {
-    assert.throws(() => maakRegister(stubCtx, map), /half\.js mist in `spel`: max, view/);
+    assert.throws(() => maakRegister(stubCtx, map), /half\.js mist in `spel` \(vorm potje\): max, view/);
   });
 });
 
@@ -149,4 +177,61 @@ test('de lobby leidt de teamstand af uit het spel, niet uit een spelnaam', () =>
   // client ook meestuurt
   for (const sleutel of Object.keys(SPEL).filter(k => !SPEL[k].teams))
     assert.equal(teamModus(sleutel, SPEL[sleutel].max, 'teams'), 'vrij', sleutel + ' hoort geen teams te kennen');
+});
+
+/* ---------- de arcade-vorm faalt net zo luid ---------- */
+
+const ARCADE_GELDIG = (sleutel, naam) => `module.exports = () => ({ spel: { sleutel: '${sleutel}', naam: '${naam}', ` +
+  "vorm: 'arcade', werelden: ['rtg'], maxPunten: 1000 } });";
+
+test('een arcadespel toevoegen is ook een bestand neerzetten', () => {
+  metMap({ 'pinbal.js': ARCADE_GELDIG('pinbal', 'Pinbal') }, (map) => {
+    const { SPEL, ARCADE } = maakRegister(stubCtx, map);
+    assert.deepEqual(ARCADE.pinbal, { naam: 'Pinbal', werelden: ['rtg'], maxPunten: 1000 });
+    assert.deepEqual(SPEL, {}, 'een arcadespel hoort niet in de potjes-tabel te landen');
+  });
+});
+
+test('een arcadespel zonder puntengrens wordt geweigerd', () => {
+  // zonder grens is een ingestuurde score onbegrensd, en die komt uit de client
+  metMap({ 'los.js': ARCADE_GELDIG('los', 'Los').replace('maxPunten: 1000', 'maxPunten: 0') }, (map) => {
+    assert.throws(() => maakRegister(stubCtx, map), /los\.js heeft maxPunten 0/);
+  });
+});
+
+test('een arcadespel zonder apps om in te staan wordt geweigerd', () => {
+  metMap({ 'nergens.js': ARCADE_GELDIG('nergens', 'Nergens').replace("werelden: ['rtg']", 'werelden: []') }, (map) => {
+    assert.throws(() => maakRegister(stubCtx, map), /nergens\.js heeft werelden \[\]/);
+  });
+});
+
+test('een arcadespel in een app die niet bestaat wordt geweigerd', () => {
+  metMap({ 'raarland.js': ARCADE_GELDIG('raarland', 'Raarland').replace("werelden: ['rtg']", "werelden: ['rtg','rtx']") }, (map) => {
+    assert.throws(() => maakRegister(stubCtx, map), /raarland\.js heeft werelden \["rtg","rtx"\]/);
+  });
+});
+
+test('een vorm die niet bestaat wordt geweigerd', () => {
+  metMap({ 'iets.js': GELDIG('iets', 'Iets').replace("wereld: 'rtg'", "wereld: 'rtg', vorm: 'gokkast'") }, (map) => {
+    assert.throws(() => maakRegister(stubCtx, map), /iets\.js heeft vorm 'gokkast'/);
+  });
+});
+
+test('een arcadespel dat zijn naam of apps mist noemt precies wat er mist', () => {
+  metMap({ 'kaal.js': "module.exports = () => ({ spel: { sleutel: 'kaal', vorm: 'arcade' } });" }, (map) => {
+    assert.throws(() => maakRegister(stubCtx, map), /kaal\.js mist in `spel` \(vorm arcade\): naam, werelden, maxPunten/);
+  });
+});
+
+test('een sleutel die twee keer bestaat wordt geweigerd', () => {
+  /* Dit kan echt: een map `dubbel/` (met index.js) en een bestand `dubbel.js`
+     leveren allebei de sleutel 'dubbel'. Zonder deze controle wint de laatste
+     in de scanvolgorde en verdwijnt de ander stil. */
+  const map = fs.mkdtempSync(path.join(os.tmpdir(), 'spelregister-'));
+  try {
+    fs.writeFileSync(path.join(map, 'dubbel.js'), GELDIG('dubbel', 'Dubbel'));
+    fs.mkdirSync(path.join(map, 'dubbel'));
+    fs.writeFileSync(path.join(map, 'dubbel', 'index.js'), GELDIG('dubbel', 'Dubbel uit de map'));
+    assert.throws(() => maakRegister(stubCtx, map), /'dubbel' staat er twee keer in/);
+  } finally { fs.rmSync(map, { recursive: true, force: true }); }
 });

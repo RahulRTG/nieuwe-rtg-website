@@ -689,11 +689,23 @@ document.addEventListener('keydown', e=>{
   else if (e.key==='ArrowUp') ttZet(0,true); else if (e.key==='ArrowDown') ttZet(9); else return;
   e.preventDefault();
 });
-/* een ranglijst onder vrienden: dezelfde lijst voor Sneek, Tetris en Sudoku */
+/* een ranglijst onder vrienden: dezelfde lijst voor Sneek, Tetris en Sudoku.
+   Scores en ranglijsten bestaan alleen voor geverifieerd volwassen leden (de
+   server beslist dat, niet deze pagina). Zegt hij `ranglijst: false`, dan gaat
+   de hele sectie weg -- kop en al. Een leeg bord met "nog geen scores" zou
+   suggereren dat je er wel een kunt halen. */
 async function laadRanglijst(spel, sel){
   try{
     const d = await api('arcade-bord', { spel });
-    $(sel).innerHTML = (d.bord||[]).length ? d.bord.map((r,i)=>
+    const lijst = $(sel), kop = lijst && lijst.previousElementSibling;
+    if (d.ranglijst === false){
+      lijst.hidden = true;
+      if (kop && kop.classList.contains('sec')) kop.hidden = true;
+      return;
+    }
+    lijst.hidden = false;
+    if (kop && kop.classList.contains('sec')) kop.hidden = false;
+    lijst.innerHTML = (d.bord||[]).length ? d.bord.map((r,i)=>
       '<div class="rij"><div class="nm">'+(i+1)+'. '+esc(r.codenaam)+(r.ik?' (jij)':'')+'</div><b style="color:var(--goud2);">'+r.punten+'</b></div>').join('')
       : '<div class="leeg">Nog geen scores. Wees de eerste!</div>';
   }catch(e){}

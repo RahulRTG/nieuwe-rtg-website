@@ -2,7 +2,10 @@
    `spel`-descriptor in zijn eigen module, en dit bestand bouwt daar de
    dispatch-tabellen uit (SPEL, SOORTEN, INITS, ZETTEN, VIEWS, STATISCH).
 
-   Wat een descriptor zegt:
+   Er zijn TWEE vormen, en het verschil is niet cosmetisch:
+
+   vorm: 'potje' (de standaard) -- twee tot zes spelers, beurten, een stand die
+   de server bewaakt. Een zet is server-authoritatief.
      sleutel      MOET de bestandsnaam zijn (zonder .js)
      naam         zoals het spel in de lobby heet
      max / min    spelersaantal; min dwingt af dat 30 Seconden met vier begint
@@ -15,6 +18,14 @@
      perTaal      eigen wachtrij per taal (Woordduel heeft een letterzak per taal)
      init/zet/view  de regels zelf; statisch: data die nooit verandert
                   (het Magnaat-bord) en dus niet elke poll mee hoeft
+
+   vorm: 'arcade' -- in je eentje, geen beurt, geen tegenstander. De regels
+   draaien in de CLIENT; de server bewaart alleen de hoogste score per speler.
+   Een arcadescore is dus niet server-authoritatief zoals een zet dat wel is.
+     werelden     lijst van apps waar het spel staat (mag er twee zijn -- Sneek
+                  en Tetris staan aan beide kanten; `wereld` enkelvoud hoort bij
+                  een potje en betekent daar iets anders: wie mag STARTEN)
+     maxPunten    bovengrens waarop de server een ingestuurde score afkapt
 
    Waarom: hiervoor stond een nieuw spel op negen plekken in zes bestanden (de
    SPEL-tabel, drie ctx-opsommingen in spellen.js, de INITS in lobby.js, de
@@ -35,8 +46,13 @@ const fs = require('fs'), path = require('path');
    valt op bij het opstarten, in plaats van stil mee te scannen. */
 const GEEN_SPEL = new Set(['register.js', 'lobby.js', 'partij.js', 'rahul.js', 'klas.js', 'quiz-data.js']);
 
-// wat een descriptor MOET hebben; ontbreekt er iets, dan noemen we het bestand
-const VERPLICHT = ['sleutel', 'naam', 'max', 'wereld', 'init', 'zet', 'view'];
+// wat een descriptor MOET hebben, per vorm; ontbreekt er iets, dan noemen we
+// het bestand EN wat er mist -- zoeken naar "welke had ik ook alweer" is de
+// fout die dit register nu juist moet uitsluiten
+const VERPLICHT = {
+  potje: ['sleutel', 'naam', 'max', 'wereld', 'init', 'zet', 'view'],
+  arcade: ['sleutel', 'naam', 'werelden', 'maxPunten']
+};
 
 /* De map is een parameter zodat de toets het register op fixtures kan draaien
    (een module zonder descriptor, een sleutel die niet bij zijn bestand hoort)
@@ -49,21 +65,34 @@ module.exports = (spelCtx, mapOverride) => {
     .map(d => d.name)
     .sort();
 
-  const SPEL = {}, INITS = {}, ZETTEN = {}, VIEWS = {}, STATISCH = {}, ruw = {};
+  const SPEL = {}, INITS = {}, ZETTEN = {}, VIEWS = {}, STATISCH = {}, ARCADE = {}, ruw = {};
   for (const naam of bestanden) {
     const mod = require(path.join(map, naam))(spelCtx);
     const s = mod && mod.spel;
     if (!s) throw new Error(`spellen/register: ${naam} geeft geen \`spel\`-descriptor terug. ` +
       'Voeg er een toe, of zet het bestand in GEEN_SPEL als het geen spel is.');
-    const mist = VERPLICHT.filter(k => s[k] === undefined || s[k] === null);
-    if (mist.length) throw new Error(`spellen/register: ${naam} mist in \`spel\`: ${mist.join(', ')}.`);
+    const vorm = s.vorm || 'potje';
+    if (!VERPLICHT[vorm]) throw new Error(`spellen/register: ${naam} heeft vorm '${s.vorm}'; alleen 'potje' of 'arcade'.`);
+    const mist = VERPLICHT[vorm].filter(k => s[k] === undefined || s[k] === null);
+    if (mist.length) throw new Error(`spellen/register: ${naam} mist in \`spel\` (vorm ${vorm}): ${mist.join(', ')}.`);
     // de sleutel MOET de bestandsnaam zijn: anders lopen de map en de tabel
     // uiteen en zoek je een spel dat er wel is en toch niet start
     const verwacht = naam.replace(/\.js$/, '');
     if (s.sleutel !== verwacht) throw new Error(`spellen/register: ${naam} noemt zich '${s.sleutel}'; verwacht '${verwacht}'.`);
-    if (s.wereld !== 'rtg' && s.wereld !== 'rtf') throw new Error(`spellen/register: ${naam} heeft wereld '${s.wereld}'; alleen 'rtg' of 'rtf'.`);
-    if (SPEL[s.sleutel]) throw new Error(`spellen/register: '${s.sleutel}' staat er twee keer in.`);
+    // een sleutel mag maar EEN ding zijn: een potje of een arcadespel, nooit
+    // allebei -- anders is "/spel/zet met soort=sneek" een open vraag
+    if (SPEL[s.sleutel] || ARCADE[s.sleutel]) throw new Error(`spellen/register: '${s.sleutel}' staat er twee keer in.`);
 
+    if (vorm === 'arcade') {
+      if (!Array.isArray(s.werelden) || !s.werelden.length || s.werelden.some(w => w !== 'rtg' && w !== 'rtf'))
+        throw new Error(`spellen/register: ${naam} heeft werelden ${JSON.stringify(s.werelden)}; ` +
+          "een niet-lege lijst met alleen 'rtg' en/of 'rtf'.");
+      if (!(s.maxPunten > 0)) throw new Error(`spellen/register: ${naam} heeft maxPunten ${s.maxPunten}; moet boven nul liggen.`);
+      ARCADE[s.sleutel] = { naam: s.naam, werelden: s.werelden.slice(), maxPunten: s.maxPunten };
+      continue;
+    }
+
+    if (s.wereld !== 'rtg' && s.wereld !== 'rtf') throw new Error(`spellen/register: ${naam} heeft wereld '${s.wereld}'; alleen 'rtg' of 'rtf'.`);
     SPEL[s.sleutel] = { naam: s.naam, max: s.max, wereld: s.wereld };
     if (s.min) SPEL[s.sleutel].min = s.min;
     if (s.volwassen) SPEL[s.sleutel].volwassen = true;
@@ -86,5 +115,5 @@ module.exports = (spelCtx, mapOverride) => {
     for (const [k, v] of Object.entries(mod)) if (k !== 'spel') ruw[k] = v;
   }
   const SOORTEN = Object.fromEntries(Object.entries(SPEL).map(([k, v]) => [k, v.naam]));
-  return { SPEL, SOORTEN, INITS, ZETTEN, VIEWS, STATISCH, ruw };
+  return { SPEL, SOORTEN, INITS, ZETTEN, VIEWS, STATISCH, ARCADE, ruw };
 };

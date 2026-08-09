@@ -192,6 +192,24 @@ test('random wachtrij: taal splitst Woordduel wel en schaken niet', async () => 
   assert.ok(wEn.wachten && !wEn.gestart, 'een Engelse letterzak hoort niet tegen een Nederlandse te spelen');
 });
 
+/* Een arcadescore komt uit de CLIENT en is dus niet server-authoritatief zoals
+   een zet in een potje. De enige rem die de server heeft is de puntengrens uit
+   de descriptor van het spel; die moet dus echt uit die descriptor komen en
+   niet uit een los getal in de scoreafhandeling. */
+test('arcade: een score wordt afgekapt op de grens uit het spel zelf', async () => {
+  const { a } = await tweeVrienden();
+  const r = await json(await raw('/member/spel/arcade-score', { spel: 'tetris', punten: 99999999 }, a.tok));
+  assert.equal(r.beste, 999999, 'een onmogelijke score hoort op de grens van het spel te blijven staan');
+  const bord = await json(await raw('/member/spel/arcade-bord', { spel: 'tetris' }, a.tok));
+  assert.equal((bord.bord[0] || {}).punten, 999999, 'en het bord toont de afgekapte score, niet de ingestuurde');
+});
+
+test('arcade: een spel dat niet bestaat wordt geweigerd', async () => {
+  const { a } = await tweeVrienden();
+  assert.equal((await raw('/member/spel/arcade-score', { spel: 'pacman', punten: 10 }, a.tok)).status, 400);
+  assert.equal((await raw('/member/spel/arcade-bord', { spel: 'pacman' }, a.tok)).status, 400);
+});
+
 test('sneek: alleen je beste score telt en vrienden zien elkaar op het bord', async () => {
   const { a, b } = await tweeVrienden();
   await raw('/member/spel/sneek-score', { punten: 120 }, a.tok);
@@ -433,6 +451,36 @@ test('elke app zijn eigen spelgroep: RTG start geen dammen, RTF start geen schak
   // ook de random wachtrij volgt de eigen spelgroep
   assert.equal((await raw('/member/spel/random', { soort: 'rummi' }, a.tok)).status, 400);
   assert.equal((await rtfSpel('random', { soort: 'magnaat' }, A)).status, 400);
+});
+
+/* DE PROGRESSIEGRENS. Alles wat een prestatie buiten het potje bewaart bestaat
+   alleen voor geverifieerd volwassen leden: De Arena belooft tieners "er
+   bestaat geen ranglijst" en een scorebord onder vrienden in dezelfde app sprak
+   dat tegen. Het spel zelf blijft gewoon speelbaar -- er wordt alleen niets van
+   bewaard, en dat is iets anders dan een verbod. */
+test('arcade: onder de 18+-grens bestaat er geen score en geen ranglijst', async () => {
+  const t = Date.now() + '' + (teller++);
+  const jong = await json(await raw('/auth/register', { name: 'Jong A' + t, email: 'ja' + t + '@v.test', phone: '0678' + String(t).slice(-6), password: 'geheim123', geboortedatum: '2010-01-01', tier: 'rtg' }));
+
+  // spelen mag: geen 403, want het spel is niet verboden
+  const post = await raw('/member/spel/arcade-score', { spel: 'sneek', punten: 4200 }, jong.token);
+  assert.equal(post.status, 200, 'een minderjarige mag Sneek gewoon spelen');
+  const r = await json(post);
+  assert.equal(r.bewaard, false, 'maar de score wordt niet bewaard');
+  assert.equal(r.beste, undefined, 'en er komt geen highscore terug');
+  assert.ok(/geverifieerde volwassen leeftijd/.test(r.reden || ''), 'de reden staat erbij');
+
+  // het bord bestaat niet, en is niet "leeg": de client hoort de sectie te verbergen
+  const bord = await json(await raw('/member/spel/arcade-bord', { spel: 'sneek' }, jong.token));
+  assert.equal(bord.ranglijst, false, 'geen ranglijst onder de grens');
+  assert.deepEqual(bord.bord, []);
+
+  // en de score is echt nergens heen gegaan: een volwassen vriend ziet hem niet
+  const { a } = await tweeVrienden();
+  await raw('/member/spel/arcade-score', { spel: 'sneek', punten: 10 }, a.tok);
+  const bordA = await json(await raw('/member/spel/arcade-bord', { spel: 'sneek' }, a.tok));
+  assert.equal(bordA.ranglijst, true, 'een geverifieerd volwassen lid heeft wel een ranglijst');
+  assert.ok(!bordA.bord.some(x => x.punten === 4200), 'de niet-bewaarde score duikt nergens op');
 });
 
 test('proost is 18+: minderjarige leden komen er niet in, volwassen leden wel', async () => {

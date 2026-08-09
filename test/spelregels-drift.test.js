@@ -15,7 +15,7 @@ const kern = require('../server/kern/spellen')({
   zijnVrienden: () => true, codenaamVan: x => x, sseToCustomer() {},
   isGeblokkeerd: () => false, socialZoek: async () => [], sociaalRate: () => true, volwassen: () => true
 });
-const { rummiSet, W_PREMIE, SPEL } = kern._spelregels;
+const { rummiSet, W_PREMIE, SPEL, ARCADE } = kern._spelregels;
 
 // de clientkant: de stukken broncode uit spelen.html knippen en uitvoeren
 const html = fs.readFileSync(path.join(__dirname, '..', 'public', 'apps', 'spelen.html'), 'utf8');
@@ -65,4 +65,49 @@ test('de spelnamen en spelersaantallen van de lobby komen overeen met de server'
     if (MAXG[sleutel] !== undefined) assert.equal(MAXG[sleutel], SPEL[sleutel].max,
       'de lobby laat een ander aantal spelers toe dan de server voor ' + sleutel);
   }
+});
+
+/* De client beslist per app welke tegels hij toont (`MIJN_SPELLEN`); de server
+   zegt in de descriptor van elk arcadespel in welke apps het hoort. Lopen die
+   uiteen, dan staat er een tegel die de speler niet mag hebben, of ontbreekt
+   er een die hij wel mag. */
+test('de arcadetegels van beide apps komen overeen met de werelden uit de server', () => {
+  const bron = knip('const MIJN_SPELLEN', 'document.querySelectorAll');
+  const rtg = new Function('const memberTok = true; ' + bron + '; return MIJN_SPELLEN;')();
+  const rtf = new Function('const memberTok = false; ' + bron + '; return MIJN_SPELLEN;')();
+  for (const [sleutel, spel] of Object.entries(ARCADE)) {
+    assert.equal(rtg.includes(sleutel), spel.werelden.includes('rtg'),
+      'arcadespel ' + sleutel + ' staat in de RTG-app anders dan de server zegt');
+    assert.equal(rtf.includes(sleutel), spel.werelden.includes('rtf'),
+      'arcadespel ' + sleutel + ' staat in de RTF-app anders dan de server zegt');
+  }
+});
+
+/* De progressiegrens staat op de SERVER, maar de client moet er wel naar
+   luisteren. Doet hij dat niet, dan krijgt een tiener geen leeg bord maar
+   "Nog geen scores. Wees de eerste!" -- een uitnodiging tot iets dat voor hem
+   niet bestaat. Deze toets draait de echte clientfunctie met een nagemaakte
+   api en nagemaakte elementen. */
+test('de client verbergt kop en lijst zodra de server zegt dat er geen ranglijst is', async () => {
+  const bron = knip('async function laadRanglijst', 'const laadTetrisBord');
+  const maak = () => ({ hidden: false, innerHTML: '', classList: { contains: () => true } });
+
+  async function draai(antwoord) {
+    const lijst = maak(), kop = maak();
+    lijst.previousElementSibling = kop;
+    const laad = new Function('api', '$', 'esc', bron + '; return laadRanglijst;')(
+      async () => antwoord, () => lijst, (x) => String(x));
+    await laad('sneek', '#snBordLijst');
+    return { lijst, kop };
+  }
+
+  const uit = await draai({ bord: [], ranglijst: false, reden: 'geen progressie' });
+  assert.equal(uit.lijst.hidden, true, 'de lijst hoort weg te zijn');
+  assert.equal(uit.kop.hidden, true, 'en de kop "Ranglijst onder vrienden" ook');
+  assert.equal(uit.lijst.innerHTML, '', 'er hoort geen "wees de eerste" te staan');
+
+  const aan = await draai({ bord: [{ codenaam: 'Zilveren Reiger', ik: true, punten: 120 }], ranglijst: true });
+  assert.equal(aan.lijst.hidden, false, 'met een ranglijst staat de lijst er gewoon');
+  assert.equal(aan.kop.hidden, false);
+  assert.ok(/Zilveren Reiger/.test(aan.lijst.innerHTML), 'en de scores staan erin');
 });

@@ -154,7 +154,7 @@ function toonLeeg(){
 function teken(){
   const o=ONDS.find(x=>x.id===HUIDIG)||{};
   zetTitel(DAG.naam||'Mijn onderneming');
-  $('#hoofd').innerHTML=[vakGroet(),vakGezond(),vakActies(),vakIntake(),vakKans(),vakSimulatie(),vakStress(),vakPlan(o),vakRechtsvorm(o),vakOprichting(),vakZaak(o)].join('');
+  $('#hoofd').innerHTML=[vakGroet(),vakGezond(),vakActies(),vakIntake(),vakKans(),vakSimulatie(),vakStress(),vakPlan(o),vakRechtsvorm(o),vakOprichting(),vakZaak(o),vakEersteKlant()].join('');
   haakKnoppen();
 }
 
@@ -342,6 +342,26 @@ function vakZaak(o){
     '<label class="veld">Uw naam<input id="aanvNaam"></label>'+
     '<label class="veld">Contact (e-mail of telefoon)<input id="aanvContact"></label>'+
     '</div><div class="rij" style="margin-top:.8rem;"><button class="knop prim" id="aanvKnop">Vraag mijn zaak aan</button></div></div>';
+}
+
+
+function vakEersteKlant(){
+  const e=DAG&&DAG.eersteklant;
+  if(!e) return '';
+  const kop=e.doel==='klaarstaan'
+    ? '<p class="groot" style="font-size:1.15rem;">Klaarstaan voor uw eerste klant</p>'+
+      '<div class="score" style="margin-top:.3rem;"><span class="n groot">'+e.percentage+'%</span>'+
+      '<span class="subtxt">'+e.klaar+' van de '+e.totaal+' gedaan</span></div>'
+    : '<p class="groot" style="font-size:1.15rem;">'+e.klanten+' klant'+(e.klanten===1?'':'en')+'</p>'+
+      (e.volgende?'<p class="subtxt" style="margin-top:.3rem;">Nog '+e.volgende.teGaan+' tot '+esc(e.volgende.label.toLowerCase())+'. '+esc(e.volgende.wat)+'</p>':
+        '<p class="subtxt" style="margin-top:.3rem;">Alle mijlpalen gehaald.</p>');
+  const open=(e.open||[]).map(s2=>'<div class="actie" style="padding:.5rem 0;"><div class="kop">'+esc(s2.label)+'</div>'+
+    '<div class="waarom">'+esc(s2.waarom)+'</div></div>').join('');
+  const mijl=(e.mijlpalen||[]).map(m=>'<span class="stap'+(m.bereikt?' bereikt':'')+'">'+esc(m.label)+'</span>').join('');
+  return '<div class="vak"><h2>Klant nummer een</h2>'+kop+
+    (open?'<div style="margin-top:.9rem;"><p class="subtxt" style="margin-bottom:.2rem;">Nog te doen:</p>'+open+'</div>':
+      '<p class="subtxt" style="margin-top:.7rem;">Uw etalage staat klaar.</p>')+
+    '<div class="ladder">'+mijl+'</div></div>';
 }
 
 /* ---------- handelingen ---------- */

@@ -1309,6 +1309,44 @@ stap aannemen, het OS zelf een zaak laten aanmaken, en de aanvraag zonder
 vastgelegd plan toelaten. De twee 500's hierboven zijn niet met een mutatie
 gevonden maar in een echte ronde -- dat is sterker bewijs, geen zwakker.
 
+### Klant nummer een, en de honderd daarna
+
+`server/kern/onderneming/eersteklant.js` + `/api/onderneming/eersteklant`. Zodra
+de zaak bestaat verandert het doel: niet meer "een bedrijf oprichten" maar er
+moet iemand kopen. Deze laag meet hoe ver de zaak daarvoor klaarstaat en
+verschuift daarna mee naar de volgende mijlpaal (1, 10, 25, 50, 100 klanten,
+elk met wat er in die stap te leren valt -- een teller die alleen optelt is een
+spelletje).
+
+**De lijst hangt af van wat de zaak DOET, niet van een lijstje per genre.** Wat
+"klaar" betekent komt uit de capslijst van `werkvormen.js`: een horecazaak
+zonder kaart is niet klaar, een dienstverlener zonder diensten evenmin, maar een
+dienstverlener heeft geen kaart nodig. Zet iemand een busje in de vloot, dan komt
+de vlootstap er vanzelf bij. Een nieuw genre krijgt zo de goede lijst zonder dat
+hier iets bij hoeft. En het mooiste geval staat als eigen toets vast: wie in zijn
+eentje een restaurant runt **is** ook zelfstandige, en krijgt allebei.
+
+**Er is geen tweede poort.** `kern/ondernemerpoort.js` loodst elke nieuwe zaak al
+door de basis (Salon-pagina, rondleidingen) voordat zij online mag. Die stand
+wordt hier gelezen en niet nagebouwd -- twee lijsten die allebei "is deze zaak er
+klaar voor" beweren, lopen binnen een maand uiteen. Om diezelfde reden staat de
+Salon-pagina hier **niet** als eigen stap: twee keer hetzelfde afvinken maakt van
+een teller een leugen.
+
+**Een percentage mag hier wel, en bij de kansscore niet.** Het verschil is dat
+dit een telling is en geen weging: acht stappen, vijf gedaan, dat is exact. De
+kansscore weegt bronnen van ongelijke betekenis en kan dat niet zijn. Zonder zaak
+is er niets te tellen, en dan is het antwoord `null` en geen 0% -- 0% zou zeggen
+dat er niets gedaan is, terwijl er niets te doen valt.
+
+In het dagbeeld gaat deze stap vóór de losse openstaande aanvragen: een zaak die
+niet online staat, krijgt er sowieso geen.
+
+Getoetst in `test/onderneming-eersteklant.test.js` (16). Vijf mutaties, alle vijf
+raak: de werkvormen negeren en iedereen alles vragen, een eigen Salon-stap naast
+die van de poort zetten, zonder zaak toch 0% teruggeven, een wachtende boeking
+als klant tellen, en de eerste-klant-actie onder de losse aanvragen laten zakken.
+
 ### RTG Werk OS (de werkplek van een organisatie)
 
 `server/bedrijf/` + `/api/bedrijf/...` + `/apps/werk.html`. Een **werkruimte**

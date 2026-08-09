@@ -18,7 +18,7 @@ module.exports = (kern) => {
     ondernemingIngeschreven, ondernemingIntakeZet, ondernemingIntakeBeeld,
     ondernemingVerkenning, ondernemingPlanVastleggen, ondernemingDagbeeld,
     ondernemingOprichting, ondernemingOprichtingZet, ondernemingAanvraag,
-    ondernemingAanvraagStand } = kern;
+    ondernemingAanvraagStand, ondernemingEersteKlant } = kern;
 
   /* `status` betekent in dit huis de HTTP-code, maar een kernmodule kan een
      domeinstand in datzelfde veld zetten ('geen-aanvraag'). Dat gebeurde hier
@@ -106,6 +106,14 @@ module.exports = (kern) => {
     const o = mijn(req);
     if (!o) return stuur(res, nietGevonden);
     stuur(res, ondernemingOprichtingZet(o, String((req.body || {}).stap || ''), (req.body || {}).klaar));
+  });
+
+  /* De weg naar klant nummer een: staat de etalage klaar, en wat is de
+     volgende mijlpaal. Null zolang er geen zaak is. */
+  app.post('/api/onderneming/eersteklant', auth, (req, res) => {
+    const o = mijn(req);
+    if (!o) return stuur(res, nietGevonden);
+    res.json({ ok: true, eersteklant: ondernemingEersteKlant(o) });
   });
 
   /* ---- de zaak aanvragen ----

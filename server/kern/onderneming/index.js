@@ -32,7 +32,7 @@
 const RV = require('./rechtsvorm');
 const FASE = require('./fase');
 
-module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boekingenVanZaak, aanmeldingen }) => {
+module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boekingenVanZaak, aanmeldingen, ondernemerpoort }) => {
 
   /* De verkenningslaag: intake -> kansverkenning -> simulatie -> stress test ->
      ondernemingsplan. Vier modules die op elkaar leunen in precies die
@@ -45,6 +45,7 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boeki
   const dag = require('./dagbeeld')({ db, boekingenVanZaak, ordersVanZaak,
     intakeOntbreekt: intake.intakeOntbreekt });
   const opr = require('./oprichting')({ save });
+  const ek = require('./eersteklant')({ db, ondernemerpoort, boekingenVanZaak, ordersVanZaak });
 
   const bak = () => {
     if (!Array.isArray(db.data.ondernemingen)) db.data.ondernemingen = [];
@@ -180,7 +181,8 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boeki
        heeft hem toch al, en twee keer rekenen kan twee antwoorden geven op
        dezelfde vraag. */
     ondernemingDagbeeld: (o) => dag.dagbeeld(o, ondernemingBeeld(o), ondernemingVerkenning(o),
-      opr.oprichtingsproject(o)),
+      opr.oprichtingsproject(o), ek.eersteKlant(o)),
+    ondernemingEersteKlant: ek.eersteKlant,
     ondernemingOprichting: opr.oprichtingsproject,
     ondernemingOprichtingZet: opr.oprichtingZet,
     ondernemingAanvraag,

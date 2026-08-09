@@ -147,6 +147,10 @@ function stubKern(zaken) {
     db, save: () => {},
     crypto: require('crypto'),
     schoon: (v, n) => (typeof v === 'string' ? v.trim().slice(0, n) : ''),
+    /* De ECHTE ondernemerpoort, met de echte salonregel erachter. Een
+       nagemaakte poort zou hier precies datgene wegnemen wat we willen meten:
+       dat de eerste-klant-lijst de bestaande poort LEEST. */
+    ondernemerpoort: require('../server/opzet/salonregel')({ data: { posts: [] } }).ondernemerpoort,
     findSupplier: (code) => zaken.find(z => z.code === code) || null,
     ordersVanZaak: () => [],
     boekingenVanZaak: (code) => (zaken.find(z => z.code === code) || {}).boekingen || []

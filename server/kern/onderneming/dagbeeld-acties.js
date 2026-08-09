@@ -13,7 +13,7 @@
 
 module.exports = ({ boekingenVanZaak, intakeOntbreekt }) => {
 
-  function acties(o, feiten, verk, project) {
+  function acties(o, feiten, verk, project, eersteklant) {
     const uit = [];
     const zet = (id, kop, waarom, waarheen) => uit.push({ id, kop, waarom, waarheen });
 
@@ -64,7 +64,20 @@ module.exports = ({ boekingenVanZaak, intakeOntbreekt }) => {
           : 'U bent ingeschreven. Met een zaak kunt u verkopen, factureren en in de Mall staan.',
         'zaak');
     }
-    // 8. wat er ligt
+    /* 8. klaarstaan voor de eerste klant. Dit gaat VOOR de losse aanvragen,
+       want een zaak die niet online staat krijgt er ook geen. */
+    if (eersteklant && eersteklant.open.length) {
+      const e = eersteklant.open[0];
+      zet('eersteklant', eersteklant.doel === 'klaarstaan'
+        ? 'Klaarstaan voor uw eerste klant (' + eersteklant.percentage + '%)'
+        : 'Nog ' + eersteklant.open.length + ' punt(en) open in uw etalage',
+        e.label + ': ' + e.waarom, 'eersteklant');
+    }
+    if (eersteklant && eersteklant.volgende && eersteklant.klanten > 0) {
+      zet('mijlpaal', 'Nog ' + eersteklant.volgende.teGaan + ' tot ' + eersteklant.volgende.label.toLowerCase(),
+        eersteklant.volgende.wat, 'eersteklant');
+    }
+    // 9. wat er ligt
     if (o.supplierCode) {
       const wacht = (boekingenVanZaak(o.supplierCode) || []).filter(b => b && b.status === 'aangevraagd').length;
       if (wacht) {

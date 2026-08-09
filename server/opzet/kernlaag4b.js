@@ -18,7 +18,7 @@
 /* `bankregie` wordt hier verklaard en tot onderaan dit deel gebruikt; daarom
    loopt de grens met deel 4a ervoor en niet erin. */
 module.exports = (kern, hulp) => {
-  const { FISCAAL_PEILJAAR, LANDEN, accounts, anthropic, betaal, centen, crypto, db, findSupplier, fonds, keyVanCodenaam, ledenAantal, log, save, schoon, sseToCustomer, sseToOffice, sseToSupplier } = hulp;
+  const { FISCAAL_PEILJAAR, LANDEN, accounts, anthropic, betaal, centen, crypto, db, findSupplier, fonds, keyVanCodenaam, ledenAantal, log, ondernemerpoort, save, schoon, sseToCustomer, sseToOffice, sseToSupplier } = hulp;
 
 /* Bankregie (kern/bankregie.js): de geldinfrastructuur-knop van de boardroom --
    een schakelaar met DRIE standen (partner -> hybride -> eigen) die bepaalt hoe
@@ -72,7 +72,11 @@ Object.assign(kern, require('../kern/onderneming')({ db, save, crypto, schoon, f
   /* De aanvraag om een zaak loopt langs de BESTAANDE aanmeldingsstroom
      (gemount in kernlaag2), zodat er geen tweede deur ontstaat naast de deur
      waar een mens voor staat. Zie de kop van kern/onderneming/index.js. */
-  aanmeldingen: kern.aanmeldingen }));
+  aanmeldingen: kern.aanmeldingen,
+  /* De poort die elke nieuwe zaak al door de basis loodst. Gelezen en niet
+     nagebouwd: twee lijsten die allebei "is deze zaak er klaar voor" beweren,
+     lopen uiteen. */
+  ondernemerpoort }));
 /* De Opvang-afdeling (AZC/COA), het Regeringskantoor van de
    minister-president en het eigen hotel van elke afdeling -- alle drie
    kamers van RTG Kantoren. */

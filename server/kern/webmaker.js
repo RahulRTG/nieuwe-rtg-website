@@ -8,7 +8,7 @@
 
    Alles wordt geschoond en begrensd; beeld verwijst naar eigen RTG-campagne of
    Salon, we bewaren alleen de verwijzing. */
-module.exports = ({ db, save, crypto, schoon, media }) => {
+module.exports = ({ db, save, crypto, schoon, media, merkHuisstijl }) => {
   const scho = schoon || ((v, n) => String(v == null ? '' : v).trim().slice(0, n || 200));
   /* De schoonmaak van de bloktaal (wat een blok mag bevatten, hoe lang, hoe
      een adres en een kleur eruitzien) staat in ./webmaker-schoon.js -- elke
@@ -97,6 +97,19 @@ module.exports = ({ db, save, crypto, schoon, media }) => {
     };
     const vg = schoonVolgorde(d, design.blokken); if (vg) design.volgorde = vg;
     const pg = paginalaag.schoonPaginas(d); if (pg) design.paginas = pg;
+    /* Hoort deze site bij een vestiging van een merk, dan komt de HUISSTIJL van
+       het merk en niet van de vestiging -- bij elke bewaring opnieuw. De
+       vestiging beheert haar eigen inhoud (openingstijden, foto's, kaart, team,
+       dat staat in haar zaakprofiel en komt via de live blokken binnen); een
+       vestiging die het merk kan omverven is precies waarom een keten centraal
+       beheer wil. */
+    if (merkHuisstijl && design.zaakCode) {
+      const h = merkHuisstijl(design.zaakCode);
+      if (h) {
+        design.thema = h.thema; design.accent = h.accent; design.kleuren = h.kleuren || null;
+        design.merk = h.merk;
+      }
+    }
     // de stand die we gaan overschrijven eerst wegleggen
     if (bestaand) versielaag.leg(bestaand, (opts && opts.reden) || 'bewaard');
     spoor.noteer(design.id, bestaand ? ((opts && opts.reden) || 'bewaard') : 'gemaakt', opts && opts.wie);

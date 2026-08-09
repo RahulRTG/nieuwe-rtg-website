@@ -710,7 +710,14 @@ const media = require('./media').maakMedia({ dir: DATA_DIR });
 /* RTG Webmaker (kern/webmaker.js): de eigen site van een lid. Staat hier en
    niet eerder omdat hij de mediastore nodig heeft: een foto die uit de
    bibliotheek valt of wordt weggehaald, moet ook van schijf. */
-const webmaker = require('./kern/webmaker')({ db, save, crypto, schoon, media });
+/* Merken met vestigingen (kern/webmerk.js) en de Website-maker kennen elkaar:
+   de maker vraagt bij elke bewaring welke huisstijl er voor deze zaak geldt,
+   het merk laat zijn hoofdontwerp door de maker uitrollen. Late binding
+   daarom -- webmerk bestaat een regel later. */
+let webmerk = null;
+const webmaker = require('./kern/webmaker')({ db, save, crypto, schoon, media,
+  merkHuisstijl: z => webmerk && webmerk.huisstijlVoorZaak(z) });
+webmerk = require('./kern/webmerk')({ db, save, scho: schoon, webmaker, findSupplier });
 /* RTG Web Platform (kern/webplatform.js): genereert bedrijfssites uit het
    zaakprofiel en lost de live zaakdata-blokken op bij het openen. */
 /* Wie van het personeel op de bedrijfssite mag staan: een publicatiebesluit
@@ -1794,7 +1801,7 @@ const kern = {
   DEMO_PASS, DEMO_SUPPLIER, DEMO_USER, DOOR_RELOCK_MS, FIN_CAT, FISCAAL_PEILJAAR, HK_STATUSES, LANDEN,
   OFFICE_CODE, PERSONAS, POS_METHODS, PRODUCTION, PUBLIC_DIR, RIT_KETEN, RIT_LEGACY, RIT_MELDING,
   RUN_STATIONS, SHIFT_NAMES, SSE_BUFFER_TTL, STAFF_SEED, TABLE_STATUSES, TOKEN_TTL_MS, UPLOAD_DIR, VAC_SOORTEN,
-  ZAAK_OPTIES, ZZP, accounts, addContact, addTicket, aiFindDoor, aiFindRoom, archief, beveilig, wacht, mailQ, mailIn, mailAuth, mailBijlage, mailSleutel, rtmailAi, rtmail, rtmailTeam, automatisering, werkmail, antivirus, atelierweb, webmaker, webplatform, webplatformTaal, webmakerAi, webmakerTeam, eigenaar, zaakdoos, rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels, rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar, mailAanname, naamlaag,
+  ZAAK_OPTIES, ZZP, accounts, addContact, addTicket, aiFindDoor, aiFindRoom, archief, beveilig, wacht, mailQ, mailIn, mailAuth, mailBijlage, mailSleutel, rtmailAi, rtmail, rtmailTeam, automatisering, werkmail, antivirus, atelierweb, webmaker, webmerk, webplatform, webplatformTaal, webmakerAi, webmakerTeam, eigenaar, zaakdoos, rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels, rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar, mailAanname, naamlaag,
   aiSystemPrompt, alcoholGrensVan, anthropic, app, appUrl, applyChatPubliek, applyChatVertaald, auth, betaal, broadcastSync,
   bufferEvent, bus, canEngage, cannedAnswer, cannedBoekhouder, cateringDishes, centen, chatApplicant,
   chatKeyOf, chatStuur, checkCred, coachCache, coachRules, conciergeInbox, connectedSupplierCodes, convOf,

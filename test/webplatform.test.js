@@ -626,6 +626,77 @@ test('21. het beeld voor RTG: tellingen over het web heen, en alleen voor het ka
   assert.equal((await api('/api/office/web/overzicht', {}, lid)).status, 401);
 });
 
+test('22. een merk met vestigingen: een sjabloon, en toch per vestiging een eigen site', async () => {
+  const office = (await api('/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+
+  assert.equal((await api('/api/office/merk/maak', { code: 'ZEILHUIS', naam: 'Zeilhuis' }, office)).status, 200);
+  assert.equal((await api('/api/office/merk/maak', { code: 'ZEILHUIS', naam: 'Zeilhuis' }, office)).status, 409, 'niet twee keer');
+
+  // twee bestaande zaken als vestiging; een verzonnen code komt er niet in
+  assert.equal((await api('/api/office/merk/vestiging', { code: 'ZEILHUIS', zaak: 'ESVEDRA' }, office)).status, 200);
+  assert.equal((await api('/api/office/merk/vestiging', { code: 'ZEILHUIS', zaak: 'SAKURA' }, office)).status, 200);
+  assert.equal((await api('/api/office/merk/vestiging', { code: 'ZEILHUIS', zaak: 'BESTAATNIET' }, office)).status, 404);
+
+  // een zaak hoort bij hooguit een merk
+  assert.equal((await api('/api/office/merk/maak', { code: 'ANDERMERK', naam: 'Ander' }, office)).status, 200);
+  const dubbel = await api('/api/office/merk/vestiging', { code: 'ANDERMERK', zaak: 'ESVEDRA' }, office);
+  assert.equal(dubbel.status, 409, 'twee merken die dezelfde vestiging opeisen kan niet');
+
+  // het hoofdontwerp: vaste tekst plus LIVE blokken
+  const sj = await api('/api/office/merk/sjabloon', { code: 'ZEILHUIS', ontwerp: {
+    titel: 'Zeilhuis', thema: 'licht', accent: '#857007',
+    blokken: [
+      { type: 'hero', kop: 'Zeilhuis', sub: 'Een merk, overal thuis' },
+      { type: 'zaakdata', bron: 'contact' },
+      { type: 'zaakdata', bron: 'menu' }
+    ] } }, office);
+  assert.equal(sj.status, 200, JSON.stringify(sj.body));
+
+  const rol = await api('/api/office/merk/uitrol', { code: 'ZEILHUIS' }, office);
+  assert.equal(rol.status, 200, JSON.stringify(rol.body));
+  assert.equal(rol.body.uitgerold.length, 2, 'beide vestigingen hebben nu een site');
+
+  /* HET PUNT: een sjabloon, maar geen twee gelijke sites. De live blokken
+     lossen per vestiging op uit HAAR profiel. */
+  const a = await api('/api/browser/open', { adres: rol.body.uitgerold[0].adres }, lid);
+  const bb = await api('/api/browser/open', { adres: rol.body.uitgerold[1].adres }, lid);
+  assert.equal(a.status, 200); assert.equal(bb.status, 200);
+  assert.equal(a.body.site.blokken[0].sub, 'Een merk, overal thuis', 'de merktekst staat op beide');
+  assert.equal(bb.body.site.blokken[0].sub, 'Een merk, overal thuis');
+  const tekstA = JSON.stringify(a.body.site.blokken);
+  const tekstB = JSON.stringify(bb.body.site.blokken);
+  assert.notEqual(tekstA, tekstB, 'en toch verschillen de sites: de live blokken zijn lokaal');
+  assert.match(tekstA + tekstB, /Tapasplank aan boord/, 'de kaart van Es Vedra staat op haar eigen site');
+
+  // de huisstijl van het merk staat op beide
+  assert.equal(a.body.site.thema, 'licht');
+  assert.equal(a.body.site.accent, '#857007');
+});
+
+test('23. een vestiging beheert haar inhoud, maar kan de huisstijl van het merk niet omverven', async () => {
+  const mijn = await api('/api/supplier/site/mijn', {}, zaak);
+  const id = mijn.body.lijst[0].id;
+
+  // de vestiging probeert eigen kleuren te zetten
+  const bw = await api('/api/supplier/site/bewaar', { design: { id, titel: 'Es Vedra Cruises',
+    thema: 'donker', accent: '#00FF00', kleuren: { bg: '#123456' },
+    blokken: [{ type: 'kop', tekst: 'Eigen tekst mag wel' }] } }, zaak);
+  assert.equal(bw.status, 200, JSON.stringify(bw.body));
+
+  // de huisstijl komt van het merk, bij elke bewaring opnieuw
+  assert.equal(bw.body.design.thema, 'licht', 'het thema van het merk wint');
+  assert.equal(bw.body.design.accent, '#857007', 'en de accentkleur ook');
+  assert.equal(bw.body.design.kleuren, null, 'eigen vrije kleuren komen er niet in');
+  assert.equal(bw.body.design.merk, 'ZEILHUIS', 'de site weet bij welk merk hij hoort');
+  // maar de eigen INHOUD is gewoon van de vestiging
+  assert.equal(bw.body.design.blokken[0].tekst, 'Eigen tekst mag wel');
+
+  // en een zaak zonder merk houdt haar eigen huisstijl
+  const vrij = await api('/api/site/bewaar', { design: { titel: 'Vrije Site', accent: '#00FF00',
+    blokken: [{ type: 'kop', tekst: 'Hoi' }] } }, lid);
+  assert.equal(vrij.body.design.accent, '#00FF00', 'wie bij geen merk hoort kiest zelf');
+});
+
 test('5. zoeken vindt sites en bedrijven in een adem', async () => {
   const z = await api('/api/browser/zoek', { q: 'vedra' }, lid);
   assert.equal(z.status, 200);

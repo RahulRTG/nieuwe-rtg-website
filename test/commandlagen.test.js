@@ -146,6 +146,46 @@ test('een land en een stad zijn aan elkaar geknoopt', async () => {
   assert.equal((await api('command/land/terug', { land: 'NL' })).status, 200);
 });
 
+/* ELKE INGANG ECHT AANRAKEN, en niet alleen de hoofdingang per laag.
+
+   scripts/dekking.js meet de WAARGENOMEN dekking uit het routejournaal: welke
+   endpoints zijn tijdens de hele suite geen enkele keer aangeroepen. Dat is een
+   ander cijfer dan "staat er een toets die erover gaat", en het is het eerlijke
+   -- acht van mijn eigen nieuwe ingangen stonden erin, terwijl de laag eronder
+   wel getoetst was. Een knop op een scherm die nooit door een toets is
+   ingedrukt, is een knop waarvan niemand weet of hij het doet. */
+test('ook de tweede knop van elke laag wordt echt aangeroepen', async () => {
+  /* De canary: verbreden, terugdraaien en afronden. Ze werken op een functie
+     uit de schakelkast, dus we zetten er een op canary en halen hem weer weg. */
+  assert.equal((await api('command/canary/start', { id: 'command-zien', deel: 0.1 })).status, 200);
+  assert.equal((await api('command/canary/breder', { id: 'command-zien', deel: 0.5 })).status, 200);
+  assert.equal((await api('command/canary/terug', { id: 'command-zien', reden: 'routetoets' })).status, 200);
+  assert.equal((await api('command/canary/af', { id: 'command-zien' })).status, 200);
+  assert.equal((await api('command/canary/af', { id: 'command-zien' })).status, 404, 'twee keer afronden kan niet');
+
+  /* De kennisgraaf en de herkomst: van een echt object uit de startdata. */
+  const wandel = await api('command/graaf/wandel', { type: 'zaak', id: 'HOSHI', diepte: 2 });
+  assert.equal(wandel.status, 200);
+  assert.equal(wandel.body.start.id, 'HOSHI');
+  const spoor = await api('command/herkomst/spoor', { type: 'zaak', id: 'HOSHI' });
+  assert.equal(spoor.status, 200);
+  assert.ok(Array.isArray(spoor.body.wordtGenoemdDoor));
+
+  /* Master data: het gouden record en het terugdraaien van een samenvoeging.
+     Zonder dubbelen in de startdata is er geen groep, en dan hoort gouden() een
+     eerlijke 404 te geven in plaats van iets te verzinnen. */
+  const groepen = (await api('command/mdm')).body.bedrijven;
+  const goud = await api('command/mdm/gouden', { sleutel: groepen.length ? groepen[0].sleutel : 'bestaat-niet' });
+  assert.equal(goud.status, groepen.length ? 200 : 404);
+  assert.equal((await api('command/mdm/terug', { verliezers: [] })).status, 400,
+    'terugdraaien zonder samenvoeging is een fout en geen stille nul');
+
+  /* En een pad weer uit de toelating halen. */
+  assert.equal((await api('command/apipoort/toelaten', { pad: '/api/extern/tijdelijk' })).status, 200);
+  assert.equal((await api('command/apipoort/toelating-weg', { pad: '/api/extern/tijdelijk' })).status, 200);
+  assert.equal((await api('command/apipoort/toelating-weg', { pad: '/api/extern/tijdelijk' })).status, 404);
+});
+
 test('het alarm meldt de stille sonde en is stil te zetten', async () => {
   const st = await api('command/alarm');
   const a = st.body.alarmen.find(x => x.id === 'niets-van-buiten');

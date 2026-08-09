@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 738 bestanden en 4203 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 742 bestanden en 4240 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,13 +12,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 738 |
-| losse beweringen (`test(...)`) | 4203 |
+| toetsbestanden | 742 |
+| losse beweringen (`test(...)`) | 4240 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 521 |
 | **overleefd**: geen mutatie kreeg hem rood | 12 |
 | niet te meten (al rood, geen module gevonden, ...) | 16 |
-| alleen in de kop *genoemd*, nog niet gemeten | 43 |
+| alleen in de kop *genoemd*, nog niet gemeten | 47 |
 | niets van beide | 146 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-648 bestanden, 4043 beweringen.
+652 bestanden, 4080 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -146,8 +146,10 @@ toets omvalt.
 | `comm-gast.test.js` | 12 | -- | De verhuizing van het gastcontact naar de communicatiekern (server/kern/comm/gast.js). DE DERDE VOORRAAD, en de eerste waarin een LID en een ZAAK in hetzelfde gesprek zitten. |
 | `comm-vergeten.test.js` | 6 | -- | Het wisrecht op de gesprekken van de communicatiekern (server/kern/vergeten/gesprekken.js). WAAROM DEZE TOETS ER IS, en waarom hij er niet was. |
 | `comm-werk.test.js` | 8 | -- | De verhuizing van de sollicitatiechat naar de communicatiekern (server/kern/comm/werk.js). DE VIERDE EN LAATSTE GROTE VOORRAAD. |
+| `command-routes-bestuur.test.js` | 10 | genoemd | DE BESTUURSROUTES VAN RTG COMMAND -- beleid, simulatie, journaal, toezicht. WAAROM DIT BESTAND ER IS. |
+| `command-routes-herstel.test.js` | 7 | genoemd | DE HERSTELROUTES VAN RTG COMMAND -- runbooks, zaken, de operator, de zandbak en de eerste stap van een overname. De tegenhanger van test/command-routes-bestuur.test.js: daar staat wat er BESLOTEN wordt, hier wat er... |
 | `command.test.js` | 19 | genoemd | RTG Command (kern/command/): de bestuurslaag van het RTG- en RTF-kantoor bewijst hier zijn zes harde beloftes. Zoeken vindt over domeinen heen; het objectdossier meet zijn afhankelijkheden in plaats van ze op te... |
-| `commandlagen.test.js` | 7 | genoemd | De ROUTES van de lagen die op de Command-ruggengraat staan: canary, zandbak, master data, overname, API-poort, landen, steden en het alarm. WAAROM DIT NAAST DE MOTORTOETSEN STAAT. |
+| `commandlagen.test.js` | 8 | genoemd | De ROUTES van de lagen die op de Command-ruggengraat staan: canary, zandbak, master data, overname, API-poort, landen, steden en het alarm. WAAROM DIT NAAST DE MOTORTOETSEN STAAT. |
 | `contact.test.js` | 6 | gezakt op `liegpoort /api/` | Nooit meer vreemden: zodra een lid echt in contact komt met een partner (hier: een bezorgaanvraag) opent er automatisch een open chatlijn. Beide kanten zien die lijn, de partner mag vooraf de Salon van het lid... |
 | `context-lijn.test.js` | 5 | gezakt op `liegpoort /api/` | De dagcontext (tijd, seizoen, temperatuur voor elke AI) en de lijnbezetting (aanmelden per kant; de schermen en de coach rekenen met het aantal aangemelde koks). |
 | `contract.test.js` | 5 | gezakt op `liegpoort /api/` | Contracten: elke zaak stelt een contract op (verhuur of personeel), gericht aan een lid (op codenaam) of een personeelslid. Beide partijen tekenen digitaal; pas als beide handtekeningen staan is het contract... |
@@ -310,6 +312,7 @@ toets omvalt.
 | `liegpoort.test.js` | 7 | gezakt op `false->true#0` | DE LIEGPOORT: liegt hij precies waar hij moet, en zwijgt hij waar het telt? WAAROM DIT ER IS. |
 | `lifestyle.test.js` | 7 | gezakt op `liegpoort /api/` | Integratietests voor De Rechterhand: de premium Lifestyle Pass-suite. Het Concierge-bureau (verzoeken + voorkeuren), het Bezittingenregister met attentiepunten, en Gezondheid & welzijn (afspraken + prive-dossier). |
 | `livegang.test.js` | 3 | gezakt op `liegpoort /api/` | De livegang: in productie start het platform schoon en op slot. - geen demozaken in de catalogus, geen demopersoneel, geen voorbeeldposts - de demo-inlog is dicht (leden en zaken) - de rate-limiter staat aan |
+| `livinglab-routes.test.js` | 11 | genoemd | DE OVERIGE ROUTES VAN HET LIVING LAB -- werkplaats, apparatuur, deelnemers, themas, de pijplijn, de coach en de bewonerskant. test/livinglab.test.js loopt de ONDERZOEKSCYCLUS af: de poorten, de ethiek, de bewijsmotor. |
 | `livinglab.test.js` | 20 | genoemd | Het RTF Living Lab: de onderzoekscyclus met haar poorten, de ethieklaag, de bewijsmotor, de scheiding van onderzoeksdata, de apparatuurpoort en de pijplijn naar echte verandering. Draai los: node... |
 | `loghygiene.test.js` | 5 | overleefd | LOGHYGIENE -- lekt er een naam, e-mailadres of token via de logs? Een systeem kan zijn database keurig versleutelen en toch alle identiteiten weggeven, omdat ze in platte tekst in de logs staan. |
 | `lokaal-tls.test.js` | 8 | gezakt op `true->false#0` | Lokale https voor het eigen netwerk (server/lokaal-tls.js). Dit is de laag die het mogelijk maakt de site op een telefoon te openen met camera, Face ID en pushmeldingen erbij -- dingen die een browser alleen op een... |
@@ -671,6 +674,7 @@ toets omvalt.
 | `zaak-loket-en-dossier.test.js` | 4 | gezakt op `liegpoort /api/` | HET LOKET EN HET DOSSIER -- 5 endpoints uit de supplier-groep. overheid/bekendmakingen, gemeente/bekendmakingen, overheid/kvk/mijn, advies/dossier/status en apply/chat/send stonden als nooit aangeroepen in de... |
 | `zaak-vloot-en-facturen.test.js` | 5 | gezakt op `liegpoort /api/` | VLOOT, FACTUREN EN OPROEPEN -- 5 endpoints uit de supplier-groep. fleet, auto, facturen/maak, samenwerking/oproep/sluit en guest/connect stonden als nooit aangeroepen in de waargenomen dekkingsmeting. |
 | `zaak.test.js` | 3 | gezakt op `liegpoort /api/` | De eigen mini-boardroom per zaak: elke leverancier zet zijn eigen functies aan/uit en ziet een HR- en marketing-momentopname. Een uitgezette functie werkt echt (bijv. |
+| `zaakcommand-routes.test.js` | 8 | genoemd | DE ROUTES VAN ZAAK COMMAND -- de commandolaag van EEN zaak, over HTTP. test/zaakcommand.test.js toetst de motor met nagemaakte gegevens: daar staat dat de zaak niets van de buurman ziet en niets van RTG. |
 | `zaakcommand.test.js` | 8 | genoemd | Zaak Command (kern/zaakcommand/): dezelfde commandologica als RTG Command, maar van EEN zaak en uitsluitend over die zaak. Deze toets bewijst vier dingen: de zaak ziet niets van een andere zaak en niets van RTG; een... |
 | `zaakdoos.test.js` | 10 | gezakt op `liegpoort /api/` | De Zaakdoos end-to-end: een cloudserver en een doos-kastje ernaast. 1. |
 | `zaaktools.test.js` | 2 | gezakt op `liegpoort /api/` | De gereedschappen die elke zaak krijgt: reageren op reviews (met melding aan de gast) en de lichte voorraad met drempelmeldingen. |

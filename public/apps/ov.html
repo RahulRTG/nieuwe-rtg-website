@@ -131,6 +131,10 @@
         <select id="velVan"><option value="hier">Huidige locatie</option></select>
         <label for="velZoek">Bestemming</label>
         <input id="velZoek" type="search" placeholder="Zoek een zaak, hotel of halte" autocomplete="off">
+        <!-- De keuzelijst met wat het zoeken oplevert. Hij hoorde bij het label
+             hierboven, maar een label wijst maar EEN veld aan: wie met een
+             schermlezer verdertabt, hoorde hier een naamloze lijst. -->
+        <label for="velNaar">Kies uit de gevonden plekken</label>
         <select id="velNaar" style="margin-top:0.4rem;"><option value="">Kies een plek</option></select>
         <p class="stil" id="velMeer"></p>
         <div class="duo">
@@ -140,10 +144,14 @@
         <!-- Zakelijk. Bewust in het boekformulier en niet in een aparte app:
              wie voor zijn werk reist, reist met dezelfde knop als thuis. Wat
              erbij komt is een rekening en een reisbeleid, geen tweede product. -->
-        <label for="velZakOrg">Op rekening van (code van uw werkgever)</label>
+        <!-- Twee velden naast elkaar, dus twee labels: hetzelfde patroon als
+             Reizigers en Koffers hierboven. Eerst stond er een label boven het
+             paar, en dan draagt alleen het eerste veld een naam. -->
         <div class="duo">
-          <input id="velZakOrg" type="text" placeholder="Laat leeg voor prive" autocomplete="off">
-          <input id="velKostenplaats" type="text" placeholder="Kostenplaats" autocomplete="off">
+          <div><label for="velZakOrg">Op rekening van (code van uw werkgever)</label>
+            <input id="velZakOrg" type="text" placeholder="Laat leeg voor prive" autocomplete="off"></div>
+          <div><label for="velKostenplaats">Kostenplaats</label>
+            <input id="velKostenplaats" type="text" placeholder="Kostenplaats" autocomplete="off"></div>
         </div>
         <div id="beleidKaart" class="weg" style="margin-top:0.6rem;border-top:1px solid var(--line);padding-top:0.6rem;">
           <p class="stil" id="beleidUit"></p>

@@ -28,11 +28,18 @@ module.exports = (kern, mijn, stuur, nietGevonden) => {
   });
 
   /* Aftreden en niet wissen: wie er ooit bestuurder was, was dat -- en juist
-     die geschiedenis is waar een aansprakelijkheidsvraag over gaat. */
+     die geschiedenis is waar een aansprakelijkheidsvraag over gaat.
+
+     HET VELD HEET `bestuurder` EN NIET `id`. Dat laatste stond er eerst, en
+     `id` is in dit hele OS de ONDERNEMING -- `mijn(req)` leest hem. Wie dus een
+     bestuurder wilde laten aftreden, overschreef daarmee de onderneming en
+     kreeg "deze onderneming staat niet op uw naam" te zien. Twee betekenissen
+     op een veldnaam is een botsing die je pas ziet als hij afgaat; de
+     oprichtingsstap hiernaast heet om dezelfde reden `stap`. */
   app.post('/api/onderneming/bestuur/af', auth, (req, res) => {
     const o = mijn(req);
     if (!o) return stuur(res, nietGevonden);
-    stuur(res, ondernemingBestuurderAf(o, (req.body || {}).id));
+    stuur(res, ondernemingBestuurderAf(o, (req.body || {}).bestuurder));
   });
 
   app.post('/api/onderneming/aandeel/zet', auth, (req, res) => {
@@ -44,7 +51,7 @@ module.exports = (kern, mijn, stuur, nietGevonden) => {
   app.post('/api/onderneming/aandeel/weg', auth, (req, res) => {
     const o = mijn(req);
     if (!o) return stuur(res, nietGevonden);
-    stuur(res, ondernemingAandeelWeg(o, (req.body || {}).id));
+    stuur(res, ondernemingAandeelWeg(o, (req.body || {}).aandeel));   // niet `id`: zie hierboven
   });
 
   /* Wie er bij de onderneming kan, over de twee rechtenmodellen die er al zijn.

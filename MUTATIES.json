@@ -2045,6 +2045,174 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "onderneming-belasting.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/onderneming/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 15,
+      "geprobeerd": 1
+    },
+    "onderneming-bestuur.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/onderneming/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 18,
+      "geprobeerd": 1
+    },
+    "onderneming-capaciteit.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/onderneming/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 13,
+      "geprobeerd": 1
+    },
+    "onderneming-contracten.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/onderneming/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 11,
+      "geprobeerd": 1
+    },
+    "onderneming-crediteuren.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/onderneming/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 10,
+      "geprobeerd": 1
+    },
+    "onderneming-dagbeeld.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/onderneming/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 9,
+      "geprobeerd": 1
+    },
+    "onderneming-debiteuren.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/onderneming/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 9,
+      "geprobeerd": 1
+    },
+    "onderneming-eersteklant.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/onderneming/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 15,
+      "geprobeerd": 1
+    },
+    "onderneming-kas.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/onderneming/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 13,
+      "geprobeerd": 1
+    },
+    "onderneming-klussen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/onderneming/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 13,
+      "geprobeerd": 1
+    },
+    "onderneming-mallprofiel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/onderneming/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 9,
+      "geprobeerd": 1
+    },
+    "onderneming-offertebouw.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/onderneming/offertebouw.js",
+      "operator": "===->!==#0",
+      "gezakt": 6,
+      "geprobeerd": 1
+    },
+    "onderneming-ontwerper.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/onderneming/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 11,
+      "geprobeerd": 1
+    },
+    "onderneming-pijplijn.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/onderneming/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 14,
+      "geprobeerd": 1
+    },
+    "onderneming-rechtsvormen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/onderneming/rechtsvorm.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
+    "onderneming-regie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/onderneming/regie.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 4
+    },
+    "onderneming-relaties.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/onderneming/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 10,
+      "geprobeerd": 1
+    },
+    "onderneming-toegang.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/onderneming/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 11,
+      "geprobeerd": 1
+    },
+    "onderneming-verkenning.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/onderneming/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 16,
+      "geprobeerd": 1
+    },
+    "onderneming-voorraad.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/onderneming/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 12,
+      "geprobeerd": 1
+    },
+    "onderneming-werving.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/onderneming/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 14,
+      "geprobeerd": 1
+    },
     "onderwijs.test.js": {
       "soort": "server",
       "staat": "gezakt",

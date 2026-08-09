@@ -79,6 +79,21 @@
     background:var(--card2);border:1px solid var(--gold);color:var(--txt);padding:.6rem 1rem;border-radius:12px;
     font-size:.85rem;opacity:0;transition:opacity .25s;pointer-events:none;z-index:40;max-width:90vw;}
   .stil{color:var(--soft);font-size:.85rem;line-height:1.55;}
+  /* Ruimte-klassen in plaats van losse stijl-attributen. Elk stijl-attribuut
+     houdt style-src-attr open in de CSP, en dat is een deur die je liever dicht
+     hebt voor iets wat net zo goed een klasse kan zijn. De namen zijn de maat
+     zelf, zodat de bedoeling in de opmaak leesbaar blijft. */
+  .r3{margin-top:.3rem;} .r35{margin-top:.35rem;} .r4{margin-top:.4rem;}
+  .r5{margin-top:.5rem;} .r6{margin-top:.6rem;} .r7{margin-top:.7rem;}
+  .r8{margin-top:.8rem;} .r9{margin-top:.9rem;} .r10{margin-top:1rem;}
+  .o2{margin-bottom:.2rem;} .o3{margin-bottom:.3rem;} .o6{margin-bottom:.6rem;}
+  .kopje{margin:.9rem 0 .3rem;} .kopje2{margin:.9rem 0 .2rem;}
+  .balkjes{margin-top:.9rem;line-height:1;}
+  .rijpad{padding:.5rem 0;}
+  .breed{flex:1 1 14rem;} .half{flex:1 1 12rem;} .smal{flex:1 1 10rem;}
+  .groot2{font-size:1.15rem;} .groot1{font-size:1.05rem;}
+  .keuze{display:flex;gap:.6rem;align-items:flex-start;cursor:pointer;}
+  .toon{display:block;}
 </style>
 </head>
 <body class="rtg-stijl">
@@ -138,9 +153,9 @@ function toonLeeg(){
     '<p class="groot groet">Ik denk erover na.</p>'+
     '<p class="subtxt">Een onderneming begint hier voordat er iets bestaat. U hoeft nog niets te weten: '+
     'een werktitel is genoeg, en alles daarna kan wijzigen.</p>'+
-    '<div class="rij" style="margin-top:1rem;">'+
-    '<label class="veld" style="flex:1 1 14rem;">Werktitel<input id="nieuwNaam" placeholder="Bijvoorbeeld: iets met ramen wassen"></label>'+
-    '</div><div class="rij" style="margin-top:.8rem;"><button class="knop prim" id="nieuwKnop">Begin een onderneming</button></div></div>';
+    '<div class="rij r10">'+
+    '<label class="veld breed">Werktitel<input id="nieuwNaam" placeholder="Bijvoorbeeld: iets met ramen wassen"></label>'+
+    '</div><div class="rij r8"><button class="knop prim" id="nieuwKnop">Begin een onderneming</button></div></div>';
   $('#nieuwKnop').addEventListener('click',async()=>{
     const naam=$('#nieuwNaam').value.trim();
     if(!naam){meld('Geef een werktitel.');return;}
@@ -160,7 +175,7 @@ function teken(){
 
 function vakGroet(){
   const ladder=(DAG.ladder||[]).map(s=>'<span class="stap'+(s.id===DAG.fase?' nu':(s.bereikt?' bereikt':''))+'">'+esc(s.label)+'</span>').join('');
-  const v=DAG.volgende?'<p class="subtxt" style="margin-top:.8rem;"><strong>Volgende mijlpaal:</strong> '+esc(DAG.volgende.label)+' &mdash; '+esc(DAG.volgende.vraag)+'</p>':'';
+  const v=DAG.volgende?'<p class="subtxt r8"><strong>Volgende mijlpaal:</strong> '+esc(DAG.volgende.label)+' &mdash; '+esc(DAG.volgende.vraag)+'</p>':'';
   return '<div class="vak"><p class="groot groet">'+esc(DAG.groet||'')+'</p>'+
     '<div class="ladder">'+ladder+'</div>'+v+'</div>';
 }
@@ -168,7 +183,7 @@ function vakGroet(){
 function vakGezond(){
   const g=DAG.gezondheid||{};
   const cij=(DAG.cijfers||[]).filter(c=>c.gemeten);
-  const cijHtml=cij.length?'<div class="cijfers" style="margin-top:1rem;">'+cij.map(c=>
+  const cijHtml=cij.length?'<div class="cijfers r10">'+cij.map(c=>
     '<div class="cijfer"><div class="lbl">'+esc(c.label)+'</div><div class="wrd">'+
     (c.eenheid==='euro'?euro(c.waarde):esc(String(c.waarde)))+'</div>'+
     (c.eenheid&&c.eenheid!=='euro'?'<div class="eh">'+esc(c.eenheid)+'</div>':'')+'</div>').join('')+'</div>':'';
@@ -177,12 +192,12 @@ function vakGezond(){
     kop='<p class="geenscore">'+esc(g.uitleg||'Nog geen cijfer te geven.')+'</p>';
   }else{
     kop='<div class="score"><span class="n groot">'+g.score+'</span><span class="subtxt">van de 100</span></div>'+
-      '<p class="subtxt" style="margin-top:.4rem;">'+esc(g.voorbehoud||'')+'</p>';
+      '<p class="subtxt r4">'+esc(g.voorbehoud||'')+'</p>';
   }
   const ontbreekt=(g.grondslag&&g.grondslag.ontbreekt||[]).map(b=>
     '<div class="bron niet"><span>'+esc(b.id)+'</span><span class="bu">'+esc(b.reden||'')+'</span></div>').join('');
   return '<div class="vak"><h2>Gezondheid</h2>'+kop+cijHtml+
-    (ontbreekt?'<div style="margin-top:.9rem;"><p class="subtxt" style="margin-bottom:.3rem;">Niet gemeten:</p>'+ontbreekt+'</div>':'')+
+    (ontbreekt?'<div class="r9"><p class="subtxt o3">Niet gemeten:</p>'+ontbreekt+'</div>':'')+
     '</div>';
 }
 
@@ -200,7 +215,7 @@ function vakIntake(){
   const w=(v)=>v===undefined||v===null?'':String(v);
   return '<div class="vak"><h2>Uw idee en uw cijfers</h2>'+
     '<p class="subtxt">De getallen hieronder zijn van u. Wij rekenen ze door en proberen ze daarna te breken.</p>'+
-    '<div class="raster" style="margin-top:.9rem;">'+
+    '<div class="raster r9">'+
     '<label class="veld">Branche<select id="f_branche"><option value="">kies...</option>'+br+'</select></label>'+
     '<label class="veld">Plaats<input id="f_plaats" value="'+esc(w(d.plaats))+'"></label>'+
     '<label class="veld">Verkoopmodel<select id="f_verkoopmodel"><option value="">kies...</option>'+vm+'</select></label>'+
@@ -212,12 +227,12 @@ function vakIntake(){
     '<label class="veld">Jaren ervaring<input id="f_ervaringJaren" type="number" min="0" value="'+esc(w(p.ervaringJaren))+'"></label>'+
     '<label class="veld">Startkapitaal<input id="f_startkapitaal" type="number" min="0" value="'+esc(w(p.startkapitaal))+'"></label>'+
     '</div>'+
-    '<div class="raster" style="margin-top:.7rem;">'+
+    '<div class="raster r7">'+
     '<label class="veld">Wat doet u<input id="f_wat" value="'+esc(w(d.wat))+'"></label>'+
     '<label class="veld">Voor wie<input id="f_doelgroep" value="'+esc(w(d.doelgroep))+'"></label>'+
     '<label class="veld">Waarom u<input id="f_onderscheid" value="'+esc(w(d.onderscheid))+'"></label>'+
     '</div>'+
-    '<div class="rij" style="margin-top:.9rem;"><button class="knop prim" id="bewaarKnop">Bewaar en reken door</button></div></div>';
+    '<div class="rij r9"><button class="knop prim" id="bewaarKnop">Bewaar en reken door</button></div></div>';
 }
 
 function vakKans(){
@@ -228,13 +243,13 @@ function vakKans(){
     kop='<p class="geenscore">'+esc(k.uitleg||'')+'</p>';
   }else{
     kop='<div class="score"><span class="n groot">'+k.score+'</span><span class="subtxt">van de 100</span></div>'+
-      '<p class="subtxt" style="margin-top:.35rem;">'+esc(k.oordeel||'')+'</p>'+
-      '<p class="subtxt" style="margin-top:.35rem;">'+esc(k.voorbehoud||'')+'</p>';
+      '<p class="subtxt r35">'+esc(k.oordeel||'')+'</p>'+
+      '<p class="subtxt r35">'+esc(k.voorbehoud||'')+'</p>';
   }
   const bronnen=(k.bronnen||[]).map(b=>b.gemeten
     ? '<div class="bron"><span><strong>'+esc(b.label)+'</strong><br><span class="bu">'+esc(b.uitleg||'')+'</span></span><span>'+esc(String(b.waarde))+' '+esc(b.eenheid||'')+'</span></div>'
     : '<div class="bron niet"><span><strong>'+esc(b.label)+'</strong><br><span class="bu">'+esc(b.reden||'')+'</span></span><span class="bu">niet gemeten</span></div>').join('');
-  return '<div class="vak"><h2>Kansverkenning</h2>'+kop+'<div style="margin-top:.9rem;">'+bronnen+'</div></div>';
+  return '<div class="vak"><h2>Kansverkenning</h2>'+kop+'<div class="r9">'+bronnen+'</div></div>';
 }
 
 function vakSimulatie(){
@@ -256,8 +271,8 @@ function vakSimulatie(){
   return '<div class="vak"><h2>Twaalf maanden vooruit</h2>'+
     '<table class="mnd"><thead><tr><th>Scenario</th><th>Jaaromzet</th><th>Resultaat</th><th>Marge</th><th>Eindkas</th><th>Kas op</th></tr></thead>'+
     '<tbody>'+rijen+'</tbody></table>'+
-    '<p class="subtxt" style="margin-top:.8rem;">'+esc(s.voorbehoud||'')+'</p>'+
-    '<div style="margin-top:.8rem;"><p class="subtxt" style="margin-bottom:.3rem;">Waar dit op rust:</p>'+aannames+'</div></div>';
+    '<p class="subtxt r8">'+esc(s.voorbehoud||'')+'</p>'+
+    '<div class="r8"><p class="subtxt o3">Waar dit op rust:</p>'+aannames+'</div></div>';
 }
 
 function vakStress(){
@@ -267,12 +282,12 @@ function vakStress(){
   const bev=(st.bevindingen||[]).map(b=>
     '<div class="bevinding '+esc(b.zwaarte)+'"><div class="bk">'+esc(b.kop)+'</div>'+
     '<div class="bw">'+esc(b.wat)+'</div><div class="bw"><strong>Doen:</strong> '+esc(b.doen)+'</div></div>').join('');
-  const sterk=(st.sterk||[]).map(x=>'<div class="bw" style="margin-top:.3rem;">&middot; '+esc(x)+'</div>').join('');
+  const sterk=(st.sterk||[]).map(x=>'<div class="bw r3">&middot; '+esc(x)+'</div>').join('');
   return '<div class="vak"><h2>Stress test</h2>'+
     '<p class="oordeel '+kl+'">'+esc(st.oordeel)+'</p>'+
-    '<p class="subtxt" style="margin-top:.3rem;">'+esc(st.toelichting)+'</p>'+bev+
-    (sterk?'<div style="margin-top:1rem;"><p class="subtxt"><strong>Wat wel houdt</strong></p>'+sterk+'</div>':'')+
-    '<p class="subtxt" style="margin-top:.9rem;">'+esc(st.nietGetoetst)+'</p></div>';
+    '<p class="subtxt r3">'+esc(st.toelichting)+'</p>'+bev+
+    (sterk?'<div class="r10"><p class="subtxt"><strong>Wat wel houdt</strong></p>'+sterk+'</div>':'')+
+    '<p class="subtxt r9">'+esc(st.nietGetoetst)+'</p></div>';
 }
 
 function vakPlan(o){
@@ -288,7 +303,7 @@ function vakPlan(o){
   }else{
     body='<p class="subtxt">Uw plan is compleet. Vastleggen bevriest deze versie en brengt u naar de volgende fase.</p>';
   }
-  const knop=(!vast&&!mist)?'<div class="rij" style="margin-top:.9rem;"><button class="knop prim" id="planKnop">Leg mijn ondernemingsplan vast</button></div>':'';
+  const knop=(!vast&&!mist)?'<div class="rij r9"><button class="knop prim" id="planKnop">Leg mijn ondernemingsplan vast</button></div>':'';
   return '<div class="vak"><h2>Ondernemingsplan</h2>'+body+knop+'</div>';
 }
 
@@ -310,13 +325,13 @@ function vakRechtsvorm(o){
   const opts=landen.map(cc=>'<optgroup label="'+esc(LANDNAAM[cc]||cc)+'">'+
     perLand[cc].map(r=>'<option value="'+esc(r.id)+'"'+(r.id===huidig?' selected':'')+'>'+
       esc(r.label)+'</option>').join('')+'</optgroup>').join('');
-  const uitleg=o.rechtsvorm?'<p class="subtxt" style="margin-top:.6rem;">'+esc(o.rechtsvorm.aansprakelijk)+'</p>':
-    '<p class="stil" style="margin-top:.6rem;">Zolang u niets kiest, kunnen we niet zeggen wat u moet regelen: de helft daarvan hangt hiervan af.</p>';
+  const uitleg=o.rechtsvorm?'<p class="subtxt r6">'+esc(o.rechtsvorm.aansprakelijk)+'</p>':
+    '<p class="stil r6">Zolang u niets kiest, kunnen we niet zeggen wat u moet regelen: de helft daarvan hangt hiervan af.</p>';
   const gew=(o.geweerd||[]).map(g=>'<div class="bron niet"><span>'+esc(g.cap)+'</span><span class="bu">'+esc(g.reden)+'</span></div>').join('');
   return '<div class="vak"><h2>Rechtsvorm</h2>'+
-    '<div class="rij"><label class="veld" style="flex:1 1 14rem;">Wat wordt het'+
+    '<div class="rij"><label class="veld breed">Wat wordt het'+
     '<select id="rvKies"><option value="">kies...</option>'+opts+'</select></label></div>'+uitleg+
-    (gew?'<div style="margin-top:.8rem;"><p class="subtxt" style="margin-bottom:.3rem;">Wat deze rechtsvorm niet toestaat:</p>'+gew+'</div>':'')+
+    (gew?'<div class="r8"><p class="subtxt o3">Wat deze rechtsvorm niet toestaat:</p>'+gew+'</div>':'')+
     '</div>';
 }
 
@@ -324,21 +339,21 @@ function vakOprichting(){
   const p=DAG&&DAG.oprichting;
   if(!p) return '';
   if(p.stand==='geen-rechtsvorm'){
-    return '<div class="vak"><h2>Wat u moet regelen</h2><p class="groot" style="font-size:1.05rem;">'+esc(p.vraag)+'</p>'+
-      '<p class="subtxt" style="margin-top:.4rem;">'+esc(p.uitleg)+'</p></div>';
+    return '<div class="vak"><h2>Wat u moet regelen</h2><p class="groot groot1">'+esc(p.vraag)+'</p>'+
+      '<p class="subtxt r4">'+esc(p.uitleg)+'</p></div>';
   }
   const perBron={rechtsvorm:'Uit uw rechtsvorm',branche:'Uit uw branche',situatie:'Uit uw plan'};
   const groepen=['rechtsvorm','branche','situatie'].map(b=>{
     const rij=(p.stappen||[]).filter(s=>s.bron===b);
     if(!rij.length) return '';
-    return '<p class="subtxt" style="margin:.9rem 0 .2rem;"><strong>'+esc(perBron[b])+'</strong></p>'+
-      rij.map(s=>'<div class="actie" style="padding:.5rem 0;"><label style="display:flex;gap:.6rem;align-items:flex-start;cursor:pointer;">'+
+    return '<p class="subtxt kopje2"><strong>'+esc(perBron[b])+'</strong></p>'+
+      rij.map(s=>'<div class="actie rijpad"><label class="keuze">'+
         '<input type="checkbox" class="oprVink" data-stap="'+esc(s.id)+'"'+(s.klaar?' checked':'')+'>'+
-        '<span><span class="kop">'+esc(s.stap)+'</span><span class="waarom" style="display:block;">'+esc(s.waarom)+'</span></span></label></div>').join('');
+        '<span><span class="kop">'+esc(s.stap)+'</span><span class="waarom toon">'+esc(s.waarom)+'</span></span></label></div>').join('');
   }).join('');
   return '<div class="vak"><h2>Wat u moet regelen</h2>'+
     '<p class="subtxt">'+p.gedaan+' van de '+p.totaal+' gedaan.</p>'+groepen+
-    '<p class="subtxt" style="margin-top:1rem;">'+esc(p.voorbehoud)+'</p></div>';
+    '<p class="subtxt r10">'+esc(p.voorbehoud)+'</p></div>';
 }
 
 function vakZaak(o){
@@ -348,14 +363,14 @@ function vakZaak(o){
   if(loopt){
     return '<div class="vak"><h2>Uw zaak</h2><p class="subtxt">Stand van uw aanvraag: <strong>'+esc(AANVRAAG.stand)+'</strong>. '+
       'Een medewerker van RTG beoordeelt hem; wij kennen zelf geen toegang toe.</p>'+
-      '<div class="rij" style="margin-top:.8rem;"><button class="knop" id="standKnop">Kijk of mijn zaak klaarstaat</button></div></div>';
+      '<div class="rij r8"><button class="knop" id="standKnop">Kijk of mijn zaak klaarstaat</button></div></div>';
   }
   return '<div class="vak"><h2>Uw zaak</h2>'+
     '<p class="subtxt">Met een zaak kunt u verkopen, factureren en in de Mall staan. De aanvraag gaat naar RTG; een mens beslist erover.</p>'+
-    '<div class="raster" style="margin-top:.8rem;">'+
+    '<div class="raster r8">'+
     '<label class="veld">Uw naam<input id="aanvNaam"></label>'+
     '<label class="veld">Contact (e-mail of telefoon)<input id="aanvContact"></label>'+
-    '</div><div class="rij" style="margin-top:.8rem;"><button class="knop prim" id="aanvKnop">Vraag mijn zaak aan</button></div></div>';
+    '</div><div class="rij r8"><button class="knop prim" id="aanvKnop">Vraag mijn zaak aan</button></div></div>';
 }
 
 
@@ -363,18 +378,18 @@ function vakEersteKlant(){
   const e=DAG&&DAG.eersteklant;
   if(!e) return '';
   const kop=e.doel==='klaarstaan'
-    ? '<p class="groot" style="font-size:1.15rem;">Klaarstaan voor uw eerste klant</p>'+
-      '<div class="score" style="margin-top:.3rem;"><span class="n groot">'+e.percentage+'%</span>'+
+    ? '<p class="groot groot2">Klaarstaan voor uw eerste klant</p>'+
+      '<div class="score r3"><span class="n groot">'+e.percentage+'%</span>'+
       '<span class="subtxt">'+e.klaar+' van de '+e.totaal+' gedaan</span></div>'
-    : '<p class="groot" style="font-size:1.15rem;">'+e.klanten+' klant'+(e.klanten===1?'':'en')+'</p>'+
-      (e.volgende?'<p class="subtxt" style="margin-top:.3rem;">Nog '+e.volgende.teGaan+' tot '+esc(e.volgende.label.toLowerCase())+'. '+esc(e.volgende.wat)+'</p>':
-        '<p class="subtxt" style="margin-top:.3rem;">Alle mijlpalen gehaald.</p>');
-  const open=(e.open||[]).map(s2=>'<div class="actie" style="padding:.5rem 0;"><div class="kop">'+esc(s2.label)+'</div>'+
+    : '<p class="groot groot2">'+e.klanten+' klant'+(e.klanten===1?'':'en')+'</p>'+
+      (e.volgende?'<p class="subtxt r3">Nog '+e.volgende.teGaan+' tot '+esc(e.volgende.label.toLowerCase())+'. '+esc(e.volgende.wat)+'</p>':
+        '<p class="subtxt r3">Alle mijlpalen gehaald.</p>');
+  const open=(e.open||[]).map(s2=>'<div class="actie rijpad"><div class="kop">'+esc(s2.label)+'</div>'+
     '<div class="waarom">'+esc(s2.waarom)+'</div></div>').join('');
   const mijl=(e.mijlpalen||[]).map(m=>'<span class="stap'+(m.bereikt?' bereikt':'')+'">'+esc(m.label)+'</span>').join('');
   return '<div class="vak"><h2>Klant nummer een</h2>'+kop+
-    (open?'<div style="margin-top:.9rem;"><p class="subtxt" style="margin-bottom:.2rem;">Nog te doen:</p>'+open+'</div>':
-      '<p class="subtxt" style="margin-top:.7rem;">Uw etalage staat klaar.</p>')+
+    (open?'<div class="r9"><p class="subtxt o2">Nog te doen:</p>'+open+'</div>':
+      '<p class="subtxt r7">Uw etalage staat klaar.</p>')+
     '<div class="ladder">'+mijl+'</div></div>';
 }
 
@@ -388,9 +403,9 @@ function vakMall(){
   return '<div class="vak"><h2>Uw pagina in de Mall</h2>'+
     '<div class="score"><span class="n groot">'+m.percentage+'%</span>'+
     '<span class="subtxt">'+m.gevuld+' van de '+m.totaal+' onderdelen</span></div>'+
-    '<p class="subtxt" style="margin-top:.3rem;">Leden komen u tegen op <code>'+esc(m.pagina)+'</code>.</p>'+
-    '<div style="margin-top:.9rem;">'+rij+'</div>'+
-    '<p class="subtxt" style="margin-top:.9rem;">'+esc(m.voorbehoud)+'</p></div>';
+    '<p class="subtxt r3">Leden komen u tegen op <code>'+esc(m.pagina)+'</code>.</p>'+
+    '<div class="r9">'+rij+'</div>'+
+    '<p class="subtxt r9">'+esc(m.voorbehoud)+'</p></div>';
 }
 
 
@@ -408,10 +423,10 @@ function vakRelaties(){
   return '<div class="vak"><h2>Uw klanten</h2>'+
     '<p class="subtxt">'+r.totaal+' klant'+(r.totaal===1?'':'en')+
     (r.herhaalaandeel===null?'':', '+r.herhaalaandeel+'% kwam terug')+'.</p>'+
-    '<div class="cijfers" style="margin-top:.8rem;">'+seg+'</div>'+
-    (opv?'<div style="margin-top:1rem;"><p class="subtxt" style="margin-bottom:.2rem;"><strong>Opvolgen</strong></p>'+opv+'</div>':'')+
-    (top?'<div style="margin-top:1rem;"><p class="subtxt" style="margin-bottom:.2rem;">Op codenaam:</p>'+top+'</div>':'')+
-    '<p class="subtxt" style="margin-top:.9rem;">'+esc(r.voorbehoud)+'</p></div>';
+    '<div class="cijfers r8">'+seg+'</div>'+
+    (opv?'<div class="r10"><p class="subtxt o2"><strong>Opvolgen</strong></p>'+opv+'</div>':'')+
+    (top?'<div class="r10"><p class="subtxt o2">Op codenaam:</p>'+top+'</div>':'')+
+    '<p class="subtxt r9">'+esc(r.voorbehoud)+'</p></div>';
 }
 
 
@@ -430,11 +445,11 @@ function vakDebiteuren(){
     '<div class="score"><span class="n groot">'+euro(d.bedrag)+'</span>'+
     '<span class="subtxt">'+d.aantal+' factu'+(d.aantal===1?'ur':'ren')+
     (d.vervallenAantal?', waarvan '+d.vervallenAantal+' vervallen ('+euro(d.vervallenBedrag)+')':'')+'</span></div>'+
-    (d.oudste?'<p class="subtxt" style="margin-top:.4rem;">De oudste staat '+d.oudste.dagenOver+' dagen open.</p>':'')+
-    '<div style="margin-top:.9rem;">'+gr+'</div>'+
-    (post?'<div style="margin-top:1rem;"><p class="subtxt" style="margin-bottom:.2rem;">Posten:</p>'+post+'</div>':'')+
-    (d.zonderVervaldatum?'<p class="subtxt" style="margin-top:.7rem;">'+d.zonderVervaldatum+' factu'+(d.zonderVervaldatum===1?'ur heeft':'ren hebben')+' geen vervaldatum.</p>':'')+
-    '<p class="subtxt" style="margin-top:.9rem;">'+esc(d.voorbehoud)+'</p></div>';
+    (d.oudste?'<p class="subtxt r4">De oudste staat '+d.oudste.dagenOver+' dagen open.</p>':'')+
+    '<div class="r9">'+gr+'</div>'+
+    (post?'<div class="r10"><p class="subtxt o2">Posten:</p>'+post+'</div>':'')+
+    (d.zonderVervaldatum?'<p class="subtxt r7">'+d.zonderVervaldatum+' factu'+(d.zonderVervaldatum===1?'ur heeft':'ren hebben')+' geen vervaldatum.</p>':'')+
+    '<p class="subtxt r9">'+esc(d.voorbehoud)+'</p></div>';
 }
 
 
@@ -453,13 +468,13 @@ function vakCrediteuren(){
     '<div class="score"><span class="n groot">'+euro(c.bedrag)+'</span>'+
     '<span class="subtxt">'+c.aantal+' factu'+(c.aantal===1?'ur':'ren')+
     (c.vervallenAantal?', waarvan '+c.vervallenAantal+' te laat ('+euro(c.vervallenBedrag)+')':'')+'</span></div>'+
-    '<div class="cijfers" style="margin-top:.9rem;">'+
+    '<div class="cijfers r9">'+
     '<div class="cijfer"><div class="lbl">Komende week</div><div class="wrd">'+euro(c.vooruit.week.bedrag)+'</div><div class="eh">'+c.vooruit.week.aantal+' facturen</div></div>'+
     '<div class="cijfer"><div class="lbl">Komende maand</div><div class="wrd">'+euro(c.vooruit.maand.bedrag)+'</div><div class="eh">'+c.vooruit.maand.aantal+' facturen</div></div>'+
     '</div>'+
-    '<div style="margin-top:.9rem;">'+gr+'</div>'+
-    (post?'<div style="margin-top:1rem;"><p class="subtxt" style="margin-bottom:.2rem;">Posten:</p>'+post+'</div>':'')+
-    '<p class="subtxt" style="margin-top:.9rem;">'+esc(c.voorbehoud)+'</p></div>';
+    '<div class="r9">'+gr+'</div>'+
+    (post?'<div class="r10"><p class="subtxt o2">Posten:</p>'+post+'</div>':'')+
+    '<p class="subtxt r9">'+esc(c.voorbehoud)+'</p></div>';
 }
 
 
@@ -468,10 +483,10 @@ function vakContracten(){
   if(!c) return '';
   if(c.stand!=='gekoppeld'){
     return '<div class="vak"><h2>Contracten</h2><p class="subtxt">'+esc(c.uitleg||'')+'</p>'+
-      (c.let?'<p class="stil" style="margin-top:.4rem;">'+esc(c.let)+'</p>':'')+
-      '<div class="rij" style="margin-top:.8rem;">'+
-      '<label class="veld" style="flex:1 1 12rem;">Werkruimtecode<input id="wrCode" placeholder="W12AB"></label>'+
-      '</div><div class="rij" style="margin-top:.6rem;"><button class="knop" id="wrKnop">Koppel werkruimte</button></div></div>';
+      (c.let?'<p class="stil r4">'+esc(c.let)+'</p>':'')+
+      '<div class="rij r8">'+
+      '<label class="veld half">Werkruimtecode<input id="wrCode" placeholder="W12AB"></label>'+
+      '</div><div class="rij r6"><button class="knop" id="wrKnop">Koppel werkruimte</button></div></div>';
   }
   const let2=(rij,kl)=>rij.map(x=>'<div class="bevinding '+kl+'"><div class="bk">'+esc(x.titel||'Contract')+
     (x.wederpartij?' &middot; '+esc(x.wederpartij):'')+'</div><div class="bw">'+esc(x.stand)+
@@ -483,10 +498,10 @@ function vakContracten(){
     '<p class="subtxt">'+c.aantal+' contract'+(c.aantal===1?'':'en')+' in werkruimte '+esc(c.werkruimte)+
     (c.verlopen?', '+c.verlopen+' verlopen':'')+
     (c.zonderEinddatum?', '+c.zonderEinddatum+' zonder einddatum':'')+'.</p>'+
-    (c.opzegdagVoorbij.length?'<div style="margin-top:.8rem;"><p class="subtxt"><strong>Opzegdag voorbij</strong></p>'+let2(c.opzegdagVoorbij,'blokkerend')+'</div>':'')+
-    (c.binnenkortOpzeggen.length?'<div style="margin-top:.8rem;"><p class="subtxt"><strong>Opzegdag nadert</strong></p>'+let2(c.binnenkortOpzeggen,'zwaar')+'</div>':'')+
-    (rest?'<div style="margin-top:1rem;">'+rest+'</div>':'')+
-    '<p class="subtxt" style="margin-top:.9rem;">'+esc(c.let||'')+'</p></div>';
+    (c.opzegdagVoorbij.length?'<div class="r8"><p class="subtxt"><strong>Opzegdag voorbij</strong></p>'+let2(c.opzegdagVoorbij,'blokkerend')+'</div>':'')+
+    (c.binnenkortOpzeggen.length?'<div class="r8"><p class="subtxt"><strong>Opzegdag nadert</strong></p>'+let2(c.binnenkortOpzeggen,'zwaar')+'</div>':'')+
+    (rest?'<div class="r10">'+rest+'</div>':'')+
+    '<p class="subtxt r9">'+esc(c.let||'')+'</p></div>';
 }
 
 
@@ -497,25 +512,25 @@ function vakBelasting(){
     '<span class="subtxt">btw af te dragen over '+b.jaar+'</span></div>'+
     '<div class="bron"><span>In rekening gebracht</span><span>'+euro(b.btw.gefactureerd)+'</span></div>'+
     '<div class="bron"><span>Voorbelasting</span><span>'+euro(b.btw.voorbelasting)+'</span></div>'+
-    '<p class="subtxt" style="margin-top:.5rem;">'+esc(b.btw.uitleg)+'</p>';
+    '<p class="subtxt r5">'+esc(b.btw.uitleg)+'</p>';
   let res;
   if(!b.reservering||!b.reservering.kan){
-    res='<p class="geenscore" style="margin-top:1rem;">'+esc((b.reservering&&b.reservering.reden)||'')+'</p>';
+    res='<p class="geenscore r10">'+esc((b.reservering&&b.reservering.reden)||'')+'</p>';
   }else{
     const r=b.reservering;
-    res='<div style="margin-top:1rem;"><p class="subtxt" style="margin-bottom:.3rem;"><strong>Winstreservering</strong></p>'+
+    res='<div class="r10"><p class="subtxt o3"><strong>Winstreservering</strong></p>'+
       '<div class="cijfers">'+
       '<div class="cijfer"><div class="lbl">Nu opzij zetten</div><div class="wrd">'+euro(r.nu.bedrag)+'</div>'+
       '<div class="eh">'+r.nu.percentage+'% van '+euro(r.nu.winst)+'</div></div>'+
       '<div class="cijfer"><div class="lbl">Bij dit tempo (extrapolatie)</div><div class="wrd">'+euro(r.extrapolatie.bedrag)+'</div>'+
       '<div class="eh">jaarwinst '+euro(r.extrapolatie.jaarwinst)+'</div></div>'+
-      '</div><p class="subtxt" style="margin-top:.4rem;">'+esc(r.extrapolatie.let)+'</p>'+
-      '<div style="margin-top:.7rem;">'+(r.aannames||[]).map(a=>
+      '</div><p class="subtxt r4">'+esc(r.extrapolatie.let)+'</p>'+
+      '<div class="r7">'+(r.aannames||[]).map(a=>
         '<div class="bron"><span>'+esc(a.naam)+'<br><span class="bu">'+esc(a.uitleg)+'</span></span>'+
         '<span class="bu">'+(a.waarde?'ja':'nee')+'</span></div>').join('')+'</div></div>';
   }
   return '<div class="vak"><h2>Opzij zetten</h2>'+btw+res+
-    '<p class="subtxt" style="margin-top:.9rem;">'+esc(b.voorbehoud)+'</p></div>';
+    '<p class="subtxt r9">'+esc(b.voorbehoud)+'</p></div>';
 }
 
 
@@ -532,18 +547,18 @@ function vakKas(){
   return '<div class="vak"><h2>Kasvooruitblik</h2>'+
     '<div class="score"><span class="n groot">'+teken+euro(k.beweging)+'</span>'+
     '<span class="subtxt">beweging over '+k.venster+' dagen</span></div>'+
-    (k.stand&&k.stand.let?'<p class="subtxt" style="margin-top:.4rem;">'+esc(k.stand.let)+'</p>':'')+
-    '<div class="cijfers" style="margin-top:.9rem;">'+
+    (k.stand&&k.stand.let?'<p class="subtxt r4">'+esc(k.stand.let)+'</p>':'')+
+    '<div class="cijfers r9">'+
     '<div class="cijfer"><div class="lbl">Komt binnen</div><div class="wrd">'+euro(k.inkomend.bedrag)+'</div><div class="eh">'+k.inkomend.aantal+' facturen</div></div>'+
     '<div class="cijfer"><div class="lbl">Gaat eruit</div><div class="wrd">'+euro(k.uitgaand.bedrag)+'</div><div class="eh">'+k.uitgaand.aantal+' facturen</div></div>'+
     '<div class="cijfer"><div class="lbl">Btw opzij</div><div class="wrd">'+euro(k.btwOpzij.bedrag)+'</div><div class="eh">niet van u</div></div>'+
     stand+'</div>'+
-    '<div style="margin-top:.9rem;"><div class="bron niet"><span><strong>Onzeker: '+euro(k.onzeker.bedrag)+'</strong><br>'+
+    '<div class="r9"><div class="bron niet"><span><strong>Onzeker: '+euro(k.onzeker.bedrag)+'</strong><br>'+
     '<span class="bu">'+esc(k.onzeker.uitleg)+'</span></span><span class="bu">'+k.onzeker.aantal+' te laat</span></div></div>'+
-    (k.stand?'':'<div class="rij" style="margin-top:.9rem;">'+
-      '<label class="veld" style="flex:1 1 10rem;">Uw banksaldo<input id="kasSaldo" type="number"></label>'+
-      '</div><div class="rij" style="margin-top:.5rem;"><button class="knop" id="kasKnop">Reken door op mijn saldo</button></div>')+
-    '<p class="subtxt" style="margin-top:.9rem;">'+esc(k.voorbehoud)+'</p></div>';
+    (k.stand?'':'<div class="rij r9">'+
+      '<label class="veld smal">Uw banksaldo<input id="kasSaldo" type="number"></label>'+
+      '</div><div class="rij r5"><button class="knop" id="kasKnop">Reken door op mijn saldo</button></div>')+
+    '<p class="subtxt r9">'+esc(k.voorbehoud)+'</p></div>';
 }
 
 
@@ -563,13 +578,13 @@ function vakVoorraad(){
     '</span></span><span>'+(d.waarde===null?'<span class="bu">geen waarde</span>':euro(d.waarde))+
     '</span></div>').join('');
   const buiten=(v.waardeBuiten||[]).map(x=>
-    '<p class="subtxt" style="margin-top:.4rem;">'+esc(x.reden)+'</p>').join('');
+    '<p class="subtxt r4">'+esc(x.reden)+'</p>').join('');
   return '<div class="vak"><h2>Voorraad</h2>'+
     (v.waarde===null?'<p class="subtxt">Geen van uw registers draagt een inkoopprijs, dus er is geen voorraadwaarde.</p>'
       :'<div class="score"><span class="n groot">'+euro(v.waarde)+'</span>'+
        '<span class="subtxt">voorraadwaarde op inkoopprijs</span></div>')+
-    '<div style="margin-top:.9rem;">'+delen+'</div>'+buiten+
-    '<p class="subtxt" style="margin-top:.9rem;">'+esc(v.nietGemeten)+'</p></div>';
+    '<div class="r9">'+delen+'</div>'+buiten+
+    '<p class="subtxt r9">'+esc(v.nietGemeten)+'</p></div>';
 }
 
 
@@ -585,16 +600,16 @@ function vakToegang(){
     const rollen=(d.rollen||[]).filter(r=>r.aantal>0).map(r=>
       '<div class="bron"><span>'+esc(r.label)+(r.alleenLezen?' <span class="bu">(leest alleen)</span>':'')+
       (r.wat?'<br><span class="bu">'+esc(r.wat)+'</span>':'')+'</span><span>'+r.aantal+'</span></div>').join('');
-    return '<p class="subtxt" style="margin:.9rem 0 .3rem;">'+
+    return '<p class="subtxt kopje">'+
       (d.soort==='zaak'?'Op de zaak':'In uw werkruimte')+'</p>'+rollen+
-      (d.let?'<p class="stil" style="margin-top:.4rem;">'+esc(d.let)+'</p>':'')+
-      (d.verlopen?'<p class="subtxt" style="margin-top:.4rem;">'+d.verlopen+
+      (d.let?'<p class="stil r4">'+esc(d.let)+'</p>':'')+
+      (d.verlopen?'<p class="subtxt r4">'+d.verlopen+
         ' verlopen rol(len); die geven geen toegang meer.</p>':'');
   }).join('');
   return '<div class="vak"><h2>Toegang</h2>'+delen+
-    (t.werkruimteUitleg?'<p class="subtxt" style="margin-top:.9rem;">'+esc(t.werkruimteUitleg)+'</p>':'')+
-    '<p class="subtxt" style="margin-top:.6rem;">'+esc(t.geenTweedeDeur)+'</p>'+
-    '<p class="subtxt" style="margin-top:.4rem;">'+esc(t.nietGemeten)+'</p></div>';
+    (t.werkruimteUitleg?'<p class="subtxt r9">'+esc(t.werkruimteUitleg)+'</p>':'')+
+    '<p class="subtxt r6">'+esc(t.geenTweedeDeur)+'</p>'+
+    '<p class="subtxt r4">'+esc(t.nietGemeten)+'</p></div>';
 }
 
 
@@ -613,10 +628,10 @@ function vakKlussen(){
   return '<div class="vak"><h2>Klussen</h2>'+
     '<div class="score"><span class="n groot">'+euro(k.buiten.bedrag)+'</span>'+
     '<span class="subtxt">van uw werk staat buiten</span></div>'+
-    '<p class="subtxt" style="margin-top:.3rem;">'+esc(k.buiten.uitleg)+'</p>'+
-    '<div class="cijfers" style="margin-top:.9rem;">'+st+'</div>'+
-    (rijen?'<div style="margin-top:.8rem;">'+rijen+'</div>':'')+
-    '<p class="subtxt" style="margin-top:.9rem;">'+esc(k.nietGemeten)+'</p></div>';
+    '<p class="subtxt r3">'+esc(k.buiten.uitleg)+'</p>'+
+    '<div class="cijfers r9">'+st+'</div>'+
+    (rijen?'<div class="r8">'+rijen+'</div>':'')+
+    '<p class="subtxt r9">'+esc(k.nietGemeten)+'</p></div>';
 }
 
 
@@ -642,11 +657,11 @@ function vakPijplijn(){
     '</span></span></div>').join('');
   return '<div class="vak"><h2>Pijplijn</h2>'+
     '<div class="cijfers">'+stadia+'</div>'+
-    '<div style="margin-top:.9rem;">'+verwacht+'</div>'+
-    (p.doorlooptijd.naarPrijs===null?'':'<p class="subtxt" style="margin-top:.7rem;">'+
+    '<div class="r9">'+verwacht+'</div>'+
+    (p.doorlooptijd.naarPrijs===null?'':'<p class="subtxt r7">'+
       esc(p.doorlooptijd.uitleg)+' Nu '+p.doorlooptijd.naarPrijs+' dag(en).</p>')+
-    (rijen?'<div style="margin-top:.8rem;">'+rijen+'</div>':'')+
-    '<p class="subtxt" style="margin-top:.9rem;">'+esc(p.nietGemeten)+'</p></div>';
+    (rijen?'<div class="r8">'+rijen+'</div>':'')+
+    '<p class="subtxt r9">'+esc(p.nietGemeten)+'</p></div>';
 }
 
 
@@ -668,7 +683,7 @@ function vakBestuur(){
     ? (b.aandelen||[]).map(a=>rij(esc(a.codenaam),a.percentage+'%')).join('')||'<p class="stil">Nog niets uitgegeven.</p>'
     : '<p class="stil">'+esc(b.aandelenGeweerd)+'</p>';
   const verd=b.verdeeld&&b.verdeeld.melding
-    ? '<p class="subtxt" style="margin-top:.4rem;">'+esc(b.verdeeld.melding)+'</p>':'';
+    ? '<p class="subtxt r4">'+esc(b.verdeeld.melding)+'</p>':'';
   const u=b.ubo;
   const ubo='<div class="bevinding'+(u.soort==='geen'?' zwaar':'')+'">'+
     '<div class="bk">UBO: '+(u.personen.length
@@ -676,10 +691,10 @@ function vakBestuur(){
       : 'nog niet vast te stellen')+'</div>'+
     '<div class="bw">'+esc(u.regel)+(u.let?' '+esc(u.let):'')+'</div></div>';
   return '<div class="vak"><h2>Bestuur</h2>'+
-    '<p class="subtxt" style="margin-bottom:.6rem;">'+esc(b.rechtsvorm)+'</p>'+best+
-    '<p class="subtxt" style="margin:.9rem 0 .3rem;">Wie bezit</p>'+aand+verd+
-    '<div style="margin-top:.9rem;">'+ubo+'</div>'+
-    '<p class="subtxt" style="margin-top:.9rem;">'+esc(b.voorbehoud)+'</p></div>';
+    '<p class="subtxt o6">'+esc(b.rechtsvorm)+'</p>'+best+
+    '<p class="subtxt kopje">Wie bezit</p>'+aand+verd+
+    '<div class="r9">'+ubo+'</div>'+
+    '<p class="subtxt r9">'+esc(b.voorbehoud)+'</p></div>';
 }
 
 
@@ -688,7 +703,7 @@ function vakCapaciteit(){
   if(!c) return '';
   if(c.stand!=='gemeten'){
     return '<div class="vak"><h2>Capaciteit</h2><p class="subtxt">'+esc(c.uitleg||'')+'</p>'+
-      (c.let?'<p class="stil" style="margin-top:.4rem;">'+esc(c.let)+'</p>':'')+'</div>';
+      (c.let?'<p class="stil r4">'+esc(c.let)+'</p>':'')+'</div>';
   }
   const balk=(c.dagen||[]).filter(d=>d.werkdag||d.bezetting!==null).slice(0,28).map(d=>{
     const p=d.bezetting===null?0:Math.min(100,d.bezetting);
@@ -699,13 +714,13 @@ function vakCapaciteit(){
   return '<div class="vak"><h2>Capaciteit</h2>'+
     '<div class="score"><span class="n groot">'+c.bezetting+'%</span>'+
     '<span class="subtxt">van uw tijd bezet, komende '+c.venster+' dagen</span></div>'+
-    '<p class="subtxt" style="margin-top:.3rem;">'+c.bezetteUren+' van de '+c.beschikbareUren+' uur over '+
+    '<p class="subtxt r3">'+c.bezetteUren+' van de '+c.beschikbareUren+' uur over '+
     c.werkdagen+' werkdagen'+(c.volleDagen?', '+c.volleDagen+' dagen praktisch vol':'')+'.</p>'+
-    (c.uren.let?'<p class="stil" style="margin-top:.4rem;">'+esc(c.uren.let)+'</p>':'')+
-    '<div style="margin-top:.9rem;line-height:1;">'+balk+'</div>'+
-    (c.buitenUrenDagen?'<p class="subtxt" style="margin-top:.7rem;">U werkt op '+c.buitenUrenDagen+
+    (c.uren.let?'<p class="stil r4">'+esc(c.uren.let)+'</p>':'')+
+    '<div class="balkjes">'+balk+'</div>'+
+    (c.buitenUrenDagen?'<p class="subtxt r7">U werkt op '+c.buitenUrenDagen+
       ' dag(en) buiten uw eigen werktijden.</p>':'')+
-    '<p class="subtxt" style="margin-top:.9rem;">'+esc(c.nietGemeten)+'</p></div>';
+    '<p class="subtxt r9">'+esc(c.nietGemeten)+'</p></div>';
 }
 
 
@@ -718,19 +733,19 @@ function vakWerving(){
     (r.viaVacature?' <span class="bu">(op vacature)</span>':'')+'</span>'+
     '<span>'+r.dagen+' dagen'+(r.dagen>=14?' &middot; te lang':'')+'</span></div>').join('');
   const extra=w.extraPersoon
-    ? '<div class="cijfers" style="margin-top:.9rem;">'+
+    ? '<div class="cijfers r9">'+
       '<div class="cijfer"><div class="lbl">Bezetting nu</div><div class="wrd">'+w.extraPersoon.van+'%</div>'+
       '<div class="eh">'+w.extraPersoon.teamNu+' persoon/personen</div></div>'+
       '<div class="cijfer"><div class="lbl">Met een erbij</div><div class="wrd">'+w.extraPersoon.naar+'%</div>'+
       '<div class="eh">'+w.extraPersoon.teamDan+' personen</div></div></div>'+
-      '<p class="subtxt" style="margin-top:.4rem;">'+esc(w.extraPersoon.let)+'</p>'
+      '<p class="subtxt r4">'+esc(w.extraPersoon.let)+'</p>'
     : '';
   return '<div class="vak"><h2>Mensen</h2>'+
     '<p class="subtxt">'+w.vacatures.open+' vacature'+(w.vacatures.open===1?'':'s')+' open, '+
     w.sollicitaties.wachtend+' sollicitatie'+(w.sollicitaties.wachtend===1?'':'s')+' wachtend'+
     (w.sollicitaties.teLang?', waarvan '+w.sollicitaties.teLang+' te lang':'')+'.</p>'+
-    (rijen?'<div style="margin-top:.8rem;">'+rijen+'</div>':'')+extra+
-    '<p class="subtxt" style="margin-top:.9rem;">'+esc(w.nietGemeten)+'</p></div>';
+    (rijen?'<div class="r8">'+rijen+'</div>':'')+extra+
+    '<p class="subtxt r9">'+esc(w.nietGemeten)+'</p></div>';
 }
 
 /* ---------- handelingen ---------- */

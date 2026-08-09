@@ -51,6 +51,7 @@ klinkt.
 | Noodkaart | `server/kern/noodkaart.js`, blok op `apps/life.html` | een noodcontact en, als u dat wilt, uw allergenen en middelen: gelezen uit het zorgprofiel en het medicatieschema, niet gekopieerd; u toont hem zelf |
 | Training | `server/kern/training.js`, `public/apps/training.html` | uw eigen trainingsschema en wat u ervan deed; aftekenen landt als beweging-meting, RTG schrijft geen training voor |
 | Schakelbaar in de boardroom | `server/functies/register/cat-apps.js`, `server/kern/lidboard/catalogus.js` | elke laag hierboven is door het lid zelf uit te zetten; het toestemmingsscherm met reden niet |
+| Voeding | `server/kern/voeding.js`, `public/apps/voeding.html` | een weekplan voor wat u wilt eten; er wordt niets geteld en er komt geen oordeel |
 | Gedachtenboek | `server/kern/gedachten.js`, `public/apps/gedachten.html` | opschrijven voor uzelf; geen model leest mee, niets wordt samengevat, en de crisisregel bewaart hier wel |
 | De dagcoach | `server/kern/dagcoach.js`, blok bovenaan `apps/life.html` | alles wat vandaag ergens staat, op volgorde van de klok; hij plant niets en bezit niets |
 | Medicatieschema | `server/kern/medicatie.js`, `public/apps/medicijnen.html` | wat u gebruikt, op welke tijden, en hoeveel er nog in huis is; RTG bepaalt nooit een dosering en controleert geen combinaties |
@@ -105,10 +106,10 @@ geen route en geen toets.
   vraagt hartslag, slaap, herstel en een normgroep, en het is een uitspraak over
   uw gezondheid.
 - **Stress en herstel.** Bestaan niet als laag.
-- **Voeding als getal.** Er wordt niets gevraagd, want een lid kan zijn voeding
-  niet in een eerlijk getal zetten. RTG Life leidt er iets naast af (hoe vaak er
-  buiten de deur gegeten is, uit het grootboek) en zegt erbij dat het een
-  afgeleide is.
+- **Voeding als getal.** Er is nu wel een weekplan (zie hieronder), maar er wordt
+  nog steeds niets geteld: een lid kan zijn voeding niet in een eerlijk getal
+  zetten. RTG Life leidt er iets naast af (hoe vaak er buiten de deur gegeten is,
+  uit het grootboek) en zegt erbij dat het een afgeleide is.
 - **Wat je moet DOEN om een doel te halen.** De doelenmotor rekent een pad uit
   tussen twee getallen; hij zegt niets over trainen, eten of gezondheid. Dat is
   geen tekort maar de grens uit deze notitie: dat is professional-supported of
@@ -654,6 +655,32 @@ hebben bewogen. Er staat waarom.
 Er is geen oefeningenbibliotheek met voorgeschreven uitvoering. Verkeerd
 uitgevoerd krachtwerk is een blessure, en een plaatje is geen begeleiding.
 
+## De voedingslaag, en waarom er niets geteld wordt
+
+`server/kern/voeding.js`, met een eigen pagina `apps/voeding.html`.
+
+Een weekplan: wat u van plan bent te eten, in uw eigen woorden, voor vandaag en
+de zes dagen erna. Het is een **plan en geen meting**, en dat verschil is de hele
+opzet.
+
+**Er wordt niets geteld.** Geen calorieën, geen macro's, geen voedingswaarde.
+Niemand weet hoeveel gram er in zijn pan zat; wie het toch vraagt krijgt een
+verzonnen cijfer terug dat daarna als feit door het systeem reist. **Er komt ook
+geen oordeel**: gezond en ongezond zijn geen eigenschappen van een maaltijd maar
+van een heel leven, en RTG kent dat leven niet.
+
+**En er is geen allergenenfilter.** Dat is de gevaarlijkste van de drie. Uw
+allergenen staan er wél — gelezen uit het zorgprofiel, niet gekopieerd — maar
+alleen als geheugensteun voor uzelf, met erbij dat RTG niet nakijkt of uw plan ze
+bevat. Een waarschuwing die soms komt, leest als een controle die altijd draait,
+en dan vertrouwt iemand op een filter dat niet weet wat er in de pan ging. De weg
+die wél werkt bestaat al: uw allergenen reizen mee naar de zaak waar u bestelt
+(`kern/gastzorg.js`), en daar staat een mens.
+
+Wat voorbij is wordt opgeruimd. Dit is een plan voor de komende week, en bewaren
+wat achter u ligt maakt er stilletjes toch een eetdagboek van — een registratie
+die u nooit heeft aangezet.
+
 ## De boardroom: eenenveertig deuren die niemand kon uitzetten
 
 Dit is geen functie maar een reparatie, en ze hoort hier omdat ze precies laat
@@ -762,7 +789,10 @@ In deze volgorde, want elke stap heeft de vorige nodig:
     Gedaan; zie hieronder. In dezelfde ronde zijn de eenenveertig RTG
     Life-routes alsnog in de boardroom gezet.
 
-Wat daarna komt: de voedingslaag, de coachmarktplaats, multi-vestiging
+16. ~~De **voedingslaag**: een weekplan, zonder telling en zonder filter.~~
+    Gedaan; zie hieronder.
+
+Wat daarna komt: de coachmarktplaats, multi-vestiging
 en resource-planning voor zorgorganisaties, en de langere staart uit het oorspronkelijke voorstel (health
 timeline, ADHD- en autismemodus, energiemanagement, mantelzorg, corporate
 wellbeing, Life Wallet, lifestyle-marktplaats). En als er ooit een gesprek komt

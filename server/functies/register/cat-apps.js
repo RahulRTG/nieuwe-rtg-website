@@ -76,6 +76,8 @@ module.exports = [
     uitleg: 'Uw eigen medicatieschema en voorraad. RTG bepaalt nooit een dosering en controleert geen combinaties.', paden: ['/api/medicatie'] },
   { id: 'training', categorie: 'Eigen apps', naam: 'Training (eigen schema)', standaard: true, doelgroepen: LEDEN,
     uitleg: 'Uw eigen trainingsschema en wat u ervan deed. RTG schrijft geen training voor en rekent geen belasting uit.', paden: ['/api/training'] },
+  { id: 'voeding', categorie: 'Eigen apps', naam: 'Voeding (weekplan)', standaard: true, doelgroepen: LEDEN,
+    uitleg: 'Een weekplan voor wat u wilt eten. Er wordt niets geteld en er komt geen oordeel over wat u eet.', paden: ['/api/voeding'] },
   { id: 'noodkaart', categorie: 'Eigen apps', naam: 'Noodkaart', standaard: true, doelgroepen: LEDEN,
     uitleg: 'Een noodcontact en, als u dat wilt, uw allergenen en middelen. U toont hem zelf; niemand kan hem opvragen.', paden: ['/api/noodkaart'] },
   { id: 'verzorging', categorie: 'Eigen apps', naam: 'Verzorging (kapper, barbier, nagels)', standaard: true, doelgroepen: LEDEN,

@@ -43,6 +43,12 @@ module.exports = function bouwKernAanDrie(kern, grens) {
   Object.assign(kern, require('../kern/trainingsschema')({ db, save, schoon, crypto,
     metingZet: kern.metingZet }));
   require('../routes/trainingsschema')(grens('trainingsschema'));
+  /* De voedingslaag (kern/voeding.js): wat u van plan bent te eten. Een PLAN en
+     geen meting -- er wordt niets geteld en er komt geen oordeel over wat u eet.
+     Leest de allergenen uit het zorgprofiel als geheugensteun, niet als filter:
+     alleen de keuken weet wat er in de pan ging. */
+  Object.assign(kern, require('../kern/voeding')({ db, save, schoon, crypto, zorgVan: kern.zorgVan }));
+  require('../routes/voeding')(grens('voeding'));
   /* De noodkaart (kern/noodkaart.js): een noodcontact en, als u dat wilt, uw
      allergenen en uw medicijnen -- gelezen uit het zorgprofiel en het
      medicatieschema, niet gekopieerd. Niemand kan hem opvragen; u toont hem zelf. */

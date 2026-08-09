@@ -35,7 +35,7 @@ const STAPEL = [
   ['life', 'life'], ['life', 'dag'], ['doelen', 'doelen'], ['dagmetingen', 'metingen'],
   ['dagmetingen', 'toestellen'], ['gemoed', 'gemoed'], ['gewoonten', 'gewoonten'],
   ['gedachten', 'gedachten'], ['medicijnen', 'medicatie'], ['training', 'training'],
-  ['noodkaart', 'noodkaart'], ['verzorging', 'verzorging']
+  ['noodkaart', 'noodkaart'], ['voeding', 'voeding'], ['verzorging', 'verzorging']
 ];
 
 test.before(async () => {

@@ -3698,6 +3698,13 @@
       "gezakt": 2,
       "geprobeerd": 1
     },
+    "voeding.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 8,
+      "scherp": "gezakt"
+    },
     "vonk.test.js": {
       "soort": "server",
       "staat": "gezakt",

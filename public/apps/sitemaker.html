@@ -113,6 +113,7 @@
     <label title="Kaartkleur (blokken met een vlak)"><span>Kaart</span><input type="color" id="kCard" aria-label="Kaartkleur"></label>
     <button class="knop" id="kReset" title="Kleuren terug naar het thema">Reset</button>
   </div>
+  <div class="apparaten" id="paginabar" role="group" aria-label="Pagina's van je site"></div>
   <div class="apparaten" id="apparaten" role="group" aria-label="Versie per toestel">
     <button type="button" data-a="telefoon">Telefoon</button>
     <button type="button" data-a="tablet">Tablet</button>
@@ -202,6 +203,37 @@ function nieuwBlok(t){
 }
 
 let DESIGN={id:null,titel:'',thema:'donker',accent:'#7F1634',kleuren:{},adres:'',online:false,blokken:[nieuwBlok('hero'),nieuwBlok('tekst')]};
+
+/* ---- meerdere pagina's per site ----
+   De maker bewerkt altijd DESIGN.blokken; bij het wisselen van pagina wordt
+   die verwijzing omgezet. HOMEBLOK onthoudt de voorpagina, zodat bewaren
+   altijd de juiste blokken op de juiste plek aflevert. */
+let PAG=-1, HOMEBLOK=DESIGN.blokken;
+function paginaReset(){ DESIGN.paginas=DESIGN.paginas||[]; PAG=-1; HOMEBLOK=DESIGN.blokken; paginaBar(); }
+function stashPagina(){ if(PAG===-1) HOMEBLOK=DESIGN.blokken; else if(DESIGN.paginas[PAG]) DESIGN.paginas[PAG].blokken=DESIGN.blokken; }
+function wisselPagina(i){ stashPagina(); PAG=i; DESIGN.blokken=(i===-1?HOMEBLOK:DESIGN.paginas[i].blokken); paginaBar(); render(); }
+function paginaBar(){
+  const el=$('#paginabar'); if(!el)return; el.textContent='';
+  const maak=(naam,i)=>{ const b=document.createElement('button'); b.type='button'; b.textContent=naam; if(i===PAG)b.classList.add('aan'); b.addEventListener('click',()=>{ if(i!==PAG)wisselPagina(i); }); el.appendChild(b); };
+  maak('Home',-1);
+  (DESIGN.paginas||[]).forEach((p,i)=>maak(p.naam,i));
+  if((DESIGN.paginas||[]).length<7){
+    const plus=document.createElement('button'); plus.type='button'; plus.textContent='+'; plus.title='Nieuwe pagina';
+    plus.addEventListener('click',()=>{ const naam=(prompt('Naam van de pagina (bijv. Contact)')||'').trim(); if(!naam)return;
+      DESIGN.paginas.push({id:RTGId('p'),naam:naam.slice(0,40),slug:'',blokken:[nieuwBlok('kop'),nieuwBlok('tekst')]});
+      wisselPagina(DESIGN.paginas.length-1); meld('Pagina toegevoegd. Bewaar om hem vast te leggen.'); });
+    el.appendChild(plus);
+  }
+  if(PAG>=0){
+    const h=document.createElement('button'); h.type='button'; h.textContent='✎'; h.title='Pagina hernoemen';
+    h.addEventListener('click',()=>{ const n=(prompt('Nieuwe naam',DESIGN.paginas[PAG].naam)||'').trim(); if(!n)return; DESIGN.paginas[PAG].naam=n.slice(0,40); DESIGN.paginas[PAG].slug=''; paginaBar(); });
+    el.appendChild(h);
+    const w=document.createElement('button'); w.type='button'; w.textContent='×'; w.title='Pagina verwijderen';
+    w.addEventListener('click',()=>{ if(!confirm('Pagina "'+DESIGN.paginas[PAG].naam+'" en alle blokken erop verwijderen?'))return; DESIGN.paginas.splice(PAG,1); PAG=-1; DESIGN.blokken=HOMEBLOK; paginaBar(); render(); });
+    el.appendChild(w);
+  }
+}
+paginaReset();
 // de themakleuren zijn het vertrekpunt van de vrije kleurkiezers; wie niets
 // aanraakt houdt het thema, wie wel kiest overschrijft alleen die ene kleur
 const THEMA_KLEUR={donker:{bg:'#0C0C0B',txt:'#F4F1EC',card:'#151312'},licht:{bg:'#F5F1EA',txt:'#20160F',card:'#FBF8F2'}};
@@ -379,7 +411,16 @@ function lintBij(){
 
 async function bewaar(stil){
   DESIGN.titel=$('#titel').value.trim()||'Mijn website';
-  try{ const d=await api('bewaar',{design:DESIGN}); DESIGN.id=d.design.id; DESIGN.adres=d.design.adres||''; DESIGN.online=!!d.design.online; if(!stil)meld('Bewaard.'); lintBij(); return true; }
+  stashPagina();
+  const payload=Object.assign({},DESIGN,{blokken:HOMEBLOK});
+  try{ const d=await api('bewaar',{design:payload});
+    DESIGN.id=d.design.id; DESIGN.adres=d.design.adres||''; DESIGN.online=!!d.design.online;
+    // de geschoonde pagina's van de server overnemen (slugs, begrenzing)
+    DESIGN.paginas=d.design.paginas||[]; HOMEBLOK=d.design.blokken||[];
+    if(PAG>=DESIGN.paginas.length) PAG=-1;
+    DESIGN.blokken=(PAG===-1?HOMEBLOK:DESIGN.paginas[PAG].blokken);
+    paginaBar(); render();
+    if(!stil)meld('Bewaard.'); lintBij(); return true; }
   catch(e){ meld(e.message); return false; }
 }
 /* Meenemen (shared/uitvoer.js): het doek is een ontwerp, geen lijst -- wat
@@ -396,7 +437,7 @@ if(window.RTGUitvoer) RTGUitvoer.bron(()=>{
 async function openen(){
   try{ const d=await api('mijn'); MIJNSITES=d.lijst||[]; const l=$('#openlijst'); l.textContent='';
     if(!(d.lijst||[]).length){ l.innerHTML='<div style="color:var(--soft);font-size:.85rem;">Nog geen websites. Bouw je eerste en bewaar hem.</div>'; }
-    (d.lijst||[]).forEach(it=>{const r=document.createElement('div');r.className='lijstrij';r.innerHTML='<span class="nm">'+esc(it.titel)+'</span><span class="mt">'+(it.online?esc(it.adres)+'.rtg':it.blokken+' blok'+(it.blokken===1?'':'ken'))+'</span>';const ob=document.createElement('button');ob.textContent='Open';ob.addEventListener('click',async()=>{try{const dd=await api('haal',{id:it.id});DESIGN=dd.design;DESIGN.blokken=DESIGN.blokken||[];DESIGN.kleuren=DESIGN.kleuren||{};$('#titel').value=DESIGN.titel;bouwSwatches();syncKleurInputs();$('#themaKnop').textContent=DESIGN.thema==='licht'?'Licht':'Donker';$('#openSheet').classList.remove('open');zetBewerk(true);lintBij();meld('Geopend.');}catch(e){meld(e.message);}});r.appendChild(ob);l.appendChild(r);});
+    (d.lijst||[]).forEach(it=>{const r=document.createElement('div');r.className='lijstrij';r.innerHTML='<span class="nm">'+esc(it.titel)+'</span><span class="mt">'+(it.online?esc(it.adres)+'.rtg':it.blokken+' blok'+(it.blokken===1?'':'ken'))+'</span>';const ob=document.createElement('button');ob.textContent='Open';ob.addEventListener('click',async()=>{try{const dd=await api('haal',{id:it.id});DESIGN=dd.design;DESIGN.blokken=DESIGN.blokken||[];DESIGN.kleuren=DESIGN.kleuren||{};paginaReset();$('#titel').value=DESIGN.titel;bouwSwatches();syncKleurInputs();$('#themaKnop').textContent=DESIGN.thema==='licht'?'Licht':'Donker';$('#openSheet').classList.remove('open');zetBewerk(true);lintBij();meld('Geopend.');}catch(e){meld(e.message);}});r.appendChild(ob);l.appendChild(r);});
     $('#openSheet').classList.add('open');
     laadSjablonen();
   }catch(e){ meld(e.message); }
@@ -416,6 +457,7 @@ async function laadSjablonen(){
         const s=(await api('sjabloon',{id:it.id})).sjabloon;
         DESIGN={id:null,titel:s.titel,thema:s.thema,accent:s.accent,kleuren:s.kleuren||{},adres:'',online:false,
           blokken:(s.blokken||[]).map(b=>Object.assign({},b)),volgorde:s.volgorde||undefined};
+        paginaReset();
         $('#titel').value=DESIGN.titel;bouwSwatches();syncKleurInputs();
         $('#themaKnop').textContent=DESIGN.thema==='licht'?'Licht':'Donker';
         $('#openSheet').classList.remove('open');zetBewerk(true);lintBij();

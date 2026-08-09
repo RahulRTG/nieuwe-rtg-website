@@ -1250,7 +1250,9 @@ De Website-maker (`/apps/sitemaker.html`, `kern/webmaker.js`) en de RTG-browser 
 - **Bladwijzers en tabs in de browser.** Bladwijzers op het toestel zelf (localStorage), met een rij op RTG Start -- de server weet niet wat u bewaart. Tabs met elk hun eigen geschiedenis, in een eigen tabbalk onder de adresbalk.
 - **De sjabloon-etalage.** De Website-studio van het Atelier kan een sjabloon **in de etalage** zetten (`/api/office/atelierweb/etalage`); leden zien die als startpunt in de Website-maker ("Begin met een sjabloon", `/api/site/sjablonen` + `/api/site/sjabloon`) en maken er met bewaren hun eigen site van. Vrijgeven is een uitdrukkelijke handeling van het kantoor: werk in uitvoering blijft binnen, ook met het id in de hand.
 
-`test/webplatform.test.js` (zeven scenario's) legt dit vast; vier mutaties (leden mogen zelf een zaakCode zetten; de live blokken worden niet meer opgelost; het formulier accepteert sites zonder ontvanger; de etalage-grendel valt weg), alle vier **RAAK**.
+- **Meerdere pagina's per site.** Naast de voorpagina draagt een ontwerp tot zeven extra pagina's (`kern/webmaker-paginas.js`), elk met eigen naam, slug en blokken -- dezelfde schoonmaak en grenzen als de voorpagina, en dubbele slugs vallen weg. De browser toont een paginabalk en begrijpt `naam.rtg/contact` in de adresbalk; de maker heeft een pagina-wissel in de kop (toevoegen, hernoemen, weghalen). De automatische bedrijfssite gebruikt dit meteen: **Home** (hero, beeld, reviews), **Aanbod** (alles wat de zaak verkoopt, live) en **Contact** (bezoekgegevens + het formulier).
+
+`test/webplatform.test.js` (acht scenario's) legt dit vast; vijf mutaties (leden mogen zelf een zaakCode zetten; de live blokken worden niet meer opgelost; het formulier accepteert sites zonder ontvanger; de etalage-grendel valt weg; het oplossen slaat de extra pagina's over), alle vijf **RAAK**.
 
 ### RTG Bank & RTG Stad (de eigen infrastructuur)
 

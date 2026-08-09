@@ -40,6 +40,9 @@ function api(pad, body, token) {
     .then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 }
 
+// alle blokken van een site: de voorpagina plus alle extra pagina's
+const alleBlokken = site => (site.blokken || []).concat(...(site.paginas || []).map(p => p.blokken || []));
+
 test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   base = srv.base;
@@ -70,12 +73,15 @@ test('1. genereren zet in een keer een complete bedrijfssite online', async () =
   assert.equal(site.titel, 'Es Vedra Cruises');
   const hero = site.blokken.find(b => b.type === 'hero');
   assert.equal(hero.kop, 'Es Vedra Cruises');
-  // de activiteiten uit het profiel staan live op de site, met prijs en tijden
-  const teksten = site.blokken.filter(b => b.type === 'tekst').map(b => b.tekst).join(' | ');
+  // de site draagt meerdere pagina's: Aanbod en Contact naast de voorpagina
+  assert.deepEqual((site.paginas || []).map(p => p.slug), ['aanbod', 'contact'], 'de vaste pagina-indeling');
+  // de activiteiten uit het profiel staan live op de aanbodpagina, met prijs en tijden
+  const aanbod = site.paginas.find(p => p.slug === 'aanbod');
+  const teksten = aanbod.blokken.filter(b => b.type === 'tekst').map(b => b.tekst).join(' | ');
   assert.match(teksten, /Sunset cruise met cava/);
   assert.match(teksten, /€ 79/);
-  // en er is geen onopgelost zaakdata-blok naar de bezoeker gelekt
-  assert.ok(!site.blokken.some(b => b.type === 'zaakdata'), 'alle live blokken zijn opgelost');
+  // en er is nergens een onopgelost zaakdata-blok naar de bezoeker gelekt
+  assert.ok(!alleBlokken(site).some(b => b.type === 'zaakdata'), 'alle live blokken zijn opgelost, ook op de extra pagina\'s');
   // de browser weet dat dit een bedrijf is, met de acties die de zaak echt kan
   assert.ok(open.body.zaak, 'de zaak-info zit erbij');
   assert.equal(open.body.zaak.naam, 'Es Vedra Cruises');
@@ -84,13 +90,13 @@ test('1. genereren zet in een keer een complete bedrijfssite online', async () =
 
 test('2. de site is live: een nieuwe menukaart staat erop zonder de site aan te raken', async () => {
   const voor = await api('/api/browser/open', { adres: 'es-vedra-cruises' }, lid);
-  assert.ok(!/Tapasplank/.test(JSON.stringify(voor.body.site.blokken)), 'het gerecht bestaat nog niet');
+  assert.ok(!/Tapasplank/.test(JSON.stringify(alleBlokken(voor.body.site))), 'het gerecht bestaat nog niet');
 
   const m = await api('/api/supplier/menu', { menu: [{ name: 'Tapasplank aan boord', desc: 'Voor twee', price: 24 }] }, zaak);
   assert.equal(m.status, 200, JSON.stringify(m.body));
 
   const na = await api('/api/browser/open', { adres: 'es-vedra-cruises' }, lid);
-  const teksten = na.body.site.blokken.filter(b => b.type === 'tekst').map(b => b.tekst).join(' | ');
+  const teksten = alleBlokken(na.body.site).filter(b => b.type === 'tekst').map(b => b.tekst).join(' | ');
   assert.match(teksten, /Tapasplank aan boord/, 'de kaart staat live op de site');
 });
 
@@ -155,9 +161,9 @@ test('7. de sjabloon-etalage: alleen wat het Atelier vrijgeeft, komt bij leden',
 test('6. het formulier op de bedrijfssite landt als klus bij de zaak, op codenaam', async () => {
   // op de bedrijfssite staat het formulier; op een ledensite zonder zaak niet
   const open = await api('/api/browser/open', { adres: 'es-vedra-cruises' }, lid);
-  assert.ok(open.body.site.blokken.some(b => b.type === 'formulier'), 'de bedrijfssite draagt het formulier');
+  assert.ok(alleBlokken(open.body.site).some(b => b.type === 'formulier'), 'de bedrijfssite draagt het formulier (op de contactpagina)');
   const ledensite = await api('/api/browser/open', { adres: 'nep-vedra' }, lid);
-  assert.ok(!ledensite.body.site.blokken.some(b => b.type === 'formulier'),
+  assert.ok(!alleBlokken(ledensite.body.site).some(b => b.type === 'formulier'),
     'zonder ontvanger geen formulier -- een knop die niets doet is erger dan geen knop');
 
   const stuur = await api('/api/browser/bericht', { adres: 'es-vedra-cruises', tekst: 'Is de sunset cruise rolstoeltoegankelijk?' }, lid);
@@ -172,6 +178,25 @@ test('6. het formulier op de bedrijfssite landt als klus bij de zaak, op codenaa
   // naar een ledensite zonder zaak kan geen bericht
   const mis = await api('/api/browser/bericht', { adres: 'nep-vedra', tekst: 'Hallo daar' }, lid);
   assert.equal(mis.status, 404);
+});
+
+test('8. een lid bouwt een site met meerdere pagina\'s, met dezelfde schoonmaak en grenzen', async () => {
+  const mk = await api('/api/site/bewaar', { design: { titel: 'Atelier Blad', blokken: [{ type: 'kop', tekst: 'Voorpagina' }],
+    paginas: [
+      { naam: 'Over ons', blokken: [{ type: 'tekst', tekst: '<script>alert(1)</script>Over het atelier.' }] },
+      { naam: 'Contact!', blokken: [{ type: 'kop', tekst: 'Schrijf ons' }] },
+      { naam: 'Over ons', blokken: [] }   // zelfde naam -> zelfde slug -> valt weg
+    ] } }, lid);
+  assert.equal(mk.status, 200, JSON.stringify(mk.body));
+  const d = mk.body.design;
+  assert.deepEqual(d.paginas.map(p => p.slug), ['over-ons', 'contact'], 'nette slugs, en de dubbele is weg');
+  assert.ok(!/</.test(d.paginas[0].blokken[0].tekst), 'ook op een extra pagina wordt de tekst geschoond');
+
+  const pub = await api('/api/site/publiceer', { id: d.id, adres: 'atelier-blad' }, lid);
+  assert.equal(pub.status, 200);
+  const open = await api('/api/browser/open', { adres: 'atelier-blad' }, lid);
+  assert.deepEqual(open.body.site.paginas.map(p => [p.naam, p.slug]),
+    [['Over ons', 'over-ons'], ['Contact!', 'contact']], 'de bezoeker krijgt de pagina\'s met naam en slug');
 });
 
 test('5. zoeken vindt sites en bedrijven in een adem', async () => {

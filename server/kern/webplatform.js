@@ -81,16 +81,22 @@ module.exports = ({ db }) => {
   /* Alle zaakdata-blokken in een gepubliceerde site oplossen. Site zonder
      zaak (of zaak die weg is): de live blokken vallen stil weg in plaats van
      als lege dozen te blijven staan. */
-  function losSite(site, s) {
+  function losBlokken(lijst, s) {
     const blokken = [];
-    (site.blokken || []).forEach(b => {
+    (lijst || []).forEach(b => {
       /* een formulier heeft een ontvanger nodig: zonder zaak erachter zou
          het een knop zijn die stilletjes niets doet, dus dan staat hij er niet */
       if (b.type === 'formulier') { if (s) blokken.push(b); return; }
       if (b.type !== 'zaakdata') { blokken.push(b); return; }
       if (s) blokken.push(...los(b, s));
     });
-    return Object.assign({}, site, { blokken });
+    return blokken;
+  }
+  function losSite(site, s) {
+    return Object.assign({}, site, {
+      blokken: losBlokken(site.blokken, s),
+      paginas: (site.paginas || []).map(p => Object.assign({}, p, { blokken: losBlokken(p.blokken, s) }))
+    });
   }
 
   /* De acties die de browser bij deze site mag aanbieden -- de browser
@@ -117,18 +123,30 @@ module.exports = ({ db }) => {
      heeft -- wat er later bijkomt in het profiel, komt vanzelf mee omdat de
      blokken verwijzen en niet kopieren. */
   function genereer(s) {
+    const voet = n => ({ id: 'g-voet' + n, type: 'voettekst', tekst: s.name + ' · op het RTG-web · onderdeel van het huis van Rahul Travel Group' });
+    // de voorpagina: wie we zijn, het beeld en wat gasten van ons vinden
     const blokken = [
       { id: 'g-hero', type: 'hero', kop: s.name,
         sub: (typeLabel(s) + (s.city ? ' · ' + s.city : '')),
         knop: 'Ontdek ' + s.name },
       { id: 'g-intro', type: 'tekst',
-        tekst: s.name + ' is partner van Rahul Travel Group. Alles op deze pagina komt live uit ons bedrijfsprofiel -- wat u hier ziet, is wat er vandaag is.' }
+        tekst: s.name + ' is partner van Rahul Travel Group. Alles op deze site komt live uit ons bedrijfsprofiel -- wat u hier ziet, is wat er vandaag is.' },
+      { id: 'g-zf', type: 'zaakdata', bron: 'fotos' },
+      { id: 'g-zr', type: 'zaakdata', bron: 'reviews' },
+      voet('h')
     ];
-    BRONNEN.filter(b => b !== 'contact').forEach((bron, i) => blokken.push({ id: 'g-z' + i, type: 'zaakdata', bron }));
-    blokken.push({ id: 'g-zc', type: 'zaakdata', bron: 'contact' });
-    blokken.push({ id: 'g-form', type: 'formulier', kop: 'Stel ons een vraag', knop: 'Verstuur' });
-    blokken.push({ id: 'g-voet', type: 'voettekst', tekst: s.name + ' · op het RTG-web · onderdeel van het huis van Rahul Travel Group' });
-    return { titel: s.name, thema: 'donker', accent: '#7F1634', blokken };
+    // de aanbodpagina: alles wat de zaak vandaag verkoopt, live
+    const aanbod = BRONNEN.filter(b => !['contact', 'fotos', 'reviews'].includes(b))
+      .map((bron, i) => ({ id: 'g-z' + i, type: 'zaakdata', bron }));
+    const paginas = [
+      { id: 'g-p-aanbod', naam: 'Aanbod', slug: 'aanbod', blokken: [...aanbod, voet('a')] },
+      { id: 'g-p-contact', naam: 'Contact', slug: 'contact', blokken: [
+        { id: 'g-zc', type: 'zaakdata', bron: 'contact' },
+        { id: 'g-form', type: 'formulier', kop: 'Stel ons een vraag', knop: 'Verstuur' },
+        voet('c')
+      ] }
+    ];
+    return { titel: s.name, thema: 'donker', accent: '#7F1634', blokken, paginas };
   }
 
   /* Universeel zoeken: niet alleen sites maar ook de bedrijven erachter.

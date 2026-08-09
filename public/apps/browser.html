@@ -68,6 +68,11 @@
   .zaakbalk a.chip{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:.28rem .7rem;font-size:.75rem;color:var(--txt);text-decoration:none;background:var(--card2);}
   .zaakbalk a.chip:hover{border-color:var(--gold);}
   .zaakbalk a.chip.hoofd{background:var(--burgundy);border-color:transparent;color:#fff;font-weight:600;}
+  /* de paginabalk van een site met meerdere pagina's */
+  .paginanav{display:flex;gap:.4rem;flex-wrap:wrap;padding:.55rem .9rem;background:var(--card);border-bottom:1px solid var(--line);}
+  .paginanav button{border:1px solid var(--line);border-radius:999px;background:var(--card2);color:var(--muted);font:inherit;font-size:.75rem;padding:.28rem .7rem;cursor:pointer;}
+  .paginanav button:hover{border-color:var(--gold);}
+  .paginanav button.aan{background:var(--bg);color:var(--gold);border-color:var(--gold);}
   /* de site-weergave */
   .sitewrap{padding:0;}
   .foutpagina{max-width:520px;margin:5rem auto;text-align:center;padding:0 1.2rem;color:var(--muted);}
@@ -103,13 +108,19 @@ let TOKEN=null; try{ TOKEN=localStorage.getItem('rtg_member_token'); }catch(e){}
 const api=(pad,body)=>fetch('/api/browser/'+pad,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'Er ging iets mis.');return d;});
 function meld(t){const m=$('#melding');m.textContent=t;m.style.opacity='1';clearTimeout(m._t);m._t=setTimeout(()=>m.style.opacity='0',2600);}
 function slug(v){return String(v==null?'':v).toLowerCase().replace(/^rtg:\/\//,'').replace(/\.rtg$/,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,30);}
+/* "naam.rtg/contact" of "rtg://naam/contact" -> {adres, pad} */
+function parseAdres(v){
+  const kaal=String(v==null?'':v).toLowerCase().replace(/^rtg:\/\//,'').trim();
+  const delen=kaal.split('/');
+  return { adres: slug(delen[0]), pad: delen.length>1?slug(delen.slice(1).join('/')):'' };
+}
 
 // geschiedenis voor terug/vooruit; een item is 'start' of {adres}
 let HIST=[], POS=-1;
 /* tabs: elke tab draagt zijn eigen geschiedenis; HIST/POS zijn altijd die
    van de actieve tab */
 let TABS=[], TAB=0;
-function tabLabel(t){ const it=t.hist[t.pos]; return (!it||it==='start')?'Start':it.adres+'.rtg'; }
+function tabLabel(t){ const it=t.hist[t.pos]; return (!it||it==='start')?'Start':it.adres+'.rtg'+(it.pad?'/'+it.pad:''); }
 function tabsBij(){
   if(!TABS.length){ TABS=[{hist:HIST,pos:POS}]; TAB=0; }
   TABS[TAB].hist=HIST; TABS[TAB].pos=POS;
@@ -144,7 +155,7 @@ function ga(item,duw){
   if(duw!==false){ HIST=HIST.slice(0,POS+1); HIST.push(item); POS=HIST.length-1; }
   knoppenBij(); bwStand(); tabsBij();
   if(item==='start'){ $('#adres').value=''; toonStart(); }
-  else { $('#adres').value=item.adres+'.rtg'; toonSite(item.adres); }
+  else { $('#adres').value=item.adres+'.rtg'+(item.pad?'/'+item.pad:''); toonSite(item.adres,item.pad||''); }
 }
 $('#terugKnop').addEventListener('click',()=>{ if(POS>0){ POS--; ga(HIST[POS],false); } });
 $('#vooruitKnop').addEventListener('click',()=>{ if(POS<HIST.length-1){ POS++; ga(HIST[POS],false); } });
@@ -168,7 +179,7 @@ $('#bwKnop').addEventListener('click',()=>{
   else { l.unshift({adres:it.adres,titel:(HUIDIGE&&HUIDIGE.site&&HUIDIGE.site.titel)||it.adres}); meld('Bewaard als bladwijzer.'); }
   bwSchrijf(l); bwStand();
 });
-$('#balk').addEventListener('submit',e=>{ e.preventDefault(); const a=slug($('#adres').value); if(a.length<2){ meld('Typ een adres, bijv. jouwzaak.rtg'); return; } ga({adres:a}); });
+$('#balk').addEventListener('submit',e=>{ e.preventDefault(); const p=parseAdres($('#adres').value); if(p.adres.length<2){ meld('Typ een adres, bijv. jouwzaak.rtg'); return; } ga({adres:p.adres,pad:p.pad}); });
 
 // ---- de RTG-startpagina ----
 let GIDS=[];
@@ -300,11 +311,25 @@ function schilder(){
   ordenSite(site,ver).forEach(b=>{ if((b.verberg||[]).includes(ver))return; doek.appendChild(tekenBlok(b,ver)); });
 }
 window.addEventListener('resize',()=>{ clearTimeout(window._rt); window._rt=setTimeout(schilder,120); });
-async function toonSite(adres){
+async function toonSite(adres,pad){
   const h=$('#hoofd'); h.innerHTML='<div class="leeg" style="padding:4rem;">Laden…</div>';
   try{
     const d=await api('open',{adres});
-    const site=d.site; HUIDIGE={site,zaak:d.zaak||null};
+    let site=d.site;
+    /* een site kan meerdere pagina's dragen: het pad achter het adres kiest er
+       een; de voorpagina is het lege pad */
+    const paginas=site.paginas||[];
+    if(pad){
+      const pg=paginas.find(p=>p.slug===pad);
+      if(!pg){
+        HUIDIGE=null;
+        h.innerHTML='<div class="foutpagina"><h2>Deze pagina bestaat niet</h2><p><b>'+esc(adres)+'.rtg/'+esc(pad)+'</b> is er niet. Ga naar de <a id="naarVoor">voorpagina</a>.</p></div>';
+        const v=$('#naarVoor'); if(v)v.addEventListener('click',()=>ga({adres}));
+        return;
+      }
+      site=Object.assign({},site,{blokken:pg.blokken,volgorde:null});
+    }
+    HUIDIGE={site,zaak:d.zaak||null};
     document.title=site.titel+' · RTG Browser';
     const wrap=document.createElement('div'); wrap.className='sitewrap';
     /* de site hoort bij een bedrijf: de browser toont wie dit is en wat je
@@ -320,6 +345,15 @@ async function toonSite(adres){
       (z.acties||[]).forEach(a=>{ const c=document.createElement('a');c.className='chip';c.href='/apps/app.html';c.textContent=LABELS[a]||a;kn.appendChild(c); });
       const open=document.createElement('a');open.className='chip hoofd';open.href='/apps/app.html';open.textContent='Open in de leden-app';kn.appendChild(open);
       balk.appendChild(kn); wrap.appendChild(balk);
+    }
+    // de paginabalk: Home plus de extra pagina's van de site
+    if(paginas.length){
+      const nav=document.createElement('nav'); nav.className='paginanav'; nav.setAttribute('aria-label',"Pagina's van deze site");
+      const maak=(naam,doel,aan)=>{ const b=document.createElement('button'); b.type='button'; b.textContent=naam; if(aan)b.className='aan';
+        b.addEventListener('click',()=>{ if(!aan) ga({adres,pad:doel}); }); nav.appendChild(b); };
+      maak('Home','',!pad);
+      paginas.forEach(p=>maak(p.naam,p.slug,pad===p.slug));
+      wrap.appendChild(nav);
     }
     const doek=document.createElement('div'); doek.className='doek'; doek.dataset.thema=site.thema||'donker'; doek.dataset.ver=''; doek.style.setProperty('--acc',site.accent||'#7F1634');
     // vrije kleuren van de maker toepassen (achtergrond, tekst, kaart); ontbreekt
@@ -340,7 +374,7 @@ async function toonSite(adres){
 if(!TOKEN){ $('#hoofd').innerHTML='<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log in op de leden-app</h2><p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">De RTG-browser hoort bij je lidmaatschap. Open de leden-app en log in.</p><p style="margin-top:1rem;"><a href="/apps/app.html">Naar de leden-app →</a></p></div>'; }
 else {
   const start=new URLSearchParams(location.search).get('adres');
-  if(start){ const a=slug(start); ga(a.length>=2?{adres:a}:'start'); } else ga('start');
+  if(start){ const p=parseAdres(start); ga(p.adres.length>=2?{adres:p.adres,pad:p.pad}:'start'); } else ga('start');
 }
 </script>
 <script src="/shared/basis.js" defer></script>

@@ -27,6 +27,8 @@ module.exports = ({ db, save, crypto, schoon, media }) => {
      schijf) en dat is een ander soort werk dan het bouwen van een pagina. */
   const fotolaag = require('./webmaker-fotos')({ store, save, media });
   const { fotos, fotoBewaar, fotoWeg } = fotolaag;
+  // meerdere pagina's per site: schoonmaak in ./webmaker-paginas.js
+  const paginalaag = require('./webmaker-paginas')({ scho, schoonBlok, crypto, slug });
 
   function slug(v) {
     return String(v == null ? '' : v).toLowerCase().trim()
@@ -99,7 +101,7 @@ module.exports = ({ db, save, crypto, schoon, media }) => {
     ['bg', 'txt', 'card'].forEach(n => { const c = hex(k[n]); if (c) uit[n] = c; });
     return Object.keys(uit).length ? uit : null;
   }
-  const publiek = d => ({ titel: d.titel, thema: d.thema, accent: d.accent, kleuren: d.kleuren || null, blokken: d.blokken || [], volgorde: d.volgorde || null, adres: d.adres, eigenaar: d.eigenaar, zaakCode: d.zaakCode || '' });
+  const publiek = d => ({ titel: d.titel, thema: d.thema, accent: d.accent, kleuren: d.kleuren || null, blokken: d.blokken || [], paginas: d.paginas || [], volgorde: d.volgorde || null, adres: d.adres, eigenaar: d.eigenaar, zaakCode: d.zaakCode || '' });
 
   function mijn(key) { return store().lijst.filter(d => d.eigenaar === key).map(kort); }
   function haal(key, id) { const d = store().lijst.find(x => x.id === scho(id, 20) && x.eigenaar === key); return d || null; }
@@ -132,6 +134,7 @@ module.exports = ({ db, save, crypto, schoon, media }) => {
       bij: new Date().toISOString()
     };
     const vg = schoonVolgorde(d, design.blokken); if (vg) design.volgorde = vg;
+    const pg = paginalaag.schoonPaginas(d); if (pg) design.paginas = pg;
     if (bestaand) { const i = s.lijst.indexOf(bestaand); s.lijst[i] = design; }
     else { s.lijst.unshift(design); s.lijst = s.lijst.slice(0, TOTAAL); }
     save();

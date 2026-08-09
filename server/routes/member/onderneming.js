@@ -13,11 +13,10 @@
    ingelogde eigenaar zijn. Dat is een eigendomscontrole op het doel en niet op
    de aanvrager (lat-regel 7); een id uit het lichaam is nooit een bewijs. */
 module.exports = (kern) => {
-  const { accounts, app, auth, save, ONDERNEMING_RECHTSVORMEN, ondernemingRechtsvormenVanLand,
+  const { accounts, app, auth, ONDERNEMING_RECHTSVORMEN, ondernemingRechtsvormenVanLand,
     ondernemingRechtsvormLanden, ondernemingVind, ondernemingVanEigenaar,
     ondernemingBeeld, ondernemingNieuw, ondernemingRechtsvorm, ondernemingKoppel,
-    ondernemingIngeschreven, ondernemingIntakeZet, ondernemingIntakeBeeld,
-    ondernemingVerkenning, ondernemingPlanVastleggen, ondernemingDagbeeld,
+    ondernemingIngeschreven, ondernemingDagbeeld,
     ondernemingOprichting, ondernemingOprichtingZet, ondernemingAanvraag,
     ondernemingAanvraagStand, ondernemingEersteKlant, ondernemingMallProfiel } = kern;
 
@@ -154,6 +153,7 @@ module.exports = (kern) => {
      poort is. */
   require('./onderneming-geld')(kern, mijn, stuur, nietGevonden);
   require('./onderneming-bestuur')(kern, mijn, stuur, nietGevonden);
+  require('./onderneming-verkenning')(kern, mijn, stuur, nietGevonden);
 
   /* ---- de zaak aanvragen ----
      Loopt langs de bestaande aanmeldingsstroom: RTG-personeel beslist, wij
@@ -172,32 +172,4 @@ module.exports = (kern) => {
     stuur(res, ondernemingAanvraagStand(o));
   });
 
-  /* ---- de verkenning: intake -> kans -> simulatie -> stress -> plan ---- */
-
-  app.post('/api/onderneming/intake', auth, (req, res) => {
-    const o = mijn(req);
-    if (!o) return stuur(res, nietGevonden);
-    if (req.body && (req.body.persoon || req.body.idee)) { ondernemingIntakeZet(o, req.body); save(); }
-    res.json({ ok: true, intake: ondernemingIntakeBeeld(o) });
-  });
-
-  /* Alles in één antwoord, in de juiste volgorde. Zie kern/onderneming/index.js:
-     een scherm dat de vier stappen zelf moet ordenen, ordent ze ooit verkeerd. */
-  app.post('/api/onderneming/verkenning', auth, (req, res) => {
-    const o = mijn(req);
-    if (!o) return stuur(res, nietGevonden);
-    stuur(res, ondernemingVerkenning(o, (req.body || {}).aannames));
-  });
-
-  /* Het plan vastleggen. Dit is de handeling die de fase van 'idee' naar
-     'validatie' brengt -- niet een knop die de fase zet, maar het feit
-     waar ./fase.js op kijkt. Adviseert de stress test 'niet starten', dan
-     weigert dit met 409 tot `tochDoorzetten` meekomt; die keuze wordt dan
-     mét het advies in het archief vastgelegd. */
-  app.post('/api/onderneming/plan/vastleggen', auth, (req, res) => {
-    const o = mijn(req);
-    if (!o) return stuur(res, nietGevonden);
-    const v = ondernemingVerkenning(o, (req.body || {}).aannames);
-    stuur(res, ondernemingPlanVastleggen(o, v.plan, v.stress, req.body || {}));
-  });
 };

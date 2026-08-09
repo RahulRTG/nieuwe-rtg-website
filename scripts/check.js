@@ -1774,7 +1774,7 @@ console.log('\n29) de Authorization-kop wordt gelezen om een token te halen, nie
     .replace(/\/\*[\s\S]*?\*\//g, m => m.replace(/[^\n]/g, ' '))
     .replace(/(^|[^:'"\\])\/\/[^\n]*/g, '$1');
   const KOP = /req\.get\(\s*['"]authorization['"]\s*\)|req\.headers\s*\[\s*['"]authorization['"]\s*\]|req\.headers\.authorization/i;
-  const VERIFIER = /\b(verifyToken|resolveSession|sessionFor|veiligGelijk|verifyActionToken|magAi|scimSleutelOk|magMeten|vanSleutel|accounts\.\w+)\s*\(/;
+  const VERIFIER = /\b(verifyToken|resolveSession|sessionFor|veiligGelijk|verifyActionToken|magAi|scimSleutelOk|apiSleutelOk|magMeten|vanSleutel|accounts\.\w+)\s*\(/;
   const VENSTER = 12;   // regels waarbinnen de verificatie moet volgen
   /* Plekken die de kop bewust lezen zonder te verifieren. Vandaag leeg, en dat
      hoort zo te blijven: wie hier iets toevoegt legt uit waarom betasten hier

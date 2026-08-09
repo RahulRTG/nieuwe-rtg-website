@@ -65,7 +65,7 @@ module.exports = [
     paden: ['/api/command/beleid', '/api/command/simulatie', '/api/command/agent', '/api/command/agents',
       '/api/command/recht', '/api/command/rechten', '/api/command/mandaat',
       '/api/command/canary', '/api/command/zandbak', '/api/command/mdm',
-      '/api/command/overname'] },
+      '/api/command/overname', '/api/command/apipoort'] },
 
   // ---- RTFoundation ----
   { id: 'foundation', categorie: 'RTFoundation', naam: 'RTFoundation-app (onderwijs)', standaard: true, doelgroepen: ['foundation'],

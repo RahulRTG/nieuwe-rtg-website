@@ -587,8 +587,13 @@
     {
       "id": "apigateway",
       "wat": "Enterprise API gateway met scopes, quota en contractregels",
-      "groep": "Nog open",
-      "dekking": []
+      "groep": "Command: zien, besturen, automatiseren",
+      "dekking": [
+        "server/kern/command/apipoort.js",
+        "server/middleware/apipoort.js",
+        "/api/command/apipoort"
+      ],
+      "let": "De poort hangt op /api/extern/ en de toelating begint LEEG: er staat niets achter tot iemand er een pad in zet. Dat is een besluit en geen omissie -- een poort die bij oplevering al half het platform ontsluit is een gat met een naam. Het geheim van een sleutel wordt nergens bewaard, het quotum staat in de opslag (dus een herstart wist hem niet) en een uitfasering wordt aangekondigd voordat hij bijt."
     },
     {
       "id": "sandbox",

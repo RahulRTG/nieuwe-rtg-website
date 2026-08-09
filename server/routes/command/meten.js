@@ -115,6 +115,20 @@ module.exports = ({ app, officeAuth, veilig, wie, command }) => {
   app.post('/api/command/overname/terug', officeAuth, (req, res) => veilig(res, () =>
     command.overname.terug(String(req.body.id || ''), wie(req))));
 
+  /* De API-poort. Het geheim van een sleutel gaat één keer mee terug en wordt
+     nergens bewaard; hier staat alleen een hash met zout. */
+  app.post('/api/command/apipoort', officeAuth, (req, res) => veilig(res, () => command.apipoort.stand()));
+  app.post('/api/command/apipoort/toelaten', officeAuth, (req, res) => veilig(res, () =>
+    command.apipoort.laatToe(String(req.body.pad || ''), { versie: req.body.versie,
+      uitfasering: req.body.uitfasering, waarvoor: req.body.waarvoor }, wie(req))));
+  app.post('/api/command/apipoort/toelating-weg', officeAuth, (req, res) => veilig(res, () =>
+    command.apipoort.haalWeg(String(req.body.pad || ''), wie(req))));
+  app.post('/api/command/apipoort/sleutel', officeAuth, (req, res) => veilig(res, () =>
+    command.apipoort.maak(req.body.naam, req.body.scopes, { door: wie(req), eigenaar: req.body.eigenaar,
+      quotaPerUur: req.body.quotaPerUur, dagen: req.body.dagen })));
+  app.post('/api/command/apipoort/intrekken', officeAuth, (req, res) => veilig(res, () =>
+    command.apipoort.trekIn(String(req.body.id || ''), wie(req), req.body.reden)));
+
   /* De melding van buitenaf. Zie de kop hierboven voor de twee sloten. */
   app.post('/api/sonde/melding', meetpoort, (req, res) => {
     const r = command.sonde.meld(req.body || {});

@@ -8,8 +8,8 @@ Dit register beoordeelt geen kwaliteit. Dat een bestand bestaat, zegt niet dat d
 
 | stand | aantal | wat het betekent |
 | --- | --- | --- |
-| gedekt | 61 | elk bewijsstuk bestaat |
-| open | 4 | nog geen dekking opgeschreven: werkvoorraad |
+| gedekt | 62 | elk bewijsstuk bestaat |
+| open | 3 | nog geen dekking opgeschreven: werkvoorraad |
 | gebroken | 0 | er wordt naar iets verwezen dat er niet (meer) is |
 
 ## De werkplek (Microsoft 365-achtig)
@@ -76,6 +76,7 @@ Dit register beoordeelt geen kwaliteit. Dat een bestand bestaat, zegt niet dat d
 | Synthetic monitoring: nepgebruikers die continu de keten lopen<br><sub>Binnen en buiten staan apart en worden nergens opgeteld. Wat er NIET is: een cron die scripts/sonde.js elke minuut van buitenaf start -- dat is een inrichtingsbesluit op een machine buiten deze repo, en het staat als punt 1 in SLO.md.</sub> | gedekt | `server/kern/command/sonde.js`<br>`/api/command/sonde`<br>`/api/sonde/melding`<br>`scripts/sonde.js` |
 | Canary deployments met automatische terugroldrempels<br><sub>Rolt een FUNCTIE uit de schakelkast gefaseerd uit, niet een build. De drempel rekent op dezelfde tellers als de servicedoelen, op het verschil sinds de nulmeting; na een herstart is die nulmeting kwijt en weegt hij bewust niet. Anoniem verkeer valt nooit in een canary.</sub> | gedekt | `server/kern/command/canary.js`<br>`server/functies/canaryas.js`<br>`/api/command/canary` |
 | Acquisition mode: een overgenomen bedrijf importeren en migreren<br><sub>Vier stappen waarvan de volgorde de veiligheid is: inlezen, afbeelden, droogloop, uitvoeren. Uitvoeren kan alleen met het zegel van precies de bekeken droogloop, er wordt nooit iets overschreven (een bestaande sleutel is een botsing), en elke ingevoerde rij draagt zijn partij zodat terugdraaien exact die rijen weghaalt.</sub> | gedekt | `server/kern/command/overname.js`<br>`server/kern/command/overnamevoorstel.js`<br>`/api/command/overname` |
+| Enterprise API gateway met scopes, quota en contractregels<br><sub>De poort hangt op /api/extern/ en de toelating begint LEEG: er staat niets achter tot iemand er een pad in zet. Dat is een besluit en geen omissie -- een poort die bij oplevering al half het platform ontsluit is een gat met een naam. Het geheim van een sleutel wordt nergens bewaard, het quotum staat in de opslag (dus een herstart wist hem niet) en een uitfasering wordt aangekondigd voordat hij bijt.</sub> | gedekt | `server/kern/command/apipoort.js`<br>`server/middleware/apipoort.js`<br>`/api/command/apipoort` |
 | Sandbox-omgevingen om processen te testen zonder productiedata<br><sub>De inhoud komt uit de zaaiset en nooit uit db.data; de motoren zien een DB-venster op het vak van de zandbak, dus er is geen pad naar een productiecollectie. Wat het NIET is: een tweede installatie -- alleen de motoren van Command draaien erop, niet de gewone app-routes.</sub> | gedekt | `server/kern/command/zandbak.js`<br>`/api/command/zandbak` |
 
 ## De zaak: dezelfde regie, eigen scope
@@ -95,5 +96,4 @@ Dit register beoordeelt geen kwaliteit. Dat een bestand bestaat, zegt niet dat d
 | Chaos testing: gecontroleerd uitschakelen om failover te bewijzen | open | _nog niet gebouwd_ |
 | Country packs: een nieuw land activeren als configuratiebundel | open | _nog niet gebouwd_ |
 | City bootstrap: een nieuwe stad automatisch inrichten | open | _nog niet gebouwd_ |
-| Enterprise API gateway met scopes, quota en contractregels | open | _nog niet gebouwd_ |
 

@@ -68,6 +68,12 @@ module.exports = (kern) => {
   app.post('/api/command/operator/recent', officeAuth, (req, res) => veilig(res, () =>
     ({ plannen: command.operator.recent(Number(req.body.n || 10)) })));
 
+  /* DE API-POORT hangt op /api/extern/ en nergens anders: één duidelijk
+     voorvoegsel, zodat er nooit een deur ontstaat die niemand meer terugvindt.
+     Hij hoort bij dit domein omdat de sleutels, scopes en quota hier beheerd
+     worden, en hij leest `kern.command` bij het VERZOEK -- niet nu. */
+  app.use(require('../../middleware/apipoort').apiPoortMiddleware(kern));
+
   require('./herstel')(ctx);
   require('./bestuur')(ctx);
   require('./toezicht')(ctx);

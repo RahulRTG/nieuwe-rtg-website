@@ -34,24 +34,27 @@
         geval NAAST dat wel mag, want een 403 die altijd komt bewijst alleen dat
         de sessie stuk is.
 
-   WAT ER MET EEN MUTATIE IS NAGETROKKEN (LAT.md regel 2). Elke bewering is een
-   keer gezien terwijl hij zakte, met een tijdelijke wijziging in de kern die
-   daarna is teruggedraaid:
+   WAT ER MET EEN MUTATIE IS NAGETROKKEN (LAT.md regel 2). Elk van de zes
+   toetsen hieronder is een keer gezien terwijl hij zakte, met een tijdelijke
+   wijziging in de kern (in een kopie van de boom, zodat de echte bestanden
+   ongemoeid bleven):
 
-     - `rest(b)` in voorraad.js laten rekenen zonder de afschrijvingen: RAAK op
-       de tweede lezing van de voorraadlijst ("afschrijven haalt het uit de
-       voorraad") en op de aandachtslijst, die de afgeschreven partij weer
-       opvoerde als "ligt over de datum in het magazijn";
-     - de `mijn`-filter uit herkomst.lijst halen: RAAK op de stadsbestuurder die
-       daarmee de grote gift van de andere stad zag staan;
-     - `openVoorMij` in beleid.js laten tellen op alle open steden in plaats van
-       de eigen: RAAK op de bevestiging (het getal bewoog niet mee met de stad
-       die tekende);
-     - de weekgrens in voorraad.lijst op een maand zetten: RAAK op `bijnaOver`,
-       en op niets anders.
+     - subsidies.js, `totalen.openMomenten` laten tellen op ALLE momenten in
+       plaats van de open: RAAK op 1, en pas bij de tweede lezing -- de eerste
+       lezing ziet er met een fout getal nog goed uit;
+     - voorraad.js, `rest(b)` laten rekenen zonder de afschrijvingen: RAAK op 2;
+     - voorraad.js, `!overDatum(b)` uit `bijnaOver` halen: RAAK op 2, op de
+       bewering dat de twee aandachtslijsten uit elkaar liggen;
+     - activiteiten.js, `aanwezig` laten tellen op status 'ingeschreven':
+       RAAK op 3, na het inchecken;
+     - bestuur.js, `quorumVan` zonder de `+ 1`: RAAK op 4;
+     - beleid.js, `openVoorMij` laten rekenen alsof iedereen landelijk is:
+       RAAK op 5 -- het getal bewoog niet mee met de stad die tekende;
+     - herkomst.js, de `mijn`-filter eruit: RAAK op 6, op de stadsbestuurder
+       die daarmee de grote gift van de andere stad zag staan.
 
-   Alle vier zakten op hun eigen bewering en lieten de rest groen; een mutatie
-   die alles laat zakken bewijst niets.
+   Alle zeven zakten op hun eigen toets en lieten de andere vijf groen; een
+   mutatie die alles laat zakken, bewijst niets.
 
    Draai los: node --experimental-sqlite --test test/rtfos-bestuur.test.js
    ========================================================================== */
@@ -304,7 +307,8 @@ test('de activiteitenlijst telt plekken, wachtlijst en aanwezigen mee met wat er
   const bezig = await os_('activiteiten', { stad: STAD_A });
   const rijBezig = bezig.body.activiteiten.find(a => a.id === id);
   assert.equal(rijBezig.aanwezig, 1, 'de ingecheckte deelnemer komt niet terug in de lijst');
-  assert.equal(rijBezig.ingeschreven, 1, 'wie binnen is telt niet meer mee als ingeschreven');
+  assert.equal(rijBezig.ingeschreven, 1,
+    'wie binnen is telde niet meer mee, terwijl hij nog steeds een van de plekken bezet');
   assert.equal(rijBezig.status, 'bezig', 'de activiteit bleef op vol staan terwijl er iemand binnen was');
 
   // de lijst is van de stad, niet van het land

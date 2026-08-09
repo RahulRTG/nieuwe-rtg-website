@@ -62,7 +62,7 @@ module.exports = (ctx) => {
       batches: rijen.map(beeld),
       aandacht: {
         overDatum: rijen.filter(b => overDatum(b) && rest(b) > 0).map(beeld),
-        bijnaOver: rijen.filter(b => b.houdbaarTot &&
+        bijnaOver: rijen.filter(b => !overDatum(b) && b.houdbaarTot &&
           Date.parse(b.houdbaarTot) < week && rest(b) > 0).map(beeld)
       },
       totalen: {

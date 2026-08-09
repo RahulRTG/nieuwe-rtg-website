@@ -96,6 +96,8 @@ function maakMall({ db, save, crypto, isRetail, haalThuis, haalLandVind, haalVak
   Object.assign(api, require('./zoek')(ctx));
   Object.assign(api, require('./lijsten')(ctx));   // bewaren en een reis bouwen
   Object.assign(api, require('./aanvragen')(ctx)); // de vraagkant: wat niemand aanbiedt
+  Object.assign(api, require('./vraagbeeld')(ctx)); // wat gevraagd en niet geleverd wordt
+  Object.assign(api, require('./spiegel')(ctx));    // zo staat een zaak in de Mall
   return { mall: api };
 }
 

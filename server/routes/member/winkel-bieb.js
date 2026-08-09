@@ -42,7 +42,9 @@ module.exports = (kern) => {
     maxPrijs: req.body.maxPrijs, binnenKm: req.body.binnenKm,
     // de live stand uit de Supplier OS: alleen wat nu open is / op voorraad ligt
     openNu: req.body.openNu === true, opVoorraad: req.body.opVoorraad === true,
-    pagina: req.body.pagina, per: req.body.per
+    pagina: req.body.pagina, per: req.body.per,
+    // dit is een mens die zoekt: tel de woorden mee voor het vraagbeeld
+    noteer: true
   })));
 
   /* ---- bewaren en een reis bouwen ----

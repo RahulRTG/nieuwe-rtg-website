@@ -54,6 +54,11 @@ module.exports = (kern) => {
 
   // de openstaande reisaanvragen bij het RTG-reisbureau (codenamen)
   app.post('/api/office/reisbureau', officeAuth, (req, res) => veilig(res, () => kern.reisbureau.aanvragen()));
+  /* Het vraagbeeld van de Mall: waar wordt naar gezocht en niets gevonden. Per
+     WOORD geteld en nooit per persoon, en pas zichtbaar boven een drempel; zie
+     de kop van kern/mall/vraagbeeld.js. Dit is de invoer voor de Kansenlaag van
+     het stadsweefsel: een tekort hier is daar een ondernemerskans. */
+  app.post('/api/office/mall/kansen', officeAuth, (req, res) => veilig(res, () => kern.mall.mallVraagbeeld.kansen(req.body && req.body.plek)));
 
   /* De doos-regie: beheer op afstand van de Zaakdoos-vloot. Het kantoor zet
      de doelversie en per doos een netwerkrol; de doos haalt beide zelf op

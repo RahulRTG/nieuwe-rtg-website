@@ -1596,6 +1596,23 @@ Drie dingen die dit bewust niet doet:
 
 Wie welke aanvraag ziet, hangt aan twee dingen: het genre moet bij de gevraagde verdieping horen, en de plek moet binnen het servicegebied van de zaak vallen. Een kapper in Haarlem krijgt geen loodgietersklus op Ibiza in beeld — en een wellness-zaak in Ibiza geen loodgietersklus in Ibiza.
 
+### Het vraagbeeld: wat gevraagd wordt en niet geleverd
+
+De Mall weet iets wat niemand anders weet: waar mensen naar zoeken en **niets vinden**. Dat is de eerlijkste marktinformatie die er is — iemand heeft de moeite genomen het te vragen en kreeg niets terug. Voor een ondernemer is dat een kans, voor een stad een tekort.
+
+Dit is ook het onderdeel met de grootste kans om verkeerd gebouwd te worden, dus vier regels staan als code en niet als belofte (`server/kern/mall/vraagbeeld.js`):
+
+1. **Geen sleutel.** Nergens wordt bijgehouden wíé iets zocht — geen lidsleutel, geen codenaam, geen sessie, geen IP. Een teller per woord per plaats per week, en verder niets. Zoekprofielen zijn hiermee ook achteraf niet te bouwen.
+2. **Losse woorden, geen zinnen.** Er wordt per wóórd geteld. "kinderstoel huren voor de bruiloft van mijn zus" is als zin herkenbaar; als vier losse woorden in een weekteller is dat niemand meer. Dit is de belangrijkste van de vier.
+3. **Een drempel.** Een woord komt pas naar buiten — naar een ondernemer of het kantoor — vanaf vijf keer. Wat een enkeling zocht blijft binnen.
+4. **Het vervalt.** Acht weken, dan weg. Een vraagbeeld is om op te handelen, niet om een geschiedenis van een stad aan te leggen.
+
+Cijfers, e-mailadressen en woorden langer dan 24 tekens gaan er sowieso niet in: die dragen het meeste risico en het minste nut. En alleen een echte zoekopdracht van een mens telt mee — de home, de reizenstrook en interne aanroepen niet, anders wijst het vraagbeeld naar binnen in plaats van naar de markt.
+
+**De lus is rond.** Een tekort in de Mall is een vierde bron voor de Kansenlaag van het stadsweefsel (`server/kern/stadsweefsel/kansen.js`, gekoppeld in `server/opzet/weefseldraden.js`). Een openstaande vacature zegt "hier is werk", een lege zoekopdracht zegt "hier is een markt" — twee verschillende tekorten die allebei in de kansenlaag horen. Begint er een zaak, dan staat haar aanbod via `kern/mall/aanbod.js` vanzelf in dezelfde zoekmachine, en wordt het tekort kleiner. Die laatste stap is geen belofte maar de bestaande leeslaag.
+
+Wat een ondernemer ziet (`POST /api/supplier/mall` → `vraag`) zijn de woorden uit zijn eigen vak en plaats, boven de drempel. Bewust géén bezoekersaantallen en géén conversie: dit zegt wat mensen zochten, niet wat zij deden.
+
 ### De Supplier OS ↔ Mall-koppeling
 
 De Mall las tot nu toe alleen wat een zaak **is** (naam, adres, artikelen, prijzen) en niet wat zij op dit moment **doet**. Een gesloten kapper stond er net zo bij als een open kapper, een woensdagmiddag die de ondernemer in zijn eigen agenda blokkeerde was in de Mall niet te zien, en een artikel met voorraad nul verschilde in niets van een artikel dat op de plank ligt.

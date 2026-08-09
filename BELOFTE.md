@@ -8,8 +8,8 @@ Dit register beoordeelt geen kwaliteit. Dat een bestand bestaat, zegt niet dat d
 
 | stand | aantal | wat het betekent |
 | --- | --- | --- |
-| gedekt | 52 | elk bewijsstuk bestaat |
-| open | 13 | nog geen dekking opgeschreven: werkvoorraad |
+| gedekt | 54 | elk bewijsstuk bestaat |
+| open | 11 | nog geen dekking opgeschreven: werkvoorraad |
 | gebroken | 0 | er wordt naar iets verwezen dat er niet (meer) is |
 
 ## De werkplek (Microsoft 365-achtig)
@@ -68,6 +68,8 @@ Dit register beoordeelt geen kwaliteit. Dat een bestand bestaat, zegt niet dat d
 | Workforce minimization: handminuten per 1.000 | gedekt | `server/kern/command/werkbesparing.js`<br>`/api/command/werk` |
 | Just-in-time privilege, break-glass en mandaat | gedekt | `server/kern/command/toegang.js`<br>`/api/command/recht/nood` |
 | RTG Command als één app | gedekt | `public/apps/command.html`<br>`public/apps/command` |
+| Knowledge graph over personen, bedrijven, contracten en gebeurtenissen<br><sub>De randen worden gemeten uit de gegevens, niet uit een schema; de wandeling zegt het als hij tegen zijn grens loopt.</sub> | gedekt | `server/kern/command/graaf.js`<br>`/api/command/graaf`<br>`test/kwaliteit.test.js` |
+| Data quality engine: duplicaten en inconsistenties vinden<br><sub>Zeker (dubbele sleutel, wees) en vermoed (zeldzame waarde) staan apart; een meter die vermoedens als feiten telt, wordt terecht genegeerd.</sub> | gedekt | `server/kern/command/kwaliteit.js`<br>`/api/command/kwaliteit`<br>`test/kwaliteit.test.js` |
 
 ## De zaak: dezelfde regie, eigen scope
 
@@ -83,10 +85,8 @@ Dit register beoordeelt geen kwaliteit. Dat een bestand bestaat, zegt niet dat d
 
 | belofte | stand | waar het staat |
 | --- | --- | --- |
-| Knowledge graph over personen, bedrijven, contracten en gebeurtenissen<br><sub>De afhankelijkhedenscan meet nu per object; een doorzoekbare graaf over alles is er niet.</sub> | open | _nog niet gebouwd_ |
 | Data lineage: waar komt een gegeven vandaan en wie hangt ervan af | open | _nog niet gebouwd_ |
 | Master data management: één authoritative record per klant/bedrijf<br><sub>kern/eenaccount doet dit voor het lid; voor bedrijven en locaties niet.</sub> | open | _nog niet gebouwd_ |
-| Data quality engine: duplicaten en inconsistenties vinden | open | _nog niet gebouwd_ |
 | SLO- en error-budgetbeheer per dienst<br><sub>SLO.md beschrijft de norm; er is geen laag die het budget bijhoudt.</sub> | open | _nog niet gebouwd_ |
 | Synthetic monitoring: nepgebruikers die continu de keten lopen | open | _nog niet gebouwd_ |
 | Chaos testing: gecontroleerd uitschakelen om failover te bewijzen | open | _nog niet gebouwd_ |

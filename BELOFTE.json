@@ -477,9 +477,13 @@
     {
       "id": "knowledge-graph",
       "wat": "Knowledge graph over personen, bedrijven, contracten en gebeurtenissen",
-      "groep": "Nog open",
-      "dekking": [],
-      "let": "De afhankelijkhedenscan meet nu per object; een doorzoekbare graaf over alles is er niet."
+      "groep": "Command: zien, besturen, automatiseren",
+      "dekking": [
+        "server/kern/command/graaf.js",
+        "/api/command/graaf",
+        "test/kwaliteit.test.js"
+      ],
+      "let": "De randen worden gemeten uit de gegevens, niet uit een schema; de wandeling zegt het als hij tegen zijn grens loopt."
     },
     {
       "id": "data-lineage",
@@ -497,8 +501,13 @@
     {
       "id": "dataquality",
       "wat": "Data quality engine: duplicaten en inconsistenties vinden",
-      "groep": "Nog open",
-      "dekking": []
+      "groep": "Command: zien, besturen, automatiseren",
+      "dekking": [
+        "server/kern/command/kwaliteit.js",
+        "/api/command/kwaliteit",
+        "test/kwaliteit.test.js"
+      ],
+      "let": "Zeker (dubbele sleutel, wees) en vermoed (zeldzame waarde) staan apart; een meter die vermoedens als feiten telt, wordt terecht genegeerd."
     },
     {
       "id": "slo",

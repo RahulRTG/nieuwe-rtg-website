@@ -33,6 +33,18 @@ module.exports = ({ app, supplierAuth, managerOnly, veilig, laag, wie }) => {
   app.post('/api/supplier/command/beleid/geschiedenis', supplierAuth, (req, res) => veilig(res, () =>
     laag(req).beleid.geschiedenis(String(req.body.id || ''))));
 
+  /* De gegevenskwaliteit en de kennisgraaf van de zaak. Voor het management:
+     ze tonen de samenhang over de hele zaak heen, en dat is dezelfde grens die
+     het journaal hieronder trekt. */
+  app.post('/api/supplier/command/kwaliteit', supplierAuth, (req, res) => veilig(res, () => {
+    if (!managerOnly(req, res)) return null;
+    return laag(req).kwaliteit.meet();
+  }));
+  app.post('/api/supplier/command/graaf', supplierAuth, (req, res) => veilig(res, () => {
+    if (!managerOnly(req, res)) return null;
+    return laag(req).graaf.vorm();
+  }));
+
   /* Het journaal, met de ketencontrole erbij. Een spoor waarvan je de heelheid
      niet kunt nakijken, is een lijst die je op zijn woord moet geloven. */
   app.post('/api/supplier/command/journaal', supplierAuth, (req, res) => veilig(res, () => {

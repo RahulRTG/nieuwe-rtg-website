@@ -1764,6 +1764,19 @@ Die laatste is de enige alarmerende stand, en de reden dat het register bestaat:
 
 Wat het register **niet** doet, is kwaliteit beoordelen. Dat een bestand bestaat, zegt niet dat de belofte goed is ingelost; daarvoor is `BEWIJS.md` er en de toetsen die daaronder liggen.
 
+### Gegevenskwaliteit en de kennisgraaf: één meting, twee vragen
+
+Twee van de open beloften zijn dicht, en ze delen hun fundament. `kern/command/kwaliteit.js` meet welk veld in de praktijk naar welke soort verwijst — er is geen tabel die zegt "orders.supplierCode wijst naar zaken", want zo'n tabel veroudert zodra er een collectie bij komt en controleert dan precies de nieuwe velden niet. Uit die ene meting komen twee dingen:
+
+- **de wezen** — rijen waarvan de verwijzing nergens aankomt. Naast dubbele sleutels en rijen zonder sleutel vormt dat de kwaliteitslaag: niet wat er *verkeerd* staat (daar zijn de runbooks voor) maar wat er *kapot* is. Een dubbele sleutel is geen bedrijfsprobleem maar een administratieprobleem, en het valt zelden op — tot iemand op de verkeerde rij klikt.
+- **de randen** van `kern/command/graaf.js` — de kennisgraaf. Het objectdossier beantwoordt één stap ("wie verwijst naar dit object"); de graaf beantwoordt de vraag erachter: hoe hangt dit samen, en wat ligt er twee stappen verderop.
+
+De drempel ligt op 80%: een veld dat vier van de vijf keer een bestaande sleutel raakt, is een verwijzing met vier wezen; een veld dat de helft van de tijd raak is, is waarschijnlijk toeval en wordt niet gecontroleerd. Liever een wees missen dan een half platform als kapot melden — daar staat een toets op.
+
+**Zeker en vermoed staan apart.** Een dubbele sleutel is een feit. Een waarde die één keer voorkomt terwijl de rest tientallen keren hetzelfde zegt, is een vermoeden (typefout, oude naam) en telt niet mee als defect. Een meter die vermoedens als feiten telt, wordt terecht genegeerd.
+
+Beide lagen draaien op het register dat ze meekrijgen, dus de zaak-kant krijgt ze gratis en volledig gescoped: de graaf loopt juist wél door en zou ongescoped het gevaarlijkste stuk zijn. In RTG Command staan ze als werkplekken **Kwaliteit** en **Kennisgraaf**; in de zaak achter de managergrens.
+
 ## Veiligheid & verbinding: vier apps op één ruggengraat
 
 Vier losse apps (elk met eigen PWA-manifest), die onderhuids dezelfde kern delen

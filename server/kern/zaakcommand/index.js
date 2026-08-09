@@ -74,6 +74,11 @@ function maakZaakCommand({ db, save, crypto, anthropic, findSupplier, commGast }
       db, save, crypto, journaal, risico, runbooks, zaken, beleid, anthropic, register, vak });
     const werkbesparing = require('../command/werkbesparing').maakWerkbesparing({ journaal, zaken, runbooks });
     const signalen = require('./signalen').maakSignalen({ db, beleid, commGast });
+    /* Dezelfde twee lagen als aan de RTG-kant, maar op het register van DEZE
+       zaak. Ze erven de scope daarmee volledig: de graaf loopt juist wél door
+       en zou ongescoped het gevaarlijkste stuk zijn. */
+    const kwaliteit = require('../command/kwaliteit').maakKwaliteit({ db, register });
+    const graaf = require('../command/graaf').maakGraaf({ db, register, kwaliteit });
     const zoeklaag = require('../command/zoek');
     const objectlaag = require('../command/object');
 
@@ -148,7 +153,7 @@ function maakZaakCommand({ db, save, crypto, anthropic, findSupplier, commGast }
         plannen: operator.recent(5), runs: runbooks.runs(6) };
     }
 
-    return { code, leiding, register, journaal, beleid, risico, zaken, runbooks, operator,
+    return { code, leiding, register, kwaliteit, graaf, journaal, beleid, risico, zaken, runbooks, operator,
       werkbesparing, signalen, puls, signaalOppakken, zoek, bereik, dossier, actiesVoor, start };
   }
 

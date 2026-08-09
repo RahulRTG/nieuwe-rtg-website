@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 723 bestanden en 4090 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 724 bestanden en 4096 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,13 +12,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 723 |
-| losse beweringen (`test(...)`) | 4090 |
+| toetsbestanden | 724 |
+| losse beweringen (`test(...)`) | 4096 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 521 |
 | **overleefd**: geen mutatie kreeg hem rood | 12 |
 | niet te meten (al rood, geen module gevonden, ...) | 16 |
-| alleen in de kop *genoemd*, nog niet gemeten | 27 |
+| alleen in de kop *genoemd*, nog niet gemeten | 28 |
 | niets van beide | 147 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-633 bestanden, 3930 beweringen.
+634 bestanden, 3936 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -280,6 +280,7 @@ toets omvalt.
 | `kluis-rotatie.test.js` | 7 | gezakt op `return-weg#0` | Sleutelrotatie van de identiteitskluis (server/accounts/onderhoud.js). Een gecompromitteerde kluissleutel moet te vervangen zijn zonder de gegevens te verliezen en zonder downtime. |
 | `koppels.test.js` | 4 | gezakt op `liegpoort /api/` | Gekoppelde schakelaars (tegenhangers): twee functies die samen een dienst vormen volgen elkaar automatisch als de boardroom er een omzet, zodat er nooit een halve dienst overblijft (vacatures zonder sollicitanten,... |
 | `kruisscan.test.js` | 4 | gezakt op `!==->===#0` | Tests voor de kruis-slice-scan (scripts/kruisscan.js). Deze scan bewaakt dat een opgeknipte module-map (X/index.js + zusjes) geen slice bevat die kaal naar een top-level naam van een zuster-slice verwijst -- een... |
+| `kwaliteit.test.js` | 6 | genoemd | De gegevenskwaliteit (kern/command/kwaliteit.js) en de kennisgraaf (kern/command/graaf.js). Beide draaien op dezelfde meting: welk veld blijkt in de praktijk naar welke soort te verwijzen. |
 | `laatste-negen.test.js` | 4 | gezakt op `liegpoort /api/` | DE LAATSTE ZES -- open verbindingen, padparameters en de kinderkant. foundation/gezin/:code/kanaal, foundation/les/:code/stream, foundation/schrift/:code, supplier/stream en de twee rtf/social/kind/boardroom-routes... |
 | `laatste-twee-endpoints.test.js` | 6 | gezakt op `liegpoort /api/` | DE LAATSTE TWEE ENDPOINTS DIE NOOIT WERDEN AANGERAAKT. Het routejournaal (server/routelog.js, uitgelezen door scripts/dekking.js) zegt precies welke routes tijdens de suite echt zijn aangeroepen. |
 | `lab-geheim.test.js` | 3 | gezakt op `true->false#0` | Bedrijfsgeheimen in het Onderzoekslab (kern/onderzoekslab.js): wie aan een project werkt (op het team) ziet het; de boardroom ziet alles; een buitenstaander ziet niets. Draai: npm test |

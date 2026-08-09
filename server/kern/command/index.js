@@ -43,6 +43,12 @@ function maakCommand({ db, save, crypto, anthropic }) {
   const puls = require('./puls').maakPuls({ db, runbooks, zaken, toezicht, journaal, beleid, register });
   const simulatie = require('./simulatie').maakSimulatie({ db, runbooks, zaken, beleid, risico, register });
   const werkbesparing = require('./werkbesparing').maakWerkbesparing({ journaal, zaken, runbooks });
+  /* De gegevenskwaliteit en de kennisgraaf leunen allebei op DEZELFDE meting:
+     welk veld blijkt in de praktijk naar welke soort te verwijzen. Daar komen
+     hier de wezen uit en daar komen bij de graaf de randen uit. Twee keer meten
+     zou twee keer iets anders kunnen zeggen over dezelfde gegevens. */
+  const kwaliteit = require('./kwaliteit').maakKwaliteit({ db, register });
+  const graaf = require('./graaf').maakGraaf({ db, register, kwaliteit });
   const zoeklaag = require('./zoek');
   const objectlaag = require('./object');
 
@@ -84,12 +90,13 @@ function maakCommand({ db, save, crypto, anthropic }) {
       werk: werkbesparing.bord(30),
       rechten: toegang.graaf(),
       plannen: operator.recent(5),
-      runs: runbooks.runs(8)
+      runs: runbooks.runs(8),
+      kwaliteit: kwaliteit.meet().tel
     };
   }
 
   return { journaal, beleid, risico, toegang, zaken, runbooks, toezicht, operator, puls,
-    simulatie, werkbesparing, zoek, bereik, dossier, actiesVoor, start, register };
+    simulatie, werkbesparing, kwaliteit, graaf, zoek, bereik, dossier, actiesVoor, start, register };
 }
 
 module.exports = { maakCommand };

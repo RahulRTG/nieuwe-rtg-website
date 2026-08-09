@@ -47,7 +47,8 @@ module.exports = [
      knop en raakt het zien en het herstellen niet. */
   { id: 'command-zien', categorie: 'RTG-Backoffice', naam: 'RTG Command: zien', standaard: true, doelgroepen: ['intern'],
     uitleg: 'De puls van alle domeinen, de zoekbalk over alles en het objectdossier met zijn tijdlijn.',
-    paden: ['/api/command/start', '/api/command/puls', '/api/command/zoek', '/api/command/object', '/api/command/journaal'] },
+    paden: ['/api/command/start', '/api/command/puls', '/api/command/zoek', '/api/command/object', '/api/command/journaal',
+      '/api/command/kwaliteit', '/api/command/graaf'] },
   { id: 'command-doen', categorie: 'RTG-Backoffice', naam: 'RTG Command: doen', standaard: true, doelgroepen: ['intern'],
     uitleg: 'De operator, de runbooks en de uitzonderingenrij: herstellen en afhandelen.',
     paden: ['/api/command/operator', '/api/command/runbook', '/api/command/runbooks', '/api/command/runs',

@@ -50,6 +50,18 @@ module.exports = ({ app, officeAuth, veilig, wie, command }) => {
     keten: command.journaal.controleer()
   })));
 
+  /* De gegevenskwaliteit: wat er in de gegevens zelf kapot is. Apart van de
+     runbooks, want dat gaat over toestanden die verkeerd zijn en dit over
+     rijen die niet kloppen -- een dubbele sleutel is geen bedrijfsprobleem
+     maar een administratieprobleem, en het valt zelden op. */
+  app.post('/api/command/kwaliteit', officeAuth, (req, res) => veilig(res, () => command.kwaliteit.meet()));
+
+  /* De kennisgraaf: hoe hangt het geheel samen, en wat ligt er twee stappen
+     verderop. De randen zijn gemeten uit de gegevens, niet uit een schema. */
+  app.post('/api/command/graaf', officeAuth, (req, res) => veilig(res, () => command.graaf.vorm()));
+  app.post('/api/command/graaf/wandel', officeAuth, (req, res) => veilig(res, () =>
+    command.graaf.wandel(String(req.body.type || ''), String(req.body.id || ''), req.body.diepte)));
+
   /* Forensic replay: achteraf reconstrueren wat er tussen twee momenten
      gebeurde, met per stap de toestand ervoor en erna. */
   app.post('/api/command/journaal/herbeleef', officeAuth, (req, res) => veilig(res, () =>

@@ -9,9 +9,9 @@
 
    De volledige startset is opgesplitst in vier datamodules: ./leden (Salon,
    facturen, reis), ./partners (partnerkanaal + grootboeken), ./leveranciers
-   (typen + voorbeeldzaken) en ./livinglab (het RTF Living Lab: één lab met zijn
+   (typen + voorbeeldzaken), ./livinglab (het RTF Living Lab: één lab met zijn
    tekenbevoegden, apparatuur en buurtvragen -- en met opzet geen verzonnen
-   onderzoeksresultaten). */
+   onderzoeksresultaten) en ./media (uitgegeven muziek uit het Klankwerk). */
 
 module.exports = function seed() {
   const demo = process.env.NODE_ENV !== 'production' || process.env.RTG_DEMO === '1';
@@ -28,7 +28,11 @@ module.exports = function seed() {
        zelf te worden neergezet, met echte tekenbevoegden. De demostand krijgt
        de steiger (lab, tekenaars, apparatuur, buurtvragen) maar nooit verzonnen
        onderzoeksresultaten -- zie de kop van ./livinglab.js. */
-    livingLab: { labs: [], studies: [], themas: [], apparatuur: [], audit: [], paspoorten: [] }
+    livingLab: { labs: [], studies: [], themas: [], apparatuur: [], audit: [], paspoorten: [] },
+    /* Ook de geseede muziek is demo-inhoud: in productie begint de zaal leeg
+       en vult hij zich met wat leden zelf uitgeven. De Media OS zegt in die
+       stand zelf wat er komt en hoe (kern/mediaos/index.js). */
+    muziekUitgaven: { lijst: [], reacties: {} }
   });
 };
 
@@ -38,6 +42,7 @@ function maakVolledigeSeed() {
     require('./leden'),
     require('./partners'),
     require('./leveranciers'),
-    require('./livinglab')
+    require('./livinglab'),
+    require('./media')
   );
 }

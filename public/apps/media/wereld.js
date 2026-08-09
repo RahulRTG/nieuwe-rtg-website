@@ -140,8 +140,25 @@
     tekenStanden(d);
     $('#uitleg').textContent = d.uitleg;
     var doos = $('#stukken'); doos.textContent = '';
-    if (!d.stukken.length) {
-      doos.appendChild(el('p', 'stil', 'Hier staat nog niets. Wat er komt, komt van makers die u volgt of van wat er nieuw bij komt.'));
+    /* Een lege stand is geen leeg raster: de server zegt wat hier komt, waarom
+       het er nu niet is, en welke stap dat opheft. Die tekst staat daar en niet
+       hier, want de reden hangt van de gegevens af (zie kern/mediaos/leeg.js). */
+    if (d.leeg) {
+      var kader = el('div', 'kader');
+      kader.style.gridColumn = '1 / -1';   // over de hele breedte, het is geen kaart tussen kaarten
+      kader.appendChild(el('b', null, d.leeg.titel));
+      kader.appendChild(el('p', 'stil', d.leeg.wat));
+      kader.appendChild(el('p', 'stil', d.leeg.waarom));
+      var rij = el('div', 'rij');
+      rij.style.display = 'flex'; rij.style.gap = '0.35rem'; rij.style.flexWrap = 'wrap'; rij.style.marginTop = '0.7rem';
+      (d.leeg.stappen || []).forEach(function (st) {
+        var a = document.createElement('a');
+        a.className = 'knop'; a.href = st.pad; a.textContent = st.tekst;
+        a.style.textDecoration = 'none'; a.style.display = 'inline-block';
+        rij.appendChild(a);
+      });
+      kader.appendChild(rij);
+      doos.appendChild(kader);
     }
     d.stukken.forEach(function (s) { doos.appendChild(kaart(s)); });
     $('#einde').textContent = d.einde;
@@ -160,7 +177,11 @@
       d.weggelaten.forEach(function (x) { k2.appendChild(el('p', 'stil', x.id + ' -- ' + x.reden)); });
       w.appendChild(k2);
     }
-    tekenRegelaars(d);
+    /* De regelaars horen bij UW wereld en niet bij die van uw werkgever: in de
+       stand Zaak staat wat uw organisatie publiceert, en "minder van deze
+       maker" slaat daar nergens op. De server stuurt daar dan ook geen
+       smaakprofiel mee, en dit scherm verzint er geen. */
+    if (d.smaak) tekenRegelaars(d); else $('#regelaars').hidden = true;
   }
   function haal() {
     api('wereld', { modus: modus }).then(teken);
@@ -169,7 +190,12 @@
   /* Wat blad.js (de lade met de hub, de maker en het bord) nodig heeft. Eén
      api-ingang en één speler voor het hele scherm; geen tweede exemplaar. */
   window.RTGMediaOS = { api: api, zeg: zeg, el: el, knop: knop, speel: S.speel, haal: haal,
-    kaart: kaart, stand: function () { return stand; } };
+    kaart: kaart, stand: function () { return stand; },
+    /* De lijsten- en deellaag (./lijst.js) praat ook met de GEWONE
+       gesprekken-endpoints, want er is maar een berichtenweg in dit huis.
+       Daarvoor heeft hij hetzelfde token nodig; een tweede uitlezing van
+       localStorage zou een tweede plek zijn die kan gaan afwijken. */
+    token: function () { return TOKEN; } };
 
   haal();
   /* Een stuk-id in de hash opent meteen de hub: zo kan een link naar één stuk

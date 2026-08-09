@@ -53,17 +53,33 @@ async function naarDeel(page, zoek) {
   /* Wachten tot het menu er IS. Het deelt het scherm pas in nadat de app zijn
      inhoud heeft opgebouwd, dus een aanroep vlak na de navigatie treft nog
      niets -- en dan blijft stilletjes het verkeerde deel open. Dat kostte hier
-     een ronde: de eerste versie riep alleen aan en keek niet of het lukte. */
-  const gelukt = await page.waitForFunction((z) => {
+     een ronde: de eerste versie riep alleen aan en keek niet of het lukte.
+
+     MAAR: NIET ELKE PAGINA KRIJGT EEN MENU, en dat is geen defect. Het
+     deelmenu doet met opzet niets bij minder dan drie delen ("dan is een menu
+     alleen maar drukte"), en het Klankwerk heeft er twee: een lijstvlak en een
+     werkvlak. Dan staat alles gewoon onder elkaar en werkt elke knop.
+
+     De kop hierboven beloofde die terugval ("valt terug op niets-doen als het
+     menu er (nog) niet is") maar de code eiste hem alsnog op: assert.ok op een
+     menu dat er nooit zou komen. Deze toets stond daardoor rood om een pagina
+     die het gewoon deed -- een belofte in tekst die geen belofte in code was
+     (LAT.md regel 6).
+
+     De tanden blijven: is er WEL een menu maar ontbreekt het gevraagde deel,
+     dan is dat een echte breuk en zakt hij nog steeds. */
+  const uitslag = await page.waitForFunction((z) => {
     if (!window.RTGDeel || !RTGDeel.delen) return false;
-    const id = RTGDeel.delen().find(d => d.includes(z));
-    if (!id) return false;
+    const alle = RTGDeel.delen();
+    if (!alle.length) return { menu: false };            // deze pagina heeft er geen
+    const id = alle.find(d => d.includes(z));
+    if (!id) return false;                                // nog aan het opbouwen: wachten
     RTGDeel.open(id);
-    return id;
+    return { menu: true, id };
   }, zoek, { timeout: 20000 }).then(h => h.jsonValue()).catch(() => null);
-  assert.ok(gelukt, 'het deel "' + zoek + '" is te openen (delen: ' +
+  assert.ok(uitslag, 'het deel "' + zoek + '" is te openen (delen: ' +
     JSON.stringify(await page.evaluate(() => window.RTGDeel ? RTGDeel.delen() : 'geen menu')) + ')');
-  await page.waitForTimeout(150);
+  if (uitslag.menu) await page.waitForTimeout(150);
 }
 
 test('Van lied naar zaal: zingen, samen maken, uitgeven en horen',
@@ -93,6 +109,26 @@ test('Van lied naar zaal: zingen, samen maken, uitgeven en horen',
     await page.click('#nieuw');
     await page.waitForFunction(() => document.querySelectorAll('#rack .kanaal').length >= 3,
       null, { timeout: 20000 });
+
+    /* WELKE VAN DE TWEE STANDEN GELDT HIER, met zoveel woorden. naarDeel()
+       hieronder werkt op twee manieren -- via het menu, of gewoon rechtstreeks
+       als er geen menu is -- en welke van de twee het is, hoort niet stil te
+       blijven staan.
+
+       Gemeten (niet aangenomen): de <main> van het Klankwerk draagt een <h1>,
+       een lijstvlak en een werkvlak. Geen van drieen is een sectie zoals het
+       deelmenu die kent (een losse .sec/h2/h3/h4-kop, of een kaart met een
+       eigen kop erin), dus het menu ziet NUL delen en bouwt niets. Dat hoort
+       ook: een studio is geen rol met secties maar een gereedschap met een
+       lijst ernaast.
+
+       Wat deze regel bewaakt is de dag dat dat verandert. Beproefd door drie
+       secties in die main te zetten: er komt een menu, en deze bewering zakt.
+       Dan is de navigatie van deze toets een herziening waard. */
+    const menuDelen = await page.evaluate(() => (window.RTGDeel && RTGDeel.delen) ? RTGDeel.delen() : null);
+    assert.deepEqual(menuDelen, [],
+      'het Klankwerk heeft te weinig delen voor een menu; alles staat onder elkaar (delen: ' +
+      JSON.stringify(menuDelen) + ')');
 
     /* ---- een heel lied, met een eigen zin ---- */
     await naarDeel(page, 'rahul-zet-iets-neer');

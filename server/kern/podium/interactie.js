@@ -4,11 +4,12 @@
    uit, en melden bij RTG-kantoor). Krijgt de gedeelde ctx van kern/podium/index.js. */
 module.exports = (ctx) => {
   const { db, save, schoon, id, nu, mag, lijsten, kanaalMet, isAbonnee, stuurRond, metIdem,
-    codenaamVan, sseToCustomer, sseToOffice, pay, herstelBoom, CADEAUS, CHAT_MAX, ABB_DAGEN } = ctx;
+    codenaamVan, sseToCustomer, sseToOffice, pay, herstelBoom, CADEAUS, CHAT_MAX, ABB_DAGEN,
+    zones, poort } = ctx;
 
   function chat(key, kid, tekst) {
-    const m = mag(key); if (!m.ok) return { status: 403, error: m.reden };
     const k = kanaalMet(kid); if (!k || !k.live) return { status: 409, error: 'Dit kanaal is nu niet live.' };
+    const m = poort.magKanaal(key, k); if (!m.ok) return { status: 403, error: m.reden };
     if ((k.geblokkeerd || []).includes(key)) return { status: 403, error: 'Dit kanaal is niet beschikbaar.' };
     if (k.key !== key && !(k.kijkers || {})[key]) return { status: 403, error: 'Kijk eerst mee met dit kanaal.' };
     tekst = schoon(tekst, 300); if (!tekst) return { status: 400, error: 'Leeg bericht.' };
@@ -19,8 +20,12 @@ module.exports = (ctx) => {
     return { status: 200, ok: true, regel };
   }
   async function cadeau(key, kid, cadeauId, idem) {
-    const m = mag(key); if (!m.ok) return { status: 403, error: m.reden };
     const k = kanaalMet(kid); if (!k || k.status !== 'goedgekeurd') return { status: 404, error: 'Kanaal niet gevonden.' };
+    const m = poort.magKanaal(key, k); if (!m.ok) return { status: 403, error: m.reden };
+    /* Niet elke wereld neemt fooien aan. Een town hall of een training hoort
+       geen cadeautjes te kennen; dat staat in de zonetabel en wordt hier
+       gevraagd, zodat de regel in de code zit en niet in een tekst. */
+    if (!poort.geldMag(k, 'cadeau')) return { status: 409, error: 'In deze zone gaan geen cadeaus.' };
     if (k.key === key) return { status: 400, error: 'Uzelf een cadeau geven kan niet.' };
     if ((k.geblokkeerd || []).includes(key)) return { status: 403, error: 'Dit kanaal is niet beschikbaar.' };
     const c = CADEAUS.find(x => x.id === cadeauId); if (!c) return { status: 400, error: 'Onbekend cadeau.' };
@@ -37,8 +42,9 @@ module.exports = (ctx) => {
     });
   }
   async function abonneer(key, kid, idem) {
-    const m = mag(key); if (!m.ok) return { status: 403, error: m.reden };
     const k = kanaalMet(kid); if (!k || k.status !== 'goedgekeurd') return { status: 404, error: 'Kanaal niet gevonden.' };
+    const m = poort.magKanaal(key, k); if (!m.ok) return { status: 403, error: m.reden };
+    if (!poort.geldMag(k, 'abonnement')) return { status: 409, error: 'In deze zone bestaat geen abonnement.' };
     if (k.key === key) return { status: 400, error: 'Dit is uw eigen kanaal.' };
     if ((k.geblokkeerd || []).includes(key)) return { status: 403, error: 'Dit kanaal is niet beschikbaar.' };
     if (!(k.abbCenten > 0)) return { status: 409, error: 'Dit kanaal heeft geen abonnement.' };
@@ -54,6 +60,11 @@ module.exports = (ctx) => {
     });
   }
 
+  /* Het kaartje (zone 'evenement') en de uitnodiging (zone 'besloten') staan in
+     ./toegang.js: twee manieren om binnen te komen die niets met de zaal zelf
+     te maken hebben, en dit bestand blijft er onder de omvangregel mee. */
+  const toegang = require('./toegang')(ctx);
+
   /* ---- veiligheid in de zaal: blokkeren en melden ---- */
   function blokkeer(key, kid, doelKey, aan) {
     const k = kanaalMet(kid); if (!k || k.key !== key) return { status: 403, error: 'Alleen de maker beheert het kanaal.' };
@@ -63,14 +74,19 @@ module.exports = (ctx) => {
     save(); return { status: 200, ok: true, geblokkeerd: k.geblokkeerd.length };
   }
   function meld(key, kid, reden) {
-    const m = mag(key); if (!m.ok) return { status: 403, error: m.reden };
     const k = kanaalMet(kid); if (!k) return { status: 404, error: 'Kanaal niet gevonden.' };
+    const m = poort.magKanaal(key, k); if (!m.ok) return { status: 403, error: m.reden };
     lijsten();
-    db.data.podiumMeldingen.push({ id: id(), kanaalId: k.id, kanaal: k.naam, van: codenaamVan(key), reden: schoon(reden, 300) || 'Geen reden opgegeven', at: nu() });
+    /* De melding draagt de ZONE mee, want hij hoort in de wachtrij van die
+       wereld. Een melding over een 18+-kanaal tussen de schoolstreams zetten,
+       is precies de vermenging die deze hele indeling moet voorkomen. */
+    db.data.podiumMeldingen.push({ id: id(), kanaalId: k.id, kanaal: k.naam, zone: zones.zoneVan(k),
+      van: codenaamVan(key), reden: schoon(reden, 300) || 'Geen reden opgegeven', at: nu() });
     db.data.podiumMeldingen = db.data.podiumMeldingen.slice(-200);
     save(); sseToOffice('sync', { scope: 'podium' });
     return { status: 200, ok: true };
   }
 
-  return { podiumChatStuur: chat, podiumCadeau: cadeau, podiumAbonneer: abonneer, podiumBlokkeer: blokkeer, podiumMeld: meld };
+  return { podiumChatStuur: chat, podiumCadeau: cadeau, podiumAbonneer: abonneer, podiumBlokkeer: blokkeer,
+    podiumMeld: meld, podiumKaartje: toegang.kaartje, podiumNodig: toegang.nodig };
 };

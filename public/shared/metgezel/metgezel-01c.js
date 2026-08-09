@@ -56,3 +56,69 @@
     meetRuimte();
     // de waarnemer meldt de allereerste opmaak niet altijd; daarom nog twee keer
     setTimeout(meetRuimte, 200); setTimeout(meetRuimte, 900);
+
+    /* RAHUL WIJKT VOOR EEN GEOPEND VENSTER.
+
+       Het blok staat op z-index 9980 en zweeft daarmee boven vrijwel elk
+       venster in dit huis (de bladen van Clips staan bijvoorbeeld op 10). Dat
+       is te zien EN te merken: een venster dat onderaan opent -- en dat zijn ze
+       hier allemaal, het is een telefoon-vorm -- krijgt zijn onderste knoppen
+       onder de balk. In Clips is dat letterlijk de knop "Sluit"; die was met
+       een vinger niet te raken en in een schermtoets niet aan te klikken
+       ("intercepts pointer events").
+
+       De oorzaak zit niet in die vensters maar hier: een laag die overal
+       bovenop ligt, hoort opzij te gaan zodra iemand ergens middenin zit. Dus
+       niet elk venster een hogere z-index geven (dat zijn drieentwintig
+       plekken die uiteen gaan lopen), maar op DEZE plek even wijken en daarna
+       gewoon terugkomen.
+
+       Wat telt als geopend venster: role="dialog", aria-modal="true" of een
+       <dialog open>. Zichtbaarheid wordt GEMETEN, want die bladen staan altijd
+       in de HTML en gaan open met een klasse.
+
+       En dat meten moet met getClientRects() en niet met offsetParent, hoe
+       gebruikelijk dat laatste ook is: bij een element met position:fixed --
+       en dat zijn deze bladen allemaal -- is offsetParent ALTIJD null. Die
+       controle wees dus precies het geval af waar hij voor bedoeld was, en
+       zag er ondertussen keurig uit. */
+    function zichtbaarVenster() {
+      var lijst = document.querySelectorAll('[role="dialog"],[aria-modal="true"],dialog[open]');
+      for (var i = 0; i < lijst.length; i++) {
+        var v = lijst[i];
+        if (v === blok || blok.contains(v)) continue;            // zijn eigen blad telt niet
+        if (v.hidden) continue;
+        if (v.getClientRects().length) return true;   // leeg bij display:none
+      }
+      return false;
+    }
+    var wijkt = null;
+    function wijkOfNiet() {
+      var moet = zichtbaarVenster();
+      if (moet === wijkt) return;
+      wijkt = moet;
+      blok.style.display = moet ? 'none' : '';
+      /* De losse pillen (de Samen-knop uit metgezel-03) staan op dezelfde
+         hoogte en zweven dus even hard; de lippen zelf zitten IN het blok en
+         gaan vanzelf mee. */
+      var pillen = document.querySelectorAll('.mgz-knop');
+      for (var p = 0; p < pillen.length; p++) pillen[p].style.display = moet ? 'none' : '';
+      meetRuimte();
+    }
+    /* Op de tel gehouden en niet op elke mutatie: deze waarnemer draait op elk
+       scherm, en de vraag zelf is een querySelectorAll. Een venster gaat open
+       op een tik, dus 150 ms is ruim binnen wat iemand merkt. */
+    var wijkKlok = null;
+    function laterKijken() {
+      if (wijkKlok) return;
+      wijkKlok = setTimeout(function () { wijkKlok = null; wijkOfNiet(); }, 150);
+    }
+    if (window.MutationObserver) {
+      try {
+        new MutationObserver(laterKijken).observe(document.body, {
+          subtree: true, childList: true,
+          attributes: true, attributeFilter: ['class', 'hidden', 'style', 'open', 'role', 'aria-modal']
+        });
+      } catch (e) { /* zonder waarnemer blijft alles zoals het was */ }
+    }
+    wijkOfNiet();

@@ -8,7 +8,9 @@
    en bij moderatie is dat de gevaarlijkste soort. */
 module.exports = (kern) => {
   const { app, auth, mediaWereld, mediaStuk, mediaMaker, mediaVolg, mediaMeldZet,
-    mediaBieb, mediaBewaar, mediaSmaakVan, mediaSmaakStuur, mediaBord } = kern;
+    mediaBieb, mediaBewaar, mediaSmaakVan, mediaSmaakStuur, mediaBord,
+    mediaLijsten, mediaLijst, mediaLijstMaak, mediaLijstZet, mediaLijstStuk, mediaLijstDeel,
+    mediaSamenStart, mediaSamenNodig, mediaSamenIn, mediaSamenUit, mediaSamenZet, mediaSamenMijn } = kern;
   if (!mediaWereld) return;
   const stuur = (res, r) => r && r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const geenGast = (req, res) => {
@@ -55,6 +57,69 @@ module.exports = (kern) => {
   app.post('/api/mediaos/bewaar', auth, (req, res) => {
     if (geenGast(req, res)) return;
     stuur(res, mediaBewaar(sess(req), req.body || {}));
+  });
+
+  /* Afspeellijsten over de vier vormen heen. Een lijst bewaart alleen id's en
+     wordt opgelost met de sessie van de LEZER -- er is dus geen weg om via een
+     lijst iets binnen te halen wat de wereld u weigert. Veranderen doet alleen
+     de eigenaar; delen (hieronder) is LEZEN. */
+  app.post('/api/mediaos/lijsten', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, mediaLijsten(sess(req)));
+  });
+  app.post('/api/mediaos/lijst', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, mediaLijst(sess(req), String((req.body || {}).id || '')));
+  });
+  app.post('/api/mediaos/lijst/maak', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, mediaLijstMaak(sess(req), req.body || {}));
+  });
+  app.post('/api/mediaos/lijst/zet', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, mediaLijstZet(sess(req), req.body || {}));
+  });
+  app.post('/api/mediaos/lijst/stuk', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, mediaLijstStuk(sess(req), req.body || {}));
+  });
+
+  /* Een lijst delen: met iemand met wie u verbonden bent, en om te LEZEN. De
+     ander lost de stukken op met zijn eigen sessie, dus een gedeelde lijst is
+     geen doorgeefluik langs een dichte deur. ASYNC: de gids die een codenaam
+     aan een sleutel koppelt is async. */
+  app.post('/api/mediaos/lijst/deel', auth, async (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, await mediaLijstDeel(sess(req), req.body || {}));
+  });
+
+  /* De luisterkamer: samen luisteren of kijken. De kamer deelt de AANWIJZER
+     (welk stuk, welke seconde, spelend of stil) en niet het geluid -- iedereen
+     speelt af met zijn eigen middelen, en wie het stuk niet mag openen krijgt
+     de reden in plaats van een zwart scherm. */
+  app.post('/api/mediaos/samen/mijn', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, mediaSamenMijn(sess(req)));
+  });
+  app.post('/api/mediaos/samen/start', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, mediaSamenStart(sess(req), req.body || {}));
+  });
+  app.post('/api/mediaos/samen/nodig', auth, async (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, await mediaSamenNodig(sess(req), req.body || {}));
+  });
+  app.post('/api/mediaos/samen/in', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, mediaSamenIn(sess(req), String((req.body || {}).id || '')));
+  });
+  app.post('/api/mediaos/samen/uit', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, mediaSamenUit(sess(req), String((req.body || {}).id || '')));
+  });
+  app.post('/api/mediaos/samen/zet', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, mediaSamenZet(sess(req), req.body || {}));
   });
 
   /* De regelaars van het eigen profiel: meer, minder, nooit, verras me, wissen.

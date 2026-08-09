@@ -9,7 +9,9 @@ module.exports = (kern) => {
     theaterKanaalMaak, theaterOfficeLijst, theaterOfficeBeslis, theaterVideoMaak,
     theaterVideoUpload, theaterVerwijder, theaterStreamVan, theaterZaal,
     theaterAbonneer, theaterReactie, theaterReacties, theaterMeld,
-    theaterThuisAanwezig, theaterSignaal } = kern;
+    theaterThuisAanwezig, theaterSignaal, theaterZaakMaak, theaterZaakZaal,
+    theaterKijkplichtZet, theaterKijkplichtGedaan, theaterKijkplichtMijn, theaterKijkplichtStand,
+    theaterHuisstijl } = kern;
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const geenGast = (req, res) => {
     if (req.session.tier === 'guest') { res.status(403).json({ error: 'Het Theater is voor leden.' }); return true; }
@@ -83,7 +85,7 @@ module.exports = (kern) => {
   app.get('/api/theater/kijk/:id', kijkRem, (req, res) => {
     const sess = resolveSession(req.query.token);
     if (!sess || sess.tier === 'guest') return res.status(401).end();
-    const v = theaterStreamVan(String(req.params.id || ''));
+    const v = theaterStreamVan(String(req.params.id || ''), sess.key);
     if (!v) return res.status(404).end();
     const range = /^bytes=(\d*)-(\d*)$/.exec(String(req.headers.range || ''));
     if (range && (range[1] || range[2])) {
@@ -96,6 +98,45 @@ module.exports = (kern) => {
     }
     res.writeHead(200, { 'Content-Type': v.type, 'Accept-Ranges': 'bytes', 'Content-Length': v.bytes });
     fs.createReadStream(v.pad).pipe(res);
+  });
+
+  /* Media for Business, opgenomen kant: de interne bibliotheek van een
+     organisatie. Wie er werkt kijkt; wie er niet werkt komt er niet in, ook
+     niet met het id -- en de bytes-route vraagt het opnieuw. */
+  app.post('/api/theater/zaak', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, theaterZaakZaal(req.session.key));
+  });
+  app.post('/api/theater/zaak/aanmeld', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, theaterZaakMaak(req.session.key, req.body || {}));
+  });
+
+  /* De huisstijl van de interne wereld: naam, payoff, kleur, thema en logo van
+     de organisatie. Binnen HAAR eigen blok -- de rest van de app blijft van
+     RTG, en een eigen domein bestaat hier niet (kern/theater/huisstijl.js). */
+  app.post('/api/theater/huisstijl', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, theaterHuisstijl(req.session.key, req.body || {}));
+  });
+
+  /* Wat uw werk u vraagt te bekijken. De medewerker tekent ZELF af; er wordt
+     geen kijkgedrag gemeten, en beide kanten lezen dezelfde lijst. */
+  app.post('/api/theater/kijkplicht/mijn', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, theaterKijkplichtMijn(req.session.key));
+  });
+  app.post('/api/theater/kijkplicht/gedaan', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, theaterKijkplichtGedaan(req.session.key, req.body || {}));
+  });
+  app.post('/api/theater/kijkplicht/zet', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, theaterKijkplichtZet(req.session.key, req.body || {}));
+  });
+  app.post('/api/theater/kijkplicht/stand', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, theaterKijkplichtStand(req.session.key, String((req.body || {}).zaakCode || '')));
   });
 
   // de kantoorkant: kanalen goedkeuren, meldingen zien, verwijderen

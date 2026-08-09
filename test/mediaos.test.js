@@ -144,15 +144,36 @@ test('2c. volgen zet nu ook het Theaterkanaal, in het domein zelf', async () => 
   assert.equal(s.band, 0, 'wie u volgt staat vooraan');
 });
 
-test('3. een bron die dicht is, valt niet stil weg maar staat erbij met reden', async () => {
-  // het Podium eist 18+ en verificatie; dit lid heeft dat niet
-  const podium = await api('/api/podium/kanalen', {}, kijker);
-  assert.equal(podium.status, 403, 'het Podium weigert dit lid');
-  assert.ok(podium.body.error, 'met een reden');
-  const w = await api('/api/mediaos/wereld', { modus: 'kijk' }, kijker);
-  const buiten = w.body.buiten.find(b => b.vorm === 'live');
-  assert.ok(buiten, 'de wereld meldt dat de live-bron buiten staat');
-  assert.equal(buiten.reden, podium.body.error, 'met exact de reden van het Podium zelf');
+test('3. een bron die dicht of stuk is, valt niet stil weg maar staat erbij met reden', () => {
+  /* DIT WAS EEN ROUTETOETS EN IS NU EEN DIRECTE. De reden: het Podium is sinds
+     de zone-indeling niet meer als geheel dicht (kern/podium/zones.js) -- de
+     open wereld staat open voor elk lid, en alleen de 18+-zone heeft nog de
+     oude deur. Daarmee was er via de route geen dichte bron meer om deze
+     eigenschap op te hangen, en een toets die niets meer kan aantonen hoort
+     niet blijven staan omdat hij groen is.
+
+     Wat bewezen moet blijven is de eigenschap zelf: valt een bron weg, dan
+     verdwijnt hij niet stil uit de wereld maar staat hij eronder met de reden
+     van dat domein zelf (LAT.md regel 5). Dat is hier met een kapotte en een
+     weigerende bron nagegaan. */
+  const { maakCatalogus } = require('../server/kern/mediaos/catalogus');
+  const sess = { key: 'user-1' };
+  const leeg = { uitgaven: [] };
+  const cat = maakCatalogus({ bronnen: {
+    tracks: () => leeg,
+    videos: () => ({ error: 'Activeer eerst uw RTG-geverifieerde paspoort.' }),
+    clips: () => { throw new Error('de clipsdienst antwoordt niet'); },
+    live: () => ({ kanalen: [] })
+  } });
+  const uit = cat.alles(sess);
+  assert.deepEqual(uit.rijen, [], 'er is niets te tonen');
+  const video = uit.buiten.find(b => b.vorm === 'video');
+  assert.ok(video, 'een weigerende bron staat erbij');
+  assert.equal(video.reden, 'Activeer eerst uw RTG-geverifieerde paspoort.', 'met exact de reden van dat domein');
+  const clip = uit.buiten.find(b => b.vorm === 'clip');
+  assert.ok(clip, 'en een bron die stuk gaat ook');
+  assert.match(clip.reden, /antwoordt niet/, 'met de fout erin, in plaats van een lege lijst');
+  assert.ok(!uit.buiten.some(b => b.vorm === 'track' || b.vorm === 'live'), 'wat het wel doet, staat er niet bij');
 });
 
 test('4. volgen schrijft in het domein zelf, niet in een tweede lijst', async () => {
@@ -309,6 +330,88 @@ test('11c. nieuw werk wekt de volgers die dat soort aan hebben staan -- en niema
   assert.ok(!(await melding(maker)).some(n => n.title === 'RTG Media'), 'geen melding over je eigen werk');
   await api('/api/theater/abonneer', { kanaalId, aan: false }, maker);
   await api('/api/clips/weg', { id: clip.body.id }, maker);
+});
+
+test('11d. een lege stand zegt wat er komt en waarom hij leeg is', async () => {
+  /* De kale gebruiker ziet in FLOW niets: er is geen clip van iemand anders.
+     Dan hoort er geen leeg raster te staan maar uitleg -- wat hier komt,
+     waarom het er nu niet is, en een stap die echt bestaat. */
+  const flow = await api('/api/mediaos/wereld', { modus: 'flow' }, kale);
+  assert.equal(flow.body.stukken.length, 0);
+  assert.ok(flow.body.leeg, 'een lege stand draagt uitleg');
+  assert.equal(flow.body.leeg.reden, 'niets');
+  assert.match(flow.body.leeg.wat, /toestel van de maker/, 'en zegt waarom dat zo werkt');
+  /* En NIET de reden van een andere stand: het Podium staat voor dit lid dicht
+     (geen geverifieerd paspoort), maar live hoort niet in FLOW. Een scherm dat
+     vriendelijk de verkeerde deur aanwijst, stuurt iemand de verkeerde kant op. */
+  assert.ok(!/paspoort/.test(flow.body.leeg.waarom), 'geen deur van een andere stand erbij gehaald');
+  assert.ok(flow.body.leeg.stappen.length >= 1, 'met een stap die echt bestaat');
+  for (const st of flow.body.leeg.stappen) {
+    assert.match(st.pad, /^\/apps\/[a-z]+\.html$/);
+    assert.ok(fs.existsSync(path.join(__dirname, '..', 'public', st.pad)), st.pad + ' bestaat als scherm');
+  }
+
+  // en zodra er iets staat, verdwijnt de lege stand
+  const muziek = await api('/api/mediaos/wereld', { modus: 'muziek' }, kale);
+  assert.ok(muziek.body.stukken.length > 0, 'muziek staat er wel: die stand vult de eigen klankmotor');
+  assert.equal(muziek.body.leeg, null, 'dan hoort er geen lege stand te staan');
+});
+
+test('11e. de drie redenen van een lege stand, elk apart', () => {
+  /* De keuze tussen die redenen is pure rekenkunde en hoort los getoetst: via
+     de route krijg je er hooguit een te pakken, want de andere twee vragen een
+     wereld die je in dezelfde installatie niet tegelijk hebt. */
+  const { legeStand } = require('../server/kern/mediaos/leeg');
+  const dichtLive = [{ vorm: 'live', vormNaam: 'Live', reden: 'Activeer eerst uw paspoort.' }];
+
+  const niets = legeStand('flow', dichtLive, [], ['clip']);
+  assert.equal(niets.reden, 'niets', 'een dichte bron van een ANDERE stand telt hier niet');
+  assert.ok(!/paspoort/.test(niets.waarom));
+
+  const deur = legeStand('kijk', dichtLive, [], ['video', 'live']);
+  assert.equal(deur.reden, 'deur');
+  assert.match(deur.waarom, /Live: Activeer eerst uw paspoort\./, 'met de reden van het domein zelf');
+
+  const ikzelf = legeStand('flow', dichtLive, [{ id: 'clip:a', reden: 'u wilt niets van X' }], ['clip']);
+  assert.equal(ikzelf.reden, 'ikzelf', 'uw eigen regelaars gaan voor: die kunt u zelf terugdraaien');
+  assert.match(ikzelf.waarom, /1 stuk\)/);
+  assert.equal(legeStand('flow', dichtLive, [{}, {}], ['clip']).waarom.includes('2 stukken'), true);
+});
+
+test('11f. de stand MUZIEK is nooit leeg op een demo-installatie, en het speelt echt', async () => {
+  /* Van de vier vormen is muziek de enige die dit huis ZELF kan opwekken: een
+     uitgave is geen bestand maar een rij getallen die het toestel uitrekent.
+     Daarom staan er vijf geseede stukken (server/seed/media.js) en de andere
+     drie standen niet -- een geseede clip zou eeuwig "maker offline" zijn.
+
+     Deze toets kijkt of ze er staan EN of ze klinken: een uitgave zonder noten
+     is een kaart met een knop die niets doet. */
+  const w = await api('/api/mediaos/wereld', { modus: 'muziek' }, kale);
+  const namen = w.body.stukken.map(x => x.titel);
+  for (const naam of ['Avondlicht', 'Kade bij nacht', 'Ochtendrust', 'Zonsopgang boven de baai', 'Late vergadering']) {
+    assert.ok(namen.includes(naam), naam + ' staat in de stand MUZIEK');
+  }
+  const avond = w.body.stukken.find(x => x.titel === 'Avondlicht');
+  assert.equal(avond.spelen.soort, 'motor');
+  const speel = await api('/api/muziek/uitgave', { id: avond.spelen.bron }, kale);
+  assert.equal(speel.status, 200);
+  const kanalen = speel.body.uitgave.kanalen || [];
+  assert.ok(kanalen.length >= 4, 'er zitten echte kanalen in (' + kanalen.length + ')');
+  const gevuld = kanalen.filter(k => (k.stappen || []).length || (k.noten || []).length);
+  assert.equal(gevuld.length, kanalen.length, 'en elk kanaal draagt stappen of noten -- anders klinkt er niets');
+  assert.equal(speel.body.uitgave.stappen, 16 * speel.body.uitgave.maten);
+
+  // de tempo's verschillen per stijl; vijf keer hetzelfde getal zou een tabel zijn die niet leest
+  const bpms = new Set(w.body.stukken.filter(x => /Avondlicht|Kade|Ochtendrust|Zonsopgang|Late verg/.test(x.titel))
+    .map(x => Number((x.meta.match(/^(\d+) slagen/) || [])[1])));
+  assert.ok(bpms.size >= 3, 'de stukken staan niet allemaal op hetzelfde tempo (' + [...bpms].join(',') + ')');
+
+  // en in productie begint het huis leeg: demo-inhoud hoort daar niet
+  const versProces = require('child_process').execFileSync(process.execPath,
+    ['-e', 'process.env.NODE_ENV="production"; delete process.env.RTG_DEMO;' +
+      ' console.log(require("' + path.join(__dirname, '..', 'server', 'seed').replace(/\\/g, '/') + '")().muziekUitgaven.lijst.length)'],
+    { encoding: 'utf8' }).trim();
+  assert.equal(versProces, '0', 'in productie staat er geen geseede muziek');
 });
 
 test('11b. Rahul kan hier zelf aan draaien: de paden staan op zijn kaart', async () => {

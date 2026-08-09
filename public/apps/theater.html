@@ -94,6 +94,16 @@
     <h2>Nieuw in de zaal</h2>
     <div class="films" id="filmsNieuw"></div>
     <p class="stil weg" id="leeg">Nog geen video's in de zaal. Start uw eigen kanaal hieronder.</p>
+    <!-- Media for Business: de interne bibliotheek van de zaak waar u werkt -->
+    <section id="blokZaak" class="weg">
+      <h2 id="zaakKop">Van uw werk</h2>
+      <p class="stil" id="zaakPayoff"></p>
+      <p class="stil" id="zaakUitleg"></p>
+      <div class="films" id="filmsZaak"></div>
+      <!-- wat uw werk u vraagt te bekijken; u tekent zelf af -->
+      <div id="kijkplicht"></div>
+      <div id="zaakBeheer"></div>
+    </section>
     <h2>Mijn kanaal</h2>
     <div id="mijnBlok"></div>
   </section>
@@ -165,8 +175,195 @@
     for (const v of zaal.abonnementen || []) abb.appendChild(filmKnop(v));
     for (const v of zaal.nieuw || []) nieuw.appendChild(filmKnop(v));
     $('#leeg').classList.toggle('weg', !!((zaal.nieuw || []).length + (zaal.abonnementen || []).length));
+    /* Eerst de zakenstand, dan pas het eigen blok: de keuze "waar komt deze
+       video" wordt in tekenMijn() opgebouwd en heeft die stand nodig. Andersom
+       verschijnt de keuze pas na een herlaadbeurt -- precies het soort stille
+       halve werking waar niemand een melding van krijgt. */
+    await laadZaak();
     tekenMijn();
     toon('vZaal');
+  }
+
+  /* ---------- Media for Business: de interne bibliotheek van uw organisatie ----------
+     Wat hier staat is INTERN gepubliceerd en staat in geen enkele openbare
+     lijst -- ook de bytes zitten achter dezelfde deur (server/kern/theater/
+     zaak.js). Dit blok verschijnt alleen bij wie ergens werkt; wie nergens
+     werkt hoort geen tab te zien die altijd nee zegt. */
+  let zaakStand = null;
+  async function laadZaak() {
+    const r = await api('zaak');
+    zaakStand = r.body || {};
+    const blok = $('#blokZaak');
+    blok.classList.toggle('weg', !zaakStand.mag);
+    if (!zaakStand.mag) return;
+    $('#zaakUitleg').textContent = zaakStand.uitleg || '';
+    tekenMerk();
+    const doos = $('#filmsZaak'); doos.innerHTML = '';
+    for (const v of (zaakStand.videos || [])) doos.appendChild(filmKnop(v));
+    if (!(zaakStand.videos || []).length) {
+      const p = document.createElement('p'); p.className = 'stil';
+      p.textContent = 'Uw organisatie heeft nog geen interne video.';
+      doos.appendChild(p);
+    }
+    await laadKijkplicht();
+    const beheer = $('#zaakBeheer'); beheer.innerHTML = '';
+    for (const z of (zaakStand.zaken || [])) {
+      if (z.leiding && z.bibliotheek) beheer.appendChild(merkBeheer(z));
+      if (!z.leiding || z.bibliotheek) continue;
+      const kaart = document.createElement('div'); kaart.className = 'kaart';
+      kaart.innerHTML = '<p class="stil">' + esc(z.naam) + ' heeft nog geen interne bibliotheek. ' +
+        'U heeft er de leiding, dus u kunt er een beginnen. RTG-kantoor keurt hem eerst goed, zoals elk kanaal.</p>' +
+        '<div class="rij"><button class="knop vol" type="button">Begin de interne bibliotheek</button></div>';
+      kaart.querySelector('button').addEventListener('click', async () => {
+        const r2 = await api('zaak/aanmeld', { zaakCode: z.code, naam: z.naam });
+        zeg(r2.body.error || 'Aangemeld. RTG-kantoor kijkt er persoonlijk naar.');
+        laadZaak();
+      });
+      beheer.appendChild(kaart);
+    }
+  }
+  /* WAT UW WERK U VRAAGT TE BEKIJKEN. Twee kanten van dezelfde lijst: de
+     medewerker tekent zelf af, de leiding ziet wie dat gedaan heeft. Wat er
+     NIET gebeurt is kijkgedrag meten -- geen kijktijd, geen weergaven, geen
+     apparaat. Dat staat er ook bij, aan allebei de kanten, want een belofte
+     die alleen in de code staat leest niemand. */
+  async function laadKijkplicht() {
+    const el = $('#kijkplicht'); el.innerHTML = '';
+    const r = await api('kijkplicht/mijn');
+    const rijen = (r.body || {}).rijen || [];
+    if (rijen.length) {
+      const kaart = document.createElement('div'); kaart.className = 'kaart';
+      kaart.innerHTML = '<b>Uw werk vraagt u dit te bekijken</b><p class="stil">' + esc(r.body.uitleg) + '</p>';
+      for (const rij of rijen) {
+        const regel = document.createElement('div'); regel.className = 'rij';
+        const naam = document.createElement('span'); naam.className = 'stil'; naam.style.flex = '1';
+        naam.textContent = (rij.titel || '(video weggehaald)') + ' · ' + rij.zaakNaam +
+          (rij.uiterlijk ? ' · uiterlijk ' + rij.uiterlijk : '') +
+          (rij.gedaan ? ' · afgetekend op ' + String(rij.gedaanOp).slice(0, 10) : '');
+        regel.appendChild(naam);
+        if (rij.titel) {
+          const kijk = document.createElement('button'); kijk.type = 'button'; kijk.className = 'knop';
+          kijk.textContent = 'Bekijk';
+          kijk.addEventListener('click', () => { const v = (zaakStand.videos || []).find(x => x.id === rij.videoId); if (v) kijk(v); });
+          regel.appendChild(kijk);
+        }
+        const af = document.createElement('button'); af.type = 'button';
+        af.className = 'knop' + (rij.gedaan ? '' : ' vol');
+        af.textContent = rij.gedaan ? 'Teken terug' : 'Ik heb dit gezien';
+        af.addEventListener('click', async () => {
+          const g = await api('kijkplicht/gedaan', { id: rij.id, aan: !rij.gedaan });
+          zeg(g.body.error || g.body.let || 'Vastgelegd.');
+          laadKijkplicht();
+        });
+        regel.appendChild(af);
+        kaart.appendChild(regel);
+      }
+      el.appendChild(kaart);
+    }
+    // en de kant van de leiding: dezelfde lijst, met wie er heeft afgetekend
+    for (const z of ((zaakStand && zaakStand.zaken) || [])) {
+      if (!z.leiding) continue;
+      const st = await api('kijkplicht/stand', { zaakCode: z.code });
+      if (st.body.error) continue;
+      const kaart = document.createElement('div'); kaart.className = 'kaart';
+      kaart.innerHTML = '<b>Werklijst van ' + esc(z.naam) + '</b><p class="stil">' + esc(st.body.uitleg) + '</p>';
+      for (const rij of (st.body.lijst || [])) {
+        const gedaan = rij.mensen.filter(m => m.gedaan).length;
+        const kan = rij.mensen.filter(m => m.gekoppeld).length;
+        const p = document.createElement('p'); p.className = 'stil';
+        p.textContent = (rij.titel || '(video weggehaald)') + ' · ' + gedaan + ' van ' + kan +
+          ' afgetekend' + (kan < rij.mensen.length ? ' (' + (rij.mensen.length - kan) + ' zonder gekoppeld account)' : '') +
+          (rij.uiterlijk ? ' · uiterlijk ' + rij.uiterlijk : '');
+        kaart.appendChild(p);
+        const wie = document.createElement('p'); wie.className = 'stil';
+        wie.textContent = rij.mensen.map(m => m.naam + (m.gekoppeld ? (m.gedaan ? ' ✓' : ' --') : ' (geen account)')).join(' · ');
+        kaart.appendChild(wie);
+        const weg = document.createElement('button'); weg.type = 'button'; weg.className = 'knop';
+        weg.textContent = 'Haal van de lijst';
+        weg.addEventListener('click', async () => {
+          const w = await api('kijkplicht/zet', { zaakCode: z.code, id: rij.id, weg: true });
+          zeg(w.body.error || 'Van de lijst gehaald. De video zelf blijft staan.');
+          laadZaak();
+        });
+        kaart.appendChild(weg);
+      }
+      // en er een toevoegen uit de eigen interne bibliotheek
+      const eigenVideos = (zaakStand.videos || []).filter(v => v.zaakCode === z.code);
+      if (eigenVideos.length) {
+        const kies = document.createElement('select');
+        kies.innerHTML = eigenVideos.map(v => '<option value="' + esc(v.id) + '">' + esc(v.titel) + '</option>').join('');
+        const knop = document.createElement('button'); knop.type = 'button'; knop.className = 'knop vol';
+        knop.textContent = 'Zet op de werklijst';
+        knop.addEventListener('click', async () => {
+          const z2 = await api('kijkplicht/zet', { zaakCode: z.code, videoId: kies.value });
+          zeg(z2.body.error || 'Op de werklijst gezet.');
+          laadZaak();
+        });
+        const rij2 = document.createElement('div'); rij2.className = 'rij';
+        rij2.appendChild(kies); rij2.appendChild(knop);
+        kaart.appendChild(rij2);
+      }
+      el.appendChild(kaart);
+    }
+  }
+
+  /* DE HUISSTIJL VAN DE ORGANISATIE -- binnen haar eigen blok, en verder
+     nergens. De balk, de navigatie en de rest van dit scherm blijven van RTG:
+     een tenant die de hele app kan omverven, kan een lid laten denken dat hij
+     ergens anders is dan hij is. Een eigen DOMEIN bestaat hier niet, en de
+     server zegt dat er zelf bij (server/kern/theater/huisstijl.js) -- dus
+     staat die zin ook op het scherm en niet alleen in een README. */
+  function tekenMerk() {
+    const blok = $('#blokZaak');
+    const k = ((zaakStand && zaakStand.kanalen) || [])[0];
+    const h = k && k.huisstijl;
+    blok.style.removeProperty('--zaakAccent');
+    if (!h) { $('#zaakKop').textContent = 'Van uw werk'; $('#zaakPayoff').textContent = ''; return; }
+    $('#zaakKop').textContent = h.naam;
+    $('#zaakPayoff').textContent = h.payoff || '';
+    blok.style.setProperty('--zaakAccent', h.accent);
+    blok.style.borderLeft = '3px solid ' + h.accent;
+    blok.style.paddingLeft = '0.8rem';
+    if (h.logo) {
+      const beeld = document.createElement('img');
+      beeld.src = h.logo; beeld.alt = h.naam; beeld.style.maxHeight = '2.2rem';
+      beeld.style.display = 'block'; beeld.style.marginBottom = '0.4rem';
+      $('#zaakKop').prepend(beeld);
+    }
+  }
+  /* De leiding stelt hem in. Het veld voor het logo is er met opzet NIET: een
+     beeld uploaden is een eigen weg met een eigen grens, en die staat hier niet.
+     Naam, payoff, kleur en thema zijn wat een scherm eerlijk kan aanbieden. */
+  function merkBeheer(z) {
+    const kaart = document.createElement('div'); kaart.className = 'kaart';
+    const h = (((zaakStand.kanalen || []).find(k => k.zaakCode === z.code) || {}).huisstijl) || {};
+    kaart.innerHTML = '<b>De naam en kleur van ' + esc(z.naam) + '</b>' +
+      '<p class="stil">' + esc(h.let || '') + '</p>' +
+      '<label for="mNaam2">Naam boven uw interne wereld</label><input id="mNaam2" maxlength="60" value="' + esc(h.naam || '') + '">' +
+      '<label for="mPayoff">Payoff</label><input id="mPayoff" maxlength="100" value="' + esc(h.payoff || '') + '">' +
+      '<label for="mAccent">Accentkleur (hexcode)</label><input id="mAccent" maxlength="7" value="' + esc(h.accent || '') + '">' +
+      '<div class="rij"><button class="knop vol" type="button">Bewaar de huisstijl</button></div>';
+    kaart.querySelector('button').addEventListener('click', async () => {
+      const r = await api('huisstijl', { zaakCode: z.code, naam: kaart.querySelector('#mNaam2').value,
+        payoff: kaart.querySelector('#mPayoff').value, accent: kaart.querySelector('#mAccent').value });
+      zeg(r.body.error || 'Bewaard.');
+      if (!r.body.error) laadZaak();
+    });
+    return kaart;
+  }
+
+  /* Waar publiceert deze video naartoe? Standaard het eigen kanaal; wie de
+     leiding heeft over een goedgekeurde interne bibliotheek kan die kiezen.
+     Het staat er UITDRUKKELIJK bij, want een video die stilletjes in de
+     verkeerde wereld landt is precies de fout die je pas merkt als de
+     verkeerde mensen meekijken. */
+  function zaakKeuze() {
+    const rijen = ((zaakStand && zaakStand.kanalen) || []).filter(k => k.leiding && k.status === 'goedgekeurd');
+    if (!rijen.length) return '';
+    return '<label for="vDoel">Waar komt deze video?</label><select id="vDoel">' +
+      '<option value="">Mijn eigen kanaal (openbaar)</option>' +
+      rijen.map(k => '<option value="' + esc(k.id) + '">Intern: ' + esc(k.zaakNaam) + '</option>').join('') +
+      '</select>';
   }
 
   /* Meenemen (shared/uitvoer.js): de zaal is een catalogus, en die neemt een
@@ -213,6 +410,7 @@
     kaart.innerHTML = '<p class="stil"><strong>' + esc(m.naam) + '</strong> · ' + m.volgers + ' abonnees · ' +
       m.gebruiktMb + ' van ' + m.maxMb + ' MB gebruikt</p>' +
       '<label for="vTitel">Titel van de nieuwe video</label><input id="vTitel" maxlength="80">' +
+      zaakKeuze() +
       '<label for="vBewaring">Waar bewaren we het origineel?</label>' +
       '<select id="vBewaring">' +
       '<option value="rtg">In de RTG-zaal (altijd beschikbaar)</option>' +
@@ -281,6 +479,9 @@
     if (bewaring === 'thuis') {
       /* Het Thuisarchief: het origineel gaat naar het eigen bestandssysteem
          van de browser (OPFS); bij RTG landen alleen titel en affiche. */
+      /* Het Thuisarchief kan NIET intern: die bytes blijven op het toestel van
+         de maker en gaan p2p naar de kijker, dus de deur van de organisatie
+         zou er niet omheen zitten. Beloof dat dan ook niet. */
       const kaart = await api('video/maak', { titel, duurS: duurS || 0, poster, bewaring: 'thuis',
         mbGeschat: Math.max(1, Math.round(blob.size / 1048576)) });
       if (kaart.body.error) return zeg(kaart.body.error);
@@ -295,7 +496,9 @@
       laadZaal();
       return;
     }
-    const kaart = await api('video/maak', { titel, duurS: duurS || 0, poster });
+    // het gekozen doel: leeg = het eigen (openbare) kanaal, anders de interne bibliotheek
+    const doel = (($('#vDoel') || {}).value || '') || undefined;
+    const kaart = await api('video/maak', { titel, duurS: duurS || 0, poster, kanaalId: doel });
     if (kaart.body.error) return zeg(kaart.body.error);
     // rauwe bytes met voortgang (XHR kan uploadvoortgang tonen, fetch niet)
     const balk = $('#vVoortgang'); balk.classList.add('zien');

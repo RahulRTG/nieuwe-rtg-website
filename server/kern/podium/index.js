@@ -31,12 +31,8 @@ const KIJKER_TTL_MS = 90 * 1000;   // wie zich 90s niet meldt is weg
 const CHAT_MAX = 200;
 const ABB_DAGEN = 30;
 const SIGNALEN = ['offer', 'answer', 'ice', 'stop'];
-// De relay-boom: elke kijker geeft de stream door aan een handjevol volgende
-// kijkers. Zo hoeft de bron (en elke kijker) maar aan FANOUT anderen te zenden,
-// en groeit de boom in de diepte mee - onbeperkt veel kijkers, zonder mediaserver.
-const FANOUT = 4;
 
-function maakPodium({ db, save, crypto, accounts, leeftijdVan, codenaamVan, sseToCustomer, sseToOffice, notify, nieuwWerk, pay, schoon }) {
+function maakPodium({ db, save, crypto, accounts, leeftijdVan, codenaamVan, keyVanCodenaam, sseToCustomer, sseToOffice, notify, nieuwWerk, pay, schoon, findSupplier }) {
   const id = () => 'pk' + crypto.randomBytes(4).toString('hex');
   const nu = () => new Date().toISOString();
 
@@ -46,21 +42,39 @@ function maakPodium({ db, save, crypto, accounts, leeftijdVan, codenaamVan, sseT
     if (!Array.isArray(db.data.podiumMeldingen)) db.data.podiumMeldingen = [];
   }
 
-  /* ---- de poort: 18+ met actief RTG-geverifieerd paspoort ---- */
+  /* ---- de poort ----
+     `lat` is de harde controle die dit huis al had, nu als losse maat: is dit
+     een echt account, en (waar de zone dat vraagt) is het geverifieerd en oud
+     genoeg. Welke zone WELKE eis stelt staat in ./zones.js -- daar hoort dat
+     besluit, niet hier. */
   function accountVanKey(key) {
     const m = /^user-(\d+)$/.exec(String(key || ''));
     if (!m) return null;
     try { return accounts.getUserById(Number(m[1])); } catch (e) { return null; }
   }
-  function mag(key) {
+  function lat(key, minLeeftijd, opties) {
     const u = accountVanKey(key);
     if (!u) return { ok: false, reden: 'Alleen voor RTG-leden met een eigen account.' };
+    if (opties && opties.alleenAccount) return { ok: true };
     if (u.verified !== 'verified') return { ok: false, reden: 'Activeer eerst uw RTG-geverifieerde paspoort.' };
     let md = {}; try { md = accounts.getMemberState(u.id) || {}; } catch (e) {}
     const lft = md.geboren ? leeftijdVan(md.geboren) : null;
-    if (lft == null || lft < MIN_LEEFTIJD) return { ok: false, reden: 'Het Podium is vanaf ' + MIN_LEEFTIJD + ' jaar.' };
+    const eis = minLeeftijd || MIN_LEEFTIJD;
+    if (lft == null || lft < eis) return { ok: false, reden: 'Deze zone is vanaf ' + eis + ' jaar.' };
     return { ok: true };
   }
+  const zones = require('./zones');
+  /* Bij welke organisaties hoort dit lid, en waar heeft hij de leiding? Die
+     vraag staat in kern/werkplekken.js, want het Theater stelt hem inmiddels
+     ook (de interne videobibliotheek). Twee keer beantwoorden is twee plekken
+     die uit elkaar kunnen lopen, en bij een TOEGANGSvraag is dat de
+     gevaarlijkste soort (LAT.md regel 4). */
+  const { zakenVan } = require('../werkplekken').maakWerkplekken({ accounts, findSupplier });
+  const poort = zones.maakZonePoort({ lat, zakenVan });
+  /* mag() blijft bestaan als DE deur van de 18+-zone, want dat is precies wat
+     hij altijd al was. Alles wat een kanaal in handen heeft, hoort echter
+     poort.magKanaal te vragen: die kent ook het kaartje en de uitnodiging. */
+  const mag = (key) => poort.magZone(key, zones.ERFENIS);
 
   const kanaalMet = kid => { lijsten(); return db.data.podiumKanalen.find(k => k.id === kid) || null; };
   const kanaalVan = key => { lijsten(); return db.data.podiumKanalen.find(k => k.key === key) || null; };
@@ -77,48 +91,10 @@ function maakPodium({ db, save, crypto, accounts, leeftijdVan, codenaamVan, sseT
     for (const key of verseKijkers(k)) sseToCustomer(key, 'podium', data);
   }
 
-  /* ---- de relay-boom: wie geeft de stream aan wie door ----
-     'bron' is de maker; elke andere knoop is een kijker die de stream van zijn
-     ouder ontvangt en aan hoogstens FANOUT kinderen doorgeeft. De ouder wordt in
-     de breedte gekozen (de plek dichtst bij de bron met nog ruimte), zodat de boom
-     ondiep blijft en de vertraging laag. Zo draagt een kanaal onbeperkt veel
-     kijkers zonder mediaserver: elke kijker helpt de volgende. */
-  const ouderKeyVan = (k, key) => {           // de key om signalen heen te sturen (bron -> de maker)
-    const o = (k.boom || {})[key];
-    return o ? (o.ouder === 'bron' ? k.key : o.ouder) : k.key;
-  };
-  function kiesOuder(k, key) {
-    const verse = new Set(verseKijkers(k));
-    const kinderenVan = (van) => Object.keys(k.boom || {}).filter(kk => kk !== key && verse.has(kk) && k.boom[kk].ouder === van);
-    const rij = ['bron'];
-    while (rij.length) {
-      const n = rij.shift();
-      const kids = kinderenVan(n);
-      if (kids.length < FANOUT) return n;
-      for (const c of kids) rij.push(c);
-    }
-    return 'bron';
-  }
-  // hang een (nieuwe of te herkoppelen) kijker onder een ouder en laat die ouder
-  // aanbieden. Bij de bron is de ouder de maker zelf.
-  function koppel(k, key) {
-    k.boom = k.boom || {};
-    const ouder = kiesOuder(k, key);
-    k.boom[key] = { ouder, at: nu() };
-    const doel = ouder === 'bron' ? k.key : ouder;
-    sseToCustomer(doel, 'podium', { kind: 'kijker', kanaalId: k.id, van: key, codenaam: codenaamVan(key) });
-    return ouder;
-  }
-  // ruim vertrokken kijkers uit de boom en herkoppel wezen (hun ouder is weg)
-  function herstelBoom(k) {
-    if (!k.boom) return;
-    const verse = new Set(verseKijkers(k));
-    for (const kk of Object.keys(k.boom)) if (!verse.has(kk)) delete k.boom[kk];
-    for (const kk of Object.keys(k.boom)) {
-      const o = k.boom[kk].ouder;
-      if (o !== 'bron' && !verse.has(o)) koppel(k, kk);
-    }
-  }
+  /* De relay-boom (wie geeft het beeld aan wie door) staat in ./boom.js: dat
+     gaat over verbindingen en niet over kanalen, geld of zones. */
+  const { ouderKeyVan, kiesOuder, koppel, herstelBoom, FANOUT } =
+    require('./boom')({ verseKijkers, sseToCustomer, codenaamVan, nu });
 
   /* RTG Pay is zelf al idempotent, maar de bijwerking hier (verdiend-teller,
      chatregel, abonnee-verlenging) mag bij een dubbeltik ook niet dubbel. */
@@ -138,14 +114,24 @@ function maakPodium({ db, save, crypto, accounts, leeftijdVan, codenaamVan, sseT
 
   /* ---- de beelden: wat kijker, maker en kantoor zien ---- */
   function kijkBeeld(k, key) {
-    return { id: k.id, naam: k.naam, genre: k.genre, bio: k.bio, codenaam: codenaamVan(k.key), makerKey: k.key,
+    return { id: k.id, naam: k.naam, zone: zones.zoneVan(k), genre: k.genre, bio: k.bio, codenaam: codenaamVan(k.key), makerKey: k.key,
       live: k.live ? { sinds: k.live.sinds, titel: k.live.titel, alleenAbonnees: !!k.live.alleenAbonnees } : null,
       kijkers: verseKijkers(k).length, abbCenten: k.abbCenten || 0,
+      // de kraam (zone 'handel'); in elke andere wereld is dit een lege lijst
+      waren: require('./handel').beeld(k, poort.geldMag(k, 'verkoop')),
       ikAbonnee: key ? isAbonnee(k, key) : false, abonneeTot: key && isAbonnee(k, key) ? k.abonnees[key] : null };
   }
   function eigenBeeld(k) {
     const b = kijkBeeld(k, null);
     return { ...b, status: k.status, verdiend: k.verdiend || 0,
+      kaartCenten: k.kaartCenten || 0,
+      /* De maker ziet ook de kaarten die UIT staan (die beheert hij) en de
+         bestellingen die eruit kwamen -- die gaan verder niemand aan. */
+      mijnWaren: (k.waren || []).map(w => ({ ...w })),
+      bestellingen: (k.verkopen || []).slice(-50).reverse(),
+      zaakCode: k.zaakCode || null,
+      kaartjes: Object.keys(k.kaartjes || {}).filter(x => poort.kaartjeGeldig(k, x)).length,
+      genodigd: (k.genodigd || []).map(x => codenaamVan(x)),
       abonnees: Object.keys(k.abonnees || {}).filter(x => isAbonnee(k, x)).length,
       kijkerLijst: verseKijkers(k).map(x => ({ key: x, codenaam: codenaamVan(x) })),
       geblokkeerd: (k.geblokkeerd || []).map(x => ({ key: x, codenaam: codenaamVan(x) })) };
@@ -155,6 +141,7 @@ function maakPodium({ db, save, crypto, accounts, leeftijdVan, codenaamVan, sseT
   const ctx = {
     db, save, schoon, id, nu, mag, lijsten, kanaalMet, kanaalVan, isAbonnee, verseKijkers,
     stuurRond, kijkBeeld, eigenBeeld, metIdem, codenaamVan, sseToCustomer, sseToOffice, notify, nieuwWerk, pay,
+    zones, poort, keyVanCodenaam, zakenVan,
     koppel, herstelBoom, ouderKeyVan, kiesOuder,
     GENRES, CADEAUS, CHAT_MAX, ABB_DAGEN, SIGNALEN, FANOUT
   };
@@ -163,14 +150,20 @@ function maakPodium({ db, save, crypto, accounts, leeftijdVan, codenaamVan, sseT
      blijft staan -- wie het Podium niet in mag, krijgt hier ook geen kanaal,
      en de Media OS meldt dan dat de bron buiten staat en waarom. */
   function kanaalVanMaker(makerKey, kijkerKey) {
-    if (kijkerKey && !mag(kijkerKey).ok) return null;
     lijsten();
     const k = kanaalVan(makerKey);
     if (!k || k.status !== 'goedgekeurd') return null;
-    return k.key === kijkerKey ? eigenBeeld(k) : kijkBeeld(k, kijkerKey || null);
+    if (k.key === kijkerKey) return eigenBeeld(k);
+    /* De Media OS toont makers over alle vormen heen. Een kanaal uit een zone
+       die NIET in de gedeelde index staat (18+, besloten, zaak) hoort daar niet
+       in te lekken -- ook niet als het lid toevallig door die deur zou mogen.
+       Wie 18+ wil zien, gaat naar die wereld en niet naar een profielkaart. */
+    if ((zones.ZONES[zones.zoneVan(k)] || {}).index !== 'gedeeld') return null;
+    if (kijkerKey && !poort.magKanaal(kijkerKey, k).ok) return null;
+    return kijkBeeld(k, kijkerKey || null);
   }
   return Object.assign({ podiumKanaalVan: kanaalVanMaker },
-    require('./kanaal')(ctx), require('./interactie')(ctx));
+    require('./kanaal')(ctx), require('./interactie')(ctx), require('./handel')(ctx));
 }
 
 module.exports = { maakPodium };

@@ -35,16 +35,23 @@ const { maakCatalogus } = require('./catalogus');
 const { maakSmaak } = require('./smaak');
 const { maakHub } = require('./hub');
 const { maakWekken } = require('./wekken');
+const { legeStand } = require('./leeg');
 
 const MODI = {
   muziek: { naam: 'Muziek', vormen: ['track'] },
   kijk: { naam: 'Kijk', vormen: ['video', 'live'] },
   flow: { naam: 'Flow', vormen: ['clip'] },
-  alles: { naam: 'Alles', vormen: ['track', 'video', 'clip', 'live'] }
+  alles: { naam: 'Alles', vormen: ['track', 'video', 'clip', 'live'] },
+  /* MEDIA FOR BUSINESS. Een eigen stand, geen filter over de gewone wereld:
+     wat hier staat is INTERN gepubliceerd (kern/theater/zaak.js, kern/podium
+     zone 'zaak') en staat in geen enkele openbare lijst. Een filter over
+     openbaar werk zou het woord "intern" gebruiken voor iets wat het niet is.
+     De stand verschijnt alleen bij wie ergens werkt -- zie zaakWereld(). */
+  zaak: { naam: 'Zaak', vormen: ['video', 'live'], intern: true }
 };
 const WERELD_MAX = 60;      // de wereld is eindig, en zegt waar hij ophoudt
 
-function maakMediaOS({ db, save, schoon, codenaamVan, keyVanCodenaam, notify, bronnen }) {
+function maakMediaOS({ db, save, schoon, crypto, codenaamVan, keyVanCodenaam, notify, bronnen, zijnVrienden, sseToCustomer }) {
   const catalogus = maakCatalogus({ bronnen });
   const smaak = maakSmaak({ db, save, schoon });
   const hub = maakHub({ catalogus, bronnen, keyVanCodenaam, codenaamVan });
@@ -55,54 +62,37 @@ function maakMediaOS({ db, save, schoon, codenaamVan, keyVanCodenaam, notify, br
      bestand is het enige dat schrijft in eigen tafels. */
   const eigen = require('./eigen')({ db, save, schoon, catalogus });
   const { biebVan, bewaar, bieb, meldZet, meldVan, MELD_SOORTEN } = eigen;
+  /* En het derde eigen ding: AFSPEELLIJSTEN over de vier vormen (./lijsten.js).
+     Zelfde regel als de bibliotheek -- alleen id's, opgelost met de sessie van
+     de lezer, dus wat weg of dicht is, staat er als verdwenen en niet als een
+     kaart die niemand kan spelen. */
+  const lijsten = require('./lijsten')({ db, save, schoon, crypto, catalogus, codenaamVan, keyVanCodenaam, zijnVrienden });
+  /* En het vierde: SAMEN LUISTEREN (./samen.js). Een luisterkamer deelt de
+     aanwijzer en niet het geluid -- iedere deelnemer lost het stuk op met zijn
+     eigen sessie, dus de kamer is geen manier om iemand iets te laten horen
+     wat hij zelf niet mag openen. */
+  const samen = require('./samen')({ db, save, crypto, catalogus, codenaamVan, keyVanCodenaam, zijnVrienden, sseToCustomer });
   /* En de andere kant van die voorkeur: nieuw werk wekt de volgers die dit
      soort van deze maker aan hebben staan (./wekken.js). De vier domeinen
      roepen dat aan via een laat gebonden haak in ./opzet/kernlaag*.js. */
   const wekken = maakWekken({ notify, codenaamVan, meldVan, bronnen });
 
-  /* ---- volgen: één knop, en hij schrijft in de domeinen zelf ----
-     Clips en het Theater kennen een gratis volgrelatie; die worden allebei
-     gezet. Het Podium kent alleen een BETAALD maandabonnement, en dat wordt
-     hier met opzet niet aangeraakt: één volgknop die ongemerkt een incasso
-     start is precies wat niet mag. De hub geeft dat als aparte stap terug. */
-  async function volg(sess, opdracht) {
-    const o = opdracht || {};
-    const naam = schoon(o.codenaam, 60);
-    if (!naam) return { status: 400, error: 'Zeg erbij wie u wilt volgen.' };
-    /* De gids is async en geeft een RIJ terug, geen sleutel; zie de uitleg in
-       ./hub.js. Wie hier de Promise als sleutel gebruikt, schrijft een
-       onvindbare volgrelatie weg zonder dat er iets klaagt. */
-    const rij = keyVanCodenaam ? await keyVanCodenaam(naam) : null;
-    const mKey = rij && rij.key ? rij.key : null;
-    if (!mKey) return { status: 404, error: 'Deze maker bestaat niet (of heeft een andere codenaam).' };
-    if (mKey === sess.key) return { status: 400, error: 'U hoeft uzelf niet te volgen.' };
-    const aan = o.aan !== false;
-    const gedaan = [];
-    /* Alleen schrijven waar er ook iets te volgen IS. Een volgrelatie op een
-       maker zonder werk zou een rij in de lijst van Clips zetten waar nooit
-       iets uit komt -- en het lid zou "volgend" zien staan zonder dat dat
-       ergens op slaat. */
-    const heeftClips = bronnen.clipsVan ? (bronnen.clipsVan(mKey, sess.key) || []).length > 0 : false;
-    if (heeftClips && bronnen.volgClips) {
-      const r = bronnen.volgClips(sess.key, mKey, aan);
-      if (r && !r.error) gedaan.push('clips');
-    }
-    const kanaal = bronnen.theaterKanaalVan ? bronnen.theaterKanaalVan(mKey) : null;
-    if (kanaal && bronnen.volgTheater) {
-      const r = bronnen.volgTheater(sess.key, kanaal.id, aan);
-      if (r && !r.error) gedaan.push('theater');
-    }
-    if (!gedaan.length) {
-      return { status: 409, error: 'Van deze maker staat er nog niets waar een volgrelatie op past.' };
-    }
-    return { status: 200, ok: true, volg: aan, in: gedaan, codenaam: naam,
-      meldingen: meldVan(sess.key, naam), soortenMogelijk: MELD_SOORTEN,
-      let: 'Een livekanaal van het Podium kost een maandbedrag; dat blijft een aparte, bewuste stap.' };
-  }
+  /* VOLGEN staat in ./volgen.js: één knop die in Clips en het Theater tegelijk
+     schrijft, en met opzet NIET in het betaalde Podium-abonnement. Dat is een
+     eigen onderwerp -- het gaat over schrijven in de domeinen, terwijl de rest
+     van dit bestand leest. */
+  const volg = require('./volgen')({ schoon, keyVanCodenaam, bronnen, meldVan, MELD_SOORTEN });
+
+  /* MEDIA FOR BUSINESS (./zaakwereld.js): de interne wereld van uw organisatie
+     -- de opgenomen bibliotheek van het Theater en de interne livekanalen van
+     het Podium. Eigen bestand, want het is een eigen wereld met een eigen deur;
+     zie de kop daar voor waarom dit géén filter over de openbare wereld is. */
+  const { zaakWereld, modiVoor } = require('./zaakwereld')({ MODI, catalogus, bronnen });
 
   /* ---- de wereld: één catalogus, drie standen ---- */
   function wereld(sess, opties) {
     const o = opties || {};
+    if (o.modus === 'zaak') return zaakWereld(sess);
     const modusNaam = MODI[o.modus] ? o.modus : 'alles';
     const modus = MODI[modusNaam];
     const alles = catalogus.alles(sess);
@@ -119,9 +109,14 @@ function maakMediaOS({ db, save, schoon, codenaamVan, keyVanCodenaam, notify, br
       .map(r => Object.assign({}, r, { bewaard: bewaard.has(r.id) }));
 
     const meer = geordend.rijen.length - rijen.length;
+    /* Een leeg raster ziet eruit als een kapotte app en zegt niet waarom. Bij
+       niets te tonen komt er daarom een stand mee die WEL iets zegt: wat hier
+       komt, waarom het er nu niet is, en welke stap dat opheft (./leeg.js). */
+    const leeg = rijen.length ? null : legeStand(modusNaam, alles.buiten, geordend.weggelaten, modus.vormen);
     return {
       status: 200, modus: modusNaam, modusNaam: modus.naam,
-      modi: Object.keys(MODI).map(k => ({ id: k, naam: MODI[k].naam })),
+      leeg,
+      modi: modiVoor(sess),
       stukken: rijen,
       totaal: geordend.rijen.length,
       einde: meer > 0
@@ -130,13 +125,17 @@ function maakMediaOS({ db, save, schoon, codenaamVan, keyVanCodenaam, notify, br
       uitleg: 'Op volgorde van: wie u volgt, wat u zelf hebt aangewezen, en daarna wat er het laatst bij kwam. ' +
         'Er is geen hitlijst en geen volgorde op kijkcijfers; bij elk stuk staat waarom het er staat.',
       weggelaten: geordend.weggelaten,
-      buiten: alles.buiten,
+      /* Alleen de bronnen die in DEZE stand horen. Onder FLOW stond anders een
+         kaart "Live staat buiten uw wereld" -- waar in die stand helemaal geen
+         live in zit. Zelfde filter als in ./leeg.js, en om dezelfde reden: een
+         scherm hoort geen deur te noemen die er niet toe doet. */
+      buiten: (alles.buiten || []).filter(b => modus.vormen.includes(b.vorm)),
       smaak: s, regelaars: smaak.smaakRegelaars(),
       volgt: [...volgt].filter(Boolean)
     };
   }
 
-  return {
+  return Object.assign({}, lijsten, samen, {
     mediaWereld: wereld, mediaVolg: volg,
     mediaBieb: bieb, mediaBewaar: bewaar,
     mediaMeldZet: meldZet, mediaMeldVan: meldVan,
@@ -145,7 +144,7 @@ function maakMediaOS({ db, save, schoon, codenaamVan, keyVanCodenaam, notify, br
     mediaStuk: hub.mediaStuk, mediaMaker: hub.mediaMaker, mediaBord: hub.mediaBord,
     mediaNieuwWerk: wekken.mediaNieuwWerk, mediaVolgersVan: wekken.mediaVolgersVan,
     MEDIA_MODI: MODI, MEDIA_MELD_SOORTEN: MELD_SOORTEN
-  };
+  });
 }
 
 module.exports = { maakMediaOS, MODI };

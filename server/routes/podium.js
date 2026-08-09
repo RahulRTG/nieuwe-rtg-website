@@ -5,17 +5,27 @@
 module.exports = (kern) => {
   const { app, auth, officeAuth, podiumKanalen, podiumKanaalMaak, podiumKanaalZet, podiumMijn,
     podiumLiveZet, podiumKijk, podiumWeg, podiumSignaal, podiumChatStuur, podiumCadeau,
-    podiumAbonneer, podiumBlokkeer, podiumMeld, podiumOfficeLijst, podiumOfficeBeslis } = kern;
-  const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error, mag: r.mag }) : res.json(r);
+    podiumAbonneer, podiumBlokkeer, podiumMeld, podiumOfficeLijst, podiumOfficeBeslis,
+    podiumKaartje, podiumNodig, podiumWaarZet, podiumKoop } = kern;
+  /* Bij een weigering gaat er meer mee dan de tekst: `mag` (mag ik in deze
+     wereld), `kaartje` (het ligt aan een kaartje en niet aan de deur) en de
+     zonelijst. Zonder die velden moet het scherm de reden uit de zin raden, en
+     dan staat dezelfde regel op twee plekken. */
+  const stuur = (res, r) => r.error
+    ? res.status(r.status || 400).json({ error: r.error, mag: r.mag, kaartje: r.kaartje, zone: r.zone, zones: r.zones })
+    : res.json(r);
   const geenGast = (req, res) => {
     if (req.session.tier === 'guest') { res.status(403).json({ error: 'Het Podium is voor leden.' }); return true; }
     return false;
   };
 
-  // de zaal in: kanalen (live eerst), de cadeaucatalogus en het eigen kanaal
+  /* De zaal van EEN ZONE. Het Podium is geen lijst meer maar een aantal
+     werelden op dezelfde motor (kern/podium/zones.js): open, creator, events,
+     besloten, 18+ -- elk met een eigen deur, een eigen index en een eigen
+     wachtrij bij het kantoor. Zonder zone krijgt u de open wereld. */
   app.post('/api/podium/kanalen', auth, (req, res) => {
     if (geenGast(req, res)) return;
-    stuur(res, podiumKanalen(req.session.key));
+    stuur(res, podiumKanalen(req.session.key, String((req.body || {}).zone || '')));
   });
   app.post('/api/podium/mijn', auth, (req, res) => {
     if (geenGast(req, res)) return;
@@ -61,6 +71,30 @@ module.exports = (kern) => {
     if (geenGast(req, res)) return;
     stuur(res, await podiumAbonneer(req.session.key, String(req.body.id || ''), req.body.idem));
   });
+  /* Een kaartje voor een evenement: eenmalig, via RTG Pay, en het loopt vanzelf
+     af. Geen abonnement dat doorloopt -- dat is een andere knop in een andere
+     zone, en dat verschil hoort te blijven bestaan. */
+  app.post('/api/podium/kaartje', auth, async (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, await podiumKaartje(req.session.key, String(req.body.id || ''), req.body.idem));
+  });
+  /* De kraam van de verkoopwereld: de maker legt productkaarten klaar, een
+     kijker rekent tijdens de uitzending af. Zelfde RTG Pay-route als een cadeau
+     en een kaartje -- er is hier geen tweede betaalweg. */
+  app.post('/api/podium/waar', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, podiumWaarZet(req.session.key, req.body || {}));
+  });
+  app.post('/api/podium/koop', auth, async (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, await podiumKoop(req.session.key, String(req.body.id || ''), String(req.body.waarId || ''), req.body.idem));
+  });
+  // uitnodigen voor een besloten kanaal (alleen de maker, op codenaam)
+  app.post('/api/podium/nodig', auth, async (req, res) => {
+    if (geenGast(req, res)) return;
+    stuur(res, await podiumNodig(req.session.key, String(req.body.id || ''), req.body.codenaam, req.body.aan !== false));
+  });
+
   // veiligheid in de zaal: de maker blokkeert, iedereen kan melden
   app.post('/api/podium/blokkeer', auth, (req, res) => {
     if (geenGast(req, res)) return;
@@ -72,8 +106,11 @@ module.exports = (kern) => {
   });
 
   // de kantoorkant: wachtende kanalen goedkeuren of weigeren, meldingen zien
+  /* De kantoorkant kijkt PER ZONE. Een 18+-aanmelding en een schoolstream
+     horen niet in dezelfde rij: ze vragen een ander oordeel. Zonder zone komt
+     alles, zoals het kantoor het altijd kreeg. */
   app.post('/api/office/podium', officeAuth, (req, res) => {
-    res.json(podiumOfficeLijst());
+    res.json(podiumOfficeLijst(String((req.body || {}).zone || '')));
   });
   app.post('/api/office/podium/beslis', officeAuth, (req, res) => {
     stuur(res, podiumOfficeBeslis(String(req.body.id || ''), String(req.body.besluit || '')));

@@ -45,6 +45,11 @@
         rij.style.display = 'flex'; rij.style.gap = '0.35rem'; rij.style.flexWrap = 'wrap'; rij.style.margin = '0.8rem 0';
         rij.appendChild(M.knop('▶ Speel', 'vol', function () { M.speel(s); }));
         rij.appendChild(M.knop('Naar ' + s.maker.codenaam, '', function () { maker(s.maker.codenaam); }));
+        /* In een lijst zetten en delen staan in ./lijst.js; hier alleen de
+           twee knoppen, zodat het bij het stuk staat waar u naar kijkt. */
+        rij.appendChild(M.knop('In lijst', '', function () { window.RTGMediaLijst.inLijst(s.id); }));
+        rij.appendChild(M.knop('Deel', '', function () { window.RTGMediaLijst.deel(s.id); }));
+        rij.appendChild(M.knop('Samen luisteren', '', function () { window.RTGMediaSamen.start(s.id); }));
         rij.appendChild(M.knop('Kopieer link', '', function () {
           var url = window.location.origin + '/apps/media.html#stuk=' + encodeURIComponent(s.id);
           if (navigator.clipboard) navigator.clipboard.writeText(url).then(function () { M.zeg('Link gekopieerd.'); },
@@ -175,5 +180,8 @@
 
   $('#biebKnop').addEventListener('click', bieb);
   $('#bordKnop').addEventListener('click', bord);
-  window.RTGMediaBlad = { stuk: stuk, maker: maker, bieb: bieb, bord: bord, dicht: dicht };
+  /* `vlak` is dezelfde lade voor ./lijst.js: een tweede overlay ernaast zou
+     twee vensters over elkaar geven zodra iemand vanuit een lijst een stuk
+     opent. Een lade, een sluitknop. */
+  window.RTGMediaBlad = { stuk: stuk, maker: maker, bieb: bieb, bord: bord, dicht: dicht, vlak: open };
 })();

@@ -52,14 +52,16 @@ function maakCommDm({ db, save, comm, dmSleutel }) {
          alsof het vanmiddag gebeurde, is geen migratie maar een vervalsing. */
       const lijst = comm.berichtenVan(gesprek.id);
       for (const m of berichten) {
-        if (!m || (!m.text && !m.post)) continue;
+        if (!m || (!m.text && !m.post && !m.stuk)) continue;
         lijst.push({
           id: 'brc_oud_' + (lijst.length + 1) + '_' + gesprek.id.slice(-6),
           van: m.from, at: m.at || gesprek.op,
           tekst: m.text ? String(m.text).slice(0, 4000) : null,
-          soort: m.post ? 'post' : 'tekst',
+          soort: m.post ? 'post' : m.stuk ? 'stuk' : 'tekst',
           antwoordOp: null,
-          bijlage: m.post ? Object.assign({ soort: 'post' }, m.post) : null,
+          /* ook een gedeeld mediastuk uit de oude vorm verhuist mee */
+          bijlage: m.post ? Object.assign({ soort: 'post' }, m.post)
+            : m.stuk ? Object.assign({ soort: 'stuk' }, m.stuk) : null,
           lang: m.lang || null,
           reacties: {}
         });
@@ -88,18 +90,24 @@ function maakCommDm({ db, save, comm, dmSleutel }) {
   function stuur(van, naar, opties) {
     const o = opties || {};
     const g = gesprek(van, naar);
+    /* Een bijlage is een post OF een mediastuk (Media OS); de soort in de
+       bijlage zelf vertelt de leeskant welke van de twee het is. */
+    const bijlage = o.post ? Object.assign({ soort: 'post' }, o.post)
+      : o.stuk ? Object.assign({ soort: 'stuk' }, o.stuk) : null;
     const m = comm.bericht({ gesprekId: g.id, van, tekst: o.tekst || '',
-      bijlage: o.post ? Object.assign({ soort: 'post' }, o.post) : null,
-      soort: o.post ? 'post' : 'tekst', lang: o.lang || null });
+      bijlage, soort: bijlage ? bijlage.soort : 'tekst', lang: o.lang || null });
     return oudeVorm(m);
   }
 
-  /* De oude berichtvorm ({ from, text, post, at, lang }). Schermen en routes
-     die er al waren blijven werken; wat er in de kern bij is gekomen (id,
-     reacties, antwoord-op) reist mee voor wie het wel wil gebruiken. */
+  /* De oude berichtvorm ({ from, text, post, stuk, at, lang }). Schermen en
+     routes die er al waren blijven werken; wat er in de kern bij is gekomen
+     (id, reacties, antwoord-op) reist mee voor wie het wel wil gebruiken. */
   function oudeVorm(m) {
-    return { id: m.id, from: m.van, text: m.tekst || '', post: (m.bijlage && m.bijlage.soort === 'post')
-      ? m.bijlage : null, at: m.at, lang: m.lang || null };
+    const b = m.bijlage || null;
+    return { id: m.id, from: m.van, text: m.tekst || '',
+      post: (b && b.soort === 'post') ? b : null,
+      stuk: (b && b.soort === 'stuk') ? { id: b.id, vorm: b.vorm || null } : null,
+      at: m.at, lang: m.lang || null };
   }
 
   function berichten(a, b, hoeveel) {

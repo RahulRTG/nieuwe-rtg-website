@@ -109,9 +109,15 @@ Object.assign(kern, maakOntmoeting({
    achter dezelfde paspoortpoort als de ontmoetingen; een kanaal gaat pas open
    na menselijke goedkeuring door kantoor; cadeautjes en abonnementen lopen
    via RTG Pay. Na pay en sociaal gemount (gebruikt beide). */
+/* Wie werkt waar (kern/werkplekken.js): het Podium (zone 'zaak'), het Theater
+   (de interne bibliotheek) en de Media OS stellen alle drie dezelfde vraag.
+   Eén exemplaar op de kern, zodat er ook maar één antwoord is. */
+Object.assign(kern, { werkplekken: require('../kern/werkplekken').maakWerkplekken({ accounts, findSupplier }) });
 Object.assign(kern, require('../kern/podium').maakPodium({
-  db, save, crypto, accounts, leeftijdVan, codenaamVan: kern.codenaamVan,
+  db, save, crypto, accounts, leeftijdVan, codenaamVan: kern.codenaamVan, keyVanCodenaam,
   sseToCustomer, sseToOffice, notify, pay: kern.pay, schoon,
+  // de zakenwereld hangt aan de personeelsadministratie; findSupplier levert de zaaknaam
+  findSupplier,
   // de haak van de Media OS: nieuw werk wekt volgers (zie ./mediaos.js)
   nieuwWerk: (key, soort, titel) => (kern.mediaNieuwWerk ? kern.mediaNieuwWerk(key, soort, titel) : null)
 }));

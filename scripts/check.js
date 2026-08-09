@@ -650,6 +650,13 @@ console.log('\n16) elk leden-pad met een derde partij gaat langs de gegevenspoor
     ['/api/huur/sos', 'noodknop tijdens een lopende huur -- hier NOOIT iets vragen'],
     ['/api/verkoop/teken', 'het contract van een deal die al loopt tekenen'],
     ['/api/asset/koop', 'RTG Shared Assets is van RTG zelf; er staat geen derde tegenover'],
+    /* De kraam van het Podium: de verkoper is een ander LID in dezelfde
+       uitzending, en het contact loopt over de kanaalchat op codenaam. RTG
+       bezorgt hier niets, vraagt geen adres en zet geen koerier in beweging --
+       een telefoonnummer eisen zou dus een drempel zijn die niemand leest.
+       Gaat RTG de bezorging wel doen (staat in TAKEN.md), dan hoort deze route
+       alsnog langs de poort en verdwijnt deze regel. */
+    ['/api/podium/koop', 'kopen bij een medelid in de uitzending; RTG bezorgt niet en vraagt geen adres'],
     ['/api/mob/aanbod', 'welk vervoer hier bestaat opvragen; er gebeurt nog niets'],
     ['/api/mob/plekken', 'de bestemmingenlijst opvragen; er gebeurt nog niets'],
     ['/api/mob/favoriet', 'je eigen bewaarde plekken; er staat geen derde tegenover'],

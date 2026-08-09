@@ -17,6 +17,7 @@ public/            alles wat de browser laadt (de webroot die de server serveert
     ├── personeel.html     personeels-app (rooster, taken, walkie-talkie, SOS)
     ├── leverancier.html   werkgevers-app (alle genres)
     ├── boardroom.html     persoonlijke boardroom (functies aan/uit, ouderbeheer)
+    ├── command.html       RTG Command: het RTG- en RTF-kantoor als één app
     ├── backoffice.html    RTG-backoffice
     ├── kantoren.html      RTG-kantoren + de boardroom-kamers (o.a. RTG Bank en RTG Stad)
     ├── bank.html          RTG Bank voor het lid (alleen zichtbaar als de boardroom hem live zet)
@@ -1696,6 +1697,30 @@ Vandaar de **zetel**: uitgedeeld vanuit de boardroom, gekoppeld aan een echte pe
 Alles wat de balie wél doet — een dossier openen, een codenaam natrekken — gaat door het **bestaande** inzagejournaal (`server/inzagelog.js`), met de zetel als "wie" en de opgegeven aanleiding als "waarom". Bewust geen eigen logboek: een tweede journaal is een journaal dat bij een audit wordt vergeten. Ook zoeken telt als inzage, ook als er niets uitkomt — wie een codenaam natrekt om te zien óf hij bestaat, doet precies wat het journaal moet vastleggen.
 
 Kern: `server/kern/ledenbalie.js`, routes `/api/office/balie/{zetels,zetel,zoek,dossier,herstel,klacht,klacht/status,abo}`, getoetst in `test/ledenbalie.test.js`.
+
+## RTG Command: het kantoor als één app
+
+Het RTG- en RTF-kantoor was een verzameling schermen: de backoffice, de kamers, het RTF-kantoor, de meldkamer, de techniek, de Office-suite. Elk scherm kende zijn eigen hoek van het platform, en niemand kende het geheel. **`/apps/command.html`** is die verzameling als één app — niet door er een menu overheen te leggen, maar door er één objectmodel onder te schuiven.
+
+**Het register is de spil.** `server/kern/command/register.js` zegt welke objectsoorten er zijn, waar ze wonen en hoe ze heten. De zoekbalk leest hem, het objectdossier leest hem, de runbooks schrijven alleen via hem, en de puls telt eruit. Een soort erbij is één regel erbij; niemand hoeft de zoekbalk aan te raken. Dat is de reden dat dit een tabel is en geen veertig if-takken: een belofte als "één zoekbalk voor letterlijk alles" die per soort een eigen tak vraagt, is binnen twee maanden stil onwaar.
+
+**De ontwerpregel, in elke module: handmatig, assisted, autonoom.** Welk van de drie geldt is nooit een eigenschap van de knop maar een uitkomst van `risico.js` uit het beleid van dat moment. Dezelfde handeling is autonoom bij één geval en mensenwerk bij honderd; de score draagt altijd zijn opbouw, zodat een mens kan zien *waarom* iets naar hem is gerouteerd — en het kan bestrijden.
+
+**De operator.** Een vraag in gewone taal wordt een gemeten plan: hoeveel gevallen, welke oorzaken, hoeveel de machine veilig mag doen, wat een mens moet beoordelen. De oorzaakgroepering (`oorzaak.js`) *meet* welk veld de gevallen het strakst clustert in plaats van een tabel "wat verklaart wat" te raadplegen; vindt hij niets dat bijna alles verklaart, dan zegt hij dat er geen gedeelde oorzaak is. Daarna is er één knop: doe de veilige gevallen, en de uitzonderingen worden zaken met eigenaar, termijn en bewijs. De AI verwoordt hooguit — zonder API-sleutel werkt alles hetzelfde, alleen is de zin dan door ons geschreven.
+
+**Schrijven kan maar op één manier.** Elke wijziging die Command aan gegevens maakt, loopt door een runbook: een veld op een object van een bekende soort krijgt een nieuwe waarde, en de oude waarde gaat mee in de ronde. Terugdraaien is daarmee geen extra code maar hetzelfde mechanisme omgekeerd — en het slaat over wat iemand anders sindsdien heeft gewijzigd, zodat een terugzetting nooit stilletjes andermans werk wist. Velden die een identiteit, een bedrag of een recht dragen staan op slot (`BEVROREN`) en worden bij het uitvoeren gecontroleerd, niet bij het opschrijven.
+
+**Beleid is een gegeven, geen code.** Prijzen, grenzen, budgetten en de risicodrempels staan in één register met versies, herkomst en reden. Zware regels vragen twee paar ogen — en wie voorstelt kan niet zelf goedkeuren, afgedwongen op de server omdat een grendel die alleen in de knop zit er niet is. Terugzetten is de vólgende versie en niet het wissen van de vorige. Naast elke regel staat een proef die met een schaduw-beleid doorrekent wat de nieuwe waarde met de routering doet, zonder iets te zetten.
+
+**Het journaal is een keten.** Elke handeling van mens én machine draagt oude toestand, nieuwe toestand, actor, reden en gebruikte regel, plus de hash van de vorige regel. `controleer()` wijst de eerste breuk aan; het scherm toont die uitslag bovenaan. De actor komt altijd uit de sessie en nooit uit de body — wie met de gedeelde kantoorcode binnenkomt heet `kantoor (gedeelde code)`, en daarmee vallen vier-ogen-goedkeuringen en zware rechten vanzelf om.
+
+**Zware rechten verlopen vanzelf.** Tijdelijke bevoegdheid, mandaat en de nooddeur (break-glass) hebben allemaal een `tot`; er is niets dat blijft staan, dus er valt ook niets te vergeten in te trekken. De nooddeur vraagt een volledige reden en staat als zwaarste handeling in het journaal.
+
+**En de meter waarop dit kan zakken.** Het werkbesparingsbord telt handminuten per duizend handelingen, de automatiseringsgraad per werkstroom en de lekken: veel volume dat nog nooit autonoom liep. Dalen die getallen niet, dan is er geen automatisering bijgekomen maar een dashboard. De minutenprijzen zijn schattingen en dat staat in de uitslag — een meter die zijn eigen onzekerheid verzwijgt, wordt gebruikt alsof hij zeker is.
+
+De werkplek-tab opent de bestaande apps (Office, RTMail, Agenda, Meet, Bestanden, Personeel, Payroll, Balans, Techniek, RTF-kantoor …) vanuit dezelfde schil, met dezelfde inlog en dezelfde gegevens. Ze worden geopend, niet nagebouwd.
+
+Kern: `server/kern/command/` (register, zoek, object, oorzaak, operator, risico, runbooks, beleid, journaal, zaken, toezicht, toegang, puls, simulatie, werkbesparing), routes `/api/command/*` in `server/routes/command/`, frontend `public/apps/command/` (gebundeld naar `public/apps/command.js`), getoetst in `test/command.test.js`.
 
 ## Veiligheid & verbinding: vier apps op één ruggengraat
 

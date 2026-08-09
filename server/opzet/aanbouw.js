@@ -73,6 +73,14 @@ module.exports = function bouwKernAan(kern, grens) {
   Object.assign(kern, require('../kern/rtgonderzoeker')({ db, save, crypto, schoon, anthropic }));
   require('../routes/rtgkantoor')(grens('rtgkantoor'));
   require('../routes/kantoren')(grens('kantoren'));
+  /* RTG Command (kern/command/): de bestuurslaag van het RTG- en RTF-kantoor.
+     Eén app over alle domeinen heen -- de puls, de zoekbalk over alles, het
+     objectdossier, de operator die een opdracht in gewone taal tot een plan
+     rekent, de runbooks, het beleidsregister met versies en het onveranderlijke
+     journaal. Hij hangt NA kantoren omdat hij op dezelfde kantoordeur zit; hij
+     leest verder alleen db.data, dus hij hoeft niet op een motor te wachten. */
+  Object.assign(kern, { command: require('../kern/command').maakCommand({ db, save, crypto, anthropic }) });
+  require('../routes/command')(grens('command'));
   require('../routes/gemeente')(grens('gemeente'));
   /* De Rijks-Bibliotheek (kern/rijksbieb.js): 10.000 werk-apps voor elke
      overheidsafdeling, inbegrepen voor rijksambtenaren; routes in overheid. */

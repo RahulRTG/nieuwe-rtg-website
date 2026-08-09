@@ -48,4 +48,12 @@ module.exports = Object.assign({
       'Geef akkoord op de ritten boven uw drempel; tot dat moment staan ze op geen enkel planbord',
       'Lees per maand wat er is gereden, per kostenplaats en per medewerker'],
     'Een leeg veld is geen grens. En elke afwijzing die uw medewerker leest, noemt de regel en het getal -- daarom staat naast de knoppen wat hij ziet.'),
+  /* RTG Command staat hier en niet bij de andere kantoorschermen in deel7:
+     dat bestand zit tegen de omvangsgrens aan, en een gids-entry is geen reden
+     om er overheen te gaan. */
+  '/apps/command.html': G('RTG Command: het RTG- en RTF-kantoor in één app. Zien, zoeken, vragen, herstellen en besturen op hetzelfde objectmodel.',
+    ['Vraag het in gewone taal aan de operator; u krijgt een gemeten antwoord met oorzaken, en daarna één knop: doe de veilige gevallen en geef mij de uitzonderingen',
+      'Zoek in de balk bovenaan op naam, code, kenteken, plaats of status en open elk object als dossier, met de tijdlijn en alles wat eraan hangt',
+      'Wijzig een beleidsregel pas nadat u hem als proef hebt doorgerekend; zware regels vragen een tweede paar ogen en zijn met één knop terug te zetten'],
+    'Elke functie heeft drie niveaus: handmatig, assisted en autonoom. Welk niveau geldt, hangt niet aan de knop maar aan het beleid van dat moment -- dezelfde handeling is autonoom bij een enkel geval en mensenwerk bij honderd.'),
 }, require('./deel10b'));

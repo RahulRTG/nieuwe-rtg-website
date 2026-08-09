@@ -56,6 +56,10 @@ const bundels = {
   'apps/app-main.js': 'apps/app-main',
   'apps/personeel.js': 'apps/personeel',
   'apps/backoffice.js': 'apps/backoffice',
+  // RTG Command: de schil, de elf werkplekken en de gedeelde staat -- zeven
+  // delen omdat elke werkplek zijn eigen tekenaar heeft en die niet in elkaars
+  // bestand horen te wonen
+  'apps/command.js': 'apps/command',
   'apps/techniek.js': 'apps/techniek',
   'apps/meldkamer.js': 'apps/meldkamer',
   'apps/foundation/gezin-rt.js': 'apps/foundation/gezin-rt',

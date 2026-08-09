@@ -140,6 +140,9 @@
       "resolveSession",
       "sessionFor"
     ],
+    "command": [
+      "command"
+    ],
     "doos": [
       "afdelingen",
       "beveilig",

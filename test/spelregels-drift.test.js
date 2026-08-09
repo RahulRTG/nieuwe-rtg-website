@@ -219,3 +219,34 @@ test('de lobby toont de stand met zijn venster, en zwijgt onder de grens', async
   assert.match(vol['#stand'].innerHTML, /3 gespeeld/);
   assert.match(vol['#stand'].innerHTML, /afgelopen jaar/, 'het venster hoort erbij te staan');
 });
+
+/* De laatste partijen in de lobby. Het punt dat anders wegvalt: een
+   tegenstander zonder codenaam (buiten de progressiegrens, of iemand die zich
+   heeft laten verwijderen) hoort "een medespeler" te worden en geen leeg
+   vakje -- een naam die ontbreekt zonder uitleg leest als een storing. */
+test('de lobby toont recente partijen, met een naamloze tegenstander als medespeler', async () => {
+  const bron = knip('function tegenTekst(tegen)', 'async function laadLobby');
+  const maak = () => ({ hidden: false, innerHTML: '' });
+
+  async function draai(antwoord) {
+    const el = maak();
+    const laad = new Function('api', '$', 'esc', 'SPELNAAM', bron + '; return laadRecent;')(
+      async () => antwoord, () => el, (x) => String(x), { schaak: 'Schaken', mejn: 'Mens erger je niet' });
+    await laad();
+    return el;
+  }
+
+  const uit = await draai({ progressie: false, uitslagen: [] });
+  assert.equal(uit.hidden, true, 'onder de grens hoort het blok weg te zijn');
+
+  const vol = await draai({ progressie: true, uitslagen: [
+    { soort: 'schaak', ik: true, gelijk: false, tegen: [{ codenaam: 'Zilveren Reiger', won: false }] },
+    { soort: 'schaak', ik: false, gelijk: false, tegen: [{ codenaam: null, won: true }] },
+    { soort: 'mejn', ik: false, gelijk: true, tegen: [{ codenaam: 'Gouden Vos', won: false }] }
+  ] });
+  assert.equal(vol.hidden, false);
+  assert.match(vol.innerHTML, /gewonnen · tegen Zilveren Reiger/, 'een gewonnen partij op codenaam');
+  assert.match(vol.innerHTML, /verloren · tegen een medespeler/, 'een naamloze tegenstander krijgt woorden');
+  assert.match(vol.innerHTML, /gelijkspel/, 'en een gelijkspel heet geen winst of verlies');
+  assert.doesNotMatch(vol.innerHTML, /tegen\s*<\/small>/, 'nooit "tegen" met niets erachter');
+});

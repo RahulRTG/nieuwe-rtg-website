@@ -136,6 +136,7 @@
     <div id="potjes"><div class="leeg">Nog geen potjes. Kies hierboven een spel.</div></div>
     <div class="sec" id="standKop" hidden>Jouw partijen</div>
     <div id="stand" hidden></div>
+    <div id="recent" hidden></div>
   </section>
 
   <!-- nieuw potje -->
@@ -388,9 +389,30 @@ async function laadStand(){
     '<div class="leeg">Over '+venster+'; oudere partijen tellen niet meer mee.</div>';
 }
 
+/* De laatste partijen zelf, onder de aantallen. Een tegenstander die buiten de
+   progressiegrens viel of zich heeft laten verwijderen staat in de uitslagen
+   zonder codenaam; hier wordt dat "een medespeler" en niet een leeg vakje --
+   een naam die ontbreekt zonder uitleg leest als een storing. */
+function tegenTekst(tegen){
+  const namen = (tegen||[]).map(t => t.codenaam ? esc(t.codenaam) : 'een medespeler');
+  return namen.length ? namen.join(' & ') : '';
+}
+async function laadRecent(){
+  let d; try{ d = await api('uitslagen', { hoeveel: 5 }); }catch(e){ return; }
+  const rijen = d.uitslagen || [];
+  const leeg = !d.progressie || !rijen.length;
+  $('#recent').hidden = leeg;
+  if (leeg) return;
+  $('#recent').innerHTML = rijen.map(r => {
+    const uit = r.gelijk ? 'gelijkspel' : (r.ik ? 'gewonnen' : 'verloren');
+    return '<div class="rij"><div class="nm">'+esc(SPELNAAM[r.soort]||r.soort)+
+      '<small>'+uit+' · tegen '+tegenTekst(r.tegen)+'</small></div></div>';
+  }).join('');
+}
+
 async function laadLobby(){
   let d; try{ d = await api('mijn'); }catch(e){ return; }
-  laadOnline(); laadZichtbaar(); laadStand();
+  laadOnline(); laadZichtbaar(); laadStand(); laadRecent();
   const u = d.uitnodigingen||[];
   $('#uitnodigingen').innerHTML = u.length ? '<div class="sec">Uitnodigingen</div>' + u.map(x =>
     '<div class="rij"><div class="nm">'+esc(x.naam)+(x.modus==='teams'?' · 2 tegen 2':'')+'<small>van '+esc(x.van)+' · met '+x.spelers.map(esc).join(', ')+'</small></div>'+

@@ -292,6 +292,10 @@ function renderBlok(blok,p){
   } else if(t==='citaat'){ s.classList.add('b-citaat'); const q=document.createElement('div'); q.className='q'; q.appendChild(veld(T.tekst,v=>zetVeld(blok,'tekst',v),true)); const br=document.createElement('div'); br.className='bron'; br.appendChild(veld(T.bron,v=>zetVeld(blok,'bron',v))); s.appendChild(q); s.appendChild(br);
   } else if(t==='ruimte'){ s.style.height=(blok.hoogte||40)+'px';
   } else if(t==='voettekst'){ s.classList.add('b-voet'); s.appendChild(veld(T.tekst,v=>zetVeld(blok,'tekst',v)));
+  } else if(t==='zaakdata'){ /* live blok van een bedrijfssite: de inhoud komt bij bezoek uit het zaakprofiel */
+    s.classList.add('b-tekst'); const d=document.createElement('div');
+    d.style.cssText='border:1px dashed currentColor;opacity:.7;padding:1rem;text-align:center;font-size:.85rem;';
+    d.textContent='Live blok · '+(blok.bron||'')+' -- wordt bij ieder bezoek automatisch gevuld uit het bedrijfsprofiel.'; s.appendChild(d);
   }
   (blok.verberg||[]).forEach(d=>s.classList.add('v-weg-'+d));
   if(BEWERK && (blok.verberg||[]).includes(APPARAAT)){ s.classList.add('dim'); const lb=document.createElement('div'); lb.className='vlabel'; lb.textContent='Verborgen op '+devNaam(APPARAAT); s.appendChild(lb); }

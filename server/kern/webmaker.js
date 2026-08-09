@@ -10,7 +10,9 @@
    Salon, we bewaren alleen de verwijzing. */
 module.exports = ({ db, save, crypto, schoon, media }) => {
   const scho = schoon || ((v, n) => String(v == null ? '' : v).trim().slice(0, n || 200));
-  const TYPES = ['hero', 'kop', 'tekst', 'knop', 'beeld', 'kolommen', 'galerij', 'citaat', 'ruimte', 'voettekst'];
+  const TYPES = ['hero', 'kop', 'tekst', 'knop', 'beeld', 'kolommen', 'galerij', 'citaat', 'ruimte', 'voettekst', 'zaakdata'];
+  // de bronnen die een live zaakdata-blok mag aanwijzen (opgelost in kern/webplatform.js)
+  const ZAAKBRONNEN = ['menu', 'diensten', 'kamers', 'agenda', 'fotos', 'reviews', 'contact'];
   const VERSIES = ['telefoon', 'tablet', 'desktop'];
   const PER_LID = 12;         // hoeveel sites een lid mag hebben
   const TOTAAL = 20000;       // harde bovengrens op de opslag
@@ -46,6 +48,7 @@ module.exports = ({ db, save, crypto, schoon, media }) => {
     else if (t === 'citaat') { o.tekst = T(b.tekst, 600); o.bron = T(b.bron, 80); }
     else if (t === 'ruimte') { o.hoogte = Math.max(8, Math.min(240, Number(b.hoogte) || 40)); }
     else if (t === 'voettekst') { o.tekst = T(b.tekst, 400); }
+    else if (t === 'zaakdata') { o.bron = ZAAKBRONNEN.includes(b.bron) ? b.bron : 'contact'; }
     if (Array.isArray(b.verberg)) {
       const v = b.verberg.filter(x => VERSIES.includes(x));
       if (v.length) o.verberg = [...new Set(v)];
@@ -95,12 +98,16 @@ module.exports = ({ db, save, crypto, schoon, media }) => {
     ['bg', 'txt', 'card'].forEach(n => { const c = hex(k[n]); if (c) uit[n] = c; });
     return Object.keys(uit).length ? uit : null;
   }
-  const publiek = d => ({ titel: d.titel, thema: d.thema, accent: d.accent, kleuren: d.kleuren || null, blokken: d.blokken || [], volgorde: d.volgorde || null, adres: d.adres, eigenaar: d.eigenaar });
+  const publiek = d => ({ titel: d.titel, thema: d.thema, accent: d.accent, kleuren: d.kleuren || null, blokken: d.blokken || [], volgorde: d.volgorde || null, adres: d.adres, eigenaar: d.eigenaar, zaakCode: d.zaakCode || '' });
 
   function mijn(key) { return store().lijst.filter(d => d.eigenaar === key).map(kort); }
   function haal(key, id) { const d = store().lijst.find(x => x.id === scho(id, 20) && x.eigenaar === key); return d || null; }
 
-  function bewaar(key, d) {
+  /* opts.zaakCode wordt alleen door de zaak-route meegegeven (na supplierAuth):
+     dat een site bij een bedrijf hoort is een feit uit de inlog, geen veld dat
+     een lid zelf in zijn ontwerp kan zetten. Bij een gewone save blijft de
+     bestaande koppeling staan. */
+  function bewaar(key, d, opts) {
     d = d || {};
     const s = store();
     let bestaand = null;
@@ -116,6 +123,7 @@ module.exports = ({ db, save, crypto, schoon, media }) => {
       accent: /^#[0-9a-fA-F]{6}$/.test(String(d.accent || '')) ? d.accent : '#7F1634',
       kleuren: schoonKleuren(d.kleuren),
       blokken: (Array.isArray(d.blokken) ? d.blokken : []).slice(0, 60).map(schoonBlok),
+      zaakCode: (opts && opts.zaakCode) ? scho(opts.zaakCode, 30) : (bestaand ? (bestaand.zaakCode || '') : ''),
       adres: bestaand ? (bestaand.adres || '') : '',
       online: bestaand ? !!bestaand.online : false,
       bezoeken: bestaand ? (bestaand.bezoeken || 0) : 0,
@@ -151,20 +159,11 @@ module.exports = ({ db, save, crypto, schoon, media }) => {
     return { ok: true, online: false };
   }
 
-  /* ---- de browser-kant (leden bekijken de gepubliceerde sites) ---- */
-  function gids() {
-    return store().lijst.filter(d => d.online && d.adres)
-      .sort((a, b) => (b.bezoeken || 0) - (a.bezoeken || 0))
-      .slice(0, 200)
-      .map(d => ({ adres: d.adres, titel: d.titel, bezoeken: d.bezoeken || 0, blokken: (d.blokken || []).length }));
-  }
-  function open(adresIn) {
-    const a = slug(adresIn);
-    const d = store().lijst.find(x => x.adres === a && x.online);
-    if (!d) return { error: 'Geen RTG-site op dit adres.', status: 404 };
-    d.bezoeken = (d.bezoeken || 0) + 1; save();
-    return { ok: true, site: publiek(d) };
-  }
+  /* De browser-kant (gids, openen, zoeken) staat in ./webmaker-blader.js:
+     bekijken is ander werk dan bouwen. */
+  const blader = require('./webmaker-blader')({ store, save, slug, publiek });
 
-  return { mijn, haal, bewaar, verwijder, publiceer, offline, gids, open, fotos, fotoBewaar, fotoWeg, TYPES };
+  return { mijn, haal, bewaar, verwijder, publiceer, offline, slug,
+           gids: blader.gids, open: blader.open, zoek: blader.zoek, adresVanZaak: blader.adresVanZaak,
+           fotos, fotoBewaar, fotoWeg, TYPES };
 };

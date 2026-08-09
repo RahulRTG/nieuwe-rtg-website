@@ -1235,6 +1235,18 @@ Wat er nog niet speelt in de Media OS zelf: een **livestream** van het Podium. D
 
 De vier apps eronder blijven gewoon bestaan en werken los: wie recht naar de studio, de zaal of het Podium wil, hoort daar zonder omweg te kunnen. Zet de boardroom de schakelaar `mediaos` uit, dan verdwijnt alleen de verbindende laag.
 
+### RTG Web Platform (de automatische bedrijfssite en de browser die bedrijven begrijpt)
+
+De Website-maker (`/apps/sitemaker.html`, `kern/webmaker.js`) en de RTG-browser (`/apps/browser.html`, browserkant in `kern/webmaker-blader.js`) hebben er een laag bij: `server/kern/webplatform.js`, met een principe -- **automatic first, customizable forever**.
+
+- **De automatische bedrijfssite.** `POST /api/supplier/site/genereer` (achter de zaak-inlog) maakt uit het bestaande zaakprofiel in een keer een complete site en zet hem online op de bedrijfsnaam (`es-vedra-cruises.rtg`; is dat adres bezet, dan naam-code). Geen kale profielpagina: hero, intro, en per bron die de zaak echt heeft een sectie. Daarna bewerkt de ondernemer hem met dezelfde maker als ieder lid (`/api/supplier/site/mijn|haal|bewaar|publiceer|offline`, eigenaar `zaak:CODE`). Nog eens genereren overschrijft het handwerk **niet** -- opnieuw beginnen is een aparte keuze (`opnieuw: true`).
+- **Live blokken, geen kopieen.** Een gegenereerde site draagt `zaakdata`-blokken die alleen een bron aanwijzen (menu, diensten, kamers, agenda, fotos, reviews, contact). Bij het openen lost de server ze op dat moment uit het zaakprofiel op naar gewone blokken -- het zaakprofiel is het **Business Master Record**: wijzigt de menukaart in de zaak-app, dan staat hij op de site zonder dat iemand de site aanraakt. De browser hoeft er niets voor te kennen.
+- **De koppeling komt uit de inlog.** Dat een site bij een bedrijf hoort is een feit uit `supplierAuth`, geen veld in het verzoek: een lid dat `zaakCode` in zijn ontwerp zet, krijgt niet de actiebalk en niet de data van andermans zaak.
+- **De browser begrijpt bedrijven.** Hoort een site bij een zaak, dan geeft `/api/browser/open` de zaak-info mee (naam, type, stad, review-gemiddelde) plus de acties die de zaak écht kan (reserveren, bestellen, boeken, diensten, kamers, chat) -- het scherm toont die als actiebalk boven de site, met de leden-app als bestemming. Alleen wat de zaak kan komt terug: een knop die niets doet is erger dan geen knop.
+- **Universeel zoeken.** `/api/browser/zoek` vindt sites en bedrijven in een adem; een bedrijf met een eigen online site krijgt het adres mee. Alleen wat toch al publiek is (naam, stad, type) -- het zoekvak is geen achterdeur naar het zaakprofiel, en offline sites zijn ook uit het zoeken weg.
+
+`test/webplatform.test.js` (vijf scenario's) legt dit vast; twee mutaties (leden mogen zelf een zaakCode zetten; de live blokken worden niet meer opgelost), allebei **RAAK**.
+
 ### RTG Bank & RTG Stad (de eigen infrastructuur)
 
 - **RTG Bank** (`server/kern/bank/` + `kern/bankregie/`): een eigen dubbel-boekhoudend grootboek naast RTG Pay (som altijd exact nul, bewaakt door BANK-01 en PAY-02 op het technische bord). De boardroom-knop heeft drie standen (partner / hybride / eigen) met vier-ogen-autorisatie bij opschalen en een nood-fallback naar de kaart-rails; de leden-bank (rekeningen met echt IBAN, sparen, passen, krediet, salarisrun uit de klokuren) gaat pas open als de boardroom hem live zet en het lid akkoord geeft. In de eigen-stand lopen ook de Pay-autoload en de 30% RTFoundation-afdracht over de eigen rails.

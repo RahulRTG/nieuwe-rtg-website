@@ -49,6 +49,15 @@
   .kaart .mt{color:var(--soft);font-size:.72rem;margin-top:.5rem;}
   .kop2{font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--soft);margin:0 0 .7rem;}
   .leeg{text-align:center;color:var(--soft);padding:2rem;}
+  /* de actiebalk: de browser weet dat deze pagina een bedrijf is */
+  .zaakbalk{position:sticky;top:59px;z-index:15;display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;background:var(--card);border-bottom:1px solid var(--line);padding:.55rem .9rem;}
+  .zaakbalk .zn{font-family:'Bodoni Moda',serif;font-size:1rem;}
+  .zaakbalk .zm{color:var(--soft);font-size:.75rem;}
+  .zaakbalk .zr{color:var(--gold);font-size:.75rem;}
+  .zaakbalk .zk{margin-left:auto;display:flex;gap:.4rem;flex-wrap:wrap;}
+  .zaakbalk a.chip{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:.28rem .7rem;font-size:.75rem;color:var(--txt);text-decoration:none;background:var(--card2);}
+  .zaakbalk a.chip:hover{border-color:var(--gold);}
+  .zaakbalk a.chip.hoofd{background:var(--burgundy);border-color:transparent;color:#fff;font-weight:600;}
   /* de site-weergave */
   .sitewrap{padding:0;}
   .foutpagina{max-width:520px;margin:5rem auto;text-align:center;padding:0 1.2rem;color:var(--muted);}
@@ -113,9 +122,41 @@ async function toonStart(){
   const h=$('#hoofd');
   h.innerHTML='<div class="start"><div class="merk">RTG · het web van het huis</div><h1>RTG Start</h1>'+
     '<p class="lead">Het besloten web van Rahul Travel Group. Bezoek de sites die leden hier hebben gebouwd, of typ een adres in de balk.</p>'+
-    '<form class="zoekgroot" id="zoekGroot"><input id="zoekIn" placeholder="jouwzaak" aria-label="Zoek een adres"><span class="suf">.rtg</span><button type="submit">Ga</button></form>'+
+    '<form class="zoekgroot" id="zoekGroot"><input id="zoekIn" placeholder="zoek een site of bedrijf, of typ een adres" aria-label="Zoeken"><span class="suf">.rtg</span><button type="submit">Zoek</button></form>'+
+    '<div id="zoekUit"></div>'+
     '<div class="kop2">Sites van leden</div><div class="rooster" id="rooster"><div class="leeg">Laden…</div></div></div>';
-  $('#zoekGroot').addEventListener('submit',e=>{ e.preventDefault(); const a=slug($('#zoekIn').value); if(a.length<2){meld('Typ een adres.');return;} ga({adres:a}); });
+  /* universeel zoeken: een exact adres opent direct; anders zoeken we sites
+     EN bedrijven en tonen we beide */
+  $('#zoekGroot').addEventListener('submit',async e=>{
+    e.preventDefault(); const q=$('#zoekIn').value.trim(); const a=slug(q);
+    if(q.length<2){meld('Typ minstens twee tekens.');return;}
+    if(GIDS.some(it=>it.adres===a)){ ga({adres:a}); return; }
+    const uit=$('#zoekUit'); uit.innerHTML='<div class="kop2">Zoeken…</div>';
+    try{
+      const d=await api('zoek',{q});
+      const sites=d.sites||[], zaken=d.zaken||[];
+      uit.textContent='';
+      if(!sites.length&&!zaken.length){ uit.innerHTML='<div class="kop2">Resultaten</div><div class="leeg" style="padding:1rem;">Niets gevonden voor "'+esc(q)+'".</div>'; return; }
+      if(sites.length){
+        const k=document.createElement('div');k.className='kop2';k.textContent='Sites';uit.appendChild(k);
+        const r=document.createElement('div');r.className='rooster';r.style.marginBottom='1.4rem';
+        sites.forEach(it=>{ const b=document.createElement('button');b.type='button';b.className='kaart';
+          b.innerHTML='<div class="nm">'+esc(it.titel)+'</div><div class="ad">'+esc(it.adres)+'.rtg</div>';
+          b.addEventListener('click',()=>ga({adres:it.adres})); r.appendChild(b); });
+        uit.appendChild(r);
+      }
+      if(zaken.length){
+        const k=document.createElement('div');k.className='kop2';k.textContent='Bedrijven';uit.appendChild(k);
+        const r=document.createElement('div');r.className='rooster';r.style.marginBottom='1.4rem';
+        zaken.forEach(z=>{ const b=document.createElement('button');b.type='button';b.className='kaart';
+          b.innerHTML='<div class="nm">'+esc(z.naam)+'</div><div class="ad">'+(z.adres?esc(z.adres)+'.rtg':esc(z.typeLabel||''))+'</div><div class="mt">'+esc([z.typeLabel,z.stad].filter(Boolean).join(' · '))+(z.adres?'':' · nog geen RTG-site')+'</div>';
+          if(z.adres) b.addEventListener('click',()=>ga({adres:z.adres}));
+          else b.addEventListener('click',()=>meld('Dit bedrijf heeft nog geen site op het RTG-web. Bekijk het in de leden-app.'));
+          r.appendChild(b); });
+        uit.appendChild(r);
+      }
+    }catch(err){ uit.innerHTML='<div class="leeg">'+esc(err.message)+'</div>'; }
+  });
   try{
     const d=await api('gids');
     GIDS=d.lijst||[];
@@ -176,6 +217,20 @@ async function toonSite(adres){
     const site=d.site; HUIDIGE={site};
     document.title=site.titel+' · RTG Browser';
     const wrap=document.createElement('div'); wrap.className='sitewrap';
+    /* de site hoort bij een bedrijf: de browser toont wie dit is en wat je
+       hier kunt -- reserveren, bestellen en chatten lopen via de leden-app,
+       met dezelfde RTG-identiteit */
+    if(d.zaak){
+      const z=d.zaak, balk=document.createElement('div'); balk.className='zaakbalk';
+      const nm=document.createElement('span');nm.className='zn';nm.textContent=z.naam;balk.appendChild(nm);
+      const mt=document.createElement('span');mt.className='zm';mt.textContent=[z.typeLabel,z.stad].filter(Boolean).join(' · ');balk.appendChild(mt);
+      if(z.rating){const rr=document.createElement('span');rr.className='zr';rr.textContent='★ '+z.rating.score+' ('+z.rating.aantal+')';balk.appendChild(rr);}
+      const kn=document.createElement('span');kn.className='zk';
+      const LABELS={reserveren:'Reserveer',bestellen:'Bestel',boeken:'Boek',diensten:'Diensten',kamers:'Kamers',chat:'Chat'};
+      (z.acties||[]).forEach(a=>{ const c=document.createElement('a');c.className='chip';c.href='/apps/app.html';c.textContent=LABELS[a]||a;kn.appendChild(c); });
+      const open=document.createElement('a');open.className='chip hoofd';open.href='/apps/app.html';open.textContent='Open in de leden-app';kn.appendChild(open);
+      balk.appendChild(kn); wrap.appendChild(balk);
+    }
     const doek=document.createElement('div'); doek.className='doek'; doek.dataset.thema=site.thema||'donker'; doek.dataset.ver=''; doek.style.setProperty('--acc',site.accent||'#7F1634');
     // vrije kleuren van de maker toepassen (achtergrond, tekst, kaart); ontbreekt
     // er een, dan houdt het thema die kleur

@@ -140,43 +140,6 @@ module.exports = (ctx) => {
     return { ok: true, aantal: l.regels.length };
   }
 
-  /* De lijst zoals het lid hem ziet: elke regel gekoppeld aan het LEVENDE
-     aanbod. Wat er niet meer is, vervalt zichtbaar; wat duurder of goedkoper
-     is geworden krijgt het verschil erbij, want dat is de reden dat je iets
-     bewaart. */
-  function toon(key, id) {
-    const l = vind(key, id);
-    if (!l) return { status: 404, error: 'Lijst niet gevonden.' };
-    const levend = new Map(ctx.aanbodAlles().aanbod.map(a => [a.id, a]));
-    const regels = l.regels.map(r => {
-      const a = levend.get(r.aanbodId);
-      if (!a) return { ...r, vervallen: true, reden: 'Dit aanbod staat niet meer in de Mall.' };
-      const nuPrijs = a.prijs ? a.prijs.bedrag : null;
-      const verschil = (r.prijsBijBewaren != null && nuPrijs != null && nuPrijs !== r.prijsBijBewaren)
-        ? Math.round((nuPrijs - r.prijsBijBewaren) * 100) / 100 : null;
-      return { ...r, vervallen: false, aanbod: a, prijsVerschil: verschil };
-    });
-    const uit = { ok: true, lijst: { ...l, regels }, aantal: regels.length,
-      vervallen: regels.filter(r => r.vervallen).length };
-    if (l.soort === 'reis') uit.reis = reisbeeld(l, regels);
-    return uit;
-  }
-
-  /* Wat er in een reis nog ontbreekt. Een geheugensteun met vier vakjes, geen
-     verkoopmotor: er staat wat er staat en wat er niet staat, zonder aandrang
-     en zonder aanbevelingen die toevallig het duurst zijn. */
-  function reisbeeld(l, regels) {
-    const aanwezig = new Set(regels.filter(r => !r.vervallen).map(r => r.type));
-    return {
-      plek: l.plek, van: l.van, tot: l.tot,
-      onderdelen: REIS_ONDERDELEN.map(o => ({
-        id: o.id, label: o.label,
-        heeft: o.typen.some(t => aanwezig.has(t))
-      })),
-      opmerking: 'Een reis boek je niet in een keer: elke regel gaat naar de partij die hem levert, met zijn eigen bevestiging.'
-    };
-  }
-
   // alle lijsten van dit lid, kort (zonder de regels uit te werken)
   function mijn(key) {
     return {
@@ -187,6 +150,8 @@ module.exports = (ctx) => {
     };
   }
 
+  // de leeskant (een lijst uitwerken tegen het levende aanbod) staat apart
+  const { toon } = require('./lijsttonen')(ctx, { vind, REIS_ONDERDELEN });
   const api = { mijn, maak, zet, weg, voegToe, haalWeg, toon, REIS_ONDERDELEN, MAX_LIJSTEN, BEWAARD };
   // "Bewaard" en het volgen van prijzen staan in ./bewaard.js
   Object.assign(api, require('./bewaard')(ctx, { bak, voegToe, haalWeg, toon, nu, BEWAARD }));

@@ -1736,6 +1736,34 @@
       "gezakt": 11,
       "scherp": "gezakt"
     },
+    "mall-bestellingen.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 9,
+      "scherp": "gezakt"
+    },
+    "mall-bewaard.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 11,
+      "scherp": "gezakt"
+    },
+    "mall-collecties.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 11,
+      "scherp": "gezakt"
+    },
+    "mall-concierge.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 11,
+      "scherp": "gezakt"
+    },
     "mall-context.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -1744,6 +1772,13 @@
       "scherp": "gezakt"
     },
     "mall-extern.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 13,
+      "scherp": "gezakt"
+    },
+    "mall-kaart.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
@@ -1762,6 +1797,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 9,
+      "scherp": "gezakt"
+    },
+    "mall-vestigingen.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 11,
       "scherp": "gezakt"
     },
     "mall-vindlaag.test.js": {

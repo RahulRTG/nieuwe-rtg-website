@@ -1,12 +1,12 @@
 {
   "vastgelegd": "2026-08-09",
   "meters": {
-    "endpointsZonderTest": 1093,
-    "dekkingPct": 68,
+    "endpointsZonderTest": 1092,
+    "dekkingPct": 69,
     "keuringStuk": 0,
     "keuringScheef": 10,
     "dependencies": 0,
-    "testbestanden": 636,
+    "testbestanden": 642,
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 17,
     "e2eBestanden": 87,
@@ -29,6 +29,12 @@
     "toetsenOngevoeligPct": 2.2
   },
   "notities": [
+    {
+      "datum": "2026-08-09",
+      "meter": "drie meters die BETER stonden vastgezet (endpointsZonderTest 1093 -> 1092, dekkingPct 68 -> 69, testbestanden 636 -> 642)",
+      "reden": "Bij het afbouwen van de Mall-lijst (kaart, land, beoordelingen, bezorging, favorieten, prijsalarm, collecties/bundels/evenementen/seizoenen, bestellingenoverzicht, filialen, zakelijke ingang, concierge) sloegen vier meters uit. Alle vier zijn HERSTELD in plaats van herijkt, en dat hoort hier met naam: toetsenNietGemeten 190 -> 184 door de zes nieuwe toetsbestanden door de mutatiemotor te halen (alle zes gezakt, ook in de scherpe ronde -- bewezen gevoelig); keuringDubbeling 81 -> 80 door mijn functie samenvatting() in mall/concierge.js te hernoemen naar trefferZin(), want die naam stond al in boerderij/adviseur.js en rtmail-ai.js en werd met de mijne een patroon; keuringOmvang 123 -> 121 door zoek.js en lijsten.js op hun natuurlijke naad te knippen (de plekkenlijst en de Mall-home naar zoekhome.js, de leeskant van een lijst naar lijsttonen.js) -- geen comments wegschaven maar echt opdelen; endpointsZonderTest ging van 1095 naar 1092 doordat de drie kantoorroutes voor RTG-collecties werkelijk ongetoetst waren en er een deurtoets bij is gekomen (mutatie H2: officeAuth eraf laat toets 10 zakken).",
+      "eerlijkheidshalve": "Van die laatste drie was alleen de dekkingswinst echt: /api/office/mall/collectie/{zet,weg} en /collecties hadden geen enkele toets die de deur probeerde. Wat de toets NIET doet is een RTG-collectie via het kantoor werkelijk samenstellen -- dat vraagt een kantoorinlog die deze toets niet heeft, en de samenstel-logica zelf wordt wel gedekt (toets 9, op de kern). De deur is dus getoetst, de doorgang niet."
+    },
     {
       "datum": "2026-08-09",
       "meter": "keuringScheef 12 -> 10 (BETER, met de hand vastgezet)",

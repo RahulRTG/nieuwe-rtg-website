@@ -191,6 +191,25 @@ test('9. andermans aanbod bundelen wordt geweigerd', async () => {
   assert.equal(rtg.ok, true, 'het kantoor stelt wel over zaken heen samen: ' + (rtg.error || ''));
 });
 
+test('9b. de kantoorroutes voor RTG-collecties zijn dicht voor leden en zaken', async () => {
+  /* Een RTG-collectie gaat OVER de zaken heen; alleen het kantoor mag hem
+     samenstellen. Zonder deze toets bestond die deur wel maar was hij nooit
+     aangeraakt -- en een deur die niemand heeft geprobeerd, is geen deur. */
+  const roster = await api(base, '/api/supplier/roster', { code: 'KAITO' });
+  const man = (roster.body.staff || []).find(x => x.role === 'manager');
+  const zaak = (await api(base, '/api/supplier/login', { code: 'KAITO', staffId: man.id, pin: '1234' })).body.token;
+  assert.ok(zaak, 'de zaak kan inloggen');
+
+  for (const pad of ['/api/office/mall/collecties', '/api/office/mall/collectie/zet', '/api/office/mall/collectie/weg']) {
+    const zonder = await api(base, pad, {});
+    assert.ok([401, 403].includes(zonder.status), pad + ' is dicht zonder sessie (' + zonder.status + ')');
+    const alsLid = await api(base, pad, {}, lid);
+    assert.ok([401, 403].includes(alsLid.status), pad + ' is dicht voor een lid (' + alsLid.status + ')');
+    const alsZaak = await api(base, pad, {}, zaak);
+    assert.ok([401, 403].includes(alsZaak.status), pad + ' is dicht voor een zaak (' + alsZaak.status + ')');
+  }
+});
+
 test('10. een evenement zonder datum en een seizoen zonder periode worden geweigerd', () => {
   const m = bouwCollecties([], [aanbodje('a', 10), aanbodje('b', 20)]);
   const ev = m.zet('rtg', 'RTG', { soort: 'evenement', titel: 'Markt', regels: ['a', 'b'] });

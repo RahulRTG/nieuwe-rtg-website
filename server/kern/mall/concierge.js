@@ -108,7 +108,7 @@ module.exports = (ctx) => {
   /* Het antwoord wordt OPGEBOUWD uit de treffers, niet geschreven door het
      model. Daarom kan er geen bevestiging, geen prijs en geen merknaam in staan
      die niet uit de Mall zelf komt. */
-  function samenvatting(d, gebruikteAI) {
+  function trefferZin(d, gebruikteAI) {
     if (!d.totaal) {
       return 'Hier vind ik niets voor. Dat kan aan de plek of de periode liggen; u kunt de vraag ook als aanvraag plaatsen, dan zien de zaken hem.';
     }
@@ -162,7 +162,7 @@ module.exports = (ctx) => {
       filters: opdracht,
       genegeerd,
       gebruikteAI,
-      antwoord: samenvatting(d, gebruikteAI),
+      antwoord: trefferZin(d, gebruikteAI),
       treffers: d.items,
       totaal: d.totaal,
       perVerdieping: d.perVerdieping,

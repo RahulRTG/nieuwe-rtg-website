@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 719 bestanden en 4082 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 719 bestanden en 4084 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 719 |
-| losse beweringen (`test(...)`) | 4082 |
+| losse beweringen (`test(...)`) | 4084 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 522 |
 | **overleefd**: geen mutatie kreeg hem rood | 12 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-631 bestanden, 3925 beweringen.
+631 bestanden, 3927 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -394,7 +394,7 @@ toets omvalt.
 | `payroll-aangifte.test.js` | 10 | -- | Payroll OS: de loonaangifte -- de derde uitgang uit dezelfde definitieve run. WAT HIER OP HET SPEL STAAT. |
 | `payroll-dekking.test.js` | 9 | -- | Payroll OS: de DEKKING per land -- waar kan er loon draaien, en waar niet? WAT HIER OP HET SPEL STAAT. |
 | `payroll-dossier.test.js` | 9 | -- | Payroll OS: HET DOSSIER -- de vier vragen, voor elk bedrag. DIT IS DE AFGESPROKEN MAATSTAF, en deze toets maakt hem toetsbaar. |
-| `payroll-journaal.test.js` | 8 | -- | Payroll OS: het loonjournaal, het betaalbestand, en verzuim. DE VIERDE VRAAG: waar is het bedrag geboekt en betaald. |
+| `payroll-journaal.test.js` | 10 | -- | Payroll OS: het loonjournaal, het betaalbestand, en verzuim. DE VIERDE VRAAG: waar is het bedrag geboekt en betaald. |
 | `payroll-loonheffing.test.js` | 12 | -- | Payroll OS: de loonheffing als TABEL -- schijven, heffingskortingen en het bijzondere tarief. WAT HIER OP HET SPEL STAAT. |
 | `payroll-motor.test.js` | 10 | -- | Payroll OS: de loonmotor, het regelpakket en het componentenregister. DE BELOFTE DIE HIER WORDT BEWAAKT is de belofte waar de hele opzet op rust: een oude loonstrook verandert nooit stilletjes mee met een... |
 | `payroll-register-verzuim.test.js` | 10 | -- | Drie lagen die WEL bestonden en door NIEMAND werden aangeroepen. Ik heb de payrolllaag nagelopen op publieke functies die nergens vandaan worden gebruikt. |

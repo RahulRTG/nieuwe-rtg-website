@@ -56,6 +56,36 @@ module.exports = (ctx) => {
     return beste;
   }
 
+  /* De IBAN's van het personeel van een zaak, als staffId -> IBAN. Dit is wat
+     de bank WEL weet en de payroll niet: welk personeelslid aan welk RTG-lid
+     hangt en welke betaalrekening dat lid heeft. De loonrun levert de bedragen,
+     deze kant levert de bestemmingen. */
+  function salarisRekeningen({ zaak }) {
+    const code = String(zaak || '').toUpperCase();
+    if (!(d().suppliers || []).some(x => x.code === code)) return { status: 404, error: 'Die zaak bestaat niet.' };
+    const rekeningen = {}, zonder = [];
+    for (const st of accounts.listStaff(code)) {
+      const lid = st.member_id != null ? accounts.getUserById(st.member_id) : null;
+      const rek = lid && lid.codename ? eersteBetaalRekening(lid.codename) : null;
+      if (rek) rekeningen[st.id] = rek.iban;
+      else zonder.push({ staffId: st.id, naam: st.name, reden: lid ? 'geen betaalrekening' : 'niet aan een RTG-lid gekoppeld' });
+    }
+    return { ok: true, zaak: code, rekeningen, zonderRekening: zonder };
+  }
+
+  /* WAT DIT WEL EN NIET IS. Dit is een KOSTENRAMING uit de geklokte uren, voor
+     de planning: wat kost dit personeel deze maand, inclusief werkgeverslasten.
+
+     Het was ook de bron van de uitbetaling, en dat was fout. De bedragen hier
+     zijn BRUTO uren x uurloon: geen loonheffing ingehouden, geen vier ogen,
+     geen loonstrook, geen journaal en geen aangifte. Het geld ging er wel echt
+     uit. Ondertussen maakt kern/payroll een netto betaalbestand met al die
+     controles, dat door niemand werd uitbetaald -- twee administraties van
+     hetzelfde loon, en de verkeerde had de knop.
+
+     Uitbetalen loopt daarom nu uitsluitend via een DEFINITIEVE loonrun; zie
+     routes/kantoren/bank-rekeningen.js. Vandaar `uitbetaalbaar: false` in het
+     antwoord: dit getal is om mee te plannen, niet om mee te betalen. */
   function salarisVoorstel({ zaak }) {
     const code = String(zaak || '').toUpperCase();
     const s = (d().suppliers || []).find(x => x.code === code);
@@ -84,7 +114,12 @@ module.exports = (ctx) => {
       if (rek) { posten.push({ naarIban: rek.iban, centen, oms: 'Salaris ' + maand }); totaal += centen; }
       else zonderRekening.push({ staffId: st.id, naam: st.name, brutoCenten: centen, reden: lid ? 'geen betaalrekening' : 'niet aan een RTG-lid gekoppeld' });
     }
-    return { ok: true, zaak: code, zaakNaam: s.name, maand, uurloon, regels, posten, zonderRekening,
+    return { ok: true, zaak: code, zaakNaam: s.name, maand, uurloon, regels, zonderRekening,
+      /* GEEN `posten` MEER. Dat veld was de betaalopdracht-in-wording en het
+         enige wat de route nodig had om bruto uit te betalen; zolang het
+         bestaat, is de verleiding er om het weer aan een run te hangen. */
+      uitbetaalbaar: false,
+      uitleg: 'Een raming uit de geklokte uren, bruto. Uitbetalen gaat via een definitieve loonrun (Payroll OS).',
       totaalCenten: totaal, brutoCenten: bruto,
       // de werkgeverslasten van het fiscale bord, zodat de boardroom het hele
       // kostenplaatje ziet (de run betaalt alleen het bruto uit)
@@ -93,6 +128,7 @@ module.exports = (ctx) => {
   }
 
   return {
+    bankSalarisRekeningen: salarisRekeningen,
     bankBulkBetaal: (a) => batch({ ...a, soort: 'bulk' }),
     bankSalarisRun: (a) => batch({ ...a, soort: 'salaris' }),
     bankSalarisVoorstel: salarisVoorstel

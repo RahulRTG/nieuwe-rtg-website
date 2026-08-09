@@ -294,26 +294,93 @@ test('salarisrun uit de klokuren: het voorstel matcht op de lid-koppeling en de 
   const staf = (await api('supplier/login', { code: 'KIKUNOI', staffId: nora.id, pin: '5678' })).body.token;
   assert.ok((await api('staff/klok/correctie', { staffId: nora.id, in: inAt.toISOString(), uit: uitAt.toISOString() }, staf)).status >= 400, 'de klokcorrectie is manager-only');
 
-  // het voorstel: dezelfde uren en hetzelfde uurloon als het fiscale bord
+  /* HET VOORSTEL IS EEN RAMING EN GEEN BETAALOPDRACHT. Dat onderscheid is de
+     kern van deze toets. De bedragen hier zijn BRUTO (uren x uurloon): geen
+     loonheffing ingehouden, geen loonstrook, geen vier ogen, geen aangifte.
+     Precies die posten werden uitbetaald, terwijl kern/payroll ondertussen een
+     netto betaalbestand maakte dat niemand uitbetaalde. */
   const v = await oapi('bank/salaris/voorstel', { zaak: 'KIKUNOI' }, 'RTG');
   assert.equal(v.status, 200);
   const rNora = v.body.regels.find(r => r.naam === 'Nora Prins');
-  assert.ok(rNora, 'Nora staat in het voorstel');
+  assert.ok(rNora, 'Nora staat in de raming');
   assert.equal(rNora.iban, noraIban, 'gematcht op haar eigen betaalrekening (lid-koppeling)');
   assert.ok(rNora.uren >= 2, 'de gecorrigeerde uren tellen mee');
   assert.equal(rNora.brutoCenten, Math.round(rNora.uren * v.body.uurloon * 100), 'bruto = uren x het uurloon van de zaak');
   assert.ok(v.body.zonderRekening.some(z => z.naam === mateo.name), 'wie geen lid-koppeling heeft staat eerlijk in het niet-uitbetaalbare lijstje');
+  assert.equal(v.body.uitbetaalbaar, false, 'en de raming zegt zelf dat hij niet uit te betalen is');
+  assert.equal(v.body.posten, undefined, 'er staat geen kant-en-klare postenlijst meer in: die was de verleiding');
 
-  // de run: het kantoor betaalt vanaf een gedekte zakelijke rekening (van een
-  // vers lid; de rtg-persona zit hierboven al aan zijn rekeningen-plafond)
+  // de rekening waarvandaan betaald wordt (een vers lid; de rtg-persona zit
+  // hierboven al aan zijn rekeningen-plafond)
   const l2 = await (await fetch(base + '/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tier: 'lifestyle' }) })).json();
   const cn = (await api('pay/overzicht', {}, l2.token)).body.codenaam;
   const zak = await oapi('bank/rekening/open', { codenaam: cn, soort: 'zakelijk' }, 'RTG');
   const zakIban = zak.body.rekening.iban;
   await api('bank/storten', { iban: zakIban, centen: 100000, idem: 'sal-dek' }, l2.token);
-  const run = await oapi('bank/salaris/run', { zaak: 'KIKUNOI', vanIban: zakIban }, 'RTG');
-  assert.equal(run.status, 200);
-  assert.equal(run.body.totaalCenten, v.body.totaalCenten, 'de run betaalt exact het voorstel uit');
+
+  // ZONDER LOONRUN GEBEURT ER NIETS. Dit was de knop die bruto uitbetaalde.
+  const zonder = await oapi('bank/salaris/run', { zaak: 'KIKUNOI', vanIban: zakIban }, 'RTG');
+  assert.equal(zonder.status, 400, 'uitbetalen zonder loonrun wordt geweigerd');
+  assert.match(zonder.body.error, /loonrun/i);
+  assert.match(zonder.body.error, /bruto/i, 'en de weigering zegt waarom dat gevaarlijk was');
+
+  /* DE ECHTE WEG: uren -> loonrun -> twee handtekeningen -> definitief ->
+     bankbatch. De regels moeten aangemerkt zijn (iemand zegt "deze tarieven
+     kloppen"), anders mag er geen definitieve run op. */
+  const pak = await oapi('payroll/regels', { land: 'NL' }, 'RTG');
+  const versie = (pak.body.pakketten || []).map(p => p.versie)[0];
+  assert.ok(versie, 'er is een meegeleverde jaargang: ' + JSON.stringify(pak.body).slice(0, 160));
+  assert.equal((await bapi('payroll/regels/keur', { land: 'NL', versie }, baas)).status, 200, 'het kantoor merkt de jaargang aan');
+
+  /* HET LAND VAN DE ZAAK BEPAALT DE LOONREGELS, en Sal de Mar staat in Ibiza:
+     supplierdefaults zet die op ES. Er is alleen een Nederlandse jaargang
+     meegeleverd, dus zonder deze regel kan deze zaak geen definitieve loonrun
+     draaien -- en dat is geen toetsprobleem maar het gedrag zelf: wie de regels
+     van een land niet heeft geladen, hoort daar geen loon te draaien. Zie
+     TAKEN.md 4.25. */
+  assert.equal((await api('supplier/settings', { land: 'NL' }, mgr)).status, 200, 'de zaak staat op NL');
+
+  /* EEN LOONRUN BEGINT BIJ HET CONTRACT EN NIET BIJ DE KLOK. Zonder contract
+     staat er wel een naam in de run maar geen loon, en dan is netto nul --
+     precies wat kern/payroll/controles.js als "loon zonder contract" meet. Het
+     bruto-voorstel van de bank had dat niet nodig, en dat is ook meteen het
+     verschil: dat rekende met een uurloon van de ZAAK in plaats van met het
+     contract van de PERSOON. */
+  const contract = await oapi('payroll/contract', { code: 'KIKUNOI', staffId: nora.id,
+    vanaf: '2026-01-01', soort: 'oproep', betaling: 'maand', uurloonCenten: 1800, urenPerWeek: 12, functie: 'Bediening' }, 'RTG');
+  assert.equal(contract.status, 200, 'Nora heeft een contract: ' + JSON.stringify(contract.body).slice(0, 160));
+
+  const periode = new Date().toISOString().slice(0, 7);
+  const open = await oapi('payroll/run/open', { code: 'KIKUNOI', periode }, 'RTG');
+  assert.equal(open.status, 200, 'de loonrun opent op dezelfde geklokte uren: ' + JSON.stringify(open.body).slice(0, 200));
+  const runId = open.body.run.id;
+
+  // vier ogen: de manager tekent aan de zaakkant, de administrateur bij het kantoor
+  const mKeur = await api('supplier/payroll/keur', { runId }, mgr);
+  assert.equal(mKeur.status, 200, 'de manager tekent: ' + JSON.stringify(mKeur.body).slice(0, 140));
+  const aKeur = await bapi('payroll/run/keur', { runId }, baas);
+  assert.equal(aKeur.status, 200, 'de administrateur tekent: ' + JSON.stringify(aKeur.body).slice(0, 140));
+  const def = await bapi('payroll/run/definitief', { runId }, tweede);
+  assert.equal(def.status, 200, 'de run is definitief: ' + JSON.stringify(def.body).slice(0, 200));
+
+  const run = (await oapi('payroll/run/een', { runId }, 'RTG')).body.run;
+  const netto = run.stroken.reduce((s, x) => s + Math.max(0, x.strook.nettoCenten), 0);
+  const brutoRun = run.stroken.reduce((s, x) => s + (x.strook.brutoCenten || 0), 0);
+  assert.ok(netto > 0 && netto < brutoRun, 'netto is minder dan bruto -- er wordt echt ingehouden: ' + netto + ' van ' + brutoRun);
+
+  const run2 = await oapi('bank/salaris/run', { runId, vanIban: zakIban }, 'RTG');
+  assert.equal(run2.status, 200, 'de bankbatch draait op de loonrun: ' + JSON.stringify(run2.body).slice(0, 200));
+  assert.equal(run2.body.runId, runId, 'en het antwoord wijst naar de run waaruit hij komt');
+
+  /* HET BEDRAG IS HET NETTO VAN DE RUN, en dat is het hele punt: er gaat niet
+     meer het brutoloon de deur uit. Alleen wie een gekoppelde betaalrekening
+     heeft wordt betaald, dus tellen we die kant precies na. */
+  const betaald = run.stroken
+    .filter(x => x.strook.nettoCenten > 0 && x.staffId === nora.id)
+    .reduce((s, x) => s + x.strook.nettoCenten, 0);
+  assert.equal(run2.body.totaalCenten, betaald, 'uitbetaald = het netto van wie een rekening heeft');
+  assert.ok(run2.body.totaalCenten < v.body.brutoCenten, 'en dus minder dan de bruto raming van het voorstel');
+
   const af = await api('bank/afschrift', { iban: noraIban }, nl.token);
   assert.ok(af.body.regels.some(r => r.soort === 'salaris' && !r.af), 'het salaris staat als bijschrijving op Nora’s afschrift');
 });

@@ -143,3 +143,35 @@ test('een leidinggevende ziet afwezig, de payroll ziet de soort', () => {
   assert.ok(ziek, 'de payroll kent de soort wel; die moet het percentage weten');
   assert.equal(ziek.betaaldDeel, 0.7);
 });
+
+/* WIE NIETS KRIJGT, HOEFT GEEN REKENING TE HEBBEN. Het betaalbestand is met
+   opzet alles-of-niets: ontbreekt van iemand een rekeningnummer, dan gaat er
+   NIETS de deur uit. Die strengheid is goed, maar hij gold ook voor mensen aan
+   wie niets werd overgemaakt -- de rekeningcontrole stond voor de nulcontrole.
+   Gevolg: een uitzendkracht zonder uren, iemand die net uit dienst is, of een
+   correctie die alleen inhoudt, blokkeerde een hele loonrun. En bij een
+   correctierun is dat precies het geval waar zo'n run voor bestaat.
+
+   De volgorde is omgedraaid: eerst kijken of er iets te betalen valt, dan pas
+   of er een rekening is. Wie wel geld krijgt, houdt zijn harde eis. */
+test('iemand met nul netto blokkeert de run niet, ook zonder rekeningnummer', () => {
+  const { run, journaal } = opzet();
+  const r = definitieveRun(run, [persoon(1, 'Sam', 100), persoon(2, 'Robin', 0)]);
+  const robin = r.stroken.find(x => x.staffId === 2);
+  assert.equal(robin.strook.nettoCenten, 0, 'Robin werkte niet en krijgt niets');
+
+  // alleen Sam heeft een rekening; Robin staat er niet in
+  const bet = journaal.betaalbestand(r, { 1: IBANS[1] });
+  assert.ok(bet.ok, 'het bestand komt er: ' + JSON.stringify(bet).slice(0, 220));
+  assert.equal(bet.bestand.aantal, 1, 'er wordt aan een persoon betaald');
+  assert.equal(bet.bestand.posten[0].staffId, 1);
+  assert.equal(bet.bestand.totaalCenten, r.stroken.find(x => x.staffId === 1).strook.nettoCenten);
+});
+
+test('maar wie WEL geld krijgt en geen rekening heeft, houdt de hele run tegen', () => {
+  const { run, journaal } = opzet();
+  const r = definitieveRun(run, [persoon(1, 'Sam', 100), persoon(2, 'Robin', 80)]);
+  const bet = journaal.betaalbestand(r, { 1: IBANS[1] });   // Robin werkte wel, maar heeft geen IBAN
+  assert.equal(bet.status, 422, 'alles-of-niets blijft gelden voor wie betaald moet worden');
+  assert.ok(bet.medewerkers.some(m => m.staffId === 2), 'en het zegt om wie het gaat');
+});

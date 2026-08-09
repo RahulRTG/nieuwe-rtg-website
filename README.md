@@ -1428,6 +1428,48 @@ raak: bonnen niet meetellen, een wachtende boeking als klant tellen, eenmalige
 klanten als stilgevallen bestempelen, offertes van andere zaken meetellen, en de
 losse aanvragen-actie er tóch dubbel bij laten komen.
 
+### Debiteuren: wat er nog open staat, en hoe lang al
+
+`server/kern/onderneming/debiteuren.js` + `/api/onderneming/debiteuren`, met de
+betaalstatus zelf in `kern/facturatie/motor.js` en het afboeken op
+`/api/supplier/facturen/betaald`.
+
+De facturatie bestond al -- nummers, btw, een PDF, per zaak uitgaand en inkomend.
+Wat er niet was, is de vraag die elke ondernemer stelt zodra hij op rekening
+werkt: **wat staat er nog open.** Facturen droegen geen betaalstatus en geen
+vervaldatum, dus gold elke factuur impliciet als afgedaan en bestond er geen
+debiteurenlijst. Die twee velden zitten er nu bij de bron in: de stand wordt niet
+geraden waar hij gezegd kan worden (`betaald` van de aanroeper telt), en anders
+geldt een aanwezige betaalmethode als bewijs -- die wordt alleen gezet als er echt
+is afgerekend.
+
+**De geschiedenis telt als betaald, en dat is expliciet.** Bestaande facturen
+hebben het veld niet. Zou "geen veld" als open gelden, dan stond morgen alles wat
+ooit gefactureerd is op de debiteurenlijst: een alarm dat niets betekent, en
+precies daarom binnen een week niet meer gelezen wordt. Dezelfde grandfathering
+als `online !== false` bij de ondernemerspoort.
+
+**De ouderdomsgroepen zijn geteld, niet gewogen** -- loopt nog, 1-14, 15-30,
+31-60, 60+ dagen over. Er komt bewust géén risicoscore uit: "betalingsrisico" zou
+hier een getal zijn dat op niets rust, want wij zien alleen deze zaak en niet het
+betaalgedrag van die klant elders. Een factuur zonder vervaldatum wordt apart
+geteld in plaats van in de jongste groep gegooid: niets weten is iets anders dan
+"loopt nog". De oudste post staat er apart bij, want een klein bedrag van drie
+maanden oud zegt meer dan het totaal.
+
+**Alleen de verkoper boekt af.** Een koper die zijn eigen factuur op betaald zet,
+is geen betaling maar een bewering. Terugdraaien mag wel -- een vergissing hoort
+herstelbaar te zijn.
+
+In het dagbeeld gaan vervallen facturen vóór de rest van de opvolging: dat is het
+meest concrete geld dat er ligt, al verdiend en alleen nog niet binnen. Wat nog
+lóópt is geen actie maar de normale gang van zaken.
+
+Getoetst in `test/onderneming-debiteuren.test.js` (12), inclusief alle vijf
+groepsgrenzen. Vijf mutaties, alle vijf raak: "geen betaalstatus" als open lezen,
+op de vervaldag al vervallen zijn, een factuur zonder vervaldatum in "loopt"
+gooien, iedereen laten afboeken, en ook lopende facturen een actie laten worden.
+
 ### RTG Werk OS (de werkplek van een organisatie)
 
 `server/bedrijf/` + `/api/bedrijf/...` + `/apps/werk.html`. Een **werkruimte**

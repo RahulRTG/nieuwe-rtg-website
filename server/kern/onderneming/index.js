@@ -53,6 +53,7 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boeki
      verklaard, en een const lezen voor zijn declaratie gooit. Zelfde functie. */
   const boek = require('../klantenboek')({ db, save, scho: schoon, boekingenVanZaak, ordersVanZaak });
   const rel = require('./relaties')({ db, klantenboek: boek.klantenboek, boekingenVanZaak });
+  const deb = require('./debiteuren')({ db });
 
   const bak = () => {
     if (!Array.isArray(db.data.ondernemingen)) db.data.ondernemingen = [];
@@ -188,10 +189,11 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boeki
        heeft hem toch al, en twee keer rekenen kan twee antwoorden geven op
        dezelfde vraag. */
     ondernemingDagbeeld: (o) => dag.dagbeeld(o, ondernemingBeeld(o), ondernemingVerkenning(o),
-      opr.oprichtingsproject(o), ek.eersteKlant(o), mp.ondernemingMallProfiel(o), rel.relaties(o)),
+      opr.oprichtingsproject(o), ek.eersteKlant(o), mp.ondernemingMallProfiel(o), rel.relaties(o), deb.debiteuren(o)),
     ondernemingEersteKlant: ek.eersteKlant,
     ondernemingMallProfiel: mp.ondernemingMallProfiel,
     ondernemingRelaties: rel.relaties,
+    ondernemingDebiteuren: deb.debiteuren,
     ondernemingKlantNotitie: boek.klantNotitie,
     ondernemingOprichting: opr.oprichtingsproject,
     ondernemingOprichtingZet: opr.oprichtingZet,

@@ -11,9 +11,11 @@
    ook de belangrijke. */
 'use strict';
 
+const DEBITEUREN = require('./debiteuren');
+
 module.exports = ({ boekingenVanZaak, intakeOntbreekt }) => {
 
-  function acties(o, feiten, verk, project, eersteklant, mall, rel) {
+  function acties(o, feiten, verk, project, eersteklant, mall, rel, deb) {
     const uit = [];
     const zet = (id, kop, waarom, waarheen) => uit.push({ id, kop, waarom, waarheen });
 
@@ -77,21 +79,28 @@ module.exports = ({ boekingenVanZaak, intakeOntbreekt }) => {
       zet('mijlpaal', 'Nog ' + eersteklant.volgende.teGaan + ' tot ' + eersteklant.volgende.label.toLowerCase(),
         eersteklant.volgende.wat, 'eersteklant');
     }
-    /* 9. de opvolging. Dit gaat VOOR de Mall-pagina en voor de losse
+    /* 9. vervallen facturen. Dit is het meest concrete geld dat er ligt: al
+       verdiend, alleen nog niet binnen. Het gaat daarom voor de rest van de
+       opvolging. */
+    if (deb) {
+      const v = DEBITEUREN.debiteurenOpvolging(deb);
+      if (v) zet('debiteuren', v.kop, v.waarom, 'debiteuren');
+    }
+    /* 10. de opvolging. Dit gaat VOOR de Mall-pagina en voor de losse
        aanvragen: het is het enige wat over geld gaat dat al binnen handbereik
        ligt. De losse aanvragen-actie hieronder valt weg zodra de opvolging hem
        al noemt -- twee keer hetzelfde vragen leest als een storing. */
     if (rel && rel.opvolging.length) {
       for (const v of rel.opvolging) zet('opvolging:' + v.id, v.kop, v.waarom, 'relaties');
     }
-    /* 10. de Mall-pagina. Na de etalage-check, want online staan gaat voor een
+    /* 11. de Mall-pagina. Na de etalage-check, want online staan gaat voor een
        mooie pagina: een pagina die niemand ziet is geen pagina. */
     if (mall && mall.open.length) {
       const m = mall.open[0];
       zet('mallprofiel', 'Uw Mall-pagina is ' + mall.percentage + '% ingevuld',
         m.label + ': ' + m.wat, 'mall');
     }
-    // 11. wat er ligt
+    // 12. wat er ligt
     const alGenoemd = !!(rel && rel.opvolging.some(v => v.id === 'aanvragen'));
     if (o.supplierCode && !alGenoemd) {
       const wacht = (boekingenVanZaak(o.supplierCode) || []).filter(b => b && b.status === 'aangevraagd').length;

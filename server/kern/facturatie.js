@@ -32,10 +32,10 @@ function maakFacturatie({ db, save, crypto, findSupplier, keyVanCodenaam, notify
   Object.assign(ctx, deelMotor);
   const deelLoket = require('./facturatie/loket')(ctx);
   Object.assign(ctx, deelLoket);
-  const { store, nummer, standaardBtw, verwerkRegels, boek, boekMetCodenaam } = deelMotor;
+  const { store, nummer, standaardBtw, verwerkRegels, boek, boekMetCodenaam, factuurBetaald } = deelMotor;
   const { publiek, vind, voorSupplier, voorLid, mag, pdf, bedragUit, aantalUit, codenaamUit, ai } = deelLoket;
 
-  return { SOORTEN, boek, boekMetCodenaam, voorSupplier, voorLid, vind, mag, pdf, publiek, standaardBtw, ai };
+  return { SOORTEN, boek, boekMetCodenaam, factuurBetaald, voorSupplier, voorLid, vind, mag, pdf, publiek, standaardBtw, ai };
 }
 
 module.exports = { maakFacturatie };

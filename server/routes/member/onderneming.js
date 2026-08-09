@@ -19,7 +19,7 @@ module.exports = (kern) => {
     ondernemingVerkenning, ondernemingPlanVastleggen, ondernemingDagbeeld,
     ondernemingOprichting, ondernemingOprichtingZet, ondernemingAanvraag,
     ondernemingAanvraagStand, ondernemingEersteKlant, ondernemingMallProfiel, ondernemingRelaties,
-    ondernemingKlantNotitie } = kern;
+    ondernemingKlantNotitie, ondernemingDebiteuren } = kern;
 
   /* `status` betekent in dit huis de HTTP-code, maar een kernmodule kan een
      domeinstand in datzelfde veld zetten ('geen-aanvraag'). Dat gebeurde hier
@@ -138,6 +138,14 @@ module.exports = (kern) => {
     if (!o) return stuur(res, nietGevonden);
     if (!o.supplierCode) return stuur(res, { status: 409, error: 'Er is nog geen zaak gekoppeld.' });
     stuur(res, ondernemingKlantNotitie(o.supplierCode, req.body || {}));
+  });
+
+  /* Wat er nog openstaat, in ouderdomsgroepen. Alleen facturen die als
+     onbetaald zijn aangemerkt; zie kern/onderneming/debiteuren.js. */
+  app.post('/api/onderneming/debiteuren', auth, (req, res) => {
+    const o = mijn(req);
+    if (!o) return stuur(res, nietGevonden);
+    res.json({ ok: true, debiteuren: ondernemingDebiteuren(o) });
   });
 
   /* ---- de zaak aanvragen ----

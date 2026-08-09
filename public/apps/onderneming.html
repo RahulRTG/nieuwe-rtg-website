@@ -154,7 +154,7 @@ function toonLeeg(){
 function teken(){
   const o=ONDS.find(x=>x.id===HUIDIG)||{};
   zetTitel(DAG.naam||'Mijn onderneming');
-  $('#hoofd').innerHTML=[vakGroet(),vakGezond(),vakActies(),vakIntake(),vakKans(),vakSimulatie(),vakStress(),vakPlan(o),vakRechtsvorm(o),vakOprichting(),vakZaak(o),vakEersteKlant(),vakMall(),vakRelaties()].join('');
+  $('#hoofd').innerHTML=[vakGroet(),vakGezond(),vakActies(),vakIntake(),vakKans(),vakSimulatie(),vakStress(),vakPlan(o),vakRechtsvorm(o),vakOprichting(),vakZaak(o),vakEersteKlant(),vakMall(),vakRelaties(),vakDebiteuren()].join('');
   haakKnoppen();
 }
 
@@ -398,6 +398,29 @@ function vakRelaties(){
     (opv?'<div style="margin-top:1rem;"><p class="subtxt" style="margin-bottom:.2rem;"><strong>Opvolgen</strong></p>'+opv+'</div>':'')+
     (top?'<div style="margin-top:1rem;"><p class="subtxt" style="margin-bottom:.2rem;">Op codenaam:</p>'+top+'</div>':'')+
     '<p class="subtxt" style="margin-top:.9rem;">'+esc(r.voorbehoud)+'</p></div>';
+}
+
+
+function vakDebiteuren(){
+  const d=DAG&&DAG.debiteuren;
+  if(!d) return '';
+  if(!d.aantal) return '<div class="vak"><h2>Openstaand</h2><p class="stil">Er staat niets open.</p></div>';
+  const gr=(d.groepen||[]).filter(g=>g.aantal).map(g=>
+    '<div class="bron"><span><strong>'+esc(g.label)+'</strong><br><span class="bu">'+esc(g.wat)+'</span></span>'+
+    '<span>'+g.aantal+'x &middot; '+euro(g.bedrag)+'</span></div>').join('');
+  const post=(d.posten||[]).slice(0,10).map(p=>
+    '<div class="bron'+(p.groep&&p.groep!=='loopt'?'':' niet')+'"><span><strong>'+esc(p.nummer||'-')+'</strong> &middot; '+esc(p.klant||'-')+
+    '<br><span class="bu">'+(p.dagenOver===null?'geen vervaldatum':(p.dagenOver>0?p.dagenOver+' dagen over':'loopt nog'))+'</span></span>'+
+    '<span>'+euro(p.totaal)+'</span></div>').join('');
+  return '<div class="vak"><h2>Openstaand</h2>'+
+    '<div class="score"><span class="n groot">'+euro(d.bedrag)+'</span>'+
+    '<span class="subtxt">'+d.aantal+' factu'+(d.aantal===1?'ur':'ren')+
+    (d.vervallenAantal?', waarvan '+d.vervallenAantal+' vervallen ('+euro(d.vervallenBedrag)+')':'')+'</span></div>'+
+    (d.oudste?'<p class="subtxt" style="margin-top:.4rem;">De oudste staat '+d.oudste.dagenOver+' dagen open.</p>':'')+
+    '<div style="margin-top:.9rem;">'+gr+'</div>'+
+    (post?'<div style="margin-top:1rem;"><p class="subtxt" style="margin-bottom:.2rem;">Posten:</p>'+post+'</div>':'')+
+    (d.zonderVervaldatum?'<p class="subtxt" style="margin-top:.7rem;">'+d.zonderVervaldatum+' factu'+(d.zonderVervaldatum===1?'ur heeft':'ren hebben')+' geen vervaldatum.</p>':'')+
+    '<p class="subtxt" style="margin-top:.9rem;">'+esc(d.voorbehoud)+'</p></div>';
 }
 
 /* ---------- handelingen ---------- */

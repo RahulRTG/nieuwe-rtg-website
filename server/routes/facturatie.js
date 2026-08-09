@@ -34,6 +34,17 @@ module.exports = (kern) => {
     res.setHeader('Content-Disposition', 'attachment; filename="' + f.nummer.replace(/[^\w.-]/g, '') + '.pdf"');
     res.send(facturatie.pdf(f));
   });
+  /* Een factuur afboeken als betaald (of dat terugdraaien). Achter de
+     zaak-inlog, en de kern controleert bovendien dat de aanvrager ook echt de
+     VERKOPER is: alleen hij weet of het geld binnen is. Een koper die zijn
+     eigen factuur op betaald zet, is geen betaling maar een bewering. */
+  app.post('/api/supplier/facturen/betaald', supplierAuth, (req, res) => {
+    if (!managerOnly(req, res)) return;
+    const r = facturatie.factuurBetaald(String((req.body || {}).id || ''),
+      req.supplier.code, (req.body || {}).betaald);
+    res.status(r.status || 200).json(r);
+  });
+
   // handmatig een factuur maken (bijv. voor een dienst): koper via codenaam of naam
   app.post('/api/supplier/facturen/maak', supplierAuth, async (req, res) => {
     if (!managerOnly(req, res)) return;

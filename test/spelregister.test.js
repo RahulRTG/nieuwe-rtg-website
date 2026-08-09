@@ -47,11 +47,18 @@ const GOUD = {
 /* De arcade is de tweede vorm: geen potje, geen beurten, wel een score. Sneek
    en Tetris staan in BEIDE apps -- dat is precies waarom een arcadespel
    `werelden` (lijst) heeft en een potje `wereld` (enkelvoud, en dat betekent
-   daar iets anders: wie mag STARTEN). */
+   daar iets anders: wie mag STARTEN).
+
+   Sudoku is de uitzondering en dat staat er met naam bij: `serverScore` betekent
+   dat de server de puzzel uitgeeft en de punten rekent, en dat `arcade-score`
+   een ingestuurd getal voor dit spel WEIGERT. Die vlag stil zien wegvallen zou
+   het scorebord weer opengooien zonder dat er iets zichtbaar kapot gaat. Zijn
+   maxPunten is daarom ook geen fantasiegrens maar de hoogste basis die de motor
+   uberhaupt kan uitdelen (moeilijk, in nul seconden). */
 const GOUD_ARCADE = {
-  sneek:  ['Sneek', ['rtg', 'rtf'], 999999],
-  tetris: ['Tetris', ['rtg', 'rtf'], 999999],
-  sudoku: ['Sudoku', ['rtf'], 999999]
+  sneek:  ['Sneek', ['rtg', 'rtf'], 999999, {}],
+  tetris: ['Tetris', ['rtg', 'rtf'], 999999, {}],
+  sudoku: ['Sudoku', ['rtg', 'rtf'], 500, { serverScore: true }]
 };
 
 test('precies een spel mag niet bekeken worden, en dat is 30 Seconden', () => {
@@ -81,10 +88,10 @@ test('de twee vormen lopen niet door elkaar', () => {
   for (const sleutel of Object.keys(SPEL)) assert.ok(!ARCADE[sleutel], sleutel + ' is een potje en hoort geen arcadescore te hebben');
 });
 
-test('elk arcadespel houdt zijn naam, apps en puntengrens', () => {
+test('elk arcadespel houdt zijn naam, apps, puntengrens en wie de score rekent', () => {
   const { ARCADE } = maakRegister(stubCtx);
-  for (const [sleutel, [naam, werelden, maxPunten]] of Object.entries(GOUD_ARCADE))
-    assert.deepEqual(ARCADE[sleutel], { naam, werelden, maxPunten }, 'arcadespel ' + sleutel);
+  for (const [sleutel, [naam, werelden, maxPunten, extra]] of Object.entries(GOUD_ARCADE))
+    assert.deepEqual(ARCADE[sleutel], Object.assign({ naam, werelden, maxPunten }, extra), 'arcadespel ' + sleutel);
 });
 
 test('elk spel houdt zijn naam, spelersaantal, wereld en toegangsregels', () => {

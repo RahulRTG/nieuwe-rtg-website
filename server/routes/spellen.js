@@ -5,7 +5,7 @@
 const { log } = require('../log');
 
 module.exports = (kern) => {
-  const { app, auth, geenGast, rtf, spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelKijk, spelReplay, spelRahul, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, spelUitslagen, spelStand, spelPrestaties, toernooiNieuw, toernooiAntwoord, mijnToernooien, toernooiStaat, sneekScore, sneekBord, arcadeScore, arcadeBord, socialConnecties } = kern;
+  const { app, auth, geenGast, rtf, spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelKijk, spelReplay, spelRahul, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, spelUitslagen, spelStand, spelPrestaties, sudokuNieuw, sudokuKlaar, toernooiNieuw, toernooiAntwoord, mijnToernooien, toernooiStaat, sneekScore, sneekBord, arcadeScore, arcadeBord, socialConnecties } = kern;
 
   function rtfSpeler(req, res) {
     const sess = rtf.verifieerProfiel(req.body.code, req.body.token);
@@ -72,6 +72,11 @@ module.exports = (kern) => {
     'zichtbaar-zet': (mij, b) => spelZichtbaarZet(mij, b.aan !== false),
     'sneek-score': (mij, b) => sneekScore(mij, b.punten),
     'sneek-bord': (mij) => Object.assign({ status: 200 }, sneekBord(mij, vriendenVan(mij))),
+    /* Sudoku loopt NIET via arcade-score: de server geeft de puzzel uit en
+       rekent de score. Er is dus ook geen tijd of getal dat hier binnenkomt --
+       alleen het ingevulde rooster. */
+    'sudoku-nieuw': (mij, b) => sudokuNieuw(mij, String(b.niveau || '')),
+    'sudoku-klaar': (mij, b) => sudokuKlaar(mij, b.rooster),
     'arcade-score': (mij, b) => arcadeScore(mij, String(b.spel || ''), b.punten),
     'arcade-bord': (mij, b) => arcadeBord(mij, String(b.spel || ''), vriendenVan(mij))
   };

@@ -1080,6 +1080,8 @@
       "spelZet",
       "spelZichtbaar",
       "spelZichtbaarZet",
+      "sudokuKlaar",
+      "sudokuNieuw",
       "toernooiAntwoord",
       "toernooiNieuw",
       "toernooiStaat"

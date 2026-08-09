@@ -29,6 +29,8 @@
                   en Tetris staan aan beide kanten; `wereld` enkelvoud hoort bij
                   een potje en betekent daar iets anders: wie mag STARTEN)
      maxPunten    bovengrens waarop de server een ingestuurde score afkapt
+     serverScore  de score wordt door de SERVER berekend (Sudoku): de algemene
+                  arcade-ingang weigert een ingestuurde score voor dit spel
 
    Waarom: hiervoor stond een nieuw spel op negen plekken in zes bestanden (de
    SPEL-tabel, drie ctx-opsommingen in spellen.js, de INITS in lobby.js, de
@@ -87,12 +89,22 @@ module.exports = (spelCtx, mapOverride) => {
     // allebei -- anders is "/spel/zet met soort=sneek" een open vraag
     if (SPEL[s.sleutel] || ARCADE[s.sleutel]) throw new Error(`spellen/register: '${s.sleutel}' staat er twee keer in.`);
 
+    /* De losse benoemde exports blijven bereikbaar, en dat gebeurt HIER --
+       vóór de splitsing per vorm. Stond dit in de potje-tak, dan sloeg de
+       `continue` van een arcadespel het over: Sudoku levert zijn puzzelmotor
+       zo mee, en die was daardoor onvindbaar. De descriptor zelf gaat er niet
+       in; die zou bij elk volgend spel over de vorige heen schrijven. */
+    for (const [k, v] of Object.entries(mod)) if (k !== 'spel') ruw[k] = v;
+
     if (vorm === 'arcade') {
       if (!Array.isArray(s.werelden) || !s.werelden.length || s.werelden.some(w => w !== 'rtg' && w !== 'rtf'))
         throw new Error(`spellen/register: ${naam} heeft werelden ${JSON.stringify(s.werelden)}; ` +
           "een niet-lege lijst met alleen 'rtg' en/of 'rtf'.");
       if (!(s.maxPunten > 0)) throw new Error(`spellen/register: ${naam} heeft maxPunten ${s.maxPunten}; moet boven nul liggen.`);
       ARCADE[s.sleutel] = { naam: s.naam, werelden: s.werelden.slice(), maxPunten: s.maxPunten };
+      // serverScore: de score komt van de SERVER en niet uit de client; de
+      // algemene arcade-ingang weigert hem dan, want er mag geen tweede pad zijn
+      if (s.serverScore) ARCADE[s.sleutel].serverScore = true;
       continue;
     }
 
@@ -112,11 +124,6 @@ module.exports = (spelCtx, mapOverride) => {
     ZETTEN[s.sleutel] = s.zet;
     VIEWS[s.sleutel] = s.view;
     if (s.statisch) STATISCH[s.sleutel] = s.statisch;
-    /* De losse benoemde exports blijven bereikbaar: de drift-toets vergelijkt
-       een paar spelregels (rummiSet, W_PREMIE) met de kopie in de client. De
-       descriptor zelf gaat er niet in -- die zou bij elk volgend spel over de
-       vorige heen schrijven en dan lijkt `ruw.spel` iets te betekenen. */
-    for (const [k, v] of Object.entries(mod)) if (k !== 'spel') ruw[k] = v;
   }
   const SOORTEN = Object.fromEntries(Object.entries(SPEL).map(([k, v]) => [k, v.naam]));
   return { SPEL, SOORTEN, INITS, ZETTEN, VIEWS, STATISCH, ARCADE, ruw };

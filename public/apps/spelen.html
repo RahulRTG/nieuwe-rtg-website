@@ -1154,34 +1154,39 @@ function tekenProost(){
   }
 }
 
-/* ---------- Sudoku: zelf spelen, ranglijst onder vrienden ---------- */
-const SU = { op:null, vast:[], grid:[], sel:null, start:0, niveau:'normaal', klaar:true };
-const SU_NIVEAUS = { makkelijk:[40,150], normaal:[50,300], moeilijk:[56,500] };
-function suVol(){
-  const g = Array(81).fill(0);
-  const kan = (i,v)=>{ const r=Math.floor(i/9), k=i%9;
-    for (let j=0;j<9;j++){ if (g[r*9+j]===v || g[j*9+k]===v) return false; }
-    const br=r-r%3, bk=k-k%3;
-    for (let rr=0;rr<3;rr++) for (let kk=0;kk<3;kk++) if (g[(br+rr)*9+bk+kk]===v) return false;
-    return true; };
-  const vul = (i)=>{ if (i===81) return true;
-    const cs=[1,2,3,4,5,6,7,8,9].sort(()=>Math.random()-0.5);
-    for (const v of cs){ if (kan(i,v)){ g[i]=v; if (vul(i+1)) return true; g[i]=0; } }
-    return false; };
-  vul(0); return g;
-}
-function suNieuw(){
-  SU.op = suVol();
-  const weg = SU_NIVEAUS[SU.niveau][0];
-  SU.grid = SU.op.slice();
-  const cellen = Array.from({length:81},(_,i)=>i).sort(()=>Math.random()-0.5).slice(0, weg);
-  cellen.forEach(i=>{ SU.grid[i]=0; });
-  SU.vast = SU.grid.map(v=>v!==0);
-  SU.sel = null; SU.start = Date.now(); SU.klaar = false;
-  suTeken();
+/* ---------- Sudoku: de SERVER maakt de puzzel en rekent de score ----------
+   Hier stond een puzzelmaker en een puntenformule, en die stuurden een getal
+   op dat de server aannam. Een score van 999999 was daarmee een regel
+   JavaScript. Nu vraagt deze pagina een puzzel op (`sudoku-nieuw`), stuurt het
+   ingevulde rooster terug (`sudoku-klaar`) en hoort van de server of het klopt
+   en wat het waard was. De oplossing staat hier niet meer -- er valt niets meer
+   af te kijken uit de broncode van deze pagina.
+
+   De klok hieronder is dus alleen een WEERGAVE: hij vertelt je hoe lang je
+   bezig bent, hij bepaalt niets. De server klokt op zijn eigen klok. */
+const SU = { puzzel:null, vast:[], grid:[], sel:null, start:0, niveau:'normaal', klaar:true, bezig:false };
+const SU_NIVEAUS = ['makkelijk','normaal','moeilijk'];
+async function suNieuw(){
+  if (SU.bezig) return;
+  SU.bezig = true; SU.klaar = true; SU.sel = null;
+  $('#suInfo').textContent = 'Een nieuwe puzzel…';
+  try{
+    const d = await api('sudoku-nieuw', { niveau: SU.niveau });
+    SU.puzzel = d.puzzel;
+    SU.grid = d.puzzel.slice();
+    SU.vast = d.puzzel.map(v => v !== 0);
+    SU.niveau = d.niveau || SU.niveau;
+    SU.start = Date.now(); SU.klaar = false;
+    $('#suInfo').textContent = '0:00 · sneller is meer punten';
+  }catch(e){
+    $('#suInfo').textContent = 'De puzzel kwam niet binnen. Probeer het zo nog eens.';
+  }finally{
+    SU.bezig = false;
+    suTeken();
+  }
 }
 function suTeken(){
-  $('#suNiveau').innerHTML = Object.keys(SU_NIVEAUS).map(n =>
+  $('#suNiveau').innerHTML = SU_NIVEAUS.map(n =>
     '<button type="button" class="chip'+(SU.niveau===n?' aan':'')+'" data-n="'+n+'">'+n+'</button>').join('');
   $('#suNiveau').querySelectorAll('[data-n]').forEach(b=>b.addEventListener('click',()=>{ SU.niveau=b.dataset.n; suNieuw(); }));
   $('#suGrid').innerHTML = SU.grid.map((v,i)=>{
@@ -1198,18 +1203,34 @@ function suTeken(){
 async function suVul(v){
   if (SU.sel==null || SU.klaar) return;
   SU.grid[SU.sel] = v;
-  if (SU.grid.every((x,i)=>x===SU.op[i])){
-    SU.klaar = true;
-    const sec = Math.round((Date.now()-SU.start)/1000);
-    const punten = Math.max(25, SU_NIVEAUS[SU.niveau][1] - sec);
-    meld('Opgelost in '+sec+' tellen: +'+punten+' punten!');
-    try{ await api('arcade-score',{spel:'sudoku', punten}); laadSudokuBord(); }catch(e){}
-  }
   suTeken();
+  // pas inleveren als er geen leeg vakje meer is: de server zegt of het klopt
+  if (SU.grid.some(x => x === 0)) return;
+  SU.klaar = true;
+  try{
+    const d = await api('sudoku-klaar', { rooster: SU.grid });
+    if (!d.goed){
+      SU.klaar = false;   // gewoon doorpuzzelen; de klok loopt door
+      $('#suInfo').textContent = 'Er zit nog een foutje in. Zoek het en vul het opnieuw in.';
+      return;
+    }
+    /* `bewaard: false` betekent niet dat er iets misging: onder de 18+-grens
+       bestaat er geen ranglijst, en het spel telt dan alleen binnen dit potje.
+       De server zegt er zelf bij waarom, dus dat halen we niet hier na. */
+    meld('Opgelost in '+d.seconden+' tellen: '+d.punten+' punten!');
+    $('#suInfo').textContent = d.bewaard === false
+      ? 'Opgelost in '+d.seconden+' tellen. ' + (d.reden || '')
+      : 'Opgelost in '+d.seconden+' tellen · '+d.punten+' punten (beste: '+d.beste+')';
+    laadSudokuBord();
+  }catch(e){
+    SU.klaar = false;
+    $('#suInfo').textContent = e.message || 'Dat kwam niet aan. Probeer het zo nog eens.';
+  }
 }
 setInterval(()=>{
-  if ($('#vSudoku').hidden || SU.klaar) return;
+  if ($('#vSudoku').hidden || SU.klaar || !SU.puzzel) return;
   const sec = Math.round((Date.now()-SU.start)/1000);
+  // alleen om naar te kijken: de server heeft zijn eigen klok en die telt
   $('#suInfo').textContent = ''+Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0')+' · sneller is meer punten';
 }, 1000);
 const laadSudokuBord = () => laadRanglijst('sudoku', '#suBordLijst');
@@ -1280,11 +1301,11 @@ function vzTeken(){
 /* ---------- start ---------- */
 /* Elke app zijn eigen spelgroep. RTG: schaken, Woordduel, Magnaat, 30 Seconden,
    Proost (18+) en Vingerroulette. RTF: mens erger je niet, pesten, dammen,
-   Rummi, Doen of Waarheid en Sudoku. Sneek en Tetris zijn gedeelde arcade.
+   Rummi en Doen of Waarheid. Sneek, Tetris en Sudoku zijn gedeelde arcade.
    Meespelen op uitnodiging kan altijd over en weer; lopende potjes en
    uitnodigingen van de andere kant blijven dus gewoon zichtbaar. */
 const MIJN_SPELLEN = memberTok
-  ? ['schaak', 'woord', 'magnaat', 'seconden', 'proost', 'vlek', 'sneek', 'tetris']
+  ? ['schaak', 'woord', 'magnaat', 'seconden', 'proost', 'vlek', 'sneek', 'tetris', 'sudoku']
   : ['mejn', 'pesten', 'dam', 'rummi', 'waarheid', 'sudoku', 'sneek', 'tetris'];
 document.querySelectorAll('.spelkaart').forEach(k => { if (!MIJN_SPELLEN.includes(k.dataset.spel)) k.style.display = 'none'; });
 laadLobby();

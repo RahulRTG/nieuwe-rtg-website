@@ -70,6 +70,9 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
     if (t - opgeschoondOm < 60000) return;
     opgeschoondOm = t;
     const s = S();
+    // een sudoku die je hebt laten staan verdwijnt ook
+    for (const [k, v] of Object.entries(s.sudoku || {}))
+      if (t - (v.start || 0) > (ruw.OUD_MS || 6 * 3600000)) delete s.sudoku[k];
     for (const [id, p] of Object.entries(s.potjes)) {
       const leeftijd = t - new Date(p.at).getTime();
       const stil = t - new Date(p.zetAt || p.at).getTime();
@@ -172,6 +175,12 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
     const s = S();
     toernooiVergeet(key);
     zettenVergeet(key);
+    /* De arcadeborden en een lopende sudoku horen bij dezelfde sleutel en
+       staan nergens anders in de weg: hier is niets van iemand anders bij, dus
+       ze gaan gewoon weg. (Een uitslag is van meer dan een en wordt daarom
+       anoniem gemaakt in plaats van weggegooid -- zie vergeten/anoniem.js.) */
+    for (const bord of Object.values(s.arcade || {})) delete bord[key];
+    if (s.sudoku) delete s.sudoku[key];
     for (const [sleutel, rij] of Object.entries(s.wachtrij || {})) {
       const over = (rij || []).filter(x => x !== key);
       if (over.length) s.wachtrij[sleutel] = over; else delete s.wachtrij[sleutel];
@@ -223,6 +232,51 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
   // Rahul als spelmaatje: in elk potje op te roepen voor hints, regels of een peptalk
   const { spelRahul } = require('./spellen/rahul')(Object.assign({ anthropic }, ctx));
 
+  /* ---------- Sudoku: de server maakt de puzzel en rekent de score ----------
+     Het eerste arcadespel dat echt narekenbaar is. De oplossing blijft hier;
+     de client krijgt hem nooit te zien. De tijd loopt op de klok van de
+     server, want een client die zijn eigen tijd meldt kan er nul van maken. */
+  function SU() { const s = S(); if (!s.sudoku) s.sudoku = {}; return s.sudoku; }
+  function sudokuNieuw(mij, niveau) {
+    const n = ruw.NIVEAUS[niveau] ? niveau : 'normaal';
+    const { op, puzzel } = ruw.maakPuzzel(n);
+    SU()[mij] = { op, puzzel, niveau: n, start: Date.now() };
+    save();
+    // alleen de PUZZEL gaat mee terug, nooit de oplossing
+    return { status: 200, ok: true, niveau: n, puzzel };
+  }
+  function sudokuKlaar(mij, rooster) {
+    const lopend = SU()[mij];
+    if (!lopend) return { status: 409, error: 'Er loopt geen puzzel. Begin er een.' };
+    if (!ruw.isRooster(rooster)) return { status: 400, error: 'Stuur een volledig rooster van 81 cijfers mee.' };
+    /* Eerst de GEGEVEN cijfers, helemaal rond, en pas daarna vergelijken. Die
+       volgorde is niet vrijblijvend: wie een gegeven cijfer wegveegt levert een
+       ander rooster in dan de puzzel die hij kreeg, en dat is een andere fout
+       dan "niet goed opgelost". Door elkaar heen lopend zou de eerste
+       afwijkende cel bepalen welke van de twee je te horen krijgt. */
+    for (let i = 0; i < 81; i++)
+      if (lopend.puzzel[i] && rooster[i] !== lopend.puzzel[i])
+        return { status: 400, error: 'De gegeven cijfers van de puzzel horen te blijven staan.' };
+    /* Fout ingevuld is geen fout van de client: de puzzel blijft staan en de
+       klok loopt door, dus je kunt gewoon verder puzzelen. */
+    for (let i = 0; i < 81; i++)
+      if (rooster[i] !== lopend.op[i]) return { status: 200, ok: true, goed: false };
+
+    const seconden = Math.max(0, (Date.now() - lopend.start) / 1000);
+    delete SU()[mij];
+    const p = ruw.punten(lopend.niveau, seconden);
+    save();
+    /* Opgelost is opgelost, ook onder de progressiegrens: je hoort hoe snel je
+       was. Wat er onder die grens NIET gebeurt is bewaren -- geen bord, geen
+       record, precies zoals `arcadeScore` het voor Sneek en Tetris doet.
+       Anders zou de server-berekening een tweede weg naar het scorebord zijn. */
+    const uit = { status: 200, ok: true, goed: true, seconden: Math.round(seconden), punten: p };
+    if (!progressieMag(mij)) return Object.assign(uit, { bewaard: false, ranglijst: false, reden: GEEN_PROGRESSIE });
+    const bord = A('sudoku');
+    if (!bord[mij] || p > bord[mij].punten) { bord[mij] = { punten: p, at: nu() }; save(); }
+    return Object.assign(uit, { bewaard: true, ranglijst: true, beste: bord[mij].punten });
+  }
+
   /* ================= arcade: ranglijsten onder vrienden =================
      Welke arcadespellen er zijn staat niet hier maar in het register: elk
      heeft een eigen module met een `vorm: 'arcade'`-descriptor. Deze laag
@@ -239,6 +293,11 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
   }
   function arcadeScore(mij, spel, punten) {
     if (!ARCADE[spel]) return { status: 400, error: 'Onbekend arcadespel.' };
+    /* Een spel waarvan de server de score berekent kent geen tweede pad. Zou
+       deze ingang hem toch aannemen, dan was alle narekening voor niets: je
+       stuurt gewoon een getal langs de motor heen. */
+    if (ARCADE[spel].serverScore)
+      return { status: 400, error: 'De score van dit spel wordt door de server bepaald.' };
     /* Geen 403: je mag dit spel WEL spelen, er wordt alleen niets bewaard. Een
        fout aan het eind van een potje zou zeggen dat je iets niet mocht, en dat
        is niet waar. `bewaard: false` zegt precies wat er gebeurt, zodat de
@@ -264,7 +323,7 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
   const sneekScore = (mij, punten) => arcadeScore(mij, 'sneek', punten);
   const sneekBord = (mij, vrienden) => arcadeBord(mij, 'sneek', vrienden);
 
-  return { spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelKijk, spelReplay, spelRahul, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, spelUitslagen, spelStand, spelPrestaties, spelVergeet, toernooiNieuw, toernooiAntwoord, mijnToernooien, toernooiStaat, sneekScore, sneekBord, arcadeScore, arcadeBord, SPEL_SOORTEN: SOORTEN,
+  return { spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelKijk, spelReplay, spelRahul, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, spelUitslagen, spelStand, spelPrestaties, sudokuNieuw, sudokuKlaar, spelVergeet, toernooiNieuw, toernooiAntwoord, mijnToernooien, toernooiStaat, sneekScore, sneekBord, arcadeScore, arcadeBord, SPEL_SOORTEN: SOORTEN,
     // alleen voor de drift-test: de client heeft een eigen kopie van deze
     // regels (directe feedback); de test houdt beide kopieën tegen elkaar
     _spelregels: { rummiSet: ruw.rummiSet, W_PREMIE: ruw.W_PREMIE, SPEL, ARCADE } };

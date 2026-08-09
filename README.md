@@ -1840,8 +1840,8 @@ spel is er een bestand in.
 | | `vorm: 'potje'` | `vorm: 'arcade'` |
 |---|---|---|
 | Spelers | 2-6, om de beurt | alleen jij |
-| Regels | server-authoritatief | **in de client** |
-| Zegt | `wereld`, `max`/`min`, `volwassen`, `buitenBeurt`, `teams`, `perTaal`, `init`/`zet`/`view`/`statisch` | `werelden` (lijst), `maxPunten` |
+| Regels | server-authoritatief | **in de client**, tenzij `serverScore` |
+| Zegt | `wereld`, `max`/`min`, `volwassen`, `buitenBeurt`, `teams`, `perTaal`, `kijken`, `init`/`zet`/`view`/`statisch` | `werelden` (lijst), `maxPunten`, `serverScore` |
 
 Een spel toevoegen is dus: een bestand neerzetten. Vergeet je de descriptor,
 dan **start de server niet**, met de bestandsnaam in de melding -- stil
@@ -1853,6 +1853,18 @@ Let op wat de arcade-rij zegt: **een arcadescore is niet server-authoritatief.**
 De client rekent en stuurt een getal; de puntengrens uit de descriptor is de
 enige rem. Dat is te dragen voor een ranglijst onder vrienden en niet meer
 zodra er een competitie of een prijs aan hangt (open punt in `TAKEN.md`).
+
+**Sudoku is de uitzondering, en laat zien hoe die eruitziet.** Zijn regels zijn
+narekenbaar, dus horen ze op de server: `sudoku-nieuw` geeft een puzzel uit en
+houdt de oplossing hier, `sudoku-klaar` neemt alleen een ingevuld rooster aan
+en de punten komen van de serverklok. `serverScore: true` in de descriptor laat
+`arcade-score` een ingestuurd getal voor dit spel **weigeren** -- zonder die
+weigering zou er gewoon een tweede deur naast staan. Wat het bewijst is dat
+*iemand* een puzzel van ons heeft opgelost in de tijd die wij hebben gemeten;
+niet dat een *mens* dat deed. Dat laatste is zonder de speler lastig te vallen
+niet te bewijzen, en doen alsof van wel zou een belofte zijn die de code niet
+waarmaakt. Sneek en Tetris hebben geen narekenbare regel en blijven dus zoals
+ze waren.
 
 ### De progressiegrens: alles wat blijft, stopt bij 18+
 

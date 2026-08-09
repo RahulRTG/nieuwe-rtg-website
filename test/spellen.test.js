@@ -690,13 +690,19 @@ test('proost is 18+: minderjarige leden komen er niet in, volwassen leden wel', 
   assert.equal(st.potje.staat.teller, 1, 'kaart een van vijfentwintig');
 });
 
-test('sudoku hoort bij de arcade: scores en ranglijst werken', async () => {
-  const { a, b } = await tweeVrienden();
-  await raw('/member/spel/arcade-score', { spel: 'sudoku', punten: 275 }, a.tok);
-  await raw('/member/spel/arcade-score', { spel: 'sudoku', punten: 410 }, b.tok);
+/* Sudoku hoort wel bij de arcade maar niet bij deze ingang: hier stonden twee
+   ingestuurde scores (275 en 410) en het bord dat ze netjes op volgorde zette.
+   Dat is precies wat er nu niet meer kan -- de server geeft de puzzel uit en
+   rekent zelf. Het hele pad (puzzel, oplossen, punten, bord) staat in
+   test/spelsudoku.test.js; hier blijft staan dat deze deur dicht is, want dit
+   is het bestand waar iemand een nieuw arcadespel bij zou zetten. */
+test('sudoku komt niet via de gewone arcade-ingang binnen', async () => {
+  const { a } = await tweeVrienden();
+  const r = await raw('/member/spel/arcade-score', { spel: 'sudoku', punten: 410 }, a.tok);
+  assert.equal(r.status, 400);
+  assert.match((await json(r)).error, /server bepaald/i);
   const bord = await json(await raw('/member/spel/arcade-bord', { spel: 'sudoku' }, a.tok));
-  assert.equal(bord.bord[0].punten, 410, 'de snelste oplosser staat bovenaan');
-  assert.equal(bord.bord.find(r => r.ik).punten, 275);
+  assert.deepEqual(bord.bord, [], 'en er is dus ook niets binnengekomen');
 });
 
 test('opgeven: de ander wint het potje', async () => {

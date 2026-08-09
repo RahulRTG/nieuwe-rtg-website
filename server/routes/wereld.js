@@ -42,13 +42,26 @@
 'use strict';
 
 module.exports = (kern) => {
-  const { app, auth, db, save, liveCodename, codenaamVan, zijnVrienden, keyVanCodenaam, gidsHaal } = kern;
+  const { app, auth, db, save, liveCodename, codenaamVan, zijnVrienden, keyVanCodenaam,
+    gidsHaal, openVacatures, anthropic } = kern;
   const rechten = require('../kern/wereld/rechten');
   const koppel = require('../kern/wereld/koppel');
   const { feed } = require('../kern/wereld/feed')({ db, codenaamVan, zijnVrienden });
   const profiel = require('../kern/wereld/profiel')({ db, zijnVrienden });
   const netwerk = require('../kern/wereld/netwerk')({ db, codenaamVan, profiel });
   const bezoek = require('../kern/wereld/bezoek')({ db, codenaamVan });
+  const inzicht = require('../kern/wereld/inzicht')({ db, codenaamVan });
+  const lijsten = require('../kern/wereld/lijsten')({ db, codenaamVan });
+  const wereldAi = require('../kern/wereld/ai')({ anthropic, netwerk, inzicht, codenaamVan });
+
+  /* DE POORT OP EEN VERMOGEN, in twee vormen omdat er twee soorten route zijn:
+     als middleware waar het vermogen bij het PAD hoort, en als gewone functie
+     waar het uit het VERZOEK komt (de lijstsoort, de AI-lens). Allebei lezen ze
+     dezelfde rechtenlijst -- de vorm verschilt, de waarheid niet. */
+  const mag = (req, vermogen) => rechten.magVan(req.session.tier, vermogen);
+  const eist = (vermogen) => (req, res, next) => mag(req, vermogen)
+    ? next()
+    : res.status(403).json({ error: 'Dit hoort bij de Lifestyle en Business Pass.', vermogen });
 
   /* De gekozen modus is een VOORKEUR en geen recht. Hij wordt bij het lezen
      altijd opnieuw langs rechten.modusOpen gehaald: wie ooit Business koos en
@@ -113,5 +126,7 @@ module.exports = (kern) => {
      inhoudelijk ook hoort: hierboven de app zelf (wie ben ik, wat zie ik),
      hieronder wie ik ben voor een ander en wat ik met het netwerk kan. */
   require('./wereld/profiel')({ app, auth, save, rechten, profiel, netwerk, bezoek,
-    koppel, zijnVrienden, keyVanCodenaam, gidsHaal });
+    koppel, zijnVrienden, keyVanCodenaam, gidsHaal, eist });
+  require('./wereld/vermogens')({ app, auth, save, eist, mag, inzicht, lijsten, wereldAi,
+    profiel, keyVanCodenaam, gidsHaal, openVacatures });
 };

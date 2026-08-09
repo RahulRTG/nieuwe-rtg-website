@@ -15,6 +15,7 @@ const fs = require('fs');
 const os = require('os');
 const path = require('path');
 const { startServer, elevateTier } = require('./helper');
+const rechten = require('../server/kern/wereld/rechten');
 
 let BASE, child;
 const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-wverm-'));
@@ -52,6 +53,73 @@ test.before(async () => {
 test.after(() => {
   if (child) try { child.kill('SIGKILL'); } catch (e) {}
   try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+});
+
+/* ---------- de registratie: geen lege namen meer ----------
+
+   Dit is de belangrijkste toets in dit bestand, en hij is er gekomen omdat de
+   lijst vol stond met beloftes die niets deden: `werving.suite`, `sales.suite`,
+   `events.zakelijk`, `leren.certificaten`, `ai.loopbaan`, `creator.gereedschap`
+   -- namen achter een betaalde pas, waarvan sommige iets beloofden dat elders
+   GRATIS al bestond (Rahul als loopbaancoach staat in kern/metier/ai.js en is er
+   voor elk lid). Dat is LAT-regel 6, en een toets die alleen de gebouwde
+   vermogens nakijkt had het nooit gezien.
+
+   Daarom draait deze de vraag om: hij loopt over ELK vermogen in rechten.js en
+   eist dat het aantoonbaar iets DOET -- als poort in de code, of met een
+   opgeschreven reden waarom het bewust geen poort is. Wie er een toevoegt zonder
+   een van beide, ziet hem zakken. */
+
+test('elk vermogen is een echte poort, of staat met reden als beschrijvend', () => {
+  const wortel = path.join(__dirname, '..');
+  const bronnen = [];
+  (function loop(dir) {
+    for (const naam of fs.readdirSync(dir)) {
+      if (naam === 'node_modules' || naam === '.git' || naam === 'data') continue;
+      const p = path.join(dir, naam);
+      const st = fs.statSync(p);
+      if (st.isDirectory()) loop(p);
+      else if (/\.(js|html)$/.test(naam) && !p.includes(path.join(wortel, 'test'))) bronnen.push(p);
+    }
+  })(path.join(wortel, 'server'));
+  (function loop(dir) {
+    for (const naam of fs.readdirSync(dir)) {
+      const p = path.join(dir, naam);
+      const st = fs.statSync(p);
+      if (st.isDirectory()) loop(p);
+      else if (/\.html$/.test(naam)) bronnen.push(p);
+    }
+  })(path.join(wortel, 'public', 'apps'));
+
+  /* De inhoud van rechten.js zelf telt NIET mee als gebruik: daar staat elke
+     naam per definitie in, en dan zou elke naam zichzelf bewijzen. */
+  const code = bronnen
+    .filter(p => !p.endsWith(path.join('kern', 'wereld', 'rechten.js')))
+    .map(p => fs.readFileSync(p, 'utf8')).join('\n');
+
+  const alle = [...new Set(rechten.TRAP.flatMap(t => rechten.ERBIJ[t]))];
+  assert.ok(alle.length > 10, 'er zijn vermogens om na te kijken');
+
+  const leeg = [];
+  for (const v of alle) {
+    const reden = rechten.BESCHRIJVEND[v];
+    if (reden) {
+      assert.ok(typeof reden === 'string' && reden.length > 20,
+        'het vermogen ' + v + ' staat als beschrijvend maar zonder echte reden');
+      continue;
+    }
+    // een poort: de naam komt letterlijk voor in de code die hem afdwingt
+    if (!code.includes("'" + v + "'") && !code.includes('"' + v + '"')) leeg.push(v);
+  }
+  assert.deepEqual(leeg, [],
+    'deze vermogens doen nergens iets en staan ook niet als beschrijvend opgeschreven: ' + leeg.join(', '));
+});
+
+test('een vermogen dat nergens meer bestaat, staat ook niet als beschrijvend', () => {
+  // de tegenkant: BESCHRIJVEND mag geen namen bevatten die uit de trap zijn gehaald
+  const alle = new Set(rechten.TRAP.flatMap(t => rechten.ERBIJ[t]));
+  const wees = Object.keys(rechten.BESCHRIJVEND).filter(v => !alle.has(v));
+  assert.deepEqual(wees, [], 'deze staan als beschrijvend maar zitten in geen enkele pas: ' + wees.join(', '));
 });
 
 /* ---------- de poort: dit hoort bij een andere pas ---------- */
@@ -170,6 +238,135 @@ test('een profielbezoek wordt genoteerd, en de kijker krijgt dat te horen', asyn
   const na2 = await json(await post('/api/wereld/bezoekers', {}, ik.token));
   assert.equal(na2.totaal, 1, 'nog steeds één bezoeker');
   assert.equal(na2.bezoekers[0].keer, 2, 'maar wel twee keer geteld');
+});
+
+/* ---------- bereik: over je eigen werk, zonder de lus ---------- */
+
+test('bereik telt je eigen posts over de bronnen heen, en belooft geen vertoningen', async () => {
+  const l = await lid('Bereik Lid', 'br1@x.nl', 'business');
+  const ander = await lid('Bereik Ander', 'br2@x.nl', 'rtg');
+
+  await post('/api/salon/plaats', { tekst: 'Een avond op zee.' }, l.token);
+  await post('/api/zakelijk/profiel/zet', { naam: 'B', kop: 'Reder' }, l.token);
+  await post('/api/zakelijk/post', { tekst: 'Wij zoeken een stuurman.' }, l.token);
+  // en iemand anders plaatst ook iets: dat mag NIET in mijn bereik terechtkomen
+  await post('/api/salon/plaats', { tekst: 'Niet van mij.' }, ander.token);
+
+  const r = await json(await post('/api/wereld/bereik', {}, l.token));
+  assert.equal(r.bronnen.salon.posts, 1, 'een Salon-post');
+  assert.equal(r.bronnen.zakelijk.posts, 1, 'en een zakelijke post');
+  assert.equal(r.totaal.posts, 2, 'twee samen -- en niet die van een ander');
+  assert.ok(r.best.some(b => b.tekst === 'Een avond op zee.'), 'de stukken staan erbij');
+  assert.ok(!JSON.stringify(r).includes('Niet van mij'), 'andermans post lekt er niet in');
+
+  // de eerlijke voetnoot hoort in het ANTWOORD te staan, niet alleen op het scherm
+  assert.match(r.voetnoot, /geen vertoningen|niet bij.*gezien/i,
+    'het antwoord zegt niet dat vertoningen niet worden geteld: ' + r.voetnoot);
+
+  // en er is geen enkele vergelijking-over-tijd in het antwoord (de lus die we niet willen)
+  assert.ok(!/vorige week|procent|%|trend|groei/i.test(JSON.stringify(r)),
+    'er staat een groei- of trendmaat in het bereik, en die hoort er niet te zijn');
+});
+
+/* ---------- de bewaarde lijsten ---------- */
+
+test('de talentpool bewaart een codenaam, nooit een sleutel, en alleen wie je mag zien', async () => {
+  const baas = await lid('Pool Baas', 'pl1@x.nl', 'business');
+  const kandidaat = await lid('Pool Kandidaat', 'pl2@x.nl', 'lifestyle');
+  /* `verstopt` heeft een GRATIS pas, en dat is hier geen toevalligheid maar de
+     eigenschap die wordt vastgelegd: een RTG Pass heeft alleen de persoonlijke
+     laag, en die staat standaard op 'contacten'. Wie dus niets professioneels
+     deelt, komt niet in andermans talentpool terecht -- ook niet als de
+     werkgever zijn codenaam kent. De professionele zoeklaag vindt mensen die
+     zich professioneel laten zien, en niemand anders. */
+  const verstopt = await lid('Pool Verstopt', 'pl3@x.nl', 'rtg');
+
+  await post('/api/salon/bio', { bio: 'Ik vaar.', plaats: 'Ibiza' }, kandidaat.token);
+  await post('/api/zakelijk/profiel/zet', { naam: 'K', kop: 'Stuurman' }, kandidaat.token);
+
+  const toevoegen = (codenaam, notitie) => post('/api/wereld/lijst/zet',
+    { soort: 'talent', nieuw: true, codenaam, notitie }, baas.token);
+
+  const r = await json(await toevoegen(kandidaat.codenaam, 'Sprak hem op het kansenbord.'));
+  assert.ok(r.ok, 'de kandidaat is bewaard: ' + JSON.stringify(r).slice(0, 120));
+  assert.equal(r.stand, 'gezien', 'met de eerste stand van deze lijst');
+
+  const pool = await json(await post('/api/wereld/lijst', { soort: 'talent' }, baas.token));
+  assert.equal(pool.items.length, 1);
+  assert.equal(pool.items[0].codenaam, kandidaat.codenaam);
+  assert.ok(!JSON.stringify(pool).includes(kandidaat.key), 'er staat nergens een sleutel in');
+
+  // iemand die niets zichtbaars heeft, kun je niet bewaren: de lijst mag geen
+  // omweg zijn om te toetsen of een codenaam bestaat
+  const dicht = await toevoegen(verstopt.codenaam, '');
+  assert.equal(dicht.status, 400);
+  assert.match((await json(dicht)).error, /niet voor je zichtbaar/);
+
+  // dubbel toevoegen mag niet, en een onbekende stand ook niet
+  assert.equal((await toevoegen(kandidaat.codenaam, '')).status, 400, 'niet twee keer dezelfde');
+  const raar = await post('/api/wereld/lijst/zet',
+    { soort: 'talent', codenaam: kandidaat.codenaam, stand: 'aangenomen' }, baas.token);
+  assert.equal(raar.status, 400, 'een stand die niet bij deze lijst hoort, wordt geweigerd');
+
+  const goed = await post('/api/wereld/lijst/zet',
+    { soort: 'talent', codenaam: kandidaat.codenaam, stand: 'benaderd' }, baas.token);
+  assert.equal(goed.status, 200, 'een stand die er wel bij hoort, mag');
+});
+
+test('de twee lijsten staan los van elkaar en hebben eigen standen', async () => {
+  const b = await lid('Lijst Baas', 'lj1@x.nl', 'business');
+  const p = await lid('Lijst Persoon', 'lj2@x.nl', 'lifestyle');
+  await post('/api/zakelijk/profiel/zet', { naam: 'P', kop: 'Inkoper' }, p.token);
+
+  await post('/api/wereld/lijst/zet', { soort: 'lead', nieuw: true, codenaam: p.codenaam }, b.token);
+  const leads = await json(await post('/api/wereld/lijst', { soort: 'lead' }, b.token));
+  const talent = await json(await post('/api/wereld/lijst', { soort: 'talent' }, b.token));
+
+  assert.equal(leads.items.length, 1, 'hij staat bij de leads');
+  assert.equal(leads.items[0].stand, 'nieuw', 'met de eerste stand van DIE lijst');
+  assert.equal(talent.items.length, 0, 'en niet in de talentpool');
+  assert.notDeepEqual(leads.standen, talent.standen, 'de twee lijsten hebben eigen standen');
+
+  // een lead-stand op de talentpool zetten mag niet
+  assert.equal((await post('/api/wereld/lijst/zet',
+    { soort: 'lead', codenaam: p.codenaam, stand: 'gewonnen' }, b.token)).status, 200);
+  assert.equal((await post('/api/wereld/lijst/zet',
+    { soort: 'lead', codenaam: p.codenaam, stand: 'niet nu' }, b.token)).status, 400,
+  'een stand uit de andere lijst wordt geweigerd');
+});
+
+/* ---------- Rahul met drie lenzen ---------- */
+
+test('Rahul krijgt alleen gegevens die de vrager zelf mag zien', async () => {
+  const vrager = await lid('AI Vrager', 'ai1@x.nl', 'business');
+  const doel = await lid('AI Doel', 'ai2@x.nl', 'business');
+
+  await post('/api/salon/bio', { bio: 'Geheim verhaal.', plaats: 'Ibiza' }, doel.token);
+  await post('/api/zakelijk/profiel/zet', { naam: 'D', kop: 'Werktuigbouwer' }, doel.token);
+
+  /* Zonder AI-sleutel geeft het model niets terug -- maar de STOF wel, en dat
+     is precies wat hier wordt nagetrokken: welke gegevens zouden er naar het
+     model gaan. Zo bewijst deze toets iets echts, ook op een machine zonder
+     sleutel (LAT-regel 3: stilvallen is geen uitkomst). */
+  const r = await json(await post('/api/wereld/rahul',
+    { lens: 'recruiter', q: 'werktuigbouwer' }, vrager.token));
+  const stof = JSON.stringify(r.stof || []);
+
+  assert.ok(stof.includes(doel.codenaam), 'het doel zit in de stof, op codenaam');
+  assert.ok(!stof.includes('Geheim verhaal'),
+    'de afgeschermde bio gaat NIET mee naar het model: ' + stof.slice(0, 200));
+  assert.ok(!stof.includes(doel.key), 'en er gaat nooit een sleutel mee');
+
+  assert.equal((await post('/api/wereld/rahul', { lens: 'bestaatniet' }, vrager.token)).status, 400);
+});
+
+test('een AI-lens is dicht zonder het bijbehorende vermogen', async () => {
+  const lief = await lid('AI Lief', 'ai3@x.nl', 'lifestyle');
+  // ai.netwerk hoort bij Lifestyle, ai.recruiter en ai.sales bij Business
+  assert.equal((await post('/api/wereld/rahul', { lens: 'netwerk', q: 'x' }, lief.token)).status, 200);
+  const dicht = await post('/api/wereld/rahul', { lens: 'recruiter', q: 'x' }, lief.token);
+  assert.equal(dicht.status, 403, 'de recruiterbril hoort bij Business');
+  assert.equal((await json(dicht)).vermogen, 'ai.recruiter', 'en zegt WELK vermogen ontbreekt');
 });
 
 test('je eigen profiel openen telt niet mee', async () => {

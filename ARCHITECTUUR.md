@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 2907 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 2912 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,10 +18,10 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 2907 |
-| servermodules (`server/**/*.js`) | 1574 |
-| routebestanden (`server/routes/**`) | 351 |
-| kernmodules (`server/kern/**`) | 912 |
+| API-endpoints | 2912 |
+| servermodules (`server/**/*.js`) | 1578 |
+| routebestanden (`server/routes/**`) | 352 |
+| kernmodules (`server/kern/**`) | 915 |
 | schermen (`public/**/*.html`) | 214 |
 | gedeelde browsermodules (`public/shared/*.js`) | 171 |
 | toetsbestanden (`test/*.test.js`) | 633 |
@@ -106,7 +106,7 @@ zie §5 -- er zijn nog 146 kern-namen die meer dan één domein aanraakt.
 | `social` | 55 | 7 | 31 | 52 |
 | `techniek` | 42 | 11 | 1 | 49 |
 | `zakelijk` | 13 | 2 | 0 | 25 |
-| `wereld` | 10 | 2 | 0 | 0 |
+| `wereld` | 15 | 3 | 0 | 0 |
 
 "Zonder bewaker" betekent: geen `auth`/`supplierAuth`/`officeAuth`-achtige middleware
 op de regel zelf. Dat is niet hetzelfde als onbeveiligd -- regel 28 van de keuring eist
@@ -137,7 +137,7 @@ domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 ```
 app(127) auth(72) supplierAuth(46) db(31) officeAuth(29) accounts(18) liveCodename(18)
 status(16) schoon(14) managerOnly(12) save(11) rtf(11) codenaamVan(11) express(10)
-tooManyTries(9) crypto(9) anthropic(9) rtmail(9) keyVanCodenaam(8) boardroomWie(7)
+anthropic(10) tooManyTries(9) crypto(9) rtmail(9) keyVanCodenaam(8) boardroomWie(7)
 logActivity(7) sseToOffice(7) payrollOS(7) geenGast(6) noteFailedTry(6) kern(6)
 gegevensStop(6) talen(6) mail(5) loginFails(5) sseToSupplier(5)
 ```

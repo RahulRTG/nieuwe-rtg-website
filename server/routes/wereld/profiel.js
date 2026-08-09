@@ -9,7 +9,7 @@
 'use strict';
 
 module.exports = ({ app, auth, save, rechten, profiel, netwerk, bezoek,
-  koppel, zijnVrienden, keyVanCodenaam, gidsHaal }) => {
+  koppel, zijnVrienden, keyVanCodenaam, gidsHaal, eist }) => {
 
   /* ---------- het profiel met lagen ----------
 
@@ -63,14 +63,8 @@ module.exports = ({ app, auth, save, rechten, profiel, netwerk, bezoek,
 
      Deze drie stonden in rechten.js als NAAM zonder iets erachter, en dat is
      een belofte in tekst (LAT-regel 6). Nu doen ze wat ze beloven, achter
-     dezelfde ene rechtenlijst. `magVan` is hier de poort en niet een extra
-     lijstje: wie het vermogen niet heeft, krijgt 403 met de reden. */
-  const eist = (vermogen) => (req, res, next) => {
-    if (!rechten.magVan(req.session.tier, vermogen))
-      return res.status(403).json({ error: 'Dit hoort bij de Lifestyle en Business Pass.', vermogen });
-    next();
-  };
-
+     dezelfde ene rechtenlijst. `eist` komt uit routes/wereld.js en staat daar
+     EEN keer, zodat er niet per deelmodule een eigen poortje ontstaat. */
   // geavanceerd zoeken: vindt ALLEEN wat je mag zien (kern/wereld/netwerk.js)
   app.post('/api/wereld/zoek', auth, eist('zoeken.geavanceerd'), (req, res) => {
     const tierVan = (key) => (gidsHaal(key) || {}).tier || 'rtg';

@@ -15,11 +15,13 @@
    dezelfde lijst op om te weten wat het mag tonen. Server en scherm kunnen dus
    niet uiteenlopen: ze lezen hetzelfde bestand.
 
-   Bewust NIET aangeraakt: routes/zakelijk.js houdt zijn eigen `pro`-poort. Die
-   vervangen is een verbouwing van een werkend domein; wat hier staat is de
-   nieuwe laag erboven. Zolang beide bestaan is `zakelijkPro()` hieronder de
-   afspraak die ze gelijk houdt -- en test/wereldlaag.test.js trekt na dat ze
-   hetzelfde zeggen. Zodra zakelijk.js hierop overstapt, vervalt die toets.
+   INMIDDELS LEEST OOK routes/zakelijk.js DEZE LIJST. Hier stond eerst dat dat
+   domein bewust zijn eigen `pro`-poort hield en dat `zakelijkPro()` de twee
+   lijsten gelijkhield -- een pleister met een naam. Die pleister is weg: er is
+   nog maar een lijst. `zakelijkPro()` bestaat nog als de naam waaronder dat
+   domein hem leest, en de toets in test/wereldlaag.test.js bewijst nu dat de
+   ENE lijst die deur echt bedient (haal `zakelijk.feed` uit de Lifestyle-trede
+   en zakelijk.test.js zakt mee).
 
    MERKREGEL DIE HIER IN CODE STAAT (CLAUDE.md): Lifestyle en Business komen er
    uitsluitend na menselijke goedkeuring of op uitnodiging. Dit bestand VERLEENT
@@ -46,16 +48,51 @@ const ERBIJ = {
     'modus.business', 'zakelijk.feed', 'zakelijk.gids', 'zakelijk.verbinden',
     'profiel.professioneel', 'profiel.creator',
     'zoeken.geavanceerd', 'inzicht.profielbezoek', 'inzicht.bereik',
-    'netwerk.analyse', 'events.zakelijk', 'leren.certificaten',
-    'ai.loopbaan', 'ai.netwerk', 'creator.gereedschap'
+    'netwerk.analyse', 'kansenbord.plaatsen', 'ai.netwerk'
   ],
   /* Business: de kant van de onderneming. Werven, verkopen, en het bedrijf
      zelf als profiel. */
   business: [
-    'profiel.ondernemer', 'werving.suite', 'werving.talentpool',
-    'sales.suite', 'sales.leads', 'inzicht.bedrijf',
-    'ai.recruiter', 'ai.sales', 'kansenbord.plaatsen'
+    'profiel.ondernemer', 'werving.talentpool', 'sales.leads',
+    'inzicht.bedrijf', 'ai.recruiter', 'ai.sales'
   ]
+};
+
+/* ---------------------------------------------------------------------------
+   DE VERMOGENS DIE BEWUST GEEN POORT ZIJN, met per stuk de reden.
+
+   WAAROM DEZE LIJST BESTAAT. Een vermogen dat in ERBIJ staat en nergens iets
+   doet, is een belofte in tekst (LAT-regel 6) -- en die stonden hier: elf
+   stuks, waarvan een deel iets beloofde achter een pas dat elders GRATIS al
+   bestond. Wat er weg is en waarom, staat in TAKEN.md 5.18.
+
+   Maar niet elk vermogen hoort een poort te zijn. De gratis trap hierboven is
+   er om te ZEGGEN wat je krijgt -- het scherm gebruikt hem om te laten zien dat
+   de RTG Pass een volwaardig netwerk is -- terwijl de echte grendels in de apps
+   zelf zitten die dat bezitten (De Salon keurt zijn eigen posts, comm.js bewaakt
+   zijn eigen gesprekken). Die twee soorten uit elkaar houden is het punt: een
+   naam is een POORT of hij is BESCHRIJVEND, en in dat tweede geval staat hier
+   waarom.
+
+   test/wereldvermogens.test.js dwingt dit af: elk vermogen is aantoonbaar een
+   poort (het staat in een magVan/EIST-aanroep in de code) of het staat hier met
+   een reden. Wie er een toevoegt zonder een van beide, ziet die toets zakken.
+   Zo kan de lijst niet opnieuw vollopen met lege namen. */
+const BESCHRIJVEND = {
+  'modus.business': 'Wordt in dit bestand zelf afgedwongen (MODI + modusOpen); de scan telt rechten.js bewust niet mee.',
+  'feed.lezen': 'De feed is een leeslaag; de poort zit op de modus (modus.business) en op de bron.',
+  'feed.plaatsen': 'Plaatsen loopt nooit via deze laag -- De Salon, Pulse en het prikbord keuren hun eigen posts.',
+  'feed.reageren': 'Reageren hoort bij de app die de post bezit, met de keuring van die app.',
+  'verhalen': 'De 24-uurs verhalen hebben hun eigen poort in kern/sociaal/snaps.js (de vriendengraaf).',
+  'snaps': 'Idem: een snap is een een-op-een-ding en wordt daar bewaakt, niet hier.',
+  'chat': 'Berichten is een EIGEN app (comm.html) met een eigen deelnemerspoort; zie kern/wereld/koppel.js.',
+  'zoeken.eenvoudig': 'Zoeken op codenaam zit in de vriendenlaag en is er voor iedereen; dit zegt alleen dat de gratis pas het heeft.',
+  'zakelijk.gids': 'Zelfde deur als zakelijk.feed: routes/zakelijk.js poort het hele domein in een keer.',
+  'zakelijk.verbinden': 'Zelfde deur als zakelijk.feed; verbinden rijdt bovendien mee op de gewone vriendengraaf.',
+  'profiel.persoonlijk': 'De profiellagen worden niet met magVan gepoort maar met lagenVoor(); dat is dezelfde lijst, een andere ingang.',
+  'profiel.professioneel': 'Ook een laag: gepoort met lagenVoor(), en de inhoud komt uit RTG Zakelijk.',
+  'profiel.creator': 'Ook een laag: gepoort met lagenVoor(); het gereedschap zelf woont bij de zaak.',
+  'profiel.ondernemer': 'Ook een laag: gepoort met lagenVoor(), gevuld uit de sleutelbos van kern/eenaccount.js.'
 };
 
 // De volgorde is de trap; hij staat één keer en de rest rekent ermee.
@@ -136,4 +173,4 @@ const lagenVoor = (tier) => LAGEN.filter(l => magVan(tier, l.eist)).map(l => ({ 
    test.js zet ze naast elkaar op dezelfde vier mensen. */
 const ZICHTBAARHEDEN = ['iedereen', 'contacten', 'zakelijk', 'genootschap', 'alleenik'];
 
-module.exports = { ERBIJ, TRAP, MODI, LAGEN, ZICHTBAARHEDEN, vermogens, magVan, modiVoor, modusOpen, lagenVoor, zakelijkPro };
+module.exports = { ERBIJ, BESCHRIJVEND, TRAP, MODI, LAGEN, ZICHTBAARHEDEN, vermogens, magVan, modiVoor, modusOpen, lagenVoor, zakelijkPro };

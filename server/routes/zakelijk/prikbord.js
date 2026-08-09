@@ -62,8 +62,20 @@ module.exports = (zctx) => {
      bord altijd leeft. Reageren kan met een profiel; de plaatser sluit de
      kans zodra hij vervuld is. */
   const KANS_SOORTEN = ['opdracht', 'samenwerking', 'vacature', 'investering', 'anders'];
+  const wereldRechten = require('../../kern/wereld/rechten');
+  const kansPoort = (req, res, next) => wereldRechten.magVan(req.session.tier, 'kansenbord.plaatsen')
+    ? next()
+    : res.status(403).json({ error: 'Op het kansenbord plaatsen hoort bij de Lifestyle en Business Pass.',
+      vermogen: 'kansenbord.plaatsen' });
 
-  app.post('/api/zakelijk/kans', auth, pro, (req, res) => {
+  /* PLAATSEN op het kansenbord staat sinds de wereldlaag onder een eigen naam:
+     `kansenbord.plaatsen` in kern/wereld/rechten.js. Dat verandert niets aan wie
+     er mag -- het vermogen zit in dezelfde Lifestyle-trede als `zakelijk.feed`,
+     dus precies de leden die hier al binnenkwamen. Wat het WEL doet is die naam
+     waarmaken: hij stond in de lijst zonder ergens iets te bedienen, en dat is
+     een belofte in tekst (LAT-regel 6). LEZEN blijft achter `pro` alleen: het
+     bord bekijken is geen apart recht. */
+  app.post('/api/zakelijk/kans', auth, pro, kansPoort, (req, res) => {
     const p = mijnProfiel(req);
     if (!p) return res.status(409).json({ error: 'Maak eerst je zakelijke profiel aan.', needProfiel: true });
     const titel = schoon(req.body.titel, 90);

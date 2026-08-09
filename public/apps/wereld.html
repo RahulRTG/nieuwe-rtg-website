@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Wereld</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<style>
+  /* ============ RTG WERELD: ÉÉN APP, ÉÉN NETWERK, JOUW CONTEXT ============
+
+     Hier stonden De Salon, Pulse, RTG Zakelijk, de genootschappen en de
+     verhalen als vijf losse apps op het beginscherm. Voor de gebruiker is dat
+     vijf keer dezelfde vraag -- "wat is er?" -- met vijf antwoorden op vijf
+     plekken, en de vervelende bijwerking van LinkedIn: om een zakelijk contact
+     te spreken moest je naar een andere app, terwijl het gewoon één mens is.
+
+     Dit is die ene app. Bovenaan staat één schakelaar (Alles, Lifestyle,
+     Business, Communities, Privé). Die verandert niet van app maar van wereld:
+     dezelfde feed, dezelfde identiteit, dezelfde chat, andere context.
+
+     WAT DIT SCHERM BEWUST NIET DOET. Het kent geen enkele regel over wie wat
+     mag. Welke werelden er open staan, welke profiellagen je hebt en wat je
+     verder mag, komt uit /api/wereld/state -- dat leest server/kern/wereld/
+     rechten.js, en dat is de enige plek waar het staat. Een knop die hier
+     verschijnt maar door de server geweigerd wordt, is de fout die je krijgt
+     zodra dit scherm zijn eigen lijstje bijhoudt.
+
+     En de vormtaal komt uit de UI-kit (/shared/rtg-ui.css). Wat hier staat is
+     alleen wat deze app echt eigen heeft: de wereldschakelaar en de feedkaart.
+     Geen nieuwe kleuren, geen tweede lettertype -- bordeaux blijft een accent
+     en op zwart schrijven we wit of --rtg-acc. */
+
+  body{margin:0;background:var(--rtg-bg);color:var(--rtg-txt);
+    font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased;}
+
+  /* de kop: wie ik ben, en in welke wereld ik sta */
+  .kop{position:sticky;top:0;z-index:5;background:var(--rtg-bg);
+    border-bottom:1px solid var(--rtg-line);padding:1rem 1.1rem 0;}
+  .kop h1{font-family:'Bodoni Moda',Georgia,serif;font-weight:400;
+    font-size:1.5rem;margin:0 0 0.15rem;letter-spacing:0.01em;}
+  .kop .wie{font-size:0.74rem;color:var(--rtg-soft);margin:0 0 0.85rem;}
+  .kop .wie b{color:var(--rtg-acc);font-weight:600;}
+
+  /* DE WERELDSCHAKELAAR. Een rij, horizontaal scrollend op een telefoon.
+     Een wereld die dicht is verdwijnt niet: hij staat er, gedimd, met een slotje.
+     Wegstoppen wat je niet hebt is oneerlijk naar beide kanten -- je weet dan
+     niet wat je mist, en je merkt ook niet dat het er is. */
+  .werelden{display:flex;gap:0.4rem;overflow-x:auto;padding-bottom:0.9rem;
+    scrollbar-width:none;}
+  .werelden::-webkit-scrollbar{display:none;}
+  .werelden button{flex:0 0 auto;background:none;border:1px solid var(--rtg-line);
+    border-radius:999px;padding:0.42rem 0.95rem;color:var(--rtg-muted);
+    font:inherit;font-size:0.76rem;font-weight:600;cursor:pointer;
+    white-space:nowrap;transition:background .18s,color .18s,border-color .18s;}
+  .werelden button[aria-current="true"]{background:var(--rtg-acc);
+    border-color:var(--rtg-acc);color:#0C0C0B;}
+  .werelden button[disabled]{opacity:0.42;cursor:not-allowed;}
+  .werelden button[disabled]::after{content:' ·';}
+
+  /* de feed */
+  main{padding:1.1rem 1.1rem 5.5rem;max-width:640px;margin:0 auto;}
+  .kaart{background:var(--rtg-card);border:1px solid var(--rtg-line);
+    border-radius:var(--rtg-rond);padding:1rem 1.05rem;margin-bottom:0.8rem;}
+  .kaart .r1{display:flex;align-items:baseline;gap:0.55rem;margin-bottom:0.5rem;}
+  .kaart .auteur{font-weight:600;font-size:0.86rem;}
+  .kaart .bron{font-size:0.66rem;color:var(--rtg-soft);text-transform:uppercase;
+    letter-spacing:0.08em;}
+  .kaart .tijd{margin-left:auto;font-size:0.7rem;color:var(--rtg-soft);
+    font-variant-numeric:tabular-nums;}
+  .kaart p{margin:0 0 0.7rem;font-size:0.9rem;line-height:1.55;
+    color:var(--rtg-txt);white-space:pre-wrap;overflow-wrap:anywhere;}
+  .kaart img{width:100%;border-radius:var(--rtg-rond-klein);display:block;
+    margin-bottom:0.7rem;}
+  .kaart .acties{display:flex;gap:0.5rem;align-items:center;}
+  .kaart .acties button{background:none;border:1px solid var(--rtg-line);
+    border-radius:999px;padding:0.3rem 0.75rem;color:var(--rtg-muted);
+    font:inherit;font-size:0.72rem;cursor:pointer;}
+  .kaart .acties button:hover{color:var(--rtg-txt);border-color:var(--rtg-acc);}
+  .kaart .tel{font-size:0.72rem;color:var(--rtg-soft);margin-left:auto;
+    font-variant-numeric:tabular-nums;}
+
+  .leeg{color:var(--rtg-soft);font-size:0.85rem;line-height:1.6;
+    text-align:center;padding:3rem 1rem;}
+  .meer{display:block;width:100%;background:none;border:1px solid var(--rtg-line);
+    border-radius:999px;padding:0.6rem;color:var(--rtg-muted);font:inherit;
+    font-size:0.78rem;cursor:pointer;margin-top:0.4rem;}
+  .fout{background:rgba(222,110,146,0.10);border:1px solid var(--rtg-rood);
+    border-radius:var(--rtg-rond-klein);padding:0.75rem 0.9rem;
+    font-size:0.8rem;color:var(--rtg-txt);margin-bottom:0.8rem;}
+
+  /* DE NAVIGATIE: vijf, en niet meer. Home, Ontdek, Chat, Activiteit, Profiel.
+     Alle diepte zit erachter; de app hoort klein te voelen. Chat is bewust een
+     LINK en geen tab: berichten is een eigen app (/apps/comm.html) en blijft
+     dat -- zie de kop van server/kern/wereld/koppel.js. */
+  .balk{position:fixed;left:0;right:0;bottom:0;z-index:6;display:flex;
+    background:rgba(12,12,11,0.94);backdrop-filter:blur(12px);
+    border-top:1px solid var(--rtg-line);
+    padding-bottom:env(safe-area-inset-bottom);}
+  .balk a{flex:1;text-align:center;padding:0.7rem 0.2rem 0.75rem;
+    color:var(--rtg-soft);text-decoration:none;font-size:0.66rem;
+    font-weight:600;letter-spacing:0.01em;}
+  .balk a[aria-current="page"]{color:var(--rtg-txt);}
+  .balk a[aria-current="page"] span{color:var(--rtg-acc);}
+  .balk span{display:block;font-size:1.05rem;line-height:1.35;}
+</style>
+</head>
+<body>
+
+<header class="kop">
+  <h1>RTG</h1>
+  <p class="wie" id="wie">Bezig met laden…</p>
+  <nav class="werelden" id="werelden" aria-label="Kies je wereld"></nav>
+</header>
+
+<main>
+  <div id="fout" hidden></div>
+  <div id="feed"></div>
+</main>
+
+<nav class="balk" aria-label="Hoofdnavigatie">
+  <a href="/apps/wereld.html" aria-current="page"><span>◎</span>Home</a>
+  <a href="/apps/app.html"><span>◈</span>Ontdek</a>
+  <a href="/apps/comm.html"><span>◇</span>Chat</a>
+  <a href="/apps/attenties.html"><span>◉</span>Activiteit</a>
+  <a href="/apps/ik.html"><span>○</span>Profiel</a>
+</nav>
+
+<script src="/shared/glyf.js"></script>
+<script>
+(function () {
+  'use strict';
+  var $ = function (s) { return document.querySelector(s); };
+  var esc = function (t) { return String(t == null ? '' : t)
+    .replace(/[&<>"']/g, function (c) { return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]; }); };
+  var token = null; try { token = localStorage.getItem('rtg_member_token'); } catch (e) {}
+
+  function api(pad, body) {
+    return fetch('/api/wereld' + pad, { method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
+      body: JSON.stringify(body || {}) })
+      .then(function (r) { return r.json().catch(function () { return {}; })
+        .then(function (d) { if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; }); });
+  }
+
+  var staat = { modus: 'alles', modi: [], vanaf: 0, items: [] };
+
+  function toon(bericht) {
+    var n = $('#fout');
+    n.hidden = !bericht; n.className = 'fout'; n.textContent = bericht || '';
+  }
+
+  var klok = function (at) {
+    if (!at) return '';
+    var d = new Date(at), nu = new Date();
+    if (d.toDateString() === nu.toDateString())
+      return String(d.getHours()).padStart(2, '0') + ':' + String(d.getMinutes()).padStart(2, '0');
+    return d.getDate() + '/' + (d.getMonth() + 1);
+  };
+  var BRONNAAM = { salon: 'De Salon', pulse: 'Pulse', zakelijk: 'Zakelijk',
+    genootschap: 'Genootschap', verhalen: 'Verhaal' };
+
+  /* De wereldschakelaar. Een dichte wereld blijft staan maar is uitgeschakeld,
+     met de reden die de SERVER meegaf -- hier staat geen eigen tekst over wat
+     een pas kost of biedt, want dan zou dat op twee plekken staan. */
+  function tekenWerelden() {
+    var n = $('#werelden');
+    n.textContent = '';
+    staat.modi.forEach(function (m) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.textContent = m.naam;
+      b.setAttribute('aria-current', staat.modus === m.id ? 'true' : 'false');
+      if (!m.open) { b.disabled = true; b.title = m.reden || ''; }
+      else b.addEventListener('click', function () { kies(m.id); });
+      n.appendChild(b);
+    });
+  }
+
+  function kies(modus) {
+    if (modus === staat.modus) return;
+    staat.modus = modus; staat.vanaf = 0; staat.items = [];
+    tekenWerelden();
+    // de keuze onthouden is een gemak, geen voorwaarde: mislukt hij, dan werkt
+    // de feed gewoon door in de gekozen wereld (maar we zwijgen er niet over)
+    api('/modus', { modus: modus }).catch(function (e) { toon(e.message); });
+    laad();
+  }
+
+  function tekenFeed(meer) {
+    var n = $('#feed');
+    n.textContent = '';
+    if (!staat.items.length) {
+      n.innerHTML = '<p class="leeg">Hier is het nog stil.<br>'
+        + 'Wat je plaatst in De Salon, op Pulse of op het zakelijke prikbord komt hier samen.</p>';
+      return;
+    }
+    staat.items.forEach(function (i) {
+      var k = document.createElement('article');
+      k.className = 'kaart';
+      k.innerHTML =
+        '<div class="r1"><span class="auteur">' + esc(i.auteur) + '</span>'
+        + '<span class="bron">' + esc(BRONNAAM[i.bron] || i.bron) + '</span>'
+        + '<span class="tijd">' + esc(klok(i.at)) + '</span></div>'
+        + (i.tekst ? '<p>' + esc(i.tekst) + '</p>' : '')
+        + (i.beeld && i.beeld.length ? '<img src="' + esc(i.beeld[0].src) + '" alt="' + esc(i.beeld[0].alt || '') + '">' : '')
+        + '<div class="acties">'
+        + '<button type="button" data-open="' + esc(i.open) + '">Openen</button>'
+        + '<button type="button" data-chat="' + esc(i.auteur) + '" data-over="' + esc(i.open) + '">Bericht</button>'
+        + '<span class="tel">' + (i.likes || 0) + ' · ' + (i.reacties || 0) + '</span>'
+        + '</div>';
+      n.appendChild(k);
+    });
+    if (meer) {
+      var b = document.createElement('button');
+      b.type = 'button'; b.className = 'meer'; b.textContent = 'Meer laden';
+      b.addEventListener('click', function () { staat.vanaf = staat.items.length; laad(true); });
+      n.appendChild(b);
+    }
+  }
+
+  /* Openen en Bericht vragen allebei de SERVER waar ze heen moeten. Dit scherm
+     bouwt geen enkele app-URL zelf; die kaart staat in kern/wereld/koppel.js,
+     en een app die verhuist hoort niet twintig schermen te breken. */
+  document.addEventListener('click', function (e) {
+    var o = e.target.closest('[data-open]'), c = e.target.closest('[data-chat]');
+    if (o) {
+      api('/open', { ref: o.getAttribute('data-open') })
+        .then(function (d) { location.href = d.doel.url; })
+        .catch(function (err) { toon(err.message); });
+    } else if (c) {
+      api('/gesprek', { codenaam: c.getAttribute('data-chat'), over: c.getAttribute('data-over') })
+        .then(function (d) { location.href = d.url; })
+        .catch(function (err) { toon(err.message); });
+    }
+  });
+
+  function laad(aanvullen) {
+    return api('/feed', { modus: staat.modus, vanaf: staat.vanaf })
+      .then(function (d) {
+        staat.items = aanvullen ? staat.items.concat(d.items) : d.items;
+        toon(null);
+        tekenFeed(d.meer);
+      })
+      .catch(function (e) { toon(e.message); tekenFeed(false); });
+  }
+
+  api('/state', {})
+    .then(function (d) {
+      staat.modus = d.modus; staat.modi = d.modi;
+      $('#wie').innerHTML = esc(d.ik.codenaam) + ' · <b>' + esc(d.ik.pas.toUpperCase()) + ' Pass</b>';
+      tekenWerelden();
+      return laad();
+    })
+    .catch(function (e) {
+      $('#wie').textContent = 'Niet ingelogd';
+      toon(e.message + ' Log opnieuw in via de app.');
+    });
+})();
+</script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
+<script src="/shared/ios.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+</body>
+</html>

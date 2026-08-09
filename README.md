@@ -1235,6 +1235,30 @@ Wat er nog niet speelt in de Media OS zelf: een **livestream** van het Podium. D
 
 De vier apps eronder blijven gewoon bestaan en werken los: wie recht naar de studio, de zaal of het Podium wil, hoort daar zonder omweg te kunnen. Zet de boardroom de schakelaar `mediaos` uit, dan verdwijnt alleen de verbindende laag.
 
+### RTG Wereld (één sociale app, vijf werelden)
+
+*One identity. One network. One app. Your context.*
+
+Er stonden vijf sociale apps naast elkaar: **De Salon** (het besloten netwerk), **Pulse** (het microblog), **RTG Zakelijk** (de LinkedIn-laag), de **genootschappen** en de **verhalen/snaps**. Voor een lid is dat vijf keer dezelfde vraag — *wat is er?* — met vijf antwoorden op vijf plekken. En het bracht precies het probleem van LinkedIn mee: om een zakelijk contact te spreken moest je naar een andere app, terwijl het gewoon één mens is.
+
+`server/kern/wereld/` legt daar één laag overheen, met één app: `/apps/wereld.html`. Bovenaan staat één schakelaar — **Alles · Lifestyle · Business · Communities · Privé** — en die verandert niet van app maar van *wereld*. Dezelfde identiteit, dezelfde feed, dezelfde chat, andere context.
+
+Het ontwerpbesluit dat alles draagt is hetzelfde als bij de Media OS: **de wereldlaag bezit die vijf domeinen niet.** Hij is een *leeslaag*. Er komt geen `db.data.wereld.posts` naast de bestaande opslag; elke bron wordt bij het opvragen uit zijn eigen domein gehaald en op één tijdlijn gezet. Plaatsen loopt er dan ook nooit langs: wie in Lifestyle plaatst, plaatst in De Salon, en die route houdt zijn eigen 9+-keuring, zijn eigen rem en zijn eigen eigenaarschap. Een tweede administratie zou LAT.md-regel 4 zijn, met als eerste zichtbare gevolg dat een verwijderde Salon-post hier gewoon blijft staan.
+
+- **Wat een pas mag, staat op één plek.** `server/kern/wereld/rechten.js` is de enige waarheid over welke werelden opengaan, welke profiellagen je hebt en wat je verder mag. De server poort ermee én het scherm tekent zich ermee (via `/api/wereld/state`), dus een knop die zichtbaar is maar door de server geweigerd wordt, kan niet ontstaan. De trap is **cumulatief**: elke pas erft alles van de pas eronder, berekend en niet overgeschreven.
+- **Gratis is niet uitgekleed.** De RTG Pass krijgt een volwaardig netwerk: plaatsen, lezen, reageren, verhalen, genootschappen, chat. Wat de **Lifestyle Pass** erbij krijgt is de professionele wereld plus het gereedschap dat elders achter een abonnement zit (geavanceerd zoeken, wie je profiel bekeek, bereikcijfers, netwerkanalyse, de creator-laag). De **Business Pass** krijgt daar de kant van de onderneming bij: werving, sales, bedrijfsinzichten en het ondernemersprofiel. Inbegrepen in het lidmaatschap, niet apart verkocht.
+- **Een gesloten wereld verdwijnt niet, hij staat er gedimd bij** — met de reden die de *server* meegaf. Wegstoppen wat je niet hebt is oneerlijk naar beide kanten: je weet niet wat je mist, en je merkt ook niet dat het bestaat.
+- **De modus is een voorkeur, geen recht.** Je keuze wordt onthouden, maar bij het lezen altijd opnieuw langs de rechten gehaald. Wie ooit Business koos en later terugvalt naar de gratis pas, blijft daar niet in staan omdat er een oude waarde in de database stond (LAT.md-regel 7: de grendel hangt aan het doel).
+- **Geen algoritme.** Chronologisch, aflopend, klaar — dezelfde merkregel als bij Pulse. De modus *filtert*, hij rangschikt niet. Geen "voor jou", geen oneindige trucs.
+
+**En Berichten blijft een eigen app.** Dat is een bewuste keuze en geen tussenstand: `/apps/comm.html` (de Universal Inbox, met bellen en videobellen) wordt niet opgeslokt. Contact heeft een andere levensduur dan een tijdlijn — je berichten wil je kunnen openen als de feed plat ligt, vanaf een melding, naast de app. Een gesprek dat alleen bestaat als tabblad van iets anders, raak je kwijt zodra dat iets anders verandert.
+
+De **naad** ertussen staat in `server/kern/wereld/koppel.js` en is één afspraak: een verwijzing heet `rtg://<soort>/<id>`, en die ene kaart zegt welke app hem opent. Geen enkel scherm bouwt zelf een app-URL, dus een app die verhuist laat geen dode links achter. Overal waar je in de wereld een mens ziet staat **Bericht**, en die brengt je in de aparte berichten-app, in het gesprek met die persoon — met het onderwerp als verwijzing klaar in het veld. De link draagt een **codenaam en nooit een sleutel**: hij belandt in een browserhistorie, een melding of een screenshot, en de identiteitskluis blijft gescheiden. Een vluchtig ding (een verhaal leeft 24 uur, een snap één keer) gaat er met opzet niet als verwijzing in mee; wie een soort toevoegt aan de kaart beantwoordt die vraag expliciet.
+
+De vijf apps eronder blijven gewoon bestaan en werken los: wie recht naar De Salon of naar het kansenbord wil, hoort daar zonder omweg te kunnen.
+
+Bewezen door `test/wereldlaag.test.js` (dertien toetsen: de gesloten wereld is echt gesloten — ook bij een rechtstreekse aanvraag —, een zakelijke post lekt niet in de "Alles" van een gratis pas, de feed loopt aflopend over de héle lijst, een onbekende verwijzing geeft 404 in plaats van een gokje) en `test/wereldlaag.e2e.js` (het scherm in een echte browser: Business staat gedimd, de Salon-post staat in de wereldfeed, en "Bericht" landt in het juiste gesprek in de aparte berichten-app zonder sleutel in de URL). Alle zeven mutaties uit LAT.md-regel 2 zijn gedaan en bijten elk op de juiste toets -- inclusief die op het verhalenfilter, de enige bron die niet publiek is.
+
 ### RTG Bank & RTG Stad (de eigen infrastructuur)
 
 - **RTG Bank** (`server/kern/bank/` + `kern/bankregie/`): een eigen dubbel-boekhoudend grootboek naast RTG Pay (som altijd exact nul, bewaakt door BANK-01 en PAY-02 op het technische bord). De boardroom-knop heeft drie standen (partner / hybride / eigen) met vier-ogen-autorisatie bij opschalen en een nood-fallback naar de kaart-rails; de leden-bank (rekeningen met echt IBAN, sparen, passen, krediet, salarisrun uit de klokuren) gaat pas open als de boardroom hem live zet en het lid akkoord geeft. In de eigen-stand lopen ook de Pay-autoload en de 30% RTFoundation-afdracht over de eigen rails.

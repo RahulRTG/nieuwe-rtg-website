@@ -1,9 +1,13 @@
 /* App-gids data, deel1 (de leden-apps, eerste helft; het vervolg staat in
    deel6). Zie ../appgids.js voor de uitleg; nieuwe pagina's krijgen hier (of in
-   het passende deel) een eigen entry. */
+   het passende deel) een eigen entry.
+
+   Opgeknipt op de 10 kB-grens: de staart staat in ./deel1b.js, en dit bestand
+   hangt hem er zelf achter -- hetzelfde patroon als deel6 en deel10. De knip
+   zit op een entry-grens; de samengevoegde gids is er niet door veranderd. */
 const G = (wat, doe, tip) => ({ wat, doe, tip });
 
-module.exports = {
+module.exports = Object.assign({
   /* ---- het leden-OS en de leden-apps (RTG-toon: ingetogen, je/jij) ---- */
   /* Er is nog maar EEN beginscherm. /apps/index.html (het scrollende
      bureaublad) en /apps/bureau.html brengen je allebei hier; ze houden een
@@ -30,6 +34,12 @@ module.exports = {
   '/apps/berichten.html': G('Je berichten met vrienden en partners, automatisch vertaald als dat nodig is.',
     ['Stuur een bericht op codenaam', 'Bel of videobel vanuit het gesprek', 'Deel een snap of verhaal met wie jij kiest'],
     'Berichten in een andere taal worden voor je vertaald; jij leest en schrijft gewoon in je eigen taal.'),
+  /* RTG Wereld staat naast comm.html en niet erin: contact is een eigen app met
+     een eigen levensduur (zie kern/wereld/koppel.js). Wat je hier leest hoort
+     dus ook uit te leggen dat het er twee zijn, en waar de naad zit. */
+  '/apps/wereld.html': G('RTG Wereld: al je sociale kanten in \u00e9\u00e9n app. Bovenaan kies je de wereld, de app blijft dezelfde.',
+    ['Schakel bovenaan tussen Alles, Lifestyle, Business, Communities en Priv\u00e9', 'Alles wat je in De Salon, op Pulse of op het zakelijke prikbord plaatst, komt hier samen in \u00e9\u00e9n tijdlijn', 'Tik "Bericht" bij iemand: je springt naar Berichten, in het gesprek met die persoon'],
+    'E\u00e9n identiteit, \u00e9\u00e9n netwerk, \u00e9\u00e9n app: je hoeft niet naar een aparte werk-app om een zakelijk contact te spreken, want het is gewoon dezelfde persoon.'),
   '/apps/genootschap.html': G('Genootschap: je besloten groepen binnen RTG, met een prikbord en bijeenkomsten.',
     ['Richt er een op en kies wie erbij mag: openbaar, besloten of geheim', 'Zet iets op het prikbord, of stel een peiling voor met een paar keuzes', 'Roep een bijeenkomst uit en zie wie ja, misschien of nee zegt'],
     'Geheim is hier echt geheim: zo\'n genootschap staat in geen enkele lijst en is alleen met een uitnodiging te vinden.'),
@@ -68,21 +78,5 @@ module.exports = {
     'Voor elke betaling zie je eerst een bevestiging; niets gaat er zonder jouw akkoord uit.'),
   '/apps/wbw.html': G('Wie betaalt wat: groepsuitgaven bijhouden met een live balans.',
     ['Maak een groep en zet uitgaven erin', 'Zie live wie wat voorschoot', 'Verreken in één keer via RTG Pay'],
-    'Direct na de vakantie verrekenen voorkomt het eeuwige "dat komt nog wel".'),
-  '/apps/bank.html': G('RTG Rekening: je saldo, afschriften en betalingen in de vertrouwde RTG-stijl.',
-    ['Bekijk je saldo en afschriften', 'Zet spaardoelen en volg ze', 'Vraag krediet aan; een mens beoordeelt'],
-    'De AI adviseert, een mens beslist; zeker bij geld houden we die volgorde altijd aan.'),
-  '/apps/balans.html': G('RTG Balans: je financiële overzicht en de boekhoudhulp.',
-    ['Bekijk inkomsten en uitgaven per maand', 'Laat de AI-boekhouder meedenken', 'Exporteer voor je administratie'],
-    'Tien minuten per week naar je balans kijken voorkomt de meeste geldverrassingen.'),
-  '/apps/loonstrook.html': G('Mijn loon: je loonstroken van alle bedrijven waar je werkt, in gewone taal.',
-    ['Zie per periode wat er bruto binnenkwam en wat er afging', 'Lees waarom het bedrag zo uitkwam, stap voor stap',
-      'Kijk wie je identiteitsgegevens opvroeg, en waarom'],
-    'Alleen afgeronde loonruns komen hier; een proefberekening van je werkgever is nog geen loonstrook.'),
-  '/apps/sport.html': G('RTG Sport: kampen, lessen en sportieve activiteiten van partners.',
-    ['Bekijk het aanbod en de data', 'Meld je aan voor een kamp of les', 'Stel een vraag aan de organisatie'],
-    'Begin klein: één vast uur per week houd je langer vol dan een groots plan.'),
-  '/apps/spelen.html': G('Spelen: bordspellen en partyspellen met vrienden, live tegen elkaar.',
-    ['Start een lobby en nodig vrienden uit', 'Kies een spel: van dammen tot Magnaat', 'Praat mee in de spelchat'],
-    'Sommige spellen hebben een leeftijdspoort; dat regelt de app automatisch netjes voor je.'),
-};
+    'Direct na de vakantie verrekenen voorkomt het eeuwige "dat komt nog wel".')
+}, require('./deel1b'));

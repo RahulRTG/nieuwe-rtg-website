@@ -9,15 +9,24 @@ const assert = require('node:assert/strict');
 
 const maakPresence = require('../server/kern/spellen/presence');
 
-// een presence-laag met precies deze verbonden sleutels
+/* Een presence-laag met precies deze verbonden sleutels. De opt-out
+   ("onzichtbaar spelen") woont in dezelfde module -- het is dezelfde vraag: wie
+   is er te zien -- dus die wordt hier NIET gestubd maar echt gezet, via de
+   opslag die de laag zelf gebruikt. Een stub zou de regel toetsen die de toets
+   zelf heeft geschreven. */
 function metOpen(sleutels, extra = {}) {
-  return maakPresence(Object.assign({
+  const db = { spellen: {} };
+  const laag = maakPresence(Object.assign({
+    S: () => db.spellen,
+    save() {},
     sseClients: sleutels.map(k => ({ key: k })),
     isGeblokkeerd: () => false,
     codenaamVan: (k) => 'CN-' + k,
-    lidBoardUit: () => false,
-    isVerborgen: () => false
+    lidBoardUit: () => false
   }, extra));
+  // wie zich onzichtbaar zet, doet dat via de gewone weg
+  for (const k of (extra.verborgen || [])) laag.spelZichtbaarZet(k, false);
+  return laag;
 }
 const namen = (r) => r.online.map(o => o.codenaam).sort();
 
@@ -101,14 +110,14 @@ test('een rare vriendenlijst geeft geen uitzondering', () => {
 test('wie zichzelf onzichtbaar zet komt in niemands stand', () => {
   /* Dit staat NAAST het uitzetten van de hele functie "spelen": "ik speel wel
      maar hoef niet gezien te worden" is iets anders dan "ik speel niet". */
-  const { spelOnline } = metOpen(['anna', 'boris'], { isVerborgen: (k) => k === 'boris' });
+  const { spelOnline } = metOpen(['anna', 'boris'], { verborgen: ['boris'] });
   assert.deepEqual(namen(spelOnline('ik', ['anna', 'boris'])), ['CN-anna']);
 });
 
 test('onzichtbaar werkt EEN kant op: je ziet anderen nog gewoon', () => {
   /* Iemand blinderen omdat hij niet gezien wil worden is een ruil, en dat is
      precies de druk die hier niet hoort. */
-  const { spelOnline } = metOpen(['anna', 'ik'], { isVerborgen: (k) => k === 'ik' });
+  const { spelOnline } = metOpen(['anna', 'ik'], { verborgen: ['ik'] });
   assert.deepEqual(namen(spelOnline('ik', ['anna'])), ['CN-anna'],
     'wie zich verbergt hoort zelf niet blind te worden');
 });

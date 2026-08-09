@@ -51,36 +51,24 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
     potje.beurt = ((potje.beurt + (stap || 1)) % n + n) % n;
   }
 
-  /* ---------- opschonen: klare potjes na een dag weg, wachtenden na zes uur,
-     en verlaten partijen na dertig dagen.
+  /* ---------- wat er weggaat: vanzelf, en op verzoek ----------
+     Het opruimen van oude potjes en het uitwissen van een vertrokken lid staan
+     in spellen/opruimen.js; hier hangt alleen de bedrading.
 
-     Die laatste ontbrak, en dat was geen detail: een potje met status 'bezig'
-     werd NOOIT opgeruimd. Twee spelers die een partij laten liggen lieten hem
-     voor altijd staan, met hun beide sleutels erin -- ongebonden groei en een
-     bewaarprobleem in een. Gemeten op de laatste ZET (`zetAt`) en niet op het
-     aanmaken, want anders zou een lange, levende partij ook verdwijnen; een
-     ouder potje zonder dat stempel valt terug op `at`.
-
-     Hooguit een keer per minuut: de scan over alle potjes hoort niet in het
-     hete pad van elke lobby-poll. ---------- */
-  const VERLATEN_MS = 30 * 86400000;
-  let opgeschoondOm = 0;
-  function opschonen() {
-    const t = Date.now();
-    if (t - opgeschoondOm < 60000) return;
-    opgeschoondOm = t;
-    const s = S();
-    // een sudoku die je hebt laten staan verdwijnt ook
-    for (const [k, v] of Object.entries(s.sudoku || {}))
-      if (t - (v.start || 0) > (ruw.OUD_MS || 6 * 3600000)) delete s.sudoku[k];
-    for (const [id, p] of Object.entries(s.potjes)) {
-      const leeftijd = t - new Date(p.at).getTime();
-      const stil = t - new Date(p.zetAt || p.at).getTime();
-      if ((p.status === 'klaar' && leeftijd > 86400000) ||
-          (p.status === 'wacht' && leeftijd > 6 * 3600000) ||
-          (p.status === 'bezig' && stil > VERLATEN_MS)) delete s.potjes[id];
-    }
-  }
+     De HAKEN zijn er omdat de volgorde niet anders kan: `opschonen` gaat als
+     eerste de lobby in (die draait hem bij elke poll), maar de takken die
+     opgeruimd moeten worden -- toernooien, replays, teams, de arcade -- bestaan
+     pas verderop. Ze schuiven daarom aan zodra ze er zijn. Dat is dezelfde
+     late binding als bij `comm` hierboven, en hij is veilig omdat er niets van
+     dit alles tijdens het OPBOUWEN wordt aangeroepen: pas als er een verzoek
+     binnenkomt. */
+  const opruimHaken = { deel: [], sudoku: null };
+  const { opschonen, spelVergeet } = require('./spellen/opruimen')({
+    S, save, codenaamVan,
+    noteerUitslag: (p) => noteerUitslag(p),
+    deelVergeet: opruimHaken.deel,
+    sudokuOpschonen: (t) => { if (opruimHaken.sudoku) opruimHaken.sudoku(t); }
+  });
 
   /* ---------- de spelmotoren: elk spel een eigen module ----------
      De gedeelde context geeft ze save/crypto/schud/beurtDoor/codenaamVan; het
@@ -90,36 +78,12 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
   const { SPEL, SOORTEN, INITS, ZETTEN, VIEWS, STATISCH, ARCADE, ruw } = require('./spellen/register')(spelCtx);
   // klasgenoten: het uitnodigingspad voor beschermde tieners (De Arena)
   const { klasgenotenVan, spelKlasgenoten } = require('./spellen/klas')({ db, codenaamVan, isGeblokkeerd });
-  /* ---------- onzichtbaar spelen: de eigen opt-out op aanwezigheid ----------
-     De functie "spelen" uitzetten werkt ook, maar dat is grover: dan kun je
-     helemaal niet meer spelen. Dit is de smalle knop -- je speelt gewoon, maar
-     niemand ziet dat je er bent.
-
-     Waarom hier en niet in de boardroom: klasgenoten zijn RTF-gezinsprofielen
-     en die hebben geen boardroom. Een opt-out die alleen voor RTG-leden bestaat
-     zou precies de groep overslaan waarvoor aanwezigheid het gevoeligst is.
-
-     Onzichtbaar is EEN kant op: je bent niet te zien en je ziet anderen nog
-     wel. Iemand blinderen omdat hij niet gezien wil worden is een ruil, en dat
-     is precies de druk die hier niet hoort. Wie wil zien moet niet hoeven
-     betalen met zichtbaarheid. */
-  function V() { const s = S(); if (!s.verborgen) s.verborgen = {}; return s.verborgen; }
-  const isVerborgen = (key) => !!V()[key];
-  const spelZichtbaar = (mij) => ({ status: 200, zichtbaar: !isVerborgen(mij) });
-  function spelZichtbaarZet(mij, aan) {
-    const v = V();
-    // alleen "uit" bewaren we; zichtbaar is de standaard en laat geen spoor na
-    if (aan === false) v[mij] = true; else delete v[mij];
-    save();
-    return { status: 200, ok: true, zichtbaar: !v[mij] };
-  }
-
   /* Wie van je vrienden er nu is. Leest de levende lijst van open
      live-verbindingen en bewaart zelf niets; zie spellen/presence.js voor de
      regels die dat begrenzen. Een toets of een stand zonder SSE-laag krijgt
      een lege lijst in plaats van een uitzondering. */
-  const { spelOnline } = require('./spellen/presence')({
-    sseClients: sseClients || [], isGeblokkeerd, codenaamVan, isVerborgen,
+  const { spelOnline, spelZichtbaar, spelZichtbaarZet } = require('./spellen/presence')({
+    S, save, sseClients: sseClients || [], isGeblokkeerd, codenaamVan,
     lidBoardUit: lidBoardUit || (() => false)
   });
 
@@ -158,57 +122,6 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
   });
 
 
-  /* ---------- een lid dat zich laat verwijderen ----------
-     Twee dingen die tot nu toe bleven staan: zijn sleutel in elk potje waarin
-     hij speelde, en zijn plek in de wachtrij. `vergeten` raakte deze tak
-     helemaal niet aan, en `opschonen` ruimt een potje met status 'bezig'
-     nooit op -- dus dat had voor altijd kunnen blijven staan.
-
-     WEGGAAN TELT ALS OPGEVEN, en dat is geen nieuw gedrag maar hetzelfde als
-     wat de knop "opgeven" doet. Wie vertrekt maakt de partij niet af, en dat
-     IS opgeven; de tegenstander wint en die overwinning landt in de uitslagen.
-     Het alternatief -- het potje stilletjes laten verdwijnen -- zou de ander
-     een partij afnemen die hij aan het winnen kon zijn.
-
-     Het potje zelf gaat daarna weg en blijft dus niet de gebruikelijke dag
-     staan. Dat kan ook niet: `spelers` bestaat uit sleutels, en een potje
-     laten staan waarin de sleutel van een verwijderd lid zit is precies wat we
-     hier weghalen. De uitslag blijft wel, met de vertrekker erin als
-     `{ anoniem: true }` -- mits het wisbeleid deze functie AANROEPT vóór het
-     anonimiseren van de uitslagen, en die volgorde staat in vergeten/anoniem.js. */
-  function spelVergeet(key) {
-    if (!key) return { status: 200, ok: true, potjes: 0 };
-    const s = S();
-    toernooiVergeet(key);
-    zettenVergeet(key);
-    teamVergeet(key);
-    /* De arcadeborden en een lopende sudoku horen bij dezelfde sleutel en
-       staan nergens anders in de weg: hier is niets van iemand anders bij, dus
-       ze gaan gewoon weg. (Een uitslag is van meer dan een en wordt daarom
-       anoniem gemaakt in plaats van weggegooid -- zie vergeten/anoniem.js.) */
-    for (const bord of Object.values(s.arcade || {})) delete bord[key];
-    if (s.sudoku) delete s.sudoku[key];
-    for (const [sleutel, rij] of Object.entries(s.wachtrij || {})) {
-      const over = (rij || []).filter(x => x !== key);
-      if (over.length) s.wachtrij[sleutel] = over; else delete s.wachtrij[sleutel];
-    }
-    let geraakt = 0;
-    for (const [id, p] of Object.entries(s.potjes || {})) {
-      if (!Array.isArray(p.spelers) || !p.spelers.includes(key)) continue;
-      geraakt++;
-      if (p.status !== 'klaar') {
-        const rest = p.spelers.filter(x => x !== key);
-        p.status = 'klaar';
-        p.gelijk = false;
-        p.winnaar = rest.length ? (rest.length === 1 ? codenaamVan(rest[0]) : rest.map(codenaamVan).join(' & ')) : null;
-        noteerUitslag(p);
-      }
-      delete s.potjes[id];
-    }
-    save();
-    return { status: 200, ok: true, potjes: geraakt };
-  }
-
   /* Prestaties, ook afgeleid uit de uitslagen: alleen wat behaald is, geen
      voortgang naar wat je "nog moet", en geen reeksen. Zie de kop van
      spellen/prestaties.js voor waarom dat drie bewuste keuzes zijn. */
@@ -220,6 +133,7 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
      een uitslag zegt WIE won en gaat een jaar mee, een verloop zegt HOE en is
      na een maand geen geheugen meer. Zie spellen/zetten.js. */
   const { noteerZet, spelReplay, zettenVergeet } = require('./spellen/zetten')({ db, save, nu, codenaamVan });
+  opruimHaken.deel.push(zettenVergeet);
 
   /* De lobby- en partijlaag draaien als submodules op een gedeelde
      context, een keer opgebouwd bij het opstarten. */
@@ -233,6 +147,7 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
   const { toernooiNieuw, toernooiAntwoord, toernooiPotjeKlaar, mijnToernooien, toernooiStaat, toernooiVergeet } =
     require('./spellen/toernooi')({ db, save, rid, nu, codenaamVan, isGeblokkeerd, SPEL, SOORTEN, schud,
       potjeDirect, leeftijdFout, nudge });
+  opruimHaken.deel.push(toernooiVergeet);
   ctx.toernooiPotjeKlaar = toernooiPotjeKlaar;
   ctx.toernooiHeeftSpeler = (id, key) => { const b = toernooiStaat(key, id); return !!(b && b.toernooi && b.toernooi.ikDoeMee); };
   const { spelStaat, spelZet, spelOpgeven, spelKijk } = require('./spellen/partij')(ctx);
@@ -253,101 +168,21 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
   const { teamNieuw, teamNodig, teamAntwoord, teamVerlaat, mijnTeams, teamVergeet } =
     require('./spellen/teams')({ db, save, rid, nu, codenaamVan, isGeblokkeerd, zijnVrienden,
       klasgenotenVan, schoon: require('./util').schoon, sociaalRate });
+  opruimHaken.deel.push(teamVergeet);
 
   const { spelPraat, spelPraatStuur } = require('./spellen/praat')(Object.assign({
     comm: () => (typeof comm === 'function' ? comm() : comm) || null
   }, ctx));
 
-  /* ---------- Sudoku: de server maakt de puzzel en rekent de score ----------
-     Het eerste arcadespel dat echt narekenbaar is. De oplossing blijft hier;
-     de client krijgt hem nooit te zien. De tijd loopt op de klok van de
-     server, want een client die zijn eigen tijd meldt kan er nul van maken. */
-  function SU() { const s = S(); if (!s.sudoku) s.sudoku = {}; return s.sudoku; }
-  function sudokuNieuw(mij, niveau) {
-    const n = ruw.NIVEAUS[niveau] ? niveau : 'normaal';
-    const { op, puzzel } = ruw.maakPuzzel(n);
-    SU()[mij] = { op, puzzel, niveau: n, start: Date.now() };
-    save();
-    // alleen de PUZZEL gaat mee terug, nooit de oplossing
-    return { status: 200, ok: true, niveau: n, puzzel };
-  }
-  function sudokuKlaar(mij, rooster) {
-    const lopend = SU()[mij];
-    if (!lopend) return { status: 409, error: 'Er loopt geen puzzel. Begin er een.' };
-    if (!ruw.isRooster(rooster)) return { status: 400, error: 'Stuur een volledig rooster van 81 cijfers mee.' };
-    /* Eerst de GEGEVEN cijfers, helemaal rond, en pas daarna vergelijken. Die
-       volgorde is niet vrijblijvend: wie een gegeven cijfer wegveegt levert een
-       ander rooster in dan de puzzel die hij kreeg, en dat is een andere fout
-       dan "niet goed opgelost". Door elkaar heen lopend zou de eerste
-       afwijkende cel bepalen welke van de twee je te horen krijgt. */
-    for (let i = 0; i < 81; i++)
-      if (lopend.puzzel[i] && rooster[i] !== lopend.puzzel[i])
-        return { status: 400, error: 'De gegeven cijfers van de puzzel horen te blijven staan.' };
-    /* Fout ingevuld is geen fout van de client: de puzzel blijft staan en de
-       klok loopt door, dus je kunt gewoon verder puzzelen. */
-    for (let i = 0; i < 81; i++)
-      if (rooster[i] !== lopend.op[i]) return { status: 200, ok: true, goed: false };
+  /* De arcade: spelen zonder tegenstander, waar alleen een getal van overblijft.
+     Inclusief Sudoku, het enige arcadespel waarvan de SERVER de score rekent.
+     Zie spellen/arcade.js voor waarom die twee soorten score niet naast elkaar
+     mogen bestaan zonder dat de ene de andere dichtzet. */
+  const { arcadeScore, arcadeBord, sneekScore, sneekBord, sudokuNieuw, sudokuKlaar, arcadeVergeet, sudokuOpschonen } =
+    require('./spellen/arcade')({ S, save, nu, codenaamVan, ARCADE, ruw, progressieMag, GEEN_PROGRESSIE });
+  opruimHaken.deel.push(arcadeVergeet);
+  opruimHaken.sudoku = sudokuOpschonen;
 
-    const seconden = Math.max(0, (Date.now() - lopend.start) / 1000);
-    delete SU()[mij];
-    const p = ruw.punten(lopend.niveau, seconden);
-    save();
-    /* Opgelost is opgelost, ook onder de progressiegrens: je hoort hoe snel je
-       was. Wat er onder die grens NIET gebeurt is bewaren -- geen bord, geen
-       record, precies zoals `arcadeScore` het voor Sneek en Tetris doet.
-       Anders zou de server-berekening een tweede weg naar het scorebord zijn. */
-    const uit = { status: 200, ok: true, goed: true, seconden: Math.round(seconden), punten: p };
-    if (!progressieMag(mij)) return Object.assign(uit, { bewaard: false, ranglijst: false, reden: GEEN_PROGRESSIE });
-    const bord = A('sudoku');
-    if (!bord[mij] || p > bord[mij].punten) { bord[mij] = { punten: p, at: nu() }; save(); }
-    return Object.assign(uit, { bewaard: true, ranglijst: true, beste: bord[mij].punten });
-  }
-
-  /* ================= arcade: ranglijsten onder vrienden =================
-     Welke arcadespellen er zijn staat niet hier maar in het register: elk
-     heeft een eigen module met een `vorm: 'arcade'`-descriptor. Deze laag
-     kent dus geen spelnamen, alleen de vorm. */
-
-  function A(spel) {
-    const s = S();
-    if (!s.arcade) {
-      s.arcade = { sneek: s.sneek || {}, tetris: {} }; // neemt oude sneek-scores mee
-      delete s.sneek; // een bron: anders lopen de oude en nieuwe sleutel uiteen
-    }
-    if (!s.arcade[spel]) s.arcade[spel] = {};
-    return s.arcade[spel];
-  }
-  function arcadeScore(mij, spel, punten) {
-    if (!ARCADE[spel]) return { status: 400, error: 'Onbekend arcadespel.' };
-    /* Een spel waarvan de server de score berekent kent geen tweede pad. Zou
-       deze ingang hem toch aannemen, dan was alle narekening voor niets: je
-       stuurt gewoon een getal langs de motor heen. */
-    if (ARCADE[spel].serverScore)
-      return { status: 400, error: 'De score van dit spel wordt door de server bepaald.' };
-    /* Geen 403: je mag dit spel WEL spelen, er wordt alleen niets bewaard. Een
-       fout aan het eind van een potje zou zeggen dat je iets niet mocht, en dat
-       is niet waar. `bewaard: false` zegt precies wat er gebeurt, zodat de
-       client zijn scorebord kan verbergen in plaats van een leeg bord te tonen. */
-    if (!progressieMag(mij)) return { status: 200, ok: true, bewaard: false, ranglijst: false, reden: GEEN_PROGRESSIE };
-    const n = Math.max(0, Math.min(ARCADE[spel].maxPunten, Math.floor(Number(punten) || 0)));
-    const s = A(spel);
-    if (!s[mij] || n > s[mij].punten) { s[mij] = { punten: n, at: nu() }; save(); }
-    return { status: 200, ok: true, bewaard: true, ranglijst: true, beste: s[mij].punten };
-  }
-  function arcadeBord(mij, spel, vrienden) {
-    if (!ARCADE[spel]) return { status: 400, error: 'Onbekend arcadespel.' };
-    if (!progressieMag(mij)) return { bord: [], ranglijst: false, reden: GEEN_PROGRESSIE };
-    const s = A(spel);
-    const rij = [mij, ...vrienden].filter(h => s[h]).map(h => ({ codenaam: codenaamVan(h), ik: h === mij, punten: s[h].punten }));
-    return { bord: rij.sort((a, b) => b.punten - a.punten).slice(0, 20), ranglijst: true };
-  }
-  /* De twee oude Sneek-routes (`/spel/sneek-score` en `/spel/sneek-bord`)
-     bestonden voordat er een arcade was en staan nog in oudere clients. Ze
-     noemen het spel bij naam omdat de ROUTE dat doet -- dat is een alias, geen
-     tweede dispatch: er valt hier niets te vergeten als er een arcadespel
-     bijkomt. */
-  const sneekScore = (mij, punten) => arcadeScore(mij, 'sneek', punten);
-  const sneekBord = (mij, vrienden) => arcadeBord(mij, 'sneek', vrienden);
 
   return { spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelKijk, spelReplay, spelRahul, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, spelUitslagen, spelStand, spelPrestaties, spelPraat, spelPraatStuur, spelTelemetrie, teamNieuw, teamNodig, teamAntwoord, teamVerlaat, mijnTeams, sudokuNieuw, sudokuKlaar, spelVergeet, toernooiNieuw, toernooiAntwoord, mijnToernooien, toernooiStaat, sneekScore, sneekBord, arcadeScore, arcadeBord, SPEL_SOORTEN: SOORTEN,
     // alleen voor de drift-test: de client heeft een eigen kopie van deze

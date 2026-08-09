@@ -43,8 +43,41 @@
       zien zou anders moeten betalen met zichtbaarheid, en dat is de ruil die
       hier niet hoort. */
 module.exports = (ctx) => {
-  const { sseClients, isGeblokkeerd, codenaamVan, lidBoardUit, isVerborgen } = ctx;
-  const verborgen = isVerborgen || (() => false);
+  const { sseClients, isGeblokkeerd, codenaamVan, lidBoardUit, S, save } = ctx;
+
+  /* ---------- onzichtbaar spelen: de eigen opt-out ----------
+     Hij staat HIER en niet in de spellenhub, want het is dezelfde vraag als
+     hierboven: wie is er te zien. De functie "spelen" uitzetten werkt ook, maar
+     dat is grover -- dan kun je helemaal niet meer spelen. Dit is de smalle
+     knop: je speelt gewoon, maar niemand ziet dat je er bent.
+
+     Waarom niet in de boardroom: klasgenoten zijn RTF-gezinsprofielen en die
+     hebben geen boardroom. Een opt-out die alleen voor RTG-leden bestaat zou
+     precies de groep overslaan waarvoor aanwezigheid het gevoeligst is.
+
+     Onzichtbaar is EEN kant op: je bent niet te zien en je ziet anderen nog
+     wel. Iemand blinderen omdat hij niet gezien wil worden is een ruil, en dat
+     is precies de druk die hier niet hoort. Wie wil zien moet niet hoeven
+     betalen met zichtbaarheid. */
+  /* Zonder opslag bestaat de opt-out niet, en dan is er ook niemand verborgen.
+     Dat is dezelfde soepelheid als bij een ontbrekende live-laag hierboven: een
+     stand of een toets zonder omgeving hoort een leeg antwoord te geven en geen
+     uitzondering. */
+  function V() {
+    if (typeof S !== 'function') return {};
+    const s = S(); if (!s.verborgen) s.verborgen = {}; return s.verborgen;
+  }
+  const isVerborgen = (key) => !!V()[key];
+  const spelZichtbaar = (mij) => ({ status: 200, zichtbaar: !isVerborgen(mij) });
+  function spelZichtbaarZet(mij, aan) {
+    const v = V();
+    if (typeof S !== 'function') return { status: 200, ok: true, zichtbaar: true };
+    // alleen "uit" bewaren we; zichtbaar is de standaard en laat geen spoor na
+    if (aan === false) v[mij] = true; else delete v[mij];
+    save();
+    return { status: 200, ok: true, zichtbaar: !v[mij] };
+  }
+  const verborgen = isVerborgen;
 
   // het functie-id uit kern/lidboard/catalogus.js dat bij /api/member/spel hoort
   const FUNCTIE = 'spelen';
@@ -76,5 +109,5 @@ module.exports = (ctx) => {
     };
   }
 
-  return { spelOnline, _bereikbaar: bereikbaar };
+  return { spelOnline, spelZichtbaar, spelZichtbaarZet, isVerborgen, _bereikbaar: bereikbaar };
 };

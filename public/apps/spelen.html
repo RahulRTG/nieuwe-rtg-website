@@ -386,7 +386,7 @@ async function laadZichtbaar(){
 function zetZichtbaarKnop(zichtbaar){
   const k = $('#zichtbaarKnop');
   k.dataset.uit = zichtbaar ? '0' : '1';
-  k.textContent = zichtbaar ? 'Onzichtbaar spelen' : 'Je bent onzichtbaar — weer zichtbaar worden';
+  k.textContent = zichtbaar ? 'Onzichtbaar spelen' : 'Je bent onzichtbaar - weer zichtbaar worden';
 }
 $('#zichtbaarKnop').addEventListener('click', async ()=>{
   const nuUit = $('#zichtbaarKnop').dataset.uit === '1';

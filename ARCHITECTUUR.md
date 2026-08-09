@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 2897 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 2898 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,14 +18,14 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 2897 |
-| servermodules (`server/**/*.js`) | 1565 |
+| API-endpoints | 2898 |
+| servermodules (`server/**/*.js`) | 1581 |
 | routebestanden (`server/routes/**`) | 349 |
-| kernmodules (`server/kern/**`) | 905 |
+| kernmodules (`server/kern/**`) | 921 |
 | schermen (`public/**/*.html`) | 213 |
 | gedeelde browsermodules (`public/shared/*.js`) | 171 |
-| toetsbestanden (`test/*.test.js`) | 630 |
-| schermtoetsen (`test/*.e2e.js`) | 87 |
+| toetsbestanden (`test/*.test.js`) | 642 |
+| schermtoetsen (`test/*.e2e.js`) | 90 |
 
 ## 2. De weg van een verzoek
 
@@ -104,7 +104,7 @@ zie §5 -- er zijn nog 146 kern-namen die meer dan één domein aanraakt.
 | `office` | 33 | 7 | 3 | 53 |
 | `staff` | 26 | 7 | 1 | 40 |
 | `social` | 55 | 7 | 31 | 52 |
-| `techniek` | 42 | 11 | 1 | 49 |
+| `techniek` | 43 | 11 | 1 | 50 |
 | `zakelijk` | 13 | 2 | 0 | 27 |
 
 "Zonder bewaker" betekent: geen `auth`/`supplierAuth`/`officeAuth`-achtige middleware
@@ -120,9 +120,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1121 |
+| kern-namen die routes aanraken | 1143 |
 | daarvan door **meer dan één** domein (de echte koppeling) | 146 |
-| daarvan door precies één domein | 975 |
+| daarvan door precies één domein | 997 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 
@@ -151,10 +151,10 @@ gegevensStop(6) talen(6) mail(5) loginFails(5) sseToSupplier(5)
 | 40 | `server/routes/member/voertuigen/verkoop.js` |
 | 40 | `server/routes/member/voertuigen.js` |
 | 39 | `server/routes/member/voertuigen/ontmoeten.js` |
+| 39 | `server/routes/spellen.js` |
 | 37 | `server/routes/auth.js` |
 | 36 | `server/routes/staff.js` |
 | 35 | `server/routes/auth/account.js` |
-| 34 | `server/routes/auth/herstel.js` |
 
 ## 6. Waar de waarheid staat
 

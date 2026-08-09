@@ -375,3 +375,66 @@ test('een uitgaande SEPA levert een betaalopdracht op die het kantoor kan volgen
   const na2 = (await oapi('bank/gezond', {}, 'RTG')).body;
   assert.equal(na2.railOpen, na.railOpen, 'geen tweede opdracht voor dezelfde tik');
 });
+
+/* DE PAYOUT-WEBHOOK. Tot deze ronde kende /api/betaal/webhook alleen INKOMEND
+   geld: een uitgaande SEPA bleef daardoor voor altijd op INGEDIEND staan. Het
+   scherpste geval is niet de geslaagde payout maar de MISLUKTE -- dan staat het
+   geld van de klant af en komt het nergens aan, en "MISLUKT" opschrijven zonder
+   terug te boeken is hetzelfde gat als voorheen, alleen een dag later. */
+test('een mislukte payout komt via de webhook binnen en brengt het geld terug', async () => {
+  const voorSaldo = (await api('bank/rekening', { iban: lid.iban }, lid.token)).body.rekening.saldoCenten;
+  const voorGezond = (await oapi('bank/gezond', {}, 'RTG')).body;
+
+  const uit = await api('bank/sepa', { iban: lid.iban, centen: 3000, naarIban: 'NL91ABNA0417164300',
+    begunstigde: 'Ontvanger', oms: 'Mislukkende overboeking', idem: 'sepa-faal' }, lid.token);
+  assert.equal(uit.status, 200);
+  const opdracht = (await oapi('bank/opdrachten', { limit: 20 }, 'RTG')).body
+    .opdrachten.find(o => o.id === uit.body.opdrachtId);
+  assert.equal(opdracht.status, 'INGEDIEND');
+  assert.ok(opdracht.settlementRef, 'de rail gaf een referentie terug');
+  const tarief = opdracht.tariefCenten;
+  const naSepa = (await api('bank/rekening', { iban: lid.iban }, lid.token)).body.rekening.saldoCenten;
+  assert.equal(naSepa, voorSaldo - 3000 - tarief, 'het geld is van de rekening af');
+
+  // de provider meldt dat de payout is mislukt (dezelfde route, ruwe body)
+  const evt = { id: 'evt_payout_1', type: 'payout.failed',
+    data: { object: { id: opdracht.settlementRef, failure_message: 'account_closed' } } };
+  const hook = await fetch(base + '/api/betaal/webhook', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(evt) });
+  assert.equal(hook.status, 200, 'de provider krijgt 200, anders blijft hij herhalen');
+
+  /* De webhook antwoordt meteen en werkt daarna af (hij mag de provider niet
+     laten wachten), dus wachten op de uitkomst en niet op een vaste tijd. */
+  let eind = null;
+  for (let i = 0; i < 40 && !eind; i++) {
+    const l = await oapi('bank/opdrachten', { limit: 20 }, 'RTG');
+    const o = l.body.opdrachten.find(x => x.id === uit.body.opdrachtId);
+    if (o && o.status !== 'INGEDIEND') eind = o;
+    else await new Promise(r => setTimeout(r, 25));
+  }
+  assert.ok(eind, 'de webhook heeft de opdracht afgehandeld');
+  assert.equal(eind.status, 'TERUGGEBOEKT', 'niet alleen MISLUKT: het geld is teruggeboekt');
+
+  const naHook = (await api('bank/rekening', { iban: lid.iban }, lid.token)).body.rekening.saldoCenten;
+  assert.equal(naHook, voorSaldo, 'het volledige bedrag staat terug, tarief incluis');
+  const naGezond = (await oapi('bank/gezond', {}, 'RTG')).body;
+  assert.equal(naGezond.sluit.klopt, true, 'en het grootboek sluit nog steeds');
+  assert.equal(naGezond.railOpen, voorGezond.railOpen, 'de reconciliatie is terug op zijn oude stand');
+  assert.equal(naGezond.railZonderTerugboeking, 0, 'er staat geen geld af zonder bestemming');
+
+  // het lid ziet de teruggang op zijn afschrift; een stille correctie bestaat niet
+  const af = await api('bank/afschrift', { iban: lid.iban }, lid.token);
+  assert.ok(af.body.regels.some(r => r.soort === 'sepa-terug' && !r.af),
+    'de teruggeboeking staat als bijschrijving op het afschrift');
+});
+
+test('een payout-webhook die wij niet kennen verandert niets en valt niet om', async () => {
+  const voor = (await oapi('bank/gezond', {}, 'RTG')).body;
+  const evt = { id: 'evt_payout_2', type: 'payout.paid', data: { object: { id: 'po_vanIemandAnders' } } };
+  const r = await fetch(base + '/api/betaal/webhook', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(evt) });
+  assert.equal(r.status, 200);
+  const na = (await oapi('bank/gezond', {}, 'RTG')).body;
+  assert.equal(na.railOpen, voor.railOpen);
+  assert.equal(na.sluit.klopt, true);
+});

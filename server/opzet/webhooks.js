@@ -15,7 +15,7 @@
 'use strict';
 
 module.exports = function hangWebhooksOp(deps) {
-  const { app, express, db, save, log, betaal, muntbetaal, opslagKlaar } = deps;
+  const { app, express, db, save, log, betaal, muntbetaal, opslagKlaar, bankVan } = deps;
   /* munten en settleFactuur bestaan in server.js PAS verderop, terwijl deze twee
      routes hierboven al gemount moeten zijn (voor express.json). Dat werkte daar
      omdat de handlers de bindingen pas bij een verzoek lezen. Diezelfde afspraak
@@ -95,6 +95,34 @@ module.exports = function hangWebhooksOp(deps) {
             // geen wachtende context: of al afgewikkeld, of een betaling die niet
             // van ons komt. Allebei geen fout, maar het hoort wel op te vallen.
             log.info('betaal-webhook zonder wachtende betaling', { id: pi.id });
+          }
+        }
+        /* DE ANDERE KANT OP: een UITBETALING die het huis heeft verlaten. Tot nu
+           toe kende deze webhook alleen inkomend geld, en daardoor bleef een
+           uitgaande SEPA voor altijd op INGEDIEND staan -- aangenomen door de
+           rail, nooit bevestigd. Nu sluit de provider hem hier af.
+
+           Een MISLUKTE payout is hier het belangrijke geval en niet het
+           uitzonderlijke: het geld staat dan van de klant af en komt nergens
+           aan. bevestig() draait daarom bij een mislukking dezelfde
+           terugboeking als bij opgeven; hier hoeven we alleen te melden WAT de
+           rail zei. Een herhaalde levering (providers herhalen) verandert niets
+           meer, want een afgeronde opdracht neemt geen nieuwe status aan. */
+        if (soort === 'payout.paid' || soort === 'payout.failed' || soort === 'payout.canceled') {
+          const po = pi;
+          const bank = bankVan && bankVan();
+          if (bank && po && po.id) {
+            const r = await bank.bankOpdrachtBevestig({
+              settlementRef: po.id,
+              gelukt: soort === 'payout.paid',
+              reden: po.failure_message || po.failure_code || soort
+            });
+            /* Een payout die wij niet kennen is geen fout (hij kan van een ander
+               deel van het huis komen), maar hij mag niet in de stilte vallen --
+               anders is "de webhook doet niets" niet te onderscheiden van "de
+               webhook komt niet aan". */
+            if (r && r.error) log.info('payout-webhook zonder bijbehorende betaalopdracht', { id: po.id, type: soort });
+            else log.info('payout-webhook verwerkt', { id: po.id, type: soort, opdracht: r && r.id, status: r && r.status });
           }
         }
         log.info('betaal-webhook', { type: soort || 'onbekend', id: evt && evt.id });

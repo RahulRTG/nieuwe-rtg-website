@@ -34,7 +34,7 @@ function teDiep(wortel) {
 
 module.exports = function lijfpoort(deps) {
   const { app, express, db, save, log, betaal, muntbetaal, opslagKlaar,
-    zaakdoos, muntenVan, settleFactuurVan } = deps;
+    zaakdoos, muntenVan, settleFactuurVan, bankVan } = deps;
 
   /* De twee betaal-webhooks staan in ./webhooks.js. Ze horen HIER en niet in de
      gewone routebedrading: een handtekening wordt over de RAUWE body berekend,
@@ -45,7 +45,7 @@ module.exports = function lijfpoort(deps) {
     app, express, db, save, log, betaal, muntbetaal,
     opslagKlaar: () => opslagKlaar(),
     // pas verderop in server.js gebouwd; zie de uitleg in webhooks.js
-    muntenVan, settleFactuurVan
+    muntenVan, settleFactuurVan, bankVan
   });
 
   app.use(express.json({ limit: '8mb' }));

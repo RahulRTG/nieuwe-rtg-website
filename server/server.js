@@ -385,7 +385,9 @@ const { schild, ssrf, zetWacht, zetRtgai } = require('./opzet/verzoekketen')({
   opslagKlaar: () => opslagKlaar(),
   // alle drie pas verderop in dit bestand gebouwd; lui doorgegeven
   beveiligVan: () => beveilig,
-  muntenVan: () => munten, settleFactuurVan: () => settleFactuur
+  muntenVan: () => munten, settleFactuurVan: () => settleFactuur,
+  // de bank bestaat pas na kernlaag4b; de payout-webhook leest hem per verzoek
+  bankVan: () => kern.bank
 });
 
 /* ---------- de poortwachters voor de routers staan in ./opzet/poortwachters.js

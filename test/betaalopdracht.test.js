@@ -164,7 +164,7 @@ test('een status kan niet achteruit, en een afgewikkelde opdracht wordt niet opn
   assert.equal(weer.status, 'AFGEWIKKELD', 'nog een keer indienen doet niets');
   assert.equal(op.vind(o.id).pogingen, 1, 'en telt geen extra poging');
 
-  const geweigerd = op.bevestig({ id: o.id, gelukt: false, reden: 'te laat' });
+  const geweigerd = await op.bevestig({ id: o.id, gelukt: false, reden: 'te laat' });
   assert.equal(geweigerd.status, 'AFGEWIKKELD', 'afgewikkeld blijft afgewikkeld');
   assert.ok(klachten.some(k => /geweigerde statusovergang/.test(k[0])), 'en de poging is geklaagd, niet genegeerd');
 });
@@ -174,7 +174,7 @@ test('de webhook-bevestiging sluit een ingediende opdracht', async () => {
   const o = op.maak(basis);
   await op.dienIn(o);
   assert.equal(op.vind(o.id).status, 'INGEDIEND');
-  const r = op.bevestig({ id: o.id, settlementRef: 'SEPA-XYZ' });
+  const r = await op.bevestig({ id: o.id, settlementRef: 'SEPA-XYZ' });
   assert.equal(r.status, 'AFGEWIKKELD');
   assert.equal(r.settlementRef, 'SEPA-XYZ');
   assert.equal(op.openstaand().aantal, 0, 'daarna is de reconciliatie leeg');
@@ -189,4 +189,76 @@ test('twee rondes tegelijk bieden dezelfde opdracht niet twee keer aan', async (
   const overgeslagen = [a, b].filter(r => r.overgeslagen).length;
   assert.equal(overgeslagen, 1, 'de tweede ronde ziet dat er al een loopt');
   assert.equal(op.vind(o.id).pogingen, 2, 'en de opdracht is maar een keer extra aangeboden');
+});
+
+/* DE WEBHOOK-KANT. De rail neemt een opdracht aan en meldt pas UREN later of hij
+   echt is verwerkt. Die tweede melding is het enige moment waarop RTG mag zeggen
+   dat het geld er is -- en, als hij negatief is, het moment waarop het geld
+   terug moet. Precies dat tweede deel is waar een statusveld alleen niet genoeg
+   is: "MISLUKT" opschrijven en het geld laten staan is hetzelfde gat als
+   daarvoor, alleen een dag later in de tijdlijn. */
+test('de webhook vindt de opdracht op de referentie van de rail, niet op onze id', async () => {
+  const { op } = maak({ railStatus: 'ingepland' });
+  const o = op.maak(basis);
+  await op.dienIn(o);
+  assert.equal(op.vind(o.id).settlementRef, 'RAIL-1');
+
+  const r = await op.bevestig({ settlementRef: 'RAIL-1' });
+  assert.equal(r.id, o.id, 'dezelfde opdracht, gevonden zonder onze eigen id');
+  assert.equal(r.status, 'AFGEWIKKELD');
+
+  // een onbekende referentie raakt niets
+  assert.equal((await op.bevestig({ settlementRef: 'RAIL-BESTAATNIET' })).status, 404,
+    'een webhook over een payout die wij niet kennen pakt geen willekeurige opdracht');
+});
+
+/* Hier stond ook een bewering dat een LEGE referentie niets matcht. Die kon niet
+   zakken: een settlementRef is null of een echte string en nooit leeg, dus de
+   vergelijking liep sowieso nergens op stuk. De mutatie sloeg af, en een toets
+   die niet kan zakken is slechter dan geen toets (LAT.md regel 9) -- weg dus, en
+   de afslag in de code heet nu een snelkoppeling in plaats van een grendel. */
+test('twee opdrachten met dezelfde railreferentie: de webhook gaat over de laatste', async () => {
+  const db = { data: {} };
+  const op = require('../server/kern/betaalopdracht')({
+    d: () => db.data, save: () => {}, crypto, nu: () => 7000,
+    log: { warn: () => {} },
+    railInzenden: async () => ({ id: 'PO-ZELFDE', status: 'ingepland' }),  // de rail hergebruikt zijn id
+    terugboeken: async () => ({ ok: true })
+  });
+  const eerste = op.maak({ ...basis, ledgerRef: 'BB-oud' });
+  const tweede = op.maak({ ...basis, ledgerRef: 'BB-nieuw' });
+  await op.dienIn(eerste);
+  await op.dienIn(tweede);
+
+  const r = await op.bevestig({ settlementRef: 'PO-ZELFDE' });
+  assert.equal(r.id, tweede.id, 'de laatste poging wint, niet de eerste');
+  assert.equal(op.vind(eerste.id).status, 'INGEDIEND', 'de oudere blijft ongemoeid');
+});
+
+test('meldt de rail achteraf een mislukking, dan komt het geld terug', async () => {
+  const { op, terug } = maak({ railStatus: 'ingepland' });
+  const o = op.maak(basis);
+  await op.dienIn(o);
+  assert.equal(op.openstaand().centen, 5000, 'zolang hij loopt telt hij mee');
+
+  const r = await op.bevestig({ settlementRef: 'RAIL-1', gelukt: false, reden: 'rekening bestaat niet' });
+  assert.equal(r.status, 'TERUGGEBOEKT', 'niet alleen MISLUKT opschrijven -- het geld moet terug');
+  assert.deepEqual(terug.aanroepen, [o.id], 'dezelfde teruggang als bij opgeven, precies een keer');
+  assert.match(op.vind(o.id).laatsteFout, /rekening bestaat niet/, 'met de reden van de rail erbij');
+  assert.equal(op.openstaand().aantal, 0, 'en daarna is de reconciliatie leeg');
+});
+
+test('een tweede webhook over dezelfde opdracht verandert niets meer', async () => {
+  const { op, terug } = maak({ railStatus: 'ingepland' });
+  const o = op.maak(basis);
+  await op.dienIn(o);
+  await op.bevestig({ settlementRef: 'RAIL-1', gelukt: false, reden: 'eerste melding' });
+  assert.equal(op.vind(o.id).status, 'TERUGGEBOEKT');
+
+  // providers herhalen hun webhooks; een tweede levering mag niet nog eens boeken
+  const weer = await op.bevestig({ settlementRef: 'RAIL-1', gelukt: false, reden: 'herhaalde melding' });
+  assert.equal(weer.status, 'TERUGGEBOEKT');
+  assert.equal(terug.aanroepen.length, 1, 'er is niet nog een keer teruggeboekt');
+  const laat = await op.bevestig({ settlementRef: 'RAIL-1', gelukt: true });
+  assert.equal(laat.status, 'TERUGGEBOEKT', 'en een late "toch gelukt" draait een teruggeboekte opdracht niet om');
 });

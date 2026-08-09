@@ -129,6 +129,7 @@ module.exports = function maakBetaalopdrachten(opties) {
   ctx.vind = derij.vind;
   const inzending = require('./inzending')(ctx);
   ctx.dienIn = inzending.dienIn;
+  ctx.draaiTerug = inzending.draaiTerug;   // bevestig() met een mislukking gebruikt dezelfde teruggang
 
   return { STATUS, maak, publiek, dienIn: inzending.dienIn, ...derij };
 };

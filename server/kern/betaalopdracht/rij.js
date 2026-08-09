@@ -58,17 +58,26 @@ module.exports = (ctx) => {
     return { ok: true, gedaan, gelukt, opgegeven };
   }
 
-  /* De bevestiging van buiten (de provider-webhook): pas hier gaat een opdracht
-     van "aangenomen" naar "definitief". Nog niet aangesloten -- de webhook van
-     server/betaal.js kent vandaag alleen inkomende betalingen; dat is TAKEN.md
-     4.23. Tot die tijd blijft een ingediende opdracht ingediend, en dat is
-     eerlijker dan hem bij inzending al afgewikkeld noemen. */
-  function bevestig({ id, settlementRef, gelukt = true, reden }) {
-    const o = vind(id);
+  /* DE BEVESTIGING VAN BUITEN (de provider-webhook): pas hier gaat een opdracht
+     van "aangenomen" naar "definitief". Dit is het enige punt waarop RTG mag
+     zeggen dat het geld er is, want tot dan weten we alleen dat de rail hem
+     heeft aangenomen.
+
+     Aanroepen kan op twee manieren: met onze eigen `id` (het kantoor), of met de
+     `settlementRef` van de provider. Dat tweede is de payout-webhook in
+     server/opzet/webhooks.js: die kent onze id niet, alleen zijn eigen.
+
+     Meldt de rail een MISLUKKING, dan is de status zetten niet genoeg -- het
+     geld staat van de klant af en komt nergens aan. Dan draait dezelfde
+     terugboeking als bij opgeven. Zonder dat zou hier precies het gat terugkomen
+     dat deze hele module dichtzet, alleen een dag later in de tijdlijn. */
+  async function bevestig({ id, settlementRef, gelukt = true, reden }) {
+    const o = id ? vind(id) : vindOpSettlement(settlementRef);
     if (!o) return { status: 404, error: 'Die betaalopdracht bestaat niet.' };
     if (gelukt) { zet(o, STATUS.AFGEWIKKELD, { settlementRef: settlementRef || o.settlementRef }); save(); return publiek(o); }
-    zet(o, STATUS.MISLUKT, { laatsteFout: String(reden || 'de rail meldde een mislukking').slice(0, 300), volgendeAt: null });
+    const week = zet(o, STATUS.MISLUKT, { laatsteFout: String(reden || 'de rail meldde een mislukking').slice(0, 300), volgendeAt: null });
     save();
+    if (week) await ctx.draaiTerug(o);   // alleen als hij ECHT naar mislukt ging
     return publiek(o);
   }
 
@@ -90,6 +99,18 @@ module.exports = (ctx) => {
   }
 
   function vind(id) { return rij().find(o => o.id === String(id || '')) || null; }
+  /* Opzoeken op de referentie van de rail. NIEUWSTE EERST, en dat is het enige
+     wat hier gedrag is: dezelfde ref kan aan twee opdrachten hangen als er met
+     de hand opnieuw is ingediend, en dan gaat de webhook over de laatste poging.
+     De lege-ref-afslag eronder is een snelkoppeling en geen grendel -- een
+     settlementRef is null of een echte string, nooit leeg, dus zonder die regel
+     zou de lus alleen zinloos de hele rij aflopen. */
+  function vindOpSettlement(ref) {
+    const r = String(ref || '');
+    if (!r) return null;
+    for (let i = rij().length - 1; i >= 0; i--) if (rij()[i].settlementRef === r) return rij()[i];
+    return null;
+  }
   function lijst({ limit = 50, status, ledgerRef, bron } = {}) {
     let r = rij().slice().reverse();
     if (status) r = r.filter(o => o.status === status);
@@ -98,5 +119,5 @@ module.exports = (ctx) => {
     return { status: 200, aantal: r.length, opdrachten: r.slice(0, Math.min(500, Math.max(1, limit))).map(publiek) };
   }
 
-  return { plaats, ronde, bevestig, openstaand, vind, lijst };
+  return { plaats, ronde, bevestig, openstaand, vind, vindOpSettlement, lijst };
 };

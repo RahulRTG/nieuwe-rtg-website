@@ -419,9 +419,9 @@
       "soort": "puur",
       "staat": "gezakt",
       "module": "server/kern/betaalopdracht/index.js",
-      "operator": "===->!==#0",
-      "gezakt": 7,
-      "geprobeerd": 3
+      "operator": "true->false#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "betaalstore.test.js": {
       "soort": "puur",

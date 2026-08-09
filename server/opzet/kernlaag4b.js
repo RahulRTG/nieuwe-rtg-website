@@ -18,7 +18,7 @@
 /* `bankregie` wordt hier verklaard en tot onderaan dit deel gebruikt; daarom
    loopt de grens met deel 4a ervoor en niet erin. */
 module.exports = (kern, hulp) => {
-  const { FISCAAL_PEILJAAR, LANDEN, accounts, anthropic, betaal, centen, crypto, db, findSupplier, fonds, keyVanCodenaam, ledenAantal, log, save, schoon, sseToCustomer, sseToOffice, sseToSupplier } = hulp;
+  const { FISCAAL_PEILJAAR, LANDEN, accounts, anthropic, betaal, betaalOpdrachten, centen, crypto, db, findSupplier, fonds, keyVanCodenaam, ledenAantal, log, save, schoon, sseToCustomer, sseToOffice, sseToSupplier } = hulp;
 
 /* Bankregie (kern/bankregie.js): de geldinfrastructuur-knop van de boardroom --
    een schakelaar met DRIE standen (partner -> hybride -> eigen) die bepaalt hoe
@@ -30,7 +30,7 @@ Object.assign(kern, bankregie);
    dezelfde dubbele-boekhoud-tucht -- rekeningen met een echt IBAN, storten (langs
    de 3-standen knop), overboeken, de brug van/naar de wallet, uitgaande SEPA achter
    de betaal-naad, en sparen met rente. Klaar om met een knop de eigen bank te worden. */
-Object.assign(kern, require('../kern/bank')({ db, save, crypto, schoon, betaal, pay: kern.pay, bankregie, keyVanCodenaam, accounts, sseToCustomer, sseToOffice, anthropic }));
+Object.assign(kern, require('../kern/bank')({ db, save, crypto, schoon, betaal, pay: kern.pay, bankregie, keyVanCodenaam, accounts, sseToCustomer, sseToOffice, anthropic, betaalOpdrachten }));
 /* De Reiswijzer (kern/reis.js): alle reisregels van elk land -- visum,
    rijrichting, alarmnummer, water, fooi, let-op -- in place op de gedeelde
    LANDEN-tabel gezet, VOOR de Regelwacht zodat de overlay er bovenop komt. */

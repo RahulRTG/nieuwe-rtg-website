@@ -27,7 +27,7 @@ const { lokaalAdres } = require('../lib/lokaaladres');
 
 module.exports = function verzoekketen(deps) {
   const { app, express, log, logboek, db, save, betaal, muntbetaal, opslagKlaar,
-    zaakdoos, PRODUCTION, beveiligVan, muntenVan, settleFactuurVan, bankVan } = deps;
+    zaakdoos, PRODUCTION, beveiligVan, muntenVan, settleFactuurVan, opdrachtenVan } = deps;
 
   /* ---------- foutisolatie per verzoek ----------
      Een bug in EEN route mag nooit het proces (en dus alle andere apps) raken.
@@ -155,7 +155,7 @@ module.exports = function verzoekketen(deps) {
   const lieg = require('./liegpoort')({ app, log });
 
   require('./lijfpoort')({ app, express, db, save, log, betaal, muntbetaal,
-    opslagKlaar, zaakdoos, muntenVan, settleFactuurVan, bankVan });
+    opslagKlaar, zaakdoos, muntenVan, settleFactuurVan, opdrachtenVan });
 
   return {
     schild, zetWacht, lieg,

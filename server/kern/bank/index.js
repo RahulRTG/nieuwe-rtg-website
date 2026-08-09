@@ -19,7 +19,7 @@
    rente in ./sparen. */
 
 module.exports = (deps) => {
-  const { db, save, crypto, schoon, betaal, pay, bankregie, keyVanCodenaam, accounts, sseToCustomer, sseToOffice, anthropic } = deps;
+  const { db, save, crypto, schoon, betaal, pay, bankregie, keyVanCodenaam, accounts, sseToCustomer, sseToOffice, anthropic, betaalOpdrachten } = deps;
   const nu = () => Date.now();
   const d = () => db.data;
 
@@ -80,7 +80,7 @@ module.exports = (deps) => {
      de boeking, want "geboekt" en "de rail heeft het aangenomen" zijn twee
      gebeurtenissen die los van elkaar mislukken. De bedrading naar de rail staat
      in ./uitgang; het gat dat dit dicht in ../betaalopdracht/index.js. */
-  const opdrachten = require('./uitgang')({ d, save, crypto, nu, betaal, boekAsync, rekMeta, seintje });
+  const opdrachten = require('./uitgang')({ opdrachten: betaalOpdrachten, boekAsync, rekMeta, seintje });
 
   // de gedeelde context voor de deelbestanden
   const ctx = { db, save, crypto, schoon, betaal, pay, bankregie, keyVanCodenaam, accounts, anthropic,

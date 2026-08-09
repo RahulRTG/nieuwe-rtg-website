@@ -33,11 +33,14 @@ function maak({ railFaalt = 0, railStatus = 'ingepland', terugboekFaalt = false,
       if (nogFalen > 0) { nogFalen--; throw new Error('de rail is onbereikbaar'); }
       return { id: 'RAIL-' + rail.pogingen.length, status: railStatus };
     },
-    terugboeken: async (o) => {
-      terug.aanroepen.push(o.id);
-      if (terugboekFaalt) return { error: 'het grootboek weigerde de teruggang' };
-      return { ok: true, boeking: { id: 'TERUG-1' } };
-    }
+  });
+  /* De teruggang wordt per SOORT geregistreerd en niet aan de constructor
+     meegegeven: een huis, een rij, maar elke rail boekt in zijn eigen grootboek
+     terug. Hier is dat de nep-SEPA. */
+  op.registreerTeruggang('sepa-uit', async (o) => {
+    terug.aanroepen.push(o.id);
+    if (terugboekFaalt) return { error: 'het grootboek weigerde de teruggang' };
+    return { ok: true, boeking: { id: 'TERUG-1' } };
   });
   return { op, db, klok, rail, terug };
 }
@@ -153,9 +156,9 @@ test('een status kan niet achteruit, en een afgewikkelde opdracht wordt niet opn
   const op = require('../server/kern/betaalopdracht')({
     d: () => db.data, save: () => {}, crypto, nu: () => 5000,
     log: { warn: (m, g) => klachten.push([m, g]) },
-    railInzenden: async () => ({ id: 'R1', status: 'paid' }),
-    terugboeken: async () => ({ ok: true })
+    railInzenden: async () => ({ id: 'R1', status: 'paid' })
   });
+  op.registreerTeruggang('sepa-uit', async () => ({ ok: true }));
   const o = op.maak(basis);
   await op.dienIn(o);
   assert.equal(op.vind(o.id).status, 'AFGEWIKKELD');
@@ -222,9 +225,9 @@ test('twee opdrachten met dezelfde railreferentie: de webhook gaat over de laats
   const op = require('../server/kern/betaalopdracht')({
     d: () => db.data, save: () => {}, crypto, nu: () => 7000,
     log: { warn: () => {} },
-    railInzenden: async () => ({ id: 'PO-ZELFDE', status: 'ingepland' }),  // de rail hergebruikt zijn id
-    terugboeken: async () => ({ ok: true })
+    railInzenden: async () => ({ id: 'PO-ZELFDE', status: 'ingepland' })  // de rail hergebruikt zijn id
   });
+  op.registreerTeruggang('sepa-uit', async () => ({ ok: true }));
   const eerste = op.maak({ ...basis, ledgerRef: 'BB-oud' });
   const tweede = op.maak({ ...basis, ledgerRef: 'BB-nieuw' });
   await op.dienIn(eerste);
@@ -261,4 +264,38 @@ test('een tweede webhook over dezelfde opdracht verandert niets meer', async () 
   assert.equal(terug.aanroepen.length, 1, 'er is niet nog een keer teruggeboekt');
   const laat = await op.bevestig({ settlementRef: 'RAIL-1', gelukt: true });
   assert.equal(laat.status, 'TERUGGEBOEKT', 'en een late "toch gelukt" draait een teruggeboekte opdracht niet om');
+});
+
+/* EEN RIJ VOOR HET HELE HUIS, MAAR NIET EEN TERUGGANG. De bank boekt terug naar
+   extern:sepa, Pay naar extern:uitbetaald, en het fonds heeft helemaal geen
+   boeking om terug te draaien. Wie die drie op een hoop gooit, boekt vroeg of
+   laat geld naar de verkeerde kant -- stil, want het grootboek sluit er gewoon
+   van. Vandaar een tabel per soort, en een weigering voor wat er niet in staat. */
+test('een soort zonder geregistreerde teruggang wordt geweigerd, niet geraden', async () => {
+  const db = { data: {} };
+  const klachten = [];
+  const op = require('../server/kern/betaalopdracht')({
+    d: () => db.data, save: () => {}, crypto, nu: () => 3000,
+    maxPogingen: 1, log: { warn: (m, g) => klachten.push([m, g]) },
+    railInzenden: async () => { throw new Error('rail dicht'); }
+  });
+  const o = op.maak({ ...basis, soort: 'onbekende-rail' });
+  await op.dienIn(o);
+
+  const eind = op.vind(o.id);
+  assert.equal(eind.status, 'MISLUKT', 'niet TERUGGEBOEKT: er is niets teruggeboekt');
+  assert.match(eind.terugboekFout, /geen teruggang geregistreerd/);
+  assert.equal(op.openstaand().zonderTerugboeking, 1, 'en hij staat als "geld af zonder bestemming" op het bord');
+  assert.ok(klachten.some(k => /TERUGBOEKING MISLUKT/.test(k[0])), 'met een luide klacht erbij');
+});
+
+test('twee rails kunnen niet dezelfde soort claimen', () => {
+  const db = { data: {} };
+  const op = require('../server/kern/betaalopdracht')({
+    d: () => db.data, save: () => {}, crypto, nu: () => 3000, log: { warn: () => {} },
+    railInzenden: async () => ({ id: 'X', status: 'ingepland' })
+  });
+  op.registreerTeruggang('sepa-uit', async () => ({ ok: true }));
+  assert.throws(() => op.registreerTeruggang('sepa-uit', async () => ({ ok: true })), /staat al een teruggang/);
+  assert.throws(() => op.registreerTeruggang('iets', 'geen functie'), /is een functie/);
 });

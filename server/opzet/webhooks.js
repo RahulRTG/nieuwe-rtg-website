@@ -15,7 +15,7 @@
 'use strict';
 
 module.exports = function hangWebhooksOp(deps) {
-  const { app, express, db, save, log, betaal, muntbetaal, opslagKlaar, bankVan } = deps;
+  const { app, express, db, save, log, betaal, muntbetaal, opslagKlaar, opdrachtenVan } = deps;
   /* munten en settleFactuur bestaan in server.js PAS verderop, terwijl deze twee
      routes hierboven al gemount moeten zijn (voor express.json). Dat werkte daar
      omdat de handlers de bindingen pas bij een verzoek lezen. Diezelfde afspraak
@@ -110,9 +110,9 @@ module.exports = function hangWebhooksOp(deps) {
            meer, want een afgeronde opdracht neemt geen nieuwe status aan. */
         if (soort === 'payout.paid' || soort === 'payout.failed' || soort === 'payout.canceled') {
           const po = pi;
-          const bank = bankVan && bankVan();
-          if (bank && po && po.id) {
-            const r = await bank.bankOpdrachtBevestig({
+          const rij = opdrachtenVan && opdrachtenVan();
+          if (rij && po && po.id) {
+            const r = await rij.bevestig({
               settlementRef: po.id,
               gelukt: soort === 'payout.paid',
               reden: po.failure_message || po.failure_code || soort

@@ -50,10 +50,6 @@ module.exports = (ctx) => {
      gaat de opdracht NIET dicht: hij blijft op MISLUKT en dus in openstaand(),
      zodat het kantoor het ziet in plaats van dat het geld zoekraakt. */
   async function draaiTerug(o) {
-    if (typeof terugboeken !== 'function') {
-      klacht('geen terugboeking ingesteld; het geld staat nog van de rekening af', { id: o.id, ledgerRef: o.ledgerRef });
-      return false;
-    }
     let r = null, fout = null;
     try { r = await terugboeken(o); }
     catch (e) { fout = e; }

@@ -23,9 +23,13 @@
    iets moet gebeuren; de ronde probeert hem opnieuw met dezelfde
    idempotentiesleutel, zodat een herhaling nooit een tweede betaling wordt.
 
-   Deze module kent geen enkele rail: wie hem gebruikt geeft `railInzenden` en
-   `terugboeken` mee (voor de bank: ../bank/uitgang.js). Dezelfde vorm past op de
-   partner-uitbetaling van Pay en de afdracht van het fonds -- TAKEN.md 4.22.
+   Deze module kent geen enkele rail: wie hem gebruikt geeft `railInzenden` mee
+   en meldt per SOORT hoe het geld terugkomt (`registreerTeruggang`). Er is met
+   opzet EEN rij voor het hele huis -- de bank-SEPA, de partneruitbetaling van
+   Pay en de afdracht van het fonds -- want anders staat het antwoord op "wat
+   is er geboekt maar niet aangekomen" op drie plekken en telt niemand ze op.
+   Elke rail boekt in zijn eigen grootboek terug, en dat weet alleen die rail
+   zelf; vandaar een tabel en geen gedeelde teruggang.
 
    Drie delen, op hun eigen naad:
      hier         wat een opdracht IS -- de statussen, wanneer hij mag veranderen
@@ -66,7 +70,7 @@ const MAX_POGINGEN = 6;
 const RAM_MAX = 50000;
 
 module.exports = function maakBetaalopdrachten(opties) {
-  const { d, save, crypto, nu, railInzenden, terugboeken, log } = opties || {};
+  const { d, save, crypto, nu, railInzenden, log } = opties || {};
   const maxPogingen = Number.isFinite(opties && opties.maxPogingen) ? opties.maxPogingen : MAX_POGINGEN;
   const backoffMs = (opties && Array.isArray(opties.backoffMs) && opties.backoffMs.length) ? opties.backoffMs : BACKOFF_MS;
 
@@ -122,6 +126,23 @@ module.exports = function maakBetaalopdrachten(opties) {
      zoekt op. Dat wordt hier laat gebonden op een gedeelde ctx -- hetzelfde
      patroon als kern/bank/index.js met rekeningOpen -- zodat geen van beide de
      ander hoeft te requiren en er dus geen kringetje ontstaat. */
+  /* De teruggangen per soort. Een soort zonder teruggang krijgt een weigering
+     en geen gok: een teruggeboeking moet naar dezelfde tegenrekening als waar
+     het geld heen ging, en die weet alleen de rail die de opdracht maakte.
+     Zonder deze tabel zou een nieuwe rail zijn mislukking stil naar de
+     verkeerde kant boeken. */
+  const teruggangen = new Map();
+  function registreerTeruggang(soort, fn) {
+    if (typeof fn !== 'function') throw new Error('Een teruggang is een functie.');
+    if (teruggangen.has(soort)) throw new Error('Voor soort "' + soort + '" staat al een teruggang.');
+    teruggangen.set(String(soort), fn);
+  }
+  const terugboeken = async (o) => {
+    const fn = teruggangen.get(o.soort);
+    if (!fn) return { error: 'Voor soort "' + o.soort + '" is geen teruggang geregistreerd.' };
+    return fn(o);
+  };
+
   const ctx = { rij, save, nu, klacht, publiek, zet, wacht, maxPogingen,
     STATUS, AF, OPEN, DEFINITIEF, ramMax: RAM_MAX, railInzenden, terugboeken };
   const derij = require('./rij')(ctx);
@@ -131,6 +152,6 @@ module.exports = function maakBetaalopdrachten(opties) {
   ctx.dienIn = inzending.dienIn;
   ctx.draaiTerug = inzending.draaiTerug;   // bevestig() met een mislukking gebruikt dezelfde teruggang
 
-  return { STATUS, maak, publiek, dienIn: inzending.dienIn, ...derij };
+  return { STATUS, maak, publiek, registreerTeruggang, dienIn: inzending.dienIn, ...derij };
 };
 module.exports.STATUS = STATUS;

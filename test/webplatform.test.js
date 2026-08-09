@@ -128,6 +128,28 @@ test('4. een lid kan zich niet aan andermans zaak koppelen', async () => {
   assert.ok(!/Sunset cruise/.test(alles), 'geen data van andermans zaak');
 });
 
+test('6. het formulier op de bedrijfssite landt als klus bij de zaak, op codenaam', async () => {
+  // op de bedrijfssite staat het formulier; op een ledensite zonder zaak niet
+  const open = await api('/api/browser/open', { adres: 'es-vedra-cruises' }, lid);
+  assert.ok(open.body.site.blokken.some(b => b.type === 'formulier'), 'de bedrijfssite draagt het formulier');
+  const ledensite = await api('/api/browser/open', { adres: 'nep-vedra' }, lid);
+  assert.ok(!ledensite.body.site.blokken.some(b => b.type === 'formulier'),
+    'zonder ontvanger geen formulier -- een knop die niets doet is erger dan geen knop');
+
+  const stuur = await api('/api/browser/bericht', { adres: 'es-vedra-cruises', tekst: 'Is de sunset cruise rolstoeltoegankelijk?' }, lid);
+  assert.equal(stuur.status, 200, JSON.stringify(stuur.body));
+  // en het bericht staat in de werklijst van de zaak, niet in een los postvak
+  const st = await api('/api/supplier/state', {}, zaak);
+  const klus = (st.body.state.tickets || []).find(t => /rolstoeltoegankelijk/.test(t.text));
+  assert.ok(klus, 'de klus staat bij de zaak');
+  assert.match(klus.by, /^RTG-web · /, 'op codenaam, niet op naam');
+  assert.ok(!/Web Lid/.test(klus.by), 'de echte naam van het lid reist niet mee');
+
+  // naar een ledensite zonder zaak kan geen bericht
+  const mis = await api('/api/browser/bericht', { adres: 'nep-vedra', tekst: 'Hallo daar' }, lid);
+  assert.equal(mis.status, 404);
+});
+
 test('5. zoeken vindt sites en bedrijven in een adem', async () => {
   const z = await api('/api/browser/zoek', { q: 'vedra' }, lid);
   assert.equal(z.status, 200);

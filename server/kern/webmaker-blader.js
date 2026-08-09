@@ -24,6 +24,12 @@ module.exports = ({ store, save, slug, publiek }) => {
       .slice(0, 12)
       .map(d => ({ adres: d.adres, titel: d.titel, bezoeken: d.bezoeken || 0 }));
   }
+  // welke zaak hoort bij een online adres (voor het formulier: wie ontvangt)
+  function zaakVanAdres(adresIn) {
+    const a = slug(adresIn);
+    const d = store().lijst.find(x => x.adres === a && x.online);
+    return d ? (d.zaakCode || '') : '';
+  }
   function open(adresIn) {
     const a = slug(adresIn);
     const d = store().lijst.find(x => x.adres === a && x.online);
@@ -31,5 +37,5 @@ module.exports = ({ store, save, slug, publiek }) => {
     d.bezoeken = (d.bezoeken || 0) + 1; save();
     return { ok: true, site: publiek(d) };
   }
-  return { gids, adresVanZaak, zoek, open };
+  return { gids, adresVanZaak, zaakVanAdres, zoek, open };
 };

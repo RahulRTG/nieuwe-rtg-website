@@ -10,7 +10,7 @@
    Salon, we bewaren alleen de verwijzing. */
 module.exports = ({ db, save, crypto, schoon, media }) => {
   const scho = schoon || ((v, n) => String(v == null ? '' : v).trim().slice(0, n || 200));
-  const TYPES = ['hero', 'kop', 'tekst', 'knop', 'beeld', 'kolommen', 'galerij', 'citaat', 'ruimte', 'voettekst', 'zaakdata'];
+  const TYPES = ['hero', 'kop', 'tekst', 'knop', 'beeld', 'kolommen', 'galerij', 'citaat', 'ruimte', 'voettekst', 'zaakdata', 'formulier'];
   // de bronnen die een live zaakdata-blok mag aanwijzen (opgelost in kern/webplatform.js)
   const ZAAKBRONNEN = ['menu', 'diensten', 'kamers', 'agenda', 'fotos', 'reviews', 'contact'];
   const VERSIES = ['telefoon', 'tablet', 'desktop'];
@@ -49,6 +49,7 @@ module.exports = ({ db, save, crypto, schoon, media }) => {
     else if (t === 'ruimte') { o.hoogte = Math.max(8, Math.min(240, Number(b.hoogte) || 40)); }
     else if (t === 'voettekst') { o.tekst = T(b.tekst, 400); }
     else if (t === 'zaakdata') { o.bron = ZAAKBRONNEN.includes(b.bron) ? b.bron : 'contact'; }
+    else if (t === 'formulier') { o.kop = T(b.kop, 120) || 'Stel ons een vraag'; o.knop = T(b.knop, 40) || 'Verstuur'; }
     if (Array.isArray(b.verberg)) {
       const v = b.verberg.filter(x => VERSIES.includes(x));
       if (v.length) o.verberg = [...new Set(v)];
@@ -164,6 +165,6 @@ module.exports = ({ db, save, crypto, schoon, media }) => {
   const blader = require('./webmaker-blader')({ store, save, slug, publiek });
 
   return { mijn, haal, bewaar, verwijder, publiceer, offline, slug,
-           gids: blader.gids, open: blader.open, zoek: blader.zoek, adresVanZaak: blader.adresVanZaak,
+           gids: blader.gids, open: blader.open, zoek: blader.zoek, adresVanZaak: blader.adresVanZaak, zaakVanAdres: blader.zaakVanAdres,
            fotos, fotoBewaar, fotoWeg, TYPES };
 };

@@ -4,7 +4,7 @@
    (geen gast). De browser-gids en het openen van een site mag elk ingelogd lid,
    zodat je door het RTG-web kunt bladeren. */
 module.exports = (kern) => {
-  const { app, auth, webmaker, webplatform, antivirus, media, supplierAuth, findSupplier } = kern;
+  const { app, auth, webmaker, webplatform, antivirus, media, supplierAuth, findSupplier, addTicket, liveCodename, save } = kern;
   const FOTO_MAX_BYTES = 2 * 1024 * 1024; // ~2 MB per foto
   const stuur = (res, r) => r && r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const geenGast = (req, res) => {
@@ -97,13 +97,23 @@ module.exports = (kern) => {
     /* hoort de site bij een zaak, dan worden de live blokken nu uit het
        zaakprofiel opgelost en krijgt de browser de acties mee -- zo weet het
        scherm dat dit een bedrijf is en niet zomaar een pagina. */
-    let zaak = null;
-    if (r.site.zaakCode && findSupplier) {
-      const s = findSupplier(r.site.zaakCode);
-      if (s) { r.site = webplatform.losSite(r.site, s); zaak = webplatform.zaakInfo(s); }
-      else r.site = webplatform.losSite(r.site, null);
-    }
-    res.json({ ok: true, site: r.site, zaak });
+    const s = (r.site.zaakCode && findSupplier) ? findSupplier(r.site.zaakCode) : null;
+    r.site = webplatform.losSite(r.site, s);
+    res.json({ ok: true, site: r.site, zaak: s ? webplatform.zaakInfo(s) : null });
+  });
+  /* het formulier op een bedrijfssite: het bericht landt als klus (ticket) bij
+     de zaak zelf, op de codenaam van het lid -- geen los postvak dat niemand
+     leest, maar de werklijst die de zaak al heeft. */
+  app.post('/api/browser/bericht', auth, (req, res) => {
+    const b = req.body || {};
+    const tekst = String(b.tekst || '').trim().slice(0, 500);
+    if (tekst.length < 3) return res.status(400).json({ error: 'Schrijf eerst een bericht.' });
+    const code = webmaker.zaakVanAdres(b.adres);
+    const s = code && findSupplier ? findSupplier(code) : null;
+    if (!s) return res.status(404).json({ error: 'Deze site heeft geen bedrijf erachter; het formulier werkt alleen op bedrijfssites.' });
+    addTicket(s.code, { name: 'RTG-web · ' + (liveCodename ? liveCodename(req.session) : 'lid') }, 'Websitebericht: ' + tekst.slice(0, 140));
+    save();
+    res.json({ ok: true });
   });
   /* universeel zoeken: sites en bedrijven in een adem. Een bedrijf met een
      eigen online site krijgt het adres mee, zodat zoeken direct het RTG-web in

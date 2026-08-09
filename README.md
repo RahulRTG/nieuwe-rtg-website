@@ -1245,7 +1245,11 @@ De Website-maker (`/apps/sitemaker.html`, `kern/webmaker.js`) en de RTG-browser 
 - **De browser begrijpt bedrijven.** Hoort een site bij een zaak, dan geeft `/api/browser/open` de zaak-info mee (naam, type, stad, review-gemiddelde) plus de acties die de zaak écht kan (reserveren, bestellen, boeken, diensten, kamers, chat) -- het scherm toont die als actiebalk boven de site, met de leden-app als bestemming. Alleen wat de zaak kan komt terug: een knop die niets doet is erger dan geen knop.
 - **Universeel zoeken.** `/api/browser/zoek` vindt sites en bedrijven in een adem; een bedrijf met een eigen online site krijgt het adres mee. Alleen wat toch al publiek is (naam, stad, type) -- het zoekvak is geen achterdeur naar het zaakprofiel, en offline sites zijn ook uit het zoeken weg.
 
-`test/webplatform.test.js` (vijf scenario's) legt dit vast; twee mutaties (leden mogen zelf een zaakCode zetten; de live blokken worden niet meer opgelost), allebei **RAAK**.
+- **De knop in de zaak-app.** `/apps/zaakweb.html` ("Mijn website" in het Meer-scherm van de leverancier-app, zelfde zaak-inlog): status, online/offline, bekijken in de browser, en opnieuw bouwen uit het profiel -- met de waarschuwing erbij dat dat het eigen handwerk weggooit.
+- **Het formulier-blok.** Een bedrijfssite draagt een contactformulier; het bericht landt als **klus (ticket) in de werklijst die de zaak al heeft**, op de codenaam van het lid -- geen los postvak dat niemand leest, en de echte naam reist niet mee. Op een site zonder zaak erachter staat het formulier er niet: een knop zonder ontvanger is erger dan geen knop (`POST /api/browser/bericht`).
+- **Bladwijzers in de browser.** Op het toestel zelf (localStorage), met een rij op RTG Start -- de server weet niet wat u bewaart.
+
+`test/webplatform.test.js` (zes scenario's) legt dit vast; drie mutaties (leden mogen zelf een zaakCode zetten; de live blokken worden niet meer opgelost; het formulier accepteert sites zonder ontvanger), alle drie **RAAK**.
 
 ### RTG Bank & RTG Stad (de eigen infrastructuur)
 

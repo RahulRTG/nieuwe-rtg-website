@@ -296,6 +296,10 @@ function renderBlok(blok,p){
     s.classList.add('b-tekst'); const d=document.createElement('div');
     d.style.cssText='border:1px dashed currentColor;opacity:.7;padding:1rem;text-align:center;font-size:.85rem;';
     d.textContent='Live blok · '+(blok.bron||'')+' -- wordt bij ieder bezoek automatisch gevuld uit het bedrijfsprofiel.'; s.appendChild(d);
+  } else if(t==='formulier'){ /* contactformulier van een bedrijfssite: berichten landen als klus bij de zaak */
+    s.classList.add('b-tekst'); const d=document.createElement('div');
+    d.style.cssText='border:1px dashed currentColor;opacity:.7;padding:1rem;text-align:center;font-size:.85rem;';
+    d.textContent='Formulier · "'+(blok.kop||'Stel ons een vraag')+'" -- bezoekers schrijven hier een bericht dat als klus bij de zaak binnenkomt.'; s.appendChild(d);
   }
   (blok.verberg||[]).forEach(d=>s.classList.add('v-weg-'+d));
   if(BEWERK && (blok.verberg||[]).includes(APPARAAT)){ s.classList.add('dim'); const lb=document.createElement('div'); lb.className='vlabel'; lb.textContent='Verborgen op '+devNaam(APPARAAT); s.appendChild(lb); }

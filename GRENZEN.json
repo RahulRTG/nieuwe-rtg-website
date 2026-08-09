@@ -1532,9 +1532,12 @@
       "wbwVerzoek"
     ],
     "webmaker": [
+      "addTicket",
       "antivirus",
       "findSupplier",
+      "liveCodename",
       "media",
+      "save",
       "webmaker",
       "webplatform"
     ],

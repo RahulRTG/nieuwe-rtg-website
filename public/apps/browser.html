@@ -74,6 +74,7 @@
   <button class="nav" id="vooruitKnop" title="Vooruit" aria-label="Vooruit">›</button>
   <button class="nav" id="herlaadKnop" title="Herladen" aria-label="Herladen">↻</button>
   <button class="nav home" id="homeKnop" title="RTG Start" aria-label="RTG Start">⌂</button>
+  <button class="nav" id="bwKnop" title="Bladwijzer" aria-label="Bladwijzer" disabled>☆</button>
   <form class="balk" id="balk">
     <span class="slot" aria-hidden="true">rtg://</span>
     <input id="adres" inputmode="url" autocomplete="off" spellcheck="false" placeholder="typ een adres, bijv. jouwzaak.rtg" aria-label="Adres">
@@ -97,7 +98,7 @@ let HIST=[], POS=-1;
 function knoppenBij(){ $('#terugKnop').disabled=POS<=0; $('#vooruitKnop').disabled=POS>=HIST.length-1; }
 function ga(item,duw){
   if(duw!==false){ HIST=HIST.slice(0,POS+1); HIST.push(item); POS=HIST.length-1; }
-  knoppenBij();
+  knoppenBij(); bwStand();
   if(item==='start'){ $('#adres').value=''; toonStart(); }
   else { $('#adres').value=item.adres+'.rtg'; toonSite(item.adres); }
 }
@@ -105,6 +106,24 @@ $('#terugKnop').addEventListener('click',()=>{ if(POS>0){ POS--; ga(HIST[POS],fa
 $('#vooruitKnop').addEventListener('click',()=>{ if(POS<HIST.length-1){ POS++; ga(HIST[POS],false); } });
 $('#herlaadKnop').addEventListener('click',()=>{ if(POS>=0) ga(HIST[POS],false); });
 $('#homeKnop').addEventListener('click',()=>ga('start'));
+
+/* bladwijzers: op dit toestel, in localStorage -- de browser onthoudt uw
+   favoriete plekken zonder dat de server ervan weet */
+function bwLees(){ try{ return JSON.parse(localStorage.getItem('rtg_web_bladwijzers')||'[]'); }catch(e){ return []; } }
+function bwSchrijf(l){ try{ localStorage.setItem('rtg_web_bladwijzers',JSON.stringify(l.slice(0,40))); }catch(e){} }
+function bwStand(){
+  const k=$('#bwKnop'); const it=HIST[POS];
+  if(!it||it==='start'){ k.disabled=true; k.textContent='☆'; return; }
+  k.disabled=false;
+  k.textContent=bwLees().some(b=>b.adres===it.adres)?'★':'☆';
+}
+$('#bwKnop').addEventListener('click',()=>{
+  const it=HIST[POS]; if(!it||it==='start')return;
+  let l=bwLees();
+  if(l.some(b=>b.adres===it.adres)){ l=l.filter(b=>b.adres!==it.adres); meld('Bladwijzer verwijderd.'); }
+  else { l.unshift({adres:it.adres,titel:(HUIDIGE&&HUIDIGE.site&&HUIDIGE.site.titel)||it.adres}); meld('Bewaard als bladwijzer.'); }
+  bwSchrijf(l); bwStand();
+});
 $('#balk').addEventListener('submit',e=>{ e.preventDefault(); const a=slug($('#adres').value); if(a.length<2){ meld('Typ een adres, bijv. jouwzaak.rtg'); return; } ga({adres:a}); });
 
 // ---- de RTG-startpagina ----
@@ -124,7 +143,19 @@ async function toonStart(){
     '<p class="lead">Het besloten web van Rahul Travel Group. Bezoek de sites die leden hier hebben gebouwd, of typ een adres in de balk.</p>'+
     '<form class="zoekgroot" id="zoekGroot"><input id="zoekIn" placeholder="zoek een site of bedrijf, of typ een adres" aria-label="Zoeken"><span class="suf">.rtg</span><button type="submit">Zoek</button></form>'+
     '<div id="zoekUit"></div>'+
+    '<div id="bwRij"></div>'+
     '<div class="kop2">Sites van leden</div><div class="rooster" id="rooster"><div class="leeg">Laden…</div></div></div>';
+  // de eigen bladwijzers bovenaan de startpagina
+  (function(){
+    const l=bwLees(); if(!l.length)return;
+    const w=$('#bwRij');
+    w.innerHTML='<div class="kop2">Bladwijzers</div>';
+    const r=document.createElement('div'); r.className='rooster'; r.style.marginBottom='1.6rem';
+    l.forEach(b=>{ const k=document.createElement('button');k.type='button';k.className='kaart';
+      k.innerHTML='<div class="nm">'+esc(b.titel)+'</div><div class="ad">'+esc(b.adres)+'.rtg</div>';
+      k.addEventListener('click',()=>ga({adres:b.adres})); r.appendChild(k); });
+    w.appendChild(r);
+  })();
   /* universeel zoeken: een exact adres opent direct; anders zoeken we sites
      EN bedrijven en tonen we beide */
   $('#zoekGroot').addEventListener('submit',async e=>{
@@ -198,6 +229,21 @@ function tekenBlok(blok,ver){
   else if(t==='kolommen'){ s.classList.add('b-kol'); [['lk','lt'],['rk','rt']].forEach(([kk,kt])=>{const c=document.createElement('div');c.appendChild(tekst(document.createElement('h3'),T[kk]));const p=document.createElement('div');p.className='kt';tekst(p,T[kt]);c.appendChild(p);s.appendChild(c);}); }
   else if(t==='galerij'){ s.classList.add('b-gal'); (blok.beelden||[]).forEach(src=>{const img=document.createElement('img');img.src=src;img.alt='';s.appendChild(img);}); }
   else if(t==='citaat'){ s.classList.add('b-citaat'); const q=document.createElement('div');q.className='q';tekst(q,T.tekst);s.appendChild(q); const br=document.createElement('div');br.className='bron';tekst(br,T.bron);s.appendChild(br); }
+  else if(t==='formulier'){ /* bericht aan de zaak achter deze site; landt daar als klus */
+    s.classList.add('b-tekst');
+    const h2=document.createElement('h2');h2.style.cssText='font-family:\'Bodoni Moda\',serif;margin-bottom:.6rem;';tekst(h2,T.kop);s.appendChild(h2);
+    const f=document.createElement('form');
+    const ta=document.createElement('textarea');ta.rows=4;ta.maxLength=500;ta.placeholder='Uw bericht aan '+(HUIDIGE&&HUIDIGE.zaak?HUIDIGE.zaak.naam:'dit bedrijf')+'…';
+    ta.style.cssText='width:100%;background:transparent;border:1px solid currentColor;border-radius:10px;padding:.7rem;color:inherit;font:inherit;opacity:.9;';
+    const kn=document.createElement('button');kn.type='submit';kn.className='b-knop';tekst(kn,T.knop);kn.style.cssText='margin-top:.6rem;cursor:pointer;border:0;';
+    f.appendChild(ta);f.appendChild(kn);
+    f.addEventListener('submit',async ev=>{ev.preventDefault();
+      const tk=ta.value.trim(); if(tk.length<3){meld('Schrijf eerst een bericht.');return;}
+      try{ await api('bericht',{adres:HUIDIGE.site.adres,tekst:tk}); ta.value=''; meld('Verstuurd. Het bedrijf ziet uw bericht in zijn werklijst, op uw codenaam.'); }
+      catch(e){ meld(e.message); }
+    });
+    s.appendChild(f);
+  }
   else if(t==='ruimte'){ s.style.height=(blok.hoogte||40)+'px'; }
   else if(t==='voettekst'){ s.classList.add('b-voet'); tekst(s,T.tekst); }
   return s;
@@ -214,7 +260,7 @@ async function toonSite(adres){
   const h=$('#hoofd'); h.innerHTML='<div class="leeg" style="padding:4rem;">Laden…</div>';
   try{
     const d=await api('open',{adres});
-    const site=d.site; HUIDIGE={site};
+    const site=d.site; HUIDIGE={site,zaak:d.zaak||null};
     document.title=site.titel+' · RTG Browser';
     const wrap=document.createElement('div'); wrap.className='sitewrap';
     /* de site hoort bij een bedrijf: de browser toont wie dit is en wat je

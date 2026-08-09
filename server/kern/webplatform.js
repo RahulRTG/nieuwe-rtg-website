@@ -84,6 +84,9 @@ module.exports = ({ db }) => {
   function losSite(site, s) {
     const blokken = [];
     (site.blokken || []).forEach(b => {
+      /* een formulier heeft een ontvanger nodig: zonder zaak erachter zou
+         het een knop zijn die stilletjes niets doet, dus dan staat hij er niet */
+      if (b.type === 'formulier') { if (s) blokken.push(b); return; }
       if (b.type !== 'zaakdata') { blokken.push(b); return; }
       if (s) blokken.push(...los(b, s));
     });
@@ -123,6 +126,7 @@ module.exports = ({ db }) => {
     ];
     BRONNEN.filter(b => b !== 'contact').forEach((bron, i) => blokken.push({ id: 'g-z' + i, type: 'zaakdata', bron }));
     blokken.push({ id: 'g-zc', type: 'zaakdata', bron: 'contact' });
+    blokken.push({ id: 'g-form', type: 'formulier', kop: 'Stel ons een vraag', knop: 'Verstuur' });
     blokken.push({ id: 'g-voet', type: 'voettekst', tekst: s.name + ' · op het RTG-web · onderdeel van het huis van Rahul Travel Group' });
     return { titel: s.name, thema: 'donker', accent: '#7F1634', blokken };
   }

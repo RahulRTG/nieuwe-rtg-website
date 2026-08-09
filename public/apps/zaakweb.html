@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mijn RTG-website · Zaak</title>
+<link rel="icon" href="/icon.svg">
+<meta name="theme-color" content="#0C0C0B">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<style>
+  :root{ --bg:var(--rtg-bg); --card:var(--rtg-card); --card2:var(--rtg-card2); --line:var(--rtg-line);
+    --txt:var(--rtg-txt); --muted:var(--rtg-muted); --soft:var(--rtg-soft); --burgundy:#C23A5E; --gold:#A98F1C; --green:#4C9A75; }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;}
+  h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  header{display:flex;align-items:center;gap:.7rem;padding:calc(env(safe-area-inset-top) + .9rem) 1.2rem .9rem;border-bottom:1px solid var(--line);}
+  header a{color:var(--muted);text-decoration:none;border:1px solid var(--line);border-radius:10px;padding:.35rem .6rem;font-size:.78rem;}
+  header .ey{font-size:.6rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  main{max-width:680px;margin:0 auto;padding:2rem 1.2rem 4rem;}
+  .lead{color:var(--muted);line-height:1.65;margin:.5rem 0 1.6rem;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1.2rem;margin-bottom:1rem;}
+  .adres{color:var(--gold);font-weight:600;}
+  .mt{color:var(--soft);font-size:.78rem;margin-top:.3rem;}
+  .stip{display:inline-block;width:.55rem;height:.55rem;border-radius:50%;background:var(--soft);margin-right:.35rem;}
+  .stip.aan{background:var(--green);}
+  .rij{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:1rem;}
+  button,a.knop{background:var(--card2);border:1px solid var(--line);color:var(--txt);font:inherit;font-size:.85rem;font-weight:600;border-radius:10px;padding:.55rem .9rem;cursor:pointer;text-decoration:none;display:inline-block;}
+  button:hover,a.knop:hover{border-color:var(--gold);}
+  button.prim{background:#7F1634;border-color:#7F1634;color:#fff;}
+  .leeg{color:var(--soft);}
+  #melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;}
+</style>
+<link href="/shared/ios.css" rel="stylesheet">
+</head>
+<body class="rtg-stijl">
+<header>
+  <a href="/apps/leverancier.html">‹ Zaak-app</a>
+  <div><div class="ey">RTG Web Platform</div><h1 style="font-size:1.1rem;">Mijn RTG-website</h1></div>
+</header>
+<main>
+  <p class="lead">Uw zaak op het eigen web van RTG. De site wordt in één keer uit uw bedrijfsprofiel gebouwd en blijft er live mee verbonden: past u uw menukaart, kamers of activiteiten aan, dan staat het meteen op de site. Daarna is het ontwerp van u -- pas aan wat u wilt.</p>
+  <div id="stand" class="card"><span class="leeg">Laden…</span></div>
+</main>
+<div id="melding" role="status"></div>
+<script>
+const $=s=>document.querySelector(s);
+const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let TOKEN=null; try{ TOKEN=localStorage.getItem('rtg_sup_token'); }catch(e){}
+const api=(pad,body)=>fetch('/api/supplier/site/'+pad,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'Er ging iets mis.');return d;});
+function meld(t){const m=$('#melding');m.textContent=t;m.style.opacity='1';clearTimeout(m._t);m._t=setTimeout(()=>m.style.opacity='0',3200);}
+
+async function toon(){
+  const el=$('#stand');
+  if(!TOKEN){ el.innerHTML='<span class="leeg">Log eerst in op de zaak-app.</span> <a class="knop" href="/apps/leverancier.html">Naar de zaak-app</a>'; return; }
+  let lijst;
+  try{ lijst=(await api('mijn')).lijst||[]; }catch(e){ el.innerHTML='<span class="leeg">'+esc(e.message)+'</span>'; return; }
+  if(!lijst.length){
+    el.innerHTML='<h2 style="font-size:1.2rem;">Nog geen website</h2>'+
+      '<p class="mt" style="font-size:.85rem;line-height:1.6;">Eén druk op de knop en RTG bouwt hem uit uw bedrijfsprofiel: naam, aanbod, foto&#39;s, reviews en contact. U hoeft niet vanaf nul te beginnen.</p>'+
+      '<div class="rij"><button class="prim" id="maak">Maak mijn website</button></div>';
+    $('#maak').addEventListener('click',async()=>{
+      try{ const r=await api('genereer'); meld('Uw site staat online op '+r.adres+'.rtg'); toon(); }catch(e){ meld(e.message); }
+    });
+    return;
+  }
+  const d=lijst[0];
+  el.innerHTML='<h2 style="font-size:1.2rem;">'+esc(d.titel)+'</h2>'+
+    '<div class="mt"><span class="stip'+(d.online?' aan':'')+'"></span>'+(d.online?'Online op ':'Offline · adres ')+'<span class="adres">'+esc(d.adres||'--')+(d.adres?'.rtg':'')+'</span> · '+d.bezoeken+' bezoek'+(d.bezoeken===1?'':'en')+' · '+d.blokken+' blokken</div>'+
+    '<div class="rij">'+
+    (d.online&&d.adres?'<a class="knop" href="/apps/browser.html?adres='+encodeURIComponent(d.adres)+'">Bekijk in de RTG-browser</a>':'')+
+    '<button id="'+(d.online?'uit':'aan')+'">'+(d.online?'Zet offline':'Zet online')+'</button>'+
+    '<button id="vers">Opnieuw uit mijn profiel</button>'+
+    '</div>'+
+    '<p class="mt" style="line-height:1.6;">De live blokken (menu, aanbod, foto&#39;s, reviews, contact) volgen uw bedrijfsprofiel vanzelf. "Opnieuw uit mijn profiel" gooit uw eigen aanpassingen aan de site weg en bouwt hem vers op -- dat vraagt hij niet nog een keer, dus wees er zeker van.</p>';
+  const uit=$('#uit'),aan=$('#aan'),vers=$('#vers');
+  if(uit)uit.addEventListener('click',async()=>{ try{ await api('offline',{id:d.id}); meld('De site staat offline.'); toon(); }catch(e){ meld(e.message);} });
+  if(aan)aan.addEventListener('click',async()=>{ try{ const r=await api('publiceer',{id:d.id,adres:d.adres||d.titel}); meld('Online op '+r.adres+'.rtg'); toon(); }catch(e){ meld(e.message);} });
+  vers.addEventListener('click',async()=>{ try{ const r=await api('genereer',{opnieuw:true}); meld('Opnieuw gebouwd uit uw profiel'+(r.adres?' -- online op '+r.adres+'.rtg':'')+'.'); toon(); }catch(e){ meld(e.message);} });
+}
+toon();
+</script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/ios.js" defer></script>
+</body>
+</html>

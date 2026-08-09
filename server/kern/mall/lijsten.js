@@ -27,6 +27,14 @@
    had bewaard. */
 
 const SOORTEN = ['lijst', 'reis'];
+/* "Bewaard" is een LIJST en geen aparte favorietenopslag. Een tweede tabel
+   naast mallLijsten zou dezelfde vraag ("wat heeft dit lid bewaard?") op twee
+   plekken beantwoorden -- precies LAT-regel 4. Het is een systeemlijst: hij
+   maakt zichzelf aan bij het eerste gebruik en is niet te verwijderen, want een
+   hartje dat een lijst weggooit die je zelf nooit hebt gemaakt is een verrassing.
+   Let op: dit gaat over AANBOD. Favoriete ZAKEN bestonden al
+   (db.data.favorieten, kern/ervaring/leden/waardering.js) en blijven daar. */
+const BEWAARD = 'bewaard';
 const MAX_LIJSTEN = 40;
 const MAX_REGELS = 200;
 
@@ -90,6 +98,7 @@ module.exports = (ctx) => {
     const lijsten = bak(key);
     const i = lijsten.findIndex(l => l.id === String(id || ''));
     if (i < 0) return { status: 404, error: 'Lijst niet gevonden.' };
+    if (lijsten[i].soort === BEWAARD) return { status: 409, error: 'Bewaard is uw vaste lijst; die kan niet weg. Haal er losse regels uit.' };
     lijsten.splice(i, 1);
     save();
     return { ok: true, aantal: lijsten.length };
@@ -109,7 +118,13 @@ module.exports = (ctx) => {
     if (l.regels.some(r => r.aanbodId === a.id)) return { status: 409, error: 'Dit staat al in ' + l.naam + '.' };
     l.regels.unshift({
       aanbodId: a.id, titel: a.titel, type: a.type, aanbieder: a.aanbieder.naam,
-      prijsBijBewaren: a.prijs ? a.prijs.bedrag : null, plek: a.plek.stad || null, at: nu()
+      prijsBijBewaren: a.prijs ? a.prijs.bedrag : null,
+      /* De stand bij het bewaren, zodat ./volgen.js kan zeggen wat er sindsdien
+         veranderde. Regels van voor deze versie hebben dit veld niet; die
+         krijgen `null` en daarover doet volgen.js dan ook geen uitspraak in
+         plaats van "onveranderd" te raden. */
+      beschikbaarBijBewaren: a.beschikbaar ? (a.beschikbaar.uit ? 'uit' : 'in') : null,
+      plek: a.plek.stad || null, at: nu()
     });
     save();
     return { ok: true, lijst: l.id, aantal: l.regels.length };
@@ -172,11 +187,14 @@ module.exports = (ctx) => {
     };
   }
 
-  const api = { mijn, maak, zet, weg, voegToe, haalWeg, toon, REIS_ONDERDELEN, MAX_LIJSTEN };
+  const api = { mijn, maak, zet, weg, voegToe, haalWeg, toon, REIS_ONDERDELEN, MAX_LIJSTEN, BEWAARD };
+  // "Bewaard" en het volgen van prijzen staan in ./bewaard.js
+  Object.assign(api, require('./bewaard')(ctx, { bak, voegToe, haalWeg, toon, nu, BEWAARD }));
   ctx.lijsten = api;
   return { mallLijsten: api };
 };
 
 module.exports.REIS_ONDERDELEN = REIS_ONDERDELEN;
+module.exports.BEWAARD = BEWAARD;
 module.exports.SOORTEN = SOORTEN;
 module.exports.MAX_LIJSTEN = MAX_LIJSTEN;

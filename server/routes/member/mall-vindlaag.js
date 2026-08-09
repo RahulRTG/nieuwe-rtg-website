@@ -52,6 +52,9 @@ module.exports = (kern) => {
       bezorgt: req.body.bezorgt === true, zakelijkAlleen: req.body.zakelijkAlleen === true,
       // de kaart kost werk over alle treffers, dus alleen als het scherm hem toont
       kaart: req.body.kaart === true,
+      // "alleen wat ik bewaarde": de ids komen van dit lid, nooit van de client
+      bewaard: req.body.bewaard === true,
+      bewaardeIds: req.body.bewaard === true ? mall.mallLijsten.bewaardeIds(req.session.key) : null,
       pagina: req.body.pagina, per: req.body.per,
       // dit is een mens die zoekt: tel de woorden mee voor het vraagbeeld
       noteer: true
@@ -70,6 +73,11 @@ module.exports = (kern) => {
   app.post('/api/mall/lijst/weg', auth, (req, res) => lijstStuur(res, mall.mallLijsten.weg(req.session.key, req.body.id)));
   app.post('/api/mall/lijst/voegtoe', auth, (req, res) => lijstStuur(res, mall.mallLijsten.voegToe(req.session.key, req.body.id, req.body.aanbodId)));
   app.post('/api/mall/lijst/regel-weg', auth, (req, res) => lijstStuur(res, mall.mallLijsten.haalWeg(req.session.key, req.body.id, req.body.aanbodId)));
+  /* Het hartje en wat er sinds het bewaren veranderde. Bewust GEEN melding:
+     dit ziet u wanneer u zelf kijkt; zie de kop van kern/mall/bewaard.js. */
+  app.post('/api/mall/bewaar', auth, (req, res) => lijstStuur(res, mall.mallLijsten.bewaarWissel(req.session.key, req.body.aanbodId)));
+  app.post('/api/mall/bewaard', auth, (req, res) => lijstStuur(res, mall.mallLijsten.toon(req.session.key, mall.mallLijsten.bewaardLijst(req.session.key).id)));
+  app.post('/api/mall/wijzigingen', auth, (req, res) => res.json(mall.mallLijsten.mallWijzigingen(req.session.key)));
 
   /* ---- de vraagkant: wat niemand aanbiedt, kun je vragen ----
      Alleen leden plaatsen een aanvraag: een open vraagmarkt voor iedereen die

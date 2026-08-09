@@ -204,29 +204,48 @@ test('een onthouden modus die niet meer mag, valt terug op Alles', async () => {
 
 /* ---------- de koppellaag ---------- */
 
-test('een onbekende verwijzing geeft 404 en geen gokje naar de homepage', async () => {
+test('de koppelkaart komt één keer mee in de state, en klopt met de server', async () => {
   const l = await lid('Link Lid', 'link@x.nl', 'rtg');
-  assert.equal((await post('/api/wereld/open', { ref: 'rtg://ietsraars/abc' }, l.token)).status, 404);
-  assert.equal((await post('/api/wereld/open', { ref: 'https://elders.nl/x' }, l.token)).status, 404);
-  assert.equal((await post('/api/wereld/open', { ref: '' }, l.token)).status, 404);
+  const st = await json(await post('/api/wereld/state', {}, l.token));
 
-  const goed = await json(await post('/api/wereld/open', { ref: 'rtg://salon/ab12' }, l.token));
-  assert.equal(goed.doel.url, '/apps/salon.html?post=ab12');
+  assert.ok(st.koppelkaart && st.koppelkaart.salon, 'de kaart wordt bezorgd');
+  assert.equal(st.koppelkaart.salon.app, '/apps/salon.html');
+  // het scherm bouwt de link met deze kaart; die moet hetzelfde opleveren als
+  // de server zelf zou doen, anders is de bezorgde kaart een tweede waarheid
+  const k = st.koppelkaart.salon;
+  assert.equal(k.app + '?' + k.param + '=ab12', koppel.open('rtg://salon/ab12').url,
+    'de bezorgde kaart en koppel.open() lopen uiteen');
 });
 
-test('de weg naar de berichten-app draagt de codenaam en nooit een sleutel', async () => {
-  const l = await lid('Chat Lid', 'chat@x.nl', 'rtg');
-  const r = await json(await post('/api/wereld/gesprek', { codenaam: l.codenaam, over: 'rtg://salon/ab12' }, l.token));
+test('een gesprek mag alleen met iemand met wie je echt verbonden bent', async () => {
+  /* De poort hangt aan het doel en niet verderop (LAT-regel 7): deze route
+     mag geen link uitdelen voor een codenaam die je niet kent, ook al zou
+     /api/comm/begin het later alsnog weigeren. */
+  const a = await lid('Chat A', 'ca@x.nl', 'rtg');
+  const b = await lid('Chat B', 'cb@x.nl', 'rtg');
+  const vreemde = await lid('Chat X', 'cx@x.nl', 'rtg');
 
+  const mijA = await json(await post('/api/member/connections', {}, a.token));
+  const mijB = await json(await post('/api/member/connections', {}, b.token));
+  await post('/api/member/connect', { key: mijB.me }, a.token);
+  await post('/api/member/connect/respond', { key: mijA.me, action: 'accept' }, b.token);
+
+  const r = await json(await post('/api/wereld/gesprek', { codenaam: b.codenaam, over: 'rtg://salon/ab12' }, a.token));
   assert.match(r.url, /^\/apps\/comm\.html\?met=/, 'hij wijst naar de aparte berichten-app');
-  assert.ok(r.url.includes(encodeURIComponent(l.codenaam)), 'met de codenaam erin');
-  assert.ok(r.url.includes('over='), 'en het onderwerp erbij');
+  assert.ok(r.url.includes(encodeURIComponent(b.codenaam)), 'met de codenaam erin');
+  assert.ok(!r.url.includes(mijB.me), 'en nooit een sleutel');
+  assert.ok(r.url.includes('over='), 'het onderwerp gaat mee');
 
   // een vluchtig ding (een verhaal leeft 24 uur) hoort niet als link door te leven
-  const vluchtig = await json(await post('/api/wereld/gesprek', { codenaam: l.codenaam, over: 'rtg://verhalen/x1' }, l.token));
+  const vluchtig = await json(await post('/api/wereld/gesprek', { codenaam: b.codenaam, over: 'rtg://verhalen/x1' }, a.token));
   assert.ok(!vluchtig.url.includes('over='), 'een verhaal gaat niet als verwijzing mee');
 
-  assert.equal((await post('/api/wereld/gesprek', {}, l.token)).status, 400, 'zonder wie: geweigerd');
+  // en de drie manieren waarop het NIET mag
+  assert.equal((await post('/api/wereld/gesprek', { codenaam: vreemde.codenaam }, a.token)).status, 403,
+    'een vreemde levert geen link op');
+  assert.equal((await post('/api/wereld/gesprek', { codenaam: 'BestaatNiet9' }, a.token)).status, 403,
+    'een codenaam die niet bestaat evenmin');
+  assert.equal((await post('/api/wereld/gesprek', {}, a.token)).status, 400, 'zonder wie: geweigerd');
 });
 
 /* ---------- de twee lijsten die gelijk moeten blijven ---------- */

@@ -147,7 +147,7 @@
         .then(function (d) { if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; }); });
   }
 
-  var staat = { modus: 'alles', modi: [], vanaf: 0, items: [] };
+  var staat = { modus: 'alles', modi: [], vanaf: 0, items: [], kaart: {} };
 
   function toon(bericht) {
     var n = $('#fout');
@@ -222,15 +222,24 @@
     }
   }
 
-  /* Openen en Bericht vragen allebei de SERVER waar ze heen moeten. Dit scherm
-     bouwt geen enkele app-URL zelf; die kaart staat in kern/wereld/koppel.js,
-     en een app die verhuist hoort niet twintig schermen te breken. */
+  /* Openen gebruikt de koppelkaart die de SERVER bij het opstarten meegaf. Dit
+     scherm kent dus geen enkele app-URL uit zichzelf -- de kaart staat in
+     kern/wereld/koppel.js en een app die verhuist breekt geen schermen. Hij
+     wordt één keer bezorgd in plaats van per tik bevraagd; een opzoektabel die
+     voor iedereen hetzelfde is, hoeft geen rondje langs de server.
+
+     Onbekend blijft onbekend: we zeggen het, en gokken niet naar de homepage. */
+  function naarRef(ref) {
+    var m = /^rtg:\/\/([a-z]+)\/(.+)$/.exec(ref || '');
+    var k = m && staat.kaart[m[1]];
+    if (!k) { toon('Deze verwijzing ken ik niet.'); return; }
+    location.href = k.app + '?' + k.param + '=' + encodeURIComponent(m[2]);
+  }
+
   document.addEventListener('click', function (e) {
     var o = e.target.closest('[data-open]'), c = e.target.closest('[data-chat]');
     if (o) {
-      api('/open', { ref: o.getAttribute('data-open') })
-        .then(function (d) { location.href = d.doel.url; })
-        .catch(function (err) { toon(err.message); });
+      naarRef(o.getAttribute('data-open'));
     } else if (c) {
       api('/gesprek', { codenaam: c.getAttribute('data-chat'), over: c.getAttribute('data-over') })
         .then(function (d) { location.href = d.url; })
@@ -250,7 +259,7 @@
 
   api('/state', {})
     .then(function (d) {
-      staat.modus = d.modus; staat.modi = d.modi;
+      staat.modus = d.modus; staat.modi = d.modi; staat.kaart = d.koppelkaart || {};
       $('#wie').innerHTML = esc(d.ik.codenaam) + ' · <b>' + esc(d.ik.pas.toUpperCase()) + ' Pass</b>';
       tekenWerelden();
       return laad();

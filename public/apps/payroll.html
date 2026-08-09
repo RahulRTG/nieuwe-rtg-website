@@ -353,43 +353,69 @@ const eurC = (c, code) => bedrag(c, code || runMunt());
 
 async function laadOs(){
   const d = await api('regels', { land: 'NL' });
+  /* AANMERKEN VRAAGT OM EEN BEVESTIGING, EN DIE STAAT IN HET SCHERM.
+
+     Hier stonden een confirm() en een prompt(). Twee bezwaren, en het tweede
+     woog het zwaarst. Ze zijn niet te toetsen: allebei blokkeren ze de
+     JavaScript van de pagina, waardoor de klik die ze opende pas oplost als ze
+     weg zijn en alles wat een schermtoets daarna vraagt achter die klik in de
+     rij komt. Een e2e liep daarop vast en is weggegooid (TAKEN.md 4.26).
+
+     Maar ook zonder toetsen was het de verkeerde vorm. Een browserdialoog kan
+     geen tekst opmaken, dus de zelfverklaring van het pakket -- de zin waar
+     iemand juist even bij moet stilstaan -- stond als kale regel in een grijs
+     venstertje, en de reden typte je in een veld dat je daarna nooit meer
+     terugzag. Nu klapt er een blok open onder de regel: de verklaring, wat
+     aanmerken betekent, een veld voor de reden en twee knoppen. */
   $('#osRegels').innerHTML = (d.pakketten || []).map(p =>
     '<div class="regel"><b>' + esc(p.versie) + '</b>' +
     '<span class="kpi">geldig ' + esc(p.geldigVan) + (p.geldigTot ? ' t/m ' + esc(p.geldigTot) : '') +
     ' · bron ' + esc((p.bron || {}).naam || (p.bron || {}).soort || 'onbekend') + '</span>' +
     '<span class="r">' + (p.stand === 'goedgekeurd'
       ? '<span class="pil">aangemerkt door ' + esc(p.goedgekeurdDoor || '') + '</span>'
-      : '<span class="pil rood">ongecontroleerd</span> <button class="knop" data-keur="' + esc(p.versie) + '"' +
-        (p.waarschuwing ? ' data-waarschuwing="' + esc(p.waarschuwing) + '"' : '') + '>Aanmerken</button>') +
-    /* De zelfverklaring van het pakket hoort ZICHTBAAR te zijn voordat iemand
-       op Aanmerken drukt, en niet pas in de foutmelding erna. Bij een pakket
-       dat aangemerkt is met zo'n verklaring staat de reden erbij: wie het deed
-       en waarom is dan het enige wat er nog van over is. */
+      : '<span class="pil rood">ongecontroleerd</span> <button class="knop" data-keur="' + esc(p.versie) + '">Aanmerken</button>') +
+    '</span>' +
+    /* De zelfverklaring hoort ZICHTBAAR te zijn voordat iemand op Aanmerken
+       drukt, en niet pas in de foutmelding erna. Bij een pakket dat ermee is
+       aangemerkt staat de reden erbij: wie het deed en waarom is dan het enige
+       wat er nog van over is. */
     (p.waarschuwing && p.stand !== 'goedgekeurd'
-      ? '<span class="kpi" style="display:block;color:var(--goud,#857007);">Dit pakket meldt zelf: ' + esc(p.waarschuwing) + '</span>' : '') +
+      ? '<span class="kpi" style="display:block;color:var(--gold);">Dit pakket meldt zelf: ' + esc(p.waarschuwing) + '</span>' : '') +
     (p.ondanksWaarschuwing
       ? '<span class="kpi" style="display:block;">uitdrukkelijk aangemerkt: ' + esc(p.ondanksWaarschuwing) + '</span>' : '') +
+    (p.stand === 'goedgekeurd' ? '' :
+      '<div class="keurvak" data-vak="' + esc(p.versie) + '" hidden style="margin-top:.5rem;padding:.6rem 0 .2rem;border-top:1px solid var(--lijn,rgba(0,0,0,.12));">' +
+      '<div class="noot" style="margin-bottom:.45rem;">Na aanmerken mag er een definitieve loonrun op deze tarieven draaien, en dus echt geld naar medewerkers. Uw naam blijft eraan hangen.</div>' +
+      (p.waarschuwing
+        ? '<div class="noot" style="margin-bottom:.45rem;color:var(--gold);">Dit pakket meldt zelf dat het ongecontroleerd is. Aanmerken kan alleen met een reden, en die blijft bij het pakket staan.</div>' +
+          '<input class="veld" data-reden="' + esc(p.versie) + '" style="width:100%;margin-bottom:.45rem;" placeholder="Waarom merkt u dit pakket toch aan?">'
+        : '') +
+      '<button class="knop" data-keur-ja="' + esc(p.versie) + '"' + (p.waarschuwing ? ' data-eist-reden="1"' : '') + '>Aanmerken</button> ' +
+      '<button class="knop stil" data-keur-nee="' + esc(p.versie) + '">Annuleren</button>' +
+      '</div>') +
     '</div>').join('') || '<div class="leeg">Nog geen regelpakketten. Werk bij of laad een jaargang.</div>';
-  $('#osRegels').querySelectorAll('[data-keur]').forEach(b => b.addEventListener('click', async () => {
-    /* Aanmerken is een handeling met een naam eraan: hierna mag er echt geld
-       op deze tarieven worden overgemaakt. Daarom eerst bevestigen.
 
-       EN BIJ EEN PAKKET DAT ZICHZELF ONGECONTROLEERD NOEMT IS DAT EEN ZWAARDERE
-       UITSPRAAK. De server weigert zo'n pakket zonder uitdrukkelijke
-       bevestiging en een reden (kern/payroll/regelpakket.js); dit scherm stuurde
-       die niet mee en liep dus op een 409 zonder uitweg. Nu vraagt hij wat de
-       server vraagt: de verklaring van het pakket in beeld, en een reden die
-       blijft staan. */
-    const w = b.dataset.waarschuwing;
-    if (!confirm('Zijn de tarieven van ' + b.dataset.keur + ' gecontroleerd tegen het Handboek Loonheffingen?\n\nNa aanmerken kan er een definitieve loonrun op draaien.')) return;
-    let extra = {};
-    if (w) {
-      const reden = prompt('Dit pakket meldt zelf:\n\n' + w +
-        '\n\nAanmerken kan alleen uitdrukkelijk. Noteer waarom u het toch aanmerkt (blijft bij het pakket staan):');
-      if (!reden || !reden.trim()) { meld('Niet aangemerkt: er is geen reden genoteerd.'); return; }
-      extra = { ondanks: true, reden: reden.trim() };
+  const vak = (v) => $('#osRegels').querySelector('[data-vak="' + CSS.escape(v) + '"]');
+  $('#osRegels').querySelectorAll('[data-keur]').forEach(b => b.addEventListener('click', () => {
+    // één blok tegelijk open: twee openstaande bevestigingen naast elkaar is
+    // vragen om in het verkeerde veld te typen
+    $('#osRegels').querySelectorAll('.keurvak').forEach(x => { x.hidden = true; });
+    const v = vak(b.dataset.keur);
+    if (v) { v.hidden = false; const inv = v.querySelector('[data-reden]'); if (inv) inv.focus(); }
+  }));
+  $('#osRegels').querySelectorAll('[data-keur-nee]').forEach(b => b.addEventListener('click', () => {
+    const v = vak(b.dataset.keurNee); if (v) v.hidden = true;
+  }));
+  $('#osRegels').querySelectorAll('[data-keur-ja]').forEach(b => b.addEventListener('click', async () => {
+    const versie = b.dataset.keurJa;
+    const extra = {};
+    if (b.dataset.eistReden) {
+      const inv = vak(versie).querySelector('[data-reden]');
+      const reden = (inv && inv.value || '').trim();
+      if (!reden) { meld('Niet aangemerkt: er is geen reden genoteerd.'); if (inv) inv.focus(); return; }
+      extra.ondanks = true; extra.reden = reden;
     }
-    try { await api('regels/keur', Object.assign({ land: 'NL', versie: b.dataset.keur }, extra)); await laadOs(); }
+    try { await api('regels/keur', Object.assign({ land: 'NL', versie }, extra)); await laadOs(); }
     catch (e) { meld(e.message); }
   }));
   // dezelfde zakenlijst als de andere tab; STAND is al geladen

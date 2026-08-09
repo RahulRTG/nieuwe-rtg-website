@@ -154,7 +154,7 @@ function toonLeeg(){
 function teken(){
   const o=ONDS.find(x=>x.id===HUIDIG)||{};
   zetTitel(DAG.naam||'Mijn onderneming');
-  $('#hoofd').innerHTML=[vakGroet(),vakGezond(),vakActies(),vakIntake(),vakKans(),vakSimulatie(),vakStress(),vakPlan(o),vakRechtsvorm(o),vakOprichting(),vakZaak(o),vakEersteKlant()].join('');
+  $('#hoofd').innerHTML=[vakGroet(),vakGezond(),vakActies(),vakIntake(),vakKans(),vakSimulatie(),vakStress(),vakPlan(o),vakRechtsvorm(o),vakOprichting(),vakZaak(o),vakEersteKlant(),vakMall()].join('');
   haakKnoppen();
 }
 
@@ -362,6 +362,21 @@ function vakEersteKlant(){
     (open?'<div style="margin-top:.9rem;"><p class="subtxt" style="margin-bottom:.2rem;">Nog te doen:</p>'+open+'</div>':
       '<p class="subtxt" style="margin-top:.7rem;">Uw etalage staat klaar.</p>')+
     '<div class="ladder">'+mijl+'</div></div>';
+}
+
+
+function vakMall(){
+  const m=DAG&&DAG.mall;
+  if(!m) return '';
+  const rij=(m.onderdelen||[]).map(o=>
+    '<div class="bron'+(o.gevuld?'':' niet')+'"><span><strong>'+esc(o.label)+'</strong><br>'+
+    '<span class="bu">'+esc(o.wat)+'</span></span><span class="bu">'+(o.gevuld?'staat er':'ontbreekt')+'</span></div>').join('');
+  return '<div class="vak"><h2>Uw pagina in de Mall</h2>'+
+    '<div class="score"><span class="n groot">'+m.percentage+'%</span>'+
+    '<span class="subtxt">'+m.gevuld+' van de '+m.totaal+' onderdelen</span></div>'+
+    '<p class="subtxt" style="margin-top:.3rem;">Leden komen u tegen op <code>'+esc(m.pagina)+'</code>.</p>'+
+    '<div style="margin-top:.9rem;">'+rij+'</div>'+
+    '<p class="subtxt" style="margin-top:.9rem;">'+esc(m.voorbehoud)+'</p></div>';
 }
 
 /* ---------- handelingen ---------- */

@@ -1347,6 +1347,42 @@ raak: de werkvormen negeren en iedereen alles vragen, een eigen Salon-stap naast
 die van de poort zetten, zonder zaak toch 0% teruggeven, een wachtende boeking
 als klant tellen, en de eerste-klant-actie onder de losse aanvragen laten zakken.
 
+### Het Mall-profiel: de branche bepaalt de architectuur
+
+`server/kern/onderneming/mallprofiel.js` + `/api/onderneming/mallprofiel`. De Mall
+toont elke partner al, gegroepeerd per genre (`kern/mall/etalage.js`). Wat daar
+niet stond is de vraag die de ondernemer stelt: **hoe hoort mijn pagina eruit te
+zien, en wat mist er nog.** Een restaurant heeft een kaart, reserveren, bestellen
+en bezorgen; een kapper heeft diensten, een agenda en vrije tijdvakken; een hotel
+heeft kamers. Dat is geen opmaak maar architectuur.
+
+**Maar niet via een lijst per branche.** Zo'n lijst zou de zoveelste genre-tabel
+in dit huis zijn, en de eerste die vergeten wordt bij genre tweeëndertig. De
+onderdelen hangen aan **caps**, en die komen uit `werkvormen.js` -- dezelfde
+afleiding die de gereedschapskisten en de eerste-klant-lijst al gebruiken. Zet een
+hotel er een busje bij, dan verschijnt het ritblok vanzelf. Drie onderdelen hangen
+aan géén cap, omdat ze bij elke zaak horen: waar u zit, hoe het eruitziet, en uw
+verhaal.
+
+**Dit beslist niets over zichtbaarheid.** Of een zaak in de Mall stáát, bepalen de
+ondernemerspoort en de salonregel, en die blijven de enige waarheid daarover. Deze
+module beschrijft alleen de opbouw en zegt per onderdeel of de gegevens er zijn --
+een zaak die offline staat kan een volledig ingevulde pagina hebben. Dat
+voorbehoud staat in het antwoord zelf en niet alleen in de code.
+
+`GENRE_PAGINA` (waar een genre in de app geboekt wordt) is voor deze module
+geëxporteerd uit `kern/mall` in plaats van overgetypt: een tweede kaart met
+dezelfde paden loopt uiteen zodra er een genre bij komt.
+
+In het dagbeeld komt de Mall-pagina ná de etalage-check: online staan gaat voor,
+want een pagina die niemand ziet is geen pagina.
+
+Getoetst in `test/onderneming-mallprofiel.test.js` (10). Vijf mutaties, alle vijf
+raak: de caps negeren en elke zaak alles geven, de vaste onderdelen tóch aan een
+cap hangen, een eigen paginakaart naast die van de Mall zetten, het profiel over
+zichtbaarheid laten beslissen, en de Mall-actie boven de etalage-check laten
+kruipen.
+
 ### RTG Werk OS (de werkplek van een organisatie)
 
 `server/bedrijf/` + `/api/bedrijf/...` + `/apps/werk.html`. Een **werkruimte**

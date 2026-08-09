@@ -13,7 +13,7 @@
 
 module.exports = ({ boekingenVanZaak, intakeOntbreekt }) => {
 
-  function acties(o, feiten, verk, project, eersteklant) {
+  function acties(o, feiten, verk, project, eersteklant, mall) {
     const uit = [];
     const zet = (id, kop, waarom, waarheen) => uit.push({ id, kop, waarom, waarheen });
 
@@ -77,7 +77,14 @@ module.exports = ({ boekingenVanZaak, intakeOntbreekt }) => {
       zet('mijlpaal', 'Nog ' + eersteklant.volgende.teGaan + ' tot ' + eersteklant.volgende.label.toLowerCase(),
         eersteklant.volgende.wat, 'eersteklant');
     }
-    // 9. wat er ligt
+    /* 9. de Mall-pagina. Na de etalage-check, want online staan gaat voor een
+       mooie pagina: een pagina die niemand ziet is geen pagina. */
+    if (mall && mall.open.length) {
+      const m = mall.open[0];
+      zet('mallprofiel', 'Uw Mall-pagina is ' + mall.percentage + '% ingevuld',
+        m.label + ': ' + m.wat, 'mall');
+    }
+    // 10. wat er ligt
     if (o.supplierCode) {
       const wacht = (boekingenVanZaak(o.supplierCode) || []).filter(b => b && b.status === 'aangevraagd').length;
       if (wacht) {

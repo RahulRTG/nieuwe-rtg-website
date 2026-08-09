@@ -137,4 +137,8 @@ function maakMall({ db, save, crypto, isRetail, haalThuis }) {
   return { mall: api };
 }
 
-module.exports = { maakMall, MALL_ETAGES: ETAGES };
+/* GENRE_PAGINA gaat mee naar buiten omdat kern/onderneming/mallprofiel.js hem
+   nodig heeft om te zeggen WAAR een zaak in de app geboekt wordt. Exporteren in
+   plaats van overtypen: een tweede kaart met dezelfde paden loopt uiteen zodra
+   er een genre bij komt (lat-regel 4). */
+module.exports = { maakMall, MALL_ETAGES: ETAGES, MALL_GENRE_PAGINA: GENRE_PAGINA };

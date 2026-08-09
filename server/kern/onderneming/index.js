@@ -46,6 +46,7 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boeki
     intakeOntbreekt: intake.intakeOntbreekt });
   const opr = require('./oprichting')({ save });
   const ek = require('./eersteklant')({ db, ondernemerpoort, boekingenVanZaak, ordersVanZaak });
+  const mp = require('./mallprofiel')({ db });
 
   const bak = () => {
     if (!Array.isArray(db.data.ondernemingen)) db.data.ondernemingen = [];
@@ -181,8 +182,9 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boeki
        heeft hem toch al, en twee keer rekenen kan twee antwoorden geven op
        dezelfde vraag. */
     ondernemingDagbeeld: (o) => dag.dagbeeld(o, ondernemingBeeld(o), ondernemingVerkenning(o),
-      opr.oprichtingsproject(o), ek.eersteKlant(o)),
+      opr.oprichtingsproject(o), ek.eersteKlant(o), mp.ondernemingMallProfiel(o)),
     ondernemingEersteKlant: ek.eersteKlant,
+    ondernemingMallProfiel: mp.ondernemingMallProfiel,
     ondernemingOprichting: opr.oprichtingsproject,
     ondernemingOprichtingZet: opr.oprichtingZet,
     ondernemingAanvraag,

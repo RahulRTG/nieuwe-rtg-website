@@ -18,7 +18,7 @@ module.exports = (kern) => {
     ondernemingIngeschreven, ondernemingIntakeZet, ondernemingIntakeBeeld,
     ondernemingVerkenning, ondernemingPlanVastleggen, ondernemingDagbeeld,
     ondernemingOprichting, ondernemingOprichtingZet, ondernemingAanvraag,
-    ondernemingAanvraagStand, ondernemingEersteKlant } = kern;
+    ondernemingAanvraagStand, ondernemingEersteKlant, ondernemingMallProfiel } = kern;
 
   /* `status` betekent in dit huis de HTTP-code, maar een kernmodule kan een
      domeinstand in datzelfde veld zetten ('geen-aanvraag'). Dat gebeurde hier
@@ -114,6 +114,14 @@ module.exports = (kern) => {
     const o = mijn(req);
     if (!o) return stuur(res, nietGevonden);
     res.json({ ok: true, eersteklant: ondernemingEersteKlant(o) });
+  });
+
+  /* Hoe de Mall-pagina van deze zaak is opgebouwd, en wat er nog mist.
+     Zegt niets over zichtbaarheid; dat blijft aan de ondernemerspoort. */
+  app.post('/api/onderneming/mallprofiel', auth, (req, res) => {
+    const o = mijn(req);
+    if (!o) return stuur(res, nietGevonden);
+    res.json({ ok: true, mall: ondernemingMallProfiel(o) });
   });
 
   /* ---- de zaak aanvragen ----

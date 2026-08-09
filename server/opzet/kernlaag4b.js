@@ -26,6 +26,17 @@ module.exports = (kern, hulp) => {
    Eerst gemount zodat de bank en de kantoor-routes dezelfde regie delen. */
 const bankregie = require('../kern/bankregie').maakBankregie({ db, save });
 Object.assign(kern, bankregie);
+/* De BEVOEGDHEID (kern/bevoegdheid.js): de zesde as naast de vijf van de
+   functieschakelaars. Die vijf gaan over wie de gebruiker is en wat de beheerder
+   heeft uitgezet; deze gaat over wat RTG zelf mag. Hij leest wat er in de
+   boardroom is vastgelegd en welke rail nu clearet -- dezelfde SEPA is een
+   partnerhandeling of eigen werk, en dat verschil bepaalt het antwoord. */
+const bevoegd = require('../kern/bevoegdheid').maakBevoegdheid({
+  vergunning: bankregie.bankVergunning,
+  partnerRails: bankregie.bankPartnerRails,
+  clearing: bankregie.bankClearing
+});
+kern.bevoegd = bevoegd;
 /* RTG Bank (kern/bank): de eigen bank, gebouwd OP het RTG Pay-grootboek en met
    dezelfde dubbele-boekhoud-tucht -- rekeningen met een echt IBAN, storten (langs
    de 3-standen knop), overboeken, de brug van/naar de wallet, uitgaande SEPA achter

@@ -17,6 +17,7 @@ const FUNCTIES = [].concat(
   require('./cat-partners'),
   require('./cat-domeinen'),
   require('./cat-domeinen2'),
+  require('./cat-geld'),
   require('./cat-domeinen3'),
   require('./cat-domeinen4'));
 

@@ -278,7 +278,7 @@
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 16,
+      "gezakt": 21,
       "scherp": "gezakt"
     },
     "bankbeveiliging.test.js": {

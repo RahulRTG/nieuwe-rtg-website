@@ -402,7 +402,9 @@ const { rtf, CSP_NONCE, zetScanNet } = require('./opzet/poortwachters')({
   sseToOffice: (ev, data) => sseToOffice(ev, data),
   sessionFor: t => sessionFor(t),
   findSupplier: c => findSupplier(c),
-  sendPushToUser: (u, n) => sendPushToUser(u, n)
+  sendPushToUser: (u, n) => sendPushToUser(u, n),
+  // de bevoegdheidslaag ontstaat pas in kernlaag4b; lui doorgegeven
+  bevoegdVan: () => kern.bevoegd
 });
 
 /* ---------- Claude API (optioneel) ---------- */

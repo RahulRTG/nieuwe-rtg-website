@@ -106,6 +106,28 @@ module.exports = (ctx) => {
     return { ok: true, ...r };
   }));
 
+  /* DE BEVOEGDHEID: wat er is vastgelegd over wat RTG zelf mag, en de matrix
+     die per handeling zegt of hij open staat en waarom niet. Dit is bewust een
+     REGISTRATIE en geen knop -- wie een vergunning kan aanzetten alsof het een
+     schakelaar is, heeft geen vergunning maar een schakelaar. */
+  app.post('/api/office/bank/bevoegdheid', officeAuth, (req, res) => veilig(res, () => kern.bevoegd.matrix({ land: req.body.land })));
+  app.post('/api/office/bank/vergunning', boardroomAuth, (req, res) => veilig(res, () => {
+    const r = kern.bankVergunningZet({ soort: req.body.soort, nummer: req.body.nummer, entiteit: req.body.entiteit,
+      landen: req.body.landen, tot: req.body.tot, wie: naam(req) });
+    if (r.ok) {
+      afdelingen.audit(naam(req), r.vergunning
+        ? 'RTG Bank-vergunning vastgelegd: ' + r.vergunning.soort + ' (' + (r.vergunning.nummer || 'zonder nummer') + ')'
+        : 'RTG Bank-vergunning INGETROKKEN -- de eigen rails clearen niet meer');
+      sync();
+    }
+    return r;
+  }));
+  app.post('/api/office/bank/partnerrail', officeAuth, (req, res) => veilig(res, () => {
+    const r = kern.bankPartnerRailZet({ rail: String(req.body.rail || ''), aan: req.body.aan === true });
+    if (r.ok) { afdelingen.audit(naam(req), 'Partnerrail ' + req.body.rail + ' ' + (req.body.aan === true ? 'aan' : 'uit')); sync(); }
+    return r;
+  }));
+
   // de leden-bank live zetten (zichtbaar in de app) of weer sluiten
   app.post('/api/office/bank/leden', officeAuth, (req, res) => veilig(res, () => {
     const r = kern.bankLedenZet({ aan: req.body.aan === true, wie: naam(req) });

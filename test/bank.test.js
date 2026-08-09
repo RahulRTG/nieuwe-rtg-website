@@ -78,6 +78,17 @@ test.before(async () => {
   assert.equal(kop.status, 200, 'het tweede lid koppelt de kantoorrol: ' + JSON.stringify(kop.body).slice(0, 140));
   tweede = (await api('account/start', { rol: 'kantoor' }, reg.token)).body.token;
   assert.ok(tweede, 'en staat als tweede persoon in de backoffice');
+
+  /* DE VERGUNNING VASTLEGGEN, en dat is sinds de bevoegdheidslaag geen decor.
+     Wat RTG zelf mag hangt niet aan de drie-standen-knop maar aan wat er is
+     vastgelegd (kern/bevoegdheid.js): zonder vergunning clearen de eigen rails
+     niet en is krediet uit eigen boek dicht. Deze opstelling doet alsof RTG de
+     vergunning heeft, zodat de rest van dit bestand de BANK toetst en niet de
+     grendel. De grendel zelf heeft zijn eigen toets verderop, die hem weghaalt
+     en terugzet. */
+  const verg = await bapi('bank/vergunning', { soort: 'bank', nummer: 'NL-TOETS-1',
+    entiteit: 'RTG Bank N.V.', landen: ['NL'] }, baas);
+  assert.equal(verg.status, 200, 'de vergunning is vastgelegd: ' + JSON.stringify(verg.body).slice(0, 140));
 });
 test.after(() => { stop(srv && srv.child); try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} });
 
@@ -437,4 +448,111 @@ test('een payout-webhook die wij niet kennen verandert niets en valt niet om', a
   const na = (await oapi('bank/gezond', {}, 'RTG')).body;
   assert.equal(na.railOpen, voor.railOpen);
   assert.equal(na.sluit.klopt, true);
+});
+
+/* DE BEVOEGDHEIDSLAAG. Dit huis had vijf assen waarop een functie dicht kan, en
+   die gaan allemaal over WIE de gebruiker is of wat de beheerder uitzette. Deze
+   zesde gaat over iets anders: of RTG de handeling zelf mag verrichten. Het
+   verschil is niet academisch -- zonder deze laag kon je met twee klikken en een
+   tweede paar ogen in een stand komen waarin het huis zich als betaaldienst
+   gedraagt, en stond "we hebben het gebouwd" gelijk aan "we mogen het".
+
+   Deze toets haalt de vergunning weg die test.before heeft vastgelegd, kijkt wat
+   er dan dichtgaat, en zet hem terug. */
+test('zonder vastgelegde vergunning gaat dicht wat RTG niet zelf mag -- met de reden, niet met een lege lijst', async () => {
+  assert.equal((await bapi('bank/vergunning', { soort: '' }, baas)).status, 200, 'de vergunning is ingetrokken');
+
+  // 1. wat software is, blijft gewoon open: dat is rekenen op eigen gegevens
+  assert.equal((await api('bank/overzicht', {}, lid.token)).status, 200, 'de bank-app blijft zichtbaar');
+  assert.equal((await api('bank/inzichten', {}, lid.token)).status, 200, 'uitgaven-inzichten blijven open');
+  assert.equal((await api('bank/vastelasten', {}, lid.token)).status, 200, 'de vaste-lasten-radar blijft open');
+
+  // 2. wat een partner voor ons doet blijft open zolang die rail draait
+  const sepa = await api('bank/sepa', { iban: lid.iban, centen: 200, naarIban: 'NL91ABNA0417164300', idem: 'verg-1' }, lid.token);
+  assert.equal(sepa.status, 200, 'SEPA loopt via de partnerrail en blijft dus open');
+
+  // 3. maar krediet uit eigen boek niet: dat doet geen partner voor ons
+  const kr = await api('bank/krediet', {}, lid.token);
+  assert.equal(kr.status, 503, 'krediet uit eigen boek is dicht');
+  assert.equal(kr.body.reden, 'bevoegdheid', 'en niet als "de beheerder zette het uit"');
+  assert.equal(kr.body.vermogen, 'KREDIET_EIGEN_BOEK');
+  assert.equal(kr.body.nodig, 'bank', 'het antwoord zegt WAT ervoor nodig is');
+  assert.match(kr.body.error, /vergunning/i, 'in een zin die een mens begrijpt');
+
+  // 4. en de eigen rails gaan niet draaien: de knop weigert het opschalen
+  const op = await bapi('bank/operationeel', { aan: true }, baas);
+  if (op.body.needsAuth) await bapi('bank/autoriseer/bevestig', { id: op.body.autorisatie.id }, tweede);
+  const draai = await bapi('bank/draai', {}, baas);
+  const bevestig = draai.body.needsAuth
+    ? await bapi('bank/autoriseer/bevestig', { id: draai.body.autorisatie.id }, tweede)
+    : draai;
+  assert.equal(bevestig.status, 409, 'opschalen naar de eigen rails wordt geweigerd: ' + JSON.stringify(bevestig.body).slice(0, 120));
+  assert.match(bevestig.body.error, /vergunning/i);
+  assert.equal((await oapi('bank', {}, 'RTG')).body.regie.modus, 'partner', 'en de stand is niet verschoven');
+
+  // 5. de matrix vertelt het kantoor precies waar de grens loopt
+  const m = await oapi('bank/bevoegdheid', {}, 'RTG');
+  assert.equal(m.status, 200);
+  assert.equal(m.body.vergunning, null, 'er ligt niets');
+  const op_ = id => m.body.regels.find(r => r.id === id);
+  assert.equal(op_('INZICHTEN').mag, true);
+  assert.equal(op_('SEPA_UIT').mag, true);
+  assert.equal(op_('SEPA_UIT').via, 'partner', 'open, maar via de partner en niet op eigen kracht');
+  assert.equal(op_('KREDIET_EIGEN_BOEK').mag, false);
+  assert.equal(op_('KREDIET_EIGEN_BOEK').nodig, 'bank');
+
+  // 6. een te LAGE vergunning is geen vergunning
+  await bapi('bank/vergunning', { soort: 'betaalinstelling', nummer: 'PI-1', landen: ['NL'] }, baas);
+  const kr2 = await api('bank/krediet', {}, lid.token);
+  assert.equal(kr2.status, 503, 'een betaalinstelling mag nog geen krediet uit eigen boek verstrekken');
+  assert.equal(kr2.body.bevoegdheidReden, 'rang', 'en de reden is de rang, niet "hij ontbreekt"');
+
+  // 7. een VERLOPEN vergunning telt niet, ook al staat hij er
+  await bapi('bank/vergunning', { soort: 'bank', nummer: 'NL-OUD', landen: ['NL'], tot: '2020-01-01' }, baas);
+  const kr3 = await api('bank/krediet', {}, lid.token);
+  assert.equal(kr3.status, 503, 'een verlopen vergunning is geen vergunning');
+  assert.equal(kr3.body.bevoegdheidReden, 'verlopen');
+
+  // terugzetten zoals test.before hem had, zodat de rest van dit bestand klopt
+  assert.equal((await bapi('bank/vergunning', { soort: 'bank', nummer: 'NL-TOETS-1',
+    entiteit: 'RTG Bank N.V.', landen: ['NL'] }, baas)).status, 200);
+  assert.equal((await api('bank/krediet', {}, lid.token)).status, 200, 'en dan mag krediet weer');
+});
+
+/* HYBRIDE MAG GEEN SLUIPROUTE ZIJN. In de hybride stand clearen de eigen rails
+   EN de kaart-rails naast elkaar. Kijkt de bevoegdheidslaag dan naar de kaart
+   ("er is toch een partner"), dan is hybride precies de stand waarin je alles
+   mag wat je op eigen kracht niet mag -- en hybride is de stand waar de knop je
+   als eerste brengt. Daarom telt in hybride de EIGEN kant: de strengste wint. */
+test('in de hybride stand telt de eigen rail, niet de partner die er ook nog is', async () => {
+  // een betaalinstelling: genoeg om de knop te mogen draaien, te weinig om
+  // klantgeld aan te houden (dat vraagt een bankvergunning)
+  assert.equal((await bapi('bank/vergunning', { soort: 'betaalinstelling', nummer: 'PI-2', landen: ['NL'] }, baas)).status, 200);
+  await naarPartner();
+
+  const op = await bapi('bank/operationeel', { aan: true }, baas);
+  if (op.body.needsAuth) await bapi('bank/autoriseer/bevestig', { id: op.body.autorisatie.id }, tweede);
+  const draai = await bapi('bank/draai', {}, baas);
+  if (draai.body.needsAuth) await bapi('bank/autoriseer/bevestig', { id: draai.body.autorisatie.id }, tweede);
+  assert.equal((await oapi('bank', {}, 'RTG')).body.regie.modus, 'hybride', 'de knop staat op hybride');
+
+  const m = await oapi('bank/bevoegdheid', {}, 'RTG');
+  assert.equal(m.body.rail, 'eigen', 'in hybride kijken we naar de eigen rail, ook al draait de kaart mee');
+  const regel = id => m.body.regels.find(r => r.id === id);
+  assert.equal(regel('SEPA_UIT').mag, true, 'SEPA mag: een betaalinstelling is daarvoor toereikend');
+  assert.equal(regel('SEPA_UIT').via, 'eigen', 'en dan op eigen kracht, niet via de partner');
+  assert.equal(regel('KLANTGELD').mag, false, 'klantgeld aanhouden niet: dat vraagt een bankvergunning');
+  assert.equal(regel('KLANTGELD').reden, 'rang');
+
+  // en dat is geen papieren uitslag: de route gaat ook echt dicht
+  const stort = await api('bank/storten', { iban: lid.iban, centen: 1000, idem: 'hyb-1' }, lid.token);
+  assert.equal(stort.status, 503, 'storten is dicht want dat is klantgeld aanhouden');
+  assert.equal(stort.body.bevoegdheidReden, 'rang');
+
+  // terug naar de stand waarin de rest van dit bestand draait
+  await naarPartner();
+  assert.equal((await bapi('bank/vergunning', { soort: 'bank', nummer: 'NL-TOETS-1',
+    entiteit: 'RTG Bank N.V.', landen: ['NL'] }, baas)).status, 200);
+  assert.equal((await api('bank/storten', { iban: lid.iban, centen: 1000, idem: 'hyb-2' }, lid.token)).status, 200,
+    'met de bankvergunning terug mag storten weer');
 });

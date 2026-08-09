@@ -17,6 +17,8 @@
    Hier: de stand, de clearing-berekening, de leden-bank-schakelaar, de tarieven
    en de spaarrente. maakBankregie(state) volgt het vaste kern-patroon. */
 
+const BEV = require('../bevoegdheid');
+
 const MODI = ['partner', 'hybride', 'eigen'];
 const RANG = { partner: 0, hybride: 1, eigen: 2 };
 const RENTE_BP_MAX = 2000;         // spaarrente tot 20% (basispunten); ruim, RTG stelt in
@@ -39,6 +41,12 @@ function maakBankregie({ db, save }) {
     if (!Number.isFinite(b.mislukt)) b.mislukt = 0;
     if (!('autorisatie' in b)) b.autorisatie = null;
     if (typeof b.ledenAan !== 'boolean') b.ledenAan = false; // staat de leden-bank live (zichtbaar in de app)?
+    /* Wat er is VASTGELEGD over wat RTG zelf mag. Leeg is het eerlijke begin en
+       betekent nee: zie kern/bevoegdheid.js. De partnerrails staan standaard AAN
+       -- dat is wat er vandaag draait, met een bevoegde partij aan de andere
+       kant -- zodat de lijst beschrijft wat er is en niet wat we hopen. */
+    if (!('vergunning' in b)) b.vergunning = null;
+    if (!b.partnerRails || typeof b.partnerRails !== 'object') b.partnerRails = { sepa: true, passen: true, rekeningen: true };
     return b;
   }
 
@@ -67,6 +75,18 @@ function maakBankregie({ db, save }) {
   function _modusZet(m, wie) {
     if (!MODI.includes(m)) return { status: 400, error: 'Kies partner, hybride of eigen.' };
     if (m !== 'partner' && !operationeel()) return { status: 409, error: 'De eigen bank is nog niet operationeel; zet hem eerst aan.' };
+    /* DE GRENDEL DIE ER NIET WAS. Zodra de eigen rails meeclearen (hybride en
+       eigen allebei) doet RTG de betaaldienst zelf, en daar is een vergunning
+       voor nodig. Zonder vastgelegde vergunning kwam je met twee klikken en een
+       tweede paar ogen in een stand waarin het huis zich als betaaldienst
+       gedraagt. Vier ogen bewaakt of het BEDOELD is; dit bewaakt of het MAG, en
+       dat is een andere vraag die niemand stelde. Afschalen loopt hier niet
+       langs -- terug naar partner mag altijd. */
+    if (m !== 'partner') {
+      const v = d().vergunning;
+      if (!v || !BEV.RANG[v.soort]) return { status: 409, error: 'Zonder vastgelegde vergunning clearen de eigen rails niet. Leg eerst de vergunning vast.' };
+      if (Number.isFinite(v.tot) && v.tot < Date.now()) return { status: 409, error: 'De vastgelegde vergunning is verlopen.' };
+    }
     const oud = d().modus;
     d().modus = m; save();
     return { ok: true, modus: m, oud, wie: wie || 'boardroom' };
@@ -82,6 +102,12 @@ function maakBankregie({ db, save }) {
   const ctx = { d, save, MODI, RANG, AUTORISATIE_MS, NOOD_DREMPEL, operationeel, _modusZet, _operationeelZet, clearing, kenmerk };
   const nood = require('./nood')(ctx);
   const aut = require('./autorisatie')(ctx);
+  /* Wat er is vastgelegd over wat RTG zelf mag, en welke partnerrails
+     meedraaien: ./vergunning. Dat is een REGISTRATIE en geen knop -- vandaar
+     naast de knop en niet erin. */
+  const verg = require('./vergunning')(ctx);
+  const vergunning = verg.vergunning;
+  const partnerRails = verg.partnerRails;
 
   // de leden-bank live zetten (zichtbaar in de app). Geen clearing-opschaling,
   // dus geen vier-ogen; wel altijd in het auditlog vanuit de route.
@@ -116,13 +142,16 @@ function maakBankregie({ db, save }) {
     return { status: 200, modus: b.modus, modi: MODI.slice(), operationeel: b.operationeel, ledenAan: b.ledenAan,
       clearing: clearing(), clearingConfig: clearingConfig(), nood: { ...b.nood }, mislukt: b.mislukt,
       autorisatie: aut.pub(b.autorisatie), spaarrenteBp: b.spaarrenteBp, spaarrentePct: b.spaarrenteBp / 100,
-      roodLimietCenten: b.roodLimietCenten, tarieven: { ...b.tarieven }, iban: { ...b.iban } };
+      roodLimietCenten: b.roodLimietCenten, tarieven: { ...b.tarieven }, iban: { ...b.iban },
+      vergunning: vergunning(), partnerRails: partnerRails() };
   }
 
   return {
     MODI: MODI.slice(),
     bankModus: modus, bankOperationeel: operationeel, bankClearing: clearing, bankClearingConfig: clearingConfig,
     bankSpaarrenteBp: spaarrenteBp, bankRoodStandaard: roodLimietStandaard, bankIbanParams: ibanParams, bankTarief: tarief,
+    bankVergunning: vergunning, bankPartnerRails: partnerRails,
+    bankVergunningZet: verg.vergunningZet, bankPartnerRailZet: verg.partnerRailZet,
     // de knop, nu via vier-ogen bij het opschalen
     bankModusZet: ({ modus: m, wie }) => aut.aanvraag({ actie: 'modus', modus: m, door: wie }),
     bankDraai: ({ wie } = {}) => aut.aanvraag({ actie: 'draai', door: wie }),

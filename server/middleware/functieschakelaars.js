@@ -39,7 +39,7 @@ const ZIN = {
   genre: 'Deze functie is voor dit genre zaken uitgeschakeld door RTG.'
 };
 
-function schakelaars({ db, accounts, functies, sessionFor, findSupplier, wachter }) {
+function schakelaars({ db, accounts, functies, sessionFor, findSupplier, wachter, bevoegdVan }) {
   return (req, res, next) => {
     const p = req.path;
     if (!p.startsWith('/api/')) return next();
@@ -51,6 +51,39 @@ function schakelaars({ db, accounts, functies, sessionFor, findSupplier, wachter
        zelf hierlangs 503's produceert is veilig: meet() telt een 503 bewust
        nooit mee (dat is de taal van "bewust dicht", geen storing). */
     if (wachter) res.on('finish', () => { try { wachter.meet(p, res.statusCode); } catch (e) {} });
+    /* DE ZESDE AS: MAG RTG DIT? De vijf hieronder gaan over wie de gebruiker is
+       en wat de beheerder heeft uitgezet. Deze gaat over iets anders -- of RTG
+       bevoegd is de handeling zelf te verrichten (kern/bevoegdheid.js) -- en
+       staat daarom BOVEN de vroege return: hij hangt niet aan de bewaarde
+       schakelaarstand, dus "er is nog nooit iets uitgezet" mag hem niet
+       overslaan. Dat onderscheid hoort ook in het antwoord: "uitgeschakeld door
+       de beheerder" en "hier is een vergunning voor nodig" zijn voor wie het
+       leest twee heel verschillende dingen. */
+    const bevoegd = bevoegdVan && bevoegdVan();
+    if (bevoegd) {
+      const f = functies.functieVoorPad(p);
+      if (f && f.vermogen) {
+        let oordeel = bevoegd.mag(f.vermogen);
+        // het land pas opzoeken als de vergunning zich tot landen beperkt
+        if (oordeel.mag && bevoegd.landTelt()) {
+          const tok = (req.get('authorization') || '').replace(/^Bearer\s+/i, '') || (req.body && req.body.token) || req.query.token;
+          let land = null;
+          try {
+            const u = tok && accounts.verifyToken(tok);
+            if (u) { const md = accounts.getMemberState(u.id) || {}; land = md.land || natieNaarLand(md.nationaliteit) || null; }
+          } catch (e) {}
+          if (land) oordeel = bevoegd.mag(f.vermogen, { land });
+        }
+        if (!oordeel.mag) {
+          return res.status(503).json({
+            error: oordeel.uitleg, functie: f.id, naam: f.naam,
+            reden: 'bevoegdheid', vermogen: oordeel.vermogen, bevoegdheidReden: oordeel.reden,
+            nodig: oordeel.nodig || undefined
+          });
+        }
+      }
+    }
+
     const staat = db.data && db.data.techniek && db.data.techniek.functies;
     if (!staat) return next(); // niets uitgezet: alles staat aan
 

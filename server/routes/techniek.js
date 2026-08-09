@@ -123,6 +123,24 @@ module.exports = (kern) => {
     res.json(Object.assign({ ok: !!r.ok }, r, { stand: melder.stand() }));
   });
 
+  /* DE SPELCIJFERS. Hoeveel potjes er per dag per spel zijn gespeeld, en
+     hoeveel stoelen daaraan zaten. Meer niet: er staat geen persoon in de
+     bron (kern/spellen/telling.js), dus er valt hier ook niets uit te halen
+     over wie wat speelt.
+
+     Waarom op het techniekbord en niet op een productdashboard: dit is de
+     enige plek in het huis waar systeembrede aantallen al thuishoren (de
+     fout-aggregatie staat er ook), en hij is afgeschermd. Zodra er een echt
+     productbord komt, hoort dit daarheen te verhuizen en niet gekopieerd te
+     worden.
+
+     `techAuth` en niet `eigenaarAlleen`: dit zijn geen bedrijfsgeheimen en
+     geen knop die iets doet -- het is een leesvraag over aantallen. */
+  app.post('/api/techniek/spelcijfers', techAuth, (req, res) => {
+    if (!kern.spelTelemetrie) return res.status(503).json({ error: 'De spellenlaag draait hier niet.' });
+    res.json(kern.spelTelemetrie(req.body && req.body.dagen));
+  });
+
   // Zekering resetten ("er weer in doen") of met de hand uitschakelen.
   app.post('/api/techniek/zekering', techAuth, eigenaarAlleen, (req, res) => {
     const t = staat();

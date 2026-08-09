@@ -50,6 +50,12 @@ Object.assign(kern, require('../kern/spellen')({
      uitgezet telt als offline, want anders nodig je iemand uit die dat verzoek
      niet kan aannemen. */
   sseClients, lidBoardUit,
+  /* Praten in het potje loopt via de communicatiekern (kern/comm) en niet via
+     een eigen berichtenvoorraad. Die kern wordt pas in laag 4 opgebouwd, dus
+     hij komt hier als FUNCTIE binnen en niet als waarde: op het moment van
+     aanroepen staat hij er wel. Vastleggen wat er nu is zou voor altijd
+     undefined betekenen -- dezelfde constructie als `convOf` bij commBronnen. */
+  comm: () => kern.comm,
   // 18+ (voor Proost): alleen een echt account met paspoort-geboortedatum telt;
   // RTF-gezinsprofielen hebben geen geverifieerde leeftijd en doen nooit mee
   volwassen: (handle) => {

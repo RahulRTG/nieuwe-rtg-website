@@ -1953,6 +1953,41 @@ bewust alleen het spel, wie aan zet is en jouw vraag mee -- niet het bord en
 niet iemands hand. Hij *kan* dus niet verklappen. Zonder API-sleutel geeft
 dezelfde motor een vaste, uitlegbare tip.
 
+### Praten in het potje
+
+Geen zevende berichtenvoorraad: een potjegesprek is een **gewoon gesprek in
+`kern/comm`** (soort `group`, sleutel `potje:<id>`) en staat dus ook in de
+Berichten-app, met de bewaartermijn, het wisrecht en de leesstand die daar al
+liggen.
+
+Erboven staat één regel: **een potje geeft geen nieuw recht om iemand te
+bereiken.** Praten kan alleen als *elk paar* aan tafel elkaar buiten dit potje
+ook al mag bereiken (vrienden of klasgenoten). De wachtrij koppelt willekeurige
+spelers -- zonder die regel is "even een potje dammen" de kortste weg naar een
+open lijn met een vreemde, en in de RTF-app zou dat precies de poort omzeilen
+die tieners onvindbaar maakt in de zoeker. *Elk paar*, want in een groepsruimte
+praat B ook tegen C.
+
+### Teams
+
+Een vaste club om mee te spelen: iedereen mag er een maken. Wat dat begrensd
+houdt is de vorm, niet een moderatiewachtrij -- een team is **niet openbaar**
+(geen zoeker, geen lijst; je ziet het alleen als je erin zit of ervoor bent
+gevraagd), uitnodigen kan **alleen binnen je eigen kring**, en je zit er pas in
+als je ja zegt. Een team heeft bewust **geen ranglijst**: die zou buiten het
+potje blijven staan en dus onder de progressiegrens vallen, en dan krijgt een
+schoolteam een bord waarop de helft van de leden niet mag staan.
+
+### Wat er geteld wordt
+
+`db.data.spelTelling` houdt per dag per spel bij hoeveel potjes er afliepen en
+hoeveel stoelen daaraan zaten. **Meer staat er niet in** -- geen sleutel, geen
+codenaam, geen winnaar. Juist daardoor mag hij álles tellen: de uitslagenlog
+bewaart niets van een partij tussen tieners onderling, dus een teller die
+daaruit zou lezen ziet De Arena nooit. De privacyregel maakt deze cijfers dus
+beter en niet slechter. Ze staan op het techniekbord
+(`/api/techniek/spelcijfers`).
+
 ## Partnerkanaal
 
 Het partnerkanaal voor niet-leden draait server-side: boekingen worden per stuk opgeslagen in `server/data/db.json` onder `bookings`, met één totaalprijs voor de klant; nettoprijs en service zijn interne administratie. RTG verdient niets aan een boeking (`rtgCut` is altijd 0): een eventuele service gaat volledig naar de partner. RTG's enige inkomsten zijn de abonnementen. (De losse publieke boekingspagina is met de marketingsite verwijderd; het model en de endpoints blijven bestaan.)

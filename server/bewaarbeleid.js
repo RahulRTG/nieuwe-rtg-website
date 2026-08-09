@@ -110,6 +110,19 @@ const BELEID = [
     vorm: 'lijst', datum: 'at', waarom: 'draagt codenamen; een afgelopen toernooi is na een kwartaal geen nieuws meer' },
   { tak: 'spelUitslagen', label: 'uitslagen van potjes', dagen: JAAR / DAG, grond: 'nodig',
     vorm: 'lijst', datum: 'at', waarom: 'draagt codenamen; een partij van meer dan een jaar terug hoeft geen stand meer te bepalen' },
+  /* De dagtelling van de spellen draagt GEEN persoon: een rij is
+     `{ dag, spel, potjes, spelers }`. Hij staat hier toch, en dat is met opzet:
+     "er zit niemand in dus het mag blijven staan" is precies de redenering
+     waarmee tellingen eeuwig worden. Twee jaar is genoeg om een seizoen met
+     het vorige te vergelijken; daarna zegt een dagcijfer niets meer over een
+     spel dat sindsdien is veranderd. */
+  { tak: 'spelTelling', label: 'dagtelling van gespeelde potjes (geen personen)', dagen: 2 * JAAR / DAG, grond: 'nodig',
+    vorm: 'lijst', datum: 'at', waarom: 'alleen aantallen per spel per dag; ouder dan twee jaar is geen vergelijking meer' },
+  /* Teams verlopen op `laatst` en niet op `at`: een club waarmee gespeeld wordt
+     blijft bestaan, een club waar een jaar niets mee gebeurde is een restant
+     met sleutels erin. Op `at` zou een actief team na een jaar verdwijnen. */
+  { tak: 'spelTeams', label: 'spelteams', dagen: JAAR / DAG, grond: 'nodig',
+    vorm: 'lijst', datum: 'laatst', waarom: 'draagt sleutels van de leden; een team waar een jaar niets mee gebeurde bestaat niet meer' },
   /* Stadsweefsel: gebeurtenissen verlopen, het register (db.data.weefsel) niet --
      een lantaarnpaal verloopt niet en de tijdreeksen vegen zichzelf per laag. */
   { tak: 'weefselZaken', label: 'stadszaken (openbare ruimte)', dagen: 3 * JAAR / DAG, grond: 'nodig',

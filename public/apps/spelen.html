@@ -102,6 +102,11 @@
   .rmantwoord{margin:.6rem 0 .2rem;font-size:.92rem;line-height:1.5;white-space:pre-wrap;}
   .rmvraag{display:flex;gap:.5rem;margin-top:.6rem;}
   .rmvraag input{flex:1;min-width:0;}
+  /* praten in het potje (de berichten staan in de communicatiekern) */
+  .praatlijst{max-height:11rem;overflow-y:auto;margin:.5rem 0 .2rem;display:flex;flex-direction:column;gap:.35rem;}
+  .praatrij{font-size:.92rem;line-height:1.45;}
+  .praatrij .van{color:var(--zacht);margin-right:.35rem;}
+  .praatrij.ik .van{color:var(--goud2);}
 </style>
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/dagkleur.css" rel="stylesheet">
@@ -134,6 +139,14 @@
     <div><button type="button" class="zichtbaarknop" id="zichtbaarKnop"></button></div>
     <div class="sec">Jouw potjes</div>
     <div id="potjes"><div class="leeg">Nog geen potjes. Kies hierboven een spel.</div></div>
+    <!-- Teams: een vaste club om mee te spelen. Geen zoeker en geen lijst van
+         andermans teams -- die bestaan niet op de server, dus ze staan hier ook
+         niet. Je ziet je eigen teams en de uitnodigingen die op je wachten. -->
+    <div class="sec">Jouw teams <small>(om samen mee te spelen)</small></div>
+    <div id="teamUitnodigingen"></div>
+    <div id="teams"><div class="leeg">Nog geen team.</div></div>
+    <div class="rmvraag"><input id="teamNaam" placeholder="Naam voor een nieuw team…" maxlength="40"><button class="knop mini" id="teamMaak" type="button">Maak team</button></div>
+    <div class="keuzerij" id="teamVrienden"></div>
     <div class="sec" id="standKop" hidden>Jouw partijen</div>
     <div id="stand" hidden></div>
     <div id="recent" hidden></div>
@@ -154,6 +167,8 @@
     <div class="kaart blok">
       <div class="sec" style="margin-top:0;">Tegen wie?</div>
       <div class="keuzerij" id="nVrienden"><span class="leeg">Vrienden laden…</span></div>
+      <!-- je team in een tik; alleen zichtbaar als je er een hebt -->
+      <div class="keuzerij" id="nTeams" hidden></div>
       <input class="veld" id="nCodenaam" placeholder="Of nodig uit op codenaam (bijv. Gouden Ibis 1234)" style="margin-top:.3rem;">
       <div class="leeg" style="padding:.3rem 0 0;">Samen spelen maakt je niet automatisch vrienden; de ander accepteert zelf.</div>
       <div class="leeg" id="nProost" hidden style="padding:.3rem 0 0;">Proost is 18+: iedereen in het potje heeft een geverifieerde volwassen leeftijd nodig. Drink met mate; water doet ook gewoon mee.</div>
@@ -240,6 +255,16 @@
       <div class="rmkop"><span>Rahul kijkt mee</span><button class="knop grijs mini" id="rmHint" type="button">Geef een tip</button></div>
       <div class="rmantwoord" id="rmAntwoord" hidden></div>
       <div class="rmvraag"><input id="rmVraag" placeholder="Vraag Rahul iets over dit potje…" maxlength="200"><button class="knop mini" id="rmVraagKnop" type="button">Vraag</button></div>
+    </div>
+    <!-- Praten in het potje. Geen eigen berichtenlaag: dit zijn gewone
+         gesprekken uit de communicatiekern, die ook in de Berichten-app staan.
+         Het venster is er alleen als er iets te praten valt: zit er iemand aan
+         tafel die je buiten dit potje niet kunt bereiken, dan zegt de server
+         nee en blijft dit blok weg. -->
+    <div class="rahulmaatje" id="sPraat" hidden>
+      <div class="rmkop"><span>Praten met de tafel</span><small id="prtInfo"></small></div>
+      <div class="praatlijst" id="prtLijst"></div>
+      <div class="rmvraag"><input id="prtVeld" placeholder="Zeg iets…" maxlength="500"><button class="knop mini" id="prtKnop" type="button">Stuur</button></div>
     </div>
     <div class="knoprij"><button class="knop rood" id="sOpgeven" style="flex:0 1 auto;">Opgeven</button></div>
   </section>
@@ -427,7 +452,7 @@ async function laadPrestaties(){
 
 async function laadLobby(){
   let d; try{ d = await api('mijn'); }catch(e){ return; }
-  laadOnline(); laadZichtbaar(); laadStand(); laadRecent(); laadPrestaties();
+  laadOnline(); laadZichtbaar(); laadStand(); laadRecent(); laadPrestaties(); laadTeams(); tekenTeamVrienden();
   const u = d.uitnodigingen||[];
   $('#uitnodigingen').innerHTML = u.length ? '<div class="sec">Uitnodigingen</div>' + u.map(x =>
     '<div class="rij"><div class="nm">'+esc(x.naam)+(x.modus==='teams'?' · 2 tegen 2':'')+'<small>van '+esc(x.van)+' · met '+x.spelers.map(esc).join(', ')+'</small></div>'+
@@ -442,6 +467,59 @@ async function laadLobby(){
     : '<div class="leeg">Nog geen potjes. Kies hierboven een spel.</div>';
   document.querySelectorAll('[data-open]').forEach(r => r.addEventListener('click', ()=> openPotje(r.dataset.open)));
 }
+
+/* ---------- teams: een vaste club om mee te spelen ----------
+   Wat hier NIET staat is net zo belangrijk als wat er wel staat: geen zoeker,
+   geen lijst van andermans teams, en geen ranglijst. De eerste twee bestaan
+   niet op de server (een team is niet openbaar), de derde is een besluit -- een
+   teamstand zou onder de progressiegrens vallen en dan staat de helft van een
+   schoolteam er niet op. */
+let MIJN_TEAMS = [];
+async function laadTeams(){
+  let d; try{ d = await api('team-mijn'); }catch(e){ return; }
+  MIJN_TEAMS = d.teams || [];
+  const u = d.uitnodigingen || [];
+  $('#teamUitnodigingen').innerHTML = u.map(t =>
+    '<div class="rij"><div class="nm">'+esc(t.naam)+'<small>uitnodiging · met '+t.leden.map(l=>esc(l.codenaam)).join(', ')+'</small></div>'+
+    '<button class="knop mini" data-tja="'+esc(t.id)+'">Doe mee</button><button class="knop grijs mini" data-tnee="'+esc(t.id)+'">✕</button></div>').join('');
+  document.querySelectorAll('[data-tja]').forEach(b => b.addEventListener('click', async()=>{ try{ await api('team-antwoord',{id:b.dataset.tja, akkoord:true}); laadTeams(); }catch(e){ meld(e.message); } }));
+  document.querySelectorAll('[data-tnee]').forEach(b => b.addEventListener('click', async()=>{ try{ await api('team-antwoord',{id:b.dataset.tnee, akkoord:false}); laadTeams(); }catch(e){ meld(e.message); } }));
+
+  $('#teams').innerHTML = MIJN_TEAMS.length ? MIJN_TEAMS.map(t =>
+    '<div class="rij"><div class="nm">'+esc(t.naam)+'<small>'+t.leden.map(l=>esc(l.codenaam)).join(' · ')+
+    (t.uitgenodigd.length ? ' · '+t.uitgenodigd.length+' gevraagd' : '')+'</small></div>'+
+    '<button class="knop grijs mini" data-tweg="'+esc(t.id)+'">Verlaat</button></div>').join('')
+    : '<div class="leeg">Nog geen team. Maak er een en vraag je vrienden erbij.</div>';
+  document.querySelectorAll('[data-tweg]').forEach(b => b.addEventListener('click', async()=>{
+    if (!confirm('Dit team verlaten?')) return;
+    try{ await api('team-verlaat',{id:b.dataset.tweg}); laadTeams(); }catch(e){ meld(e.message); }
+  }));
+}
+/* De kieslijst bij het oprichten. Alleen vrienden: de server laat toch niets
+   anders door (uitnodigen kan alleen binnen je eigen kring), dus een lijst die
+   meer toont zou een knop zijn die niets doet. */
+let teamGekozen = [];
+async function tekenTeamVrienden(){
+  let vr = []; try{ vr = await vriendenLijst(); }catch(e){}
+  $('#teamVrienden').innerHTML = vr.length ? vr.map(v =>
+      '<button type="button" class="chip'+(teamGekozen.includes(v.key)?' aan':'')+'" data-tk="'+esc(v.key)+'">'+esc(v.codename)+'</button>').join('')
+    : '';
+  $('#teamVrienden').querySelectorAll('[data-tk]').forEach(b => b.addEventListener('click', ()=>{
+    const k = b.dataset.tk;
+    teamGekozen = teamGekozen.includes(k) ? teamGekozen.filter(x=>x!==k) : teamGekozen.concat(k);
+    tekenTeamVrienden();
+  }));
+}
+$('#teamMaak').addEventListener('click', async ()=>{
+  const naam = $('#teamNaam').value.trim();
+  if (!naam) return;
+  try{
+    await api('team-nieuw',{ naam, leden: teamGekozen });
+    $('#teamNaam').value=''; teamGekozen = [];
+    tekenTeamVrienden(); laadTeams();
+    meld('Team gemaakt. Wie je vroeg krijgt een uitnodiging.');
+  }catch(e){ meld(e.message); }
+});
 
 /* ---------- nieuw potje ---------- */
 let nSpel = 'mejn', nGrootte = 2, nModus = 'vrij', nGekozen = [], nTaal = 'nl';
@@ -490,6 +568,20 @@ async function tekenVrienden(){
     nGekozen = nGekozen.includes(k) ? nGekozen.filter(x=>x!==k) : nGekozen.concat(k).slice(-max);
     tekenVrienden();
   }));
+  /* Je team in een tik. Dat is waar een team voor is: niet om een stand bij te
+     houden maar om niet elke week dezelfde vier mensen te hoeven aanklikken.
+     De grens van het potje geldt gewoon -- een team van zes past niet in een
+     partij schaken, dus dan komen de eersten mee. */
+  const teams = MIJN_TEAMS.filter(t => t.leden.length > 1);
+  $('#nTeams').hidden = !teams.length;
+  $('#nTeams').innerHTML = teams.map(t =>
+    '<button type="button" class="chip" data-tid="'+esc(t.id)+'">'+esc(t.naam)+'</button>').join('');
+  $('#nTeams').querySelectorAll('[data-tid]').forEach(b => b.addEventListener('click', ()=>{
+    const t = MIJN_TEAMS.find(x => x.id === b.dataset.tid);
+    if (!t) return;
+    nGekozen = t.leden.map(l => l.key).filter(k => vr.some(v => v.key === k)).slice(0, max);
+    tekenVrienden();
+  }));
   $('#nStart').textContent = 'Nodig uit en start' + (nGekozen.length ? ' ('+nGekozen.length+')' : '');
 }
 $('#nStart').addEventListener('click', async ()=>{
@@ -517,6 +609,7 @@ let huidig = null, pollT = null, mgVelden = null;
 async function ververs(){
   if (!huidig) return;
   try{ const d = await api('staat', { id: huidig.id }); huidig = d.potje; tekenPotje(); }catch(e){}
+  laadPraat();
 }
 async function openPotje(id){
   // bij het openen reist het statische Magnaat-bord eenmalig mee; de polls
@@ -527,6 +620,8 @@ async function openPotje(id){
   if (huidig.soort === 'quiz' || huidig.soort === 'schat' || huidig.soort === 'orde'){ location.href = '/apps/foundation/societeit.html?potje=' + encodeURIComponent(id); return; }
   if (huidig.staat && huidig.staat.velden) mgVelden = huidig.staat.velden;
   toon('vSpel'); tekenPotje();
+  $('#sPraat').hidden = true; $('#prtLijst').innerHTML = ''; prtLaatst = '';
+  laadPraat();
   clearInterval(pollT);
   pollT = setInterval(()=>{ if (document.hidden) return; if (window.Satelliet && !Satelliet.beurt('potje')) return; ververs(); }, 8000);
 }
@@ -595,6 +690,43 @@ async function vraagRahul(vraag){
 $('#rmHint').addEventListener('click', ()=> vraagRahul(''));
 $('#rmVraagKnop').addEventListener('click', ()=>{ const v = $('#rmVraag').value.trim(); if(!v) return; vraagRahul(v); $('#rmVraag').value=''; });
 $('#rmVraag').addEventListener('keydown', e=>{ if(e.key==='Enter') $('#rmVraagKnop').click(); });
+
+/* ---------- Praten in het potje ----------
+   Deze pagina houdt GEEN berichten bij: het venster hieronder toont wat de
+   server teruggeeft, en die berichten staan in de communicatiekern -- dezelfde
+   plek als je gewone gesprekken, dus ze staan ook gewoon in de Berichten-app.
+
+   OF er gepraat mag worden beslist de server ook: zit er iemand aan tafel die
+   je buiten dit potje niet kunt bereiken (de wachtrij koppelt vreemden), dan
+   komt er een 403 en blijft het hele blok weg. Dat is bewust geen uitleg op
+   het scherm: een uitnodiging om te vragen waarom, is een uitnodiging om het
+   te proberen. */
+let prtLaatst = '';
+async function laadPraat(){
+  if (!huidig) return;
+  let d;
+  try{ d = await api('praat', { id: huidig.id }); }
+  catch(e){ $('#sPraat').hidden = true; return; }   // 403/404: dit potje praat niet
+  $('#sPraat').hidden = false;
+  const lijst = $('#prtLijst');
+  const berichten = d.berichten || [];
+  const stempel = berichten.map(b => b.id).join(',');
+  if (stempel === prtLaatst) return;               // niets nieuws: niet opnieuw tekenen
+  prtLaatst = stempel;
+  lijst.innerHTML = berichten.length ? berichten.map(b =>
+    '<div class="praatrij'+(b.vanMij?' ik':'')+'"><span class="van">'+esc(b.vanMij?'jij':b.van)+'</span>'+esc(b.tekst||'')+'</div>').join('')
+    : '<div class="leeg">Nog niets gezegd.</div>';
+  lijst.scrollTop = lijst.scrollHeight;
+}
+async function stuurPraat(){
+  const veld = $('#prtVeld'), t = veld.value.trim();
+  if (!huidig || !t) return;
+  veld.value = '';
+  try{ await api('praat-stuur', { id: huidig.id, tekst: t }); prtLaatst = ''; await laadPraat(); }
+  catch(e){ meld(e.message); veld.value = t; }
+}
+$('#prtKnop').addEventListener('click', stuurPraat);
+$('#prtVeld').addEventListener('keydown', e=>{ if(e.key==='Enter') stuurPraat(); });
 
 /* ---------- Mens erger je niet: het bord op canvas ---------- */
 const MK = ['#E05B5B','#5B8FE0','#5FA56A','#E0B24A'];

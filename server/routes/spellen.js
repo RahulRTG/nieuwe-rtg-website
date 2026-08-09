@@ -5,7 +5,7 @@
 const { log } = require('../log');
 
 module.exports = (kern) => {
-  const { app, auth, geenGast, rtf, spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelKijk, spelReplay, spelRahul, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, spelUitslagen, spelStand, spelPrestaties, sudokuNieuw, sudokuKlaar, toernooiNieuw, toernooiAntwoord, mijnToernooien, toernooiStaat, sneekScore, sneekBord, arcadeScore, arcadeBord, socialConnecties } = kern;
+  const { app, auth, geenGast, rtf, spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelKijk, spelReplay, spelRahul, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, spelUitslagen, spelStand, spelPrestaties, spelPraat, spelPraatStuur, teamNieuw, teamNodig, teamAntwoord, teamVerlaat, mijnTeams, sudokuNieuw, sudokuKlaar, toernooiNieuw, toernooiAntwoord, mijnToernooien, toernooiStaat, sneekScore, sneekBord, arcadeScore, arcadeBord, socialConnecties } = kern;
 
   function rtfSpeler(req, res) {
     const sess = rtf.verifieerProfiel(req.body.code, req.body.token);
@@ -72,6 +72,19 @@ module.exports = (kern) => {
     'zichtbaar-zet': (mij, b) => spelZichtbaarZet(mij, b.aan !== false),
     'sneek-score': (mij, b) => sneekScore(mij, b.punten),
     'sneek-bord': (mij) => Object.assign({ status: 200 }, sneekBord(mij, vriendenVan(mij))),
+    /* Teams: een vaste club om mee te spelen. Uitnodigen kan alleen binnen je
+       eigen kring, en die kring wordt HIER bepaald en niet in het verzoek --
+       net als bij een potje en een toernooi. */
+    'team-nieuw': (mij, b) => teamNieuw(mij, b.naam, (Array.isArray(b.leden) ? b.leden : []).filter(k => kringVan(mij).includes(k))),
+    'team-nodig': (mij, b) => teamNodig(mij, String(b.id || ''), (Array.isArray(b.leden) ? b.leden : []).filter(k => kringVan(mij).includes(k))),
+    'team-antwoord': (mij, b) => teamAntwoord(mij, String(b.id || ''), b.akkoord === true),
+    'team-verlaat': (mij, b) => teamVerlaat(mij, String(b.id || '')),
+    'team-mijn': (mij) => mijnTeams(mij),
+    /* Praten in het potje. Geen eigen berichtenvoorraad -- dit gaat de
+       communicatiekern in; zie kern/spellen/praat.js. Twee acties, want lezen
+       mag geen gesprek AANMAKEN. */
+    praat: (mij, b) => spelPraat(mij, String(b.id || ''), b.aantal),
+    'praat-stuur': (mij, b) => spelPraatStuur(mij, String(b.id || ''), b.tekst),
     /* Sudoku loopt NIET via arcade-score: de server geeft de puzzel uit en
        rekent de score. Er is dus ook geen tijd of getal dat hier binnenkomt --
        alleen het ingevulde rooster. */

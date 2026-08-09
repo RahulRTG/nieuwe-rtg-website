@@ -12,7 +12,7 @@
    codenaam (maakt geen vriendschap), via het door de server bevestigde
    klasgenoten-pad, of via de random wachtrij per spel en groepsgrootte.
    Beurten gaan via polling plus een SSE-duwtje. */
-module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, isGeblokkeerd, socialZoek, sociaalRate, volwassen, anthropic, sseClients, lidBoardUit }) => {
+module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, isGeblokkeerd, socialZoek, sociaalRate, volwassen, anthropic, sseClients, lidBoardUit, comm }) => {
   const fs = require('fs'), zlib = require('zlib'), path = require('path');
   const rid = (n) => crypto.randomBytes(n).toString('hex');
   const nu = () => new Date().toISOString();
@@ -147,8 +147,14 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
      toernooien. Deelnemers buiten de progressiegrens staan er zonder codenaam
      in; speelde niemand binnen de grens mee, dan wordt er niets bewaard. Zie
      spellen/uitslagen.js. */
+  /* Telemetrie: geaggregeerd, zonder personen. Hangt aan `noteerUitslag` en
+     niet aan de twee einden van een potje -- een plek, en meteen dezelfde
+     idempotentie. Zie spellen/telling.js voor waarom dit NAAST de uitslagen
+     staat en er niet uit wordt afgeleid. */
+  const { telPotje, spelTelemetrie } = require('./spellen/telling')({ db, save, nu, SOORTEN });
+
   const { noteerUitslag, spelUitslagen, spelStand } = require('./spellen/uitslagen')({
-    db, save, codenaamVan, nu, progressieMag
+    db, save, codenaamVan, nu, progressieMag, telPotje
   });
 
 
@@ -175,6 +181,7 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
     const s = S();
     toernooiVergeet(key);
     zettenVergeet(key);
+    teamVergeet(key);
     /* De arcadeborden en een lopende sudoku horen bij dezelfde sleutel en
        staan nergens anders in de weg: hier is niets van iemand anders bij, dus
        ze gaan gewoon weg. (Een uitslag is van meer dan een en wordt daarom
@@ -231,6 +238,25 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
   const { spelStaat, spelZet, spelOpgeven, spelKijk } = require('./spellen/partij')(ctx);
   // Rahul als spelmaatje: in elk potje op te roepen voor hints, regels of een peptalk
   const { spelRahul } = require('./spellen/rahul')(Object.assign({ anthropic }, ctx));
+
+  /* Praten in het potje. Geen eigen berichtenvoorraad: dit gaat de
+     communicatiekern in als een gesprek van soort 'group', met alles wat daar
+     al aan hangt (bewaartermijn, wisrecht, leesstand, sein). `comm` komt als
+     FUNCTIE binnen omdat de spellen in laag 1 worden opgebouwd en die kern pas
+     in laag 4 -- op het moment van aanroepen bestaat hij wel. Zonder comm (een
+     toets die alleen potjes speelt) blijft praten gewoon dicht. */
+  /* Teams: een vaste club om mee te spelen. Iedereen mag er een maken; wat dat
+     begrensd houdt staat in spellen/teams.js (niet openbaar, uitnodigen alleen
+     binnen je eigen kring, en pas lid als je ja zegt). Bewust ZONDER ranglijst
+     -- een teamstand zou onder de progressiegrens vallen en dan staat de helft
+     van een schoolteam er niet op. */
+  const { teamNieuw, teamNodig, teamAntwoord, teamVerlaat, mijnTeams, teamVergeet } =
+    require('./spellen/teams')({ db, save, rid, nu, codenaamVan, isGeblokkeerd, zijnVrienden,
+      klasgenotenVan, schoon: require('./util').schoon, sociaalRate });
+
+  const { spelPraat, spelPraatStuur } = require('./spellen/praat')(Object.assign({
+    comm: () => (typeof comm === 'function' ? comm() : comm) || null
+  }, ctx));
 
   /* ---------- Sudoku: de server maakt de puzzel en rekent de score ----------
      Het eerste arcadespel dat echt narekenbaar is. De oplossing blijft hier;
@@ -323,7 +349,7 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
   const sneekScore = (mij, punten) => arcadeScore(mij, 'sneek', punten);
   const sneekBord = (mij, vrienden) => arcadeBord(mij, 'sneek', vrienden);
 
-  return { spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelKijk, spelReplay, spelRahul, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, spelUitslagen, spelStand, spelPrestaties, sudokuNieuw, sudokuKlaar, spelVergeet, toernooiNieuw, toernooiAntwoord, mijnToernooien, toernooiStaat, sneekScore, sneekBord, arcadeScore, arcadeBord, SPEL_SOORTEN: SOORTEN,
+  return { spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelKijk, spelReplay, spelRahul, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, spelUitslagen, spelStand, spelPrestaties, spelPraat, spelPraatStuur, spelTelemetrie, teamNieuw, teamNodig, teamAntwoord, teamVerlaat, mijnTeams, sudokuNieuw, sudokuKlaar, spelVergeet, toernooiNieuw, toernooiAntwoord, mijnToernooien, toernooiStaat, sneekScore, sneekBord, arcadeScore, arcadeBord, SPEL_SOORTEN: SOORTEN,
     // alleen voor de drift-test: de client heeft een eigen kopie van deze
     // regels (directe feedback); de test houdt beide kopieën tegen elkaar
     _spelregels: { rummiSet: ruw.rummiSet, W_PREMIE: ruw.W_PREMIE, SPEL, ARCADE } };

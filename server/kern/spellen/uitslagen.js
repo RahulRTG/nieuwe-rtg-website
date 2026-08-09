@@ -35,7 +35,7 @@
 const { BELEID } = require('../../bewaarbeleid');
 
 module.exports = (ctx) => {
-  const { db, save, codenaamVan, progressieMag, nu } = ctx;
+  const { db, save, codenaamVan, progressieMag, nu, telPotje } = ctx;
 
   /* Het VENSTER waarover een stand gaat is de bewaartermijn van de log, en
      niet iets aparts. Daarom halen we hem daar op in plaats van hem hier over
@@ -71,6 +71,13 @@ module.exports = (ctx) => {
     if (!potje || potje.status !== 'klaar' || potje.uitslagGenoteerd) return null;
     const binnen = potje.spelers.filter(k => progressieMag(k));
     potje.uitslagGenoteerd = true;
+    /* De geaggregeerde teller hangt HIER en niet aan de twee plekken waar een
+       potje kan eindigen: dat zou twee kansen zijn om er een te vergeten, en
+       de idempotentie hierboven is er meteen ook die van de teller. Hij staat
+       VOOR de grens-controle, want er komt geen persoon in -- alleen het soort
+       spel en het aantal stoelen. Zou hij eronder staan, dan telde De Arena
+       stelselmatig niet mee. Zie spellen/telling.js. */
+    if (typeof telPotje === 'function') telPotje(potje);
     // niemand binnen de grens: geen spoor, ook niet anoniem
     if (!binnen.length) return null;
 

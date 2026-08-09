@@ -122,6 +122,16 @@ module.exports = (ctx) => {
      Zonder gekozen plek is alles raak; de Mall filtert dan niet op locatie. */
   function bedient(a, plek) {
     if (!plek || !plek.slug) return true;
+    /* Een zaak met filialen bedient een plek zodra EEN van haar vestigingen
+       dat doet; zie ./vestigingen.js. Zonder filialen is dit precies de oude
+       regel op de enige plek die er is. */
+    if (a.vestigingen && a.vestigingen.length > 1) {
+      return require('./vestigingen').bedientVanaf(a, plek, bedientEen);
+    }
+    return bedientEen(a, plek);
+  }
+
+  function bedientEen(a, plek) {
     if (a.plek.slug && a.plek.slug === plek.slug) return true;
     const b = a.bereik || { soort: 'adres', km: 0 };
     if (b.soort === 'europa' || b.soort === 'online') return true;
@@ -133,9 +143,18 @@ module.exports = (ctx) => {
     return false;
   }
 
-  // afstand in meters tussen een aanbod en een punt; null als een van beide ontbreekt
+  /* Afstand in meters tussen een aanbod en een punt; null als een van beide
+     ontbreekt. Bij filialen: de afstand tot de DICHTSTBIJZIJNDE vestiging --
+     anders staat een keten met een filiaal om de hoek onderaan omdat haar
+     hoofdkantoor in een andere stad zit. */
   function afstandTot(a, punt) {
-    if (!punt || !a.plek.punt) return null;
+    if (a.vestigingen && a.vestigingen.length > 1) {
+      return require('./vestigingen').afstandVanaf(a, punt, afstandEen);
+    }
+    return afstandEen(a, punt);
+  }
+  function afstandEen(a, punt) {
+    if (!punt || !a.plek || !a.plek.punt) return null;
     return haversine(a.plek.punt, punt);
   }
 
@@ -146,12 +165,15 @@ module.exports = (ctx) => {
   function plekkenUit(lijst) {
     const per = new Map();
     for (const a of lijst) {
-      if (!a.plek.slug) continue;
-      if (!per.has(a.plek.slug)) per.set(a.plek.slug, { slug: a.plek.slug, stad: a.plek.stad, land: a.plek.land, aantal: 0, punten: [] });
-      const p = per.get(a.plek.slug);
-      p.aantal++;
-      if (a.plek.punt) p.punten.push(a.plek.punt);
-      if (!p.land && a.plek.land) p.land = a.plek.land;
+      // een zaak met filialen telt mee in ELKE stad waar zij staat
+      for (const q of (a.vestigingen && a.vestigingen.length ? a.vestigingen : [a.plek])) {
+        if (!q.slug) continue;
+        if (!per.has(q.slug)) per.set(q.slug, { slug: q.slug, stad: q.stad, land: q.land, aantal: 0, punten: [] });
+        const p = per.get(q.slug);
+        p.aantal++;
+        if (q.punt) p.punten.push(q.punt);
+        if (!p.land && q.land) p.land = q.land;
+      }
     }
     return [...per.values()].map(p => ({
       slug: p.slug, stad: p.stad, land: p.land, aantal: p.aantal,

@@ -87,6 +87,23 @@ module.exports = (kern) => {
   })));
   app.post('/api/mall/collectie', auth, (req, res) => lijstStuur(res, mall.mallCollecties.toon(req.body.id)));
 
+  /* ---- de zakelijke ingang ----
+     Geen tweede Mall maar dezelfde, anders gefilterd: alleen aanbod met een
+     inkoopprijs, en die prijzen exclusief btw. De pas bepaalt het, niet het
+     verzoek -- anders koopt iedereen op inkoop door een vinkje te sturen. */
+  app.post('/api/mall/zakelijk', auth, (req, res) => {
+    if (req.session.tier !== 'business') {
+      return res.status(403).json({ error: 'De zakelijke Mall hoort bij de Business Pass. Een pas krijgt u niet hier maar via een gesprek met RTG.' });
+    }
+    res.json(mall.mallZoek({
+      q: String(req.body.q || '').slice(0, 120),
+      plek: req.body.plek, punt: req.body.punt, land: req.body.land,
+      verdieping: req.body.verdieping, type: req.body.type,
+      pagina: req.body.pagina, per: req.body.per,
+      zakelijk: true, zakelijkAlleen: true, noteer: true
+    }));
+  });
+
   /* ---- wat u lopen heeft, over de domeinen heen ----
      Nadrukkelijk GEEN gezamenlijke afrekening: achter deze regels zitten
      verschillende partijen met eigen bevestigingen. Zie kern/mall/bestellingen.js. */

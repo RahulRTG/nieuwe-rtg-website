@@ -60,6 +60,15 @@ module.exports = (ctx) => {
     }
     return cacheBezorg.get(code);
   }
+  const cacheVest = new Map();
+  function vestigingenVan(code) {
+    if (!code) return null;
+    if (!cacheVest.has(code)) {
+      const s = zaakMet(code);
+      cacheVest.set(code, s ? require('./vestigingen').vestigingenVan(s, plekVan) : null);
+    }
+    return cacheVest.get(code);
+  }
 
   function aanbod(o) {
     const type = TYPEN[o.type] ? o.type : null;
@@ -92,6 +101,12 @@ module.exports = (ctx) => {
          meegeven en wint dan. */
       waardering: o.waardering || waarderingVan(o.aanbieder.code),
       bezorgt: o.bezorgt != null ? !!o.bezorgt : bezorgtVan(o.aanbieder.code),
+      /* De filialen van de zaak. Een zaak zonder filialen krijgt een lijst van
+         een; zo hoeft de zoeklaag nergens twee gevallen te kennen. `perVestiging`
+         zegt eerlijk dat prijs en voorraad van de zaak als geheel zijn en niet
+         per filiaal -- zie de kop van ./vestigingen.js. */
+      vestigingen: o.vestigingen || vestigingenVan(o.aanbieder.code) || [o.plek],
+      perVestiging: false,
       beschikbaar: o.beschikbaar || null,
       cta: o.cta || TYPEN[type].cta,
       pagina: o.pagina,
@@ -135,7 +150,7 @@ module.exports = (ctx) => {
      verdwijnen: de fout komt als `stuk` mee terug en de Mall toont hem. */
   function alles() {
     geweigerd.length = 0;
-    cacheWaardering.clear(); cacheBezorg.clear();
+    cacheWaardering.clear(); cacheBezorg.clear(); cacheVest.clear();
     const out = [], stuk = [];
     for (const [naam, fn] of BRONNEN) {
       try { out.push(...fn()); }

@@ -21,6 +21,103 @@ Alles hieronder is daarvan afgeleid. Wat er niet uit volgt, hoort hier niet.
 
 ---
 
+## 0. De super-app-regel
+
+> **RTG Super Apps vervangen geen domeinsoftware. Ze orkestreren
+> domeinsoftware. Alleen apps die feitelijk dezelfde kern, dezelfde data én
+> dezelfde workflow dupliceren, mogen samensmelten tot één product.**
+
+De toetsvraag bij elke app die "erbij" of "eraf" moet, is daarom niet *"kan dit
+in een super-app?"* maar:
+
+> **Is dit een zelfstandige professionele capability, of is dit slechts een
+> andere ingang naar dezelfde capability?**
+
+Alleen in het tweede geval samenvoegen. In het eerste geval een laag erboven.
+
+### Drie lagen
+
+| Laag | Wat het is | Voorbeelden die er nu staan |
+|---|---|---|
+| **1 — Specialistische apps** | Echte software per genre, met eigen kern, eigen data en eigen diepte | Sound, Theater, Clips, Podium, Agenda, Notities, Bestanden, dispatch, ovroutes, horeca, payroll, school |
+| **2 — Genre-superapps** | De ontdek-, identiteits-, distributie- en samenhanglaag over één wereld | RTG Media, RTG Mobiliteit, het Privékantoor |
+| **3 — RTG-hoofdlaag** | Identiteit, zoeken, AI, betalen, meldingen, vrienden, rechten, bestanden, locatie en workflows dwars over apps heen | het OS zelf (`apps/app.html`), `kern/comm`, RTG Pay, de kluis |
+
+De gebruiker ervaart één wereld; de professional houdt gespecialiseerde
+software. Mobiliteit is één Uber-achtige ervaring waarin iemand zegt "breng mij
+naar Parijs", terwijl daaronder afzonderlijke serieuze systemen blijven bestaan
+voor rijden, fietsen, OV, chauffeurs, verkeersleiding, routebeheer en dispatch.
+Media laat iemand een artiest ontdekken, een nummer luisteren in Sound, een
+concert boeken via Podium en een documentaire kijken in Video — zonder die vier
+producten in één scherm te persen.
+
+### Waarom deze regel er staat
+
+Twee samenvoegingen in dit huis zijn allebei goed afgelopen, om
+tegengestelde redenen — en juist dat verschil is de regel:
+
+- **`comm.html` mócht vier apps vervangen.** Er waren zes berichtenvoorraden en
+  vier voordeuren naar hetzelfde: één gespreksmodel, één poort, één leesstand.
+  Vier verschijningsvormen van dezelfde capability.
+- **`veilig.html` mócht vier apps vervangen.** Thuiswacht, Codewoord, Vitaal en
+  Thuisrust deelden `kern/veiligheid/`, `shared/veiligheid.js`, dezelfde kring en
+  dezelfde grens. Ze verschilden alleen in de vraag die ze stelden.
+- **`media.html` mócht dat juist NIET.** Klankwerk, Theater, Clips en Podium
+  hebben elk een eigen catalogus, eigen makers en een eigen vak. Ze samenpersen
+  zou identiteit en functie vernietigen. De Media OS bezit die vier domeinen
+  daarom niet: elke rij wordt bij het opvragen uit het domein zelf gehaald.
+  Dat staat als ontwerpbesluit ook in `apps/app-main/app-main-24.js`: *naast, en
+  niet in plaats daarvan.*
+
+De verleiding gaat altijd één kant op — alles samenvoegen tot er nog één scherm
+over is. Dat levert geen super-app maar een monsterapp met vijfduizend functies.
+Het doel is een ecosysteem: **de superapps zijn de steden, de gespecialiseerde
+apps de gebouwen.**
+
+### Wat dit betekent voor het aantal apps
+
+Het aantal tegels is geen doel op zich, in geen van beide richtingen. Een tegel
+minder is winst als hij een tweede voordeur naar dezelfde kern was, en verlies
+als hij een eigen vak was. De maat is de toetsvraag hierboven, niet het getal.
+
+### Welke laag-2-superapps er staan, en welke ontbreken
+
+Gemeten en niet aangenomen: per catalogus-app zijn de `/api/`-routes uit de
+pagina en haar eigen scripts gehaald, en daarna gegroepeerd op de kern die ze
+aanroepen. Wat dat opleverde:
+
+| Wereld | Laag 2 | Stand |
+|---|---|---|
+| Media | `apps/media.html` | **staat** — haalt elke rij uit het domein zelf op |
+| Mobiliteit | `apps/ov.html` + `dispatch` + `zakelijk` | **staat** — 25 vervoersmodules op één kern |
+| Privékantoor | `apps/lifestyle.html` op `kern/bureau/` | **staat** — 20 kamers naar 23 apps |
+| Communicatie | `apps/comm.html` | **staat** (was een terechte samensmelting) |
+| Veiligheid | `apps/veilig.html` | **staat** (was een terechte samensmelting) |
+| Werk | `apps/werk.html` | **staat** — voor organisaties |
+| Office | — | **ontbreekt** |
+| Reizen | — | **ontbreekt** (consumentenkant; het Privékantoor dekt alleen de premium-kant) |
+| Social | — | **ontbreekt** |
+| Games | — | **ontbreekt** |
+| Mall | — | **ontbreekt** (`apps/mall.html` bestaat en staat niet in de bibliotheek) |
+
+Twee waarschuwingen bij die meting, zodat niemand haar sterker leest dan ze is.
+Ze kijkt naar **links en routes**, dus een laag die zijn domeinen via de server
+ophaalt in plaats van via een link (precies wat de Media OS doet, en goed doet)
+lijkt minder te dekken dan hij dekt. En een app zonder eigen route is niet
+vanzelf leeg: hij kan op de gedeelde laag draaien.
+
+Wat de meting wél hard maakte: `/api/member/rechterhand` wordt door **twaalf**
+catalogus-apps aangeroepen — Cercle, Entourage, Attenties, Reisboek, Hangar,
+Maison, Table, Cellier, Garde-robe, Logboek, Mecenaat en Nalatenschap. Dat ziet
+eruit als twaalf ingangen naar één kern, en dus als een samensmelting. Het is
+het niet: elk van de twaalf heeft een eigen module in `kern/rechterhand/` met
+eigen data en een eigen workflow (een wijnkelder met drinkvenster is geen
+nalatenschap met versleutelde velden). Ze delen een routenaam en een dossier,
+niet een capability. **Een gedeeld routevoorvoegsel is geen gedeelde kern** — en
+dat is precies de fout die de toetsvraag hierboven moet voorkomen.
+
+---
+
 ## 1. Wat er vandaag al staat
 
 Dit is geen groen veld, en dat is het belangrijkste feit in dit document. De

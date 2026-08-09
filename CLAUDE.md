@@ -8,6 +8,12 @@ Website + ledenportaal + app (PWA) voor Rahul Travel Group (RTG) — een members
 
 **`README.md` is de actuele technische documentatie** (structuur, starten, API-overzicht, PWA, partnerkanaal) — lees die eerst bij technische vragen. Dit CLAUDE.md bevat vooral de merkregels en afspraken die niet uit de code af te leiden zijn.
 
+**`PLATFORM.md` bevat de super-app-regel** — lees die vóór je apps samenvoegt of
+een nieuwe app aanmaakt. In één zin: super apps vervangen geen domeinsoftware,
+ze orkestreren die; alleen apps die dezelfde kern, data én workflow dupliceren
+mogen samensmelten. De toetsvraag is niet "kan dit in een super-app?" maar "is
+dit een zelfstandige capability, of een tweede ingang naar dezelfde?".
+
 **`LAT.md` is de technische lat** — negen regels die allemaal uit een fout komen die hier écht is gemaakt, met per regel wat hem handhaaft en waar er alleen op mensen wordt vertrouwd. Lees die vóór je code schrijft of repareert. De belangrijkste twee: repareer de oorzaak en niet het symptoom, en trek elke bewering na met een mutatie (een toets die je niet hebt zien zakken is geen toets). LAT.md gaat over de code, CLAUDE.md over het merk.
 
 ## Structuur en starten (kort)

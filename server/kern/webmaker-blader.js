@@ -30,6 +30,12 @@ module.exports = ({ store, save, slug, publiek }) => {
     const d = store().lijst.find(x => x.adres === a && x.online);
     return d ? (d.zaakCode || '') : '';
   }
+  // wiens site staat er op dit adres (voor de persoon-balk en het formulier)
+  function eigenaarVanAdres(adresIn) {
+    const a = slug(adresIn);
+    const d = store().lijst.find(x => x.adres === a && x.online);
+    return d ? (d.eigenaar || '') : '';
+  }
   function open(adresIn) {
     const a = slug(adresIn);
     const d = store().lijst.find(x => x.adres === a && x.online);
@@ -37,5 +43,5 @@ module.exports = ({ store, save, slug, publiek }) => {
     d.bezoeken = (d.bezoeken || 0) + 1; save();
     return { ok: true, site: publiek(d) };
   }
-  return { gids, adresVanZaak, zaakVanAdres, zoek, open };
+  return { gids, adresVanZaak, zaakVanAdres, eigenaarVanAdres, zoek, open };
 };

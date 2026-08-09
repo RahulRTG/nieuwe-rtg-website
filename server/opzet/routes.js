@@ -111,6 +111,7 @@ module.exports = function hangRoutesOp(kern) {
   require('../routes/muziek-samen')(grens('muziek-samen'));
   require('../routes/atelierweb')(grens('atelierweb'));
   require('../routes/webmaker')(grens('webmaker'));
+  require('../routes/webbrowser')(grens('webbrowser'));
   require('../routes/journalistiek')(grens('journalistiek'));
   require('../routes/markt')(grens('markt'));
   require('../routes/borden')(grens('borden'));

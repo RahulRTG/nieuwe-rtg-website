@@ -1531,14 +1531,24 @@
       "wbwVerreken",
       "wbwVerzoek"
     ],
-    "webmaker": [
+    "webbrowser": [
       "addTicket",
-      "antivirus",
-      "atelierweb",
+      "codenaamVan",
+      "commDm",
+      "connectieTussen",
       "findSupplier",
       "liveCodename",
-      "media",
       "save",
+      "sseToCustomer",
+      "verbActief",
+      "webmaker",
+      "webplatform"
+    ],
+    "webmaker": [
+      "antivirus",
+      "atelierweb",
+      "liveCodename",
+      "media",
       "webmaker",
       "webmakerAi",
       "webplatform"

@@ -162,9 +162,6 @@ test('6. het formulier op de bedrijfssite landt als klus bij de zaak, op codenaa
   // op de bedrijfssite staat het formulier; op een ledensite zonder zaak niet
   const open = await api('/api/browser/open', { adres: 'es-vedra-cruises' }, lid);
   assert.ok(alleBlokken(open.body.site).some(b => b.type === 'formulier'), 'de bedrijfssite draagt het formulier (op de contactpagina)');
-  const ledensite = await api('/api/browser/open', { adres: 'nep-vedra' }, lid);
-  assert.ok(!alleBlokken(ledensite.body.site).some(b => b.type === 'formulier'),
-    'zonder ontvanger geen formulier -- een knop die niets doet is erger dan geen knop');
 
   const stuur = await api('/api/browser/bericht', { adres: 'es-vedra-cruises', tekst: 'Is de sunset cruise rolstoeltoegankelijk?' }, lid);
   assert.equal(stuur.status, 200, JSON.stringify(stuur.body));
@@ -175,9 +172,52 @@ test('6. het formulier op de bedrijfssite landt als klus bij de zaak, op codenaa
   assert.match(klus.by, /^RTG-web · /, 'op codenaam, niet op naam');
   assert.ok(!/Web Lid/.test(klus.by), 'de echte naam van het lid reist niet mee');
 
-  // naar een ledensite zonder zaak kan geen bericht
+  // je eigen site aanschrijven is geen gesprek
   const mis = await api('/api/browser/bericht', { adres: 'nep-vedra', tekst: 'Hallo daar' }, lid);
-  assert.equal(mis.status, 404);
+  assert.equal(mis.status, 400);
+});
+
+test('10. de persoonlijke site: op codenaam, en het formulier wordt een gesprek -- alleen tussen verbonden leden', async () => {
+  const reg = await api('/api/auth/register', { name: 'Persoon Twee', email: 'persoon2@voorbeeld.test',
+    password: 'webgeheim34', geboortedatum: '1993-03-03', tier: 'rtg', pasApp: 'rtg' });
+  const lid2 = reg.body.token;
+
+  const g = await api('/api/site/persoonlijk', {}, lid2);
+  assert.equal(g.status, 200, JSON.stringify(g.body));
+  const codenaam = g.body.design.titel;
+  assert.equal(g.body.adres, codenaam.toLowerCase().replace(/[^a-z0-9]+/g, '-'), 'het adres is de codenaam');
+  assert.ok(!/Persoon Twee/.test(JSON.stringify(g.body.design)), 'de echte naam komt nergens in het ontwerp');
+  // nog eens vragen geeft dezelfde site terug, geen tweede
+  const g2 = await api('/api/site/persoonlijk', {}, lid2);
+  assert.equal(g2.body.bestond, true);
+
+  // de browser begrijpt dat dit een persoon is en geeft de codenaam mee
+  const open = await api('/api/browser/open', { adres: g.body.adres }, lid);
+  assert.equal(open.status, 200);
+  assert.equal((open.body.persoon || {}).codenaam, codenaam);
+  assert.equal(open.body.zaak, null);
+  assert.ok(alleBlokken(open.body.site).some(b => b.type === 'formulier'), 'de contactpagina draagt het formulier');
+
+  // een vreemde bereikt het lid niet: eerst verbinden, zoals overal in dit huis
+  const koud = await api('/api/browser/bericht', { adres: g.body.adres, tekst: 'Hallo, mooi werk hier.' }, lid);
+  assert.equal(koud.status, 403);
+  assert.match(koud.body.error, /verbonden/i);
+
+  // verbinden: lid 1 vraagt, lid 2 aanvaardt
+  const mijnKey = (await api('/api/member/connections', {}, lid)).body.me;
+  const zoek = await api('/api/member/find', { q: codenaam }, lid);
+  const gevonden = (zoek.body.results || []).find(x => x.codename === codenaam);
+  assert.ok(gevonden, 'de codenaam is vindbaar');
+  assert.equal((await api('/api/member/connect', { key: gevonden.key }, lid)).status, 200);
+  assert.equal((await api('/api/member/connect/respond', { key: mijnKey, action: 'accept' }, lid2)).status, 200);
+
+  // en nu wordt het formulier een gesprek, op codenaam
+  const warm = await api('/api/browser/bericht', { adres: g.body.adres, tekst: 'Hallo, mooi werk hier.' }, lid);
+  assert.equal(warm.status, 200, JSON.stringify(warm.body));
+  assert.equal(warm.body.via, 'chat');
+  const dm = await api('/api/member/dm', { withKey: mijnKey }, lid2);
+  assert.ok((dm.body.messages || []).some(m => /Via jouw site: Hallo, mooi werk hier\./.test(m.text)),
+    'het bericht staat in het gesprek van de ontvanger');
 });
 
 test('8. een lid bouwt een site met meerdere pagina\'s, met dezelfde schoonmaak en grenzen', async () => {

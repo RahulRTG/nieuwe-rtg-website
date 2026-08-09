@@ -1,10 +1,7 @@
-/* Routes voor de Website-maker (leden) en de RTG-browser.
-
-   Bouwen en publiceren zit achter de gewone leden-inlog en is voor echte leden
-   (geen gast). De browser-gids en het openen van een site mag elk ingelogd lid,
-   zodat je door het RTG-web kunt bladeren. */
+/* Routes voor de Website-maker: de bouwkant, voor leden en zaken. De
+   leeskant (de RTG-browser) staat in routes/webbrowser.js. */
 module.exports = (kern) => {
-  const { app, auth, webmaker, webplatform, webmakerAi, atelierweb, antivirus, media, supplierAuth, findSupplier, addTicket, liveCodename, save } = kern;
+  const { app, auth, webmaker, webplatform, webmakerAi, atelierweb, antivirus, media, supplierAuth, liveCodename } = kern;
   const FOTO_MAX_BYTES = 2 * 1024 * 1024; // ~2 MB per foto
   const stuur = (res, r) => r && r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const geenGast = (req, res) => {
@@ -24,6 +21,23 @@ module.exports = (kern) => {
   app.post('/api/site/verwijder', auth, (req, res) => { if (geenGast(req, res)) return; stuur(res, webmaker.verwijder(req.session.key, (req.body || {}).id)); });
   app.post('/api/site/publiceer', auth, (req, res) => { if (geenGast(req, res)) return; const b = req.body || {}; stuur(res, webmaker.publiceer(req.session.key, b.id, b.adres)); });
   app.post('/api/site/offline', auth, (req, res) => { if (geenGast(req, res)) return; stuur(res, webmaker.offline(req.session.key, (req.body || {}).id)); });
+
+  /* ---- de persoonlijke site: ieders eigen plek op het RTG-web ----
+     Op CODENAAM -- de echte naam blijft in de kluis. Zelfde principe als de
+     bedrijfssite: een compleet startpunt in een keer, daarna van het lid. */
+  app.post('/api/site/persoonlijk', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    const codenaam = liveCodename(req.session);
+    const adres = webmaker.slug(codenaam);
+    // bestaat je persoonlijke site al, dan krijg je hem terug in plaats van een tweede
+    const bestaande = webmaker.mijn(req.session.key).find(d => d.adres === adres);
+    if (bestaande) return res.json({ ok: true, bestond: true, design: webmaker.haal(req.session.key, bestaande.id), adres });
+    const r = webmaker.bewaar(req.session.key, webplatform.genereerPersoon(codenaam));
+    if (r.error) return stuur(res, r);
+    const p = webmaker.publiceer(req.session.key, r.design.id, adres);
+    if (p.error) return stuur(res, p);
+    res.json({ ok: true, design: webmaker.haal(req.session.key, r.design.id), adres: p.adres });
+  });
 
   /* ---- AI in de maker ----
      De opdracht werkt op het ontwerp zoals het NU op het doek staat (ook
@@ -115,38 +129,4 @@ module.exports = (kern) => {
   app.post('/api/supplier/site/publiceer', supplierAuth, (req, res) => { const b = req.body || {}; stuur(res, webmaker.publiceer(zaakKey(req), b.id, b.adres)); });
   app.post('/api/supplier/site/offline', supplierAuth, (req, res) => { stuur(res, webmaker.offline(zaakKey(req), (req.body || {}).id)); });
 
-  // ---- de browser (elk ingelogd lid mag bladeren) ----
-  app.post('/api/browser/gids', auth, (req, res) => { res.json({ lijst: webmaker.gids() }); });
-  app.post('/api/browser/open', auth, (req, res) => {
-    const r = webmaker.open((req.body || {}).adres);
-    if (r.error) return stuur(res, r);
-    /* hoort de site bij een zaak, dan worden de live blokken nu uit het
-       zaakprofiel opgelost en krijgt de browser de acties mee -- zo weet het
-       scherm dat dit een bedrijf is en niet zomaar een pagina. */
-    const s = (r.site.zaakCode && findSupplier) ? findSupplier(r.site.zaakCode) : null;
-    r.site = webplatform.losSite(r.site, s);
-    res.json({ ok: true, site: r.site, zaak: s ? webplatform.zaakInfo(s) : null });
-  });
-  /* het formulier op een bedrijfssite: het bericht landt als klus (ticket) bij
-     de zaak zelf, op de codenaam van het lid -- geen los postvak dat niemand
-     leest, maar de werklijst die de zaak al heeft. */
-  app.post('/api/browser/bericht', auth, (req, res) => {
-    const b = req.body || {};
-    const tekst = String(b.tekst || '').trim().slice(0, 500);
-    if (tekst.length < 3) return res.status(400).json({ error: 'Schrijf eerst een bericht.' });
-    const code = webmaker.zaakVanAdres(b.adres);
-    const s = code && findSupplier ? findSupplier(code) : null;
-    if (!s) return res.status(404).json({ error: 'Deze site heeft geen bedrijf erachter; het formulier werkt alleen op bedrijfssites.' });
-    addTicket(s.code, { name: 'RTG-web · ' + (liveCodename ? liveCodename(req.session) : 'lid') }, 'Websitebericht: ' + tekst.slice(0, 140));
-    save();
-    res.json({ ok: true });
-  });
-  /* universeel zoeken: sites en bedrijven in een adem. Een bedrijf met een
-     eigen online site krijgt het adres mee, zodat zoeken direct het RTG-web in
-     leidt. */
-  app.post('/api/browser/zoek', auth, (req, res) => {
-    const q = (req.body || {}).q;
-    const zaken = webplatform.zoekZaken(q).map(z => Object.assign(z, { adres: webmaker.adresVanZaak(z.code) || '' }));
-    res.json({ sites: webmaker.zoek(q), zaken });
-  });
 };

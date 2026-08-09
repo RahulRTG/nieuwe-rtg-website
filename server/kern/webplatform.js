@@ -81,21 +81,23 @@ module.exports = ({ db }) => {
   /* Alle zaakdata-blokken in een gepubliceerde site oplossen. Site zonder
      zaak (of zaak die weg is): de live blokken vallen stil weg in plaats van
      als lege dozen te blijven staan. */
-  function losBlokken(lijst, s) {
+  function losBlokken(lijst, s, magFormulier) {
     const blokken = [];
     (lijst || []).forEach(b => {
-      /* een formulier heeft een ontvanger nodig: zonder zaak erachter zou
-         het een knop zijn die stilletjes niets doet, dus dan staat hij er niet */
-      if (b.type === 'formulier') { if (s) blokken.push(b); return; }
+      /* een formulier heeft een ontvanger nodig: bij een zaak is dat de
+         werklijst, bij een lid het gesprek -- zonder ontvanger zou het een
+         knop zijn die stilletjes niets doet, dus dan staat hij er niet */
+      if (b.type === 'formulier') { if (magFormulier) blokken.push(b); return; }
       if (b.type !== 'zaakdata') { blokken.push(b); return; }
       if (s) blokken.push(...los(b, s));
     });
     return blokken;
   }
-  function losSite(site, s) {
+  function losSite(site, s, magFormulier) {
+    const mf = magFormulier === undefined ? !!s : magFormulier;
     return Object.assign({}, site, {
-      blokken: losBlokken(site.blokken, s),
-      paginas: (site.paginas || []).map(p => Object.assign({}, p, { blokken: losBlokken(p.blokken, s) }))
+      blokken: losBlokken(site.blokken, s, mf),
+      paginas: (site.paginas || []).map(p => Object.assign({}, p, { blokken: losBlokken(p.blokken, s, mf) }))
     });
   }
 
@@ -149,6 +151,26 @@ module.exports = ({ db }) => {
     return { titel: s.name, thema: 'donker', accent: '#7F1634', blokken, paginas };
   }
 
+  /* De persoonlijke site: ieders eigen plek op het RTG-web, op CODENAAM --
+     de echte naam blijft in de kluis, ook hier. Zelfde principe als de
+     bedrijfssite: een compleet startpunt, daarna van het lid zelf. */
+  function genereerPersoon(codenaam) {
+    return { titel: codenaam, thema: 'donker', accent: '#7F1634',
+      blokken: [
+        { id: 'gp-hero', type: 'hero', kop: codenaam, sub: 'Lid van Rahul Travel Group', knop: 'Maak kennis' },
+        { id: 'gp-intro', type: 'tekst', tekst: 'Dit is mijn eigen plek op het RTG-web. Vertel hier wie je bent, wat je maakt of waar je van houdt -- open de Website-maker en maak hem van jou.' },
+        { id: 'gp-kol', type: 'kolommen', lk: 'Wat ik doe', lt: 'Schrijf hier over je werk, je vak of je projecten.', rk: 'Waar ik van houd', rt: 'Reizen, muziek, eten -- wat je maar kwijt wilt.' },
+        { id: 'gp-voet', type: 'voettekst', tekst: codenaam + ' · op het RTG-web' }
+      ],
+      paginas: [
+        { id: 'gp-p-contact', naam: 'Contact', slug: 'contact', blokken: [
+          { id: 'gp-ct', type: 'tekst', tekst: 'Een bericht via deze pagina komt binnen als gesprek in mijn leden-app. We moeten daarvoor wel verbonden zijn -- zo houden we het hier rustig.' },
+          { id: 'gp-form', type: 'formulier', kop: 'Schrijf me', knop: 'Verstuur' },
+          { id: 'gp-voet2', type: 'voettekst', tekst: codenaam + ' · op het RTG-web' }
+        ] }
+      ] };
+  }
+
   /* Universeel zoeken: niet alleen sites maar ook de bedrijven erachter.
      Alleen wat al publiek is (naam, stad, type) -- het zoekvak is geen
      achterdeur naar het zaakprofiel. */
@@ -163,5 +185,5 @@ module.exports = ({ db }) => {
       .map(s => ({ code: s.code, naam: s.name, stad: s.city || '', typeLabel: typeLabel(s) }));
   }
 
-  return { BRONNEN, genereer, los, losSite, zaakInfo, zoekZaken };
+  return { BRONNEN, genereer, genereerPersoon, los, losSite, zaakInfo, zoekZaken };
 };

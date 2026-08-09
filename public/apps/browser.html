@@ -288,13 +288,14 @@ function tekenBlok(blok,ver){
     s.classList.add('b-tekst');
     const h2=document.createElement('h2');h2.style.cssText='font-family:\'Bodoni Moda\',serif;margin-bottom:.6rem;';tekst(h2,T.kop);s.appendChild(h2);
     const f=document.createElement('form');
-    const ta=document.createElement('textarea');ta.rows=4;ta.maxLength=500;ta.placeholder='Uw bericht aan '+(HUIDIGE&&HUIDIGE.zaak?HUIDIGE.zaak.naam:'dit bedrijf')+'…';
+    const ta=document.createElement('textarea');ta.rows=4;ta.maxLength=500;ta.placeholder='Uw bericht aan '+(HUIDIGE&&HUIDIGE.zaak?HUIDIGE.zaak.naam:(HUIDIGE&&HUIDIGE.persoon?HUIDIGE.persoon.codenaam:'de maker'))+'…';
     ta.style.cssText='width:100%;background:transparent;border:1px solid currentColor;border-radius:10px;padding:.7rem;color:inherit;font:inherit;opacity:.9;';
     const kn=document.createElement('button');kn.type='submit';kn.className='b-knop';tekst(kn,T.knop);kn.style.cssText='margin-top:.6rem;cursor:pointer;border:0;';
     f.appendChild(ta);f.appendChild(kn);
     f.addEventListener('submit',async ev=>{ev.preventDefault();
       const tk=ta.value.trim(); if(tk.length<3){meld('Schrijf eerst een bericht.');return;}
-      try{ await api('bericht',{adres:HUIDIGE.site.adres,tekst:tk}); ta.value=''; meld('Verstuurd. Het bedrijf ziet uw bericht in zijn werklijst, op uw codenaam.'); }
+      try{ const r=await api('bericht',{adres:HUIDIGE.site.adres,tekst:tk}); ta.value='';
+        meld(r.via==='chat'?'Verstuurd als gesprek in de leden-app, op uw codenaam.':'Verstuurd. Het bedrijf ziet uw bericht in zijn werklijst, op uw codenaam.'); }
       catch(e){ meld(e.message); }
     });
     s.appendChild(f);
@@ -329,7 +330,7 @@ async function toonSite(adres,pad){
       }
       site=Object.assign({},site,{blokken:pg.blokken,volgorde:null});
     }
-    HUIDIGE={site,zaak:d.zaak||null};
+    HUIDIGE={site,zaak:d.zaak||null,persoon:d.persoon||null};
     document.title=site.titel+' · RTG Browser';
     const wrap=document.createElement('div'); wrap.className='sitewrap';
     /* de site hoort bij een bedrijf: de browser toont wie dit is en wat je
@@ -344,6 +345,16 @@ async function toonSite(adres,pad){
       const LABELS={reserveren:'Reserveer',bestellen:'Bestel',boeken:'Boek',diensten:'Diensten',kamers:'Kamers',chat:'Chat'};
       (z.acties||[]).forEach(a=>{ const c=document.createElement('a');c.className='chip';c.href='/apps/app.html';c.textContent=LABELS[a]||a;kn.appendChild(c); });
       const open=document.createElement('a');open.className='chip hoofd';open.href='/apps/app.html';open.textContent='Open in de leden-app';kn.appendChild(open);
+      balk.appendChild(kn); wrap.appendChild(balk);
+    }
+    /* iemands eigen plek: de browser toont de codenaam en biedt verbinden
+       en chatten via de leden-app -- de browser begrijpt ook personen */
+    if(!d.zaak&&d.persoon){
+      const balk=document.createElement('div'); balk.className='zaakbalk';
+      const nm=document.createElement('span');nm.className='zn';nm.textContent=d.persoon.codenaam;balk.appendChild(nm);
+      const mt=document.createElement('span');mt.className='zm';mt.textContent='Lid op het RTG-web';balk.appendChild(mt);
+      const kn=document.createElement('span');kn.className='zk';
+      const c=document.createElement('a');c.className='chip hoofd';c.href='/apps/app.html';c.textContent='Verbind & chat in de leden-app';kn.appendChild(c);
       balk.appendChild(kn); wrap.appendChild(balk);
     }
     // de paginabalk: Home plus de extra pagina's van de site

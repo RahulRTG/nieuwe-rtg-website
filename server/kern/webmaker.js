@@ -168,6 +168,6 @@ module.exports = ({ db, save, crypto, schoon, media }) => {
   const blader = require('./webmaker-blader')({ store, save, slug, publiek });
 
   return { mijn, haal, bewaar, verwijder, publiceer, offline, slug,
-           gids: blader.gids, open: blader.open, zoek: blader.zoek, adresVanZaak: blader.adresVanZaak, zaakVanAdres: blader.zaakVanAdres,
+           gids: blader.gids, open: blader.open, zoek: blader.zoek, adresVanZaak: blader.adresVanZaak, zaakVanAdres: blader.zaakVanAdres, eigenaarVanAdres: blader.eigenaarVanAdres,
            fotos, fotoBewaar, fotoWeg, TYPES };
 };

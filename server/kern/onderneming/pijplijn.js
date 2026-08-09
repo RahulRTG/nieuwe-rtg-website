@@ -86,7 +86,11 @@ module.exports = ({ db }) => {
     omschrijving: String(x.omschrijving || '').slice(0, 80),
     stadium: x.status, bedrag: Number.isFinite(Number(x.prijs)) ? Number(x.prijs) : null,
     dagen: dagenGeleden(x.status === 'aangeboden' ? (x.antwoordAt || x.at) : x.at, nuT),
-    wens: x.wens || null
+    wens: x.wens || null,
+    /* Hoeveel regels de prijs dragen. Null en niet 0 als er geen opbouw is: een
+       offerte met alleen een bedrag is niet hetzelfde als een offerte die uit
+       nul regels is opgebouwd. Zie kern/onderneming/offertebouw.js. */
+    opgebouwd: Array.isArray(x.regels) && x.regels.length ? x.regels.length : null
   });
 
   /* De scoringskans uit de eigen geschiedenis. Alleen offertes die de zaak

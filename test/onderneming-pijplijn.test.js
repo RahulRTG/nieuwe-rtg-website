@@ -225,6 +225,19 @@ test('er komt geen enkele echte naam of sleutel in het antwoord', () => {
   assert.ok(!tekst.includes('customerKey'));
 });
 
+test('een opgebouwde offerte laat zien dat hij is opgebouwd, een kale niet', () => {
+  const K = stubKern([
+    aangeboden(240, 1, { regels: [{ omschrijving: 'Uur', aantal: 4, stuk: 60, btw: 21 }] }),
+    aangeboden(500, 1)
+  ]);
+  const p = K.ondernemingPijplijn(ond(K), NU);
+  const met = p.rijen.find(r => r.bedrag === 240);
+  const zonder = p.rijen.find(r => r.bedrag === 500);
+  assert.equal(met.opgebouwd, 1);
+  assert.equal(zonder.opgebouwd, null,
+    'niet 0: een offerte met alleen een bedrag is iets anders dan een die uit nul regels bestaat');
+});
+
 /* ---------------- het dagbeeld ---------------- */
 
 test('het dagbeeld draagt de pijplijn en zet zijn opvolging voor die van de relaties', () => {

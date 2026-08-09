@@ -1881,6 +1881,45 @@ toetste wel een vorm zónder `oprichting`-veld, maar niet een met een lege lijst
 -- en juist die kwam er ongestraft doorheen. Er staat nu een geval met
 `oprichting: []`; daarna beet de mutatie wel.
 
+### De offertebouwer: een prijs die is opgebouwd in plaats van bedacht
+
+`server/kern/onderneming/offertebouw.js` + `server/kern/regelsom.js`, gebruikt
+door `offerteAntwoord` in `kern/vakwerk/pro.js`
+(`/api/supplier/vak/offerte/antwoord`, ongewijzigde route).
+
+De offertestroom vroeg de zaak om één getal. Dat werkt, en het gaat mis zodra
+een klus uit meer dan één ding bestaat: de ondernemer rekent het op een kladje
+uit, de klant krijgt een bedrag zonder te zien waarvoor, en bij het factureren
+begint het rekenwerk opnieuw. Nu kan de prijs uit **regels** komen — uit het
+eigen aanbod (de prijs komt daarvandaan, dus een tariefverhoging werkt door
+zonder dat er een offerte wordt nagelopen) of los ingevoerd (materiaal,
+voorrijkosten). De regels reizen mee naar de klant.
+
+**Een dienst die niet bestaat wordt geweigerd, niet stil overgeslagen.** Anders
+denkt de ondernemer dat zijn tarief in de offerte staat terwijl er iets anders
+of niets staat — en dat is een te lage offerte die er compleet uitziet. Om
+dezelfde reden heeft elke losse regel een omschrijving nodig: een bedrag zonder
+reden leest de klant als willekeur.
+
+**De som staat niet in de bouwer.** `kern/regelsom.js` is nieuw en rekent hem,
+dezelfde functie die de factuurmotor nu gebruikt (die had zijn eigen kopie). Een
+offerte van 1.000 euro die een factuur van 999,99 oplevert, is een cent waar een
+klant een mail over stuurt en niemand het antwoord op weet. Stukprijzen zijn
+inclusief btw en de btw wordt per regel teruggerekend, zodat 9% en 21% in
+dezelfde offerte kunnen staan.
+
+**De offertestroom blijft de enige schrijver.** De bouwer is puur: hij leest de
+zaak en rekent. De status, de melding aan de klant en de boeking bij akkoord
+blijven waar ze stonden. Alleen een prijs opgeven mag ook nog steeds — een klus
+van een uur is soms gewoon een bedrag.
+
+Getoetst in `test/onderneming-offertebouw.test.js` (15). Zeven mutaties, alle
+zeven raak: een onbekende dienst stil overslaan, een meegestuurde prijs het
+eigen tarief laten overschrijven, de btw-lijst laten uiteenlopen met die van de
+facturatie, de btw verkeerd terugrekenen, een eigen tarief per regel negeren,
+een fout uit de bouwer negeren, en een losse regel zonder omschrijving
+doorlaten.
+
 ### RTG Werk OS (de werkplek van een organisatie)
 
 `server/bedrijf/` + `/api/bedrijf/...` + `/apps/werk.html`. Een **werkruimte**

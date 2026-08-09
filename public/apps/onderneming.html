@@ -567,7 +567,9 @@ function vakPijplijn(){
     '<span>'+esc(r.klant||'onbekend')+' &middot; '+esc(r.omschrijving)+'<br>'+
     '<span class="bu">'+esc(r.stadium)+'</span></span>'+
     '<span>'+(r.bedrag===null?'-':euro(r.bedrag))+'<br><span class="bu">'+
-    (r.dagen===null?'':r.dagen+' dagen')+'</span></span></div>').join('');
+    (r.dagen===null?'':r.dagen+' dagen')+
+    (r.opgebouwd?' &middot; '+r.opgebouwd+' regel'+(r.opgebouwd===1?'':'s'):'')+
+    '</span></span></div>').join('');
   return '<div class="vak"><h2>Pijplijn</h2>'+
     '<div class="cijfers">'+stadia+'</div>'+
     '<div style="margin-top:.9rem;">'+verwacht+'</div>'+

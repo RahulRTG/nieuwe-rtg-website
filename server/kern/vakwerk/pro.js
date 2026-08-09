@@ -4,17 +4,23 @@
    klus direct als bevestigde boeking in de agenda -- betalen loopt daarna
    gewoon achteraf via de bestaande wegen; er wordt nooit geclaimd dat er
    betaald is. Alles op codenaam. Krijgt de gedeelde ctx van vakwerk/index. */
+const OFFERTEBOUW = require('../onderneming/offertebouw');
+
 module.exports = (ctx) => {
   const { db, save, findSupplier, isVak, scho, crypto, notify, notifySupplier,
     sseToCustomer, sseToSupplier, boekingenVoegToe } = ctx;
   const nu = () => new Date().toISOString();
   const lijst = () => (Array.isArray(db.data.vakOffertes) ? db.data.vakOffertes : (db.data.vakOffertes = []));
 
+  /* `regels` reist mee naar de klant: een bedrag zonder onderbouwing is precies
+     waar de offertebouwer voor bestaat. Null als de zaak alleen een prijs gaf --
+     dat mag nog steeds, en oudere offertes hebben niets anders. */
   const publiekLid = o => ({ id: o.id, supplierCode: o.supplierCode, zaak: o.supplierName,
     omschrijving: o.omschrijving, wens: o.wens, status: o.status, prijs: o.prijs || null,
+    regels: o.regels || null, btwBedrag: o.btwBedrag != null ? o.btwBedrag : null,
     toelichting: o.toelichting || null, boekingRef: o.boekingRef || null, at: o.at });
   const publiekZaak = o => ({ id: o.id, klant: o.customerCodename, omschrijving: o.omschrijving,
-    wens: o.wens, status: o.status, prijs: o.prijs || null, at: o.at });
+    wens: o.wens, status: o.status, prijs: o.prijs || null, regels: o.regels || null, at: o.at });
 
   function offerteVraag(sessie, body) {
     const s = findSupplier((body || {}).supplierCode);
@@ -42,13 +48,29 @@ module.exports = (ctx) => {
   const offertesVanLid = key => ({ status: 200, offertes: lijst().filter(o => o.customerKey === key).slice(0, 25).map(publiekLid) });
   const offertesVanZaak = code => lijst().filter(o => o.supplierCode === code).slice(0, 40).map(publiekZaak);
 
+  /* Antwoorden kan op twee manieren, en dit blijft de ENIGE plek die een
+     offerte bijwerkt. Met `regels` bouwt kern/onderneming/offertebouw.js de
+     prijs op uit het eigen aanbod plus losse posten; met alleen `prijs` gaat
+     het zoals het altijd ging. Dat tweede is geen tijdelijke tolerantie maar
+     het eerlijke geval: een klus van een uur is soms gewoon een bedrag. */
   function offerteAntwoord(code, body) {
     const o = lijst().find(x => x.id === String((body || {}).id || '') && x.supplierCode === code);
     if (!o) return { status: 404, error: 'Offerte niet gevonden.' };
     if (o.status !== 'aangevraagd') return { status: 409, error: 'Deze aanvraag is al ' + o.status + '.' };
-    const prijs = Math.round(Number((body || {}).prijs) * 100) / 100;
-    if (!(prijs > 0)) return { status: 400, error: 'Geef een prijs op.' };
-    o.status = 'aangeboden'; o.prijs = prijs; o.toelichting = scho((body || {}).toelichting, 200) || null; o.antwoordAt = nu();
+
+    let prijs = Math.round(Number((body || {}).prijs) * 100) / 100;
+    let opbouw = null;
+    if (Array.isArray((body || {}).regels) && body.regels.length) {
+      opbouw = OFFERTEBOUW.offerteBouw(findSupplier(code), body.regels, scho);
+      if (!opbouw.ok) return opbouw;
+      prijs = opbouw.totaal;
+    }
+    if (!(prijs > 0)) return { status: 400, error: 'Geef een prijs op, of bouw hem op uit regels.' };
+    o.status = 'aangeboden'; o.prijs = prijs;
+    o.regels = opbouw ? opbouw.regels : null;
+    o.subtotaal = opbouw ? opbouw.subtotaal : null;
+    o.btwBedrag = opbouw ? opbouw.btwBedrag : null;
+    o.toelichting = scho((body || {}).toelichting, 200) || null; o.antwoordAt = nu();
     save();
     notify(o.customerTier, { icon: 'agenda', title: o.supplierName, body: 'Uw offerte-aanvraag is beantwoord: ' + prijs.toLocaleString('nl-NL') + ' euro. Akkoord geven kan in de Mall.', scope: 'orders' });
     sseToCustomer(o.customerKey || o.customerTier, 'sync', { scope: 'orders' });

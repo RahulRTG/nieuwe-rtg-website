@@ -2,6 +2,8 @@
    standaard btw-tarief per genre, regels verwerken en het tweezijdige
    boeken (op code of codenaam). Krijgt de gedeelde context een keer bij
    het opstarten vanuit kern/facturatie.js. */
+const REGELSOM = require('../regelsom');
+
 module.exports = (ctx) => {
   const { db, save, crypto, findSupplier, keyVanCodenaam, notify, notifySupplier, sseToCustomer, sseToSupplier, factuur, anthropic, schoon,
     SOORTEN, LAAG_BTW_TYPES, nu, scho, rond } = ctx;
@@ -21,20 +23,10 @@ module.exports = (ctx) => {
     return LAAG_BTW_TYPES.includes(supplier.type) ? 9 : 21;
   }
 
-  // Reken de regels door: elk stuk is een prijs INCLUSIEF btw.
-  function verwerkRegels(regels, btwStandaard) {
-    let subtotaal = 0, btwBedrag = 0, totaal = 0;
-    const uit = (Array.isArray(regels) ? regels : []).slice(0, 60).map(r => {
-      const aantal = Math.max(1, Number(r.aantal) || 1);
-      const stuk = rond(r.stuk);
-      const btw = Number.isFinite(Number(r.btw)) ? Number(r.btw) : btwStandaard;
-      const regelIncl = rond(aantal * stuk);
-      const regelExcl = rond(regelIncl / (1 + btw / 100));
-      subtotaal += regelExcl; btwBedrag += rond(regelIncl - regelExcl); totaal += regelIncl;
-      return { omschrijving: scho(r.omschrijving, 120) || 'Post', aantal, stuk, btw, incl: regelIncl };
-    });
-    return { regels: uit, subtotaal: rond(subtotaal), btwBedrag: rond(btwBedrag), totaal: rond(totaal) };
-  }
+  /* Reken de regels door. De som zelf staat in kern/regelsom.js, want de
+     offertebouwer rekent hem ook -- en een offerte die anders afrondt dan de
+     factuur die eruit voortkomt, is een verschil dat niemand kan uitleggen. */
+  const verwerkRegels = (regels, btwStandaard) => REGELSOM.verwerkRegels(regels, btwStandaard, scho);
 
   /* De kern: boek EGn transactie -> EGn tweezijdige factuur.
      data: { soort, verkoperCode, verkoperNaam, koper:{key,naam,codenaam,supplierCode},

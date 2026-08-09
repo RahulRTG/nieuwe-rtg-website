@@ -73,10 +73,15 @@ module.exports = (kern) => {
     'sneek-score': (mij, b) => sneekScore(mij, b.punten),
     'sneek-bord': (mij) => Object.assign({ status: 200 }, sneekBord(mij, vriendenVan(mij))),
     /* Teams: een vaste club om mee te spelen. Uitnodigen kan alleen binnen je
-       eigen kring, en die kring wordt HIER bepaald en niet in het verzoek --
-       net als bij een potje en een toernooi. */
-    'team-nieuw': (mij, b) => teamNieuw(mij, b.naam, (Array.isArray(b.leden) ? b.leden : []).filter(k => kringVan(mij).includes(k))),
-    'team-nodig': (mij, b) => teamNodig(mij, String(b.id || ''), (Array.isArray(b.leden) ? b.leden : []).filter(k => kringVan(mij).includes(k))),
+       eigen kring, en die wordt gewogen in `kern/spellen/kring.js` -- met opzet
+       NIET hier nog een keer. Hier stond eerst een tweede filter op `kringVan`,
+       en dat was smaller dan de kern: `kringVan` kent vrienden en klasgenoten,
+       de kring kent ook het huishouden. Een ouder kon zijn eigen kind dus niet
+       in zijn team vragen. Twee definities van dezelfde kring is precies wat
+       kring.js moest opheffen; deze route geeft de gevraagde sleutels door en
+       de kern zeeft ze. */
+    'team-nieuw': (mij, b) => teamNieuw(mij, b.naam, Array.isArray(b.leden) ? b.leden : []),
+    'team-nodig': (mij, b) => teamNodig(mij, String(b.id || ''), Array.isArray(b.leden) ? b.leden : []),
     'team-antwoord': (mij, b) => teamAntwoord(mij, String(b.id || ''), b.akkoord === true),
     'team-verlaat': (mij, b) => teamVerlaat(mij, String(b.id || '')),
     'team-mijn': (mij) => mijnTeams(mij),

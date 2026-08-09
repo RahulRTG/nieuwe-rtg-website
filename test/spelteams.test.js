@@ -268,6 +268,27 @@ test('over de route: een team maken, meedoen en samen spelen', async () => {
   assert.equal(sleutels.length, 2, 'de sleutels reizen mee zodat je in een tik kunt uitnodigen');
 });
 
+test('over de route: een gezinslid mag wel in je team, ook zonder vriendschap', async () => {
+  /* Hier zat een tweede definitie van de kring: de route filterde op vrienden
+     en klasgenoten, de kern kent ook het huishouden. Een ouder kon zijn eigen
+     kind dus niet in zijn team vragen -- de smalste van de twee won, zonder dat
+     iemand dat besloten had. */
+  const t = Date.now() + '' + (teller++);
+  const fnd = (pad, body) => fetch(BASE + '/api/foundation' + pad, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {})
+  });
+  const g = await json(await fnd('/gezin/maak', { gezinsnaam: 'Teamgezin ' + t, naam: 'Ouder', pin: '1234' }));
+  const p2 = await json(await fnd('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Oom', rol: 'gezinslid', groep: 'volw' }));
+  const kies = await json(await fnd('/gezin/profiel/kies', { code: g.code, profielId: p2.profiel.id }));
+
+  const r = await json(await fetch(BASE + '/api/rtf/spel/team-nieuw', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code: g.code, token: g.token, naam: 'Gezinsclub', leden: [kies.profiel.handle || ('rtf:' + g.code + ':' + p2.profiel.id)] })
+  }));
+  assert.equal(r.ok, true, JSON.stringify(r).slice(0, 200));
+  assert.equal(r.team.uitgenodigd.length, 1, 'het gezinslid is gevraagd: ' + JSON.stringify(r.team));
+});
+
 test('over de route: een sleutel van buiten je kring meesturen levert niets op', async () => {
   const a = await lid(), b = await lid(), vreemde = await lid();
   const bKey = await bevriend(a, b);

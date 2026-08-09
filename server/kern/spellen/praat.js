@@ -41,7 +41,7 @@ module.exports = (ctx) => {
   // plek -- het teamuitnodigen leest dezelfde regel
   const { elkPaarKent } = require('./kring')(ctx);
 
-  const GEEN = 'In dit potje zit iemand die je buiten het spel niet kunt bereiken. Praten kan met vrienden en klasgenoten.';
+  const GEEN = 'In dit potje zit iemand die je buiten het spel niet kunt bereiken. Praten kan met vrienden, klasgenoten en je eigen gezin.';
 
   function potjeVan(mij, id) {
     /* Zonder communicatiekern bestaat praten hier niet. Dat is geen storing die

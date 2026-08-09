@@ -87,6 +87,12 @@ module.exports = (kern) => {
   })));
   app.post('/api/mall/collectie', auth, (req, res) => lijstStuur(res, mall.mallCollecties.toon(req.body.id)));
 
+  /* ---- wat u lopen heeft, over de domeinen heen ----
+     Nadrukkelijk GEEN gezamenlijke afrekening: achter deze regels zitten
+     verschillende partijen met eigen bevestigingen. Zie kern/mall/bestellingen.js. */
+  app.post('/api/mall/bestellingen', auth, (req, res) =>
+    res.json(mall.mallBestellingen.mijn(req.session.key, liveCodename(req.session))));
+
   /* ---- de vraagkant: wat niemand aanbiedt, kun je vragen ----
      Alleen leden plaatsen een aanvraag: een open vraagmarkt voor iedereen die
      een gratis account maakt is binnen een week een prikbord met troep. */

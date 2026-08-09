@@ -8,11 +8,14 @@ module.exports = (ctx) => {
      Een review kan pas na een geslaagde afronding, een per dienst. Het
      gemiddelde staat als lopende som in reviewStats: O(1) per opzoeking,
      ook met miljoenen reviews. */
-  const REVIEW_OK = {
-    order: ['geserveerd', 'bezorgd', 'opgehaald'],
-    ride: ['afgerond', 'gearriveerd'],
-    boeking: ['afgerond']
-  };
+  /* Welke STATUSSEN "afgerond" heten staat in ../afgerond.js, want de Mall
+     stelt dezelfde vraag. Welke SOORTEN een review mogen krijgen blijft hier:
+     die tabel kent ook verblijven en reizen, en die beoordeel je niet langs
+     deze weg. Zonder deze eigen poort zou een review op een reis geen nette
+     400 meer geven maar doorvallen naar een 404. */
+  const REVIEW_SOORTEN = ['order', 'ride', 'boeking'];
+  const { AFGEROND } = require('../afgerond');
+  const REVIEW_OK = Object.fromEntries(REVIEW_SOORTEN.map(s => [s, AFGEROND[s]]));
   function plaatsReview(sess, codename, body) {
     const soort = String(body.soort || '');
     const ref = String(body.ref || '');

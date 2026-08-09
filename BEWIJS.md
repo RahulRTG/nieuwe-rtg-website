@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 726 bestanden en 4160 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 727 bestanden en 4169 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,13 +12,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 726 |
-| losse beweringen (`test(...)`) | 4160 |
+| toetsbestanden | 727 |
+| losse beweringen (`test(...)`) | 4169 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 527 |
 | **overleefd**: geen mutatie kreeg hem rood | 12 |
 | niet te meten (al rood, geen module gevonden, ...) | 16 |
-| alleen in de kop *genoemd*, nog niet gemeten | 27 |
+| alleen in de kop *genoemd*, nog niet gemeten | 28 |
 | niets van beide | 144 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-639 bestanden, 4004 beweringen.
+640 bestanden, 4013 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -314,6 +314,7 @@ toets omvalt.
 | `maildns.test.js` | 8 | gezakt op `===->!==#0` | De mail-DNS nameting (server/maildns.js): staat het er ook echt, en klopt het? WAAROM DEZE TOETS EEN TABEL GEBRUIKT EN NIET HET INTERNET. |
 | `mailpost-kantoor.test.js` | 9 | gezakt op `liegpoort /api/` | DE DERTIEN LAATSTE MAILENDPOINTS ZONDER TOETS -- de kantoorkant, de IMAP-sleutels en de PDF-notities. Ze zijn samen genomen omdat ze samen de rest van de mailronde van vandaag vormen: alles wat erbij kwam en waar de... |
 | `mailpost.test.js` | 11 | gezakt op `liegpoort /api/` | De MAILINFRASTRUCTUUR: de verzendwachtrij en de buitenpoort. Vier beweringen, en ze gaan alle vier over wat er gebeurt als het MISGAAT -- want dat is waar een mailsysteem zich onderscheidt van een verzendknop: 1. |
+| `mall-bestellingen.test.js` | 9 | genoemd | Het bestellingenoverzicht van de RTG Mall: alles wat een lid lopen heeft, over vijf domeinen heen. Waar deze toetsen op mikken: 1. |
 | `mall-bewaard.test.js` | 11 | genoemd | Bewaren in de RTG Mall, en wat er sinds het bewaren veranderde. De twee valkuilen waar deze toetsen op mikken: 1. |
 | `mall-collecties.test.js` | 11 | genoemd | Samengesteld aanbod in de RTG Mall: collecties, bundels, evenementen en seizoenen -- vier soorten met een vorm. Waar deze toetsen op mikken, in volgorde van hoe duur de fout is: 1. |
 | `mall-context.test.js` | 10 | gezakt op `liegpoort /api/` | De laatste twee van de lijst: TIJD ALS CONTEXT en de ZAKELIJKE PRIJS. Waar EN wanneer: een zaak die pas na jouw vertrek weer plek heeft, hoort niet als beschikbaar te gelden. |

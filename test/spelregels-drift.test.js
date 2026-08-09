@@ -165,3 +165,26 @@ test('de ids die de lobby opzoekt bestaan ook in de pagina', () => {
   for (const id of ids)
     assert.ok(new RegExp('id="' + id + '"').test(html), 'de pagina mist een element met id="' + id + '"');
 });
+
+/* Welke app welk spel START staat twee keer: in de descriptor van elk spel
+   (`wereld`) en in `MIJN_SPELLEN` in de lobby. Voor de arcade werd dat hierboven
+   al bewaakt; dit doet hetzelfde voor de potjes.
+
+   Bewust EEN kant op. "Elk spel van deze wereld hoort in de lijst" zou niet
+   kloppen: de zes duels van De Arena en De Societeit zijn ook wereld 'rtf',
+   maar wonen in arena.html en societeit.html en horen niet in deze lobby. Wat
+   wel moet kloppen: elk spel dat de lobby TOONT staat aan de goede kant. */
+test('de spellen van de lobby staan in de app die ze mag starten', () => {
+  const namen = new Function(knip('const SPELNAAM', '/* ---------- wie er nu is') + '; return SPELNAAM;')();
+  const bron = knip('const MIJN_SPELLEN', 'document.querySelectorAll');
+  const rtg = new Function('const memberTok = true; ' + bron + '; return MIJN_SPELLEN;')();
+  const rtf = new Function('const memberTok = false; ' + bron + '; return MIJN_SPELLEN;')();
+
+  for (const sleutel of Object.keys(namen)) {
+    const inRtg = rtg.includes(sleutel), inRtf = rtf.includes(sleutel);
+    assert.ok(inRtg !== inRtf, 'spel "' + sleutel + '" hoort in precies EEN van beide apps te staan, niet in ' +
+      (inRtg ? 'allebei' : 'geen van beide'));
+    assert.equal(inRtg ? 'rtg' : 'rtf', SPEL[sleutel].wereld,
+      'de lobby zet "' + sleutel + '" in de andere app dan de server toestaat');
+  }
+});

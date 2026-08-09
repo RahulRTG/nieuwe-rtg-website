@@ -27,7 +27,7 @@ const stubCtx = { save() {}, crypto: require('crypto'), schud: (a) => a, beurtDo
    gegenereerd -- anders toetst hij zichzelf. */
 const GOUD = {
   mejn:     ['Mens erger je niet', 4, 'rtf', { teams: 'keuze' }],
-  schaak:   ['Schaken', 2, 'rtg', { eigenBeurt: true }],
+  schaak:   ['Schaken', 2, 'rtg', {}],
   woord:    ['Woordduel', 2, 'rtg', { perTaal: true }],
   pesten:   ['Pesten', 4, 'rtf', {}],
   dam:      ['Dammen', 2, 'rtf', {}],

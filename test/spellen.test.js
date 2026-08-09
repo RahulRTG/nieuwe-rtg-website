@@ -117,6 +117,46 @@ test('schaken: een legale opening telt, een onwettige zet wordt geweigerd, beurt
   assert.equal(st.potje.staat.aanZet, 'w', 'daarna is wit weer aan zet');
 });
 
+/* Schaken had een eigen beurtvlag ('eigenBeurt') omdat het zelf bijhoudt wie
+   aan zet is. Die is weg: schaakZet zet potje.beurt na elke zet op de andere
+   speler, dus de generieke beurtcontrole gaf precies hetzelfde antwoord en de
+   vlag bewaakte niets -- hem weghalen werd door geen enkele toets gepakt.
+
+   Wat de veiligheid nu draagt is de AANNAME eronder, en die staat hier: de
+   beurt van het potje en de kleur aan zet lopen gelijk op. Stopt schaakZet met
+   het bijwerken van potje.beurt, dan blokkeert de generieke controle voortaan
+   elke tweede zet -- en dan zakt deze toets. */
+test('schaken: om de beurt, en de beurt van het potje loopt met de kleur mee', async () => {
+  const { a, b } = await tweeVrienden();
+  const nieuw = await json(await raw('/member/spel/nieuw', { soort: 'schaak', vrienden: [b.key] }, a.tok));
+  await raw('/member/spel/antwoord', { id: nieuw.id, akkoord: true }, b.tok);
+
+  const begin = await json(await raw('/member/spel/staat', { id: nieuw.id }, a.tok));
+  assert.equal(begin.potje.staat.aanZet, 'w', 'wit begint');
+  assert.equal(begin.potje.beurt, 0, 'en dat is de speler die het potje startte');
+
+  // zwart mag niet openen: pion van 8 naar 16 is op zichzelf legaal, maar niet nu
+  const tevroeg = await raw('/member/spel/zet', { id: nieuw.id, zet: { van: 8, naar: 16 } }, b.tok);
+  assert.equal(tevroeg.status, 409, 'zwart is nog niet aan zet');
+
+  // wit zet, en daarna staan BEIDE kanten op zwart
+  assert.equal((await raw('/member/spel/zet', { id: nieuw.id, zet: { van: 48, naar: 40 } }, a.tok)).status, 200);
+  const na1 = await json(await raw('/member/spel/staat', { id: nieuw.id }, b.tok));
+  assert.equal(na1.potje.staat.aanZet, 'z', 'de kleur is doorgeschoven');
+  assert.equal(na1.potje.beurt, 1, 'en de beurt van het potje ook -- dit is de aanname');
+
+  // en nu kan zwart wel, wat bewijst dat de generieke controle hem doorlaat
+  assert.equal((await raw('/member/spel/zet', { id: nieuw.id, zet: { van: 8, naar: 16 } }, b.tok)).status, 200);
+  const na2 = await json(await raw('/member/spel/staat', { id: nieuw.id }, a.tok));
+  assert.equal(na2.potje.staat.aanZet, 'w');
+  assert.equal(na2.potje.beurt, 0, 'de twee lopen samen terug naar wit');
+
+  // wit twee keer achter elkaar kan niet
+  assert.equal((await raw('/member/spel/zet', { id: nieuw.id, zet: { van: 40, naar: 32 } }, a.tok)).status, 200);
+  assert.equal((await raw('/member/spel/zet', { id: nieuw.id, zet: { van: 49, naar: 41 } }, a.tok)).status, 409,
+    'twee zetten op rij hoort niet te kunnen');
+});
+
 test('woordduel: het woordenboek keurt; een echt NL-woord over het midden scoort', async () => {
   const { a, b } = await tweeVrienden();
   const nieuw = await json(await raw('/member/spel/nieuw', { soort: 'woord', vrienden: [b.key] }, a.tok));

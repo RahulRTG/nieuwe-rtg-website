@@ -13,7 +13,6 @@
                   op uitnodiging kan altijd over en weer
      volwassen    de 18+-poort (Proost), op elk toetredingsmoment afgedwongen
      buitenBeurt  acties die niet op je beurt hoeven (Magnaat bouwen; de duels)
-     eigenBeurt   het spel houdt zelf bij wie aan zet is (schaken)
      teams        'altijd' (30 Seconden) of 'keuze' (2-tegen-2 bij een vol potje)
      perTaal      eigen wachtrij per taal (Woordduel heeft een letterzak per taal)
      init/zet/view  de regels zelf; statisch: data die nooit verandert
@@ -96,7 +95,6 @@ module.exports = (spelCtx, mapOverride) => {
     SPEL[s.sleutel] = { naam: s.naam, max: s.max, wereld: s.wereld };
     if (s.min) SPEL[s.sleutel].min = s.min;
     if (s.volwassen) SPEL[s.sleutel].volwassen = true;
-    if (s.eigenBeurt) SPEL[s.sleutel].eigenBeurt = true;
     if (s.buitenBeurt) SPEL[s.sleutel].buitenBeurt = s.buitenBeurt;
     if (s.perTaal) SPEL[s.sleutel].perTaal = true;
     if (s.teams) {

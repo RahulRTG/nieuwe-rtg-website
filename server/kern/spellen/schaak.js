@@ -118,6 +118,13 @@ module.exports = (ctx) => {
   function schaakZet(potje, h, zet) {
     const st = potje.staat;
     const kleur = potje.spelers.indexOf(h) === 0 ? 'w' : 'z';
+    /* Deze controle is sinds het weghalen van de eigenBeurt-vlag REDUNDANT: de
+       generieke beurtbewaking in partij.js weigert dezelfde zet al. Hij blijft
+       staan omdat hij de eigen regel van dit spel is -- de motor hoort niet af
+       te hangen van wie hem aanroept -- maar hij is via de route niet te
+       onderscheiden van die andere, en een mutatie die hem weghaalt wordt dan
+       ook door geen toets gepakt. Dat is hier bewust: het is een bewaker, geen
+       belofte over gedrag. */
     if (st.aanZet !== kleur) return { status: 409, error: 'De ander is aan zet.' };
     const van = Number(zet.van), naar = Number(zet.naar);
     if (!schLegaal(st, kleur).some(z => z.van === van && z.naar === naar)) return { status: 400, error: 'Die zet kan niet.' };
@@ -138,11 +145,20 @@ module.exports = (ctx) => {
 
   /* ================= Woordduel (wordfeud-achtig, eer-systeem) ================= */
 
-  /* eigenBeurt: schaken controleert zelf wie aan zet is (de kleur staat in de
-     stand, niet in potje.beurt). Stond als "p.soort !== 'schaak'" in de
-     centrale dispatch; nu als eigenschap van dit spel. */
+  /* Schaken heeft GEEN eigen beurtvlag. Die stond hier, als opvolger van de
+     uitzondering "p.soort !== 'schaak'" in de centrale dispatch -- maar hij
+     bewaakte niets: `schaakZet` zet `potje.beurt` na elke zet op de andere
+     speler (zie onderaan), dus de generieke beurtcontrole geeft precies
+     hetzelfde antwoord. Een mutatie die de vlag weghaalde werd door geen
+     enkele toets gepakt, en een vlag die belooft iets te bewaken wat hij niet
+     bewaakt is erger dan geen vlag.
+
+     Wat de veiligheid nu draagt is de aanname eronder, en die is WEL getoetst
+     (test/spellen.test.js, "schaken: om de beurt"): potje.beurt en st.aanZet
+     lopen gelijk op. Stopt schaakZet met het bijwerken van potje.beurt, dan
+     zakt die toets. */
   const spel = {
-    sleutel: 'schaak', naam: 'Schaken', max: 2, wereld: 'rtg', eigenBeurt: true,
+    sleutel: 'schaak', naam: 'Schaken', max: 2, wereld: 'rtg',
     init: schaakInit, zet: schaakZet,
     view: (p, st) => ({ bord: st.bord.join(''), aanZet: st.aanZet, laatste: st.zetten[st.zetten.length - 1] || null })
   };

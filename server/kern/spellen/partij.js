@@ -29,13 +29,15 @@ module.exports = (ctx) => {
     if (!ZETTEN[p.soort]) return { status: 400, error: 'Onbekend spel.' };
     /* De beurtbewaking is spel-neutraal en leest alleen de descriptor:
        'buitenBeurt' noemt de acties die niet op je beurt hoeven (Magnaat:
-       bouwen/terugverkopen; de duels: iedereen speelt in eigen tempo), en
-       'eigenBeurt' zegt dat het spel zelf bijhoudt wie aan zet is (schaken
-       heeft de kleur in de stand staan). Geen enkele spelnaam meer in deze
-       laag -- dat was hiervoor wel zo, en dat is waarom een nieuw spel er
-       stilletjes verkeerd doorheen kon. */
+       bouwen/terugverkopen; de duels: iedereen speelt in eigen tempo). Geen
+       enkele spelnaam meer in deze laag -- dat was hiervoor wel zo, en dat is
+       waarom een nieuw spel er stilletjes verkeerd doorheen kon.
+
+       Er was hier ook een 'eigenBeurt' voor schaken. Die is weg: schaakZet
+       houdt potje.beurt zelf bij, dus deze controle gaf daar hetzelfde
+       antwoord en de vlag bewaakte niets. Zie de kop van spellen/schaak.js. */
     const beheer = zet && (SPEL[p.soort].buitenBeurt || []).includes(zet.actie);
-    if (!SPEL[p.soort].eigenBeurt && !beheer && p.spelers[p.beurt] !== mij) return { status: 409, error: 'De ander is aan zet.' };
+    if (!beheer && p.spelers[p.beurt] !== mij) return { status: 409, error: 'De ander is aan zet.' };
     return ZETTEN[p.soort](p, mij, zet || {});
   }
   function spelOpgeven(mij, id) {

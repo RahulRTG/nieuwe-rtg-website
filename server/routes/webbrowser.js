@@ -9,7 +9,8 @@ module.exports = (kern) => {
   app.post('/api/browser/gids', auth, (req, res) => { res.json({ lijst: webmaker.gids() }); });
 
   app.post('/api/browser/open', auth, async (req, res) => {
-    const r = webmaker.open((req.body || {}).adres);
+    const b0 = req.body || {};
+    const r = webmaker.open(b0.adres, b0.pad, req.session.key);
     if (r.error) return stuur(res, r);
     /* hoort de site bij een zaak, dan worden de live blokken nu uit het
        zaakprofiel opgelost en krijgt de browser de acties mee -- zo weet het
@@ -55,6 +56,7 @@ module.exports = (kern) => {
     const s = code && findSupplier ? findSupplier(code) : null;
     if (s) {
       addTicket(s.code, { name: 'RTG-web · ' + (liveCodename ? liveCodename(req.session) : 'lid') }, 'Websitebericht: ' + tekst.slice(0, 140));
+      webmaker.telFormulier(webmaker.idVanAdres(b.adres));
       save();
       return res.json({ ok: true, via: 'werklijst' });
     }

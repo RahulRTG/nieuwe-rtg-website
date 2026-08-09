@@ -73,6 +73,7 @@ async function toon(){
     '<button id="'+(d.online?'uit':'aan')+'">'+(d.online?'Zet offline':'Zet online')+'</button>'+
     '<button id="vers">Opnieuw uit mijn profiel</button>'+
     (d.wacht?'<button class="prim" id="live">Zet wijzigingen online</button>':'')+
+    '<button id="cijfers">Cijfers</button>'+
     '<button id="hist">Eerdere versies</button>'+
     '<button id="team">Wie op de site staat</button>'+
     (d.online?'<button id="plan">Later publiceren</button><button id="spoor">Wie deed wat</button>':'')+
@@ -84,6 +85,31 @@ async function toon(){
   if(uit)uit.addEventListener('click',async()=>{ try{ await api('offline',{id:d.id}); meld('De site staat offline.'); toon(); }catch(e){ meld(e.message);} });
   if(aan)aan.addEventListener('click',async()=>{ try{ const r=await api('publiceer',{id:d.id,adres:d.adres||d.titel}); meld('Online op '+r.adres+'.rtg'); toon(); }catch(e){ meld(e.message);} });
   vers.addEventListener('click',async()=>{ try{ const r=await api('genereer',{opnieuw:true}); meld('Opnieuw gebouwd uit uw profiel'+(r.adres?' -- online op '+r.adres+'.rtg':'')+'. De vorige stand staat onder "Eerdere versies".'); toon(); }catch(e){ meld(e.message);} });
+  /* Cijfers: tellingen over uw site. Wat er NIET gemeten wordt staat erbij --
+     anders leest iemand "12 bezoeken" als "12 mensen". */
+  $('#cijfers').addEventListener('click',async()=>{
+    const vak=$('#histvak');
+    try{
+      const r=await api('cijfers',{id:d.id}); const c=r.cijfers;
+      vak.textContent='';
+      const kop=document.createElement('p'); kop.className='mt';
+      kop.textContent=c.totaal+' bezoek'+(c.totaal===1?'':'en')+' · '+c.formulieren+' bericht'+(c.formulieren===1?'':'en')+' via het formulier. Uw eigen bezoeken tellen niet mee.';
+      vak.appendChild(kop);
+      if(c.paginas.length){
+        const p=document.createElement('p'); p.className='mt';
+        p.textContent='Per pagina: '+c.paginas.map(x=>x.slug+' '+x.aantal).join(' · ');
+        vak.appendChild(p);
+      }
+      if(c.dagen.length){
+        const p=document.createElement('p'); p.className='mt';
+        p.textContent='Per dag: '+c.dagen.slice(-14).map(x=>x.dag.slice(5)+' '+x.aantal).join(' · ');
+        vak.appendChild(p);
+      }
+      const n=document.createElement('p'); n.className='mt'; n.style.opacity='.75';
+      n.textContent='Niet gemeten: '+c.nietGemeten.join(', ')+'. RTG meet dingen, geen mensen.';
+      vak.appendChild(n);
+    }catch(e){ meld(e.message); }
+  });
   /* Later publiceren: kies een moment; wat er DAN klaarstaat gaat naar buiten. */
   const planKnop=$('#plan');
   if(planKnop)planKnop.addEventListener('click',async()=>{

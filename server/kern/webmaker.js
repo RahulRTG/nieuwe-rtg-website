@@ -35,6 +35,9 @@ module.exports = ({ db, save, crypto, schoon, media }) => {
   const versielaag = require('./webmaker-versies')({ store, save, scho });
   // wie deed wat, wanneer (./webmaker-spoor.js) -- het verslag onder de goedkeuringsflow
   const spoor = require('./webmaker-spoor')({ store, save, scho });
+  /* Cijfers over een site (./webmaker-meting.js): tellingen van gebeurtenissen,
+     nooit van mensen. */
+  const meting = require('./webmaker-meting')({ store, save });
 
   /* ---- concept en wat er online staat ----
 
@@ -107,7 +110,7 @@ module.exports = ({ db, save, crypto, schoon, media }) => {
     const s = store();
     const weg = s.lijst.find(x => x.id === scho(id, 20) && x.eigenaar === key);
     s.lijst = s.lijst.filter(x => !(x.id === scho(id, 20) && x.eigenaar === key));
-    if (weg) { versielaag.wis(weg.id); spoor.wis(weg.id); }   // een site die weg is, laat niets achter
+    if (weg) { versielaag.wis(weg.id); spoor.wis(weg.id); meting.wis(weg.id); }   // een site die weg is, laat niets achter
     save();
     return { ok: true };
   }
@@ -117,6 +120,12 @@ module.exports = ({ db, save, crypto, schoon, media }) => {
     const d = haal(key, id);
     if (!d) return { error: 'Website niet gevonden.', status: 404 };
     return { ok: true, lijst: versielaag.lijst(d) };
+  }
+  /* De cijfers van een site: tellingen, geen mensen (./webmaker-meting.js). */
+  function cijfers(key, id) {
+    const d = haal(key, id);
+    if (!d) return { error: 'Website niet gevonden.', status: 404 };
+    return { ok: true, cijfers: meting.cijfers(d) };
   }
   function herstel(key, id, i, wie) {
     const d = haal(key, id);
@@ -134,14 +143,14 @@ module.exports = ({ db, save, crypto, schoon, media }) => {
 
   /* De browser-kant (gids, openen, zoeken) staat in ./webmaker-blader.js:
      bekijken is ander werk dan bouwen. */
-  const blader = require('./webmaker-blader')({ store, save, slug, publiek, rijp: d => pub.rijp(d) });
+  const blader = require('./webmaker-blader')({ store, save, slug, publiek, rijp: d => pub.rijp(d), meting });
 
   /* haal() geeft met opzet de LEVENDE regel terug (publiceer, herstel en
      zetLive schrijven erin), dus de afgeleide "wacht"-vlag hangen we er niet
      aan vast maar reiken we los aan -- zo staat de regel nog steeds op een
      plek en breken we het schrijven niet. */
-  return { mijn, haal, bewaar, verwijder, slug, versies, herstel, wacht,
+  return { mijn, haal, bewaar, verwijder, slug, versies, herstel, wacht, cijfers, webOverzicht: meting.overzicht, telFormulier: meting.formulier,
            publiceer: pub.publiceer, zetLive: pub.zetLive, offline: pub.offline, plan: pub.plan, spoorVan: pub.spoorVan, planVeeg: pub.veeg,
-           gids: blader.gids, open: blader.open, zoek: blader.zoek, adresVanZaak: blader.adresVanZaak, zaakVanAdres: blader.zaakVanAdres, eigenaarVanAdres: blader.eigenaarVanAdres,
+           gids: blader.gids, open: blader.open, zoek: blader.zoek, adresVanZaak: blader.adresVanZaak, zaakVanAdres: blader.zaakVanAdres, eigenaarVanAdres: blader.eigenaarVanAdres, idVanAdres: blader.idVanAdres,
            fotos, fotoBewaar, fotoWeg, TYPES };
 };

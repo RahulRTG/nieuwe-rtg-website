@@ -571,6 +571,61 @@ test('19. een site lezen in je eigen taal: wel de tekst, niet de naam', async ()
   assert.equal(eigen.body.design.blokken[1].tekst, Z);
 });
 
+test('20. cijfers tellen gebeurtenissen, geen mensen -- en je eigen bezoek telt niet mee', async () => {
+  const mk = await api('/api/site/bewaar', { design: { titel: 'Meethuis', blokken: [{ type: 'kop', tekst: 'Hoi' }],
+    paginas: [{ naam: 'Contact', blokken: [{ type: 'kop', tekst: 'Schrijf' }] }] } }, lid);
+  const id = mk.body.design.id;
+  await api('/api/site/publiceer', { id, adres: 'meethuis' }, lid);
+
+  // de maker kijkt zelf: dat hoort niet mee te tellen
+  await api('/api/browser/open', { adres: 'meethuis' }, lid);
+  await api('/api/browser/open', { adres: 'meethuis' }, lid);
+  const eigen = await api('/api/site/cijfers', { id }, lid);
+  assert.equal(eigen.status, 200, JSON.stringify(eigen.body));
+  assert.equal(eigen.body.cijfers.totaal, 0, 'je eigen site nakijken blaast je cijfers niet op');
+
+  // een echte bezoeker, op twee pagina's
+  const reg = await api('/api/auth/register', { name: 'Kijk Lid', email: 'kijklid@voorbeeld.test',
+    password: 'webgeheim90', geboortedatum: '1996-06-06', tier: 'rtg', pasApp: 'rtg' });
+  const kijker = reg.body.token;
+  await api('/api/browser/open', { adres: 'meethuis' }, kijker);
+  await api('/api/browser/open', { adres: 'meethuis', pad: 'contact' }, kijker);
+  await api('/api/browser/open', { adres: 'meethuis', pad: 'contact' }, kijker);
+
+  const c = (await api('/api/site/cijfers', { id }, lid)).body.cijfers;
+  assert.equal(c.totaal, 3, 'drie bezoeken van buiten');
+  const perPagina = Object.fromEntries(c.paginas.map(p => [p.slug, p.aantal]));
+  assert.equal(perPagina.home, 1);
+  assert.equal(perPagina.contact, 2, 'per pagina geteld');
+  assert.equal(c.dagen.length, 1, 'en per dag, niet per moment');
+  assert.ok(c.dagen[0].dag.length === 10, 'een dag is een datum, geen tijdstip');
+
+  /* GEEN MENSEN. Er mag nergens een sleutel, codenaam of tijdstip in de
+     cijfers opduiken -- anders is dit geen teller maar een lijst van wie waar
+     heeft gekeken. */
+  const rauw = JSON.stringify(c);
+  assert.ok(!/Kijk Lid/.test(rauw), 'geen naam');
+  assert.ok(!/[0-9]{2}:[0-9]{2}/.test(rauw), 'geen tijdstippen');
+  assert.ok(Array.isArray(c.nietGemeten) && c.nietGemeten.length, 'er staat bij wat er NIET gemeten wordt');
+
+  // de cijfers zijn van de eigenaar
+  assert.equal((await api('/api/site/cijfers', { id }, kijker)).status, 404);
+});
+
+test('21. het beeld voor RTG: tellingen over het web heen, en alleen voor het kantoor', async () => {
+  const office = (await api('/api/office/login', { code: 'RTG-OFFICE' })).body.token;
+  const o = await api('/api/office/web/overzicht', {}, office);
+  assert.equal(o.status, 200, JSON.stringify(o.body));
+  assert.ok(o.body.sites > 0 && o.body.online > 0, 'RTG ziet hoe groot het eigen web is');
+  assert.ok(o.body.zakelijk >= 1, 'en hoeveel daarvan bedrijfssites zijn');
+  assert.ok(Array.isArray(o.body.top) && o.body.top.length, 'met de best bezochte sites');
+  // ook hier geen mensen: alleen adres, titel en aantallen
+  assert.deepEqual(Object.keys(o.body.top[0]).sort(), ['adres', 'bezoeken', 'titel', 'zaak']);
+
+  // een gewoon lid komt hier niet
+  assert.equal((await api('/api/office/web/overzicht', {}, lid)).status, 401);
+});
+
 test('5. zoeken vindt sites en bedrijven in een adem', async () => {
   const z = await api('/api/browser/zoek', { q: 'vedra' }, lid);
   assert.equal(z.status, 200);

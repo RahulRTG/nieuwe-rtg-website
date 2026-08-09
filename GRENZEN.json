@@ -1545,6 +1545,9 @@
       "webmaker",
       "webplatform"
     ],
+    "webmeting": [
+      "webmaker"
+    ],
     "webmaker": [
       "antivirus",
       "atelierweb",

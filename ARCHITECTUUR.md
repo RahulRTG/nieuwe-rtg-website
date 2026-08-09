@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 2923 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 2926 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,10 +18,10 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 2923 |
-| servermodules (`server/**/*.js`) | 1579 |
-| routebestanden (`server/routes/**`) | 351 |
-| kernmodules (`server/kern/**`) | 917 |
+| API-endpoints | 2926 |
+| servermodules (`server/**/*.js`) | 1581 |
+| routebestanden (`server/routes/**`) | 352 |
+| kernmodules (`server/kern/**`) | 918 |
 | schermen (`public/**/*.html`) | 214 |
 | gedeelde browsermodules (`public/shared/*.js`) | 171 |
 | toetsbestanden (`test/*.test.js`) | 631 |
@@ -112,7 +112,7 @@ op de regel zelf. Dat is niet hetzelfde als onbeveiligd -- regel 28 van de keuri
 per route een poort **of** een plek op de publieke lijst met reden. Deze kolom is een
 wegwijzer, geen verdict.
 
-Daarnaast 1534 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 1537 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 
@@ -134,7 +134,7 @@ domein. Alle vijf getallen staan in `NORM.json` aan een ratel en mogen alleen za
 domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 
 ```
-app(128) auth(72) supplierAuth(47) db(31) officeAuth(29) liveCodename(19) accounts(18)
+app(129) auth(73) supplierAuth(48) db(31) officeAuth(30) liveCodename(19) accounts(18)
 status(16) schoon(14) managerOnly(13) save(11) rtf(11) codenaamVan(11) express(10)
 tooManyTries(9) crypto(9) anthropic(9) rtmail(9) boardroomWie(7) logActivity(7)
 sseToOffice(7) keyVanCodenaam(7) payrollOS(7) geenGast(6) noteFailedTry(6) kern(6)

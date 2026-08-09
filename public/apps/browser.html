@@ -337,7 +337,7 @@ window.addEventListener('resize',()=>{ clearTimeout(window._rt); window._rt=setT
 async function toonSite(adres,pad){
   const h=$('#hoofd'); h.innerHTML='<div class="leeg" style="padding:4rem;">Laden…</div>';
   try{
-    const d=await api('open',{adres});
+    const d=await api('open',{adres,pad:pad||''});
     let site=d.site;
     /* een site kan meerdere pagina's dragen: het pad achter het adres kiest er
        een; de voorpagina is het lege pad */

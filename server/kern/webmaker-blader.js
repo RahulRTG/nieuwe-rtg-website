@@ -2,7 +2,7 @@
    gepubliceerde sites. Staat apart van webmaker.js omdat dit ander werk is
    dan bouwen: hier wordt niets veranderd behalve de bezoekteller, en alles
    wat naar buiten gaat is al online gezet door zijn maker. */
-module.exports = ({ store, save, slug, publiek, rijp }) => {
+module.exports = ({ store, save, slug, publiek, rijp, meting }) => {
   function gids() {
     return store().lijst.filter(d => d.online && d.adres)
       .sort((a, b) => (b.bezoeken || 0) - (a.bezoeken || 0))
@@ -30,13 +30,19 @@ module.exports = ({ store, save, slug, publiek, rijp }) => {
     const d = store().lijst.find(x => x.adres === a && x.online);
     return d ? (d.zaakCode || '') : '';
   }
+  // welke site staat er op dit adres (voor de formulierteller)
+  function idVanAdres(adresIn) {
+    const a = slug(adresIn);
+    const d = store().lijst.find(x => x.adres === a && x.online);
+    return d ? d.id : '';
+  }
   // wiens site staat er op dit adres (voor de persoon-balk en het formulier)
   function eigenaarVanAdres(adresIn) {
     const a = slug(adresIn);
     const d = store().lijst.find(x => x.adres === a && x.online);
     return d ? (d.eigenaar || '') : '';
   }
-  function open(adresIn) {
+  function open(adresIn, pad, bezoeker) {
     const a = slug(adresIn);
     const d = store().lijst.find(x => x.adres === a && x.online);
     if (!d) return { error: 'Geen RTG-site op dit adres.', status: 404 };
@@ -45,8 +51,13 @@ module.exports = ({ store, save, slug, publiek, rijp }) => {
        De veger doet hetzelfde op een tik, maar een bezoeker hoort niet op een
        tik te hoeven wachten. */
     if (rijp) rijp(d);
-    d.bezoeken = (d.bezoeken || 0) + 1; save();
+    /* Tellen wat er gebeurt, niet wie het deed: de bezoeker gaat hier alleen
+       heen om het EIGEN bezoek van de maker niet mee te tellen, en wordt
+       nergens bewaard (kern/webmaker-meting.js). */
+    if (!bezoeker || bezoeker !== d.eigenaar) d.bezoeken = (d.bezoeken || 0) + 1;
+    if (meting) meting.bezoek(d, pad, bezoeker);
+    save();
     return { ok: true, site: publiek(d) };
   }
-  return { gids, adresVanZaak, zaakVanAdres, eigenaarVanAdres, zoek, open };
+  return { gids, adresVanZaak, zaakVanAdres, eigenaarVanAdres, idVanAdres, zoek, open };
 };

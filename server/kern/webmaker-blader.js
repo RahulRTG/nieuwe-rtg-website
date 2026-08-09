@@ -2,7 +2,7 @@
    gepubliceerde sites. Staat apart van webmaker.js omdat dit ander werk is
    dan bouwen: hier wordt niets veranderd behalve de bezoekteller, en alles
    wat naar buiten gaat is al online gezet door zijn maker. */
-module.exports = ({ store, save, slug, publiek }) => {
+module.exports = ({ store, save, slug, publiek, rijp }) => {
   function gids() {
     return store().lijst.filter(d => d.online && d.adres)
       .sort((a, b) => (b.bezoeken || 0) - (a.bezoeken || 0))
@@ -40,6 +40,11 @@ module.exports = ({ store, save, slug, publiek }) => {
     const a = slug(adresIn);
     const d = store().lijst.find(x => x.adres === a && x.online);
     if (!d) return { error: 'Geen RTG-site op dit adres.', status: 404 };
+    /* Stond er een publicatie gepland en is dat moment geweest, dan gaat hij
+       NU naar buiten -- voordat deze bezoeker de oude stand te zien krijgt.
+       De veger doet hetzelfde op een tik, maar een bezoeker hoort niet op een
+       tik te hoeven wachten. */
+    if (rijp) rijp(d);
     d.bezoeken = (d.bezoeken || 0) + 1; save();
     return { ok: true, site: publiek(d) };
   }

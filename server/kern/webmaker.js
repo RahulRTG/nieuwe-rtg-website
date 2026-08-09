@@ -33,6 +33,8 @@ module.exports = ({ db, save, crypto, schoon, media }) => {
      gaat de vorige stand daarheen, zodat de AI-knop en "opnieuw genereren"
      een weg terug hebben. */
   const versielaag = require('./webmaker-versies')({ store, save, scho });
+  // wie deed wat, wanneer (./webmaker-spoor.js) -- het verslag onder de goedkeuringsflow
+  const spoor = require('./webmaker-spoor')({ store, save, scho });
 
   /* ---- concept en wat er online staat ----
 
@@ -85,6 +87,8 @@ module.exports = ({ db, save, crypto, schoon, media }) => {
          alsnog buiten -- precies wat deze laag moet voorkomen. */
       live: bestaand ? (bestaand.live || null) : null,
       liveOp: bestaand ? (bestaand.liveOp || null) : null,
+      // een gepland publicatiemoment overleeft een bewaring om dezelfde reden
+      plan: bestaand ? (bestaand.plan || undefined) : undefined,
       gemaakt: bestaand ? bestaand.gemaakt : new Date().toISOString(),
       bij: new Date().toISOString()
     };
@@ -92,6 +96,7 @@ module.exports = ({ db, save, crypto, schoon, media }) => {
     const pg = paginalaag.schoonPaginas(d); if (pg) design.paginas = pg;
     // de stand die we gaan overschrijven eerst wegleggen
     if (bestaand) versielaag.leg(bestaand, (opts && opts.reden) || 'bewaard');
+    spoor.noteer(design.id, bestaand ? ((opts && opts.reden) || 'bewaard') : 'gemaakt', opts && opts.wie);
     if (bestaand) { const i = s.lijst.indexOf(bestaand); s.lijst[i] = design; }
     else { s.lijst.unshift(design); s.lijst = s.lijst.slice(0, TOTAAL); }
     save();
@@ -102,7 +107,7 @@ module.exports = ({ db, save, crypto, schoon, media }) => {
     const s = store();
     const weg = s.lijst.find(x => x.id === scho(id, 20) && x.eigenaar === key);
     s.lijst = s.lijst.filter(x => !(x.id === scho(id, 20) && x.eigenaar === key));
-    if (weg) versielaag.wis(weg.id);   // een site die weg is, laat geen geschiedenis achter
+    if (weg) { versielaag.wis(weg.id); spoor.wis(weg.id); }   // een site die weg is, laat niets achter
     save();
     return { ok: true };
   }
@@ -113,50 +118,30 @@ module.exports = ({ db, save, crypto, schoon, media }) => {
     if (!d) return { error: 'Website niet gevonden.', status: 404 };
     return { ok: true, lijst: versielaag.lijst(d) };
   }
-  function herstel(key, id, i) {
+  function herstel(key, id, i, wie) {
     const d = haal(key, id);
     if (!d) return { error: 'Website niet gevonden.', status: 404 };
-    return versielaag.herstel(d, i);
+    const r = versielaag.herstel(d, i);
+    if (!r.error) { spoor.noteer(d.id, 'oudere versie teruggezet', wie); save(); }
+    return r;
   }
 
-  function publiceer(key, id, adresIn) {
-    const d = haal(key, id);
-    if (!d) return { error: 'Website niet gevonden.', status: 404 };
-    const a = slug(adresIn || d.adres || d.titel);
-    if (a.length < 2) return { error: 'Kies een adres van minstens twee tekens (letters, cijfers, koppelteken).', status: 400 };
-    const bezet = store().lijst.find(x => x.adres === a && x.id !== d.id);
-    if (bezet) return { error: 'Dit adres is al bezet. Kies een ander.', status: 409 };
-    d.adres = a; d.online = true; d.bij = new Date().toISOString();
-    bevries(d);              // online gaan is ook het eerste publiceren
-    save();
-    return { ok: true, adres: a, online: true };
-  }
-  /* De wijzigingen die in het concept staan naar buiten brengen. Een aparte
-     handeling, want dit is het moment waarop het web verandert -- bij een zaak
-     is dat werk van de leiding (zie routes/webmaker.js). */
-  function zetLive(key, id) {
-    const d = haal(key, id);
-    if (!d) return { error: 'Website niet gevonden.', status: 404 };
-    if (!d.online || !d.adres) return { error: 'Zet de site eerst online; dan kun je wijzigingen publiceren.', status: 400 };
-    bevries(d); save();
-    return { ok: true, op: d.liveOp };
-  }
-  function offline(key, id) {
-    const d = haal(key, id);
-    if (!d) return { error: 'Website niet gevonden.', status: 404 };
-    d.online = false; save();
-    return { ok: true, online: false };
-  }
+  /* Alles wat bepaalt WAT ER BUITEN STAAT -- online gaan, wijzigingen
+     publiceren, een moment plannen, uit de lucht halen, en het spoor daarvan --
+     staat in ./webmaker-publiceren.js. Dat is een ander soort werk dan het
+     bouwen van een ontwerp, en het is de kant waar de leiding over gaat. */
+  const pub = require('./webmaker-publiceren')({ store, save, slug, haal, bevries, spoor });
 
   /* De browser-kant (gids, openen, zoeken) staat in ./webmaker-blader.js:
      bekijken is ander werk dan bouwen. */
-  const blader = require('./webmaker-blader')({ store, save, slug, publiek });
+  const blader = require('./webmaker-blader')({ store, save, slug, publiek, rijp: d => pub.rijp(d) });
 
   /* haal() geeft met opzet de LEVENDE regel terug (publiceer, herstel en
      zetLive schrijven erin), dus de afgeleide "wacht"-vlag hangen we er niet
      aan vast maar reiken we los aan -- zo staat de regel nog steeds op een
      plek en breken we het schrijven niet. */
-  return { mijn, haal, bewaar, verwijder, publiceer, zetLive, offline, slug, versies, herstel, wacht,
+  return { mijn, haal, bewaar, verwijder, slug, versies, herstel, wacht,
+           publiceer: pub.publiceer, zetLive: pub.zetLive, offline: pub.offline, plan: pub.plan, spoorVan: pub.spoorVan, planVeeg: pub.veeg,
            gids: blader.gids, open: blader.open, zoek: blader.zoek, adresVanZaak: blader.adresVanZaak, zaakVanAdres: blader.zaakVanAdres, eigenaarVanAdres: blader.eigenaarVanAdres,
            fotos, fotoBewaar, fotoWeg, TYPES };
 };

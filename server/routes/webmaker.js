@@ -31,6 +31,9 @@ module.exports = (kern) => {
   // wat je bewaarde staat in je concept; hiermee gaat het naar buiten
   app.post('/api/site/live', auth, (req, res) => { if (geenGast(req, res)) return; stuur(res, webmaker.zetLive(req.session.key, (req.body || {}).id)); });
   app.post('/api/site/offline', auth, (req, res) => { if (geenGast(req, res)) return; stuur(res, webmaker.offline(req.session.key, (req.body || {}).id)); });
+  // publiceren op een gekozen moment, en het spoor van wat er met deze site gebeurde
+  app.post('/api/site/plan', auth, (req, res) => { if (geenGast(req, res)) return; const b = req.body || {}; stuur(res, webmaker.plan(req.session.key, b.id, b.moment)); });
+  app.post('/api/site/spoor', auth, (req, res) => { if (geenGast(req, res)) return; stuur(res, webmaker.spoorVan(req.session.key, (req.body || {}).id)); });
 
   /* ---- de persoonlijke site: ieders eigen plek op het RTG-web ----
      Op CODENAAM -- de echte naam blijft in de kluis. Zelfde principe als de

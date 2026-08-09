@@ -75,6 +75,7 @@ async function toon(){
     (d.wacht?'<button class="prim" id="live">Zet wijzigingen online</button>':'')+
     '<button id="hist">Eerdere versies</button>'+
     '<button id="team">Wie op de site staat</button>'+
+    (d.online?'<button id="plan">Later publiceren</button><button id="spoor">Wie deed wat</button>':'')+
     '</div>'+
     '<div id="histvak"></div>'+
     '<p class="mt" style="line-height:1.6;">De live blokken (menu, aanbod, foto&#39;s, reviews, contact) volgen uw bedrijfsprofiel vanzelf. "Opnieuw uit mijn profiel" gooit uw eigen aanpassingen aan de site weg en bouwt hem vers op -- dat vraagt hij niet nog een keer, dus wees er zeker van.</p>';
@@ -83,6 +84,31 @@ async function toon(){
   if(uit)uit.addEventListener('click',async()=>{ try{ await api('offline',{id:d.id}); meld('De site staat offline.'); toon(); }catch(e){ meld(e.message);} });
   if(aan)aan.addEventListener('click',async()=>{ try{ const r=await api('publiceer',{id:d.id,adres:d.adres||d.titel}); meld('Online op '+r.adres+'.rtg'); toon(); }catch(e){ meld(e.message);} });
   vers.addEventListener('click',async()=>{ try{ const r=await api('genereer',{opnieuw:true}); meld('Opnieuw gebouwd uit uw profiel'+(r.adres?' -- online op '+r.adres+'.rtg':'')+'. De vorige stand staat onder "Eerdere versies".'); toon(); }catch(e){ meld(e.message);} });
+  /* Later publiceren: kies een moment; wat er DAN klaarstaat gaat naar buiten. */
+  const planKnop=$('#plan');
+  if(planKnop)planKnop.addEventListener('click',async()=>{
+    const inv=prompt('Op welk moment moeten uw wijzigingen naar buiten?\nBijvoorbeeld: 2026-08-15 03:00 (laat leeg om een planning in te trekken)');
+    if(inv===null)return;
+    const moment=inv.trim()?new Date(inv.trim().replace(' ','T')).toISOString():'';
+    try{ const r=await api('plan',{id:d.id,moment});
+      meld(r.plan?'Gepland. Wat er op dat moment klaarstaat, gaat dan naar buiten.':'De planning is ingetrokken.'); }
+    catch(e){ meld(e.message); }
+  });
+  /* Het spoor: wie deed wat, wanneer. Hoort bij de afspraak dat alleen de
+     leiding publiceert -- een goedkeuring zonder verslag is niet na te gaan. */
+  const spoorKnop=$('#spoor');
+  if(spoorKnop)spoorKnop.addEventListener('click',async()=>{
+    const vak=$('#histvak');
+    try{
+      const r=await api('spoor',{id:d.id}); vak.textContent='';
+      if(!(r.lijst||[]).length){ vak.innerHTML='<p class="mt">Nog niets vastgelegd.</p>'; return; }
+      r.lijst.forEach(x=>{
+        const p=document.createElement('p'); p.className='mt';
+        p.textContent=String(x.op||'').replace('T',' ').slice(0,16)+' · '+x.wat+(x.wie?' · '+x.wie:'');
+        vak.appendChild(p);
+      });
+    }catch(e){ meld(e.message); }
+  });
   /* Wie op de site staat. Niemand staat er vanzelf op: per medewerker zet u
      hem aan. Naam en functie gaan naar buiten, verder niets. */
   $('#team').addEventListener('click',async()=>{

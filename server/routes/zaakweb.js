@@ -35,6 +35,10 @@ module.exports = (kern) => {
      hem online; "customizable forever": daarna bewerkt de ondernemer hem met
      dezelfde maker als ieder lid. */
   const zaakKey = req => 'zaak:' + req.supplier.code;
+  /* Wie het deed. Bij een zaak delen meerdere mensen dezelfde site, dus het
+     spoor hoort een naam te noemen -- dezelfde naam die ook in de
+     activiteitenlijst van de zaak staat. */
+  const wie = req => (req.actor && req.actor.name) || null;
   app.post('/api/supplier/site/genereer', supplierAuth, (req, res) => {
     if (!managerOnly(req, res)) return;   // genereren zet de site meteen online
     const key = zaakKey(req);
@@ -70,17 +74,28 @@ module.exports = (kern) => {
      Dat is dezelfde grens als op de menukaart en de prijzen. */
   app.post('/api/supplier/site/publiceer', supplierAuth, (req, res) => {
     if (!managerOnly(req, res)) return;
-    const b = req.body || {}; stuur(res, webmaker.publiceer(zaakKey(req), b.id, b.adres));
+    const b = req.body || {}; stuur(res, webmaker.publiceer(zaakKey(req), b.id, b.adres, wie(req)));
   });
   app.post('/api/supplier/site/live', supplierAuth, (req, res) => {
     if (!managerOnly(req, res)) return;
-    stuur(res, webmaker.zetLive(zaakKey(req), (req.body || {}).id));
+    stuur(res, webmaker.zetLive(zaakKey(req), (req.body || {}).id, wie(req)));
   });
   app.post('/api/supplier/site/offline', supplierAuth, (req, res) => {
     if (!managerOnly(req, res)) return;
-    stuur(res, webmaker.offline(zaakKey(req), (req.body || {}).id));
+    stuur(res, webmaker.offline(zaakKey(req), (req.body || {}).id, wie(req)));
   });
   app.post('/api/supplier/site/versies', supplierAuth, (req, res) => stuur(res, webmaker.versies(zaakKey(req), (req.body || {}).id)));
-  app.post('/api/supplier/site/herstel', supplierAuth, (req, res) => { const b = req.body || {}; stuur(res, webmaker.herstel(zaakKey(req), b.id, b.i)); });
+  app.post('/api/supplier/site/herstel', supplierAuth, (req, res) => { const b = req.body || {}; stuur(res, webmaker.herstel(zaakKey(req), b.id, b.i, wie(req))); });
+  /* publiceren op een gekozen moment, en het spoor: allebei werk van de
+     leiding, want het gaat over wat er naar buiten gaat en wie dat deed */
+  app.post('/api/supplier/site/plan', supplierAuth, (req, res) => {
+    if (!managerOnly(req, res)) return;
+    const b = req.body || {};
+    stuur(res, webmaker.plan(zaakKey(req), b.id, b.moment, wie(req)));
+  });
+  app.post('/api/supplier/site/spoor', supplierAuth, (req, res) => {
+    if (!managerOnly(req, res)) return;
+    stuur(res, webmaker.spoorVan(zaakKey(req), (req.body || {}).id));
+  });
 
 };

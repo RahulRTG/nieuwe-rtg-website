@@ -469,6 +469,64 @@ test('16. het team-blok: niemand staat er vanzelf op, en er gaat niet meer naar 
   assert.ok(!new RegExp(wie.naam).test(JSON.stringify(alleBlokken(weg.body.site))), 'van de site gehaald is van de site af');
 });
 
+test('17. publiceren op een gekozen moment brengt naar buiten wat er DAN klaarstaat', async () => {
+  const mk = await api('/api/site/bewaar', { design: { titel: 'Kaarshuis',
+    blokken: [{ type: 'kop', tekst: 'Wat er online staat' }] } }, lid);
+  const id = mk.body.design.id;
+
+  // plannen kan niet zolang de site niet online is: online gaan is een eigen besluit
+  const tevroeg = await api('/api/site/plan', { id, moment: new Date(Date.now() + 60000).toISOString() }, lid);
+  assert.equal(tevroeg.status, 400);
+
+  await api('/api/site/publiceer', { id, adres: 'kaarshuis' }, lid);
+  // een moment dat al geweest is, is geen planning
+  assert.equal((await api('/api/site/plan', { id, moment: '2020-01-01T00:00:00Z' }, lid)).status, 400);
+
+  // plannen op een moment vlak vooruit, en daarna NOG iets wijzigen
+  const moment = new Date(Date.now() + 1500).toISOString();
+  assert.equal((await api('/api/site/plan', { id, moment }, lid)).status, 200);
+  await api('/api/site/bewaar', { design: { id, titel: 'Kaarshuis', blokken: [{ type: 'kop', tekst: 'Latere gedachte' }] } }, lid);
+
+  // zolang het moment niet is aangebroken, verandert er buiten niets
+  const voor = await api('/api/browser/open', { adres: 'kaarshuis' }, lid);
+  assert.equal(voor.body.site.blokken[0].tekst, 'Wat er online staat');
+
+  await new Promise(r => setTimeout(r, 1700));
+  const na = await api('/api/browser/open', { adres: 'kaarshuis' }, lid);
+  /* De belofte: wat er op het geplande moment klaarstond gaat naar buiten --
+     niet de stand van toen er gepland werd. Anders verdwijnt alles wat je er
+     na het plannen nog aan deed, en merk je dat pas als het buiten staat. */
+  assert.equal(na.body.site.blokken[0].tekst, 'Latere gedachte');
+
+  // en de planning is daarna op: hij vuurt niet nog eens
+  const spoor = await api('/api/site/spoor', { id }, lid);
+  assert.equal(spoor.body.lijst.filter(x => /volgens planning/.test(x.wat)).length, 1);
+});
+
+test('18. het spoor: wie deed wat, wanneer -- en bij een zaak staat de naam erbij', async () => {
+  const mijn = await api('/api/supplier/site/mijn', {}, zaak);
+  const id = mijn.body.lijst[0].id;
+
+  const voor = (await api('/api/supplier/site/spoor', { id }, zaak)).body.lijst.length;
+  assert.equal((await api('/api/supplier/site/live', { id }, zaak)).status, 200);
+  const na = await api('/api/supplier/site/spoor', { id }, zaak);
+  assert.ok(na.body.lijst.length > voor, 'publiceren laat een spoor na');
+
+  const laatste = na.body.lijst[0];
+  assert.match(laatste.wat, /gepubliceerd/);
+  assert.ok(laatste.wie, 'bij een zaak staat erbij wie het deed');
+  assert.ok(laatste.op, 'en wanneer');
+
+  // het spoor is werk van de leiding: een medewerker leest het niet
+  const gewoon = (await api('/api/supplier/roster', { code: 'ESVEDRA' })).body.staff.find(x => x.role !== 'manager');
+  const mede = (await api('/api/supplier/login', { code: 'ESVEDRA', staffId: gewoon.id, pin: '5678' })).body.token;
+  assert.equal((await api('/api/supplier/site/spoor', { id }, mede)).status, 403);
+  assert.equal((await api('/api/supplier/site/plan', { id, moment: new Date(Date.now() + 60000).toISOString() }, mede)).status, 403);
+
+  // en het spoor van andermans site bestaat niet
+  assert.equal((await api('/api/site/spoor', { id }, lid)).status, 404);
+});
+
 test('5. zoeken vindt sites en bedrijven in een adem', async () => {
   const z = await api('/api/browser/zoek', { q: 'vedra' }, lid);
   assert.equal(z.status, 200);

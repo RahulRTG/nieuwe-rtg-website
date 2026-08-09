@@ -88,6 +88,7 @@ module.exports = (deps) => {
 
   const rek = require('./rekeningen')(ctx);
   const over = require('./overboeken')(ctx);
+  const brug = require('./walletbrug')(ctx);
   const spaar = require('./sparen')(ctx);
   const pas = require('./passen')(ctx);
   const krediet = require('./krediet')(ctx);
@@ -98,42 +99,10 @@ module.exports = (deps) => {
   ctx.rekeningOpen = rek.rekeningOpen;
   const hart = require('./hart')(ctx);
 
-  /* ---- afschrift: de boekingen die een rekening raken, nieuwste eerst ---- */
-  function afschrift({ iban, limit = 50, offset = 0 }) {
-    const m = rekMeta(iban);
-    if (!m) return { status: 404, error: 'De rekening bestaat niet.' };
-    const raakt = grootboek().filter(b => b.van === iban || b.naar === iban);
-    const regels = raakt.slice(offset, offset + Math.min(200, Math.max(1, limit))).map(b => ({
-      id: b.id, af: b.van === iban, centen: b.centen, soort: b.soort, oms: b.oms,
-      tegen: b.van === iban ? b.naar : b.van, at: b.at
-    }));
-    return { ok: true, iban, saldoCenten: saldoVan(iban), aantal: raakt.length, regels };
-  }
-
-  /* ---- de bank-gezondheid + het boardroom-overzicht (achter de office-inlog) ---- */
-  function gezondheid() {
-    const s = saldi();
-    let deposito = 0, krediet = 0;
-    for (const [r, c] of Object.entries(s)) { if (isExtern(r)) continue; if (c >= 0) deposito += c; else krediet += -c; }
-    const emissie = -saldoVan('extern:emissie');  // wat de eigen bank heeft uitgegeven (positief = in omloop)
-    const rekN = Object.keys(rekeningen()).length;
-    /* De reconciliatie hoort naast de sluitcontrole en niet erin: die zegt of de
-       boekingen onderling kloppen, deze of wat er geboekt is ook buiten RTG is
-       aangekomen. Een bank kan perfect sluiten zonder dat er een euro weg is. */
-    const rail = opdrachten.openstaand();
-    return { status: 200, sluit: sluitcontrole(), depositoCenten: deposito, kredietCenten: krediet,
-      inOmloopCenten: emissie, reserveCenten: saldoVan('rtg:reserve'), renteBetaaldCenten: -saldoVan('rtg:rente'),
-      foundationCenten: saldoVan('extern:foundation'),
-      railOpenCenten: rail.centen, railOpen: rail.aantal, railMislukt: rail.mislukt,
-      railZonderTerugboeking: rail.zonderTerugboeking, railOudsteAt: rail.oudsteAt,
-      aantalRekeningen: rekN, boekingenVandaag: grootboek().filter(b => nu() - b.at < 86400000).length };
-  }
-  function overzicht() {
-    const g = gezondheid();
-    const lijst = Object.values(rekeningen()).sort((a, b) => b.geopend - a.geopend).slice(0, 100)
-      .map(m => ({ iban: m.iban, codenaam: m.codenaam, soort: m.soort, naam: m.naam, saldoCenten: saldoVan(m.iban), bevroren: !!m.bevroren, roodLimiet: m.roodLimiet || 0 }));
-    return { status: 200, regie: bankregie.bankregieOverzicht(), gezondheid: g, rekeningen: lijst };
-  }
+  /* Het afschrift, de gezondheid en het boardroom-overzicht: alleen lezen,
+     en daarom apart in ./bord. */
+  const { afschrift, gezondheid, overzicht } = require('./bord')(
+    Object.assign({}, ctx, { sluitcontrole, opdrachten }));
 
   const api = { MIN_CENTEN, MAX_CENTEN, SOORTEN, boek, boekAsync, geldModus, saldoVan, sluitcontrole, afschrift, gezondheid, overzicht, reconcileVanMotor, motorStand,
     bankOpdrachten: (f) => opdrachten.lijst(f || {}),
@@ -141,7 +110,7 @@ module.exports = (deps) => {
     bankOpdrachtenRonde: (a) => opdrachten.ronde(a || {}),
     bankOpdrachtOpnieuw: (id) => opdrachten.dienIn(id),
     bankOpdrachtBevestig: (a) => opdrachten.bevestig(a || {}) };
-  Object.assign(api, rek, over, spaar, pas, krediet, incasso, zakelijk, advies, hart);
+  Object.assign(api, rek, over, brug, spaar, pas, krediet, incasso, zakelijk, advies, hart);
 
   /* De bankrondes lopen vanzelf: elk uur een tik die de spaarrente (idempotent
      op de klok: alleen hele verstreken dagen) en de vervallen vaste betalingen

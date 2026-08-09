@@ -149,30 +149,9 @@ function maakDekking({ db, save, nu, regelpakket, LANDEN, accounts }) {
     return { at: tijd(), peildatum: String(peildatum || tijd()).slice(0, 10), landen: rijen, telling };
   }
 
-  /* ---------- verval ----------
-     EEN JAARGANG DIE AFLOOPT ZONDER OPVOLGER IS DE KLASSIEKE JANUARIFOUT. Op 31
-     december draait alles; op 1 januari kan er geen enkele loonrun meer, en dat
-     is de week waarin er juist gedraaid moet worden. Daarom kijkt dit vooruit
-     en niet terug. */
-  function verlooptBinnen(dagen, peildatum) {
-    const d = Number(dagen) > 0 ? Number(dagen) : 60;
-    const nuDag = new Date(String(peildatum || tijd()).slice(0, 10) + 'T00:00:00Z').getTime();
-    const grens = new Date(nuDag + d * 86400000).toISOString().slice(0, 10);
-    const uit = [];
-    for (const w of landenMetWerk()) {
-      const p = regelpakket.opDatum(w.land, String(peildatum || tijd()).slice(0, 10));
-      if (!p || !p.geldigTot || p.geldigTot > grens) continue;
-      // is er al een opvolger die ingaat op de dag na het verval?
-      const dagErna = new Date(new Date(p.geldigTot + 'T00:00:00Z').getTime() + 86400000).toISOString().slice(0, 10);
-      const opvolger = regelpakket.opDatum(w.land, dagErna);
-      if (opvolger) continue;
-      uit.push({ land: w.land, versie: p.versie, geldigTot: p.geldigTot,
-        personeel: w.personeel, zaken: w.zaken,
-        uitleg: 'Na ' + p.geldigTot + ' ligt er geen regelpakket voor ' + w.land +
-          '. Vanaf dat moment kan er geen loonrun meer draaien.' });
-    }
-    return uit;
-  }
+  /* Welke jaargang binnenkort afloopt zonder opvolger: ./dekking-verval.
+     Vooruitkijken is een eigen vraag naast "kan dit land vandaag draaien". */
+  const { verlooptBinnen } = require('./dekking-verval')({ tijd, regelpakket, landenMetWerk });
 
   return { wereld, voorLand, landenMetWerk, verlooptBinnen,
     bronnenVan, alleBronnen, zetBron, haalBronWeg, noteerBron, UIT_FISCAAL, NIET_UIT_FISCAAL };

@@ -151,6 +151,46 @@
   .wlegenda{display:flex;gap:1rem;flex-wrap:wrap;font-size:.75rem;color:var(--muted);margin:.5rem 0 .2rem;align-items:center;}
   .wlegenda span{display:flex;gap:.35rem;align-items:center;}
 .merkvlak{display:inline-block;background:#7F1634;color:#fff;padding:.22rem .7rem .28rem;border-radius:4px;}
+  /* De bankkamer: reconciliatie, vergunning en de bevoegdheidsmatrix.
+     Deze regels staan hier en niet in losse stijlattributen. Twee redenen, en de
+     tweede is de echte: die attributen houden style-src-attr in de CSP open
+     (de norm telt ze daarom), en een rij die op twintig plekken dezelfde vier
+     declaraties herhaalt is op geen enkele plek te wijzigen. */
+  .bk-lab{display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;}
+  .bk-stil{color:var(--soft);}
+  /* --burgundy is in dit bestand al #C23A5E, de variant voor op zwart. */
+  .bk-let{color:var(--burgundy);}
+  .bk-goed{color:var(--gold);}
+  .bk-krap{margin-top:-.4rem;}
+  .bk-na{margin-top:.7rem;}
+  .bk-nazin{color:var(--soft);margin-top:.3rem;}
+  .bk-uitleg{margin:.2rem 0 .6rem;color:var(--soft);font-size:.85rem;}
+  .bk-stand{font-size:.82rem;margin-bottom:.7rem;}
+  .bk-waarschuw{color:var(--burgundy);font-size:.78rem;}
+  .bk-knopje{padding:.25rem .8rem;font-size:.75rem;}
+  .bk-velden{display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;}
+  .bk-w7{width:7rem;} .bk-w8{width:8rem;} .bk-w9{width:9rem;} .bk-w12{width:12rem;}
+  .bk-w15{min-width:15rem;}
+  .bk-rij{display:flex;gap:.6rem;align-items:baseline;flex-wrap:wrap;padding:.35rem 0;
+    font-size:.82rem;border-bottom:1px solid rgba(255,255,255,.08);}
+  .bk-rij.wijd{padding:.4rem 0;}
+  .bk-rij .soort{min-width:9rem;}
+  .bk-rij .bedrag{color:var(--gold);font-variant-numeric:tabular-nums;}
+  .bk-rij .reden{flex:1;min-width:12rem;color:var(--soft);}
+  .bk-rij .mini{padding:.15rem .6rem;font-size:.72rem;}
+  .bk-vink{min-width:1.2rem;color:var(--gold);}
+  .bk-vink.nee{color:var(--burgundy);}
+  .bk-handeling{min-width:14rem;}
+  .bk-via{color:var(--soft);min-width:9rem;}
+  .bk-vraagt{color:var(--soft);font-size:.74rem;}
+  .bk-besluit{flex:1;min-width:100%;color:var(--soft);font-size:.74rem;padding-top:.2rem;}
+  .bk-inleiding{font-size:.78rem;color:var(--soft);padding-bottom:.5rem;
+    border-bottom:1px solid rgba(255,255,255,.08);}
+  .bk-tegels{margin-bottom:.6rem;}
+  .bk-tegel{text-align:center;padding:.9rem .6rem;}
+  .bk-tegel.rood{border-color:var(--burgundy);}
+  .bk-tegel .lab{font-size:.72rem;color:var(--soft);}
+  .bk-tegel .waarde{font-size:1.05rem;color:var(--gold);margin-top:.25rem;}
 </style>
 <!-- niet defer: dit script draait voor elke inline-body-script en voor elk kader -->
 <script src="/shared/media.js"></script>
@@ -763,11 +803,11 @@
     <div class="kpis" id="bankGezond"></div>
 
     <h3 class="sec">De rail: geboekt, en ook echt aangekomen?</h3>
-    <p class="deck" style="margin-top:-.4rem;">De sluitcontrole hierboven zegt of de boekingen onderling kloppen. Dit zegt iets anders: of wat geboekt is ook bij de andere bank is aangekomen. Een grootboek kan perfect sluiten terwijl er geen euro het huis heeft verlaten.</p>
+    <p class="deck bk-krap">De sluitcontrole hierboven zegt of de boekingen onderling kloppen. Dit zegt iets anders: of wat geboekt is ook bij de andere bank is aangekomen. Een grootboek kan perfect sluiten terwijl er geen euro het huis heeft verlaten.</p>
     <div class="kaart" id="bankRail"></div>
 
     <h3 class="sec">Bevoegdheid: wat RTG mag, niet wat RTG kan</h3>
-    <p class="deck" style="margin-top:-.4rem;">Software bouwen en bevoegd zijn om geld te bewegen zijn twee dingen. Wat hier staat is <em>vastgelegd</em>, niet aangezet: leeg betekent nee, verlopen betekent nee, en een te lage rang ook.</p>
+    <p class="deck bk-krap">Software bouwen en bevoegd zijn om geld te bewegen zijn twee dingen. Wat hier staat is <em>vastgelegd</em>, niet aangezet: leeg betekent nee, verlopen betekent nee, en een te lage rang ook.</p>
     <div class="kaart" id="bankVergunning"></div>
     <div class="kaart lijst" id="bankBevoegd"><div class="leeg">Laden…</div></div>
 
@@ -2362,22 +2402,22 @@ function bankRenderRail(g, op){
   const STATUSZIN = { GEBOEKT: 'wacht op de rail', INGEDIEND: 'aangenomen, nog niet bevestigd',
     AFGEWIKKELD: 'afgerond', MISLUKT: 'opgegeven', TERUGGEBOEKT: 'teruggeboekt' };
   const rijen = (op.opdrachten || []).map(o =>
-    '<div style="display:flex;gap:.6rem;align-items:baseline;flex-wrap:wrap;padding:.35rem 0;' + bkLijn + 'font-size:.82rem;">' +
-    '<strong style="min-width:9rem;">' + esc(o.soort) + '</strong>' +
-    '<span style="color:var(--gold);font-variant-numeric:tabular-nums;">' + bkEuro(o.centen) + '</span>' +
-    '<span style="color:var(--soft);">' + esc(STATUSZIN[o.status] || o.status) + '</span>' +
-    (o.pogingen > 1 ? '<span style="color:var(--soft);">' + o.pogingen + ' pogingen</span>' : '') +
-    (o.laatsteFout ? '<span style="flex:1;min-width:12rem;color:var(--soft);">' + esc(o.laatsteFout) + '</span>' : '') +
-    (o.status === 'MISLUKT' ? '<button class="knop stil" data-opnieuw="' + esc(o.id) + '" style="padding:.15rem .6rem;font-size:.72rem;">Opnieuw indienen</button>' : '') +
+    '<div class="bk-rij">' +
+    '<strong class="soort">' + esc(o.soort) + '</strong>' +
+    '<span class="bedrag">' + bkEuro(o.centen) + '</span>' +
+    '<span class="bk-stil">' + esc(STATUSZIN[o.status] || o.status) + '</span>' +
+    (o.pogingen > 1 ? '<span class="bk-stil">' + o.pogingen + ' pogingen</span>' : '') +
+    (o.laatsteFout ? '<span class="reden">' + esc(o.laatsteFout) + '</span>' : '') +
+    (o.status === 'MISLUKT' ? '<button class="knop stil mini" data-opnieuw="' + esc(o.id) + '">Opnieuw indienen</button>' : '') +
     '</div>').join('');
   $('#bankRail').innerHTML =
-    '<div class="kpis" style="margin-bottom:.6rem;">' + tegels.map(([l, v, rood]) =>
-      '<div class="kaart" style="text-align:center;padding:.9rem .6rem;' + (rood ? 'border-color:var(--burgundy);' : '') + '">' +
-      '<div style="font-size:.72rem;color:var(--soft);">' + esc(l) + '</div>' +
-      '<div style="font-size:1.05rem;color:var(--gold);margin-top:.25rem;">' + esc(v) + '</div></div>').join('') + '</div>' +
+    '<div class="kpis bk-tegels">' + tegels.map(([l, v, rood]) =>
+      '<div class="kaart bk-tegel' + (rood ? ' rood' : '') + '">' +
+      '<div class="lab">' + esc(l) + '</div>' +
+      '<div class="waarde">' + esc(v) + '</div></div>').join('') + '</div>' +
     (rijen || '<div class="leeg">Niets onderweg.</div>') +
-    '<div style="margin-top:.7rem;"><button class="knop stil" id="bankRondeBtn" type="button" style="padding:.25rem .8rem;font-size:.75rem;">Nu opnieuw aanbieden</button>' +
-    (alarm ? ' <span style="color:var(--burgundy-on-dark);font-size:.78rem;">Er staat geld af dat nergens is aangekomen.</span>' : '') + '</div>';
+    '<div class="bk-na"><button class="knop stil bk-knopje" id="bankRondeBtn" type="button">Nu opnieuw aanbieden</button>' +
+    (alarm ? ' <span class="bk-waarschuw">Er staat geld af dat nergens is aangekomen.</span>' : '') + '</div>';
   $('#bankRondeBtn').addEventListener('click', async () => {
     try { const d = await api('bank/opdrachten/ronde', {}); meld(d.gedaan ? d.gedaan + ' opnieuw aangeboden.' : 'Niets aan de beurt.'); bankVervers(); } catch (e) { meld(e.message); }
   });
@@ -2398,22 +2438,22 @@ function bankRenderVergunning(bv){
   const v = bv.vergunning;
   const dat = v && v.tot ? new Date(v.tot).toISOString().slice(0, 10) : '';
   $('#bankVergunning').innerHTML =
-    '<div style="font-size:.82rem;margin-bottom:.7rem;">' +
+    '<div class="bk-stand">' +
       (v ? '<strong>' + esc(BK_SOORT[v.soort] || v.soort) + '</strong>' +
            (v.nummer ? ' · ' + esc(v.nummer) : '') + (v.entiteit ? ' · ' + esc(v.entiteit) : '') +
            ' · landen: ' + esc((v.landen || []).join(', ') || 'alle') +
            (v.tot ? ' · geldig tot ' + esc(dat) : ' · zonder einddatum') +
-           (v.verlopen ? ' <span style="color:var(--burgundy-on-dark);">VERLOPEN</span>' : '')
-         : '<span style="color:var(--soft);">Er is niets vastgelegd. De eigen rails clearen niet, en krediet uit eigen boek staat dicht.</span>') +
+           (v.verlopen ? ' <span class="bk-let">VERLOPEN</span>' : '')
+         : '<span class="bk-stil">Er is niets vastgelegd. De eigen rails clearen niet, en krediet uit eigen boek staat dicht.</span>') +
     '</div>' +
-    '<div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;">' +
-    '<span><label for="bkVSoort" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Soort</label>' +
+    '<div class="bk-velden">' +
+    '<span><label for="bkVSoort" class="bk-lab">Soort</label>' +
       '<select id="bkVSoort">' + Object.keys(BK_SOORT).map(k =>
         '<option value="' + k + '"' + (v && v.soort === k ? ' selected' : (!v && k === '' ? ' selected' : '')) + '>' + esc(BK_SOORT[k]) + '</option>').join('') + '</select></span>' +
-    '<span><label for="bkVNr" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Nummer</label><input id="bkVNr" value="' + esc(v && v.nummer || '') + '" style="width:9rem;"></span>' +
-    '<span><label for="bkVEnt" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Entiteit</label><input id="bkVEnt" value="' + esc(v && v.entiteit || '') + '" style="width:12rem;"></span>' +
-    '<span><label for="bkVLand" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Landen (NL,BE)</label><input id="bkVLand" value="' + esc((v && v.landen || []).join(',')) + '" style="width:8rem;"></span>' +
-    '<span><label for="bkVTot" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Geldig tot</label><input id="bkVTot" type="date" value="' + esc(dat) + '"></span>' +
+    '<span><label for="bkVNr" class="bk-lab">Nummer</label><input id="bkVNr" class="bk-w9" value="' + esc(v && v.nummer || '') + '"></span>' +
+    '<span><label for="bkVEnt" class="bk-lab">Entiteit</label><input id="bkVEnt" class="bk-w12" value="' + esc(v && v.entiteit || '') + '"></span>' +
+    '<span><label for="bkVLand" class="bk-lab">Landen (NL,BE)</label><input id="bkVLand" class="bk-w8" value="' + esc((v && v.landen || []).join(',')) + '"></span>' +
+    '<span><label for="bkVTot" class="bk-lab">Geldig tot</label><input id="bkVTot" type="date" value="' + esc(dat) + '"></span>' +
     '<button class="knop stil" id="bkVZet" type="button">Vastleggen</button></div>';
   $('#bkVZet').addEventListener('click', async () => {
     try {
@@ -2436,21 +2476,21 @@ const BK_VIA = { software: 'eigen software', partner: 'via de partner', eigen: '
 function bankRenderBevoegd(bv){
   const rail = bv.rail === 'eigen' ? 'de eigen rails' : bv.rail === 'partner' ? 'de kaart-rails van de partner' : 'geen enkele rail';
   $('#bankBevoegd').innerHTML =
-    '<div style="font-size:.78rem;color:var(--soft);padding-bottom:.5rem;' + bkLijn + '">Er cleart op dit moment ' + esc(rail) + '. Dat bepaalt mee wat mag: dezelfde handeling is via een partner iets anders dan op eigen kracht.</div>' +
+    '<div class="bk-inleiding">Er cleart op dit moment ' + esc(rail) + '. Dat bepaalt mee wat mag: dezelfde handeling is via een partner iets anders dan op eigen kracht.</div>' +
     bv.regels.map(r =>
-      '<div style="display:flex;gap:.6rem;align-items:baseline;flex-wrap:wrap;padding:.4rem 0;' + bkLijn + 'font-size:.82rem;">' +
-      '<span style="min-width:1.2rem;color:' + (r.mag ? 'var(--gold)' : 'var(--burgundy-on-dark)') + ';">' + (r.mag ? '✓' : '✗') + '</span>' +
-      '<strong style="min-width:14rem;">' + esc(r.naam) + '</strong>' +
-      '<span style="color:var(--soft);min-width:9rem;">' + esc(r.mag ? (BK_VIA[r.via] || r.via) : (BK_REDEN[r.reden] || r.reden)) + '</span>' +
-      (r.nodig ? '<span style="color:var(--soft);font-size:.74rem;">vraagt: ' + esc(BK_SOORT[r.nodig] || r.nodig) + '</span>' : '') +
-      (r.besluit ? '<span style="flex:1;min-width:100%;color:var(--soft);font-size:.74rem;padding-top:.2rem;">' + esc(r.besluit) + '</span>' : '') +
+      '<div class="bk-rij wijd">' +
+      '<span class="bk-vink' + (r.mag ? '' : ' nee') + '">' + (r.mag ? '✓' : '✗') + '</span>' +
+      '<strong class="bk-handeling">' + esc(r.naam) + '</strong>' +
+      '<span class="bk-via">' + esc(r.mag ? (BK_VIA[r.via] || r.via) : (BK_REDEN[r.reden] || r.reden)) + '</span>' +
+      (r.nodig ? '<span class="bk-vraagt">vraagt: ' + esc(BK_SOORT[r.nodig] || r.nodig) + '</span>' : '') +
+      (r.besluit ? '<span class="bk-besluit">' + esc(r.besluit) + '</span>' : '') +
       '</div>').join('');
 }
 function bankRenderInstel(r){
   $('#bankInstel').innerHTML =
-    '<div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;">' +
-    '<span><label for="bankRente" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Spaarrente per jaar (%)</label><input id="bankRente" type="number" min="0" max="20" step="0.1" value="' + r.spaarrentePct + '" style="width:7rem;"></span>' +
-    '<span><label for="bankRood" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Standaard rood staan (€)</label><input id="bankRood" type="number" min="0" step="10" value="' + (r.roodLimietCenten / 100) + '" style="width:8rem;"></span>' +
+    '<div class="bk-velden">' +
+    '<span><label for="bankRente" class="bk-lab">Spaarrente per jaar (%)</label><input id="bankRente" class="bk-w7" type="number" min="0" max="20" step="0.1" value="' + r.spaarrentePct + '"></span>' +
+    '<span><label for="bankRood" class="bk-lab">Standaard rood staan (€)</label><input id="bankRood" class="bk-w8" type="number" min="0" step="10" value="' + (r.roodLimietCenten / 100) + '"></span>' +
     '<button class="knop stil" id="bankInstelZet" type="button">Bewaar</button></div>';
   $('#bankInstelZet').addEventListener('click', async () => {
     try { await api('bank/instellingen', { spaarrenteBp: Math.round(Number($('#bankRente').value) * 100), roodLimietEuro: Number($('#bankRood').value) }); meld('Instellingen bewaard.'); bankVervers(); } catch (e) { meld(e.message); }
@@ -2530,12 +2570,12 @@ function bankRenderSalaris(reks){
   if (!doos.dataset.gewired){
     doos.dataset.gewired = '1';
     doos.innerHTML =
-      '<p style="margin:.2rem 0 .6rem;color:var(--soft);font-size:.85rem;">De <strong>raming</strong> rekent de geklokte maanduren om naar brutoloon plus werkgeverslasten &mdash; om mee te plannen, niet om mee te betalen. <strong>Uitbetalen</strong> gaat via een definitieve loonrun uit de Payroll OS: die houdt loonheffing in, is door twee mensen getekend en levert het nettobedrag per medewerker.</p>' +
+      '<p class="bk-uitleg">De <strong>raming</strong> rekent de geklokte maanduren om naar brutoloon plus werkgeverslasten &mdash; om mee te plannen, niet om mee te betalen. <strong>Uitbetalen</strong> gaat via een definitieve loonrun uit de Payroll OS: die houdt loonheffing in, is door twee mensen getekend en levert het nettobedrag per medewerker.</p>' +
       '<div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;">' +
       '<span><label for="bankSalZaak" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Zaak (code)</label><input id="bankSalZaak" placeholder="bijv. TOREN" style="width:9rem;"></span>' +
       '<span><label for="bankSalVan" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Betaal vanaf</label><select id="bankSalVan" style="min-width:14rem;"></select></span>' +
       '<button class="knop stil" id="bankSalMaak" type="button">Maak raming</button>' +
-      '<span id="bankSalRunWrap" hidden><label for="bankSalRunId" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Definitieve loonrun</label><select id="bankSalRunId" style="min-width:15rem;"></select></span>' +
+      '<span id="bankSalRunWrap" hidden><label for="bankSalRunId" class="bk-lab">Definitieve loonrun</label><select id="bankSalRunId" class="bk-w15"></select></span>' +
       '<button class="knop" id="bankSalRun" type="button" hidden>Betaal deze loonrun uit</button></div>' +
       '<div id="bankSalUit" style="margin-top:.6rem;font-size:.85rem;"></div>';
     $('#bankSalMaak').addEventListener('click', async () => {
@@ -2560,9 +2600,9 @@ function bankRenderSalaris(reks){
         const d = await api('bank/salaris/run', { runId, vanIban: $('#bankSalVan').value });
         meld(d.geboekt + ' netto loonbetaling(en) geboekt: ' + bkEuro(d.totaalCenten));
         $('#bankSalRun').hidden = true;
-        $('#bankSalUit').innerHTML = '<div style="color:var(--gold);">✓ Loonrun ' + esc(d.periode) + ' uitbetaald: ' +
+        $('#bankSalUit').innerHTML = '<div class="bk-goed">✓ Loonrun ' + esc(d.periode) + ' uitbetaald: ' +
           d.geboekt + ' betaling(en), ' + bkEuro(d.totaalCenten) + ' netto.</div>' +
-          (d.terugtevorderenCenten ? '<div style="color:var(--soft);margin-top:.3rem;">Nog terug te vorderen: ' + bkEuro(d.terugtevorderenCenten) + ' (die maken we niet over).</div>' : '');
+          (d.terugtevorderenCenten ? '<div class="bk-nazin">Nog terug te vorderen: ' + bkEuro(d.terugtevorderenCenten) + ' (die maken we niet over).</div>' : '');
         bankVervers();
       } catch (e) { meld(e.message); }
     });
@@ -2579,7 +2619,7 @@ function bankRenderSalaris(reks){
       sel.innerHTML = runs.map(r => '<option value="' + esc(r.id) + '">' + esc(r.periode) +
         (r.correctieVan ? ' (correctie)' : '') + (r.opDemoTabellen ? ' - op ongecontroleerde tabellen' : '') + '</option>').join('');
       wrap.hidden = knop.hidden = !runs.length;
-      if (!runs.length) $('#bankSalUit').innerHTML += '<div style="margin-top:.45rem;color:var(--soft);">Er is nog geen definitieve loonrun voor deze zaak. Uitbetalen kan pas daarna &mdash; open er een in de Payroll OS.</div>';
+      if (!runs.length) $('#bankSalUit').innerHTML += '<div class="bk-nazin">Er is nog geen definitieve loonrun voor deze zaak. Uitbetalen kan pas daarna &mdash; open er een in de Payroll OS.</div>';
     } catch (e) { wrap.hidden = knop.hidden = true; meld(e.message); }
   }
 

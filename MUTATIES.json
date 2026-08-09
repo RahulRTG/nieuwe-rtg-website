@@ -302,6 +302,13 @@
       "gezakt": 8,
       "scherp": "gezakt"
     },
+    "bankkamer.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "bedrijfbeeld.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -2224,6 +2231,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "scherp": "gezakt"
+    },
+    "payrollkeur.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
       "scherp": "gezakt"
     },
     "pda-aanmelden.test.js": {

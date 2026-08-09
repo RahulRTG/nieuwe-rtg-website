@@ -30,33 +30,6 @@ module.exports = (ctx) => {
   app.post('/api/office/bank', officeAuth, (req, res) => veilig(res, () => bank.overzicht()));
   app.post('/api/office/bank/gezond', officeAuth, (req, res) => veilig(res, () => bank.gezondheid()));
 
-  /* DE RECONCILIATIE: wat is er geboekt maar nog niet buiten RTG afgerond?
-     Dit is bewust een EIGEN lijst naast de gezondheid, want de sluitcontrole
-     kan hier per definitie niet over meepraten -- een boeking naar extern:sepa
-     sluit ook als de rail hem nooit heeft aangenomen. Wie hier een oplopend
-     getal ziet, kijkt naar een storing bij de rail en niet naar een fout in de
-     boekhouding. */
-  app.post('/api/office/bank/opdrachten', officeAuth, (req, res) => veilig(res, () => ({
-    ...bank.bankOpdrachten({ limit: Number(req.body.limit) || 50, status: req.body.status, bron: req.body.bron }),
-    open: bank.bankOpdrachtenOpen()
-  })));
-  // met de hand een ronde draaien (de tik doet dit vanzelf elke minuut)
-  app.post('/api/office/bank/opdrachten/ronde', officeAuth, async (req, res) => {
-    const r = await bank.bankOpdrachtenRonde({});
-    if (r.gedaan) afdelingen.audit(naam(req), 'RTG Bank opdrachtenronde met de hand: ' + r.gedaan + ' ingediend, ' + r.opgegeven + ' opgegeven');
-    res.json(r);
-  });
-  /* Een opgegeven opdracht opnieuw indienen. Dat is een BESLUIT van het
-     kantoor -- de automaat heeft het al zes keer geprobeerd en het geld is
-     teruggeboekt -- dus hij komt in het auditlog en niet stil door. */
-  app.post('/api/office/bank/opdrachten/opnieuw', officeAuth, async (req, res) => {
-    const r = await bank.bankOpdrachtOpnieuw(String(req.body.id || ''));
-    if (r.error) return res.status(r.status || 400).json({ error: r.error });
-    afdelingen.audit(naam(req), 'RTG Bank betaalopdracht ' + r.id + ' met de hand opnieuw ingediend (' + r.status + ')');
-    sync();
-    res.json(r);
-  });
-
   /* De knop: een stand kiezen, één slag verder/terug draaien, en de bank aan-
      of uitzetten als uitgevende partij. Verder draaien kan alleen als de bank
      operationeel is; dat bewaakt de bankregie zelf. */
@@ -106,28 +79,6 @@ module.exports = (ctx) => {
     return { ok: true, ...r };
   }));
 
-  /* DE BEVOEGDHEID: wat er is vastgelegd over wat RTG zelf mag, en de matrix
-     die per handeling zegt of hij open staat en waarom niet. Dit is bewust een
-     REGISTRATIE en geen knop -- wie een vergunning kan aanzetten alsof het een
-     schakelaar is, heeft geen vergunning maar een schakelaar. */
-  app.post('/api/office/bank/bevoegdheid', officeAuth, (req, res) => veilig(res, () => kern.bevoegd.matrix({ land: req.body.land })));
-  app.post('/api/office/bank/vergunning', boardroomAuth, (req, res) => veilig(res, () => {
-    const r = kern.bankVergunningZet({ soort: req.body.soort, nummer: req.body.nummer, entiteit: req.body.entiteit,
-      landen: req.body.landen, tot: req.body.tot, wie: naam(req) });
-    if (r.ok) {
-      afdelingen.audit(naam(req), r.vergunning
-        ? 'RTG Bank-vergunning vastgelegd: ' + r.vergunning.soort + ' (' + (r.vergunning.nummer || 'zonder nummer') + ')'
-        : 'RTG Bank-vergunning INGETROKKEN -- de eigen rails clearen niet meer');
-      sync();
-    }
-    return r;
-  }));
-  app.post('/api/office/bank/partnerrail', officeAuth, (req, res) => veilig(res, () => {
-    const r = kern.bankPartnerRailZet({ rail: String(req.body.rail || ''), aan: req.body.aan === true });
-    if (r.ok) { afdelingen.audit(naam(req), 'Partnerrail ' + req.body.rail + ' ' + (req.body.aan === true ? 'aan' : 'uit')); sync(); }
-    return r;
-  }));
-
   // de leden-bank live zetten (zichtbaar in de app) of weer sluiten
   app.post('/api/office/bank/leden', officeAuth, (req, res) => veilig(res, () => {
     const r = kern.bankLedenZet({ aan: req.body.aan === true, wie: naam(req) });
@@ -145,5 +96,10 @@ module.exports = (ctx) => {
      salaris en incasso -- staan in ./bank-rekeningen. Dit bestand gaat over de
      REGIE: de drie-standen-knop, het vier-ogen-principe erop en de noodstop.
      Twee onderwerpen, en samen pasten ze niet meer onder de 10 KB. */
+  /* De RECONCILIATIE (wat is er geboekt maar nog niet buiten RTG afgerond) en
+     de BEVOEGDHEID (wat mag RTG zelf) staan in ./bank-bevoegd. Allebei gaan ze
+     over de grens tussen RTG en de buitenwereld; dit bestand gaat over de
+     stand van het huis zelf. */
+  require('./bank-bevoegd')(Object.assign({}, ctx, { naam }));
   require('./bank-rekeningen')(Object.assign({}, ctx, { naam }));
 };

@@ -43,6 +43,14 @@
   .leeg{color:var(--muted);font-size:.85rem;padding:.4rem 0;}
   .kpi{font-size:.74rem;color:var(--soft);}
   .noot{font-size:.72rem;color:var(--soft);line-height:1.55;}
+  /* Het bevestigblok bij "Aanmerken". Als klasse en niet als inline
+     stijlattribuut: die houden style-src-attr in de CSP open, en de norm telt ze. */
+  .keurvak{margin-top:.5rem;padding:.6rem 0 .2rem;border-top:1px solid var(--line);width:100%;}
+  .keurvak .noot{margin-bottom:.45rem;}
+  .keurvak .noot.let{color:var(--gold);}
+  .keurvak .veld{width:100%;margin-bottom:.45rem;}
+  .kpi.blok{display:block;}
+  .kpi.blok.let{color:var(--gold);}
 </style>
 <link href="/shared/ios.css" rel="stylesheet">
 </head>
@@ -380,15 +388,15 @@ async function laadOs(){
        aangemerkt staat de reden erbij: wie het deed en waarom is dan het enige
        wat er nog van over is. */
     (p.waarschuwing && p.stand !== 'goedgekeurd'
-      ? '<span class="kpi" style="display:block;color:var(--gold);">Dit pakket meldt zelf: ' + esc(p.waarschuwing) + '</span>' : '') +
+      ? '<span class="kpi blok let">Dit pakket meldt zelf: ' + esc(p.waarschuwing) + '</span>' : '') +
     (p.ondanksWaarschuwing
-      ? '<span class="kpi" style="display:block;">uitdrukkelijk aangemerkt: ' + esc(p.ondanksWaarschuwing) + '</span>' : '') +
+      ? '<span class="kpi blok">uitdrukkelijk aangemerkt: ' + esc(p.ondanksWaarschuwing) + '</span>' : '') +
     (p.stand === 'goedgekeurd' ? '' :
-      '<div class="keurvak" data-vak="' + esc(p.versie) + '" hidden style="margin-top:.5rem;padding:.6rem 0 .2rem;border-top:1px solid var(--lijn,rgba(0,0,0,.12));">' +
-      '<div class="noot" style="margin-bottom:.45rem;">Na aanmerken mag er een definitieve loonrun op deze tarieven draaien, en dus echt geld naar medewerkers. Uw naam blijft eraan hangen.</div>' +
+      '<div class="keurvak" data-vak="' + esc(p.versie) + '" hidden>' +
+      '<div class="noot">Na aanmerken mag er een definitieve loonrun op deze tarieven draaien, en dus echt geld naar medewerkers. Uw naam blijft eraan hangen.</div>' +
       (p.waarschuwing
-        ? '<div class="noot" style="margin-bottom:.45rem;color:var(--gold);">Dit pakket meldt zelf dat het ongecontroleerd is. Aanmerken kan alleen met een reden, en die blijft bij het pakket staan.</div>' +
-          '<input class="veld" data-reden="' + esc(p.versie) + '" style="width:100%;margin-bottom:.45rem;" placeholder="Waarom merkt u dit pakket toch aan?">'
+        ? '<div class="noot let">Dit pakket meldt zelf dat het ongecontroleerd is. Aanmerken kan alleen met een reden, en die blijft bij het pakket staan.</div>' +
+          '<input class="veld" data-reden="' + esc(p.versie) + '" placeholder="Waarom merkt u dit pakket toch aan?">'
         : '') +
       '<button class="knop" data-keur-ja="' + esc(p.versie) + '"' + (p.waarschuwing ? ' data-eist-reden="1"' : '') + '>Aanmerken</button> ' +
       '<button class="knop stil" data-keur-nee="' + esc(p.versie) + '">Annuleren</button>' +

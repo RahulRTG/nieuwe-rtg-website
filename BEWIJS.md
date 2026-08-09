@@ -15,11 +15,11 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 720 |
 | losse beweringen (`test(...)`) | 4090 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 522 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 524 |
 | **overleefd**: geen mutatie kreeg hem rood | 12 |
 | niet te meten (al rood, geen module gevonden, ...) | 16 |
 | alleen in de kop *genoemd*, nog niet gemeten | 24 |
-| niets van beide | 146 |
+| niets van beide | 144 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -678,7 +678,7 @@ toets omvalt.
 | `agenda.e2e.js` | 1 | -- | Scherm-test voor RTG Agenda: het maandraster, Rahul die in gewone taal plant, een afspraak met het paneel, uitnodigen op codenaam en het ja-zeggen door de ander, en de ICS-export. Echte namen horen nergens in beeld... |
 | `appmenu.e2e.js` | 7 | genoemd | Het app-menu (public/shared/appmenu.js) en de belofte dat Rahul ÉÉN balk heeft. TWEE BELOFTES, EN ALLEBEI ZIJN ZE HIER AL EEN KEER GEBROKEN. |
 | `apps-ui.e2e.js` | 11 | -- | Scherm-tests voor de overige vlaggenschip-apps: leverancier, lid en backoffice. Elk logt in via een API-token in localStorage (net als de PDA- test), opent de app in een echte browser en controleert dat de beveiligde... |
-| `bankkamer.e2e.js` | 1 | -- | Scherm-toets op de BANKKAMER van de boardroom (kantoren.html, sectie vBank). WAAROM DIT BESTAND ER IS. |
+| `bankkamer.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-toets op de BANKKAMER van de boardroom (kantoren.html, sectie vBank). WAAROM DIT BESTAND ER IS. |
 | `bankscherm.e2e.js` | 3 | -- | Scherm-toets op de bank: legt een toets de weg van deze app werkelijk af? WAAROM JUIST DEZE APP EERST scripts/schermen.js telde 105 van de 188 schermen waar geen enkele toets de weg aflegt -- ze worden wel geopend... |
 | `berichten.e2e.js` | 1 | -- | Scherm-test voor de communicatie-app. De unit-toetsen (test/berichten.test.js, test/comm-dm.test.js) bewijzen de server-kant; deze bewijst dat de APP het ook echt doet in een browser: de lijst komt op, een gesprek... |
 | `bestanden.e2e.js` | 1 | -- | Scherm-test voor RTG Bestanden: uploaden via de kiezer, het paneel met voorvertoning, delen op codenaam, de nieuwe versie van de andere kant, en de prullenbak met herstel. Draait alleen waar een browser is. |
@@ -729,7 +729,7 @@ toets omvalt.
 | `office-suite.e2e.js` | 1 | -- | Scherm-test voor de tekstverwerker en de presentatie van RTG Office. Wat hier bewezen wordt: - zoeken en vervangen raakt alleen TEKST, nooit de opmaak: na "haven" naar "kade" staat de kop er nog als kop; - de... |
 | `overheidschermen.e2e.js` | 2 | -- | DE OVERHEIDSSCHERMEN: DE BURGER EN DE AMBTENAAR. Acht schermen uit de lijst van TAKEN 4.9, en ze vallen in twee soorten die precies tegenover elkaar staan: DE BURGERKANT (gemeente, overheid) is voor het lid zelf. |
 | `paginas.e2e.js` | 1 | -- | DE PAGINASCAN -- elke pagina in public/ wordt echt geopend in een browser. WAAROM DIT ER IS De schermtests hiernaast (test/*.e2e.js) beproeven allemaal EEN scherm dat iemand belangrijk vond. |
-| `payrollkeur.e2e.js` | 1 | -- | Scherm-toets op het AANMERKEN van een regelpakket (payroll.html, tab "Loonrun (OS)"). WAAROM DIT BESTAND ER IS, en het is een onaangename reden. |
+| `payrollkeur.e2e.js` | 1 | gezakt op `liegpoort /api/` | Scherm-toets op het AANMERKEN van een regelpakket (payroll.html, tab "Loonrun (OS)"). WAAROM DIT BESTAND ER IS, en het is een onaangename reden. |
 | `pda-ui.e2e.js` | 3 | -- | Scherm-test: de PDA draait in een echte browser (Playwright). Zo valt de frontend-logica ook onder de suite, en is een refactor van een scherm net zo veilig als de backend. |
 | `pinherstel.e2e.js` | 2 | -- | DE PIN-HERSTELSTROOM, IN EEN ECHTE BROWSER, VAN LINK TOT NIEUWE PIN. WAAROM DEZE TOETS BESTAAT. |
 | `poortgesprek.e2e.js` | 1 | -- | Scherm-test voor het gegevensgesprek: de client-kant van de gegevenspoort. De server houdt een handeling met een derde partij tegen met 428 en zegt wat er mist. |

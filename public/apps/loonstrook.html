@@ -13,7 +13,7 @@
 <link href="/shared/rtg-ui.css" rel="stylesheet">
 <style>
   :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--line:var(--rtg-line);--txt:var(--rtg-txt);
-    --soft:var(--rtg-soft);--gold:#C9A24B;--groen:#69B891;}
+    --soft:var(--rtg-soft);--gold:#C9A24B;--groen:#69B891;--burgundy:#C23A5E;}
   *{margin:0;padding:0;box-sizing:border-box;}
   body{background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;min-height:100dvh;}
   .kop{display:flex;align-items:center;gap:0.7rem;padding:calc(env(safe-area-inset-top,0px) + 0.9rem) 1.1rem 0.6rem;}
@@ -27,6 +27,10 @@
   .strookkop b{font-size:0.95rem;}
   .netto{font-family:'Bodoni Moda',serif;font-size:1.5rem;}
   .uitleg{margin-top:0.55rem;font-size:0.86rem;line-height:1.6;}
+  /* De melding dat de strook op ongecontroleerde tabellen is gerekend: een
+     smalle bordeauxrand ernaast, zodat hij opvalt zonder een rood vlak te
+     worden. Als klasse, want de norm telt losse stijlattributen. */
+  .uitleg.let{margin-top:0.4rem;border-left:2px solid var(--burgundy);padding-left:0.6rem;}
   .rij{display:flex;justify-content:space-between;gap:0.8rem;font-size:0.82rem;padding:0.32rem 0;border-bottom:1px solid var(--line);}
   .rij:last-child{border-bottom:0;}
   .rij .lbl{color:var(--soft);}
@@ -150,7 +154,7 @@
            de run op tabellen die zelf melden dat ze niet tegen de bron zijn
            gelegd, dan is dat iets wat hij hoort te weten voordat hij ermee naar
            de bank of de gemeente stapt. */
-        (s.opDemoTabellen ? '<p class="uitleg" style="margin-top:0.4rem;border-left:2px solid var(--burgundy);padding-left:0.6rem;">' +
+        (s.opDemoTabellen ? '<p class="uitleg let">' +
           'Deze berekening staat op belastingtabellen die nog niet tegen de officiële bron zijn gelegd. ' +
           'De bedragen kunnen daardoor afwijken. Gebruik deze strook niet als bewijs van inkomen; vraag uw werkgever om een gecontroleerde versie.</p>' : '') +
         '<p class="uitleg">' + esc(s.uitleg) + '</p>' +

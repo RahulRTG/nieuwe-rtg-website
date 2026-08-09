@@ -14,16 +14,15 @@
    AUTORISATIE (./autorisatie: opschalen vergt vier ogen -- A vraagt aan, B
    bevestigt; afschalen mag altijd direct, een terugval blokkeer je nooit).
 
-   Hier: de stand, de clearing-berekening, de leden-bank-schakelaar, de tarieven
-   en de spaarrente. maakBankregie(state) volgt het vaste kern-patroon. */
+   Hier: de stand, de clearing-berekening en de leden-bank-schakelaar. De
+   tarieven, de spaarrente en de rood-staan-ruimte staan in ./instellingen; wat
+   er is VASTGELEGD over wat RTG mag in ./vergunning.
+   maakBankregie(state) volgt het vaste kern-patroon. */
 
 const BEV = require('../bevoegdheid');
 
 const MODI = ['partner', 'hybride', 'eigen'];
 const RANG = { partner: 0, hybride: 1, eigen: 2 };
-const RENTE_BP_MAX = 2000;         // spaarrente tot 20% (basispunten); ruim, RTG stelt in
-const ROOD_MAX_CENTEN = 5000000;   // rood staan tot 50.000 euro als bovengrens
-const FOOI_MAX_CENTEN = 100000;    // een tarief is nooit meer dan 1000 euro
 const NOOD_DREMPEL = 3;            // zoveel mislukte eigen-clearings achter elkaar -> automatisch nood
 const AUTORISATIE_MS = 10 * 60 * 1000; // de tweede persoon heeft tien minuten
 
@@ -106,36 +105,15 @@ function maakBankregie({ db, save }) {
      meedraaien: ./vergunning. Dat is een REGISTRATIE en geen knop -- vandaar
      naast de knop en niet erin. */
   const verg = require('./vergunning')(ctx);
+  /* De spaarrente, de rood-staan-ruimte en de tarieven: ./instellingen. Wat de
+     bank REKENT, naast wat de bank IS. */
+  const inst = require('./instellingen')(ctx);
   const vergunning = verg.vergunning;
   const partnerRails = verg.partnerRails;
 
   // de leden-bank live zetten (zichtbaar in de app). Geen clearing-opschaling,
   // dus geen vier-ogen; wel altijd in het auditlog vanuit de route.
   function ledenZet({ aan, wie }) { d().ledenAan = aan === true; save(); return { ok: true, ledenAan: d().ledenAan, wie: wie || 'boardroom' }; }
-
-  function instellingenZet({ spaarrenteBp: rente, roodLimietEuro, tarieven }) {
-    const b = d();
-    if (rente != null) {
-      const bp = Math.round(Number(rente));
-      if (!Number.isFinite(bp) || bp < 0 || bp > RENTE_BP_MAX) return { status: 400, error: 'De spaarrente moet tussen 0 en 20% liggen.' };
-      b.spaarrenteBp = bp;
-    }
-    if (roodLimietEuro != null) {
-      const centen = Math.round(Number(roodLimietEuro) * 100);
-      if (!Number.isFinite(centen) || centen < 0 || centen > ROOD_MAX_CENTEN) return { status: 400, error: 'De rood-staan-limiet moet tussen 0 en 50.000 euro liggen.' };
-      b.roodLimietCenten = centen;
-    }
-    if (tarieven && typeof tarieven === 'object') {
-      for (const naam of ['sepaUitCenten', 'spoedCenten', 'passenCenten']) {
-        if (tarieven[naam] == null) continue;
-        const c = Math.round(Number(tarieven[naam]));
-        if (!Number.isFinite(c) || c < 0 || c > FOOI_MAX_CENTEN) return { status: 400, error: 'Een tarief moet tussen 0 en 1000 euro liggen.' };
-        b.tarieven[naam] = c;
-      }
-    }
-    save();
-    return { ok: true, spaarrenteBp: b.spaarrenteBp, roodLimietCenten: b.roodLimietCenten, tarieven: { ...b.tarieven } };
-  }
 
   function overzicht() {
     const b = d();
@@ -162,7 +140,7 @@ function maakBankregie({ db, save }) {
     bankNoodMeld: nood.noodMeld, bankNoodHerstel: nood.noodHerstel, bankClearingMislukt: nood.clearingMislukt, bankClearingGelukt: nood.clearingGelukt,
     // leden-bank live
     bankLedenAan: ledenAan, bankLedenZet: ledenZet,
-    bankInstellingenZet: instellingenZet, bankregieOverzicht: overzicht
+    bankInstellingenZet: inst.instellingenZet, bankregieOverzicht: overzicht
   };
 }
 

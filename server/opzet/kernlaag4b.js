@@ -5,6 +5,7 @@
      bank
      reis
      fiscaal/regelwacht
+     fiscaal/btwaangifte
      thuis
      koppel
      tafelwensen
@@ -40,6 +41,10 @@ Object.assign(kern, require('../kern/reis')({ LANDEN }));
    LANDEN-tabel, herstart-vast, met een dagelijkse bron-check. */
 Object.assign(kern, require('../kern/fiscaal/regelwacht')({ db, save, LANDEN, peiljaar: FISCAAL_PEILJAAR }));
 kern.regelwacht.herstelOverlay();
+/* De btw-aangifte van een zaak (kern/fiscaal/btwaangifte.js): opmaken uit het
+   factuurregister, controleren, indienen vastleggen en corrigeren -- naar het
+   model van de loonaangifte, met het factuurregister als enige bron. */
+Object.assign(kern, require('../kern/fiscaal/btwaangifte').maakBtwAangifte({ db, save, crypto }));
 const regelTimer = setInterval(() => { kern.regelwacht.check().catch(() => {}); }, Number(process.env.FISCAAL_CHECK_MS || 86400000));
 if (regelTimer.unref) regelTimer.unref();
 /* RTG Thuis (kern/thuis): thuisverhuur van lid aan lid -- ons antwoord op

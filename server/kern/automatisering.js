@@ -82,7 +82,8 @@ module.exports = ({ rtmail }) => {
     const b = (bedrag != null && isFinite(bedrag)) ? (' Het voorbereide bedrag is EUR ' + Number(bedrag).toFixed(2) + '.') : '';
     const d = deadline ? (' Deadline: ' + String(deadline).slice(0, 20) + '.') : '';
     const body = 'Je btw-aangifte' + p + ' komt eraan.' + d + b +
-      ' De cijfers staan klaar in de belastingtool. Controleren en indienen doe je zelf; Rahul dient nooit voor je in.';
+      ' Maak de aangifte op in je Kantoor onder Boekhouding; die telt hem uit je eigen factuurregister.' +
+      ' Controleren en indienen doe je zelf; Rahul dient nooit voor je in.';
     return rtmail.systeemStuur(adres, 'Btw-aangifte komt eraan', body, 'overheid');
   }
 

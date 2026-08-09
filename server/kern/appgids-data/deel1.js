@@ -72,9 +72,15 @@ module.exports = {
   '/apps/bank.html': G('RTG Rekening: je saldo, afschriften en betalingen in de vertrouwde RTG-stijl.',
     ['Bekijk je saldo en afschriften', 'Zet spaardoelen en volg ze', 'Vraag krediet aan; een mens beoordeelt'],
     'De AI adviseert, een mens beslist; zeker bij geld houden we die volgorde altijd aan.'),
-  '/apps/balans.html': G('RTG Balans: je financiële overzicht en de boekhoudhulp.',
-    ['Bekijk inkomsten en uitgaven per maand', 'Laat de AI-boekhouder meedenken', 'Exporteer voor je administratie'],
-    'Tien minuten per week naar je balans kijken voorkomt de meeste geldverrassingen.'),
+  /* Deze entry beschreef jarenlang een boekhoudapp met een AI-boekhouder en een
+     export voor je administratie. RTG Balans is dat niet en is dat nooit
+     geweest: het is het rustscherm (kern/balans.js, routes/balans.js). Wie de
+     gids las, zocht hier een boekhouding die er niet zit. De boekhouding van een
+     zaak staat in het Kantoor, de zzp-belastingtool onder Betalen. */
+  '/apps/balans.html': G('RTG Balans: je weekbeeld en het advies om ook eens niks te doen.',
+    ['Zie hoe vol je komende week staat', 'Lees waar Rahul rust, een hobby of ontprikkelen aanraadt',
+      'Bewaar je recepten in de beveiligde opslag van dit toestel'],
+    'Geen streaks en geen scores: dit scherm mag je ook gewoon negeren, en dat is niet erg.'),
   '/apps/loonstrook.html': G('Mijn loon: je loonstroken van alle bedrijven waar je werkt, in gewone taal.',
     ['Zie per periode wat er bruto binnenkwam en wat er afging', 'Lees waarom het bedrag zo uitkwam, stap voor stap',
       'Kijk wie je identiteitsgegevens opvroeg, en waarom'],

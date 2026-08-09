@@ -561,6 +561,20 @@
       "gezakt": 4,
       "scherp": "gezakt"
     },
+    "btw-aangifte.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
+    },
+    "btw-scherm.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "bugjacht.test.js": {
       "soort": "server",
       "staat": "gezakt",

@@ -519,6 +519,10 @@ packages). Ze bewaken de plekken waar geld en wet aan hangen:
   wachtwoord-hashing (scrypt) en sessietokens;
 - de zzp-belastingtool (rekenkundige invarianten, afscherming per pas,
   peiljaar) en de leeftijdslaag (leeftijdsgroep uit de geboortedatum);
+- de btw-aangifte van een zaak (`test/btw-aangifte.test.js`): de periodevakken,
+  de telling over het factuurregister, de twee controles die weigeren, de
+  correctie na indienen en de poorten van de endpoints — plus een schermtoets
+  (`test/btw-scherm.e2e.js`) die de kaart in een echte browser laat rekenen;
 - De Salon-rechten (gast liket wel, reageert niet), de bestel- en betaalflow
   en de AVG-rechten (inzage en definitieve verwijdering).
 
@@ -665,6 +669,46 @@ De HTML-bestanden werken ook los (dubbelklikken of statische hosting): het porta
 | `POST /api/cv/get` / `POST /api/cv/save` | Het RTG-cv van het lid (de cv-builder in de leden-app) |
 | `POST /api/member/apply` `{supplierCode, func}` | Solliciteren bij een partner; kan pas met een afgerond cv |
 | `POST /api/supplier/apply` `{code, name, func, contact}` | Open sollicitatie via het startscherm van een partner-app |
+
+### De btw-aangifte van een zaak (`kern/fiscaal/btwaangifte.js`)
+
+Gebouwd naar het model van de loonaangifte (`kern/payroll/aangifte.js`), en om
+dezelfde reden: **één bron, geen tweede motor.** De aangifte komt uit het
+factuurregister en niets anders. Elke factuurregel draagt zijn eigen tarief
+sinds de facturatiemotor hem boekte, en dat tarief is wat de klant op zijn bon
+zag; er wordt hier geen btw opnieuw uitgerekend. Het tellen staat in
+`kern/fiscaal/btwtelling.js`, dat ook als enige plek weet wat `2026K3` betekent.
+
+Twee controles die weigeren in plaats van waarschuwen:
+
+1. de btw uit de regels moet exact de btw op de facturen zelf zijn (twee wegen
+   door hetzelfde register: regel versus factuurkop);
+2. bij indienen wordt opnieuw geteld — zijn er sinds het opmaken facturen
+   bijgekomen, dan weigert hij, want indienen op verouderde cijfers is een
+   verkeerde aangifte met een handtekening eronder.
+
+Verder: opmaken mag altijd, **indienen pas als de periode voorbij is**; een
+ingediende aangifte verandert niet meer maar krijgt een correctie bovenop, met
+verwijzing en verschil; en `dienIn` legt alleen vast DAT er is ingediend, door
+wie en met welk kenmerk. RTG verzendt niets — dat is dezelfde afspraak als in
+het btw-draaiboek (`kern/automatisering.js`): de zaak dient zelf in.
+
+Anders dan bij de loonaangifte, waar het RTG-kantoor indient en de werkgever
+meeleest, doet de ondernemer dit zelf: hij is de belastingplichtige. Er is dus
+bewust geen kantoorroute die dat overneemt.
+
+| Endpoint | Doel |
+|---|---|
+| `POST /api/supplier/btw/opmaken` `{periode, correctie?}` | Aangifte opmaken of bijwerken (`2026K3` of `2026-07`); manager, eigen zaak uit het token |
+| `POST /api/supplier/btw/aangiftes` `{jaar?}` | De eigen aangiftes teruglezen |
+| `POST /api/supplier/btw/aangifte` `{id}` | Eén aangifte in detail |
+| `POST /api/supplier/btw/indienen` `{id, kenmerk}` | Vastleggen dat hij is ingediend; zonder kenmerk geen bewijs |
+
+Het scherm staat in het Kantoor van de zaak onder Boekhouding, naast (en
+nadrukkelijk niet in plaats van) "Btw deze maand": dat bord is de maandstand uit
+de kassa en de boekingen, de aangifte is de periode uit het factuurregister.
+Twee verschillende vragen. Wat er níét in zit is omzet die nooit een factuur
+kreeg; de aangifte verantwoordt daarom uit hoeveel facturen hij komt.
 
 ### RTG School (de onderwijs-toren)
 

@@ -99,6 +99,7 @@ app.post('/api/supplier/notifications/read', supplierAuth, (req, res) => {
   require('./supplier/salon')(kern);
   require('./supplier/events')(kern);
   require('./supplier/financien')(kern);
+  require('./supplier/btw')(kern);
   require('./supplier/vervoer')(kern);
   require('./supplier/kassa')(kern);
   require('./supplier/horeca')(kern); // RTG Horeca OS: rekeningen, keuken, bezorging, club, hotel-folio

@@ -97,6 +97,12 @@ const BELEID = [
      stand, terwijl niemand daar nog om vroeg. Deelnemers onder de
      progressiegrens staan er zonder codenaam in (kern/spellen/uitslagen.js),
      dus wat hier verloopt is de historie van volwassen leden. */
+  /* Het verloop van een partij (de replay). Dertig dagen: een uitslag is een
+     feit dat een jaar meegaat, een verloop is een geheugen dat je binnen een
+     maand nog eens naspeelt en daarna niet meer. Aparte tak, want anders erft
+     het een de termijn van het ander. */
+  { tak: 'spelZetten', label: 'verloop van partijen (replay)', dagen: 30, grond: 'nodig',
+    vorm: 'lijst', datum: 'at', waarom: 'alleen om je eigen partij terug te kijken; daarna heeft het geen doel meer' },
   /* Toernooien: een begrensd evenement, dus korter dan de uitslagen zelf. Wie
      het gewonnen heeft blijft als partij in spelUitslagen staan; het bord met
      de loting hoeft niet een jaar te blijven hangen. */

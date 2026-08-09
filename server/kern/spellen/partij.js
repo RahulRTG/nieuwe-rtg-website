@@ -3,7 +3,7 @@
    en opgeven. Krijgt de gedeelde context een keer bij het opstarten vanuit
    kern/spellen.js. */
 module.exports = (ctx) => {
-  const { db, save, crypto, codenaamVan, nu, S, SPEL, SOORTEN, nudge, VIEWS, ZETTEN, STATISCH, noteerUitslag, zijnVrienden, isGeblokkeerd } = ctx;
+  const { db, save, crypto, codenaamVan, nu, S, SPEL, SOORTEN, nudge, VIEWS, ZETTEN, STATISCH, noteerUitslag, noteerZet, zijnVrienden, isGeblokkeerd } = ctx;
   // het toernooi hangt aan dezelfde plek als de uitslag: zo is er geen tweede
   // moment waarop een ronde kan blijven hangen (late binding, zie spellen.js)
   const naPotje = (p) => { noteerUitslag(p); if (ctx.toernooiPotjeKlaar) ctx.toernooiPotjeKlaar(p); };
@@ -42,6 +42,9 @@ module.exports = (ctx) => {
     const beheer = zet && (SPEL[p.soort].buitenBeurt || []).includes(zet.actie);
     if (!beheer && p.spelers[p.beurt] !== mij) return { status: 409, error: 'De ander is aan zet.' };
     const r = ZETTEN[p.soort](p, mij, zet || {});
+    // het verloop vastleggen, maar alleen van een zet die is GEACCEPTEERD:
+    // een replay met afgekeurde zetten erin is geen verloop maar een logboek
+    if (!r.error) noteerZet(p, mij, zet || {});
     /* Wanneer er voor het laatst iets GEBEURDE. `at` is het moment van
        aanmaken en zegt niets over of een potje nog leeft; zonder dit stempel
        kan de opschoning een verlaten partij niet van een drukke onderscheiden. */

@@ -91,5 +91,8 @@ module.exports = ({ db, save, crypto, schoon }) => {
     save(); return { ok: true, wachtend: w };
   }
 
-  return { beauty: { overzicht: beautyOverzicht, boek: beautyBoek, afspraakStatus: beautyStatus, walkIn, walkStatus } };
+  /* salonVan gaat mee naar buiten omdat de ledenkant (./beautyleden.js) op
+     DEZELFDE bak moet werken. Een tweede demoSalon zou een tweede waarheid
+     over de agenda zijn, en die lopen altijd uiteen. */
+  return { beauty: { overzicht: beautyOverzicht, boek: beautyBoek, afspraakStatus: beautyStatus, walkIn, walkStatus, salonVan } };
 };

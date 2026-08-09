@@ -3,7 +3,6 @@
    De uitleg over wat dit is staat in ../appcatalogus-data.js. */
 module.exports = [
   ['wbw', 'Wie betaalt wat', 'geld', '/apps/wbw.html', 'Groepsuitgaven met live balans en verrekenen via RTG Pay.'],
-  ['balans', 'Balans', 'geld', '/apps/balans.html', 'Je saldo en tikgeschiedenis in één overzicht.'],
   ['rtgcode', 'RTG-code', 'geld', '/apps/rtgcode.html', 'Je betaal- en toegangscodes veilig op één plek.'],
   ['logboek', 'Logboek', 'geld', '/apps/logboek.html', 'Je acties en bevestigingen, netjes vastgelegd.'],
   ['mecenaat', 'Mecenaat', 'geld', '/apps/mecenaat.html', 'Steun projecten en goede doelen als mecenas.'],
@@ -12,15 +11,21 @@ module.exports = [
 
   // ---- spelen & sport ----
   ['spelen', 'Spelen', 'spelen', '/apps/spelen.html', 'Dammen, rummikub, Magnaat, partyspellen, sudoku en meer, samen of alleen.'],
-  ['sport', 'Sport', 'spelen', '/apps/sport.html', 'Je sportactiviteiten en clubs.'],
+
+  // ---- leven & gezondheid ----
+  // Waar iemand zoekt, niet waar de code woont: Vitaal draait op de gedeelde
+  // veiligheidskern en Balans op de agenda, maar je zoekt ze allebei hier.
+  ['sport', 'Sport', 'leven', '/apps/sport.html', 'Je sportactiviteiten en clubs.'],
+  ['balans', 'Balans', 'leven', '/apps/balans.html', 'Je week op rust en ritme: Rahul adviseert ook eens niks, zonder streaks of schuldgevoel.'],
+  ['vitaal', 'Vitaal', 'leven', '/apps/vitaal.html', 'Een knop per dag: het gaat goed. Voor medicijnen, en voor wie alleen woont.'],
 
   // ---- veiligheid & identiteit ----
-  // De vier veiligheidsapps draaien op een gedeelde kern (kern/veiligheid/):
-  // een kring van codenamen, je laatst bekende plek, en een dodemansknop die
-  // op de SERVER tikt, zodat hij ook afgaat als je telefoon uitvalt.
+  // Thuiswacht, Codewoord, Vitaal en Thuisrust draaien op een gedeelde kern
+  // (kern/veiligheid/): een kring van codenamen, je laatst bekende plek, en een
+  // dodemansknop die op de SERVER tikt, zodat hij ook afgaat als je telefoon
+  // uitvalt. Vitaal staat hierboven onder leven, want daar wordt hij gezocht.
   ['thuiswacht', 'Thuiswacht', 'veiligheid', '/apps/thuiswacht.html', 'Zeg hoe lang je onderweg bent; meld je je niet, dan krijgt je kring bericht met je laatst bekende plek.'],
   ['codewoord', 'Codewoord', 'veiligheid', '/apps/codewoord.html', 'Een gewone zin die je kring stil waarschuwt met je plek; op je scherm gebeurt er niets zichtbaars.'],
-  ['vitaal', 'Vitaal', 'veiligheid', '/apps/vitaal.html', 'Een knop per dag: het gaat goed. Voor medicijnen, en voor wie alleen woont.'],
   ['thuisrust', 'Thuisrust', 'veiligheid', '/apps/thuisrust.html', 'Niet storen tot je thuis bent; je eigen kring komt er altijd doorheen.'],
   ['ik', 'Wie ben ik', 'veiligheid', '/apps/ik.html', 'Wat Rahul over je mag weten: hoe hij tegen je doet, je voornaamwoorden en je eigen geloofskeuze. Alles optioneel.'],
   ['passkeys', 'Passkeys', 'veiligheid', '/apps/passkeys.html', 'Inloggen met vingerafdruk, gezicht of een fysieke sleutel.'],

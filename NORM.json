@@ -4,7 +4,7 @@
     "endpointsZonderTest": 1093,
     "dekkingPct": 68,
     "keuringStuk": 0,
-    "keuringScheef": 12,
+    "keuringScheef": 10,
     "dependencies": 0,
     "testbestanden": 636,
     "dekkingWaargenomenPct": 100,
@@ -29,6 +29,12 @@
     "toetsenOngevoeligPct": 2.2
   },
   "notities": [
+    {
+      "datum": "2026-08-09",
+      "meter": "keuringScheef 12 -> 10 (BETER, met de hand vastgezet)",
+      "reden": "kern/ledenbalie-dossier.js en kern/ledenbalie-klachten.js zijn weg. De keuring meldde ze als \"wordt nergens aangeroepen\" en dat klopte: commit 811af7e sneed ze uit ledenbalie.js om dat bestand onder de 10 kB te krijgen, maar zette de aanroeper nooit om. ledenbalie.js hield zijn eigen balieDossier en de klachten bleven via ledenbalie-zaken.js lopen. De weggesneden kopieen waren daarna ook nog uit elkaar gaan lopen -- hun klachtsoorten waren betaling/toegang/reis/partner/privacy/overig tegen reis/betaling/app/partner/anders in de levende weg. Aansluiten zou dus geen ontbrekend gedrag herstellen maar levend gedrag veranderen, en dat is een andere beslissing dan \"een gat dichten\".",
+      "eerlijkheidshalve": "Verwijderen en niet aansluiten was een keuze van de eigenaar, gevraagd met de feiten erbij. Wat pleit voor verwijderen is LAT-regel 4: zolang die bestanden er staan kan iemand de dode kopie bewerken in de overtuiging dat hij iets repareert, en niets klaagt. Wat we ermee verliezen is de knip die 811af7e bedoelde: ledenbalie.js blijft op 9,8 kB en zit dus vlak onder de grens (hij telt mee in keuringOmvang). Die knip is daarmee niet gedaan maar ook niet half blijven hangen."
+    },
     {
       "datum": "2026-08-09",
       "meter": "tien meters opnieuw geijkt op de gemeten stand; vijf die BETER stonden meteen vastgezet",

@@ -17,16 +17,20 @@
    de weg van een echte rit: eerst een leeg bord, dan een aanvraag op de markt,
    dan de toewijzing, dan de prik, dan het afrekenen.
 
-   WAT HIER NIET IN STAAT, EN WAAROM. /api/staff/inzetbaarheid hoorde in dit
-   rijtje, maar dat pad IS niet te halen zonder de productiecode te veranderen:
-   server/routes/staff/inzetbaarheid.js pakt `payrollOS` en `sseToSupplier` niet
-   uit zijn context (regel 6), terwijl de route ze op regel 9 en 20 gebruikt.
-   Elke aanroep eindigt daardoor in "ReferenceError: payrollOS is not defined"
-   en een 500 -- ook de nette invoer. Een toets die dat vastlegt zou de kapotte
+   WAT VAN /api/staff/inzetbaarheid HIER ALLEEN ALS DEUR IN STAAT, EN WAAROM.
+   Dat pad hoorde in het rijtje hierboven, maar zijn binnenkant is niet te halen
+   zonder de productiecode te veranderen: server/routes/staff/inzetbaarheid.js
+   pakt `payrollOS` en `sseToSupplier` niet uit zijn context (regel 6), terwijl
+   de route ze op regel 9 en 20 gebruikt. Elke aanroep die de deur door komt
+   eindigt daardoor in "ReferenceError: payrollOS is not defined" en een 500 --
+   ook de nette invoer, nagemeten. Een toets die dat vastlegt zou de kapotte
    stand vastzetten in plaats van hem te repareren, en de strenge poort in
-   test/helper.js kleurt de hele run sowieso rood op zo'n serverfout. Het staat
-   in het antwoord bij deze opdracht; het hoort met een regeltje in de route
-   gerepareerd te worden, niet hier omzeild. */
+   test/helper.js kleurt de hele run sowieso rood op zo'n serverfout
+   ("serverfout":true). Wat er WEL van te toetsen valt staat in toets 5: de deur.
+   Die is geen opvulling -- achter hem liggen verzuimgegevens, en hij is het
+   enige wat een route die ooit zonder supplierAuth wordt opgehangen tegenhoudt.
+   De kapotte binnenkant hoort met een regeltje in de route gerepareerd te
+   worden, niet hier omzeild; het staat in het antwoord bij deze opdracht. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
@@ -252,9 +256,21 @@ test('4. na het afrekenen komt er geen prik meer bij, en de rit verhuist naar kl
   assert.equal(bord.body.inzetbaar, 1, 'de vloot staat er nog gewoon, de rit is af en de wagen niet');
 });
 
+/* De deuren staan hier apart en niet los verspreid, omdat het om EEN bewering
+   gaat die op vier paden moet gelden: personeelswerk hangt achter supplierAuth
+   en een klant is geen personeel. De foutmelding wordt meegelezen en niet alleen
+   de 401, want een route die per ongeluk zonder supplierAuth wordt opgehangen
+   kan best zelf een 401 geven om een heel andere reden -- dan zou "401" hier
+   groen blijven terwijl de deur weg is. Met de tekst erbij zakt hij. */
 test('5. de personeelsdeuren: een lidtoken is geen personeelstoken', async () => {
-  for (const pad of ['/api/staff/mob/mijn', '/api/staff/mob/positie', '/api/staff/mob/kaart/storingen']) {
-    assert.equal((await api(pad, { ref }, reiziger)).status, 401, pad + ' gaat niet open met een lidtoken');
-    assert.equal((await api(pad, { ref })).status, 401, pad + ' gaat niet open zonder token');
+  for (const pad of ['/api/staff/mob/mijn', '/api/staff/mob/positie',
+    '/api/staff/mob/kaart/storingen', '/api/staff/inzetbaarheid']) {
+    const metLid = await api(pad, { ref }, reiziger);
+    assert.equal(metLid.status, 401, pad + ' gaat niet open met een lidtoken');
+    assert.match(metLid.body.error, /Niet ingelogd als leverancier/,
+      pad + ': het is de personeelsdeur die weigert, niet toevallig iets anders');
+    const zonder = await api(pad, { ref });
+    assert.equal(zonder.status, 401, pad + ' gaat niet open zonder token');
+    assert.match(zonder.body.error, /Niet ingelogd als leverancier/, pad + ' zonder token');
   }
 });

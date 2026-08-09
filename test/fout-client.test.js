@@ -73,6 +73,17 @@ async function wachtOpLog(merk, ms) {
   }
 }
 
+// Hetzelfde wachten, maar op ruwe logtekst: niet elke regel die we zoeken is
+// een clientfout-regel (een geweigerd lijf logt een uitzondering, geen melding).
+async function wachtOpTekst(merk, ms) {
+  const eind = Date.now() + (ms || 5000);
+  for (;;) {
+    if (stderrTekst.includes(merk)) return true;
+    if (Date.now() > eind) return false;
+    await new Promise(r => setTimeout(r, 25));
+  }
+}
+
 /* Spoelen: stuur een melding waarvan we WEL weten dat hij gelogd hoort te
    worden, en wacht tot die regel binnen is. Alles wat daarvoor is verstuurd,
    staat er dan ook -- of staat er nooit. */
@@ -191,8 +202,29 @@ test('6. een onleesbaar lijf wordt geweigerd en belandt niet in het logboek', as
   const r = await meld('{"melding":"KAPOT6", dit is geen json');
   assert.equal(r.status, 400, 'onleesbare JSON is een invoerfout, geen 204 en geen 500');
   const uit = await r.json();
-  assert.ok(uit.error && !/JSON|token|position/i.test(uit.error), 'de client krijgt een nette zin, geen ontleedfout: ' + uit.error);
+
+  /* De client krijgt EEN vaste, nietszeggende zin. Hier stond eerst een verbod
+     op de woorden "JSON", "token" en "position" -- dat is de Engelse tekst van
+     de ontleder van V8, en die komt hier nooit langs: dit huis heeft een eigen
+     ontleder (server/lib/rtgjson.js) die Nederlands spreekt en dingen zegt als
+     "objectsleutel moet een string zijn (positie 21)". Een verbod op "position"
+     laat "positie" woordeloos door. Nagetrokken met een mutatie: err.message
+     rechtstreeks naar de client sturen liet die oude regel gewoon groen.
+     Vandaar de gelijkheid -- elk woord uit welke ontleder dan ook wijkt af. */
+  assert.equal(uit.error, 'Er ging iets mis. Probeer het opnieuw.',
+    'de client krijgt de vaste zin en geen woord uit de ontleder: ' + uit.error);
   assert.ok(!uit.stack, 'en zeker geen stack');
+  const antwoord = JSON.stringify(uit);
+  for (const woord of ['objectsleutel', 'positie', 'rtgjson', 'server/']) {
+    assert.ok(!antwoord.includes(woord), 'geen "' + woord + '" in het antwoord: ' + antwoord);
+  }
+
+  /* Die zin mag alleen zo kaal zijn omdat er een verzoek-id bij zit dat de
+     beheerder naar het volledige verhaal in het logboek brengt. Zonder dat id
+     is "er ging iets mis" geen nette afhandeling maar een doodlopend spoor,
+     dus het id wordt hier ook echt in het logboek teruggezocht. */
+  assert.ok(uit.id, 'er hoort een verzoek-id bij, anders is de melding nergens terug te vinden');
+  assert.ok(await wachtOpTekst(uit.id), 'het id uit het antwoord staat ook in het logboek: ' + uit.id);
 
   await spoel();
   assert.ok(!stderrTekst.includes('KAPOT6'), 'van een geweigerd lijf komt niets in het logboek');

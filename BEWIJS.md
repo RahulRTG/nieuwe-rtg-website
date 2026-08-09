@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 751 bestanden en 4239 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 754 bestanden en 4277 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 751 |
-| losse beweringen (`test(...)`) | 4239 |
+| toetsbestanden | 754 |
+| losse beweringen (`test(...)`) | 4277 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 538 |
 | **overleefd**: geen mutatie kreeg hem rood | 13 |
 | niet te meten (al rood, geen module gevonden, ...) | 16 |
-| alleen in de kop *genoemd*, nog niet gemeten | 25 |
-| niets van beide | 159 |
+| alleen in de kop *genoemd*, nog niet gemeten | 26 |
+| niets van beide | 161 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-654 bestanden, 4073 beweringen.
+657 bestanden, 4111 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -192,7 +192,7 @@ toets omvalt.
 | `foundation-rest.test.js` | 4 | gezakt op `liegpoort /api/` | DE LAATSTE FOUNDATION-ROUTES -- 5 endpoints, twee heel verschillende kanten. Hiermee is de foundation-groep uit de dekkingsmeting afgewerkt. |
 | `foundation.test.js` | 28 | gezakt op `liegpoort /api/` | Integratietests voor de RTFoundation-lesapp (gratis onderwijs): de live-les, het bord, het schrift, opgaven en de AI-bijles. Draait tegen een echte RTG-server in een tijdelijke datamap. |
 | `fout-aggregatie.test.js` | 5 | gezakt op `&&->||` | Test voor de eigen in-memory fout-aggregatie in server/log.js. Storingen worden gegroepeerd op een vingerafdruk (bericht met cijfers weggenormaliseerd + plaats), met een teller; foutenSamenvatting() geeft de... |
-| `fout-client.test.js` | 9 | -- | DE INGANG VOOR BROWSERFOUTEN: POST /api/fout/client WAAROM DEZE TOETS BESTAAT. Dit is het enige spoor van een storing die alleen op het toestel van een gebruiker gebeurt (server/routes/fout.js, gevoed door... |
+| `fout-client.test.js` | 9 | genoemd | DE INGANG VOOR BROWSERFOUTEN: POST /api/fout/client WAAROM DEZE TOETS BESTAAT. Dit is het enige spoor van een storing die alleen op het toestel van een gebruiker gebeurt (server/routes/fout.js, gevoed door... |
 | `foutmelder.test.js` | 4 | gezakt op `===->!==` | Eigen externe fout-melder (server/foutmelder.js), die @sentry/node verving. We draaien tegen een lokale nep-webhook en controleren: er gaat een nette JSON-POST uit met de fout + context, dezelfde fout wordt binnen... |
 | `functieplaats.test.js` | 4 | gezakt op `liegpoort /api/` | De plaats-as van de schakelkast: een functie per STAD of DORP dicht. Fijner dan het land, grover dan de persoon. |
 | `functies.test.js` | 13 | -- | Tests voor de functieschakelaars (server/functies.js): de pad-matching (langste prefix wint), de standaard (alles aan) en de catalogus. Zuiver, geen server nodig. |
@@ -288,6 +288,8 @@ toets omvalt.
 | `laatste-negen.test.js` | 4 | gezakt op `liegpoort /api/` | DE LAATSTE ZES -- open verbindingen, padparameters en de kinderkant. foundation/gezin/:code/kanaal, foundation/les/:code/stream, foundation/schrift/:code, supplier/stream en de twee rtf/social/kind/boardroom-routes... |
 | `laatste-twee-endpoints.test.js` | 6 | gezakt op `liegpoort /api/` | DE LAATSTE TWEE ENDPOINTS DIE NOOIT WERDEN AANGERAAKT. Het routejournaal (server/routelog.js, uitgelezen door scripts/dekking.js) zegt precies welke routes tijdens de suite echt zijn aangeroepen. |
 | `lab-geheim.test.js` | 3 | gezakt op `true->false#0` | Bedrijfsgeheimen in het Onderzoekslab (kern/onderzoekslab.js): wie aan een project werkt (op het team) ziet het; de boardroom ziet alles; een buitenstaander ziet niets. Draai: npm test |
+| `lab2-bewoner.test.js` | 13 | -- | De BEWONERSKANT van het RTF Living Lab, plus het kantoorwerk eromheen dat nergens anders in de suite langskomt: het apparatuurregister (uitgifte, storing sluiten, reservering intrekken), de klachtenprocedure van... |
+| `lab2-werk.test.js` | 14 | -- | Het KANTOORWERK van het RTF Living Lab: het bestuur van een lab (budget, partners), het stafbeeld op een lab, het vraagstuk, "wat nu", de deelnemers en hun rollen, de werkplaats (taken, agenda, documenten, logboek,... |
 | `labfonds.test.js` | 4 | gezakt op `===->!==#0` | Het Lab-fonds (kern/labfonds.js): leden zamelen in voor het RTF Onderzoekslab, per locatie verdeeld, en beslissen gezamenlijk met de AI-scheidsrechter. |
 | `leden-gids-pg.test.js` | 1 | slaat zichzelf over | Integratietest voor de Postgres-ledengids (member_dir): met DATABASE_URL gezet staat de codenaam/pas-gids als GEINDEXEERDE RIJEN in Postgres in plaats van als object in het geheugen. Een nieuw lid dat zich meldt... |
 | `leden-teller.test.js` | 1 | gezakt op `liegpoort /api/` | De kantoor-totalen tellen de leden met een goedkope, onderhouden teller (ledenAantal) i.p.v. Object.keys(memberDir).length, dat O(N) is en bij miljoenen leden seconden per verzoek kost. |
@@ -578,6 +580,7 @@ toets omvalt.
 | `studio.test.js` | 6 | gezakt op `liegpoort /api/` | RTG Ontwerpstudio: het voertuig- en vaartuig-ontwerpbureau van de kantoren (automotive, jachten, luchtvaart, helikopters). Een AI tekent het concept uit (silhouet, aandrijving, materialen, gedempt palet, uitrusting,... |
 | `stun.test.js` | 4 | gezakt op `===->!==#0` | Test voor de eigen STUN-server (server/stun.js): een Binding Request krijgt een Binding Success Response met een correct ge-XOR'd MAPPED-ADDRESS terug, en rommel wordt genegeerd (geen crash). Zo bellen leden zonder... |
 | `stuur.test.js` | 9 | gezakt op `liegpoort /api/` | Het AI-stuur: Rahul voert acties uit op elk toegestaan API-pad via een interne aanroep met de eigen inlog van de gebruiker. Dezelfde rechten en dezelfde schakelkast als de app-knoppen; infrastructuur is verboden... |
+| `supplier-comm-mob-payroll.test.js` | 11 | -- | NEGENTIEN ZAKELIJKE INGANGEN DIE DOOR GEEN ENKELE TOETS WERDEN AANGEROEPEN. Ze staan in vier bestanden, ze zitten alle vier in de zaak-app, en de suite kwam er nooit langs: routes/supplier/comm.js inbox, gesprek,... |
 | `supplier-post-drive.test.js` | 12 | gezakt op `liegpoort /api/` | DE POST EN DE TEAM-DRIVE VAN EEN ZAAK -- de grens tussen twee bedrijven. Zestien endpoints die de waargenomen dekkingsmeting (scripts/dekking.js) als NOOIT AANGEROEPEN aanwees. |
 | `svgpaden.test.js` | 8 | gezakt op `===->!==#0` | De pad-keuring zelf toetsen. Een keuring die "niets gevonden" zegt is pas iets waard als vaststaat dat hij het echte defect ziet en geldige paden met rust laat. |
 | `synergie.test.js` | 6 | gezakt op `liegpoort /api/` | RTG Synergie: zaken maken samen deals en pakketten. Pas als elke deelnemer heeft getekend staat het pakket live; RTG Pay splitst elke aankoop exact volgens de afgesproken aandelen (de som moet kloppen). |

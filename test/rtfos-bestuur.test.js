@@ -56,6 +56,21 @@
    Alle zeven zakten op hun eigen toets en lieten de andere vijf groen; een
    mutatie die alles laat zakken, bewijst niets.
 
+   BIJ DE KEURING KWAMEN ER TWEE MUTATIES BIJ, en die legden allebei een gat
+   bloot dat hierboven nog niet gedekt was:
+
+     - bestuur.js, `zetelsIn` voor een stadsvergadering laten teruggeven wat er
+       bij het aanmaken als `omvang` werd MEEGEGEVEN in plaats van de zetels te
+       tellen: RAAK op 4. Dat de landelijke vergadering wel met de opgegeven
+       omvang rekent en de stad met haar echte zetels, stond nergens vast --
+       een stad kon zo haar eigen quorum opgeven;
+     - basis.js, de gedeelde 403 uit `poort` de stadsnaam afnemen: RAAK op 1, 2
+       EN 3. Dat die er drie tegelijk raakt is met opzet: toetsen 1 en 2 keken
+       al of de weigering de stad noemt, toets 3 nam met de kale 403 genoegen en
+       bleef bij deze mutatie groen. Nu niet meer -- een 403 om een heel andere
+       reden (module uit, stad geblokkeerd) telt daar niet meer mee als bewijs
+       dat de stadsgrens dichtzit.
+
    Draai los: node --experimental-sqlite --test test/rtfos-bestuur.test.js
    ========================================================================== */
 const test = require('node:test');
@@ -311,9 +326,11 @@ test('de activiteitenlijst telt plekken, wachtlijst en aanwezigen mee met wat er
     'wie binnen is telde niet meer mee, terwijl hij nog steeds een van de plekken bezet');
   assert.equal(rijBezig.status, 'bezig', 'de activiteit bleef op vol staan terwijl er iemand binnen was');
 
-  // de lijst is van de stad, niet van het land
+  // de lijst is van de stad, niet van het land -- en de weigering noemt de stad
+  // waarop hij slaat, zodat een 403 om een heel andere reden hier niet meetelt
   const vreemd = await os_('activiteiten', { stad: STAD_B }, BESTUUR_A);
   assert.equal(vreemd.status, 403, 'Almelo las de agenda van Assen');
+  assert.match(vreemd.body.error, /Assen/);
 });
 
 /* ---------------------------------------------------------------------------
@@ -370,10 +387,24 @@ test('een vergadering opvragen geeft het gerekende quorum, en niet aan het verke
   assert.equal(eigenLezen.status, 200, 'de stad kon haar eigen notulen niet opvragen');
   assert.equal(eigenLezen.body.vergadering.stad, STAD_A);
 
-  // maar die van Almelo zijn weer niet zomaar van iedereen met een kantoorsessie:
-  // het landelijke bestuur mag wel, en dat is hier het verschil met hierboven
+  /* En andersom: het landelijke bestuur mag WEL bij de notulen van een stad --
+     de poort staat per orgaan open, niet per stad dicht. Een kale 200 zou hier
+     te weinig zeggen (een lege of verkeerde vergadering is ook 200), dus het
+     stuk dat terugkomt moet ook echt dat van Almelo zijn. */
   const landLeest = await os_('vergadering', { id: eigen.body.vergadering.id });
   assert.equal(landLeest.status, 200, 'het landelijke bestuur kwam niet bij de notulen van een stad');
+  assert.equal(landLeest.body.vergadering.id, eigen.body.vergadering.id);
+  assert.equal(landLeest.body.vergadering.stad, STAD_A,
+    'het landelijke bestuur kreeg een ander stuk terug dan dat van Almelo');
+  /* En hier komt het verschil met de landelijke vergadering hierboven boven
+     water: die rekent met de OPGEGEVEN omvang (5), een stadsvergadering met de
+     zetels die er echt zijn. Almelo heeft er een, en de `omvang: 3` die bij het
+     aanmaken werd meegegeven telt dus niet mee -- anders zou een stad haar
+     eigen quorum kunnen opgeven. */
+  assert.equal(landLeest.body.vergadering.omvang, 1,
+    'de opgegeven omvang overschreef het aantal zetels van de stad');
+  assert.equal(landLeest.body.vergadering.quorum, 1,
+    'het quorum van een stadsvergadering wordt niet uit haar zetels gerekend');
 });
 
 /* ---------------------------------------------------------------------------

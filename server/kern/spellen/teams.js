@@ -24,7 +24,9 @@
    en niet op `at`. Een team dat gebruikt wordt blijft dus staan; een team waar
    een jaar niets mee gebeurde is geen team meer maar een restant. */
 module.exports = (ctx) => {
-  const { db, save, rid, nu, codenaamVan, isGeblokkeerd, zijnVrienden, klasgenotenVan, schoon, sociaalRate } = ctx;
+  const { db, save, rid, nu, codenaamVan, schoon, sociaalRate } = ctx;
+  // dezelfde kring als bij het praten in een potje, uit een bron: ./kring.js
+  const { bereikbaar } = require('./kring')(ctx);
 
   const MAX_LEDEN = 12;        // een club om mee te spelen, geen ledenbestand
   const MAX_TEAMS = 8;         // per persoon; anders is "maak er een" een spamknop
@@ -36,12 +38,7 @@ module.exports = (ctx) => {
   }
   const teamVan = (id) => T().find(t => t.id === String(id || '')) || null;
   const hoortErbij = (t, key) => !!t && (t.leden.includes(key) || t.uitgenodigd.includes(key));
-  // dezelfde kring als bij een potje: vrienden en klasgenoten, blokkades eruit
-  function inKring(mij, ander) {
-    if (!ander || ander === mij) return false;
-    if (isGeblokkeerd(mij, ander) || isGeblokkeerd(ander, mij)) return false;
-    return zijnVrienden(mij, ander) || klasgenotenVan(mij).some(kg => kg.key === ander);
-  }
+  const inKring = (mij, ander) => bereikbaar(mij, ander);
   // elk gebruik houdt het team levend; zie de kop over `laatst`
   function raak(t) { t.laatst = nu(); }
 

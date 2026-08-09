@@ -1962,11 +1962,17 @@ liggen.
 
 Erboven staat één regel: **een potje geeft geen nieuw recht om iemand te
 bereiken.** Praten kan alleen als *elk paar* aan tafel elkaar buiten dit potje
-ook al mag bereiken (vrienden of klasgenoten). De wachtrij koppelt willekeurige
-spelers -- zonder die regel is "even een potje dammen" de kortste weg naar een
-open lijn met een vreemde, en in de RTF-app zou dat precies de poort omzeilen
-die tieners onvindbaar maakt in de zoeker. *Elk paar*, want in een groepsruimte
-praat B ook tegen C.
+ook al mag bereiken. De wachtrij koppelt willekeurige spelers -- zonder die
+regel is "even een potje dammen" de kortste weg naar een open lijn met een
+vreemde, en in de RTF-app zou dat precies de poort omzeilen die tieners
+onvindbaar maakt in de zoeker. *Elk paar*, want in een groepsruimte praat B ook
+tegen C.
+
+Wie dat zijn staat in `kern/spellen/kring.js`, op één plek (het uitnodigen voor
+een team stelt dezelfde vraag): **vrienden, klasgenoten, of hetzelfde gezin.**
+Die derde ontbrak en viel pas op door het na te meten -- een ouder en een kind
+die samen dammen zijn geen "vrienden" en geen klasgenoten, terwijl een
+huishouden een sterkere kring is dan allebei.
 
 ### Teams
 

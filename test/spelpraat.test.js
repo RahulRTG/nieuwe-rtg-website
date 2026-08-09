@@ -258,6 +258,44 @@ test('een potjechat komt in de Berichten-app terecht, als gewoon gesprek', async
   assert.equal(weer.berichten.length, 2, 'een gesprek is een gesprek, waar je het ook opent');
 });
 
+/* HETZELFDE GEZIN. Twee profielen onder dezelfde gezinscode zijn geen
+   "vrienden" (dat is een andere laag) en geen klasgenoten, en vielen daardoor
+   buiten de kring: een ouder en een kind die samen dammen kregen geen chat.
+   Dat is gevonden door het na te meten en niet door erover na te denken, en
+   het staat hier zodat het niet stilletjes terugkomt.
+
+   De tweede helft van deze toets gaat over de NAAM van de afzender. Het
+   actormodel van kern/comm kent 'zaak:', 'mens:' en 'gezin:', maar niet de
+   'rtf:'-sleutel die de spellen dragen -- die kwam eruit als "Onbekend". Twee
+   gezinsleden zagen elkaars berichten dus zonder naam. */
+test('twee profielen uit hetzelfde gezin praten, en hun naam staat erbij', async () => {
+  const t = Date.now() + '' + (teller++);
+  const fnd = (pad, body) => fetch(BASE + '/api/foundation' + pad, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {})
+  });
+  const g = await json(await fnd('/gezin/maak', { gezinsnaam: 'Praatgezin ' + t, naam: 'Ouder', pin: '1234' }));
+  const p2 = await json(await fnd('/gezin/profiel/maak', { code: g.code, token: g.token, naam: 'Oom', rol: 'gezinslid', groep: 'volw' }));
+  const kies = await json(await fnd('/gezin/profiel/kies', { code: g.code, profielId: p2.profiel.id }));
+  const A = { code: g.code, token: g.token }, B = { code: g.code, token: kies.token };
+  const spel = (actie, body, s) => fetch(BASE + '/api/rtf/spel/' + actie, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(Object.assign({ code: s.code, token: s.token }, body || {}))
+  });
+
+  const nieuw = await json(await spel('nieuw', { soort: 'dam', codenamen: [kies.profiel.codenaam] }, A));
+  assert.ok(nieuw.id, 'het potje start: ' + JSON.stringify(nieuw).slice(0, 200));
+  await spel('antwoord', { id: nieuw.id, akkoord: true }, B);
+
+  const stuur = await json(await spel('praat-stuur', { id: nieuw.id, tekst: 'jij mag' }, A));
+  assert.equal(stuur.ok, true, 'een huishouden is een kring: ' + JSON.stringify(stuur).slice(0, 200));
+
+  const lees = await json(await spel('praat', { id: nieuw.id }, B));
+  assert.equal(lees.berichten.length, 1);
+  assert.notEqual(lees.berichten[0].van, 'Onbekend', 'de afzender heeft een naam');
+  assert.ok(lees.berichten[0].van && lees.berichten[0].van.length > 3,
+    'en dat is zijn codenaam: ' + lees.berichten[0].van);
+});
+
 test('een derde die het potje-id kent leest niet mee', async () => {
   const { a, b } = await tweeVrienden();
   const { a: c } = await tweeVrienden();

@@ -19,7 +19,9 @@
    Elk PAAR, en niet "iedereen die ik ken": in een groepsruimte praat ook B
    tegen C. Zou de controle alleen naar mijn eigen kant kijken, dan kan ik twee
    mensen die elkaar niet mogen bereiken in een kamer zetten door ze allebei
-   uit te nodigen.
+   uit te nodigen. Wat "bereiken" precies is -- vrienden, klasgenoten, hetzelfde
+   gezin -- staat in ./kring.js en niet hier, want het teamuitnodigen stelt
+   dezelfde vraag en twee antwoorden gaan uiteen.
 
    LEZEN MAAKT GEEN GESPREK. Het gesprek ontstaat pas bij het eerste bericht.
    `gesprekMaak` is idempotent op de sleutel en dus verleidelijk om ook als
@@ -31,24 +33,13 @@
    potje blijft staan: er wordt niets van opgeteld en niets van vergeleken. De
    grens die hier telt is de kring, niet de leeftijd. */
 module.exports = (ctx) => {
-  const { comm, S, SOORTEN, codenaamVan, zijnVrienden, isGeblokkeerd, klasgenotenVan, sociaalRate } = ctx;
+  const { comm, S, SOORTEN, codenaamVan, sociaalRate } = ctx;
 
   const MAX = 500;   // een bericht is een bericht; de kern kapt zelf op 4000
 
-  // kent A B buiten dit potje om? vrienden of klasgenoten, en niet geblokkeerd
-  function bereikbaar(a, b) {
-    if (isGeblokkeerd(a, b) || isGeblokkeerd(b, a)) return false;
-    if (zijnVrienden(a, b)) return true;
-    return klasgenotenVan(a).some(kg => kg.key === b);
-  }
-  /* Alle paren, niet alleen die van mij -- zie de kop. Bij zes spelers zijn dat
-     vijftien vragen, een keer per keer dat iemand de chat opent. */
-  function elkPaarKent(spelers) {
-    for (let i = 0; i < spelers.length; i++)
-      for (let j = i + 1; j < spelers.length; j++)
-        if (!bereikbaar(spelers[i], spelers[j])) return false;
-    return true;
-  }
+  // wie je buiten dit potje om al kunt bereiken staat in ./kring.js, op EEN
+  // plek -- het teamuitnodigen leest dezelfde regel
+  const { elkPaarKent } = require('./kring')(ctx);
 
   const GEEN = 'In dit potje zit iemand die je buiten het spel niet kunt bereiken. Praten kan met vrienden en klasgenoten.';
 

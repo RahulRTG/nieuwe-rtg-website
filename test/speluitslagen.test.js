@@ -277,3 +277,66 @@ test('wie zich laat verwijderen verdwijnt ook uit zijn eigen stand', () => {
   assert.equal(u.spelStand('anna').totaal.gespeeld, 0, 'niets meer van anna');
   assert.equal(u.spelStand('boris').totaal.gespeeld, 1, 'boris houdt de zijne');
 });
+
+/* ---------- weggaan telt als opgeven ----------
+   `vergeten` raakte db.data.spellen helemaal niet aan: de sleutel van een
+   verwijderd lid bleef staan in elk potje waarin hij speelde, en `opschonen`
+   ruimt een potje met status 'bezig' nooit op -- dus dat kon voor altijd
+   blijven staan. Dat was bestaand en onzichtbaar, omdat het scenario in
+   test/vergeten.test.js geen potje speelt. */
+const maakSpellen = require('../server/kern/spellen');
+
+function spellenKern(volw = () => true) {
+  const db = { data: {} };
+  const kern = maakSpellen({
+    db, save() {}, crypto: require('crypto'), zijnVrienden: () => true, codenaamVan: (k) => 'CN-' + k,
+    sseToCustomer() {}, isGeblokkeerd: () => false, socialZoek: async () => [], sociaalRate: () => true,
+    volwassen: volw, sseClients: [], lidBoardUit: () => false
+  });
+  return { db, kern };
+}
+const lopend = (id, spelers) => ({ id, soort: 'schaak', modus: 'vrij', status: 'bezig',
+  spelers, uitgenodigd: [], beurt: 0, teams: [0, 1], winnaar: null, at: new Date().toISOString() });
+
+test('wie zich laat verwijderen geeft zijn lopende potjes op, en de ander wint', () => {
+  const { db, kern } = spellenKern();
+  db.data.spellen = { potjes: { p1: lopend('p1', ['weg', 'blijf']) }, wachtrij: { 'schaak:2': ['weg', 'ander'] } };
+
+  require('../server/kern/vergeten/anoniem')({ db, accounts: {}, spelVergeet: kern.spelVergeet })
+    .anonimiseer('weg', 'CN-weg', null);
+
+  assert.deepEqual(Object.keys(db.data.spellen.potjes), [], 'het potje is weg -- er zat een sleutel in');
+  assert.deepEqual(db.data.spellen.wachtrij, { 'schaak:2': ['ander'] }, 'en uit de wachtrij, zonder de ander te raken');
+
+  const r = (db.data.spelUitslagen || [])[0];
+  assert.ok(r, 'de partij landt wel als uitslag: de ander won hem');
+  assert.deepEqual(r.spelers.find(s => s.key === 'blijf'), { key: 'blijf', codenaam: 'CN-blijf', won: true });
+  assert.deepEqual(r.spelers.find(s => s.anoniem), { anoniem: true, won: false }, 'de vertrekker staat er anoniem in');
+  assert.equal(JSON.stringify(db.data).includes('CN-weg'), false, 'zijn codenaam staat nergens meer');
+  assert.equal(JSON.stringify(db.data).includes('"weg"'), false, 'zijn sleutel ook niet');
+});
+
+test('de volgorde klopt: eerst opgeven, dan pas anonimiseren', () => {
+  /* Draai je die om, dan maakt het opgeven een VERSE uitslagrij met de
+     codenaam van het verwijderde lid erin, nadat de anonimisering al langs is
+     geweest. Deze toets meet dat aan het eindresultaat. */
+  const { db, kern } = spellenKern();
+  db.data.spellen = { potjes: { p1: lopend('p1', ['weg', 'blijf']) }, wachtrij: {} };
+  require('../server/kern/vergeten/anoniem')({ db, accounts: {}, spelVergeet: kern.spelVergeet })
+    .anonimiseer('weg', 'CN-weg', null);
+  assert.equal(JSON.stringify(db.data.spelUitslagen).includes('weg'), false,
+    'de verse uitslagrij hoort ook geanonimiseerd te zijn');
+});
+
+test('een verlaten partij wordt opgeruimd, een levende niet', () => {
+  const { db, kern } = spellenKern();
+  const oud = new Date(Date.now() - 40 * 86400000).toISOString();
+  const vers = new Date().toISOString();
+  db.data.spellen = { potjes: {
+    verlaten: Object.assign(lopend('verlaten', ['a', 'b']), { at: oud, zetAt: oud }),
+    levend: Object.assign(lopend('levend', ['a', 'b']), { at: oud, zetAt: vers })
+  }, wachtrij: {} };
+  kern.mijnSpellen('a');   // hierin zit het opschonen
+  assert.deepEqual(Object.keys(db.data.spellen.potjes), ['levend'],
+    'gemeten op de laatste ZET, niet op het aanmaken -- anders sneuvelt een lange levende partij');
+});

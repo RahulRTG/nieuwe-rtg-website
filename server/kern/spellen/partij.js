@@ -3,7 +3,7 @@
    en opgeven. Krijgt de gedeelde context een keer bij het opstarten vanuit
    kern/spellen.js. */
 module.exports = (ctx) => {
-  const { db, save, crypto, codenaamVan, S, SPEL, SOORTEN, nudge, VIEWS, ZETTEN, STATISCH, noteerUitslag } = ctx;
+  const { db, save, crypto, codenaamVan, nu, S, SPEL, SOORTEN, nudge, VIEWS, ZETTEN, STATISCH, noteerUitslag } = ctx;
   /* De weergave per spel (de staat zoals EEN speler hem mag zien: handen en
      rekken van anderen blijven verborgen) staat in het spel zelf en komt via
      het register mee in VIEWS. Een spel zonder eigen weergave komt het
@@ -39,6 +39,10 @@ module.exports = (ctx) => {
     const beheer = zet && (SPEL[p.soort].buitenBeurt || []).includes(zet.actie);
     if (!beheer && p.spelers[p.beurt] !== mij) return { status: 409, error: 'De ander is aan zet.' };
     const r = ZETTEN[p.soort](p, mij, zet || {});
+    /* Wanneer er voor het laatst iets GEBEURDE. `at` is het moment van
+       aanmaken en zegt niets over of een potje nog leeft; zonder dit stempel
+       kan de opschoning een verlaten partij niet van een drukke onderscheiden. */
+    if (!r.error) p.zetAt = nu();
     /* Een potje kan door de zet zelf klaar raken (mat, laatste kaart, doel
        bereikt). Dat vastleggen hoort HIER en niet in elk spel apart: zestien
        motoren die er elk aan moeten denken is zestien kansen om het te

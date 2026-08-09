@@ -51,9 +51,19 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
     potje.beurt = ((potje.beurt + (stap || 1)) % n + n) % n;
   }
 
-  /* ---------- opschonen: klare potjes na een dag weg, wachtenden na een uur.
+  /* ---------- opschonen: klare potjes na een dag weg, wachtenden na zes uur,
+     en verlaten partijen na dertig dagen.
+
+     Die laatste ontbrak, en dat was geen detail: een potje met status 'bezig'
+     werd NOOIT opgeruimd. Twee spelers die een partij laten liggen lieten hem
+     voor altijd staan, met hun beide sleutels erin -- ongebonden groei en een
+     bewaarprobleem in een. Gemeten op de laatste ZET (`zetAt`) en niet op het
+     aanmaken, want anders zou een lange, levende partij ook verdwijnen; een
+     ouder potje zonder dat stempel valt terug op `at`.
+
      Hooguit een keer per minuut: de scan over alle potjes hoort niet in het
      hete pad van elke lobby-poll. ---------- */
+  const VERLATEN_MS = 30 * 86400000;
   let opgeschoondOm = 0;
   function opschonen() {
     const t = Date.now();
@@ -62,7 +72,10 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
     const s = S();
     for (const [id, p] of Object.entries(s.potjes)) {
       const leeftijd = t - new Date(p.at).getTime();
-      if ((p.status === 'klaar' && leeftijd > 86400000) || (p.status === 'wacht' && leeftijd > 6 * 3600000)) delete s.potjes[id];
+      const stil = t - new Date(p.zetAt || p.at).getTime();
+      if ((p.status === 'klaar' && leeftijd > 86400000) ||
+          (p.status === 'wacht' && leeftijd > 6 * 3600000) ||
+          (p.status === 'bezig' && stil > VERLATEN_MS)) delete s.potjes[id];
     }
   }
 
@@ -135,6 +148,49 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
     db, save, codenaamVan, nu, progressieMag
   });
 
+
+  /* ---------- een lid dat zich laat verwijderen ----------
+     Twee dingen die tot nu toe bleven staan: zijn sleutel in elk potje waarin
+     hij speelde, en zijn plek in de wachtrij. `vergeten` raakte deze tak
+     helemaal niet aan, en `opschonen` ruimt een potje met status 'bezig'
+     nooit op -- dus dat had voor altijd kunnen blijven staan.
+
+     WEGGAAN TELT ALS OPGEVEN, en dat is geen nieuw gedrag maar hetzelfde als
+     wat de knop "opgeven" doet. Wie vertrekt maakt de partij niet af, en dat
+     IS opgeven; de tegenstander wint en die overwinning landt in de uitslagen.
+     Het alternatief -- het potje stilletjes laten verdwijnen -- zou de ander
+     een partij afnemen die hij aan het winnen kon zijn.
+
+     Het potje zelf gaat daarna weg en blijft dus niet de gebruikelijke dag
+     staan. Dat kan ook niet: `spelers` bestaat uit sleutels, en een potje
+     laten staan waarin de sleutel van een verwijderd lid zit is precies wat we
+     hier weghalen. De uitslag blijft wel, met de vertrekker erin als
+     `{ anoniem: true }` -- mits het wisbeleid deze functie AANROEPT vóór het
+     anonimiseren van de uitslagen, en die volgorde staat in vergeten/anoniem.js. */
+  function spelVergeet(key) {
+    if (!key) return { status: 200, ok: true, potjes: 0 };
+    const s = S();
+    for (const [sleutel, rij] of Object.entries(s.wachtrij || {})) {
+      const over = (rij || []).filter(x => x !== key);
+      if (over.length) s.wachtrij[sleutel] = over; else delete s.wachtrij[sleutel];
+    }
+    let geraakt = 0;
+    for (const [id, p] of Object.entries(s.potjes || {})) {
+      if (!Array.isArray(p.spelers) || !p.spelers.includes(key)) continue;
+      geraakt++;
+      if (p.status !== 'klaar') {
+        const rest = p.spelers.filter(x => x !== key);
+        p.status = 'klaar';
+        p.gelijk = false;
+        p.winnaar = rest.length ? (rest.length === 1 ? codenaamVan(rest[0]) : rest.map(codenaamVan).join(' & ')) : null;
+        noteerUitslag(p);
+      }
+      delete s.potjes[id];
+    }
+    save();
+    return { status: 200, ok: true, potjes: geraakt };
+  }
+
   /* De lobby- en partijlaag draaien als submodules op een gedeelde
      context, een keer opgebouwd bij het opstarten. */
   const ctx = { db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, isGeblokkeerd, socialZoek, sociaalRate, volwassen,
@@ -186,7 +242,7 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
   const sneekScore = (mij, punten) => arcadeScore(mij, 'sneek', punten);
   const sneekBord = (mij, vrienden) => arcadeBord(mij, 'sneek', vrienden);
 
-  return { spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelRahul, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, spelUitslagen, spelStand, sneekScore, sneekBord, arcadeScore, arcadeBord, SPEL_SOORTEN: SOORTEN,
+  return { spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelRahul, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, spelUitslagen, spelStand, spelVergeet, sneekScore, sneekBord, arcadeScore, arcadeBord, SPEL_SOORTEN: SOORTEN,
     // alleen voor de drift-test: de client heeft een eigen kopie van deze
     // regels (directe feedback); de test houdt beide kopieën tegen elkaar
     _spelregels: { rummiSet: ruw.rummiSet, W_PREMIE: ruw.W_PREMIE, SPEL, ARCADE } };

@@ -30,7 +30,9 @@
   .rij input{width:6.5rem;}
   .knop.mini{padding:.4rem .7rem;font-size:.8rem;}
   .lbl{display:block;margin:.7rem 0 .2rem;font-size:.8rem;color:var(--soft);}
-  #tWat{width:100%;}
+  #tWat,#tDagen,#tVanWie{width:100%;}
+  .knop.hoofd{margin-top:.9rem;}
+  #lWat{flex:1 1 10rem;width:auto;}
 </style>
 <script src="/shared/seizoen.js" defer></script>
 <script src="/shared/veiligheid.js" defer></script>
@@ -66,12 +68,12 @@
       <textarea id="tWat" rows="3" maxlength="600"
         placeholder="Bijv. 40 minuten rustig, praattempo. Van mijn coach."></textarea>
       <label class="lbl" for="tDagen">Op welke dagen? Nummers, 1 is maandag.</label>
-      <input id="tDagen" maxlength="30" placeholder="2, 4, 6" style="width:100%;">
+      <input id="tDagen" maxlength="30" placeholder="2, 4, 6">
       <label class="lbl" for="tDuur">Hoeveel minuten duurt hij?</label>
       <input id="tDuur" type="number" step="5" min="1" max="600" inputmode="numeric">
       <label class="lbl" for="tVanWie">Van wie is dit schema?</label>
-      <input id="tVanWie" maxlength="60" placeholder="Uzelf, of de naam van uw coach" style="width:100%;">
-      <button class="knop hoofd" id="tMaak" style="margin-top:.9rem;">Toevoegen</button>
+      <input id="tVanWie" maxlength="60" placeholder="Uzelf, of de naam van uw coach">
+      <button class="knop hoofd" id="tMaak">Toevoegen</button>
     </div>
   </section>
 
@@ -81,7 +83,7 @@
       <p class="stil">Ook zonder schema. Wat u noteert telt mee als beweging van die dag, op uw eigen
       woord.</p>
       <div class="rij">
-        <input id="lWat" maxlength="80" placeholder="Bijv. Wandeling" style="flex:1 1 10rem;width:auto;">
+        <input id="lWat" maxlength="80" placeholder="Bijv. Wandeling">
         <input id="lDuur" type="number" step="5" min="1" max="600" inputmode="numeric" aria-label="Minuten">
         <span class="stil">minuten</span>
         <button class="knop mini" id="lNoteer">Noteren</button>

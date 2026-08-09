@@ -651,6 +651,15 @@
       "gezakt": 2,
       "scherp": "gezakt"
     },
+    "consent-dekking.test.js": {
+      "soort": "puur",
+      "staat": "overleefd",
+      "modules": [
+        "server/kern/consent.js"
+      ],
+      "geprobeerd": 19,
+      "posities": 8
+    },
     "contact.test.js": {
       "soort": "server",
       "staat": "gezakt",

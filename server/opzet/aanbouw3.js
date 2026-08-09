@@ -32,13 +32,17 @@ module.exports = function bouwKernAanDrie(kern, grens) {
      die leest de lijst eruit. */
   Object.assign(kern, require('../kern/medicatie')({ db, save, schoon, crypto }));
   require('../routes/medicatie')(grens('medicatie'));
-  /* Training (kern/training.js): het eigen trainingsschema. RTG schrijft geen
+  /* Het trainingsschema (kern/trainingsschema.js).
+     LET OP DE NAAM: er bestaat al een server/training.js, en dat is iets heel
+     anders -- de micro-learning voor personeel in de PDA. Die twee mogen niet
+     dezelfde bestandsnaam dragen; toen dat wel zo was, is test/training.test.js
+     van dat andere onderdeel per ongeluk overschreven. RTG schrijft geen
      training voor -- geen sets, geen opbouw, geen belastingscore. Aftekenen
      schrijft een beweging-meting weg via de metingenlaag, zodat er geen tweede
      beweegcijfer naast het bestaande komt. Staat daarom NA de metingen. */
-  Object.assign(kern, require('../kern/training')({ db, save, schoon, crypto,
+  Object.assign(kern, require('../kern/trainingsschema')({ db, save, schoon, crypto,
     metingZet: kern.metingZet }));
-  require('../routes/training')(grens('training'));
+  require('../routes/trainingsschema')(grens('trainingsschema'));
   /* De noodkaart (kern/noodkaart.js): een noodcontact en, als u dat wilt, uw
      allergenen en uw medicijnen -- gelezen uit het zorgprofiel en het
      medicatieschema, niet gekopieerd. Niemand kan hem opvragen; u toont hem zelf. */

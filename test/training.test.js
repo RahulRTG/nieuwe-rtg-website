@@ -1,181 +1,134 @@
-/* Training (kern/training.js). Dezelfde vorm als het medicatieschema, en om
-   dezelfde reden: RTG schrijft geen trainingsschema voor.
-
-   Wat hier wordt vastgezet:
-   1. WAT ERIN GAAT IS WAT U INTIKT. Geen sets, geen opbouw, geen belastingscore,
-      geen oefeningenbibliotheek -- en geen veld dat RTG zelf heeft bedacht.
-   2. AFTEKENEN SCHRIJFT NAAR DE BESTAANDE BEWEEGMETING, niet naar een tweede
-      beweegtotaal hier (LAT.md regel 4), en met herkomst "zelf".
-   3. HERTELLEN, NIET AFTREKKEN. Wie twee keer aftekent en er een weghaalt, houdt
-      anders een cijfer over dat nergens meer op slaat.
-   4. Een mislukte schrijfactie staat IN HET ANTWOORD (regel 5).
-   Draai los: node --experimental-sqlite --test test/training.test.js */
+/* Training & tips in de PDA: micro-learning voor het personeel.
+   1) De zuivere tip-bibliotheek is rol-bewust en zonder dubbelingen.
+   2) In de PDA ziet elk teamlid tips voor de eigen functie plus een tip van de
+      dag; een manager kan eigen huistips toevoegen en verwijderen; de coach
+      geeft altijd een antwoord (met terugval op de bibliotheek).
+   Draai: node --experimental-sqlite --test test/training.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const { spawn } = require('node:child_process');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
+const { startServer } = require('./helper');
+const training = require('../server/training');
 
-let srv, base, lid, sup;
-const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-training-'));
+test('bibliotheek: eigen rol-tips plus algemene basis, zonder dubbelingen', () => {
+  const bediening = training.tipsVoor('Bediening', 'staff');
+  assert.ok(bediening.length >= 4, 'bediening heeft eigen tips');
+  assert.ok(bediening.some(t => /rekening/i.test(t.t + t.s)), 'een herkenbare bediening-tip');
+  assert.ok(bediening.some(t => t.t === 'Uitblinken zit in details'), 'de algemene basis zit erbij');
+  const titels = bediening.map(t => t.t);
+  assert.equal(titels.length, new Set(titels).size, 'geen dubbele tips');
+});
 
-const api = (pad, body, t) => fetch(base + '/api/' + pad, {
-  method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + t },
-  body: JSON.stringify(body || {})
-}).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
+test('bibliotheek: een manager krijgt ook beheer-tips', () => {
+  const staf = training.tipsVoor('Bediening', 'staff');
+  const man = training.tipsVoor('Bediening', 'manager');
+  assert.ok(man.length > staf.length, 'de manager ziet extra tips');
+  assert.ok(man.some(t => /briefing/i.test(t.t + t.s)), 'beheer-tip over de briefing');
+});
+
+test('bibliotheek: onbekende functie valt terug op de algemene basis', () => {
+  const alg = training.tipsVoor('', 'staff');
+  assert.ok(alg.length >= 1);
+  assert.ok(alg.every(t => training.ALGEMEEN.some(a => a.t === t.t)), 'alleen algemene tips');
+});
+
+test('bibliotheek: de coach kiest een passende tip bij de vraag', () => {
+  const hit = training.coachTip('hoe breng ik de rekening netjes?', 'Bediening', 'staff');
+  assert.ok(hit && /rekening/i.test(hit.t + hit.s), 'de rekening-tip komt boven');
+  const altijd = training.coachTip('iets heel raars zonder trefwoord xyzzy', 'Keuken', 'staff');
+  assert.ok(altijd && altijd.t, 'er komt altijd een tip terug');
+});
+
+// ---- Endpoint-tests met een draaiende server -----------------------------
+let BASE;
+const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-train-'));
+let child, kikMan, kikStaf, lidToken;
+
+async function api(pad, body, token) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = 'Bearer ' + token;
+  return fetch(BASE + pad, { method: 'POST', headers, body: JSON.stringify(body || {}) });
+}
+const json = r => r.json();
+async function login(code, rol) {
+  const roster = await json(await api('/api/supplier/roster', { code }));
+  const s = roster.staff.find(x => rol === 'manager' ? x.role === 'manager' : x.role !== 'manager');
+  return (await json(await api('/api/supplier/login', { code, staffId: s.id, pin: rol === 'manager' ? '1234' : '5678' }))).token;
+}
 
 test.before(async () => {
-  srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, DEMO_SUPPLIER: 'KIKUNOI' } });
-  base = srv.base;
-  lid = await fetch(base + '/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ tier: 'rtg' }) }).then(r => r.json()).then(d => d.token);
-  sup = (await api('supplier/login', { username: 'rahul', password: 'Imran' }, '')).body.token;
-  assert.ok(lid && sup);
+  ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } }));
+  kikMan = await login('KIKUNOI', 'manager');
+  kikStaf = await login('KIKUNOI', 'staff');
+  const reg = await json(await api('/api/auth/register', { name: 'Gast Lid', email: 'train@x.nl', phone: '0612345731',
+    password: 'geheim123', geboortedatum: '1990-01-01', tier: 'business', pasApp: 'business' }));
+  lidToken = reg.token;
 });
 test.after(() => {
-  stop(srv && srv.child);
+  if (child) try { child.kill('SIGKILL'); } catch (e) {}
   try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
 });
 
-test('een leeg schema zegt zelf waar RTG niet over gaat', async () => {
-  const r = await api('training', {}, lid);
-  assert.equal(r.status, 200);
-  assert.deepEqual(r.body.schema, []);
-  assert.deepEqual(r.body.gedaan, []);
-  assert.match(r.body.grens.kop, /schrijft geen training voor/i);
-  assert.ok(r.body.grens.wegen.some(w => /fysiotherapeut|huisarts/i.test(w.naam)));
-  assert.match(r.body.uitleg, /rekent geen belasting/i);
+test('PDA: het teamlid krijgt tips voor de eigen functie en een tip van de dag', async () => {
+  const d = await json(await api('/api/supplier/training', {}, kikStaf));
+  assert.equal(d.func, 'Bediening', 'de functie komt uit het personeelsdossier');
+  assert.ok(d.tipVanDeDag && d.tipVanDeDag.t, 'er is een tip van de dag');
+  assert.ok(d.tips.some(t => /rekening/i.test(t.t + t.s)), 'bediening-tips staan erin');
+  assert.equal(d.kanBeheren, false, 'gewoon personeel beheert geen tips');
 });
 
-test('wat erin gaat is wat u intikt, en er komt niets bij', async () => {
-  const r = await api('training/zet', { naam: 'Rustige duurloop', wat: '40 min zone 2, eigen tempo',
-    dagen: '2,4,6', duurMin: 40, vanWie: 'Coach Ali' }, lid);
-  const t = r.body.schema[0];
-  assert.equal(t.naam, 'Rustige duurloop');
-  assert.deepEqual(t.dagen, [2, 4, 6]);
-  assert.equal(t.duurMin, 40);
-  assert.equal(t.vanWie, 'Coach Ali', 'van wie het schema is, want dat is meestal niet RTG');
-  assert.deepEqual(Object.keys(t).sort(),
-    ['dagen', 'duurMin', 'gemaakt', 'id', 'naam', 'vanWie', 'wat'],
-    'geen veld dat RTG zelf heeft bedacht: geen zone, geen belasting, geen score');
+test('PDA: de manager voegt een eigen huistip toe; het team ziet hem vooraan', async () => {
+  // personeel mag geen huistip toevoegen
+  assert.equal((await api('/api/supplier/training/add', { titel: 'Stiekem', tekst: 'mag niet' }, kikStaf)).status, 403);
+  // de manager voegt een huistip toe
+  const add = await api('/api/supplier/training/add', { titel: 'Onze wijngroet', tekst: 'Noem bij elke fles het huis en het jaar.' }, kikMan);
+  assert.equal(add.status, 200);
+  // het personeel ziet de huistip nu bovenaan
+  const d = await json(await api('/api/supplier/training', {}, kikStaf));
+  assert.equal(d.tips[0].t, 'Onze wijngroet', 'de eigen tip staat vooraan');
+  assert.ok(d.eigen.some(t => t.t === 'Onze wijngroet'));
+  // dubbele titel wordt geweigerd
+  assert.equal((await api('/api/supplier/training/add', { titel: 'Onze wijngroet', tekst: 'nogmaals' }, kikMan)).status, 409);
+  // en de manager kan hem weer verwijderen
+  assert.equal((await api('/api/supplier/training/remove', { titel: 'Onze wijngroet' }, kikMan)).status, 200);
+  const na = await json(await api('/api/supplier/training', {}, kikStaf));
+  assert.ok(!na.eigen.some(t => t.t === 'Onze wijngroet'), 'de tip is weg');
 });
 
-test('een vertypte dag valt niet stilletjes weg', async () => {
-  const r = await api('training/zet', { naam: 'Kracht', dagen: '1, maandag, 9', duurMin: 50 }, lid);
-  const t = r.body.schema.find(x => x.naam === 'Kracht');
-  assert.deepEqual(t.dagen, [1], 'alleen echte dagnummers blijven staan');
-  assert.match(r.body.gewaarschuwd || '', /dag is een nummer/i);
+test('PDA: de coach geeft altijd een bruikbaar antwoord', async () => {
+  const lege = await api('/api/supplier/coach', { vraag: '' }, kikStaf);
+  assert.equal(lege.status, 400, 'een lege vraag wordt geweigerd');
+  const d = await json(await api('/api/supplier/coach', { vraag: 'Hoe breng ik de rekening netjes?' }, kikStaf));
+  assert.ok(d.antwoord && d.antwoord.length > 5, 'er komt een antwoord');
+  assert.ok(d.bron === 'ai' || d.bron === 'bibliotheek', 'de bron is bekend');
 });
 
-test('aftekenen schrijft naar de bestaande beweegmeting, met herkomst zelf', async () => {
-  const id = (await api('training', {}, lid)).body.schema.find(x => x.naam === 'Rustige duurloop').id;
-  const r = await api('training/deed', { schemaId: id }, lid);
-  assert.equal(r.status, 200);
-  assert.equal(r.body.meting.ok, true);
-  assert.equal(r.body.meting.minuten, 40, 'de duur uit het schema telt mee');
-
-  /* En dat cijfer staat echt in de metingenlaag, niet in een eigen tweede
-     beweegtotaal hier. */
-  const m = (await api('metingen', {}, lid)).body;
-  assert.equal(m.beeld.beweging.vandaag, 40, 'de dagmeting beweging staat op 40');
-  assert.deepEqual(m.beeld.beweging.herkomsten, ['zelf'],
-    'op uw eigen woord: u bent degene die zegt dat u het deed');
+test('PDA: de coach kent de context van een concrete tafel (allergie mee)', async () => {
+  // de manager zet een keukengerecht op de kaart
+  assert.equal((await api('/api/supplier/menu', { menu: [{ id: 'ramen', name: 'Ramen', price: 12, station: 'keuken', cat: 'Warm' }] }, kikMan)).status, 200);
+  // een gast bestelt aan tafel met een allergie-notitie
+  const ord = await json(await api('/api/order', { supplierCode: 'KIKUNOI', items: [{ id: 'ramen', qty: 1 }], table: 'Tafel 9', allergyNote: 'noten' }, lidToken));
+  assert.ok(ord.order && ord.order.ref, 'de bestelling is aangemaakt');
+  // de coach krijgt de tafel als context mee en echoot de tafel terug
+  const c = await json(await api('/api/supplier/coach', { vraag: 'Waar moet ik op letten?', ref: ord.order.ref }, kikStaf));
+  assert.equal(c.tafel, 'Tafel 9', 'de coach herkent de tafel');
+  assert.ok(c.antwoord && c.antwoord.length > 5, 'er komt een bruikbaar antwoord');
 });
 
-test('twee trainingen op een dag tellen op, en weghalen telt opnieuw', async () => {
-  await api('training/deed', { wat: 'Losse wandeling', duurMin: 20 }, lid);
-  let m = (await api('metingen', {}, lid)).body;
-  assert.equal(m.beeld.beweging.vandaag, 60, '40 + 20');
-
-  const wandeling = (await api('training', {}, lid)).body.gedaan.find(g => g.wat === 'Losse wandeling');
-  const r = await api('training/deed-weg', { id: wandeling.id }, lid);
-  assert.equal(r.body.meting.minuten, 40, 'er wordt herteld uit wat er over is');
-  m = (await api('metingen', {}, lid)).body;
-  assert.equal(m.beeld.beweging.vandaag, 40);
-});
-
-test('de training van gisteren telt niet mee in het cijfer van vandaag', async () => {
-  /* Via de API kan alleen voor vandaag worden afgetekend, dus dit gat is daar
-     niet te zien: de vorige toets zette alles op dezelfde dag en bleef daarom
-     groen toen de optelling over ALLE dagen liep. Hier krijgt de laag zijn eigen
-     klok mee. */
-  const maak = require('../server/kern/training');
-  const geschreven = [];
-  const laag = maak({ db: { data: {} }, save: () => {},
-    schoon: (s, n) => String(s || '').slice(0, n), crypto: require('crypto'),
-    metingZet: (k, body) => { geschreven.push(body); return { ok: true }; } });
-
-  const gisteren = new Date('2026-05-04T10:00:00Z');
-  const vandaag = new Date('2026-05-05T10:00:00Z');
-  laag.trainingDeed('k', { wat: 'Gisteren', duurMin: 90 }, gisteren);
-  laag.trainingDeed('k', { wat: 'Vandaag', duurMin: 25 }, vandaag);
-
-  assert.deepEqual(geschreven[0], { onderwerp: 'beweging', waarde: 90, op: '2026-05-04' });
-  assert.deepEqual(geschreven[1], { onderwerp: 'beweging', waarde: 25, op: '2026-05-05' },
-    'alleen de minuten van die dag, en op die dag geschreven');
-});
-
-test('de laatste training weghalen zet uw beweging niet op nul', async () => {
-  /* Nul zou een bewering zijn die RTG niet kan doen: u kunt die dag ook zonder
-     training hebben bewogen. De meting blijft staan zoals hij stond, en het
-     antwoord zegt waarom. */
-  const laatste = (await api('training', {}, lid)).body.gedaan[0];
-  const r = await api('training/deed-weg', { id: laatste.id }, lid);
-  assert.equal(r.body.meting.ok, true);
-  assert.match(r.body.meting.uitleg, /niet op nul/i);
-  const m = (await api('metingen', {}, lid)).body;
-  assert.equal(m.beeld.beweging.vandaag, 40, 'de meting die er stond, staat er nog');
-});
-
-test('een mislukte schrijfactie staat in het antwoord en niet alleen in de logs', async () => {
-  const maak = require('../server/kern/training');
-  const db = { data: {} };
-  const laag = maak({ db, save: () => {}, schoon: (s, n) => String(s || '').slice(0, n),
-    crypto: require('crypto'), metingZet: () => { throw new Error('boem'); } });
-  const r = laag.trainingDeed('k', { wat: 'Iets', duurMin: 30 });
-  assert.equal(r.meting.ok, false);
-  assert.match(r.meting.uitleg, /niet bijgewerkt/i, 'het lid hoort te horen dat zijn cijfer niet klopt');
-
-  const zonder = maak({ db: { data: {} }, save: () => {}, schoon: (s, n) => String(s || '').slice(0, n),
-    crypto: require('crypto') });
-  assert.equal(zonder.trainingDeed('k', { wat: 'Iets', duurMin: 30 }).meting.ok, false,
-    'en een laag die er helemaal niet is, ook');
-});
-
-test('wat vandaag op schema staat, staat er zonder aansporing', async () => {
-  /* Een training die op de dag van vandaag valt, want anders toetst dit een lege
-     lijst -- en een lege lijst draagt vanzelf geen oordeel. */
-  const vandaagNr = new Date().getUTCDay() || 7;
-  await api('training/zet', { naam: 'Vandaag iets', dagen: String(vandaagNr), duurMin: 30 }, lid);
-
-  const d = (await api('training', {}, lid)).body;
-  assert.ok(d.vandaagOpSchema.some(x => x.naam === 'Vandaag iets'),
-    'de training van vandaag staat erbij');
-
-  /* Alleen de DATA scannen, niet de vaste uitleg: die zegt met opzet "RTG zegt
-     niet of u te hard traint", en een scan over het hele antwoord slaat dan aan
-     op de zin die de belofte doet. Dat kostte deze toets een ronde. */
-  const data = JSON.stringify({ schema: d.schema, vandaagOpSchema: d.vandaagOpSchema, gedaan: d.gedaan });
-  assert.ok(!/\d+\s*dag(en)?\s*(niet|geleden|op rij)/i.test(data),
-    'geen "u bent al drie dagen niet geweest": dat is een verwijt met een teller');
-  assert.ok(!/reeks|streak|score|belasting|te hard|te weinig/i.test(data),
-    'en geen reeks en geen oordeel in de gegevens');
-  const velden = new Set(d.vandaagOpSchema.flatMap(x => Object.keys(x)));
-  assert.deepEqual([...velden].sort(),
-    ['dagen', 'duurMin', 'gedaan', 'gemaakt', 'id', 'naam', 'vanWie', 'wat'],
-    'en geen veld erbij waar een oordeel in past');
-
-  // en de vaste teksten zeggen wel wat ze horen te zeggen
-  assert.match(d.uitleg, /zegt niet of u te hard of te zacht traint/i);
-});
-
-test('een onbekend schema of logboekregel geeft 404, en niemand anders komt erbij', async () => {
-  assert.equal((await api('training/deed', { schemaId: 'bestaat-niet' }, lid)).status, 404);
-  assert.equal((await api('training/weg', { id: 'bestaat-niet' }, lid)).status, 404);
-  assert.equal((await api('training/deed-weg', { id: 'bestaat-niet' }, lid)).status, 404);
-  assert.equal((await api('training/deed', { wat: 'Iets' }, lid)).status, 400, 'zonder duur geen regel');
-
-  assert.equal((await api('training', {}, sup)).status, 401);
-  assert.equal((await api('training/zet', { naam: 'X' }, '')).status, 401);
+test('PDA: voortgang; een gelezen tip blijft bewaard en kan terug', async () => {
+  const d0 = await json(await api('/api/supplier/training', {}, kikStaf));
+  const titel = d0.tips[0].t;
+  assert.ok(!(d0.gelezen || []).includes(titel), 'nog niet gelezen');
+  // markeer als gelezen
+  const g = await json(await api('/api/supplier/training/gelezen', { titel }, kikStaf));
+  assert.ok(g.gelezen.includes(titel), 'staat nu op gelezen');
+  // en het blijft bewaard bij een volgende blik
+  const d1 = await json(await api('/api/supplier/training', {}, kikStaf));
+  assert.ok(d1.gelezen.includes(titel), 'de voortgang is bewaard');
+  // terugdraaien kan ook
+  const u = await json(await api('/api/supplier/training/gelezen', { titel, uit: true }, kikStaf));
+  assert.ok(!u.gelezen.includes(titel), 'weer op ongelezen');
 });

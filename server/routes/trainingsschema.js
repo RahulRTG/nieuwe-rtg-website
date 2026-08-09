@@ -1,4 +1,6 @@
-/* Routes "training": het eigen trainingsschema van het lid (kern/training.js).
+/* Routes "trainingsschema": het eigen schema van het lid
+   (kern/trainingsschema.js; niet te verwarren met server/training.js, de
+   micro-learning voor personeel in de PDA).
 
    Vijf routes, alle vijf van het lid zelf. Er is geen route waarmee een coach,
    een club of een zaak het schema van iemand anders leest of aanpast: een coach

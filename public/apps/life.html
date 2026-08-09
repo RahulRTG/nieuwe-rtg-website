@@ -50,6 +50,7 @@
   .dagrij .wat .uit{display:block;color:var(--soft);font-size:.78rem;line-height:1.5;margin-top:.1rem;}
   .dagrij .bron{font-size:.74rem;white-space:nowrap;}
   .dagrij.af .klok,.dagrij.af .wat b{color:var(--soft);}
+  .losse{margin-top:1rem;}
 </style>
 <script src="/shared/seizoen.js" defer></script>
 <script src="/shared/veiligheid.js" defer></script>
@@ -398,7 +399,7 @@
       '<a class="bron" href="' + esc(x.naar) + '">' + esc(x.naam) + ' &#8594;</a></div>';
     html += opTijd.map(regel).join('');
     if (los.length) {
-      html += '<p class="stil" style="margin-top:1rem;">Ergens vandaag, zonder vast tijdstip:</p>' +
+      html += '<p class="stil losse">Ergens vandaag, zonder vast tijdstip:</p>' +
         los.map(regel).join('');
     }
     el.innerHTML = html;

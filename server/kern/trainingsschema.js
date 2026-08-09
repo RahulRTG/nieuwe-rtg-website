@@ -1,4 +1,7 @@
-/* Training: uw eigen schema, en wat u er echt van deed.
+/* Het trainingsschema: uw eigen schema, en wat u er echt van deed.
+
+   NIET TE VERWARREN MET server/training.js -- dat is de micro-learning voor
+   personeel in de PDA. Vandaar de langere naam hier.
 
    DEZELFDE VORM ALS HET MEDICATIESCHEMA, EN OM DEZELFDE REDEN. RTG schrijft geen
    trainingsschema voor. Geen sets, geen herhalingen, geen gewichten, geen

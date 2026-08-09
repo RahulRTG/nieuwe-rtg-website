@@ -1,4 +1,4 @@
-/* Schermtoets voor apps/training.html.
+/* Schermtoets voor apps/training.html (motor: kern/trainingsschema.js).
 
    Twee dingen worden hier op het scherm zelf nagekeken. Ten eerste dat er GEEN
    advies staat: RTG stelt niets voor en zegt niet of je te hard traint, en een

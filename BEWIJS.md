@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 742 bestanden en 4179 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 743 bestanden en 4188 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,11 +12,11 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 742 |
-| losse beweringen (`test(...)`) | 4179 |
+| toetsbestanden | 743 |
+| losse beweringen (`test(...)`) | 4188 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 521 |
-| **overleefd**: geen mutatie kreeg hem rood | 12 |
+| **overleefd**: geen mutatie kreeg hem rood | 13 |
 | niet te meten (al rood, geen module gevonden, ...) | 16 |
 | alleen in de kop *genoemd*, nog niet gemeten | 26 |
 | niets van beide | 167 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-647 bestanden, 4015 beweringen.
+648 bestanden, 4024 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -141,7 +141,7 @@ toets omvalt.
 | `comm-gast.test.js` | 12 | -- | De verhuizing van het gastcontact naar de communicatiekern (server/kern/comm/gast.js). DE DERDE VOORRAAD, en de eerste waarin een LID en een ZAAK in hetzelfde gesprek zitten. |
 | `comm-vergeten.test.js` | 6 | -- | Het wisrecht op de gesprekken van de communicatiekern (server/kern/vergeten/gesprekken.js). WAAROM DEZE TOETS ER IS, en waarom hij er niet was. |
 | `comm-werk.test.js` | 8 | -- | De verhuizing van de sollicitatiechat naar de communicatiekern (server/kern/comm/werk.js). DE VIERDE EN LAATSTE GROTE VOORRAAD. |
-| `consent-dekking.test.js` | 3 | -- | De handhaver onder het Consent Center. Dat scherm zei van zichzelf: "dit register wordt met de hand bijgehouden; komt er ergens een nieuwe soort toestemming bij, dan verschijnt hij hier niet vanzelf". |
+| `consent-dekking.test.js` | 3 | overleefd | De handhaver onder het Consent Center. Dat scherm zei van zichzelf: "dit register wordt met de hand bijgehouden; komt er ergens een nieuwe soort toestemming bij, dan verschijnt hij hier niet vanzelf". |
 | `consent.test.js` | 6 | -- | Het Consent Center (kern/consent.js). De belofte van dit scherm is "wie raakt mijn gegevens aan, en hier zet u het stop", en die belofte heeft twee helften die allebei kunnen breken: 1. |
 | `contact.test.js` | 6 | gezakt op `liegpoort /api/` | Nooit meer vreemden: zodra een lid echt in contact komt met een partner (hier: een bezorgaanvraag) opent er automatisch een open chatlijn. Beide kanten zien die lijn, de partner mag vooraf de Salon van het lid... |
 | `context-lijn.test.js` | 5 | gezakt op `liegpoort /api/` | De dagcontext (tijd, seizoen, temperatuur voor elke AI) en de lijnbezetting (aanmelden per kant; de schermen en de coach rekenen met het aantal aangemelde koks). |
@@ -597,7 +597,8 @@ toets omvalt.
 | `tls-x509.test.js` | 3 | gezakt op `return-weg#0` | Bewijst dat onze eigen X.509/DER-laag echte, bruikbare bytes maakt: een self-signed certificaat dat OpenSSL (via Node's tls) accepteert in een ECHTE TLS-handshake, en een CSR die correct over de juiste inhoud is... |
 | `toegankelijk.test.js` | 5 | -- | Het toegankelijkheidsprofiel (kern/toegankelijk.js): hoe het scherm zich hoort te gedragen. Wat hier bewezen wordt: de stand blijft staan, een onbekende waarde valt terug op normaal in plaats van stil te blijven... |
 | `toestellen.test.js` | 6 | -- | Gekoppelde toestellen (kern/toestellen.js): de tweede herkomst. Het zwaartepunt van deze toets is niet dat het werkt, maar dat de sleutel SMAL is. |
-| `training.test.js` | 10 | gezakt op `liegpoort /api/` | Training (kern/training.js). Dezelfde vorm als het medicatieschema, en om dezelfde reden: RTG schrijft geen trainingsschema voor. |
+| `training.test.js` | 9 | gezakt op `liegpoort /api/` | Training & tips in de PDA: micro-learning voor het personeel. 1) De zuivere tip-bibliotheek is rol-bewust en zonder dubbelingen. |
+| `trainingsschema.test.js` | 10 | -- | Het trainingsschema (kern/trainingsschema.js). dezelfde reden: RTG schrijft geen trainingsschema voor. |
 | `transfer.test.js` | 5 | gezakt op `liegpoort /api/` | De eigen transferdienst van een activiteitenzaak: alleen met een geldig ticket, prijs 0 (inclusief) of het afgesproken bedrag, en iedereen ziet elkaar: de zaak de rit en de chauffeur, de chauffeur de klant, en de... |
 | `txgeld.test.js` | 6 | overleefd | DE TWEE GELDCOLLECTIES IN HET GROOTBOEK. directBetalingen en betaalVerzoeken werden bijgehouden met db.data.X.unshift(item); db.data.X = db.data.X.slice(0, N); Dat is precies waar boeking 50.001 aan verdween (zie... |
 | `txindex.test.js` | 2 | overleefd | Transactie-index: bewijs dat de O(1)-helpers exact hetzelfde antwoorden als de naieve scans die ze vervangen, ook na mutaties, vervanging van de array (archief/venster/pg-sync) en schrijven BUITEN de helpers om... |
@@ -775,7 +776,7 @@ toets omvalt.
 | `scanner.e2e.js` | 1 | -- | Scherm-test voor RTG Scanner: foto's kiezen (de weg die ook zonder camera werkt), de paginastrook, en bewaren als PDF die als gewoon bestand in de Bestanden-kluis belandt (map Scans). De camera zelf valt buiten... |
 | `toegankelijk-scherm.e2e.js` | 1 | -- | De belofte van het toegankelijkheidsprofiel is "op elk scherm van RTG", en dat is precies wat een servertoets niet kan zien. Deze toets zet de instelling op de ene pagina (apps/ik.html) en kijkt of hij doorwerkt op... |
 | `toestemming-scherm.e2e.js` | 1 | -- | Schermtoets voor apps/toestemming.html. Dit scherm belooft twee dingen die allebei op het scherm zelf waar moeten zijn: 1. |
-| `training-scherm.e2e.js` | 1 | -- | Schermtoets voor apps/training.html. Twee dingen worden hier op het scherm zelf nagekeken. |
+| `trainingsschema-scherm.e2e.js` | 1 | -- | Schermtoets voor apps/training.html (motor: kern/trainingsschema.js). Twee dingen worden hier op het scherm zelf nagekeken. |
 | `veiligheid.e2e.js` | 1 | -- | De vier veiligheidsapps in een echte browser. De server-toetsen (test/veiligheid.test.js) bewijzen dat de keten werkt. |
 | `vertaler.e2e.js` | 1 | -- | Scherm-test voor RTG Vertaler: inloggen, typen, de live-vertaling (met de halve-seconde-rustpauze), een reiszin aantikken en bewaren op het toestel. |
 | `verzorging-scherm.e2e.js` | 1 | -- | Schermtoets voor de verzorgingskant van de Zorg-tab: de kapper, de barbier en de nagelstudio staan nu in de leden-app. Wat hier bewezen wordt is precies wat een servertoets NIET kan zien: dat het blok echt op het... |

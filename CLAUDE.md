@@ -12,7 +12,7 @@ Website + ledenportaal + app (PWA) voor Rahul Travel Group (RTG) — een members
 
 ## Structuur en starten (kort)
 
-- `public/` — de webroot: `apps/` (portaal, PWA-app, leverancier, backoffice; 141 schermen), `apps/foundation/` (de RTFoundation, 68), `apps/juridisch/` (3), `site/` (alleen `404.html`), `shared/` (i18n, realtime), `fonts/`, `campagne/`, `sw.js` + `manifest.webmanifest` (PWA). **Er is geen `index.html`**: wie naar `/` gaat krijgt `/apps/app.html` (het RTG-OS-bureaublad) via een interne herschrijving in `server/middleware/voordeur.js` — bewust geen 302, zodat de nonce-laag er gewoon overheen gaat
+- `public/` — de webroot: `apps/` (portaal, PWA-app, leverancier, backoffice; 141 schermen), `apps/foundation/` (de RTFoundation, 68), `apps/juridisch/` (3), `site/` (alleen `404.html`), `shared/` (i18n, realtime), `fonts/`, `campagne/`, `sw.js` + `manifest.webmanifest` (PWA). **Er is geen `index.html` en geen marketingsite**: wie naar `/` gaat krijgt `/apps/app.html` via een interne herschrijving in `server/middleware/voordeur.js` (bewust geen 302, zodat de nonce-laag er gewoon overheen gaat), en die pagina draagt de inlogpoort zelf. Je komt dus direct bij de inlog
 - `server/` — Node/Express-backend: `server.js`, `accounts.js` (identiteitskluis + codenamen), `db.js`/`seed.js`, `data/` (runtime: db.json, rtg.db, sleutels — **staat in .gitignore, nooit committen**)
 - Starten: `npm start` (gebruikt `--experimental-sqlite`, vereist Node 22+) → http://localhost:3000
 - Echte AI: `ANTHROPIC_API_KEY` als environment variable; zonder key vaste demo-antwoorden. De key nooit in de repo of client-side JS zetten.
@@ -65,6 +65,7 @@ De eerdere **statische versie** (losse HTML-bestanden in de root + Vercel `api/c
 
 ## Wat NIET te doen
 
+- **Geen marketingsite terugbouwen.** De publieke marketingpagina's zijn er bewust uit; `/` komt direct op de inlog uit. Een landingspagina, "over ons", een prijzenpagina of een publieke homepage is dus geen ontbrekend stuk dat je even aanvult — het is een besluit. Alleen terugbouwen als daar expliciet om gevraagd wordt
 - Geen "verslavende" engagement-patronen (kunstmatige urgentie, oneindige scroll-tricks)
 - **De progressielaag stopt bij 18+.** Alles wat een prestatie bewaart búiten het potje — highscores, ranglijsten, niveaus, prestaties, toernooien, seizoenen — bestaat alleen voor leden die de 18+-poort halen (`volwassen()`: paspoort-geboortedatum gecontroleerd én 18 of ouder). Onder die grens blijft elk spel volledig speelbaar; er wordt alleen niets van bewaard. De Arena belooft tieners met zoveel woorden "alles telt alleen binnen het potje; er bestaat geen ranglijst", en School houdt vast aan "leren is geen wedstrijd". De grens staat op één plek in de code (`progressieMag` in `server/kern/spellen.js`); nieuwe progressievormen hangen daaraan en krijgen geen eigen kopie van de regel.
 - Geen nieuwe kleuren of fonts zonder de merkregels hierboven te checken

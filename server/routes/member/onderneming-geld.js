@@ -9,7 +9,7 @@
 module.exports = (kern, mijn, stuur, nietGevonden) => {
   const { app, auth, ondernemingRelaties, ondernemingKlantNotitie,
     ondernemingDebiteuren, ondernemingCrediteuren, ondernemingContracten,
-    ondernemingWerkruimte, ondernemingBelasting, ondernemingKas, ondernemingKasSaldo, ondernemingCapaciteit } = kern;
+    ondernemingWerkruimte, ondernemingBelasting, ondernemingKas, ondernemingKasSaldo, ondernemingCapaciteit, ondernemingWerving } = kern;
 
   /* Het klantenboek en de opvolging. Alles op codenaam: dit boek kent geen
      echte namen, en dat is het ontwerp en geen tekortkoming. */
@@ -86,5 +86,13 @@ module.exports = (kern, mijn, stuur, nietGevonden) => {
     const o = mijn(req);
     if (!o) return stuur(res, nietGevonden);
     res.json({ ok: true, capaciteit: ondernemingCapaciteit(o, undefined, Number((req.body || {}).dagen)) });
+  });
+
+  /* Vacatures en wachtende sollicitaties, geteld en geklokt. Namen en cv's
+     staan in de personeels-app; zie kern/onderneming/werving.js. */
+  app.post('/api/onderneming/werving', auth, (req, res) => {
+    const o = mijn(req);
+    if (!o) return stuur(res, nietGevonden);
+    res.json({ ok: true, werving: ondernemingWerving(o) });
   });
 };

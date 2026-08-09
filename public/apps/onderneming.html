@@ -154,7 +154,7 @@ function toonLeeg(){
 function teken(){
   const o=ONDS.find(x=>x.id===HUIDIG)||{};
   zetTitel(DAG.naam||'Mijn onderneming');
-  $('#hoofd').innerHTML=[vakGroet(),vakGezond(),vakActies(),vakIntake(),vakKans(),vakSimulatie(),vakStress(),vakPlan(o),vakRechtsvorm(o),vakOprichting(),vakZaak(o),vakEersteKlant(),vakMall(),vakRelaties(),vakDebiteuren(),vakCrediteuren(),vakContracten(),vakBelasting(),vakKas(),vakCapaciteit()].join('');
+  $('#hoofd').innerHTML=[vakGroet(),vakGezond(),vakActies(),vakIntake(),vakKans(),vakSimulatie(),vakStress(),vakPlan(o),vakRechtsvorm(o),vakOprichting(),vakZaak(o),vakEersteKlant(),vakMall(),vakRelaties(),vakDebiteuren(),vakCrediteuren(),vakContracten(),vakBelasting(),vakKas(),vakCapaciteit(),vakWerving()].join('');
   haakKnoppen();
 }
 
@@ -556,6 +556,31 @@ function vakCapaciteit(){
     (c.buitenUrenDagen?'<p class="subtxt" style="margin-top:.7rem;">U werkt op '+c.buitenUrenDagen+
       ' dag(en) buiten uw eigen werktijden.</p>':'')+
     '<p class="subtxt" style="margin-top:.9rem;">'+esc(c.nietGemeten)+'</p></div>';
+}
+
+
+function vakWerving(){
+  const w=DAG&&DAG.werving;
+  if(!w) return '';
+  if(!w.vacatures.open && !w.sollicitaties.wachtend && !w.extraPersoon) return '';
+  const rijen=(w.sollicitaties.rijen||[]).map(r=>
+    '<div class="bron'+(r.dagen>=14?'':' niet')+'"><span>'+esc(r.functie||'Open sollicitatie')+
+    (r.viaVacature?' <span class="bu">(op vacature)</span>':'')+'</span>'+
+    '<span>'+r.dagen+' dagen'+(r.dagen>=14?' &middot; te lang':'')+'</span></div>').join('');
+  const extra=w.extraPersoon
+    ? '<div class="cijfers" style="margin-top:.9rem;">'+
+      '<div class="cijfer"><div class="lbl">Bezetting nu</div><div class="wrd">'+w.extraPersoon.van+'%</div>'+
+      '<div class="eh">'+w.extraPersoon.teamNu+' persoon/personen</div></div>'+
+      '<div class="cijfer"><div class="lbl">Met een erbij</div><div class="wrd">'+w.extraPersoon.naar+'%</div>'+
+      '<div class="eh">'+w.extraPersoon.teamDan+' personen</div></div></div>'+
+      '<p class="subtxt" style="margin-top:.4rem;">'+esc(w.extraPersoon.let)+'</p>'
+    : '';
+  return '<div class="vak"><h2>Mensen</h2>'+
+    '<p class="subtxt">'+w.vacatures.open+' vacature'+(w.vacatures.open===1?'':'s')+' open, '+
+    w.sollicitaties.wachtend+' sollicitatie'+(w.sollicitaties.wachtend===1?'':'s')+' wachtend'+
+    (w.sollicitaties.teLang?', waarvan '+w.sollicitaties.teLang+' te lang':'')+'.</p>'+
+    (rijen?'<div style="margin-top:.8rem;">'+rijen+'</div>':'')+extra+
+    '<p class="subtxt" style="margin-top:.9rem;">'+esc(w.nietGemeten)+'</p></div>';
 }
 
 /* ---------- handelingen ---------- */

@@ -1693,6 +1693,43 @@ regex tegen "gemiste omzet" sloeg aan op mijn eigen voorbehoud en op het woord
 "prijs" in een adviestekst -- die zoekt nu naar het uitlezen van een bedrag, wat
 de eigenlijke vraag was.
 
+### Werving: staat er iemand te wachten
+
+`server/kern/onderneming/werving.js` + `/api/onderneming/werving`. Vacatures en
+sollicitaties bestaan al (`db.data.vacatures`, `db.data.applications`); deze laag
+bouwt daar niets naast maar **telt en klokt** ze, en legt de uitkomst naast de
+bezetting.
+
+**Hier staan geen namen.** Een sollicitatie draagt in de opslag een echte naam en
+contactgegevens -- die heeft een werkgever ook nodig om iemand aan te nemen, en
+daarvoor is de personeels-app. Maar dit is een signaallaag op het dagbeeld, en
+daar is een aantal en een wachttijd genoeg. Elke naam die hier zou opduiken, is
+een naam op een scherm waar hij niet voor nodig is; dat is precies hoe de
+codenaam-regel elders sneuvelt. Een toets controleert dat er geen naam, geen
+contactgegeven en zelfs geen codenaam in het antwoord terechtkomt.
+
+**Het probleem is niet werven maar antwoorden.** Een sollicitatie die drie weken
+blijft liggen, is een kandidaat die intussen ergens anders begint -- en de zaak
+denkt dat er niemand reageerde. De wachttijd van de oudste openstaande
+sollicitatie is daarom het getal dat op het dagbeeld komt, niet het aantal
+vacatures.
+
+**Wat een extra persoon doet, is rekenkunde en geen belofte.** De beschikbare tijd
+in `capaciteit.js` schaalt recht evenredig met de teamgrootte, dus de bezetting bij
+n+1 mensen is exact uit te rekenen: van 92% naar 61% bij een team van twee. Wat er
+niet bij staat is of die persoon zichzelf terugverdient -- daarvoor zouden wij
+vraag moeten kennen die nooit is gesteld.
+
+Op het dagbeeld staat werving direct achter capaciteit: het is het antwoord op
+dezelfde vraag. En "vol maar niemand gezocht" verschijnt alleen als de bezetting
+echt gemeten is -- zonder agenda weten wij niet of het druk is.
+
+Getoetst in `test/onderneming-werving.test.js` (15). Zes mutaties; vijf beten
+meteen. **De zesde sloeg af en legde een gat in mijn toets bloot:** bij een team
+van één is `n/(n+1)` toevallig gelijk aan de helft, dus een formule die altijd
+halveert kwam er ongestraft doorheen. Er staat nu een tweede geval met een team
+van drie (drie kwart, niet de helft); daarna beet de mutatie wel.
+
 ### RTG Werk OS (de werkplek van een organisatie)
 
 `server/bedrijf/` + `/api/bedrijf/...` + `/apps/werk.html`. Een **werkruimte**

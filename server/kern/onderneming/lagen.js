@@ -35,6 +35,7 @@ module.exports = (ctx) => {
   const bel = require('./belasting')({ db });
   const kas = require('./kas')({ save });
   const cap = require('./capaciteit')({ db, boekingenVanZaak });
+  const wrv = require('./werving')({ db });
 
-  return { intake, kans, sim, stress, plan, dag, opr, ek, mp, boek, rel, deb, cred, con, bel, kas, cap };
+  return { intake, kans, sim, stress, plan, dag, opr, ek, mp, boek, rel, deb, cred, con, bel, kas, cap, wrv };
 };

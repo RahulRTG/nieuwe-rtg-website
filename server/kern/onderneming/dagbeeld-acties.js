@@ -17,10 +17,11 @@ const CONTRACTEN = require('./contracten');
 const BELASTING = require('./belasting');
 const KAS = require('./kas');
 const CAPACITEIT = require('./capaciteit');
+const WERVING = require('./werving');
 
 module.exports = ({ boekingenVanZaak, intakeOntbreekt }) => {
 
-  function acties(o, feiten, verk, project, eersteklant, mall, rel, deb, cred, con, bel, kas, cap) {
+  function acties(o, feiten, verk, project, eersteklant, mall, rel, deb, cred, con, bel, kas, cap, wrv) {
     const uit = [];
     const zet = (id, kop, waarom, waarheen) => uit.push({ id, kop, waarom, waarheen });
 
@@ -127,21 +128,27 @@ module.exports = ({ boekingenVanZaak, intakeOntbreekt }) => {
       const v = CAPACITEIT.capaciteitOpvolging(cap);
       if (v) zet('capaciteit', v.kop, v.waarom, 'capaciteit');
     }
-    /* 15. de opvolging. Dit gaat VOOR de Mall-pagina en voor de losse
+    /* 15. de werving. Direct achter de capaciteit, want het is het antwoord op
+       dezelfde vraag: een sollicitatie die blijft liggen is de duurste vorm van
+       te druk zijn. */
+    if (wrv) {
+      for (const v of WERVING.wervingOpvolging(wrv, cap)) zet('werving:' + v.id, v.kop, v.waarom, 'werving');
+    }
+    /* 16. de opvolging. Dit gaat VOOR de Mall-pagina en voor de losse
        aanvragen: het is het enige wat over geld gaat dat al binnen handbereik
        ligt. De losse aanvragen-actie hieronder valt weg zodra de opvolging hem
        al noemt -- twee keer hetzelfde vragen leest als een storing. */
     if (rel && rel.opvolging.length) {
       for (const v of rel.opvolging) zet('opvolging:' + v.id, v.kop, v.waarom, 'relaties');
     }
-    /* 16. de Mall-pagina. Na de etalage-check, want online staan gaat voor een
+    /* 17. de Mall-pagina. Na de etalage-check, want online staan gaat voor een
        mooie pagina: een pagina die niemand ziet is geen pagina. */
     if (mall && mall.open.length) {
       const m = mall.open[0];
       zet('mallprofiel', 'Uw Mall-pagina is ' + mall.percentage + '% ingevuld',
         m.label + ': ' + m.wat, 'mall');
     }
-    // 17. wat er ligt
+    // 18. wat er ligt
     const alGenoemd = !!(rel && rel.opvolging.some(v => v.id === 'aanvragen'));
     if (o.supplierCode && !alGenoemd) {
       const wacht = (boekingenVanZaak(o.supplierCode) || []).filter(b => b && b.status === 'aangevraagd').length;

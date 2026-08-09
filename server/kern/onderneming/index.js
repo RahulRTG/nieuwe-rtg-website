@@ -40,7 +40,7 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boeki
   /* Alle deellagen worden in ./lagen.js opgebouwd -- dit bestand ging over de
      10 kB van het modulebeleid, en dat is de goede naad: daar de
      gereedschapskist, hier het object zelf. */
-  const { intake, kans, sim, stress, plan, dag, opr, ek, mp, boek, rel, deb, cred, con, bel, kas, cap } =
+  const { intake, kans, sim, stress, plan, dag, opr, ek, mp, boek, rel, deb, cred, con, bel, kas, cap, wrv } =
     require('./lagen')({ db, save, schoon, ordersVanZaak, boekingenVanZaak, ondernemerpoort });
 
   const bak = () => {
@@ -133,9 +133,10 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boeki
          de kasvooruitblik. Zou die ze zelf opnieuw opvragen, dan kunnen er
          twee antwoorden op dezelfde vraag ontstaan. */
       const d = deb.debiteuren(o, t), c = cred.crediteuren(o, t), b = bel.belasting(o, t);
+      const cp = cap.capaciteit(o, t);
       return dag.dagbeeld(o, ondernemingBeeld(o), ondernemingVerkenning(o),
         opr.oprichtingsproject(o), ek.eersteKlant(o), mp.ondernemingMallProfiel(o),
-        rel.relaties(o, t), d, c, con.contracten(o, vandaag), b, kas.kas(o, d, c, b, t), cap.capaciteit(o, t));
+        rel.relaties(o, t), d, c, con.contracten(o, vandaag), b, kas.kas(o, d, c, b, t), cp, wrv.werving(o, cp, t));
     },
     ondernemingEersteKlant: ek.eersteKlant,
     ondernemingMallProfiel: mp.ondernemingMallProfiel,
@@ -150,6 +151,10 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boeki
     },
     ondernemingKasSaldo: kas.kasSaldoZet,
     ondernemingCapaciteit: cap.capaciteit,
+    ondernemingWerving: (o, nu) => {
+      const t = Number.isFinite(nu) ? nu : Date.now();
+      return wrv.werving(o, cap.capaciteit(o, t), t);
+    },
     ondernemingWerkruimte: (o, code) => con.ondernemingWerkruimte(o, code, save),
     ondernemingKlantNotitie: boek.klantNotitie,
     ondernemingOprichting: opr.oprichtingsproject,

@@ -173,6 +173,25 @@ test('random wachtrij: twee wachtenden voor hetzelfde spel worden een potje', as
   assert.ok(mijn.potjes.some(p => p.id === w2.id && p.status === 'bezig'), 'de eerste ziet het gestarte potje');
 });
 
+/* De wachtrij splitst per spel en groepsgrootte, en ALLEEN bij een
+   taalgevoelig spel ook per taal (Woordduel heeft een eigen letterzak per
+   taal). Splitste hij overal op taal, dan zouden twee schakers die toevallig
+   een andere app-taal hebben elkaar nooit vinden -- een lege wachtrij die
+   niemand kan verklaren. */
+test('random wachtrij: taal splitst Woordduel wel en schaken niet', async () => {
+  const { a, b } = await tweeVrienden();
+  const nl = await json(await raw('/member/spel/random', { soort: 'schaak', taal: 'nl' }, a.tok));
+  assert.ok(nl.wachten, 'de eerste schaker wacht');
+  const en = await json(await raw('/member/spel/random', { soort: 'schaak', taal: 'en' }, b.tok));
+  assert.ok(en.gestart, 'bij schaken doet de taal er niet toe: ze vinden elkaar');
+
+  const { a: c, b: d } = await tweeVrienden();
+  const wNl = await json(await raw('/member/spel/random', { soort: 'woord', taal: 'nl' }, c.tok));
+  assert.ok(wNl.wachten, 'de Nederlandse woordspeler wacht');
+  const wEn = await json(await raw('/member/spel/random', { soort: 'woord', taal: 'en' }, d.tok));
+  assert.ok(wEn.wachten && !wEn.gestart, 'een Engelse letterzak hoort niet tegen een Nederlandse te spelen');
+});
+
 test('sneek: alleen je beste score telt en vrienden zien elkaar op het bord', async () => {
   const { a, b } = await tweeVrienden();
   await raw('/member/spel/sneek-score', { punten: 120 }, a.tok);

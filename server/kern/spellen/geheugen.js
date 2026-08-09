@@ -47,5 +47,7 @@ module.exports = (ctx) => {
     nr: st.af[mij], tot: RONDEN, punten: st.punten[mij],
     stand: p.spelers.map(sp => ({ af: st.af[sp], punten: st.punten[sp] }))
   });
-  return { geheugenInit, geheugenZet, geheugenView };
+  const spel = { sleutel: 'geheugen', naam: 'Geheugenduel', max: 4, wereld: 'rtf', buitenBeurt: ['reeks'],
+    init: geheugenInit, zet: geheugenZet, view: geheugenView };
+  return { spel, geheugenInit, geheugenZet, geheugenView };
 };

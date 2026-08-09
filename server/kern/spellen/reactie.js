@@ -45,5 +45,7 @@ module.exports = (ctx) => {
     tijden: st.tijden[mij],
     stand: p.spelers.map(sp => ({ af: st.tijden[sp].length, totaal: st.tijden[sp].reduce((a, b) => a + b, 0) }))
   });
-  return { reactieInit, reactieZet, reactieView };
+  const spel = { sleutel: 'reactie', naam: 'Reactieduel', max: 4, wereld: 'rtf', buitenBeurt: ['tik'],
+    init: reactieInit, zet: reactieZet, view: reactieView };
+  return { spel, reactieInit, reactieZet, reactieView };
 };

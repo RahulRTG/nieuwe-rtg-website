@@ -43,5 +43,10 @@ module.exports = (ctx) => {
      groep; wie niet wil of niet drinkt, drinkt water; dat staat er ook bij.
      Na 25 kaarten is het potje klaar. Geen winnaar of verliezer. */
 
-  return { waarheidInit, waarheidZet };
+  const spel = {
+    sleutel: 'waarheid', naam: 'Doen of Waarheid', max: 6, wereld: 'rtf',
+    init: waarheidInit, zet: waarheidZet,
+    view: (p, st) => ({ punten: p.spelers.map(sp => st.punten[sp]), kaart: st.kaart, wat: st.wat, doel: 8 })
+  };
+  return { spel, waarheidInit, waarheidZet };
 };

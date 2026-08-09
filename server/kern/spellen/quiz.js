@@ -42,5 +42,7 @@ module.exports = (ctx) => {
       nr: st.idx[mij], tot: st.vragen.length, goed: st.goed[mij],
       stand: p.spelers.map(sp => ({ af: st.idx[sp], goed: st.goed[sp] })) };
   };
-  return { quizInit, quizZet, quizView };
+  const spel = { sleutel: 'quiz', naam: 'Quizduel', max: 4, wereld: 'rtf', buitenBeurt: ['antwoord'],
+    init: quizInit, zet: quizZet, view: quizView };
+  return { spel, quizInit, quizZet, quizView };
 };

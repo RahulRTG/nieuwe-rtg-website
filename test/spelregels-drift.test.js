@@ -15,7 +15,7 @@ const kern = require('../server/kern/spellen')({
   zijnVrienden: () => true, codenaamVan: x => x, sseToCustomer() {},
   isGeblokkeerd: () => false, socialZoek: async () => [], sociaalRate: () => true, volwassen: () => true
 });
-const { rummiSet, W_PREMIE } = kern._spelregels;
+const { rummiSet, W_PREMIE, SPEL } = kern._spelregels;
 
 // de clientkant: de stukken broncode uit spelen.html knippen en uitvoeren
 const html = fs.readFileSync(path.join(__dirname, '..', 'public', 'apps', 'spelen.html'), 'utf8');
@@ -46,5 +46,23 @@ test('de rummi-setregels van client en server keuren dezelfde setjes goed', () =
   for (const set of setjes) {
     assert.equal(rGeldigSet(set) === true, rummiSet(set) != null,
       'client en server oordelen verschillend over: ' + JSON.stringify(set));
+  }
+});
+
+/* De spelnamen bestaan ook in tweevoud: de server heeft ze in de descriptors
+   (via het register), de lobby in spelen.html heeft een eigen SPELNAAM/MAXG om
+   een potje al te kunnen tonen voordat de server antwoordt. Loopt dat uiteen,
+   dan heet hetzelfde spel op twee plekken anders of laat de client een
+   spelersaantal toe dat de server weigert. */
+test('de spelnamen en spelersaantallen van de lobby komen overeen met de server', () => {
+  const bron = knip('const SPELNAAM', 'async function laadLobby');
+  const { SPELNAAM, MAXG } = new Function(bron + '; return { SPELNAAM, MAXG };')();
+  for (const [sleutel, naam] of Object.entries(SPELNAAM)) {
+    assert.ok(SPEL[sleutel], 'de lobby kent spel "' + sleutel + '" dat de server niet heeft');
+    // de client mag de 18+-poort in de naam zetten ("Proost (18+)"); de rest moet gelijk zijn
+    assert.ok(naam.startsWith(SPEL[sleutel].naam), 'spel ' + sleutel + ' heet op de client "' + naam +
+      '" en op de server "' + SPEL[sleutel].naam + '"');
+    if (MAXG[sleutel] !== undefined) assert.equal(MAXG[sleutel], SPEL[sleutel].max,
+      'de lobby laat een ander aantal spelers toe dan de server voor ' + sleutel);
   }
 });

@@ -78,5 +78,11 @@ module.exports = (ctx) => {
      de laatste rij word je dam (die vliegt over de hele diagonaal). Als
      huisregel hoeft de meerderheidsslag niet: elke slag telt. */
 
-  return { pestenInit, pestenZet };
+  const spel = {
+    sleutel: 'pesten', naam: 'Pesten', max: 4, wereld: 'rtf',
+    init: pestenInit, zet: pestenZet,
+    view: (p, st, mij) => ({ hand: st.handen[mij], aantallen: p.spelers.map(sp => st.handen[sp].length), open: st.open[st.open.length - 1],
+      kleurKeuze: st.kleurKeuze, pak: st.pak, richting: st.richting, stapel: st.stapel.length })
+  };
+  return { spel, pestenInit, pestenZet };
 };

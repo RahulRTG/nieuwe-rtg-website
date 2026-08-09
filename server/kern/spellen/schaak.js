@@ -138,5 +138,13 @@ module.exports = (ctx) => {
 
   /* ================= Woordduel (wordfeud-achtig, eer-systeem) ================= */
 
-  return { schaakInit, schaakZet };
+  /* eigenBeurt: schaken controleert zelf wie aan zet is (de kleur staat in de
+     stand, niet in potje.beurt). Stond als "p.soort !== 'schaak'" in de
+     centrale dispatch; nu als eigenschap van dit spel. */
+  const spel = {
+    sleutel: 'schaak', naam: 'Schaken', max: 2, wereld: 'rtg', eigenBeurt: true,
+    init: schaakInit, zet: schaakZet,
+    view: (p, st) => ({ bord: st.bord.join(''), aanZet: st.aanZet, laatste: st.zetten[st.zetten.length - 1] || null })
+  };
+  return { spel, schaakInit, schaakZet };
 };

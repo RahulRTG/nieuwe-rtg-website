@@ -67,5 +67,7 @@ module.exports = (ctx) => {
       nr: st.af[mij], tot: RONDEN, punten: st.punten[mij],
       stand: p.spelers.map(sp => ({ af: st.af[sp], punten: st.punten[sp] })) };
   };
-  return { ordeInit, ordeZet, ordeView };
+  const spel = { sleutel: 'orde', naam: 'Rangschikduel', max: 4, wereld: 'rtf', buitenBeurt: ['orde'],
+    init: ordeInit, zet: ordeZet, view: ordeView };
+  return { spel, ordeInit, ordeZet, ordeView };
 };

@@ -3,35 +3,12 @@
    en opgeven. Krijgt de gedeelde context een keer bij het opstarten vanuit
    kern/spellen.js. */
 module.exports = (ctx) => {
-  const { db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, isGeblokkeerd, socialZoek, sociaalRate, volwassen,
-    rid, nu, S, SPEL, SOORTEN, TEAMS, wereldFout, leeftijdFout, nudge, schud, beurtDoor, opschonen,
-    mejnInit, mejnZet, mejnZetten, mejnGooi, schaakInit, schaakZet, woordInit, woordZet, W_PREMIE,
-    pestenInit, pestenZet, damInit, damZet, damZetten, rummiInit, rummiZet, rummiSet,
-    magnaatInit, magnaatZet, M_VELDEN, secondenInit, secondenZet, waarheidInit, waarheidZet, proostInit, proostZet,
-    flitsZet, flitsView, reactieZet, reactieView, quizZet, quizView, schatZet, schatView,
-    geheugenZet, geheugenView, ordeZet, ordeView } = ctx;
-  /* De staat zoals EEN speler hem mag zien (handen en rekken van anderen
-     blijven verborgen). Een expliciete map per soort: een nieuw spel zonder
-     eigen weergave faalt luid in plaats van stil als Woordduel te renderen. */
-  const VIEWS = {
-    mejn: (p, st, mij) => ({ pionnen: p.spelers.map(sp => st.pionnen[sp].map(x => x.pos)), dobbel: st.dobbel, mag: st.mag, zetten: p.spelers[p.beurt] === mij && st.mag === 'zet' ? mejnZetten(p, mij) : [] }),
-    schaak: (p, st) => ({ bord: st.bord.join(''), aanZet: st.aanZet, laatste: st.zetten[st.zetten.length - 1] || null }),
-    woord: (p, st, mij) => ({ bord: st.bord, scores: p.spelers.map(sp => st.scores[sp]), rek: st.rekken[mij], zak: st.zak.length, passes: st.passes }),
-    pesten: (p, st, mij) => ({ hand: st.handen[mij], aantallen: p.spelers.map(sp => st.handen[sp].length), open: st.open[st.open.length - 1], kleurKeuze: st.kleurKeuze, pak: st.pak, richting: st.richting, stapel: st.stapel.length }),
-    dam: (p, st, mij) => ({ bord: st.bord.join(''), ketting: st.ketting, zetten: p.status === 'bezig' && p.spelers[p.beurt] === mij ? damZetten(p, mij) : [] }),
-    rummi: (p, st, mij) => ({ rek: st.rekken[mij], tafel: st.tafel, aantallen: p.spelers.map(sp => st.rekken[sp].length), zak: st.zak.length, eerste: st.eerste[mij], passes: st.passes }),
-    magnaat: (p, st) => ({ posities: p.spelers.map(sp => st.posities[sp]), geld: p.spelers.map(sp => st.geld[sp]), failliet: p.spelers.map(sp => !!st.failliet[sp]), cel: p.spelers.map(sp => st.cel[sp] > 0),
-      eigenaar: Object.fromEntries(Object.entries(st.eigenaar).map(([v, h]) => [v, p.spelers.indexOf(h)])), // veld -> spelerindex
-      huizen: st.huizen, mag: st.mag, koopVeld: st.koopVeld, dobbel: st.dobbel, kaart: st.kaart }),
-    seconden: (p, st, mij) => {
-      const rader = (p.beurt + 2) % p.spelers.length; // de teamgenoot raadt en mag de kaart niet zien
-      return { scores: st.scores, kaart: st.kaart && p.spelers.indexOf(mij) !== rader ? st.kaart : null, tot: st.tot, rader, bezig: !!st.kaart };
-    },
-    waarheid: (p, st) => ({ punten: p.spelers.map(sp => st.punten[sp]), kaart: st.kaart, wat: st.wat, doel: 8 }),
-    proost: (p, st) => ({ kaart: st.kaart, teller: st.teller, totaal: st.totaal }),
-    flits: flitsView, reactie: reactieView, quiz: quizView, schat: schatView,
-    geheugen: geheugenView, orde: ordeView
-  };
+  const { db, save, crypto, codenaamVan, S, SPEL, SOORTEN, nudge, VIEWS, ZETTEN, STATISCH } = ctx;
+  /* De weergave per spel (de staat zoals EEN speler hem mag zien: handen en
+     rekken van anderen blijven verborgen) staat in het spel zelf en komt via
+     het register mee in VIEWS. Een spel zonder eigen weergave komt het
+     register niet eens door, dus het kan hier niet stil als iets anders
+     gerenderd worden. */
   function spelStaat(mij, id, metVelden) {
     const p = S().potjes[id];
     if (!p || !p.spelers.includes(mij)) return { status: 404, error: 'Dit potje bestaat niet (meer).' };
@@ -39,23 +16,26 @@ module.exports = (ctx) => {
       spelers: p.spelers.map(codenaamVan), ik: p.spelers.indexOf(mij), beurt: p.beurt, winnaar: p.winnaar, gelijk: !!p.gelijk };
     if (p.status !== 'wacht' && p.staat && VIEWS[p.soort]) {
       uit.staat = VIEWS[p.soort](p, p.staat, mij);
-      // het statische Magnaat-bord reist alleen mee als de client erom vraagt
-      // (bij het openen), niet bij elke poll van 2,5 seconde
-      if (p.soort === 'magnaat' && metVelden) uit.staat.velden = M_VELDEN;
+      // data die nooit verandert (het Magnaat-bord) reist alleen mee als de
+      // client erom vraagt (bij het openen), niet bij elke poll van 2,5 seconde
+      if (metVelden && STATISCH[p.soort]) Object.assign(uit.staat, STATISCH[p.soort](p));
     }
     return { status: 200, potje: uit };
   }
-  const ZETTEN = { mejn: mejnZet, schaak: schaakZet, woord: woordZet, pesten: pestenZet, dam: damZet, rummi: rummiZet, magnaat: magnaatZet, seconden: secondenZet, waarheid: waarheidZet, proost: proostZet, flits: flitsZet, reactie: reactieZet, quiz: quizZet, schat: schatZet, geheugen: geheugenZet, orde: ordeZet };
   function spelZet(mij, id, zet) {
     const p = S().potjes[id];
     if (!p || !p.spelers.includes(mij)) return { status: 404, error: 'Dit potje bestaat niet (meer).' };
     if (p.status !== 'bezig') return { status: 409, error: 'Dit potje loopt niet (meer).' };
     if (!ZETTEN[p.soort]) return { status: 400, error: 'Onbekend spel.' };
-    // sommige acties mogen buiten je beurt (Magnaat: bouwen/terugverkopen);
-    // dat staat in de speltabel, niet als losse uitzondering in de dispatch
+    /* De beurtbewaking is spel-neutraal en leest alleen de descriptor:
+       'buitenBeurt' noemt de acties die niet op je beurt hoeven (Magnaat:
+       bouwen/terugverkopen; de duels: iedereen speelt in eigen tempo), en
+       'eigenBeurt' zegt dat het spel zelf bijhoudt wie aan zet is (schaken
+       heeft de kleur in de stand staan). Geen enkele spelnaam meer in deze
+       laag -- dat was hiervoor wel zo, en dat is waarom een nieuw spel er
+       stilletjes verkeerd doorheen kon. */
     const beheer = zet && (SPEL[p.soort].buitenBeurt || []).includes(zet.actie);
-    if (p.soort !== 'schaak' && !beheer && p.spelers[p.beurt] !== mij) return { status: 409, error: 'De ander is aan zet.' };
-    if (p.soort === 'mejn' && zet && zet.actie === 'gooi') return mejnGooi(p, mij);
+    if (!SPEL[p.soort].eigenBeurt && !beheer && p.spelers[p.beurt] !== mij) return { status: 409, error: 'De ander is aan zet.' };
     return ZETTEN[p.soort](p, mij, zet || {});
   }
   function spelOpgeven(mij, id) {

@@ -20,32 +20,14 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
     if (!db.data.spellen) db.data.spellen = { potjes: {}, wachtrij: {} };
     return db.data.spellen;
   }
-  /* Een tabel per spel is de enige bron: naam, spelersaantal en welke app het
-     potje START (meespelen op uitnodiging kan altijd over en weer). 'min'
-     dwingt af dat 30 Seconden echt met vier begint; 'volwassen' is de
-     18+-poort van Proost (paspoort-geboortedatum; RTF-profielen hebben geen
-     geverifieerde leeftijd en doen dus nooit mee). */
-  const SPEL = {
-    mejn:     { naam: 'Mens erger je niet', max: 4, wereld: 'rtf' },
-    schaak:   { naam: 'Schaken',            max: 2, wereld: 'rtg' },
-    woord:    { naam: 'Woordduel',          max: 2, wereld: 'rtg' },
-    pesten:   { naam: 'Pesten',             max: 4, wereld: 'rtf' },
-    dam:      { naam: 'Dammen',             max: 2, wereld: 'rtf' },
-    rummi:    { naam: 'Rummi',              max: 4, wereld: 'rtf' },
-    magnaat:  { naam: 'Magnaat',            max: 6, wereld: 'rtg', buitenBeurt: ['bouw', 'verkoop'] },
-    seconden: { naam: '30 Seconden',        max: 4, min: 4, wereld: 'rtg' },
-    waarheid: { naam: 'Doen of Waarheid',   max: 6, wereld: 'rtf' },
-    proost:   { naam: 'Proost',             max: 6, wereld: 'rtg', volwassen: true },
-    // de Arena-duels (tieners): iedereen speelt dezelfde opgaven in eigen
-    // tempo, dus de zet mag buiten de beurt
-    flits:    { naam: 'Flitsduel',          max: 4, wereld: 'rtf', buitenBeurt: ['antwoord'] },
-    reactie:  { naam: 'Reactieduel',        max: 4, wereld: 'rtf', buitenBeurt: ['tik'] },
-    quiz:     { naam: 'Quizduel',           max: 4, wereld: 'rtf', buitenBeurt: ['antwoord'] },
-    schat:    { naam: 'Schatduel',          max: 4, wereld: 'rtf', buitenBeurt: ['schat'] },
-    geheugen: { naam: 'Geheugenduel',       max: 4, wereld: 'rtf', buitenBeurt: ['reeks'] },
-    orde:     { naam: 'Rangschikduel',      max: 4, wereld: 'rtf', buitenBeurt: ['orde'] }
-  };
-  const SOORTEN = Object.fromEntries(Object.entries(SPEL).map(([k, v]) => [k, v.naam]));
+  /* De spellen beschrijven zichzelf in een `spel`-descriptor in hun eigen
+     module onder ./spellen/; `spellen/register.js` bouwt daar SPEL, SOORTEN en
+     de dispatch-tabellen uit. Wat zo'n descriptor allemaal kan zeggen (de
+     18+-poort, het minimum, teams, taal) staat daar en met opzet niet ook hier.
+
+     Het register draait verderop, zodra nudge/schud/beurtDoor bestaan die het
+     aan de spellen doorgeeft. De functies hieronder lezen SPEL pas als er een
+     verzoek binnenkomt, dus die volgorde klopt. */
   const TEAMS = [0, 1, 0, 1, 0, 1]; // om en om twee teams, tot zes spelers
   function wereldFout(wereld, soort) {
     if (!SPEL[soort] || SPEL[soort].wereld === wereld || (wereld !== 'rtg' && wereld !== 'rtf')) return null;
@@ -84,44 +66,20 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
     }
   }
 
-  /* ================= Mens erger je niet =================
-     Ring van 40 velden; speler p start op veld p*10. Een pion: -1 = in het
-     starthok, 0..39 = op de ring (absoluut), 100+i = eigen thuisrij. */
-
   /* ---------- de spelmotoren: elk spel een eigen module ----------
-     De gedeelde context geeft ze save/crypto/schud/beurtDoor/codenaamVan; de
-     dispatch-tabellen (INITS/ZETTEN/VIEWS) hieronder blijven ongewijzigd. */
+     De gedeelde context geeft ze save/crypto/schud/beurtDoor/codenaamVan; het
+     register haalt ze op en levert de dispatch-tabellen. Dit blok groeit niet
+     meer mee met het aantal spellen -- dat was het hele punt. */
   const spelCtx = { save, crypto, schud, beurtDoor, codenaamVan, nudge };
-  const { mejnInit, mejnZet, mejnZetten, mejnGooi } = require('./spellen/mejn')(spelCtx);
-  const { schaakInit, schaakZet } = require('./spellen/schaak')(spelCtx);
-  const { woordInit, woordZet, W_PREMIE } = require('./spellen/woord')(spelCtx);
-  const { pestenInit, pestenZet } = require('./spellen/pesten')(spelCtx);
-  const { damInit, damZet, damZetten } = require('./spellen/dam')(spelCtx);
-  const { rummiInit, rummiZet, rummiSet } = require('./spellen/rummi')(spelCtx);
-  const { magnaatInit, magnaatZet, M_VELDEN } = require('./spellen/magnaat')(spelCtx);
-  const { secondenInit, secondenZet } = require('./spellen/seconden')(spelCtx);
-  const { waarheidInit, waarheidZet } = require('./spellen/waarheid')(spelCtx);
-  const { proostInit, proostZet } = require('./spellen/proost')(spelCtx);
-  const { flitsInit, flitsZet, flitsView } = require('./spellen/flits')(spelCtx);
-  const { reactieInit, reactieZet, reactieView } = require('./spellen/reactie')(spelCtx);
-  const { quizInit, quizZet, quizView } = require('./spellen/quiz')(spelCtx);
-  const { schatInit, schatZet, schatView } = require('./spellen/schat')(spelCtx);
-  const { geheugenInit, geheugenZet, geheugenView } = require('./spellen/geheugen')(spelCtx);
-  const { ordeInit, ordeZet, ordeView } = require('./spellen/orde')(spelCtx);
+  const { SPEL, SOORTEN, INITS, ZETTEN, VIEWS, STATISCH, ruw } = require('./spellen/register')(spelCtx);
   // klasgenoten: het uitnodigingspad voor beschermde tieners (De Arena)
   const { klasgenotenVan, spelKlasgenoten } = require('./spellen/klas')({ db, codenaamVan, isGeblokkeerd });
-
 
   /* De lobby- en partijlaag draaien als submodules op een gedeelde
      context, een keer opgebouwd bij het opstarten. */
   const ctx = { db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, isGeblokkeerd, socialZoek, sociaalRate, volwassen,
     rid, nu, S, SPEL, SOORTEN, TEAMS, wereldFout, leeftijdFout, nudge, schud, beurtDoor, opschonen,
-    mejnInit, mejnZet, mejnZetten, mejnGooi, schaakInit, schaakZet, woordInit, woordZet, W_PREMIE,
-    pestenInit, pestenZet, damInit, damZet, damZetten, rummiInit, rummiZet, rummiSet,
-    magnaatInit, magnaatZet, M_VELDEN, secondenInit, secondenZet, waarheidInit, waarheidZet, proostInit, proostZet,
-    flitsInit, flitsZet, flitsView, reactieInit, reactieZet, reactieView, klasgenotenVan,
-    quizInit, quizZet, quizView, schatInit, schatZet, schatView,
-    geheugenInit, geheugenZet, geheugenView, ordeInit, ordeZet, ordeView };
+    INITS, ZETTEN, VIEWS, STATISCH, klasgenotenVan };
   const { spelStart, spelGrootte, spelNieuw, spelAntwoord, spelRandom, mijnSpellen } = require('./spellen/lobby')(ctx);
   const { spelStaat, spelZet, spelOpgeven } = require('./spellen/partij')(ctx);
   // Rahul als spelmaatje: in elk potje op te roepen voor hints, regels of een peptalk
@@ -157,5 +115,5 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
   return { spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelRahul, spelKlasgenoten, sneekScore, sneekBord, arcadeScore, arcadeBord, SPEL_SOORTEN: SOORTEN,
     // alleen voor de drift-test: de client heeft een eigen kopie van deze
     // regels (directe feedback); de test houdt beide kopieën tegen elkaar
-    _spelregels: { rummiSet, W_PREMIE } };
+    _spelregels: { rummiSet: ruw.rummiSet, W_PREMIE: ruw.W_PREMIE, SPEL } };
 };

@@ -174,3 +174,42 @@ test('de bewaarmotor veegt oude uitslagen ook echt weg', () => {
   assert.deepEqual(zonder.filter(t => String(t).includes('spelUitslagen')), [],
     'spelUitslagen hoort niet op de lijst zonderBeleid te staan');
 });
+
+/* ---------- het recht op vergetelheid ----------
+   Een uitslagenlijst met sleutels en codenamen erin is persoonsdata, en die
+   moet wisbaar zijn. test/vergeten.test.js veegt door ELKE tak van db.json en
+   faalt als de sleutel of codenaam van een verwijderd lid er nog in staat --
+   deze tak zou daar dus doorheen zijn gevallen als hij niet in het beleid was
+   gezet. Dat gat was er echt: de tak is eerst gebouwd en pas daarna aan
+   vergeten/anoniem.js toegevoegd. */
+const maakAnoniem = require('../server/kern/vergeten/anoniem');
+
+test('een verwijderd lid verdwijnt uit de uitslagen, de partij van de ander blijft', () => {
+  const u = maak();
+  u.noteerUitslag(potje({ id: 'p1', spelers: ['anna', 'boris'] }));
+  maakAnoniem({ db: u.db, accounts: {} }).anonimiseer('anna', 'CN-anna', null);
+
+  const r = u.db.data.spelUitslagen[0];
+  assert.ok(r, 'de partij blijft bestaan voor boris');
+  assert.deepEqual(r.spelers[0], { anoniem: true, won: true }, 'anna is eruit, haar uitslag niet');
+  assert.deepEqual(r.spelers[1], { key: 'boris', codenaam: 'CN-boris', won: false });
+  const tekst = JSON.stringify(u.db.data.spelUitslagen);
+  assert.equal(tekst.includes('anna'), false, 'sleutel noch codenaam blijft achter');
+});
+
+test('blijft er niemand met naam over, dan gaat de hele partij weg', () => {
+  // een rij waarin niemand meer staat is voor niemand nog historie
+  const u = maak();
+  u.noteerUitslag(potje({ id: 'metKind', spelers: ['anna', 'kind1'] }));
+  maakAnoniem({ db: u.db, accounts: {} }).anonimiseer('anna', 'CN-anna', null);
+  assert.deepEqual(u.db.data.spelUitslagen, [], 'de laatste genoemde speler weg = de rij weg');
+});
+
+test('het wissen van het ene lid raakt de partijen van een ander niet', () => {
+  const u = maak();
+  u.noteerUitslag(potje({ id: 'p1', spelers: ['anna', 'boris'] }));
+  u.noteerUitslag(potje({ id: 'p2', spelers: ['chris', 'dana'], winnaar: 'CN-chris' }));
+  maakAnoniem({ db: u.db, accounts: {} }).anonimiseer('anna', 'CN-anna', null);
+  assert.deepEqual(u.spelUitslagen('chris').uitslagen.map(x => x.id), ['p2'], 'chris houdt zijn historie');
+  assert.deepEqual(u.spelUitslagen('boris').uitslagen.map(x => x.id), ['p1'], 'en boris ook');
+});

@@ -96,6 +96,27 @@ module.exports = function maakAnoniem({ db, accounts }) {
     db.data.contacts = db.data.contacts.filter(c => c.higher !== cn && c.rtg !== cn);
   }
 
+
+  /* Uitslagen van potjes (kern/spellen/uitslagen.js). Een partij is per
+     definitie van meer dan een: hem weggooien zou de historie van de
+     tegenstander uitwissen. De persoon gaat eruit en de partij blijft, in
+     precies de vorm die deze laag al kent -- `{ anoniem: true }`, dezelfde
+     vorm die een deelnemer onder de progressiegrens krijgt. Zo hoeft niemand
+     die de lijst leest een tweede soort "onbekende speler" te begrijpen.
+
+     Blijft er daarna geen enkele genoemde speler over, dan gaat de rij alsnog
+     weg: een partij waarin niemand meer staat is voor niemand nog historie, en
+     hem laten staan zou opslag zijn zonder doel. */
+  function speluitslagen(key) {
+    if (!key || !Array.isArray(db.data.spelUitslagen)) return;
+    for (const r of db.data.spelUitslagen) {
+      for (let i = 0; i < (r.spelers || []).length; i++) {
+        if (r.spelers[i] && r.spelers[i].key === key) r.spelers[i] = { anoniem: true, won: !!r.spelers[i].won };
+      }
+    }
+    db.data.spelUitslagen = db.data.spelUitslagen.filter(r => (r.spelers || []).some(s => s && s.key));
+  }
+
   // Alles in een keer, in de volgorde waarin ../vergeten.js het deed.
   function anonimiseer(key, cn, sessie) {
     reacties(key, cn);
@@ -105,6 +126,7 @@ module.exports = function maakAnoniem({ db, accounts }) {
     aanmeldingen(key, cn, sessie);
     cadeaukaarten(key);
     zaakMeldingen(cn);
+    speluitslagen(key);
   }
 
   return { anonimiseer };

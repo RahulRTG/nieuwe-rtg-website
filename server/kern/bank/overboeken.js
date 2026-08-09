@@ -116,11 +116,31 @@ module.exports = (ctx) => {
     return metIdem(idem ? 'sepa:' + iban + ':' + idem : null, 'sepa|' + iban + '|' + c + '|' + dest, async () => {
       const b = await boekAsync({ van: iban, naar: 'extern:sepa', centen: c, soort: 'sepa-uit', oms: oms || ('SEPA naar ' + dest), ref: dest });
       if (b.error) return b;
-      if (fooi > 0) await boekAsync({ van: iban, naar: 'rtg:reserve', centen: fooi, soort: 'tarief', oms: 'SEPA-tarief' });
-      try { await betaal.maakUitbetaling({ bedrag: c, iban: dest, begunstigde: begunstigde || '', referentie: b.boeking.id, idempotentieSleutel: idem ? 'bank-sepa:' + iban + ':' + idem : undefined, omschrijving: oms || 'RTG Bank SEPA' }); }
-      catch (e) { /* eventueel-consistent: de payout kan later opnieuw; de boeking staat al */ }
+      let tariefRef = null;
+      if (fooi > 0) {
+        const t = await boekAsync({ van: iban, naar: 'rtg:reserve', centen: fooi, soort: 'tarief', oms: 'SEPA-tarief' });
+        if (!t.error) tariefRef = t.boeking.id;
+      }
+      /* Eerst de opdracht VASTLEGGEN, dan pas de rail bellen. Hier stond een
+         aanroep met een lege catch eronder: mislukte de payout, dan was het
+         geld van de rekening af, stond het op extern:sepa, sloot het grootboek
+         netjes en gebeurde er buiten RTG nooit meer iets. Nu overleeft de
+         opdracht de mislukking en zelfs een herstart; ../betaalopdracht.js
+         probeert hem opnieuw met dezelfde sleutel en boekt terug als de rail
+         het blijft weigeren. */
+      const op = ctx.opdrachten.maak({
+        soort: 'sepa-uit', rail: 'betaalnaad', centen: c, bron: iban, bestemming: dest,
+        begunstigde: begunstigde || '', oms: oms || 'RTG Bank SEPA', ledgerRef: b.boeking.id,
+        tariefCenten: fooi, tariefRef,
+        idemSleutel: 'bank-sepa:' + iban + ':' + (idem || b.boeking.id)
+      });
+      const na = await ctx.opdrachten.dienIn(op);
       seintje(rekMeta(iban).codenaam);
-      return { ok: true, saldoCenten: saldoVan(iban), overgemaakt: c, tarief: fooi, naar: dest };
+      /* Wat het lid te horen krijgt is nu de waarheid en niet "gelukt": de
+         opdracht staat, maar of hij bij de bank van de ontvanger is aangekomen
+         weten we hier nog niet. Vandaar de status erbij. */
+      return { ok: true, saldoCenten: saldoVan(iban), overgemaakt: c, tarief: fooi, naar: dest,
+        opdrachtId: op.id, opdrachtStatus: na.status };
     });
   }
 

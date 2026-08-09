@@ -30,6 +30,33 @@ module.exports = (ctx) => {
   app.post('/api/office/bank', officeAuth, (req, res) => veilig(res, () => bank.overzicht()));
   app.post('/api/office/bank/gezond', officeAuth, (req, res) => veilig(res, () => bank.gezondheid()));
 
+  /* DE RECONCILIATIE: wat is er geboekt maar nog niet buiten RTG afgerond?
+     Dit is bewust een EIGEN lijst naast de gezondheid, want de sluitcontrole
+     kan hier per definitie niet over meepraten -- een boeking naar extern:sepa
+     sluit ook als de rail hem nooit heeft aangenomen. Wie hier een oplopend
+     getal ziet, kijkt naar een storing bij de rail en niet naar een fout in de
+     boekhouding. */
+  app.post('/api/office/bank/opdrachten', officeAuth, (req, res) => veilig(res, () => ({
+    ...bank.bankOpdrachten({ limit: Number(req.body.limit) || 50, status: req.body.status, bron: req.body.bron }),
+    open: bank.bankOpdrachtenOpen()
+  })));
+  // met de hand een ronde draaien (de tik doet dit vanzelf elke minuut)
+  app.post('/api/office/bank/opdrachten/ronde', officeAuth, async (req, res) => {
+    const r = await bank.bankOpdrachtenRonde({});
+    if (r.gedaan) afdelingen.audit(naam(req), 'RTG Bank opdrachtenronde met de hand: ' + r.gedaan + ' ingediend, ' + r.opgegeven + ' opgegeven');
+    res.json(r);
+  });
+  /* Een opgegeven opdracht opnieuw indienen. Dat is een BESLUIT van het
+     kantoor -- de automaat heeft het al zes keer geprobeerd en het geld is
+     teruggeboekt -- dus hij komt in het auditlog en niet stil door. */
+  app.post('/api/office/bank/opdrachten/opnieuw', officeAuth, async (req, res) => {
+    const r = await bank.bankOpdrachtOpnieuw(String(req.body.id || ''));
+    if (r.error) return res.status(r.status || 400).json({ error: r.error });
+    afdelingen.audit(naam(req), 'RTG Bank betaalopdracht ' + r.id + ' met de hand opnieuw ingediend (' + r.status + ')');
+    sync();
+    res.json(r);
+  });
+
   /* De knop: een stand kiezen, één slag verder/terug draaien, en de bank aan-
      of uitzetten als uitgevende partij. Verder draaien kan alleen als de bank
      operationeel is; dat bewaakt de bankregie zelf. */

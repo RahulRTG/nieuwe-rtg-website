@@ -415,6 +415,14 @@
       "gezakt": 4,
       "scherp": "gezakt"
     },
+    "betaalopdracht.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/betaalopdracht/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 7,
+      "geprobeerd": 3
+    },
     "betaalstore.test.js": {
       "soort": "puur",
       "staat": "gezakt",

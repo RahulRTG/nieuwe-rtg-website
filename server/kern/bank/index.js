@@ -76,9 +76,15 @@ module.exports = (deps) => {
     MIN_CENTEN, MAX_CENTEN, saldi, grootboek, saldoVan, rekMeta, isExtern, bodem,
     id, schoon, nu, save, d, geldModus, motorklant, bordSeintje });
 
+  /* DE BETAALOPDRACHTEN: alles wat het huis verlaat krijgt een eigen rij naast
+     de boeking, want "geboekt" en "de rail heeft het aangenomen" zijn twee
+     gebeurtenissen die los van elkaar mislukken. De bedrading naar de rail staat
+     in ./uitgang; het gat dat dit dicht in ../betaalopdracht/index.js. */
+  const opdrachten = require('./uitgang')({ d, save, crypto, nu, betaal, boekAsync, rekMeta, seintje });
+
   // de gedeelde context voor de deelbestanden
   const ctx = { db, save, crypto, schoon, betaal, pay, bankregie, keyVanCodenaam, accounts, anthropic,
-    nu, d, MIN_CENTEN, MAX_CENTEN, SOORTEN, saldi, grootboek, rekeningen, rekMeta, saldoVan, isExtern, id, boek, boekAsync, geldModus, bodem, seintje };
+    nu, d, MIN_CENTEN, MAX_CENTEN, SOORTEN, saldi, grootboek, rekeningen, rekMeta, saldoVan, isExtern, id, boek, boekAsync, geldModus, bodem, seintje, opdrachten };
 
   const rek = require('./rekeningen')(ctx);
   const over = require('./overboeken')(ctx);
@@ -111,9 +117,15 @@ module.exports = (deps) => {
     for (const [r, c] of Object.entries(s)) { if (isExtern(r)) continue; if (c >= 0) deposito += c; else krediet += -c; }
     const emissie = -saldoVan('extern:emissie');  // wat de eigen bank heeft uitgegeven (positief = in omloop)
     const rekN = Object.keys(rekeningen()).length;
+    /* De reconciliatie hoort naast de sluitcontrole en niet erin: die zegt of de
+       boekingen onderling kloppen, deze of wat er geboekt is ook buiten RTG is
+       aangekomen. Een bank kan perfect sluiten zonder dat er een euro weg is. */
+    const rail = opdrachten.openstaand();
     return { status: 200, sluit: sluitcontrole(), depositoCenten: deposito, kredietCenten: krediet,
       inOmloopCenten: emissie, reserveCenten: saldoVan('rtg:reserve'), renteBetaaldCenten: -saldoVan('rtg:rente'),
       foundationCenten: saldoVan('extern:foundation'),
+      railOpenCenten: rail.centen, railOpen: rail.aantal, railMislukt: rail.mislukt,
+      railZonderTerugboeking: rail.zonderTerugboeking, railOudsteAt: rail.oudsteAt,
       aantalRekeningen: rekN, boekingenVandaag: grootboek().filter(b => nu() - b.at < 86400000).length };
   }
   function overzicht() {
@@ -123,7 +135,12 @@ module.exports = (deps) => {
     return { status: 200, regie: bankregie.bankregieOverzicht(), gezondheid: g, rekeningen: lijst };
   }
 
-  const api = { MIN_CENTEN, MAX_CENTEN, SOORTEN, boek, boekAsync, geldModus, saldoVan, sluitcontrole, afschrift, gezondheid, overzicht, reconcileVanMotor, motorStand };
+  const api = { MIN_CENTEN, MAX_CENTEN, SOORTEN, boek, boekAsync, geldModus, saldoVan, sluitcontrole, afschrift, gezondheid, overzicht, reconcileVanMotor, motorStand,
+    bankOpdrachten: (f) => opdrachten.lijst(f || {}),
+    bankOpdrachtenOpen: () => opdrachten.openstaand(),
+    bankOpdrachtenRonde: (a) => opdrachten.ronde(a || {}),
+    bankOpdrachtOpnieuw: (id) => opdrachten.dienIn(id),
+    bankOpdrachtBevestig: (a) => opdrachten.bevestig(a || {}) };
   Object.assign(api, rek, over, spaar, pas, krediet, incasso, zakelijk, advies, hart);
 
   /* De bankrondes lopen vanzelf: elk uur een tik die de spaarrente (idempotent
@@ -141,6 +158,16 @@ module.exports = (deps) => {
       .catch(e => console.warn('[bank] ronde mislukt:', e.message));
   }, RONDE_MS);
   if (rondeTimer.unref) rondeTimer.unref();
+
+  /* De opdrachtenronde loopt VEEL vaker dan de uurtik: een mislukte inzending is
+     geen maandelijkse rente maar geld dat vaststaat, en een uur wachten op de
+     eerste herhaling is voor wie net op "verstuur" drukte een storing. De
+     backoff in de opdracht bepaalt wie aan de beurt is; deze tik kijkt alleen. */
+  const OPDRACHT_RONDE_MS = Number(process.env.BANK_OPDRACHT_RONDE_MS || 60000);
+  const opdrachtTimer = setInterval(() => {
+    opdrachten.ronde({}).catch(e => console.warn('[bank] opdrachtenronde mislukt:', e.message));
+  }, OPDRACHT_RONDE_MS);
+  if (opdrachtTimer.unref) opdrachtTimer.unref();
 
   return { bank: api };
 };

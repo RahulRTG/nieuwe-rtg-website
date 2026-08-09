@@ -325,3 +325,53 @@ test('afschrift-export: het lid downloadt zijn eigen rekening als CSV; andermans
   const vreemd = await csv(noraIban, lid.token);
   assert.ok(vreemd.status === 403 || vreemd.status === 404, 'andermans afschrift is niet te downloaden');
 });
+
+/* DE NAAD TUSSEN BOEKING EN RAIL. Hier stond niets, en dat was precies het
+   probleem: sepaUit belde de payout in een try met een lege catch eronder, dus
+   een mislukte rail gaf een geslaagd antwoord terug, het geld stond van de
+   rekening af op extern:sepa, en het grootboek sloot netjes. De sluitcontrole
+   kan dat per definitie niet vinden -- de tegenboeking klopt immers.
+
+   Deze toets bewijst de BEDRADING (dat sepaUit echt een betaalopdracht maakt en
+   indient, en dat de reconciliatie hem ziet); het gedrag bij een mislukkende
+   rail staat in test/betaalopdracht.test.js, want een rail die weigert is in een
+   draaiende server niet eerlijk uit te lokken. */
+test('een uitgaande SEPA levert een betaalopdracht op die het kantoor kan volgen', async () => {
+  await api('bank/storten', { iban: lid.iban, centen: 50000, idem: 'sepa-dek' }, lid.token);
+  const voor = (await oapi('bank/gezond', {}, 'RTG')).body;
+
+  const uit = await api('bank/sepa', { iban: lid.iban, centen: 12500, naarIban: 'NL91ABNA0417164300',
+    begunstigde: 'Ontvanger', oms: 'Huur', idem: 'sepa-1' }, lid.token);
+  assert.equal(uit.status, 200);
+  assert.equal(uit.body.overgemaakt, 12500);
+  assert.ok(uit.body.opdrachtId, 'het antwoord draagt de opdracht die eraan hangt');
+  assert.equal(uit.body.opdrachtStatus, 'INGEDIEND',
+    'aangenomen door de rail, maar NIET afgewikkeld -- dat weet alleen de webhook');
+
+  // het kantoor ziet de opdracht, met de boeking eraan gekoppeld
+  const lijst = await oapi('bank/opdrachten', { limit: 10 }, 'RTG');
+  assert.equal(lijst.status, 200);
+  const mijne = lijst.body.opdrachten.find(o => o.id === uit.body.opdrachtId);
+  assert.ok(mijne, 'de opdracht staat op het kantoorbord');
+  assert.equal(mijne.soort, 'sepa-uit');
+  assert.equal(mijne.centen, 12500);
+  assert.equal(mijne.bestemming, 'NL91ABNA0417164300');
+  assert.ok(mijne.ledgerRef, 'met de boeking waar hij bij hoort');
+  assert.ok(mijne.settlementRef, 'en de referentie die de rail teruggaf');
+
+  /* De reconciliatie: geboekt maar buiten RTG nog niet rond. Dit getal staat
+     NAAST de sluitcontrole en meet iets anders -- beide moeten kloppen. */
+  const na = (await oapi('bank/gezond', {}, 'RTG')).body;
+  assert.equal(na.sluit.klopt, true, 'het grootboek sluit nog steeds');
+  assert.equal(na.railOpen, (voor.railOpen || 0) + 1, 'er staat een opdracht meer open');
+  assert.equal(na.railOpenCenten, (voor.railOpenCenten || 0) + 12500, 'voor precies dit bedrag');
+  assert.equal(na.railMislukt, 0, 'en niets is mislukt');
+  assert.ok(na.railOudsteAt > 0, 'met een leeftijd, zodat een blijvende storing opvalt');
+
+  // dubbeltik: dezelfde idem-sleutel maakt geen tweede opdracht
+  const weer = await api('bank/sepa', { iban: lid.iban, centen: 12500, naarIban: 'NL91ABNA0417164300',
+    begunstigde: 'Ontvanger', oms: 'Huur', idem: 'sepa-1' }, lid.token);
+  assert.equal(weer.body.herhaald, true);
+  const na2 = (await oapi('bank/gezond', {}, 'RTG')).body;
+  assert.equal(na2.railOpen, na.railOpen, 'geen tweede opdracht voor dezelfde tik');
+});

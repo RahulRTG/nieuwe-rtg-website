@@ -49,6 +49,7 @@ klinkt.
 | Gewoonten | `server/kern/gewoonten.js`, blok op `apps/life.html` | kleine dingen die u vaker wilt doen; de dagenteller staat uit tot u hem aanzet |
 | Wachtlijst en gemiste afspraak | `server/kern/care/wachtlijst.js` | eerder aan de beurt als er iets vrijkomt (u boekt zelf), en een no-show die niet met u meereist |
 | Noodkaart | `server/kern/noodkaart.js`, blok op `apps/life.html` | een noodcontact en, als u dat wilt, uw allergenen en middelen: gelezen uit het zorgprofiel en het medicatieschema, niet gekopieerd; u toont hem zelf |
+| De dagcoach | `server/kern/dagcoach.js`, blok bovenaan `apps/life.html` | alles wat vandaag ergens staat, op volgorde van de klok; hij plant niets en bezit niets |
 | Medicatieschema | `server/kern/medicatie.js`, `public/apps/medicijnen.html` | wat u gebruikt, op welke tijden, en hoeveel er nog in huis is; RTG bepaalt nooit een dosering en controleert geen combinaties |
 | Inzage-audit | `server/inzagelog.js` | wie welke identiteitsgegevens opvroeg, en waarom |
 | Identiteitskluis | `server/accounts.js` | echte namen apart; alles daarbuiten draait op codenamen |
@@ -105,8 +106,9 @@ geen route en geen toets.
   tussen twee getallen; hij zegt niets over trainen, eten of gezondheid. Dat is
   geen tekort maar de grens uit deze notitie: dat is professional-supported of
   clinical werk, en dat staat er niet.
-- **De dagcoach** die een dag indeelt (ontbijt, wandeling, training, avondroutine).
-  Het scherm zegt wel waar vandaag het meeste te winnen valt, maar plant niets.
+- **Een dag die RTG indeelt** (ontbijt, wandeling, training, avondroutine). De
+  dagcoach die er nu staat legt alleen naast elkaar wat het lid al ergens heeft
+  staan; hij verzint geen tijdstippen. Zie hieronder waarom.
 - **De rest van de toegankelijkheid.** Het profiel dat er nu is doet vier
   dingen (zie hieronder); eenvoudige taal, een taak per scherm,
   schermlezer-teksten en spraakbesturing staan er bewust niet in, want die zijn
@@ -545,6 +547,43 @@ zoals de Vitale check-in dat doet — en dat is een eigen ronde. Er staat daarom
 ook nergens op het scherm dat RTG u zal herinneren; een belofte in tekst is een
 belofte in code (LAT.md regel 6).
 
+## De dagcoach, en waarom hij niets plant
+
+`server/kern/dagcoach.js`, met een blok bovenaan `apps/life.html`.
+
+Het oorspronkelijke voorstel vroeg om een Daily Coach die de dag indeelt:
+ontbijt, wandeling, training, avondroutine. Dat is niet gebouwd, en de reden is
+niet dat het te veel werk was.
+
+Een dagindeling maken vereist weten hoeveel energie iemand heeft, wat er buiten
+RTG in zijn dag staat, wanneer hij kinderen ophaalt, wanneer hij vergadert en wat
+hij lekker vindt. Daarvan weet RTG niets. Een indeling verzinnen uit wat RTG
+toevallig wel weet, levert een **zelfverzekerd verkeerd plan** — en dat is erger
+dan geen plan, want het ziet er even goed uit als een goed plan. Wie zijn dag
+naar zo'n schema inricht en merkt dat het niet klopt, vertrouwt het volgende
+scherm ook niet meer.
+
+Wat de dagcoach daarom wel doet: alles wat het lid vandaag al ergens heeft staan
+op een rij zetten, op volgorde van de klok. Medicijnmomenten en afspraken hebben
+een tijd; gewoonten, dagmetingen en de check-in hebben er geen — en die krijgen
+er ook geen. Een gewoonte om kwart over drie zetten omdat het schema dan leeg is,
+is precies het verzinnen waar dit onderdeel niet aan doet. Ze staan onderaan, als
+"ergens vandaag".
+
+**Hij bezit niets.** Er is één route en die leest alleen; er is geen `/dag/af`.
+Afvinken gebeurt in de laag die het ding bezit, en op het scherm staat dan ook
+geen enkele afvinkknop — alleen een weg naar de app waar het thuishoort. Twee
+plekken die dezelfde dag bijhouden, is precies wat LAT.md regel 4 verbiedt.
+
+**Geen score.** Er staat hoeveel er open is, want dat is een aantal dingen. Er
+staat nergens "vier van de zeven" en er is geen balk die vol loopt: dat maakt van
+een dag een cijfer en van een rustige dag een slechte. De toets bewaakt dat op
+twee manieren — op de tekst én op de vorm van het antwoord — omdat de
+tekstcontrole alleen een `voortgang: "2 van de 5"` er ongezien doorheen liet.
+
+Rust komt uit `kern/balans.js` en niet uit dit bestand: zegt de agenda dat er
+deze week geen lege dag is, dan mag dat er staan. Verzinnen doet hij het niet.
+
 ## De grenzen die vast moeten staan vóór de bouw
 
 Deze horen in de architectuur en niet in een latere ronde, want ze bepalen hoe
@@ -614,9 +653,11 @@ In deze volgorde, want elke stap heeft de vorige nodig:
 12. ~~Het **medicatieschema**, zonder interactiecontrole.~~ Gedaan; zie
     hierboven. De herinnering die afgaat staat er bewust nog niet.
 
-Wat daarna komt: de dagcoach, sport- en voedingslagen, de
-coachmarktplaats, multi-vestiging en resource-planning voor zorgorganisaties,
-het gedachtenboek, en de langere staart uit het oorspronkelijke voorstel (health
+13. ~~De **dagcoach**, die niets plant.~~ Gedaan; zie hieronder.
+
+Wat daarna komt: sport- en voedingslagen, de coachmarktplaats, multi-vestiging
+en resource-planning voor zorgorganisaties, het gedachtenboek, en de langere
+staart uit het oorspronkelijke voorstel (health
 timeline, ADHD- en autismemodus, energiemanagement, mantelzorg, corporate
 wellbeing, Life Wallet, lifestyle-marktplaats). En als er ooit een gesprek komt
 op het mentale onderwerp, dan door `zorgniveau.js` heen.

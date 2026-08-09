@@ -144,6 +144,9 @@
       "consentIntrek",
       "consentVan"
     ],
+    "dagcoach": [
+      "dagVoor"
+    ],
     "doelen": [
       "doelMaak",
       "doelMeet",

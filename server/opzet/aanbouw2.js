@@ -126,6 +126,11 @@ module.exports = function bouwKernAanTwee(kern, grens) {
      KERN mee, net als Life, want hij leest lagen die verspreid gemonteerd zijn. */
   Object.assign(kern, require('../kern/consent')({ kern }));
   require('../routes/consent')(grens('consent'));
+  /* De dagcoach (kern/dagcoach.js): wat er vandaag staat, op volgorde van de
+     klok. Hij plant niets en bezit niets -- afvinken gebeurt in de laag die het
+     ding wel bezit. Krijgt de KERN mee, net als Life, om dezelfde reden. */
+  Object.assign(kern, require('../kern/dagcoach')({ kern }));
+  require('../routes/dagcoach')(grens('dagcoach'));
   /* RTG Life (kern/life.js): het ene scherm dat de lagen hierboven bij elkaar
      leest -- ritme, doelen, afspraken en de check-in. Hij krijgt de KERN mee en
      geen losse functies, want hij pakt ze op aanroepmoment: hij hangt later in

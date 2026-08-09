@@ -44,6 +44,12 @@
   .keus{display:flex;gap:.5rem;align-items:flex-start;margin-top:.6rem;font-size:.82rem;line-height:1.5;}
   .keus input{margin-top:.2rem;flex:none;}
   #nood .rij input{width:auto;flex:1 1 8rem;min-width:8rem;}
+  .dagrij{display:flex;align-items:baseline;gap:.9rem;padding:.75rem 0;border-top:1px solid var(--line);}
+  .dagrij .klok{font-family:'Bodoni Moda',Georgia,serif;font-size:1.2rem;min-width:3.4rem;}
+  .dagrij .wat{flex:1 1 auto;font-size:.9rem;}
+  .dagrij .wat .uit{display:block;color:var(--soft);font-size:.78rem;line-height:1.5;margin-top:.1rem;}
+  .dagrij .bron{font-size:.74rem;white-space:nowrap;}
+  .dagrij.af .klok,.dagrij.af .wat b{color:var(--soft);}
 </style>
 <script src="/shared/seizoen.js" defer></script>
 <script src="/shared/veiligheid.js" defer></script>
@@ -59,6 +65,15 @@
 </header>
 <main id="inhoud">
   <div id="winst"></div>
+
+  <section aria-label="Uw dag">
+    <h2>Uw dag</h2>
+    <p class="stil">Alles wat u vandaag al ergens heeft staan, op volgorde van de klok. RTG deelt
+    uw dag niet in: het weet niet hoeveel energie u heeft, wat er buiten RTG in uw dag staat of
+    wanneer u de kinderen ophaalt, en een indeling verzinnen uit de rest levert een zelfverzekerd
+    verkeerd plan. Afvinken doet u in de app waar het thuishoort.</p>
+    <div id="dag"><p class="stil">Laden...</p></div>
+  </section>
 
   <section aria-label="Uw signalen">
     <h2>Hoe u ervoor staat</h2>
@@ -365,6 +380,30 @@
       : '<p class="stil">Uw week geeft op dit moment geen aanleiding tot advies.</p>';
   }
 
+  /* De dag: regels met een tijd bovenaan, wat geen tijd heeft eronder. Elke
+     regel draagt zijn bron en een weg ernaartoe, want dit scherm bezit niets --
+     hier valt niets af te vinken, en dat hoort ook zichtbaar te zijn. Geen
+     "vier van de zeven" en geen balk: dat maakt van een dag een cijfer. */
+  function tekenDag(d) {
+    const el = $('#dag'); if (!el) return;
+    const p = d.punten || [];
+    let html = '<div class="winst"><span class="kop">Vandaag</span><p>' + esc(d.kop) + '</p></div>';
+    if (d.rust) html += '<p class="stil">' + esc(d.rust) + '</p>';
+    if (!p.length) { el.innerHTML = html; return; }
+    const opTijd = p.filter(x => x.tijd), los = p.filter(x => !x.tijd);
+    const regel = x => '<div class="dagrij' + (x.gedaan ? ' af' : '') + '">' +
+      '<span class="klok">' + (x.tijd ? esc(x.tijd) : '&mdash;') + '</span>' +
+      '<span class="wat"><b>' + esc(x.wat) + '</b>' +
+        '<span class="uit">' + esc(x.uitleg) + '</span></span>' +
+      '<a class="bron" href="' + esc(x.naar) + '">' + esc(x.naam) + ' &#8594;</a></div>';
+    html += opTijd.map(regel).join('');
+    if (los.length) {
+      html += '<p class="stil" style="margin-top:1rem;">Ergens vandaag, zonder vast tijdstip:</p>' +
+        los.map(regel).join('');
+    }
+    el.innerHTML = html;
+  }
+
   /* Alleen wat er vandaag staat, en alleen lezen: aftekenen gebeurt in
      Medicijnen. Staat er niets in het schema, dan staat hier geen nul en geen
      lege balk maar een zin die zegt dat er niets is. En nergens "neem dit in":
@@ -456,10 +495,12 @@
 
   async function laad() {
     try {
-      const [d, m, t, g, w, n, med] = await Promise.all([
+      const [d, m, t, g, w, n, med, dag] = await Promise.all([
         Veilig.api('/api/life'), Veilig.api('/api/metingen'), Veilig.api('/api/toestellen'),
         Veilig.api('/api/gemoed'), Veilig.api('/api/gewoonten'), Veilig.api('/api/noodkaart'),
-        Veilig.api('/api/medicatie')]);
+        Veilig.api('/api/medicatie'), Veilig.api('/api/dag')]);
+      tekenDag(dag);
+      tekenStoringen(dag.storingen);
       tekenGemoed(g, null);
       tekenNood(n);
       tekenMedicatie(med);

@@ -215,6 +215,24 @@ test('RTG Life: een doel uit Doelen staat er, en wat niet gemeten wordt zegt dat
     assert.ok(!/\bneem\b|moet u innemen/i.test(medblok),
       'Life zegt wat er staat, niet wat u moet innemen: ' + medblok.slice(0, 120));
 
+    /* 1f. de dag. Het medicijn van 08:00 staat op de klok, de gewoonte eronder
+       zonder tijd, en elke regel wijst naar de app die hem bezit -- want hier
+       valt niets af te vinken, en dat hoort zichtbaar te zijn. */
+    await api('gewoonten/maak', { naam: 'Even buiten', waarom: 'hoofd leeg' });
+    await page.reload({ waitUntil: 'load' });
+    await openDeel(page, 'Uw dag');
+    await page.waitForFunction(() => /Metoprolol/.test(document.getElementById('dag').textContent),
+      { timeout: 15000 });
+    const dagblok = await page.textContent('#dag');
+    assert.match(dagblok, /08:00/, 'het moment uit het schema staat op de klok');
+    assert.match(dagblok, /Even buiten/, 'en de gewoonte staat er ook');
+    assert.match(dagblok, /zonder vast tijdstip/i,
+      'met een kop die zegt dat die geen tijd heeft in plaats van er een te verzinnen');
+    assert.equal(await page.locator('#dag .dagrij button').count(), 0,
+      'er staat geen enkele afvinkknop op de dag: dit scherm bezit niets');
+    assert.ok(await page.locator('#dag .dagrij a[href*="medicijnen"]').count(),
+      'de medicijnregel wijst naar Medicijnen');
+
     /* 2. het doel uit Doelen staat hier, zonder dat het lid Doelen heeft
        geopend in deze sessie. */
     await openDeel(page, 'Waar u naartoe werkt');

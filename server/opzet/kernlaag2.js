@@ -39,7 +39,7 @@ Object.assign(kern, require('../kern/werkplaats').maakWerkplaats({ db, save, cry
 /* De RTG Mall (kern/mall.js): de luxe shoppingmall in de leden-app; een
    gecureerde etagelijst van de retail-partners, elk met een eigen catalogus. */
 Object.assign(kern, require('../kern/mall').maakMall(Object.assign(
-  { db, save, crypto, isRetail: kern.retailIsRetail },
+  { db, save, crypto, isRetail: kern.retailIsRetail, anthropic },
   // de vier late bindingen (Thuis, Reiswijzer, Supplier OS): ./malldraden.js
   require('./malldraden')(kern))));
 /* De App-Bibliotheek (kern/appbieb.js): 20.000 professionele apps in de Mall,

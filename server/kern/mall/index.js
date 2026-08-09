@@ -59,7 +59,7 @@ const GENRE_PAGINA = {
   taxi: '/apps/ov.html', verhuur: '/apps/mall.html', tweewielers: '/apps/mall.html'
 };
 
-function maakMall({ db, save, crypto, isRetail, haalThuis, haalLandVind, haalVakwerk, haalFoodcourt, haalZaakFunctie, haalGroothandel }) {
+function maakMall({ db, save, crypto, isRetail, anthropic, haalThuis, haalLandVind, haalVakwerk, haalFoodcourt, haalZaakFunctie, haalGroothandel }) {
   const nu = () => new Date().toISOString();
   const va = (sku, kleuren, maten, v) => {
     const out = [];
@@ -75,7 +75,7 @@ function maakMall({ db, save, crypto, isRetail, haalThuis, haalLandVind, haalVak
 
   // de gedeelde ctx voor de deelbestanden
   const ctx = {
-    db, save, crypto, isRetail, haalThuis, haalLandVind, haalVakwerk, haalFoodcourt, haalZaakFunctie, haalGroothandel,
+    db, save, crypto, isRetail, anthropic, haalThuis, haalLandVind, haalVakwerk, haalFoodcourt, haalZaakFunctie, haalGroothandel,
     nu, va, isBoer, farmTeKoop, verborgen, winkelCatalogus,
     ETAGES, ETAGE_IDS, GIDS_GENRES, GENRE_PAGINA
   };
@@ -98,6 +98,7 @@ function maakMall({ db, save, crypto, isRetail, haalThuis, haalLandVind, haalVak
   Object.assign(api, require('./aanvragen')(ctx)); // de vraagkant: wat niemand aanbiedt
   Object.assign(api, require('./collecties')(ctx)); // collectie, bundel, evenement, seizoen
   Object.assign(api, require('./bestellingen')(ctx)); // wat een lid lopen heeft, over de domeinen heen
+  Object.assign(api, require('./concierge')(ctx));    // een zin in, een zoekopdracht uit
   Object.assign(api, require('./vraagbeeld')(ctx)); // wat gevraagd en niet geleverd wordt
   Object.assign(api, require('./spiegel')(ctx));    // zo staat een zaak in de Mall
   return { mall: api };

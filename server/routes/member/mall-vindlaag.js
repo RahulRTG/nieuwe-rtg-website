@@ -87,6 +87,22 @@ module.exports = (kern) => {
   })));
   app.post('/api/mall/collectie', auth, (req, res) => lijstStuur(res, mall.mallCollecties.toon(req.body.id)));
 
+  /* ---- de concierge: een zin in, een zoekopdracht uit ----
+     Het model vertaalt de zin naar FILTERS en schrijft geen antwoordtekst; wat
+     het lid leest is opgeteld uit de echte treffers. Zie de kop van
+     kern/mall/concierge.js voor waarom dat de enige veilige vorm is. */
+  app.post('/api/mall/concierge', auth, async (req, res) => {
+    try {
+      const r = await mall.mallConcierge.vraag(req.body.vraag, {
+        plek: req.body.plek, punt: req.body.punt, tier: req.session.tier
+      });
+      lijstStuur(res, r);
+    } catch (e) {
+      console.error('[mall-concierge]', e);
+      res.status(500).json({ error: 'De concierge is even niet bereikbaar. Zoeken werkt gewoon.' });
+    }
+  });
+
   /* ---- de zakelijke ingang ----
      Geen tweede Mall maar dezelfde, anders gefilterd: alleen aanbod met een
      inkoopprijs, en die prijzen exclusief btw. De pas bepaalt het, niet het

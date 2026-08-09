@@ -210,6 +210,64 @@ test('arcade: een spel dat niet bestaat wordt geweigerd', async () => {
   assert.equal((await raw('/member/spel/arcade-bord', { spel: 'pacman' }, a.tok)).status, 400);
 });
 
+/* Wie er nu is. Dit hangt aan de LEVENDE lijst van open live-verbindingen, dus
+   een toets die alleen de route aantikt bewijst niets: hier gaat de stream van
+   de vriend echt open en weer dicht, en de stand hoort mee te bewegen. */
+async function opentStream(url) {
+  const ac = new AbortController();
+  const res = await fetch(url, { signal: ac.signal });
+  assert.equal(res.status, 200, 'de stream hoort open te gaan');
+  const reader = res.body.getReader();
+  await reader.read();                       // wacht op 'retry:' + hello, dan staat hij geregistreerd
+  return { sluit: () => { try { ac.abort(); } catch (e) {} } };
+}
+const wacht = (ms) => new Promise(r => setTimeout(r, ms));
+
+test('online: een vriend verschijnt als zijn stream opengaat en verdwijnt als hij sluit', async () => {
+  const { a, b } = await tweeVrienden();
+
+  const leeg = await json(await raw('/member/spel/online', {}, a.tok));
+  assert.deepEqual(leeg.online, [], 'niemand verbonden, dus niemand aanwezig');
+  assert.equal(leeg.aantal, 0);
+
+  const stroom = await opentStream(BASE + '/api/stream?token=' + encodeURIComponent(b.tok));
+  try {
+    const erbij = await json(await raw('/member/spel/online', {}, a.tok));
+    assert.equal(erbij.aantal, 1, 'de vriend met een open stream is aanwezig');
+    assert.equal(erbij.online[0].codenaam, b.cn, 'op codenaam');
+    // en hij ziet zichzelf niet in zijn eigen lijst
+    const zelf = await json(await raw('/member/spel/online', {}, b.tok));
+    assert.equal(zelf.aantal, 0, 'jezelf sta je niet in je eigen lijst');
+  } finally { stroom.sluit(); }
+
+  // de verbinding sluiten haalt hem er weer uit: geen "laatst gezien" die
+  // blijft hangen, want er wordt niets bewaard
+  for (let i = 0; i < 20; i++) {
+    const na = await json(await raw('/member/spel/online', {}, a.tok));
+    if (na.aantal === 0) return;
+    await wacht(100);
+  }
+  assert.fail('na het sluiten van de stream hoort de vriend weg te zijn');
+});
+
+test('online: de vriendenkring komt van de server, niet uit het verzoek', async () => {
+  /* Mocht een client zelf sleutels mogen meesturen, dan kon je de aanwezigheid
+     van willekeurige leden aftasten. De route negeert de body.
+
+     De vreemde moet hier ECHT online zijn, anders slaagt deze toets ook als er
+     niemand verbonden is -- dat bewijst zijn eigen vriend hieronder. */
+  const { a } = await tweeVrienden();
+  const { a: vriendVanVreemde, b: vreemde } = await tweeVrienden();
+  const stroom = await opentStream(BASE + '/api/stream?token=' + encodeURIComponent(vreemde.tok));
+  try {
+    const bewijs = await json(await raw('/member/spel/online', {}, vriendVanVreemde.tok));
+    assert.equal(bewijs.aantal, 1, 'de vreemde staat echt open (anders toetst het onderstaande niets)');
+
+    const r = await json(await raw('/member/spel/online', { vrienden: [vreemde.key], codenamen: [vreemde.cn] }, a.tok));
+    assert.deepEqual(r.online, [], 'een vreemde die je meestuurt hoort niet in je stand te komen');
+  } finally { stroom.sluit(); }
+});
+
 test('sneek: alleen je beste score telt en vrienden zien elkaar op het bord', async () => {
   const { a, b } = await tweeVrienden();
   await raw('/member/spel/sneek-score', { punten: 120 }, a.tok);

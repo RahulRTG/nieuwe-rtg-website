@@ -26,7 +26,7 @@
 'use strict';
 
 module.exports = (kern, hulp) => {
-  const { DATA_DIR, PERSONAS, accounts, anthropic, boekingenVanKlant, crypto, db, findSupplier, keyVanCodenaam, ledenAantal, leeftijdVan, log, mail, media, ordersVanKlant, ordersVanZaak, rtf, save, schoon, sendPush, sendPushToUser, sociaal, sseToCustomer, sseToOffice } = hulp;
+  const { DATA_DIR, PERSONAS, accounts, anthropic, boekingenVanKlant, crypto, db, findSupplier, keyVanCodenaam, ledenAantal, leeftijdVan, lidBoardUit, log, mail, media, ordersVanKlant, ordersVanZaak, rtf, save, schoon, sendPush, sendPushToUser, sociaal, sseClients, sseToCustomer, sseToOffice } = hulp;
 
 Object.assign(kern, sociaal); // de sociale kern-helpers erbij
 /* Tafelticket (kern/tafelticket.js): de bonnen van dezelfde tafel op een
@@ -43,6 +43,13 @@ Object.assign(kern, require('../kern/spellen')({
   isGeblokkeerd: kern.isGeblokkeerd, socialZoek: kern.socialZoek, sociaalRate: kern.sociaalRate,
   // Rahul als spelmaatje: praat met een echte sleutel, valt anders terug op vaste tips
   anthropic,
+  /* Wie er NU is (spellen/presence.js). sseClients is de levende lijst van open
+     live-verbindingen -- de RTG-app en de RTF-app schrijven er allebei in, dus
+     aanwezigheid werkt over beide werelden zonder eigen opslag. lidBoardUit is
+     dezelfde poort die /api/member/spel zou weigeren: wie "spelen" heeft
+     uitgezet telt als offline, want anders nodig je iemand uit die dat verzoek
+     niet kan aannemen. */
+  sseClients, lidBoardUit,
   // 18+ (voor Proost): alleen een echt account met paspoort-geboortedatum telt;
   // RTF-gezinsprofielen hebben geen geverifieerde leeftijd en doen nooit mee
   volwassen: (handle) => {

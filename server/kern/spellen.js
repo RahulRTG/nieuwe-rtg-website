@@ -12,7 +12,7 @@
    codenaam (maakt geen vriendschap), via het door de server bevestigde
    klasgenoten-pad, of via de random wachtrij per spel en groepsgrootte.
    Beurten gaan via polling plus een SSE-duwtje. */
-module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, isGeblokkeerd, socialZoek, sociaalRate, volwassen, anthropic }) => {
+module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, isGeblokkeerd, socialZoek, sociaalRate, volwassen, anthropic, sseClients, lidBoardUit }) => {
   const fs = require('fs'), zlib = require('zlib'), path = require('path');
   const rid = (n) => crypto.randomBytes(n).toString('hex');
   const nu = () => new Date().toISOString();
@@ -74,6 +74,14 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
   const { SPEL, SOORTEN, INITS, ZETTEN, VIEWS, STATISCH, ARCADE, ruw } = require('./spellen/register')(spelCtx);
   // klasgenoten: het uitnodigingspad voor beschermde tieners (De Arena)
   const { klasgenotenVan, spelKlasgenoten } = require('./spellen/klas')({ db, codenaamVan, isGeblokkeerd });
+  /* Wie van je vrienden er nu is. Leest de levende lijst van open
+     live-verbindingen en bewaart zelf niets; zie spellen/presence.js voor de
+     vier regels die dat begrenzen. Een toets of een stand zonder SSE-laag
+     krijgt een lege lijst in plaats van een uitzondering. */
+  const { spelOnline } = require('./spellen/presence')({
+    sseClients: sseClients || [], isGeblokkeerd, codenaamVan,
+    lidBoardUit: lidBoardUit || (() => false)
+  });
 
   /* De lobby- en partijlaag draaien als submodules op een gedeelde
      context, een keer opgebouwd bij het opstarten. */
@@ -146,7 +154,7 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
   const sneekScore = (mij, punten) => arcadeScore(mij, 'sneek', punten);
   const sneekBord = (mij, vrienden) => arcadeBord(mij, 'sneek', vrienden);
 
-  return { spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelRahul, spelKlasgenoten, sneekScore, sneekBord, arcadeScore, arcadeBord, SPEL_SOORTEN: SOORTEN,
+  return { spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelRahul, spelKlasgenoten, spelOnline, sneekScore, sneekBord, arcadeScore, arcadeBord, SPEL_SOORTEN: SOORTEN,
     // alleen voor de drift-test: de client heeft een eigen kopie van deze
     // regels (directe feedback); de test houdt beide kopieën tegen elkaar
     _spelregels: { rummiSet: ruw.rummiSet, W_PREMIE: ruw.W_PREMIE, SPEL, ARCADE } };

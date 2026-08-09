@@ -5,7 +5,7 @@
 const { log } = require('../log');
 
 module.exports = (kern) => {
-  const { app, auth, geenGast, rtf, spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelRahul, spelKlasgenoten, sneekScore, sneekBord, arcadeScore, arcadeBord, socialConnecties } = kern;
+  const { app, auth, geenGast, rtf, spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelRahul, spelKlasgenoten, spelOnline, sneekScore, sneekBord, arcadeScore, arcadeBord, socialConnecties } = kern;
 
   function rtfSpeler(req, res) {
     const sess = rtf.verifieerProfiel(req.body.code, req.body.token);
@@ -37,6 +37,10 @@ module.exports = (kern) => {
     // de kieslijst met klasgenoten (De Arena); een RTG-lid heeft geen klas
     // en krijgt gewoon een lege lijst
     klasgenoten: (mij) => spelKlasgenoten(mij),
+    /* Wie van je vrienden er nu is. De kring komt hier vandaan en niet uit het
+       verzoek: een client die zelf een lijst sleutels mag meesturen zou de
+       aanwezigheid van willekeurige leden kunnen aftasten. */
+    online: (mij) => Object.assign({ status: 200 }, spelOnline(mij, vriendenVan(mij))),
     'sneek-score': (mij, b) => sneekScore(mij, b.punten),
     'sneek-bord': (mij) => Object.assign({ status: 200 }, sneekBord(mij, vriendenVan(mij))),
     'arcade-score': (mij, b) => arcadeScore(mij, String(b.spel || ''), b.punten),

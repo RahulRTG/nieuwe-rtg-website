@@ -1881,7 +1881,13 @@ const hulp = {
   mail, media, noteFailedTry, notify, notifySupplier, onboarding, openVacatures, optieAan,
   ordersVanKlant, ordersVanZaak, pasTegoedToe, path, pickupCode, pinSlot, pushLive, rememberSession,
   reserveerTafel, rtf, rtmail, save, schoon, sendPush, sendPushToUser, sociaal, sseToCustomer,
-  sseToOffice, sseToSupplier, supplierState, ticketsVoorSlot, verdienPunten, zetRtgai, zorgContact
+  sseToOffice, sseToSupplier, supplierState, ticketsVoorSlot, verdienPunten, zetRtgai, zorgContact,
+  /* Voor "wie van je vrienden is er nu" (kern/spellen/presence.js): de levende
+     lijst van open live-verbindingen, en dezelfde functiepoort die
+     /api/member/spel zou weigeren. Ze gaan naar de KERNLAGEN en niet naar de
+     kern zelf -- routers hebben ze niet nodig, en die oppervlakte houden we
+     klein (zie TAKEN.md 5.14). */
+  sseClients, lidBoardUit
 };
 
 /* De samenstelling van de kern staat in ./opzet/kernlaag1..7.js --

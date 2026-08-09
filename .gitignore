@@ -31,3 +31,11 @@ public/dist/
 # Twintig minuten om te maken, dus niet in de repo -- de census meldt netjes
 # NIET GEMETEN als hij er niet is.
 DEKKING-LCOV.info
+
+# De wegwerpbestanden van de ijk-toets (test/meterijk.test.js). Die zet met
+# opzet bekend-foute code in de boom om te controleren dat de meters er echt op
+# uitslaan, en ruimt ze daarna op. Zolang hij draait staan ze er wel, en dan is
+# `git add -A` genoeg om ze per ongeluk mee te committen -- dat scheelde hier
+# een keer een haar. Ze zijn nooit bron.
+server/kern/zz-ijk-tijdelijk*.js
+server/routes/zz-ijk-tijdelijk*.js

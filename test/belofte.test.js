@@ -82,14 +82,32 @@ test('een API-pad telt pas als het echt geregistreerd is', () => {
   }
 });
 
-test('het rapport noemt de open beloften bij naam en verzint er geen dekking bij', () => {
+/* DEZE TOETS EISTE EERST DAT ER WERKVOORRAAD WAS ("assert.ok(open.length)"),
+   en dat was geen eigenschap maar een momentopname: op de dag dat de laatste
+   open belofte dichtging, zakte hij. Een toets die rood wordt omdat het werk af
+   is, meet de kalender en niet de code.
+
+   Wat hier WEL een eigenschap is: het register mag niet liegen in beide
+   richtingen. Staat er iets open, dan staat het bij naam in het rapport en
+   draagt het geen dekking. Staat er niets open, dan zegt de telling dat met een
+   nul -- en dan hoort er ook geen enkele belofte als "nog niet gebouwd" te
+   worden getoond. Dat tweede is de gevaarlijke kant: een rapport dat werk toont
+   dat niet meer bestaat, stuurt iemand naar een lade die al leeg is. */
+test('het rapport is eerlijk over de werkvoorraad, of die er nu is of niet', () => {
   const md = fs.readFileSync(belofte.DOEL, 'utf8');
-  const { rijen } = belofte.meet();
+  const { rijen, tel } = belofte.meet();
   const open = rijen.filter(r => r.stand === 'open');
-  assert.ok(open.length, 'er staat werkvoorraad open; dat hoort zichtbaar te zijn');
+  assert.equal(open.length, tel.open, 'de telling en de rijen zijn het eens');
+
   for (const r of open) {
     assert.ok(md.includes(r.wat), 'de open belofte "' + r.wat + '" staat in het rapport');
     assert.equal(r.dekking.length, 0, 'en draagt geen dekking die er niet is');
   }
-  assert.match(md, /_nog niet gebouwd_/, 'open beloften worden als zodanig getoond');
+
+  const getoond = (md.match(/_nog niet gebouwd_/g) || []).length;
+  assert.equal(getoond, open.length,
+    'precies de open beloften worden als "nog niet gebouwd" getoond -- geen enkele meer en geen ' +
+    'enkele minder (getoond: ' + getoond + ', open: ' + open.length + ')');
+  assert.match(md, new RegExp('\\| open \\| ' + tel.open + ' \\|'),
+    'en de telling staat in de tabel bovenaan, ook als hij nul is');
 });

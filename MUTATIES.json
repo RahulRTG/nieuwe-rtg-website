@@ -2139,6 +2139,10 @@
       "gezakt": 18,
       "scherp": "gezakt"
     },
+    "paginascripts.test.js": {
+      "soort": "puur",
+      "staat": "geen module gevonden"
+    },
     "pakket.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -3087,6 +3091,14 @@
       "gezakt": 2,
       "scherp": "gezakt"
     },
+    "spelkijken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/spellen.js",
+      "operator": "return-weg#0",
+      "gezakt": 7,
+      "geprobeerd": 3
+    },
     "spellen.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -3122,6 +3134,22 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
+    "spelpresence.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/spellen/presence.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "spelprestaties.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/spellen/uitslagen.js",
+      "operator": "!==->===#0",
+      "gezakt": 5,
+      "geprobeerd": 2
+    },
     "spelregels-drift.test.js": {
       "soort": "puur",
       "staat": "overleefd",
@@ -3130,6 +3158,22 @@
       ],
       "geprobeerd": 18,
       "posities": 8
+    },
+    "spelregister.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/spellen/register.js",
+      "operator": "===->!==#0",
+      "gezakt": 20,
+      "geprobeerd": 1
+    },
+    "spelreplay.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/spellen.js",
+      "operator": "return-weg#0",
+      "gezakt": 6,
+      "geprobeerd": 3
     },
     "spelsudoku.e2e.js": {
       "soort": "server",
@@ -3165,6 +3209,22 @@
       "operator": "liegpoort /api/",
       "gezakt": 1,
       "scherp": "gezakt"
+    },
+    "speltoernooi.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/spellen.js",
+      "operator": "return-weg#0",
+      "gezakt": 5,
+      "geprobeerd": 3
+    },
+    "speluitslagen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/spellen/uitslagen.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "sportclub.test.js": {
       "soort": "server",

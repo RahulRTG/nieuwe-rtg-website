@@ -1,17 +1,19 @@
-/* Kern-module "spellen": potjes op de vriendenlaag, voor alle leden (RTF
-   en RTG spelen tegen elkaar, op codenaam). Elk spel is server-
-   authoritatief en leeft in een eigen deelmodule onder ./spellen/:
-   bordspellen (mens erger je niet, schaken, dammen, Rummi, Magnaat),
-   Woordduel (eer-systeem, zonder woordenboek), partyspellen (30 Seconden,
-   Doen of Waarheid, Proost 18+ op paspoort-geboortedatum), de RTF-duels
-   van De Arena en De Societeit (flits, reactie, quiz, schat: dezelfde
-   opgaven voor iedereen, zetten buiten de beurt) en de arcade met een
-   ranglijst onder vrienden (Sneek, Tetris, Sudoku).
+/* Kern-module "spellen": DE BEDRADING van het spelplatform.
 
-   Een potje start met uitgenodigde vrienden (die accepteren zelf), op
-   codenaam (maakt geen vriendschap), via het door de server bevestigde
-   klasgenoten-pad, of via de random wachtrij per spel en groepsgrootte.
-   Beurten gaan via polling plus een SSE-duwtje. */
+   Dit bestand hangt de deellagen aan elkaar en bevat verder niets: elk spel
+   beschrijft zichzelf in ./spellen/ en het register bouwt daar de tabellen uit;
+   de lobby, de partij, de uitslagen, de stand, de prestaties, de toernooien,
+   het meekijken, de replays, het praten, de teams, de telling, de arcade en het
+   opruimen hebben elk hun eigen bestand met hun eigen kop.
+
+   Wat hier WEL staat is de volgorde, en die is de inhoud: een laag die een
+   andere leest moet erna komen. Waar dat niet kan, staat er een late binding
+   met de reden erbij (`comm`, de opruimhaken, `SPEL` in gedeeld.js).
+
+   Een potje start met uitgenodigde vrienden (die accepteren zelf), op codenaam
+   (maakt geen vriendschap), via het door de server bevestigde klasgenoten-pad,
+   of via de random wachtrij per spel en groepsgrootte. Beurten gaan via polling
+   plus een SSE-duwtje. */
 module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, isGeblokkeerd, socialZoek, sociaalRate, volwassen, anthropic, sseClients, lidBoardUit, comm }) => {
   const fs = require('fs'), zlib = require('zlib'), path = require('path');
   const rid = (n) => crypto.randomBytes(n).toString('hex');
@@ -20,48 +22,25 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
     if (!db.data.spellen) db.data.spellen = { potjes: {}, wachtrij: {} };
     return db.data.spellen;
   }
-  /* De spellen beschrijven zichzelf in een `spel`-descriptor in hun eigen
-     module onder ./spellen/; `spellen/register.js` bouwt daar SPEL, SOORTEN en
-     de dispatch-tabellen uit. Wat zo'n descriptor allemaal kan zeggen (de
-     18+-poort, het minimum, teams, taal) staat daar en met opzet niet ook hier.
-
-     Het register draait verderop, zodra nudge/schud/beurtDoor bestaan die het
-     aan de spellen doorgeeft. De functies hieronder lezen SPEL pas als er een
-     verzoek binnenkomt, dus die volgorde klopt. */
+  /* Wat een descriptor kan zeggen staat in spellen/register.js en met opzet
+     niet ook hier. Het register draait verderop, zodra de gedeelde spelregels
+     bestaan die het aan de spellen doorgeeft. */
   const TEAMS = [0, 1, 0, 1, 0, 1]; // om en om twee teams, tot zes spelers
-  function wereldFout(wereld, soort) {
-    if (!SPEL[soort] || SPEL[soort].wereld === wereld || (wereld !== 'rtg' && wereld !== 'rtf')) return null;
-    return wereld === 'rtg' ? 'Dit spel vind je in de RTFoundation-app.' : 'Dit spel vind je in de RTG-leden-app.';
-  }
-  // de 18+-poort, op ELK toetredingsmoment (starten, uitnodigen, accepteren)
-  function leeftijdFout(soort, handle) {
-    if (SPEL[soort] && SPEL[soort].volwassen && !volwassen(handle))
-      return 'Proost is 18+. Dit spel kan alleen met leden met een geverifieerde volwassen leeftijd.';
-    return null;
-  }
-  const nudge = (naar, potje) => { try { sseToCustomer(naar, 'social', { kind: 'spel', potje: potje.id, soort: potje.soort }); } catch (e) {} };
-  // eerlijk schudden (Fisher-Yates op crypto), gedeeld door alle kaart- en letterzakken
-  function schud(arr) {
-    for (let i = arr.length - 1; i > 0; i--) { const j = crypto.randomInt(0, i + 1); [arr[i], arr[j]] = [arr[j], arr[i]]; }
-    return arr;
-  }
-  // beurt doorschuiven met de klok mee (of tegen, met stap -1); spel-neutraal
-  function beurtDoor(potje, stap) {
-    const n = potje.spelers.length;
-    potje.beurt = ((potje.beurt + (stap || 1)) % n + n) % n;
-  }
+  /* De vijf dingen die elk spel van het platform krijgt -- twee poorten, de
+     schudbeker, de beurtvolgorde en het duwtje naar de andere kant -- staan in
+     spellen/gedeeld.js. Ze lezen de descriptor en kennen geen spelnaam.
 
-  /* ---------- wat er weggaat: vanzelf, en op verzoek ----------
-     Het opruimen van oude potjes en het uitwissen van een vertrokken lid staan
-     in spellen/opruimen.js; hier hangt alleen de bedrading.
+     Ze hangen HIER en niet lager: het register en de lobby krijgen ze mee, en
+     `SPEL` bestaat pas na het register. Dat is dezelfde late binding als
+     hieronder: de functies worden pas bij een verzoek aangeroepen. */
+  const { wereldFout, leeftijdFout, nudge, schud, beurtDoor } =
+    require('./spellen/gedeeld')({ crypto, sseToCustomer, volwassen, get SPEL() { return SPEL; } });
 
-     De HAKEN zijn er omdat de volgorde niet anders kan: `opschonen` gaat als
-     eerste de lobby in (die draait hem bij elke poll), maar de takken die
-     opgeruimd moeten worden -- toernooien, replays, teams, de arcade -- bestaan
-     pas verderop. Ze schuiven daarom aan zodra ze er zijn. Dat is dezelfde
-     late binding als bij `comm` hierboven, en hij is veilig omdat er niets van
-     dit alles tijdens het OPBOUWEN wordt aangeroepen: pas als er een verzoek
-     binnenkomt. */
+  /* Wat er weggaat, vanzelf en op verzoek: spellen/opruimen.js. De HAKEN zijn
+     er omdat de volgorde niet anders kan -- `opschonen` gaat als eerste de
+     lobby in, terwijl de takken die opgeruimd moeten worden pas verderop
+     bestaan. Ze schuiven aan zodra ze er zijn; veilig, want er wordt tijdens
+     het opbouwen niets van dit alles aangeroepen. */
   const opruimHaken = { deel: [], sudoku: null };
   const { opschonen, spelVergeet } = require('./spellen/opruimen')({
     S, save, codenaamVan,
@@ -87,25 +66,9 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
     lidBoardUit: lidBoardUit || (() => false)
   });
 
-  /* DE PROGRESSIEGRENS. Alles wat een prestatie BUITEN het potje bewaart --
-     highscores, ranglijsten, later niveaus, prestaties en toernooien -- bestaat
-     alleen voor geverifieerd volwassen leden. Dat is dezelfde poort als die van
-     Proost: `volwassen()` betekent "RTG heeft de paspoort-geboortedatum
-     gecontroleerd EN die is 18+", dus een lid zonder gecontroleerd paspoort
-     valt er ook buiten tot dat gedaan is.
-
-     Waarom die grens er is: `CLAUDE.md` verbiedt verslavende
-     engagement-patronen, De Arena belooft tieners met zoveel woorden "alles
-     telt alleen binnen het potje; er bestaat geen ranglijst", en de School-lat
-     zegt "leren is geen wedstrijd". Een scorebord onder vrienden in dezelfde
-     RTF-app sprak dat tegen. Onder de grens blijft elk spel gewoon volledig
-     speelbaar -- er wordt alleen niets van bewaard.
-
-     Deze functie is met opzet de ENIGE plek waar die grens staat: komt er een
-     tweede progressievorm bij (prestaties, toernooien, niveaus), dan hangt die
-     hier aan en niet aan een eigen kopie van de regel. */
-  const progressieMag = (handle) => volwassen(handle);
-  const GEEN_PROGRESSIE = 'Scores en ranglijsten bestaan alleen voor leden met een geverifieerde volwassen leeftijd. Het spel zelf speel je gewoon.';
+  /* DE PROGRESSIEGRENS staat in spellen/grens.js: de enige regel waar deze hele
+     laag aan hangt, en daarom een eigen bestand met een eigen naam. */
+  const { progressieMag, GEEN_PROGRESSIE } = require('./spellen/grens')({ volwassen });
 
   /* Uitslagen die een potje overleven: de bron onder winrate, niveaus en
      toernooien. Deelnemers buiten de progressiegrens staan er zonder codenaam

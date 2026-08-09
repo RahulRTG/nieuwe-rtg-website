@@ -361,8 +361,6 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
     ['public/shared/i18n/i18n-03.js', 'de taaltabel + kiezer, een geheel'],
     ['server/server.js', 'de bedrading van de hele app; wordt per ronde verder verdund'],
     ['server/opzet/kernlaag4.js', 'een ophanglijst, geen module: elke regel hangt een kern op aan de vorige laag. Dezelfde reden als server.js hierboven -- er zit geen naad in, alleen volgorde, en die volgorde IS de inhoud'],
-    ['server/opzet/kernlaag1.js', 'dezelfde ophanglijst als kernlaag4 hierboven, een laag eerder'],
-    ['server/kern/spellen.js', 'de bedrading van de spellenlaag: vijftien deelmodules met per stuk de reden dat ze bestaan. Wat er aan LOGICA in stond is er uit -- de arcade, het opruimen en vergeten, de opt-out op aanwezigheid, het schema van een toernooi hebben elk hun eigen bestand -- en wat overblijft is een ophanglijst plus de progressiegrens, de ene regel waar de hele laag aan hangt en die daarom niet in een deelbestand hoort'],
     ['public/apps/boardroom-eigenaar.js', 'de eigenaarszetel: vier panelen op een gedeelde api/el-kern in een IIFE']
   ]);
   /* NOG TE DOEN. Deze staan net boven de grens en moeten opgeknipt worden, maar

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 733 bestanden en 4245 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 733 bestanden en 4247 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,13 +13,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 733 |
-| losse beweringen (`test(...)`) | 4245 |
+| losse beweringen (`test(...)`) | 4247 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 529 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 536 |
 | **overleefd**: geen mutatie kreeg hem rood | 12 |
-| niet te meten (al rood, geen module gevonden, ...) | 16 |
-| alleen in de kop *genoemd*, nog niet gemeten | 25 |
-| niets van beide | 151 |
+| niet te meten (al rood, geen module gevonden, ...) | 17 |
+| alleen in de kop *genoemd*, nog niet gemeten | 24 |
+| niets van beide | 144 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-643 bestanden, 4086 beweringen.
+643 bestanden, 4088 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -269,7 +269,7 @@ toets omvalt.
 | `kern-util.test.js` | 4 | gezakt op `!==->===` | Zuivere kern-hulpjes (server/kern/util.js): los testbaar, geen server nodig. |
 | `ketenchat.test.js` | 5 | gezakt op `liegpoort /api/` | De ketenchat en de interne noodknop: korpsen verbinden eenmalig en delen daarna EEN ketenkanaal; besloten deelgroepen zijn alleen voor de leden en de meldkamer-chefs van de betrokken korpsen kijken mee (lezen, niet... |
 | `keuken.test.js` | 17 | gezakt op `liegpoort /api/` | Het keukenbrein (toren horeca): recepten per gerecht, automatische voorraad-afboeking bij de kassabon EN de betaalde gastbestelling, telling, verspilling, levering (met nieuwe kostprijs), het inkoopadvies en de marge... |
-| `keuring.test.js` | 6 | gezakt op `===->!==#0` | De Keuring keurt het systeem; deze test keurt de Keuring. Een oordeelsscript dat vals alarm slaat wordt genegeerd, en een script dat niets meer vindt wordt overbodig. |
+| `keuring.test.js` | 8 | gezakt op `===->!==#0` | De Keuring keurt het systeem; deze test keurt de Keuring. Een oordeelsscript dat vals alarm slaat wordt genegeerd, en een script dat niets meer vindt wordt overbodig. |
 | `kijken.test.js` | 2 | gezakt op `===->!==#0` | Rahul kijkt mee: een foto van iets, en hij zegt wat het is. Het gaat hier vooral om de poort ervoor. |
 | `kijkplicht.test.js` | 5 | -- | WAT UW WERK U VRAAGT TE BEKIJKEN -- en wat daarbij NIET wordt gemeten. Een organisatie met een interne bibliotheek wil kunnen aanwijzen dat iedereen de nieuwe werkinstructie moet zien, en zien wie dat gedaan heeft. |
 | `kleine-grendels.test.js` | 5 | gezakt op `liegpoort /api/` | DE KLEINE GRENDELS. Vier losse bevindingen uit de laatste doorlichting die geen van alle een eigen testbestand rechtvaardigen, maar samen wel. |
@@ -380,7 +380,7 @@ toets omvalt.
 | `ov.test.js` | 8 | gezakt op `liegpoort /api/` | RTG OV: al het vervoer in een app. Lijnen met haltes, live voertuigen via de PDA, twee snelle check-ins (oplichtende code of GPS-een-tik) en uitchecken met eerlijke km-prijs via RTG Pay. |
 | `overheid.test.js` | 18 | gezakt op `liegpoort /api/` | De Overheid (kern/overheid.js): de landelijke laag naast de gemeente. Zes pijlers voor inwoners, ondernemers en rijksambtenaren. |
 | `ovkaart.test.js` | 12 | -- | De OV-kaartverkoop: een vervoerbewijs mag alleen bestaan als er een geldige overeenkomst met de vervoerder onder ligt. Draai los: node --experimental-sqlite --test test/ovkaart.test.js Wat deze toetsen bewaken: 1. |
-| `paginascripts.test.js` | 2 | -- | Syntaxbewaking op de inline scripts van elke pagina. Waarom dit bestaat: de apps van RTG dragen hun JavaScript in een groot inline `<script>`-blok. |
+| `paginascripts.test.js` | 2 | geen module gevonden | Syntaxbewaking op de inline scripts van elke pagina. Waarom dit bestaat: de apps van RTG dragen hun JavaScript in een groot inline `<script>`-blok. |
 | `pakket.test.js` | 4 | gezakt op `===->!==#0` | RTG Bedrijfspakketten: een lid kiest zijn bedrijfstype en krijgt de juiste indeling voor de eigen zaak. De catalogus is pure data; de interne RTG-kantoorfuncties (afdelingen/boardroom) blijven bedrijfsgeheim en komen... |
 | `papieren-boardroom.test.js` | 8 | gezakt op `liegpoort /api/` | HET PAPIERWERK IN DE BOARDROOM. De 18 vragen die alleen een mens kan beantwoorden -- de juridische naam en het KvK-nummer, het privacy-aanspreekpunt, of er een FG is, hoe lang een paspoortscan bewaard wordt, welke... |
 | `papieren.test.js` | 9 | gezakt op `liegpoort /api/` | DE PAPIEREN: Rahul vraagt het AVG-papierwerk uit in plaats van een [VUL IN]-lijst achter te laten die niemand invult. Waar deze tests op letten, in volgorde van belang: 1. |
@@ -541,21 +541,21 @@ toets omvalt.
 | `smtp.test.js` | 7 | gezakt op `===->!==#0` | Eigen SMTP-verzendclient (server/smtp.js), die nodemailer verving. We draaien tegen een nep-SMTP-server (net/tls) en controleren de protocolstappen en de MIME-opmaak: EHLO -> MAIL/RCPT/DATA, base64-body die terug... |
 | `societeit.test.js` | 2 | gezakt op `liegpoort /api/` | Integratietests voor De Societeit (18-21): het Quizduel (tien dezelfde vragen, oplossing blijft op de server tot er geantwoord is) en het Schatduel (vijf ronden, het dichtstbij pakt het punt). Jong-profielen zijn... |
 | `sparren.test.js` | 3 | gezakt op `liegpoort /api/` | Sparren: Rahul denkt mee (niet om zijn gelijk te halen) en komt op een geparkeerde gedachte terug als je rustig thuis bent met een lege agenda. Getoetst via de routes: parkeren + lijst + status, dat een spar-vraag in... |
-| `spelkijken.test.js` | 10 | genoemd | Meekijken bij een lopend potje. Twee poorten die verschillend werk doen: MAG DIT SPEL bekeken worden (per spel in de descriptor, standaard NIET), en MAG JIJ dit potje bekijken (vriend van een speler, of mededeelnemer... |
+| `spelkijken.test.js` | 10 | gezakt op `return-weg#0` | Meekijken bij een lopend potje. Twee poorten die verschillend werk doen: MAG DIT SPEL bekeken worden (per spel in de descriptor, standaard NIET), en MAG JIJ dit potje bekijken (vriend van een speler, of mededeelnemer... |
 | `spellen.test.js` | 30 | gezakt op `liegpoort /api/` | Integratietests voor de spellenlaag: potjes op de vriendenlaag. Twee RTG-leden worden vrienden en spelen: mens erger je niet (uitnodigen, accepteren, dobbelen, zetten), schaken (legale en onwettige zetten), woordduel... |
 | `spelmaatje.test.js` | 4 | gezakt op `liegpoort /api/` | Integratietest: Rahul als spelmaatje. In elk potje kun je Rahul erbij roepen voor een hint, een regel of een peptalk. |
 | `spelpoort.test.js` | 3 | gezakt op `liegpoort /api/` | DE TWEE POORTEN VAN HET SPELDOMEIN. Elke spelactie hangt onder twee routes: `/api/member/spel/<actie>` met een Bearer-token, en `/api/rtf/spel/<actie>` met een gezinscode plus profieltoken (server/routes/spellen.js). |
 | `spelpraat.test.js` | 13 | gezakt op `liegpoort /api/` | Praten IN het potje. Twee dingen worden hier bewaakt, en het tweede is het belangrijkste. |
-| `spelpresence.test.js` | 12 | -- | Wie er NU is, van je vrienden en je klasgenoten. Vijf regels, en vier ervan zijn er om iets te voorkomen -- dus staan ze hier alle vijf als toets, met de fout erbij die ze tegenhouden. |
-| `spelprestaties.test.js` | 8 | -- | Prestaties, afgeleid uit de uitslagen. Drie keuzes maken dit anders dan een gewoon prestatiesysteem, en die staan hier alle drie als toets omdat ze anders stil terugdraaien: alleen wat BEHAALD is gaat terug (geen "7... |
+| `spelpresence.test.js` | 12 | gezakt op `true->false#0` | Wie er NU is, van je vrienden en je klasgenoten. Vijf regels, en vier ervan zijn er om iets te voorkomen -- dus staan ze hier alle vijf als toets, met de fout erbij die ze tegenhouden. |
+| `spelprestaties.test.js` | 8 | gezakt op `!==->===#0` | Prestaties, afgeleid uit de uitslagen. Drie keuzes maken dit anders dan een gewoon prestatiesysteem, en die staan hier alle drie als toets omdat ze anders stil terugdraaien: alleen wat BEHAALD is gaat terug (geen "7... |
 | `spelregels-drift.test.js` | 11 | overleefd | Driftbewaking: twee spelregels bestaan bewust in tweevoud (server keurt, client geeft directe feedback): de Woordduel-premievelden en de Rummi-setregels. Deze test haalt de CLIENT-kopie uit spelen.html en houdt hem... |
-| `spelregister.test.js` | 21 | -- | Het spelregister: elk spel beschrijft zichzelf in zijn eigen module en het register bouwt daar de dispatch-tabellen uit. Deze toets bewaakt twee dingen die anders pas midden in een potje zouden opvallen: 1. |
-| `spelreplay.test.js` | 9 | -- | Het verloop van een partij, voor de replay. De uitslagen zeggen WIE won; dit zegt HOE. |
+| `spelregister.test.js` | 21 | gezakt op `===->!==#0` | Het spelregister: elk spel beschrijft zichzelf in zijn eigen module en het register bouwt daar de dispatch-tabellen uit. Deze toets bewaakt twee dingen die anders pas midden in een potje zouden opvallen: 1. |
+| `spelreplay.test.js` | 9 | gezakt op `return-weg#0` | Het verloop van een partij, voor de replay. De uitslagen zeggen WIE won; dit zegt HOE. |
 | `spelsudoku.test.js` | 20 | gezakt op `liegpoort /api/` | Sudoku: het eerste arcadespel waarvan de score NIET uit de client komt. Bij Sneek en Tetris rekent de browser de punten uit en stuurt een getal op; de server kan daar niets van narekenen en kapt hem alleen af op de... |
 | `spelteams.test.js` | 19 | gezakt op `liegpoort /api/` | Teams: een vaste club om mee te spelen. Iedereen mag er een maken. |
 | `speltelling.test.js` | 9 | gezakt op `liegpoort /api/` | Telemetrie van de spellen: geaggregeerd, zonder personen. Deze toets bewaakt vooral wat er NIET in mag staan. |
-| `speltoernooi.test.js` | 14 | -- | Toernooien: een knockout waarvan elke wedstrijd een GEWOON potje is. De keuze die het meeste uitlegt: een toernooi valt NIET onder de progressiegrens. |
-| `speluitslagen.test.js` | 25 | -- | Uitslagen die een potje overleven -- de bron onder winrate, niveaus en toernooien, die er tot nu toe niet was (een klaar potje werd na 24 uur weggegooid). De regel die het meeste werk doet: de progressiegrens geldt... |
+| `speltoernooi.test.js` | 14 | gezakt op `return-weg#0` | Toernooien: een knockout waarvan elke wedstrijd een GEWOON potje is. De keuze die het meeste uitlegt: een toernooi valt NIET onder de progressiegrens. |
+| `speluitslagen.test.js` | 25 | gezakt op `===->!==#0` | Uitslagen die een potje overleven -- de bron onder winrate, niveaus en toernooien, die er tot nu toe niet was (een klaar potje werd na 24 uur weggegooid). De regel die het meeste werk doet: de progressiegrens geldt... |
 | `sportclub.test.js` | 10 | gezakt op `liegpoort /api/` | Het sportstadion en het clubsysteem: de club tekent zijn EIGEN plattegrond (vakken met capaciteit en prijs, horeca en wc's erop), leden reserveren tickets per vak (afrekenen aan de poort), de scan is eenmalig, de... |
 | `sso.test.js` | 28 | gezakt op `return-weg#0` | SSO: de laag waarmee een zakelijke klant met zijn eigen identiteitsprovider inlogt. Dit is auth, dus de tests gaan vooral over wat er NIET mag. |
 | `ssrf.test.js` | 10 | gezakt op `true->false#0` | Tests voor de SSRF-afweer (server/kern/ssrf.js). Het scherpst getoetste geval is het web-push-endpoint: dat komt van de client en de server POST daar later naartoe. |

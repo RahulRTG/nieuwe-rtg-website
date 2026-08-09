@@ -131,7 +131,13 @@
         <select id="velVan"><option value="hier">Huidige locatie</option></select>
         <label for="velZoek">Bestemming</label>
         <input id="velZoek" type="search" placeholder="Zoek een zaak, hotel of halte" autocomplete="off">
-        <select id="velNaar" style="margin-top:0.4rem;"><option value="">Kies een plek</option></select>
+        <!-- Het zichtbare label hierboven hoort bij het ZOEKVELD; deze keuzelijst
+             is het veld dat de bestemming echt vasthoudt en had daardoor geen
+             naam voor een schermlezer -- een lege combobox, terwijl er twee
+             velden onder een kopje staan. De naam is dezelfde tekst die een
+             ziende gebruiker in de lijst leest, dus er ontstaat hier geen
+             tweede bewoording naast de zichtbare. -->
+        <select id="velNaar" aria-label="Kies een plek" style="margin-top:0.4rem;"><option value="">Kies een plek</option></select>
         <p class="stil" id="velMeer"></p>
         <div class="duo">
           <div><label for="velReizigers">Reizigers</label><input id="velReizigers" type="number" min="1" max="60" value="1"></div>

@@ -167,18 +167,43 @@ test('het Podium vraagt eerst een geverifieerd paspoort, en toont het achterste 
     const r = await toon(o.page, base, 'podium', token);
     assert.equal(r.pad, '/apps/podium.html', 'het Podium blijft op zijn eigen adres');
 
-    /* DE POORT. Een leeftijdsgrens die je met een klik overslaat is geen grens.
-       Dit scherm hoort te zeggen dat er eerst een geverifieerd paspoort moet
-       zijn -- en dat is iets anders dan een vinkje "ik ben 18". */
-    assert.match(r.tekst, /18\+/, 'de leeftijdsgrens staat er: ' + r.tekst.slice(0, 200));
-    assert.match(r.tekst, /geverifieerd|verifieer|paspoort/i,
-      'en er moet een geverifieerd paspoort aan te pas komen: ' + r.tekst.slice(0, 200));
+    /* DE POORT ZIT OP DE 18+-WERELD EN NIET OP DE VOORDEUR, en dat is het
+       ontwerp: het Podium heeft vijf werelden op dezelfde motor, en alleen die
+       ene is 18+. Een lid dat binnenkomt landt in Live -- open voor alle leden
+       -- en daar hoort geen paspoortvraag te staan. Deze toets keek naar de
+       landingspagina en zakte daarom op een scherm dat het goed deed.
+
+       Wat de merkregel WEL eist, staat hieronder: kies de 18+-wereld, en dan
+       gaat de deur dicht met de reden erbij. Een leeftijdsgrens die je met een
+       klik overslaat is geen grens. */
+    assert.match(r.tekst, /18\+/, 'de 18+-wereld is als deur zichtbaar: ' + r.tekst.slice(0, 200));
     assert.match(r.tekst, /codenaam/i, 'op codenaam, zoals de rest van dit huis');
 
+    const poort = await o.page.evaluate(async () => {
+      const knop = [...document.querySelectorAll('#zoneBalk button')]
+        .find(b => /18\+/.test(b.textContent));
+      if (!knop) return { gevonden: false };
+      knop.click();
+      /* Wachten tot de poort er echt staat: het klikken zet een verzoek uit, en
+         meten voordat het antwoord binnen is, meet de vorige wereld. */
+      for (let i = 0; i < 40; i++) {
+        const p = document.getElementById('vPoort');
+        if (p && !p.classList.contains('weg')) break;
+        await new Promise(r2 => setTimeout(r2, 100));
+      }
+      const p = document.getElementById('vPoort');
+      return { gevonden: true, dicht: !!(p && !p.classList.contains('weg')),
+        tekst: document.body.innerText.replace(/\s+/g, ' ') };
+    });
+    assert.ok(poort.gevonden, 'de 18+-wereld staat in de balk');
+    assert.ok(poort.dicht, 'zonder verificatie gaat de poort dicht: ' + poort.tekst.slice(0, 200));
+    assert.match(poort.tekst, /geverifieerd|verifieer|paspoort/i,
+      'en er moet een geverifieerd paspoort aan te pas komen: ' + poort.tekst.slice(0, 200));
+
     /* En het achterste blijft achter de poort. Zonder verificatie hoort er geen
-       inhoud te staan -- geen namen, geen beelden, geen lijst. */
-    assert.ok(r.tekst.trim().length < 1200,
-      'zonder verificatie staat er alleen de poort en niet het hele podium (' + r.tekst.trim().length + ' tekens)');
+       inhoud van die wereld te staan -- geen namen, geen beelden, geen lijst. */
+    assert.ok(!/NU LIVE|ALLE KANALEN/.test(poort.tekst),
+      'achter de poort staat geen zaal (' + poort.tekst.slice(0, 300) + ')');
 
     assert.deepEqual(o.fouten, [], 'paginafouten: ' + o.fouten.join(' | '));
   } finally {

@@ -68,15 +68,32 @@ async function naarDeel(page, zoek) {
 
      De tanden blijven: is er WEL een menu maar ontbreekt het gevraagde deel,
      dan is dat een echte breuk en zakt hij nog steeds. */
+  /* LEEG IS NIET HETZELFDE ALS GEEN MENU, en dat verschil kostte een ronde.
+     Het Klankwerk zet zijn delen pas neer als er een stuk OPEN is -- de
+     .deel-koppen staan in het werkvlak. Wie meteen na het aanmaken kijkt, ziet
+     nul delen, concludeert "deze pagina heeft er geen", en loopt daarna tegen
+     een menu aan dat inmiddels alles behalve het eerste deel heeft weggezet
+     (.rtgdeel-weg, display:none). Dat is precies hoe deze toets rood stond op
+     een pagina die het gewoon deed.
+
+     Daarom telt een lege lijst pas als "geen menu" nadat hij LEEG BLIJFT. Een
+     halve seconde stilte is genoeg: het menu bouwt op in dezelfde tik als de
+     inhoud eromheen. */
   const uitslag = await page.waitForFunction((z) => {
     if (!window.RTGDeel || !RTGDeel.delen) return false;
     const alle = RTGDeel.delen();
-    if (!alle.length) return { menu: false };            // deze pagina heeft er geen
+    if (!alle.length) {
+      const nu = Date.now();
+      if (!window.__leegSinds) { window.__leegSinds = nu; return false; }
+      return nu - window.__leegSinds > 500 ? { menu: false } : false;
+    }
+    window.__leegSinds = 0;
     const id = alle.find(d => d.includes(z));
     if (!id) return false;                                // nog aan het opbouwen: wachten
     RTGDeel.open(id);
     return { menu: true, id };
   }, zoek, { timeout: 20000 }).then(h => h.jsonValue()).catch(() => null);
+  await page.evaluate(() => { window.__leegSinds = 0; });
   assert.ok(uitslag, 'het deel "' + zoek + '" is te openen (delen: ' +
     JSON.stringify(await page.evaluate(() => window.RTGDeel ? RTGDeel.delen() : 'geen menu')) + ')');
   if (uitslag.menu) await page.waitForTimeout(150);
@@ -115,19 +132,26 @@ test('Van lied naar zaal: zingen, samen maken, uitgeven en horen',
        als er geen menu is -- en welke van de twee het is, hoort niet stil te
        blijven staan.
 
-       Gemeten (niet aangenomen): de <main> van het Klankwerk draagt een <h1>,
-       een lijstvlak en een werkvlak. Geen van drieen is een sectie zoals het
-       deelmenu die kent (een losse .sec/h2/h3/h4-kop, of een kaart met een
-       eigen kop erin), dus het menu ziet NUL delen en bouwt niets. Dat hoort
-       ook: een studio is geen rol met secties maar een gereedschap met een
-       lijst ernaast.
+       DIE STAND IS OMGESLAGEN, en de vorige versie van deze regel voorspelde
+       dat: "wat deze regel bewaakt is de dag dat dat verandert". Het werkvlak
+       draagt inmiddels eigen .deel-koppen (het raster, de notenrol, de vorm,
+       Rahul, samen produceren, uitgeven), dus het menu ziet ze WEL en zet alles
+       behalve het open deel weg met .rtgdeel-weg. Navigeren gaat dus voortaan
+       via het menu, en dat is precies wat naarDeel() hieronder doet.
 
-       Wat deze regel bewaakt is de dag dat dat verandert. Beproefd door drie
-       secties in die main te zetten: er komt een menu, en deze bewering zakt.
-       Dan is de navigatie van deze toets een herziening waard. */
-    const menuDelen = await page.evaluate(() => (window.RTGDeel && RTGDeel.delen) ? RTGDeel.delen() : null);
-    assert.deepEqual(menuDelen, [],
-      'het Klankwerk heeft te weinig delen voor een menu; alles staat onder elkaar (delen: ' +
+       Gemeten en niet aangenomen: hieronder staat dat er echt delen zijn. Zakt
+       dit, dan is de pagina teruggegaan naar alles-onder-elkaar en mag de
+       navigatie weer eenvoudiger. */
+    const menuDelen = await page.evaluate(() => new Promise(res => {
+      const kijk = (n) => {
+        const d = (window.RTGDeel && RTGDeel.delen) ? RTGDeel.delen() : [];
+        if (d.length || n <= 0) return res(d);
+        setTimeout(() => kijk(n - 1), 100);
+      };
+      kijk(30);
+    }));
+    assert.ok(menuDelen.length >= 3,
+      'het werkvlak draagt eigen delen, dus er is een menu (delen: ' +
       JSON.stringify(menuDelen) + ')');
 
     /* ---- een heel lied, met een eigen zin ---- */

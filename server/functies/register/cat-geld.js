@@ -52,5 +52,23 @@ module.exports = [
     uitleg: 'Rahul kijkt mee met de rekeningen en geeft advies; hij besluit niets.', paden: ['/api/bank/advies'],
     vermogen: 'INZICHTEN' },
   { id: 'dom-wallet', categorie: 'Geld', naam: 'Wallet', standaard: true, doelgroepen: LEDEN_GAST,
-    uitleg: 'De wallet van een lid binnen RTG Pay.', paden: ['/api/wallet'] }
+    uitleg: 'De wallet van een lid binnen RTG Pay.', paden: ['/api/wallet'],
+    vermogen: 'WALLET_SALDO' },
+  /* De wallet-handelingen zelf staan met hun VOLLEDIGE pad in de lijst en niet
+     als '/api/pay'. Dat laatste zou gelijk lang zijn als het pad van de
+     bestaande schakelaar 'betalen' (cat-partners), en bij gelijke lengte wint
+     wie het eerst in de catalogus staat -- een volgorde-afhankelijkheid die je
+     pas merkt als iemand de bestanden herschikt. Wat hier niet staat blijft
+     dus gewoon onder 'betalen' vallen, precies zoals voorheen. */
+  { id: 'dom-pay-wallet', categorie: 'Geld', naam: 'Walletsaldo en betalen binnen RTG', standaard: true, doelgroepen: LEDEN_GAST,
+    uitleg: 'Saldo aanhouden, opladen, tikken en betaalverzoeken binnen het gesloten RTG-circuit.',
+    paden: ['/api/pay/overzicht', '/api/pay/oplaad', '/api/pay/stuur', '/api/pay/verzoek', '/api/pay/tik', '/api/pay/tikcode', '/api/pay/tiks', '/api/pay/kascode'],
+    vermogen: 'WALLET_SALDO' },
+  /* De partneruitbetaling hoort aan DEZELFDE partnerrail als de bank-SEPA, en
+     dat was hij niet: de boardroom kon de sepa-rail uitzetten, waarna de bank
+     stopte met overboeken terwijl partners gewoon doorbetaald werden. Een rail
+     die half uit staat is geen rail die uit staat. */
+  { id: 'dom-partner-uitbetaling', categorie: 'Geld', naam: 'Partnersaldo uitbetalen', standaard: true, doelgroepen: ['leverancier'],
+    uitleg: 'Het RTG Pay-saldo van een zaak naar zijn bankrekening sturen.', paden: ['/api/supplier/pay/uitbetaal'],
+    vermogen: 'PARTNER_UITBETALING' }
 ];

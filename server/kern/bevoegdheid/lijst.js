@@ -30,12 +30,28 @@ const VERMOGENS = {
   PAS_UITGIFTE:       { soort: 'rail', naam: 'Betaalpassen uitgeven', eigenNodig: 'elektronischgeldinstelling', partnerRail: 'passen' },
   GELD_UITGEVEN:      { soort: 'rail', naam: 'Eigen geld in omloop brengen', eigenNodig: 'elektronischgeldinstelling', partnerRail: null },
 
+  PARTNER_UITBETALING: { soort: 'rail', naam: 'Partnersaldo uitbetalen naar de bank', eigenNodig: 'betaalinstelling', partnerRail: 'sepa' },
+
+  /* -- besluit: toegestaan omdat RTG heeft VASTGESTELD dat het buiten de
+     vergunningplicht valt, en niet omdat er een vergunning ligt of een partner
+     het doet. Een vierde soort en geen stilzwijgende weglating: wat hier niet
+     stond, ontbrak gewoon in de lijst, en dan lijkt "hij staat er niet in" op
+     "er is over nagedacht". De reden staat erbij en is daarmee aanvechtbaar --
+     dat is het hele punt van hem opschrijven. */
+  WALLET_SALDO: { soort: 'besluit', naam: 'Walletsaldo van leden aanhouden',
+    besluit: 'Een gesloten circuit met harde plafonds: saldo is alleen binnen RTG te besteden, ' +
+      'wordt niet uitbetaald aan het lid en kent een maximum per wallet en per boeking. ' +
+      'RTG rekent dit tot een beperkt netwerk. Verandert een van die drie -- uitbetaling aan ' +
+      'het lid, besteding buiten RTG, of het loslaten van de plafonds -- dan vervalt de grond ' +
+      'onder dit besluit en hoort dit vermogen van soort te wisselen.' },
+
   // -- puur vergunning: geen partner doet dit voor ons, en geen rail verandert het --
   KREDIET_EIGEN_BOEK: { soort: 'vergunning', naam: 'Krediet uit eigen boek', nodig: 'bank' },
   RENTE_OP_DEPOSITO:  { soort: 'vergunning', naam: 'Rente over spaargeld uitkeren', nodig: 'bank' }
 };
 
 const zinnen = {
+  besluit: 'Toegestaan op grond van een vastgesteld besluit, niet op grond van een vergunning.',
   geen: 'RTG mag dit zelf nog niet; hiervoor is een vergunning nodig die nog niet is vastgelegd.',
   rang: 'De vastgelegde vergunning is niet toereikend voor deze handeling.',
   verlopen: 'De vastgelegde vergunning is verlopen.',

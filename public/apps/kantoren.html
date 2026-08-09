@@ -2432,7 +2432,7 @@ function bankRenderVergunning(bv){
 const BK_REDEN = { geen: 'geen vergunning vastgelegd', rang: 'de vastgelegde vergunning is te licht',
   verlopen: 'de vergunning is verlopen', land: 'niet geldig in dit land', rail: 'de partnerrail staat uit',
   'alleen-eigen': 'kan alleen over de eigen rails, en die clearen nu niet' };
-const BK_VIA = { software: 'eigen software', partner: 'via de partner', eigen: 'op eigen kracht', 'eigen-boek': 'uit eigen boek' };
+const BK_VIA = { software: 'eigen software', partner: 'via de partner', eigen: 'op eigen kracht', 'eigen-boek': 'uit eigen boek', besluit: 'op een vastgesteld besluit' };
 function bankRenderBevoegd(bv){
   const rail = bv.rail === 'eigen' ? 'de eigen rails' : bv.rail === 'partner' ? 'de kaart-rails van de partner' : 'geen enkele rail';
   $('#bankBevoegd').innerHTML =
@@ -2443,6 +2443,7 @@ function bankRenderBevoegd(bv){
       '<strong style="min-width:14rem;">' + esc(r.naam) + '</strong>' +
       '<span style="color:var(--soft);min-width:9rem;">' + esc(r.mag ? (BK_VIA[r.via] || r.via) : (BK_REDEN[r.reden] || r.reden)) + '</span>' +
       (r.nodig ? '<span style="color:var(--soft);font-size:.74rem;">vraagt: ' + esc(BK_SOORT[r.nodig] || r.nodig) + '</span>' : '') +
+      (r.besluit ? '<span style="flex:1;min-width:100%;color:var(--soft);font-size:.74rem;padding-top:.2rem;">' + esc(r.besluit) + '</span>' : '') +
       '</div>').join('');
 }
 function bankRenderInstel(r){

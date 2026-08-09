@@ -556,3 +556,51 @@ test('in de hybride stand telt de eigen rail, niet de partner die er ook nog is'
   assert.equal((await api('bank/storten', { iban: lid.iban, centen: 1000, idem: 'hyb-2' }, lid.token)).status, 200,
     'met de bankvergunning terug mag storten weer');
 });
+
+/* EEN RAIL DIE HALF UIT STAAT IS GEEN RAIL DIE UIT STAAT. De boardroom kan de
+   sepa-partnerrail uitzetten -- de bank stopt dan met overboeken. De
+   partneruitbetaling liep gewoon door, want die kende de rail niet: hetzelfde
+   geld, dezelfde partner, dezelfde naad, en toch maar een van de twee dicht.
+   Dat is het soort halve maatregel waar een noodstop op stukloopt.
+
+   Meteen ook de vierde soort in de lijst: een BESLUIT. Het walletsaldo staat
+   niet open omdat er een vergunning ligt en niet omdat een partner het doet,
+   maar omdat RTG heeft vastgesteld dat een gesloten circuit met plafonds
+   erbuiten valt. Dat mag, maar dan hoort het opgeschreven te staan waar iemand
+   het kan tegenspreken -- en niet te ontbreken, want ontbreken lijkt op "er is
+   over nagedacht". */
+test('de partnerrail geldt voor iedereen die eraan hangt, en een besluit staat opgeschreven', async () => {
+  /* De manager van een zaak, want uitbetalen is managerwerk (test/pay.test.js
+     legt die deur vast). Zonder managerrol krijgen we een 403 en toetsen we de
+     verkeerde grendel. */
+  const zaakToken = (await (await fetch(base + '/api/supplier/login', { method: 'POST',
+    headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: 'rahul', password: 'Imran' }) })).json()).token;
+  assert.ok(zaakToken, 'de zaakmanager is ingelogd');
+
+  // met de rail aan komt de uitbetaling gewoon door de deur (en struikelt pas
+  // op een leeg saldo -- dat is een andere vraag dan of hij mag)
+  const aan = await api('supplier/pay/uitbetaal', {}, zaakToken);
+  assert.notEqual(aan.status, 503, 'met de rail aan is dit geen bevoegdheidsvraag: ' + JSON.stringify(aan.body).slice(0, 120));
+
+  // de boardroom zet de sepa-rail uit: de bank EN de partner gaan allebei dicht
+  assert.equal((await oapi('bank/partnerrail', { rail: 'sepa', aan: false }, 'RTG')).status, 200);
+  const uit = await api('supplier/pay/uitbetaal', {}, zaakToken);
+  assert.equal(uit.status, 503, 'de partneruitbetaling hangt aan dezelfde rail');
+  assert.equal(uit.body.reden, 'bevoegdheid');
+  assert.equal(uit.body.vermogen, 'PARTNER_UITBETALING');
+  const bankUit = await api('bank/sepa', { iban: lid.iban, centen: 200, naarIban: 'NL91ABNA0417164300', idem: 'rail-uit' }, lid.token);
+  assert.equal(bankUit.status, 503, 'en de bank-SEPA ook, want het is dezelfde rail');
+
+  // de matrix laat het besluit zien met zijn grond, niet als kaal vinkje
+  const m = await oapi('bank/bevoegdheid', {}, 'RTG');
+  const wallet = m.body.regels.find(r => r.id === 'WALLET_SALDO');
+  assert.equal(wallet.mag, true);
+  assert.equal(wallet.soort, 'besluit', 'geen software en geen vergunning: een besluit');
+  assert.match(wallet.besluit, /gesloten circuit/, 'met de grond erbij');
+  assert.match(wallet.besluit, /vervalt de grond/, 'en met wanneer die grond vervalt');
+  // en het walletsaldo zelf blijft gewoon werken -- een besluit sluit niets
+  assert.equal((await api('pay/overzicht', {}, lid.token)).status, 200);
+
+  assert.equal((await oapi('bank/partnerrail', { rail: 'sepa', aan: true }, 'RTG')).status, 200, 'rail weer aan');
+  assert.equal((await api('bank/sepa', { iban: lid.iban, centen: 200, naarIban: 'NL91ABNA0417164300', idem: 'rail-aan' }, lid.token)).status, 200);
+});

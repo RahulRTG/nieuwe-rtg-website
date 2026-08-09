@@ -83,6 +83,12 @@ function maakBevoegdheid({ vergunning, partnerRails, clearing, nu = () => Date.n
     const f = VERMOGENS[id];
     if (!f) return { mag: false, reden: 'onbekend', uitleg: zinnen.onbekend, vermogen: id };
     if (f.soort === 'software') return { mag: true, vermogen: id, via: 'software' };
+    /* Een besluit is geen vergunning en hoort er ook niet op te lijken; vandaar
+       een eigen `via`. De GROND staat in de lijst en wordt daar door matrix()
+       opgehaald -- hij stond eerst ook in dit antwoord, maar niemand las hem
+       daar. Een veld dat niemand leest is geen documentatie maar ballast, en
+       een mutatie erop slaat af (LAT.md regel 9). */
+    if (f.soort === 'besluit') return { mag: true, vermogen: id, via: 'besluit' };
     if (f.soort === 'vergunning') return toetsVergunning(f.nodig, id, land, 'eigen-boek');
 
     const rail = railVan();
@@ -129,7 +135,8 @@ function maakBevoegdheid({ vergunning, partnerRails, clearing, nu = () => Date.n
         const f = VERMOGENS[id];
         const r = mag(id, { land });
         return { id, naam: f.naam, soort: f.soort, nodig: f.eigenNodig || f.nodig || null,
-          partnerRail: f.partnerRail || null, mag: r.mag, reden: r.reden || null, via: r.via || null };
+          partnerRail: f.partnerRail || null, mag: r.mag, reden: r.reden || null, via: r.via || null,
+          besluit: f.besluit || null };
       })
     };
   }

@@ -88,4 +88,10 @@ module.exports = function bouwKernAanTwee(kern, grens) {
   Object.assign(kern, require('../kern/toegankelijk')({ accounts: kern.accounts }));
   // Wie ben ik voor Rahul: omgang, voornaamwoorden en de eigen geloofskeuze.
   require('../routes/ik')(grens('ik'));
+  /* RTG Life (kern/life.js): het ene scherm dat de lagen hierboven bij elkaar
+     leest -- ritme, doelen, afspraken en de check-in. Hij krijgt de KERN mee en
+     geen losse functies, want hij pakt ze op aanroepmoment: hij hangt later in
+     de bouw dan wat hij leest, en een kopie zou undefined bevriezen. */
+  Object.assign(kern, require('../kern/life')({ kern }));
+  require('../routes/life')(grens('life'));
 };

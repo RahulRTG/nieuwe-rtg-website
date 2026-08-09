@@ -38,6 +38,7 @@ klinkt.
 | Gezin | `public/apps/foundation/gezondheid.html`, `gevoel.html`, `rust.html` | gezinsgezondheidsboekje, hoe voel je je, even rust |
 | Toegankelijkheidsprofiel | `server/kern/toegankelijk.js`, `public/shared/toegankelijk.js`, kop van `shared/basis.js` | tekstgrootte, contrast, beweging en onderstreepte links, op elke pagina die `shared/basis.js` laadt |
 | Doelenmotor | `server/kern/doelen.js`, `public/apps/doelen.html` | beginpunt, streefpunt, datum en reden; mijlpalen worden afgeleid, dus een gemiste week is een ander pad en geen mislukking |
+| Het ene scherm | `server/kern/life.js`, `public/apps/life.html` | leest ritme, doelen, afspraken en check-in bij elkaar; meet zelf niets en legt niets vast |
 | Inzage-audit | `server/inzagelog.js` | wie welke identiteitsgegevens opvroeg, en waarom |
 | Identiteitskluis | `server/accounts.js` | echte namen apart; alles daarbuiten draait op codenamen |
 
@@ -83,7 +84,8 @@ geen route en geen toets.
   tussen twee getallen; hij zegt niets over trainen, eten of gezondheid. Dat is
   geen tekort maar de grens uit deze notitie: dat is professional-supported of
   clinical werk, en dat staat er niet.
-- **Life Compass** (de zes signalen op één scherm) en de **dagcoach**.
+- **De dagcoach** die een dag indeelt (ontbijt, wandeling, training, avondroutine).
+  Het scherm zegt wel waar vandaag het meeste te winnen valt, maar plant niets.
 - **De rest van de toegankelijkheid.** Het profiel dat er nu is doet vier
   dingen (zie hieronder); eenvoudige taal, een taak per scherm,
   schermlezer-teksten en spraakbesturing staan er bewust niet in, want die zijn
@@ -160,6 +162,36 @@ nulmeting werden gerekend in plaats van vanaf de meting -- een pad dat bij 3 km
 begint terwijl je 4 km loopt, oftewel precies "opnieuw beginnen". De bewering is
 nu dat elke mijlpaal VOOR je ligt en nooit achter je, en dat ziet het wel.
 
+## RTG Life, het scherm
+
+Een lid hoeft niet te weten of hij Doelen, Balans, Zorg of Vitaal moet openen.
+`apps/life.html` leest die lagen en zet ze naast elkaar: ritme (uit de agenda),
+doelen, komende afspraken bij zorg en verzorging, en de dagelijkse check-in.
+
+**Het meet zelf niets en legt niets vast.** Er staat geen enkele nieuwe bak
+achter dit scherm. Dat is met opzet: een overzicht dat zelf gaat bijhouden,
+wordt een tweede waarheid naast de laag waar het vandaan kwam. Een doel dat je
+bij Doelen stopt, is hier meteen weg -- daar is een toets voor.
+
+**En het verzint geen cijfers.** Voor slaap, beweging en voeding is geen bron
+aangesloten. Ze staan er dus als "niet gemeten", met de reden erbij, en zonder
+getal. Niet weggelaten (dat leest als "hier valt niets te halen") en niet op nul
+(dat leest als een slechte uitslag). Bij welzijn is dat verschil geen detail.
+
+**Een kapotte laag is zichtbaar.** Doet een van de lagen het niet, dan staat dat
+bovenaan het scherm met de naam van de laag erbij. Anders zien "geen afspraken"
+en "de zorglaag is stuk" er hetzelfde uit. Die vorm ving meteen een echte fout:
+`kern.balans` is een object terwijl doelen, care en de veiligheidskern hun
+functies plat in de kern hangen, en de toets meldde "de laag Balans is niet
+aangesloten" op een systeem waar Balans gewoon draaide.
+
+**Stilte is een geldige uitkomst.** Bovenaan staat waar vandaag het meeste te
+winnen valt, en een van de antwoorden is "er is niets dat om uw aandacht
+vraagt". Een scherm dat elke dag iets dringends moet vinden, verzint het op den
+duur; dat is precies het engagement-patroon dat `CLAUDE.md` verbiedt. Ook hier
+leerde een mutatie iets: de tak die dat zegt stond onder geen enkele toets, dus
+"Er is vandaag veel te doen" eronder schuiven bleef groen. Nu niet meer.
+
 ## De grenzen die vast moeten staan vóór de bouw
 
 Deze horen in de architectuur en niet in een latere ronde, want ze bepalen hoe
@@ -203,10 +235,9 @@ In deze volgorde, want elke stap heeft de vorige nodig:
 1. ~~Het **toegankelijkheidsprofiel**, platformbreed.~~ Gedaan; zie hierboven
    wat het wel en niet doet.
 2. ~~De **doelenmotor**.~~ Gedaan; zie hierboven.
-3. Het **Life Compass**-scherm dat leest uit wat er dan is -- met "niet gemeten"
-   waar niets gemeten is, en niet met een nul. Dat is `LAT.md` regel 3 toegepast
-   op een gezondheidsscherm, en bij welzijnscijfers is het verschil tussen "geen
-   gegevens" en "slecht" niet cosmetisch.
+3. ~~Het **Life Compass**-scherm.~~ Gedaan; zie hieronder.
 
-Wat daarna komt (slaap, voeding, stress, coach, marktplaats) hangt aan die twee
-en hoort pas daarna aan de beurt.
+Wat daarna komt (slaap, voeding, stress, coach, marktplaats) hangt aan deze drie
+en hoort pas daarna aan de beurt. De eerstvolgende die iets toevoegt is een
+BRON: zolang er niets meet, blijven slaap, beweging en voeding op RTG Life staan
+als "niet gemeten", en dat is precies wat ze zijn.

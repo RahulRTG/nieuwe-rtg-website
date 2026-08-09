@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Life</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/veiligheid.css" rel="stylesheet">
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<style>
+  .winst{border:1px solid var(--line);border-left:2px solid var(--goldlicht);
+    padding:1.1rem 1.2rem;margin:.2rem 0 1.6rem;}
+  .winst .kop{font-size:.66rem;letter-spacing:.18em;text-transform:uppercase;color:var(--goldlicht);}
+  .winst p{font-family:'Bodoni Moda',Georgia,serif;font-size:1.25rem;line-height:1.45;margin:.45rem 0 0;}
+  .sig{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;
+    padding:.85rem 0;border-top:1px solid var(--line);}
+  .sig .naam{font-size:.9rem;}
+  .sig .uit{display:block;color:var(--soft);font-size:.78rem;line-height:1.5;margin-top:.15rem;}
+  .sig .waarde{font-family:'Bodoni Moda',Georgia,serif;font-size:1.5rem;white-space:nowrap;}
+  .sig .eenheid{display:block;color:var(--soft);font-size:.72rem;text-align:right;}
+  .sig.leeg .waarde{font-family:'Inter',system-ui,sans-serif;font-size:.82rem;color:var(--soft);font-style:italic;}
+  .kaartje{border:1px solid var(--line);border-radius:12px;padding:.9rem 1rem;margin:.6rem 0;}
+  .kaartje b{display:block;}
+  .kaartje .m{color:var(--soft);font-size:.82rem;line-height:1.5;margin-top:.2rem;}
+  .balk{height:2px;background:rgba(255,255,255,.10);margin:.6rem 0 0;}
+  .balk i{display:block;height:2px;background:var(--goldlicht);}
+  .storing{border:1px solid var(--rood,#DE6E92);border-radius:10px;padding:.7rem .9rem;
+    margin:.6rem 0;font-size:.82rem;color:var(--soft);}
+  .heen{display:inline-block;margin:.35rem .5rem 0 0;font-size:.82rem;}
+</style>
+<script src="/shared/seizoen.js" defer></script>
+<script src="/shared/veiligheid.js" defer></script>
+<link href="/shared/ios.css" rel="stylesheet">
+</head>
+<body class="rtg-stijl">
+<a class="skip" href="#inhoud">Naar de inhoud</a>
+<header class="kop">
+  <a href="/apps/app.html" aria-label="Terug naar de app">&#8592;</a>
+  <h1>RTG Life</h1>
+  <div class="rek"></div>
+  <span class="stil">wat er vandaag toe doet</span>
+</header>
+<main id="inhoud">
+  <div id="winst"></div>
+
+  <section aria-label="Uw signalen">
+    <h2>Hoe u ervoor staat</h2>
+    <div id="signalen"><p class="stil">Laden...</p></div>
+    <p class="stil" style="margin-top:.8rem;">Wat hier niet gemeten wordt, staat er als niet
+    gemeten. RTG vult geen nul in waar niets bekend is, en verzint geen score.</p>
+  </section>
+
+  <section aria-label="Uw doelen">
+    <h2>Waar u naartoe werkt</h2>
+    <div id="doelen"></div>
+    <a class="heen" href="/apps/doelen.html">Naar Doelen &#8594;</a>
+  </section>
+
+  <section aria-label="Wat eraan komt">
+    <h2>Wat eraan komt</h2>
+    <div id="afspraken"></div>
+    <a class="heen" href="/apps/app.html">Zorg en verzorging in de app &#8594;</a>
+  </section>
+
+  <section aria-label="Rust en ritme">
+    <h2>Rust en ritme</h2>
+    <div id="adviezen"></div>
+    <a class="heen" href="/apps/balans.html">Naar Balans &#8594;</a>
+  </section>
+
+  <div id="grens" class="rtgdeel-vast"></div>
+</main>
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const esc = s => Veilig.esc(String(s == null ? '' : s));
+
+  function tekenWinst(w) {
+    if (!w) { $('#winst').innerHTML = ''; return; }
+    $('#winst').innerHTML = '<div class="winst"><span class="kop">' + esc(w.kop) + '</span>' +
+      '<p>' + esc(w.tekst) + '</p></div>';
+  }
+
+  /* Een signaal is gemeten of niet gemeten; er is geen derde vorm. De
+     niet-gemeten regels blijven staan MET hun reden, want een weggelaten regel
+     leest als "hier valt niets te halen" en een lege plek als een storing. */
+  function tekenSignalen(lijst) {
+    $('#signalen').innerHTML = lijst.map(s => s.gemeten
+      ? '<div class="sig"><span class="naam">' + esc(s.naam) +
+          (s.uitleg ? '<span class="uit">' + esc(s.uitleg) + '</span>' : '') + '</span>' +
+        '<span><span class="waarde">' + esc(s.waarde) + '</span>' +
+          '<span class="eenheid">' + esc(s.eenheid) + '</span></span></div>'
+      : '<div class="sig leeg"><span class="naam">' + esc(s.naam) +
+          '<span class="uit">' + esc(s.reden) + '</span></span>' +
+        '<span class="waarde">niet gemeten</span></div>').join('');
+  }
+
+  function tekenDoelen(d) {
+    if (!d.length) {
+      $('#doelen').innerHTML = '<p class="stil">U heeft nog geen doel staan.</p>';
+      return;
+    }
+    $('#doelen').innerHTML = d.map(x => {
+      const pct = x.aandeel == null ? null : Math.round(x.aandeel * 100);
+      return '<div class="kaartje"><b>' + esc(x.titel) + '</b>' +
+        '<span class="m">' + esc(x.bericht) + '</span>' +
+        (pct == null ? '' : '<div class="balk"><i style="width:' + pct + '%;"></i></div>') +
+        '</div>';
+    }).join('');
+  }
+
+  function tekenAfspraken(a) {
+    if (!a.length) {
+      $('#afspraken').innerHTML = '<p class="stil">Er staat niets gepland bij zorg of verzorging.</p>';
+      return;
+    }
+    $('#afspraken').innerHTML = a.map(x => '<div class="kaartje"><b>' + esc(x.wat) + '</b>' +
+      '<span class="m">' + esc(x.waar) + ' &middot; ' + esc(x.datum) + ' om ' + esc(x.tijd) +
+      ' &middot; ' + (x.soort === 'zorg' ? 'zorg' : 'verzorging') + '</span></div>').join('');
+  }
+
+  function tekenAdviezen(a) {
+    $('#adviezen').innerHTML = a.length
+      ? a.map(x => '<div class="kaartje"><span class="m">' + esc(x.tekst) + '</span></div>').join('')
+      : '<p class="stil">Uw week geeft op dit moment geen aanleiding tot advies.</p>';
+  }
+
+  /* Een laag die het niet doet, staat op het scherm. Stil overslaan zou hier
+     betekenen dat "geen afspraken" en "de zorglaag is stuk" er hetzelfde
+     uitzien, en dat is precies het verschil dat je wilt zien. */
+  function tekenStoringen(s) {
+    if (!s || !s.length) return;
+    $('#winst').insertAdjacentHTML('beforeend', s.map(t =>
+      '<div class="storing" role="status">' + esc(t) + ' Wat hieronder staat is daardoor niet compleet.</div>').join(''));
+  }
+
+  async function laad() {
+    try {
+      const d = await Veilig.api('/api/life');
+      tekenWinst(d.winst);
+      tekenSignalen(d.signalen || []);
+      tekenDoelen(d.doelen || []);
+      tekenAfspraken(d.afspraken || []);
+      tekenAdviezen(d.adviezen || []);
+      tekenStoringen(d.storingen);
+    } catch (e) {
+      $('#signalen').innerHTML = '<p class="stil">' + esc(e.message) + '</p>';
+    }
+  }
+
+  if (document.readyState !== 'loading') laad();
+  else window.addEventListener('load', laad);
+})();
+</script>
+<script src="/shared/deelmenu.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
+<script src="/shared/ios.js" defer></script>
+</body>
+</html>

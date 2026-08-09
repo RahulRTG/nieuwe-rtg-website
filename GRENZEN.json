@@ -312,6 +312,9 @@
       "schoolbieb",
       "status"
     ],
+    "life": [
+      "lifeVoor"
+    ],
     "livinglab": [
       "id",
       "livinglab",

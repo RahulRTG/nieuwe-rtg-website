@@ -564,14 +564,23 @@
     {
       "id": "countrypack",
       "wat": "Country packs: een nieuw land activeren als configuratiebundel",
-      "groep": "Nog open",
-      "dekking": []
+      "groep": "Command: zien, besturen, automatiseren",
+      "dekking": [
+        "LANDEN.json",
+        "server/kern/command/landpakket.js",
+        "/api/command/land"
+      ],
+      "let": "Een pakket dekt de INRICHTING en nooit de naleving: btw-registratie, loonaangifte en een toezichthouder staan per land als mensenwerk, en die lijst wordt niet korter door te activeren. LANDEN.json draagt alleen wat nergens anders staat -- de fiscale kennis komt uit kern/fiscaal/landen.js (189 landen), de muntschaal uit kern/payroll/valuta.js."
     },
     {
       "id": "citybootstrap",
       "wat": "City bootstrap: een nieuwe stad automatisch inrichten",
-      "groep": "Nog open",
-      "dekking": []
+      "groep": "Command: zien, besturen, automatiseren",
+      "dekking": [
+        "server/kern/command/stadstart.js",
+        "/api/command/stad"
+      ],
+      "let": "Richt de ADMINISTRATIE in: een stad krijgt een land (het landpakket moet aanstaan), een naam op dezelfde normalisatie als de schakelkast, en de per-plaats-standen. Wat het NIET doet staat er als openstaande stap bij: het stadsweefsel draagt vandaag een geografie zonder sleutel welke stad, dus een tweede stad met eigen zones en Stadsdozen is een verbouwing van die laag en geen knop hier."
     },
     {
       "id": "acquisition",

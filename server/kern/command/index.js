@@ -59,38 +59,16 @@ function maakCommand({ db, save, crypto, anthropic }) {
      termijn" uit te komen en niet stilzwijgend dat van RTG. */
   const herkomst = require('./herkomst').maakHerkomst({ db, register, graaf, journaal, runbooks,
     bewaarbeleid: require('../../bewaarbeleid').BELEID });
-  /* Master data voor bedrijven en locaties. Welke collecties een partij dragen
-     en welk veld de naam en de plaats is, staat HIER en niet in de module: dat
-     is aangegeven en geen meting, en het hoort op één plek te staan. De
-     plaatsnormalisatie komt uit de schakelkast, want die bepaalt al of een
-     functie in jouw woonplaats openstaat -- twee normalisaties zouden betekenen
-     dat die twee schermen het over een andere stad hebben. */
-  const mdm = require('./mdm').maakMdm({ db, save, journaal,
-    plaatsNorm: require('../../functies/toegang').plaatsNorm,
-    partijen: [
-      { type: 'zaak', collectie: 'suppliers', sleutel: 'code', naam: 'name', plaats: 'city', loc: 'loc' },
-      { type: 'partner', collectie: 'partners', sleutel: 'code', naam: 'name', plaats: 'city' }
-    ] });
-  /* De API-poort: sleutels, scopes, quota en contractregels voor koppelingen.
-     De toelating begint LEEG, dus er staat niets achter deze poort tot iemand
-     er een pad in zet. Dat is een besluit; zie de kop van ./apipoort.js. */
-  const apipoort = require('./apipoort').maakApiPoort({ db, save, crypto, journaal });
-  /* Overnamemodus: de administratie van een overgenomen bedrijf inlezen, in
-     vier stappen waarvan de volgorde de veiligheid is. Uitvoeren kan alleen met
-     het zegel van precies de droogloop die is bekeken. */
-  const overname = require('./overname').maakOvername({ db, save, crypto, journaal, register });
-  /* De zandbak: dezelfde motoren op een DB-VENSTER met zaaigegevens. Er is geen
-     aanroep waarlangs een handeling daarbinnen bij een productiecollectie komt,
-     want het object dat die motoren zien heeft die collecties niet. */
-  const zandbak = require('./zandbak').maakZandbak({ db, save, crypto, register,
-    zaai: require('../../seed') });
-  /* De canary: een functie uit de schakelkast stap voor stap openzetten, met
-     een terugroldrempel die op DEZELFDE tellers rekent als de servicedoelen.
-     De verdeling zelf woont niet hier maar in server/functies/toegang.js, bij
-     de code die al beslist of een pad open is -- één beslisser, geen tweede. */
-  const canary = require('./canary').maakCanary({ db, save, journaal,
-    meting: require('../../meting'), functies: require('../../functies/register') });
-  canary.tikker();
+  /* DE LAGEN DIE OP DE RUGGENGRAAT STAAN, en die staan in ./lagen.js. Hier
+     boven staat de ruggengraat zelf: register, journaal, beleid, risico,
+     recepten, operator, puls. Daaronder komen de lagen die daarop leunen --
+     master data, landpakketten, de API-poort, de overname, de zandbak en de
+     canary. Ze zijn uit dit bestand gehaald toen het over de 10 kB-grens ging;
+     de naad lag er al, want dit zijn allemaal dingen die de ruggengraat
+     GEBRUIKEN en die de ruggengraat zelf niet nodig heeft. */
+  const lagen = require('./lagen').maakLagen({ db, save, crypto, journaal, register });
+  const { mdm, landpakket, apipoort, overname, zandbak, canary, stadstart } = lagen;
+
   /* De meetkant van niveau 5. De sonde levert de metingen van BUITENAF en de
      SLO-meter houdt het foutbudget bij; ze staan in deze volgorde omdat de
      meter de sonde erbij zet en niet andersom. De reizen komen uit dezelfde
@@ -160,7 +138,7 @@ function maakCommand({ db, save, crypto, anthropic }) {
   }
 
   return { journaal, beleid, risico, toegang, zaken, runbooks, toezicht, operator, puls,
-    simulatie, werkbesparing, kwaliteit, graaf, herkomst, slo, sonde, canary, zandbak, mdm, overname, apipoort,
+    simulatie, werkbesparing, kwaliteit, graaf, herkomst, slo, sonde, canary, zandbak, mdm, overname, apipoort, landpakket, stadstart,
     zoek, bereik, dossier, actiesVoor, start, register };
 }
 

@@ -129,6 +129,25 @@ module.exports = ({ app, officeAuth, veilig, wie, command }) => {
   app.post('/api/command/apipoort/intrekken', officeAuth, (req, res) => veilig(res, () =>
     command.apipoort.trekIn(String(req.body.id || ''), wie(req), req.body.reden)));
 
+  /* Landpakketten. Activeren zet alleen de per-land-standen in de schakelkast;
+     de mensenwerk-lijst blijft staan en verdwijnt niet door te activeren. */
+  app.post('/api/command/land', officeAuth, (req, res) => veilig(res, () =>
+    command.landpakket.stand(req.body.land ? String(req.body.land) : null)));
+  app.post('/api/command/land/activeer', officeAuth, (req, res) => veilig(res, () =>
+    command.landpakket.activeer(String(req.body.land || ''), wie(req))));
+  app.post('/api/command/land/terug', officeAuth, (req, res) => veilig(res, () =>
+    command.landpakket.terug(String(req.body.land || ''), wie(req))));
+
+  /* Stadsstart. De stand is met opzet eerlijker dan de knop: "gestart"
+     betekent dat de administratie klaarstaat, niet dat de stad draait. */
+  app.post('/api/command/stad', officeAuth, (req, res) => veilig(res, () =>
+    command.stadstart.stand(req.body.naam ? String(req.body.naam) : null)));
+  app.post('/api/command/stad/start', officeAuth, (req, res) => veilig(res, () =>
+    command.stadstart.start(String(req.body.naam || ''), { land: req.body.land, sluit: req.body.sluit,
+      door: wie(req) })));
+  app.post('/api/command/stad/stop', officeAuth, (req, res) => veilig(res, () =>
+    command.stadstart.stop(String(req.body.naam || ''), wie(req))));
+
   /* De melding van buitenaf. Zie de kop hierboven voor de twee sloten. */
   app.post('/api/sonde/melding', meetpoort, (req, res) => {
     const r = command.sonde.meld(req.body || {});

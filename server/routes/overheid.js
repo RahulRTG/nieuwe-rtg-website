@@ -33,22 +33,7 @@ module.exports = (kern) => {
   // het handelsregister-overzicht voor de ambtenaar
   app.post('/api/overheid/kvk/lijst', supplierAuth, rijk, (req, res) => res.json(overheid.kvkLijst()));
 
-  /* ---- het Belastingkantoor: de inspecteurscockpit (kern/overheid/kantoor.js) ---- */
-  app.post('/api/overheid/bd/cockpit', supplierAuth, rijk, (req, res) => res.json(overheid.bdCockpit()));
-  app.post('/api/overheid/bd/aanslagen', supplierAuth, rijk, (req, res) => res.json(overheid.bdAanslagen(req.body || {})));
-  app.post('/api/overheid/bd/btw', supplierAuth, rijk, (req, res) => res.json(overheid.bdBtwBeeld()));
-  /* De aansluiting: wat het factuurregister zegt naast wat er is aangegeven.
-     Zonder periode de laatst AFGESLOTEN -- over een lopend kwartaal hoort er nog
-     niets te zijn ingediend, dus daarop openen zou loos alarm zijn. */
-  app.post('/api/overheid/bd/btw/aansluiting', supplierAuth, rijk, (req, res) =>
-    stuur(res, overheid.bdBtwAansluiting(String((req.body || {}).periode || '') || overheid.vorigeBtwPeriode())));
-  app.post('/api/overheid/bd/herinnering', supplierAuth, rijk, (req, res) => stuur(res, overheid.bdHerinnering(wie(req), String(req.body.ref || ''))));
-  app.post('/api/overheid/bd/regeling', supplierAuth, rijk, (req, res) => stuur(res, overheid.bdRegeling(wie(req), String(req.body.ref || ''), req.body.maanden)));
-  app.post('/api/overheid/bd/kwijt', supplierAuth, rijk, (req, res) => stuur(res, overheid.bdKwijtschelding(wie(req), String(req.body.ref || ''), req.body.reden)));
-  app.post('/api/overheid/bd/ai', supplierAuth, rijk, async (req, res) => {
-    try { res.json(await overheid.bdAI(String(req.body.vraag || ''))); }
-    catch (e) { res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
-  });
+  require('./overheid-bd')(kern, { rijk, stuur, wie });
 
   /* ---- De Rechtspraak: de rechtbank (kern/overheid/rechtbank.js) ---- */
   app.post('/api/overheid/rb/cockpit', supplierAuth, rijk, (req, res) => res.json(overheid.rbCockpit()));

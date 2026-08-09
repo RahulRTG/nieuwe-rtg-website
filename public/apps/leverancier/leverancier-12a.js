@@ -16,12 +16,16 @@
      app zelf, en kunnen renderStation (deel 15) en de bedrading (deel 22) er
      allebei bij. Aan het eind van deel 12 zat dit middenin een andere functie
      en was het op het scherm een ReferenceError; check.js regel 42 wees dat aan. */
-  let btwData = null, btwBusy = false, btwOpen = null, btwMsg = '';
+  let btwData = null, btwBusy = false, btwOpen = null, btwMsg = '', btwNaheff = null;
   async function laadBtw(){
     if (btwBusy) return;
     btwBusy = true;
     try { btwData = await API.call('/supplier/btw/aangiftes', {}); }
     catch(e){ btwData = { error: e.message, aangiftes: [] }; }
+    /* De naheffingen die de Belastingdienst oplegde. Concepten zitten er niet
+       bij -- die filtert de server weg, want een concept is nog geen besluit. */
+    try { btwNaheff = (await API.call('/supplier/btw/naheffingen', {})).naheffingen; }
+    catch(e){ btwNaheff = []; }
     btwBusy = false;
     renderStation();
   }
@@ -30,37 +34,6 @@
     let j = d.getUTCFullYear(), k = Math.floor(d.getUTCMonth() / 3) + 1;
     for (let i = 0; i < 5; i++){ uit.push(j + 'K' + k); k -= 1; if (k === 0){ k = 4; j -= 1; } }
     return uit;
-  }
-  function btwDetail(a){
-    if (!a) return '';
-    const rijen = (a.tarieven || []).map(r =>
-      '<div class="st-row"><span>'+T('fn.btwomzet','Omzet')+' '+r.tarief+'%'+
-      '<span class="sub">'+(r.rubriek ? T('fn.btwrub','rubriek')+' '+r.rubriek+' · ' : '')+
-        T('fn.grondslag','grondslag')+' '+eur(r.omzetCenten/100)+'</span>'+
-      '</span><b class="btw-btw">'+eur(r.btwCenten/100)+'</b></div>').join('')
-      || '<div class="tkc-who">'+T('fn.btwleeg','Geen facturen in deze periode.')+'</div>';
-    const terug = a.saldoCenten < 0;
-    return '<div class="btw-blok">'+
-      '<div class="st-row"><span><b>'+escT(a.periode)+'</b>'+(a.soort === 'correctie' ? ' ('+T('fn.btwcorr','correctie')+')' : '')+
-        '<span class="sub">'+escT(a.van)+' t/m '+escT(a.tot)+' · '+a.verkoopFacturen+' '+T('fn.btwvk','verkoopfacturen')+
-        ' · '+a.inkoopFacturen+' '+T('fn.btwik','inkoopfacturen')+'</span></span>'+
-        '<span class="sub">'+(a.stand === 'ingediend' ? T('fn.btwin','ingediend') : T('fn.btwcon','concept'))+'</span></div>'+
-      rijen+
-      '<div class="st-row streep"><span>'+T('fn.btwversch','Verschuldigde btw')+'</span><b>'+eur(a.verschuldigdCenten/100)+'</b></div>'+
-      '<div class="st-row"><span>'+T('fn.btwvoor','Voorbelasting')+'<span class="sub">'+T('fn.btwvoor.s','btw op uw inkoopfacturen')+'</span></span><b>- '+eur(a.voorbelastingCenten/100)+'</b></div>'+
-      '<div class="st-row streep"><span><b>'+(terug ? T('fn.btwterug','Terug te vragen') : T('fn.btwbetaal','Te betalen'))+'</b></span>'+
-        '<b class="btw-saldo '+(terug ? 'terug' : 'betaal')+'">'+eur(Math.abs(a.saldoCenten)/100)+'</b></div>'+
-      (a.verschilCenten != null ? '<div class="tkc-who">'+T('fn.btwversch2','Verschil met de ingediende aangifte')+': '+eur(a.verschilCenten/100)+'</div>' : '')+
-      (a.let ? '<div class="tkc-who">'+escT(a.let)+'</div>' : '')+
-      (a.stand === 'ingediend'
-        ? '<div class="tkc-who">'+T('fn.btwinop','Ingediend op')+' '+escT(String(a.ingediendOp).slice(0, 10))+' '+T('fn.btwdoor','door')+' '+
-            escT(a.ingediendDoor)+' · '+T('fn.btwkenmerk','kenmerk')+' '+escT(a.kenmerk)+'</div>'+
-          '<button class="obtn" id="btwCorr" data-p="'+escT(a.periode)+'">'+T('fn.btwmaakcorr','Correctie opmaken')+'</button>'
-        : a.periodeLoopt ? ''
-        : '<div class="btw-rij">'+
-          '<input class="st-in btw-kenmerk" id="btwKenmerk" placeholder="'+T('fn.btwkenmerk.ph','Kenmerk van de Belastingdienst')+'">'+
-          '<button class="obtn primary" id="btwDien" data-id="'+escT(a.id)+'">'+T('fn.btwdien','Indienen vastleggen')+'</button></div>')+
-      '</div>';
   }
   /* De kaart. Bewust NAAST "Btw deze maand" en niet als hetzelfde getal
      eronder: dat bord is de maandstand uit de kassa en de boekingen, de
@@ -81,7 +54,27 @@
       btwDetail(toon)+
       (eerder.length > 1 ? '<div class="tkc-who btw-eerder">'+T('fn.btweerder','Eerder')+': '+
         eerder.slice(1, 6).map(a => escT(a.periode)+' ('+(a.stand === 'ingediend' ? T('fn.btwin','ingediend') : T('fn.btwcon','concept'))+')').join(' · ')+'</div>' : '')+
+      btwNaheffingen()+
       '</div>';
+  }
+  /* De naheffingen. Alleen tonen wat er staat: het bedrag, de grond van een
+     boete en het besluit op een bezwaar komen alle drie van de Belastingdienst,
+     en het scherm rekent of vertaalt er niets aan. */
+  function btwNaheffingen(){
+    if (!btwNaheff || !btwNaheff.length) return '';
+    return '<div class="btw-blok"><b>'+T('fn.nh','Naheffing van de Belastingdienst')+'</b>'+
+      btwNaheff.map(n =>
+        '<div class="st-row"><span>'+escT(n.kenmerk)+' · '+escT(n.periode)+
+        '<span class="sub">'+T('fn.nh.stand','stand')+': '+escT(n.status)+
+        (n.boeteCenten ? ' · '+T('fn.nh.boete','boete')+' '+eur(n.boeteCenten/100)+(n.boeteGrond ? ' ('+escT(n.boeteGrond)+')' : '') : '')+
+        (n.vervaltOp ? ' · '+T('fn.nh.vervalt','vervalt')+' '+escT(n.vervaltOp) : '')+
+        (n.bezwaar && n.bezwaar.besluit ? ' · '+T('fn.nh.besluit','besluit op bezwaar')+': '+escT(n.bezwaar.besluit)+' · '+escT(n.bezwaar.motivering || '') : '')+
+        '</span></span><b class="btw-saldo betaal">'+eur(n.totaalCenten/100)+'</b></div>'+
+        (n.status === 'vastgesteld'
+          ? '<div class="btw-rij"><input class="st-in btw-kenmerk" id="nhr'+escT(n.id)+'" placeholder="'+T('fn.nh.reden','Waarom bent u het er niet mee eens?')+'">'+
+            '<button class="obtn" data-nhbez="'+escT(n.id)+'">'+T('fn.nh.bezwaar','Bezwaar maken')+'</button></div>'
+          : n.status === 'bezwaar' ? '<div class="tkc-who">'+T('fn.nh.loopt','Uw bezwaar loopt; een andere inspecteur beoordeelt het.')+'</div>' : '')
+      ).join('')+'</div>';
   }
   function btwBedrading(el){
     async function opmaken(periode, correctie){
@@ -95,6 +88,15 @@
     }
     const bO = el.querySelector('#btwOp'); if (bO) bO.addEventListener('click', () => opmaken(el.querySelector('#btwPer').value, false));
     const bC = el.querySelector('#btwCorr'); if (bC) bC.addEventListener('click', () => opmaken(bC.dataset.p, true));
+    el.querySelectorAll('[data-nhbez]').forEach(b => b.addEventListener('click', async () => {
+      const veld = el.querySelector('#nhr' + b.dataset.nhbez);
+      btwMsg = '';
+      try {
+        const d = await API.call('/supplier/btw/naheffing/bezwaar', { id: b.dataset.nhbez, reden: veld ? veld.value : '' });
+        btwMsg = d.let || '';
+        btwData = null; await laadBtw();
+      } catch(e){ toast(e.message); btwMsg = e.message; renderStation(); }
+    }));
     const bD = el.querySelector('#btwDien'); if (bD) bD.addEventListener('click', async () => {
       btwMsg = '';
       try {

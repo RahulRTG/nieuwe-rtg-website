@@ -528,6 +528,10 @@ packages). Ze bewaken de plekken waar geld en wet aan hangen:
   hetzelfde tellen, en dat er over een lopende periode géén signalen komen —
   met een schermtoets (`test/btw-aansluiting-scherm.e2e.js`) die hetzelfde
   bedrag aan beide kanten van de tafel op het scherm zet;
+- de naheffingsaanslag (`test/btw-naheffing.test.js`): dat het bedrag uit de
+  aansluiting komt en niet uit het verzoek, dat dezelfde ogen niet dubbel
+  tellen bij vaststellen én bij het bezwaar erop, dat een boete niet zonder
+  grond bestaat, en dat een concept nog geen besluit is;
 - De Salon-rechten (gast liket wel, reageert niet), de bestel- en betaalflow
   en de AVG-rechten (inzage en definitieve verwijdering).
 
@@ -745,6 +749,47 @@ vergeleek twee verschillende dingen zonder dat iets dat zei. Het heet nu
 | Endpoint | Doel |
 |---|---|
 | `POST /api/overheid/bd/btw/aansluiting` `{periode?}` | Per zaak: geteld uit het register naast de ingediende aangifte, met verschil en stand; zonder periode de laatst afgesloten |
+
+#### En wat de inspecteur er dan van vindt: de naheffing (`kern/overheid/naheffing.js`)
+
+Het is een **naheffing** en geen navordering. Btw is een aangiftebelasting — je
+berekent en betaalt hem zelf, en wat er niet is betaald wordt nageheven (art. 20
+AWR). Navordering hoort bij een aanslagbelasting zoals de inkomstenbelasting.
+Andere bevoegdheden, andere termijnen; de twee door elkaar halen is geen
+woordenspel.
+
+**Het bedrag wordt niet getypt.** Het komt uit de aansluiting: gefactureerd min
+aangegeven. Een naheffing met een invulveld is een tweede berekening naast het
+register, en dan gaat de discussie over het getal in plaats van over de feiten.
+
+**Vier ogen, en dezelfde ogen tellen nooit dubbel** (hetzelfde idioom als
+`kern/uitgifte.js`): wie hem opmaakt stelt hem niet vast, en wie hem opmaakte of
+vaststelde beslist niet op het bezwaar ertegen — een besluit laten heroverwegen
+door dezelfde persoon is geen heroverweging. De namen komen uit de
+personeelslogin op de persoonlijke pincode, nooit uit het verzoek.
+
+**De boete ontstaat nooit vanzelf.** Geen enkele stand levert er een op; een mens
+zet een percentage en schrijft erbij waarom. Zonder grond geen boete.
+
+Verder: een concept is nog geen besluit (de zaak ziet het niet en er staat geen
+bezwaar tegen open), een vastgestelde naheffing trek je niet stilletjes in, en
+vaststellen hertelt eerst — zijn de cijfers sinds het opmaken veranderd, dan
+weigert hij.
+
+**Wat hier niet gebeurt: innen.** Er beweegt geen geld. De naheffing is een
+besluit met een vervaldatum en een rechtsmiddel; de invordering is een eigen
+onderwerp (zie `bdHerinnering`/`bdRegeling` voor hoe dit huis dat bij aanslagen
+doet).
+
+| Endpoint | Doel |
+|---|---|
+| `POST /api/overheid/bd/naheffing/maak` `{periode?, code, boetePct?, boeteGrond?}` | Concept opmaken; bedrag uit de aansluiting |
+| `POST /api/overheid/bd/naheffing/stelvast` `{id}` | Vaststellen — moet een ándere inspecteur zijn; maakt bekend aan de zaak |
+| `POST /api/overheid/bd/naheffing/intrek` `{id, reden}` | Alleen een concept |
+| `POST /api/overheid/bd/naheffing/bezwaar/beslis` `{id, toewijzen, motivering}` | Derde ogen; toewijzen laat niets staan |
+| `POST /api/overheid/bd/naheffingen` `{status?, periode?}` | De lijst voor het kantoor |
+| `POST /api/supplier/btw/naheffingen` | De zaak leest zijn eigen (geen concepten) |
+| `POST /api/supplier/btw/naheffing/bezwaar` `{id, reden}` | De zaak maakt bezwaar |
 
 ### RTG School (de onderwijs-toren)
 

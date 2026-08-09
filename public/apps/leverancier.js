@@ -1638,12 +1638,16 @@
      app zelf, en kunnen renderStation (deel 15) en de bedrading (deel 22) er
      allebei bij. Aan het eind van deel 12 zat dit middenin een andere functie
      en was het op het scherm een ReferenceError; check.js regel 42 wees dat aan. */
-  let btwData = null, btwBusy = false, btwOpen = null, btwMsg = '';
+  let btwData = null, btwBusy = false, btwOpen = null, btwMsg = '', btwNaheff = null;
   async function laadBtw(){
     if (btwBusy) return;
     btwBusy = true;
     try { btwData = await API.call('/supplier/btw/aangiftes', {}); }
     catch(e){ btwData = { error: e.message, aangiftes: [] }; }
+    /* De naheffingen die de Belastingdienst oplegde. Concepten zitten er niet
+       bij -- die filtert de server weg, want een concept is nog geen besluit. */
+    try { btwNaheff = (await API.call('/supplier/btw/naheffingen', {})).naheffingen; }
+    catch(e){ btwNaheff = []; }
     btwBusy = false;
     renderStation();
   }
@@ -1653,6 +1657,84 @@
     for (let i = 0; i < 5; i++){ uit.push(j + 'K' + k); k -= 1; if (k === 0){ k = 4; j -= 1; } }
     return uit;
   }
+  /* De kaart. Bewust NAAST "Btw deze maand" en niet als hetzelfde getal
+     eronder: dat bord is de maandstand uit de kassa en de boekingen, de
+     aangifte is de periode uit het factuurregister. Twee verschillende vragen,
+     en ze horen niet als een cijfer gepresenteerd te worden. */
+  function btwKaart(){
+    if (!btwData && !btwBusy) laadBtw();
+    const eerder = ((btwData && btwData.aangiftes) || []).slice().sort((a, b) => (a.periode < b.periode ? 1 : -1));
+    const toon = btwOpen || eerder[0] || null;
+    return '<div class="tkc h-volbreed"><h3>'+T('fn.btwaan','Btw-aangifte')+'</h3>'+
+      '<div class="tkc-who">'+T('fn.btwaan.s','Opgemaakt uit uw factuurregister: elke regel telt mee met het tarief dat erop staat. Omzet zonder factuur staat er niet in. Controleren en indienen doet u zelf; RTG dient nooit voor u in en verzendt niets.')+'</div>'+
+      '<div class="btw-rij">'+
+      '<select class="st-in btw-per" id="btwPer">'+
+      btwPeriodes().map(p => '<option value="'+p+'"'+(toon && toon.periode === p ? ' selected' : '')+'>'+p+'</option>').join('')+'</select>'+
+      '<button class="obtn primary" id="btwOp">'+T('fn.btwopmaak','Opmaken')+'</button></div>'+
+      (btwMsg ? '<div class="tkc-who btw-melding">'+escT(btwMsg)+'</div>' : '')+
+      (btwData && btwData.error ? '<div class="tkc-who">'+escT(btwData.error)+'</div>' : '')+
+      btwDetail(toon)+
+      (eerder.length > 1 ? '<div class="tkc-who btw-eerder">'+T('fn.btweerder','Eerder')+': '+
+        eerder.slice(1, 6).map(a => escT(a.periode)+' ('+(a.stand === 'ingediend' ? T('fn.btwin','ingediend') : T('fn.btwcon','concept'))+')').join(' · ')+'</div>' : '')+
+      btwNaheffingen()+
+      '</div>';
+  }
+  /* De naheffingen. Alleen tonen wat er staat: het bedrag, de grond van een
+     boete en het besluit op een bezwaar komen alle drie van de Belastingdienst,
+     en het scherm rekent of vertaalt er niets aan. */
+  function btwNaheffingen(){
+    if (!btwNaheff || !btwNaheff.length) return '';
+    return '<div class="btw-blok"><b>'+T('fn.nh','Naheffing van de Belastingdienst')+'</b>'+
+      btwNaheff.map(n =>
+        '<div class="st-row"><span>'+escT(n.kenmerk)+' · '+escT(n.periode)+
+        '<span class="sub">'+T('fn.nh.stand','stand')+': '+escT(n.status)+
+        (n.boeteCenten ? ' · '+T('fn.nh.boete','boete')+' '+eur(n.boeteCenten/100)+(n.boeteGrond ? ' ('+escT(n.boeteGrond)+')' : '') : '')+
+        (n.vervaltOp ? ' · '+T('fn.nh.vervalt','vervalt')+' '+escT(n.vervaltOp) : '')+
+        (n.bezwaar && n.bezwaar.besluit ? ' · '+T('fn.nh.besluit','besluit op bezwaar')+': '+escT(n.bezwaar.besluit)+' · '+escT(n.bezwaar.motivering || '') : '')+
+        '</span></span><b class="btw-saldo betaal">'+eur(n.totaalCenten/100)+'</b></div>'+
+        (n.status === 'vastgesteld'
+          ? '<div class="btw-rij"><input class="st-in btw-kenmerk" id="nhr'+escT(n.id)+'" placeholder="'+T('fn.nh.reden','Waarom bent u het er niet mee eens?')+'">'+
+            '<button class="obtn" data-nhbez="'+escT(n.id)+'">'+T('fn.nh.bezwaar','Bezwaar maken')+'</button></div>'
+          : n.status === 'bezwaar' ? '<div class="tkc-who">'+T('fn.nh.loopt','Uw bezwaar loopt; een andere inspecteur beoordeelt het.')+'</div>' : '')
+      ).join('')+'</div>';
+  }
+  function btwBedrading(el){
+    async function opmaken(periode, correctie){
+      btwMsg = '';
+      try {
+        const d = await API.call('/supplier/btw/opmaken', { periode, correctie: !!correctie });
+        btwOpen = d.aangifte;
+        btwMsg = d.bijgewerkt ? T('fn.btwbij','De aangifte is bijgewerkt met de facturen die er sindsdien bij kwamen.') : '';
+        await laadBtw();
+      } catch(e){ toast(e.message); btwMsg = e.message; renderStation(); }
+    }
+    const bO = el.querySelector('#btwOp'); if (bO) bO.addEventListener('click', () => opmaken(el.querySelector('#btwPer').value, false));
+    const bC = el.querySelector('#btwCorr'); if (bC) bC.addEventListener('click', () => opmaken(bC.dataset.p, true));
+    el.querySelectorAll('[data-nhbez]').forEach(b => b.addEventListener('click', async () => {
+      const veld = el.querySelector('#nhr' + b.dataset.nhbez);
+      btwMsg = '';
+      try {
+        const d = await API.call('/supplier/btw/naheffing/bezwaar', { id: b.dataset.nhbez, reden: veld ? veld.value : '' });
+        btwMsg = d.let || '';
+        btwData = null; await laadBtw();
+      } catch(e){ toast(e.message); btwMsg = e.message; renderStation(); }
+    }));
+    const bD = el.querySelector('#btwDien'); if (bD) bD.addEventListener('click', async () => {
+      btwMsg = '';
+      try {
+        const d = await API.call('/supplier/btw/indienen', { id: bD.dataset.id, kenmerk: (el.querySelector('#btwKenmerk') || {}).value || '' });
+        btwOpen = d.aangifte; btwMsg = d.let || '';
+        await laadBtw();
+      } catch(e){ toast(e.message); btwMsg = e.message; renderStation(); }
+    });
+  }
+  /* ---- de btw-aangifte, deel 2: HET DETAIL van een aangifte ----
+
+     Afgesplitst van leverancier-12a.js, dat tegen de omvanglat aan liep toen de
+     naheffing erbij kwam. Op deze plek in de stroom -- de delen worden rauw
+     aaneengeplakt -- staat dit in dezelfde scope als btwKaart() hierboven, dus
+     die kan er gewoon bij; zie de kop van leverancier-12a.js voor waarom die
+     plek uitmaakt. */
   function btwDetail(a){
     if (!a) return '';
     const rijen = (a.tarieven || []).map(r =>
@@ -1683,48 +1765,6 @@
           '<input class="st-in btw-kenmerk" id="btwKenmerk" placeholder="'+T('fn.btwkenmerk.ph','Kenmerk van de Belastingdienst')+'">'+
           '<button class="obtn primary" id="btwDien" data-id="'+escT(a.id)+'">'+T('fn.btwdien','Indienen vastleggen')+'</button></div>')+
       '</div>';
-  }
-  /* De kaart. Bewust NAAST "Btw deze maand" en niet als hetzelfde getal
-     eronder: dat bord is de maandstand uit de kassa en de boekingen, de
-     aangifte is de periode uit het factuurregister. Twee verschillende vragen,
-     en ze horen niet als een cijfer gepresenteerd te worden. */
-  function btwKaart(){
-    if (!btwData && !btwBusy) laadBtw();
-    const eerder = ((btwData && btwData.aangiftes) || []).slice().sort((a, b) => (a.periode < b.periode ? 1 : -1));
-    const toon = btwOpen || eerder[0] || null;
-    return '<div class="tkc h-volbreed"><h3>'+T('fn.btwaan','Btw-aangifte')+'</h3>'+
-      '<div class="tkc-who">'+T('fn.btwaan.s','Opgemaakt uit uw factuurregister: elke regel telt mee met het tarief dat erop staat. Omzet zonder factuur staat er niet in. Controleren en indienen doet u zelf; RTG dient nooit voor u in en verzendt niets.')+'</div>'+
-      '<div class="btw-rij">'+
-      '<select class="st-in btw-per" id="btwPer">'+
-      btwPeriodes().map(p => '<option value="'+p+'"'+(toon && toon.periode === p ? ' selected' : '')+'>'+p+'</option>').join('')+'</select>'+
-      '<button class="obtn primary" id="btwOp">'+T('fn.btwopmaak','Opmaken')+'</button></div>'+
-      (btwMsg ? '<div class="tkc-who btw-melding">'+escT(btwMsg)+'</div>' : '')+
-      (btwData && btwData.error ? '<div class="tkc-who">'+escT(btwData.error)+'</div>' : '')+
-      btwDetail(toon)+
-      (eerder.length > 1 ? '<div class="tkc-who btw-eerder">'+T('fn.btweerder','Eerder')+': '+
-        eerder.slice(1, 6).map(a => escT(a.periode)+' ('+(a.stand === 'ingediend' ? T('fn.btwin','ingediend') : T('fn.btwcon','concept'))+')').join(' · ')+'</div>' : '')+
-      '</div>';
-  }
-  function btwBedrading(el){
-    async function opmaken(periode, correctie){
-      btwMsg = '';
-      try {
-        const d = await API.call('/supplier/btw/opmaken', { periode, correctie: !!correctie });
-        btwOpen = d.aangifte;
-        btwMsg = d.bijgewerkt ? T('fn.btwbij','De aangifte is bijgewerkt met de facturen die er sindsdien bij kwamen.') : '';
-        await laadBtw();
-      } catch(e){ toast(e.message); btwMsg = e.message; renderStation(); }
-    }
-    const bO = el.querySelector('#btwOp'); if (bO) bO.addEventListener('click', () => opmaken(el.querySelector('#btwPer').value, false));
-    const bC = el.querySelector('#btwCorr'); if (bC) bC.addEventListener('click', () => opmaken(bC.dataset.p, true));
-    const bD = el.querySelector('#btwDien'); if (bD) bD.addEventListener('click', async () => {
-      btwMsg = '';
-      try {
-        const d = await API.call('/supplier/btw/indienen', { id: bD.dataset.id, kenmerk: (el.querySelector('#btwKenmerk') || {}).value || '' });
-        btwOpen = d.aangifte; btwMsg = d.let || '';
-        await laadBtw();
-      } catch(e){ toast(e.message); btwMsg = e.message; renderStation(); }
-    });
   }
   // het vakwerk-dashboard (dienstverlenende genres): vandaag-bord, aanvragen, KPI's en AI
   let vakData = null, vakBusy = false, vakAiMsg = '', vakAiBusy = false, vakUren = null, vakPro = null;

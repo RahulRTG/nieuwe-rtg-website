@@ -19,7 +19,7 @@
    (kern/automatisering.js): Rahul zet klaar en herinnert, en dient nooit voor
    iemand in. Er is hier dus bewust GEEN kantoorroute die dat overneemt. */
 module.exports = (kern) => {
-  const { app, btwAangifte, supplierAuth, schoon } = kern;
+  const { app, btwAangifte, overheid, supplierAuth, schoon } = kern;
   if (!btwAangifte) return;
 
   const antwoord = (res, r) => (r && r.error) ? res.status(r.status || 400).json(r) : res.json(r);
@@ -66,5 +66,29 @@ module.exports = (kern) => {
     if (!a || a.code !== String(req.supplier.code).toUpperCase())
       return res.status(404).json({ error: 'Deze aangifte kennen we niet.' });
     antwoord(res, btwAangifte.dienIn(a.id, door, schoon(b.kenmerk, 40)));
+  });
+
+  /* ---- de naheffing die de Belastingdienst oplegde (kern/overheid/naheffing.js) ----
+
+     De zaak leest hier ZIJN naheffingen en maakt er bezwaar tegen. Concepten
+     zitten er niet bij: een concept is een gedachte van het kantoor en nog geen
+     besluit, en iets bekendmaken dat nog niet is vastgesteld zou de zaak laten
+     schrikken van iets wat misschien nooit komt. Dat filter staat in de motor,
+     niet hier.
+
+     Zoals overal: de zaakcode komt uit het TOKEN. Een code in het lijf zou
+     betekenen dat elke manager de naheffingen van de buurman opvraagt, en daar
+     staat zijn omzet in. */
+  app.post('/api/supplier/btw/naheffingen', supplierAuth, (req, res) => {
+    const door = managerOf(req, res); if (!door) return;
+    if (!overheid) return res.status(503).json({ error: 'De overheidslaag draait niet.' });
+    res.json(overheid.naheffingVanZaak(req.supplier.code));
+  });
+
+  app.post('/api/supplier/btw/naheffing/bezwaar', supplierAuth, (req, res) => {
+    const door = managerOf(req, res); if (!door) return;
+    if (!overheid) return res.status(503).json({ error: 'De overheidslaag draait niet.' });
+    const b = req.body || {};
+    antwoord(res, overheid.naheffingBezwaar(req.supplier.code, String(b.id || ''), schoon(b.reden, 800)));
   });
 };

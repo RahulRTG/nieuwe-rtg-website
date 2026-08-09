@@ -65,6 +65,7 @@
      attributen houden style-src-attr in de CSP open en worden geteld door de
      meter inlineStijlAttributen, die alleen omlaag mag. */
   .rij.kop{margin:0 0 .7rem;}
+  .rij.tussen{margin:.7rem 0;}
   .veld.kort{max-width:110px;}
   .item h4 .code{color:var(--soft);font-family:Inter,system-ui,sans-serif;}
   .let{color:var(--burgundy);}
@@ -130,6 +131,24 @@
       </div>
       <div id="aanslLijst"></div>
     </section>
+    <section class="paneel" id="p-nh">
+      <div class="item">
+        <h4>Naheffing opmaken</h4>
+        <div class="meta">Het bedrag komt uit de aansluiting en is niet in te vullen: gefactureerd min aangegeven.
+          Een boete ontstaat nooit vanzelf; zet hem zelf en schrijf erbij waarom.</div>
+        <div class="rij">
+          <input class="veld kort" id="nhPer" maxlength="7" placeholder="2026K2" aria-label="Periode">
+          <input class="veld kort" id="nhCode" maxlength="20" placeholder="Zaakcode" aria-label="Zaakcode">
+          <input class="veld kort" id="nhPct" type="number" min="0" max="100" placeholder="boete %" aria-label="Boetepercentage">
+          <input class="veld" id="nhGrond" maxlength="300" placeholder="Grond voor de boete (alleen bij een percentage)" aria-label="Grond voor de boete">
+          <button class="knop" id="nhMaak">Opmaken</button>
+        </div>
+      </div>
+      <div class="rij tussen">
+        <select class="veld" id="nhStand"><option value="">Alle naheffingen</option><option value="concept">Concept</option><option value="vastgesteld">Vastgesteld</option><option value="bezwaar">Bezwaar</option><option value="gehandhaafd">Gehandhaafd</option><option value="vernietigd">Vernietigd</option><option value="ingetrokken">Ingetrokken</option></select>
+      </div>
+      <div id="nhLijst"></div>
+    </section>
   </div>
 </main>
 <div class="melding" id="melding" role="status"></div>
@@ -183,9 +202,9 @@ $('#loginGo').addEventListener('click', async () => {
   } catch(e){ meld(e.message); }
 });
 
-const TABS = [['sig','Signalen'],['aan','Aanslagen'],['btw','Btw-beeld'],['aansl','Aansluiting']];
+const TABS = [['sig','Signalen'],['aan','Aanslagen'],['btw','Btw-beeld'],['aansl','Aansluiting'],['nh','Naheffingen']];
 let HUIDIG = 'sig';
-let SIGNALEN = null, AANSLAGEN = null, BTW = null, AANSL = null;
+let SIGNALEN = null, AANSLAGEN = null, BTW = null, AANSL = null, NH = null;
 /* Meenemen (shared/uitvoer.js): dit kantoor houdt drie registers vast en toont
    er altijd een. Wat u meeneemt is dus het tabblad dat OPEN staat, met de
    velden los -- niet de regel "Inkomen € 42.000 · aftrek € 3.100 · open" die
@@ -214,6 +233,13 @@ if (window.RTGUitvoer) RTGUitvoer.bron(() => {
       z.verschilCenten==null?'':z.verschilCenten/100, z.stand||'', z.kenmerk||'',
       z.ingediendOp?String(z.ingediendOp).slice(0,10):''])
   };
+  if (HUIDIG === 'nh' && NH) return {
+    naam: 'naheffingen',
+    kolommen: ['kenmerk','zaak','code','periode','naheffing','boete %','boete','totaal','stand','opgemaakt door','vastgesteld door','bezwaar'],
+    rijen: (NH.naheffingen||[]).map(n => [n.kenmerk||'', n.zaak||'', n.code||'', n.periode||'',
+      (n.naheffingCenten||0)/100, n.boetePct||0, (n.boeteCenten||0)/100, (n.totaalCenten||0)/100,
+      n.status||'', n.opgemaaktDoor||'', n.vastgesteldDoor||'', n.bezwaar ? (n.bezwaar.besluit||'loopt') : ''])
+  };
   if (HUIDIG === 'sig' && SIGNALEN) return {
     naam: 'signalen',
     kolommen: ['soort','kenmerk','wie','toelichting'],
@@ -224,11 +250,12 @@ if (window.RTGUitvoer) RTGUitvoer.bron(() => {
 function toon(t){
   HUIDIG = t;
   $('#tabs').querySelectorAll('.tab').forEach(b => b.classList.toggle('aan', b.dataset.t === t));
-  ['sig','aan','btw','aansl'].forEach(x => $('#p-'+x).classList.toggle('aan', x === t));
+  ['sig','aan','btw','aansl','nh'].forEach(x => $('#p-'+x).classList.toggle('aan', x === t));
   if (t === 'sig') laadCockpit();
   if (t === 'aan') laadAanslagen();
   if (t === 'btw') laadBtw();
   if (t === 'aansl') laadAansluiting();
+  if (t === 'nh') laadNaheffingen();
 }
 function start(){
   $('#tabs').innerHTML = TABS.map(([t,n]) => '<button class="tab" data-t="'+t+'">'+n+'</button>').join('');
@@ -325,10 +352,92 @@ async function laadAansluiting(){
             (z.kenmerk ? ' · kenmerk ' + esc(z.kenmerk) : '') +
             (z.soort === 'correctie' ? ' · correctie' : '')) +
         (z.ingeschreven ? '' : ' · <span class="status open">niet in het KVK-register</span>') +
-        '</div><div class="meta">' + esc(z.uitleg || '') + '</div></div>';
+        '</div><div class="meta">' + esc(z.uitleg || '') + '</div>' +
+        /* Alleen waar er iets te heffen valt, en alleen als de periode voorbij
+           is: over een lopend kwartaal weigert de server hem toch, en een knop
+           die altijd afketst is een knop die niet had moeten staan. */
+        (!r.periodeLoopt && (z.stand === 'wijkt_af' || z.stand === 'niet_aangegeven')
+          ? '<div class="rij"><button class="knop stil" data-nhvoor="' + esc(z.code) + '">Naheffing opmaken…</button></div>' : '') +
+        '</div>';
     }).join('') : '<div class="leeg">Geen facturen en geen aangiftes in deze periode.</div>');
+    /* De knop VULT het formulier en dient niets in: een naheffing die met een
+       tik ontstaat is een besluit zonder dat iemand naar de boete heeft gekeken. */
+    $('#aanslLijst').querySelectorAll('[data-nhvoor]').forEach(b => b.addEventListener('click', () => {
+      $('#nhPer').value = r.periode; $('#nhCode').value = b.dataset.nhvoor;
+      toon('nh');
+      $('#nhPct').focus();
+    }));
   } catch(e){ meld(e.message); }
 }
+/* De naheffingen. Alle knoppen hier zijn een VOORSTEL aan de server: die
+   bewaakt de vier ogen, want een scherm dat zelf bepaalt wie mag tekenen is een
+   scherm dat je omzeilt door een ander scherm te openen. De weigering die
+   terugkomt ("een ANDERE inspecteur", "geen heroverweging") is wat de ambtenaar
+   moet lezen, dus die wordt letterlijk getoond. */
+const NH_LABEL = { concept: ['goud','concept'], vastgesteld: ['open','vastgesteld'],
+  bezwaar: ['goud','bezwaar loopt'], gehandhaafd: ['open','gehandhaafd'],
+  vernietigd: ['ok','vernietigd'], ingetrokken: ['ok','ingetrokken'] };
+async function laadNaheffingen(){
+  try {
+    const r = await api('/api/overheid/bd/naheffingen', { status: $('#nhStand').value });
+    NH = r;
+    $('#nhLijst').innerHTML = (r.naheffingen.length ? r.naheffingen.map(n => {
+      const st = NH_LABEL[n.status] || ['','?'];
+      return '<div class="item' + (n.status === 'bezwaar' ? ' sig' : '') + '"><h4>' + esc(n.zaak) +
+        ' <small class="code">' + esc(n.kenmerk) + '</small> <span class="status ' + st[0] + '">' + st[1] + '</span></h4>' +
+        '<div class="meta">' + esc(n.periode) + ' · naheffing ' + euro(n.naheffingCenten/100) +
+        (n.boeteCenten ? ' · boete ' + euro(n.boeteCenten/100) + ' (' + n.boetePct + '%)' : ' · geen boete') +
+        ' · totaal <b>' + euro(n.totaalCenten/100) + '</b>' +
+        ' · opgemaakt door ' + esc(n.opgemaaktDoor) +
+        (n.vastgesteldDoor ? ' · vastgesteld door ' + esc(n.vastgesteldDoor) : '') +
+        (n.vervaltOp ? ' · vervalt ' + esc(n.vervaltOp) : '') + '</div>' +
+        (n.boeteGrond ? '<div class="meta">Grond voor de boete: ' + esc(n.boeteGrond) + '</div>' : '') +
+        (n.bezwaar ? '<div class="meta">Bezwaar: ' + esc(n.bezwaar.reden) +
+          (n.bezwaar.besluit ? ' · ' + esc(n.bezwaar.besluit) + ' door ' + esc(n.bezwaar.door) + ': ' + esc(n.bezwaar.motivering) : '') +
+          '</div>' : '') +
+        '<div class="rij">' +
+        (n.status === 'concept' ? '<button class="knop" data-nhvast="' + esc(n.id) + '">Vaststellen (andere ogen)</button>' +
+          '<input class="veld" data-nhreden="' + esc(n.id) + '" maxlength="300" placeholder="Reden van intrekken">' +
+          '<button class="knop stil" data-nhintrek="' + esc(n.id) + '">Intrekken</button>' : '') +
+        (n.status === 'bezwaar' ? '<input class="veld" data-nhmot="' + esc(n.id) + '" maxlength="600" placeholder="Motivering van het besluit">' +
+          '<button class="knop" data-nhtoe="' + esc(n.id) + '">Bezwaar toewijzen</button>' +
+          '<button class="knop rood" data-nhaf="' + esc(n.id) + '">Bezwaar afwijzen</button>' : '') +
+        '</div></div>';
+    }).join('') : '<div class="leeg">Geen naheffingen.</div>');
+    bindNaheffingen();
+  } catch(e){ meld(e.message); }
+}
+function bindNaheffingen(){
+  const doe = async (pad, lijf) => {
+    try { const r = await api(pad, lijf); if (r.let) meld(r.let); await laadNaheffingen(); }
+    catch(e){ meld(e.message); }
+  };
+  $('#nhLijst').querySelectorAll('[data-nhvast]').forEach(b => b.addEventListener('click',
+    () => doe('/api/overheid/bd/naheffing/stelvast', { id: b.dataset.nhvast })));
+  $('#nhLijst').querySelectorAll('[data-nhintrek]').forEach(b => b.addEventListener('click', () => {
+    const veld = $('#nhLijst').querySelector('[data-nhreden="' + b.dataset.nhintrek + '"]');
+    doe('/api/overheid/bd/naheffing/intrek', { id: b.dataset.nhintrek, reden: veld ? veld.value : '' });
+  }));
+  const beslis = (b, toewijzen) => {
+    const id = b.dataset.nhtoe || b.dataset.nhaf;
+    const veld = $('#nhLijst').querySelector('[data-nhmot="' + id + '"]');
+    doe('/api/overheid/bd/naheffing/bezwaar/beslis', { id, toewijzen, motivering: veld ? veld.value : '' });
+  };
+  $('#nhLijst').querySelectorAll('[data-nhtoe]').forEach(b => b.addEventListener('click', () => beslis(b, true)));
+  $('#nhLijst').querySelectorAll('[data-nhaf]').forEach(b => b.addEventListener('click', () => beslis(b, false)));
+}
+$('#nhMaak').addEventListener('click', async () => {
+  try {
+    const r = await api('/api/overheid/bd/naheffing/maak', { periode: $('#nhPer').value.trim(),
+      code: $('#nhCode').value.trim(), boetePct: Number($('#nhPct').value) || 0, boeteGrond: $('#nhGrond').value });
+    meld('Concept ' + r.naheffing.kenmerk + ' opgemaakt: ' + euro(r.naheffing.totaalCenten/100) +
+      '. Een ANDERE inspecteur stelt hem vast.');
+    $('#nhGrond').value = ''; $('#nhPct').value = '';
+    await laadNaheffingen();
+  } catch(e){ meld(e.message); }
+});
+$('#nhStand').addEventListener('change', laadNaheffingen);
+
 $('#aanslGa').addEventListener('click', laadAansluiting);
 $('#aanslPer').addEventListener('keydown', e => { if (e.key === 'Enter') laadAansluiting(); });
 

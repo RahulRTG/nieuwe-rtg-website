@@ -575,6 +575,14 @@
       "gezakt": 1,
       "scherp": "gezakt"
     },
+    "btw-naheffing.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/fiscaal/btwaangifte.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
     "btw-scherm.e2e.js": {
       "soort": "server",
       "staat": "gezakt",

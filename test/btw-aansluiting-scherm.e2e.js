@@ -87,6 +87,28 @@ test('Belastingkantoor: de aansluiting toont hetzelfde getal als de zaak zelf zi
     assert.match(tekst, /Deze periode loopt nog/, 'en over een lopende periode is dat geen verwijt');
     assert.match(tekst, /1 factuur\b/, 'een factuur is geen "1 facturen"');
 
+    /* De naheffingen-tab. Wat hier te bewijzen valt op een server waar alle
+       facturen van vandaag zijn: het tabblad tekent zich, het formulier staat er,
+       en de WEIGERING van de server komt er letterlijk uit in plaats van dat het
+       scherm er iets vriendelijkers van maakt. Over een lopend kwartaal valt
+       niets na te heffen, en dat is precies wat er moet komen te staan.
+
+       Het opleggen zelf staat in test/btw-naheffing.test.js: dat vraagt een
+       AFGESLOTEN tijdvak, en dat is via deze weg niet te maken. */
+    await page.click('.tab[data-t="nh"]');
+    await page.waitForSelector('#nhMaak', { timeout: 15000 });
+    assert.match(await page.$eval('#nhLijst', e => e.textContent), /Geen naheffingen/);
+
+    await page.fill('#nhPer', periode);
+    await page.fill('#nhCode', eigen.aangifte.code);
+    await page.click('#nhMaak');
+    await page.waitForFunction(() => /periode/.test(document.querySelector('#melding').textContent),
+      null, { timeout: 15000 });
+    assert.match(await page.$eval('#melding', e => e.textContent), /loopt de periode nog/,
+      'de weigering van de server staat er letterlijk');
+    assert.match(await page.$eval('#nhLijst', e => e.textContent), /Geen naheffingen/,
+      'en er is niets ontstaan');
+
     assert.deepEqual(fouten, [], 'geen JS-fouten tijdens het scherm');
   } finally {
     if (browser) await browser.close();

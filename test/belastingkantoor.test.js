@@ -166,3 +166,49 @@ test('8. een periode die niet bestaat wordt geweigerd, en het rijk is de enige l
     'een gewone zaak leest de aansluiting van iedereen niet');
   assert.equal((await api(base, '/api/overheid/bd/btw/aansluiting', {}, null)).status, 401);
 });
+
+/* ---- de naheffingsaanslag: de poorten en de weigeringen over HTTP ----
+   Het gedrag zelf staat in test/btw-naheffing.test.js, met een verzetbare klok:
+   naheffen kan alleen over een AFGESLOTEN tijdvak, en over deze server zijn alle
+   facturen van vandaag. Wat hier wel te bewijzen valt, is dat de routes bestaan,
+   dat ze achter het rijk hangen, en dat de weigering van de motor er echt
+   doorheen komt in plaats van een lege 200. */
+test('9. de naheffing hangt achter het rijk, en de weigering komt er ongeschonden uit', async () => {
+  const nu = new Date();
+  const lopend = nu.getUTCFullYear() + 'K' + (Math.floor(nu.getUTCMonth() / 3) + 1);
+
+  // over een LOPEND tijdvak valt niets na te heffen: er is nog niets te laat
+  const teVroeg = await api(base, '/api/overheid/bd/naheffing/maak', { periode: lopend, code: 'KIKUNOI' }, rijk);
+  assert.equal(teVroeg.status, 409);
+  assert.match(teVroeg.body.error, /loopt de periode nog/);
+
+  // en een onbekende zaak levert geen lege naheffing op
+  const onbekend = await api(base, '/api/overheid/bd/naheffing/maak', { periode: '2026K1', code: 'BESTAATNIET' }, rijk);
+  assert.equal(onbekend.status, 404);
+
+  const lijst = await api(base, '/api/overheid/bd/naheffingen', {}, rijk);
+  assert.equal(lijst.status, 200);
+  assert.deepEqual(lijst.body.naheffingen, [], 'er is er geen een opgemaakt');
+  assert.equal(lijst.body.openBezwaren, 0);
+
+  // de poorten: een gewone zaak en een anonieme bezoeker komen er niet in
+  for (const pad of ['/api/overheid/bd/naheffing/maak', '/api/overheid/bd/naheffing/stelvast',
+    '/api/overheid/bd/naheffing/intrek', '/api/overheid/bd/naheffing/bezwaar/beslis',
+    '/api/overheid/bd/naheffingen']) {
+    assert.equal((await api(base, pad, { id: 'x' }, partner)).status, 403, pad + ' voor een gewone zaak');
+    assert.equal((await api(base, pad, { id: 'x' }, null)).status, 401, pad + ' anoniem');
+  }
+});
+
+test('10. de zaak leest zijn eigen naheffingen en niemand anders die van hem', async () => {
+  const mijn = await api(base, '/api/supplier/btw/naheffingen', {}, partner);
+  assert.equal(mijn.status, 200);
+  assert.deepEqual(mijn.body.naheffingen, []);
+  // bezwaar tegen iets wat niet bestaat is een 404 en geen stille 200
+  const nep = await api(base, '/api/supplier/btw/naheffing/bezwaar',
+    { id: 'nhbestaatniet', reden: 'hier klopt niets van' }, partner);
+  assert.equal(nep.status, 404);
+  // en zonder token komt er niets uit
+  assert.equal((await api(base, '/api/supplier/btw/naheffingen', {}, null)).status, 401);
+  assert.equal((await api(base, '/api/supplier/btw/naheffing/bezwaar', { id: 'x' }, null)).status, 401);
+});

@@ -138,7 +138,10 @@ function maakOverheid({ db, save, crypto, anthropic, findSupplier, notify, notif
      heeft, krijgt hem via de ctx -- dat is de enige weg die deze laag kent. */
   const toezicht = require('./btwtoezicht')(ctx);
   Object.assign(ctx, toezicht);
-  Object.assign(api, toezicht,
+  /* De naheffing staat OP het toezicht: hij haalt zijn bedrag uit de
+     aansluiting en nergens anders, dus hij komt erna en krijgt hem via de ctx. */
+  const naheffing = require('./naheffing')(ctx);
+  Object.assign(api, toezicht, naheffing,
     require('./belasting')(ctx),
     require('./rdw')(ctx),
     require('./onderneming')(ctx),

@@ -1662,6 +1662,40 @@ Drie regels die de koppeling veilig maken:
 
 De kassa overschrijft de **weergave**, niet de administratie: de eigen voorraadrij van de zaak blijft staan zoals hij stond.
 
+### Kaart, land, filialen: waar iets is
+
+**De kaart** (`server/kern/mall/kaart.js`) is nadrukkelijk **geen straatkaart**. De CSP van dit huis staat geen vreemde tegelserver toe, en een kaartdienst inhuren betekent dat elke zoekopdracht — inclusief waar het lid staat — langs een andere partij komt. Wat er wel is: de onderlinge ligging, geprojecteerd op een vierkant vlak met de zoeker in het midden. Je ziet daarmee wat je van een kaart wilt weten in een zoeklijst (ligt dit bij elkaar, ligt dit bij mij) zonder iets naar buiten te sturen. De kaart gaat over **alle** treffers, niet over de zichtbare pagina, en treffers zonder coördinaat verdwijnen niet stilletjes maar komen terug als `zonderPunt` met een regel erbij: *"8 van de 40 treffers staan hier niet op."*
+
+**Het land** is de stap van een stad naar een werelddeel: filteren op `ES` zet Ibiza, Madrid en Marbella naast elkaar. Aanbod waarvan het land onbekend is valt weg — dat meenemen zou raden zijn. Het antwoord noemt zelf welke landen erin zitten (`landen`), zodat een scherm geen landenlijst hoeft te verzinnen.
+
+**Filialen** (`server/kern/mall/vestigingen.js`). Een zaak had precies één stad, en dus was de vestiging in Haarlem onvindbaar zodra het hoofdadres in Amsterdam stond. Er wordt géén kopie van het aanbod per vestiging gemaakt — dan staat hetzelfde brood twintig keer in de lijst en moet elke prijswijziging op twintig plaatsen landen. Het blijft één aanbod met een lijst plekken: `bedient()` is raak zodra één vestiging de plek bedient, `afstandTot()` meet naar de dichtstbijzijnde, en de zaak telt mee in elke stad waar zij staat. Wat dit **niet** modelleert: filialen met eigen prijzen, voorraden of openingstijden. Elk aanbod draagt daarom `perVestiging: false`.
+
+### Beoordelingen, bezorging, bewaren
+
+**Beoordelingen** bestonden al (1–5 sterren na afronding, lopende som in `reviewStats`). De Mall rekent er geen tweede gemiddelde naast uit: de som staat één keer in `server/kern/ervaring/rating.js` en wordt door zowel de reviewlaag als de Mall gelezen. RTG Thuis houdt reviews per *huis* bij en geeft daarom zijn eigen cijfer mee. **Een cijfer is geen keurmerk van RTG**, en dat staat er in de Mall bij.
+
+**Bezorging** leunt op de schakelaar die de zaak al had. De regel staat als pure functie in `server/kern/leverancier/bezorgregel.js`: bezorgen vraagt om *mogen* én *aanstaan*. Een zaak die de schakelaar uit heeft hoort niet in een bezorgfilter — anders stuurt de Mall iemand een bezorging in die niet komt.
+
+**Bewaren** (`server/kern/mall/bewaard.js`) is een systeemlijst in de gewone lijsten, geen tweede opslag. Omdat elke bewaarde regel zijn prijs en beschikbaarheid van het moment van bewaren meekrijgt, is het "prijsalarm" geen machinerie maar een vergelijking. En het is met opzet **geen melding**: geen push, geen e-mail, geen badge. Je ziet het wanneer je zelf kijkt, zonder aftelklok en zonder voorspelling dat iets duurder wordt. Regels van vóór deze versie hebben geen vastgelegde beschikbaarheid; daarover doet de laag géén uitspraak, maar ze worden wel geteld in `zonderVergelijking`.
+
+### Samengesteld aanbod en het bestellingenoverzicht
+
+**Collecties, bundels, evenementen en seizoenen** (`server/kern/mall/collecties.js`) zijn één ding met per soort een veld erbij: een benoemde set aanbod met een reden. De losse prijs van een bundel wordt **altijd uit het levende aanbod opgeteld en nooit bewaard** — een opgeslagen optelsom is morgen een leugen. En een bundel die een onderdeel mist is kapot: hij komt terug met `compleet: false`, zegt wat er ontbreekt en toont géén prijsvergelijk. Doorrekenen zonder onderdeel laat iemand een korting kopen die hij niet krijgt. Wat er geldt komt uit de **datum** en niet uit een vinkje "actief" — een vinkje dat niemand omzet is hoe een winteractie in juli blijft staan. Een zaak bundelt alleen haar eigen aanbod; het kantoor stelt over zaken heen samen.
+
+**Het bestellingenoverzicht** (`server/kern/mall/bestellingen.js`, `POST /api/mall/bestellingen`) doet wat de aanbodlaag doet, de andere kant op: uit vijf domeinen één overzicht van wat een lid lopen heeft. Er is **geen gezamenlijke afrekening** en die komt er niet: achter die regels zitten verschillende partijen met eigen bevestigingen. Elke regel wijst naar het domeinscherm dat hem beheert; er wordt hier niets geschreven. Een omvallende bron komt terug in `stuk` in plaats van als een korter lijstje, een onbekende status houdt zijn eigen naam, en `betaald` is `null` waar een bron het niet bijhoudt — `null` is niet `false`.
+
+### De zakelijke ingang en de concierge
+
+**De zakelijke Mall** (`POST /api/mall/zakelijk`) is geen tweede Mall maar dezelfde, anders gefilterd: alleen aanbod met een inkoopprijs, exclusief btw en met `btw:'ex'` erbij. De **pas** bepaalt dat, nooit het verzoek — een meegestuurd vinkje koopt geen inkoopprijs. Wie geen Business Pass heeft krijgt een 403 die naar een gesprek met RTG verwijst; de app mag zo'n pas nooit zelf verlenen.
+
+**De concierge** (`server/kern/mall/concierge.js`, `POST /api/mall/concierge`) is het enige stuk van de Mall waar een taalmodel bij komt, en de vorm is de beveiliging: het model vertaalt de zin naar **filters** en schrijft geen antwoordtekst. Wat het lid leest is opgeteld uit de echte treffers. Een model dat over aanbod mag antwoorden verzint vroeg of laat een restaurant, een prijs of een beschikbaarheid — en juist bij een bevestigde boeking, een echt hotelmerk als "partner" of een belofte over een pas is die schade niet terug te draaien.
+
+Drie dingen staan daarom in code en niet in de prompt:
+
+1. **Vragen over een pas gaan niet naar het model.** Lifestyle, Business, de ballotage en De Salon worden vóór de AI-aanroep herkend en beantwoord met een vaste doorverwijzing naar een mens. De regel is afgebakend: *"beachclub met toegang tot het strand"* is een gewone zoekvraag.
+2. **Wat uit het model komt is invoer.** Een verdieping of type dat niet bestaat wordt weggegooid én gemeld in `genegeerd`; "morgen" wordt niet tot een datum geraden. Een half begrepen vraag mag er niet uitzien als een goed begrepen vraag.
+3. **Zonder sleutel geen verzonnen antwoord.** De zin gaat als gewone zoektekst door dezelfde zoeklaag, en dat staat in het antwoord.
+
 ### De wallet en de ledenpas
 
 **apps/wallet.html** is alles wat je bij je draagt. Bovenaan ligt je **ledenpas**: codenaam, lidnummer, welke pas en een QR met je lidnummer (onze eigen codec, `shared/qr.js` + `shared/qrteken.js`). Daaronder je passen, tickets, sleutels, feestmunten en klantenkaarten (`/api/wallet`, `server/kern/wallet.js`). De pas stond vroeger op het beginscherm van de app; daar staat nu de klok.

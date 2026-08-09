@@ -245,7 +245,7 @@ test('10. een aanvraag zonder vak of plaats wordt geweigerd, met de reden', asyn
 
 test('11. elke route die de nieuwe schermen aanroepen, bestaat ook echt', async () => {
   const paden = new Set();
-  for (const f of ['mijnmall.js', 'mijnmall-aanvragen.js', 'leverancier-aanvragen.js']) {
+  for (const f of ['mijnmall.js', 'mijnmall-aanvragen.js', 'mijnmall-mijn.js', 'leverancier-aanvragen.js']) {
     const bron = fs.readFileSync(path.join(__dirname, '..', 'public', 'apps', f), 'utf8');
     for (const m of bron.matchAll(/api\('(\/api\/[a-z0-9/_-]+)'/g)) paden.add(m[1]);
   }

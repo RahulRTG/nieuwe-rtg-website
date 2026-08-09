@@ -157,6 +157,77 @@ test('schaken: om de beurt, en de beurt van het potje loopt met de kleur mee', a
     'twee zetten op rij hoort niet te kunnen');
 });
 
+/* Een potje kan ook door een ZET klaar raken, en dat pad legt de uitslag op een
+   andere plek vast dan opgeven. Zonder deze toets bleef die helft ongedekt:
+   een mutatie die het noteren uit spelZet haalt werd nergens rood.
+
+   Het herdersmat is het kortste dat bestaat: 1. f3 e5 2. g4 Dh4#. In de
+   bordindex van deze motor (rij 0 boven, wit onder): f2-f3 is 53->45, e7-e5 is
+   12->28, g2-g4 is 54->38, en de dame van d8 naar h4 is 3->39. */
+test('uitslagen: ook een potje dat door een zet eindigt levert een uitslag op', async () => {
+  const { a, b } = await tweeVrienden();
+  const voor = (await json(await raw('/member/spel/uitslagen', {}, b.tok))).uitslagen.length;
+  const nieuw = await json(await raw('/member/spel/nieuw', { soort: 'schaak', vrienden: [b.key] }, a.tok));
+  await raw('/member/spel/antwoord', { id: nieuw.id, akkoord: true }, b.tok);
+
+  const zet = async (van, naar, tok) => {
+    const r = await raw('/member/spel/zet', { id: nieuw.id, zet: { van, naar } }, tok);
+    assert.equal(r.status, 200, 'zet ' + van + '->' + naar + ' hoort te mogen');
+    return json(r);
+  };
+  await zet(53, 45, a.tok);          // f3
+  await zet(12, 28, b.tok);          // e5
+  await zet(54, 38, a.tok);          // g4
+  await zet(3, 39, b.tok);           // Dh4 -- mat
+
+  const st = await json(await raw('/member/spel/staat', { id: nieuw.id }, a.tok));
+  assert.equal(st.potje.status, 'klaar', 'het potje is uit');
+  assert.equal(st.potje.winnaar, b.cn, 'zwart gaf mat');
+
+  const na = await json(await raw('/member/spel/uitslagen', {}, b.tok));
+  assert.equal(na.uitslagen.length, voor + 1, 'de gewonnen partij staat in de historie');
+  assert.equal(na.uitslagen[0].id, nieuw.id);
+  assert.equal(na.uitslagen[0].ik, true, 'b won');
+  assert.equal(na.uitslagen[0].gelijk, false);
+});
+
+/* Een uitslag ontstaat uit een ECHT afgelopen potje, en niet doordat een toets
+   hem er zelf in zet. Opgeven is de kortste weg naar "klaar" die alle spellen
+   delen -- daarom loopt deze toets daarlangs. */
+test('uitslagen: een afgelopen potje levert een uitslag op, en die is van jou', async () => {
+  const { a, b } = await tweeVrienden();
+  const voor = await json(await raw('/member/spel/uitslagen', {}, a.tok));
+  const nieuw = await json(await raw('/member/spel/nieuw', { soort: 'schaak', vrienden: [b.key] }, a.tok));
+  await raw('/member/spel/antwoord', { id: nieuw.id, akkoord: true }, b.tok);
+
+  // nog niets: het potje loopt
+  const tijdens = await json(await raw('/member/spel/uitslagen', {}, a.tok));
+  assert.equal(tijdens.uitslagen.length, voor.uitslagen.length, 'een lopend potje is nog geen uitslag');
+
+  assert.equal((await raw('/member/spel/opgeven', { id: nieuw.id }, a.tok)).status, 200);
+
+  const na = await json(await raw('/member/spel/uitslagen', {}, a.tok));
+  assert.equal(na.uitslagen.length, voor.uitslagen.length + 1, 'er staat er een bij');
+  const r = na.uitslagen[0];
+  assert.equal(r.id, nieuw.id);
+  assert.equal(r.soort, 'schaak');
+  assert.equal(r.ik, false, 'wie opgeeft wint niet');
+  assert.deepEqual(r.tegen, [{ codenaam: b.cn, won: true }], 'de ander won, op codenaam');
+
+  // en b ziet dezelfde partij vanaf zijn kant
+  const bijB = await json(await raw('/member/spel/uitslagen', {}, b.tok));
+  assert.equal((bijB.uitslagen[0] || {}).ik, true, 'b heeft gewonnen');
+});
+
+test('uitslagen: onder de 18+-grens bestaat er geen historie', async () => {
+  const t = Date.now() + '' + (teller++);
+  const jong = await json(await raw('/auth/register', { name: 'Jong U' + t, email: 'ju' + t + '@v.test', phone: '0679' + String(t).slice(-6), password: 'geheim123', geboortedatum: '2010-01-01', tier: 'rtg' }));
+  const r = await json(await raw('/member/spel/uitslagen', {}, jong.token));
+  assert.deepEqual(r.uitslagen, []);
+  assert.equal(r.progressie, false);
+  assert.match(r.reden, /geverifieerde volwassen leeftijd/);
+});
+
 test('woordduel: het woordenboek keurt; een echt NL-woord over het midden scoort', async () => {
   const { a, b } = await tweeVrienden();
   const nieuw = await json(await raw('/member/spel/nieuw', { soort: 'woord', vrienden: [b.key] }, a.tok));

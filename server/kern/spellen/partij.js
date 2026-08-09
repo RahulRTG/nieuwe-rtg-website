@@ -3,7 +3,7 @@
    en opgeven. Krijgt de gedeelde context een keer bij het opstarten vanuit
    kern/spellen.js. */
 module.exports = (ctx) => {
-  const { db, save, crypto, codenaamVan, S, SPEL, SOORTEN, nudge, VIEWS, ZETTEN, STATISCH } = ctx;
+  const { db, save, crypto, codenaamVan, S, SPEL, SOORTEN, nudge, VIEWS, ZETTEN, STATISCH, noteerUitslag } = ctx;
   /* De weergave per spel (de staat zoals EEN speler hem mag zien: handen en
      rekken van anderen blijven verborgen) staat in het spel zelf en komt via
      het register mee in VIEWS. Een spel zonder eigen weergave komt het
@@ -38,7 +38,14 @@ module.exports = (ctx) => {
        antwoord en de vlag bewaakte niets. Zie de kop van spellen/schaak.js. */
     const beheer = zet && (SPEL[p.soort].buitenBeurt || []).includes(zet.actie);
     if (!beheer && p.spelers[p.beurt] !== mij) return { status: 409, error: 'De ander is aan zet.' };
-    return ZETTEN[p.soort](p, mij, zet || {});
+    const r = ZETTEN[p.soort](p, mij, zet || {});
+    /* Een potje kan door de zet zelf klaar raken (mat, laatste kaart, doel
+       bereikt). Dat vastleggen hoort HIER en niet in elk spel apart: zestien
+       motoren die er elk aan moeten denken is zestien kansen om het te
+       vergeten, en dat merk je pas als een uitslag ontbreekt. noteerUitslag is
+       idempotent, dus een dubbele aanroep kan geen kwaad. */
+    if (p.status === 'klaar') noteerUitslag(p);
+    return r;
   }
   function spelOpgeven(mij, id) {
     const p = S().potjes[id];
@@ -47,6 +54,7 @@ module.exports = (ctx) => {
     p.status = 'klaar';
     const rest = p.spelers.filter(sp => sp !== mij);
     p.winnaar = rest.length === 1 ? codenaamVan(rest[0]) : rest.map(codenaamVan).join(' & ');
+    noteerUitslag(p);   // opgeven is ook een uitslag: de rest heeft gewonnen
     save();
     rest.forEach(sp => nudge(sp, p));
     return { status: 200, ok: true };

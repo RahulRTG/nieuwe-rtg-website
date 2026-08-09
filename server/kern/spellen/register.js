@@ -43,7 +43,8 @@ const fs = require('fs'), path = require('path');
 /* Deelmodules die geen spel zijn maar wel in deze map wonen. Bewust een
    expliciete lijst: een helper die je hier neerzet en vergeet toe te voegen
    valt op bij het opstarten, in plaats van stil mee te scannen. */
-const GEEN_SPEL = new Set(['register.js', 'lobby.js', 'partij.js', 'rahul.js', 'klas.js', 'quiz-data.js', 'presence.js']);
+const GEEN_SPEL = new Set(['register.js', 'lobby.js', 'partij.js', 'rahul.js', 'klas.js', 'quiz-data.js',
+  'presence.js', 'uitslagen.js']);
 
 // wat een descriptor MOET hebben, per vorm; ontbreekt er iets, dan noemen we
 // het bestand EN wat er mist -- zoeken naar "welke had ik ook alweer" is de

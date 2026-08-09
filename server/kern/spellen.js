@@ -107,21 +107,6 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
     lidBoardUit: lidBoardUit || (() => false)
   });
 
-  /* De lobby- en partijlaag draaien als submodules op een gedeelde
-     context, een keer opgebouwd bij het opstarten. */
-  const ctx = { db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, isGeblokkeerd, socialZoek, sociaalRate, volwassen,
-    rid, nu, S, SPEL, SOORTEN, TEAMS, wereldFout, leeftijdFout, nudge, schud, beurtDoor, opschonen,
-    INITS, ZETTEN, VIEWS, STATISCH, klasgenotenVan };
-  const { spelStart, spelGrootte, spelNieuw, spelAntwoord, spelRandom, mijnSpellen } = require('./spellen/lobby')(ctx);
-  const { spelStaat, spelZet, spelOpgeven } = require('./spellen/partij')(ctx);
-  // Rahul als spelmaatje: in elk potje op te roepen voor hints, regels of een peptalk
-  const { spelRahul } = require('./spellen/rahul')(Object.assign({ anthropic }, ctx));
-
-  /* ================= arcade: ranglijsten onder vrienden =================
-     Welke arcadespellen er zijn staat niet hier maar in het register: elk
-     heeft een eigen module met een `vorm: 'arcade'`-descriptor. Deze laag
-     kent dus geen spelnamen, alleen de vorm. */
-
   /* DE PROGRESSIEGRENS. Alles wat een prestatie BUITEN het potje bewaart --
      highscores, ranglijsten, later niveaus, prestaties en toernooien -- bestaat
      alleen voor geverifieerd volwassen leden. Dat is dezelfde poort als die van
@@ -141,6 +126,29 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
      hier aan en niet aan een eigen kopie van de regel. */
   const progressieMag = (handle) => volwassen(handle);
   const GEEN_PROGRESSIE = 'Scores en ranglijsten bestaan alleen voor leden met een geverifieerde volwassen leeftijd. Het spel zelf speel je gewoon.';
+
+  /* Uitslagen die een potje overleven: de bron onder winrate, niveaus en
+     toernooien. Deelnemers buiten de progressiegrens staan er zonder codenaam
+     in; speelde niemand binnen de grens mee, dan wordt er niets bewaard. Zie
+     spellen/uitslagen.js. */
+  const { noteerUitslag, spelUitslagen } = require('./spellen/uitslagen')({
+    db, save, codenaamVan, nu, progressieMag
+  });
+
+  /* De lobby- en partijlaag draaien als submodules op een gedeelde
+     context, een keer opgebouwd bij het opstarten. */
+  const ctx = { db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, isGeblokkeerd, socialZoek, sociaalRate, volwassen,
+    rid, nu, S, SPEL, SOORTEN, TEAMS, wereldFout, leeftijdFout, nudge, schud, beurtDoor, opschonen,
+    INITS, ZETTEN, VIEWS, STATISCH, klasgenotenVan, noteerUitslag };
+  const { spelStart, spelGrootte, spelNieuw, spelAntwoord, spelRandom, mijnSpellen } = require('./spellen/lobby')(ctx);
+  const { spelStaat, spelZet, spelOpgeven } = require('./spellen/partij')(ctx);
+  // Rahul als spelmaatje: in elk potje op te roepen voor hints, regels of een peptalk
+  const { spelRahul } = require('./spellen/rahul')(Object.assign({ anthropic }, ctx));
+
+  /* ================= arcade: ranglijsten onder vrienden =================
+     Welke arcadespellen er zijn staat niet hier maar in het register: elk
+     heeft een eigen module met een `vorm: 'arcade'`-descriptor. Deze laag
+     kent dus geen spelnamen, alleen de vorm. */
 
   function A(spel) {
     const s = S();
@@ -178,7 +186,7 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
   const sneekScore = (mij, punten) => arcadeScore(mij, 'sneek', punten);
   const sneekBord = (mij, vrienden) => arcadeBord(mij, 'sneek', vrienden);
 
-  return { spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelRahul, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, sneekScore, sneekBord, arcadeScore, arcadeBord, SPEL_SOORTEN: SOORTEN,
+  return { spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelRahul, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, spelUitslagen, sneekScore, sneekBord, arcadeScore, arcadeBord, SPEL_SOORTEN: SOORTEN,
     // alleen voor de drift-test: de client heeft een eigen kopie van deze
     // regels (directe feedback); de test houdt beide kopieën tegen elkaar
     _spelregels: { rummiSet: ruw.rummiSet, W_PREMIE: ruw.W_PREMIE, SPEL, ARCADE } };

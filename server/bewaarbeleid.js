@@ -91,6 +91,14 @@ const BELEID = [
     vorm: 'lijst', datum: 'at', waarom: 'herhaling moet zichtbaar blijven, maar niet voor altijd' },
   { tak: 'paspoortLog', label: 'paspoortcontroles', dagen: JAAR / DAG, grond: 'nodig',
     vorm: 'lijst', datum: 'at', waarom: 'aantonen dat een leeftijdscheck is gedaan' },
+  /* Uitslagen van potjes: de bron onder winrate, niveaus en toernooien. Een
+     jaar, en dat is een keuze met twee kanten. Korter en een seizoen past er
+     niet in; langer en een partij van jaren terug bepaalt nog steeds iemands
+     stand, terwijl niemand daar nog om vroeg. Deelnemers onder de
+     progressiegrens staan er zonder codenaam in (kern/spellen/uitslagen.js),
+     dus wat hier verloopt is de historie van volwassen leden. */
+  { tak: 'spelUitslagen', label: 'uitslagen van potjes', dagen: JAAR / DAG, grond: 'nodig',
+    vorm: 'lijst', datum: 'at', waarom: 'draagt codenamen; een partij van meer dan een jaar terug hoeft geen stand meer te bepalen' },
   /* Stadsweefsel: gebeurtenissen verlopen, het register (db.data.weefsel) niet --
      een lantaarnpaal verloopt niet en de tijdreeksen vegen zichzelf per laag. */
   { tak: 'weefselZaken', label: 'stadszaken (openbare ruimte)', dagen: 3 * JAAR / DAG, grond: 'nodig',

@@ -190,7 +190,10 @@
     ],
     "ik": [
       "geloof",
-      "stemmingToon"
+      "stemmingToon",
+      "TOEGANKELIJK_KEUZES",
+      "toegankelijkVan",
+      "toegankelijkZet"
     ],
     "journaal": [
       "boardroomAuth",

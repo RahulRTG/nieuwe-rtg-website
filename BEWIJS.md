@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 719 bestanden en 4060 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 721 bestanden en 4066 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 719 |
-| losse beweringen (`test(...)`) | 4060 |
+| toetsbestanden | 721 |
+| losse beweringen (`test(...)`) | 4066 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 521 |
 | **overleefd**: geen mutatie kreeg hem rood | 12 |
 | niet te meten (al rood, geen module gevonden, ...) | 16 |
 | alleen in de kop *genoemd*, nog niet gemeten | 24 |
-| niets van beide | 146 |
+| niets van beide | 148 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-631 bestanden, 3903 beweringen.
+632 bestanden, 3908 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -584,6 +584,7 @@ toets omvalt.
 | `tls-boot.test.js` | 3 | gezakt op `&&->||#0` | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `tls-native.test.js` | 3 | gezakt op `true->false#0` | Bewijst dat onze native TLS-laag (server/lib/tls.js) echt HTTPS termineert: HTTP/1.1 over TLS serveren, ALPN naar h2 aanbieden, zelf een self-signed cert maken en cachen, en het certificaat LIVE omwisselen... |
 | `tls-x509.test.js` | 3 | gezakt op `return-weg#0` | Bewijst dat onze eigen X.509/DER-laag echte, bruikbare bytes maakt: een self-signed certificaat dat OpenSSL (via Node's tls) accepteert in een ECHTE TLS-handshake, en een CSR die correct over de juiste inhoud is... |
+| `toegankelijk.test.js` | 5 | -- | Het toegankelijkheidsprofiel (kern/toegankelijk.js): hoe het scherm zich hoort te gedragen. Wat hier bewezen wordt: de stand blijft staan, een onbekende waarde valt terug op normaal in plaats van stil te blijven... |
 | `training.test.js` | 9 | gezakt op `liegpoort /api/` | Training & tips in de PDA: micro-learning voor het personeel. 1) De zuivere tip-bibliotheek is rol-bewust en zonder dubbelingen. |
 | `transfer.test.js` | 5 | gezakt op `liegpoort /api/` | De eigen transferdienst van een activiteitenzaak: alleen met een geldig ticket, prijs 0 (inclusief) of het afgesproken bedrag, en iedereen ziet elkaar: de zaak de rit en de chauffeur, de chauffeur de klant, en de... |
 | `txgeld.test.js` | 6 | overleefd | DE TWEE GELDCOLLECTIES IN HET GROOTBOEK. directBetalingen en betaalVerzoeken werden bijgehouden met db.data.X.unshift(item); db.data.X = db.data.X.slice(0, N); Dat is precies waar boeking 50.001 aan verdween (zie... |
@@ -671,7 +672,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-88 bestanden, 157 beweringen.
+89 bestanden, 158 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -753,6 +754,7 @@ toets omvalt.
 | `salon-app.e2e.js` | 1 | -- | Scherm-test voor De Salon-app. De unit-toetsen (test/salon-app.test.js) bewijzen de server-kant; deze bewijst dat het SCHERM het doet: plaatsen vanaf het tabblad zelf, de post die daarna in je eigen profiel staat,... |
 | `scan-tafel.e2e.js` | 1 | -- | Scherm-test: de tafel-QR-stroom in de leden-app. We loggen als lid in (token in localStorage), openen de app, klikken op de scan-knop en voeren met de hand een tafel-QR-payload in (headless heeft geen camera). |
 | `scanner.e2e.js` | 1 | -- | Scherm-test voor RTG Scanner: foto's kiezen (de weg die ook zonder camera werkt), de paginastrook, en bewaren als PDF die als gewoon bestand in de Bestanden-kluis belandt (map Scans). De camera zelf valt buiten... |
+| `toegankelijk-scherm.e2e.js` | 1 | -- | De belofte van het toegankelijkheidsprofiel is "op elk scherm van RTG", en dat is precies wat een servertoets niet kan zien. Deze toets zet de instelling op de ene pagina (apps/ik.html) en kijkt of hij doorwerkt op... |
 | `veiligheid.e2e.js` | 1 | -- | De vier veiligheidsapps in een echte browser. De server-toetsen (test/veiligheid.test.js) bewijzen dat de keten werkt. |
 | `vertaler.e2e.js` | 1 | -- | Scherm-test voor RTG Vertaler: inloggen, typen, de live-vertaling (met de halve-seconde-rustpauze), een reiszin aantikken en bewaren op het toestel. |
 | `verzorging-scherm.e2e.js` | 1 | -- | Schermtoets voor de verzorgingskant van de Zorg-tab: de kapper, de barbier en de nagelstudio staan nu in de leden-app. Wat hier bewezen wordt is precies wat een servertoets NIET kan zien: dat het blok echt op het... |

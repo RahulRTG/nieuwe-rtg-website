@@ -77,6 +77,10 @@ module.exports = function bouwKernAanTwee(kern, grens) {
   require('../routes/code')(grens('code'));
   // RTG Veilig: Thuiswacht, Codewoord, Vitale check-in en Thuisrust.
   require('../routes/veiligheid')(grens('veiligheid'));
+  /* Het toegankelijkheidsprofiel (kern/toegankelijk.js): hoe het scherm zich
+     hoort te gedragen. Hangt aan het ik-domein, want het is een instelling van
+     het lid over zichzelf; shared/basis.js voert hem uit op elke pagina. */
+  Object.assign(kern, require('../kern/toegankelijk')({ accounts: kern.accounts }));
   // Wie ben ik voor Rahul: omgang, voornaamwoorden en de eigen geloofskeuze.
   require('../routes/ik')(grens('ik'));
 };

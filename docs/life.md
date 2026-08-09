@@ -36,6 +36,7 @@ klinkt.
 | Dagelijkse check-in | `public/apps/vitaal.html` + de veiligheidskern | één knop per dag; de klok loopt op de server, dus stilte is het signaal |
 | Sport | `public/apps/sport.html`, `sportclub.html`, `server/kern/clubs.js` | activiteiten, clubs, lessen, banen |
 | Gezin | `public/apps/foundation/gezondheid.html`, `gevoel.html`, `rust.html` | gezinsgezondheidsboekje, hoe voel je je, even rust |
+| Toegankelijkheidsprofiel | `server/kern/toegankelijk.js`, `public/shared/toegankelijk.js`, kop van `shared/basis.js` | tekstgrootte, contrast, beweging en onderstreepte links, op elke pagina die `shared/basis.js` laadt |
 | Inzage-audit | `server/inzagelog.js` | wie welke identiteitsgegevens opvroeg, en waarom |
 | Identiteitskluis | `server/accounts.js` | echte namen apart; alles daarbuiten draait op codenamen |
 
@@ -81,13 +82,46 @@ geen route en geen toets.
 - **Gewoonten, slaap, voeding, water, stress, herstel, trainingsbelasting.**
   Geen van deze bestaat als laag.
 - **Life Compass** (de zes signalen op één scherm) en de **dagcoach**.
-- **Toegankelijkheidsprofiel dat platformbreed doorwerkt.** Er is wel
-  `prefers-reduced-motion` in `public/shared/rust.css` en Vitaal zet zelf grotere
-  tekst en grotere raakvlakken, maar dat is per pagina geregeld en niet één
-  profiel dat heel RTG respecteert. ADHD- en autismemodus bestaan niet.
+- **De rest van de toegankelijkheid.** Het profiel dat er nu is doet vier
+  dingen (zie hieronder); eenvoudige taal, een taak per scherm,
+  schermlezer-teksten en spraakbesturing staan er bewust niet in, want die zijn
+  per pagina werk en geen schakelaar. ADHD- en autismemodus bestaan niet.
 - **Wearables en apparaatkoppelingen.**
 - **Coach-marktplaats en coachportaal.**
 - **Multi-vestiging voor zorgorganisaties, resource-planning, wachtlijstmotor.**
+
+## Het toegankelijkheidsprofiel, zoals het nu werkt
+
+Vier instellingen, in te stellen op `apps/ik.html` onder "Hoe het scherm zich
+gedraagt": tekstgrootte (normaal, groot, nog groter), contrast, beweging en
+onderstreepte links. `server/kern/toegankelijk.js` is de enige plek waar staat
+welke er zijn; het scherm rendert de schakelaars uit die lijst, dus een optie
+erbij is één regel daar.
+
+**Waarom deze vier en niet meer.** Dit zijn precies de dingen die een gedeelde
+laag kan waarmaken zonder dat een app er iets voor doet. De tekstmaat werkt
+omdat de hele familie in `rem` meet: ruim drieduizend plekken, en precies één in
+`px`. Contrast tilt de twee gedempte tinten van het huis op (dezelfde `#F4F1EC`,
+alleen minder doorzichtig), dus er komt geen kleur bij die niet van het merk is.
+Een schakelaar aanbieden voor iets dat per pagina gebouwd moet worden, zou een
+belofte zijn die de code niet waarmaakt.
+
+**Twee wegen, en de snelle telt.** De stand staat in `localStorage` en wordt
+bovenin `shared/basis.js` meteen toegepast; `shared/toegankelijk.js` haalt hem
+daarna bij de server op zodat een tweede toestel hem ook krijgt. Die volgorde is
+geen optimalisatie maar de functie zelf: wie grote tekst nodig heeft, hoort geen
+flits kleine tekst te zien terwijl de server nadenkt.
+
+Dat onderscheid heeft de toets zelf moeten leren. De eerste versie mat de
+tekstgrootte pas nadat beide wegen klaar konden zijn, en bleef groen terwijl de
+snelle weg was weggehaald -- afgeslagen, en dus een bevinding. `test/toegankelijk-scherm.e2e.js`
+snijdt nu de server-weg af en meet wat er dan nog staat.
+
+**Waar het niet werkt.** Contrast raakt alleen pagina's die de huis-tokens
+(`--rtg-txt`, `--rtg-soft`, `--rtg-muted`, `--rtg-line`) gebruiken; een pagina
+die haar grijstinten hard invult, verandert niet mee. Tekstgrootte en beweging
+raken alles. En zonder eigen account is er niets om bij de server te bewaren:
+de instelling blijft dan op dat ene toestel staan.
 
 ## De grenzen die vast moeten staan vóór de bouw
 
@@ -129,8 +163,8 @@ groot zijn; het scherm hoort dat niet te voelen.
 
 In deze volgorde, want elke stap heeft de vorige nodig:
 
-1. Het **toegankelijkheidsprofiel**, platformbreed. Het is de enige die de
-   andere apps meteen beter maakt en die niets gevoeligs toevoegt.
+1. ~~Het **toegankelijkheidsprofiel**, platformbreed.~~ Gedaan; zie hierboven
+   wat het wel en niet doet.
 2. De **doelenmotor**, want die is de ruggengraat onder sport, slaap, voeding en
    coach; los gebouwd krijgt elk daarvan zijn eigen halve versie.
 3. Het **Life Compass**-scherm dat leest uit wat er dan is -- met "niet gemeten"
@@ -138,5 +172,5 @@ In deze volgorde, want elke stap heeft de vorige nodig:
    op een gezondheidsscherm, en bij welzijnscijfers is het verschil tussen "geen
    gegevens" en "slecht" niet cosmetisch.
 
-Wat daarna komt (slaap, voeding, stress, coach, marktplaats) hangt aan die drie
+Wat daarna komt (slaap, voeding, stress, coach, marktplaats) hangt aan die twee
 en hoort pas daarna aan de beurt.

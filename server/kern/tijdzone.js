@@ -78,4 +78,32 @@ function lokaal(zone, wanneer) {
   };
 }
 
-module.exports = { LAND_ZONE, TERUGVAL, geldigeZone, zoneVan, lokaal };
+/* EEN antwoord op "in welke zone staat deze zaak", voor het hele huis.
+
+   De Mall, de vakwerk-agenda en de Food Court stellen alle drie dezelfde vraag,
+   en het zou een stille ramp zijn als ze er verschillend op antwoorden: dan
+   biedt de Mall een tijdvak aan dat het boekscherm niet kent. Vandaar een
+   gedeelde functie in plaats van drie keer `zoneVan(s, ergensLand)`.
+
+   De landbepaling komt uit de Reiswijzer (kern/reis.js), die van een plaats
+   weet in welk land hij ligt. Die tabel wordt later in de opbouw gemaakt dan de
+   modules die hem hier nodig hebben, dus hij wordt bij het opstarten EEN keer
+   geregistreerd -- dezelfde overlay-gedachte als waarmee de reisrijen op de
+   LANDEN-tabel worden gezet. Is hij er niet, dan valt de zone terug op het
+   land van de zaak en anders op UTC; `aangenomen` zegt dat dan ook. */
+let landVindReg = null;
+function zetLandVind(fn) { landVindReg = (typeof fn === 'function') ? fn : null; }
+const landVindAan = () => !!landVindReg;
+
+function zaakZone(s) {
+  if (!s) return { zone: TERUGVAL, bron: 'terugval', aangenomen: true };
+  const eigen = s.tijdzone;
+  if (geldigeZone(eigen)) return { zone: eigen, bron: 'zaak', aangenomen: false };
+  let land = s.country || null;
+  if (!land && landVindReg && s.city) { try { land = landVindReg(s.city); } catch (e) { land = null; } }
+  return zoneVan({ country: land }, land);
+}
+// hoe laat het is BIJ DE ZAAK; de vorm die de bellers werkelijk gebruiken
+const nuBijZaak = (s, wanneer) => lokaal(zaakZone(s).zone, wanneer);
+
+module.exports = { LAND_ZONE, TERUGVAL, geldigeZone, zoneVan, lokaal, zetLandVind, landVindAan, zaakZone, nuBijZaak };

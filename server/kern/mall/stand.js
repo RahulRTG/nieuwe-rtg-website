@@ -36,7 +36,7 @@
    alleen voor de zichtbare pagina wordt gedaan. */
 
 const { LUNCH, DINER } = require('../foodcourt');
-const { zoneVan, lokaal } = require('../tijdzone');
+const { zaakZone, nuBijZaak } = require('../tijdzone');
 
 const WAAROM_NULL = 'Deze zaak heeft geen openingstijden vastgelegd in haar eigen systeem.';
 
@@ -56,12 +56,12 @@ module.exports = (ctx) => {
   const zaakFunctie = () => (typeof haalZaakFunctie === 'function' ? haalZaakFunctie() : null);
   const bronnen = () => ({ vakwerk: !!vakwerk(), foodcourt: !!foodcourt(), zaak: !!zaakFunctie() });
 
-  // de tijdzone van een zaak; het land komt uit dezelfde bepaling als de plek
-  function zoneVoor(s) {
-    const land = ctx.plek.plekVan({ stad: s.city, land: s.country }).land;
-    return zoneVan(s, land);
-  }
-  const nuBij = (s, wanneer) => lokaal(zoneVoor(s).zone, wanneer);
+  /* De tijdzone van een zaak komt uit kern/tijdzone.js en niet uit een eigen
+     afleiding hier: de vakwerk-agenda en de Food Court stellen dezelfde vraag,
+     en drie antwoorden op een vraag is hoe de Mall een tijdvak gaat aanbieden
+     dat het boekscherm niet kent (LAT-regel 4). */
+  const zoneVoor = (s) => zaakZone(s);
+  const nuBij = (s, wanneer) => nuBijZaak(s, wanneer);
 
   /* Neemt deze zaak op dit moment bestellingen of reserveringen aan? Dit is de
      schakelaar die de ondernemer zelf omzet in zijn mini-boardroom. We vragen

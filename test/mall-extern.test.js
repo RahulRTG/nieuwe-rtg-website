@@ -114,6 +114,11 @@ test('3. een zaak zet haar eigen tijdzone, en de Mall rekent er meteen mee', asy
   await api('/api/supplier/tijdzone', { tijdzone: 'auto' }, tok.SERENA);
   const terug = await api('/api/supplier/mall', {}, tok.SERENA);
   assert.ok(terug.body.tijdzone.aangenomen, 'auto zet hem terug op de landzone');
+  /* En die landzone is echt afgeleid en geen terugval: de zaak staat in Ibiza,
+     dus Europe/Madrid. Zonder de registratie van de plaatsbepaling uit de
+     Reiswijzer zou hier UTC staan en zou niemand het merken. */
+  assert.equal(terug.body.tijdzone.zone, 'Europe/Madrid', 'Ibiza is herkend als Spanje');
+  assert.equal(terug.body.tijdzone.bron, 'land');
 });
 
 test('4. "Nu open" volgt de klok van de zaak, niet die van de server', async () => {
@@ -256,6 +261,126 @@ test('10. een tijdvak van vandaag ligt nooit in het verleden van de zaak zelf', 
       String(hier.minuten % 60).padStart(2, '0') + ' bij de zaak zelf');
   }
   assert.ok(vandaag >= 1, 'en minstens een tijdvak valt op de eigen dag van de zaak (' + hier.datum + ')');
+
+  await api('/api/supplier/tijdzone', { tijdzone: 'auto' }, tok.SERENA);
+});
+
+/* ---------------------------------------------------------------------------
+   3. De reparatie bij de oorzaak: vakwerk en de Food Court rekenen zelf in de
+      zone van de zaak. Daarvoor deed alleen de leeslaag dat, en dan kan de
+      Mall-kaart een tijdvak tonen dat het boekscherm niet kent.
+   --------------------------------------------------------------------------- */
+
+test('11. de Mall-kaart en het boekscherm noemen hetzelfde eerste tijdvak', async () => {
+  await api('/api/supplier/tijdzone', { tijdzone: 'Pacific/Auckland' }, tok.SERENA);
+  await api('/api/supplier/vak/uren-zet', {
+    dagen: [true, true, true, true, true, true, true], van: '00:00', tot: '23:59'
+  }, tok.SERENA);
+
+  const kaart = (await mallVan('SERENA')).find(a => a.beschikbaar && a.beschikbaar.datum);
+  assert.ok(kaart, 'de Mall toont een tijdvak');
+
+  // hetzelfde vragen langs de weg waarlangs je werkelijk boekt
+  const dienstId = kaart.id.split(':')[2];
+  const boek = await api('/api/booking/slots', { supplierCode: 'SERENA', serviceId: dienstId, date: kaart.beschikbaar.datum }, lid);
+  assert.equal(boek.status, 200);
+  assert.ok(boek.body.tijden.length, 'het boekscherm heeft tijden op die dag');
+  assert.equal(boek.body.tijden[0], kaart.beschikbaar.tijd,
+    'het eerste tijdvak op de Mall-kaart is hetzelfde als in het boekscherm');
+
+  /* En het BOEKSCHERM filtert zelf, niet alleen de Mall eroverheen. Dit stond
+     eerst achter `if (datum === vandaag bij de zaak)`, en dan bewees het niets:
+     de mutatie "vakwerk terug naar servertijd" liet geen toets zakken omdat de
+     Mall zijn eigen filter er nog overheen legde. Nu wordt de eigen dag van de
+     zaak expliciet opgevraagd. */
+  const hier = tz.lokaal('Pacific/Auckland');
+  const vandaagDaar = await api('/api/booking/slots', { supplierCode: 'SERENA', serviceId: dienstId, date: hier.datum }, lid);
+  assert.equal(vandaagDaar.status, 200);
+  const min = (t) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5));
+  assert.ok(vandaagDaar.body.tijden.length >= 1, 'de zaak is de klok rond open, dus er staat iets open op haar eigen dag');
+  for (const t of vandaagDaar.body.tijden) {
+    assert.ok(min(t) > hier.minuten,
+      t + ' ligt na ' + Math.floor(hier.minuten / 60) + ':' + String(hier.minuten % 60).padStart(2, '0') + ' bij de zaak zelf');
+  }
+  /* En het EERSTE tijdvak is precies het eerste dat bij de zaak nog komt. "Alles
+     ligt in de toekomst" was niet genoeg: staat de zaak VOOR de server, dan
+     filtert servertijd juist te veel weg en zijn alle overgebleven tijden nog
+     steeds toekomst. Dan mis je een uur aanbod zonder dat iets klaagt. */
+  const duur = vandaagDaar.body.duurMin;
+  const stap = Math.max(30, Math.min(duur, 120));
+  let verwacht = null;
+  for (let m = 0; m + duur <= 1439; m += stap) { if (m > hier.minuten) { verwacht = m; break; } }
+  assert.ok(verwacht != null, 'er hoort vandaag nog een tijdvak te komen');
+  assert.equal(min(vandaagDaar.body.tijden[0]), verwacht,
+    'het eerste tijdvak is het eerste dat bij de zaak nog komt, niet het eerste dat op de server nog komt');
+  await api('/api/supplier/tijdzone', { tijdzone: 'auto' }, tok.SERENA);
+});
+
+test('12. de Food Court rekent datum en tijd met dezelfde klok', async () => {
+  /* Hier stond de datum in UTC en de tijd in de zone van de server: twee
+     klokken in dezelfde functie, wat rond middernacht een tijdslot van gisteren
+     of morgen opleverde. De zone wordt zo gekozen dat de lokale datum GEGARAND-
+     EERD van de UTC-datum verschilt, ongeacht wanneer deze toets draait. */
+  const kok = await login('KIKUNOI');
+  assert.ok(kok, 'het restaurant kan inloggen');
+  const utcUur = new Date().getUTCHours();
+  const zone = utcUur < 11 ? 'Pacific/Midway' : 'Pacific/Kiritimati';
+  const zet = await api('/api/supplier/tijdzone', { tijdzone: zone }, kok);
+  assert.equal(zet.status, 200);
+
+  const daar = tz.lokaal(zone);
+  const utcDatum = new Date().toISOString().slice(0, 10);
+  assert.notEqual(daar.datum, utcDatum, 'de zone is zo gekozen dat de datum echt verschilt');
+
+  const t = await api('/api/foodcourt/tijden', { code: 'KIKUNOI' }, lid);
+  assert.equal(t.status, 200);
+  assert.equal(t.body.datum, daar.datum, 'zonder datum pakt de Food Court de dag van de ZAAK, niet die van de server');
+
+  await api('/api/supplier/tijdzone', { tijdzone: 'auto' }, kok);
+});
+
+test('13. de datumgrens van het boekscherm ligt bij de zaak, niet bij de server', async () => {
+  /* De laatste van de drie mutaties die eerst afsloegen. vakwerk weigerde een
+     datum die "in het verleden" ligt, gemeten op de server. Voor een zaak die
+     achterloopt op de server is haar eigen vandaag dan al verleden; voor een
+     zaak die voorloopt is haar eigen gisteren nog toekomst.
+
+     Welke van de twee we kunnen meten hangt af van het uur waarop deze toets
+     draait, dus de zone EN de bewering worden daarop gekozen. Zo bijt hij
+     altijd, in plaats van zichzelf in de helft van de gevallen over te slaan. */
+  const utcUur = new Date().getUTCHours();
+  const achter = utcUur < 11;
+  const zone = achter ? 'Pacific/Midway' : 'Pacific/Kiritimati';
+  await api('/api/supplier/tijdzone', { tijdzone: zone }, tok.SERENA);
+  await api('/api/supplier/vak/uren-zet', {
+    dagen: [true, true, true, true, true, true, true], van: '00:00', tot: '23:59'
+  }, tok.SERENA);
+
+  const daar = tz.lokaal(zone);
+  const utcDatum = new Date().toISOString().slice(0, 10);
+  assert.notEqual(daar.datum, utcDatum, 'de zone is zo gekozen dat de dag echt verschilt');
+
+  const mijn = await mallVan('SERENA');
+  const dienstId = (mijn.find(a => a.type === 'dienst' || a.type === 'offerte') || {}).id;
+  assert.ok(dienstId, 'er is een dienst om over te oordelen');
+  const dienst = dienstId.split(':')[2];
+
+  if (achter) {
+    // de zaak loopt achter: haar eigen vandaag is de dag VOOR die van de server
+    assert.ok(daar.datum < utcDatum);
+    const r = await api('/api/booking/slots', { supplierCode: 'SERENA', serviceId: dienst, date: daar.datum }, lid);
+    assert.equal(r.status, 200);
+    assert.ok(r.body.tijden.length >= 1,
+      'de eigen dag van de zaak wordt aangenomen, ook al is hij op de server al voorbij');
+  } else {
+    // de zaak loopt voor: haar eigen gisteren is de dag van de server
+    const gisteren = new Date(new Date(daar.datum + 'T12:00:00Z').getTime() - 86400000).toISOString().slice(0, 10);
+    assert.equal(gisteren, utcDatum, 'haar gisteren is de dag van de server');
+    const r = await api('/api/booking/slots', { supplierCode: 'SERENA', serviceId: dienst, date: gisteren }, lid);
+    assert.equal(r.status, 200);
+    assert.equal(r.body.tijden.length, 0,
+      'een dag die bij de zaak al voorbij is levert niets op, ook al is hij op de server vandaag');
+  }
 
   await api('/api/supplier/tijdzone', { tijdzone: 'auto' }, tok.SERENA);
 });

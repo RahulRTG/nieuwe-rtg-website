@@ -19,7 +19,7 @@
    als startlijstje in de zaak zelf. */
 'use strict';
 
-module.exports = ({ save, scho, aanmeldingen, oprichtingsproject, ondernemingNaam, ondernemingKoppel }) => {
+module.exports = ({ save, scho, aanmeldingen, oprichtingsproject, ondernemingNaam, ondernemingKoppel, provisioningStand }) => {
 
   function ondernemingAanvraag(o, accountId, body) {
     if (o.supplierCode) return { status: 409, error: 'Deze onderneming heeft al een zaak.' };
@@ -44,8 +44,29 @@ module.exports = ({ save, scho, aanmeldingen, oprichtingsproject, ondernemingNaa
 
     o.aanmeldingId = r.aanmelding.id;
     save();
-    return { ok: true, aanmelding: r.aanmelding,
-      uitleg: 'Uw aanvraag staat op de stapel. Een medewerker van RTG beoordeelt hem; wij kennen zelf geen toegang toe.' };
+
+    /* De provisioning-knop van de boardroom (kern/onderneming/regie.js). In de
+       stand 'automatisch' wordt de zaak direct klaargezet, langs DEZELFDE
+       provisioning die het personeel anders in gang zet -- er komt geen tweede
+       manier bij om een zaak te maken. De PAS blijft in elke stand mensenwerk;
+       dat is een andere knop en een andere regel. */
+    const stand = provisioningStand ? provisioningStand() : 'mens';
+    if (stand === 'automatisch' && aanmeldingen.provisioneerId) {
+      const gezet = aanmeldingen.provisioneerId(r.aanmelding.id);
+      if (gezet && gezet.code) {
+        const k = ondernemingKoppel(o, gezet.code);
+        if (k.ok) {
+          return { ok: true, aanmelding: r.aanmelding, stand, zaak: { code: gezet.code },
+            onderneming: k.onderneming,
+            uitleg: 'Uw zaak staat klaar. RTG heeft het klaarzetten van zaken op automatisch staan; uw pas blijft een besluit van een mens.' };
+        }
+      }
+    }
+
+    return { ok: true, aanmelding: r.aanmelding, stand,
+      uitleg: stand === 'na-termijn'
+        ? 'Uw aanvraag staat op de stapel. Uw zaak wordt klaargezet zodra de eerste termijn is afgetekend.'
+        : 'Uw aanvraag staat op de stapel. Een medewerker van RTG beoordeelt hem; wij kennen zelf geen toegang toe.' };
   }
 
   /* De stand van de aanvraag, en -- zodra de zaak er echt staat -- de

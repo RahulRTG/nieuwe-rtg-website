@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 732 bestanden en 4262 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 733 bestanden en 4276 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 732 |
-| losse beweringen (`test(...)`) | 4262 |
+| toetsbestanden | 733 |
+| losse beweringen (`test(...)`) | 4276 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 521 |
 | **overleefd**: geen mutatie kreeg hem rood | 12 |
 | niet te meten (al rood, geen module gevonden, ...) | 16 |
 | alleen in de kop *genoemd*, nog niet gemeten | 27 |
-| niets van beide | 156 |
+| niets van beide | 157 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-644 bestanden, 4101 beweringen.
+645 bestanden, 4115 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -375,6 +375,7 @@ toets omvalt.
 | `onderneming-kas.test.js` | 14 | -- | Ronde: de kasvooruitblik. Vier beweringen: 1. |
 | `onderneming-mallprofiel.test.js` | 10 | -- | Ronde: het Mall-profiel -- hoe de pagina van een zaak is opgebouwd. Drie beweringen: 1. |
 | `onderneming-oprichting.test.js` | 14 | -- | Ronde: het oprichtingsproject en de aanvraag van de zaak -- het laatste stuk van de reis, van vastgelegd plan naar draaiende onderneming. De twee beweringen die hier het zwaarst wegen: 1. |
+| `onderneming-regie.test.js` | 14 | -- | Ronde: de ondernemersregie -- twee knoppen van de boardroom. Vier beweringen: 1. |
 | `onderneming-relaties.test.js` | 12 | -- | Ronde: het klantenboek en de relaties -- het CRM van het Ondernemers-OS. Vier beweringen: 1. |
 | `onderneming-verkenning.test.js` | 20 | genoemd | Ronde: de pre-oprichtingsfase -- intake, kansverkenning, simulatie, stress test en het ondernemingsplan. De zwaartepunten liggen op de twee plekken waar dit soort software liegt: 1. |
 | `onderneming-werving.test.js` | 15 | genoemd | Ronde: de werving -- staat er iemand te wachten. Vier beweringen: 1. |

@@ -40,7 +40,7 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boeki
   /* Alle deellagen worden in ./lagen.js opgebouwd -- dit bestand ging over de
      10 kB van het modulebeleid, en dat is de goede naad: daar de
      gereedschapskist, hier het object zelf. */
-  const { intake, kans, sim, stress, plan, dag, opr, ek, mp, boek, rel, deb, cred, con, bel, kas, cap, wrv } =
+  const { intake, kans, sim, stress, plan, dag, opr, ek, mp, boek, rel, deb, cred, con, bel, kas, cap, wrv, regie } =
     require('./lagen')({ db, save, schoon, ordersVanZaak, boekingenVanZaak, ondernemerpoort });
 
   const bak = () => {
@@ -73,7 +73,7 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boeki
      een mens voor staat. */
   const { ondernemingAanvraag, ondernemingAanvraagStand } = require('./aanvraag')({
     save, scho, aanmeldingen, oprichtingsproject: opr.oprichtingsproject,
-    ondernemingNaam, ondernemingKoppel });
+    ondernemingNaam, ondernemingKoppel, provisioningStand: regie.provisioningStand });
 
   /* ---- de verkenning in één keer ----
      De vier stappen leunen op elkaar (de stress test kan niets zonder de
@@ -151,6 +151,11 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boeki
     },
     ondernemingKasSaldo: kas.kasSaldoZet,
     ondernemingCapaciteit: cap.capaciteit,
+    ondernemingRegie: regie.regieBeeld,
+    ondernemingProvisioningStand: regie.provisioningStand,
+    ondernemingProvisioningZet: regie.provisioningZet,
+    ondernemingBijdrageZet: regie.bijdrageZet,
+    ondernemingBijdrageOver: regie.bijdrageOver,
     ondernemingWerving: (o, nu) => {
       const t = Number.isFinite(nu) ? nu : Date.now();
       return wrv.werving(o, cap.capaciteit(o, t), t);

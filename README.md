@@ -1730,6 +1730,56 @@ van één is `n/(n+1)` toevallig gelijk aan de helft, dus een formule die altijd
 halveert kwam er ongestraft doorheen. Er staat nu een tweede geval met een team
 van drie (drie kwart, niet de helft); daarna beet de mutatie wel.
 
+### De ondernemersregie: twee knoppen van de boardroom
+
+`server/kern/onderneming/regie.js` + `/api/office/ondernemersregie{,/provisioning,/bijdrage}`.
+RTG bepaalt zelf hoe streng of hoe soepel het Ondernemers-OS staat. Twee dingen
+die niets met elkaar te maken hebben, en die daarom apart staan.
+
+**1. Provisioning -- wanneer wordt de ZAAK klaargezet.** Drie standen: `mens`
+(personeel beoordeelt elke aanvraag), `na-termijn` (de zaak komt er zodra de
+eerste termijn is afgetekend) en `automatisch` (wie zijn plan vastlegt, krijgt
+direct een werkende zaak).
+
+**Een onderscheid dat nooit mag vervagen:** een *zaak* klaarzetten is
+operationeel werk; een *pas* toekennen is toegang verlenen tot RTG zelf, en dat
+blijft mensenwerk. `magAutomatischToekennen` in `kern/aanmeldingen.js` geeft voor
+geen enkele pas `true`, in welke stand deze knop ook staat. Zou één knop beide
+regelen, dan stond er een schuifje waarmee iemand per ongeluk de merkregel uitzet.
+In de stand `automatisch` loopt het klaarzetten bovendien langs **dezelfde**
+provisioning die het personeel anders in gang zet (`provisioneerId`), dus er komt
+geen tweede manier bij om een zaak te maken -- en de idempotentie blijft staan.
+
+**Soepeler zetten vraagt een naam, strenger zetten nooit.** Hetzelfde principe als
+de bankregie: een terugval blokkeer je niet. Elke wijziging komt met wie hem zette
+in een journaal.
+
+**2. De bijdrage -- wat RTG per transactie inhoudt.** `rtgCut` was in het
+partnerkanaal een constante 0 ("RTG verdient niets aan een boeking"); dat is nu een
+knop. Staat de bijdrage uit, dan komt er nog steeds nul uit en verandert er niets
+aan wat een partner krijgt. Drie dingen worden nooit geraden:
+
+- **het percentage**, ten hoogste 5% -- die bovengrens staat in code en niet in
+  een instelling, zodat hij niet per ongeluk hoger wordt gezet;
+- **de grondslag**: `via-rtg` (het enige dat RTG zelf kan meten, en de
+  beginstand), `betaald` (beschermender: over een factuur die nooit binnenkomt
+  draagt niemand af) of `totaal` -- die laatste draagt zijn eigen waarschuwing dat
+  RTG hem **niet** kan meten en dus op opgave rust;
+- **de drempel** waaronder er niets wordt ingehouden. Dat is geen coulance maar
+  het punt van de constructie: bij lage omzet hoort de bijdrage beschermend te
+  werken, niet mee te zuigen.
+
+De bijdrage wordt over de **service** genomen en niet over het totaal: de netto
+reissom is het geld van de aanbieder, en een percentage over andermans inkoop is
+geen bijdrage maar een boete op omzet. Aanzetten vraagt een naam én een
+percentage -- een bijdrage die aanstaat op nul is een schakelaar die niets doet en
+wel zo lijkt.
+
+Getoetst in `test/onderneming-regie.test.js` (14). Zes mutaties, alle zes raak:
+soepeler zetten zonder naam toestaan, strenger zetten óók een naam laten vragen,
+de bovengrens van 5% weghalen, de drempel negeren, aanzetten op nul procent
+toestaan, en de bijdrage van de netto reissom afhalen in plaats van van de service.
+
 ### RTG Werk OS (de werkplek van een organisatie)
 
 `server/bedrijf/` + `/api/bedrijf/...` + `/apps/werk.html`. Een **werkruimte**
@@ -2450,7 +2500,7 @@ niets van, en dat is geen tweederangs ervaring.
 
 ## Partnerkanaal
 
-Het partnerkanaal voor niet-leden draait server-side: boekingen worden per stuk opgeslagen in `server/data/db.json` onder `bookings`, met één totaalprijs voor de klant; nettoprijs en service zijn interne administratie. RTG verdient niets aan een boeking (`rtgCut` is altijd 0): een eventuele service gaat volledig naar de partner. RTG's enige inkomsten zijn de abonnementen. (De losse publieke boekingspagina is met de marketingsite verwijderd; het model en de endpoints blijven bestaan.)
+Het partnerkanaal voor niet-leden draait server-side: boekingen worden per stuk opgeslagen in `server/data/db.json` onder `bookings`, met één totaalprijs voor de klant; nettoprijs en service zijn interne administratie. RTG verdiende niets aan een boeking (`rtgCut` was altijd 0). Sinds de ondernemersregie is dat een KNOP van de boardroom: staat de bijdrage uit -- de beginstand -- dan is `rtgCut` nul en gaat een eventuele service volledig naar de partner, precies als voorheen. Staat hij aan, dan houdt RTG het ingestelde promillage in op de SERVICE (nooit op de netto reissom van de aanbieder) en gaat de rest naar de partner. (De losse publieke boekingspagina is met de marketingsite verwijderd; het model en de endpoints blijven bestaan.)
 
 ## Documentatie
 

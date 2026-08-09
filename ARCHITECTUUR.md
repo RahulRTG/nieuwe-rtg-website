@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 2926 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 2929 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,13 +18,13 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 2926 |
-| servermodules (`server/**/*.js`) | 1598 |
+| API-endpoints | 2929 |
+| servermodules (`server/**/*.js`) | 1599 |
 | routebestanden (`server/routes/**`) | 351 |
-| kernmodules (`server/kern/**`) | 935 |
+| kernmodules (`server/kern/**`) | 936 |
 | schermen (`public/**/*.html`) | 214 |
 | gedeelde browsermodules (`public/shared/*.js`) | 171 |
-| toetsbestanden (`test/*.test.js`) | 644 |
+| toetsbestanden (`test/*.test.js`) | 645 |
 | schermtoetsen (`test/*.e2e.js`) | 88 |
 
 ## 2. De weg van een verzoek
@@ -99,9 +99,9 @@ zie §5 -- er zijn nog 146 kern-namen die meer dan één domein aanraakt.
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
 | `auth` | 19 | 5 | 8 | 45 |
-| `member` | 438 | 52 | 10 | 378 |
+| `member` | 438 | 52 | 10 | 379 |
 | `supplier` | 502 | 90 | 6 | 278 |
-| `office` | 33 | 7 | 3 | 53 |
+| `office` | 36 | 7 | 3 | 57 |
 | `staff` | 26 | 7 | 1 | 40 |
 | `social` | 55 | 7 | 31 | 52 |
 | `techniek` | 42 | 11 | 1 | 49 |
@@ -120,9 +120,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1151 |
+| kern-namen die routes aanraken | 1155 |
 | daarvan door **meer dan één** domein (de echte koppeling) | 146 |
-| daarvan door precies één domein | 1005 |
+| daarvan door precies één domein | 1009 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 
@@ -136,7 +136,7 @@ domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 ```
 app(126) auth(71) supplierAuth(46) db(30) officeAuth(29) accounts(18) liveCodename(17)
 status(16) schoon(14) managerOnly(12) rtf(11) express(10) save(10) codenaamVan(10)
-tooManyTries(9) crypto(9) anthropic(9) rtmail(9) boardroomWie(7) logActivity(7)
+tooManyTries(9) crypto(9) anthropic(9) rtmail(9) boardroomWie(8) logActivity(7)
 sseToOffice(7) keyVanCodenaam(7) payrollOS(7) geenGast(6) noteFailedTry(6) kern(6)
 gegevensStop(6) talen(6) mail(5) loginFails(5) sseToSupplier(5)
 ```

@@ -70,6 +70,18 @@ app.post('/api/supplier/mall/sync', supplierAuth, (req, res) => {
   res.json(kern.mall.mallStand.extern.meld(req.supplier, req.body || {}));
 });
 
+/* De vraagkant: aanvragen van leden die bij deze zaak passen (vak en
+   werkgebied), en reageren. Wie zich bedenkt wijzigt zijn eigen reactie in
+   plaats van er een tweede naast te zetten; zie kern/mall/aanvragen.js. */
+app.post('/api/supplier/mall/aanvragen', supplierAuth, (req, res) => {
+  res.json(kern.mall.mallAanvragen.voorZaak(req.supplier));
+});
+app.post('/api/supplier/mall/aanvraag/reageer', supplierAuth, (req, res) => {
+  const r = kern.mall.mallAanvragen.reageer(req.supplier, req.body.id, req.body || {});
+  if (r.error) return res.status(r.status || 400).json({ error: r.error });
+  res.json(r);
+});
+
 /* De tijdzone van de zaak. Zonder deze is "Nu open" de tijd van de server, en
    dat is voor een zaak op Ibiza een uur mis. Leeg maken kan door 'auto' te
    sturen: dan geldt weer de hoofdzone van het land. */

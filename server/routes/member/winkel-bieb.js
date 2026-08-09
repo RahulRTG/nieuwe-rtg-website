@@ -3,7 +3,7 @@
    RTF-Bibliotheek). Apart gehouden zodat winkel.js klein blijft; alleen routes,
    de logica woont in de kern-modules. */
 module.exports = (kern) => {
-  const { app, auth, foodcourt, mall, appbieb, reisbieb, rtfbieb, gegevensStop } = kern;
+  const { app, auth, foodcourt, mall, appbieb, reisbieb, rtfbieb, gegevensStop, liveCodename } = kern;
 
   /* Het toegangsmodel van de echte RTG Bibliotheek: BLADEREN is voor iedereen
      zichtbaar (ook de aangemelde gratis gast). Installeren uit de
@@ -44,6 +44,30 @@ module.exports = (kern) => {
     openNu: req.body.openNu === true, opVoorraad: req.body.opVoorraad === true,
     pagina: req.body.pagina, per: req.body.per
   })));
+
+  /* ---- bewaren en een reis bouwen ----
+     Een verlanglijst en "voeg toe aan mijn reis" zijn hetzelfde ding met twee
+     velden verschil; zie de kop van kern/mall/lijsten.js. Er wordt hier niets
+     afgerekend: elke regel wijst naar de partij die hem levert. */
+  const lijstStuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
+  app.post('/api/mall/lijsten', auth, (req, res) => res.json(mall.mallLijsten.mijn(req.session.key)));
+  app.post('/api/mall/lijst/nieuw', auth, (req, res) => lijstStuur(res, mall.mallLijsten.maak(req.session.key, req.body || {})));
+  app.post('/api/mall/lijst', auth, (req, res) => lijstStuur(res, mall.mallLijsten.toon(req.session.key, req.body.id)));
+  app.post('/api/mall/lijst/zet', auth, (req, res) => lijstStuur(res, mall.mallLijsten.zet(req.session.key, req.body.id, req.body || {})));
+  app.post('/api/mall/lijst/weg', auth, (req, res) => lijstStuur(res, mall.mallLijsten.weg(req.session.key, req.body.id)));
+  app.post('/api/mall/lijst/voegtoe', auth, (req, res) => lijstStuur(res, mall.mallLijsten.voegToe(req.session.key, req.body.id, req.body.aanbodId)));
+  app.post('/api/mall/lijst/regel-weg', auth, (req, res) => lijstStuur(res, mall.mallLijsten.haalWeg(req.session.key, req.body.id, req.body.aanbodId)));
+
+  /* ---- de vraagkant: wat niemand aanbiedt, kun je vragen ----
+     Alleen leden plaatsen een aanvraag: een open vraagmarkt voor iedereen die
+     een gratis account maakt is binnen een week een prikbord met troep. */
+  app.post('/api/mall/aanvraag', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    lijstStuur(res, mall.mallAanvragen.plaats(req.session.key, liveCodename(req.session), req.body || {}));
+  });
+  app.post('/api/mall/aanvragen/mijn', auth, (req, res) => res.json(mall.mallAanvragen.mijn(req.session.key)));
+  app.post('/api/mall/aanvraag/sluit', auth, (req, res) => lijstStuur(res, mall.mallAanvragen.sluit(req.session.key, req.body.id)));
+  app.post('/api/mall/aanvraag/kies', auth, (req, res) => lijstStuur(res, mall.mallAanvragen.kies(req.session.key, req.body.id, req.body.code)));
 
   /* ---- de RTG Mall: de enige plek waar je bij RTG koopt ---- */
   app.post('/api/mall', auth, (req, res) => res.json(mall.overzicht()));

@@ -281,8 +281,40 @@ function trefKaart(a){
     (a.open && a.open.open !== null
       ? '<span class="'+(a.open.open?'vrij':'dicht')+'">'+(a.open.open?'&#9679; ':'')+esc(a.open.tekst)+'</span>' : '')+
     (a.beschikbaar ? '<span class="'+(a.beschikbaar.uit?'dicht':'vrij')+'">'+esc(a.beschikbaar.tekst)+'</span>' : '')+
-    '<a class="knop ga" href="'+esc(a.pagina)+'">'+esc(a.cta)+' →</a>'+
+    '<div class="rij" style="margin-top:.5rem;">'+
+      '<a class="knop ga" href="'+esc(a.pagina)+'">'+esc(a.cta)+' →</a>'+
+      '<button class="knop stil bewaar" data-id="'+esc(a.id)+'" type="button">Bewaren</button>'+
+    '</div>'+
   '</div>';
+}
+
+/* Bewaren: kies een bestaande lijst of maak er een. Een verlanglijst en een
+   reismand zijn hetzelfde ding met twee velden verschil; de Mall rekent niets
+   af, elke regel gaat naar de partij die hem levert. */
+async function bewaar(aanbodId){
+  let d;
+  try { d = await api('/api/mall/lijsten'); } catch(e){ meld(e.message); return; }
+  const namen = d.lijsten.map((l, i) => (i+1)+'. '+l.naam+(l.soort==='reis'?' (reis)':'')+' - '+l.aantal);
+  const keuze = prompt('Bewaren in:\n'+(namen.length?namen.join('\n')+'\n\n':'')+
+    'Typ een nummer, of een naam voor een nieuwe lijst.\nBegin met "reis:" voor een reismand.');
+  if (keuze === null) return;
+  const gekozen = d.lijsten[Number(keuze.trim()) - 1];
+  try {
+    let id;
+    if (gekozen) id = gekozen.id;
+    else {
+      const naam = keuze.trim();
+      if (!naam) return;
+      const reis = /^reis:/i.test(naam);
+      const r = await api('/api/mall/lijst/nieuw', { naam: reis ? naam.slice(5).trim() : naam, soort: reis ? 'reis' : 'lijst' });
+      id = r.lijst.id;
+    }
+    const r = await api('/api/mall/lijst/voegtoe', { id, aanbodId });
+    meld('Bewaard (' + r.aantal + ' in deze lijst).');
+  } catch(e){ meld(e.message); }
+}
+function koppelBewaar(wortel){
+  if (wortel) wortel.querySelectorAll('.bewaar').forEach(b => b.addEventListener('click', () => bewaar(b.dataset.id)));
 }
 
 async function tekenTreffers(){
@@ -306,6 +338,7 @@ async function tekenTreffers(){
       '<span style="font-size:.78rem;color:var(--muted);">pagina '+d.pagina+' van '+d.paginas+'</span>'+
       '<button class="knop stil" id="tVolgend"'+(d.pagina>=d.paginas?' disabled':'')+'>Volgende →</button>'
     : '';
+  koppelBewaar($('#treffers'));
   const v = $('#tVorig'), n = $('#tVolgend');
   if (v) v.addEventListener('click', () => { V.pagina--; tekenTreffers(); });
   if (n) n.addEventListener('click', () => { V.pagina++; tekenTreffers(); });
@@ -328,6 +361,7 @@ async function laadReizen(){
     '<a href="/apps/hotels.html" style="color:var(--gold);">Verblijven</a> · '+
     '<a href="/apps/vluchten.html" style="color:var(--gold);">Vluchten</a> · '+
     '<a href="/apps/hangar.html" style="color:var(--gold);">Jets &amp; charters</a></p></div>';
+  koppelBewaar(w);
 }
 
 /* ---------- De echte RTG Bibliotheek: één huis met drie afdelingen en een

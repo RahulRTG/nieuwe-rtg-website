@@ -1578,6 +1578,24 @@ De Mall is nu een **discovery-laag boven op alle bestaande domeinen**. Die domei
 
 **Wat er nog niet is** (bewust, en met naam in plaats van als stilte): één winkelmand over ordertypes heen, de trip-cart ("voeg toe aan reis"), personalisatie en tijd als context, de aanvraagmarkt ("ik zoek morgen een fotograaf"), de B2B-modus met zakelijke prijzen, het leverancierdashboard met zoekvragen, en de terugkoppeling van tekorten naar de Kansenlaag. De laag waar die allemaal op staan — één aanbod-object, één plek, één zoekingang — ligt er nu.
 
+### Bewaren, een reis bouwen, en de vraagkant
+
+**Lijsten en de reismand** (`server/kern/mall/lijsten.js`). Een verlanglijst en "voeg toe aan mijn reis" waren als aparte functies bedacht en zijn hetzelfde ding met twee velden verschil: een lijst met `soort: 'reis'` draagt een plek en een periode, en kan daarmee zeggen wat er nog ontbreekt (verblijf, vervoer, tafel, iets te doen). Twee systemen bouwen zou twee keer hetzelfde bewaren.
+
+Dit is nadrukkelijk **geen winkelmand die afrekent**. Een reis met een hotel, een scooter en een tafel bestaat uit drie handelingen bij drie partijen, en doen alsof dat één knop is, belooft de klant iets wat er niet is. De lijst brengt ze bij elkaar en wijst per regel de weg.
+
+Een bewaard aanbod dat verdwijnt — uitverkocht, zaak gestopt, reis vol — blijft in de lijst staan met `vervallen: true` en de reden erbij. De regel draagt zelf de titel en de prijs van het moment van bewaren, zodat je nog kunt zien *wat* je had bewaard en of het duurder is geworden. Stilweg verdwijnen laat iemand zoeken naar iets waarvan hij zeker weet dat hij het had.
+
+**De vraagkant** (`server/kern/mall/aanvragen.js`). Een zoekmachine kan alleen vinden wat er staat: "ik heb morgen een fotograaf nodig op Ibiza" levert nul treffers zolang geen fotograaf zich heeft aangemeld — en die nul is geen antwoord maar een gemiste markt. Een lid plaatst zijn vraag, de zaken die hem kunnen bedienen zien hem en reageren.
+
+Drie dingen die dit bewust niet doet:
+
+1. **Geen veiling.** Geen aftellende klok, geen "nog 2 plekken". Dat zijn de patronen die `CLAUDE.md` verbiedt, en ze horen hier het minst thuis: wie een loodgieter zoekt is al gehaast genoeg.
+2. **Geen automatische gunning.** Het lid kiest zelf, of kiest niet. Kiezen boekt niets en betaalt niets — de zaak krijgt bericht en neemt contact op via de gewone weg.
+3. **Geen adres in de open aanvraag.** Een zaak ziet de plek en wat er nodig is, en de codenaam. In een vraag die voor meerdere zaken zichtbaar is, hoort niet te staan wanneer iemand niet thuis is.
+
+Wie welke aanvraag ziet, hangt aan twee dingen: het genre moet bij de gevraagde verdieping horen, en de plek moet binnen het servicegebied van de zaak vallen. Een kapper in Haarlem krijgt geen loodgietersklus op Ibiza in beeld — en een wellness-zaak in Ibiza geen loodgietersklus in Ibiza.
+
 ### De Supplier OS ↔ Mall-koppeling
 
 De Mall las tot nu toe alleen wat een zaak **is** (naam, adres, artikelen, prijzen) en niet wat zij op dit moment **doet**. Een gesloten kapper stond er net zo bij als een open kapper, een woensdagmiddag die de ondernemer in zijn eigen agenda blokkeerde was in de Mall niet te zien, en een artikel met voorraad nul verschilde in niets van een artikel dat op de plank ligt.

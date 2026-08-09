@@ -20,7 +20,7 @@ const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-authrol-'));
 const api = (method, pad, token) => fetch(base + pad, {
   method, headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token },
   body: method === 'GET' ? undefined : '{}'
-}).then(r => ({ status: r.status }));
+}).then(async r => ({ status: r.status, body: await r.json().catch(() => null) }));
 
 // Elke route + de eerste echte middleware (express.json-prefix overslaan) uit
 // de serverbron. Middleware 'auth' = leden-endpoint.
@@ -59,10 +59,17 @@ test('ELK leden-endpoint weigert een leverancier- en kantoor-token met 401 (geen
   const fout = [];
   for (const e of endpoints) {
     for (const [rol, tok] of [['leverancier', sup], ['kantoor', office]]) {
-      const { status } = await api(e.method, e.pad, tok);
-      // 401 is de eis. 404 mag (een padparam-dummy bestaat niet), maar 2xx/3xx
-      // (ongewenste toegang) en 5xx (crash) zijn allebei fout.
-      if (status < 400 || status >= 500) fout.push(e.method + ' ' + e.pad + ' [' + rol + '] -> ' + status);
+      const { status, body } = await api(e.method, e.pad, tok);
+      /* 401 is de eis. 404 mag (een padparam-dummy bestaat niet), maar 2xx/3xx
+         (ongewenste toegang) en 5xx (crash) zijn allebei fout.
+
+         Een uitzondering, en het is er een die de belofte STERKER maakt: een
+         503 van een functie die bewust uitstaat. Dat endpoint laat niemand
+         binnen -- ook geen lid -- en dat is meer dan de 401 die hier gevraagd
+         wordt. We eisen wel dat het antwoord de functie noemt, zodat een echte
+         503-crash gewoon blijft opvallen. */
+      const bewustDicht = status === 503 && body && body.functie;
+      if (!bewustDicht && (status < 400 || status >= 500)) fout.push(e.method + ' ' + e.pad + ' [' + rol + '] -> ' + status);
     }
   }
   assert.equal(fout.length, 0, 'endpoints die een niet-leden-token binnenlieten of crashten:\n' + fout.slice(0, 40).join('\n'));

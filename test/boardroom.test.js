@@ -57,12 +57,19 @@ test.before(async () => {
 });
 test.after(() => stop(srv && srv.child));
 
-test('1. de eigenaar logt in en ziet alle functies groen (standaard aan)', async () => {
+/* Hoeveel functies horen er standaard UIT te staan? Dat was er ooit geen een,
+   en toen luidde deze toets "alles groen". Sinds het eigen domein buiten het
+   RTG-web bestaat er wel zo'n functie, en de belofte is scherper: er staat niets
+   uit BEHALVE wat standaard uit hoort te staan. */
+const UIT_STANDAARD = require('../server/functies').FUNCTIES.filter(f => f.standaard === false).length;
+
+test('1. de eigenaar logt in en ziet alle functies op hun standaard', async () => {
   const st = await api(base, '/api/boardroom/status', {}, owner);
   assert.equal(st.status, 200);
   assert.equal(st.body.eigenaar, true);
   assert.ok(st.body.samenvatting.totaal >= 20, 'een flink aantal functies');
-  assert.equal(st.body.samenvatting.uit, 0, 'standaard staat alles aan');
+  assert.ok(UIT_STANDAARD >= 1, 'er is minstens een functie die standaard uit staat');
+  assert.equal(st.body.samenvatting.uit, UIT_STANDAARD, 'niets staat uit behalve wat standaard uit hoort');
   assert.equal(st.body.samenvatting.storing, 0);
   // elke functie heeft een geldige stoplicht-status
   const alle = st.body.functies.flatMap(g => g.functies);
@@ -79,7 +86,7 @@ test('2. een functie uitzetten kleurt hem rood en blokkeert hem echt', async () 
   assert.equal(geblokt.status, 503, 'charter is uitgeschakeld');
   assert.equal(geblokt.body.functie, 'charter');
   const st = await api(base, '/api/boardroom/status', {}, owner);
-  assert.equal(st.body.samenvatting.uit, 1);
+  assert.equal(st.body.samenvatting.uit, UIT_STANDAARD + 1, 'de charter erbij');
 });
 
 test('3. een storing melden kleurt de functie oranje maar blokkeert niet', async () => {
@@ -101,10 +108,10 @@ test('4. uit wint van storing (rood boven oranje)', async () => {
   assert.equal(tickets.status, 'uit', 'een uitgezette functie is rood, ook met een storing');
 });
 
-test('5. reset zet alles terug naar de standaard (alles groen)', async () => {
+test('5. reset zet alles terug naar de standaard', async () => {
   const r = await api(base, '/api/boardroom/reset', {}, owner);
   assert.equal(r.status, 200);
-  assert.equal(r.body.samenvatting.uit, 0);
+  assert.equal(r.body.samenvatting.uit, UIT_STANDAARD, 'terug naar de standaard, niet naar "alles aan"');
   assert.equal(r.body.samenvatting.storing, 0);
   // charter werkt weer (niet meer 503)
   const na = await api(base, '/api/charter/aanbod', { city: 'Ibiza' });

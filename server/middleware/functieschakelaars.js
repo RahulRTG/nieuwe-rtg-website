@@ -52,11 +52,21 @@ function schakelaars({ db, accounts, functies, sessionFor, findSupplier, wachter
        nooit mee (dat is de taal van "bewust dicht", geen storing). */
     if (wachter) res.on('finish', () => { try { wachter.meet(p, res.statusCode); } catch (e) {} });
     const staat = (db.data && db.data.techniek && db.data.techniek.functies) || null;
-    /* De snelle uitgang: is er nog nooit iets geschakeld, dan staat alles aan
-       -- maar alleen zolang elke functie standaard AAN is. Een functie die
-       standaard UIT hoort te staan moet ook op een verse installatie dicht
-       zitten, anders betekent "standaard uit" niets. */
-    if (!staat && !functies.HEEFT_UIT_STANDAARD) return next();
+    /* DE SNELLE UITGANG: is er nog nooit iets geschakeld, dan staat alles aan.
+       Dat klopte zolang elke functie standaard AAN was, en zo was het ook: er
+       bestond geen enkele functie met standaard:false. Zodra die er wel een is,
+       stond hij op een verse installatie gewoon open -- en dan betekent
+       "standaard uit" niets.
+
+       De uitgang blijft daarom bestaan, maar laat de functies die STANDAARD UIT
+       zijn erdoorheen zakken naar de gewone afhandeling. Hem helemaal weghalen
+       zou veel meer doen dan bedoeld: dan gaat op een verse installatie ineens
+       de hele regelmachine draaien (genre-, land- en plaatsregels uit de
+       standaardmatrix), en die sliep daar juist. */
+    if (!staat && functies.HEEFT_UIT_STANDAARD) {
+      const f = functies.functieVoorPad(p);
+      if (!f || f.standaard !== false) return next();
+    } else if (!staat) return next();
 
     // De doelgroep van dit verzoek: uit het pad (leverancier/personeel/intern/
     // foundation) of uit de pas van het ingelogde lid (RTG/Lifestyle/Business).

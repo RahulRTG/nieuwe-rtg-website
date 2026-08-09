@@ -46,16 +46,33 @@ module.exports = (ctx) => {
   /* De seed -- de zes zones, hun straten en de gebieden erboven -- staat in
      ./geografieseed.js. Die bouwt de boom een keer op; hieronder wordt hij
      alleen nog bevraagd. */
-  const { zorgGeografie } = require('./geografieseed')({ REF, gebieden, save, hoeken, middenVan, omhullende });
+  const zaai = require('./geografieseed')({ REF, gebieden, save, hoeken, middenVan, omhullende });
+  const { zorgGeografie } = zaai;
 
   // ---- opvragen ----
 
   const gebied = (id) => perId()[String(id || '')] || null;
   const kinderen = (id) => gebieden().filter(g => g.ouder === String(id || ''));
-  const opNiveau = (niveau) => gebieden().filter(g => g.niveau === niveau);
-  const namen = (niveau) => opNiveau(niveau).map(g => g.naam);
-  const opNaam = (naam, niveau) => gebieden().find(g =>
-    g.naam.toLowerCase() === String(naam || '').trim().toLowerCase() && (!niveau || g.niveau === niveau)) || null;
+
+  /* De STAD-AS staat in ./steden.js: welke stad hoort bij dit gebied, welke
+     steden zijn er, wat zijn de grenzen van een stad en hoe komt er een bij.
+     Dat is uit dit bestand gehaald toen het over de 10 kB-grens ging, en de
+     naad lag er al: geografie.js bevraagt de boom, steden.js gaat over de
+     WORTELS van die boom. */
+  const stadas = require('./steden')({ gebieden, gebied, NIVEAUS, BOUNDS, schoon, coordPaar, zaai, opNaamRuw: (naam, niveau) => gebieden().find(g => g.naam.toLowerCase() === String(naam || '').trim().toLowerCase() && (!niveau || g.niveau === niveau)) || null });
+  const { stadVan, steden, stadId, inStad, grenzenVan, stadErbij } = stadas;
+
+  const opNiveau = (niveau, stad) => {
+    const wortel = stadId(stad);
+    return gebieden().filter(g => g.niveau === niveau && inStad(g, wortel));
+  };
+  const namen = (niveau, stad) => opNiveau(niveau, stad).map(g => g.naam);
+  const opNaam = (naam, niveau, stad) => {
+    const wortel = stadId(stad);
+    return gebieden().find(g =>
+      g.naam.toLowerCase() === String(naam || '').trim().toLowerCase() &&
+      (!niveau || g.niveau === niveau) && inStad(g, wortel)) || null;
+  };
 
   // de kruimelpad van stad naar dit gebied; begrensd, want een kapotte
   // ouder-verwijzing mag geen oneindige lus worden
@@ -102,41 +119,34 @@ module.exports = (ctx) => {
      terug bij twijfel. Een adreszoeker die gokt, hangt meldingen aan de
      verkeerde straat en dat is erger dan geen plaats: dan gaat er iemand
      kijken op een plek waar niets aan de hand is. */
-  function uitTekst(tekst) {
+  function uitTekst(tekst, stad) {
     const t = String(tekst || '').toLowerCase();
     if (t.length < 3) return null;
-    let beste = null;
-    for (const g of [...opNiveau('straatsegment'), ...opNiveau('zone')]) {
+    let beste = null, evenGoed = 0;
+    for (const g of [...opNiveau('straatsegment', stad), ...opNiveau('zone', stad)]) {
       const naam = g.naam.toLowerCase();
       if (!new RegExp('(^|[^a-z])' + naam.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') + '([^a-z]|$)').test(t)) continue;
-      if (!beste || naam.length > beste.naam.length) beste = g;
+      if (!beste || naam.length > beste.naam.length) { beste = g; evenGoed = 1; }
+      else if (naam.length === beste.naam.length && g.id !== beste.id) evenGoed++;
     }
-    return beste;
+    /* TWEE STEDEN KUNNEN DEZELFDE STRAATNAAM HEBBEN, en het startraster geeft ze
+       zelfs dezelfde. Staat de naam in meer dan een stad, dan is er geen
+       antwoord -- deze zoeker geeft al sinds zijn eerste versie niets terug bij
+       twijfel, en dit is precies zo'n twijfel. Wie het wel weet, geeft de stad
+       mee. */
+    return evenGoed > 1 ? null : beste;
   }
 
-  function gebiedMaak({ niveau, naam, ouder, punten, soort }) {
-    zorgGeografie();
-    if (!NIVEAUS.includes(String(niveau || ''))) return { status: 400, error: 'Kies een niveau: ' + NIVEAUS.join(', ') + '.' };
-    const n = schoon(naam, 60);
-    if (!n) return { status: 400, error: 'Hoe heet het gebied?' };
-    const o = ouder ? gebied(ouder) : null;
-    if (ouder && !o) return { status: 404, error: 'Dat ouder-gebied bestaat niet.' };
-    if (o && NIVEAUS.indexOf(o.niveau) >= NIVEAUS.indexOf(niveau))
-      return { status: 400, error: 'Een ' + niveau + ' hoort onder een ' + NIVEAUS[NIVEAUS.indexOf(niveau) - 1] + ', niet onder een ' + o.niveau + '.' };
-    const rij = (Array.isArray(punten) ? punten : []).map(q => ({ lat: Number(q && q.lat), lng: Number(q && q.lng) }))
-      .filter(q => Number.isFinite(q.lat) && Number.isFinite(q.lng) &&
-        q.lat >= BOUNDS.lat0 && q.lat <= BOUNDS.lat1 && q.lng >= BOUNDS.lng0 && q.lng <= BOUNDS.lng1);
-    if (!rij.length) return { status: 400, error: 'Geef minstens een punt binnen de stadsgrenzen.' };
-    const s = ['punt', 'lijn', 'vlak'].includes(soort) ? soort : (rij.length === 1 ? 'punt' : rij.length === 2 ? 'lijn' : 'vlak');
-    const g = { id: 'G-' + crypto.randomBytes(4).toString('hex'), niveau, naam: n,
-      ouder: o ? o.id : null, geometrie: { soort: s, punten: rij }, centrum: middenVan(rij) };
-    gebieden().push(g);
-    save();
-    return { ok: true, gebied: g };
-  }
+  /* Het MAKEN van een gebied staat in ./gebiedmaak.js: dit bestand bevraagt de
+     boom, dat bestand voegt eraan toe. Twee dingen die los van elkaar
+     veranderen -- de straatzoeker wijzigt zelden, de regels voor wat er onder
+     wat mag hangen wel. */
+  const gebiedMaak = require('./gebiedmaak')({ NIVEAUS, gebied, gebieden, save, crypto, schoon,
+    middenVan, zorgGeografie, grenzenVan, stadVan });
 
   return {
     NIVEAUS, zorgGeografie, gebied, kinderen, opNiveau, namen, opNaam, uitTekst, pad, binnen, plaats, label,
+    stadVan, steden, stadErbij, grenzenVan,
     afstand: haversine, totGeometrie, inVlak, middenVan,
     api: {
       weefselGebieden: ({ niveau } = {}) => {
@@ -145,6 +155,9 @@ module.exports = (ctx) => {
           gebieden: (niveau ? opNiveau(niveau) : gebieden()).map(g => ({ ...g, label: label(g.id) })) };
       },
       weefselGebiedMaak: gebiedMaak,
+      weefselStadErbij: (v) => { const r = stadErbij(v || {}); return r.ok ? { status: 200, ...r } : r; },
+      weefselSteden: () => { zorgGeografie(); return { status: 200,
+        steden: steden().map(g => ({ id: g.id, naam: g.naam, zones: namen('zone', g.id).length })) }; },
       weefselPlaats: ({ lat, lng }) => {
         const p = coordPaar(lat, lng);
         if (!p) return { status: 400, error: 'Geef een geldige positie (lat en lng).' };

@@ -1796,6 +1796,25 @@ Twee dingen die door deze ronde heen lopen. **Een nulmeting die je kwijt bent, i
 
 De chaosproef leverde het eerste gemeten failover-cijfer op: SIGKILL op de actieve server, 535 verzoeken op 25 ms, **0 mislukt**. Dat staat in `SLO.md` naast de herstelmeting, met het voorbehoud erbij dat "geen onderbreking gemeten" iets anders is dan "geen onderbreking".
 
+### Het stadsweefsel draagt meer dan één stad
+
+De boom van het weefsel begint bij `stad` en is vijf niveaus diep, dus **meerdere wortels pasten er altijd al in**. Wat ontbrak waren drie dingen, en ze waren geen van drieën zichtbaar zolang er één stad was:
+
+1. **Niemand bouwde er een tweede.** `zorgGeografie()` stopte zodra er iets stond.
+2. **De bevragingen kenden geen stad.** `namen('zone')` gaf de zones van alles bij elkaar. Dat leest als één stad zolang er één is, en is stilzwijgend fout zodra er twee zijn — een veldploeg ziet dan zones die duizend kilometer verderop liggen. Dit is de gevaarlijkste van de drie, want er gaat niets kapot: er staat gewoon te veel.
+3. **De grenzen waren die van Ibiza.** Elk punt werd getoetst aan de vaste rechthoek uit `kern/navigatie`, dus een gebied in een tweede stad viel per definitie "buiten de stadsgrenzen" en die stad kon nooit gevuld worden.
+
+`kern/stadsweefsel/steden.js` lost alle drie op: `stadErbij()` bouwt hetzelfde startraster (zes zones, drie buurten, drie wijken, twee straatsegmenten per zone) rond een eigen middelpunt met een eigen id-voorvoegsel, elke bevraging kent een stad-as, en de grenzen komen van de stad zelf. Twee steden mogen elkaar **niet overlappen** — dan hoort een punt bij allebei en gaan er twee ploegen naar dezelfde lantaarn.
+
+**Er wordt niets verhuisd.** De eerste stad houdt haar ids (`G-stad`, `G-marina`, `G-marina-laan`) letterlijk. Gegevens verplaatsen om een functie toe te voegen is de duurste manier om een fout te maken die je pas maanden later ziet.
+
+Daarmee kan de **stadsstart** de stap doen die hij eerder als openstaand moest melden: met een middelpunt bouwt hij het weefsel echt. Mislukt dat — geen middelpunt, een stad die overlapt — dan blijft de stap open staan met de reden erbij, en wordt hij niet groen gemeld. Wat mensenwerk blijft is eerlijker geworden in plaats van korter: de zes zones dragen generieke namen die hernoemd horen te worden, en er ligt geen wegennet onder een tweede stad.
+
+Twee echte fouten kwamen onderweg boven, allebei gevonden door een toets en geen van beide door een lezer:
+
+- Bij het opknippen viel `zorgGeografie()` uit `stadErbij()` weg. Wie een tweede stad aanmaakte vóórdat er ooit een zone was opgevraagd, kreeg een platform waarin de **eerste stad nooit meer werd gezaaid**.
+- `stadId()` gaf `null` voor zowel "geen stad gevraagd" als "een stad gevraagd die niet bestaat". Een vraag naar de zones van een nog niet gebouwde stad gaf dus de zones van **alle** steden terug — en de stadsstart las dat als "zes zones" en meldde de weefselstap groen terwijl er niets stond.
+
 ### De norm is weer een norm
 
 `npm run norm` stond rood: elf meters waren weggelopen sinds 8 augustus, terwijl er een hele bestuurslaag bij kwam. Ze zijn met de hand vastgezet in `NORM.json` — niet met `--vastleggen`, want dat tilt ook meters op die niemand heeft aangeraakt — en met een geschreven reden per post, zoals dat bestand zelf voorschrijft: *"Herstel het, of verlaag de norm met de hand — dan staat het als bewuste keuze in de historie."*

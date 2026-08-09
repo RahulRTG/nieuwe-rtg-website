@@ -2009,8 +2009,12 @@
           '<div class="kaart"><h3>Nieuwe stad</h3><div class="crij">' +
           '<input class="veld mid" id="stN" placeholder="naam">' +
           '<input class="veld smal" id="stL" placeholder="landcode (bv. NL)">' +
+          '<input class="veld kort" id="stLat" placeholder="lat" aria-label="breedtegraad">' +
+          '<input class="veld kort" id="stLng" placeholder="lng" aria-label="lengtegraad">' +
           '<button class="knop vol" id="stGa">Starten</button></div>' +
-          '<p class="meta">Het landpakket van dat land moet aanstaan.</p></div>';
+          '<p class="meta">Het landpakket van dat land moet aanstaan. Met een middelpunt bouwt de start ' +
+          'ook meteen het weefsel: zes zones met hun straatsegmenten. Zonder middelpunt staat de ' +
+          'administratie er wel en blijft die stap open.</p></div>';
 
         for (var i = 0; i < d.steden.length; i++) {
           var s2 = d.steden[i];
@@ -2026,7 +2030,9 @@
         document.querySelector('#stUit').innerHTML = u;
         document.querySelector('#stGa').onclick = function () {
           api('stad/start', { naam: document.querySelector('#stN').value,
-            land: document.querySelector('#stL').value })
+            land: document.querySelector('#stL').value,
+            lat: Number(document.querySelector('#stLat').value) || null,
+            lng: Number(document.querySelector('#stLng').value) || null })
             .then(teken).catch(function (e) { if (!e.stil) C.meld(e.message); });
         };
         hang('data-stweg', function (n) { return api('stad/stop', { naam: n }).then(teken); });

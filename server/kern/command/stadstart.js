@@ -27,6 +27,10 @@
 const MAX_STEDEN = 100;
 
 function maakStadstart({ db, save, journaal, landpakket, functies, plaatsNorm, weefsel }) {
+  /* Het weefsel mag lui binnenkomen: het hangt pas aan de kern na de aanbouw,
+     en deze laag wordt daarvoor gebouwd. Dezelfde late binding als bij
+     genrepuls en de API-poort. */
+  const W = () => (typeof weefsel === 'function' ? weefsel() : weefsel);
   const norm = typeof plaatsNorm === 'function' ? plaatsNorm : (v => String(v || '').toLowerCase().trim());
 
   function staat() {
@@ -59,19 +63,29 @@ function maakStadstart({ db, save, journaal, landpakket, functies, plaatsNorm, w
       uitleg: dicht.length ? dicht.length + ' functie(s) staan hier dicht: ' + dicht.join(', ')
         : 'geen enkele functie staat in deze stad dicht' });
 
-    /* Het weefsel. Dit is de stap die een knop NIET kan doen, en hij staat er
-       daarom als openstaand in plaats van als vinkje. */
+    /* Het weefsel. Deze stap STOND op "kan een knop niet doen": de boom droeg
+       een geografie zonder sleutel "welke stad". Sinds die verbouwing
+       (kern/stadsweefsel/steden.js) draagt hij meerdere wortels, en meet deze
+       stap of DEZE stad er echt in staat -- met haar eigen zones. */
     let zones = null;
-    try { zones = weefsel && typeof weefsel.weefselZones === 'function' ? weefsel.weefselZones() : null; } catch (e) { zones = null; }
-    uit.push({ stap: 'stadsweefsel', bron: 'kern/stadsweefsel', gedaan: false, aard: 'gemeten',
-      uitleg: 'het weefsel draagt vandaag EEN geografie' +
-        (zones ? ' (' + zones.length + ' zones)' : '') + ' zonder sleutel "welke stad". Een tweede stad ' +
-        'met eigen zones, Stadsdozen en tijdreeksen is een verbouwing van die laag en geen knop hier.' });
+    try { const w = W(); zones = w && typeof w.weefselZones === 'function' ? w.weefselZones(stad.naam) : null; }
+    catch (e) { zones = null; }
+    const heeft = Array.isArray(zones) && zones.length > 0;
+    uit.push({ stap: 'stadsweefsel', bron: 'kern/stadsweefsel', gedaan: heeft, aard: 'gemeten',
+      uitleg: heeft
+        ? zones.length + ' zones met hun straatsegmenten staan in het weefsel (' + zones.join(', ') + ')'
+        : 'deze stad staat niet in het weefsel. Start hem opnieuw, of zet hem er met de hand in; ' +
+          'zonder gebieden hoort een melding uit deze stad nergens bij.' });
     return uit;
   }
 
+  /* WAT ER NA HET STARTEN NOG MENSENWERK BLIJFT. Deze lijst is korter geworden
+     doordat het weefsel meerdere steden ging dragen, maar hij is niet leeg --
+     en de twee die erbij kwamen zijn eerlijker dan de ene die eraf ging. */
   const MENSENWERK = [
-    'de zones, straten en Stadsdozen van deze stad in het weefsel zetten (dat is vandaag een verbouwing, zie de stap hierboven)',
+    'de zones hernoemen: een nieuwe stad krijgt het generieke startraster (Centrum, Marina, Boulevard...), en die namen kloppen zelden',
+    'er ligt geen wegennet onder een tweede stad; kern/navigatie kent er een, en dat is dat van de eerste stad',
+    'Stadsdozen plaatsen: het weefsel kent de zones, maar er staat nog geen sensor in',
     'een gemeente of beheerder die de openbare-ruimtebesluiten neemt',
     'de lokale tarieven en openingstijden nalopen; het landpakket dekt het land en niet de stad'
   ];
@@ -110,6 +124,22 @@ function maakStadstart({ db, save, journaal, landpakket, functies, plaatsNorm, w
 
     lijst[sleutel] = { naam: String(naam).slice(0, 60), sleutel, land,
       gestart: new Date().toISOString(), door: String(o.door || 'onbekend'), sluit: [] };
+
+    /* HET WEEFSEL ERBIJ, en dit is de stap die deze knop tot voor kort niet kon
+       doen. Hij mag mislukken (geen middelpunt opgegeven, een stad die
+       overlapt) -- dan blijft de stap gewoon openstaan met de reden erbij, en
+       staat de administratie er alvast. Wat hij NIET doet is de fout inslikken
+       en groen melden. */
+    const wf = W();
+    if (wf && typeof wf.weefselStadErbij === 'function' && o.lat != null && o.lng != null) {
+      try {
+        const w = wf.weefselStadErbij({ naam: String(naam), lat: o.lat, lng: o.lng, sleutel });
+        lijst[sleutel].weefsel = w && w.stad ? { id: w.stad.id, zones: (w.zones || []).length }
+          : { fout: (w && w.error) || 'onbekende reden' };
+      } catch (e) { lijst[sleutel].weefsel = { fout: e.message }; }
+    } else {
+      lijst[sleutel].weefsel = { fout: 'geen middelpunt opgegeven (lat en lng), dus er is geen geografie gebouwd' };
+    }
 
     const st = staat();
     for (const id of (Array.isArray(o.sluit) ? o.sluit : [])) {

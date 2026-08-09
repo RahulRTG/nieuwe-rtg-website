@@ -107,7 +107,16 @@ module.exports = (deps) => {
     weefselBeeld: beeld,
     weefselKaart: kaart,
     // de zonenamen: kern/stad had ze zelf in db.data.stadZones; die waarheid ligt nu hier
-    weefselZones: () => { geo.zorgGeografie(); return geo.namen('zone'); },
+    /* De zonenamen. Sinds het weefsel meerdere steden draagt, kan deze vraag
+       niet meer zonder stad -- zonder stad zijn het de zones van ALLES, en dat
+       leest als een stad zolang er een is. De parameter is optioneel gebleven
+       omdat kern/stad vandaag een stad toont; wie hem weglaat krijgt wat hij
+       vroeger kreeg, en dat staat in weefselSteden() te zien. */
+    weefselZones: (stad) => { geo.zorgGeografie(); return geo.namen('zone', stad); },
+    /* weefselStadErbij en weefselSteden staan NIET hier maar in geo.api, en dat
+       is geen slordigheid: Object.assign hieronder legt geo.api over dit object
+       heen, dus een tweede versie met dezelfde naam zou stil verliezen. Een
+       naam, een plek. */
     weefselZone: (naam) => geo.opNaam(naam, 'zone'),
     // een Stadsdoos krijgt een plaats en wordt een object in het register
     weefselDoosPlaats: (doos) => {

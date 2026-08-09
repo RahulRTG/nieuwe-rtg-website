@@ -28,7 +28,7 @@
    ./risico.js uit het beleid van dat moment. */
 'use strict';
 
-function maakCommand({ db, save, crypto, anthropic, sseToOffice }) {
+function maakCommand({ db, save, crypto, anthropic, sseToOffice, kern }) {
   /* HET RTG-REGISTER, en het gaat er expliciet in. Elke laag die gegevens leest
      krijgt hem mee in plaats van hem te importeren; dat is wat het mogelijk
      maakt om dezelfde motoren op een BEPERKT register te draaien (de zaak-kant,
@@ -66,7 +66,7 @@ function maakCommand({ db, save, crypto, anthropic, sseToOffice }) {
      canary. Ze zijn uit dit bestand gehaald toen het over de 10 kB-grens ging;
      de naad lag er al, want dit zijn allemaal dingen die de ruggengraat
      GEBRUIKEN en die de ruggengraat zelf niet nodig heeft. */
-  const lagen = require('./lagen').maakLagen({ db, save, crypto, journaal, register });
+  const lagen = require('./lagen').maakLagen({ db, save, crypto, journaal, register, kern });
   const { mdm, landpakket, apipoort, overname, zandbak, canary, stadstart } = lagen;
 
   /* De meetkant van niveau 5. De sonde levert de metingen van BUITENAF en de

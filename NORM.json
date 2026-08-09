@@ -11,7 +11,7 @@
     "zelfpoortendeToetsen": 17,
     "e2eBestanden": 69,
     "keuringOmvang": 126,
-    "keuringDubbeling": 89,
+    "keuringDubbeling": 90,
     "keuringDekkingAdvies": 53,
     "endpointsNooitAangeraakt": 0,
     "onbewaakt": 0,
@@ -22,13 +22,19 @@
     "inlineStijlAttributen": 5850,
     "browserpoortToetsen": 103,
     "kernBreedte": 1123,
-    "kernGedeeld": 147,
+    "kernGedeeld": 148,
     "kernBreedsteBestand": 71,
     "kernOngebruikt": 0,
-    "toetsenNietGemeten": 204,
+    "toetsenNietGemeten": 205,
     "toetsenOngevoeligPct": 2.3
   },
   "notities": [
+    {
+      "datum": "2026-08-09",
+      "meter": "keuringDubbeling 89 -> 90, kernGedeeld 147 -> 148, toetsenNietGemeten 204 -> 205",
+      "reden": "De verbouwing van het stadsweefsel: de boom droeg een stad terwijl zijn eigen wortelniveau er meerdere toestond. Er kwamen drie bestanden bij (kern/stadsweefsel/steden.js, gebiedmaak.js en routes/command/inrichten.js), alle drie op een naad die er al lag en alle drie omdat het bestand eronder over de 10 kB-grens ging. Een gedeelde kern-eigenschap erbij (kern.weefsel gaat nu ook naar de commandlaag, met late binding) en een toetsbestand erbij (test/stadsweefsel-steden.test.js).",
+      "eerlijkheidshalve": "Vier mutaties gedraaid op de nieuwe laag, alle vier raak. Belangrijker: de toetsen vonden twee echte fouten die ik zelf had gemaakt en die geen enkele lezer eruit had gehaald. Bij het opknippen viel zorgGeografie() uit stadErbij(), zodat wie een tweede stad aanmaakte voordat er ooit een zone was opgevraagd, de EERSTE stad nooit meer gezaaid kreeg. En stadId() gaf null voor zowel 'geen stad gevraagd' als 'een stad gevraagd die niet bestaat', waardoor een vraag naar de zones van een nog niet gebouwde stad de zones van ALLE steden teruggaf -- en de stadsstart dat als zes zones las en de weefselstap groen meldde terwijl er niets stond. Dat tweede is precies de klasse fout waar deze hele ronde over ging: niets gaat kapot, er staat alleen te veel."
+    },
     {
       "datum": "2026-08-09",
       "meter": "elf meters met de hand vastgezet na de Command-bouw (zie de lijst hieronder)",

@@ -1,21 +1,22 @@
 /* Stadsstart (kern/command/stadstart.js): een stad inrichten, en eerlijk zeggen
    wat een knop niet kan.
 
-   WAT DEZE TOETS VOORAL BEWAAKT is de stap die BEWUST op "niet gedaan" blijft
-   staan. Het stadsweefsel draagt vandaag één geografie zonder sleutel "welke
-   stad"; een tweede stad met eigen zones en Stadsdozen is een verbouwing van
-   die laag en geen knop hier. Dat had verstopt kunnen worden achter een groene
-   melding, en dat is precies de duurste soort knop: iemand start Antwerpen,
-   ziet "ingericht", en ontdekt een maand later dat elke meting in de zones van
-   de eerste stad is geboekt.
+   WAT DEZE TOETS VOORAL BEWAAKT is dat een MISLUKTE weefselbouw niet als groen
+   wordt gemeld. Deze stap stond lang op "kan een knop niet doen", omdat de boom
+   één geografie droeg; sinds kern/stadsweefsel/steden.js draagt hij er meer en
+   bouwt deze knop hem echt. Maar hij kan mislukken -- geen middelpunt, een stad
+   die overlapt -- en dan hoort de stap open te blijven staan met de reden. De
+   duurste variant is de andere: iemand start Antwerpen, ziet "ingericht", en
+   ontdekt een maand later dat elke meting in de zones van de eerste stad is
+   geboekt.
 
    En het tweede: een stad in een land dat niet is ingericht, is een stad zonder
    munt, zonder tarieven en zonder loonregels. Dat wordt geweigerd en niet
    half gedaan.
 
    MUTATIES die zijn gedraaid en welke toets erop zakte (LAT.md regel 2):
-   - de weefselstap op gedaan:true zetten
-     -> "de weefselstap blijft openstaan en zegt waarom" ZAKT (RAAK)
+   - de weefselstap altijd op gedaan:true zetten
+     -> "zonder middelpunt blijft de weefselstap openstaan, met de reden" ZAKT (RAAK)
    - de landcontrole uit start() halen
      -> "een stad zonder ingericht land gaat niet door" ZAKT (RAAK)
    - stop() de per-plaats-standen laten staan
@@ -38,9 +39,19 @@ function maak() {
   const functies = { OP_ID: { 'supplier-pos': { id: 'supplier-pos' } } };
   const landpakket = maakLandpakket({ db, save: () => {}, journaal, fiscaal, valuta,
     talen: () => db.data.talen, functies });
-  const stad = maakStadstart({ db, save: () => {}, journaal, landpakket, functies, plaatsNorm,
-    weefsel: { weefselZones: () => ['centrum', 'marina'] } });
-  return { db, stad, landpakket, regels };
+  /* Een nagemaakt weefsel dat zich als het echte gedraagt: het kent zones per
+     stad en alleen van steden die er zijn gezet. */
+  const bak = {};
+  const weefsel = {
+    weefselZones: (naam) => bak[String(naam || '')] || [],
+    weefselStadErbij: ({ naam }) => {
+      if (bak[naam]) return { status: 409, error: 'bestaat al' };
+      bak[naam] = ['Oud-West', 'Centrum', 'Marina', 'Bedrijvenkwartier', 'Groenzone', 'Boulevard'];
+      return { stad: { id: 'G-x-stad', naam }, zones: bak[naam] };
+    }
+  };
+  const stad = maakStadstart({ db, save: () => {}, journaal, landpakket, functies, plaatsNorm, weefsel });
+  return { db, stad, landpakket, regels, bak };
 }
 
 test('een stad zonder ingericht land gaat niet door', () => {
@@ -71,24 +82,40 @@ test('een stad in een ingericht land start, met de naam genormaliseerd', () => {
     'dezelfde plaats anders getypt is dezelfde plaats');
 });
 
-test('de weefselstap blijft openstaan en zegt waarom', () => {
-  /* DE KERN. Deze stap hoort NIET groen te worden door hem te starten. */
-  const { stad, landpakket } = maak();
+test('met een middelpunt wordt het weefsel echt gebouwd', () => {
+  /* DEZE STAP STOND OP "KAN EEN KNOP NIET DOEN", en dat was waar zolang de boom
+     één geografie droeg. Sinds kern/stadsweefsel/steden.js draagt hij meerdere
+     wortels, en meet deze stap of DEZE stad er echt in staat. */
+  const { stad, landpakket, bak } = maak();
+  landpakket.activeer('BE', 'ik');
+  const r = stad.start('Antwerpen', { land: 'BE', lat: 51.22, lng: 4.40, door: 'ik' });
+  const w = r.stappen.find(s => s.stap === 'stadsweefsel');
+  assert.equal(w.gedaan, true);
+  assert.match(w.uitleg, /6 zones/);
+  assert.deepEqual(r.open, [], 'er staat geen stap meer open');
+  assert.equal(bak.Antwerpen.length, 6, 'en het weefsel is echt aangeroepen');
+  assert.match(r.let, /eerlijker dan de knop/);
+});
+
+test('zonder middelpunt blijft de weefselstap openstaan, met de reden', () => {
+  /* DE ANDERE KANT, en die is belangrijker: een mislukte weefselbouw mag NIET
+     als groen gemeld worden. Zonder lat en lng valt er niets te bouwen, en dan
+     staat de stap open met de reden erbij in plaats van te verdwijnen. */
+  const { stad, landpakket, db } = maak();
   landpakket.activeer('BE', 'ik');
   const r = stad.start('Antwerpen', { land: 'BE', door: 'ik' });
   const w = r.stappen.find(s => s.stap === 'stadsweefsel');
   assert.equal(w.gedaan, false);
-  assert.match(w.uitleg, /EEN geografie/);
-  assert.match(w.uitleg, /verbouwing/);
+  assert.match(w.uitleg, /staat niet in het weefsel/);
   assert.deepEqual(r.open, ['stadsweefsel']);
-  assert.ok(r.mensenwerk.length >= 3);
-  assert.match(r.let, /eerlijker dan de knop/);
+  assert.match(db.data.steden.antwerpen.weefsel.fout, /geen middelpunt/);
+  assert.ok(r.mensenwerk.length >= 5, 'en er blijft mensenwerk staan');
 });
 
 test('starten zet de per-plaats-standen, stoppen haalt ze weg', () => {
   const { db, stad, landpakket } = maak();
   landpakket.activeer('BE', 'ik');
-  stad.start('Antwerpen', { land: 'BE', door: 'ik', sluit: ['supplier-pos', 'bestaat-niet'] });
+  stad.start('Antwerpen', { land: 'BE', lat: 51.22, lng: 4.40, door: 'ik', sluit: ['supplier-pos', 'bestaat-niet'] });
   assert.equal(db.data.techniek.functies['supplier-pos'].perPlaats.antwerpen, false);
   assert.equal(db.data.techniek.functies['bestaat-niet'], undefined, 'een onbekende functie wordt niet verzonnen');
   const k = stad.stand('Antwerpen');

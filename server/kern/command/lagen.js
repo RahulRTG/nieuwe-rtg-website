@@ -14,7 +14,7 @@
    gebruikt. */
 'use strict';
 
-function maakLagen({ db, save, crypto, journaal, register }) {
+function maakLagen({ db, save, crypto, journaal, register, kern }) {
   /* Master data voor bedrijven en locaties. Welke collecties een partij dragen
      en welk veld de naam en de plaats is, staat HIER en niet in de module: dat
      is aangegeven en geen meting, en het hoort op één plek te staan. De
@@ -62,7 +62,11 @@ function maakLagen({ db, save, crypto, journaal, register }) {
   const stadstart = require('./stadstart').maakStadstart({ db, save, journaal, landpakket,
     functies: require('../../functies/register'),
     plaatsNorm: require('../../functies/toegang').plaatsNorm,
-    weefsel: null });
+    /* Het weefsel gaat er nu ECHT in: sinds kern/stadsweefsel/steden.js draagt
+       de boom meerdere steden, dus kan deze laag er een bouwen in plaats van
+       hem als openstaande stap te melden. Late binding, want kern.weefsel hangt
+       er pas na de aanbouw. */
+    weefsel: () => (kern && kern.weefsel) || null });
 
   return { mdm, landpakket, apipoort, overname, zandbak, canary, stadstart };
 }

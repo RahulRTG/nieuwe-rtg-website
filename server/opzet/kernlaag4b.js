@@ -77,6 +77,17 @@ Object.assign(kern, require('../kern/onderneming')({ db, save, crypto, schoon, f
      nagebouwd: twee lijsten die allebei "is deze zaak er klaar voor" beweren,
      lopen uiteen. */
   ondernemerpoort }));
+/* De Rechtsvormwacht (kern/onderneming/rechtsvormwacht.js): rechtsvormen --
+   Nederlandse en buitenlandse in een register -- worden automatisch bijgewerkt
+   in plaats van overgetypt. Zelfde ontwerp als de Regelwacht hierboven: een
+   gevalideerde overlay op het gedeelde register, herstart-vast, met een
+   dagelijkse bron-check en de ingebouwde tabel als veilige basis. Hij hangt
+   direct achter de onderneming, want die tabel is van hem. */
+Object.assign(kern, require('../kern/onderneming/rechtsvormwacht')({ db, save }));
+kern.rechtsvormwacht.herstelOverlay();
+const rvTimer = setInterval(() => { kern.rechtsvormwacht.check().catch(() => {}); },
+  Number(process.env.RECHTSVORM_CHECK_MS || 86400000));
+if (rvTimer.unref) rvTimer.unref();
 /* De Opvang-afdeling (AZC/COA), het Regeringskantoor van de
    minister-president en het eigen hotel van elke afdeling -- alle drie
    kamers van RTG Kantoren. */

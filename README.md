@@ -1823,6 +1823,64 @@ aanvraag klokken, de mediaan door een gemiddelde vervangen, het scorings-verwijt
 ook zonder meting laten verschijnen, en de pijplijn-acties achter die van de
 relaties zetten.
 
+### Rechtsvormen: Nederland en het buitenland, automatisch bijgewerkt
+
+`server/kern/onderneming/rechtsvorm.js` (het register en de logica),
+`rechtsvorm-nl.js`, `rechtsvorm-europa.js` (BE, DE, FR, ES),
+`rechtsvorm-angelsaksisch.js` (GB, US) en `rechtsvormwacht.js` +
+`/api/onderneming/rechtsvormen[?land=DE]` en
+`/api/office/rechtsvormwacht{,/check,/zet}`.
+
+**Een register, elk met zijn land.** De Nederlandse vormen houden hun kale id
+(`bv`, `stichting`): die staan in de opslag van bestaande ondernemingen, en een
+hernoemde id laat een bestaand bedrijf achter zonder rechtsvorm. Buitenlandse
+vormen dragen hun landcode in het id (`de-gmbh`). De twee landentabellen staan
+apart omdat ze een andere rechtstraditie beschrijven -- op het continent
+ontstaat een kapitaalvennootschap bij de **notaris**, in de angelsaksische
+landen door **registratie** -- en dat verschil zit in bijna elke
+oprichtingsstap.
+
+**Wat wij niet weten, staat er niet.** Voor een land dat wij niet kennen komt er
+geen ongeveer-Nederlandse lijst maar een expliciet "wij kennen de rechtsvormen
+van dit land niet", met de landen die wij wel kennen erbij. Wie op de verkeerde
+lijst afgaat, gaat naar de verkeerde instantie. Om dezelfde reden noemt elke
+stap de instantie van het land zelf (KBO, Handelsregister, Companies House) en
+draagt geen buitenlandse vorm een Nederlands fiscaal begrip als
+`urencriterium` of `dga-loon` -- daar staat `winst-bij-eigenaar` of
+`winstbelasting-rechtspersoon`. En de Verenigde Staten zeggen zelf dat het
+bedrijfsrecht daar van de **staat** is en niet van de federatie.
+
+**De Nederlandse belastingsom blijft Nederlands.** `zzpBerekening` rekent met
+Nederlandse regels; `belasting.js` weigert daarom te rekenen zodra het land van
+de rechtsvorm niet NL is, met de reden in het antwoord. De btw-optelsom uit de
+eigen facturen blijft wel staan -- dat is een som en geen tarief.
+
+**De Rechtsvormwacht** is dezelfde constructie als de Regelwacht: een
+gevalideerde overlay op het gedeelde register, herstart-vast
+(`db.data.rechtsvormRegels`), met een dagelijkse controle op
+`RECHTSVORM_BRON_URL` en de ingebouwde tabel als veilige basis. Vier grendels
+die een bron nooit kan openen:
+
+- **verboden groeit alleen** -- een bron mag een verbod toevoegen en er nooit
+  een weghalen, anders is één regel in een bestand genoeg om een stichting
+  winst te laten uitkeren;
+- **caps komen uit het woordenboek** van dit huis; een verzonnen naam vult geen
+  scherm maar kan wel een knop laten opduiken die niemand ontwierp;
+- **rechtspersoon en notarieel liggen vast** zodra een vorm bestaat -- die
+  eerste stuurt de belastinggrendel aan;
+- **een rechtsvorm verdwijnt nooit**: er kan een onderneming aan hangen.
+
+Een nieuwe vorm (ook in een nieuw land) mag er wel bij, maar alleen compleet:
+zonder label, landcode, expliciete `rechtspersoon` en een gevulde
+oprichtingslijst komt hij er niet in. Een halve rechtsvorm is erger dan geen,
+want hij verschijnt wel in de keuzelijst.
+
+Getoetst in `test/onderneming-rechtsvormen.test.js` (21). Acht mutaties; zeven
+beten meteen. **De achtste sloeg af en legde een gat in mijn toets bloot:** ik
+toetste wel een vorm zónder `oprichting`-veld, maar niet een met een lege lijst
+-- en juist die kwam er ongestraft doorheen. Er staat nu een geval met
+`oprichting: []`; daarna beet de mutatie wel.
+
 ### RTG Werk OS (de werkplek van een organisatie)
 
 `server/bedrijf/` + `/api/bedrijf/...` + `/apps/werk.html`. Een **werkruimte**

@@ -13,7 +13,8 @@
    ingelogde eigenaar zijn. Dat is een eigendomscontrole op het doel en niet op
    de aanvrager (lat-regel 7); een id uit het lichaam is nooit een bewijs. */
 module.exports = (kern) => {
-  const { app, auth, save, ONDERNEMING_RECHTSVORMEN, ondernemingVind, ondernemingVanEigenaar,
+  const { app, auth, save, ONDERNEMING_RECHTSVORMEN, ondernemingRechtsvormenVanLand,
+    ondernemingRechtsvormLanden, ondernemingVind, ondernemingVanEigenaar,
     ondernemingBeeld, ondernemingNieuw, ondernemingRechtsvorm, ondernemingKoppel,
     ondernemingIngeschreven, ondernemingIntakeZet, ondernemingIntakeBeeld,
     ondernemingVerkenning, ondernemingPlanVastleggen, ondernemingDagbeeld,
@@ -44,11 +45,21 @@ module.exports = (kern) => {
   /* De rechtsvormen als keuzelijst -- zonder inlog, want het is voorlichting
      en geen bedrijfsdata. Wat een B.V. van een stichting onderscheidt hoort
      iemand te kunnen lezen vóórdat hij een account heeft. */
+  /* Nederland en het buitenland staan in EEN lijst, elk met hun land erbij.
+     Met ?land=DE komt alleen dat land -- en voor een land dat wij niet kennen
+     komt er geen halve Nederlandse lijst maar een eerlijk "wij weten het niet";
+     zie kern/onderneming/rechtsvorm-landen.js. */
   app.get('/api/onderneming/rechtsvormen', (req, res) => {
-    res.json({ ok: true, rechtsvormen: Object.entries(ONDERNEMING_RECHTSVORMEN).map(([id, r]) => ({
-      id, label: r.label, kort: r.kort, rechtspersoon: r.rechtspersoon,
-      notarieel: r.notarieel, aansprakelijk: r.aansprakelijk, stappen: r.oprichting.length
-    })) });
+    const kort = (id, r) => ({ id, label: r.label, kort: r.kort, land: r.land,
+      rechtspersoon: r.rechtspersoon, notarieel: r.notarieel,
+      aansprakelijk: r.aansprakelijk, stappen: r.oprichting.length });
+    const land = String((req.query || {}).land || '').trim();
+    if (land) {
+      const l = ondernemingRechtsvormenVanLand(land);
+      return res.json(Object.assign({}, l, { rechtsvormen: l.vormen.map(v => kort(v.id, v)) }));
+    }
+    res.json({ ok: true, landen: ondernemingRechtsvormLanden(),
+      rechtsvormen: Object.entries(ONDERNEMING_RECHTSVORMEN).map(([id, r]) => kort(id, r)) });
   });
 
   // Alles wat op mijn naam staat. Meerdere mag: dat is een groep in wording.

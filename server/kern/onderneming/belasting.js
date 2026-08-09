@@ -19,6 +19,12 @@
       weten wij niets van. Dat staat in het antwoord en niet alleen hier, want
       het reist mee naar het scherm.
 
+   EN NIET VOOR EEN BUITENLANDSE RECHTSVORM. zzpBerekening rekent met
+   Nederlandse regels. Een Duitse GmbH of een Britse sole trader door datzelfde
+   sommetje halen geeft een getal dat er precies zo uitziet als een goed getal
+   en het niet is. De rechtsvorm draagt zijn land (./rechtsvorm.js); is dat niet
+   NL, dan komt er geen bedrag maar de reden.
+
    EN VOOR EEN B.V. WORDT ER NIETS UITGEREKEND. zzpBerekening is de
    inkomstenbelasting van een IB-ondernemer. Een B.V. betaalt
    vennootschapsbelasting en kent DGA-loon; een stichting heeft geen
@@ -74,7 +80,15 @@ module.exports = ({ db }) => {
        winst is: op verlies hoeft niemand iets opzij te zetten, en
        zzpBerekening weigert een nul terecht. */
     let reservering = null;
-    if (rechtspersoon) {
+    /* Eerst het land en dan pas de rechtsvorm: voor een buitenlandse vorm doet
+       het niet ter zake of hij rechtspersoon is -- wij kennen de regels van dat
+       land sowieso niet. */
+    if (rv && rv.land !== 'NL') {
+      reservering = { kan: false,
+        reden: 'Deze rechtsvorm hoort bij ' + rv.land + ' en wij rekenen alleen met Nederlandse regels. ' +
+          'Wat u daar opzij hoort te zetten, hangt af van tarieven en aftrekken die wij niet kennen. ' +
+          'Wij verzinnen daar geen getal bij: dat zou eruitzien als een goed getal en het niet zijn.' };
+    } else if (rechtspersoon) {
       reservering = { kan: false,
         reden: 'Een ' + rv.label.toLowerCase() + ' betaalt geen inkomstenbelasting over de winst. ' +
           (rv.caps.includes('vpb')
@@ -147,6 +161,10 @@ module.exports = ({ db }) => {
         uitleg: 'Dit is een optelsom uit uw eigen facturen, geen schatting. De btw die u in rekening bracht is nooit van u geweest.'
       },
       winst: { omzet, inkoop, winst, basis: 'alleen facturen via RTG' },
+      /* Het land waar deze cijfers op slaan, zodat een scherm nooit hoeft te
+         raden of de btw-regel hierboven een Nederlandse is. Null zolang er geen
+         rechtsvorm is gekozen. */
+      land: rv ? rv.land : null,
       reservering,
       voorbehoud: 'Wij zien alleen wat via RTG is gefactureerd. Contante omzet, een rekening buiten RTG, autokosten, afschrijving of een boete kennen wij niet. Dit is een reservering en geen aangifte, en geen fiscaal advies.'
     };

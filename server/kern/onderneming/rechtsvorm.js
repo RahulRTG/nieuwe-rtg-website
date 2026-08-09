@@ -22,84 +22,65 @@
    geen winst uitkeren. Zou 'winstuitkering' alleen ONTBREKEN in haar caps, dan
    zet de eerste as die hem wel meebrengt de knop er alsnog neer -- en dat is
    precies hoe een grendel stil verdwijnt. Daarom trekt capsSamen() de verboden
-   er NA het samenvoegen af: wat verboden is, wint altijd. */
+   er NA het samenvoegen af: wat verboden is, wint altijd.
+
+   NEDERLAND EN DE REST STAAN IN EEN LIJST, en elke vorm draagt zijn LAND. De
+   Nederlandse vormen houden hun kale id ('bv', 'stichting'): die staan in de
+   opslag van bestaande ondernemingen, en een id hernoemen betekent dat een
+   bestaand bedrijf ineens geen rechtsvorm meer heeft. Buitenlandse vormen
+   dragen hun landcode in het id ('de-gmbh'), zodat de twee elkaar nooit in de
+   weg zitten. De buitenlandse tabel staat in ./rechtsvorm-landen.js, met daar
+   de reden waarom hij apart hoort.
+
+   HET LAND IS GEEN VERSIERING. ./belasting.js rekent met Nederlandse regels;
+   voor een vorm met een ander land weigert hij te rekenen in plaats van een
+   Nederlands sommetje op een Duitse GmbH los te laten. Wie het land hier
+   weghaalt, zet die grendel uit. */
 'use strict';
 
-/* De caps van de B.V. staan hier los, omdat de holding ze erft. Overtypen zou
-   betekenen dat een nieuwe bv-verplichting stil buiten de holding blijft. */
-const BV_CAPS = ['vpb', 'dga-loon', 'aandeelhouders', 'aandeelhoudersregister',
-  'ubo', 'jaarrekening', 'deponering', 'notaris'];
-/* Wat een rechtspersoon met aandelen nooit mag: de ondernemersaftrekken uit de
-   inkomstenbelasting. Ook los, om dezelfde reden. */
-const IB_AFTREK = ['urencriterium', 'startersaftrek', 'mkb-winstvrijstelling'];
+const { NL } = require('./rechtsvorm-nl');
 
-const RECHTSVORMEN = {
-  eenmanszaak: {
-    label: 'Eenmanszaak', kort: 'zzp', rechtspersoon: false, notarieel: false,
-    aansprakelijk: 'U bent met uw privévermogen aansprakelijk voor de schulden van de zaak.',
-    caps: ['ib-aangifte', 'urencriterium', 'startersaftrek', 'mkb-winstvrijstelling', 'kleineondernemersregeling'],
-    verboden: ['aandelen', 'dga-loon', 'winstuitkering'],
-    oprichting: ['bedrijfsnaam kiezen', 'inschrijven bij de KvK', 'btw-nummer aanvragen',
-      'zakelijke rekening openen', 'aansprakelijkheidsverzekering', 'algemene voorwaarden']
-  },
-  vof: {
-    label: 'Vennootschap onder firma', kort: 'vof', rechtspersoon: false, notarieel: false,
-    aansprakelijk: 'Elke vennoot is hoofdelijk aansprakelijk -- ook voor de schulden die een ander aangaat.',
-    caps: ['ib-aangifte', 'urencriterium', 'startersaftrek', 'mkb-winstvrijstelling',
-      'kleineondernemersregeling', 'vennoten', 'vennootschapscontract'],
-    verboden: ['aandelen', 'dga-loon', 'winstuitkering'],
-    oprichting: ['bedrijfsnaam kiezen', 'vennootschapscontract opstellen', 'winstverdeling vastleggen',
-      'inschrijven bij de KvK', 'btw-nummer aanvragen', 'zakelijke rekening openen']
-  },
-  bv: {
-    label: 'Besloten vennootschap', kort: 'bv', rechtspersoon: true, notarieel: true,
-    aansprakelijk: 'De vennootschap is aansprakelijk, niet u privé -- behalve bij onbehoorlijk bestuur.',
-    caps: BV_CAPS.slice(),
-    verboden: IB_AFTREK.slice(),
-    oprichting: ['bedrijfsnaam controleren', 'statuten bij de notaris', 'aandelen verdelen',
-      'inschrijven bij de KvK', 'UBO-opgave doen', 'zakelijke rekening openen',
-      'DGA-salaris vaststellen', 'aandeelhoudersregister aanleggen']
-  },
-  holding: {
-    label: 'Holding met werkmaatschappij(en)', kort: 'holding', rechtspersoon: true, notarieel: true,
-    aansprakelijk: 'Elke vennootschap is apart aansprakelijk; de holding houdt de aandelen.',
-    caps: BV_CAPS.concat(['deelnemingen', 'intercompany', 'consolidatie', 'fiscale-eenheid']),
-    verboden: IB_AFTREK.slice(),
-    oprichting: ['structuur bepalen', 'statuten bij de notaris', 'holding oprichten',
-      'werkmaatschappij oprichten', 'aandelen storten', 'inschrijven bij de KvK',
-      'UBO-opgave doen', 'managementovereenkomst opstellen']
-  },
-  stichting: {
-    label: 'Stichting', kort: 'stichting', rechtspersoon: true, notarieel: true,
-    aansprakelijk: 'De stichting is aansprakelijk; bestuurders alleen bij onbehoorlijk bestuur.',
-    caps: ['bestuur', 'ubo', 'jaarverslag', 'donaties', 'anbi', 'doelstelling', 'notaris'],
-    /* Een stichting heeft geen eigenaar en geen winstoogmerk. Deze vier zijn de
-       reden dat verboden apart bestaat: ze mogen door GEEN enkele andere as
-       alsnog aangezet worden. */
-    verboden: ['winstuitkering', 'aandelen', 'dga-loon'].concat(IB_AFTREK),
-    oprichting: ['doelstelling formuleren', 'bestuur samenstellen', 'statuten bij de notaris',
-      'inschrijven bij de KvK', 'UBO-opgave doen', 'bankrekening openen',
-      'beleidsplan opstellen', 'ANBI-status aanvragen (optioneel)']
-  },
-  vereniging: {
-    label: 'Vereniging', kort: 'vereniging', rechtspersoon: true, notarieel: false,
-    aansprakelijk: 'Zonder notariële akte zijn de bestuurders hoofdelijk aansprakelijk.',
-    caps: ['bestuur', 'leden', 'ledenvergadering', 'contributie', 'ubo', 'jaarverslag', 'anbi'],
-    verboden: ['winstuitkering', 'aandelen', 'dga-loon'].concat(IB_AFTREK),
-    oprichting: ['doelstelling formuleren', 'bestuur samenstellen', 'statuten opstellen',
-      'ledenvergadering beleggen', 'inschrijven bij de KvK', 'contributie vaststellen']
-  },
-  cooperatie: {
-    label: 'Coöperatie', kort: 'coöperatie', rechtspersoon: true, notarieel: true,
-    aansprakelijk: 'De coöperatie is aansprakelijk; de aansprakelijkheid van de leden staat in de statuten.',
-    caps: ['bestuur', 'leden', 'ledenvergadering', 'vpb', 'ubo', 'jaarrekening', 'notaris'],
-    verboden: IB_AFTREK.slice(),
-    oprichting: ['doelstelling formuleren', 'leden werven', 'statuten bij de notaris',
-      'aansprakelijkheid kiezen (WA/BA/UA)', 'inschrijven bij de KvK', 'UBO-opgave doen']
+/* Alle rechtsvormen in EEN register: Nederland plus de landen uit
+   ./rechtsvorm-landen.js. Het is bewust een levend object en geen kopie --
+   ./rechtsvormwacht.js werkt hem in place bij, precies zoals de Regelwacht dat
+   met de LANDEN-tabel doet, zodat elke lezer per direct de nieuwe stand heeft. */
+const LAND = require('./rechtsvorm-landen');
+
+const RECHTSVORMEN = Object.assign({}, NL);
+for (const [cc, l] of Object.entries(LAND.LANDEN)) {
+  for (const [id, v] of Object.entries(l.vormen)) {
+    RECHTSVORMEN[id] = Object.assign({ land: cc }, v);
   }
-};
+}
+
+/* De vocabulaire van caps die in dit huis bestaat. Alles wat een bron ooit mag
+   aanzetten moet hierin staan: een cap die nergens voorkomt, kan geen scherm
+   vullen maar wel een knop laten verschijnen die niemand heeft ontworpen. */
+const CAPS_WOORDENBOEK = [...new Set(
+  Object.values(RECHTSVORMEN).flatMap(v => v.caps.concat(v.verboden)).concat(LAND.EXTRA_CAPS)
+)].sort();
 
 const isRechtsvorm = (id) => Object.prototype.hasOwnProperty.call(RECHTSVORMEN, id);
+
+/* De rechtsvormen van een land, of een expliciet "wij weten het niet". Niet een
+   lege lijst: leeg leest als "dit land kent geen rechtsvormen", en dat is iets
+   heel anders dan "wij hebben ze niet". Zie de kop van ./rechtsvorm-landen.js. */
+function rechtsvormenVanLand(cc) {
+  const code = String(cc || '').toUpperCase();
+  const eigen = Object.entries(RECHTSVORMEN).filter(([, v]) => v.land === code);
+  if (!eigen.length) {
+    return { ok: false, land: code, vormen: [],
+      reden: 'Wij kennen de rechtsvormen van dit land niet.',
+      uitleg: 'Wij zetten er met opzet geen Nederlandse lijst neer die er ongeveer op lijkt: wie daarop afgaat, gaat naar de verkeerde instantie. Vraag dit na bij een adviseur ter plaatse.',
+      landen: LANDEN_MET_VORMEN() };
+  }
+  const l = LAND.LANDEN[code];
+  return { ok: true, land: code, naam: (l && l.naam) || 'Nederland',
+    let: (l && l.let) || null,
+    vormen: eigen.map(([id, v]) => Object.assign({ id }, v)) };
+}
+
+const LANDEN_MET_VORMEN = () => [...new Set(Object.values(RECHTSVORMEN).map(v => v.land))].sort();
 
 /* De rechtsvorm of null. Null en niet een standaardwaarde: "ik weet nog niet
    wat ik word" is een echte stand in de ideefase, en die mag geen eenmanszaak
@@ -123,4 +104,5 @@ function capsSamen(lijsten, verboden) {
   return { caps: [...uit].sort(), geweerd: weg.sort() };
 }
 
-module.exports = { RECHTSVORMEN, isRechtsvorm, rechtsvormVan, capsVanRechtsvorm, verbodenVanRechtsvorm, capsSamen };
+module.exports = { RECHTSVORMEN, NL, CAPS_WOORDENBOEK, isRechtsvorm, rechtsvormVan,
+  rechtsvormenVanLand, LANDEN_MET_VORMEN, capsVanRechtsvorm, verbodenVanRechtsvorm, capsSamen };

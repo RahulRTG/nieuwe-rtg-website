@@ -293,9 +293,23 @@ function vakPlan(o){
 }
 
 
+/* De landen die in de keuzelijst kunnen voorkomen. Alleen een naam bij een
+   code: welke vormen er zijn, zegt de server -- die tabel wordt automatisch
+   bijgewerkt en een tweede lijst hier zou daarmee uiteenlopen. */
+const LANDNAAM={NL:'Nederland',BE:'België',DE:'Duitsland',FR:'Frankrijk',ES:'Spanje',
+  GB:'Verenigd Koninkrijk',US:'Verenigde Staten'};
+
 function vakRechtsvorm(o){
   const huidig=(o.rechtsvorm&&o.rechtsvorm.id)||'';
-  const opts=(RECHTSVORMEN||[]).map(r=>'<option value="'+esc(r.id)+'"'+(r.id===huidig?' selected':'')+'>'+esc(r.label)+'</option>').join('');
+  /* Gegroepeerd per land, met Nederland bovenaan. Een platte lijst van
+     achtentwintig vormen uit zeven landen leest als een sorteerfout, en dan
+     kiest iemand de Duitse GmbH omdat die er toevallig boven stond. */
+  const perLand={};
+  (RECHTSVORMEN||[]).forEach(r=>{ (perLand[r.land||'NL']=perLand[r.land||'NL']||[]).push(r); });
+  const landen=Object.keys(perLand).sort((a,b)=>a==='NL'?-1:(b==='NL'?1:a.localeCompare(b)));
+  const opts=landen.map(cc=>'<optgroup label="'+esc(LANDNAAM[cc]||cc)+'">'+
+    perLand[cc].map(r=>'<option value="'+esc(r.id)+'"'+(r.id===huidig?' selected':'')+'>'+
+      esc(r.label)+'</option>').join('')+'</optgroup>').join('');
   const uitleg=o.rechtsvorm?'<p class="subtxt" style="margin-top:.6rem;">'+esc(o.rechtsvorm.aansprakelijk)+'</p>':
     '<p class="stil" style="margin-top:.6rem;">Zolang u niets kiest, kunnen we niet zeggen wat u moet regelen: de helft daarvan hangt hiervan af.</p>';
   const gew=(o.geweerd||[]).map(g=>'<div class="bron niet"><span>'+esc(g.cap)+'</span><span class="bu">'+esc(g.reden)+'</span></div>').join('');

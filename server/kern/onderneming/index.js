@@ -99,7 +99,12 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boeki
   }
 
   return {
+    /* Het levende register: Nederland en het buitenland samen. Bewust de
+       tabel zelf en geen kopie -- de Rechtsvormwacht werkt hem in place bij,
+       en een kopie zou de oude stand blijven tonen. */
     ONDERNEMING_RECHTSVORMEN: RV.RECHTSVORMEN,
+    ondernemingRechtsvormenVanLand: RV.rechtsvormenVanLand,
+    ondernemingRechtsvormLanden: RV.LANDEN_MET_VORMEN,
     ondernemingVind: vind,
     ondernemingVanEigenaar: vanEigenaar,
     ondernemingVanZaak: vanZaak,

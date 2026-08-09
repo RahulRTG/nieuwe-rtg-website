@@ -45,41 +45,7 @@
    vergunning alleen wat hier is vastgelegd, niet de code eromheen. */
 'use strict';
 
-const RANG = { betaalinstelling: 1, elektronischgeldinstelling: 2, bank: 3 };
-const SOORTEN = Object.keys(RANG);
-
-/* De lijst. `nodig` zegt wat de handeling vraagt; `rail` zegt bij welke rail die
-   eis geldt -- 'eigen' betekent: over onze eigen rails is dit vergunningswerk,
-   over de partnerrail is het de partner die bevoegd is. */
-const VERMOGENS = {
-  // -- software: dit mogen we altijd, het is rekenen op eigen gegevens --
-  BANK_SCHERM:        { soort: 'software', naam: 'De bank-app tonen' },
-  INZICHTEN:          { soort: 'software', naam: 'Uitgaven-inzichten' },
-  BUDGETTEREN:        { soort: 'software', naam: 'Budgetten en vaste lasten' },
-  SPAARDOELEN:        { soort: 'software', naam: 'Spaardoelen (een streefbedrag tonen)' },
-
-  // -- partner of eigen, afhankelijk van de rail --
-  REKENING_HOUDEN:    { soort: 'rail', naam: 'Betaalrekeningen aanhouden', eigenNodig: 'bank', partnerRail: 'rekeningen' },
-  KLANTGELD:          { soort: 'rail', naam: 'Klantgeld aanhouden', eigenNodig: 'bank', partnerRail: 'rekeningen' },
-  SEPA_UIT:           { soort: 'rail', naam: 'SEPA-overboeking versturen', eigenNodig: 'betaalinstelling', partnerRail: 'sepa' },
-  SEPA_IN:            { soort: 'rail', naam: 'SEPA-overboeking ontvangen', eigenNodig: 'betaalinstelling', partnerRail: 'sepa' },
-  INCASSO:            { soort: 'rail', naam: 'Automatische incasso', eigenNodig: 'betaalinstelling', partnerRail: 'sepa' },
-  PAS_UITGIFTE:       { soort: 'rail', naam: 'Betaalpassen uitgeven', eigenNodig: 'elektronischgeldinstelling', partnerRail: 'passen' },
-  GELD_UITGEVEN:      { soort: 'rail', naam: 'Eigen geld in omloop brengen', eigenNodig: 'elektronischgeldinstelling', partnerRail: null },
-
-  // -- puur vergunning: geen partner doet dit voor ons, en geen rail verandert het --
-  KREDIET_EIGEN_BOEK: { soort: 'vergunning', naam: 'Krediet uit eigen boek', nodig: 'bank' },
-  RENTE_OP_DEPOSITO:  { soort: 'vergunning', naam: 'Rente over spaargeld uitkeren', nodig: 'bank' }
-};
-
-const zinnen = {
-  geen: 'RTG mag dit zelf nog niet; hiervoor is een vergunning nodig die nog niet is vastgelegd.',
-  rang: 'De vastgelegde vergunning is niet toereikend voor deze handeling.',
-  verlopen: 'De vastgelegde vergunning is verlopen.',
-  land: 'De vergunning geldt niet voor dit land.',
-  rail: 'De partner die dit voor RTG doet, staat op dit moment uit.',
-  onbekend: 'Deze handeling staat niet in de bevoegdhedenlijst.'
-};
+const { RANG, SOORTEN, VERMOGENS, zinnen } = require('./lijst');
 
 /* `state` levert wat er is VASTGELEGD en wat er NU draait:
      vergunning()  -> null of { soort, nummer, entiteit, landen: [], tot: <ms> }
@@ -121,7 +87,12 @@ function maakBevoegdheid({ vergunning, partnerRails, clearing, nu = () => Date.n
 
     const rail = railVan();
     if (rail === 'partner') {
-      if (!f.partnerRail) return { mag: false, reden: 'geen', uitleg: zinnen.geen, vermogen: id, nodig: f.eigenNodig };
+      /* Geen partner die dit voor ons doet, en we draaien niet op eigen rails.
+         De reden is dan NIET "er ligt geen vergunning" -- die kan er best
+         liggen; het scherm zei dat ook doodleuk met een bankvergunning in huis.
+         De echte reden is dat deze handeling alleen over de eigen rails kan en
+         die nu niet clearen. */
+      if (!f.partnerRail) return { mag: false, reden: 'alleen-eigen', uitleg: zinnen['alleen-eigen'], vermogen: id, nodig: f.eigenNodig };
       const rails = partnerRails() || {};
       if (rails[f.partnerRail] === false) return { mag: false, reden: 'rail', uitleg: zinnen.rail, vermogen: id, partnerRail: f.partnerRail };
       return { mag: true, vermogen: id, via: 'partner', partnerRail: f.partnerRail };

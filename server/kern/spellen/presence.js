@@ -33,9 +33,18 @@
       tonen en nodig je iemand uit die dat verzoek gegarandeerd niet kan
       aannemen. Daarom leest deze laag dezelfde `lidBoardUit` als de poort die
       dat verzoek zou weigeren -- een tweede, eigen oordeel zou juist de kans
-      op verschil zijn. */
+      op verschil zijn.
+
+   5. ONZICHTBAAR IS ONZICHTBAAR. Wie zichzelf op onzichtbaar heeft gezet komt
+      in niemands stand, ook niet bij een vriend of klasgenoot. Die knop staat
+      naast het uitzetten van de hele functie, want "ik speel wel maar hoef
+      niet gezien te worden" is iets anders dan "ik speel niet". Hij werkt maar
+      EEN kant op: je bent niet te zien en je ziet anderen nog wel. Wie wil
+      zien zou anders moeten betalen met zichtbaarheid, en dat is de ruil die
+      hier niet hoort. */
 module.exports = (ctx) => {
-  const { sseClients, isGeblokkeerd, codenaamVan, lidBoardUit } = ctx;
+  const { sseClients, isGeblokkeerd, codenaamVan, lidBoardUit, isVerborgen } = ctx;
+  const verborgen = isVerborgen || (() => false);
 
   // het functie-id uit kern/lidboard/catalogus.js dat bij /api/member/spel hoort
   const FUNCTIE = 'spelen';
@@ -45,15 +54,18 @@ module.exports = (ctx) => {
      kent die boardroom niet en valt daar op "niet uitgezet" terug, wat klopt:
      die functie kun je daar niet omzetten. */
   function bereikbaar(key) {
+    if (verborgen(key)) return false;
     if (!sseClients.some(c => c.key === key)) return false;
     try { return !lidBoardUit(key, FUNCTIE); } catch (e) { return true; }
   }
 
-  /* Wie van deze vrienden er nu is. Geeft codenamen terug en geen sleutels:
-     dit gaat naar het scherm van een ander lid, en daar hoort de identiteits-
-     kluis buiten te blijven. */
-  function spelOnline(mij, vrienden) {
-    const lijst = (Array.isArray(vrienden) ? vrienden : [])
+  /* Wie van deze kring er nu is -- vrienden en, voor wie op school zit, ook
+     klasgenoten. De kring komt binnen als lijst sleutels en wordt hier niet
+     zelf opgehaald: welke kring je hebt is een vraag van de laag erboven, wie
+     ervan te zien is de vraag van deze. Dubbele sleutels (iemand die vriend EN
+     klasgenoot is) vallen weg, anders telt hij twee keer mee. */
+  function spelOnline(mij, kring) {
+    const lijst = [...new Set(Array.isArray(kring) ? kring : [])]
       .filter(v => v !== mij && !isGeblokkeerd(mij, v) && bereikbaar(v));
     return {
       online: lijst.map(v => ({ codenaam: codenaamVan(v), key: v })),

@@ -1,7 +1,7 @@
-/* Wie van je vrienden er NU is. Vier regels, en drie ervan zijn er om iets te
-   voorkomen -- dus staan ze hier alle vier als toets, met de fout erbij die ze
-   tegenhouden. De laag bewaart niets: hij leest de levende lijst van open
-   live-verbindingen, dus is hij met stubs precies na te spelen.
+/* Wie er NU is, van je vrienden en je klasgenoten. Vijf regels, en vier ervan
+   zijn er om iets te voorkomen -- dus staan ze hier alle vijf als toets, met de
+   fout erbij die ze tegenhouden. De laag bewaart niets: hij leest de levende
+   lijst van open live-verbindingen, dus is hij met stubs precies na te spelen.
 
    Draai los: node --experimental-sqlite --test test/spelpresence.test.js */
 const test = require('node:test');
@@ -15,7 +15,8 @@ function metOpen(sleutels, extra = {}) {
     sseClients: sleutels.map(k => ({ key: k })),
     isGeblokkeerd: () => false,
     codenaamVan: (k) => 'CN-' + k,
-    lidBoardUit: () => false
+    lidBoardUit: () => false,
+    isVerborgen: () => false
   }, extra));
 }
 const namen = (r) => r.online.map(o => o.codenaam).sort();
@@ -93,4 +94,32 @@ test('een rare vriendenlijst geeft geen uitzondering', () => {
   const { spelOnline } = metOpen(['anna']);
   for (const raar of [null, undefined, 'anna', 42, {}])
     assert.deepEqual(spelOnline('ik', raar).online, [], 'geen lijst hoort leeg terug te geven: ' + JSON.stringify(raar));
+});
+
+/* ---------- onzichtbaar spelen: de aparte opt-out ---------- */
+
+test('wie zichzelf onzichtbaar zet komt in niemands stand', () => {
+  /* Dit staat NAAST het uitzetten van de hele functie "spelen": "ik speel wel
+     maar hoef niet gezien te worden" is iets anders dan "ik speel niet". */
+  const { spelOnline } = metOpen(['anna', 'boris'], { isVerborgen: (k) => k === 'boris' });
+  assert.deepEqual(namen(spelOnline('ik', ['anna', 'boris'])), ['CN-anna']);
+});
+
+test('onzichtbaar werkt EEN kant op: je ziet anderen nog gewoon', () => {
+  /* Iemand blinderen omdat hij niet gezien wil worden is een ruil, en dat is
+     precies de druk die hier niet hoort. */
+  const { spelOnline } = metOpen(['anna', 'ik'], { isVerborgen: (k) => k === 'ik' });
+  assert.deepEqual(namen(spelOnline('ik', ['anna'])), ['CN-anna'],
+    'wie zich verbergt hoort zelf niet blind te worden');
+});
+
+/* ---------- de kring: vrienden en klasgenoten door elkaar ---------- */
+
+test('dezelfde persoon telt maar een keer, ook als hij vriend EN klasgenoot is', () => {
+  // de kring komt als twee lijsten achter elkaar binnen; dubbel tellen zou
+  // "3 vrienden zijn er nu" laten zeggen terwijl het er twee zijn
+  const { spelOnline } = metOpen(['anna', 'boris']);
+  const r = spelOnline('ik', ['anna', 'boris', 'anna']);
+  assert.equal(r.aantal, 2);
+  assert.deepEqual(namen(r), ['CN-anna', 'CN-boris']);
 });

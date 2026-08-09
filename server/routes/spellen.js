@@ -5,7 +5,7 @@
 const { log } = require('../log');
 
 module.exports = (kern) => {
-  const { app, auth, geenGast, rtf, spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelRahul, spelKlasgenoten, spelOnline, sneekScore, sneekBord, arcadeScore, arcadeBord, socialConnecties } = kern;
+  const { app, auth, geenGast, rtf, spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelRahul, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, sneekScore, sneekBord, arcadeScore, arcadeBord, socialConnecties } = kern;
 
   function rtfSpeler(req, res) {
     const sess = rtf.verifieerProfiel(req.body.code, req.body.token);
@@ -14,6 +14,14 @@ module.exports = (kern) => {
     return sess.handle;
   }
   const vriendenVan = (mij) => (socialConnecties(mij).connections || []).map(c => c.key);
+  /* De kring waarbinnen aanwezigheid bestaat: je vrienden, plus je klasgenoten
+     als je op school zit. Die tweede hoort erbij omdat beschermde tieners
+     onvindbaar zijn via de codenaam-zoeker: hun klas is de enige kring die ze
+     hebben, en zonder die kring zou aanwezigheid voor hen leeg blijven.
+     spelKlasgenoten filtert blokkades er zelf al uit; presence doet het nog
+     eens, want een dubbele controle op een blokkade is geen verspilling. */
+  const kringVan = (mij) => vriendenVan(mij)
+    .concat((spelKlasgenoten(mij).klasgenoten || []).map(kg => kg.key));
   const stuur = (res, r) => r.error ? res.status(r.status).json({ error: r.error }) : res.json(r);
 
   // dezelfde acties voor beide werelden; alleen de identiteit verschilt, en
@@ -37,10 +45,13 @@ module.exports = (kern) => {
     // de kieslijst met klasgenoten (De Arena); een RTG-lid heeft geen klas
     // en krijgt gewoon een lege lijst
     klasgenoten: (mij) => spelKlasgenoten(mij),
-    /* Wie van je vrienden er nu is. De kring komt hier vandaan en niet uit het
-       verzoek: een client die zelf een lijst sleutels mag meesturen zou de
-       aanwezigheid van willekeurige leden kunnen aftasten. */
-    online: (mij) => Object.assign({ status: 200 }, spelOnline(mij, vriendenVan(mij))),
+    /* Wie er nu is. De kring komt hier vandaan en niet uit het verzoek: een
+       client die zelf een lijst sleutels mag meesturen zou de aanwezigheid van
+       willekeurige leden kunnen aftasten. */
+    online: (mij) => Object.assign({ status: 200 }, spelOnline(mij, kringVan(mij))),
+    // de eigen opt-out: wel spelen, niet gezien worden
+    zichtbaar: (mij) => spelZichtbaar(mij),
+    'zichtbaar-zet': (mij, b) => spelZichtbaarZet(mij, b.aan !== false),
     'sneek-score': (mij, b) => sneekScore(mij, b.punten),
     'sneek-bord': (mij) => Object.assign({ status: 200 }, sneekBord(mij, vriendenVan(mij))),
     'arcade-score': (mij, b) => arcadeScore(mij, String(b.spel || ''), b.punten),

@@ -31,6 +31,11 @@
      aansporing. */
   .onlinestip{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--groen);margin-right:.4rem;vertical-align:middle;}
   .onlinelijn{color:var(--zacht);font-size:.8rem;margin:.2rem 0 0;}
+  /* De opt-out: klein en zonder nadruk, maar altijd te vinden. Een knop die
+     alleen opduikt als je hem al zoekt is geen keuze. */
+  .zichtbaarknop{background:none;border:none;padding:.2rem 0;margin:.15rem 0 0;color:var(--zacht);
+    font-family:inherit;font-size:.75rem;text-decoration:underline;cursor:pointer;}
+  .zichtbaarknop[data-uit="1"]{color:var(--txt);}
   .blok{padding:1rem;margin-bottom:.8rem;}
   .keuzerij{display:flex;gap:.5rem;flex-wrap:wrap;margin:.5rem 0;}
   .chip{background:var(--paneel2);border:2px solid var(--lijn);color:var(--txt);border-radius:999px;padding:.35rem .8rem;font-size:.85rem;cursor:pointer;}
@@ -126,6 +131,7 @@
     </div>
     <div id="uitnodigingen"></div>
     <div class="onlinelijn" id="onlineLijn" hidden></div>
+    <div><button type="button" class="zichtbaarknop" id="zichtbaarKnop"></button></div>
     <div class="sec">Jouw potjes</div>
     <div id="potjes"><div class="leeg">Nog geen potjes. Kies hierboven een spel.</div></div>
   </section>
@@ -337,12 +343,33 @@ async function laadOnline(){
   const lijn = $('#onlineLijn');
   lijn.hidden = n === 0;
   lijn.innerHTML = n === 0 ? ''
-    : '<span class="onlinestip"></span>' + n + (n === 1 ? ' vriend is er nu' : ' vrienden zijn er nu');
+    : '<span class="onlinestip"></span>' + n + (n === 1 ? ' speler is er nu' : ' spelers zijn er nu');
 }
+
+/* De eigen opt-out. Dit is iets anders dan de functie "spelen" uitzetten: je
+   speelt gewoon door, alleen ziet niemand dat je er bent. Hij werkt een kant
+   op -- onzichtbaar zijn maakt je niet blind -- en de knop staat er altijd,
+   want een keuze die je moet zoeken is geen keuze. */
+async function laadZichtbaar(){
+  let d; try{ d = await api('zichtbaar'); }catch(e){ return; }
+  zetZichtbaarKnop(d.zichtbaar !== false);
+}
+function zetZichtbaarKnop(zichtbaar){
+  const k = $('#zichtbaarKnop');
+  k.dataset.uit = zichtbaar ? '0' : '1';
+  k.textContent = zichtbaar ? 'Onzichtbaar spelen' : 'Je bent onzichtbaar — weer zichtbaar worden';
+}
+$('#zichtbaarKnop').addEventListener('click', async ()=>{
+  const nuUit = $('#zichtbaarKnop').dataset.uit === '1';
+  try{
+    const d = await api('zichtbaar-zet', { aan: nuUit });   // uit -> weer aan, en andersom
+    zetZichtbaarKnop(d.zichtbaar !== false);
+  }catch(e){ meld(e.message); }
+});
 
 async function laadLobby(){
   let d; try{ d = await api('mijn'); }catch(e){ return; }
-  laadOnline();
+  laadOnline(); laadZichtbaar();
   const u = d.uitnodigingen||[];
   $('#uitnodigingen').innerHTML = u.length ? '<div class="sec">Uitnodigingen</div>' + u.map(x =>
     '<div class="rij"><div class="nm">'+esc(x.naam)+(x.modus==='teams'?' · 2 tegen 2':'')+'<small>van '+esc(x.van)+' · met '+x.spelers.map(esc).join(', ')+'</small></div>'+

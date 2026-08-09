@@ -55,7 +55,7 @@ test('de rummi-setregels van client en server keuren dezelfde setjes goed', () =
    dan heet hetzelfde spel op twee plekken anders of laat de client een
    spelersaantal toe dat de server weigert. */
 test('de spelnamen en spelersaantallen van de lobby komen overeen met de server', () => {
-  const bron = knip('const SPELNAAM', 'async function laadLobby');
+  const bron = knip('const SPELNAAM', '/* ---------- wie er nu is');
   const { SPELNAAM, MAXG } = new Function(bron + '; return { SPELNAAM, MAXG };')();
   for (const [sleutel, naam] of Object.entries(SPELNAAM)) {
     assert.ok(SPEL[sleutel], 'de lobby kent spel "' + sleutel + '" dat de server niet heeft');
@@ -117,7 +117,7 @@ test('de client verbergt kop en lijst zodra de server zegt dat er geen ranglijst
    wegvallen: bij nul vrienden staat er niets (een regel "0 vrienden zijn er
    nu" is een por, geen bericht), en er komt nooit een tijd in beeld. */
 test('de lobby toont aanwezigheid zonder tijden, en zwijgt als er niemand is', async () => {
-  const bron = knip('let ONLINE = new Set();', 'async function laadLobby');
+  const bron = knip('let ONLINE = new Set();', '/* De eigen opt-out');
   const maak = () => ({ hidden: false, innerHTML: '' });
 
   async function draai(antwoord) {
@@ -130,15 +130,15 @@ test('de lobby toont aanwezigheid zonder tijden, en zwijgt als er niemand is', a
 
   const leeg = await draai({ online: [], aantal: 0, stand: 'nu' });
   assert.equal(leeg.lijn.hidden, true, 'bij niemand hoort de regel weg te zijn');
-  assert.equal(leeg.lijn.innerHTML, '', 'en niet "0 vrienden"');
+  assert.equal(leeg.lijn.innerHTML, '', 'en niet "0 spelers"');
 
   const een = await draai({ online: [{ codenaam: 'Zilveren Reiger', key: 'user-9' }], aantal: 1, stand: 'nu' });
   assert.equal(een.lijn.hidden, false);
-  assert.match(een.lijn.innerHTML, /1 vriend is er nu/, 'enkelvoud bij een');
+  assert.match(een.lijn.innerHTML, /1 speler is er nu/, 'enkelvoud bij een');
   assert.ok(een.online.has('user-9'), 'de sleutel is onthouden, zodat de vriendenkiezer hem kan markeren');
 
   const drie = await draai({ online: [{ key: 'a' }, { key: 'b' }, { key: 'c' }], aantal: 3, stand: 'nu' });
-  assert.match(drie.lijn.innerHTML, /3 vrienden zijn er nu/, 'meervoud bij meer');
+  assert.match(drie.lijn.innerHTML, /3 spelers zijn er nu/, 'meervoud bij meer');
   assert.doesNotMatch(drie.lijn.innerHTML, /geleden|minuut|minuten|uur|sinds/,
     'er hoort geen tijd of "laatst gezien" in beeld te komen');
 

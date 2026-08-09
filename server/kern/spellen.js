@@ -74,12 +74,36 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
   const { SPEL, SOORTEN, INITS, ZETTEN, VIEWS, STATISCH, ARCADE, ruw } = require('./spellen/register')(spelCtx);
   // klasgenoten: het uitnodigingspad voor beschermde tieners (De Arena)
   const { klasgenotenVan, spelKlasgenoten } = require('./spellen/klas')({ db, codenaamVan, isGeblokkeerd });
+  /* ---------- onzichtbaar spelen: de eigen opt-out op aanwezigheid ----------
+     De functie "spelen" uitzetten werkt ook, maar dat is grover: dan kun je
+     helemaal niet meer spelen. Dit is de smalle knop -- je speelt gewoon, maar
+     niemand ziet dat je er bent.
+
+     Waarom hier en niet in de boardroom: klasgenoten zijn RTF-gezinsprofielen
+     en die hebben geen boardroom. Een opt-out die alleen voor RTG-leden bestaat
+     zou precies de groep overslaan waarvoor aanwezigheid het gevoeligst is.
+
+     Onzichtbaar is EEN kant op: je bent niet te zien en je ziet anderen nog
+     wel. Iemand blinderen omdat hij niet gezien wil worden is een ruil, en dat
+     is precies de druk die hier niet hoort. Wie wil zien moet niet hoeven
+     betalen met zichtbaarheid. */
+  function V() { const s = S(); if (!s.verborgen) s.verborgen = {}; return s.verborgen; }
+  const isVerborgen = (key) => !!V()[key];
+  const spelZichtbaar = (mij) => ({ status: 200, zichtbaar: !isVerborgen(mij) });
+  function spelZichtbaarZet(mij, aan) {
+    const v = V();
+    // alleen "uit" bewaren we; zichtbaar is de standaard en laat geen spoor na
+    if (aan === false) v[mij] = true; else delete v[mij];
+    save();
+    return { status: 200, ok: true, zichtbaar: !v[mij] };
+  }
+
   /* Wie van je vrienden er nu is. Leest de levende lijst van open
      live-verbindingen en bewaart zelf niets; zie spellen/presence.js voor de
-     vier regels die dat begrenzen. Een toets of een stand zonder SSE-laag
-     krijgt een lege lijst in plaats van een uitzondering. */
+     regels die dat begrenzen. Een toets of een stand zonder SSE-laag krijgt
+     een lege lijst in plaats van een uitzondering. */
   const { spelOnline } = require('./spellen/presence')({
-    sseClients: sseClients || [], isGeblokkeerd, codenaamVan,
+    sseClients: sseClients || [], isGeblokkeerd, codenaamVan, isVerborgen,
     lidBoardUit: lidBoardUit || (() => false)
   });
 
@@ -154,7 +178,7 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
   const sneekScore = (mij, punten) => arcadeScore(mij, 'sneek', punten);
   const sneekBord = (mij, vrienden) => arcadeBord(mij, 'sneek', vrienden);
 
-  return { spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelRahul, spelKlasgenoten, spelOnline, sneekScore, sneekBord, arcadeScore, arcadeBord, SPEL_SOORTEN: SOORTEN,
+  return { spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelRahul, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, sneekScore, sneekBord, arcadeScore, arcadeBord, SPEL_SOORTEN: SOORTEN,
     // alleen voor de drift-test: de client heeft een eigen kopie van deze
     // regels (directe feedback); de test houdt beide kopieën tegen elkaar
     _spelregels: { rummiSet: ruw.rummiSet, W_PREMIE: ruw.W_PREMIE, SPEL, ARCADE } };

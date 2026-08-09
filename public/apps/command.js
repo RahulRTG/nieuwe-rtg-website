@@ -1260,6 +1260,8 @@
         '<p class="meta">' + (d.bron.buiten && d.bron.buiten.gemeten
           ? 'Van buitenaf: ' + d.bron.buiten.pogingen + ' metingen, ' + d.bron.buiten.mislukt + ' mislukt.'
           : 'Van buitenaf: ' + esc((d.bron.buiten && d.bron.buiten.uitleg) || 'niet gemeten')) + '</p>' +
+        '<p class="meta">De failover is apart beproefd en niet beweerd: <code>npm run chaos</code> start een ' +
+        'eigen trio en schiet de ACTIEVE server om met SIGKILL. De uitslag staat in SLO.md.</p>' +
         '<p class="meta">De doelen staan in ' + esc(d.norm.bestand) + ' (vastgelegd ' + esc(d.norm.vastgelegd) +
         '); een doel telt pas mee vanaf ' + d.norm.minimumVerzoeken + ' verzoeken en ' +
         Math.round(d.norm.minimumDekking * 100) + '% van zijn venster.</p></div>';
@@ -1473,5 +1475,574 @@
 
   var i = C.WERKPLEKKEN.findIndex(function (w) { return w.id === 'graaf'; });
   C.WERKPLEKKEN.splice(i + 1, 0, { id: 'herkomst', naam: 'Herkomst', sec: 'Zien' });
+  void S;
+})();
+/* RTG Command, deel 12: de uitrol (canary) en de zandbak.
+
+   TWEE SCHERMEN DIE ALLEBEI OVER RISICO GAAN, en die het risico dus moeten
+   TONEN in plaats van wegpoetsen. Bij de canary is dat de stand van de
+   terugroldrempel en het aantal antwoorden waarop die rust; bij de zandbak is
+   dat wat een zandbak NIET is. Een knop "ronde draaien" zonder die zinnen
+   eromheen nodigt uit tot vertrouwen dat er niet is. */
+(function () {
+  'use strict';
+  var C = window.RTGCommand, esc = C.esc, api = C.api, S = C.S;
+
+  var KLEUR = { 'binnen de drempel': 'ok', 'over de drempel': 'mis',
+    'onvoldoende gemeten': 'onbekend', 'niet te wegen': 'onbekend' };
+
+  C.TEKENAARS.canary = function (el) {
+    el.innerHTML = '<h2 class="ckop">Uitrol</h2>' +
+      '<p class="lead">Een functie stap voor stap openzetten, met een drempel die hem automatisch ' +
+      'terugdraait. De verdeling is vast per persoon en verschilt per functie; anoniem verkeer valt ' +
+      'er nooit in, dus op paden die vooral zonder inlog worden gebruikt bereikt en meet een canary ' +
+      'bijna niets.</p><div id="caUit"><div class="leeg">Ophalen…</div></div>';
+    teken();
+
+    function teken() {
+      api('canary').then(function (d) {
+        var u = '<div class="rooster">' +
+          tegel('Lopend', d.tel.lopend, d.tel.lopend ? 'gold' : '', 'uitrollen die nu gewogen worden') +
+          tegel('Teruggerold', d.tel.teruggerold, d.tel.teruggerold ? 'acc' : '', 'over de drempel gegaan') +
+          '</div>';
+
+        u += '<div class="kaart"><h3>Nieuwe uitrol</h3>' +
+          '<div class="crij"><input class="veld" id="caId" placeholder="functie-id (bv. command-zien)" style="width:16rem;">' +
+          '<input class="veld" id="caDeel" value="0.1" style="width:5rem;" aria-label="deel">' +
+          '<button class="knop vol" id="caGa">Starten</button></div>' +
+          '<p class="meta">Een canary verdeelt een OPEN functie over de mensen; hij opent geen dichte. ' +
+          'Standaard: ' + Math.round(d.standaard.drempel * 1000) / 10 + '% serverfouten is de drempel, ' +
+          'vanaf ' + d.standaard.minimum + ' antwoorden.</p></div>';
+
+        if (!d.canaries.length) u += '<div class="kaart"><p>Er loopt geen enkele uitrol.</p></div>';
+        for (var i = 0; i < d.canaries.length; i++) u += kaartVan(d.canaries[i]);
+        u += '<p class="meta">' + esc(d.uitleg) + '</p>';
+        document.querySelector('#caUit').innerHTML = u;
+
+        document.querySelector('#caGa').onclick = function () {
+          api('canary/start', { id: document.querySelector('#caId').value,
+            deel: Number(document.querySelector('#caDeel').value || 0.1) })
+            .then(function () { teken(); }).catch(function (e) { if (!e.stil) C.meld(e.message); });
+        };
+        Array.prototype.forEach.call(document.querySelectorAll('[data-ca]'), function (b) {
+          b.onclick = function () {
+            api('canary/' + b.getAttribute('data-ca'), { id: b.getAttribute('data-id'),
+              deel: Number(b.getAttribute('data-deel') || 0) })
+              .then(function () { teken(); }).catch(function (e) { if (!e.stil) C.meld(e.message); });
+          };
+        });
+      }).catch(function (e) {
+        if (!e.stil) document.querySelector('#caUit').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>';
+      });
+    }
+
+    function kaartVan(k) {
+      var m = k.meting;
+      var u = '<div class="kaart"><h3>' + esc(k.naam) + ' <span class="meta">' + esc(k.id) + '</span></h3>' +
+        '<div class="crij"><span class="cniveau ' + (KLEUR[k.oordeel] || '') + '">' + esc(k.oordeel) + '</span>' +
+        '<span class="meta">' + Math.round(k.deel * 100) + '% van de mensen · ' + esc(k.stand) + '</span></div>' +
+        '<div class="rooster">' +
+        tegel('Antwoorden', m.kwijt ? '-' : m.antwoorden, '', 'sinds de nulmeting') +
+        tegel('Serverfouten', m.kwijt ? '-' : m.fouten, m.fouten ? 'acc' : '', 'in dezelfde periode') +
+        tegel('Drempel', Math.round(k.drempel * 1000) / 10 + '%', '', 'vanaf ' + k.minimum + ' antwoorden') +
+        '</div>';
+      if (m.kwijt) u += '<p class="meta">' + esc(m.uitleg) + '</p>';
+      if (k.reden) u += '<p class="meta">Teruggerold: ' + esc(k.reden) + '</p>';
+      if (k.let) u += '<p class="meta">' + esc(k.let) + '</p>';
+      u += '<div class="crij">' +
+        knop(k.id, 'breder', 'Naar 50%', 0.5) + knop(k.id, 'breder', 'Naar 100%', 1) +
+        knop(k.id, 'terug', 'Terugdraaien', 0) + knop(k.id, 'af', 'Afronden', 0) +
+        '</div><p class="meta">Afronden is iets anders dan honderd procent: zolang er een canary hangt, ' +
+        'loopt er een uitrol die gewogen wordt.</p></div>';
+      return u;
+    }
+    function knop(id, actie, tekst, deel) {
+      return '<button class="knop" data-ca="' + actie + '" data-id="' + esc(id) + '" data-deel="' + deel + '">' +
+        esc(tekst) + '</button>';
+    }
+  };
+
+  C.TEKENAARS.zandbak = function (el) {
+    el.innerHTML = '<h2 class="ckop">Zandbak</h2>' +
+      '<p class="lead">Een proces proeven zonder ook maar één productierij aan te raken. De inhoud komt ' +
+      'uit de zaaiset en nooit uit de echte gegevens; de motoren zien een venster op het vak van deze ' +
+      'zandbak, dus er is geen pad naar een productiecollectie.</p>' +
+      '<div id="zaUit"><div class="leeg">Ophalen…</div></div>';
+    teken();
+
+    function teken() {
+      api('zandbak').then(function (d) {
+        var u = '<div class="kaart"><h3>Wat een zandbak niet is</h3><p>' + esc(d.let) + '</p></div>';
+        u += '<div class="kaart"><h3>Nieuwe zandbak</h3><div class="crij">' +
+          '<input class="veld" id="zaN" placeholder="naam" style="width:12rem;">' +
+          '<input class="veld" id="zaW" placeholder="waarvoor (optioneel)" style="width:18rem;">' +
+          '<button class="knop vol" id="zaGa">Maken</button></div>' +
+          '<p class="meta">' + d.zandbakken.length + ' van maximaal ' + d.max + '; standaard ' +
+          d.standaardDagen + ' dagen houdbaar. ' + esc(d.uitleg) + '</p></div>';
+
+        for (var i = 0; i < d.zandbakken.length; i++) {
+          var z = d.zandbakken[i];
+          u += '<div class="kaart"><h3>' + esc(z.naam) + ' <span class="meta">' + z.objecten + ' objecten</span></h3>' +
+            '<p class="meta">Gemaakt ' + esc(z.gemaakt) + ' door ' + esc(z.door) + ', vervalt ' + esc(z.vervalt) + '.' +
+            (z.waarvoor ? ' ' + esc(z.waarvoor) : '') + '</p>' +
+            (z.let ? '<p class="meta">' + esc(z.let) + '</p>' : '') +
+            '<div class="crij"><input class="veld" data-zoek="' + esc(z.naam) + '" placeholder="zoek in deze zandbak" style="width:14rem;">' +
+            '<button class="knop" data-zzoek="' + esc(z.naam) + '">Zoeken</button>' +
+            '<button class="knop" data-zkwal="' + esc(z.naam) + '">Kwaliteit meten</button>' +
+            '<button class="knop" data-zweg="' + esc(z.naam) + '">Opruimen</button></div>' +
+            '<div id="zu-' + esc(z.naam) + '"></div></div>';
+        }
+        document.querySelector('#zaUit').innerHTML = u;
+
+        document.querySelector('#zaGa').onclick = function () {
+          api('zandbak/maak', { naam: document.querySelector('#zaN').value,
+            waarvoor: document.querySelector('#zaW').value })
+            .then(function () { teken(); }).catch(function (e) { if (!e.stil) C.meld(e.message); });
+        };
+        hang('data-zweg', function (n) { return api('zandbak/weg', { naam: n }).then(teken); });
+        hang('data-zzoek', function (n) {
+          var v = document.querySelector('[data-zoek="' + n + '"]').value;
+          return api('zandbak/zoek', { naam: n, q: v }).then(function (r) {
+            document.querySelector('#zu-' + n).innerHTML = '<p class="meta">' + r.totaal +
+              ' treffers in de zandbak: ' + esc((r.treffers || []).map(function (t) { return t.titel; }).join(' · ')) + '</p>';
+          });
+        });
+        hang('data-zkwal', function (n) {
+          return api('zandbak/kwaliteit', { naam: n }).then(function (r) {
+            document.querySelector('#zu-' + n).innerHTML = '<p class="meta">' + r.tel.defecten +
+              ' defecten over ' + r.gemeten.objecten + ' objecten in de zandbak.</p>';
+          });
+        });
+      }).catch(function (e) {
+        if (!e.stil) document.querySelector('#zaUit').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>';
+      });
+    }
+    function hang(attr, doe) {
+      Array.prototype.forEach.call(document.querySelectorAll('[' + attr + ']'), function (b) {
+        b.onclick = function () { doe(b.getAttribute(attr)).catch(function (e) { if (!e.stil) C.meld(e.message); }); };
+      });
+    }
+  };
+
+  function tegel(l, v, k, u) {
+    return '<div class="tegel"><div class="l">' + esc(l) + '</div><div class="v ' + (k || '') + '">' + esc(v) + '</div>' +
+      (u ? '<div class="u">' + esc(u) + '</div>' : '') + '</div>';
+  }
+
+  C.WERKPLEKKEN.push(
+    { id: 'canary', naam: 'Uitrol', sec: 'Besturen',
+      teller: function (s) { return s.start && s.start.canary ? s.start.canary.lopend : 0; } },
+    { id: 'zandbak', naam: 'Zandbak', sec: 'Besturen' });
+  void S;
+})();
+/* RTG Command, deel 13: master data.
+
+   DIT SCHERM TOONT EEN VOORSTEL EN GEEN BESLUIT, en dat moet te zien zijn. Bij
+   elke groep staat waarom de meter denkt dat het dezelfde partij is EN dat twee
+   bedrijven met dezelfde naam in dezelfde stad twee bedrijven kunnen zijn. Dat
+   verschil zit niet in de gegevens, dus het hoort ook niet als zekerheid op het
+   scherm te staan. */
+(function () {
+  'use strict';
+  var C = window.RTGCommand, esc = C.esc, api = C.api, S = C.S;
+
+  C.TEKENAARS.mdm = function (el) {
+    el.innerHTML = '<h2 class="ckop">Master data</h2>' +
+      '<p class="lead">Eén gezaghebbend record per bedrijf en per locatie. De kandidaten zijn gemeten ' +
+      'uit de gegevens; welk veld de naam en de plaats draagt komt uit een tabel. Er wordt hier nooit ' +
+      'vanzelf samengevoegd.</p><div id="mdUit"><div class="leeg">Meten…</div></div>';
+    teken();
+
+    function teken() {
+      api('mdm').then(function (d) {
+        var u = '<div class="rooster">' +
+          tegel('Groepen', d.tel.groepen, d.tel.groepen ? 'gold' : 'groen', d.tel.rijen + ' rijen erin') +
+          tegel('Plaatsen', d.tel.plaatsen, '', d.tel.schrijfwijzen + ' met meer dan één schrijfwijze') +
+          tegel('Samengevoegd', d.samengevoegd, '', 'rijen met een verwijzing naar een gouden record') +
+          '</div><div class="kaart"><h3>De grens van deze meting</h3><p>' + esc(d.let) + '</p>' +
+          '<p class="meta">Bronnen: ' + esc(d.bronnen.map(function (b) {
+            return b.collectie + ' (' + b.naamVeld + ')'; }).join(', ')) + '</p></div>';
+
+        if (!d.bedrijven.length) u += '<div class="kaart"><p>Geen enkele groep die op elkaar lijkt.</p></div>';
+        for (var i = 0; i < d.bedrijven.length; i++) {
+          var g = d.bedrijven[i];
+          u += '<div class="kaart"><h3>' + esc(g.leden[0].naam) + ' <span class="meta">' + g.aantal + ' rijen · ' +
+            esc(g.zekerheid) + '</span></h3><p class="meta">' + esc(g.waarom) + '</p>' +
+            '<div class="schuif"><table class="ctab"><thead><tr><th>Soort</th><th>Id</th><th>Naam</th><th>Plaats</th></tr></thead><tbody>' +
+            g.leden.map(function (l) {
+              return '<tr><td>' + esc(l.soort) + '</td><td>' + esc(l.id) + '</td><td>' + esc(l.naam) +
+                '</td><td class="meta">' + esc(l.plaats || '') + '</td></tr>';
+            }).join('') + '</tbody></table></div>' +
+            '<div class="crij"><button class="knop" data-goud="' + esc(g.sleutel) + '">Gouden record bekijken</button>' +
+            '<span class="meta">' + esc(g.let) + '</span></div><div id="mg-' + esc(g.sleutel).replace(/[^a-z0-9]/g, '') + '"></div></div>';
+        }
+
+        if (d.locaties.dichtbij.length) {
+          u += '<div class="kaart"><h3>Plaatsen die dicht bij elkaar liggen</h3>' +
+            d.locaties.dichtbij.map(function (x) {
+              return '<div class="lijn"><b>' + esc(x.a) + '</b> en <b>' + esc(x.b) + '</b> ' +
+                '<span class="meta">' + x.afstandM + ' m</span><div class="meta">' + esc(x.let) + '</div></div>';
+            }).join('') + '</div>';
+        }
+        document.querySelector('#mdUit').innerHTML = u;
+
+        Array.prototype.forEach.call(document.querySelectorAll('[data-goud]'), function (b) {
+          b.onclick = function () {
+            var sl = b.getAttribute('data-goud');
+            api('mdm/gouden', { sleutel: sl }).then(function (r) {
+              document.querySelector('#mg-' + sl.replace(/[^a-z0-9]/g, '')).innerHTML =
+                '<p class="meta" style="margin-top:.6rem;">' + esc(r.uitleg) + '</p>' +
+                '<div class="schuif"><table class="ctab"><thead><tr><th>Veld</th><th>Wint</th><th>Van</th><th>Alternatieven</th></tr></thead><tbody>' +
+                Object.keys(r.velden).slice(0, 20).map(function (k) {
+                  var v = r.velden[k];
+                  return '<tr><td>' + esc(k) + '</td><td>' + esc(String(v.waarde).slice(0, 40)) + '</td>' +
+                    '<td class="meta">' + esc(v.van) + '</td><td class="meta">' +
+                    esc(v.alternatieven.map(function (a) { return String(a.waarde).slice(0, 20); }).join(' · ')) +
+                    '</td></tr>';
+                }).join('') + '</tbody></table></div>' +
+                '<p class="meta">Strijdig: ' + esc(r.strijdig.join(', ') || 'niets') + '. Samenvoegen is ' +
+                'mensenwerk en gaat via de API (mdm/samen), zodat het altijd een reden en een journaalregel draagt.</p>';
+            }).catch(function (e) { if (!e.stil) C.meld(e.message); });
+          };
+        });
+      }).catch(function (e) {
+        if (!e.stil) document.querySelector('#mdUit').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>';
+      });
+    }
+  };
+
+  function tegel(l, v, k, u) {
+    return '<div class="tegel"><div class="l">' + esc(l) + '</div><div class="v ' + (k || '') + '">' + esc(v) + '</div>' +
+      (u ? '<div class="u">' + esc(u) + '</div>' : '') + '</div>';
+  }
+
+  var i = C.WERKPLEKKEN.findIndex(function (w) { return w.id === 'herkomst'; });
+  C.WERKPLEKKEN.splice(i + 1, 0, { id: 'mdm', naam: 'Master data', sec: 'Zien' });
+  void S;
+})();
+/* RTG Command, deel 14: de overname.
+
+   HET SCHERM LOOPT IN DE VOLGORDE VAN DE MOTOR: inlezen, afbeelden, droogloop,
+   uitvoeren. Die volgorde is de veiligheid, dus hij staat ook zo op het scherm
+   in plaats van als vier losse knoppen naast elkaar.
+
+   HET ZEGEL STAAT OP DE KNOP. "Uitvoeren met zegel a1b2c3" is geen sier: het
+   zegel hoort bij precies de droogloop die eronder staat. Verandert de partij
+   of de afbeelding, dan past het niet meer en weigert de server -- zodat je
+   nooit het ene rapport goedkeurt en iets anders importeert. */
+(function () {
+  'use strict';
+  var C = window.RTGCommand, esc = C.esc, api = C.api, S = C.S;
+
+  C.TEKENAARS.overname = function (el) {
+    el.innerHTML = '<h2 class="ckop">Overname</h2>' +
+      '<p class="lead">De administratie van een overgenomen bedrijf inlezen, in vier stappen waarvan de ' +
+      'volgorde de veiligheid is. Uitvoeren kan alleen met het zegel van precies de droogloop die je hebt ' +
+      'bekeken, en er wordt nooit iets overschreven.</p>' +
+      '<div id="ovUit"><div class="leeg">Ophalen…</div></div>';
+    teken();
+
+    function teken() {
+      api('overname').then(function (d) {
+        var u = '<div class="kaart"><h3>Nieuwe partij inlezen</h3>' +
+          '<div class="crij"><input class="veld" id="ovN" placeholder="naam van de partij" style="width:14rem;">' +
+          '<select class="veld" id="ovS">' + d.soorten.map(function (s2) {
+            return '<option value="' + esc(s2.type) + '">' + esc(s2.label) + ' (sleutel: ' + esc(s2.sleutel) + ')</option>';
+          }).join('') + '</select></div>' +
+          '<label class="lb" for="ovR">De rijen, als JSON-lijst</label>' +
+          '<textarea class="veld" id="ovR" placeholder=\'[{"ID":"X1","Naam":"Zaak Een"}]\'></textarea>' +
+          '<div class="crij"><button class="knop vol" id="ovGa">Inlezen</button></div>' +
+          '<p class="meta">' + esc(d.uitleg) + '</p></div>';
+
+        for (var i = 0; i < d.partijen.length; i++) u += partij(d.partijen[i]);
+        document.querySelector('#ovUit').innerHTML = u;
+
+        document.querySelector('#ovGa').onclick = function () {
+          var rijen;
+          try { rijen = JSON.parse(document.querySelector('#ovR').value || '[]'); }
+          catch (e) { return C.meld('Dat is geen geldige JSON.'); }
+          api('overname/lees', { naam: document.querySelector('#ovN').value,
+            soort: document.querySelector('#ovS').value, rijen: rijen })
+            .then(function () { teken(); }).catch(function (e) { if (!e.stil) C.meld(e.message); });
+        };
+        hang('data-ovd', function (id) { return api('overname/droogloop', { id: id }).then(teken); });
+        hang('data-ovt', function (id) { return api('overname/terug', { id: id }).then(teken); });
+        Array.prototype.forEach.call(document.querySelectorAll('[data-ova]'), function (b) {
+          b.onclick = function () {
+            var id = b.getAttribute('data-ova');
+            var a = document.querySelector('#ova-' + id).value;
+            var afb;
+            try { afb = JSON.parse(a || '{}'); } catch (e) { return C.meld('Dat is geen geldige JSON.'); }
+            api('overname/afbeelden', { id: id, afbeelding: afb })
+              .then(function () { teken(); }).catch(function (e) { if (!e.stil) C.meld(e.message); });
+          };
+        });
+        Array.prototype.forEach.call(document.querySelectorAll('[data-ovv]'), function (b) {
+          b.onclick = function () {
+            api('overname/voer', { id: b.getAttribute('data-ovv'), zegel: b.getAttribute('data-zegel'),
+              reden: 'overname via het scherm' })
+              .then(function () { teken(); }).catch(function (e) { if (!e.stil) C.meld(e.message); });
+          };
+        });
+      }).catch(function (e) {
+        if (!e.stil) document.querySelector('#ovUit').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>';
+      });
+    }
+
+    function partij(p) {
+      var u = '<div class="kaart"><h3>' + esc(p.naam) + ' <span class="meta">' + esc(p.soort) + ' · ' +
+        p.rijen + ' rijen · ' + esc(p.stand) + '</span></h3>';
+      u += '<label class="lb" for="ova-' + esc(p.id) + '">Afbeelding: ons veld naar hun veld</label>' +
+        '<div class="crij"><input class="veld" id="ova-' + esc(p.id) + '" style="width:22rem;" value=\'' +
+        esc(JSON.stringify(p.afbeelding || {})) + '\'>' +
+        '<button class="knop" data-ova="' + esc(p.id) + '">Afbeelden</button>' +
+        '<button class="knop" data-ovd="' + esc(p.id) + '">Droogloop</button></div>';
+      if (p.rapport) {
+        u += '<div class="rooster">' +
+          tegel('Gaat erin', p.rapport.erin, 'groen', 'van ' + p.rapport.aangeboden + ' aangeboden') +
+          tegel('Gaat er niet in', p.rapport.mis, p.rapport.mis ? 'gold' : '', 'met een reden per rij') +
+          '</div>' +
+          (p.rapport.misVoorbeelden.length ? '<div class="schuif"><table class="ctab"><thead><tr><th>Regel</th><th>Sleutel</th><th>Waarom niet</th></tr></thead><tbody>' +
+            p.rapport.misVoorbeelden.map(function (m) {
+              return '<tr><td>' + m.regel + '</td><td>' + esc(m.sleutel || '') + '</td><td class="meta">' +
+                esc(m.waarom) + '</td></tr>';
+            }).join('') + '</tbody></table></div>' : '');
+        if (!p.uitgevoerd) {
+          u += '<div class="crij"><button class="knop vol" data-ovv="' + esc(p.id) + '" data-zegel="' +
+            esc(p.rapport.zegel) + '">Uitvoeren met zegel ' + esc(p.rapport.zegel) + '</button></div>';
+        }
+      }
+      if (p.uitgevoerd) {
+        u += '<p class="meta">Uitgevoerd op ' + esc(p.uitgevoerd.at) + ' door ' + esc(p.uitgevoerd.door) +
+          ': ' + p.uitgevoerd.erin + ' rijen erin.</p>' +
+          '<div class="crij"><button class="knop" data-ovt="' + esc(p.id) + '">Terugdraaien</button></div>';
+      }
+      return u + '</div>';
+    }
+    function hang(attr, doe) {
+      Array.prototype.forEach.call(document.querySelectorAll('[' + attr + ']'), function (b) {
+        b.onclick = function () { doe(b.getAttribute(attr)).catch(function (e) { if (!e.stil) C.meld(e.message); }); };
+      });
+    }
+  };
+
+
+  function tegel(l, v, k, u) {
+    return '<div class="tegel"><div class="l">' + esc(l) + '</div><div class="v ' + (k || '') + '">' + esc(v) + '</div>' +
+      (u ? '<div class="u">' + esc(u) + '</div>' : '') + '</div>';
+  }
+
+  C.WERKPLEKKEN.push({ id: 'overname', naam: 'Overname', sec: 'Doen' });
+  void S;
+})();
+/* RTG Command, deel 15: koppelingen en landen.
+
+   TWEE SCHERMEN DIE ALLEBEI IETS TONEN WAT ER NOG NIET IS, en dat is hier geen
+   tekortkoming maar de inhoud: de API-poort staat er en er zit niets achter
+   (de toelating begint leeg), en een landpakket richt in maar dekt geen
+   naleving, dus de mensenwerk-lijst blijft staan na het activeren.
+
+   Op allebei had een groen vinkje gekund. Dat vinkje is precies wat later
+   iemand laat denken dat het klaar is. De steden staan in ./command-16.js. */
+(function () {
+  'use strict';
+  var C = window.RTGCommand, esc = C.esc, api = C.api, S = C.S;
+
+  C.TEKENAARS.apipoort = function (el) {
+    el.innerHTML = '<h2 class="ckop">Koppelingen</h2>' +
+      '<p class="lead">Sleutels, scopes, quota en uitfasering voor machines, op /api/extern/. Het geheim ' +
+      'van een sleutel is één keer te zien en wordt nergens bewaard.</p>' +
+      '<div id="apUit"><div class="leeg">Ophalen…</div></div>';
+    teken();
+
+    function teken() {
+      api('apipoort').then(function (d) {
+        var u = '';
+        if (d.let) u += '<div class="kaart"><h3>Er staat niets achter deze poort</h3><p>' + esc(d.let) + '</p></div>';
+        u += '<div class="rooster">' +
+          tegel('Sleutels', d.tel.sleutels, '', d.tel.actief + ' actief van maximaal ' + d.max) +
+          tegel('Toegelaten paden', d.tel.paden, d.tel.paden ? '' : 'gold', 'wat een sleutel ooit mag raken') +
+          '</div>';
+
+        u += '<div class="kaart"><h3>Een pad toelaten</h3><div class="crij">' +
+          '<input class="veld" id="apPad" placeholder="/api/extern/..." style="width:16rem;">' +
+          '<input class="veld" id="apVer" value="v1" style="width:5rem;" aria-label="versie">' +
+          '<input class="veld" id="apUit2" placeholder="uitfasering (ISO-datum, optioneel)" style="width:14rem;">' +
+          '<button class="knop vol" id="apGa">Toelaten</button></div></div>';
+
+        if (d.toelating.length) {
+          u += '<div class="kaart"><h3>De toelating</h3><div class="schuif"><table class="ctab"><thead><tr>' +
+            '<th>Pad</th><th>Versie</th><th>Uitfasering</th><th></th></tr></thead><tbody>' +
+            d.toelating.map(function (t) {
+              return '<tr><td>' + esc(t.pad) + '</td><td class="meta">' + esc(t.versie) + '</td><td class="meta">' +
+                esc(t.uitfasering || '-') + '</td><td><button class="knop" data-apweg="' + esc(t.pad) +
+                '">Eraf</button></td></tr>';
+            }).join('') + '</tbody></table></div></div>';
+        }
+
+        u += '<div class="kaart"><h3>Een sleutel maken</h3><div class="crij">' +
+          '<input class="veld" id="apN" placeholder="naam van de koppeling" style="width:14rem;">' +
+          '<input class="veld" id="apS" placeholder="scope-pad" style="width:14rem;">' +
+          '<input class="veld" id="apQ" value="1000" style="width:6rem;" aria-label="quotum per uur">' +
+          '<button class="knop vol" id="apMaak">Maken</button></div>' +
+          '<p class="meta">Een scope buiten de toelating wordt geweigerd en niet stil ingeperkt.</p>' +
+          '<div id="apGeheim"></div></div>';
+
+        for (var i = 0; i < d.sleutels.length; i++) {
+          var s2 = d.sleutels[i];
+          u += '<div class="lijn"><b>' + esc(s2.naam) + '</b> <span class="meta">' + esc(s2.id) +
+            (s2.ingetrokken ? ' · ingetrokken' : '') + '</span>' +
+            '<div class="meta">' + esc(s2.scopes.map(function (sc) {
+              return sc.pad + ' (' + sc.methoden.join('/') + ')'; }).join(' · ')) +
+            ' · ' + s2.gebruiktDitUur + '/' + s2.quotaPerUur + ' dit uur · ' + s2.geweigerd + ' geweigerd</div>' +
+            (s2.ingetrokken ? '' : '<div class="crij"><button class="knop" data-apin="' + esc(s2.id) +
+              '">Intrekken</button></div>') + '</div>';
+        }
+        document.querySelector('#apUit').innerHTML = u;
+
+        document.querySelector('#apGa').onclick = function () {
+          api('apipoort/toelaten', { pad: document.querySelector('#apPad').value,
+            versie: document.querySelector('#apVer').value,
+            uitfasering: document.querySelector('#apUit2').value || null })
+            .then(teken).catch(function (e) { if (!e.stil) C.meld(e.message); });
+        };
+        document.querySelector('#apMaak').onclick = function () {
+          api('apipoort/sleutel', { naam: document.querySelector('#apN').value,
+            scopes: [{ pad: document.querySelector('#apS').value }],
+            quotaPerUur: Number(document.querySelector('#apQ').value || 1000) })
+            .then(function (r) {
+              document.querySelector('#apGeheim').innerHTML = '<p class="meta" style="margin-top:.6rem;">' +
+                '<b>' + esc(r.geheim) + '</b><br>' + esc(r.let) + '</p>';
+            }).catch(function (e) { if (!e.stil) C.meld(e.message); });
+        };
+        hang('data-apweg', function (p) { return api('apipoort/toelating-weg', { pad: p }).then(teken); });
+        hang('data-apin', function (id) { return api('apipoort/intrekken', { id: id, reden: 'via het scherm' }).then(teken); });
+      }).catch(function (e) {
+        if (!e.stil) document.querySelector('#apUit').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>';
+      });
+    }
+  };
+
+  C.TEKENAARS.land = function (el) {
+    el.innerHTML = '<h2 class="ckop">Landen</h2>' +
+      '<p class="lead">Een land aanzetten als configuratiebundel. Een pakket dekt de inrichting en nooit ' +
+      'de naleving: btw-registratie, loonaangifte en een toezichthouder blijven mensenwerk.</p>' +
+      '<div id="laUit"><div class="leeg">Ophalen…</div></div>';
+    teken();
+
+    function teken(land) {
+      api('land', land ? { land: land } : {}).then(function (d) {
+        var u = '';
+        if (d.pakketten) {
+          u += '<div class="kaart"><h3>De pakketten</h3><div class="schuif"><table class="ctab"><thead><tr>' +
+            '<th>Land</th><th>Munt</th><th>Taal</th><th>Aan</th><th>Mensenwerk</th><th></th></tr></thead><tbody>' +
+            d.pakketten.map(function (p) {
+              return '<tr><td>' + esc(p.naam) + '</td><td class="meta">' + esc(p.valuta) + '</td>' +
+                '<td class="meta">' + esc(p.taal) + '</td><td>' + (p.actief ? 'ja' : 'nee') + '</td>' +
+                '<td class="meta">' + p.mensenwerk + ' punten</td>' +
+                '<td><button class="knop" data-lakijk="' + esc(p.land) + '">Bekijken</button></td></tr>';
+            }).join('') + '</tbody></table></div><p class="meta">' + esc(d.let) + '</p></div>';
+        } else {
+          u += '<div class="kaart"><h3>' + esc(d.naam) + '</h3>' +
+            d.onderdelen.map(function (o) {
+              return '<div class="lijn"><b>' + esc(o.wat) + '</b> <span class="cniveau ' +
+                (o.ligt ? 'ok' : 'mis') + '">' + (o.ligt ? 'ligt er' : 'ontbreekt') + '</span>' +
+                '<div class="meta">' + esc(o.uitleg) + ' <i>(' + esc(o.bron) + ')</i></div></div>';
+            }).join('') +
+            '<div class="crij" style="margin-top:.7rem;">' +
+            '<button class="knop vol" data-laaan="' + esc(d.land) + '">Activeren</button>' +
+            '<button class="knop" data-lauit="' + esc(d.land) + '">Terugdraaien</button>' +
+            '<button class="knop" data-lakijk="">Terug naar de lijst</button></div></div>' +
+            '<div class="kaart"><h3>Blijft mensenwerk</h3><ul>' +
+            d.mensenwerk.map(function (m) { return '<li class="meta">' + esc(m) + '</li>'; }).join('') +
+            '</ul><p class="meta">' + esc(d.waarschuwing) + '</p></div>';
+        }
+        document.querySelector('#laUit').innerHTML = u;
+        hang('data-lakijk', function (l) { teken(l || null); return Promise.resolve(); });
+        hang('data-laaan', function (l) { return api('land/activeer', { land: l }).then(function () { teken(l); }); });
+        hang('data-lauit', function (l) { return api('land/terug', { land: l }).then(function () { teken(l); }); });
+      }).catch(function (e) {
+        if (!e.stil) document.querySelector('#laUit').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>';
+      });
+    }
+  };
+
+  function hang(attr, doe) {
+    Array.prototype.forEach.call(document.querySelectorAll('[' + attr + ']'), function (b) {
+      b.onclick = function () { doe(b.getAttribute(attr)).catch(function (e) { if (!e.stil) C.meld(e.message); }); };
+    });
+  }
+  function tegel(l, v, k, u) {
+    return '<div class="tegel"><div class="l">' + esc(l) + '</div><div class="v ' + (k || '') + '">' + esc(v) + '</div>' +
+      (u ? '<div class="u">' + esc(u) + '</div>' : '') + '</div>';
+  }
+
+  C.WERKPLEKKEN.push(
+    { id: 'apipoort', naam: 'Koppelingen', sec: 'Besturen' },
+    { id: 'land', naam: 'Landen', sec: 'Besturen' });
+  void S;
+})();
+/* RTG Command, deel 16: de steden.
+
+   HET SCHERM TOONT PER STAP OF HIJ GEDAAN IS, en er staat er bewust een tussen
+   die dat NOOIT wordt: het stadsweefsel draagt vandaag een geografie zonder
+   sleutel "welke stad". Een tweede stad met eigen zones en Stadsdozen is een
+   verbouwing van die laag.
+
+   Dat had een groen vinkje kunnen zijn. Dan start iemand Antwerpen, ziet
+   "ingericht", en ontdekt een maand later dat elke meting in de zones van de
+   eerste stad is geboekt. */
+(function () {
+  'use strict';
+  var C = window.RTGCommand, esc = C.esc, api = C.api, S = C.S;
+
+  C.TEKENAARS.stad = function (el) {
+    el.innerHTML = '<h2 class="ckop">Steden</h2>' +
+      '<p class="lead">Een stad inrichten. De stand is met opzet eerlijker dan de knop: "gestart" betekent ' +
+      'dat de administratie klaarstaat, niet dat de stad draait.</p>' +
+      '<div id="stUit"><div class="leeg">Ophalen…</div></div>';
+    teken();
+
+    function teken() {
+      api('stad').then(function (d) {
+        var u = '<div class="kaart"><h3>Wat een knop hier niet kan</h3><p>' + esc(d.let) + '</p></div>' +
+          '<div class="kaart"><h3>Nieuwe stad</h3><div class="crij">' +
+          '<input class="veld" id="stN" placeholder="naam" style="width:12rem;">' +
+          '<input class="veld" id="stL" placeholder="landcode (bv. NL)" style="width:8rem;">' +
+          '<button class="knop vol" id="stGa">Starten</button></div>' +
+          '<p class="meta">Het landpakket van dat land moet aanstaan.</p></div>';
+
+        for (var i = 0; i < d.steden.length; i++) {
+          var s2 = d.steden[i];
+          u += '<div class="kaart"><h3>' + esc(s2.naam) + ' <span class="meta">' + esc(s2.land) + '</span></h3>' +
+            s2.stappen.map(function (p) {
+              return '<div class="lijn"><b>' + esc(p.stap) + '</b> <span class="cniveau ' +
+                (p.gedaan ? 'ok' : 'onbekend') + '">' + (p.gedaan ? 'gedaan' : 'staat open') + '</span>' +
+                '<div class="meta">' + esc(p.uitleg) + '</div></div>';
+            }).join('') +
+            '<div class="crij" style="margin-top:.7rem;"><button class="knop" data-stweg="' + esc(s2.naam) +
+            '">Stoppen</button></div></div>';
+        }
+        document.querySelector('#stUit').innerHTML = u;
+        document.querySelector('#stGa').onclick = function () {
+          api('stad/start', { naam: document.querySelector('#stN').value,
+            land: document.querySelector('#stL').value })
+            .then(teken).catch(function (e) { if (!e.stil) C.meld(e.message); });
+        };
+        hang('data-stweg', function (n) { return api('stad/stop', { naam: n }).then(teken); });
+      }).catch(function (e) {
+        if (!e.stil) document.querySelector('#stUit').innerHTML = '<div class="leeg">' + esc(e.message) + '</div>';
+      });
+    }
+  };
+
+
+  function hang(attr, doe) {
+    Array.prototype.forEach.call(document.querySelectorAll('[' + attr + ']'), function (b) {
+      b.onclick = function () { doe(b.getAttribute(attr)).catch(function (e) { if (!e.stil) C.meld(e.message); }); };
+    });
+  }
+
+  C.WERKPLEKKEN.push({ id: 'stad', naam: 'Steden', sec: 'Besturen' });
   void S;
 })();

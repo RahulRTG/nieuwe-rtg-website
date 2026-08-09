@@ -18,8 +18,8 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | **gezakt** op een mutatie (bewezen gevoelig) | 521 |
 | **overleefd**: geen mutatie kreeg hem rood | 12 |
 | niet te meten (al rood, geen module gevonden, ...) | 16 |
-| alleen in de kop *genoemd*, nog niet gemeten | 39 |
-| niets van beide | 147 |
+| alleen in de kop *genoemd*, nog niet gemeten | 40 |
+| niets van beide | 146 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -703,7 +703,7 @@ toets omvalt.
 | `clips-studio.e2e.js` | 1 | -- | Scherm-test voor de Clips-studio: knippen, geluid en ondertitels, en het toegangsfilter in de kop. test/clips.test.js bewijst de server-kant; deze bewijst dat de studio op het scherm werkt en dat de feed de standen... |
 | `comm-zaak.e2e.js` | 3 | -- | De zakelijke deur van het communicatieplatform (routes/supplier/comm.js). comm-actor.test.js toetst het MODEL: de sleutels, de naamruimtes, de poort. |
 | `comm.e2e.js` | 5 | -- | Het communicatieplatform (server/kern/comm + apps/comm.html). WAT HIER BEWAAKT WORDT, en waarom juist dit. |
-| `command.e2e.js` | 1 | -- | Schermtoets voor RTG Command: de app komt beveiligd op met een kantoortoken, tekent het Command Center, laat de operator een plan maken en opent een objectdossier -- alles zonder onopgevangen JS-fouten. WAAROM DIT... |
+| `command.e2e.js` | 1 | genoemd | Schermtoets voor RTG Command: de app komt beveiligd op met een kantoortoken, tekent het Command Center, laat de operator een plan maken en opent een objectdossier -- alles zonder onopgevangen JS-fouten. WAAROM DIT... |
 | `csp.e2e.js` | 1 | -- | DE CSP ZOALS EEN BROWSER HEM ERVAART. Een Content-Security-Policy is de enige beveiliging in dit huis die je niet kunt aantonen door de code te lezen. |
 | `deelmenu.e2e.js` | 3 | genoemd | Scherm-test voor het deelmenu (shared/deelmenu.js): een app met veel delen wordt een menu met een deel tegelijk, in plaats van een lange rol. Het contract, op de eerste pagina die meedoet (rtgschool.html): 1. |
 | `deelmenuronde.e2e.js` | 5 | genoemd | DE TWEEDE RONDE VAN HET DEELMENU: WAT ER GEBEURT ALS DE APP HERTEKENT. test/deelmenuwacht.e2e.js bewaakt de EERSTE ronde: komt er een menu zodra de app zijn schermen neerzet. |

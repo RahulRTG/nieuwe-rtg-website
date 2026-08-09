@@ -124,7 +124,10 @@ function maakCommand({ db, save, crypto, anthropic }) {
       /* De SLO-stand hoort op het beginscherm omdat een foutbudget dat je moet
          opzoeken geen rem is. Hij staat hier wel INGEPAKT: ontbreekt SLO.json,
          dan hoort dat één luide tegel te zijn en niet een leeg beginscherm. */
-      slo: sloKort()
+      slo: sloKort(),
+      /* De lopende uitrollen, want een canary die niemand meer bekijkt is
+         precies het geval waarvoor de terugroldrempel bestaat. */
+      canary: canary.stand().tel
     };
   }
 

@@ -61,7 +61,15 @@ test('RTG Command: het Command Center, de operator en een objectdossier komen op
 
     /* Elke werkplek tekenen. Een werkplek die op een ReferenceError stukloopt,
        laat de titel weg -- en de foutenlijst vangt hem alsnog. */
-    for (const w of ['zoek', 'operator', 'zaken', 'herstel', 'beleid', 'simulatie', 'toezicht', 'werk', 'journaal', 'werkplek']) {
+    /* ALLE werkplekken, ook de lagen die er later bij kwamen. Die laatste
+       tekenen elk uit een eigen deelbestand van de bundel, en juist een knip op
+       de verkeerde plek levert daar een ReferenceError op precies één werkplek
+       op -- op de server is dan alles groen. Dit is de enige toets die dat
+       ziet, dus hij hoort compleet te zijn en niet bij de eerste tien te
+       stoppen. */
+    for (const w of ['zoek', 'operator', 'zaken', 'herstel', 'beleid', 'simulatie', 'toezicht', 'werk',
+      'journaal', 'werkplek', 'kwaliteit', 'graaf', 'herkomst', 'mdm', 'slo', 'sonde',
+      'canary', 'zandbak', 'overname', 'apipoort', 'land', 'stad']) {
       await page.click('#rail button[data-w="' + w + '"]');
       await page.waitForFunction(() => {
         /* De app-titel is de <h1> in de kop (die de iOS-laag tot navigatiebalk
@@ -71,6 +79,28 @@ test('RTG Command: het Command Center, de operator en een objectdossier komen op
         return h && h.textContent.trim().length > 0;
       }, null, { timeout: 8000 });
       assert.deepEqual(paginaFouten, [], 'geen JS-fout op werkplek ' + w);
+
+      /* EERST WACHTEN TOT HET OPHALEN KLAAR IS. De kop staat er meteen (die
+         wordt synchroon gezet), maar de inhoud komt uit een api()-aanroep. Wie
+         direct daarna de tekst leest, leest de wachtmelding -- en ziet dus ook
+         niet wat er daarna misging. Precies daardoor overleefde een mutatie de
+         eerste versie van deze toets. */
+      await page.waitForFunction(() => {
+        const m = document.querySelector('main');
+        return m && !/Ophalen…|Meten…/.test(m.textContent);
+      }, null, { timeout: 12000 });
+
+      /* EN DAN DE TEKST ZELF NAKIJKEN, want de kop alleen is niet genoeg. Elke
+         werkplek haalt zijn gegevens op met api().then(...).catch(...), en die
+         catch is er voor een echte serverfout -- maar hij vangt net zo goed een
+         ReferenceError uit de tekenfunctie en zet die als nette melding op het
+         scherm. Dan staat de kop er, is de foutenlijst leeg, en is de werkplek
+         toch stuk. */
+      const tekst = await page.textContent('main');
+      for (const gaatMis of ['is not defined', 'is not a function', 'Cannot read properties']) {
+        assert.ok(!tekst.includes(gaatMis),
+          'werkplek ' + w + ' toont een JS-fout als melding: ' + tekst.slice(0, 200));
+      }
     }
 
     // De operator: een vraag stellen en een gemeten antwoord terugkrijgen.

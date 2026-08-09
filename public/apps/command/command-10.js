@@ -47,6 +47,8 @@
         '<p class="meta">' + (d.bron.buiten && d.bron.buiten.gemeten
           ? 'Van buitenaf: ' + d.bron.buiten.pogingen + ' metingen, ' + d.bron.buiten.mislukt + ' mislukt.'
           : 'Van buitenaf: ' + esc((d.bron.buiten && d.bron.buiten.uitleg) || 'niet gemeten')) + '</p>' +
+        '<p class="meta">De failover is apart beproefd en niet beweerd: <code>npm run chaos</code> start een ' +
+        'eigen trio en schiet de ACTIEVE server om met SIGKILL. De uitslag staat in SLO.md.</p>' +
         '<p class="meta">De doelen staan in ' + esc(d.norm.bestand) + ' (vastgelegd ' + esc(d.norm.vastgelegd) +
         '); een doel telt pas mee vanaf ' + d.norm.minimumVerzoeken + ' verzoeken en ' +
         Math.round(d.norm.minimumDekking * 100) + '% van zijn venster.</p></div>';

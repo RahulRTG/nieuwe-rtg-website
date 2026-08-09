@@ -120,6 +120,7 @@
     <button type="button" data-a="desktop">Desktop</button>
   </div>
   <span class="sp"></span>
+  <button class="knop" id="aiKnop" title="Vraag de assistent het ontwerp aan te passen">AI</button>
   <button class="knop" id="blokKnop">+ Blok</button>
   <button class="knop" id="bewerkKnop">Voorbeeld</button>
   <button class="knop" id="openKnop">Mijn sites</button>
@@ -234,6 +235,32 @@ function paginaBar(){
   }
 }
 paginaReset();
+
+/* ---- AI in de maker ----
+   De assistent past het ontwerp aan zoals het NU op het doek staat; jij ziet
+   het resultaat en bewaart zelf. Niets gaat vanzelf de deur uit. */
+$('#aiKnop').addEventListener('click',async()=>{
+  const opdracht=(prompt('Wat wil je veranderen? Bijv. "maak het luxer" of "maak een pagina voor bruiloften"')||'').trim();
+  if(!opdracht)return;
+  stashPagina();
+  meld('De assistent denkt na…');
+  try{
+    const r=await api('ai',{design:Object.assign({},DESIGN,{blokken:HOMEBLOK}),opdracht});
+    if(!r.design){ meld(r.antwoord||'Geen wijziging.'); return; }
+    const d=r.design;
+    if(d.titel)DESIGN.titel=d.titel;
+    if(['licht','donker'].includes(d.thema))DESIGN.thema=d.thema;
+    if(/^#[0-9a-fA-F]{6}$/.test(d.accent||''))DESIGN.accent=d.accent;
+    DESIGN.kleuren=d.kleuren||{};
+    HOMEBLOK=(d.blokken||[]).map(b=>{ if(!b.id)b.id=RTGId('b'); return b; });
+    DESIGN.paginas=(d.paginas||[]).slice(0,7).map(p=>({id:p.id||RTGId('p'),naam:p.naam||'Pagina',slug:p.slug||'',
+      blokken:(p.blokken||[]).map(b=>{ if(!b.id)b.id=RTGId('b'); return b; })}));
+    PAG=-1; DESIGN.blokken=HOMEBLOK;
+    $('#titel').value=DESIGN.titel;bouwSwatches();syncKleurInputs();
+    $('#themaKnop').textContent=DESIGN.thema==='licht'?'Licht':'Donker';
+    paginaBar(); render(); meld(r.antwoord||'Aangepast -- bekijk het doek en bewaar zelf.');
+  }catch(e){ meld(e.message); }
+});
 // de themakleuren zijn het vertrekpunt van de vrije kleurkiezers; wie niets
 // aanraakt houdt het thema, wie wel kiest overschrijft alleen die ene kleur
 const THEMA_KLEUR={donker:{bg:'#0C0C0B',txt:'#F4F1EC',card:'#151312'},licht:{bg:'#F5F1EA',txt:'#20160F',card:'#FBF8F2'}};

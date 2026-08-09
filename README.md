@@ -1252,7 +1252,9 @@ De Website-maker (`/apps/sitemaker.html`, `kern/webmaker.js`) en de RTG-browser 
 
 - **Meerdere pagina's per site.** Naast de voorpagina draagt een ontwerp tot zeven extra pagina's (`kern/webmaker-paginas.js`), elk met eigen naam, slug en blokken -- dezelfde schoonmaak en grenzen als de voorpagina, en dubbele slugs vallen weg. De browser toont een paginabalk en begrijpt `naam.rtg/contact` in de adresbalk; de maker heeft een pagina-wissel in de kop (toevoegen, hernoemen, weghalen). De automatische bedrijfssite gebruikt dit meteen: **Home** (hero, beeld, reviews), **Aanbod** (alles wat de zaak verkoopt, live) en **Contact** (bezoekgegevens + het formulier).
 
-`test/webplatform.test.js` (acht scenario's) legt dit vast; vijf mutaties (leden mogen zelf een zaakCode zetten; de live blokken worden niet meer opgelost; het formulier accepteert sites zonder ontvanger; de etalage-grendel valt weg; het oplossen slaat de extra pagina's over), alle vijf **RAAK**.
+- **AI in de maker, als assistent en niet als black box.** De AI-knop in de Website-maker (`kern/webmaker-ai.js`, `POST /api/site/ai` en `/api/supplier/site/ai`) past het ontwerp aan zoals het NU op het doek staat -- "maak het luxer", "maak een pagina voor bruiloften", "herschrijf de intro zakelijker". Het antwoord is een aangepast ontwerp dat de maker toont; **er wordt niets opgeslagen** -- de gebruiker beoordeelt, verfijnt en bewaart zelf, en dan pas loopt het langs de gewone schoonmaak. Zonder AI-sleutel draait een demostand met drie eerlijke transformaties (luxer, licht/donker, pagina toevoegen); wat hij niet kan, zegt hij -- geen gedaan-vinkje zonder daad.
+
+`test/webplatform.test.js` (negen scenario's) legt dit vast; zes mutaties (leden mogen zelf een zaakCode zetten; de live blokken worden niet meer opgelost; het formulier accepteert sites zonder ontvanger; de etalage-grendel valt weg; het oplossen slaat de extra pagina's over; de AI-demostand zegt "gedaan" zonder daad), alle zes **RAAK**.
 
 ### RTG Bank & RTG Stad (de eigen infrastructuur)
 

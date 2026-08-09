@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 2908 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 2910 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,10 +18,10 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 2908 |
-| servermodules (`server/**/*.js`) | 1568 |
+| API-endpoints | 2910 |
+| servermodules (`server/**/*.js`) | 1569 |
 | routebestanden (`server/routes/**`) | 349 |
-| kernmodules (`server/kern/**`) | 908 |
+| kernmodules (`server/kern/**`) | 909 |
 | schermen (`public/**/*.html`) | 214 |
 | gedeelde browsermodules (`public/shared/*.js`) | 171 |
 | toetsbestanden (`test/*.test.js`) | 631 |
@@ -112,7 +112,7 @@ op de regel zelf. Dat is niet hetzelfde als onbeveiligd -- regel 28 van de keuri
 per route een poort **of** een plek op de publieke lijst met reden. Deze kolom is een
 wegwijzer, geen verdict.
 
-Daarnaast 1519 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 1521 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 
@@ -120,9 +120,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1122 |
+| kern-namen die routes aanraken | 1123 |
 | daarvan door **meer dan één** domein (de echte koppeling) | 148 |
-| daarvan door precies één domein | 974 |
+| daarvan door precies één domein | 975 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 

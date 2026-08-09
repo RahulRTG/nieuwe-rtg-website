@@ -4,7 +4,7 @@
    (geen gast). De browser-gids en het openen van een site mag elk ingelogd lid,
    zodat je door het RTG-web kunt bladeren. */
 module.exports = (kern) => {
-  const { app, auth, webmaker, webplatform, atelierweb, antivirus, media, supplierAuth, findSupplier, addTicket, liveCodename, save } = kern;
+  const { app, auth, webmaker, webplatform, webmakerAi, atelierweb, antivirus, media, supplierAuth, findSupplier, addTicket, liveCodename, save } = kern;
   const FOTO_MAX_BYTES = 2 * 1024 * 1024; // ~2 MB per foto
   const stuur = (res, r) => r && r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const geenGast = (req, res) => {
@@ -24,6 +24,21 @@ module.exports = (kern) => {
   app.post('/api/site/verwijder', auth, (req, res) => { if (geenGast(req, res)) return; stuur(res, webmaker.verwijder(req.session.key, (req.body || {}).id)); });
   app.post('/api/site/publiceer', auth, (req, res) => { if (geenGast(req, res)) return; const b = req.body || {}; stuur(res, webmaker.publiceer(req.session.key, b.id, b.adres)); });
   app.post('/api/site/offline', auth, (req, res) => { if (geenGast(req, res)) return; stuur(res, webmaker.offline(req.session.key, (req.body || {}).id)); });
+
+  /* ---- AI in de maker ----
+     De opdracht werkt op het ontwerp zoals het NU op het doek staat (ook
+     onbewaard); het antwoord is een aangepast ontwerp dat de maker toont.
+     Er wordt hier niets opgeslagen -- de gebruiker beoordeelt en bewaart
+     zelf, en dan pas loopt het langs de gewone schoonmaak. */
+  app.post('/api/site/ai', auth, async (req, res) => {
+    if (geenGast(req, res)) return;
+    const b = req.body || {};
+    res.json(await webmakerAi.schrijf(b.design || {}, b.opdracht));
+  });
+  app.post('/api/supplier/site/ai', supplierAuth, async (req, res) => {
+    const b = req.body || {};
+    res.json(await webmakerAi.schrijf(b.design || {}, b.opdracht));
+  });
 
   /* ---- de sjabloon-etalage van het Atelier ----
      Leden beginnen met een ontwerp van het huis in plaats van vanaf nul; wat

@@ -199,6 +199,36 @@ test('8. een lid bouwt een site met meerdere pagina\'s, met dezelfde schoonmaak 
     [['Over ons', 'over-ons'], ['Contact!', 'contact']], 'de bezoeker krijgt de pagina\'s met naam en slug');
 });
 
+test('9. de AI-assistent past aan maar bewaart niets; de demostand is eerlijk over wat hij kan', async () => {
+  const ontwerp = { titel: 'Trattoria Sole', thema: 'licht', accent: '#7F1634',
+    blokken: [{ id: 'b1', type: 'hero', kop: 'Trattoria Sole' }] };
+
+  // de demostand kan "luxer": thema en accent, met uitleg -- en het ontwerp
+  // komt terug in plaats van te worden opgeslagen
+  const lux = await api('/api/site/ai', { design: ontwerp, opdracht: 'Maak het luxer.' }, lid);
+  assert.equal(lux.status, 200);
+  assert.equal(lux.body.gedaan, true);
+  assert.equal(lux.body.design.thema, 'donker');
+  assert.equal(lux.body.design.accent, '#857007', 'goud uit het eigen palet, geen verzonnen kleur');
+  const mijnVoor = await api('/api/site/mijn', {}, lid);
+
+  // en een nieuwe pagina op verzoek
+  const pag = await api('/api/site/ai', { design: ontwerp, opdracht: 'Maak een pagina voor bruiloften.' }, lid);
+  assert.equal(pag.body.gedaan, true);
+  assert.equal(pag.body.design.paginas.length, 1);
+  assert.match(pag.body.design.paginas[0].naam, /bruiloften/i);
+
+  // wat de demostand niet kan, zegt hij eerlijk -- geen gedaan-vinkje zonder daad
+  const nee = await api('/api/site/ai', { design: ontwerp, opdracht: 'Vertaal alles naar het Spaans.' }, lid);
+  assert.equal(nee.body.gedaan, false);
+  assert.equal(nee.body.design, null);
+  assert.match(nee.body.antwoord, /demostand|sleutel/i);
+
+  // niets van dit alles heeft iets opgeslagen
+  const mijnNa = await api('/api/site/mijn', {}, lid);
+  assert.equal(mijnNa.body.lijst.length, mijnVoor.body.lijst.length, 'de assistent bewaart niet zelf');
+});
+
 test('5. zoeken vindt sites en bedrijven in een adem', async () => {
   const z = await api('/api/browser/zoek', { q: 'vedra' }, lid);
   assert.equal(z.status, 200);

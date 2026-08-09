@@ -136,7 +136,7 @@ module.exports = ({ db, boekingenVanZaak, ordersVanZaak, intakeOntbreekt }) => {
   /* Het hele beeld. Krijgt de verkenning mee in plaats van hem zelf te draaien:
      de route heeft hem toch al, en twee keer rekenen zou twee antwoorden kunnen
      geven op dezelfde vraag. */
-  function dagbeeld(o, beeld, verk, project, eersteklant, mall, rel, deb, cred, con, bel, kas, cap, wrv, pij) {
+  function dagbeeld(o, beeld, verk, project, eersteklant, mall, rel, deb, cred, con, bel, kas, cap, wrv, pij, bst) {
     const feiten = beeld.feiten;
     const zaak = o.supplierCode ? (db.data.suppliers || []).find(s => s.code === o.supplierCode) : null;
     return {
@@ -161,6 +161,7 @@ module.exports = ({ db, boekingenVanZaak, ordersVanZaak, intakeOntbreekt }) => {
       capaciteit: cap || null,
       werving: wrv || null,
       pijplijn: pij || null,
+      bestuur: bst || null,
       rechtsvorm: beeld.rechtsvorm,
       caps: beeld.caps
     };

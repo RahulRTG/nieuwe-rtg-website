@@ -33,6 +33,15 @@ module.exports = [
   // Let op: NIET 'office' als id; die naam is al van de RTG-Backoffice hieronder.
   { id: 'kantoorpakket', categorie: 'Eigen apps', naam: 'RTG Office (kantoorpakket)', standaard: true, doelgroepen: LEDEN,
     uitleg: 'Het eigen kantoorpakket: tekstdocumenten en rekenbladen op uw account, alleen-lezen te delen op codenaam.', paden: ['/api/kantoorpakket'] },
+  /* Het Ondernemers-OS. Stond met al zijn routes BUITEN de schakelkast -- niet
+     door een besluit maar door optelling: de app groeide en stap twee (deze
+     catalogus) bleef liggen. Vanuit de boardroom was hij daardoor niet uit te
+     zetten en greep de storingswachter er nooit op in. Een pad volstaat: alles
+     onder /api/onderneming hoort bij deze ene app, en dat is precies de reden
+     dat het OS een OS heet en geen verzameling modules. */
+  { id: 'ondernemersos', categorie: 'Eigen apps', naam: 'RTG Ondernemers-OS', standaard: true, doelgroepen: LEDEN,
+    uitleg: 'Van "ik denk erover na" tot een draaiend bedrijf in een scherm: de verkenning en de stress test, de rechtsvorm en het oprichtingsproject, het dagbeeld met debiteuren, btw, kas en capaciteit, de verkooppijplijn en het bestuur met de UBO-afleiding.',
+    paden: ['/api/onderneming'] },
   { id: 'vonk', categorie: 'Eigen apps', naam: 'RTG Vonk (dating)', standaard: true, doelgroepen: LEDEN,
     uitleg: 'Dating op codenaam met de Salon-veiligheidslat: 18+, geverifieerd paspoort, een eindige dagselectie, en bij een match automatisch een tafel rond het midden van beide woonplaatsen (EUR 10 p.p., waarvan EUR 5 voor RTG).', paden: ['/api/vonk'] },
   { id: 'mediaos', categorie: 'Eigen apps', naam: 'RTG Media (één mediawereld)', standaard: true, doelgroepen: LEDEN,

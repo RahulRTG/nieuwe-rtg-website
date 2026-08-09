@@ -62,6 +62,23 @@ module.exports = ({ db, findSupplier, ordersVanZaak, boekingenVanZaak, vanEigena
     };
   }
 
+  /* ---- de drie assen samengevoegd ----
+     Apart van ondernemingBeeld omdat ./bestuur.js hem ook nodig heeft: of er
+     aandeelhouders kunnen zijn, hangt af van dezelfde samenvoeging mét dezelfde
+     aftrek van de verboden. Zou het bestuur zijn eigen lijstje maken, dan staan
+     er twee waarheden over wat een rechtsvorm mag. */
+  function ondernemingCaps(o) {
+    const s = zaakVan(o);
+    const werkcaps = s ? db.capsVan(s) : [];
+    const fb = FASE.faseBeeld(ondernemingFeiten(o));
+    /* `aandelen` reist mee als kandidaat zodra het register mag bestaan. De cap
+        heet `aandeelhouders`, het verbod heet `aandelen`; zonder deze regel
+        haalt capsSamen niets weg en bijt het verbod van een stichting niet. */
+    const rvCaps = RV.capsVanRechtsvorm(o.rechtsvorm);
+    const kandidaten = rvCaps.includes('aandeelhouders') ? rvCaps.concat(['aandelen']) : rvCaps;
+    return RV.capsSamen([werkcaps, kandidaten, fb.ontgrendeld], RV.verbodenVanRechtsvorm(o.rechtsvorm));
+  }
+
   /* ---- het beeld: de drie assen samengevoegd ---- */
   function ondernemingBeeld(o) {
     if (!o) return null;
@@ -72,11 +89,7 @@ module.exports = ({ db, findSupplier, ordersVanZaak, boekingenVanZaak, vanEigena
     /* De werkvormen komen van de zaak; zolang die er niet is, doet die as
        niet mee -- niet met een lege lijst omdat we hem "toch nodig hebben",
        maar omdat een onderneming zonder zaak nog niets DOET. */
-    const werkcaps = s ? db.capsVan(s) : [];
-    const samen = RV.capsSamen(
-      [werkcaps, RV.capsVanRechtsvorm(o.rechtsvorm), fb.ontgrendeld],
-      RV.verbodenVanRechtsvorm(o.rechtsvorm)
-    );
+    const samen = ondernemingCaps(o);
     return {
       id: o.id,
       naam: ondernemingNaam(o),
@@ -84,7 +97,7 @@ module.exports = ({ db, findSupplier, ordersVanZaak, boekingenVanZaak, vanEigena
       zaak: s ? { code: s.code, type: s.type } : null,
       kvk: o.kvk || null,
       rechtsvorm: rv ? {
-        id: rv.id, label: rv.label, kort: rv.kort, rechtspersoon: rv.rechtspersoon,
+        id: rv.id, label: rv.label, kort: rv.kort, land: rv.land, rechtspersoon: rv.rechtspersoon,
         notarieel: rv.notarieel, aansprakelijk: rv.aansprakelijk, oprichting: rv.oprichting
       } : null,
       fase: fb.fase,
@@ -102,5 +115,5 @@ module.exports = ({ db, findSupplier, ordersVanZaak, boekingenVanZaak, vanEigena
     };
   }
 
-  return { zaakVan, ondernemingNaam, ondernemingFeiten, ondernemingBeeld };
+  return { zaakVan, ondernemingNaam, ondernemingFeiten, ondernemingCaps, ondernemingBeeld };
 };

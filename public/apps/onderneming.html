@@ -154,7 +154,7 @@ function toonLeeg(){
 function teken(){
   const o=ONDS.find(x=>x.id===HUIDIG)||{};
   zetTitel(DAG.naam||'Mijn onderneming');
-  $('#hoofd').innerHTML=[vakGroet(),vakGezond(),vakActies(),vakIntake(),vakKans(),vakSimulatie(),vakStress(),vakPlan(o),vakRechtsvorm(o),vakOprichting(),vakZaak(o),vakEersteKlant(),vakMall(),vakRelaties(),vakPijplijn(),vakDebiteuren(),vakCrediteuren(),vakContracten(),vakBelasting(),vakKas(),vakCapaciteit(),vakWerving()].join('');
+  $('#hoofd').innerHTML=[vakGroet(),vakGezond(),vakActies(),vakIntake(),vakKans(),vakSimulatie(),vakStress(),vakPlan(o),vakRechtsvorm(o),vakOprichting(),vakZaak(o),vakEersteKlant(),vakMall(),vakRelaties(),vakBestuur(),vakPijplijn(),vakDebiteuren(),vakCrediteuren(),vakContracten(),vakBelasting(),vakKas(),vakCapaciteit(),vakWerving()].join('');
   haakKnoppen();
 }
 
@@ -577,6 +577,39 @@ function vakPijplijn(){
       esc(p.doorlooptijd.uitleg)+' Nu '+p.doorlooptijd.naarPrijs+' dag(en).</p>')+
     (rijen?'<div style="margin-top:.8rem;">'+rijen+'</div>':'')+
     '<p class="subtxt" style="margin-top:.9rem;">'+esc(p.nietGemeten)+'</p></div>';
+}
+
+
+/* Het bestuur. Drie standen, en het scherm toont ze alle drie als iets anders:
+   zonder rechtsvorm een vraag, bij een eenmanszaak een uitleg, en anders het
+   register. Nergens een leeg formulier -- dat leest als een openstaande taak. */
+function vakBestuur(){
+  const b=DAG&&DAG.bestuur;
+  if(!b) return '';
+  if(b.stand==='geen-rechtsvorm') return '';   /* de rechtsvormvraag staat er al */
+  if(b.stand==='niet-van-toepassing'){
+    return '<div class="vak"><h2>Bestuur</h2><p class="subtxt">'+esc(b.uitleg)+'</p></div>';
+  }
+  const rij=(l,r)=>'<div class="bron"><span>'+l+'</span><span>'+r+'</span></div>';
+  const best=(b.bestuurders||[]).map(x=>rij(esc(x.codenaam)+'<br><span class="bu">'+esc(x.rolLabel)+
+    (x.tekent?'':' &middot; tekent niet')+'</span>','sinds '+esc(x.sinds))).join('')
+    ||'<p class="stil">Nog niemand ingeschreven.</p>';
+  const aand=b.magAandelen
+    ? (b.aandelen||[]).map(a=>rij(esc(a.codenaam),a.percentage+'%')).join('')||'<p class="stil">Nog niets uitgegeven.</p>'
+    : '<p class="stil">'+esc(b.aandelenGeweerd)+'</p>';
+  const verd=b.verdeeld&&b.verdeeld.melding
+    ? '<p class="subtxt" style="margin-top:.4rem;">'+esc(b.verdeeld.melding)+'</p>':'';
+  const u=b.ubo;
+  const ubo='<div class="bevinding'+(u.soort==='geen'?' zwaar':'')+'">'+
+    '<div class="bk">UBO: '+(u.personen.length
+      ? u.personen.map(p=>esc(p.codenaam)+(p.percentage?' ('+p.percentage+'%)':'')).join(', ')
+      : 'nog niet vast te stellen')+'</div>'+
+    '<div class="bw">'+esc(u.regel)+(u.let?' '+esc(u.let):'')+'</div></div>';
+  return '<div class="vak"><h2>Bestuur</h2>'+
+    '<p class="subtxt" style="margin-bottom:.6rem;">'+esc(b.rechtsvorm)+'</p>'+best+
+    '<p class="subtxt" style="margin:.9rem 0 .3rem;">Wie bezit</p>'+aand+verd+
+    '<div style="margin-top:.9rem;">'+ubo+'</div>'+
+    '<p class="subtxt" style="margin-top:.9rem;">'+esc(b.voorbehoud)+'</p></div>';
 }
 
 

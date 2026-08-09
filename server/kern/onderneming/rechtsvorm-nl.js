@@ -13,7 +13,11 @@
 
 /* De caps van de B.V. staan hier los, omdat de holding ze erft. Overtypen zou
    betekenen dat een nieuwe bv-verplichting stil buiten de holding blijft. */
-const BV_CAPS = ['vpb', 'dga-loon', 'aandeelhouders', 'aandeelhoudersregister',
+/* `bestuur` staat er bij, en dat is geen detail: een B.V. heeft altijd een
+   statutair bestuur. Het ontbrak, en dat viel pas op toen kern/onderneming/
+   bestuur.js op deze cap ging leunen -- een B.V. kon toen geen bestuurder
+   inschrijven. Zo hoort het ook op te vallen: de as is de waarheid. */
+const BV_CAPS = ['vpb', 'dga-loon', 'bestuur', 'aandeelhouders', 'aandeelhoudersregister',
   'ubo', 'jaarrekening', 'deponering', 'notaris'];
 /* Wat een rechtspersoon met aandelen nooit mag: de ondernemersaftrekken uit de
    inkomstenbelasting. Ook los, om dezelfde reden. */

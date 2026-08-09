@@ -1920,6 +1920,51 @@ facturatie, de btw verkeerd terugrekenen, een eigen tarief per regel negeren,
 een fout uit de bouwer negeren, en een losse regel zonder omschrijving
 doorlaten.
 
+### Het bestuur: wie beslist, wie bezit, en wie er als UBO uit volgt
+
+`server/kern/onderneming/bestuur.js` + `bestuur-handelingen.js` +
+`/api/onderneming/bestuur{,/zet,/af}` en
+`/api/onderneming/aandeel/{zet,weg}`.
+
+**Dit bestaat alleen waar het echt bestaat.** Een eenmanszaak heeft geen bestuur
+en geen aandeelhouders — de ondernemer *is* de onderneming. Zou dat scherm er
+toch staan, leeg, dan leest het als "u moet dit nog invullen", en dan verzint
+iemand een bestuur voor een bedrijf dat er geen kan hebben. Zonder rechtsvorm
+komt er de vraag en geen register.
+
+**Het verbod wint, ook hier.** Een stichting kent geen aandelen. Dat komt uit
+dezelfde `verboden` als de capslijst — er staat in dit bestand geen enkele
+rechtsvormnaam, want dat zou een tweede waarheid zijn. Onderweg bleek die
+grendel eerst *decoratie*: de cap heet `aandeelhouders` en het verbod heet
+`aandelen`, dus de aftrek raakte niets. Het bestuur leest nu de samengevoegde
+capslijst van `beeld.js`, waarin `aandelen` als kandidaat meereist — pas daarna
+wint het verbod ook van een werkvorm die de cap zou meebrengen.
+
+**De UBO wordt afgeleid en niet ingevuld.** Meer dan 25% van de aandelen is
+uiteindelijk belanghebbende; is er niemand, dan gelden de statutair bestuurders
+(pseudo-UBO), en commissarissen en adviseurs tellen daar niet in mee. Er is dan
+ook géén route en géén functie die de UBO zet: een aangevinkte UBO blijft staan
+als de aandelen verschuiven, en dan klopt het register precies op het moment dat
+het ertoe doet niet meer.
+
+**Aftreden is geen wissen** — wie er ooit bestuurder was, was dat, en juist die
+geschiedenis is waar een aansprakelijkheidsvraag over gaat. Een niet volledig
+verdeeld kapitaal is een **melding en geen fout**: tijdens een oprichting is dat
+normaal, en een register dat rood kleurt terwijl er niets mis is, leert iemand
+rood te negeren. Alles op codenaam, en het antwoord zegt zelf dat dit niet de
+UBO-opgave bij de KvK is.
+
+Onderweg bleek de B.V. geen `bestuur`-cap te dragen, terwijl elke B.V. een
+statutair bestuur heeft. Dat is in de tabel gerepareerd en niet omheen gewerkt:
+de as is de waarheid.
+
+Getoetst in `test/onderneming-bestuur.test.js` (19). Negen mutaties; zeven beten
+meteen. **Twee sloegen af en legden allebei iets echts bloot:** de drempeltoets
+had codenamen van één letter, die al op de lengte werden geweigerd — er waren dus
+nooit aandeelhouders, en twee toetsen slaagden om de verkeerde reden. En de
+verboden-aftrek bleek geen werk te doen, zoals hierboven beschreven. Na beide
+reparaties beten de mutaties wel.
+
 ### RTG Werk OS (de werkplek van een organisatie)
 
 `server/bedrijf/` + `/api/bedrijf/...` + `/apps/werk.html`. Een **werkruimte**

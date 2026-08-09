@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 2933 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 2938 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,13 +18,13 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 2933 |
-| servermodules (`server/**/*.js`) | 1609 |
-| routebestanden (`server/routes/**`) | 351 |
-| kernmodules (`server/kern/**`) | 946 |
+| API-endpoints | 2938 |
+| servermodules (`server/**/*.js`) | 1612 |
+| routebestanden (`server/routes/**`) | 352 |
+| kernmodules (`server/kern/**`) | 948 |
 | schermen (`public/**/*.html`) | 214 |
 | gedeelde browsermodules (`public/shared/*.js`) | 171 |
-| toetsbestanden (`test/*.test.js`) | 648 |
+| toetsbestanden (`test/*.test.js`) | 649 |
 | schermtoetsen (`test/*.e2e.js`) | 88 |
 
 ## 2. De weg van een verzoek
@@ -99,7 +99,7 @@ zie §5 -- er zijn nog 146 kern-namen die meer dan één domein aanraakt.
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
 | `auth` | 19 | 5 | 8 | 45 |
-| `member` | 439 | 52 | 10 | 382 |
+| `member` | 444 | 53 | 10 | 387 |
 | `supplier` | 502 | 90 | 6 | 278 |
 | `office` | 39 | 7 | 3 | 58 |
 | `staff` | 26 | 7 | 1 | 40 |
@@ -120,9 +120,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1159 |
+| kern-namen die routes aanraken | 1164 |
 | daarvan door **meer dan één** domein (de echte koppeling) | 146 |
-| daarvan door precies één domein | 1013 |
+| daarvan door precies één domein | 1018 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 

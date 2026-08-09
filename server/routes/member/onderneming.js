@@ -140,6 +140,7 @@ module.exports = (kern) => {
      modulebeleid. Hij krijgt dezelfde eigendomscontrole mee, zodat er maar een
      poort is. */
   require('./onderneming-geld')(kern, mijn, stuur, nietGevonden);
+  require('./onderneming-bestuur')(kern, mijn, stuur, nietGevonden);
 
   /* ---- de zaak aanvragen ----
      Loopt langs de bestaande aanmeldingsstroom: RTG-personeel beslist, wij

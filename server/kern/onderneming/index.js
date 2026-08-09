@@ -57,8 +57,14 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boeki
   /* Het leesdeel (feiten + beeld) staat in ./beeld.js: dit bestand ging over
      de 10 kB-grens, en dat is de natuurlijke naad -- hier de levensloop van het
      object, daar het lezen ervan. */
-  const { ondernemingNaam, ondernemingFeiten, ondernemingBeeld } =
+  const { ondernemingNaam, ondernemingFeiten, ondernemingCaps, ondernemingBeeld } =
     require('./beeld')({ db, findSupplier, ordersVanZaak, boekingenVanZaak, vanEigenaar });
+
+  /* Het bestuur hangt aan de ONDERNEMING en niet aan de zaak: wie beslist en
+     wie bezit is een juridisch feit, geen operationeel. Hij staat hier en niet
+     in ./lagen.js omdat hij de samengevoegde capslijst van ./beeld.js leest, en
+     die wordt hierboven pas gemaakt. */
+  const bst = require('./bestuur')({ save, schoon, ondernemingCaps });
 
   /* De vier handelingen die het object zelf veranderen staan in
      ./levensloop.js -- dit bestand ging over de 10 kB van het modulebeleid, en
@@ -142,7 +148,7 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boeki
       return dag.dagbeeld(o, ondernemingBeeld(o), ondernemingVerkenning(o),
         opr.oprichtingsproject(o), ek.eersteKlant(o), mp.ondernemingMallProfiel(o),
         rel.relaties(o, t), d, c, con.contracten(o, vandaag), b, kas.kas(o, d, c, b, t), cp, wrv.werving(o, cp, t),
-        pij.pijplijn(o, t));
+        pij.pijplijn(o, t), bst.bestuur(o));
     },
     ondernemingEersteKlant: ek.eersteKlant,
     ondernemingMallProfiel: mp.ondernemingMallProfiel,
@@ -158,6 +164,11 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boeki
     ondernemingKasSaldo: kas.kasSaldoZet,
     ondernemingCapaciteit: cap.capaciteit,
     ondernemingPijplijn: pij.pijplijn,
+    ondernemingBestuur: bst.bestuur,
+    ondernemingBestuurderZet: bst.bestuurderZet,
+    ondernemingBestuurderAf: bst.bestuurderAf,
+    ondernemingAandeelZet: bst.aandeelZet,
+    ondernemingAandeelWeg: bst.aandeelWeg,
     ondernemingRegie: regie.regieBeeld,
     ondernemingProvisioningStand: regie.provisioningStand,
     ondernemingProvisioningZet: regie.provisioningZet,

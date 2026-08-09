@@ -10,7 +10,7 @@ module.exports = (kern, mijn, stuur, nietGevonden) => {
   const { app, auth, ondernemingRelaties, ondernemingKlantNotitie,
     ondernemingDebiteuren, ondernemingCrediteuren, ondernemingContracten,
     ondernemingWerkruimte, ondernemingBelasting, ondernemingKas, ondernemingKasSaldo, ondernemingCapaciteit,
-    ondernemingWerving, ondernemingPijplijn } = kern;
+    ondernemingWerving, ondernemingPijplijn, ondernemingVoorraad } = kern;
 
   /* Het klantenboek en de opvolging. Alles op codenaam: dit boek kent geen
      echte namen, en dat is het ontwerp en geen tekortkoming. */
@@ -105,5 +105,14 @@ module.exports = (kern, mijn, stuur, nietGevonden) => {
     const o = mijn(req);
     if (!o) return stuur(res, nietGevonden);
     res.json({ ok: true, pijplijn: ondernemingPijplijn(o) });
+  });
+
+  /* Wat er ligt, uit de vier registers die er al zijn. Er wordt niets
+     geschreven: voorraad muteren gebeurt waar ermee gewerkt wordt (de keuken,
+     de kassa, de oogst). Zie kern/onderneming/voorraad.js. */
+  app.post('/api/onderneming/voorraad', auth, (req, res) => {
+    const o = mijn(req);
+    if (!o) return stuur(res, nietGevonden);
+    res.json({ ok: true, voorraad: ondernemingVoorraad(o) });
   });
 };

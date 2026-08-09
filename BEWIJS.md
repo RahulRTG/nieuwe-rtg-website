@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 737 bestanden en 4346 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 738 bestanden en 4359 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,13 +12,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 737 |
-| losse beweringen (`test(...)`) | 4346 |
+| toetsbestanden | 738 |
+| losse beweringen (`test(...)`) | 4359 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 521 |
 | **overleefd**: geen mutatie kreeg hem rood | 12 |
 | niet te meten (al rood, geen module gevonden, ...) | 16 |
-| alleen in de kop *genoemd*, nog niet gemeten | 29 |
+| alleen in de kop *genoemd*, nog niet gemeten | 30 |
 | niets van beide | 159 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-649 bestanden, 4185 beweringen.
+650 bestanden, 4198 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -382,6 +382,7 @@ toets omvalt.
 | `onderneming-regie.test.js` | 14 | -- | Ronde: de ondernemersregie -- twee knoppen van de boardroom. Vier beweringen: 1. |
 | `onderneming-relaties.test.js` | 12 | -- | Ronde: het klantenboek en de relaties -- het CRM van het Ondernemers-OS. Vier beweringen: 1. |
 | `onderneming-verkenning.test.js` | 20 | genoemd | Ronde: de pre-oprichtingsfase -- intake, kansverkenning, simulatie, stress test en het ondernemingsplan. De zwaartepunten liggen op de twee plekken waar dit soort software liegt: 1. |
+| `onderneming-voorraad.test.js` | 13 | genoemd | Ronde: de voorraad -- wat er ligt, en wat wij niet kunnen zien. Vijf beweringen: 1. |
 | `onderneming-werving.test.js` | 15 | genoemd | Ronde: de werving -- staat er iemand te wachten. Vier beweringen: 1. |
 | `onderneming.test.js` | 22 | genoemd | Ronde: het Ondernemers-OS -- de drie assen van één bedrijfsobject. 1. |
 | `onderwijs.test.js` | 3 | gezakt op `liegpoort /api/` | RTG School golf 1: de officiële ladder, het leerpaspoort dat een leven lang meegaat, de doorstroomkaart die rare sprongen tegenhoudt, en de eerlijkheid (geen accreditatieclaims, geen echte namen in het dossier). |

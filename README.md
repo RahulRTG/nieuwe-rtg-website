@@ -1965,6 +1965,46 @@ nooit aandeelhouders, en twee toetsen slaagden om de verkeerde reden. En de
 verboden-aftrek bleek geen werk te doen, zoals hierboven beschreven. Na beide
 reparaties beten de mutaties wel.
 
+### De voorraad: wat er ligt, en wat wij niet kunnen zien
+
+`server/kern/onderneming/voorraad.js` + `/api/onderneming/voorraad`.
+
+Dit huis houdt voorraad al op **vier** plekken bij, en elke plek doet dat anders
+omdat het werk anders is: de keuken (`s.voorraad`, met een minimum per artikel,
+een kostprijs en een mutatiejournaal), retail (`s.artikelen` met varianten —
+voorraad zit op de variant), de boerderij (`s.boerderij.producten`, gevuld door
+de oogst) en de groothandel (`s.groothandel.producten`, met inkoopprijs). Een
+vijfde register ernaast zou binnen een maand uiteenlopen met alle vier, en zou
+de enige zijn die niemand bijwerkt omdat er niet in gewerkt wordt. Deze laag
+**leest** ze en legt ze naast elkaar; er staat geen enkele schrijfactie in.
+
+Drie dingen die het met opzet niet uitrekent:
+
+- **geen voorraadwaarde op een verkoopprijs.** Retail en boerderij kennen geen
+  inkoopprijs. Een waarde daarop bevat de winst al — dat is een
+  omzetverwachting, geen voorraadwaarde. Daar komt `null` met de reden, en het
+  totaal zegt erbij welke delen erbuiten vallen: een totaal dat stilzwijgend een
+  deel mist, wordt overgetypt in een balans;
+- **geen bestelpunt waar er geen is.** De groothandel heeft `minBestel`, en dat
+  is de minimale hoeveelheid *per bestelling*, geen bestelpunt. Die twee
+  verwarren meldt een volle groothandel als "bijna op". Bij de boerderij bepaalt
+  wat er groeit de voorraad;
+- **geen dekking in dagen.** Daarvoor zouden wij verbruik over tijd moeten
+  kennen; alleen de keuken schrijft mutaties weg, en alleen binnen RTG. "Nog
+  vier dagen" op zo'n grondslag is een getal waar iemand een bestelling op
+  baseert.
+
+Retail telt laag op de **variant** en niet op het artikel: maat 42 op is een
+gemiste verkoop, ook al ligt de rest in het schap. De drempel van de zaak zelf
+(`s.settings.retailDrempel`) wint van de standaard. Op het dagbeeld staat de
+voorraad vóór de verkoopkant — wat u niet heeft kunt u ook niet verkopen.
+
+Getoetst in `test/onderneming-voorraad.test.js` (13). Zeven mutaties, alle zeven
+raak: de waarde op de verkoopprijs baseren, `minBestel` als bestelpunt
+gebruiken, retail op het artikel in plaats van de variant tellen, een artikel
+zonder minimum toch laag noemen, de eigen drempel negeren, een totaal geven
+zonder enige bron, en inactieve groothandelsproducten meetellen.
+
 ### RTG Werk OS (de werkplek van een organisatie)
 
 `server/bedrijf/` + `/api/bedrijf/...` + `/apps/werk.html`. Een **werkruimte**

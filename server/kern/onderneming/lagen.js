@@ -39,7 +39,10 @@ module.exports = (ctx) => {
   /* De pijplijn LEEST de bestaande offertestroom (kern/vakwerk/pro.js) en
      schrijft er niets in; vandaar alleen db. */
   const pij = require('./pijplijn')({ db });
+  /* De voorraad LEEST de vier registers die er al zijn (keuken, retail,
+     boerderij, groothandel) en bouwt er geen vijfde bij. Vandaar alleen db. */
+  const vrd = require('./voorraad')({ db });
   const regie = require('./regie')({ db, save });
 
-  return { intake, kans, sim, stress, plan, dag, opr, ek, mp, boek, rel, deb, cred, con, bel, kas, cap, wrv, pij, regie };
+  return { intake, kans, sim, stress, plan, dag, opr, ek, mp, boek, rel, deb, cred, con, bel, kas, cap, wrv, pij, vrd, regie };
 };

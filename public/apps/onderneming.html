@@ -154,7 +154,7 @@ function toonLeeg(){
 function teken(){
   const o=ONDS.find(x=>x.id===HUIDIG)||{};
   zetTitel(DAG.naam||'Mijn onderneming');
-  $('#hoofd').innerHTML=[vakGroet(),vakGezond(),vakActies(),vakIntake(),vakKans(),vakSimulatie(),vakStress(),vakPlan(o),vakRechtsvorm(o),vakOprichting(),vakZaak(o),vakEersteKlant(),vakMall(),vakRelaties(),vakBestuur(),vakPijplijn(),vakDebiteuren(),vakCrediteuren(),vakContracten(),vakBelasting(),vakKas(),vakCapaciteit(),vakWerving()].join('');
+  $('#hoofd').innerHTML=[vakGroet(),vakGezond(),vakActies(),vakIntake(),vakKans(),vakSimulatie(),vakStress(),vakPlan(o),vakRechtsvorm(o),vakOprichting(),vakZaak(o),vakEersteKlant(),vakMall(),vakRelaties(),vakBestuur(),vakPijplijn(),vakDebiteuren(),vakCrediteuren(),vakContracten(),vakBelasting(),vakKas(),vakCapaciteit(),vakWerving(),vakVoorraad()].join('');
   haakKnoppen();
 }
 
@@ -550,6 +550,29 @@ function vakKas(){
 /* De pijplijn. Twee dingen die het scherm niet mag doen: een bedrag zetten bij
    een stadium dat er geen heeft, en een verwachting tonen zonder gemeten
    scoringskans. In beide gevallen staat er de reden en geen getal. */
+/* De voorraad. Twee dingen die het scherm nooit mag doen: een waarde tonen waar
+   er geen inkoopprijs is, en "laag" melden waar geen bestelpunt bestaat. In
+   allebei de gevallen staat er de reden en geen getal. */
+function vakVoorraad(){
+  const v=DAG&&DAG.voorraad;
+  if(!v) return '';
+  const delen=(v.delen||[]).map(d=>
+    '<div class="bron'+(d.laag?'':' niet')+'"><span>'+esc(d.label)+'<br><span class="bu">'+
+    d.artikelen+' artikel'+(d.artikelen===1?'':'en')+
+    (d.laag===null?' &middot; '+esc(d.laagReden||''):(d.laag?' &middot; '+d.laag+' onder het bestelpunt':''))+
+    '</span></span><span>'+(d.waarde===null?'<span class="bu">geen waarde</span>':euro(d.waarde))+
+    '</span></div>').join('');
+  const buiten=(v.waardeBuiten||[]).map(x=>
+    '<p class="subtxt" style="margin-top:.4rem;">'+esc(x.reden)+'</p>').join('');
+  return '<div class="vak"><h2>Voorraad</h2>'+
+    (v.waarde===null?'<p class="subtxt">Geen van uw registers draagt een inkoopprijs, dus er is geen voorraadwaarde.</p>'
+      :'<div class="score"><span class="n groot">'+euro(v.waarde)+'</span>'+
+       '<span class="subtxt">voorraadwaarde op inkoopprijs</span></div>')+
+    '<div style="margin-top:.9rem;">'+delen+'</div>'+buiten+
+    '<p class="subtxt" style="margin-top:.9rem;">'+esc(v.nietGemeten)+'</p></div>';
+}
+
+
 function vakPijplijn(){
   const p=DAG&&DAG.pijplijn;
   if(!p) return '';

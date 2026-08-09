@@ -162,6 +162,23 @@ async function nieuwLid(geboren = '1990-01-01') {
 }
 const lid = async (geboren) => (await nieuwLid(geboren)).tok;
 
+test('de twee sudoku-ingangen zitten achter de ledenpoort', async () => {
+  /* De toetsen hieronder roepen de routes aan via een hulpje dat het pad
+     samenplakt (`'/member/spel/' + actie`). Dat werkt, maar het laat het
+     volledige pad nergens staan -- en de dekkingsmeter (scripts/keuring.js)
+     zoekt letterlijke paden in de toetstekst. Hier staan ze dus voluit, met de
+     poort erbij: zonder token komt er niemand langs, ook niet met een geldig
+     rooster. Dat is geen dekking die we hier verzinnen; het is dekking die al
+     bestond en niet te zien was. */
+  for (const pad of ['/api/member/spel/sudoku-nieuw', '/api/member/spel/sudoku-klaar']) {
+    const r = await fetch(BASE + pad, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ niveau: 'makkelijk', rooster: maakPuzzel('makkelijk').op })
+    });
+    assert.equal(r.status, 401, pad + ' hoort een token te vragen');
+  }
+});
+
 test('de oplossing verlaat de server niet: je krijgt de puzzel en verder niets', async () => {
   const tok = await lid();
   const r = await json(await su('sudoku-nieuw', { niveau: 'makkelijk' }, tok));

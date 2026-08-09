@@ -268,6 +268,40 @@ test('over de route: een team maken, meedoen en samen spelen', async () => {
   assert.equal(sleutels.length, 2, 'de sleutels reizen mee zodat je in een tik kunt uitnodigen');
 });
 
+test('over de route: erbij vragen en weggaan, de twee die alleen op kernniveau stonden', async () => {
+  /* `/api/member/spel/team-nodig` en `team-verlaat` waren wel op kernniveau
+     getoetst maar liepen nooit over de ROUTE. Dat is precies het stuk dat de
+     kerntoets niet ziet: de poort (auth, geen gast), het zeven van de
+     argumenten, en de vorm van het antwoord. Bij `team-verlaat` weegt dat
+     dubbel, want de app roept hem echt aan (spelen.html). */
+  const a = await lid(), b = await lid(), c = await lid();
+  const bKey = await bevriend(a, b);
+  const cKey = await bevriend(a, c);
+
+  const gemaakt = await json(await raw('/member/spel/team-nieuw', { naam: 'Groeiclub', leden: [bKey] }, a.tok));
+  await raw('/member/spel/team-antwoord', { id: gemaakt.team.id, akkoord: true }, b.tok);
+
+  // erbij vragen: alleen de baas, en het antwoord draagt de nieuwe stand
+  const doorB = await raw('/member/spel/team-nodig', { id: gemaakt.team.id, leden: [cKey] }, b.tok);
+  assert.equal(doorB.status, 403, 'wie het team niet maakte vraagt er niemand bij');
+  const doorA = await json(await raw('/member/spel/team-nodig', { id: gemaakt.team.id, leden: [cKey] }, a.tok));
+  assert.equal(doorA.ok, true, JSON.stringify(doorA).slice(0, 200));
+  assert.equal(doorA.team.uitgenodigd.length, 1);
+  assert.equal((await json(await raw('/member/spel/team-mijn', {}, c.tok))).uitnodigingen.length, 1,
+    'en c heeft de uitnodiging ook echt');
+
+  // weggaan: het team blijft bestaan zolang er iemand in zit
+  const weg = await json(await raw('/member/spel/team-verlaat', { id: gemaakt.team.id }, a.tok));
+  assert.equal(weg.opgeheven, false);
+  assert.deepEqual((await json(await raw('/member/spel/team-mijn', {}, a.tok))).teams, [], 'a zit er niet meer in');
+  const laatste = await json(await raw('/member/spel/team-verlaat', { id: gemaakt.team.id }, b.tok));
+  assert.equal(laatste.opgeheven, true, 'de laatste die weggaat heft het team op');
+
+  // zonder token komt er niemand langs de poort
+  assert.equal((await raw('/member/spel/team-nodig', { id: gemaakt.team.id, leden: [cKey] })).status, 401);
+  assert.equal((await raw('/member/spel/team-verlaat', { id: gemaakt.team.id })).status, 401);
+});
+
 test('over de route: een gezinslid mag wel in je team, ook zonder vriendschap', async () => {
   /* Hier zat een tweede definitie van de kring: de route filterde op vrienden
      en klasgenoten, de kern kent ook het huishouden. Een ouder kon zijn eigen

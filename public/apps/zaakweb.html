@@ -68,6 +68,10 @@ async function toon(){
   const d=lijst[0];
   el.innerHTML='<h2 style="font-size:1.2rem;">'+esc(d.titel)+'</h2>'+
     '<div class="mt"><span class="stip'+(d.online?' aan':'')+'"></span>'+(d.online?'Online op ':'Offline · adres ')+'<span class="adres">'+esc(d.adres||'--')+(d.adres?'.rtg':'')+'</span> · '+d.bezoeken+' bezoek'+(d.bezoeken===1?'':'en')+' · '+d.blokken+' blokken'+(d.wacht?' · <b>er staan wijzigingen klaar die nog niet online zijn</b>':'')+'</div>'+
+    /* Hoort deze site bij een merk, dan zegt het scherm dat: anders zet een
+       vestiging kleuren die bij het bewaren stilletjes terugspringen, en een
+       stille weigering is geen weigering. */
+    (d.merk?'<p class="mt">Onderdeel van merk <b>'+esc(d.merk)+'</b>. De huisstijl (thema en kleuren) komt van het merk en kunt u hier niet wijzigen; uw eigen inhoud -- kaart, foto\'s, openingstijden, team -- beheert u gewoon zelf.</p>':'')+
     '<div class="rij">'+
     (d.online&&d.adres?'<a class="knop" href="/apps/browser.html?adres='+encodeURIComponent(d.adres)+'">Bekijk in de RTG-browser</a>':'')+
     '<button id="'+(d.online?'uit':'aan')+'">'+(d.online?'Zet offline':'Zet online')+'</button>'+

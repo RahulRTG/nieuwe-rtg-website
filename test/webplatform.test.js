@@ -690,6 +690,11 @@ test('23. een vestiging beheert haar inhoud, maar kan de huisstijl van het merk 
   assert.equal(bw.body.design.merk, 'ZEILHUIS', 'de site weet bij welk merk hij hoort');
   // maar de eigen INHOUD is gewoon van de vestiging
   assert.equal(bw.body.design.blokken[0].tekst, 'Eigen tekst mag wel');
+  /* En het scherm van de vestiging krijgt het merk mee: anders zet een
+     vestiging kleuren die bij het bewaren stilletjes terugspringen, en een
+     stille weigering is geen weigering. */
+  const lijst = await api('/api/supplier/site/mijn', {}, zaak);
+  assert.equal(lijst.body.lijst[0].merk, 'ZEILHUIS', 'de vestiging ziet bij welk merk zij hoort');
 
   // en een zaak zonder merk houdt haar eigen huisstijl
   const vrij = await api('/api/site/bewaar', { design: { titel: 'Vrije Site', accent: '#00FF00',

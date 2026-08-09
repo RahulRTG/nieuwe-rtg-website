@@ -51,7 +51,7 @@ module.exports = ({ db, save, crypto, schoon, media, merkHuisstijl }) => {
   function bevries(d) { d.live = versielaag.ontwerpVan(d); d.liveOp = new Date().toISOString(); }
   const wacht = d => !!d.online && !!d.liveOp && new Date(d.bij) > new Date(d.liveOp);
 
-  const kort = d => ({ id: d.id, titel: d.titel, adres: d.adres || '', online: !!d.online, bezoeken: d.bezoeken || 0, bij: d.bij, blokken: (d.blokken || []).length, wacht: wacht(d) });
+  const kort = d => ({ id: d.id, titel: d.titel, adres: d.adres || '', online: !!d.online, bezoeken: d.bezoeken || 0, bij: d.bij, blokken: (d.blokken || []).length, wacht: wacht(d), merk: d.merk || '' });
   const publiek = d => {
     const o = d.live || d;   // geen bevroren stand (oude site): dan het concept
     return { titel: o.titel, thema: o.thema, accent: o.accent, kleuren: o.kleuren || null, blokken: o.blokken || [], paginas: o.paginas || [], volgorde: o.volgorde || null, adres: d.adres, eigenaar: d.eigenaar, zaakCode: d.zaakCode || '' };

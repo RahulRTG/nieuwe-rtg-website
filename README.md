@@ -531,7 +531,11 @@ packages). Ze bewaken de plekken waar geld en wet aan hangen:
 - de naheffingsaanslag (`test/btw-naheffing.test.js`): dat het bedrag uit de
   aansluiting komt en niet uit het verzoek, dat dezelfde ogen niet dubbel
   tellen bij vaststellen én bij het bezwaar erop, dat een boete niet zonder
-  grond bestaat, en dat een concept nog geen besluit is;
+  grond bestaat, en dat een concept nog geen besluit is — plus de hele keten
+  over de échte routes met drie echte ambtenaren
+  (`test/btw-naheffing-keten.test.js`, inclusief de poging om de vier ogen te
+  omzeilen door een collega's naam mee te sturen) en het scherm van de zaak
+  waar het bezwaar vandaan gaat (`test/btw-naheffing-scherm.e2e.js`);
 - De Salon-rechten (gast liket wel, reageert niet), de bestel- en betaalflow
   en de AVG-rechten (inzage en definitieve verwijdering).
 
@@ -790,6 +794,22 @@ doet).
 | `POST /api/overheid/bd/naheffingen` `{status?, periode?}` | De lijst voor het kantoor |
 | `POST /api/supplier/btw/naheffingen` | De zaak leest zijn eigen (geen concepten) |
 | `POST /api/supplier/btw/naheffing/bezwaar` `{id, reden}` | De zaak maakt bezwaar |
+
+#### De herinnering rekent ook zelf (`kern/automatisering.js`)
+
+Het btw-draaiboek NAM een bedrag, een periode en een deadline aan, en de route
+gaf ze door uit het verzoek — dus wie de route aanriep bepaalde wat er in de
+herinnering stond, ongeacht wat het register zei. Dat is dezelfde fout als een
+aangifte met een invulveld, alleen dan in een e-mail. Nu telt het draaiboek zelf,
+met dezelfde routine als de aangifte, en rekent het de aangiftetermijn uit (een
+maand na afloop van het tijdvak, art. 10 AWR).
+
+En hij zwijgt als er niets te herinneren valt: is er al ingediend of viel er
+niets aan te geven, dan gaat er geen bericht. Een draaiboek dat ook mailt als
+alles op orde is, leert de ondernemer zijn post te negeren — en dan mist hij de
+keer dat het wel moest. `POST /api/supplier/rtmail/btw-herinner` geeft dan een
+`200` met `bericht: null` en de reden erbij, want een stille 200 laat de zaak
+denken dat er post onderweg is.
 
 ### RTG School (de onderwijs-toren)
 

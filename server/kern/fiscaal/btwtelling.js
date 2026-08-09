@@ -41,6 +41,23 @@ function periodeVak(periode) {
   return null;
 }
 
+/* HET LAATST AFGESLOTEN KWARTAAL, uit een datum (YYYY-MM-DD). Puur, en hij
+   staat hier omdat dit bestand al weet wat een periode is -- niet in de laag die
+   hem toevallig het eerst nodig had.
+
+   Drie plekken rekenen ermee en ze moeten hetzelfde antwoord geven: het
+   Belastingkantoor opent erop (het lopende kwartaal is per definitie nog niet
+   aangegeven, dus daarop openen is een scherm vol loos alarm), de naheffing mag
+   alleen daarover, en de btw-herinnering gaat erover. Drie eigen rekensommen
+   zouden binnen een kwartaal uiteenlopen (LAT.md regel 4). */
+function vorigeBtwPeriode(vandaag) {
+  const d = String(vandaag || '');
+  let jaar = Number(d.slice(0, 4));
+  let kw = Math.floor((Number(d.slice(5, 7)) - 1) / 3) + 1;
+  kw -= 1; if (kw === 0) { kw = 4; jaar -= 1; }
+  return jaar + 'K' + kw;
+}
+
 function maakBtwTelling({ db }) {
   const cent = (n) => Math.round((Number(n) || 0) * 100);
 
@@ -160,4 +177,4 @@ function maakBtwTelling({ db }) {
   return { telFacturen, telPerZaak, tarievenPerTarief, controleerRegister };
 }
 
-module.exports = { maakBtwTelling, periodeVak, RUBRIEK_NL };
+module.exports = { maakBtwTelling, periodeVak, vorigeBtwPeriode, RUBRIEK_NL };

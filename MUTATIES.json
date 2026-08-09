@@ -575,6 +575,20 @@
       "gezakt": 1,
       "scherp": "gezakt"
     },
+    "btw-naheffing-keten.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "btw-naheffing-scherm.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
     "btw-naheffing.test.js": {
       "soort": "puur",
       "staat": "gezakt",

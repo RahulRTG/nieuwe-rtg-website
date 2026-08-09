@@ -10,7 +10,11 @@
    Dit begint met het welkom-draaiboek voor elk nieuw lid (RTG en RTF). Volgende
    draaiboeken (personeel, inkoop, facturen, overheid) komen hier stap voor stap
    bij, elk met een eigen test. */
-module.exports = ({ rtmail }) => {
+const { maakBtwTelling, periodeVak, vorigeBtwPeriode } = require('./fiscaal/btwtelling');
+
+module.exports = ({ rtmail, db, nu }) => {
+  const klok = () => (nu ? nu() : new Date().toISOString()).slice(0, 10);
+  const telling = db ? maakBtwTelling({ db }) : null;
   // Een nieuw lid krijgt meteen een welkom in zijn eigen RTMAIL-postvak. Geeft
   // het bezorgde bericht terug (of null als er geen bruikbaar adres is).
   function welkomLid({ codename, wereld } = {}) {
@@ -72,20 +76,49 @@ module.exports = ({ rtmail }) => {
     return [naarGroot, kopie].filter(Boolean);
   }
 
-  // Overheid-draaiboek: een btw-herinnering in het RTMAIL-postvak van de zaak,
-  // met de voorbereide cijfers. Indienen blijft een mens: het draaiboek zet
-  // het klaar en herinnert, het dient nooit zelf in.
-  function btwHerinnering({ zaakCode, periode, bedrag, deadline } = {}) {
+  /* Overheid-draaiboek: DE BTW-HERINNERING.
+
+     Het bedrag stond hier in een parameter, en de route haalde hem uit het
+     verzoek. Dat is precies de fout die de btw-aangifte kwam oplossen, alleen
+     dan in een e-mail: een tweede getal naast het factuurregister, en dus een
+     herinnering die iets anders zegt dan de aangifte waar hij naar verwijst.
+     Nu telt het draaiboek zelf, met dezelfde routine als de aangifte.
+
+     HIJ HERINNERT ALLEEN ALS ER IETS TE HERINNEREN VALT. Is er over het tijdvak
+     al ingediend, of viel er niets aan te geven, dan gaat er geen bericht. Een
+     draaiboek dat ook mailt als alles op orde is, leert de ondernemer zijn post
+     te negeren -- en dan mist hij de keer dat het wel moest.
+
+     De aangiftetermijn is een maand na afloop van het tijdvak (art. 10 AWR voor
+     een aangiftebelasting): het tijdvak eindigt 30 juni, de aangifte moet er
+     31 juli zijn. Die datum wordt dus gerekend en niet meegestuurd. */
+  function btwStand(zaakCode) {
+    if (!telling) return null;
+    const code = String(zaakCode || '').toUpperCase();
+    const periode = vorigeBtwPeriode(klok());
+    const vak = periodeVak(periode);
+    if (!vak) return null;
+    const alIngediend = (db.data.btwAangiftes || []).some(a =>
+      a.code === code && a.periode === periode && a.stand === 'ingediend');
+    if (alIngediend) return null;
+    const t = telling.telFacturen(code, vak);
+    if (t.verkoopSom - t.voorbelasting <= 0) return null;
+    const eind = new Date(vak.tot + 'T00:00:00.000Z');
+    const deadline = new Date(Date.UTC(eind.getUTCFullYear(), eind.getUTCMonth() + 2, 0)).toISOString().slice(0, 10);
+    return { periode, centen: t.verkoopSom - t.voorbelasting, deadline };
+  }
+
+  function btwHerinnering({ zaakCode } = {}) {
     const adres = rtmail.normAdres(zaakCode);
     if (!adres) return null;
-    const p = periode ? (' over ' + String(periode).slice(0, 30)) : '';
-    const b = (bedrag != null && isFinite(bedrag)) ? (' Het voorbereide bedrag is EUR ' + Number(bedrag).toFixed(2) + '.') : '';
-    const d = deadline ? (' Deadline: ' + String(deadline).slice(0, 20) + '.') : '';
-    const body = 'Je btw-aangifte' + p + ' komt eraan.' + d + b +
-      ' Maak de aangifte op in je Kantoor onder Boekhouding; die telt hem uit je eigen factuurregister.' +
+    const st = btwStand(zaakCode);
+    if (!st) return null;
+    const body = 'Je btw-aangifte over ' + st.periode + ' komt eraan. Deadline: ' + st.deadline + '.' +
+      ' Uit je factuurregister komt op dit moment EUR ' + (st.centen / 100).toFixed(2) + ' te betalen.' +
+      ' Maak de aangifte op in je Kantoor onder Boekhouding; die telt hem uit datzelfde register.' +
       ' Controleren en indienen doe je zelf; Rahul dient nooit voor je in.';
     return rtmail.systeemStuur(adres, 'Btw-aangifte komt eraan', body, 'overheid');
   }
 
-  return { welkomLid, sollicitatieBinnen, factuurGeboekt, inkoopVoorstel, btwHerinnering };
+  return { welkomLid, sollicitatieBinnen, factuurGeboekt, inkoopVoorstel, btwHerinnering, btwStand };
 };

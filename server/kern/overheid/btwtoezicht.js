@@ -22,7 +22,7 @@
    Krijgt de gedeelde ctx van kern/overheid/index.js. */
 'use strict';
 
-const { periodeVak } = require('../fiscaal/btwtelling');
+const { periodeVak, vorigeBtwPeriode: vorigVak } = require('../fiscaal/btwtelling');
 
 module.exports = (ctx) => {
   /* telPerZaak komt uit de ctx en wordt hier NIET zelf opgebouwd: ./kantoor.js
@@ -133,15 +133,10 @@ module.exports = (ctx) => {
   }
 
   /* De periode waar het toezicht standaard naar kijkt: de LAATST AFGESLOTEN.
-     Het lopende kwartaal is per definitie nog niet aangegeven, dus daarop
-     openen zou het kantoor elke dag een scherm vol loos alarm geven. */
-  function vorigeBtwPeriode() {
-    const d = vandaag();
-    let jaar = Number(d.slice(0, 4));
-    let kw = Math.floor((Number(d.slice(5, 7)) - 1) / 3) + 1;
-    kw -= 1; if (kw === 0) { kw = 4; jaar -= 1; }
-    return jaar + 'K' + kw;
-  }
+     De rekensom staat in ../fiscaal/btwtelling.js, want de naheffing en de
+     btw-herinnering rekenen met hetzelfde kwartaal; drie kopieen lopen binnen
+     een kwartaal uiteen. */
+  const vorigeBtwPeriode = () => vorigVak(vandaag());
 
   return { bdBtwAansluiting, btwSignalen, vorigeBtwPeriode, BTW_STANDEN: STANDEN };
 };

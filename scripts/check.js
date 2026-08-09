@@ -2438,6 +2438,41 @@ console.log('\n40) ARCHITECTUUR.md loopt niet achter op de code');
   }
 }
 
+/* 41b) HET BELOFTEREGISTER KLOPT.
+
+   Deze regel bestaat door een fout die ik twee keer achter elkaar maakte. Op de
+   vraag "wat is er nog niet" scande ik eerst alleen de bovenste maplaag en
+   meldde ik RTG Sheets, Slides en Forms als ontbrekend -- ze stonden in
+   public/apps/office/. Daarna meldde ik CRM en BI als ontbrekend, terwijl CRM
+   als server/bedrijf/klant.js bestaat en de voorspellaag als server/kern/voorspel/.
+
+   Twee keer fout op dezelfde vraag betekent niet dat er beter gezocht moet
+   worden; het betekent dat er geen bron was om in te kijken. BELOFTE.json is die
+   bron, en deze regel houdt hem eerlijk: elk bewijsstuk moet echt bestaan.
+
+   DE GEVAARLIJKE STAND IS "GEBROKEN", niet "open". Een belofte die nog open
+   staat, weet iedereen. Een belofte die ooit waar was en stil verdween, mist
+   niemand -- en precies die vindt deze regel. Bij het schrijven van het register
+   sloeg hij meteen drie keer aan: drie paden wezen naar modules die ergens
+   anders bleken te wonen. */
+console.log('\n41b) BELOFTE.md klopt en geen enkele belofte is stilletjes gebroken');
+{
+  try {
+    const belofte = require('./belofte');
+    const opSchijf = fs.existsSync(belofte.DOEL) ? fs.readFileSync(belofte.DOEL, 'utf8') : null;
+    const verwacht = belofte.bouw();
+    const { tel, rijen } = belofte.meet();
+    if (opSchijf === null) fout('BELOFTE.md bestaat niet -- draai: node scripts/belofte.js');
+    else if (opSchijf !== verwacht) fout('BELOFTE.md loopt achter op BELOFTE.json -- draai: node scripts/belofte.js');
+    else if (tel.gebroken) {
+      for (const r of rijen.filter(x => x.stand === 'gebroken'))
+        fout('gebroken belofte "' + r.wat + '": ' + r.kwijt.join(', ') + ' bestaat niet (meer)');
+    } else ok(tel.gedekt + ' beloften gedekt, ' + tel.open + ' open, geen enkele gebroken');
+  } catch (e) {
+    fout('het belofteregister kon niet worden gelezen (' + e.message + '); dan stelt deze regel niets vast');
+  }
+}
+
 console.log('\n41) BEWIJS.md loopt niet achter op de toetsen');
 {
   try {

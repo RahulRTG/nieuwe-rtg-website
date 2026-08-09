@@ -1,0 +1,559 @@
+{
+  "uitleg": "Wat er is toegezegd, en waar het staat. Elke belofte draagt haar dekking: bestandspaden of API-paden die er echt moeten zijn. `node scripts/belofte.js` kijkt dat na. Een belofte zonder dekking heet OPEN en is werkvoorraad; een belofte die naar iets verwijst dat er niet meer is heet GEBROKEN, en dat is de enige alarmerende stand -- zo'n belofte mist niemand vanzelf.\n\nDit register beoordeelt geen kwaliteit. Dat een bestand bestaat, zegt niet dat de belofte goed is ingelost; daarvoor is BEWIJS.md er, en de toetsen die daaronder liggen.",
+  "beloften": [
+    {
+      "id": "docs",
+      "wat": "RTG Docs: documenten met AI schrijven, vergelijken en koppelen",
+      "groep": "De werkplek (Microsoft 365-achtig)",
+      "dekking": [
+        "public/apps/office/tekst.js",
+        "public/apps/office/tekstpro.js",
+        "public/apps/office.html"
+      ]
+    },
+    {
+      "id": "sheets",
+      "wat": "RTG Sheets: formules, reeksen, grafieken en analyse",
+      "groep": "De werkplek (Microsoft 365-achtig)",
+      "dekking": [
+        "public/apps/office/blad.js",
+        "public/apps/office/bladpro.js",
+        "public/apps/office/bladgrafiek.js"
+      ]
+    },
+    {
+      "id": "slides",
+      "wat": "RTG Slides: presentaties uit cijfers en projecten",
+      "groep": "De werkplek (Microsoft 365-achtig)",
+      "dekking": [
+        "public/apps/office/pres.js",
+        "public/apps/office/presenteren.js"
+      ]
+    },
+    {
+      "id": "forms",
+      "wat": "RTG Forms: formulieren, aanvragen en uitslagen",
+      "groep": "De werkplek (Microsoft 365-achtig)",
+      "dekking": [
+        "public/apps/office/formulier.js",
+        "public/apps/office/formulieruitslag.js"
+      ]
+    },
+    {
+      "id": "whiteboard",
+      "wat": "RTG Whiteboard: schetsen en procesontwerp",
+      "groep": "De werkplek (Microsoft 365-achtig)",
+      "dekking": [
+        "public/apps/office/schets.js",
+        "public/apps/office/bord.js"
+      ]
+    },
+    {
+      "id": "mail",
+      "wat": "RTG Mail: eigen mailstack met gedeelde postbussen",
+      "groep": "De werkplek (Microsoft 365-achtig)",
+      "dekking": [
+        "public/apps/rtmail.html",
+        "server/routes/rtmail.js",
+        "server/smtp.js",
+        "server/imap.js"
+      ]
+    },
+    {
+      "id": "calendar",
+      "wat": "RTG Calendar: mensen, ruimtes en middelen in één planning",
+      "groep": "De werkplek (Microsoft 365-achtig)",
+      "dekking": [
+        "public/apps/agenda.html",
+        "server/routes/agenda.js",
+        "server/kern/agenda-pro.js"
+      ]
+    },
+    {
+      "id": "meet",
+      "wat": "RTG Meet: vergaderen, scherm delen, notulen",
+      "groep": "De werkplek (Microsoft 365-achtig)",
+      "dekking": [
+        "public/apps/meet.html",
+        "server/routes/meet.js"
+      ]
+    },
+    {
+      "id": "chat",
+      "wat": "RTG Chat: interne en externe messaging in één gesprekslijst",
+      "groep": "De werkplek (Microsoft 365-achtig)",
+      "dekking": [
+        "public/apps/comm.html",
+        "server/kern/comm"
+      ]
+    },
+    {
+      "id": "drive",
+      "wat": "RTG Drive: versies, rechten, bewaartermijn en spoor",
+      "groep": "De werkplek (Microsoft 365-achtig)",
+      "dekking": [
+        "public/apps/bestanden.html",
+        "server/routes/bestanden.js",
+        "server/kern/bestanden-poort.js"
+      ]
+    },
+    {
+      "id": "notes",
+      "wat": "RTG Notes: aantekeningen gekoppeld aan dossiers",
+      "groep": "De werkplek (Microsoft 365-achtig)",
+      "dekking": [
+        "public/apps/notities.html",
+        "server/routes/notities.js"
+      ]
+    },
+    {
+      "id": "sites",
+      "wat": "RTG Sites: interne portals en kennisomgevingen",
+      "groep": "De werkplek (Microsoft 365-achtig)",
+      "dekking": [
+        "public/apps/sitemaker.html",
+        "public/apps/websitestudio.html"
+      ]
+    },
+    {
+      "id": "projects",
+      "wat": "RTG Projects: taken, mijlpalen, capaciteit",
+      "groep": "De werkplek (Microsoft 365-achtig)",
+      "dekking": [
+        "public/apps/werk.html",
+        "server/routes/planners.js"
+      ]
+    },
+    {
+      "id": "crm",
+      "wat": "RTG CRM: klanten, kansen, contactmomenten",
+      "groep": "De werkplek (Microsoft 365-achtig)",
+      "dekking": [
+        "server/bedrijf/klant.js"
+      ],
+      "let": "Gewogen pijplijn, verplichte verliesreden, bewust geen klantwaarde-score."
+    },
+    {
+      "id": "servicedesk",
+      "wat": "RTG Service Desk: meldingen, SLA's, escalaties",
+      "groep": "De werkplek (Microsoft 365-achtig)",
+      "dekking": [
+        "public/apps/meldkamer.html",
+        "server/kern/ledenbalie.js"
+      ]
+    },
+    {
+      "id": "hr",
+      "wat": "RTG HR: personeel, verlof, onboarding, beoordelingen",
+      "groep": "De werkplek (Microsoft 365-achtig)",
+      "dekking": [
+        "public/apps/personeel.html",
+        "server/routes/supplier/hrplus.js"
+      ]
+    },
+    {
+      "id": "finance",
+      "wat": "RTG Finance: grootboek, facturatie, budgetten",
+      "groep": "De werkplek (Microsoft 365-achtig)",
+      "dekking": [
+        "public/apps/balans.html",
+        "server/routes/facturatie.js",
+        "server/kern/balans.js"
+      ]
+    },
+    {
+      "id": "payroll",
+      "wat": "RTG Payroll: loonrun, uren, toeslagen",
+      "groep": "De werkplek (Microsoft 365-achtig)",
+      "dekking": [
+        "public/apps/payroll.html",
+        "server/routes/payroll.js"
+      ]
+    },
+    {
+      "id": "bi",
+      "wat": "RTG BI: cijfers, voorspelling en rapportage",
+      "groep": "De werkplek (Microsoft 365-achtig)",
+      "dekking": [
+        "server/kern/voorspel",
+        "server/meting.js",
+        "public/apps/office/bladgrafiek.js"
+      ],
+      "let": "Het voorspellen is bewust doorzichtig en zegt het als er te weinig geschiedenis is."
+    },
+    {
+      "id": "automate",
+      "wat": "RTG Automate: workflows over de apps heen",
+      "groep": "De werkplek (Microsoft 365-achtig)",
+      "dekking": [
+        "server/kern/automatisering.js"
+      ]
+    },
+    {
+      "id": "build",
+      "wat": "RTG Build: interne apps laten bouwen",
+      "groep": "De werkplek (Microsoft 365-achtig)",
+      "dekking": [
+        "server/kern/werkplaats.js"
+      ]
+    },
+    {
+      "id": "identity",
+      "wat": "RTG Identity: SSO, SCIM, passkeys, MFA",
+      "groep": "De werkplek (Microsoft 365-achtig)",
+      "dekking": [
+        "server/sso",
+        "server/scim",
+        "server/webauthn",
+        "public/apps/passkeys.html"
+      ]
+    },
+    {
+      "id": "mdm",
+      "wat": "RTG Device Management: apparaten en vloot op afstand",
+      "groep": "De werkplek (Microsoft 365-achtig)",
+      "dekking": [
+        "server/vloot.js",
+        "public/apps/doos.html",
+        "server/kern/zaakdoos"
+      ]
+    },
+    {
+      "id": "security",
+      "wat": "RTG Security Center: risico, alerts, zero-trust",
+      "groep": "De werkplek (Microsoft 365-achtig)",
+      "dekking": [
+        "server/kern/beveiliging",
+        "server/beveiliging.js"
+      ]
+    },
+    {
+      "id": "compliance",
+      "wat": "RTG Compliance Center: AVG, bewaren, bewijs",
+      "groep": "De werkplek (Microsoft 365-achtig)",
+      "dekking": [
+        "server/bewaarbeleid.js",
+        "server/bewaartermijnen.js",
+        "VERWERKINGSREGISTER.md",
+        "DPIA.md"
+      ]
+    },
+    {
+      "id": "contracts",
+      "wat": "RTG Contracts: afspraken, termijnen, risico",
+      "groep": "De werkplek (Microsoft 365-achtig)",
+      "dekking": [
+        "server/routes/supplier/contract.js",
+        "server/bedrijf/contract.js"
+      ]
+    },
+    {
+      "id": "wiki",
+      "wat": "RTG Wiki: interne kennis voor mensen en agents",
+      "groep": "De werkplek (Microsoft 365-achtig)",
+      "dekking": [
+        "server/kern/appbieb.js",
+        "server/kern/bibliothecaris.js"
+      ]
+    },
+    {
+      "id": "designer",
+      "wat": "RTG Designer: eigen beeld en ontwerp",
+      "groep": "De werkplek (Microsoft 365-achtig)",
+      "dekking": [
+        "server/kern/atelier",
+        "public/shared/bureaupda.js"
+      ]
+    },
+    {
+      "id": "devportal",
+      "wat": "RTG Developer Portal: API's, logs, sleutels",
+      "groep": "De werkplek (Microsoft 365-achtig)",
+      "dekking": [
+        "public/apps/techniek.html",
+        "server/techniek.js"
+      ]
+    },
+    {
+      "id": "cmd-puls",
+      "wat": "Global Command Center: realtime stand van elk domein",
+      "groep": "Command: zien, besturen, automatiseren",
+      "dekking": [
+        "server/kern/command/puls.js",
+        "/api/command/puls"
+      ]
+    },
+    {
+      "id": "cmd-zoek",
+      "wat": "Cross-domain search: één balk over alles",
+      "groep": "Command: zien, besturen, automatiseren",
+      "dekking": [
+        "server/kern/command/zoek.js",
+        "/api/command/zoek"
+      ]
+    },
+    {
+      "id": "cmd-object",
+      "wat": "Universal Object Control: ieder object openen",
+      "groep": "Command: zien, besturen, automatiseren",
+      "dekking": [
+        "server/kern/command/object.js",
+        "/api/command/object"
+      ]
+    },
+    {
+      "id": "cmd-tijdlijn",
+      "wat": "Event timeline per object",
+      "groep": "Command: zien, besturen, automatiseren",
+      "dekking": [
+        "server/kern/command/object.js"
+      ]
+    },
+    {
+      "id": "cmd-operator",
+      "wat": "AI Operator: opdracht in gewone taal",
+      "groep": "Command: zien, besturen, automatiseren",
+      "dekking": [
+        "server/kern/command/operator.js",
+        "/api/command/operator/plan"
+      ]
+    },
+    {
+      "id": "cmd-oorzaak",
+      "wat": "Root-cause: de oorzaak wordt gemeten, niet geraden",
+      "groep": "Command: zien, besturen, automatiseren",
+      "dekking": [
+        "server/kern/command/oorzaak.js"
+      ]
+    },
+    {
+      "id": "cmd-toezicht",
+      "wat": "AI Supervisor: budgetten, botsingen, stoppen",
+      "groep": "Command: zien, besturen, automatiseren",
+      "dekking": [
+        "server/kern/command/toezicht.js",
+        "/api/command/agents"
+      ]
+    },
+    {
+      "id": "cmd-runbooks",
+      "wat": "Autonomous remediation via goedgekeurde runbooks",
+      "groep": "Command: zien, besturen, automatiseren",
+      "dekking": [
+        "server/kern/command/runbooks.js",
+        "/api/command/runbook/voer"
+      ]
+    },
+    {
+      "id": "cmd-rollback",
+      "wat": "One-click rollback op elke herstelronde",
+      "groep": "Command: zien, besturen, automatiseren",
+      "dekking": [
+        "/api/command/runbook/terug"
+      ]
+    },
+    {
+      "id": "cmd-beleid",
+      "wat": "Policy-as-data met versies en vier ogen",
+      "groep": "Command: zien, besturen, automatiseren",
+      "dekking": [
+        "server/kern/command/beleid.js",
+        "/api/command/beleid/zet"
+      ]
+    },
+    {
+      "id": "cmd-risico",
+      "wat": "Risk engine + confidence routing (hand/assist/auto)",
+      "groep": "Command: zien, besturen, automatiseren",
+      "dekking": [
+        "server/kern/command/risico.js"
+      ]
+    },
+    {
+      "id": "cmd-zaken",
+      "wat": "Exception queue met eigenaar, termijn en besluit",
+      "groep": "Command: zien, besturen, automatiseren",
+      "dekking": [
+        "server/kern/command/zaken.js",
+        "/api/command/zaken"
+      ]
+    },
+    {
+      "id": "cmd-journaal",
+      "wat": "Immutable audit trail met hashketen",
+      "groep": "Command: zien, besturen, automatiseren",
+      "dekking": [
+        "server/kern/command/journaal.js",
+        "/api/command/journaal"
+      ]
+    },
+    {
+      "id": "cmd-replay",
+      "wat": "Forensic replay van een tijdvak",
+      "groep": "Command: zien, besturen, automatiseren",
+      "dekking": [
+        "/api/command/journaal/herbeleef"
+      ]
+    },
+    {
+      "id": "cmd-sim",
+      "wat": "Digital twin / what-if en veilige beleidsproef",
+      "groep": "Command: zien, besturen, automatiseren",
+      "dekking": [
+        "server/kern/command/simulatie.js",
+        "/api/command/simulatie/watals"
+      ]
+    },
+    {
+      "id": "cmd-werk",
+      "wat": "Workforce minimization: handminuten per 1.000",
+      "groep": "Command: zien, besturen, automatiseren",
+      "dekking": [
+        "server/kern/command/werkbesparing.js",
+        "/api/command/werk"
+      ]
+    },
+    {
+      "id": "cmd-jit",
+      "wat": "Just-in-time privilege, break-glass en mandaat",
+      "groep": "Command: zien, besturen, automatiseren",
+      "dekking": [
+        "server/kern/command/toegang.js",
+        "/api/command/recht/nood"
+      ]
+    },
+    {
+      "id": "cmd-app",
+      "wat": "RTG Command als één app",
+      "groep": "Command: zien, besturen, automatiseren",
+      "dekking": [
+        "public/apps/command.html",
+        "public/apps/command"
+      ]
+    },
+    {
+      "id": "zaak-register",
+      "wat": "Objectregister van één zaak, zonder de buurman",
+      "groep": "De zaak: dezelfde regie, eigen scope",
+      "dekking": [
+        "server/kern/zaakcommand/register.js"
+      ]
+    },
+    {
+      "id": "zaak-signalen",
+      "wat": "Signalen: wat een mens moet beslissen",
+      "groep": "De zaak: dezelfde regie, eigen scope",
+      "dekking": [
+        "server/kern/zaakcommand/signalen.js"
+      ]
+    },
+    {
+      "id": "zaak-runbooks",
+      "wat": "Recepten die administratie rechtzetten, geen werkelijkheid verzinnen",
+      "groep": "De zaak: dezelfde regie, eigen scope",
+      "dekking": [
+        "server/kern/zaakcommand/runbooks.js"
+      ]
+    },
+    {
+      "id": "zaak-rol",
+      "wat": "Rolscope: verlof en sollicitaties alleen voor de leiding",
+      "groep": "De zaak: dezelfde regie, eigen scope",
+      "dekking": [
+        "server/kern/zaakcommand/register.js",
+        "test/zaakcommand.test.js"
+      ]
+    },
+    {
+      "id": "zaak-app",
+      "wat": "Regie in de zaak-app en op de PDA, één scherm",
+      "groep": "De zaak: dezelfde regie, eigen scope",
+      "dekking": [
+        "public/shared/zaakcommand",
+        "public/apps/leverancier.html",
+        "public/apps/personeel.html"
+      ]
+    },
+    {
+      "id": "knowledge-graph",
+      "wat": "Knowledge graph over personen, bedrijven, contracten en gebeurtenissen",
+      "groep": "Nog open",
+      "dekking": [],
+      "let": "De afhankelijkhedenscan meet nu per object; een doorzoekbare graaf over alles is er niet."
+    },
+    {
+      "id": "data-lineage",
+      "wat": "Data lineage: waar komt een gegeven vandaan en wie hangt ervan af",
+      "groep": "Nog open",
+      "dekking": []
+    },
+    {
+      "id": "mdm",
+      "wat": "Master data management: één authoritative record per klant/bedrijf",
+      "groep": "Nog open",
+      "dekking": [],
+      "let": "kern/eenaccount doet dit voor het lid; voor bedrijven en locaties niet."
+    },
+    {
+      "id": "dataquality",
+      "wat": "Data quality engine: duplicaten en inconsistenties vinden",
+      "groep": "Nog open",
+      "dekking": []
+    },
+    {
+      "id": "slo",
+      "wat": "SLO- en error-budgetbeheer per dienst",
+      "groep": "Nog open",
+      "dekking": [],
+      "let": "SLO.md beschrijft de norm; er is geen laag die het budget bijhoudt."
+    },
+    {
+      "id": "synthetic",
+      "wat": "Synthetic monitoring: nepgebruikers die continu de keten lopen",
+      "groep": "Nog open",
+      "dekking": []
+    },
+    {
+      "id": "chaos",
+      "wat": "Chaos testing: gecontroleerd uitschakelen om failover te bewijzen",
+      "groep": "Nog open",
+      "dekking": []
+    },
+    {
+      "id": "canary",
+      "wat": "Canary deployments met automatische terugroldrempels",
+      "groep": "Nog open",
+      "dekking": []
+    },
+    {
+      "id": "countrypack",
+      "wat": "Country packs: een nieuw land activeren als configuratiebundel",
+      "groep": "Nog open",
+      "dekking": []
+    },
+    {
+      "id": "citybootstrap",
+      "wat": "City bootstrap: een nieuwe stad automatisch inrichten",
+      "groep": "Nog open",
+      "dekking": []
+    },
+    {
+      "id": "acquisition",
+      "wat": "Acquisition mode: een overgenomen bedrijf importeren en migreren",
+      "groep": "Nog open",
+      "dekking": []
+    },
+    {
+      "id": "apigateway",
+      "wat": "Enterprise API gateway met scopes, quota en contractregels",
+      "groep": "Nog open",
+      "dekking": []
+    },
+    {
+      "id": "sandbox",
+      "wat": "Sandbox-omgevingen om processen te testen zonder productiedata",
+      "groep": "Nog open",
+      "dekking": []
+    }
+  ]
+}

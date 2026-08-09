@@ -1748,6 +1748,22 @@ De drie paden blijven bestaan als echte apps met hun eigen gids-ingang en hun ei
 
 Getoetst in `test/bureaupda.e2e.js`: alle drie komen op met hun eigen bureau, elk spreekt alleen zijn eigen endpoints aan (de fout die je bij een samengevoegde werking het eerst zou maken), en alle drie dragen nu dezelfde disciplinerij.
 
+### Het belofteregister: wat is toegezegd, en waar staat het
+
+Op de vraag "maak alles wat er nog niet is" is hier twee keer het verkeerde antwoord gegeven. De eerste keer werd alleen de bovenste maplaag gescand en kwamen RTG Sheets, Slides en Forms als ontbrekend terug — ze staan in `public/apps/office/`. De tweede keer kwamen CRM en BI als ontbrekend terug, terwijl CRM als `server/bedrijf/klant.js` bestaat (met gewogen pijplijn en een verplichte verliesreden) en de voorspellaag als `server/kern/voorspel/`.
+
+Twee keer fout op dezelfde vraag betekent niet dat er beter gezocht moet worden. Het betekent dat er geen bron was om in te kijken. Dit huis heeft `GRENZEN.json` voor domeingrenzen, `NORM.json` voor meters, `BEWIJS.md` voor wat de toetsen beweren en `ARCHITECTUUR.md` voor de kaart — maar niets dat zei wat er is *beloofd* en waar dat staat.
+
+**`BELOFTE.json`** is die bron; `npm run belofte` schrijft er `BELOFTE.md` uit. Elke belofte draagt haar dekking — bestandspaden en API-paden — en het script kijkt na of die er echt zijn:
+
+- **gedekt** — elk bewijsstuk bestaat;
+- **open** — nog geen dekking: werkvoorraad, en dat mag;
+- **gebroken** — er wordt verwezen naar iets dat er niet (meer) is.
+
+Die laatste is de enige alarmerende stand, en de reden dat het register bestaat: een belofte die nog open staat weet iedereen, maar een belofte die ooit waar was en stil verdween mist niemand. Bij het opschrijven sloeg hij meteen drie keer aan — drie paden wezen naar modules die ergens anders bleken te wonen. Keuringsregel 41b houdt het bestand actueel en laat de keuring zakken op elke gebroken belofte; `test/belofte.test.js` toetst de meter zelf met een bewijsstuk dat niet bestaat, want een meter die je niet hebt zien uitslaan meet niets.
+
+Wat het register **niet** doet, is kwaliteit beoordelen. Dat een bestand bestaat, zegt niet dat de belofte goed is ingelost; daarvoor is `BEWIJS.md` er en de toetsen die daaronder liggen.
+
 ## Veiligheid & verbinding: vier apps op één ruggengraat
 
 Vier losse apps (elk met eigen PWA-manifest), die onderhuids dezelfde kern delen

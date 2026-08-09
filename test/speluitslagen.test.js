@@ -14,6 +14,7 @@ const assert = require('node:assert/strict');
 
 const maakUitslagen = require('../server/kern/spellen/uitslagen');
 const { BELEID } = require('../server/bewaarbeleid');
+const bewaar = require('../server/bewaartermijnen');
 
 // alles wat niet met 'kind' begint is volwassen; zo is de grens in een oogopslag te lezen
 const volwassen = (h) => !String(h).startsWith('kind');
@@ -150,4 +151,26 @@ test('uitslagen staan in het bewaarbeleid en verlopen dus', () => {
   assert.equal(regel.datum, 'at', 'de motor moet weten welk veld de datum is');
   assert.ok(regel.dagen > 0 && regel.dagen <= 366, 'een jaar of korter, geen eeuwigheid: ' + regel.dagen);
   assert.ok(regel.waarom && regel.waarom.length > 10, 'met een reden erbij');
+});
+
+test('de bewaarmotor veegt oude uitslagen ook echt weg', () => {
+  /* De toets hierboven eist dat de REGEL bestaat. Dat is niet hetzelfde als
+     dat hij werkt: een regel met de verkeerde `vorm` of een `datum` die niet
+     bestaat wordt door de motor stil overgeslagen, en dan staat er beleid op
+     papier terwijl er niets verloopt. Daarom hier de motor zelf, op een verse
+     en een verlopen partij. */
+  const DAG = 86400000;
+  const geleden = (d) => new Date(Date.now() - d * DAG).toISOString();
+  const rij = (id, dagen) => ({ id, at: geleden(dagen), soort: 'schaak',
+    spelers: [{ key: 'anna', codenaam: 'CN-anna', won: true }] });
+  const db = { data: { spelUitslagen: [rij('vers', 30), rij('oud', 400)] } };
+
+  bewaar.veeg(db, { echt: true });
+  assert.deepEqual(db.data.spelUitslagen.map(r => r.id), ['vers'],
+    'een partij van meer dan een jaar terug hoort weg te zijn, een verse te blijven');
+
+  // en de tak staat niet op de lijst van takken zonder beleid
+  const zonder = bewaar.zonderBeleid({ data: { spelUitslagen: [rij('x', 1)] } }) || [];
+  assert.deepEqual(zonder.filter(t => String(t).includes('spelUitslagen')), [],
+    'spelUitslagen hoort niet op de lijst zonderBeleid te staan');
 });

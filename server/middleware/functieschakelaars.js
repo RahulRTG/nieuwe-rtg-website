@@ -56,30 +56,51 @@ function schakelaars({ db, accounts, functies, sessionFor, findSupplier, wachter
        bevoegd is de handeling zelf te verrichten (kern/bevoegdheid.js) -- en
        staat daarom BOVEN de vroege return: hij hangt niet aan de bewaarde
        schakelaarstand, dus "er is nog nooit iets uitgezet" mag hem niet
-       overslaan. Dat onderscheid hoort ook in het antwoord: "uitgeschakeld door
-       de beheerder" en "hier is een vergunning voor nodig" zijn voor wie het
-       leest twee heel verschillende dingen. */
+       overslaan.
+
+       MAAR HIJ ANTWOORDT NOOIT VOOR DE DEUR. Hier stond hij zonder die regel,
+       en dat brak een invariant die dit huis wel degelijk bewaakt: elk
+       leden-endpoint weigert een leverancier- of kantoortoken met 401
+       (test/auth-rol.test.js). /api/bank/krediet gaf voortaan 503 aan iedereen
+       -- ook aan wie er helemaal niet hoorde te zijn. Twee dingen mis: het
+       antwoord op "mag RTG dit" kwam voor het antwoord op "wie ben jij", en het
+       vertelde aan een willekeurige beller welke vermogens dicht staan en
+       waarom.
+
+       De regel is nu: de bevoegdheid geldt alleen voor de DOELGROEP van de
+       functie. Hoort de beller daar niet bij (of is hij niemand), dan zwijgt
+       deze laag en laat hij de deur van de route zelf antwoorden. Dat is ook
+       inhoudelijk juist: "hiervoor is een vergunning nodig" is geen antwoord op
+       een verkeerd token. */
     const bevoegd = bevoegdVan && bevoegdVan();
     if (bevoegd) {
       const f = functies.functieVoorPad(p);
       if (f && f.vermogen) {
-        let oordeel = bevoegd.mag(f.vermogen);
-        // het land pas opzoeken als de vergunning zich tot landen beperkt
-        if (oordeel.mag && bevoegd.landTelt()) {
-          const tok = (req.get('authorization') || '').replace(/^Bearer\s+/i, '') || (req.body && req.body.token) || req.query.token;
-          let land = null;
-          try {
-            const u = tok && accounts.verifyToken(tok);
-            if (u) { const md = accounts.getMemberState(u.id) || {}; land = md.land || natieNaarLand(md.nationaliteit) || null; }
-          } catch (e) {}
-          if (land) oordeel = bevoegd.mag(f.vermogen, { land });
-        }
-        if (!oordeel.mag) {
-          return res.status(503).json({
-            error: oordeel.uitleg, functie: f.id, naam: f.naam,
-            reden: 'bevoegdheid', vermogen: oordeel.vermogen, bevoegdheidReden: oordeel.reden,
-            nodig: oordeel.nodig || undefined
-          });
+        const tok = (req.get('authorization') || '').replace(/^Bearer\s+/i, '') || (req.body && req.body.token) || req.query.token;
+        let gebruiker = null, tier = null;
+        try { if (tok) gebruiker = accounts.verifyToken(tok); } catch (e) {}
+        if (tok && !gebruiker) { try { const ses = sessionFor(tok); if (ses && ses.tier) tier = ses.tier; } catch (e) {} }
+        const doel = functies.doelgroepVanVerzoek(p, gebruiker) ||
+          (tier ? functies.tierNaarDoelgroep(tier) : null);
+        const raakt = doel && Array.isArray(f.doelgroepen) && f.doelgroepen.includes(doel);
+        if (raakt) {
+          let oordeel = bevoegd.mag(f.vermogen);
+          // het land pas opzoeken als de vergunning zich tot landen beperkt
+          if (oordeel.mag && gebruiker && bevoegd.landTelt()) {
+            let land = null;
+            try {
+              const md = accounts.getMemberState(gebruiker.id) || {};
+              land = md.land || natieNaarLand(md.nationaliteit) || null;
+            } catch (e) {}
+            if (land) oordeel = bevoegd.mag(f.vermogen, { land });
+          }
+          if (!oordeel.mag) {
+            return res.status(503).json({
+              error: oordeel.uitleg, functie: f.id, naam: f.naam,
+              reden: 'bevoegdheid', vermogen: oordeel.vermogen, bevoegdheidReden: oordeel.reden,
+              nodig: oordeel.nodig || undefined
+            });
+          }
         }
       }
     }

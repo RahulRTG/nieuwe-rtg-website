@@ -359,13 +359,37 @@ async function laadOs(){
     ' · bron ' + esc((p.bron || {}).naam || (p.bron || {}).soort || 'onbekend') + '</span>' +
     '<span class="r">' + (p.stand === 'goedgekeurd'
       ? '<span class="pil">aangemerkt door ' + esc(p.goedgekeurdDoor || '') + '</span>'
-      : '<span class="pil rood">ongecontroleerd</span> <button class="knop" data-keur="' + esc(p.versie) + '">Aanmerken</button>') +
-    '</span></div>').join('') || '<div class="leeg">Nog geen regelpakketten. Werk bij of laad een jaargang.</div>';
+      : '<span class="pil rood">ongecontroleerd</span> <button class="knop" data-keur="' + esc(p.versie) + '"' +
+        (p.waarschuwing ? ' data-waarschuwing="' + esc(p.waarschuwing) + '"' : '') + '>Aanmerken</button>') +
+    /* De zelfverklaring van het pakket hoort ZICHTBAAR te zijn voordat iemand
+       op Aanmerken drukt, en niet pas in de foutmelding erna. Bij een pakket
+       dat aangemerkt is met zo'n verklaring staat de reden erbij: wie het deed
+       en waarom is dan het enige wat er nog van over is. */
+    (p.waarschuwing && p.stand !== 'goedgekeurd'
+      ? '<span class="kpi" style="display:block;color:var(--goud,#857007);">Dit pakket meldt zelf: ' + esc(p.waarschuwing) + '</span>' : '') +
+    (p.ondanksWaarschuwing
+      ? '<span class="kpi" style="display:block;">uitdrukkelijk aangemerkt: ' + esc(p.ondanksWaarschuwing) + '</span>' : '') +
+    '</div>').join('') || '<div class="leeg">Nog geen regelpakketten. Werk bij of laad een jaargang.</div>';
   $('#osRegels').querySelectorAll('[data-keur]').forEach(b => b.addEventListener('click', async () => {
     /* Aanmerken is een handeling met een naam eraan: hierna mag er echt geld
-       op deze tarieven worden overgemaakt. Daarom eerst bevestigen. */
+       op deze tarieven worden overgemaakt. Daarom eerst bevestigen.
+
+       EN BIJ EEN PAKKET DAT ZICHZELF ONGECONTROLEERD NOEMT IS DAT EEN ZWAARDERE
+       UITSPRAAK. De server weigert zo'n pakket zonder uitdrukkelijke
+       bevestiging en een reden (kern/payroll/regelpakket.js); dit scherm stuurde
+       die niet mee en liep dus op een 409 zonder uitweg. Nu vraagt hij wat de
+       server vraagt: de verklaring van het pakket in beeld, en een reden die
+       blijft staan. */
+    const w = b.dataset.waarschuwing;
     if (!confirm('Zijn de tarieven van ' + b.dataset.keur + ' gecontroleerd tegen het Handboek Loonheffingen?\n\nNa aanmerken kan er een definitieve loonrun op draaien.')) return;
-    try { await api('regels/keur', { land: 'NL', versie: b.dataset.keur }); await laadOs(); }
+    let extra = {};
+    if (w) {
+      const reden = prompt('Dit pakket meldt zelf:\n\n' + w +
+        '\n\nAanmerken kan alleen uitdrukkelijk. Noteer waarom u het toch aanmerkt (blijft bij het pakket staan):');
+      if (!reden || !reden.trim()) { meld('Niet aangemerkt: er is geen reden genoteerd.'); return; }
+      extra = { ondanks: true, reden: reden.trim() };
+    }
+    try { await api('regels/keur', Object.assign({ land: 'NL', versie: b.dataset.keur }, extra)); await laadOs(); }
     catch (e) { meld(e.message); }
   }));
   // dezelfde zakenlijst als de andere tab; STAND is al geladen

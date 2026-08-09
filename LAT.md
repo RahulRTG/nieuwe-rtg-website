@@ -299,6 +299,7 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 | staat elke functie in de boardroom (en dus onder een schakelaar) | `scripts/schakelbaar.js` + `NORM.json` |
 | de wisregels van de identiteitskluis en de locatiesporen | `server/bewaarveger.js` |
 | elk scherm geeft een teken van leven (dood is stiller dan stuk) | `test/leven.e2e.js` |
+| elk scherm past op het toestel (niets breder, niets langer) | `scripts/telefoonmaat.js` + `test/telefoonmaat.e2e.js` + `check.js` regel 43 |
 | de Postgres-toetsen, elk in een eigen database | `scripts/pgtoetsen.js` |
 | een omgeving die schermtoetsen belooft, heeft ook een browser | `test/browserpoort.e2e.js` |
 | de pijplijn die dit alles draait bij elke push | `.github/workflows/ci.yml` |

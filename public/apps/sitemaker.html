@@ -42,7 +42,13 @@
   .apparaten{display:flex;gap:.15rem;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:.15rem;}
   .apparaten button{background:transparent;border:0;color:var(--muted);font:inherit;font-size:.72rem;font-weight:600;padding:.3rem .55rem;border-radius:7px;cursor:pointer;white-space:nowrap;}
   .apparaten button.aan{background:var(--bg);color:var(--gold);}
-  main{padding:1.3rem;display:flex;justify-content:center;min-height:60vh;}
+  /* een KOLOM en niet een rij: shared/ios.js zet de bovenregel van de kop als
+     eerste kind in main, en in een rij komt die NAAST de inhoud te staan in
+     plaats van erboven. Samen waren ze breder dan 320 punten, en omdat een rij
+     met justify-content:center naar twee kanten uitloopt viel het inlogkaartje
+     half buiten het scherm. align-items:center doet nu het centreren dat
+     justify-content in de rij deed. */
+  main{padding:1.3rem;display:flex;flex-direction:column;align-items:center;min-height:60vh;}
   .doek{border:1px solid var(--line);box-shadow:0 30px 80px rgba(0,0,0,.4);}
   .doek.mobielkader{border-radius:30px;border:2px solid var(--line);box-shadow:0 30px 80px rgba(0,0,0,.5);}
   /* bewerk-affordances */
@@ -98,6 +104,7 @@
   .tip b{color:var(--gold);font-weight:600;}
 </style>
 <link href="/shared/ios.css" rel="stylesheet">
+<link href="/shared/maat.css" rel="stylesheet">
 </head>
 <body class="rtg-stijl">
 <header>

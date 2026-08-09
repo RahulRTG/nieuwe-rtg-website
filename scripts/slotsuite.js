@@ -83,6 +83,14 @@ const LAGEN = [
   { id: 'a11y', naam: 'DE TOEGANKELIJKHEID', hard: true, stappen: [
     ['a11y-scan', [NODE, ['scripts/a11y.js'], { A11Y_STRICT: '1' }]]
   ] },
+  /* DE TOESTELMAAT staat als eigen laag en niet als stap bij de
+     toegankelijkheid, want het is een andere vraag: niet "kan iedereen erbij"
+     maar "past het op het toestel". TELEFOONMAAT_STRICT=1 om dezelfde reden als
+     A11Y_STRICT hierboven -- in de laatste poort voor go-live is "geen browser,
+     dus niet gemeten" geen groen (LAT regel 3). */
+  { id: 'maat', naam: 'DE TOESTELMAAT', hard: true, stappen: [
+    ['telefoonmaat', [NODE, ['scripts/telefoonmaat.js'], { TELEFOONMAAT_STRICT: '1' }]]
+  ] },
   { id: 'beproeving', naam: 'DE BEPROEVING', hard: true, overslaanBijSnel: true, stappen: [
     ['de storm', [NODE, ['--experimental-sqlite', 'scripts/beproeving.js']]]
   ] },

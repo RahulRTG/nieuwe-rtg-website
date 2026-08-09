@@ -55,7 +55,10 @@
 
   /* Rahul plant mee, in gewone taal */
   .rahulbalk{display:flex;gap:.5rem;margin-bottom:1rem;}
-  .rahulbalk input{flex:1;}
+  /* min-width:0 -- een flexkind weigert anders smaller te worden dan zijn
+     eigen inhoud (min-width:auto), en dat is hier de placeholder. Op 320
+     punten duwde die de knop ernaast het scherm uit. */
+  .rahulbalk input{flex:1;min-width:0;}
 
   /* de maand: een echt raster; buiten de maand gedimd, vandaag met goud */
   .mgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(--line);
@@ -126,6 +129,7 @@
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <script src="/shared/seizoen.js" defer></script>
 <link href="/shared/ios.css" rel="stylesheet">
+<link href="/shared/maat.css" rel="stylesheet">
 </head>
 <body class="rtg-stijl">
 <header>

@@ -40,7 +40,9 @@
   /* de chatbalk */
   /* de zaal-balk staat boven de OS-brede stuurbalk (handenvrij, bottom:0) */
   .balk{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(4.4rem + env(safe-area-inset-bottom));z-index:6;display:flex;gap:.4rem;width:min(560px,94vw);background:rgba(21,19,18,.88);border:1px solid var(--line);border-radius:999px;padding:.4rem;backdrop-filter:blur(8px);}
-  .balk input{flex:1;background:transparent;border:none;outline:none;color:var(--txt);font:inherit;font-size:.86rem;padding:.35rem .7rem;}
+  /* min-width:0 -- zonder dat weigert het veld smaller te worden dan zijn eigen
+     placeholder, en duwde het de twee knoppen ernaast de balk uit. */
+  .balk input{flex:1;min-width:0;background:transparent;border:none;outline:none;color:var(--txt);font:inherit;font-size:.86rem;padding:.35rem .7rem;}
   .balk button{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:999px;padding:.35rem .8rem;font:inherit;font-size:.8rem;cursor:pointer;}
   .balk .zeg{background:var(--gold);border-color:var(--gold);color:#000;font-weight:600;}
   /* overlays: gids en suite-atelier */
@@ -79,6 +81,7 @@
 </style>
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
+<link href="/shared/maat.css" rel="stylesheet">
 </head>
 <body class="rtg-stijl">
 <main style="display:contents">

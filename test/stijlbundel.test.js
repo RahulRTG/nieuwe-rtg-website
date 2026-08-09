@@ -109,17 +109,32 @@ test('8. relatieve url() wordt absoluut gemaakt tegen de eigen map', () => {
   assert.ok(uit.includes('url(https://x.example/y.png)'), 'een volledige URL blijft heel');
 });
 
-test('9. de echte app-pagina: zes bladen samen, en er raakt geen script zoek', () => {
+/* Hier stond "een bundel op deze pagina", en dat klopte tot shared/maat.css
+   erbij kwam. Die hangt achteraan, naast ios.css, want de maat van het toestel
+   is het laatste woord over de maat van de inhoud -- en twee buren maken daar
+   nu een tweede bundel van waar ios.css eerst alleen stond.
+
+   Wat NIET veranderde is waar dit bestand over gaat: het aantal verzoeken dat
+   het tekenen tegenhoudt. Dat was twee (een bundel plus die losse ios.css) en
+   is nog steeds twee (twee bundels). Een blad erbij, nul verzoeken erbij.
+
+   Daarom pint deze toets nu het GETAL dat telt in plaats van het getal dat
+   toevallig een was. Dat is scherper dan eerst: `na < voor` liet elke waarde
+   onder de negen door, ook zeven. */
+test('9. de echte app-pagina: alles samen in twee verzoeken, en er raakt geen script zoek', () => {
   const fs = require('fs');
   const path = require('path');
   const bron = fs.readFileSync(path.join(__dirname, '..', 'public', 'apps', 'app.html'), 'utf8');
   const uit = herschrijfHtml(bron);
   const b = bundelHrefs(uit);
-  assert.equal(b.length, 1, 'een bundel op deze pagina');
-  assert.ok(b[0].length >= 5, 'met minstens vijf bladen erin: ' + b[0].join(', '));
+  assert.equal(b.length, 2, 'twee bundels: de kop, en de staart (ios + maat) achter de eigen stijl van de pagina');
+  assert.ok(b[0].length >= 5, 'de kopbundel heeft minstens vijf bladen: ' + b[0].join(', '));
+  assert.deepEqual(b[1], ['/shared/ios.css', '/shared/maat.css'],
+    'de staartbundel is de OS-laag en daarna de toestelmaat, in die volgorde: ' + b[1].join(', '));
   assert.equal((bron.match(/<script/g) || []).length, (uit.match(/<script/g) || []).length,
     'evenveel scripts voor als na -- er verdwijnt niets tussen de links vandaan');
   const voor = (bron.match(/<link[^>]*rel="stylesheet"/g) || []).length;
   const na = (uit.match(/<link[^>]*rel="stylesheet"/g) || []).length;
   assert.ok(na < voor, 'minder blokkerende verzoeken dan eerst: ' + voor + ' -> ' + na);
+  assert.equal(na, 2, 'en het zijn er precies twee, niet "minder dan negen"');
 });

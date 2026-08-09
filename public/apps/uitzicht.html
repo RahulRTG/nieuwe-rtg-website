@@ -33,7 +33,10 @@
   h1 em{font-style:italic;color:var(--goud-zacht);}
   .lead{max-width:46ch;color:var(--soft);font-size:1.02rem;line-height:1.6;margin-bottom:1.4rem;}
   /* de 3D-stad */
-  .stad{position:relative;width:min(960px,94vw);aspect-ratio:16/10;margin:0.4rem auto 1.2rem;
+  /* 100% en niet 94vw: vw kent de padding van de ouder niet. Op 320 punten is
+     94vw 301 punten breed terwijl er binnen de marges van main maar 285 punten
+     over is -- het stadsbeeld stak er acht punten uit. */
+  .stad{position:relative;width:min(960px,100%);aspect-ratio:16/10;margin:0.4rem auto 1.2rem;
     border:1px solid var(--line);border-radius:20px;overflow:hidden;
     background:radial-gradient(120% 80% at 50% 0%, #191316, #0C0C0B 70%);
     box-shadow:0 40px 80px rgba(0,0,0,0.6);}
@@ -60,6 +63,7 @@
   .voet a{color:var(--goud-zacht);}
 </style>
 <link href="/shared/ios.css" rel="stylesheet">
+<link href="/shared/maat.css" rel="stylesheet">
 </head>
 <body class="rtg-stijl">
 <header class="kop">

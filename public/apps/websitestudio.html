@@ -52,7 +52,11 @@
   .apparaten button.aan{background:none;color:var(--txt);border-bottom-color:var(--gold);}
   /* het doek (de website die je bouwt) -- een container, zodat de blokken
      meebuigen met de DOEK-breedte (de gekozen versie), niet met het venster */
-  main{padding:1.3rem;display:flex;justify-content:center;min-height:60vh;}
+  /* een KOLOM en niet een rij: shared/ios.js zet de bovenregel van de kop als
+     eerste kind in main, en in een rij komt die NAAST het doek te staan in
+     plaats van erboven -- samen breder dan het scherm. align-items:center doet
+     nu het centreren dat justify-content in de rij deed. */
+  main{padding:1.3rem;display:flex;flex-direction:column;align-items:center;min-height:60vh;}
   .doek{width:100%;max-width:1080px;border-radius:16px;overflow:hidden;border:1px solid var(--line);box-shadow:0 30px 80px rgba(0,0,0,.4);container-type:inline-size;transition:max-width .28s ease;}
   .doek.mobielkader{border-radius:30px;border:2px solid var(--line);box-shadow:0 30px 80px rgba(0,0,0,.5);}
   /* thema-tokens op het doek zelf */
@@ -131,6 +135,7 @@
   .inlog a{color:var(--gold);}
 </style>
 <link href="/shared/ios.css" rel="stylesheet">
+<link href="/shared/maat.css" rel="stylesheet">
 </head>
 <body class="rtg-stijl">
 <header>

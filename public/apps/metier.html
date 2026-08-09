@@ -37,6 +37,12 @@
      rtg-ui.css (body.rtg-stijl .tabs > button) anders zwaarder weegt -- die
      won hier ook van de oude regels, waardoor de actieve tab niets liet zien. */
   body.rtg-stijl .tabs{display:flex;gap:.15rem;margin:.7rem -1.1rem -.7rem;padding:0 1.1rem;overflow-x:auto;flex-wrap:nowrap;}
+  /* De bloeding hierboven is gemeten op de marges van main (1.1rem). Zodra
+     shared/ios.js de balk in de navigatiebalk hangt, staat hij in een vak met
+     0.75rem inzet en steekt hij er dus 0.35rem aan weerszijden uit -- de hele
+     pagina schoof daardoor zes punten. In de balk bloedt hij niet: die bepaalt
+     zijn eigen inzet. */
+  body.rtg-stijl .ios-nav-extra .tabs{margin-inline:0;padding-inline:0;}
   body.rtg-stijl .tabs > button{background:none;border:0;border-bottom:2px solid transparent;border-radius:0;
     margin-bottom:-1px;color:var(--muted);padding:.55rem .8rem .6rem;font-family:Inter,system-ui,sans-serif;
     font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;cursor:pointer;}
@@ -66,6 +72,7 @@
   .aibalk form{display:flex;gap:.5rem;max-width:660px;margin:0 auto;}
 </style>
 <link href="/shared/ios.css" rel="stylesheet">
+<link href="/shared/maat.css" rel="stylesheet">
 </head>
 <body class="rtg-stijl">
 <a href="#main" class="skip">Naar de inhoud</a>

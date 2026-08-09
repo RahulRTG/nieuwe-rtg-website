@@ -2544,5 +2544,62 @@ console.log('\n42) geen functie die binnen een andere functie staat en erbuiten 
   if (!stuk) ok(gekeken + ' gebundelde app-scripts: geen enkele functie wordt buiten zijn eigen omhulsel aangeroepen');
 }
 
+/* 43) elk scherm draagt de toestelmaat.
+
+   public/shared/maat.css is de grendel: op de wortel `overflow-x:clip`, en
+   daaronder de maten van beeld, veld, blad en melding. Zonder die koppeling is
+   een pagina precies zo breed als zijn slechtste regel toelaat, en dat merk je
+   pas op een telefoon.
+
+   Deze regel is de STATISCHE helft en draait altijd, ook zonder browser. De
+   andere helft is scripts/telefoonmaat.js, die in een echte browser meet of er
+   dan ook werkelijk niets uitsteekt. Deze regel alleen bewijst niet dat een
+   scherm past -- hij bewijst dat de grendel eraan hangt. Beide zijn nodig: de
+   koppeling zonder meting is een belofte, de meting zonder koppeling is werk
+   dat de volgende pagina weer kwijtraakt.
+
+   WAT ER NIET ONDER VALT: een pagina zonder enig stijlblad en zonder eigen
+   <style>. Dat is geen scherm maar een doorverwijzing (apps/berichten.html
+   stuurt in nul seconden door naar apps/comm.html). Die uitzondering staat hier
+   met naam en niet als stilzwijgend gat, en hij is smal: zodra zo'n pagina ook
+   maar een stijlregel krijgt, telt hij weer mee. */
+console.log('\n43) elk scherm draagt de toestelmaat (shared/maat.css)');
+{
+  const BLAD = path.join(ROOT, 'public/shared/maat.css');
+  /* Zonder de grendel zelf is de koppeling een lege huls, en dan telt deze
+     regel schermen die niets dragen. Dat is een meter die niet kan zakken.
+
+     ZONDER COMMENTAAR, en dat is hier geen nettigheid maar de reparatie: de
+     eerste versie zocht `overflow-x:clip` in de hele tekst van het blad. De
+     kop van maat.css legt uit waarom daar `clip` staat en niet `hidden`, dus
+     die woorden staan er ook in proza -- en toen ik de regel bij wijze van
+     proef uit de CSS haalde, bleef deze keuring vrolijk groen. Vierde keer
+     dat een meter hier tekst voor code aanzag. Nu moet het een echte regel op
+     `html` zijn. */
+  const grendel = (bron) => /(^|[};])\s*html\s*\{[^}]*overflow-x:\s*clip/.test(zonderCommentaar(bron));
+  if (!fs.existsSync(BLAD)) {
+    fout('public/shared/maat.css ontbreekt, dus deze regel is niet vast te stellen');
+  } else if (!grendel(fs.readFileSync(BLAD, 'utf8'))) {
+    fout('public/shared/maat.css zet geen overflow-x:clip meer op html; dan grendelt de koppeling niets');
+  } else {
+    const PUB = path.join(ROOT, 'public');
+    const web = (p) => '/' + path.relative(PUB, p).split(path.sep).join('/');
+    const paginas = [];
+    loop(PUB, /\.html$/, f => { if (!web(f).startsWith('/dist/')) paginas.push(f); });
+    let mis = 0, schermen = 0, doorverwijzing = 0;
+    for (const p of paginas) {
+      const s = fs.readFileSync(p, 'utf8');
+      const heeftStijl = /<link[^>]+\.css[^>]*>/.test(s) || /<style[\s>]/.test(s);
+      if (!heeftStijl) { doorverwijzing++; continue; }
+      schermen++;
+      if (!s.includes('/shared/maat.css')) {
+        mis++;
+        fout(web(p) + ' laadt shared/maat.css niet -- dan geldt de maat van het toestel daar niet');
+      }
+    }
+    if (!mis) ok(schermen + ' schermen dragen de toestelmaat (' + doorverwijzing + ' doorverwijzing(en) zonder stijl tellen niet mee)');
+  }
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

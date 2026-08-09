@@ -64,9 +64,18 @@
 /* Links en rechts krijgen precies wat ze nodig hebben, de titel krijgt de rest
    en mag krimpen (minmax(0,1fr), anders weigert een grid-kolom smaller te
    worden dan zijn inhoud). Met 1fr aan de zijkanten liep "Exporteer +
-   Afspraak" de balk uit en raakte de laatste knop de schermrand. */
+   Afspraak" de balk uit en raakte de laatste knop de schermrand.
+
+   EN DAARNA LIEP HIJ ALSNOG UIT, want `auto` in kolom 3 is dat halve verhaal.
+   Een kolom van `auto` krimpt niet onder zijn inhoud, en de inhoud van deze
+   is een rij knoppen met `nowrap` waar shared/appmenu.js er ook nog een aan
+   toevoegt. Op 320 punten stond de balk van websitestudio op 759 punten: de
+   helft van de app-knoppen buiten beeld, en de hele PAGINA sleepbaar. Dat
+   gold voor tien van de zeventien schermen die uitliepen -- een oorzaak, tien
+   gevolgen. Met minmax(0,auto) mag de kolom wel onder zijn inhoud krimpen;
+   wat er dan niet meer in past schuift binnen de rij zelf (zie hieronder). */
 .ios-nav-rij{
-  display:grid; grid-template-columns:auto minmax(0,1fr) auto; align-items:center;
+  display:grid; grid-template-columns:auto minmax(0,1fr) minmax(0,auto); align-items:center;
   gap:0.4rem; min-height:var(--ios-balk);
   padding-inline:max(0.6rem, env(safe-area-inset-left,0px)) max(0.6rem, env(safe-area-inset-right,0px));
 }
@@ -97,11 +106,20 @@
 .ios-nav:not([data-groot]) .ios-nav-titel{opacity:1;}
 
 /* de acties rechts: iOS zet ze op 17 punten in de accentkleur, geen knopvlak */
+/* Past de rij niet meer op het scherm, dan schuift DE RIJ en niet de pagina.
+   De knoppen houden hun eigen maat (flex:none) -- ze afknijpen zou ze
+   onleesbaar maken, en dat is geen ruil maar een verlies. De schuifbalk is
+   weg: op een telefoon is dat een veeg, geen balk. */
 .ios-nav-acties{
   grid-column:3; justify-self:end;
   display:flex; align-items:center; gap:0.25rem;
+  min-width:0; max-width:100%;
+  overflow-x:auto; overflow-y:hidden;
+  scrollbar-width:none; -webkit-overflow-scrolling:touch;
 }
+.ios-nav-acties::-webkit-scrollbar{ display:none; }
 .ios-nav-acties > *{
+  flex:none;
   font:400 17px/1 'Inter',system-ui,sans-serif !important;
   color:var(--ios-accent) !important;
   background:none !important; border:none !important;
@@ -117,6 +135,22 @@
   padding:0 max(0.75rem, env(safe-area-inset-left,0px)) 0.5rem;
   display:flex; flex-direction:column; gap:0.5rem;
 }
+/* WAAROM HIER GEEN REGEL STAAT DIE DE INHOUD BINNEN DE BALK TREKT, en dat is
+   geprobeerd. Wat hier binnenkomt komt uit de PAGINA en is daar getekend op de
+   marges van main: een tabbalk die met `margin:0 -1.1rem` tot de rand van main
+   bloedt, bloedt hier 0.35rem verder dan de balk breed is, en dan schuift de
+   pagina. Zo liep metier.html uit.
+
+   Een `.ios-nav-extra > *{margin-inline:0}` repareert dat niet. De pagina
+   schrijft `body.rtg-stijl .tabs` (0,2,1) en dit blad haalt met een kind-ster
+   niet meer dan (0,2,0) -- de regel stond er, en metier liep nog steeds zes
+   punten uit. Er zwaarder overheen gaan werkt alleen met !important of met een
+   specificiteits-wedloop tegen regels die je niet kent, en de kit doet geen
+   van beide (zie README).
+
+   Dus staat de reparatie waar de bloeding staat -- in de pagina -- en bewaakt
+   scripts/telefoonmaat.js het geval algemeen: verplaatst iemand later weer een
+   balk met eigen marges hierheen, dan zakt de meter en niet de gebruiker. */
 .ios-nav-extra input[type=search],
 .ios-nav-extra input[type=text]{
   width:100%; border:none; border-radius:10px;

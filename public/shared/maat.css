@@ -1,0 +1,83 @@
+/* ========================= DE TOESTELMAAT =========================
+   Niets is breder dan het scherm, en niets is langer dan het scherm.
+
+   WAAR DIT UIT KOMT. Op een telefoon van 320 punten (de kleine PDA, en de
+   smalste maat die dit huis bedient) liepen zeventien van de tweehonderd-
+   dertien schermen uit hun jasje. De ene helft kon je horizontaal wegslepen
+   -- de app schoof onder je duim vandaan en de rechterkolom stond buiten
+   beeld. De andere helft stond op een body met `overflow:hidden`, en daar
+   was het erger: daar SCHOOF niets, daar was de knop gewoon weg. Onbereikbaar,
+   zonder enig teken dat er iets miste.
+
+   WAT DIT BLAD DOET, EN WAT NIET. Dit is de BUITENMAAT en niet de reparatie.
+   De oorzaken zitten per geval in de pagina zelf (een `94vw` die de padding
+   van zijn ouder niet kent, een `1fr`-kolom die niet onder zijn inhoud wil
+   krimpen, een `nowrap` op tekst die langer kan zijn dan het scherm) en die
+   zijn daar gerepareerd -- zie de commits, niet dit blad. Wat hier staat is de
+   grendel eromheen: gaat er ooit weer iets buiten de lijnen, dan kan het het
+   SCHERM niet meer uit trekken.
+
+   Een grendel die alleen verbergt zou een pleister zijn (LAT regel 1), en een
+   pleister die de meter blind maakt is erger dan geen pleister (regel 10).
+   Daarom meet scripts/telefoonmaat.js niet of de PAGINA schuift maar waar elk
+   ELEMENT staat: die meting werkt door de grendel heen. Nagetrokken met een
+   element van 600 punten in oog.html -- de meter zag hem (+298), grendel en
+   al. De eerste versie van die scan deed het WEL op `scrollWidth` en meldde
+   daardoor nul uitlopers op alle 213 schermen; dat was gewoon niet waar.
+
+   En de mutatie de andere kant op, want die zegt meer: haal `overflow-x:clip`
+   hieronder weg en er gebeurt niets -- alle 213 schermen blijven schoon. Deze
+   grendel dekt dus geen enkele oorzaak toe. Hij staat er voor de volgende
+   regel die iemand schrijft, niet voor de regels die er nu staan.
+
+   Insluiten als LAATSTE blad van de pagina, na ios.css: de maat van het
+   toestel is het laatste woord over de maat van de inhoud.
+   ================================================================== */
+
+/* ------------------------------------------------- 1. de buitenmaat */
+/* `clip` en niet `hidden`, en dat verschil is hier niet cosmetisch: op de
+   wortel slaat overflow door naar de viewport, en `hidden` maakt daar een
+   scrollcontainer van. Elke `position:sticky` in dit huis -- de iOS-balk op
+   elk scherm -- hangt aan die viewport. Met `hidden` blijft de balk bij het
+   scrollen achter; met `clip` ontstaat er geen scrollcontainer en blijft hij
+   staan. Nagemeten in een echte browser, niet aangenomen. */
+html{ overflow-x:clip; }
+body{ max-width:100%; overflow-x:clip; }
+
+/* ---------------------------------------- 2. wat van nature te groot is */
+/* Alles met een eigen natuurlijke breedte krimpt mee met zijn vak in plaats
+   van eruit te steken. In :where() en dus met gewicht nul: een pagina die dit
+   ergens echt anders nodig heeft, overschrijft het met een gewone regel --
+   precies zoals rtg-ui.css het doet, en zonder !important. */
+:where(img,svg,video,canvas,iframe,embed,object,picture){ max-width:100%; }
+:where(input,select,textarea,button){ max-width:100%; }
+:where(pre,table,blockquote,figure){ max-width:100%; }
+/* code en tabellen mogen breder zijn dan de regel -- maar dan schuiven ZIJ,
+   en niet het scherm. Een eigen schuifvak is geen uitloop. */
+:where(pre){ overflow-x:auto; }
+
+/* Een woord dat langer is dan de regel (een URL, een codewoord, een
+   e-mailadres, een IBAN) duwt anders de hele kolom het scherm uit. Dit breekt
+   alleen wat anders NIET past; gewone tekst blijft breken op de spatie. */
+body{ overflow-wrap:break-word; }
+
+/* --------------------------------------------- 3. de laag over het scherm */
+/* Een blad, een melding of een dialoog hangt aan de viewport. Zijn maat is
+   dus de maat van het toestel: nooit breder, en nooit langer dan het scherm.
+   Wat er niet in past schuift binnen de laag zelf.
+
+   100% en niet 100vw/100dvh: voor een vast gepositioneerd element IS het
+   omhullende blok de viewport, en 100vw telt op een desktop de schuifbalk mee
+   -- dat is precies de uitloop die we hier weghalen. */
+:where(dialog,.blad,.sheet,.rahulsheet,.modal,.ios-blad){
+  max-width:100%; max-height:100dvh; overflow:auto;
+}
+:where(.melding,.toast,.vmelding,.scrim,.waas,.ios-waas){
+  max-width:100%; max-height:100dvh;
+}
+
+/* WAT HIER BEWUST NIET STAAT: een veilige-zone-padding op de body. Dat is een
+   ANDER onderwerp (de notch, niet de maat), elke pagina regelt zijn eigen
+   inzet al met env(safe-area-inset-*), en een tweede padding eromheen telt
+   daar gewoon bij op. Een blad dat er twee onderwerpen bij pakt, wordt de
+   plek waar alles in belandt. */

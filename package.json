@@ -31,6 +31,7 @@
     "check": "node scripts/check.js",
     "ast-scan": "node scripts/ast-scan.js",
     "a11y": "node scripts/a11y.js",
+    "telefoonmaat": "node scripts/telefoonmaat.js",
     "build": "node scripts/build.js",
     "test": "rm -f .routejournaal && RTG_ROUTELOG=.routejournaal node --experimental-sqlite --test test/*.test.js",
     "test:coverage": "node --experimental-sqlite --experimental-test-coverage --test test/*.test.js",

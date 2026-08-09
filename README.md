@@ -405,6 +405,55 @@ ergens iets rood wordt. Alles met een id blijft staan, altijd.
 Split View (`shared/split.js`) blijft: twee apps naast elkaar is iPad, geen
 bureaublad. In zo'n paneel krijgt de app geen eigen home-indicator.
 
+### De toestelmaat: niets breder of langer dan het scherm
+
+Een telefoon-OS dat je opzij kunt slepen is geen telefoon-OS. Op 320 punten (de
+kleine PDA, de smalste maat die we bedienen) liepen **zeventien van de 213
+schermen** uit hun jasje. De helft kon je horizontaal wegslepen; de andere helft
+stond op een `body` met `overflow:hidden` en daar was het erger -- daar schoof
+niets, daar was de knop gewoon wég. Geen melding, geen log, geen toets die zakte.
+
+Dat ligt nu op drie plekken vast, en die drie doen elk iets anders:
+
+1. **`shared/maat.css` is de grendel**, en hangt aan elke pagina (als laatste
+   blad, ná `ios.css`). `overflow-x:clip` op de wortel -- `clip` en niet
+   `hidden`, want op de wortel slaat overflow door naar de viewport en `hidden`
+   maakt daar een scrollcontainer van, waarna elke `position:sticky` kopbalk bij
+   het scrollen achterblijft. Nagemeten in een echte browser op pagina's van
+   12.000 punten hoog, niet aangenomen. Daaronder: beeld, veld, blad en melding
+   krijgen de maat van het scherm mee, in `:where()` en dus met gewicht nul, zodat
+   een pagina die het écht anders nodig heeft er gewoon overheen schrijft.
+2. **De oorzaken zijn per geval gerepareerd**, en dat is het echte werk. Eén
+   gedeelde (`.ios-nav-acties` groeide de balk uit met elke knop die een app
+   erin hing -- goed voor tien van de zeventien; hij schuift nu zelf in plaats
+   van de pagina mee te trekken) en negen in de pagina's: een `94vw` die de
+   padding van zijn ouder niet kent, een `1fr`-kolom die niet onder zijn inhoud
+   wil krimpen, een flexveld zonder `min-width:0`, een `nowrap` op tekst die
+   langer kan zijn dan het scherm, een bloeding die op de marges van `main` is
+   getekend maar in de navigatiebalk terechtkomt, en een `main` als flexrij
+   waar de OS-laag een tweede kind in hangt.
+3. **Twee metingen bewaken het**, want ze zien elk iets anders. `npm run
+   telefoonmaat` meet **alle 213 schermen** op 320x480 en 390x844, uitgelogd, op
+   de eerste render. `test/telefoonmaat.e2e.js` meet de **vlaggenschepen
+   ingelogd**, waar de meeste opmaak pas leeft. Beide draaien in CI en in de
+   slotsuite (`TELEFOONMAAT_STRICT=1`: geen browser is dáár geen groen).
+   `check.js` regel 43 houdt statisch bij dat elk scherm de grendel ook echt
+   laadt.
+
+De meting kijkt naar **rechthoeken** en niet naar `documentElement.scrollWidth`,
+en dat is geen stijlkeuze: onder de grendel schuift de pagina niet meer, dus die
+scrollWidth meldt niets. De eerste versie van de scan meldde daardoor nul
+uitlopers op alle 213 schermen, en dat was gewoon niet waar -- LAT regel 10, in
+het instrument zelf. Een element binnen een voorouder die zélf horizontaal
+schuift (een tabbalk, een carrousel, een codeblok) telt niet mee: dat schuift
+zichzelf. `body` en `html` tellen daarbij níét als zo'n voorouder; dat is de
+grendel, en die als "netjes afgeknipt" lezen was precies hoe de meter blind werd.
+
+Wat de grendel níét doet, en dat is met een mutatie nagetrokken: hij dekt niets
+toe. Haal `overflow-x:clip` weg en alle 213 schermen blijven schoon -- de
+oorzaken zijn echt weg, en de grendel is er voor de volgende regel die iemand
+schrijft.
+
 ### Het RTF Living Lab: spelenderwijs, maar niet vrijblijvend
 
 `server/kern/livinglab/` + `server/routes/livinglab/` + `/apps/livinglab.html`

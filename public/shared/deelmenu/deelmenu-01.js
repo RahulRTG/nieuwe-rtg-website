@@ -25,9 +25,14 @@
 
   var css = '.rtgdeel-balk{display:flex;flex-wrap:wrap;gap:.15rem;margin:.6rem 0 1.1rem;padding:0 0 .1rem;' +
       'border-bottom:1px solid var(--line,var(--lijn,#2A2724));}' +
+    /* max-width + ellipsis: de knoptekst komt uit de kop van een deel en kan
+       elke lengte hebben. Op labpas.html stak zo'n kop met nowrap zestien
+       punten buiten het scherm. Nowrap blijft (dit is een tabbalk, geen
+       alinea), maar hij kan de balk niet meer uit groeien. */
     '.rtgdeel-balk button{background:none;border:0;cursor:pointer;padding:.55rem .8rem .6rem;margin-bottom:-1px;' +
       'font-family:Inter,system-ui,sans-serif;font-size:.72rem;font-weight:600;letter-spacing:.12em;text-transform:uppercase;' +
-      'color:var(--muted,var(--zacht,#8A8680));border-bottom:2px solid transparent;white-space:nowrap;}' +
+      'color:var(--muted,var(--zacht,#8A8680));border-bottom:2px solid transparent;white-space:nowrap;' +
+      'max-width:100%;overflow:hidden;text-overflow:ellipsis;}' +
     '.rtgdeel-balk button:hover{color:var(--txt,#F7F5F1);}' +
     '.rtgdeel-balk button[aria-current="true"]{color:var(--txt,#F7F5F1);' +
       'border-bottom-color:var(--gold,var(--goud,#857007));}' +

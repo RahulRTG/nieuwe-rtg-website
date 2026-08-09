@@ -10,12 +10,14 @@
    exitcode 0 in plaats van te breken; scripts/check.js bewaakt intussen de
    statische a11y-regels die altijd draaien. Forceer falen-bij-afwezigheid met
    A11Y_STRICT=1. */
-const fs = require('fs');
 const path = require('path');
-const http = require('http');
+/* De statische server, de MIME-lijst en de browser-zoektocht staan in
+   scripts/lib/statisch.js: scripts/telefoonmaat.js heeft ze ook nodig, en een
+   tweede kopie van dezelfde waarheid loopt uiteen zonder dat iets klaagt
+   (LAT regel 4). */
+const { server: statischeServer, laadBrowser: laadPlaywright } = require('./lib/statisch');
 
 const ROOT = path.join(__dirname, '..');
-const PUB = path.join(ROOT, 'public');
 const STRICT = process.env.A11Y_STRICT === '1';
 
 // vlaggenschip-schermen: de eerste render (uitgelogd) van de belangrijkste apps
@@ -51,36 +53,6 @@ const PAGINAS = [
   '/apps/metier.html',
   '/apps/genootschap.html',
 ];
-
-const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css',
-  '.svg': 'image/svg+xml', '.json': 'application/json', '.webmanifest': 'application/manifest+json',
-  '.png': 'image/png', '.jpg': 'image/jpeg', '.woff2': 'font/woff2' };
-
-function laadPlaywright() {
-  const paden = [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules'];
-  for (const p of paden) {
-    try { return require(p ? require.resolve('playwright', { paths: [p] }) : 'playwright'); }
-    catch (e) { /* volgende pad */ }
-  }
-  // Geen Playwright-pakket? Val terug op onze eigen browser-driver (CDP over de
-  // pipe-transport), maar alleen als er echt een Chromium-binary staat.
-  try { const eigen = require('../server/lib/browser'); if (eigen.beschikbaar()) return eigen; } catch (e) { /* geen browser */ }
-  return null;
-}
-
-function statischeServer() {
-  return http.createServer((req, res) => {
-    let rel = decodeURIComponent(req.url.split('?')[0]);
-    if (rel.endsWith('/')) rel += 'index.html';
-    const bestand = path.join(PUB, path.normalize(rel));
-    if (!bestand.startsWith(PUB)) { res.writeHead(403); return res.end(); }
-    fs.readFile(bestand, (err, data) => {
-      if (err) { res.writeHead(404); return res.end('niet gevonden'); }
-      res.writeHead(200, { 'content-type': MIME[path.extname(bestand)] || 'application/octet-stream' });
-      res.end(data);
-    });
-  });
-}
 
 (async () => {
   const pw = laadPlaywright();

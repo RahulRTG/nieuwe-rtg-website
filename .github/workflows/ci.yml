@@ -124,6 +124,14 @@ jobs:
         run: node scripts/a11y.js
         env:
           A11Y_STRICT: '1'
+      # Past elk scherm op het toestel? Alle 213 pagina's op 320x480 (de kleine
+      # PDA) en 390x844 (de telefoon van nu). TELEFOONMAAT_STRICT=1 om dezelfde
+      # reden als hierboven: de browser is net geinstalleerd, dus "overgeslagen"
+      # betekent hier dat die installatie stuk is en niet dat het niet hoefde.
+      - name: Toestelmaat (niets breder of langer dan het scherm)
+        run: node scripts/telefoonmaat.js
+        env:
+          TELEFOONMAAT_STRICT: '1'
       # RTG_E2E_STRICT=1 zegt: deze omgeving BELOOFT schermtoetsen te draaien.
       # test/browserpoort.e2e.js zakt dan als er geen browser is. Zonder die
       # vlag slaan drieenveertig e2e-bestanden zichzelf stil over als Chromium

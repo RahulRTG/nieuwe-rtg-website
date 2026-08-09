@@ -62,7 +62,10 @@
   #rkToetsen button:hover{border-color:var(--gold);}
   #rkToetsen .op{color:var(--gold);}
   #rkToetsen .gelijk{background:var(--gold);border-color:var(--gold);color:#0C0C0B;grid-column:span 2;}
-  .zaak{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-top:.8rem;}
+  /* minmax(0,1fr) en niet 1fr: een 1fr-kolom krimpt niet onder de inhoud van
+     zijn breedste kind, en het reken-vak heeft drie velden naast elkaar. Op
+     320 punten stond de rechterkolom daardoor 295 punten buiten het scherm. */
+  .zaak{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:.6rem;margin-top:.8rem;}
   .zaak .vak{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.7rem .8rem;}
   .zaak .vak b{display:block;font-size:.72rem;color:var(--gold);letter-spacing:.08em;text-transform:uppercase;margin-bottom:.35rem;}
   .zaak .uitkomst{font-size:.82rem;color:var(--muted);margin-top:.4rem;line-height:1.5;}
@@ -91,6 +94,7 @@
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <script src="/shared/seizoen.js" defer></script>
 <link href="/shared/ios.css" rel="stylesheet">
+<link href="/shared/maat.css" rel="stylesheet">
 </head>
 <body class="rtg-stijl">
 <header>

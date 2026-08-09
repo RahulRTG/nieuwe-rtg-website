@@ -27,7 +27,7 @@ module.exports = (ctx) => {
      Bewust GEEN zoekvragen, bezoekersaantallen of conversie: die horen bij een
      leverancierdashboard en dat is een eigen beslissing met een eigen
      privacyvraag. Dit toont alleen wat er van deze zaak zelf al bekend is. */
-  function voorZaak(code) {
+  function spiegelVanZaak(code) {
     const s = (ctx.db.data.suppliers || []).find(x => x.code === String(code || ''));
     if (!s) return { status: 404, error: 'Zaak niet gevonden.' };
     const { aanbod } = aanbodAlles();
@@ -64,5 +64,5 @@ module.exports = (ctx) => {
     };
   }
 
-  return { mallVoorZaak: voorZaak };
+  return { mallVoorZaak: spiegelVanZaak };
 };

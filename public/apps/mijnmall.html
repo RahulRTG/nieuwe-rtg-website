@@ -48,6 +48,20 @@
     padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;z-index:30;}
   .inlog{max-width:420px;margin:4rem auto;text-align:center;padding:0 1.2rem;}
   .inlog a{color:var(--gold);border-bottom:1px solid var(--gold);}
+  /* Vervangen style="..."-attributen. Ze staan hier als klasse omdat de CSP
+     style-src-attr pas dicht kan als public/ er geen meer heeft; NORM.json telt
+     ze en dat getal mag alleen omlaag. Zelfde maten als de attributen hadden. */
+  .lees{max-width:62ch;}
+  .groei{flex:1;min-width:12rem;}
+  .groei-breed{flex:1;min-width:14rem;}
+  .smal{max-width:10rem;}
+  .smaller{max-width:8rem;}
+  .duw{flex:1;}
+  .strak{margin-top:0;}
+  .ruim{margin-top:.5rem;}
+  .ruimer{margin-top:.6rem;}
+  .ruimst{margin-top:1rem;}
+  .goed{color:var(--green);}
   @media (prefers-reduced-motion: reduce){*{transition:none !important;}}
 </style>
 <link href="/shared/ios.css" rel="stylesheet">
@@ -58,27 +72,27 @@
   <div><div class="ey">Alleen voor leden</div><h1>Mijn Mall</h1></div>
 </header>
 <main id="main">
-  <p class="oms" style="max-width:62ch;">Wat je bewaarde, de reizen die je aan het bouwen bent, en de vragen die je in de Mall hebt uitgezet. Er wordt hier niets afgerekend: elke regel gaat naar de partij die hem levert.</p>
+  <p class="oms lees">Wat je bewaarde, de reizen die je aan het bouwen bent, en de vragen die je in de Mall hebt uitgezet. Er wordt hier niets afgerekend: elke regel gaat naar de partij die hem levert.</p>
 
   <div class="deel">Lijsten en reizen</div>
   <div class="rij">
-    <input id="nieuwNaam" class="veld" placeholder="Naam van een nieuwe lijst" maxlength="60" style="flex:1;min-width:12rem;">
+    <input id="nieuwNaam" class="veld groei" placeholder="Naam van een nieuwe lijst" maxlength="60">
     <button class="knop stil" id="nieuwLijst" type="button">Lijst</button>
     <button class="knop stil" id="nieuwReis" type="button">Reismand</button>
   </div>
   <div id="lijsten"></div>
 
   <div class="deel">Mijn aanvragen</div>
-  <p class="oms" style="max-width:62ch;">Vind je iets niet, plaats dan je vraag. Zaken die hem kunnen bedienen reageren; jij kiest. Kiezen boekt en betaalt niets.</p>
+  <p class="oms lees">Vind je iets niet, plaats dan je vraag. Zaken die hem kunnen bedienen reageren; jij kiest. Kiezen boekt en betaalt niets.</p>
   <div class="kaart">
     <div class="rij">
-      <input id="aWat" class="veld" placeholder="Wat zoek je? Bijvoorbeeld: fotograaf voor vier uur" maxlength="300" style="flex:1;min-width:14rem;">
+      <input id="aWat" class="veld groei-breed" placeholder="Wat zoek je? Bijvoorbeeld: fotograaf voor vier uur" maxlength="300">
     </div>
     <div class="rij">
       <select id="aVerdieping" class="veld" aria-label="Waar hoort dit bij"><option value="">Waar hoort dit bij?</option></select>
-      <input id="aPlek" class="veld" placeholder="Plaats" maxlength="40" style="max-width:10rem;">
+      <input id="aPlek" class="veld smal" placeholder="Plaats" maxlength="40">
       <input id="aWanneer" class="veld" type="date" aria-label="Wanneer">
-      <input id="aBudget" class="veld" type="number" min="0" placeholder="Budget" style="max-width:8rem;" aria-label="Budget in euro">
+      <input id="aBudget" class="veld smaller" type="number" min="0" placeholder="Budget" aria-label="Budget in euro">
       <button class="knop" id="aPlaats" type="button">Plaatsen</button>
     </div>
   </div>

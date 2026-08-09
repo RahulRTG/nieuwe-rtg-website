@@ -81,7 +81,7 @@ module.exports = (ctx, hulp) => {
 
   /* De zichtbare pagina verrijken. Krijgt hoogstens een pagina aan aanbod en
      vult daar het eerstvolgende vrije moment in. */
-  function verrijk(items, periode) {
+  function verrijkPagina(items, periode) {
     const zaken = new Map((db.data.suppliers || []).map(s => [s.code, s]));
     const agenda = (a) => a.type === 'dienst' || a.type === 'offerte' || a.type === 'eten';
     return items.map(a => {
@@ -102,5 +102,5 @@ module.exports = (ctx, hulp) => {
     });
   }
 
-  return { eerstVrij, eersteTafel, verrijk };
+  return { eerstVrij, eersteTafel, verrijk: verrijkPagina };
 };

@@ -58,12 +58,12 @@ async function teken() {
         ' &middot; ' + a.aantalReacties + (a.aantalReacties === 1 ? ' reactie' : ' reacties') + '</div>' +
       (mijn ? '<div class="mijn"><div class="oms">' + esc(mijn.tekst) + '</div>' +
         (mijn.prijs ? '<div class="meta">' + euro(mijn.prijs) + '</div>' : '') +
-        (mijn.gekozen ? '<div class="meta" style="color:var(--green);">Gekozen. Het lid verwacht dat u contact opneemt.</div>'
+        (mijn.gekozen ? '<div class="meta goed">Gekozen. Het lid verwacht dat u contact opneemt.</div>'
           : '<div class="meta">Uw reactie staat er; u kunt hem hieronder wijzigen.</div>') + '</div>' : '') +
       '<div class="rij">' +
-        '<input class="veld tekst" data-id="' + esc(a.id) + '" style="flex:1;min-width:12rem;" maxlength="400" ' +
+        '<input class="veld tekst groei" data-id="' + esc(a.id) + '" maxlength="400" ' +
           'placeholder="Wat kunt u bieden?" value="' + esc(mijn ? mijn.tekst : '') + '">' +
-        '<input class="veld prijs" data-id="' + esc(a.id) + '" type="number" min="0" style="max-width:8rem;" ' +
+        '<input class="veld prijs smaller" data-id="' + esc(a.id) + '" type="number" min="0" ' +
           'placeholder="Prijs" value="' + (mijn && mijn.prijs ? mijn.prijs : '') + '" aria-label="Prijs in euro">' +
         '<button class="knop reageer" data-id="' + esc(a.id) + '" type="button">' + (mijn ? 'Bijwerken' : 'Reageren') + '</button>' +
       '</div>' +
@@ -81,8 +81,8 @@ async function teken() {
 
 if (!TOKEN) {
   $('#main').innerHTML = '<div class="inlog"><h2>Log eerst in</h2>' +
-    '<p class="oms" style="margin-top:.6rem;">Dit scherm is voor aangesloten zaken. Log in op het leveranciersportaal.</p>' +
-    '<p style="margin-top:1rem;"><a href="/apps/leverancier.html">Naar het portaal &rarr;</a></p></div>';
+    '<p class="oms ruimer">Dit scherm is voor aangesloten zaken. Log in op het leveranciersportaal.</p>' +
+    '<p class="ruimst"><a href="/apps/leverancier.html">Naar het portaal &rarr;</a></p></div>';
 } else {
   teken();
 }

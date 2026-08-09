@@ -78,7 +78,7 @@ module.exports = (ctx) => {
   /* Noteren. Wordt alleen aangeroepen vanuit een ECHTE zoekopdracht van een
      mens (de route zet `noteer`), nooit vanuit een interne aanroep -- anders
      telt de Mall zijn eigen verkeer mee en wijst het vraagbeeld naar binnen. */
-  function noteer({ woorden, verdieping, plek, treffers }) {
+  function noteerVraag({ woorden, verdieping, plek, treffers }) {
     const lijst = (woorden || []).filter(telbaar).slice(0, MAX_WOORDEN);
     if (!lijst.length) return { ok: true, geteld: 0 };
     const v = bak();
@@ -134,7 +134,7 @@ module.exports = (ctx) => {
   /* Wat een zaak te zien krijgt: de woorden uit haar eigen vak en haar eigen
      plaats, boven de drempel. Geen bezoekersaantallen en geen conversie -- dit
      zegt wat mensen zochten, niet wat zij deden. */
-  function voorZaak(s) {
+  function vraagVoorZaak(s) {
     const { GENRE_VERDIEPING } = require('./aanbodvorm');
     const mijnVak = GENRE_VERDIEPING[s.type] || null;
     const mijnPlek = ctx.plek.plekVan({ stad: s.city, land: s.country }).slug;
@@ -175,7 +175,7 @@ module.exports = (ctx) => {
     };
   }
 
-  const api = { noteer, tekorten, voorZaak, kansen, opgeteld, DREMPEL, WEKEN };
+  const api = { noteer: noteerVraag, tekorten, voorZaak: vraagVoorZaak, kansen, opgeteld, DREMPEL, WEKEN };
   ctx.vraagbeeld = api;
   return { mallVraagbeeld: api };
 };

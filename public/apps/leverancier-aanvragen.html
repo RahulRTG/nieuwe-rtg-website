@@ -38,6 +38,20 @@
     padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;z-index:30;}
   .inlog{max-width:420px;margin:4rem auto;text-align:center;padding:0 1.2rem;}
   .inlog a{color:var(--gold);border-bottom:1px solid var(--gold);}
+  /* Vervangen style="..."-attributen. Ze staan hier als klasse omdat de CSP
+     style-src-attr pas dicht kan als public/ er geen meer heeft; NORM.json telt
+     ze en dat getal mag alleen omlaag. Zelfde maten als de attributen hadden. */
+  .lees{max-width:62ch;}
+  .groei{flex:1;min-width:12rem;}
+  .groei-breed{flex:1;min-width:14rem;}
+  .smal{max-width:10rem;}
+  .smaller{max-width:8rem;}
+  .duw{flex:1;}
+  .strak{margin-top:0;}
+  .ruim{margin-top:.5rem;}
+  .ruimer{margin-top:.6rem;}
+  .ruimst{margin-top:1rem;}
+  .goed{color:var(--green);}
   @media (prefers-reduced-motion: reduce){*{transition:none !important;}}
 </style>
 <link href="/shared/ios.css" rel="stylesheet">
@@ -48,7 +62,7 @@
   <div><div class="ey">Uit de Mall</div><h1>Aanvragen</h1></div>
 </header>
 <main id="main">
-  <p class="oms" id="uitleg" style="max-width:62ch;">Leden die iets zoeken en het niet vinden, plaatsen hier hun vraag. U ziet alleen wat bij uw vak en uw werkgebied past.</p>
+  <p class="oms lees" id="uitleg">Leden die iets zoeken en het niet vinden, plaatsen hier hun vraag. U ziet alleen wat bij uw vak en uw werkgebied past.</p>
   <div id="lijst"></div>
 </main>
 <div class="melding" id="melding" role="status"></div>

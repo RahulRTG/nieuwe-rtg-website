@@ -51,11 +51,11 @@ async function tekenLijsten() {
   if (!d.lijsten.length) { $('#lijsten').innerHTML = '<div class="leeg">Nog niets bewaard. Druk in de Mall op Bewaren bij iets dat je wilt onthouden.</div>'; return; }
   $('#lijsten').innerHTML = d.lijsten.map((l) =>
     '<div class="kaart" data-lijst="' + esc(l.id) + '">' +
-      '<div class="rij" style="margin-top:0;">' +
+      '<div class="rij strak">' +
         '<h3>' + esc(l.naam) + '</h3>' +
         '<span class="meta">' + (l.soort === 'reis' ? 'reis' : 'lijst') + ' &middot; ' + l.aantal + '</span>' +
         (l.plek ? '<span class="meta">' + esc(l.plek) + (l.van ? ' &middot; ' + esc(l.van) + ' t/m ' + esc(l.tot || '') : '') + '</span>' : '') +
-        '<span style="flex:1;"></span>' +
+        '<span class="duw"></span>' +
         '<button class="knop stil open" data-id="' + esc(l.id) + '" type="button">' + (OPEN.has(l.id) ? 'Inklappen' : 'Openen') + '</button>' +
         (l.soort === 'reis' ? '<a class="knop stil" href="/apps/mall.html?lijst=' + encodeURIComponent(l.id) + '">Zoeken voor deze reis</a>' : '') +
         '<button class="knop stil weg" data-id="' + esc(l.id) + '" type="button">Verwijder</button>' +
@@ -85,7 +85,7 @@ async function tekenInhoud(id) {
   if (d.reis) {
     html += '<div class="vakjes">' + d.reis.onderdelen.map((o) =>
       '<span class="vak' + (o.heeft ? ' heeft' : '') + '">' + (o.heeft ? '&#10003; ' : '') + esc(o.label) + '</span>').join('') + '</div>' +
-      '<p class="meta" style="margin-top:.5rem;">' + esc(d.reis.opmerking) + '</p>';
+      '<p class="meta ruim">' + esc(d.reis.opmerking) + '</p>';
   }
   html += l.regels.map((r) => {
     if (r.vervallen) {
@@ -163,8 +163,8 @@ async function plaatsAanvraag() {
 window.addEventListener('DOMContentLoaded', () => {
   if (!TOKEN) {
     $('#main').innerHTML = '<div class="inlog"><h2>Log eerst in</h2>' +
-      '<p class="oms" style="margin-top:.6rem;">Mijn Mall is er voor leden. Open de app en log in met je RTG-account.</p>' +
-      '<p style="margin-top:1rem;"><a href="/apps/app.html">Naar de app &rarr;</a></p></div>';
+      '<p class="oms ruimer">Mijn Mall is er voor leden. Open de app en log in met je RTG-account.</p>' +
+      '<p class="ruimst"><a href="/apps/app.html">Naar de app &rarr;</a></p></div>';
     return;
   }
   start();

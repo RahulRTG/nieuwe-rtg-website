@@ -16,9 +16,9 @@ async function tekenAanvragen() {
   if (!d.aanvragen.length) { $('#aanvragen').innerHTML = '<div class="leeg">Nog geen aanvragen uitgezet.</div>'; return; }
   $('#aanvragen').innerHTML = d.aanvragen.map((a) =>
     '<div class="kaart">' +
-      '<div class="rij" style="margin-top:0;"><h3>' + esc(a.wat) + '</h3>' +
+      '<div class="rij strak"><h3>' + esc(a.wat) + '</h3>' +
         '<span class="meta">' + esc(a.status) + ' &middot; ' + esc(a.plek || '') + (a.wanneer ? ' &middot; ' + esc(a.wanneer) : '') + '</span>' +
-        '<span style="flex:1;"></span>' +
+        '<span class="duw"></span>' +
         (a.status === 'open' ? '<button class="knop stil sluit" data-id="' + esc(a.id) + '" type="button">Sluiten</button>' : '') +
       '</div>' +
       (a.budget ? '<div class="meta">budget ' + euro(a.budget) + '</div>' : '') +
@@ -27,11 +27,11 @@ async function tekenAanvragen() {
             '<div class="regel"><div><b>' + esc(r.zaak) + '</b>' +
             '<div class="oms">' + esc(r.tekst) + '</div>' +
             (r.prijs ? '<div class="meta">' + euro(r.prijs) + '</div>' : '') +
-            (r.gekozen ? '<div class="meta" style="color:var(--green);">Gekozen; de zaak neemt contact op. Er is nog niets geboekt of betaald.</div>' : '') +
+            (r.gekozen ? '<div class="meta goed">Gekozen; de zaak neemt contact op. Er is nog niets geboekt of betaald.</div>' : '') +
             '</div><div class="op">' +
             (a.status === 'open' ? '<button class="knop kies" data-id="' + esc(a.id) + '" data-code="' + esc(r.code) + '" type="button">Kiezen</button>' : '') +
             '</div></div>').join('')
-        : '<div class="meta" style="margin-top:.5rem;">Nog geen reacties. Zaken in dit vak en deze plaats zien uw vraag.</div>') +
+        : '<div class="meta ruim">Nog geen reacties. Zaken in dit vak en deze plaats zien uw vraag.</div>') +
     '</div>').join('');
 
   $('#aanvragen').querySelectorAll('.sluit').forEach((b) => b.addEventListener('click', async () => {

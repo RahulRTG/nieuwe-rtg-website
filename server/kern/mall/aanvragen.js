@@ -46,7 +46,7 @@ module.exports = (ctx) => {
   /* Een lid plaatst een vraag. De verdieping bepaalt wie hem ziet; zonder
      verdieping zou elke zaak alles krijgen en is het scherm binnen een week
      een prullenbak die niemand meer opent. */
-  function plaats(key, codename, data) {
+  function plaatsAanvraag(key, codename, data) {
     data = data || {};
     const lijst = bak();
     const mijnOpen = lijst.filter(a => a.key === key && open(a)).length;
@@ -69,11 +69,11 @@ module.exports = (ctx) => {
     lijst.unshift(a);
     db.data.mallAanvragen = lijst.slice(0, 5000);
     save();
-    return { ok: true, aanvraag: publiek(a, true) };
+    return { ok: true, aanvraag: publiekeAanvraag(a, true) };
   }
 
   // de vorm voor het lid (eigen) of voor een zaak (zonder de sleutel van het lid)
-  function publiek(a, eigen) {
+  function publiekeAanvraag(a, eigen) {
     return {
       id: a.id, wat: a.wat, verdieping: a.verdieping,
       plek: a.plek.stad, wanneer: a.wanneer, budget: a.budget,
@@ -89,7 +89,7 @@ module.exports = (ctx) => {
   }
 
   function mijn(key) {
-    return { ok: true, aanvragen: bak().filter(a => a.key === key).slice(0, 50).map(a => publiek(a, true)) };
+    return { ok: true, aanvragen: bak().filter(a => a.key === key).slice(0, 50).map(a => publiekeAanvraag(a, true)) };
   }
 
   function sluit(key, id) {
@@ -97,7 +97,7 @@ module.exports = (ctx) => {
     if (!a) return { status: 404, error: 'Aanvraag niet gevonden.' };
     a.status = 'gesloten';
     save();
-    return { ok: true, aanvraag: publiek(a, true) };
+    return { ok: true, aanvraag: publiekeAanvraag(a, true) };
   }
 
   /* Het lid kiest een reactie. Er wordt NIETS geboekt en niets betaald: de zaak
@@ -112,13 +112,13 @@ module.exports = (ctx) => {
     a.reacties.forEach(x => { x.gekozen = x.code === r.code; });
     a.status = 'gegund';
     save();
-    return { ok: true, aanvraag: publiek(a, true),
+    return { ok: true, aanvraag: publiekeAanvraag(a, true),
       opmerking: r.zaak + ' krijgt bericht en neemt contact met u op. Er is nog niets geboekt of betaald.' };
   }
 
   /* Wat een zaak te zien krijgt: alleen open aanvragen in haar eigen vak en
      binnen haar servicegebied. Een zaak zonder passend genre ziet er geen. */
-  function voorZaak(s) {
+  function aanvragenVoorZaak(s) {
     const mijnVerdieping = GENRE_VERDIEPING[s.type] || null;
     const bereik = plek.bereikVan(s);
     const mijnPlek = plek.plekVan({ stad: s.city, land: s.country, punt: s.loc });
@@ -132,7 +132,7 @@ module.exports = (ctx) => {
       ok: true,
       verdieping: mijnVerdieping,
       bereik,
-      aanvragen: lijst.slice(0, 50).map(a => publiek(a, false)),
+      aanvragen: lijst.slice(0, 50).map(a => publiekeAanvraag(a, false)),
       aantal: lijst.length,
       opmerking: mijnVerdieping
         ? 'Aanvragen uit ' + (VERDIEPINGEN.find(v => v.id === mijnVerdieping) || {}).label + ' binnen uw werkgebied.'
@@ -142,11 +142,11 @@ module.exports = (ctx) => {
 
   /* Een zaak reageert. Een reactie per zaak per aanvraag: wie zich bedenkt
      wijzigt zijn eigen reactie in plaats van er een tweede naast te zetten. */
-  function reageer(s, id, data) {
+  function reageerOpAanvraag(s, id, data) {
     data = data || {};
     const a = bak().find(x => x.id === String(id || ''));
     if (!a || !open(a)) return { status: 404, error: 'Deze aanvraag staat niet meer open.' };
-    const zicht = voorZaak(s);
+    const zicht = aanvragenVoorZaak(s);
     if (!zicht.aanvragen.some(x => x.id === a.id)) return { status: 403, error: 'Deze aanvraag valt buiten uw vak of werkgebied.' };
     const tekst = schoon(data.tekst, 400);
     if (tekst.length < 3) return { status: 400, error: 'Schrijf kort wat u kunt bieden.' };
@@ -158,7 +158,7 @@ module.exports = (ctx) => {
     if (bestaand) { bestaand.tekst = tekst; bestaand.prijs = prijs; bestaand.at = nu(); }
     else a.reacties.push({ code: s.code, zaak: s.name, tekst, prijs, at: nu(), gekozen: false });
     save();
-    return { ok: true, aanvraag: publiek(a, false) };
+    return { ok: true, aanvraag: publiekeAanvraag(a, false) };
   }
 
   /* Wat er gevraagd wordt en niet geleverd: aanvragen zonder een enkele
@@ -169,7 +169,8 @@ module.exports = (ctx) => {
     return bak().filter(a => open(a) && !(a.reacties || []).length);
   }
 
-  const api = { plaats, mijn, sluit, kies, voorZaak, reageer, onbeantwoord, MAX_OPEN_PER_LID, DAGEN_GELDIG };
+  const api = { plaats: plaatsAanvraag, mijn, sluit, kies, voorZaak: aanvragenVoorZaak,
+    reageer: reageerOpAanvraag, onbeantwoord, MAX_OPEN_PER_LID, DAGEN_GELDIG };
   ctx.aanvragen = api;
   return { mallAanvragen: api };
 };

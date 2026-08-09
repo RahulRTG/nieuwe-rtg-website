@@ -77,7 +77,7 @@ module.exports = (ctx) => {
      aanbieder WEET, en met opzet niets over de kwaliteit van het aanbod --
      "RTG Partner" is een contract, geen keurmerk, en mag dus ook nooit als
      keurmerk worden gepresenteerd (zie de tekst in de Mall zelf). */
-  function status(s) {
+  function verificatieStand(s) {
     if (!s) return null;
     if (s.mall && s.mall.partner) return 'RTG Partner';
     if (s.settings && s.settings.ondernemerOs) return 'RTG Business';
@@ -88,7 +88,7 @@ module.exports = (ctx) => {
   const zichtbareZaken = () => (db.data.suppliers || []).filter(s => s && !verborgen(s));
   const genreLabel = (g) => ((db.data.supplierTypes || {})[g] || {}).label || g;
 
-  const hulp = { aanbod, prijs, getal, tekst, status, zaakPlek, zichtbareZaken, genreLabel, bereikVan, plekVan, RTG_BEREIK };
+  const hulp = { aanbod, prijs, getal, tekst, status: verificatieStand, zaakPlek, zichtbareZaken, genreLabel, bereikVan, plekVan, RTG_BEREIK };
   const zaken = require('./aanbodzaken')(ctx, hulp);
   const breed = require('./aanbodrtg')(ctx, hulp);
 

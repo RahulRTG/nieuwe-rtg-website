@@ -47,6 +47,12 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boeki
   const opr = require('./oprichting')({ save });
   const ek = require('./eersteklant')({ db, ondernemerpoort, boekingenVanZaak, ordersVanZaak });
   const mp = require('./mallprofiel')({ db });
+  /* Het gedeelde klantenboek, hetzelfde dat Vakwerk gebruikt. Twee boeken
+     naast elkaar lopen uiteen (lat-regel 4). */
+  /* `schoon` en niet `scho`: die laatste wordt verderop in dit bestand pas
+     verklaard, en een const lezen voor zijn declaratie gooit. Zelfde functie. */
+  const boek = require('../klantenboek')({ db, save, scho: schoon, boekingenVanZaak, ordersVanZaak });
+  const rel = require('./relaties')({ db, klantenboek: boek.klantenboek, boekingenVanZaak });
 
   const bak = () => {
     if (!Array.isArray(db.data.ondernemingen)) db.data.ondernemingen = [];
@@ -182,9 +188,11 @@ module.exports = ({ db, save, crypto, schoon, findSupplier, ordersVanZaak, boeki
        heeft hem toch al, en twee keer rekenen kan twee antwoorden geven op
        dezelfde vraag. */
     ondernemingDagbeeld: (o) => dag.dagbeeld(o, ondernemingBeeld(o), ondernemingVerkenning(o),
-      opr.oprichtingsproject(o), ek.eersteKlant(o), mp.ondernemingMallProfiel(o)),
+      opr.oprichtingsproject(o), ek.eersteKlant(o), mp.ondernemingMallProfiel(o), rel.relaties(o)),
     ondernemingEersteKlant: ek.eersteKlant,
     ondernemingMallProfiel: mp.ondernemingMallProfiel,
+    ondernemingRelaties: rel.relaties,
+    ondernemingKlantNotitie: boek.klantNotitie,
     ondernemingOprichting: opr.oprichtingsproject,
     ondernemingOprichtingZet: opr.oprichtingZet,
     ondernemingAanvraag,

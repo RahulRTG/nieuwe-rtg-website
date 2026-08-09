@@ -154,7 +154,7 @@ function toonLeeg(){
 function teken(){
   const o=ONDS.find(x=>x.id===HUIDIG)||{};
   zetTitel(DAG.naam||'Mijn onderneming');
-  $('#hoofd').innerHTML=[vakGroet(),vakGezond(),vakActies(),vakIntake(),vakKans(),vakSimulatie(),vakStress(),vakPlan(o),vakRechtsvorm(o),vakOprichting(),vakZaak(o),vakEersteKlant(),vakMall()].join('');
+  $('#hoofd').innerHTML=[vakGroet(),vakGezond(),vakActies(),vakIntake(),vakKans(),vakSimulatie(),vakStress(),vakPlan(o),vakRechtsvorm(o),vakOprichting(),vakZaak(o),vakEersteKlant(),vakMall(),vakRelaties()].join('');
   haakKnoppen();
 }
 
@@ -377,6 +377,27 @@ function vakMall(){
     '<p class="subtxt" style="margin-top:.3rem;">Leden komen u tegen op <code>'+esc(m.pagina)+'</code>.</p>'+
     '<div style="margin-top:.9rem;">'+rij+'</div>'+
     '<p class="subtxt" style="margin-top:.9rem;">'+esc(m.voorbehoud)+'</p></div>';
+}
+
+
+function vakRelaties(){
+  const r=DAG&&DAG.relaties;
+  if(!r) return '';
+  const seg=Object.entries(r.segmenten).map(([k,v])=>
+    '<div class="cijfer"><div class="lbl">'+esc(k)+'</div><div class="wrd">'+v.aantal+'</div>'+
+    '<div class="eh">'+esc(v.uitleg)+'</div></div>').join('');
+  const opv=(r.opvolging||[]).map(v=>'<div class="actie"><div class="kop">'+esc(v.kop)+'</div>'+
+    '<div class="waarom">'+esc(v.waarom)+'</div></div>').join('');
+  const top=(r.top||[]).slice(0,8).map(k=>'<div class="bron"><span><strong>'+esc(k.codenaam)+'</strong>'+
+    (k.notitie?'<br><span class="bu">'+esc(k.notitie)+'</span>':'')+'</span>'+
+    '<span>'+k.aantal+'x &middot; '+euro(k.omzet)+'</span></div>').join('');
+  return '<div class="vak"><h2>Uw klanten</h2>'+
+    '<p class="subtxt">'+r.totaal+' klant'+(r.totaal===1?'':'en')+
+    (r.herhaalaandeel===null?'':', '+r.herhaalaandeel+'% kwam terug')+'.</p>'+
+    '<div class="cijfers" style="margin-top:.8rem;">'+seg+'</div>'+
+    (opv?'<div style="margin-top:1rem;"><p class="subtxt" style="margin-bottom:.2rem;"><strong>Opvolgen</strong></p>'+opv+'</div>':'')+
+    (top?'<div style="margin-top:1rem;"><p class="subtxt" style="margin-bottom:.2rem;">Op codenaam:</p>'+top+'</div>':'')+
+    '<p class="subtxt" style="margin-top:.9rem;">'+esc(r.voorbehoud)+'</p></div>';
 }
 
 /* ---------- handelingen ---------- */

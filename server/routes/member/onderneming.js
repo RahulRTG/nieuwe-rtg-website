@@ -18,7 +18,8 @@ module.exports = (kern) => {
     ondernemingIngeschreven, ondernemingIntakeZet, ondernemingIntakeBeeld,
     ondernemingVerkenning, ondernemingPlanVastleggen, ondernemingDagbeeld,
     ondernemingOprichting, ondernemingOprichtingZet, ondernemingAanvraag,
-    ondernemingAanvraagStand, ondernemingEersteKlant, ondernemingMallProfiel } = kern;
+    ondernemingAanvraagStand, ondernemingEersteKlant, ondernemingMallProfiel, ondernemingRelaties,
+    ondernemingKlantNotitie } = kern;
 
   /* `status` betekent in dit huis de HTTP-code, maar een kernmodule kan een
      domeinstand in datzelfde veld zetten ('geen-aanvraag'). Dat gebeurde hier
@@ -122,6 +123,21 @@ module.exports = (kern) => {
     const o = mijn(req);
     if (!o) return stuur(res, nietGevonden);
     res.json({ ok: true, mall: ondernemingMallProfiel(o) });
+  });
+
+  /* Het klantenboek en de opvolging. Alles op codenaam: dit boek kent geen
+     echte namen, en dat is het ontwerp en geen tekortkoming. */
+  app.post('/api/onderneming/relaties', auth, (req, res) => {
+    const o = mijn(req);
+    if (!o) return stuur(res, nietGevonden);
+    res.json({ ok: true, relaties: ondernemingRelaties(o) });
+  });
+
+  app.post('/api/onderneming/relaties/notitie', auth, (req, res) => {
+    const o = mijn(req);
+    if (!o) return stuur(res, nietGevonden);
+    if (!o.supplierCode) return stuur(res, { status: 409, error: 'Er is nog geen zaak gekoppeld.' });
+    stuur(res, ondernemingKlantNotitie(o.supplierCode, req.body || {}));
   });
 
   /* ---- de zaak aanvragen ----

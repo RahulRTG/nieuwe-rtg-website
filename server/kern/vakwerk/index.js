@@ -15,7 +15,7 @@
 
 const { VAK_GENRES } = require('./genres');
 
-function maakVakwerk({ db, save, anthropic, findSupplier, boekingenVanZaak, schoon,
+function maakVakwerk({ db, save, anthropic, findSupplier, boekingenVanZaak, ordersVanZaak, schoon,
   crypto, notify, notifySupplier, sseToCustomer, sseToSupplier, boekingenVoegToe }) {
   const scho = schoon || ((v, n) => String(v == null ? '' : v).trim().slice(0, n || 200));
   const vandaagStr = () => new Date().toISOString().slice(0, 10);
@@ -23,7 +23,8 @@ function maakVakwerk({ db, save, anthropic, findSupplier, boekingenVanZaak, scho
   const datumVan = b => (b.wanneer ? String(b.wanneer).slice(0, 10) : null);
   const tijdVan = b => (b.wanneer && String(b.wanneer).length > 10 ? String(b.wanneer).slice(11, 16) : null);
   // de dag waarop de omzet valt: betaald -> betaaldatum, anders de aanmaakdatum
-  const geldDag = b => String(b.paidAt || b.finishedAt || b.at || '').slice(0, 10);
+  // dezelfde definitie als het gedeelde klantenboek; niet twee keer opschrijven
+  const geldDag = require('../klantenboek').geldDag;
 
   function genreVan(s) { return s ? VAK_GENRES[s.type] : null; }
   function isVak(s) { return !!genreVan(s); }
@@ -109,7 +110,7 @@ function maakVakwerk({ db, save, anthropic, findSupplier, boekingenVanZaak, scho
   }
 
   // de gedeelde ctx voor de deelbestanden
-  const ctx = { db, save, anthropic, findSupplier, boekingenVanZaak, scho, vandaagStr, rond,
+  const ctx = { db, save, anthropic, findSupplier, boekingenVanZaak, ordersVanZaak, scho, vandaagStr, rond,
     datumVan, tijdVan, geldDag, genreVan, isVak, geldigeTijd, naarMin, naarTijd, publiek, bord, VAK_GENRES,
     crypto, notify, notifySupplier, sseToCustomer, sseToSupplier, boekingenVoegToe };
   const api = { GENRES: VAK_GENRES, isVak, bord };

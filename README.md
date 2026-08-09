@@ -1383,6 +1383,51 @@ cap hangen, een eigen paginakaart naast die van de Mall zetten, het profiel over
 zichtbaarheid laten beslissen, en de Mall-actie boven de etalage-check laten
 kruipen.
 
+### Het klantenboek en de relaties (het CRM)
+
+`server/kern/klantenboek.js` + `server/kern/onderneming/relaties.js` +
+`/api/onderneming/relaties{,/notitie}`.
+
+**Er is nu één klantenboek.** Het stond in `kern/vakwerk/pro2.js` en gold alleen
+voor de vakgenres, terwijl de vraag "wie zijn mijn klanten" niet aan een genre
+hangt: een restaurant, een winkel en een hotel hadden er geen. Het staat nu in
+`kern/klantenboek.js` en Vakwerk gebruikt diezelfde -- twee boeken naast elkaar
+lopen uiteen. Twee dingen zijn bewust zo gebleven: de opslagsleutel blijft
+`vakKlantNotities` (een mooiere naam is geen reden om data te verhuizen; een
+migratie die niets oplost is puur risico), en het draait op **codenaam**. Dat
+laatste is geen tekortkoming maar het ontwerp, en een CRM is precies de plek waar
+die regel anders stilletjes zou sneuvelen. Wat er wél veranderde: **bonnen tellen
+mee**. Wie bij dezelfde zaak at maar niet boekte, bestond in het oude boek niet.
+
+**Er komen geen leads en prospects bij, en dat is een keuze.** Een echte
+CRM-pijplijn begint bij een lead, maar binnen RTG bestaat geen enkel proces dat
+leads *produceert*: niemand importeert een lijst, geen formulier maakt een
+prospect. Zo'n register zou hier een lege tabel zijn die alleen met de hand te
+vullen is -- precies het soort register dat na twee weken niemand bijhoudt en
+daarna verkeerde cijfers geeft. Wat er wél is, is echt: transacties,
+offerte-aanvragen en boekingen die op antwoord wachten. Komt er ooit een echte
+leadbron, dan past die hier gewoon bij.
+
+**De segmenten zijn geteld, niet geraden**: nieuw (kocht een keer), terugkerend,
+en stilgevallen (kocht vaker, maar is 120+ dagen weg). Geen AI-oordeel, want dan
+hangt de indeling af van een sleutel die er niet altijd is en verschuift zij
+zonder dat er iets gebeurd is. Een **eenmalige** klant die lang wegblijft geldt
+niet als stilgevallen: daar is stilte normaal, en dat verwijt slaat nergens op.
+
+**De opvolging rust op wat er echt staat** -- openstaande aanvragen, offertes
+zonder prijs (met apart wie er langer dan zeven dagen ligt), en vaste klanten die
+stil vielen. Geen enkele regel is een herinnering die wij verzonnen: een rustige
+zaak krijgt een lege lijst, want niets te doen is ook een uitkomst.
+
+In het dagbeeld gaat de opvolging vóór de Mall-pagina (geld binnen handbereik gaat
+voor een mooiere pagina), en de oude losse "aanvragen"-actie valt weg zodra de
+opvolging hem al noemt -- twee keer hetzelfde vragen leest als een storing.
+
+Getoetst in `test/onderneming-relaties.test.js` (12). Vijf mutaties, alle vijf
+raak: bonnen niet meetellen, een wachtende boeking als klant tellen, eenmalige
+klanten als stilgevallen bestempelen, offertes van andere zaken meetellen, en de
+losse aanvragen-actie er tóch dubbel bij laten komen.
+
 ### RTG Werk OS (de werkplek van een organisatie)
 
 `server/bedrijf/` + `/api/bedrijf/...` + `/apps/werk.html`. Een **werkruimte**

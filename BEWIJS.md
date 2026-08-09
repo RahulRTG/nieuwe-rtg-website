@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 724 bestanden en 4153 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 725 bestanden en 4165 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 724 |
-| losse beweringen (`test(...)`) | 4153 |
+| toetsbestanden | 725 |
+| losse beweringen (`test(...)`) | 4165 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 521 |
 | **overleefd**: geen mutatie kreeg hem rood | 12 |
 | niet te meten (al rood, geen module gevonden, ...) | 16 |
 | alleen in de kop *genoemd*, nog niet gemeten | 26 |
-| niets van beide | 149 |
+| niets van beide | 150 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-636 bestanden, 3992 beweringen.
+637 bestanden, 4004 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -369,6 +369,7 @@ toets omvalt.
 | `onderneming-eersteklant.test.js` | 16 | -- | Ronde: de eerste klant, en de honderd daarna. Drie beweringen die hier het zwaarst wegen: 1. |
 | `onderneming-mallprofiel.test.js` | 10 | -- | Ronde: het Mall-profiel -- hoe de pagina van een zaak is opgebouwd. Drie beweringen: 1. |
 | `onderneming-oprichting.test.js` | 14 | -- | Ronde: het oprichtingsproject en de aanvraag van de zaak -- het laatste stuk van de reis, van vastgelegd plan naar draaiende onderneming. De twee beweringen die hier het zwaarst wegen: 1. |
+| `onderneming-relaties.test.js` | 12 | -- | Ronde: het klantenboek en de relaties -- het CRM van het Ondernemers-OS. Vier beweringen: 1. |
 | `onderneming-verkenning.test.js` | 20 | genoemd | Ronde: de pre-oprichtingsfase -- intake, kansverkenning, simulatie, stress test en het ondernemingsplan. De zwaartepunten liggen op de twee plekken waar dit soort software liegt: 1. |
 | `onderneming.test.js` | 22 | genoemd | Ronde: het Ondernemers-OS -- de drie assen van één bedrijfsobject. 1. |
 | `onderwijs.test.js` | 3 | gezakt op `liegpoort /api/` | RTG School golf 1: de officiële ladder, het leerpaspoort dat een leven lang meegaat, de doorstroomkaart die rare sprongen tegenhoudt, en de eerlijkheid (geen accreditatieclaims, geen echte namen in het dossier). |

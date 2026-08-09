@@ -6,39 +6,14 @@
    beurt zijn op het bord; een herinnering is een bewuste knop van de zaak,
    hooguit eens per 30 dagen -- nooit automatische spam. */
 module.exports = (ctx) => {
-  const { db, save, findSupplier, boekingenVanZaak, scho, notify, sseToCustomer, geldDag } = ctx;
+  const { db, save, findSupplier, boekingenVanZaak, ordersVanZaak, scho, notify, sseToCustomer, geldDag } = ctx;
   const nu = () => new Date().toISOString();
-  const nots = code => {
-    if (!db.data.vakKlantNotities || typeof db.data.vakKlantNotities !== 'object') db.data.vakKlantNotities = {};
-    return db.data.vakKlantNotities[code] = db.data.vakKlantNotities[code] || {};
-  };
-
-  /* ---- het klantenboek: per codenaam de historie en de eigen notitie ---- */
-  function klantenboek(code) {
-    const per = new Map();
-    for (const b of (boekingenVanZaak(code) || [])) {
-      if (b.status === 'wacht-op-betaling' || !b.customerCodename) continue;
-      const k = per.get(b.customerCodename) || { codenaam: b.customerCodename, aantal: 0, omzet: 0, laatste: null };
-      k.aantal++;
-      if (b.paid) k.omzet = Math.round((k.omzet + (b.price || 0)) * 100) / 100;
-      const dag = geldDag(b);
-      if (!k.laatste || dag > k.laatste) k.laatste = dag;
-      per.set(b.customerCodename, k);
-    }
-    const n = nots(code);
-    return [...per.values()]
-      .map(k => ({ ...k, notitie: n[k.codenaam] || null }))
-      .sort((a, b) => (b.omzet - a.omzet) || (b.aantal - a.aantal));
-  }
-  function klantNotitie(code, body) {
-    const codenaam = scho((body || {}).codenaam, 60);
-    if (!codenaam) return { status: 400, error: 'Voor welke klant is de notitie?' };
-    const tekst = scho((body || {}).tekst, 200);
-    const n = nots(code);
-    if (tekst) n[codenaam] = tekst; else delete n[codenaam];
-    save();
-    return { status: 200, ok: true };
-  }
+  /* Het klantenboek staat in kern/klantenboek.js: de vraag "wie zijn mijn
+     klanten" hangt niet aan een genre, en twee boeken naast elkaar lopen
+     uiteen (lat-regel 4). Vakwerk houdt er dus geen eigen meer op na. */
+  const boek = require('../klantenboek')({ db, save, scho, boekingenVanZaak, ordersVanZaak });
+  const klantenboek = boek.klantenboek;
+  const klantNotitie = boek.klantNotitie;
 
   /* ---- de digitale werkbon: een afgeronde klus netjes afsluiten ---- */
   function werkbonOpen(code) {

@@ -173,7 +173,10 @@ test('een draaiende zaak levert wél cijfers en wél een gezondheidsscore', () =
 
   assert.ok(typeof d.gezondheid.score === 'number', 'nu is er wel genoeg om te meten');
   assert.equal(d.gezondheid.grondslag.gemeten, 4);
-  assert.ok(d.acties.some(a => a.id === 'aanvragen'), 'de openstaande aanvraag komt op de lijst');
+  const aanvraagActies = d.acties.filter(a => /aanvragen/.test(a.id));
+  assert.equal(aanvraagActies.length, 1,
+    'de openstaande aanvraag komt op de lijst, en precies een keer -- de opvolging noemt hem al');
+  assert.equal(aanvraagActies[0].id, 'opvolging:aanvragen');
 });
 
 test('zonder betaalde omzet deze maand blijft die bron onmeetbaar, en zakt de score niet naar nul', () => {

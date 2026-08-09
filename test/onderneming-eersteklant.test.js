@@ -230,9 +230,11 @@ test('het dagbeeld zet de eerste-klant-actie boven de losse aanvragen', () => {
   const K = stubKern([zaak]);
   const d = K.ondernemingDagbeeld(ondMet(K, zaak));
   const iEerste = d.acties.findIndex(a => a.id === 'eersteklant');
-  const iAanvraag = d.acties.findIndex(a => a.id === 'aanvragen');
+  const iAanvraag = d.acties.findIndex(a => /aanvragen/.test(a.id));
   assert.ok(iEerste >= 0 && iAanvraag >= 0, 'allebei staan er');
   assert.ok(iEerste < iAanvraag,
     'een zaak die niet online staat krijgt sowieso geen aanvragen; dat gaat dus voor');
+  assert.equal(d.acties.filter(a => /aanvragen/.test(a.id)).length, 1,
+    'en er staat er maar een: twee keer hetzelfde vragen leest als een storing');
   assert.ok(d.eersteklant, 'en het beeld hangt aan het dagbeeld');
 });

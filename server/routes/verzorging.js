@@ -17,6 +17,7 @@ module.exports = (kern) => {
   b('', (code) => beauty.overzicht(code));
   b('/boek', (code, x) => beauty.boek(code, x));
   b('/status', (code, x) => beauty.afspraakStatus(code, x.id, x.status));
+  b('/uren', (code, x) => beauty.uren(code, x));
   b('/walkin', (code, x) => beauty.walkIn(code, x));
   b('/walkin/status', (code, x) => beauty.walkStatus(code, x.id, x.status));
 

@@ -9,9 +9,14 @@
    ziet wat" heet en er drie vergeet, is erger dan geen overzicht: het geeft
    zekerheid die er niet is. Daarom staat hieronder een REGISTER van elke laag
    die toestemming draagt, met per stuk of hij hier staat. Wat niet gedekt is,
-   staat er MET reden bij en gaat als zodanig naar het scherm. En daarom zegt
-   het scherm ook dat dit register met de hand wordt bijgehouden: geen enkele
-   machine merkt op dat er ergens een nieuwe toestemming is bijgekomen.
+   staat er MET reden bij en gaat als zodanig naar het scherm.
+
+   EN ER LET IETS OP. test/consent-dekking.test.js zoekt in server/kern/ naar de
+   vorm van een toestemming (een rij met een `key` en een `status: 'actief'`) en
+   eist dat elke module die hem heeft, hier staat of daar een reden krijgt. Een
+   nieuwe laag zakt dus met naam en toenaam. Wat die scan NIET vindt is een
+   andere vorm -- RTG iD gebruikt een `ingetrokken`-vlag en staat hier omdat een
+   mens hem erin zette. Het gat is kleiner, niet weg, en het scherm zegt dat.
 
    Wat een toets wel bewaakt: dat voor elke gedekte laag de intrekknop echt
    intrekt (heen en terug), en dat het register en wat het scherm toont niet
@@ -110,8 +115,9 @@ module.exports = ({ kern }) => {
 
     return {
       ok: true, toestemmingen: uit, lagen: LAGEN, nietGedekt: NIET_GEDEKT, storingen,
-      voorbehoud: 'Deze lijst wordt met de hand bijgehouden. Komt er ergens in RTG een nieuwe ' +
-        'soort toestemming bij, dan verschijnt hij hier niet vanzelf.'
+      voorbehoud: 'Op deze lijst let een toets mee: een nieuwe toestemming van de bekende soort ' +
+        'valt niet stil buiten dit scherm. Een soort die er anders uitziet nog wel, en dan is dit ' +
+        'register weer mensenwerk.'
     };
   }
 

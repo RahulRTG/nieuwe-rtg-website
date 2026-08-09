@@ -23,6 +23,10 @@ module.exports = ({ db, save, crypto, schoon }) => {
         { id: 'b4', naam: 'Kleuren, heel', soort: 'kapper', duurMin: 90, prijs: 120 },
         { id: 'b5', naam: 'Manicure', soort: 'nagels', duurMin: 45, prijs: 40 }
       ],
+      /* De openingstijden staan bij de salon zelf. Ze stonden als constante in
+         ./beautyleden.js met een briefje erbij dat dat een gat was; dit is dat
+         gat. Elke salon zet ze nu zelf, en de ledenkant leest ze hier. */
+      opening: { van: '09:00', tot: '18:00', stapMin: 30 },
       afspraken: [], wachtrij: [], teller: 0
     };
   }
@@ -33,7 +37,7 @@ module.exports = ({ db, save, crypto, schoon }) => {
     const d = vandaag();
     const vandaagAf = s.afspraken.filter(a => a.datum === d && a.status !== 'weg');
     return {
-      naam: s.naam, stoelen: s.stoelen, behandelingen: s.behandelingen,
+      naam: s.naam, stoelen: s.stoelen, behandelingen: s.behandelingen, opening: s.opening || null,
       afspraken: s.afspraken.filter(a => a.datum >= d && a.status !== 'weg').slice(0, 40),
       wachtrij: s.wachtrij.slice(0, 20),
       kpi: {
@@ -70,6 +74,19 @@ module.exports = ({ db, save, crypto, schoon }) => {
     a.status = statusWens; save();
     return { ok: true, afspraak: a };
   }
+  /* De uren zetten. Een salon die 's avonds open is, hoort dat te kunnen zeggen
+     zonder dat er iemand in de code hoeft. */
+  function beautyUren(code, b) {
+    const s = salonVan(code);
+    const van = String(b.van || ''), tot = String(b.tot || '');
+    if (!TIJD.test(van) || !TIJD.test(tot)) return { status: 400, error: 'Vul een begin- en eindtijd in (uu:mm).' };
+    if (van >= tot) return { status: 400, error: 'De sluitingstijd ligt voor de openingstijd.' };
+    const stapMin = Math.min(120, Math.max(5, Math.round(Number(b.stapMin) || 30)));
+    s.opening = { van, tot, stapMin };
+    save();
+    return { ok: true, opening: s.opening };
+  }
+
   function walkIn(code, b) {
     const s = salonVan(code);
     const beh = s.behandelingen.find(x => x.id === String(b.behandelingId || ''));
@@ -94,5 +111,6 @@ module.exports = ({ db, save, crypto, schoon }) => {
   /* salonVan gaat mee naar buiten omdat de ledenkant (./beautyleden.js) op
      DEZELFDE bak moet werken. Een tweede demoSalon zou een tweede waarheid
      over de agenda zijn, en die lopen altijd uiteen. */
-  return { beauty: { overzicht: beautyOverzicht, boek: beautyBoek, afspraakStatus: beautyStatus, walkIn, walkStatus, salonVan } };
+  return { beauty: { overzicht: beautyOverzicht, boek: beautyBoek, afspraakStatus: beautyStatus,
+    uren: beautyUren, walkIn, walkStatus, salonVan } };
 };

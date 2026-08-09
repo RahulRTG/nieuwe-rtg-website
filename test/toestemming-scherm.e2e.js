@@ -77,8 +77,8 @@ test('Toestemming: de lijst toont wie wat mag, en intrekken raakt de bron',
     await openDeel(page, 'Waar deze lijst ophoudt');
     const grenzen = await page.textContent('#grenzen');
     assert.match(grenzen, /Salon|veiligheidskring|boeking/i, 'de uitzonderingen staan er met reden');
-    assert.match(await page.textContent('#voorbehoud'), /met de hand/i,
-      'en er staat bij dat dit register met de hand wordt bijgehouden');
+    assert.match(await page.textContent('#voorbehoud'), /toets mee/i,
+      'en er staat bij dat er iets op de lijst let');
 
     /* 3. intrekken, en dan bij de BRON kijken. */
     await openDeel(page, 'Wat er nu mag');

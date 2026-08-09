@@ -13,11 +13,11 @@
 
 const { TIJD, DATUM } = require('../genrehulp');
 
-/* De salon kent (nog) geen openingstijden in zijn eigen data. Tot die er zijn
-   staat het rooster hier, met dezelfde stap voor elke salon. Dat is een
-   BEKEND gat en geen aanname die zich verstopt: zodra een salon zijn uren zelf
-   zet, hoort dit weg en komt het uit de bak. */
-const DAG_VAN = 9 * 60, DAG_TOT = 18 * 60, STAP = 30;
+/* De openingstijden komen uit de salon zelf (zie ./beauty.js). Hier stond
+   eerder een constante met een briefje erbij dat dat een gat was; dat gat is
+   gedicht. Wat blijft staan is een TERUGVAL voor een salon die er nog geen
+   heeft -- die moet niet onzichtbaar worden, maar gewoon open zijn. */
+const TERUGVAL = { van: '09:00', tot: '18:00', stapMin: 30 };
 
 const alsTijd = m => String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0');
 const alsMin = t => Number(t.slice(0, 2)) * 60 + Number(t.slice(3));
@@ -37,8 +37,10 @@ module.exports = ({ db, save, beauty }) => {
   function vrijeTijden(s, beh, datum) {
     const stoelen = s.stoelen.filter(x => x.soort === beh.soort);
     const bezet = s.afspraken.filter(a => a.datum === datum && a.status !== 'weg');
+    const o = s.opening || TERUGVAL;
+    const van = alsMin(o.van), tot = alsMin(o.tot), stap = o.stapMin || TERUGVAL.stapMin;
     const uit = [];
-    for (let m = DAG_VAN; m + beh.duurMin <= DAG_TOT; m += STAP) {
+    for (let m = van; m + beh.duurMin <= tot; m += stap) {
       const van = alsTijd(m), tot = alsTijd(m + beh.duurMin);
       const vrij = stoelen.find(st => !bezet.some(a => a.stoelId === st.id && van < a.tot && tot > a.van));
       if (vrij) uit.push({ tijd: van, stoelId: vrij.id });
@@ -56,6 +58,7 @@ module.exports = ({ db, save, beauty }) => {
       return {
         code: p.code, naam: s.naam || p.name, waar: (p.loc && p.loc.label) || p.city || null,
         soort: 'verzorging', medisch: false, icon: 'beauty',
+        opening: s.opening || TERUGVAL,
         behandelingen: s.behandelingen.map(b => ({
           id: b.id, naam: b.naam, vak: b.soort, soort: 'cosmetisch',
           duurMin: b.duurMin, prijs: b.prijs,

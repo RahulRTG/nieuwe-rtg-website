@@ -21,6 +21,7 @@ const api = (pad, body, t) => fetch(base + '/api/' + pad, {
   body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 const morgen = () => new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+const overDagen = n => new Date(Date.now() + n * 86400000).toISOString().slice(0, 10);
 
 test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, DEMO_SUPPLIER: 'VELVET' } });
@@ -83,6 +84,34 @@ test('boeken vult de agenda van de salon zelf: het slot is daarna voor iedereen 
   // 2. en het is ook niet alsnog te boeken door er langs het aanbod om te vragen
   const nogmaals = await api('verzorging/boek', { code: salon.code, behandelingId: beh.id, datum, tijd }, lid2);
   assert.equal(nogmaals.status, 409, 'een bezet slot geeft een botsing, geen tweede afspraak');
+});
+
+test('de salon zet zijn eigen uren, en de ledenkant volgt ze', async () => {
+  /* Dit rooster stond als constante in de code, met een briefje erbij dat dat
+     een gat was. Nu staat het bij de salon; deze toets is het bewijs dat de
+     ledenkant het daar ook echt vandaan haalt en niet uit een eigen getal. */
+  const datum = overDagen(3);
+  const voor = (await api('verzorging', { datum }, lid)).body.aanbieders[0];
+  const behVoor = voor.behandelingen.find(b => b.tijden.length);
+  assert.equal(voor.opening.van, '09:00');
+  assert.ok(behVoor.tijden.includes('09:00'), 'standaard gaat de deur om negen uur open');
+  assert.ok(!behVoor.tijden.some(t => t >= '18:00'), 'en om zes uur dicht');
+
+  const sup = (await api('supplier/login', { username: 'rahul', password: 'Imran' }, '')).body.token;
+  const uren = await api('supplier/beauty/uren', { van: '12:00', tot: '20:00', stapMin: 60 }, sup);
+  assert.equal(uren.status, 200, JSON.stringify(uren.body));
+
+  const na = (await api('verzorging', { datum }, lid)).body.aanbieders[0];
+  const behNa = na.behandelingen.find(b => b.id === behVoor.id);
+  assert.equal(na.opening.van, '12:00', 'de ledenkant toont de uren van de salon');
+  assert.ok(!behNa.tijden.includes('09:00'), 'negen uur is geen optie meer');
+  assert.ok(behNa.tijden.includes('12:00'), 'twaalf uur wel');
+  assert.ok(behNa.tijden.some(t => t >= '18:00'), 'en de avond is nu open');
+
+  const gek = await api('supplier/beauty/uren', { van: '20:00', tot: '12:00' }, sup);
+  assert.equal(gek.status, 400, 'dicht voor open is geen dag');
+
+  await api('supplier/beauty/uren', { van: '09:00', tot: '18:00', stapMin: 30 }, sup);
 });
 
 test('mijn-lijst is van mij alleen, en de salon ziet een codenaam en geen echte naam', async () => {

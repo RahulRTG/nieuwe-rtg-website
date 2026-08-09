@@ -56,9 +56,11 @@ dus de botsingscontrole staat op één plek. Een lid boekt op codenaam; de salon
 ziet dus precies wat elke andere partner ziet. `test/verzorging-leden.test.js`
 en `test/verzorging-scherm.e2e.js` houden dat vast.
 
-Wat er nog niet is: de salon kent geen eigen openingstijden, dus het rooster
-staat als constante in `beautyleden.js` (09:00--18:00, stap van 30 minuten).
-Zodra een salon zijn uren zelf zet, hoort die constante weg.
+De salon zet zijn eigen openingstijden via `/api/supplier/beauty/uren`, en de
+ledenkant leest ze daar. Hier stond eerder een constante met een briefje erbij
+dat dat een gat was; dat is gedicht. Wat blijft staan is een terugval voor een
+salon die nog geen uren heeft -- die moet niet onzichtbaar worden maar gewoon
+open zijn.
 
 ## De aanbieder-kant (De Zorgbalie)
 

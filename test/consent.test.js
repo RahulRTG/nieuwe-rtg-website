@@ -46,8 +46,10 @@ test('een lid dat niets deelt, ziet een lege lijst en geen storing', async () =>
   const d = await lijst();
   assert.deepEqual(d.toestemmingen, [], 'niets aangezet is niets op de lijst');
   assert.deepEqual(d.storingen, [], 'en alle lagen zijn bereikbaar');
-  assert.ok(d.voorbehoud && /met de hand/i.test(d.voorbehoud),
-    'het scherm zegt zelf dat dit register met de hand wordt bijgehouden');
+  assert.ok(d.voorbehoud && /toets let mee|toets mee/i.test(d.voorbehoud),
+    'het scherm zegt dat er iets op de lijst let');
+  assert.match(d.voorbehoud, /anders uitziet|mensenwerk/i,
+    'en waar dat ophoudt: een toestemming van een andere vorm valt er nog buiten');
   assert.ok(d.nietGedekt.length >= 3, 'en het zegt waar de lijst ophoudt');
   assert.deepEqual(d.nietGedekt.map(x => x.naam), NIET_GEDEKT.map(x => x.naam));
   for (const x of d.nietGedekt) assert.ok(x.reden, 'elke uitzondering draagt een reden');

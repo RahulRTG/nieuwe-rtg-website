@@ -80,6 +80,13 @@ de catalogusregel, de gidsentry) en niets vergelijkt ze. `LAT.md` regel 6 noemt
 dat met naam: voor proza bestaat geen handhaver. Deze drift is met de hand
 gevonden en met de hand hersteld, en kan met de hand terugkomen.
 
+Dat is bewust zo gebleven. Voor de twee ANDERE gaten uit deze notitie is
+inmiddels wel iets gebouwd -- de salon heeft eigen openingstijden, en op het
+consent-register let `test/consent-dekking.test.js` mee -- maar of twee stukken
+proza elkaar tegenspreken, is niet machinaal te beslissen. Een controle die dat
+zou proberen, wordt een controle die je moet wegstrepen, en die wordt binnen een
+week genegeerd.
+
 ## Wat er niet staat
 
 Niet gebouwd, en dus ook niet half. Voor elk hiervan geldt: er is geen module,
@@ -294,11 +301,18 @@ de **eigen app** van die laag of het er echt af is.
 **Het gevaarlijkste aan dit scherm is onvolledigheid.** Een overzicht dat "wie
 ziet wat" heet en er drie vergeet, is erger dan geen overzicht: het geeft
 zekerheid die er niet is. Daarom staat er een register van gedekte lagen in
-`kern/consent.js`, staan de niet-gedekte dingen er **met reden** bij (wat u in De
-Salon plaatst, uw veiligheidskring, wat een zaak van een boeking weet), en zegt
-het scherm zelf dat dit register met de hand wordt bijgehouden. Geen enkele
-machine merkt op dat er ergens in RTG een nieuwe soort toestemming bijkomt. Dat
-is de eerlijke stand, en het staat er als zodanig.
+`kern/consent.js`, en staan de niet-gedekte dingen er **met reden** bij (wat u
+in De Salon plaatst, uw veiligheidskring, uw dagcheck-in, wat een zaak van een
+boeking weet).
+
+**En er let iets op dat register.** `test/consent-dekking.test.js` zoekt in
+`server/kern/` naar de vórm van een toestemming -- een rij met een `key` en een
+`status: 'actief'` -- en eist dat elke module die hem heeft, in het register
+staat of daar een reden krijgt. Een nieuwe laag zakt dus met naam en toenaam;
+een verzonnen module met precies die vorm is er een keer doorheen gehaald om te
+zien dat de scan uitslaat. Wat hij NIET vindt is een andere vorm: RTG iD
+gebruikt een `ingetrokken`-vlag en staat in het register omdat een mens hem erin
+zette. Het gat is kleiner, niet weg, en het scherm zegt dat ook zo.
 
 **Zien en schrijven zijn niet hetzelfde.** Een kliniek *ziet* iets; een toestel
 *schrijft* iets; een gemachtigde *handelt namens u*. Die drie staan met een eigen

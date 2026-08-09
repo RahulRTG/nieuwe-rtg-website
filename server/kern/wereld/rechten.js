@@ -123,9 +123,17 @@ const LAGEN = [
 ];
 const lagenVoor = (tier) => LAGEN.filter(l => magVan(tier, l.eist)).map(l => ({ id: l.id, naam: l.naam }));
 
-/* Wie mag dit onderdeel van mijn profiel zien. De gebruiker kiest per laag; dit
+/* Wie mag dit onderdeel van mijn profiel zien. De gebruiker kiest per VELD; dit
    is de lijst waaruit hij kiest, en meteen de lijst waartegen de server een
-   ingestuurde keuze controleert (anders is het een vormcontrole -- regel 8). */
-const ZICHTBAARHEDEN = ['iedereen', 'contacten', 'zakelijk', 'vrienden', 'genootschap', 'alleenik'];
+   ingestuurde keuze controleert (anders is het een vormcontrole -- regel 8).
+
+   HIER STONDEN ER ZES, met 'vrienden' naast 'contacten'. Dat was een lege
+   belofte en hij is weg: dit huis heeft EEN vriendengraaf, dus die twee zouden
+   precies dezelfde mensen aanwijzen. Twee knoppen met hetzelfde gevolg is een
+   leugen in de interface -- de gebruiker denkt iets af te schermen wat hij niet
+   afschermt. Elk van deze vijf wijst aantoonbaar een andere groep aan; wat ze
+   betekenen staat in kern/wereld/profiel.js (magZien) en test/wereldprofiel.
+   test.js zet ze naast elkaar op dezelfde vier mensen. */
+const ZICHTBAARHEDEN = ['iedereen', 'contacten', 'zakelijk', 'genootschap', 'alleenik'];
 
 module.exports = { ERBIJ, TRAP, MODI, LAGEN, ZICHTBAARHEDEN, vermogens, magVan, modiVoor, modusOpen, lagenVoor, zakelijkPro };

@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 2901 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 2904 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,13 +18,13 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 2901 |
-| servermodules (`server/**/*.js`) | 1570 |
+| API-endpoints | 2904 |
+| servermodules (`server/**/*.js`) | 1571 |
 | routebestanden (`server/routes/**`) | 350 |
-| kernmodules (`server/kern/**`) | 909 |
+| kernmodules (`server/kern/**`) | 910 |
 | schermen (`public/**/*.html`) | 214 |
 | gedeelde browsermodules (`public/shared/*.js`) | 171 |
-| toetsbestanden (`test/*.test.js`) | 631 |
+| toetsbestanden (`test/*.test.js`) | 632 |
 | schermtoetsen (`test/*.e2e.js`) | 88 |
 
 ## 2. De weg van een verzoek
@@ -94,7 +94,7 @@ luister
 Acht domeinen, uit `server/opzet/routes.js`. Met `RTG_DOMAINS=member,social` draait
 een proces alleen die domeinen; een gateway (`server/poort.js`) stuurt de
 padvoorvoegsels dan naar het juiste proces. **Die belofte is nog niet waargemaakt:**
-zie §5 -- er zijn nog 146 kern-namen die meer dan één domein aanraakt.
+zie §5 -- er zijn nog 147 kern-namen die meer dan één domein aanraakt.
 
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
@@ -105,8 +105,8 @@ zie §5 -- er zijn nog 146 kern-namen die meer dan één domein aanraakt.
 | `staff` | 26 | 7 | 1 | 40 |
 | `social` | 55 | 7 | 31 | 52 |
 | `techniek` | 42 | 11 | 1 | 49 |
-| `zakelijk` | 13 | 2 | 0 | 27 |
-| `wereld` | 4 | 1 | 0 | 0 |
+| `zakelijk` | 13 | 2 | 0 | 26 |
+| `wereld` | 7 | 1 | 0 | 0 |
 
 "Zonder bewaker" betekent: geen `auth`/`supplierAuth`/`officeAuth`-achtige middleware
 op de regel zelf. Dat is niet hetzelfde als onbeveiligd -- regel 28 van de keuring eist
@@ -121,9 +121,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1121 |
-| daarvan door **meer dan één** domein (de echte koppeling) | 146 |
-| daarvan door precies één domein | 975 |
+| kern-namen die routes aanraken | 1120 |
+| daarvan door **meer dan één** domein (de echte koppeling) | 147 |
+| daarvan door precies één domein | 973 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 
@@ -136,7 +136,7 @@ domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 
 ```
 app(127) auth(72) supplierAuth(46) db(31) officeAuth(29) accounts(18) liveCodename(18)
-status(16) schoon(14) managerOnly(12) save(11) rtf(11) express(10) codenaamVan(10)
+status(16) schoon(14) managerOnly(12) save(11) rtf(11) codenaamVan(11) express(10)
 tooManyTries(9) crypto(9) anthropic(9) rtmail(9) keyVanCodenaam(8) boardroomWie(7)
 logActivity(7) sseToOffice(7) payrollOS(7) geenGast(6) noteFailedTry(6) kern(6)
 gegevensStop(6) talen(6) mail(5) loginFails(5) sseToSupplier(5)

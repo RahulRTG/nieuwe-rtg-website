@@ -93,6 +93,24 @@
     border-radius:var(--rtg-rond-klein);padding:0.75rem 0.9rem;
     font-size:0.8rem;color:var(--rtg-txt);margin-bottom:0.8rem;}
 
+  /* het profiel: per laag een kaart, per veld een regel met een keuzelijst.
+     De keuzelijst is de hele interactie -- invullen gebeurt in de bronapp. */
+  .laag{background:var(--rtg-card);border:1px solid var(--rtg-line);
+    border-radius:var(--rtg-rond);padding:1rem 1.05rem;margin-bottom:0.8rem;}
+  .laag h2{font-family:'Bodoni Moda',Georgia,serif;font-weight:400;
+    font-size:1.1rem;margin:0 0 0.15rem;}
+  .laag .bron{font-size:0.7rem;color:var(--rtg-soft);margin:0 0 0.9rem;}
+  .laag .bron a{color:var(--rtg-acc);}
+  .veld{display:flex;align-items:center;gap:0.6rem;padding:0.55rem 0;
+    border-top:1px solid var(--rtg-line);flex-wrap:wrap;}
+  .veld .nm{font-size:0.8rem;font-weight:600;min-width:8rem;}
+  .veld .wa{font-size:0.8rem;color:var(--rtg-muted);flex:1;
+    overflow-wrap:anywhere;}
+  .veld .wa.leeg{color:var(--rtg-soft);font-style:italic;}
+  .veld select{background:var(--rtg-card2);color:var(--rtg-txt);font:inherit;
+    font-size:0.74rem;border:1px solid var(--rtg-line);
+    border-radius:999px;padding:0.28rem 0.6rem;cursor:pointer;}
+
   /* DE NAVIGATIE: vijf, en niet meer. Home, Ontdek, Chat, Activiteit, Profiel.
      Alle diepte zit erachter; de app hoort klein te voelen. Chat is bewust een
      LINK en geen tab: berichten is een eigen app (/apps/comm.html) en blijft
@@ -120,6 +138,7 @@
 <main>
   <div id="fout" hidden></div>
   <div id="feed"></div>
+  <div id="profiel" hidden></div>
 </main>
 
 <nav class="balk" aria-label="Hoofdnavigatie">
@@ -127,7 +146,7 @@
   <a href="/apps/app.html"><span>◈</span>Ontdek</a>
   <a href="/apps/comm.html"><span>◇</span>Chat</a>
   <a href="/apps/attenties.html"><span>◉</span>Activiteit</a>
-  <a href="/apps/ik.html"><span>○</span>Profiel</a>
+  <a href="#profiel" id="profielTab"><span>○</span>Profiel</a>
 </nav>
 
 <script src="/shared/glyf.js"></script>
@@ -147,7 +166,8 @@
         .then(function (d) { if (!r.ok) throw new Error(d.error || 'Er ging iets mis.'); return d; }); });
   }
 
-  var staat = { modus: 'alles', modi: [], vanaf: 0, items: [], kaart: {} };
+  var staat = { modus: 'alles', modi: [], vanaf: 0, items: [], kaart: {},
+    weergave: 'feed', zichtbaarheden: [] };
 
   function toon(bericht) {
     var n = $('#fout');
@@ -245,6 +265,95 @@
         .then(function (d) { location.href = d.url; })
         .catch(function (err) { toon(err.message); });
     }
+  });
+
+  /* ---------------------------------------------------- het profiel
+
+     Wat hier NIET staat is net zo belangrijk als wat er wel staat: geen
+     invoervelden. Elke laag woont in zijn eigen app en die houdt zijn keuring;
+     dit scherm toont de waarde en zegt waar je hem wijzigt (de `bron` komt van
+     de server mee). Wat je hier WEL doet is het enige dat de wereldlaag zelf
+     bezit: per veld kiezen wie het mag zien.
+
+     De keuzelijst wordt gevuld met de zichtbaarheden die de SERVER meegaf --
+     geen eigen lijstje in de HTML, want dan zou een verwijderde stand hier
+     blijven staan (dat is precies wat er met 'vrienden' gebeurd zou zijn). */
+  var ZICHT_UITLEG = {
+    iedereen: 'Iedereen', contacten: 'Mijn contacten',
+    zakelijk: 'Zakelijke contacten', genootschap: 'Mijn genootschappen',
+    alleenik: 'Alleen ik'
+  };
+
+  function toonWaarde(w) {
+    if (w === null || w === undefined || w === '') return null;
+    if (w === true) return 'Ja';
+    if (Array.isArray(w)) return w.map(function (x) {
+      if (x && typeof x === 'object') return x.naam || x.handle || x.platform || '';
+      return String(x);
+    }).filter(Boolean).join(', ');
+    return String(w);
+  }
+
+  function tekenProfiel(lagen) {
+    var n = $('#profiel');
+    n.textContent = '';
+    lagen.forEach(function (l) {
+      var kaart = document.createElement('section');
+      kaart.className = 'laag';
+      var bron = l.bron
+        ? 'Je vult dit in bij <a href="' + esc(l.bron.app) + '">' + esc(l.bron.naam) + '</a>.'
+        : '';
+      kaart.innerHTML = '<h2>' + esc(l.naam) + '</h2><p class="bron">' + bron + '</p>';
+      l.velden.forEach(function (v) {
+        var w = toonWaarde(v.waarde);
+        var rij = document.createElement('div');
+        rij.className = 'veld';
+        rij.innerHTML = '<span class="nm">' + esc(v.naam) + '</span>'
+          + '<span class="wa' + (w ? '' : ' leeg') + '">' + esc(w || 'Nog niet ingevuld') + '</span>';
+        var sel = document.createElement('select');
+        sel.setAttribute('aria-label', 'Wie mag ' + v.naam + ' zien?');
+        staat.zichtbaarheden.forEach(function (z) {
+          var o = document.createElement('option');
+          o.value = z; o.textContent = ZICHT_UITLEG[z] || z;
+          if (z === v.zicht) o.selected = true;
+          sel.appendChild(o);
+        });
+        sel.addEventListener('change', function () {
+          api('/profiel/zicht', { pad: v.pad, niveau: sel.value })
+            .then(function () { toon(null); })
+            .catch(function (e) { toon(e.message); });
+        });
+        rij.appendChild(sel);
+        kaart.appendChild(rij);
+      });
+      n.appendChild(kaart);
+    });
+  }
+
+  /* Wisselen tussen de feed en het profiel. Bewust binnen dezelfde app: het
+     profiel is een KANT van dezelfde identiteit, niet een andere plek. */
+  function toonWeergave(welke) {
+    staat.weergave = welke;
+    $('#feed').hidden = welke !== 'feed';
+    $('#profiel').hidden = welke !== 'profiel';
+    $('#werelden').hidden = welke !== 'feed';
+    document.querySelectorAll('.balk a').forEach(function (a) {
+      a.setAttribute('aria-current', a.id === 'profielTab'
+        ? (welke === 'profiel' ? 'page' : 'false')
+        : (welke === 'feed' && a.getAttribute('href') === '/apps/wereld.html' ? 'page' : 'false'));
+    });
+  }
+
+  $('#profielTab').addEventListener('click', function (e) {
+    e.preventDefault();
+    if (staat.weergave === 'profiel') { toonWeergave('feed'); return; }
+    api('/profiel', {})
+      .then(function (d) {
+        staat.zichtbaarheden = d.zichtbaarheden || [];
+        tekenProfiel(d.lagen || []);
+        toonWeergave('profiel');
+      })
+      .catch(function (err) { toon(err.message); });
   });
 
   function laad(aanvullen) {

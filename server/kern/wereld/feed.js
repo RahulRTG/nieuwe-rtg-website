@@ -34,7 +34,7 @@ const BRONNEN = {
 };
 const EIST = { zakelijk: 'zakelijk.feed', genootschap: 'genootschap' };
 
-module.exports = ({ db, liveCodename, zijnVrienden }) => {
+module.exports = ({ db, codenaamVan, zijnVrienden }) => {
   const tijd = x => new Date(x || 0).getTime() || 0;
   const kort = (t, n) => String(t == null ? '' : t).slice(0, n);
 
@@ -83,17 +83,27 @@ module.exports = ({ db, liveCodename, zijnVrienden }) => {
        mijne. Wie geen lid is, krijgt een lege lijst -- geen 403, want "er is
        hier niets voor jou" is de eerlijke uitkomst. */
     genootschap: (mij) => {
-      const alle = Object.values(db.data.genootschap || {});
-      const mijne = alle.filter(g => Array.isArray(g.leden)
-        && g.leden.some(l => (typeof l === 'string' ? l : l && l.key) === mij));
+      /* De vorm hier is met zorg overgenomen uit kern/genootschap/index.js en
+         niet geraden: de groepen staan in `db.data.genootschap.groepen` (een
+         array) en de berichten in `db.data.genootschap.prikbord[groepId]` (een
+         map per groep). Dat stond hier eerst fout -- ik las het als een map van
+         groepen met hun prikbord erin -- en het gaf geen enkele fout: gewoon
+         altijd nul berichten. Precies de stille soort. Dat het bleef staan lag
+         aan de toets: die keek of de bron MEEDEED, niet of er inhoud uitkwam.
+         Nu staat er een toets die een echt prikbordbericht terugverwacht. */
+      const G = db.data.genootschap || {};
+      const isLid = (gr) => (gr.leden || []).some(l => (typeof l === 'string' ? l : l && l.key) === mij);
       const uit = [];
-      for (const g of mijne) for (const b of (g.prikbord || [])) {
-        if (b.weg) continue;
-        uit.push(item('genootschap', {
-          id: b.id, wereld: 'genootschap', auteur: b.codenaam || b.naam,
-          tekst: b.tekst, at: b.at,
-          likes: Object.keys(b.likes || {}).length, reacties: (b.reacties || []).length
-        }));
+      for (const gr of (G.groepen || [])) {
+        if (!isLid(gr)) continue;                    // geheim blijft geheim
+        for (const b of ((G.prikbord || {})[gr.id] || [])) {
+          if (b.weg) continue;
+          uit.push(item('genootschap', {
+            id: b.id, wereld: 'genootschap',
+            auteur: (codenaamVan ? codenaamVan(b.vanKey) : '') || 'Een lid',
+            tekst: b.tekst, at: b.at, reacties: (b.reacties || []).length
+          }));
+        }
       }
       return uit;
     },
@@ -105,7 +115,12 @@ module.exports = ({ db, liveCodename, zijnVrienden }) => {
       .filter(s => s.van === mij || (zijnVrienden && zijnVrienden(mij, s.van)))
       .map(s => item('verhalen', {
         id: s.id, wereld: 'prive',
-        auteur: s.codenaam || (liveCodename ? liveCodename(s.van) : '') || 'Een lid',
+        /* codenaamVan(sleutel), NIET liveCodename: die laatste verwacht een
+           SESSIE en geeft voor een kale sleutel altijd null -- waarna elke
+           auteur hier stil "Een lid" heette. Gevonden doordat de genootschap-
+           toets de auteursnaam echt vergelijkt in plaats van alleen te kijken
+           of er iets staat. */
+        auteur: (codenaamVan ? codenaamVan(s.van) : '') || 'Een lid',
         tekst: s.tekst || '', at: s.at,
         beeld: s.foto ? [{ src: '/media/' + s.foto, alt: '' }] : []
       }))

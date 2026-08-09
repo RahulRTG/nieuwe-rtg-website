@@ -1540,6 +1540,7 @@
       "welzijn"
     ],
     "wereld": [
+      "gidsHaal",
       "zijnVrienden"
     ],
     "werkbeleid": [
@@ -1580,7 +1581,6 @@
       "zoekInvite"
     ],
     "zakelijk": [
-      "PRO",
       "Z",
       "connectieTussen",
       "connectiesVan",

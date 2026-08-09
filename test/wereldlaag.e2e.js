@@ -104,6 +104,46 @@ test('RTG Wereld: de schakelaar, de ene feed, en de sprong naar de berichten-app
     assert.match(await page.evaluate(() => document.getElementById('veld').value), /^rtg:\/\/salon\//,
       'de verwijzing naar de post staat niet klaar in het invoerveld');
 
+    // 5. het profiel: de lagen staan er, en de zichtbaarheid die je in het
+    //    scherm kiest komt ECHT op de server terecht (niet alleen in de select)
+    await page.goto(base + '/apps/wereld.html', { waitUntil: 'load' });
+    await page.waitForSelector('#werelden button', { timeout: 15000 });
+    await page.click('#profielTab');
+    await page.waitForSelector('.laag .veld select', { timeout: 15000 });
+
+    const bron = await page.evaluate(() => document.querySelector('.laag .bron').textContent);
+    assert.match(bron, /De Salon/, 'de laag zegt niet waar je hem invult');
+
+    await page.evaluate(() => {
+      const rijen = [...document.querySelectorAll('.laag .veld')];
+      const rij = rijen.find(r => r.querySelector('.nm').textContent === 'Over mij');
+      const sel = rij.querySelector('select');
+      sel.value = 'alleenik';
+      sel.dispatchEvent(new Event('change'));
+    });
+    /* De server is de waarheid: opnieuw ophalen moet de nieuwe stand geven.
+
+       HIER STOND EEN page.waitForFunction MET EEN ASYNC FUNCTIE, en die kon niet
+       zakken. Playwright wacht op een truthy uitkomst, en een async functie
+       geeft een PROMISE terug -- altijd truthy, dus hij was meteen "klaar" en
+       controleerde niets. Gevonden doordat de mutatie (het scherm de keuze niet
+       laten versturen) AFSLOEG waar hij had moeten bijten; dat is precies
+       waarom LAT-regel 2 vier uitkomsten kent en niet twee.
+
+       Nu haalt Node zelf de stand op, met een korte lus voor de schrijfronde. */
+    const zichtNu = async () => {
+      const d = await api(base, '/api/wereld/profiel', {}, a);
+      const v = d.lagen.flatMap(l => l.velden).find(x => x.pad === 'persoonlijk.over');
+      return v && v.zicht;
+    };
+    let zicht = null;
+    for (let i = 0; i < 20 && zicht !== 'alleenik'; i++) {
+      zicht = await zichtNu();
+      if (zicht !== 'alleenik') await new Promise(r => setTimeout(r, 250));
+    }
+    assert.equal(zicht, 'alleenik',
+      'de keuze uit het scherm is niet op de server geland (stond op ' + zicht + ')');
+
     assert.deepEqual(fouten, [], 'geen JS-fouten tijdens het scherm');
   } finally {
     if (browser) await browser.close();

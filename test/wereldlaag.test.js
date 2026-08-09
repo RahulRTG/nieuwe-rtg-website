@@ -48,7 +48,10 @@ async function lid(naam, email, tier) {
     const office = (await json(await post('/api/office/login', { code: 'RTG-OFFICE' }))).token;
     await elevateTier(BASE, d.token, tier, office);
   }
-  return { token: d.token, codenaam: d.state.user.codename };
+  /* De LIVE codenaam (via /api/metier/ik), niet die uit het registratie-antwoord:
+     dat is de naam die de ledengids kent en die de app zelf toont. */
+  const p = await json(await post('/api/metier/ik', {}, d.token));
+  return { token: d.token, codenaam: p.profiel.codenaam };
 }
 
 test.before(async () => {
@@ -133,6 +136,46 @@ test('een zakelijke post blijft uit de feed van de gratis pas -- ook in "Alles"'
     'en er lekt geen enkel zakelijk item in zijn "Alles"');
 });
 
+test('een prikbordbericht komt in Communities, en alleen bij de leden', async () => {
+  /* Deze toets bestond eerst NIET, en dat was een gat met gevolgen: de
+     genootschap-lezer las de opslag verkeerd (groepen staan in
+     `db.data.genootschap.groepen`, niet als losse sleutels) en gaf dus altijd
+     nul berichten. Geen fout, geen log -- alleen een lege lijst. De toets die er
+     wel was keek of de BRON meedeed in de modus, niet of er inhoud uitkwam, en
+     kon daarom niet zakken (LAT-regel 9). */
+  const a = await lid('Genoot A', 'ga@x.nl', 'rtg');
+  const b = await lid('Genoot B', 'gb@x.nl', 'rtg');
+  const buiten = await lid('Genoot Buiten', 'gc@x.nl', 'rtg');
+
+  const opgericht = await json(await post('/api/genootschap/richt-op',
+    { naam: 'De Zeilers', soort: 'besloten' }, a.token));
+  const groep = opgericht.groep && opgericht.groep.id;
+  assert.ok(groep, 'het genootschap is opgericht: ' + JSON.stringify(opgericht).slice(0, 140));
+
+  const uitn = await json(await post('/api/genootschap/nodig-uit', { groep, wie: b.codenaam }, a.token));
+  assert.ok(!uitn.error, 'de uitnodiging is verstuurd: ' + JSON.stringify(uitn).slice(0, 140));
+  const binnen = await json(await post('/api/genootschap/binnen', { groep }, b.token));
+  assert.ok(!binnen.error, 'B treedt binnen: ' + JSON.stringify(binnen).slice(0, 120));
+
+  const geplaatst = await json(await post('/api/genootschap/prik',
+    { groep, tekst: 'Zaterdag varen we uit.' }, a.token));
+  assert.ok(!geplaatst.error, 'het bericht staat op het prikbord: ' + JSON.stringify(geplaatst).slice(0, 120));
+
+  const communities = async t =>
+    (await json(await post('/api/wereld/feed', { modus: 'genootschap' }, t))).items;
+
+  const bijB = await communities(b.token);
+  const raak = bijB.find(i => i.tekst === 'Zaterdag varen we uit.');
+  assert.ok(raak, 'een medelid ziet het bericht in Communities');
+  assert.equal(raak.bron, 'genootschap', 'met de juiste bron');
+  assert.equal(raak.auteur, a.codenaam, 'en op codenaam van de plaatser');
+
+  assert.ok((await communities(a.token)).some(i => i.tekst === 'Zaterdag varen we uit.'),
+    'de plaatser ziet hem ook');
+  assert.ok(!(await communities(buiten.token)).some(i => i.tekst === 'Zaterdag varen we uit.'),
+    'wie er niet in zit ziet niets -- besloten blijft besloten');
+});
+
 test('de feed is chronologisch, nieuwste eerst -- geen algoritme', async () => {
   const l = await lid('Tijd Lid', 'tijd@x.nl', 'rtg');
   await post('/api/salon/plaats', { tekst: 'eerst' }, l.token);
@@ -178,6 +221,9 @@ test('Privé toont het verhaal van een vriend, en juist niet dat van een vreemde
   assert.equal(bijA.filter(i => i.bron === 'verhalen').length, 1,
     'de vriend ziet precies één verhaal');
   assert.equal(bijA[0].tekst, 'Zonsondergang', 'en het is dat van B');
+  // de naam echt vergelijken en niet alleen kijken of er iets staat: de
+  // terugval 'Een lid' zag er jarenlang uit als een naam (zie feed.js)
+  assert.equal(bijA[0].auteur, b.codenaam, 'op codenaam van B, niet op de terugval');
 
   const bijC = await prive(c.token);
   assert.equal(bijC.filter(i => i.bron === 'verhalen').length, 0,

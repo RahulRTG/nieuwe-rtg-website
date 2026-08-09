@@ -26,10 +26,23 @@ module.exports = (kern) => {
   const nu = () => new Date().toISOString();
   const rid = (n = 4) => crypto.randomBytes(n).toString('hex');
 
-  // voor de professionele passen: Lifestyle en Business (gast en basis-pas niet)
-  const PRO = ['lifestyle', 'business'];
+  /* De poort voor de professionele passen: Lifestyle en Business.
+
+     HIER STOND EEN EIGEN LIJST (`const PRO = ['lifestyle', 'business']`) en die
+     is weg. Toen kern/wereld/rechten.js erbij kwam, stond dezelfde waarheid op
+     twee plekken: dit domein besliste zelf wie er binnenkomt, en de wereldlaag
+     besliste hetzelfde nog een keer. Dat is LAT-regel 4, en het werd voorlopig
+     gelijkgehouden door een toets die beide kanten tegen elkaar aanhield -- een
+     pleister, met naam, in TAKEN.md 5.18 (e).
+
+     Nu leest dit domein de rechtenmodule. De pleister is daarmee weg: er valt
+     niets meer uiteen te lopen, want er is nog maar één lijst. De toets in
+     test/wereldlaag.test.js blijft staan en verandert van betekenis -- hij
+     bewees eerst dat twee lijsten gelijk waren, en bewijst nu dat de ENE lijst
+     ook echt de deur van dit domein bedient. */
+  const rechten = require('../kern/wereld/rechten');
   function pro(req, res, next) {
-    if (!PRO.includes(req.session.tier))
+    if (!rechten.zakelijkPro(req.session.tier))
       return res.status(403).json({ error: 'RTG Zakelijk is onderdeel van de Lifestyle en Business Pass.' });
     next();
   }
@@ -68,7 +81,7 @@ module.exports = (kern) => {
      context, een keer opgebouwd bij het opstarten. */
   const zctx = { app, auth, crypto, db, save, schoon, liveCodename, openVacatures, gidsHaal, talen,
     socialVerbind, connectieTussen, statusVan, zijnVrienden, verbActief, codenaamVan, sseToCustomer,
-    Z, nu, rid, PRO, pro, mijnProfiel, pasVan, connectiesVan, gedeeldeConnecties, publiek };
+    Z, nu, rid, pro, mijnProfiel, pasVan, connectiesVan, gedeeldeConnecties, publiek };
   require('./zakelijk/netwerk')(zctx);
   require('./zakelijk/prikbord')(zctx);
 };

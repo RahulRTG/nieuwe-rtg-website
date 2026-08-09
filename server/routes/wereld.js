@@ -8,11 +8,12 @@
    dit domein geeft er één ingang op, met een schakelaar die niet van app
    verandert maar van wereld.
 
-   Vier endpoints, en meer horen er ook niet te zijn:
+   De endpoints, en meer horen er ook niet te zijn:
      /api/wereld/state   -- wie ben ik, wat mag ik, welke modi staan open,
                             plus de koppelkaart (waar woont welk soort ding)
      /api/wereld/feed    -- de ene tijdlijn, gefilterd op modus
      /api/wereld/modus   -- mijn gekozen modus onthouden
+     /api/wereld/profiel -- mijn profiel met lagen, en wie wat mag zien
      /api/wereld/gesprek -- de weg naar de aparte berichten-app
 
    HIER STOND EEN VIJFDE, EN DIE IS WEG. `/api/wereld/open` zette één
@@ -38,10 +39,11 @@
 'use strict';
 
 module.exports = (kern) => {
-  const { app, auth, db, save, liveCodename, zijnVrienden, keyVanCodenaam } = kern;
+  const { app, auth, db, save, liveCodename, codenaamVan, zijnVrienden, keyVanCodenaam, gidsHaal } = kern;
   const rechten = require('../kern/wereld/rechten');
   const koppel = require('../kern/wereld/koppel');
-  const { feed } = require('../kern/wereld/feed')({ db, liveCodename, zijnVrienden });
+  const { feed } = require('../kern/wereld/feed')({ db, codenaamVan, zijnVrienden });
+  const profiel = require('../kern/wereld/profiel')({ db, zijnVrienden });
 
   /* De gekozen modus is een VOORKEUR en geen recht. Hij wordt bij het lezen
      altijd opnieuw langs rechten.modusOpen gehaald: wie ooit Business koos en
@@ -98,6 +100,47 @@ module.exports = (kern) => {
     const uit = feed({ tier, key: req.session.key, modus, vanaf: req.body.vanaf, hoeveel: req.body.hoeveel });
     if (uit.error) return res.status(403).json(uit);
     res.json(uit);
+  });
+
+  /* ---------- het profiel met lagen ----------
+
+     Lezen en zichtbaarheid zetten, meer niet. INVULLEN kan hier met opzet niet:
+     elke laag woont in zijn eigen app (De Salon, RTG Zakelijk, je zaak) en die
+     houdt zijn keuring en zijn rem -- zie de kop van kern/wereld/profiel.js. Het
+     scherm krijgt per laag de `bron` mee zodat het kan zeggen WAAR je iets
+     wijzigt, in plaats van een invoerveld te tonen dat niets opslaat. */
+  app.post('/api/wereld/profiel', auth, (req, res) => {
+    const tier = req.session.tier;
+    if (!rechten.TRAP.includes(tier))
+      return res.status(403).json({ error: 'RTG Wereld is er voor leden met een pas.' });
+    res.json({
+      lagen: profiel.mijnProfiel(req.session.key, tier),
+      zichtbaarheden: rechten.ZICHTBAARHEDEN
+    });
+  });
+
+  app.post('/api/wereld/profiel/zicht', auth, (req, res) => {
+    const r = profiel.zetZicht(req.session.key, req.session.tier,
+      String(req.body.pad || ''), String(req.body.niveau || ''));
+    if (r.error) return res.status(400).json(r);
+    save();
+    res.json(r);
+  });
+
+  /* Het profiel van een ander, op CODENAAM -- nooit op sleutel, want dat is de
+     enige identiteit die dit huis naar buiten kent. Per veld geldt wat de
+     eigenaar heeft ingesteld; wat je niet mag zien ontbreekt gewoon. */
+  app.post('/api/wereld/profiel/van', auth, async (req, res) => {
+    const codenaam = String(req.body.codenaam || '').trim().slice(0, 60);
+    if (!codenaam) return res.status(400).json({ error: 'Wie?' });
+    let doel = null;
+    try { const t = await keyVanCodenaam(codenaam); doel = t && t.key; } catch (e) { doel = null; }
+    if (!doel) return res.status(404).json({ error: 'Dit lid ken ik niet.' });
+    const doelTier = (gidsHaal(doel) || {}).tier || 'rtg';
+    res.json({
+      codenaam,
+      lagen: profiel.profielVoor(req.session.key, doel, doelTier)
+    });
   });
 
   /* De weg naar de berichten-app -- de enige plek die hem maakt.

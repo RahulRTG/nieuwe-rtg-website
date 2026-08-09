@@ -18,8 +18,8 @@
 
    De module kent zelf geen leveranciers; hij krijgt het zaakobject aangereikt
    door de route (die via supplierAuth/findSupplier al weet wie het is). */
-module.exports = ({ db }) => {
-  const BRONNEN = ['menu', 'diensten', 'kamers', 'agenda', 'events', 'vacatures', 'openingstijden', 'fotos', 'reviews', 'contact'];
+module.exports = ({ db, team }) => {
+  const BRONNEN = ['menu', 'diensten', 'kamers', 'agenda', 'events', 'vacatures', 'openingstijden', 'team', 'fotos', 'reviews', 'contact'];
   const DAGEN = ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag'];
 
   const geld = p => (p == null || p === '' ? '' : '€ ' + p);
@@ -39,7 +39,7 @@ module.exports = ({ db }) => {
   /* Het oplossen van een live blok naar gewone blokken staat in
      ./webplatform-live.js: dat is per bron een eigen stukje kennis over hoe
      het zaakprofiel eruitziet, en dat hoort niet door deze laag heen te lopen. */
-  const los = require('./webplatform-live')({ db, geld, veiligBeeld, rating, DAGEN });
+  const los = require('./webplatform-live')({ db, geld, veiligBeeld, rating, DAGEN, team });
 
   /* Alle zaakdata-blokken van een pagina oplossen. Site zonder zaak (of zaak
      die weg is): de live blokken vallen stil weg in plaats van als lege dozen
@@ -118,6 +118,7 @@ module.exports = ({ db }) => {
       /* Alleen live blokken, met opzet: heeft de zaak geen openstaande
          vacatures, dan verdwijnt deze pagina vanzelf uit de navigatie. */
       { id: 'g-p-werk', naam: 'Werken bij ons', slug: 'werken-bij-ons', blokken: [
+        { id: 'g-zt', type: 'zaakdata', bron: 'team' },
         { id: 'g-zv', type: 'zaakdata', bron: 'vacatures' }
       ] },
       { id: 'g-p-contact', naam: 'Contact', slug: 'contact', blokken: [

@@ -9,7 +9,7 @@
 module.exports = ({ scho, crypto }) => {
   const TYPES = ['hero', 'kop', 'tekst', 'knop', 'beeld', 'kolommen', 'galerij', 'citaat', 'ruimte', 'voettekst', 'zaakdata', 'formulier', 'faq', 'prijzen'];
   // de bronnen die een live zaakdata-blok mag aanwijzen (opgelost in kern/webplatform.js)
-  const ZAAKBRONNEN = ['menu', 'diensten', 'kamers', 'agenda', 'events', 'vacatures', 'openingstijden', 'fotos', 'reviews', 'contact'];
+  const ZAAKBRONNEN = ['menu', 'diensten', 'kamers', 'agenda', 'events', 'vacatures', 'openingstijden', 'team', 'fotos', 'reviews', 'contact'];
   const RIJ_MAX = 12;   // hoeveel vragen of prijsregels een blok mag dragen
   const VERSIES = ['telefoon', 'tablet', 'desktop'];
 

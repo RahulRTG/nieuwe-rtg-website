@@ -4,9 +4,21 @@
    andere rolverdeling geldt: bewerken mag iedereen die bij de zaak werkt,
    maar naar buiten brengen is werk van de leiding. */
 module.exports = (kern) => {
-  const { app, webmaker, webplatform, webmakerAi, supplierAuth, managerOnly } = kern;
+  const { app, webmaker, webplatform, webmakerAi, webmakerTeam, supplierAuth, managerOnly } = kern;
   const stuur = (res, r) => r && r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const metWacht = d => Object.assign({}, d, { wacht: webmaker.wacht(d) });
+
+  /* Wie op de site mag staan. Werk van de leiding: iemand op de website
+     zetten is een publicatiebesluit over een mens, niet een instelling. */
+  app.post('/api/supplier/site/team', supplierAuth, (req, res) => {
+    if (!managerOnly(req, res)) return;
+    res.json({ lijst: webmakerTeam.lijst(req.supplier.code) });
+  });
+  app.post('/api/supplier/site/team/zet', supplierAuth, (req, res) => {
+    if (!managerOnly(req, res)) return;
+    const b = req.body || {};
+    stuur(res, webmakerTeam.zet(req.supplier.code, b.id, b.aan === true));
+  });
 
   // dezelfde ontwerpassistent als in de ledenmaker; bewaart niets zelf
   app.post('/api/supplier/site/ai', supplierAuth, async (req, res) => {

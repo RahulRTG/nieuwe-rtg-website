@@ -5,7 +5,7 @@
    site, want dat is erger dan geen menu. Alles wat hier naar buiten komt,
    stond al buiten: de publieke zaakgegevens, gepubliceerde events, openstaande
    vacatures en het reviewgemiddelde. */
-module.exports = ({ db, geld, veiligBeeld, rating, DAGEN }) => {
+module.exports = ({ db, geld, veiligBeeld, rating, DAGEN, team }) => {
   function los(blok, s) {
     const uit = [];
     const kop = t => uit.push({ id: blok.id + '-k', type: 'kop', tekst: t });
@@ -57,6 +57,15 @@ module.exports = ({ db, geld, veiligBeeld, rating, DAGEN }) => {
         kop('Openingstijden');
         const open = DAGEN.filter((_, i) => dagen[i]);
         item('u', open.length ? open.join(', ') + ': ' + u.van + ' - ' + u.tot : 'Op afspraak.');
+      }
+    } else if (bron === 'team') {
+      /* Alleen de mensen die de leiding hiervoor heeft aangewezen, en alleen
+         hun naam en functie. Wie niet is aangewezen of uit dienst is, staat er
+         niet -- dat wordt bij ieder bezoek opnieuw gevraagd (kern/webmaker-team.js). */
+      const mensen = team ? team.publiek(s.code) : [];
+      if (mensen.length) {
+        kop('Ons team');
+        mensen.slice(0, 60).forEach((m, i) => item('t' + i, [m.naam, m.func].filter(Boolean).join(' -- ')));
       }
     } else if (bron === 'fotos') {
       const beelden = (s.photos || []).filter(veiligBeeld).slice(0, 12);

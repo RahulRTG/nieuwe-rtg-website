@@ -74,6 +74,7 @@ async function toon(){
     '<button id="vers">Opnieuw uit mijn profiel</button>'+
     (d.wacht?'<button class="prim" id="live">Zet wijzigingen online</button>':'')+
     '<button id="hist">Eerdere versies</button>'+
+    '<button id="team">Wie op de site staat</button>'+
     '</div>'+
     '<div id="histvak"></div>'+
     '<p class="mt" style="line-height:1.6;">De live blokken (menu, aanbod, foto&#39;s, reviews, contact) volgen uw bedrijfsprofiel vanzelf. "Opnieuw uit mijn profiel" gooit uw eigen aanpassingen aan de site weg en bouwt hem vers op -- dat vraagt hij niet nog een keer, dus wees er zeker van.</p>';
@@ -82,6 +83,30 @@ async function toon(){
   if(uit)uit.addEventListener('click',async()=>{ try{ await api('offline',{id:d.id}); meld('De site staat offline.'); toon(); }catch(e){ meld(e.message);} });
   if(aan)aan.addEventListener('click',async()=>{ try{ const r=await api('publiceer',{id:d.id,adres:d.adres||d.titel}); meld('Online op '+r.adres+'.rtg'); toon(); }catch(e){ meld(e.message);} });
   vers.addEventListener('click',async()=>{ try{ const r=await api('genereer',{opnieuw:true}); meld('Opnieuw gebouwd uit uw profiel'+(r.adres?' -- online op '+r.adres+'.rtg':'')+'. De vorige stand staat onder "Eerdere versies".'); toon(); }catch(e){ meld(e.message);} });
+  /* Wie op de site staat. Niemand staat er vanzelf op: per medewerker zet u
+     hem aan. Naam en functie gaan naar buiten, verder niets. */
+  $('#team').addEventListener('click',async()=>{
+    const vak=$('#histvak');
+    try{
+      const r=await api('team'); const lijst=r.lijst||[];
+      vak.textContent='';
+      const kop=document.createElement('p'); kop.className='mt';
+      kop.textContent='Alleen wie u hier aanzet, verschijnt met naam en functie op uw website. Wie uit dienst gaat, verdwijnt er vanzelf weer af.';
+      vak.appendChild(kop);
+      if(!lijst.length){ const p=document.createElement('p'); p.className='mt'; p.textContent='Er staat nog niemand in uw personeelsbestand.'; vak.appendChild(p); return; }
+      lijst.forEach(m=>{
+        const rij=document.createElement('div'); rij.className='rij'; rij.style.alignItems='center';
+        const t=document.createElement('span'); t.className='mt'; t.style.flex='1';
+        t.textContent=m.naam+(m.func?' · '+m.func:'')+(m.op?' · staat op de site':'');
+        const b=document.createElement('button'); b.textContent=m.op?'Van de site halen':'Op de site zetten';
+        if(m.op)b.className='prim';
+        b.addEventListener('click',async()=>{
+          try{ await api('team/zet',{id:m.id,aan:!m.op}); meld(m.op?'Van de site gehaald.':'Op de site gezet. Publiceer om het naar buiten te brengen.'); $('#team').click(); }
+          catch(e){ meld(e.message);} });
+        rij.appendChild(t); rij.appendChild(b); vak.appendChild(rij);
+      });
+    }catch(e){ meld(e.message); }
+  });
   /* eerdere versies: elke bewaring legt de vorige stand weg, dus ook na
      "opnieuw uit mijn profiel" is er een weg terug */
   $('#hist').addEventListener('click',async()=>{

@@ -429,6 +429,46 @@ test('15. de blokken met rijen (faq en prijzen) worden per rij geschoond en begr
   assert.deepEqual(prijs.regels, [{ naam: 'Sessie', prijs: '€ 45', wat: 'Een uur' }]);
 });
 
+test('16. het team-blok: niemand staat er vanzelf op, en er gaat niet meer naar buiten dan naam en functie', async () => {
+  await api('/api/supplier/site/genereer', { opnieuw: true }, zaak);
+
+  /* NIEMAND STAAT ER VANZELF OP. Dat een zaak personeel heeft en een site
+     maakt, is geen besluit om dat personeel op het web te zetten. */
+  const zonder = await api('/api/browser/open', { adres: 'es-vedra-cruises' }, lid);
+  assert.ok(!/Ons team/.test(JSON.stringify(alleBlokken(zonder.body.site))), 'zonder aanwijzing geen team op de site');
+
+  const lijst = await api('/api/supplier/site/team', {}, zaak);
+  assert.equal(lijst.status, 200, JSON.stringify(lijst.body));
+  assert.ok(lijst.body.lijst.length >= 2, 'de leiding ziet wie er werkt');
+  assert.ok(lijst.body.lijst.every(m => m.op === false), 'en iedereen staat standaard uit');
+
+  // de leiding wijst een iemand aan
+  const wie = lijst.body.lijst[0];
+  assert.equal((await api('/api/supplier/site/team/zet', { id: wie.id, aan: true }, zaak)).status, 200);
+
+  const met = await api('/api/browser/open', { adres: 'es-vedra-cruises' }, lid);
+  const alles = JSON.stringify(alleBlokken(met.body.site));
+  assert.match(alles, new RegExp(wie.naam), 'de aangewezen medewerker staat erop');
+  // ER GAAT NIET MEER NAAR BUITEN DAN NAAM EN FUNCTIE
+  const ander = lijst.body.lijst.find(m => m.id !== wie.id);
+  assert.ok(!new RegExp(ander.naam).test(alles), 'en de collega die niet is aangewezen niet');
+  assert.ok(!/manager|"lid"|staffId/.test(alles), 'geen rol, geen lidmaatschap, geen interne velden');
+
+  // een medewerker mag dit niet zetten: het is een besluit over een mens
+  const gewoon = (await api('/api/supplier/roster', { code: 'ESVEDRA' })).body.staff.find(x => x.role !== 'manager');
+  const mede = (await api('/api/supplier/login', { code: 'ESVEDRA', staffId: gewoon.id, pin: '5678' })).body.token;
+  assert.equal((await api('/api/supplier/site/team', {}, mede)).status, 403);
+  assert.equal((await api('/api/supplier/site/team/zet', { id: wie.id, aan: false }, mede)).status, 403);
+
+  // en een vreemd id komt er niet in
+  assert.equal((await api('/api/supplier/site/team/zet', { id: 999999, aan: true }, zaak)).status, 404);
+
+  // weer van de site halen kan, en dan is hij ook echt weg
+  assert.equal((await api('/api/supplier/site/team/zet', { id: wie.id, aan: false }, zaak)).status, 200);
+  const weg = await api('/api/browser/open', { adres: 'es-vedra-cruises' }, lid);
+  assert.ok(!new RegExp(wie.naam).test(JSON.stringify(alleBlokken(weg.body.site))), 'van de site gehaald is van de site af');
+});
+
 test('5. zoeken vindt sites en bedrijven in een adem', async () => {
   const z = await api('/api/browser/zoek', { q: 'vedra' }, lid);
   assert.equal(z.status, 200);

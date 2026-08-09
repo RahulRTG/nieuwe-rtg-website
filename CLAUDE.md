@@ -12,7 +12,7 @@ Website + ledenportaal + app (PWA) voor Rahul Travel Group (RTG) — een members
 
 ## Structuur en starten (kort)
 
-- `public/` — de webroot: `index.html` (homepage), `site/` (marketingpagina's), `apps/` (portaal, PWA-app, leverancier, backoffice), `shared/` (i18n, realtime), `sw.js` + `manifest.webmanifest` (PWA)
+- `public/` — de webroot: `apps/` (portaal, PWA-app, leverancier, backoffice; 141 schermen), `apps/foundation/` (de RTFoundation, 68), `apps/juridisch/` (3), `site/` (alleen `404.html`), `shared/` (i18n, realtime), `fonts/`, `campagne/`, `sw.js` + `manifest.webmanifest` (PWA). **Er is geen `index.html`**: wie naar `/` gaat krijgt `/apps/app.html` (het RTG-OS-bureaublad) via een interne herschrijving in `server/middleware/voordeur.js` — bewust geen 302, zodat de nonce-laag er gewoon overheen gaat
 - `server/` — Node/Express-backend: `server.js`, `accounts.js` (identiteitskluis + codenamen), `db.js`/`seed.js`, `data/` (runtime: db.json, rtg.db, sleutels — **staat in .gitignore, nooit committen**)
 - Starten: `npm start` (gebruikt `--experimental-sqlite`, vereist Node 22+) → http://localhost:3000
 - Echte AI: `ANTHROPIC_API_KEY` als environment variable; zonder key vaste demo-antwoorden. De key nooit in de repo of client-side JS zetten.

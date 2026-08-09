@@ -143,3 +143,110 @@ test('een verwijderd lid laat geen toernooi met zijn sleutel achter', () => {
   const tekst = JSON.stringify(db.data.spelToernooien || []);
   assert.equal(tekst.includes('"weg"'), false, 'zijn sleutel staat nergens meer: ' + tekst);
 });
+
+/* ---------- de twee vormen, en wat er bij een gelijkspel gebeurt ----------
+   Hier praten we rechtstreeks met de module, met een nagemaakte `potjeDirect`.
+   Reden: een remise is via `opgeven` niet te maken -- wie opgeeft verliest --
+   en juist het overspelen is de regel die getoetst moet worden. */
+const maakToernooi = require('../server/kern/spellen/toernooi');
+
+function losseModule() {
+  const db = { data: { spellen: { potjes: {}, wachtrij: {} } } };
+  let n = 0;
+  const potjeDirect = (soort, spelers, extra) => {
+    const p = Object.assign({ id: 'potje' + (++n), soort, spelers: spelers.slice(), status: 'bezig',
+      winnaar: null, gelijk: false }, extra);
+    db.data.spellen.potjes[p.id] = p;
+    return p;
+  };
+  const t = maakToernooi({ db, save() {}, rid: () => 'T' + (++n), nu: () => new Date().toISOString(),
+    codenaamVan: (k) => 'CN-' + k, isGeblokkeerd: () => false,
+    SPEL: { schaak: { naam: 'Schaken', max: 2, wereld: 'rtg' } }, SOORTEN: { schaak: 'Schaken' },
+    schud: (a) => a, potjeDirect, leeftijdFout: () => null, nudge() {} });
+  return { db, potjeDirect, ...t };
+}
+const klaar = (db, id, winnaar, gelijk) => {
+  const p = db.data.spellen.potjes[id];
+  p.status = 'klaar'; p.winnaar = winnaar ? 'CN-' + winnaar : null; p.gelijk = !!gelijk;
+  return p;
+};
+
+test('een gelijkspel in een knockout wordt overgespeeld, tot er een winnaar is', () => {
+  const m = losseModule();
+  m.toernooiNieuw('a', { soort: 'schaak', maat: 4, vorm: 'knockout', spelers: ['b', 'c', 'd'] });
+  const t = m.db.data.spelToernooien[0];
+  ['b', 'c', 'd'].forEach(x => m.toernooiAntwoord(x, t.id, true));
+  const paar = t.paren[0], eerste = paar.potje;
+
+  m.toernooiPotjeKlaar(klaar(m.db, eerste, null, true));
+  assert.notEqual(t.paren[0].potje, eerste, 'er staat een NIEUWE wedstrijd tussen dezelfde twee');
+  assert.equal(t.paren[0].winnaar, null, 'en nog steeds geen winnaar');
+  assert.equal(t.paren[0].overgespeeld, 1);
+  assert.deepEqual(m.db.data.spellen.potjes[t.paren[0].potje].spelers.slice().sort(), [paar.a, paar.b].sort());
+
+  // ook de tweede remise wordt overgespeeld: er is geen bovengrens
+  m.toernooiPotjeKlaar(klaar(m.db, t.paren[0].potje, null, true));
+  assert.equal(t.paren[0].overgespeeld, 2, 'onbegrensd overspelen is de gekozen regel');
+
+  m.toernooiPotjeKlaar(klaar(m.db, t.paren[0].potje, paar.b, false));
+  assert.equal(t.paren[0].winnaar, paar.b, 'pas een echte winnaar sluit de wedstrijd');
+});
+
+test('een toernooi loopt niet eeuwig vast als de wedstrijd verdwijnt', () => {
+  /* Dat is het risico van "overspelen tot er een winnaar is": een verlaten
+     partij wordt na dertig dagen opgeruimd, en dan wacht het toernooi op een
+     uitslag die nooit komt. */
+  const m = losseModule();
+  m.toernooiNieuw('a', { soort: 'schaak', maat: 4, vorm: 'knockout', spelers: ['b', 'c', 'd'] });
+  const t = m.db.data.spelToernooien[0];
+  ['b', 'c', 'd'].forEach(x => m.toernooiAntwoord(x, t.id, true));
+  delete m.db.data.spellen.potjes[t.paren[0].potje];      // alsof opschonen langs is geweest
+
+  const bord = m.toernooiStaat('a', t.id).toernooi;
+  assert.equal(bord.status, 'klaar');
+  assert.equal(bord.afgebroken, true, 'afgebroken, en niet stil blijven wachten');
+  assert.equal(bord.winnaar, null, 'niemand wint een toernooi dat niet is uitgespeeld');
+});
+
+test('round robin: iedereen tegen iedereen, winst 3 en gelijk 1', () => {
+  const m = losseModule();
+  m.toernooiNieuw('a', { soort: 'schaak', maat: 3, vorm: 'roundrobin', spelers: ['b', 'c'] });
+  const t = m.db.data.spelToernooien[0];
+  ['b', 'c'].forEach(x => m.toernooiAntwoord(x, t.id, true));
+  assert.equal(t.paren.length, 3, 'drie spelers geven drie wedstrijden');
+
+  // a wint van b, a wint van c, b en c spelen gelijk
+  const paar = (x, y) => t.paren.find(p => [p.a, p.b].sort().join() === [x, y].sort().join());
+  m.toernooiPotjeKlaar(klaar(m.db, paar('a', 'b').potje, 'a', false));
+  m.toernooiPotjeKlaar(klaar(m.db, paar('a', 'c').potje, 'a', false));
+  m.toernooiPotjeKlaar(klaar(m.db, paar('b', 'c').potje, null, true));
+
+  assert.equal(t.status, 'klaar');
+  assert.equal(t.winnaar, 'a');
+  const stand = m.toernooiStaat('a', t.id).toernooi.stand;
+  assert.deepEqual(stand.map(r => [r.codenaam, r.punten]),
+    [['CN-a', 6], ['CN-b', 1], ['CN-c', 1]], 'winst 3, gelijk 1');
+});
+
+test('gelijk aan de top blijft gelijk: er wordt geen winnaar verzonnen', () => {
+  /* Een tweede criterium bedenken zou een winnaar aanwijzen die niemand heeft
+     afgesproken. Liever gedeeld. */
+  const m = losseModule();
+  m.toernooiNieuw('a', { soort: 'schaak', maat: 3, vorm: 'roundrobin', spelers: ['b', 'c'] });
+  const t = m.db.data.spelToernooien[0];
+  ['b', 'c'].forEach(x => m.toernooiAntwoord(x, t.id, true));
+  for (const p of t.paren) m.toernooiPotjeKlaar(klaar(m.db, p.potje, null, true));   // alles gelijk
+  assert.equal(t.status, 'klaar');
+  assert.equal(t.winnaar, null);
+  assert.equal(t.gedeeld, true);
+});
+
+test('de vorm bepaalt hoeveel spelers er mogen meedoen', () => {
+  const m = losseModule();
+  // knockout kent alleen machten van twee; 3 valt terug op de eerste maat (4)
+  m.toernooiNieuw('a', { soort: 'schaak', maat: 3, vorm: 'knockout', spelers: ['b', 'c', 'd'] });
+  assert.equal(m.db.data.spelToernooien[0].maat, 4, 'knockout met drie bestaat niet');
+  // round robin mag wel met drie
+  m.toernooiNieuw('a', { soort: 'schaak', maat: 3, vorm: 'roundrobin', spelers: ['b', 'c'] });
+  assert.equal(m.db.data.spelToernooien[1].maat, 3);
+});

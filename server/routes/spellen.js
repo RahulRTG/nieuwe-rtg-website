@@ -58,7 +58,7 @@ module.exports = (kern) => {
     /* Toernooien: een knockout waarvan elke wedstrijd een gewoon potje is. De
        deelnemers komen uit dezelfde kring als een potje (vrienden en
        klasgenoten), dus de kring wordt hier bepaald en niet in het verzoek. */
-    'toernooi-nieuw': (mij, b) => toernooiNieuw(mij, { soort: b.soort, naam: b.naam, maat: b.maat,
+    'toernooi-nieuw': (mij, b) => toernooiNieuw(mij, { soort: b.soort, naam: b.naam, maat: b.maat, vorm: b.vorm,
       spelers: (Array.isArray(b.spelers) ? b.spelers : []).filter(k => kringVan(mij).includes(k)) }),
     'toernooi-antwoord': (mij, b) => toernooiAntwoord(mij, String(b.id || ''), b.akkoord === true),
     'toernooi-mijn': (mij) => mijnToernooien(mij),

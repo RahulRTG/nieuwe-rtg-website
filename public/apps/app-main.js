@@ -574,6 +574,17 @@ var RTG_BOUW = '1b06c62c';
          staat de actie. Alles daaronder is bijzaak. */
       '#gate{display:flex;flex-direction:column;align-items:center;justify-content:center;' +
         'gap:0;padding:6vh 1.1rem;}' +
+      /* DE HALO. De sterren waren overal even druk, ook precies daar waar de
+         klok en de tekst staan -- en dan moet het oog zelf uitzoeken wat het
+         onderwerp is. Een zachte donkere ovaal achter de kolom maakt het daar
+         stil, zodat de klok vanzelf naar voren komt. Geen vlak en geen kader:
+         een verloop dat aan de randen volledig verdwijnt, zodat je hem niet
+         als vorm ziet maar alleen als rust. */
+      '#gate::after{content:"";position:absolute;left:50%;top:50%;' +
+        'width:min(150vw,1100px);height:min(120vh,1000px);' +
+        'transform:translate(-50%,-50%);pointer-events:none;z-index:0;' +
+        'background:radial-gradient(ellipse at center,' +
+          'rgba(0,0,0,0.62) 0%,rgba(0,0,0,0.45) 32%,rgba(0,0,0,0.18) 58%,rgba(0,0,0,0) 78%);}' +
       /* de klok groeit: hij is letterlijk het merk, en stond op een zesde van
          de hoogte alsof hij een illustratie was */
       '#gate .os-lock{margin:0;}' +

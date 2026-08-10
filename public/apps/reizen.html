@@ -12,72 +12,103 @@
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <link href="/shared/rtg-ui.css" rel="stylesheet">
+<!-- NA rtg-ui.css: de dichtheid- en betekenislaag van het Design System 2.0
+     (ONTWERP.md). Hij vervangt de basisvormtaal niet, hij vult hem aan. -->
+<link href="/shared/rtg-ontwerp.css" rel="stylesheet">
 <style>
-  .reis{display:block;border:1px solid var(--rtg-line);border-radius:12px;padding:.85rem .95rem;margin:.5rem 0;
+  /* De toestandsregel bovenaan: één dominante mededeling, en pas daarnaast de
+     afwijkingen (ONTWERP.md par. 3). Geen zes even grote dozen. */
+  .staat{padding:var(--rtg-ruim) 0 calc(var(--rtg-ruim) + 4px);border-bottom:1px solid var(--rtg-line);}
+  .staat .hoofd{font-size:1.35rem;line-height:1.15;}
+  .staat .bij{margin-top:.4rem;color:var(--rtg-soft);font-size:.82rem;
+    display:flex;gap:1.1rem;flex-wrap:wrap;font-variant-numeric:var(--rtg-cijfers);}
+  .staat .bij b{color:var(--rtg-txt);font-weight:600;}
+
+  /* Het register. Twee kolommen op smal (wanneer + de rest), drie op breed. */
+  .rij .datum{width:5.2rem;flex:none;color:var(--rtg-soft);font-variant-numeric:var(--rtg-cijfers);
+    font-size:.8rem;letter-spacing:.04em;text-transform:uppercase;}
+  .rij .kern{min-width:0;flex:1;}
+  /* De PLAATS is de kop van de regel, in Bodoni -- dat is een van de rollen die
+     ceremonieel mag zijn (ONTWERP.md par. 1). Eerder stond hij achter de titel
+     geplakt ("Ibiza, jetset-week Ibiza"), en een serif midden in een
+     sans-zin leest niet als signatuur maar als storing. */
+  .rij .plek{display:block;font-size:1.15rem;line-height:1.2;white-space:nowrap;
+    overflow:hidden;text-overflow:ellipsis;}
+  .rij .naam{display:block;font-size:.82rem;color:var(--rtg-muted);margin-top:.1rem;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .rij .onder{display:flex;align-items:center;gap:.55rem;flex-wrap:wrap;margin-top:.3rem;}
+  .rij .bron{font-size:.7rem;letter-spacing:.09em;text-transform:uppercase;color:var(--rtg-soft);}
+  .rij .pijl{color:var(--rtg-soft);flex:none;}
+  @media (max-width:520px){ .rij .datum{width:4.2rem;} }
+
+  .kop-register{display:flex;align-items:baseline;gap:.7rem;margin:calc(var(--rtg-ruim) * 1.6) 0 .2rem;}
+  .kop-register h2{margin:0;font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--rtg-soft);font-weight:600;}
+  .kop-register .tel{margin-left:auto;font-size:.74rem;color:var(--rtg-soft);
+    font-variant-numeric:var(--rtg-cijfers);}
+
+  /* De wereld eronder: geen kaarten maar een typografische groep met
+     haarlijnen. Een kaart is alleen een kaart als het ding een zelfstandig
+     object is (ONTWERP.md par. 7), en een verwijzing naar een app is dat niet. */
+  .poorten{display:grid;grid-template-columns:repeat(auto-fill,minmax(15rem,1fr));gap:0 var(--rtg-ruim);}
+  .poort{display:block;padding:var(--rtg-ruim-klein) 0;border-bottom:1px solid var(--rtg-line);
     color:inherit;text-decoration:none;}
-  .reis:hover,.reis:focus-visible{border-color:var(--rtg-goud);}
-  .reis .kop{display:flex;gap:.6rem;align-items:baseline;}
-  .reis .kop b{font-size:1rem;}
-  .reis .wanneer{margin-left:auto;color:var(--rtg-soft);font-size:.82rem;white-space:nowrap;}
-  /* block, want dit zijn spans: zonder dit lopen de meta-regel en het
-     app-merkje op EEN regel door en plakt "REISBUREAU" tegen "aangevraagd" aan.
-     Dat stond er een screenshot lang. */
-  .reis .bij{display:block;color:var(--rtg-soft);font-size:.84rem;margin-top:.35rem;}
-  .merk{display:inline-block;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;
-    color:var(--rtg-soft);border:1px solid var(--rtg-line);border-radius:99px;padding:.1rem .5rem;}
-  .wereld{display:grid;grid-template-columns:repeat(auto-fill,minmax(9rem,1fr));gap:.5rem;margin-top:.6rem;}
-  .wereld a{display:block;border:1px solid var(--rtg-line);border-radius:12px;padding:.7rem .8rem;
-    color:inherit;text-decoration:none;font-size:.9rem;}
-  .wereld a:hover,.wereld a:focus-visible{border-color:var(--rtg-goud);}
-  .wereld a span{display:block;color:var(--rtg-soft);font-size:.78rem;margin-top:.2rem;line-height:1.45;}
-  .stilte{border:1px solid var(--rtg-goud);border-radius:12px;padding:.8rem .9rem;margin:.8rem 0;
-    font-size:.86rem;line-height:1.55;color:var(--rtg-soft);background:rgba(201,162,75,.09);}
+  .poort b{display:block;font-size:.9rem;font-weight:600;}
+  .poort span{display:block;color:var(--rtg-soft);font-size:.78rem;line-height:1.45;margin-top:.1rem;}
+  .poort:hover b,.poort:focus-visible b{color:var(--rtg-goud);}
+
+  .stilte{border-left:2px solid var(--rtg-sig-incident);padding:.7rem 0 .7rem .9rem;margin:var(--rtg-ruim) 0;
+    font-size:.84rem;line-height:1.55;color:var(--rtg-soft);}
+  .stilte strong{color:var(--rtg-txt);}
 </style>
 <link href="/shared/ios.css" rel="stylesheet">
 </head>
-<body class="rtg-stijl">
+<!-- Pro-dichtheid: dit is een scherm waarop iemand iets opzoekt en dan
+     doorklikt, niet een scherm om naar te kijken. World zou hier lucht geven
+     die niets draagt (ONTWERP.md par. 2). -->
+<body class="rtg-stijl" data-rtg-modus="pro">
 <a class="skip" href="#inhoud">Naar de inhoud</a>
 <header class="kop">
   <a href="/apps/app.html" aria-label="Terug naar de app">&#8592;</a>
-  <h1>RTG Reizen</h1>
+  <h1 class="rtg-ceremonie">RTG Reizen</h1>
   <div class="rek"></div>
   <span class="stil">uw reiswereld</span>
 </header>
 
-<!-- RTG Reizen is een super app in de zin van PLATFORM.md: hij ORKESTREERT de
-     reisdomeinen en vervangt ze niet. Verblijven, Reisbureau, Vluchten en
-     Hangar houden hun eigen diepte, hun eigen catalogus en hun eigen
-     boekingsstroom; wat hier staat is wat nergens bestond -- uw komende reis
-     bij elkaar, ongeacht in welke app u hem geboekt heeft.
-
-     Daarom staat er op dit scherm GEEN knop die boekt, wijzigt of annuleert.
-     Elke regel is een link naar de app die het echte werk doet. Zou dit scherm
-     ook boeken, dan was er een tweede plek waar een reis ontstaat, en dan is de
-     vraag "waar staat mijn boeking echt" binnen een maand niet meer te
-     beantwoorden (LAT.md regel 4). -->
+<!-- RTG Reizen ORKESTREERT de reisdomeinen en vervangt ze niet (PLATFORM.md).
+     Verblijven, Reisbureau, Vluchten en Hangar houden hun eigen catalogus en
+     hun eigen boekingsstroom; hier staat wat nergens bestond -- uw komende reis
+     bij elkaar. Daarom is er GEEN knop die boekt, wijzigt of annuleert: elke
+     regel is een link naar de app die het echte werk doet. Zou dit scherm ook
+     boeken, dan ontstaat een reis op twee plekken (LAT.md regel 4). -->
 
 <main id="inhoud">
-  <section aria-label="Uw komende reis">
-    <h2>Wat eraan komt</h2>
-    <div id="stilte"></div>
-    <div id="komend"><p class="stil">Laden...</p></div>
+  <section class="staat" aria-label="Toestand">
+    <div class="hoofd rtg-werk" id="hoofd">Laden…</div>
+    <div class="bij" id="bij"></div>
   </section>
 
-  <section aria-label="De reiswereld">
-    <h2>Waar u verder heen kunt</h2>
-    <p class="stil">Elk van deze is een eigen app met zijn eigen diepte. Dit scherm brengt ze samen;
-    het vervangt ze niet.</p>
-    <div class="wereld">
-      <a href="/apps/rtg.html"><b>Het Huis</b><span>Reserveren en bestellen bij alle partners, op codenaam.</span></a>
-      <a href="/apps/hotels.html"><b>Verblijven</b><span>Hotels, appartementen en villa's met ledenprijzen.</span></a>
-      <a href="/apps/reisbureau.html"><b>Reisbureau</b><span>Samengestelde reizen tegen de nettoprijs.</span></a>
-      <a href="/apps/vluchten.html"><b>Vluchten</b><span>Zoeken, boeken, inchecken en volgen.</span></a>
-      <a href="/apps/hangar.html"><b>Hangar</b><span>Privéjets en charters vanaf Business Aviation.</span></a>
-      <a href="/apps/reisboek.html"><b>Reisboek</b><span>Uw reisdagboek: boekingen worden een verslag.</span></a>
-      <a href="/apps/maison.html"><b>Maison</b><span>Uw vaste verblijven en tweede huizen.</span></a>
-      <a href="/apps/ov.html"><b>RTG OV</b><span>Bus, trein, metro, veerboot en taxi onderweg.</span></a>
-    </div>
-  </section>
+  <div id="stilte"></div>
+
+  <div class="kop-register">
+    <h2>Wat eraan komt</h2>
+    <span class="tel" id="tel"></span>
+  </div>
+  <div class="rtg-register" id="komend"><p class="stil">Laden…</p></div>
+
+  <div class="kop-register"><h2>De reiswereld</h2></div>
+  <p class="stil" style="font-size:.8rem;margin:.2rem 0 .6rem;">Elk hiervan is een eigen app met zijn
+  eigen diepte. Dit scherm brengt ze samen; het vervangt ze niet.</p>
+  <div class="poorten">
+    <a class="poort" href="/apps/rtg.html"><b>Het Huis</b><span>Reserveren en bestellen bij alle partners, op codenaam.</span></a>
+    <a class="poort" href="/apps/hotels.html"><b>Verblijven</b><span>Hotels, appartementen en villa's met ledenprijzen.</span></a>
+    <a class="poort" href="/apps/reisbureau.html"><b>Reisbureau</b><span>Samengestelde reizen tegen de nettoprijs.</span></a>
+    <a class="poort" href="/apps/vluchten.html"><b>Vluchten</b><span>Zoeken, boeken, inchecken en volgen.</span></a>
+    <a class="poort" href="/apps/hangar.html"><b>Hangar</b><span>Privéjets en charters vanaf Business Aviation.</span></a>
+    <a class="poort" href="/apps/reisboek.html"><b>Reisboek</b><span>Uw reisdagboek: boekingen worden een verslag.</span></a>
+    <a class="poort" href="/apps/maison.html"><b>Maison</b><span>Uw vaste verblijven en tweede huizen.</span></a>
+    <a class="poort" href="/apps/ov.html"><b>RTG OV</b><span>Bus, trein, metro, veerboot en taxi onderweg.</span></a>
+  </div>
 </main>
 
 <script>
@@ -86,41 +117,90 @@
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g,
     c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
   const token = () => { try { return localStorage.getItem('rtg_member_token'); } catch (e) { return null; } };
-
   const SOORT = { verblijf: 'Verblijf', reis: 'Reis', vlucht: 'Vlucht', charter: 'Charter' };
 
-  function datum(d) {
+  const datum = d => {
     if (!d) return '';
     const x = new Date(d + 'T00:00:00');
-    return isNaN(x) ? d : x.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' });
+    return isNaN(x) ? d : x.toLocaleDateString('nl-NL', { day: '2-digit', month: 'short' }).replace('.', '');
+  };
+
+  /* De dominante toestand, en pas daarnaast de afwijkingen. Een scherm dat
+     "1.284 boekingen" roept zegt niets; "3 vragen aandacht" wel. */
+  function tekenStaat(t) {
+    if (!t.komend) { $('#hoofd').textContent = 'Niets gepland'; $('#bij').textContent = ''; return; }
+    /* Wachten is geen aandacht. Drie reizen die netjes bij de reisadviseur
+       liggen is de normale gang van zaken; daar "er vraagt iets aandacht"
+       boven zetten is loos alarm, en loos alarm leert mensen de kop te
+       negeren op de dag dat het wel klopt. Alleen een afwijking of een
+       onbekende toestand haalt de kop. */
+    const alarm = t.aandacht + t.onbekend;
+    $('#hoofd').textContent = alarm ? 'Er vraagt iets aandacht'
+      : (t.wachtend ? 'Alles loopt' : 'Alles staat klaar');
+    const stukken = [];
+    if (t.aandacht) stukken.push('<b>' + t.aandacht + '</b> vraagt actie');
+    if (t.wachtend) stukken.push('<b>' + t.wachtend + '</b> wacht op bevestiging');
+    // een toestand die we niet kennen wordt genoemd en niet stilzwijgend
+    // meegeteld als "in orde"
+    if (t.onbekend) stukken.push('<b>' + t.onbekend + '</b> met onbekende status');
+    if (!stukken.length) stukken.push('geen actie nodig');
+    // elk stuk in een eigen span: .bij is een flexrij, dus zonder omhulsel
+    // worden "3" en de woorden erachter twee losse cellen met een gat ertussen
+    $('#bij').innerHTML = stukken.map(s => '<span>' + s + '</span>').join('');
+  }
+
+  function rij(x) {
+    const kopieer = x.kenmerk
+      ? '<button class="rtg-ref" type="button" data-ref="' + esc(x.kenmerk) + '" ' +
+        'title="Kopieer kenmerk">' + esc(x.kenmerk) + '</button>' : '';
+    const status = x.status
+      ? '<span class="rtg-status"' + (x.sig ? ' data-sig="' + esc(x.sig) + '"' : '') +
+        ' data-teken="' + esc(x.teken || '·') + '">' + esc(x.status) + '</span>' : '';
+    const actie = x.wacht
+      ? '<span class="rtg-actie" data-wacht>Wacht op · ' + esc(x.wacht) + '</span>' : '';
+    return '<a class="rij rtg-rail" href="' + esc(x.link) + '"' +
+        (x.sig ? ' data-sig="' + esc(x.sig) + '"' : '') + '>' +
+      '<span class="datum">' + esc(datum(x.van)) +
+        (x.tot && x.tot !== x.van ? '<br>' + esc(datum(x.tot)) : '') + '</span>' +
+      /* Kop = de plaats (Bodoni). Is er geen plaats, dan draagt de titel de kop
+         maar in de werk-letter: liever een sans-kop dan een serif op iets dat
+         geen plaats is. */
+      '<span class="kern">' +
+        (x.bestemming
+          ? '<span class="plek rtg-plaats">' + esc(x.bestemming) + '</span>' +
+            '<span class="naam">' + esc(x.titel || SOORT[x.soort] || 'Reis') + '</span>'
+          : '<span class="plek rtg-werk" style="font-size:.98rem;font-weight:600;">' +
+            esc(x.titel || SOORT[x.soort] || 'Reis') + '</span>') +
+        '<span class="onder">' + status + actie + kopieer +
+          '<span class="bron">' + esc(x.app) + '</span></span>' +
+      '</span>' +
+      '<span class="pijl" aria-hidden="true">›</span>' +
+    '</a>';
   }
 
   function teken(d) {
     /* Eerst zeggen wat er NIET is opgehaald. Een reiswereld die na een storing
-       drie in plaats van vier reizen toont, lijkt compleet en is het niet --
-       dat is precies hoe iemand een vlucht mist. */
+       drie in plaats van vier reizen toont, lijkt compleet en is het niet. */
     $('#stilte').innerHTML = (d.stil || []).length
       ? '<div class="stilte" role="status"><strong>Niet alles is opgehaald.</strong> ' +
-        esc((d.stil || []).join(' en ')) + ' gaf geen antwoord, dus wat daar staat ontbreekt hieronder. ' +
-        'Dit is geen leeg reisschema maar een onvolledig reisschema; kijk zo nodig in de app zelf.</div>'
-      : '';
+        esc((d.stil || []).join(' en ')) + ' gaf geen antwoord. Dit is een onvolledig reisschema, ' +
+        'geen leeg reisschema; kijk zo nodig in de app zelf.</div>' : '';
+
+    tekenStaat(d.telling || { komend: 0, aandacht: 0, wachtend: 0, onbekend: 0 });
 
     const r = d.komend || [];
-    if (!r.length) {
-      $('#komend').innerHTML = '<p class="stil">Er staat niets gepland. Zodra u ergens boekt -- in welke ' +
-        'reisapp dan ook -- verschijnt het hier vanzelf.</p>';
-      return;
-    }
-    $('#komend').innerHTML = r.map(x =>
-      '<a class="reis" href="' + esc(x.link) + '">' +
-        '<span class="kop"><b>' + esc(x.titel || SOORT[x.soort] || 'Reis') + '</b>' +
-          '<span class="wanneer">' + esc(datum(x.van)) + (x.tot && x.tot !== x.van ? ' &ndash; ' + esc(datum(x.tot)) : '') + '</span>' +
-        '</span>' +
-        '<span class="bij">' + esc(SOORT[x.soort] || x.soort) +
-          (x.bestemming ? ' &middot; ' + esc(x.bestemming) : '') +
-          (x.status ? ' &middot; ' + esc(x.status) : '') + '</span>' +
-        '<span class="bij"><span class="merk">' + esc(x.app) + '</span></span>' +
-      '</a>').join('');
+    $('#tel').textContent = r.length ? r.length + (r.length === 1 ? ' reis' : ' reizen') : '';
+    $('#komend').innerHTML = r.length
+      ? r.map(rij).join('')
+      : '<p class="stil">Er staat niets gepland. Zodra u ergens boekt, in welke reisapp dan ook, ' +
+        'verschijnt het hier vanzelf.</p>';
+
+    // referentie kopiëren: de professional zoekt hiernaar
+    $('#komend').querySelectorAll('.rtg-ref').forEach(b => b.addEventListener('click', async (e) => {
+      e.preventDefault(); e.stopPropagation();
+      try { await navigator.clipboard.writeText(b.dataset.ref); const t = b.textContent;
+        b.textContent = 'gekopieerd'; setTimeout(() => { b.textContent = t; }, 1200); } catch (err) {}
+    }));
   }
 
   async function laad() {
@@ -134,6 +214,7 @@
       if (!res.ok) throw new Error(d.error || 'Er ging iets mis.');
       teken(d);
     } catch (e) {
+      $('#hoofd').textContent = 'Niet ingelogd';
       $('#komend').innerHTML = '<p class="stil">' + esc(e.message) + ' Log eerst in via de leden-app.</p>';
     }
   }

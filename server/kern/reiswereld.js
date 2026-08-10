@@ -24,11 +24,38 @@ module.exports.maakReiswereld = ({ kern }) => {
   /* Elke bron levert zijn eigen vorm; dit maakt er één regel van. `app` en
      `link` wijzen naar de specialist, want daar hoort het echte werk te
      gebeuren. */
-  const regel = (soort, o) => ({
-    soort, titel: o.titel || '', bestemming: o.bestemming || '',
-    van: dag(o.van), tot: dag(o.tot) || null, status: o.status || '',
-    kenmerk: o.kenmerk || '', app: o.app, link: o.link
-  });
+  /* Wat een status BETEKENT hoort op één plek te wonen. Zou elk scherm zelf
+     beslissen dat "aangevraagd" geel is en "bevestigd" groen, dan lopen Reizen,
+     Office en Command binnen een maand uit elkaar op precies de vraag waar een
+     gebruiker op stuurt (LAT.md regel 4, en ONTWERP.md par. 3 en 5).
+
+     Drie dingen per regel, en met opzet niet alleen een kleur:
+       sig    -- de toestand voor de Signal Rail (gezond/aandacht/incident/actief)
+       teken  -- het teken naast het woord, want kleur alleen is niet genoeg
+       wacht  -- waarop gewacht wordt, als er op iets gewacht wordt
+
+     Een status die we NIET kennen krijgt geen kleur en geen teken. Raden zou
+     hier het ergst mogelijke zijn: een onbekende toestand groen kleuren is
+     precies hoe je iemand een vlucht laat missen. */
+  const BETEKENIS = {
+    bevestigd:   { sig: 'gezond', teken: '✓' },
+    geboekt:     { sig: 'gezond', teken: '✓' },
+    ingecheckt:  { sig: 'gezond', teken: '✓' },
+    aangevraagd: { sig: 'actief', teken: '◷', wacht: 'reisadviseur' },
+    afgewezen:   { sig: 'incident', teken: '!' },
+    vertraagd:   { sig: 'aandacht', teken: '!' }
+  };
+
+  const regel = (soort, o) => {
+    const st = String(o.status || '').toLowerCase();
+    const b = BETEKENIS[st] || {};
+    return {
+      soort, titel: o.titel || '', bestemming: o.bestemming || '',
+      van: dag(o.van), tot: dag(o.tot) || null, status: o.status || '',
+      sig: b.sig || '', teken: b.teken || '', wacht: b.wacht || '',
+      kenmerk: o.kenmerk || '', app: o.app, link: o.link
+    };
+  };
 
   /* Een bron die stukgaat mag de andere niet meenemen, en mag ook niet stil
      verdwijnen. Een reiswereld die na een storing drie in plaats van vier
@@ -79,9 +106,23 @@ module.exports.maakReiswereld = ({ kern }) => {
       .filter(r => (r.tot || r.van) >= nu)
       .sort((a, b) => (a.van || '').localeCompare(b.van || ''));
 
+    /* Uitzonderingsgestuurd (ONTWERP.md par. 3): het scherm hoort niet te
+       roepen hoeveel het weet, maar of er iets aan de hand is. Deze telling
+       maakt dat mogelijk zonder dat het scherm er zelf overheen hoeft te lopen
+       -- en zonder dat de twee ooit uit elkaar lopen. */
+    const telling = {
+      komend: komendeReizen.length,
+      aandacht: komendeReizen.filter(r => r.sig === 'aandacht' || r.sig === 'incident').length,
+      wachtend: komendeReizen.filter(r => !!r.wacht).length,
+      /* Onbekende toestanden apart tellen en apart noemen. Ze verstoppen tussen
+         "in orde" zou een raadsel als geruststelling verkopen. */
+      onbekend: komendeReizen.filter(r => !r.sig).length
+    };
+
     return {
       ok: true,
       komend: komendeReizen,
+      telling,
       /* Eerlijk over wat er niet gemeten is: niet nul melden wat onbekend is.
          Het scherm zegt dit hardop, want een lege reiswereld die eigenlijk een
          storing is, laat iemand een vlucht missen. */

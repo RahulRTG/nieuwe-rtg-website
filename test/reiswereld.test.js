@@ -123,3 +123,52 @@ test('de wereld leest bij elke vraag opnieuw, en bewaart niets van zichzelf', ()
   assert.deepEqual(Object.keys(maakReiswereld({ kern }).reiswereld), ['komend'],
     'de samenhanglaag hoort alleen te kunnen lezen; boeken en annuleren blijft in de specialist');
 });
+
+/* ---------------------------------------------- betekenis en uitzondering -- */
+
+test('een bekende status krijgt een toestand EN een teken, niet alleen kleur', () => {
+  const w = wereldMet({
+    reisbureau: { mijn: () => [{ ref: 'R1', titel: 'Toscane', vertrek: morgen(5), status: 'aangevraagd' }] },
+    mijnVerblijven: () => [{ id: 'v1', roomName: 'Suite', aankomst: morgen(9), vertrek: morgen(12), status: 'bevestigd' }]
+  });
+  const [reis, verblijf] = w.komend('k').komend;
+  assert.equal(reis.sig, 'actief');
+  assert.equal(reis.teken, '◷');
+  assert.equal(reis.wacht, 'reisadviseur', 'een aanvraag wacht op een mens, en dat hoort het scherm te kunnen zeggen');
+  assert.equal(verblijf.sig, 'gezond');
+  assert.equal(verblijf.teken, '✓');
+  assert.equal(verblijf.wacht, '', 'een bevestigd verblijf wacht nergens op');
+});
+
+/* DE BELANGRIJKSTE VAN DIT TWEETAL.
+
+   DE MUTATIE DIE HEM HOORT TE LATEN ZAKKEN: geef BETEKENIS een terugval, zoals
+   `const b = BETEKENIS[st] || { sig: 'gezond', teken: '✓' }`. Alles ziet er dan
+   netjes uit -- en een status die niemand kent, staat groen met een vinkje op
+   het scherm. Dat is precies hoe je iemand een vlucht laat missen. */
+test('een ONBEKENDE status krijgt geen kleur en geen teken, en wordt apart geteld', () => {
+  const w = wereldMet({
+    reisbureau: { mijn: () => [{ ref: 'R9', titel: 'Iets nieuws', vertrek: morgen(4), status: 'halfweg-goedgekeurd' }] }
+  });
+  const uit = w.komend('k');
+  assert.equal(uit.komend[0].sig, '', 'raden is hier het ergste wat je kunt doen');
+  assert.equal(uit.komend[0].teken, '');
+  assert.equal(uit.komend[0].status, 'halfweg-goedgekeurd', 'het woord zelf blijft wel gewoon staan');
+  assert.equal(uit.telling.onbekend, 1, 'en hij wordt apart geteld, niet weggemoffeld onder "in orde"');
+  assert.equal(uit.telling.aandacht, 0);
+});
+
+test('de telling is uitzonderingsgestuurd: wat aandacht vraagt is apart te zien', () => {
+  const w = wereldMet({
+    reisbureau: { mijn: () => [
+      { ref: 'A', titel: 'Wacht', vertrek: morgen(2), status: 'aangevraagd' },
+      { ref: 'B', titel: 'Stuk', vertrek: morgen(3), status: 'afgewezen' },
+      { ref: 'C', titel: 'Goed', vertrek: morgen(4), status: 'bevestigd' }
+    ] }
+  });
+  const t = w.komend('k').telling;
+  assert.equal(t.komend, 3);
+  assert.equal(t.aandacht, 1, 'alleen de afgewezen reis vraagt een mens');
+  assert.equal(t.wachtend, 1, 'de aanvraag wacht op de reisadviseur');
+  assert.equal(t.onbekend, 0);
+});

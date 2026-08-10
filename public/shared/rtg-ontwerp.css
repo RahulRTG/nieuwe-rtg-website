@@ -116,10 +116,15 @@
   display:flex;align-items:center;gap:var(--rtg-ruim);
   min-height:var(--rtg-regel);
   padding:var(--rtg-ruim-klein) var(--rtg-ruim);
+  /* Draagt de rij ook een rail, dan moet de inhoud daar ACHTER beginnen. Deze
+     kiezer is specifieker dan .rtg-rail, dus zonder deze regel wint de
+     padding hierboven en schuift de eerste kolom onder de rail door -- op een
+     screenshot zag je het eerste cijfer van de datum half wegvallen. */
   border-bottom:1px solid var(--rtg-line);
   font-size:var(--rtg-tekst);
   color:inherit;text-decoration:none;
 }
+.rtg-register .rij.rtg-rail{padding-left:calc(var(--rtg-ruim) + 6px);}
 .rtg-register .rij:hover,
 .rtg-register .rij:focus-visible{background:rgba(255,255,255,0.03);}
 .rtg-register .rij > .rek{margin-left:auto;}

@@ -1,6 +1,6 @@
 /* Spellen (deelmodule): het register. Een spel beschrijft ZICHZELF in een
    `spel`-descriptor in zijn eigen module, en dit bestand bouwt daar de
-   dispatch-tabellen uit (SPEL, SOORTEN, INITS, ZETTEN, VIEWS, STATISCH).
+   dispatch-tabellen uit (SPEL, SOORTEN, INITS, ZETTEN, ZICHT, STATISCH).
 
    Er zijn TWEE vormen, en het verschil is niet cosmetisch:
 
@@ -15,11 +15,12 @@
      buitenBeurt  acties die niet op je beurt hoeven (Magnaat bouwen; de duels)
      teams        'altijd' (30 Seconden) of 'keuze' (2-tegen-2 bij een vol potje)
      perTaal      eigen wachtrij per taal (Woordduel heeft een letterzak per taal)
-     kijken       mag een niet-speler meekijken? STANDAARD NIET. Opt-in, want de
-                  weergave van een spel kan een kijker meer laten zien dan een
-                  speler -- 30 Seconden toont de kaart aan wie geen spelersindex
-                  heeft, en dat is precies de rader die hem niet mag zien
-     init/zet/view  de regels zelf; statisch: data die nooit verandert
+     zicht        WIE ZIET WAT: `speler` (verplicht), `kijker` (weglaten =
+                  niet te bekijken) en `publiek` (weglaten = niet op een
+                  gedeeld scherm). Drie lagen in plaats van de oude vlag
+                  `kijken`, en de reden staat in ./zicht.js: die vlag was een
+                  bewering die bij drie spellen niet klopte
+     init/zet     de regels zelf; statisch: data die nooit verandert
                   (het Magnaat-bord) en dus niet elke poll mee hoeft
 
    vorm: 'arcade' -- in je eentje, geen beurt, geen tegenstander. De regels
@@ -34,7 +35,7 @@
 
    Waarom: hiervoor stond een nieuw spel op negen plekken in zes bestanden (de
    SPEL-tabel, drie ctx-opsommingen in spellen.js, de INITS in lobby.js, de
-   ZETTEN en VIEWS in partij.js, plus de client), en stonden er vijf losse
+   ZETTEN en de weergaven in partij.js, plus de client), en stonden er vijf losse
    "is dit spel X?"-uitzonderingen in de platformlaag. Vergat je er een, dan
    faalde dat pas in het potje zelf. Nu is een spel toevoegen: een bestand
    neerzetten dat een `spel` teruggeeft. Er is geen tweede plek meer om te
@@ -45,20 +46,35 @@
    een spel spoorloos uit de lobby verdwijnt, en dat is precies de klasse fout
    die dit register moet uitsluiten. */
 const fs = require('fs'), path = require('path');
+const { ZONDER_SPELER, bouw: bouwZicht } = require('./zicht');
 
 /* Deelmodules die geen spel zijn maar wel in deze map wonen. Bewust een
    expliciete lijst: een helper die je hier neerzet en vergeet toe te voegen
    valt op bij het opstarten, in plaats van stil mee te scannen. */
 const GEEN_SPEL = new Set(['register.js', 'lobby.js', 'partij.js', 'rahul.js', 'klas.js', 'quiz-data.js',
-  'presence.js', 'uitslagen.js', 'prestaties.js', 'toernooi.js', 'zetten.js', 'praat.js', 'telling.js', 'teams.js', 'kring.js', 'arcade.js', 'opruimen.js', 'toernooi-schema.js', 'gedeeld.js', 'grens.js']);
+  'presence.js', 'uitslagen.js', 'prestaties.js', 'toernooi.js', 'zetten.js', 'praat.js', 'telling.js', 'teams.js', 'kring.js', 'arcade.js', 'opruimen.js', 'toernooi-schema.js', 'gedeeld.js', 'grens.js', 'zicht.js', 'klok.js', 'beleid.js']);
 
 // wat een descriptor MOET hebben, per vorm; ontbreekt er iets, dan noemen we
 // het bestand EN wat er mist -- zoeken naar "welke had ik ook alweer" is de
 // fout die dit register nu juist moet uitsluiten
 const VERPLICHT = {
-  potje: ['sleutel', 'naam', 'max', 'wereld', 'init', 'zet', 'view'],
+  potje: ['sleutel', 'naam', 'max', 'wereld', 'init', 'zet', 'zicht'],
   arcade: ['sleutel', 'naam', 'werelden', 'maxPunten']
 };
+
+/* De oude vorm, en waarom hij LUID wordt geweigerd in plaats van stil vertaald.
+   `view` + `kijken: true` betekende "de spelerweergave zonder speler is ook de
+   kijkweergave", en dat klopte bij drie van de zestien spellen niet (zie de kop
+   van ./zicht.js). Een automatische vertaling zou die drie fouten meenemen naar
+   de nieuwe vorm en er de schijn van een besluit aan geven. Wie migreert hoort
+   per spel de vraag te beantwoorden. */
+const OUD = {
+  view: 'heet nu `zicht.speler`',
+  kijken: 'is vervangen door `zicht.kijker` (weglaten = niet te bekijken)'
+};
+
+// de speelvormen die een potje kan dragen; 'live' is de stille standaard
+const VORMEN = ['live', 'async', 'party'];
 
 /* De map is een parameter zodat de toets het register op fixtures kan draaien
    (een module zonder descriptor, een sleutel die niet bij zijn bestand hoort)
@@ -71,14 +87,23 @@ module.exports = (spelCtx, mapOverride) => {
     .map(d => d.name)
     .sort();
 
-  const SPEL = {}, INITS = {}, ZETTEN = {}, VIEWS = {}, STATISCH = {}, ARCADE = {}, ruw = {};
+  /* De sentinel reist mee in de context en niet via een require in elk spel:
+     het register is de eigenaar van het descriptor-vocabulaire, dus het deelt
+     ook het woord uit dat daarin gebruikt mag worden. */
+  const ctx = Object.assign({ ZONDER_SPELER }, spelCtx);
+
+  const SPEL = {}, INITS = {}, ZETTEN = {}, ZICHT = {}, STATISCH = {}, ARCADE = {}, ruw = {};
   for (const naam of bestanden) {
-    const mod = require(path.join(map, naam))(spelCtx);
+    const mod = require(path.join(map, naam))(ctx);
     const s = mod && mod.spel;
     if (!s) throw new Error(`spellen/register: ${naam} geeft geen \`spel\`-descriptor terug. ` +
       'Voeg er een toe, of zet het bestand in GEEN_SPEL als het geen spel is.');
     const vorm = s.vorm || 'potje';
     if (!VERPLICHT[vorm]) throw new Error(`spellen/register: ${naam} heeft vorm '${s.vorm}'; alleen 'potje' of 'arcade'.`);
+    // de oude vorm eerst, want "mist zicht" is een verwarrende melding voor een
+    // spel dat gewoon nog `view` heet
+    for (const [oud, wat] of Object.entries(OUD))
+      if (s[oud] !== undefined) throw new Error(`spellen/register: ${naam} gebruikt nog \`${oud}\`; dat ${wat}. Zie spellen/zicht.js.`);
     const mist = VERPLICHT[vorm].filter(k => s[k] === undefined || s[k] === null);
     if (mist.length) throw new Error(`spellen/register: ${naam} mist in \`spel\` (vorm ${vorm}): ${mist.join(', ')}.`);
     // de sleutel MOET de bestandsnaam zijn: anders lopen de map en de tabel
@@ -114,17 +139,41 @@ module.exports = (spelCtx, mapOverride) => {
     if (s.volwassen) SPEL[s.sleutel].volwassen = true;
     if (s.buitenBeurt) SPEL[s.sleutel].buitenBeurt = s.buitenBeurt;
     if (s.perTaal) SPEL[s.sleutel].perTaal = true;
-    if (s.kijken) SPEL[s.sleutel].kijken = true;
+    /* VORMEN: welke speelvormen dit spel draagt. 'live' is de stille standaard
+       en dus wat elk bestaand spel houdt; 'async' zegt dat een beurt uren of
+       dagen mag duren (zie ./klok.js). Een spel dat niets zegt krijgt geen
+       klok -- de veilige stand, want een reactieduel met 24 uur per beurt is
+       geen spel meer. */
+    if (s.vormen !== undefined) {
+      if (!Array.isArray(s.vormen) || !s.vormen.length || s.vormen.some(v => !VORMEN.includes(v)))
+        throw new Error(`spellen/register: ${naam} heeft vormen ${JSON.stringify(s.vormen)}; ` +
+          `een niet-lege lijst uit ${JSON.stringify(VORMEN)}.`);
+      SPEL[s.sleutel].vormen = s.vormen.slice();
+    } else SPEL[s.sleutel].vormen = ['live'];
     if (s.teams) {
       if (s.teams !== 'altijd' && s.teams !== 'keuze')
         throw new Error(`spellen/register: ${naam} heeft teams '${s.teams}'; alleen 'altijd' of 'keuze'.`);
       SPEL[s.sleutel].teams = s.teams;
     }
+    /* Het zicht: drie lagen, en alleen de eerste is verplicht. `kijker` mag de
+       sentinel ZONDER_SPELER zijn ("mijn spelerweergave is zonder speler
+       veilig"); een string of een `true` mag niet, want dan is het weer een
+       vlag in plaats van een verwijzing. */
+    const z = s.zicht;
+    if (typeof z !== 'object' || typeof z.speler !== 'function')
+      throw new Error(`spellen/register: ${naam} heeft geen \`zicht.speler\`; dat is de weergave voor een deelnemer.`);
+    if (z.kijker !== undefined && z.kijker !== ZONDER_SPELER && typeof z.kijker !== 'function')
+      throw new Error(`spellen/register: ${naam} heeft een \`zicht.kijker\` die geen functie is en niet ZONDER_SPELER. ` +
+        'Laat hem weg als dit spel niet bekeken mag worden.');
+    if (z.publiek !== undefined && typeof z.publiek !== 'function')
+      throw new Error(`spellen/register: ${naam} heeft een \`zicht.publiek\` die geen functie is. ` +
+        'Laat hem weg als dit spel niet op een gedeeld scherm hoort.');
+
     INITS[s.sleutel] = s.init;
     ZETTEN[s.sleutel] = s.zet;
-    VIEWS[s.sleutel] = s.view;
+    ZICHT[s.sleutel] = bouwZicht(s.sleutel, z);
     if (s.statisch) STATISCH[s.sleutel] = s.statisch;
   }
   const SOORTEN = Object.fromEntries(Object.entries(SPEL).map(([k, v]) => [k, v.naam]));
-  return { SPEL, SOORTEN, INITS, ZETTEN, VIEWS, STATISCH, ARCADE, ruw };
+  return { SPEL, SOORTEN, INITS, ZETTEN, ZICHT, STATISCH, ARCADE, ruw };
 };

@@ -4,11 +4,13 @@
    gedeelde context een keer bij het opstarten vanuit kern/spellen.js. */
 module.exports = (ctx) => {
   const { db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, isGeblokkeerd, socialZoek, sociaalRate, volwassen,
-    rid, nu, S, SPEL, SOORTEN, TEAMS, wereldFout, leeftijdFout, nudge, schud, beurtDoor, opschonen,
+    rid, nu, S, SPEL, SOORTEN, TEAMS, wereldFout, leeftijdFout, nudge, schud, beurtDoor, opschonen, klok,
     INITS, klasgenotenVan } = ctx;
   function spelStart(potje) {
     potje.status = 'bezig'; potje.beurt = 0;
     INITS[potje.soort](potje);
+    // de eerste beurt begint nu; zonder tempo doet dit niets
+    if (klok) klok.zetKlok(potje);
   }
   // 30 Seconden speel je met twee teams van twee; Proost alleen met 18+
   function spelGrootte(soort, grootte) {
@@ -27,13 +29,17 @@ module.exports = (ctx) => {
     if (t === 'keuze' && modus === 'teams' && grootte === SPEL[soort].max) return 'teams';
     return 'vrij';
   }
-  async function spelNieuw(mij, { soort, grootte, modus, vrienden, codenamen, klasgenoten, taal, wereld }) {
+  async function spelNieuw(mij, { soort, grootte, modus, vrienden, codenamen, klasgenoten, taal, wereld, tempo }) {
     opschonen();
     if (!SPEL[soort]) return { status: 400, error: 'Onbekend spel.' };
     const wf = wereldFout(wereld, soort);
     if (wf) return { status: 400, error: wf };
     const lf = leeftijdFout(soort, mij);
     if (lf) return { status: 403, error: lf };
+    // het tempo hoort bij het spel: een reactieduel met 24 uur per beurt is
+    // geen spel meer, dus dat weigert de klok op basis van `vormen`
+    const tf = klok ? klok.tempoFout(soort, tempo) : null;
+    if (tf) return { status: 400, error: tf };
     // een potje met uitnodigingen telt als EEN uitnodiging tegen het budget,
     // ook op het vriendenpad (anders is nudge-spam naar vrienden gratis)
     if (!sociaalRate(mij, 'spel-uitnodiging', 20, 3600000)) return { status: 429, error: 'Rustig aan met uitnodigen.' };
@@ -64,7 +70,7 @@ module.exports = (ctx) => {
     if (uitgenodigd.length > max - 1) return { status: 400, error: 'Te veel spelers voor dit spel.' };
     for (const v of uitgenodigd) { const vf = leeftijdFout(soort, v); if (vf) return { status: 403, error: vf }; }
     const potje = { id: rid(5), soort, grootte: max, modus: teamModus(soort, max, modus),
-      taal: taal === 'en' ? 'en' : 'nl',
+      taal: taal === 'en' ? 'en' : 'nl', tempo: tempo || null,
       teams: TEAMS, spelers: [mij], uitgenodigd, status: 'wacht', beurt: 0, winnaar: null, at: nu(), door: codenaamVan(mij) };
     S().potjes[potje.id] = potje;
     save();
@@ -89,24 +95,32 @@ module.exports = (ctx) => {
     p.spelers.forEach(sp => nudge(sp, p));
     return { status: 200, ok: true, gestart: p.status === 'bezig', geannuleerd: !S().potjes[id] && p.status !== 'bezig' };
   }
-  function spelRandom(mij, soort, grootte, taal, wereld) {
+  function spelRandom(mij, soort, grootte, taal, wereld, tempo) {
     opschonen();
     if (!SPEL[soort]) return { status: 400, error: 'Onbekend spel.' };
     const wf = wereldFout(wereld, soort);
     if (wf) return { status: 400, error: wf };
     const lf = leeftijdFout(soort, mij);
     if (lf) return { status: 403, error: lf };
+    const tf = klok ? klok.tempoFout(soort, tempo) : null;
+    if (tf) return { status: 400, error: tf };
     const max = spelGrootte(soort, grootte);
     const w_taal = taal === 'en' ? 'en' : 'nl';
-    // de wachtrij splitst per spel en groepsgrootte, en alleen bij een
-    // taalgevoelig spel ook per taal (zie perTaal in de descriptor)
-    const sleutel = soort + ':' + max + (SPEL[soort].perTaal ? ':' + w_taal : '');
+    /* De wachtrij splitst per spel en groepsgrootte, en alleen bij een
+       taalgevoelig spel ook per taal (zie perTaal in de descriptor).
+
+       HET TEMPO SPLITST HEM OOK, en dat moet wel: wie een partij van 72 uur per
+       beurt zoekt en er een van 30 seconden krijgt, heeft geen tegenstander
+       maar een verloren partij. Een potje zonder tempo houdt de oude sleutel,
+       dus bestaande wachtrijen veranderen niet. */
+    const sleutel = soort + ':' + max + (SPEL[soort].perTaal ? ':' + w_taal : '') + (tempo ? ':' + tempo : '');
     const w = S().wachtrij;
     w[sleutel] = (w[sleutel] || []).filter(x => x !== mij);
     w[sleutel].push(mij);
     if (w[sleutel].length >= max) {
       const spelers = w[sleutel].splice(0, max);
-      const potje = { id: rid(5), soort, grootte: max, modus: teamModus(soort, max), taal: w_taal, teams: TEAMS, spelers, uitgenodigd: [],
+      const potje = { id: rid(5), soort, grootte: max, modus: teamModus(soort, max), taal: w_taal, tempo: tempo || null,
+        teams: TEAMS, spelers, uitgenodigd: [],
         status: 'wacht', beurt: 0, winnaar: null, at: nu(), door: 'random' };
       S().potjes[potje.id] = potje;
       spelStart(potje);
@@ -124,6 +138,8 @@ module.exports = (ctx) => {
       id: p.id, soort: p.soort, naam: SOORTEN[p.soort], status: p.status, modus: p.modus, taal: p.taal || 'nl',
       spelers: p.spelers.map(codenaamVan), wachtOp: p.uitgenodigd.length,
       aanZet: p.status === 'bezig' ? codenaamVan(p.spelers[p.beurt]) : null, ikAanZet: p.status === 'bezig' && p.spelers[p.beurt] === mij,
+      // de klok reist mee zodat de lobby "jouw beurt, nog 18 uur" kan tonen
+      klok: klok ? klok.klokStand(p) : null,
       winnaar: p.winnaar, gelijk: !!p.gelijk, at: p.at
     })).sort((a, b) => String(b.at).localeCompare(String(a.at))).slice(0, 20);
     const uitnodigingen = alle.filter(p => p.status === 'wacht' && p.uitgenodigd.includes(mij)).map(p => ({

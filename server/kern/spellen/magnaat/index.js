@@ -5,7 +5,7 @@
    kaarten en de huurfactor) is pure data en woont in ./bord. */
 const { M_GROEP_HUIZEN, M_VELDEN, M_KAARTEN } = require('./bord');
 module.exports = (ctx) => {
-  const { save, crypto, codenaamVan, nudge } = ctx;
+  const { save, crypto, codenaamVan, nudge, ZONDER_SPELER } = ctx;
 
   function magnaatInit(potje) {
     const st = { posities: {}, geld: {}, eigenaar: {}, huizen: {}, cel: {}, failliet: {}, dobbel: null, mag: 'gooi', koopVeld: null, kaart: null, dubbels: 0 };
@@ -131,13 +131,24 @@ module.exports = (ctx) => {
      client erom vraagt (bij openen), niet bij elke poll van 2,5 seconde.
      Stond als "is dit magnaat?" in de centrale dispatch. */
   const spel = {
-    sleutel: 'magnaat', naam: 'Magnaat', max: 6, wereld: 'rtg', buitenBeurt: ['bouw', 'verkoop'], kijken: true,
+    sleutel: 'magnaat', naam: 'Magnaat', max: 6, wereld: 'rtg', buitenBeurt: ['bouw', 'verkoop'], vormen: ['live', 'async'],
     init: magnaatInit, zet: magnaatZet,
     statisch: () => ({ velden: M_VELDEN }),
-    view: (p, st) => ({ posities: p.spelers.map(sp => st.posities[sp]), geld: p.spelers.map(sp => st.geld[sp]),
-      failliet: p.spelers.map(sp => !!st.failliet[sp]), cel: p.spelers.map(sp => st.cel[sp] > 0),
-      eigenaar: Object.fromEntries(Object.entries(st.eigenaar).map(([v, h]) => [v, p.spelers.indexOf(h)])), // veld -> spelerindex
-      huizen: st.huizen, mag: st.mag, koopVeld: st.koopVeld, dobbel: st.dobbel, kaart: st.kaart })
+    /* Alles aan tafel is openbaar: posities, geld, bezit en huizen staan bij
+       dit spel per definitie open. De weergave leest `mij` niet, dus een kijker
+       en een gedeeld scherm zien hetzelfde als een speler.
+
+       LET OP BIJ DE ECONOMIE (zie GAMEHALL.md §12): zodra er geheime biedingen
+       en onderhandelingen bijkomen, is dit niet meer waar. Die horen dan in de
+       spelerlaag, en `kijker`/`publiek` krijgen een eigen functie die ze
+       weglaat -- niet deze drie die dan stilzwijgend te veel tonen. */
+    zicht: {
+      speler: (p, st) => ({ posities: p.spelers.map(sp => st.posities[sp]), geld: p.spelers.map(sp => st.geld[sp]),
+        failliet: p.spelers.map(sp => !!st.failliet[sp]), cel: p.spelers.map(sp => st.cel[sp] > 0),
+        eigenaar: Object.fromEntries(Object.entries(st.eigenaar).map(([v, h]) => [v, p.spelers.indexOf(h)])), // veld -> spelerindex
+        huizen: st.huizen, mag: st.mag, koopVeld: st.koopVeld, dobbel: st.dobbel, kaart: st.kaart }),
+      kijker: ZONDER_SPELER
+    }
   };
   return { spel, magnaatInit, magnaatZet, M_VELDEN };
 };

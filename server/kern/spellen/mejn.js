@@ -5,7 +5,7 @@
    Ring van 40 velden; speler p start op veld p*10. Een pion: -1 = in het
    starthok, 0..39 = op de ring (absoluut), 100+i = eigen thuisrij. */
 module.exports = (ctx) => {
-  const { save, crypto, schud, beurtDoor, codenaamVan, nudge } = ctx;
+  const { save, crypto, schud, beurtDoor, codenaamVan, nudge, ZONDER_SPELER } = ctx;
 
   function mejnInit(potje) {
     const st = { pionnen: {}, dobbel: null, mag: 'gooi' };
@@ -105,10 +105,15 @@ module.exports = (ctx) => {
   const spel = {
     // teams:'keuze' -- 2-tegen-2 kan, maar alleen als het potje vol is (vier
     // spelers) en de starter erom vraagt; anders speelt iedereen voor zich
-    sleutel: 'mejn', naam: 'Mens erger je niet', max: 4, wereld: 'rtf', teams: 'keuze', kijken: true,
+    sleutel: 'mejn', naam: 'Mens erger je niet', max: 4, wereld: 'rtf', teams: 'keuze', vormen: ['live', 'async'],
     init: mejnInit, zet: mejnZetOfGooi,
-    view: (p, st, mij) => ({ pionnen: p.spelers.map(sp => st.pionnen[sp].map(x => x.pos)), dobbel: st.dobbel, mag: st.mag,
-      zetten: p.spelers[p.beurt] === mij && st.mag === 'zet' ? mejnZetten(p, mij) : [] })
+    /* Alle pionnen staan open op het bord; `zetten` is het enige persoonlijke
+       en valt zonder speler op een lege lijst terug. */
+    zicht: {
+      speler: (p, st, mij) => ({ pionnen: p.spelers.map(sp => st.pionnen[sp].map(x => x.pos)), dobbel: st.dobbel, mag: st.mag,
+        zetten: p.spelers[p.beurt] === mij && st.mag === 'zet' ? mejnZetten(p, mij) : [] }),
+      kijker: ZONDER_SPELER
+    }
   };
   return { spel, mejnInit, mejnZet, mejnZetten, mejnGooi };
 };

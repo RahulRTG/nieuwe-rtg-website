@@ -5,7 +5,7 @@
 const { log } = require('../log');
 
 module.exports = (kern) => {
-  const { app, auth, geenGast, rtf, spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelKijk, spelReplay, spelRahul, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, spelUitslagen, spelStand, spelPrestaties, spelPraat, spelPraatStuur, teamNieuw, teamNodig, teamAntwoord, teamVerlaat, mijnTeams, sudokuNieuw, sudokuKlaar, toernooiNieuw, toernooiAntwoord, mijnToernooien, toernooiStaat, sneekScore, sneekBord, arcadeScore, arcadeBord, socialConnecties } = kern;
+  const { app, auth, geenGast, rtf, spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelToewijzen, spelKijk, spelReplay, spelRahul, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, spelUitslagen, spelStand, spelPrestaties, spelPraat, spelPraatStuur, teamNieuw, teamNodig, teamAntwoord, teamVerlaat, mijnTeams, sudokuNieuw, sudokuKlaar, toernooiNieuw, toernooiAntwoord, mijnToernooien, toernooiStaat, sneekScore, sneekBord, arcadeScore, arcadeBord, socialConnecties } = kern;
 
   function rtfSpeler(req, res) {
     const sess = rtf.verifieerProfiel(req.body.code, req.body.token);
@@ -27,9 +27,9 @@ module.exports = (kern) => {
   // dezelfde acties voor beide werelden; alleen de identiteit verschilt, en
   // elke app start zijn eigen spelgroep (meespelen op uitnodiging kan altijd)
   const ACTIES = {
-    nieuw: (mij, b, wereld) => spelNieuw(mij, { soort: b.soort, grootte: b.grootte, modus: b.modus, vrienden: b.vrienden, codenamen: b.codenamen, klasgenoten: b.klasgenoten, taal: b.taal, wereld }),
+    nieuw: (mij, b, wereld) => spelNieuw(mij, { soort: b.soort, grootte: b.grootte, modus: b.modus, vrienden: b.vrienden, codenamen: b.codenamen, klasgenoten: b.klasgenoten, taal: b.taal, tempo: b.tempo, wereld }),
     antwoord: (mij, b) => spelAntwoord(mij, String(b.id || ''), b.akkoord === true),
-    random: (mij, b, wereld) => spelRandom(mij, String(b.soort || ''), b.grootte, b.taal, wereld),
+    random: (mij, b, wereld) => spelRandom(mij, String(b.soort || ''), b.grootte, b.taal, wereld, b.tempo),
     mijn: (mij) => Object.assign({ status: 200 }, mijnSpellen(mij)),
     staat: (mij, b) => spelStaat(mij, String(b.id || ''), b.velden === true),
     zet: (mij, b) => {
@@ -40,6 +40,10 @@ module.exports = (kern) => {
       return r;
     },
     opgeven: (mij, b) => spelOpgeven(mij, String(b.id || '')),
+    /* De partij opeisen als de klok van de ander verliep. Bewust een APARTE
+       actie en niet iets wat 'staat' stilletjes doet: een potje beeindigen is
+       een handeling en hoort er een te blijven. */
+    toewijzen: (mij, b) => spelToewijzen(mij, String(b.id || '')),
     // het verloop van je EIGEN partij; een kijker krijgt hier niets
     replay: (mij, b) => spelReplay(mij, String(b.id || '')),
     // meekijken: mag dit spel bekeken worden, en hoor jij bij de kring?

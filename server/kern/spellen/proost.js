@@ -2,7 +2,7 @@
    Verbatim afgesplitst uit kern/spellen.js; de lobby (aldaar) doet matchmaking,
    beurten en views en roept deze motor via de gedeelde context aan. */
 module.exports = (ctx) => {
-  const { save, crypto, schud, beurtDoor, codenaamVan, nudge } = ctx;
+  const { save, crypto, schud, beurtDoor, codenaamVan, nudge, ZONDER_SPELER } = ctx;
 
   const P_PROOST = ['{A} proost met iedereen en neemt 1 slok.', 'Iedereen die vandaag heeft gewerkt: 1 slok.', '{A} kiest iemand die 2 slokken neemt.',
     'Linkerbuur van {A}: 1 slok.', 'Waterronde: iedereen een glas water. Verplicht.', 'Iedereen die weleens te laat op een feest kwam: 1 slok.',
@@ -38,9 +38,20 @@ module.exports = (ctx) => {
   /* volwassen: de 18+-poort op paspoort-geboortedatum, afgedwongen op ELK
      toetredingsmoment (starten, uitnodigen, accepteren). */
   const spel = {
-    sleutel: 'proost', naam: 'Proost', max: 6, wereld: 'rtg', volwassen: true, kijken: true,
+    sleutel: 'proost', naam: 'Proost', max: 6, wereld: 'rtg', volwassen: true,
     init: proostInit, zet: proostZet,
-    view: (p, st) => ({ kaart: st.kaart, teller: st.teller, totaal: st.totaal })
+    /* De kaart ligt open op tafel -- dat is het spel. De weergave leest `mij`
+       niet, dus er valt voor een kijker niets te onthullen.
+
+       GEEN `publiek`, en dat is een besluit: een gedeeld scherm in een kamer is
+       precies waar Proost thuishoort, maar deze poort is 18+ en een projectie
+       heeft geen sessie en dus geen leeftijd. Zolang een scherm niet kan
+       bewijzen dat er niemand onder de grens meekijkt, blijft dit spel op de
+       toestellen van de spelers zelf. */
+    zicht: {
+      speler: (p, st) => ({ kaart: st.kaart, teller: st.teller, totaal: st.totaal }),
+      kijker: ZONDER_SPELER
+    }
   };
   return { spel, proostInit, proostZet };
 };

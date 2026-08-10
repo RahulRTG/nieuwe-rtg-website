@@ -78,8 +78,10 @@ er al zijn. Ze opnieuw bouwen zou de duurste vorm van vooruitgang zijn.
 | Wat | Waar | Staat |
 |---|---|---|
 | Zelfbeschrijvend register, luid bij een fout | `spellen/register.js` | af |
-| Lobby, uitnodigen, wachtrij, teamstand | `spellen/lobby.js` | af, mist tempo |
-| Partij, zet, opgeven, meekijken | `spellen/partij.js` | af, zicht te grof (§6) |
+| Lobby, uitnodigen, wachtrij, teamstand | `spellen/lobby.js` | af, met tempo |
+| Partij, zet, opgeven, meekijken, toewijzen | `spellen/partij.js` | af, drie zichtlagen (§6) |
+| Zicht: speler / kijker / publiek | `spellen/zicht.js` | **nieuw, af** |
+| Klok per beurt, tempo, vervaltermijn | `spellen/klok.js` | **nieuw, af** |
 | Toernooien: knockout + roundrobin | `spellen/toernooi.js`, `toernooi-schema.js` | af, mist Swiss/poules |
 | Replay per partij | `spellen/zetten.js` | af, 500 zetten / 30 dagen |
 | Uitslagen, stand, prestaties | `spellen/uitslagen.js`, `prestaties.js` | af |
@@ -125,20 +127,21 @@ const spel = {
   volwassen: false, buitenBeurt: [], teams: null, perTaal: false,
   init, zet, statisch,
 
-  // ---- nieuw: welke vormen dit spel draagt ----
+  // ---- nieuw: welke vormen dit spel draagt (GEBOUWD) ----
   vormen: ['live', 'async'],          // standaard ['live']
 
-  // ---- nieuw: tempo (alleen zinvol bij 'async') ----
-  tempo: {
-    live:     ['30s', '5m', '15m'],
-    relaxed:  ['6u', '12u'],
-    longplay: ['24u', '72u']
-  },
+  /* De tempolijst zelf staat NIET hier maar in ./klok.js, en dat is een
+     correctie op de eerste opzet van dit document. Een spel zegt of het async
+     KAN; wélke tempi er bestaan (30s / 5m / 15m / 6u / 12u / 24u / 72u) is een
+     eigenschap van het platform, want ze zijn voor elk async spel hetzelfde.
+     Zestien eigen lijstjes zijn zestien plekken waar '12u' kan gaan afwijken
+     zonder dat iemand dat besloot. Een spel dat later een eigen set nodig heeft
+     voegt er een toe; dán is dát de uitzondering die om uitleg vraagt. */
 
-  // ---- nieuw: het zichtmodel, drie lagen (§6) ----
+  // ---- nieuw: het zichtmodel, drie lagen (§6) — GEBOUWD ----
   zicht: {
     speler:  (p, st, mij) => ({ ... }),   // verplicht (was: view)
-    kijker:  (p, st) => ({ ... }),        // weglaten = niet te bekijken
+    kijker:  ZONDER_SPELER,               // of een eigen functie, of weglaten
     publiek: (p, st) => ({ ... })         // weglaten = niet te projecteren
   },
 
@@ -220,18 +223,39 @@ bestand is. Elke nieuwe laag erft die eis. Wie in `projectie.js` een
 
 ---
 
-## 6. Het zichtmodel: het einde van `kijken: true`
+## 6. Het zichtmodel: het einde van `kijken: true` — **gebouwd**
 
 Dit is de belangrijkste architectuurwijziging, en hij lost een bestaand
 probleem op in plaats van er een nieuw omheen te bouwen.
 
-Vandaag zijn er twee weergaven: de speler krijgt `view(p, st, mij)`, de kijker
-krijgt dezelfde functie met `mij = null`. Dat is elegant — er is geen tweede
-weergave die kan gaan afwijken — en het botst hard zodra er een televisie in de
-kamer staat. Bij 30 Seconden verbergt de weergave de kaart voor de **rader**
-door naar zijn spelersindex te kijken; een kijker heeft geen index en ziet de
-kaart dus wél. Daarom staat meekijken daar uit, en daarom kan het spel dat het
-meest om een gedeeld scherm vraagt juist niet op een gedeeld scherm.
+Er waren twee weergaven: de speler kreeg `view(p, st, mij)`, de kijker dezelfde
+functie met `mij = null`, en `kijken: true` in de descriptor zei dat dat tweede
+veilig was. Dat is elegant — er is geen tweede weergave die kan gaan afwijken.
+
+**Maar die vlag was een bewering, en niemand had hem nagemeten. Hij klopte bij
+drie van de zestien spellen niet:**
+
+| Spel | Wat er misging | Gevolg |
+|---|---|---|
+| 30 Seconden | de kaart wordt verborgen voor de **rader** op zijn spelersindex; `indexOf(null)` is `-1` en dus nooit de rader | de kijker zag de kaart juist **wél** — bekend, en daarom stond meekijken uit |
+| Reactieduel | `st.tijden[mij].length` met `mij = null` | **uitzondering → 500** |
+| Schatduel | `st.antwoorden[mij].length` met `mij = null` | **uitzondering → 500** |
+
+De laatste twee stonden gewoon op `kijken: true`. Ze konden er stil in zitten
+omdat geen enkele toets `spelKijk` op die twee aanriep, en de catalogustoets
+alleen naar de vlág keek — niet naar wat de weergave deed. Meekijken bij een
+Reactieduel of Schatduel gaf dus een serverfout, voor iedereen, altijd.
+
+**Met één nuance die erbij hoort:** `/api/member/spel/kijk` en de RTF-tegenhanger
+bestaan en zijn routeerbaar, maar **geen enkele client roept ze aan** — meekijken
+is vandaag alleen een API en heeft nog geen scherm. De fouten waren dus echt en
+bereikbaar voor wie de API aanspreekt, en niet zichtbaar voor wie de app
+gebruikt. Dat maakt ze niet minder waar; het verklaart waarom ze er zo lang in
+konden zitten, en het is precies de reden dat de spectator-laag (§8) een eigen
+scherm nodig heeft voordat er iets op geleund wordt.
+
+Gevolg voor het ontwerp: 30 Seconden — het spel dat het meest om een gedeeld
+scherm vraagt — kon als enige juist niet op een gedeeld scherm.
 
 **Drie lagen, expliciet per spel:**
 
@@ -248,14 +272,37 @@ transacties — en niet de geheime biedingen. Bij Schaken zijn `kijker` en
 opgeschreven staan.
 
 **Waarom niet één functie met een rolparameter?** Omdat dat precies de vorm is
-waarin de huidige fout is ontstaan: één functie die uit een index afleidt wie
-je bent. Drie functies kunnen niet stilletjes in elkaars gat vallen.
+waarin de fout is ontstaan: één functie die uit een index afleidt wie je bent.
+Drie functies kunnen niet stilletjes in elkaars gat vallen.
 
-**Hoe dit wordt bewaakt.** `test/spelkijken.test.js` doet dit al voor twee
-lagen: hij speelt een kaart en vergelijkt wat de rader ziet met wat een kijker
-ziet. Dat wordt uitgebreid naar drie, en per spel dat `publiek` levert komt er
-een toets die aantoont dat verborgen informatie er niet in zit. De mutatie die
-raak moet zijn: haal de filtering uit `publiek` en de toets zakt.
+**Vijftien spellen kunnen hun kijkweergave wél uit de spelerweergave halen**, en
+daar vijftien bijna-kopieën naast zetten zou ze laten uiteenlopen. Die zeggen
+`kijker: ZONDER_SPELER` — een claim, geen vlag. Het verschil is dat de claim
+wordt **nagerekend**: `zicht.lekken()` vergelijkt wat een niet-speler ziet met
+wat elke echte speler ziet, en meldt elk veld dat voor iemand verborgen is en
+aan een kijker wel getoond wordt. Dat is exact de vorm van alle drie de fouten
+hierboven.
+
+**Hoe dit bewaakt wordt** (`test/spelkijken.test.js`, `test/spelregister.test.js`):
+
+- de lekcontrole draait over élk spel dat `ZONDER_SPELER` claimt;
+- er staat een **positieve controle** naast — de bewaker moet 30 Seconden nog
+  steeds kunnen vinden — want een bewaker die niets kan vinden is geen bewaker;
+- elke kijkweergave wordt echt aangeroepen via `spelKijk`, bij elk spel dat er
+  een heeft (dat was de toets die ontbrak);
+- geen projectie mag iets tonen wat de spelerweergave voor iemand verbergt;
+- het register weigert `view` en `kijken` **luid** in plaats van ze stil te
+  vertalen: automatisch omzetten zou de drie fouten meenemen naar de nieuwe
+  vorm en er de schijn van een besluit aan geven.
+
+Acht mutaties gemeten, zeven raak. De achtste staat in de open punten: de
+tempo-term in de vervaltermijn is vandaag onobserveerbaar (§7).
+
+Eén valkuil die bij het meten bovenkwam en die in de toets staat: de eerste
+versie van de lekcontrole bouwde elk potje met alleen `init` en vond daarom
+niets bij 30 Seconden — er ligt dan nog geen kaart. Een spel waarvan het geheim
+pas ná een zet ontstaat heeft een openingszet nodig, en de toets controleert
+dat zo'n openingszet de staat écht verandert.
 
 ---
 
@@ -291,11 +338,21 @@ Drie opties, en de keuze is de derde:
 gevolg dat je later niet meer terugvindt:**
 
 - `opruimen.js` gooit een potje met status `bezig` weg na dertig dagen, gemeten
-  op `zetAt`. Een Long Play-partij van 72 uur per beurt met zes spelers kan
-  legitiem langer stilliggen. **De vervaltermijn moet uit het tempo volgen**
-  (bijvoorbeeld: tien gemiste beurten), niet uit een vast getal.
-- `zetten.js` kapt af op 500 zetten per partij. Magnaat over drie weken haalt
-  dat makkelijk. Zie §12.
+  op `zetAt`. De vervaltermijn komt nu uit `klok.vervalMs` en volgt het tempo.
+  **Let op: dat is vandaag geen gedragsverandering, en de eerste versie van deze
+  paragraaf had het mis.** De redenering was "zes spelers met 72 uur per beurt
+  lopen tegen die maand aan"; nagerekend klopt dat niet. `zetAt` reset bij elke
+  handeling aan tafel, dus de langste stilte die legitiem kan ontstaan is één
+  speler die zijn volle beurt opmaakt — bij 72 uur precies drie dagen. En
+  `10 × 72u` is toevallig exact dertig dagen, dus de formule geeft bij elk
+  bestaand tempo hetzelfde antwoord als het vaste getal. Het is een **naad**:
+  de regel staat nu uitgesproken op één plek in plaats van als getal in een
+  `if`, en hij schuift mee zodra er een tempo boven 72 uur komt.
+- `zetten.js` kapt af op 500 zetten per partij. Voor Magnaat *zoals het nu is*
+  haalt een campagne van drie weken dat niet; met de economie van §12 (bieden,
+  onderhandelen, veilingen, herstructureren — allemaal buiten de beurt) wél.
+  Dat is een projectie en geen meting, en het hoort gemeten te worden vóór de
+  economie er staat.
 - `nudge()` duwt via SSE naar wie online is. Bij Async is de speler per
   definitie offline. Er komt dus één herinnering per beurt — **één**, aan de
   speler die aan zet is, uitzetbaar, en zonder "je tegenstander wacht al twee
@@ -505,15 +562,24 @@ sectoren (vastgoed, horeca, retail, media, mobiliteit, logistiek, energie,
 toerisme), specialisatie, markten die bewegen (`TOERISME +18%`,
 `ENERGIECRISIS`, `RENTEVERHOGING`), onderhandelingen, veilingen, leningen.
 
+**Gekozen: meteen de volledige economische wereld**, niet eerst een async-versie
+van het bestaande bord. Dat maakt Magnaat het duurste onderdeel van fase 1, en
+het betekent dat de drie grenzen hieronder allemaal tegelijk meekomen.
+
 Wat dit technisch bijzonder maakt is niet de economie maar de **duur**. Een
-campagne van drie weken raakt drie bestaande grenzen, en die moeten vóór de
-eerste regel spelcode opgelost zijn:
+campagne van drie weken raakt drie bestaande grenzen:
 
 | Grens | Nu | Nodig |
 |---|---|---|
-| Verlaten partij | 30 dagen op `zetAt` | uit het tempo afgeleid (§7) |
-| Replay | 500 zetten, dan oudste weg | eigen budget; een campagne is méér dan 500 handelingen, en juist het begin is hier interessant |
+| Verlaten partij | `klok.vervalMs`, vandaag 30 dagen | **al opgelost, en het was geen probleem** — zie de correctie in §7 |
+| Replay | 500 zetten, dan oudste weg | eigen budget; met bieden en onderhandelen buiten de beurt loopt een campagne daaroverheen. Meet het vóór de economie er staat |
 | Buiten je beurt | `buitenBeurt: ['bouw','verkoop']` | uitbreiden met bod, aanbod, onderhandeling, herstructurering |
+
+En één die de economie zelf meebrengt: **`zicht` van Magnaat klopt nu omdat
+alles aan tafel openbaar is.** Zodra er geheime biedingen en onderhandelingen
+zijn, is dat niet meer waar en moeten `kijker` en `publiek` een eigen functie
+krijgen die ze weglaat. Die waarschuwing staat in de descriptor zelf, zodat wie
+de economie bouwt er niet omheen kan lezen.
 
 Dat derde is wat Long Play werkbaar maakt: als je alleen op je beurt iets kunt,
 staat een partij van zes spelers met 24 uur per beurt zes dagen stil tussen twee
@@ -795,10 +861,18 @@ spellen die elk een andere categorie bewijzen, dan de rest.
 
 **Fase 0 — de fundamenten (niets zichtbaar, alles hangt eraan)**
 
-1. `zicht.js` — drie lagen, en `kijken: true` uitfaseren (§6)
-2. `klok.js` — tempo, en de vervaltermijn uit het tempo afleiden (§7)
-3. `beleid.js` — één afleiding over de bestaande poorten (§18)
-4. Room-uitbreiding: `vorm`, `tempo`, `context`, `bron`, `host` (§8)
+| | Wat | Staat |
+|---|---|---|
+| 1 | `zicht.js` — drie lagen, `kijken: true` uitgefaseerd (§6) | **af** |
+| 2 | `klok.js` — tempo, toewijzen, vervaltermijn (§7) | **af** |
+| 3 | `beleid.js` — één afleiding over de bestaande poorten (§18) | open |
+| 4 | Room-uitbreiding: `context`, `bron`, `host` (§8) | open — `vorm` en `tempo` staan er |
+
+Wat fase 0 onderweg heeft opgeleverd, en dat is het argument voor de volgorde:
+**drie bestaande fouten die niemand zag.** `kijken: true` was een bewering
+zonder meting, en hij klopte bij drie van de zestien spellen niet — 30 Seconden
+lekte de kaart aan een kijker, en Reactieduel en Schatduel gooiden een
+uitzondering die de route in een 500 veranderde. Zie §6.
 
 **Fase 1 — de vijf bewijsspellen**
 
@@ -896,10 +970,13 @@ techniek is er niet om zichtbaar te zijn.
 | # | Punt | Blokkeert |
 |---|---|---|
 | a | Arcadescore niet server-authoritatief (staat al als 5.22) | dagchallenge, ghost, arcade-toernooien |
-| b | `zicht.publiek` bestaat niet; meekijken is één laag | party mode, 30 Seconden op een scherm |
-| c | Potje-verval is een vast getal, niet uit het tempo | Long Play, Magnaat |
-| d | Replay kapt af op 500 zetten | Magnaat-campagnes |
-| e | Geen klok per beurt, geen herinnering buiten SSE | async in alle vormen |
+| ~~b~~ | ~~`zicht.publiek` bestaat niet; meekijken is één laag~~ — **opgelost**, en het legde drie fouten bloot | — |
+| ~~c~~ | ~~Potje-verval is een vast getal~~ — **naad gelegd, maar het was geen probleem**; de aanleiding klopte niet, zie §7 | — |
+| d | Replay kapt af op 500 zetten; niet gemeten voor een echte campagne | Magnaat met economie |
+| ~~e~~ | ~~Geen klok per beurt~~ — **opgelost**; de herinnering buiten SSE nog niet | async zonder push |
+| e2 | Eén herinnering per beurt voor wie offline is (§7) | Relaxed en Long Play in de praktijk |
 | f | Rating heeft geen tak met datum per item | ranked (moet afgeleid worden) |
 | g | `TEAMS` is vast `[0,1,0,1,0,1]` | vrije teamindeling in party |
 | h | Een potjegesprek is niet terug te vinden vanuit het potje na afloop (5.32) | game activity in de chat |
+| i | `GEMISTE_BEURTEN` en de tempo-term in `vervalMs` zijn vandaag onobserveerbaar (de bodem wint altijd); een mutatie erop wordt niet gepakt | niets — staat er als bekende, uitgelegde blinde vlek |
+| j | Alleen 30 Seconden en zeven duels hebben een `zicht.publiek`; de rest projecteert nog niet | party mode per spel (fase 1/3) |

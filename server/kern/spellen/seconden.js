@@ -45,20 +45,33 @@ module.exports = (ctx) => {
      voor iedereen leuk: niets gemeens, niets wat je niet durft te laten zien. */
 
   const spel = {
-    /* GEEN `kijken`, en dat is het enige spel waar dat zo is. De weergave
-       verbergt de kaart voor de RADER door op zijn spelersindex te kijken --
-       en een kijker heeft geen index, dus die zou de kaart juist wel zien en
-       hem kunnen doorgeven. Nagemeten, niet aangenomen: zie
-       test/spelkijken.test.js. Meekijken kan hier pas als er een eigen
-       kijkweergave is die de kaart weglaat.
-
-       teams:'altijd' -- 30 Seconden BESTAAT alleen als twee teams van twee,
+    /* teams:'altijd' -- 30 Seconden BESTAAT alleen als twee teams van twee,
        vandaar ook min 4. De lobby leest dat hier en kent de spelnaam niet. */
     sleutel: 'seconden', naam: '30 Seconden', max: 4, min: 4, wereld: 'rtg', teams: 'altijd',
     init: secondenInit, zet: secondenZet,
-    view: (p, st, mij) => {
-      const rader = (p.beurt + 2) % p.spelers.length; // de teamgenoot raadt en mag de kaart niet zien
-      return { scores: st.scores, kaart: st.kaart && p.spelers.indexOf(mij) !== rader ? st.kaart : null, tot: st.tot, rader, bezig: !!st.kaart };
+    /* HET SPEL WAAR HET ZICHTMODEL VOOR IS.
+
+       GEEN `kijker`, en dit is het enige spel waar dat zo is. De spelerweergave
+       verbergt de kaart voor de RADER door naar zijn spelersindex te kijken; een
+       kijker heeft geen index, dus `indexOf(null)` is -1 en dat is nooit de
+       rader -- die zou de kaart juist WEL zien en hem kunnen doorgeven.
+       Nagemeten en niet aangenomen: test/spelkijken.test.js speelt een kaart en
+       vergelijkt de twee. Vandaar ook geen ZONDER_SPELER hier: die claim zou
+       hier onwaar zijn, en de lektoets pakt hem.
+
+       WEL `publiek`, en dat is precies waarom dit model er is. Op een gedeeld
+       scherm in de kamer hoort de score, de klok en wie er raadt -- en nooit
+       de kaart. Dat is geen filtering die we ergens vergeten kunnen: de kaart
+       zit niet in wat deze functie teruggeeft, dus het scherm KAN hem niet
+       krijgen. Hiervoor was dit spel het enige dat niet op een televisie kon,
+       terwijl het het spel is dat er het meest om vraagt. */
+    zicht: {
+      speler: (p, st, mij) => {
+        const rader = (p.beurt + 2) % p.spelers.length; // de teamgenoot raadt en mag de kaart niet zien
+        return { scores: st.scores, kaart: st.kaart && p.spelers.indexOf(mij) !== rader ? st.kaart : null, tot: st.tot, rader, bezig: !!st.kaart };
+      },
+      publiek: (p, st) => ({ scores: st.scores, tot: st.tot,
+        rader: (p.beurt + 2) % p.spelers.length, bezig: !!st.kaart })
     }
   };
   return { spel, secondenInit, secondenZet };

@@ -2,7 +2,7 @@
    Verbatim afgesplitst uit kern/spellen.js; de lobby (aldaar) doet matchmaking,
    beurten en views en roept deze motor via de gedeelde context aan. */
 module.exports = (ctx) => {
-  const { save, crypto, schud, beurtDoor, codenaamVan, nudge } = ctx;
+  const { save, crypto, schud, beurtDoor, codenaamVan, nudge, ZONDER_SPELER } = ctx;
 
   const W_WAARHEID = ['Wat is het gekste dat je ooit gegeten hebt?', 'Waar lag je als kind wakker van?', 'Wat is je meest onhandige moment van dit jaar?',
     'Welk compliment is je altijd bijgebleven?', 'Wat zou je doen met een dag onzichtbaarheid?', 'Welk liedje ken je stiekem helemaal uit je hoofd?',
@@ -44,9 +44,17 @@ module.exports = (ctx) => {
      Na 25 kaarten is het potje klaar. Geen winnaar of verliezer. */
 
   const spel = {
-    sleutel: 'waarheid', naam: 'Doen of Waarheid', max: 6, wereld: 'rtf', kijken: true,
+    sleutel: 'waarheid', naam: 'Doen of Waarheid', max: 6, wereld: 'rtf',
     init: waarheidInit, zet: waarheidZet,
-    view: (p, st) => ({ punten: p.spelers.map(sp => st.punten[sp]), kaart: st.kaart, wat: st.wat, doel: 8 })
+    /* De opdracht is voor de hele tafel bedoeld; de weergave leest `mij` niet.
+       `publiek` toont de stand en WAT er gekozen is (doen of waarheid), maar
+       niet de kaart zelf: op een gedeeld scherm hoort de opdracht van degene
+       die aan de beurt is niet vooruit te lopen op zijn eigen keuze. */
+    zicht: {
+      speler: (p, st) => ({ punten: p.spelers.map(sp => st.punten[sp]), kaart: st.kaart, wat: st.wat, doel: 8 }),
+      kijker: ZONDER_SPELER,
+      publiek: (p, st) => ({ punten: p.spelers.map(sp => st.punten[sp]), wat: st.wat, doel: 8 })
+    }
   };
   return { spel, waarheidInit, waarheidZet };
 };

@@ -72,7 +72,18 @@ module.exports = (ctx) => {
       nr: st.antwoorden[mij].length, tot: RONDEN, beslist: st.beslist,
       stand: p.spelers.map(sp => ({ af: st.antwoorden[sp].length, punten: st.punten[sp] })) };
   };
-  const spel = { sleutel: 'schat', naam: 'Schatduel', max: 4, wereld: 'rtf', buitenBeurt: ['schat'], kijken: true,
-    init: schatInit, zet: schatZet, view: schatView };
+  /* EEN EIGEN KIJKWEERGAVE, om dezelfde reden als bij Reactieduel: `schatView`
+     leest `st.antwoorden[mij].length`, en dat is voor een kijker
+     `undefined.length`. Meekijken gooide hier, met een 500 als gevolg, terwijl
+     de descriptor `kijken: true` zei.
+
+     Een kijker krijgt de tussenstand en de al besliste ronden; de openstaande
+     vraag is persoonlijk, want die kennen terwijl een ander nog moet schatten
+     is een voordeel dat je kunt doorgeven. */
+  const schatBuiten = (p, st) => ({ tot: RONDEN, beslist: st.beslist,
+    stand: p.spelers.map(sp => ({ af: st.antwoorden[sp].length, punten: st.punten[sp] })) });
+  const spel = { sleutel: 'schat', naam: 'Schatduel', max: 4, wereld: 'rtf', buitenBeurt: ['schat'],
+    init: schatInit, zet: schatZet,
+    zicht: { speler: schatView, kijker: schatBuiten, publiek: schatBuiten } };
   return { spel, schatInit, schatZet, schatView };
 };

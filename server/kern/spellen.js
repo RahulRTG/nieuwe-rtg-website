@@ -36,17 +36,33 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
   const { wereldFout, leeftijdFout, nudge, schud, beurtDoor } =
     require('./spellen/gedeeld')({ crypto, sseToCustomer, volwassen, get SPEL() { return SPEL; } });
 
+  /* DE KLOK: hoe lang een beurt mag duren, en wat er gebeurt als hij verloopt.
+     Staat hier hoog omdat de opruiming er meteen op leunt (een Long Play-partij
+     is pas verlaten na tien gemiste beurten, niet na een vaste maand), en hij
+     leest `SPEL` net als gedeeld.js met een late binding. */
+  const klok = require('./spellen/klok')({ get SPEL() { return SPEL; } });
+
   /* Wat er weggaat, vanzelf en op verzoek: spellen/opruimen.js. De HAKEN zijn
      er omdat de volgorde niet anders kan -- `opschonen` gaat als eerste de
      lobby in, terwijl de takken die opgeruimd moeten worden pas verderop
      bestaan. Ze schuiven aan zodra ze er zijn; veilig, want er wordt tijdens
      het opbouwen niets van dit alles aangeroepen. */
-  const opruimHaken = { deel: [], sudoku: null };
+  const opruimHaken = { deel: [], sudoku: null, opgeven: null };
   const { opschonen, spelVergeet } = require('./spellen/opruimen')({
     S, save, codenaamVan,
     noteerUitslag: (p) => noteerUitslag(p),
     deelVergeet: opruimHaken.deel,
-    sudokuOpschonen: (t) => { if (opruimHaken.sudoku) opruimHaken.sudoku(t); }
+    sudokuOpschonen: (t) => { if (opruimHaken.sudoku) opruimHaken.sudoku(t); },
+    vervalMs: (p) => klok.vervalMs(p),
+    /* De enige plek waar een klok uit zichzelf een partij beeindigt: een
+       toernooiwedstrijd. Geeft terug of er iets gebeurd is, zodat de opruiming
+       weet dat ze dit potje verder met rust moet laten. Late binding, want
+       `spelOpgeven` bestaat pas na de partijlaag. */
+    geefOp: (p) => {
+      if (!klok.verlooptVanzelf(p) || !opruimHaken.opgeven) return false;
+      opruimHaken.opgeven(p.spelers[p.beurt], p.id);
+      return true;
+    }
   });
 
   /* ---------- de spelmotoren: elk spel een eigen module ----------
@@ -54,7 +70,7 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
      register haalt ze op en levert de dispatch-tabellen. Dit blok groeit niet
      meer mee met het aantal spellen -- dat was het hele punt. */
   const spelCtx = { save, crypto, schud, beurtDoor, codenaamVan, nudge };
-  const { SPEL, SOORTEN, INITS, ZETTEN, VIEWS, STATISCH, ARCADE, ruw } = require('./spellen/register')(spelCtx);
+  const { SPEL, SOORTEN, INITS, ZETTEN, ZICHT, STATISCH, ARCADE, ruw } = require('./spellen/register')(spelCtx);
   // klasgenoten: het uitnodigingspad voor beschermde tieners (De Arena)
   const { klasgenotenVan, spelKlasgenoten } = require('./spellen/klas')({ db, codenaamVan, isGeblokkeerd });
   /* Wie van je vrienden er nu is. Leest de levende lijst van open
@@ -101,8 +117,8 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
   /* De lobby- en partijlaag draaien als submodules op een gedeelde
      context, een keer opgebouwd bij het opstarten. */
   const ctx = { db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, isGeblokkeerd, socialZoek, sociaalRate, volwassen,
-    rid, nu, S, SPEL, SOORTEN, TEAMS, wereldFout, leeftijdFout, nudge, schud, beurtDoor, opschonen,
-    INITS, ZETTEN, VIEWS, STATISCH, klasgenotenVan, noteerUitslag, noteerZet };
+    rid, nu, S, SPEL, SOORTEN, TEAMS, wereldFout, leeftijdFout, nudge, schud, beurtDoor, opschonen, klok,
+    INITS, ZETTEN, ZICHT, STATISCH, klasgenotenVan, noteerUitslag, noteerZet };
   const { spelStart, spelGrootte, potjeDirect, spelNieuw, spelAntwoord, spelRandom, mijnSpellen } = require('./spellen/lobby')(ctx);
   /* Toernooien: een knockout waarvan elke wedstrijd een GEWOON potje is. Staat
      bewust NIET achter de progressiegrens -- een toernooi is een begrensd
@@ -113,7 +129,9 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
   opruimHaken.deel.push(toernooiVergeet);
   ctx.toernooiPotjeKlaar = toernooiPotjeKlaar;
   ctx.toernooiHeeftSpeler = (id, key) => { const b = toernooiStaat(key, id); return !!(b && b.toernooi && b.toernooi.ikDoeMee); };
-  const { spelStaat, spelZet, spelOpgeven, spelKijk } = require('./spellen/partij')(ctx);
+  const { spelStaat, spelZet, spelOpgeven, spelKijk, spelToewijzen } = require('./spellen/partij')(ctx);
+  // de opruiming kan nu een verlopen toernooiwedstrijd afmaken (zie hierboven)
+  opruimHaken.opgeven = spelOpgeven;
   // Rahul als spelmaatje: in elk potje op te roepen voor hints, regels of een peptalk
   const { spelRahul } = require('./spellen/rahul')(Object.assign({ anthropic }, ctx));
 
@@ -147,7 +165,7 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
   opruimHaken.sudoku = sudokuOpschonen;
 
 
-  return { spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelKijk, spelReplay, spelRahul, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, spelUitslagen, spelStand, spelPrestaties, spelPraat, spelPraatStuur, spelTelemetrie, teamNieuw, teamNodig, teamAntwoord, teamVerlaat, mijnTeams, sudokuNieuw, sudokuKlaar, spelVergeet, toernooiNieuw, toernooiAntwoord, mijnToernooien, toernooiStaat, sneekScore, sneekBord, arcadeScore, arcadeBord, SPEL_SOORTEN: SOORTEN,
+  return { spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelToewijzen, spelKijk, spelReplay, spelRahul, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, spelUitslagen, spelStand, spelPrestaties, spelPraat, spelPraatStuur, spelTelemetrie, teamNieuw, teamNodig, teamAntwoord, teamVerlaat, mijnTeams, sudokuNieuw, sudokuKlaar, spelVergeet, toernooiNieuw, toernooiAntwoord, mijnToernooien, toernooiStaat, sneekScore, sneekBord, arcadeScore, arcadeBord, SPEL_SOORTEN: SOORTEN,
     // alleen voor de drift-test: de client heeft een eigen kopie van deze
     // regels (directe feedback); de test houdt beide kopieën tegen elkaar
     _spelregels: { rummiSet: ruw.rummiSet, W_PREMIE: ruw.W_PREMIE, SPEL, ARCADE } };

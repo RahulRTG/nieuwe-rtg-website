@@ -15,10 +15,19 @@
        putten, dus geeft de pagina zijn lijst mee. */
     schil.apps = (opties.apps || []).slice();
     w.addEventListener('resize', schik);
-    // een surface die zelf om context roept (uit een frame, zelfde herkomst)
+    /* Berichten uit de surfaces. Alleen van dezelfde herkomst -- een surface
+       is een eigen pagina, maar altijd onze eigen. */
     w.addEventListener('message', function (e) {
-      if (e.origin !== location.origin || !e.data || e.data.rtg !== 'context') return;
-      context(e.data.ref);
+      if (e.origin !== location.origin || !e.data) return;
+      if (e.data.rtg === 'context') { context(e.data.ref); return; }
+      var s = surfaceVanVenster(e.source);
+      if (!s) return;                       // een venster dat geen surface is, telt niet mee
+      if (e.data.rtg === 'sleep-start') {
+        var v = schoneVerwijzing(e.data.object);
+        if (v) sleepStart(s, v);
+      } else if (e.data.rtg === 'sleep-kan-ja') {
+        sleepKanJa(s, e.data.wat);
+      }
     });
     schik(); tekenConsole();
     return w.RTGSchil;
@@ -32,6 +41,10 @@
     get ruimtes() { return Object.keys(alleRuimtes()); },
     // stap 6: het palet
     palet: paletTreffers,
+    /* stap 7: objecten tussen apps. Een app in een surface roept dit NIET aan --
+       die praat via postMessage, want hij draait in een eigen venster. Dit staat
+       er voor de werkruimte-pagina zelf en voor de toetsen. */
+    sleepStart: sleepStart, schoneVerwijzing: schoneVerwijzing,
     get surfaces() { return schil.surfaces.slice(); },
     get actief() { return schil.actief; }
   };

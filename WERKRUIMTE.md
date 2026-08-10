@@ -251,15 +251,40 @@ Klein en omkeerbaar, en elke stap levert op zichzelf iets op.
    sluit een surface. Geen fuzzy zoeken en geen scores: wat je typt staat
    vooraan, daarna wat het bevat. Een palet dat je niet kunt voorspellen, kun
    je ook niet uit je hoofd leren -- en daar bestaat het voor.
-7. **Slepen van objecten** tussen surfaces, met de bevestigingsstap. *Nog niet
-   gebouwd.* Wat er staat (`04-slepen.js`) sleept SURFACES, niet de objecten
-   erin. Dat tweede vraagt dat elke app zegt wat een sleepbaar object is en wat
-   "hier neerzetten" daar betekent -- een afspraak op een dossier is iets
-   anders dan een bestand op een gesprek. Dat is een koppelvlak tussen shell en
-   apps, geen shell-uitbreiding, en dus een eigen stap.
-8. **Rahul schikt de ruimte.** *Nog niet gebouwd.* Hangt aan 7: zonder dat de
-   shell weet welke objecten er in een surface leven, kan Rahul hooguit
-   surfaces verplaatsen -- en dat kan de gebruiker zelf al beter.
+7. ✅ **Slepen van objecten** tussen surfaces, met de bevestigingsstap
+   (`shared/rtg-schil/06b-objecten.js`). Het koppelvlak is een gesprek van vier
+   berichten, alle vier same-origin `postMessage`:
+
+   ```
+   app   -> schil   sleep-start    {object:{soort,id,label,velden}}
+   schil -> app     sleep-kan      "kun jij hier iets mee?"
+   app   -> schil   sleep-kan-ja   {wat:'ik zet er een afspraak van'}
+   schil -> app     sleep-doe      pas NA bevestiging door een mens
+   ```
+
+   **Zwijgen is nee.** Een app die de soort niet kent antwoordt niet, en licht
+   tijdens het slepen dus niet op. **De schil draagt een verwijzing, nooit een
+   dossier**: soort, id, label en een handvol `velden` die de verzender al op
+   het scherm had staan — dezelfde regel als bij Context Linking, en de
+   ontvanger doet de handeling met zijn eigen sessie en zijn eigen rechten.
+
+   Eerste paar dat het doet: **Reizen → Agenda** ("zet deze reis als afspraak").
+   `test/werkruimte-objecten.e2e.js` bewaakt de drie regels die dit een
+   operating environment maken in plaats van een desktop met vensters: loslaten
+   doet niets, annuleren doet niets, en een surface die de soort niet kent is
+   geen doelwit.
+
+   *Wat het bouwen leerde:* zodra de cursor boven een surface hangt, gaan de
+   pointer-events naar dat iframe en ziet de schil de muis niet meer bewegen.
+   Er ligt daarom een doorzichtig vangvlak over de ruimte zolang er gesleept
+   wordt — en alleen dan, want een vlak dat blijft liggen maakt elke app
+   onklikbaar.
+8. **Rahul schikt de ruimte.** *Nog niet gebouwd.* Nu stap 7 er is, kan dit
+   wel: de shell weet welke soorten een surface aankan. Wat er nog niet is, is
+   een reden om het door Rahul te laten doen in plaats van door de gebruiker —
+   surfaces verplaatsen kost een sleep, en een assistent die dat overneemt moet
+   het aantoonbaar beter doen. Eerst een echte werkruimte met vijf apps in
+   dagelijks gebruik; dan pas is te zien wat er te schikken valt.
 
 Stap 2 en 3 zijn de voorwaarde voor de rest: zolang een surface geen shell-gedrag
 erft, bouwt elke app zijn eigen desktop en zijn we terug bij twintig stijlen.

@@ -182,3 +182,40 @@ body.rtg-stijl main.rtg-werkruimte{max-width:none;margin:0;padding:0;}
   border-bottom:1px solid var(--rtg-line,rgba(255,255,255,.09));}
 .rtg-console .bewaar:hover,.rtg-console .bewaar:focus-visible{
   color:var(--gold-tekst,#C0A544);border-bottom-color:var(--gold-tekst,#C0A544);}
+
+/* ------------------------------------------- objecten tussen apps (stap 7) --
+   Tijdens het slepen lichten de surfaces op die er IETS mee kunnen -- en alleen
+   die. Zo weet je waar je heen kunt voordat je loslaat, in plaats van dat je
+   het achteraf ontdekt. Een surface die niet antwoordt blijft donker: zwijgen
+   is nee. */
+.rtg-werkruimte[data-sleept-object] .rtg-surface{transition:opacity var(--rtg-tijd-paneel,180ms) var(--rtg-veer,ease);}
+.rtg-werkruimte[data-sleept-object] .rtg-surface:not([data-kan-vangen]){opacity:.45;}
+.rtg-surface[data-kan-vangen]{outline:1px solid var(--gold-rand,rgba(192,165,68,.52));outline-offset:-1px;}
+.rtg-surface[data-vangt]{outline:2px solid var(--gold-tekst,#C0A544);outline-offset:-2px;}
+
+/* Het vangvlak tijdens een objectsleep. Doorzichtig, maar het vangt de
+   pointer-events die anders in een surface-iframe verdwijnen. Alleen aanwezig
+   zolang er gesleept wordt. */
+.rtg-sleepvangst{position:absolute;inset:0;z-index:70;display:none;cursor:grabbing;}
+.rtg-sleepvangst[data-aan]{display:block;}
+
+/* HET VOORSTEL. Een sleep is een voorstel en geen handeling, dus dit is geen
+   toastje in een hoek maar een vraag in het midden waar je iets mee moet.
+   Bevestigen doet een mens (WERKRUIMTE.md par. 6, CLAUDE.md). */
+.rtg-voorstel{position:absolute;inset:0;z-index:90;display:none;
+  align-items:center;justify-content:center;background:rgba(6,5,5,.55);
+  backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
+.rtg-voorstel[data-aan]{display:flex;}
+.rtg-voorstel .doos{width:min(420px,92%);background:var(--rtg-card,#151312);
+  border:1px solid var(--gold-rand,rgba(192,165,68,.52));border-radius:14px;
+  padding:1.2rem 1.3rem;box-shadow:0 24px 60px rgba(0,0,0,.5);
+  font-family:var(--rtg-interface,Inter,system-ui,sans-serif);}
+.rtg-voorstel .wat{margin:0 0 .4rem;font-size:1rem;line-height:1.35;color:var(--rtg-txt,#F4F0E9);}
+.rtg-voorstel .wie{margin:0 0 1.1rem;font-size:.78rem;line-height:1.45;color:var(--rtg-soft,rgba(244,240,233,.56));}
+.rtg-voorstel .knoppen{display:flex;gap:.6rem;justify-content:flex-end;}
+.rtg-voorstel button{background:none;border:1px solid var(--rtg-line,rgba(255,255,255,.09));
+  border-radius:999px;padding:.45rem 1.1rem;cursor:pointer;font:inherit;font-size:.84rem;
+  color:var(--rtg-txt,#F4F0E9);}
+.rtg-voorstel button.vol{background:var(--rtg-goud,#C0A544);border-color:var(--rtg-goud,#C0A544);
+  color:#1C1608;font-weight:600;}
+.rtg-voorstel button:hover{border-color:var(--gold-tekst,#C0A544);}

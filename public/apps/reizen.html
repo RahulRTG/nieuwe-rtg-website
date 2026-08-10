@@ -134,7 +134,14 @@
     if (x.personen) feiten.push('<span>' + ic(ICO.mens) + x.personen + ' ' +
       (x.personen === 1 ? 'reiziger' : 'reizigers') + '</span>');
     if (x.wacht) feiten.push('<span>' + ic(ICO.pand) + esc(x.wacht.charAt(0).toUpperCase() + x.wacht.slice(1)) + '</span>');
-    return '<a class="reis" href="' + esc(x.link) + '"' + (x.sig ? ' data-sig="' + esc(x.sig) + '"' : '') + '>' +
+    /* SLEEPBAAR (WERKRUIMTE.md par. 6). De gegevens die hieronder in data-*
+       staan, zijn precies wat er in deze regel al op het scherm staat: titel,
+       bestemming en datum. Niets meer -- een verwijzing hoort klein te zijn, en
+       wat de gebruiker hier niet ziet, gaat hier ook niet uit. */
+    return '<a class="reis" href="' + esc(x.link) + '"' + (x.sig ? ' data-sig="' + esc(x.sig) + '"' : '') +
+      ' data-sleep="reis" data-sleep-id="' + esc(x.kenmerk || x.titel || '') + '"' +
+      ' data-sleep-label="' + esc((x.titel || SOORT[x.soort] || 'Reis') + (x.bestemming ? ' naar ' + x.bestemming : '')) + '"' +
+      ' data-sleep-datum="' + esc(x.van || '') + '">' +
       '<span class="stip"></span>' +
       '<span class="doos">' +
         '<span class="dag"><span class="wd">' + esc(d.wd) + '</span>' +
@@ -182,6 +189,41 @@
   $('#poorten').innerHTML = WERELD.map(([naam, uitleg, url, icoon]) =>
     '<a class="poort" href="' + url + '"><span class="ic">' + ic(icoon, 26) + '</span>' +
     '<b>' + esc(naam) + '</b><span>' + esc(uitleg) + '</span></a>').join('');
+
+  /* Een regel oppakken en aan de schil aanbieden. Alleen binnen een surface:
+     buiten de werkruimte is er niets om hem heen te slepen, en dan hoort een
+     regel gewoon een link te blijven. De schil doet de rest -- hij vraagt de
+     andere surfaces of ze er iets mee kunnen, en laat pas iets gebeuren nadat
+     een mens bevestigd heeft. */
+  (function sleepbaar() {
+    let inSchil = false;
+    try { inSchil = window.top !== window.self; } catch (e) { inSchil = false; }
+    if (!inSchil) return;
+    document.addEventListener('pointerdown', (e) => {
+      const a = e.target.closest('[data-sleep]');
+      if (!a) return;
+      let bewogen = false;
+      const x0 = e.clientX, y0 = e.clientY;
+      const beweeg = (m) => {
+        if (bewogen || Math.abs(m.clientX - x0) + Math.abs(m.clientY - y0) < 8) return;
+        bewogen = true;
+        /* Pas bij ECHTE beweging een sleep. Een tik is een tik: wie op een regel
+           drukt om hem te openen, hoort geen voorstel te krijgen. */
+        window.parent.postMessage({ rtg: 'sleep-start', object: {
+          soort: a.dataset.sleep, id: a.dataset.sleepId, label: a.dataset.sleepLabel,
+          velden: { datum: a.dataset.sleepDatum }
+        } }, location.origin);
+      };
+      const los = () => {
+        document.removeEventListener('pointermove', beweeg);
+        document.removeEventListener('pointerup', los);
+        // een sleep is geen klik: de link mag niet ook nog openen
+        if (bewogen) a.addEventListener('click', (c) => c.preventDefault(), { once: true });
+      };
+      document.addEventListener('pointermove', beweeg);
+      document.addEventListener('pointerup', los);
+    });
+  })();
 
   (async function laad() {
     try {

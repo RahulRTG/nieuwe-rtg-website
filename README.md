@@ -2667,6 +2667,42 @@ dat ook; een stap die doet alsof is erger dan een stap die eerlijk is.
 
 Getoetst in `test/werkindienst.test.js` (4). Vier mutaties, alle vier raak.
 
+#### Twee grenzen die in de vorm zitten, niet in een controle
+
+**Herkomst uit een andere RTG-app** (`server/bedrijf/herkomst.js`). "Bus 28 is
+defect" gebeurt in RTG Mobility; het ticket, het project en het contract met de
+leverancier gebeuren hier. Tot nu toe was er geen draad tussen die twee, dus
+stond er hooguit "bus 28" in de vrije tekst — en dat is geen verwijzing maar een
+hoop. Een ticket of taak draagt nu een `rtg://<soort>/<id>`, de vorm die
+`kern/wereld/koppel.js` al kende; er komt geen tweede verwijsvorm naast.
+
+**En de verwijzing wordt nooit opgelost.** Een werkruimtelid is geen RTG-lid —
+dat zijn twee identiteiten, en dat is de regel waar deze hele laag op rust. Er
+reist geen titel, geen status en geen enkel veld van de RTG-kant mee: bewaard en
+getoond worden alleen de soort, het id en welke app hem opent. Wie de inhoud wil
+zien, opent hem met zijn **eigen** RTG-sessie. Was het andersom, dan kon een
+werkgever via zijn werkruimte in RTG-gegevens kijken zonder dat daar ooit een
+deur voor is opengezet.
+
+Onderweg bleek `koppel.ontleed()` twee vragen tegelijk te beantwoorden: is dit
+een geldige verwijzing, én kent dit huis die soort? Voor een ticket over een
+voertuig zijn dat verschillende antwoorden — de verwijzing is geldig, alleen
+heeft `voertuig` hier (nog) geen bestemming. `koppel.vorm()` beantwoordt nu de
+eerste vraag, `ontleed()` doet onveranderd de tweede. Een onbekende soort wordt
+dus **bewaard en niet gegokt**: geen stille link naar de homepage.
+
+**Uw eigen werk** (`server/bedrijf/mijnwerk.js`). "Waar was ik gebleven" is een
+prettige app en, aan de andere kant van dezelfde tafel, een volgsysteem. Dit
+huis trok die grens al bij de kijkplicht, en hier staat hij in de **vorm van de
+route**: er is geen parameter om naar iemand anders te vragen. Geen `lidId`, dus
+geen pad — niet een controle die iemand kan vergeten. Het beheer-token komt er
+ook niet in, juist omdat het alle rechten draagt. En er wordt niets nieuws over
+u vastgelegd: de laag leest het journaal dat de modules zelf al schrijven.
+
+Getoetst in `test/werkgrens.test.js` (6). Vijf mutaties, alle vijf raak — de
+vormcontrole eruit, de verwijzing tóch oplossen, een onbekende soort een gegokte
+pagina geven, het meegestuurde `lidId` wél lezen, en het beheer-token toelaten.
+
 #### "Dit project loopt achter. Waarom?"
 
 `POST /api/bedrijf/project/waarom` (`server/bedrijf/waarom.js`) is de vraag waar

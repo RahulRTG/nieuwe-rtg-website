@@ -44,11 +44,32 @@ const KAART = {
   event:        { app: '/apps/podium.html',  param: 'event',   titel: 'Podium',        deel: true }
 };
 
+/* TWEE VRAGEN, EN ZE ZIJN NIET DEZELFDE.
+
+   `vorm()` zegt of iets een geldige VERWIJZING is: klopt de bouw van
+   `rtg://<soort>/<id>`. `ontleed()` zegt bovendien of DIT HUIS die soort kent
+   -- of er dus een app is om heen te gaan.
+
+   Ze stonden eerst in één functie, en dat viel op zodra de werkruimtelaag een
+   ticket aan iets uit een andere app wilde hangen: een verwijzing naar een
+   soort die hier (nog) geen bestemming heeft, is niet ONGELDIG -- hij is
+   geldig en onbekend, en die twee horen een ander antwoord te krijgen.
+   Weigeren zou de gebruiker dwingen het dan maar in de vrije tekst te zetten,
+   en dan is de draad weg.
+
+   `ontleed()` doet nog precies wat hij deed; wie hem gebruikt merkt niets. */
+const VORM = /^rtg:\/\/([a-z]{3,20})\/([A-Za-z0-9_-]{1,64})$/;
+
+function vorm(ref) {
+  const m = VORM.exec(String(ref || ''));
+  return m ? { soort: m[1], id: m[2] } : null;
+}
+
 // `rtg://salon/ab12` -> { soort: 'salon', id: 'ab12' }, of null als het geen
-// geldige verwijzing is. Bewust streng: alles wat niet past is geen verwijzing.
+// geldige verwijzing is OF als deze soort hier geen bestemming heeft.
 function ontleed(ref) {
-  const m = /^rtg:\/\/([a-z]{3,20})\/([A-Za-z0-9_-]{1,64})$/.exec(String(ref || ''));
-  return m && KAART[m[1]] ? { soort: m[1], id: m[2] } : null;
+  const d = vorm(ref);
+  return d && KAART[d.soort] ? d : null;
 }
 
 /* Waar moet ik heen om dit te openen? Geeft null bij een onbekende verwijzing
@@ -101,4 +122,4 @@ function naarGesprek(codenaam, bij) {
   return url;
 }
 
-module.exports = { KAART, MODUS_LADE, ontleed, open, magDelen, naarGesprek, ladeVoorModus };
+module.exports = { KAART, MODUS_LADE, vorm, ontleed, open, magDelen, naarGesprek, ladeVoorModus };

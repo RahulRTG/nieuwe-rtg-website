@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 859 bestanden en 5387 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 860 bestanden en 5393 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 859 |
-| losse beweringen (`test(...)`) | 5387 |
+| toetsbestanden | 860 |
+| losse beweringen (`test(...)`) | 5393 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 603 |
 | **overleefd**: geen mutatie kreeg hem rood | 13 |
 | niet te meten (al rood, geen module gevonden, ...) | 17 |
 | alleen in de kop *genoemd*, nog niet gemeten | 56 |
-| niets van beide | 170 |
+| niets van beide | 171 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-748 bestanden, 5202 beweringen.
+749 bestanden, 5208 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -746,6 +746,7 @@ toets omvalt.
 | `werkbeleid-dienst.test.js` | 6 | gezakt op `liegpoort /api/` | HET WERKBELEID GELDT TIJDENS JE DIENST, EN NIET IN JE PAUZE. Het werkgeversbeleid kan functies op de pas van een medewerker dichtzetten: geen Salon, geen AI, geen paspoort delen. |
 | `werkgeheugen.test.js` | 7 | -- | HET GEHEUGEN VAN EEN BESLUIT: waarom hebben we dit gedaan, en wat raakte het. Zeven beweringen, en ze gaan allemaal over de vraag wat dit over drie jaar nog waard is: 1. |
 | `werkgezondheid.test.js` | 5 | -- | GEZONDHEID EN DE DAGBRIEFING: één cijfer dat niet liegt. Vijf beweringen, en ze gaan allemaal over de manier waarop zo'n cijfer normaal gesproken onwaar wordt: 1. |
+| `werkgrens.test.js` | 6 | -- | TWEE GRENZEN DIE IN DE VORM ZITTEN, NIET IN EEN CONTROLE. Deze twee lagen zijn allebei gebouwd rond iets wat ze NIET doen, en dat is precies wat hier wordt vastgelegd: HERKOMST (bedrijf/herkomst.js) -- werk dat uit... |
 | `werkindienst.test.js` | 4 | -- | HET INDIENSTPROCES: de stap die het systeem ziet, wordt gemeten. Vijf beweringen, en de eerste is de reden dat deze module bestaat naast zijn spiegel (het uitdienstproces): 1. |
 | `werkmail.test.js` | 5 | gezakt op `liegpoort /api/` | Werkmail: het zakelijke adresboek per zaak boven op RTMAIL. Standaard- adressen voor eigenaar en management, rahul@<bedrijf>.rtg dat zelf terugschrijft, werkgeversbeheer (aanmaken en afpakken), de buitenpost (extern... |
 | `werkplaats-uitgifte.test.js` | 5 | gezakt op `liegpoort /api/` | RTG Werkplaats geeft rechtstreeks uit: een opdracht wordt na het uitwerken als echt onderdeel in de winkel gezet (App Store of Bibliotheek). De overlay leeft in db.data.appbiebExtra en verschijnt bij de leden in de... |

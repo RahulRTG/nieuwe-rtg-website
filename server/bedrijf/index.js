@@ -128,6 +128,10 @@ module.exports = (kern) => {
   require('./aansluiting')(sctx);
   require('./postbrug')(sctx);
   require('./mijn')(sctx);
+  // Herkomst uit een andere RTG-app (verwijzing bewaren, NOOIT oplossen) en
+  // het eigen werk van een lid (geen parameter om naar een ander te vragen).
+  Object.assign(sctx, require('./herkomst')(sctx));
+  require('./mijnwerk')(sctx);
   Object.assign(sctx, require('./beeld')(sctx));
   // Gezondheid en dagbriefing: lezen het directiebeeld, meten zelf niets.
   Object.assign(sctx, require('./gezondheid')(sctx));

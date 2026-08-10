@@ -4,6 +4,9 @@
 module.exports = [
 
   // ---- sociaal & contact ----
+  /* RTG Sociaal is laag 2 (PLATFORM.md): hij ORKESTREERT Berichten, De Salon,
+     Genootschap, Pulse en de rest, en vervangt ze niet. */
+  ['sociaal', 'RTG Sociaal', 'sociaal', '/apps/sociaal.html', 'Wat er tussen u en de mensen om u heen speelt -- gesprekken die op antwoord wachten, aanstaande bijeenkomsten, en wat er in uw kring geplaatst is. Praten en plaatsen blijft in de app die het echte werk doet.'],
   ['berichten', 'Berichten', 'sociaal', '/apps/comm.html', 'Alle gesprekken van het platform op een plek -- mensen, zaken, onderweg, officieel -- met bellen en videobellen in de kop van het gesprek. Rahul vat samen, stelt een antwoord op en haalt de afspraken eruit.'],
   ['salon', 'De Salon', 'sociaal', '/apps/salon.html', 'Het besloten sociale netwerk van RTG: zelf plaatsen met foto\'s en onderwerpen, leden volgen, bewaren en reageren. Rahul schrijft een bijschrift mee en vat de reacties samen.'],
   ['genootschap', 'Genootschap', 'sociaal', '/apps/genootschap.html', 'Besloten groepen met een prikbord, peilingen en bijeenkomsten. Geheim is echt geheim, en er is geen enkele groeitruc.'],

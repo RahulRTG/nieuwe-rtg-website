@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Sociaal</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<!-- de vormtaal van een wereldscherm; dezelfde als RTG Reizen, en met opzet
+     uit een gedeeld blad in plaats van overgetikt (LAT.md regel 4) -->
+<link href="/shared/rtg-wereld.css" rel="stylesheet">
+<style>
+  /* Wat alleen van DIT scherm is. De rest komt uit rtg-wereld.css; komt hier
+     iets te staan dat ook voor Reizen geldt, dan hoort het daar en niet hier. */
+  /* Een kantoorregel heeft geen bestemming maar wel een tijd. De datumkolom
+     draagt daarom het uur in plaats van de maand wanneer het vandaag is. */
+  .dag .uur{display:block;margin-top:.1rem;font-size:.66rem;letter-spacing:.1em;
+    color:var(--rtg-soft);font-variant-numeric:var(--rtg-cijfers);}
+  .kern .open{font-variant-numeric:var(--rtg-cijfers);}
+</style>
+</head>
+<body class="rtg-stijl" data-rtg-modus="pro">
+<a class="skip" href="#inhoud">Naar de inhoud</a>
+
+<!-- RTG Sociaal ORKESTREERT de kantoordomeinen en vervangt ze niet
+     (PLATFORM.md). Berichten, De Salon, Genootschap, Pulse, Vonk, Meet en
+     Attenties houden elk hun eigen kern, hun eigen opslag en hun eigen werkstroom. Op de toetsvraag
+     "zelfstandige capability of tweede ingang naar dezelfde?" is het antwoord
+     bij alle het eerste -- dus smelt hier niets samen. (Cercle en Entourage
+     lijken wel twee ingangen naar dezelfde kring; dat is het volgende
+     onderzoek en staat opgeschreven in kern/socialewereld.js.)
+
+     Daarom staat er op dit scherm geen knop die iets maakt, wijzigt of
+     verwijdert: elke regel is een weg naar de app die het echte werk doet.
+     Zou dit scherm ook opslaan, dan bestaat een taak op twee plekken
+     (LAT.md regel 4). -->
+
+<main id="inhoud">
+  <header class="merkkop">
+    <h1 class="rtg-ceremonie">RTG Sociaal</h1>
+  </header>
+
+  <a class="balk" id="balk" href="#kring" data-rustig>
+    <span class="teken" id="balkTeken"></span>
+    <span>
+      <span class="kop" id="balkKop">Laden</span>
+      <span class="zin rtg-ceremonie" id="balkZin">&nbsp;</span>
+    </span>
+    <span class="pijl" aria-hidden="true">&rsaquo;</span>
+  </a>
+
+  <div id="stilte"></div>
+
+  <div class="regkop">
+    <h2>Uw kring</h2>
+    <span class="tel" id="tel"></span>
+  </div>
+  <div id="kring"><p class="stil">Laden...</p></div>
+
+  <div class="regkop"><h2>De sociale wereld</h2></div>
+  <div class="poorten" id="poorten"></div>
+</main>
+
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g,
+    c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+  const token = () => { try { return localStorage.getItem('rtg_member_token'); } catch (e) { return null; } };
+  const SOORT = { gesprek: 'Gesprek', bijeenkomst: 'Bijeenkomst', bericht: 'Bericht' };
+
+  /* Eén iconenset, 24x24 grid, één lijndikte (ONTWERP.md par. 13). Inline SVG
+     en geen emoji: beeld komt uit de eigen set, en een emoji ziet er op elk
+     toestel anders uit. */
+  const ic = (d, n) => '<svg width="' + (n || 16) + '" height="' + (n || 16) + '" viewBox="0 0 24 24" ' +
+    'fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" ' +
+    'stroke-linejoin="round" aria-hidden="true">' + d + '</svg>';
+  const ICO = {
+    bel:  '<path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/>',
+    vink: '<path d="M20 6 9 17l-5-5"/>',
+    klok: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    lijst:'<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',
+    blad: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/>',
+    map:  '<path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.6-.8L9.4 3.8A2 2 0 0 0 7.8 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/>',
+    mens: '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>'
+  };
+
+  /* De vier specialisten. Dit is de kern van de super-app-regel: hier staan
+     LINKS naar volwaardige producten, geen vervangingen ervan. */
+  const WERELD = [
+    ['Berichten', 'Alle gesprekken op een plek', '/apps/comm.html', ICO.lijst],
+    ['De Salon', 'Het besloten netwerk van RTG', '/apps/salon.html', ICO.blad],
+    ['Genootschap', 'Groepen en bijeenkomsten', '/apps/genootschap.html', ICO.mens],
+    ['Pulse', 'De dag in uw kring, rustig gebundeld', '/apps/pulse.html', ICO.klok]
+  ];
+
+  const WD = ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag'];
+  const MND = ['jan', 'feb', 'mrt', 'apr', 'mei', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
+  const VANDAAG = new Date().toISOString().slice(0, 10);
+  function dagdeel(d) {
+    if (!d) return null;
+    const x = new Date(d + 'T00:00:00');
+    if (isNaN(x)) return { wd: '', nr: d, mnd: '' };
+    // twee cijfers, want 06 en 29 horen in een kolom even breed te zijn
+    return { wd: WD[x.getDay()], nr: String(x.getDate()).padStart(2, '0'), mnd: MND[x.getMonth()] };
+  }
+
+  function tekenBalk(t) {
+    /* Wachten is geen aandacht. Drie documenten die bij een ander liggen is de
+       normale gang van zaken; daar een alarmbalk boven zetten is loos alarm, en
+       loos alarm leert mensen de balk te negeren op de dag dat hij wel klopt.
+       Exact dezelfde afweging als in RTG Reizen, en met opzet dezelfde. */
+    const alarm = t.aandacht + t.onbekend;
+    const b = $('#balk');
+    if (alarm) {
+      b.removeAttribute('data-rustig');
+      $('#balkTeken').innerHTML = ic(ICO.bel, 22);
+      $('#balkKop').textContent = 'Er vraagt iets aandacht';
+      const s = [];
+      if (t.aandacht) s.push(t.aandacht + ' ' + (t.aandacht === 1 ? 'vraagt' : 'vragen') + ' actie');
+      if (t.onbekend) s.push(t.onbekend + ' met onbekende status');
+      $('#balkZin').textContent = s.join(', ');
+      return;
+    }
+    b.setAttribute('data-rustig', '');
+    $('#balkTeken').innerHTML = ic(ICO.vink, 22);
+    $('#balkKop').textContent = t.regels ? 'Er speelt iets' : 'Niets openstaand';
+    $('#balkZin').textContent = t.wachtend
+      ? t.wachtend + ' ' + (t.wachtend === 1 ? 'ligt' : 'liggen') + ' bij een ander'
+      : (t.regels ? 'geen actie nodig' : 'een rustige kring');
+  }
+
+  function werkRegel(x) {
+    const d = dagdeel(x.wanneer);
+    const feiten = [];
+    // alleen tonen wat het domein echt weet; niets verzinnen
+    if (x.open) feiten.push('<span class="open">' + ic(ICO.lijst) + x.open + ' ongelezen</span>');
+    if (x.door) feiten.push('<span>' + ic(ICO.mens) + esc(x.door) + '</span>');
+    return '<a class="reis" href="' + esc(x.link) + '"' + (x.sig ? ' data-sig="' + esc(x.sig) + '"' : '') + '>' +
+      '<span class="stip"></span>' +
+      '<span class="doos">' +
+        '<span class="dag">' + (d
+          ? '<span class="wd">' + esc(d.wd) + '</span>' +
+            '<span class="nr rtg-datum">' + esc(d.nr) + '</span>' +
+            (x.wanneer === VANDAAG && x.tijd
+              ? '<span class="uur">' + esc(x.tijd) + '</span>'
+              : '<span class="mnd">' + esc(d.mnd) + '</span>')
+          /* Geen datum is geen "vandaag". Een document zonder wijzigingsdatum
+             krijgt daarom een streep en geen verzonnen dag. */
+          : '<span class="mnd">&mdash;</span>') + '</span>' +
+        '<span class="kern">' +
+          '<h3>' + esc(x.titel || SOORT[x.soort] || 'Regel') + '</h3>' +
+          (x.status ? '<span class="status"><span class="rtg-status"' +
+            (x.sig ? ' data-sig="' + esc(x.sig) + '"' : '') +
+            ' data-teken="' + esc(x.teken || '·') + '">' + esc(x.status) + '</span></span>' : '') +
+          (feiten.length ? '<span class="feiten">' + feiten.join('<span aria-hidden="true">·</span>') + '</span>' : '') +
+          '<span class="onder">' +
+            (x.kenmerk ? '<button class="rtg-ref" type="button" data-ref="' + esc(x.kenmerk) +
+              '" title="Kopieer kenmerk">' + esc(x.kenmerk) + '</button>' : '') +
+            '<span class="bron">' + esc(x.app) + '</span>' +
+          '</span>' +
+        '</span>' +
+      '</span>' +
+      '<span class="pijl" aria-hidden="true">&rsaquo;</span>' +
+    '</a>';
+  }
+
+  function teken(d) {
+    tekenBalk(d.telling || {});
+    const r = d.regels || [];
+    $('#tel').textContent = r.length ? r.length + (r.length === 1 ? ' regel' : ' regels') : '';
+    $('#kring').innerHTML = r.length
+      ? r.map(werkRegel).join('')
+      : '<p class="stil">Er wacht niemand op u. Wat er in Berichten, Genootschap of Pulse speelt, komt hier vanzelf te staan.</p>';
+
+    /* EERLIJK OVER WAT ER NIET GEMETEN IS. Een leeg kantoorbeeld dat eigenlijk
+       een storing is, laat iemand een vergadering missen. Zwijgen zou hier de
+       ergste keuze zijn, dus het staat er hardop. */
+    $('#stilte').innerHTML = (d.stil || []).length
+      ? '<p class="stil">Niet opgehaald: ' + esc((d.stil || []).join(', ')) +
+        '. Dit beeld is dus niet compleet.</p>'
+      : '';
+
+    $('#poorten').innerHTML = WERELD.map(([n, z, h, i]) =>
+      '<a class="poort" href="' + h + '"><span class="ic">' + ic(i, 22) + '</span>' +
+      '<b>' + esc(n) + '</b><span>' + esc(z) + '</span></a>').join('');
+  }
+
+  // klikken op een kenmerk kopieert het (ONTWERP.md: de referentie is wat een
+  // professional zoekt, dus hij staat er en is met een klik mee te nemen)
+  document.addEventListener('click', (e) => {
+    const b = e.target.closest('.rtg-ref');
+    if (!b) return;
+    e.preventDefault();
+    try {
+      navigator.clipboard.writeText(b.dataset.ref);
+      const oud = b.textContent; b.textContent = 'gekopieerd';
+      setTimeout(() => { b.textContent = oud; }, 1200);
+    } catch (err) {}
+  });
+
+  (async function laad() {
+    try {
+      const res = await fetch('/api/sociaal/wereld', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (token() || '') },
+        body: '{}'
+      });
+      const d = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(d.error || 'Er ging iets mis.');
+      teken(d);
+    } catch (e) {
+      $('#balkKop').textContent = 'Niet ingelogd';
+      $('#balkZin').textContent = '';
+      $('#kring').innerHTML = '<p class="stil">' + esc(e.message) + ' Log eerst in via de leden-app.</p>';
+      $('#poorten').innerHTML = WERELD.map(([n, z, h, i]) =>
+        '<a class="poort" href="' + h + '"><span class="ic">' + ic(i, 22) + '</span>' +
+        '<b>' + esc(n) + '</b><span>' + esc(z) + '</span></a>').join('');
+    }
+  })();
+})();
+</script>
+<script src="/shared/deelmenu.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
+<script src="/shared/ios.js" defer></script>
+</body>
+</html>

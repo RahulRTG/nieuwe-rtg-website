@@ -94,11 +94,37 @@ aanroepen. Wat dat opleverde:
 | Communicatie | `apps/comm.html` | **staat** (was een terechte samensmelting) |
 | Veiligheid | `apps/veilig.html` | **staat** (was een terechte samensmelting) |
 | Werk | `apps/werk.html` | **staat** — voor organisaties |
-| Office | — | **ontbreekt** |
-| Reizen | — | **ontbreekt** (consumentenkant; het Privékantoor dekt alleen de premium-kant) |
-| Social | — | **ontbreekt** |
-| Games | — | **ontbreekt** |
+| Office | `apps/kantoor.html` op `kern/kantoorwereld.js` | **staat** — agenda, taken, documenten en gedeelde bestanden |
+| Reizen | `apps/reizen.html` op `kern/reiswereld.js` | **staat** — vlucht, verblijf, reis en charter |
+| Social | `apps/sociaal.html` op `kern/socialewereld.js` | **staat** — gesprekken, bijeenkomsten, de kring |
+| Games | — | **met opzet niet gebouwd**, zie hieronder |
 | Mall | — | **ontbreekt** (`apps/mall.html` bestaat en staat niet in de bibliotheek) |
+
+### Games krijgt géén superapp, en dat is de regel die werkt
+
+Bij het bouwen van de drie werelden hierboven kwam Games ook aan de beurt, en
+daar bleef de teller op **één** staan: `apps/spelen.html`, op `kern/spellen/`.
+Eén specialist.
+
+Een genre-superapp bestaat om meerdere specialisten te verbinden. Boven één
+app is er niets te verbinden: dan bouw je een scherm dat een lijst met één
+regel toont en doorlinkt naar de app die de gebruiker toch al open had. Dat is
+geen laag maar een omweg — en precies het soort scherm waar de super-app-regel
+tegen beschermt, alleen dan van de andere kant.
+
+Dus: geen `apps/games.html` tot er een tweede zelfstandige spel-capability
+staat. Komt die er (een eigen arcade-kern naast de bordspellen bijvoorbeeld),
+dan is dit het moment om de vraag opnieuw te stellen. Opgeschreven als besluit
+en niet als achterstand, zodat niemand het later voor vergeten aanziet.
+
+### Wat wél nog een echte vraag is: Cercle en Entourage
+
+Cercle heet "je besloten kring: de mensen die dichtbij staan" en Entourage "je
+vaste mensen en hun rol om je heen". Dat zijn twee beschrijvingen van
+hetzelfde, en dan is dit precies het geval waarin samenvoegen wél mag. Maar
+vaststellen dat twee apps dezelfde kern, data én workflow dupliceren vraagt een
+blik in allebei die kernen; samenvoegen op een vermoeden is wat de regel
+verbiedt. Staat dus als volgend onderzoek, niet als uitgevoerde keuze.
 
 Twee waarschuwingen bij die meting, zodat niemand haar sterker leest dan ze is.
 Ze kijkt naar **links en routes**, dus een laag die zijn domeinen via de server

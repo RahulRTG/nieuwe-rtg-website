@@ -143,4 +143,8 @@ Object.assign(kern, require('../kern/reiswereld').maakReiswereld({ kern }));
    bezit niets en schrijft nooit; werken doet u in de specialist. Dezelfde
    late lezing van de kern om dezelfde reden. */
 Object.assign(kern, require('../kern/kantoorwereld').maakKantoorwereld({ kern }));
+/* RTG Sociaal (kern/socialewereld.js): dezelfde laag over de sociale wereld --
+   gesprekken die op antwoord wachten, aanstaande bijeenkomsten, en wat er in
+   uw kring geplaatst is. Ook deze bezit niets en schrijft nooit. */
+Object.assign(kern, require('../kern/socialewereld').maakSocialeWereld({ kern }));
 };

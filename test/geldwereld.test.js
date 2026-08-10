@@ -112,7 +112,11 @@ test('elke toestand die deze laag kan maken, kent hij ook', () => {
   assert.equal(r.telling.onbekend, 0);
 });
 
-test('de vier werelden spreken dezelfde taal', () => {
+/* De naam van deze toets beloofde vier werelden en keek er naar EEN. Wat hij
+   echt meet is de vorm van geldwereld zelf, en dat is nuttig -- dus heet hij
+   nu zo. De vier werelden worden vergeleken in test/wereldkern.test.js, waar
+   ze alle vier geladen worden. */
+test('de vorm van deze laag: precies de vijf velden die het scherm verwacht', () => {
   const r = wereld().stand('k');
   assert.deepEqual(Object.keys(r).sort(), ['bronnen', 'ok', 'regels', 'stil', 'telling']);
   assert.deepEqual(Object.keys(r.telling).sort(),

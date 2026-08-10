@@ -18,6 +18,18 @@
    waar je op wilt bouwen. */
 module.exports.maakReiswereld = ({ kern }) => {
 
+  /* De grammatica van een wereld staat op EEN plek (kern/wereldkern.js): de
+     vier signalen, hun volgorde, en het vangnet dat een stukke bron meldt
+     zonder de rest mee te nemen. Die stonden hier als eigen kopie -- in alle
+     vier de werelden letterlijk hetzelfde -- en dan bedoelt de eerste die er
+     een verandert iets anders met hetzelfde woord (LAT.md regel 4).
+
+     Het WOORDENBOEK blijft hier: welke statussen deze wereld kent, weet
+     alleen deze wereld. En het sorteren en tellen ook, want die VERSCHILLEN
+     per wereld met reden; ze samenvoegen zou van vier werelden een grijze
+     middelmaat maken (zie het waarom in wereldkern.js). */
+  const { RANG, bron, betekenisVan } = require('./wereldkern');
+
   const dag = (d) => String(d || '').slice(0, 10);
   const vandaag = () => new Date().toISOString().slice(0, 10);
 
@@ -45,10 +57,14 @@ module.exports.maakReiswereld = ({ kern }) => {
     afgewezen:   { sig: 'incident', teken: '!' },
     vertraagd:   { sig: 'aandacht', teken: '!' }
   };
+  /* Door de poort: betekenisVan weigert een status die een signaal noemt
+     dat niet bestaat. Zonder die controle gaf een onbekend signaal stil NaN
+     in de vergelijking en sorteerde de hele rij gewoon niet. */
+  const betekenis = betekenisVan(BETEKENIS);
 
   const regel = (soort, o) => {
     const st = String(o.status || '').toLowerCase();
-    const b = BETEKENIS[st] || {};
+    const b = betekenis(st);
     return {
       soort, titel: o.titel || '', bestemming: o.bestemming || '',
       van: dag(o.van), tot: dag(o.tot) || null, status: o.status || '',
@@ -67,10 +83,6 @@ module.exports.maakReiswereld = ({ kern }) => {
      reizen toont, is erger dan een die zegt dat hij het niet weet: de eerste
      lijkt compleet. Vandaar per bron een eigen uitkomst, en een lijst `stil`
      met wat er niet opgehaald kon worden. */
-  function bron(naam, fn, uit, stil) {
-    try { for (const r of fn() || []) uit.push(r); }
-    catch (e) { stil.push(naam); }
-  }
 
   function komend(key) {
     const uit = [], stil = [];

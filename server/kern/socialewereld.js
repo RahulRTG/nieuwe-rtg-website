@@ -31,6 +31,18 @@
    kern/kantoorwereld.js. */
 module.exports.maakSocialeWereld = ({ kern }) => {
 
+  /* De grammatica van een wereld staat op EEN plek (kern/wereldkern.js): de
+     vier signalen, hun volgorde, en het vangnet dat een stukke bron meldt
+     zonder de rest mee te nemen. Die stonden hier als eigen kopie -- in alle
+     vier de werelden letterlijk hetzelfde -- en dan bedoelt de eerste die er
+     een verandert iets anders met hetzelfde woord (LAT.md regel 4).
+
+     Het WOORDENBOEK blijft hier: welke statussen deze wereld kent, weet
+     alleen deze wereld. En het sorteren en tellen ook, want die VERSCHILLEN
+     per wereld met reden; ze samenvoegen zou van vier werelden een grijze
+     middelmaat maken (zie het waarom in wereldkern.js). */
+  const { RANG, bron, betekenisVan } = require('./wereldkern');
+
   const dag = (d) => String(d || '').slice(0, 10);
   const vandaag = () => new Date().toISOString().slice(0, 10);
 
@@ -44,10 +56,14 @@ module.exports.maakSocialeWereld = ({ kern }) => {
     gedeeld:   { sig: 'actief', teken: '◷', wacht: 'de ander' },
     rustig:    { sig: 'gezond', teken: '✓' }
   };
+  /* Door de poort: betekenisVan weigert een status die een signaal noemt
+     dat niet bestaat. Zonder die controle gaf een onbekend signaal stil NaN
+     in de vergelijking en sorteerde de hele rij gewoon niet. */
+  const betekenis = betekenisVan(BETEKENIS);
 
   const regel = (soort, o) => {
     const st = String(o.status || '').toLowerCase();
-    const b = BETEKENIS[st] || {};
+    const b = betekenis(st);
     return {
       soort, titel: o.titel || '', wanneer: dag(o.wanneer) || null,
       tijd: o.tijd || null, status: o.status || '',
@@ -61,10 +77,6 @@ module.exports.maakSocialeWereld = ({ kern }) => {
   /* Een bron die stukgaat mag de andere niet meenemen, en mag ook niet stil
      verdwijnen. Een sociaal beeld dat na een storing twee van de drie bronnen
      toont, lijkt compleet -- en dan blijft iemand onbeantwoord. */
-  function bron(naam, fn, uit, stil) {
-    try { for (const r of fn() || []) uit.push(r); }
-    catch (e) { stil.push(naam); }
-  }
 
   function kring(key) {
     const uit = [], stil = [];
@@ -103,9 +115,8 @@ module.exports.maakSocialeWereld = ({ kern }) => {
 
     /* Wat op u wacht bovenaan, daarna op tijd. Dezelfde rangorde als de andere
        twee werelden. */
-    const rang = { incident: 0, aandacht: 1, actief: 2, gezond: 3, '': 4 };
     const regels = uit.sort((a, b) =>
-      (rang[a.sig] - rang[b.sig]) ||
+      (RANG[a.sig] - RANG[b.sig]) ||
       String(a.wanneer || '9999').localeCompare(String(b.wanneer || '9999')) ||
       String(a.tijd || '').localeCompare(String(b.tijd || '')));
 

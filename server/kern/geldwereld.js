@@ -17,6 +17,18 @@
    woorden voor de toestanden. De kern wordt LAAT gelezen, om dezelfde reden. */
 module.exports.maakGeldwereld = ({ kern }) => {
 
+  /* De grammatica van een wereld staat op EEN plek (kern/wereldkern.js): de
+     vier signalen, hun volgorde, en het vangnet dat een stukke bron meldt
+     zonder de rest mee te nemen. Die stonden hier als eigen kopie -- in alle
+     vier de werelden letterlijk hetzelfde -- en dan bedoelt de eerste die er
+     een verandert iets anders met hetzelfde woord (LAT.md regel 4).
+
+     Het WOORDENBOEK blijft hier: welke statussen deze wereld kent, weet
+     alleen deze wereld. En het sorteren en tellen ook, want die VERSCHILLEN
+     per wereld met reden; ze samenvoegen zou van vier werelden een grijze
+     middelmaat maken (zie het waarom in wereldkern.js). */
+  const { RANG, bron, betekenisVan } = require('./wereldkern');
+
   const vandaag = () => new Date().toISOString().slice(0, 10);
 
   const BETEKENIS = {
@@ -26,10 +38,14 @@ module.exports.maakGeldwereld = ({ kern }) => {
     gedeeld:   { sig: 'actief', teken: '◷', wacht: 'de ander' },
     rustig:    { sig: 'gezond', teken: '✓' }
   };
+  /* Door de poort: betekenisVan weigert een status die een signaal noemt
+     dat niet bestaat. Zonder die controle gaf een onbekend signaal stil NaN
+     in de vergelijking en sorteerde de hele rij gewoon niet. */
+  const betekenis = betekenisVan(BETEKENIS);
 
   const regel = (soort, o) => {
     const st = String(o.status || '').toLowerCase();
-    const b = BETEKENIS[st] || {};
+    const b = betekenis(st);
     return {
       soort, titel: o.titel || '', wanneer: o.wanneer || null,
       status: o.status || '',
@@ -50,10 +66,6 @@ module.exports.maakGeldwereld = ({ kern }) => {
      verdwijnen. Bij geld weegt dat het zwaarst van alle werelden: een
      geldbeeld zonder de openstaande verrekeningen LIJKT gezond, en dan doet
      iemand een uitgave die hij niet had gedaan. */
-  function bron(naam, fn, uit, stil) {
-    try { for (const r of fn() || []) uit.push(r); }
-    catch (e) { stil.push(naam); }
-  }
 
   function stand(key) {
     const uit = [], stil = [];
@@ -100,9 +112,8 @@ module.exports.maakGeldwereld = ({ kern }) => {
         }));
     }, uit, stil);
 
-    const rang = { incident: 0, aandacht: 1, actief: 2, gezond: 3, '': 4 };
     const regels = uit.sort((a, b) =>
-      (rang[a.sig] - rang[b.sig]) ||
+      (RANG[a.sig] - RANG[b.sig]) ||
       String(a.wanneer || '9999').localeCompare(String(b.wanneer || '9999')));
 
     const telling = {

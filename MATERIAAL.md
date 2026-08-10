@@ -13,6 +13,36 @@ zelfverzekerd.
 
 ---
 
+## De ankers komen uit het logo
+
+Goud is **`#857007`** en bordeaux is **`#7F1634`** — precies zoals ze in
+`CLAUDE.md` staan en precies zoals ze in het beeldmerk zitten.
+
+Een eerdere versie van dit bestand had ze **verzonnen** uit de beschrijving: een
+champagne `#B99A55` en een wijn `#3D0F1E` die nergens op sloegen behalve op mijn
+eigen idee ervan. Dat is precies de fout die `CLAUDE.md` verbiedt — de kleuren
+komen exact uit het logo en veranderen niet zonder opdracht.
+
+Wat de materialenleer wél toevoegt is **het licht**. De logotoon is de kleur van
+het materiaal in rust; de glans zet daar een lichtere en een donkerdere toon
+omheen. Champagne is dus geen andere kleur maar hetzelfde goud waar licht op
+valt, en fluweel is hetzelfde bordeaux in de schaduw.
+
+Twee metingen die dat bevestigen, en die de beschrijving en het merk laten
+samenvallen:
+
+| | helderheid | |
+|---|---|---|
+| logo-bordeaux `#7F1634` | **56,8** | al donker genoeg voor fluweel — donkerder dan het "vrij rode" dat het leek |
+| logo-goud `#857007` | **106** | diep olijfgoud |
+| internet-goud `#FFD700` | 202 | glitter |
+
+*Handhaving:* `test/materiaal.test.js` eist die twee tonen letterlijk. Zonder die
+ankertoets drijft een materiaal langzaam weg van het beeldmerk zonder dat iemand
+het merkt — wat dus ook precies gebeurd was.
+
+---
+
 ## De vijf materialen
 
 Elk materiaal wordt beschreven als **materiaal · licht · gevoel**, en pas daarna

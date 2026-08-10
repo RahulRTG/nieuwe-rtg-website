@@ -68,11 +68,31 @@ test('Gold is mat champagne, geen internet-goud', () => {
      puur geel, dus blauw niet op nul) en de basis mag niet uitgeblazen zijn. */
   var c = hex('gold-basis');
   assert.ok(c.r > c.g && c.g > c.b, 'goud loopt warm af: rood > groen > blauw');
-  assert.ok(c.b > 40, 'goud met bijna geen blauw is puur geel en dus glitter (' + c.hex + ')');
-  assert.ok(c.r < 230, 'een uitgeblazen goud is een spiegel; dit hoort mat te zijn (' + c.hex + ')');
+  /* Op HELDERHEID en niet op het blauwkanaal. De eerste versie van deze toets
+     eiste blauw > 40 "want anders is het puur geel", en dat zou de echte
+     logotoon #857007 (blauw = 7) hebben afgekeurd terwijl die juist de norm is.
+     Wat glitter van geborsteld goud onderscheidt is licht: #FFD700 heeft
+     helderheid 202, het logogoud 106. Een regel die het merk afkeurt is geen
+     regel maar een fout. */
+  var licht = (c.r * 299 + c.g * 587 + c.b * 114) / 1000;
+  assert.ok(licht < 160, 'goud met helderheid ' + Math.round(licht) +
+    ' is internet-goud (' + c.hex + '); geborsteld champagne blijft mat en diep');
   // geborsteld metaal heeft EEN lichtrichting: drie stops, niet tien
   var tonen = glansTonen('gold');
   assert.ok(tonen.length <= 3, 'meer dan drie lichtpunten maakt van geborsteld goud glitter');
+});
+
+/* DE ANKERTOETS. Zonder deze kan een materiaal langzaam wegdrijven van het
+   beeldmerk zonder dat iemand het merkt -- en dat is precies wat er gebeurd was:
+   een verzonnen champagne en een verzonnen wijn stonden er een commit lang in.
+
+   DE MUTATIE DIE HEM HOORT TE LATEN ZAKKEN: zet --gold-basis terug op #B99A55.
+   Dat ziet er prima uit, haalt alle andere toetsen, en is niet het logo. */
+test('goud en bordeaux zijn EXACT de tonen uit het logo', () => {
+  assert.equal(hex('gold-basis').hex.toUpperCase(), '#857007',
+    'de goudtoon hoort exact het logogoud te zijn (CLAUDE.md: kleuren komen uit het logo)');
+  assert.equal(hex('bordeaux-basis').hex.toUpperCase(), '#7F1634',
+    'de bordeauxtoon hoort exact het logobordeaux te zijn');
 });
 
 test('Bordeaux is fluweel: het absorbeert licht', () => {

@@ -9,7 +9,19 @@
 
    Deze laag komt NA rtg-ui.css en rtg-ontwerp.css. Hij zet de bestaande
    merktokens niet opnieuw -- die blijven waar ze wonen (LAT.md regel 4) -- maar
-   voegt toe waar die geen antwoord op hebben: waarvan een vlak gemaakt is. */
+   voegt toe waar die geen antwoord op hebben: waarvan een vlak gemaakt is.
+
+   DE ANKERS KOMEN UIT HET LOGO. Goud is #857007 en bordeaux is #7F1634, precies
+   zoals ze in CLAUDE.md staan en precies zoals ze in het beeldmerk zitten. Een
+   eerdere versie van dit blad had ze VERZONNEN uit de beschrijving -- een
+   champagne #B99A55 en een wijn #3D0F1E die nergens op sloegen behalve op mijn
+   eigen idee ervan. Dat is precies de fout die CLAUDE.md verbiedt: de kleuren
+   komen exact uit het logo en veranderen niet zonder opdracht.
+
+   Wat de materialenleer WEL toevoegt is het licht. De logotoon is de kleur van
+   het materiaal in rust; de glans zet daar een lichtere en een donkerdere toon
+   omheen. Champagne is dus geen andere kleur maar hetzelfde goud waar licht op
+   valt, en fluweel is hetzelfde bordeaux in de schaduw. */
 
 :root{
   /* ---- Pearl: gepolijst keramiek, levend wit ----------------------------
@@ -24,10 +36,10 @@
   /* ---- Gold: 18 karaat geborsteld champagnegoud -------------------------
      Mat en diep, geen spiegel en geen glitter. Het verloop heeft EEN
      lichtrichting: geborsteld metaal heeft er een, glitter heeft er tien. */
-  --gold-basis:#B99A55;
-  --gold-diep:#8E7439;
-  --gold-glans:linear-gradient(145deg,#D6BC82 0%,#B99A55 52%,#8E7439 100%);
-  --gold-rand:rgba(214,188,130,0.55);
+  --gold-basis:#857007;        /* EXACT de goudtoon uit het logo */
+  --gold-diep:#5E4F05;
+  --gold-glans:linear-gradient(145deg,#C0A544 0%,#857007 52%,#5E4F05 100%);
+  --gold-rand:rgba(192,165,68,0.52);
   --op-gold:#171308;
 
   /* ---- Onyx: pianolak ---------------------------------------------------
@@ -43,10 +55,10 @@
      ABSORBEERT licht. Bijna zwart tot er licht op valt; dan pas zie je rood.
      Daarom is de basis fors donkerder dan het oude accent (#C23A5E was rood,
      dit is wijn). */
-  --bordeaux-basis:#3D0F1E;
-  --bordeaux-diep:#240A13;
-  --bordeaux-glans:linear-gradient(155deg,#5A1A2C 0%,#3D0F1E 55%,#240A13 100%);
-  --bordeaux-rand:rgba(122,32,58,0.42);
+  --bordeaux-basis:#7F1634;    /* EXACT de bordeauxtoon uit het logo */
+  --bordeaux-diep:#4A0C1E;
+  --bordeaux-glans:linear-gradient(155deg,#9E1C40 0%,#7F1634 52%,#4A0C1E 100%);
+  --bordeaux-rand:rgba(158,28,64,0.45);
   --op-bordeaux:#F4F0E9;
 
   /* ---- Royal: satijn ----------------------------------------------------

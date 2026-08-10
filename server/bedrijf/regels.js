@@ -1,95 +1,107 @@
-/* RTG Werk OS (deellaag): bedrijfsregels -- beleid dat iets tegenhoudt.
+/* RTG Werk OS (deellaag): bedrijfsregels -- het REGISTER.
 
    "Contract boven 50.000 euro? Dan moet juridisch er altijd naar kijken en de
    CFO tekenen." Dat soort afspraken stond in dit huis nergens: het waren
    gewoontes, en een gewoonte is precies zo sterk als de drukste dag.
 
-   DE HELE ONTWERPREGEL: EEN REGEL DIE NIETS TEGENHOUDT IS THEATER. Daarom kun
-   je hier alleen een regel maken voor een soort waar in de code ook echt een
-   plek is die hem afdwingt. Een regel voor "project" wordt GEWEIGERD zolang er
-   geen moment is waarop hij iets kan blokkeren -- met de reden erbij. Een
-   beleidsscherm vol regels die nergens langskomen, is erger dan geen
-   beleidsscherm: het leest als bewaking.
+   DE HELE ONTWERPREGEL: EEN REGEL DIE NIETS TEGENHOUDT IS THEATER. Je kunt hier
+   alleen een regel maken voor een soort waar in de code ook echt een plek is die
+   hem afdwingt. Een regel voor "project" wordt GEWEIGERD zolang er geen moment
+   is waarop hij iets kan blokkeren -- met de reden erbij. Een beleidsscherm vol
+   regels die nergens langskomen is erger dan geen beleidsscherm: het leest als
+   bewaking die er niet is.
 
-   VANDAAG IS DAT EEN PLEK: het activeren van een contract. Dat staat hieronder
-   als AFGEDWONGEN en niet als proza, en het antwoord van /regels noemt hem.
+   TWEE PLEKKEN, EN ZE HOUDEN VERSCHILLEND TEGEN. Dat verschil staat in de tabel
+   hieronder en niet in een handleiding, want het is het enige wat een lezer moet
+   weten om te snappen wat zijn regel doet:
 
-   WAT EEN REGEL WEL EN NIET TOEVOEGT. Twee handtekeningen (wij en wederpartij)
-   waren er al en zijn structureel; daar gaat een regel niet over. Wat een regel
-   toevoegt is WIE ER VAN BINNEN MOET GOEDKEUREN, uitgedrukt in rechten en niet
-   in namen: 'recht' is juridisch, 'geld.goedkeuren' is wie over geld gaat. Zo
-   blijft de regel staan als er iemand anders die rol krijgt.
+     contract -> HOUDT VAST. Zolang een goedkeuring ontbreekt, staat een getekend
+                 contract op "wacht op goedkeuring" in plaats van actief.
+     besluit  -> WEIGERT. De stemronde sluiten lukt niet zolang een vereiste
+                 goedkeuring ontbreekt; het besluit blijft in stemming staan.
 
-   DRIE DINGEN DIE DEZE LAAG NIET LAAT GEBEUREN, en ze komen alle drie uit de
-   vraag "hoe zou ik hier onderuit komen?":
-
-   1. EEN MENS KEURT EEN KEER GOED. Wie 'recht' en 'geld.goedkeuren' allebei
-      draagt, kan niet in zijn eentje een vier-ogen-regel afvinken. Daarmee is
-      "twee rechten" ook echt twee mensen.
-   2. HET BEHEER-TOKEN KEURT NIET. Dezelfde regel als bij stemmen over een
-      besluit: goedkeuren doet een lid met een eigen sleutel, anders staat er
-      een handtekening zonder gezicht.
-   3. EEN GOEDKEURING GELDT VOOR HET BEDRAG WAAROP HIJ IS GEGEVEN. Gaat de
-      waarde daarna OMHOOG, dan vervalt hij en gaat het contract terug naar
-      "wacht op goedkeuring". Zonder die regel is de hele laag te omzeilen met
-      een contract van een euro dat je achteraf ophoogt -- en dat is geen
-      theoretisch gat maar de makkelijkste weg eromheen. */
+   ELKE SOORT DRAAGT ZIJN EIGEN VOORWAARDE, en meer vormen zijn er niet. Een
+   contract drempelt op een BEDRAG, een besluit op zijn SOORT. Dat is geen
+   regeltaal, en dat is met opzet: een taal in een configuratiebestand is een
+   tweede implementatie die je niet kunt toetsen -- dezelfde afweging die
+   kern/command/beleid.js maakt als hij getallen wel en regels niet in gegevens
+   zet. Komt er een derde plek bij, dan komt hij hier te staan EN in de code die
+   hem aanroept; die twee horen samen te bewegen. */
 'use strict';
 
-/* Waar een regel echt iets tegenhoudt. Een soort die hier niet staat, kan geen
-   regel krijgen. Komt er een tweede plek bij, dan komt hij hier te staan EN in
-   de code die hem aanroept -- die twee horen samen te bewegen. */
 const AFGEDWONGEN = {
-  contract: 'bij het activeren van een contract: zolang een vereiste goedkeuring ontbreekt, staat het op "wacht op goedkeuring" in plaats van actief'
+  contract: { voorwaarde: 'boven',
+    waar: 'bij het activeren van een contract: zolang een vereiste goedkeuring ontbreekt, staat het op "wacht op goedkeuring" in plaats van actief' },
+  besluit: { voorwaarde: 'besluitSoort',
+    waar: 'bij het sluiten van de stemronde: zolang een vereiste goedkeuring ontbreekt, kan het besluit niet worden gesloten' }
 };
-
-const WACHT = 'wacht op goedkeuring';
 
 module.exports = (sctx) => {
   const { app, save, schoon, nu, rid, werkPoort, log, eigenVeld } = sctx;
   const R = (w) => { if (!w.regels) w.regels = {}; return w.regels; };
   const centenVan = (v) => Math.round(Math.max(0, Number(v) || 0) * 100);
 
-  /* Welke regels raken DIT contract? Alleen de drempel telt mee; een regel
-     zonder drempel geldt altijd voor die soort. */
-  const regelsVoor = (w, c) => Object.values(R(w))
-    .filter(r => r.soort === 'contract' && Number(c.waardeCenten || 0) > Number(r.bovenCenten || 0))
-    .sort((a, b) => a.bovenCenten - b.bovenCenten);
+  /* Welke regels raken DIT object? Per soort één voorwaarde, en de vraag wordt
+     hier één keer beantwoord -- de handhaving (./regelpoort.js) stelt hem, maar
+     verzint hem niet (LAT-regel 4). */
+  function regelsVoor(w, soort, obj) {
+    return Object.values(R(w)).filter(r => {
+      if (r.soort !== soort) return false;
+      if (soort === 'contract') return Number(obj.waardeCenten || 0) > Number(r.bovenCenten || 0);
+      if (soort === 'besluit') return !r.besluitSoort || r.besluitSoort === obj.soort;
+      return false;
+    }).sort((a, b) => String(a.id).localeCompare(String(b.id)));
+  }
 
-  /* ---------- de regels zelf ---------- */
   app.post('/api/bedrijf/regel/zet', (req, res) => {
     const g = werkPoort(req, res, 'werkruimte'); if (!g) return;
     const soort = String(req.body.soort || '');
-    if (!AFGEDWONGEN[soort]) return res.status(400).json({
+    const plek = AFGEDWONGEN[soort];
+    if (!plek) return res.status(400).json({
       error: 'Voor "' + soort + '" is er geen plek in de code waar zo\'n regel iets kan tegenhouden.',
       let: 'Een regel die niets tegenhoudt is theater, en een beleidsscherm vol zulke regels leest als bewaking die er niet is. Wat wel kan: ' + Object.keys(AFGEDWONGEN).join(', ') + '.' });
+
     const eist = Array.isArray(req.body.eist) ? [...new Set(req.body.eist.map(String))] : [];
     if (!eist.length) return res.status(400).json({ error: 'Welke goedkeuring eist deze regel? Zonder eis verandert hij niets.' });
     const onbekend = eist.filter(x => !sctx.RECHTEN.includes(x));
     if (onbekend.length) return res.status(400).json({ error: 'Onbekend recht: ' + onbekend.join(', ') + '.' });
-    const bovenCenten = centenVan(req.body.boven);
+
+    /* De voorwaarde hoort bij de soort. Een besluitregel met een bedrag erin zou
+       een getal dragen dat nergens wordt gelezen -- en een instelling die niets
+       doet is dezelfde leugen als een regel die niets tegenhoudt. */
+    const besluitSoort = schoon(req.body.besluitSoort, 30) || null;
+    if (besluitSoort && !sctx.BESLUITSOORTEN.includes(besluitSoort))
+      return res.status(400).json({ error: 'Onbekende besluitsoort: ' + besluitSoort + '.' });
+    if (plek.voorwaarde === 'boven' && besluitSoort)
+      return res.status(400).json({ error: 'Een contractregel drempelt op een bedrag, niet op een besluitsoort.' });
+    if (plek.voorwaarde === 'besluitSoort' && req.body.boven != null)
+      return res.status(400).json({ error: 'Een besluitregel geldt voor een SOORT besluit; een bedrag wordt daar nergens gelezen.' });
 
     const id = schoon(req.body.regelId, 20) || rid(4);
     const bestaand = eigenVeld(R(g.w), id);
+    if (bestaand && bestaand.soort !== soort)
+      return res.status(409).json({ error: 'Die regel gaat over ' + bestaand.soort + '; maak er een nieuwe voor ' + soort + '.' });
     const r = bestaand || { id, soort, historie: [], at: nu(), door: g.l.naam };
-    if (bestaand) {
-      r.historie.push({ was: { bovenCenten: r.bovenCenten, eist: r.eist }, door: g.l.naam, at: nu() });
-    }
-    r.bovenCenten = bovenCenten; r.eist = eist;
+    if (bestaand) r.historie.push({ was: { bovenCenten: r.bovenCenten, besluitSoort: r.besluitSoort, eist: r.eist }, door: g.l.naam, at: nu() });
+    r.bovenCenten = plek.voorwaarde === 'boven' ? centenVan(req.body.boven) : null;
+    r.besluitSoort = plek.voorwaarde === 'besluitSoort' ? besluitSoort : null;
+    r.eist = eist;
     R(g.w)[id] = r;
-    log(g.w, g.l, 'regel-gezet', id, soort + ' boven ' + (bovenCenten / 100) + ': ' + eist.join(' + '));
+    log(g.w, g.l, 'regel-gezet', id, soort + ': ' + eist.join(' + '));
     save();
-    res.json({ ok: true, regel: r, afgedwongen: AFGEDWONGEN[soort],
-      let: 'Deze regel geldt vanaf nu. Contracten die al actief zijn, worden er NIET met terugwerkende kracht door teruggezet -- dat zou een lopende afspraak stilzwijgend openbreken. Hij bijt zodra er aan zo\'n contract iets verandert.' });
+    res.json({ ok: true, regel: r, afgedwongen: plek.waar,
+      let: 'Deze regel geldt vanaf nu. Wat al actief of gesloten is, wordt er NIET met terugwerkende kracht door teruggezet -- dat zou een lopende afspraak stilzwijgend openbreken. Hij bijt bij de eerstvolgende handeling.' });
   });
 
   app.post('/api/bedrijf/regels', (req, res) => {
     const g = werkPoort(req, res, 'werkruimte'); if (!g) return;
     res.json({ ok: true,
-      regels: Object.values(R(g.w)).map(r => Object.assign({}, r,
-        { bovenEuro: r.bovenCenten / 100, afgedwongen: AFGEDWONGEN[r.soort] || null })),
-      soorten: Object.keys(AFGEDWONGEN), rechten: sctx.RECHTEN,
-      let: 'Elke regel noemt WAAR hij wordt afgedwongen. Staat daar niets, dan doet hij niets -- en zo\'n regel kan hier niet ontstaan.' });
+      regels: Object.values(R(g.w)).map(r => Object.assign({}, r, {
+        bovenEuro: r.bovenCenten == null ? null : r.bovenCenten / 100,
+        afgedwongen: (AFGEDWONGEN[r.soort] || {}).waar || null })),
+      soorten: Object.entries(AFGEDWONGEN).map(([k, v]) => ({ soort: k, voorwaarde: v.voorwaarde, waar: v.waar })),
+      rechten: sctx.RECHTEN,
+      let: 'Elke regel noemt WAAR hij wordt afgedwongen, en hoe: een contract wordt vastgehouden, een besluit wordt geweigerd. Staat daar niets, dan doet hij niets -- en zo\'n regel kan hier niet ontstaan.' });
   });
 
   app.post('/api/bedrijf/regel/weg', (req, res) => {
@@ -102,12 +114,12 @@ module.exports = (sctx) => {
     log(g.w, g.l, 'regel-weg', r.id, reden);
     save();
     res.json({ ok: true, weg: r.id,
-      let: 'Contracten die op deze regel stonden te wachten, gaan pas mee bij hun eerstvolgende wijziging; er wordt hier niets stil geactiveerd.' });
+      let: 'Wat op deze regel stond te wachten, gaat pas mee bij de eerstvolgende handeling; er wordt hier niets stil geactiveerd of gesloten.' });
   });
 
   /* De handhaving staat in ./regelpoort.js -- samen gingen ze over de 10 kB van
      keuringsregel 13, en de naad is echt: hier staat WAT er is afgesproken,
      daar staat waar het wordt tegengehouden. `regelsVoor` reist mee zodat de
-     drempelvraag op EEN plek wordt beantwoord (LAT-regel 4). */
+     voorwaardevraag op EEN plek wordt beantwoord (LAT-regel 4). */
   return { REGELS: R, regelsVoor, REGELSOORTEN: AFGEDWONGEN };
 };

@@ -32,7 +32,7 @@ const api = (pad, body) => fetch(BASE + '/api/bedrijf' + pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 
-let W, B, W2, B2, VK, JU, SV, HR, PL, VK2, KLANT, PROJECT;
+let W, B, W2, B2, VK, JU, SV, HR, PL, VK2, KLANT, PROJECT, PIA_ID, PIA_TOKEN;
 
 /* De sleutels van een lid draagt elke aanroep mee, dus ze mogen ALLEEN heten
    zoals de poort ze noemt. Een helper die ook `id` en `naam` teruggaf, schreef
@@ -43,7 +43,10 @@ async function lid(ruimte, beheer, naam, rollen) {
   const a = (await api('/lid/aanmeld', { werkruimte: ruimte, naam })).body;
   await api('/lid/besluit', { werkruimte: ruimte, beheerToken: beheer, lidId: a.lidId, akkoord: true });
   await api('/lid/rollen', { werkruimte: ruimte, beheerToken: beheer, lidId: a.lidId, rollen });
-  return { werkruimte: ruimte, lidToken: a.lidToken };
+  /* `lidId` mag hier wel mee: geen enkele route waar dit object in wordt
+     gespreid leest dat veld -- de ledenroutes krijgen hun lidId expliciet, met
+     het beheer-token erbij. `id` en `naam` zouden wel botsen; zie hierboven. */
+  return { werkruimte: ruimte, lidToken: a.lidToken, lidId: a.lidId };
 }
 const typen = (uit) => (uit.groepen || []).map(g => g.type);
 const titels = (uit) => (uit.groepen || []).flatMap(g => g.rijen.map(r => r.titel));
@@ -58,6 +61,7 @@ test.before(async () => {
   SV = await lid(W, B, 'Sam', ['service']);
   HR = await lid(W, B, 'Hanna', ['hr']);
   PL = await lid(W, B, 'Pia', ['projectleider']);
+  PIA_TOKEN = PL.lidToken; PIA_ID = PL.lidId;
 
   const w2 = (await api('/werkruimte/maak', { naam: 'Zuidkaap BV', land: 'NL' })).body;
   W2 = w2.werkruimte; B2 = w2.beheerToken;
@@ -185,4 +189,64 @@ test('6. een jong register zegt dat het niets MOCHT meten, niet dat er niets is'
   assert.ok(uit.nietGemeten.includes('klant'),
     'met één rij mag er geen verwijzing gemeten worden, en dat hoort er te staan');
   assert.match(uit.let, /niet gemeten/i, 'en het verschil met "geen samenhang" staat er met zoveel woorden');
+});
+
+/* DE MENS IN HET REGISTER. Hij is als laatste toegevoegd omdat er eerst twee
+   dingen moesten kloppen: de gevoelige velden moesten dicht, en er moest een
+   manier zijn om een mens te VINDEN. Dat tweede kon alleen op naam, en dat is
+   een risico dat de laag zelf hoort te melden. */
+test('8. de mens staat in het register, achter het recht "mens"', async () => {
+  const hanna = (await api('/zoek', Object.assign({ q: 'pia' }, HR))).body;
+  assert.ok(typen(hanna).includes('lid'), 'HR heeft het recht "mens" en vindt de medewerker');
+
+  const vera = (await api('/zoek', Object.assign({ q: 'pia' }, VK))).body;
+  assert.ok(!vera.bereik.map(b => b.type).includes('lid'),
+    'verkoop heeft geen recht "mens"; de soort staat niet eens in haar bereik');
+});
+
+test('9. het dossier van een mens vindt zijn werk, en zegt waarop het matcht', async () => {
+  /* Met het beheer-token, want dit vraagt TWEE rechten tegelijk: "mens" om de
+     persoon te zien en "project" om zijn werk te zien. HR heeft alleen de
+     eerste -- en dat is precies het gedrag dat toets 1 eist, dus die vraag hoort
+     hier door iemand gesteld te worden die allebei draagt. */
+  const d = (await api('/dossier', { werkruimte: W, beheerToken: B, type: 'lid', id: PIA_ID })).body;
+  assert.equal(d.object.titel, 'Pia');
+
+  const groep = (d.afhankelijkheden || []).find(g => g.type === 'project');
+  assert.ok(groep, 'het project waar Pia eigenaar van is, hoort hier te staan');
+  assert.equal(groep.rijen[0].via, 'eigenaar', 'gevonden via het veld dat haar noemt');
+
+  assert.equal(d.naamgrens.opNaam, true, 'en de uitslag zegt dat dit op NAAM gaat');
+  assert.match(d.naamgrens.let, /niet op een sleutel/i);
+});
+
+test('10. een naamgenoot wordt geteld en gemeld, niet weggemoffeld', async () => {
+  const tweede = await lid(W, B, 'Pia', ['projectleider']);
+  assert.ok(tweede.lidToken, 'er werkt nu een tweede Pia');
+
+  const d = (await api('/dossier', Object.assign({ type: 'lid', id: PIA_ID }, HR))).body;
+  assert.equal(d.naamgrens.naamgenoten, 1, 'de laag telt de naamgenoot');
+  assert.match(d.naamgrens.let, /kan werk van een ander bevatten/i,
+    'en waarschuwt dat de samenhang hieronder van iemand anders kan zijn');
+});
+
+test('11. de sleutels van een mens staan niet in zijn dossier', async () => {
+  const d = (await api('/dossier', Object.assign({ type: 'lid', id: PIA_ID }, HR))).body;
+  const token = d.feiten.find(f => f.veld === 'token');
+  assert.ok(token && token.kluis, 'het lid-token staat als kluisveld en niet als waarde');
+  assert.ok(!JSON.stringify(d.feiten).includes(PIA_TOKEN), 'nergens staat het echte token');
+
+  /* `rtgKey` ONTSTAAT pas als een medewerker zijn persoonlijke RTG-account
+     koppelt, en daar is een echte ledensessie voor nodig. Een route-toets die
+     hem hier zoekt, kijkt dus naar een veld dat niet bestaat -- en die kan niet
+     zakken. Een mutatie liet dat zien: rtgKey uit de VERBORGEN-lijst halen
+     veranderde niets aan de uitslag hierboven. Daarom staat de bewering waar
+     hij WEL kan zakken: op de functie zelf. */
+  const { feiten } = require('../server/kern/command/object');
+  const rij = feiten({ id: 'x9', naam: 'Pia', rtgKey: 'GEHEIME-ACCOUNTSLEUTEL', functie: 'projectleider' });
+  const rtg = rij.find(f => f.veld === 'rtgKey');
+  assert.ok(rtg, 'het veld hoort in het dossier voor te komen');
+  assert.equal(rtg.kluis, true, 'maar als kluisveld');
+  assert.ok(!JSON.stringify(rij).includes('GEHEIME-ACCOUNTSLEUTEL'),
+    'de koppeling tussen de medewerker en zijn persoonlijke RTG-account verlaat de kluis niet');
 });

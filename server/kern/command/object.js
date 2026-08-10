@@ -29,7 +29,11 @@ const MAX_PER_SOORT = 8;
    gevoelig is: een dossier dat een base64-foto of een lijst van 900 kamers
    uitprint is onleesbaar, en een dossier dat een e-mailadres toont omzeilt de
    kluis. Objecten en arrays worden samengevat, niet uitgeklapt. */
-const VERBORGEN = new Set(['email', 'e-mail', 'realName', 'naamEcht', 'wachtwoord', 'password', 'token', 'secret', 'iban', 'foto', 'image', 'avatar']);
+/* `rtgKey` staat erbij sinds de werkruimtelaag mensen in haar register zette.
+   Dat veld koppelt een medewerker van een organisatie aan zijn PERSOONLIJKE
+   RTG-account; een dossier dat het uitprint, legt buiten de kluis om een
+   verband tussen twee identiteiten dat juist gescheiden hoort te blijven. */
+const VERBORGEN = new Set(['email', 'e-mail', 'realName', 'naamEcht', 'wachtwoord', 'password', 'token', 'secret', 'iban', 'foto', 'image', 'avatar', 'rtgKey']);
 
 function feiten(r) {
   const uit = [];

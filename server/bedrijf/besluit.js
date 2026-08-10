@@ -104,6 +104,17 @@ module.exports = (sctx) => {
     if (b.status !== 'stemmen') return res.status(409).json({ error: 'Dit voorstel staat op ' + b.status + '.' });
     const t = telling(b);
     if (!b.stemmen.length) return res.status(409).json({ error: 'Er is niet gestemd. Een besluit zonder stemmen is geen besluit; de automaat neemt het hier niet over.' });
+    /* De bedrijfsregels (bedrijf/regelpoort.js) kunnen eisen dat er eerst namens
+       bepaalde rechten is goedgekeurd -- "een investeringsbesluit gaat niet
+       dicht zonder de CFO". Er wordt hier geen eigen wachtstand ingevoerd: het
+       besluit blijft gewoon in stemming staan, met de reden erbij. Late binding
+       via sctx, want regelpoort.js wordt voor dit bestand gemount. */
+    const regel = sctx.regelMagSluiten(g.w, b);
+    if (regel.ontbreekt.length) return res.status(409).json({
+      error: 'Een bedrijfsregel eist eerst goedkeuring namens ' + regel.ontbreekt.join(' en ') + '.',
+      ontbreekt: regel.ontbreekt,
+      let: 'Het besluit blijft in stemming staan. Goedkeuren gaat via /api/bedrijf/keur; een mens keurt daar één keer goed, dus twee rechten zijn ook echt twee mensen.' });
+
     const evalueerOp = schoon(req.body.evalueerOp, 10);
     const aangenomen = t.voor > t.tegen;
     if (aangenomen && !evalueerOp)
@@ -132,9 +143,16 @@ module.exports = (sctx) => {
 
   sctx.startBron('goedkeuringen', 'besluit', (g) => {
     const alle = Object.values(B(g.w));
+    /* `zonderUitkomst` is de scherpe van de drie: een evaluatiedatum die is
+       verstreken terwijl er niets is opgeschreven, is precies het geval waarin
+       een besluit "geëvalueerd" heet zonder dat iemand heeft teruggekeken. Hij
+       staat apart van `teEvalueren` (die telt ook wat vandaag aan de beurt is)
+       zodat het verschil tussen "nog doen" en "blijven liggen" zichtbaar is. */
     return { inAdvies: alle.filter(b => b.status === 'advies').length,
       teStemmen: alle.filter(b => b.status === 'stemmen' && !b.stemmen.some(s => s.lidId === g.l.id)).length,
-      teEvalueren: alle.filter(b => b.evalueerOp && b.evalueerOp <= dag()).length };
+      teEvalueren: alle.filter(b => b.evalueerOp && b.evalueerOp <= dag()).length,
+      zonderUitkomst: alle.filter(b => b.status === 'aangenomen' && b.evalueerOp && b.evalueerOp <= dag()
+        && !(b.evaluaties || []).length).length };
   });
 
   return { BESLUITSOORTEN: SOORTEN, BESLUITEN: B };

@@ -29,6 +29,7 @@
 'use strict';
 
 const { maakWerkRegister } = require('../kern/werkcommand/register');
+const { naamgrens } = require('../kern/werkcommand/naamgrens');
 const zoeklaag = require('../kern/command/zoek');
 const objectlaag = require('../kern/command/object');
 const { maakKwaliteit } = require('../kern/command/kwaliteit');
@@ -115,6 +116,7 @@ module.exports = (sctx) => {
     const magBesluit = g.rechten.includes('besluit');
     res.json(Object.assign({ ok: true }, d, {
       besluiten: magBesluit ? sctx.besluitenOver(g.w, type, id) : null,
+      naamgrens: type === 'lid' ? naamgrens(g.w.leden, d.object.titel) : null,
       let: 'De samenhang hieronder is gemeten uit de gegevens zelf en niet uit een schema. De tijdlijn komt uit het werkjournaal, en dat legt niet elke handeling vast; leeg is hier dus niet hetzelfde als "er gebeurde niets".'
         + (magBesluit ? '' : ' Of er besluiten over dit object gaan, staat er niet: daarvoor mist u het recht "besluit". Dat is niet hetzelfde als "er zijn er geen".')
     }));

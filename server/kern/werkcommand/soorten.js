@@ -101,7 +101,32 @@ const SOORTEN = [
 
   { type: 'besluit', label: 'Besluit', meervoud: 'besluiten', domein: 'governance', recht: 'besluit',
     veld: 'besluiten', sleutel: 'id', zoek: ['id', 'titel', 'soort', 'status', 'eigenaar'],
-    titel: r => eerste(r, 'titel', 'id'), sub: r => bij(s(r.soort), s(r.status), s(r.eigenaar)) }
+    titel: r => eerste(r, 'titel', 'id'), sub: r => bij(s(r.soort), s(r.status), s(r.eigenaar)) },
+
+  /* DE MENS, en hij is met opzet als laatste toegevoegd en niet als eerste.
+     Twee dingen moesten eerst kloppen, en tot ze klopten stond hier de reden in
+     plaats van de soort:
+
+     1. `token` (de inlogsleutel) en `rtgKey` (de koppeling naar het
+        persoonlijke RTG-account) staan allebei in de VERBORGEN-lijst van
+        kern/command/object.js. Zonder die tweede zou het dossier een verband
+        tussen twee identiteiten uitprinten dat gescheiden hoort te blijven.
+     2. Er moest een manier zijn om een mens te VINDEN. Geen module verwijst
+        naar een lid met zijn id -- `eigenaar`, `wie` en `door` zijn vrije tekst
+        met een naam erin. Vandaar `verwijst`: dit is de enige soort in dit huis
+        die op NAAM wordt gevonden en niet op sleutel.
+
+     DAT LAATSTE IS EEN RISICO EN GEEN TRUC. Twee mensen kunnen dezelfde naam
+     dragen, en dan haalt het dossier van de een het werk van de ander binnen.
+     De laag die hem leest MOET dat melden; server/bedrijf/inzicht.js telt de
+     dubbele namen in de werkruimte en zet ze in de uitslag. Een verband dat op
+     een naam rust en zich voordoet als een sleutel, is precies het soort stille
+     onwaarheid waar dit huis het vaakst op is gevallen. */
+  { type: 'lid', label: 'Medewerker', meervoud: 'medewerkers', domein: 'mensen', recht: 'mens',
+    veld: 'leden', sleutel: 'id', zoek: ['id', 'naam', 'functie', 'afdeling'],
+    titel: r => eerste(r, 'naam', 'id'),
+    sub: r => bij(s(r.functie), s(r.afdeling), s(r.status), r.extern ? 'extern' : ''),
+    verwijst: r => [s(r.id), s(r.naam)].filter(Boolean) }
 ];
 
 module.exports = { SOORTEN };

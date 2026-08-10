@@ -2476,19 +2476,33 @@ vrijwel altijd een bestaande sleutel van een andere soort bevat. Onder die
 grens (te weinig rijen) is de samenhang **niet gemeten** — en dat staat er met
 zoveel woorden, want een lege kaart leest anders als "geen samenhang".
 
-**De leden staan er bewust niet in.** Een lidrij draagt `token` (de inlogsleutel
-van die medewerker) en `rtgKey` (de koppeling naar zijn persoonlijke
-RTG-account); de VERBORGEN-lijst van `object.js` kent de eerste wel en de tweede
-niet. Dat is dezelfde afweging waarom het zaakregister `supplierTeam` weglaat:
-dat draagt pincodes. Het kost bovendien vrijwel niets, want geen enkele module
-verwijst naar een lid met zijn id — `eigenaar`, `wie` en `door` zijn vrije tekst.
-Mensen in de graaf is een eigen stap met een eigen besluit en geen bijvangst van
-een register; hij staat als open punt in `TAKEN.md`.
+**De mens staat er ook in, achter het recht `mens` — en met de prijs erbij.**
+Dat was eerst bewust niet zo, want een lidrij draagt `token` (de inlogsleutel)
+en `rtgKey` (de koppeling naar het persoonlijke RTG-account). Beide staan nu in
+de VERBORGEN-lijst van `object.js`; die tweede is er expliciet voor dit doel bij
+gekomen, want een dossier dat hem uitprint legt buiten de kluis om een verband
+tussen twee identiteiten dat gescheiden hoort te blijven.
 
-Getoetst in `test/werkregister.test.js` (7). Zes mutaties, alle zes raak — onder
-andere de rechten-zeef weghalen, de lezer over werkruimtes heen laten lopen, de
-afscherming van de kennisbank slopen en de ticketsoort naar de verkeerde bak
-wijzen.
+Het tweede probleem was ernstiger: **geen enkele module verwijst naar een mens
+met zijn id** — `eigenaar`, `wie` en `door` zijn vrije tekst met een naam erin.
+De soort `lid` is daarom de enige in dit huis met een eigen `verwijst`, en wordt
+op **naam** gevonden. Dat is een risico en geen truc: twee mensen kunnen dezelfde
+naam dragen, en een naam als "Open" is ook een statuswaarde.
+`kern/werkcommand/naamgrens.js` meet allebei en zet het in de uitslag — het
+dossier van een medewerker zegt zelf dat het op naam matcht, telt de naamgenoten
+en waarschuwt als de naam ook een gewone veldwaarde is. Een verband dat op een
+naam rust en zich voordoet als een sleutel, is precies het soort stille
+onwaarheid waar dit huis het vaakst op is gevallen.
+
+Getoetst in `test/werkregister.test.js` (11). Negen mutaties, alle negen raak —
+onder andere de rechten-zeef weghalen, de lezer over werkruimtes heen laten
+lopen, de afscherming van de kennisbank slopen, de ticketsoort naar de verkeerde
+bak wijzen, de mens op id in plaats van op naam zoeken en de naamgenoot niet
+tellen. **Eén mutatie sloeg af en dat was de nuttigste**: `rtgKey` uit de
+VERBORGEN-lijst halen veranderde niets, omdat de medewerker in die toets nooit
+een RTG-account had gekoppeld en het veld dus niet bestond. Dat is een toets die
+niet kon zakken (LAT-regel 9); de bewering staat nu op de functie zelf, en daar
+bijt de mutatie wel.
 
 #### Het geheugen van een besluit: waarom hebben we dit gedaan
 
@@ -2558,16 +2572,28 @@ soort waar in de code ook echt een plek is die hem afdwingt — een regel voor
 hij kan blokkeren. Een beleidsscherm vol regels die nergens langskomen is erger
 dan geen beleidsscherm: het leest als bewaking die er niet is.
 
-Vandaag is dat één plek: **het activeren van een contract**. Dat staat als tabel
-in de code en het antwoord van `/regels` noemt hem per regel.
+Er zijn twee plekken, en **ze houden verschillend tegen** — dat verschil staat in
+de tabel in de code en het antwoord van `/regels` noemt het per regel:
+
+| Soort | Voorwaarde | Hoe hij tegenhoudt |
+|---|---|---|
+| `contract` | boven een **bedrag** | **houdt vast**: een getekend contract blijft op `wacht op goedkeuring` staan in plaats van actief |
+| `besluit` | een **besluitsoort** (investering, prijs, …) | **weigert**: de stemronde sluiten lukt niet, het besluit blijft in stemming |
+
+Elke soort draagt zijn eigen voorwaarde, en meer vormen zijn er niet. Een
+besluitregel met een bedrag erin wordt geweigerd: een instelling die nergens
+wordt gelezen is dezelfde leugen als een regel die niets tegenhoudt. Dit is
+bewust **geen regeltaal** — een taal in een configuratiebestand is een tweede
+implementatie die je niet kunt toetsen, dezelfde afweging die
+`kern/command/beleid.js` maakt.
 
 | Endpoint | Doel |
 |---|---|
 | `POST /api/bedrijf/regel/zet` `{soort, boven, eist:[rechten]}` | Een regel vastleggen (recht `werkruimte`) |
 | `POST /api/bedrijf/regels` | Alle regels, elk met wáár hij wordt afgedwongen |
 | `POST /api/bedrijf/regel/weg` `{regelId, reden}` | Vervallen — met een reden |
-| `POST /api/bedrijf/contract/keur` `{contractId, recht}` | Goedkeuren namens een recht dat u werkelijk draagt |
-| `POST /api/bedrijf/contract/keuring` `{contractId}` | Wat dit contract nog nodig heeft, en wie er al tekende |
+| `POST /api/bedrijf/keur` `{soort, id, recht}` | Goedkeuren namens een recht dat u werkelijk draagt — één route voor alle soorten |
+| `POST /api/bedrijf/keuring` `{soort, id}` | Wat dit object nog nodig heeft, en wie er al goedkeurde |
 
 **Wat een regel wel en niet toevoegt.** Twee handtekeningen (wij en wederpartij)
 waren er al en zijn structureel; daar gaat een regel niet over. Wat een regel
@@ -2599,7 +2625,11 @@ Een nieuwe regel werkt **niet met terugwerkende kracht**: contracten die al
 actief zijn worden er niet door teruggezet, want dat zou een lopende afspraak
 stilzwijgend openbreken. Hij bijt zodra er aan zo'n contract iets verandert.
 
-Getoetst in `test/werkregels.test.js` (7). Zeven mutaties, alle zeven raak — de
+Er is **één goedkeurroute voor alle soorten**. Twee routes die hetzelfde doen
+lopen uiteen zodra er een grendel bij komt — en juist bij een goedkeuring is dat
+de grendel die je kwijtraakt.
+
+Getoetst in `test/werkregels.test.js` (9). Zeven mutaties, alle zeven raak — de
 drempel laten vervallen, één mens twee keer laten goedkeuren, het beheer-token
 toelaten, de herwaardering bij ophoging weghalen (twee keer, aan beide kanten
 van de naad), de status zetten zonder naar de goedkeuringen te kijken, en een

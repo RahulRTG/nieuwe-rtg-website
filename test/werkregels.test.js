@@ -79,7 +79,7 @@ test('2. onder de drempel verandert er niets', async () => {
   const na = await teken(c.id, 'wederpartij', 'Groenhof BV', JU);
   assert.equal(na.body.contract.status, 'actief', 'twee handtekeningen en klaar');
 
-  const k = (await api('/contract/keuring', Object.assign({ contractId: c.id }, JU))).body;
+  const k = (await api('/keuring', Object.assign({ soort: 'contract', id: c.id }, JU))).body;
   assert.deepEqual(k.regels, [], 'dit contract valt onder geen enkele regel');
 });
 
@@ -100,21 +100,21 @@ test('4. een mens keurt een keer goed, en het beheer-token keurt niet', async ()
   await teken(c.id, 'wij', 'Joris', JU);
   await teken(c.id, 'wederpartij', 'Kaap Lease BV', JU);
 
-  const beheer = await api('/contract/keur', { werkruimte: W, beheerToken: B, contractId: c.id, recht: 'recht' });
+  const beheer = await api('/keur', { werkruimte: W, beheerToken: B, soort: 'contract', id: c.id, recht: 'recht' });
   assert.equal(beheer.status, 403, 'het beheer-token keurt niet goed');
 
-  const zonderRecht = await api('/contract/keur', Object.assign({ contractId: c.id, recht: 'geld.goedkeuren' }, FI));
+  const zonderRecht = await api('/keur', Object.assign({ soort: 'contract', id: c.id, recht: 'geld.goedkeuren' }, FI));
   assert.equal(zonderRecht.status, 403, 'Fien heeft "geld" maar niet "geld.goedkeuren"');
 
   /* Dana is directie en draagt BEIDE vereiste rechten. Zij mag er één afvinken
      en daarna niet de tweede: anders is "vier ogen" één paar. */
-  const eerste = await api('/contract/keur', Object.assign({ contractId: c.id, recht: 'recht' }, DI));
+  const eerste = await api('/keur', Object.assign({ soort: 'contract', id: c.id, recht: 'recht' }, DI));
   assert.equal(eerste.status, 200);
-  const tweede = await api('/contract/keur', Object.assign({ contractId: c.id, recht: 'geld.goedkeuren' }, DI));
+  const tweede = await api('/keur', Object.assign({ soort: 'contract', id: c.id, recht: 'geld.goedkeuren' }, DI));
   assert.equal(tweede.status, 409, 'dezelfde mens keurt niet twee keer goed');
   assert.match(tweede.body.error, /in zijn eentje/i);
 
-  const k = (await api('/contract/keuring', Object.assign({ contractId: c.id }, JU))).body;
+  const k = (await api('/keuring', Object.assign({ soort: 'contract', id: c.id }, JU))).body;
   assert.equal(k.status, 'wacht op goedkeuring', 'en het contract wacht dus nog');
   assert.deepEqual(k.ontbreekt, ['geld.goedkeuren']);
 });
@@ -125,8 +125,8 @@ test('5. met de vereiste goedkeuringen gaat hij wel actief', async () => {
   await teken(c.id, 'wij', 'Joris', JU);
   await teken(c.id, 'wederpartij', 'Nachtwacht BV', JU);
 
-  await api('/contract/keur', Object.assign({ contractId: c.id, recht: 'recht' }, JU));
-  const laatste = await api('/contract/keur', Object.assign({ contractId: c.id, recht: 'geld.goedkeuren' }, DI));
+  await api('/keur', Object.assign({ soort: 'contract', id: c.id, recht: 'recht' }, JU));
+  const laatste = await api('/keur', Object.assign({ soort: 'contract', id: c.id, recht: 'geld.goedkeuren' }, DI));
   assert.equal(laatste.body.status, 'actief', 'twee verschillende mensen, twee rechten, rond');
   assert.match(laatste.body.let, /staat op actief/i);
 });
@@ -136,8 +136,8 @@ test('6. het bedrag ophogen is de uitweg, en die is dicht', async () => {
     wederpartij: 'Helder', soort: 'leverancier', waarde: 60000 }, JU))).body.contract;
   await teken(c.id, 'wij', 'Joris', JU);
   await teken(c.id, 'wederpartij', 'Helder BV', JU);
-  await api('/contract/keur', Object.assign({ contractId: c.id, recht: 'recht' }, JU));
-  const rond = await api('/contract/keur', Object.assign({ contractId: c.id, recht: 'geld.goedkeuren' }, DI));
+  await api('/keur', Object.assign({ soort: 'contract', id: c.id, recht: 'recht' }, JU));
+  const rond = await api('/keur', Object.assign({ soort: 'contract', id: c.id, recht: 'geld.goedkeuren' }, DI));
   assert.equal(rond.body.status, 'actief');
 
   const op = await api('/contract/zet', Object.assign({ contractId: c.id, titel: 'Schoonmaak',
@@ -145,7 +145,7 @@ test('6. het bedrag ophogen is de uitweg, en die is dicht', async () => {
   assert.equal(op.body.contract.status, 'wacht op goedkeuring', 'ophogen zet het contract terug');
   assert.match(op.body.let, /vervallen/i, 'en zegt dat de oude goedkeuringen zijn vervallen');
 
-  const k = (await api('/contract/keuring', Object.assign({ contractId: c.id }, JU))).body;
+  const k = (await api('/keuring', Object.assign({ soort: 'contract', id: c.id }, JU))).body;
   assert.equal(k.goedkeuringen.length, 0, 'geen enkele goedkeuring telt nog mee');
   assert.equal(k.vervallen.length, 2, 'maar ze staan er wel, met de reden');
   assert.match(k.vervallen[0].reden, /omhoog/i);
@@ -154,7 +154,50 @@ test('6. het bedrag ophogen is de uitweg, en die is dicht', async () => {
 test('7. goedkeuren kan alleen waar een regel erom vraagt', async () => {
   const c = (await api('/contract/zet', Object.assign({ titel: 'Koffie',
     wederpartij: 'Bonenhuis', soort: 'leverancier', waarde: 900 }, JU))).body.contract;
-  const uit = await api('/contract/keur', Object.assign({ contractId: c.id, recht: 'recht' }, JU));
+  const uit = await api('/keur', Object.assign({ soort: 'contract', id: c.id, recht: 'recht' }, JU));
   assert.equal(uit.status, 409, 'onder de drempel vraagt geen regel om een goedkeuring');
   assert.match(uit.body.let, /alleen de twee handtekeningen/i);
+});
+
+/* HET TWEEDE AANGRIJPINGSPUNT. De laag was pas iets waard als hij niet één
+   trucje voor contracten is: een besluit wordt niet vastgehouden maar
+   GEWEIGERD, en dat verschil staat in het register zelf. */
+test('8. een besluitregel weigert het sluiten van de stemronde', async () => {
+  const r = await api('/regel/zet', { werkruimte: W, beheerToken: B, soort: 'besluit',
+    besluitSoort: 'investering', eist: ['geld.goedkeuren'] });
+  assert.equal(r.status, 200);
+  assert.match(r.body.afgedwongen, /sluiten van de stemronde/i, 'en hij noemt hoe hij tegenhoudt');
+
+  const b = (await api('/besluit/maak', Object.assign({ titel: 'Tweede vestiging',
+    onderbouwing: 'De huidige hal zit vol.', soort: 'investering' }, JU))).body.besluit;
+  await api('/besluit/stemronde', Object.assign({ besluitId: b.id }, JU));
+  await api('/besluit/stem', Object.assign({ besluitId: b.id, stem: 'voor' }, JU));
+
+  const dicht = await api('/besluit/sluit', Object.assign({ besluitId: b.id, evalueerOp: '2027-06-01' }, JU));
+  assert.equal(dicht.status, 409, 'zonder de CFO gaat dit besluit niet dicht');
+  assert.deepEqual(dicht.body.ontbreekt, ['geld.goedkeuren']);
+
+  /* En een besluit van een ANDERE soort valt er niet onder: de voorwaarde van
+     een besluitregel is de soort, niet het bestaan van een regel. */
+  const ander = (await api('/besluit/maak', Object.assign({ titel: 'Nieuw logo',
+    onderbouwing: 'Het oude is van 2012.', soort: 'product' }, JU))).body.besluit;
+  await api('/besluit/stemronde', Object.assign({ besluitId: ander.id }, JU));
+  await api('/besluit/stem', Object.assign({ besluitId: ander.id, stem: 'voor' }, JU));
+  const los = await api('/besluit/sluit', Object.assign({ besluitId: ander.id, evalueerOp: '2027-06-01' }, JU));
+  assert.equal(los.body.besluit.status, 'aangenomen', 'een productbesluit gaat gewoon dicht');
+
+  // Met de goedkeuring erbij gaat de eerste alsnog dicht.
+  await api('/keur', Object.assign({ soort: 'besluit', id: b.id, recht: 'geld.goedkeuren' }, DI));
+  const alsnog = await api('/besluit/sluit', Object.assign({ besluitId: b.id, evalueerOp: '2027-06-01' }, JU));
+  assert.equal(alsnog.body.besluit.status, 'aangenomen', 'met de CFO erbij wel');
+});
+
+test('9. een regel draagt alleen de voorwaarde die zijn soort kent', async () => {
+  const metBedrag = await api('/regel/zet', { werkruimte: W, beheerToken: B, soort: 'besluit',
+    besluitSoort: 'prijs', boven: 1000, eist: ['geld.goedkeuren'] });
+  assert.equal(metBedrag.status, 400, 'een besluitregel leest nergens een bedrag');
+
+  const metSoort = await api('/regel/zet', { werkruimte: W, beheerToken: B, soort: 'contract',
+    besluitSoort: 'prijs', boven: 1000, eist: ['recht'] });
+  assert.equal(metSoort.status, 400, 'en een contractregel drempelt niet op een besluitsoort');
 });

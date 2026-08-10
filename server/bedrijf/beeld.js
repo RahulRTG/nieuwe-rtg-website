@@ -79,7 +79,11 @@ module.exports = (sctx) => {
 
     const contracten = Object.values(w.contracten || {});
     if (contracten.length) {
+      /* `wachtOpGoedkeuring` hoort op het directiebeeld en niet alleen op het
+         contract zelf: een getekend contract dat op een goedkeuring blijft
+         liggen, is werk dat stilstaat zonder dat iemand een melding kreeg. */
       uit.recht = { actief: contracten.filter(c => c.status === 'actief').length,
+        wachtOpGoedkeuring: contracten.filter(c => c.status === 'wacht op goedkeuring').length,
         zonderEinddatum: contracten.filter(c => !c.eindigt).length,
         opzegdagBinnen30: contracten.filter(c => c.eindigt && c.opzegtermijnDagen &&
           new Date(Date.parse(c.eindigt) - c.opzegtermijnDagen * 86400000).toISOString().slice(0, 10) >= dag() &&
@@ -91,7 +95,9 @@ module.exports = (sctx) => {
       uit.governance = { inAdvies: besluiten.filter(b => b.status === 'advies').length,
         inStemming: besluiten.filter(b => b.status === 'stemmen').length,
         aangenomen: besluiten.filter(b => b.status === 'aangenomen').length,
-        teEvalueren: besluiten.filter(b => b.evalueerOp && b.evalueerOp <= dag()).length };
+        teEvalueren: besluiten.filter(b => b.evalueerOp && b.evalueerOp <= dag()).length,
+        evaluatiedatumVoorbijZonderUitkomst: besluiten.filter(b => b.status === 'aangenomen'
+          && b.evalueerOp && b.evalueerOp <= dag() && !(b.evaluaties || []).length).length };
     } else niet.push({ blok: 'governance', reden: 'nog geen besluiten' });
 
     const it = Object.values(w.apparaten || {});

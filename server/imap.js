@@ -1,92 +1,63 @@
 /* IMAP: een gewone mailclient laten meelezen met een RTG-postvak.
 
-   WAAROM DIT EEN ADAPTER IS EN GEEN TWEEDE MAILBOX. Het postvakmodel van dit
-   huis (kern/rtmail-vak.js) kent mappen, etiketten, favorieten en sluimeren.
-   IMAP kent mappen en vlaggen. Dat lijkt op elkaar maar is het niet, en de
-   verleiding is om het model naar IMAP te buigen. Dat gebeurt hier niet: IMAP
-   is een VERTALING boven op wat er al staat, en de waarheid blijft in RTMAIL.
-   Wie hier iets wijzigt, wijzigt het daar -- er is geen tweede administratie.
+   DIT IS EEN ADAPTER EN GEEN TWEEDE MAILBOX. IMAP is een VERTALING boven op wat
+   er al staat; de waarheid blijft in RTMAIL, en wie hier iets wijzigt wijzigt
+   het daar. De tabel zelf (welke map, welke vlag, en waar hij wringt) staat in
+   ./imap-vertaling.js.
 
-   DE VERTALING, en waar hij wringt:
+   DIT BESTAND IS DE VORM VAN HET GESPREK: merken, commando's, de staat van de
+   sessie, en de literal van APPEND. Wat de client uit een map HAALT staat in
+   ./imap-lezen.js, wat hij erin ZET in ./imap-schrijf.js, en de verbinding
+   eronder in ./imap-server.js -- die laatste splitsing is de reden dat dit te
+   beproeven is met twee arrays in plaats van een netwerk.
 
-     INBOX      -> de map 'in'
-     Archive    -> de map 'archief'
-     Trash      -> de map 'prullenbak'
-     Sent       -> wat dit adres verstuurd heeft
-     \\Seen      -> gelezen
-     \\Flagged   -> favoriet
-     etiketten  -> die bestaan niet in IMAP; ze zijn zichtbaar als sleutelwoord
-                   maar een client kan ze niet altijd tonen. Dat is een
-                   TEKORTKOMING VAN HET PROTOCOL en niet van dit huis, en hij
-                   staat hier opgeschreven in plaats van weggemoffeld.
-     sluimeren  -> bestaat niet in IMAP. Sluimerende post is in de client
-                   gewoon zichtbaar. Ook dat is eerlijker dan hem verbergen:
-                   een client die post niet ziet die er wel is, is erger.
+   Het WACHTEN op nieuwe post (IDLE) staat in ./imap-idle.js: dat is de enige
+   laag die uit zichzelf iets naar de client stuurt, en alles wat daar fout kan
+   gaan is van een andere soort dan hier.
 
-   WAT DIT WEL EN NIET IS. Dit is een LEESLAAG met vlaggen: SELECT, FETCH,
-   SEARCH, STORE en EXPUNGE-loos verplaatsen. Wat er NIET in zit: APPEND (een
-   client die post in het postvak schrijft), IDLE (wachten op nieuwe post) en
-   TLS op de poort zelf. Die drie staan in TAKEN, want een half beloofde IMAP
-   is erger dan geen: een client die APPEND probeert en een fout krijgt, denkt
-   dat zijn concept verloren is.
+   WAT ER NIET IN ZIT: TLS op de poort zelf (dat doet ./imap-server.js met een
+   eigen sleutel; anders hoort er een doorgeefluik voor) en JMAP/CardDAV/CalDAV.
+   Zie TAKEN.md 5.13.
 
    DE INLOG. Een gewoon wachtwoord werkt hier NIET, en dat is met opzet: een
    mailclient bewaart zijn wachtwoord op schijf, en het RTG-wachtwoord opent
    veel meer dan een postvak. Wie IMAP wil, maakt een APPARAATSLEUTEL aan (via
    /api/member/rtmail/imap/sleutel). Die geeft toegang tot precies EEN postvak,
-   is los in te trekken, en staat in het journaal.
-
-   Dit bestand is het GESPREK: regels erin, regels eruit, zonder socket. De
-   server die dat gesprek over een verbinding voert staat in ./imap-server.js.
-   Die splitsing kwam door de tien-kilobyte-regel, maar hij is ook de reden dat
-   dit te beproeven is met twee arrays in plaats van een netwerk. */
+   is los in te trekken, en staat in het journaal. */
 'use strict';
 
-const CRLF = '\r\n';
-// de vertaaltabel; alles wat hier niet in staat, bestaat voor een client niet
-const MAPPEN = [
-  { imap: 'INBOX', vak: 'in' },
-  { imap: 'Archive', vak: 'archief' },
-  { imap: 'Trash', vak: 'prullenbak' },
-  { imap: 'Sent', vak: 'uit' }
-];
+const { CRLF, MAPPEN, vakVan, isConceptMap } = require('./imap-vertaling');
 
-module.exports = ({ vak, rtmail, sleutels, poort, host, tlsOpties }) => {
-  const vakVan = (naam) => (MAPPEN.find(m => m.imap.toLowerCase() === String(naam || '').toLowerCase()) || {}).vak || null;
 
-  /* Een bericht als RFC 5322-tekst. Een client verwacht een heel bericht, geen
-     JSON -- dus bouwen we hem hier op uit wat RTMAIL bewaart. De koppen zijn
-     bewust minimaal en eerlijk: wat we niet weten, verzinnen we niet. */
-  function alsBericht(m) {
-    const kop = [
-      'From: ' + m.van,
-      'To: ' + m.naar,
-      'Subject: ' + m.onderwerp,
-      'Date: ' + new Date(m.at).toUTCString(),
-      'Message-ID: <' + m.id + '@rtmail>',
-      m.antwoordOp ? 'In-Reply-To: <' + m.antwoordOp + '@rtmail>' : null,
-      'X-RTG-Vertrouwd: ' + (m.vertrouwd ? 'ja' : 'nee'),
-      'MIME-Version: 1.0',
-      'Content-Type: text/plain; charset=utf-8'
-    ].filter(Boolean).join(CRLF);
-    return kop + CRLF + CRLF + String(m.tekst || '');
-  }
-
-  const vlaggenVan = (m) => {
-    const v = [];
-    if (m.gelezen) v.push('\\Seen');
-    if (m.favoriet) v.push('\\Flagged');
-    for (const l of (m.labels || [])) v.push(String(l).replace(/[^A-Za-z0-9_-]/g, ''));
-    return v.filter(Boolean);
-  };
+module.exports = ({ vak, rtmail, sleutels, schrijf, idleMs, poort, host, tlsOpties }) => {
+  /* De schrijfkant is OPTIONEEL: zonder `schrijf` bestaat Drafts niet en weigert
+     APPEND zoals hij dat altijd deed. Zo blijft deze laag te beproeven met alleen
+     een leesvak, en valt een aanroeper die de schrijflaag niet meegeeft niet om
+     op undefined -- hij krijgt minder, en zegt dat. */
+  const pen = schrijf ? require('./imap-schrijf')({ schrijf }) : null;
+  const lees = require('./imap-lezen')({ vak, rtmail, schrijf });
+  /* `idleMs` is er voor de TOETS: de enige manier om te zien dat een gestopte
+     lus ook echt stilstaat, is wachten tot hij weer getikt zou hebben. */
+  const wachten = require('./imap-idle')({ ms: idleMs });
+  const mappen = () => MAPPEN.filter(m => !m.concepten || pen);
 
   /* Een sessie. Houdt bij wie er inlogde en welke map open staat; verder is
      alles een vraag aan de lagen eronder. */
-  function sessie(schrijf) {
+  function sessie(uit) {
     let adres = null, open = null, lijst = [];
-    const zeg = (s) => schrijf(s + CRLF);
+    // de literal van APPEND: zolang dit staat, is elke regel BRIEF en geen commando
+    let brief = null;
+    const zeg = (s) => uit(s + CRLF);
+    // de IDLE-wacht van deze sessie; zie ./imap-idle.js
+    const idle = wachten.maak({ zeg, tel: () => herlaad().length });
 
     function laad(mapNaam) {
+      if (isConceptMap(mapNaam)) {
+        if (!pen) return false;
+        lijst = pen.alsBerichten(adres);
+        open = mapNaam;
+        return true;
+      }
       const v = vakVan(mapNaam);
       if (!v) return false;
       /* OUDSTE EERST. IMAP nummert berichten oplopend vanaf 1 en die nummers
@@ -96,13 +67,50 @@ module.exports = ({ vak, rtmail, sleutels, poort, host, tlsOpties }) => {
       open = mapNaam;
       return true;
     }
+    const herlaad = () => { laad(open); return lijst; };
 
     return {
       get adres() { return adres; },
       get open() { return open; },
+      get idlet() { return idle.lopend; },
+      sluit: () => idle.stop(),
       async regel(ruw) {
+        /* EERST DE BRIEF, DAN DE COMMANDO'S. Staat er een APPEND open, dan is
+           deze regel een stuk van het bericht -- ook als er "LOGOUT" in staat.
+           Wie dit omdraait, laat de INHOUD van een bericht commando's uitvoeren. */
+        if (brief) {
+          brief.buf += String(ruw == null ? '' : ruw) + CRLF;
+          if (Buffer.byteLength(brief.buf) < brief.bytes) return;
+          const r = pen.legAf(adres, brief.buf.slice(0, brief.bytes));
+          const merk = brief.merk;
+          brief = null;
+          if (r.fout) return zeg(merk + ' NO ' + r.fout);
+          if (open && isConceptMap(open)) { herlaad(); zeg('* ' + lijst.length + ' EXISTS'); }
+          return zeg(merk + ' OK [APPENDUID 1 ' + r.concept.id + '] APPEND klaar');
+        }
         const tekst = String(ruw || '').trim();
         if (!tekst) return;
+
+        /* DONE IS HET ENIGE COMMANDO ZONDER MERK. Zo staat het in RFC 2177: de
+           client sluit een IDLE af met een kale regel `DONE`, en het antwoord
+           draagt het merk van de IDLE die ermee wordt afgesloten. Wie hem als
+           gewoon commando ontleedt, ziet DONE als het MERK en een leeg
+           commando -- dan hangt de client tot de verbinding wegvalt. */
+        if (/^DONE$/i.test(tekst)) {
+          if (!idle.lopend) return zeg('* BAD er liep geen IDLE');
+          const merk = idle.merk;
+          idle.stop();
+          return zeg(merk + ' OK IDLE klaar');
+        }
+        /* Zolang een IDLE loopt is er niets anders te doen dan DONE -- met EEN
+           uitzondering: LOGOUT. Dat is de client die afscheid neemt, en die
+           laten wachten op een DONE die dan nooit komt, laat de sessie hangen.
+           Deze uitzondering is er niet uit netheid maar omdat de toets het liet
+           zien: `stopIdle()` in de LOGOUT-tak hieronder was ONBEREIKBAAR zolang
+           deze regel er onvoorwaardelijk stond, en dan belooft die tak iets wat
+           hij nooit doet. */
+        if (idle.lopend && !/^\S+\s+LOGOUT\b/i.test(tekst)) return zeg('* BAD sluit eerst de IDLE af met DONE');
+
         const spatie = tekst.indexOf(' ');
         const merk = spatie < 0 ? tekst : tekst.slice(0, spatie);
         const rest = spatie < 0 ? '' : tekst.slice(spatie + 1);
@@ -111,24 +119,27 @@ module.exports = ({ vak, rtmail, sleutels, poort, host, tlsOpties }) => {
         const arg = spatie2 < 0 ? '' : rest.slice(spatie2 + 1);
 
         if (cmd === 'CAPABILITY') {
-          zeg('* CAPABILITY IMAP4rev1 AUTH=PLAIN');
+          /* Dit is een BELOFTE: de client richt zich erop in. IDLE er wel bij
+             zetten en dan niets doen is de ergste vorm -- dan stopt hij met
+             kijken en wacht op iets dat nooit komt. */
+          zeg('* CAPABILITY IMAP4rev1 AUTH=PLAIN IDLE');
           return zeg(merk + ' OK CAPABILITY klaar');
         }
-        if (cmd === 'LOGOUT') { zeg('* BYE tot ziens'); zeg(merk + ' OK LOGOUT klaar'); return 'sluiten'; }
+        if (cmd === 'LOGOUT') { idle.stop(); zeg('* BYE tot ziens'); zeg(merk + ' OK LOGOUT klaar'); return 'sluiten'; }
         if (cmd === 'NOOP') return zeg(merk + ' OK');
 
         if (cmd === 'LOGIN') {
           const m = /^"?([^"\s]+)"?\s+"?([^"]+)"?$/.exec(arg.trim());
           if (!m) return zeg(merk + ' NO geef gebruikersnaam en apparaatsleutel');
-          const uit = sleutels.controleer(m[1], m[2]);
-          if (!uit.ok) return zeg(merk + ' NO ' + uit.waarom);
-          adres = uit.adres;
+          const r = sleutels.controleer(m[1], m[2]);
+          if (!r.ok) return zeg(merk + ' NO ' + r.waarom);
+          adres = r.adres;
           return zeg(merk + ' OK ingelogd op ' + adres);
         }
         if (!adres) return zeg(merk + ' NO log eerst in');
 
         if (cmd === 'LIST') {
-          for (const m of MAPPEN) zeg('* LIST () "/" "' + m.imap + '"');
+          for (const m of mappen()) zeg('* LIST (' + (m.concepten ? '\\Drafts' : '') + ') "/" "' + m.imap + '"');
           return zeg(merk + ' OK LIST klaar');
         }
         if (cmd === 'SELECT' || cmd === 'EXAMINE') {
@@ -136,73 +147,42 @@ module.exports = ({ vak, rtmail, sleutels, poort, host, tlsOpties }) => {
           if (!laad(naam)) return zeg(merk + ' NO die map bestaat hier niet');
           zeg('* ' + lijst.length + ' EXISTS');
           zeg('* 0 RECENT');
-          zeg('* FLAGS (\\Seen \\Flagged)');
+          zeg('* FLAGS (\\Seen \\Flagged \\Draft)');
           zeg('* OK [UIDVALIDITY 1] stabiel');
           return zeg(merk + ' OK [' + (cmd === 'EXAMINE' ? 'READ-ONLY' : 'READ-WRITE') + '] ' + naam + ' geopend');
         }
-        if (!open) return zeg(merk + ' NO kies eerst een map met SELECT');
 
-        if (cmd === 'FETCH') {
-          const m = /^(\d+)(?::(\d+|\*))?\s+(.+)$/.exec(arg.trim());
-          if (!m) return zeg(merk + ' BAD wat moet ik ophalen?');
-          const van = Math.max(1, parseInt(m[1], 10));
-          const tot = m[2] === '*' ? lijst.length : (m[2] ? parseInt(m[2], 10) : van);
-          const wat = m[3].toUpperCase();
-          for (let i = van; i <= Math.min(tot, lijst.length); i++) {
-            const b = lijst[i - 1];
-            if (!b) continue;
-            if (/BODY|RFC822/.test(wat)) {
-              const tekst = alsBericht(b);
-              zeg('* ' + i + ' FETCH (FLAGS (' + vlaggenVan(b).join(' ') + ') RFC822 {' + Buffer.byteLength(tekst) + '}');
-              schrijf(tekst + CRLF + ')' + CRLF);
-            } else {
-              zeg('* ' + i + ' FETCH (FLAGS (' + vlaggenVan(b).join(' ') + ') INTERNALDATE "' + b.at + '")');
-            }
-          }
-          return zeg(merk + ' OK FETCH klaar');
-        }
-
-        if (cmd === 'STORE') {
-          const m = /^(\d+)\s+([+-]?)FLAGS(?:\.SILENT)?\s+\(?([^)]*)\)?$/i.exec(arg.trim());
-          if (!m) return zeg(merk + ' BAD onbegrepen STORE');
-          const b = lijst[parseInt(m[1], 10) - 1];
-          if (!b) return zeg(merk + ' NO dat bericht staat niet in deze map');
-          const aan = m[2] !== '-';
-          const vlaggen = m[3].split(/\s+/).filter(Boolean).map(x => x.toLowerCase());
-          /* HIER WORDT DE WAARHEID GEWIJZIGD, en dat gebeurt in RTMAIL zelf.
-             Een client die een ster zet, zet hem in het postvak -- niet in een
-             IMAP-schaduwadministratie die daarna uit de pas loopt. */
-          if (vlaggen.includes('\\flagged')) vak.ster(adres, b.id, aan);
-          if (vlaggen.includes('\\seen')) rtmail.lees(adres, b.id);
-          if (vlaggen.includes('\\deleted') && aan) vak.verplaats(adres, b.id, 'prullenbak');
-          laad(open);
-          const nieuw = lijst.find(x => x.id === b.id);
-          if (nieuw) zeg('* ' + (lijst.indexOf(nieuw) + 1) + ' FETCH (FLAGS (' + vlaggenVan(nieuw).join(' ') + '))');
-          return zeg(merk + ' OK STORE klaar');
-        }
-
-        if (cmd === 'SEARCH') {
-          const vraag = arg.replace(/^(TEXT|BODY|SUBJECT)\s+/i, '').replace(/^"|"$/g, '').trim();
-          const r = vak.zoek(adres, vraag, { limit: 100 });
-          const nrs = [];
-          if (r.ok) for (const b of r.berichten) {
-            const i = lijst.findIndex(x => x.id === b.id);
-            if (i >= 0) nrs.push(i + 1);
-          }
-          zeg('* SEARCH' + (nrs.length ? ' ' + nrs.sort((a, b) => a - b).join(' ') : ''));
-          return zeg(merk + ' OK SEARCH klaar');
-        }
-
+        /* APPEND MAG ZONDER GEOPENDE MAP: hij noemt zijn eigen doelmap. Alles
+           hieronder niet -- dat gaat over de map die open staat. */
         if (cmd === 'APPEND') {
-          /* Bewust NIET stilzwijgend: een client die denkt dat zijn concept is
-             opgeslagen terwijl dat niet zo is, verliest werk. Liever een
-             duidelijke weigering. */
-          return zeg(merk + ' NO APPEND kan hier niet; schrijf uw post in RTG Mail zelf');
+          /* Bewust NIET stilzwijgend, ook nu er wel iets kan: een client die
+             denkt dat zijn concept is opgeslagen terwijl dat niet zo is,
+             verliest werk. Wat er wel en niet mag staat in ./imap-schrijf.js --
+             kort: een client kan geen ONTVANGEN post maken. */
+          if (!pen) return zeg(merk + ' NO APPEND kan hier niet; schrijf uw post in RTG Mail zelf');
+          const b = pen.begin(arg);
+          if (b.fout) return zeg(merk + ' NO ' + b.fout);
+          brief = { merk, bytes: b.bytes, buf: '' };
+          return zeg('+ ga verder');
         }
+
+        if (!open) return zeg(merk + ' NO kies eerst een map met SELECT');
+        const ctx = { merk, adres, open, lijst, zeg, uit, laad, herlaad };
+
+        if (cmd === 'FETCH') return lees.fetch(arg, ctx);
+        if (cmd === 'STORE') return lees.store(arg, ctx);
+        if (cmd === 'SEARCH') return lees.search(arg, ctx);
+
+        // wachten op nieuwe post; de lus en zijn afwegingen staan in ./imap-idle.js
+        if (cmd === 'IDLE') {
+          idle.start(merk, lijst.length);
+          return zeg('+ idling');
+        }
+
         return zeg(merk + ' BAD dat commando kent deze server niet');
       }
     };
   }
 
-  return { sessie, alsBericht, vlaggenVan, MAPPEN, vakVan };
+  return { sessie, IDLE_MS: wachten.IDLE_MS, MAPPEN, vakVan };
 };

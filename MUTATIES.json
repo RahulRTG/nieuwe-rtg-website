@@ -1426,6 +1426,14 @@
       "gezakt": 4,
       "scherp": "gezakt"
     },
+    "imap-socket.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/mailsleutel.js",
+      "operator": "!==->===#0",
+      "gezakt": 2,
+      "geprobeerd": 2
+    },
     "imap.test.js": {
       "soort": "puur",
       "staat": "gezakt",

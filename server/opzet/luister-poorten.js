@@ -31,7 +31,11 @@ module.exports = (kern) => {
       
       const tlsOpties = process.env.IMAP_KEY && process.env.IMAP_CERT
         ? { key: fs.readFileSync(process.env.IMAP_KEY), cert: fs.readFileSync(process.env.IMAP_CERT) } : null;
+      /* `schrijf` is de conceptenlaag, en die maakt de map Drafts en het
+         commando APPEND mogelijk. Zonder hem blijft IMAP een leeslaag en
+         weigert APPEND met zoveel woorden -- zie de kop van ../imap.js. */
       require('../imap-server')({ vak: kern.rtmailVak, rtmail: kern.rtmail, sleutels: kern.mailSleutel,
+        schrijf: kern.rtmailSchrijf,
         poort: Number(process.env.IMAP_POORT), host: process.env.IMAP_HOST || '127.0.0.1', tlsOpties })
         .start().then(() => console.log('[imap] luistert op ' + (process.env.IMAP_HOST || '127.0.0.1') + ':' +
           process.env.IMAP_POORT + (tlsOpties ? ' (TLS)' : ' -- PLAT, zet er een doorgeefluik met TLS voor')));

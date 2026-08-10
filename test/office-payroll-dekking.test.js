@@ -259,9 +259,17 @@ test('een pakket aanmerken verandert het wereldbeeld van de dekking', async () =
   spoor.versie = landVoor.body.land.pakket.versie;
   spoor.geldigTot = landVoor.body.land.pakket.geldigTot;
 
-  const keur = await api('/api/office/payroll/regels/keur',
+  /* Het meegeleverde NL-pakket meldt ZELF dat het ongecontroleerd is; sinds
+     de 4.25-poort kan aanmerken dan alleen uitdrukkelijk (ondanks + reden).
+     Zonder die twee is een 409 hier het juiste antwoord -- dat bewaakt
+     test/payrollkeur zelf. Deze toets gaat over de DEKKING en neemt dus de
+     uitdrukkelijke weg. */
+  const zonder = await api('/api/office/payroll/regels/keur',
     { land: 'NL', versie: spoor.versie }, gedeeld);
-  assert.equal(keur.body.stand, 'goedgekeurd', 'een mens merkt de jaargang aan: ' + uitleg(keur));
+  assert.equal(zonder.status, 409, 'zonder ondanks+reden blijft de poort dicht: ' + uitleg(zonder));
+  const keur = await api('/api/office/payroll/regels/keur',
+    { land: 'NL', versie: spoor.versie, ondanks: true, reden: 'dekkingstoets: demo-jaargang bewust aangemerkt' }, gedeeld);
+  assert.equal(keur.body.stand, 'goedgekeurd', 'een mens merkt de jaargang uitdrukkelijk aan: ' + uitleg(keur));
 
   const landNa = await api('/api/office/payroll/dekking/land', { land: 'NL' }, gedeeld);
   assert.equal(landNa.body.land.stand, 'draait', 'nu mag er een definitieve run op: ' + uitleg(landNa));

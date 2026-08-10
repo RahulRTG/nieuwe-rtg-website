@@ -165,12 +165,29 @@ test('de bouwer rekent met dezelfde som als de factuurmotor', () => {
     'en de factuurmotor rekent hem ook daar: een offerte die anders afrondt dan de factuur is onuitlegbaar');
 });
 
-test('het lage-btw-lijstje is hetzelfde als dat van de facturatie', () => {
-  const F = require('fs').readFileSync('server/kern/facturatie.js', 'utf8');
-  const m = F.match(/const LAAG_BTW_TYPES = \[([^\]]*)\]/);
-  const daar = m[1].split(',').map(s => s.trim().replace(/'/g, '')).filter(Boolean).sort();
-  assert.deepEqual(OB.LAAG_BTW_TYPES.slice().sort(), daar,
-    'twee lijsten die uiteenlopen geven een offerte met een ander tarief dan de factuur');
+/* Deze toets vergeleek twee KOPIEEN van het lage-btw-lijstje (hier en in
+   kern/facturatie.js) -- en op de dag dat de belastingronde dat lijstje in de
+   facturatie door de fiscale laag verving, zakte hij precies zoals beloofd.
+   De reparatie is niet de lijstjes weer gelijktrekken maar de kopie opheffen:
+   beide lezen nu kern/fiscaal/tarief.js. Dus bewaakt de toets voortaan DAT,
+   in gedrag en in bron. */
+test('het btw-tarief komt uit dezelfde fiscale laag als dat van de facturatie', () => {
+  const TARIEF = require('../server/kern/fiscaal/tarief');
+  // gedrag: een restaurant-zaak krijgt voor eten hetzelfde tarief als de fiscale laag zegt
+  const resto = zaak({ type: 'restaurant', menu: [{ name: 'Soep' }] });
+  assert.equal(OB.btwVanZaak(resto, []), TARIEF.tariefVan(resto, 'eten'),
+    'de bouwer en de fiscale laag horen hetzelfde tarief te geven');
+  assert.equal(OB.btwVanZaak(zaak(), []), TARIEF.tariefVan(zaak(), 'standaard'),
+    'en een zzp-zaak het standaardtarief van haar land');
+  // bron: geen eigen kopie meer, in geen van beide bestanden
+  const fs = require('fs');
+  for (const p of ['server/kern/onderneming/offertebouw.js', 'server/kern/facturatie/motor.js']) {
+    const bron = fs.readFileSync(p, 'utf8');
+    assert.ok(bron.includes("require('../fiscaal/tarief')") || bron.includes("require('../../fiscaal/tarief')") || bron.includes("../fiscaal/tarief"),
+      p + ' hoort de fiscale laag te lezen');
+    assert.ok(!/LAAG_BTW_TYPES\s*=\s*\[/.test(bron),
+      p + ' hoort geen eigen kopie van het lijstje meer te dragen');
+  }
 });
 
 /* ---------------- de offertestroom blijft de schrijver ---------------- */

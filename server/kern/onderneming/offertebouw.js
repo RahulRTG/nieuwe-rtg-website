@@ -36,15 +36,16 @@
 
 const REGELSOM = require('../regelsom');
 
-/* Het standaardtarief per genre, dezelfde regel als de facturatie hanteert.
-   Bewust hier herhaald als LIJST en niet als functie-aanroep: de offertebouwer
-   draait binnen de vakwerklaag, die de facturatiemotor niet in handen heeft.
-   Loopt deze lijst ooit uiteen met die van kern/facturatie.js, dan valt dat op
-   in de toets die ze naast elkaar legt. */
-const LAAG_BTW_TYPES = ['restaurant', 'bar', 'hotel', 'groothandel', 'boerderij'];
+/* Het standaardtarief komt uit de fiscale laag (kern/fiscaal/tarief.js):
+   DEZELFDE bron als de factuurmotor. Hier stond een eigen kopie van het
+   genre-lijstje, met een toets die de twee lijsten naast elkaar legde; op de
+   dag dat de belastingronde het lijstje in de facturatie door de landentabel
+   verving, ving die toets precies wat hij beloofde -- en is de kopie hier
+   vervangen door de bron zelf. `caps` (uit db.capsVan) reist optioneel mee
+   omdat deze module de opslag niet kent, dezelfde afspraak als basisCat. */
+const TARIEF = require('../fiscaal/tarief');
+const btwVanZaak = (s, caps) => TARIEF.tariefVan(s, TARIEF.basisCat(s, caps || []));
 const MAX_REGELS = 40;
-
-const btwVanZaak = (s) => (s && LAAG_BTW_TYPES.includes(s.type) ? 9 : 21);
 
 /* De diensten van een zaak, ongeacht waar ze wonen. Een vakzaak zet ze in
    `services`; dat is de lijst waar de offertestroom zelf ook uit put. */
@@ -53,7 +54,7 @@ const dienstenVan = (s) => (Array.isArray(s && s.services) ? s.services : []);
 /* Bouw de regels op. Geeft OF een resultaat OF een fout met de reden -- nooit
    een half resultaat, want een offerte met een stilzwijgend weggevallen regel
    is een offerte die te laag is en dat niet laat zien. */
-function offerteBouw(zaak, regelsIn, scho) {
+function offerteBouw(zaak, regelsIn, scho, caps) {
   const schoon = scho || ((v, n) => String(v == null ? '' : v).trim().slice(0, n || 200));
   const lijst = Array.isArray(regelsIn) ? regelsIn : [];
   if (!lijst.length) return { status: 400, error: 'Een offerte zonder regels is een prijs zonder onderbouwing.' };
@@ -62,7 +63,7 @@ function offerteBouw(zaak, regelsIn, scho) {
   }
 
   const diensten = dienstenVan(zaak);
-  const btwStd = btwVanZaak(zaak);
+  const btwStd = btwVanZaak(zaak, caps);
   const uit = [];
 
   for (const r of lijst) {
@@ -84,8 +85,10 @@ function offerteBouw(zaak, regelsIn, scho) {
          eigen kopie van die regel liet `null` en `''` als 0% door, en dan staat
          er een offerte zonder btw met een totaal dat er normaal uitziet. */
       const eigenBtw = REGELSOM.tariefVan(d.btw);
+      /* Geen eigen tarief? Dan blijft het veld leeg en beslist de som via de
+         fiscale opzoeker hieronder -- precies zoals op de factuur straks. */
       uit.push({ omschrijving: schoon(r.omschrijving, 120) || String(d.name || 'Dienst'),
-        aantal, stuk, btw: eigenBtw !== null ? eigenBtw : btwStd,
+        aantal, stuk, btw: eigenBtw !== null ? eigenBtw : undefined,
         bron: 'dienst', dienstId });
     } else {
       const stuk = Math.round((Number((r || {}).stuk) || 0) * 100) / 100;
@@ -94,11 +97,16 @@ function offerteBouw(zaak, regelsIn, scho) {
       if (!oms) return { status: 400, error: 'Elke losse regel heeft een omschrijving nodig; anders leest de klant een bedrag zonder reden.' };
       const losBtw = REGELSOM.tariefVan((r || {}).btw);
       uit.push({ omschrijving: oms, aantal, stuk,
-        btw: losBtw !== null ? losBtw : btwStd, bron: 'los' });
+        btw: losBtw !== null ? losBtw : undefined, bron: 'los' });
     }
   }
 
-  const som = REGELSOM.verwerkRegels(uit, btwStd, schoon);
+  /* Dezelfde per-regel-opzoeker als de factuurmotor meegeeft: een glas wijn
+     in een restaurant is geen eten, en dat hoort op de offerte al te kloppen
+     en niet pas op de factuur. Regels met een eigen tarief gaan erlangs. */
+  const basis = TARIEF.basisCat(zaak, caps || []);
+  const perRegel = (omschrijving) => TARIEF.tariefVan(zaak, TARIEF.catVanItem(zaak, omschrijving, basis));
+  const som = REGELSOM.verwerkRegels(uit, btwStd, schoon, perRegel);
   if (!(som.totaal > 0)) return { status: 400, error: 'Het totaal komt op nul uit.' };
 
   /* De regels dragen hun herkomst mee: verwerkRegels geeft alleen het geld
@@ -117,4 +125,4 @@ function offerteBouw(zaak, regelsIn, scho) {
   };
 }
 
-module.exports = { offerteBouw, btwVanZaak, LAAG_BTW_TYPES, MAX_REGELS };
+module.exports = { offerteBouw, btwVanZaak, MAX_REGELS };

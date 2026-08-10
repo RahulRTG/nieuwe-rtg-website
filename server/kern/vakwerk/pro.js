@@ -61,7 +61,11 @@ module.exports = (ctx) => {
     let prijs = Math.round(Number((body || {}).prijs) * 100) / 100;
     let opbouw = null;
     if (Array.isArray((body || {}).regels) && body.regels.length) {
-      opbouw = OFFERTEBOUW.offerteBouw(findSupplier(code), body.regels, scho);
+      /* caps reist mee zodat de bouwer het tarief uit de fiscale laag kan
+         halen met dezelfde basiscategorie als de factuurmotor straks. */
+      const zaakVoorOfferte = findSupplier(code);
+      let zaakCaps = []; try { zaakCaps = db.capsVan(zaakVoorOfferte) || []; } catch (e) { zaakCaps = []; }
+      opbouw = OFFERTEBOUW.offerteBouw(zaakVoorOfferte, body.regels, scho, zaakCaps);
       if (!opbouw.ok) return opbouw;
       prijs = opbouw.totaal;
     }

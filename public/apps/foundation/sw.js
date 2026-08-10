@@ -21,7 +21,18 @@ const SHELL = [
   '/apps/foundation/mediawijs.html',
   '/apps/foundation/contact.html', '/apps/foundation/gezin-rt.js', '/apps/foundation/werk.html', '/apps/foundation/vrienden.html', '/apps/foundation/markt.html',
   '/apps/foundation/beheer.html', '/apps/foundation/privacy.html', '/apps/foundation/sessie.js',
-  /* De drie schermen van het Foundation OS. Ze staan in dezelfde schil omdat ze
+  /* Deze tien stonden WEL op de hub en NIET in de schil: spelen, de biebs, de
+     schoolkant en het magazine. Precies de tegels waarmee een kind zich
+     bezighoudt als er niets anders is -- en dus juist de tegels die je nodig
+     hebt in een auto, een wachtkamer of een buurthuis met slecht bereik. Wie
+     hier een pagina bijzet op de hub, zet hem ook hier neer; de gaten waren
+     niet te zien omdat niets ze telde. */
+  '/apps/foundation/speeltuin.html', '/apps/foundation/speelhal.html', '/apps/foundation/arena.html',
+  '/apps/foundation/societeit.html', '/apps/foundation/bieb.html', '/apps/foundation/geloofbieb.html',
+  '/apps/foundation/schoolbieb.html', '/apps/foundation/beroepen.html', '/apps/foundation/school.html',
+  '/apps/foundation/magazine.html',
+  /* De ZES rolschermen van het Foundation OS (het commentaar zei drie; er
+     stonden er al zes). Ze staan in dezelfde schil omdat ze
      in dezelfde scope liggen: een tweede service worker op /apps/foundation/
      zou deze eerste vervangen, en dan is de gezinsapp zijn cache kwijt. Ze
      draaien op een POST-API en die gaat nooit uit de cache -- wat hier offline

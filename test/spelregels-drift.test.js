@@ -278,3 +278,46 @@ test('de lobby toont alleen behaalde prestaties, zonder teller of voortgang', as
   assert.equal(/van de|nog\b|te gaan|\d+\s*\/\s*\d+/i.test(vol.innerHTML), false,
     'geen teller en geen voortgang: ' + vol.innerHTML);
 });
+
+/* ---------- de klok: twee kopieën die niet mogen schuiven ----------
+
+   De client kiest zelf welke spellen hij een tempo-vraag stelt en welke tempi
+   in de lijst staan. Dat is dezelfde afweging als bij MIJN_SPELLEN: de server
+   keurt en weigert, de client geeft alleen de keuze -- en een rondje naar de
+   server vóór de eerste tekening zou een flits geven voor een lijst die eens
+   per jaar verandert. De duplicatie mag dus blijven, maar niet stil uiteenlopen. */
+
+test('de tempo-keuze van de lobby staat bij spellen die async ook echt kunnen', () => {
+  const bron = knip('const ASYNC_SPELLEN', 'const TEMPI');
+  const clientAsync = new Function(bron + '; return ASYNC_SPELLEN;')();
+  const serverAsync = Object.keys(SPEL).filter(k => (SPEL[k].vormen || []).includes('async'));
+  assert.deepEqual(clientAsync.slice().sort(), serverAsync.slice().sort(),
+    'de lobby vraagt om een tempo bij een ander stel spellen dan de server toestaat');
+});
+
+test('elk tempo dat de lobby aanbiedt bestaat ook op de server', () => {
+  /* Andersom hoeft niet: de lobby toont met opzet een SELECTIE (vijf van de
+     zeven) om de keuze klein te houden. Wat hij aanbiedt moet wel bestaan --
+     anders krijgt de speler een weigering op een knop die wij hem gaven. */
+  const bron = knip('const TEMPI', 'function klokTekst');
+  const clientTempi = new Function(bron + '; return TEMPI;')().map(r => r[0]).filter(Boolean);
+  const { TEMPO } = require('../server/kern/spellen/klok');
+  for (const t of clientTempi)
+    assert.ok(TEMPO[t], 'de lobby biedt tempo "' + t + '" aan, maar de server kent hem niet');
+});
+
+test('de klokttekst telt niet zichtbaar af, en zwijgt zonder klok', () => {
+  /* CLAUDE.md verbiedt kunstmatige urgentie. Een klok die in seconden wegtikt
+     op een partij van drie dagen is precies dat, dus de tekst is grof: minuten,
+     dan uren, dan dagen. */
+  const bron = knip('function klokTekst', '/* ---------- wie er nu is');
+  const klokTekst = new Function(bron + '; return klokTekst;')();
+  assert.equal(klokTekst(null), '', 'een potje zonder klok zegt niets');
+  assert.equal(klokTekst({ beurtTot: null }), '');
+  assert.equal(klokTekst({ beurtTot: new Date(Date.now() + 1000).toISOString(), verlopen: true }), 'tijd om');
+  assert.match(klokTekst({ beurtTot: new Date(Date.now() + 18 * 3600000).toISOString() }), /^nog 18 uur$/);
+  assert.match(klokTekst({ beurtTot: new Date(Date.now() + 30 * 60000).toISOString() }), /^nog 30 min$/);
+  assert.match(klokTekst({ beurtTot: new Date(Date.now() + 3 * 86400000).toISOString() }), /^nog 3 dagen$/);
+  assert.equal(klokTekst({ beurtTot: new Date(Date.now() - 5000).toISOString() }), 'tijd om',
+    'een klok die voorbij is zegt dat, ook zonder de vlag van de server');
+});

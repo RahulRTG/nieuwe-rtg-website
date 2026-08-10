@@ -35,7 +35,7 @@ test.after(() => {
 
 const LEDEN_SPELACTIES = [
   '/api/member/spel/nieuw', '/api/member/spel/antwoord', '/api/member/spel/random', '/api/member/spel/mijn',
-  '/api/member/spel/staat', '/api/member/spel/zet', '/api/member/spel/opgeven', '/api/member/spel/toewijzen', '/api/member/spel/replay',
+  '/api/member/spel/staat', '/api/member/spel/zet', '/api/member/spel/opgeven', '/api/member/spel/toewijzen', '/api/member/spel/replay', '/api/member/spel/nabespreking',
   '/api/member/spel/kijk', '/api/member/spel/rahul', '/api/member/spel/klasgenoten', '/api/member/spel/online',
   '/api/member/spel/uitslagen', '/api/member/spel/stand', '/api/member/spel/prestaties',
   '/api/member/spel/toernooi-nieuw', '/api/member/spel/toernooi-antwoord', '/api/member/spel/toernooi-mijn',
@@ -62,7 +62,7 @@ test('elke ledeningang van het speldomein vraagt een token', async () => {
 
 const RTF_SPELACTIES = [
   '/api/rtf/spel/nieuw', '/api/rtf/spel/antwoord', '/api/rtf/spel/random', '/api/rtf/spel/mijn',
-  '/api/rtf/spel/staat', '/api/rtf/spel/zet', '/api/rtf/spel/opgeven', '/api/rtf/spel/toewijzen', '/api/rtf/spel/replay',
+  '/api/rtf/spel/staat', '/api/rtf/spel/zet', '/api/rtf/spel/opgeven', '/api/rtf/spel/toewijzen', '/api/rtf/spel/replay', '/api/rtf/spel/nabespreking',
   '/api/rtf/spel/kijk', '/api/rtf/spel/rahul', '/api/rtf/spel/klasgenoten', '/api/rtf/spel/online',
   '/api/rtf/spel/uitslagen', '/api/rtf/spel/stand', '/api/rtf/spel/prestaties',
   '/api/rtf/spel/toernooi-nieuw', '/api/rtf/spel/toernooi-antwoord', '/api/rtf/spel/toernooi-mijn',

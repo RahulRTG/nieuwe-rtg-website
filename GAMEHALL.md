@@ -551,6 +551,23 @@ daarom álles ziet.
 > maar: `status !== 'klaar'` geeft een fout. Dat is toetsbaar met een mutatie —
 > haal de controle weg en de toets zakt — en een prompt-instructie is dat niet.
 
+**Gebouwd** (`spellen/nabespreking.js`, fase 1). Twee dingen die bij het bouwen
+scherper werden dan het plan:
+
+- De regel hangt aan *"staat het potje nog in `S().potjes` én loopt het"*, niet
+  aan *"het potje moet bestaan"*. Een klaar potje verdwijnt na een dag, het
+  verloop leeft dertig dagen — bond je de nabespreking aan het bestaan van het
+  potje, dan verdwijnt hij precies wanneer je hem het vaakst wilt.
+- Rahul krijgt de **zettenlijst zoals hij is opgeslagen**, plus de uitslag. Het
+  platform legt niet uit wat een zet betekent, want dat weet het niet. Voor
+  schaken is van-veld/naar-veld genoeg om over te praten; voor een spel waar
+  dat niet genoeg is, komt de `gebeurtenis()` uit het begin van deze paragraaf.
+  Wat er níet gebeurt is dat deze laag schaakkennis krijgt.
+
+Zonder API-sleutel geeft dezelfde ingang een smalle, narekenbare samenvatting
+(hoeveel zetten, hoeveel van jou, de uitslag). Analyse verzinnen die er niet is
+zou erger zijn dan niets zeggen.
+
 Bij Woordduel mag Rahul wél tijdens het spel taalhulp geven in een expliciete
 **oefenmodus** (`variant: 'oefenen'`), en zo'n potje is per definitie niet
 ranked en telt niet mee in de uitslagen.
@@ -889,7 +906,7 @@ uitzondering die de route in een 500 veranderde. Zie §6.
 
 | Spel | Bewijst |
 |---|---|
-| **Schaken** | premium 1v1 + async + replay + nabespreking |
+| **Schaken** | premium 1v1 + async + replay + nabespreking — *in uitvoering* |
 | **30 Seconden** | party + big screen + verborgen informatie |
 | **Sudoku** | arcade + dagchallenge (de enige die nu al kan) |
 | **Quizduel** | teams + Foundation + eigen content |
@@ -984,10 +1001,12 @@ techniek is er niet om zichtbaar te zijn.
 | ~~b~~ | ~~`zicht.publiek` bestaat niet; meekijken is één laag~~ — **opgelost**, en het legde drie fouten bloot | — |
 | ~~c~~ | ~~Potje-verval is een vast getal~~ — **naad gelegd, maar het was geen probleem**; de aanleiding klopte niet, zie §7 | — |
 | d | Replay kapt af op 500 zetten; niet gemeten voor een echte campagne | Magnaat met economie |
-| ~~e~~ | ~~Geen klok per beurt~~ — **opgelost**; de herinnering buiten SSE nog niet | async zonder push |
+| ~~e~~ | ~~Geen klok per beurt~~ — **opgelost**, inclusief de keuze in de lobby, de klok in het potje en de toewijs-knop | — |
 | e2 | Eén herinnering per beurt voor wie offline is (§7) | Relaxed en Long Play in de praktijk |
 | f | Rating heeft geen tak met datum per item | ranked (moet afgeleid worden) |
 | g | `TEAMS` is vast `[0,1,0,1,0,1]` | vrije teamindeling in party |
 | h | Een potjegesprek is niet terug te vinden vanuit het potje na afloop (5.32) | game activity in de chat |
 | i | `GEMISTE_BEURTEN` en de tempo-term in `vervalMs` zijn vandaag onobserveerbaar (de bodem wint altijd); een mutatie erop wordt niet gepakt | niets — staat er als bekende, uitgelegde blinde vlek |
-| j | Alleen 30 Seconden en zeven duels hebben een `zicht.publiek`; de rest projecteert nog niet | party mode per spel (fase 1/3) |
+| j | Tien spellen hebben een `zicht.publiek`; de zes andere projecteren nog niet | party mode per spel (fase 1/3) |
+| k | Meekijken heeft nog geen scherm: `/spel/kijk` bestaat alleen als API | spectator-laag (§8) |
+| l | Een replay is nog ruwe data; er is geen scherm dat een partij naspeelt | de replay-weergave van Schaken |

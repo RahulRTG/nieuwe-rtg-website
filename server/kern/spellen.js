@@ -143,7 +143,15 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
   // de opruiming kan nu een verlopen toernooiwedstrijd afmaken (zie hierboven)
   opruimHaken.opgeven = spelOpgeven;
   // Rahul als spelmaatje: in elk potje op te roepen voor hints, regels of een peptalk
-  const { spelRahul } = require('./spellen/rahul')(Object.assign({ anthropic }, ctx));
+  const { spelRahul, _KENNIS } = require('./spellen/rahul')(Object.assign({ anthropic }, ctx));
+
+  /* Rahul als NABESPREKER, en dat is bewust een tweede deur. Het spelmaatje
+     hierboven krijgt het bord niet te zien en kan dus niet verklappen; deze
+     leest het hele verloop en weigert daarom een lopend potje. Die weigering
+     staat in de module zelf, op de status -- niet in een prompt, want een
+     prompt is niet te toetsen. Zie de kop van spellen/nabespreking.js. */
+  const { spelNabespreking } = require('./spellen/nabespreking')(
+    Object.assign({ anthropic, spelReplay, _KENNIS }, ctx));
 
   /* Praten in het potje. Geen eigen berichtenvoorraad: dit gaat de
      communicatiekern in als een gesprek van soort 'group', met alles wat daar
@@ -175,7 +183,7 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
   opruimHaken.sudoku = sudokuOpschonen;
 
 
-  return { spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelToewijzen, spelKijk, spelReplay, spelRahul, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, spelUitslagen, spelStand, spelPrestaties, spelPraat, spelPraatStuur, spelTelemetrie, teamNieuw, teamNodig, teamAntwoord, teamVerlaat, mijnTeams, sudokuNieuw, sudokuKlaar, spelVergeet, toernooiNieuw, toernooiAntwoord, mijnToernooien, toernooiStaat, sneekScore, sneekBord, arcadeScore, arcadeBord, SPEL_SOORTEN: SOORTEN,
+  return { spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelToewijzen, spelKijk, spelReplay, spelRahul, spelNabespreking, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, spelUitslagen, spelStand, spelPrestaties, spelPraat, spelPraatStuur, spelTelemetrie, teamNieuw, teamNodig, teamAntwoord, teamVerlaat, mijnTeams, sudokuNieuw, sudokuKlaar, spelVergeet, toernooiNieuw, toernooiAntwoord, mijnToernooien, toernooiStaat, sneekScore, sneekBord, arcadeScore, arcadeBord, SPEL_SOORTEN: SOORTEN,
     // alleen voor de drift-test: de client heeft een eigen kopie van deze
     // regels (directe feedback); de test houdt beide kopieën tegen elkaar
     _spelregels: { rummiSet: ruw.rummiSet, W_PREMIE: ruw.W_PREMIE, SPEL, ARCADE } };

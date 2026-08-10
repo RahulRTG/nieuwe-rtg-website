@@ -56,6 +56,9 @@
   .rek button.aan{border-color:#fff;transform:translateY(-3px);}
   .rek button.op{opacity:.35;}
   .knoprij{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.6rem;}
+  /* De klok: rustig en zonder seconden. Geen aftelbalk, geen rood -- een
+     partij van drie dagen hoort niet aan je te trekken. */
+  .klokrij{margin-top:.6rem;text-align:center;color:var(--zacht);font-size:.85rem;letter-spacing:.02em;}
   .knoprij .knop{flex:1;min-width:6rem;}
   .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:var(--paneel);border:1px solid var(--goud);color:var(--txt);border-radius:999px;padding:.5rem 1rem;font-size:.85rem;opacity:0;transition:opacity .3s;pointer-events:none;z-index:50;}
   .winbanner{padding:1rem;text-align:center;border:1px solid var(--goud);border-radius:14px;margin-bottom:.8rem;background:linear-gradient(135deg,#26200f,#1c1809);}
@@ -164,6 +167,12 @@
       <div class="sec" style="margin-top:0;">In welke taal?</div>
       <div class="keuzerij" id="nTalen"></div>
     </div>
+    <!-- alleen bij spellen die een beurt van uren of dagen aankunnen -->
+    <div class="kaart blok" id="nTempoBlok" hidden>
+      <div class="sec" style="margin-top:0;">Hoeveel tijd per beurt?</div>
+      <div class="keuzerij" id="nTempi"></div>
+      <div class="leeg" style="padding:.3rem 0 0;">Bij een lange beurt hoef je niet tegelijk online te zijn. Loopt de tijd af, dan kan je tegenstander de partij toewijzen — vanzelf gebeurt er niets.</div>
+    </div>
     <div class="kaart blok">
       <div class="sec" style="margin-top:0;">Tegen wie?</div>
       <div class="keuzerij" id="nVrienden"><span class="leeg">Vrienden laden…</span></div>
@@ -266,7 +275,15 @@
       <div class="praatlijst" id="prtLijst"></div>
       <div class="rmvraag"><input id="prtVeld" placeholder="Zeg iets…" maxlength="500"><button class="knop mini" id="prtKnop" type="button">Stuur</button></div>
     </div>
-    <div class="knoprij"><button class="knop rood" id="sOpgeven" style="flex:0 1 auto;">Opgeven</button></div>
+    <div class="klokrij" id="sKlok" hidden></div>
+    <div class="knoprij">
+      <button class="knop rood" id="sOpgeven" style="flex:0 1 auto;">Opgeven</button>
+      <!-- alleen als de klok van de ander verliep; er gebeurt nooit iets vanzelf -->
+      <button class="knop" id="sToewijzen" hidden style="flex:0 1 auto;">Partij toewijzen</button>
+      <!-- pas na afloop: Rahul leest dan het hele verloop (zie nabespreking.js) -->
+      <button class="knop grijs" id="sNabespreken" hidden style="flex:0 1 auto;">Rahul: bespreek na</button>
+    </div>
+    <div class="leeg" id="sNabespreking" hidden></div>
   </section>
 
   <!-- tetris -->
@@ -357,6 +374,34 @@ document.querySelectorAll('[data-terug]').forEach(a => a.addEventListener('click
 const SPELNAAM = { mejn:'Mens erger je niet', schaak:'Schaken', woord:'Woordduel', pesten:'Pesten',
   dam:'Dammen', rummi:'Rummi', magnaat:'Magnaat', seconden:'30 Seconden', waarheid:'Doen of Waarheid', proost:'Proost (18+)' };
 const MAXG = { mejn:4, pesten:4, rummi:4, magnaat:6, waarheid:6, proost:6 };
+/* Welke spellen een KLOK PER BEURT kunnen dragen, en welke tempi er zijn.
+   Allebei een kopie van de server (`vormen` in de descriptor, `TEMPO` in
+   kern/spellen/klok.js); de server keurt en weigert, dit is alleen de keuzelijst.
+   Dat is dezelfde afweging als bij MIJN_SPELLEN: de tegels staan al in de HTML
+   en een rondje naar de server vóór de eerste tekening zou een flits geven voor
+   een lijst die eens per jaar verandert. De duplicatie mag dus blijven, maar
+   niet stil uiteenlopen -- test/spelregels-drift.test.js houdt beide kopieën
+   tegen elkaar. */
+const ASYNC_SPELLEN = ['schaak','dam','woord','rummi','mejn','magnaat'];
+const TEMPI = [
+  ['', 'Live, aan tafel'],
+  ['15m', 'Live · 15 min'],
+  ['12u', 'Relaxed · 12 uur'],
+  ['24u', 'Long play · 24 uur'],
+  ['72u', 'Long play · 72 uur']
+];
+// "nog 18 uur": grof en zonder seconden. Een klok die zichtbaar wegtikt op een
+// partij van drie dagen is precies de urgentie die hier niet hoort.
+function klokTekst(k){
+  if (!k || !k.beurtTot) return '';
+  if (k.verlopen) return 'tijd om';
+  const ms = new Date(k.beurtTot).getTime() - Date.now();
+  if (ms <= 0) return 'tijd om';
+  const min = Math.round(ms/60000);
+  if (min < 60) return 'nog ' + Math.max(1, min) + ' min';
+  const uur = Math.round(min/60);
+  return uur < 48 ? 'nog ' + uur + ' uur' : 'nog ' + Math.round(uur/24) + ' dagen';
+}
 /* ---------- wie er nu is ----------
    De server beslist wie hierin staat (eigen vrienden, geblokkeerd eruit, en
    wie "spelen" heeft uitgezet telt als offline). Deze pagina toont het alleen.
@@ -450,6 +495,13 @@ async function laadPrestaties(){
     '<small>'+esc(p.uitleg||'')+'</small></div></div>').join('');
 }
 
+/* De klok achter de stand in de lobby. Alleen als er een tempo is: een potje
+   zonder klok ziet er precies zo uit als altijd. */
+function klokBij(x){
+  if (x.status !== 'bezig' || !x.klok) return '';
+  const t = klokTekst(x.klok);
+  return t ? ' · ' + t : '';
+}
 async function laadLobby(){
   let d; try{ d = await api('mijn'); }catch(e){ return; }
   laadOnline(); laadZichtbaar(); laadStand(); laadRecent(); laadPrestaties(); laadTeams(); tekenTeamVrienden();
@@ -463,7 +515,7 @@ async function laadLobby(){
   $('#potjes').innerHTML = p.length ? p.map(x =>
     '<div class="rij" style="cursor:pointer;" data-open="'+esc(x.id)+'">'+(x.ikAanZet?'<span class="beurtstip"></span>':'')+
     '<div class="nm">'+esc(x.naam)+(x.soort==='woord'?(x.taal==='en'?' ':' '):'')+(x.modus==='teams'?' · 2 tegen 2':'')+'<small>'+x.spelers.map(esc).join(' · ')+' · '+
-    (x.status==='klaar' ? (x.winnaar?''+esc(x.winnaar):'gelijkspel') : x.status==='wacht' ? 'wacht op '+x.wachtOp+' speler(s)' : (x.ikAanZet?'jij bent aan zet!':'wacht op '+esc(x.aanZet)))+'</small></div><span>→</span></div>').join('')
+    (x.status==='klaar' ? (x.winnaar?''+esc(x.winnaar):'gelijkspel') : x.status==='wacht' ? 'wacht op '+x.wachtOp+' speler(s)' : (x.ikAanZet?'jij bent aan zet!':'wacht op '+esc(x.aanZet)))+klokBij(x)+'</small></div><span>→</span></div>').join('')
     : '<div class="leeg">Nog geen potjes. Kies hierboven een spel.</div>';
   document.querySelectorAll('[data-open]').forEach(r => r.addEventListener('click', ()=> openPotje(r.dataset.open)));
 }
@@ -522,19 +574,20 @@ $('#teamMaak').addEventListener('click', async ()=>{
 });
 
 /* ---------- nieuw potje ---------- */
-let nSpel = 'mejn', nGrootte = 2, nModus = 'vrij', nGekozen = [], nTaal = 'nl';
+let nSpel = 'mejn', nGrootte = 2, nModus = 'vrij', nGekozen = [], nTaal = 'nl', nTempo = '';
 document.querySelectorAll('.spelkaart').forEach(k => k.addEventListener('click', ()=>{
   if (k.dataset.spel === 'sneek'){ toon('vSneek'); laadSneekBord(); return; }
   if (k.dataset.spel === 'tetris'){ toon('vTetris'); laadTetrisBord(); return; }
   if (k.dataset.spel === 'sudoku'){ toon('vSudoku'); suNieuw(); laadSudokuBord(); return; }
   if (k.dataset.spel === 'vlek'){ toon('vVlek'); vzStart(); return; }
-  nSpel = k.dataset.spel; nGrootte = nSpel==='seconden' ? 4 : 2; nModus = 'vrij'; nGekozen = []; nTaal = 'nl'; $('#nCodenaam').value='';
+  nSpel = k.dataset.spel; nGrootte = nSpel==='seconden' ? 4 : 2; nModus = 'vrij'; nGekozen = []; nTaal = 'nl'; nTempo = ''; $('#nCodenaam').value='';
   $('#nTitel').textContent = SPELNAAM[nSpel];
   $('#nGrootteBlok').hidden = !MAXG[nSpel];
   $('#nTaalBlok').hidden = nSpel !== 'woord';
+  $('#nTempoBlok').hidden = !ASYNC_SPELLEN.includes(nSpel);
   $('#nProost').hidden = nSpel !== 'proost';
   $('#nSeconden').hidden = nSpel !== 'seconden';
-  tekenTalen(); tekenGroottes(); tekenVrienden();
+  tekenTalen(); tekenTempi(); tekenGroottes(); tekenVrienden();
   toon('vNieuw');
 }));
 function tekenGroottes(){
@@ -544,6 +597,11 @@ function tekenGroottes(){
   if (nSpel === 'mejn') opties.push([4,'teams','2 tegen 2']);
   $('#nGroottes').innerHTML = opties.map(([g,m,l]) => '<button type="button" class="chip'+(nGrootte===g&&nModus===m?' aan':'')+'" data-g="'+g+'" data-m="'+m+'">'+l+'</button>').join('');
   $('#nGroottes').querySelectorAll('button').forEach(b => b.addEventListener('click', ()=>{ nGrootte=Number(b.dataset.g); nModus=b.dataset.m; nGekozen=nGekozen.slice(0, nGrootte-1); tekenGroottes(); tekenVrienden(); }));
+}
+function tekenTempi(){
+  $('#nTempi').innerHTML = TEMPI.map(([t,l]) =>
+    '<button type="button" class="chip'+(nTempo===t?' aan':'')+'" data-tp="'+t+'">'+l+'</button>').join('');
+  $('#nTempi').querySelectorAll('button').forEach(b => b.addEventListener('click', ()=>{ nTempo=b.dataset.tp; tekenTempi(); }));
 }
 function tekenTalen(){
   $('#nTalen').innerHTML = [['nl','Nederlands'],['en','Engels']].map(([t,l]) =>
@@ -588,7 +646,7 @@ $('#nStart').addEventListener('click', async ()=>{
   $('#nFout').textContent='';
   try{
     const cn = $('#nCodenaam').value.trim();
-    const d = await api('nieuw', { soort:nSpel, grootte:nGrootte, modus:nModus, vrienden:nGekozen, codenamen: cn ? [cn] : [], taal:nTaal });
+    const d = await api('nieuw', { soort:nSpel, grootte:nGrootte, modus:nModus, vrienden:nGekozen, codenamen: cn ? [cn] : [], taal:nTaal, tempo: nTempo || undefined });
     meld('Uitnodiging verstuurd. Het potje start zodra je vrienden meedoen.');
     toon('vLobby'); laadLobby();
   }catch(e){ $('#nFout').textContent = e.message; }
@@ -596,7 +654,7 @@ $('#nStart').addEventListener('click', async ()=>{
 $('#nRandom').addEventListener('click', async ()=>{
   $('#nFout').textContent='';
   try{
-    const d = await api('random', { soort:nSpel, grootte:nGrootte, taal:nTaal });
+    const d = await api('random', { soort:nSpel, grootte:nGrootte, taal:nTaal, tempo: nTempo || undefined });
     if (d.gestart){ openPotje(d.id); } else { meld('Je staat in de rij ('+d.plek+' van '+d.nodig+'). Zodra het vol is, start het potje.'); toon('vLobby'); laadLobby(); }
   }catch(e){ $('#nFout').textContent = e.message; }
 });
@@ -666,12 +724,34 @@ function tekenPotje(){
   $('#sWin').hidden = p.status !== 'klaar';
   if (p.status==='klaar') $('#sWin').innerHTML = p.winnaar ? '<b>'+esc(p.winnaar)+'</b> wint dit potje!' : '<b>Gelijkspel.</b> Sterk van allebei.';
   $('#sOpgeven').style.display = p.status==='bezig' ? '' : 'none';
+  /* De klok, en de twee knoppen die eraan hangen. Toewijzen verschijnt alleen
+     als de tijd van de ANDER om is: je eigen verlopen klok geeft je geen
+     partij, en de server weigert dat ook. */
+  const k = p.klok, mijnBeurt = p.status==='bezig' && p.beurt===p.ik;
+  const kt = p.status==='bezig' ? klokTekst(k) : '';
+  $('#sKlok').hidden = !kt;
+  if (kt) $('#sKlok').textContent = (mijnBeurt ? 'Jouw beurt — ' : 'Beurt van ' + esc(p.spelers[p.beurt]) + ' — ') + kt;
+  $('#sToewijzen').hidden = !(k && k.verlopen && p.status==='bezig' && !mijnBeurt);
+  $('#sNabespreken').hidden = p.status !== 'klaar';
+  if (p.status !== 'klaar') { $('#sNabespreking').hidden = true; $('#sNabespreking').textContent = ''; }
   const SECTIES = { mejn:'#sMejn', schaak:'#sSchaak', woord:'#sWoord', pesten:'#sPesten', dam:'#sDam', rummi:'#sRummi', magnaat:'#sMagnaat', seconden:'#sSeconden', waarheid:'#sWaarheid', proost:'#sProost' };
   Object.entries(SECTIES).forEach(([s,sel]) => { $(sel).hidden = p.soort !== s || p.status === 'wacht'; });
   if (p.status==='wacht') return;
   const TEKEN = { mejn:tekenMejn, schaak:tekenSchaak, pesten:tekenPesten, woord:tekenWoord, dam:tekenDam, rummi:tekenRummi, magnaat:tekenMagnaat, seconden:tekenSeconden, waarheid:tekenWaarheid, proost:tekenProost };
   (TEKEN[p.soort]||tekenWoord)();
 }
+$('#sToewijzen').addEventListener('click', async ()=>{
+  if (!huidig || !confirm('De tijd van je tegenstander is om. Deze partij aan jou toewijzen?')) return;
+  try{ await api('toewijzen', { id: huidig.id }); const d = await api('staat',{id:huidig.id}); huidig=d.potje; tekenPotje(); }
+  catch(e){ meld(e.message); }
+});
+$('#sNabespreken').addEventListener('click', async ()=>{
+  if (!huidig) return;
+  $('#sNabespreking').hidden = false; $('#sNabespreking').textContent = 'Rahul kijkt de partij terug…';
+  try{ const d = await api('nabespreking', { id: huidig.id });
+    $('#sNabespreking').textContent = d.antwoord || d.samenvatting || '';
+  }catch(e){ $('#sNabespreking').textContent = e.message; }
+});
 $('#sOpgeven').addEventListener('click', async ()=>{
   if (!huidig || !confirm('Dit potje opgeven?')) return;
   try{ await api('opgeven', { id: huidig.id }); const d = await api('staat',{id:huidig.id}); huidig=d.potje; tekenPotje(); }catch(e){ meld(e.message); }

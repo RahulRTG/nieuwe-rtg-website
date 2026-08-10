@@ -5,7 +5,7 @@
 const { log } = require('../log');
 
 module.exports = (kern) => {
-  const { app, auth, geenGast, rtf, spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelToewijzen, spelKijk, spelReplay, spelRahul, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, spelUitslagen, spelStand, spelPrestaties, spelPraat, spelPraatStuur, teamNieuw, teamNodig, teamAntwoord, teamVerlaat, mijnTeams, sudokuNieuw, sudokuKlaar, toernooiNieuw, toernooiAntwoord, mijnToernooien, toernooiStaat, sneekScore, sneekBord, arcadeScore, arcadeBord, socialConnecties } = kern;
+  const { app, auth, geenGast, rtf, spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelToewijzen, spelKijk, spelReplay, spelRahul, spelNabespreking, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, spelUitslagen, spelStand, spelPrestaties, spelPraat, spelPraatStuur, teamNieuw, teamNodig, teamAntwoord, teamVerlaat, mijnTeams, sudokuNieuw, sudokuKlaar, toernooiNieuw, toernooiAntwoord, mijnToernooien, toernooiStaat, sneekScore, sneekBord, arcadeScore, arcadeBord, socialConnecties } = kern;
 
   function rtfSpeler(req, res) {
     const sess = rtf.verifieerProfiel(req.body.code, req.body.token);
@@ -56,6 +56,11 @@ module.exports = (kern) => {
     kijk: (mij, b) => spelKijk(mij, String(b.id || '')),
     // Rahul als spelmaatje: een hint, een regel of een peptalk tijdens het potje
     rahul: (mij, b) => spelRahul(mij, String(b.id || ''), b.vraag),
+    /* Rahul die de partij NA AFLOOP nabespreekt. Bewust een tweede ingang en
+       geen vlag op `rahul`: deze leest het hele verloop en weigert daarom een
+       lopend potje. Een vlag op dezelfde deur zou betekenen dat een verkeerde
+       waarde het bord alsnog opengooit. */
+    nabespreking: (mij, b) => spelNabespreking(mij, String(b.id || ''), b.vraag),
     // de kieslijst met klasgenoten (De Arena); een RTG-lid heeft geen klas
     // en krijgt gewoon een lege lijst
     klasgenoten: (mij) => spelKlasgenoten(mij),

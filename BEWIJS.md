@@ -15,11 +15,11 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | toetsbestanden | 861 |
 | losse beweringen (`test(...)`) | 5402 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 603 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 611 |
 | **overleefd**: geen mutatie kreeg hem rood | 13 |
 | niet te meten (al rood, geen module gevonden, ...) | 17 |
-| alleen in de kop *genoemd*, nog niet gemeten | 56 |
-| niets van beide | 172 |
+| alleen in de kop *genoemd*, nog niet gemeten | 55 |
+| niets van beide | 165 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -744,21 +744,21 @@ toets omvalt.
 | `wereldvermogens.test.js` | 14 | gezakt op `liegpoort /api/` | De vermogens van de Lifestyle- en Business Pass die eerst alleen een NAAM in rechten.js hadden: geavanceerd zoeken, netwerkanalyse en "wie bekeek mijn profiel". De belangrijkste bewering staat in het midden: ZOEKEN... |
 | `werk-bij-inloggen.test.js` | 1 | gezakt op `liegpoort /api/` | Een account voor alles: je logt in op je RTG-account en je werk-app staat er meteen. Geen tweede inlog, geen pincode, geen rol kiezen. |
 | `werkbeleid-dienst.test.js` | 6 | gezakt op `liegpoort /api/` | HET WERKBELEID GELDT TIJDENS JE DIENST, EN NIET IN JE PAUZE. Het werkgeversbeleid kan functies op de pas van een medewerker dichtzetten: geen Salon, geen AI, geen paspoort delen. |
-| `werkgeheugen.test.js` | 7 | -- | HET GEHEUGEN VAN EEN BESLUIT: waarom hebben we dit gedaan, en wat raakte het. Zeven beweringen, en ze gaan allemaal over de vraag wat dit over drie jaar nog waard is: 1. |
-| `werkgezondheid.test.js` | 5 | -- | GEZONDHEID EN DE DAGBRIEFING: één cijfer dat niet liegt. Vijf beweringen, en ze gaan allemaal over de manier waarop zo'n cijfer normaal gesproken onwaar wordt: 1. |
-| `werkgrens.test.js` | 9 | -- | TWEE GRENZEN DIE IN DE VORM ZITTEN, NIET IN EEN CONTROLE. Deze twee lagen zijn allebei gebouwd rond iets wat ze NIET doen, en dat is precies wat hier wordt vastgelegd: HERKOMST (bedrijf/herkomst.js) -- werk dat uit... |
-| `werkindienst.test.js` | 4 | -- | HET INDIENSTPROCES: de stap die het systeem ziet, wordt gemeten. Vijf beweringen, en de eerste is de reden dat deze module bestaat naast zijn spiegel (het uitdienstproces): 1. |
+| `werkgeheugen.test.js` | 7 | gezakt op `liegpoort /api/` | HET GEHEUGEN VAN EEN BESLUIT: waarom hebben we dit gedaan, en wat raakte het. Zeven beweringen, en ze gaan allemaal over de vraag wat dit over drie jaar nog waard is: 1. |
+| `werkgezondheid.test.js` | 5 | gezakt op `liegpoort /api/` | GEZONDHEID EN DE DAGBRIEFING: één cijfer dat niet liegt. Vijf beweringen, en ze gaan allemaal over de manier waarop zo'n cijfer normaal gesproken onwaar wordt: 1. |
+| `werkgrens.test.js` | 9 | gezakt op `liegpoort /api/` | TWEE GRENZEN DIE IN DE VORM ZITTEN, NIET IN EEN CONTROLE. Deze twee lagen zijn allebei gebouwd rond iets wat ze NIET doen, en dat is precies wat hier wordt vastgelegd: HERKOMST (bedrijf/herkomst.js) -- werk dat uit... |
+| `werkindienst.test.js` | 4 | gezakt op `liegpoort /api/` | HET INDIENSTPROCES: de stap die het systeem ziet, wordt gemeten. Vijf beweringen, en de eerste is de reden dat deze module bestaat naast zijn spiegel (het uitdienstproces): 1. |
 | `werkmail.test.js` | 5 | gezakt op `liegpoort /api/` | Werkmail: het zakelijke adresboek per zaak boven op RTMAIL. Standaard- adressen voor eigenaar en management, rahul@<bedrijf>.rtg dat zelf terugschrijft, werkgeversbeheer (aanmaken en afpakken), de buitenpost (extern... |
 | `werkplaats-uitgifte.test.js` | 5 | gezakt op `liegpoort /api/` | RTG Werkplaats geeft rechtstreeks uit: een opdracht wordt na het uitwerken als echt onderdeel in de winkel gezet (App Store of Bibliotheek). De overlay leeft in db.data.appbiebExtra en verschijnt bij de leden in de... |
 | `werkplek-wijzigen.test.js` | 10 | gezakt op `liegpoort /api/` | De werkplek, tweede helft: WIJZIGEN en WEGGOOIEN. test/werkplek.test.js loopt de deur langs en maakt in elk bureau iets aan: een ontwerp, een artikel, een idee. |
 | `werkplek.test.js` | 13 | gezakt op `liegpoort /api/` | De werkplek: RTG en RTF als twee aparte huizen. Het gaat hier vooral om de deur: de eigenaar mag in beide huizen, een medewerker alleen in het zijne, en wie geen sleutel heeft ziet niets. |
-| `werkregels.test.js` | 9 | -- | BEDRIJFSREGELS: beleid dat iets tegenhoudt. "Contract boven 50.000 euro? |
-| `werkregister.test.js` | 11 | genoemd | HET WERKREGISTER: zoeken, dossier en samenhang over de tien modules heen. Deze laag bouwt geen tweede administratie -- hij zet de bestaande bakken van een werkruimte in een register (kern/werkcommand/register.js) en... |
-| `werktoen.test.js` | 6 | -- | DE TIJDMACHINE EN DE UITVALANALYSE: twee vragen die niet meer beweren dan ze meten. TOEN (bedrijf/toen.js) -- de organisatie op een datum. |
+| `werkregels.test.js` | 9 | gezakt op `liegpoort /api/` | BEDRIJFSREGELS: beleid dat iets tegenhoudt. "Contract boven 50.000 euro? |
+| `werkregister.test.js` | 11 | gezakt op `liegpoort /api/` | HET WERKREGISTER: zoeken, dossier en samenhang over de tien modules heen. Deze laag bouwt geen tweede administratie -- hij zet de bestaande bakken van een werkruimte in een register (kern/werkcommand/register.js) en... |
+| `werktoen.test.js` | 6 | gezakt op `liegpoort /api/` | DE TIJDMACHINE EN DE UITVALANALYSE: twee vragen die niet meer beweren dan ze meten. TOEN (bedrijf/toen.js) -- de organisatie op een datum. |
 | `werkvenster.test.js` | 4 | gezakt op `liegpoort /api/` | Het werkvenster: de werkgever bepaalt wanneer personeel op de werkpagina en de PDA mag. Getoetst op beide lagen: de kernlogica (vensters, middernacht, manager/vrijstelling, Rahuls advies) met een vaste klok, en de... |
 | `werkvloer.test.js` | 7 | gezakt op `liegpoort /api/` | De werkvloer-laag: twee schermen één handeling, de tafellijst met allergenen en de gedeelde checklijst. Getest: een verzoek dat de manager op het bureau maakt staat meteen bij de collega op de PDA, de betaalcode is... |
 | `werkvormen.test.js` | 11 | gezakt op `liegpoort /api/` | Ronde: werkvormen + de staatskamers van RTG Kantoren. 1. |
-| `werkwaarom.test.js` | 5 | -- | WAAROM LOOPT DIT PROJECT ACHTER: de oorzaak wordt gemeten, niet geraden. Vijf beweringen: 1. |
+| `werkwaarom.test.js` | 5 | gezakt op `liegpoort /api/` | WAAROM LOOPT DIT PROJECT ACHTER: de oorzaak wordt gemeten, niet geraden. Vijf beweringen: 1. |
 | `werving-link.test.js` | 3 | -- | De wervingslink: een werkgever nodigt iemand uit die nog geen RTG-account heeft, en die persoon is na het aanmelden meteen personeel. WAT HIER GEREPAREERD IS. |
 | `wiring-contract.test.js` | 2 | overleefd | **geen kop** -- deze toets zegt nergens wat hij bewijst |
 | `wisselen-en-historie.test.js` | 5 | gezakt op `liegpoort /api/` | WISSELEN VAN AFDELING, EN DE RITHISTORIE -- 3 endpoints. supplier/wissel, supplier/wissel/opties en supplier/ride/history stonden als nooit aangeroepen in de waargenomen dekkingsmeting. |

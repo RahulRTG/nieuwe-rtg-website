@@ -81,7 +81,7 @@ test('een modus zet alleen dichtheid, nooit kleur of lettertype', () => {
 test('serif staat op een gesloten lijst rollen en nergens anders', () => {
   /* Bodoni is ceremonieel. Een signatuur die overal staat is geen signatuur;
      dat is precies waarom het geheel vlak aanvoelde. */
-  const TOEGESTAAN = ['.rtg-ceremonie', '.rtg-kpi', '.rtg-plaats'];
+  const TOEGESTAAN = ['.rtg-ceremonie', '.rtg-kpi', '.rtg-datum', '.rtg-plaats'];
   /* "sans-serif" bevat het woord serif. Die eerst weghalen, anders vlagt deze
      toets juist de Inter-regels -- de werk-rollen -- als ceremonieel. Ook dat
      zakte in de eerste versie. */

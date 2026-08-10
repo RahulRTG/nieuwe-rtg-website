@@ -43,6 +43,7 @@ belangrijk uit, dus niets was belangrijk.
 - een bestemming of stad;
 - een belangrijk bedrag;
 - één dominante KPI;
+- een dagnummer dat als anker in een register dient;
 - bewust merkgebruik.
 
 **Bodoni mag niet op**: statussen, kaarttitels, invoervelden, tabelkoppen,
@@ -58,8 +59,8 @@ RTG-R-ECF153 · 2 reizigers · €2.200 · 18 AUG   ← Inter, compact, tabulair
 
 *Handhaving:* `test/ontwerp.test.js` telt per pagina de serif-rollen en zakt
 zodra een pagina Bodoni op een niet-toegestane rol zet. De klassen die serif
-dragen zijn een **gesloten lijst** (`.rtg-ceremonie`, `.rtg-kpi`, `.rtg-plaats`,
-`h1`); een vrije `font-family` in een pagina-`<style>` is een fout.
+dragen zijn een **gesloten lijst** (`.rtg-ceremonie`, `.rtg-kpi`, `.rtg-datum`,
+`.rtg-plaats`, `h1`); een vrije `font-family` in een pagina-`<style>` is een fout.
 
 ---
 

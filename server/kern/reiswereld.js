@@ -53,6 +53,11 @@ module.exports.maakReiswereld = ({ kern }) => {
       soort, titel: o.titel || '', bestemming: o.bestemming || '',
       van: dag(o.van), tot: dag(o.tot) || null, status: o.status || '',
       sig: b.sig || '', teken: b.teken || '', wacht: b.wacht || '',
+      /* Alleen meesturen wat het domein ECHT weet. Een verblijf kent geen
+         reizigersaantal en een vlucht kent een stoel en geen gezelschap; daar
+         een 1 neerzetten zou een getal verzinnen dat er nooit stond. Het scherm
+         laat de regel dan gewoon weg. */
+      personen: Number(o.personen) > 0 ? Number(o.personen) : null,
       kenmerk: o.kenmerk || '', app: o.app, link: o.link
     };
   };
@@ -80,7 +85,7 @@ module.exports.maakReiswereld = ({ kern }) => {
     bron('reisbureau', () => (kern.reisbureau.mijn(key) || [])
       .filter(a => a.status !== 'geannuleerd')
       .map(a => regel('reis', {
-        titel: a.titel, bestemming: a.bestemming, van: a.vertrek,
+        titel: a.titel, bestemming: a.bestemming, van: a.vertrek, personen: a.personen,
         status: a.status, kenmerk: a.ref, app: 'Reisbureau', link: '/apps/reisbureau.html'
       })), uit, stil);
 

@@ -72,21 +72,26 @@ function afhankelijkheden(reg, db, soort, r) {
 }
 
 /* De tijdlijn: wat er rond dit object gebeurde. Twee bronnen, in één lijn:
-   - het Command-journaal (elke menselijke en automatische ingreep hierop);
+   - het journaal dat de aanroeper meegeeft (elke ingreep die daarin staat);
    - de tijdstempels die het record zelf draagt (aangemaakt, betaald, gewijzigd).
    Meer bronnen komen erbij zodra ze bestaan; de vorm is dan dezelfde. */
 const TIJDVELDEN = [['at', 'aangemaakt'], ['created_at', 'aangemaakt'], ['createdAt', 'aangemaakt'],
   ['paidAt', 'betaald'], ['betaaldOp', 'betaald'], ['updatedAt', 'gewijzigd'], ['bijgewerkt', 'gewijzigd'],
   ['afgerondOp', 'afgerond'], ['annuleerdOp', 'geannuleerd']];
 
-function tijdlijn(soort, r, journaal) {
+/* `bron` benoemt WELK journaal de regels leverde. Standaard 'command', want dat
+   is waar deze laag begon; de werkruimtelaag geeft er 'werkruimte' mee. Dat is
+   geen cosmetica: die twee journalen dekken verschillende handelingen, en een
+   regel die "command" heet terwijl hij uit een werkruimte komt, laat een lezer
+   denken dat de dekking van het ene journaal die van het andere is. */
+function tijdlijn(soort, r, journaal, bron) {
   const lijn = [];
   for (const [veld, wat] of TIJDVELDEN) {
     const v = r[veld];
     if (v) lijn.push({ at: s(v), wat, bron: 'record', veld });
   }
   for (const j of journaal.overObject(soort.type, s(r[soort.sleutel]))) {
-    lijn.push({ at: j.at, wat: j.actie, bron: 'command', door: j.actor, reden: j.reden,
+    lijn.push({ at: j.at, wat: j.actie, bron: bron || 'command', door: j.actor, reden: j.reden,
       niveau: j.niveau, uitslag: j.uitslag, id: j.id });
   }
   lijn.sort((a, b) => s(b.at).localeCompare(s(a.at)));
@@ -95,7 +100,7 @@ function tijdlijn(soort, r, journaal) {
 
 /* Het complete dossier. `acties` komt van buiten (risico.js kent het beleid),
    zodat dit bestand niets over risico hoeft te weten. */
-function dossier(reg, db, type, id, { journaal, actiesVoor }) {
+function dossier(reg, db, type, id, { journaal, actiesVoor, bron }) {
   const soort = reg.OP_TYPE.get(String(type));
   if (!soort) return { error: 'Onbekende soort: ' + type, status: 404 };
   const r = reg.vindRij(db, soort.type, id);
@@ -107,7 +112,7 @@ function dossier(reg, db, type, id, { journaal, actiesVoor }) {
     feiten: feiten(r),
     afhankelijkheden: afh.groepen,
     afhankelijkhedenOnvolledig: afh.onvolledig,
-    tijdlijn: tijdlijn(soort, r, journaal),
+    tijdlijn: tijdlijn(soort, r, journaal, bron),
     acties: actiesVoor ? actiesVoor(k, r) : []
   };
 }

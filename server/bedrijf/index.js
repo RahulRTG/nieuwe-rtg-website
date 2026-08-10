@@ -178,5 +178,9 @@ module.exports = (kern) => {
   require('./postbrug')(sctx);
   require('./mijn')(sctx);
   Object.assign(sctx, require('./beeld')(sctx));
+  /* Zoeken, dossier en samenhang over alle modules heen. Staat BEWUST als
+     laatste: hij leest de soorten van de lagen hierboven en voegt er geen
+     eigen opslag aan toe. */
+  require('./inzicht')(sctx);
   return sctx;
 };

@@ -2430,6 +2430,66 @@ wordt uitgerekend uit de einddatum en de opzegtermijn; stemmen kan pas na de
 adviesronde en het beheer-token stemt niet; en wat niet gemeten wordt staat
 overal als **niet gemeten** in plaats van als nul.
 
+#### Het werkregister: één objectmodel onder de tien modules
+
+De tien modules kenden elkaar niet. Een contract wist niet welke projecten
+eraan hingen, een klant niet welke tickets, een ticket niet welk issue — elke
+module had zijn eigen lijst en zijn eigen zoekveld. De motoren die dat kunnen
+beantwoorden stonden er al (`kern/command/zoek.js`, `object.js`, `graaf.js`,
+`kwaliteit.js`): ze zijn expliciet gebouwd om **een register mee te krijgen**
+in plaats van er een te importeren, en dat is precies waarom de zaak-kant ze
+gescoped kan gebruiken. Wat ontbrak was dat de werkruimte-objecten in geen
+enkel register stonden.
+
+`server/kern/werkcommand/` is dat register — het derde in dit huis, naast dat
+van RTG (`kern/command/register.js`) en dat van een zaak
+(`kern/zaakcommand/register.js`). Vijftien soorten over de tien modules heen:
+project, taak, kennisartikel, klant, kans, ticket, storing, repository, issue,
+release, feature flag, apparaat, licentie, contract, besluit. Er wordt **geen
+tabel verplaatst en geen kopie aangelegd**: elke soort leest de bak waar hij al
+woonde (`db.data.werkruimtes[CODE]`).
+
+Vier routes, en geen ervan rekent zelf iets uit — ze bouwen per verzoek het
+register uit de rechten van het lid dat aanklopt en geven dat aan de bestaande
+motoren (`server/bedrijf/inzicht.js`):
+
+| Endpoint | Doel |
+|---|---|
+| `POST /api/bedrijf/zoek` `{q, type?}` | Eén zoekbalk over alle modules, met `bereik`: waar er is gezocht |
+| `POST /api/bedrijf/dossier` `{type, id}` | De feiten, wie ernaar verwijst, en de tijdlijn uit het werkjournaal |
+| `POST /api/bedrijf/samenhang` | De vorm van het geheel: soorten, randen, en wat niet gemeten mocht worden |
+| `POST /api/bedrijf/wandel` `{type, id, diepte}` | Wat er twee stappen verderop ligt — de klant achter het ticket achter het issue |
+
+**Twee assen van scope, en allebei door weglaten.** De werkruimte: elke soort
+draagt een `lees(db)` die alleen zijn eigen werkruimte opent, dus er bestaat
+geen pad waarlangs een rij van een andere organisatie naar buiten komt. En het
+recht: het Werk OS poort zijn modules per recht, dus een soort waarvoor u het
+recht mist **zit niet in uw register** — hij wordt niet gefilterd, hij is er
+niet. Dat verschil is hier alles: de afhankelijkhedenscan loopt álle soorten
+van het register langs, en één vergeten filter levert dan de contracten van een
+ander op. `rechten` heeft daarom geen standaardwaarde; wie hem vergeet krijgt
+een leeg register, en dat is de goede kant om fout te gaan.
+
+**De randen worden gemeten, niet getekend.** Niemand heeft ergens genoteerd dat
+een ticket aan een klant hangt; `kwaliteit.js` meet welk veld in de praktijk
+vrijwel altijd een bestaande sleutel van een andere soort bevat. Onder die
+grens (te weinig rijen) is de samenhang **niet gemeten** — en dat staat er met
+zoveel woorden, want een lege kaart leest anders als "geen samenhang".
+
+**De leden staan er bewust niet in.** Een lidrij draagt `token` (de inlogsleutel
+van die medewerker) en `rtgKey` (de koppeling naar zijn persoonlijke
+RTG-account); de VERBORGEN-lijst van `object.js` kent de eerste wel en de tweede
+niet. Dat is dezelfde afweging waarom het zaakregister `supplierTeam` weglaat:
+dat draagt pincodes. Het kost bovendien vrijwel niets, want geen enkele module
+verwijst naar een lid met zijn id — `eigenaar`, `wie` en `door` zijn vrije tekst.
+Mensen in de graaf is een eigen stap met een eigen besluit en geen bijvangst van
+een register; hij staat als open punt in `TAKEN.md`.
+
+Getoetst in `test/werkregister.test.js` (7). Zes mutaties, alle zes raak — onder
+andere de rechten-zeef weghalen, de lezer over werkruimtes heen laten lopen, de
+afscherming van de kennisbank slopen en de ticketsoort naar de verkeerde bak
+wijzen.
+
 ### RTG Podium: werelden op één motor
 
 Het Podium was één product achter één deur: geverifieerd paspoort en 18 jaar, voor iedereen die wilde kijken. Dat maakte de voorziening onbruikbaar voor alles wat die deur niet nodig heeft — een schoolstream, een productlancering, een concert — terwijl de techniek eronder (de relay-boom over kijkers, de chat, RTG Pay, de goedkeuring door een mens) voor al die dingen dezelfde is.

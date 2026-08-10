@@ -12,7 +12,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '1b06c62c';
+var RTG_BOUW = '598b0b33';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -3465,6 +3465,10 @@ var RTG_BOUW = '1b06c62c';
        ('os:rtf'), terwijl ze zeventien onderdelen, een eigen service worker en
        een eigen huis heeft. Een wereld die als tegel in een andere wereld
        hangt, is geen wereld. */
+    /* De wereldtegel NAVIGEERT naar het huis; een tweede item in deze lijst zou
+       nooit in beeld komen (openMap navigeert, zie 26.js). Het
+       levens-command-center staat daarom als tegel OP de hub zelf, in de
+       oudersectie -- zie de opmerking daar over de twee sessiewerelden. */
     { sleutel: 'map-rtf', naam: 'RTFoundation', wereld: '/apps/foundation/index.html', glyf: 'rtf', items: ['os:rtf'] }
   ];
 

@@ -100,6 +100,10 @@
        ('os:rtf'), terwijl ze zeventien onderdelen, een eigen service worker en
        een eigen huis heeft. Een wereld die als tegel in een andere wereld
        hangt, is geen wereld. */
+    /* De wereldtegel NAVIGEERT naar het huis; een tweede item in deze lijst zou
+       nooit in beeld komen (openMap navigeert, zie 26.js). Het
+       levens-command-center staat daarom als tegel OP de hub zelf, in de
+       oudersectie -- zie de opmerking daar over de twee sessiewerelden. */
     { sleutel: 'map-rtf', naam: 'RTFoundation', wereld: '/apps/foundation/index.html', glyf: 'rtf', items: ['os:rtf'] }
   ];
 

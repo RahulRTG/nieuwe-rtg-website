@@ -173,18 +173,18 @@ module.exports = (kern) => {
   Object.assign(sctx, require('./it')(sctx));
   require('./uitdienst')(sctx);
   Object.assign(sctx, require('./contract')(sctx));
+  // Regels + handhaving: na contract.js, en contract.js roept ze aan via sctx.
+  Object.assign(sctx, require('./regels')(sctx));
+  Object.assign(sctx, require('./regelpoort')(sctx));
   Object.assign(sctx, require('./besluit')(sctx));
   require('./aansluiting')(sctx);
   require('./postbrug')(sctx);
   require('./mijn')(sctx);
   Object.assign(sctx, require('./beeld')(sctx));
-  /* Zoeken, dossier en samenhang over alle modules heen. Staat BEWUST als
-     laatste: hij leest de soorten van de lagen hierboven en voegt er geen
-     eigen opslag aan toe. */
-  /* Het geheugen van een besluit. NA besluit.js (hij leest `BESLUITEN`) en
-     VOOR inzicht.js (dat zijn `besluitenOver` in het dossier zet). */
+  // Besluitgeheugen: na besluit.js, en voor inzicht.js (dossier leest het).
   Object.assign(sctx, require('./geheugen')(sctx));
   Object.assign(sctx, require('./geheugenlezen')(sctx));
+  // Zoeken, dossier en samenhang: leest de soorten van alle lagen hierboven.
   require('./inzicht')(sctx);
   return sctx;
 };

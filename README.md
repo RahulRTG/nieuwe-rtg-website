@@ -2410,7 +2410,7 @@ journaal en startscherm -- zodat dit ook aan een andere organisatie te geven is.
 | Service | tickets met twee SLA-klokken, storingen, evaluatie, tevredenheid |
 | Bouw | repositories, issues, releases per omgeving, feature flags |
 | IT | apparaten, licenties, het uitdienstproces in zes stappen |
-| Recht | contractbibliotheek met een uitgerekende laatste opzegdag |
+| Recht | contractbibliotheek met een uitgerekende laatste opzegdag, en de bedrijfsregels die bepalen wie er moet goedkeuren |
 | Governance | voorstel, adviesronde, stemronde, besluit met evaluatiemoment, de objecten die het besluit raakt en de uitkomst van het terugkijken |
 | Beeld | het directiebeeld en de geconsolideerde blik over dochters |
 
@@ -2543,6 +2543,67 @@ bewijs bij het koppelen weghalen, de lezer met een ander register laten
 oplossen, intrekken laten wissen, de titel-van-toen vervangen door die van nu,
 een evaluatie de vorige laten overschrijven, en het dossier de omgekeerde vraag
 niet meer laten stellen.
+
+#### Bedrijfsregels: beleid dat iets tegenhoudt
+
+"Contract boven €50.000? Dan kijkt juridisch er altijd naar en tekent de CFO."
+Dat soort afspraken stond hier nergens: het waren gewoontes, en een gewoonte is
+precies zo sterk als de drukste dag.
+
+`server/bedrijf/regels.js` (het register) en `regelpoort.js` (de handhaving)
+maken er beleid van. **De ontwerpregel die alles draagt: een regel die niets
+tegenhoudt is theater.** Je kunt hier daarom alleen een regel maken voor een
+soort waar in de code ook echt een plek is die hem afdwingt — een regel voor
+"project" wordt gewéigerd, met de reden erbij, zolang er geen moment is waarop
+hij kan blokkeren. Een beleidsscherm vol regels die nergens langskomen is erger
+dan geen beleidsscherm: het leest als bewaking die er niet is.
+
+Vandaag is dat één plek: **het activeren van een contract**. Dat staat als tabel
+in de code en het antwoord van `/regels` noemt hem per regel.
+
+| Endpoint | Doel |
+|---|---|
+| `POST /api/bedrijf/regel/zet` `{soort, boven, eist:[rechten]}` | Een regel vastleggen (recht `werkruimte`) |
+| `POST /api/bedrijf/regels` | Alle regels, elk met wáár hij wordt afgedwongen |
+| `POST /api/bedrijf/regel/weg` `{regelId, reden}` | Vervallen — met een reden |
+| `POST /api/bedrijf/contract/keur` `{contractId, recht}` | Goedkeuren namens een recht dat u werkelijk draagt |
+| `POST /api/bedrijf/contract/keuring` `{contractId}` | Wat dit contract nog nodig heeft, en wie er al tekende |
+
+**Wat een regel wel en niet toevoegt.** Twee handtekeningen (wij en wederpartij)
+waren er al en zijn structureel; daar gaat een regel niet over. Wat een regel
+toevoegt is wie er van bínnen moet goedkeuren, uitgedrukt in **rechten en niet
+in namen** — `recht` is juridisch, `geld.goedkeuren` is wie over geld gaat. Zo
+blijft de regel staan als iemand anders die rol krijgt. Ontbreekt er een
+goedkeuring, dan staat het contract op **wacht op goedkeuring** in plaats van
+actief, met bij naam wat er mist.
+
+Drie grendels, en ze komen alle drie uit de vraag hoe je hier onderuit zou komen:
+
+- **Eén mens keurt één keer goed.** Wie `recht` en `geld.goedkeuren` allebei
+  draagt, kan niet in zijn eentje een vier-ogen-regel afvinken. Daarmee is "twee
+  rechten" ook echt twee mensen.
+- **Het beheer-token keurt niet** — dezelfde regel als bij het stemmen over een
+  besluit: anders staat er een goedkeuring zonder gezicht.
+- **Een goedkeuring geldt voor het bedrag waarop hij is gegeven.** Gaat de
+  waarde daarna omhoog, dan vervalt hij (met het bedrag van toen erbij) en valt
+  het contract terug naar wacht. Zonder die grendel is de hele laag te omzeilen
+  met een contract van een euro dat je achteraf ophoogt — niet theoretisch, maar
+  de makkelijkste weg eromheen.
+
+`regelpoort.js` is sindsdien de **enige** plek in dit huis die de status van een
+contract op actief zet of terugzet. `contract.js` deed dat vroeger zelf; met een
+tweede voorwaarde erbij zouden twee plekken bepalen wanneer een contract actief
+is, en die lopen uiteen (LAT-regel 4).
+
+Een nieuwe regel werkt **niet met terugwerkende kracht**: contracten die al
+actief zijn worden er niet door teruggezet, want dat zou een lopende afspraak
+stilzwijgend openbreken. Hij bijt zodra er aan zo'n contract iets verandert.
+
+Getoetst in `test/werkregels.test.js` (7). Zeven mutaties, alle zeven raak — de
+drempel laten vervallen, één mens twee keer laten goedkeuren, het beheer-token
+toelaten, de herwaardering bij ophoging weghalen (twee keer, aan beide kanten
+van de naad), de status zetten zonder naar de goedkeuringen te kijken, en een
+regel toelaten voor een soort die nergens wordt afgedwongen.
 
 ### RTG Podium: werelden op één motor
 

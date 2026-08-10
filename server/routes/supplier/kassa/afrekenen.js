@@ -1,8 +1,13 @@
-/* Kassa (deelmodule): het afrekenen: uitchecken (per kamer of tafel, met
-   splitsen) en cadeaukaarten verkopen en innen. Krijgt de gedeelde kern
-   een keer bij het opstarten vanuit routes/supplier/kassa.js. */
+/* Kassa (deelmodule): het afrekenen van een RESTANT REKENING -- uitchecken per
+   kamer of tafel (met splitsen), en het tafelticket dat alle bonnen van een
+   tafel in een keer voldoet. De cadeaukaarten stonden hier ook en zijn bij de
+   reparatie van TAKEN.md 4.27 naar ./cadeaukaarten.js gegaan: dit bestand ging
+   daardoor over de 10 kB-grens, en de naad lag er al -- hier wordt een
+   openstaande rekening afgewikkeld, daar leeft een eigen tegoed.
+   Krijgt de gedeelde kern een keer bij het opstarten vanuit
+   routes/supplier/kassa.js. */
 module.exports = (kern) => {
-  const { app, crypto, db, facturatie, gcCode, logActivity, notify, pickupCode, save, sseToCustomer, sseToOffice,
+  const { app, crypto, db, facturatie, logActivity, notify, pickupCode, save, sseToCustomer, sseToOffice,
           sseToSupplier, supplierAuth, pay, tafelticket } = kern;
   // dezelfde factuurroutine als de app-kant; zie kern/lidacties/factuur.js
   const { maakFactuurVoorLid, regelsVanItems } = require('../../../kern/lidacties/factuur');
@@ -47,6 +52,15 @@ app.post('/api/supplier/pos/checkout', supplierAuth, async (req, res) => {
   const tf = (req.supplier.tables || []).find(t => t.name === room);
   if (tf) tf.status = 'vrij';
   save();
+  /* HIER GEEN FACTUUR, en dat is een besluit. De losse posten op de rekening
+     zijn al gefactureerd op het moment dat ze werden aangeslagen
+     (/api/supplier/pos/sale boekt er een per bon); deze bon is de AFWIKKELING
+     van die posten en niet een nieuwe verkoop. Er wel een boeken zou de
+     btw-aangifte laten verdubbelen -- dat is bij het bouwen van TAKEN.md 4.28
+     eerst gedaan en meteen weer teruggedraaid toen de toets het liet zien.
+     Wat er WEL nog open staat: kamerlasten die niet via de kassa binnenkomen
+     (logies bij het inchecken, de minibar) boeken helemaal geen factuur; zie
+     TAKEN.md 4.29. */
   logActivity(req.supplier.code, req.actor, 'checkte ' + room + ' uit: € ' + total + ' (' + method + ')');
   sseToSupplier(req.supplier.code, 'sync', { scope: 'pos' });
   /* Splitsen vanaf de rekening: de betaler rekent het geheel af met RTG Pay
@@ -100,11 +114,17 @@ app.post('/api/supplier/tafelticket/afrekenen', supplierAuth, (req, res) => {
     sseToCustomer(o.customerKey || o.customerTier, 'sync', { scope: 'orders' });
     notify(o.customerKey || o.customerTier, { icon: '\u{1F9FE}', title: req.supplier.name, body: 'De rekening aan ' + chk.table + ' is voldaan. Bedankt en tot ziens.', scope: 'orders' });
   }
-  // een gebundelde kassabon voor het hele tafelticket
+  /* Een gebundelde kassabon voor het hele tafelticket: het kassastuk van de
+     zaak. Hij draagt `omzetElders`, want de omzet staat al op de bestellingen
+     hierboven -- die staan in db.data.orders en worden daar geteld. Zonder dat
+     merk telde de maandboekhouding de tafel twee keer: een keer per bon en
+     een keer als bundel (TAKEN.md 4.28). Wie de bon telt, vraagt het aan
+     kern/fiscaal/kasomzet.js. */
   const sale = {
     id: crypto.randomBytes(4).toString('hex'), bon: pickupCode(), actor: req.actor.name,
     desc: 'Tafelticket ' + chk.table + ' (' + chk.bonnen.length + ' bon(nen), ' + codenames.length + ' gast(en))',
     room: chk.table, items: null, total: chk.subtotaal, method,
+    omzetElders: 'bonnen',
     at: new Date().toISOString()
   };
   const list = db.data.posSales[req.supplier.code] = (db.data.posSales[req.supplier.code] || []);
@@ -119,32 +139,5 @@ app.post('/api/supplier/tafelticket/afrekenen', supplierAuth, (req, res) => {
   sseToSupplier(req.supplier.code, 'sync', { scope: 'pos' });
   sseToOffice('sync', { scope: 'orders' });
   res.json({ ok: true, sale, table: chk.table, aantalBonnen: chk.bonnen.length, subtotaal: chk.subtotaal, gasten: codenames.length });
-});
-
-app.post('/api/supplier/giftcard/sell', supplierAuth, (req, res) => {
-  const bedrag = Math.round(Number(req.body.bedrag));
-  if (!(bedrag >= 10 && bedrag <= 5000)) return res.status(400).json({ error: 'Kies een bedrag tussen € 10 en € 5.000.' });
-  const kaart = { code: gcCode(), supplierCode: req.supplier.code, supplierName: req.supplier.name, bedrag, saldo: bedrag,
-    kocht: req.actor.name + ' (kassa)', customerKey: null, at: new Date().toISOString(), verzilveringen: [] };
-  db.data.giftcards.unshift(kaart);
-  db.data.giftcards = db.data.giftcards.slice(0, 20000);
-  save();
-  logActivity(req.supplier.code, req.actor, 'verkocht een cadeaukaart van € ' + bedrag + ' (' + kaart.code + ')');
-  res.json({ ok: true, kaart });
-});
-
-app.post('/api/supplier/giftcard/redeem', supplierAuth, (req, res) => {
-  const code = String(req.body.code || '').trim().toUpperCase();
-  const g = (db.data.giftcards || []).find(x => x.code === code && x.supplierCode === req.supplier.code);
-  if (!g) return res.status(404).json({ error: 'Deze cadeaukaart kennen we hier niet.' });
-  const bedrag = Math.round(Number(req.body.bedrag) * 100) / 100;
-  if (!(bedrag > 0)) return res.status(400).json({ error: 'Geen geldig bedrag.' });
-  if (bedrag > g.saldo) return res.status(409).json({ error: 'Onvoldoende saldo: er staat nog € ' + g.saldo + ' op deze kaart.' });
-  g.saldo = Math.round((g.saldo - bedrag) * 100) / 100;
-  g.verzilveringen = g.verzilveringen || [];
-  g.verzilveringen.push({ bedrag, at: new Date().toISOString(), actor: req.actor.name });
-  save();
-  logActivity(req.supplier.code, req.actor, 'inde € ' + bedrag + ' van cadeaukaart ' + g.code + ' (rest € ' + g.saldo + ')');
-  res.json({ ok: true, saldo: g.saldo, kaart: { code: g.code, saldo: g.saldo } });
 });
 };

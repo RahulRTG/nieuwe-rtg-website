@@ -37,6 +37,28 @@ async function mallVan(code, extra) {
   const r = await api('/api/mall/zoek', { per: 60, ...(extra || {}) }, lid);
   return r.body.items.filter(a => a.aanbieder.code === code);
 }
+/* Een zone waarin het bij de zaak MIDDEN OP DE DAG is, en die gegarandeerd
+   afwijkt van de klok van de server.
+
+   Hier stond eerst gewoon 'Pacific/Auckland', en dat is een tijdbom gebleken.
+   Auckland ligt op UTC+12, dus tussen 10:00 en 12:00 UTC is het daar 22:00 tot
+   23:59 -- en in die twee uur past er in de eigen dag van de zaak geen tijdvak
+   van een uur meer. De toetsen die eisen dat er "vandaag bij de zaak nog iets
+   openstaat" stonden dan rood, met een melding die de boekingslaag beschuldigde
+   terwijl er niets mis was. Twee uur per etmaal, dus in de meeste runs
+   onzichtbaar; gevonden doordat het toevallig 10:04 UTC was.
+
+   De vaste zone is daarom vervangen door een zone die uit de klok volgt: het
+   doeluur ligt bij de zaak, niet op de server. Etc/GMT+N is UTC-N (de POSIX-
+   omkering), en Etc/GMT-N is UTC+N. Valt het verschil op nul, dan wordt het een
+   uur -- een zaak die op servertijd loopt meet niets. */
+function zoneMetLokaalUur(doelUur) {
+  let o = (doelUur == null ? 9 : doelUur) - new Date().getUTCHours();
+  while (o < -11) o += 24;
+  while (o > 12) o -= 24;
+  if (o === 0) o = 1;
+  return o > 0 ? 'Etc/GMT-' + o : 'Etc/GMT+' + (-o);
+}
 
 test.before(async () => {
   srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
@@ -243,12 +265,13 @@ test('10. een tijdvak van vandaag ligt nooit in het verleden van de zaak zelf', 
      AFGESLAGEN. vakwerk laat de tijden weg die op de SERVER al voorbij zijn;
      voor een zaak in een andere zone klopt dat niet, en dan biedt de Mall een
      tijdvak aan dat daar al is geweest. */
-  await api('/api/supplier/tijdzone', { tijdzone: 'Pacific/Auckland' }, tok.SERENA);
+  const zone = zoneMetLokaalUur(9);
+  await api('/api/supplier/tijdzone', { tijdzone: zone }, tok.SERENA);
   await api('/api/supplier/vak/uren-zet', {
     dagen: [true, true, true, true, true, true, true], van: '00:00', tot: '23:59'
   }, tok.SERENA);
 
-  const hier = tz.lokaal('Pacific/Auckland');
+  const hier = tz.lokaal(zone);
   const mijn = (await mallVan('SERENA')).filter(a => a.beschikbaar && a.beschikbaar.datum);
   assert.ok(mijn.length >= 1, 'er is een dienst met een tijdvak, anders meet deze toets niets');
   const naarMin = (t) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5));
@@ -272,7 +295,8 @@ test('10. een tijdvak van vandaag ligt nooit in het verleden van de zaak zelf', 
    --------------------------------------------------------------------------- */
 
 test('11. de Mall-kaart en het boekscherm noemen hetzelfde eerste tijdvak', async () => {
-  await api('/api/supplier/tijdzone', { tijdzone: 'Pacific/Auckland' }, tok.SERENA);
+  const zone = zoneMetLokaalUur(9);
+  await api('/api/supplier/tijdzone', { tijdzone: zone }, tok.SERENA);
   await api('/api/supplier/vak/uren-zet', {
     dagen: [true, true, true, true, true, true, true], van: '00:00', tot: '23:59'
   }, tok.SERENA);
@@ -293,7 +317,7 @@ test('11. de Mall-kaart en het boekscherm noemen hetzelfde eerste tijdvak', asyn
      de mutatie "vakwerk terug naar servertijd" liet geen toets zakken omdat de
      Mall zijn eigen filter er nog overheen legde. Nu wordt de eigen dag van de
      zaak expliciet opgevraagd. */
-  const hier = tz.lokaal('Pacific/Auckland');
+  const hier = tz.lokaal(zone);
   const vandaagDaar = await api('/api/booking/slots', { supplierCode: 'SERENA', serviceId: dienstId, date: hier.datum }, lid);
   assert.equal(vandaagDaar.status, 200);
   const min = (t) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5));
@@ -347,10 +371,25 @@ test('13. de datumgrens van het boekscherm ligt bij de zaak, niet bij de server'
 
      Welke van de twee we kunnen meten hangt af van het uur waarop deze toets
      draait, dus de zone EN de bewering worden daarop gekozen. Zo bijt hij
-     altijd, in plaats van zichzelf in de helft van de gevallen over te slaan. */
+     altijd, in plaats van zichzelf in de helft van de gevallen over te slaan.
+
+     DE GRENS STOND EERST FOUT, en dat kwam pas boven toen de toets er op een
+     ochtend rood van stond -- met een melding die de PRODUCTCODE beschuldigde
+     terwijl er niets mis was. De reden zit in de vorm van het probleem: een
+     zaak die op de vorige kalenderdag zit, zit daar per definitie 's AVONDS
+     (haar lokale uur is 24 min het verschil). Met Pacific/Midway (UTC-11) is
+     dat 13:00 + het UTC-uur, dus om 09:00 UTC is het daar 22:00 en past er in
+     die dag geen tijdvak van een uur meer -- nul tijdvakken, om een reden die
+     niets met de datumgrens te maken heeft. Twee dingen rechtgezet:
+     Etc/GMT+12 in plaats van Midway (een uur meer lucht: 12:00 + het UTC-uur),
+     en de omslag naar de vooruitlopende zone op 10 in plaats van 11, want
+     Pacific/Kiritimati (UTC+14) staat vanaf 10:00 UTC pas op de volgende dag.
+     Samen dekken ze de klok rond. En de PREMISSE wordt nu hardop nagerekend
+     in plaats van aangenomen: is er bij de zaak geen ruimte meer in haar eigen
+     dag, dan zakt deze toets op zijn eigen opzet en niet op de boekingslaag. */
   const utcUur = new Date().getUTCHours();
-  const achter = utcUur < 11;
-  const zone = achter ? 'Pacific/Midway' : 'Pacific/Kiritimati';
+  const achter = utcUur < 10;
+  const zone = achter ? 'Etc/GMT+12' : 'Pacific/Kiritimati';
   await api('/api/supplier/tijdzone', { tijdzone: zone }, tok.SERENA);
   await api('/api/supplier/vak/uren-zet', {
     dagen: [true, true, true, true, true, true, true], van: '00:00', tot: '23:59'
@@ -370,6 +409,13 @@ test('13. de datumgrens van het boekscherm ligt bij de zaak, niet bij de server'
     assert.ok(daar.datum < utcDatum);
     const r = await api('/api/booking/slots', { supplierCode: 'SERENA', serviceId: dienst, date: daar.datum }, lid);
     assert.equal(r.status, 200);
+    /* Eerst de eigen opzet: past er bij de zaak uberhaupt nog een tijdvak in
+       haar avond? De stap is nooit groter dan de duur, dus twee keer de duur
+       na "nu" is de ruime kant van die vraag. Zakt deze regel, dan is de
+       ZONEKEUZE hierboven te krap geworden -- niet de datumgrens. */
+    assert.ok(daar.minuten + 2 * r.body.duurMin <= 23 * 60 + 59,
+      'de premisse van deze toets: bij de zaak is het ' + Math.floor(daar.minuten / 60) + ':' +
+      String(daar.minuten % 60).padStart(2, '0') + ' en er past nog een tijdvak van ' + r.body.duurMin + ' min in haar dag');
     assert.ok(r.body.tijden.length >= 1,
       'de eigen dag van de zaak wordt aangenomen, ook al is hij op de server al voorbij');
   } else {

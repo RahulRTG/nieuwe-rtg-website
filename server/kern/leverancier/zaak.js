@@ -7,6 +7,8 @@ module.exports = (ctx) => {
     HK_STATUSES, POS_METHODS, DOOR_RELOCK_MS, TABLE_STATUSES, ZAAK_OPTIES,
     ordersVanZaak, boekingenVanZaak, publicTrip } = ctx;
   const { deptsFor } = ctx; // uit de gastcontactlaag, die eerder gemount is
+  // welke kassabon meetelt: EEN plek, zie kern/fiscaal/kasomzet.js
+  const kasomzet = require('../fiscaal/kasomzet');
   function publicSupplier(s, lang) {
     const t = Object.assign({}, db.data.supplierTypes[s.type] || {}, { caps: db.capsVan(s) });
     const loc = s.loc ? { ...s.loc, label: i18n.localize(s.loc.label, lang) } : s.loc;
@@ -86,8 +88,12 @@ module.exports = (ctx) => {
     for (const k of volgers) sseToCustomer(k, 'sync', { scope: 'salon' });
   }
 
-  /* Kassa-dagoverzicht (Z-rapport). Kamerlasten tellen pas mee als omzet bij het
-     uitchecken (anders dubbel). */
+  /* Kassa-dagoverzicht (Z-rapport): wat er vandaag door de kassa ging. Welke
+     bon dat is staat in kern/fiscaal/kasomzet.js -- `doorDeKassa` en niet
+     `btwOmzet`, want een bon op 'rtg' is geld dat wel degelijk aan de balie is
+     geind terwijl de btw op de bestelling zelf zit. Kamer- en tafellasten
+     tellen pas bij het uitchecken, en een gebundelde bon telt niet nog eens
+     bovenop zijn eigen onderdelen (anders dubbel; TAKEN.md 4.28). */
   function posDay(code) {
     const today = new Date().toISOString().slice(0, 10);
     const all = db.data.posSales[code] || [];
@@ -96,7 +102,7 @@ module.exports = (ctx) => {
     let total = 0;
     for (const s of sales) {
       byActor[s.actor] = (byActor[s.actor] || 0) + s.total;
-      if (s.method === 'kamer') continue;
+      if (!kasomzet.doorDeKassa(s)) continue;
       total += s.total;
       byMethod[s.method] = (byMethod[s.method] || 0) + s.total;
     }

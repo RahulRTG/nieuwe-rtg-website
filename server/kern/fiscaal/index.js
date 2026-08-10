@@ -14,6 +14,8 @@ const { zzpBerekening } = require('./zzp');
 // welke categorie en welk percentage bij deze zaak horen -- op EEN plek, want
 // de factuur van de klant vraagt het aan dezelfde routine; zie ./tarief.js
 const tarief = require('./tarief');
+// en welke kassabon meetelt als omzet -- ook op EEN plek, zie ./kasomzet.js
+const kasomzet = require('./kasomzet');
 
 function maakFiscaal({ db, centen, btwSplit }) {
   function financeVoor(s) {
@@ -34,8 +36,10 @@ function maakFiscaal({ db, centen, btwSplit }) {
       if (o.supplierCode !== s.code || !o.paid || !inMaand(o.paidAt || o.at)) continue;
       for (const it of o.items || []) tel(catVan(it.name), (it.price || 0) * (it.qty || 1));
     }
+    /* Welke kassabon meetelt staat in ./kasomzet.js en niet hier -- deze regel
+       stond op vier plekken en alle vier anders; zie de kop daar. */
     for (const v of db.data.posSales[s.code] || []) {
-      if (v.method === 'rtg' || v.method === 'kamer' || !inMaand(v.at)) continue;
+      if (!kasomzet.btwOmzet(v) || !inMaand(v.at)) continue;
       if (v.items && v.items.length) for (const it of v.items) tel(catVan(it.name), (it.price || 0) * (it.qty || 1));
       else tel(basisCat, v.total || 0);
     }
@@ -47,12 +51,20 @@ function maakFiscaal({ db, centen, btwSplit }) {
       if (b.supplierCode !== s.code || !b.paid || b.status === 'geweigerd' || !inMaand(b.paidAt || b.at)) continue;
       tel('dienst', b.price || 0);
     }
-    // cadeaukaarten (meervoudig inwisselbaar): btw-moment is de inwisseling
+    /* Cadeaukaarten (meervoudig inwisselbaar): het btw-moment is de
+       INWISSELING en niet de verkoop -- dat klopte en blijft staan. Wat hier
+       NIET meer gebeurt is het bedrag apart optellen (`tel(basisCat, ...)`).
+       De inwisseling is sinds TAKEN.md 4.27 een betaalwijze op een echte
+       kassabon: die bon draagt de omzet en boekt zijn factuur, net als
+       contant. Telde deze regel er nog eens bovenop, dan stond dezelfde euro
+       twee keer in de boekhouding -- en in de aangifte maar een keer, want die
+       telt het factuurregister. De cijfers hieronder blijven wel staan: ze
+       vertellen de zaak wat er aan kaarten uitstaat, en die verplichting is
+       geen omzet. */
     const kaarten = (db.data.giftcards || []).filter(g => g.supplierCode === s.code);
     const gcVerkocht = kaarten.filter(g => inMaand(g.at)).reduce((x, g) => x + g.bedrag, 0);
     let gcIngewisseld = 0;
     for (const g of kaarten) for (const w of g.verzilveringen || []) if (inMaand(w.at)) gcIngewisseld += w.bedrag;
-    if (gcIngewisseld) tel(basisCat, gcIngewisseld);
     const gcOpen = centen(kaarten.reduce((x, g) => x + g.saldo, 0));
     const btw = Object.entries(potten).map(([cat, omzet]) =>
       ({ cat, label: FIN_CAT[cat] || cat, ...btwSplit(omzet, tarief.tariefVan(s, cat)) }))

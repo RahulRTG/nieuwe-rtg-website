@@ -17,6 +17,14 @@
       body.payCode = await vraagPayCode(); if (!body.payCode) return;
       body.idem = RTGIdem('pos');
     }
+    /* Cadeaukaart: de kaartcode hoort BIJ de bon. Werd de kaart apart
+       verzilverd terwijl de bon op contant stond, dan telde de boekhouding
+       hetzelfde bedrag twee keer -- zie TAKEN.md 4.27. */
+    if (method === 'cadeaukaart'){
+      const c = window.prompt(T('pos.gccode','Code van de cadeaukaart:'));
+      if (!c || !c.trim()) return;
+      body.gcCode = c.trim().toUpperCase();
+    }
     try {
       const d = await API.call('/supplier/pos/sale', body);
       bon = {};

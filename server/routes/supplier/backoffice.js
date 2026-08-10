@@ -3,6 +3,8 @@
    gedeelde kern een keer bij het opstarten vanuit routes/supplier.js. */
 module.exports = (kern) => {
   const { app, db, supplierAuth, ordersVanZaak, boekingenVanZaak } = kern;
+  // welke kassabon omzet draagt: EEN plek, zie kern/fiscaal/kasomzet.js
+  const kasomzet = require('../../kern/fiscaal/kasomzet');
   /* zaakcommand OP AANROEPMOMENT uit de kern, en niet hierboven uit de
      destructurering. Deze router wordt opgehangen vóórdat opzet/aanbouw.js de
      zaak-commandolaag aan de kern hangt; wie hem hier vastpakt, pakt undefined
@@ -25,9 +27,11 @@ app.post('/api/supplier/backoffice', supplierAuth, (req, res) => {
   const orders = ordersVanZaak(s.code).filter(o => o.paid && o.status !== 'geweigerd' && o.status !== 'terugbetaald');
   const ritten = db.data.rides.filter(r => r.supplierCode === s.code && r.paid && r.status !== 'geweigerd');
   const boekingen = boekingenVanZaak(s.code).filter(b => b.paid && b.status !== 'geweigerd');
-  // kassaverkopen zonder dubbeltellingen: RTG-codes zijn al app-omzet,
-  // kamerlasten tellen pas bij het uitchecken
-  const kassa = (db.data.posSales[s.code] || []).filter(v => v.method !== 'rtg' && v.method !== 'kamer');
+  /* kassaverkopen zonder dubbeltellingen. WELKE bon dat is staat in
+     kern/fiscaal/kasomzet.js en niet hier: deze filter miste 'tafel' en het
+     merk van een gebundelde bon, en telde de weekomzet daardoor te hoog --
+     dezelfde drift als in de maandboekhouding (TAKEN.md 4.28). */
+  const kassa = (db.data.posSales[s.code] || []).filter(kasomzet.btwOmzet);
   const week = [];
   for (let i = 6; i >= 0; i--) {
     const d = new Date(nu - i * 86400000).toISOString().slice(0, 10);

@@ -8,6 +8,8 @@ module.exports = (kern) => {
   // dezelfde factuurroutine als de app-kant; zie kern/lidacties/factuur.js
   const { maakFactuurVoorLid, regelsVanItems } = require('../../../kern/lidacties/factuur');
   const factuurVoorLid = maakFactuurVoorLid(facturatie);
+  // het verzilveren van een cadeaukaart staat op EEN plek; zie kern/cadeaukaart.js
+  const cadeaukaart = require('../../../kern/cadeaukaart');
 app.post('/api/supplier/pos/sale', supplierAuth, async (req, res) => {
   let total = Number(req.body.total);
   if (!(total > 0) || total > 100000) return res.status(400).json({ error: 'Geen geldig bedrag.' });
@@ -29,6 +31,17 @@ app.post('/api/supplier/pos/sale', supplierAuth, async (req, res) => {
     luchtzijde = { pct, totaalNormaal: Math.round(total * 100) / 100 };
     total = Math.round(total * f * 100) / 100;
     if (items) items = items.map(i => ({ ...i, prijsNormaal: i.price, price: Math.round(i.price * f * 100) / 100 }));
+  }
+  /* Cadeaukaart: het saldo gaat er EERST af, om dezelfde reden als bij RTG Pay
+     hieronder -- lukt de betaling niet, dan is er ook geen bon. De kaart wordt
+     alleen verlaagd; de omzet en de factuur staan op deze bon, want de
+     inwisseling is de betaalwijze en geen tweede optelling ernaast
+     (TAKEN.md 4.27). */
+  let kaartCode = null;
+  if (method === 'cadeaukaart') {
+    const v = cadeaukaart.verzilver(db, req.supplier.code, req.body.gcCode || req.body.code, total, req.actor.name);
+    if (v.error) return res.status(v.status || 400).json({ error: v.error });
+    kaartCode = v.kaart.code;
   }
   // RTG Pay: de gast toont de betaalcode uit de app; die wordt eerst geind
   // in het grootboek. Lukt dat niet, dan is er ook geen bon.
@@ -56,6 +69,8 @@ app.post('/api/supplier/pos/sale', supplierAuth, async (req, res) => {
     desc: String(req.body.desc || '').slice(0, 140),
     room: req.body.room ? String(req.body.room).slice(0, 60) : null,
     items, total, method, betaler, luchtzijde,
+    // welke kaart er is aangesproken; het saldo staat op de kaart zelf
+    kaart: kaartCode,
     betaaldienstKosten: betaaldienstKosten || null,
     at: new Date().toISOString()
   };

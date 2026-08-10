@@ -60,6 +60,34 @@
     // "het vak van de klok op het beginscherm is vierkant").
     '.rtg-ring::before{content:"";position:absolute;inset:1.5%;border-radius:50%;pointer-events:none;' +
       'box-shadow:0.18rem 0.22rem 0.7rem rgba(0,0,0,0.34), 0.7rem 0.85rem 2.2rem rgba(0,0,0,0.22);}' +
+    /* Vervolg van klok-01: het glas en de rest van de ringstijl. Geknipt omdat
+       deel 01 met de glaslagen over de 10 KB-grens ging. De knip ligt midden in
+       een stringconcatenatie -- deel 01 eindigt op een + en dit deel maakt hem
+       af; de bundel plakt ze weer aaneen tot exact hetzelfde bestand. */
+    /* HET GLAS. De klok had een slagschaduw en dus gewicht, maar geen
+       oppervlak: hij las als een tekening van een horloge en niet als een
+       horloge. Twee lagen erbij, allebei nauwelijks zichtbaar -- dat is de
+       bedoeling (MATERIAAL.md: maximaal 2-3% oppervlakteschittering, geen
+       zichtbare zware gradient).
+
+       1. Een lichtval over het kristal, linksboven, die heel langzaam
+          verschuift. Een horloge staat nooit precies stil onder een lamp.
+       2. Een binnenschaduw langs de bovenrand: de kast werpt schaduw op de
+          wijzerplaat. Dat is wat een plaat DIEPTE geeft in plaats van vlakheid.
+
+       Beide staan boven de wijzerplaat maar onder de wijzers zou mooier zijn;
+       dat kan hier niet zonder de SVG te herbouwen, en op deze sterkte is het
+       verschil niet te zien. Eerlijk opgeschreven zodat niemand het later voor
+       een vergissing aanziet. */
+    '.rtg-ring::after{content:"";position:absolute;inset:1.5%;border-radius:50%;pointer-events:none;' +
+      'z-index:2;' +
+      'background:' +
+        'radial-gradient(ellipse 62% 48% at 28% 20%,rgba(255,255,255,0.055) 0%,rgba(255,255,255,0.02) 42%,rgba(255,255,255,0) 68%),' +
+        'linear-gradient(160deg,rgba(255,255,255,0.03) 0%,rgba(255,255,255,0) 38%);' +
+      'box-shadow:inset 0 0.06rem 0.5rem rgba(0,0,0,0.38), inset 0 -0.04rem 0.3rem rgba(255,255,255,0.03);' +
+      'animation:rtgGlas 24s ease-in-out infinite alternate;}' +
+    '@keyframes rtgGlas{from{transform:translate(0,0);}to{transform:translate(1.2%,0.8%);}}' +
+    '@media (prefers-reduced-motion:reduce){.rtg-ring::after{animation:none;}}' +
     '.rtg-ring svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;}' +
     // fijne randen: een gouden haarlijn buiten, een witte lichtlijn, een
     // paletkleurige accent-flens

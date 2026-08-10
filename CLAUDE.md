@@ -14,6 +14,14 @@ ze orkestreren die; alleen apps die dezelfde kern, data én workflow dupliceren
 mogen samensmelten. De toetsvraag is niet "kan dit in een super-app?" maar "is
 dit een zelfstandige capability, of een tweede ingang naar dezelfde?".
 
+**`ONTWERP.md` is het RTG Design System 2.0** — de vormtaal: merk-elementen
+tegenover werk-elementen (Bodoni is ceremonieel en staat op een gesloten lijst
+rollen), de drie modi World/Pro/Command, uitzonderingsgestuurd ontwerpen, kleur
+als betekenis, en de eigen componenten (Signal Rail, Reference, Action Line,
+Context Pane, Command Palette). In één zin: **van veraf classy, van dichtbij
+extreem krachtig.** Lees die vóór je aan een scherm begint; `test/ontwerp.test.js`
+handhaaft wat machinaal te handhaven is.
+
 **`LAT.md` is de technische lat** — negen regels die allemaal uit een fout komen die hier écht is gemaakt, met per regel wat hem handhaaft en waar er alleen op mensen wordt vertrouwd. Lees die vóór je code schrijft of repareert. De belangrijkste twee: repareer de oorzaak en niet het symptoom, en trek elke bewering na met een mutatie (een toets die je niet hebt zien zakken is geen toets). LAT.md gaat over de code, CLAUDE.md over het merk.
 
 ## Structuur en starten (kort)

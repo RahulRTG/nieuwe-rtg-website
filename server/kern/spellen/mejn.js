@@ -1,6 +1,9 @@
 /* Spelmotor "mejn" (kern/spellen): Mens erger je niet: 2-4 spelers of 2-tegen-2; de server dobbelt en bewaakt de regels.
    Verbatim afgesplitst uit kern/spellen.js; de lobby (aldaar) doet matchmaking,
-   beurten en views en roept deze motor via de gedeelde context aan. */
+   beurten en views en roept deze motor via de gedeelde context aan.
+
+   Ring van 40 velden; speler p start op veld p*10. Een pion: -1 = in het
+   starthok, 0..39 = op de ring (absoluut), 100+i = eigen thuisrij. */
 module.exports = (ctx) => {
   const { save, crypto, schud, beurtDoor, codenaamVan, nudge } = ctx;
 
@@ -96,5 +99,16 @@ module.exports = (ctx) => {
 
   /* ================= Schaken ================= */
 
-  return { mejnInit, mejnZet, mejnZetten, mejnGooi };
+  /* De dobbelworp was een uitzondering in de centrale dispatch ("is dit mejn
+     en heet de actie gooi?"). Hij hoort hier: het is een zet van dit spel. */
+  const mejnZetOfGooi = (potje, h, zet) => zet.actie === 'gooi' ? mejnGooi(potje, h) : mejnZet(potje, h, zet);
+  const spel = {
+    // teams:'keuze' -- 2-tegen-2 kan, maar alleen als het potje vol is (vier
+    // spelers) en de starter erom vraagt; anders speelt iedereen voor zich
+    sleutel: 'mejn', naam: 'Mens erger je niet', max: 4, wereld: 'rtf', teams: 'keuze', kijken: true,
+    init: mejnInit, zet: mejnZetOfGooi,
+    view: (p, st, mij) => ({ pionnen: p.spelers.map(sp => st.pionnen[sp].map(x => x.pos)), dobbel: st.dobbel, mag: st.mag,
+      zetten: p.spelers[p.beurt] === mij && st.mag === 'zet' ? mejnZetten(p, mij) : [] })
+  };
+  return { spel, mejnInit, mejnZet, mejnZetten, mejnGooi };
 };

@@ -127,5 +127,17 @@ module.exports = (ctx) => {
     return { status: 200, ok: true, dobbel: st.dobbel };
   }
 
-  return { magnaatInit, magnaatZet, M_VELDEN };
+  /* statisch(): het bord verandert nooit, dus het reist alleen mee als de
+     client erom vraagt (bij openen), niet bij elke poll van 2,5 seconde.
+     Stond als "is dit magnaat?" in de centrale dispatch. */
+  const spel = {
+    sleutel: 'magnaat', naam: 'Magnaat', max: 6, wereld: 'rtg', buitenBeurt: ['bouw', 'verkoop'], kijken: true,
+    init: magnaatInit, zet: magnaatZet,
+    statisch: () => ({ velden: M_VELDEN }),
+    view: (p, st) => ({ posities: p.spelers.map(sp => st.posities[sp]), geld: p.spelers.map(sp => st.geld[sp]),
+      failliet: p.spelers.map(sp => !!st.failliet[sp]), cel: p.spelers.map(sp => st.cel[sp] > 0),
+      eigenaar: Object.fromEntries(Object.entries(st.eigenaar).map(([v, h]) => [v, p.spelers.indexOf(h)])), // veld -> spelerindex
+      huizen: st.huizen, mag: st.mag, koopVeld: st.koopVeld, dobbel: st.dobbel, kaart: st.kaart })
+  };
+  return { spel, magnaatInit, magnaatZet, M_VELDEN };
 };

@@ -170,3 +170,61 @@ test('flitsduel: honderd potjes starten allemaal (geen lege trekking in een som)
     await spel('opgeven', { id: nieuw.id }, A);
   }
 });
+
+/* ---------- aanwezigheid: de klas is hier de hele kring ----------
+   Beschermde tieners zijn onvindbaar via de codenaam-zoeker, dus hun klas is
+   de enige kring die ze hebben. Telde die niet mee voor aanwezigheid, dan bleef
+   "wie is er nu" voor hen altijd leeg -- precies voor de groep waarvoor samen
+   spelen het meest bedoeld is. Deze toets opent de stream ECHT, want het gaat
+   om de levende verbindingenlijst en niet om een tabel. */
+async function opentStream(sess) {
+  const ac = new AbortController();
+  const url = BASE + '/api/rtf/social/stream?code=' + encodeURIComponent(sess.code) +
+    '&token=' + encodeURIComponent(sess.token);
+  const res = await fetch(url, { signal: ac.signal });
+  assert.equal(res.status, 200, 'de stream hoort open te gaan');
+  const reader = res.body.getReader();
+  await reader.read();                    // wacht tot hij geregistreerd staat
+  return { sluit: () => { try { ac.abort(); } catch (e) {} } };
+}
+
+test('online: een klasgenoot telt mee, een tiener uit een andere klas niet', async () => {
+  const leeg = await json(await spel('online', {}, A));
+  assert.deepEqual(leeg.online, [], 'niemand verbonden, dus niemand aanwezig');
+
+  const stroom = await opentStream(B);
+  try {
+    const erbij = await json(await spel('online', {}, A));
+    assert.equal(erbij.aantal, 1, 'de klasgenoot met een open stream is aanwezig');
+    assert.equal(erbij.online[0].codenaam, bCn, 'op codenaam, nooit op echte naam');
+    assert.equal(JSON.stringify(erbij).includes(ECHT), false, 'er reist geen echte naam mee');
+
+    // C zit in een andere klas en is geen vriend: die hoort B niet te zien
+    const buiten = await json(await spel('online', {}, C));
+    assert.deepEqual(buiten.online, [], 'buiten je klas bestaat er geen aanwezigheid');
+  } finally { stroom.sluit(); }
+});
+
+test('online: onzichtbaar spelen haalt je uit de stand van je klasgenoot', async () => {
+  const stroom = await opentStream(B);
+  try {
+    assert.equal((await json(await spel('online', {}, A))).aantal, 1, 'B is te zien');
+
+    const uit = await json(await spel('zichtbaar-zet', { aan: false }, B));
+    assert.equal(uit.zichtbaar, false);
+    assert.deepEqual((await json(await spel('online', {}, A))).online, [], 'en nu niet meer');
+    assert.equal((await json(await spel('zichtbaar', {}, B))).zichtbaar, false, 'B kan zijn eigen stand lezen');
+
+    /* Een kant op: B is onzichtbaar maar blijft zelf zien. Daarvoor moet A
+       wel open staan, anders toetst dit niets. */
+    const stroomA = await opentStream(A);
+    try {
+      assert.equal((await json(await spel('online', {}, B))).aantal, 1,
+        'wie zich verbergt hoort zelf niet blind te worden');
+    } finally { stroomA.sluit(); }
+
+    const aan = await json(await spel('zichtbaar-zet', { aan: true }, B));
+    assert.equal(aan.zichtbaar, true);
+    assert.equal((await json(await spel('online', {}, A))).aantal, 1, 'en hij is weer te zien');
+  } finally { stroom.sluit(); }
+});

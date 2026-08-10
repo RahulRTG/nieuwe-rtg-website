@@ -98,5 +98,11 @@ module.exports = (ctx) => {
      kan betalen verkoopt automatisch terug aan de bank (halve prijs); is dat
      niet genoeg, dan ben je failliet en spelen de anderen door. */
 
-  return { rummiInit, rummiZet, rummiSet };
+  const spel = {
+    sleutel: 'rummi', naam: 'Rummi', max: 4, wereld: 'rtf', kijken: true,
+    init: rummiInit, zet: rummiZet,
+    view: (p, st, mij) => ({ rek: st.rekken[mij], tafel: st.tafel, aantallen: p.spelers.map(sp => st.rekken[sp].length),
+      zak: st.zak.length, eerste: st.eerste[mij], passes: st.passes })
+  };
+  return { spel, rummiInit, rummiZet, rummiSet };
 };

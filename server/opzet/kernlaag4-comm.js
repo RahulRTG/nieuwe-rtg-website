@@ -35,7 +35,7 @@ module.exports = (kern, hulp) => {
    Zonder die vergelijking zou 'mens:AB12:7' de naam van teamlid 7 opleveren,
    welk bedrijf dat ook is -- een sleutel verzinnen was dan een manier om de
    personeelstabel af te lopen. */
-const commNaam = require('../kern/comm/wie').maakNaam({
+const commActorNaam = require('../kern/comm/wie').maakNaam({
   codenaamVan: kern.codenaamVan,
   zaakNaam: (code) => { const z = findSupplier(code); return z ? z.name : null; },
   mensNaam: (code, id) => {
@@ -45,6 +45,19 @@ const commNaam = require('../kern/comm/wie').maakNaam({
     } catch (e) { return null; }
   }
 });
+/* HET ACTORMODEL KENT NIET ALLE SLEUTELS DIE DIT HUIS HEEFT. `wie.js` leest
+   'zaak:', 'mens:' en 'gezin:'; de sociale laag en de spellen dragen een
+   RTF-profiel als 'rtf:<gezinscode>:<profielId>'. Dat laatste komt uit
+   ontleed() als NULL -- terecht, want gokken wat een onbekende ruimte betekent
+   is precies wat daar niet hoort te gebeuren -- en dan heette de afzender in
+   een gesprek "Onbekend". Dat viel op toen de potjechat er kwam: twee
+   gezinsprofielen die samen dammen zagen elkaars berichten zonder naam.
+
+   De brug staat HIER, op de plek waar de twee woordenboeken elkaar raken, en
+   niet in wie.js: `codenaamVan` is de functie die beide werelden al kent.
+   Alleen de weergave gaat hierlangs -- wie ergens IN mag hangt aan de
+   deelnemerslijst en verandert hier niet. */
+const commNaam = (sleutel) => commActorNaam(sleutel) || (kern.codenaamVan ? kern.codenaamVan(sleutel) : null) || null;
 kern.comm = require('../kern/comm').maakComm({ db, save, crypto,
   codenaamVan: kern.codenaamVan, naamVan: commNaam,
   sein: require('../kern/comm/wie').maakSein({ sseToCustomer: hulp.sseToCustomer,

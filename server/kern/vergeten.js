@@ -42,7 +42,7 @@ module.exports = function maakVergeten(kern) {
   const bytes = require('./vergeten/bytes')({ db, media, bestanden });
   // de identiteitsmap (paspoortscans en selfies): zie ../identiteitsmap.js
   const identiteitsmap = require('../identiteitsmap').maakIdentiteitsmap(UPLOAD_DIR);
-  const anoniem = require('./vergeten/anoniem')({ db, accounts });
+  const anoniem = require('./vergeten/anoniem')({ db, accounts, spelVergeet: kern.spelVergeet });
   const { wisGesprekkenVan: wisGesprekken, wisSollicitatiechats } = require('./vergeten/gesprekken');
 
   /* Wist dit lid definitief. Async omdat de mediastore ook een objectopslag op

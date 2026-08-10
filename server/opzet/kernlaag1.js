@@ -26,7 +26,7 @@
 'use strict';
 
 module.exports = (kern, hulp) => {
-  const { DATA_DIR, PERSONAS, accounts, anthropic, boekingenVanKlant, crypto, db, findSupplier, keyVanCodenaam, ledenAantal, leeftijdVan, log, mail, media, ordersVanKlant, ordersVanZaak, rtf, save, schoon, sendPush, sendPushToUser, sociaal, sseToCustomer, sseToOffice } = hulp;
+  const { DATA_DIR, PERSONAS, accounts, anthropic, boekingenVanKlant, crypto, db, findSupplier, keyVanCodenaam, ledenAantal, leeftijdVan, lidBoardUit, log, mail, media, ordersVanKlant, ordersVanZaak, rtf, save, schoon, sendPush, sendPushToUser, sociaal, sseClients, sseToCustomer, sseToOffice } = hulp;
 
 Object.assign(kern, sociaal); // de sociale kern-helpers erbij
 /* Tafelticket (kern/tafelticket.js): de bonnen van dezelfde tafel op een
@@ -36,13 +36,19 @@ Object.assign(kern, { tafelticket: require('../kern/tafelticket')({ crypto, data
 // De dynamische, gesloten RTG-code: HMAC-ondertekende, kort houdbare tokens die
 // alleen ons systeem maakt en verifieert (dyncode.key, 0600, in .gitignore).
 Object.assign(kern, { dyncode: require('../kern/dyncode')({ crypto, dataDir: DATA_DIR }) });
-/* Spellen (kern/spellen.js): mens-erger-je-niet, schaken, woordduel en het
-   Sneek-scorebord op de vriendenlaag; RTF- en RTG-leden spelen tegen elkaar. */
+/* Spellen (kern/spellen.js): het spelplatform op de vriendenlaag; RTF- en
+   RTG-leden spelen tegen elkaar. */
 Object.assign(kern, require('../kern/spellen')({
   db, save, crypto, zijnVrienden: kern.zijnVrienden, codenaamVan: kern.codenaamVan, sseToCustomer,
   isGeblokkeerd: kern.isGeblokkeerd, socialZoek: kern.socialZoek, sociaalRate: kern.sociaalRate,
   // Rahul als spelmaatje: praat met een echte sleutel, valt anders terug op vaste tips
   anthropic,
+  // wie er NU is: de levende lijst van open live-verbindingen uit beide apps,
+  // plus de poort "spelen uitgezet" (zie kern/spellen/presence.js)
+  sseClients, lidBoardUit,
+  // praten in het potje gaat de communicatiekern in; die bestaat pas in laag 4,
+  // dus als FUNCTIE (zie kern/spellen/praat.js)
+  comm: () => kern.comm,
   // 18+ (voor Proost): alleen een echt account met paspoort-geboortedatum telt;
   // RTF-gezinsprofielen hebben geen geverifieerde leeftijd en doen nooit mee
   volwassen: (handle) => {
@@ -59,24 +65,10 @@ Object.assign(kern, require('../kern/spellen')({
    De dodemansknop telt op de klok van DEZE server, niet in de app. Dat is de
    hele reden dat het werkt als de telefoon uitvalt: geen levensteken is zelf
    het signaal. Zie kern/veilig/wacht.js. */
-function meldAan(handle, note) {
-  if (!handle) return null;
-  const n = { id: crypto.randomBytes(4).toString('hex'), read: false, at: new Date().toISOString(), ...note };
-  /* De veiligheidsbaan: een rust-stand ("niet storen") mag een
-     veiligheidsmelding NOOIT tegenhouden. Daarom vraagt deze poort het
-     expliciet, in plaats van de gewone meldingsvoorkeuren te volgen. */
-  if (kern.rustMagDoor && !kern.rustMagDoor(handle, n)) return n;
-  db.data.notifications[handle] = (db.data.notifications[handle] || []);
-  db.data.notifications[handle].unshift(n);
-  db.data.notifications[handle] = db.data.notifications[handle].slice(0, 40);
-  save();
-  sseToCustomer(handle, 'notify', n);
-  sseToCustomer(handle, 'veilig', n);          // de vier apps luisteren hierop
-  try { sendPush(handle, n); } catch (e) { /* push mag een alarm nooit tegenhouden */ }
-  const m = /^user-(.+)$/.exec(String(handle));
-  if (m) { try { sendPushToUser(m[1], n); } catch (e) {} }
-  return n;
-}
+/* De melding zelf staat in ./meldaan.js: hoe een alarm bij een lid landt, en
+   waarom een rust-stand hem niet mag tegenhouden. Hier hangt alleen de draad. */
+const meldAan = require('./meldaan')({ kern, db, save, crypto, sseToCustomer, sendPush, sendPushToUser });
+
 Object.assign(kern, require('../kern/veiligheid')({
   db, save, crypto, schoon, mail,
   kluis: require('../accounts/kluis'),

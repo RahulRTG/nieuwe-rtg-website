@@ -5,13 +5,7 @@
 module.exports = (ctx) => {
   const { db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, isGeblokkeerd, socialZoek, sociaalRate, volwassen,
     rid, nu, S, SPEL, SOORTEN, TEAMS, wereldFout, leeftijdFout, nudge, schud, beurtDoor, opschonen,
-    mejnInit, mejnZet, mejnZetten, mejnGooi, schaakInit, schaakZet, woordInit, woordZet, W_PREMIE,
-    pestenInit, pestenZet, damInit, damZet, damZetten, rummiInit, rummiZet, rummiSet,
-    magnaatInit, magnaatZet, M_VELDEN, secondenInit, secondenZet, waarheidInit, waarheidZet, proostInit, proostZet,
-    flitsInit, reactieInit, quizInit, schatInit, geheugenInit, ordeInit, klasgenotenVan } = ctx;
-  const INITS = { mejn: mejnInit, schaak: schaakInit, pesten: pestenInit, woord: woordInit,
-    dam: damInit, rummi: rummiInit, magnaat: magnaatInit, seconden: secondenInit, waarheid: waarheidInit, proost: proostInit,
-    flits: flitsInit, reactie: reactieInit, quiz: quizInit, schat: schatInit, geheugen: geheugenInit, orde: ordeInit };
+    INITS, klasgenotenVan } = ctx;
   function spelStart(potje) {
     potje.status = 'bezig'; potje.beurt = 0;
     INITS[potje.soort](potje);
@@ -20,6 +14,18 @@ module.exports = (ctx) => {
   function spelGrootte(soort, grootte) {
     const s = SPEL[soort];
     return Math.min(s.max, Math.max(s.min || 2, Number(grootte) || 2));
+  }
+  /* Speelt dit potje in teams? Dat staat in de descriptor van het spel, niet
+     als spelnaam hier: 'altijd' is een spel dat niet anders KAN (30 Seconden,
+     twee teams van twee), 'keuze' is een spel waar het mag als het potje vol
+     zit en de starter erom vraagt (2-tegen-2 mens-erger-je-niet). Op het
+     random-pad wordt er niets gevraagd, dus daar wint 'altijd' en blijft
+     'keuze' vrij spel. */
+  function teamModus(soort, grootte, modus) {
+    const t = SPEL[soort].teams;
+    if (t === 'altijd') return 'teams';
+    if (t === 'keuze' && modus === 'teams' && grootte === SPEL[soort].max) return 'teams';
+    return 'vrij';
   }
   async function spelNieuw(mij, { soort, grootte, modus, vrienden, codenamen, klasgenoten, taal, wereld }) {
     opschonen();
@@ -57,7 +63,7 @@ module.exports = (ctx) => {
     if (!uitgenodigd.length) return { status: 400, error: 'Nodig minstens een speler uit (vriend of codenaam), of speel random.' };
     if (uitgenodigd.length > max - 1) return { status: 400, error: 'Te veel spelers voor dit spel.' };
     for (const v of uitgenodigd) { const vf = leeftijdFout(soort, v); if (vf) return { status: 403, error: vf }; }
-    const potje = { id: rid(5), soort, grootte: max, modus: (soort === 'mejn' && modus === 'teams' && max === 4) || soort === 'seconden' ? 'teams' : 'vrij',
+    const potje = { id: rid(5), soort, grootte: max, modus: teamModus(soort, max, modus),
       taal: taal === 'en' ? 'en' : 'nl',
       teams: TEAMS, spelers: [mij], uitgenodigd, status: 'wacht', beurt: 0, winnaar: null, at: nu(), door: codenaamVan(mij) };
     S().potjes[potje.id] = potje;
@@ -92,13 +98,15 @@ module.exports = (ctx) => {
     if (lf) return { status: 403, error: lf };
     const max = spelGrootte(soort, grootte);
     const w_taal = taal === 'en' ? 'en' : 'nl';
-    const sleutel = soort + ':' + max + (soort === 'woord' ? ':' + w_taal : '');
+    // de wachtrij splitst per spel en groepsgrootte, en alleen bij een
+    // taalgevoelig spel ook per taal (zie perTaal in de descriptor)
+    const sleutel = soort + ':' + max + (SPEL[soort].perTaal ? ':' + w_taal : '');
     const w = S().wachtrij;
     w[sleutel] = (w[sleutel] || []).filter(x => x !== mij);
     w[sleutel].push(mij);
     if (w[sleutel].length >= max) {
       const spelers = w[sleutel].splice(0, max);
-      const potje = { id: rid(5), soort, grootte: max, modus: soort === 'seconden' ? 'teams' : 'vrij', taal: w_taal, teams: TEAMS, spelers, uitgenodigd: [],
+      const potje = { id: rid(5), soort, grootte: max, modus: teamModus(soort, max), taal: w_taal, teams: TEAMS, spelers, uitgenodigd: [],
         status: 'wacht', beurt: 0, winnaar: null, at: nu(), door: 'random' };
       S().potjes[potje.id] = potje;
       spelStart(potje);
@@ -123,5 +131,26 @@ module.exports = (ctx) => {
     }));
     return { potjes: mijnPotjes, uitnodigingen };
   }
-  return { spelStart, spelGrootte, spelNieuw, spelAntwoord, spelRandom, mijnSpellen };
+  /* Een potje dat METEEN begint tussen spelers die al ja hebben gezegd. Dat is
+     het pad voor een toernooiwedstrijd: daar is de uitnodiging al gedaan bij
+     het toernooi zelf, dus een tweede ronde accepteren zou een lege plichtpleging
+     zijn. Hij loopt bewust langs dezelfde spelStart als elk ander potje -- een
+     toernooipartij is een gewone partij, met alle spelregels en poorten die
+     daarbij horen, en niet een tweede soort potje. */
+  function potjeDirect(soort, spelers, extra) {
+    const potje = Object.assign({
+      id: rid(5), soort, grootte: spelers.length, modus: teamModus(soort, spelers.length),
+      taal: 'nl', teams: TEAMS, spelers: spelers.slice(), uitgenodigd: [],
+      status: 'wacht', beurt: 0, winnaar: null, at: nu(), door: 'toernooi'
+    }, extra || {});
+    S().potjes[potje.id] = potje;
+    spelStart(potje);
+    save();
+    spelers.forEach(sp => nudge(sp, potje));
+    return potje;
+  }
+
+  // teamModus reist mee naar buiten zodat de toets hem los kan aanspreken:
+  // via de API is "vier spelers, wel of geen teams" een dure opstelling
+  return { spelStart, spelGrootte, teamModus, potjeDirect, spelNieuw, spelAntwoord, spelRandom, mijnSpellen };
 };

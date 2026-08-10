@@ -330,6 +330,32 @@ function ongebruikt() {
     while ((m = re.exec(lees(p)))) dynamisch.add(path.resolve(path.dirname(p), m[1]));
   }
 
+  /* TWEEDE VORM: EEN MAP DIE ZICHZELF UITLEEST.
+
+     De vorm hierboven vangt `require('./map/' + naam)`, waar het pad nog als
+     tekst in de bron staat. `server/kern/spellen/register.js` doet het anders:
+     hij leest zijn eigen map met `fs.readdirSync` en laadt wat hij vindt met
+     `require(path.join(map, naam))`. Er staat dan NERGENS een padtekst om op
+     te matchen -- en dus meldde deze keuring vijftien spellen (dam, mejn,
+     schaak, sudoku, ...) als dode code terwijl ze bij elke start geladen
+     worden. Vijftien valse meldingen is niet "een beetje ruis": het is de
+     reden dat niemand de zestiende nog gelooft.
+
+     Het signaal is de COMBINATIE: wie een map uitleest en uit een samengesteld
+     pad requiret, laadt die map in zijn geheel. Dat is precies de vorm van een
+     register.
+
+     WAT DEZE REGEL NIET MEER ZIET, en dat hoort erbij: een bestand IN zo'n map
+     dat echt dood is. De keuring kan aan de buitenkant niet zien welke
+     bestanden de scanner overslaat. Bij het spelregister vangt de scanner dat
+     zelf op -- een module zonder descriptor laat de server niet opstarten, en
+     wat geen spel is staat op een expliciete lijst -- maar dat is een belofte
+     van dat register en niet van deze keuring. */
+  for (const p of bronBestanden) {
+    const t = lees(p);
+    if (/\breaddirSync\s*\(/.test(t) && /require\(\s*path\.join\(/.test(t)) dynamisch.add(path.dirname(p));
+  }
+
   /* DE STARTPUNTEN. Een bestand dat je met `node ...` aanroept wordt per
      definitie door niemand gerequired, en is daarom nooit dode code. Ze komen
      uit package.json en niet uit een lijst hier: zet iemand er morgen een bij,

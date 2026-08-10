@@ -14,7 +14,7 @@
    nog niet klaar. Een getter haalt hem op het moment dat hij nodig is. */
 module.exports = (bctx) => {
   const { techniek, functies, eigenaar, inzagelog, log, accounts, archief, beveilig,
-    db, app, ctx, staat, isEigenaar, techAuth, bewaren, foutmelder } = bctx;
+    db, app, ctx, staat, isEigenaar, techAuth, bewaren, foutmelder, spelTelemetrie } = bctx;
 
   // Het statusbord: alle checks + zekeringen. Eigenaar ziet ook de toegangslijst.
   app.get('/api/techniek/status', techAuth, async (req, res) => {
@@ -77,4 +77,22 @@ module.exports = (bctx) => {
     res.json(uit);
   });
 
+
+  /* DE SPELCIJFERS. Hoeveel potjes er per dag per spel zijn gespeeld, en
+     hoeveel stoelen daaraan zaten. Meer niet: er staat geen persoon in de bron
+     (kern/spellen/telling.js), dus er valt hier ook niets uit te halen over wie
+     wat speelt.
+
+     Waarom op het techniekbord en niet op een productdashboard: dit is de enige
+     plek in het huis waar systeembrede aantallen al thuishoren -- de
+     fout-aggregatie staat er ook -- en hij is afgeschermd. Zodra er een echt
+     productbord komt, hoort dit daarheen te VERHUIZEN en niet gekopieerd te
+     worden.
+
+     `techAuth` en niet `eigenaarAlleen`: dit zijn geen bedrijfsgeheimen en geen
+     knop die iets doet -- het is een leesvraag over aantallen. */
+  app.post('/api/techniek/spelcijfers', techAuth, (req, res) => {
+    if (!spelTelemetrie) return res.status(503).json({ error: 'De spellenlaag draait hier niet.' });
+    res.json(spelTelemetrie(req.body && req.body.dagen));
+  });
 };

@@ -98,7 +98,9 @@ module.exports = (kern) => {
      tussen de knoppen die het bord bedienen. */
   require('./techniek/bord')({ techniek, functies, eigenaar, inzagelog, log,
     accounts, archief, beveilig, db, app, ctx, staat, isEigenaar, techAuth,
-    bewaren: () => bewaarDeel, foutmelder: kern.foutmelder });
+    bewaren: () => bewaarDeel, foutmelder: kern.foutmelder,
+    // de spelcijfers zijn een BORD-lezing en horen dus daar; zie ./techniek/bord.js
+    spelTelemetrie: kern.spelTelemetrie });
 
   /* DE ZELFPROEF VAN DE ALARMWEG.
 

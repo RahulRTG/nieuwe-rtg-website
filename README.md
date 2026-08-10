@@ -2062,6 +2062,175 @@ het daar is, en wat je gelooft. Dat geef je niet aan een derde.
 staat een keuze in het profiel of er staat er geen. Wie niets invult merkt er
 niets van, en dat is geen tweederangs ervaring.
 
+## Spellen: een platform onder de spellen
+
+Negentien spellen (zestien potjes met beurten, drie arcadespellen met een
+score) plus de kinderspellen van De Speeltuin en De Speelhal. Wat eronder ligt
+is belangrijker dan het aantal: `server/kern/spellen/` is een platform, en een
+spel is er een bestand in.
+
+### Een spel beschrijft zichzelf
+
+`spellen/register.js` scant de map en bouwt de dispatch-tabellen uit een
+`spel`-descriptor die elk spel zelf meelevert. Er zijn twee vormen:
+
+| | `vorm: 'potje'` | `vorm: 'arcade'` |
+|---|---|---|
+| Spelers | 2-6, om de beurt | alleen jij |
+| Regels | server-authoritatief | **in de client**, tenzij `serverScore` |
+| Zegt | `wereld`, `max`/`min`, `volwassen`, `buitenBeurt`, `teams`, `perTaal`, `kijken`, `init`/`zet`/`view`/`statisch` | `werelden` (lijst), `maxPunten`, `serverScore` |
+
+Een spel toevoegen is dus: een bestand neerzetten. Vergeet je de descriptor,
+dan **start de server niet**, met de bestandsnaam in de melding -- stil
+overslaan zou betekenen dat een spel spoorloos uit de lobby verdwijnt, en dat
+is precies de fout die dit register moet uitsluiten. In `lobby.js`, `partij.js`
+en `spellen.js` staat geen enkele spelnaam meer.
+
+Let op wat de arcade-rij zegt: **een arcadescore is niet server-authoritatief.**
+De client rekent en stuurt een getal; de puntengrens uit de descriptor is de
+enige rem. Dat is te dragen voor een ranglijst onder vrienden en niet meer
+zodra er een competitie of een prijs aan hangt (open punt in `TAKEN.md`).
+
+**Sudoku is de uitzondering, en laat zien hoe die eruitziet.** Zijn regels zijn
+narekenbaar, dus horen ze op de server: `sudoku-nieuw` geeft een puzzel uit en
+houdt de oplossing hier, `sudoku-klaar` neemt alleen een ingevuld rooster aan
+en de punten komen van de serverklok. `serverScore: true` in de descriptor laat
+`arcade-score` een ingestuurd getal voor dit spel **weigeren** -- zonder die
+weigering zou er gewoon een tweede deur naast staan. Wat het bewijst is dat
+*iemand* een puzzel van ons heeft opgelost in de tijd die wij hebben gemeten;
+niet dat een *mens* dat deed. Dat laatste is zonder de speler lastig te vallen
+niet te bewijzen, en doen alsof van wel zou een belofte zijn die de code niet
+waarmaakt. Sneek en Tetris hebben geen narekenbare regel en blijven dus zoals
+ze waren.
+
+### De progressiegrens: alles wat blijft, stopt bij 18+
+
+Eén functie (`progressieMag` in `kern/spellen.js`) bepaalt wie een spoor
+achterlaat: highscores, ranglijsten, uitslagen, standen en prestaties bestaan
+alleen voor leden die de 18+-poort halen -- dezelfde poort als Proost, dus met
+een gecontroleerde paspoort-geboortedatum. **Onder die grens blijft elk spel
+volledig speelbaar; er wordt alleen niets van bewaard.**
+
+Dat is geen voorzichtigheid maar het rechttrekken van een tegenspraak: De Arena
+belooft tieners met zoveel woorden "alles telt alleen binnen het potje; er
+bestaat geen ranglijst", terwijl dezelfde app drie arcadeborden toonde.
+
+### Wie er nu is
+
+Presence is een **afgeleide, geen tabel**: de RTG-app (`/api/stream`) en de
+RTF-app (`/api/rtf/social/stream`) schrijven hun open verbinding allebei in
+dezelfde `sseClients`-lijst, dus "wie is er nu" is een vraag aan die lijst.
+Vijf regels begrenzen hem, en vier ervan houden iets tegen:
+
+- de kring (vrienden **en** klasgenoten) komt van de server, niet uit het
+  verzoek -- anders kun je de aanwezigheid van willekeurige leden aftasten;
+- **binair, geen "laatst gezien"** -- dat vraagt opslag die er niet is, en het
+  is precies de druk die dit huis niet bouwt;
+- geblokkeerd valt weg, aan beide kanten;
+- wie de functie "spelen" heeft uitgezet telt als offline, want anders nodig je
+  iemand uit die het verzoek gegarandeerd niet kan aannemen;
+- wie zichzelf onzichtbaar zet komt in niemands stand -- **een kant op**: je
+  bent niet te zien en je ziet anderen nog wel.
+
+Klasgenoten tellen mee omdat beschermde tieners onvindbaar zijn via de
+codenaam-zoeker: hun klas is de enige kring die ze hebben.
+
+### Uitslagen, stand en prestaties: één bron, niets bijgehouden
+
+Een klaar potje werd na 24 uur weggegooid, dus er bestond geen geschiedenis.
+`db.data.spelUitslagen` legt nu per afgelopen potje vast wie wat won -- op
+**één plek** in `partij.js`, voor allebei de manieren waarop een potje eindigt
+(een winnende zet en opgeven).
+
+De progressiegrens geldt ook voor het **bewaren**: de partij blijft, maar
+alleen deelnemers binnen de grens staan er met codenaam in; wie erbuiten valt
+staat er als `{ anoniem: true }`, en speelde niemand binnen de grens mee dan
+wordt er niets bewaard. Zo raakt een volwassene zijn historie niet kwijt zodra
+hij met een tiener speelt, en bouwt het systeem toch geen profiel van die
+tiener op.
+
+Stand (`spelStand`) en prestaties (`spelPrestaties`) worden **afgeleid** uit die
+log en niet apart bijgehouden. Dat is een bewuste keuze: een eigen teller zou
+blijvend zijn en dus buiten het bewaarbeleid vallen -- en dat beleid kent
+alleen takken met een datum per item, dus zo'n teller zou permanent op de lijst
+`zonderBeleid()` staan. Afleiden kost geen opslag, heeft geen tweede wispad
+nodig en verloopt vanzelf mee.
+
+Het gevolg staat in het antwoord en op het scherm: een stand gaat over het
+**venster** van de log (een jaar, uit `bewaarbeleid.js` zelf) en niet over
+altijd. "7 gewonnen" zonder tijdsaanduiding zou lezen als een totaal voor
+altijd. Een prestatie kan dus ook weer verdwijnen -- geen bug maar het punt.
+
+Prestaties tonen **alleen wat behaald is**. Geen "3 van de 12", geen lijst van
+wat je nog kunt halen, geen reeksen. Een voortgangsbalk naar een doel dat je
+niet zelf koos is de por die hier niet thuishoort; drie toetsen bewaken dat.
+
+### Bewaren en vergeten
+
+- **Bewaartermijn:** uitslagen verlopen na een jaar (`server/bewaarbeleid.js`).
+  Ze staan op het hoogste niveau in `db.data` en niet genest onder `spellen`,
+  want de bewaarmotor leest `db.data[tak]` -- genest zouden ze buiten het
+  beleid vallen.
+- **Verlaten partijen:** een potje met status `bezig` werd nooit opgeruimd. Nu
+  verloopt het na dertig dagen, gemeten op de laatste **zet** en niet op het
+  aanmaken.
+- **Vergeten:** wie zijn account laat wissen geeft zijn lopende potjes op --
+  de tegenstander wint, die overwinning landt in de uitslagen, en de vertrekker
+  staat daar meteen anoniem in. Die volgorde is het hele punt en staat als
+  toets.
+
+Wat dat wel en niet beschermt, staat ook in de code: het voorkomt dat de
+**server** een profiel opbouwt. Het verbergt niet dat je met iemand speelde
+voor de tegenstander zelf -- die zat erbij.
+
+### Rahul als spelmaatje
+
+In elk potje op te roepen voor regels, een hint of een peptalk. Hij krijgt
+bewust alleen het spel, wie aan zet is en jouw vraag mee -- niet het bord en
+niet iemands hand. Hij *kan* dus niet verklappen. Zonder API-sleutel geeft
+dezelfde motor een vaste, uitlegbare tip.
+
+### Praten in het potje
+
+Geen zevende berichtenvoorraad: een potjegesprek is een **gewoon gesprek in
+`kern/comm`** (soort `group`, sleutel `potje:<id>`) en staat dus ook in de
+Berichten-app, met de bewaartermijn, het wisrecht en de leesstand die daar al
+liggen.
+
+Erboven staat één regel: **een potje geeft geen nieuw recht om iemand te
+bereiken.** Praten kan alleen als *elk paar* aan tafel elkaar buiten dit potje
+ook al mag bereiken. De wachtrij koppelt willekeurige spelers -- zonder die
+regel is "even een potje dammen" de kortste weg naar een open lijn met een
+vreemde, en in de RTF-app zou dat precies de poort omzeilen die tieners
+onvindbaar maakt in de zoeker. *Elk paar*, want in een groepsruimte praat B ook
+tegen C.
+
+Wie dat zijn staat in `kern/spellen/kring.js`, op één plek (het uitnodigen voor
+een team stelt dezelfde vraag): **vrienden, klasgenoten, of hetzelfde gezin.**
+Die derde ontbrak en viel pas op door het na te meten -- een ouder en een kind
+die samen dammen zijn geen "vrienden" en geen klasgenoten, terwijl een
+huishouden een sterkere kring is dan allebei.
+
+### Teams
+
+Een vaste club om mee te spelen: iedereen mag er een maken. Wat dat begrensd
+houdt is de vorm, niet een moderatiewachtrij -- een team is **niet openbaar**
+(geen zoeker, geen lijst; je ziet het alleen als je erin zit of ervoor bent
+gevraagd), uitnodigen kan **alleen binnen je eigen kring**, en je zit er pas in
+als je ja zegt. Een team heeft bewust **geen ranglijst**: die zou buiten het
+potje blijven staan en dus onder de progressiegrens vallen, en dan krijgt een
+schoolteam een bord waarop de helft van de leden niet mag staan.
+
+### Wat er geteld wordt
+
+`db.data.spelTelling` houdt per dag per spel bij hoeveel potjes er afliepen en
+hoeveel stoelen daaraan zaten. **Meer staat er niet in** -- geen sleutel, geen
+codenaam, geen winnaar. Juist daardoor mag hij álles tellen: de uitslagenlog
+bewaart niets van een partij tussen tieners onderling, dus een teller die
+daaruit zou lezen ziet De Arena nooit. De privacyregel maakt deze cijfers dus
+beter en niet slechter. Ze staan op het techniekbord
+(`/api/techniek/spelcijfers`).
+
 ## Partnerkanaal
 
 Het partnerkanaal voor niet-leden draait server-side: boekingen worden per stuk opgeslagen in `server/data/db.json` onder `bookings`, met één totaalprijs voor de klant; nettoprijs en service zijn interne administratie. RTG verdient niets aan een boeking (`rtgCut` is altijd 0): een eventuele service gaat volledig naar de partner. RTG's enige inkomsten zijn de abonnementen. (De losse publieke boekingspagina is met de marketingsite verwijderd; het model en de endpoints blijven bestaan.)

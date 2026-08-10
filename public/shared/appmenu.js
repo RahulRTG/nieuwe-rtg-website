@@ -93,13 +93,19 @@
         'stroke-width:1.7;stroke-linecap:round;}' +
       '.amn-knop:hover{color:var(--txt,#F7F5F1);}' +
       '.amn-knop:focus-visible{outline:2px solid var(--gold,#857007);outline-offset:3px;border-radius:8px;}' +
-      /* zwevend, voor de paar pagina\'s zonder eigen kopbalk */
+      /* de linkercel van de navigatiebalk: hamburger, dan de terugweg */
+      '.ios-nav-links{grid-column:1;justify-self:start;display:flex;align-items:center;gap:0.15rem;}' +
+      /* de hamburger naast de eigen terugweg van een pagina zonder kopbalk */
+      '.amn-koprij{display:flex;align-items:center;gap:0.5rem;}' +
+      '.amn-koprij > .amn-knop{margin-left:-0.35rem;}' +
+      /* zwevend, voor de paar pagina\'s zonder eigen kopbalk. LINKS en zonder
+         vlak: geen achtergrond, geen rand, geen afgeronde doos. Dat was het
+         zwaarste element van de kopbalk terwijl het het lichtste hoort te zijn. */
       '.amn-knop.amn-zweef{position:fixed;z-index:9970;' +
         'top:calc(env(safe-area-inset-top,0px) + .55rem);' +
-        'right:calc(env(safe-area-inset-right,0px) + .7rem);' +
-        'width:38px;height:38px;border-radius:12px;color:#EDE9E3;' +
-        'background:rgba(18,16,15,.72);border:1px solid rgba(255,255,255,.14);' +
-        'backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);}' +
+        'left:calc(env(safe-area-inset-left,0px) + .7rem);' +
+        'width:38px;height:38px;border-radius:0;color:var(--txt,#EDE9E3);' +
+        'background:none;border:0;backdrop-filter:none;-webkit-backdrop-filter:none;}' +
       /* het blad */
       '.amn-scrim{position:fixed;inset:0;z-index:9994;display:none;' +
         'align-items:flex-end;justify-content:center;background:rgba(6,5,5,.62);' +
@@ -483,9 +489,18 @@
   function wissel() { (scrim && scrim.classList.contains('amn-open')) ? sluit() : open(); }
 
   /* ---------------------------------------------------------- de knop */
-  /* Drie plekken, in deze volgorde: de statusbalk van het beginscherm, de
-     navigatiebalk die shared/ios.js van de kopbalk maakte, en anders zwevend
-     rechtsboven. Die laatste is de vangnet-stand voor de handvol pagina's
+  /* DE RTG-HEADERSTANDAARD: de hamburger staat LINKS, en verder niets.
+     Hij stond rechtsboven in een afgerond vierkant met een eigen achtergrond,
+     een rand en een blur -- een knopvlak dus, en daarmee het zwaarste element
+     van elke kopbalk terwijl het het minst belangrijke is. Op ruim
+     tweehonderd pagina's.
+     Links, omdat dat de plek is waar het oog begint te lezen en waar je duim
+     staat; zonder vlak, omdat een teken van drie streepjes geen doos nodig
+     heeft om een knop te zijn.
+
+     Drie plekken, in deze volgorde: de navigatiebalk die shared/ios.js van de
+     kopbalk maakte, de eigen kopbalk van een pagina, en anders zwevend
+     linksboven. Die laatste is de vangnet-stand voor de handvol pagina's
      zonder kopbalk -- zonder dat zou "op elke app" gewoon niet waar zijn. */
   function plaatsKnop() {
     knop = d.createElement('button');
@@ -508,9 +523,52 @@
     hangOp();
   }
 
+  /* De linkercel van de navigatiebalk. Die bestaat nog niet: het raster van
+     .ios-nav-rij is [auto | titel | auto] en de eerste kolom wordt door de
+     terugknop gevuld. We maken er een cel van die BEIDE draagt -- eerst de
+     hamburger, dan de terugweg -- zodat ze niet om dezelfde kolom vechten. */
+  function linkerCel(rij) {
+    var cel = rij.querySelector(':scope > .ios-nav-links');
+    if (cel) return cel;
+    cel = d.createElement('div');
+    cel.className = 'ios-nav-links';
+    rij.insertBefore(cel, rij.firstChild);
+    var terug = rij.querySelector(':scope > .ios-terug');
+    if (terug) cel.appendChild(terug);
+    return cel;
+  }
+
   function hangOp() {
-    var acties = d.querySelector('.ios-nav .ios-nav-acties');
-    if (acties) { knop.classList.remove('amn-zweef'); acties.appendChild(knop); return; }
+    knop.classList.remove('amn-zweef');
+    var rij = d.querySelector('.ios-nav .ios-nav-rij');
+    if (rij) { linkerCel(rij).insertBefore(knop, linkerCel(rij).firstChild); return; }
+
+    /* Geen iOS-balk? Dan de eigen kopbalk van de pagina, vooraan.
+       Een echte <header> heeft al een eigen rij, dus daar kan de knop zo in.
+       Maar veel pagina's hebben helemaal geen header: die zetten alleen een
+       losse terugweg als eerste kind van de body. Legde ik de zwevende knop
+       daaroverheen, dan lag de hamburger LETTERLIJK op "naar de app" -- en dat
+       is wat er gebeurde toen ik hem van rechts naar links verhuisde. Zwevend
+       linksboven is alleen veilig als er links bovenin niets staat.
+       Daarom krijgen die twee samen een rij. */
+    var kop = d.querySelector('header.kop, header.merkkop, body > header');
+    if (kop) { kop.insertBefore(knop, kop.firstChild); return; }
+
+    /* De terugweg staat lang niet altijd direct onder de body -- op
+       boardroom.html zit hij binnen <main class="rtg-wrap">. Zoeken op de
+       KLASSE en niet op de plek in de boom; wel eerst kijken of hij ook
+       werkelijk bovenaan staat, want een terugweg onderaan de pagina is geen
+       kopbalk. */
+    var terug = d.querySelector('.rtg-terug');
+    if (terug && terug.getBoundingClientRect().top > 220) terug = null;
+    if (terug && terug.parentNode) {
+      var rijtje = d.createElement('div');
+      rijtje.className = 'amn-koprij';
+      terug.parentNode.insertBefore(rijtje, terug);
+      rijtje.appendChild(knop);
+      rijtje.appendChild(terug);
+      return;
+    }
     knop.classList.add('amn-zweef');
     d.body.appendChild(knop);
   }

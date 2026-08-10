@@ -553,6 +553,12 @@ var RTG_BOUW = '1b06c62c';
         '#gate .ag-doos{max-width:34rem;}' +
       '}';
     document.head.appendChild(st);
+    /* Vervolg van app-main-04: de poort-inhoud (mond, zin, invoerveld,
+       passkey) en het gesprek erachter. Geknipt omdat deel 04 met de
+       schermvullende sterrenhemel over de 10 KB-grens ging die het
+       modulebeleid stelt; de bundel plakt 04 en 04b weer aaneen tot exact
+       hetzelfde bestand. De cut ligt op een statement-grens binnen dezelfde
+       gesloten scope, dus er verandert niets aan het gedrag. */
 
     // een heel subtiele 3D-sterrenhemel over het hele inlogscherm, in RTG-stijl
     (function sterrenhemel(){

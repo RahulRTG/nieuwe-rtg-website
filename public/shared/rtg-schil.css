@@ -148,3 +148,37 @@ body.rtg-stijl main.rtg-werkruimte{max-width:none;margin:0;padding:0;}
 @media (prefers-reduced-motion:reduce){
   .rtg-surface,.rtg-console,.rtg-dok,.rtg-handle::before{transition:none;}
 }
+
+/* ------------------------------------------------------------- het palet --
+   Stap 6 uit WERKRUIMTE.md. Hij ligt OVER de ruimte en niet in een la: de
+   console is de navigator, en navigeren doe je vanaf waar je bent. Bovenaan
+   en niet gecentreerd, zodat je blik niet naar het midden hoeft en de lijst
+   naar beneden kan groeien zonder te verspringen. */
+.palet{position:fixed;inset:0;z-index:80;display:flex;justify-content:center;
+  align-items:flex-start;padding-top:14vh;background:rgba(6,5,5,.5);
+  backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
+.palet[hidden]{display:none;}
+.paletdoos{width:min(560px,92vw);background:var(--rtg-card,#151312);
+  border:1px solid var(--gold-rand,rgba(192,165,68,.52));border-radius:14px;
+  overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.5);}
+.paletdoos input{width:100%;box-sizing:border-box;background:none;border:0;
+  border-bottom:1px solid var(--rtg-line,rgba(255,255,255,.09));
+  padding:1rem 1.1rem;color:var(--rtg-txt,#F4F0E9);
+  font:400 1rem/1.3 var(--rtg-interface,Inter,system-ui,sans-serif);}
+.paletdoos input:focus{outline:none;}
+.paletdoos ul{list-style:none;margin:0;padding:.35rem 0;max-height:46vh;overflow-y:auto;}
+.paletdoos li{display:flex;align-items:baseline;gap:1rem;padding:.6rem 1.1rem;
+  font:400 .92rem/1.3 var(--rtg-interface,Inter,system-ui,sans-serif);cursor:pointer;}
+.paletdoos li[aria-selected="true"]{background:rgba(255,255,255,.055);}
+.paletdoos li:hover{background:rgba(255,255,255,.035);}
+.paletdoos li .hint{margin-left:auto;font-size:.72rem;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--rtg-soft,rgba(244,240,233,.56));}
+.paletdoos li.leeg{color:var(--rtg-soft,rgba(244,240,233,.56));cursor:default;}
+
+/* de knop om een kamer te bewaren: een regel, geen vlak */
+.rtg-console .bewaar{display:block;margin-top:.5rem;background:none;border:0;padding:0;
+  color:var(--rtg-soft,rgba(244,240,233,.56));cursor:pointer;
+  font:400 .76rem/1.4 var(--rtg-interface,Inter,system-ui,sans-serif);
+  border-bottom:1px solid var(--rtg-line,rgba(255,255,255,.09));}
+.rtg-console .bewaar:hover,.rtg-console .bewaar:focus-visible{
+  color:var(--gold-tekst,#C0A544);border-bottom-color:var(--gold-tekst,#C0A544);}

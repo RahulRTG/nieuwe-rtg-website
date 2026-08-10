@@ -239,10 +239,27 @@ Klein en omkeerbaar, en elke stap levert op zichzelf iets op.
    zoomstanden, en de gutters. Zonder inhoud, puur het gedrag.
 3. **De console** als anker, met de actieve surfaces erin.
 4. **Context Linking**: de verwijzingenbus, en twee apps die erop reageren.
-5. **Werkruimtes** bewaren en terughalen.
-6. **⌘K** in de console.
-7. **Slepen van objecten** tussen surfaces, met de bevestigingsstap.
-8. **Rahul schikt de ruimte.**
+5. ✅ **Werkruimtes** bewaren en terughalen (`shared/rtg-schil/06-werkruimtes.js`).
+   Wat er bewaard wordt is met opzet weinig: per surface een naam, een adres,
+   de zoomstand, en alleen bij een zelf neergezette surface de rechthoek. Geen
+   inhoud, geen sessie. Een werkruimte is een MEUBELPLAN; wie hem terughaalt
+   opent dezelfde apps opnieuw met zijn eigen rechten. Stond er inhoud in, dan
+   was hij een tweede administratie en een sluiproute langs de rechten --
+   precies wat par. 5 over Context Linking al verbiedt. `test/werkruimte.e2e.js`
+   bewaakt dat: het meubelplan mag geen andere velden dragen.
+6. ✅ **⌘K** in de console. Opent apps, haalt een bewaarde werkruimte terug en
+   sluit een surface. Geen fuzzy zoeken en geen scores: wat je typt staat
+   vooraan, daarna wat het bevat. Een palet dat je niet kunt voorspellen, kun
+   je ook niet uit je hoofd leren -- en daar bestaat het voor.
+7. **Slepen van objecten** tussen surfaces, met de bevestigingsstap. *Nog niet
+   gebouwd.* Wat er staat (`04-slepen.js`) sleept SURFACES, niet de objecten
+   erin. Dat tweede vraagt dat elke app zegt wat een sleepbaar object is en wat
+   "hier neerzetten" daar betekent -- een afspraak op een dossier is iets
+   anders dan een bestand op een gesprek. Dat is een koppelvlak tussen shell en
+   apps, geen shell-uitbreiding, en dus een eigen stap.
+8. **Rahul schikt de ruimte.** *Nog niet gebouwd.* Hangt aan 7: zonder dat de
+   shell weet welke objecten er in een surface leven, kan Rahul hooguit
+   surfaces verplaatsen -- en dat kan de gebruiker zelf al beter.
 
 Stap 2 en 3 zijn de voorwaarde voor de rest: zolang een surface geen shell-gedrag
 erft, bouwt elke app zijn eigen desktop en zijn we terug bij twintig stijlen.

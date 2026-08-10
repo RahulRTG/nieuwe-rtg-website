@@ -32,7 +32,11 @@
       vlak.appendChild(f);
     }
 
-    var s = { id: id, naam: opties.naam || id, el: e, zoom: e.dataset.zoom, eigen: false };
+    /* Het adres hoort BIJ de surface. Een werkruimte bewaart een meubelplan
+       (naam, adres, zoom) en moet dat adres dus kunnen teruglezen; stond het
+       alleen in de opties, dan wist de shell na het openen niet meer wat er in
+       een surface draaide. */
+    var s = { id: id, naam: opties.naam || id, url: opties.url || '', el: e, zoom: e.dataset.zoom, eigen: false };
     schil.surfaces.push(s);
 
     h.addEventListener('pointerdown', function (ev) {

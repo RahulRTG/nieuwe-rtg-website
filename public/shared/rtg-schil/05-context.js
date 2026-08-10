@@ -35,6 +35,21 @@
         b.addEventListener('click', function () { var s = vind(b.dataset.ga); if (s) { zoom(s, 'work'); maakActief(s); } });
       });
     }
+    /* De bewaarde werkruimtes. Ze staan in de console en niet in een menu:
+       de console IS de navigator (WERKRUIMTE.md par. 10), en een kamer
+       terughalen is navigeren. */
+    var wr = schil.console.querySelector('[data-ruimtes]');
+    if (wr) {
+      var namen = Object.keys(alleRuimtes());
+      wr.innerHTML = namen.length
+        ? namen.map(function (n) {
+            return '<button type="button" data-ruimte="' + esc(n) + '">' + esc(n) + '</button>';
+          }).join('')
+        : '<span class="stil" style="font-size:.78rem;">nog niets bewaard</span>';
+      wr.querySelectorAll('[data-ruimte]').forEach(function (b) {
+        b.addEventListener('click', function () { haalRuimte(b.dataset.ruimte); });
+      });
+    }
     var ctx = schil.console.querySelector('[data-context]');
     if (ctx) {
       ctx.innerHTML = schil.huidigeContext
@@ -43,25 +58,3 @@
     }
   }
 
-  function start(opties) {
-    opties = opties || {};
-    schil.vak = opties.vak || d.querySelector('.rtg-werkruimte');
-    schil.console = opties.console || schil.vak.querySelector('.rtg-console');
-    schil.dok = el('div', 'rtg-dok', schil.vak);
-    w.addEventListener('resize', schik);
-    // een surface die zelf om context roept (uit een frame, zelfde herkomst)
-    w.addEventListener('message', function (e) {
-      if (e.origin !== location.origin || !e.data || e.data.rtg !== 'context') return;
-      context(e.data.ref);
-    });
-    schik(); tekenConsole();
-    return w.RTGSchil;
-  }
-
-  w.RTGSchil = {
-    start: start, open: open, sluit: sluit, zoom: zoom,
-    context: context, opContext: opContext,
-    get surfaces() { return schil.surfaces.slice(); },
-    get actief() { return schil.actief; }
-  };
-})(window, document);

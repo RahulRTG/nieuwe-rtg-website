@@ -74,6 +74,12 @@
     </div>
 
     <div class="blok">
+      <div class="bloknaam">Werkruimtes</div>
+      <div class="rijtje" data-ruimtes></div>
+      <button type="button" class="bewaar" id="bewaar">Deze kamer bewaren</button>
+    </div>
+
+    <div class="blok">
       <div class="bloknaam">Gedeelde context</div>
       <div class="context" data-context></div>
     </div>
@@ -85,6 +91,16 @@
     </div>
   </aside>
 </main>
+
+<!-- HET PALET (WERKRUIMTE.md par. 10, stap 6). Het staat over de ruimte heen en
+     niet in een la: de console is de navigator, en navigeren doe je vanaf waar
+     je bent. Escape sluit; Enter doet de bovenste regel. -->
+<div class="palet" id="palet" hidden role="dialog" aria-modal="true" aria-label="Commandopalet">
+  <div class="paletdoos">
+    <input id="paletIn" autocomplete="off" placeholder="Open een app, haal een werkruimte terug, sluit iets..." aria-label="Opdracht">
+    <ul id="paletLijst" role="listbox"></ul>
+  </div>
+</div>
 
 <!-- media.js VOOR de schil: die geeft het camera- en microfoonrecht door aan
      elke surface, en dat moet gebeuren voordat er een frame wordt gemaakt. -->
@@ -106,7 +122,7 @@
     { id: 'office', naam: 'Documenten', url: '/apps/office.html' }
   ];
 
-  const schil = RTGSchil.start({ vak: $('#ruimte'), console: $('#console') });
+  const schil = RTGSchil.start({ vak: $('#ruimte'), console: $('#console'), apps: WERELDEN });
 
   $('#werelden').innerHTML = WERELDEN.map(w =>
     '<button type="button" data-open="' + w.id + '">' + w.naam + '</button>').join('');
@@ -115,19 +131,48 @@
     if (w) RTGSchil.open(w.id, { naam: w.naam, url: w.url, kort: w.naam });
   }));
 
-  /* De zoekregel is de navigator, niet een sidebar (WERKRUIMTE.md par. 10).
-     Dit is de eenvoudigste vorm ervan: openen op naam. De volle palet met
-     opdrachten en Rahul erin staat als stap 6 in WERKRUIMTE.md; wat hier staat
-     doet nu al iets echts en belooft niets extra's. */
-  function ga(tekst) {
-    const t = String(tekst || '').trim().toLowerCase();
-    if (!t) return;
-    const w = WERELDEN.find(x => x.naam.toLowerCase().startsWith(t) || x.id.startsWith(t));
-    if (w) { RTGSchil.open(w.id, { naam: w.naam, url: w.url, kort: w.naam }); $('#zoek').value = ''; }
+  /* HET PALET (WERKRUIMTE.md par. 10, stap 6). De console is de navigator; dit
+     is zijn mond. Hier stond een zoekregel die alleen op naam kon openen --
+     eerlijk, maar niet veel. Nu opent hij apps, haalt hij een bewaarde
+     werkruimte terug en sluit hij een surface, en de treffers komen uit de
+     schil zelf (RTGSchil.palet) zodat het scherm ze niet nog eens bijhoudt. */
+  let paletKeuze = 0;
+  function paletTeken() {
+    const t = RTGSchil.palet($('#paletIn').value);
+    paletKeuze = Math.min(paletKeuze, Math.max(0, t.length - 1));
+    $('#paletLijst').innerHTML = t.length
+      ? t.map((x, i) => '<li role="option"' + (i === paletKeuze ? ' aria-selected="true"' : '') +
+          '><span>' + x.label + '</span><span class="hint">' + x.hint + '</span></li>').join('')
+      : '<li class="leeg">Niets gevonden</li>';
+    $('#paletLijst').querySelectorAll('li[role="option"]').forEach((li, i) =>
+      li.addEventListener('click', () => { t[i].doe(); paletDicht(); }));
+    return t;
   }
-  $('#zoek').addEventListener('keydown', (e) => { if (e.key === 'Enter') ga(e.target.value); });
+  function paletOpen() {
+    $('#palet').hidden = false; paletKeuze = 0;
+    $('#paletIn').value = ''; $('#paletIn').focus(); paletTeken();
+  }
+  function paletDicht() { $('#palet').hidden = true; }
+  $('#paletIn').addEventListener('input', () => { paletKeuze = 0; paletTeken(); });
+  $('#paletIn').addEventListener('keydown', (e) => {
+    const t = RTGSchil.palet($('#paletIn').value);
+    if (e.key === 'ArrowDown') { e.preventDefault(); paletKeuze = Math.min(paletKeuze + 1, t.length - 1); paletTeken(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); paletKeuze = Math.max(paletKeuze - 1, 0); paletTeken(); }
+    else if (e.key === 'Enter') { e.preventDefault(); if (t[paletKeuze]) { t[paletKeuze].doe(); paletDicht(); } }
+    else if (e.key === 'Escape') { e.preventDefault(); paletDicht(); }
+  });
+  $('#palet').addEventListener('click', (e) => { if (e.target.id === 'palet') paletDicht(); });
+  // de zoekregel in de console opent hetzelfde palet: EEN ingang, twee plekken
+  $('#zoek').addEventListener('focus', paletOpen);
   document.addEventListener('keydown', (e) => {
-    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); $('#zoek').focus(); }
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); paletOpen(); }
+  });
+
+  /* Een kamer bewaren (stap 5). Bewust met een naam die u zelf geeft: "Mijn
+     Directie" onthoudt u, "Werkruimte 3" niet. */
+  $('#bewaar').addEventListener('click', () => {
+    const n = prompt('Hoe heet deze kamer?', 'Mijn Directie');
+    if (n) RTGSchil.bewaarRuimte(n);
   });
 
   // een werkruimte begint niet leeg: twee surfaces, zodat de tafel meteen leest

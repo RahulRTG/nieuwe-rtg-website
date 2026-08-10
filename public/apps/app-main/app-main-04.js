@@ -100,7 +100,36 @@
          rechthoek met afgeronde hoeken en daarbuiten was het vlak zwart. Een
          inlogscherm hoort geen venster in een venster te zijn.
          De inhoud houdt zijn eigen breedte -- alleen de HEMEL wordt groot. */
+      /* DE COMPOSITIE. Dit scherm had vijf objecten die allemaal ongeveer even
+         belangrijk waren -- klok, lippen, zin, invoerveld, koekjesmelding --
+         met grote lege vlakken ertussen die niets deden. Leegte in een premium
+         ontwerp is bewust; dit was leegte omdat de inhoud niet wist waar hij
+         moest staan.
+         Nu is het EEN verticale kolom met een duidelijke rangorde: de klok is
+         de identiteit en de held, Rahul komt er direct onder uit, en daaronder
+         staat de actie. Alles daaronder is bijzaak. */
+      '#gate{display:flex;flex-direction:column;align-items:center;justify-content:center;' +
+        'gap:0;padding:6vh 1.1rem;}' +
+      /* de klok groeit: hij is letterlijk het merk, en stond op een zesde van
+         de hoogte alsof hij een illustratie was */
+      '#gate .os-lock{margin:0;}' +
+      '#gate .os-lock-klok{width:min(58vw,var(--klokmax,300px));height:min(58vw,var(--klokmax,300px));}' +
+      /* de lippen sluiten AAN op de klok: Rahul komt eruit, hij zweeft er niet
+         tientallen pixels onder */
+      '#gate .ag-mond{margin:-0.6rem auto 0.2rem;width:min(52vw,240px);height:auto;}' +
+      // de zin is de aanspreking en geen onderschrift
+      '#gate .ag-zin{font-size:clamp(1.35rem,5.2vw,1.9rem);line-height:1.3;' +
+        'min-height:0;padding:0.5rem 0 1.1rem;max-width:22ch;}' +
+      // het invoerveld is de actie: breed en royaal, geen streepje
+      '#gate .ag-rij{width:min(100%,30rem);min-height:58px;border:1px solid var(--line);' +
+        'border-radius:14px;margin:0;padding:0 0.5rem 0 0.9rem;}' +
+      '#gate .ag-rij input{font-size:1rem;padding:1rem 0.4rem;text-align:left;}' +
+      /* de koekjesmelding hoort niet MIDDEN in de kennismaking. Hij zweeft
+         onderaan, buiten de kolom, waar hij de compositie niet meer breekt. */
+      '#gate ~ .rtgcookie,.rtgcookie{position:fixed;left:50%;transform:translateX(-50%);' +
+        'bottom:1rem;z-index:60;max-width:min(92vw,26rem);}' +
       '@media (min-width:900px){' +
+        '#gate .os-lock-klok{--klokmax:380px;}' +
         '#gate{position:fixed;inset:0;width:100vw;max-width:none;height:100vh;' +
           'margin:0;border-radius:0;border:0;display:flex;align-items:center;' +
           'justify-content:center;flex-direction:column;}' +

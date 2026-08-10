@@ -138,6 +138,9 @@ module.exports = (kern) => {
   // Besluitgeheugen: na besluit.js, en voor inzicht.js (dossier leest het).
   Object.assign(sctx, require('./geheugen')(sctx));
   Object.assign(sctx, require('./geheugenlezen')(sctx));
+  // De organisatie op een datum (bestaan, geen toestand) en de uitvalanalyse.
+  require('./toen')(sctx);
+  require('./uitval')(sctx);
   // Zoeken, dossier en samenhang: leest de soorten van alle lagen hierboven.
   require('./inzicht')(sctx);
   return sctx;

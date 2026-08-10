@@ -2667,6 +2667,38 @@ dat ook; een stap die doet alsof is erger dan een stap die eerlijk is.
 
 Getoetst in `test/werkindienst.test.js` (4). Vier mutaties, alle vier raak.
 
+#### De organisatie op een datum, en wat er omvalt als een leverancier wegvalt
+
+**`POST /api/bedrijf/toen` `{datum}`** (`server/bedrijf/toen.js`) zegt **wat er
+bestond** op een datum — geteld uit het aanmaakmoment van elke rij. Wat hij
+níét doet is de **toestand** van toen: of een contract op die dag al actief was,
+wie er toen aan een project werkte, welke rollen iemand had. Een wijziging
+overschrijft de vorige waarde en er ligt geen gebeurtenislaag onder de
+schrijfhandelingen. Dat staat in elk antwoord, niet als voetnoot maar als
+eigenschap van de uitslag — de volledige tijdmachine zou een organisatie tonen
+waarin alles wat niet in het journaal staat er nooit is geweest.
+
+Rijen zonder aanmaakmoment worden **geteld** (`zonderDatum`) in plaats van stil
+buiten de telling te vallen: 40 met een verzwegen marge is geen 40. En hij erft
+de twee scope-assen van het register — wie een soort niet mag zien, ziet hem ook
+in het verleden niet.
+
+**`POST /api/bedrijf/uitval` `{wederpartij}`** (`server/bedrijf/uitval.js`)
+beantwoordt "welke klanten lopen risico als deze leverancier uitvalt". De vorm
+wordt bepaald door één probleem: **een leverancier bestaat hier niet als
+object** — er is alleen `wederpartij`, een vrij tekstveld op een contract. De
+eerste stap gaat dus op naam, met dezelfde waarschuwing die de soort `lid`
+draagt. Alles daarna loopt over echte sleutels (`klantId` → tickets, kansen), en
+elke rij zegt met `via` welke van de twee het was — anders krijgt de hele keten
+de hardheid van de zwakste schakel zonder dat je kunt zien welke dat is. De
+besluiten waarin die leverancier ooit is gekozen komen mee uit het
+besluitgeheugen; dat is de vraag die je stelt op de dag dat hij omvalt.
+
+Wat er niet in staat: hoe waarschijnlijk uitval is, wat het zou kosten, en wie
+er achter deze partij zit. Alle drie met de reden erbij.
+
+Getoetst in `test/werktoen.test.js` (6). Vier mutaties, alle vier raak.
+
 #### Twee grenzen die in de vorm zitten, niet in een controle
 
 **Herkomst uit een andere RTG-app** (`server/bedrijf/herkomst.js`). "Bus 28 is

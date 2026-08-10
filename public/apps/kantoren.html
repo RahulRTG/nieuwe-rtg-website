@@ -370,6 +370,22 @@
       <div id="bToegangLijst" style="margin-top:.6rem;font-size:.82rem;"></div>
     </div>
 
+    <!-- De go-live-keuring. Hier hoort hij, want drie van de acht blokkerende
+         punten worden op deze pagina ingevuld (het verwerkingsregister, het
+         datalek-draaiboek en de achttien vragen). Alleen voor de eigenaar:
+         deze lijst zegt wat er aan de opstelling mankeert. -->
+    <h3 class="sec" id="bGoliveKop" hidden>Klaar om live te gaan?</h3>
+    <div class="kaart" id="bGolive" hidden>
+      <p class="stil" style="font-size:.78rem;color:var(--soft);margin:0 0 .6rem;line-height:1.6;">
+        Dezelfde keuring als <code>npm run golive</code>, niet een tweede lijst ernaast. Rood houdt de lancering tegen,
+        oranje is een risico dat je bewust neemt. De sleutels zet je op de server; het papierwerk hieronder vul je hier in.
+        Wat er in een sleutel st&aacute;&aacute;t komt hier nooit te staan &mdash; alleen of hij er is.</p>
+      <div id="bGoliveStand" style="font-size:.82rem;margin:0 0 .6rem;"></div>
+      <div id="bGoliveLijst"></div>
+      <h4 style="margin:1.1rem 0 .3rem;font-size:.88rem;">Buiten de code, op de server zelf</h4>
+      <div id="bGoliveBuiten" style="font-size:.8rem;color:var(--soft);"></div>
+    </div>
+
     <!-- Het papierwerk: de achttien dingen die alleen een mens kan invullen.
          Alleen voor de eigenaar: hier staan het KvK-nummer, het prive-nummer
          van de jurist en de afspraak wie er 's nachts gebeld wordt. -->
@@ -3177,6 +3193,8 @@ async function laadPapieren(baas){
       await api('papieren/antwoord', { id: id, waarde: veld ? veld.value : '', parkeer: !!parkeer });
       meld(parkeer ? 'Genoteerd als nog niet bekend; dit punt blijft openstaan.' : 'Vastgelegd.');
       laadPapieren(true);
+      // en de keuring erbij: het antwoord dat je net gaf kan een blokkade opheffen
+      laadGolive(true);
     } catch (e) { meld(e.message); }
   };
   $('#bPapLijst').querySelectorAll('[data-papzet]').forEach(b => b.addEventListener('click', () => zet(b.dataset.papzet, false)));
@@ -3202,6 +3220,30 @@ async function laadPapieren(baas){
   } catch (e) {}
 }
 
+/* DE GO-LIVE-KEURING. Dezelfde controles als npm run golive (server/golive.js),
+   want twee lijsten over dezelfde opstelling lopen uiteen zodra iemand er een
+   aanraakt. De database wordt vanaf hier niet echt aangeraakt -- dat kost vier
+   seconden wachten en dit scherm ververst; de keuring zegt dat er zelf bij. */
+async function laadGolive(baas){
+  $('#bGoliveKop').hidden = $('#bGolive').hidden = !baas;
+  if (!baas) return;
+  let d;
+  try { d = await api('golive'); } catch (e) { $('#bGoliveStand').textContent = e.message; return; }
+
+  $('#bGoliveStand').innerHTML = d.klaar
+    ? '<span style="color:var(--gold);">Geen blokkerende punten meer. Start met NODE_ENV=production.</span>'
+    : '<b style="color:var(--burgundy-on-dark,#C23A5E);">' + d.blokkers + '</b> blokkerend(e) punt(en) houden de lancering tegen.';
+
+  const kleur = p => p.blokkeert ? 'var(--burgundy-on-dark,#C23A5E)' : (p.teken === '\u26A0' ? 'var(--gold)' : 'var(--soft)');
+  $('#bGoliveLijst').innerHTML = d.punten.map(p =>
+    '<div style="display:flex;gap:.6rem;align-items:baseline;margin:0 0 .4rem;">' +
+      '<span style="color:' + kleur(p) + ';">' + esc(p.teken) + '</span>' +
+      '<span style="flex:1;font-size:.82rem;line-height:1.5;">' + esc(p.tekst) + '</span>' +
+    '</div>').join('');
+  $('#bGoliveBuiten').innerHTML = (d.buitenDeCode || []).map(x =>
+    '<div style="margin:0 0 .3rem;">&middot; ' + esc(x) + '</div>').join('');
+}
+
 async function openBoard(){
   zetKamerUrl('boardroom');
   let d;
@@ -3210,6 +3252,7 @@ async function openBoard(){
   toon('vBoard');
   boardDeur(false);
   laadToegang(!!d.baas);
+  laadGolive(!!d.baas);
   laadPapieren(!!d.baas);
   laadGeld();
   laadRahul();

@@ -30,4 +30,14 @@ module.exports = (tctx) => {
       catch (e) { return null; }
     }
   });
+
+  /* De go-live-keuring hangt hier om dezelfde reden: hij leest het papierwerk
+     hierboven mee, en de eigenaar hoort op allebei de plekken hetzelfde
+     oordeel te zien. De controles staan in server/golive.js. */
+  require('../golive-deur')({
+    app,
+    prefix: '/api/techniek',
+    poort: [techAuth, eigenaarAlleen],
+    isBaas: (req) => (isEigenaar ? isEigenaar(req.techUser) : true)
+  });
 };

@@ -33,6 +33,17 @@ module.exports = (ctx) => {
     wie: (req) => req.boardroomKey || null
   });
 
+  /* EN DE KEURING ERBIJ. Wie hier het papierwerk invult, hoort ook te zien of
+     het genoeg was: drie van de acht blokkerende go-live-punten worden op deze
+     pagina ingevuld, en het oordeel stond tot nu toe alleen in een terminal.
+     Dezelfde handler als op het techniekbord, met dezelfde eigenaarcontrole. */
+  require('../golive-deur')({
+    app,
+    prefix: '/api/office',
+    poort: boardroomAuth,
+    isBaas: (req) => !!req.boardroomBaas
+  });
+
   /* De sleutel van de kamer: de eigenaar geeft toegang op codenaam en trekt
      hem ook weer in. De lijst toont alleen codenamen; namen blijven in de kluis. */
   app.post('/api/office/boardroom/toegang', boardroomAuth, (req, res) => veilig(res, () =>

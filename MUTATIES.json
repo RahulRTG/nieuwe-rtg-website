@@ -1738,6 +1738,15 @@
       "gezakt": 19,
       "scherp": "gezakt"
     },
+    "lidfactuur.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "gezakt": 10,
+      "traag": true,
+      "reden": "kwam er niet uit binnen het gewone budget van 90s maar wel binnen 360s: deze toets is TRAAG, hij lekt niets",
+      "operator": "liegpoort /api/",
+      "scherp": "gezakt"
+    },
     "liegpoort.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -4275,6 +4284,14 @@
       "module": "server/webpush.js",
       "operator": "&&->||#0",
       "gezakt": 1,
+      "geprobeerd": 3
+    },
+    "weefselnaden.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/stad/veldwerk.js",
+      "operator": "&&->||#0",
+      "gezakt": 4,
       "geprobeerd": 3
     },
     "wereld.test.js": {

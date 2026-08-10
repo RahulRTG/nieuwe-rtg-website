@@ -65,11 +65,11 @@ function maakGeldbeleid({ db, save, klok }) {
   const { logSchrijf, log } = require('./actielog')(ctx);
   ctx.logSchrijf = logSchrijf;
   const { potten, potZet, potReserveer, potWeg } = require('./potten')(ctx);
-  const { regels, regelZet } = require('./regels')(ctx);
+  const { regels, regelZet, regelWeg } = require('./regels')(ctx);
   ctx.potReserveer = potReserveer;
   const evalueer = require('./evalueer')(ctx);
 
-  return { geldbeleid: { regels, regelZet, potten, potZet, potReserveer, potWeg, log, logSchrijf, evalueer } };
+  return { geldbeleid: { regels, regelZet, regelWeg, potten, potZet, potReserveer, potWeg, log, logSchrijf, evalueer } };
 }
 
 // beide aanroepvormen uit de kernlagen werken: require(..)({db,save}) en require(..).maakGeldbeleid({db,save})

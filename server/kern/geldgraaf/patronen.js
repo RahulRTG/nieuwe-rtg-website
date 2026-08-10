@@ -3,11 +3,14 @@
 
    De maat is bewust smal (GELD.md fase 1): twee of meer betalingen met
    dezelfde omschrijving of tegenpartij, met een tussenpoos van 25 tot 35
-   dagen en bedragen die per stap hooguit tien procent verschillen, gelden
-   als maandelijks. Alles wat daar niet aan voldoet is GEEN patroon -- te
-   weinig geschiedenis levert eerlijk niets op, want een verzonnen vaste
-   last is erger dan een gemiste: hij drukt de vooruitblik omlaag en het lid
-   gaat sparen voor een rekening die niet bestaat.
+   dagen, gelden als maandelijks. HET RITME beslist, niet het bedrag; zie het
+   blok bij de lus hieronder voor waarom hier eerst een tienprocentsmaat op
+   het bedrag stond en waarom die precies het verkeerde deed.
+
+   Alles wat daar niet aan voldoet is GEEN patroon -- te weinig geschiedenis
+   levert eerlijk niets op, want een verzonnen vaste last is erger dan een
+   gemiste: hij drukt de vooruitblik omlaag en het lid gaat sparen voor een
+   rekening die niet bestaat.
 
    Inkomende transacties doen bewust niet mee: verwacht inkomen komt uit
    payroll (zie ./bronnen.js), en wie hier ook op inkomend zou matchen telt

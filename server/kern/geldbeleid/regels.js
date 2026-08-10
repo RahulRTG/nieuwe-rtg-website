@@ -60,5 +60,27 @@ module.exports = (ctx) => {
     return { status: 200, ok: true, regel: zichtRegel(regel) };
   }
 
-  return { regels, regelZet };
+  /* OPRUIMEN MOET KUNNEN, want de foutmelding hierboven belooft het. Zonder
+     deze functie was een regel onverwijderbaar: na veertig regels -- ook
+     uitgezette, ook mislukte pogingen om van soort te wisselen -- kon een lid
+     nooit meer een nieuwe maken, terwijl de tekst zei dat hij eerst moest
+     opruimen. Een melding die een handeling belooft die niet bestaat, is een
+     leugen tegen de gebruiker (LAT.md regel 6).
+
+     De regel gaat weg, het LOG blijft: wat er is gebeurd toen hij nog stond,
+     is gebeurd. Vandaar dat het weghalen zelf ook een logregel krijgt. */
+  function regelWeg(codenaam, id) {
+    const rec = pak(codenaam);
+    if (!rec) return { status: 400, error: 'Geen codenaam.' };
+    const i = rec.regels.findIndex(r => r.id === String(id));
+    if (i === -1) return { status: 404, error: 'Deze regel bestaat niet.' };
+    const weg = rec.regels[i];
+    rec.regels.splice(i, 1);
+    logSchrijf(codenaam, { wie: 'lid', wat: 'Beleidsregel verwijderd: ' + weg.soort,
+      waarom: 'het lid bepaalt zijn eigen beleid; wat er gebeurde toen de regel nog stond blijft in dit log staan',
+      gegevens: ['regel: ' + weg.id, 'niveau: ' + weg.niveau] });
+    return { status: 200, ok: true };
+  }
+
+  return { regels, regelZet, regelWeg };
 };

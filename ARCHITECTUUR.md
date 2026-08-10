@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 2906 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 2905 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,7 +18,7 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 2906 |
+| API-endpoints | 2905 |
 | servermodules (`server/**/*.js`) | 1597 |
 | routebestanden (`server/routes/**`) | 355 |
 | kernmodules (`server/kern/**`) | 931 |
@@ -112,7 +112,7 @@ op de regel zelf. Dat is niet hetzelfde als onbeveiligd -- regel 28 van de keuri
 per route een poort **of** een plek op de publieke lijst met reden. Deze kolom is een
 wegwijzer, geen verdict.
 
-Daarnaast 1517 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 1516 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 
@@ -120,9 +120,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1128 |
+| kern-namen die routes aanraken | 1127 |
 | daarvan door **meer dan één** domein (de echte koppeling) | 149 |
-| daarvan door precies één domein | 979 |
+| daarvan door precies één domein | 978 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 

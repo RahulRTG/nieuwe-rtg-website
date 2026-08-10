@@ -85,8 +85,10 @@ module.exports.maakGeldwereld = ({ kern }) => {
     /* Mecenaat: wat toegezegd is en nog niet betaald. De sommen komen uit de
        module zelf. */
     bron('toezeggingen', () => {
-      const m = kern.mecenaat(key) || {};
-      return (m.giften || []).filter(g => !g.betaald).slice(0, 6)
+      /* de kijk-variant: kern.mecenaat() gaat via L() en ZET het hele
+         lifestyle-dossier op voor wie alleen keek (zie het waarom in
+         kern/rechterhand/mecenaat.js) */
+      return (kern.mecenaatKijk(key) || []).filter(g => !g.betaald).slice(0, 6)
         .map(g => regel('toezegging', {
           titel: g.doel, wanneer: g.datum || null,
           status: g.datum && g.datum < nu ? 'verlopen' : 'open',

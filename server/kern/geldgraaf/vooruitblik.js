@@ -69,7 +69,18 @@ function verwachtTot(patronen, feiten, horizonEind) {
    maand telt niet mee: een halve maand drukt het gemiddelde en laat de
    buffer groter lijken dan hij is -- bij geld is te rooskleurig de
    gevaarlijke kant. Minder dan twee volledige maanden geschiedenis geeft
-   eerlijk null, geen getal dat op een week boodschappen rust. */
+   eerlijk null, geen getal dat op een week boodschappen rust.
+
+   EN DE OUDSTE MAAND TELT OOK NIET MEE, om precies dezelfde reden. De bron
+   levert de laatste paar honderd boekingen (bronnen.js); bij een druk
+   grootboek valt de rand van dat venster middenin een maand, en dan is de
+   oudste maand net zo goed een halve maand -- alleen niet zichtbaar als
+   zodanig. De keuring rekende het na: drie afgesloten maanden met gelijke
+   uitgaven gaven een buffer van 3,4 waar 3,0 het echte getal was.
+
+   Dat kost een maand geschiedenis, en dat is de goede ruil: liever een
+   buffer die te klein oogt dan een die te groot oogt. Daarom vraagt de
+   drempel nu drie maanden in het venster in plaats van twee. */
 function maandlasten(feiten) {
   const perMaand = new Map();
   const lopend = vandaag().slice(0, 7);
@@ -80,10 +91,12 @@ function maandlasten(feiten) {
     if (m === lopend) continue;
     perMaand.set(m, (perMaand.get(m) || 0) + f.centen);
   }
-  if (perMaand.size < 2) return null;
+  if (perMaand.size < 3) return null;
+  const maanden = [...perMaand.keys()].sort();
+  maanden.shift(); // de oudste kan afgekapt zijn door de vensterrand
   let som = 0;
-  for (const c of perMaand.values()) som += c;
-  return Math.round(som / perMaand.size);
+  for (const m of maanden) som += perMaand.get(m);
+  return Math.round(som / maanden.length);
 }
 
 function bereken({ saldoCenten, patronen, feiten }) {

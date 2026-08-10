@@ -15,7 +15,11 @@ function kernMet(over) {
     codenaamVan: (key) => 'CODE-' + key,
     pay: { rekLid: (c) => 'lid:' + c, saldoVan: () => 0 },
     wbwMijn: () => ({ groepen: [] }),
-    mecenaat: () => ({ giften: [] })
+    /* mecenaatKijk en niet mecenaat: de samenhanglaag leest sinds de
+       keuring via de kijk-variant, die het lifestyle-dossier NIET
+       aanmaakt voor wie alleen keek (zie kern/rechterhand/mecenaat.js).
+       De stub volgt de echte vorm: een kale lijst giften. */
+    mecenaatKijk: () => []
   };
   Object.assign(k, over || {});
   return k;
@@ -69,11 +73,11 @@ test('alleen lijstjes met een saldo dat niet nul is', () => {
 });
 
 test('een verlopen toezegging is een incident, een lopende niet', () => {
-  const w = wereld({ mecenaat: () => ({ giften: [
+  const w = wereld({ mecenaatKijk: () => [
     { id: 'm1', doel: 'Onderwijs', bedrag: 50000, betaald: false, datum: dagen(-3) },
     { id: 'm2', doel: 'Natuur', bedrag: 25000, betaald: false, datum: dagen(30) },
     { id: 'm3', doel: 'Betaald al', bedrag: 10000, betaald: true, datum: dagen(-9) }
-  ] }) });
+  ] });
   const r = w.stand('k');
   assert.deepEqual(r.regels.map(x => x.kenmerk), ['m1', 'm2', 'wallet'], 'betaalde giften horen hier niet');
   assert.equal(r.regels[0].sig, 'incident');
@@ -98,9 +102,9 @@ test('elke toestand die deze laag kan maken, kent hij ook', () => {
   const w = wereld({
     pay: { rekLid: (c) => c, saldoVan: () => 100 },
     wbwMijn: () => ({ groepen: [{ id: 'g1', naam: 'X', mijnSaldo: 5 }] }),
-    mecenaat: () => ({ giften: [
+    mecenaatKijk: () => [
       { id: 'm1', doel: 'A', bedrag: 1, betaald: false, datum: dagen(-1) },
-      { id: 'm2', doel: 'B', bedrag: 1, betaald: false, datum: dagen(5) }] })
+      { id: 'm2', doel: 'B', bedrag: 1, betaald: false, datum: dagen(5) }]
   });
   const r = w.stand('k');
   assert.equal(r.regels.length, 4); // wallet + lijstje + twee toezeggingen

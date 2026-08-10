@@ -90,7 +90,7 @@ test('een vers lid krijgt een staande cockpit: contractvorm, hele centen, lege u
   assert.deepEqual(Object.keys(c.vooruitblik).sort(), ['d30', 'd7', 'd90']);
   for (const h of ['d7', 'd30', 'd90'])
     assert.ok(Number.isInteger(c.vooruitblik[h]), 'vooruitblik ' + h + ' hoort rauw in hele centen');
-  assert.ok(Array.isArray(c.tijdlijn) && c.tijdlijn.length <= 20, 'de tijdlijn is begrensd op twintig');
+  assert.ok(Array.isArray(c.tijdlijn), 'de tijdlijn is een lijst');
   assert.ok(c.bronnen.includes('wallet') && c.bronnen.includes('beleid'), 'de bronnenlijst noemt de gelddomeinen');
   for (const s of c.stil)
     assert.ok(c.bronnen.includes(s), 'een stille bron hoort een BEKENDE bron te zijn, niet: ' + s);
@@ -146,18 +146,90 @@ test('patroonherkenning: drie maandelijkse betalingen met een hogere jongste gev
   assert.equal(c.vooruitblik.d30, 50000 - 2700, 'de vooruitblik rekent met het nieuwe bedrag');
 });
 
+/* 2b-iii. DE ANDERE KANT OP, en die ontbrak. De twee toetsen hierboven meten
+   alleen dat een stijging WORDT gezien; ze zeggen niets over vals alarm. De
+   keuring zette daarom `duurder: true` vast in patronen.js en zag alle negen
+   toetsen groen blijven -- een vaste post die gelijk blijft of goedkoper wordt
+   zou als 'post-duurder' op het command center komen zonder dat iets klaagde.
+   Een commitbericht van mij beweerde dat dit was nagemeten; dat klopte, maar
+   een meting zonder toets is weg zodra hij gedaan is (LAT.md regel 2).
+
+   Hetzelfde geldt voor het RITME. Het hele herkenningsfilter op `if (false)`
+   zetten (elke tussenpoos en elk bedrag telt als maandelijks) overleefde de
+   suite ook. Beide gaten zitten hieronder.
+
+   MUTATIES GEZIEN ZAKKEN: (a) `duurder: laatste.centen > vorige.centen` op
+   `true` -- zakte op "een gelijk gebleven post is niet duurder geworden";
+   (b) de hele voorwaarde in de lus op `if (false)` -- zakte op "een wekelijks
+   ritme is geen maandelijkse vaste post". Allebei teruggedraaid, daarna
+   groen. */
+/* 2b-iv. DE GRENS VAN TWINTIG, echt gemeten. Hier stond eerst
+   `c.tijdlijn.length <= 20` op een VERS lid, en dat lid heeft een lege
+   tijdlijn: die bewering was altijd waar, ook met de slice eruit. Een toets
+   die niet kan zakken belooft een grens die de opstelling niet meet (LAT.md
+   regel 9). Nu met vijfentwintig echte boekingen erin.
+
+   MUTATIE GEZIEN ZAKKEN: `.slice(0, 20)` uit server/kern/geldgraaf/index.js
+   gehaald; zakte op "de tijdlijn houdt op bij twintig" (25 != 20).
+   Teruggedraaid, daarna groen. */
+test('de tijdlijn is echt begrensd op twintig, gemeten met vijfentwintig boekingen', () => {
+  const veel = [];
+  for (let i = 1; i <= 25; i++) veel.push(betaling(100 + i, i, i));
+  const c = maakGraaf(veel).cockpit('sleutel');
+  assert.equal(c.tijdlijn.length, 20, 'de tijdlijn houdt op bij twintig');
+  /* en het zijn de NIEUWSTE twintig, niet zomaar twintig: de oudste boeking
+     (25 dagen terug) hoort er niet meer bij te staan */
+  assert.equal(c.tijdlijn.some(r => r.centen === 125), false,
+    'de oudste boeking hoort buiten de twintig te vallen');
+});
+
+test('geen vals alarm: een gelijk gebleven of goedkopere vaste post is geen post-duurder', () => {
+  const gelijk = maakGraaf([betaling(2500, 60, 1), betaling(2500, 30, 2), betaling(2500, 0, 3)]);
+  assert.equal(gelijk.cockpit('sleutel').uitzonderingen.filter(x => x.soort === 'post-duurder').length, 0,
+    'een gelijk gebleven post is niet duurder geworden');
+
+  const omlaag = maakGraaf([betaling(3000, 60, 1), betaling(3000, 30, 2), betaling(2000, 0, 3)]);
+  const u = omlaag.cockpit('sleutel').uitzonderingen.filter(x => x.soort === 'post-duurder');
+  assert.equal(u.length, 0, 'een goedkoper geworden post is zeker geen post-duurder');
+  /* wel nog steeds een herkend patroon: de vooruitblik hoort met het NIEUWE,
+     lagere bedrag te rekenen -- anders spaart iemand voor lucht */
+  assert.equal(omlaag.cockpit('sleutel').vooruitblik.d30, 50000 - 2000,
+    'de vooruitblik volgt ook een daling');
+});
+
+test('het ritme beslist: een wekelijkse reeks en een factor-vijf-verschil zijn geen vaste post', () => {
+  const wekelijks = maakGraaf([betaling(2000, 14, 1), betaling(2000, 7, 2), betaling(2000, 0, 3)]);
+  assert.equal(wekelijks.cockpit('sleutel').vooruitblik.d30, 50000,
+    'een wekelijks ritme is geen maandelijkse vaste post');
+
+  /* Zelfde omschrijving, maar bedragen die veel te ver uit elkaar liggen: dat
+     is geen vaste last maar toeval in de omschrijving. De grofheidscontrole
+     (factor vier) hoort ze te scheiden. */
+  const scheef = maakGraaf([betaling(1000, 30, 1), betaling(5100, 0, 2)]);
+  assert.equal(scheef.cockpit('sleutel').vooruitblik.d30, 50000,
+    'een factor vijf uit elkaar is geen reeks maar toeval in de omschrijving');
+
+  /* En de tegenproef, zodat deze toets niet slaagt omdat er uberhaupt niets
+     wordt herkend: factor drie hoort er WEL doorheen te komen. */
+  const netaan = maakGraaf([betaling(10000, 30, 1), betaling(30000, 0, 2)]);
+  assert.equal(netaan.cockpit('sleutel').vooruitblik.d30, 50000 - 30000,
+    'binnen de grofheidscontrole blijft het gewoon een vaste post');
+});
+
 /* 2b-ii. Het bindende routecontract van fase 1: is het DERDE bedrag 20
    procent hoger, dan hoort er een 'post-duurder' te staan. Dit is precies
    het geval waarvoor de uitzondering bestaat (een vaste post die fors
    duurder wordt), dus deze toets is met opzet niet afgezwakt naar wat de
    huidige motor aankan.
 
-   GEEN mutatie nodig om deze te zien zakken: hij zakt tegen de ECHTE kern.
-   De 10-procent-per-stap-maat in server/kern/geldgraaf/patronen.js verwerpt
-   de hele reeks zodra de stijging boven de tien procent komt, waardoor juist
-   de forse prijsstijging onzichtbaar blijft. Dat 2b-i (8 procent) wel
-   slaagt, bewijst dat de meetopstelling deugt en dat het aan de maat ligt,
-   niet aan de toets. */
+   TOEN DEZE TOETS WERD GESCHREVEN ZAKTE HIJ, tegen de echte kern en zonder
+   mutatie: er stond een tienprocentsmaat per stap in patronen.js, en die
+   verwierp de hele reeks zodra de stijging boven de tien procent kwam --
+   waardoor juist de forse prijsstijging onzichtbaar bleef. Dat 2b-i (8
+   procent) wel slaagde, bewees dat het aan de maat lag en niet aan de
+   meetopstelling. De maat is daarop vervangen door een grofheidscontrole op
+   een factor vier, en sindsdien slaagt deze toets. Hij blijft staan als
+   bewaker van die reparatie. */
 test('routecontract: is het derde bedrag 20 procent hoger, dan staat er een post-duurder', () => {
   const g = maakGraaf([betaling(2500, 60, 1), betaling(2500, 30, 2), betaling(3000, 0, 3)]);
   const c = g.cockpit('sleutel');

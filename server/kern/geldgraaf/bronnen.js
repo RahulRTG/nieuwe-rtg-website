@@ -83,9 +83,12 @@ module.exports = ({ kern }) => {
      projecteren zou drie keer te veel lasten verzinnen -- dan liever
      eenmalig op zijn datum. */
   function mecenaatFeiten(key) {
-    const m = kern.mecenaat(key) || {};
+    /* kijk-variant: kern.mecenaat() gaat via L() en ZET het lifestyle-dossier
+       op voor wie alleen keek (zie het waarom in kern/rechterhand/mecenaat.js).
+       Een graaf die belooft alleen te lezen, hoort dat ook te doen. */
+    const giften = kern.mecenaatKijk(key);
     const uit = [];
-    for (const g of (m.giften || [])) {
+    for (const g of giften) {
       if (g.betaald) continue;
       uit.push(feit({
         /* MAAL HONDERD, en dat is geen slordigheid maar de uitzondering die

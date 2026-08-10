@@ -24,12 +24,20 @@ module.exports = (ctx) => {
     const doel = bedragVan(p.doelCenten != null ? p.doelCenten : (bestaand ? bestaand.doelCenten : null));
     if (doel == null) return { status: 400, error: 'Geef een doel in hele centen (0 tot ' + MAX_CENTEN + ').' };
     if (!bestaand && rec.potten.length >= MAX_POTTEN) return { status: 400, error: 'Meer dan ' + MAX_POTTEN + ' potten; ruim eerst op.' };
+    /* NIETS VERANDERD IS GEEN HANDELING. Een pot hernoemen naar dezelfde naam
+       is geldig, maar het hoort niet in het log: met tweehonderdtien van die
+       onschuldige aanroepen was elke oudere regel het log uit te duwen, en dan
+       verantwoordt het niets meer (de keuring toonde dat aan). Het log draagt
+       veranderingen, geen kliks. */
+    const zelfde = bestaand && bestaand.naam === nm && bestaand.doelCenten === doel;
     const pot = bestaand || { id: maakId('pot'), standCenten: 0 };
     pot.naam = nm; pot.doelCenten = doel;
     if (!bestaand) rec.potten.push(pot);
     // ook dit in het log: beleid over geld is zelf een geldhandeling (GELD.md par. 5)
-    logSchrijf(codenaam, { wie: 'lid', wat: (bestaand ? 'Pot aangepast: ' : 'Pot gemaakt: ') + nm,
-      waarom: 'oormerken over het eigen tegoed; er beweegt geen geld', gegevens: ['pot: ' + pot.id, 'doel: ' + doel + ' centen'] });
+    if (!zelfde) {
+      logSchrijf(codenaam, { wie: 'lid', wat: (bestaand ? 'Pot aangepast: ' : 'Pot gemaakt: ') + nm,
+        waarom: 'oormerken over het eigen tegoed; er beweegt geen geld', gegevens: ['pot: ' + pot.id, 'doel: ' + doel + ' centen'] });
+    }
     return { status: 200, ok: true, pot: zichtPot(pot) };
   }
 

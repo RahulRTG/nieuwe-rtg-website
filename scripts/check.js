@@ -2625,5 +2625,46 @@ console.log('\n43) de SLO-tabel in SLO.md is een afdruk van SLO.json');
   }
 }
 
+/* 44) ELK PUNT IN TAKEN.md HEEFT EEN EIGEN NUMMER.
+
+   LAT.md verwijst op drie plekken naar de takenlijst ("die lijst staat in de
+   takenlijst, niet in iemands hoofd"), en de code doet dat ook: er staan
+   tientallen verwijzingen van de vorm `TAKEN.md 4.28` in koppen van modules en
+   toetsen. Dan is een nummer een ADRES, en een adres dat twee keer bestaat is
+   geen adres meer.
+
+   Dat is niet theoretisch gebleven. Bij het samenvoegen van parallelle takken
+   pakte elke tak het eerstvolgende vrije nummer, en dat werd in beide takken
+   hetzelfde -- negen nummers waren daardoor twee of drie keer in gebruik, en
+   vier ervan werden ook nog eens vanuit de code aangewezen. Ze zijn hernummerd
+   (het oude nummer staat er nog bij, zodat een oude verwijzing te volgen
+   blijft), maar de volgende samenvoeging doet het gewoon opnieuw als niemand
+   het tegenhoudt. Vandaar deze regel.
+
+   Wat hij NIET controleert: of een verwijzing uit de code naar een BESTAAND
+   nummer wijst. Dat zou hij kunnen, maar een verwijzing naar een punt dat is
+   opgeruimd is geen fout -- het staat er dan als geschiedenis. Dubbel gebruik
+   is dat wel. */
+console.log('\n44) elk punt in TAKEN.md heeft een eigen nummer');
+{
+  const pad = path.join(ROOT, 'TAKEN.md');
+  if (!fs.existsSync(pad)) fout('TAKEN.md bestaat niet, terwijl LAT.md er op drie plekken naar verwijst');
+  else {
+    const gezien = new Map();
+    const dubbel = [];
+    let n = 0;
+    for (const regel of fs.readFileSync(pad, 'utf8').split('\n')) {
+      const m = /^\|\s*(?:~~)?(\d+\.\d+)(?:~~)?\s*\|/.exec(regel);
+      if (!m) continue;
+      n++;
+      if (gezien.has(m[1])) dubbel.push(m[1] + ' (ook op regel ' + gezien.get(m[1]) + ')');
+      else gezien.set(m[1], n);
+    }
+    if (!n) fout('TAKEN.md bevat geen enkele genummerde regel; dan stelt deze controle niets vast');
+    else if (dubbel.length) fout('TAKEN.md gebruikt ' + dubbel.length + ' nummer(s) meer dan een keer: ' + dubbel.slice(0, 8).join(', '));
+    else ok(n + ' punten in TAKEN.md, allemaal met een eigen nummer');
+  }
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

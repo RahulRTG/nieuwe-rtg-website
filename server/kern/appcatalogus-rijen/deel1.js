@@ -51,6 +51,12 @@ module.exports = [
   ['sitemaker', 'Website-maker', 'media', '/apps/sitemaker.html', 'Bouw met blokken je eigen RTG-site, met eigen foto\'s en beeld uit De Salon.'],
   ['browser', 'RTG Browser', 'media', '/apps/browser.html', 'Blader door de sites die leden in het RTG-web publiceren.'],
   ['werk', 'RTG Werk OS', 'media', '/apps/werk.html', 'De werkplek van een hele organisatie: startscherm per rol, projecten, kennisbank, klanten, servicedesk, bouw, apparaten, contracten en besluiten. Wat niet gemeten wordt, staat er als niet gemeten en niet als nul.'],
+  /* RTG Kantoor is laag 2 (PLATFORM.md): hij ORKESTREERT Office, Agenda,
+     Notities en Bestanden en vervangt ze niet. Alle vier zijn zelfstandige
+     capabilities met een eigen kern -- op de toetsvraag "of slechts een tweede
+     ingang naar dezelfde?" is het antwoord bij alle vier nee. Wat Kantoor
+     toevoegt is wat nergens bestond: uw werkdag uit vier domeinen tegelijk. */
+  ['kantoor', 'RTG Kantoor', 'media', '/apps/kantoor.html', 'Uw werkdag bij elkaar -- afspraken, open taken, documenten en gedeelde bestanden -- ongeacht in welke app ze leven. Maken en wijzigen blijft in de app die het echte werk doet.'],
   ['office', 'RTG Office', 'media', '/apps/office.html', 'Tekst en rekenblad met autosave, delen op codenaam en export.'],
   ['agenda', 'Agenda', 'media', '/apps/agenda.html', 'Maand, week en lijst; uitnodigen op codenaam, herinneringen, en je RTG-boekingen staan er vanzelf in.'],
   ['notities', 'Notities & Taken', 'media', '/apps/notities.html', 'Notities en lijstjes met vinkjes; delen op codenaam is samen werken, en een datum wordt vanzelf een agenda-afspraak.'],

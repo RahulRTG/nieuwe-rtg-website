@@ -12,135 +12,13 @@
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <link href="/shared/rtg-ui.css" rel="stylesheet">
-<link href="/shared/rtg-ontwerp.css" rel="stylesheet">
-<!-- de materialenlaag: dit scherm kiest materialen en geen kleuren
-     (MATERIAAL.md). Na rtg-ontwerp.css, want hij vult die aan. -->
-<link href="/shared/rtg-materiaal.css" rel="stylesheet">
-<link href="/shared/rtg-themas.css" rel="stylesheet">
-<style>
-  /* Eén maatstelsel voor dit scherm; alles hangt aan de dichtheid van de modus
-     zodat World/Pro/Command hetzelfde scherm anders dicht maken en niet een
-     ander scherm worden (ONTWERP.md par. 2). */
-  /* GEEN harde grond hier. Die kwam eerst uit dit bestand (var(--onyx-glans)),
-     en daardoor kon geen enkel thema hem nog veranderen -- precies de reden dat
-     vier thema's er vier keer hetzelfde uitzagen. De grond komt nu uit
-     rtg-themas.css, dat per thema een ander MATERIAAL kiest. */
-  main{padding:0 var(--rtg-ruim) 1rem;max-width:820px;margin-inline:auto;}
-
-  /* --- de kop: merk links, monogram rechts --- */
-  /* a.terug en niet .terug: de algemene a-regel van het blad schildert links
-     bordeaux, en bordeaux als TEKSTkleur op zwart haalt de contrastgrens niet
-     (CLAUDE.md: op zwart is het wit of burgundy-on-dark). De keuring meldde
-     3,78:1; met de zachte tekstkleur is het weer leesbaar. */
-  a.terug{display:inline-block;margin-top:1rem;font-size:.8rem;color:var(--rtg-soft);
-    text-decoration:none;letter-spacing:.04em;}
-  a.terug:hover,a.terug:focus-visible{color:var(--gold-tekst);}
-  .merkkop{display:flex;align-items:flex-start;gap:1rem;padding:.7rem 0 1.1rem;}
-  .merkkop h1{margin:0;font-size:clamp(2rem,8vw,2.6rem);line-height:1.02;letter-spacing:0.005em;}
-  .merkkop .onder{display:block;margin-top:.45rem;font-size:.68rem;letter-spacing:.22em;
-    text-transform:uppercase;color:var(--rtg-soft);}
-  .monogram{margin-left:auto;flex:none;width:56px;height:56px;border-radius:50%;
-    border:1px solid var(--gold-rand);display:grid;place-items:center;
-    font-size:.82rem;letter-spacing:.08em;color:var(--gold-basis);}
-
-  /* --- de aandachtsbalk: EEN dominante mededeling, geen zes dozen --- */
-  /* GEEN width:100% hier. Een blok-element vult zijn ouder al, en met de
-     padding en de rand erbij werd hij 9px te breed -- net genoeg om de hele
-     pagina horizontaal te laten schuiven, en te weinig om het te zien zonder
-     het te meten. */
-  /* Vraagt er iets aandacht, dan is de balk FLUWEEL: bordeaux dat licht
-     absorbeert en pas rood wordt als je kijkt. Is er niets, dan is hij stil --
-     een gouden balk boven een rustige dag is loos alarm. */
-  .balk{display:flex;align-items:center;gap:.95rem;text-align:left;
-    padding:.95rem 1rem;border:1px solid var(--bordeaux-rand);
-    border-left:2px solid var(--gold-tekst);
-    border-radius:var(--rtg-rond-klein);background:var(--bordeaux-glans);
-    color:var(--op-bordeaux);text-decoration:none;}
-  .balk[data-rustig]{border-color:var(--rtg-line);border-left-color:var(--rtg-sig-stil);
-    background:none;color:inherit;}
-  .balk .teken{flex:none;color:var(--op-bordeaux);display:grid;place-items:center;}
-  .balk[data-rustig] .teken{color:var(--rtg-soft);}
-  /* IVOOR op fluweel, geen goud. Zelfs het champagne-hoogsel haalt op bordeaux
-     maar 4,21:1 en de logotoon 2,09:1. Dit is dezelfde regel die CLAUDE.md al
-     voor bordeaux stelt, nu andersom: op een bordeaux vlak lees je ivoor.
-     Het goud blijft waar het wel werkt -- als rand, en als icoon op onyx. */
-  .balk .kop{display:block;font-size:.66rem;letter-spacing:.19em;text-transform:uppercase;
-    color:var(--op-bordeaux);opacity:.85;}
-  .balk[data-rustig] .kop{color:var(--rtg-soft);}
-  .balk .zin{display:block;margin-top:.25rem;font-size:1.12rem;line-height:1.25;}
-  .balk .pijl{margin-left:auto;color:var(--rtg-soft);flex:none;}
-
-  /* --- registerkop --- */
-  .regkop{display:flex;align-items:baseline;gap:.8rem;margin:1.6rem 0 .55rem;}
-  .regkop h2{margin:0;font-size:.68rem;letter-spacing:.19em;text-transform:uppercase;
-    color:var(--rtg-soft);font-weight:500;}
-  .regkop .tel{margin-left:auto;font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;
-    color:var(--rtg-soft);font-variant-numeric:var(--rtg-cijfers);}
-
-  /* --- het register: tijdlijn links, dan de datumkolom, dan de inhoud --- */
-  .reis{display:flex;align-items:stretch;gap:0;position:relative;
-    padding:0 0 0 1.15rem;color:inherit;text-decoration:none;}
-  /* de tijdlijn loopt DOOR tussen de regels; de stip zit op de datum. Zo lees
-     je de reeks als een reis door de tijd en niet als losse dozen. */
-  .reis::before{content:"";position:absolute;left:3px;top:0;bottom:0;width:1px;
-    background:var(--rtg-line);}
-  /* De stip zit op de MIDDENLIJN van zijn regel, net als de datum ernaast. Hij
-     stond op een vaste afstand van boven (1,55rem); toen de datum naar het
-     midden zakte bleef hij achter en wees hij nergens meer naar. Een tijdlijn
-     waarvan de stip niet bij zijn eigen datum staat, is geen tijdlijn.
-     De lijn begint en eindigt daarom ook bij de eerste en laatste stip. */
-  .reis:first-child::before{top:50%;}
-  .reis:last-child::before{bottom:50%;}
-  .reis .stip{position:absolute;left:0;top:50%;transform:translateY(-50%);
-    width:7px;height:7px;border-radius:50%;background:var(--rtg-sig-stil);}
-  .reis[data-sig="gezond"]   .stip{background:var(--rtg-sig-gezond);}
-  .reis[data-sig="aandacht"] .stip{background:var(--rtg-sig-aandacht);}
-  .reis[data-sig="incident"] .stip{background:var(--rtg-sig-incident);}
-  .reis[data-sig="actief"]   .stip{background:var(--rtg-sig-actief);}
-
-  .reis .doos{display:flex;gap:var(--rtg-ruim);flex:1;min-width:0;
-    padding:var(--rtg-ruim) 0;border-bottom:1px solid var(--rtg-line);}
-  .reis:last-child .doos{border-bottom:0;}
-  .reis:hover .doos,.reis:focus-visible .doos{background:rgba(255,255,255,.022);}
-
-  /* Verticaal midden tussen de haarlijnen. De rij is een flexrij, dus .dag
-     rekte wel mee in hoogte maar de tekst erin begon bovenaan -- terwijl de
-     kolom ernaast (titel, status, feiten, kenmerk) veel hoger is. Het gevolg:
-     de datum stond tegen de bovenste streep aan met een gat naar de onderste.
-     Zelf een kolom worden en die centreren zet hem op de optische middenlijn
-     van zijn eigen regel. */
-  .dag{width:5.4rem;flex:none;text-align:center;
-    display:flex;flex-direction:column;justify-content:center;}
-  .dag .wd,.dag .mnd{display:block;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;
-    color:var(--rtg-soft);}
-  .dag .nr{display:block;margin:.1rem 0 .05rem;}
-
-  .kern{min-width:0;flex:1;}
-  .kern h3{margin:0;font-size:1.02rem;font-weight:600;line-height:1.3;}
-  /* de plaats staat als cursieve serif ACHTER de titel: een annotatie, geen
-     tweede kop. Rechtop naast een sans-titel las het als een storing. */
-  .kern h3 .rtg-plaats{font-size:.98rem;color:var(--rtg-muted);margin-left:.3em;}
-  .kern .status{margin-top:.3rem;}
-  .kern .feiten{display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;margin-top:.4rem;
-    font-size:.82rem;color:var(--rtg-soft);}
-  .kern .feiten span{display:inline-flex;align-items:center;gap:.35rem;}
-  .kern .onder{display:flex;align-items:center;gap:.7rem;flex-wrap:wrap;margin-top:.45rem;}
-  .kern .bron{font-size:.64rem;letter-spacing:.16em;text-transform:uppercase;color:var(--rtg-soft);}
-  .reis .pijl{align-self:center;padding-left:.4rem;color:var(--rtg-soft);flex:none;}
-
-  /* --- de wereld: vier poorten, gelijk van maat, icoon in goud --- */
-  .poorten{display:grid;grid-template-columns:repeat(auto-fit,minmax(7.5rem,1fr));gap:.55rem;}
-  .poort{display:block;padding:1rem .7rem;border:1px solid var(--rtg-line);
-    border-radius:var(--rtg-rond-klein);text-align:center;color:inherit;text-decoration:none;}
-  .poort:hover,.poort:focus-visible{border-color:var(--gold-rand);}
-  .poort .ic{color:var(--gold-tekst);display:block;margin:0 auto .55rem;}
-  .poort b{display:block;font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;font-weight:600;}
-  .poort span{display:block;margin-top:.3rem;font-size:.76rem;line-height:1.4;color:var(--rtg-soft);}
-
-  .stilte{border-left:2px solid var(--rtg-sig-incident);padding:.7rem 0 .7rem .9rem;margin:1rem 0;
-    font-size:.84rem;line-height:1.55;color:var(--rtg-soft);}
-  .stilte strong{color:var(--rtg-txt);}
-</style>
+<!-- het ontwerpsysteem, de materialen en de vier thema's komen mee via
+     shared/rtg-ui.css, dat ze insluit voor het hele platform. Hier stonden ze
+     ook nog eens los; dat laadde dezelfde drie bladen twee keer. -->
+<!-- De vormtaal van een wereldscherm staat in een eigen blad, want RTG Kantoor
+     gebruikt hem ook. Twee keer overtikken betekent twee superapps die uit
+     elkaar groeien (LAT.md regel 4). -->
+<link href="/shared/rtg-wereld.css" rel="stylesheet">
 <link href="/shared/ios.css" rel="stylesheet">
 </head>
 <body class="rtg-stijl" data-rtg-modus="pro">
@@ -323,7 +201,6 @@
   })();
 })();
 </script>
-<script src="/shared/rtg-themas.js"></script>
 <script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>

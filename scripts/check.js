@@ -993,9 +993,25 @@ console.log('\n21) geen pagina leest een css-token dat nergens gezet wordt');
     bekeken++;
     const html = leesVeilig(f);
     const def = gezetteTokens(html);
+    /* @import VOLGEN. Een blad mag een ander blad insluiten, en sinds
+       shared/rtg-ui.css het ontwerpsysteem, de materialen en de thema's
+       insluit, komt het grootste deel van de tokens langs die weg binnen.
+       Keek deze regel alleen naar de <link>-lijst, dan meldde hij een token
+       als "ontbreekt" terwijl het er in de browser gewoon staat -- vals alarm
+       dus, en vals alarm leert mensen de melding weg te klikken op de dag dat
+       hij wel klopt. Gevonden toen apps/kantoor.html erbij kwam. */
+    const cssMet = (p2, diep) => {
+      const bron = zonderCss(leesVeilig(p2));
+      for (const t of gezetteTokens(bron)) def.add(t);
+      if (diep > 4) return;
+      for (const im of bron.matchAll(/@import\s+(?:url\(\s*)?['"]?([^'")\s]+\.css)/gi)) {
+        const q = im[1].startsWith('/') ? path.join(PUB, im[1]) : path.join(path.dirname(p2), im[1]);
+        cssMet(q, diep + 1);
+      }
+    };
     for (const m of html.matchAll(/<link[^>]+href="([^"]+\.css)"/gi)) {
       const p2 = m[1].startsWith('/') ? path.join(PUB, m[1]) : path.join(path.dirname(f), m[1]);
-      for (const t of gezetteTokens(zonderCss(leesVeilig(p2)))) def.add(t);
+      cssMet(p2, 0);
     }
     for (const m of html.matchAll(/<script[^>]+src="([^"]+\.js)"/gi)) {
       const p2 = m[1].startsWith('/') ? path.join(PUB, m[1]) : path.join(path.dirname(f), m[1]);

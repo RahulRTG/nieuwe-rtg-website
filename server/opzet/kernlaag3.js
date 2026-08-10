@@ -138,4 +138,9 @@ Object.assign(kern, require('../kern/rechterhand')({ db, save, crypto, liveCoden
    hele kern mee en leest die laat, want hij hangt aan lagen die in dezelfde
    ronde worden samengesteld. */
 Object.assign(kern, require('../kern/reiswereld').maakReiswereld({ kern }));
+/* RTG Kantoor (kern/kantoorwereld.js): dezelfde laag, maar dan over de
+   kantoorwereld -- agenda, taken, documenten en gedeelde bestanden. Ook deze
+   bezit niets en schrijft nooit; werken doet u in de specialist. Dezelfde
+   late lezing van de kern om dezelfde reden. */
+Object.assign(kern, require('../kern/kantoorwereld').maakKantoorwereld({ kern }));
 };

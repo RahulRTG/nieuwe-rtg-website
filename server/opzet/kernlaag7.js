@@ -152,16 +152,7 @@ Object.assign(kern, require('../kern/ledenbalie')({
    partnerlijst de bedrijven, de Beroepen-Bibliotheek de beroepen -- en het
    weefsel is er alleen de LEZER van. Laat gebonden, want alle drie zijn ze
    eerder gemount dan dit punt. */
-kern.weefsel.weefselKoppelEconomie({
-  vacatures: () => openVacatures(null, null).map(v => ({ id: v.id, code: v.supplierCode, bedrijf: v.bedrijf,
-    func: v.func, uren: v.uren, loc: v.loc })),
-  bedrijven: () => (db.data.suppliers || []).map(s => ({ code: s.code, naam: s.name, type: s.type || null, loc: s.loc })),
-  beroepen: () => {
-    const bb = require('../kern/beroepenbieb/data');
-    return [...bb.TECHNIEK_BEROEPEN.map(b => ({ beroep: b, wereld: 'techniek', wereldLabel: 'Technisch & agrarisch' })),
-      ...bb.ZAKEN_BEROEPEN.map(b => ({ beroep: b, wereld: 'zaken', wereldLabel: 'Bedrijfsleven' }))];
-  }
-});
+kern.weefsel.weefselKoppelEconomie(require('./weefseldraden')(kern, { db, openVacatures }));
 
 /* Het Foundation OS (kern/rtfos/): het bestuurssysteem van de RTFoundation --
    een landelijke stichting met zelfstandige stadsafdelingen, lokale

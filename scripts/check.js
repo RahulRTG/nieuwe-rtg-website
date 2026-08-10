@@ -668,7 +668,12 @@ console.log('\n16) elk leden-pad met een derde partij gaat langs de gegevenspoor
     ['/api/mob/reis/mijn', 'je eigen reizen bekijken'],
     ['/api/mob/abo/aanbod', 'kijken of er een abonnement te koop is; er gebeurt nog niets'],
     ['/api/mob/abo/mijn', 'je eigen abonnementen bekijken'],
-    ['/api/mob/beleid', 'het reisbeleid van je eigen werkgever lezen; er gebeurt niets']
+    ['/api/mob/beleid', 'het reisbeleid van je eigen werkgever lezen; er gebeurt niets'],
+    /* Je EIGEN lopende bestellingen teruglezen, over de domeinen heen. Er gaat
+       geen gegeven naar een derde: de rijen komen uit RTG zelf en gaan naar het
+       lid dat ze heeft geplaatst. Er wordt ook niets besteld of betaald -- elke
+       regel wijst naar het domeinscherm dat hem beheert. */
+    ['/api/mall/bestellingen', 'je eigen lopende bestellingen teruglezen; leeslaag, geen derde partij']
   ]);
   let gaten = 0, poorten = 0;
   loop(path.join(ROOT, 'server/routes'), /\.js$/, f => {

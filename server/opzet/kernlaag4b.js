@@ -47,6 +47,11 @@ Object.assign(kern, require('../kern/bank')({ db, save, crypto, schoon, betaal, 
    rijrichting, alarmnummer, water, fooi, let-op -- in place op de gedeelde
    LANDEN-tabel gezet, VOOR de Regelwacht zodat de overlay er bovenop komt. */
 Object.assign(kern, require('../kern/reis')({ LANDEN }));
+/* De tijdzone-hulp van het huis leent diezelfde plaatsbepaling: van een zaak in
+   "Ibiza" weten we zo dat zij in Europe/Madrid staat. Een keer registreren, en
+   daarna geven de Mall, de vakwerk-agenda en de Food Court gegarandeerd
+   HETZELFDE antwoord op "hoe laat is het bij deze zaak". */
+require('../kern/tijdzone').zetLandVind(kern.landVind);
 /* De Regelwacht (kern/fiscaal/regelwacht.js): belastingen en regels worden
    automatisch bijgewerkt -- een gevalideerde overlay op de gedeelde
    LANDEN-tabel, herstart-vast, met een dagelijkse bron-check. */

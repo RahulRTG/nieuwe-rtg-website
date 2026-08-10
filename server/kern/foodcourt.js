@@ -12,9 +12,15 @@ const PRIJZEN = ['€€', '€€€', '€€€€'];
 const LUNCH = ['12:00', '12:30', '13:00', '13:30', '14:00'];
 const DINER = ['18:30', '19:00', '19:30', '20:00', '20:30', '21:00', '21:30', '22:00'];
 
+/* De klok is die van de ZAAK. Hier stond de datum in UTC en de tijd in de zone
+   van de server -- twee verschillende klokken in dezelfde functie, wat rond
+   middernacht een tijdslot van gisteren of morgen opleverde. De zone komt uit
+   kern/tijdzone.js, dezelfde die de vakwerk-agenda en de Mall gebruiken. */
+const { nuBijZaak } = require('./tijdzone');
+const naarMinuten = (t) => Number(String(t).slice(0, 2)) * 60 + Number(String(t).slice(3, 5));
+
 function maakFoodcourt({ db, save, crypto }) {
   const nu = () => new Date().toISOString();
-  const vandaag = () => new Date().toISOString().slice(0, 10);
   function hash(s) { let h = 2166136261; s = String(s); for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; }
 
   // een eetgelegenheid is een partner die tafelreserveringen aanneemt
@@ -74,14 +80,14 @@ function maakFoodcourt({ db, save, crypto }) {
   function tijden(code, datumIn, personenIn) {
     const s = (db.data.suppliers || []).find(x => x.code === String(code || '') && isEetgelegenheid(x));
     if (!s) return { status: 404, error: 'Restaurant niet gevonden.' };
-    const datum = /^\d{4}-\d{2}-\d{2}$/.test(String(datumIn || '')) ? String(datumIn) : vandaag();
-    if (datum < vandaag()) return { status: 400, error: 'Kies een datum vanaf vandaag.' };
+    const hier = nuBijZaak(s);
+    const datum = /^\d{4}-\d{2}-\d{2}$/.test(String(datumIn || '')) ? String(datumIn) : hier.datum;
+    if (datum < hier.datum) return { status: 400, error: 'Kies een datum vanaf vandaag.' };
     const personen = Math.min(20, Math.max(1, parseInt(personenIn, 10) || 2));
     const open = !(s.settings && s.settings.reservationsOpen === false);
     const cap = capaciteit(s);
-    const nuTijd = new Date().toTimeString().slice(0, 5);
     const bouw = (lijst, dienst) => lijst
-      .filter(t => datum > vandaag() || t > nuTijd)
+      .filter(t => datum > hier.datum || naarMinuten(t) > hier.minuten)
       .map(t => ({ tijd: t, dienst, vol: !open || (bezetOp(s, datum, t) + personen > cap) }));
     return {
       ok: true, restaurant: { code: s.code, naam: s.name, keuken: (s.foodcourt || {}).keuken || 'Restaurant', deal: (s.foodcourt || {}).deal || null },
@@ -90,7 +96,7 @@ function maakFoodcourt({ db, save, crypto }) {
     };
   }
 
-  return { foodcourt: { KEUKENS, overzicht, tijden, seed, isEetgelegenheid } };
+  return { foodcourt: { KEUKENS, LUNCH, DINER, overzicht, tijden, seed, isEetgelegenheid } };
 }
 
-module.exports = { maakFoodcourt };
+module.exports = { maakFoodcourt, LUNCH, DINER };

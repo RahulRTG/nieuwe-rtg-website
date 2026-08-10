@@ -90,6 +90,7 @@ function schrijf(doel) {
       uit.push(MERK + n + '. ' + v.id);
       uit.push('# Vraag:  ' + v.vraag);
       if (v.waarom) for (const r of hak('# Waarom: ', v.waarom)) uit.push(r);
+      if (v.huidig) for (const r of hak('# Nu:     ', v.huidig)) uit.push(r);
       uit.push('# Geldig: ' + eisTekst(v));
       uit.push(ANTWOORD + (ingevuld ? ' ' + ingevuld : ''));
     }

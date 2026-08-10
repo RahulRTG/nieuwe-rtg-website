@@ -73,6 +73,45 @@
   .inlog{max-width:420px;margin:4rem auto;text-align:center;padding:0 1.2rem;}
   .inlog a{color:var(--gold);border-bottom:1px solid var(--gold);}
   .deel{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted,var(--zacht,#8A8680));margin:1.6rem 0 .5rem;}
+  /* ---- de vindlaag: zoeken en de plek waar je staat ---- */
+  .vind{margin:.4rem 0 0;}
+  .vind .zoekrij{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;}
+  .vind input.zoek{flex:1;min-width:12rem;background:var(--card);border:1px solid var(--line);border-radius:12px;
+    color:var(--txt);font:inherit;font-size:1rem;padding:.75rem .9rem;}
+  .vind input.zoek:focus{outline:none;border-color:var(--gold);}
+  .plekrij{display:flex;gap:.5rem;align-items:center;flex-wrap:wrap;margin-top:.6rem;font-size:.8rem;color:var(--soft);}
+  .plekrij select{background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.82rem;padding:.4rem .6rem;}
+  .verdiepingen{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:.55rem;margin-top:1rem;}
+  .vd{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:.7rem .8rem;text-align:left;
+    color:var(--txt);font:inherit;cursor:pointer;transition:border-color .2s,transform .2s;}
+  .vd:hover{border-color:var(--gold);transform:translateY(-2px);}
+  .vd.aan{border-color:var(--gold);}
+  .vd b{font-family:'Bodoni Moda',serif;font-weight:500;font-size:.98rem;display:block;}
+  .vd span{font-size:.7rem;color:var(--soft);letter-spacing:.08em;text-transform:uppercase;}
+  /* een gevonden aanbod: één kaartvorm voor product, reis, dienst, huur en marktplaats */
+  .treffers{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:.8rem;}
+  .tref{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.9rem;display:flex;flex-direction:column;gap:.3rem;}
+  .tref .band{display:flex;gap:.4rem;align-items:center;flex-wrap:wrap;font-size:.62rem;letter-spacing:.12em;text-transform:uppercase;}
+  .tref .soort{color:var(--gold);}
+  .tref .wie{border:1px solid var(--line);border-radius:999px;padding:.1rem .45rem;color:var(--soft);}
+  .tref .wie.part{border-color:var(--burgundy);color:var(--burgundy);}
+  .tref h3{font-size:1.02rem;margin-top:.15rem;}
+  .tref .oms{font-size:.82rem;color:var(--muted);line-height:1.5;}
+  .tref .waar{font-size:.74rem;color:var(--soft);}
+  .tref .prijs{font-size:.92rem;margin-top:.2rem;font-variant-numeric:tabular-nums;}
+  .tref .vrij{font-size:.74rem;color:var(--green,#4C9A75);}
+  .tref .dicht{font-size:.74rem;color:var(--soft);}
+  .tref .ga{margin-top:.5rem;align-self:flex-start;text-decoration:none;}
+  .stukmelding{border:1px solid var(--burgundy);border-radius:12px;padding:.7rem .9rem;margin-top:.9rem;font-size:.82rem;color:var(--muted);}
+  /* Vervangen style="..."-attributen: de CSP kan style-src-attr pas dicht als
+     public/ er geen meer heeft, en NORM.json telt ze. Zelfde maten als de
+     attributen hadden. */
+  .vindnoot{color:var(--soft);font-size:.8rem;line-height:1.6;max-width:64ch;margin-top:.9rem;}
+  .midden{justify-content:center;}
+  .knoprij{margin-top:.5rem;}
+  .bladtel{font-size:.78rem;color:var(--muted);}
+  .reisnoot{color:var(--muted);font-size:.82rem;line-height:1.6;margin:.9rem 0 0;}
+  .goudlink{color:var(--gold);}
 </style>
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <script src="/shared/adresvoorstel.js"></script>
@@ -86,12 +125,37 @@
   <div><div class="ey">Alleen voor leden</div><h1>De RTG Mall</h1></div>
 </header>
 <main id="main">
-  <p style="color:var(--muted);font-size:.9rem;line-height:1.6;max-width:60ch;">Alles wat je bij RTG koopt, op één plek. Het eigen-merk bestel je direct; bij de mode-boutieks gelden ledenprijzen en leg je een stuk apart of laat je een maat naar de paskamer brengen. Prijzen in euro.</p>
-  <div class="deel">Bibliotheek</div>
-  <div id="biebKop"></div>
-  <div id="appbieb"></div>
-  <div id="reisbieb"></div>
-  <div id="rtfbieb"></div>
+  <!-- De vindlaag: eerst waar je bent en wat je zoekt, pas daarna wie het aanbiedt. -->
+  <section class="vind" aria-label="Zoeken in de Mall">
+    <div class="zoekrij">
+      <input id="zoek" class="zoek" type="search" placeholder="Wat zoek je? Bijvoorbeeld: scooter huren Ibiza" maxlength="120" aria-label="Zoeken in de Mall">
+      <button class="knop" id="zoekKnop" type="button">Zoeken</button>
+    </div>
+    <div class="plekrij">
+      <span>In de buurt van</span>
+      <select id="plek" aria-label="Plek"><option value="">Overal</option></select>
+      <span id="plekTel"></span>
+      <button class="knop stil" id="nuOpen" type="button">Nu open</button>
+      <button class="knop stil" id="opVoorraad" type="button">Op voorraad</button>
+      <button class="knop stil" id="wisZoek" type="button" hidden>Alles tonen</button>
+      <a class="knop stil" href="/apps/mijnmall.html">Mijn lijsten &amp; reizen</a>
+    </div>
+    <div class="verdiepingen" id="verdiepingen"></div>
+    <p class="vindnoot">Alles wat je bij RTG koopt, boekt, huurt of aanvraagt, op een plek. Wie de aanbieder is staat bij elk aanbod; RTG staat niet garant voor wat een ander levert.</p>
+    <div id="stukMelding"></div>
+  </section>
+
+  <!-- de resultaten; verbergt de vaste verdiepingen zolang er gezocht wordt -->
+  <section id="trefWrap" hidden aria-label="Gevonden">
+    <div class="etage"><div class="etage-kop"><h2 id="trefKop">Gevonden</h2><span class="n" id="trefTel"></span></div>
+      <div id="treffers"></div>
+      <div class="rij midden" id="trefBlader"></div>
+    </div>
+  </section>
+
+<div id="vast">
+  <div class="deel">Reizen · boeken</div>
+  <div id="reizenWrap"></div>
   <div class="deel">Boutieks</div>
   <div id="etages"></div>
   <div class="deel">RTG Thuis</div>
@@ -100,6 +164,15 @@
   <div id="dienstenWrap"></div>
   <div class="deel">Leveranciers</div>
   <div id="gidsWrap"></div>
+  <!-- Ontdekken staat NA het aanbod: een reisgids is inspiratie, geen reis.
+       Zolang de Reis-Bibliotheek bovenaan stond, was het enige wat de Mall
+       over reizen liet zien een boekenkast. -->
+  <div class="deel">Ontdekken</div>
+  <div id="biebKop"></div>
+  <div id="appbieb"></div>
+  <div id="reisbieb"></div>
+  <div id="rtfbieb"></div>
+</div>
 </main>
 
 <section class="blad" id="blad" aria-label="Boutique">
@@ -140,7 +213,170 @@ if (!TOKEN) {
   $('#main').innerHTML = '<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log eerst in</h2>'+
     '<p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">De RTG Mall is er voor leden. Open de app en log in met je RTG-account.</p>'+
     '<p style="margin-top:1rem;"><a href="/apps/app.html">Naar de app →</a></p></div>';
-} else { laad(); tekenBiebKop(); laadAppbieb(); laadReisbieb(); laadRtfbieb(); }
+} else { laad(); startVind(); laadReizen(); tekenBiebKop(); laadAppbieb(); laadReisbieb(); laadRtfbieb(); }
+
+/* ---------- De vindlaag: locatie en intentie eerst ----------
+   De Mall is de commerciele voorkant van heel RTG: reizen, verblijven, eten,
+   winkels, diensten, vervoer en de Marktplaats staan in EEN zoekresultaat,
+   met een duidelijk verschil tussen een zaak en een particulier. Deze laag
+   toont; boeken en kopen gebeurt op de pagina waar dat al gebeurde. */
+const V = { q: '', plek: '', verdieping: '', pagina: 1, openNu: false, opVoorraad: false, lijst: '' };
+/* Kwam je hier vanuit een reismand, dan zoekt de Mall meteen met haar plek en
+   periode. De context komt daarmee uit iets dat het lid zelf heeft gebouwd, en
+   niet uit wat we van hem hebben onthouden. */
+try { V.lijst = new URLSearchParams(location.search).get('lijst') || ''; } catch (e) {}
+const WIE = { zaak: 'Professioneel', particulier: 'Particulier', rtg: 'RTG' };
+
+async function startVind(){
+  try {
+    const d = await api('/api/mall/plekken');
+    const sel = $('#plek');
+    sel.innerHTML = '<option value="">Overal</option>' +
+      d.plekken.map(p => '<option value="'+esc(p.slug)+'">'+esc(p.stad)+' ('+p.aantal+')</option>').join('');
+    // een kapotte bron mag niet stil verdwijnen: hij staat er, met naam
+    toonStuk(d.stuk);
+  } catch(e){ return; }
+  $('#plek').addEventListener('change', () => { V.plek = $('#plek').value; V.pagina = 1; tekenHome(); if (V.q || V.verdieping) tekenTreffers(); });
+  let zt; $('#zoek').addEventListener('input', () => { clearTimeout(zt); zt = setTimeout(() => { V.q = $('#zoek').value.trim(); V.pagina = 1; tekenTreffers(); }, 320); });
+  $('#zoek').addEventListener('keydown', e => { if (e.key === 'Enter'){ V.q = $('#zoek').value.trim(); V.pagina = 1; tekenTreffers(); } });
+  $('#zoekKnop').addEventListener('click', () => { V.q = $('#zoek').value.trim(); V.pagina = 1; tekenTreffers(); });
+  $('#wisZoek').addEventListener('click', () => { V.q = ''; V.verdieping = ''; V.openNu = false; V.opVoorraad = false; V.pagina = 1; $('#zoek').value = ''; standknoppen(); tekenTreffers(); });
+  /* De twee live filters. Ze staan op de stand die de zaak zelf bijhoudt: "Nu
+     open" komt uit haar agenda of haar schakelaar, "Op voorraad" uit haar
+     voorraad. Een zaak die geen openingstijden heeft vastgelegd valt hier weg;
+     dat is eerlijker dan gokken. */
+  $('#nuOpen').addEventListener('click', () => { V.openNu = !V.openNu; V.pagina = 1; standknoppen(); tekenTreffers(); });
+  $('#opVoorraad').addEventListener('click', () => { V.opVoorraad = !V.opVoorraad; V.pagina = 1; standknoppen(); tekenTreffers(); });
+  standknoppen();
+  tekenHome();
+}
+
+function standknoppen(){
+  $('#nuOpen').classList.toggle('aan', V.openNu);
+  $('#opVoorraad').classList.toggle('aan', V.opVoorraad);
+}
+
+function toonStuk(stuk){
+  if (!stuk || !stuk.length){ $('#stukMelding').innerHTML = ''; return; }
+  $('#stukMelding').innerHTML = '<div class="stukmelding">Een deel van de Mall is nu niet te doorzoeken: '+
+    stuk.map(s => esc(s.bron)).join(', ')+'. De rest werkt gewoon.</div>';
+}
+
+// de verdiepingen met wat er op deze plek werkelijk staat
+async function tekenHome(){
+  let d; try { d = await api('/api/mall/home', { plek: V.plek }); } catch(e){ return; }
+  $('#plekTel').textContent = d.plek ? d.totaal + ' in en om ' + d.plek.stad : d.totaal + ' in de hele Mall';
+  $('#verdiepingen').innerHTML = d.verdiepingen.map(v =>
+    '<button class="vd'+(V.verdieping===v.id?' aan':'')+'" data-id="'+esc(v.id)+'" type="button">'+
+      '<b>'+esc(v.label)+'</b><span>'+v.aantal+'</span></button>').join('');
+  $('#verdiepingen').querySelectorAll('.vd').forEach(b => b.addEventListener('click', () => {
+    V.verdieping = (V.verdieping === b.dataset.id) ? '' : b.dataset.id;
+    V.pagina = 1; tekenTreffers(); tekenHome();
+  }));
+  toonStuk(d.stuk);
+}
+
+function trefKaart(a){
+  const wie = WIE[a.aanbieder.soort] || a.aanbieder.soort;
+  const partner = a.aanbieder.status === 'RTG Partner';
+  const afst = a.afstand != null
+    ? (a.afstand < 1000 ? a.afstand + ' m' : Math.round(a.afstand/100)/10 + ' km')
+    : null;
+  // bij RTG-eigen aanbod zegt "RTG" en "RTG Partner" twee keer hetzelfde
+  const toonStatus = a.aanbieder.status && a.aanbieder.soort !== 'rtg';
+  return '<div class="tref">'+
+    '<div class="band"><span class="soort">'+esc(a.typeLabel)+'</span>'+
+      '<span class="wie'+(partner?' part':'')+'">'+esc(wie)+'</span>'+
+      (toonStatus ? '<span class="wie">'+esc(a.aanbieder.status)+'</span>' : '')+'</div>'+
+    '<h3>'+esc(a.titel)+'</h3>'+
+    (a.uitleg ? '<span class="oms">'+esc(a.uitleg)+'</span>' : '')+
+    '<span class="waar">'+esc(a.aanbieder.naam)+(a.plek.stad?' · '+esc(a.plek.stad):'')+(afst?' · '+afst:'')+'</span>'+
+    (a.prijs ? '<span class="prijs">'+(a.prijs.vanaf?'vanaf ':'')+euro(a.prijs.bedrag)+' <span class="waar">'+esc(a.prijs.eenheid)+'</span></span>' : '')+
+    (a.open && a.open.open !== null
+      ? '<span class="'+(a.open.open?'vrij':'dicht')+'">'+(a.open.open?'&#9679; ':'')+esc(a.open.tekst)+'</span>' : '')+
+    (a.beschikbaar ? '<span class="'+(a.beschikbaar.uit?'dicht':'vrij')+'">'+esc(a.beschikbaar.tekst)+'</span>' : '')+
+    '<div class="rij knoprij">'+
+      '<a class="knop ga" href="'+esc(a.pagina)+'">'+esc(a.cta)+' →</a>'+
+      '<button class="knop stil bewaar" data-id="'+esc(a.id)+'" type="button">Bewaren</button>'+
+    '</div>'+
+  '</div>';
+}
+
+/* Bewaren: kies een bestaande lijst of maak er een. Een verlanglijst en een
+   reismand zijn hetzelfde ding met twee velden verschil; de Mall rekent niets
+   af, elke regel gaat naar de partij die hem levert. */
+async function bewaar(aanbodId){
+  let d;
+  try { d = await api('/api/mall/lijsten'); } catch(e){ meld(e.message); return; }
+  const namen = d.lijsten.map((l, i) => (i+1)+'. '+l.naam+(l.soort==='reis'?' (reis)':'')+' - '+l.aantal);
+  const keuze = prompt('Bewaren in:\n'+(namen.length?namen.join('\n')+'\n\n':'')+
+    'Typ een nummer, of een naam voor een nieuwe lijst.\nBegin met "reis:" voor een reismand.');
+  if (keuze === null) return;
+  const gekozen = d.lijsten[Number(keuze.trim()) - 1];
+  try {
+    let id;
+    if (gekozen) id = gekozen.id;
+    else {
+      const naam = keuze.trim();
+      if (!naam) return;
+      const reis = /^reis:/i.test(naam);
+      const r = await api('/api/mall/lijst/nieuw', { naam: reis ? naam.slice(5).trim() : naam, soort: reis ? 'reis' : 'lijst' });
+      id = r.lijst.id;
+    }
+    const r = await api('/api/mall/lijst/voegtoe', { id, aanbodId });
+    meld('Bewaard (' + r.aantal + ' in deze lijst).');
+  } catch(e){ meld(e.message); }
+}
+function koppelBewaar(wortel){
+  if (wortel) wortel.querySelectorAll('.bewaar').forEach(b => b.addEventListener('click', () => bewaar(b.dataset.id)));
+}
+
+async function tekenTreffers(){
+  const zoekt = !!(V.q || V.verdieping || V.openNu || V.opVoorraad || V.lijst);
+  $('#trefWrap').hidden = !zoekt;
+  $('#vast').hidden = zoekt;
+  $('#wisZoek').hidden = !zoekt;
+  if (!zoekt) return;
+  let d;
+  try { d = await api('/api/mall/zoek', { q: V.q, plek: V.plek, verdieping: V.verdieping, openNu: V.openNu, opVoorraad: V.opVoorraad, lijst: V.lijst, pagina: V.pagina }); }
+  catch(e){ $('#treffers').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; return; }
+  $('#trefKop').textContent = V.q ? 'Gevonden voor "'+V.q+'"' : 'Alles op deze verdieping';
+  $('#trefTel').textContent = d.totaal + (d.plek ? ' · '+d.plek.stad : '') + (d.totaal ? '' : ' · niets gevonden');
+  $('#treffers').innerHTML = d.items.length
+    ? '<div class="treffers">'+d.items.map(trefKaart).join('')+'</div>'
+    : '<div class="leeg">'+(V.openNu||V.opVoorraad
+        ? 'Niets dat hieraan voldoet. "Nu open" en "Op voorraad" komen uit wat de zaken zelf bijhouden; een zaak zonder vastgelegde openingstijden staat er bewust niet bij.'
+        : 'Niets gevonden. Probeer een ander woord, of zet de plek op Overal; er staan '+d.totaalVoorFilter+' dingen in de Mall.')+'</div>';
+  $('#trefBlader').innerHTML = d.paginas > 1
+    ? '<button class="knop stil" id="tVorig"'+(d.pagina<=1?' disabled':'')+'>← Vorige</button>'+
+      '<span class="bladtel">pagina '+d.pagina+' van '+d.paginas+'</span>'+
+      '<button class="knop stil" id="tVolgend"'+(d.pagina>=d.paginas?' disabled':'')+'>Volgende →</button>'
+    : '';
+  koppelBewaar($('#treffers'));
+  const v = $('#tVorig'), n = $('#tVolgend');
+  if (v) v.addEventListener('click', () => { V.pagina--; tekenTreffers(); });
+  if (n) n.addEventListener('click', () => { V.pagina++; tekenTreffers(); });
+  toonStuk(d.stuk);
+}
+
+/* De verdieping Reizen: de samengestelde reizen van het RTG-reisbureau stonden
+   tot nu toe helemaal niet in de Mall -- alleen een boekenkast met reisgidsen.
+   Dit is het echte aanbod; de gidsen staan verderop onder Ontdekken. */
+async function laadReizen(){
+  let d; try { d = await api('/api/mall/zoek', { type: 'reis', per: 6 }); } catch(e){ return; }
+  const w = $('#reizenWrap');
+  if (!d.items.length){ w.innerHTML = ''; return; }
+  w.innerHTML = '<div class="etage"><div class="etage-kop"><h2>Complete reizen</h2>'+
+    '<span class="n">'+d.totaal+' · nettoprijs, een reisadviseur bevestigt</span></div>'+
+    '<div class="treffers">'+d.items.map(trefKaart).join('')+'</div>'+
+    '<p class="reisnoot">Je vraagt een reis aan; '+
+    'een RTG-reisadviseur bevestigt de datum en stelt hem samen. '+
+    '<a href="/apps/reisbureau.html" class="goudlink">Naar het reisbureau</a> · '+
+    '<a href="/apps/hotels.html" class="goudlink">Verblijven</a> · '+
+    '<a href="/apps/vluchten.html" class="goudlink">Vluchten</a> · '+
+    '<a href="/apps/hangar.html" class="goudlink">Jets &amp; charters</a></p></div>';
+  koppelBewaar(w);
+}
 
 /* ---------- De echte RTG Bibliotheek: één huis met drie afdelingen en een
    bibliothecaris. Bladeren is voor iedereen; wat je mag installeren hangt
@@ -153,7 +389,7 @@ function tekenBiebKop(){
     '<div class="boutiek" style="cursor:default;">'+
       '<b>De bibliothecaris</b>'+
       '<span class="tag">Vertel wat u zoekt of wilt leren; de bibliothecaris zoekt dwars door de App-, Reis- en RTF-afdeling en raadt echte titels aan.</span>'+
-      '<div class="rij" style="margin-top:.5rem;">'+
+      '<div class="rij knoprij">'+
         '<input class="veld" id="bibVraag" maxlength="300" placeholder="Bijv. ik wil leren fotograferen, of: we gaan naar Londen" style="flex:1;min-width:12rem;">'+
         '<button class="knop" id="bibGo">Vraag advies</button>'+
       '</div>'+
@@ -230,7 +466,7 @@ async function tekenRtf(){
         : '<div class="leeg">Niets gevonden. Probeer een andere zoekterm.</div>';
       blader.innerHTML = d.paginas > 1
         ? '<button class="knop stil" id="rfVorig"'+(d.pagina<=1?' disabled':'')+'>← Vorige</button>'+
-          '<span style="font-size:.78rem;color:var(--muted);">pagina '+d.pagina.toLocaleString('nl-NL')+' van '+d.paginas.toLocaleString('nl-NL')+' · '+d.totaal.toLocaleString('nl-NL')+' apps</span>'+
+          '<span class="bladtel">pagina '+d.pagina.toLocaleString('nl-NL')+' van '+d.paginas.toLocaleString('nl-NL')+' · '+d.totaal.toLocaleString('nl-NL')+' apps</span>'+
           '<button class="knop stil" id="rfVolgend"'+(d.pagina>=d.paginas?' disabled':'')+'>Volgende →</button>'
         : '';
       const vorig = $('#rfVorig'), volgend = $('#rfVolgend');
@@ -306,7 +542,7 @@ async function tekenApps(){
         : '<div class="leeg">Niets gevonden. Probeer een andere zoekterm.</div>';
       blader.innerHTML = d.paginas > 1
         ? '<button class="knop stil" id="abVorig"'+(d.pagina<=1?' disabled':'')+'>← Vorige</button>'+
-          '<span style="font-size:.78rem;color:var(--muted);">pagina '+d.pagina.toLocaleString('nl-NL')+' van '+d.paginas.toLocaleString('nl-NL')+' · '+d.totaal.toLocaleString('nl-NL')+' apps</span>'+
+          '<span class="bladtel">pagina '+d.pagina.toLocaleString('nl-NL')+' van '+d.paginas.toLocaleString('nl-NL')+' · '+d.totaal.toLocaleString('nl-NL')+' apps</span>'+
           '<button class="knop stil" id="abVolgend"'+(d.pagina>=d.paginas?' disabled':'')+'>Volgende →</button>'
         : '';
       const vorig = $('#abVorig'), volgend = $('#abVolgend');
@@ -393,7 +629,7 @@ async function tekenReis(){
         : '<div class="leeg">Niets gevonden. Probeer een andere zoekterm.</div>';
       blader.innerHTML = d.paginas > 1
         ? '<button class="knop stil" id="rbVorig"'+(d.pagina<=1?' disabled':'')+'>← Vorige</button>'+
-          '<span style="font-size:.78rem;color:var(--muted);">pagina '+d.pagina.toLocaleString('nl-NL')+' van '+d.paginas.toLocaleString('nl-NL')+' · '+d.totaal.toLocaleString('nl-NL')+' gidsen</span>'+
+          '<span class="bladtel">pagina '+d.pagina.toLocaleString('nl-NL')+' van '+d.paginas.toLocaleString('nl-NL')+' · '+d.totaal.toLocaleString('nl-NL')+' gidsen</span>'+
           '<button class="knop stil" id="rbVolgend"'+(d.pagina>=d.paginas?' disabled':'')+'>Volgende →</button>'
         : '';
       const vorig = $('#rbVorig'), volgend = $('#rbVolgend');

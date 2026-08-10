@@ -35,11 +35,9 @@ module.exports = (ctx) => {
   }
 
   /* Welke zaken mogen een ophaal/bezorgdienst voeren: horeca (orders-caps)
-     en zelfstandigen. Hotels/vervoer hebben hun eigen kanalen al. */
-  function magBezorgen(s) {
-    const caps = db.capsVan(s);
-    return caps.includes('orders') || s.type === 'zzp';
-  }
+     en zelfstandigen. Hotels/vervoer hebben hun eigen kanalen al. De regel
+     zelf staat in ./bezorgregel.js, omdat de Mall hem ook leest. */
+  const magBezorgen = (s) => require('./bezorgregel').magBezorgen(db, s);
   /* Tickets leven als boekingen met soort 'ticket'; verlopen onbetaalde (ouder
      dan 30 min) tellen niet mee voor de capaciteit. */
   function ticketsVoorSlot(code, activiteitId, datum, tijd) {

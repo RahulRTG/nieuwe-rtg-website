@@ -18,6 +18,7 @@ module.exports = [
   ['rtg', 'Het Huis', 'reizen', '/apps/rtg.html', 'Reserveren, boeken en bestellen bij alle partners, alles op codenaam.'],
   ['hotels', 'Verblijven', 'reizen', '/apps/hotels.html', 'Hotels, appartementen en villa\'s met ledenprijzen en keyless toegang.'],
   ['reisbureau', 'Reisbureau', 'reizen', '/apps/reisbureau.html', 'Samengestelde reizen tegen de nettoprijs, met AI-reisadvies in gewone woorden.'],
+  ['mijnmall', 'Mijn Mall', 'reizen', '/apps/mijnmall.html', 'Je lijsten, je reismanden en de vragen die je in de Mall hebt uitgezet.'],
   ['reisboek', 'Reisboek', 'reizen', '/apps/reisboek.html', 'Je reisdagboek: boekingen en momenten worden vanzelf een mooi verslag.'],
   ['vluchten', 'Vluchten', 'reizen', '/apps/vluchten.html', 'Vluchten zoeken, boeken en volgen.'],
   ['hangar', 'Hangar', 'reizen', '/apps/hangar.html', 'De Hangar: privéjets en charters vanaf Business Aviation.'],

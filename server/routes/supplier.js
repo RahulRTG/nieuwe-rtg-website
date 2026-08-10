@@ -50,6 +50,68 @@ app.get('/api/supplier/stream', (req, res) => {
 
 app.post('/api/supplier/state', supplierAuth, (req, res) => res.json({ state: supplierState(req.supplier, req.actor) }));
 
+/* "Zo staat u in de Mall": de andere kant van de Supplier OS-koppeling. De
+   zaak ziet welk aanbod van haar in de Mall staat, welke stand de Mall daarbij
+   uit haar eigen agenda en voorraad leest, en wat er nog ontbreekt (geen uren
+   = niet in "Nu open"). Alleen de eigen zaak; er is geen code-parameter, zodat
+   niemand hiermee bij een ander kan kijken. */
+app.post('/api/supplier/mall', supplierAuth, (req, res) => {
+  const r = kern.mall.mallVoorZaak(req.supplier.code);
+  if (r.error) return res.status(r.status || 400).json({ error: r.error });
+  res.json(r);
+});
+
+/* De koppeling voor een EXTERN kassa- of boekingssysteem: voorraad en
+   open/dicht melden. Alleen die twee, en alleen voor de eigen zaak. Een
+   melding telt een half uur als actueel en vervalt daarna vanzelf, zodat een
+   uitgevallen koppeling geen winkel ten onrechte open en gevuld houdt. Zie de
+   kop van kern/mall/extern.js. */
+app.post('/api/supplier/mall/sync', supplierAuth, (req, res) => {
+  res.json(kern.mall.mallStand.extern.meld(req.supplier, req.body || {}));
+});
+
+/* De vraagkant: aanvragen van leden die bij deze zaak passen (vak en
+   werkgebied), en reageren. Wie zich bedenkt wijzigt zijn eigen reactie in
+   plaats van er een tweede naast te zetten; zie kern/mall/aanvragen.js. */
+app.post('/api/supplier/mall/aanvragen', supplierAuth, (req, res) => {
+  res.json(kern.mall.mallAanvragen.voorZaak(req.supplier));
+});
+app.post('/api/supplier/mall/aanvraag/reageer', supplierAuth, (req, res) => {
+  const r = kern.mall.mallAanvragen.reageer(req.supplier, req.body.id, req.body || {});
+  if (r.error) return res.status(r.status || 400).json({ error: r.error });
+  res.json(r);
+});
+
+/* Samengesteld aanbod van de zaak zelf: een bundel, een evenement of een
+   seizoensaanbod uit haar EIGEN aanbod. Andermans aanbod erin bundelen wordt
+   geweigerd -- dat is een belofte die zij niet kan waarmaken. */
+app.post('/api/supplier/mall/collecties', supplierAuth, (req, res) => {
+  res.json(kern.mall.mallCollecties.vanZaak(req.supplier.code));
+});
+app.post('/api/supplier/mall/collectie/zet', supplierAuth, (req, res) => {
+  const r = kern.mall.mallCollecties.zet(req.supplier.code, req.supplier.name, req.body || {});
+  if (r.error) return res.status(r.status || 400).json({ error: r.error });
+  res.json(r);
+});
+app.post('/api/supplier/mall/collectie/weg', supplierAuth, (req, res) => {
+  const r = kern.mall.mallCollecties.verwijder(req.supplier.code, (req.body || {}).id);
+  if (r.error) return res.status(r.status || 400).json({ error: r.error });
+  res.json(r);
+});
+
+/* De tijdzone van de zaak. Zonder deze is "Nu open" de tijd van de server, en
+   dat is voor een zaak op Ibiza een uur mis. Leeg maken kan door 'auto' te
+   sturen: dan geldt weer de hoofdzone van het land. */
+app.post('/api/supplier/tijdzone', supplierAuth, (req, res) => {
+  const wens = String((req.body || {}).tijdzone || '').trim();
+  const { geldigeZone } = require('../kern/tijdzone');
+  if (wens && wens !== 'auto' && !geldigeZone(wens))
+    return res.status(400).json({ error: 'Onbekende tijdzone. Gebruik een IANA-naam, bijvoorbeeld Europe/Madrid.' });
+  if (!wens || wens === 'auto') delete req.supplier.tijdzone; else req.supplier.tijdzone = wens;
+  save();
+  res.json({ ok: true, tijdzone: kern.mall.mallStand.zoneVoor(req.supplier) });
+});
+
 app.post('/api/supplier/notifications/read', supplierAuth, (req, res) => {
   (db.data.supplierNotifications[req.supplier.code] || []).forEach(n => n.read = true);
   save();

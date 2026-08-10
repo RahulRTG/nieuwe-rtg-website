@@ -293,6 +293,15 @@ test('elke routehandler die een id uit het verzoek pakt, noemt ook de sessie', (
     'server/routes/member/winkel-bieb.js POST /api/foodcourt/tijden': 'vrije tijdsloten van een restaurant: openbare beschikbaarheid',
     'server/routes/member/winkel-bieb.js POST /api/mall/land': 'catalogus van een boerderij: openbaar aanbod',
     'server/routes/member/winkel-bieb.js POST /api/mall/reis/lees': 'reisgids lezen: openbare bibliotheekinhoud',
+    /* (b) een collectie, bundel, evenement of seizoen is samengesteld aanbod
+       dat de Mall aan iedere pashouder toont; er is geen tweede eigenaar om
+       tegen te beschermen. Dat het ook per id opvraagbaar is en niet alleen via
+       de lijst, is met opzet: een evenement van volgende maand staat nog niet in
+       "wat geldt vandaag", maar een link ernaartoe hoort te werken. De ids zijn
+       willekeurige bytes en dus niet af te lopen. Beheren (zet/verwijder) loopt
+       NIET via deze route maar via /api/supplier/... en /api/office/..., en daar
+       wordt wel op eigenaarschap gecontroleerd. */
+    'server/routes/member/mall-vindlaag.js POST /api/mall/collectie': 'samengesteld aanbod: openbaar voor elke pashouder, beheren gaat via de zaak- en kantoorroutes',
     'server/routes/thuis.js POST /api/thuis/detail': 'detail van een advertentie: openbaar aanbod',
     'server/routes/thuis.js POST /api/thuis/reviews': 'reviews bij een advertentie: openbaar',
     /* (c) de terugkeer van een identiteitsprovider. Hier IS er per definitie nog

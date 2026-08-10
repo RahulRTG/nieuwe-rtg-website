@@ -2948,6 +2948,150 @@ Wat je niet wilt zien, zet je uit in de **Boardroom** (bedieningspaneel → Boar
 
 De statusbalk houdt drie dingen vast: batterij, de bel en het bedieningspaneel. Scannen, je Zegel tonen en je backoffice zitten in dat paneel.
 
+### De Mall: de commerciële voorkant van heel RTG
+
+**apps/mall.html** was een winkel met spullen: zeven etages met boutieks, plus drie bibliotheken. Alles wat je verder bij RTG kon boeken, huren of aanvragen zat in zijn eigen app, en het reisbureau stond er zelfs helemaal niet in — het enige wat de Mall over reizen liet zien was een boekenkast met reisgidsen.
+
+De Mall is nu een **discovery-laag boven op alle bestaande domeinen**. Die domeinen houden hun eigen systemen; de Mall maakt ze gezamenlijk vindbaar.
+
+**Locatie en intentie eerst, type aanbieder daarna.** Bovenaan staat één zoekbalk en de plek waar je staat. "scooter huren Ibiza" zoekt tegelijk door leveranciers, verhuurbedrijven, marktplaats-aanbod en reisaanbod; wie de aanbieder is (professioneel, particulier, RTG) staat op elke kaart, zodat het verschil nooit hoeft te worden uitgelegd.
+
+| deel | waar | wat |
+|---|---|---|
+| het aanbod-object | `kern/mall/aanbod.js` + `aanbodvorm.js` | twaalf typen (product, dienst, boeking, huur, ticket, reis, verblijf, eten, vervoer, marktplaats, abonnement, offerte) in één vorm, met elf verdiepingen |
+| de bronnen | `kern/mall/aanbodzaken.js` (uit de zaken) + `aanbodrtg.js` (RTG-breed) | tien bronnen: reisbureau, logies, foodcourt, retail, eigen-merk, boerderij, dienstenplein, mobiliteit, marktplaats, thuis |
+| locatie & servicegebied | `kern/mall/plek.js` | de plekken worden afgeleid uit het aanbod dat er echt is; per zaak een bereik (adres, straal, stad, land, Europa, online) |
+| zoeken & rangschikken | `kern/mall/zoek.js` + `zoekweging.js` | `POST /api/mall/zoek`, `/api/mall/home`, `/api/mall/plekken` |
+
+**Vier regels die in de code staan en niet alleen hier:**
+
+1. **Rangschikken gebeurt niet op geld.** Een RTG Partner komt niet hoger omdat hij partner is; er is met opzet geen partner-term in de weging. Partners krijgen hun voordeel in integratie, niet in ranking. `test/mall-vindlaag.test.js` leest de weging en zakt zodra iemand er een aanbieder-term in zet.
+2. **Relevantie en volgorde zijn niet hetzelfde.** Beschikbaarheid sorteert, maar laat niets toe dat niet gevraagd is. Toen dat één som was, gaf "scooter huren Ibiza" negen resultaten: vier ringen, drie potten honing en twee villa's, puur omdat die op voorraad stonden.
+3. **De projectie wordt gedeeld, niet overgeschreven.** De prijs van een reis komt uit `reisAanbod(db)` in `kern/reisbureau.js`, de zichtbaarheid van een advertentie uit `kern/markt/openbaar.js`. Een reis die bij het bureau € 2.200 kost en in de Mall € 22 is precies het soort verschil dat niemand ziet aankomen.
+4. **Een status is geen keurmerk.** RTG Partner, RTG Verified, RTG Business en Marktplaats-lid zeggen wat RTG over de aanbieder wéét. De Mall zegt er zelf bij dat RTG niet garant staat voor wat een ander levert.
+
+**Wat er onderweg is gerepareerd:** de genres `jet`, `helikopter`, `taxi`, `charter`, `verhuur` en `tweewielers` stonden wel in de leveranciersgids maar hadden geen pagina, dus ze vielen terug op `/apps/app.html` met `boekbaar: false` — zichtbaar en tegelijk doodlopend, terwijl `hangar.html` en `ov.html` gewoon bestonden. Ze wijzen nu elk naar de plek waar je ze werkelijk aanvraagt.
+
+**Tijd als context.** Zoeken kent naast een plek ook een periode (`van`/`tot`). Die stuurt de agenda-vraag aan: het eerstvolgende vrije tijdvak wordt binnen die periode gezocht in plaats van "de eerstvolgende week". Er wordt níéts weggefilterd — "niets vrij in deze periode" is een antwoord dat je wilt zien, geen reden om een zaak te verbergen. Een reismand (`lijst: <id>`) geeft haar plek en periode door, zodat zoeken vanuit een reis vanzelf de goede context heeft.
+
+Dat is ook waar de **personalisatie** zit, en bewust niet verder: context die het lid zélf zet — een gekozen plek, een gekozen periode, de reismand waarin hij werkt. Er wordt niets onthouden om later mee te raden. Een gedragsprofiel opbouwen is precies wat dit huis niet doet.
+
+**De zakelijke prijs.** Een Business Pass koopt op inkoopprijs waar die bestaat. Die prijs komt uit `prijsVoor()` van `kern/groothandel.js` zelf; de Mall *kiest* welke van de twee hij toont en rekent er geen. Zakelijk zien betekent ook `btw: 'ex'` erbij, want een inkoopprijs zonder die vermelding is een verkeerd getal. De pas komt van een mens: geen enkele registratie geeft zichzelf een Business Pass, dus niemand geeft zichzelf inkoopprijzen.
+
+### Bewaren, een reis bouwen, en de vraagkant
+
+**Lijsten en de reismand** (`server/kern/mall/lijsten.js`). Een verlanglijst en "voeg toe aan mijn reis" waren als aparte functies bedacht en zijn hetzelfde ding met twee velden verschil: een lijst met `soort: 'reis'` draagt een plek en een periode, en kan daarmee zeggen wat er nog ontbreekt (verblijf, vervoer, tafel, iets te doen). Twee systemen bouwen zou twee keer hetzelfde bewaren.
+
+Dit is nadrukkelijk **geen winkelmand die afrekent**. Een reis met een hotel, een scooter en een tafel bestaat uit drie handelingen bij drie partijen, en doen alsof dat één knop is, belooft de klant iets wat er niet is. De lijst brengt ze bij elkaar en wijst per regel de weg.
+
+Een bewaard aanbod dat verdwijnt — uitverkocht, zaak gestopt, reis vol — blijft in de lijst staan met `vervallen: true` en de reden erbij. De regel draagt zelf de titel en de prijs van het moment van bewaren, zodat je nog kunt zien *wat* je had bewaard en of het duurder is geworden. Stilweg verdwijnen laat iemand zoeken naar iets waarvan hij zeker weet dat hij het had.
+
+**De vraagkant** (`server/kern/mall/aanvragen.js`). Een zoekmachine kan alleen vinden wat er staat: "ik heb morgen een fotograaf nodig op Ibiza" levert nul treffers zolang geen fotograaf zich heeft aangemeld — en die nul is geen antwoord maar een gemiste markt. Een lid plaatst zijn vraag, de zaken die hem kunnen bedienen zien hem en reageren.
+
+Drie dingen die dit bewust niet doet:
+
+1. **Geen veiling.** Geen aftellende klok, geen "nog 2 plekken". Dat zijn de patronen die `CLAUDE.md` verbiedt, en ze horen hier het minst thuis: wie een loodgieter zoekt is al gehaast genoeg.
+2. **Geen automatische gunning.** Het lid kiest zelf, of kiest niet. Kiezen boekt niets en betaalt niets — de zaak krijgt bericht en neemt contact op via de gewone weg.
+3. **Geen adres in de open aanvraag.** Een zaak ziet de plek en wat er nodig is, en de codenaam. In een vraag die voor meerdere zaken zichtbaar is, hoort niet te staan wanneer iemand niet thuis is.
+
+Wie welke aanvraag ziet, hangt aan twee dingen: het genre moet bij de gevraagde verdieping horen, en de plek moet binnen het servicegebied van de zaak vallen. Een kapper in Haarlem krijgt geen loodgietersklus op Ibiza in beeld — en een wellness-zaak in Ibiza geen loodgietersklus in Ibiza.
+
+### De schermen: Mijn Mall en de vraagkant van een zaak
+
+**apps/mijnmall.html** is waar een lid zijn lijsten, zijn reismanden en zijn eigen aanvragen bij elkaar ziet. Een reismand toont vier vakjes — verblijf, vervoer ter plaatse, tafel, iets te doen — die aanvinken zodra er iets in zit, met de knop *Zoeken voor deze reis*: die opent de Mall met de plek en de periode van die reis al ingevuld. Een regel waarvan het aanbod verdwenen is blijft staan, doorzichtig, met de reden erbij; is de prijs veranderd sinds je hem bewaarde, dan staat het verschil erachter.
+
+Er staat nergens een knop die doet alsof dit afrekent, en nergens een aftelklok of een "nog 2 beschikbaar". Een lijst is een geheugensteun.
+
+**apps/leverancier-aanvragen.html** is de andere kant: een zaak ziet de vragen die bij haar vak en werkgebied passen, en reageert met wat zij kan bieden en wat het kost. Wie zich bedenkt werkt zijn eigen reactie bij in plaats van er een tweede naast te zetten. Staat er niets, dan zegt het scherm wat het werkgebied nu is en of dat een aanname is — want dat bepaalt precies welke vragen binnenkomen.
+
+Wat de zaak ziet is beperkt en dat is met opzet: de vraag, de plaats, de dag, een eventueel budget en de codenaam. Geen adres.
+
+### Het vraagbeeld: wat gevraagd wordt en niet geleverd
+
+De Mall weet iets wat niemand anders weet: waar mensen naar zoeken en **niets vinden**. Dat is de eerlijkste marktinformatie die er is — iemand heeft de moeite genomen het te vragen en kreeg niets terug. Voor een ondernemer is dat een kans, voor een stad een tekort.
+
+Dit is ook het onderdeel met de grootste kans om verkeerd gebouwd te worden, dus vier regels staan als code en niet als belofte (`server/kern/mall/vraagbeeld.js`):
+
+1. **Geen sleutel.** Nergens wordt bijgehouden wíé iets zocht — geen lidsleutel, geen codenaam, geen sessie, geen IP. Een teller per woord per plaats per week, en verder niets. Zoekprofielen zijn hiermee ook achteraf niet te bouwen.
+2. **Losse woorden, geen zinnen.** Er wordt per wóórd geteld. "kinderstoel huren voor de bruiloft van mijn zus" is als zin herkenbaar; als vier losse woorden in een weekteller is dat niemand meer. Dit is de belangrijkste van de vier.
+3. **Een drempel.** Een woord komt pas naar buiten — naar een ondernemer of het kantoor — vanaf vijf keer. Wat een enkeling zocht blijft binnen.
+4. **Het vervalt.** Acht weken, dan weg. Een vraagbeeld is om op te handelen, niet om een geschiedenis van een stad aan te leggen.
+
+Cijfers, e-mailadressen en woorden langer dan 24 tekens gaan er sowieso niet in: die dragen het meeste risico en het minste nut. En alleen een echte zoekopdracht van een mens telt mee — de home, de reizenstrook en interne aanroepen niet, anders wijst het vraagbeeld naar binnen in plaats van naar de markt.
+
+**De lus is rond.** Een tekort in de Mall is een vierde bron voor de Kansenlaag van het stadsweefsel (`server/kern/stadsweefsel/kansen.js`, gekoppeld in `server/opzet/weefseldraden.js`). Een openstaande vacature zegt "hier is werk", een lege zoekopdracht zegt "hier is een markt" — twee verschillende tekorten die allebei in de kansenlaag horen. Begint er een zaak, dan staat haar aanbod via `kern/mall/aanbod.js` vanzelf in dezelfde zoekmachine, en wordt het tekort kleiner. Die laatste stap is geen belofte maar de bestaande leeslaag.
+
+Wat een ondernemer ziet (`POST /api/supplier/mall` → `vraag`) zijn de woorden uit zijn eigen vak en plaats, boven de drempel. Bewust géén bezoekersaantallen en géén conversie: dit zegt wat mensen zochten, niet wat zij deden.
+
+### De Supplier OS ↔ Mall-koppeling
+
+De Mall las tot nu toe alleen wat een zaak **is** (naam, adres, artikelen, prijzen) en niet wat zij op dit moment **doet**. Een gesloten kapper stond er net zo bij als een open kapper, een woensdagmiddag die de ondernemer in zijn eigen agenda blokkeerde was in de Mall niet te zien, en een artikel met voorraad nul verschilde in niets van een artikel dat op de plank ligt.
+
+`server/kern/mall/stand.js` haalt die stand op uit de systemen waar de ondernemer al werkt. Er wordt niets opgeslagen en geen enkele openingstijd opnieuw gedefinieerd: het is dezelfde rij.
+
+| wat | uit welk systeem |
+|---|---|
+| openingstijden, werkdagen, geblokkeerde dagen | `kern/vakwerk/agenda.js` (`s.vakUren`) |
+| vrije tijdvakken en tafels | `vakwerk.slots` en `foodcourt.tijden` |
+| aan/uit voor bestellen en reserveren | `kern/zaak.js` (`zaakFunctieAan`) |
+| voorraad | de varianten van de zaak zelf |
+
+**Wat we niet weten, zeggen we niet.** `openNu` geeft drie antwoorden: `true`, `false` en `null`. Null betekent "deze zaak heeft geen openingstijden vastgelegd" en is met opzet géén "open" — het filter *Nu open* laat zo'n zaak dus weg. Dat is eerlijker dan gokken, en voor de ondernemer meteen de reden om zijn uren wél in te vullen: iemand voor niets door de regen sturen is erger dan een treffer missen.
+
+**Kosten.** `openNu` is goedkoop en wordt voor de hele Mall berekend, zodat het filter over álles kan werken. Het eerstvolgende vrije tijdvak vraagt per zaak per dag de agenda op en wordt daarom alleen voor de zichtbare pagina opgehaald (hoogstens zestig kaarten), niet voor duizenden aanbod-objecten.
+
+**De andere kant: `POST /api/supplier/mall`.** Een ondernemer werkt in zijn eigen systeem en zag nooit wat daar aan de Mall-kant van terechtkomt — precies waar stille drift ontstaat. Deze weergave is een spiegel, geen dashboard: welk aanbod van u staat er, welke stand leest de Mall uit uw agenda en voorraad, en wat ontbreekt er nog (geen uren = niet in *Nu open*; geen werkgebied = de Mall neemt aan wat uw genre meebrengt). Bewust géén zoekvragen, bezoekersaantallen of conversie: dat is een leverancierdashboard en een eigen beslissing met een eigen privacyvraag.
+
+**De klok is die van de zaak** (`server/kern/tijdzone.js`). Zolang alles op servertijd rekende was *Nu open* in Ibiza een uur mis — de stilste fout die er is, want de klant staat voor een dichte deur en denkt dat de zaak gesloten is. De zone komt uit `s.tijdzone` (IANA), anders uit de hoofdzone van het land van de zaak, en die tweede zegt van zichzelf dat het een aanname is. `POST /api/supplier/tijdzone` zet hem; `auto` zet hem terug. Er wordt niets zelf uitgerekend: `Intl` heeft de volledige zonedatabase inclusief zomertijd aan boord.
+
+**Eén antwoord op "hoe laat is het bij deze zaak".** `zaakZone(s)` en `nuBijZaak(s)` worden gedeeld door de Mall, de vakwerk-agenda (`kern/vakwerk/agenda.js`) én de Food Court. Dat is geen netheid maar noodzaak: gaven die drie een verschillend antwoord, dan biedt de Mall een tijdvak aan dat het boekscherm niet kent. De landbepaling van de Reiswijzer wordt daarvoor één keer bij het opstarten geregistreerd (`kern/tijdzone.zetLandVind`, in `opzet/kernlaag4b.js`) — dezelfde overlay-gedachte waarmee de reisrijen op de landentabel worden gezet.
+
+De reparatie zit dus **bij de oorzaak en niet in de leeslaag**: eerder rekende alleen de Mall in de zone van de zaak en filterde `vakwerk.slots()` nog op servertijd. Dat viel niet op omdat de Mall er zijn eigen filter overheen legde — precies het soort gat waar LAT-regel 1 over gaat. De Food Court had daarbij een eigen variant: de datum stond in UTC en de tijd in de zone van de server, twee klokken in dezelfde functie.
+
+**Een kassasysteem van buiten** (`server/kern/mall/extern.js`, `POST /api/supplier/mall/sync`). Twee dingen mogen naar binnen en met opzet niet meer: **voorraad** per sku en **open/dicht**. Geen prijzen, geen artikelen, geen teksten — een koppeling die stilletjes productnamen kan overschrijven is een veel groter ding, met een eigen gesprek over wie wat mag.
+
+Drie regels die de koppeling veilig maken:
+
+1. **Houdbaarheid.** Een melding telt 30 minuten als actueel; daarna valt de Mall terug op wat zij zelf weet. Een kassa die stopt met melden is namelijk niet te onderscheiden van een kassa die "alles nog steeds op voorraad" bedoelt — behalve door de tijd. Zo houdt een uitgevallen koppeling nooit een winkel dagenlang open en gevuld.
+2. **De zaak wint van de kassa.** Zet de ondernemer zijn zaak in RTG op "neemt geen reserveringen aan", dan telt dat zwaarder dan wat het kassasysteem meldt. Een schakelaar die je omzet en die niets doet is erger dan geen schakelaar. Voorraad werkt andersom: daar is het externe getal het meest actueel, want daar loopt de verkoop.
+3. **Wat niet is aangenomen, wordt teruggemeld.** Regels zonder sku, een `open` die geen ja/nee is, sku's die hier niet bestaan: allemaal in het antwoord. Een koppeling die stil iets weggooit is niet te bouwen tegen.
+
+De kassa overschrijft de **weergave**, niet de administratie: de eigen voorraadrij van de zaak blijft staan zoals hij stond.
+
+### Kaart, land, filialen: waar iets is
+
+**De kaart** (`server/kern/mall/kaart.js`) is nadrukkelijk **geen straatkaart**. De CSP van dit huis staat geen vreemde tegelserver toe, en een kaartdienst inhuren betekent dat elke zoekopdracht — inclusief waar het lid staat — langs een andere partij komt. Wat er wel is: de onderlinge ligging, geprojecteerd op een vierkant vlak met de zoeker in het midden. Je ziet daarmee wat je van een kaart wilt weten in een zoeklijst (ligt dit bij elkaar, ligt dit bij mij) zonder iets naar buiten te sturen. De kaart gaat over **alle** treffers, niet over de zichtbare pagina, en treffers zonder coördinaat verdwijnen niet stilletjes maar komen terug als `zonderPunt` met een regel erbij: *"8 van de 40 treffers staan hier niet op."*
+
+**Het land** is de stap van een stad naar een werelddeel: filteren op `ES` zet Ibiza, Madrid en Marbella naast elkaar. Aanbod waarvan het land onbekend is valt weg — dat meenemen zou raden zijn. Het antwoord noemt zelf welke landen erin zitten (`landen`), zodat een scherm geen landenlijst hoeft te verzinnen.
+
+**Filialen** (`server/kern/mall/vestigingen.js`). Een zaak had precies één stad, en dus was de vestiging in Haarlem onvindbaar zodra het hoofdadres in Amsterdam stond. Er wordt géén kopie van het aanbod per vestiging gemaakt — dan staat hetzelfde brood twintig keer in de lijst en moet elke prijswijziging op twintig plaatsen landen. Het blijft één aanbod met een lijst plekken: `bedient()` is raak zodra één vestiging de plek bedient, `afstandTot()` meet naar de dichtstbijzijnde, en de zaak telt mee in elke stad waar zij staat. Wat dit **niet** modelleert: filialen met eigen prijzen, voorraden of openingstijden. Elk aanbod draagt daarom `perVestiging: false`.
+
+### Beoordelingen, bezorging, bewaren
+
+**Beoordelingen** bestonden al (1–5 sterren na afronding, lopende som in `reviewStats`). De Mall rekent er geen tweede gemiddelde naast uit: de som staat één keer in `server/kern/ervaring/rating.js` en wordt door zowel de reviewlaag als de Mall gelezen. RTG Thuis houdt reviews per *huis* bij en geeft daarom zijn eigen cijfer mee. **Een cijfer is geen keurmerk van RTG**, en dat staat er in de Mall bij.
+
+**Bezorging** leunt op de schakelaar die de zaak al had. De regel staat als pure functie in `server/kern/leverancier/bezorgregel.js`: bezorgen vraagt om *mogen* én *aanstaan*. Een zaak die de schakelaar uit heeft hoort niet in een bezorgfilter — anders stuurt de Mall iemand een bezorging in die niet komt.
+
+**Bewaren** (`server/kern/mall/bewaard.js`) is een systeemlijst in de gewone lijsten, geen tweede opslag. Omdat elke bewaarde regel zijn prijs en beschikbaarheid van het moment van bewaren meekrijgt, is het "prijsalarm" geen machinerie maar een vergelijking. En het is met opzet **geen melding**: geen push, geen e-mail, geen badge. Je ziet het wanneer je zelf kijkt, zonder aftelklok en zonder voorspelling dat iets duurder wordt. Regels van vóór deze versie hebben geen vastgelegde beschikbaarheid; daarover doet de laag géén uitspraak, maar ze worden wel geteld in `zonderVergelijking`.
+
+### Samengesteld aanbod en het bestellingenoverzicht
+
+**Collecties, bundels, evenementen en seizoenen** (`server/kern/mall/collecties.js`) zijn één ding met per soort een veld erbij: een benoemde set aanbod met een reden. De losse prijs van een bundel wordt **altijd uit het levende aanbod opgeteld en nooit bewaard** — een opgeslagen optelsom is morgen een leugen. En een bundel die een onderdeel mist is kapot: hij komt terug met `compleet: false`, zegt wat er ontbreekt en toont géén prijsvergelijk. Doorrekenen zonder onderdeel laat iemand een korting kopen die hij niet krijgt. Wat er geldt komt uit de **datum** en niet uit een vinkje "actief" — een vinkje dat niemand omzet is hoe een winteractie in juli blijft staan. Een zaak bundelt alleen haar eigen aanbod; het kantoor stelt over zaken heen samen.
+
+**Het bestellingenoverzicht** (`server/kern/mall/bestellingen.js`, `POST /api/mall/bestellingen`) doet wat de aanbodlaag doet, de andere kant op: uit vijf domeinen één overzicht van wat een lid lopen heeft. Er is **geen gezamenlijke afrekening** en die komt er niet: achter die regels zitten verschillende partijen met eigen bevestigingen. Elke regel wijst naar het domeinscherm dat hem beheert; er wordt hier niets geschreven. Een omvallende bron komt terug in `stuk` in plaats van als een korter lijstje, een onbekende status houdt zijn eigen naam, en `betaald` is `null` waar een bron het niet bijhoudt — `null` is niet `false`.
+
+### De zakelijke ingang en de concierge
+
+**De zakelijke Mall** (`POST /api/mall/zakelijk`) is geen tweede Mall maar dezelfde, anders gefilterd: alleen aanbod met een inkoopprijs, exclusief btw en met `btw:'ex'` erbij. De **pas** bepaalt dat, nooit het verzoek — een meegestuurd vinkje koopt geen inkoopprijs. Wie geen Business Pass heeft krijgt een 403 die naar een gesprek met RTG verwijst; de app mag zo'n pas nooit zelf verlenen.
+
+**De concierge** (`server/kern/mall/concierge.js`, `POST /api/mall/concierge`) is het enige stuk van de Mall waar een taalmodel bij komt, en de vorm is de beveiliging: het model vertaalt de zin naar **filters** en schrijft geen antwoordtekst. Wat het lid leest is opgeteld uit de echte treffers. Een model dat over aanbod mag antwoorden verzint vroeg of laat een restaurant, een prijs of een beschikbaarheid — en juist bij een bevestigde boeking, een echt hotelmerk als "partner" of een belofte over een pas is die schade niet terug te draaien.
+
+Drie dingen staan daarom in code en niet in de prompt:
+
+1. **Vragen over een pas gaan niet naar het model.** Lifestyle, Business, de ballotage en De Salon worden vóór de AI-aanroep herkend en beantwoord met een vaste doorverwijzing naar een mens. De regel is afgebakend: *"beachclub met toegang tot het strand"* is een gewone zoekvraag.
+2. **Wat uit het model komt is invoer.** Een verdieping of type dat niet bestaat wordt weggegooid én gemeld in `genegeerd`; "morgen" wordt niet tot een datum geraden. Een half begrepen vraag mag er niet uitzien als een goed begrepen vraag.
+3. **Zonder sleutel geen verzonnen antwoord.** De zin gaat als gewone zoektekst door dezelfde zoeklaag, en dat staat in het antwoord.
+
 ### De wallet en de ledenpas
 
 **apps/wallet.html** is alles wat je bij je draagt. Bovenaan ligt je **ledenpas**: codenaam, lidnummer, welke pas en een QR met je lidnummer (onze eigen codec, `shared/qr.js` + `shared/qrteken.js`). Daaronder je passen, tickets, sleutels, feestmunten en klantenkaarten (`/api/wallet`, `server/kern/wallet.js`). De pas stond vroeger op het beginscherm van de app; daar staat nu de klok.

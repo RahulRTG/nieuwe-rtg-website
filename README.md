@@ -1191,6 +1191,28 @@ Bewezen door `test/gastroomservice.test.js` (zeven toetsen, kamer en club) en `t
 
 Wat er **nog niet** is, en dat is een grens en geen omissie: er is nog geen Rahul-conciërge op deze laag, geen gastscherm voor bezorgen, roomservice of foodcourt (`gast.html` dekt de tafel; de rest is API), geen service-request-kanaal, geen koppeling naar Work OS voor uitzonderingen, en beleid is één zaak per keer — multi-location en holdings raken het datamodel en zijn een eigen verbouwing.
 
+### RTG Evening OS (een avond als plan, niet als product)
+
+`server/kern/avond/` + `/api/avond/...`. De vraag die hieraan voorafging was niet "welke functie ontbreekt" maar "waarom heeft niemand dit eerder zo gebouwd". Het antwoord dat deze laag geeft: **een avond is geen app maar een plan over bestaande boekingen heen.** Een stap wijst naar een reservering in `db.data.reserveringen`, een rit in de mobiliteitskern, een rsvp bij een event — en bezit er geen kopie van. Dezelfde truc als het `mandjeId` van de foodcourt: één veld dat zegt "deze horen bij elkaar", en verder niets (LAT-regel 4).
+
+Wat een avond wél bezit zijn drie beloften, en die staan als **som** in de code en niet als tekst:
+
+1. **De klok klopt.** Elke stap begint nadat de vorige is afgelopen, met de reistijd ertussen, en het geheel eindigt vóór het tijdstip waarop je thuis wilt zijn. Haalt een plan dat niet, dan wordt het **geweigerd** met hoeveel het te laat is — niet geleverd met een sterretje.
+2. **Het budget klopt.** Per persoon, inclusief vervoer, met ruimte voor fooi (die nooit wordt voorgevuld — dezelfde regel als in de horeca-kern). Een budget dat pas aan het eind blijkt te zijn overschreden, is geen budget.
+3. **Niets is geboekt tot het geboekt is.** Elke stap draagt zijn eigen staat: `voorstel`, `aangevraagd`, `bevestigd`, `mislukt`. De staat van de avond volgt daaruit en wordt niet apart gezet, dus er kan nooit "rond" boven een plan staan waarvan de helft nog moet worden bevestigd. Een **tafel belooft deze laag nooit**: het lid vraagt aan, de zaak beslist — die regel stond al in de reserveringslaag en wordt hier niet omzeild omdat "geregeld" prettiger klinkt.
+
+De samensteller (`samenstellen.js`) stelt **alleen voor wat bestaat**. Geen verzonnen cocktailbar, geen taxi van een vervoerder die we niet hebben: kan een stap niet worden gevuld, dan blijft hij leeg met de reden erbij. Elke keuze draagt zijn grond mee (`uitleg`) en de duurschattingen staan er als **aanname** bij, want een planner die doet alsof hij weet dat een diner 97 minuten duurt is nauwkeuriger dan hij kan zijn. En er wordt bewust geen urgentie gemaakt: geen "nog twee tafels!", niets voorgeselecteerd wat geld kost, en een plan verloopt niet.
+
+**De Hospitality DNA** (`voorkeuren.js`) is de laag eronder: wat een zaak van je mag weten. Delen gaat **per soort** (tafelvoorkeur, drank, sfeer, toegankelijkheid, gelegenheden) en niet met één schakelaar, want je tafelvoorkeur en je verjaardag zijn niet hetzelfde soort gegeven. Drie standen: `nooit`, `gevraagd` (alleen als je het deze keer meegeeft) en `altijd`. Toegankelijkheid staat als enige standaard open — dat is de enige soort waar níét delen de gast schaadt in plaats van beschermt.
+
+- **Het zorgprofiel blijft waar het staat.** Allergenen, dieet en medische punten zitten al in `kern/gastzorg.js` met hun eigen toestemmingsregel; die wordt hier gelezen en niet gekopieerd. Een tweede allergie-administratie is precies de fout die je bij allergieën niet wilt maken.
+- **Een uitzondering per zaak kan alleen smaller maken.** Ruimer vragen legt niets vast en zegt waarom. Dat was eerst een clamp die de smallere waarde bewaarde — een val, want dan stond er een uitzondering die de gast nooit had gekozen, en die bleef hangen zodra hij de soort later ruimer zette.
+- **RTG leidt geen voorkeuren af uit je gedrag.** Wat hier staat heb je zelf opgeschreven, en dat verschil staat als zin in het profiel. Een systeem dat uit je bestellingen afleidt dat je van pittig houdt en dat doorgeeft aan een zaak, is iets anders dan een gast die zijn voorkeur opschrijft.
+
+Bewezen door `test/avond.test.js` (elf toetsen: de klok en het budget weigeren echt, een tafel komt nooit verder dan `aangevraagd`, de aangevraagde reservering staat in de gewone reserveringenlijst, `gevraagd` lekt niet zonder te vragen, en een avond van een ander is niet op te vragen). Zes mutaties nagetrokken, alle zes raak.
+
+Wat er **nog niet** is: vervoer en uitgaan hebben nog geen aanvraagweg vanuit de planner (die stappen blijven `voorstel` mét de reden), er is nog geen scherm, en de rest van de lijst — live drukte, weer, gezelschapsafstemming, herinneringen — staat er niet. Dit is de bodem waarop dat kan.
+
 ### RTG Mobility OS (de vervoerskern)
 
 `server/kern/mobiliteit/` + `/api/mob/...`, `/api/staff/mob/...`,

@@ -74,6 +74,12 @@
       "werkplekkenBijLogin",
       "wisselCodeIn"
     ],
+    "avond": [
+      "findSupplier",
+      "liveCodename",
+      "reserveerTafel",
+      "zorgVoor"
+    ],
     "baby": [
       "baby"
     ],

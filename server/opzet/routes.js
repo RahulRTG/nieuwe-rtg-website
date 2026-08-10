@@ -81,11 +81,10 @@ module.exports = function hangRoutesOp(kern) {
   /* SCIM: de provisioning-deur voor de IdP van een klant. Eigen auth (een sleutel
      per organisatie), dus bewust naast de gewone routes en niet in een domein. */
   require('../routes/scim')(grens('scim'));
-  /* Het Hospitality Guest OS: de gastkant van de horecatoren. Bewust NAAST de
-     domeinen en niet erin -- de poort is de tafelsleutel uit de QR en niet een
-     leden- of leverancierssessie, dus een gast aan tafel 12 moet hier ook
-     binnenkomen als het member-domein niet meedraait. */
+  // Guest OS: de poort is de tafel-QR en geen sessie, dus naast de domeinen (zie routes/gast.js).
   require('../routes/gast')(grens('gast'));
+  // RTG Evening OS: een avond als plan over meerdere domeinen, dus naast de domeinen.
+  require('../routes/avond')(grens('avond'));
   require('../routes/meting')(grens('meting'));
   require('../routes/algpin')(grens('algpin'));
   require('../routes/werkbeleid')(grens('werkbeleid'));

@@ -1,0 +1,100 @@
+/* RTG Materialen & Licht -- de vijf materialen als code (MATERIAAL.md).
+
+   Een materiaal is hier nooit EEN waarde. Elk draagt drie lagen:
+     -basis   de kleur van het materiaal zelf
+     -glans   hoe licht erop valt: richting en zachtheid
+     -rand    wat de rand met licht doet
+   Een vlak dat alleen -basis gebruikt is geverfd karton; pas met glans en rand
+   wordt het een materiaal.
+
+   Deze laag komt NA rtg-ui.css en rtg-ontwerp.css. Hij zet de bestaande
+   merktokens niet opnieuw -- die blijven waar ze wonen (LAT.md regel 4) -- maar
+   voegt toe waar die geen antwoord op hebben: waarvan een vlak gemaakt is. */
+
+:root{
+  /* ---- Pearl: gepolijst keramiek, levend wit ----------------------------
+     WARM en nooit blauw: in elke toon geldt rood >= groen >= blauw. Een koel
+     wit is hier niet een andere smaak maar het verkeerde materiaal. */
+  --pearl-basis:#F4F0E9;
+  --pearl-diep:#E8E2D7;
+  --pearl-glans:linear-gradient(160deg,#FBF8F3 0%,#F4F0E9 46%,#EDE7DC 100%);
+  --pearl-rand:rgba(120,108,88,0.22);
+  --op-pearl:#1A1713;          /* wat er leesbaar op staat */
+
+  /* ---- Gold: 18 karaat geborsteld champagnegoud -------------------------
+     Mat en diep, geen spiegel en geen glitter. Het verloop heeft EEN
+     lichtrichting: geborsteld metaal heeft er een, glitter heeft er tien. */
+  --gold-basis:#B99A55;
+  --gold-diep:#8E7439;
+  --gold-glans:linear-gradient(145deg,#D6BC82 0%,#B99A55 52%,#8E7439 100%);
+  --gold-rand:rgba(214,188,130,0.55);
+  --op-gold:#171308;
+
+  /* ---- Onyx: pianolak ---------------------------------------------------
+     Niet egaal. Egaal zwart is verf; pianolak houdt een nauwelijks zichtbaar
+     verloop en een rand die licht vangt. */
+  --onyx-basis:#0C0C0B;
+  --onyx-diep:#050505;
+  --onyx-glans:linear-gradient(168deg,#171614 0%,#0C0C0B 58%,#070706 100%);
+  --onyx-rand:rgba(255,255,255,0.09);
+  --op-onyx:#F4F0E9;
+
+  /* ---- Bordeaux: fluweel ------------------------------------------------
+     ABSORBEERT licht. Bijna zwart tot er licht op valt; dan pas zie je rood.
+     Daarom is de basis fors donkerder dan het oude accent (#C23A5E was rood,
+     dit is wijn). */
+  --bordeaux-basis:#3D0F1E;
+  --bordeaux-diep:#240A13;
+  --bordeaux-glans:linear-gradient(155deg,#5A1A2C 0%,#3D0F1E 55%,#240A13 100%);
+  --bordeaux-rand:rgba(122,32,58,0.42);
+  --op-bordeaux:#F4F0E9;
+
+  /* ---- Royal: satijn ----------------------------------------------------
+     Het ENIGE materiaal dat koel mag zijn. Koningsblauw, geen Microsoft-blauw:
+     het moet als instituut voelen. */
+  --royal-basis:#1B2F5E;
+  --royal-diep:#101E3F;
+  --royal-glans:linear-gradient(150deg,#2A4680 0%,#1B2F5E 55%,#101E3F 100%);
+  --royal-rand:rgba(74,110,178,0.38);
+  --op-royal:#F0F2F7;
+
+  /* ---- de twee letterrollen --------------------------------------------
+     Alles loopt hierdoorheen, zodat het wisselen van de werkletter later EEN
+     regel is in plaats van een sweep over tweehonderd pagina's. Inter is de
+     tijdelijke invulling van de interface-rol: een grotesk, alleen geen
+     geometrische (MATERIAAL.md, "de grens, eerlijk benoemd"). */
+  --rtg-display:'Bodoni Moda',Georgia,serif;
+  --rtg-interface:'Inter',system-ui,sans-serif;
+}
+
+/* ------------------------------------------------------- de materiaalvlakken --
+   Een vlak kiest een MATERIAAL en geen kleur: class="rtg-vlak-onyx". */
+.rtg-vlak-pearl,
+.rtg-vlak-gold,
+.rtg-vlak-onyx,
+.rtg-vlak-bordeaux,
+.rtg-vlak-royal{
+  /* geen slagschaduw: diepte komt uit de rand en de glans, niet uit een wolk
+     onder een kaart (MATERIAAL.md, "licht is een eigenschap") */
+  box-shadow:none;
+  border-style:solid;
+  border-width:1px;
+}
+.rtg-vlak-pearl   {background:var(--pearl-glans);   border-color:var(--pearl-rand);   color:var(--op-pearl);}
+.rtg-vlak-gold    {background:var(--gold-glans);    border-color:var(--gold-rand);    color:var(--op-gold);}
+.rtg-vlak-onyx    {background:var(--onyx-glans);    border-color:var(--onyx-rand);    color:var(--op-onyx);}
+.rtg-vlak-bordeaux{background:var(--bordeaux-glans);border-color:var(--bordeaux-rand);color:var(--op-bordeaux);}
+.rtg-vlak-royal   {background:var(--royal-glans);   border-color:var(--royal-rand);   color:var(--op-royal);}
+
+/* De gouden rand als focus: een dunne lijn die licht vangt, geen gloed. */
+.rtg-licht{position:relative;}
+.rtg-licht::after{
+  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  border:1px solid transparent;
+  transition:border-color var(--rtg-tijd-kort,120ms) var(--rtg-veer,ease);
+}
+.rtg-licht[data-actief]::after{border-color:var(--gold-rand);}
+
+/* ------------------------------------------------------------- typografie -- */
+.rtg-display{font-family:var(--rtg-display);}
+.rtg-interface{font-family:var(--rtg-interface);}

@@ -22,6 +22,17 @@ Context Pane, Command Palette). In één zin: **van veraf classy, van dichtbij
 extreem krachtig.** Lees die vóór je aan een scherm begint; `test/ontwerp.test.js`
 handhaaft wat machinaal te handhaven is.
 
+**`MATERIAAL.md` is de materialenleer** — een luxemerk denkt niet in kleuren
+maar in materialen en licht. Vijf materialen met elk een basis, een glans en een
+rand: Pearl (gepolijst keramiek, warm en nooit blauw), Gold (geborsteld
+champagnegoud, mat), Onyx (pianolak, nooit egaal), Bordeaux (fluweel, absorbeert
+licht) en Royal (satijn, als enige koel). Plus de twee letterrollen. Kies een
+materiaal, geen kleur; `test/materiaal.test.js` meet of het er nog een is.
+
+**`WERKRUIMTE.md` is het desktopparadigma** — RTG Desktop is not a collection of
+pages, it is a movable operational space. Surfaces met een gouden greep rond een
+centrale console, en Context Linking dat alleen een verwijzing rondstuurt.
+
 **`LAT.md` is de technische lat** — negen regels die allemaal uit een fout komen die hier écht is gemaakt, met per regel wat hem handhaaft en waar er alleen op mensen wordt vertrouwd. Lees die vóór je code schrijft of repareert. De belangrijkste twee: repareer de oorzaak en niet het symptoom, en trek elke bewering na met een mutatie (een toets die je niet hebt zien zakken is geen toets). LAT.md gaat over de code, CLAUDE.md over het merk.
 
 ## Structuur en starten (kort)

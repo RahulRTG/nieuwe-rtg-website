@@ -2635,6 +2635,69 @@ toelaten, de herwaardering bij ophoging weghalen (twee keer, aan beide kanten
 van de naad), de status zetten zonder naar de goedkeuringen te kijken, en een
 regel toelaten voor een soort die nergens wordt afgedwongen.
 
+#### Instroom: de stap die het systeem ziet, wordt gemeten
+
+Er stond een uitstroomproces met zes stappen en geen instroomproces. Dat is de
+verkeerde helft om te hebben: bij vertrek is er een aanleiding, bij aankomst
+niet — de nieuwe medewerker zit er gewoon, en wat er niet gebeurt merkt niemand
+tot het misgaat.
+
+`server/bedrijf/indienst.js` is de spiegel, met één verschil dat de hele reden
+is dat hij bestaat: **een stap die het systeem zelf kan zien, wordt gemeten en
+niet afgevinkt**. Bij de uitstroom weigert een vinkje zolang de meting hem
+tegenspreekt; hier bestaat het vinkje niet eens. Een vinkje naast een meting is
+dezelfde waarheid op twee plekken, en op de dag dat ze uiteenlopen gelooft
+niemand meer welke van de twee klopt.
+
+| Stap | Aard |
+|---|---|
+| functie en afdeling ingevuld | gemeten |
+| rollen toegekend | gemeten |
+| werkplek uitgegeven | gemeten (uit de IT-inventaris) |
+| welkomstgesprek gevoerd | mensenwerk |
+| veiligheids- en privacy-instructie | mensenwerk |
+| eerste weken ingepland | mensenwerk |
+
+Dat is wat "niemand hoeft dit te starten" hier betekent: niet dat een automaat
+het werk doet, maar dat het werk zichzelf meldt zodra het gebeurt. IT geeft een
+laptop uit in een heel andere module, en de stap staat vanzelf op groen — met de
+meting erbij, zodat "nog niet" altijd een reden heeft. Wat dit huis níét kan
+(een laptop bestellen, een badge maken, salaris aanmelden) is mensenwerk en zegt
+dat ook; een stap die doet alsof is erger dan een stap die eerlijk is.
+
+Getoetst in `test/werkindienst.test.js` (4). Vier mutaties, alle vier raak.
+
+#### Gezondheid en de dagbriefing: één cijfer dat niet liegt
+
+`server/bedrijf/gezondheid.js` geeft één cijfer met de reden eronder —
+`/api/bedrijf/gezondheid` en `/api/bedrijf/dagbeeld`. Het is de makkelijkste
+plek in dit huis om een getal te verzinnen dat als feit gaat rondlopen, dus:
+
+- **Hij meet niets zelf.** Elk signaal leest het directiebeeld dat er al was.
+  Een gezondheidscijfer met een eigen meting zegt op een dag iets anders dan het
+  scherm waar het over gaat — dezelfde reden die `kern/command/alarm.js` opgeeft.
+- **Elk signaal weegt even zwaar, en dat staat erbij.** Gewichten zijn een
+  mening, en een mening die als getal is vermomd valt niet meer te bespreken.
+- **Wat niet gemeten kan worden, telt niet als gezond.** Een lege werkruimte
+  krijgt geen 100% maar **geen cijfer**; anders is de score het hoogst op de dag
+  dat er nog niets is. De noemer staat er altijd bij: groen van *meetbaar*.
+- **Het cijfer komt nooit alleen** — wat eraf gaat staat er met naam, met het
+  gemeten getal en met waar je het repareert.
+
+De dagbriefing is hetzelfde in zinnen, en die zinnen komen **niet** uit een
+taalmodel maar uit dezelfde signalen met dezelfde getallen. Een briefing die
+iets anders zegt dan het bord waar hij op leunt, is precies wat een directie
+leert om hem niet te lezen. Wat niet gemeten kon worden staat eronder en niet
+tussen het advies: geen signaal is geen goed nieuws.
+
+**Twee signalen zijn er bij het schrijven uitgegooid**, en dat is dezelfde fout
+die LAT-regel 9 over toetsen maakt. "Teruggedraaide productiereleases" telt de
+historie — eenmaal rood, nooit meer groen, dus dat meet een litteken en geen
+gezondheid. En "opzegdag voorbij" bestond niet als meting, dus hij zou altijd op
+nul staan: een signaal dat nooit kan uitslaan koopt vertrouwen dat er niet is.
+
+Getoetst in `test/werkgezondheid.test.js` (5). Vier mutaties, alle vier raak.
+
 ### RTG Podium: werelden op één motor
 
 Het Podium was één product achter één deur: geverifieerd paspoort en 18 jaar, voor iedereen die wilde kijken. Dat maakte de voorziening onbruikbaar voor alles wat die deur niet nodig heeft — een schoolstream, een productlancering, een concert — terwijl de techniek eronder (de relay-boom over kijkers, de chat, RTG Pay, de goedkeuring door een mens) voor al die dingen dezelfde is.

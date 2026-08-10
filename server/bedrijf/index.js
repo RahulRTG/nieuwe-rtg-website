@@ -99,67 +99,13 @@ module.exports = (kern) => {
         : null });
   });
 
-  /* ---------- leden ----------
-     Aanmelden kan iedereen; TOEGEVEN doet de werkruimte. Zonder die tweede
-     stap is een werkruimte een open deur met een lijst erachter. */
-  app.post('/api/bedrijf/lid/aanmeld', (req, res) => {
-    const w = ruimteVan(req);
-    if (!w) return res.status(404).json({ error: 'Die werkruimte kennen we niet.' });
-    const naam = schoon(req.body.naam, 60);
-    if (!naam) return res.status(400).json({ error: 'Onder welke naam werkt u hier?' });
-    const l = { id: rid(4), naam, functie: schoon(req.body.functie, 60) || null,
-      afdeling: schoon(req.body.afdeling, 40) || null, extern: req.body.extern === true,
-      rollen: [], status: 'wacht', token: crypto.randomBytes(24).toString('hex'), at: nu() };
-    w.leden[l.id] = l;
-    save();
-    res.json({ ok: true, lidId: l.id, lidToken: l.token, status: l.status,
-      let: 'U staat op de lijst maar bent nog niet toegelaten. Tot iemand met het beheer-token u toelaat, werkt dit token nergens voor.' });
-  });
-
-  app.post('/api/bedrijf/lid/besluit', (req, res) => {
-    const w = beheerVan(req, res); if (!w) return;
-    const l = eigenVeld(w.leden, String(req.body.lidId || ''));
-    if (!l) return res.status(404).json({ error: 'Dat lid kennen we niet.' });
-    const akkoord = req.body.akkoord === true;
-    if (!akkoord) {
-      l.status = 'afgewezen'; l.token = null; l.afgewezenAt = nu();
-      save();
-      return res.json({ ok: true, lid: { id: l.id, status: l.status } });
-    }
-    l.status = 'actief'; l.toegelatenAt = nu();
-    save();
-    res.json({ ok: true, lid: { id: l.id, naam: l.naam, status: l.status, rollen: l.rollen } });
-  });
-
-  /* Uit dienst: EEN handeling die de sleutel intrekt en het spoor laat staan.
-     Het IT-deel (apparaten terug, accounts blokkeren) hangt hier later aan;
-     de plek waar dat gebeurt is deze, en niet een tweede knop ergens anders. */
-  app.post('/api/bedrijf/lid/uit-dienst', (req, res) => {
-    const w = beheerVan(req, res); if (!w) return;
-    const l = eigenVeld(w.leden, String(req.body.lidId || ''));
-    if (!l) return res.status(404).json({ error: 'Dat lid kennen we niet.' });
-    if (l.status === 'uit dienst') return res.status(409).json({ error: 'Dit lid staat al uit dienst.' });
-    const reden = schoon(req.body.reden, 120);
-    if (!reden) return res.status(400).json({ error: 'Noteer waarom dit lidmaatschap eindigt; een lege uitstroom is later niet te reconstrueren.' });
-    l.status = 'uit dienst'; l.token = null; l.uitReden = reden; l.uitAt = nu();
-    l.laatsteDag = schoon(req.body.laatsteDag, 10) || dag();
-    save();
-    res.json({ ok: true, lid: { id: l.id, naam: l.naam, status: l.status, laatsteDag: l.laatsteDag },
-      let: 'De sleutel is per direct ingetrokken. Wat er van deze persoon in de werkruimte staat blijft staan, met zijn naam erbij -- werk uitwissen maakt een dossier onleesbaar.' });
-  });
-
-  app.post('/api/bedrijf/leden', (req, res) => {
-    const w = beheerVan(req, res); if (!w) return;
-    const rijen = Object.values(w.leden)
-      .filter(l => !req.body.status || l.status === String(req.body.status))
-      .map(l => ({ id: l.id, naam: l.naam, functie: l.functie, afdeling: l.afdeling,
-        extern: l.extern, rollen: l.rollen, status: l.status, at: l.at }));
-    res.json({ ok: true, aantal: rijen.length, leden: rijen,
-      wacht: Object.values(w.leden).filter(l => l.status === 'wacht').length });
-  });
+  /* De ledenroutes staan in ./leden.js -- dit bestand ging door de mounts
+     over de 10 kB van keuringsregel 13, en de naad is echt: hier staat de
+     werkruimte, daar staan de mensen erin. */
 
   // de deellagen; de volgorde is gedrag (rollen zet de poort die de rest
   // gebruikt, en start zet de blokkenregistratie waar de rest zich op meldt)
+  require('./leden')(sctx);
   Object.assign(sctx, require('./rollen')(sctx));
   require('./start')(sctx);
   Object.assign(sctx, require('./project')(sctx));
@@ -172,6 +118,7 @@ module.exports = (kern) => {
   require('./vlag')(sctx);
   Object.assign(sctx, require('./it')(sctx));
   require('./uitdienst')(sctx);
+  Object.assign(sctx, require('./indienst')(sctx));
   Object.assign(sctx, require('./contract')(sctx));
   // Regels + handhaving: na contract.js, en contract.js roept ze aan via sctx.
   Object.assign(sctx, require('./regels')(sctx));
@@ -181,6 +128,8 @@ module.exports = (kern) => {
   require('./postbrug')(sctx);
   require('./mijn')(sctx);
   Object.assign(sctx, require('./beeld')(sctx));
+  // Gezondheid en dagbriefing: lezen het directiebeeld, meten zelf niets.
+  Object.assign(sctx, require('./gezondheid')(sctx));
   // Besluitgeheugen: na besluit.js, en voor inzicht.js (dossier leest het).
   Object.assign(sctx, require('./geheugen')(sctx));
   Object.assign(sctx, require('./geheugenlezen')(sctx));

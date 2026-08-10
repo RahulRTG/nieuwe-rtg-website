@@ -90,9 +90,34 @@ een moment waarop de helft werkt.
 
 | Wereld | Stand |
 |---|---|
-| **RTG Geld** | ✅ samengevoegd: tien pagina's werden tien standen van `apps/geld.html` (veilig-patroon: `apps/geld/schil.js` + een module per stand); de oude paden leiden om |
+| **RTG Geld** | ✅ samengevoegd: tien pagina's werden tien standen van `apps/geld.html` (veilig-patroon: `apps/geld/schil.js` + een module per stand); de oude paden leiden om. Daarna als EERSTE wereld het volle patroon hieronder (GELD.md) |
 | RTG Veilig | ✅ was al samengevoegd (vier standen) |
 | de overige zes | voordeur staat; het samenvoegen van de secties volgt per wereld |
+
+### Het wereldpatroon: samenvoegen is stap een, niet de bedoeling
+
+Een wereld is pas af als hij zijn onderwerp BEGRIJPT. Acht schillen om
+tachtig pagina's is opruimen; acht werelden die elk hun domein snappen is een
+platform. RTG Geld heeft de vorm sinds 10 augustus 2026 werkend en getoetst,
+en elke volgende wereld krijgt dezelfde vijf lagen:
+
+| Laag | Wat | De regel die hem eerlijk houdt |
+|---|---|---|
+| **graaf** | projectie over de domeinen, plus vooruitblik | leest alleen, bezit niets, telt nooit zelf op wat een domein al optelt |
+| **beleid** | de regels van de mens zelf | het systeem handelt binnen beleid, nooit naar eigen inzicht |
+| **cockpit** | het command center | uitzonderingsgestuurd; rust is een uitkomst, geen leegte |
+| **Rahul** | een gegronde stem | rekent met echte cijfers en noemt bij elk antwoord zijn bronnen |
+| **actielog** | het geheugen | groeit aan, wordt nooit herschreven |
+
+Wat per wereld verschilt is niet de vorm maar het WERKWOORD dat de vierde
+laag mag. RTG Geld voert uit binnen regels en binnen het eigen tegoed
+(GELD.md par. 3: geld verlaat het huis nooit vanzelf). RTFoundation voert
+niets uit en opent alleen (LEVEN.md par. 2.2). Wie een nieuwe wereld bouwt,
+kiest dat werkwoord bewust en schrijft het op voordat hij begint.
+
+De diepte-documenten per wereld: **GELD.md** (financieel besturingssysteem,
+fase 1 af) en **LEVEN.md** (RTFoundation als Life OS, de grenzen van een
+platform dat bij de geboorte begint).
 
 ---
 

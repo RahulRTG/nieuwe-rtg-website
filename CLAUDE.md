@@ -12,7 +12,18 @@ Website + ledenportaal + app (PWA) voor Rahul Travel Group (RTG) — een members
 een nieuwe app aanmaakt. In één zin: super apps vervangen geen domeinsoftware,
 ze orkestreren die; alleen apps die dezelfde kern, data én workflow dupliceren
 mogen samensmelten. De toetsvraag is niet "kan dit in een super-app?" maar "is
-dit een zelfstandige capability, of een tweede ingang naar dezelfde?".
+dit een zelfstandige capability, of een tweede ingang naar dezelfde?". Daar
+staat ook **het wereldpatroon**: samenvoegen is stap een, niet de bedoeling —
+een wereld is pas af als hij zijn onderwerp begrijpt (graaf, beleid, cockpit,
+gegronde Rahul, actielog).
+
+**`GELD.md` en `LEVEN.md` zijn de diepte-documenten per wereld.** GELD.md
+maakt van RTG Geld een financieel besturingssysteem; de harde grens daar is
+dat geld het huis nooit vanzelf verlaat. LEVEN.md maakt van RTFoundation een
+Life OS dat een mens vanaf de geboorte begeleidt — lees vóór je daaraan werkt
+vooral paragraaf 2, de grenzen: een kind is geen profiel, nooit sturen maar
+openen, en de bijdrage-spiegel is nooit vergelijkend. Waar een functie botst
+met een grens, vervalt de functie.
 
 **`ONTWERP.md` is het RTG Design System 2.0** — de vormtaal: merk-elementen
 tegenover werk-elementen (Bodoni is ceremonieel en staat op een gesloten lijst

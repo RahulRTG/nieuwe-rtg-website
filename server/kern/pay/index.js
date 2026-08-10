@@ -147,7 +147,11 @@ module.exports = ({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, sch
     betaaldienstKosten: betaaldienstKosten || (() => 0),
     MIN_CENTEN, MAX_CENTEN, KASCODE_MS, KASCODE_MAX
   };
-  const api = { MIN_CENTEN, MAX_CENTEN, boek, boekAsync, geldModus, sluitcontrole, laadOp, oplaadAfronden, saldoVan, koppelBank, reconcileVanMotor };
+  /* rekLid hoort bij het koppelvlak: de vorm 'lid:' + codenaam is een regel
+     van dit domein, en wie hem nodig heeft (ov, mobiliteit, geldwereld) tikte
+     hem tot nu toe letterlijk na. Een naamregel die op vier plekken staat, is
+     op dag een al drie keer bijna fout gegaan. */
+  const api = { MIN_CENTEN, MAX_CENTEN, boek, boekAsync, geldModus, sluitcontrole, laadOp, oplaadAfronden, saldoVan, rekLid, koppelBank, reconcileVanMotor };
   // schaduw-stand voor het statusbord (drift-detector): vergelijkt de JS-stand
   // met de Rust-motor -- niet alleen de som maar ook een vingerafdruk over ALLE
   // saldi, zodat per-rekening-drift die de som mist er alsnog uit komt. De afdruk

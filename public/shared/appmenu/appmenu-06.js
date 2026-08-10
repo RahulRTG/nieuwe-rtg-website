@@ -48,10 +48,24 @@
     return cel;
   }
 
+  /* Staat het er ECHT? offsetParent is null zodra een voorouder display:none of
+     hidden is. Twee keer heeft die vraag hier een gat opgeleverd, allebei van
+     dezelfde soort: de knop was aanwezig, en onzichtbaar.
+       - techniek.html en foundation/gevoel.html hebben een `header.kop` binnen
+         een blok dat pas na inloggen verschijnt;
+       - gemeentepda.html en leverancier-rtmail.html hebben wel een `.ios-nav`
+         maar die staat er niet. Vroeger viel de knop daar door naar zwevend
+         omdat ik op `.ios-nav-acties` zocht en dat element er niet was; sinds
+         ik op `.ios-nav-rij` zoek bestaat hij wel, en verdween de knop in een
+         verborgen balk.
+     Een aanwezige knop die je niet ziet is erger dan geen knop: de toets die
+     alleen op bestaan kijkt, kleurt groen. */
+  function zichtbaar(e) { return !!(e && (e.offsetParent || e.getClientRects().length)); }
+
   function hangOp() {
     knop.classList.remove('amn-zweef');
     var rij = d.querySelector('.ios-nav .ios-nav-rij');
-    if (rij) { linkerCel(rij).insertBefore(knop, linkerCel(rij).firstChild); return; }
+    if (rij && zichtbaar(rij)) { linkerCel(rij).insertBefore(knop, linkerCel(rij).firstChild); return; }
 
     /* Geen iOS-balk? Dan de eigen kopbalk van de pagina, vooraan.
        Een echte <header> heeft al een eigen rij, dus daar kan de knop zo in.
@@ -61,7 +75,9 @@
        is wat er gebeurde toen ik hem van rechts naar links verhuisde. Zwevend
        linksboven is alleen veilig als er links bovenin niets staat.
        Daarom krijgen die twee samen een rij. */
-    var kop = d.querySelector('header.kop, header.merkkop, body > header');
+    var kop = null;
+    var koppen = d.querySelectorAll('header.kop, header.merkkop, body > header');
+    for (var i = 0; i < koppen.length; i++) { if (zichtbaar(koppen[i])) { kop = koppen[i]; break; } }
     if (kop) { kop.insertBefore(knop, kop.firstChild); return; }
 
     /* De terugweg staat lang niet altijd direct onder de body -- op
@@ -70,7 +86,7 @@
        werkelijk bovenaan staat, want een terugweg onderaan de pagina is geen
        kopbalk. */
     var terug = d.querySelector('.rtg-terug');
-    if (terug && terug.getBoundingClientRect().top > 220) terug = null;
+    if (terug && (!zichtbaar(terug) || terug.getBoundingClientRect().top > 220)) terug = null;
     if (terug && terug.parentNode) {
       var rijtje = d.createElement('div');
       rijtje.className = 'amn-koprij';

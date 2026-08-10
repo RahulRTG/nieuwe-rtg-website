@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 725 bestanden en 4105 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 726 bestanden en 4113 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,13 +12,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 725 |
-| losse beweringen (`test(...)`) | 4105 |
+| toetsbestanden | 726 |
+| losse beweringen (`test(...)`) | 4113 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 521 |
 | **overleefd**: geen mutatie kreeg hem rood | 12 |
 | niet te meten (al rood, geen module gevonden, ...) | 16 |
-| alleen in de kop *genoemd*, nog niet gemeten | 31 |
+| alleen in de kop *genoemd*, nog niet gemeten | 32 |
 | niets van beide | 145 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-635 bestanden, 3946 beweringen.
+636 bestanden, 3954 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -200,6 +200,7 @@ toets omvalt.
 | `geheugen.test.js` | 9 | gezakt op `===->!==` | Test voor de GEHEUGEN-motor (server/db/geheugen.js): de volledig in-memory runtime-engine met versleutelde, incrementele, brok-per-collectie-opslag. Toetst het beloofde: correctheid (round-trip), privacy (niets... |
 | `geld-conservatie-last.test.js` | 1 | gezakt op `liegpoort /api/` | Geld-conservatie onder GELIJKTIJDIGE, ECHTE schrijfpaden. De beproeving zaait haar activiteit rechtstreeks in de opslag (snel, maar het toetst geen functionele juistheid van de echte betaalroute). |
 | `geldregie.test.js` | 3 | gezakt op `liegpoort /api/` | De geld-regie van de boardroom: RTG bepaalt de pasprijzen (publiek zichtbaar, de voorwaarden volgen live), de interne partnervergoeding per genre of per zaak, en het RTG-ledenvoordeel per genre (RTG legt bij; de zaak... |
+| `geldwereld.test.js` | 8 | genoemd | RTG Geld, de samenhanglaag. Zelfde beloftes als de andere werelden -- bezit niets, verzint niets, meldt stille bronnen -- plus de regel die alleen hier geldt: DEZE LAAG TELT NIETS ZELF OP. |
 | `geloofbieb.test.js` | 7 | gezakt op `liegpoort /api/` | De Geloof & Wijsheid-Bibliotheek: een ECHTE, leesbare kern over alle religies en levensbeschouwingen, als gelijken naast elkaar, altijd gratis (cadeau van de RTFoundation), met de leeftijdspoort van het profiel. Elk... |
 | `gemeente.test.js` | 9 | gezakt op `liegpoort /api/` | RTG Gemeente (kern/gemeente.js): het civiele systeem als partner-genre. Vier pijlers voor inwoners, gemeente-medewerkers en RTG-partners. |
 | `genootschap-beheer.test.js` | 4 | gezakt op `liegpoort /api/` | HET BEHEER VAN EEN GENOOTSCHAP -- 3 endpoints. Deze drie wees de waargenomen dekkingsmeting aan als nooit aangeroepen: pas-aan, eruit en reactie-weg. |

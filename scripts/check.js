@@ -2624,5 +2624,50 @@ console.log('\n43) geen weggegooide tekstoptelling in een gebundeld script');
   if (!stuk) ok(gekeken + ' gebundelde app-scripts: elk tekstbrok komt ergens aan');
 }
 
+/* 44) een app staat in precies EEN wereld op het beginscherm.
+
+   DE FOUT DIE DIT VANGT: twee plekken voor hetzelfde is precies waarom je iets
+   nergens meer vindt. Een lid dat Vluchten een keer onder Reizen zag staan,
+   zoekt hem daar -- en als hij ook onder Leven hangt, is de vraag "waar stond
+   dat ook alweer" terug, wat het hele acht-werelden-besluit juist moest
+   oplossen (PLATFORM.md par. 0).
+
+   WAAROM HIER EN NIET IN DE SCHERMTOETS. Dit stond in test/appmenu.e2e.js, en
+   die telde de tegels door elke map open te klikken. Sinds een wereldtegel de
+   APP opent en niet een tegelveld, is die lijst uit het scherm verdwenen. De
+   regel is niet vervallen; hij heeft een andere plek nodig, en de bron is de
+   juiste: MAPPEN staat als letterlijke lijst in app-main-24a2.js.
+
+   Wat deze regel NIET doet: iets zeggen over welke wereld de juiste is. Dat is
+   een ontwerpvraag. Hij zegt alleen dat het er precies een is. */
+console.log('\n44) elke app staat in precies een wereld op het beginscherm');
+{
+  /* Het pad uit ROOT en niet uit PUB: die laatste is een blok-constante die hier
+     niet bestaat. Met een try/catch eromheen werd die ReferenceError een lege
+     bron, en die lege bron werd de melding "MAPPEN staat er niet meer" -- een
+     diagnose die naar het verkeerde bestand wees. Een vangnet dat de oorzaak
+     verbergt is erger dan geen vangnet. */
+  const mappenPad = path.join(ROOT, 'public', 'apps/app-main/app-main-24a2.js');
+  let bron = '';
+  try { bron = fs.readFileSync(mappenPad, 'utf8'); }
+  catch (e) { fout('app-main-24a2.js is niet te lezen: ' + e.message); }
+  const blok = /const MAPPEN = \[([\s\S]*?)\n  \];/.exec(bron);
+  if (!blok) fout('MAPPEN staat niet meer als lijst in app-main-24a2.js; deze regel meet dan niets');
+  else {
+    const zonderCommentaar = blok[1].replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/\/\/[^\n]*/g, ' ');
+    const items = (zonderCommentaar.match(/'(?:tab|link|os):[a-z0-9-]+'/g) || []).map(x => x.slice(1, -1));
+    const gezien = new Map();
+    const dubbel = [];
+    for (const it of items) {
+      if (gezien.has(it)) { if (!dubbel.includes(it)) dubbel.push(it); }
+      else gezien.set(it, true);
+    }
+    if (!items.length) fout('geen enkel item gevonden in MAPPEN -- de regel leest de verkeerde vorm');
+    else if (dubbel.length) fout('deze apps staan in meer dan een wereld: ' + dubbel.join(', '));
+    else ok(items.length + ' items over ' + (blok[1].match(/sleutel:/g) || []).length +
+      ' werelden: geen enkele staat er twee keer in');
+  }
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

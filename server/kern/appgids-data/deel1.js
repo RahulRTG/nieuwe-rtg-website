@@ -3,7 +3,7 @@
    het passende deel) een eigen entry. */
 const G = (wat, doe, tip) => ({ wat, doe, tip });
 
-module.exports = {
+module.exports = Object.assign({
   /* ---- het leden-OS en de leden-apps (RTG-toon: ingetogen, je/jij) ---- */
   /* Er is nog maar EEN beginscherm. /apps/index.html (het scrollende
      bureaublad) en /apps/bureau.html brengen je allebei hier; ze houden een
@@ -45,40 +45,4 @@ module.exports = {
   '/apps/pulse.html': G('Pulse: wat er nu speelt in jouw RTG-wereld, rustig gebundeld.',
     ['Lees de hoogtepunten van vandaag', 'Tik door naar de app waar iets gebeurt', 'Stel in waarover je seintjes wilt'],
     'Geen eindeloze feed: Pulse toont wat er is en houdt dan op. Dat is bewust.'),
-  '/apps/nieuws.html': G('RTG Nieuws: de redactie bundelt wat voor leden telt.',
-    ['Lees artikelen per rubriek', 'Bewaar wat je later wilt lezen', 'Reageer waar dat kan'],
-    'Kwaliteit boven snelheid: liever één goed stuk dan tien snelle.'),
-  '/apps/reizen.html': G('RTG Reizen: uw reiswereld op een plek -- alles wat eraan komt, uit alle reisapps tegelijk.',
-    ['Kijk bovenaan wat er als eerste aankomt: vlucht, verblijf, reis of charter',
-     'Tik een regel aan om naar de app te gaan die hem heeft; daar boekt en wijzigt u',
-     'Onderaan staat de hele reiswereld, als u nog niets geboekt heeft'],
-    'Dit scherm boekt zelf niets en annuleert zelf niets, met opzet: uw boeking hoort op een plek te staan en niet op twee. Staat er "niet alles is opgehaald", lees dat dan als een onvolledig reisschema en niet als een leeg reisschema.'),
-  '/apps/sociaal.html': G('RTG Sociaal: wat er tussen u en uw kring speelt, uit alle sociale apps tegelijk.',
-    ['Bovenaan staat wat op u wacht: een onbeantwoord gesprek, een bijeenkomst die eraan komt',
-     'Tik een regel aan om naar de app te gaan die hem heeft; daar antwoordt en plaatst u',
-     'Onderaan staat de hele sociale wereld, als er niets openstaat'],
-    'Dit scherm praat zelf niet en plaatst zelf niets, met opzet. Er staat ook geen teller van volgers of likes: dit is een overzicht van wat er speelt, geen aansporing om vaker te kijken.'),
-  '/apps/kantoor.html': G('RTG Kantoor: uw werkdag op een plek -- agenda, taken, documenten en gedeelde bestanden tegelijk.',
-    ['Kijk bovenaan of er iets aandacht vraagt; wat rustig loopt blijft rustig',
-     'Tik een regel aan om naar de app te gaan die hem heeft; daar maakt en wijzigt u',
-     'Onderaan staat de hele kantoorwereld, als er nog niets openstaat'],
-    'Dit scherm maakt zelf niets en wijzigt zelf niets, met opzet: een taak hoort op een plek te staan en niet op twee. Staat er "niet alles is opgehaald", lees dat dan als een onvolledige werkdag en niet als een lege werkdag.'),
-  '/apps/hotels.html': G('Verblijven: hotels, appartementen en villa\'s van onze partners, met ledenprijzen.',
-    ['Bekijk kamers, foto\'s en vrije data', 'Boek direct; de partner bevestigt', 'Open je kamer met keyless waar dat kan'],
-    'De ledenprijsgarantie geldt overal: nooit meer dan de publieke prijs van de partner zelf.'),
-  '/apps/reisbureau.html': G('Het RTG-reisbureau: samengestelde reizen tegen de nettoprijs.',
-    ['Blader door de reizen of vraag AI-reisadvies', 'Vraag een reis aan; een reisadviseur bevestigt', 'Volg en annuleer je aanvragen onder Mijn'],
-    'Vertel je wens in gewone woorden; het advies wijst de best passende reis aan en legt uit waarom.'),
-  '/apps/foodcourt.html': G('De Food Court: alle restaurants op een rij, reserveren in een paar tikken.',
-    ['Kies een restaurant en bekijk de tijdsloten', 'Reserveer; de zaak beslist en je krijgt bericht', 'Bekijk keuken, prijs en ledenvoordeel per zaak'],
-    'Reserveer ruim vooruit voor de populaire avonden; annuleren kan altijd netjes in de app.'),
-  '/apps/uitgaan.html': G('Uitgaan: bars, clubs en beachclubs met hun avonden en gastenlijsten.',
-    ['Bekijk de avonden per adres', 'Zet jezelf op de gastenlijst', 'Laat je entreecode zien aan de deur'],
-    'Je leeftijdslaag bepaalt wat je ziet; dat is voor je eigen veiligheid en die van de zaak.'),
-  '/apps/mall.html': G('De RTG Mall: de enige plek waar je bij RTG koopt, van eigen-merk tot boutieks, plus de bibliotheken.',
-    ['Bestel eigen-merk en boerderijproducten direct', 'Blader door de App- en Reis-Bibliotheek; installeren is inbegrepen', 'Leg mode apart of laat een maat naar de paskamer brengen'],
-    'De bibliotheken zijn een pas-voordeel: tienduizenden apps en een miljoen reisgidsen, zonder bijbetalen.'),
-  '/apps/pay.html': G('RTG Pay: betalen en tikken tussen vrienden, veilig en direct.',
-    ['Stuur of vraag een tik', 'Bekijk je saldo en geschiedenis', 'Splits een rekening met je gezelschap'],
-    'Voor elke betaling zie je eerst een bevestiging; niets gaat er zonder jouw akkoord uit.'),
-};
+}, require('./deel1b'));

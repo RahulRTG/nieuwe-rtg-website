@@ -21,11 +21,76 @@ Alles hieronder is daarvan afgeleid. Wat er niet uit volgt, hoort hier niet.
 
 ---
 
-## 0. De super-app-regel
+## 0. De super-app-regel — HERZIEN
 
-> **RTG Super Apps vervangen geen domeinsoftware. Ze orkestreren
-> domeinsoftware. Alleen apps die feitelijk dezelfde kern, dezelfde data én
-> dezelfde workflow dupliceren, mogen samensmelten tot één product.**
+> **Acht apps. Niet drieëntachtig.**
+
+Dit is een besluit van de eigenaar, en het vervangt de regel die hier stond.
+Wat er stond, en waarom het veranderde, staat er met opzet onder: een regel die
+stilletjes wordt vervangen is een regel die niemand meer vertrouwt.
+
+### Wat er nu geldt
+
+Een lid opent **acht** apps, en niet meer:
+
+| Wereld | Bevat |
+|---|---|
+| **RTG Reizen** | vluchten, verblijven, reisbureau, vervoer, navigatie, reisboek, hangar |
+| **RTG Media** | muziek, theater, clips, podium, camera, galerij, krant, spelen, sport |
+| **RTG Kantoor** | documenten, agenda, notities, bestanden, gereedschap, browser, werk |
+| **RTG Sociaal** | berichten, De Salon, genootschap, pulse, vonk, meet, vrienden |
+| **RTG Geld** | wallet, bank, balans, wie betaalt wat, métier, mecenaat, nalatenschap |
+| **RTG Veilig** | wie ben ik, passkeys, thuiswacht, codewoord, vitaal, juridisch |
+| **RTG Leven** | het huis, maison, table, cellier, garde-robe, zorg, gezin, cercle |
+| **RTFoundation** | de stichting, met haar eigen zeventien onderdelen |
+
+Wat vandaag 83 losse pagina's zijn, worden **onderdelen binnen** die acht. Geen
+eigen tegel, geen eigen adres in de bibliotheek, geen eigen kopbalk: een sectie
+in de app waar hij hoort.
+
+### Wat "app" hier betekent, en wat níét meegaat
+
+**Een app is wat een lid opent.** De 83 HTML-pagina's worden er acht.
+
+De **domeinkernen op de server** blijven staan — `kern/agenda.js`,
+`kern/bestanden.js`, `kern/office/`, `kern/luchthaven.js` en de rest. Dat is de
+diepte waar dit besluit juist om vraagt, en niemand noemt `kern/agenda.js` een
+app. Ze verhuizen niet en ze smelten niet samen; alleen wie ze aanroept
+verandert.
+
+### Wat er hiervoor stond, en wat het kostte om het te vervangen
+
+> *RTG Super Apps vervangen geen domeinsoftware. Ze orkestreren domeinsoftware.
+> Alleen apps die feitelijk dezelfde kern, dezelfde data én dezelfde workflow
+> dupliceren, mogen samensmelten tot één product.*
+
+Die regel is niet fout gebleken. Hij beschermde tegen samenvoegen op een
+vermoeden, en dat werkte: het onderzoek naar Cercle en Entourage verderop in
+dit document liet zien dat twee apps die identiek KLONKEN totaal verschillende
+data en werkstromen hadden.
+
+Wat hij niet oploste is het probleem waar dit besluit over gaat: **drieëntachtig
+ingangen zijn er drieëntachtig, ook als ze stuk voor stuk verdedigbaar zijn.**
+Een lid dat "waar stond dat ook alweer" moet denken, heeft geen baat bij een
+architectuur die per app uitlegt waarom hij bestaat.
+
+De eigenaar is op de gevolgen gewezen voordat hij koos: samenvoegen tot acht
+codebases raakt werkende software, kost maanden, en de oude regel verbood het.
+Dat is afgewogen en het besluit staat. Wat de oude regel wél blijft doen is
+het werk *sturen*: waar twee onderdelen binnen een wereld dezelfde kern en
+dezelfde workflow blijken te delen, worden het er één; waar ze dat niet doen,
+blijven het twee secties in dezelfde app. Samenvoegen van de SCHIL is besloten;
+samenvoegen van de LOGICA blijft bewijs vragen.
+
+### De volgorde
+
+Niet alles tegelijk. Per wereld: de schil, dan de secties erin, dan de oude
+pagina's als omleiding, en pas als een wereld af is de volgende. Zo is er nooit
+een moment waarop de helft werkt.
+
+---
+
+## 0b. De oude super-app-regel (nog geldig binnen een wereld)
 
 De toetsvraag bij elke app die "erbij" of "eraf" moet, is daarom niet *"kan dit
 in een super-app?"* maar:

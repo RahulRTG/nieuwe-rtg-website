@@ -147,4 +147,8 @@ Object.assign(kern, require('../kern/kantoorwereld').maakKantoorwereld({ kern })
    gesprekken die op antwoord wachten, aanstaande bijeenkomsten, en wat er in
    uw kring geplaatst is. Ook deze bezit niets en schrijft nooit. */
 Object.assign(kern, require('../kern/socialewereld').maakSocialeWereld({ kern }));
+/* RTG Geld (kern/geldwereld.js): dezelfde laag over de geldwereld -- wallet,
+   verrekeningen, toezeggingen. Bezit niets, schrijft nooit, en telt vooral
+   niets zelf op wat een domein al optelt. */
+Object.assign(kern, require('../kern/geldwereld').maakGeldwereld({ kern }));
 };

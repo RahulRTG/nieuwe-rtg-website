@@ -89,6 +89,7 @@ module.exports = function bouwKernAan(kern, grens) {
   require('../routes/reis')(grens('reis'));
   require('../routes/kantoor')(grens('kantoor'));
   require('../routes/sociaal')(grens('sociaal'));
+  require('../routes/geld')(grens('geld'));
   require('../routes/thuis')(grens('thuis'));
   require('../routes/werkvloer')(grens('werkvloer'));
   require('../routes/regering')(grens('regering'));

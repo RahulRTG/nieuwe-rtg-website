@@ -3408,16 +3408,16 @@ var RTG_BOUW = '1b06c62c';
      twee plekken voor hetzelfde is precies waarom je hem nergens meer vindt. */
   const MAPPEN = [
     /* --- eerste rij --- */
-    { sleutel: 'map-reizen', naam: 'Reizen', items: [
+    { sleutel: 'map-reizen', naam: 'RTG Reizen', wereld: '/apps/reizen.html', glyf: 'vluchten', items: [
       'tab:reizen', 'link:reizen', 'tab:terplaatse', 'link:vluchten', 'link:ov', 'link:navigatie',
       'link:flits', 'link:stad', 'link:reisboek', 'link:hangar', 'link:residentie'] },
-    { sleutel: 'map-geld', naam: 'Geld', items: [
+    { sleutel: 'map-geld', naam: 'RTG Geld', wereld: '/apps/geld.html', glyf: 'wallet', items: [
       'tab:betalen', 'link:wallet', 'link:bank', 'link:wbw', 'link:rtgcode',
       'link:balans', 'tab:assets', 'link:labfonds', 'link:mecenaat',
       'link:nalatenschap', 'link:logboek'] },
     /* De Salon is weer De Salon: mensen en wat je met ze deelt. Wat je in je
        eentje kijkt of luistert staat bij Media. */
-    { sleutel: 'map-salon', naam: 'De Salon', items: [
+    { sleutel: 'map-salon', naam: 'RTG Sociaal', wereld: '/apps/sociaal.html', glyf: 'salon', items: [
       'tab:salon', 'link:pulse', 'link:vrienden', 'os:snaps', 'link:camera',
       'link:vonk', 'link:cercle', 'link:entourage', 'link:rendezvous', 'link:attenties'] },
     /* Het Huis is het huishouden in de brede zin: waar je woont, wat er op
@@ -3425,16 +3425,19 @@ var RTG_BOUW = '1b06c62c';
        gaat. Die laatste helft (zorg, gezin, vitaal, rust) stond even in een
        eigen map Zorg; die is hier terug, want zonder haar was Het Huis op een
        RTG-pas een map met drie tegels. De kantoorkant zit bij Werk. */
-    { sleutel: 'map-huis', naam: 'Het Huis', items: [
-      'link:ontdek', 'os:rtf', 'tab:bestellen', 'tab:zorg', 'tab:gezin',
+    /* os:rtf stond hier, en staat nu in zijn eigen wereld hieronder. Regel 44
+       in scripts/check.js ving dat meteen: een app in twee werelden is precies
+       waarom je hem nergens meer vindt. */
+    { sleutel: 'map-huis', naam: 'RTG Leven', wereld: '/apps/lifestyle.html', glyf: 'wonen', items: [
+      'link:ontdek', 'tab:bestellen', 'tab:zorg', 'tab:gezin',
       'link:rechterhand',
       'link:maison', 'link:table', 'link:cellier', 'link:garderobe'] },
 
     /* --- tweede rij, gecentreerd --- */
-    { sleutel: 'map-media', naam: 'Media', items: [
+    { sleutel: 'map-media', naam: 'RTG Media', wereld: '/apps/media.html', glyf: 'film', items: [
       'link:muziek', 'link:podium', 'link:theater', 'link:clips', 'link:spelen',
       'link:nieuws', 'link:krant', 'link:sport'] },
-    { sleutel: 'map-werk', naam: 'Werk', items: [
+    { sleutel: 'map-werk', naam: 'RTG Kantoor', wereld: '/apps/kantoor.html', glyf: 'office', items: [
       'link:office', 'os:werk', 'link:loonstrook', 'link:school',
       'link:browser', 'link:sitemaker'] },
     /* Veilig: wie je bent en wie er over je waakt. De vier apps op dezelfde
@@ -3456,8 +3459,13 @@ var RTG_BOUW = '1b06c62c';
        app-bibliotheek zet hem zelf al in de categorie "Veiligheid & identiteit"
        naast Wie ben ik en Passkeys, en het gaat over jouw voorwaarden en jouw
        akkoorden -- wie je bent, niet waar je werkt. Werk houdt zes tegels. */
-    { sleutel: 'map-veilig', naam: 'Veilig', items: [
-      'link:ik', 'link:veilig', 'link:passkeys', 'link:juridisch'] }
+    { sleutel: 'map-veilig', naam: 'RTG Veilig', wereld: '/apps/veilig.html', glyf: 'schild', items: [
+      'link:ik', 'link:veilig', 'link:passkeys', 'link:juridisch'] },
+    /* De achtste wereld. De stichting stond als EEN tegel binnen Het Huis
+       ('os:rtf'), terwijl ze zeventien onderdelen, een eigen service worker en
+       een eigen huis heeft. Een wereld die als tegel in een andere wereld
+       hangt, is geen wereld. */
+    { sleutel: 'map-rtf', naam: 'RTFoundation', wereld: '/apps/foundation/index.html', glyf: 'rtf', items: ['os:rtf'] }
   ];
 
   /* De premium-suite (De Rechterhand) bestaat alleen voor Lifestyle en
@@ -3856,6 +3864,22 @@ var RTG_BOUW = '1b06c62c';
     const el = document.createElement('button');
     el.className = 'os-app os-map'; el.dataset.sleutel = map.sleutel;
     el.setAttribute('aria-label', 'Map ' + mapNaam(map));
+    /* EEN WERELD IS EEN APP EN ZIET ERUIT ALS EEN APP: een tegel met een glyf,
+       geen mapvoorbeeld met minitegels (PLATFORM.md par. 0). Het mapvoorbeeld
+       had ook een echt gebrek: het telde de ZICHTBARE onderdelen, dus op de
+       instappas toonde RTG Leven drie snippers en RTFoundation een -- en dan
+       oogt de instap budget, precies wat de merkregel verbiedt. Een glyf is
+       op elke pas even vol. */
+    if (map.wereld) {
+      const tegel = document.createElement('span'); tegel.className = 'os-tegel';
+      const g = window.RTGGlyf && RTGGlyf.svg(map.glyf);
+      if (g) tegel.appendChild(g);
+      else { const m = document.createElement('span'); m.className = 'os-monogram'; m.textContent = mapNaam(map).replace(/^RTG /, '').slice(0, 2); tegel.appendChild(m); }
+      el.appendChild(tegel);
+      const nm = document.createElement('span'); nm.className = 'os-naam'; nm.textContent = mapNaam(map); el.appendChild(nm);
+      el.addEventListener('click', () => { if (!wiebel) openMap(map); });
+      return el;
+    }
     const tegel = document.createElement('span'); tegel.className = 'os-tegel os-map-tegel';
     for (const item of map.items.filter(itemZichtbaar).slice(0, 9)) {
       const mini = document.createElement('span'); mini.className = 'os-map-mini';
@@ -3948,6 +3972,13 @@ var RTG_BOUW = '1b06c62c';
      raster van #osMapGrid af -- niet twee rasters in elkaar.
      test/appmenu.e2e.js meet de meetkunde en zakt als dat weer gebeurt. */
   function openMap(map) {
+    /* ACHT WERELDEN (PLATFORM.md par. 0). Een wereld is een APP en geen map:
+       tikken opent hem, en er komt geen tussenscherm met tegels. De `items`
+       blijven staan zolang de onderdelen nog eigen pagina's zijn -- Spotlight
+       indexeert ze en zonder die index is er halverwege de verhuizing van
+       alles onvindbaar. Naarmate een wereld zijn secties opslokt, loopt die
+       lijst vanzelf leeg. */
+    if (map.wereld) { location.href = map.wereld; return; }
     mapTitel.textContent = mapNaam(map);
     mapGrid.textContent = '';
     const zicht = map.items.filter(itemZichtbaar);

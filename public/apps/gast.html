@@ -72,7 +72,7 @@
 <header>
   <span class="ey">Rahul Travel Group</span>
   <h1 id="zaakNaam">Aan tafel</h1>
-  <p class="sub" id="zaakSub">Scan de code op tafel om te beginnen.</p>
+  <p class="sub" id="zaakSub">Scan de code op je tafel of op je kamer om te beginnen.</p>
 </header>
 
 <main id="main" role="main">
@@ -80,11 +80,11 @@
 
   <!-- 1. aanschuiven -->
   <section class="kaart" id="vAanschuif" hidden>
-    <h2>Schuif aan</h2>
+    <h2 id="aanschuifKop">Schuif aan</h2>
     <p class="sub" id="lopend"></p>
     <label class="lbl" for="naam">Hoe mogen we je noemen?</label>
     <input id="naam" maxlength="40" placeholder="Sam" autocomplete="given-name">
-    <p class="sub" style="margin-top:.5rem;">Alleen deze naam komt op de rekening te staan, zodat je tafelgenoten zien wie wat bestelde. Verder slaan we niets van je op.</p>
+    <p class="sub" id="naamUitleg" style="margin-top:.5rem;">Alleen deze naam komt op de rekening te staan, zodat je tafelgenoten zien wie wat bestelde. Verder slaan we niets van je op.</p>
     <div class="rij" style="margin-top:.8rem;"><button class="prim" id="bAanschuif">Aanschuiven</button></div>
   </section>
 
@@ -121,12 +121,28 @@
       </select>
       <div class="rij" style="margin-top:.6rem;"><button id="bVerdeel">Verdeel</button></div>
       <div id="verdeling" style="margin-top:.8rem;"></div>
+
       <label class="lbl" for="fooi">Fooi (in euro, alleen als je dat wilt)</label>
       <input id="fooi" inputmode="decimal" placeholder="0,00">
-      <div class="rij" style="margin-top:.6rem;">
-        <button id="bFooi">Fooi vastleggen</button>
-        <button class="prim" id="bBetaal">Betalen</button>
+      <div class="rij" style="margin-top:.6rem;"><button id="bFooi">Fooi vastleggen</button></div>
+
+      <label class="lbl" for="rail">Waarmee reken je af?</label>
+      <select id="rail">
+        <option value="bon">Cadeaubon</option>
+        <option value="tegoed">Polsband of tegoed</option>
+        <option value="kamer">Op mijn hotelkamer</option>
+      </select>
+      <!-- Het codeveld staat IN het scherm en niet in een prompt(). Dat is geen
+           smaak: een prompt() blokkeert de JavaScript van de pagina tot hij weg
+           is, en je kunt er geen tekst in opmaken. Dit huis heeft die les al
+           een keer betaald (TAKEN 4.26). -->
+      <div id="codeVak">
+        <label class="lbl" for="bonCode">Code van je bon of polsband</label>
+        <input id="bonCode" maxlength="40" placeholder="Scan of typ de code" autocomplete="off">
+        <div class="rij" style="margin-top:.5rem;"><button id="bSaldo">Saldo bekijken</button></div>
+        <p class="sub" id="saldoUit" style="margin-top:.35rem;"></p>
       </div>
+      <div class="rij" style="margin-top:.8rem;"><button class="prim" id="bBetaal">Betalen</button></div>
       <p class="sub" id="railLet" style="margin-top:.6rem;"></p>
     </section>
   </div>
@@ -181,17 +197,46 @@
     });
   }
 
-  /* ---------- binnenkomen ---------- */
+  /* ---------- binnenkomen ----------
+     Een QR hoort bij een TAFEL of bij een KAMER, en het scherm hoort dat
+     verschil te tonen: "Kamer 308" in plaats van een tafel die er niet is, en
+     "roomservice" in plaats van "aanschuiven". Een kamer-QR zonder open
+     gastrekening geeft bovendien een eigen antwoord (je bent uitgecheckt, of je
+     bent er nog niet), en dat hoort de gast te lezen in plaats van een lege
+     pagina te krijgen. */
+  var SOORT = 'tafel';
+
   function start() {
-    if (!TOKEN) { meld('Scan de QR-code op je tafel om te beginnen.'); return; }
+    if (!TOKEN) { meld('Scan de QR-code op je tafel of op je kamer om te beginnen.'); return; }
     api('tafel', { token: TOKEN }).then(function (j) {
+      if (j._code === 'geen-verblijf') {
+        $('#zaakSub').textContent = 'Kamer ' + (j.kamer || '');
+        return meld(j._fout);
+      }
       if (j._fout) return meld(j._fout);
+      SOORT = j.soort || 'tafel';
+      var opKamer = SOORT === 'kamer';
       $('#zaakNaam').textContent = j.zaak.naam;
-      $('#zaakSub').textContent = j.tafel + (j.zaak.plaats ? ' · ' + j.zaak.plaats : '');
+      $('#zaakSub').textContent = (opKamer ? 'Kamer ' + j.kamer : j.tafel) +
+        (j.zaak.plaats ? ' · ' + j.zaak.plaats : '');
       KAART = j.kaart; BELEID = j.beleid;
-      $('#lopend').textContent = j.lopendeRekening
-        ? 'Er zitten al ' + j.lopendeRekening.gasten + ' mensen aan deze tafel, met ' + j.lopendeRekening.regels + ' bestelling(en).'
-        : 'Jij bent de eerste aan deze tafel.';
+      document.title = (opKamer ? 'Roomservice' : 'Aan tafel') + ' · RTG';
+      $('#aanschuifKop').textContent = opKamer ? 'Roomservice' : 'Schuif aan';
+      $('#bAanschuif').textContent = opKamer ? 'Beginnen' : 'Aanschuiven';
+      $('#naamUitleg').textContent = opKamer
+        ? 'Deze naam staat op je bestelling, zodat de bediening weet wie er opendoet. Verder slaan we niets van je op.'
+        : 'Alleen deze naam komt op de rekening te staan, zodat je tafelgenoten zien wie wat bestelde. Verder slaan we niets van je op.';
+      $('#lopend').textContent = opKamer
+        ? (j.lopendeRekening
+          ? 'Er loopt al een bestelling op deze kamer met ' + j.lopendeRekening.regels + ' regel(s).'
+          : 'Bestellingen komen op de rekening van je kamer.')
+        : (j.lopendeRekening
+          ? 'Er zitten al ' + j.lopendeRekening.gasten + ' mensen aan deze tafel, met ' + j.lopendeRekening.regels + ' bestelling(en).'
+          : 'Jij bent de eerste aan deze tafel.');
+      /* Op een kamer is "op de kamer boeken" de voor de hand liggende rail, en
+         aan tafel bestaat hij helemaal niet. */
+      $('#rail').value = opKamer ? 'kamer' : 'bon';
+      railGewisseld();
       if (SLEUTEL) laadRekening(true); else $('#vAanschuif').hidden = false;
     });
   }
@@ -360,15 +405,55 @@
     });
   });
 
-  $('#bBetaal').addEventListener('click', function () {
-    var bon = prompt('Code van je cadeaubon of tegoed:');
-    if (!bon) return;
-    api('betaal', { sleutel: SLEUTEL, wijze: 'bon', bonCode: bon,
-      idem: window.RTGId ? RTGId('gastbetaal') : TOKEN + ':betaal:' + bon }).then(function (j) {
-      if (j._fout) return meld(j._fout);
-      meld(j.gesloten ? 'De rekening is voldaan. Fijne avond.' : 'Betaald: ' + euro(j.betaald) + '. Er staat nog ' + euro(j.openstaand) + ' open.', true);
-      laadRekening();
+  /* Het codeveld hoort alleen bij de rails die een code kennen. Op de kamer
+     boeken vraagt niets: dat je op die kamer zit, is al bewezen door de QR die
+     je hebt gescand. */
+  function railGewisseld() {
+    var w = $('#rail').value;
+    $('#codeVak').hidden = (w === 'kamer');
+    $('#saldoUit').textContent = '';
+  }
+  $('#rail').addEventListener('change', railGewisseld);
+
+  $('#bSaldo').addEventListener('click', function () {
+    var code = $('#bonCode').value.trim();
+    if (!code) return meld('Vul de code van je bon of polsband in.');
+    api('band', { sleutel: SLEUTEL, bonCode: code }).then(function (j) {
+      if (j._fout) { $('#saldoUit').textContent = j._fout; return; }
+      $('#saldoUit').textContent = 'Saldo: ' + euro(j.saldo) + '. ' + j.let;
     });
+  });
+
+  $('#bBetaal').addEventListener('click', function () {
+    var w = $('#rail').value;
+    var code = $('#bonCode').value.trim();
+    if (w !== 'kamer' && !code) return meld('Vul de code van je bon of polsband in.');
+    /* De sleutel hoort bij DEZE betaling en niet bij deze klik: twee keer tikken
+       of een hapering in het netwerk mag geen tweede afschrijving worden. */
+    var idem = window.RTGId ? RTGId('gastbetaal') : TOKEN + ':betaal:' + w + ':' + code;
+    $('#bBetaal').disabled = true;
+    api('betaal', { sleutel: SLEUTEL, wijze: w, bonCode: code || undefined, idem: idem })
+      .then(function (j) {
+        $('#bBetaal').disabled = false;
+        if (j._fout) return meld(j._fout);
+        if (j.bonSaldo != null) $('#saldoUit').textContent = 'Er staat nog ' + euro(j.bonSaldo) + ' op je bon.';
+        if (j.gesloten) {
+          /* Klaar. NIET opnieuw laden: de tafelsessie vervalt zodra de rekening
+             is voldaan, dus dat zou een 401 opleveren en de afscheidsboodschap
+             overschrijven met "schuif opnieuw aan". Het scherm sluit hier zelf
+             netjes af -- de rekening blijft staan zoals hij was. */
+          SLEUTEL = null;
+          try { localStorage.removeItem('rtg_gast_' + TOKEN); } catch (e) {}
+          meld('De rekening is voldaan. Fijne avond.', true);
+          $('#mand').hidden = true;
+          $('#bBetaal').disabled = true;
+          $('#bVerdeel').disabled = true;
+          $('#bFooi').disabled = true;
+          return;
+        }
+        meld('Betaald: ' + euro(j.betaald) + '. Er staat nog ' + euro(j.openstaand) + ' open.', true);
+        laadRekening();
+      });
   });
 
   start();

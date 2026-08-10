@@ -67,16 +67,6 @@ module.exports = Object.assign({
   '/apps/foodcourt.html': G('De Food Court: alle restaurants op een rij, reserveren in een paar tikken.',
     ['Kies een restaurant en bekijk de tijdsloten', 'Reserveer; de zaak beslist en je krijgt bericht', 'Bekijk keuken, prijs en ledenvoordeel per zaak'],
     'Reserveer ruim vooruit voor de populaire avonden; annuleren kan altijd netjes in de app.'),
-  /* De gastkant van de horecatoren: dit scherm hoort NIET in het rijtje
-     leden-apps thuis dat je vanaf het homescreen opent -- je komt er via de QR
-     op tafel, vaak zonder lid te zijn. De gids staat er wel, want de keuring
-     eist er een per pagina en een gast die de gids opent hoort geen algemeen
-     verhaal te krijgen. */
-  '/apps/gast.html': G('Aan tafel: de kaart lezen, bestellen vanaf je eigen telefoon en de rekening zien meelopen.',
-    ['Scan de QR op tafel; je tafelgenoten doen hetzelfde en zitten dan op dezelfde rekening',
-      'Zet een allergie in het eigen veld, niet bij de opmerkingen: dat veld gaat ongefilterd naar de keuken',
-      'Bij Afrekenen verdeel je de rekening gelijk, per bestelling of laat je een persoon alles betalen'],
-    'Een ernstige allergie loopt eerst langs een medewerker; zolang die niet heeft bevestigd begint de keuken er niet aan.'),
   '/apps/uitgaan.html': G('Uitgaan: bars, clubs en beachclubs met hun avonden en gastenlijsten.',
     ['Bekijk de avonden per adres', 'Zet jezelf op de gastenlijst', 'Laat je entreecode zien aan de deur'],
     'Je leeftijdslaag bepaalt wat je ziet; dat is voor je eigen veiligheid en die van de zaak.'),

@@ -110,6 +110,11 @@ module.exports = ({ save, schoon, crypto, horeca }) => {
         uit.push({ zaakcode, rekeningId: r.id, kanaal: r.kanaal, status: r.status,
           regels: (r.regels || []).length, geopendAt: r.geopendAt,
           bezorg: r.bezorg || null, afhaal: r.afhaal || null,
+          /* Hoort deze bestelling bij een foodcourt-mandje? Zonder dit veld kan
+             een scherm dat beide lijsten toont ze niet uit elkaar houden, en
+             stond dezelfde bestelling er twee keer in -- een keer los en een
+             keer als deel van het mandje. In een echte browser gezien. */
+          mandjeId: r.mandjeId || null,
           totalen: horeca.totaal(r), openstaand: horeca.openstaand(r) });
       }
     }

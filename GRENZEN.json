@@ -229,6 +229,23 @@
    "officeWeg",
    "werkplek"
   ],
+  "kantoorpakket-huis": [
+   "boardroomBaas",
+   "officeAI",
+   "officeBewaar",
+   "officeDeel",
+   "officeKring",
+   "officeMaak",
+   "officeMijn",
+   "officeOpen",
+   "officeSter",
+   "officeTerug",
+   "officeUitslag",
+   "officeVersies",
+   "officeVul",
+   "officeWeg",
+   "werkplek"
+  ],
   "kantoren": [
    "afdelingen",
    "aidataExport",

@@ -360,6 +360,17 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
     ['public/shared/i18n/i18n-01.js', 'de taaltabel + kiezer, een geheel'],
     ['public/shared/i18n/i18n-03.js', 'de taaltabel + kiezer, een geheel'],
     ['server/server.js', 'de bedrading van de hele app; wordt per ronde verder verdund'],
+    /* De vijfenvijftig bureau-routes staan sinds regel 45 VOLUIT: een pad dat
+       met een plus wordt gebouwd ziet de schakelkast niet, en dan is de route
+       vanuit de boardroom niet te sturen. Dat maakt dit bestand langer dan de
+       maat, maar niet ingewikkelder: het is een aaneengesloten registratielijst
+       van zes bureaus, met het werk zelf in EEN handler-fabriek erboven.
+
+       Opknippen is geprobeerd en teruggedraaid. De drie bureaus die meegingen
+       namen ook de plank-route mee, die op db en op de werkplekcode leunt; wat
+       ontstond was geen tweede bestand maar een half bestand, en de toetsen
+       lieten dat meteen zien. Een lijst hoort bij elkaar te blijven. */
+    ['server/routes/werkplek-bureaus.js', 'de registratielijst van zes bureaus, voluit sinds regel 45; het werk staat in EEN handler erboven'],
     ['server/opzet/kernlaag4.js', 'een ophanglijst, geen module: elke regel hangt een kern op aan de vorige laag. Dezelfde reden als server.js hierboven -- er zit geen naad in, alleen volgorde, en die volgorde IS de inhoud'],
     ['public/apps/boardroom-eigenaar.js', 'de eigenaarszetel: vier panelen op een gedeelde api/el-kern in een IIFE']
   ]);
@@ -641,6 +652,17 @@ console.log('\n16) elk leden-pad met een derde partij gaat langs de gegevenspoor
   const MAG_ZONDER = new Map([
     ['/api/member/sport/tickets', 'je eigen ticketlijst opvragen'],
     ['/api/member/boardroom/logboek', 'je eigen boardroom-journaal ("logboek" bevat toevallig "boek"); geen derde partij'],
+    /* Dezelfde valse vriend, nu bij De Rechterhand. Het REISBOEK is uw eigen
+       reisdagboek en het LOGBOEK het onderhoudsboek van uw eigen jacht of
+       oldtimer: eigen dossiers, geen bestelling en geen partij tegenover u.
+       Ze werden zichtbaar toen de rechterhand-paden voluit kwamen te staan
+       (regel 45); daarvoor zag ook deze regel ze niet. */
+    ['/api/member/rechterhand/reisboek', 'uw eigen reisdagboek ("reisboek" bevat toevallig "boek"); geen derde partij'],
+    ['/api/member/rechterhand/logboek', 'het onderhoudsboek van uw eigen bezit; geen derde partij'],
+    ['/api/member/rechterhand/logboek/object', 'idem: een eigen object in het eigen logboek'],
+    ['/api/member/rechterhand/logboek/object/weg', 'idem'],
+    ['/api/member/rechterhand/logboek/regel', 'idem: een onderhoudsregel bij eigen bezit'],
+    ['/api/member/rechterhand/logboek/regel/weg', 'idem'],
     ['/api/tickets/aanbod', 'het aanbod bekijken; er gebeurt nog niets'],
     ['/api/verhuur/aanbod', 'het aanbod bekijken; er gebeurt nog niets'],
     ['/api/verkoop/showroom', 'de showroom bekijken; er gebeurt nog niets'],
@@ -1515,7 +1537,10 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
        erbuiten). Stond eerst als aanroep BINNEN de handler; is middleware geworden
        toen die routes zichtbaar werden, zodat bij elke route staat welke deur hij
        heeft -- zie regel 45 voor waarom ze onzichtbaar waren. */
-    'gezinsPoort', 'huisPoort']);
+    'gezinsPoort', 'huisPoort',
+    /* spread van [auth, geenGast], zoals `lid` hierboven; werd zichtbaar toen
+       de kantoorpakket-paden voluit kwamen te staan (regel 45) */
+    'ledenAuth', 'rtfPoort']);
   const POORT_BINNEN = /\b(profiel|schoolProfiel|rtfSociaal|eisAccount|resolveSession|verifyToken|sessionFor|magInzien|isEigenaar|boardroomWie|magBoardroom|doosSleutelOk|magMeten|metPartner|samenSess|kantoorSess|werkPoort|beheerVan|lidVan)\s*\(/;
 
   /* PUBLIEK MET REDEN. Alles hier is een bewuste keuze, geen omissie. Wie een
@@ -2731,9 +2756,11 @@ console.log('\n45) elk routepad staat voluit, zodat de schakelkast ze kan tellen
      BUITEN-lijst in schakelbaar.js, met een belangrijk verschil dat er ook bij
      hoort te staan: die lijst bevat KEUZES, deze bevat SCHULD. */
   const BEKEND = new Set([
-    'server/opzet/poortwachters.js', 'server/routes/kantoorpakket.js', 'server/routes/member/bureau.js', 'server/routes/member/lifestyle.js',
-    'server/routes/member/pulse.js', 'server/routes/member/rechterhand.js',
-    'server/routes/member/rendezvous.js', 'server/routes/supplier/creator.js', 'server/routes/werkplek-bureaus.js'
+    /* Nog EEN over: de poortwachterslaag zelf. Die monteert hele
+       routefamilies achter een deur en bouwt daarbij een voorvoegsel op; dat
+       is een ander geval dan een lijst acties, en het hoort bij een aparte
+       ronde met de poortwachters zelf ernaast. Van negentien naar een. */
+    'server/opzet/poortwachters.js'
   ]);
   const nieuwe = bouwers.filter(b => !BEKEND.has(b.split(':')[0]));
   const schoongemaakt = [...BEKEND].filter(f => !bouwers.some(b => b.split(':')[0] === f));

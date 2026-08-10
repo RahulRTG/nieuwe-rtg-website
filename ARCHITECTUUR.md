@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 2897 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 2898 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,13 +18,13 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 2897 |
-| servermodules (`server/**/*.js`) | 1565 |
+| API-endpoints | 2898 |
+| servermodules (`server/**/*.js`) | 1567 |
 | routebestanden (`server/routes/**`) | 349 |
-| kernmodules (`server/kern/**`) | 905 |
-| schermen (`public/**/*.html`) | 214 |
+| kernmodules (`server/kern/**`) | 907 |
+| schermen (`public/**/*.html`) | 215 |
 | gedeelde browsermodules (`public/shared/*.js`) | 171 |
-| toetsbestanden (`test/*.test.js`) | 630 |
+| toetsbestanden (`test/*.test.js`) | 631 |
 | schermtoetsen (`test/*.e2e.js`) | 87 |
 
 ## 2. De weg van een verzoek
@@ -112,7 +112,7 @@ op de regel zelf. Dat is niet hetzelfde als onbeveiligd -- regel 28 van de keuri
 per route een poort **of** een plek op de publieke lijst met reden. Deze kolom is een
 wegwijzer, geen verdict.
 
-Daarnaast 1508 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 1509 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 
@@ -120,9 +120,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1121 |
+| kern-namen die routes aanraken | 1122 |
 | daarvan door **meer dan één** domein (de echte koppeling) | 146 |
-| daarvan door precies één domein | 975 |
+| daarvan door precies één domein | 976 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 

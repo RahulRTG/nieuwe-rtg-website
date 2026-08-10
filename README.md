@@ -1235,6 +1235,42 @@ Wat er nog niet speelt in de Media OS zelf: een **livestream** van het Podium. D
 
 De vier apps eronder blijven gewoon bestaan en werken los: wie recht naar de studio, de zaal of het Podium wil, hoort daar zonder omweg te kunnen. Zet de boardroom de schakelaar `mediaos` uit, dan verdwijnt alleen de verbindende laag.
 
+### RTG Reizen (de reiswereld, laag 2)
+
+`server/kern/reiswereld.js` + `/api/reis/wereld` + `/apps/reizen.html`. De eerste
+super app die volgens de regel in `PLATFORM.md` is gebouwd: hij **orkestreert**
+de reisdomeinen en vervangt ze niet. Verblijven, Reisbureau, Vluchten en Hangar
+houden hun eigen catalogus, hun eigen diepte en hun eigen boekingsstroom.
+
+Wat hij toevoegt is wat nergens bestond: **uw komende reis bij elkaar**, uit alle
+domeinen tegelijk, op datum — de vlucht van dinsdag, het hotel van woensdag en de
+aangevraagde reis van volgende maand in één tijdlijn, ongeacht in welke app u ze
+boekte.
+
+Wat hij met opzet **niet** heeft: een knop die boekt, wijzigt of annuleert. Elke
+regel is een link naar de app die het echte werk doet. Zou dit scherm ook boeken,
+dan was er een tweede plek waar een reis ontstaat, en dan is "waar staat mijn
+boeking echt" binnen een maand niet meer te beantwoorden (LAT.md regel 4). De
+module heeft dan ook geen eigen collectie, schrijft nooit, en bewaart niets: elke
+regel wordt bij het opvragen uit het domein zelf gehaald via de functie die dat
+domein al had. `test/reiswereld.test.js` bewijst dat door de domeinen te
+veranderen *nadat* de wereld is samengesteld, en door te toetsen dat de laag
+alleen `komend()` aanbiedt en verder niets.
+
+**De regel die deze laag het scherpst maakt: een bron die stilvalt, verzwijgt
+zichzelf niet.** Een reiswereld hangt per definitie aan drie andere domeinen.
+Valt er één weg en toont het scherm gewoon de andere twee, dan *lijkt* het
+reisschema compleet — en zo mist iemand een vlucht. Elke bron wordt daarom apart
+opgehaald; wat niet lukte komt als naam terug in `stil`, en het scherm zegt dan
+hardop dat dit een onvolledig en geen leeg reisschema is. De mutatie die de toets
+laat zakken staat in het testbestand: laat `bron()` de fout stil opeten, en twee
+toetsen vallen om terwijl de app er ongewijzigd uitziet.
+
+De domeingrens deed hier trouwens zijn werk: `/api/reis/wereld` kreeg bij de
+eerste aanroep een 500 omdat het domein `reis` `kern.reiswereld` niet in
+`GRENZEN.json` had staan. Dat is geen hindernis maar de bedoeling — een domein
+dat verder reikt dan het opschrijft, hoort te stuiten.
+
 ### RTG Bank & RTG Stad (de eigen infrastructuur)
 
 - **RTG Bank** (`server/kern/bank/` + `kern/bankregie/`): een eigen dubbel-boekhoudend grootboek naast RTG Pay (som altijd exact nul, bewaakt door BANK-01 en PAY-02 op het technische bord). De boardroom-knop heeft drie standen (partner / hybride / eigen) met vier-ogen-autorisatie bij opschalen en een nood-fallback naar de kaart-rails; de leden-bank (rekeningen met echt IBAN, sparen, passen, krediet, salarisrun uit de klokuren) gaat pas open als de boardroom hem live zet en het lid akkoord geeft. In de eigen-stand lopen ook de Pay-autoload en de 30% RTFoundation-afdracht over de eigen rails.

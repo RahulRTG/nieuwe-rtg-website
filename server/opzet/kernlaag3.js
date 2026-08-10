@@ -132,4 +132,10 @@ Object.assign(kern, require('../kern/assets')({ db, save, crypto, schoon, notify
 Object.assign(kern, require('../kern/lifestyle')({ db, save, crypto, anthropic, liveCodename, notify }));
 // De extra premium ROS-apps van de Lifestyle Pass: Reisboek, Cellier, Table, Maison
 Object.assign(kern, require('../kern/rechterhand')({ db, save, crypto, liveCodename, anthropic, DATA_DIR }));
+/* RTG Reizen (kern/reiswereld.js): de samenhanglaag over de reiswereld -- laag 2
+   uit PLATFORM.md. Hij bezit niets en schrijft nooit; hij haalt uw komende reis
+   op uit de domeinen zelf (verblijf, reisbureau, luchthaven). Krijgt daarom de
+   hele kern mee en leest die laat, want hij hangt aan lagen die in dezelfde
+   ronde worden samengesteld. */
+Object.assign(kern, require('../kern/reiswereld').maakReiswereld({ kern }));
 };

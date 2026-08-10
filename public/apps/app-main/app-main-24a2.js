@@ -44,7 +44,7 @@
   const MAPPEN = [
     /* --- eerste rij --- */
     { sleutel: 'map-reizen', naam: 'Reizen', items: [
-      'tab:reizen', 'tab:terplaatse', 'link:vluchten', 'link:ov', 'link:navigatie',
+      'tab:reizen', 'link:reizen', 'tab:terplaatse', 'link:vluchten', 'link:ov', 'link:navigatie',
       'link:flits', 'link:stad', 'link:reisboek', 'link:hangar', 'link:residentie'] },
     { sleutel: 'map-geld', naam: 'Geld', items: [
       'tab:betalen', 'link:wallet', 'link:bank', 'link:wbw', 'link:rtgcode',

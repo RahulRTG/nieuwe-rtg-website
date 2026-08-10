@@ -44,6 +44,10 @@ const PAGINAS = [
      vinden terwijl de klok loopt. De vier schermen die hierin opgingen stonden
      nooit in deze lijst; dat was een gat, niet een keuze. */
   '/apps/veilig.html',
+  /* RTG Reizen: de wereld boven de reisapps. Staat hier omdat een lijst met
+     komende reizen alleen werkt als hij ook zonder muis en met een schermlezer
+     te doorlopen is -- het is de app waarin iemand op een station kijkt. */
+  '/apps/reizen.html',
   '/apps/ov.html',
   '/apps/ovdienst.html',
   '/apps/ovroutes.html',

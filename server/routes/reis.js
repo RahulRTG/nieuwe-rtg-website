@@ -12,4 +12,9 @@ module.exports = (kern) => {
   });
 
   app.post('/api/reis/landen', auth, (req, res) => res.json({ landen: reisLanden() }));
+
+  /* RTG Reizen, de samenhanglaag: uw komende reis uit alle reisdomeinen bij
+     elkaar. Alleen lezen -- boeken, wijzigen en annuleren blijft in de
+     gespecialiseerde app, en deze route heeft er geen tegenhanger voor. */
+  app.post('/api/reis/wereld', auth, (req, res) => res.json(kern.reiswereld.komend(req.session.key)));
 };

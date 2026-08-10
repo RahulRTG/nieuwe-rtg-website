@@ -50,6 +50,17 @@
     pulse:       { naam: 'Vandaag',         url: '/apps/pulse.html' },
     nieuws:      { naam: 'Nieuws',        url: '/apps/nieuws.html' },
     krant:       { naam: 'Krant',     url: '/apps/krant.html' },
+    /* RTG Reizen staat NAAST Vluchten, Verblijven, Reisbureau en Hangar en niet
+       in plaats daarvan -- net als RTG Media naast Video, Sound, Theater en
+       Podium. Het is de laag die er een wereld van maakt (PLATFORM.md, laag 2);
+       wie recht naar het inchecken of de hangar wil, hoort daar gewoon heen te
+       kunnen. */
+    /* "RTG Reizen" en niet "Reizen": de map draagt al een OS-tab die Reizen
+       heet (tab:reizen, het boeken zelf), en twee tegels met dezelfde naam in
+       een map is voor een gebruiker een raadsel en voor test/appmenu.e2e.js een
+       fout -- die toets bewaakt dat een app in precies EEN map staat en meet dat
+       op het label. De bibliotheek noemt hem ook RTG Reizen. */
+    reizen:      { naam: 'RTG Reizen',    url: '/apps/reizen.html' },
     vluchten:    { naam: 'Vluchten',      url: '/apps/vluchten.html' },
     sport:       { naam: 'Sport',         url: '/apps/sport.html' },
     school:      { naam: 'School',    url: '/apps/rtgschool.html' },

@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Reizen</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="manifest" href="/manifests/reizen.webmanifest">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<style>
+  .reis{display:block;border:1px solid var(--rtg-line);border-radius:12px;padding:.85rem .95rem;margin:.5rem 0;
+    color:inherit;text-decoration:none;}
+  .reis:hover,.reis:focus-visible{border-color:var(--rtg-goud);}
+  .reis .kop{display:flex;gap:.6rem;align-items:baseline;}
+  .reis .kop b{font-size:1rem;}
+  .reis .wanneer{margin-left:auto;color:var(--rtg-soft);font-size:.82rem;white-space:nowrap;}
+  .reis .bij{color:var(--rtg-soft);font-size:.84rem;margin-top:.25rem;}
+  .merk{display:inline-block;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--rtg-soft);border:1px solid var(--rtg-line);border-radius:99px;padding:.1rem .5rem;}
+  .wereld{display:grid;grid-template-columns:repeat(auto-fill,minmax(9rem,1fr));gap:.5rem;margin-top:.6rem;}
+  .wereld a{display:block;border:1px solid var(--rtg-line);border-radius:12px;padding:.7rem .8rem;
+    color:inherit;text-decoration:none;font-size:.9rem;}
+  .wereld a:hover,.wereld a:focus-visible{border-color:var(--rtg-goud);}
+  .wereld a span{display:block;color:var(--rtg-soft);font-size:.78rem;margin-top:.2rem;line-height:1.45;}
+  .stilte{border:1px solid var(--rtg-goud);border-radius:12px;padding:.8rem .9rem;margin:.8rem 0;
+    font-size:.86rem;line-height:1.55;color:var(--rtg-soft);background:rgba(201,162,75,.09);}
+</style>
+<link href="/shared/ios.css" rel="stylesheet">
+</head>
+<body class="rtg-stijl">
+<a class="skip" href="#inhoud">Naar de inhoud</a>
+<header class="kop">
+  <a href="/apps/app.html" aria-label="Terug naar de app">&#8592;</a>
+  <h1>RTG Reizen</h1>
+  <div class="rek"></div>
+  <span class="stil">uw reiswereld</span>
+</header>
+
+<!-- RTG Reizen is een super app in de zin van PLATFORM.md: hij ORKESTREERT de
+     reisdomeinen en vervangt ze niet. Verblijven, Reisbureau, Vluchten en
+     Hangar houden hun eigen diepte, hun eigen catalogus en hun eigen
+     boekingsstroom; wat hier staat is wat nergens bestond -- uw komende reis
+     bij elkaar, ongeacht in welke app u hem geboekt heeft.
+
+     Daarom staat er op dit scherm GEEN knop die boekt, wijzigt of annuleert.
+     Elke regel is een link naar de app die het echte werk doet. Zou dit scherm
+     ook boeken, dan was er een tweede plek waar een reis ontstaat, en dan is de
+     vraag "waar staat mijn boeking echt" binnen een maand niet meer te
+     beantwoorden (LAT.md regel 4). -->
+
+<main id="inhoud">
+  <section aria-label="Uw komende reis">
+    <h2>Wat eraan komt</h2>
+    <div id="stilte"></div>
+    <div id="komend"><p class="stil">Laden...</p></div>
+  </section>
+
+  <section aria-label="De reiswereld">
+    <h2>Waar u verder heen kunt</h2>
+    <p class="stil">Elk van deze is een eigen app met zijn eigen diepte. Dit scherm brengt ze samen;
+    het vervangt ze niet.</p>
+    <div class="wereld">
+      <a href="/apps/rtg.html"><b>Het Huis</b><span>Reserveren en bestellen bij alle partners, op codenaam.</span></a>
+      <a href="/apps/hotels.html"><b>Verblijven</b><span>Hotels, appartementen en villa's met ledenprijzen.</span></a>
+      <a href="/apps/reisbureau.html"><b>Reisbureau</b><span>Samengestelde reizen tegen de nettoprijs.</span></a>
+      <a href="/apps/vluchten.html"><b>Vluchten</b><span>Zoeken, boeken, inchecken en volgen.</span></a>
+      <a href="/apps/hangar.html"><b>Hangar</b><span>Privéjets en charters vanaf Business Aviation.</span></a>
+      <a href="/apps/reisboek.html"><b>Reisboek</b><span>Uw reisdagboek: boekingen worden een verslag.</span></a>
+      <a href="/apps/maison.html"><b>Maison</b><span>Uw vaste verblijven en tweede huizen.</span></a>
+      <a href="/apps/ov.html"><b>RTG OV</b><span>Bus, trein, metro, veerboot en taxi onderweg.</span></a>
+    </div>
+  </section>
+</main>
+
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g,
+    c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+  const token = () => { try { return localStorage.getItem('rtg_member_token'); } catch (e) { return null; } };
+
+  const SOORT = { verblijf: 'Verblijf', reis: 'Reis', vlucht: 'Vlucht', charter: 'Charter' };
+
+  function datum(d) {
+    if (!d) return '';
+    const x = new Date(d + 'T00:00:00');
+    return isNaN(x) ? d : x.toLocaleDateString('nl-NL', { day: 'numeric', month: 'short' });
+  }
+
+  function teken(d) {
+    /* Eerst zeggen wat er NIET is opgehaald. Een reiswereld die na een storing
+       drie in plaats van vier reizen toont, lijkt compleet en is het niet --
+       dat is precies hoe iemand een vlucht mist. */
+    $('#stilte').innerHTML = (d.stil || []).length
+      ? '<div class="stilte" role="status"><strong>Niet alles is opgehaald.</strong> ' +
+        esc((d.stil || []).join(' en ')) + ' gaf geen antwoord, dus wat daar staat ontbreekt hieronder. ' +
+        'Dit is geen leeg reisschema maar een onvolledig reisschema; kijk zo nodig in de app zelf.</div>'
+      : '';
+
+    const r = d.komend || [];
+    if (!r.length) {
+      $('#komend').innerHTML = '<p class="stil">Er staat niets gepland. Zodra u ergens boekt -- in welke ' +
+        'reisapp dan ook -- verschijnt het hier vanzelf.</p>';
+      return;
+    }
+    $('#komend').innerHTML = r.map(x =>
+      '<a class="reis" href="' + esc(x.link) + '">' +
+        '<span class="kop"><b>' + esc(x.titel || SOORT[x.soort] || 'Reis') + '</b>' +
+          '<span class="wanneer">' + esc(datum(x.van)) + (x.tot && x.tot !== x.van ? ' &ndash; ' + esc(datum(x.tot)) : '') + '</span>' +
+        '</span>' +
+        '<span class="bij">' + esc(SOORT[x.soort] || x.soort) +
+          (x.bestemming ? ' &middot; ' + esc(x.bestemming) : '') +
+          (x.status ? ' &middot; ' + esc(x.status) : '') + '</span>' +
+        '<span class="bij"><span class="merk">' + esc(x.app) + '</span></span>' +
+      '</a>').join('');
+  }
+
+  async function laad() {
+    try {
+      const res = await fetch('/api/reis/wereld', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (token() || '') },
+        body: '{}'
+      });
+      const d = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(d.error || 'Er ging iets mis.');
+      teken(d);
+    } catch (e) {
+      $('#komend').innerHTML = '<p class="stil">' + esc(e.message) + ' Log eerst in via de leden-app.</p>';
+    }
+  }
+  laad();
+})();
+</script>
+<script src="/shared/deelmenu.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
+<script src="/shared/ios.js" defer></script>
+</body>
+</html>

@@ -15,6 +15,12 @@ module.exports = [
   ['attenties', 'Attenties', 'sociaal', '/apps/attenties.html', 'Attenties en cadeaus regelen voor wie je waardeert.'],
 
   // ---- reizen & verblijf ----
+  /* RTG Reizen is de wereld erboven (PLATFORM.md, laag 2): hij orkestreert de
+     reisapps en vervangt ze niet. Hij staat daarom NAAST Verblijven,
+     Reisbureau, Vluchten en Hangar en niet in plaats daarvan -- die vier houden
+     hun eigen catalogus en hun eigen boekingsstroom. Wat hij toevoegt is wat
+     nergens bestond: uw komende reis bij elkaar, uit alle domeinen tegelijk. */
+  ['reizen', 'RTG Reizen', 'reizen', '/apps/reizen.html', 'Uw komende reis bij elkaar -- vlucht, verblijf, reis en charter -- ongeacht in welke app u hem boekte. Boeken en annuleren blijft in de app die het echte werk doet.'],
   ['rtg', 'Het Huis', 'reizen', '/apps/rtg.html', 'Reserveren, boeken en bestellen bij alle partners, alles op codenaam.'],
   ['hotels', 'Verblijven', 'reizen', '/apps/hotels.html', 'Hotels, appartementen en villa\'s met ledenprijzen en keyless toegang.'],
   ['reisbureau', 'Reisbureau', 'reizen', '/apps/reisbureau.html', 'Samengestelde reizen tegen de nettoprijs, met AI-reisadvies in gewone woorden.'],

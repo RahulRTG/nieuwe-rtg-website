@@ -123,7 +123,14 @@ function statischeServer() {
     if (res.overtredingen.length) {
       totaal += res.overtredingen.reduce((n, v) => n + v.aantal, 0);
       console.log(`\n[a11y] ${pad}: ${res.overtredingen.length} soort(en) structurele overtreding`);
-      for (const v of res.overtredingen) console.log(`  · ${v.id}: ${v.help} (${v.aantal}x)`);
+      for (const v of res.overtredingen) {
+        console.log(`  · ${v.id}: ${v.help} (${v.aantal}x)`);
+        /* WAAR, net als bij het contrastadvies hieronder. Zonder plaats is een
+           structurele overtreding op een pagina met veertig velden een zoektocht
+           -- en juist deze meldingen laten de bouw falen, dus daar wil je het
+           adres het hardst. */
+        for (const w of (v.waar || [])) console.log(`      ${w}`);
+      }
     } else {
       console.log(`[a11y] ${pad}: schoon`);
     }

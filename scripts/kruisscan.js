@@ -60,7 +60,14 @@ function strip(src) {
   let out = '';
   const n = src.length;
   const OPENERS = new Set(['=', '(', ',', ':', ';', '!', '&', '|', '?', '{', '}', '[',
-    '<', '>', '+', '-', '*', '%', '^', '~', 'r'/* return */]);
+    '<', '>', '+', '-', '*', '%', '^', '~',
+    /* De LAATSTE letter van de sleutelwoorden waarna een regex mag beginnen.
+       Hier stond 'r' met de opmerking "return" -- maar `prev` is het laatste
+       betekenisvolle teken, en dat is de 'n'. Gevolg: `return /^\d{4}/.test(x)`
+       werd niet als regex herkend, en de `\d` erin telde als een kale
+       identifier `d`. Dat is precies een vals alarm van het soort dat deze scan
+       niet hoort te geven. */
+    'n'/* return, in */, 'f'/* typeof, of */, 'e'/* case */]);
   let i = 0, prev = '';
   const pushSpaces = (from, to) => { for (let k = from; k < to; k++) out += (src[k] === '\n' ? '\n' : ' '); };
   while (i < n) {

@@ -18,7 +18,7 @@
 /* `bankregie` wordt hier verklaard en tot onderaan dit deel gebruikt; daarom
    loopt de grens met deel 4a ervoor en niet erin. */
 module.exports = (kern, hulp) => {
-  const { FISCAAL_PEILJAAR, LANDEN, accounts, anthropic, betaal, betaalOpdrachten, centen, crypto, db, findSupplier, fonds, keyVanCodenaam, ledenAantal, log, save, schoon, sseToCustomer, sseToOffice, sseToSupplier } = hulp;
+  const { FISCAAL_PEILJAAR, LANDEN, accounts, anthropic, betaal, betaalOpdrachten, centen, crypto, db, findSupplier, fonds, keyVanCodenaam, ledenAantal, log, magAi, ondernemerpoort, save, schoon, sseToCustomer, sseToOffice, sseToSupplier } = hulp;
 
 /* Bankregie (kern/bankregie.js): de geldinfrastructuur-knop van de boardroom --
    een schakelaar met DRIE standen (partner -> hybride -> eigen) die bepaalt hoe
@@ -72,6 +72,41 @@ Object.assign(kern, require('../kern/checklijst')({ db, save, crypto, schoon }))
    de vervoerstools EN de zzp-tools. De afleiding zelf hangt al aan db
    (db.capsVan); dit is de kern-ingang voor de route. */
 Object.assign(kern, require('../kern/werkvormen')({ db }));
+/* De ONDERNEMING (kern/onderneming): één bedrijfsobject dat bestaat vanaf
+   "ik denk erover na" tot een groep met meerdere vennootschappen. Hij hangt
+   hier, direct achter de werkvormen, omdat hij hun afleiding samenvoegt met
+   twee assen die zij niet kent: de rechtsvorm (zzp, bv, stichting) en de
+   levensfase. De boekingen- en bonnen-index komt rechtstreeks uit ../db,
+   net als in kern/leverancier.js: O(1) per zaak in plaats van een scan. */
+Object.assign(kern, require('../kern/onderneming')({ db, save, crypto, schoon, findSupplier,
+  ordersVanZaak: require('../db').ordersVanZaak, boekingenVanZaak: require('../db').boekingenVanZaak,
+  /* De aanvraag om een zaak loopt langs de BESTAANDE aanmeldingsstroom
+     (gemount in kernlaag2), zodat er geen tweede deur ontstaat naast de deur
+     waar een mens voor staat. Zie de kop van kern/onderneming/index.js. */
+  aanmeldingen: kern.aanmeldingen,
+  /* De poort die elke nieuwe zaak al door de basis loodst. Gelezen en niet
+     nagebouwd: twee lijsten die allebei "is deze zaak er klaar voor" beweren,
+     lopen uiteen. */
+  ondernemerpoort,
+  /* Het personeel van een zaak woont in de identiteitskluis (SQLite), niet in
+     db.data. De toegangslaag telt en klokt het; namen worden hier niet
+     opgehaald. Zie kern/onderneming/toegang.js. */
+  staffLijst: (code) => accounts.listStaff(code),
+  /* De AI-laag van het Ondernemers-OS draait op dezelfde client en dezelfde
+     poort als de rest van het huis; zonder sleutel valt hij terug op de eigen
+     data. Zie kern/onderneming/ontwerper.js. */
+  anthropic, magAi }));
+/* De Rechtsvormwacht (kern/onderneming/rechtsvormwacht.js): rechtsvormen --
+   Nederlandse en buitenlandse in een register -- worden automatisch bijgewerkt
+   in plaats van overgetypt. Zelfde ontwerp als de Regelwacht hierboven: een
+   gevalideerde overlay op het gedeelde register, herstart-vast, met een
+   dagelijkse bron-check en de ingebouwde tabel als veilige basis. Hij hangt
+   direct achter de onderneming, want die tabel is van hem. */
+Object.assign(kern, require('../kern/onderneming/rechtsvormwacht')({ db, save }));
+kern.rechtsvormwacht.herstelOverlay();
+const rvTimer = setInterval(() => { kern.rechtsvormwacht.check().catch(() => {}); },
+  Number(process.env.RECHTSVORM_CHECK_MS || 86400000));
+if (rvTimer.unref) rvTimer.unref();
 /* De Opvang-afdeling (AZC/COA), het Regeringskantoor van de
    minister-president en het eigen hotel van elke afdeling -- alle drie
    kamers van RTG Kantoren. */

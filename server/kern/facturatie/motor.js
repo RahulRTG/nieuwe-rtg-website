@@ -2,6 +2,8 @@
    standaard btw-tarief per genre, regels verwerken en het tweezijdige
    boeken (op code of codenaam). Krijgt de gedeelde context een keer bij
    het opstarten vanuit kern/facturatie.js. */
+const REGELSOM = require('../regelsom');
+
 module.exports = (ctx) => {
   const { db, save, crypto, findSupplier, keyVanCodenaam, notify, notifySupplier, sseToCustomer, sseToSupplier, factuur, anthropic, schoon,
     SOORTEN, LAAG_BTW_TYPES, nu, scho, rond } = ctx;
@@ -21,20 +23,10 @@ module.exports = (ctx) => {
     return LAAG_BTW_TYPES.includes(supplier.type) ? 9 : 21;
   }
 
-  // Reken de regels door: elk stuk is een prijs INCLUSIEF btw.
-  function verwerkRegels(regels, btwStandaard) {
-    let subtotaal = 0, btwBedrag = 0, totaal = 0;
-    const uit = (Array.isArray(regels) ? regels : []).slice(0, 60).map(r => {
-      const aantal = Math.max(1, Number(r.aantal) || 1);
-      const stuk = rond(r.stuk);
-      const btw = Number.isFinite(Number(r.btw)) ? Number(r.btw) : btwStandaard;
-      const regelIncl = rond(aantal * stuk);
-      const regelExcl = rond(regelIncl / (1 + btw / 100));
-      subtotaal += regelExcl; btwBedrag += rond(regelIncl - regelExcl); totaal += regelIncl;
-      return { omschrijving: scho(r.omschrijving, 120) || 'Post', aantal, stuk, btw, incl: regelIncl };
-    });
-    return { regels: uit, subtotaal: rond(subtotaal), btwBedrag: rond(btwBedrag), totaal: rond(totaal) };
-  }
+  /* Reken de regels door. De som zelf staat in kern/regelsom.js, want de
+     offertebouwer rekent hem ook -- en een offerte die anders afrondt dan de
+     factuur die eruit voortkomt, is een verschil dat niemand kan uitleggen. */
+  const verwerkRegels = (regels, btwStandaard) => REGELSOM.verwerkRegels(regels, btwStandaard, scho);
 
   /* De kern: boek EGn transactie -> EGn tweezijdige factuur.
      data: { soort, verkoperCode, verkoperNaam, koper:{key,naam,codenaam,supplierCode},
@@ -63,6 +55,24 @@ module.exports = (ctx) => {
       methode: scho(data.methode, 20) || null, ref: scho(data.ref, 60) || null,
       at: nu(), datum: nu().slice(0, 10)
     };
+    /* DE BETAALSTATUS. Facturen droegen die niet, dus gold elke factuur
+       impliciet als afgedaan en bestond er geen debiteurenlijst.
+
+       De stand wordt NIET geraden waar hij gezegd kan worden: `data.betaald`
+       telt, en anders geldt de aanwezigheid van een betaalmethode als bewijs
+       -- die wordt alleen gezet als er echt is afgerekend (een bon, een rit).
+       Zonder allebei staat de factuur open, met een vervaldatum.
+
+       Let op wat hier NIET gebeurt: bestaande facturen krijgen geen veld en
+       tellen elders als betaald (zie kern/onderneming/debiteuren.js). Zou de
+       geschiedenis als open gelden, dan stond morgen alles wat ooit is
+       gefactureerd op de debiteurenlijst -- een alarm dat niets betekent en
+       daarna niet meer gelezen wordt. */
+    const termijn = Number(data.betaaltermijn);
+    f.betaaltermijn = Number.isFinite(termijn) && termijn > 0 && termijn <= 365 ? Math.round(termijn) : 14;
+    f.betaald = data.betaald !== undefined ? !!data.betaald : !!f.methode;
+    f.betaaldAt = f.betaald ? nu() : null;
+    f.vervaldatum = new Date(Date.parse(f.at) + f.betaaltermijn * 86400000).toISOString().slice(0, 10);
     s.facturen.unshift(f);
     s.facturen = s.facturen.slice(0, 100000);
     save();
@@ -93,5 +103,24 @@ module.exports = (ctx) => {
     }
     return boek(data);
   }
-  return { store, nummer, standaardBtw, verwerkRegels, boek, boekMetCodenaam };
+  /* Een openstaande factuur afboeken. Alleen de VERKOPER mag dat, want alleen
+     hij weet of het geld binnen is; een koper die zijn eigen factuur op betaald
+     zet, is geen betaling maar een bewering. Idempotent, en terugdraaien mag
+     ook -- een vergissing hoort herstelbaar te zijn. */
+  function factuurBetaald(id, verkoperCode, betaald) {
+    const f = store().facturen.find(x => x.id === String(id || ''));
+    if (!f) return { status: 404, error: 'Deze factuur bestaat niet.' };
+    if (!verkoperCode || f.verkoper.code !== verkoperCode) {
+      return { status: 403, error: 'Alleen de verkoper kan een factuur afboeken.' };
+    }
+    const naar = betaald !== false;
+    if (!!f.betaald === naar) return { status: 200, ok: true, betaald: naar, ongewijzigd: true };
+    f.betaald = naar;
+    f.betaaldAt = naar ? nu() : null;
+    save();
+    if (sseToSupplier && f.verkoper.code) sseToSupplier(f.verkoper.code, 'sync', { scope: 'facturen' });
+    return { status: 200, ok: true, betaald: naar };
+  }
+
+  return { store, nummer, standaardBtw, verwerkRegels, boek, boekMetCodenaam, factuurBetaald };
 };

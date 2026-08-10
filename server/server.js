@@ -1949,7 +1949,11 @@ const hulp = {
      /api/member/spel zou weigeren. Ze gaan naar de KERNLAGEN en niet naar de
      kern zelf -- routers hebben ze niet nodig, en die oppervlakte houden we
      klein (zie TAKEN.md 5.14). */
-  sseClients, lidBoardUit
+  sseClients, lidBoardUit,
+  /* De AI-poort (kern/aipoort.js) gaat mee de kern in: het Ondernemers-OS heeft
+     hem nodig en hoort hem niet na te bouwen -- een tweede poort naar dezelfde
+     AI is een poort die niemand bewaakt. */
+  magAi: (req) => aiPoort.magAi(req)
 };
 
 /* De samenstelling van de kern staat in ./opzet/kernlaag1..7.js --

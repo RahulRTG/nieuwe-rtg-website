@@ -1108,6 +1108,1008 @@ meetelt, de drempel die een verbod wordt, en een `werktBij` die niet meer naar
 het bedrijf kijkt -- elk daarvan laat een andere toets zakken. Het scherm van de
 werkgever loopt de weg af in `test/mobiliteitscherm.e2e.js`.
 
+### RTG Ondernemers-OS: drie assen, één bedrijfsobject
+
+`server/kern/onderneming/` + `/api/onderneming/...`. De ruggengraat onder alles
+wat een ondernemer hier kan: **één object dat bestaat vanaf "ik denk erover na"**
+en dat meegroeit tot een groep met meerdere vennootschappen.
+
+**Waarom het er is.** Een bedrijf bestond hier in twee gedaanten. Vóór de
+oprichting was het een `aanmelding` (`kern/aanmeldingen/bedrijf.js`), daarna een
+`supplier`, en `provisioneer()` maakte die tweede op het moment dat het personeel
+de eerste termijn aftekende. Twee objecten voor één bedrijf is regel 4, en de
+naad zat op de slechtst denkbare plek: alles vóór de oprichting -- het idee, de
+verkenning, het plan, de rechtsvormkeuze -- had geen object om aan te hangen, en
+alles erna had geen geheugen van wat er vooraf bedacht was.
+
+De onderneming **wijst de zaak aan** in plaats van hem over te schrijven. De
+supplier blijft wat hij is (het menu, de vloot, het personeel); de onderneming is
+wie hij juridisch en in zijn leven is. De **naam woont daarbij op precies één
+plek, en die plek verhuist**: zolang er geen zaak is staat hij op de onderneming,
+en bij het koppelen wordt de lokale naam wéggegooid -- niet gekopieerd, want een
+tweede naam die niemand meer bijwerkt is precies waar regel 4 over gaat.
+
+**De drie assen komen samen in één capslijst:**
+
+- **Wat zij DOET** -- `kern/werkvormen.js`, ongewijzigd: afgeleid uit vloot, menu,
+  kamers, personeel.
+- **Wat zij IS** -- `onderneming/rechtsvorm.js`: eenmanszaak, vof, bv, holding,
+  stichting, vereniging, coöperatie. Dit wordt als enige **niet** afgeleid, en met
+  reden: een rechtsvorm is een feit van de notaris en de KvK, en gokken zou hier
+  betekenen dat iemand op de verkeerde aangifte belandt. Wat er wél uit volgt
+  (verplichtingen, gereedschap, oprichtingsstappen) staat als data.
+- **Waar zij STAAT** -- `onderneming/fase.js`: idee, validatie, oprichting, eerste
+  klant, tractie, werkgever, vestigingen, groep. Afgeleid uit feiten en nooit
+  gezet, want een opgeslagen fase loopt uiteen met de werkelijkheid en alles wat
+  erop leunt is dan óók fout. Het is de **hoogste bereikte** fase en niet de
+  eerste die zakt: wie eerst inschrijft en pas daarna zijn plan opschrijft blijft
+  niet op 'idee' hangen. En zonder feiten geeft hij `null` en niet 'idee' (regel
+  3: 'idee' is een geldige uitkomst en mag dus nooit het antwoord zijn op
+  ontbrekende invoer).
+
+**`verboden` is geen tweede capslijst maar het tegendeel ervan**, en het bestaat
+apart omdat een verbod anders verliest van een andere as. Een stichting mag geen
+winst uitkeren; zou `winstuitkering` alleen ontbréken in haar caps, dan zet de
+eerste as die hem wél meebrengt de knop alsnog neer. `capsSamen()` trekt de
+verboden er dus ná het samenvoegen af, en geeft terug wat er is geweerd en
+waarom -- een knop die zonder uitleg ontbreekt leest als een storing.
+
+**Geen paslaag op nadenken.** De zzp-belastingtool en de AI-boekhouder blijven
+achter de Business Pass; de onderneming zelf niet. De eerste stand is letterlijk
+"ik denk erover na", en iemand die dat denkt heeft nog geen zakelijke pas.
+
+Getoetst in `test/onderneming.test.js` (22 toetsen). Vijf mutaties gedaan en alle
+vijf zagen we de júiste toets laten zakken: de verboden niet meer aftrekken, de
+fase stil op 'idee' laten vallen, de ladder bij het eerste gat laten stoppen, de
+naam kopiëren in plaats van weggooien, en de eigendomscontrole op de routes
+weghalen.
+
+### De pre-oprichtingsfase: verkennen, doorrekenen, en mogen afraden
+
+`server/kern/onderneming/{intake,kans,simulatie,stress,stress-toetsen,plan}.js`
++ `/api/onderneming/{intake,verkenning,plan/vastleggen}`. De vier stappen vóór
+de oprichting, gebouwd op het ondernemingsobject hierboven. Ze leunen op elkaar
+in één volgorde en worden daarom als één ketting aangeroepen
+(`ondernemingVerkenning`) -- een scherm dat ze zelf moet ordenen, ordent ze ooit
+verkeerd.
+
+**De kansverkenning is een meter, en regel 10 gaat over meters.** Een score van
+87/100 ziet eruit als een feit, wordt overgeschreven in een ondernemingsplan en
+daarna aan een bank getoond. Drie dingen liggen daarom vast:
+
+- **Niet gemeten is niet nul.** Een bron zonder data levert geen punten én telt
+  niet mee in de noemer. Zou hij als nul meetellen, dan krijgt een leeg platform
+  vanzelf een lage score en leest een gebrek aan méting als een gebrek aan kans.
+- **Onder twee gemeten bronnen komt er geen cijfer**, maar `null` met de reden.
+  Een getal met een voorbehoud eronder wordt een getal zodra iemand het overtypt.
+- **De grondslag reist mee**: per bron of hij gemeten is, welke waarde eruit
+  kwam en hoeveel punten dat gaf.
+
+De vier bronnen zijn bestaande data en er komt geen register bij: concurrentie
+(zaken van dezelfde soort in dezelfde plaats), vraag (hun boekingen en bonnen),
+personeel (open vacatures in de branche -- een tekort is voor een starter een
+risico) en bedrijfsruimte (leegstand uit het stadsweefsel, de bron die in de
+praktijk het vaakst eerlijk 'niet gemeten' meldt). Nul concurrenten is bewust
+**niet** de topscore: een markt waar niemand zit, is vaker geen markt dan een gat.
+
+**Het volume komt van de ondernemer, niet van ons.** De simulatie rekent zijn
+eigen aannames door over twaalf maanden in drie scenario's, en elke aanname staat
+met **naam, getal en herkomst** in het antwoord -- `opgegeven` of `aanname`.
+Zonder dat onderscheid lijkt onze startwaarde net zo hard als zijn eigen cijfer,
+en zo wisselt een prognose ongemerkt van eigenaar. Ontbreekt er invoer, dan komt
+er een fout met de ontbrekende velden en geen half doorgerekende maand.
+
+**De stress test mag 'niet starten' zeggen.** Netjes doorgerekende aannames zien
+er altijd goed uit, en dat is het probleem; deze module gaat er met opzet tegenin.
+Verkopen onder de kostprijs is blokkerend (meer verkopen maakt het verlies
+groter), net als een kas die in het *basisscenario* onder nul duikt -- niet in een
+somber geval dat wij erbij verzinnen, maar in wat de ondernemer zelf verwacht. Er
+staat ook in wat juist wél houdt: een lijst die alleen problemen noemt, wordt na
+twee keer weggeklikt, en dan doet ook de blokkerende bevinding er niet meer toe.
+
+**Het advies is geen slot.** Het levende ondernemingsplan wordt elke keer opnieuw
+gebouwd en nergens bewaard (een kopie zou verouderen zodra de intake wijzigt).
+Wat wél wordt bewaard is de **beslissing**: vastleggen zet een bevroren versie in
+het archief, en bij een 'niet starten' gaat dat alleen door met een
+uitdrukkelijke `tochDoorzetten` die mét het advies wordt opgeschreven. Software
+die een mens verbiedt te ondernemen omdat een rekensom dat vindt, is niet aan
+ons; zorgen dat niemand kan zeggen dat hij het niet wist, wel. Dat vastleggen is
+tegelijk de fase-overgang van 'idee' naar 'validatie' -- geen knop die een fase
+zet, maar het feit waar `fase.js` op kijkt.
+
+Getoetst in `test/onderneming-verkenning.test.js` (20 toetsen). Zes mutaties
+gedaan; vijf beten meteen. De zesde sloeg af en bleek een kapotte mutatie te zijn
+(de cache die hij moest zetten werd nooit gevuld) -- opnieuw gedaan, en toen zakte
+de juiste toets. De vijf andere: ontbrekende bronnen als nul meetellen, de
+bronnendrempel weghalen, 'onder de kostprijs' van blokkerend naar zwaar zetten,
+de simulatie op halve invoer laten rekenen, en de bevestiging bij 'niet starten'
+overslaan.
+
+### De schil: één scherm dat met het bedrijf meegroeit
+
+`server/kern/onderneming/dagbeeld.js` + `/api/onderneming/dagbeeld` +
+`/apps/onderneming.html`. De ondernemer hoort geen modules te zien. Hij opent
+zijn bedrijf en ziet waar hij staat, wat er vandaag toe doet, en wat hij eraan
+kan doen -- en dat scherm is **fase-bewust**, want dat is de hele belofte: een
+idee krijgt geen debiteurenbeheer, een groep krijgt geen intakevragen meer.
+
+**Het scherm verzint geen cijfers om zichzelf te vullen.** Een onderneming in de
+ideefase heeft geen omzet, en dan staat er geen "€0" maar niets: nul is een
+gemeten waarde en die suggereert dat er verkocht had kunnen worden. Elk cijfer
+draagt `gemeten`, en wat niet gemeten is, staat als **reden** onder "niet
+gemeten" in plaats van als getal.
+
+**De gezondheidsscore loopt via dezelfde meter als de kansverkenning**
+(`onderneming/meter.js`). Hoe je met ontbrekende bronnen omgaat is precies het
+stuk dat je twee keer nét anders opschrijft, dus staat het één keer: niet-gemeten
+telt ook niet mee in de noemer, onder twee bronnen komt er geen cijfer, en de
+grondslag reist mee. Gevolg, en het is de bedoeling: **een onderneming zonder
+zaak heeft één meetbare bron en krijgt dus geen cijfer.** Een bedrijf dat
+gisteren begon en vandaag een 60 krijgt, heeft een cijfer over niets.
+
+**De acties staan op gewicht, met een reden per stuk.** Wat het plan breekt
+(een blokkerende bevinding) gaat vóór een ontbrekend intakeveld, en dat gaat vóór
+"kies eens een rechtsvorm". Elke actie zegt waaróm hij er staat: een lijst
+opdrachten zonder reden wordt een afvinklijst, en daarin verdwijnt ook de
+belangrijke.
+
+Eén ding dat het scherm bewust *niet* aanneemt: dat zijn eigen kopbalk blijft
+staan. `shared/ios.js` bouwt de chrome om, en de eerste versie hier ging ervan
+uit dat haar `<h1>` er daarna nog was -- waarop het hele scherm bleef hangen op
+een `null`. Dat is geen fout van die laag maar van de aanname; er wordt nu alleen
+naar de chrome geschreven als hij er nog is.
+
+Getoetst in `test/onderneming-dagbeeld.test.js` (10) en
+`test/onderneming-scherm.e2e.js` (4, in een echte browser). Zes mutaties, alle
+zes raak: ontbrekende bronnen als nul meetellen, de bronnendrempel verlagen, een
+omzet van nul tonen in plaats van niets, de acties niet meer op gewicht zetten,
+de schil de 409 laten wegpoetsen door meteen `tochDoorzetten` mee te sturen, en
+de schil ook de niet-gemeten cijfers laten tekenen.
+
+### Het oprichtingsproject en de zaak: de reis afgemaakt
+
+`server/kern/onderneming/{oprichting,aanvraag}.js` +
+`/api/onderneming/{oprichting,oprichting/zet,aanvraag,aanvraag/stand}`. Het laatste
+stuk: van een vastgelegd plan naar een zaak die draait.
+
+**Zonder rechtsvorm geen lijst.** De oprichtingsstappen komen uit drie bronnen --
+de rechtsvorm (gelezen uit `rechtsvorm.js`, niet overgetypt), de branche
+(een restaurant heeft een alcoholvergunning nodig, een rijschool een
+instructeurspas) en de situatie (samen ondernemen vraagt afspraken op papier,
+geen startkapitaal vraagt een buffer). Omdat de helft van die stappen van de
+rechtsvorm afhangt, geeft het project zonder die keuze géén halve lijst maar de
+vraag: een lijst die compleet lijkt en het niet is, laat iemand langs de notaris
+fietsen. En de lijst zegt zelf dat hij niet juridisch volledig is -- wie een
+lijst afvinkt die zich compleet voordoet, controleert daarna niets meer.
+
+**Er is geen tweede deur naar een zaak.** Een zaak aanmaken betekent partner
+worden, en dat besluit is mensenwerk ("er is geen automatische toekenning",
+`kern/aanmeldingen.js`). Het Ondernemers-OS maakt daarom **geen supplier** maar
+een gewone aanmelding, precies zoals het aanmeldformulier -- alleen al ingevuld
+met wat de intake weet. Zou het OS zelf provisioneren, dan stond er een deur
+naast de deur waar een mens voor staat, en dat is de deur die niemand meer
+bewaakt. De nog openstaande oprichtingsstappen gaan mee als `behoeften`, zodat de
+bestaande provisioning ze omzet in de wensenlijst van de nieuwe zaak: wat hier
+nog te doen stond, staat straks als startlijstje in de zaak zelf.
+
+**Een fout die twee keer moest afgaan voordat hij goed gerepareerd was.** Beide
+modules gaven een domeinstand terug in een veld `status` -- en `status` betekent
+in elke route van dit huis de HTTP-code. `res.status('geen-rechtsvorm')` gooit,
+dus een volstrekt correct verzoek viel om met een 500. De eerste reparatie
+hernoemde het veld in één bestand; toen ging dezelfde fout af in het tweede. Dat
+was symptoombestrijding (regel 1). De echte reparatie is nu tweeledig: de
+kernmodules geven `stand`, én `stuur()` in de route leest alleen een écht
+geheel getal tussen 100 en 599 als HTTP-code. Dat tweede maakt de hele klasse
+onmogelijk in plaats van hem per aanroep te repareren. Die guard heeft zelf geen
+eigen toets, want er is nu geen aanroeper meer die hem kan bereiken -- hij staat
+hier genoemd zodat dat bekend is en geen belofte in tekst blijft.
+
+Getoetst in `test/onderneming-oprichting.test.js` (14) en in de schermronde. Vier
+mutaties, alle vier raak: zonder rechtsvorm tóch een lijst geven, een verzonnen
+stap aannemen, het OS zelf een zaak laten aanmaken, en de aanvraag zonder
+vastgelegd plan toelaten. De twee 500's hierboven zijn niet met een mutatie
+gevonden maar in een echte ronde -- dat is sterker bewijs, geen zwakker.
+
+### Klant nummer een, en de honderd daarna
+
+`server/kern/onderneming/eersteklant.js` + `/api/onderneming/eersteklant`. Zodra
+de zaak bestaat verandert het doel: niet meer "een bedrijf oprichten" maar er
+moet iemand kopen. Deze laag meet hoe ver de zaak daarvoor klaarstaat en
+verschuift daarna mee naar de volgende mijlpaal (1, 10, 25, 50, 100 klanten,
+elk met wat er in die stap te leren valt -- een teller die alleen optelt is een
+spelletje).
+
+**De lijst hangt af van wat de zaak DOET, niet van een lijstje per genre.** Wat
+"klaar" betekent komt uit de capslijst van `werkvormen.js`: een horecazaak
+zonder kaart is niet klaar, een dienstverlener zonder diensten evenmin, maar een
+dienstverlener heeft geen kaart nodig. Zet iemand een busje in de vloot, dan komt
+de vlootstap er vanzelf bij. Een nieuw genre krijgt zo de goede lijst zonder dat
+hier iets bij hoeft. En het mooiste geval staat als eigen toets vast: wie in zijn
+eentje een restaurant runt **is** ook zelfstandige, en krijgt allebei.
+
+**Er is geen tweede poort.** `kern/ondernemerpoort.js` loodst elke nieuwe zaak al
+door de basis (Salon-pagina, rondleidingen) voordat zij online mag. Die stand
+wordt hier gelezen en niet nagebouwd -- twee lijsten die allebei "is deze zaak er
+klaar voor" beweren, lopen binnen een maand uiteen. Om diezelfde reden staat de
+Salon-pagina hier **niet** als eigen stap: twee keer hetzelfde afvinken maakt van
+een teller een leugen.
+
+**Een percentage mag hier wel, en bij de kansscore niet.** Het verschil is dat
+dit een telling is en geen weging: acht stappen, vijf gedaan, dat is exact. De
+kansscore weegt bronnen van ongelijke betekenis en kan dat niet zijn. Zonder zaak
+is er niets te tellen, en dan is het antwoord `null` en geen 0% -- 0% zou zeggen
+dat er niets gedaan is, terwijl er niets te doen valt.
+
+In het dagbeeld gaat deze stap vóór de losse openstaande aanvragen: een zaak die
+niet online staat, krijgt er sowieso geen.
+
+Getoetst in `test/onderneming-eersteklant.test.js` (16). Vijf mutaties, alle vijf
+raak: de werkvormen negeren en iedereen alles vragen, een eigen Salon-stap naast
+die van de poort zetten, zonder zaak toch 0% teruggeven, een wachtende boeking
+als klant tellen, en de eerste-klant-actie onder de losse aanvragen laten zakken.
+
+### Het Mall-profiel: de branche bepaalt de architectuur
+
+`server/kern/onderneming/mallprofiel.js` + `/api/onderneming/mallprofiel`. De Mall
+toont elke partner al, gegroepeerd per genre (`kern/mall/etalage.js`). Wat daar
+niet stond is de vraag die de ondernemer stelt: **hoe hoort mijn pagina eruit te
+zien, en wat mist er nog.** Een restaurant heeft een kaart, reserveren, bestellen
+en bezorgen; een kapper heeft diensten, een agenda en vrije tijdvakken; een hotel
+heeft kamers. Dat is geen opmaak maar architectuur.
+
+**Maar niet via een lijst per branche.** Zo'n lijst zou de zoveelste genre-tabel
+in dit huis zijn, en de eerste die vergeten wordt bij genre tweeëndertig. De
+onderdelen hangen aan **caps**, en die komen uit `werkvormen.js` -- dezelfde
+afleiding die de gereedschapskisten en de eerste-klant-lijst al gebruiken. Zet een
+hotel er een busje bij, dan verschijnt het ritblok vanzelf. Drie onderdelen hangen
+aan géén cap, omdat ze bij elke zaak horen: waar u zit, hoe het eruitziet, en uw
+verhaal.
+
+**Dit beslist niets over zichtbaarheid.** Of een zaak in de Mall stáát, bepalen de
+ondernemerspoort en de salonregel, en die blijven de enige waarheid daarover. Deze
+module beschrijft alleen de opbouw en zegt per onderdeel of de gegevens er zijn --
+een zaak die offline staat kan een volledig ingevulde pagina hebben. Dat
+voorbehoud staat in het antwoord zelf en niet alleen in de code.
+
+`GENRE_PAGINA` (waar een genre in de app geboekt wordt) is voor deze module
+geëxporteerd uit `kern/mall` in plaats van overgetypt: een tweede kaart met
+dezelfde paden loopt uiteen zodra er een genre bij komt.
+
+In het dagbeeld komt de Mall-pagina ná de etalage-check: online staan gaat voor,
+want een pagina die niemand ziet is geen pagina.
+
+Getoetst in `test/onderneming-mallprofiel.test.js` (10). Vijf mutaties, alle vijf
+raak: de caps negeren en elke zaak alles geven, de vaste onderdelen tóch aan een
+cap hangen, een eigen paginakaart naast die van de Mall zetten, het profiel over
+zichtbaarheid laten beslissen, en de Mall-actie boven de etalage-check laten
+kruipen.
+
+### Het klantenboek en de relaties (het CRM)
+
+`server/kern/klantenboek.js` + `server/kern/onderneming/relaties.js` +
+`/api/onderneming/relaties{,/notitie}`.
+
+**Er is nu één klantenboek.** Het stond in `kern/vakwerk/pro2.js` en gold alleen
+voor de vakgenres, terwijl de vraag "wie zijn mijn klanten" niet aan een genre
+hangt: een restaurant, een winkel en een hotel hadden er geen. Het staat nu in
+`kern/klantenboek.js` en Vakwerk gebruikt diezelfde -- twee boeken naast elkaar
+lopen uiteen. Twee dingen zijn bewust zo gebleven: de opslagsleutel blijft
+`vakKlantNotities` (een mooiere naam is geen reden om data te verhuizen; een
+migratie die niets oplost is puur risico), en het draait op **codenaam**. Dat
+laatste is geen tekortkoming maar het ontwerp, en een CRM is precies de plek waar
+die regel anders stilletjes zou sneuvelen. Wat er wél veranderde: **bonnen tellen
+mee**. Wie bij dezelfde zaak at maar niet boekte, bestond in het oude boek niet.
+
+**Er komen geen leads en prospects bij, en dat is een keuze.** Een echte
+CRM-pijplijn begint bij een lead, maar binnen RTG bestaat geen enkel proces dat
+leads *produceert*: niemand importeert een lijst, geen formulier maakt een
+prospect. Zo'n register zou hier een lege tabel zijn die alleen met de hand te
+vullen is -- precies het soort register dat na twee weken niemand bijhoudt en
+daarna verkeerde cijfers geeft. Wat er wél is, is echt: transacties,
+offerte-aanvragen en boekingen die op antwoord wachten. Komt er ooit een echte
+leadbron, dan past die hier gewoon bij.
+
+**De segmenten zijn geteld, niet geraden**: nieuw (kocht een keer), terugkerend,
+en stilgevallen (kocht vaker, maar is 120+ dagen weg). Geen AI-oordeel, want dan
+hangt de indeling af van een sleutel die er niet altijd is en verschuift zij
+zonder dat er iets gebeurd is. Een **eenmalige** klant die lang wegblijft geldt
+niet als stilgevallen: daar is stilte normaal, en dat verwijt slaat nergens op.
+
+**De opvolging rust op wat er echt staat** -- openstaande aanvragen, offertes
+zonder prijs (met apart wie er langer dan zeven dagen ligt), en vaste klanten die
+stil vielen. Geen enkele regel is een herinnering die wij verzonnen: een rustige
+zaak krijgt een lege lijst, want niets te doen is ook een uitkomst.
+
+In het dagbeeld gaat de opvolging vóór de Mall-pagina (geld binnen handbereik gaat
+voor een mooiere pagina), en de oude losse "aanvragen"-actie valt weg zodra de
+opvolging hem al noemt -- twee keer hetzelfde vragen leest als een storing.
+
+Getoetst in `test/onderneming-relaties.test.js` (12). Vijf mutaties, alle vijf
+raak: bonnen niet meetellen, een wachtende boeking als klant tellen, eenmalige
+klanten als stilgevallen bestempelen, offertes van andere zaken meetellen, en de
+losse aanvragen-actie er tóch dubbel bij laten komen.
+
+### Debiteuren: wat er nog open staat, en hoe lang al
+
+`server/kern/onderneming/debiteuren.js` + `/api/onderneming/debiteuren`, met de
+betaalstatus zelf in `kern/facturatie/motor.js` en het afboeken op
+`/api/supplier/facturen/betaald`.
+
+De facturatie bestond al -- nummers, btw, een PDF, per zaak uitgaand en inkomend.
+Wat er niet was, is de vraag die elke ondernemer stelt zodra hij op rekening
+werkt: **wat staat er nog open.** Facturen droegen geen betaalstatus en geen
+vervaldatum, dus gold elke factuur impliciet als afgedaan en bestond er geen
+debiteurenlijst. Die twee velden zitten er nu bij de bron in: de stand wordt niet
+geraden waar hij gezegd kan worden (`betaald` van de aanroeper telt), en anders
+geldt een aanwezige betaalmethode als bewijs -- die wordt alleen gezet als er echt
+is afgerekend.
+
+**De geschiedenis telt als betaald, en dat is expliciet.** Bestaande facturen
+hebben het veld niet. Zou "geen veld" als open gelden, dan stond morgen alles wat
+ooit gefactureerd is op de debiteurenlijst: een alarm dat niets betekent, en
+precies daarom binnen een week niet meer gelezen wordt. Dezelfde grandfathering
+als `online !== false` bij de ondernemerspoort.
+
+**De ouderdomsgroepen zijn geteld, niet gewogen** -- loopt nog, 1-14, 15-30,
+31-60, 60+ dagen over. Er komt bewust géén risicoscore uit: "betalingsrisico" zou
+hier een getal zijn dat op niets rust, want wij zien alleen deze zaak en niet het
+betaalgedrag van die klant elders. Een factuur zonder vervaldatum wordt apart
+geteld in plaats van in de jongste groep gegooid: niets weten is iets anders dan
+"loopt nog". De oudste post staat er apart bij, want een klein bedrag van drie
+maanden oud zegt meer dan het totaal.
+
+**Alleen de verkoper boekt af.** Een koper die zijn eigen factuur op betaald zet,
+is geen betaling maar een bewering. Terugdraaien mag wel -- een vergissing hoort
+herstelbaar te zijn.
+
+In het dagbeeld gaan vervallen facturen vóór de rest van de opvolging: dat is het
+meest concrete geld dat er ligt, al verdiend en alleen nog niet binnen. Wat nog
+lóópt is geen actie maar de normale gang van zaken.
+
+Getoetst in `test/onderneming-debiteuren.test.js` (12), inclusief alle vijf
+groepsgrenzen. Vijf mutaties, alle vijf raak: "geen betaalstatus" als open lezen,
+op de vervaldag al vervallen zijn, een factuur zonder vervaldatum in "loopt"
+gooien, iedereen laten afboeken, en ook lopende facturen een actie laten worden.
+
+### Crediteuren: wat er nog uit moet, en wanneer
+
+`server/kern/onderneming/crediteuren.js` + `/api/onderneming/crediteuren`, met het
+gedeelde rekenwerk in `server/kern/onderneming/ouderdom.js`.
+
+De spiegel van de debiteuren, op dezelfde facturenlijst: waar de ene kant kijkt
+naar wat deze zaak heeft **verstuurd** en nog niet binnen is, kijkt deze naar wat
+zij heeft **ontvangen** en nog niet betaald.
+
+**Het rekenwerk is gedeeld, de teksten niet.** Of iets twintig dagen over is, is
+rekenkunde en aan beide kanten hetzelfde; dat staat nu één keer in `ouderdom.js`
+(grenzen, `dagenOver`, `groepVan`, `deelIn`). Wat je eraan dóét verschilt wél: bij
+een debiteur is "bel de klant" het advies, bij een crediteur "betaal, of uw
+leverancier stopt met leveren". Die teksten wonen daarom bij de kant zelf --
+zouden ze gedeeld zijn, dan stond er binnen een maand aan één van beide kanten een
+zin die er niet hoort.
+
+**Een asymmetrie die er echt is, en die niet wordt weggepoetst.** Een factuur
+wordt afgeboekt door de **verkoper**, want alleen hij ziet of het geld binnen is.
+Voor de koper betekent dat: een factuur die hij vandaag betaalt, blijft op zijn
+lijst staan tot de verkoper hem afboekt. Dat is ongemakkelijk, maar het
+alternatief is erger: een tweede vlag "ik heb betaald" naast de eerste maakt twee
+waarheden over één factuur, en dan is niet meer te zeggen welke telt. Het staat
+daarom in het antwoord, zodat een scherm het kan uitleggen in plaats van dat
+iemand denkt dat de lijst kapot is.
+
+**De vooruitblik is een optelsom, geen prognose.** Wat er de komende week en maand
+uit moet, is de som van de vervaldata die er al liggen -- posten zónder
+vervaldatum tellen niet mee, want dat zou een bedrag suggereren dat op een datum
+rust die er niet is. Er zit geen voorspelling in van wat er nog bij komt, en dat
+staat er ook bij: een liquiditeitsprognose die doet alsof zij de toekomst kent, is
+precies het soort getal waar iemand een beslissing op neemt.
+
+In het dagbeeld komen vervallen crediteuren direct ná de debiteuren: allebei geld
+dat al vaststaat, maar wat binnenkomt betaalt wat eruit moet.
+
+Getoetst in `test/onderneming-crediteuren.test.js` (11). Vijf mutaties, alle vijf
+raak: de spiegel omdraaien, de debiteuren-teksten aan de crediteuren geven, de
+vooruitblik posten zonder vervaldatum laten meetellen, van de gedeelde rekenkern
+een eigen kopie maken, en uitgaand geld boven binnenkomend geld zetten.
+
+### De contractklok op het dagbeeld
+
+`server/kern/onderneming/contracten.js` + `/api/onderneming/{contracten,werkruimte}`,
+met de gedeelde klok in `server/bedrijf/contractklok.js`.
+
+**Hier is geen contractregister gebouwd, en dat is het hele punt.** RTG Werk OS
+heeft er al een (`server/bedrijf/contract.js`): soorten, tekenen met twee namen,
+opzeggen, en een klok die de laatste opzegdag **uitrekent** uit de einddatum en de
+opzegtermijn in plaats van hem te laten overtypen. Dat is beter dan wat hier in
+een middag zou ontstaan, en een tweede register zou vooral betekenen dat een
+ondernemer twee lijsten heeft en niet weet welke telt.
+
+Wat er wél ontbrak was de **brug**. De contractbibliotheek hangt aan een
+werkruimte -- een eigen wereld met een eigen code en inlog -- en een onderneming
+wist daar niets van. Een verzekering die stil afliep, stond dus in een systeem dat
+de ondernemer op zijn dagbeeld niet zag. Die koppeling is er nu, en deze laag
+**leest alleen**: aanmaken, tekenen en opzeggen blijft in het Werk OS achter zijn
+eigen poort. De klok zelf is uit `contract.js` gelicht naar `contractklok.js`,
+zodat beide kanten dezelfde berekening gebruiken (zelfde patroon als
+`ouderdom.js` bij de debiteuren).
+
+**Geen werkruimte is een eigen stand, geen lege lijst.** Wie niets koppelde, heeft
+geen "nul contracten" maar een register dat wij niet kunnen zien -- `aantal` is
+`null`, met de zin erbij dat dit géén bevestiging is dat er niets loopt. Een
+ontbrekende koppeling die als "alles in orde" leest, is precies het soort stilte
+waar deze module tegen bedoeld is.
+
+**De klok is te zetten, want anders is hij niet te toetsen.** `contractklok.js`
+neemt de dag als parameter, en `ondernemingDagbeeld(o, nu)` geeft hem door aan de
+vier lagen die op de klok leunen (relaties, debiteuren, crediteuren, contracten).
+In productie geeft niemand hem mee en geldt gewoon nu.
+
+In het dagbeeld staat de contractklok ná het geld dat vaststaat, maar vóór de
+gewone opvolging: een gemiste opzegdag is al gebeurd en kost een jaar, waar een
+klant die niet terugbelt nog te bereiken is. En een gemiste opzegdag gaat voor een
+naderende, om dezelfde reden.
+
+Getoetst in `test/onderneming-contracten.test.js` (14). Vijf mutaties, alle vijf
+raak: geen werkruimte als lege lijst tonen, een onbekende werkruimtecode aannemen,
+ook concepten stilzwijgend laten verlengen, de opzegdag gelijkstellen aan de
+einddatum, en een naderende opzegdag boven een gemiste zetten.
+
+### Opzij zetten: de btw en de winstreservering
+
+`server/kern/onderneming/belasting.js` + `/api/onderneming/belasting`.
+
+De belastingtool bestond al (`kern/fiscaal/zzp.js`): een indicatieve
+jaarberekening per land met een reserveringspercentage. Wat ontbrak was de
+koppeling aan wat er **echt is gefactureerd** -- de ondernemer moest zelf een
+verwachte jaarwinst intypen, en precies dat getal is het getal dat hij niet weet.
+Deze laag rekent op de facturen die er staan, en houdt twee dingen streng uit
+elkaar.
+
+**De btw is geen schatting.** Wat u in rekening bracht min uw voorbelasting is een
+optelsom uit uw eigen facturen. Dat geld is nooit van u geweest; het staat alleen
+even op uw rekening. Het is het enige harde getal hier, en daarom het enige dat
+een actie op het dagbeeld oplevert -- een herinnering hangen aan een indicatie zou
+een schatting tot een schuld maken.
+
+**Voor een rechtspersoon wordt er niets uitgerekend.** `zzpBerekening` is de
+inkomstenbelasting van een IB-ondernemer; een B.V. betaalt vennootschapsbelasting
+en kent DGA-loon, een stichting heeft geen winstoogmerk. Datzelfde sommetje op een
+rechtspersoon loslaten geeft een getal dat er precies zo uitziet als een goed getal
+en het niet is. Er komt dus geen bedrag maar de reden -- de rechtsvorm-as weet dat
+al. De btw geldt intussen gewoon: die hangt niet aan de rechtsvorm.
+
+**Extrapolatie heet extrapolatie.** Naast de reservering op wat er nu al staat
+(een tarief toegepast op geld dat al verdiend is) staat wat het wordt als dit
+tempo het hele jaar doorzet, met het aantal verstreken dagen erbij en het woord
+"doortrekking van vandaag, geen prognose".
+
+**De aannames staan in het antwoord, en waar wij iets niet weten kiezen we de
+kant die de reservering hóger maakt.** Het urencriterium wordt afgeleid uit de
+opgegeven uren (1225 uur per jaar is ruwweg 24 uur per week); staat er niets, dan
+nemen we aan dat het gehaald wordt en zeggen we dat. De **startersaftrek rekenen
+we niet mee**: die hangt af van hoe vaak iemand hem al gebruikte, en meenemen zou
+de reservering te laag maken.
+
+Getoetst in `test/onderneming-belasting.test.js` (16). Vijf mutaties; drie beten
+meteen. **Twee sloegen af, en dat waren allebei echte bevindingen over mijn eigen
+werk:**
+
+- Er stond een `Math.max(percentage, berekende belasting)` "voor de zekerheid",
+  met een comment dat bescherming beloofde bij hoge winsten. Nagemeten over elke
+  winst van 1.000 tot een miljoen: die max bond **nul keer**. `reserveerPct` is het
+  tarief plus vijf punten met een bodem van 20%, dus hij dekt de indicatie altijd
+  al. Dode code met een belofte eraan is erger dan geen code; hij is weg, en de
+  toets bewaakt nu de eigenschap die er wél is.
+- De toets op "startersaftrek telt niet mee" las een hardgecodeerde `false` uit
+  het antwoord in plaats van de werkelijk gebruikte optie. Die kon dus nooit
+  zakken (regel 9). De waarde komt nu uit de opties, en de toets vergelijkt de
+  uitkomst mét en zónder die aftrek.
+
+### De kasvooruitblik: waar kom ik uit over dertig dagen
+
+`server/kern/onderneming/kas.js` + `/api/onderneming/kas{,/saldo}`. Drie beelden
+die er al waren, bij elkaar gelegd: wat er binnenkomt (debiteuren), wat eruit moet
+(crediteuren) en wat er niet van u is (btw). Ze worden **meegegeven** en niet
+opnieuw uitgerekend -- twee keer dezelfde vraag stellen kan twee antwoorden geven.
+
+**Het grootste probleem is wat wij niet weten: het banksaldo.** RTG ziet facturen,
+geen bankrekening. Een kaspositie zonder beginsaldo is dus geen positie maar een
+som van bewegingen, en die twee door elkaar halen is precies hoe iemand denkt dat
+het goed komt terwijl de rekening leeg is. Daarom staat er standaard een
+**beweging**, en pas een stand zodra de ondernemer zelf een saldo opgeeft -- met
+de datum erbij, want een saldo van drie maanden geleden is geen saldo. Boven de
+31 dagen heet het verouderd, met de reden erbij.
+
+**De onzekerheid ligt niet symmetrisch, en dat is expres.** Geld dat u nog moet
+krijgen en al te laat is, telt **niet** mee als inkomend: te laat is precies de
+reden om er niet op te rekenen. Geld dat u moet betalen en al te laat is, telt
+**wel** mee: dat moet u sowieso voldoen. Beide keuzes maken het beeld somberder,
+en dat is de kant waarop een kasprognose hoort te leunen. Een toets legt dat vast
+met een geval waar de optimistische lezing +7.000 zou zeggen en de eerlijke -3.000.
+
+Wat te laat openstaat verdwijnt daarmee niet uit beeld: het staat apart als
+**onzeker**, met bedrag en aantal. Het is geen nul (het bestaat) en geen inkomen
+(het had er al moeten zijn).
+
+**Er zit geen voorspelling in.** Wat er de komende maand nog aan nieuwe omzet bij
+komt, weten wij niet en verzinnen wij niet. Dit is een optelsom van wat er nu ligt,
+met de vervaldata die er nu op staan; loon, huur en abonnementen buiten RTG zitten
+er niet in, en dat staat in het antwoord.
+
+Op het dagbeeld staat de kasvooruitblik bovenaan het geldblok -- de optelsom zegt
+meer dan elke losse post eronder -- en alleen een negatieve beweging levert een
+waarschuwing op. Een positieve maand is geen actie, en een waarschuwing die elke
+maand komt is geen waarschuwing.
+
+Getoetst in `test/onderneming-kas.test.js` (14). Zes mutaties, alle zes raak: te
+late debiteuren tóch meetellen, te late crediteuren laten wegvallen, een
+beginsaldo van nul verzinnen, een oud saldo niet laten verouderen, ook een
+positieve maand laten waarschuwen, en de kasregel onder de losse posten laten
+zakken.
+
+### Capaciteit: kan er nog iets bij
+
+`server/kern/onderneming/capaciteit.js` + `/api/onderneming/capaciteit`, met de
+tijdhelpers in `server/kern/agendatijd.js`. Na het geld is dit wat een ondernemer
+als eerste raakt. De gegevens stonden er al: werkdagen en openingstijden
+(`vakUren`), de teamgrootte, en de boekingen met de duur van de dienst erbij.
+
+**Wat hier niet wordt uitgerekend: gemiste omzet.** Het is verleidelijk om te
+zeggen "u loopt 6.800 euro per maand mis door capaciteitsgebrek", en het klinkt
+precies als het soort inzicht waar software voor is. Maar wij zien geen vraag die
+nooit is gesteld: iemand die de agenda vol zag en wegklikte, staat nergens. Zo'n
+bedrag zou een verzinsel zijn met een euroteken ervoor -- en juist dat wordt
+overgeschreven in een besluit om iemand aan te nemen. Wat er wél staat is wat er
+is: hoeveel dagen zaten vol, hoeveel procent van uw tijd is bezet, hoeveel
+aanvragen bleven liggen. Een toets bewaakt dat de module nergens een bedrag
+uitleest.
+
+**De bezetting is een exacte deling** -- geboekte minuten door beschikbare minuten
+-- en daarmee iets anders dan de scores elders in dit OS, die bronnen van ongelijk
+gewicht optellen. Werk op een niet-werkdag telt wel als bezette tijd maar niet als
+beschikbare; de uitkomst kan dus boven de 100% uitkomen, en dat is de eerlijke
+uitkomst: u werkt dan meer dan u zelf hebt opgegeven.
+
+**Zonder agenda geen bezetting.** Een winkel of restaurant heeft geen `vakUren`,
+en daar betekent capaciteit iets heel anders (stoelen, voorraad, vierkante
+meters). Dan komt er een eigen stand en geen 0%: een winkel die als "0% bezet"
+leest, is een verkeerd antwoord op een vraag die niet is gesteld.
+
+**Buiten de eigen uren werken weegt zwaarder dan een volle agenda.** Dat is al
+gebeurd en het is de stille manier waarop iemand zichzelf opbrandt; een volle
+agenda is nog te sturen. Op het dagbeeld staat capaciteit ná het geld en de klok,
+maar vóór de gewone opvolging: meer klanten werven terwijl de agenda vol staat, is
+werk dat u daarna moet weigeren.
+
+De vier tijdhelpers (`datumVan`, `tijdVan`, `naarMin`, `naarTijd`) stonden inline
+in `kern/vakwerk/index.js` en staan nu in `kern/agendatijd.js`. Ze zijn klein, maar
+dragen een gedeelde waarheid: waar de datum en tijd van een boeking vandaan komen.
+
+Getoetst in `test/onderneming-capaciteit.test.js` (15). Zes mutaties, alle zes
+raak. Drie toetsen zakten eerst op mijn eigen aannames, niet op de code: `dag(5)`
+bleek een zaterdag en geen vrijdag (nagerekend in plaats van aangenomen, en de
+weekdagen staan nu als constante in de toets), een winkel van één persoon ís
+volgens `werkvormen.js` ook zelfstandige en krijgt dus wél een agenda, en mijn
+regex tegen "gemiste omzet" sloeg aan op mijn eigen voorbehoud en op het woord
+"prijs" in een adviestekst -- die zoekt nu naar het uitlezen van een bedrag, wat
+de eigenlijke vraag was.
+
+### Werving: staat er iemand te wachten
+
+`server/kern/onderneming/werving.js` + `/api/onderneming/werving`. Vacatures en
+sollicitaties bestaan al (`db.data.vacatures`, `db.data.applications`); deze laag
+bouwt daar niets naast maar **telt en klokt** ze, en legt de uitkomst naast de
+bezetting.
+
+**Hier staan geen namen.** Een sollicitatie draagt in de opslag een echte naam en
+contactgegevens -- die heeft een werkgever ook nodig om iemand aan te nemen, en
+daarvoor is de personeels-app. Maar dit is een signaallaag op het dagbeeld, en
+daar is een aantal en een wachttijd genoeg. Elke naam die hier zou opduiken, is
+een naam op een scherm waar hij niet voor nodig is; dat is precies hoe de
+codenaam-regel elders sneuvelt. Een toets controleert dat er geen naam, geen
+contactgegeven en zelfs geen codenaam in het antwoord terechtkomt.
+
+**Het probleem is niet werven maar antwoorden.** Een sollicitatie die drie weken
+blijft liggen, is een kandidaat die intussen ergens anders begint -- en de zaak
+denkt dat er niemand reageerde. De wachttijd van de oudste openstaande
+sollicitatie is daarom het getal dat op het dagbeeld komt, niet het aantal
+vacatures.
+
+**Wat een extra persoon doet, is rekenkunde en geen belofte.** De beschikbare tijd
+in `capaciteit.js` schaalt recht evenredig met de teamgrootte, dus de bezetting bij
+n+1 mensen is exact uit te rekenen: van 92% naar 61% bij een team van twee. Wat er
+niet bij staat is of die persoon zichzelf terugverdient -- daarvoor zouden wij
+vraag moeten kennen die nooit is gesteld.
+
+Op het dagbeeld staat werving direct achter capaciteit: het is het antwoord op
+dezelfde vraag. En "vol maar niemand gezocht" verschijnt alleen als de bezetting
+echt gemeten is -- zonder agenda weten wij niet of het druk is.
+
+Getoetst in `test/onderneming-werving.test.js` (15). Zes mutaties; vijf beten
+meteen. **De zesde sloeg af en legde een gat in mijn toets bloot:** bij een team
+van één is `n/(n+1)` toevallig gelijk aan de helft, dus een formule die altijd
+halveert kwam er ongestraft doorheen. Er staat nu een tweede geval met een team
+van drie (drie kwart, niet de helft); daarna beet de mutatie wel.
+
+### De ondernemersregie: twee knoppen van de boardroom
+
+`server/kern/onderneming/regie.js` + `/api/office/ondernemersregie{,/provisioning,/bijdrage}`.
+RTG bepaalt zelf hoe streng of hoe soepel het Ondernemers-OS staat. Twee dingen
+die niets met elkaar te maken hebben, en die daarom apart staan.
+
+**1. Provisioning -- wanneer wordt de ZAAK klaargezet.** Drie standen: `mens`
+(personeel beoordeelt elke aanvraag), `na-termijn` (de zaak komt er zodra de
+eerste termijn is afgetekend) en `automatisch` (wie zijn plan vastlegt, krijgt
+direct een werkende zaak).
+
+**Een onderscheid dat nooit mag vervagen:** een *zaak* klaarzetten is
+operationeel werk; een *pas* toekennen is toegang verlenen tot RTG zelf, en dat
+blijft mensenwerk. `magAutomatischToekennen` in `kern/aanmeldingen.js` geeft voor
+geen enkele pas `true`, in welke stand deze knop ook staat. Zou één knop beide
+regelen, dan stond er een schuifje waarmee iemand per ongeluk de merkregel uitzet.
+In de stand `automatisch` loopt het klaarzetten bovendien langs **dezelfde**
+provisioning die het personeel anders in gang zet (`provisioneerId`), dus er komt
+geen tweede manier bij om een zaak te maken -- en de idempotentie blijft staan.
+
+**Soepeler zetten vraagt een naam, strenger zetten nooit.** Hetzelfde principe als
+de bankregie: een terugval blokkeer je niet. Elke wijziging komt met wie hem zette
+in een journaal.
+
+**2. De bijdrage -- wat RTG per transactie inhoudt.** `rtgCut` was in het
+partnerkanaal een constante 0 ("RTG verdient niets aan een boeking"); dat is nu een
+knop. Staat de bijdrage uit, dan komt er nog steeds nul uit en verandert er niets
+aan wat een partner krijgt. Drie dingen worden nooit geraden:
+
+- **het percentage**, ten hoogste 5% -- die bovengrens staat in code en niet in
+  een instelling, zodat hij niet per ongeluk hoger wordt gezet;
+- **de grondslag**: `via-rtg` (het enige dat RTG zelf kan meten, en de
+  beginstand), `betaald` (beschermender: over een factuur die nooit binnenkomt
+  draagt niemand af) of `totaal` -- die laatste draagt zijn eigen waarschuwing dat
+  RTG hem **niet** kan meten en dus op opgave rust;
+- **de drempel** waaronder er niets wordt ingehouden. Dat is geen coulance maar
+  het punt van de constructie: bij lage omzet hoort de bijdrage beschermend te
+  werken, niet mee te zuigen.
+
+De bijdrage wordt over de **service** genomen en niet over het totaal: de netto
+reissom is het geld van de aanbieder, en een percentage over andermans inkoop is
+geen bijdrage maar een boete op omzet. Aanzetten vraagt een naam én een
+percentage -- een bijdrage die aanstaat op nul is een schakelaar die niets doet en
+wel zo lijkt.
+
+Getoetst in `test/onderneming-regie.test.js` (14). Zes mutaties, alle zes raak:
+soepeler zetten zonder naam toestaan, strenger zetten óók een naam laten vragen,
+de bovengrens van 5% weghalen, de drempel negeren, aanzetten op nul procent
+toestaan, en de bijdrage van de netto reissom afhalen in plaats van van de service.
+
+### Sales OS: de pijplijn
+
+`server/kern/onderneming/pijplijn.js` + `pijplijn-opvolging.js` +
+`/api/onderneming/pijplijn`. Offertes bestonden al (`db.data.vakOffertes`, gevuld
+door `kern/vakwerk/pro.js`); deze laag bouwt er geen tweede stroom naast, maar
+leest hem, groepeert hem in stadia en rekent uit wat er echt openstaat. Er staat
+nergens een schrijfactie op die stroom: antwoorden, weigeren en akkoord geven
+blijft waar de klant het ziet.
+
+**Twee open stadia, en ze zijn niet hetzelfde.** Bij `aangevraagd` ligt de bal
+bij de ondernemer -- en omdat er nog geen prijs op staat, heeft dat stadium
+**geen bedrag**. Er komt daar geen schatting uit eerdere klussen: dat zou een
+omzetverwachting zijn die de ondernemer nooit heeft uitgesproken. Bij
+`aangeboden` ligt de bal bij de klant, en dat is het enige bedrag dat de pijplijn
+kent.
+
+**De forecast is een meting of hij is er niet** (lat-regel 10). De gewogen
+verwachting is het openstaande bedrag maal de scoringskans, en die kans komt uit
+de eigen beslissingsgeschiedenis van deze zaak. Onder vijf afgeronde offertes is
+er geen kans en dus geen verwachting -- dan staat er `null` met de reden erbij, en
+geen brancheaanname of vrolijke 50%.
+
+**Wat de zaak zelf afwees, is geen verloren verkoop.** Een offerte die de
+ondernemer weigerde en een offerte die de klant introk zijn twee verschillende
+gebeurtenissen; opgeteld leest een volle agenda als een slecht verkoopjaar. Alleen
+het tweede telt mee in de scoringskans, en beide worden apart geteld.
+
+De wachttijd van een uitgebrachte offerte loopt vanaf de **prijs** en niet vanaf
+de aanvraag: een klant die drie dagen nadenkt over een offerte van veertig dagen
+oud, laat niets liggen. De doorlooptijd naar een prijs is een mediaan -- één
+offerte die een half jaar bleef liggen laat een gemiddelde de hele zaak traag
+maken. Op het dagbeeld staat de pijplijn vóór de gewone opvolging: een
+uitgebrachte offerte is verricht werk dat staat te verdampen, waar een aanvraag
+nog niets in zich heeft. Aanvragen zonder prijs noemt `relaties.js` al; de
+pijplijn herhaalt die regel niet. Alles op codenaam.
+
+Getoetst in `test/onderneming-pijplijn.test.js` (14). Zeven mutaties, alle zeven
+raak: aanvragen tóch een bedrag van 0 geven, eigen weigeringen als verlies
+meetellen, de drempel van vijf beslissingen weghalen, de stiltijd vanaf de
+aanvraag klokken, de mediaan door een gemiddelde vervangen, het scorings-verwijt
+ook zonder meting laten verschijnen, en de pijplijn-acties achter die van de
+relaties zetten.
+
+### Rechtsvormen: Nederland en het buitenland, automatisch bijgewerkt
+
+`server/kern/onderneming/rechtsvorm.js` (het register en de logica),
+`rechtsvorm-nl.js`, `rechtsvorm-europa.js` (BE, DE, FR, ES),
+`rechtsvorm-angelsaksisch.js` (GB, US) en `rechtsvormwacht.js` +
+`/api/onderneming/rechtsvormen[?land=DE]` en
+`/api/office/rechtsvormwacht{,/check,/zet}`.
+
+**Een register, elk met zijn land.** De Nederlandse vormen houden hun kale id
+(`bv`, `stichting`): die staan in de opslag van bestaande ondernemingen, en een
+hernoemde id laat een bestaand bedrijf achter zonder rechtsvorm. Buitenlandse
+vormen dragen hun landcode in het id (`de-gmbh`). De twee landentabellen staan
+apart omdat ze een andere rechtstraditie beschrijven -- op het continent
+ontstaat een kapitaalvennootschap bij de **notaris**, in de angelsaksische
+landen door **registratie** -- en dat verschil zit in bijna elke
+oprichtingsstap.
+
+**Wat wij niet weten, staat er niet.** Voor een land dat wij niet kennen komt er
+geen ongeveer-Nederlandse lijst maar een expliciet "wij kennen de rechtsvormen
+van dit land niet", met de landen die wij wel kennen erbij. Wie op de verkeerde
+lijst afgaat, gaat naar de verkeerde instantie. Om dezelfde reden noemt elke
+stap de instantie van het land zelf (KBO, Handelsregister, Companies House) en
+draagt geen buitenlandse vorm een Nederlands fiscaal begrip als
+`urencriterium` of `dga-loon` -- daar staat `winst-bij-eigenaar` of
+`winstbelasting-rechtspersoon`. En de Verenigde Staten zeggen zelf dat het
+bedrijfsrecht daar van de **staat** is en niet van de federatie.
+
+**De Nederlandse belastingsom blijft Nederlands.** `zzpBerekening` rekent met
+Nederlandse regels; `belasting.js` weigert daarom te rekenen zodra het land van
+de rechtsvorm niet NL is, met de reden in het antwoord. De btw-optelsom uit de
+eigen facturen blijft wel staan -- dat is een som en geen tarief.
+
+**De Rechtsvormwacht** is dezelfde constructie als de Regelwacht: een
+gevalideerde overlay op het gedeelde register, herstart-vast
+(`db.data.rechtsvormRegels`), met een dagelijkse controle op
+`RECHTSVORM_BRON_URL` en de ingebouwde tabel als veilige basis. Vier grendels
+die een bron nooit kan openen:
+
+- **verboden groeit alleen** -- een bron mag een verbod toevoegen en er nooit
+  een weghalen, anders is één regel in een bestand genoeg om een stichting
+  winst te laten uitkeren;
+- **caps komen uit het woordenboek** van dit huis; een verzonnen naam vult geen
+  scherm maar kan wel een knop laten opduiken die niemand ontwierp;
+- **rechtspersoon en notarieel liggen vast** zodra een vorm bestaat -- die
+  eerste stuurt de belastinggrendel aan;
+- **een rechtsvorm verdwijnt nooit**: er kan een onderneming aan hangen.
+
+Een nieuwe vorm (ook in een nieuw land) mag er wel bij, maar alleen compleet:
+zonder label, landcode, expliciete `rechtspersoon` en een gevulde
+oprichtingslijst komt hij er niet in. Een halve rechtsvorm is erger dan geen,
+want hij verschijnt wel in de keuzelijst.
+
+Getoetst in `test/onderneming-rechtsvormen.test.js` (21). Acht mutaties; zeven
+beten meteen. **De achtste sloeg af en legde een gat in mijn toets bloot:** ik
+toetste wel een vorm zónder `oprichting`-veld, maar niet een met een lege lijst
+-- en juist die kwam er ongestraft doorheen. Er staat nu een geval met
+`oprichting: []`; daarna beet de mutatie wel.
+
+### De offertebouwer: een prijs die is opgebouwd in plaats van bedacht
+
+`server/kern/onderneming/offertebouw.js` + `server/kern/regelsom.js`, gebruikt
+door `offerteAntwoord` in `kern/vakwerk/pro.js`
+(`/api/supplier/vak/offerte/antwoord`, ongewijzigde route).
+
+De offertestroom vroeg de zaak om één getal. Dat werkt, en het gaat mis zodra
+een klus uit meer dan één ding bestaat: de ondernemer rekent het op een kladje
+uit, de klant krijgt een bedrag zonder te zien waarvoor, en bij het factureren
+begint het rekenwerk opnieuw. Nu kan de prijs uit **regels** komen — uit het
+eigen aanbod (de prijs komt daarvandaan, dus een tariefverhoging werkt door
+zonder dat er een offerte wordt nagelopen) of los ingevoerd (materiaal,
+voorrijkosten). De regels reizen mee naar de klant.
+
+**Een dienst die niet bestaat wordt geweigerd, niet stil overgeslagen.** Anders
+denkt de ondernemer dat zijn tarief in de offerte staat terwijl er iets anders
+of niets staat — en dat is een te lage offerte die er compleet uitziet. Om
+dezelfde reden heeft elke losse regel een omschrijving nodig: een bedrag zonder
+reden leest de klant als willekeur.
+
+**De som staat niet in de bouwer.** `kern/regelsom.js` is nieuw en rekent hem,
+dezelfde functie die de factuurmotor nu gebruikt (die had zijn eigen kopie). Een
+offerte van 1.000 euro die een factuur van 999,99 oplevert, is een cent waar een
+klant een mail over stuurt en niemand het antwoord op weet. Stukprijzen zijn
+inclusief btw en de btw wordt per regel teruggerekend, zodat 9% en 21% in
+dezelfde offerte kunnen staan.
+
+**De offertestroom blijft de enige schrijver.** De bouwer is puur: hij leest de
+zaak en rekent. De status, de melding aan de klant en de boeking bij akkoord
+blijven waar ze stonden. Alleen een prijs opgeven mag ook nog steeds — een klus
+van een uur is soms gewoon een bedrag.
+
+Getoetst in `test/onderneming-offertebouw.test.js` (15). Zeven mutaties, alle
+zeven raak: een onbekende dienst stil overslaan, een meegestuurde prijs het
+eigen tarief laten overschrijven, de btw-lijst laten uiteenlopen met die van de
+facturatie, de btw verkeerd terugrekenen, een eigen tarief per regel negeren,
+een fout uit de bouwer negeren, en een losse regel zonder omschrijving
+doorlaten.
+
+### Het bestuur: wie beslist, wie bezit, en wie er als UBO uit volgt
+
+`server/kern/onderneming/bestuur.js` + `bestuur-handelingen.js` +
+`/api/onderneming/bestuur{,/zet,/af}` en
+`/api/onderneming/aandeel/{zet,weg}`.
+
+**Dit bestaat alleen waar het echt bestaat.** Een eenmanszaak heeft geen bestuur
+en geen aandeelhouders — de ondernemer *is* de onderneming. Zou dat scherm er
+toch staan, leeg, dan leest het als "u moet dit nog invullen", en dan verzint
+iemand een bestuur voor een bedrijf dat er geen kan hebben. Zonder rechtsvorm
+komt er de vraag en geen register.
+
+**Het verbod wint, ook hier.** Een stichting kent geen aandelen. Dat komt uit
+dezelfde `verboden` als de capslijst — er staat in dit bestand geen enkele
+rechtsvormnaam, want dat zou een tweede waarheid zijn. Onderweg bleek die
+grendel eerst *decoratie*: de cap heet `aandeelhouders` en het verbod heet
+`aandelen`, dus de aftrek raakte niets. Het bestuur leest nu de samengevoegde
+capslijst van `beeld.js`, waarin `aandelen` als kandidaat meereist — pas daarna
+wint het verbod ook van een werkvorm die de cap zou meebrengen.
+
+**De UBO wordt afgeleid en niet ingevuld.** Meer dan 25% van de aandelen is
+uiteindelijk belanghebbende; is er niemand, dan gelden de statutair bestuurders
+(pseudo-UBO), en commissarissen en adviseurs tellen daar niet in mee. Er is dan
+ook géén route en géén functie die de UBO zet: een aangevinkte UBO blijft staan
+als de aandelen verschuiven, en dan klopt het register precies op het moment dat
+het ertoe doet niet meer.
+
+**Aftreden is geen wissen** — wie er ooit bestuurder was, was dat, en juist die
+geschiedenis is waar een aansprakelijkheidsvraag over gaat. Een niet volledig
+verdeeld kapitaal is een **melding en geen fout**: tijdens een oprichting is dat
+normaal, en een register dat rood kleurt terwijl er niets mis is, leert iemand
+rood te negeren. Alles op codenaam, en het antwoord zegt zelf dat dit niet de
+UBO-opgave bij de KvK is.
+
+Onderweg bleek de B.V. geen `bestuur`-cap te dragen, terwijl elke B.V. een
+statutair bestuur heeft. Dat is in de tabel gerepareerd en niet omheen gewerkt:
+de as is de waarheid.
+
+Getoetst in `test/onderneming-bestuur.test.js` (19). Negen mutaties; zeven beten
+meteen. **Twee sloegen af en legden allebei iets echts bloot:** de drempeltoets
+had codenamen van één letter, die al op de lengte werden geweigerd — er waren dus
+nooit aandeelhouders, en twee toetsen slaagden om de verkeerde reden. En de
+verboden-aftrek bleek geen werk te doen, zoals hierboven beschreven. Na beide
+reparaties beten de mutaties wel.
+
+### De voorraad: wat er ligt, en wat wij niet kunnen zien
+
+`server/kern/onderneming/voorraad.js` + `/api/onderneming/voorraad`.
+
+Dit huis houdt voorraad al op **vier** plekken bij, en elke plek doet dat anders
+omdat het werk anders is: de keuken (`s.voorraad`, met een minimum per artikel,
+een kostprijs en een mutatiejournaal), retail (`s.artikelen` met varianten —
+voorraad zit op de variant), de boerderij (`s.boerderij.producten`, gevuld door
+de oogst) en de groothandel (`s.groothandel.producten`, met inkoopprijs). Een
+vijfde register ernaast zou binnen een maand uiteenlopen met alle vier, en zou
+de enige zijn die niemand bijwerkt omdat er niet in gewerkt wordt. Deze laag
+**leest** ze en legt ze naast elkaar; er staat geen enkele schrijfactie in.
+
+Drie dingen die het met opzet niet uitrekent:
+
+- **geen voorraadwaarde op een verkoopprijs.** Retail en boerderij kennen geen
+  inkoopprijs. Een waarde daarop bevat de winst al — dat is een
+  omzetverwachting, geen voorraadwaarde. Daar komt `null` met de reden, en het
+  totaal zegt erbij welke delen erbuiten vallen: een totaal dat stilzwijgend een
+  deel mist, wordt overgetypt in een balans;
+- **geen bestelpunt waar er geen is.** De groothandel heeft `minBestel`, en dat
+  is de minimale hoeveelheid *per bestelling*, geen bestelpunt. Die twee
+  verwarren meldt een volle groothandel als "bijna op". Bij de boerderij bepaalt
+  wat er groeit de voorraad;
+- **geen dekking in dagen.** Daarvoor zouden wij verbruik over tijd moeten
+  kennen; alleen de keuken schrijft mutaties weg, en alleen binnen RTG. "Nog
+  vier dagen" op zo'n grondslag is een getal waar iemand een bestelling op
+  baseert.
+
+Retail telt laag op de **variant** en niet op het artikel: maat 42 op is een
+gemiste verkoop, ook al ligt de rest in het schap. De drempel van de zaak zelf
+(`s.settings.retailDrempel`) wint van de standaard. Op het dagbeeld staat de
+voorraad vóór de verkoopkant — wat u niet heeft kunt u ook niet verkopen.
+
+Getoetst in `test/onderneming-voorraad.test.js` (13). Zeven mutaties, alle zeven
+raak: de waarde op de verkoopprijs baseren, `minBestel` als bestelpunt
+gebruiken, retail op het artikel in plaats van de variant tellen, een artikel
+zonder minimum toch laag noemen, de eigen drempel negeren, een totaal geven
+zonder enige bron, en inactieve groothandelsproducten meetellen.
+
+### De klusketen: van akkoord tot geld, en waar hij blijft steken
+
+`server/kern/onderneming/klussen.js` + `/api/onderneming/klussen`.
+
+De keten bestond al, in drie objecten die elkaar met een **referentie**
+vasthouden: een offerte krijgt bij akkoord een `boekingRef`, de boeking draagt
+die `ref`, en een factuur draagt `ref`. Wat er niet was, is code die hem volgt —
+`boekingRef` kwam nergens anders voor dan op de plek waar hij werd gezet. Deze
+laag volgt hem, en zet er geen vierde object naast dat "project" heet: dat zou
+met de hand bijgehouden moeten worden en loopt na twee weken achter op de drie
+die vanzelf meebewegen.
+
+**Vier plekken waar een klus blijft steken**, en alleen de laatste twee zijn "uw
+geld ligt ergens anders": akkoord maar niet ingepland, ingepland, uitgevoerd
+maar niet gefactureerd, en gefactureerd maar niet betaald. Ingepland werk telt
+daarom **niet** mee in het openstaande bedrag — dat als openstaand geld tonen
+maakt een drukke maand tot een incassoprobleem.
+
+Drie dingen die het niet beweert:
+
+- **geen factuur betekent niet dat er niet is gefactureerd.** Het betekent dat
+  wij binnen RTG geen factuur met deze referentie zien; wie buiten RTG
+  factureert doet dat gewoon;
+- **de factuur wordt op referentie gevonden**, nooit op bedrag of klant — twee
+  klussen van dezelfde klant voor hetzelfde bedrag zouden anders elkaars factuur
+  opeisen;
+- **geen doorlooptijd van klus tot geld.** Oplevering en goedkeuring meten wij
+  niet; wat er wel staat is hoe lang elke stap nu open staat, en dat is een
+  meting.
+
+Betaald is betaald langs welke van de twee wegen dan ook: de boeking kent `paid`
+(de kassa) en de factuur `betaald` (de facturatielaag). Eisen dat ze allebei
+staan, toont een betaalde klus als onbetaald. Elke stap heeft zijn eigen
+traagheidsdrempel, want ze betekenen iets anders.
+
+Getoetst in `test/onderneming-klussen.test.js` (13). Zeven mutaties; zes beten
+meteen. **De zevende sloeg af en legde een gat in mijn toets bloot:** één
+drempel voor alle stappen liet niets zakken, omdat mijn gevallen toevallig aan
+beide kanten van elke drempel hetzelfde uitvielen. Er staat nu een geval dat ze
+scheidt — negen dagen is traag voor een onbetaalde uitvoering en juist niet voor
+een factuur — en daarna beet de mutatie wel.
+
+### De toegang: wie kan wat, over de twee werelden die er al zijn
+
+`server/kern/onderneming/toegang.js` + `/api/onderneming/toegang`.
+
+Toegang is in dit huis op twee plekken geregeld, en die twee zijn met opzet
+verschillend: de **zaak** kent precies twee rollen (manager en staff — genoeg
+voor een vloer waar iemand kassa draait), de **werkruimte** in RTG Werk OS kent
+achttien rechten, veertien rollen, rollen met een einddatum, vier soorten inzage
+die een *reden* vragen, en een journaal. Een derde model hierboven zou een derde
+waarheid zijn over dezelfde vraag. Deze laag leest ze allebei en legt ze naast
+elkaar.
+
+**Het gat wordt benoemd en niet gedicht:** op de zaak kan een beheerder alles,
+en dat staat er — een scherm dat nuance suggereert geeft schijnzekerheid.
+**Er wordt niets gezet:** toegang verlenen gebeurt waar de rol woont, allebei
+achter hun eigen poort met hun eigen journaal; een tweede deur naar hetzelfde
+slot is een deur die niemand bewaakt. Het venster is precies dat van de poort:
+een verlopen rol telt niet mee, een rol die nog moet ingaan ook niet, en een rol
+die vandaag afloopt geldt vandaag nog. Geen namen — alleen aantallen, rollen en
+vensters.
+
+Onderweg bleek `server/bedrijf/rollen.js` zijn tabellen alleen binnen de factory
+terug te geven. Ze staan nu ook op de module zelf, zodat deze laag ze kan lezen
+in plaats van overtypen.
+
+Getoetst in `test/onderneming-toegang.test.js` (12). Zeven mutaties, alle zeven
+raak.
+
+### De bedrijfsontwerper en de Mall-bouwer: AI die meedenkt en nergens over beslist
+
+`server/kern/onderneming/ontwerper.js` +
+`/api/onderneming/ontwerp{,/opdrachten}`.
+
+Twee opdrachten met dezelfde grenzen: **ontwerp** (meedenken over het idee) en
+**mall** (meeschrijven aan de Mall-pagina). Het model krijgt alleen wat er echt
+staat — de eigen intake, de eigen kansverkenning en stress test, het eigen
+mallprofiel — en wat ontbreekt heet **ONBEKEND** in de prompt, zodat het model
+ernaar vraagt in plaats van het in te vullen. Een leeg veld leest een model als
+"niet van toepassing".
+
+**Het model schrijft niets weg.** De uitkomst is tekst die de ondernemer zelf
+overneemt; een AI die zijn eigen voorstel opslaat, maakt van een suggestie een
+feit en dan weet niemand later meer wie wat bedacht. Zelfde regel als bij
+`kern/agent.js`: een voorstel wacht op een mens.
+
+**Drie merkregels staan letterlijk in de systeemprompt, en gelden ook in de
+uitwijk:** geen toegang beloven (Lifestyle en Business gaan uitsluitend na
+menselijke goedkeuring), geen echt merk als bevestigde partner en nooit claimen
+dat een boeking is verwerkt, en afwegingen in plaats van juridische of fiscale
+zekerheid.
+
+**Zonder sleutel komt er geen leeg scherm**, maar een antwoord uit de eigen data
+met `demo: true` erbij — een demostand die doet alsof er een model meekeek is
+erger dan geen demostand. Een kapot of leeg antwoordend model valt op diezelfde
+uitwijk terug. Wie er op mag beslist de bestaande `kern/aipoort.js`; die poort
+wordt hier niet nagebouwd.
+
+Getoetst in `test/onderneming-ontwerper.test.js` (11). Acht mutaties, alle acht
+raak. Eén toetsfout onderweg gerepareerd: de intake is genest (`persoon`/`idee`)
+en werd plat aangeleverd, waardoor de prompt in twee toetsen over lege feiten
+ging. De helper rekent nu na dat de intake echt is gezet.
+
 ### RTG Werk OS (de werkplek van een organisatie)
 
 `server/bedrijf/` + `/api/bedrijf/...` + `/apps/werk.html`. Een **werkruimte**
@@ -2280,7 +3282,7 @@ beter en niet slechter. Ze staan op het techniekbord
 
 ## Partnerkanaal
 
-Het partnerkanaal voor niet-leden draait server-side: boekingen worden per stuk opgeslagen in `server/data/db.json` onder `bookings`, met één totaalprijs voor de klant; nettoprijs en service zijn interne administratie. RTG verdient niets aan een boeking (`rtgCut` is altijd 0): een eventuele service gaat volledig naar de partner. RTG's enige inkomsten zijn de abonnementen. (De losse publieke boekingspagina is met de marketingsite verwijderd; het model en de endpoints blijven bestaan.)
+Het partnerkanaal voor niet-leden draait server-side: boekingen worden per stuk opgeslagen in `server/data/db.json` onder `bookings`, met één totaalprijs voor de klant; nettoprijs en service zijn interne administratie. RTG verdiende niets aan een boeking (`rtgCut` was altijd 0). Sinds de ondernemersregie is dat een KNOP van de boardroom: staat de bijdrage uit -- de beginstand -- dan is `rtgCut` nul en gaat een eventuele service volledig naar de partner, precies als voorheen. Staat hij aan, dan houdt RTG het ingestelde promillage in op de SERVICE (nooit op de netto reissom van de aanbieder) en gaat de rest naar de partner. (De losse publieke boekingspagina is met de marketingsite verwijderd; het model en de endpoints blijven bestaan.)
 
 ## Documentatie
 

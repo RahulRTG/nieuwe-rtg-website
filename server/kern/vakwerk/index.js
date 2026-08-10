@@ -15,22 +15,20 @@
 
 const { VAK_GENRES } = require('./genres');
 
-function maakVakwerk({ db, save, anthropic, findSupplier, boekingenVanZaak, schoon,
+function maakVakwerk({ db, save, anthropic, findSupplier, boekingenVanZaak, ordersVanZaak, schoon,
   crypto, notify, notifySupplier, sseToCustomer, sseToSupplier, boekingenVoegToe }) {
   const scho = schoon || ((v, n) => String(v == null ? '' : v).trim().slice(0, n || 200));
   const vandaagStr = () => new Date().toISOString().slice(0, 10);
   const rond = n => Math.round((Number(n) || 0) * 100) / 100;
-  const datumVan = b => (b.wanneer ? String(b.wanneer).slice(0, 10) : null);
-  const tijdVan = b => (b.wanneer && String(b.wanneer).length > 10 ? String(b.wanneer).slice(11, 16) : null);
+  // datum, tijd en het rekenen met minuten staan in kern/agendatijd.js, gedeeld
+  // met de capaciteitslaag: waar "wanneer" vandaan komt hoort op een plek
+  const { datumVan, tijdVan, geldigeTijd, naarMin, naarTijd } = require('../agendatijd');
   // de dag waarop de omzet valt: betaald -> betaaldatum, anders de aanmaakdatum
-  const geldDag = b => String(b.paidAt || b.finishedAt || b.at || '').slice(0, 10);
+  // dezelfde definitie als het gedeelde klantenboek; niet twee keer opschrijven
+  const geldDag = require('../klantenboek').geldDag;
 
   function genreVan(s) { return s ? VAK_GENRES[s.type] : null; }
   function isVak(s) { return !!genreVan(s); }
-
-  const geldigeTijd = t => /^([01]\d|2[0-3]):[0-5]\d$/.test(String(t || ''));
-  const naarMin = t => { const m = String(t).match(/^(\d{2}):(\d{2})$/); return m ? (+m[1]) * 60 + (+m[2]) : null; };
-  const naarTijd = m => String(Math.floor(m / 60)).padStart(2, '0') + ':' + String(m % 60).padStart(2, '0');
 
   function publiek(b) {
     return {
@@ -109,7 +107,7 @@ function maakVakwerk({ db, save, anthropic, findSupplier, boekingenVanZaak, scho
   }
 
   // de gedeelde ctx voor de deelbestanden
-  const ctx = { db, save, anthropic, findSupplier, boekingenVanZaak, scho, vandaagStr, rond,
+  const ctx = { db, save, anthropic, findSupplier, boekingenVanZaak, ordersVanZaak, scho, vandaagStr, rond,
     datumVan, tijdVan, geldDag, genreVan, isVak, geldigeTijd, naarMin, naarTijd, publiek, bord, VAK_GENRES,
     crypto, notify, notifySupplier, sseToCustomer, sseToSupplier, boekingenVoegToe };
   const api = { GENRES: VAK_GENRES, isVak, bord };

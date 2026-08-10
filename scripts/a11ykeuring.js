@@ -122,12 +122,23 @@ function adres(el) {
 function keurInPagina() {
   const structureel = {};
   const contrast = {};
-  const tel = (bak, id, help) => { bak[id] = bak[id] || { id: id, help: help, aantal: 0, waar: [] }; bak[id].aantal++; };
+  /* `el` mag ontbreken (een paginabrede bevinding als een missende <title>
+     heeft geen element), maar waar hij er WEL is, gaat het adres mee. Dat deed
+     alleen de contrastmelding hieronder, en de kop van adres() legt precies uit
+     waarom dat nodig is -- alleen gold dat argument net zo goed voor een
+     structurele overtreding. Een keuring die "1 formulierveld zonder label" op
+     een pagina met veertig velden meldt, laat de vinder zoeken; dat kostte hier
+     een ronde. Hoogstens drie voorbeelden, zelfde grens als bij contrast. */
+  const tel = (bak, id, help, el) => {
+    bak[id] = bak[id] || { id: id, help: help, aantal: 0, waar: [] };
+    bak[id].aantal++;
+    if (el && bak[id].waar.length < 3) bak[id].waar.push(adres(el));
+  };
 
-  document.querySelectorAll('img').forEach(img => { if (zichtbaar(img) && mistAlt(img)) tel(structureel, 'afbeelding-alt', 'Afbeelding zonder alt-tekst'); });
-  document.querySelectorAll('button, [role="button"]').forEach(el => { if (zichtbaar(el) && mistNaam(el)) tel(structureel, 'knop-naam', 'Knop zonder toegankelijke naam'); });
-  document.querySelectorAll('a[href]').forEach(el => { if (zichtbaar(el) && mistNaam(el)) tel(structureel, 'link-naam', 'Link zonder toegankelijke naam'); });
-  document.querySelectorAll('input, select, textarea').forEach(el => { if (zichtbaar(el) && mistLabel(el)) tel(structureel, 'veld-label', 'Formulierveld zonder label'); });
+  document.querySelectorAll('img').forEach(img => { if (zichtbaar(img) && mistAlt(img)) tel(structureel, 'afbeelding-alt', 'Afbeelding zonder alt-tekst', img); });
+  document.querySelectorAll('button, [role="button"]').forEach(el => { if (zichtbaar(el) && mistNaam(el)) tel(structureel, 'knop-naam', 'Knop zonder toegankelijke naam', el); });
+  document.querySelectorAll('a[href]').forEach(el => { if (zichtbaar(el) && mistNaam(el)) tel(structureel, 'link-naam', 'Link zonder toegankelijke naam', el); });
+  document.querySelectorAll('input, select, textarea').forEach(el => { if (zichtbaar(el) && mistLabel(el)) tel(structureel, 'veld-label', 'Formulierveld zonder label', el); });
   const html = document.documentElement;
   if (!html.getAttribute('lang')) tel(structureel, 'html-taal', '<html> zonder lang-attribuut');
   if (!(document.title || '').trim()) tel(structureel, 'titel', 'Document zonder <title>');

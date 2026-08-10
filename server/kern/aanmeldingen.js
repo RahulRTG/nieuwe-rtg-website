@@ -137,8 +137,14 @@ module.exports = ({ db, save, crypto, schoon, geldPasprijzen, accounts }) => {
   // staat in ./aanmeldingen/besluit.js; zie de kop daar waarom apart.
   const { beslis } = require('./aanmeldingen/besluit')({ vind, beeld, kap, nu, accounts, save, startBetalingen, PASSEN });
 
-  /* Seam voor de AI-laag: mag deze pas automatisch worden toegekend? Nooit, voor
-     geen enkele pas. Zo kan geen assistent per ongeluk toegang beloven. */
+  /* Seam voor de AI-laag: mag deze PAS automatisch worden toegekend? Nooit, voor
+     geen enkele pas. Zo kan geen assistent per ongeluk toegang beloven.
+
+     Let op het verschil met de provisioning-knop in kern/onderneming/regie.js:
+     die gaat over het klaarzetten van een ZAAK, en dat is operationeel werk.
+     Een PAS is toegang tot RTG zelf en blijft mensenwerk, in elke stand van
+     die knop. Wie die twee door elkaar haalt, zet de merkregel uit met een
+     schuifje dat over iets anders leek te gaan. */
   function magAutomatischToekennen(pas) { return false; }
 
   /* Een termijn aftekenen als voldaan (administratieve bevestiging door een
@@ -149,5 +155,20 @@ module.exports = ({ db, save, crypto, schoon, geldPasprijzen, accounts }) => {
     return bedrijfMod.termijnVoldaan(B, a, maand, door);
   }
 
-  return { aanmeldingen: { aanvraag, lijst, een, beslis, betalingen, termijnVoldaan, magAutomatischToekennen, PASSEN } };
+  /* De zaak klaarzetten OP ID, voor de provisioning-knop van de boardroom
+     (kern/onderneming/regie.js, stand 'automatisch'). Hij zoekt de echte
+     aanmelding op en geeft die door aan dezelfde provisioning die het
+     personeel anders in gang zet: bedrijfMod.provisioneer MUTEERT de
+     aanmelding (a.gezaakt) en is daarmee idempotent. Een nagemaakt object
+     doorgeven zou die idempotentie stilletjes breken -- dan stond er bij een
+     tweede aanroep een tweede zaak. */
+  function provisioneerId(id) {
+    const a = vind(String(id || ''));
+    if (!a) return { status: 404, error: 'Deze aanmelding bestaat niet.' };
+    if (!a.bedrijf) return { status: 409, error: 'Deze aanmelding draagt geen bedrijfsgegevens.' };
+    return bedrijfMod.provisioneer(a) || { status: 409, error: 'De zaak stond al klaar.' };
+  }
+
+  return { aanmeldingen: { aanvraag, lijst, een, beslis, betalingen, termijnVoldaan,
+    magAutomatischToekennen, provisioneerId, PASSEN } };
 };

@@ -16,13 +16,15 @@
 <!-- de materialenlaag: dit scherm kiest materialen en geen kleuren
      (MATERIAAL.md). Na rtg-ontwerp.css, want hij vult die aan. -->
 <link href="/shared/rtg-materiaal.css" rel="stylesheet">
+<link href="/shared/rtg-themas.css" rel="stylesheet">
 <style>
   /* Eén maatstelsel voor dit scherm; alles hangt aan de dichtheid van de modus
      zodat World/Pro/Command hetzelfde scherm anders dicht maken en niet een
      ander scherm worden (ONTWERP.md par. 2). */
-  /* De grond is Onyx: pianolak en geen egale verf. Het verloop is nauwelijks
-     zichtbaar en dat hoort zo -- je merkt het pas als het weg is. */
-  body{background:var(--onyx-glans);background-attachment:fixed;color:var(--op-onyx);}
+  /* GEEN harde grond hier. Die kwam eerst uit dit bestand (var(--onyx-glans)),
+     en daardoor kon geen enkel thema hem nog veranderen -- precies de reden dat
+     vier thema's er vier keer hetzelfde uitzagen. De grond komt nu uit
+     rtg-themas.css, dat per thema een ander MATERIAAL kiest. */
   main{padding:0 var(--rtg-ruim) 1rem;max-width:820px;margin-inline:auto;}
 
   /* --- de kop: merk links, monogram rechts --- */
@@ -321,6 +323,7 @@
   })();
 })();
 </script>
+<script src="/shared/rtg-themas.js"></script>
 <script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>

@@ -69,7 +69,23 @@ async function nieuwLid(base) {
   return reg.token;
 }
 
-async function toon(page, base, app, token) {
+/* `wachtOp` is een stuk tekst dat op het scherm MOET verschijnen voordat we
+   gaan kijken. Zonder dat argument blijft dit precies wat het was: even wachten
+   en dan lezen.
+
+   WAAROM DAT ERBIJ IS GEKOMEN. De vaste seconde hieronder was een mes op de
+   snede: gemeten kwam de demo-melding er op ~1000 ms, dus of de toets slaagde
+   hing af van hoe druk de machine was. Hij ging om toen er een domein bijkwam,
+   en de melding die je dan krijgt ("het zegt dat dit een demo is: Naar de
+   inhoud MEENEMEN ...") wijst naar een scherm dat niets mankeert. Zo'n rood
+   kost precies het vertrouwen dat een toets moet leveren, en de volgende
+   persoon zoekt het op de verkeerde plek.
+
+   Wachten op een VOORWAARDE lost dat op zonder de bewering te verzwakken:
+   verschijnt de tekst niet, dan zakt de toets alsnog -- maar dan met "gewacht
+   op ... maar dat verscheen niet", en dat is een uitspraak over het scherm in
+   plaats van over de timing. */
+async function toon(page, base, app, token, wachtOp) {
   const pad = '/apps/' + app + '.html';
   await page.goto(base + pad, { waitUntil: 'domcontentloaded' });
   await page.evaluate(t => {
@@ -77,7 +93,14 @@ async function toon(page, base, app, token) {
     if (t) localStorage.setItem('rtg_member_token', t); else localStorage.removeItem('rtg_member_token');
   }, token || null);
   await page.goto(base + pad, { waitUntil: 'domcontentloaded' });
-  await page.waitForTimeout(1000);
+  if (wachtOp) {
+    await page.waitForFunction(
+      (naald) => document.body.innerText.replace(/\s+/g, ' ').toLowerCase().includes(naald.toLowerCase()),
+      wachtOp, { timeout: 15000 }
+    ).catch(() => { throw new Error('gewacht op "' + wachtOp + '" op ' + pad + ', maar dat verscheen niet'); });
+  } else {
+    await page.waitForTimeout(1000);
+  }
   return page.evaluate(() => ({
     pad: location.pathname,
     deur: !!document.querySelector('.rtgdeur'),
@@ -103,7 +126,7 @@ test('het bureaublad zegt eerlijk dat dit een demo is, en wat er precies uit sta
     const o = await opstelling();
     browser = o.browser;
 
-    const r = await toon(o.page, base, 'index', token);
+    const r = await toon(o.page, base, 'index', token, 'demo');
     assert.equal(r.pad, '/apps/index.html', 'het bureaublad opent');
 
     /* DE MELDING ZELF. Niet alleen "demo" -- dat kan van alles betekenen -- maar

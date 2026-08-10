@@ -50,6 +50,14 @@ const PAGINAS = [
   '/apps/salon.html',
   '/apps/metier.html',
   '/apps/genootschap.html',
+  /* De sociale super-app. Een nieuw scherm hoort meteen in de keuring te staan,
+     anders is 'schoon' een aanname in plaats van een meting -- en dat is hier
+     nagetrokken: haal de tekst uit een link in de onderbalk weg en deze scan
+     meldt 'link-naam' op /apps/wereld.html. Wat hij NIET ziet is wat achter de
+     inlog zit (de panelen Ontdek en Profiel staan bij de eerste render op
+     hidden); dat geldt voor elk scherm in deze lijst en is de reikwijdte van
+     deze scan, niet iets wat dit scherm apart heeft. */
+  '/apps/wereld.html',
 ];
 
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css',

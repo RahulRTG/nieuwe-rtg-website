@@ -3839,6 +3839,27 @@
       "gezakt": 5,
       "scherp": "gezakt"
     },
+    "wereldlaag.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "wereldlaag.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 13,
+      "scherp": "gezakt"
+    },
+    "wereldprofiel.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
+      "scherp": "gezakt"
+    },
     "wereldregels.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -3856,6 +3877,13 @@
       ],
       "geprobeerd": 10,
       "posities": 8
+    },
+    "wereldvermogens.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 12,
+      "scherp": "gezakt"
     },
     "werk-bij-inloggen.test.js": {
       "soort": "server",

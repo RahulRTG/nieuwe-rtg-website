@@ -50,36 +50,45 @@ const api = async (base, pad, body, token) => (await fetch(base + pad, {
    was. Dit hulpje doet wat de gebruiker doet, en valt terug op niets-doen als
    het menu er (nog) niet is: dan staat alles gewoon onder elkaar. */
 async function naarDeel(page, zoek) {
-  /* Wachten tot het menu er IS. Het deelt het scherm pas in nadat de app zijn
-     inhoud heeft opgebouwd, dus een aanroep vlak na de navigatie treft nog
-     niets -- en dan blijft stilletjes het verkeerde deel open. Dat kostte hier
-     een ronde: de eerste versie riep alleen aan en keek niet of het lukte.
+  /* Wachten tot het menu er IS, en dat is hier drie keer misgegaan -- elke keer
+     omdat "nul delen" met twee verschillende dingen werd verward.
 
-     MAAR: NIET ELKE PAGINA KRIJGT EEN MENU, en dat is geen defect. Het
-     deelmenu doet met opzet niets bij minder dan drie delen ("dan is een menu
-     alleen maar drukte"), en het Klankwerk heeft er twee: een lijstvlak en een
-     werkvlak. Dan staat alles gewoon onder elkaar en werkt elke knop.
+     RONDE 1: de helper riep RTGDeel.open() aan zonder te kijken of het lukte,
+     en liet dan stilletjes het verkeerde deel open staan.
 
-     De kop hierboven beloofde die terugval ("valt terug op niets-doen als het
-     menu er (nog) niet is") maar de code eiste hem alsnog op: assert.ok op een
-     menu dat er nooit zou komen. Deze toets stond daardoor rood om een pagina
-     die het gewoon deed -- een belofte in tekst die geen belofte in code was
-     (LAT.md regel 6).
+     RONDE 2: er kwam een assert.ok op een menu, terwijl de kop beloofde dat hij
+     zou terugvallen als er geen menu was. Die belofte stond alleen in tekst
+     (LAT-regel 6), en de toets stond rood om een pagina die het gewoon deed.
+     Toen is `nul delen` gaan gelden als "deze pagina heeft er geen".
 
-     De tanden blijven: is er WEL een menu maar ontbreekt het gevraagde deel,
-     dan is dat een echte breuk en zakt hij nog steeds. */
+     RONDE 3, en dat is deze: die terugval verwarde NUL DELEN met NOG GEEN
+     DELEN. Het Klankwerk bouwt zijn werkvlak pas op als er een stuk openstaat,
+     en het deelmenu deelt dat vlak daarna alsnog in -- in zeven delen. De
+     helper werd daarvoor aangeroepen, zag nul delen, concludeerde "geen menu"
+     en deed niets. Even later verscheen het menu alsnog, opende het EERSTE deel
+     en zette de rest op `display:none`. De knop waar de toets op wachtte stond
+     vanaf dat moment in een verborgen kaart, en Playwright meldde precies dat:
+     "element is visible, enabled and stable ... scrolling into view ... element
+     is not visible".
+
+     Vandaar dat nul delen nu weer WACHTEN betekent. Een pagina die echt geen
+     menu heeft, hoort hier dus ook niet meer langs te komen -- en dat klopt:
+     deze helper wordt alleen door dit bestand gebruikt, voor een pagina die er
+     aantoonbaar wel een heeft (de toets hieronder legt die zeven delen vast). */
   const uitslag = await page.waitForFunction((z) => {
     if (!window.RTGDeel || !RTGDeel.delen) return false;
     const alle = RTGDeel.delen();
-    if (!alle.length) return { menu: false };            // deze pagina heeft er geen
+    if (!alle.length) return false;              // NOG geen delen: wachten, niet concluderen
     const id = alle.find(d => d.includes(z));
-    if (!id) return false;                                // nog aan het opbouwen: wachten
+    if (!id) return false;                        // nog aan het opbouwen: wachten
     RTGDeel.open(id);
-    return { menu: true, id };
+    return { id };
   }, zoek, { timeout: 20000 }).then(h => h.jsonValue()).catch(() => null);
   assert.ok(uitslag, 'het deel "' + zoek + '" is te openen (delen: ' +
     JSON.stringify(await page.evaluate(() => window.RTGDeel ? RTGDeel.delen() : 'geen menu')) + ')');
-  if (uitslag.menu) await page.waitForTimeout(150);
+  /* Even laten bezinken: openen zet de andere delen op display:none, en een
+     klik vlak daarna landt anders op een kaart die net aan het verdwijnen is. */
+  await page.waitForTimeout(150);
 }
 
 test('Van lied naar zaal: zingen, samen maken, uitgeven en horen',
@@ -110,25 +119,30 @@ test('Van lied naar zaal: zingen, samen maken, uitgeven en horen',
     await page.waitForFunction(() => document.querySelectorAll('#rack .kanaal').length >= 3,
       null, { timeout: 20000 });
 
-    /* WELKE VAN DE TWEE STANDEN GELDT HIER, met zoveel woorden. naarDeel()
-       hieronder werkt op twee manieren -- via het menu, of gewoon rechtstreeks
-       als er geen menu is -- en welke van de twee het is, hoort niet stil te
-       blijven staan.
+    /* DIE DAG IS GEKOMEN, en deze regel is omgedraaid.
 
-       Gemeten (niet aangenomen): de <main> van het Klankwerk draagt een <h1>,
-       een lijstvlak en een werkvlak. Geen van drieen is een sectie zoals het
-       deelmenu die kent (een losse .sec/h2/h3/h4-kop, of een kaart met een
-       eigen kop erin), dus het menu ziet NUL delen en bouwt niets. Dat hoort
-       ook: een studio is geen rol met secties maar een gereedschap met een
-       lijst ernaast.
+       Hier stond dat het Klankwerk NUL delen heeft en dus geen deelmenu krijgt
+       ("een studio is geen rol met secties maar een gereedschap met een lijst
+       ernaast"), met erbij: "Wat deze regel bewaakt is de dag dat dat verandert
+       ... dan is de navigatie van deze toets een herziening waard."
 
-       Wat deze regel bewaakt is de dag dat dat verandert. Beproefd door drie
-       secties in die main te zetten: er komt een menu, en deze bewering zakt.
-       Dan is de navigatie van deze toets een herziening waard. */
-    const menuDelen = await page.evaluate(() => (window.RTGDeel && RTGDeel.delen) ? RTGDeel.delen() : null);
-    assert.deepEqual(menuDelen, [],
-      'het Klankwerk heeft te weinig delen voor een menu; alles staat onder elkaar (delen: ' +
-      JSON.stringify(menuDelen) + ')');
+       Nagemeten, en het klopt niet meer: zodra er een stuk openstaat bouwt het
+       werkvlak zich op en deelt het menu hem in ZEVEN delen. De oude bewering
+       mat alleen het moment VOOR die opbouw, en was daardoor waar om de
+       verkeerde reden -- terwijl de toets even verderop stukliep op precies dat
+       menu (het opende het eerste deel en zette de rest op display:none).
+
+       Wat er nu staat is de bewering die de oude wilde zijn: er IS een menu, en
+       het draagt de delen waar deze toets doorheen loopt. Verdwijnt er een, dan
+       zakt hij hier -- met de naam erbij -- in plaats van twintig regels later
+       op een knop die "niet zichtbaar" is. */
+    const menuDelen = await page.waitForFunction(
+      () => (window.RTGDeel && RTGDeel.delen && RTGDeel.delen().length) ? RTGDeel.delen() : false,
+      null, { timeout: 20000 }).then(h => h.jsonValue());
+    for (const deel of ['het-raster', 'de-notenrol', 'rahul-zet-iets-neer', 'samen-produceren', 'uitgeven']) {
+      assert.ok(menuDelen.includes(deel),
+        'het deelmenu van het Klankwerk mist "' + deel + '" (delen: ' + JSON.stringify(menuDelen) + ')');
+    }
 
     /* ---- een heel lied, met een eigen zin ---- */
     await naarDeel(page, 'rahul-zet-iets-neer');

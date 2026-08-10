@@ -140,11 +140,44 @@ test('elke pagina in public/ opent zonder onafgevangen fout',
           // pas na de load, en juist daar sneuvelt er iets. Bij 300ms miste hij
           // apps/payroll.html, waarvan de fout uit een afgewezen aanroep komt.
           await new Promise(r => setTimeout(r, 900));
-          probe = await page.evaluate(() => ({
-            titel: (document.title || '').trim(),
-            taal: document.documentElement.getAttribute('lang') || '',
-            kinderen: document.body ? document.body.children.length : 0
-          }));
+          /* NA EEN META-REFRESH MEET JE DE BESTEMMING, NIET DEZE PAGINA.
+
+             Drie paden zijn een briefje met `<meta http-equiv="refresh"
+             content="0;url=...">`: berichten, zorgbalie en kantoorpda. Die staan
+             er nul milliseconden, dus wat je 900 ms later uit de DOM leest is de
+             pagina waar je INMIDDELS bent -- meestal de bestemming (die zijn
+             eigen titel en inhoud heeft, dus dan slaagt de meting om de
+             verkeerde reden), en onder belasting soms een halve navigatie zonder
+             kinderen. Zo zakte deze toets een keer op kantoorpda.html met
+             `kinderen=0`, terwijl er niets mis was.
+
+             Voor die drie meten we daarom het BRIEFJE ZELF, uit zijn eigen
+             bestand: heeft hij een titel, een taal en inhoud, en bestaat de
+             pagina waar hij heen wijst? Dat is deterministisch en het gaat over
+             het juiste document. De browser blijft hem wel openen -- de
+             JS-fouten en de 404's op eigen bestanden komen gewoon binnen, en
+             daar is deze scan voor. */
+          const bron = fs.readFileSync(path.join(PUB, p), 'utf8');
+          const refresh = /<meta[^>]+http-equiv=["']refresh["'][^>]*content=["'][^"']*url=([^"'>]+)/i.exec(bron);
+          if (refresh) {
+            const doel = refresh[1].split('?')[0].split('#')[0];
+            const bestaat = doel.startsWith('/') && fs.existsSync(path.join(PUB, doel));
+            if (!bestaat) ontbreekt.push(p + '  ->  omleiding wijst naar ' + doel + ', dat bestaat niet');
+            const t = /<title>([^<]*)<\/title>/i.exec(bron);
+            const h = /<html[^>]*\blang\s*=\s*["']([^"']+)["']/i.exec(bron);
+            const b = /<body[^>]*>([\s\S]*?)<\/body>/i.exec(bron);
+            probe = {
+              titel: t ? t[1].trim() : '',
+              taal: h ? h[1] : '',
+              kinderen: b && /<\w+/.test(b[1]) ? 1 : 0
+            };
+          } else {
+            probe = await page.evaluate(() => ({
+              titel: (document.title || '').trim(),
+              taal: document.documentElement.getAttribute('lang') || '',
+              kinderen: document.body ? document.body.children.length : 0
+            }));
+          }
         } catch (e) {
           fouten.push('LAADFOUT: ' + e.message);
         }

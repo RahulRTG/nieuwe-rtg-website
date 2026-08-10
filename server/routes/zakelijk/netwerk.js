@@ -4,8 +4,8 @@
    het opstarten vanuit routes/zakelijk.js. */
 module.exports = (zctx) => {
   const { app, auth, crypto, db, save, schoon, liveCodename, openVacatures, gidsHaal, talen,
-    socialVerbind, connectieTussen, statusVan, zijnVrienden, verbActief, codenaamVan, sseToCustomer,
-    Z, nu, rid, PRO, pro, mijnProfiel, pasVan, connectiesVan, gedeeldeConnecties, publiek } = zctx;
+    socialVerbind, connectieTussen, statusVan, zijnVrienden, codenaamVan, sseToCustomer,
+    Z, nu, rid, pro, mijnProfiel, pasVan, connectiesVan, gedeeldeConnecties, publiek } = zctx;
   /* ---------- mijn profiel ---------- */
   app.post('/api/zakelijk/profiel', auth, pro, (req, res) => {
     const p = mijnProfiel(req);

@@ -54,7 +54,7 @@ module.exports = function hangRoutesOp(kern) {
      die domeinen; een gateway (server/poort.js) stuurt de padprefixen dan naar
      het juiste domeinproces. De infra-endpoints (health, stream, push, cluster,
      translate) en de foundation-mount zitten in de kern en draaien altijd mee. */
-  const ALLE_DOMEINEN = ['auth', 'member', 'supplier', 'office', 'staff', 'social', 'techniek', 'zakelijk'];
+  const ALLE_DOMEINEN = ['auth', 'member', 'supplier', 'office', 'staff', 'social', 'techniek', 'zakelijk', 'wereld'];
   const gekozenDomeinen = (process.env.RTG_DOMAINS || ALLE_DOMEINEN.join(','))
     .split(',').map(s => s.trim()).filter(s => s && s !== '-'); // '-' = bewust geen domeinen (vloot)
   for (const naam of gekozenDomeinen) {

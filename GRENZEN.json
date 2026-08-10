@@ -1603,6 +1603,11 @@
     "welzijn": [
       "welzijn"
     ],
+    "wereld": [
+      "gidsHaal",
+      "openVacatures",
+      "zijnVrienden"
+    ],
     "werkbeleid": [
       "status",
       "werkbeleidOverzicht",
@@ -1645,7 +1650,6 @@
       "zaakcommand"
     ],
     "zakelijk": [
-      "PRO",
       "Z",
       "connectieTussen",
       "connectiesVan",
@@ -1660,7 +1664,6 @@
       "rid",
       "socialVerbind",
       "statusVan",
-      "verbActief",
       "zijnVrienden"
     ],
     "zorgwallet": [

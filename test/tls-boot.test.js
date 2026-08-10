@@ -38,6 +38,14 @@ const http = require('http');
 const https = require('https');
 const fs = require('fs');
 const os = require('os');
+/* De vrije-poortkiezer van test/helper.js, en niet een gok uit een bereik.
+   Die helper is er precies voor dit: hij bindt op 0, leest de poort die het
+   besturingssysteem toewijst en geeft hem weer vrij. In de kop daar staat dat
+   een gegokte poort "de oude oorzaak van sporadische fetch failed" was -- en
+   deze toets gokte er nog een, met als gevolg een rood dat niets over de code
+   zei ("Poort 39340 is al in gebruik"). Een toets die om een andere reden dan
+   zijn onderwerp kan zakken, kost precies het vertrouwen dat hij moet leveren. */
+const { vrijePoort } = require('./helper');
 const path = require('path');
 
 const ROOT = path.join(__dirname, '..');
@@ -84,7 +92,7 @@ async function wachtTotOp(mod, port, uitInfo, tot = 30000) {
 
 async function opgestart(dataDir, tls, mod) {
   for (let poging = 0; ; poging++) {
-    const port = 38000 + Math.floor(Math.random() * 1500);
+    const port = await vrijePoort();
     const { kind, uitInfo } = boot(port, dataDir, tls);
     try { await wachtTotOp(mod, port, uitInfo); return { kind, uitInfo, port }; }
     catch (e) {
@@ -155,9 +163,13 @@ test('npm run telefoon: de POORTWACHTER termineert https, en dat is het commando
   const dataDir = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-telefoon-'));
   let kind = null;
   try {
-    const port = 39100 + Math.floor(Math.random() * 300);
+    /* Twee losse vrije poorten: een voor de poortwachter zelf en een als basis
+       voor de drie werkers erachter. Ze uit elkaar halen scheelt de aanname dat
+       poort+10 ook vrij zou zijn. */
+    const port = await vrijePoort();
+    const trioBasis = await vrijePoort();
     const env = Object.assign({}, process.env, {
-      RTG_LOKAAL_TLS: '1', PORT: String(port), RTG_TRIO_BASIS: String(port + 10),
+      RTG_LOKAAL_TLS: '1', PORT: String(port), RTG_TRIO_BASIS: String(trioBasis),
       RTG_DATA_DIR: dataDir, NODE_ENV: 'test', RTG_DEMO: '1', ANTHROPIC_API_KEY: '', RTG_PG: ''
     });
     kind = cp.spawn(process.execPath, ['server/trio.js'], { cwd: ROOT, env, stdio: ['ignore', 'pipe', 'pipe'] });

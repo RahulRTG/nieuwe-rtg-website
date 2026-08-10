@@ -1,6 +1,5 @@
-/* Stand -- Metier, deel 3: laden, de knoppen, Rahul en de aanmelding van de
-   stand. Sluitstuk van metier.js en metierb.js; dit bestand laadt als laatste
-   (bestandsnaamvolgorde) en mag dus overal bij. */
+/* Stand -- Metier, deel 3: laden, de knoppen, Rahul en de aanmelding.
+   Laadt als laatste (bestandsnaamvolgorde) en mag dus overal bij. */
 (function (w, d) {
   'use strict';
   var V = w.RTGGeld = w.RTGGeld || { standen: [] };
@@ -73,8 +72,7 @@
     laad();
   }
 
-  /* De loontoets legt een bod naast de wet; de uitslag hoort in het vak,
-     ook als het een fout is (zo deed het origineel het ook). */
+  // de loontoets: de uitslag hoort in het vak, ook als het een fout is
   async function toets() {
     var Geld = w.Geld, u = d.getElementById('mtUtoets');
     if (!u) return;
@@ -87,9 +85,8 @@
     } catch (e) { u.textContent = e.message; }
   }
 
-  /* Een keer aan document, want het paneel wordt bij elke wissel opnieuw
-     getekend; alle haken dragen het mt-voorvoegsel, dus buiten deze stand
-     vangt dit niets. */
+  /* Een keer aan document, want het paneel wordt steeds opnieuw getekend;
+     alle haken dragen mt, dus buiten deze stand vangt dit niets. */
   d.addEventListener('click', function (ev) {
     var t = ev.target.closest('[data-mtt]');
     if (t) { M.tab = t.getAttribute('data-mtt'); return laad(); }

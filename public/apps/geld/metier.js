@@ -1,8 +1,7 @@
 /* Stand -- Metier, deel 1: staat, vormen en de opbouw van Mijn profiel en
    Mijn naam. Was /apps/metier.html: de beroepskant van RTG, het profiel op
-   codenaam en de echte naam in de kluis. Gesplitst in drie bestanden omdat de
-   repo elk bestand onder de 10 KB houdt; dit deel tekent alleen, metierc.js
-   haalt de data, bindt de knoppen en registreert de stand. */
+   codenaam, de echte naam in de kluis. Drie bestanden omdat de repo elk
+   bestand onder de 10 KB houdt; metierc.js bindt en registreert. */
 (function (w, d) {
   'use strict';
   var Deel = w.RTGGeldDeel = w.RTGGeldDeel || {};
@@ -28,9 +27,13 @@
         'letter-spacing:.12em;text-transform:uppercase;white-space:nowrap;cursor:pointer;}' +
       '.mt-tabs button[aria-pressed="true"]{color:var(--rtg-txt);border-bottom-color:var(--gold-basis);}' +
       '#paneel .mt-tx{flex:1;min-width:0;}' +
-      '#paneel .badge{margin-left:.35rem;}' +
+      /* .badge en .chips zijn UI-kit-klassen die zusterstanden ook dragen, en
+         dit blad blijft (id-wacht) in de head staan na een standwissel; dus
+         op het eigen vak scopen, niet op #paneel, anders kleurt Metier de
+         chips van Mecenaat mee */
+      '#mtVak .badge{margin-left:.35rem;}' +
       '#paneel .mt-zg{color:var(--gold-tekst);border-color:var(--gold-rand);}' +
-      '#paneel .chips button[aria-pressed="true"]{border-color:var(--gold-rand);color:var(--gold-tekst);}' +
+      '#mtVak .chips button[aria-pressed="true"]{border-color:var(--gold-rand);color:var(--gold-tekst);}' +
       '#paneel .mt-mini{background:none;border:0;color:var(--gold-tekst);font-size:.75rem;cursor:pointer;' +
         'padding:0;text-decoration:underline;}' +
       '#paneel .mt-uit{border:1px solid var(--rtg-line);border-radius:12px;padding:.6rem .8rem;margin-top:.6rem;' +

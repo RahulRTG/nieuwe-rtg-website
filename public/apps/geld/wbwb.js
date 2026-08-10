@@ -8,7 +8,6 @@
   'use strict';
   var V = w.RTGGeld = w.RTGGeld || { standen: [] };
   var $ = function (s) { return d.querySelector(s); };
-  var bronAan = false;
 
   function Deel() { return w.RTGGeldDeel.wbw; }
 
@@ -130,10 +129,16 @@
     var D = Deel();
     D.stijl();
     $('#wbWrap').addEventListener('click', klik);
-    /* een keer aanmelden is genoeg: het model kijkt zelf of de stand er
-       staat, en uitvoer.js laadt deferred dus hij is er nu al */
-    if (w.RTGUitvoer && !bronAan) { bronAan = true; w.RTGUitvoer.bron(model); }
+    /* Het document heeft EEN bron-slot en elke zusterstand schrijft het bij
+       zijn start opnieuw. Dus: bij ELKE start aanmelden, bij stop weer
+       loslaten -- een eenmalige vlag hier liet Meenemen blijvend leeg staan
+       zodra u een keer naar een andere stand en terug was gewisseld. */
+    if (w.RTGUitvoer) w.RTGUitvoer.bron(model);
     laadLijstjes();
+  }
+
+  function stop() {
+    if (w.RTGUitvoer) w.RTGUitvoer.bron(null);
   }
 
   V.standen.push({
@@ -180,6 +185,7 @@
           '<div class="kaart wb-log" id="wbLog"><p class="stil">Nog geen uitgaven.</p></div>' +
         '</section>' +
       '</div>',
-    start: start
+    start: start,
+    stop: stop
   });
 })(window, document);

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 726 bestanden en 4113 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 727 bestanden en 4114 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 726 |
-| losse beweringen (`test(...)`) | 4113 |
+| toetsbestanden | 727 |
+| losse beweringen (`test(...)`) | 4114 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 521 |
 | **overleefd**: geen mutatie kreeg hem rood | 12 |
 | niet te meten (al rood, geen module gevonden, ...) | 16 |
 | alleen in de kop *genoemd*, nog niet gemeten | 32 |
-| niets van beide | 145 |
+| niets van beide | 146 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -676,7 +676,7 @@ toets omvalt.
 
 ## Schermtoetsen (`npm run e2e`, met een browser)
 
-90 bestanden, 159 beweringen.
+91 bestanden, 160 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -700,6 +700,7 @@ toets omvalt.
 | `deur.e2e.js` | 2 | gezakt op `liegpoort /api/` | Scherm-test voor de gedeelde poort (shared/deur.js). Veertien apps toonden aan wie er niet in mag precies een zin -- "Alleen met de Lifestyle Pass" -- zonder knop, zonder uitleg, zonder weg vooruit. |
 | `eigensessieschermen.e2e.js` | 3 | -- | DE SCHERMEN MET EEN EIGEN SESSIESOORT, EN DE TWEE DOORVERWIJSSTUBS. Twaalf van de vijftien schermen die na TAKEN 4.9 nog geen eigen toets hadden. |
 | `galerij.e2e.js` | 1 | -- | Scherm-test voor RTG Galerij: de tijdlijn met beelden uit twee bronnen (De Salon en RTG Bestanden), de kijker met favoriet, en een album bouwen. Draait alleen waar een browser beschikbaar is. |
+| `geld.e2e.js` | 1 | -- | Scherm-test voor RTG Geld als ECHTE app: tien standen in een schil (PLATFORM.md par. 0, de eerste wereld die werkelijk is samengevoegd). |
 | `genootschap.e2e.js` | 1 | -- | Scherm-test voor Genootschap. De unit-toetsen (test/genootschap.test.js) bewijzen de server-kant; deze bewijst dat het scherm het doet: oprichten, een bijeenkomst uitroepen en beantwoorden, en een peiling waarvan de... |
 | `gereedschap.e2e.js` | 1 | -- | Scherm-test voor RTG Gereedschap: rekenen met de toetsen (btw erbij), een wekker en een timer zetten (de server telt), en het alarmscherm dat op het SSE-seintje opent. Draait alleen waar een browser is. |
 | `gpsschakelaar.e2e.js` | 1 | -- | Scherm-test voor de GPS-schakelaar van het OS-menu (rtg_os_gps). De schakelaar bestond, maar geen enkele locatie-aanroep las hem: wie hem op "uit" zette werd alsnog om de twintig seconden om een positie gevraagd (de... |

@@ -1,5 +1,5 @@
-/* Stand -- Metier, deel 2: het beroepsregister, de loonspiegel, de coach en
-   de meeneembron. Tekent alleen, net als metier.js; metierc.js doet de rest. */
+/* Stand -- Metier, deel 2: register, loonspiegel, coach en meeneembron.
+   Tekent alleen, net als metier.js; metierc.js doet de rest. */
 (function (w, d) {
   'use strict';
   var M = (w.RTGGeldDeel = w.RTGGeldDeel || {}).metier;
@@ -49,10 +49,9 @@
       '<div class="mt-knoppen"><button class="knop hoofd" id="mtBaanbeveel" type="button">Plaatsen</button></div></div>';
   };
 
-  /* De loonspiegel: elders een betaalde dienst, hier gewoon in de pas. Echte
-     uurlonen uit de loonrun van RTG-zaken, met het wettelijk minimum ernaast.
-     Vakken met te weinig zaken staan er bewust niet bij: die drempel houdt de
-     server aan, dit scherm toont alleen wat hij teruggeeft. */
+  /* De loonspiegel: elders betaald, hier in de pas. Echte uurlonen uit de
+     loonrun van RTG-zaken, met de wet ernaast. Vakken met te weinig zaken
+     ontbreken bewust: die drempel houdt de server aan. */
   M.loonRij = function (r) {
     var esc = w.Geld.esc;
     return '<div class="rij"><div class="mt-tx"><b>' + esc(r.vakNaam) + '</b>' +
@@ -106,9 +105,9 @@
       '<p class="stil" style="margin-top:.5rem;">Er wordt niets van bewaard en niets van gedeeld. Dit is een oefenruimte.</p></div>';
   };
 
-  /* Meenemen (shared/uitvoer.js): drie schermen met echte rijen, en wat u
-     meeneemt is het scherm waar u staat: uw eigen werk, wat u in het register
-     vond, of de loonspiegel. De coach levert tekst en geen gegevens. */
+  /* Meenemen (shared/uitvoer.js): wat je meeneemt is het scherm waar je
+     staat: je eigen werk, het register of de loonspiegel. De coach levert
+     tekst en geen gegevens. */
   M.uitvoer = function () {
     if (M.tab === 'register' && M.register) {
       return { naam: 'beroepsregister', kolommen: ['codenaam', 'beroepskop', 'plaats', 'open voor werk', 'bevestigd', 'vaardigheden'],

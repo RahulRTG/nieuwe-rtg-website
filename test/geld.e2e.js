@@ -104,7 +104,13 @@ test('RTG Geld: tien standen openen, wisselen schoon, en de oude paden leiden om
       assert.equal(u.searchParams.get('ref'), 'toets', 'de querystring hoort mee te reizen');
     }
 
-    const echteFouten = fouten.filter((f) => !/favicon/i.test(f));
+    /* De browser logt ELKE mislukte fetch als consolefout, ook de twee die
+       hier de bedoeling zijn: mecenaat en logboek zijn premium, en de server
+       weigert een RTG-pas met een 403. Die weigering is het juiste gedrag (de
+       stand toont hem), dus alleen die vorm wordt gefilterd; elke andere
+       consolefout blijft een zakker. */
+    const echteFouten = fouten.filter((f) =>
+      !/favicon/i.test(f) && !/Failed to load resource.*403/.test(f));
     assert.deepEqual(echteFouten, [], 'RTG Geld hoort zonder consolefouten te draaien');
   } finally {
     if (browser) await browser.close().catch(() => {});

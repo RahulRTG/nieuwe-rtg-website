@@ -14,6 +14,8 @@
 <!-- de vormtaal van een wereldscherm (balk, register, regkop); gedeeld met
      Reizen, Kantoor en Sociaal in plaats van overgetikt (LAT.md regel 4) -->
 <link href="/shared/rtg-wereld.css" rel="stylesheet">
+<!-- de vorm van de mediapoort-meldingen; hoort bij /shared/media.js (keuring 38) -->
+<link href="/shared/media.css" rel="stylesheet">
 <style>
   /* De standenbalk: dezelfde vormtaal als RTG Veilig en de Media OS -- een
      strook met een haarlijn eronder, de actieve stand met een gouden
@@ -70,10 +72,11 @@
 </main>
 
 <script src="/apps/geld/hulp.js"></script>
-<!-- TUSSENSTAND: zes van de tien standen staan er; rtgcode, labfonds,
-     mecenaat, logboek en nalatenschap zijn in aanbouw en komen er in de
-     volgende commit bij. Alleen bestaande bestanden staan hier, want een
-     script-tag naar een bestand dat er niet is, is een consolefout. -->
+<!-- De volgorde van de scripts is de volgorde van de standenbalk: het
+     overzicht eerst (daar bestaat de wereld voor), dan wat u dagelijks
+     aanraakt, dan de administraties. Meerdere bestanden per stand zijn de
+     10 KB-regel (scripts/check.js regel 13): het eerste deel zet de functies
+     op w.RTGGeldDeel, het laatste deel registreert de stand. -->
 <script src="/apps/geld/overzicht.js"></script>
 <script src="/apps/geld/wallet.js"></script>
 <script src="/apps/geld/walletb.js"></script>
@@ -87,10 +90,24 @@
 <script src="/apps/geld/metierc.js"></script>
 <script src="/apps/geld/balans.js"></script>
 <script src="/apps/geld/balansb.js"></script>
+<script src="/apps/geld/rtgcode.js"></script>
+<script src="/apps/geld/rtgcodeb.js"></script>
+<script src="/apps/geld/labfonds.js"></script>
+<script src="/apps/geld/labfondsb.js"></script>
+<script src="/apps/geld/mecenaat.js"></script>
+<script src="/apps/geld/mecenaatb.js"></script>
+<script src="/apps/geld/logboek.js"></script>
+<script src="/apps/geld/logboekb.js"></script>
+<script src="/apps/geld/nalatenschap.js"></script>
+<script src="/apps/geld/nalatenschapb.js"></script>
 <script src="/apps/geld/schil.js"></script>
 <script src="/shared/seizoen.js" defer></script>
 <script src="/shared/qr.js" defer></script>
 <script src="/shared/qrteken.js" defer></script>
+<!-- de mediapoort vast aan boord (keuring 38: wie RTGMedia zegt, laadt de
+     deur); de scanstapel van de stand RTG-code ziet hem staan en slaat hem
+     bij het bijladen gewoon over -->
+<script src="/shared/media.js" defer></script>
 <script src="/shared/uitvoer.js" defer></script>
 <script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>

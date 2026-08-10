@@ -78,10 +78,15 @@
      je de reeks als een reis door de tijd en niet als losse dozen. */
   .reis::before{content:"";position:absolute;left:3px;top:0;bottom:0;width:1px;
     background:var(--rtg-line);}
-  .reis:first-child::before{top:1.9rem;}
-  .reis:last-child::before{bottom:calc(100% - 1.9rem);}
-  .reis .stip{position:absolute;left:0;top:1.55rem;width:7px;height:7px;border-radius:50%;
-    background:var(--rtg-sig-stil);}
+  /* De stip zit op de MIDDENLIJN van zijn regel, net als de datum ernaast. Hij
+     stond op een vaste afstand van boven (1,55rem); toen de datum naar het
+     midden zakte bleef hij achter en wees hij nergens meer naar. Een tijdlijn
+     waarvan de stip niet bij zijn eigen datum staat, is geen tijdlijn.
+     De lijn begint en eindigt daarom ook bij de eerste en laatste stip. */
+  .reis:first-child::before{top:50%;}
+  .reis:last-child::before{bottom:50%;}
+  .reis .stip{position:absolute;left:0;top:50%;transform:translateY(-50%);
+    width:7px;height:7px;border-radius:50%;background:var(--rtg-sig-stil);}
   .reis[data-sig="gezond"]   .stip{background:var(--rtg-sig-gezond);}
   .reis[data-sig="aandacht"] .stip{background:var(--rtg-sig-aandacht);}
   .reis[data-sig="incident"] .stip{background:var(--rtg-sig-incident);}
@@ -92,7 +97,14 @@
   .reis:last-child .doos{border-bottom:0;}
   .reis:hover .doos,.reis:focus-visible .doos{background:rgba(255,255,255,.022);}
 
-  .dag{width:5.4rem;flex:none;text-align:center;}
+  /* Verticaal midden tussen de haarlijnen. De rij is een flexrij, dus .dag
+     rekte wel mee in hoogte maar de tekst erin begon bovenaan -- terwijl de
+     kolom ernaast (titel, status, feiten, kenmerk) veel hoger is. Het gevolg:
+     de datum stond tegen de bovenste streep aan met een gat naar de onderste.
+     Zelf een kolom worden en die centreren zet hem op de optische middenlijn
+     van zijn eigen regel. */
+  .dag{width:5.4rem;flex:none;text-align:center;
+    display:flex;flex-direction:column;justify-content:center;}
   .dag .wd,.dag .mnd{display:block;font-size:.6rem;letter-spacing:.16em;text-transform:uppercase;
     color:var(--rtg-soft);}
   .dag .nr{display:block;margin:.1rem 0 .05rem;}

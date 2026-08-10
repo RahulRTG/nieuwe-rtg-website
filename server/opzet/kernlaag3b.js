@@ -13,6 +13,10 @@
                    tower langs de AGENDA en niet als eigen opslag: een
                    aangenomen voorstel is een gewone afspraak.
 
+   Onderaan staan sindsdien ook geldbeleid en geldgraaf (GELD.md): de geldgraaf
+   is de financiele evenknie van de levensgraaf en hoort bij deze motorlaag;
+   kernlaag3.js zelf zat tegen de omvangregel aan. Zie het commentaar daar.
+
    DE VOLGORDE IS GEDRAG. `bureau` krijgt de levensgraaf mee en bouwt hem niet
    zelf, dus die staat ervoor. Allebei staan ze NA kern/lifestyle en
    kern/rechterhand uit kernlaag3: de graaf projecteert op hun dossiers, en
@@ -40,4 +44,20 @@ Object.assign(kern, require('../kern/bureau')({ db, save, crypto, anthropic, liv
    voorstel. Staat hier omdat hij de tower voedt langs de agenda -- niet als
    eigen opslag. Een aangenomen voorstel is een gewone afspraak. */
 Object.assign(kern, { postdatum: require('../kern/postdatum')({ db, save, rtmail, agenda: kern.agenda }) });
+/* Geldbeleid (kern/geldbeleid/): het beleid van het LID over zijn eigen geld --
+   regels, potten en het append-only actielog (GELD.md par. 3-5). Aan db/save
+   zoals geldregie in kernlaag4, want dit is een schrijvende opslaglaag en geen
+   projectie. Ze staan in DIT bestand omdat kernlaag3.js tegen de omvangregel
+   aan zit, en bij de levensgraaf hierboven horen ze inhoudelijk thuis: de
+   geldgraaf is daar de financiele evenknie van. VOOR de graaf gemount, want
+   de graaf krijgt deze laag als argument mee -- een thunk zou die echte
+   afhankelijkheid alleen maar verstoppen. */
+Object.assign(kern, require('../kern/geldbeleid').maakGeldbeleid({ db, save }));
+/* De geldgraaf (kern/geldgraaf/): de alleen-lezen projectielaag over de
+   gelddomeinen, met de vooruitblik (GELD.md par. 1). Leest de kern LAAT zoals
+   kern/geldwereld.js, zodat de mountvolgorde van de bronnen er niet toe doet;
+   alleen het geldbeleid gaat expliciet mee, omdat het hierboven net is
+   gemonteerd en de graaf er zichtbaar van afhangt (potten trekken van het
+   vrij besteedbare af). */
+Object.assign(kern, require('../kern/geldgraaf')({ kern, geldbeleid: kern.geldbeleid }));
 };

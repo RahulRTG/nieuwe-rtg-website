@@ -49,7 +49,12 @@ const mediaan = (getallen) => {
 const euroTekst = (centen) => {
   const c = Math.round(Number(centen) || 0);
   const abs = Math.abs(c);
-  return (c < 0 ? '-' : '') + '€ ' + Math.floor(abs / 100) + ',' + String(abs % 100).padStart(2, '0');
+  /* Met duizendtalpunten, want dit zijn Nederlandse zinnen: "1000,00" leest
+     als een tikfout en "1.000,00" als een bedrag. Handmatig gegroepeerd en
+     niet met toLocaleString: die hangt aan de landinstelling van de SERVER,
+     en die hoort de tekst van een lid niet te bepalen. */
+  const heel = String(Math.floor(abs / 100)).replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+  return (c < 0 ? '-' : '') + '€ ' + heel + ',' + String(abs % 100).padStart(2, '0');
 };
 
 /* Voor stabiele uitzondering-ids: het scherm mag een uitzondering aan zijn id

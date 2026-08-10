@@ -149,6 +149,7 @@ Object.assign(kern, require('../kern/kantoorwereld').maakKantoorwereld({ kern })
 Object.assign(kern, require('../kern/socialewereld').maakSocialeWereld({ kern }));
 /* RTG Geld (kern/geldwereld.js): dezelfde laag over de geldwereld -- wallet,
    verrekeningen, toezeggingen. Bezit niets, schrijft nooit, en telt vooral
-   niets zelf op wat een domein al optelt. */
+   niets zelf op wat een domein al optelt. Geldbeleid en geldgraaf mounten
+   direct hierna in ./kernlaag3b.js: de omvangregel hield ze hier weg. */
 Object.assign(kern, require('../kern/geldwereld').maakGeldwereld({ kern }));
 };

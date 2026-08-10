@@ -19,7 +19,7 @@
    rente in ./sparen. */
 
 module.exports = (deps) => {
-  const { db, save, crypto, schoon, betaal, pay, bankregie, keyVanCodenaam, accounts, sseToCustomer, sseToOffice, anthropic } = deps;
+  const { db, save, bijeen, crypto, schoon, betaal, pay, bankregie, keyVanCodenaam, accounts, sseToCustomer, sseToOffice, anthropic } = deps;
   const nu = () => Date.now();
   const d = () => db.data;
 
@@ -77,7 +77,7 @@ module.exports = (deps) => {
     id, schoon, nu, save, d, geldModus, motorklant, bordSeintje });
 
   // de gedeelde context voor de deelbestanden
-  const ctx = { db, save, crypto, schoon, betaal, pay, bankregie, keyVanCodenaam, accounts, anthropic,
+  const ctx = { db, save, bijeen, crypto, schoon, betaal, pay, bankregie, keyVanCodenaam, accounts, anthropic,
     nu, d, MIN_CENTEN, MAX_CENTEN, SOORTEN, saldi, grootboek, rekeningen, rekMeta, saldoVan, isExtern, id, boek, boekAsync, geldModus, bodem, seintje };
 
   const rek = require('./rekeningen')(ctx);

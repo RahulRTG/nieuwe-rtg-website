@@ -32,8 +32,8 @@ const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
 const zlib = require('zlib');
-const { db, load, save, DATA_DIR, STORE, opslagKlaar, pgPoolStatus, startGedeeld, startSqliteSync, startPostgres, flushBijAfsluiten, onExternalChange, grootSupplierSync, grootAantal,
-  ledenGidsActief, ledenGidsHaal, ledenGidsAantal, ledenGidsZet, ledenGidsWeg, ledenGidsExact, ledenGidsZoek,
+const { db, load, save, bijeen, DATA_DIR, STORE, opslagKlaar, pgPoolStatus, startGedeeld, startSqliteSync, startPostgres, flushBijAfsluiten, onExternalChange, grootSupplierSync, grootAantal,
+  ledenGidsActief, ledenGidsHaal, ledenGidsAantal, ledenGidsZet, ledenGidsWeg, ledenGidsExact, ledenGidsZoek, ledenGidsHaalWacht,
   orderMetRef, ordersVanKlant, ordersVanZaak, ordersVoegToe,
   boekingMetRef, boekingenVanKlant, boekingenVanZaak, boekingenVoegToe,
   directBetalingMetRef, directBetalingenVanKlant, directBetalingenVanZaak, directBetalingenVoegToe,
@@ -526,7 +526,7 @@ function logInlog(kanaal, ok, wie, req) {
 const {
   AUTHOR_TIER, SSE_BUFFER_TTL, aiPoort, antivirus, archief, atelierweb, auth, automatisering, 
   beveilig, broadcastSync, bufferEvent, bus, connectedSupplierCodes, dirTouch, 
-  ensureSupplierDefaults, etaMinutes, gidsHaal, gidsWeg, gidsZoekCodenaam, guestsFor, 
+  ensureSupplierDefaults, etaMinutes, gidsHaal, gidsHaalWacht, gidsWeg, gidsZoekCodenaam, guestsFor,
   haversine, initRealtime, keyVanCodenaam, ledenAantal, leverSse, liveCodename, liveStateFor, 
   mailQ, mailIn, mailAuth, mailBijlage, mailSleutel, rtmailAi, naamlaag, nextSseId, notify, ondernemerpoort, pushLive, resolveSession, rtmail, rtmailTeam,
   rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels, rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar, mailAanname,
@@ -534,9 +534,9 @@ const {
   speelOpnieuw, sseBuffer, sseClients, sseSend, sseToCustomer, toRad, webpush, werkmail
   , scanNet, wacht
 } = require('./opzet/diensten')({
-  DATA_DIR, DEMO, PERSONAS, accounts, crypto, db, eigenaar, findSupplier, i18n, 
-  ledenGidsAantal, ledenGidsActief, ledenGidsExact, ledenGidsHaal, ledenGidsWeg, ledenGidsZet, 
-  ledenGidsZoek, ledenPrijs, maakLive, mail, onExternalChange, 
+  DATA_DIR, DEMO, PERSONAS, accounts, crypto, db, eigenaar, findSupplier, i18n,
+  ledenGidsAantal, ledenGidsActief, ledenGidsExact, ledenGidsHaal, ledenGidsHaalWacht, ledenGidsWeg, ledenGidsZet,
+  ledenGidsZoek, ledenPrijs, maakLive, mail, onExternalChange,
   ordersVanKlant, rtf, save, schild, schoon, sessionFor, sessions, sseToOffice, sseToSupplier, 
   tokenHash,
   // pas verderop in dit bestand gebouwd; zie de uitleg in diensten.js
@@ -799,7 +799,7 @@ function eisAccount(req, res) {
    HALEN. Dat is geen omweg om de volgorde heen: de sociale laag heeft de kern
    alleen nodig op het moment dat er echt een bericht langskomt, en tegen die
    tijd staat hij er. Een vaste verwijzing zou hier voor altijd undefined zijn. */
-const sociaal = require('./kern/sociaal')({ db, save, sseToCustomer, rtf, crypto, gidsHaal, gidsZoekCodenaam, media,
+const sociaal = require('./kern/sociaal')({ db, save, sseToCustomer, rtf, crypto, gidsHaal, gidsHaalWacht, gidsZoekCodenaam, media,
   commDm: () => kern && kern.commDm });
 // Verplichte intake (paspoort/e-mail/telefoon/adres/standaard) + contract voor elk
 // account, per scope (platform 'rtg' of leverancier-code), AI-aanpasbaar.
@@ -1885,7 +1885,7 @@ const kern = {
    wel wordt gebruikt, valt bij het opstarten meteen om. */
 const hulp = {
   DATA_DIR, FISCAAL_PEILJAAR, LANDEN, PERSONAS, accounts, alcoholGrensVan, annuleerReservering,
-  anthropic, app, archief, betaal, beveilig, boekingenVanKlant, boekingenVanZaak, boekingenVoegToe,
+  anthropic, app, archief, betaal, beveilig, bijeen, boekingenVanKlant, boekingenVanZaak, boekingenVoegToe,
   broadcastSync, centen, crypto, db, entreeCode, etaMinutes, findSupplier, fonds, fooiUit,
   geborenVan, haversine, idGeverifieerd, keyVanCodenaam, klantProfiel, klokVan, ledenAantal,
   ledenPrijs, leeftijdVan, legApart, liveCodename, log, logActivity, loginFails, maakOntmoeting,

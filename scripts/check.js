@@ -425,7 +425,24 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
     // 10,7 KB: de postbus. Ging over de grens toen de outbox een teller kreeg
     // (twee mails in dezelfde milliseconde overschreven elkaar). De naad zit
     // tussen het opstellen en het afleveren.
-    'server/mail.js'
+    'server/mail.js',
+    /* 11,4 en 10,7 KB: allebei stonden ze tientallen bytes onder de grens en
+       gingen ze erover door een gemeten oorzaak uit de beproevingsladder. De
+       crashproef (kill -9 onder schrijflast) vond een dubbele boeking doordat
+       geld en idem-sleutel in twee losse commits landden -- de save-bundel
+       (bijeen) hoort naast de save() die hij bewaakt. En de 1M-ronde vond een
+       404 op een bestaand lid doordat een koude cache als feit werd gelezen --
+       de wachtende lezing hoort naast de lader die hij hergebruikt. De snedes
+       die er wel zijn (bijeen naar een eigen module; het zoek-deel van de
+       ledengids apart) zijn echte bedrading en staan in TAKEN.md. */
+    'server/db/index.js',
+    'server/db/ledengids.js',
+    /* 11,3 KB: dezelfde crashproef-ronde. De rijstrook-sleutels (geld + idem)
+       gingen elk in een eigen transactie en een kill -9 tussen die twee commits
+       boekte dubbel; nu schrijft de rijstrook als EEN transactie. De snede
+       bestaat (schrijfEen + de twee schrijflanen naar een eigen deel) en staat
+       in TAKEN.md 4.23. */
+    'server/pg/sync.js'
   ]);
   let teGroot = 0, uitz = 0, nog = [];
   for (const map of ['server', 'public']) {

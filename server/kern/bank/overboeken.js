@@ -5,14 +5,16 @@
    betaal-naad. Idempotent op de clearende paden: dubbeltikken kan nooit dubbel
    afschrijven of dubbel storten. Krijgt de gedeelde ctx van kern/bank/index.js. */
 module.exports = (ctx) => {
-  const { db, save, crypto, nu, d, boekAsync, rekMeta, saldoVan, betaal, pay, bankregie, seintje } = ctx;
+  const { db, save, bijeen, crypto, nu, d, boekAsync, rekMeta, saldoVan, betaal, pay, bankregie, seintje } = ctx;
 
   const eigenaar = (iban, codenaam) => { const m = rekMeta(iban); return m && (!codenaam || m.codenaam === String(codenaam).trim()); };
 
   /* Idempotentie die een herstart overleeft: dezelfde sleutel geeft exact
      hetzelfde antwoord terug en clearet nooit twee keer. */
-  // met verzoek-binding; dezelfde module als RTG Pay, zie ../../lib/idem.js
-  const metIdem = require('../../lib/idem')({ d, save, naam: 'bankIdem' });
+  // met verzoek-binding; dezelfde module als RTG Pay, zie ../../lib/idem.js.
+  // De save-bundel legt boeking en idem-sleutel als EEN commit vast; de kaart-
+  // wacht in het werk raakt door de context-binding geen andere verzoeken.
+  const metIdem = require('../../lib/idem')({ d, save, naam: 'bankIdem', bijeen });
 
   /* Storten: extern geld op een rekening zetten. De knop bepaalt hoe het clearet:
      - partner/hybride: via de kaart-naad (Apple Pay/kaart), tegenrekening extern:kaart;

@@ -35,7 +35,7 @@
 'use strict';
 
 module.exports = (kern, hulp) => {
-  const { DATA_DIR, anthropic, betaal, boekingenVanZaak, boekingenVoegToe, crypto, db, etaMinutes, findSupplier, haversine, keyVanCodenaam, liveCodename, notify, notifySupplier, save, schoon, sseToCustomer, sseToSupplier } = hulp;
+  const { DATA_DIR, anthropic, betaal, bijeen, boekingenVanZaak, boekingenVoegToe, crypto, db, etaMinutes, findSupplier, haversine, keyVanCodenaam, liveCodename, notify, notifySupplier, save, schoon, sseToCustomer, sseToSupplier } = hulp;
 
 /* RTG Airport (kern/luchthaven.js): de gehele luchthavenoperatie ·
    vluchtleiding, passagiersketen (boeken/inchecken op codenaam), de draai op
@@ -112,7 +112,7 @@ Object.assign(kern, require('../kern/vakwerk').maakVakwerk({ db, save, anthropic
   crypto, notify, notifySupplier, sseToCustomer, sseToSupplier, boekingenVoegToe }));
 /* RTG Pay (kern/pay.js): de interne betaallaag met wallet, grootboek,
    tikkies, kassacode en automatisch bijladen via de betaal-naad. */
-Object.assign(kern, require('../kern/pay')({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon,
+Object.assign(kern, require('../kern/pay')({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon,
   // de geld-regie bepaalt het tarief; als thunk zodat de mount-volgorde niet uitmaakt
   betaaldienstKosten: c => (kern.betaaldienstKosten ? kern.betaaldienstKosten(c) : 0) }));
 /* Het keukenbrein (kern/keuken.js): recepten per gerecht, automatische

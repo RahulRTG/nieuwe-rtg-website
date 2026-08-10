@@ -4,7 +4,7 @@
    kern/sociaal/vrienden.js. */
 module.exports = (ctx) => {
 const { db, save, sseToCustomer, rtf, crypto, gidsHaal, gidsZoekCodenaam, media,
-  dmSleutel, connectieTussen, isRtf, codeExists, codenaamVan, soortVan, isKindHandle,
+  dmSleutel, connectieTussen, isRtf, codeBestaat, codenaamVan, soortVan, isKindHandle,
   isBeschermdHandle, verbActief, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, sociaalRate } = ctx;
 function kindContacten(gezinCode, kidHandle) {
   const okKid = rtf.socialProfielen().some(sp => sp.handle === kidHandle && sp.gezinCode === gezinCode && sp.beschermd);
@@ -53,9 +53,12 @@ async function socialZoek(mij, q) {
 /* vriendschapsverzoek van 'mij' naar 'naar'. doorOuder=true betekent: een
    ouder/verzorger doet dit namens zijn beschermde kind (via ouderVerbind); dan
    geldt de ouder-goedkeuring voor de kant van dit kind als al gegeven. */
-function socialVerbind(mij, naar, doorOuder) {
+async function socialVerbind(mij, naar, doorOuder) {
   if (naar === mij) return { status: 400, error: 'Dat ben je zelf.' };
-  if (!codeExists(naar)) return { status: 404, error: 'Deze codenaam kennen we niet.' };
+  /* De wachtende bestaanscheck: dit 404-besluit mag niet op een koude cache
+     rusten (in Postgres-stand kreeg een net gevonden codenaam hier onder last
+     "kennen we niet" -- zie codeBestaat in ../sociaal.js). */
+  if (!(await codeBestaat(naar))) return { status: 404, error: 'Deze codenaam kennen we niet.' };
   // beschermd profiel (15 of jonger): kan zelf geen verzoeken sturen...
   if (!doorOuder && isBeschermdHandle(mij)) return { status: 403, error: 'Je ouder of verzorger voegt vrienden voor je toe.' };
   // ...en is voor anderen onbenaderbaar (404: we verklappen niet dat het bestaat)
@@ -93,7 +96,7 @@ async function ouderVerbind(gezinCode, kidHandle, doel) {
   if (!sp) return { status: 403, error: 'Dit is geen kind van jouw gezin.' };
   // doel mag een handle zijn of een exacte codenaam (zo typt een ouder gewoon de codenaam over)
   let naar = String(doel || '').trim();
-  if (!codeExists(naar)) {
+  if (!(await codeBestaat(naar))) {
     const q = naar.toLowerCase();
     const kandidaten = [];
     for (const m of await gidsZoekCodenaam(q, true)) kandidaten.push(m.key);

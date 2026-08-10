@@ -1,33 +1,33 @@
 {
-  "gedraaid": "2026-08-05T14:32:44.570Z",
-  "modus": "sqlite",
+  "gedraaid": "2026-08-10T09:05:30.432Z",
+  "modus": "postgres",
   "machine": {
-    "kernen": 4,
-    "geheugenGB": 17,
-    "platform": "linux",
-    "node": "v22.22.2"
+    "kernen": 8,
+    "geheugenGB": 9,
+    "platform": "darwin",
+    "node": "v24.18.0"
   },
   "oordeel": "PASS",
   "gezakteDrempels": 0,
   "meters": {
-    "p50Ms": 21,
+    "p50Ms": 13,
     "p95Ms": 89,
-    "p99Ms": 144,
-    "maxMs": 1167,
-    "doorvoerPerSec": 395,
-    "stormDuurSec": 186.2,
+    "p99Ms": 377,
+    "maxMs": 10003,
+    "doorvoerPerSec": 864,
+    "stormDuurSec": 1202.3,
     "serverfouten5xx": 0,
     "serverfouten5xxPaden": [],
-    "eventLoopP99Ms": 64.8,
-    "eventLoopMaxMs": 1130.8,
-    "cpuGemiddeldPct": 123.1,
-    "cpuPiekPct": 156.3,
-    "ramPiekMB": 316,
+    "eventLoopP99Ms": 232,
+    "eventLoopMaxMs": 2968,
+    "cpuGemiddeldPct": null,
+    "cpuPiekPct": null,
+    "ramPiekMB": 1120,
     "geheugenHellingMBPerMin": 0,
-    "herstelSeconden": 1,
-    "verhalenSlaagPctStorm": 76.4,
+    "herstelSeconden": 10.6,
+    "verhalenSlaagPctStorm": 71.6,
     "verhalenGefaaldStorm": 0,
     "endpointsOnbereikt": 0,
-    "endpointsBestookt": 1879
+    "endpointsBestookt": 2384
   }
 }

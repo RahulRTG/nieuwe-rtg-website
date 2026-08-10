@@ -2726,13 +2726,13 @@ console.log('\n45) elk routepad staat voluit, zodat de schakelkast ze kan tellen
      BUITEN-lijst in schakelbaar.js, met een belangrijk verschil dat er ook bij
      hoort te staan: die lijst bevat KEUZES, deze bevat SCHULD. */
   const BEKEND = new Set([
-    'server/opzet/poortwachters.js', 'server/routes/alpine.js', 'server/routes/baby.js',
-    'server/routes/gebouw.js', 'server/routes/journalistiek.js', 'server/routes/kantoorpakket.js',
-    'server/routes/leren.js', 'server/routes/marina.js', 'server/routes/member/bureau.js',
-    'server/routes/member/lifestyle.js', 'server/routes/member/pulse.js',
-    'server/routes/member/rechterhand.js', 'server/routes/member/rendezvous.js',
-    'server/routes/spellen.js', 'server/routes/supplier/creator.js', 'server/routes/tiener.js',
-    'server/routes/welzijn.js', 'server/routes/werkplek-bureaus.js', 'server/routes/zorgwallet.js'
+    'server/opzet/poortwachters.js', 'server/routes/baby.js',
+    'server/routes/kantoorpakket.js', 'server/routes/leren.js',
+    'server/routes/member/bureau.js', 'server/routes/member/lifestyle.js',
+    'server/routes/member/pulse.js', 'server/routes/member/rechterhand.js',
+    'server/routes/member/rendezvous.js', 'server/routes/spellen.js',
+    'server/routes/supplier/creator.js', 'server/routes/tiener.js',
+    'server/routes/welzijn.js', 'server/routes/werkplek-bureaus.js'
   ]);
   const nieuwe = bouwers.filter(b => !BEKEND.has(b.split(':')[0]));
   const schoongemaakt = [...BEKEND].filter(f => !bouwers.some(b => b.split(':')[0] === f));

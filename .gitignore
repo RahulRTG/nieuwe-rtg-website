@@ -31,3 +31,13 @@ public/dist/
 # Twintig minuten om te maken, dus niet in de repo -- de census meldt netjes
 # NIET GEMETEN als hij er niet is.
 DEKKING-LCOV.info
+
+# De ijkbestanden van test/meterijk.test.js. Die toets bewijst dat een meter
+# echt uitslaat door heel even een bekend-fout bestand neer te zetten, te
+# meten, en het weer op te ruimen. Ze horen dus nooit gecommit te worden --
+# maar ze horen ook niet als "los bestand" op te vallen terwijl de toets
+# draait: dan gooit iemand (of een agent die netjes wil opruimen) ze weg
+# voordat de meter geteld heeft, en zakt de ijking op een fout die er niet
+# is. Dat is hier gebeurd. Achterblijvers worden niet door git bewaakt maar
+# door de toets zelf ("de ijking ruimt zichzelf op").
+zz-ijk-tijdelijk*

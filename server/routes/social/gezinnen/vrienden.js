@@ -30,10 +30,10 @@ app.post('/api/rtf/social/find', async (req, res) => {
   if (s.beschermd) return res.status(403).json({ error: 'Je ouder of verzorger voegt vrienden voor je toe.' });
   res.json({ results: await socialZoek(s.handle, req.body.q) });
 });
-app.post('/api/rtf/social/connect', (req, res) => {
+app.post('/api/rtf/social/connect', async (req, res) => {
   const s = rtfSociaal(req, res); if (!s) return;
   if (s.beschermd) return res.status(403).json({ error: 'Je ouder of verzorger voegt vrienden voor je toe.' });
-  const r = socialVerbind(s.handle, String(req.body.key || ''));
+  const r = await socialVerbind(s.handle, String(req.body.key || ''));
   if (r.error) return res.status(r.status).json({ error: r.error });
   res.json({ ok: true, status: r.st });
 });

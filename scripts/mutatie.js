@@ -292,7 +292,13 @@ const WACHT_MUTATIE = 90000;
    zijn, ook als er nog een handle openstaat. Alleen gebruikt om NA een time-out te
    achterhalen wat de asserties zeiden -- zie tijdoutMaarMeetbaar(). */
 function draaiToets(bestand, env, wacht, forceer) {
-  const vlaggen = ['--experimental-sqlite', '--test'];
+  /* DE REPORTER STAAT VASTGEPIND OP TAP, want deze functie leest de uitslag
+     met /^# tests/ en /^not ok/. Tot Node 22 was TAP de standaard zonder TTY;
+     op Node 24 is dat de spec-reporter geworden en las de motor ineens NIETS
+     meer -- elke toets heette "geen toetsen gedraaid", ook een suite die
+     aantoonbaar draaide en zakte. Een meter die op een standaardinstelling
+     leunt, meet de standaardinstelling (LAT regel 10). */
+  const vlaggen = ['--experimental-sqlite', '--test', '--test-reporter=tap'];
   if (forceer) vlaggen.push('--test-force-exit');
   const r = spawnSync('node', vlaggen.concat([bestand]), {
     cwd: WORTEL, encoding: 'utf8', timeout: wacht || WACHT_NUL, maxBuffer: 64 * 1024 * 1024,

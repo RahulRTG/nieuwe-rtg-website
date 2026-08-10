@@ -31,6 +31,23 @@ module.exports = (ctx) => {
         if (g) items.push({ soort: 'event', datum: e.date, tijd: e.time || '', titel: e.name + ' bij ' + s.name + ' (' + g.qty + 'p)', status: 'gastenlijst', ref: e.id });
       }
     }
+    /* De reizen zelf (vluchten, verblijven, reisaanvragen) zijn dezelfde
+       projectie op de bron: een annulering filtert zichzelf weg. */
+    const lucht = db.data.luchthaven || {};
+    for (const b of lucht.boekingen || []) {
+      if (b.key !== key || b.status === 'geannuleerd') continue;
+      const v = (lucht.vluchten || []).find(x => x.id === b.vluchtId);
+      if (!v || v.status === 'geannuleerd' || v.soort !== 'vertrek' || !v.datum || v.datum < van) continue;
+      items.push({ soort: 'vlucht', datum: v.datum, tijd: v.tijd || '', titel: 'Vlucht ' + v.nummer + ' naar ' + v.bestemming, status: b.status, ref: b.code });
+    }
+    for (const v of db.data.verblijven || []) {
+      if (v.customerKey !== key || !['aangevraagd', 'bevestigd', 'ingecheckt'].includes(v.status) || !v.aankomst || v.aankomst < van) continue;
+      items.push({ soort: 'verblijf', datum: v.aankomst, tijd: '', titel: 'Verblijf: ' + v.roomName + ' bij ' + v.supplierName + ' (' + v.nachten + (v.nachten === 1 ? ' nacht)' : ' nachten)'), status: v.status, ref: v.ref });
+    }
+    for (const a of db.data.reisAanvragen || []) {
+      if (a.customerKey !== key || !['aangevraagd', 'bevestigd'].includes(a.status) || !a.vertrek || a.vertrek < van) continue;
+      items.push({ soort: 'reis', datum: a.vertrek, tijd: '', titel: 'Reis: ' + a.titel + ' (' + a.bestemming + ')', status: a.status, ref: a.ref });
+    }
     items.sort((a, b) => (a.datum + (a.tijd || '99')).localeCompare(b.datum + (b.tijd || '99')));
     const dagen = [];
     for (const it of items) {

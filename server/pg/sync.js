@@ -130,37 +130,69 @@ module.exports = (ctx) => {
       }
       return a[1].length - b[1].length;
     });
+    /* Een collectie schrijven, binnen een al geopende transactie. De advisory
+       lock is cruciaal: bij de ALLEREERSTE schrijf bestaat de rij nog niet, en
+       dan zou "SELECT ... FOR UPDATE" niets vergrendelen -- twee gelijktijdige
+       schrijvers zouden dan allebei "geen rij" zien, de merge overslaan en
+       elkaars insert overschrijven (verloren update). De lock serialiseert
+       schrijvers naar dezelfde collectie, rij of niet. De caches (laatsteJson,
+       toegepast) werkt de AANROEPER pas na de COMMIT bij: een rollback mag
+       geen bijgewerkte cache achterlaten. */
+    async function schrijfEen(client, k, jOns) {
+      await client.query('SELECT pg_advisory_xact_lock(hashtext($1)::bigint)', [k]);
+      const huidig = await client.query('SELECT val, ver FROM kv WHERE key = $1 FOR UPDATE', [k]);
+      let j = jOns;
+      if (huidig.rows.length && Number(huidig.rows[0].ver) > (toegepast.get(k) || 0)) {
+        const base = laatsteJson.has(k) ? JSON.parse(laatsteJson.get(k)) : undefined;
+        const samen = merge3(base, dataNu[k], JSON.parse(uitStore(huidig.rows[0].val)));
+        dataNu[k] = samen;
+        j = JSON.stringify(samen);
+      }
+      const nv = await client.query("SELECT nextval('kv_ver_seq') AS v");
+      const ver = Number(nv.rows[0].v);
+      await client.query(
+        `INSERT INTO kv(key, val, ver, bijgewerkt) VALUES($1, $2, $3, now())
+         ON CONFLICT(key) DO UPDATE SET val = EXCLUDED.val, ver = EXCLUDED.ver, bijgewerkt = now()`,
+        [k, naarStore(j), ver]
+      );
+      await client.query(`SELECT pg_notify($1, $2)`, [KANAAL, k]);
+      return { j, ver };
+    }
+    const naCommit = (k, r) => { laatsteJson.set(k, r.j); laatsteSchrijf.set(k, Date.now()); toegepast.set(k, r.ver); geschreven++; };
+    /* DE RIJSTROOK IS EEN GEHEEL. paySaldi en payIdem elk in een eigen
+       transactie committen liet een venster staan: een kill -9 tussen die twee
+       commits gaf een schijf waarop het geld staat en de idem-sleutel niet, en
+       de crashproef boekte er prompt dubbel door (+137 centen, herhaalbaar).
+       Daarom gaan de rijstrook-sleutels in EEN transactie: alles of niets.
+       De slotvolgorde is de sleutelNAAM, niet de grootte -- groottes verschillen
+       per instance, en twee instances die dezelfde locks in verschillende
+       volgorde nemen zetten elkaar klem. De trage laan hieronder houdt zijn
+       transactie per collectie: grote blobs in een groepstransactie zouden de
+       locks seconden vasthouden. */
+    if (alleen && gewijzigd.length) {
+      gewijzigd.sort((a, b) => (a[0] < b[0] ? -1 : a[0] > b[0] ? 1 : 0));
+      const client = await pool.connect();
+      const geslaagd = [];
+      try {
+        await client.query('BEGIN');
+        for (const [k, jOns] of gewijzigd) geslaagd.push([k, await schrijfEen(client, k, jOns)]);
+        await client.query('COMMIT');
+      } catch (e) {
+        try { await client.query('ROLLBACK'); } catch (x) {}
+        throw e;
+      } finally {
+        client.release();
+      }
+      for (const [k, r] of geslaagd) naCommit(k, r);
+      return geschreven;
+    }
     for (const [k, jOns] of gewijzigd) {
       const client = await pool.connect();
       try {
         await client.query('BEGIN');
-        // Transactie-brede advisory lock per collectie. Cruciaal: bij de ALLEREERSTE
-        // schrijf bestaat de rij nog niet, en dan zou "SELECT ... FOR UPDATE" niets
-        // vergrendelen -- twee gelijktijdige schrijvers zouden dan allebei "geen rij"
-        // zien, de merge overslaan en elkaars insert overschrijven (verloren update).
-        // De advisory lock serialiseert schrijvers naar dezelfde collectie, rij of niet.
-        await client.query('SELECT pg_advisory_xact_lock(hashtext($1)::bigint)', [k]);
-        const huidig = await client.query('SELECT val, ver FROM kv WHERE key = $1 FOR UPDATE', [k]);
-        let j = jOns;
-        if (huidig.rows.length && Number(huidig.rows[0].ver) > (toegepast.get(k) || 0)) {
-          const base = laatsteJson.has(k) ? JSON.parse(laatsteJson.get(k)) : undefined;
-          const samen = merge3(base, dataNu[k], JSON.parse(uitStore(huidig.rows[0].val)));
-          dataNu[k] = samen;
-          j = JSON.stringify(samen);
-        }
-        const nv = await client.query("SELECT nextval('kv_ver_seq') AS v");
-        const ver = Number(nv.rows[0].v);
-        await client.query(
-          `INSERT INTO kv(key, val, ver, bijgewerkt) VALUES($1, $2, $3, now())
-           ON CONFLICT(key) DO UPDATE SET val = EXCLUDED.val, ver = EXCLUDED.ver, bijgewerkt = now()`,
-          [k, naarStore(j), ver]
-        );
-        await client.query(`SELECT pg_notify($1, $2)`, [KANAAL, k]);
+        const r = await schrijfEen(client, k, jOns);
         await client.query('COMMIT');
-        laatsteJson.set(k, j);
-        laatsteSchrijf.set(k, Date.now());
-        toegepast.set(k, ver);
-        geschreven++;
+        naCommit(k, r);
       } catch (e) {
         try { await client.query('ROLLBACK'); } catch (x) {}
         throw e;

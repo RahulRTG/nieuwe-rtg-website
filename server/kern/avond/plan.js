@@ -172,7 +172,7 @@ module.exports = ({ db, save, crypto, schoon }) => {
 
   /* Een stap koppelen aan een echte boeking. De aanroeper heeft die boeking
      net in zijn eigen domein gemaakt en geeft hier alleen door WAAR hij staat. */
-  function koppel(key, avondId, stapId, { domein, id, staat, reden }) {
+  function koppel(key, avondId, stapId, { domein, id, staat, reden, centenPP }) {
     const a = vanId(key, avondId);
     if (!a) return { status: 404, error: 'Deze avond kennen we niet.' };
     const s = a.stappen.find(x => x.id === String(stapId || ''));
@@ -181,6 +181,15 @@ module.exports = ({ db, save, crypto, schoon }) => {
     s.boeking = id ? { domein: schoon(domein, 30), id: schoon(id, 60) } : null;
     s.staat = String(staat);
     s.reden = schoon(reden, 160) || null;
+    /* DE ECHTE PRIJS VERVANGT DE SCHATTING. Dit ontbrak, en een mutatie op de
+       budgetcontrole van de rit liet geen enkele toets zakken -- omdat de
+       geboekte prijs nooit op de stap terechtkwam. Het budget klopte dus wel
+       op de raming en niet op wat er werkelijk werd uitgegeven, en dat is
+       precies het gat waar een budget doorheen lekt. */
+    if (centenPP != null) {
+      s.geraamdCentenPP = s.geraamdCentenPP == null ? s.centenPP : s.geraamdCentenPP;
+      s.centenPP = Math.max(0, Math.min(100000, parseInt(centenPP, 10) || 0));
+    }
     save();
     return { ok: true, avond: beeld(a) };
   }

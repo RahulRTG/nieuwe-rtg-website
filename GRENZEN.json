@@ -75,8 +75,11 @@
       "wisselCodeIn"
     ],
     "avond": [
+      "favLijst",
       "findSupplier",
       "liveCodename",
+      "reisBoek",
+      "reisPlan",
       "reserveerTafel",
       "zorgVoor"
     ],

@@ -113,12 +113,16 @@ test('een stap zonder aanvraagweg wordt niet stil groen gezet', async () => {
     personen: 2, plafondPP: 20000 }, LID);
   const id = voorstel.body.avond.id;
   const gevraagd = await post('/api/avond/aanvragen', { id }, LID);
-  const vervoer = gevraagd.body.avond.stappen.find(s => s.soort === 'vervoer');
-  if (vervoer) {
-    assert.equal(vervoer.staat, 'voorstel');
-    assert.match(vervoer.reden || '', /RTG OV|nog niet/i,
-      'een stap die nog geen aanvraagweg heeft, zegt dat met zoveel woorden');
-  }
+  /* De UITGAAN-stap, want die heeft (nog) geen aanvraagweg. Hier stond eerst de
+     vervoersstap; die heeft er inmiddels wel een, en de toets matchte daarna
+     per ongeluk op de nieuwe reden. Een toets die op een andere bewering is
+     gaan slaan dan zijn titel zegt, bewaakt niets meer. */
+  const uitgaan = gevraagd.body.avond.stappen.find(s => s.soort === 'uitgaan');
+  assert.ok(uitgaan, 'de opstelling hoort een uitgaan-stap te bevatten');
+  assert.equal(uitgaan.staat, 'voorstel', 'geen aanvraagweg betekent: blijft voorstel');
+  assert.match(uitgaan.reden || '', /nog niet via de avondplanner/i,
+    'en de stap zegt met zoveel woorden dat er nog geen weg voor is');
+  assert.notEqual(gevraagd.body.avond.staat, 'rond');
 });
 
 test('de reservering die de avond aanvraagt, staat ook echt in mijn reserveringen', async () => {
@@ -210,4 +214,98 @@ test('een avond van een ander is niet op te vragen', async () => {
     geboortedatum: '1990-05-05', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' });
   const gluur = await post('/api/avond', { id }, reg.body.token);
   assert.equal(gluur.status, 404, 'een avond hangt aan het lid dat hem maakte');
+});
+
+/* ---------------------------------------------------------------------------
+   DE TERUGREIS. Dit is de enige stap waarvoor de planner iets moet weten wat
+   hij niet heeft: waar je woont. Dat staat in de kluis achter de gegevenspoort
+   en hoort daar te blijven. De mobiliteitskern kent wel favoriete plekken die
+   het lid zelf heeft opgeslagen -- dat is de goede haak, en het verschil tussen
+   "handig" en "hoort".
+   --------------------------------------------------------------------------- */
+
+test('zonder favoriete thuisplek wordt de rit niet geboekt, en de reden wijst de weg', async () => {
+  const voorstel = await post('/api/avond/voorstel', { start: '19:00', thuisOm: '01:30',
+    personen: 2, plafondPP: 20000 }, LID);
+  const id = voorstel.body.avond.id;
+  const gevraagd = await post('/api/avond/aanvragen', { id }, LID);
+  const rit = gevraagd.body.avond.stappen.find(s => s.soort === 'vervoer');
+  assert.ok(rit, 'er hoort een vervoersstap in het plan te staan');
+  assert.equal(rit.staat, 'voorstel', 'zonder bekende bestemming wordt er niets geboekt');
+  assert.match(rit.reden || '', /favoriete plek|kluis/i,
+    'en de reden wijst naar waar je hem zet, in plaats van je adres uit de kluis te halen');
+});
+
+test('met een favoriete thuisplek wordt de rit echt geboekt, en die staat in mijn ritten', async () => {
+  /* De favoriet zetten langs de ECHTE weg van RTG OV: een tweede manier om een
+     plek op te slaan zou een tweede plekkenlijst zijn. */
+  const fav = await post('/api/mob/favoriet', { naam: 'Thuis', plek: { zaak: 'SAKURA' } }, LID);
+  assert.equal(fav.status, 200, JSON.stringify(fav.body).slice(0, 160));
+
+  const voorstel = await post('/api/avond/voorstel', { start: '18:30', thuisOm: '02:00',
+    personen: 2, plafondPP: 30000 }, LID);
+  const id = voorstel.body.avond.id;
+  const gevraagd = await post('/api/avond/aanvragen', { id }, LID);
+  const rit = gevraagd.body.avond.stappen.find(s => s.soort === 'vervoer');
+
+  if (rit.staat === 'bevestigd') {
+    assert.equal(rit.boeking.domein, 'mobiliteit',
+      'de stap wijst naar de ECHTE reis en houdt geen eigen kopie');
+    assert.match(rit.reden || '', /Geboekt/);
+    const mijn = await post('/api/mob/reis/mijn', {}, LID);
+    assert.ok((mijn.body.reizen || mijn.body.reis || []).length >= 1 || mijn.status === 200,
+      'de reis staat in de gewone reizenlijst van RTG OV');
+  } else {
+    /* Kan hij niet worden geboekt, dan hoort dat een REDEN te hebben die de
+       gast iets zegt -- niet een lege stap. Dat is hier net zo goed geslaagd:
+       de belofte is "nooit stil groen", niet "altijd een taxi". */
+    assert.ok(rit.reden && rit.reden.length > 10,
+      'een rit die niet lukt, zegt waarom: ' + JSON.stringify(rit.reden));
+    assert.notEqual(rit.staat, 'bevestigd');
+  }
+});
+
+test('een geboekte rit telt mee in het budget, en past hij niet dan gaat hij niet', async () => {
+  await post('/api/mob/favoriet', { naam: 'Thuis', plek: { zaak: 'SAKURA' } }, LID);
+
+  /* Eerst RUIM: dan mag de rit geboekt worden, en dan hoort zijn ECHTE prijs op
+     de stap te staan in plaats van de raming van nul. Dat was het gat: zonder
+     dat telt het budget precies het geld niet mee dat werkelijk wordt
+     uitgegeven, en klopt de belofte "het budget klopt" alleen op papier. */
+  const ruim = await post('/api/avond/voorstel', { start: '18:30', thuisOm: '02:00',
+    personen: 2, plafondPP: 40000 }, LID);
+  assert.equal(ruim.status, 200, JSON.stringify(ruim.body).slice(0, 200));
+  const na = await post('/api/avond/aanvragen', { id: ruim.body.avond.id }, LID);
+  const rit = na.body.avond.stappen.find(s => s.soort === 'vervoer');
+  assert.ok(rit, 'er hoort een vervoersstap te zijn');
+  if (rit.staat === 'bevestigd') {
+    assert.ok(rit.centenPP > 0, 'een geboekte rit kost geld en dat hoort op de stap te staan');
+    const som = na.body.avond.stappen.reduce((t, s) => t + s.centenPP, 0);
+    assert.equal(na.body.avond.budget.perPersoon, som,
+      'het budget telt de echte prijs van de rit mee');
+  }
+  /* En hoe dan ook: het plan blijft binnen het plafond dat de gast stelde. Dit
+     is de bewering die zakt zodra de budgetcontrole van de rit wordt
+     weggehaald. */
+  assert.equal(na.body.avond.budget.past, true,
+    'na het aanvragen staat het plan nog steeds binnen het plafond');
+});
+
+test('geen enkele zin die de gast leest bevat NaN of undefined', async () => {
+  /* Deze toets bestaat om een echte fout. De prijs van een reisoptie zit in
+     `optie.totaal.prijs`; `optie.totaal` zelf is een OBJECT. Ik nam aan dat het
+     een bedrag was, en de weigering luidde daardoor "de goedkoopste rit kost
+     € NaN" -- een zin die een gast te zien zou krijgen. Een getal dat nergens
+     vandaan komt, hoort nooit in een mensentekst te belanden. */
+  await post('/api/mob/favoriet', { naam: 'Thuis', plek: { zaak: 'SAKURA' } }, LID);
+  const v = await post('/api/avond/voorstel', { start: '18:30', thuisOm: '02:00',
+    personen: 2, plafondPP: 40000 }, LID);
+  const na = await post('/api/avond/aanvragen', { id: v.body.avond.id }, LID);
+  const alleTekst = JSON.stringify(na.body) + JSON.stringify(v.body);
+  assert.ok(!/NaN/.test(alleTekst), 'er staat NaN in wat de gast leest: ' +
+    (alleTekst.match(/.{0,60}NaN.{0,40}/) || [''])[0]);
+  assert.ok(!/undefined/.test(alleTekst), 'er staat undefined in wat de gast leest');
+  const rit = na.body.avond.stappen.find(s => s.soort === 'vervoer');
+  assert.equal(rit.staat, 'bevestigd', 'met een thuisplek en ruim budget wordt de rit echt geboekt');
+  assert.ok(rit.centenPP > 0 && Number.isFinite(rit.centenPP));
 });

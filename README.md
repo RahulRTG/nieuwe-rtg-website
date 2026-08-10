@@ -1211,7 +1211,13 @@ De samensteller (`samenstellen.js`) stelt **alleen voor wat bestaat**. Geen verz
 
 Bewezen door `test/avond.test.js` (elf toetsen: de klok en het budget weigeren echt, een tafel komt nooit verder dan `aangevraagd`, de aangevraagde reservering staat in de gewone reserveringenlijst, `gevraagd` lekt niet zonder te vragen, en een avond van een ander is niet op te vragen). Zes mutaties nagetrokken, alle zes raak.
 
-Wat er **nog niet** is: vervoer en uitgaan hebben nog geen aanvraagweg vanuit de planner (die stappen blijven `voorstel` mét de reden), er is nog geen scherm, en de rest van de lijst — live drukte, weer, gezelschapsafstemming, herinneringen — staat er niet. Dit is de bodem waarop dat kan.
+**Het aanvragen** (`aanvragen.js`) is waar het plan werkelijkheid wordt, en waar het onderscheid tussen `aangevraagd` en `bevestigd` geen woordkeus is. Een **tafel** gaat naar aangevraagd — de zaak beslist. Een **rit** mag wél op bevestigd: de mobiliteitskern boekt hem en er komt een chauffeur; daar beslist niemand meer over. Twee dingen die in een lijstje hetzelfde lijken en volstrekt verschillen in wat je ervan mag verwachten.
+
+De terugreis is de enige stap waarvoor de planner iets moet weten wat hij niet heeft: waar je woont. Dat staat in de kluis achter de gegevenspoort en blijft daar. De mobiliteitskern kent wél **favoriete plekken** die het lid zelf heeft opgeslagen, en dat is de goede haak: heb je er een die "thuis" heet, dan plant de avond je terugreis en boekt hem echt; heb je er geen, dan zegt hij dat en waar je hem zet. Een adres uit de kluis trekken omdat het toevallig handig is, is precies wat privacy by design moet voorkomen. De rit kiest de **goedkoopste** optie die binnen de resterende ruimte past — het budget is een grens die de gast stelde, snelheid een voorkeur die hij niet heeft uitgesproken — en past er niets, dan gaat er niets en noemt de weigering het bedrag.
+
+Twee fouten die de mutaties hier vonden en die anders waren meegegaan: de **geboekte prijs landde niet op de stap**, waardoor het budget precies het geld niet meetelde dat werkelijk werd uitgegeven; en de prijs van een reisoptie zit in `optie.totaal.prijs` terwijl `totaal` een *object* is — de weigering luidde daardoor "de goedkoopste rit kost € NaN", een zin die een gast te zien zou krijgen. Er staat nu een toets die de hele uitvoer op `NaN` en `undefined` nakijkt.
+
+Wat er **nog niet** is: uitgaan heeft nog geen aanvraagweg (die stap blijft `voorstel` mét de reden), er is nog geen scherm, en de rest van de lijst — live drukte, geluid, weer, gezelschapsafstemming, herinneringen — staat er niet. Die vragen sensoren of gegevens die dit huis niet heeft; de bodem waarop ze kunnen staan ligt er wel.
 
 ### RTG Mobility OS (de vervoerskern)
 

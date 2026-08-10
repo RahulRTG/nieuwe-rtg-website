@@ -19,6 +19,11 @@ module.exports = (kern) => {
     zorgVoor: (k) => (kern.zorgVoor ? kern.zorgVoor(k) : null) });
   const planlaag = require('../kern/avond/plan')({ db, save, crypto, schoon });
   const steller = require('../kern/avond/samenstellen')({ findSupplier, planlaag, voorkeuren });
+  const aanvraaglaag = require('../kern/avond/aanvragen')({ planlaag, schoon });
+  /* De mobiliteitskern hoort bij een ANDER domein en wordt later gemount. Dus
+     op het moment van aanroepen bevragen, niet hier vastpakken. */
+  const mob = () => (kern.reisPlan && kern.reisBoek
+    ? { reisPlan: kern.reisPlan, reisBoek: kern.reisBoek, favLijst: kern.favLijst } : null);
 
   const stuur = (res, r) => (r && r.error)
     ? res.status(r.status || 400).json({ error: r.error, code: r.code || null, teLaatMin: r.teLaatMin })
@@ -80,12 +85,13 @@ module.exports = (kern) => {
      `aangevraagd` en niet naar `bevestigd`: het lid vraagt aan, de zaak beslist
      (die regel stond al in routes/member/handel/uitjes.js en wordt hier niet
      omzeild omdat het toevallig prettiger klinkt). */
-  app.post('/api/avond/aanvragen', auth, (req, res) => {
+  app.post('/api/avond/aanvragen', auth, async (req, res) => {
     const a = planlaag.vanId(req.session.key, (req.body || {}).id);
     if (!a) return res.status(404).json({ error: 'Deze avond kennen we niet.', code: 'onbekend' });
 
     const uitkomsten = [];
-    for (const stap of a.stappen) {
+    for (let i = 0; i < a.stappen.length; i++) {
+      const stap = a.stappen[i];
       if (stap.staat !== 'voorstel') { uitkomsten.push({ stap: stap.id, overgeslagen: true, staat: stap.staat }); continue; }
 
       if (stap.soort === 'eten' && stap.zaak && kern.reserveerTafel) {
@@ -103,13 +109,20 @@ module.exports = (kern) => {
         continue;
       }
 
+      if (stap.soort === 'vervoer') {
+        const uit = await aanvraaglaag.vervoerStap(req.session.key, req.session, a, stap, i, mob());
+        planlaag.koppel(req.session.key, a.id, stap.id,
+          { domein: uit.domein, id: uit.id, staat: uit.staat, reden: uit.reden, centenPP: uit.centenPP });
+        uitkomsten.push({ stap: stap.id, ok: uit.staat === 'bevestigd', staat: uit.staat,
+          reden: uit.reden, code: uit.code || null });
+        continue;
+      }
+
       /* Alles waar (nog) geen echte aanvraagweg voor is, blijft staan als
          voorstel MET de reden. Stil op 'bevestigd' zetten zou het plan groen
          maken zonder dat er iets is geregeld. */
       planlaag.koppel(req.session.key, a.id, stap.id, { staat: 'voorstel',
-        reden: stap.soort === 'vervoer'
-          ? 'De rit vraag je aan in RTG OV; die koppeling staat nog niet in de avondplanner.'
-          : 'Voor dit soort stap loopt de aanvraag nog niet via de avondplanner.' });
+        reden: 'Voor een stap van het soort "' + stap.soort + '" loopt de aanvraag nog niet via de avondplanner.' });
       uitkomsten.push({ stap: stap.id, ok: false, staat: 'voorstel', reden: 'nog geen aanvraagweg' });
     }
 

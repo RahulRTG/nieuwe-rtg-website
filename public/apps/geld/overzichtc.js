@@ -20,11 +20,10 @@
   var SOORT = { minimumbuffer: 'Minimumbuffer', maanddrempel: 'Maanddrempel',
     'reserveer-maandelijks': 'Maandelijks reserveren', 'gift-bevestiging': 'Gift-bevestiging' };
 
-  /* komma of punt (als wbwb.js); alleen het scherm maakt euro's */
-  function centen(v) {
-    var c = Math.round(parseFloat(String(v || '').replace(',', '.')) * 100);
-    return isFinite(c) ? c : null;
-  }
+  /* Naar centen via Geld.centen (hulp.js), op EEN plek: het eigen regeltje
+     dat hier stond las "1.000" als een euro en zette een minimumbuffer dus
+     duizend keer te laag, stil, waarna Rahul op die drempel handelde. */
+  function centen(v) { return w.Geld.centen(v); }
 
   function kn(attr, txt) { return '<button class="knop" type="button" ' + attr + '>' + txt + '</button>'; }
 
@@ -128,6 +127,16 @@
 
   /* gedelegeerd: de vlakken hertekenen, de omhulling gaat mee weg */
   function klik(e) {
+    /* #potten is geen stand maar het beleid-paneel van deze stand. Zonder
+       deze opvang viel de schil terug op de eerste stand en hertekende de
+       knop het overzicht, terwijl het lid dacht een reservering klaar te
+       zetten: een klaargezette handeling met een dode knop. */
+    var anker = e.target.closest('[data-ovactie="#potten"]');
+    if (anker) {
+      e.preventDefault();
+      if ($('#ovBeleid').hidden) beleid(); else $('#ovBeleid').scrollIntoView({ block: 'start' });
+      return;
+    }
     var b = e.target.closest('button'), v;
     if (!b) return;
     var ds = b.dataset;
@@ -180,17 +189,10 @@
     if (w.RTGUitvoer) w.RTGUitvoer.bron(null);
   }
 
-  /* via createElement: alleen echte elementen krijgen de CSP-nonce */
-  var st = d.createElement('style');
-  st.id = 'ovcStijl';
-  st.textContent =
-    '#paneel .ov-vraagrij{display:flex;gap:.6rem}#paneel .ov-vraagrij input{flex:1;min-width:0}' +
-    '#paneel #ovBeleidKnop{margin:1.4rem 0 .6rem}' +
-    '#paneel .ov-regel{display:flex;align-items:center;justify-content:space-between;' +
-      'padding:.45rem 0;border-top:1px solid var(--rtg-line)}' +
-    '#paneel .ov-doe{display:flex;flex-wrap:wrap;gap:.5rem;margin:.4rem 0 1rem}' +
-    '#paneel .ov-doe input,#paneel .ov-doe select{flex:1;min-width:7rem}';
-  d.head.appendChild(st);
+  /* De stijl van dit paneel staat bij die van deel 1 (OVCSS in overzicht.js):
+     een stand hoort EEN stijlblad te hebben, niet twee die elkaar in de head
+     verdringen -- en het scheelt hier de ruimte om uit te leggen waarom de
+     dingen staan zoals ze staan. */
 
   /* ovAlles, niet ovWrap: deel 1 tekent zelf #ovWrap en #ovVooruit in #ovVak */
   V.standen.push({

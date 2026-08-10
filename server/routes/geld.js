@@ -15,8 +15,30 @@
 module.exports = (kern) => {
   const { app, auth } = kern;
 
-  app.post('/api/geld/wereld', auth, (req, res) =>
-    res.json(kern.geldwereld.stand(req.session.key)));
+  /* GEEN GASTEN, en dat is hier geen beleefdheidsregel maar een lek dat we
+     dicht doen. Een anonieme demo-gast heeft geen codenaam; kern.codenaamVan
+     valt voor hem stil terug op de rauwe sessiesleutel, en die belandde
+     daarmee als opslagsleutel in db.data.geldbeleid -- een stuk van zijn
+     sessietoken, blijvend op schijf, met actielogregels op naam van een lid
+     dat niet bestaat. Dat omzeilt precies het codenamen-ontwerp (CLAUDE.md:
+     klantdata draait op codenamen) en groeit bovendien onbegrensd, want elke
+     gast-login is een nieuw token en dus een nieuwe rij.
+
+     Dezelfde poort als RTG Pay (routes/pay.js) en het bankhart: wie geen lid
+     is, heeft hier niets te zoeken. */
+  const geenGast = (req, res) => {
+    if (req.session.tier === 'guest') {
+      res.status(403).json({ error: 'RTG Geld is voor leden.' });
+      return true;
+    }
+    return false;
+  };
+
+  app.post('/api/geld/wereld', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    try { res.json(kern.geldwereld.stand(req.session.key)); }
+    catch (e) { res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
+  });
 
   /* Kernantwoorden dragen een status mee voor de http-laag; het lichaam hoort
      hem niet te herhalen, want dan bestaan er twee plekken met dezelfde
@@ -33,6 +55,7 @@ module.exports = (kern) => {
      lichaam bij het lid belandt; de fout blijft zichtbaar in de serverlog. */
   function route(pad, werk) {
     app.post('/api/geld/' + pad, auth, (req, res) => {
+      if (geenGast(req, res)) return;
       try { stuur(res, werk(kern.codenaamVan(req.session.key), req.body || {})); }
       catch (e) { res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
     });
@@ -42,6 +65,7 @@ module.exports = (kern) => {
      alleen ok erbij. Hier wordt niets bijgerekend -- een tweede rekenlaag in
      een route loopt gegarandeerd uit de pas met de kern. */
   app.post('/api/geld/cockpit', auth, (req, res) => {
+    if (geenGast(req, res)) return;
     try { res.json(Object.assign({ ok: true }, kern.geldgraaf.cockpit(req.session.key))); }
     catch (e) { res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
   });

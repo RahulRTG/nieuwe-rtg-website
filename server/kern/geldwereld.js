@@ -34,9 +34,13 @@ module.exports.maakGeldwereld = ({ kern }) => {
       soort, titel: o.titel || '', wanneer: o.wanneer || null,
       status: o.status || '',
       sig: b.sig || '', teken: b.teken || '', wacht: b.wacht || '',
-      /* Bedragen in CENTEN, zoals elk gelddomein hier ze bewaart. Het scherm
-         maakt er euro's van; twee afrondlagen zijn een cent verschil die
-         niemand kan verklaren. */
+      /* Bedragen in CENTEN. Het scherm maakt er euro's van; twee afrondlagen
+         zijn een cent verschil die niemand kan verklaren.
+
+         Hier stond "zoals elk gelddomein hier ze bewaart", en dat is niet
+         waar: mecenaat bewaart hele euro's. Die onware zin heeft de fout een
+         tijd verborgen gehouden, want wie hem las hoefde niet meer te kijken.
+         Elke bron rekent nu zelf om, en dit is de plek waar dat moet. */
       centen: Number.isFinite(o.centen) ? Math.round(o.centen) : null,
       kenmerk: o.kenmerk || '', app: o.app, link: o.link
     };
@@ -86,7 +90,10 @@ module.exports.maakGeldwereld = ({ kern }) => {
         .map(g => regel('toezegging', {
           titel: g.doel, wanneer: g.datum || null,
           status: g.datum && g.datum < nu ? 'verlopen' : 'open',
-          centen: g.bedrag,
+          /* maal honderd: mecenaat bewaart hele euro's en niet centen (zie
+             kern/rechterhand/mecenaat.js). Stond hier rauw, en toonde een
+             toezegging van 500 euro dus als 5 euro. */
+          centen: Math.round((Number(g.bedrag) || 0) * 100),
           kenmerk: g.id, app: 'Mecenaat', link: '/apps/geld.html#mecenaat'
         }));
     }, uit, stil);

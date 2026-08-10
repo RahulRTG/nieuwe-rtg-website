@@ -24,10 +24,26 @@ module.exports = (kern) => {
 
   /* Leden schrijven bedragen in euro's ("kan ik nog 250 uitgeven?"); intern is
      alles centen. De vertaling gebeurt hier een keer, aan de rand. Getallen
-     die een duur aanduiden (30 dagen, 3 maanden) zijn geen bedrag. */
+     die een duur aanduiden (30 dagen, 3 maanden) zijn geen bedrag.
+
+     NEDERLANDSE SCHRIJFWIJZE, en dat is hier geen detail. De punt is bij ons
+     het DUIZENDTALTEKEN en de komma de decimaal: 1.000 is duizend euro, niet
+     een euro. Stond dat verkeerd, dan las deze functie de eigen voorbeeldvraag
+     van de app ("Kan ik deze maand nog 1.000 euro uitgeven?") als een euro en
+     antwoordde Rahul opgewekt "ja, dat past" op een bedrag dat er ver
+     overheen ging. Van alle fouten die een geldassistent kan maken is te ruim
+     ja-zeggen de gevaarlijkste, dus:
+       - punten tussen cijfergroepen van drie zijn duizendtallen en gaan eruit;
+       - een komma is de decimaal;
+       - een punt met een of twee cijfers erachter (1.50) accepteren we ook als
+         decimaal, want zo tikt een deel van de mensen het nu eenmaal, en het
+         verschil met een duizendtal is eenduidig: 1.500 is duizendvijfhonderd,
+         1.50 is anderhalve euro. */
   function centenUitVraag(q) {
-    const m = /(?:€\s*)?(\d{1,7})(?:[.,](\d{1,2}))?(?!\d)(?!\s*(?:%|dag|week|maand|jaar|uur))/i.exec(q);
-    return m ? Number(m[1]) * 100 + Number((m[2] || '0').padEnd(2, '0')) : null;
+    const m = /(?:€\s*)?(\d{1,3}(?:\.\d{3})+|\d{1,9})(?:[.,](\d{1,2})(?!\d))?(?!\d)(?!\s*(?:%|dag|week|maand|jaar|uur))/i.exec(q);
+    if (!m) return null;
+    const heel = Number(m[1].replace(/\./g, ''));
+    return heel * 100 + Number((m[2] || '0').padEnd(2, '0'));
   }
 
   /* Het controlespoor achter elk antwoord: bron + feit, in rauwe centen zoals
@@ -80,6 +96,11 @@ module.exports = (kern) => {
   }
 
   app.post('/api/geld/rahul', auth, async (req, res) => {
+    /* Dezelfde poort als de andere geldroutes: een anonieme gast heeft geen
+       codenaam, en zijn sessiesleutel hoort niet als opslagsleutel in de
+       beleidslaag te belanden (zie het waarom in routes/geld.js). */
+    if (req.session.tier === 'guest')
+      return res.status(403).json({ error: 'RTG Geld is voor leden.' });
     try {
       const key = req.session.key;
       const vraag = schoon((req.body || {}).vraag, 400);

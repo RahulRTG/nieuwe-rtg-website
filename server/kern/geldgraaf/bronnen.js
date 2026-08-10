@@ -88,7 +88,15 @@ module.exports = ({ kern }) => {
     for (const g of (m.giften || [])) {
       if (g.betaald) continue;
       uit.push(feit({
-        soort: 'toezegging', titel: g.doel, centen: g.bedrag, richting: 'uit',
+        /* MAAL HONDERD, en dat is geen slordigheid maar de uitzondering die
+           dit huis heeft: mecenaat bewaart HELE EURO'S, niet centen (zie
+           kern/rechterhand/mecenaat.js en de opmerking in
+           public/apps/geld/mecenaat.js). Stond het er rauw, dan telde een
+           toezegging van 500 euro als vijf euro mee in de lasten, de
+           vooruitblik en de verwachtingszin, en ging de gift-bevestiging van
+           het beleid vrijwel nooit af. De omzetting hoort bij de bron, hier,
+           een keer -- precies zoals payroll dat hierboven ook doet. */
+        soort: 'toezegging', titel: g.doel, centen: Math.round((Number(g.bedrag) || 0) * 100), richting: 'uit',
         wanneer: g.datum || null,
         herhaling: g.periode === 'maand' ? 'maandelijks' : null,
         tijd: g.at, bron: 'mecenaat', link: LINK('mecenaat')

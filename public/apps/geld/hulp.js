@@ -44,6 +44,30 @@
       (Math.abs(c) / 100).toLocaleString('nl-NL', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
 
+  /* En de weg terug: wat een lid intikt, EEN keer naar centen. Hier stond
+     eerst in elke stand een eigen regeltje `parseFloat(v.replace(',', '.'))`,
+     en dat leest de Nederlandse schrijfwijze verkeerd: bij ons is de punt het
+     DUIZENDTALTEKEN en de komma de decimaal, dus "1.000" werd een euro in
+     plaats van duizend. In een beleidscherm zet dat een minimumbuffer duizend
+     keer te laag, zonder een woord van waarschuwing, en Rahul rekent daarna
+     met die drempel.
+
+     Punten tussen groepen van drie zijn duizendtallen en gaan eruit; een
+     komma is de decimaal. Een punt met een of twee cijfers erachter (1.50)
+     laten we ook als decimaal gelden, want zo tikt een deel van de mensen
+     het, en dubbelzinnig is het niet: 1.500 is duizendvijfhonderd, 1.50 is
+     anderhalve euro. Onleesbaar levert null op, en null is geen nul: de
+     aanroeper hoort erom te vragen in plaats van stil met nul te rekenen. */
+  function centen(v) {
+    const s = String(v == null ? '' : v).trim().replace(/^€\s*/, '');
+    if (!/^\d{1,3}(?:\.\d{3})+(?:,\d{1,2})?$|^\d+(?:[.,]\d{1,2})?$/.test(s)) return null;
+    const punten = (s.match(/\.\d{3}(?!\d)/g) || []).length > 0;
+    const kaal = punten ? s.replace(/\./g, '') : s;
+    const [heel, deel] = kaal.replace(',', '.').split('.');
+    const c = Number(heel) * 100 + Number((deel || '0').padEnd(2, '0'));
+    return Number.isFinite(c) ? c : null;
+  }
+
   function datum(dd) {
     const x = new Date(String(dd || '').slice(0, 10) + 'T00:00:00');
     if (isNaN(x)) return String(dd || '');
@@ -69,5 +93,5 @@
     meldT = setTimeout(() => { el.style.display = 'none'; }, 2600);
   }
 
-  w.Geld = { token, api, esc, euro, datum, melding };
+  w.Geld = { token, api, esc, euro, centen, datum, melding };
 })(window, document);

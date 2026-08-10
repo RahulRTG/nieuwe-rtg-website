@@ -57,8 +57,13 @@
 
   async function uitgave() {
     var Geld = w.Geld, D = Deel();
-    /* komma of punt, allebei goed; de server rekent verder in centen */
-    var centen = Math.round(parseFloat(String($('#wbBedrag').value).replace(',', '.')) * 100);
+    /* Naar centen via Geld.centen (hulp.js), op EEN plek: het eigen regeltje
+       dat hier stond las "1.000" als een euro, want het nam de punt voor een
+       decimaalteken in plaats van het duizendtalteken dat het bij ons is. In
+       een gedeeld lijstje betekent dat een diner van duizend euro dat als een
+       euro wordt omgeslagen over de tafel. */
+    var centen = Geld.centen($('#wbBedrag').value);
+    if (centen == null || centen <= 0) return Geld.melding('Bedrag?');
     var voor = [];
     d.querySelectorAll('#wbVoor input:checked').forEach(function (x) { voor.push(x.value); });
     try {

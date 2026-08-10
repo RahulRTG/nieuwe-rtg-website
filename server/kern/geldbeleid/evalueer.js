@@ -84,6 +84,11 @@ module.exports = (ctx) => {
             gegevens: ['beleid: reserveer-maandelijks ' + regel.drempelCenten + ' centen',
               'potten: ' + pot.naam + ' staat op ' + pot.standCenten + ' van ' + pot.doelCenten + ' centen'],
             niveau: regel.niveau,
+            /* #potten is een ANKER VOOR HET SCHERM en geen stand: de potten
+               wonen in het beleid-paneel van het overzicht, dat de cockpit op
+               deze klik opendoet (public/apps/geld/overzichtc.js). Wie hem
+               ooit als hash naar de schil stuurt, komt op de eerste stand uit
+               en denkt dat er niets gebeurde. */
             actie: regel.niveau === 'kijken' ? null : { label: 'Reserveer nu', link: '#potten' } });
         }
 

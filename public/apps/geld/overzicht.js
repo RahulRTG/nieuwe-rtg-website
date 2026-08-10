@@ -46,8 +46,15 @@
     '#ovWrap .ov-uitleg{margin:0 0 .6rem;font-size:.86rem;line-height:1.55;color:var(--rtg-soft);}' +
     '#ovWrap .ov-waarom{background:none;border:0;padding:0;cursor:pointer;font:inherit;' +
       'font-size:.74rem;font-weight:600;color:var(--rtg-goud);}' +
-    '#ovWrap .ov-geg{list-style:none;margin:.6rem 0 0;padding:.6rem 0 0;border-top:1px solid var(--rtg-line);}' +
-    '#ovWrap .ov-geg li{font-size:.76rem;color:var(--rtg-soft);line-height:1.6;}' +
+    /* Het beleid-paneel (deel 3) hangt buiten #ovWrap en heeft daarom eigen
+       scoping; het staat hier omdat een stand EEN stijlblad hoort te hebben
+       en niet twee die elkaar in de head verdringen. */
+    '#paneel .ov-vraagrij{display:flex;gap:.6rem}#paneel .ov-vraagrij input{flex:1;min-width:0}' +
+    '#paneel #ovBeleidKnop{margin:1.4rem 0 .6rem}' +
+    '#paneel .ov-regel{display:flex;align-items:center;justify-content:space-between;' +
+      'padding:.45rem 0;border-top:1px solid var(--rtg-line)}' +
+    '#paneel .ov-doe{display:flex;flex-wrap:wrap;gap:.5rem;margin:.4rem 0 1rem}' +
+    '#paneel .ov-doe input,#paneel .ov-doe select{flex:1;min-width:7rem}' +
     '#ovWrap .ov-standen{display:flex;flex-wrap:wrap;gap:.1rem 1rem;margin-top:1.8rem;' +
       'padding-top:.75rem;border-top:1px solid var(--rtg-line);}' +
     '#ovWrap .ov-standen a{font-size:.74rem;color:var(--rtg-soft);text-decoration:none;}' +
@@ -102,13 +109,12 @@
         '<button class="ov-waarom" type="button" data-ovwaarom="' + esc(x.id) + '">Waarom</button>' +
         (x.actie ? '<a class="knop" href="' + esc(x.actie.link) + '" data-ovactie="' + esc(x.actie.link) + '">' +
           esc(x.actie.label) + '</a>' : '') +
-      '</div>' +
-      /* De gegevens staan al in de kaart, alleen verborgen: de Waarom-knop
-         (deel 3) hoeft enkel hidden om te zetten. Zo is de uitlegbaarheid van
-         GELD.md par. 5 geen tweede serverrit die ook nog stuk kan zijn. */
-      '<ul class="ov-geg" data-ovgeg="' + esc(x.id) + '" hidden>' +
-        (x.gegevens || []).map(function (g) { return '<li>' + esc(g) + '</li>'; }).join('') +
-      '</ul></article>';
+      '</div></article>';
+    /* Hier stond de gegevens-lijst nog een keer, verborgen, met het
+       commentaar dat deel 3 hem enkel zou hoeven tonen. Dat gebeurde nooit:
+       de Waarom-knop vult het eigen #ovWaarom-vlak uit hetzelfde beeld (deel
+       2). Twee kopieen van dezelfde gegevens in de DOM, waarvan er een niet
+       te bereiken was -- weg dus, en het commentaar erbij. */
   }
 
   /* De ankerrij komt uit de aanmeldingen zelf (RTGGeld.standen): de naam van

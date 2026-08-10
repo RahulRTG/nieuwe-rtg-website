@@ -82,9 +82,16 @@
 .rtg-plaats{font-size:1.05rem;font-style:italic;}
 /* De dagnummers in een register. Ze zijn de ankers waarop iemand scant: niet
    "een getal" maar de kop van de regel, zoals een bedrag dat in een financieel
-   overzicht is. Daarom ceremonieel, en daarom tabulair -- 06 en 29 moeten onder
-   elkaar even breed zijn, anders golft de kolom. */
-.rtg-datum{font-size:2.1rem;line-height:1;font-variant-numeric:var(--rtg-cijfers);}
+   overzicht is. Daarom ceremonieel.
+
+   PROPORTIONEEL en niet tabulair, en dat is hier het omgekeerde van de regel
+   voor bedragen. Tabulaire cijfers geven elk teken dezelfde celbreedte, dus de
+   smalle 1 krijgt evenveel ruimte als een 8 en staat scheef in zijn eigen cel.
+   In een KOLOM met bedragen is dat precies wat je wilt -- alles lijnt uit. Maar
+   een dagnummer staat hier GECENTREERD onder een weekdag, en dan zie je het
+   meteen: 29 en 06 stonden recht, 17 hing uit het lood. De kolom golft er niet
+   van, want die heeft een vaste breedte. */
+.rtg-datum{font-size:2.1rem;line-height:1;font-variant-numeric:proportional-nums;}
 
 /* Alles wat werk is, is Inter met uitlijnende cijfers. */
 .rtg-werk,

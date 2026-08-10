@@ -1510,7 +1510,12 @@ console.log('\n27) geen dode configuratie: elke aangeraden variabele wordt ergen
 console.log('\n28) elke API-route heeft een poort (of staat met reden op de publieke lijst)');
 {
   const POORT_MW = new Set(['auth', 'supplierAuth', 'officeAuth', 'techAuth', 'boardroomAuth',
-    'huisAuth', 'baasAuth', 'lid', 'geenGast', 'eigenaarAlleen']);
+    'huisAuth', 'baasAuth', 'lid', 'geenGast', 'eigenaarAlleen',
+    /* de gezinsdeur van het RTFoundation-huis (gezinscode + profieltoken, gasten
+       erbuiten). Stond eerst als aanroep BINNEN de handler; is middleware geworden
+       toen die routes zichtbaar werden, zodat bij elke route staat welke deur hij
+       heeft -- zie regel 45 voor waarom ze onzichtbaar waren. */
+    'gezinsPoort', 'huisPoort']);
   const POORT_BINNEN = /\b(profiel|schoolProfiel|rtfSociaal|eisAccount|resolveSession|verifyToken|sessionFor|magInzien|isEigenaar|boardroomWie|magBoardroom|doosSleutelOk|magMeten|metPartner|samenSess|kantoorSess|werkPoort|beheerVan|lidVan)\s*\(/;
 
   /* PUBLIEK MET REDEN. Alles hier is een bewuste keuze, geen omissie. Wie een
@@ -2726,13 +2731,9 @@ console.log('\n45) elk routepad staat voluit, zodat de schakelkast ze kan tellen
      BUITEN-lijst in schakelbaar.js, met een belangrijk verschil dat er ook bij
      hoort te staan: die lijst bevat KEUZES, deze bevat SCHULD. */
   const BEKEND = new Set([
-    'server/opzet/poortwachters.js', 'server/routes/baby.js',
-    'server/routes/kantoorpakket.js', 'server/routes/leren.js',
-    'server/routes/member/bureau.js', 'server/routes/member/lifestyle.js',
+    'server/opzet/poortwachters.js', 'server/routes/kantoorpakket.js', 'server/routes/member/bureau.js', 'server/routes/member/lifestyle.js',
     'server/routes/member/pulse.js', 'server/routes/member/rechterhand.js',
-    'server/routes/member/rendezvous.js', 'server/routes/spellen.js',
-    'server/routes/supplier/creator.js', 'server/routes/tiener.js',
-    'server/routes/welzijn.js', 'server/routes/werkplek-bureaus.js'
+    'server/routes/member/rendezvous.js', 'server/routes/supplier/creator.js', 'server/routes/werkplek-bureaus.js'
   ]);
   const nieuwe = bouwers.filter(b => !BEKEND.has(b.split(':')[0]));
   const schoongemaakt = [...BEKEND].filter(f => !bouwers.some(b => b.split(':')[0] === f));

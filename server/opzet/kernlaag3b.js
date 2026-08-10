@@ -60,4 +60,14 @@ Object.assign(kern, require('../kern/geldbeleid').maakGeldbeleid({ db, save }));
    gemonteerd en de graaf er zichtbaar van afhangt (potten trekken van het
    vrij besteedbare af). */
 Object.assign(kern, require('../kern/geldgraaf')({ kern, geldbeleid: kern.geldbeleid }));
+/* De levenslijn (kern/levenslijn/): EEN lijn door een leven in plaats van vijf
+   leeftijdshokjes (LEVEN.md par. 1.1). Hoort bij deze motorlaag om dezelfde
+   reden als de geldgraaf: hij projecteert alleen-lezen over domeinen die de
+   waarheid beheren, en hij leest de LEVENSGRAAF hierboven voor zijn termijnen.
+
+   Leest de kern LAAT (in de functies), dus de mountvolgorde doet er niet toe;
+   dat moet ook, want zijn bronnen wonen verspreid over kernlaag3 (rechterhand
+   /entourage), kernlaag4 (metier) en server.js zelf (onderwijs, paspoort,
+   rtf). SCHRIJFT NOOIT: deze laag opent, hij handelt niet. */
+Object.assign(kern, require('../kern/levenslijn')({ kern }));
 };

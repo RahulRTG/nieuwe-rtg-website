@@ -1476,7 +1476,15 @@ const {
   mijnStatus: paspoortStatus, vraag: paspoortVraag, beslis: paspoortBeslis,
   trekIn: paspoortTrekIn, bekijk: paspoortBekijk, dienIncidentIn: paspoortIncident,
   beoordeelIncident: paspoortBeoordeel, mijnVerzoeken: paspoortMijn,
-  partnerVerzoeken: paspoortPartner, incidentenVoorOffice: paspoortIncidenten
+  partnerVerzoeken: paspoortPartner, incidentenVoorOffice: paspoortIncidenten,
+  /* De twee alleen-lezen vragen die andere lagen aan deze module stellen: de
+     vervaldatum voor kern/levensgraaf en het geboortejaar voor
+     kern/levenslijn. Ze staan hier omdat een naam die niet in de kern belandt
+     ook niet bestaat: kernlaag3b vraagt `kern.paspoortVervaldatumVan` achter
+     een ternary, en die viel dus stil terug op null -- de paspoortknoop van de
+     levensgraaf is daardoor nooit gebouwd. Een belofte in commentaar is een
+     belofte in code (LAT.md regel 6), en dit is de plek waar hij waar wordt. */
+  paspoortVervaldatumVan, paspoortGeboortejaarVan
 } = maakPaspoort({
   db, save, crypto, accounts, notify, notifySupplier, sseToCustomer,
   sseToSupplier, sseToOffice, leesUploadDataUrl, leeftijdVan, gidsHaal
@@ -1866,7 +1874,8 @@ const kern = {
   talen,
   PASPOORT_NIVEAUS, leesUploadDataUrl, paspoortStatus, paspoortVraag, paspoortBeslis,
   paspoortTrekIn, paspoortBekijk, paspoortIncident, paspoortBeoordeel, paspoortMijn,
-  paspoortPartner, paspoortIncidenten
+  paspoortPartner, paspoortIncidenten,
+  paspoortVervaldatumVan, paspoortGeboortejaarVan
 };
 
 /* De helpers en constanten uit dit bestand die de kernlagen nodig hebben, op

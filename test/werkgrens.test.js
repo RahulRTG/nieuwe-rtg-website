@@ -79,13 +79,32 @@ test('2. een geldige verwijzing wordt bewaard en NIET opgelost', async () => {
 });
 
 test('3. een soort die dit huis niet kent, wordt bewaard en niet gegokt', async () => {
+  /* `koffer` staat niet in de kaart van kern/wereld/koppel.js. Hij is geldig van
+     vorm en het ticket gaat er echt over, dus hij wordt BEWAARD -- alleen is er
+     geen app om heen te gaan, en dat wordt gezegd in plaats van een pagina te
+     gokken. (Deze toets stond eerst op `voertuig`; die soort heeft sinds
+     public/apps/voertuig.html wél een bestemming, zie toets 3b.) */
   await api('/herkomst/zet', Object.assign({ soort: 'ticket', id: TICKET.id,
-    ref: 'rtg://voertuig/28' }, SAM.cred));
+    ref: 'rtg://koffer/28' }, SAM.cred));
   const uit = (await api('/herkomst', Object.assign({ soort: 'ticket', id: TICKET.id }, SAM.cred))).body;
-  assert.equal(uit.herkomst.soort, 'voertuig', 'de verwijzing staat er gewoon');
+  assert.equal(uit.herkomst.soort, 'koffer', 'de verwijzing staat er gewoon');
   assert.equal(uit.herkomst.opent, null, 'maar er wordt geen pagina gegokt');
   assert.match(uit.herkomst.let, /geen app om heen te gaan/i, 'met de reden erbij');
   assert.equal(uit.herkomst.door, 'Sam', 'en wie hem legde');
+});
+
+test('3b. een defect voertuig heeft nu WEL een bestemming', async () => {
+  /* Dit was het scenario waar deze hele draad om begon: "bus 28 is defect"
+     gebeurt in RTG Mobility, het ticket hier. Sinds public/apps/voertuig.html
+     bestaat, wijst die verwijzing ergens heen. */
+  await api('/herkomst/zet', Object.assign({ soort: 'ticket', id: TICKET.id,
+    ref: 'rtg://voertuig/bus28' }, SAM.cred));
+  const uit = (await api('/herkomst', Object.assign({ soort: 'ticket', id: TICKET.id }, SAM.cred))).body;
+  assert.equal(uit.herkomst.soort, 'voertuig');
+  assert.ok(uit.herkomst.opent, 'er is een app om heen te gaan');
+  assert.match(uit.herkomst.opent.app, /voertuig\.html\?voertuig=bus28/, 'met het id in het adres');
+  assert.match(uit.herkomst.let, /wordt NIET opgelost/i,
+    'en de verwijzing wordt nog steeds niet opgelost: alleen het adres, geen inhoud');
 });
 
 test('4. er is geen parameter om naar het werk van een ander te vragen', async () => {

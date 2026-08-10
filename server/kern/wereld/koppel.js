@@ -41,7 +41,18 @@ const KAART = {
   vacature:     { app: '/apps/zakelijk.html', param: 'kans',  titel: 'Kansenbord',     deel: true },
   reis:         { app: '/apps/app.html',     param: 'reis',    titel: 'Reizen',        deel: true },
   zaak:         { app: '/apps/app.html',     param: 'zaak',    titel: 'Ter plaatse',   deel: true },
-  event:        { app: '/apps/podium.html',  param: 'event',   titel: 'Podium',        deel: true }
+  event:        { app: '/apps/podium.html',  param: 'event',   titel: 'Podium',        deel: true },
+  /* TWEE DINGEN HETEN VOERTUIG, EN DIT IS DE DUURZAME. Deze verwijzing wijst
+     naar een `mobAsset`: het voertuig zelf, met zijn papieren, dat er morgen
+     nog is. `db.data.ovVoertuigen` -- waar het objectregister van RTG Command
+     de soort `voertuig` op zet -- is iets anders: een LIVE positie met een
+     houdbaarheid van twee minuten, die verdwijnt zodra een chauffeur zijn
+     dienst beeindigt. Daar verwijzen zou een link opleveren die vrijwel altijd
+     dood is; daarom staat die soort hier niet.
+     `deel: false` -- een vlootscherm hangt achter de vervoerderdeur, en een
+     link die in een gesprek belandt bij iemand die er niet in kan, belooft iets
+     wat hij niet waarmaakt. */
+  voertuig:     { app: '/apps/voertuig.html', param: 'voertuig', titel: 'Voertuig',     deel: false }
 };
 
 /* TWEE VRAGEN, EN ZE ZIJN NIET DEZELFDE.

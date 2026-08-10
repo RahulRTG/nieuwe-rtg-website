@@ -23,5 +23,10 @@ module.exports = {
     'Begin klein: één vast uur per week houd je langer vol dan een groots plan.'),
   '/apps/spelen.html': G('Spelen: bordspellen en partyspellen met vrienden, live tegen elkaar.',
     ['Start een lobby en nodig vrienden uit', 'Kies een spel: van dammen tot Magnaat', 'Praat mee in de spelchat'],
-    'Sommige spellen hebben een leeftijdspoort; dat regelt de app automatisch netjes voor je.')
+    'Sommige spellen hebben een leeftijdspoort; dat regelt de app automatisch netjes voor je.'),
+  '/apps/voertuig.html': G('RTG Voertuig: een voertuig uit uw vloot, met zijn papieren en of hij vandaag mag rijden.',
+    ['Open er een uit de vloot, of rechtstreeks met een adres (?voertuig=id)',
+      'Lees of hij inzetbaar is -- en zo niet, om welke reden precies',
+      'Zie welke verplichte papieren er zijn en welke bijna aflopen'],
+    'Een verplicht document zonder geldige einddatum telt hier als ONGELDIG en niet als "vast wel in orde": een grens die bij twijfel doorlaat, is geen grens.')
 };

@@ -189,5 +189,11 @@ module.exports = ({ kern }) => {
     };
   }
 
-  return { levenslijn: { lijn, feiten } };
+  /* Het command center staat in ./cockpit.js en niet hier: het is het derde
+     antwoord (moet ik iets doen) en het heeft de niveaus erbij, terwijl dit
+     bestand over de lijn zelf gaat. Het krijgt feiten() mee en leest nergens
+     zelf -- zo blijft er EEN plek waar de bronnen worden aangeraakt. */
+  const { cockpit } = require('./cockpit')({ feiten });
+
+  return { levenslijn: { lijn, feiten, cockpit } };
 };

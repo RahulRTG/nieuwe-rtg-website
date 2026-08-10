@@ -18,8 +18,8 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | **gezakt** op een mutatie (bewezen gevoelig) | 521 |
 | **overleefd**: geen mutatie kreeg hem rood | 12 |
 | niet te meten (al rood, geen module gevonden, ...) | 16 |
-| alleen in de kop *genoemd*, nog niet gemeten | 36 |
-| niets van beide | 146 |
+| alleen in de kop *genoemd*, nog niet gemeten | 35 |
+| niets van beide | 147 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -722,7 +722,7 @@ toets omvalt.
 | `klankwerk.e2e.js` | 1 | -- | Scherm-test voor RTG Klankwerk. test/muziek.test.js bewijst de server-kant; deze bewijst dat het instrument werkt: een stuk openen, een stap aanzetten, een noot in de notenrol zetten, Rahul om een voorstel vragen en... |
 | `laatstedrie.e2e.js` | 1 | -- | De laatste drie schermen zonder eigen toets: RTG Camera, RTG Eye en het tweede scherm. WAAROM DEZE DRIE OVERBLEVEN, en waarom dat geen toeval is: twee ervan vragen de CAMERA (`getUserMedia`) en de derde is een tweede... |
 | `ledenschermen.e2e.js` | 3 | -- | DE LEDENSCHERMEN: WAT HET HUIS OVER ZICHZELF ZEGT. Achttien schermen uit de lijst van TAKEN 4.9, en ze hebben iets gemeen dat de andere groepen niet hebben: ze staan het dichtst bij het lid, en juist daar doet dit... |
-| `leven.e2e.js` | 1 | genoemd | LEEFT ELK SCHERM, OF STAAT HET ER ALLEEN MAAR? test/paginas.e2e.js vraagt: gaat deze pagina open zonder te klagen. |
+| `leven.e2e.js` | 1 | -- | Schermtoets voor het levens-command-center (LEVEN.md par. 1.5). |
 | `lifestyleschermen.e2e.js` | 2 | -- | DE TWAALF LIFESTYLE-SCHERMEN: LEGT EEN TOETS DE WEG ECHT AF? WAAROM JUIST DEZE TWAALF Bij het afsluiten van TAKEN 4.1 heb ik zelf de openstaande rest opgeschreven: "wat er nog steeds niet is: dezelfde weg door het... |
 | `livinglab.e2e.js` | 2 | -- | Scherm-test voor het RTF Living Lab: het kantoorscherm (/apps/livinglab.html) en het bewonersscherm (/apps/labpas.html). WAAROM DEZE TOETS ER IS. |
 | `media.e2e.js` | 1 | -- | CAMERA EN MICROFOON ZOALS EEN BROWSER ZE ERVAART. WAAROM DEZE TOETS BESTAAT. |

@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 2904 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 2906 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,11 +18,11 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 2904 |
-| servermodules (`server/**/*.js`) | 1594 |
-| routebestanden (`server/routes/**`) | 353 |
-| kernmodules (`server/kern/**`) | 930 |
-| schermen (`public/**/*.html`) | 219 |
+| API-endpoints | 2906 |
+| servermodules (`server/**/*.js`) | 1597 |
+| routebestanden (`server/routes/**`) | 355 |
+| kernmodules (`server/kern/**`) | 931 |
+| schermen (`public/**/*.html`) | 220 |
 | gedeelde browsermodules (`public/shared/*.js`) | 182 |
 | toetsbestanden (`test/*.test.js`) | 640 |
 | schermtoetsen (`test/*.e2e.js`) | 91 |
@@ -94,7 +94,7 @@ luister
 Acht domeinen, uit `server/opzet/routes.js`. Met `RTG_DOMAINS=member,social` draait
 een proces alleen die domeinen; een gateway (`server/poort.js`) stuurt de
 padvoorvoegsels dan naar het juiste proces. **Die belofte is nog niet waargemaakt:**
-zie §5 -- er zijn nog 148 kern-namen die meer dan één domein aanraakt.
+zie §5 -- er zijn nog 149 kern-namen die meer dan één domein aanraakt.
 
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
@@ -112,7 +112,7 @@ op de regel zelf. Dat is niet hetzelfde als onbeveiligd -- regel 28 van de keuri
 per route een poort **of** een plek op de publieke lijst met reden. Deze kolom is een
 wegwijzer, geen verdict.
 
-Daarnaast 1515 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 1517 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 
@@ -120,8 +120,8 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1127 |
-| daarvan door **meer dan één** domein (de echte koppeling) | 148 |
+| kern-namen die routes aanraken | 1128 |
+| daarvan door **meer dan één** domein (de echte koppeling) | 149 |
 | daarvan door precies één domein | 979 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
@@ -134,9 +134,9 @@ domein. Alle vijf getallen staan in `NORM.json` aan een ratel en mogen alleen za
 domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 
 ```
-app(130) auth(75) supplierAuth(46) db(30) officeAuth(29) accounts(18) liveCodename(17)
-status(16) schoon(15) managerOnly(12) codenaamVan(12) rtf(11) express(10) save(10)
-anthropic(10) tooManyTries(9) crypto(9) rtmail(9) boardroomWie(7) logActivity(7)
+app(132) auth(77) supplierAuth(46) db(30) officeAuth(29) accounts(18) liveCodename(17)
+status(16) schoon(16) managerOnly(12) codenaamVan(12) rtf(11) anthropic(11) express(10)
+save(10) tooManyTries(9) crypto(9) rtmail(9) boardroomWie(7) logActivity(7)
 sseToOffice(7) keyVanCodenaam(7) payrollOS(7) geenGast(6) noteFailedTry(6) kern(6)
 gegevensStop(6) talen(6) mail(5) loginFails(5) sseToSupplier(5)
 ```

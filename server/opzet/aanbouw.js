@@ -90,6 +90,8 @@ module.exports = function bouwKernAan(kern, grens) {
   require('../routes/kantoor')(grens('kantoor'));
   require('../routes/sociaal')(grens('sociaal'));
   require('../routes/geld')(grens('geld'));
+  // het Life OS van de RTFoundation (LEVEN.md); leest alleen, schrijft nooit
+  require('../routes/leven')(grens('leven'));
   require('../routes/thuis')(grens('thuis'));
   require('../routes/werkvloer')(grens('werkvloer'));
   require('../routes/regering')(grens('regering'));

@@ -1,89 +1,23 @@
-/* ============================================================================
-   LEEFT ELK SCHERM, OF STAAT HET ER ALLEEN MAAR?
+/* Schermtoets voor het levens-command-center (LEVEN.md par. 1.5).
 
-   test/paginas.e2e.js vraagt: gaat deze pagina open zonder te klagen. Dat is de
-   ene helft. Deze toets vraagt de andere, en het is de helft die vandaag een uur
-   kostte: DOET er ook iets?
+   Deze toets bewaakt EEN ding, en dat is de zwaarste regel van dit scherm:
+   fasen zonder aanwijzing komen NIET in beeld, ook niet grijs. Wie geen
+   studie, geen kinderen of geen pensioen heeft, mist niets (par. 1.1); een
+   grijze fase leest als een gemiste stap en maakt van de levenslijn stilletjes
+   een voortgangsbalk over iemands leven.
 
-   HET GEVAL WAAR DEZE TOETS UIT KOMT
+   Daarnaast: geen enkel patroon dat om terugkomen vraagt (par. 2.9), en geen
+   getal dat mensen vergelijkt (par. 2.4). Die zijn hier op de GERENDERDE
+   tekst gemeten en niet op de bron, want een verbod dat je op de broncode
+   toetst overleeft geen herschrijving.
 
-   De wings van de leden-app stonden in een eigen deelbestand. De bron in
-   public/apps/app-main/ wordt op GROOTTE geknipt en niet op functiegrenzen, dus
-   dat bestand belandde midden in een functie die nooit wordt aangeroepen. Het
-   beeld was volmaakt geruststellend: 200, geen JS-fout, titel klopt, taal klopt,
-   body vol, alle elementen in de DOM, de browser haalde de code op. Elke poort
-   die we hadden stond groen. Er gebeurde alleen niets.
-
-   Zo'n scherm is niet stuk, het is DOOD. En dood is stiller dan stuk.
-
-   HOE JE LEVEN MEET ZONDER ELK SCHERM APART TE KENNEN
-
-   Twee tekenen, allebei generiek: een scherm dat leeft praat met de API, of het
-   verandert zijn eigen DOM nadat de pagina geladen is. Een MutationObserver die
-   bij DOMContentLoaded begint, telt precies dat.
-
-   DE DREMPEL IS GEMETEN, NIET GEKOZEN. Over alle 189 schermen:
-
-       dood (geen api, geen mutatie)           0 mutaties   1 scherm
-       het STILSTE levende scherm             54 mutaties
-       p5 / p25 / mediaan                     84 / 112 / 143
-
-   Tussen 0 en 54 zit niets. Tien is daarom een veilige grens: vijf keer onder
-   het stilste levende scherm en ver boven dood. Geen wedloop met de klok, want
-   de afstand is een factor vijf en geen paar procent.
-
-   WAT DEZE TOETS NIET VANGT, en dat hoort erbij: een scherm dat wel iets doet
-   maar het VERKEERDE. Daar zijn de gerichte toetsen voor. Deze vangt de
-   categorie waar de rest blind voor is.
-
-   Draai: npm run e2e   (of los: node --experimental-sqlite --test test/leven.e2e.js)
-   ========================================================================== */
+   Draait alleen waar een browser beschikbaar is; anders overgeslagen. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const { startServer, letOpFouten } = require('./helper');
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
-const { startServer, stop } = require('./helper');
-
-const PUB = path.join(__dirname, '..', 'public');
-const DREMPEL = 10;          // mutaties na de load; zie de meting hierboven
-
-/* Schermen die met REDEN niets doen. Elke regel is een keuze, geen omissie --
-   dezelfde afspraak als de publieke-routelijst in scripts/check.js. Wie hier
-   iets aan toevoegt, zet de reden erbij; een lijst die stil groeit is precies
-   hoe een toets zijn tanden verliest. */
-const MAG_STIL = new Map([
-  ['/site/404.html', 'een statische foutpagina: geen JS, en dat hoort zo'],
-  ['/apps/juridisch/privacy.html', 'lopende juridische tekst: negenduizend woorden die er gewoon staan, zonder API en zonder opbouw. Wat er WEL in moet staan bewaakt test/juridischeschermen.e2e.js'],
-  ['/apps/juridisch/partnervoorwaarden.html', 'idem: lopende tekst, bewaakt door test/juridischeschermen.e2e.js']
-]);
-
-/* WAAROM DEZE TOETS MET EEN SESSIE MEET
-
-   Hij deed dat niet, en daar liep hij op vast: eenentwintig schermen stonden
-   als "dood" te boek terwijl ze alleen maar dicht waren. Zonder inlog KAN een
-   ledenapp niets doen -- hij toont een eerlijke melding ("Log eerst in op de
-   leden-app") en zwijgt verder. Dat is een scherm dat zijn werk doet.
-
-   Het cijfer maakte het extra broos. De kop hieronder zegt dat tussen "dood" en
-   het stilste levende scherm niets zat, met 54 als ondergrens; inmiddels bouwde
-   elk uitgelogd scherm zijn gedeelde schil op en landde daarmee rond de acht a
-   negen mutaties -- vlak onder de drempel van tien. Welke schermen zakten hing
-   dan af van de timing van die ene run: de ene keer camera.html, de andere keer
-   agenda.html en wallet.html. Een toets die per run iets anders aanwijst, wijst
-   niets aan.
-
-   Met een gewone ledensessie erin is er nog EEN scherm zonder api-aanroep
-   (/site/404.html, en dat staat met reden op MAG_STIL). De rest doet gewoon
-   zijn werk. Een tussenoplossing met een lijst van "dicht en dus vrijgesteld"
-   schermen is daarmee vervallen -- die stond hier even, en hij was overbodig
-   zodra de meting klopte. Wat de toets vangt is onveranderd: een scherm dat
-   opengaat en waarvan de JS niets doet.
-
-   Wat dit NIET dekt: apps achter een ANDERE deur (zaak, leverancier, kantoor,
-   gezin) draaien hier op een ledensessie en tonen dus hun eigen deur. Dat ze
-   dat netjes doen ligt vast in test/kantoordeuren.e2e.js en
-   test/rtfkinderschermen.e2e.js. */
 
 function laadBrowser() {
   for (const p of [undefined, '/opt/node22/lib/node_modules', '/usr/lib/node_modules', '/usr/local/lib/node_modules']) {
@@ -94,101 +28,90 @@ function laadBrowser() {
 }
 const pw = laadBrowser();
 
-function alleHtml(map) {
-  const uit = [];
-  for (const naam of fs.readdirSync(map)) {
-    const vol = path.join(map, naam);
-    if (fs.statSync(vol).isDirectory()) uit.push(...alleHtml(vol));
-    else if (naam.endsWith('.html')) uit.push('/' + path.relative(PUB, vol).split(path.sep).join('/'));
-  }
-  return uit;
-}
-
-test('elk scherm geeft een teken van leven', { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async (t) => {
-  const paginas = alleHtml(PUB).sort();
-  /* Een lege lijst is geen "alles goed" maar een kapotte meting (LAT.md regel
-     3). Zonder deze regel zou een verplaatste map netjes nul schermen vinden en
-     groen geven -- de stilste manier om een toets uit te zetten. */
-  assert.ok(paginas.length > 150, 'de scan vindt de schermen (' + paginas.length + ')');
-
+test('het levens-command-center: geen lege fasen, geen balk, geen aansporing',
+  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-leven-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
-  const dood = [];       // geen api en te weinig mutaties
-  const genezen = [];    // stond op MAG_STIL maar leeft nu
-  const stilste = [];    // voor het rapport: waar zit de ondergrens vandaag
   try {
+    const t = Date.now();
+    const reg = await (await fetch(base + '/api/auth/register', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name: 'Leven Echt', email: 'le' + t + '@e.test',
+        phone: '06' + String(t).slice(-8), password: 'geheim123',
+        geboortedatum: '1994-05-05', tier: 'rtg' })
+    })).json();
+    assert.ok(reg.token, 'registreren hoort een token te geven');
+
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
-    const u = Date.now().toString().slice(-8);
-    const lid = await fetch(base + '/api/auth/register', { method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: 'Levenlid', email: 'lv' + u + '@x.nl', phone: '06' + u,
-        password: 'geheim12345', geboortedatum: '1985-05-05', tier: 'rtg' }) }).then(r => r.json());
-    /* Zonder sessie meet deze toets iets anders dan hij beweert: uitgelogd doen
-       de meeste schermen terecht niets, en dan vallen er zeventien om met de
-       melding "dood" terwijl er alleen een token ontbreekt. Dat is de valse
-       uitslag waar LAT-regel 3 over gaat -- een meter hoort te zakken als zijn
-       invoer ontbreekt, maar dan MET de goede reden. Vandaar deze harde stop:
-       liever hier duidelijk klappen dan verderop zeventien schermen ten onrechte
-       beschuldigen. */
-    assert.ok(lid && lid.token, 'de ledensessie is aangemaakt -- zonder token meet deze toets de verkeerde stand: ' +
-      JSON.stringify(lid).slice(0, 160));
-    const banen = 4;
-    const werk = Array.from({ length: banen }, () => []);
-    paginas.forEach((p, i) => werk[i % banen].push(p));
+    const ctx = await browser.newContext({ viewport: { width: 430, height: 932 } });
+    await ctx.addInitScript((tok) => {
+      try {
+        localStorage.setItem('rtg_member_token', tok);
+        localStorage.setItem('rtg_lang', 'nl');
+        localStorage.setItem('rtg_cookieinfo_v1', '1');
+      } catch (e) {}
+    }, reg.token);
+    const page = await ctx.newPage();
+    const fouten = [];
+    letOpFouten(page, fouten);
 
-    await Promise.all(werk.map(async (lijst) => {
-      const ctx = await browser.newContext({ viewport: { width: 1280, height: 900 }, serviceWorkers: 'block' });
-      const page = await ctx.newPage();
-      /* De teller wordt VOOR elke navigatie opnieuw gezet (addInitScript draait
-         bij elke load) en begint pas bij DOMContentLoaded: wat de browser zelf
-         tijdens het parsen bouwt, telt niet mee. Alleen wat de JS daarna doet. */
-      await page.addInitScript((tok) => {
-        try { if (tok) localStorage.setItem('rtg_member_token', tok); localStorage.setItem('rtg_cookieinfo_v1', '1'); } catch (e) {}
-        window.__mut = 0;
-        addEventListener('DOMContentLoaded', () => {
-          new MutationObserver(ms => { window.__mut += ms.length; })
-            .observe(document.documentElement, { childList: true, subtree: true, attributes: true, characterData: true });
-        });
-      }, lid && lid.token);
-      for (const p of lijst) {
-        let api = 0;
-        const tel = r => { try { if (new URL(r.url()).pathname.startsWith('/api/')) api++; } catch (e) {} };
-        page.on('request', tel);
-        let mut = 0, kapot = null;
-        try {
-          await page.goto(base + p, { waitUntil: 'load', timeout: 30000 });
-          // ruim wachten: veel schermen doen hun eerste aanroep pas na de load
-          await new Promise(r => setTimeout(r, 900));
-          mut = await page.evaluate(() => window.__mut || 0);
-        } catch (e) { kapot = e.message.slice(0, 120); }
-        page.off('request', tel);
+    await page.goto(base + '/apps/leven.html', { waitUntil: 'domcontentloaded' });
+    await page.waitForSelector('.lv-staat', { timeout: 15000 });
 
-        const leeft = api > 0 || mut >= DREMPEL;
-        const magStil = MAG_STIL.has(p);
-        if (!leeft && !magStil) dood.push(p + '  ->  ' + api + ' api-aanroepen, ' + mut + ' mutaties' + (kapot ? ', laadfout: ' + kapot : ''));
-        if (leeft && magStil) genezen.push(p);
-        if (api === 0) stilste.push({ p, mut });
-      }
-      await ctx.close();
+    const beeld = await page.evaluate(() => ({
+      staat: (document.querySelector('.lv-staat') || {}).textContent || '',
+      getekend: [...document.querySelectorAll('.lv-fase')].map((x) => x.dataset.staat),
+      balk: !!document.querySelector('progress, [role="progressbar"]'),
+      tekst: (document.getElementById('inhoud').innerText || '').toLowerCase()
     }));
+
+    /* De server kent tien fasen; een vers lid heeft er hooguit een paar met
+       een aanwijzing. Wat hier telt is dat er GEEN nvt op het scherm staat. */
+    const lijn = await (await fetch(base + '/api/leven/lijn', {
+      method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + reg.token },
+      body: '{}'
+    })).json();
+    const nvt = (lijn.fasen || []).filter((f) => f.staat === 'nvt').length;
+    assert.ok(nvt > 0, 'een vers lid hoort fasen zonder aanwijzing te hebben, anders meet deze toets niets');
+    assert.equal(beeld.getekend.filter((s) => s === 'nvt').length, 0,
+      'een fase zonder aanwijzing hoort NIET op het scherm te staan (LEVEN.md par. 1.1)');
+    assert.equal(beeld.getekend.length, (lijn.fasen || []).length - nvt,
+      'precies de fasen met een aanwijzing, niet meer en niet minder');
+
+    assert.ok(beeld.staat.length > 0, 'het scherm zegt in een regel hoe het ervoor staat');
+    assert.equal(beeld.balk, false, 'geen voortgangsbalk over een leven');
+
+    /* par. 2.9 en 2.4, op de getoonde tekst. "van de 10" vangt de teller die
+       een levenslijn ongemerkt in een score verandert. */
+    for (const woord of ['streak', 'op rij', 'dagdoel', 'badge', 'punten', 'score',
+      'van de 10', '% voltooid', 'beter dan']) {
+      assert.equal(beeld.tekst.includes(woord), false,
+        'het scherm hoort geen "' + woord + '" te tonen (LEVEN.md par. 2.4 en 2.9)');
+    }
+
+    /* De mentor antwoordt met zijn verantwoording eronder (par. 2.10). */
+    await page.fill('#lvMentorIn', 'Hoe sta ik ervoor?');
+    await page.click('#lvMentorForm button[type="submit"]');
+    await page.waitForFunction(() => {
+      const el = document.getElementById('lvMentorUit');
+      return el && !el.hidden && !/ogenblik/i.test(el.textContent);
+    }, { timeout: 15000 });
+    const mentor = await page.evaluate(() => ({
+      tekst: document.getElementById('lvMentorUit').innerText,
+      gegevens: [...document.querySelectorAll('#lvMentorUit .lv-geg li')].length
+    }));
+    assert.ok(mentor.gegevens > 0, 'een antwoord komt met de gebruikte gegevens erbij');
+    for (const zin of ['niets voor jou', 'niet geschikt', 'kans is klein', 'haalbaar']) {
+      assert.equal(mentor.tekst.toLowerCase().includes(zin), false,
+        'de mentor opent en raadt nooit af (LEVEN.md par. 2.2): "' + zin + '"');
+    }
+
+    const echteFouten = fouten.filter((f) => !/favicon/i.test(f));
+    assert.deepEqual(echteFouten, [], 'het scherm hoort zonder consolefouten te draaien');
   } finally {
-    if (browser) await browser.close();
-    stop(child);
-    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+    if (browser) await browser.close().catch(() => {});
+    child.kill();
+    fs.rmSync(TMP, { recursive: true, force: true });
   }
-
-  /* De ondergrens in beeld, elke ronde. Zakt die richting de drempel, dan is dat
-     zichtbaar VOORDAT de toets omvalt -- en dan is het een gesprek over de
-     drempel in plaats van een verrassing. */
-  stilste.sort((a, b) => a.mut - b.mut);
-  t.diagnostic('stilste schermen zonder api-aanroep: ' +
-    stilste.slice(0, 5).map(s => s.p + '=' + s.mut).join(', ') + '  (drempel ' + DREMPEL + ')');
-
-  assert.deepEqual(dood, [],
-    'deze schermen geven geen enkel teken van leven -- ze openen, maar hun JS doet niets:\n  ' + dood.join('\n  '));
-  /* Een scherm dat op MAG_STIL staat maar inmiddels leeft, is geen fout maar
-     wel een lijst die krimpen kan. Melden, niet laten zakken: zie de kop van
-     test/paginas.e2e.js voor waarom dat hier de goede kant is. */
-  if (genezen.length) console.log('  # deze schermen leven nu en mogen uit MAG_STIL:\n  #   ' + genezen.join('\n  #   '));
 });

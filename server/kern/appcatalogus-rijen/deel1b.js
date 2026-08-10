@@ -36,7 +36,7 @@ module.exports = [
   ['boeken', 'Boeken', 'media', '/apps/boeken.html', 'De huisbibliotheek plus je eigen tekstbestanden uit de kluis, met een rustige lezer. Alleen je leesplek reist mee; geen leesdoelen, geen reeksen.'],
   ['krant', 'RTG Krant', 'media', '/apps/krant.html', 'De kiosk: de kranten die nieuwsbedrijven binnen RTG uitgeven, elk in de eigen huisstijl.'],
   ['nieuws', 'Nieuws', 'media', '/apps/nieuws.html', 'RTG Nieuws per rubriek, met wat je later wilt lezen bewaard.'],
-  ['garderobe', 'Garde-robe', 'media', '/apps/garderobe.html', 'Je kledingkast en looks bij elkaar.'],
+  ['garderobe', 'Garde-robe', 'media', '/apps/garderobe.html', 'Uw digitale garderobe: per stuk type, merk, kleur, maat en waar het hangt -- welke woning, welke kast. Plus uw vaklui: kleermaker, schoenmaker, stomerij.'],
 
   // ---- geld & werk ----
   ['metier', 'Métier', 'geld', '/apps/metier.html', 'Je beroepsprofiel op codenaam, met de rollen die RTG zelf heeft bevestigd. Je naam geef je per werkgever vrij, en je trekt hem net zo makkelijk weer in.'],

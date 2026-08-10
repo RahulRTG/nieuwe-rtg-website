@@ -5,10 +5,10 @@ module.exports = [
   ['wbw', 'Wie betaalt wat', 'geld', '/apps/wbw.html', 'Groepsuitgaven met live balans en verrekenen via RTG Pay.'],
   ['balans', 'Balans', 'geld', '/apps/balans.html', 'Je saldo en tikgeschiedenis in één overzicht.'],
   ['rtgcode', 'RTG-code', 'geld', '/apps/rtgcode.html', 'Je betaal- en toegangscodes veilig op één plek.'],
-  ['logboek', 'Logboek', 'geld', '/apps/logboek.html', 'Je acties en bevestigingen, netjes vastgelegd.'],
-  ['mecenaat', 'Mecenaat', 'geld', '/apps/mecenaat.html', 'Steun projecten en goede doelen als mecenas.'],
+  ['logboek', 'Logboek', 'geld', '/apps/logboek.html', 'Het onderhoudsboek van uw jacht, jet, oldtimer of ander kostbaar bezit: keuringen, servicebeurten, reparaties en verzekeringen met datum, kosten en wanneer het weer aan de beurt is.'],
+  ['mecenaat', 'Mecenaat', 'geld', '/apps/mecenaat.html', 'Uw filantropie op orde: per gift het doel, het thema, het bedrag, en of het een toezegging is of al betaald. Het overzicht toont wat er via de RTFoundation loopt.'],
   ['labfonds', 'Lab-fonds', 'geld', '/apps/labfonds.html', 'Steun het RTG-onderzoekslab en volg waar je bijdrage heen gaat.'],
-  ['nalatenschap', 'Nalatenschap', 'geld', '/apps/nalatenschap.html', 'Regel wat er later met je account en bezittingen gebeurt.'],
+  ['nalatenschap', 'Nalatenschap', 'geld', '/apps/nalatenschap.html', 'Een discreet, versleuteld dossier voor later: welke documenten er zijn en waar ze liggen, uw vertrouwenspersonen, en uw persoonlijke wensen.'],
 
   // ---- spelen & sport ----
   ['spelen', 'Spelen', 'spelen', '/apps/spelen.html', 'Dammen, rummikub, Magnaat, partyspellen, sudoku en meer, samen of alleen.'],

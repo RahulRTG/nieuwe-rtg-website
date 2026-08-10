@@ -22,7 +22,7 @@ module.exports = [
   ['entourage', 'Entourage', 'sociaal', '/apps/entourage.html', 'Uw vaste reisgezelschap: wie u meeneemt, hun band, dieet en documenten met vervaldatum. Stel een gezelschap samen en zie wat er ontbreekt voordat u aan de balie staat.'],
   ['rendezvous', 'Rendez-vous', 'sociaal', '/apps/rendezvous.html', 'Afspraken en ontmoetingen plannen met je kring.'],
   ['vonk', 'Vonk', 'sociaal', '/apps/vonk.html', 'RTG Vonk: kennismaken op wens; bij een wederzijdse match reserveert RTG een tafel in het midden.'],
-  ['attenties', 'Attenties', 'sociaal', '/apps/attenties.html', 'Attenties en cadeaus regelen voor wie je waardeert.'],
+  ['attenties', 'Attenties', 'sociaal', '/apps/attenties.html', 'Uw relatiebeheer: per relatie de band, de belangrijke data en hun voorkeuren, plus de giftgeschiedenis zodat u nooit twee keer hetzelfde geeft.'],
 
   // ---- reizen & verblijf ----
   /* RTG Reizen is de wereld erboven (PLATFORM.md, laag 2): hij orkestreert de
@@ -34,18 +34,18 @@ module.exports = [
   ['rtg', 'Het Huis', 'reizen', '/apps/rtg.html', 'Reserveren, boeken en bestellen bij alle partners, alles op codenaam.'],
   ['hotels', 'Verblijven', 'reizen', '/apps/hotels.html', 'Hotels, appartementen en villa\'s met ledenprijzen en keyless toegang.'],
   ['reisbureau', 'Reisbureau', 'reizen', '/apps/reisbureau.html', 'Samengestelde reizen tegen de nettoprijs, met AI-reisadvies in gewone woorden.'],
-  ['reisboek', 'Reisboek', 'reizen', '/apps/reisboek.html', 'Je reisdagboek: boekingen en momenten worden vanzelf een mooi verslag.'],
+  ['reisboek', 'Reisboek', 'reizen', '/apps/reisboek.html', 'Uw prive-reisdossier: per reis een draaiboek met de heen- en terugreis, de verblijven, de reisdocumenten met geldigheid en een dag-tot-dag-programma.'],
   ['vluchten', 'Vluchten', 'reizen', '/apps/vluchten.html', 'Vluchten zoeken, boeken en volgen.'],
-  ['hangar', 'Hangar', 'reizen', '/apps/hangar.html', 'De Hangar: privéjets en charters vanaf Business Aviation.'],
+  ['hangar', 'Hangar', 'reizen', '/apps/hangar.html', 'Uw privevliegtuigen en charters: per toestel type, registratie, thuishaven en stoelen, met de vluchten, de vlieguren en de laatst bekende positie.'],
   ['ov', 'RTG OV', 'reizen', '/apps/ov.html', 'Bus, trein, metro, veerboot en taxi in één reisapp, met live GPS en snelle check-in.'],
   ['navigatie', 'Navigatie', 'reizen', '/apps/navigatie.html', 'Navigeren met de RTG-kaart.'],
   ['flits', 'Flits', 'reizen', '/apps/flits.html', 'Een ingetogen rijscherm met community-meldingen (flitser, file, ongeval) en spraak.'],
   ['stad', 'Mijn Stad', 'reizen', '/apps/stad.html', 'Alles om je heen in het RTG-web, op de kaart van je stad.'],
-  ['maison', 'Maison', 'reizen', '/apps/maison.html', 'Je vaste verblijven en tweede huizen bij elkaar.'],
+  ['maison', 'Maison', 'reizen', '/apps/maison.html', 'Huishouden en staf: uw huishoudelijk personeel met rol en contact, de lopende taken met wie en wanneer, en een logboek van wat er in en om huis speelt.'],
 
   // ---- eten & uitgaan ----
   ['foodcourt', 'Food Court', 'eten', '/apps/foodcourt.html', 'Alle restaurants op een rij; reserveren met tijdsloten in een paar tikken.'],
-  ['table', 'Table', 'eten', '/apps/table.html', 'Je tafelreserveringen en gastenlijsten.'],
-  ['cellier', 'Cellier', 'eten', '/apps/cellier.html', 'Je wijnkelder en proefnotities.'],
+  ['table', 'Table', 'eten', '/apps/table.html', 'De prive-diners en events die u zelf geeft: gastenlijst met dieet en voorkeuren, tafelindeling, menu per gang. Herbruikbaar voor de volgende keer.'],
+  ['cellier', 'Cellier', 'eten', '/apps/cellier.html', 'Uw wijnkelder: per fles domein, jaargang, aantal, waarde en drinkvenster. Het overzicht wijst aan wat nu op dronk is, met de kelderwaarde. Een fles schenken telt af.'],
   ['uitgaan', 'Uitgaan', 'eten', '/apps/uitgaan.html', 'Bars, clubs en beachclubs met hun avonden en gastenlijsten.'],
 ];

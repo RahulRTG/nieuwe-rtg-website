@@ -148,6 +148,42 @@ De les is de moeite van het opschrijven waard: ik had deze twee bijna
 samengevoegd op grond van hun *omschrijving*. De toetsvraag stellen is niet
 genoeg — je moet hem aan de **code** stellen.
 
+### En het bleek geen incident
+
+Als twee beschrijvingen zó mis konden zijn, hoeveel dan nog? De twaalf apps met
+het `rechterhand`-voorvoegsel zijn samen gebouwd, dus daar was dezelfde drift
+het waarschijnlijkst. Van de tien die daarnaast nog gecontroleerd zijn, klopten
+er **zeven** niet:
+
+| App | Stond er | Doet het |
+|---|---|---|
+| Logboek | "je acties en bevestigingen, netjes vastgelegd" | onderhoudsboek van jacht/jet/oldtimer, met keuringen en vervaldata |
+| Maison | "je vaste verblijven en tweede huizen" | huishoudelijk personeel, taken en een huislogboek |
+| Table | "je tafelreserveringen" | de diners die u ZELF geeft: gastenlijst, tafelindeling, menu |
+| Reisboek | "worden vanzelf een mooi verslag" | een draaiboek dat u zelf invult; niets gaat vanzelf |
+| Garde-robe | "je kledingkast en looks" | kleding en vaklui; "looks" bestaat niet |
+| Cellier | "proefnotities" | één notitieveld per fles |
+| Mecenaat | "steun projecten en goede doelen" | een administratie van toezeggingen; er wordt niets betaald |
+
+De **app-gids** was erger dan de catalogus, en die is wat Rahul een lid
+vertelt. Daar stond onder meer "open deuren op afstand waar dat kan" (Maison),
+"laat de sommelier alvast kiezen" (Table), "laat een maat naar de paskamer
+brengen" (Garde-robe), "wij verzorgen inpakken en bezorgen" (Attenties) en
+"exporteer voor uw administratie" (Logboek). Geen van die dingen bestaat als
+route; nagerekend per pagina.
+
+Dat is dezelfde soort belofte die `CLAUDE.md` verbiedt bij boekingen en
+toegang, alleen dan over functies. Alle zeventien teksten zijn herschreven naar
+wat de modules werkelijk doen, mét de eerlijkheidsregels die al in de code
+stonden maar niet in de gids — dat RTG geen clubgids bijhoudt, dat Cellier
+niets adviseert bij te kopen, dat Hangar geen live tracking doet.
+
+Wat hier NIET aan gedaan is: een toets die dit machinaal vangt. Een
+beschrijving vergelijken met wat een module doet, is een oordeel en geen
+meting; wie daar een regel van maakt, krijgt vals alarm of vals vertrouwen.
+Voor deze twaalf is het met de hand nagelopen en dat staat hier opgeschreven,
+zodat de volgende die iets toevoegt weet dat de tekst óók bij de code hoort.
+
 Twee waarschuwingen bij die meting, zodat niemand haar sterker leest dan ze is.
 Ze kijkt naar **links en routes**, dus een laag die zijn domeinen via de server
 ophaalt in plaats van via een link (precies wat de Media OS doet, en goed doet)

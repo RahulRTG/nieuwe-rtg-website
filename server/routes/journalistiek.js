@@ -27,28 +27,36 @@ module.exports = (kern) => {
     return true;
   }
   // elke redactie-route langs dezelfde deur; alleen /api/krant/* blijft openbaar
-  const red = (pad, fn) => app.post('/api/supplier/redactie' + pad, supplierAuth, (req, res) => {
+  /* De paden staan voluit en niet als '/api/supplier/redactie' + pad. Een opgebouwd pad
+     ziet scripts/schakelbaar.js niet, en wat die census niet ziet is vanuit
+     de boardroom niet uit te zetten en niet per stad te sluiten
+     (scripts/check.js regel 45). De controle eromheen blijft op EEN plek;
+     alleen de registratie is uitgeschreven. */
+  const doe = (fn) => (req, res) => {
     if (!eisRedactie(req, res)) return;
     return fn(req, res);
-  });
+  };
 
-  red('/staat', (req, res) => res.json(journalistiek.staat(code(req))));
-  red('/artikelen', (req, res) => res.json(journalistiek.artikelen(code(req), req.body || {})));
-  red('/artikel/haal', (req, res) => {
+  app.post('/api/supplier/redactie/staat', supplierAuth, doe((req, res) => res.json(journalistiek.staat(code(req)))));
+  app.post('/api/supplier/redactie/artikelen', supplierAuth, doe((req, res) => res.json(journalistiek.artikelen(code(req), req.body || {}))));
+  app.post('/api/supplier/redactie/artikel/haal', supplierAuth, doe((req, res) => {
     const a = journalistiek.artikelVol(code(req), (req.body || {}).id);
     if (!a) return res.status(404).json({ error: 'Artikel niet gevonden.' });
     res.json({ artikel: a });
-  });
-  red('/artikel/bewaar', (req, res) => stuur(res, journalistiek.bewaarArtikel(code(req), req.body || {}, req.actor)));
-  red('/artikel/publiceer', (req, res) => stuur(res, journalistiek.publiceer(code(req), (req.body || {}).id, req.actor)));
-  red('/artikel/concept', (req, res) => stuur(res, journalistiek.naarConcept(code(req), (req.body || {}).id)));
-  red('/artikel/verwijder', (req, res) => stuur(res, journalistiek.verwijderArtikel(code(req), (req.body || {}).id)));
-  red('/snel', (req, res) => stuur(res, journalistiek.snel(code(req), req.body || {}, req.actor)));
-  red('/rubriek/bewaar', (req, res) => stuur(res, journalistiek.rubriekBewaar(code(req), (req.body || {}).naam)));
-  red('/rubriek/verwijder', (req, res) => stuur(res, journalistiek.rubriekWeg(code(req), (req.body || {}).naam)));
-  red('/huisstijl', (req, res) => stuur(res, journalistiek.huisstijlBewaar(code(req), req.body || {})));
-  red('/site/bewaar', (req, res) => stuur(res, journalistiek.siteBewaar(code(req), (req.body || {}).design || req.body || {})));
-  red('/assist', async (req, res) => { try { res.json(await journalistiek.assist(code(req), req.body || {})); } catch (e) { res.json({ chapo: '', koppen: [] }); } });
+  }));
+  app.post('/api/supplier/redactie/artikel/bewaar', supplierAuth, doe((req, res) => stuur(res, journalistiek.bewaarArtikel(code(req), req.body || {}, req.actor))));
+  app.post('/api/supplier/redactie/artikel/publiceer', supplierAuth, doe((req, res) => stuur(res, journalistiek.publiceer(code(req), (req.body || {}).id, req.actor))));
+  app.post('/api/supplier/redactie/artikel/concept', supplierAuth, doe((req, res) => stuur(res, journalistiek.naarConcept(code(req), (req.body || {}).id))));
+  app.post('/api/supplier/redactie/artikel/verwijder', supplierAuth, doe((req, res) => stuur(res, journalistiek.verwijderArtikel(code(req), (req.body || {}).id))));
+  app.post('/api/supplier/redactie/snel', supplierAuth, doe((req, res) => stuur(res, journalistiek.snel(code(req), req.body || {}, req.actor))));
+  app.post('/api/supplier/redactie/rubriek/bewaar', supplierAuth, doe((req, res) => stuur(res, journalistiek.rubriekBewaar(code(req), (req.body || {}).naam))));
+  app.post('/api/supplier/redactie/rubriek/verwijder', supplierAuth, doe((req, res) => stuur(res, journalistiek.rubriekWeg(code(req), (req.body || {}).naam))));
+  app.post('/api/supplier/redactie/huisstijl', supplierAuth, doe((req, res) => stuur(res, journalistiek.huisstijlBewaar(code(req), req.body || {}))));
+  app.post('/api/supplier/redactie/site/bewaar', supplierAuth, doe((req, res) => stuur(res, journalistiek.siteBewaar(code(req), (req.body || {}).design || req.body || {}))));
+  app.post('/api/supplier/redactie/assist', supplierAuth, doe(async (req, res) => {
+    try { res.json(await journalistiek.assist(code(req), req.body || {})); }
+    catch (e) { res.json({ chapo: '', koppen: [] }); }
+  }));
 
   // openbaar: de krant lezen
   app.post('/api/krant/gids', (req, res) => res.json({ lijst: journalistiek.krantGids() }));

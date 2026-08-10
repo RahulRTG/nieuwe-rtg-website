@@ -47,9 +47,20 @@ function herken(bronFeiten) {
     for (let i = 1; i < rijen.length; i++) {
       const poos = dagenTussen(rijen[i - 1].wanneer, rijen[i].wanneer);
       const a = rijen[i - 1].centen, b = rijen[i].centen;
-      /* Tien procent in gehele centen: verschil * 10 <= grootste, zodat er
-         geen drijvende komma aan te pas komt. */
-      if (poos < POOS_MIN || poos > POOS_MAX || Math.abs(a - b) * 10 > Math.max(a, b)) {
+      /* HET RITME bepaalt of dit een vaste post is, NIET het bedrag. Hier
+         stond eerst ook een tienprocentsmaat op het bedrag, en die deed twee
+         dingen tegelijk: hij groepeerde de reeks en hij mat de stijging.
+         Gevolg: precies waar de uitzondering voor bestaat -- een vaste last
+         die fors duurder wordt -- viel de reeks uit elkaar en zag niemand
+         iets. Een sportclub die van 25 naar 30 euro gaat was onzichtbaar,
+         een van 25 naar 27 niet. Dat is de verkeerde kant op.
+
+         Het bedrag doet nog wel mee als grofheidscontrole: hooguit een
+         factor vier uit elkaar, anders horen twee betalingen met toevallig
+         dezelfde omschrijving (een tikkie van vijf euro en een rekening van
+         vijfhonderd) niet in dezelfde reeks. In gehele centen, zodat er geen
+         drijvende komma aan te pas komt. */
+      if (poos < POOS_MIN || poos > POOS_MAX || Math.min(a, b) * 4 < Math.max(a, b)) {
         past = false;
         break;
       }

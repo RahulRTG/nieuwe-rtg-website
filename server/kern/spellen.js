@@ -92,7 +92,7 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
      hem via `ctx` en nieuwe ingangen (chat, projectie, Game Night) horen hem te
      gebruiken in plaats van de losse poorten opnieuw te bevragen. */
   const beleid = require('./spellen/beleid')({
-    wereldFout, leeftijdFout, progressieMag, GEEN_PROGRESSIE, ZICHT,
+    wereldFout, leeftijdFout, ZICHT,
     get SPEL() { return SPEL; }
   });
 

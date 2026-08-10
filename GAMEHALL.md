@@ -837,7 +837,7 @@ raakt nooit de spelmacht.
 | Magnaat | async, live | long play | bord + openbaar bezit | later | vlaggenschip (§12) |
 | Rummi | live, async | relaxed | tafel, niet de rekken | ja | |
 | Pesten | live | live | open kaart + aantallen | nee | |
-| Mens erger je niet | live | live, relaxed | volledig | nee | 2-tegen-2 |
+| Mens erger je niet | live, **async** | live, relaxed | volledig | nee | 2-tegen-2 |
 | Proost | party | — | spelstatus, niet de opdracht | nee | 18+, opdracht privé op de telefoon |
 | 30 Seconden | party | — | **score + klok, nooit de kaart** | nee | rollen: omschrijver/rader |
 | Doen of Waarheid | party | — | punten + wat, niet de kaart | nee | eigen privékaarten |
@@ -854,6 +854,14 @@ raakt nooit de spelmacht.
 De regel achter de kolom `publiek`: hij bevat wat iedereen in de kamer tóch al
 weet. Bij 30 Seconden is dat het hele punt van het spel — en de reden dat het
 zichtmodel van §6 vóór party mode af moet zijn.
+
+**Wat er na fase 0 werkelijk staat**, want de tabel hierboven is de bedoeling en
+niet de stand: zes spellen dragen `async` (schaken, dammen, Woordduel, Rummi,
+mens-erger-je-niet, Magnaat), vijftien hebben een `kijker` en tien een
+`publiek` (30 Seconden, schaken, Woordduel, Doen of Waarheid en de zes duels
+met een tussenstand: Quizduel, Flitsduel, Geheugenduel, Rangschikduel,
+Reactieduel en Schatduel). De rest van de kolommen — ranked, party-rollen,
+presentatie per scherm — bestaat nog niet en staat in fase 1 en verder.
 
 ---
 

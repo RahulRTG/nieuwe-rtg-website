@@ -3,7 +3,7 @@
    en opgeven. Krijgt de gedeelde context een keer bij het opstarten vanuit
    kern/spellen.js. */
 module.exports = (ctx) => {
-  const { db, save, crypto, codenaamVan, nu, S, SPEL, SOORTEN, nudge, ZICHT, ZETTEN, STATISCH, noteerUitslag, noteerZet, zijnVrienden, isGeblokkeerd, klok } = ctx;
+  const { db, save, crypto, codenaamVan, nu, S, SPEL, SOORTEN, nudge, ZICHT, ZETTEN, STATISCH, noteerUitslag, noteerZet, zijnVrienden, isGeblokkeerd, klok, beleid } = ctx;
   // het toernooi hangt aan dezelfde plek als de uitslag: zo is er geen tweede
   // moment waarop een ronde kan blijven hangen (late binding, zie spellen.js)
   const naPotje = (p) => { noteerUitslag(p); if (ctx.toernooiPotjeKlaar) ctx.toernooiPotjeKlaar(p); };
@@ -83,7 +83,7 @@ module.exports = (ctx) => {
         heeft geblokkeerd hoeft niet te dulden dat je zijn partij volgt. */
   function magKijken(mij, p) {
     if (p.spelers.includes(mij)) return 'Je speelt zelf mee in dit potje.';
-    if (!ZICHT[p.soort] || !ZICHT[p.soort].kijker) return 'Bij dit spel kun je niet meekijken.';
+    if (!beleid.magBekeken(p.soort)) return 'Bij dit spel kun je niet meekijken.';
     if (p.spelers.some(sp => isGeblokkeerd(mij, sp))) return 'Dit potje is niet beschikbaar.';
     if (p.spelers.some(sp => zijnVrienden(mij, sp))) return null;
     if (p.toernooi && ctx.toernooiHeeftSpeler && ctx.toernooiHeeftSpeler(p.toernooi, mij)) return null;

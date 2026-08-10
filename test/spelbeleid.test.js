@@ -116,27 +116,29 @@ test('de starter is de host, en de wachtrij levert er geen', async () => {
 
 /* ---------- het zicht is de bron voor "mag hier meegekeken worden" ---------- */
 
-test('meekijken en projecteren worden uit het zicht afgeleid, niet uit een vlag', () => {
+test('meekijken wordt uit het zicht afgeleid, niet uit een vlag', () => {
   const beleid = maakBeleid({
-    wereldFout: () => null, leeftijdFout: () => null, progressieMag: () => true,
-    GEEN_PROGRESSIE: '',
+    wereldFout: () => null, leeftijdFout: () => null,
     ZICHT: { schaak: { speler() {}, kijker() {}, publiek() {} }, seconden: { speler() {}, kijker: null, publiek() {} } },
     get SPEL() { return { schaak: {}, seconden: {} }; }
   });
   assert.equal(beleid.magBekeken('schaak'), true);
   assert.equal(beleid.magBekeken('seconden'), false, 'geen kijkweergave, dus niet te bekijken');
-  assert.equal(beleid.magGeprojecteerd('seconden'), true, 'wel te projecteren');
   assert.equal(beleid.magBekeken('kwartet'), false, 'een spel dat niet bestaat al helemaal niet');
 });
 
-test('bewaart() is grens.js en geen tweede leeftijdscontrole', () => {
-  let gevraagd = 0;
-  const beleid = maakBeleid({
-    wereldFout: () => null, leeftijdFout: () => null, ZICHT: {}, GEEN_PROGRESSIE: '',
-    progressieMag: (h) => { gevraagd++; return h === 'volwassen'; },
-    get SPEL() { return {}; }
-  });
-  assert.equal(beleid.bewaart('volwassen'), true);
-  assert.equal(beleid.bewaart('kind'), false);
-  assert.equal(gevraagd, 2, 'beide keren is het grens.js die antwoordt');
+test('de partij stelt die vraag ook echt HIER en niet zelf aan ZICHT', () => {
+  /* Anders zijn er weer twee plekken die hem beantwoorden, en dat is precies
+     wat deze laag moest opheffen. Gemeten via de echte kern: 30 Seconden heeft
+     geen kijkweergave, dus de poort hoort dicht te zitten. */
+  const o = opstelling();
+  const p = { id: 's1', soort: 'seconden', modus: 'teams', spelers: ['a', 'b', 'c', 'd'],
+    uitgenodigd: [], beurt: 0, teams: [0, 1, 0, 1], status: 'bezig', winnaar: null,
+    at: new Date().toISOString() };
+  require('../server/kern/spellen/register')({ save() {}, crypto: require('crypto'),
+    schud: (a) => a, beurtDoor() {}, codenaamVan: (x) => x, nudge() {} }).INITS.seconden(p);
+  o.db.data.spellen.potjes.s1 = p;
+  const r = o.kern.spelKijk('vriend', 's1');
+  assert.equal(r.status, 403);
+  assert.match(r.error, /niet meekijken/);
 });

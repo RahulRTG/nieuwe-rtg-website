@@ -30,7 +30,7 @@
    context van een potje wordt daarom gezet door de INGANG (de lobby weet of hij
    uit een chat of uit de Hall komt) en niet doorgegeven door de aanvrager. */
 module.exports = (ctx) => {
-  const { wereldFout, leeftijdFout, progressieMag, ZICHT, GEEN_PROGRESSIE } = ctx;
+  const { wereldFout, leeftijdFout, ZICHT } = ctx;
   const spel = (soort) => (ctx.SPEL || {})[soort];
 
   /* De contexten waarin een potje kan ontstaan. Een gesloten lijst, om dezelfde
@@ -67,17 +67,17 @@ module.exports = (ctx) => {
     return lf ? { status: 403, error: lf } : null;
   }
 
-  /* Blijft er iets van dit potje over? Niet een tweede leeftijdscontrole maar
-     dezelfde: grens.js is en blijft de enige plek waar dit staat. Hij zit hier
-     zodat een nieuwe ingang de vraag KAN stellen zonder grens.js te hoeven
-     kennen -- niet zodat hij een eigen antwoord krijgt. */
-  const bewaart = (wie) => progressieMag(wie);
+  /* Mag er bij dit spel meegekeken worden? Dat is nu dezelfde vraag als
+     "bestaat er een kijkweergave", en dat is de hele winst van zicht.js: er is
+     niets meer om apart aan of uit te zetten. `partij.js` stelt hem HIER en
+     niet zelf aan ZICHT -- anders zijn er weer twee plekken die hem
+     beantwoorden, en dat is precies wat deze laag moest opheffen.
 
-  /* Wat dit spel aan zicht toelaat. De vraag "mag hier meegekeken worden" is nu
-     dezelfde vraag als "bestaat er een kijkweergave", en dat is de hele winst
-     van zicht.js: er is niets meer om apart aan of uit te zetten. */
+     `magGeprojecteerd` en een `bewaart()` om `progressieMag` heen stonden hier
+     ook, en zijn eruit gehaald: ze hadden geen enkele aanroeper. Vooruit
+     gebouwde API is dode code die er als beleid uitziet. De projectievraag komt
+     terug zodra de projectiekamer er is (GAMEHALL.md §9), mét een aanroeper. */
   const magBekeken = (soort) => !!(ZICHT[soort] && ZICHT[soort].kijker);
-  const magGeprojecteerd = (soort) => !!(ZICHT[soort] && ZICHT[soort].publiek);
 
   /* Wat een ingang aan een potje mag meegeven. Bewust een functie en geen
      object dat de aanroeper zelf vult: zo is er een plek waar staat welke
@@ -92,5 +92,5 @@ module.exports = (ctx) => {
     };
   }
 
-  return { CONTEXTEN, contextVan, mag, magMeedoen, bewaart, magBekeken, magGeprojecteerd, roomVelden, GEEN_PROGRESSIE };
+  return { CONTEXTEN, contextVan, mag, magMeedoen, magBekeken, roomVelden };
 };

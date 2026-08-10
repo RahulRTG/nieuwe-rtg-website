@@ -21,6 +21,9 @@
      Daarom hier geen max-width: extra pixels horen extra RTG te tonen en niet
      bredere marges (WERKRUIMTE.md par. 8). */
   html,body{height:100%;margin:0;overflow:hidden;}
+  a.terugmobiel{display:inline-block;margin-top:.5rem;font-size:.76rem;
+    color:var(--rtg-soft);text-decoration:none;letter-spacing:.04em;}
+  a.terugmobiel:hover,a.terugmobiel:focus-visible{color:var(--rtg-goud);}
   .smal{position:fixed;inset:0;display:none;place-items:center;padding:2rem;text-align:center;}
   .smal p{max-width:22rem;color:var(--rtg-soft);line-height:1.6;font-size:.9rem;}
   .smal a{color:var(--rtg-goud);}
@@ -33,7 +36,11 @@
   }
 </style>
 </head>
-<body class="rtg-stijl" data-rtg-modus="pro">
+<!-- data-ios-uit: deze pagina IS de schil. Een hamburger met een app-menu zou
+     hier een tweede navigator naast de console zetten, en twee navigators is er
+     een te veel. De weg terug staat daarom expliciet in de console zelf; zonder
+     die link zou dit attribuut een uitweg zijn in plaats van een keuze. -->
+<body class="rtg-stijl" data-rtg-modus="pro" data-ios-uit>
 
 <div class="smal">
   <p><strong style="color:var(--rtg-txt);">RTG Workspace is voor een groot scherm.</strong><br>
@@ -48,6 +55,7 @@
     <div>
       <h1>RTG Command</h1>
       <div class="wie" id="wie">Rahul &middot; Nederland / RTG</div>
+      <a class="terugmobiel" href="/apps/app.html">&lsaquo; RTG Mobile</a>
     </div>
 
     <div class="blok">

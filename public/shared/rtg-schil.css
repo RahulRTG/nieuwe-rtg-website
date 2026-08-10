@@ -9,6 +9,11 @@
 
 .rtg-werkruimte{
   position:fixed;inset:0;
+  /* rtg-ui.css zet `body.rtg-stijl main{max-width:840px;margin:0 auto;padding:...}`
+     -- goed voor een leespagina, dodelijk voor een werkruimte. Zonder deze drie
+     regels stond de hele tafel als een kolom van 840px midden op een scherm van
+     1920 en bleef de rest zwart. Dit is geen smaakverschil maar precies wat
+     WERKRUIMTE.md par. 8 verbiedt: extra pixels horen extra RTG te tonen. */
   background:var(--rtg-bg);
   /* De gutter is geen decoratie: hij is wat maakt dat de surfaces als losse
      voorwerpen op een commandotafel liggen in plaats van als dichtgeplempt
@@ -17,9 +22,22 @@
   overflow:hidden;
 }
 
+/* Deze kiezer is met opzet zo zwaar. rtg-ui.css zet
+   `body.rtg-stijl main{max-width:840px;margin:0 auto;padding:...}` -- goed voor
+   een leespagina, dodelijk voor een werkruimte, en SPECIFIEKER dan een losse
+   klasse. Volgorde helpt daar niet tegen: een enkele .rtg-werkruimte verloor het
+   en de hele tafel stond als kolom van 840px midden op een scherm van 1920, met
+   de rest zwart. Precies wat WERKRUIMTE.md par. 8 verbiedt. */
+body.rtg-stijl main.rtg-werkruimte{max-width:none;margin:0;padding:0;}
+
 /* ------------------------------------------------------------- de surface -- */
 .rtg-surface{
   position:absolute;
+  /* border-box, want de schil zet width en height in pixels en dit huis zet
+     box-sizing niet globaal. Zonder dit telt de padding van de handle en de
+     rand er nog bij op en steekt elke surface een paar pixels buiten zijn eigen
+     vak -- de console werd 1086px hoog in een venster van 1080. */
+  box-sizing:border-box;
   display:flex;flex-direction:column;
   background:var(--rtg-card);
   border:1px solid var(--rtg-line);
@@ -81,7 +99,7 @@
 /* Bij het slepen naar een rand verschijnt de plek waar hij landt. Een voorstel
    dus, en geen sprong: je ziet waar hij heen gaat voordat je loslaat. */
 .rtg-dok{
-  position:absolute;pointer-events:none;
+  position:absolute;pointer-events:none;box-sizing:border-box;
   border:1px dashed rgba(201,162,75,.55);
   background:rgba(201,162,75,.07);
   border-radius:var(--rtg-rond-klein);
@@ -91,7 +109,7 @@
 
 /* ------------------------------------------------------------- de console -- */
 .rtg-console{
-  position:absolute;
+  position:absolute;box-sizing:border-box;
   display:flex;flex-direction:column;gap:.9rem;
   padding:1rem;
   background:var(--rtg-card);

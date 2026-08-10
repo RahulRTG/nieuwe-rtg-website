@@ -2667,6 +2667,37 @@ dat ook; een stap die doet alsof is erger dan een stap die eerlijk is.
 
 Getoetst in `test/werkindienst.test.js` (4). Vier mutaties, alle vier raak.
 
+#### "Dit project loopt achter. Waarom?"
+
+`POST /api/bedrijf/project/waarom` (`server/bedrijf/waarom.js`) is de vraag waar
+een dashboard normaal ophoudt en een mens begint met gokken. De hele waarde zit
+in wat hij weigert te doen.
+
+Elke bevinding is een geteld getal met de rijen erbij: taken over hun deadline,
+taken die wachten op werk dat nog niet af is, het budget (geschreven uren maal
+het uurtarief — geen schatting), mijlpalen waarvan de datum voorbij is. Wat een
+mens zelf als **risico** noteerde staat apart van de metingen: dat is een
+verwachting en geen waarneming, en door elkaar getoond krijgt het geheel de
+hardheid van het zwakste deel.
+
+**Het gedeelde patroon wordt gemeten met `kern/command/oorzaak.js`** — dezelfde
+module die RTG Command gebruikt; er komt geen tweede naast. Die zoekt zelf welk
+veld de gevallen het strakst clustert en zegt het als hij niets vindt. Eén ding
+is er wél naast gezet, met de reden erbij: die module slaat een veld over waarin
+*alle* gevallen dezelfde waarde hebben — in zijn eigen context (een storingslijst
+groeperen) onderscheidt dat niets, maar hier is "alle tien de late taken staan op
+naam van dezelfde persoon" juist het sterkste signaal dat er is. Dat is een
+andere vraag, geen tweede implementatie van dezelfde.
+
+**En wat dit huis niet weet, staat als niet gemeten.** Het voorbeeld dat bij deze
+vraag altijd valt is "de leverancier wacht" — en dat is precies iets wat hier
+nergens is vastgelegd: een project kent geen leverancier, en een taak kent geen
+externe blokkade, alleen "wacht op" naar een andere taak. Die regel verzinnen zou
+de rest van het antwoord waardeloos maken. Hij staat met naam bij `nietGemeten`,
+en dat is geen voorbehoud maar een werklijst.
+
+Getoetst in `test/werkwaarom.test.js` (5). Vier mutaties, alle vier raak.
+
 #### Gezondheid en de dagbriefing: één cijfer dat niet liegt
 
 `server/bedrijf/gezondheid.js` geeft één cijfer met de reden eronder —

@@ -97,7 +97,8 @@ module.exports = (sctx) => {
         aangenomen: besluiten.filter(b => b.status === 'aangenomen').length,
         teEvalueren: besluiten.filter(b => b.evalueerOp && b.evalueerOp <= dag()).length,
         evaluatiedatumVoorbijZonderUitkomst: besluiten.filter(b => b.status === 'aangenomen'
-          && b.evalueerOp && b.evalueerOp <= dag() && !(b.evaluaties || []).length).length };
+          && b.evalueerOp && b.evalueerOp <= dag() && !(b.evaluaties || []).length).length,
+        zonderKoppeling: besluiten.filter(b => !(Array.isArray(b.raakt) ? b.raakt : []).some(k => !k.terug)).length };
     } else niet.push({ blok: 'governance', reden: 'nog geen besluiten' });
 
     const it = Object.values(w.apparaten || {});

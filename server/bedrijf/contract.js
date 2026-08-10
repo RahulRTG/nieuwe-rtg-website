@@ -50,6 +50,14 @@ module.exports = (sctx) => {
     c.verplichtingen = Array.isArray(req.body.verplichtingen)
       ? req.body.verplichtingen.slice(0, 30).map(v => schoon(v, 200)).filter(Boolean) : (c.verplichtingen || []);
     c.vindplaats = schoon(req.body.vindplaats, 200) || c.vindplaats || null;
+    /* Land en afdeling staan OP HET CONTRACT en worden nergens afgeleid. Een
+       bedrijfsregel mag erop drempelen, en dan moet de waarde onbetwistbaar bij
+       dit contract horen -- afleiden uit de klant zou betekenen dat een contract
+       zonder klant stilzwijgend buiten elke landregel valt. Leeg = niet
+       ingevuld, en een regel die op dat veld drempelt, geldt dan NIET; dat staat
+       zo in regels.js en in het antwoord van /keuring. */
+    c.land = (schoon(req.body.land, 2) || c.land || '').toUpperCase() || null;
+    c.afdeling = schoon(req.body.afdeling, 40) || c.afdeling || null;
     C(g.w)[c.id] = c;
     /* Het bedrag ophogen is de makkelijkste weg om een bedrijfsregel te
        omzeilen: teken een contract van een euro en maak er daarna vijf miljoen

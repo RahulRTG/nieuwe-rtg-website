@@ -20,17 +20,25 @@
      besluit  -> WEIGERT. De stemronde sluiten lukt niet zolang een vereiste
                  goedkeuring ontbreekt; het besluit blijft in stemming staan.
 
-   ELKE SOORT DRAAGT ZIJN EIGEN VOORWAARDE, en meer vormen zijn er niet. Een
-   contract drempelt op een BEDRAG, een besluit op zijn SOORT. Dat is geen
-   regeltaal, en dat is met opzet: een taal in een configuratiebestand is een
-   tweede implementatie die je niet kunt toetsen -- dezelfde afweging die
-   kern/command/beleid.js maakt als hij getallen wel en regels niet in gegevens
-   zet. Komt er een derde plek bij, dan komt hij hier te staan EN in de code die
-   hem aanroept; die twee horen samen te bewegen. */
+   ELKE SOORT DRAAGT ZIJN EIGEN VOORWAARDE. Een contract drempelt op een BEDRAG
+   en mag daarnaast op LAND en AFDELING worden ingeperkt; een besluit op zijn
+   SOORT. Die extra twee lezen een veld van het contract ZELF en worden nergens
+   afgeleid -- uit de klant halen zou betekenen dat een contract zonder klant
+   stilzwijgend buiten elke landregel valt. En een leeg veld betekent NIET "past
+   overal op": dan geldt de regel gewoon niet, want de andere kant op zou een
+   landregel stil over alles heen leggen.
+
+   HET BLIJFT EEN VASTE LIJST VOORWAARDEN EN GEEN REGELTAAL. Elke voorwaarde die
+   erbij komt, staat in de code die hem LEEST -- een taal in een
+   configuratiebestand is een tweede implementatie die je niet kunt toetsen,
+   dezelfde afweging die kern/command/beleid.js maakt als hij getallen wel en
+   regels niet in gegevens zet. Komt er een derde plek of een vierde voorwaarde
+   bij, dan komt die hier te staan EN in de code die hem aanroept; die twee horen
+   samen te bewegen. */
 'use strict';
 
 const AFGEDWONGEN = {
-  contract: { voorwaarde: 'boven',
+  contract: { voorwaarde: 'boven', extra: ['land', 'afdeling'],
     waar: 'bij het activeren van een contract: zolang een vereiste goedkeuring ontbreekt, staat het op "wacht op goedkeuring" in plaats van actief' },
   besluit: { voorwaarde: 'besluitSoort',
     waar: 'bij het sluiten van de stemronde: zolang een vereiste goedkeuring ontbreekt, kan het besluit niet worden gesloten' }
@@ -47,7 +55,17 @@ module.exports = (sctx) => {
   function regelsVoor(w, soort, obj) {
     return Object.values(R(w)).filter(r => {
       if (r.soort !== soort) return false;
-      if (soort === 'contract') return Number(obj.waardeCenten || 0) > Number(r.bovenCenten || 0);
+      if (soort === 'contract') {
+        if (Number(obj.waardeCenten || 0) <= Number(r.bovenCenten || 0)) return false;
+        /* De extra voorwaarden zijn EN en ze lezen een veld van het contract
+           zelf. Een regel die een land of afdeling noemt terwijl het contract
+           dat veld leeg heeft, geldt NIET -- en dat is de veilige kant op: een
+           lege waarde als "past overal op" lezen, zou elke landregel stil over
+           alles heen leggen. /keuring zegt het met zoveel woorden. */
+        if (r.land && String(obj.land || '').toUpperCase() !== r.land) return false;
+        if (r.afdeling && String(obj.afdeling || '').toLowerCase() !== r.afdeling.toLowerCase()) return false;
+        return true;
+      }
       if (soort === 'besluit') return !r.besluitSoort || r.besluitSoort === obj.soort;
       return false;
     }).sort((a, b) => String(a.id).localeCompare(String(b.id)));
@@ -69,6 +87,10 @@ module.exports = (sctx) => {
     /* De voorwaarde hoort bij de soort. Een besluitregel met een bedrag erin zou
        een getal dragen dat nergens wordt gelezen -- en een instelling die niets
        doet is dezelfde leugen als een regel die niets tegenhoudt. */
+    const land = (schoon(req.body.land, 2) || '').toUpperCase() || null;
+    const afdeling = schoon(req.body.afdeling, 40) || null;
+    if ((land || afdeling) && plek.voorwaarde !== 'boven')
+      return res.status(400).json({ error: 'Land en afdeling zijn voorwaarden op een contract; een ' + soort + '-regel leest ze nergens.' });
     const besluitSoort = schoon(req.body.besluitSoort, 30) || null;
     if (besluitSoort && !sctx.BESLUITSOORTEN.includes(besluitSoort))
       return res.status(400).json({ error: 'Onbekende besluitsoort: ' + besluitSoort + '.' });
@@ -85,12 +107,15 @@ module.exports = (sctx) => {
     if (bestaand) r.historie.push({ was: { bovenCenten: r.bovenCenten, besluitSoort: r.besluitSoort, eist: r.eist }, door: g.l.naam, at: nu() });
     r.bovenCenten = plek.voorwaarde === 'boven' ? centenVan(req.body.boven) : null;
     r.besluitSoort = plek.voorwaarde === 'besluitSoort' ? besluitSoort : null;
+    r.land = plek.voorwaarde === 'boven' ? land : null;
+    r.afdeling = plek.voorwaarde === 'boven' ? afdeling : null;
     r.eist = eist;
     R(g.w)[id] = r;
     log(g.w, g.l, 'regel-gezet', id, soort + ': ' + eist.join(' + '));
     save();
     res.json({ ok: true, regel: r, afgedwongen: plek.waar,
-      let: 'Deze regel geldt vanaf nu. Wat al actief of gesloten is, wordt er NIET met terugwerkende kracht door teruggezet -- dat zou een lopende afspraak stilzwijgend openbreken. Hij bijt bij de eerstvolgende handeling.' });
+      let: 'Deze regel geldt vanaf nu. Wat al actief of gesloten is, wordt er NIET met terugwerkende kracht door teruggezet -- dat zou een lopende afspraak stilzwijgend openbreken. Hij bijt bij de eerstvolgende handeling.'
+        + ((land || afdeling) ? ' LET OP: deze regel noemt ' + [land ? 'land ' + land : null, afdeling ? 'afdeling ' + afdeling : null].filter(Boolean).join(' en ') + '. Een contract waarvan dat veld LEEG is, valt er niet onder -- een lege waarde wordt niet als "past overal op" gelezen.' : '') });
   });
 
   app.post('/api/bedrijf/regels', (req, res) => {

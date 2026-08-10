@@ -201,3 +201,42 @@ test('9. een regel draagt alleen de voorwaarde die zijn soort kent', async () =>
     besluitSoort: 'prijs', boven: 1000, eist: ['recht'] });
   assert.equal(metSoort.status, 400, 'en een contractregel drempelt niet op een besluitsoort');
 });
+
+/* LAND EN AFDELING ALS VOORWAARDE. Dit is de enige plek in deze laag waar een
+   regel op meer dan een bedrag drempelt. De gevaarlijke kant is een LEEG veld:
+   als "niet ingevuld" leest als "past overal op", ligt een landregel stil over
+   alle contracten heen. */
+test('10. een landregel geldt alleen voor contracten met DAT land', async () => {
+  const r = await api('/regel/zet', { werkruimte: W, beheerToken: B, soort: 'contract',
+    boven: 1000, land: 'BE', eist: ['geld.goedkeuren'] });
+  assert.equal(r.status, 200);
+  assert.match(r.body.let, /valt er niet onder/i, 'het antwoord waarschuwt voor het lege veld');
+
+  const be = (await api('/contract/zet', Object.assign({ titel: 'Belgisch vervoer',
+    wederpartij: 'Ardennen BV', soort: 'leverancier', waarde: 5000, land: 'BE' }, JU))).body.contract;
+  const nl = (await api('/contract/zet', Object.assign({ titel: 'Nederlands vervoer',
+    wederpartij: 'Veluwe BV', soort: 'leverancier', waarde: 5000, land: 'NL' }, JU))).body.contract;
+  const leeg = (await api('/contract/zet', Object.assign({ titel: 'Vervoer zonder land',
+    wederpartij: 'Ergens BV', soort: 'leverancier', waarde: 5000 }, JU))).body.contract;
+
+  const kBe = (await api('/keuring', Object.assign({ soort: 'contract', id: be.id }, JU))).body;
+  assert.ok(kBe.eist.includes('geld.goedkeuren'), 'het Belgische contract valt onder de regel');
+
+  const kNl = (await api('/keuring', Object.assign({ soort: 'contract', id: nl.id }, JU))).body;
+  assert.ok(!kNl.eist.includes('geld.goedkeuren'), 'het Nederlandse niet');
+
+  /* En het contract ZONDER land valt er ook niet onder -- maar dat wordt
+     GEMELD, want anders lijkt "geen regel" op "er is geen regel". */
+  const kLeeg = (await api('/keuring', Object.assign({ soort: 'contract', id: leeg.id }, JU))).body;
+  assert.ok(!kLeeg.eist.includes('geld.goedkeuren'), 'zonder land geldt de landregel niet');
+  assert.ok(kLeeg.nietVanToepassing.some(x => x.land === 'BE'),
+    'en dat staat er, met de reden erbij');
+  assert.match(kLeeg.nietVanToepassing[0].reden, /geen land/i);
+});
+
+test('11. land en afdeling bestaan alleen als voorwaarde op een contract', async () => {
+  const uit = await api('/regel/zet', { werkruimte: W, beheerToken: B, soort: 'besluit',
+    besluitSoort: 'prijs', land: 'BE', eist: ['geld.goedkeuren'] });
+  assert.equal(uit.status, 400, 'een besluitregel leest een land nergens');
+  assert.match(uit.body.error, /leest ze nergens/i);
+});

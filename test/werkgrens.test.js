@@ -29,7 +29,7 @@ const api = (pad, body) => fetch(BASE + '/api/bedrijf' + pad, {
   method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body || {})
 }).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
 
-let W, B, SAM, PIA, TICKET;
+let W, B, SAM, PIA, TICKET, RTG_TOKEN;
 
 test.before(async () => {
   ({ child, base: BASE } = await startServer({ env: { RTG_DATA_DIR: TMP, SMTP_URL: '' } }));
@@ -154,4 +154,78 @@ test('9. bij twee naamgenoten wordt er GEEN id gekozen', async () => {
      terugwerkende kracht omgegooid. */
   const mijn = (await api('/mijnwerk', PIA.cred)).body;
   assert.ok(mijn.gevonden.opId >= 1, 'de eerdere toewijzing blijft op id staan');
+});
+
+/* OPLOSSEN NA EIGEN KOPPELING. De verwijzing werd nooit opgelost; dat mag nu
+   wel, maar alleen met de identiteit van het LID -- zijn eigen, eenmalig
+   gekoppelde RTG-account -- en nooit met die van de werkruimte.
+
+   Deze drie toetsen gebruiken een ECHTE RTG-sessie. Een eerdere versie deed dat
+   niet en accepteerde 401 of 403; die kon dus niet zakken, en twee mutaties
+   sloegen er dan ook op af (LAT-regel 9). Nu bijt hij. */
+const metSessie = (pad, body, token) => fetch(BASE + '/api/bedrijf' + pad, {
+  method: 'POST',
+  headers: Object.assign({ 'Content-Type': 'application/json' },
+    token ? { Authorization: 'Bearer ' + token } : {}),
+  body: JSON.stringify(body || {})
+}).then(async r => ({ status: r.status, body: await r.json().catch(() => ({})) }));
+
+test('10. met een RTG-sessie maar ZONDER koppeling wordt er niets gelezen', async () => {
+  const inlog = await fetch(BASE + '/api/auth/login', { method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ login: 'roellie.i@gmail.com', password: 'Imran' }) }).then(r => r.json());
+  assert.ok(inlog.token, 'de demo-inlog werkt');
+  RTG_TOKEN = inlog.token;
+
+  await api('/herkomst/zet', Object.assign({ soort: 'ticket', id: TICKET.id,
+    ref: 'rtg://zaak/HOSHI' }, SAM.cred));
+
+  const uit = await metSessie('/herkomst/open',
+    Object.assign({ soort: 'ticket', id: TICKET.id }, SAM.cred), RTG_TOKEN);
+  assert.equal(uit.status, 200, 'de sessie komt binnen');
+  assert.equal(uit.body.opgelost, null, 'maar er is niets van de RTG-kant gelezen');
+  assert.match(uit.body.reden, /niet aan dit lidmaatschap gekoppeld/i,
+    'want dit lid heeft zijn RTG-account niet gekoppeld');
+});
+
+test('11. na de eigen koppeling wordt hij WEL opgelost', async () => {
+  const kop = await metSessie('/lid/koppel', SAM.cred, RTG_TOKEN);
+  assert.equal(kop.status, 200, 'Sam koppelt zijn eigen RTG-account');
+
+  const uit = await metSessie('/herkomst/open',
+    Object.assign({ soort: 'ticket', id: TICKET.id }, SAM.cred), RTG_TOKEN);
+  assert.equal(uit.status, 200);
+  assert.ok(uit.body.opgelost, 'nu komt er een titel mee');
+  assert.ok(uit.body.opgelost.titel, 'en die is niet leeg');
+  assert.match(uit.body.let, /met UW RTG-sessie/i, 'met wiens sessie hij is gelezen');
+  assert.match(uit.body.let, /bewaart hem niet/i, 'en dat de werkruimte hem niet bewaart');
+});
+
+test('12. een ANDERE RTG-sessie dan de gekoppelde lost niets op', async () => {
+  /* De tweede grendel: het is niet genoeg dat er EEN geldige RTG-sessie
+     meekomt, hij moet het account zijn dat DIT lid heeft gekoppeld. Zonder
+     deze toets kon die controle eruit zonder dat er iets rood werd -- de
+     eerdere versie gebruikte alleen de gekoppelde sessie en bewees dus niets. */
+  const reg = await fetch(BASE + '/api/auth/register', { method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name: 'Bram Jansen', email: 'bram-werkgrens@x.nl', phone: '0612345672',
+      password: 'geheim123', geboortedatum: '1992-02-02' }) }).then(r => r.json());
+  const ander = reg.token ? reg : await fetch(BASE + '/api/auth/login', { method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ login: 'bram-werkgrens@x.nl', password: 'geheim123' }) }).then(r => r.json());
+  assert.ok(ander.token, 'een tweede RTG-account is beschikbaar');
+
+  const uit = await metSessie('/herkomst/open',
+    Object.assign({ soort: 'ticket', id: TICKET.id }, SAM.cred), ander.token);
+  assert.equal(uit.status, 200);
+  assert.equal(uit.body.opgelost, null, 'met een vreemde sessie komt er niets mee');
+  assert.match(uit.body.reden, /niet het account dat aan dit lidmaatschap is gekoppeld/i);
+});
+
+test('13. het beheer-token lost nooit op, ook niet met een geldige sessie', async () => {
+  const uit = await metSessie('/herkomst/open',
+    { werkruimte: W, beheerToken: B, soort: 'ticket', id: TICKET.id }, RTG_TOKEN);
+  assert.equal(uit.status, 403, 'de werkgever opent deze deur niet');
+  assert.match(uit.body.let, /opent de werkgever de deur/i,
+    'met de reden waarom dat de kern van deze grens is');
 });

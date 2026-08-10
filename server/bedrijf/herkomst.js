@@ -13,9 +13,20 @@
    EN DE GRENS BLIJFT STAAN, DAAR GAAT DEZE MODULE VOORAL OVER.
 
    Een werkruimtelid is GEEN RTG-lid; dat zijn twee identiteiten, en dat is de
-   regel waar de hele bedrijfslaag op rust. Deze module lost een verwijzing
-   daarom NOOIT op: er wordt geen titel, geen status en geen enkel veld van de
-   RTG-kant opgehaald. Wat er wordt bewaard en getoond is de verwijzing zelf --
+   regel waar de hele bedrijfslaag op rust. De gewone leesroute lost een
+   verwijzing daarom NOOIT op: er wordt geen titel, geen status en geen enkel
+   veld van de RTG-kant opgehaald.
+
+   ER IS EEN TWEEDE ROUTE (/herkomst/open) DIE DAT WEL DOET, EN PRECIES DAAROM
+   STAAT DE GRENS ERIN. Hij vraagt een echte RTG-sessie, en die moet het account
+   zijn dat DIT lid eenmalig zelf koppelde (bedrijf/aansluiting.js, twee sleutels
+   van dezelfde persoon). Niet de werkgever opent de deur maar de medewerker; het
+   beheer-token komt er niet in, juist omdat het alle rechten draagt. Wie niet
+   koppelde ziet alleen de verwijzing, zoals daarvoor. En wat er gelezen wordt,
+   wordt NIET in de werkruimte bewaard: bij de volgende lezer gaat het opnieuw
+   langs diens eigen sessie, of niet. Dat `bedrijf` hierdoor `findSupplier` uit
+   de kern gebruikt, staat als besluit in GRENZEN.json -- de domeingrens sloeg
+   erop aan en dat hoort zo: een laag die verder reikt, schrijft dat op. Wat er wordt bewaard en getoond is de verwijzing zelf --
    de soort, het id, en welke app hem opent. Wie de inhoud wil zien, opent hem
    met zijn EIGEN RTG-sessie, en heeft die niet, dan ziet hij niets. Dat is
    precies het patroon van de Media OS: er reist alleen een id mee, en iedere
@@ -37,8 +48,22 @@
 
 const koppel = require('../kern/wereld/koppel');
 
+/* WELKE SOORTEN WORDEN OPGELOST, EN WAAROM ZO WEINIG. Oplossen betekent dat er
+   een titel van de RTG-kant meekomt, en dat mag alleen voor gegevens die dit
+   lid ook op de gewone manier zou zien. Een zaak draagt een openbare naam (hij
+   staat in de Mall), dus die kan. Voor alles wat NIET op deze lijst staat komt
+   er geen titel maar de reden -- en die lijst uitbreiden is per soort een eigen
+   afweging, geen vinkje. */
+const OPLOSBAAR = {
+  zaak: (kern, id) => {
+    const z = kern.findSupplier ? kern.findSupplier(id) : null;
+    return z ? { titel: z.name || z.code, sub: [z.type, z.city].filter(Boolean).join(' · ') } : null;
+  }
+};
+
 module.exports = (sctx) => {
-  const { app, save, schoon, nu, werkPoort, log, eigenVeld } = sctx;
+  const { app, save, schoon, nu, werkPoort, log, eigenVeld, kern } = sctx;
+  const { auth } = kern;
 
   /* Waar een herkomst op mag hangen. Bewust kort: dit zijn de twee soorten waar
      werk van buiten binnenkomt. Een verwijzing op alles toestaan zou een veld
@@ -81,6 +106,28 @@ module.exports = (sctx) => {
     res.json({ ok: true, soort, id: obj.id, herkomst: toon(ref) });
   });
 
+  /* De verwijzing OPLOSSEN mag alleen met de identiteit van het LID, en nooit
+     met die van de werkruimte. `auth` haalt de RTG-sessie uit de kop; die moet
+     bovendien dezelfde zijn als het account dat dit lid eenmalig koppelde
+     (bedrijf/aansluiting.js, twee sleutels van dezelfde persoon). Zo opent niet
+     de werkgever de deur maar de medewerker zelf -- wie niet koppelde, ziet
+     alleen de verwijzing, precies zoals daarvoor.
+
+     Dat `auth` hier voor de route hangt, betekent dat deze weg een RTG-sessie
+     VRAAGT. De route zonder oplossen blijft daarom bestaan; wie geen sessie
+     heeft, hoort niet buitengesloten te worden van zijn eigen ticket. */
+  function opgelostVoor(g, ref, sessieKey) {
+    const d = koppel.vorm(ref);
+    if (!d) return { mag: false, reden: 'geen geldige verwijzing' };
+    if (!g.l || !g.l.rtgKey) return { mag: false, reden: 'u heeft uw RTG-account niet aan dit lidmaatschap gekoppeld; zonder die koppeling wordt er niets van de RTG-kant gelezen' };
+    if (!sessieKey || sessieKey !== g.l.rtgKey) return { mag: false, reden: 'de meegestuurde RTG-sessie is niet het account dat aan dit lidmaatschap is gekoppeld' };
+    const lezer = OPLOSBAAR[d.soort];
+    if (!lezer) return { mag: false, reden: 'de soort "' + d.soort + '" wordt niet opgelost; dat is per soort een eigen afweging en geen vinkje' };
+    const uit = lezer(kern, d.id);
+    return uit ? { mag: true, titel: uit.titel, sub: uit.sub || null }
+      : { mag: false, reden: 'gekoppeld en toegestaan, maar dit object bestaat aan de RTG-kant niet (meer)' };
+  }
+
   app.post('/api/bedrijf/herkomst', (req, res) => {
     const soort = String(req.body.soort || '');
     if (!BAK[soort]) return res.status(400).json({ error: 'Een herkomst hangt aan: ' + Object.keys(BAK).join(', ') + '.' });
@@ -91,6 +138,29 @@ module.exports = (sctx) => {
       herkomst: obj.herkomst ? Object.assign({}, toon(obj.herkomst.ref),
         { door: obj.herkomst.door, at: obj.herkomst.at }) : null,
       let: obj.herkomst ? null : 'Dit ' + soort + ' heeft geen herkomst uit een andere RTG-app. Dat is geen ontbrekend gegeven maar een lege draad.' });
+  });
+
+  /* Dezelfde vraag, maar MET uw eigen RTG-sessie erbij. Alleen langs deze weg
+     komt er een titel van de andere kant mee. */
+  app.post('/api/bedrijf/herkomst/open', auth, (req, res) => {
+    const soort = String(req.body.soort || '');
+    if (!BAK[soort]) return res.status(400).json({ error: 'Een herkomst hangt aan: ' + Object.keys(BAK).join(', ') + '.' });
+    const g = werkPoort(req, res, RECHT[soort]); if (!g) return;
+    if (g.directie) return res.status(403).json({
+      error: 'Oplossen doet een lid met zijn eigen gekoppelde RTG-account, niet het beheer-token.',
+      let: 'Anders opent de werkgever de deur naar RTG-gegevens in plaats van de medewerker, en dat is precies de grens waar deze laag op rust.' });
+    const obj = eigenVeld(BAK[soort](g.w), String(req.body.id || ''));
+    if (!obj) return res.status(404).json({ error: 'Dat ' + soort + ' kennen we niet.' });
+    if (!obj.herkomst) return res.status(404).json({ error: 'Dit ' + soort + ' heeft geen herkomst.' });
+
+    const op = opgelostVoor(g, obj.herkomst.ref, req.session && req.session.key);
+    res.json({ ok: true, soort, id: obj.id,
+      herkomst: Object.assign({}, toon(obj.herkomst.ref), { door: obj.herkomst.door, at: obj.herkomst.at }),
+      opgelost: op.mag ? { titel: op.titel, sub: op.sub } : null,
+      reden: op.mag ? null : op.reden,
+      let: op.mag
+        ? 'Deze titel is gelezen met UW RTG-sessie, niet met die van de werkruimte. De werkruimte bewaart hem niet: bij de volgende lezer wordt hij opnieuw met diens eigen sessie opgehaald, of niet.'
+        : 'Er is niets van de RTG-kant gelezen. De verwijzing staat er wel; u opent hem zelf in de andere app.' });
   });
 
   return { herkomstToon: toon };

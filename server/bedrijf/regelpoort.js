@@ -149,7 +149,15 @@ module.exports = (sctx) => {
       vervallen: (obj.goedkeuringen || []).filter(k => k.vervallen)
         .map(k => ({ naam: k.naam, recht: k.recht, reden: k.vervallen.reden })),
       regels: s.regels.map(r => ({ id: r.id, bovenEuro: r.bovenCenten == null ? null : r.bovenCenten / 100,
-        besluitSoort: r.besluitSoort || null, eist: r.eist })),
+        besluitSoort: r.besluitSoort || null, land: r.land || null, afdeling: r.afdeling || null,
+        eist: r.eist })),
+      /* Welke regels NIET golden omdat dit contract het veld leeg heeft. Zonder
+         deze regel lijkt "geen regel van toepassing" op "er is geen regel", en
+         dat is precies het verschil dat een landregel waardeloos maakt. */
+      nietVanToepassing: Object.values(sctx.REGELS(g.w))
+        .filter(r => r.soort === 'contract' && ((r.land && !obj.land) || (r.afdeling && !obj.afdeling)))
+        .map(r => ({ id: r.id, land: r.land || null, afdeling: r.afdeling || null,
+          reden: 'dit contract heeft ' + (r.land && !obj.land ? 'geen land' : 'geen afdeling') + ' ingevuld' })),
       let: s.regels.length ? null : 'Dit ' + soort + ' valt onder geen enkele regel.' });
   });
 

@@ -130,30 +130,9 @@ module.exports = (sctx) => {
       let: b.bezwaren.length ? 'De ' + b.bezwaren.length + ' bezwaar/bezwaren blijven bij dit besluit staan; bij de evaluatie is dat het eerste wat je wilt lezen.' : null });
   });
 
-  app.post('/api/bedrijf/besluiten', (req, res) => {
-    const g = werkPoort(req, res, 'besluit'); if (!g) return;
-    const rijen = Object.values(B(g.w))
-      .filter(b => !req.body.status || b.status === String(req.body.status))
-      .map(b => ({ id: b.id, titel: b.titel, soort: b.soort, status: b.status, eigenaar: b.eigenaar,
-        telling: telling(b), bezwaren: b.bezwaren.length, evalueerOp: b.evalueerOp,
-        evaluatieTeGaan: b.evalueerOp ? Math.round((Date.parse(b.evalueerOp) - Date.parse(dag())) / 86400000) : null }));
-    res.json({ ok: true, aantal: rijen.length, besluiten: rijen,
-      teEvalueren: rijen.filter(b => b.evaluatieTeGaan != null && b.evaluatieTeGaan <= 0) });
-  });
-
-  sctx.startBron('goedkeuringen', 'besluit', (g) => {
-    const alle = Object.values(B(g.w));
-    /* `zonderUitkomst` is de scherpe van de drie: een evaluatiedatum die is
-       verstreken terwijl er niets is opgeschreven, is precies het geval waarin
-       een besluit "geëvalueerd" heet zonder dat iemand heeft teruggekeken. Hij
-       staat apart van `teEvalueren` (die telt ook wat vandaag aan de beurt is)
-       zodat het verschil tussen "nog doen" en "blijven liggen" zichtbaar is. */
-    return { inAdvies: alle.filter(b => b.status === 'advies').length,
-      teStemmen: alle.filter(b => b.status === 'stemmen' && !b.stemmen.some(s => s.lidId === g.l.id)).length,
-      teEvalueren: alle.filter(b => b.evalueerOp && b.evalueerOp <= dag()).length,
-      zonderUitkomst: alle.filter(b => b.status === 'aangenomen' && b.evalueerOp && b.evalueerOp <= dag()
-        && !(b.evaluaties || []).length).length };
-  });
+  /* De lijst en de startbron staan in ./besluitlijst.js -- dit bestand ging
+     over de 10 kB van keuringsregel 13, en de naad is echt: hier wordt besloten,
+     daar wordt geteld. */
 
   return { BESLUITSOORTEN: SOORTEN, BESLUITEN: B };
 };

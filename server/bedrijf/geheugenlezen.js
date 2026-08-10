@@ -85,5 +85,28 @@ module.exports = (sctx) => {
       .sort((a, b2) => String(b2.at).localeCompare(String(a.at)));
   }
 
+  /* ---------- welke besluiten gaan nergens over ----------
+     Het besluitgeheugen begint op de dag dat het gebouwd is: alles van daarvoor
+     draagt geen koppelingen. Die schuld hoort ZICHTBAAR te zijn in het product
+     en niet alleen in een takenlijst, want daar kijkt niemand die aan het werk
+     is. Wat hier NIET gebeurt is raden: er is geen tekstzoeker die de
+     onderbouwing afspeurt naar namen van klanten en contracten. Dan koppelt de
+     machine een besluit aan een klant omdat de naam toevallig in een zin staat,
+     en dat bederft een geheugen in plaats van het te vullen. Een koppeling is
+     een uitspraak van een mens die erbij was. */
+  app.post('/api/bedrijf/besluiten/zonder-koppeling', (req, res) => {
+    const g = werkPoort(req, res, 'besluit'); if (!g) return;
+    const rijen = Object.values(B(g.w))
+      .filter(b => !(Array.isArray(b.raakt) ? b.raakt : []).some(k => !k.terug))
+      .map(b => ({ id: b.id, titel: b.titel, soort: b.soort, status: b.status,
+        eigenaar: b.eigenaar, at: b.at,
+        ingetrokkenKoppelingen: (Array.isArray(b.raakt) ? b.raakt : []).filter(k => k.terug).length }))
+      .sort((a, b2) => String(b2.at).localeCompare(String(a.at)));
+    res.json({ ok: true, aantal: rijen.length, besluiten: rijen,
+      let: rijen.length
+        ? 'Deze besluiten gaan volgens de administratie nergens over. Voor alles van voor het besluitgeheugen is dat geen fout maar een gat -- leg de koppeling met /api/bedrijf/besluit/raakt, maar alleen als u weet waar het over ging. Er wordt hier niets geraden: een besluit dat de machine aan een klant koppelt omdat de naam in een zin staat, bederft dit geheugen.'
+        : 'Elk besluit is aan minstens een object gekoppeld.' });
+  });
+
   return { besluitenOver };
 };

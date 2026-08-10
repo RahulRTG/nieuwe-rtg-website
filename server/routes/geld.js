@@ -61,14 +61,22 @@ module.exports = (kern) => {
 
   /* Een keer per verzoek van sleutel naar codenaam, zoals geldwereld het doet.
      De try bestaat omdat een omgevallen kernlaag anders als kale 500 zonder
-     lichaam bij het lid belandt; de fout blijft zichtbaar in de serverlog. */
-  function route(pad, werk) {
-    app.post('/api/geld/' + pad, auth, (req, res) => {
-      if (geenGast(req, res)) return;
-      try { stuur(res, werk(kern.codenaamVan(req.session.key), req.body || {})); }
-      catch (e) { res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
-    });
-  }
+     lichaam bij het lid belandt; de fout blijft zichtbaar in de serverlog.
+
+     ELK PAD STAAT HIERONDER VOLUIT, en dat is geen omslachtigheid. Hier stond
+     `app.post('/api/geld/' + pad, ...)` met een lus eromheen, en dat leest
+     prettig -- maar scripts/schakelbaar.js zoekt LETTERLIJKE paden om te
+     tellen welke routes vanuit de boardroom te schakelen zijn. Een pad dat
+     met een plus wordt gebouwd, ziet die census niet: de routes waren
+     onzichtbaar, en onzichtbaar betekent hier dat niemand ze kan uitzetten,
+     per stad kan sluiten of door de storingswachter kan laten afknijpen. Wat
+     je niet kunt tellen, kun je niet besturen. Dus: de vorm die meetbaar is
+     wint van de vorm die kort is. Hetzelfde geldt in routes/leven.js. */
+  const doe = (werk) => (req, res) => {
+    if (geenGast(req, res)) return;
+    try { stuur(res, werk(kern.codenaamVan(req.session.key), req.body || {})); }
+    catch (e) { res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
+  };
 
   /* Het command center: exact het beeld dat kern/geldgraaf samenstelt, met
      alleen ok erbij. Hier wordt niets bijgerekend -- een tweede rekenlaag in
@@ -82,17 +90,17 @@ module.exports = (kern) => {
   /* Beleid en potten. De kern logt elk van deze handelingen zelf met
      wie 'lid' in het append-only actielog: via deze routes handelt altijd het
      lid, en het log mag het lid en Rahul nooit door elkaar halen. */
-  route('beleid', (c) => ({ status: 200, ok: true,
-    regels: kern.geldbeleid.regels(c), potten: kern.geldbeleid.potten(c) }));
-  route('beleid/zet', (c, b) => kern.geldbeleid.regelZet(c, b));
-  route('pot/zet', (c, b) => kern.geldbeleid.potZet(c, b));
+  app.post('/api/geld/beleid', auth, doe((c) => ({ status: 200, ok: true,
+    regels: kern.geldbeleid.regels(c), potten: kern.geldbeleid.potten(c) })));
+  app.post('/api/geld/beleid/zet', auth, doe((c, b) => kern.geldbeleid.regelZet(c, b)));
+  app.post('/api/geld/pot/zet', auth, doe((c, b) => kern.geldbeleid.potZet(c, b)));
   // centen mag negatief zijn: dat geeft een oormerk vrij; de kern bewaakt de nulgrens
-  route('pot/reserveer', (c, b) => kern.geldbeleid.potReserveer(c, String(b.id || ''), b.centen));
+  app.post('/api/geld/pot/reserveer', auth, doe((c, b) => kern.geldbeleid.potReserveer(c, String(b.id || ''), b.centen)));
   /* opruimen hoort erbij: zonder deze route belooft de foutmelding bij
      veertig regels een handeling die niet bestaat (LAT.md regel 6) */
-  route('beleid/weg', (c, b) => kern.geldbeleid.regelWeg(c, String(b.id || '')));
-  route('pot/weg', (c, b) => kern.geldbeleid.potWeg(c, String(b.id || '')));
-  route('actielog', (c) => ({ status: 200, ok: true, log: kern.geldbeleid.log(c) }));
+  app.post('/api/geld/beleid/weg', auth, doe((c, b) => kern.geldbeleid.regelWeg(c, String(b.id || ''))));
+  app.post('/api/geld/pot/weg', auth, doe((c, b) => kern.geldbeleid.potWeg(c, String(b.id || ''))));
+  app.post('/api/geld/actielog', auth, doe((c) => ({ status: 200, ok: true, log: kern.geldbeleid.log(c) })));
 
   /* De gegronde Rahul staat in een eigen bestand: antwoorden (AI plus het
      rekenende terugvalpad) is meer dan vertalen, en dat hoort niet tussen de

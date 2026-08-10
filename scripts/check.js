@@ -650,6 +650,12 @@ console.log('\n16) elk leden-pad met een derde partij gaat langs de gegevenspoor
     ['/api/huur/sos', 'noodknop tijdens een lopende huur -- hier NOOIT iets vragen'],
     ['/api/verkoop/teken', 'het contract van een deal die al loopt tekenen'],
     ['/api/asset/koop', 'RTG Shared Assets is van RTG zelf; er staat geen derde tegenover'],
+    /* Een pot is een OORMERK binnen het eigen tegoed en geen reservering bij
+       iemand: er beweegt geen geld en er staat geen partij tegenover (GELD.md
+       par. 3). Het woord "reserveer" is hier de valse vriend. Deze route werd
+       zichtbaar toen de geldpaden voluit kwamen te staan (regel 45); daarvoor
+       zag deze regel hem niet, en dat is precies waarom die vorm is verboden. */
+    ['/api/geld/pot/reserveer', 'een oormerk in het eigen tegoed; geen derde partij en geen geldbeweging'],
     /* De kraam van het Podium: de verkoper is een ander LID in dezelfde
        uitzending, en het contact loopt over de kanaalchat op codenaam. RTG
        bezorgt hier niets, vraagt geen adres en zet geen koerier in beweging --
@@ -2667,6 +2673,79 @@ console.log('\n44) elke app staat in precies een wereld op het beginscherm');
     else ok(items.length + ' items over ' + (blok[1].match(/sleutel:/g) || []).length +
       ' werelden: geen enkele staat er twee keer in');
   }
+}
+
+/* 45) ELK ROUTEPAD STAAT VOLUIT.
+
+   Waarom dit een eigen regel is, en geen smaak. scripts/schakelbaar.js telt
+   welke routes vanuit de boardroom te schakelen zijn door de bron af te lezen
+   op letterlijke paden. Wie zijn pad met een plus bouwt --
+   `app.post('/api/geld/' + pad, ...)` in een lus -- is voor die census
+   ONZICHTBAAR. En onzichtbaar is hier erger dan ongedekt: een ongedekte route
+   staat in de zakkerlijst, een onzichtbare route bestaat niet en niemand mist
+   hem. Hij is er gewoon, altijd, voor iedereen, en geen knop in de boardroom
+   raakt hem.
+
+   Dat is hier echt gebeurd, met acht geldroutes en twee levensroutes tegelijk.
+   Het viel pas op doordat de twee LOSSE routes in dezelfde bestanden wel
+   zichtbaar waren en als ongedekt gemeld werden; waren die er niet geweest,
+   dan had niets geklaagd. Een meter met een blinde vlek is geen meter, dus
+   staat de vorm die meetbaar is nu vast (LAT.md regel 3).
+
+   Wat wel mag: een pad met een express-parameter (:id) of een regexp. Die
+   staan nog steeds voluit als tekst en zijn dus gewoon te tellen. */
+console.log('\n45) elk routepad staat voluit, zodat de schakelkast ze kan tellen');
+{
+  const lees = (f) => { try { return fs.readFileSync(f, 'utf8'); } catch (e) { return ''; } };
+  const bouwers = [];
+  let bekeken = 0;
+  loop(path.join(ROOT, 'server'), /\.js$/, (f) => {
+    const s = zonderCommentaar(lees(f));
+    if (!/app\.(get|post|put|delete|patch|all)\s*\(/.test(s)) return;
+    bekeken++;
+    /* een routeaanroep waarvan het eerste argument met een string BEGINT en
+       daarna doorloopt met een plus: dat is precies de vorm die de census
+       niet ziet */
+    for (const m of s.matchAll(/app\.(?:get|post|put|delete|patch|all)\s*\(\s*'([^']*)'\s*\+/g)) {
+      bouwers.push(path.relative(ROOT, f) + ": '" + m[1] + "' + ...");
+    }
+    // en de vorm zonder enige letterlijke tekst: app.post(pad, ...)
+    for (const m of s.matchAll(/app\.(?:get|post|put|delete|patch|all)\s*\(\s*([A-Za-z_$][\w$]*)\s*,/g)) {
+      bouwers.push(path.relative(ROOT, f) + ': app.post(' + m[1] + ', ...)');
+    }
+  });
+  /* DE SCHULD DIE ER AL LAG, met naam en toenaam. Deze regel vond negentien
+     bestanden die hun paden opbouwen -- niet als besluit maar door optelling,
+     precies zoals scripts/schakelbaar.js het beschrijft voor de catalogus.
+     Ze in een keer openbreken is een aparte klus met een eigen risico; ze
+     stilzwijgend doorlaten is hoe de vlek is ontstaan.
+
+     Dus staat de lijst hier, en hij mag ALLEEN KRIMPEN. Een nieuw bestand dat
+     paden opbouwt zakt meteen; een bestand dat wordt opgeruimd hoort van deze
+     lijst af (de regel zegt zelf wanneer dat kan). Zelfde afspraak als de
+     BUITEN-lijst in schakelbaar.js, met een belangrijk verschil dat er ook bij
+     hoort te staan: die lijst bevat KEUZES, deze bevat SCHULD. */
+  const BEKEND = new Set([
+    'server/opzet/poortwachters.js', 'server/routes/alpine.js', 'server/routes/baby.js',
+    'server/routes/gebouw.js', 'server/routes/journalistiek.js', 'server/routes/kantoorpakket.js',
+    'server/routes/leren.js', 'server/routes/marina.js', 'server/routes/member/bureau.js',
+    'server/routes/member/lifestyle.js', 'server/routes/member/pulse.js',
+    'server/routes/member/rechterhand.js', 'server/routes/member/rendezvous.js',
+    'server/routes/spellen.js', 'server/routes/supplier/creator.js', 'server/routes/tiener.js',
+    'server/routes/welzijn.js', 'server/routes/werkplek-bureaus.js', 'server/routes/zorgwallet.js'
+  ]);
+  const nieuwe = bouwers.filter(b => !BEKEND.has(b.split(':')[0]));
+  const schoongemaakt = [...BEKEND].filter(f => !bouwers.some(b => b.split(':')[0] === f));
+
+  if (!bekeken) fout('geen enkel bestand met routes gevonden; deze regel meet dan niets');
+  else if (nieuwe.length) {
+    for (const b of nieuwe) fout('NIEUW routepad wordt opgebouwd en is onzichtbaar voor de schakelkast -- ' + b);
+  } else if (schoongemaakt.length) {
+    /* Geen fout maar een opdracht: wie een bestand opruimt, haalt hem ook van
+       de lijst. Anders slijt de lijst tot een verzameling namen die niets meer
+       zegt, en dan is de ratel geen ratel meer. */
+    fout('deze bestanden bouwen geen paden meer op; haal ze uit BEKEND in deze regel: ' + schoongemaakt.join(', '));
+  } else ok(bekeken + ' bestanden met routes; geen nieuwe opbouwers, ' + BEKEND.size + ' bekende resteren');
 }
 
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');

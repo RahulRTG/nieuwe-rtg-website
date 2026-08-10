@@ -61,7 +61,20 @@ module.exports = (ctx) => {
     else if (a.actie === 'modus') { _operationeelZet(true, wie); res = _modusZet(a.modus, wie); }
     else res = { ok: true };
     b.autorisatie = null; save();
-    return { ok: true, uitgevoerd: a.actie, modus: d().modus, operationeel: d().operationeel, aangevraagdDoor: a.door, bevestigdDoor: wie, ...(res && res.error ? { fout: res.error } : {}) };
+    /* EEN MISLUKTE UITVOERING IS GEEN GESLAAGDE BEVESTIGING. Hier stond
+       `return { ok: true, ..., fout: res.error }`: de tweede persoon kreeg 200
+       en de reden waarom er niets was gebeurd stond als los veldje ernaast, waar
+       geen enkele aanroeper naar keek. De stand bleef staan, het scherm zei
+       "bevestigd", en de autorisatie was op. Dat viel pas op toen de
+       vergunningsgrendel in _modusZet een weigering ging teruggeven -- daarvoor
+       kon _modusZet alleen falen op "nog niet operationeel", en dat zet
+       _operationeelZet er een regel eerder net zelf aan.
+
+       De autorisatie wordt WEL opgebruikt: een toestemming geldt voor die ene
+       poging, en na een weigering hoort er een nieuwe aanvraag te komen in
+       plaats van een tweede kans op dezelfde handtekening. */
+    if (res && res.error) return { status: res.status || 409, error: res.error, uitgevoerd: null, aangevraagdDoor: a.door, bevestigdDoor: wie };
+    return { ok: true, uitgevoerd: a.actie, modus: d().modus, operationeel: d().operationeel, aangevraagdDoor: a.door, bevestigdDoor: wie };
   }
   function status() { return { ok: true, autorisatie: pub(d().autorisatie) }; }
   function annuleer({ wie } = {}) { d().autorisatie = null; save(); return { ok: true, wie: wie || 'boardroom' }; }

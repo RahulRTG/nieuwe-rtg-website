@@ -60,14 +60,46 @@ module.exports = (ctx) => {
      batch-voorcontrole als elke bulkbetaling. */
   app.post('/api/office/bank/salaris/voorstel', officeAuth, (req, res) => veilig(res, () =>
     bank.bankSalarisVoorstel({ zaak: req.body.zaak })));
+  /* DE SALARISRUN LOOPT VIA DE LOONRUN, EN NERGENS OMHEEN.
+
+     Hier stond: haal het voorstel uit de geklokte uren en betaal die posten
+     uit. Die posten waren BRUTO -- uren x uurloon -- dus er ging loon de deur
+     uit zonder ingehouden loonheffing, zonder loonstrook, zonder vier ogen en
+     zonder aangifte. Ondertussen maakt kern/payroll precies het goede bestand
+     (netto per persoon, alleen uit een DEFINITIEVE run, met twee controles op
+     het totaal) en betaalde niemand het uit. Twee administraties van hetzelfde
+     loon, en de verkeerde had de knop.
+
+     Nu levert de loonrun de BEDRAGEN en de bank de BESTEMMINGEN: de payroll
+     kent staffId's en netto's, de bank weet welk personeelslid aan welk
+     RTG-lid hangt en welke rekening dat lid heeft. Elk levert wat hij echt
+     weet, en niemand rekent het werk van de ander na. */
   app.post('/api/office/bank/salaris/run', officeAuth, async (req, res) => {
-    const v = bank.bankSalarisVoorstel({ zaak: req.body.zaak });
-    if (v.error) { veilig(res, () => v); return; }
-    if (!v.posten.length) { veilig(res, () => ({ status: 400, error: 'Geen uitbetaalbare posten: niemand met geklokte uren en een gekoppelde betaalrekening.' })); return; }
-    const r = await bank.bankSalarisRun({ vanIban: String(req.body.vanIban || ''), posten: v.posten });
+    const runId = String((req.body || {}).runId || '');
+    if (!runId) { veilig(res, () => ({ status: 400,
+      error: 'Een salarisrun betaalt een definitieve loonrun uit; geef de runId mee. Uitbetalen op geklokte uren zou het brutoloon overmaken.' })); return; }
+    const run = kern.payrollOS.run.haal(runId);
+    if (!run) { veilig(res, () => ({ status: 404, error: 'Die loonrun bestaat niet.' })); return; }
+
+    const reks = bank.bankSalarisRekeningen({ zaak: run.code });
+    if (reks.error) { veilig(res, () => reks); return; }
+    /* Het betaalbestand controleert zelf of de run definitief is en of het
+       totaal klopt met de run en met het loonjournaal. Die controles hier
+       overdoen zou een tweede oordeel opleveren dat kan afwijken; dit is er
+       een dat kan weigeren, en dan gaat er niets. */
+    const best = kern.payrollOS.journaal.betaalbestand(run, reks.rekeningen);
+    if (best.error) { veilig(res, () => best); return; }
+    const bestand = best.bestand;
+    if (!bestand.posten.length) { veilig(res, () => ({ status: 400, error: 'Niemand met een netto bedrag om uit te betalen.' })); return; }
+
+    const posten = bestand.posten.map(p => ({ naarIban: p.iban, centen: p.centen, oms: 'Salaris ' + run.periode }));
+    const r = await bank.bankSalarisRun({ vanIban: String(req.body.vanIban || ''), posten });
     veilig(res, () => {
-      if (r.ok) { afdelingen.audit(naam(req), 'Salarisrun ' + v.zaak + ' (' + v.maand + '): ' + r.geboekt + ' loonbetaling(en), € ' + (r.totaalCenten / 100).toFixed(2)); sync(); }
-      return r.ok ? { ...r, zaak: v.zaak, maand: v.maand, zonderRekening: v.zonderRekening } : r;
+      if (r.ok) { afdelingen.audit(naam(req), 'Salarisrun ' + run.code + ' (' + run.periode + ') uit loonrun ' + run.id + ': ' +
+        r.geboekt + ' netto loonbetaling(en), € ' + (r.totaalCenten / 100).toFixed(2)); sync(); }
+      return r.ok ? { ...r, zaak: run.code, periode: run.periode, runId: run.id,
+        betaalbestandId: bestand.id, terugtevorderenCenten: bestand.terugtevorderenCenten,
+        zonderKoppeling: reks.zonderRekening } : r;
     });
   });
 

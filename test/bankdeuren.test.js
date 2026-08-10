@@ -58,11 +58,22 @@ const KANTOOR = [
   '/api/office/bank/afschrift', '/api/office/bank/rente', '/api/office/bank/krediet',
   '/api/office/bank/krediet/besluit', '/api/office/bank/salaris/voorstel',
   '/api/office/bank/salaris/run', '/api/office/bank/incasso',
-  '/api/office/bank/regels', '/api/office/bank/regels/update', '/api/office/bank/regels/check'
+  '/api/office/bank/regels', '/api/office/bank/regels/update', '/api/office/bank/regels/check',
+  /* De rail-reconciliatie en de bevoegdheidsmatrix. Twee ervan bieden een
+     betaalopdracht opnieuw aan de rail aan, en dat is geld in beweging -- ze
+     staan daarom ook in de GELD-lijst van toets 6. */
+  '/api/office/bank/opdrachten', '/api/office/bank/opdrachten/ronde',
+  '/api/office/bank/opdrachten/opnieuw', '/api/office/bank/bevoegdheid',
+  '/api/office/bank/partnerrail'
 ];
 const BOARDROOM = [
   '/api/office/bank/modus', '/api/office/bank/draai', '/api/office/bank/operationeel',
-  '/api/office/bank/autoriseer/bevestig', '/api/office/bank/autoriseer/annuleer'
+  '/api/office/bank/autoriseer/bevestig', '/api/office/bank/autoriseer/annuleer',
+  /* De vergunning staat hier en de matrix ernaast bij het kantoor: LEZEN wat er
+     mag hoort bij het werk, VASTLEGGEN wat er is afgegeven hoort bij een
+     persoon. Met de gedeelde code zou het huis zichzelf een bankvergunning
+     kunnen geven, en daarmee de eigen rails opendraaien. */
+  '/api/office/bank/vergunning'
 ];
 
 test.before(async () => {
@@ -97,7 +108,7 @@ test.after(() => {
    stilletjes leeglopen; vandaar de telling. */
 test('1. geen enkel bank-endpoint staat open zonder inlog (en ze bestaan allemaal)', async () => {
   const alle = KANTOOR.concat(BOARDROOM);
-  assert.equal(alle.length, 25, 'de deurenlijst is compleet; loopt hij leeg, dan bewijzen 5 en 6 niets meer');
+  assert.equal(alle.length, 31, 'de deurenlijst is compleet; loopt hij leeg, dan bewijzen 5 en 6 niets meer');
   for (const pad of alle) {
     const r = await api(pad, {}, null);
     assert.equal(r.status, 401, pad + ' hoort 401 te geven zonder token (kreeg ' + r.status + ')');
@@ -117,10 +128,11 @@ test('2. een gewoon lid komt nergens bij de bank', async () => {
   }
 });
 
-/* De vijf zwaarste knoppen staan achter de boardroom: de bankmodus omzetten,
-   de bank terugdraaien, hem operationeel verklaren, en een autorisatie
-   bevestigen of annuleren. De gedeelde kantoorcode is daar nadrukkelijk niet
-   genoeg -- die is geen persoon, en bij deze knoppen wil je weten wie. */
+/* De zes zwaarste knoppen staan achter de boardroom: de bankmodus omzetten,
+   de bank terugdraaien, hem operationeel verklaren, een autorisatie bevestigen
+   of annuleren, en de vergunning vastleggen. De gedeelde kantoorcode is daar
+   nadrukkelijk niet genoeg -- die is geen persoon, en bij deze knoppen wil je
+   weten wie. */
 test('3. de gedeelde kantoorcode komt de boardroom niet in', async () => {
   for (const pad of BOARDROOM) {
     const r = await api(pad, {}, office);
@@ -158,14 +170,18 @@ test('5. de kantoorcode komt bij de kantoor-endpoints door de deur', async () =>
     'zit er ineens een achter een strengere deur, dan is dat een verbetering die hier hoort te staan');
 });
 
-/* Vijf van die kantoor-endpoints VERPLAATSEN GELD of verlenen krediet. Dat ze
+/* Zeven van die kantoor-endpoints VERPLAATSEN GELD of verlenen krediet. Dat ze
    met de gedeelde code bereikbaar zijn is een risico dat we hier alleen
    vastleggen; het besluit erover ligt bij de eigenaar. Deze aparte toets
    bestaat zodat dat feit een eigen regel in de uitslag heeft en niet wegvalt
    in een lus over twintig paden. */
-test('6. vijf geld-verplaatsende knoppen staan achter de gedeelde code -- vastgelegd, niet goedgekeurd', async () => {
+test('6. zeven geld-verplaatsende knoppen staan achter de gedeelde code -- vastgelegd, niet goedgekeurd', async () => {
   const GELD = ['/api/office/bank/rekening/open', '/api/office/bank/rente',
-    '/api/office/bank/krediet/besluit', '/api/office/bank/salaris/run', '/api/office/bank/incasso'];
+    '/api/office/bank/krediet/besluit', '/api/office/bank/salaris/run', '/api/office/bank/incasso',
+    /* Nieuw in de rail-reconciliatie: allebei bieden ze een reeds geboekte
+       betaalopdracht opnieuw aan de rail aan. Geen nieuw besluit, wel geld dat
+       alsnog het huis verlaat -- en dus hoort het in deze lijst. */
+    '/api/office/bank/opdrachten/ronde', '/api/office/bank/opdrachten/opnieuw'];
   for (const pad of GELD) {
     const r = await api(pad, {}, office);
     assert.notEqual(r.status, 401, pad);

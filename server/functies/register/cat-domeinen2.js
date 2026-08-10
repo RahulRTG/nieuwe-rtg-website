@@ -69,11 +69,5 @@ module.exports = [
   { id: 'dom-kmar', categorie: 'Identiteit en veiligheid', naam: 'Grensdiensten (KMar)', standaard: true, doelgroepen: LEDEN,
     uitleg: 'De grens- en documentcontrole bij reizen.', paden: ['/api/kmar'] },
   { id: 'dom-onboarding', categorie: 'Identiteit en veiligheid', naam: 'Onboarding', standaard: true, doelgroepen: ALLE,
-    uitleg: 'De eerste stappen na aanmelden: profiel compleet maken.', paden: ['/api/onboarding'] },
-
-  // ---------- geld ----------
-  { id: 'dom-rekening', categorie: 'Geld', naam: 'RTG Rekening', standaard: true, doelgroepen: LEDEN,
-    uitleg: 'Saldo, afschriften en betalingen op de eigen rekeninglaag.', paden: ['/api/bank'] },
-  { id: 'dom-wallet', categorie: 'Geld', naam: 'Wallet', standaard: true, doelgroepen: LEDEN_GAST,
-    uitleg: 'De wallet van een lid binnen RTG Pay.', paden: ['/api/wallet'] }
+    uitleg: 'De eerste stappen na aanmelden: profiel compleet maken.', paden: ['/api/onboarding'] }
 ];

@@ -36,7 +36,11 @@ module.exports = (kern) => {
      een mens zegt "deze tarieven kloppen", en de naam blijft eraan hangen. */
   app.post('/api/office/payroll/regels/keur', officeAuth, (req, res) => {
     const b = req.body || {};
-    antwoord(res, payrollOS.regels.merkAan(String(b.land || 'NL'), String(b.versie || ''), wie(req)));
+    /* `ondanks` + `reden` zijn er voor een pakket dat zelf meldt dat het
+       ongecontroleerd is: aanmerken kan dan alleen uitdrukkelijk, en de reden
+       blijft eraan hangen. Zie kern/payroll/regelpakket.js. */
+    antwoord(res, payrollOS.regels.merkAan(String(b.land || 'NL'), String(b.versie || ''), wie(req),
+      { ondanks: b.ondanks === true, reden: b.reden }));
   });
 
   app.post('/api/office/payroll/regels/haal', officeAuth, async (req, res) => {

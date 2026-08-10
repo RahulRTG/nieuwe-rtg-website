@@ -43,9 +43,29 @@ test('uitbetaling: zonder IBAN reserveren (te_storten), met IBAN inplannen, idem
 // ---- 2. het afdracht-grootboek ----
 function nepDb() { return { data: { fondsAfdrachten: [] } }; }
 
+/* De afdracht gaat sinds TAKEN.md 4.22 door dezelfde opdrachtenrij als de
+   bank-SEPA en de partneruitbetaling van Pay: een afdracht die de rail weigert
+   wordt herhaald in plaats van stil op te_storten te blijven staan. De rij komt
+   hier met een NEPRAIL, want een rail die weigert is met de demo-provider niet
+   uit te lokken -- en juist dat geval is de reden dat de rij bestaat. */
+function nepRij(db, { faalt = 0, maxPogingen = 2 } = {}) {
+  let nog = faalt, n = 0;
+  const klok = { t: 1000 };
+  const rij = require('../server/kern/betaalopdracht')({
+    d: () => db.data, save: () => {}, crypto: require('crypto'), nu: () => klok.t,
+    maxPogingen, backoffMs: [1], log: { warn: () => {} },
+    railInzenden: async () => {
+      n++;
+      if (nog > 0) { nog--; throw new Error('de rail is onbereikbaar'); }
+      return { id: 'UIT-' + n, status: 'ingepland' };
+    }
+  });
+  return { rij, klok };
+}
+
 test('fonds: 30% ex btw, alleen abonnementen, idempotent per factuur', async () => {
   const db = nepDb();
-  const fonds = maakFonds({ db, save: () => {}, betaal, env: {} }); // geen IBAN
+  const fonds = maakFonds({ db, save: () => {}, betaalOpdrachten: nepRij(db).rij, env: {} }); // geen IBAN
 
   // 78,65 incl btw -> 65 ex btw -> 30% = 19,50 -> 1950 cent
   assert.equal(aandeelCenten(78.65), 1950, 'zuivere 30%-ex-btw-rekensom');
@@ -71,7 +91,7 @@ test('fonds: 30% ex btw, alleen abonnementen, idempotent per factuur', async () 
 
 test('fonds: met IBAN wordt de afdracht meteen ingepland als uitbetaling', async () => {
   const db = nepDb();
-  const fonds = maakFonds({ db, save: () => {}, betaal, env: { RTF_IBAN: 'NL11FOUND0000000001', RTF_BEGUNSTIGDE: 'Stichting RTFoundation' } });
+  const fonds = maakFonds({ db, save: () => {}, betaalOpdrachten: nepRij(db).rij, env: { RTF_IBAN: 'NL11FOUND0000000001', RTF_BEGUNSTIGDE: 'Stichting RTFoundation' } });
   const a = await fonds.boekAfdracht({ invoiceId: 'INV-2', wie: 'acc:2', bijdrage: 78.65, omschrijving: 'Maandbijdrage lidmaatschap' });
   assert.equal(a.status, 'ingepland', 'met IBAN: ingepland');
   assert.ok(a.uitbetaalId, 'er is een uitbetaal-referentie');
@@ -80,7 +100,7 @@ test('fonds: met IBAN wordt de afdracht meteen ingepland als uitbetaling', async
 
 test('fonds: op de eigen rails (bank-naad) boekt de afdracht meteen als gestort', async () => {
   const db = nepDb();
-  const fonds = maakFonds({ db, save: () => {}, betaal, env: { RTF_IBAN: 'NL11FOUND0000000001' } });
+  const fonds = maakFonds({ db, save: () => {}, betaalOpdrachten: nepRij(db).rij, env: { RTF_IBAN: 'NL11FOUND0000000001' } });
   // de bank-naad zoals server.js hem koppelt: alleen als de knop effectief op
   // "eigen" staat een boeking, anders null -> terugval op de betaal-naad
   let eigen = false; const boekingen = [];
@@ -145,4 +165,62 @@ test('e2e: een betaalde maandfactuur boekt 30% en de backoffice ziet het te stor
   assert.equal(af.aantal, 1, 'precies een afdracht geboekt (geen dubbele)');
   assert.equal(af.teStorten, foundation, 'het te storten bedrag is exact het teruggemelde foundation-deel');
   assert.equal(af.iban, '', 'IBAN nog niet ingesteld in deze omgeving');
+});
+
+/* HET GEVAL WAAR 4.22 OM DRAAIT. De afdracht ging rechtstreeks naar de
+   betaal-naad, met een catch die hem op te_storten zette en logde. Niet stil,
+   maar er kwam ook nooit iemand op terug: te_storten wachtte op een mens. Nu
+   wordt hij herhaald, en pas als de rail hem blijft weigeren valt hij terug --
+   met de reden erbij, zodat te_storten weer "geen bestemming" betekent en geen
+   verzamelbak voor mislukkingen is. */
+test('fonds: een rail die eenmalig hapert kost de afdracht niets, de rij dient hem opnieuw in', async () => {
+  const db = nepDb();
+  const { rij, klok } = nepRij(db, { faalt: 1, maxPogingen: 4 });
+  const fonds = maakFonds({ db, save: () => {}, betaalOpdrachten: rij, env: { RTF_IBAN: 'NL11FOUND0000000001' } });
+  const a = await fonds.boekAfdracht({ invoiceId: 'INV-hapert', wie: 'acc:9', bijdrage: 78.65, omschrijving: 'Maandbijdrage lidmaatschap' });
+
+  assert.equal(rij.openstaand().aantal, 1, 'de afdracht staat als openstaande opdracht in de rij');
+  assert.equal(a.uitbetaalId, null, 'de eerste poging mislukte, dus er is nog geen referentie');
+
+  klok.t += 1000;
+  await rij.ronde({ tot: klok.t });
+  const op = rij.vind(a.opdrachtId);
+  assert.equal(op.status, 'INGEDIEND', 'de tweede poging slaagt vanzelf');
+  assert.equal(rij.openstaand().mislukt, 0, 'en er is niets opgegeven');
+});
+
+test('fonds: blijft de rail weigeren, dan valt de afdracht terug op te_storten MET de reden', async () => {
+  const db = nepDb();
+  const { rij, klok } = nepRij(db, { faalt: 99, maxPogingen: 2 });
+  const fonds = maakFonds({ db, save: () => {}, betaalOpdrachten: rij, env: { RTF_IBAN: 'NL11FOUND0000000001' } });
+  const a = await fonds.boekAfdracht({ invoiceId: 'INV-stuk', wie: 'acc:9', bijdrage: 78.65, omschrijving: 'Maandbijdrage lidmaatschap' });
+
+  klok.t += 1000;
+  await rij.ronde({ tot: klok.t });
+
+  const op = rij.vind(a.opdrachtId);
+  assert.equal(op.status, 'TERUGGEBOEKT', 'opgegeven, en de teruggang is gedraaid');
+  const bewaard = db.data.fondsAfdrachten.find(x => x.id === a.id);
+  assert.equal(bewaard.status, 'te_storten', 'de afdracht wacht weer op een bestemming');
+  assert.match(bewaard.fout, /onbereikbaar/, 'met de reden erbij, niet als lege terugval');
+  assert.equal(rij.openstaand().aantal, 0, 'en de reconciliatie is leeg: er staat niets meer af');
+});
+
+/* DE ORDENING, en dit is de reden dat de afdracht METEEN in de lijst gaat en
+   niet pas na de eerste inzending. Geeft de rij het al bij de eerste poging op
+   (maxPogingen 1), dan draait de teruggang terwijl boekAfdracht nog loopt. Zoekt
+   die de afdracht dan op ledgerRef en staat hij er nog niet, dan valt de reden
+   weg en blijft de opdracht op MISLUKT hangen met geld dat nergens heen kan. */
+test('fonds: geeft de rij het al bij de eerste poging op, dan vindt de teruggang de afdracht toch', async () => {
+  const db = nepDb();
+  const { rij } = nepRij(db, { faalt: 99, maxPogingen: 1 });
+  const fonds = maakFonds({ db, save: () => {}, betaalOpdrachten: rij, env: { RTF_IBAN: 'NL11FOUND0000000001' } });
+  const a = await fonds.boekAfdracht({ invoiceId: 'INV-meteen-stuk', wie: 'acc:9', bijdrage: 78.65, omschrijving: 'Maandbijdrage lidmaatschap' });
+
+  const op = rij.vind(a.opdrachtId);
+  assert.equal(op.status, 'TERUGGEBOEKT', 'de teruggang is gedraaid tijdens boekAfdracht zelf');
+  assert.equal(rij.vind(a.opdrachtId).terugboekFout, null, 'en hij liep niet stuk op een afdracht die nog niet bestond');
+  const bewaard = db.data.fondsAfdrachten.find(x => x.id === a.id);
+  assert.equal(bewaard.status, 'te_storten');
+  assert.match(bewaard.fout, /onbereikbaar/);
 });

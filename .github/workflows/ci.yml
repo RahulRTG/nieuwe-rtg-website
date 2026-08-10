@@ -52,8 +52,26 @@ jobs:
       # afgehandeld. Dat kost niets extra's in deze stap en levert de volgende
       # stap een waargenomen dekkingscijfer in plaats van een tekstzoektocht
       # door de tests. Zie server/routelog.js en scripts/dekking.js.
+      # EEN GEZAKTE TOETS MOET TE LEZEN ZIJN, ANDERS IS HET GEEN SIGNAAL.
+      # Deze stap zakte een keer met drie rode toetsen, en die namen waren niet
+      # meer te achterhalen: node zet "not ok" op de plek waar de toets draaide,
+      # daarna komt de dekkingstabel van ruim tweeduizend regels overheen, en de
+      # log-API levert alleen de STAART. Het downloadadres van het volledige log
+      # ligt achter een andere host, die niet altijd bereikbaar is. Wie dan een
+      # rode stap ziet, weet alleen DAT er iets zakte. Vandaar de herhaling
+      # onderaan: bij een rode uitslag komen de "not ok"-regels en de telling
+      # nog een keer voorbij, na de tabel, waar ze wel te vinden zijn.
       - name: Unit- en integratietests + dekkingsvloer (json-opslag)
-        run: npm run test:gate
+        run: |
+          set -o pipefail
+          uitslag=0
+          npm run test:gate 2>&1 | tee /tmp/gate.log || uitslag=$?
+          if [ "$uitslag" -ne 0 ]; then
+            echo "----- GEZAKTE TOETSEN (herhaald; hierboven staan ze onder de dekkingstabel) -----"
+            grep -E "not ok [0-9]" /tmp/gate.log | head -60 || true
+            grep -E "^# (tests|pass|fail|skipped) " /tmp/gate.log || true
+          fi
+          exit "$uitslag"
         env:
           RTG_ROUTELOG: ${{ github.workspace }}/routejournaal.log
       # De PostgreSQL-opslag, -accounts en chaos-test apart, met DATABASE_URL alleen

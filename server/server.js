@@ -385,7 +385,9 @@ const { schild, ssrf, zetWacht, zetRtgai } = require('./opzet/verzoekketen')({
   opslagKlaar: () => opslagKlaar(),
   // alle drie pas verderop in dit bestand gebouwd; lui doorgegeven
   beveiligVan: () => beveilig,
-  muntenVan: () => munten, settleFactuurVan: () => settleFactuur
+  muntenVan: () => munten, settleFactuurVan: () => settleFactuur,
+  // de opdrachtenrij bestaat pas verderop; de payout-webhook leest hem per verzoek
+  opdrachtenVan: () => betaalOpdrachten
 });
 
 /* ---------- de poortwachters voor de routers staan in ./opzet/poortwachters.js
@@ -400,7 +402,9 @@ const { rtf, CSP_NONCE, zetScanNet } = require('./opzet/poortwachters')({
   sseToOffice: (ev, data) => sseToOffice(ev, data),
   sessionFor: t => sessionFor(t),
   findSupplier: c => findSupplier(c),
-  sendPushToUser: (u, n) => sendPushToUser(u, n)
+  sendPushToUser: (u, n) => sendPushToUser(u, n),
+  // de bevoegdheidslaag ontstaat pas in kernlaag4b; lui doorgegeven
+  bevoegdVan: () => kern.bevoegd
 });
 
 /* ---------- Claude API (optioneel) ---------- */
@@ -1423,11 +1427,28 @@ const {
   directBetalingMetRef, directBetalingenVanKlant, directBetalingenVanZaak, directBetalingenVoegToe,
   betaalVerzoekMetRef, betaalVerzoekenVoorCodenaam, betaalVerzoekenVanZaak, betaalVerzoekenVoegToe });
 
+/* DE BETAALOPDRACHTEN (kern/betaalopdracht/): een rij voor alles wat het huis
+   ECHT verlaat -- de SEPA van de bank, de partneruitbetaling van Pay en de
+   afdracht van het fonds. EEN rij en niet drie, want anders staat het antwoord
+   op "wat is geboekt maar niet aangekomen" op drie plekken en telt niemand ze
+   op. Hij wordt hier gebouwd omdat hij ouder moet zijn dan zijn drie gebruikers;
+   elk van hen meldt daarna zijn eigen teruggang aan (registreerTeruggang), want
+   terugboeken kan alleen in het grootboek waar het geld vandaan kwam. */
+const betaalOpdrachten = require('./kern/betaalopdracht')({
+  d: () => db.data, save, crypto, nu: () => Date.now(), log,
+  // aanbieden bij de rail: dezelfde sleutel bij elke poging, zodat een
+  // herhaling bij de provider nooit een tweede betaling wordt
+  railInzenden: (o) => betaal.maakUitbetaling({
+    bedrag: o.centen, valuta: o.valuta, iban: o.bestemming, begunstigde: o.begunstigde,
+    referentie: o.ledgerRef, idempotentieSleutel: o.idemSleutel, omschrijving: o.oms
+  })
+});
+
 /* De RTFoundation-afdracht (kern/fonds.js): van elke bevestigde maandbetaling
    van een klant gaat automatisch 30% (ex btw) naar de foundation. De afdracht
    wordt op het betaalmoment geboekt en, zodra het IBAN in de omgeving staat,
    via de betaal-naad als uitbetaling ingepland. */
-const fonds = maakFonds({ db, save, betaal, log, env: process.env });
+const fonds = maakFonds({ db, save, betaal, log, env: process.env, betaalOpdrachten });
 
 /* Munt-ontvangst (server/muntbetaal.js + kern/munten.js): RTG accepteert
    cryptomunten voor zijn eigen diensten en zet ze via een vergunninghoudende
@@ -1874,7 +1895,7 @@ const kern = {
    wel wordt gebruikt, valt bij het opstarten meteen om. */
 const hulp = {
   DATA_DIR, FISCAAL_PEILJAAR, LANDEN, PERSONAS, accounts, alcoholGrensVan, annuleerReservering,
-  anthropic, app, archief, betaal, beveilig, boekingenVanKlant, boekingenVanZaak, boekingenVoegToe,
+  anthropic, app, archief, betaal, betaalOpdrachten, beveilig, boekingenVanKlant, boekingenVanZaak, boekingenVoegToe,
   broadcastSync, centen, crypto, db, entreeCode, etaMinutes, findSupplier, fonds, fooiUit,
   geborenVan, haversine, idGeverifieerd, keyVanCodenaam, klantProfiel, klokVan, ledenAantal,
   ledenPrijs, leeftijdVan, legApart, liveCodename, log, logActivity, loginFails, maakOntmoeting,

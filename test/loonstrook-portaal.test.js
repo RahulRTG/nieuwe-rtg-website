@@ -70,9 +70,10 @@ test('van de wervingslink tot de loonstrook van de medewerker', async () => {
      er geen db.json om in te schrijven. Het is dezelfde db.data die alle routes
      gebruiken; alleen de motor eronder verschilt. */
   const env = { SMTP_URL: '', RTG_DATA_DIR: TMP, OFFICE_CODE: KANTOOR, RTG_STORE: 'json' };
+  let s = null;   // buiten de try, zodat de finally hem hoe dan ook kan stoppen
   try {
     /* ---- ronde 1: iemand komt binnen via de wervingslink ---- */
-    let s = await startServer({ env });
+    s = await startServer({ env });
     let zaakTok = (await post(s.base, '/api/supplier/login',
       { code: ZAAK, staffId: MANAGER, pin: '1234' })).data.token;
     assert.ok(zaakTok, 'manager-sessie bij de zaak');
@@ -112,8 +113,14 @@ test('van de wervingslink tot de loonstrook van de medewerker', async () => {
     const pakket = (regels.pakketten || []).find(p => p.geldigVan <= PERIODE + '-01' &&
       (!p.geldigTot || p.geldigTot >= PERIODE + '-01'));
     assert.ok(pakket, 'er ligt een regelpakket dat geldt in ' + PERIODE);
+    /* UITDRUKKELIJK, want de meegeleverde jaargang meldt zelf dat de cijfers
+       niet tegen het Handboek zijn gelegd. Zonder `ondanks` en een reden gaat
+       hij niet aan -- zie kern/payroll/regelpakket.js. Dat een toets dit moet
+       uitspreken is de bedoeling: op deze tabellen hoort geen echte loonstrook
+       te staan, en wie ze toch aanmerkt zegt dat met zoveel woorden. */
     assert.equal((await post(base, '/api/office/payroll/regels/keur',
-      { land: 'NL', versie: pakket.versie }, kantoor)).data.stand, 'goedgekeurd');
+      { land: 'NL', versie: pakket.versie, ondanks: true,
+        reden: 'Toetsopstelling: demo-tabellen, geen echte loonstroken' }, kantoor)).data.stand, 'goedgekeurd');
 
     // de werkgever legt het contract vast -- de stap die ontbrak
     zaakTok = (await post(base, '/api/supplier/login',
@@ -195,6 +202,13 @@ test('van de wervingslink tot de loonstrook van de medewerker', async () => {
     assert.ok(strook, 'zijn loonstrook over ' + PERIODE + ' staat in zijn portaal');
     assert.notEqual(strook.zaak, ZAAK, 'de zaak staat op naam en niet als code');
     assert.ok(strook.strook.nettoCenten > 0, 'er staat een nettobedrag');
+    /* WAAROP DIT BEDRAG BERUST, aan de kant van de medewerker. De
+       administrateur kan het regelpakket erbij halen; hij niet. Deze run draait
+       op de meegeleverde jaargang, die zelf meldt dat de cijfers niet tegen het
+       Handboek zijn gelegd -- dus hoort dat mee te komen tot hier, en niet
+       alleen in de backoffice te blijven hangen. */
+    assert.equal(strook.opDemoTabellen, true,
+      'de strook draagt dat hij op ongecontroleerde tabellen berust');
 
     /* De uitleg is het punt van dit scherm: een strook die alleen bedragen
        toont laat mensen raden. Hij hoort de uren te noemen waar het bedrag uit
@@ -242,8 +256,15 @@ test('van de wervingslink tot de loonstrook van de medewerker', async () => {
     assert.equal(spoor.status, 200);
     assert.deepEqual(spoor.data.verzoeken, [], 'niemand vroeg zijn papieren op');
 
-    await stop(s.child);
   } finally {
+    /* DE SERVER STOPPEN HOORT IN DE FINALLY EN NIET AAN HET EIND VAN DE TRY.
+       Hij stond daar, en dat maakte van elke zakkende bewering een HANG: het
+       kindproces bleef draaien, de toetsloper wachtte op dat handvat, en na
+       tien minuten zag je een time-out in plaats van de assertie die het
+       eerst begaf. Dat kostte bij het beproeven van deze toets een half uur
+       zoeken naar een probleem dat er niet was -- en het is de vorm van
+       LAT.md regel 3: stilvallen is geen uitkomst. */
+    try { if (s && s.child) await stop(s.child); } catch (e) { /* al weg */ }
     fs.rmSync(TMP, { recursive: true, force: true });
   }
 });

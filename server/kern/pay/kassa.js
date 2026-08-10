@@ -3,8 +3,19 @@
    en uitbetalen naar de bank via de betaal-naad). Krijgt de gedeelde ctx van
    kern/pay/index.js. */
 module.exports = (ctx) => {
-  const { crypto, save, betaal, nu, kascodes, grootboek, rekLid, rekPartner, saldoVan,
-    metIdem, boekAsync, zorgSaldo, seintje, betaaldienstKosten, MIN_CENTEN, MAX_CENTEN, KASCODE_MS, KASCODE_MAX } = ctx;
+  const { crypto, save, nu, kascodes, grootboek, rekLid, rekPartner, saldoVan,
+    metIdem, boekAsync, zorgSaldo, seintje, betaaldienstKosten, opdrachten,
+    MIN_CENTEN, MAX_CENTEN, KASCODE_MS, KASCODE_MAX } = ctx;
+
+  /* De teruggang van de partneruitbetaling: alleen deze kant weet dat het
+     pay-grootboek het is en dat de tegenrekening extern:uitbetaald heet. Zie
+     ../betaalopdracht/ voor waarom dit een tabel per soort is en geen gedeelde
+     functie. */
+  opdrachten.registreerTeruggang('pay-uit', async (o) => {
+    const terug = await boekAsync({ van: 'extern:uitbetaald', naar: o.bron, centen: o.centen,
+      soort: 'terug', oms: 'Uitbetaling niet verstuurd, teruggeboekt', ref: o.ledgerRef });
+    return terug;
+  });
 
   /* ---------- de kassacode: contactloos bij de partner ---------- */
   function kasCode({ codenaam, maxCenten }) {
@@ -92,22 +103,33 @@ module.exports = (ctx) => {
       const c = Math.min(saldoVan(rek), MAX_CENTEN);
       if (c <= 0) return { status: 400, error: 'Er staat niets om uit te betalen.' };
       /* Eerst afboeken, dan pas uitbetalen -- het stond andersom, dus de
-         uitbetaling lag al vast terwijl de boeking nog kon weigeren. Lukt de
-         uitbetaling niet, dan draaien we de afboeking terug, dezelfde compensatie
-         als bank/overboeken.js. */
+         uitbetaling lag al vast terwijl de boeking nog kon weigeren. */
       const b = await boekAsync({ van: rek, naar: 'extern:uitbetaald', centen: c, soort: 'uitbetaling', oms: 'Uitbetaald naar de bank' });
       if (b.error) return b;
-      try {
-        await betaal.maakUitbetaling({
-          bedrag: c, referentie: 'pay-uit-' + supplierCode + '-' + nu(),
-          idempotentieSleutel: idem ? 'pay-uit:' + supplierCode + ':' + idem : undefined,
-          begunstigde: supplierCode, omschrijving: 'RTG Pay uitbetaling'
-        });
-      } catch (e) {
-        await boekAsync({ van: 'extern:uitbetaald', naar: rek, centen: c, soort: 'terug', oms: 'Uitbetaling mislukt, teruggeboekt' });
-        return { status: 502, error: 'De uitbetaling lukte niet: ' + e.message };
-      }
-      return { ok: true, uitbetaald: c, restant: saldoVan(rek) };
+
+      /* HIER STOND EEN COMPENSATIE, EN DIE WAS GEVAARLIJKER DAN HIJ LEEK. Bij een
+         fout van de betaal-naad werd de afboeking teruggedraaid en kreeg de
+         partner een 502. Dat klopt alleen als de uitbetaling zeker NIET is
+         aangemaakt -- en dat weet je bij een timeout juist niet. Slaagde de
+         payout bij de provider terwijl het antwoord verloren ging, dan kreeg de
+         partner zijn saldo terug terwijl het geld al onderweg was: twee keer
+         hetzelfde bedrag, en het grootboek sloot allebei de keren netjes.
+
+         Daarom nu dezelfde rij als de bank: de opdracht wordt vastgelegd, de
+         inzending wordt herhaald met DEZELFDE sleutel (dus een geslaagde eerste
+         poging wordt bij de provider geen tweede betaling), en pas als de rail
+         hem blijft weigeren komt het geld terug. De partner hoort daarom nu
+         "in behandeling" en niet "gelukt" -- dat is wat we werkelijk weten. */
+      const op = opdrachten.maak({
+        soort: 'pay-uit', rail: 'betaalnaad', centen: c, bron: rek, begunstigde: supplierCode,
+        oms: 'RTG Pay uitbetaling', ledgerRef: b.boeking.id,
+        /* De sleutel hing aan nu(), dus elke poging kreeg er een andere en twee
+           klikken waren twee uitbetalingen. Hij hangt nu aan de BOEKING: die is
+           er precies een per uitbetaling. */
+        idemSleutel: 'pay-uit:' + supplierCode + ':' + (idem || b.boeking.id)
+      });
+      const na = await opdrachten.dienIn(op);
+      return { ok: true, uitbetaald: c, restant: saldoVan(rek), opdrachtId: op.id, opdrachtStatus: na.status };
     });
   }
 

@@ -18,7 +18,7 @@
 /* `bankregie` wordt hier verklaard en tot onderaan dit deel gebruikt; daarom
    loopt de grens met deel 4a ervoor en niet erin. */
 module.exports = (kern, hulp) => {
-  const { FISCAAL_PEILJAAR, LANDEN, accounts, anthropic, betaal, centen, crypto, db, findSupplier, fonds, keyVanCodenaam, ledenAantal, log, save, schoon, sseToCustomer, sseToOffice, sseToSupplier } = hulp;
+  const { FISCAAL_PEILJAAR, LANDEN, accounts, anthropic, betaal, betaalOpdrachten, centen, crypto, db, findSupplier, fonds, keyVanCodenaam, ledenAantal, log, save, schoon, sseToCustomer, sseToOffice, sseToSupplier } = hulp;
 
 /* Bankregie (kern/bankregie.js): de geldinfrastructuur-knop van de boardroom --
    een schakelaar met DRIE standen (partner -> hybride -> eigen) die bepaalt hoe
@@ -26,11 +26,22 @@ module.exports = (kern, hulp) => {
    Eerst gemount zodat de bank en de kantoor-routes dezelfde regie delen. */
 const bankregie = require('../kern/bankregie').maakBankregie({ db, save });
 Object.assign(kern, bankregie);
+/* De BEVOEGDHEID (kern/bevoegdheid.js): de zesde as naast de vijf van de
+   functieschakelaars. Die vijf gaan over wie de gebruiker is en wat de beheerder
+   heeft uitgezet; deze gaat over wat RTG zelf mag. Hij leest wat er in de
+   boardroom is vastgelegd en welke rail nu clearet -- dezelfde SEPA is een
+   partnerhandeling of eigen werk, en dat verschil bepaalt het antwoord. */
+const bevoegd = require('../kern/bevoegdheid').maakBevoegdheid({
+  vergunning: bankregie.bankVergunning,
+  partnerRails: bankregie.bankPartnerRails,
+  clearing: bankregie.bankClearing
+});
+kern.bevoegd = bevoegd;
 /* RTG Bank (kern/bank): de eigen bank, gebouwd OP het RTG Pay-grootboek en met
    dezelfde dubbele-boekhoud-tucht -- rekeningen met een echt IBAN, storten (langs
    de 3-standen knop), overboeken, de brug van/naar de wallet, uitgaande SEPA achter
    de betaal-naad, en sparen met rente. Klaar om met een knop de eigen bank te worden. */
-Object.assign(kern, require('../kern/bank')({ db, save, crypto, schoon, betaal, pay: kern.pay, bankregie, keyVanCodenaam, accounts, sseToCustomer, sseToOffice, anthropic }));
+Object.assign(kern, require('../kern/bank')({ db, save, crypto, schoon, betaal, pay: kern.pay, bankregie, keyVanCodenaam, accounts, sseToCustomer, sseToOffice, anthropic, betaalOpdrachten }));
 /* De Reiswijzer (kern/reis.js): alle reisregels van elk land -- visum,
    rijrichting, alarmnummer, water, fooi, let-op -- in place op de gedeelde
    LANDEN-tabel gezet, VOOR de Regelwacht zodat de overlay er bovenop komt. */

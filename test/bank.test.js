@@ -78,6 +78,17 @@ test.before(async () => {
   assert.equal(kop.status, 200, 'het tweede lid koppelt de kantoorrol: ' + JSON.stringify(kop.body).slice(0, 140));
   tweede = (await api('account/start', { rol: 'kantoor' }, reg.token)).body.token;
   assert.ok(tweede, 'en staat als tweede persoon in de backoffice');
+
+  /* DE VERGUNNING VASTLEGGEN, en dat is sinds de bevoegdheidslaag geen decor.
+     Wat RTG zelf mag hangt niet aan de drie-standen-knop maar aan wat er is
+     vastgelegd (kern/bevoegdheid.js): zonder vergunning clearen de eigen rails
+     niet en is krediet uit eigen boek dicht. Deze opstelling doet alsof RTG de
+     vergunning heeft, zodat de rest van dit bestand de BANK toetst en niet de
+     grendel. De grendel zelf heeft zijn eigen toets verderop, die hem weghaalt
+     en terugzet. */
+  const verg = await bapi('bank/vergunning', { soort: 'bank', nummer: 'NL-TOETS-1',
+    entiteit: 'RTG Bank N.V.', landen: ['NL'] }, baas);
+  assert.equal(verg.status, 200, 'de vergunning is vastgelegd: ' + JSON.stringify(verg.body).slice(0, 140));
 });
 test.after(() => { stop(srv && srv.child); try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {} });
 
@@ -283,26 +294,107 @@ test('salarisrun uit de klokuren: het voorstel matcht op de lid-koppeling en de 
   const staf = (await api('supplier/login', { code: 'KIKUNOI', staffId: nora.id, pin: '5678' })).body.token;
   assert.ok((await api('staff/klok/correctie', { staffId: nora.id, in: inAt.toISOString(), uit: uitAt.toISOString() }, staf)).status >= 400, 'de klokcorrectie is manager-only');
 
-  // het voorstel: dezelfde uren en hetzelfde uurloon als het fiscale bord
+  /* HET VOORSTEL IS EEN RAMING EN GEEN BETAALOPDRACHT. Dat onderscheid is de
+     kern van deze toets. De bedragen hier zijn BRUTO (uren x uurloon): geen
+     loonheffing ingehouden, geen loonstrook, geen vier ogen, geen aangifte.
+     Precies die posten werden uitbetaald, terwijl kern/payroll ondertussen een
+     netto betaalbestand maakte dat niemand uitbetaalde. */
   const v = await oapi('bank/salaris/voorstel', { zaak: 'KIKUNOI' }, 'RTG');
   assert.equal(v.status, 200);
   const rNora = v.body.regels.find(r => r.naam === 'Nora Prins');
-  assert.ok(rNora, 'Nora staat in het voorstel');
+  assert.ok(rNora, 'Nora staat in de raming');
   assert.equal(rNora.iban, noraIban, 'gematcht op haar eigen betaalrekening (lid-koppeling)');
   assert.ok(rNora.uren >= 2, 'de gecorrigeerde uren tellen mee');
   assert.equal(rNora.brutoCenten, Math.round(rNora.uren * v.body.uurloon * 100), 'bruto = uren x het uurloon van de zaak');
   assert.ok(v.body.zonderRekening.some(z => z.naam === mateo.name), 'wie geen lid-koppeling heeft staat eerlijk in het niet-uitbetaalbare lijstje');
+  assert.equal(v.body.uitbetaalbaar, false, 'en de raming zegt zelf dat hij niet uit te betalen is');
+  assert.equal(v.body.posten, undefined, 'er staat geen kant-en-klare postenlijst meer in: die was de verleiding');
 
-  // de run: het kantoor betaalt vanaf een gedekte zakelijke rekening (van een
-  // vers lid; de rtg-persona zit hierboven al aan zijn rekeningen-plafond)
+  // de rekening waarvandaan betaald wordt (een vers lid; de rtg-persona zit
+  // hierboven al aan zijn rekeningen-plafond)
   const l2 = await (await fetch(base + '/api/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ tier: 'lifestyle' }) })).json();
   const cn = (await api('pay/overzicht', {}, l2.token)).body.codenaam;
   const zak = await oapi('bank/rekening/open', { codenaam: cn, soort: 'zakelijk' }, 'RTG');
   const zakIban = zak.body.rekening.iban;
   await api('bank/storten', { iban: zakIban, centen: 100000, idem: 'sal-dek' }, l2.token);
-  const run = await oapi('bank/salaris/run', { zaak: 'KIKUNOI', vanIban: zakIban }, 'RTG');
-  assert.equal(run.status, 200);
-  assert.equal(run.body.totaalCenten, v.body.totaalCenten, 'de run betaalt exact het voorstel uit');
+
+  // ZONDER LOONRUN GEBEURT ER NIETS. Dit was de knop die bruto uitbetaalde.
+  const zonder = await oapi('bank/salaris/run', { zaak: 'KIKUNOI', vanIban: zakIban }, 'RTG');
+  assert.equal(zonder.status, 400, 'uitbetalen zonder loonrun wordt geweigerd');
+  assert.match(zonder.body.error, /loonrun/i);
+  assert.match(zonder.body.error, /bruto/i, 'en de weigering zegt waarom dat gevaarlijk was');
+
+  /* DE ECHTE WEG: uren -> loonrun -> twee handtekeningen -> definitief ->
+     bankbatch. De regels moeten aangemerkt zijn (iemand zegt "deze tarieven
+     kloppen"), anders mag er geen definitieve run op. */
+  const pak = await oapi('payroll/regels', { land: 'NL' }, 'RTG');
+  const versie = (pak.body.pakketten || []).map(p => p.versie)[0];
+  assert.ok(versie, 'er is een meegeleverde jaargang: ' + JSON.stringify(pak.body).slice(0, 160));
+  /* AANMERKEN IS EEN UITSPRAAK EN GEEN VINKJE. De meegeleverde jaargang meldt
+     zelf dat de cijfers niet tegen het Handboek zijn gelegd; hem zomaar
+     aanmerken kan daarom niet meer. Deze toets doet het uitdrukkelijk, en dat
+     is precies wat een echte installatie ook moet doen -- of, beter, een
+     gecontroleerde jaargang laden. */
+  const zomaar = await bapi('payroll/regels/keur', { land: 'NL', versie }, baas);
+  assert.equal(zomaar.status, 409, 'een pakket dat zichzelf ongecontroleerd noemt gaat niet zomaar aan');
+  assert.match(zomaar.body.waarschuwing, /Handboek Loonheffingen/, 'en de reden komt uit het pakket zelf');
+  assert.equal((await bapi('payroll/regels/keur', { land: 'NL', versie, ondanks: true }, baas)).status, 400,
+    'ook uitdrukkelijk niet zonder reden');
+  const keur = await bapi('payroll/regels/keur', { land: 'NL', versie, ondanks: true,
+    reden: 'Toetsopstelling: demo-tabellen, geen echte loonstroken' }, baas);
+  assert.equal(keur.status, 200, 'met reden mag het: ' + JSON.stringify(keur.body).slice(0, 140));
+  assert.equal(keur.body.opDemoTabellen, true, 'en het pakket draagt dat het demo-tabellen zijn');
+
+  /* HET LAND VAN DE ZAAK BEPAALT DE LOONREGELS, en Sal de Mar staat in Ibiza:
+     supplierdefaults zet die op ES. Er is alleen een Nederlandse jaargang
+     meegeleverd, dus zonder deze regel kan deze zaak geen definitieve loonrun
+     draaien -- en dat is geen toetsprobleem maar het gedrag zelf: wie de regels
+     van een land niet heeft geladen, hoort daar geen loon te draaien. Zie
+     TAKEN.md 4.25. */
+  assert.equal((await api('supplier/settings', { land: 'NL' }, mgr)).status, 200, 'de zaak staat op NL');
+
+  /* EEN LOONRUN BEGINT BIJ HET CONTRACT EN NIET BIJ DE KLOK. Zonder contract
+     staat er wel een naam in de run maar geen loon, en dan is netto nul --
+     precies wat kern/payroll/controles.js als "loon zonder contract" meet. Het
+     bruto-voorstel van de bank had dat niet nodig, en dat is ook meteen het
+     verschil: dat rekende met een uurloon van de ZAAK in plaats van met het
+     contract van de PERSOON. */
+  const contract = await oapi('payroll/contract', { code: 'KIKUNOI', staffId: nora.id,
+    vanaf: '2026-01-01', soort: 'oproep', betaling: 'maand', uurloonCenten: 1800, urenPerWeek: 12, functie: 'Bediening' }, 'RTG');
+  assert.equal(contract.status, 200, 'Nora heeft een contract: ' + JSON.stringify(contract.body).slice(0, 160));
+
+  const periode = new Date().toISOString().slice(0, 7);
+  const open = await oapi('payroll/run/open', { code: 'KIKUNOI', periode }, 'RTG');
+  assert.equal(open.status, 200, 'de loonrun opent op dezelfde geklokte uren: ' + JSON.stringify(open.body).slice(0, 200));
+  const runId = open.body.run.id;
+
+  // vier ogen: de manager tekent aan de zaakkant, de administrateur bij het kantoor
+  const mKeur = await api('supplier/payroll/keur', { runId }, mgr);
+  assert.equal(mKeur.status, 200, 'de manager tekent: ' + JSON.stringify(mKeur.body).slice(0, 140));
+  const aKeur = await bapi('payroll/run/keur', { runId }, baas);
+  assert.equal(aKeur.status, 200, 'de administrateur tekent: ' + JSON.stringify(aKeur.body).slice(0, 140));
+  const def = await bapi('payroll/run/definitief', { runId }, tweede);
+  assert.equal(def.status, 200, 'de run is definitief: ' + JSON.stringify(def.body).slice(0, 200));
+
+  const run = (await oapi('payroll/run/een', { runId }, 'RTG')).body.run;
+  assert.equal(run.opDemoTabellen, true, 'de run draagt waarop hij berust, tot na definitief');
+  const netto = run.stroken.reduce((s, x) => s + Math.max(0, x.strook.nettoCenten), 0);
+  const brutoRun = run.stroken.reduce((s, x) => s + (x.strook.brutoCenten || 0), 0);
+  assert.ok(netto > 0 && netto < brutoRun, 'netto is minder dan bruto -- er wordt echt ingehouden: ' + netto + ' van ' + brutoRun);
+
+  const run2 = await oapi('bank/salaris/run', { runId, vanIban: zakIban }, 'RTG');
+  assert.equal(run2.status, 200, 'de bankbatch draait op de loonrun: ' + JSON.stringify(run2.body).slice(0, 200));
+  assert.equal(run2.body.runId, runId, 'en het antwoord wijst naar de run waaruit hij komt');
+
+  /* HET BEDRAG IS HET NETTO VAN DE RUN, en dat is het hele punt: er gaat niet
+     meer het brutoloon de deur uit. Alleen wie een gekoppelde betaalrekening
+     heeft wordt betaald, dus tellen we die kant precies na. */
+  const betaald = run.stroken
+    .filter(x => x.strook.nettoCenten > 0 && x.staffId === nora.id)
+    .reduce((s, x) => s + x.strook.nettoCenten, 0);
+  assert.equal(run2.body.totaalCenten, betaald, 'uitbetaald = het netto van wie een rekening heeft');
+  assert.ok(run2.body.totaalCenten < v.body.brutoCenten, 'en dus minder dan de bruto raming van het voorstel');
+
   const af = await api('bank/afschrift', { iban: noraIban }, nl.token);
   assert.ok(af.body.regels.some(r => r.soort === 'salaris' && !r.af), 'het salaris staat als bijschrijving op Nora’s afschrift');
 });
@@ -324,4 +416,272 @@ test('afschrift-export: het lid downloadt zijn eigen rekening als CSV; andermans
   assert.equal((await csv(lid.iban, null)).status, 401);
   const vreemd = await csv(noraIban, lid.token);
   assert.ok(vreemd.status === 403 || vreemd.status === 404, 'andermans afschrift is niet te downloaden');
+});
+
+/* DE NAAD TUSSEN BOEKING EN RAIL. Hier stond niets, en dat was precies het
+   probleem: sepaUit belde de payout in een try met een lege catch eronder, dus
+   een mislukte rail gaf een geslaagd antwoord terug, het geld stond van de
+   rekening af op extern:sepa, en het grootboek sloot netjes. De sluitcontrole
+   kan dat per definitie niet vinden -- de tegenboeking klopt immers.
+
+   Deze toets bewijst de BEDRADING (dat sepaUit echt een betaalopdracht maakt en
+   indient, en dat de reconciliatie hem ziet); het gedrag bij een mislukkende
+   rail staat in test/betaalopdracht.test.js, want een rail die weigert is in een
+   draaiende server niet eerlijk uit te lokken. */
+test('een uitgaande SEPA levert een betaalopdracht op die het kantoor kan volgen', async () => {
+  await api('bank/storten', { iban: lid.iban, centen: 50000, idem: 'sepa-dek' }, lid.token);
+  const voor = (await oapi('bank/gezond', {}, 'RTG')).body;
+
+  const uit = await api('bank/sepa', { iban: lid.iban, centen: 12500, naarIban: 'NL91ABNA0417164300',
+    begunstigde: 'Ontvanger', oms: 'Huur', idem: 'sepa-1' }, lid.token);
+  assert.equal(uit.status, 200);
+  assert.equal(uit.body.overgemaakt, 12500);
+  assert.ok(uit.body.opdrachtId, 'het antwoord draagt de opdracht die eraan hangt');
+  assert.equal(uit.body.opdrachtStatus, 'INGEDIEND',
+    'aangenomen door de rail, maar NIET afgewikkeld -- dat weet alleen de webhook');
+
+  // het kantoor ziet de opdracht, met de boeking eraan gekoppeld
+  const lijst = await oapi('bank/opdrachten', { limit: 10 }, 'RTG');
+  assert.equal(lijst.status, 200);
+  const mijne = lijst.body.opdrachten.find(o => o.id === uit.body.opdrachtId);
+  assert.ok(mijne, 'de opdracht staat op het kantoorbord');
+  assert.equal(mijne.soort, 'sepa-uit');
+  assert.equal(mijne.centen, 12500);
+  assert.equal(mijne.bestemming, 'NL91ABNA0417164300');
+  assert.ok(mijne.ledgerRef, 'met de boeking waar hij bij hoort');
+  assert.ok(mijne.settlementRef, 'en de referentie die de rail teruggaf');
+
+  /* De reconciliatie: geboekt maar buiten RTG nog niet rond. Dit getal staat
+     NAAST de sluitcontrole en meet iets anders -- beide moeten kloppen. */
+  const na = (await oapi('bank/gezond', {}, 'RTG')).body;
+  assert.equal(na.sluit.klopt, true, 'het grootboek sluit nog steeds');
+  assert.equal(na.railOpen, (voor.railOpen || 0) + 1, 'er staat een opdracht meer open');
+  assert.equal(na.railOpenCenten, (voor.railOpenCenten || 0) + 12500, 'voor precies dit bedrag');
+  assert.equal(na.railMislukt, 0, 'en niets is mislukt');
+  assert.ok(na.railOudsteAt > 0, 'met een leeftijd, zodat een blijvende storing opvalt');
+
+  // dubbeltik: dezelfde idem-sleutel maakt geen tweede opdracht
+  const weer = await api('bank/sepa', { iban: lid.iban, centen: 12500, naarIban: 'NL91ABNA0417164300',
+    begunstigde: 'Ontvanger', oms: 'Huur', idem: 'sepa-1' }, lid.token);
+  assert.equal(weer.body.herhaald, true);
+  const na2 = (await oapi('bank/gezond', {}, 'RTG')).body;
+  assert.equal(na2.railOpen, na.railOpen, 'geen tweede opdracht voor dezelfde tik');
+});
+
+/* DE PAYOUT-WEBHOOK. Tot deze ronde kende /api/betaal/webhook alleen INKOMEND
+   geld: een uitgaande SEPA bleef daardoor voor altijd op INGEDIEND staan. Het
+   scherpste geval is niet de geslaagde payout maar de MISLUKTE -- dan staat het
+   geld van de klant af en komt het nergens aan, en "MISLUKT" opschrijven zonder
+   terug te boeken is hetzelfde gat als voorheen, alleen een dag later. */
+test('een mislukte payout komt via de webhook binnen en brengt het geld terug', async () => {
+  const voorSaldo = (await api('bank/rekening', { iban: lid.iban }, lid.token)).body.rekening.saldoCenten;
+  const voorGezond = (await oapi('bank/gezond', {}, 'RTG')).body;
+
+  const uit = await api('bank/sepa', { iban: lid.iban, centen: 3000, naarIban: 'NL91ABNA0417164300',
+    begunstigde: 'Ontvanger', oms: 'Mislukkende overboeking', idem: 'sepa-faal' }, lid.token);
+  assert.equal(uit.status, 200);
+  const opdracht = (await oapi('bank/opdrachten', { limit: 20 }, 'RTG')).body
+    .opdrachten.find(o => o.id === uit.body.opdrachtId);
+  assert.equal(opdracht.status, 'INGEDIEND');
+  assert.ok(opdracht.settlementRef, 'de rail gaf een referentie terug');
+  const tarief = opdracht.tariefCenten;
+  const naSepa = (await api('bank/rekening', { iban: lid.iban }, lid.token)).body.rekening.saldoCenten;
+  assert.equal(naSepa, voorSaldo - 3000 - tarief, 'het geld is van de rekening af');
+
+  // de provider meldt dat de payout is mislukt (dezelfde route, ruwe body)
+  const evt = { id: 'evt_payout_1', type: 'payout.failed',
+    data: { object: { id: opdracht.settlementRef, failure_message: 'account_closed' } } };
+  const hook = await fetch(base + '/api/betaal/webhook', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(evt) });
+  assert.equal(hook.status, 200, 'de provider krijgt 200, anders blijft hij herhalen');
+
+  /* De webhook antwoordt meteen en werkt daarna af (hij mag de provider niet
+     laten wachten), dus wachten op de uitkomst en niet op een vaste tijd. */
+  let eind = null;
+  for (let i = 0; i < 40 && !eind; i++) {
+    const l = await oapi('bank/opdrachten', { limit: 20 }, 'RTG');
+    const o = l.body.opdrachten.find(x => x.id === uit.body.opdrachtId);
+    if (o && o.status !== 'INGEDIEND') eind = o;
+    else await new Promise(r => setTimeout(r, 25));
+  }
+  assert.ok(eind, 'de webhook heeft de opdracht afgehandeld');
+  assert.equal(eind.status, 'TERUGGEBOEKT', 'niet alleen MISLUKT: het geld is teruggeboekt');
+
+  const naHook = (await api('bank/rekening', { iban: lid.iban }, lid.token)).body.rekening.saldoCenten;
+  assert.equal(naHook, voorSaldo, 'het volledige bedrag staat terug, tarief incluis');
+  const naGezond = (await oapi('bank/gezond', {}, 'RTG')).body;
+  assert.equal(naGezond.sluit.klopt, true, 'en het grootboek sluit nog steeds');
+  assert.equal(naGezond.railOpen, voorGezond.railOpen, 'de reconciliatie is terug op zijn oude stand');
+  assert.equal(naGezond.railZonderTerugboeking, 0, 'er staat geen geld af zonder bestemming');
+
+  // het lid ziet de teruggang op zijn afschrift; een stille correctie bestaat niet
+  const af = await api('bank/afschrift', { iban: lid.iban }, lid.token);
+  assert.ok(af.body.regels.some(r => r.soort === 'sepa-terug' && !r.af),
+    'de teruggeboeking staat als bijschrijving op het afschrift');
+});
+
+test('een payout-webhook die wij niet kennen verandert niets en valt niet om', async () => {
+  const voor = (await oapi('bank/gezond', {}, 'RTG')).body;
+  const evt = { id: 'evt_payout_2', type: 'payout.paid', data: { object: { id: 'po_vanIemandAnders' } } };
+  const r = await fetch(base + '/api/betaal/webhook', {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(evt) });
+  assert.equal(r.status, 200);
+  const na = (await oapi('bank/gezond', {}, 'RTG')).body;
+  assert.equal(na.railOpen, voor.railOpen);
+  assert.equal(na.sluit.klopt, true);
+});
+
+/* DE BEVOEGDHEIDSLAAG. Dit huis had vijf assen waarop een functie dicht kan, en
+   die gaan allemaal over WIE de gebruiker is of wat de beheerder uitzette. Deze
+   zesde gaat over iets anders: of RTG de handeling zelf mag verrichten. Het
+   verschil is niet academisch -- zonder deze laag kon je met twee klikken en een
+   tweede paar ogen in een stand komen waarin het huis zich als betaaldienst
+   gedraagt, en stond "we hebben het gebouwd" gelijk aan "we mogen het".
+
+   Deze toets haalt de vergunning weg die test.before heeft vastgelegd, kijkt wat
+   er dan dichtgaat, en zet hem terug. */
+test('zonder vastgelegde vergunning gaat dicht wat RTG niet zelf mag -- met de reden, niet met een lege lijst', async () => {
+  assert.equal((await bapi('bank/vergunning', { soort: '' }, baas)).status, 200, 'de vergunning is ingetrokken');
+
+  // 1. wat software is, blijft gewoon open: dat is rekenen op eigen gegevens
+  assert.equal((await api('bank/overzicht', {}, lid.token)).status, 200, 'de bank-app blijft zichtbaar');
+  assert.equal((await api('bank/inzichten', {}, lid.token)).status, 200, 'uitgaven-inzichten blijven open');
+  assert.equal((await api('bank/vastelasten', {}, lid.token)).status, 200, 'de vaste-lasten-radar blijft open');
+
+  // 2. wat een partner voor ons doet blijft open zolang die rail draait
+  const sepa = await api('bank/sepa', { iban: lid.iban, centen: 200, naarIban: 'NL91ABNA0417164300', idem: 'verg-1' }, lid.token);
+  assert.equal(sepa.status, 200, 'SEPA loopt via de partnerrail en blijft dus open');
+
+  // 3. maar krediet uit eigen boek niet: dat doet geen partner voor ons
+  const kr = await api('bank/krediet', {}, lid.token);
+  assert.equal(kr.status, 503, 'krediet uit eigen boek is dicht');
+  assert.equal(kr.body.reden, 'bevoegdheid', 'en niet als "de beheerder zette het uit"');
+  assert.equal(kr.body.vermogen, 'KREDIET_EIGEN_BOEK');
+  assert.equal(kr.body.nodig, 'bank', 'het antwoord zegt WAT ervoor nodig is');
+  assert.match(kr.body.error, /vergunning/i, 'in een zin die een mens begrijpt');
+
+  // 4. en de eigen rails gaan niet draaien: de knop weigert het opschalen
+  const op = await bapi('bank/operationeel', { aan: true }, baas);
+  if (op.body.needsAuth) await bapi('bank/autoriseer/bevestig', { id: op.body.autorisatie.id }, tweede);
+  const draai = await bapi('bank/draai', {}, baas);
+  const bevestig = draai.body.needsAuth
+    ? await bapi('bank/autoriseer/bevestig', { id: draai.body.autorisatie.id }, tweede)
+    : draai;
+  assert.equal(bevestig.status, 409, 'opschalen naar de eigen rails wordt geweigerd: ' + JSON.stringify(bevestig.body).slice(0, 120));
+  assert.match(bevestig.body.error, /vergunning/i);
+  assert.equal((await oapi('bank', {}, 'RTG')).body.regie.modus, 'partner', 'en de stand is niet verschoven');
+
+  // 5. de matrix vertelt het kantoor precies waar de grens loopt
+  const m = await oapi('bank/bevoegdheid', {}, 'RTG');
+  assert.equal(m.status, 200);
+  assert.equal(m.body.vergunning, null, 'er ligt niets');
+  const op_ = id => m.body.regels.find(r => r.id === id);
+  assert.equal(op_('INZICHTEN').mag, true);
+  assert.equal(op_('SEPA_UIT').mag, true);
+  assert.equal(op_('SEPA_UIT').via, 'partner', 'open, maar via de partner en niet op eigen kracht');
+  assert.equal(op_('KREDIET_EIGEN_BOEK').mag, false);
+  assert.equal(op_('KREDIET_EIGEN_BOEK').nodig, 'bank');
+
+  // 6. een te LAGE vergunning is geen vergunning
+  await bapi('bank/vergunning', { soort: 'betaalinstelling', nummer: 'PI-1', landen: ['NL'] }, baas);
+  const kr2 = await api('bank/krediet', {}, lid.token);
+  assert.equal(kr2.status, 503, 'een betaalinstelling mag nog geen krediet uit eigen boek verstrekken');
+  assert.equal(kr2.body.bevoegdheidReden, 'rang', 'en de reden is de rang, niet "hij ontbreekt"');
+
+  // 7. een VERLOPEN vergunning telt niet, ook al staat hij er
+  await bapi('bank/vergunning', { soort: 'bank', nummer: 'NL-OUD', landen: ['NL'], tot: '2020-01-01' }, baas);
+  const kr3 = await api('bank/krediet', {}, lid.token);
+  assert.equal(kr3.status, 503, 'een verlopen vergunning is geen vergunning');
+  assert.equal(kr3.body.bevoegdheidReden, 'verlopen');
+
+  // terugzetten zoals test.before hem had, zodat de rest van dit bestand klopt
+  assert.equal((await bapi('bank/vergunning', { soort: 'bank', nummer: 'NL-TOETS-1',
+    entiteit: 'RTG Bank N.V.', landen: ['NL'] }, baas)).status, 200);
+  assert.equal((await api('bank/krediet', {}, lid.token)).status, 200, 'en dan mag krediet weer');
+});
+
+/* HYBRIDE MAG GEEN SLUIPROUTE ZIJN. In de hybride stand clearen de eigen rails
+   EN de kaart-rails naast elkaar. Kijkt de bevoegdheidslaag dan naar de kaart
+   ("er is toch een partner"), dan is hybride precies de stand waarin je alles
+   mag wat je op eigen kracht niet mag -- en hybride is de stand waar de knop je
+   als eerste brengt. Daarom telt in hybride de EIGEN kant: de strengste wint. */
+test('in de hybride stand telt de eigen rail, niet de partner die er ook nog is', async () => {
+  // een betaalinstelling: genoeg om de knop te mogen draaien, te weinig om
+  // klantgeld aan te houden (dat vraagt een bankvergunning)
+  assert.equal((await bapi('bank/vergunning', { soort: 'betaalinstelling', nummer: 'PI-2', landen: ['NL'] }, baas)).status, 200);
+  await naarPartner();
+
+  const op = await bapi('bank/operationeel', { aan: true }, baas);
+  if (op.body.needsAuth) await bapi('bank/autoriseer/bevestig', { id: op.body.autorisatie.id }, tweede);
+  const draai = await bapi('bank/draai', {}, baas);
+  if (draai.body.needsAuth) await bapi('bank/autoriseer/bevestig', { id: draai.body.autorisatie.id }, tweede);
+  assert.equal((await oapi('bank', {}, 'RTG')).body.regie.modus, 'hybride', 'de knop staat op hybride');
+
+  const m = await oapi('bank/bevoegdheid', {}, 'RTG');
+  assert.equal(m.body.rail, 'eigen', 'in hybride kijken we naar de eigen rail, ook al draait de kaart mee');
+  const regel = id => m.body.regels.find(r => r.id === id);
+  assert.equal(regel('SEPA_UIT').mag, true, 'SEPA mag: een betaalinstelling is daarvoor toereikend');
+  assert.equal(regel('SEPA_UIT').via, 'eigen', 'en dan op eigen kracht, niet via de partner');
+  assert.equal(regel('KLANTGELD').mag, false, 'klantgeld aanhouden niet: dat vraagt een bankvergunning');
+  assert.equal(regel('KLANTGELD').reden, 'rang');
+
+  // en dat is geen papieren uitslag: de route gaat ook echt dicht
+  const stort = await api('bank/storten', { iban: lid.iban, centen: 1000, idem: 'hyb-1' }, lid.token);
+  assert.equal(stort.status, 503, 'storten is dicht want dat is klantgeld aanhouden');
+  assert.equal(stort.body.bevoegdheidReden, 'rang');
+
+  // terug naar de stand waarin de rest van dit bestand draait
+  await naarPartner();
+  assert.equal((await bapi('bank/vergunning', { soort: 'bank', nummer: 'NL-TOETS-1',
+    entiteit: 'RTG Bank N.V.', landen: ['NL'] }, baas)).status, 200);
+  assert.equal((await api('bank/storten', { iban: lid.iban, centen: 1000, idem: 'hyb-2' }, lid.token)).status, 200,
+    'met de bankvergunning terug mag storten weer');
+});
+
+/* EEN RAIL DIE HALF UIT STAAT IS GEEN RAIL DIE UIT STAAT. De boardroom kan de
+   sepa-partnerrail uitzetten -- de bank stopt dan met overboeken. De
+   partneruitbetaling liep gewoon door, want die kende de rail niet: hetzelfde
+   geld, dezelfde partner, dezelfde naad, en toch maar een van de twee dicht.
+   Dat is het soort halve maatregel waar een noodstop op stukloopt.
+
+   Meteen ook de vierde soort in de lijst: een BESLUIT. Het walletsaldo staat
+   niet open omdat er een vergunning ligt en niet omdat een partner het doet,
+   maar omdat RTG heeft vastgesteld dat een gesloten circuit met plafonds
+   erbuiten valt. Dat mag, maar dan hoort het opgeschreven te staan waar iemand
+   het kan tegenspreken -- en niet te ontbreken, want ontbreken lijkt op "er is
+   over nagedacht". */
+test('de partnerrail geldt voor iedereen die eraan hangt, en een besluit staat opgeschreven', async () => {
+  /* De manager van een zaak, want uitbetalen is managerwerk (test/pay.test.js
+     legt die deur vast). Zonder managerrol krijgen we een 403 en toetsen we de
+     verkeerde grendel. */
+  const zaakToken = (await (await fetch(base + '/api/supplier/login', { method: 'POST',
+    headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: 'rahul', password: 'Imran' }) })).json()).token;
+  assert.ok(zaakToken, 'de zaakmanager is ingelogd');
+
+  // met de rail aan komt de uitbetaling gewoon door de deur (en struikelt pas
+  // op een leeg saldo -- dat is een andere vraag dan of hij mag)
+  const aan = await api('supplier/pay/uitbetaal', {}, zaakToken);
+  assert.notEqual(aan.status, 503, 'met de rail aan is dit geen bevoegdheidsvraag: ' + JSON.stringify(aan.body).slice(0, 120));
+
+  // de boardroom zet de sepa-rail uit: de bank EN de partner gaan allebei dicht
+  assert.equal((await oapi('bank/partnerrail', { rail: 'sepa', aan: false }, 'RTG')).status, 200);
+  const uit = await api('supplier/pay/uitbetaal', {}, zaakToken);
+  assert.equal(uit.status, 503, 'de partneruitbetaling hangt aan dezelfde rail');
+  assert.equal(uit.body.reden, 'bevoegdheid');
+  assert.equal(uit.body.vermogen, 'PARTNER_UITBETALING');
+  const bankUit = await api('bank/sepa', { iban: lid.iban, centen: 200, naarIban: 'NL91ABNA0417164300', idem: 'rail-uit' }, lid.token);
+  assert.equal(bankUit.status, 503, 'en de bank-SEPA ook, want het is dezelfde rail');
+
+  // de matrix laat het besluit zien met zijn grond, niet als kaal vinkje
+  const m = await oapi('bank/bevoegdheid', {}, 'RTG');
+  const wallet = m.body.regels.find(r => r.id === 'WALLET_SALDO');
+  assert.equal(wallet.mag, true);
+  assert.equal(wallet.soort, 'besluit', 'geen software en geen vergunning: een besluit');
+  assert.match(wallet.besluit, /gesloten circuit/, 'met de grond erbij');
+  assert.match(wallet.besluit, /vervalt de grond/, 'en met wanneer die grond vervalt');
+  // en het walletsaldo zelf blijft gewoon werken -- een besluit sluit niets
+  assert.equal((await api('pay/overzicht', {}, lid.token)).status, 200);
+
+  assert.equal((await oapi('bank/partnerrail', { rail: 'sepa', aan: true }, 'RTG')).status, 200, 'rail weer aan');
+  assert.equal((await api('bank/sepa', { iban: lid.iban, centen: 200, naarIban: 'NL91ABNA0417164300', idem: 'rail-aan' }, lid.token)).status, 200);
 });

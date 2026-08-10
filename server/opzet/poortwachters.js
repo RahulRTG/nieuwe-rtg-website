@@ -54,6 +54,7 @@ const { scriptbundel, PAD: scriptbundelPad } = require('../middleware/scriptbund
   app.use(schakelaars({ db, accounts, functies,
     sessionFor: t => sessionFor(t),
     findSupplier: c => findSupplier(c),
+    bevoegdVan: deps.bevoegdVan,
     wachter: functiewachter }));
   app.use(jsonGzip());
 

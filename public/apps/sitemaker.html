@@ -113,12 +113,15 @@
     <label title="Kaartkleur (blokken met een vlak)"><span>Kaart</span><input type="color" id="kCard" aria-label="Kaartkleur"></label>
     <button class="knop" id="kReset" title="Kleuren terug naar het thema">Reset</button>
   </div>
+  <div class="apparaten" id="paginabar" role="group" aria-label="Pagina's van je site"></div>
   <div class="apparaten" id="apparaten" role="group" aria-label="Versie per toestel">
     <button type="button" data-a="telefoon">Telefoon</button>
     <button type="button" data-a="tablet">Tablet</button>
     <button type="button" data-a="desktop">Desktop</button>
   </div>
   <span class="sp"></span>
+  <button class="knop" id="aiKnop" title="Vraag de assistent het ontwerp aan te passen">AI</button>
+  <button class="knop" id="terugKnop" title="Eerdere versies van deze site">Historie</button>
   <button class="knop" id="blokKnop">+ Blok</button>
   <button class="knop" id="bewerkKnop">Voorbeeld</button>
   <button class="knop" id="openKnop">Mijn sites</button>
@@ -128,6 +131,7 @@
 <div class="lint" id="lint" hidden>
   <span class="stip" id="lintStip"></span>
   <span id="lintTekst">Nog niet online. Klik op "Ga online" om je site een RTG-adres te geven.</span>
+  <button class="knop" id="liveKnop" hidden>Zet wijzigingen online</button>
 </div>
 <div class="lint" id="versienoot" hidden></div>
 <main id="hoofd">
@@ -153,6 +157,18 @@
 <div class="sheet" id="openSheet"><div class="box">
   <h2>Mijn websites</h2><div class="sub">Open een eerder gemaakte site om verder te werken.</div>
   <div id="openlijst"></div>
+  <div style="margin-top:1rem;"><button class="knop" id="persoonlijkKnop">Maak mijn persoonlijke pagina</button>
+    <div class="sub" style="margin-top:.35rem;">Je eigen plek op het RTG-web, op je codenaam -- in een keer klaar, daarna van jou.</div></div>
+  <div id="versievak" hidden>
+    <h2 style="margin-top:1.1rem;">Eerdere versies</h2>
+    <div class="sub">De stand van voor elke bewaring. Terugzetten laat je adres en online-stand met rust -- en is zelf ook weer terug te draaien.</div>
+    <div id="versielijst"></div>
+  </div>
+  <div id="sjabloonvak" hidden>
+    <h2 style="margin-top:1.1rem;">Begin met een sjabloon</h2>
+    <div class="sub">Ontwerpen van het RTG Atelier als startpunt -- daarna is het jouw site.</div>
+    <div id="sjabloonlijst"></div>
+  </div>
 </div></div>
 <div class="sheet" id="onlineSheet"><div class="box">
   <h2>Ga online</h2><div class="sub">Kies het RTG-adres waarop bezoekers je site vinden. Alleen letters, cijfers en koppeltekens.</div>
@@ -179,7 +195,9 @@ const ACCENTEN=['#7F1634','#9E1C40','#C23A5E','#857007','#A98F1C','#0C0C0B','#2E
 const BLOKTYPES=[
   {t:'hero',n:'Hero',k:'grote kop + knop'},{t:'kop',n:'Kop',k:'sectiekop'},{t:'tekst',n:'Tekst',k:'alinea'},
   {t:'knop',n:'Knop',k:'oproep'},{t:'beeld',n:'Beeld',k:'één afbeelding'},{t:'kolommen',n:'Twee kolommen',k:'naast elkaar'},
-  {t:'galerij',n:'Galerij',k:'meerdere beelden'},{t:'citaat',n:'Citaat',k:'uitspraak'},{t:'ruimte',n:'Ruimte',k:'witruimte'},{t:'voettekst',n:'Voettekst',k:'onderaan'}
+  {t:'galerij',n:'Galerij',k:'meerdere beelden'},{t:'citaat',n:'Citaat',k:'uitspraak'},{t:'ruimte',n:'Ruimte',k:'witruimte'},{t:'voettekst',n:'Voettekst',k:'onderaan'},
+  {t:'faq',n:'Veelgestelde vragen',k:'vraag en antwoord'},{t:'prijzen',n:'Prijzen',k:'wat het kost'},
+  {t:'salon',n:'Uit De Salon',k:'uitgelicht beeld, met naam'}
 ];
 function nieuwBlok(t){
   const id=RTGId('b');
@@ -193,10 +211,70 @@ function nieuwBlok(t){
   if(t==='citaat')return{id,type:t,tekst:'Een tevreden klant zegt iets moois.',bron:'Naam'};
   if(t==='ruimte')return{id,type:t,hoogte:48};
   if(t==='voettekst')return{id,type:t,tekst:'© Mijn bedrijf · via RTG'};
+  if(t==='faq')return{id,type:t,kop:'Veelgestelde vragen',vragen:[{v:'Waar zijn jullie te vinden?',a:'Beschrijf hier waar klanten je vinden.'},{v:'Hoe maak ik een afspraak?',a:'Leg hier uit hoe het werkt.'}]};
+  if(t==='salon')return{id,type:'zaakdata',bron:'salon'};
+  if(t==='prijzen')return{id,type:t,kop:'Wat het kost',regels:[{naam:'Eerste dienst',prijs:'€ 45',wat:'Korte omschrijving.'},{naam:'Tweede dienst',prijs:'€ 90',wat:'Korte omschrijving.'}]};
   return{id,type:'tekst',tekst:''};
 }
 
 let DESIGN={id:null,titel:'',thema:'donker',accent:'#7F1634',kleuren:{},adres:'',online:false,blokken:[nieuwBlok('hero'),nieuwBlok('tekst')]};
+
+/* ---- meerdere pagina's per site ----
+   De maker bewerkt altijd DESIGN.blokken; bij het wisselen van pagina wordt
+   die verwijzing omgezet. HOMEBLOK onthoudt de voorpagina, zodat bewaren
+   altijd de juiste blokken op de juiste plek aflevert. */
+let PAG=-1, HOMEBLOK=DESIGN.blokken;
+function paginaReset(){ DESIGN.paginas=DESIGN.paginas||[]; PAG=-1; HOMEBLOK=DESIGN.blokken; paginaBar(); }
+function stashPagina(){ if(PAG===-1) HOMEBLOK=DESIGN.blokken; else if(DESIGN.paginas[PAG]) DESIGN.paginas[PAG].blokken=DESIGN.blokken; }
+function wisselPagina(i){ stashPagina(); PAG=i; DESIGN.blokken=(i===-1?HOMEBLOK:DESIGN.paginas[i].blokken); paginaBar(); render(); }
+function paginaBar(){
+  const el=$('#paginabar'); if(!el)return; el.textContent='';
+  const maak=(naam,i)=>{ const b=document.createElement('button'); b.type='button'; b.textContent=naam; if(i===PAG)b.classList.add('aan'); b.addEventListener('click',()=>{ if(i!==PAG)wisselPagina(i); }); el.appendChild(b); };
+  maak('Home',-1);
+  (DESIGN.paginas||[]).forEach((p,i)=>maak(p.naam,i));
+  if((DESIGN.paginas||[]).length<7){
+    const plus=document.createElement('button'); plus.type='button'; plus.textContent='+'; plus.title='Nieuwe pagina';
+    plus.addEventListener('click',()=>{ const naam=(prompt('Naam van de pagina (bijv. Contact)')||'').trim(); if(!naam)return;
+      DESIGN.paginas.push({id:RTGId('p'),naam:naam.slice(0,40),slug:'',blokken:[nieuwBlok('kop'),nieuwBlok('tekst')]});
+      wisselPagina(DESIGN.paginas.length-1); meld('Pagina toegevoegd. Bewaar om hem vast te leggen.'); });
+    el.appendChild(plus);
+  }
+  if(PAG>=0){
+    const h=document.createElement('button'); h.type='button'; h.textContent='✎'; h.title='Pagina hernoemen';
+    h.addEventListener('click',()=>{ const n=(prompt('Nieuwe naam',DESIGN.paginas[PAG].naam)||'').trim(); if(!n)return; DESIGN.paginas[PAG].naam=n.slice(0,40); DESIGN.paginas[PAG].slug=''; paginaBar(); });
+    el.appendChild(h);
+    const w=document.createElement('button'); w.type='button'; w.textContent='×'; w.title='Pagina verwijderen';
+    w.addEventListener('click',()=>{ if(!confirm('Pagina "'+DESIGN.paginas[PAG].naam+'" en alle blokken erop verwijderen?'))return; DESIGN.paginas.splice(PAG,1); PAG=-1; DESIGN.blokken=HOMEBLOK; paginaBar(); render(); });
+    el.appendChild(w);
+  }
+}
+paginaReset();
+
+/* ---- AI in de maker ----
+   De assistent past het ontwerp aan zoals het NU op het doek staat; jij ziet
+   het resultaat en bewaart zelf. Niets gaat vanzelf de deur uit. */
+$('#aiKnop').addEventListener('click',async()=>{
+  const opdracht=(prompt('Wat wil je veranderen? Bijv. "maak het luxer" of "maak een pagina voor bruiloften"')||'').trim();
+  if(!opdracht)return;
+  stashPagina();
+  meld('De assistent denkt na…');
+  try{
+    const r=await api('ai',{design:Object.assign({},DESIGN,{blokken:HOMEBLOK}),opdracht});
+    if(!r.design){ meld(r.antwoord||'Geen wijziging.'); return; }
+    const d=r.design;
+    if(d.titel)DESIGN.titel=d.titel;
+    if(['licht','donker'].includes(d.thema))DESIGN.thema=d.thema;
+    if(/^#[0-9a-fA-F]{6}$/.test(d.accent||''))DESIGN.accent=d.accent;
+    DESIGN.kleuren=d.kleuren||{};
+    HOMEBLOK=(d.blokken||[]).map(b=>{ if(!b.id)b.id=RTGId('b'); return b; });
+    DESIGN.paginas=(d.paginas||[]).slice(0,7).map(p=>({id:p.id||RTGId('p'),naam:p.naam||'Pagina',slug:p.slug||'',
+      blokken:(p.blokken||[]).map(b=>{ if(!b.id)b.id=RTGId('b'); return b; })}));
+    PAG=-1; DESIGN.blokken=HOMEBLOK;
+    $('#titel').value=DESIGN.titel;bouwSwatches();syncKleurInputs();
+    $('#themaKnop').textContent=DESIGN.thema==='licht'?'Licht':'Donker';
+    paginaBar(); render(); meld(r.antwoord||'Aangepast -- bekijk het doek en bewaar zelf.');
+  }catch(e){ meld(e.message); }
+});
 // de themakleuren zijn het vertrekpunt van de vrije kleurkiezers; wie niets
 // aanraakt houdt het thema, wie wel kiest overschrijft alleen die ene kleur
 const THEMA_KLEUR={donker:{bg:'#0C0C0B',txt:'#F4F1EC',card:'#151312'},licht:{bg:'#F5F1EA',txt:'#20160F',card:'#FBF8F2'}};
@@ -292,6 +370,38 @@ function renderBlok(blok,p){
   } else if(t==='citaat'){ s.classList.add('b-citaat'); const q=document.createElement('div'); q.className='q'; q.appendChild(veld(T.tekst,v=>zetVeld(blok,'tekst',v),true)); const br=document.createElement('div'); br.className='bron'; br.appendChild(veld(T.bron,v=>zetVeld(blok,'bron',v))); s.appendChild(q); s.appendChild(br);
   } else if(t==='ruimte'){ s.style.height=(blok.hoogte||40)+'px';
   } else if(t==='voettekst'){ s.classList.add('b-voet'); s.appendChild(veld(T.tekst,v=>zetVeld(blok,'tekst',v)));
+  } else if(t==='faq'||t==='prijzen'){
+    /* Blokken met rijen. Elk veld is los te bewerken; een rij leeghalen laat
+       hem bij het bewaren vanzelf wegvallen (de schoonmaak gooit lege rijen
+       weg), en met "+ rij" komt er een bij. */
+    s.classList.add('b-tekst');
+    const h=document.createElement('h2'); h.style.cssText='font-family:\'Bodoni Moda\',serif;margin-bottom:.8rem;';
+    h.appendChild(veld(T.kop,v=>zetVeld(blok,'kop',v))); s.appendChild(h);
+    const rijen=t==='faq'?(blok.vragen=blok.vragen||[]):(blok.regels=blok.regels||[]);
+    const velden=t==='faq'?[['v','vraag',false],['a','antwoord',true]]:[['naam','dienst',false],['prijs','prijs',false],['wat','omschrijving',true]];
+    rijen.forEach(r=>{
+      const d=document.createElement('div'); d.style.cssText='border-bottom:1px solid currentColor;padding:.5rem 0;';
+      velden.forEach(([k,,meer])=>{
+        const el=veld(r[k],v=>{r[k]=v;},meer);
+        el.style.display='block'; if(k==='v'||k==='naam')el.style.fontWeight='600'; else el.style.opacity='.8';
+        d.appendChild(el);
+      });
+      s.appendChild(d);
+    });
+    if(BEWERK){
+      const plus=document.createElement('button'); plus.type='button'; plus.textContent='+ rij';
+      plus.style.cssText='margin-top:.6rem;background:transparent;border:1px dashed currentColor;color:inherit;border-radius:8px;padding:.3rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;';
+      plus.addEventListener('click',()=>{ rijen.push(t==='faq'?{v:'Nieuwe vraag',a:'Het antwoord.'}:{naam:'Nieuwe regel',prijs:'€ 0',wat:''}); render(); });
+      s.appendChild(plus);
+    }
+  } else if(t==='zaakdata'){ /* live blok van een bedrijfssite: de inhoud komt bij bezoek uit het zaakprofiel */
+    s.classList.add('b-tekst'); const d=document.createElement('div');
+    d.style.cssText='border:1px dashed currentColor;opacity:.7;padding:1rem;text-align:center;font-size:.85rem;';
+    d.textContent='Live blok · '+(blok.bron||'')+' -- wordt bij ieder bezoek automatisch gevuld uit het bedrijfsprofiel.'; s.appendChild(d);
+  } else if(t==='formulier'){ /* contactformulier van een bedrijfssite: berichten landen als klus bij de zaak */
+    s.classList.add('b-tekst'); const d=document.createElement('div');
+    d.style.cssText='border:1px dashed currentColor;opacity:.7;padding:1rem;text-align:center;font-size:.85rem;';
+    d.textContent='Formulier · "'+(blok.kop||'Stel ons een vraag')+'" -- bezoekers schrijven hier een bericht dat als klus bij de zaak binnenkomt.'; s.appendChild(d);
   }
   (blok.verberg||[]).forEach(d=>s.classList.add('v-weg-'+d));
   if(BEWERK && (blok.verberg||[]).includes(APPARAAT)){ s.classList.add('dim'); const lb=document.createElement('div'); lb.className='vlabel'; lb.textContent='Verborgen op '+devNaam(APPARAAT); s.appendChild(lb); }
@@ -355,8 +465,13 @@ function zetBewerk(aan){BEWERK=aan;$('#bewerkKnop').textContent=aan?'Voorbeeld':
 function lintBij(){
   const l=$('#lint'); l.hidden=false;
   const stip=$('#lintStip'); stip.classList.toggle('aan',!!DESIGN.online);
+  /* Bewaren verandert je CONCEPT; bezoekers zien de stand van het laatste
+     publiceren. Dat moet hier staan, anders bewaart iemand tien keer en
+     vraagt zich af waarom het web niet meebeweegt. */
+  $('#liveKnop').hidden=!DESIGN.wacht;
   if(DESIGN.online && DESIGN.adres){
-    $('#lintTekst').innerHTML='Online op <span class="adres">'+esc(DESIGN.adres)+'.rtg</span> · <a href="/apps/browser.html?adres='+encodeURIComponent(DESIGN.adres)+'" target="_blank" rel="noopener">bekijk in de RTG-browser →</a>';
+    $('#lintTekst').innerHTML='Online op <span class="adres">'+esc(DESIGN.adres)+'.rtg</span> · <a href="/apps/browser.html?adres='+encodeURIComponent(DESIGN.adres)+'" target="_blank" rel="noopener">bekijk in de RTG-browser →</a>'+
+      (DESIGN.wacht?' · <b>je hebt bewaarde wijzigingen die nog niet online staan</b>':'');
   } else {
     $('#lintTekst').textContent='Nog niet online. Klik op "Ga online" om je site een RTG-adres te geven.';
   }
@@ -366,7 +481,18 @@ function lintBij(){
 
 async function bewaar(stil){
   DESIGN.titel=$('#titel').value.trim()||'Mijn website';
-  try{ const d=await api('bewaar',{design:DESIGN}); DESIGN.id=d.design.id; DESIGN.adres=d.design.adres||''; DESIGN.online=!!d.design.online; if(!stil)meld('Bewaard.'); lintBij(); return true; }
+  stashPagina();
+  const payload=Object.assign({},DESIGN,{blokken:HOMEBLOK});
+  try{ const d=await api('bewaar',{design:payload});
+    DESIGN.id=d.design.id; DESIGN.adres=d.design.adres||''; DESIGN.online=!!d.design.online;
+    // bewaren verandert het concept: staat de site online, dan wacht dit op publiceren
+    DESIGN.wacht=!!DESIGN.online;
+    // de geschoonde pagina's van de server overnemen (slugs, begrenzing)
+    DESIGN.paginas=d.design.paginas||[]; HOMEBLOK=d.design.blokken||[];
+    if(PAG>=DESIGN.paginas.length) PAG=-1;
+    DESIGN.blokken=(PAG===-1?HOMEBLOK:DESIGN.paginas[PAG].blokken);
+    paginaBar(); render();
+    if(!stil)meld('Bewaard.'); lintBij(); return true; }
   catch(e){ meld(e.message); return false; }
 }
 /* Meenemen (shared/uitvoer.js): het doek is een ontwerp, geen lijst -- wat
@@ -381,11 +507,82 @@ if(window.RTGUitvoer) RTGUitvoer.bron(()=>{
     rijen:MIJNSITES.map(s=>[s.titel||'', s.adres?s.adres+'.rtg':'', s.online?'ja':'nee', s.blokken, s.bezoeken||0, String(s.bij||'').slice(0,10)]) };
 });
 async function openen(){
+  $('#versievak').hidden=true;   // het sheet doet twee dingen; toon alleen wat je vroeg
   try{ const d=await api('mijn'); MIJNSITES=d.lijst||[]; const l=$('#openlijst'); l.textContent='';
     if(!(d.lijst||[]).length){ l.innerHTML='<div style="color:var(--soft);font-size:.85rem;">Nog geen websites. Bouw je eerste en bewaar hem.</div>'; }
-    (d.lijst||[]).forEach(it=>{const r=document.createElement('div');r.className='lijstrij';r.innerHTML='<span class="nm">'+esc(it.titel)+'</span><span class="mt">'+(it.online?esc(it.adres)+'.rtg':it.blokken+' blok'+(it.blokken===1?'':'ken'))+'</span>';const ob=document.createElement('button');ob.textContent='Open';ob.addEventListener('click',async()=>{try{const dd=await api('haal',{id:it.id});DESIGN=dd.design;DESIGN.blokken=DESIGN.blokken||[];DESIGN.kleuren=DESIGN.kleuren||{};$('#titel').value=DESIGN.titel;bouwSwatches();syncKleurInputs();$('#themaKnop').textContent=DESIGN.thema==='licht'?'Licht':'Donker';$('#openSheet').classList.remove('open');zetBewerk(true);lintBij();meld('Geopend.');}catch(e){meld(e.message);}});r.appendChild(ob);l.appendChild(r);});
+    (d.lijst||[]).forEach(it=>{const r=document.createElement('div');r.className='lijstrij';r.innerHTML='<span class="nm">'+esc(it.titel)+'</span><span class="mt">'+(it.online?esc(it.adres)+'.rtg':it.blokken+' blok'+(it.blokken===1?'':'ken'))+'</span>';const ob=document.createElement('button');ob.textContent='Open';ob.addEventListener('click',async()=>{try{const dd=await api('haal',{id:it.id});DESIGN=dd.design;DESIGN.blokken=DESIGN.blokken||[];DESIGN.kleuren=DESIGN.kleuren||{};paginaReset();$('#titel').value=DESIGN.titel;bouwSwatches();syncKleurInputs();$('#themaKnop').textContent=DESIGN.thema==='licht'?'Licht':'Donker';$('#openSheet').classList.remove('open');zetBewerk(true);lintBij();meld('Geopend.');}catch(e){meld(e.message);}});r.appendChild(ob);l.appendChild(r);});
     $('#openSheet').classList.add('open');
+    laadSjablonen();
   }catch(e){ meld(e.message); }
+}
+/* de versiegeschiedenis: de stand van voor elke bewaring, met een weg terug */
+function laadOntwerp(d,bericht){
+  DESIGN=d;DESIGN.blokken=DESIGN.blokken||[];DESIGN.kleuren=DESIGN.kleuren||{};paginaReset();
+  $('#titel').value=DESIGN.titel;bouwSwatches();syncKleurInputs();
+  $('#themaKnop').textContent=DESIGN.thema==='licht'?'Licht':'Donker';
+  $('#openSheet').classList.remove('open');zetBewerk(true);lintBij();
+  if(bericht)meld(bericht);
+}
+/* wat je bewaarde staat in je concept; hiermee gaat het naar buiten */
+$('#liveKnop').addEventListener('click',async()=>{
+  if(!DESIGN.id)return;
+  try{ await api('live',{id:DESIGN.id}); DESIGN.wacht=false; lintBij(); meld('Je wijzigingen staan online.'); }
+  catch(e){ meld(e.message); }
+});
+$('#terugKnop').addEventListener('click',async()=>{
+  if(!DESIGN.id){ meld('Bewaar je site eerst; daarna houdt hij zijn geschiedenis bij.'); return; }
+  const vak=$('#versievak'),l=$('#versielijst');
+  try{
+    const d=await api('versies',{id:DESIGN.id});
+    const lijst=d.lijst||[];
+    l.textContent='';
+    if(!lijst.length){ l.innerHTML='<div style="color:var(--soft);font-size:.85rem;">Nog geen eerdere versies. Vanaf je volgende bewaring staat de vorige stand hier.</div>'; }
+    lijst.forEach(v=>{
+      const r=document.createElement('div');r.className='lijstrij';
+      const wanneer=String(v.op||'').replace('T',' ').slice(0,16);
+      r.innerHTML='<span class="nm">'+esc(wanneer)+'</span><span class="mt">'+esc(v.reden)+' · '+v.blokken+' blok'+(v.blokken===1?'':'ken')+'</span>';
+      const hb=document.createElement('button');hb.textContent='Zet terug';
+      hb.addEventListener('click',async()=>{
+        if(!confirm('Deze versie terugzetten? Je huidige stand gaat naar de geschiedenis, dus je kunt weer vooruit.'))return;
+        try{ const rr=await api('herstel',{id:DESIGN.id,i:v.i}); laadOntwerp(rr.design,'Teruggezet. Je adres en online-stand zijn ongemoeid gebleven.'); }
+        catch(e){ meld(e.message); }
+      });
+      r.appendChild(hb);l.appendChild(r);
+    });
+    vak.hidden=false;$('#openSheet').classList.add('open');
+  }catch(e){ meld(e.message); }
+});
+/* de persoonlijke pagina: in een keer gegenereerd op je codenaam en meteen online */
+$('#persoonlijkKnop').addEventListener('click',async()=>{
+  try{
+    const r=await api('persoonlijk');
+    laadOntwerp(r.design, r.bestond?'Je persoonlijke pagina stond er al -- hier is hij.':'Je pagina staat online op '+r.adres+'.rtg. Maak hem nu van jou.');
+  }catch(e){ meld(e.message); }
+});
+/* de etalage van het Atelier: een sjabloon als startpunt voor een NIEUWE site */
+async function laadSjablonen(){
+  let d; try{ d=await api('sjablonen'); }catch(e){ return; }
+  const lijst=d.lijst||[]; if(!lijst.length) return;
+  const vak=$('#sjabloonvak'); vak.hidden=false;
+  const l=$('#sjabloonlijst'); l.textContent='';
+  lijst.forEach(it=>{
+    const r=document.createElement('div');r.className='lijstrij';
+    r.innerHTML='<span class="nm">'+esc(it.titel)+'</span><span class="mt">'+it.blokken+' blok'+(it.blokken===1?'':'ken')+' · '+esc(it.thema)+'</span>';
+    const kb=document.createElement('button');kb.textContent='Gebruik';
+    kb.addEventListener('click',async()=>{
+      try{
+        const s=(await api('sjabloon',{id:it.id})).sjabloon;
+        DESIGN={id:null,titel:s.titel,thema:s.thema,accent:s.accent,kleuren:s.kleuren||{},adres:'',online:false,
+          blokken:(s.blokken||[]).map(b=>Object.assign({},b)),volgorde:s.volgorde||undefined};
+        paginaReset();
+        $('#titel').value=DESIGN.titel;bouwSwatches();syncKleurInputs();
+        $('#themaKnop').textContent=DESIGN.thema==='licht'?'Licht':'Donker';
+        $('#openSheet').classList.remove('open');zetBewerk(true);lintBij();
+        meld('Sjabloon geladen als nieuwe site. Bewaar om hem van jou te maken.');
+      }catch(e){ meld(e.message); }
+    });
+    r.appendChild(kb);l.appendChild(r);
+  });
 }
 
 function onlineSheet(){
@@ -397,7 +594,7 @@ function onlineSheet(){
 }
 async function publiceer(){
   const adres=$('#adresIn').value.trim();
-  try{ const r=await api('publiceer',{id:DESIGN.id,adres}); DESIGN.adres=r.adres; DESIGN.online=true; $('#onlineSheet').classList.remove('open'); lintBij(); meld('Je staat online op '+r.adres+'.rtg'); }
+  try{ const r=await api('publiceer',{id:DESIGN.id,adres}); DESIGN.adres=r.adres; DESIGN.online=true; DESIGN.wacht=false; $('#onlineSheet').classList.remove('open'); lintBij(); meld('Je staat online op '+r.adres+'.rtg'); }
   catch(e){ meld(e.message); }
 }
 async function offline(){

@@ -8,10 +8,12 @@
 
    Alles wordt geschoond en begrensd; beeld verwijst naar eigen RTG-campagne of
    Salon, we bewaren alleen de verwijzing. */
-module.exports = ({ db, save, crypto, schoon, media }) => {
+module.exports = ({ db, save, crypto, schoon, media, merkHuisstijl }) => {
   const scho = schoon || ((v, n) => String(v == null ? '' : v).trim().slice(0, n || 200));
-  const TYPES = ['hero', 'kop', 'tekst', 'knop', 'beeld', 'kolommen', 'galerij', 'citaat', 'ruimte', 'voettekst'];
-  const VERSIES = ['telefoon', 'tablet', 'desktop'];
+  /* De schoonmaak van de bloktaal (wat een blok mag bevatten, hoe lang, hoe
+     een adres en een kleur eruitzien) staat in ./webmaker-schoon.js -- elke
+     ingang die iets van buiten aanneemt loopt daarlangs. */
+  const { TYPES, slug, schoonBlok, schoonVolgorde, schoonKleuren } = require('./webmaker-schoon')({ scho, crypto });
   const PER_LID = 12;         // hoeveel sites een lid mag hebben
   const TOTAAL = 20000;       // harde bovengrens op de opslag
 
@@ -25,82 +27,52 @@ module.exports = ({ db, save, crypto, schoon, media }) => {
      schijf) en dat is een ander soort werk dan het bouwen van een pagina. */
   const fotolaag = require('./webmaker-fotos')({ store, save, media });
   const { fotos, fotoBewaar, fotoWeg } = fotolaag;
+  // meerdere pagina's per site: schoonmaak in ./webmaker-paginas.js
+  const paginalaag = require('./webmaker-paginas')({ scho, schoonBlok, crypto, slug });
+  /* De versiegeschiedenis staat in ./webmaker-versies.js: bij elke bewaring
+     gaat de vorige stand daarheen, zodat de AI-knop en "opnieuw genereren"
+     een weg terug hebben. */
+  const versielaag = require('./webmaker-versies')({ store, save, scho });
+  // wie deed wat, wanneer (./webmaker-spoor.js) -- het verslag onder de goedkeuringsflow
+  const spoor = require('./webmaker-spoor')({ store, save, scho });
+  /* Cijfers over een site (./webmaker-meting.js): tellingen van gebeurtenissen,
+     nooit van mensen. */
+  const meting = require('./webmaker-meting')({ store, save });
+  /* Een eigen adres buiten het RTG-web (./webdomein.js). Staat standaard uit;
+     de boardroom-schakelaar zit op de functie 'dom-eigendomein'. */
+  const domeinlaag = require('./webdomein')({ store, save, scho, spoor });
+  /* Hoe een bewaard ontwerp eruitziet -- en vooral: WAT EEN BEWARING OVERLEEFT.
+     Dat laatste is drie keer misgegaan (de bevroren stand, het geplande moment
+     en het gekoppelde domein verdwenen elk stilletjes bij de eerstvolgende
+     opslag), dus het staat op een eigen plek: ./webmaker-ontwerp.js. */
+  const bouwOntwerp = require('./webmaker-ontwerp')({ scho, crypto, schoonBlok, schoonKleuren });
 
-  function slug(v) {
-    return String(v == null ? '' : v).toLowerCase().trim()
-      .replace(/^rtg:\/\//, '').replace(/\.rtg$/, '')   // "rtg://naam" of "naam.rtg" mag ook
-      .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 30);
-  }
-  function schoonBlok(b) {
-    b = b || {};
-    const t = TYPES.includes(b.type) ? b.type : 'tekst';
-    const T = (v, n) => scho(v, n || 400);
-    const o = { id: scho(b.id, 20) || ('b' + crypto.randomBytes(4).toString('hex')), type: t };
-    if (t === 'hero') { o.kop = T(b.kop, 120); o.sub = T(b.sub, 240); o.knop = T(b.knop, 40); }
-    else if (t === 'kop') { o.tekst = T(b.tekst, 160); }
-    else if (t === 'tekst') { o.tekst = T(b.tekst, 4000); }
-    else if (t === 'knop') { o.tekst = T(b.tekst, 40); o.href = T(b.href, 300); }
-    else if (t === 'beeld') { o.src = T(b.src, 400); o.bijschrift = T(b.bijschrift, 160); }
-    else if (t === 'kolommen') { o.lk = T(b.lk, 80); o.lt = T(b.lt, 1500); o.rk = T(b.rk, 80); o.rt = T(b.rt, 1500); }
-    else if (t === 'galerij') { o.beelden = (Array.isArray(b.beelden) ? b.beelden : []).slice(0, 12).map(s => T(s, 400)).filter(Boolean); }
-    else if (t === 'citaat') { o.tekst = T(b.tekst, 600); o.bron = T(b.bron, 80); }
-    else if (t === 'ruimte') { o.hoogte = Math.max(8, Math.min(240, Number(b.hoogte) || 40)); }
-    else if (t === 'voettekst') { o.tekst = T(b.tekst, 400); }
-    if (Array.isArray(b.verberg)) {
-      const v = b.verberg.filter(x => VERSIES.includes(x));
-      if (v.length) o.verberg = [...new Set(v)];
-    }
-    // per-versie eigen tekst (telefoon/tablet): alleen de tekstvelden die dit blok kent
-    if (b.varianten && typeof b.varianten === 'object') {
-      const V = {};
-      ['telefoon', 'tablet'].forEach(ver => {
-        const src = b.varianten[ver];
-        if (src && typeof src === 'object') {
-          const ov = {};
-          Object.keys(o).forEach(k => {
-            if (['id', 'type', 'verberg', 'varianten'].includes(k)) return;
-            if (typeof o[k] === 'string' && typeof src[k] === 'string') ov[k] = T(src[k], 4000);
-          });
-          if (Object.keys(ov).length) V[ver] = ov;
-        }
-      });
-      if (Object.keys(V).length) o.varianten = V;
-    }
-    return o;
-  }
+  /* ---- concept en wat er online staat ----
 
-  function schoonVolgorde(d, blokken) {
-    if (!d.volgorde || typeof d.volgorde !== 'object') return undefined;
-    const ids = new Set(blokken.map(b => b.id));
-    const V = {};
-    ['telefoon', 'tablet'].forEach(ver => {
-      const arr = d.volgorde[ver];
-      if (!Array.isArray(arr)) return;
-      const seen = new Set(); const uit = [];
-      arr.forEach(x => { const s = scho(x, 20); if (ids.has(s) && !seen.has(s)) { seen.add(s); uit.push(s); } });
-      if (uit.length) V[ver] = uit;
-    });
-    return Object.keys(V).length ? V : undefined;
-  }
+     Wat de maker bewerkt is het CONCEPT; wat bezoekers zien is de bevroren
+     stand van het laatste publiceren (d.live). Zonder dat onderscheid gaat
+     elke halve zin die iemand intypt meteen het web op, en dat is voor een
+     bedrijfssite geen werkbare manier van werken.
 
-  const kort = d => ({ id: d.id, titel: d.titel, adres: d.adres || '', online: !!d.online, bezoeken: d.bezoeken || 0, bij: d.bij, blokken: (d.blokken || []).length });
-  // vrije kleuren: alleen echte hex-waarden (#rgb of #rrggbb) worden bewaard;
-  // de sleutels die we kennen zijn bg (achtergrond), txt (tekst) en card (kaart).
-  // Het accent blijft zijn eigen veld. Ontbreekt een kleur, dan valt de site
-  // terug op het thema (licht/donker) -- niets forceren.
-  function schoonKleuren(k) {
-    if (!k || typeof k !== 'object') return null;
-    const hex = v => /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(String(v || '')) ? String(v) : null;
-    const uit = {};
-    ['bg', 'txt', 'card'].forEach(n => { const c = hex(k[n]); if (c) uit[n] = c; });
-    return Object.keys(uit).length ? uit : null;
-  }
-  const publiek = d => ({ titel: d.titel, thema: d.thema, accent: d.accent, kleuren: d.kleuren || null, blokken: d.blokken || [], volgorde: d.volgorde || null, adres: d.adres, eigenaar: d.eigenaar });
+     Een site van voor deze laag heeft nog geen bevroren stand; die serveert
+     gewoon zijn concept, zodat er niets omvalt en niemand zijn site kwijt is. */
+  function bevries(d) { d.live = versielaag.ontwerpVan(d); d.liveOp = new Date().toISOString(); }
+  const wacht = d => !!d.online && !!d.liveOp && new Date(d.bij) > new Date(d.liveOp);
+
+  const kort = d => ({ id: d.id, titel: d.titel, adres: d.adres || '', online: !!d.online, bezoeken: d.bezoeken || 0, bij: d.bij, blokken: (d.blokken || []).length, wacht: wacht(d), merk: d.merk || '', domein: d.domein || '' });
+  const publiek = d => {
+    const o = d.live || d;   // geen bevroren stand (oude site): dan het concept
+    return { titel: o.titel, thema: o.thema, accent: o.accent, kleuren: o.kleuren || null, blokken: o.blokken || [], paginas: o.paginas || [], volgorde: o.volgorde || null, adres: d.adres, eigenaar: d.eigenaar, zaakCode: d.zaakCode || '' };
+  };
 
   function mijn(key) { return store().lijst.filter(d => d.eigenaar === key).map(kort); }
   function haal(key, id) { const d = store().lijst.find(x => x.id === scho(id, 20) && x.eigenaar === key); return d || null; }
 
-  function bewaar(key, d) {
+  /* opts.zaakCode wordt alleen door de zaak-route meegegeven (na supplierAuth):
+     dat een site bij een bedrijf hoort is een feit uit de inlog, geen veld dat
+     een lid zelf in zijn ontwerp kan zetten. Bij een gewone save blijft de
+     bestaande koppeling staan. */
+  function bewaar(key, d, opts) {
     d = d || {};
     const s = store();
     let bestaand = null;
@@ -108,21 +80,25 @@ module.exports = ({ db, save, crypto, schoon, media }) => {
     if (!bestaand && s.lijst.filter(x => x.eigenaar === key).length >= PER_LID) {
       return { error: 'Je hebt het maximum aantal websites bereikt. Verwijder er eerst een.', status: 400 };
     }
-    const design = {
-      id: bestaand ? bestaand.id : ('w' + crypto.randomBytes(5).toString('hex')),
-      eigenaar: key,
-      titel: scho(d.titel, 80) || 'Mijn website',
-      thema: ['licht', 'donker'].includes(d.thema) ? d.thema : 'donker',
-      accent: /^#[0-9a-fA-F]{6}$/.test(String(d.accent || '')) ? d.accent : '#7F1634',
-      kleuren: schoonKleuren(d.kleuren),
-      blokken: (Array.isArray(d.blokken) ? d.blokken : []).slice(0, 60).map(schoonBlok),
-      adres: bestaand ? (bestaand.adres || '') : '',
-      online: bestaand ? !!bestaand.online : false,
-      bezoeken: bestaand ? (bestaand.bezoeken || 0) : 0,
-      gemaakt: bestaand ? bestaand.gemaakt : new Date().toISOString(),
-      bij: new Date().toISOString()
-    };
+    const design = bouwOntwerp({ d, key, opts, bestaand });
     const vg = schoonVolgorde(d, design.blokken); if (vg) design.volgorde = vg;
+    const pg = paginalaag.schoonPaginas(d); if (pg) design.paginas = pg;
+    /* Hoort deze site bij een vestiging van een merk, dan komt de HUISSTIJL van
+       het merk en niet van de vestiging -- bij elke bewaring opnieuw. De
+       vestiging beheert haar eigen inhoud (openingstijden, foto's, kaart, team,
+       dat staat in haar zaakprofiel en komt via de live blokken binnen); een
+       vestiging die het merk kan omverven is precies waarom een keten centraal
+       beheer wil. */
+    if (merkHuisstijl && design.zaakCode) {
+      const h = merkHuisstijl(design.zaakCode);
+      if (h) {
+        design.thema = h.thema; design.accent = h.accent; design.kleuren = h.kleuren || null;
+        design.merk = h.merk;
+      }
+    }
+    // de stand die we gaan overschrijven eerst wegleggen
+    if (bestaand) versielaag.leg(bestaand, (opts && opts.reden) || 'bewaard');
+    spoor.noteer(design.id, bestaand ? ((opts && opts.reden) || 'bewaard') : 'gemaakt', opts && opts.wie);
     if (bestaand) { const i = s.lijst.indexOf(bestaand); s.lijst[i] = design; }
     else { s.lijst.unshift(design); s.lijst = s.lijst.slice(0, TOTAAL); }
     save();
@@ -130,41 +106,43 @@ module.exports = ({ db, save, crypto, schoon, media }) => {
   }
 
   function verwijder(key, id) {
-    const s = store(); s.lijst = s.lijst.filter(x => !(x.id === scho(id, 20) && x.eigenaar === key)); save();
+    const s = store();
+    const weg = s.lijst.find(x => x.id === scho(id, 20) && x.eigenaar === key);
+    s.lijst = s.lijst.filter(x => !(x.id === scho(id, 20) && x.eigenaar === key));
+    if (weg) { versielaag.wis(weg.id); spoor.wis(weg.id); meting.wis(weg.id); }   // een site die weg is, laat niets achter
+    save();
     return { ok: true };
   }
+  /* Vier vragen die allemaal eerst "is deze site van jou?" stellen. Die
+     controle staat in haal(); hem vier keer overschrijven is vier plekken waar
+     hij kan gaan afwijken. */
+  const vanMij = (key, id, doe) => { const d = haal(key, id); return d ? doe(d) : { error: 'Website niet gevonden.', status: 404 }; };
+  const versies = (key, id) => vanMij(key, id, d => ({ ok: true, lijst: versielaag.lijst(d) }));
+  const herstel = (key, id, i, wie) => vanMij(key, id, d => {
+    const r = versielaag.herstel(d, i);
+    if (!r.error) { spoor.noteer(d.id, 'oudere versie teruggezet', wie); save(); }
+    return r;
+  });
+  // een eigen adres buiten het RTG-web, en de cijfers over deze site
+  const domein = (key, id, host, wie) => vanMij(key, id, d => domeinlaag.koppel(d, host, wie));
+  const cijfers = (key, id) => vanMij(key, id, d => ({ ok: true, cijfers: meting.cijfers(d) }));
 
-  function publiceer(key, id, adresIn) {
-    const d = haal(key, id);
-    if (!d) return { error: 'Website niet gevonden.', status: 404 };
-    const a = slug(adresIn || d.adres || d.titel);
-    if (a.length < 2) return { error: 'Kies een adres van minstens twee tekens (letters, cijfers, koppelteken).', status: 400 };
-    const bezet = store().lijst.find(x => x.adres === a && x.id !== d.id);
-    if (bezet) return { error: 'Dit adres is al bezet. Kies een ander.', status: 409 };
-    d.adres = a; d.online = true; d.bij = new Date().toISOString(); save();
-    return { ok: true, adres: a, online: true };
-  }
-  function offline(key, id) {
-    const d = haal(key, id);
-    if (!d) return { error: 'Website niet gevonden.', status: 404 };
-    d.online = false; save();
-    return { ok: true, online: false };
-  }
+  /* Alles wat bepaalt WAT ER BUITEN STAAT -- online gaan, wijzigingen
+     publiceren, een moment plannen, uit de lucht halen, en het spoor daarvan --
+     staat in ./webmaker-publiceren.js. Dat is een ander soort werk dan het
+     bouwen van een ontwerp, en het is de kant waar de leiding over gaat. */
+  const pub = require('./webmaker-publiceren')({ store, save, slug, haal, bevries, spoor });
 
-  /* ---- de browser-kant (leden bekijken de gepubliceerde sites) ---- */
-  function gids() {
-    return store().lijst.filter(d => d.online && d.adres)
-      .sort((a, b) => (b.bezoeken || 0) - (a.bezoeken || 0))
-      .slice(0, 200)
-      .map(d => ({ adres: d.adres, titel: d.titel, bezoeken: d.bezoeken || 0, blokken: (d.blokken || []).length }));
-  }
-  function open(adresIn) {
-    const a = slug(adresIn);
-    const d = store().lijst.find(x => x.adres === a && x.online);
-    if (!d) return { error: 'Geen RTG-site op dit adres.', status: 404 };
-    d.bezoeken = (d.bezoeken || 0) + 1; save();
-    return { ok: true, site: publiek(d) };
-  }
+  /* De browser-kant (gids, openen, zoeken) staat in ./webmaker-blader.js:
+     bekijken is ander werk dan bouwen. */
+  const blader = require('./webmaker-blader')({ store, save, slug, publiek, rijp: d => pub.rijp(d), meting });
 
-  return { mijn, haal, bewaar, verwijder, publiceer, offline, gids, open, fotos, fotoBewaar, fotoWeg, TYPES };
+  /* haal() geeft met opzet de LEVENDE regel terug (publiceer, herstel en
+     zetLive schrijven erin), dus de afgeleide "wacht"-vlag hangen we er niet
+     aan vast maar reiken we los aan -- zo staat de regel nog steeds op een
+     plek en breken we het schrijven niet. */
+  return { mijn, haal, bewaar, verwijder, slug, versies, herstel, wacht, cijfers, domein, publiekeStand: publiek, siteVoorHost: domeinlaag.siteVoorHost, webOverzicht: meting.overzicht, telFormulier: meting.formulier,
+           publiceer: pub.publiceer, zetLive: pub.zetLive, offline: pub.offline, plan: pub.plan, spoorVan: pub.spoorVan, planVeeg: pub.veeg,
+           gids: blader.gids, open: blader.open, zoek: blader.zoek, adresVanZaak: blader.adresVanZaak, zaakVanAdres: blader.zaakVanAdres, eigenaarVanAdres: blader.eigenaarVanAdres, idVanAdres: blader.idVanAdres,
+           fotos, fotoBewaar, fotoWeg, TYPES };
 };

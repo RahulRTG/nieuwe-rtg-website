@@ -1978,6 +1978,7 @@ console.log('\n34) elke AI-ingang draagt de toegangsregel, of staat erkend op de
     ['kern/bijles.js', 'RTF-onderwijs: bijles, geen pasgesprek'],
     ['kern/gemeente/meldingen.js', 'JSON-uitvoer: meldingsvelden, geen vrije tekst naar een lid'],
     ['kern/homekit.js', 'JSON-uitvoer: scene-definitie, geen vrije tekst naar een lid'],
+    ['kern/webmaker-ai.js', 'JSON-uitvoer: een website-ontwerp in de bloktaal, geen vrije tekst naar een lid'],
     ['kern/kijken.js', 'begrensd: beeldherkenning met eigen harde grenzen, geen pasgesprek'],
     ['kern/kletspraat/gesprek.js', 'kletsspel met eigen opdracht + taalregels, geen pasgesprek'],
     ['kern/leren/overhoren/lijsten.js', 'RTF-onderwijs: overhoorlijsten, geen pasgesprek'],

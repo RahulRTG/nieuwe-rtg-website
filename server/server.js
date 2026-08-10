@@ -396,8 +396,11 @@ const { schild, ssrf, zetWacht, zetRtgai } = require('./opzet/verzoekketen')({
    bestanden. Ook hier een late binding: het scan-net wordt pas gebouwd als
    `beveilig` en `wacht` er zijn (zetScanNet). */
 const PUBLIC_DIR = path.join(__dirname, '..', 'public');
-const { rtf, CSP_NONCE, zetScanNet } = require('./opzet/poortwachters')({
-  app, express, db, save, log, accounts, eigenaar, PUBLIC_DIR, PRODUCTION, opslagKlaar,
+/* De haak voor eigen domeinen: hij wordt hier leeg meegegeven en pas gevuld
+   zodra de webmaker bestaat. Zolang hij leeg is, verandert er niets. */
+const eigenWeb = {};
+const { rtf, CSP_NONCE, zetScanNet, functies } = require('./opzet/poortwachters')({
+  app, express, db, save, log, accounts, eigenaar, PUBLIC_DIR, PRODUCTION, opslagKlaar, eigenWeb,
   // hoisted of verderop in dit bestand; lui doorgegeven
   sseToOffice: (ev, data) => sseToOffice(ev, data),
   sessionFor: t => sessionFor(t),
@@ -714,7 +717,45 @@ const media = require('./media').maakMedia({ dir: DATA_DIR });
 /* RTG Webmaker (kern/webmaker.js): de eigen site van een lid. Staat hier en
    niet eerder omdat hij de mediastore nodig heeft: een foto die uit de
    bibliotheek valt of wordt weggehaald, moet ook van schijf. */
-const webmaker = require('./kern/webmaker')({ db, save, crypto, schoon, media });
+/* Merken met vestigingen (kern/webmerk.js) en de Website-maker kennen elkaar:
+   de maker vraagt bij elke bewaring welke huisstijl er voor deze zaak geldt,
+   het merk laat zijn hoofdontwerp door de maker uitrollen. Late binding
+   daarom -- webmerk bestaat een regel later. */
+let webmerk = null;
+const webmaker = require('./kern/webmaker')({ db, save, crypto, schoon, media,
+  merkHuisstijl: z => webmerk && webmerk.huisstijlVoorZaak(z) });
+webmerk = require('./kern/webmerk')({ db, save, scho: schoon, webmaker, findSupplier });
+/* De haak vullen die de poortwachters boven express.static hebben gezet: een
+   verzoek op een gekoppelde hostnaam krijgt de GEPUBLICEERDE site als HTML.
+   De boardroom-schakelaar staat standaard uit; zolang die dicht is gebeurt hier
+   niets en valt het verzoek gewoon door naar de site van het huis. */
+const webdomeinHtml = require('./kern/webdomein-html');
+eigenWeb.serveer = (req, res, next) => {
+  try {
+    const staat = db.data && db.data.techniek && db.data.techniek.functies;
+    if (!functies.functieAan('dom-eigendomein', staat)) return next();
+    const host = String(req.headers.host || '').split(':')[0];
+    const d = webmaker.siteVoorHost(host);
+    if (!d) return next();
+    const s = d.zaakCode ? findSupplier(d.zaakCode) : null;
+    // wat er BUITEN staat is de gepubliceerde stand, nooit het concept
+    const site = webplatform.losSite(webmaker.publiekeStand(d), s, true);
+    const pad = req.path === '/' ? '' : req.path.replace(/^\//, '').replace(/\/$/, '');
+    const html = webdomeinHtml.render(site, pad);
+    if (html == null) return res.status(404).type('text/plain').send('Deze pagina bestaat niet.');
+    res.type('html').send(html);
+  } catch (e) { next(); }
+};
+/* RTG Web Platform (kern/webplatform.js): genereert bedrijfssites uit het
+   zaakprofiel en lost de live zaakdata-blokken op bij het openen. */
+/* Wie van het personeel op de bedrijfssite mag staan: een publicatiebesluit
+   van de leiding, geen veld in de personeelsadministratie. */
+const webmakerTeam = require('./kern/webmaker-team')({ db, save, listStaff: accounts.listStaff });
+const webplatform = require('./kern/webplatform')({ db, team: webmakerTeam });
+/* Een site lezen in je eigen taal: dezelfde vertaallaag als de berichten. */
+const webplatformTaal = require('./kern/webplatform-taal')({ vertaler: require('./translate') });
+// AI in de Website-maker: past een ontwerp aan op een opdracht; bewaart niets zelf
+const webmakerAi = require('./kern/webmaker-ai')({ anthropic, schoon });
 app.get('/media/:naam', (req, res) => { media.serveer(req, res).catch(() => { if (!res.headersSent) res.status(500).end(); }); });
 // Eenmalige verhuizing van al bestaande base64-foto's (Salon + snaps) naar de
 // mediastore, zodat ook oude data het geheugen niet meer belast. Alleen de
@@ -1805,7 +1846,7 @@ const kern = {
   DEMO_PASS, DEMO_SUPPLIER, DEMO_USER, DOOR_RELOCK_MS, FIN_CAT, FISCAAL_PEILJAAR, HK_STATUSES, LANDEN,
   OFFICE_CODE, PERSONAS, POS_METHODS, PRODUCTION, PUBLIC_DIR, RIT_KETEN, RIT_LEGACY, RIT_MELDING,
   RUN_STATIONS, SHIFT_NAMES, SSE_BUFFER_TTL, STAFF_SEED, TABLE_STATUSES, TOKEN_TTL_MS, UPLOAD_DIR, VAC_SOORTEN,
-  ZAAK_OPTIES, ZZP, accounts, addContact, addTicket, aiFindDoor, aiFindRoom, archief, beveilig, wacht, mailQ, mailIn, mailAuth, mailBijlage, mailSleutel, rtmailAi, rtmail, rtmailTeam, automatisering, werkmail, antivirus, atelierweb, webmaker, eigenaar, zaakdoos, rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels, rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar, mailAanname, naamlaag,
+  ZAAK_OPTIES, ZZP, accounts, addContact, addTicket, aiFindDoor, aiFindRoom, archief, beveilig, wacht, mailQ, mailIn, mailAuth, mailBijlage, mailSleutel, rtmailAi, rtmail, rtmailTeam, automatisering, werkmail, antivirus, atelierweb, webmaker, webmerk, webplatform, webplatformTaal, webmakerAi, webmakerTeam, eigenaar, zaakdoos, rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels, rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar, mailAanname, naamlaag,
   aiSystemPrompt, alcoholGrensVan, anthropic, app, appUrl, applyChatPubliek, applyChatVertaald, auth, betaal, broadcastSync,
   bufferEvent, bus, canEngage, cannedAnswer, cannedBoekhouder, cateringDishes, centen, chatApplicant,
   chatKeyOf, chatStuur, checkCred, coachCache, coachRules, conciergeInbox, connectedSupplierCodes, convOf,

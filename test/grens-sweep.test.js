@@ -168,10 +168,16 @@ async function eenmaligSweepen() {
 test('1. geen enkel endpoint valt om (geen 500) op een ingelogd verzoek', async () => {
   /* Een 500 betekent: er kwam invoer doorheen waar de code niet op gebouwd is.
      400 en 403 zijn prima -- dat is de code die NEE zegt. 429 ook: dat is de
-     rem, en die hoort te werken. */
+     rem, en die hoort te werken.
+
+     En een 503 die de naam van een uitgezette functie meedraagt: dat is de
+     schakelkast die NEE zegt, niet code die omvalt. Het huis maakt dat
+     onderscheid al -- de storingswachter telt zo'n 503 bewust niet mee. Zonder
+     de functienaam blijft een 503 gewoon een omgevallen endpoint. */
   const r = await eenmaligSweepen();
   assert.ok(r.length > 200, 'de sweep heeft daadwerkelijk een grote lijst gelopen (' + r.length + ')');
-  const omgevallen = r.filter(x => x.status >= 500 || x.status === 0)
+  const bewustDicht = x => x.status === 503 && /"functie"\s*:/.test(x.tekst || '');
+  const omgevallen = r.filter(x => (x.status >= 500 || x.status === 0) && !bewustDicht(x))
     .map(x => x.pad + ' -> ' + x.status + ' ' + x.tekst.slice(0, 120));
   assert.deepEqual(omgevallen, [],
     'deze endpoints vallen om op een gewoon ingelogd verzoek met onzin erin:\n  ' + omgevallen.join('\n  '));

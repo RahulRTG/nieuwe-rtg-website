@@ -1,12 +1,13 @@
-/* Routes voor de Website-maker (leden) en de RTG-browser.
-
-   Bouwen en publiceren zit achter de gewone leden-inlog en is voor echte leden
-   (geen gast). De browser-gids en het openen van een site mag elk ingelogd lid,
-   zodat je door het RTG-web kunt bladeren. */
+/* Routes voor de Website-maker: de bouwkant, voor leden en zaken. De
+   leeskant (de RTG-browser) staat in routes/webbrowser.js. */
 module.exports = (kern) => {
-  const { app, auth, webmaker, antivirus, media } = kern;
+  const { app, auth, webmaker, webplatform, webmakerAi, atelierweb, antivirus, media, liveCodename } = kern;
   const FOTO_MAX_BYTES = 2 * 1024 * 1024; // ~2 MB per foto
   const stuur = (res, r) => r && r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
+  /* Het scherm moet weten of er bewaarde wijzigingen klaarstaan die nog niet
+     online zijn; de regel daarvoor staat in de kern, hier hangen we hem er
+     alleen bij (haal() geeft de levende regel terug, die kopieren we niet). */
+  const metWacht = d => Object.assign({}, d, { wacht: webmaker.wacht(d) });
   const geenGast = (req, res) => {
     if (req.session.tier === 'guest') { res.status(403).json({ error: 'Een eigen website maken is voor leden. Word lid om te beginnen.' }); return true; }
     return false;
@@ -18,12 +19,60 @@ module.exports = (kern) => {
     if (geenGast(req, res)) return;
     const d = webmaker.haal(req.session.key, (req.body || {}).id);
     if (!d) return res.status(404).json({ error: 'Website niet gevonden.' });
-    res.json({ design: d });
+    res.json({ design: metWacht(d) });
   });
   app.post('/api/site/bewaar', auth, (req, res) => { if (geenGast(req, res)) return; const b = req.body || {}; stuur(res, webmaker.bewaar(req.session.key, b.design || b)); });
   app.post('/api/site/verwijder', auth, (req, res) => { if (geenGast(req, res)) return; stuur(res, webmaker.verwijder(req.session.key, (req.body || {}).id)); });
+  /* de versiegeschiedenis: wat er vandaag staat is niet het enige wat er ooit
+     stond -- de AI-knop en een misser hebben een weg terug */
+  app.post('/api/site/versies', auth, (req, res) => { if (geenGast(req, res)) return; stuur(res, webmaker.versies(req.session.key, (req.body || {}).id)); });
+  app.post('/api/site/herstel', auth, (req, res) => { if (geenGast(req, res)) return; const b = req.body || {}; stuur(res, webmaker.herstel(req.session.key, b.id, b.i)); });
   app.post('/api/site/publiceer', auth, (req, res) => { if (geenGast(req, res)) return; const b = req.body || {}; stuur(res, webmaker.publiceer(req.session.key, b.id, b.adres)); });
+  // wat je bewaarde staat in je concept; hiermee gaat het naar buiten
+  app.post('/api/site/live', auth, (req, res) => { if (geenGast(req, res)) return; stuur(res, webmaker.zetLive(req.session.key, (req.body || {}).id)); });
   app.post('/api/site/offline', auth, (req, res) => { if (geenGast(req, res)) return; stuur(res, webmaker.offline(req.session.key, (req.body || {}).id)); });
+  // publiceren op een gekozen moment, en het spoor van wat er met deze site gebeurde
+  app.post('/api/site/plan', auth, (req, res) => { if (geenGast(req, res)) return; const b = req.body || {}; stuur(res, webmaker.plan(req.session.key, b.id, b.moment)); });
+  app.post('/api/site/spoor', auth, (req, res) => { if (geenGast(req, res)) return; stuur(res, webmaker.spoorVan(req.session.key, (req.body || {}).id)); });
+
+  /* ---- de persoonlijke site: ieders eigen plek op het RTG-web ----
+     Op CODENAAM -- de echte naam blijft in de kluis. Zelfde principe als de
+     bedrijfssite: een compleet startpunt in een keer, daarna van het lid. */
+  app.post('/api/site/persoonlijk', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    const codenaam = liveCodename(req.session);
+    const adres = webmaker.slug(codenaam);
+    // bestaat je persoonlijke site al, dan krijg je hem terug in plaats van een tweede
+    const bestaande = webmaker.mijn(req.session.key).find(d => d.adres === adres);
+    if (bestaande) return res.json({ ok: true, bestond: true, design: metWacht(webmaker.haal(req.session.key, bestaande.id)), adres });
+    const r = webmaker.bewaar(req.session.key, webplatform.genereerPersoon(codenaam));
+    if (r.error) return stuur(res, r);
+    const p = webmaker.publiceer(req.session.key, r.design.id, adres);
+    if (p.error) return stuur(res, p);
+    res.json({ ok: true, design: metWacht(webmaker.haal(req.session.key, r.design.id)), adres: p.adres });
+  });
+
+  /* ---- AI in de maker ----
+     De opdracht werkt op het ontwerp zoals het NU op het doek staat (ook
+     onbewaard); het antwoord is een aangepast ontwerp dat de maker toont.
+     Er wordt hier niets opgeslagen -- de gebruiker beoordeelt en bewaart
+     zelf, en dan pas loopt het langs de gewone schoonmaak. */
+  app.post('/api/site/ai', auth, async (req, res) => {
+    if (geenGast(req, res)) return;
+    const b = req.body || {};
+    res.json(await webmakerAi.schrijf(b.design || {}, b.opdracht));
+  });
+
+  /* ---- de sjabloon-etalage van het Atelier ----
+     Leden beginnen met een ontwerp van het huis in plaats van vanaf nul; wat
+     het Atelier niet uitdrukkelijk heeft vrijgegeven, bestaat hier niet. */
+  app.post('/api/site/sjablonen', auth, (req, res) => { if (geenGast(req, res)) return; res.json({ lijst: atelierweb.etalage() }); });
+  app.post('/api/site/sjabloon', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    const d = atelierweb.etalageHaal((req.body || {}).id);
+    if (!d) return res.status(404).json({ error: 'Dit sjabloon staat niet in de etalage.' });
+    res.json({ sjabloon: d });
+  });
 
   // ---- eigen foto's: uploaden (na virusscan), tonen en weghalen ----
   app.post('/api/site/fotos', auth, (req, res) => { if (geenGast(req, res)) return; res.json({ fotos: webmaker.fotos(req.session.key) }); });
@@ -49,7 +98,4 @@ module.exports = (kern) => {
   });
   app.post('/api/site/foto-weg', auth, (req, res) => { if (geenGast(req, res)) return; stuur(res, webmaker.fotoWeg(req.session.key, String((req.body || {}).url || ''))); });
 
-  // ---- de browser (elk ingelogd lid mag bladeren) ----
-  app.post('/api/browser/gids', auth, (req, res) => { res.json({ lijst: webmaker.gids() }); });
-  app.post('/api/browser/open', auth, (req, res) => { stuur(res, webmaker.open((req.body || {}).adres)); });
 };

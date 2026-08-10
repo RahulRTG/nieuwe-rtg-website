@@ -10,8 +10,16 @@
    het in zijn opdracht mee, en de poorten rekenen ermee. Een lijst, drie lezers.
 
    Dit bestand bevat daarom geen logica en geen opslag: alleen de vaste vormen
-   waar de rest van de map naar wijst. */
+   waar de rest van de map naar wijst. "Hier" is sindsdien twee bestanden -- zie
+   hieronder -- maar nog steeds een ingang. */
 'use strict';
+
+/* De vier tabellen die over MENSEN gaan -- rollen, bewijsgraden, risicoklassen
+   en de gevoelige onderwerpen -- staan in ./kader-mensen.js. Ze horen bij
+   hetzelfde kader en gaan hieronder gewoon mee naar buiten; ze staan alleen in
+   een eigen bestand omdat "wat is een onderzoek" en "wat mag een onderzoek"
+   twee vragen zijn met twee lezers. */
+const { ROLLEN, BEWIJS, RISICO, GEVOELIG } = require('./kader-mensen');
 
 /* ---------- de onderzoekscyclus ----------
    Elk onderzoek doorloopt deze keten, in deze volgorde, zonder overslaan. De
@@ -80,57 +88,6 @@ const METHODEN = [
   { methode: 'literatuur', naam: 'Literatuuronderzoek', aard: 'kwalitatief', minN: 1, meetmomenten: 1, maxBewijs: 'indicatie', mensen: false }
 ];
 
-/* ---------- de rollen ----------
-   Bewoners zijn medeonderzoeker, geen respondent. Wat een rol MAG staat hier
-   als rechtenlijst; ./mensen.js is de enige die hem leest.
-     lezen        het dossier van de studie inzien
-     bijdragen    observaties, notities en taken toevoegen
-     leiden       de cyclus verzetten, plan en team wijzigen
-     tekenen      de ethische toets of het besluit ondertekenen
-     toezicht     stopcriteria hanteren en een studie stilleggen */
-const ROLLEN = [
-  { rol: 'buurtonderzoeker', naam: 'Buurtonderzoeker', rechten: ['lezen', 'bijdragen'] },
-  { rol: 'ervaringsdeskundige', naam: 'Ervaringsdeskundige', rechten: ['lezen', 'bijdragen'] },
-  { rol: 'onderzoeker', naam: 'Onderzoeker', rechten: ['lezen', 'bijdragen'] },
-  { rol: 'professional', naam: 'Professional', rechten: ['lezen', 'bijdragen', 'tekenen'] },
-  { rol: 'projectleider', naam: 'Projectleider', rechten: ['lezen', 'bijdragen', 'leiden'] },
-  { rol: 'reviewer', naam: 'Onafhankelijk reviewer', rechten: ['lezen', 'tekenen'] },
-  { rol: 'toezichthouder', naam: 'Ethisch toezichthouder', rechten: ['lezen', 'tekenen', 'toezicht'] }
-];
-
-/* ---------- de bewijsgraden ----------
-   Oplopend. `rang` is waar de rekenkunde op draait; `mens` betekent dat deze
-   graad alleen door een MENS aan een conclusie gehangen mag worden. Dat is de
-   kern van punt 7: het systeem mag een indicatie zelf afleiden, maar "sterk
-   bewijs" en "bewezen" zijn een oordeel en geen berekening. */
-const BEWIJS = [
-  { graad: 'aanname', rang: 0, naam: 'Aanname', mens: false, uitleg: 'Wat we denken, nog zonder waarneming.' },
-  { graad: 'waarneming', rang: 1, naam: 'Waarneming', mens: false, uitleg: 'Eén of enkele keren gezien; nog geen patroon.' },
-  { graad: 'indicatie', rang: 2, naam: 'Indicatie', mens: false, uitleg: 'Een patroon dat een richting aangeeft.' },
-  { graad: 'sterk', rang: 3, naam: 'Sterk bewijs', mens: true, uitleg: 'Meerdere bronnen wijzen dezelfde kant op.' },
-  { graad: 'bewezen', rang: 4, naam: 'Bewezen binnen deze studie', mens: true, uitleg: 'Aangetoond hier, in deze opzet, met deze mensen. Niet daarbuiten.' }
-];
-
-/* ---------- de risicoklassen ----------
-   Een prullenbaktest heeft weinig nodig; onderzoek rond kinderen, mentale
-   gezondheid, schulden of kwetsbare groepen veel. Per klasse staat hier wat er
-   AF moet zijn voor de studie deelnemers mag werven:
-     review      een ethische review met een menselijke handtekening
-     privacy     een uitgevoerde privacytoets
-     ouderlijk   ouderlijke toestemming bij minderjarigen
-     gescheiden  onderzoeksdata strikt los van gewone Foundation-profielen
-     tekenaars   hoeveel VERSCHILLENDE mensen de review moeten tekenen */
-const RISICO = [
-  { klasse: 'laag', rang: 0, naam: 'Laag', review: false, privacy: false, ouderlijk: false, gescheiden: false, tekenaars: 0,
-    uitleg: 'Geen persoonsgegevens, geen kwetsbare groepen. Denk aan een prullenbak of een sensor.' },
-  { klasse: 'midden', rang: 1, naam: 'Midden', review: true, privacy: true, ouderlijk: false, gescheiden: false, tekenaars: 1,
-    uitleg: 'Volwassen deelnemers, gewone persoonsgegevens.' },
-  { klasse: 'hoog', rang: 2, naam: 'Hoog', review: true, privacy: true, ouderlijk: true, gescheiden: true, tekenaars: 2,
-    uitleg: 'Kinderen, mentale gezondheid, schulden, of andere kwetsbaarheid.' },
-  { klasse: 'zeerhoog', rang: 3, naam: 'Zeer hoog', review: true, privacy: true, ouderlijk: true, gescheiden: true, tekenaars: 2,
-    uitleg: 'Meerdere kwetsbaarheden tegelijk, of een ingreep die schade kan doen.' }
-];
-
 /* ---------- wat een studie kan worden ----------
    Punt 10: een resultaat eindigt niet als PDF. Dit zijn de uitgangen. */
 const UITGANGEN = [
@@ -142,14 +99,6 @@ const UITGANGEN = [
   { uitgang: 'onderwijs', naam: 'Onderwijsproject', icon: 'diploma' },
   { uitgang: 'onderzoek', naam: 'Nieuw onderzoek', icon: 'agenda' }
 ];
-
-/* Onderwerpen die de risicoklasse omhoog duwen. Bewust GEEN filter dat een
-   studie weigert: dit onderzoek moet juist kunnen, maar dan met de waarborgen
-   die erbij horen. ./ethiek.js gebruikt deze lijst als bodem, nooit als plafond
-   -- wie zelf hoger inschat, houdt hoger. */
-const GEVOELIG = ['kind', 'kinderen', 'jeugd', 'minderjarig', 'leerling', 'depress', 'suicide', 'zelfmoord',
-  'mentale gezondheid', 'psych', 'verslaving', 'schuld', 'armoede', 'dakloos', 'vluchteling', 'asiel',
-  'mishandel', 'huiselijk geweld', 'dementie', 'gehandicapt', 'beperking', 'medisch', 'ziekte'];
 
 const bij = (lijst, sleutel, waarde) => lijst.find(x => x[sleutel] === waarde) || null;
 const soort = s => bij(SOORTEN, 'soort', s);

@@ -84,13 +84,15 @@ const LADEN = [
 const MAX_TEKST = 4000;         // een bericht is een bericht, geen document
 const MAX_PER_GESPREK = 500;    // wat we per gesprek bewaren
 const MAX_GESPREKKEN = 400;     // per lid, in de inbox
-const MAX_DEELNEMERS = 256;
 /* De grenzen die van de MENS zijn (een kwartier corrigeren, een por per
-   minuut) staan bij de handelingen zelf: ./deelnemer.js. */
+   minuut) staan bij de handelingen zelf: ./deelnemer.js. En hoeveel deelnemers
+   een gesprek draagt staat waar het gesprek wordt aangelegd: ./gesprek.js. */
 
 const wie = require('./wie');
 const { maakTonen } = require('./tonen');
 const { maakDeelnemer } = require('./deelnemer');
+const { maakGesprek } = require('./gesprek');
+const { maakBericht } = require('./bericht');
 
 function maakComm({ db, save, crypto, codenaamVan, naamVan, sein, sseToCustomer }) {
   const nu = () => new Date().toISOString();
@@ -105,141 +107,12 @@ function maakComm({ db, save, crypto, codenaamVan, naamVan, sein, sseToCustomer 
     return (f ? f(key) : null) || null;
   };
 
-  /* ---------------------------------------------------------- opslag */
-  function G() {
-    if (!Array.isArray(db.data.commGesprekken)) db.data.commGesprekken = [];
-    return db.data.commGesprekken;
-  }
-  function B() {
-    if (!db.data.commBerichten || typeof db.data.commBerichten !== 'object') db.data.commBerichten = {};
-    return db.data.commBerichten;
-  }
-  function S() {
-    if (!db.data.commStand || typeof db.data.commStand !== 'object') db.data.commStand = {};
-    return db.data.commStand;
-  }
-  const standVan = (key, gid) => ((S()[key] || {})[gid] || {});
-  function standZet(key, gid, veld, waarde) {
-    const s = S();
-    const rij = s[key] = s[key] || {};
-    const st = rij[gid] = rij[gid] || {};
-    if (waarde === null || waarde === false || waarde === '') delete st[veld];
-    else st[veld] = waarde;
-    if (!Object.keys(st).length) delete rij[gid];
-    return st;
-  }
-
-  /* -------------------------------------------------------- toegang */
-  const gesprekVan = (gid) => G().find((g) => g.id === gid) || null;
-  const magErin = (g, key) => !!(g && Array.isArray(g.deelnemers) && g.deelnemers.includes(key));
-  /* Elke leesweg loopt hierlangs. Geen enkele functie hieronder haalt een
-     gesprek op zonder deze poort -- een id raden mag nooit genoeg zijn. */
-  function eis(gid, key) {
-    const g = gesprekVan(gid);
-    if (!g) throw new Error('Dit gesprek bestaat niet.');
-    if (!magErin(g, key)) throw new Error('Dit gesprek is niet van jou.');
-    return g;
-  }
-
-  /* --------------------------------------------------- een gesprek maken */
-  /* DE ENIGE MANIER waarop er een gesprek bij komt, en dus de plek waar elke
-     module langskomt. Idempotent op meta.sleutel: een rit, een bestelling of
-     een ticket vraagt bij elke stap opnieuw om "zijn" gesprek en hoort er dan
-     niet elke keer een nieuw te krijgen. Zonder dat zou de taxi-module zelf
-     moeten onthouden welk gesprek bij welke rit hoort -- en dan zit de
-     koppeling weer in de module in plaats van hier. */
-  function gesprekMaak(opties) {
-    const o = opties || {};
-    const soort = SOORTEN.includes(o.soort) ? o.soort : 'personal';
-    const deelnemers = [...new Set((o.deelnemers || []).filter(Boolean).map(String))].slice(0, MAX_DEELNEMERS);
-    if (deelnemers.length < 1) throw new Error('Een gesprek heeft deelnemers nodig.');
-    const sleutel = o.meta && o.meta.sleutel ? String(o.meta.sleutel).slice(0, 120) : null;
-    if (sleutel) {
-      const bestaat = G().find((g) => g.meta && g.meta.sleutel === sleutel);
-      if (bestaat) {
-        /* Wie er later bij komt (een tweede chauffeur, een collega die de zaak
-           overneemt) schuift gewoon aan. Wie eruit moet, gaat er niet vanzelf
-           uit: dat is een handeling met gevolgen en hoort een eigen weg te
-           hebben, niet een neveneffect van "maak dit gesprek nog eens". */
-        for (const d of deelnemers) if (!bestaat.deelnemers.includes(d)) bestaat.deelnemers.push(d);
-        save();
-        return bestaat;
-      }
-    }
-    const g = {
-      id: id('gsp'), soort,
-      titel: String(o.titel || '').slice(0, 120) || null,
-      deelnemers, door: o.door || deelnemers[0],
-      op: nu(), laatst: nu(),
-      meta: Object.assign({}, o.meta || {})
-    };
-    G().push(g);
-    B()[g.id] = [];
-    save();
-    return g;
-  }
-
-  /* Het gesprek van een module OPZOEKEN zonder het te maken. gesprekMaak() is
-     idempotent op meta.sleutel en dus verleidelijk om ook als opzoeker te
-     gebruiken -- maar dan MAAKT een leesvraag een gesprek, en een module die
-     "bestaat deze lijn?" vraagt krijgt altijd ja. Dat is geen detail: bij het
-     gastcontact hing er een controle aan ("alleen inzage als er echt een lijn
-     is"), en die viel om zodra de vraag zelf de lijn aanlegde. */
-  const gesprekMetSleutel = (sleutel) =>
-    (sleutel ? G().find((g) => g.meta && g.meta.sleutel === String(sleutel)) : null) || null;
-
-  /* Het een-op-een gesprek tussen twee leden is er precies een, welke kant je
-     het ook opent. De sleutel is daarom de twee sleutels op alfabet -- zonder
-     dat krijg je twee gesprekken die elkaars berichten niet zien, en dat is
-     het soort fout dat pas opvalt als iemand zegt "ik heb je wel geantwoord". */
-  function tussen(a, b, opties) {
-    const paar = [String(a), String(b)].sort();
-    return gesprekMaak(Object.assign({ soort: 'personal', deelnemers: paar,
-      meta: { sleutel: 'paar:' + paar.join('|') } }, opties || {}));
-  }
-
-  /* ------------------------------------------------------ een bericht */
-  function bericht(opties) {
-    const o = opties || {};
-    const g = eis(o.gesprekId, o.van);
-    const tekst = String(o.tekst == null ? '' : o.tekst).slice(0, MAX_TEKST).trim();
-    const bijlage = o.bijlage && typeof o.bijlage === 'object' ? o.bijlage : null;
-    if (!tekst && !bijlage) throw new Error('Een leeg bericht versturen doet niets.');
-    if (o.antwoordOp) {
-      // antwoorden op een bericht uit een ander gesprek zou een citaat maken
-      // van iets waar de lezer geen toegang toe heeft
-      const bron = (B()[g.id] || []).find((m) => m.id === o.antwoordOp);
-      if (!bron) throw new Error('Dat bericht staat niet in dit gesprek.');
-    }
-    const m = {
-      id: id('brc'), van: o.van, at: nu(),
-      /* Namens wie er geschreven wordt (`van`) en WIE het typte (`door`) zijn
-         bij een zaak niet hetzelfde. Alleen ingevuld als het iemand uit
-         dezelfde zaak is: `door` van een vreemde sleutel zou een manier zijn
-         om een naam in andermans gesprek te zetten. */
-      door: o.door && wie.zelfdeZaak(o.door, o.van) ? String(o.door) : null,
-      tekst: tekst || null,
-      soort: o.soort || (bijlage ? bijlage.soort || 'bijlage' : 'tekst'),
-      antwoordOp: o.antwoordOp || null,
-      bijlage: bijlage,
-      /* De brontaal reist mee met het bericht en niet met de lezer. Dat lijkt
-         een detail tot iemand van taal wisselt: dan moet een oud bericht nog
-         steeds vertaald kunnen worden vanaf de taal waarin het GESCHREVEN is,
-         en niet vanaf de taal die de schrijver vandaag toevallig heeft staan. */
-      lang: o.lang || null,
-      reacties: {}
-    };
-    const lijst = B()[g.id] = B()[g.id] || [];
-    lijst.push(m);
-    if (lijst.length > MAX_PER_GESPREK) lijst.splice(0, lijst.length - MAX_PER_GESPREK);
-    g.laatst = m.at;
-    // de afzender heeft zijn eigen bericht per definitie gelezen
-    standZet(o.van, g.id, 'gelezen', m.at);
-    standZet(o.van, g.id, 'concept', null);
-    save();
-    seinNaarDeRest(g, o.van, 'bericht', { gesprekId: g.id, bericht: tonen.toonBericht(m, o.van) });
-    return m;
-  }
+  /* De opslag, de toegangspoort en het aanleggen van een gesprek: ./gesprek.js.
+     Deze kern houdt de binnenkant ervan vast, want de andere helften
+     (./tonen.js, ./deelnemer.js, ./bericht.js) leunen er allemaal op. */
+  const gespr = maakGesprek({ db, save, nu, id, SOORTEN });
+  const { G, B, standVan, standZet, gesprekVan, magErin, eis,
+    gesprekMaak, gesprekMetSleutel, tussen } = gespr;
 
   /* Iedereen behalve de afzender krijgt het sein. Wie het gesprek stil heeft
      gezet krijgt het OOK -- stil gaat over meldingen, niet over of het scherm
@@ -262,20 +135,8 @@ function maakComm({ db, save, crypto, codenaamVan, naamVan, sein, sseToCustomer 
     }
   }
 
-  /* Twee deuren voor de verhuizing van een oude voorraad (./dm.js), en
-     bewust smal: de geschiedenis moet MET zijn eigen tijdstempels naar binnen
-     kunnen, en de leesstand moet meeverhuizen. Via bericht() zou alles op NU
-     komen te staan -- een gesprek van twee jaar dat er ineens uitziet alsof
-     het vanmiddag gebeurde. Wie niets te verhuizen heeft, gebruikt bericht(). */
-  const berichtenVan = (gesprekId) => (B()[gesprekId] = B()[gesprekId] || []);
-  function leesZet(key, gesprekId, at) {
-    if (!key || !at) return;
-    const nuStand = standVan(key, gesprekId).gelezen || '';
-    if (at > nuStand) standZet(key, gesprekId, 'gelezen', at);
-  }
-
-  /* De twee andere helften krijgen de binnenkant mee en niet de db: zo is aan
-     deze regels af te lezen wat ze precies mogen aanraken.
+  /* De andere helften krijgen de binnenkant mee en niet de db: zo is aan deze
+     regels af te lezen wat ze precies mogen aanraken.
 
      ./deelnemer.js eerst, want ./tonen.js leunt op isAanwezig en wieTypt --
      "wie is er online" en "wie typt er" horen bij de handelingen en niet bij de
@@ -288,6 +149,13 @@ function maakComm({ db, save, crypto, codenaamVan, naamVan, sein, sseToCustomer 
     isAanwezig: deelnemer.isAanwezig, wieTypt: deelnemer.wieTypt,
     LADEN, MAX_GESPREKKEN
   });
+  /* ./bericht.js als laatste, want een nieuw bericht gaat als sein de deur uit
+     in de vorm die ./tonen.js ervan maakt -- en dan moet die er zijn. */
+  const brc = maakBericht({
+    B, eis, nu, id, save, standZet, standVan, seinNaarDeRest,
+    toon: (m, mij) => tonen.toonBericht(m, mij), MAX_TEKST, MAX_PER_GESPREK
+  });
+  const { bericht, berichtenVan, leesZet } = brc;
 
   return {
     SOORTEN, LADEN,

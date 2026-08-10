@@ -90,6 +90,13 @@ function blokkadeReden(id, staat, ctx) {
 // Staat er ergens een standaard-genre-matrix in de catalogus? Dan moet de
 // middleware het genre ook opzoeken als er (nog) geen bewaarde regels zijn.
 const HEEFT_GENRE_STANDAARD = FUNCTIES.some(f => Array.isArray(f.alleenGenres));
+/* Staat er ergens een functie die STANDAARD UIT is? De middleware heeft een
+   snelle uitgang voor "er is nog nooit iets geschakeld, dus alles staat aan".
+   Die uitgang klopt alleen zolang elke functie standaard AAN is. Zodra er een
+   functie bijkomt die standaard uit hoort te staan, zou die op een verse
+   installatie gewoon openstaan -- precies het omgekeerde van wat "standaard
+   uit" betekent. */
+const HEEFT_UIT_STANDAARD = FUNCTIES.some(f => f.standaard === false);
 // Staan er ergens land-regels? Zo niet, dan hoeft de middleware het land van het
 // lid niet op te zoeken (scheelt een opzoeking per verzoek).
 function heeftLandRegels(staat) {
@@ -181,5 +188,5 @@ function doelgroepVanVerzoek(pad, user) {
 // bord). Elke functie toont de globale stand plus haar doelgroepen met eigen stand.
 
 module.exports = { functieVoorPad, functieAan, functieAanVoor, functieStoring, functieStatus,
-  heeftLandRegels, heeftPlaatsRegels, plaatsNorm, heeftGenreRegels, HEEFT_GENRE_STANDAARD, blokkadeReden, padGeblokkeerd,
+  heeftLandRegels, heeftPlaatsRegels, plaatsNorm, heeftGenreRegels, HEEFT_GENRE_STANDAARD, HEEFT_UIT_STANDAARD, blokkadeReden, padGeblokkeerd,
   doelgroepVanVerzoek, tierNaarDoelgroep, volgKoppels, inCanary };

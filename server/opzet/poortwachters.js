@@ -24,7 +24,7 @@
 
 module.exports = function poortwachters(deps) {
   const { app, express, db, save, log, accounts, eigenaar, PUBLIC_DIR, PRODUCTION,
-    opslagKlaar, sseToOffice, sessionFor, findSupplier, sendPushToUser } = deps;
+    opslagKlaar, sseToOffice, sessionFor, findSupplier, sendPushToUser, eigenWeb } = deps;
 
   const { remOpDeDeur, opslagPoort, hoofdzekering } = require('../middleware/remmen');
   const { schakelaars } = require('../middleware/functieschakelaars');
@@ -69,6 +69,22 @@ const { scriptbundel, PAD: scriptbundelPad } = require('../middleware/scriptbund
   // een gezinsmelding voor een gekoppelde oppas/familie ook als telefoonmelding (web-push)
   rtf.setPushHook((userId, note) => { try { sendPushToUser(userId, note); } catch (e) {} });
 
+  /* EEN EIGEN DOMEIN (standaard uit, boardroom-functie 'dom-eigendomein').
+     Komt een verzoek binnen op een hostnaam die aan een site gekoppeld is, dan
+     serveren we die site hier als gewone HTML -- voor een bezoeker zonder
+     leden-app. Dit moet BOVEN het bureaublad staan: dat herschrijft '/' naar
+     de leden-app, en op een eigen domein hoort '/' de site van het lid te zijn
+     en niet de app van het huis.
+
+     De haak wordt pas verderop in server.js gevuld (de webmaker bestaat hier
+     nog niet); zolang hij leeg is verandert er niets aan de keten. */
+  app.use((req, res, next) => {
+    if (!eigenWeb || typeof eigenWeb.serveer !== 'function') return next();
+    if (req.method !== 'GET' && req.method !== 'HEAD') return next();
+    // alleen echte paginapaden; assets (met punt) en de API lopen hun gewone weg
+    if (req.path.startsWith('/api/') || req.path.indexOf('.') !== -1) return next();
+    eigenWeb.serveer(req, res, next);
+  });
   bureaublad(app);
   app.use(cspNonce(PUBLIC_DIR, CSP_NONCE));
   /* De gebundelde stijlbladen. Staat NA cspNonce: die laag schrijft de

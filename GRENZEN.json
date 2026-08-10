@@ -1540,10 +1540,42 @@
       "wbwVerreken",
       "wbwVerzoek"
     ],
+    "webbrowser": [
+      "addTicket",
+      "notify",
+      "notifySupplier",
+      "webplatformTaal",
+      "codenaamVan",
+      "commDm",
+      "connectieTussen",
+      "findSupplier",
+      "liveCodename",
+      "save",
+      "sseToCustomer",
+      "verbActief",
+      "webmaker",
+      "webplatform"
+    ],
+    "webmeting": [
+      "webmaker"
+    ],
+    "webmerk": [
+      "webmerk"
+    ],
     "webmaker": [
       "antivirus",
+      "atelierweb",
+      "liveCodename",
       "media",
-      "webmaker"
+      "webmaker",
+      "webmakerAi",
+      "webplatform"
+    ],
+    "zaakweb": [
+      "webmaker",
+      "webmakerAi",
+      "webmakerTeam",
+      "webplatform"
     ],
     "welzijn": [
       "welzijn"

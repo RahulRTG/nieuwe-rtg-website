@@ -117,14 +117,36 @@ staat. Komt die er (een eigen arcade-kern naast de bordspellen bijvoorbeeld),
 dan is dit het moment om de vraag opnieuw te stellen. Opgeschreven als besluit
 en niet als achterstand, zodat niemand het later voor vergeten aanziet.
 
-### Wat wél nog een echte vraag is: Cercle en Entourage
+### Cercle en Entourage: onderzocht, en NIET samenvoegen
 
-Cercle heet "je besloten kring: de mensen die dichtbij staan" en Entourage "je
-vaste mensen en hun rol om je heen". Dat zijn twee beschrijvingen van
-hetzelfde, en dan is dit precies het geval waarin samenvoegen wél mag. Maar
-vaststellen dat twee apps dezelfde kern, data én workflow dupliceren vraagt een
-blik in allebei die kernen; samenvoegen op een vermoeden is wat de regel
-verbiedt. Staat dus als volgend onderzoek, niet als uitgevoerde keuze.
+Deze twee stonden hier als verdacht. Cercle heette in de catalogus "je besloten
+kring: de mensen die dichtbij staan" en Entourage "je vaste mensen en hun rol om
+je heen" — twee beschrijvingen van hetzelfde, dus precies het geval waarin
+samenvoegen wél mag.
+
+In de kernen kijken gaf het omgekeerde antwoord.
+
+| | Cercle | Entourage |
+|---|---|---|
+| Data | **clubs**: stad, lidnummer, sinds, dresscode, reciprociteit, gastpassen | **mensen**: band, voorkeuren, dieet, documenten met vervaldatum |
+| Kernvraag | "waar kan ik in Milaan terecht, en op welk lidmaatschap?" | "wat ontbreekt er aan dit gezelschap voordat we vertrekken?" |
+| Werkstroom | reciprociteit opzoeken, een gastpas afboeken | een gezelschap samenstellen, verlopende documenten signaleren |
+| Module | `kern/rechterhand/cercle.js` | `kern/rechterhand/entourage.js` |
+
+Geen gedeelde data, geen gedeelde workflow. Wat ze wél delen is een
+routevoorvoegsel (`/api/member/rechterhand/`) en een opslaghelper — en dat is
+letterlijk de val waar dit document al voor waarschuwt: **een gedeeld
+routevoorvoegsel is geen gedeelde kern.**
+
+**Wat er dus fout was, was de beschrijving en niet de architectuur.** Vier
+teksten klopten niet met de code: Cercle heette "de mensen die dichtbij staan"
+terwijl het clubs bijhoudt, en de app-gids beloofde bij Entourage zelfs "betaal
+en verantwoord netjes via de app" — een functie die niet bestaat. Die vier zijn
+herschreven naar wat de modules werkelijk doen.
+
+De les is de moeite van het opschrijven waard: ik had deze twee bijna
+samengevoegd op grond van hun *omschrijving*. De toetsvraag stellen is niet
+genoeg — je moet hem aan de **code** stellen.
 
 Twee waarschuwingen bij die meting, zodat niemand haar sterker leest dan ze is.
 Ze kijkt naar **links en routes**, dus een laag die zijn domeinen via de server

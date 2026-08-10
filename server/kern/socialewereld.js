@@ -19,13 +19,13 @@
      Meet               vergaderkamers, WebRTC. Zelfstandig.
      Attenties          cadeaus en attenties. Zelfstandig.
 
-   WAT HIER WEL EEN VRAAG IS, en eerlijk als vraag blijft staan: Cercle ("je
-   besloten kring") en Entourage ("je vaste mensen en hun rol") beschrijven
-   allebei de mensen om u heen. Dat RUIKT naar twee ingangen naar dezelfde
-   capability, en dan zou samenvoegen juist wel mogen. Maar dat vaststellen
-   vraagt eerst een blik in hun twee kernen, en apps samenvoegen op een
-   vermoeden is precies wat de regel verbiedt. Het staat daarom hier
-   opgeschreven als het volgende onderzoek, niet als een uitgevoerde keuze.
+   CERCLE EN ENTOURAGE ZIJN ONDERZOCHT, en blijven apart. Ze stonden hier als
+   verdacht omdat hun omschrijvingen allebei "de mensen om u heen" beloofden.
+   In de kernen kijken gaf het omgekeerde antwoord: Cercle houdt CLUBS bij
+   (stad, lidnummer, dresscode, reciprociteit, gastpassen) en Entourage MENSEN
+   (band, dieet, documenten met vervaldatum). Andere data, andere werkstroom.
+   Wat ze deelden was een routevoorvoegsel, en dat is geen gedeelde kern.
+   Fout zat dus in de beschrijving, niet in de architectuur -- zie PLATFORM.md.
 
    De kern wordt LAAT gelezen, om dezelfde reden als bij kern/reiswereld.js en
    kern/kantoorwereld.js. */

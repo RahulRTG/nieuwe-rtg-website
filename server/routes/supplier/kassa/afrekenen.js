@@ -52,15 +52,26 @@ app.post('/api/supplier/pos/checkout', supplierAuth, async (req, res) => {
   const tf = (req.supplier.tables || []).find(t => t.name === room);
   if (tf) tf.status = 'vrij';
   save();
-  /* HIER GEEN FACTUUR, en dat is een besluit. De losse posten op de rekening
-     zijn al gefactureerd op het moment dat ze werden aangeslagen
-     (/api/supplier/pos/sale boekt er een per bon); deze bon is de AFWIKKELING
-     van die posten en niet een nieuwe verkoop. Er wel een boeken zou de
-     btw-aangifte laten verdubbelen -- dat is bij het bouwen van TAKEN.md 4.28
-     eerst gedaan en meteen weer teruggedraaid toen de toets het liet zien.
-     Wat er WEL nog open staat: kamerlasten die niet via de kassa binnenkomen
-     (logies bij het inchecken, de minibar) boeken helemaal geen factuur; zie
-     TAKEN.md 4.29. */
+  /* HIER de factuur, en op precies EEN plek voor alles wat op deze rekening
+     stond. Dit is het moment waarop de kamer- of tafellasten omzet worden: de
+     losse posten zijn uitstel en tellen niet mee (kern/fiscaal/kasomzet.js),
+     deze gebundelde bon wel.
+
+     Dat is bij het bouwen van 4.28 twee keer verkeerd om gegaan en het hoort
+     hier te staan. Eerst stond de factuur hier WEL terwijl /pos/sale er ook al
+     een boekte -- dan verdubbelt de aangifte, en de toets liet dat meteen
+     zien. Toen is hij hier weggehaald, en toen bleef 4.29 over: de logies bij
+     het inchecken en de minibar zetten hun kamerlast rechtstreeks neer, buiten
+     /pos/sale om, en die omzet kwam dus NOOIT in het factuurregister en dus
+     nooit in de aangifte. Nu boekt /pos/sale niets voor 'kamer' en 'tafel' en
+     boekt deze route het geheel: een moment, ongeacht langs welke weg de post
+     op de rekening kwam. */
+  facturatie.boekMetCodenaam({
+    soort: 'verkoop', verkoperCode: req.supplier.code, verkoperNaam: req.supplier.name,
+    koper: { naam: betaler || room || 'Kasklant' },
+    regels: [{ omschrijving: sale.desc, aantal: 1, stuk: total }],
+    methode: method, ref: sale.id
+  }, betaler).catch(() => {});
   logActivity(req.supplier.code, req.actor, 'checkte ' + room + ' uit: € ' + total + ' (' + method + ')');
   sseToSupplier(req.supplier.code, 'sync', { scope: 'pos' });
   /* Splitsen vanaf de rekening: de betaler rekent het geheel af met RTG Pay

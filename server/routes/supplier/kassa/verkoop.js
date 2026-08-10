@@ -33,10 +33,9 @@ app.post('/api/supplier/pos/sale', supplierAuth, async (req, res) => {
     if (items) items = items.map(i => ({ ...i, prijsNormaal: i.price, price: Math.round(i.price * f * 100) / 100 }));
   }
   /* Cadeaukaart: het saldo gaat er EERST af, om dezelfde reden als bij RTG Pay
-     hieronder -- lukt de betaling niet, dan is er ook geen bon. De kaart wordt
-     alleen verlaagd; de omzet en de factuur staan op deze bon, want de
-     inwisseling is de betaalwijze en geen tweede optelling ernaast
-     (TAKEN.md 4.27). */
+     hieronder -- lukt de betaling niet, dan is er ook geen bon. Waarom de
+     inwisseling een BETAALWIJZE is en geen tweede omzetregel: zie
+     kern/cadeaukaart.js (TAKEN.md 4.27). */
   let kaartCode = null;
   if (method === 'cadeaukaart') {
     const v = cadeaukaart.verzilver(db, req.supplier.code, req.body.gcCode || req.body.code, total, req.actor.name);
@@ -82,6 +81,10 @@ app.post('/api/supplier/pos/sale', supplierAuth, async (req, res) => {
   try { kern.keuken.boekVerkoopAf(req.supplier, items || [], 'kassa (' + req.actor.name + ')'); } catch (e) {}
   logActivity(req.supplier.code, req.actor, 'rekende € ' + total + ' af (' + method + (sale.room ? ', ' + sale.room : '') + ')');
   sseToSupplier(req.supplier.code, 'sync', { scope: 'pos' });
+  /* EEN POST OP DE KAMER OF DE TAFEL IS NOG GEEN VERKOOP, dus ook nog geen
+     factuur: die hoort bij het afrekenen, en daar staat hij (zie de kop bij
+     de factuur in ./afrekenen.js, en TAKEN.md 4.29). */
+  if (method === 'kamer' || method === 'tafel') return res.json({ ok: true, sale, betaler });
   // automatische factuur voor beide partijen; de koper wordt gekoppeld als er een
   // RTG-codenaam bij de betaling zat, anders krijgt alleen de zaak de bon.
   const factuurRegels = items && items.length

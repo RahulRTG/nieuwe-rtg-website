@@ -48,7 +48,28 @@ const serverJs = alle.filter(p => p.includes('/server/') && p.endsWith('.js'));
 const testJs = alle.filter(p => p.includes('/test/') && p.endsWith('.js'));
 const publicHtml = alle.filter(p => p.includes('/public/') && p.endsWith('.html'));
 const publicJs = alle.filter(p => p.includes('/public/') && p.endsWith('.js') && !p.endsWith('.min.js'));
-const lees = p => { try { return fs.readFileSync(p, 'utf8'); } catch (e) { return ''; } };
+/* EEN BESTAND DAT NIET TE LEZEN IS, IS GEEN LEEG BESTAND.
+
+   Hier stond `catch (e) { return ''; }` en verder niets, en dat is de duurste
+   regel van deze keuring gebleken. De dekkingsmeter plakt alle toetsbestanden
+   aaneen en zoekt daar de routes in; valt er een bestand weg, dan telt elke
+   route die ALLEEN door dat bestand wordt aangeroepen ineens als ongetest.
+   Dan gaat `endpointsZonderTest` omhoog, klaagt de ratel over de commit die je
+   net maakte, en klopt er niets van -- want het cijfer is plausibel, en dat is
+   precies wat het gevaarlijk maakt. Het is een keer echt gebeurd (1204 in
+   plaats van 1104, zie TAKEN.md 6.16); met 854 toetsbestanden en 1179
+   bronbestanden die achter elkaar synchroon worden gelezen is een tijdelijke
+   EMFILE of een bestand dat net wordt weggeschreven geen theorie.
+
+   De lege string blijft -- de rest van de keuring hoort niet om te vallen --
+   maar de misser wordt GETELD en gaat mee in het rapport, zodat norm.js de
+   meting kan weigeren in plaats van hem te geloven. LAT-regel 3 (een meter
+   zonder invoer zakt) en regel 5 (niets faalt stil), op dezelfde plek. */
+const onleesbaar = [];
+const lees = p => {
+  try { return fs.readFileSync(p, 'utf8'); }
+  catch (e) { onleesbaar.push({ bestand: path.relative(WORTEL, p), reden: String((e && e.code) || e).slice(0, 40) }); return ''; }
+};
 const kort = p => path.relative(WORTEL, p);
 
 /* Bouwsel is geen bron. public/dist/** is geminificeerd, en public/apps/x.js
@@ -469,6 +490,17 @@ function keur() {
     dekking: dekking(), beloftes: beloftes(), privacy: privacy(), pariteit: pariteit(),
     dubbelingen: dubbelingen(), ongebruikt: ongebruikt(), i18n: i18n(), uitschieters: uitschieters()
   };
+  /* De bestanden die niet te lezen waren, HARDOP. Ze staan in het rapport zodat
+     norm.js de meting kan weigeren (zie de kop bij `lees` hierboven): een
+     dekkingscijfer dat op halve invoer is berekend hoort niet als achteruitgang
+     te tellen, want dan beschuldigt de ratel een onschuldige commit. Ook als
+     melding, want wie de keuring met de hand draait hoort het ook te zien. */
+  if (onleesbaar.length)
+    meld('scheef', 'meting', 'Er waren ' + onleesbaar.length + ' bestand(en) niet te lezen; de dekking is op halve invoer berekend.',
+      onleesbaar.slice(0, 5).map(x => x.bestand + ' (' + x.reden + ')').join(', '),
+      'Dit is bijna altijd de MACHINE en niet de code (te veel open bestanden, of een bestand dat net werd weggeschreven). Draai de keuring opnieuw op een stille machine.');
+  cijfers.onleesbaar = onleesbaar.length;
+  cijfers.onleesbareBestanden = onleesbaar.slice(0, 20);
   const stuk = bevindingen.filter(b => b.soort === 'stuk');
   const scheef = bevindingen.filter(b => b.soort === 'scheef');
   const beter = bevindingen.filter(b => b.soort === 'beter');

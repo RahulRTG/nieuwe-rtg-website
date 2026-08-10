@@ -44,10 +44,22 @@ function btwOmzet(bon) {
   return !NIET_ALS_OMZET.has(bon.method);
 }
 
-/* Ging dit bedrag echt door de kassa? Zelfde regel, maar 'rtg' telt hier wel:
-   dat is geld dat aan de balie is geind, alleen boekt de bestelling de btw. */
+/* Ging dit bedrag echt door de kassa? Twee verschillen met btwOmzet, en ze
+   zijn allebei een keer fout geweest:
+
+   1. 'rtg' telt hier WEL. Dat is geld dat aan de balie is geind; alleen boekt
+      de bestelling zelf de btw.
+   2. EEN BUNDEL TELT HIER OOK WEL, en dat is de correctie op mijn eigen eerste
+      versie. Bij het tafelticket zijn de onderdelen BESTELLINGEN
+      (db.data.orders) en geen kassabonnen -- die staan dus nergens in deze
+      lijst. Een bundel overslaan haalde het geld van die tafel uit het
+      dagtotaal van de kassa terwijl de gasten wel degelijk contant hadden
+      betaald. Bij het uitchecken staan de onderdelen er wel (op 'kamer' of
+      'tafel'), en die vallen hieronder al weg; de bundel telt en dat klopt.
+      Kortom: hier telt precies wat er over de toonbank ging, en de vraag of
+      de omzet elders al staat is een ANDERE vraag. */
 function doorDeKassa(bon) {
-  if (!bon || isBundel(bon)) return false;
+  if (!bon) return false;
   return !NIET_DOOR_KASSA.has(bon.method);
 }
 

@@ -89,11 +89,10 @@ module.exports = (ctx) => {
   }
 
   /* Kassa-dagoverzicht (Z-rapport): wat er vandaag door de kassa ging. Welke
-     bon dat is staat in kern/fiscaal/kasomzet.js -- `doorDeKassa` en niet
-     `btwOmzet`, want een bon op 'rtg' is geld dat wel degelijk aan de balie is
-     geind terwijl de btw op de bestelling zelf zit. Kamer- en tafellasten
-     tellen pas bij het uitchecken, en een gebundelde bon telt niet nog eens
-     bovenop zijn eigen onderdelen (anders dubbel; TAKEN.md 4.28). */
+     bon dat is, staat in kern/fiscaal/kasomzet.js -- `doorDeKassa` en niet
+     `btwOmzet`. Die twee lopen hier op twee punten uiteen, en waarom staat
+     daar; de korte versie is dat "geld in de la" iets anders is dan "omzet
+     van de zaak". */
   function posDay(code) {
     const today = new Date().toISOString().slice(0, 10);
     const all = db.data.posSales[code] || [];
@@ -101,8 +100,11 @@ module.exports = (ctx) => {
     const byMethod = {}, byActor = {};
     let total = 0;
     for (const s of sales) {
-      byActor[s.actor] = (byActor[s.actor] || 0) + s.total;
+      /* byActor stelde deze vraag NIET en telde ook openstaande posten mee, dus
+         de bedragen naast de namen telden niet op tot het dagtotaal eronder --
+         terwijl het scherm ze als euro's naast elkaar zet (TAKEN.md 4.30). */
       if (!kasomzet.doorDeKassa(s)) continue;
+      byActor[s.actor] = (byActor[s.actor] || 0) + s.total;
       total += s.total;
       byMethod[s.method] = (byMethod[s.method] || 0) + s.total;
     }

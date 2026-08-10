@@ -408,15 +408,23 @@ function meet(bronnen) {
      teruggeeft is geslaagd; een keuring die niets teruggeeft (of onleesbaars)
      is een echte storing en die gooit alsnog, met de eerste regels van zijn
      eigen foutstroom erbij -- LAT-regel 3: een meter zonder invoer zakt. */
-  const r = spawnSync(process.execPath,
-    ['--experimental-sqlite', path.join(__dirname, 'keuring.js'), '--json'],
-    { cwd: WORTEL, encoding: 'utf8', timeout: 600000, maxBuffer: 128 * 1024 * 1024 });
+  /* `bronnen.keuring` is er om dezelfde reden als `bronnen.leesMutaties`
+     hieronder: de ijking moet een rapport kunnen VOEDEN in plaats van de echte
+     keuring van tien minuten te draaien. Zonder argument gaat alles zoals
+     altijd. */
   let k = null;
-  try { k = JSON.parse(r.stdout); } catch (e) { k = null; }
-  if (!k || !k.cijfers) {
-    throw new Error('de keuring gaf geen leesbaar rapport (exit ' + r.status + '): ' +
-      String(r.stderr || r.stdout || '').trim().split('\n').slice(0, 3).join(' | ').slice(0, 300));
+  if (bronnen && bronnen.keuring) k = bronnen.keuring;
+  else {
+    const r = spawnSync(process.execPath,
+      ['--experimental-sqlite', path.join(__dirname, 'keuring.js'), '--json'],
+      { cwd: WORTEL, encoding: 'utf8', timeout: 600000, maxBuffer: 128 * 1024 * 1024 });
+    try { k = JSON.parse(r.stdout); } catch (e) { k = null; }
+    if (!k || !k.cijfers) {
+      throw new Error('de keuring gaf geen leesbaar rapport (exit ' + r.status + '): ' +
+        String(r.stderr || r.stdout || '').trim().split('\n').slice(0, 3).join(' | ').slice(0, 300));
+    }
   }
+  if (!k || !k.cijfers) throw new Error('de keuring gaf geen leesbaar rapport.');
 
   /* De dependencies tellen we uit package.json zelf en niet uit een rapport:
      dit is de meter waar je bij twijfel de bron van wilt zien. */
@@ -570,6 +578,24 @@ function meet(bronnen) {
   if (!k.cijfers.dekking || !k.cijfers.dekking.routes) {
     throw new Error('de routekaart gaf geen routes; dan zijn endpointsZonderTest en dekkingPct niet gemeten ' +
       '(draai: node --experimental-sqlite scripts/routekaart.js --json)');
+  }
+
+  /* EN EEN HALVE MEETING IS OOK GEEN METING, ook al ziet het cijfer er goed uit.
+
+     De regel hierboven vangt het geval waarin de routekaart NIETS teruggeeft.
+     Wat hij niet ving is het geval dat werkelijk is voorgekomen: de keuring
+     plakt alle toetsbestanden aaneen om de dekking te zoeken, en een bestand
+     dat niet te lezen was telde als een LEEG bestand. Elke route die alleen
+     door dat bestand wordt aangeroepen heet dan ongetest, endpointsZonderTest
+     springt omhoog, en de ratel klaagt over de commit die je net maakte.
+     Een keer echt gebeurd: 1204 in plaats van 1104 (TAKEN.md 6.16).
+
+     Dat is de gevaarlijkste soort meetfout, want er komt een plausibel getal
+     uit. Dus zakt de meting, met de bestanden erbij -- niet de commit. */
+  if (k.cijfers.onleesbaar) {
+    const namen = (k.cijfers.onleesbareBestanden || []).map(x => x.bestand + ' (' + x.reden + ')').join(', ');
+    throw new Error('de keuring kon ' + k.cijfers.onleesbaar + ' bestand(en) niet lezen, dus de dekking is op halve invoer berekend' +
+      (namen ? ': ' + namen : '') + '. Dit is bijna altijd de machine en niet de code; draai opnieuw op een stille machine.');
   }
 
   return {

@@ -15,6 +15,8 @@
      4  en daarmee komt de btw-aangifte uit op de omzet van dezelfde maand,
         over beide tarieven -- keuken en bar
      5  en een factuur die NIET lukt valt niet stil (toets 8)
+     6  een post op de kamer of de tafel is nog GEEN verkoop: die wordt pas
+        gefactureerd bij het afrekenen, en dan precies een keer
 
    Punt 3 en 4 zijn het hele doel. Een factuur die er wel is maar een ander
    bedrag draagt, is geen reparatie maar een derde cijfer erbij.
@@ -22,10 +24,13 @@
    De twee dubbeltellingen aan de ANDERE kant -- de cadeaukaart en het
    tafelticket op 'contant' (TAKEN.md 4.27 en 4.28) -- stonden hier als
    caveat: ze zaten niet in toets 7, want ze zeiden niets over die reparatie.
-   Ze zijn nu gerepareerd en staan als toets 9 en 10, apart gehouden om
-   dezelfde reden: het is een defect aan de kant van de BOEKHOUDING, en de
-   maat is dan ook een andere (de boekhouding tegen de som van de bonnen,
-   niet de aangifte tegen de boekhouding).
+   Ze zijn nu gerepareerd en staan in het laatste deel van dit bestand, apart
+   gehouden om dezelfde reden: het is een defect aan de kant van de
+   BOEKHOUDING, en de maat is dan ook een andere (de boekhouding tegen de som
+   van de bonnen, niet de aangifte tegen de boekhouding). Daar staat ook het
+   verschil tussen de twee vragen die de kassa en de boekhouding stellen --
+   ging dit geld door de la, tegen draagt deze bon omzet -- want dat verschil
+   is bij het repareren twee keer de verkeerde kant op gegaan.
 
    Draai los: node --experimental-sqlite --test test/lidfactuur.test.js */
 const test = require('node:test');
@@ -560,6 +565,17 @@ test('11. een tafelrekening uitchecken telt EEN keer: de losse posten of de bund
     assert.equal(Math.round((open.body.btw || []).reduce((s, r) => s + r.omzet, 0) * 100), 0,
       'een openstaande tafelrekening is nog geen omzet');
 
+    /* En ook nog geen GELD. Het kassaoverzicht zet het dagtotaal en de
+       bedragen per medewerker als euro's naast elkaar op een kaart, dus die
+       horen bij elkaar op te tellen -- byActor telde ook de openstaande
+       posten mee en dan klopt de kaart niet met zichzelf (TAKEN.md 4.30).
+       Dit is de plek waar dat bijt: er staan hier twee posten op de tafel en
+       er is nog niets afgerekend. */
+    const kas = (await api(base, '/api/supplier/state', { code: 'KIKUNOI' }, mgr)).body.state.pos;
+    assert.equal(Math.round(kas.total * 100), 0, 'er is nog niets door de kassa gegaan');
+    assert.equal(Math.round(Object.values(kas.byActor).reduce((x, v) => x + v, 0) * 100), 0,
+      'en dus staat er ook niets op naam van een medewerker');
+
     const uit = await api(base, '/api/supplier/pos/checkout', { room: tafel.name, method: 'contant' }, mgr);
     assert.equal(uit.status, 200, JSON.stringify(uit.body).slice(0, 200));
     assert.equal(Math.round(uit.body.sale.total * 100), somPosten, 'de bundel is de som van de posten');
@@ -572,6 +588,146 @@ test('11. een tafelrekening uitchecken telt EEN keer: de losse posten of de bund
     const na = await api(base, '/api/supplier/finance', {}, mgr);
     assert.equal(Math.round((na.body.btw || []).reduce((s, r) => s + r.omzet, 0) * 100), somPosten,
       'na het uitchecken telt de rekening EEN keer');
+
+    /* EN DE AANGIFTE KOMT ERBIJ UIT. Dat was de tweede helft (TAKEN.md 4.29):
+       een post op de kamer of de tafel is nog geen verkoop, dus /pos/sale
+       boekt er geen factuur bij -- anders zou de omzet in de aangifte in de
+       maand van BESTELLEN staan en in de boekhouding in de maand van
+       AFREKENEN. De factuur hoort bij het uitchecken, en daar staat hij nu.
+       Precies EEN, want twee wegen naar dezelfde rekening geven geen twee
+       facturen. */
+    const facturen = (await api(base, '/api/supplier/facturen/mijn', {}, mgr)).body.verkocht || [];
+    const opBundel = facturen.filter(f => f.ref === uit.body.sale.id);
+    assert.equal(opBundel.length, 1, 'het uitchecken levert precies EEN factuur op');
+    assert.equal(Math.round(opBundel[0].totaal * 100), somPosten, 'voor het hele bedrag van de rekening');
+    assert.equal(facturen.length, 1, 'en de losse posten hebben er zelf geen -- die waren uitstel');
+
+    const grondslagNa = Math.round((na.body.btw || []).reduce((s, r) => s + r.grondslag, 0) * 100);
+    const op = await api(base, '/api/supplier/btw/opmaken', { periode: na.body.maand }, mgr);
+    assert.equal(op.status, 200, JSON.stringify(op.body).slice(0, 200));
+    assert.equal((op.body.aangifte.tarieven || []).reduce((s, t) => s + t.omzetCenten, 0), grondslagNa,
+      'en de aangifte telt dezelfde omzet als de boekhouding');
+  } finally {
+    stop(child);
+    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+  }
+});
+
+/* ---------------------------------------------------------------------------
+   6. DE KASSA EN DE BOEKHOUDING STELLEN TWEE VERSCHILLENDE VRAGEN
+
+   Toets 9 tot en met 11 gaan over de BOEKHOUDING: draagt deze bon omzet? Het
+   kassa-dagoverzicht stelt een andere vraag -- ging dit geld door de la? -- en
+   die twee lopen op precies twee punten uiteen. Dat verschil hoort zichtbaar
+   te zijn, want het is bij het bouwen van 4.28 twee keer misgegaan: eerst
+   telde de boekhouding een tafel dubbel, en daarna haalde mijn eigen
+   reparatie het contante geld van dezelfde tafel uit het kassatotaal.
+
+   Een gebundelde bon van een tafelticket draagt geen omzet (die staat op de
+   bestellingen) maar wel geld (de gasten betaalden contant). Een openstaande
+   tafelrekening draagt geen van beide: dat is uitstel.
+   --------------------------------------------------------------------------- */
+test('12. het kassatotaal telt de contante tafel WEL, de boekhouding niet nog eens', async () => {
+  const TMP = verseDataDir();
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  try {
+    const mgr = await managerVan(base, 'KIKUNOI');
+    await api(base, '/api/supplier/settings', { code: 'KIKUNOI', opties: { betaalVooraf: false } }, mgr);
+    const tafel = '7';
+    const lid = await registreer(base);
+    const item = await eersteItem(base, lid, 'KIKUNOI');
+    const r1 = await api(base, '/api/order', { supplierCode: 'KIKUNOI', items: [{ id: item, qty: 2 }], table: tafel }, lid);
+    assert.equal(r1.status, 200, JSON.stringify(r1.body).slice(0, 200));
+    const som = Math.round(r1.body.order.total * 100);
+
+    const voor = (await api(base, '/api/supplier/state', { code: 'KIKUNOI' }, mgr)).body.state.pos;
+    const tk = await api(base, '/api/supplier/tafelticket', { table: tafel }, mgr);
+    const af = await api(base, '/api/supplier/tafelticket/afrekenen',
+      { table: tafel, zegel: tk.body.ticket.zegel, at: tk.body.ticket.at, method: 'contant' }, mgr);
+    assert.equal(af.status, 200, JSON.stringify(af.body).slice(0, 200));
+    await even();
+
+    /* DE KASSA: het geld ligt in de la, dus het telt. Dit is de fout die ik
+       zelf maakte bij 4.28 -- de bundel overslaan omdat de boekhouding hem
+       overslaat, terwijl de onderdelen van een tafelticket BESTELLINGEN zijn
+       en dus helemaal niet in het kassaoverzicht staan. */
+    const na = (await api(base, '/api/supplier/state', { code: 'KIKUNOI' }, mgr)).body.state.pos;
+    assert.equal(Math.round((na.total - voor.total) * 100), som,
+      'het kassatotaal groeit met precies het bedrag van de tafel');
+    assert.equal(Math.round((na.byMethod.contant || 0) * 100), som, 'en staat onder contant');
+
+    /* EN DE BEDRAGEN NAAST DE NAMEN TELLEN OP TOT DAT TOTAAL. Ze stonden in
+       het scherm als euro's naast elkaar terwijl byActor ook openstaande
+       posten meetelde -- twee getallen op een kaart die niet bij elkaar
+       optellen (TAKEN.md 4.30). */
+    const somActors = Object.values(na.byActor).reduce((s, x) => s + x, 0);
+    assert.equal(Math.round(somActors * 100), Math.round(na.total * 100),
+      'per medewerker telt op tot het dagtotaal');
+
+    // DE BOEKHOUDING: EEN keer, want de bestellingen dragen de omzet al
+    const fin = await api(base, '/api/supplier/finance', {}, mgr);
+    assert.equal(Math.round((fin.body.btw || []).reduce((s, r) => s + r.omzet, 0) * 100), som,
+      'de boekhouding telt de tafel EEN keer');
+  } finally {
+    stop(child);
+    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+  }
+});
+
+test('13. een minibarlast komt buiten de kassa om binnen, en belandt toch in de aangifte', async () => {
+  /* DIT is TAKEN.md 4.29 in zijn zuiverste vorm. Een minibartelling zet de
+     kamerlast RECHTSTREEKS op de rekening (routes/supplier/kamers/
+     voorzieningen.js), buiten /api/supplier/pos/sale om. Die post boekte dus
+     nooit een factuur, en omdat de boekhouding hem bij het uitchecken wel
+     telde, stond die omzet wel in de maandcijfers van de zaak en NIET in de
+     btw-aangifte. Precies het gat dat dit hele bestand voor de app-kant heeft
+     gedicht, maar dan aan de hotelkant.
+
+     Hetzelfde geldt voor de logies bij het inchecken. Die weg is hier niet
+     nagelopen omdat er een heel verblijf voor nodig is; de reparatie zit niet
+     bij de bron maar bij het AFREKENEN, en dat is precies waarom deze ene
+     bron genoeg is om hem te bewijzen: welke weg de post ook nam, hij komt
+     langs dezelfde check-out. */
+  const TMP = verseDataDir();
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  try {
+    const mgr = await managerVan(base, 'HOSHI');
+    const st = (await api(base, '/api/supplier/state', { code: 'HOSHI' }, mgr)).body.state;
+    const kamer = (st.rooms || [])[0];
+    const mb = ((st.minibar || {}).catalog || [])[0];
+    assert.ok(kamer && mb, 'het hotel heeft een kamer en een minibar-catalogus');
+
+    const tel = await api(base, '/api/supplier/minibar/count',
+      { room: kamer.name, items: [{ id: mb.id, qty: 2 }] }, mgr);
+    assert.equal(tel.status, 200, JSON.stringify(tel.body).slice(0, 200));
+    const last = Math.round(mb.price * 2 * 100);
+    assert.equal(Math.round(tel.body.charged * 100), last, 'het verbruik staat als kamerlast op de rekening');
+    await even();
+
+    // nog niets: de last is uitstel, dus geen omzet, geen factuur, geen geld
+    const voor = await api(base, '/api/supplier/finance', {}, mgr);
+    assert.equal(Math.round((voor.body.btw || []).reduce((s, r) => s + r.omzet, 0) * 100), 0,
+      'een openstaande kamerlast is nog geen omzet');
+    assert.equal(((await api(base, '/api/supplier/facturen/mijn', {}, mgr)).body.verkocht || []).length, 0,
+      'en nog geen factuur');
+
+    const uit = await api(base, '/api/supplier/pos/checkout', { room: kamer.name, method: 'contant' }, mgr);
+    assert.equal(uit.status, 200, JSON.stringify(uit.body).slice(0, 200));
+    await even();
+
+    const na = await api(base, '/api/supplier/finance', {}, mgr);
+    const omzet = Math.round((na.body.btw || []).reduce((s, r) => s + r.omzet, 0) * 100);
+    assert.equal(omzet, last, 'na het uitchecken telt de kamerlast EEN keer als omzet');
+
+    const facturen = (await api(base, '/api/supplier/facturen/mijn', {}, mgr)).body.verkocht || [];
+    assert.equal(facturen.length, 1, 'en er staat precies EEN factuur -- dat was er nul');
+    assert.equal(Math.round(facturen[0].totaal * 100), last, 'voor het bedrag van de rekening');
+
+    const grondslag = Math.round((na.body.btw || []).reduce((s, r) => s + r.grondslag, 0) * 100);
+    const op = await api(base, '/api/supplier/btw/opmaken', { periode: na.body.maand }, mgr);
+    assert.equal(op.status, 200, JSON.stringify(op.body).slice(0, 200));
+    assert.equal((op.body.aangifte.tarieven || []).reduce((s, t) => s + t.omzetCenten, 0), grondslag,
+      'en de aangifte komt uit op de boekhouding -- dat was nul tegenover de volle last');
   } finally {
     stop(child);
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}

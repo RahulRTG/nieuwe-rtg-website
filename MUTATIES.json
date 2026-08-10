@@ -2032,6 +2032,14 @@
       "geprobeerd": 17,
       "posities": 8
     },
+    "meterhalf.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/norm.js",
+      "operator": "&&->||#0",
+      "gezakt": 1,
+      "geprobeerd": 3
+    },
     "meterijk.test.js": {
       "soort": "puur",
       "staat": "muteert zelf",

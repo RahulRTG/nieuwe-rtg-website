@@ -115,3 +115,43 @@ test('6. wat op naam staat, draagt de naamgrens mee', async () => {
   assert.match(sam.naamgrens.let, /niet op een sleutel/i,
     'de lijst gaat op naam, en dat wordt gezegd in plaats van verzwegen');
 });
+
+/* HET LID-ID NAAST DE NAAM (bedrijf/wieis.js). Dit was de zwaarste schuld die
+   deze reeks achterliet: mensen werden alleen op naam gevonden. Drie
+   beweringen, en de derde is de reden dat het een helper werd en geen regel per
+   module. */
+test('7. een onbedubbelzinnige naam levert een id op, en dat wordt gebruikt', async () => {
+  const t = (await api('/ticket/maak', Object.assign({ onderwerp: 'Pomp lekt',
+    wie: 'Pia' }, SAM.cred))).body;
+  assert.equal(t.ticket.wie, 'Pia', 'de naam blijft gewoon staan');
+  assert.equal(t.ticket.wieId, PIA.lidId, 'en het id staat ernaast');
+  assert.equal(t.wieLet, null, 'geen voorbehoud: de naam was thuis te brengen');
+
+  const mijn = (await api('/mijnwerk', PIA.cred)).body;
+  assert.ok(mijn.gevonden.opId >= 1, 'die rij wordt op id gevonden');
+  assert.equal(mijn.gevonden.opNaam, 0, 'en niet op naam');
+  assert.match(mijn.gevonden.let, /geen naamgok/i);
+});
+
+test('8. een naam die niet thuis te brengen is, blijft een naam -- met de reden', async () => {
+  const buiten = (await api('/ticket/maak', Object.assign({ onderwerp: 'Dak lekt',
+    wie: 'Iemand van buiten' }, SAM.cred))).body;
+  assert.equal(buiten.ticket.wie, 'Iemand van buiten', 'de toewijzing wordt niet geweigerd');
+  assert.equal(buiten.ticket.wieId, null, 'er wordt geen id gegokt');
+  assert.match(buiten.wieLet, /geen actief lid/i, 'en de gebruiker hoort waarom');
+});
+
+test('9. bij twee naamgenoten wordt er GEEN id gekozen', async () => {
+  const a = (await api('/lid/aanmeld', { werkruimte: W, naam: 'Pia' })).body;
+  await api('/lid/besluit', { werkruimte: W, beheerToken: B, lidId: a.lidId, akkoord: true });
+
+  const t = (await api('/ticket/maak', Object.assign({ onderwerp: 'Derde melding',
+    wie: 'Pia' }, SAM.cred))).body;
+  assert.equal(t.ticket.wieId, null, 'twee actieve Pia\'s: er wordt er geen gekozen');
+  assert.match(t.wieLet, /2 actieve leden heten zo/i, 'met de telling erbij');
+
+  /* En de rij die eerder WEL een id kreeg, blijft exact -- er wordt niets met
+     terugwerkende kracht omgegooid. */
+  const mijn = (await api('/mijnwerk', PIA.cred)).body;
+  assert.ok(mijn.gevonden.opId >= 1, 'de eerdere toewijzing blijft op id staan');
+});

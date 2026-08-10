@@ -2483,16 +2483,30 @@ de VERBORGEN-lijst van `object.js`; die tweede is er expliciet voor dit doel bij
 gekomen, want een dossier dat hem uitprint legt buiten de kluis om een verband
 tussen twee identiteiten dat gescheiden hoort te blijven.
 
-Het tweede probleem was ernstiger: **geen enkele module verwijst naar een mens
-met zijn id** — `eigenaar`, `wie` en `door` zijn vrije tekst met een naam erin.
-De soort `lid` is daarom de enige in dit huis met een eigen `verwijst`, en wordt
-op **naam** gevonden. Dat is een risico en geen truc: twee mensen kunnen dezelfde
-naam dragen, en een naam als "Open" is ook een statuswaarde.
-`kern/werkcommand/naamgrens.js` meet allebei en zet het in de uitslag — het
-dossier van een medewerker zegt zelf dat het op naam matcht, telt de naamgenoten
-en waarschuwt als de naam ook een gewone veldwaarde is. Een verband dat op een
-naam rust en zich voordoet als een sleutel, is precies het soort stille
-onwaarheid waar dit huis het vaakst op is gevallen.
+Het tweede probleem was ernstiger: geen enkele module verwees naar een mens met
+zijn id — `eigenaar`, `wie` en `door` waren vrije tekst met een naam erin. De
+soort `lid` kreeg daarom als enige in dit huis een eigen `verwijst` en werd op
+**naam** gevonden, met alle risico van dien: twee mensen kunnen dezelfde naam
+dragen, en een naam als "Open" is ook een statuswaarde.
+`kern/werkcommand/naamgrens.js` meet allebei en zet het in de uitslag.
+
+**Sinds `server/bedrijf/wieis.js` krimpt die gok.** Bij het vastleggen van een
+naam wordt er ook een **id** opgeslagen, als dat id onbedubbelzinnig is —
+precies één actief lid met die naam. Bij nul (een externe, een typefout) of bij
+twee of meer blijft alleen de naam staan, **met de reden in het antwoord**. Drie
+dingen gebeuren daar met opzet niet: er wordt niets afgedwongen (een taak moet
+naar iemand van buiten kunnen), niets met terugwerkende kracht ingevuld (dat zou
+precies de gok zijn die dit oplost), en de naam wordt niet vervangen — het id
+komt ernaast.
+
+Wat het oplevert is af te lezen: de afhankelijkhedenscan meldt het **veld**
+waarop hij matchte, dus `via: 'wieId'` is exact en `via: 'wie'` is een naam. De
+scan trekt daarbij een treffer op de sleutel vóór een treffer op de naam, ook
+als het naamveld eerder op de rij staat — anders hing het oordeel af van de
+volgorde waarin velden toevallig zijn gezet. Het persoonsdossier en `/mijnwerk`
+tellen allebei hoeveel rijen op id zijn gevonden en hoeveel nog op naam. De
+naamgok verdwijnt niet met een knop; hij krimpt, en hoeveel er nog van over is,
+staat er.
 
 Getoetst in `test/werkregister.test.js` (11). Negen mutaties, alle negen raak —
 onder andere de rechten-zeef weghalen, de lezer over werkruimtes heen laten

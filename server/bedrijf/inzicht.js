@@ -64,6 +64,22 @@ module.exports = (sctx) => {
     };
   }
 
+  /* HOE HARD IS DE SAMENHANG VAN EEN MENS? De afhankelijkhedenscan meldt per rij
+     het VELD waarop hij matchte, en dat veld verklapt precies wat we willen
+     weten: `wieId` en `eigenaarId` zijn sleutels (exact), `wie` en `eigenaar`
+     zijn namen (kan een naamgenoot zijn). Sinds bedrijf/wieis.js dragen nieuwe
+     rijen dat id, dus dit getal hoort te krimpen -- en zolang het niet nul is,
+     staat er hoeveel van dit dossier nog op een gok rust. */
+  function hardheid(d) {
+    const rijen = (d.afhankelijkheden || []).flatMap(gr => gr.rijen || []);
+    const opId = rijen.filter(r => /Id$/.test(String(r.via || ''))).length;
+    const opNaam = rijen.length - opId;
+    return { gevonden: { opId, opNaam,
+      let: opNaam
+        ? opNaam + ' van de ' + rijen.length + ' getoonde rijen zijn op NAAM gevonden en kunnen van een naamgenoot zijn; ' + opId + ' via een lid-id, en die zijn exact. Kijk per rij naar "via".'
+        : 'Alle getoonde rijen zijn via een lid-id gevonden; er zit geen naamgok in.' } };
+  }
+
   /* De hele laag van één verzoek. `g` komt uit werkPoort, dus de werkruimte en
      de rechten zijn al bewezen voordat hier iets wordt gebouwd. */
   function laagVoor(g) {
@@ -116,7 +132,7 @@ module.exports = (sctx) => {
     const magBesluit = g.rechten.includes('besluit');
     res.json(Object.assign({ ok: true }, d, {
       besluiten: magBesluit ? sctx.besluitenOver(g.w, type, id) : null,
-      naamgrens: type === 'lid' ? naamgrens(g.w.leden, d.object.titel) : null,
+      naamgrens: type === 'lid' ? Object.assign(naamgrens(g.w.leden, d.object.titel), hardheid(d)) : null,
       let: 'De samenhang hieronder is gemeten uit de gegevens zelf en niet uit een schema. De tijdlijn komt uit het werkjournaal, en dat legt niet elke handeling vast; leeg is hier dus niet hetzelfde als "er gebeurde niets".'
         + (magBesluit ? '' : ' Of er besluiten over dit object gaan, staat er niet: daarvoor mist u het recht "besluit". Dat is niet hetzelfde als "er zijn er geen".')
     }));

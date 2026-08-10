@@ -214,10 +214,14 @@ test('9. het dossier van een mens vindt zijn werk, en zegt waarop het matcht', a
 
   const groep = (d.afhankelijkheden || []).find(g => g.type === 'project');
   assert.ok(groep, 'het project waar Pia eigenaar van is, hoort hier te staan');
-  assert.equal(groep.rijen[0].via, 'eigenaar', 'gevonden via het veld dat haar noemt');
-
-  assert.equal(d.naamgrens.opNaam, true, 'en de uitslag zegt dat dit op NAAM gaat');
-  assert.match(d.naamgrens.let, /niet op een sleutel/i);
+  /* Sinds bedrijf/wieis.js draagt het project een `eigenaarId`, en de scan
+     trekt een treffer op de SLEUTEL voor boven een treffer op de naam -- ook
+     als het naamveld eerder op de rij staat. Zonder die voorkeur zou een
+     exacte match als naamgok geteld worden. */
+  assert.equal(groep.rijen[0].via, 'eigenaarId', 'gevonden via het lid-id en niet via de naam');
+  assert.equal(d.naamgrens.gevonden.opNaam, 0, 'geen enkele rij rust hier nog op een naam');
+  assert.ok(d.naamgrens.gevonden.opId >= 1, 'en minstens een via het id');
+  assert.match(d.naamgrens.gevonden.let, /geen naamgok/i);
 });
 
 test('10. een naamgenoot wordt geteld en gemeld, niet weggemoffeld', async () => {

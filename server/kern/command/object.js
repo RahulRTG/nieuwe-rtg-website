@@ -62,11 +62,24 @@ function afhankelijkheden(reg, db, soort, r) {
     for (let i = 0; i < gekeken && raak.length < MAX_PER_SOORT * 4; i++) {
       const q = alle[i];
       if (!q || (ander.type === soort.type && s(q[ander.sleutel]) === s(r[soort.sleutel]))) continue;
-      let veld = '';
+      /* EEN RIJ KAN OP MEER DAN EEN VELD MATCHEN, en dan is niet elk veld even
+         hard. Een taak die zowel `wieId` (de sleutel van dit object) als `wie`
+         (zijn naam) draagt, is via het ID gevonden en niet via een naam die ook
+         van een naamgenoot kan zijn. Daarom wordt hier niet op de eerste
+         treffer gestopt maar de treffer op de SLEUTEL voorgetrokken; `via`
+         vertelt de lezer daarna welke van de twee het was. Zonder deze voorkeur
+         hangt het antwoord af van de volgorde waarin de velden toevallig op de
+         rij zijn gezet, en dat is geen eigenschap om een oordeel op te bouwen. */
+      const eigen = s(r[soort.sleutel]).toLowerCase();
+      let veld = '', opSleutel = '';
       for (const [k, v] of Object.entries(q)) {
         if (v == null || typeof v === 'object') continue;
-        if (sleutels.has(s(v).toLowerCase())) { veld = k; break; }
+        const w = s(v).toLowerCase();
+        if (!sleutels.has(w)) continue;
+        if (eigen && w === eigen) { opSleutel = k; break; }
+        if (!veld) veld = k;
       }
+      veld = opSleutel || veld;
       if (veld) raak.push(Object.assign(reg.kort(ander, q), { via: veld }));
     }
     if (raak.length) groepen.push({ type: ander.type, label: ander.label, meervoud: ander.meervoud,

@@ -61,12 +61,12 @@ module.exports = (sctx) => {
       tekst: schoon(req.body.tekst, 4000) || null,
       klantId: schoon(req.body.klantId, 20) || null,
       melder: schoon(req.body.melder, 60) || null,
-      wie: schoon(req.body.wie, 60) || null,
       status: 'open', storingId: null, reacties: [], eersteReactieAt: null,
       at: nu(), door: g.l.naam };
+    const wie = sctx.zetWie(g.w, t, 'wie', schoon(req.body.wie, 60));
     T(g.w)[t.id] = t;
     save();
-    res.json({ ok: true, ticket: t, sla: sla(t), normen: PRIO });
+    res.json({ ok: true, ticket: t, sla: sla(t), normen: PRIO, wieLet: wie.reden });
   });
 
   /* Reageren. Een automatische bevestiging mag, maar hij zet de klok niet

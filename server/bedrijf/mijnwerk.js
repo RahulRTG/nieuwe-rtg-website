@@ -47,19 +47,25 @@ module.exports = (sctx) => {
     const mijn = (w.journaal || []).filter(j => j && j.wieId === g.l.id).slice(0, 15)
       .map(j => ({ wat: j.wat, waarover: j.waarover, at: j.at }));
 
-    /* En wat er op uw naam openstaat. Dit gaat WEL op naam -- de modules leggen
-       geen lid-id vast bij `wie` of `eigenaar` -- dus de waarschuwing van
-       kern/werkcommand/naamgrens.js reist mee. Een lijst die van een naamgenoot
-       kan zijn en dat niet zegt, is erger dan geen lijst. */
+    /* Wat er op uw naam openstaat -- en sinds bedrijf/wieis.js met een ID waar
+       dat kon. `mij()` pakt eerst het id (exact) en valt alleen terug op de naam
+       als de rij geen id draagt: dat zijn de rijen van voor die ronde, en die
+       kunnen van een naamgenoot zijn. De telling van allebei staat in de
+       uitslag, zodat zichtbaar is hoeveel van deze lijst nog een gok is. */
+    let exact = 0, opNaam = 0;
+    const mij = (r, veld) => {
+      if (r[veld + 'Id']) { const raak = r[veld + 'Id'] === g.l.id; if (raak) exact++; return raak; }
+      const raak = String(r[veld] || '') === naam; if (raak) opNaam++; return raak;
+    };
     const taken = Object.values(w.taken || {})
-      .filter(t => t.kolom !== 'klaar' && String(t.wie || '') === naam)
+      .filter(t => t.kolom !== 'klaar' && mij(t, 'wie'))
       .sort((a, b) => String(a.deadline || '9999').localeCompare(String(b.deadline || '9999')));
     const tickets = Object.values(w.tickets || {})
-      .filter(t => t.status !== 'gesloten' && String(t.wie || '') === naam);
+      .filter(t => t.status !== 'gesloten' && mij(t, 'wie'));
     const projecten = Object.values(w.projecten || {})
-      .filter(p => p.status === 'loopt' && String(p.eigenaar || '') === naam);
+      .filter(p => p.status === 'loopt' && mij(p, 'eigenaar'));
     const kansen = Object.values(w.kansen || {})
-      .filter(k => k.fase !== 'gewonnen' && k.fase !== 'verloren' && String(k.eigenaar || '') === naam);
+      .filter(k => k.fase !== 'gewonnen' && k.fase !== 'verloren' && mij(k, 'eigenaar'));
 
     res.json({ ok: true,
       wie: { naam, rollen: g.rechten },
@@ -73,6 +79,10 @@ module.exports = (sctx) => {
           projecten: projecten.length, kansen: kansen.length }
       },
       laatstGedaan: mijn,
+      gevonden: { opId: exact, opNaam,
+        let: opNaam
+          ? opNaam + ' rij(en) zijn op NAAM gevonden en niet op een id: die dragen geen lid-id (van voor die laag bestond) en kunnen dus van een naamgenoot zijn. ' + exact + ' rij(en) zijn exact.'
+          : 'Alle rijen zijn op lid-id gevonden; er zit geen naamgok in deze lijst.' },
       naamgrens: naamgrens(w.leden, naam),
       let: 'Dit is uw eigen werk. Er bestaat geen aanroep waarmee u hier het werk van een collega uit haalt -- deze route kent geen veld om iemand anders in te vullen, en dat is met opzet de grendel in plaats van een controle die iemand kan vergeten. Er wordt voor dit scherm ook niets nieuws over u vastgelegd: het leest het journaal dat de modules zelf al schrijven.' });
   });

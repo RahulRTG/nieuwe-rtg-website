@@ -545,6 +545,25 @@ var RTG_BOUW = '1b06c62c';
          rechthoek met afgeronde hoeken en daarbuiten was het vlak zwart. Een
          inlogscherm hoort geen venster in een venster te zijn.
          De inhoud houdt zijn eigen breedte -- alleen de HEMEL wordt groot. */
+    /* Vervolg van app-main-04: de brede-schermregels van de poort. Geknipt
+       omdat deel 04 met de compositieregels weer over de 10 KB-grens ging.
+       De bundel plakt 04, 04a en 04b weer aaneen tot exact hetzelfde bestand;
+       de knip ligt midden in een stringconcatenatie, dus deel 04 eindigt met
+       een + en dit deel maakt hem af. */
+      '@media (min-width:900px){' +
+        '#gate .os-lock{--klokschaal:1.5;}' +
+        '#gate{position:fixed;inset:0;width:100vw;max-width:none;height:100vh;' +
+          'margin:0;border-radius:0;border:0;display:flex;align-items:center;' +
+          'justify-content:center;flex-direction:column;}' +
+        '#gate canvas:not(.ag-mond){position:absolute;inset:0;width:100vw;height:100vh;}' +
+        '#gate .ag-doos{max-width:34rem;}' +
+      '}';
+    document.head.appendChild(st);
+    /* Vervolg van app-main-04: de compositieregels van de poort (een kolom:
+       klok, lippen, aanspreking, veld). Geknipt omdat deel 04 opnieuw over de
+       10 KB-grens ging. De knip ligt midden in een stringconcatenatie -- deel
+       04 eindigt op een + en dit deel maakt hem af; de bundel plakt 04, 04ab,
+       04a en 04b weer aaneen tot exact hetzelfde bestand. */
       /* DE COMPOSITIE. Dit scherm had vijf objecten die allemaal ongeveer even
          belangrijk waren -- klok, lippen, zin, invoerveld, koekjesmelding --
          met grote lege vlakken ertussen die niets deden. Leegte in een premium
@@ -571,35 +590,30 @@ var RTG_BOUW = '1b06c62c';
          tientallen pixels onder */
       '#gate .ag-mond{margin:-0.6rem auto 0.2rem;width:min(52vw,240px);height:auto;}' +
       // de zin is de aanspreking en geen onderschrift
+      /* margin-inline:auto, anders staat de zin 43px links van de as. De doos
+         is een flexkolom met align-items:stretch, dus een kind met een
+         max-width blijft aan de linkerrand plakken -- gemeten, niet gegokt. */
       '#gate .ag-zin{font-size:clamp(1.35rem,5.2vw,1.9rem);line-height:1.3;' +
-        'min-height:0;padding:0.5rem 0 1.1rem;max-width:22ch;}' +
+        'min-height:0;padding:0.5rem 0 1.1rem;max-width:22ch;margin-inline:auto;}' +
       // het invoerveld is de actie: breed en royaal, geen streepje
       /* EEN rand, niet twee. De rij had al een border-bottom uit de basisstijl;
          daar een volledige rand overheen leggen gaf een dubbele doos met een
          verspringende binnenrand. Eerst de oude weg, dan de nieuwe. */
+      /* EEN doos, en symmetrisch. De rij droeg mijn ring en het invoerveld
+         binnenin had zijn EIGEN achtergrond, rand en radius -- vandaar de
+         dubbele doos met een binnenvlak dat 8px uit het midden lag. De rij
+         draagt nu het kader, het veld erin is kaal. De padding was ook
+         asymmetrisch (0,9rem links tegen 0,5rem rechts). */
       '#gate .ag-rij{width:min(100%,30rem);min-height:58px;border:0;' +
         'box-shadow:inset 0 0 0 1px var(--line);border-radius:14px;' +
-        'margin:0;padding:0 0.5rem 0 0.9rem;}' +
+        'margin-inline:auto;padding:0 0.9rem;}' +
       '#gate .ag-rij:focus-within{box-shadow:inset 0 0 0 1px var(--burgundy);}' +
+      '#gate .ag-rij input{background:none;border:0;border-radius:0;box-shadow:none;}' +
       '#gate .ag-rij input{font-size:1rem;padding:1rem 0.4rem;text-align:left;}' +
       /* de koekjesmelding hoort niet MIDDEN in de kennismaking. Hij zweeft
          onderaan, buiten de kolom, waar hij de compositie niet meer breekt. */
       '#gate ~ .rtgcookie,.rtgcookie{position:fixed;left:50%;transform:translateX(-50%);' +
         'bottom:1rem;z-index:60;max-width:min(92vw,26rem);}' +
-    /* Vervolg van app-main-04: de brede-schermregels van de poort. Geknipt
-       omdat deel 04 met de compositieregels weer over de 10 KB-grens ging.
-       De bundel plakt 04, 04a en 04b weer aaneen tot exact hetzelfde bestand;
-       de knip ligt midden in een stringconcatenatie, dus deel 04 eindigt met
-       een + en dit deel maakt hem af. */
-      '@media (min-width:900px){' +
-        '#gate .os-lock{--klokschaal:1.5;}' +
-        '#gate{position:fixed;inset:0;width:100vw;max-width:none;height:100vh;' +
-          'margin:0;border-radius:0;border:0;display:flex;align-items:center;' +
-          'justify-content:center;flex-direction:column;}' +
-        '#gate canvas:not(.ag-mond){position:absolute;inset:0;width:100vw;height:100vh;}' +
-        '#gate .ag-doos{max-width:34rem;}' +
-      '}';
-    document.head.appendChild(st);
     /* Vervolg van app-main-04: de poort-inhoud (mond, zin, invoerveld,
        passkey) en het gesprek erachter. Geknipt omdat deel 04 met de
        schermvullende sterrenhemel over de 10 KB-grens ging die het

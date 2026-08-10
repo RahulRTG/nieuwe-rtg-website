@@ -106,8 +106,17 @@ module.exports = (sctx) => {
     const d = objectlaag.dossier(register, db, type, id,
       { journaal: journaalVan(g.w), actiesVoor: null, bron: 'werkruimte' });
     if (d.error) return res.status(d.status || 404).json({ error: d.error });
+
+    /* De besluiten die dit object raken. Die komen NIET uit de gemeten
+       samenhang hierboven: een besluit draagt zijn objecten als lijst, en de
+       scan van object.js slaat lijsten over. Vandaar een eigen vraag aan
+       geheugen.js -- en `null` (geen recht) is bewust iets anders dan `[]`
+       (wel gekeken, niets gevonden). */
+    const magBesluit = g.rechten.includes('besluit');
     res.json(Object.assign({ ok: true }, d, {
+      besluiten: magBesluit ? sctx.besluitenOver(g.w, type, id) : null,
       let: 'De samenhang hieronder is gemeten uit de gegevens zelf en niet uit een schema. De tijdlijn komt uit het werkjournaal, en dat legt niet elke handeling vast; leeg is hier dus niet hetzelfde als "er gebeurde niets".'
+        + (magBesluit ? '' : ' Of er besluiten over dit object gaan, staat er niet: daarvoor mist u het recht "besluit". Dat is niet hetzelfde als "er zijn er geen".')
     }));
   });
 

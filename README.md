@@ -2411,7 +2411,7 @@ journaal en startscherm -- zodat dit ook aan een andere organisatie te geven is.
 | Bouw | repositories, issues, releases per omgeving, feature flags |
 | IT | apparaten, licenties, het uitdienstproces in zes stappen |
 | Recht | contractbibliotheek met een uitgerekende laatste opzegdag |
-| Governance | voorstel, adviesronde, stemronde, besluit met evaluatiemoment |
+| Governance | voorstel, adviesronde, stemronde, besluit met evaluatiemoment, de objecten die het besluit raakt en de uitkomst van het terugkijken |
 | Beeld | het directiebeeld en de geconsolideerde blik over dochters |
 
 Wat deze laag met opzet **niet** doet: geen tweede Docs, chat, agenda of
@@ -2489,6 +2489,60 @@ Getoetst in `test/werkregister.test.js` (7). Zes mutaties, alle zes raak — ond
 andere de rechten-zeef weghalen, de lezer over werkruimtes heen laten lopen, de
 afscherming van de kennisbank slopen en de ticketsoort naar de verkeerde bak
 wijzen.
+
+#### Het geheugen van een besluit: waarom hebben we dit gedaan
+
+De besluitvorming stond er al — voorstel, adviesronde met bezwaren, stemronde,
+uitkomst, evaluatiedatum — maar een besluit hing aan **niets**. Het ging over
+een leverancier, een project of een release, en nergens stond wélke. Daarmee is
+"waarom kozen we leverancier X" over drie jaar onbeantwoordbaar, en "welke
+projecten worden geraakt door dit contract" zelfs vandaag.
+
+`server/bedrijf/geheugen.js` (schrijven) en `geheugenlezen.js` (lezen) leggen
+die verbinding vast. **Dit is de enige koppeling in deze laag die niet gemeten
+wordt, en dat is geen tekortkoming van de meter maar een eigenschap van wat er
+wordt vastgelegd**: een besluit raakt meerdere objecten, dus het is een lijst —
+en zowel `kwaliteit.js` als de afhankelijkhedenscan van `object.js` slaan
+lijsten over. Hij wordt dus door een mens geschreven en expliciet teruggelezen.
+
+| Endpoint | Doel |
+|---|---|
+| `POST /api/bedrijf/besluit/raakt` `{besluitId, type, id}` | Dit besluit gaat over dit object |
+| `POST /api/bedrijf/besluit/raakt-terug` `{koppelId, reden}` | Intrekken — met een reden, en zonder te wissen |
+| `POST /api/bedrijf/besluit/evaluatie` `{uitkomst, tekst}` | Wat het terugkijken opleverde; evaluaties stapelen |
+| `POST /api/bedrijf/besluit/geheugen` `{besluitId}` | Onderbouwing, adviezen, bezwaren, stemmen, uitkomst, evaluaties en de geraakte objecten |
+| `POST /api/bedrijf/dossier` | Draagt nu ook `besluiten`: welke besluiten dit object raken |
+
+Vier regels dragen het, en alle vier komen ze uit dezelfde vraag — wat is dit
+over drie jaar nog waard?
+
+- **Een koppeling wordt bewezen, niet geloofd.** Het object moet bestaan in het
+  register van degene die koppelt. Een id dat niet bestaat en een object dat de
+  koppelaar niet mag zien geven **hetzelfde antwoord**: anders is dit veld een
+  manier om te toetsen welke id's er in een gesloten module bestaan.
+- **Een koppeling draagt wat het tóén was.** Niet alleen `{type, id}` maar ook
+  de titel op het moment van koppelen. Een contract wordt hernoemd, een vlag
+  wordt opgeruimd — en dan is "besluit 14 juni ging over c8f1a" geen antwoord
+  meer. Een verdwenen object staat er als **verdwenen** met de titel van toen;
+  het besluit ging er wel degelijk over.
+- **Intrekken wist niets.** Een verkeerde koppeling wordt ingetrokken met een
+  reden en blijft leesbaar staan. Wie kan wissen, kan de geschiedenis
+  herschrijven — en dan is dit geen geheugen maar een prikbord.
+- **Iedere lezer lost op met zijn eigen register.** Wie het recht voor een soort
+  mist, krijgt een **telling** en nergens de titel — dezelfde vorm die de
+  kennisbank al gebruikt met `verborgen: n`.
+
+En de evaluatie is de andere helft: het Werk OS eiste al een evaluatiedatum bij
+elk aangenomen besluit, maar er was geen manier om op te schrijven wát het
+terugkijken opleverde. Een datum zonder uitkomst is een agendapunt. Evaluaties
+stapelen, want een besluit mag na drie jaar anders uitpakken dan na drie
+maanden, en dan horen ze allebei gelezen te worden.
+
+Getoetst in `test/werkgeheugen.test.js` (7). Zes mutaties, alle zes raak — het
+bewijs bij het koppelen weghalen, de lezer met een ander register laten
+oplossen, intrekken laten wissen, de titel-van-toen vervangen door die van nu,
+een evaluatie de vorige laten overschrijven, en het dossier de omgekeerde vraag
+niet meer laten stellen.
 
 ### RTG Podium: werelden op één motor
 

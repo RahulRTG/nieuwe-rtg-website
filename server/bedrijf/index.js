@@ -181,6 +181,10 @@ module.exports = (kern) => {
   /* Zoeken, dossier en samenhang over alle modules heen. Staat BEWUST als
      laatste: hij leest de soorten van de lagen hierboven en voegt er geen
      eigen opslag aan toe. */
+  /* Het geheugen van een besluit. NA besluit.js (hij leest `BESLUITEN`) en
+     VOOR inzicht.js (dat zijn `besluitenOver` in het dossier zet). */
+  Object.assign(sctx, require('./geheugen')(sctx));
+  Object.assign(sctx, require('./geheugenlezen')(sctx));
   require('./inzicht')(sctx);
   return sctx;
 };

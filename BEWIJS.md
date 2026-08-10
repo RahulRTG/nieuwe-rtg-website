@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 854 bestanden en 5353 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 855 bestanden en 5360 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 854 |
-| losse beweringen (`test(...)`) | 5353 |
+| toetsbestanden | 855 |
+| losse beweringen (`test(...)`) | 5360 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 603 |
 | **overleefd**: geen mutatie kreeg hem rood | 13 |
 | niet te meten (al rood, geen module gevonden, ...) | 17 |
 | alleen in de kop *genoemd*, nog niet gemeten | 55 |
-| niets van beide | 166 |
+| niets van beide | 167 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-743 bestanden, 5168 beweringen.
+744 bestanden, 5175 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -744,6 +744,7 @@ toets omvalt.
 | `wereldvermogens.test.js` | 14 | gezakt op `liegpoort /api/` | De vermogens van de Lifestyle- en Business Pass die eerst alleen een NAAM in rechten.js hadden: geavanceerd zoeken, netwerkanalyse en "wie bekeek mijn profiel". De belangrijkste bewering staat in het midden: ZOEKEN... |
 | `werk-bij-inloggen.test.js` | 1 | gezakt op `liegpoort /api/` | Een account voor alles: je logt in op je RTG-account en je werk-app staat er meteen. Geen tweede inlog, geen pincode, geen rol kiezen. |
 | `werkbeleid-dienst.test.js` | 6 | gezakt op `liegpoort /api/` | HET WERKBELEID GELDT TIJDENS JE DIENST, EN NIET IN JE PAUZE. Het werkgeversbeleid kan functies op de pas van een medewerker dichtzetten: geen Salon, geen AI, geen paspoort delen. |
+| `werkgeheugen.test.js` | 7 | -- | HET GEHEUGEN VAN EEN BESLUIT: waarom hebben we dit gedaan, en wat raakte het. Zeven beweringen, en ze gaan allemaal over de vraag wat dit over drie jaar nog waard is: 1. |
 | `werkmail.test.js` | 5 | gezakt op `liegpoort /api/` | Werkmail: het zakelijke adresboek per zaak boven op RTMAIL. Standaard- adressen voor eigenaar en management, rahul@<bedrijf>.rtg dat zelf terugschrijft, werkgeversbeheer (aanmaken en afpakken), de buitenpost (extern... |
 | `werkplaats-uitgifte.test.js` | 5 | gezakt op `liegpoort /api/` | RTG Werkplaats geeft rechtstreeks uit: een opdracht wordt na het uitwerken als echt onderdeel in de winkel gezet (App Store of Bibliotheek). De overlay leeft in db.data.appbiebExtra en verschijnt bij de leden in de... |
 | `werkplek-wijzigen.test.js` | 10 | gezakt op `liegpoort /api/` | De werkplek, tweede helft: WIJZIGEN en WEGGOOIEN. test/werkplek.test.js loopt de deur langs en maakt in elk bureau iets aan: een ontwerp, een artikel, een idee. |

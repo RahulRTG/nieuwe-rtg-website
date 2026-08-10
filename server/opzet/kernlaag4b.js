@@ -11,15 +11,13 @@
      tafelwensen
      checklijst
      werkvormen
-     opvang
-     afdelingshotel
-     regering */
+     (opvang, afdelingshotel en regering staan sinds de 10 kB-knip in ./kernlaag4c.js) */
 'use strict';
 
 /* `bankregie` wordt hier verklaard en tot onderaan dit deel gebruikt; daarom
    loopt de grens met deel 4a ervoor en niet erin. */
 module.exports = (kern, hulp) => {
-  const { FISCAAL_PEILJAAR, LANDEN, accounts, anthropic, betaal, betaalOpdrachten, centen, crypto, db, findSupplier, fonds, keyVanCodenaam, ledenAantal, log, magAi, ondernemerpoort, save, schoon, sseToCustomer, sseToOffice, sseToSupplier } = hulp;
+  const { FISCAAL_PEILJAAR, LANDEN, accounts, anthropic, betaal, betaalOpdrachten, centen, crypto, db, findSupplier, fonds, keyVanCodenaam, log, magAi, ondernemerpoort, save, schoon, sseToCustomer, sseToOffice, sseToSupplier } = hulp;
 
 /* Bankregie (kern/bankregie.js): de geldinfrastructuur-knop van de boardroom --
    een schakelaar met DRIE standen (partner -> hybride -> eigen) die bepaalt hoe
@@ -117,13 +115,9 @@ kern.rechtsvormwacht.herstelOverlay();
 const rvTimer = setInterval(() => { kern.rechtsvormwacht.check().catch(() => {}); },
   Number(process.env.RECHTSVORM_CHECK_MS || 86400000));
 if (rvTimer.unref) rvTimer.unref();
-/* De Opvang-afdeling (AZC/COA), het Regeringskantoor van de
-   minister-president en het eigen hotel van elke afdeling -- alle drie
-   kamers van RTG Kantoren. */
-Object.assign(kern, require('../kern/opvang')({ db, save, crypto }));
-Object.assign(kern, require('../kern/afdelingshotel')({ db, save, crypto }));
-Object.assign(kern, require('../kern/regering')({ db, save, crypto, LANDEN,
-  regelwacht: kern.regelwacht, bank: kern.bank, opvang: kern.opvang, afdelingen: kern.afdelingen, ledenAantal }));
+/* De drie kamers van RTG Kantoren (opvang, afdelingshotel, regering) staan in
+   ./kernlaag4c.js: op de 10 kB-grens uitgeknipt, en zij zijn de naad -- ze
+   gebruiken als enige hier `bankregie` niet. */
 /* Pay draait op de eigen bank zodra die live is: een saldotekort in de wallet
    wordt eerst gedekt vanaf de eigen betaalrekening (eigen rails), en pas
    daarna via de kaart-naad. Late binding, want de bank bouwt op pay. */

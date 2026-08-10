@@ -1937,7 +1937,7 @@ const kern = {
 const hulp = {
   DATA_DIR, FISCAAL_PEILJAAR, LANDEN, PERSONAS, accounts, alcoholGrensVan, annuleerReservering,
   anthropic, app, archief, betaal, betaalOpdrachten, beveilig, boekingenVanKlant, boekingenVanZaak, boekingenVoegToe,
-  broadcastSync, centen, crypto, db, entreeCode, etaMinutes, findSupplier, fonds, fooiUit,
+  broadcastSync, centen, crypto, db, entreeCode, etaMinutes, facturatie, findSupplier, fonds, fooiUit,
   geborenVan, haversine, idGeverifieerd, keyVanCodenaam, klantProfiel, klokVan, ledenAantal,
   ledenPrijs, leeftijdVan, legApart, liveCodename, log, logActivity, loginFails, maakOntmoeting,
   mail, media, noteFailedTry, notify, notifySupplier, onboarding, openVacatures, optieAan,

@@ -211,6 +211,15 @@ const IJKINGEN = {
       const zonder = norm.telInlineStijl(() => geen, ['verzonnen.js']);
       assert.equal(met, 3, 'drie attributen worden er drie geteld');
       assert.equal(zonder, 0, 'CSSOM-schrijfacties tellen niet mee -- dat is de uitweg, geen schuld');
+      /* EN DE WRINGER. Een attribuut dat alleen in COMMENTAAR staat, houdt geen
+         style-src-attr open: de ontleder ziet het nooit. Telde de meter het wel,
+         dan strafte hij het OPSCHRIJVEN van de regel af -- de val van LAT.md
+         regel 10, hier voor de vierde keer. De proef zet beide vormen in een
+         bestand, zodat hij ook zakt als de wringer te gulzig wordt en het echte
+         attribuut meeneemt. */
+      const gemengd = '/* geen style="x" hier */\nconst h = \'<i style="b"></i>\'; // ook geen style="y"';
+      assert.equal(norm.telInlineStijl(() => gemengd, ['verzonnen2.js']), 1,
+        'alleen het echte attribuut telt; die in commentaar niet');
       return met - zonder;
     }
   },

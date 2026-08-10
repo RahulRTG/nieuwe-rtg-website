@@ -44,19 +44,28 @@ function tariefVan(waarde) {
 }
 
 /* `scho` mag mee omdat de aanroepers hun eigen schoonmaakregels hebben; zonder
-   valt hij terug op knippen en trimmen. */
-function verwerkRegels(regels, btwStandaard, scho) {
+   valt hij terug op knippen en trimmen.
+
+   `btwVoorRegel` (optioneel) komt uit de belastingronde: de factuurmotor geeft
+   een opzoeker mee die het tarief van EEN regel uit de fiscale laag haalt (een
+   glas wijn in een restaurant is geen eten). Hij telt NA het eigen tarief van
+   de regel -- wie zelf btw meegeeft doet een bewuste keuze -- en VOOR het
+   zaaksbrede standaardtarief. De offertebouwer geeft niets mee en rekent dus
+   zoals hij al deed; de som zelf blijft hier, op de ene plek. */
+function verwerkRegels(regels, btwStandaard, scho, btwVoorRegel) {
   const schoon = scho || ((v, n) => String(v == null ? '' : v).trim().slice(0, n || 200));
   let subtotaal = 0, btwBedrag = 0, totaal = 0;
   const uit = (Array.isArray(regels) ? regels : []).slice(0, 60).map(r => {
     const aantal = Math.max(1, Number(r.aantal) || 1);
     const stuk = rond(r.stuk);
     const eigen = tariefVan(r.btw);
+    const fiscaal = (eigen === null && typeof btwVoorRegel === 'function')
+      ? tariefVan(btwVoorRegel(r.omschrijving)) : null;
     const standaard = tariefVan(btwStandaard);
-    /* Valt allebei weg, dan 0%: dat is het enige tarief dat wij zonder
+    /* Valt alles weg, dan 0%: dat is het enige tarief dat wij zonder
        aanname kunnen toepassen, en het staat als tarief in de regel zodat het
        zichtbaar is in plaats van verstopt. */
-    const btw = eigen !== null ? eigen : (standaard !== null ? standaard : 0);
+    const btw = eigen !== null ? eigen : (fiscaal !== null ? fiscaal : (standaard !== null ? standaard : 0));
     const regelIncl = rond(aantal * stuk);
     const regelExcl = rond(regelIncl / (1 + btw / 100));
     subtotaal += regelExcl; btwBedrag += rond(regelIncl - regelExcl); totaal += regelIncl;

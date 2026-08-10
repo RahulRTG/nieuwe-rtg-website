@@ -61,6 +61,14 @@
   .sig.register{border-left-color:var(--gold);}
   .sig.controle{border-left-color:var(--burgundy);}
   .leeg{color:var(--muted);font-size:.88rem;padding:1rem 0;}
+  /* De aansluiting. Als klassen en niet als style="..." per element: die
+     attributen houden style-src-attr in de CSP open en worden geteld door de
+     meter inlineStijlAttributen, die alleen omlaag mag. */
+  .rij.kop{margin:0 0 .7rem;}
+  .rij.tussen{margin:.7rem 0;}
+  .veld.kort{max-width:110px;}
+  .item h4 .code{color:var(--soft);font-family:Inter,system-ui,sans-serif;}
+  .let{color:var(--burgundy);}
   .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:#000;border:1px solid var(--gold);color:var(--txt);padding:.55rem .9rem;border-radius:10px;font-size:.82rem;opacity:0;transition:opacity .25s;pointer-events:none;max-width:90%;z-index:30;}
   .login{max-width:360px;margin:3rem auto;padding:0 1rem;text-align:center;}
   .login .veld{width:100%;margin-bottom:.6rem;}
@@ -116,6 +124,31 @@
       <div id="aanLijst"></div>
     </section>
     <section class="paneel" id="p-btw"></section>
+    <section class="paneel" id="p-aansl">
+      <div class="rij kop">
+        <input class="veld kort" id="aanslPer" maxlength="7" placeholder="2026K2" aria-label="Periode">
+        <button class="knop stil" id="aanslGa">Toon periode</button>
+      </div>
+      <div id="aanslLijst"></div>
+    </section>
+    <section class="paneel" id="p-nh">
+      <div class="item">
+        <h4>Naheffing opmaken</h4>
+        <div class="meta">Het bedrag komt uit de aansluiting en is niet in te vullen: gefactureerd min aangegeven.
+          Een boete ontstaat nooit vanzelf; zet hem zelf en schrijf erbij waarom.</div>
+        <div class="rij">
+          <input class="veld kort" id="nhPer" maxlength="7" placeholder="2026K2" aria-label="Periode">
+          <input class="veld kort" id="nhCode" maxlength="20" placeholder="Zaakcode" aria-label="Zaakcode">
+          <input class="veld kort" id="nhPct" type="number" min="0" max="100" placeholder="boete %" aria-label="Boetepercentage">
+          <input class="veld" id="nhGrond" maxlength="300" placeholder="Grond voor de boete (alleen bij een percentage)" aria-label="Grond voor de boete">
+          <button class="knop" id="nhMaak">Opmaken</button>
+        </div>
+      </div>
+      <div class="rij tussen">
+        <select class="veld" id="nhStand"><option value="">Alle naheffingen</option><option value="concept">Concept</option><option value="vastgesteld">Vastgesteld</option><option value="bezwaar">Bezwaar</option><option value="gehandhaafd">Gehandhaafd</option><option value="vernietigd">Vernietigd</option><option value="ingetrokken">Ingetrokken</option></select>
+      </div>
+      <div id="nhLijst"></div>
+    </section>
   </div>
 </main>
 <div class="melding" id="melding" role="status"></div>
@@ -169,9 +202,9 @@ $('#loginGo').addEventListener('click', async () => {
   } catch(e){ meld(e.message); }
 });
 
-const TABS = [['sig','Signalen'],['aan','Aanslagen'],['btw','Btw-beeld']];
+const TABS = [['sig','Signalen'],['aan','Aanslagen'],['btw','Btw-beeld'],['aansl','Aansluiting'],['nh','Naheffingen']];
 let HUIDIG = 'sig';
-let SIGNALEN = null, AANSLAGEN = null, BTW = null;
+let SIGNALEN = null, AANSLAGEN = null, BTW = null, AANSL = null, NH = null;
 /* Meenemen (shared/uitvoer.js): dit kantoor houdt drie registers vast en toont
    er altijd een. Wat u meeneemt is dus het tabblad dat OPEN staat, met de
    velden los -- niet de regel "Inkomen € 42.000 · aftrek € 3.100 · open" die
@@ -187,9 +220,25 @@ if (window.RTGUitvoer) RTGUitvoer.bron(() => {
   };
   if (HUIDIG === 'btw' && BTW) return {
     naam: 'btw-beeld',
-    kolommen: ['zaak','code','jaar','facturen','omzet','btw','in het handelsregister'],
+    kolommen: ['zaak','code','jaar','facturen','grondslag (excl. btw)','btw','in het handelsregister'],
     rijen: (BTW.zaken||[]).map(z => [z.naam||'', z.code||'', BTW.jaar||'', z.facturen||0,
-      z.omzet||0, z.btw||0, z.ingeschreven?'ja':'nee'])
+      z.grondslag||0, z.btw||0, z.ingeschreven?'ja':'nee'])
+  };
+  if (HUIDIG === 'aansl' && AANSL) return {
+    naam: 'btw-aansluiting',
+    kolommen: ['zaak','code','periode','facturen','grondslag (excl. btw)','geteld btw','aangegeven btw','verschil','stand','kenmerk','ingediend op'],
+    rijen: (AANSL.zaken||[]).map(z => [z.naam||'', z.code||'', AANSL.periode||'', z.facturen||0,
+      (z.grondslagCenten||0)/100, (z.geteldBtwCenten||0)/100,
+      z.aangegevenBtwCenten==null?'':z.aangegevenBtwCenten/100,
+      z.verschilCenten==null?'':z.verschilCenten/100, z.stand||'', z.kenmerk||'',
+      z.ingediendOp?String(z.ingediendOp).slice(0,10):''])
+  };
+  if (HUIDIG === 'nh' && NH) return {
+    naam: 'naheffingen',
+    kolommen: ['kenmerk','zaak','code','periode','naheffing','boete %','boete','totaal','stand','opgemaakt door','vastgesteld door','bezwaar'],
+    rijen: (NH.naheffingen||[]).map(n => [n.kenmerk||'', n.zaak||'', n.code||'', n.periode||'',
+      (n.naheffingCenten||0)/100, n.boetePct||0, (n.boeteCenten||0)/100, (n.totaalCenten||0)/100,
+      n.status||'', n.opgemaaktDoor||'', n.vastgesteldDoor||'', n.bezwaar ? (n.bezwaar.besluit||'loopt') : ''])
   };
   if (HUIDIG === 'sig' && SIGNALEN) return {
     naam: 'signalen',
@@ -201,10 +250,12 @@ if (window.RTGUitvoer) RTGUitvoer.bron(() => {
 function toon(t){
   HUIDIG = t;
   $('#tabs').querySelectorAll('.tab').forEach(b => b.classList.toggle('aan', b.dataset.t === t));
-  ['sig','aan','btw'].forEach(x => $('#p-'+x).classList.toggle('aan', x === t));
+  ['sig','aan','btw','aansl','nh'].forEach(x => $('#p-'+x).classList.toggle('aan', x === t));
   if (t === 'sig') laadCockpit();
   if (t === 'aan') laadAanslagen();
   if (t === 'btw') laadBtw();
+  if (t === 'aansl') laadAansluiting();
+  if (t === 'nh') laadNaheffingen();
 }
 function start(){
   $('#tabs').innerHTML = TABS.map(([t,n]) => '<button class="tab" data-t="'+t+'">'+n+'</button>').join('');
@@ -242,10 +293,19 @@ async function laadAanslagen(){
         : '<span class="status open">open '+euro(a.saldo)+(a.dagenOpen?' · '+a.dagenOpen+'d':'')+'</span>';
       const reg = a.regeling ? ' <span class="status">regeling '+a.regeling.maanden+'×'+euro(a.regeling.per)+'</span>' : '';
       const her = a.herinnerd ? ' <span class="status">herinnerd</span>' : '';
+      /* Kwijtschelden gaat door TWEE inspecteurs. Ligt er nog niets, dan staat
+         er "Voordragen"; ligt er een voordracht, dan staat die er met naam en
+         reden bij en zijn de twee besluitknoppen zichtbaar. */
+      const vs = a.kwijtVoorstel;
+      const kwijtKnop = vs
+        ? '<button class="knop rood" data-kwijtja="'+a.ref+'">Kwijtschelden</button><button class="knop stil" data-kwijtnee="'+a.ref+'">Voordracht afwijzen</button>'
+        : '<button class="knop stil" data-kwijt="'+a.ref+'">Voordragen voor kwijtschelding</button>';
       const acties = (!a.betaald && !a.kwijtgescholden && a.saldo > 0)
-        ? '<div class="rij"><button class="knop stil" data-her="'+a.ref+'">Herinnering</button><button class="knop stil" data-reg="'+a.ref+'">Regeling</button><button class="knop rood" data-kwijt="'+a.ref+'">Kwijtschelden</button></div>' : '';
+        ? '<div class="rij"><button class="knop stil" data-her="'+a.ref+'">Herinnering</button><button class="knop stil" data-reg="'+a.ref+'">Regeling</button>'+kwijtKnop+'</div>' : '';
+      const vsRegel = vs && !a.kwijtgescholden
+        ? '<div class="meta">Voorgedragen voor kwijtschelding door '+esc(vs.door)+' ('+esc(String(vs.at).slice(0,10))+'): '+esc(vs.reden)+'. Een ANDERE inspecteur beslist.</div>' : '';
       return '<div class="item"><h4>'+esc(a.wie)+' · '+a.jaar+' <small style="color:var(--soft);font-family:Inter;">'+esc(a.ref)+'</small></h4>'+
-        '<div class="meta">Inkomen '+euro(a.inkomen)+' · aftrek '+euro(a.aftrek)+' · '+st+reg+her+'</div>'+acties+'</div>';
+        '<div class="meta">Inkomen '+euro(a.inkomen)+' · aftrek '+euro(a.aftrek)+' · '+st+reg+her+'</div>'+vsRegel+acties+'</div>';
     }).join('') : '<div class="leeg">Geen aanslagen in deze selectie.</div>';
     $('#aanLijst').querySelectorAll('[data-her]').forEach(b => b.addEventListener('click', async () => {
       try { await api('/api/overheid/bd/herinnering', { ref: b.dataset.her }); meld('Herinnering verstuurd via de Berichtenbox.'); laadAanslagen(); laadCockpit(); } catch(e){ meld(e.message); } }));
@@ -253,9 +313,14 @@ async function laadAanslagen(){
       const m = prompt('Betalingsregeling: in hoeveel maanden (2-24)?', '6'); if (!m) return;
       try { const r = await api('/api/overheid/bd/regeling', { ref: b.dataset.reg, maanden: m }); meld('Regeling: '+r.regeling.maanden+' maanden van '+euro(r.regeling.per)+'.'); laadAanslagen(); laadCockpit(); } catch(e){ meld(e.message); } }));
     $('#aanLijst').querySelectorAll('[data-kwijt]').forEach(b => b.addEventListener('click', async () => {
-      if (!confirm('Deze openstaande aanslag kwijtschelden?')) return;
-      const reden = prompt('Reden (komt in de Berichtenbox van de inwoner):', '') || '';
-      try { await api('/api/overheid/bd/kwijt', { ref: b.dataset.kwijt, reden }); meld('Kwijtgescholden.'); laadAanslagen(); laadCockpit(); } catch(e){ meld(e.message); } }));
+      const reden = prompt('Grond voor de kwijtschelding (een ander beslist erop; komt daarna in de Berichtenbox):', '') || '';
+      if (!reden.trim()) return;
+      try { const r = await api('/api/overheid/bd/kwijt/voordracht', { ref: b.dataset.kwijt, reden }); meld(r.let || 'Voorgedragen.'); laadAanslagen(); laadCockpit(); } catch(e){ meld(e.message); } }));
+    $('#aanLijst').querySelectorAll('[data-kwijtja]').forEach(b => b.addEventListener('click', async () => {
+      if (!confirm('Deze aanslag definitief kwijtschelden? Dit is niet terug te draaien.')) return;
+      try { await api('/api/overheid/bd/kwijt/besluit', { ref: b.dataset.kwijtja, akkoord: true }); meld('Kwijtgescholden; de inwoner heeft bericht.'); laadAanslagen(); laadCockpit(); } catch(e){ meld(e.message); } }));
+    $('#aanLijst').querySelectorAll('[data-kwijtnee]').forEach(b => b.addEventListener('click', async () => {
+      try { const r = await api('/api/overheid/bd/kwijt/besluit', { ref: b.dataset.kwijtnee, akkoord: false }); meld(r.let || 'Afgewezen.'); laadAanslagen(); laadCockpit(); } catch(e){ meld(e.message); } }));
   } catch(e){ meld(e.message); }
 }
 $('#stand').addEventListener('change', laadAanslagen);
@@ -264,11 +329,170 @@ async function laadBtw(){
   try {
     const r = await api('/api/overheid/bd/btw');
     BTW = r;
-    $('#p-btw').innerHTML = '<div class="item"><h4>Btw-beeld '+r.jaar+'</h4><div class="meta">Rechtstreeks uit de facturatiemotor van het platform, gekoppeld aan het KVK-handelsregister: '+euro(r.totaalBtw)+' btw over '+euro(r.totaalOmzet)+' omzet.</div></div>'+
+    $('#p-btw').innerHTML = '<div class="item"><h4>Btw-beeld '+r.jaar+'</h4><div class="meta">Rechtstreeks uit de facturatiemotor van het platform, gekoppeld aan het KVK-handelsregister: '+euro(r.totaalBtw)+' btw over '+euro(r.totaalGrondslag)+' omzet (grondslag, exclusief btw).</div></div>'+
       (r.zaken.length ? r.zaken.map(z => '<div class="item"><h4>'+esc(z.naam)+' <small style="color:var(--soft);font-family:Inter;">'+esc(z.code)+'</small></h4><div class="meta">'+z.facturen+' facturen · omzet '+euro(z.omzet)+' · btw '+euro(z.btw)+' · '+(z.ingeschreven?'<span class="status ok">KVK ingeschreven</span>':'<span class="status open">niet in het register</span>')+'</div></div>').join('')
       : '<div class="leeg">Nog geen facturen dit jaar.</div>');
   } catch(e){ meld(e.message); }
 }
+
+/* De aansluiting: wat het factuurregister zegt naast wat er is aangegeven.
+   Het scherm rekent hier NIETS uit -- ook het verschil komt van de server, want
+   dat is precies het getal waar een inspecteur een zaak op aanspreekt. Zonder
+   periode kiest de server de laatst AFGESLOTEN: over een lopend kwartaal hoort
+   er nog niets te zijn ingediend. */
+const AANSL_LABEL = { sluit_aan: ['ok','sluit aan'], wijkt_af: ['open','wijkt af'],
+  niet_aangegeven: ['open','niet aangegeven'], alleen_concept: ['goud','alleen concept'] };
+async function laadAansluiting(){
+  try {
+    const r = await api('/api/overheid/bd/btw/aansluiting', { periode: $('#aanslPer').value.trim() });
+    AANSL = r;
+    $('#aanslPer').value = r.periode;
+    const kop = '<div class="item"><h4>Aansluiting ' + esc(r.periode) + '</h4><div class="meta">' +
+      esc(r.van) + ' t/m ' + esc(r.tot) + ' · gefactureerd ' + euro(r.geteldBtwCenten/100) +
+      ' · aangegeven ' + euro(r.aangegevenBtwCenten/100) + ' · ' + r.aangiftes + ' aangifte(n)' +
+      (r.zonderAangifte ? ' · <b class="let">' + r.zonderAangifte + ' zonder aangifte</b>' : '') +
+      '</div>' + (r.periodeLoopt ? '<div class="meta">Deze periode loopt nog: er hoort nog niets te zijn ingediend, ' +
+        'dus "niet aangegeven" is hier geen bevinding.</div>' : '') + '</div>';
+    $('#aanslLijst').innerHTML = kop + (r.zaken.length ? r.zaken.map(z => {
+      const st = AANSL_LABEL[z.stand] || ['','?'];
+      return '<div class="item' + (z.stand === 'sluit_aan' ? '' : ' sig') + '"><h4>' + esc(z.naam) +
+        ' <small class="code">' + esc(z.code) + '</small> ' +
+        '<span class="status ' + st[0] + '">' + st[1] + '</span></h4><div class="meta">' +
+        z.facturen + (z.facturen === 1 ? ' factuur' : ' facturen') + ' · grondslag ' + euro(z.grondslagCenten/100) +
+        ' · gefactureerde btw ' + euro(z.geteldBtwCenten/100) +
+        (z.aangegevenBtwCenten == null ? ' · geen aangifte'
+          : ' · aangegeven ' + euro(z.aangegevenBtwCenten/100) +
+            (z.verschilCenten ? ' · <b class="let">verschil ' + euro(z.verschilCenten/100) + '</b>' : '') +
+            (z.kenmerk ? ' · kenmerk ' + esc(z.kenmerk) : '') +
+            (z.soort === 'correctie' ? ' · correctie' : '')) +
+        (z.ingeschreven ? '' : ' · <span class="status open">niet in het KVK-register</span>') +
+        '</div><div class="meta">' + esc(z.uitleg || '') + '</div>' +
+        /* Alleen waar er iets te heffen valt, en alleen als de periode voorbij
+           is: over een lopend kwartaal weigert de server hem toch, en een knop
+           die altijd afketst is een knop die niet had moeten staan. */
+        (!r.periodeLoopt && (z.stand === 'wijkt_af' || z.stand === 'niet_aangegeven')
+          ? '<div class="rij"><button class="knop stil" data-nhvoor="' + esc(z.code) + '">Naheffing opmaken…</button></div>' : '') +
+        '</div>';
+    }).join('') : '<div class="leeg">Geen facturen en geen aangiftes in deze periode.</div>');
+    /* De knop VULT het formulier en dient niets in: een naheffing die met een
+       tik ontstaat is een besluit zonder dat iemand naar de boete heeft gekeken. */
+    $('#aanslLijst').querySelectorAll('[data-nhvoor]').forEach(b => b.addEventListener('click', () => {
+      $('#nhPer').value = r.periode; $('#nhCode').value = b.dataset.nhvoor;
+      toon('nh');
+      $('#nhPct').focus();
+    }));
+  } catch(e){ meld(e.message); }
+}
+/* De naheffingen. Alle knoppen hier zijn een VOORSTEL aan de server: die
+   bewaakt de vier ogen, want een scherm dat zelf bepaalt wie mag tekenen is een
+   scherm dat je omzeilt door een ander scherm te openen. De weigering die
+   terugkomt ("een ANDERE inspecteur", "geen heroverweging") is wat de ambtenaar
+   moet lezen, dus die wordt letterlijk getoond. */
+const NH_LABEL = { concept: ['goud','concept'], vastgesteld: ['open','vastgesteld'],
+  bezwaar: ['goud','bezwaar loopt'], gehandhaafd: ['open','gehandhaafd'],
+  vernietigd: ['ok','vernietigd'], ingetrokken: ['ok','ingetrokken'] };
+async function laadNaheffingen(){
+  try {
+    const r = await api('/api/overheid/bd/naheffingen', { status: $('#nhStand').value });
+    NH = r;
+    $('#nhLijst').innerHTML = (r.naheffingen.length ? r.naheffingen.map(n => {
+      const st = NH_LABEL[n.status] || ['','?'];
+      return '<div class="item' + (n.status === 'bezwaar' ? ' sig' : '') + '"><h4>' + esc(n.zaak) +
+        ' <small class="code">' + esc(n.kenmerk) + '</small> <span class="status ' + st[0] + '">' + st[1] + '</span></h4>' +
+        '<div class="meta">' + esc(n.periode) + ' · naheffing ' + euro(n.naheffingCenten/100) +
+        (n.boeteCenten ? ' · boete ' + euro(n.boeteCenten/100) + ' (' + n.boetePct + '%)' : ' · geen boete') +
+        ' · totaal <b>' + euro(n.totaalCenten/100) + '</b>' +
+        ' · opgemaakt door ' + esc(n.opgemaaktDoor) +
+        (n.vastgesteldDoor ? ' · vastgesteld door ' + esc(n.vastgesteldDoor) : '') +
+        (n.vervaltOp ? ' · vervalt ' + esc(n.vervaltOp) : '') + '</div>' +
+        (n.boeteGrond ? '<div class="meta">Grond voor de boete: ' + esc(n.boeteGrond) + '</div>' : '') +
+        (n.kostenCenten ? '<div class="meta">Invordering: ' +
+          (n.aanmaningOp ? 'aangemaand ' + esc(String(n.aanmaningOp).slice(0,10)) : '') +
+          (n.dwangbevelOp ? ' · dwangbevel ' + esc(String(n.dwangbevelOp).slice(0,10)) : '') +
+          (n.beslagOp ? ' · beslag ' + esc(String(n.beslagOp).slice(0,10)) + ' (' + euro(n.beslagCenten/100) + ')' : '') +
+          ' · kosten ' + euro(n.kostenCenten/100) + ' · openstaand <b>' + euro(n.openstaandCenten/100) + '</b></div>' : '') +
+        (n.regeling ? '<div class="meta">Regeling: ' + n.regeling.maanden + ' maanden à ' +
+          euro(n.regeling.perCenten/100) + ', tot ' + esc(n.regeling.totOp) + ' (door ' + esc(n.regeling.door) + ')</div>' : '') +
+        (n.invorderingGestopt ? '<div class="meta">Invordering stopgezet door ' + esc(n.invorderingGestopt.door) +
+          ': ' + esc(n.invorderingGestopt.reden) + '</div>' : '') +
+        (n.bezwaar ? '<div class="meta">Bezwaar: ' + esc(n.bezwaar.reden) +
+          (n.bezwaar.besluit ? ' · ' + esc(n.bezwaar.besluit) + ' door ' + esc(n.bezwaar.door) + ': ' + esc(n.bezwaar.motivering) : '') +
+          '</div>' : '') +
+        '<div class="rij">' +
+        (n.status === 'concept' ? '<button class="knop" data-nhvast="' + esc(n.id) + '">Vaststellen (andere ogen)</button>' +
+          '<input class="veld" data-nhreden="' + esc(n.id) + '" maxlength="300" placeholder="Reden van intrekken">' +
+          '<button class="knop stil" data-nhintrek="' + esc(n.id) + '">Intrekken</button>' : '') +
+        (n.status === 'bezwaar' ? '<input class="veld" data-nhmot="' + esc(n.id) + '" maxlength="600" placeholder="Motivering van het besluit">' +
+          '<button class="knop" data-nhtoe="' + esc(n.id) + '">Bezwaar toewijzen</button>' +
+          '<button class="knop rood" data-nhaf="' + esc(n.id) + '">Bezwaar afwijzen</button>' : '') +
+        '</div>' +
+        /* De invorderingsknoppen. Ze staan er ALLEMAAL zodra een naheffing
+           openstaat; de server zegt zelf welke stap nu mag en waarom niet. Een
+           knop verbergen omdat het scherm denkt te weten dat hij niet mag, is
+           het oordeel van de server naar de opmaak verplaatsen -- en dan lopen
+           die twee uiteen. */
+        (n.openstaandCenten > 0 && !n.invorderingGestopt && ['vastgesteld','bezwaar','gehandhaafd'].includes(n.status)
+          ? '<div class="rij">' +
+            '<button class="knop stil" data-nhaanm="' + esc(n.id) + '">Aanmanen</button>' +
+            '<button class="knop stil" data-nhdwang="' + esc(n.id) + '">Dwangbevel</button>' +
+            '<button class="knop rood" data-nhbeslag="' + esc(n.id) + '">Beslag (andere ogen)</button>' +
+            '<input class="veld kort" data-nhmnd="' + esc(n.id) + '" type="number" min="1" max="12" placeholder="mnd">' +
+            '<button class="knop stil" data-nhreg="' + esc(n.id) + '">Regeling</button>' +
+            '<input class="veld" data-nhstopr="' + esc(n.id) + '" maxlength="300" placeholder="Reden van stopzetten">' +
+            '<button class="knop stil" data-nhstop="' + esc(n.id) + '">Invordering stopzetten</button>' +
+            '</div>' : '') +
+        '</div>';
+    }).join('') : '<div class="leeg">Geen naheffingen.</div>');
+    bindNaheffingen();
+  } catch(e){ meld(e.message); }
+}
+function bindNaheffingen(){
+  const doe = async (pad, lijf) => {
+    try { const r = await api(pad, lijf); if (r.let) meld(r.let); await laadNaheffingen(); }
+    catch(e){ meld(e.message); }
+  };
+  $('#nhLijst').querySelectorAll('[data-nhvast]').forEach(b => b.addEventListener('click',
+    () => doe('/api/overheid/bd/naheffing/stelvast', { id: b.dataset.nhvast })));
+  $('#nhLijst').querySelectorAll('[data-nhintrek]').forEach(b => b.addEventListener('click', () => {
+    const veld = $('#nhLijst').querySelector('[data-nhreden="' + b.dataset.nhintrek + '"]');
+    doe('/api/overheid/bd/naheffing/intrek', { id: b.dataset.nhintrek, reden: veld ? veld.value : '' });
+  }));
+  const beslis = (b, toewijzen) => {
+    const id = b.dataset.nhtoe || b.dataset.nhaf;
+    const veld = $('#nhLijst').querySelector('[data-nhmot="' + id + '"]');
+    doe('/api/overheid/bd/naheffing/bezwaar/beslis', { id, toewijzen, motivering: veld ? veld.value : '' });
+  };
+  $('#nhLijst').querySelectorAll('[data-nhtoe]').forEach(b => b.addEventListener('click', () => beslis(b, true)));
+  $('#nhLijst').querySelectorAll('[data-nhaf]').forEach(b => b.addEventListener('click', () => beslis(b, false)));
+  const stap = (attr, pad, extra) => $('#nhLijst').querySelectorAll('[data-' + attr + ']').forEach(b =>
+    b.addEventListener('click', () => doe(pad, Object.assign({ id: b.dataset[attr.replace('data-', '')] },
+      extra ? extra(b.dataset[attr.replace('data-', '')]) : {}))));
+  stap('nhaanm', '/api/overheid/bd/naheffing/aanmaning');
+  stap('nhdwang', '/api/overheid/bd/naheffing/dwangbevel');
+  stap('nhbeslag', '/api/overheid/bd/naheffing/beslag');
+  stap('nhreg', '/api/overheid/bd/naheffing/regeling', id => {
+    const v = $('#nhLijst').querySelector('[data-nhmnd="' + id + '"]');
+    return { maanden: v ? Number(v.value) : 0 };
+  });
+  stap('nhstop', '/api/overheid/bd/naheffing/stop', id => {
+    const v = $('#nhLijst').querySelector('[data-nhstopr="' + id + '"]');
+    return { reden: v ? v.value : '' };
+  });
+}
+$('#nhMaak').addEventListener('click', async () => {
+  try {
+    const r = await api('/api/overheid/bd/naheffing/maak', { periode: $('#nhPer').value.trim(),
+      code: $('#nhCode').value.trim(), boetePct: Number($('#nhPct').value) || 0, boeteGrond: $('#nhGrond').value });
+    meld('Concept ' + r.naheffing.kenmerk + ' opgemaakt: ' + euro(r.naheffing.totaalCenten/100) +
+      '. Een ANDERE inspecteur stelt hem vast.');
+    $('#nhGrond').value = ''; $('#nhPct').value = '';
+    await laadNaheffingen();
+  } catch(e){ meld(e.message); }
+});
+$('#nhStand').addEventListener('change', laadNaheffingen);
+
+$('#aanslGa').addEventListener('click', laadAansluiting);
+$('#aanslPer').addEventListener('keydown', e => { if (e.key === 'Enter') laadAansluiting(); });
 
 $('#aiK').addEventListener('click', async () => {
   const v = $('#aiV').value.trim(); if (!v) return;

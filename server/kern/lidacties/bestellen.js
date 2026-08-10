@@ -1,16 +1,21 @@
-/* Lidacties (deelmodule): bestellen bij een partner: plaatsOrderVoor (met
-   ledenprijsgarantie, 86 van de keuken, de alcohol/leeftijdsgrens en het
-   betaalmoment) en betaalOrderVoor (fooi, puntentegoed, spaarpunten).
-   Krijgt de gedeelde context een keer bij het opstarten vanuit
-   kern/lidacties.js. */
+/* Lidacties (deelmodule): BESTELLEN bij een partner -- plaatsOrderVoor, met de
+   ledenprijsgarantie, 86 van de keuken, de alcohol/leeftijdsgrens, het
+   zorgprofiel en het betaalmoment van de zaak.
+
+   BETALEN staat in ./betalen.js en de gezamenlijke rekening in ./rekening.js;
+   dit bestand hangt ze alle drie aan dezelfde ctx op. Krijgt die context een
+   keer bij het opstarten vanuit kern/lidacties.js. */
 const { servicekostenVoor } = require('../servicekosten');
 
 module.exports = (ctx) => {
+  /* De namen die BETALEN nodig had (fooiUit, pasTegoedToe, verdienPunten,
+     ledenvoordeelVoor, orderMetRef, factuurVoorLid) staan hier niet meer: die
+     zijn met betaalOrderVoor mee naar ./betalen.js gegaan. */
   const { db, save, crypto, schoon, PERSONAS, findSupplier, ledenPrijs, optieAan,
     leeftijdVan, geborenVan, idGeverifieerd, alcoholGrensVan, pickupCode, entreeCode, ticketsVoorSlot,
-    fooiUit, pasTegoedToe, verdienPunten, liveCodename, haversine, pushLive,
+    liveCodename, haversine, pushLive,
     notifySupplier, sseToSupplier, sseToOffice, zorgVoor, zorgContact, keuken,
-    orderMetRef, ordersVoegToe, boekingMetRef, boekingenVoegToe, openLijnVoor, ledenvoordeelVoor } = ctx;
+    ordersVoegToe, boekingMetRef, boekingenVoegToe, openLijnVoor } = ctx;
 function plaatsOrderVoor(session, body) {
   // betalen bij partners mag ook zonder pas (gratis gebruiker)
   const s = findSupplier(body.supplierCode);
@@ -116,45 +121,9 @@ function plaatsOrderVoor(session, body) {
   return { ok: true, order };
 }
 
-function betaalOrderVoor(session, body) {
-  const o = orderMetRef(body.ref);
-  if (!o || (o.customerKey || o.customerTier) !== session.key) return { status: 404, error: 'Bestelling niet gevonden.' };
-  if (o.paid) return { status: 409, error: 'Al betaald.' };
-  /* Een terugbetaalde of geannuleerde bon mag NIET opnieuw betaald worden.
-     `o.paid` was de enige poort, en juist de annulering zet die weer op false
-     (ervaring/leden/annuleren.js: paid=false, refunded=true, status
-     'terugbetaald'). Daarmee viel de grendel weg en kon dezelfde retour-bon nog
-     een keer betalen: punten er nog eens bij, de ingredienten nog eens afgeboekt
-     en de zaak kreeg 'Nieuwe bestelling (betaald)' voor iets wat al retour was.
-     De verloopgrens hieronder ving dat niet, want die geldt alleen bij
-     'wacht-op-betaling'. */
-  if (o.refunded || ['terugbetaald', 'geweigerd', 'geannuleerd'].includes(o.status))
-    return { status: 409, error: 'Deze bestelling is geannuleerd (' + o.status + ') en kan niet opnieuw betaald worden.' };
-  // de verloopgrens geldt alleen voor vooraf betalen; achteraf mag later
-  if (o.status === 'wacht-op-betaling' && Date.now() - new Date(o.at) > 30 * 60000) return { status: 410, error: 'Deze bestelling is verlopen. Plaats hem opnieuw.' };
-  // fooi (gaat naar het team), punten-tegoed (RTG legt bij) en spaarpunten
-  const fooi = fooiUit(body, o.total);
-  if (fooi) o.fooi = fooi;
-  const korting = pasTegoedToe(session.key, o.total);
-  if (korting) o.puntenKorting = korting;
-  // het RTG-ledenvoordeel per genre (de boardroom bepaalt; RTG legt bij,
-  // dus de zaak houdt het volle bedrag en de nettoprijzen-belofte blijft staan)
-  const voordeel = ledenvoordeelVoor(findSupplier(o.supplierCode), o.total - korting);
-  if (voordeel) o.regieKorting = voordeel;
-  o.paid = true;
-  o.paidAt = new Date().toISOString();
-  if (o.status === 'wacht-op-betaling') o.status = 'nieuw';
-  verdienPunten(session.key, o.total - korting - voordeel, o.supplierName);
-  save();
-  // betaald = definitief: het keukenbrein boekt de ingredienten af via de recepten
-  try { keuken.boekVerkoopAf(findSupplier(o.supplierCode), o.items || [], 'bestelling ' + o.ref); } catch (e) {}
-  // nu pas hoort de zaak ervan: betaald = definitief
-  notifySupplier(o.supplierCode, { icon: 'hotel', title: 'Nieuwe bestelling (betaald)', body: o.customerCodename + ', ' + o.items.reduce((n, i) => n + i.qty, 0) + ' item(s), \u20AC ' + o.total + (o.allergyNote ? ' \u00B7 allergie: ' + o.allergyNote : '') });
-  sseToSupplier(o.supplierCode, 'sync', { scope: 'orders' });
-  sseToOffice('sync', { scope: 'orders' });
-  return { ok: true, order: o };
-}
-  // "De rekening" (betalen na het eten) woont als eigen deelmodule in
-  // lidacties/rekening.js, zodat beide bestanden in de 5-10 KB-band blijven.
+  /* Betalen woont in ./betalen.js en "de rekening" (betalen na het eten) in
+     ./rekening.js, zodat alle drie de bestanden in de 5-10 KB-band blijven. Ze
+     draaien op dezelfde ctx, dus er is geen tweede kopie van iets. */
+  const { betaalOrderVoor } = require('./betalen')(ctx);
   return { plaatsOrderVoor, betaalOrderVoor };
 };

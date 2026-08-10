@@ -124,11 +124,21 @@ module.exports = (kern) => {
     if (!r) return res.status(400).json({ error: 'Geef een groothandel-code op.' });
     res.json({ ok: true, bezorgd: r.length });
   });
+  /* De btw-herinnering. Periode, bedrag en deadline stonden hier in het LIJF en
+     werden overgenomen; nu leidt het draaiboek ze zelf af uit het
+     factuurregister (kern/automatisering.js). Een herinnering met een getypt
+     bedrag is een tweede getal naast de aangifte waar hij naar verwijst, en dan
+     zegt de een iets anders dan de ander.
+
+     Geen bericht is hier een geldige uitkomst en geen fout: is er over het
+     tijdvak al ingediend of viel er niets aan te geven, dan valt er niets te
+     herinneren. Dat zegt hij met zoveel woorden, want een stille 200 laat de
+     zaak denken dat er post onderweg is. */
   app.post('/api/supplier/rtmail/btw-herinner', supplierAuth, (req, res) => {
     if (!automatisering) return res.status(503).json({ error: 'De automatiseringen draaien niet.' });
-    const b = req.body || {};
-    const r = automatisering.btwHerinnering({ zaakCode: req.supplier.code, periode: b.periode, bedrag: b.bedrag, deadline: b.deadline });
-    if (!r) return res.status(400).json({ error: 'Kon de herinnering niet klaarzetten.' });
+    const r = automatisering.btwHerinnering({ zaakCode: req.supplier.code });
+    if (!r) return res.status(200).json({ ok: true, bericht: null,
+      reden: 'Er valt niets te herinneren: over het laatst afgesloten tijdvak is al ingediend, of er was niets aan te geven.' });
     res.json({ ok: true, bericht: r });
   });
 

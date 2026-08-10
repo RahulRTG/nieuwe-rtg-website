@@ -13,7 +13,7 @@
 'use strict';
 
 module.exports = (kern, hulp) => {
-  const { PERSONAS, accounts, alcoholGrensVan, annuleerReservering, anthropic, beveilig, crypto, db, entreeCode, findSupplier, fooiUit, geborenVan, haversine, idGeverifieerd, keyVanCodenaam, klantProfiel, ledenPrijs, leeftijdVan, legApart, liveCodename, log, logActivity, maakOntmoeting, notify, notifySupplier, optieAan, pasTegoedToe, pickupCode, pushLive, reserveerTafel, save, schoon, sseToCustomer, sseToOffice, sseToSupplier, ticketsVoorSlot, verdienPunten, zorgContact } = hulp;
+  const { PERSONAS, accounts, alcoholGrensVan, annuleerReservering, anthropic, beveilig, crypto, db, entreeCode, facturatie, findSupplier, fooiUit, geborenVan, haversine, idGeverifieerd, keyVanCodenaam, klantProfiel, ledenPrijs, leeftijdVan, legApart, liveCodename, log, logActivity, maakOntmoeting, notify, notifySupplier, optieAan, pasTegoedToe, pickupCode, pushLive, reserveerTafel, save, schoon, sseToCustomer, sseToOffice, sseToSupplier, ticketsVoorSlot, verdienPunten, zorgContact } = hulp;
 
 /* RTG Stad (kern/stad): het slimme-stad-platform op EIGEN hardware (de
    Stadsdoos-vloot, dezelfde familie als de Zaakdoos) en eigen software --
@@ -47,6 +47,9 @@ Object.assign(kern, require('../kern/lidacties')({
   leeftijdVan, geborenVan, idGeverifieerd, alcoholGrensVan, pickupCode, entreeCode, ticketsVoorSlot,
   fooiUit, pasTegoedToe, verdienPunten, liveCodename, haversine, pushLive,
   notifySupplier, sseToSupplier, sseToOffice,
+  // elke betaalde lidtransactie hoort een factuur op te leveren;
+  // zie de kop van kern/lidacties/factuur.js
+  facturatie,
   zorgVoor: kern.zorgVoor, zorgContact, keuken: kern.keuken,
   ledenvoordeelVoor: kern.ledenvoordeelVoor
 }));

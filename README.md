@@ -520,6 +520,44 @@ packages). Ze bewaken de plekken waar geld en wet aan hangen:
   wachtwoord-hashing (scrypt) en sessietokens;
 - de zzp-belastingtool (rekenkundige invarianten, afscherming per pas,
   peiljaar) en de leeftijdslaag (leeftijdsgroep uit de geboortedatum);
+- de btw-aangifte van een zaak (`test/btw-aangifte.test.js`): de periodevakken,
+  de telling over het factuurregister, de twee controles die weigeren, de
+  correctie na indienen en de poorten van de endpoints — plus een schermtoets
+  (`test/btw-scherm.e2e.js`) die de kaart in een echte browser laat rekenen;
+- het btw-toezicht van het Belastingkantoor (`test/btw-toezicht.test.js`): de
+  vier standen van de aansluiting, dat inspecteur en aangever op de cent
+  hetzelfde tellen, en dat er over een lopende periode géén signalen komen —
+  met een schermtoets (`test/btw-aansluiting-scherm.e2e.js`) die hetzelfde
+  bedrag aan beide kanten van de tafel op het scherm zet;
+- de naheffingsaanslag (`test/btw-naheffing.test.js`): dat het bedrag uit de
+  aansluiting komt en niet uit het verzoek, dat dezelfde ogen niet dubbel
+  tellen bij vaststellen én bij het bezwaar erop, dat een boete niet zonder
+  grond bestaat, en dat een concept nog geen besluit is — plus de hele keten
+  over de échte routes met drie echte ambtenaren
+  (`test/btw-naheffing-keten.test.js`, inclusief de poging om de vier ogen te
+  omzeilen door een collega's naam mee te sturen) en het scherm van de zaak
+  waar het bezwaar en de betaling vandaan gaan
+  (`test/btw-naheffing-scherm.e2e.js`);
+- het betalen zelf: dat er eerst wordt geboekt en pas daarna op betaald gezet,
+  dat een mislukte boeking niets achterlaat, en dat een toegewezen bezwaar op
+  een betaalde naheffing terugstort — met een nepbank die op commando weigert,
+  want met de echte bank zou alleen de gelukkige helft getoetst worden;
+- de invordering: dat elke stap op de termijn van de vorige wacht (verzetbare
+  klok), dat beslag andere ogen vraagt en nooit meer pakt dan de schuld, dat een
+  deelbeslag de rest laat staan, en dat de regeling en de stopknop de keten
+  echt tegenhouden;
+- dat elke betaalde lidtransactie ook echt een factuur oplevert
+  (`test/lidfactuur.test.js`): zes betaalwegen — in de app, de gezamenlijke
+  rekening, een boeking, een rit, de balie op de ophaalcode en het tafelticket
+  — elk precies één factuur op de ref van de bon, nooit twee voor dezelfde bon,
+  en als sluitstuk dat de btw-aangifte op de cent uitkomt op de omzet die de
+  maandboekhouding van diezelfde zaak telt, over twee tarieven tegelijk. Plus
+  dat een factuur die niet lukt de betaling niet omvertrekt maar wél op het
+  techniekbord komt;
+- dat de kwijtschelding van een aanslag door twee inspecteurs gaat
+  (`test/belastingkantoor.test.js` en `test/kwijtschelding-scherm.e2e.js`):
+  voordragen met een grond, beslissen door een ander, en de inwoner hoort er
+  pas van als er écht is besloten;
 - De Salon-rechten (gast liket wel, reageert niet), de bestel- en betaalflow
   en de AVG-rechten (inzage en definitieve verwijdering).
 
@@ -666,6 +704,253 @@ De HTML-bestanden werken ook los (dubbelklikken of statische hosting): het porta
 | `POST /api/cv/get` / `POST /api/cv/save` | Het RTG-cv van het lid (de cv-builder in de leden-app) |
 | `POST /api/member/apply` `{supplierCode, func}` | Solliciteren bij een partner; kan pas met een afgerond cv |
 | `POST /api/supplier/apply` `{code, name, func, contact}` | Open sollicitatie via het startscherm van een partner-app |
+
+### Waar de omzet vandaan komt, en tegen welk tarief
+
+Twee dingen zaten hier los van elkaar terwijl ze over dezelfde transactie gaan,
+en allebei zijn ze rechtgezet.
+
+**1. Elke betaalde lidtransactie boekt nu een factuur** (`kern/lidacties/factuur.js`).
+De kassa, de retail, de verhuur en het vastgoed deden dat al; de transacties van
+het lid — een bestelling, de gezamenlijke rekening, een boeking, een rit — niet,
+en de twee kassawegen waarlangs zo'n bestelling alsnog wordt afgerekend (de
+ophaalcode aan de balie en het tafelticket) evenmin. Dat viel niemand op tot de
+btw-aangifte kwam: die telt het **factuurregister**, dus omzet zonder factuur
+stond er niet in, terwijl de maandboekhouding van diezelfde zaak hem wel telde.
+Er staat nu één routine die weet hoe een lidtransactie een factuur wordt, en de
+zes wegen roepen die aan — precies één keer, op het moment dat er écht is
+betaald. Een factuur die niet lukt draait de betaling nooit terug, maar valt ook
+niet stil: hij gaat naar de fout-aggregatie en dus naar het techniekbord.
+
+**2. Het btw-tarief stond op twee plekken en die twee waren het oneens**
+(`kern/fiscaal/tarief.js`). De maandboekhouding zocht een percentage op in de
+landentabel van de zaak; de facturatiemotor had `restaurant/bar/hotel/
+groothandel/boerderij → 9%, de rest → 21%` in zijn kop staan, zonder ooit naar
+het land te kijken. Voor een Nederlandse zaak viel dat samen. Voor Sal de Mar op
+Ibiza (land `ES`) niet: de boekhouding rekende 10%, de bon van de gast zei 9%.
+En het was niet bij te houden — de landentabel is levend, want de Regelwacht
+legt er een overlay overheen zodra een tarief verandert, en twee vaste getallen
+elders lopen daar per definitie op achter.
+
+Beide kanten vragen het nu aan dezelfde routine, dus ze **kunnen** niet meer
+uiteenlopen. Twee gevolgen die het waard zijn om te noemen:
+
+- de bon van de gast draagt per regel het juiste tarief, dus een glas wijn in
+  een restaurant staat op het standaardtarief en niet op het lage;
+- **een zaak zonder kaart, kamers of ritten valt nu onder `standaard` in plaats
+  van `eten`.** De boekhouding zette elke zaak zonder kamers of ritten op
+  `eten`, dus een kledingwinkel rekende het verlaagde tarief over een jas. Dat
+  cijfer verandert daardoor, en dat is de bedoeling.
+
+### De btw-aangifte van een zaak (`kern/fiscaal/btwaangifte.js`)
+
+Gebouwd naar het model van de loonaangifte (`kern/payroll/aangifte.js`), en om
+dezelfde reden: **één bron, geen tweede motor.** De aangifte komt uit het
+factuurregister en niets anders. Elke factuurregel draagt zijn eigen tarief
+sinds de facturatiemotor hem boekte, en dat tarief is wat de klant op zijn bon
+zag; er wordt hier geen btw opnieuw uitgerekend. Het tellen staat in
+`kern/fiscaal/btwtelling.js`, dat ook als enige plek weet wat `2026K3` betekent.
+
+Twee controles die weigeren in plaats van waarschuwen:
+
+1. de btw uit de regels moet exact de btw op de facturen zelf zijn (twee wegen
+   door hetzelfde register: regel versus factuurkop);
+2. bij indienen wordt opnieuw geteld — zijn er sinds het opmaken facturen
+   bijgekomen, dan weigert hij, want indienen op verouderde cijfers is een
+   verkeerde aangifte met een handtekening eronder.
+
+Verder: opmaken mag altijd, **indienen pas als de periode voorbij is**; een
+ingediende aangifte verandert niet meer maar krijgt een correctie bovenop, met
+verwijzing en verschil; en `dienIn` legt alleen vast DAT er is ingediend, door
+wie en met welk kenmerk. RTG verzendt niets — dat is dezelfde afspraak als in
+het btw-draaiboek (`kern/automatisering.js`): de zaak dient zelf in.
+
+Anders dan bij de loonaangifte, waar het RTG-kantoor indient en de werkgever
+meeleest, doet de ondernemer dit zelf: hij is de belastingplichtige. Er is dus
+bewust geen kantoorroute die dat overneemt.
+
+| Endpoint | Doel |
+|---|---|
+| `POST /api/supplier/btw/opmaken` `{periode, correctie?}` | Aangifte opmaken of bijwerken (`2026K3` of `2026-07`); manager, eigen zaak uit het token |
+| `POST /api/supplier/btw/aangiftes` `{jaar?}` | De eigen aangiftes teruglezen |
+| `POST /api/supplier/btw/aangifte` `{id}` | Eén aangifte in detail |
+| `POST /api/supplier/btw/indienen` `{id, kenmerk}` | Vastleggen dat hij is ingediend; zonder kenmerk geen bewijs |
+
+Het scherm staat in het Kantoor van de zaak onder Boekhouding, naast (en
+nadrukkelijk niet in plaats van) "Btw deze maand": dat bord is de maandstand uit
+de kassa en de boekingen, de aangifte is de periode uit het factuurregister.
+Twee verschillende vragen. Wat er níét in zit is omzet die nooit een factuur
+kreeg; de aangifte verantwoordt daarom uit hoeveel facturen hij komt.
+
+#### De andere kant: het toezicht (`kern/overheid/btwtoezicht.js`)
+
+Het Belastingkantoor had een btw-beeld maar geen enkel besef van wat een zaak
+daarover had **aangegeven** — een cijfer zonder de vraag erachter. De vraag van
+een inspecteur is niet "hoeveel btw zit er in het register", maar "klopt wat er
+is aangegeven met wat er is gefactureerd, en wie heeft niets ingediend".
+
+De aansluiting zet die twee naast elkaar, per zaak per periode, met vier standen:
+`sluit_aan`, `wijkt_af`, `niet_aangegeven`, `alleen_concept`. Daaruit volgen de
+btw-signalen in de inspecteurscockpit — maar **alleen over een afgesloten
+periode**: over een lopend kwartaal weigert de aangifte van de ondernemer het
+indienen met zoveel woorden, dus daar is "niets ingediend" de bedoeling en geen
+bevinding. Het scherm opent om dezelfde reden op het laatst afgesloten kwartaal.
+
+**Eén telling voor beide partijen.** Het geteld-uit-het-register komt bij de
+inspecteur uit dezelfde routine als bij de aangever (`telPerZaak` naast
+`telFacturen`, tot op de regelsom in `regelBtwCenten`). Dat is de kern van de
+zaak en geen zuinigheid: een toezichthouder die anders rekent dan de aangever
+vindt altijd een verschil, en dan zegt een verschil niets meer. Zo betekent een
+verschil precies één ding — er is na het indienen iets aan de facturen veranderd,
+of er is niets aangegeven.
+
+Bij die verbouwing is ook het woord *omzet* in het btw-beeld rechtgezet: dat veld
+droeg het factuurbedrag **inclusief** btw. Wie het naast een aangifte legde,
+vergeleek twee verschillende dingen zonder dat iets dat zei. Het heet nu
+`grondslag` en draagt ook dat getal.
+
+| Endpoint | Doel |
+|---|---|
+| `POST /api/overheid/bd/btw/aansluiting` `{periode?}` | Per zaak: geteld uit het register naast de ingediende aangifte, met verschil en stand; zonder periode de laatst afgesloten |
+
+#### En wat de inspecteur er dan van vindt: de naheffing (`kern/overheid/naheffing.js`)
+
+Het is een **naheffing** en geen navordering. Btw is een aangiftebelasting — je
+berekent en betaalt hem zelf, en wat er niet is betaald wordt nageheven (art. 20
+AWR). Navordering hoort bij een aanslagbelasting zoals de inkomstenbelasting.
+Andere bevoegdheden, andere termijnen; de twee door elkaar halen is geen
+woordenspel.
+
+**Het bedrag wordt niet getypt.** Het komt uit de aansluiting: gefactureerd min
+aangegeven. Een naheffing met een invulveld is een tweede berekening naast het
+register, en dan gaat de discussie over het getal in plaats van over de feiten.
+
+**Vier ogen, en dezelfde ogen tellen nooit dubbel** (hetzelfde idioom als
+`kern/uitgifte.js`): wie hem opmaakt stelt hem niet vast, en wie hem opmaakte of
+vaststelde beslist niet op het bezwaar ertegen — een besluit laten heroverwegen
+door dezelfde persoon is geen heroverweging. De namen komen uit de
+personeelslogin op de persoonlijke pincode, nooit uit het verzoek.
+
+**De boete ontstaat nooit vanzelf.** Geen enkele stand levert er een op; een mens
+zet een percentage en schrijft erbij waarom. Zonder grond geen boete.
+
+Verder: een concept is nog geen besluit (de zaak ziet het niet en er staat geen
+bezwaar tegen open), een vastgestelde naheffing trek je niet stilletjes in, en
+vaststellen hertelt eerst — zijn de cijfers sinds het opmaken veranderd, dan
+weigert hij.
+
+**En betalen is een echte boeking** (`kern/overheid/naheffing-betalen.js`). Hier
+stond drie commits lang dat innen er níét was, met de reden erbij: een
+`betaald = true` zonder boeking is een leugen in de database. Nu gebeurt het
+zoals het hoort — een dubbele boeking in het grootboek van RTG Bank, van de
+zakelijke rekening van de zaak naar `extern:belastingdienst`. Dat laatste is de
+eerlijke tegenrekening: de Belastingdienst bankiert niet bij RTG, dus het geld
+verlaat het platform. De som van alle saldi blijft exact nul.
+
+**De volgorde is de hele zaak:** eerst boeken, dan pas op betaald. Andersom zou
+een mislukte boeking een betaalde naheffing opleveren, en dat is het ergste van
+de twee — dan denkt iedereen dat het klaar is. Wat de bank weigert (nog niet
+live, geen zakelijke rekening, te weinig saldo) wordt ongeschonden doorgegeven,
+met het tekort erbij en de mededeling dat er niets is afgeschreven.
+
+Wordt een bezwaar tegen een al betaalde naheffing toegewezen, dan komt het geld
+terug — een besluit dat de aanslag vernietigt en het bedrag laat staan, doet
+niets.
+
+#### En als er niet betaald wordt: de invordering (`kern/overheid/naheffing-invordering.js`)
+
+De keten is één kant op en **elke stap wacht op de termijn van de vorige**:
+vervallen → aanmaning → dwangbevel → beslag. Niet "na een dag of wat": de datum
+staat op de naheffing en wordt nagerekend. Een invorderingsstap die te vroeg mag,
+is een dwangmiddel zonder grond. Aanmaning en dwangbevel leggen kosten op (art.
+63a IW en de Kostenwet, demo-peiljaar) en die tellen mee in wat er te betalen is
+— een aanmaning die kosten oplegt maar het bedrag niet meebeweegt, houdt de
+invordering aan de gang om acht euro.
+
+**Beslag is de enige stap met vier ogen**, en met opzet de enige: hier gaat er
+geld van een rekening af zonder dat de rekeninghouder tekent. Wie het dwangbevel
+uitvaardigde, legt het beslag niet. Er wordt **nooit meer gepakt dan de schuld**;
+staat er minder op de rekening, dan is het een deelbetaling en blijft de rest
+openstaan. Een lege rekening levert een nette weigering op, geen mislukte
+boeking.
+
+**Er zit een rem en een stopknop in** (`kern/overheid/naheffing-rem.js`), en dat
+is geen vriendelijkheid maar een voorwaarde. Een betalingsregeling schort de
+invordering op zolang hij loopt; een ontvanger kan de invordering stopzetten met
+een reden, in élke stand — ook na een beslag, want juist dan is er iets
+misgegaan. Zonder die twee is dit een ratel die maar één kant op kan, en dat is
+precies het soort systeem dat mensen kapotmaakt omdat niemand meer aan de
+noodrem kon. De stopknop belooft níét dat het geld terugkomt: wat er al is
+afgeschreven loopt via een besluit op bezwaar, niet via een pennenstreek van de
+ontvanger.
+
+**Wat er niet is, en niet komt:** beslag op iets anders dan de zakelijke rekening
+waarop de aanslag is opgelegd. Geen loonbeslag, geen bodembeslag, geen
+derdenbeslag. Dat zijn bevoegdheden met eigen waarborgen en eigen rechters, en
+die verzin je er niet even bij.
+
+| Endpoint | Doel |
+|---|---|
+| `POST /api/overheid/bd/naheffing/aanmaning` `{id}` | Na de betaaltermijn; legt aanmaningskosten op |
+| `POST /api/overheid/bd/naheffing/dwangbevel` `{id}` | Na de aanmaningstermijn; betekeningskosten |
+| `POST /api/overheid/bd/naheffing/beslag` `{id}` | Na het dwangbevel, door ándere ogen; nooit meer dan de schuld |
+| `POST /api/overheid/bd/naheffing/regeling` `{id, maanden}` | De rem: 1–12 maanden, zet de invordering stil |
+| `POST /api/overheid/bd/naheffing/stop` `{id, reden}` | De stopknop, in elke stand, met een reden |
+
+| Endpoint | Doel |
+|---|---|
+| `POST /api/overheid/bd/naheffing/maak` `{periode?, code, boetePct?, boeteGrond?}` | Concept opmaken; bedrag uit de aansluiting |
+| `POST /api/overheid/bd/naheffing/stelvast` `{id}` | Vaststellen — moet een ándere inspecteur zijn; maakt bekend aan de zaak |
+| `POST /api/overheid/bd/naheffing/intrek` `{id, reden}` | Alleen een concept |
+| `POST /api/overheid/bd/naheffing/bezwaar/beslis` `{id, toewijzen, motivering}` | Derde ogen; toewijzen laat niets staan |
+| `POST /api/overheid/bd/naheffingen` `{status?, periode?}` | De lijst voor het kantoor |
+| `POST /api/supplier/btw/naheffingen` | De zaak leest zijn eigen (geen concepten) |
+| `POST /api/supplier/btw/naheffing/bezwaar` `{id, reden}` | De zaak maakt bezwaar |
+| `POST /api/supplier/btw/naheffing/betaal` `{id}` | De zaak betaalt: een echte boeking van zijn zakelijke rekening |
+
+#### En de oudere kant van hetzelfde kantoor: de IB-aanslag (`kern/overheid/kantoor-invordering.js`)
+
+Er draaiden **twee invorderingsregimes naast elkaar in hetzelfde kantoor**. De
+naheffing hierboven heeft vier ogen op elke stap die geld raakt; de oudere
+IB-kant (herinnering, betalingsregeling, kwijtschelding) had er nul — één
+inspecteur kon in zijn eentje een schuld wegstrepen. Dat is nu gelijkgetrokken
+op het punt waar het ertoe doet: **kwijtschelden is de enige onomkeerbare
+handeling in dat rijtje**, en die gaat in twee stappen door twee mensen. Een
+herinnering kun je opnieuw sturen en een regeling kun je intrekken; een
+kwijtgescholden aanslag komt niet terug.
+
+De burger hoort pas van een kwijtschelding als er écht is besloten — een
+voordracht is geen besluit, dus er valt nog niets mee te delen.
+
+| Endpoint | Doel |
+|---|---|
+| `POST /api/overheid/bd/herinnering` `{ref}` | Betalingsherinnering via de Berichtenbox, op naam |
+| `POST /api/overheid/bd/regeling` `{ref, maanden}` | 2–24 maanden, op naam |
+| `POST /api/overheid/bd/kwijt/voordracht` `{ref, reden}` | Voordragen, met een verplichte grond; de burger hoort nog niets |
+| `POST /api/overheid/bd/kwijt/besluit` `{ref, akkoord}` | Beslissen — moet een ándere inspecteur zijn; afwijzen laat de aanslag gewoon openstaan |
+
+**Wat er aan deze kant (nog) niet is: termijnen.** De naheffing rekent na of een
+vervaldatum echt is verstreken voordat de volgende stap mag, en kent aanmaning,
+dwangbevel en beslag; de IB-kant kent alleen een herinnering zonder klok
+erachter. Dat is met opzet niet half nagebootst — knoppen die een volgorde
+suggereren zonder de datums na te rekenen zijn misleidender dan geen. Het staat
+als 4.23 in `TAKEN.md`.
+
+#### De herinnering rekent ook zelf (`kern/automatisering.js`)
+
+Het btw-draaiboek NAM een bedrag, een periode en een deadline aan, en de route
+gaf ze door uit het verzoek — dus wie de route aanriep bepaalde wat er in de
+herinnering stond, ongeacht wat het register zei. Dat is dezelfde fout als een
+aangifte met een invulveld, alleen dan in een e-mail. Nu telt het draaiboek zelf,
+met dezelfde routine als de aangifte, en rekent het de aangiftetermijn uit (een
+maand na afloop van het tijdvak, art. 10 AWR).
+
+En hij zwijgt als er niets te herinneren valt: is er al ingediend of viel er
+niets aan te geven, dan gaat er geen bericht. Een draaiboek dat ook mailt als
+alles op orde is, leert de ondernemer zijn post te negeren — en dan mist hij de
+keer dat het wel moest. `POST /api/supplier/rtmail/btw-herinner` geeft dan een
+`200` met `bericht: null` en de reden erbij, want een stille 200 laat de zaak
+denken dat er post onderweg is.
 
 ### RTG School (de onderwijs-toren)
 

@@ -52,7 +52,8 @@ const WATERHEFFINGEN = [
 const WATERMELD = { verontreiniging: 'Verontreiniging/lozing', wateroverlast: 'Wateroverlast', kade: 'Kade/oever', beschoeiing: 'Beschoeiing/duiker' };
 const WATER_STATUS = ['nieuw', 'in behandeling', 'opgelost', 'afgewezen'];
 
-function maakOverheid({ db, save, crypto, anthropic, findSupplier, notify, notifySupplier, sseToSupplier }) {
+function maakOverheid({ db, save, crypto, anthropic, findSupplier, notify, notifySupplier, sseToSupplier,
+  bankLive, bankBoek, bankSaldo }) {
   const nu = () => new Date().toISOString();
   const jaar = () => new Date().getFullYear();
   const id = () => crypto.randomBytes(4).toString('hex');
@@ -120,6 +121,12 @@ function maakOverheid({ db, save, crypto, anthropic, findSupplier, notify, notif
   const ctx = {
     db, save, crypto, anthropic, findSupplier, notify, notifySupplier, sseToSupplier,
     nu, jaar, id, ref, schoon, eur, hash, seed, bericht,
+    /* De bank, laat opgezocht (zie de kop bij maakOverheid in opzet/kernlaag2.js):
+       een betaalde naheffing is een echte boeking in het grootboek van RTG Bank.
+       Ze staan HIER in de ctx en niet alleen in de parameterlijst -- daar zijn ze
+       eerder stilletjes verdwenen, en dan is de hele betaalweg dood zonder dat
+       iets klaagt. */
+    bankLive, bankBoek, bankSaldo,
     IB, TOESLAGEN, UITKERINGEN, RECHTSVORMEN, SUBSIDIES, WATERHEFFINGEN, WATERMELD, WATER_STATUS
   };
 
@@ -127,7 +134,21 @@ function maakOverheid({ db, save, crypto, anthropic, findSupplier, notify, notif
     seed, isRijk, magBehandelen, berichten, berichtGelezen,
     TOESLAGEN, UITKERINGEN, RECHTSVORMEN, RIJBEWIJS_CATS, IB
   };
-  Object.assign(api,
+  /* DE TELLING OVER HET FACTUURREGISTER hoort in de ctx en niet in een slice,
+     want twee slices lezen hem: ./btwtoezicht.js (de aansluiting per zaak) en
+     ./kantoor.js (het btw-beeld van het jaar). Het is dezelfde routine als
+     waarmee de ondernemer zijn aangifte opmaakt -- een inspecteur die anders
+     rekent dan de aangever vindt altijd een verschil. */
+  Object.assign(ctx, { telPerZaak: require('../fiscaal/btwtelling').maakBtwTelling({ db }).telPerZaak });
+  /* Het btw-toezicht gaat EERST en gaat de ctx in, want ./kantoor.js leunt
+     erop: de cockpit-signalen komen eruit. Een slice die een zuster nodig
+     heeft, krijgt hem via de ctx -- dat is de enige weg die deze laag kent. */
+  const toezicht = require('./btwtoezicht')(ctx);
+  Object.assign(ctx, toezicht);
+  /* De naheffing staat OP het toezicht: hij haalt zijn bedrag uit de
+     aansluiting en nergens anders, dus hij komt erna en krijgt hem via de ctx. */
+  const naheffing = require('./naheffing')(ctx);
+  Object.assign(api, toezicht, naheffing,
     require('./belasting')(ctx),
     require('./rdw')(ctx),
     require('./onderneming')(ctx),

@@ -146,12 +146,13 @@ Object.assign(kern, require('../kern/gemeente').maakGemeente({ db, save, crypto,
 // de gemeente-partner en zijn config bestaan meteen bij het opstarten, zodat een
 // medewerker kan inloggen ook zonder dat er eerst een inwoner iets deed
 kern.gemeente.seed();
-/* De Overheid (kern/overheid.js): de landelijke laag naast de gemeente ·
-   Berichtenbox, Belastingdienst (aangifte + toeslagen), RDW (voertuig +
-   rijbewijs), KVK-ondernemersloket, sociale zekerheid (UWV/SVB) en een
-   referendum, voor inwoners, ondernemers en rijksambtenaren. */
+/* De Overheid (kern/overheid/): Berichtenbox, Belastingdienst, RDW, KVK,
+   sociale zekerheid en een referendum. */
+// de bank gaat LAAT (komt pas in kernlaag4b); zie kern/overheid/naheffing-betalen.js
 Object.assign(kern, require('../kern/overheid').maakOverheid({ db, save, crypto, anthropic,
-  findSupplier, notify, notifySupplier, sseToSupplier }));
+  findSupplier, notify, notifySupplier, sseToSupplier,
+  bankLive: () => !!(kern.bank && kern.bankLedenAan && kern.bankLedenAan()),
+  bankBoek: o => kern.bank.boekAsync(o), bankSaldo: i => kern.bank.saldoVan(i) }));
 kern.overheid.seed();
 // de RTG-vloot (autoverhuur, tweewielers) meteen in het RDW-register, zodat een
 // kenteken-check op een huurauto de APK-status teruggeeft

@@ -5,6 +5,9 @@
 module.exports = (kern) => {
   const { POS_METHODS, app, broadcastSync, crypto, db, facturatie, logActivity, notify, pickupCode, save,
           sseToCustomer, sseToOffice, sseToSupplier, supplierAuth, pay, ordersVanZaak } = kern;
+  // dezelfde factuurroutine als de app-kant; zie kern/lidacties/factuur.js
+  const { maakFactuurVoorLid, regelsVanItems } = require('../../../kern/lidacties/factuur');
+  const factuurVoorLid = maakFactuurVoorLid(facturatie);
 app.post('/api/supplier/pos/sale', supplierAuth, async (req, res) => {
   let total = Number(req.body.total);
   if (!(total > 0) || total > 100000) return res.status(400).json({ error: 'Geen geldig bedrag.' });
@@ -88,6 +91,14 @@ app.post('/api/supplier/pos/redeem', supplierAuth, (req, res) => {
   if (!o.paid) {
     // afrekenen via RTG-lidmaatschap; komt als omzet in het dagoverzicht
     o.paid = true;
+    /* HET MOMENT VAN BETALEN, en dat stond hier als enige betaalweg niet bij.
+       Elke andere weg zet paidAt (bestellen.js, rekening.js, tafelticket), en de
+       hele verslaglegging valt daarop terug: het dagrapport, de maandboekhouding
+       en de kantoorcijfers rekenen met `paidAt || at`. Zonder paidAt telde een
+       bon die vorige maand is geplaatst en vandaag wordt opgehaald mee in de
+       VORIGE maand -- en dan wijkt hij af van de factuur hieronder, die de datum
+       van vandaag draagt. */
+    o.paidAt = new Date().toISOString();
     sale = {
       id: crypto.randomBytes(4).toString('hex'),
       bon: pickupCode(),
@@ -100,6 +111,15 @@ app.post('/api/supplier/pos/redeem', supplierAuth, (req, res) => {
     const list = db.data.posSales[req.supplier.code] = (db.data.posSales[req.supplier.code] || []);
     list.unshift(sale);
     db.data.posSales[req.supplier.code] = list.slice(0, 300);
+    /* HIER wordt de bestelling afgerekend, dus hier hoort de factuur -- en
+       nergens anders: betaalde het lid al in de app, dan is hij daar geboekt en
+       staat deze tak (`if (!o.paid)`) niet aan. Deze bon krijgt method 'rtg' en
+       wordt door financeVoor overgeslagen om dubbeltelling te vermijden; zonder
+       de factuur hieronder viel de omzet daarmee helemaal buiten de btw.
+       Via dezelfde routine als de app-kant (kern/lidacties/factuur.js), want
+       twee wegen naar dezelfde bon horen dezelfde factuur op te leveren. */
+    factuurVoorLid({ supplierCode: req.supplier.code, supplierNaam: req.supplier.name,
+      codenaam: o.customerCodename, ref: o.ref, methode: 'rtg', regels: regelsVanItems(o.items) });
   }
   o.status = 'geserveerd';
   save();

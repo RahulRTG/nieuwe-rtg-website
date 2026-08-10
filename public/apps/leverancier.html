@@ -592,6 +592,20 @@
   .st-row .acts{display:flex;gap:0.4rem;flex-shrink:0;}
   .st-in{width:100%;background:var(--card2);border:1px solid var(--line);border-radius:10px;padding:0.65rem 0.8rem;font-size:0.85rem;color:var(--txt);outline:none;}
   .st-form{display:grid;gap:0.5rem;margin-top:0.6rem;}
+  /* De btw-aangifte (leverancier-12a.js). Als klassen en niet als style="..."
+     op elk element: die attributen houden style-src-attr in de CSP open, en ze
+     worden geteld door de meter inlineStijlAttributen die alleen omlaag mag. */
+  .btw-rij{display:flex;gap:0.5rem;flex-wrap:wrap;align-items:center;margin-top:0.5rem;}
+  .btw-per{flex:2;min-width:120px;}
+  .btw-kenmerk{flex:2;min-width:150px;}
+  .btw-melding{color:var(--gold);margin-top:0.4rem;}
+  .btw-eerder{margin-top:0.6rem;}
+  .btw-blok{border:1px solid var(--line);border-radius:12px;padding:0.7rem 0.9rem;margin-top:0.6rem;}
+  .btw-blok .streep{border-top:1px solid var(--line);}
+  .btw-btw{color:var(--gold);}
+  .btw-saldo{font-size:1.05rem;}
+  .btw-saldo.terug{color:var(--gold);}
+  .btw-saldo.betaal{color:var(--burgundy);}
   .tkc h3{font-size:0.66rem;letter-spacing:0.14em;text-transform:uppercase;color:var(--gold);font-weight:600;}
   .ev-bar{height:5px;border-radius:99px;background:var(--card2);overflow:hidden;}
   .ev-bar i{display:block;height:100%;background:var(--gold);}
@@ -1425,6 +1439,21 @@ window.I18N = { en: {
   'fn.gcin':'Redeemed this month', 'fn.gci.s':'revenue + VAT moment',
   'fn.gcopen':'Outstanding balance', 'fn.gco.s':'liability on the balance sheet', 'fn.kaarten':'card(s)',
   'fn.gcsell':'Sell card', 'fn.gcredeem':'Redeem', 'fn.gcklaar':'Gift card sold. Hand over this code:', 'fn.gcgeind':'Redeemed. Remaining balance on the card:',
+  'fn.btwaan':'VAT return', 'fn.btwopmaak':'Draw up',
+  'fn.btwaan.s':'Drawn up from your invoice register: every line counts at the rate printed on it. Revenue without an invoice is not in it. Checking and filing is yours to do; RTG never files for you and sends nothing.',
+  'fn.btwomzet':'Revenue', 'fn.btwrub':'box', 'fn.btwleeg':'No invoices in this period.',
+  'fn.btwvk':'sales invoices', 'fn.btwik':'purchase invoices', 'fn.btwcorr':'correction',
+  'fn.btwin':'filed', 'fn.btwcon':'draft', 'fn.btwversch':'VAT due', 'fn.btwvoor':'Input VAT',
+  'fn.btwvoor.s':'VAT on your purchase invoices', 'fn.btwterug':'To reclaim', 'fn.btwbetaal':'To pay',
+  'fn.btwversch2':'Difference with the filed return', 'fn.btwinop':'Filed on', 'fn.btwdoor':'by',
+  'fn.btwkenmerk':'reference', 'fn.btwkenmerk.ph':'Reference from the tax authority',
+  'fn.btwdien':'Record as filed', 'fn.btwmaakcorr':'Draw up correction', 'fn.btweerder':'Earlier',
+  'fn.btwbij':'The return has been updated with the invoices booked since.',
+  'fn.nh':'Additional assessment from the tax authority', 'fn.nh.stand':'status', 'fn.nh.boete':'penalty',
+  'fn.nh.vervalt':'due', 'fn.nh.besluit':'decision on your objection',
+  'fn.nh.reden':'Why do you disagree?', 'fn.nh.bezwaar':'Object',
+  'fn.nh.loopt':'Your objection is pending; a different inspector reviews it.',
+  'fn.nh.betaal':'Pay', 'fn.nh.betaald':'Paid on', 'fn.nh.terug':'refunded on',
   'fn.regels':'Rules in ', 'fn.ai':'AI accountant',
   'kt.thuis':'RTG Thuis', 'th.kop':'RTG Thuis', 'th.bord':'The host dashboard', 'th.live':'Homes live',
   'th.ink':'Earnings (completed stays)', 'th.bez':'Occupancy next 30 days', 'th.ja':'yes',

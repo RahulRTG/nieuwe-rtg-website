@@ -152,16 +152,13 @@
      (LAT.md regel 4). -->
 
 <main id="inhoud">
-  <!-- De terugweg hoort op elke app-pagina te staan. In een eerdere versie van
-       dit scherm was hij bij het herontwerp gesneuveld: er was toen alleen nog
-       het hamburgermenu, en dat is een menu en geen terugknop. -->
-  <a class="terug" href="/apps/app.html">&lsaquo; Home</a>
+  <!-- EEN vaste RTG-header: hamburger, appnaam, lucht, inhoud. Verder niets.
+       Hier stonden een "Home"-link, een RTG-rondje en de ondertitel "uw
+       reiswereld" -- vier keer tegelijk vertellen dat dit RTG is, waardoor het
+       merk juist zwakker werd. De hamburger van het app-menu (shared/appmenu.js)
+       is de enige navigatie; de weg terug loopt daardoorheen. -->
   <header class="merkkop">
-    <div>
-      <h1 class="rtg-ceremonie">RTG Reizen</h1>
-      <span class="onder">uw reiswereld</span>
-    </div>
-    <div class="monogram" aria-hidden="true">RTG</div>
+    <h1 class="rtg-ceremonie">RTG Reizen</h1>
   </header>
 
   <a class="balk" id="balk" href="#komend" data-rustig>

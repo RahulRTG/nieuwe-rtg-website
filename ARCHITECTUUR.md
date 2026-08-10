@@ -22,7 +22,7 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 | servermodules (`server/**/*.js`) | 1857 |
 | routebestanden (`server/routes/**`) | 400 |
 | kernmodules (`server/kern/**`) | 1132 |
-| schermen (`public/**/*.html`) | 230 |
+| schermen (`public/**/*.html`) | 231 |
 | gedeelde browsermodules (`public/shared/*.js`) | 180 |
 | toetsbestanden (`test/*.test.js`) | 747 |
 | schermtoetsen (`test/*.e2e.js`) | 111 |
@@ -138,8 +138,8 @@ domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 ```
 app(151) auth(91) supplierAuth(51) db(34) officeAuth(32) status(27) liveCodename(25)
 accounts(18) schoon(16) managerOnly(15) save(14) codenaamVan(12) crypto(11) rtf(11)
-tooManyTries(10) anthropic(10) boardroomWie(9) express(9) rtmail(9) payrollOS(8)
-keyVanCodenaam(8) noteFailedTry(7) findSupplier(7) logActivity(7) gegevensStop(7)
+tooManyTries(10) anthropic(10) boardroomWie(9) express(9) rtmail(9) gegevensStop(8)
+payrollOS(8) keyVanCodenaam(8) noteFailedTry(7) findSupplier(7) logActivity(7)
 sseToOffice(7) geenGast(6) kern(6) talen(6) mail(5) loginFails(5) sseToSupplier(5)
 overheid(5) notifySupplier(5) sseToCustomer(5)
 ```

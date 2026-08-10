@@ -89,6 +89,16 @@ module.exports = (kern) => {
     const a = planlaag.vanId(req.session.key, (req.body || {}).id);
     if (!a) return res.status(404).json({ error: 'Deze avond kennen we niet.', code: 'onbekend' });
 
+    /* DE GEGEVENSPOORT, EN WAAROM HIJ HIER OOK MOET STAAN. `/api/reserveer`
+       heeft hem (`gegevensStop(..., 'reservering')`), maar deze route roept
+       `reserveerTafel` RECHTSTREEKS aan en liep er dus omheen: een avond
+       aanvragen deed wat een reservering aanvragen niet mag. Zo'n omweg is het
+       gevaarlijkste soort gat, want de poort staat er nog en lijkt te werken.
+       Alleen vragen als er ook echt een tafel in het plan zit -- een avond van
+       alleen vervoer hoeft geen telefoonnummer. */
+    if (a.stappen.some(s => s.soort === 'eten' && s.zaak && s.staat === 'voorstel')
+      && kern.gegevensStop(req, res, 'reservering')) return;
+
     const uitkomsten = [];
     for (let i = 0; i < a.stappen.length; i++) {
       const stap = a.stappen[i];

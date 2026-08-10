@@ -8,6 +8,11 @@
 const G = (wat, doe, tip) => ({ wat, doe, tip });
 
 module.exports = {
+  '/apps/avond.html': G('Een hele avond plannen: Rahul stelt een keten voor van eten, iets drinken en de rit naar huis, binnen je budget en op tijd thuis.',
+    ['Zeg vanaf hoe laat, hoe laat je thuis wilt zijn, met hoeveel en wat je per persoon wilt uitgeven',
+      'Elke stap draagt zijn reden; wat Rahul niet kan vullen blijft leeg met de uitleg erbij',
+      'Onder "Wat zaken van me weten" bepaal je per soort wat een zaak te zien krijgt'],
+    'Een tafel is aangevraagd en niet bevestigd: de zaak beslist. Een geboekte rit staat wel vast. Dat verschil staat per stap in het scherm.'),
   /* De twee horeca-gastschermen. Ze staan HIER en niet in deel1 om dezelfde
      reden als de rest van dit bestand: deel1 ging er weer overheen. */
   '/apps/bestellen.html': G('Bestellen bij RTG-horeca buiten de deur: laten bezorgen, zelf afhalen of een foodcourt-mandje bij meer loketten.',

@@ -309,3 +309,27 @@ test('geen enkele zin die de gast leest bevat NaN of undefined', async () => {
   assert.equal(rit.staat, 'bevestigd', 'met een thuisplek en ruim budget wordt de rit echt geboekt');
   assert.ok(rit.centenPP > 0 && Number.isFinite(rit.centenPP));
 });
+
+test('de avondplanner loopt niet om de gegevenspoort heen', async () => {
+  /* `/api/reserveer` heeft een gegevenspoort; deze route roept reserveerTafel
+     RECHTSTREEKS aan en liep er eerst omheen. Een avond aanvragen deed toen wat
+     een reservering aanvragen niet mag -- het gevaarlijkste soort gat, want de
+     poort staat er nog en lijkt te werken. */
+  const u = String(Date.now()) + '3';
+  const reg = await post('/api/auth/register', { name: 'Zonder nummer',
+    email: 'zn' + u + '@voorbeeld.nl', password: 'geheim123',
+    geboortedatum: '1990-05-05', geslacht: 'v', tier: 'rtg', pasApp: 'rtg' });
+  const kaal = reg.body.token;
+  if (!kaal) return; // registreren zonder telefoon kan niet: dan toetst dit niets
+
+  const v = await post('/api/avond/voorstel', { start: '19:00', thuisOm: '01:30',
+    personen: 2, plafondPP: 20000 }, kaal);
+  assert.equal(v.status, 200, JSON.stringify(v.body).slice(0, 160));
+  const uit = await post('/api/avond/aanvragen', { id: v.body.avond.id }, kaal);
+  assert.equal(uit.status, 428, 'zonder telefoonnummer hoort de poort te bijten, net als bij /api/reserveer');
+  assert.ok((uit.body.ontbreekt || []).length, 'en te zeggen wat er ontbreekt');
+
+  const na = await post('/api/avond', { id: v.body.avond.id }, kaal);
+  assert.ok(na.body.avond.stappen.every(s => s.staat === 'voorstel'),
+    'en er hoort niets te zijn aangevraagd');
+});

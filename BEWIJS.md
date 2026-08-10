@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 858 bestanden en 5391 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 858 bestanden en 5392 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 858 |
-| losse beweringen (`test(...)`) | 5391 |
+| losse beweringen (`test(...)`) | 5392 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 603 |
 | **overleefd**: geen mutatie kreeg hem rood | 13 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-747 bestanden, 5206 beweringen.
+747 bestanden, 5207 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -76,7 +76,7 @@ toets omvalt.
 | `auth-rol.test.js` | 2 | gezakt op `liegpoort /api/` | Uitputtende auth-scoping-test. Niet een steekproef en geen mooipraterij: deze test leest ELKE leden-route (auth-middleware) rechtstreeks uit de bron en eist dat een leverancier- EN een kantoor-token daar 401 krijgen... |
 | `automatisering.test.js` | 11 | gezakt op `return-weg` | De automatiseringen (draaiboeken) op de RTMAIL-rail. Unit-test op het welkom- draaiboek met een nep-db, zodat we los kunnen bewijzen dat een nieuw lid een welkom in zijn eigen RTMAIL-postvak krijgt -- zonder echte... |
 | `autoverkoop.test.js` | 5 | gezakt op `liegpoort /api/` | 5-sterren autoverkoop bovenop het verhuurbedrijf: een exclusieve showroom, proefrit op afspraak, kopen met bod + inruil + concierge-aflevering, en een digitaal koopcontract. Draai: npm test |
-| `avond.test.js` | 15 | -- | RTG EVENING OS: de avond als plan. WAT DIT BESTAND BEWAAKT. |
+| `avond.test.js` | 16 | -- | RTG EVENING OS: de avond als plan. WAT DIT BESTAND BEWAAKT. |
 | `baby.test.js` | 5 | gezakt op `liegpoort /api/` | Integratietests voor het babyboekje (RTF Mini): het dagboek met foto's via de mediastore, de rechten (gast erbuiten, weghalen alleen door schrijver of beheerder), de gezinsnamen en de AI-gezinsmomenten met... |
 | `backupvolledig.test.js` | 2 | -- | EEN BACKUP DIE HALF IS, IS GEEN BACKUP. TWEE FOUTEN, allebei stil: 1. |
 | `balans.test.js` | 5 | gezakt op `liegpoort /api/` | RTG Balans: Rahul kijkt naar agenda, rooster en eetpatroon en adviseert ook eens niks: rust, hobby's, ontprikkelen; eerlijk en zonder dwang. |

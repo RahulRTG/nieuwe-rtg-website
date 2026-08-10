@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Een avond · RTG</title>
+<link rel="icon" href="/icons/partners.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<script src="/shared/id.js"></script>
+<!-- De client-kant van de gegevenspoort: het aanvragen van een avond kan een
+     428 geven (een tafel vraagt een telefoonnummer), en dan hoort Rahul dat te
+     vragen in plaats van dat het scherm belooft dat hij het doet. -->
+<script src="/shared/poortgesprek.js" defer></script>
+<style>
+  :root{ --bg:var(--rtg-bg); --card:var(--rtg-card); --card2:var(--rtg-card2); --line:var(--rtg-line);
+    --txt:var(--rtg-txt); --muted:var(--rtg-muted); --soft:var(--rtg-soft);
+    --burgundy:#C23A5E; --gold:#A98F1C; --groen:#4C9A75; }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:9rem;}
+  h1,h2,h3{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  header{position:sticky;top:0;z-index:6;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.9));
+    backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);
+    display:flex;align-items:flex-start;gap:.8rem;}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header h1{font-size:1.3rem;margin-top:.1rem;}
+  .terug{margin-left:auto;background:transparent;border:1px solid var(--line);color:var(--txt);
+    border-radius:10px;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;}
+  main{padding:1.1rem;max-width:760px;margin:0 auto;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1rem 1.1rem;margin-bottom:.9rem;}
+  .kaart h2{font-size:1.02rem;margin-bottom:.5rem;}
+  .lbl{font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--soft);display:block;margin:.7rem 0 .3rem;}
+  input,select{font:inherit;width:100%;background:var(--card2);color:var(--txt);
+    border:1px solid var(--line);border-radius:10px;padding:.6rem .7rem;}
+  button{font:inherit;cursor:pointer;border-radius:10px;border:1px solid var(--line);
+    background:var(--card2);color:var(--txt);padding:.55rem .9rem;}
+  button.prim{background:var(--burgundy);border-color:var(--burgundy);color:#fff;font-weight:600;}
+  button:disabled{opacity:.45;cursor:not-allowed;}
+  .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
+  .twee{display:grid;grid-template-columns:1fr 1fr;gap:.5rem;}
+  .tabs{display:flex;gap:.4rem;overflow-x:auto;padding:.2rem 0 .6rem;}
+  .tabs button{white-space:nowrap;font-size:.85rem;}
+  .tabs button[aria-selected="true"]{background:var(--burgundy);border-color:var(--burgundy);color:#fff;}
+  .sub{font-size:.83rem;color:var(--soft);line-height:1.55;}
+
+  /* De stappen van een avond. De staat is een woord EN een kleur; alleen kleur
+     is geen informatie voor wie hem niet ziet. */
+  .stap{display:flex;gap:.8rem;padding:.8rem 0;border-bottom:1px solid var(--line);}
+  .stap:last-child{border-bottom:0;}
+  .stap .tijd{font-variant-numeric:tabular-nums;color:var(--gold);min-width:5.4rem;font-size:.86rem;}
+  .stap .nm{font-weight:600;}
+  .stap .pr{margin-left:auto;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;}
+  .staat{display:inline-block;font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;
+    border:1px solid var(--line);border-radius:6px;padding:.05rem .4rem;margin-top:.25rem;}
+  .staat.bevestigd{color:var(--groen);border-color:var(--groen);}
+  .staat.aangevraagd{color:var(--gold);border-color:var(--gold);}
+  .staat.mislukt{color:var(--burgundy);border-color:var(--burgundy);}
+  .reden{font-size:.8rem;color:var(--soft);margin-top:.25rem;}
+  .waarom{font-size:.79rem;color:var(--soft);margin-top:.2rem;font-style:italic;}
+  .zekerheid{border:1px solid var(--gold);border-radius:10px;padding:.6rem .75rem;
+    font-size:.86rem;margin-bottom:.8rem;}
+  .gat{border:1px dashed var(--line);border-radius:10px;padding:.6rem .75rem;
+    font-size:.83rem;color:var(--soft);margin-top:.5rem;}
+  .melding{background:var(--card2);border:1px solid var(--burgundy);border-radius:10px;
+    padding:.6rem .75rem;font-size:.86rem;margin-bottom:.8rem;}
+  .melding.ok{border-color:var(--groen);}
+  .bedrag{font-variant-numeric:tabular-nums;font-weight:600;}
+  /* De balk staat BOVEN de metgezel van Rahul (bottom .9rem, z-index 9980);
+     op bottom:0 is de knop in een echte browser niet aan te klikken. */
+  .balk{position:fixed;left:0;right:0;z-index:7;background:var(--card);
+    bottom:calc(env(safe-area-inset-bottom,0px) + 4.3rem);
+    border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:.8rem 1.1rem;}
+  .balk[hidden]{display:none;}
+  .balk .rij{max-width:760px;margin:0 auto;}
+  .wr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);}
+</style>
+</head>
+<body>
+<header>
+  <div><span class="ey">Rahul Travel Group</span><h1>Een avond</h1></div>
+  <button class="terug" id="bTerug">Terug</button>
+</header>
+
+<main id="main" role="main">
+  <div id="melding" hidden></div>
+
+  <div class="tabs" role="tablist">
+    <button role="tab" aria-selected="true" data-tab="plannen">Plannen</button>
+    <button role="tab" aria-selected="false" data-tab="mijn">Mijn avonden</button>
+    <button role="tab" aria-selected="false" data-tab="voorkeuren">Wat zaken van me weten</button>
+  </div>
+
+  <div data-paneel="plannen">
+    <section class="kaart">
+      <h2>Wat voor avond wordt het?</h2>
+      <p class="sub">Rahul stelt een plan voor uit zaken die er echt zijn. Wat hij niet kan vullen, laat hij leeg met de reden erbij.</p>
+      <div class="twee">
+        <div><label class="lbl" for="start">Vanaf</label><input id="start" value="19:00" inputmode="numeric" placeholder="19:00"></div>
+        <div><label class="lbl" for="thuis">Thuis om</label><input id="thuis" value="00:30" inputmode="numeric" placeholder="00:30"></div>
+      </div>
+      <div class="twee">
+        <div><label class="lbl" for="personen">Met hoeveel</label><input id="personen" value="2" inputmode="numeric"></div>
+        <div><label class="lbl" for="budget">Budget p.p. (euro)</label><input id="budget" value="80" inputmode="decimal"></div>
+      </div>
+      <label class="lbl" for="sfeer">Sfeer (mag leeg)</label>
+      <input id="sfeer" maxlength="40" placeholder="rustig, levendig, zakelijk">
+      <div class="rij" style="margin-top:.9rem;">
+        <button class="prim" id="bPlan">Stel een avond voor</button>
+      </div>
+    </section>
+
+    <section class="kaart" id="planVak" hidden>
+      <h2 id="planKop">Het voorstel</h2>
+      <div class="zekerheid" id="zekerheid"></div>
+      <div id="stappen"></div>
+      <div id="gaten"></div>
+      <p class="sub" id="aannames" style="margin-top:.7rem;"></p>
+    </section>
+  </div>
+
+  <div data-paneel="mijn" hidden>
+    <section class="kaart"><h2>Wat er loopt</h2><div id="mijnLijst"></div></section>
+  </div>
+
+  <div data-paneel="voorkeuren" hidden>
+    <section class="kaart">
+      <h2>Wat zaken van je mogen weten</h2>
+      <p class="sub">Delen gaat per soort. <b>Gevraagd</b> betekent: alleen als je het die keer zelf meegeeft. Wat hier staat schrijf je zelf op: RTG leidt niets af uit je bestellingen.</p>
+      <div id="dna" style="margin-top:.8rem;"></div>
+      <div class="rij" style="margin-top:.9rem;"><button class="prim" id="bDna">Opslaan</button></div>
+    </section>
+  </div>
+</main>
+
+<div class="balk" id="balk" hidden>
+  <div class="rij">
+    <span id="balkTekst"></span>
+    <span class="bedrag" id="balkBedrag" style="margin-left:auto;"></span>
+    <button class="prim" id="bVraag">Aanvragen</button>
+  </div>
+</div>
+
+<script>
+/* RTG Evening OS in het scherm.
+
+   WAT DIT SCHERM MOET DOEN EN WAT NIET. Het toont een plan met de staat van
+   elke stap erbij, en het maakt niets mooier dan het is: `aangevraagd` krijgt
+   een andere kleur EN een ander woord dan `bevestigd`, en de zin boven het plan
+   komt van de server (`zekerheid`) en niet uit dit bestand. Een scherm dat zelf
+   bedenkt hoe zeker een avond is, gaat vroeg of laat iets anders zeggen dan de
+   werkelijkheid eronder.
+
+   Er staat ook geen aftelklok, geen "nog 2 tafels!" en niets voorgeselecteerd
+   wat geld kost. Een avondplanner is precies de plek waar zulke patronen
+   ongemerkt insluipen (CLAUDE.md). */
+(function () {
+  'use strict';
+  var $ = function (s) { return document.querySelector(s); };
+  var esc = function (t) {
+    return String(t == null ? '' : t).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  };
+  var euro = function (c) { return '€ ' + ((c || 0) / 100).toFixed(2).replace('.', ','); };
+  var TOKEN = null; try { TOKEN = localStorage.getItem('rtg_member_token'); } catch (e) {}
+  var AVOND = null, UITLEG = [], GATEN = [];
+
+  function meld(t, ok) {
+    var el = $('#melding');
+    if (!t) { el.hidden = true; return; }
+    el.className = 'melding' + (ok ? ' ok' : '');
+    el.textContent = t; el.hidden = false;
+    if (ok) setTimeout(function () { el.hidden = true; }, 6000);
+  }
+
+  function api(pad, body, herkans) {
+    return fetch(pad, { method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
+      body: JSON.stringify(body || {}) }).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (j) {
+        j._status = r.status;
+        /* De 428 van de gegevenspoort gaat naar de gedeelde module: die stelt
+           de vraag en doet daarna deze aanroep opnieuw. */
+        if (!herkans && window.RTGGegevensPoort) {
+          var p = window.RTGGegevensPoort.vang(j, r.status, function () { return api(pad, body, true); }, api);
+          if (p) return p;
+        }
+        if (!r.ok) { j._fout = j.error || 'Er ging iets mis.'; j._code = j.code || null; }
+        return j;
+      });
+    });
+  }
+
+  /* ---------- plannen ---------- */
+  $('#bPlan').addEventListener('click', function () {
+    var centen = Math.round(parseFloat(String($('#budget').value).replace(',', '.')) * 100);
+    $('#bPlan').disabled = true;
+    api('/api/avond/voorstel', {
+      start: $('#start').value, thuisOm: $('#thuis').value,
+      personen: parseInt($('#personen').value, 10) || 2,
+      plafondPP: centen >= 0 ? centen : 0, sfeer: $('#sfeer').value
+    }).then(function (j) {
+      $('#bPlan').disabled = false;
+      if (j._fout) {
+        /* De weigeringen van de klok en het budget zijn INHOUD en geen storing:
+           ze zeggen precies wat er niet past. Ze worden dus getoond zoals ze
+           zijn, met het getal erbij. */
+        return meld(j._fout + (j.teLaatMin ? ' (' + j.teLaatMin + ' minuten te laat)' : ''));
+      }
+      AVOND = j.avond; UITLEG = j.uitleg || []; GATEN = j.gaten || [];
+      $('#aannames').textContent = (j.aannames || []).join(' ');
+      teken();
+    }).catch(function (e) { $('#bPlan').disabled = false; meld(e && e.message ? e.message : 'Dan gaat het niet door.'); });
+  });
+
+  function waaromVan(soort) {
+    var u = UITLEG.filter(function (x) { return x.stap === soort; })[0];
+    return u ? u.waarom.join('; ') : '';
+  }
+
+  function teken() {
+    if (!AVOND) return;
+    $('#planVak').hidden = false;
+    $('#planKop').textContent = AVOND.titel || 'Het voorstel';
+    $('#zekerheid').textContent = AVOND.zekerheid;
+    var tl = {};
+    (AVOND.tijdlijn || []).forEach(function (t) { tl[t.id] = t; });
+
+    $('#stappen').innerHTML = AVOND.stappen.map(function (s) {
+      var t = tl[s.id] || {};
+      var waarom = waaromVan(s.soort);
+      return '<div class="stap"><div class="tijd">' + esc(t.van || '') + (t.tot ? '<br>' + esc(t.tot) : '') + '</div>' +
+        '<div><span class="nm">' + esc(s.titel) + '</span>' +
+        '<div><span class="staat ' + esc(s.staat) + '">' + esc(s.staat) + '</span></div>' +
+        (s.reden ? '<div class="reden">' + esc(s.reden) + '</div>' : '') +
+        (waarom ? '<div class="waarom">' + esc(waarom) + '</div>' : '') +
+        '</div><div class="pr">' + (s.centenPP ? euro(s.centenPP) : '') + '</div></div>';
+    }).join('');
+
+    $('#gaten').innerHTML = GATEN.map(function (g) {
+      return '<div class="gat"><b>' + esc(g.soort) + ':</b> ' + esc(g.reden) + '</div>';
+    }).join('');
+
+    var b = AVOND.budget;
+    $('#balkTekst').textContent = AVOND.stappen.length + ' stappen' +
+      (AVOND.eindigt ? ', klaar om ' + AVOND.eindigt : '');
+    $('#balkBedrag').textContent = euro(b.perPersoon) + ' p.p.';
+    $('#balk').hidden = actieveTab() !== 'plannen';
+    /* Wat valt er nog aan te vragen? Alleen stappen die nog NIET zijn
+       geprobeerd. Een stap die op `voorstel` staat MET een reden is al langs
+       geweest en kwam niet verder (geen aanvraagweg, buiten budget); daar nog
+       een keer op drukken doet niets. Een knop die "Aanvragen" heet terwijl er
+       niets gebeurt, is een knop die liegt. */
+    var teDoen = AVOND.stappen.filter(function (s) { return s.staat === 'voorstel' && !s.reden; }).length;
+    var blijftLiggen = AVOND.stappen.filter(function (s) { return s.staat === 'voorstel' && s.reden; }).length;
+    $('#bVraag').disabled = !teDoen;
+    $('#bVraag').textContent = teDoen ? 'Aanvragen'
+      : (blijftLiggen ? blijftLiggen + ' stap(pen) kunnen niet' : 'Alles is aangevraagd');
+  }
+
+  /* ---------- aanvragen ---------- */
+  $('#bVraag').addEventListener('click', function () {
+    if (!AVOND) return;
+    $('#bVraag').disabled = true;
+    api('/api/avond/aanvragen', { id: AVOND.id }).then(function (j) {
+      $('#bVraag').disabled = false;
+      if (j._fout) return meld(j._fout);
+      AVOND = j.avond;
+      teken();
+      var bevestigd = AVOND.stappen.filter(function (s) { return s.staat === 'bevestigd'; }).length;
+      var gevraagd = AVOND.stappen.filter(function (s) { return s.staat === 'aangevraagd'; }).length;
+      meld(j.let + (bevestigd ? ' ' + bevestigd + ' stap(pen) staan vast, ' : ' ') +
+        gevraagd + ' wacht(en) op de zaak.', false);
+    }).catch(function (e) {
+      $('#bVraag').disabled = false;
+      meld(e && e.message ? e.message : 'Dan gaat het niet door.');
+    });
+  });
+
+  /* ---------- mijn avonden ---------- */
+  function laadMijn() {
+    api('/api/avond/mijn', {}).then(function (j) {
+      if (j._fout) return meld(j._fout);
+      $('#mijnLijst').innerHTML = (j.avonden || []).map(function (a) {
+        return '<div class="stap"><div class="tijd">' + esc(a.datum || '') + '</div><div>' +
+          '<span class="nm">' + esc(a.titel) + '</span>' +
+          '<div><span class="staat ' + esc(a.staat) + '">' + esc(a.staat) + '</span></div>' +
+          '<div class="reden">' + esc(a.zekerheid) + '</div></div>' +
+          '<div class="pr">' + euro(a.budget.perPersoon) + ' p.p.</div></div>';
+      }).join('') || '<p class="sub">Er staat nog geen avond gepland.</p>';
+    });
+  }
+
+  /* ---------- de Hospitality DNA ---------- */
+  function laadDna() {
+    api('/api/avond/voorkeuren', {}).then(function (j) {
+      if (j._fout) return meld(j._fout);
+      $('#dna').innerHTML = j.profiel.soorten.map(function (s) {
+        return '<div style="padding:.6rem 0;border-bottom:1px solid var(--line);">' +
+          '<label class="lbl" for="v_' + esc(s.id) + '">' + esc(s.label) + '</label>' +
+          '<input id="v_' + esc(s.id) + '" maxlength="160" value="' + esc(s.waarde) +
+          '" placeholder="' + esc(s.uitleg) + '">' +
+          '<div class="rij" style="margin-top:.4rem;">' +
+          '<label class="wr" for="d_' + esc(s.id) + '">Delen: ' + esc(s.label) + '</label>' +
+          '<select id="d_' + esc(s.id) + '" style="width:auto;">' +
+          j.profiel.standen.map(function (st) {
+            return '<option value="' + esc(st) + '"' + (st === s.delen ? ' selected' : '') + '>' + esc(st) + '</option>';
+          }).join('') + '</select></div></div>';
+      }).join('');
+    });
+  }
+
+  $('#bDna').addEventListener('click', function () {
+    var waarden = {}, delen = {};
+    document.querySelectorAll('[id^="v_"]').forEach(function (el) { waarden[el.id.slice(2)] = el.value; });
+    document.querySelectorAll('[id^="d_"]').forEach(function (el) { delen[el.id.slice(2)] = el.value; });
+    api('/api/avond/voorkeuren', { zet: { waarden: waarden, delen: delen } }).then(function (j) {
+      if (j._fout) return meld(j._fout);
+      meld('Opgeslagen. Zaken zien alleen wat je op "altijd" hebt gezet, plus wat je per keer meegeeft.', true);
+    });
+  });
+
+  function actieveTab() {
+    var b = document.querySelector('[role="tab"][aria-selected="true"]');
+    return b ? b.getAttribute('data-tab') : 'plannen';
+  }
+  document.querySelector('.tabs').addEventListener('click', function (e) {
+    var t = e.target.getAttribute && e.target.getAttribute('data-tab');
+    if (!t) return;
+    document.querySelectorAll('[role="tab"]').forEach(function (b) {
+      b.setAttribute('aria-selected', String(b.getAttribute('data-tab') === t));
+    });
+    document.querySelectorAll('[data-paneel]').forEach(function (p) {
+      p.hidden = p.getAttribute('data-paneel') !== t;
+    });
+    $('#balk').hidden = t !== 'plannen' || !AVOND;
+    if (t === 'mijn') laadMijn();
+    if (t === 'voorkeuren') laadDna();
+  });
+
+  $('#bTerug').addEventListener('click', function () { history.back(); });
+  if (!TOKEN) meld('Log in bij RTG om een avond te plannen.');
+})();
+</script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+</body>
+</html>

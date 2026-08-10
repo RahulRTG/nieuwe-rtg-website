@@ -1,0 +1,57 @@
+{
+  "uitleg": "Landpakketten: wat er nodig is om RTG in een land aan te zetten, als gegevens. Hier staat ALLEEN wat nergens anders staat -- de munt, de voertaal, welke functies daar dicht moeten en wat er mensenwerk blijft. Wat het huis al weet, staat niet nog een keer hier: de btw-tarieven, het minimumuurloon en de werkgeverslasten komen uit server/kern/fiscaal/landen.js (189 landen), de muntschaal uit server/kern/payroll/valuta.js en de loontabellen uit de regelpakketten. Een tweede kopie van die kennis zou binnen een jaar iets anders beweren dan de eerste.",
+  "vastgelegd": "2026-08-09",
+  "let": "Een pakket dekt de INRICHTING en nooit de naleving. Een land aanzetten betekent niet dat RTG daar btw-plichtig geregistreerd is, dat er een loonaangifte loopt of dat een toezichthouder akkoord is. Die drie staan per pakket als mensenwerk, en ze blijven mensenwerk.",
+  "pakketten": [
+    {
+      "land": "NL",
+      "naam": "Nederland",
+      "valuta": "EUR",
+      "taal": "nl",
+      "sluit": [],
+      "mensenwerk": [
+        "btw-registratie en het aangifteritme bevestigen",
+        "loonaangifte en de aansluiting bij de Belastingdienst",
+        "de bewaartermijnen in server/bewaarbeleid.js zijn op Nederlands recht geschreven; voor elk ander land moeten ze opnieuw gewogen worden"
+      ]
+    },
+    {
+      "land": "BE",
+      "naam": "België",
+      "valuta": "EUR",
+      "taal": "nl",
+      "sluit": [],
+      "mensenwerk": [
+        "btw-registratie (of de OSS-regeling) bevestigen",
+        "sociale zekerheid en de aansluiting bij een sociaal secretariaat",
+        "de bewaartermijnen opnieuw wegen tegen Belgisch recht"
+      ]
+    },
+    {
+      "land": "ES",
+      "naam": "Spanje",
+      "valuta": "EUR",
+      "taal": "en",
+      "sluit": [],
+      "mensenwerk": [
+        "IVA-registratie (modelo 303/390) bevestigen",
+        "loonaangifte en de aansluiting bij de Seguridad Social",
+        "een Spaanstalige vertaling; het pakket staat nu op Engels omdat er geen Spaanse vertaling ligt",
+        "de bewaartermijnen opnieuw wegen tegen Spaans recht"
+      ]
+    },
+    {
+      "land": "JP",
+      "naam": "Japan",
+      "valuta": "JPY",
+      "taal": "en",
+      "sluit": [],
+      "mensenwerk": [
+        "consumptiebelasting en de registratie als factuuruitgever",
+        "de yen heeft GEEN onderverdeling; elk scherm dat honderdsten aanneemt moet nagelopen worden (zie server/kern/payroll/valuta.js)",
+        "een Japanse vertaling",
+        "de bewaartermijnen opnieuw wegen tegen Japans recht"
+      ]
+    }
+  ]
+}

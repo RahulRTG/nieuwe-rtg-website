@@ -131,7 +131,11 @@
         <select id="velVan"><option value="hier">Huidige locatie</option></select>
         <label for="velZoek">Bestemming</label>
         <input id="velZoek" type="search" placeholder="Zoek een zaak, hotel of halte" autocomplete="off">
-        <select id="velNaar" style="margin-top:0.4rem;"><option value="">Kies een plek</option></select>
+        <!-- De keuzelijst die de zoekresultaten van hierboven toont. Hij hoort
+             bij hetzelfde label "Bestemming", maar een select kan geen tweede
+             `for` delen en heeft geen placeholder om op terug te vallen; zonder
+             eigen naam is hij voor een schermlezer een naamloos veld. -->
+        <select id="velNaar" aria-label="Bestemming kiezen uit de zoekresultaten" style="margin-top:0.4rem;"><option value="">Kies een plek</option></select>
         <p class="stil" id="velMeer"></p>
         <div class="duo">
           <div><label for="velReizigers">Reizigers</label><input id="velReizigers" type="number" min="1" max="60" value="1"></div>

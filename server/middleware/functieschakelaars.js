@@ -36,7 +36,11 @@ const ZIN = {
   land: 'Deze functie is in jouw land uitgeschakeld door de beheerder.',
   plaats: 'Deze functie is in jouw woonplaats uitgeschakeld door de beheerder.',
   persoon: 'Deze functie is voor jouw account uitgeschakeld door de beheerder.',
-  genre: 'Deze functie is voor dit genre zaken uitgeschakeld door RTG.'
+  genre: 'Deze functie is voor dit genre zaken uitgeschakeld door RTG.',
+  /* De canary is geen storing en geen straf: de functie wordt uitgerold en is
+     nog niet aan iedereen toe. Dat hoort er ook zo te staan -- "uitgeschakeld
+     door de beheerder" zou een supportvraag opleveren die nergens over gaat. */
+  canary: 'Deze functie wordt stap voor stap uitgerold en staat nog niet voor iedereen open.'
 };
 
 function schakelaars({ db, accounts, functies, sessionFor, findSupplier, wachter }) {

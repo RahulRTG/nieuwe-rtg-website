@@ -17,6 +17,7 @@ public/            alles wat de browser laadt (de webroot die de server serveert
     ├── personeel.html     personeels-app (rooster, taken, walkie-talkie, SOS)
     ├── leverancier.html   werkgevers-app (alle genres)
     ├── boardroom.html     persoonlijke boardroom (functies aan/uit, ouderbeheer)
+    ├── command.html       RTG Command: het RTG- en RTF-kantoor als één app
     ├── backoffice.html    RTG-backoffice
     ├── kantoren.html      RTG-kantoren + de boardroom-kamers (o.a. RTG Bank en RTG Stad)
     ├── bank.html          RTG Bank voor het lid (alleen zichtbaar als de boardroom hem live zet)
@@ -1696,6 +1697,181 @@ Vandaar de **zetel**: uitgedeeld vanuit de boardroom, gekoppeld aan een echte pe
 Alles wat de balie wél doet — een dossier openen, een codenaam natrekken — gaat door het **bestaande** inzagejournaal (`server/inzagelog.js`), met de zetel als "wie" en de opgegeven aanleiding als "waarom". Bewust geen eigen logboek: een tweede journaal is een journaal dat bij een audit wordt vergeten. Ook zoeken telt als inzage, ook als er niets uitkomt — wie een codenaam natrekt om te zien óf hij bestaat, doet precies wat het journaal moet vastleggen.
 
 Kern: `server/kern/ledenbalie.js`, routes `/api/office/balie/{zetels,zetel,zoek,dossier,herstel,klacht,klacht/status,abo}`, getoetst in `test/ledenbalie.test.js`.
+
+## RTG Command: het kantoor als één app
+
+Het RTG- en RTF-kantoor was een verzameling schermen: de backoffice, de kamers, het RTF-kantoor, de meldkamer, de techniek, de Office-suite. Elk scherm kende zijn eigen hoek van het platform, en niemand kende het geheel. **`/apps/command.html`** is die verzameling als één app — niet door er een menu overheen te leggen, maar door er één objectmodel onder te schuiven.
+
+**Het register is de spil.** `server/kern/command/register.js` zegt welke objectsoorten er zijn, waar ze wonen en hoe ze heten. De zoekbalk leest hem, het objectdossier leest hem, de runbooks schrijven alleen via hem, en de puls telt eruit. Een soort erbij is één regel erbij; niemand hoeft de zoekbalk aan te raken. Dat is de reden dat dit een tabel is en geen veertig if-takken: een belofte als "één zoekbalk voor letterlijk alles" die per soort een eigen tak vraagt, is binnen twee maanden stil onwaar.
+
+**De ontwerpregel, in elke module: handmatig, assisted, autonoom.** Welk van de drie geldt is nooit een eigenschap van de knop maar een uitkomst van `risico.js` uit het beleid van dat moment. Dezelfde handeling is autonoom bij één geval en mensenwerk bij honderd; de score draagt altijd zijn opbouw, zodat een mens kan zien *waarom* iets naar hem is gerouteerd — en het kan bestrijden.
+
+**De operator.** Een vraag in gewone taal wordt een gemeten plan: hoeveel gevallen, welke oorzaken, hoeveel de machine veilig mag doen, wat een mens moet beoordelen. De oorzaakgroepering (`oorzaak.js`) *meet* welk veld de gevallen het strakst clustert in plaats van een tabel "wat verklaart wat" te raadplegen; vindt hij niets dat bijna alles verklaart, dan zegt hij dat er geen gedeelde oorzaak is. Daarna is er één knop: doe de veilige gevallen, en de uitzonderingen worden zaken met eigenaar, termijn en bewijs. De AI verwoordt hooguit — zonder API-sleutel werkt alles hetzelfde, alleen is de zin dan door ons geschreven.
+
+**Schrijven kan maar op één manier.** Elke wijziging die Command aan gegevens maakt, loopt door een runbook: een veld op een object van een bekende soort krijgt een nieuwe waarde, en de oude waarde gaat mee in de ronde. Terugdraaien is daarmee geen extra code maar hetzelfde mechanisme omgekeerd — en het slaat over wat iemand anders sindsdien heeft gewijzigd, zodat een terugzetting nooit stilletjes andermans werk wist. Velden die een identiteit, een bedrag of een recht dragen staan op slot (`BEVROREN`) en worden bij het uitvoeren gecontroleerd, niet bij het opschrijven.
+
+**Beleid is een gegeven, geen code.** Prijzen, grenzen, budgetten en de risicodrempels staan in één register met versies, herkomst en reden. Zware regels vragen twee paar ogen — en wie voorstelt kan niet zelf goedkeuren, afgedwongen op de server omdat een grendel die alleen in de knop zit er niet is. Terugzetten is de vólgende versie en niet het wissen van de vorige. Naast elke regel staat een proef die met een schaduw-beleid doorrekent wat de nieuwe waarde met de routering doet, zonder iets te zetten.
+
+**Het journaal is een keten.** Elke handeling van mens én machine draagt oude toestand, nieuwe toestand, actor, reden en gebruikte regel, plus de hash van de vorige regel. `controleer()` wijst de eerste breuk aan; het scherm toont die uitslag bovenaan. De actor komt altijd uit de sessie en nooit uit de body — wie met de gedeelde kantoorcode binnenkomt heet `kantoor (gedeelde code)`, en daarmee vallen vier-ogen-goedkeuringen en zware rechten vanzelf om.
+
+**Zware rechten verlopen vanzelf.** Tijdelijke bevoegdheid, mandaat en de nooddeur (break-glass) hebben allemaal een `tot`; er is niets dat blijft staan, dus er valt ook niets te vergeten in te trekken. De nooddeur vraagt een volledige reden en staat als zwaarste handeling in het journaal.
+
+**En de meter waarop dit kan zakken.** Het werkbesparingsbord telt handminuten per duizend handelingen, de automatiseringsgraad per werkstroom en de lekken: veel volume dat nog nooit autonoom liep. Dalen die getallen niet, dan is er geen automatisering bijgekomen maar een dashboard. De minutenprijzen zijn schattingen en dat staat in de uitslag — een meter die zijn eigen onzekerheid verzwijgt, wordt gebruikt alsof hij zeker is.
+
+De werkplek-tab opent de bestaande apps (Office, RTMail, Agenda, Meet, Bestanden, Personeel, Payroll, Balans, Techniek, RTF-kantoor …) vanuit dezelfde schil, met dezelfde inlog en dezelfde gegevens. Ze worden geopend, niet nagebouwd.
+
+Kern: `server/kern/command/` (register, zoek, object, oorzaak, operator, risico, runbooks, beleid, journaal, zaken, toezicht, toegang, puls, simulatie, werkbesparing), routes `/api/command/*` in `server/routes/command/`, frontend `public/apps/command/` (gebundeld naar `public/apps/command.js`), getoetst in `test/command.test.js`.
+
+## De Regie van de zaak: dezelfde logica, maar alleen over de eigen zaak
+
+RTG Command bestuurt het platform. Een partner heeft dat niet nodig en mag het niet zien -- hij heeft dezelfde soort laag nodig over **zijn eigen zaak**. Die staat in `server/kern/zaakcommand/` en hangt als werkgebied **Regie** in de zaak-app (`/apps/leverancier.html`) en als tegel **Regie** in de personeels-PDA (`/apps/personeel.html`).
+
+**De motoren zijn dezelfde, de gegevens niet.** Journaal, beleid, risico, uitzonderingen, runbooks, operator en werkbesparing komen uit `kern/command/`; ze kregen daarvoor twee haken. De eerste is het **register als parameter**: `zoek.js` en `object.js` importeren geen register meer maar krijgen er een. De tweede is het **vak**: elke motor slaat op in een object dat de aanroeper aanwijst. Zo heeft elke zaak zijn eigen hashketen, zijn eigen grenzen en zijn eigen lijst, met één implementatie eronder.
+
+**De scope heeft twee assen, en de tweede kwam er door een lek.** De eerste versie scoopte alleen op de zaak — en toen kon een ober via de zoekbalk de verlofaanvragen en sollicitaties van zijn collega's lezen, gegevens die overal elders achter `managerOnly` staan. De reparatie is **weglaten en niet filteren**: een soort met `as: 'leiding'` staat niet in het register van een medewerker. Hij is er niet, dus geen enkele lezer kan hem vinden — ook de afhankelijkhedenscan niet, die álle soorten langsloopt. Een filter had op één van die lezers vergeten kunnen worden. `leiding` staat standaard op false: wie de vlag vergeet ziet te weinig, en dat is de goede kant om fout te gaan.
+
+**Isolatie is bouw, geen belofte.** De zaakcode komt uitsluitend uit de sessie (`supplierAuth` zet `req.supplier` uit `sess.code`); geen enkele route in dit domein leest een code uit de body. Het register van een zaak kent alleen de eigen soorten, en elk van die soorten draagt zijn eigen `lees()` die op de zaakcode sluit. Zoeken op de code van de buurman levert daarom niet "niets gevonden na filtering" op maar niets, omdat er niets te vinden is.
+
+**De recepten verzinnen geen werkelijkheid.** Dat is bij een zaak een scherpere eis dan bij het platform: een bestelling op "in bereiding" zetten omdat hij te lang op "nieuw" staat, zou betekenen dat het systeem zegt dat de keuken begonnen is terwijl niemand iets deed. Wat de vier recepten wél doen is administratieve drift rechtzetten: een bestelling waarvan alle stations "klaar" melden maar de status achterliep, een ritstatus van vóór de huidige keten (`rijdt` → `aan-boord`), een bevestigde boeking waarvan de datum allang voorbij is, een klus die als opgelost is gemarkeerd maar nog openstaat. Alles wat de zaak moet *beslissen* — een boeking bevestigen, een chauffeur toewijzen, verlof toekennen — is geen recept maar een **signaal** dat een uitzondering wordt met eigenaar, termijn en bewijs.
+
+**Die signalen bestonden al, met de hand geschreven.** Ze stonden als `alerts` in `routes/supplier/backoffice.js`. Dat werkte zolang er één lezer was; met de Regie erbij zouden er twee bijna-gelijke lijsten zijn geweest. Ze staan nu één keer, in `kern/zaakcommand/signalen.js`, en de backoffice leest dezelfde bron — met hetzelfde antwoord als voorheen, tweetalig en al.
+
+Kern: `server/kern/zaakcommand/` (register, runbooks, signalen, index), routes `/api/supplier/command/*` in `server/routes/zaakcommand/`, scherm `public/shared/zaakcommand/` (gebundeld naar `public/shared/zaakcommand.js`, gedeeld door beide apps), schakelbaar als `zaakregie` en `zaakregie-beheer`. Getoetst in `test/zaakcommand.test.js` (acht beweringen, vier mutaties) en `test/zaakregie.e2e.js` (beide schermen in een echte browser).
+
+### De drie bureau-PDA's draaien op één werking
+
+`studio-pda.html` (198 regels), `hardware-pda.html` (199) en `architect-pda.html` (184) waren drie kopieën van hetzelfde ontwerp. Na het normaliseren van de bureaunaam verschilden ze 54 tot 73 regels — en dat waren geen drie ontwerpen maar één dat uit elkaar was gelopen: de studio kreeg de nieuwe deelmenu-stijl voor de disciplinerij, de architect bleef op de oude pillen; de studio nam elf kolommen mee bij het uitvoeren, de hardware zeven en de architect acht, met verschillende namen voor hetzelfde; de architect laadde `deur.js` in de kop en de andere twee in de body. Zo'n verschil merkt niemand, want niemand opent drie apps naast elkaar.
+
+De werking staat nu één keer in **`public/shared/bureaupda.js`**. Wat per bureau verschilt — de naam, de brief-hint, de twee velden waarmee een concept wordt samengevat (silhouet/aandrijving, behuizing/chip, typologie/constructie) en de kolommen van het register — staat daar als **gegeven** in één tabel. Een vierde bureau is een regel in die tabel plus een pagina van tachtig regels.
+
+De drie paden blijven bestaan als echte apps met hun eigen gids-ingang en hun eigen deur: er wordt vanuit `kantoren.html` drie keer naar gelinkt en er staat een toets op hun deur (`test/kantoordeuren.e2e.js`). Ze vervangen door een doorverwijzing zou werk kapotmaken om iets op te ruimen wat niemand stoorde.
+
+Getoetst in `test/bureaupda.e2e.js`: alle drie komen op met hun eigen bureau, elk spreekt alleen zijn eigen endpoints aan (de fout die je bij een samengevoegde werking het eerst zou maken), en alle drie dragen nu dezelfde disciplinerij.
+
+### Het belofteregister: wat is toegezegd, en waar staat het
+
+Op de vraag "maak alles wat er nog niet is" is hier twee keer het verkeerde antwoord gegeven. De eerste keer werd alleen de bovenste maplaag gescand en kwamen RTG Sheets, Slides en Forms als ontbrekend terug — ze staan in `public/apps/office/`. De tweede keer kwamen CRM en BI als ontbrekend terug, terwijl CRM als `server/bedrijf/klant.js` bestaat (met gewogen pijplijn en een verplichte verliesreden) en de voorspellaag als `server/kern/voorspel/`.
+
+Twee keer fout op dezelfde vraag betekent niet dat er beter gezocht moet worden. Het betekent dat er geen bron was om in te kijken. Dit huis heeft `GRENZEN.json` voor domeingrenzen, `NORM.json` voor meters, `BEWIJS.md` voor wat de toetsen beweren en `ARCHITECTUUR.md` voor de kaart — maar niets dat zei wat er is *beloofd* en waar dat staat.
+
+**`BELOFTE.json`** is die bron; `npm run belofte` schrijft er `BELOFTE.md` uit. Elke belofte draagt haar dekking — bestandspaden en API-paden — en het script kijkt na of die er echt zijn:
+
+- **gedekt** — elk bewijsstuk bestaat;
+- **open** — nog geen dekking: werkvoorraad, en dat mag;
+- **gebroken** — er wordt verwezen naar iets dat er niet (meer) is.
+
+Die laatste is de enige alarmerende stand, en de reden dat het register bestaat: een belofte die nog open staat weet iedereen, maar een belofte die ooit waar was en stil verdween mist niemand. Bij het opschrijven sloeg hij meteen drie keer aan — drie paden wezen naar modules die ergens anders bleken te wonen. Keuringsregel 41b houdt het bestand actueel en laat de keuring zakken op elke gebroken belofte; `test/belofte.test.js` toetst de meter zelf met een bewijsstuk dat niet bestaat, want een meter die je niet hebt zien uitslaan meet niets.
+
+Wat het register **niet** doet, is kwaliteit beoordelen. Dat een bestand bestaat, zegt niet dat de belofte goed is ingelost; daarvoor is `BEWIJS.md` er en de toetsen die daaronder liggen.
+
+### Gegevenskwaliteit en de kennisgraaf: één meting, twee vragen
+
+Twee van de open beloften zijn dicht, en ze delen hun fundament. `kern/command/kwaliteit.js` meet welk veld in de praktijk naar welke soort verwijst — er is geen tabel die zegt "orders.supplierCode wijst naar zaken", want zo'n tabel veroudert zodra er een collectie bij komt en controleert dan precies de nieuwe velden niet. Uit die ene meting komen twee dingen:
+
+- **de wezen** — rijen waarvan de verwijzing nergens aankomt. Naast dubbele sleutels en rijen zonder sleutel vormt dat de kwaliteitslaag: niet wat er *verkeerd* staat (daar zijn de runbooks voor) maar wat er *kapot* is. Een dubbele sleutel is geen bedrijfsprobleem maar een administratieprobleem, en het valt zelden op — tot iemand op de verkeerde rij klikt.
+- **de randen** van `kern/command/graaf.js` — de kennisgraaf. Het objectdossier beantwoordt één stap ("wie verwijst naar dit object"); de graaf beantwoordt de vraag erachter: hoe hangt dit samen, en wat ligt er twee stappen verderop.
+
+De drempel ligt op 80%: een veld dat vier van de vijf keer een bestaande sleutel raakt, is een verwijzing met vier wezen; een veld dat de helft van de tijd raak is, is waarschijnlijk toeval en wordt niet gecontroleerd. Liever een wees missen dan een half platform als kapot melden — daar staat een toets op.
+
+**Zeker en vermoed staan apart.** Een dubbele sleutel is een feit. Een waarde die één keer voorkomt terwijl de rest tientallen keren hetzelfde zegt, is een vermoeden (typefout, oude naam) en telt niet mee als defect. Een meter die vermoedens als feiten telt, wordt terecht genegeerd.
+
+Beide lagen draaien op het register dat ze meekrijgen, dus de zaak-kant krijgt ze gratis en volledig gescoped: de graaf loopt juist wél door en zou ongescoped het gevaarlijkste stuk zijn. In RTG Command staan ze als werkplekken **Kwaliteit** en **Kennisgraaf**; in de zaak achter de managergrens.
+
+### De laatste acht beloften, en wat ze bewust níet doen
+
+Het belofteregister staat op **65 gedekt, 0 open, 0 gebroken**. De acht die als laatste dichtgingen raken uitrol, migratie en meerdere omgevingen — precies het gebied waar een knop makkelijk mooier is dan de werkelijkheid. Wat elk van ze weigert te doen is daarom net zo belangrijk als wat het doet.
+
+| Laag | Wat het doet | Wat het bewust niet doet |
+|---|---|---|
+| **Canary** (`kern/command/canary.js`) | een functie uit de schakelkast gefaseerd openzetten, met een terugroldrempel op dezelfde tellers als de servicedoelen | niet wegen als de nulmeting kwijt is (na een herstart); anoniem verkeer valt nooit in een canary |
+| **Zandbak** (`zandbak.js`) | dezelfde motoren op een DB-venster met zaaigegevens, met eigen journaal en beleid | geen productierijen kopiëren; geen tweede installatie — alleen de motoren van Command, niet de app-routes |
+| **Master data** (`mdm.js`, `mdmsamen.js`) | gemeten dubbelen over bedrijven en locaties, met een gouden record per veld | nooit vanzelf samenvoegen; nooit iets wissen (verliezers houden een verwijzing) |
+| **Overname** (`overname.js`) | inlezen → afbeelden → droogloop → uitvoeren, met terugdraaien per partij | niets overschrijven (een bestaande sleutel is een botsing); niet uitvoeren zonder het zegel van de bekeken droogloop |
+| **API-poort** (`apipoort.js`) | sleutels, scopes, quota en uitfasering op `/api/extern/` | niets ontsluiten: de toelating begint leeg; scopes buiten de toelating worden geweigerd en niet stil ingeperkt |
+| **Landpakketten** (`LANDEN.json`, `landpakket.js`) | munt, voertaal en schakelkaststand per land, geleund op wat het huis al weet | geen naleving: btw-registratie en loonaangifte blijven mensenwerk, en die lijst wordt niet korter door te activeren |
+| **Stadsstart** (`stadstart.js`) | een stad met land, genormaliseerde naam en per-plaats-standen | niet doen alsof het weefsel meerdere steden draagt; die stap blijft openstaan met de reden erbij |
+| **Chaosproef** (`scripts/chaos.js`) | een eigen trio starten en de **actieve** server met SIGKILL omleggen, en meten | niet op productie te richten; "geen onderbreking gemeten" nooit als "geen onderbreking" tonen |
+
+Twee dingen die door deze ronde heen lopen. **Een nulmeting die je kwijt bent, is geen nul** — de canary weigert te wegen na een herstart, want doorrekenen zou een negatief foutaantal geven en dus altijd groen. En **een grens weigert, hij perkt niet stil in** — de API-poort maakt geen half-ingeperkte sleutel, want dan denkt een koppeling ergens bij te mogen en merkt hij pas in productie van niet.
+
+De chaosproef leverde het eerste gemeten failover-cijfer op: SIGKILL op de actieve server, 535 verzoeken op 25 ms, **0 mislukt**. Dat staat in `SLO.md` naast de herstelmeting, met het voorbehoud erbij dat "geen onderbreking gemeten" iets anders is dan "geen onderbreking".
+
+### Het stadsweefsel draagt meer dan één stad
+
+De boom van het weefsel begint bij `stad` en is vijf niveaus diep, dus **meerdere wortels pasten er altijd al in**. Wat ontbrak waren drie dingen, en ze waren geen van drieën zichtbaar zolang er één stad was:
+
+1. **Niemand bouwde er een tweede.** `zorgGeografie()` stopte zodra er iets stond.
+2. **De bevragingen kenden geen stad.** `namen('zone')` gaf de zones van alles bij elkaar. Dat leest als één stad zolang er één is, en is stilzwijgend fout zodra er twee zijn — een veldploeg ziet dan zones die duizend kilometer verderop liggen. Dit is de gevaarlijkste van de drie, want er gaat niets kapot: er staat gewoon te veel.
+3. **De grenzen waren die van Ibiza.** Elk punt werd getoetst aan de vaste rechthoek uit `kern/navigatie`, dus een gebied in een tweede stad viel per definitie "buiten de stadsgrenzen" en die stad kon nooit gevuld worden.
+
+`kern/stadsweefsel/steden.js` lost alle drie op: `stadErbij()` bouwt hetzelfde startraster (zes zones, drie buurten, drie wijken, twee straatsegmenten per zone) rond een eigen middelpunt met een eigen id-voorvoegsel, elke bevraging kent een stad-as, en de grenzen komen van de stad zelf. Twee steden mogen elkaar **niet overlappen** — dan hoort een punt bij allebei en gaan er twee ploegen naar dezelfde lantaarn.
+
+**Er wordt niets verhuisd.** De eerste stad houdt haar ids (`G-stad`, `G-marina`, `G-marina-laan`) letterlijk. Gegevens verplaatsen om een functie toe te voegen is de duurste manier om een fout te maken die je pas maanden later ziet.
+
+Daarmee kan de **stadsstart** de stap doen die hij eerder als openstaand moest melden: met een middelpunt bouwt hij het weefsel echt. Mislukt dat — geen middelpunt, een stad die overlapt — dan blijft de stap open staan met de reden erbij, en wordt hij niet groen gemeld. Wat mensenwerk blijft is eerlijker geworden in plaats van korter: de zes zones dragen generieke namen die hernoemd horen te worden, en er ligt geen wegennet onder een tweede stad.
+
+Twee echte fouten kwamen onderweg boven, allebei gevonden door een toets en geen van beide door een lezer:
+
+- Bij het opknippen viel `zorgGeografie()` uit `stadErbij()` weg. Wie een tweede stad aanmaakte vóórdat er ooit een zone was opgevraagd, kreeg een platform waarin de **eerste stad nooit meer werd gezaaid**.
+- `stadId()` gaf `null` voor zowel "geen stad gevraagd" als "een stad gevraagd die niet bestaat". Een vraag naar de zones van een nog niet gebouwde stad gaf dus de zones van **alle** steden terug — en de stadsstart las dat als "zes zones" en meldde de weefselstap groen terwijl er niets stond.
+
+### De norm is weer een norm
+
+`npm run norm` stond rood: elf meters waren weggelopen sinds 8 augustus, terwijl er een hele bestuurslaag bij kwam. Ze zijn met de hand vastgezet in `NORM.json` — niet met `--vastleggen`, want dat tilt ook meters op die niemand heeft aangeraakt — en met een geschreven reden per post, zoals dat bestand zelf voorschrijft: *"Herstel het, of verlaag de norm met de hand — dan staat het als bewuste keuze in de historie."*
+
+Eerst gerepareerd wat te repareren was:
+
+- **`endpointsZonderTest` 1188 → 1158** door `test/commandlagen.test.js`: elke nieuwe laag krijgt daar een echte route-aanroep plus een 401-controle zonder sessie. Die toets vond meteen een fout die geen enkele motortoets kon zien — `stadstart` eiste alleen dat er een landpakket *bestond*, terwijl zijn eigen foutmelding belooft dat het land is *ingericht*.
+- **`inlineStijlAttributen` 5871 → 5850** door de `style=""`-attributen uit de nieuwe schermen te halen; er staan nu vier veldbreedte-klassen in `command.html`. Dat is geen smaak: elk style-attribuut houdt `style-src-attr` open in de CSP.
+
+Bewust vastgelegd en niet gerepareerd: negen servermodules staan echt over de 10 kB-grens, en **geen ervan is in dit werk ontstaan** (`server.js`, `kern/comm/`, `opzet/kernlaag4.js`, `livinglab/kader.js`, `routes/auth.js`, …). Vastleggen is daar geen goedkeuring maar het weer laten werken van de meter; ze blijven werkvoorraad. Datzelfde geldt voor `toetsenNietGemeten`: de veertien nieuwe toetsbestanden zijn wél met de hand gemuteerd (27 mutaties, alle 27 raak, per bestand in de kop genoteerd), maar de mutatiemotor is er niet langs geweest — en dat wordt hier niet als hetzelfde geteld.
+
+### Het alarm: piepen op verandering, niet elke ronde
+
+`SLO.md` noemde het sinds de eerste versie als zijn tweede gat: de cijfers worden gemeten en het foutbudget wordt bijgehouden, maar er gaat niemand piepen. `kern/command/alarm.js` is die piep, en hij **meet niets zelf** — elke controle leest een laag die er al is (servicedoelen, sonde, canary, gegevenskwaliteit, de hashketen van het journaal). Een alarm met een eigen meting zegt op een dag iets anders dan het scherm waar het over gaat, en dan gelooft niemand meer welk van de twee.
+
+De drempels staan in `SLO.json`, de controles in de module. Dat is een bewuste knip: getallen horen in gegevens, maar een regeltaal in een configuratiebestand is een tweede implementatie die je niet kunt toetsen.
+
+Het belangrijkste is het ritme. Er gaat een regel in het journaal en een sein naar het kantoorbord bij het **ontstaan** en bij het **oplossen**, en daartussen niet meer — een melding die elke dertig seconden terugkomt leert mensen om hem weg te klikken, en dan is de volgende, echte melding ook weg. Stilzetten kan, met een maximum en een reden; die stilte staat zelf ook in het journaal, want anders is achteraf niet te zien dat iemand het heeft weggeklikt.
+
+Wat er **niet** gebeurt: geen mail, geen telefoonmelding. Dat is een kanaalbesluit met een piket eraan vast, en dat hoort niet stilzwijgend ingebouwd te worden. De uitgangen die er zijn, staan in de uitslag.
+
+### Herkomst: dezelfde meting, en bij elk antwoord hoe hard het is
+
+`kern/command/herkomst.js` is de derde vraag op die ene meting. Per soort: waar het naartoe wijst, wie eraan mag schrijven (de runbookcatalogus), wie het werkelijk deed (het journaal), hoe lang het blijft (`server/bewaarbeleid.js`) en wat er wees wordt als het verdwijnt.
+
+Twee dingen maken het meer dan een plaatje.
+
+**Elk antwoord draagt zijn aard** — *gemeten* (uit de gegevens zelf), *aangegeven* (uit een tabel die een mens schreef, met erbij wélke tabel) of *afgeleid* (gerekend uit die twee). Door elkaar getoond krijgt het geheel de betrouwbaarheid van het zwakste deel, en kan niemand zien welk deel dat is.
+
+**Stilte is geen bewijs.** Het journaal ziet alleen wat via RTG Command is gegaan; de gewone app-routes en de leverancierskant lopen er niet doorheen. "Geen schrijver" betekent hier dus niet "hier schrijft niemand in" — en precies die verwarring is hoe iemand iets weggooit waar wel degelijk aan wordt geschreven. Die zin staat bovenaan het scherm, niet in een voetnoot.
+
+De zaak-kant draait dezelfde module op haar eigen register, journaal en receptenboek, maar **zonder bewaarbeleid**: die tabel is van RTG. Een ondernemer een termijn tonen die hij nooit heeft afgesproken is erger dan hem geen termijn tonen, dus staat er dan "geen termijn" — en dat is waar. Werkplek **Herkomst** onder Zien; in de zaak achter de managergrens.
+
+### Servicedoelen en de sonde: de meter die niet geruststelt
+
+`SLO.md` beschreef sinds de eerste versie wát wij onszelf opleggen, en noemde er even eerlijk bij wat eronder ontbrak. Twee van die gaten zijn nu dicht.
+
+**De norm staat in `SLO.json`.** Daar leest `kern/command/slo.js` hem, en de tabel in `SLO.md` is een afdruk die door `npm run slo` wordt geschreven; `npm run check` regel 43 maakt de keuring rood zodra die afdruk achterloopt. Een streefwaarde die op twee plaatsen staat, staat er binnen een maand twee keer anders — en dan is het document dat een mens leest het verkeerde van de twee.
+
+**Het foutbudget wordt bijgehouden**, per doel: hoeveel storingsminuten er in de marge tussen streefwaarde en 100% passen, hoeveel daarvan verbruikt is, en de brandsnelheid. Boven de 1 is het budget op vóórdat het venster om is. Zolang er budget over is mag er uitgerold worden; is het op, dan gaat de aandacht naar stabiliteit. Dat is de hele reden dat een foutbudget bestaat: het maakt de afweging tussen snelheid en stabiliteit een cijfer in plaats van een discussie.
+
+**Maar het gevaarlijkste geval is niet "niet gehaald", het is "niets gemeten".** De tellers in `server/meting.js` beginnen bij elke herstart op nul. Een vers proces met drie verzoeken en nul fouten staat rekenkundig op 100% beschikbaar, en dát als "doel gehaald" tonen is de duurste leugen die dit scherm kan vertellen. Vandaar een derde uitslag naast gehaald en niet gehaald: **onvoldoende gemeten**, met een eigen kleur en de reden erbij, zolang er minder dan 200 verzoeken zijn of over minder dan 5% van het venster is gemeten. Die uitslag houdt de uitrol bewust *niet* tegen — een slot dat na elke herstart een dag dichtzit, wordt omzeild in plaats van gebruikt.
+
+Snelheidsdoelen geven om dezelfde reden een **bovengrens en geen punt**: de duur zit in een histogram met vaste emmers, dus het eerlijke antwoord is "p90 ligt op of onder 0,25 s" en niet een kommagetal dat er niet in zit.
+
+**De sonde** (`kern/command/sonde.js`) loopt de reizen uit `SLO.json`: `/api/health`, `/api/ready`, de voordeur, het publieke aanbod, en een inlogpoging die **met opzet verkeerd inlogt** en een afwijzing verwacht — de sonde toetst dat het pad antwoordt, niet dat hij binnenkomt. Een 200 daar zou een bevinding zijn en geen succes.
+
+Binnen en buiten staan apart en worden nergens opgeteld:
+
+| Kant | Hoe | Wat het bewijst |
+|---|---|---|
+| **binnen** | `POST /api/command/sonde/draai` | de HTTP-laag antwoordt — niet dat een klant erbij kan |
+| **buiten** | `node scripts/sonde.js https://host --melden --token=…` op een andere machine, terug via `POST /api/sonde/melding` | TLS, DNS, de reverse proxy en het netwerk zitten erin |
+
+Die meldingsingang is de enige route in Command zonder kantoorinlog, want hij bestaat juist voor een machine waar geen sessie is. Hij zit achter **dezelfde poort als `/api/metrics`** (`server/meetpoort.js`, token of intern adres, 404 in plaats van 403) — die poort stond in `routes/meting.js` met het commentaar "zodat er niet per ongeluk een tweede, lossere deur ontstaat", en dit wás die tweede deur, dus staat hij nu op één plek. En de kant van een melding staat vast op *buiten*: een melder die zijn eigen kant mag kiezen, kan het strenge cijfer opvullen met makkelijke metingen.
+
+Wat er **niet** is en in `SLO.md` blijft staan: een cron die de sonde elke minuut van buitenaf start (een inrichtingsbesluit op een machine buiten deze repo), alertregels, en een gemeten basislijn in plaats van verstandig gekozen streefwaarden.
 
 ## Veiligheid & verbinding: vier apps op één ruggengraat
 

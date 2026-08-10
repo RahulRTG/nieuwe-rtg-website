@@ -167,10 +167,35 @@ function samenvatting() {
   };
 }
 
+/* De ruwe reeksen als gegevens, voor de SLO-meter (kern/command/slo.js).
+
+   Dit is GEEN tweede telling maar een derde vorm van dezelfde tellers: tekst()
+   maakt er Prometheus van, samenvatting() maakt er één regel van, en dit maakt
+   er de losse reeksen van omdat een servicedoel per route en per statusklasse
+   moet kunnen kiezen. Wie hier zelf zou gaan tellen, zou binnen een maand iets
+   anders zeggen dan /api/metrics. */
+function reeksen() {
+  const verzoeken = [];
+  for (const [k, n] of staat.verzoeken) {
+    verzoeken.push({
+      methode: k.slice(0, k.indexOf(' ')),
+      route: k.slice(k.indexOf(' ') + 1, k.lastIndexOf(' ')),
+      status: k.slice(k.lastIndexOf(' ') + 1),
+      aantal: n
+    });
+  }
+  const duur = [];
+  for (const [k, d] of staat.duur) {
+    duur.push({ methode: k.slice(0, k.indexOf(' ')), route: k.slice(k.indexOf(' ') + 1),
+      emmers: d.emmers.slice(), som: d.som, aantal: d.aantal });
+  }
+  return { gestart: staat.gestart, emmers: EMMERS.slice(), verzoeken, duur };
+}
+
 function wis() {
   staat.verzoeken.clear(); staat.duur.clear(); staat.fouten.clear();
   staat.open = 0; staat.gestart = Date.now();
 }
 
-module.exports = { middleware, telVerzoek, telFout, tekst, samenvatting, wis, EMMERS, statusKlasse,
+module.exports = { middleware, telVerzoek, telFout, tekst, samenvatting, reeksen, wis, EMMERS, statusKlasse,
   lusVertraging, lusWis };

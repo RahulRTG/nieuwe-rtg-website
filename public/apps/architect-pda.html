@@ -9,7 +9,6 @@
   <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/rosthema.css" rel="stylesheet">
 <script src="/shared/glyf.js"></script>
-<script src="/shared/deur.js"></script>
 <script src="/shared/levendekleur.js" defer></script>
 <script src="/shared/rosthema.js" defer></script>
 <link href="/shared/rtg-ui.css" rel="stylesheet">
@@ -32,11 +31,7 @@
   select.veld{color-scheme:dark;}
   .knop{background:var(--txt);color:#000;border:none;border-radius:11px;padding:.6rem .9rem;font:inherit;font-weight:600;font-size:.86rem;cursor:pointer;}
   .knop.stil{background:transparent;color:var(--txt);border:1px solid var(--line);font-weight:500;}
-  .chips{display:flex;gap:.4rem;overflow-x:auto;padding-bottom:.2rem;}
-  .chip{white-space:nowrap;background:var(--card);border:1px solid var(--line);border-radius:999px;padding:.35rem .8rem;font-size:.8rem;color:var(--txt);cursor:pointer;}
-  .chip.aan{background:var(--gold);color:#000;border-color:var(--gold);}
   .pil{font-size:.6rem;letter-spacing:.1em;text-transform:uppercase;border:1px solid var(--line);border-radius:999px;padding:.15rem .55rem;color:var(--muted);}
-  .swatch{width:1.6rem;height:1.6rem;border-radius:7px;border:1px solid var(--line);}
   .rij{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;}
   .sec{font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin:.2rem 0;}
   .leeg{color:var(--muted);font-size:.85rem;padding:.6rem 0;}
@@ -45,6 +40,15 @@
 <link href="/shared/ios.css" rel="stylesheet">
 </head>
 <body class="rtg-stijl">
+<!-- DIT SCHERM IS DUN GEWORDEN, EN DAT IS DE HELE WINST. De drie bureau-PDA's
+     (studio, hardware, architect) waren drie kopieën van hetzelfde ontwerp die
+     uit elkaar waren gelopen: andere chip-stijl, andere uitvoerkolommen, de
+     deur op een andere plek. De werking staat nu één keer in
+     /shared/bureaupda.js; wat dit bureau eigen is (naam, brief-hint, de twee
+     velden die een concept samenvatten, de kolommen) staat daar als gegeven in
+     één tabel. Een vierde bureau is een regel in die tabel plus een pagina als
+     deze. -->
+
 <header>
   <div class="ey">RTG Architectenbureau</div>
   <h1>Architect PDA</h1>
@@ -64,114 +68,9 @@
 </main>
 <div class="melding" id="melding" role="status"></div>
 <script src="/shared/uitvoer.js"></script>
-<script>
-const $ = s => document.querySelector(s);
-const esc = t => String(t==null?'':t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let TOKEN = null; try { TOKEN = localStorage.getItem('rtg_office_token'); } catch (e) {}
-/* De deur op de app zelf, in plaats van wegsturen. Wie hier uitgelogd komt
-   verloor met een location.replace() waar hij heen wilde: je landde op de
-   personeels-app zonder te zien welke app je had geopend (TAKEN 5.5). De
-   gedeelde poort toont wat deze app is en waar de inlog zit, met de weg terug
-   in de link. Laadt de poort onverhoopt niet, dan doen we alsnog wat we eerst
-   deden -- een dichte app zonder uitleg is erger dan een omweg. */
-function uitgelogd(){
-  var naar = '/apps/personeel.html?kantoor=1&terug=' + encodeURIComponent(location.pathname);
-  if (!window.RTGDeur) { location.replace(naar); return; }
-  /* Pas op de volgende tick tekenen. De deur vervangt #main, en dit script
-     bindt daarna nog listeners aan knoppen binnen #main -- die zijn dan weg en
-     dat gaf een reeks "Cannot read properties of null". De listeners hangen nu
-     netjes aan elementen die daarna verdwijnen: geen fout, en de deur staat er
-     zodra de pagina klaar is met opbouwen. */
-  setTimeout(function () {
-    var el = document.getElementById('main') || document.body;
-    RTGDeur.toon(el, { soort: 'personeel', naar: naar });
-  }, 0);
-}
-if (!TOKEN) uitgelogd();
-const api = (pad, body) => fetch('/api/office/' + pad, {
-  method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + TOKEN },
-  body: JSON.stringify(body || {})
-}).then(async r => { const d = await r.json().catch(() => ({})); if (!r.ok) { if (r.status === 401) uitgelogd(); throw new Error(d.error || 'Er ging iets mis.'); } return d; });
-function meld(t){ const m = $('#melding'); m.textContent = t; m.style.opacity = '1'; clearTimeout(m._t); m._t = setTimeout(() => m.style.opacity = '0', 2400); }
-
-let DATA = null, filter = '';
-async function laad(){
-  try { DATA = await api('architect'); } catch(e){ $('#pLijst').innerHTML = '<div class="leeg">'+esc(e.message)+'</div>'; return; }
-  const sel = $('#pCat');
-  if (!sel.options.length) sel.innerHTML = DATA.disciplines.map(c => '<option value="'+c.id+'">'+esc(c.label)+'</option>').join('');
-  render();
-}
-/* Meenemen: het ontwerpregister kent zijn eigen velden, dus geeft de app die
-   door in plaats van de gedeelde laag de kaarten van het scherm te laten
-   plukken -- daar staat een swatch en een afgeknipte regel, hier staan
-   discipline, status en typologie als losse kolommen. */
-if (window.RTGUitvoer) RTGUitvoer.bron(function(){
-  if (!DATA || !DATA.ontwerpen) return null;
-  return {
-    naam: 'ontwerpen',
-    kolommen: ['naam','discipline','project','huis','status','typologie','constructie','aangemaakt'],
-    rijen: DATA.ontwerpen.map(function(o){
-      const c = o.concept || {};
-      return [o.naam||'', o.disciplineLabel||o.discipline||'', o.collectie||'', o.huis||'',
-        o.status||'', c.typologie||'', c.constructie||'', String(o.at||'').slice(0,10)];
-    })
-  };
-});
-function statusPil(s){ const g = s==='realisatie'?'var(--gold)':(s==='archief'?'var(--muted)':'var(--txt)'); return '<span class="pil" style="color:'+g+';">'+esc(s)+'</span>'; }
-function volgende(s){ const i = DATA.statussen.indexOf(s); return (i>=0 && i < DATA.statussen.length-1) ? DATA.statussen[i+1] : null; }
-function render(){
-  $('#pFilters').innerHTML = '<button class="chip'+(filter===''?' aan':'')+'" data-f="">Alle</button>' +
-    DATA.disciplines.map(c => '<button class="chip'+(filter===c.id?' aan':'')+'" data-f="'+c.id+'">'+RTGGlyf.tekst(c.icon)+' '+esc(c.label)+(c.aantal?' ('+c.aantal+')':'')+'</button>').join('');
-  $('#pFilters').querySelectorAll('.chip').forEach(b => b.addEventListener('click', () => { filter = b.dataset.f; render(); }));
-  const lijst = DATA.ontwerpen.filter(o => !filter || o.discipline === filter);
-  $('#pLijst').innerHTML = lijst.length ? lijst.map(o => {
-    const c = o.concept; const nx = volgende(o.status);
-    return '<div class="kaart" style="margin-bottom:.7rem;">'+
-      '<div class="rij" style="justify-content:space-between;">'+
-        '<h2 style="font-size:1.02rem;">'+RTGGlyf.tekst(o.icon)+' '+esc(o.naam)+'</h2>'+statusPil(o.status)+'</div>'+
-      '<div style="font-size:.72rem;color:var(--muted);margin-bottom:.4rem;">'+esc(o.disciplineLabel)+(o.huis?' · '+esc(o.huis):'')+'</div>'+
-      (c ? '<div class="rij" style="margin-bottom:.4rem;">'+(c.kleuren||[]).map(k => '<span class="swatch" title="'+esc(k.naam)+'" style="background:'+esc(k.hex)+';"></span>').join('')+'</div>'+
-        '<div style="font-size:.82rem;line-height:1.55;"><b>'+esc(c.typologie)+'</b> · '+esc(c.constructie)+'</div>'
-        : '<div class="leeg">Nog geen concept.</div>')+
-      (o.kritiek ? '<div style="margin-top:.45rem;border-left:2px solid var(--gold);padding-left:.6rem;font-size:.8rem;line-height:1.5;">'+esc(o.kritiek)+'</div>' : '')+
-      '<div class="rij" style="margin-top:.6rem;">'+
-        '<button class="knop stil" data-concept="'+o.id+'">'+(c?'Herteken':'Teken')+'</button>'+
-        '<button class="knop stil" data-kritiek="'+o.id+'">Kritiek</button>'+
-        (nx?'<button class="knop" data-next="'+o.id+'" data-s="'+nx+'" style="margin-left:auto;">→ '+nx+'</button>':'')+
-      '</div></div>';
-  }).join('') : '<div class="leeg">Geen concepten in deze discipline.</div>';
-  bind();
-}
-function vervang(o){ const i = DATA.ontwerpen.findIndex(x => x.id === o.id); if (i>=0) DATA.ontwerpen[i] = o; render(); }
-function bind(){
-  document.querySelectorAll('[data-concept]').forEach(b => b.addEventListener('click', async () => {
-    b.disabled = true; b.textContent = 'Tekent...';
-    try { vervang((await api('architect/concept', { id: b.dataset.concept })).ontwerp); } catch(e){ meld(e.message); b.disabled = false; }
-  }));
-  document.querySelectorAll('[data-kritiek]').forEach(b => b.addEventListener('click', async () => {
-    b.disabled = true; b.textContent = '...';
-    try { vervang((await api('architect/kritiek', { id: b.dataset.kritiek })).ontwerp); } catch(e){ meld(e.message); b.disabled = false; }
-  }));
-  document.querySelectorAll('[data-next]').forEach(b => b.addEventListener('click', async () => {
-    try { vervang((await api('architect/zet', { id: b.dataset.next, status: b.dataset.s })).ontwerp); meld('Naar '+b.dataset.s); } catch(e){ meld(e.message); }
-  }));
-}
-$('#pMaak').addEventListener('click', async () => {
-  const naam = $('#pNaam').value.trim(); if (!naam){ meld('Geef het concept een naam.'); return; }
-  try {
-    const r = await api('architect/maak', { discipline: $('#pCat').value, naam, brief: $('#pBrief').value.trim() });
-    $('#pNaam').value = ''; $('#pBrief').value = '';
-    DATA.ontwerpen.unshift(r.ontwerp);
-    try { vervang((await api('architect/concept', { id: r.ontwerp.id })).ontwerp); } catch(e){ render(); }
-    meld('Concept aangemaakt; de chef-architect tekent het uit.');
-  } catch(e){ meld(e.message); }
-});
-/* Zonder kantoorsessie staat de deur er al; doorstarten levert dan
-   alleen 401-en op die de poort weer zouden overschrijven. */
-if (TOKEN) {
-  laad();
-}
-</script>
+<script src="/shared/deur.js"></script>
+<script src="/shared/bureaupda.js"></script>
+<script>RTGBureauPDA.start('architect');</script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 <script src="/shared/bediening.js" defer></script>

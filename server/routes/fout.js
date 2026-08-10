@@ -10,11 +10,23 @@
    vereist. Wat er tegenover staat: er wordt niets bewaard en niets uitgevoerd,
    alleen gelogd, en de rem hieronder houdt het klein. */
 module.exports = (kern) => {
-  const { app, express, tooManyTries } = kern;
+  const { app, tooManyTries } = kern;
   // log komt uit de module zelf: hij zit niet in de kern-bundel die routes krijgen
   const { log } = require('../log');
 
-  app.post('/api/fout/client', express.json({ limit: '4kb' }), (req, res) => {
+  /* DE GRENS VAN 4 kB STOND HIER, EN DEED NIETS. Er staat een globale
+     express.json({limit:'8mb'}) voor alle routes (server/opzet/lijfpoort.js);
+     tegen de tijd dat deze laag draait is het lichaam al geparsed, en een
+     tweede json()-laag met een kleinere grens laat het gewoon door. De grens
+     stond dus in de broncode en niet in het gedrag: twintig kilobyte kwam er
+     zonder morren in. Voor een deur die met opzet ZONDER inlog openstaat is dat
+     precies de verkeerde helft om alleen op papier te hebben.
+
+     Nu op de lengte van het verzoek zelf, voor de rem en voor het loggen. */
+  const MAX_LIJF = 4 * 1024;
+  app.post('/api/fout/client', (req, res) => {
+    const lang = Number(req.headers['content-length'] || 0);
+    if (lang > MAX_LIJF) return res.status(413).json({ error: 'Een foutmelding past in 4 kB.' });
     // een kapot scherm meldt hooguit drie keer; wie meer stuurt is geen scherm
     if (tooManyTries && tooManyTries(res, 'clientfout:' + req.ip, 30, 60000)) return;
     const b = req.body || {};

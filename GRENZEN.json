@@ -140,6 +140,9 @@
       "resolveSession",
       "sessionFor"
     ],
+    "command": [
+      "command"
+    ],
     "doos": [
       "afdelingen",
       "beveilig",
@@ -1389,6 +1392,7 @@
       "zaakBoard",
       "zaakFunctieAan",
       "zaakZet",
+      "zaakcommand",
       "zetArtikel",
       "zetCollectie",
       "zetKlantMaten",
@@ -1575,6 +1579,10 @@
       "notifySupplier",
       "verbindLid",
       "zoekInvite"
+    ],
+    "zaakcommand": [
+      "managerOnly",
+      "zaakcommand"
     ],
     "zakelijk": [
       "PRO",

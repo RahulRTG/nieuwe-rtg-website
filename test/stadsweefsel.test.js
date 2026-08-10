@@ -373,8 +373,16 @@ test('beheer: een gebied erbij, een relatie erbij en weer weg, werk toewijzen, e
   // een zone ONDER een straatsegment hangen mag niet: de boom loopt maar een kant op
   assert.equal((await oapi('weefsel/gebied/maak', { niveau: 'zone', gebiedNaam: 'Onzin', ouder: g.body.gebied.id,
     punten: [{ lat: zone.centrum.lat, lng: zone.centrum.lng }] })).status, 400);
-  // en buiten de stadsgrenzen bestaat geen gebied
-  assert.equal((await oapi('weefsel/gebied/maak', { niveau: 'buurt', gebiedNaam: 'Amsterdam-Zuid', punten: [{ lat: 52.34, lng: 4.87 }] })).status, 400);
+  /* Een gebied zonder ouder hangt nergens onder. Dat werd vroeger
+     tegengehouden door de coordinaattoets tegen de vaste rechthoek van Ibiza;
+     sinds het weefsel meerdere steden draagt is dat de verkeerde reden -- een
+     ouderloze buurt hoort dan bij GEEN stad en valt uit elke stad-gescopete
+     vraag. De eis staat nu op de ouder zelf. */
+  const wees = await oapi('weefsel/gebied/maak', { niveau: 'buurt', gebiedNaam: 'Amsterdam-Zuid', punten: [{ lat: 52.34, lng: 4.87 }] });
+  assert.equal(wees.status, 400);
+  assert.match(wees.body.error, /hangt onder een gebied/);
+  // en een stad maak je niet zo: die heeft zijn hele raster nodig
+  assert.equal((await oapi('weefsel/gebied/maak', { niveau: 'stad', gebiedNaam: 'Losse stad', punten: [{ lat: 52.34, lng: 4.87 }] })).status, 400);
 
   // een relatie leggen tussen twee echte objecten, en weer weghalen
   const gemaal = (await oapi('weefsel/objecten', { soort: 'gemaal' })).body.objecten[0];

@@ -1487,8 +1487,12 @@ console.log('\n27) geen dode configuratie: elke aangeraden variabele wordt ergen
    Elke ronde werd de lijst kleiner. Wie hem uitbreidt: meten, niet gokken. */
 console.log('\n28) elke API-route heeft een poort (of staat met reden op de publieke lijst)');
 {
+  /* `meetpoort` staat hier omdat het dezelfde deur is als `magMeten` hieronder,
+     alleen als middleware: server/meetpoort.js weigert met 404 tenzij het
+     metrics-token klopt of het verzoek van een intern adres komt. Hij kwam
+     erbij toen de sonde een tweede endpoint met precies die eis kreeg. */
   const POORT_MW = new Set(['auth', 'supplierAuth', 'officeAuth', 'techAuth', 'boardroomAuth',
-    'huisAuth', 'baasAuth', 'lid', 'geenGast', 'eigenaarAlleen']);
+    'huisAuth', 'baasAuth', 'lid', 'geenGast', 'eigenaarAlleen', 'meetpoort']);
   const POORT_BINNEN = /\b(profiel|schoolProfiel|rtfSociaal|eisAccount|resolveSession|verifyToken|sessionFor|magInzien|isEigenaar|boardroomWie|magBoardroom|doosSleutelOk|magMeten|metPartner|samenSess|kantoorSess|werkPoort|beheerVan|lidVan)\s*\(/;
 
   /* PUBLIEK MET REDEN. Alles hier is een bewuste keuze, geen omissie. Wie een
@@ -1770,7 +1774,7 @@ console.log('\n29) de Authorization-kop wordt gelezen om een token te halen, nie
     .replace(/\/\*[\s\S]*?\*\//g, m => m.replace(/[^\n]/g, ' '))
     .replace(/(^|[^:'"\\])\/\/[^\n]*/g, '$1');
   const KOP = /req\.get\(\s*['"]authorization['"]\s*\)|req\.headers\s*\[\s*['"]authorization['"]\s*\]|req\.headers\.authorization/i;
-  const VERIFIER = /\b(verifyToken|resolveSession|sessionFor|veiligGelijk|verifyActionToken|magAi|scimSleutelOk|magMeten|vanSleutel|accounts\.\w+)\s*\(/;
+  const VERIFIER = /\b(verifyToken|resolveSession|sessionFor|veiligGelijk|verifyActionToken|magAi|scimSleutelOk|apiSleutelOk|magMeten|vanSleutel|accounts\.\w+)\s*\(/;
   const VENSTER = 12;   // regels waarbinnen de verificatie moet volgen
   /* Plekken die de kop bewust lezen zonder te verifieren. Vandaag leeg, en dat
      hoort zo te blijven: wie hier iets toevoegt legt uit waarom betasten hier
@@ -2438,6 +2442,41 @@ console.log('\n40) ARCHITECTUUR.md loopt niet achter op de code');
   }
 }
 
+/* 41b) HET BELOFTEREGISTER KLOPT.
+
+   Deze regel bestaat door een fout die ik twee keer achter elkaar maakte. Op de
+   vraag "wat is er nog niet" scande ik eerst alleen de bovenste maplaag en
+   meldde ik RTG Sheets, Slides en Forms als ontbrekend -- ze stonden in
+   public/apps/office/. Daarna meldde ik CRM en BI als ontbrekend, terwijl CRM
+   als server/bedrijf/klant.js bestaat en de voorspellaag als server/kern/voorspel/.
+
+   Twee keer fout op dezelfde vraag betekent niet dat er beter gezocht moet
+   worden; het betekent dat er geen bron was om in te kijken. BELOFTE.json is die
+   bron, en deze regel houdt hem eerlijk: elk bewijsstuk moet echt bestaan.
+
+   DE GEVAARLIJKE STAND IS "GEBROKEN", niet "open". Een belofte die nog open
+   staat, weet iedereen. Een belofte die ooit waar was en stil verdween, mist
+   niemand -- en precies die vindt deze regel. Bij het schrijven van het register
+   sloeg hij meteen drie keer aan: drie paden wezen naar modules die ergens
+   anders bleken te wonen. */
+console.log('\n41b) BELOFTE.md klopt en geen enkele belofte is stilletjes gebroken');
+{
+  try {
+    const belofte = require('./belofte');
+    const opSchijf = fs.existsSync(belofte.DOEL) ? fs.readFileSync(belofte.DOEL, 'utf8') : null;
+    const verwacht = belofte.bouw();
+    const { tel, rijen } = belofte.meet();
+    if (opSchijf === null) fout('BELOFTE.md bestaat niet -- draai: node scripts/belofte.js');
+    else if (opSchijf !== verwacht) fout('BELOFTE.md loopt achter op BELOFTE.json -- draai: node scripts/belofte.js');
+    else if (tel.gebroken) {
+      for (const r of rijen.filter(x => x.stand === 'gebroken'))
+        fout('gebroken belofte "' + r.wat + '": ' + r.kwijt.join(', ') + ' bestaat niet (meer)');
+    } else ok(tel.gedekt + ' beloften gedekt, ' + tel.open + ' open, geen enkele gebroken');
+  } catch (e) {
+    fout('het belofteregister kon niet worden gelezen (' + e.message + '); dan stelt deze regel niets vast');
+  }
+}
+
 console.log('\n41) BEWIJS.md loopt niet achter op de toetsen');
 {
   try {
@@ -2542,6 +2581,35 @@ console.log('\n42) geen functie die binnen een andere functie staat en erbuiten 
     });
   }
   if (!stuk) ok(gekeken + ' gebundelde app-scripts: geen enkele functie wordt buiten zijn eigen omhulsel aangeroepen');
+}
+
+/* 43) DE SLO-TABEL IN SLO.md IS EEN AFDRUK VAN SLO.json.
+
+   Sinds er een meter is die de servicedoelen leest (server/kern/command/slo.js)
+   staan ze in SLO.json. De tabel in SLO.md stond er los naast, en dat is de
+   toestand waar LAT.md regel 4 over gaat: twee plaatsen met dezelfde waarheid
+   lopen uit elkaar, en dan is het document dat een MENS leest het verkeerde van
+   de twee. Bijstellen van een streefwaarde zonder de tabel bij te werken is
+   precies hoe dat gebeurt, en het valt nergens op.
+
+   Zelfde vorm als regel 40 en 41: de bouw wordt herhaald en de volle tekst
+   vergeleken, geen hash in de kop -- want een hash kan iemand bijwerken zonder
+   de inhoud. */
+console.log('\n43) de SLO-tabel in SLO.md is een afdruk van SLO.json');
+{
+  try {
+    const slo = require('./slo');
+    const opSchijf = fs.existsSync(slo.DOEL) ? fs.readFileSync(slo.DOEL, 'utf8') : null;
+    if (opSchijf === null) fout('SLO.md bestaat niet, terwijl SLO.json de norm draagt');
+    else if (slo.bouw(opSchijf) !== opSchijf) fout('SLO.md loopt achter op SLO.json -- draai: npm run slo');
+    else {
+      const norm = JSON.parse(fs.readFileSync(slo.BRON, 'utf8'));
+      ok(norm.doelen.length + ' servicedoelen en ' + (norm.reizen || []).length +
+        ' sondereizen staan in SLO.json, en SLO.md is daar gelijk aan');
+    }
+  } catch (e) {
+    fout('de SLO-norm kon niet worden gelezen (' + e.message + '); dan stelt deze regel niets vast');
+  }
 }
 
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');

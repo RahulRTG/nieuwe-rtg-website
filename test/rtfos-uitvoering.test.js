@@ -351,3 +351,65 @@ test('een publiek bericht gaat pas na landelijk akkoord de deur uit', async () =
   const opnieuw = await os_('bericht/verzend', { id: publiek.body.bericht.id }, STADSBESTUUR);
   assert.equal(opnieuw.body.bericht.status, 'wacht_op_landelijk', 'de gewijzigde tekst ging zonder nieuw besluit de deur uit');
 });
+
+/* ---------------------------------------------------------------------------
+   DE OVERZICHTEN ZELF: PER STAD, EN NIET VAN EEN ANDERE STAD
+
+   De zes lijstroutes (subsidies, voorraad, activiteiten, vergadering, beleid,
+   herkomst) werden door geen enkele toets geopend, terwijl juist zij de
+   stadsscheiding dragen: elke lijst gaat door dezelfde poort (stad.lezen) en
+   filtert op de stad die de zetel toestaat. Een lijst die dat vergeet, is de
+   plek waar de ene stad de administratie van de andere leest.
+   ------------------------------------------------------------------------- */
+test('elke lijst is van EEN stad, en een tweede stad ziet er niets van', async () => {
+  const subs = await os_('subsidies', { stad: STAD });
+  assert.equal(subs.status, 200, JSON.stringify(subs.body).slice(0, 200));
+  assert.ok(Array.isArray(subs.body.subsidies) && subs.body.soorten.length > 0,
+    'de lijst komt met zijn eigen keuzelijsten, zodat een scherm niets kan tonen wat de server weigert');
+  assert.ok(subs.body.totalen, 'en met de totalen erbij');
+
+  const voorraad = await os_('voorraad', { stad: STAD });
+  assert.equal(voorraad.status, 200, JSON.stringify(voorraad.body).slice(0, 200));
+  const acts = await os_('activiteiten', { stad: STAD });
+  assert.equal(acts.status, 200, JSON.stringify(acts.body).slice(0, 200));
+
+  /* Een tweede stad, zonder zetel voor het stadsbestuur van IJmuiden. Wat hij
+     terugkrijgt mag nooit een rij van IJmuiden bevatten. */
+  const tweede = (await os_('stad/maak', { naam: 'Velsen-Noord' })).body.stad.id;
+  await os_('stad/status', { id: tweede, status: 'actief' });
+  for (const vlag of ['subsidy_management', 'warehouse_management', 'events'])
+    await os_('stad/module', { id: tweede, vlag, aan: true });
+
+  const anderSubs = await os_('subsidies', { stad: tweede });
+  assert.equal(anderSubs.status, 200, JSON.stringify(anderSubs.body).slice(0, 200));
+  const mijn = new Set((subs.body.subsidies || []).map(s => s.id));
+  assert.deepEqual((anderSubs.body.subsidies || []).filter(s => mijn.has(s.id)), [],
+    'geen enkele subsidie komt in beide steden voor');
+
+  const geenZetel = await os_('subsidies', { stad: tweede }, STADSBESTUUR);
+  assert.notEqual(geenZetel.status, 200,
+    'het bestuur van IJmuiden komt niet in de administratie van Velsen-Noord');
+});
+
+test('landelijk beleid, herkomst en een vergadering zijn los op te vragen', async () => {
+  const beleid = await os_('beleid', {});
+  assert.equal(beleid.status, 200, JSON.stringify(beleid.body).slice(0, 200));
+
+  const herkomst = await os_('herkomst', {});
+  assert.equal(herkomst.status, 200, JSON.stringify(herkomst.body).slice(0, 200));
+
+  /* Een vergadering opvragen die er niet is, hoort een nette 404 te zijn: dit
+     is de route waarmee een scherm een agendapunt opent, en een leeg antwoord
+     zou daar als een lege vergadering worden getekend. */
+  const spook = await os_('vergadering', { id: 'bestaat-niet' });
+  assert.equal(spook.status, 404, JSON.stringify(spook.body).slice(0, 200));
+
+  const gemaakt = await os_('vergadering/maak', { orgaan: 'bestuur', stad: STAD,
+    datum: '2026-09-01', titel: 'Najaarsvergadering' });
+  assert.equal(gemaakt.status, 200, JSON.stringify(gemaakt.body).slice(0, 200));
+  const id = gemaakt.body.vergadering.id;
+
+  const een = await os_('vergadering', { id });
+  assert.equal(een.status, 200, JSON.stringify(een.body).slice(0, 200));
+  assert.equal(een.body.vergadering.id, id, 'en het is dezelfde vergadering');
+});

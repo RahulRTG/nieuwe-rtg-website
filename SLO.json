@@ -1,0 +1,152 @@
+{
+  "uitleg": "De servicedoelen van RTG, als gegevens en niet als proza. SLO.md legt uit WAAROM ze zo staan; dit bestand is wat de meter leest (server/kern/command/slo.js) en waaruit de tabel in SLO.md wordt geschreven (scripts/slo.js). Twee plaatsen met dezelfde waarheid gaan uit elkaar lopen, dus staat de waarheid hier en is de tabel daar een afdruk.",
+  "vastgelegd": "2026-08-09",
+  "minimumVerzoeken": 200,
+  "minimumDekking": 0.05,
+  "doelen": [
+    {
+      "id": "beschikbaarheid",
+      "naam": "Beschikbaarheid",
+      "soort": "beschikbaarheid",
+      "meet": "aandeel verzoeken zonder 5xx",
+      "streef": 99.9,
+      "vensterDagen": 30,
+      "kies": {
+        "route": "*"
+      },
+      "waarom": "Het brede doel. Alles wat de app afhandelt telt mee, ook de rustige overzichtspagina's."
+    },
+    {
+      "id": "snelheid-p90",
+      "naam": "Snelheid, gewoon werk",
+      "soort": "snelheid",
+      "meet": "p90 van rtg_duur_seconden op lees-endpoints",
+      "streef": 0.25,
+      "eenheid": "s",
+      "kwantiel": 0.9,
+      "vensterDagen": 30,
+      "kies": {
+        "route": "*",
+        "methoden": [
+          "GET"
+        ]
+      },
+      "waarom": "Wat een medewerker de hele dag voelt. Lezen, want schrijven mag traag zijn als het maar klopt."
+    },
+    {
+      "id": "snelheid-p99",
+      "naam": "Snelheid, staart",
+      "soort": "snelheid",
+      "meet": "p99 van rtg_duur_seconden op lees-endpoints",
+      "streef": 1,
+      "eenheid": "s",
+      "kwantiel": 0.99,
+      "vensterDagen": 30,
+      "kies": {
+        "route": "*",
+        "methoden": [
+          "GET"
+        ]
+      },
+      "waarom": "De staart is waar mensen afhaken. Een gemiddelde verbergt hem."
+    },
+    {
+      "id": "inloggen",
+      "naam": "Inloggen",
+      "soort": "beschikbaarheid",
+      "meet": "aandeel /api/auth/login zonder 5xx",
+      "streef": 99.95,
+      "vensterDagen": 30,
+      "kies": {
+        "routeBegintMet": "/api/auth/login"
+      },
+      "waarom": "Wie niet kan inloggen ziet niets. Dat weegt zwaarder dan een trage lijst."
+    },
+    {
+      "id": "betalen",
+      "naam": "Betalen",
+      "soort": "beschikbaarheid",
+      "meet": "aandeel betaalroutes zonder 5xx",
+      "streef": 99.95,
+      "vensterDagen": 30,
+      "kies": {
+        "routeBegintMet": "/api/pay"
+      },
+      "waarom": "Wie niet kan betalen houdt een half afgeronde transactie over, en dat kost meer dan een storing."
+    }
+  ],
+  "reizen": [
+    {
+      "id": "gezond",
+      "naam": "De server antwoordt",
+      "pad": "/api/health",
+      "methode": "GET",
+      "verwacht": [
+        200
+      ],
+      "maxMs": 500,
+      "waarom": "De laagste lat die er is: het proces leeft en de HTTP-laag antwoordt."
+    },
+    {
+      "id": "gereed",
+      "naam": "De server is gereed",
+      "pad": "/api/ready",
+      "methode": "GET",
+      "verwacht": [
+        200,
+        503
+      ],
+      "maxMs": 1000,
+      "waarom": "Gereed of eerlijk niet gereed. Allebei is een antwoord; geen antwoord is de storing."
+    },
+    {
+      "id": "voordeur",
+      "naam": "De voordeur laadt",
+      "pad": "/",
+      "methode": "GET",
+      "verwacht": [
+        200
+      ],
+      "maxMs": 1500,
+      "waarom": "Wat een bezoeker als eerste ziet. Ligt dit plat, dan is de rest niet interessant."
+    },
+    {
+      "id": "inlogpad",
+      "naam": "Het inlogpad antwoordt",
+      "pad": "/api/auth/login",
+      "methode": "POST",
+      "body": {
+        "email": "sonde@rtg.invalid",
+        "wachtwoord": "sonde-doet-niet-in"
+      },
+      "verwacht": [
+        400,
+        401,
+        403,
+        429
+      ],
+      "maxMs": 2000,
+      "waarom": "Bewust een verkeerde inlog: de sonde toetst dat het pad ANTWOORDT, niet dat hij binnenkomt. Een 200 hier zou een bevinding zijn en geen succes."
+    },
+    {
+      "id": "aanbod",
+      "naam": "Het publieke aanbod laadt",
+      "pad": "/api/aanbod",
+      "methode": "GET",
+      "verwacht": [
+        200,
+        401,
+        404
+      ],
+      "maxMs": 1500,
+      "waarom": "Een leesroute die de database aanraakt. Antwoordt de voordeur wel maar deze niet, dan zit het onder de webserver."
+    }
+  ],
+  "alarmen": {
+    "uitleg": "De drempels waarop het alarm afgaat. De CONTROLES zelf staan in server/kern/command/alarm.js en zijn geen taaltje: een regeltaal in een configuratiebestand is een tweede implementatie die je niet kunt toetsen. Wat hier staat zijn de getallen waarop die controles slaan.",
+    "budgetRestDeel": 0.25,
+    "defectenDrempel": 25,
+    "buitenStilUren": 24,
+    "stilteMaxUren": 72
+  }
+}

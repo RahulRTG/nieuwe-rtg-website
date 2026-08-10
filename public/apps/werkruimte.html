@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Workspace</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<link href="/shared/rtg-ontwerp.css" rel="stylesheet">
+<link href="/shared/rtg-schil.css" rel="stylesheet">
+<!-- de vorm van de mediamelding hoort bij de mediapoort: zonder dit blad
+     staat de uitleg er wel, maar ongestileerd -->
+<link href="/shared/media.css" rel="stylesheet">
+<style>
+  /* De werkruimte is geen pagina die scrolt maar een vlak dat het scherm vult.
+     Daarom hier geen max-width: extra pixels horen extra RTG te tonen en niet
+     bredere marges (WERKRUIMTE.md par. 8). */
+  html,body{height:100%;margin:0;overflow:hidden;}
+  .smal{position:fixed;inset:0;display:none;place-items:center;padding:2rem;text-align:center;}
+  .smal p{max-width:22rem;color:var(--rtg-soft);line-height:1.6;font-size:.9rem;}
+  .smal a{color:var(--rtg-goud);}
+  /* Onder 900px is dit niet de juiste omgeving: daar is RTG Mobile de app, en
+     een werkruimte met vijf surfaces op een telefoon is een belofte die het
+     scherm niet waar kan maken. Eerlijk zeggen is beter dan uitrekken. */
+  @media (max-width:899px){
+    .rtg-werkruimte{display:none;}
+    .smal{display:grid;}
+  }
+</style>
+</head>
+<body class="rtg-stijl" data-rtg-modus="pro">
+
+<div class="smal">
+  <p><strong style="color:var(--rtg-txt);">RTG Workspace is voor een groot scherm.</strong><br>
+  Op een telefoon is RTG Mobile de app: dezelfde wereld, andere omgeving.
+  <br><br><a href="/apps/app.html">Naar RTG Mobile</a></p>
+</div>
+
+<main class="rtg-werkruimte" id="ruimte">
+  <!-- De console: het anker van de werkruimte, geen menu met twintig apps maar
+       de huidige context (WERKRUIMTE.md par. 2). -->
+  <aside class="rtg-console" id="console" aria-label="RTG Command">
+    <div>
+      <h1>RTG Command</h1>
+      <div class="wie" id="wie">Rahul &middot; Nederland / RTG</div>
+    </div>
+
+    <div class="blok">
+      <div class="bloknaam">Vraag of open iets</div>
+      <input class="zoek" id="zoek" placeholder="&#8984;K  Reizen, Veilig, Ibiza..." aria-label="Zoeken of openen">
+    </div>
+
+    <div class="blok">
+      <div class="bloknaam">Werelden</div>
+      <div class="rijtje" id="werelden"></div>
+    </div>
+
+    <div class="blok">
+      <div class="bloknaam">Actief</div>
+      <div class="rijtje" data-actieflijst></div>
+    </div>
+
+    <div class="blok">
+      <div class="bloknaam">Gedeelde context</div>
+      <div class="context" data-context></div>
+    </div>
+
+    <div class="blok">
+      <div class="bloknaam">Rahul</div>
+      <div class="context">Schikt de ruimte als u dat vraagt. Hij verstuurt niets
+      en betaalt niets; dat blijft aan u.</div>
+    </div>
+  </aside>
+</main>
+
+<!-- media.js VOOR de schil: die geeft het camera- en microfoonrecht door aan
+     elke surface, en dat moet gebeuren voordat er een frame wordt gemaakt. -->
+<script src="/shared/media.js"></script>
+<script src="/shared/rtg-schil.js"></script>
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+
+  /* De werelden die als surface te openen zijn. Elk is een ECHTE app die zijn
+     eigen pagina blijft: de schil weet alleen naam en adres, niet wat erin
+     gebeurt (PLATFORM.md -- de apps houden hun diepte, de bovenlaag verbindt). */
+  const WERELDEN = [
+    { id: 'reizen', naam: 'Reizen', url: '/apps/reizen.html' },
+    { id: 'veilig', naam: 'Veilig', url: '/apps/veilig.html' },
+    { id: 'agenda', naam: 'Agenda', url: '/apps/agenda.html' },
+    { id: 'bestanden', naam: 'Bestanden', url: '/apps/bestanden.html' },
+    { id: 'notities', naam: 'Notities', url: '/apps/notities.html' },
+    { id: 'office', naam: 'Documenten', url: '/apps/office.html' }
+  ];
+
+  const schil = RTGSchil.start({ vak: $('#ruimte'), console: $('#console') });
+
+  $('#werelden').innerHTML = WERELDEN.map(w =>
+    '<button type="button" data-open="' + w.id + '">' + w.naam + '</button>').join('');
+  $('#werelden').querySelectorAll('[data-open]').forEach(b => b.addEventListener('click', () => {
+    const w = WERELDEN.find(x => x.id === b.dataset.open);
+    if (w) RTGSchil.open(w.id, { naam: w.naam, url: w.url, kort: w.naam });
+  }));
+
+  /* De zoekregel is de navigator, niet een sidebar (WERKRUIMTE.md par. 10).
+     Dit is de eenvoudigste vorm ervan: openen op naam. De volle palet met
+     opdrachten en Rahul erin staat als stap 6 in WERKRUIMTE.md; wat hier staat
+     doet nu al iets echts en belooft niets extra's. */
+  function ga(tekst) {
+    const t = String(tekst || '').trim().toLowerCase();
+    if (!t) return;
+    const w = WERELDEN.find(x => x.naam.toLowerCase().startsWith(t) || x.id.startsWith(t));
+    if (w) { RTGSchil.open(w.id, { naam: w.naam, url: w.url, kort: w.naam }); $('#zoek').value = ''; }
+  }
+  $('#zoek').addEventListener('keydown', (e) => { if (e.key === 'Enter') ga(e.target.value); });
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); $('#zoek').focus(); }
+  });
+
+  // een werkruimte begint niet leeg: twee surfaces, zodat de tafel meteen leest
+  RTGSchil.open('reizen', { naam: 'Reizen', url: '/apps/reizen.html', kort: 'Reizen' });
+  RTGSchil.open('agenda', { naam: 'Agenda', url: '/apps/agenda.html', kort: 'Agenda' });
+})();
+</script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+</body>
+</html>

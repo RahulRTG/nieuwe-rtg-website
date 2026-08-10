@@ -9,6 +9,11 @@
 const G = (wat, doe, tip) => ({ wat, doe, tip });
 
 module.exports = {
+  '/apps/werkruimte.html': G('RTG Workspace: uw werkruimte op een groot scherm, waar meerdere RTG-apps naast elkaar draaien en elkaar begrijpen.',
+    ['Open een wereld uit de console links; hij verschijnt als eigen vlak',
+     'Pak de gouden greep bovenaan een vlak om het te verplaatsen, of sleep het naar een schermrand om het vast te zetten',
+     'Druk op Cmd-K (of Ctrl-K) om iets te zoeken of te openen zonder de muis'],
+    'Dit is geen grotere telefoon-app: op een groot scherm hoort er meer RTG te staan, niet hetzelfde maar uitgerekt. De apps blijven zelfstandig; de werkruimte verbindt ze alleen.'),
   '/apps/wbw.html': G('Wie betaalt wat: groepsuitgaven bijhouden met een live balans.',
     ['Maak een groep en zet uitgaven erin', 'Zie live wie wat voorschoot', 'Verreken in één keer via RTG Pay'],
     'Direct na de vakantie verrekenen voorkomt het eeuwige "dat komt nog wel".'),

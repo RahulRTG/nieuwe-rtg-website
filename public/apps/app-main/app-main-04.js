@@ -141,12 +141,3 @@
          onderaan, buiten de kolom, waar hij de compositie niet meer breekt. */
       '#gate ~ .rtgcookie,.rtgcookie{position:fixed;left:50%;transform:translateX(-50%);' +
         'bottom:1rem;z-index:60;max-width:min(92vw,26rem);}' +
-      '@media (min-width:900px){' +
-        '#gate .os-lock{--klokschaal:1.5;}' +
-        '#gate{position:fixed;inset:0;width:100vw;max-width:none;height:100vh;' +
-          'margin:0;border-radius:0;border:0;display:flex;align-items:center;' +
-          'justify-content:center;flex-direction:column;}' +
-        '#gate canvas:not(.ag-mond){position:absolute;inset:0;width:100vw;height:100vh;}' +
-        '#gate .ag-doos{max-width:34rem;}' +
-      '}';
-    document.head.appendChild(st);

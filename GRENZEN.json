@@ -183,6 +183,14 @@
     "galerij": [
       "galerij"
     ],
+    "gast": [
+      "findSupplier",
+      "tooManyTries",
+      "noteFailedTry",
+      "horecaFolioBoek",
+      "logActivity",
+      "sseToSupplier"
+    ],
     "gebouw": [
       "gebouw",
       "status"

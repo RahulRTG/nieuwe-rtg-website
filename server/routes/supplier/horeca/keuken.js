@@ -69,6 +69,11 @@ module.exports = (kern) => {
       for (const regel of (rek.regels || [])) {
         if (!regel.vrijAt) continue;               // nog niet vrijgegeven door de zaal
         if (regel.stand === 'uitgegeven') continue; // van het bord af
+        /* Wacht deze gastbestelling nog op een mens (allergie, plafond), dan
+           hoort de keuken er niet aan te beginnen. De belofte "een ernstige
+           allergie gaat eerst langs een medewerker" is anders alleen een
+           melding op een scherm en geen grendel. */
+        if (regel.bevestiging === 'wacht') continue;
         if (station && String(regel.station || 'warm') !== station) continue;
         rijen.push(bord(h, rek, regel));
       }

@@ -1151,6 +1151,27 @@ staat de allergie erbij), wat is uitgegeven verdwijnt van de pas, en roomservice
 die op de kamer wordt geboekt komt op de gastrekening van diezelfde kamer
 terecht.
 
+### RTG Hospitality Guest OS (de gastkant van de horecatoren)
+
+`server/kern/gast/` + `server/routes/gast/` + `/apps/gast.html`. De Horeca OS hierboven was compleet voor de **zaak** en had geen enkele deur voor de **gast**: veertien modules, dertien verkoopkanalen — waaronder `qr`, `online`, `afhaal`, `bezorging` en `roomservice` — en alles achter `supplierAuth`. Een gast kon reserveren en verder niets.
+
+Het dragende ontwerpbesluit is hetzelfde als bij de Media OS en de wereldlaag: **dit is geen tweede horecasysteem.** Er komt geen `db.data.gastorders` naast de rekeningen. Een gastbestelling is een regel op dezelfde rekening die de bediening op haar scherm ziet, gebouwd door dezelfde `kern/horeca/regel.js`, zichtbaar op hetzelfde keukenbord. Die regelbouwer is er in deze ronde uit `routes/supplier/horeca/rekening.js` gehaald en apart gezet: zolang alleen de bediening bestelde stond hij prima in de handler, maar met een tweede aanroeper zouden er twee antwoorden ontstaan op "wat kost dit met happy hour" (LAT-regel 4).
+
+- **De poort is de tafelsleutel, geen inlog.** De QR hoort bij de *tafel* en niet bij de rekening — een gedrukte sticker gaat jaren mee — en het token staat **gehasht** in de opslag: wie de database leest, opent er geen tafelsessie mee. Aanschuiven levert een sleutel die bij díe open rekening hoort; is de rekening voldaan, dan is de sleutel niets meer waard. Op de rekening staat een handle, nooit een echte naam en nooit een ledensleutel.
+- **Meerdere telefoons, één rekening.** Elke deelnemer krijgt het `gastNr` dat de rekening al kende, dus de bestaande splitlaag per persoon werkt meteen. Iedereen ziet dezelfde live rekening: wat er staat, wie het bestelde, wat er nog openstaat.
+- **Het beleid van de zaak staat op één plek** (`kern/gast/beleid.js`) en elke uitkomst draagt drie dingen: of het mag, een machineleesbare code en de zin die de gast leest. Standaard: de gast mag bestellen, een **ernstige allergie gaat langs een medewerker**, alcohol vereist een **geverifieerde** leeftijd (een beweerde leeftijd opent die deur niet — LAT-regel 7). Die eerste is geen melding maar een grendel: zolang niemand heeft bevestigd, staat de regel **niet op het keukenbord**.
+- **Waarom?** bestaat als route (`/api/gast/waarom`) en wordt beantwoord door dezelfde beleidslaag die het ook tegenhoudt. Een uitleg uit een andere bron dan de beslissing is vroeg of laat een uitleg die niet klopt.
+- **Verdelen knipt de rekening niet.** Splitsen door de bediening (`horeca/schuif.js`) maakt twee rekeningen; een gast maakt een *afspraak over wie welk deel betaalt*. Dezelfde somdiscipline: 10,00 door drie is 3,34 + 3,33 + 3,33, en een verdeling die niet optelt wordt geweigerd in plaats van rechtgetrokken.
+- **Afrekenen liegt niet.** Vanaf de telefoon van de gast lopen alleen de rails die er echt zijn: cadeaubon, tegoed en de hotelkamer (via de bestaande folio-laag). Kaart en online geven een **501 met de reden** in plaats van een groen vinkje.
+- **Idempotentie en audit zitten er vanaf de eerste versie in.** Elke bestelling en betaling draagt een sleutel; dezelfde sleutel geeft hetzelfde antwoord zonder het nog een keer te doen. Elke mutatie legt actor, tijd, bron, apparaat, van, naar en reden vast — en de gast kan dat logboek zelf lezen (`/api/gast/logboek`).
+- **De tijdlijn is een projectie en geen opslag.** De regel droeg al `at`, `vrijAt`, `startAt`, `klaarAt` en `uitAt`, gezet door het keukenscherm. De gast leest "de keuken is begonnen", de keuken ziet stations en urgentie. Eén gebeurtenis, twee perspectieven.
+
+Aan de zaakkant staat dit in `routes/supplier/horeca/gastbeheer.js`: de QR per tafel uitgeven (opnieuw uitgeven is een aparte handeling met een waarschuwing, want het maakt elke gedrukte sticker dood), een gerecht op **uitverkocht** zetten, het gastbeleid, en de **wachtrij** met bevestigen of afwijzen — afwijzen kan niet zonder reden, want die reden leest de gast.
+
+Bewezen door `test/gastorder.test.js` (elf toetsen, waaronder: een gastbestelling verschijnt in de rekeningenlijst van de zaak met hetzelfde bedrag; een prijs die de telefoon meestuurt verliest het van de kaart; twee keer bestellen met dezelfde sleutel levert één regel; een onbevestigde allergie blijft van het keukenbord). Zes mutaties nagetrokken, alle zes raak.
+
+Wat er **nog niet** is, en dat is een grens en geen omissie: bezorging, afhaal, roomservice, club en foodcourt hebben aan de gastkant nog geen eigen deur (de rekenlaag eronder wel), er is nog geen Rahul-conciërge op deze laag, en multi-location beleid is één zaak per keer.
+
 ### RTG Mobility OS (de vervoerskern)
 
 `server/kern/mobiliteit/` + `/api/mob/...`, `/api/staff/mob/...`,

@@ -1,0 +1,380 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Aan tafel · RTG</title>
+<link rel="icon" href="/icons/partners.svg">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<!-- RTGId maakt de idempotentiesleutel van een bestelling. Bewust zonder defer
+     en vooraan: het script eronder gebruikt hem meteen bij de eerste bestelling,
+     en een terugval op Date.now() zou twee snelle tikken hetzelfde (of juist een
+     ander) sleutelnummer geven. -->
+<script src="/shared/id.js"></script>
+<style>
+  :root{ --bg:var(--rtg-bg); --card:var(--rtg-card); --card2:var(--rtg-card2); --line:var(--rtg-line);
+    --txt:var(--rtg-txt); --muted:var(--rtg-muted); --soft:var(--rtg-soft);
+    --burgundy:#C23A5E; --gold:#A98F1C; --groen:#4C9A75; }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:6rem;}
+  h1,h2{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  header{position:sticky;top:0;z-index:6;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.9));
+    backdrop-filter:blur(8px);padding:1rem 1.1rem .7rem;border-bottom:1px solid var(--line);}
+  header .ey{font-size:.62rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header h1{font-size:1.3rem;margin-top:.1rem;}
+  header .sub{font-size:.82rem;color:var(--soft);margin-top:.15rem;}
+  main{padding:1.1rem;max-width:760px;margin:0 auto;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:1rem 1.1rem;margin-bottom:.9rem;}
+  .kaart h2{font-size:1.02rem;margin-bottom:.6rem;}
+  .lbl{font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--soft);display:block;margin:.6rem 0 .3rem;}
+  input,select,textarea{font:inherit;width:100%;background:var(--card2);color:var(--txt);
+    border:1px solid var(--line);border-radius:10px;padding:.6rem .7rem;}
+  button{font:inherit;cursor:pointer;border-radius:10px;border:1px solid var(--line);
+    background:var(--card2);color:var(--txt);padding:.55rem .9rem;}
+  button.prim{background:var(--burgundy);border-color:var(--burgundy);color:#fff;font-weight:600;}
+  button:disabled{opacity:.45;cursor:not-allowed;}
+  .rij{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;}
+  .tabs{display:flex;gap:.4rem;overflow-x:auto;padding:.2rem 0 .6rem;}
+  .tabs button{white-space:nowrap;font-size:.85rem;}
+  .tabs button[aria-selected="true"]{background:var(--burgundy);border-color:var(--burgundy);color:#fff;}
+  .item{display:flex;gap:.7rem;align-items:flex-start;padding:.7rem 0;border-bottom:1px solid var(--line);}
+  .item:last-child{border-bottom:0;}
+  .item .nm{font-weight:600;}
+  .item .ds{font-size:.82rem;color:var(--soft);margin-top:.15rem;}
+  .item .pr{margin-left:auto;text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;}
+  .item.uit{opacity:.5;}
+  .waarschuw{font-size:.78rem;color:var(--burgundy);margin-top:.2rem;}
+  .alg{display:inline-block;font-size:.68rem;border:1px solid var(--line);border-radius:6px;
+    padding:.05rem .35rem;margin:.25rem .25rem 0 0;color:var(--soft);}
+  .mand{position:fixed;left:0;right:0;bottom:0;z-index:7;background:var(--card);
+    border-top:1px solid var(--line);padding:.8rem 1.1rem calc(.8rem + env(safe-area-inset-bottom));}
+  /* Expliciet, want `hidden` van de browser is een UA-regel met de laagste
+     specificiteit: de klasse hierboven wint er zo van en de balk bleef op het
+     rekening-tabblad staan. Nagekeken in een echte browser. */
+  .mand[hidden]{display:none;}
+  .mand .rij{max-width:760px;margin:0 auto;}
+  .bedrag{font-variant-numeric:tabular-nums;font-weight:600;}
+  .melding{background:var(--card2);border:1px solid var(--burgundy);border-radius:10px;
+    padding:.6rem .75rem;font-size:.86rem;margin-bottom:.8rem;}
+  .melding.goed{border-color:var(--groen);}
+  .tl{list-style:none;font-size:.85rem;}
+  .tl li{display:flex;gap:.7rem;padding:.35rem 0;border-bottom:1px solid var(--line);}
+  .tl li:last-child{border-bottom:0;}
+  .tl .om{color:var(--gold);font-variant-numeric:tabular-nums;min-width:3.2rem;}
+  .deel{display:flex;justify-content:space-between;padding:.4rem 0;border-bottom:1px solid var(--line);}
+  .deel.ik{color:var(--gold);font-weight:600;}
+  .wr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);}
+</style>
+</head>
+<body>
+<header>
+  <span class="ey">Rahul Travel Group</span>
+  <h1 id="zaakNaam">Aan tafel</h1>
+  <p class="sub" id="zaakSub">Scan de code op tafel om te beginnen.</p>
+</header>
+
+<main id="main" role="main">
+  <div id="melding" hidden></div>
+
+  <!-- 1. aanschuiven -->
+  <section class="kaart" id="vAanschuif" hidden>
+    <h2>Schuif aan</h2>
+    <p class="sub" id="lopend"></p>
+    <label class="lbl" for="naam">Hoe mogen we je noemen?</label>
+    <input id="naam" maxlength="40" placeholder="Sam" autocomplete="given-name">
+    <p class="sub" style="margin-top:.5rem;">Alleen deze naam komt op de rekening te staan, zodat je tafelgenoten zien wie wat bestelde. Verder slaan we niets van je op.</p>
+    <div class="rij" style="margin-top:.8rem;"><button class="prim" id="bAanschuif">Aanschuiven</button></div>
+  </section>
+
+  <!-- 2. de app -->
+  <div id="vApp" hidden>
+    <div class="tabs" role="tablist">
+      <button role="tab" aria-selected="true" data-tab="kaart">Kaart</button>
+      <button role="tab" aria-selected="false" data-tab="rekening">Rekening</button>
+      <button role="tab" aria-selected="false" data-tab="afrekenen">Afrekenen</button>
+    </div>
+
+    <section class="kaart" data-paneel="kaart">
+      <h2>De kaart</h2>
+      <label class="lbl" for="allergie">Allergie of dieet (gaat mee naar de keuken)</label>
+      <input id="allergie" maxlength="120" placeholder="bijvoorbeeld: ernstige notenallergie">
+      <p class="sub" id="allergieLet" style="margin-top:.35rem;"></p>
+      <div id="kaartLijst" style="margin-top:.8rem;"></div>
+    </section>
+
+    <section class="kaart" data-paneel="rekening" hidden>
+      <h2>Wat er op tafel staat</h2>
+      <div id="rekLijst"></div>
+      <h2 style="margin-top:1rem;">Verloop</h2>
+      <ul class="tl" id="tijdlijn"></ul>
+    </section>
+
+    <section class="kaart" data-paneel="afrekenen" hidden>
+      <h2>Afrekenen</h2>
+      <label class="lbl" for="wijze">Hoe verdelen we de rekening?</label>
+      <select id="wijze">
+        <option value="gelijk">Gelijk over iedereen</option>
+        <option value="product">Ieder wat die zelf bestelde</option>
+        <option value="een">Eén persoon betaalt alles</option>
+      </select>
+      <div class="rij" style="margin-top:.6rem;"><button id="bVerdeel">Verdeel</button></div>
+      <div id="verdeling" style="margin-top:.8rem;"></div>
+      <label class="lbl" for="fooi">Fooi (in euro, alleen als je dat wilt)</label>
+      <input id="fooi" inputmode="decimal" placeholder="0,00">
+      <div class="rij" style="margin-top:.6rem;">
+        <button id="bFooi">Fooi vastleggen</button>
+        <button class="prim" id="bBetaal">Betalen</button>
+      </div>
+      <p class="sub" id="railLet" style="margin-top:.6rem;"></p>
+    </section>
+  </div>
+</main>
+
+<div class="mand" id="mand" hidden>
+  <div class="rij">
+    <span id="mandTekst">Niets gekozen</span>
+    <span class="bedrag" id="mandBedrag" style="margin-left:auto;">€ 0,00</span>
+    <button class="prim" id="bBestel" disabled>Bestellen</button>
+  </div>
+</div>
+
+<script>
+/* De gastkant van de horecatoren. Bewust GEEN gedeelde horeca/kern.js: die
+   draagt de zaak-inlog (rtg_sup_token) en dit scherm heeft juist géén
+   zaaksessie -- alleen een tafelsleutel uit de QR. Twee soorten sessies door
+   elkaar halen is precies hoe een gast per ongeluk een leverancierstoken
+   meestuurt. */
+(function () {
+  'use strict';
+  var $ = function (s) { return document.querySelector(s); };
+  var esc = function (t) {
+    return String(t == null ? '' : t).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  };
+  var euro = function (c) { return '€ ' + ((c || 0) / 100).toFixed(2).replace('.', ','); };
+  var TOKEN = new URLSearchParams(location.search).get('t') || '';
+  var SLEUTEL = null, KAART = [], MAND = {}, REK = null, BELEID = null;
+  try { SLEUTEL = localStorage.getItem('rtg_gast_' + TOKEN); } catch (e) {}
+
+  function meld(tekst, goed) {
+    var el = $('#melding');
+    if (!tekst) { el.hidden = true; return; }
+    el.className = 'melding' + (goed ? ' goed' : '');
+    el.textContent = tekst; el.hidden = false;
+    if (goed) setTimeout(function () { el.hidden = true; }, 4000);
+  }
+
+  function api(pad, body) {
+    return fetch('/api/gast/' + pad, { method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body || {}) }).then(function (r) {
+      return r.json().catch(function () { return {}; }).then(function (j) {
+        /* Een fout van de server is hier ECHTE inhoud en geen technisch
+           ongelukje: hij draagt de reden die de gast hoort te lezen. Daarom
+           wordt hij getoond zoals hij is, en niet vervangen door "er ging iets
+           mis". */
+        if (!r.ok) { j._fout = j.error || 'Er ging iets mis.'; j._code = j.code || null; }
+        return j;
+      });
+    });
+  }
+
+  /* ---------- binnenkomen ---------- */
+  function start() {
+    if (!TOKEN) { meld('Scan de QR-code op je tafel om te beginnen.'); return; }
+    api('tafel', { token: TOKEN }).then(function (j) {
+      if (j._fout) return meld(j._fout);
+      $('#zaakNaam').textContent = j.zaak.naam;
+      $('#zaakSub').textContent = j.tafel + (j.zaak.plaats ? ' · ' + j.zaak.plaats : '');
+      KAART = j.kaart; BELEID = j.beleid;
+      $('#lopend').textContent = j.lopendeRekening
+        ? 'Er zitten al ' + j.lopendeRekening.gasten + ' mensen aan deze tafel, met ' + j.lopendeRekening.regels + ' bestelling(en).'
+        : 'Jij bent de eerste aan deze tafel.';
+      if (SLEUTEL) laadRekening(true); else $('#vAanschuif').hidden = false;
+    });
+  }
+
+  $('#bAanschuif').addEventListener('click', function () {
+    api('aanschuiven', { token: TOKEN, naam: $('#naam').value }).then(function (j) {
+      if (j._fout) return meld(j._fout);
+      SLEUTEL = j.sleutel;
+      try { localStorage.setItem('rtg_gast_' + TOKEN, SLEUTEL); } catch (e) {}
+      $('#vAanschuif').hidden = true;
+      toon(j.rekening);
+    });
+  });
+
+  function laadRekening(eersteKeer) {
+    api('rekening', { sleutel: SLEUTEL }).then(function (j) {
+      if (j._code === 'sessie-weg') {
+        /* De rekening is voldaan of de zaak heeft hem gesloten. De sleutel
+           weggooien en opnieuw laten aanschuiven is eerlijker dan een scherm
+           dat blijft draaien op iets wat niet meer bestaat. */
+        try { localStorage.removeItem('rtg_gast_' + TOKEN); } catch (e) {}
+        SLEUTEL = null; $('#vApp').hidden = true; $('#vAanschuif').hidden = false;
+        if (!eersteKeer) meld('Deze rekening is afgerond. Schuif opnieuw aan voor een nieuwe.');
+        return;
+      }
+      if (j._fout) return meld(j._fout);
+      toon(j.rekening);
+    });
+  }
+
+  /* Welk tabblad staat open. De mandbalk hangt HIERAAN en niet aan "we hebben
+     net iets geladen": toon() draait ook na het wisselen van tabblad, en toen
+     die de balk onvoorwaardelijk aanzette stond hij weer in beeld op de
+     rekening -- de knop Bestellen onder een scherm waar niets te bestellen is. */
+  function actieveTab() {
+    var b = document.querySelector('[role="tab"][aria-selected="true"]');
+    return b ? b.getAttribute('data-tab') : 'kaart';
+  }
+
+  function toon(rek) {
+    REK = rek;
+    $('#vApp').hidden = false;
+    $('#mand').hidden = actieveTab() !== 'kaart';
+    tekenKaart(); tekenRekening();
+  }
+
+  /* ---------- de kaart ---------- */
+  function tekenKaart() {
+    var cats = [], per = {};
+    KAART.forEach(function (m) { if (!per[m.cat]) { per[m.cat] = []; cats.push(m.cat); } per[m.cat].push(m); });
+    var h = '';
+    cats.forEach(function (c) {
+      h += '<h2 style="margin:1rem 0 .2rem;">' + esc(c) + '</h2>';
+      per[c].forEach(function (m) {
+        var aantal = MAND[m.id] || 0;
+        h += '<div class="item' + (m.uitverkocht ? ' uit' : '') + '">' +
+          '<div><span class="nm">' + esc(m.naam) + '</span>' +
+          (m.uitleg ? '<div class="ds">' + esc(m.uitleg) + '</div>' : '') +
+          (m.allergenen || []).map(function (a) { return '<span class="alg">' + esc(a) + '</span>'; }).join('') +
+          (m.uitverkocht ? '<div class="waarschuw">Door de keuken op uitverkocht gezet.</div>' : '') +
+          (m.alcohol ? '<div class="waarschuw">Alcohol: dit neemt een medewerker op.</div>' : '') +
+          '</div><div class="pr">' + euro(m.centen) +
+          (m.uitverkocht || m.alcohol ? '' :
+            '<div class="rij" style="justify-content:flex-end;margin-top:.35rem;">' +
+            '<button data-min="' + esc(m.id) + '" aria-label="Eén minder">−</button>' +
+            '<span aria-live="polite" style="min-width:1.4rem;text-align:center;">' + aantal + '</span>' +
+            '<button data-plus="' + esc(m.id) + '" aria-label="Eén meer">+</button></div>') +
+          '</div></div>';
+      });
+    });
+    $('#kaartLijst').innerHTML = h;
+    $('#allergieLet').textContent = BELEID && BELEID.allergieBevestiging === 'ernstig'
+      ? 'Bij een ernstige allergie loopt je bestelling eerst langs een medewerker. Dat duurt even, en dat is de bedoeling.'
+      : '';
+    tekenMand();
+  }
+
+  $('#kaartLijst').addEventListener('click', function (e) {
+    var plus = e.target.getAttribute && e.target.getAttribute('data-plus');
+    var min = e.target.getAttribute && e.target.getAttribute('data-min');
+    if (plus) MAND[plus] = Math.min(20, (MAND[plus] || 0) + 1);
+    if (min) { MAND[min] = Math.max(0, (MAND[min] || 0) - 1); if (!MAND[min]) delete MAND[min]; }
+    if (plus || min) tekenKaart();
+  });
+
+  function tekenMand() {
+    var n = 0, som = 0;
+    Object.keys(MAND).forEach(function (id) {
+      var m = KAART.filter(function (x) { return x.id === id; })[0];
+      if (m) { n += MAND[id]; som += m.centen * MAND[id]; }
+    });
+    $('#mandTekst').textContent = n ? n + ' × gekozen' : 'Niets gekozen';
+    $('#mandBedrag').textContent = euro(som);
+    $('#bBestel').disabled = !n;
+  }
+
+  $('#bBestel').addEventListener('click', function () {
+    var items = Object.keys(MAND).map(function (id) { return { itemId: id, aantal: MAND[id] }; });
+    /* De idempotentiesleutel hoort bij DEZE bestelling en niet bij deze klik:
+       hij wordt hier één keer gemaakt en blijft gelijk als de knop twee keer
+       wordt geraakt of het netwerk hapert. */
+    var idem = window.RTGId ? RTGId('gastbestel') : (TOKEN + ':' + items.map(function (i) { return i.itemId + 'x' + i.aantal; }).join(',') + ':' + REK.regels.length);
+    $('#bBestel').disabled = true;
+    api('bestel', { sleutel: SLEUTEL, items: items, allergie: $('#allergie').value, idem: idem })
+      .then(function (j) {
+        $('#bBestel').disabled = false;
+        if (j._fout) return meld(j._fout);
+        MAND = {};
+        meld(j.bevestiging ? j.bevestiging.uitleg : 'Je bestelling staat bij de keuken.', !j.bevestiging);
+        toon(j.rekening);
+      });
+  });
+
+  /* ---------- de rekening ---------- */
+  function tekenRekening() {
+    if (!REK) return;
+    var h = '';
+    REK.regels.forEach(function (r) {
+      h += '<div class="item"><div><span class="nm">' + r.aantal + ' × ' + esc(r.naam) + '</span>' +
+        '<div class="ds">' + (r.doorHandle ? esc(r.doorHandle) : 'tafel') +
+        (r.bevestiging === 'wacht' ? ' · wacht op een medewerker' : ' · ' + esc(r.stand)) + '</div>' +
+        (r.allergie ? '<div class="waarschuw">' + esc(r.allergie) + '</div>' : '') +
+        '</div><div class="pr">' + euro(r.centen * r.aantal) + '</div></div>';
+    });
+    if (!REK.regels.length) h = '<p class="sub">Er staat nog niets op de rekening.</p>';
+    h += '<div class="item"><div class="nm">Te betalen</div><div class="pr bedrag">' + euro(REK.totalen.teBetalen) + '</div></div>';
+    if (REK.totalen.betaald) h += '<div class="item"><div>Al voldaan</div><div class="pr">' + euro(REK.totalen.betaald) + '</div></div>';
+    $('#rekLijst').innerHTML = h;
+    $('#tijdlijn').innerHTML = (REK.tijdlijn || []).map(function (t) {
+      return '<li><span class="om">' + esc(t.om) + '</span><span>' + esc(t.wat) + ' · ' + esc(t.wie) + '</span></li>';
+    }).join('') || '<li><span>Nog niets gebeurd.</span></li>';
+    $('#railLet').textContent = 'Afrekenen kan vanaf je telefoon met een cadeaubon, tegoed of op je hotelkamer. Kaart en pin lopen via de bediening.';
+  }
+
+  document.querySelector('.tabs').addEventListener('click', function (e) {
+    var t = e.target.getAttribute && e.target.getAttribute('data-tab');
+    if (!t) return;
+    document.querySelectorAll('[role="tab"]').forEach(function (b) {
+      b.setAttribute('aria-selected', String(b.getAttribute('data-tab') === t));
+    });
+    document.querySelectorAll('[data-paneel]').forEach(function (p) {
+      p.hidden = p.getAttribute('data-paneel') !== t;
+    });
+    $('#mand').hidden = t !== 'kaart';
+    if (t !== 'kaart') laadRekening();
+  });
+
+  /* ---------- afrekenen ---------- */
+  $('#bVerdeel').addEventListener('click', function () {
+    api('verdeel', { sleutel: SLEUTEL, wijze: $('#wijze').value }).then(function (j) {
+      if (j._fout) return meld(j._fout);
+      $('#verdeling').innerHTML = j.delen.map(function (d) {
+        return '<div class="deel' + (d.ik ? ' ik' : '') + '"><span>' + esc(d.handle) + (d.ik ? ' (jij)' : '') +
+          '</span><span class="bedrag">' + euro(d.centen) + '</span></div>';
+      }).join('');
+    });
+  });
+
+  $('#bFooi').addEventListener('click', function () {
+    var c = Math.round(parseFloat(String($('#fooi').value).replace(',', '.')) * 100);
+    if (!(c >= 0)) return meld('Vul een bedrag in, of laat het veld leeg als je geen fooi wilt geven.');
+    api('fooi', { sleutel: SLEUTEL, centen: c }).then(function (j) {
+      if (j._fout) return meld(j._fout);
+      meld('Fooi vastgelegd: ' + euro(j.fooi) + '. Die gaat naar het personeel en telt niet mee in de omzet.', true);
+      laadRekening();
+    });
+  });
+
+  $('#bBetaal').addEventListener('click', function () {
+    var bon = prompt('Code van je cadeaubon of tegoed:');
+    if (!bon) return;
+    api('betaal', { sleutel: SLEUTEL, wijze: 'bon', bonCode: bon,
+      idem: window.RTGId ? RTGId('gastbetaal') : TOKEN + ':betaal:' + bon }).then(function (j) {
+      if (j._fout) return meld(j._fout);
+      meld(j.gesloten ? 'De rekening is voldaan. Fijne avond.' : 'Betaald: ' + euro(j.betaald) + '. Er staat nog ' + euro(j.openstaand) + ' open.', true);
+      laadRekening();
+    });
+  });
+
+  start();
+})();
+</script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+</body>
+</html>

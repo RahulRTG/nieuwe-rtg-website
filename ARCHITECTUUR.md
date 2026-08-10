@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 3214 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 3229 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,13 +18,13 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 3214 |
-| servermodules (`server/**/*.js`) | 1833 |
-| routebestanden (`server/routes/**`) | 391 |
-| kernmodules (`server/kern/**`) | 1117 |
-| schermen (`public/**/*.html`) | 228 |
+| API-endpoints | 3229 |
+| servermodules (`server/**/*.js`) | 1844 |
+| routebestanden (`server/routes/**`) | 396 |
+| kernmodules (`server/kern/**`) | 1123 |
+| schermen (`public/**/*.html`) | 229 |
 | gedeelde browsermodules (`public/shared/*.js`) | 180 |
-| toetsbestanden (`test/*.test.js`) | 742 |
+| toetsbestanden (`test/*.test.js`) | 743 |
 | schermtoetsen (`test/*.e2e.js`) | 111 |
 
 ## 2. De weg van een verzoek
@@ -95,13 +95,13 @@ luister
 Acht domeinen, uit `server/opzet/routes.js`. Met `RTG_DOMAINS=member,social` draait
 een proces alleen die domeinen; een gateway (`server/poort.js`) stuurt de
 padvoorvoegsels dan naar het juiste proces. **Die belofte is nog niet waargemaakt:**
-zie §5 -- er zijn nog 154 kern-namen die meer dan één domein aanraakt.
+zie §5 -- er zijn nog 156 kern-namen die meer dan één domein aanraakt.
 
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
 | `auth` | 19 | 5 | 8 | 46 |
 | `member` | 477 | 56 | 10 | 398 |
-| `supplier` | 520 | 91 | 6 | 284 |
+| `supplier` | 525 | 92 | 6 | 283 |
 | `office` | 39 | 7 | 3 | 58 |
 | `staff` | 26 | 7 | 1 | 40 |
 | `social` | 55 | 7 | 31 | 52 |
@@ -114,7 +114,7 @@ op de regel zelf. Dat is niet hetzelfde als onbeveiligd -- regel 28 van de keuri
 per route een poort **of** een plek op de publieke lijst met reden. Deze kolom is een
 wegwijzer, geen verdict.
 
-Daarnaast 1718 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 1728 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 
@@ -122,9 +122,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1260 |
-| daarvan door **meer dan één** domein (de echte koppeling) | 154 |
-| daarvan door precies één domein | 1106 |
+| kern-namen die routes aanraken | 1266 |
+| daarvan door **meer dan één** domein (de echte koppeling) | 156 |
+| daarvan door precies één domein | 1110 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 
@@ -136,12 +136,12 @@ domein. Alle vijf getallen staan in `NORM.json` aan een ratel en mogen alleen za
 domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 
 ```
-app(149) auth(89) supplierAuth(51) officeAuth(32) db(32) status(27) liveCodename(24)
-accounts(18) managerOnly(15) schoon(14) save(12) codenaamVan(12) rtf(11) anthropic(10)
-tooManyTries(9) boardroomWie(9) crypto(9) express(9) rtmail(9) payrollOS(8)
-keyVanCodenaam(8) logActivity(7) sseToOffice(7) geenGast(6) noteFailedTry(6) kern(6)
-gegevensStop(6) talen(6) mail(5) loginFails(5) sseToSupplier(5) overheid(5)
-findSupplier(5) notifySupplier(5) sseToCustomer(5)
+app(150) auth(89) supplierAuth(51) db(33) officeAuth(32) status(27) liveCodename(24)
+accounts(18) managerOnly(15) schoon(15) save(13) codenaamVan(12) rtf(11)
+tooManyTries(10) crypto(10) anthropic(10) boardroomWie(9) express(9) rtmail(9)
+payrollOS(8) keyVanCodenaam(8) noteFailedTry(7) logActivity(7) sseToOffice(7)
+geenGast(6) kern(6) findSupplier(6) gegevensStop(6) talen(6) mail(5) loginFails(5)
+sseToSupplier(5) overheid(5) notifySupplier(5) sseToCustomer(5)
 ```
 
 **De breedste routebestanden** -- hier zou je beginnen:

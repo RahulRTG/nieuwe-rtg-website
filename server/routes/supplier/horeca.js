@@ -32,4 +32,5 @@ module.exports = (kern) => {
   require('./horeca/haccp')(ctx);      // temperaturen, batches en THT, controlelijsten
   require('./horeca/personeel')(ctx);  // fooienpot, loonkosten tegenover omzet, gastprofiel
   require('./horeca/dashboard')(ctx);  // dagbeeld per kanaal en de signalen
+  require('./horeca/gastbeheer')(ctx); // de zaakkant van de gastendeur: QR, uitverkocht, beleid, bevestigen
 };

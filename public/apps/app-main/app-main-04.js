@@ -94,7 +94,19 @@
         'font-size:0.68rem;letter-spacing:0.06em;color:var(--soft);opacity:0;transition:opacity var(--rtg-tempo,340ms) var(--rtg-ease,ease);}' +
       '.ag-doos.ag-kluis-aan .ag-kluis{display:flex;opacity:1;}' +
       // de sterrenhemel gaat achter alles; de poort-inhoud eroverheen
-      '#gate > *:not(canvas){position:relative;z-index:1;}';
+      '#gate > *:not(canvas){position:relative;z-index:1;}' +
+      /* OP DESKTOP VULT DE HEMEL HET SCHERM. De poort was een kaart van 662px
+         midden op een venster van 1600: de sterren stonden opgesloten in een
+         rechthoek met afgeronde hoeken en daarbuiten was het vlak zwart. Een
+         inlogscherm hoort geen venster in een venster te zijn.
+         De inhoud houdt zijn eigen breedte -- alleen de HEMEL wordt groot. */
+      '@media (min-width:900px){' +
+        '#gate{position:fixed;inset:0;width:100vw;max-width:none;height:100vh;' +
+          'margin:0;border-radius:0;border:0;display:flex;align-items:center;' +
+          'justify-content:center;flex-direction:column;}' +
+        '#gate canvas:not(.ag-mond){position:absolute;inset:0;width:100vw;height:100vh;}' +
+        '#gate .ag-doos{max-width:34rem;}' +
+      '}';
     document.head.appendChild(st);
 
     // een heel subtiele 3D-sterrenhemel over het hele inlogscherm, in RTG-stijl

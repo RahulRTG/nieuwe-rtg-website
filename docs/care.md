@@ -41,6 +41,27 @@ van spa's, wellness en klinieken. Boeken kiest een dag en tijdslot en rekent
 in één keer af; bij een kliniek staat de aparte, uitdrukkelijke intake-deling
 in de kaart.
 
+## Verzorging staat ernaast, niet ertussen
+
+De kapper, de barbier en de nagelstudio staan in dezelfde tab, maar het is een
+eigen blok met een eigen kop en een eigen kern
+(`server/kern/verzorging/beautyleden.js`, routes `/api/verzorging*`). Dat is
+geen indeling maar een grens: cosmetische verzorging draagt **geen** zorgprofiel
+mee en kent **geen** intake-deling. Een kapper hoort geen medisch dossier te
+zien, en de enige manier om dat zeker te weten is dat die laag er niet bij kan.
+
+De salonagenda blijft daarbij één waarheid. De ledenlaag leest dezelfde bak als
+de zaak zelf (`db.data.beauty[code]`) en laat het boeken door `beautyBoek` doen,
+dus de botsingscontrole staat op één plek. Een lid boekt op codenaam; de salon
+ziet dus precies wat elke andere partner ziet. `test/verzorging-leden.test.js`
+en `test/verzorging-scherm.e2e.js` houden dat vast.
+
+De salon zet zijn eigen openingstijden via `/api/supplier/beauty/uren`, en de
+ledenkant leest ze daar. Hier stond eerder een constante met een briefje erbij
+dat dat een gat was; dat is gedicht. Wat blijft staan is een terugval voor een
+salon die nog geen uren heeft -- die moet niet onzichtbaar worden maar gewoon
+open zijn.
+
 ## De aanbieder-kant (De Zorgbalie)
 
 Een zorgaanbieder is een echte leverancier: het `zorg`-sectortype in

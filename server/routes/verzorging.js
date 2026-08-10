@@ -1,8 +1,11 @@
 /* Domein "verzorging": de beauty-salon en barbier, petcare en de
    kinderopvang met nanny-service, elk achter een eigen cap ('beauty',
-   'petcare', 'opvang'); de kern in server/kern/verzorging.js. */
+   'petcare', 'opvang'); de kern in server/kern/verzorging.js.
+
+   Onderaan staat de LEDENkant van de salon: dezelfde agenda, maar dan van de
+   kant van wie er een afspraak maakt, op codenaam. */
 module.exports = (kern) => {
-  const { app, db, supplierAuth, beauty, petcare, opvang } = kern;
+  const { app, db, auth, liveCodename, supplierAuth, beauty, petcare, opvang, verzorgingLeden } = kern;
   const stuur = (res, r) => { const { status, ...rest } = r; res.status(status || 200).json(rest); };
   const maak = (basis, capNaam, domein) => (pad, fn) => app.post(basis + pad, supplierAuth, (req, res) => {
     const caps = db.capsVan(req.supplier);
@@ -14,6 +17,7 @@ module.exports = (kern) => {
   b('', (code) => beauty.overzicht(code));
   b('/boek', (code, x) => beauty.boek(code, x));
   b('/status', (code, x) => beauty.afspraakStatus(code, x.id, x.status));
+  b('/uren', (code, x) => beauty.uren(code, x));
   b('/walkin', (code, x) => beauty.walkIn(code, x));
   b('/walkin/status', (code, x) => beauty.walkStatus(code, x.id, x.status));
 
@@ -35,4 +39,15 @@ module.exports = (kern) => {
   o('/nanny', (code, x) => opvang.nannyVraag(code, x));
   o('/nanny/zet', (code, x) => opvang.nannyZet(code, x));
   o('/verslag', (code, x) => opvang.verslagMaak(code, x));
+
+  /* ---- de ledenkant van de salon (cosmetisch, niet-medisch) ----
+     Geen zorgprofiel en geen intake: die horen bij Care en een kapper heeft ze
+     niet nodig. Alleen leden; een gast krijgt 403 uit de kern. */
+  const l = (pad, fn) => app.post('/api/verzorging' + pad, auth, (req, res) =>
+    stuur(res, fn(req.session, liveCodename(req.session), req.body || {})));
+
+  l('', (sess, naam, x) => verzorgingLeden.overzicht(naam, x.datum));
+  l('/boek', (sess, naam, x) => verzorgingLeden.boek(sess, naam, x));
+  l('/mijn', (sess, naam) => verzorgingLeden.mijn(naam));
+  l('/annuleer', (sess, naam, x) => verzorgingLeden.annuleer(naam, x.code, x.id));
 };

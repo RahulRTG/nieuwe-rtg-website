@@ -77,6 +77,11 @@
     </div>
   </section>
 
+  <section aria-label="Hoe het scherm zich gedraagt">
+    <h2>Hoe het scherm zich gedraagt</h2>
+    <div class="kaart" id="toegankelijk"><p class="stil">Laden...</p></div>
+  </section>
+
   <section aria-label="Geloof of levensbeschouwing">
     <h2>Geloof of levensbeschouwing</h2>
     <div class="kaart" id="geloof"><p class="stil">Laden...</p></div>
@@ -215,7 +220,37 @@
     } catch (e) { host.innerHTML = '<p class="stil">' + Veilig.esc(e.message) + '</p>'; }
   }
 
-  function teken(d) { tekenFase(d); tekenOmgang(d); tekenGeloof(d); $('#vnw').value = d.voornaamwoord; $('#aanhef').value = d.aanhef; }
+  /* Hoe het scherm zich gedraagt. De schakelaars komen uit de server-lijst
+     (kern/toegankelijk.js), zodat een optie erbij daar een regel is en hier
+     niets. Zetten gaat via RTGToegankelijk: dat past hem meteen toe op DEZE
+     pagina en bewaart hem voor alle andere. */
+  function tekenToegankelijk(d) {
+    const nu = d.toegankelijk || {};
+    const velden = d.keuzes.toegankelijk;
+    $('#toegankelijk').innerHTML =
+      '<p class="stil">Dit geldt op elk scherm van RTG, niet alleen hier. U kunt het altijd terugzetten.</p>' +
+      Object.keys(velden).map(veld => {
+        const v = velden[veld];
+        return '<div style="margin-top:1rem;">' +
+          '<b style="display:block;">' + Veilig.esc(v.label) + '</b>' +
+          '<span class="stil" style="display:block;margin:.15rem 0 .3rem;">' + Veilig.esc(v.uitleg) + '</span>' +
+          v.opties.map(o => '<button class="keus" data-tgveld="' + veld + '" data-tgwaarde="' + o.id + '"' +
+            ' aria-pressed="' + ((nu[veld] || 'normaal') === o.id) + '">' +
+            '<b>' + Veilig.esc(o.naam) + '</b>' +
+            (o.uitleg ? '<span>' + Veilig.esc(o.uitleg) + '</span>' : '') + '</button>').join('') +
+          '</div>';
+      }).join('');
+    $('#toegankelijk').querySelectorAll('[data-tgveld]').forEach(b => b.addEventListener('click', async () => {
+      const deel = {}; deel[b.dataset.tgveld] = b.dataset.tgwaarde;
+      try {
+        const r = window.RTGToegankelijk ? await RTGToegankelijk.zet(deel) : await Veilig.api('/api/ik/toegankelijk/zet', deel);
+        if (r && r.toegankelijk) tekenToegankelijk({ toegankelijk: r.toegankelijk, keuzes: { toegankelijk: velden } });
+        Veilig.melding('Genoteerd.');
+      } catch (e) { Veilig.melding(e.message); }
+    }));
+  }
+
+  function teken(d) { tekenFase(d); tekenOmgang(d); tekenToegankelijk(d); tekenGeloof(d); $('#vnw').value = d.voornaamwoord; $('#aanhef').value = d.aanhef; }
 
   async function laad() {
     try { teken(await Veilig.api('/api/ik')); vandaag(); }

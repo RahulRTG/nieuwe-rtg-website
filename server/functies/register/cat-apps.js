@@ -56,5 +56,6 @@ module.exports = [
   { id: 'ghost', categorie: 'Eigen apps', naam: 'Ghost Driver (simulatie)', standaard: true, doelgroepen: ['leverancier', 'intern'],
     uitleg: 'De voorspellende verkeers- en logistieksimulatie. Standaard alleen voor vervoerders; de verkeersleiding (kantoor) ziet altijd alles.',
     paden: ['/api/supplier/ghost', '/api/office/ghost'],
-    alleenGenres: ['taxi', 'jet', 'helikopter', 'ov', 'charter'] }
+    alleenGenres: ['taxi', 'jet', 'helikopter', 'ov', 'charter'] },
+
 ];

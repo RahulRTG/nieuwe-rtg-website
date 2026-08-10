@@ -4,7 +4,7 @@
 
    Dit is de orkestrator: de config (categorieen, doelgroepen) staat in
    ./doelgroepen en de catalogus is per categoriegroep opgeknipt in ./cat-leden,
-   ./cat-apps en ./cat-partners. Hier worden ze samengevoegd (in de
+   ./cat-apps, ./cat-life en ./cat-partners. Hier worden ze samengevoegd (in de
    oorspronkelijke volgorde) en volgen de fail-fast-controles op dubbele id's,
    de tegenhangers (KOPPELS) en de uitrolfases (FASES). */
 const { CATEGORIEEN, DOELGROEPEN, DOELGROEP_IDS, DOELGROEP_OP_ID, LEDEN, LEDEN_RTF } = require('./doelgroepen');
@@ -14,6 +14,7 @@ const { CATEGORIEEN, DOELGROEPEN, DOELGROEP_IDS, DOELGROEP_OP_ID, LEDEN, LEDEN_R
 const FUNCTIES = [].concat(
   require('./cat-leden'),
   require('./cat-apps'),
+  require('./cat-life'),
   require('./cat-partners'),
   require('./cat-zaakregie'),
   require('./cat-domeinen'),

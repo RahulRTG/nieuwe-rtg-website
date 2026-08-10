@@ -1,0 +1,238 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Training</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/veiligheid.css" rel="stylesheet">
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<style>
+  .grens{border:1px solid var(--line);border-left:2px solid var(--goldlicht);
+    padding:1rem 1.1rem;margin:.2rem 0 1.4rem;}
+  .grens b{display:block;font-family:'Bodoni Moda',Georgia,serif;font-size:1.05rem;font-weight:600;}
+  .grens p{font-size:.86rem;line-height:1.6;color:var(--soft);margin:.4rem 0 0;}
+  .grens ul{list-style:none;padding:0;margin:.6rem 0 0;}
+  .grens li{font-size:.84rem;line-height:1.6;padding:.2rem 0;}
+  .tr{border:1px solid var(--line);border-radius:12px;padding:1rem;margin:.7rem 0;}
+  .tr h3{font-family:'Bodoni Moda',Georgia,serif;font-size:1.1rem;font-weight:600;margin:0;}
+  .tr .m{color:var(--soft);font-size:.82rem;line-height:1.55;margin:.25rem 0 0;}
+  .tr .wat{font-size:.88rem;line-height:1.6;margin:.5rem 0 0;white-space:pre-wrap;}
+  .log{display:flex;justify-content:space-between;align-items:baseline;gap:.8rem;
+    padding:.6rem 0;border-top:1px solid var(--line);font-size:.86rem;}
+  .log .dag{color:var(--soft);font-size:.78rem;}
+  .rij{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;margin-top:.8rem;}
+  .rij input{width:6.5rem;}
+  .knop.mini{padding:.4rem .7rem;font-size:.8rem;}
+  .lbl{display:block;margin:.7rem 0 .2rem;font-size:.8rem;color:var(--soft);}
+  #tWat,#tDagen,#tVanWie{width:100%;}
+  .knop.hoofd{margin-top:.9rem;}
+  #lWat{flex:1 1 10rem;width:auto;}
+</style>
+<script src="/shared/seizoen.js" defer></script>
+<script src="/shared/veiligheid.js" defer></script>
+<link href="/shared/ios.css" rel="stylesheet">
+</head>
+<body class="rtg-stijl">
+<a class="skip" href="#inhoud">Naar de inhoud</a>
+<header class="kop">
+  <a href="/apps/life.html" aria-label="Terug naar RTG Life">&#8592;</a>
+  <h1>Training</h1>
+  <div class="rek"></div>
+  <span class="stil">uw schema, uw tempo</span>
+</header>
+<main id="inhoud">
+  <div id="grens"></div>
+
+  <section aria-label="Vandaag op schema">
+    <h2>Vandaag op schema</h2>
+    <div id="vandaag"><p class="stil">Laden...</p></div>
+  </section>
+
+  <section aria-label="Mijn schema">
+    <h2>Mijn schema</h2>
+    <div id="schema"></div>
+  </section>
+
+  <section aria-label="Een training erbij">
+    <h2>Een training erbij</h2>
+    <div class="kaart">
+      <label class="lbl" for="tNaam">Hoe heet deze training?</label>
+      <input id="tNaam" maxlength="60" placeholder="Bijv. Rustige duurloop">
+      <label class="lbl" for="tWat">Wat doet u precies? In uw eigen woorden.</label>
+      <textarea id="tWat" rows="3" maxlength="600"
+        placeholder="Bijv. 40 minuten rustig, praattempo. Van mijn coach."></textarea>
+      <label class="lbl" for="tDagen">Op welke dagen? Nummers, 1 is maandag.</label>
+      <input id="tDagen" maxlength="30" placeholder="2, 4, 6">
+      <label class="lbl" for="tDuur">Hoeveel minuten duurt hij?</label>
+      <input id="tDuur" type="number" step="5" min="1" max="600" inputmode="numeric">
+      <label class="lbl" for="tVanWie">Van wie is dit schema?</label>
+      <input id="tVanWie" maxlength="60" placeholder="Uzelf, of de naam van uw coach">
+      <button class="knop hoofd" id="tMaak">Toevoegen</button>
+    </div>
+  </section>
+
+  <section aria-label="Losse training noteren">
+    <h2>Iets losses noteren</h2>
+    <div class="kaart">
+      <p class="stil">Ook zonder schema. Wat u noteert telt mee als beweging van die dag, op uw eigen
+      woord.</p>
+      <div class="rij">
+        <input id="lWat" maxlength="80" placeholder="Bijv. Wandeling">
+        <input id="lDuur" type="number" step="5" min="1" max="600" inputmode="numeric" aria-label="Minuten">
+        <span class="stil">minuten</span>
+        <button class="knop mini" id="lNoteer">Noteren</button>
+      </div>
+    </div>
+  </section>
+
+  <section aria-label="Wat u deed">
+    <h2>Wat u deed</h2>
+    <div id="log"></div>
+  </section>
+
+  <section aria-label="Wat dit niet doet">
+    <h2>Wat dit niet doet</h2>
+    <div class="kaart">
+      <p class="stil">RTG stelt geen training voor, rekent geen belasting uit en zegt niet of u te
+      hard of te zacht traint. Er is geen oefeningenbibliotheek met voorgeschreven uitvoering: een
+      plaatje is geen begeleiding, en verkeerd uitgevoerd krachtwerk is een blessure. Wat hier staat
+      heeft u zelf ingevoerd, of uw coach.</p>
+      <p class="stil">Er zijn geen reeksen en geen scores. Een week overslaan is geen gebeurtenis:
+      er komt geen melding en er gaat niets verloren.</p>
+    </div>
+  </section>
+
+  <div id="onder" class="rtgdeel-vast"></div>
+</main>
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const esc = s => Veilig.esc(String(s == null ? '' : s));
+  const DAGEN = ['', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag', 'zondag'];
+
+  function tekenGrens(g) {
+    if (!g) return;
+    $('#grens').innerHTML = '<div class="grens"><b>' + esc(g.kop) + '</b>' +
+      '<p>' + esc(g.tekst) + '</p><ul>' + (g.wegen || []).map(w =>
+        '<li><b>' + esc(w.naam) + '</b> &middot; ' + esc(w.hoe) + '</li>').join('') + '</ul></div>';
+  }
+
+  const dagenTekst = d => (d || []).length ? (d.map(n => DAGEN[n]).join(', ')) : 'geen vaste dagen';
+
+  /* Wat vandaag op schema staat. Geen aansporing en geen teller: er staat wat er
+     staat, en of u het al heeft afgetekend. */
+  function tekenVandaag(lijst) {
+    const el = $('#vandaag');
+    if (!lijst.length) {
+      el.innerHTML = '<p class="stil">Er staat vandaag niets in uw schema.</p>';
+      return;
+    }
+    el.innerHTML = lijst.map(t => '<div class="tr"><h3>' + esc(t.naam) + '</h3>' +
+      '<p class="m">' + (t.duurMin ? esc(t.duurMin) + ' minuten' : 'zonder vaste duur') +
+        (t.vanWie ? ' &middot; van ' + esc(t.vanWie) : '') +
+        (t.gedaan ? ' &middot; afgetekend' : '') + '</p>' +
+      (t.wat ? '<p class="wat">' + esc(t.wat) + '</p>' : '') +
+      (t.gedaan ? '' : '<div class="rij"><button class="knop mini" data-deed="' + esc(t.id) + '">Gedaan</button></div>') +
+      '</div>').join('');
+    el.querySelectorAll('[data-deed]').forEach(b => b.addEventListener('click', async () => {
+      try {
+        const d = await Veilig.api('/api/training/deed', { schemaId: b.dataset.deed });
+        teken(d);
+        Veilig.melding(d.meting && d.meting.uitleg ? d.meting.uitleg : 'Genoteerd.');
+      } catch (e) { Veilig.melding(e.message); }
+    }));
+  }
+
+  function tekenSchema(lijst) {
+    const el = $('#schema');
+    if (!lijst.length) { el.innerHTML = '<p class="stil">Er staat nog niets in uw schema.</p>'; return; }
+    el.innerHTML = lijst.map(t => '<div class="tr"><h3>' + esc(t.naam) + '</h3>' +
+      '<p class="m">' + esc(dagenTekst(t.dagen)) +
+        (t.duurMin ? ' &middot; ' + esc(t.duurMin) + ' minuten' : '') +
+        (t.vanWie ? ' &middot; van ' + esc(t.vanWie) : '') + '</p>' +
+      (t.wat ? '<p class="wat">' + esc(t.wat) + '</p>' : '') +
+      '<div class="rij"><button class="knop mini" data-weg="' + esc(t.id) + '">Uit mijn schema</button></div>' +
+      '</div>').join('');
+    el.querySelectorAll('[data-weg]').forEach(b => b.addEventListener('click', async () => {
+      if (!window.confirm('Deze training uit uw schema halen?')) return;
+      try { teken(await Veilig.api('/api/training/weg', { id: b.dataset.weg })); }
+      catch (e) { Veilig.melding(e.message); }
+    }));
+  }
+
+  function tekenLog(lijst) {
+    const el = $('#log');
+    if (!lijst.length) { el.innerHTML = '<p class="stil">U heeft nog niets genoteerd.</p>'; return; }
+    el.innerHTML = lijst.map(g => '<div class="log">' +
+      '<span>' + esc(g.wat) + ' <span class="dag">' + esc(g.op) + '</span></span>' +
+      '<span>' + esc(g.duurMin) + ' min ' +
+        '<button class="knop mini" data-logweg="' + esc(g.id) + '">Weg</button></span></div>').join('');
+    el.querySelectorAll('[data-logweg]').forEach(b => b.addEventListener('click', async () => {
+      try {
+        const d = await Veilig.api('/api/training/deed-weg', { id: b.dataset.logweg });
+        teken(d);
+        Veilig.melding(d.meting && d.meting.uitleg ? d.meting.uitleg : 'Weggehaald.');
+      } catch (e) { Veilig.melding(e.message); }
+    }));
+  }
+
+  function teken(d) {
+    tekenGrens(d.grens);
+    tekenVandaag(d.vandaagOpSchema || []);
+    tekenSchema(d.schema || []);
+    tekenLog(d.gedaan || []);
+    if (d.gewaarschuwd) Veilig.melding(d.gewaarschuwd);
+    /* Ging het wegschrijven van de beweegmeting mis, dan hoort het lid dat te
+       zien: zijn cijfer klopt dan niet, en dat is geen detail. */
+    if (d.meting && d.meting.ok === false) Veilig.melding(d.meting.uitleg);
+  }
+
+  async function laad() {
+    try { teken(await Veilig.api('/api/training')); }
+    catch (e) { $('#vandaag').innerHTML = '<p class="stil">' + esc(e.message) + '</p>'; }
+  }
+
+  function start() {
+    $('#tMaak').addEventListener('click', async () => {
+      try {
+        teken(await Veilig.api('/api/training/zet', {
+          naam: $('#tNaam').value, wat: $('#tWat').value, dagen: $('#tDagen').value,
+          duurMin: $('#tDuur').value, vanWie: $('#tVanWie').value }));
+        $('#tNaam').value = ''; $('#tWat').value = ''; $('#tDagen').value = '';
+        $('#tDuur').value = ''; $('#tVanWie').value = '';
+        Veilig.melding('Toegevoegd.');
+      } catch (e) { Veilig.melding(e.message); }
+    });
+    $('#lNoteer').addEventListener('click', async () => {
+      try {
+        const d = await Veilig.api('/api/training/deed',
+          { wat: $('#lWat').value, duurMin: $('#lDuur').value });
+        $('#lWat').value = ''; $('#lDuur').value = '';
+        teken(d);
+        Veilig.melding(d.meting && d.meting.uitleg ? d.meting.uitleg : 'Genoteerd.');
+      } catch (e) { Veilig.melding(e.message); }
+    });
+    laad();
+  }
+
+  if (document.readyState !== 'loading') start();
+  else window.addEventListener('load', start);
+})();
+</script>
+<script src="/shared/deelmenu.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
+<script src="/shared/ios.js" defer></script>
+</body>
+</html>

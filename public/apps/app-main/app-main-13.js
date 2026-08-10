@@ -70,6 +70,7 @@
     renderCareIntakes();
     renderCarePakketten();
     renderCareAanbod();
+    laadVerzorging(); // de kapper en de barbier, apart gehouden van de zorg
   }
   function renderCareMijn(mijn){
     const el = $('#careMijn'); if (!el) return;

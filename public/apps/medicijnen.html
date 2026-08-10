@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Medicijnen</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/veiligheid.css" rel="stylesheet">
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<style>
+  .grens{border:1px solid var(--line);border-left:2px solid var(--goldlicht);
+    padding:1rem 1.1rem;margin:.2rem 0 1.4rem;}
+  .grens b{display:block;font-family:'Bodoni Moda',Georgia,serif;font-size:1.05rem;font-weight:600;}
+  .grens p{font-size:.86rem;line-height:1.6;color:var(--soft);margin:.4rem 0 0;}
+  .grens ul{list-style:none;padding:0;margin:.6rem 0 0;}
+  .grens li{font-size:.84rem;line-height:1.6;padding:.2rem 0;}
+  .punt{display:flex;justify-content:space-between;align-items:center;gap:.8rem;
+    padding:.7rem 0;border-top:1px solid var(--line);}
+  .punt .tijd{font-family:'Bodoni Moda',Georgia,serif;font-size:1.3rem;min-width:3.6rem;}
+  .punt .wat{flex:1 1 auto;font-size:.88rem;}
+  .punt .wat span{display:block;color:var(--soft);font-size:.76rem;margin-top:.1rem;}
+  .punt.af .tijd,.punt.af .wat{color:var(--soft);}
+  .mid{border:1px solid var(--line);border-radius:12px;padding:1rem;margin:.8rem 0;}
+  .mid h3{font-family:'Bodoni Moda',Georgia,serif;font-size:1.1rem;font-weight:600;margin:0;}
+  .mid .m{color:var(--soft);font-size:.82rem;line-height:1.55;margin:.25rem 0 0;}
+  .rij{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;margin-top:.8rem;}
+  .rij input{width:6.5rem;}
+  .knop.mini{padding:.4rem .7rem;font-size:.8rem;}
+  .lbl{display:block;margin:.7rem 0 .2rem;font-size:.8rem;color:var(--soft);}
+  .onbekend{color:var(--soft);font-style:italic;}
+  .knop.hoofd{margin-top:.9rem;}
+</style>
+<script src="/shared/seizoen.js" defer></script>
+<script src="/shared/veiligheid.js" defer></script>
+<link href="/shared/ios.css" rel="stylesheet">
+</head>
+<body class="rtg-stijl">
+<a class="skip" href="#inhoud">Naar de inhoud</a>
+<header class="kop">
+  <a href="/apps/life.html" aria-label="Terug naar RTG Life">&#8592;</a>
+  <h1>Medicijnen</h1>
+  <div class="rek"></div>
+  <span class="stil">uw lijst, uw wekker</span>
+</header>
+<main id="inhoud">
+  <div id="grens"></div>
+
+  <section aria-label="Vandaag">
+    <h2>Vandaag</h2>
+    <div id="vandaag"><p class="stil">Laden...</p></div>
+  </section>
+
+  <section aria-label="Mijn middelen">
+    <h2>Wat u gebruikt</h2>
+    <div id="lijst"></div>
+  </section>
+
+  <section aria-label="Een middel erbij">
+    <h2>Een middel erbij</h2>
+    <div class="kaart">
+      <label class="lbl" for="mNaam">Hoe heet het? Neem de naam over van het doosje.</label>
+      <input id="mNaam" maxlength="60" placeholder="Bijv. Metoprolol">
+      <label class="lbl" for="mSterkte">Sterkte, ook van het doosje.</label>
+      <input id="mSterkte" maxlength="40" placeholder="Bijv. 50 mg, 1 tablet">
+      <label class="lbl" for="mMomenten">Op welke tijden? Gescheiden door komma.</label>
+      <input id="mMomenten" maxlength="80" placeholder="08:00, 20:00">
+      <label class="lbl" for="mNotitie">Iets om te onthouden (voor uzelf).</label>
+      <input id="mNotitie" maxlength="200" placeholder="Bijv. bij het eten">
+      <button class="knop hoofd" id="mMaak">Toevoegen</button>
+      <div id="mFout"></div>
+    </div>
+  </section>
+
+  <section aria-label="Wat dit niet doet">
+    <h2>Wat dit niet doet</h2>
+    <div class="kaart">
+      <p class="stil">RTG houdt uw lijst bij en telt af wat u zelf heeft ingevoerd. Er is geen
+      middelenlijst om uit te kiezen, geen voorgestelde sterkte, geen maximum en geen controle op
+      combinaties of bijwerkingen. Dat laatste met opzet: een half werkende interactiecontrole is
+      gevaarlijker dan geen, want hij wekt vertrouwen waar niets onder ligt. Er staat hier ook
+      nergens dat u iets moet innemen &mdash; dat is een doseerinstructie, en die komt van uw arts.</p>
+      <p class="stil">De voorraad wordt geteld vanaf wat u aftekent. Tekent u niet af, dan staat er
+      een te hoog getal; vult u geen voorraad in, dan staat er niets. RTG verzint geen getal om het
+      vakje te vullen.</p>
+    </div>
+  </section>
+
+  <div id="onder" class="rtgdeel-vast"></div>
+</main>
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const esc = s => Veilig.esc(String(s == null ? '' : s));
+
+  /* De grens staat er altijd, ook op een dag dat er niets aan de hand is. Bij
+     een gesprek is hij een alarm; bij een schema is hij een bordje aan de muur. */
+  function tekenGrens(g) {
+    if (!g) return;
+    $('#grens').innerHTML = '<div class="grens"><b>' + esc(g.kop) + '</b>' +
+      '<p>' + esc(g.tekst) + '</p><ul>' + (g.wegen || []).map(w =>
+        '<li><b>' + esc(w.naam) + '</b> &middot; ' + esc(w.hoe) + '</li>').join('') + '</ul></div>';
+  }
+
+  /* "Geweest en niet afgetekend" is een constatering, geen verwijt: geen rood,
+     geen uitroepteken, geen teller die bijhoudt hoe vaak het al is gebeurd. */
+  function tekenVandaag(punten) {
+    const el = $('#vandaag');
+    if (!punten.length) {
+      el.innerHTML = '<p class="stil">Er staan geen tijden in uw schema, dus er is vandaag niets af te tekenen.</p>';
+      return;
+    }
+    el.innerHTML = punten.map(p =>
+      '<div class="punt' + (p.afgetekend ? ' af' : '') + '">' +
+        '<span class="tijd">' + esc(p.moment) + '</span>' +
+        '<span class="wat">' + esc(p.naam) + (p.sterkte ? ' ' + esc(p.sterkte) : '') +
+          '<span>' + (p.afgetekend ? 'afgetekend' : (p.geweest ? 'stond gepland, nog niet afgetekend' : 'komt nog')) + '</span></span>' +
+        '<button class="knop mini" data-af="' + esc(p.id) + '" data-mom="' + esc(p.moment) + '"' +
+          ' data-aan="' + (p.afgetekend ? '0' : '1') + '" aria-pressed="' + (p.afgetekend) + '">' +
+          (p.afgetekend ? 'Terugdraaien' : 'Aftekenen') + '</button>' +
+      '</div>').join('');
+    el.querySelectorAll('[data-af]').forEach(b => b.addEventListener('click', async () => {
+      try { teken(await Veilig.api('/api/medicatie/af',
+        { id: b.dataset.af, moment: b.dataset.mom, aan: b.dataset.aan === '1' })); }
+      catch (e) { Veilig.melding(e.message); }
+    }));
+  }
+
+  function tekenVoorraad(v) {
+    if (!v.bekend) return '<p class="m onbekend">' + esc(v.reden) + '</p>';
+    return '<p class="m">Nog <b>' + esc(v.over) + '</b> in huis' +
+      (v.dagenNog == null ? '. ' + esc(v.dagenReden || '')
+        : ', genoeg voor ongeveer ' + esc(v.dagenNog) + ' dag' + (v.dagenNog === 1 ? '' : 'en') + '.') +
+      ' <span class="onbekend">' + esc(v.hoe) + '</span></p>';
+  }
+
+  function tekenLijst(middelen) {
+    const el = $('#lijst');
+    if (!middelen.length) {
+      el.innerHTML = '<p class="stil">Er staat nog niets in uw schema.</p>';
+      return;
+    }
+    el.innerHTML = middelen.map(m => '<div class="mid">' +
+      '<h3>' + esc(m.naam) + (m.sterkte ? ' <span class="stil">' + esc(m.sterkte) + '</span>' : '') + '</h3>' +
+      '<p class="m">' + (m.momenten.length ? 'Om ' + esc(m.momenten.join(', ')) : 'Geen vaste tijden') +
+        (m.notitie ? ' &middot; ' + esc(m.notitie) : '') + '</p>' +
+      tekenVoorraad(m.voorraad) +
+      '<div class="rij">' +
+        '<label class="stil" for="v' + esc(m.id) + '">In huis</label>' +
+        '<input id="v' + esc(m.id) + '" type="number" step="1" min="0" inputmode="numeric" data-vveld="' + esc(m.id) + '"' +
+          (m.voorraad.bekend ? ' value="' + esc(m.voorraad.over) + '"' : '') + '>' +
+        '<button class="knop mini" data-voorraad="' + esc(m.id) + '">Voorraad bijwerken</button>' +
+        '<button class="knop mini" data-weg="' + esc(m.id) + '">Van de lijst</button>' +
+      '</div></div>').join('');
+    el.querySelectorAll('[data-voorraad]').forEach(b => b.addEventListener('click', async () => {
+      const veld = el.querySelector('[data-vveld="' + b.dataset.voorraad + '"]');
+      try { teken(await Veilig.api('/api/medicatie/voorraad', { id: b.dataset.voorraad, aantal: veld.value }));
+        Veilig.melding('Bijgewerkt.'); }
+      catch (e) { Veilig.melding(e.message); }
+    }));
+    el.querySelectorAll('[data-weg]').forEach(b => b.addEventListener('click', async () => {
+      if (!window.confirm('Dit middel van uw lijst halen?')) return;
+      try { teken(await Veilig.api('/api/medicatie/weg', { id: b.dataset.weg })); }
+      catch (e) { Veilig.melding(e.message); }
+    }));
+  }
+
+  function teken(d) {
+    tekenGrens(d.grens);
+    tekenVandaag(d.vandaag || []);
+    tekenLijst(d.middelen || []);
+    if (d.gewaarschuwd) Veilig.melding(d.gewaarschuwd);
+  }
+
+  async function laad() {
+    try { teken(await Veilig.api('/api/medicatie')); }
+    catch (e) { $('#vandaag').innerHTML = '<p class="stil">' + esc(e.message) + '</p>'; }
+  }
+
+  function start() {
+    $('#mMaak').addEventListener('click', async () => {
+      try {
+        const r = await Veilig.api('/api/medicatie/zet', {
+          naam: $('#mNaam').value, sterkte: $('#mSterkte').value,
+          momenten: $('#mMomenten').value, notitie: $('#mNotitie').value });
+        /* Slaat de crisisregel aan op het notitieveld, dan is er niets bewaard
+           en komt hier de weg naar hulp terug in plaats van een lijst. */
+        if (r.mag === false) {
+          $('#mFout').innerHTML = '<div class="grens"><b>' + esc(r.escalatie.kop) + '</b>' +
+            '<p>' + esc(r.escalatie.tekst) + '</p><ul>' + (r.escalatie.wegen || []).map(w =>
+              '<li><b>' + esc(w.naam) + '</b> &middot; ' + esc(w.hoe) + '</li>').join('') + '</ul></div>';
+          return;
+        }
+        $('#mFout').innerHTML = '';
+        $('#mNaam').value = ''; $('#mSterkte').value = '';
+        $('#mMomenten').value = ''; $('#mNotitie').value = '';
+        teken(r);
+        Veilig.melding('Toegevoegd.');
+      } catch (e) { Veilig.melding(e.message); }
+    });
+    laad();
+  }
+
+  if (document.readyState !== 'loading') start();
+  else window.addEventListener('load', start);
+})();
+</script>
+<script src="/shared/deelmenu.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
+<script src="/shared/ios.js" defer></script>
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Doelen</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/veiligheid.css" rel="stylesheet">
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<style>
+  .doel{border:1px solid var(--line);border-radius:12px;padding:1rem;margin:.8rem 0;}
+  .doel h3{font-family:'Bodoni Moda',Georgia,serif;font-size:1.15rem;font-weight:600;margin:0;}
+  .doel .waarom{color:var(--soft);font-size:.84rem;line-height:1.55;margin:.25rem 0 .7rem;}
+  .doel .nu{font-size:.9rem;margin:.2rem 0;}
+  .doel .nu b{font-size:1.35rem;font-family:'Bodoni Moda',Georgia,serif;}
+  .bericht{font-size:.88rem;line-height:1.55;margin:.6rem 0 .2rem;}
+  .balk{height:3px;background:rgba(255,255,255,.10);margin:.7rem 0 .2rem;}
+  .balk i{display:block;height:3px;background:var(--goldlicht);}
+  .paden{list-style:none;padding:0;margin:.7rem 0 0;}
+  .paden li{display:flex;justify-content:space-between;gap:.6rem;font-size:.82rem;
+    color:var(--soft);padding:.32rem 0;border-top:1px solid var(--line);}
+  .rij{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;margin-top:.8rem;}
+  .rij input{width:6.5rem;}
+  .knop.mini{padding:.4rem .7rem;font-size:.8rem;}
+  .lbl{display:block;margin:.7rem 0 .2rem;font-size:.8rem;color:var(--soft);}
+  .geenmeting{color:var(--soft);font-style:italic;}
+</style>
+<script src="/shared/seizoen.js" defer></script>
+<script src="/shared/veiligheid.js" defer></script>
+<link href="/shared/ios.css" rel="stylesheet">
+</head>
+<body class="rtg-stijl">
+<a class="skip" href="#inhoud">Naar de inhoud</a>
+<header class="kop">
+  <a href="/apps/app.html" aria-label="Terug naar de app">&#8592;</a>
+  <h1>Doelen</h1>
+  <div class="rek"></div>
+  <span class="stil">een pad, geen scorebord</span>
+</header>
+<main id="inhoud">
+  <p class="stil">Waar u begon, waar u heen wilt, wanneer en waarom. De stappen ertussen rekent RTG
+  elke keer opnieuw uit vanaf waar u nu staat. Loopt een week anders, dan wordt het pad anders;
+  u begint nooit opnieuw. Er zijn geen reeksen bij te houden en niets gaat verloren als u een
+  tijdje niets doet.</p>
+
+  <section aria-label="Mijn doelen">
+    <h2>Mijn doelen</h2>
+    <div id="lijst"><p class="stil">Laden...</p></div>
+  </section>
+
+  <section aria-label="Een doel erbij">
+    <h2>Een doel erbij</h2>
+    <div class="kaart">
+      <label class="lbl" for="dTitel">Wat wilt u bereiken?</label>
+      <input id="dTitel" maxlength="90" placeholder="Bijv. 10 kilometer kunnen hardlopen">
+      <label class="lbl" for="dReden">Waarom wilt u dit?</label>
+      <input id="dReden" maxlength="300" placeholder="Voor uzelf; dit helpt meer dan het getal">
+      <label class="lbl" for="dEenheid">Waarin meet u het?</label>
+      <input id="dEenheid" maxlength="20" placeholder="km, kilo, uur, keer per week">
+      <label class="lbl" for="dNul">Waar staat u nu?</label>
+      <input id="dNul" type="number" step="any" inputmode="decimal">
+      <label class="lbl" for="dStreef">Waar wilt u heen?</label>
+      <input id="dStreef" type="number" step="any" inputmode="decimal">
+      <label class="lbl" for="dOp">Wanneer wilt u er zijn?</label>
+      <input id="dOp" type="date">
+      <button class="knop hoofd" id="dMaak" style="margin-top:.9rem;">Doel toevoegen</button>
+    </div>
+  </section>
+
+  <section aria-label="Wat dit niet doet">
+    <h2>Wat dit niet doet</h2>
+    <div class="kaart">
+      <p class="stil">RTG rekent een pad uit tussen twee getallen die u zelf kiest. Het zegt niet
+      hoe u moet trainen, wat u moet eten of wat gezond voor u is; daar is een mens voor, en die
+      kent u. Elke meting staat op uw eigen woord ("zelf gemeten"), en dat blijft zichtbaar zolang
+      er geen apparaat of behandelaar is die iets vastlegt.</p>
+    </div>
+  </section>
+
+  <div id="grens" class="rtgdeel-vast"></div>
+</main>
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const esc = s => Veilig.esc(String(s == null ? '' : s));
+
+  function tekenDoel(d) {
+    const pct = d.aandeel == null ? null : Math.round(d.aandeel * 100);
+    return '<div class="doel">' +
+      '<h3>' + esc(d.titel) + '</h3>' +
+      '<p class="waarom">' + esc(d.reden) + '</p>' +
+      (d.stand.gemeten
+        ? '<p class="nu"><b>' + esc(d.stand.waarde) + '</b> ' + esc(d.eenheid) +
+          ' <span class="stil">gemeten op ' + esc(d.stand.op) + ', zelf</span></p>'
+        : '<p class="nu geenmeting">Nog niets gemeten.</p>') +
+      (pct == null ? '' : '<div class="balk"><i style="width:' + pct + '%;"></i></div>' +
+        '<p class="stil">' + pct + '% van ' + esc(d.nulmeting.waarde) + ' naar ' + esc(d.streef.waarde) +
+        ' ' + esc(d.eenheid) + '</p>') +
+      '<p class="bericht">' + esc(d.bericht) + '</p>' +
+      (d.mijlpalen.length
+        ? '<ul class="paden">' + d.mijlpalen.slice(0, 6).map(m =>
+            '<li><span>' + esc(m.op) + '</span><span>' + esc(m.waarde) + ' ' + esc(d.eenheid) + '</span></li>').join('') +
+          '</ul>'
+        : '') +
+      '<div class="rij">' +
+        '<label class="stil" for="m' + esc(d.id) + '">Meting</label>' +
+        '<input id="m' + esc(d.id) + '" type="number" step="any" inputmode="decimal" data-meetveld="' + esc(d.id) + '">' +
+        '<button class="knop mini" data-meet="' + esc(d.id) + '">Zet erin</button>' +
+        '<input type="date" data-datumveld="' + esc(d.id) + '" aria-label="Nieuwe streefdatum">' +
+        '<button class="knop mini" data-verzet="' + esc(d.id) + '">Datum verzetten</button>' +
+        '<button class="knop mini" data-stop="' + esc(d.id) + '">Stoppen</button>' +
+      '</div></div>';
+  }
+
+  function teken(d) {
+    const el = $('#lijst');
+    if (!d.doelen.length) {
+      el.innerHTML = '<p class="stil">U heeft nog geen doel staan. Eentje is genoeg om te beginnen.</p>';
+      return;
+    }
+    el.innerHTML = d.doelen.map(tekenDoel).join('');
+    el.querySelectorAll('[data-meet]').forEach(b => b.addEventListener('click', async () => {
+      const veld = el.querySelector('[data-meetveld="' + b.dataset.meet + '"]');
+      /* De maak-, meet- en verzet-routes geven EEN doel terug, niet de lijst;
+         daarom hier opnieuw laden en niet het antwoord doorgeven aan teken().
+         Dat verschil kostte eerst een scherm dat stil bleef staan. */
+      try { await Veilig.api('/api/doelen/meet', { id: b.dataset.meet, waarde: veld.value });
+        await laad(); Veilig.melding('Genoteerd.'); }
+      catch (e) { Veilig.melding(e.message); }
+    }));
+    el.querySelectorAll('[data-verzet]').forEach(b => b.addEventListener('click', async () => {
+      const veld = el.querySelector('[data-datumveld="' + b.dataset.verzet + '"]');
+      try { await Veilig.api('/api/doelen/verzet', { id: b.dataset.verzet, streefOp: veld.value });
+        await laad(); Veilig.melding('Het pad is opnieuw uitgerekend.'); }
+      catch (e) { Veilig.melding(e.message); }
+    }));
+    el.querySelectorAll('[data-stop]').forEach(b => b.addEventListener('click', async () => {
+      try { await Veilig.api('/api/doelen/stop', { id: b.dataset.stop }); laad(); Veilig.melding('Gestopt.'); }
+      catch (e) { Veilig.melding(e.message); }
+    }));
+  }
+
+  async function laad() {
+    try { teken(await Veilig.api('/api/doelen')); }
+    catch (e) { $('#lijst').innerHTML = '<p class="stil">' + esc(e.message) + '</p>'; }
+  }
+
+  function start() {
+    $('#dMaak').addEventListener('click', async () => {
+      try {
+        await Veilig.api('/api/doelen/maak', {
+          titel: $('#dTitel').value, reden: $('#dReden').value, eenheid: $('#dEenheid').value,
+          nulmeting: $('#dNul').value, streef: $('#dStreef').value, streefOp: $('#dOp').value
+        });
+        await laad();
+        $('#dTitel').value = ''; $('#dReden').value = ''; $('#dEenheid').value = '';
+        $('#dNul').value = ''; $('#dStreef').value = ''; $('#dOp').value = '';
+        Veilig.melding('Uw doel staat erin.');
+      } catch (e) { Veilig.melding(e.message); }
+    });
+    laad();
+  }
+
+  if (document.readyState !== 'loading') start();
+  else window.addEventListener('load', start);
+})();
+</script>
+<script src="/shared/deelmenu.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
+<script src="/shared/ios.js" defer></script>
+</body>
+</html>

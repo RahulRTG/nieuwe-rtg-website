@@ -113,7 +113,15 @@ module.exports = (ctx) => {
     bk.status = 'geannuleerd';
     bk.geannuleerdOp = nu();
     save();
-    return { ok: true, ref: bk.ref };
+    /* Er komt een slot vrij. De wachtlijst hangt LATER in de opbouw dan deze
+       laag, dus hij wordt op aanroepmoment uit de context gepakt; ontbreekt hij,
+       dan annuleert het gewoon door -- een wachtlijst die niet kan seinen mag
+       geen annulering tegenhouden. */
+    let gewekt = 0;
+    if (typeof ctx.slotVrij === 'function') {
+      gewekt = ctx.slotVrij(bk.aanbiederId, bk.datum, bk.tijd, bk.behandelingNaam) || 0;
+    }
+    return { ok: true, ref: bk.ref, wachtlijstGewekt: gewekt };
   }
 
   function careMijn(key) {

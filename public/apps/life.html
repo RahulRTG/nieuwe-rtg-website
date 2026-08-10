@@ -1,0 +1,536 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Life</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/veiligheid.css" rel="stylesheet">
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<style>
+  .winst{border:1px solid var(--line);border-left:2px solid var(--goldlicht);
+    padding:1.1rem 1.2rem;margin:.2rem 0 1.6rem;}
+  .winst .kop{font-size:.66rem;letter-spacing:.18em;text-transform:uppercase;color:var(--goldlicht);}
+  .winst p{font-family:'Bodoni Moda',Georgia,serif;font-size:1.25rem;line-height:1.45;margin:.45rem 0 0;}
+  .sig{display:flex;justify-content:space-between;align-items:baseline;gap:1rem;
+    padding:.85rem 0;border-top:1px solid var(--line);}
+  .sig .naam{font-size:.9rem;}
+  .sig .uit{display:block;color:var(--soft);font-size:.78rem;line-height:1.5;margin-top:.15rem;}
+  .sig .waarde{font-family:'Bodoni Moda',Georgia,serif;font-size:1.5rem;white-space:nowrap;}
+  .sig .eenheid{display:block;color:var(--soft);font-size:.72rem;text-align:right;}
+  .sig.leeg .waarde{font-family:'Inter',system-ui,sans-serif;font-size:.82rem;color:var(--soft);font-style:italic;}
+  .kaartje{border:1px solid var(--line);border-radius:12px;padding:.9rem 1rem;margin:.6rem 0;}
+  .kaartje b{display:block;}
+  .kaartje .m{color:var(--soft);font-size:.82rem;line-height:1.5;margin-top:.2rem;}
+  .balk{height:2px;background:rgba(255,255,255,.10);margin:.6rem 0 0;}
+  .balk i{display:block;height:2px;background:var(--goldlicht);}
+  .storing{border:1px solid var(--rood,#DE6E92);border-radius:10px;padding:.7rem .9rem;
+    margin:.6rem 0;font-size:.82rem;color:var(--soft);}
+  .heen{display:inline-block;margin:.35rem .5rem 0 0;font-size:.82rem;}
+  .rij{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;margin-top:.7rem;}
+  .rij input{width:6rem;}
+  .knop.mini{padding:.4rem .7rem;font-size:.8rem;}
+  /* De noodkaart wordt gelezen door iemand die haast heeft en u niet kent:
+     groot, rustig, en niets eromheen dat om aandacht vraagt. */
+  .nkaart{border:1px solid var(--line);border-left:2px solid var(--goldlicht);padding:1.1rem 1.2rem;}
+  .nkaart p{font-family:'Bodoni Moda',Georgia,serif;font-size:1.15rem;line-height:1.5;margin:0 0 .5rem;}
+  .nkaart p:last-child{margin-bottom:0;}
+  .nkaart p.leeg{font-family:'Inter',system-ui,sans-serif;font-size:.85rem;color:var(--soft);}
+  .keus{display:flex;gap:.5rem;align-items:flex-start;margin-top:.6rem;font-size:.82rem;line-height:1.5;}
+  .keus input{margin-top:.2rem;flex:none;}
+  #nood .rij input{width:auto;flex:1 1 8rem;min-width:8rem;}
+  .dagrij{display:flex;align-items:baseline;gap:.9rem;padding:.75rem 0;border-top:1px solid var(--line);}
+  .dagrij .klok{font-family:'Bodoni Moda',Georgia,serif;font-size:1.2rem;min-width:3.4rem;}
+  .dagrij .wat{flex:1 1 auto;font-size:.9rem;}
+  .dagrij .wat .uit{display:block;color:var(--soft);font-size:.78rem;line-height:1.5;margin-top:.1rem;}
+  .dagrij .bron{font-size:.74rem;white-space:nowrap;}
+  .dagrij.af .klok,.dagrij.af .wat b{color:var(--soft);}
+  .losse{margin-top:1rem;}
+</style>
+<script src="/shared/seizoen.js" defer></script>
+<script src="/shared/veiligheid.js" defer></script>
+<link href="/shared/ios.css" rel="stylesheet">
+</head>
+<body class="rtg-stijl">
+<a class="skip" href="#inhoud">Naar de inhoud</a>
+<header class="kop">
+  <a href="/apps/app.html" aria-label="Terug naar de app">&#8592;</a>
+  <h1>RTG Life</h1>
+  <div class="rek"></div>
+  <span class="stil">wat er vandaag toe doet</span>
+</header>
+<main id="inhoud">
+  <div id="winst"></div>
+
+  <section aria-label="Uw dag">
+    <h2>Uw dag</h2>
+    <p class="stil">Alles wat u vandaag al ergens heeft staan, op volgorde van de klok. RTG deelt
+    uw dag niet in: het weet niet hoeveel energie u heeft, wat er buiten RTG in uw dag staat of
+    wanneer u de kinderen ophaalt, en een indeling verzinnen uit de rest levert een zelfverzekerd
+    verkeerd plan. Afvinken doet u in de app waar het thuishoort.</p>
+    <div id="dag"><p class="stil">Laden...</p></div>
+  </section>
+
+  <section aria-label="Uw signalen">
+    <h2>Hoe u ervoor staat</h2>
+    <div id="signalen"><p class="stil">Laden...</p></div>
+    <p class="stil" style="margin-top:.8rem;">Wat hier niet gemeten wordt, staat er als niet
+    gemeten. RTG vult geen nul in waar niets bekend is, en verzint geen score.</p>
+  </section>
+
+  <section aria-label="Hoe zit u erbij">
+    <h2>Hoe zit u erbij</h2>
+    <p class="stil">Een tik, meer hoeft niet. Wilt u er iets bij schrijven, dan blijft dat van u:
+    het verlaat uw account niet en er is geen knop die dat wel zou doen. Geen reeksen, geen score.</p>
+    <div id="gemoed"></div>
+  </section>
+
+  <section aria-label="Vandaag invullen">
+    <h2>Vandaag invullen</h2>
+    <p class="stil">Drie dingen die alleen u weet. Ze blijven van u: ze gaan naar geen partner,
+    geen zaak en geen coach, en er staat altijd bij dat u ze zelf heeft ingevuld.</p>
+    <div id="invullen"></div>
+  </section>
+
+  <section aria-label="Gewoonten">
+    <h2>Gewoonten</h2>
+    <p class="stil">Kleine dingen die u vaker wilt doen. De dagenteller staat uit; zet hem aan als
+    hij u helpt, en uit als hij u opjaagt. Een dag overslaan is geen gebeurtenis: er komt geen
+    melding en er gaat niets verloren.</p>
+    <div id="gewoonten"></div>
+  </section>
+
+  <section aria-label="Gekoppelde toestellen">
+    <h2>Toestellen</h2>
+    <p class="stil">Een horloge of weegschaal die zelf meet, mag dagmetingen wegschrijven. Zo'n
+    toestel krijgt een eigen sleutel die precies dat ene kan: meten. Geen agenda, geen betalingen,
+    geen dossier. U kunt hem altijd intrekken; wat er gemeten is blijft dan gewoon staan.</p>
+    <div id="toestellen"></div>
+  </section>
+
+  <section aria-label="Uw doelen">
+    <h2>Waar u naartoe werkt</h2>
+    <div id="doelen"></div>
+    <a class="heen" href="/apps/doelen.html">Naar Doelen &#8594;</a>
+  </section>
+
+  <section aria-label="Wat eraan komt">
+    <h2>Wat eraan komt</h2>
+    <div id="afspraken"></div>
+    <a class="heen" href="/apps/app.html">Zorg en verzorging in de app &#8594;</a>
+  </section>
+
+  <section aria-label="Rust en ritme">
+    <h2>Rust en ritme</h2>
+    <div id="adviezen"></div>
+    <a class="heen" href="/apps/balans.html">Naar Balans &#8594;</a>
+  </section>
+
+  <section aria-label="Medicijnen">
+    <h2>Vandaag in te nemen</h2>
+    <p class="stil">Wat er in uw eigen medicatieschema staat. Aftekenen doet u in Medicijnen; RTG
+    zegt niet dat u iets moet innemen en gaat niet over dosering.</p>
+    <div id="medicatie"></div>
+    <a class="heen" href="/apps/medicijnen.html">Naar Medicijnen &#8594;</a>
+  </section>
+
+  <section aria-label="Noodkaart">
+    <h2>Als u het zelf niet kunt vertellen</h2>
+    <p class="stil">Het kleinste beetje dat een vreemde over u moet weten: wie er gebeld moet worden,
+    en als u dat wilt uw allergenen en uw medicijnen. Die worden gelezen uit uw zorgprofiel en uw
+    medicatieschema en niet gekopieerd &mdash; haalt u er daar iets weg, dan staat het hier ook niet
+    meer. U toont deze kaart zelf op uw scherm. Niemand kan hem op afstand opvragen, ook een
+    hulpverlener niet.</p>
+    <div id="nood"></div>
+  </section>
+
+  <div id="grens" class="rtgdeel-vast"></div>
+</main>
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const esc = s => Veilig.esc(String(s == null ? '' : s));
+
+  function tekenWinst(w) {
+    if (!w) { $('#winst').innerHTML = ''; return; }
+    $('#winst').innerHTML = '<div class="winst"><span class="kop">' + esc(w.kop) + '</span>' +
+      '<p>' + esc(w.tekst) + '</p></div>';
+  }
+
+  /* Een signaal is gemeten of niet gemeten; er is geen derde vorm. De
+     niet-gemeten regels blijven staan MET hun reden, want een weggelaten regel
+     leest als "hier valt niets te halen" en een lege plek als een storing. */
+  function tekenSignalen(lijst) {
+    $('#signalen').innerHTML = lijst.map(s => s.gemeten
+      ? '<div class="sig"><span class="naam">' + esc(s.naam) +
+          (s.uitleg ? '<span class="uit">' + esc(s.uitleg) + '</span>' : '') + '</span>' +
+        '<span><span class="waarde">' + esc(s.waarde) + '</span>' +
+          '<span class="eenheid">' + esc(s.eenheid) + '</span></span></div>'
+      : '<div class="sig leeg"><span class="naam">' + esc(s.naam) +
+          '<span class="uit">' + esc(s.reden) + '</span></span>' +
+        '<span class="waarde">niet gemeten</span></div>').join('');
+  }
+
+  /* De invulvelden komen uit de server-lijst (kern/metingen.js), zodat een
+     onderwerp erbij daar een regel is en hier niets. */
+  function tekenInvullen(d) {
+    const el = $('#invullen'); if (!el) return;
+    const namen = Object.keys(d.onderwerpen || {});
+    el.innerHTML = namen.map(naam => {
+      const o = d.onderwerpen[naam];
+      const b = (d.beeld || {})[naam] || {};
+      return '<div class="kaartje"><b>' + esc(o.label) + '</b>' +
+        '<span class="m">' + esc(o.vraag) + '</span>' +
+        '<div class="rij">' +
+          '<input type="number" step="' + esc(o.stap) + '" min="0" max="' + esc(o.max) + '" inputmode="decimal"' +
+            ' aria-label="' + esc(o.vraag) + '" data-mveld="' + esc(naam) + '"' +
+            (b.vandaag == null ? '' : ' value="' + esc(b.vandaag) + '"') + '>' +
+          '<span class="stil">' + esc(o.eenheid) + '</span>' +
+          '<button class="knop mini" data-mzet="' + esc(naam) + '">Bewaren</button>' +
+          (b.vandaag == null ? '' : '<button class="knop mini" data-mweg="' + esc(naam) + '">Wissen</button>') +
+        '</div></div>';
+    }).join('');
+    el.querySelectorAll('[data-mzet]').forEach(k => k.addEventListener('click', async () => {
+      const veld = el.querySelector('[data-mveld="' + k.dataset.mzet + '"]');
+      try { await Veilig.api('/api/metingen/zet', { onderwerp: k.dataset.mzet, waarde: veld.value });
+        await laad(); Veilig.melding('Genoteerd.'); }
+      catch (e) { Veilig.melding(e.message); }
+    }));
+    el.querySelectorAll('[data-mweg]').forEach(k => k.addEventListener('click', async () => {
+      try { await Veilig.api('/api/metingen/weg', { onderwerp: k.dataset.mweg });
+        await laad(); Veilig.melding('Gewist.'); }
+      catch (e) { Veilig.melding(e.message); }
+    }));
+  }
+
+  /* De sleutel van een net gekoppeld toestel blijft op het scherm staan tot het
+     lid de pagina verlaat. Hij komt maar EEN keer terug van de server en wordt
+     nergens bewaard, dus een herteken die hem wegpoetst zou hem echt kwijt
+     maken. Bij het herladen is hij weg, en dat hoort ook. */
+  let versSleutel = null;
+
+  /* De dagcheck-in. Slaat de grens uit kern/zorgniveau.js aan, dan komt er GEEN
+     tiplijst terug maar een weg naar echte hulp -- en dan tekent dit scherm die
+     ook alleen. Een telefoonnummer onder een verder vrolijk lijstje zetten zou
+     precies de grens zijn die geen grens is. */
+  function tekenGemoed(d, antwoord) {
+    const el = $('#gemoed'); if (!el) return;
+    const nu = (d.vandaagIngevuld || {}).stemming || null;
+    let html = '<div class="rij">' + (d.stemmingen || []).map(s =>
+      '<button class="knop mini' + (nu === s.id ? ' on' : '') + '" data-stem="' + esc(s.id) + '"' +
+      ' aria-pressed="' + (nu === s.id) + '">' + esc(s.label) + '</button>').join('') + '</div>';
+
+    html += '<div class="kaartje"><b>Wilt u er iets bij schrijven?</b>' +
+      '<span class="m">Hoeft niet. Het is voor uzelf.</span>' +
+      '<textarea id="gNotitie" rows="3" maxlength="1000" aria-label="Voor uzelf"' +
+      ' style="width:100%;margin-top:.5rem;">' + esc((d.vandaagIngevuld || {}).notitie || '') + '</textarea>' +
+      '<div class="rij"><button class="knop mini" id="gBewaar">Bewaren</button>' +
+      (d.vandaagIngevuld ? '<button class="knop mini" id="gWeg">Wissen</button>' : '') + '</div></div>';
+
+    const esc2 = x => '<div class="kaartje"><b>' + esc(x.kop) + '</b><span class="m">' + esc(x.tekst) + '</span>' +
+      '<ul style="margin:.5rem 0 0 1rem;padding:0;">' + (x.wegen || []).map(w =>
+        '<li style="font-size:.85rem;line-height:1.6;"><b>' + esc(w.naam) + '</b> &middot; ' + esc(w.hoe) + '</li>').join('') +
+      '</ul></div>';
+
+    if (antwoord && antwoord.mag === false) {
+      html += '<div class="storing" role="status">' + esc(antwoord.uitleg || '') + '</div>' + esc2(antwoord.escalatie);
+    } else {
+      const aanhoudend = (antwoord && antwoord.aanhoudend) || d.aanhoudend;
+      if (aanhoudend) html += esc2(aanhoudend);
+      const doen = (antwoord && antwoord.doen) || d.doen || [];
+      if (doen.length) {
+        html += '<div style="font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);margin:1rem 0 .3rem;">' +
+          'Of doe gewoon iets</div>' + doen.map(x =>
+          '<div class="kaartje"><b>' + esc(x.naam) + '</b><span class="m">' + esc(x.hoe) + '</span></div>').join('');
+      }
+    }
+    el.innerHTML = html;
+
+    let gekozen = nu;
+    el.querySelectorAll('[data-stem]').forEach(b => b.addEventListener('click', async () => {
+      gekozen = b.dataset.stem;
+      try {
+        const r = await Veilig.api('/api/gemoed/zet',
+          { stemming: gekozen, notitie: ($('#gNotitie') || {}).value || '' });
+        tekenGemoed(await Veilig.api('/api/gemoed'), r);
+      } catch (e) { Veilig.melding(e.message); }
+    }));
+    const bew = $('#gBewaar');
+    if (bew) bew.addEventListener('click', async () => {
+      if (!gekozen) { Veilig.melding('Kies eerst hoe u erbij zit.'); return; }
+      try {
+        const r = await Veilig.api('/api/gemoed/zet', { stemming: gekozen, notitie: $('#gNotitie').value });
+        tekenGemoed(await Veilig.api('/api/gemoed'), r);
+        Veilig.melding('Genoteerd.');
+      } catch (e) { Veilig.melding(e.message); }
+    });
+    const weg = $('#gWeg');
+    if (weg) weg.addEventListener('click', async () => {
+      try { await Veilig.api('/api/gemoed/weg', {}); tekenGemoed(await Veilig.api('/api/gemoed'), null);
+        Veilig.melding('Gewist.'); }
+      catch (e) { Veilig.melding(e.message); }
+    });
+  }
+
+  function tekenGewoonten(d) {
+    const el = $('#gewoonten'); if (!el) return;
+    const lijst = d.gewoonten || [];
+    el.innerHTML = (lijst.length ? lijst.map(g =>
+      '<div class="kaartje"><b>' + esc(g.naam) + '</b>' +
+      (g.waarom ? '<span class="m">' + esc(g.waarom) + '</span>' : '') +
+      '<div class="rij">' +
+        '<button class="knop mini' + (g.vandaagGedaan ? ' on' : '') + '" data-gtik="' + esc(g.id) + '"' +
+        ' aria-pressed="' + (g.vandaagGedaan) + '">' + (g.vandaagGedaan ? 'Vandaag gedaan' : 'Vandaag doen') + '</button>' +
+        '<button class="knop mini" data-greeks="' + esc(g.id) + '" data-aan="' + (!g.reeksAan) + '">' +
+          (g.reeksAan ? 'Teller uit' : 'Teller aan') + '</button>' +
+        '<button class="knop mini" data-gweg="' + esc(g.id) + '">Weg</button>' +
+      '</div>' +
+      (g.reeksAan ? '<span class="m">' + esc(g.reeks) + ' dagen op rij</span>' : '') +
+      '<span class="m">' + esc(g.dagen.length) + ' van de laatste ' + esc(g.venster) + ' dagen</span>' +
+      '</div>').join('') : '<p class="stil">U heeft nog geen gewoonte staan.</p>') +
+      '<div class="kaartje"><b>Een gewoonte erbij</b>' +
+      '<div class="rij"><input maxlength="60" placeholder="Bijv. elke dag even buiten" aria-label="Wat wilt u vaker doen?" id="gwNaam">' +
+      '<button class="knop mini" id="gwMaak">Toevoegen</button></div></div>';
+
+    el.querySelectorAll('[data-gtik]').forEach(b => b.addEventListener('click', async () => {
+      try { await Veilig.api('/api/gewoonten/tik', { id: b.dataset.gtik }); await laad(); }
+      catch (e) { Veilig.melding(e.message); }
+    }));
+    el.querySelectorAll('[data-greeks]').forEach(b => b.addEventListener('click', async () => {
+      try { await Veilig.api('/api/gewoonten/reeks', { id: b.dataset.greeks, aan: b.dataset.aan === 'true' });
+        await laad(); }
+      catch (e) { Veilig.melding(e.message); }
+    }));
+    el.querySelectorAll('[data-gweg]').forEach(b => b.addEventListener('click', async () => {
+      try { await Veilig.api('/api/gewoonten/stop', { id: b.dataset.gweg }); await laad(); Veilig.melding('Weg.'); }
+      catch (e) { Veilig.melding(e.message); }
+    }));
+    const mk = $('#gwMaak');
+    if (mk) mk.addEventListener('click', async () => {
+      try { await Veilig.api('/api/gewoonten/maak', { naam: $('#gwNaam').value }); await laad();
+        Veilig.melding('Toegevoegd.'); }
+      catch (e) { Veilig.melding(e.message); }
+    });
+  }
+
+  function tekenToestellen(d) {
+    const el = $('#toestellen'); if (!el) return;
+    const lijst = d.toestellen || [];
+    el.innerHTML = (lijst.length
+      ? lijst.map(t => '<div class="kaartje"><b>' + esc(t.naam) + '</b>' +
+          '<span class="m">Gekoppeld op ' + esc((t.gekoppeldOp || '').slice(0, 10)) +
+          ' &middot; ' + esc(t.geschreven) + ' metingen' +
+          (t.laatstGezien ? ' &middot; laatst gezien ' + esc(t.laatstGezien.slice(0, 10)) : ' &middot; nog niets ontvangen') +
+          '</span><div class="rij"><button class="knop mini" data-tweg="' + esc(t.id) + '">Intrekken</button></div></div>').join('')
+      : '<p class="stil">Er is nog geen toestel gekoppeld.</p>') +
+      '<div class="kaartje"><b>Een toestel koppelen</b>' +
+      '<div class="rij"><input maxlength="60" placeholder="Bijv. Horloge" aria-label="Naam van het toestel" id="tNaam">' +
+      '<button class="knop mini" id="tKoppel">Koppelen</button></div>' +
+      '<div id="tSleutel">' + (versSleutel
+        ? '<div class="storing" role="status"><b>' + esc(versSleutel.sleutel) + '</b><br>' +
+          esc(versSleutel.uitleg) + '</div>'
+        : '') + '</div></div>';
+    el.querySelectorAll('[data-tweg]').forEach(k => k.addEventListener('click', async () => {
+      try { const r = await Veilig.api('/api/toestellen/intrek', { id: k.dataset.tweg });
+        await laad(); Veilig.melding(r.uitleg || 'Ingetrokken.'); }
+      catch (e) { Veilig.melding(e.message); }
+    }));
+    const kop = $('#tKoppel');
+    if (kop) kop.addEventListener('click', async () => {
+      try {
+        const r = await Veilig.api('/api/toestellen/koppel', { naam: $('#tNaam').value });
+        versSleutel = { sleutel: r.sleutel, uitleg: r.sleutelUitleg };
+        tekenToestellen(await Veilig.api('/api/toestellen'));
+        Veilig.melding('Gekoppeld.');
+      } catch (e) { Veilig.melding(e.message); }
+    });
+  }
+
+  function tekenDoelen(d) {
+    if (!d.length) {
+      $('#doelen').innerHTML = '<p class="stil">U heeft nog geen doel staan.</p>';
+      return;
+    }
+    $('#doelen').innerHTML = d.map(x => {
+      const pct = x.aandeel == null ? null : Math.round(x.aandeel * 100);
+      return '<div class="kaartje"><b>' + esc(x.titel) + '</b>' +
+        '<span class="m">' + esc(x.bericht) + '</span>' +
+        (pct == null ? '' : '<div class="balk"><i style="width:' + pct + '%;"></i></div>') +
+        '</div>';
+    }).join('');
+  }
+
+  function tekenAfspraken(a) {
+    if (!a.length) {
+      $('#afspraken').innerHTML = '<p class="stil">Er staat niets gepland bij zorg of verzorging.</p>';
+      return;
+    }
+    $('#afspraken').innerHTML = a.map(x => '<div class="kaartje"><b>' + esc(x.wat) + '</b>' +
+      '<span class="m">' + esc(x.waar) + ' &middot; ' + esc(x.datum) + ' om ' + esc(x.tijd) +
+      ' &middot; ' + (x.soort === 'zorg' ? 'zorg' : 'verzorging') + '</span></div>').join('');
+  }
+
+  function tekenAdviezen(a) {
+    $('#adviezen').innerHTML = a.length
+      ? a.map(x => '<div class="kaartje"><span class="m">' + esc(x.tekst) + '</span></div>').join('')
+      : '<p class="stil">Uw week geeft op dit moment geen aanleiding tot advies.</p>';
+  }
+
+  /* De dag: regels met een tijd bovenaan, wat geen tijd heeft eronder. Elke
+     regel draagt zijn bron en een weg ernaartoe, want dit scherm bezit niets --
+     hier valt niets af te vinken, en dat hoort ook zichtbaar te zijn. Geen
+     "vier van de zeven" en geen balk: dat maakt van een dag een cijfer. */
+  function tekenDag(d) {
+    const el = $('#dag'); if (!el) return;
+    const p = d.punten || [];
+    let html = '<div class="winst"><span class="kop">Vandaag</span><p>' + esc(d.kop) + '</p></div>';
+    if (d.rust) html += '<p class="stil">' + esc(d.rust) + '</p>';
+    if (!p.length) { el.innerHTML = html; return; }
+    const opTijd = p.filter(x => x.tijd), los = p.filter(x => !x.tijd);
+    const regel = x => '<div class="dagrij' + (x.gedaan ? ' af' : '') + '">' +
+      '<span class="klok">' + (x.tijd ? esc(x.tijd) : '&mdash;') + '</span>' +
+      '<span class="wat"><b>' + esc(x.wat) + '</b>' +
+        '<span class="uit">' + esc(x.uitleg) + '</span></span>' +
+      '<a class="bron" href="' + esc(x.naar) + '">' + esc(x.naam) + ' &#8594;</a></div>';
+    html += opTijd.map(regel).join('');
+    if (los.length) {
+      html += '<p class="stil losse">Ergens vandaag, zonder vast tijdstip:</p>' +
+        los.map(regel).join('');
+    }
+    el.innerHTML = html;
+  }
+
+  /* Alleen wat er vandaag staat, en alleen lezen: aftekenen gebeurt in
+     Medicijnen. Staat er niets in het schema, dan staat hier geen nul en geen
+     lege balk maar een zin die zegt dat er niets is. En nergens "neem dit in":
+     dat is een doseerinstructie en daar gaat RTG niet over. */
+  function tekenMedicatie(d) {
+    const el = $('#medicatie'); if (!el) return;
+    const p = d.vandaag || [];
+    if (!p.length) {
+      el.innerHTML = (d.middelen || []).length
+        ? '<p class="stil">Er staan geen tijden in uw schema.</p>'
+        : '<p class="stil">U heeft nog geen medicatieschema.</p>';
+      return;
+    }
+    const open = p.filter(x => !x.afgetekend).length;
+    el.innerHTML = '<p class="stil">' + p.length + ' moment' + (p.length === 1 ? '' : 'en') +
+      ' vandaag, waarvan ' + open + ' nog niet afgetekend.</p>' +
+      p.map(x => '<div class="sig' + (x.afgetekend ? ' leeg' : '') + '">' +
+        '<span class="naam">' + esc(x.naam) + (x.sterkte ? ' ' + esc(x.sterkte) : '') +
+          '<span class="uit">' + (x.afgetekend ? 'afgetekend' :
+            (x.geweest ? 'stond gepland, nog niet afgetekend' : 'komt nog')) + '</span></span>' +
+        '<span class="waarde">' + esc(x.moment) + '</span></div>').join('');
+  }
+
+  /* De kaart staat BOVEN het formulier, want wat u invult is precies wat een
+     vreemde straks leest. Staat hij uit, dan staat er ook geen kaart -- geen
+     grijze voorvertoning, want half getoond leest als bijna aan. */
+  function tekenNood(d) {
+    const el = $('#nood'); if (!el) return;
+    const k = d.kaart || {};
+    const regels = [];
+    if (k.contactNaam) regels.push('<b>Bel ' + esc(k.contactNaam) + '</b>' +
+      (k.contactTel ? ' &middot; ' + esc(k.contactTel) : ''));
+    if (k.watNodig) regels.push(esc(k.watNodig));
+    if (k.zorgErbij && (k.allergenen || []).length) regels.push('Allergisch voor ' + esc(k.allergenen.join(', ')));
+    if (k.zorgErbij && k.medisch) regels.push('Let op: ' + esc(k.medisch));
+    if (k.medicijnenErbij && (k.medicijnen || []).length) regels.push('Gebruikt ' + esc(k.medicijnen.join(', ')));
+
+    el.innerHTML =
+      (k.aan
+        ? '<div class="nkaart">' + (regels.length
+            ? regels.map(r => '<p>' + r + '</p>').join('')
+            : '<p class="leeg">Uw kaart staat aan, maar er staat nog niets op.</p>') + '</div>'
+        : '<p class="stil">Uw noodkaart staat uit. Er is niets te tonen.</p>') +
+      '<div class="kaartje">' +
+        '<div class="rij">' +
+          '<input maxlength="60" id="nNaam" aria-label="Wie moet er gebeld worden" ' +
+            'placeholder="Wie moet er gebeld worden?" value="' + esc(k.contactNaam) + '">' +
+          '<input maxlength="30" id="nTel" aria-label="Telefoonnummer" ' +
+            'placeholder="Telefoonnummer" value="' + esc(k.contactTel) + '">' +
+        '</div>' +
+        '<textarea id="nNodig" rows="2" maxlength="200" aria-label="Wat moet iemand meteen weten"' +
+          ' placeholder="Wat moet iemand meteen weten? Houd het kort."' +
+          ' style="width:100%;margin-top:.5rem;">' + esc(k.watNodig) + '</textarea>' +
+        '<label class="keus"><input type="checkbox" id="nZorg"' + (k.zorgErbij ? ' checked' : '') +
+          '> Zet mijn allergenen en aandachtspunten uit mijn zorgprofiel erbij</label>' +
+        '<label class="keus"><input type="checkbox" id="nMeds"' + (k.medicijnenErbij ? ' checked' : '') +
+          '> Zet de middelen uit mijn medicatieschema erbij</label>' +
+        '<label class="keus"><input type="checkbox" id="nAan"' + (k.aan ? ' checked' : '') +
+          '> De kaart staat aan</label>' +
+        '<div class="rij"><button class="knop mini" id="nBewaar">Bewaren</button>' +
+        (d.bestaat ? '<button class="knop mini" id="nWeg">Kaart weggooien</button>' : '') +
+        '</div></div>';
+
+    $('#nBewaar').addEventListener('click', async () => {
+      try {
+        tekenNood(await Veilig.api('/api/noodkaart/zet', {
+          contactNaam: $('#nNaam').value, contactTel: $('#nTel').value,
+          watNodig: $('#nNodig').value, zorgErbij: $('#nZorg').checked,
+          medicijnenErbij: $('#nMeds').checked, aan: $('#nAan').checked }));
+        Veilig.melding('Bewaard.');
+      } catch (e) { Veilig.melding(e.message); }
+    });
+    const weg = $('#nWeg');
+    if (weg) weg.addEventListener('click', async () => {
+      try { await Veilig.api('/api/noodkaart/weg', {});
+        tekenNood(await Veilig.api('/api/noodkaart')); Veilig.melding('Weggegooid.'); }
+      catch (e) { Veilig.melding(e.message); }
+    });
+  }
+
+  /* Een laag die het niet doet, staat op het scherm. Stil overslaan zou hier
+     betekenen dat "geen afspraken" en "de zorglaag is stuk" er hetzelfde
+     uitzien, en dat is precies het verschil dat je wilt zien. */
+  function tekenStoringen(s) {
+    if (!s || !s.length) return;
+    $('#winst').insertAdjacentHTML('beforeend', s.map(t =>
+      '<div class="storing" role="status">' + esc(t) + ' Wat hieronder staat is daardoor niet compleet.</div>').join(''));
+  }
+
+  async function laad() {
+    try {
+      const [d, m, t, g, w, n, med, dag] = await Promise.all([
+        Veilig.api('/api/life'), Veilig.api('/api/metingen'), Veilig.api('/api/toestellen'),
+        Veilig.api('/api/gemoed'), Veilig.api('/api/gewoonten'), Veilig.api('/api/noodkaart'),
+        Veilig.api('/api/medicatie'), Veilig.api('/api/dag')]);
+      tekenDag(dag);
+      tekenStoringen(dag.storingen);
+      tekenGemoed(g, null);
+      tekenNood(n);
+      tekenMedicatie(med);
+      tekenGewoonten(w);
+      tekenInvullen(m);
+      tekenToestellen(t);
+      tekenWinst(d.winst);
+      tekenSignalen(d.signalen || []);
+      tekenDoelen(d.doelen || []);
+      tekenAfspraken(d.afspraken || []);
+      tekenAdviezen(d.adviezen || []);
+      tekenStoringen(d.storingen);
+    } catch (e) {
+      $('#signalen').innerHTML = '<p class="stil">' + esc(e.message) + '</p>';
+    }
+  }
+
+  if (document.readyState !== 'loading') laad();
+  else window.addEventListener('load', laad);
+})();
+</script>
+<script src="/shared/deelmenu.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
+<script src="/shared/ios.js" defer></script>
+</body>
+</html>

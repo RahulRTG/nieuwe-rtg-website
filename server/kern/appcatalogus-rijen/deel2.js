@@ -3,7 +3,6 @@
    De uitleg over wat dit is staat in ../appcatalogus-data.js. */
 module.exports = [
   ['wbw', 'Wie betaalt wat', 'geld', '/apps/wbw.html', 'Groepsuitgaven met live balans en verrekenen via RTG Pay.'],
-  ['balans', 'Balans', 'geld', '/apps/balans.html', 'Je saldo en tikgeschiedenis in één overzicht.'],
   ['rtgcode', 'RTG-code', 'geld', '/apps/rtgcode.html', 'Je betaal- en toegangscodes veilig op één plek.'],
   ['logboek', 'Logboek', 'geld', '/apps/logboek.html', 'Je acties en bevestigingen, netjes vastgelegd.'],
   ['mecenaat', 'Mecenaat', 'geld', '/apps/mecenaat.html', 'Steun projecten en goede doelen als mecenas.'],
@@ -12,16 +11,30 @@ module.exports = [
 
   // ---- spelen & sport ----
   ['spelen', 'Spelen', 'spelen', '/apps/spelen.html', 'Dammen, rummikub, Magnaat, partyspellen, sudoku en meer, samen of alleen.'],
-  ['sport', 'Sport', 'spelen', '/apps/sport.html', 'Je sportactiviteiten en clubs.'],
+
+  // ---- leven & gezondheid ----
+  // Waar iemand zoekt, niet waar de code woont: Vitaal draait op de gedeelde
+  // veiligheidskern en Balans op de agenda, maar je zoekt ze allebei hier.
+  ['life', 'RTG Life', 'leven', '/apps/life.html', 'Een scherm voor je hele leven bij RTG: ritme, doelen, afspraken, check-in en je noodkaart bij elkaar. Wat niet gemeten wordt, staat er als niet gemeten.'],
+  ['doelen', 'Doelen', 'leven', '/apps/doelen.html', 'Waar je begon, waar je heen wilt en waarom; de stappen ertussen rekent RTG opnieuw uit vanaf waar je nu staat.'],
+  ['sport', 'Sport', 'leven', '/apps/sport.html', 'Je sportactiviteiten en clubs.'],
+  ['training', 'Training', 'leven', '/apps/training.html', 'Je eigen trainingsschema en wat je er echt van deed. RTG schrijft geen training voor en rekent geen belasting uit.'],
+  ['balans', 'Balans', 'leven', '/apps/balans.html', 'Je week op rust en ritme: Rahul adviseert ook eens niks, zonder streaks of schuldgevoel.'],
+  ['vitaal', 'Vitaal', 'leven', '/apps/vitaal.html', 'Een knop per dag: het gaat goed. Voor medicijnen, en voor wie alleen woont.'],
+  ['tijdlijn', 'Tijdlijn', 'leven', '/apps/tijdlijn.html', 'Wat er in de tijd met je gebeurd is, op een rij. Geen verbanden en geen score: naast elkaar zetten is iets anders dan zeggen wat het betekent.'],
+  ['voeding', 'Voeding', 'leven', '/apps/voeding.html', 'Je weekplan voor wat je wilt eten. Een plan, geen telling: RTG telt geen calorieen en beoordeelt niet wat je eet.'],
+  ['gedachten', 'Gedachtenboek', 'leven', '/apps/gedachten.html', 'Een plek om iets op te schrijven, voor jezelf. Er leest geen model mee en er wordt niets samengevat.'],
+  ['medicijnen', 'Medicijnen', 'leven', '/apps/medicijnen.html', 'Je eigen medicatieschema: wat je gebruikt, op welke tijden, en hoeveel er nog in huis is. RTG bepaalt nooit een dosering.'],
 
   // ---- veiligheid & identiteit ----
-  // De vier veiligheidsapps draaien op een gedeelde kern (kern/veiligheid/):
-  // een kring van codenamen, je laatst bekende plek, en een dodemansknop die
-  // op de SERVER tikt, zodat hij ook afgaat als je telefoon uitvalt.
+  // Thuiswacht, Codewoord, Vitaal en Thuisrust draaien op een gedeelde kern
+  // (kern/veiligheid/): een kring van codenamen, je laatst bekende plek, en een
+  // dodemansknop die op de SERVER tikt, zodat hij ook afgaat als je telefoon
+  // uitvalt. Vitaal staat hierboven onder leven, want daar wordt hij gezocht.
   ['thuiswacht', 'Thuiswacht', 'veiligheid', '/apps/thuiswacht.html', 'Zeg hoe lang je onderweg bent; meld je je niet, dan krijgt je kring bericht met je laatst bekende plek.'],
   ['codewoord', 'Codewoord', 'veiligheid', '/apps/codewoord.html', 'Een gewone zin die je kring stil waarschuwt met je plek; op je scherm gebeurt er niets zichtbaars.'],
-  ['vitaal', 'Vitaal', 'veiligheid', '/apps/vitaal.html', 'Een knop per dag: het gaat goed. Voor medicijnen, en voor wie alleen woont.'],
   ['thuisrust', 'Thuisrust', 'veiligheid', '/apps/thuisrust.html', 'Niet storen tot je thuis bent; je eigen kring komt er altijd doorheen.'],
+  ['toestemming', 'Toestemming', 'veiligheid', '/apps/toestemming.html', 'Wie mag iets van je zien en welk toestel schrijft iets weg; intrekken gaat naar de plek waar de toestemming leeft.'],
   ['ik', 'Wie ben ik', 'veiligheid', '/apps/ik.html', 'Wat Rahul over je mag weten: hoe hij tegen je doet, je voornaamwoorden en je eigen geloofskeuze. Alles optioneel.'],
   ['passkeys', 'Passkeys', 'veiligheid', '/apps/passkeys.html', 'Inloggen met vingerafdruk, gezicht of een fysieke sleutel.'],
   ['juridisch', 'Juridisch', 'veiligheid', '/apps/juridisch.html', 'Voorwaarden, contracten en je eigen akkoorden.'],

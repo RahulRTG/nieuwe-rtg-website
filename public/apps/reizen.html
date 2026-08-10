@@ -19,7 +19,10 @@
   .reis .kop{display:flex;gap:.6rem;align-items:baseline;}
   .reis .kop b{font-size:1rem;}
   .reis .wanneer{margin-left:auto;color:var(--rtg-soft);font-size:.82rem;white-space:nowrap;}
-  .reis .bij{color:var(--rtg-soft);font-size:.84rem;margin-top:.25rem;}
+  /* block, want dit zijn spans: zonder dit lopen de meta-regel en het
+     app-merkje op EEN regel door en plakt "REISBUREAU" tegen "aangevraagd" aan.
+     Dat stond er een screenshot lang. */
+  .reis .bij{display:block;color:var(--rtg-soft);font-size:.84rem;margin-top:.35rem;}
   .merk{display:inline-block;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;
     color:var(--rtg-soft);border:1px solid var(--rtg-line);border-radius:99px;padding:.1rem .5rem;}
   .wereld{display:grid;grid-template-columns:repeat(auto-fill,minmax(9rem,1fr));gap:.5rem;margin-top:.6rem;}

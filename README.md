@@ -1170,7 +1170,18 @@ Aan de zaakkant staat dit in `routes/supplier/horeca/gastbeheer.js`: de QR per t
 
 Bewezen door `test/gastorder.test.js` (elf toetsen, waaronder: een gastbestelling verschijnt in de rekeningenlijst van de zaak met hetzelfde bedrag; een prijs die de telefoon meestuurt verliest het van de kaart; twee keer bestellen met dezelfde sleutel levert één regel; een onbevestigde allergie blijft van het keukenbord). Zes mutaties nagetrokken, alle zes raak.
 
-Wat er **nog niet** is, en dat is een grens en geen omissie: bezorging, afhaal, roomservice, club en foodcourt hebben aan de gastkant nog geen eigen deur (de rekenlaag eronder wel), er is nog geen Rahul-conciërge op deze laag, en multi-location beleid is één zaak per keer.
+**Buiten de deur: bezorgen en afhalen** (`kern/gast/buitenshuis.js`, `routes/gast/bezorgen.js`). Dit is de tweede naad op dezelfde motor, en het verschil is leerzaam. Aan tafel bewijst de QR dat je er *bent* — of je lid bent doet er niet toe. Thuis bestaat dat bewijs niet en moet er iemand bereikbaar zijn, dus daar is de **ledensessie** de poort. Alles eronder is identiek: dezelfde rekening, dezelfde orderlaag, dezelfde idempotentie en audit. Dat is precies waarom de gastlaag geen generieke "bestelmotor" met een tafel als toevallige parameter is geworden — wat verschilt is hóe je bewijst dat een bestelling van jou is, en dat hoort gescheiden van de rest.
+
+- **De volgorde is gedrag**: eerst de zone, dan het mandje, dan het tijdslot. Andersom reserveer je keukenminuten voor een rit die nooit gaat rijden, en die minuten knijpen dan een keuken dicht die leegstaat. Valt het adres buiten de zone, dan wordt er geen rekening geopend en geen minuut bezet.
+- **De bezorgkosten staan als regel op de rekening**, niet als een veld ernaast: zo tellen ze mee in het totaal, de splitsing en de betaling zonder dat een van die drie er apart rekening mee hoeft te houden. Ze worden opnieuw berekend ná het mandje, want gratis-vanaf hangt aan het bedrag.
+- **Een vol tijdslot noemt het eerstvolgende** en de bestelling blijft staan — alleen de tijd ontbreekt dan nog. Alles weggooien omdat het een kwartier te druk was, betekent dat de gast opnieuw mag kiezen.
+- **Een lid heeft hooguit één lopende bestelling per zaak en per kanaal**, dezelfde regel als "een tafel heeft hooguit één open rekening" en om dezelfde reden.
+- **De gegevenspoort bijt hier echt.** Bezorging vraagt telefoon én adres (er komt iemand langs), afhalen alleen een nummer (de tas ligt klaar op een code, een adres zou meer zijn dan nodig). Zonder die gegevens volgt een 428 die zegt wát er ontbreekt, en de app opent daarop het gegevensgesprek.
+- De rekensom eronder — zones, kosten, tijdsloten — is uit de leveranciersroute gehaald naar `kern/horeca/bezorglaag.js`. Dezelfde verhuizing als bij `regel.js`, om dezelfde reden: een zone die de zaak anders uitrekent dan de gast levert een bestelling op die wordt aangenomen en niet gereden kan worden.
+
+Bewezen door `test/gastbezorging.test.js` (acht toetsen, waaronder een die de zone-uitkomst van de gastroute naast die van de leveranciersroute legt). Vijf mutaties nagetrokken, alle vijf raak.
+
+Wat er **nog niet** is, en dat is een grens en geen omissie: roomservice, club en foodcourt hebben aan de gastkant nog geen eigen deur (de rekenlaag eronder wel), er is nog geen Rahul-conciërge op deze laag, geen gastscherm voor bezorgen (alleen de API), en multi-location beleid is één zaak per keer.
 
 ### RTG Mobility OS (de vervoerskern)
 

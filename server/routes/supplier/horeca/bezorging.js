@@ -19,10 +19,13 @@
    De gecombineerde route en het afleverbewijs staan in horeca/bezorgrit.js. */
 module.exports = (kern) => {
   const { app, save, schoon, supplierAuth, haversine, horeca } = kern;
-  const { H, nu, id, centen, uitEuro } = horeca;
-
-  const B = (code) => { const h = H(code); if (!h.bezorg) h.bezorg = { zones: [], sloten: {}, open: true, ritten: {} }; return h.bezorg; };
-  const pc = (s) => String(s || '').toUpperCase().replace(/\s+/g, '').slice(0, 6);
+  const { nu, id, centen, uitEuro } = horeca;
+  /* De rekensom (zones, kosten, sloten) staat in kern/horeca/bezorglaag.js,
+     want de gastkant stelt dezelfde vragen. Een zone die de zaak anders
+     uitrekent dan de gast levert een bestelling op die wordt aangenomen en niet
+     gereden kan worden. */
+  const laag = require('../../../kern/horeca/bezorglaag')({ save, horeca, haversine });
+  const { B, pc, zoekZone, slotenVan, reserveerSlot } = laag;
 
   /* ---------- zones ---------- */
   app.post('/api/supplier/horeca/bezorg/zone', supplierAuth, (req, res) => {
@@ -42,20 +45,6 @@ module.exports = (kern) => {
     save();
     res.json({ ok: true, open: b.open, redenDicht: b.redenDicht || null, zones: b.zones });
   });
-
-  /* De poort voor een adres: welke zone, wat kost het, en wat is het minimum.
-     Hij antwoordt ook als het NIET kan, met de reden erbij. */
-  function zoekZone(b, { postcode, lat, lng }, zaak) {
-    const code = pc(postcode);
-    for (const z of b.zones) if (z.postcodes.length && z.postcodes.some(p => code.startsWith(p))) return { zone: z, hoe: 'postcode' };
-    if (lat != null && lng != null && zaak && zaak.lat != null && zaak.lng != null) {
-      const km = haversine(Number(lat), Number(lng), Number(zaak.lat), Number(zaak.lng));
-      for (const z of b.zones) if (z.straalKm && km <= z.straalKm) return { zone: z, hoe: 'straal', km: Math.round(km * 10) / 10 };
-      const grootste = b.zones.filter(z => z.straalKm).sort((a, c) => c.straalKm - a.straalKm)[0];
-      if (grootste) return { zone: null, reden: 'U zit ' + (Math.round(km * 10) / 10) + ' km verderop; we bezorgen tot ' + grootste.straalKm + ' km.', km: Math.round(km * 10) / 10 };
-    }
-    return { zone: null, reden: code ? 'Postcode ' + code + ' valt buiten onze bezorgzones.' : 'Geef een postcode of een locatie op.' };
-  }
 
   app.post('/api/supplier/horeca/bezorg/check', supplierAuth, (req, res) => {
     const b = B(req.supplier.code);
@@ -87,33 +76,15 @@ module.exports = (kern) => {
       }
       save();
     }
-    const dag = schoon(req.body.datum, 10) || nu().slice(0, 10);
-    const bezet = (b.sloten[dag] || {});
-    const rijen = Object.entries(b.slotInstel || {}).sort().map(([tijd, cap]) => ({
-      tijd, capaciteitMinuten: cap, gebruiktMinuten: bezet[tijd] || 0,
-      vrij: Math.max(0, cap - (bezet[tijd] || 0)), vol: (bezet[tijd] || 0) >= cap }));
-    res.json({ ok: true, datum: dag, sloten: rijen,
+    const uit = slotenVan(req.supplier.code, schoon(req.body.datum, 10));
+    res.json({ ok: true, datum: uit.datum, sloten: uit.sloten,
       let: 'De capaciteit staat in keukenminuten, niet in bestellingen.' });
   });
 
   app.post('/api/supplier/horeca/bezorg/reserveer-slot', supplierAuth, (req, res) => {
-    const b = B(req.supplier.code);
-    const dag = schoon(req.body.datum, 10) || nu().slice(0, 10);
-    const tijd = schoon(req.body.tijd, 5);
-    const minuten = Math.max(1, Math.min(600, parseInt(req.body.minuten, 10) || 15));
-    const cap = (b.slotInstel || {})[tijd];
-    if (cap == null) return res.status(404).json({ error: 'Dat tijdslot bestaat niet. Stel de sloten eerst in.' });
-    b.sloten[dag] = b.sloten[dag] || {};
-    const gebruikt = b.sloten[dag][tijd] || 0;
-    if (gebruikt + minuten > cap) {
-      const volgende = Object.entries(b.slotInstel).sort()
-        .find(([t, c]) => t > tijd && (c - ((b.sloten[dag] || {})[t] || 0)) >= minuten);
-      return res.status(409).json({ error: 'Dat tijdslot is vol (' + gebruikt + ' van ' + cap + ' minuten bezet).',
-        vol: true, eerstvolgende: volgende ? volgende[0] : null,
-        let: volgende ? 'Om ' + volgende[0] + ' is er nog ruimte.' : 'Vandaag is er geen slot meer vrij met genoeg ruimte.' });
-    }
-    b.sloten[dag][tijd] = gebruikt + minuten;
-    save();
-    res.json({ ok: true, datum: dag, tijd, gereserveerd: minuten, gebruikt: b.sloten[dag][tijd], capaciteit: cap });
+    const uit = reserveerSlot(req.supplier.code, { datum: schoon(req.body.datum, 10),
+      tijd: schoon(req.body.tijd, 5), minuten: req.body.minuten });
+    if (uit.error) return res.status(uit.status || 400).json(uit);
+    res.json(uit);
   });
 };

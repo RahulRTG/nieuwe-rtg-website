@@ -59,8 +59,15 @@ module.exports = (kern) => {
     ? kern.horecaFolioBoek(...a)
     : { status: 409, error: 'De hotellaag staat bij deze zaak niet aan.' });
 
-  const ctx = Object.assign({}, kern, { horeca, beleid, sessie, orderlaag, afrekenlaag, gastAuth, stuur, folioBoek });
+  /* Buiten de deur: bezorgen en afhalen. Andere naad (de ledensessie in plaats
+     van de tafel-QR), dezelfde rekening eronder. */
+  const buitenshuis = require('../kern/gast/buitenshuis')({ save, schoon, crypto, horeca });
+  const bezorglaag = require('../kern/horeca/bezorglaag')({ save, horeca, haversine: kern.haversine });
+
+  const ctx = Object.assign({}, kern, { horeca, beleid, sessie, orderlaag, afrekenlaag,
+    buitenshuis, bezorglaag, gastAuth, stuur, folioBoek });
   require('./gast/tafel')(ctx);     // de QR, aanschuiven, de kaart en het beleid
   require('./gast/bestellen')(ctx); // bestellen, de rekening lezen, waarom-vragen
   require('./gast/afrekenen')(ctx); // verdelen, fooi, betalen
+  require('./gast/bezorgen')(ctx);  // bezorgen en afhalen vanaf de ledenapp
 };

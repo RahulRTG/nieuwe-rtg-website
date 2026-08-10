@@ -30,7 +30,14 @@ const ERNSTIG = ['anafyla', 'ernstig', 'pinda', 'noot', 'noten', 'schaaldier', '
 
 const STANDAARD = {
   bestellen: true,              // mag de gast zelf bestellen
-  kanalen: ['tafel', 'qr', 'bar', 'terras'],
+  /* Waarom bezorging en afhaal HIER standaard in staan en de zaalkanalen ook.
+     Bij een tafel is zelf bestellen een keuze naast de bediening: een zaak kan
+     zeggen "bij ons neemt de ober op". Bij bezorging en afhaal bestaat dat
+     alternatief niet -- de gast zit thuis. Ze eruit laten zou betekenen dat een
+     zaak bezorgzones instelt, tijdsloten inricht, en dat er vervolgens niemand
+     kan bestellen. De echte poort voor bezorging is dan ook niet deze lijst
+     maar of er zones zijn (kern/horeca/bezorglaag.js weigert met 'geen-zones'). */
+  kanalen: ['tafel', 'qr', 'bar', 'terras', 'bezorging', 'afhaal'],
   allergieBevestiging: 'ernstig', // nooit | ernstig | altijd
   alcoholLeeftijd: 18,
   orderPlafondCenten: 50000,    // hierboven moet een medewerker bevestigen

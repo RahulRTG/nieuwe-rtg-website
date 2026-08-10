@@ -185,11 +185,12 @@
     ],
     "gast": [
       "findSupplier",
-      "tooManyTries",
-      "noteFailedTry",
+      "haversine",
       "horecaFolioBoek",
       "logActivity",
-      "sseToSupplier"
+      "noteFailedTry",
+      "sseToSupplier",
+      "tooManyTries"
     ],
     "gebouw": [
       "gebouw",

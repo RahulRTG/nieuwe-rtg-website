@@ -642,6 +642,12 @@ console.log('\n16) elk leden-pad met een derde partij gaat langs de gegevenspoor
     ['/api/member/sport/tickets', 'je eigen ticketlijst opvragen'],
     ['/api/member/boardroom/logboek', 'je eigen boardroom-journaal ("logboek" bevat toevallig "boek"); geen derde partij'],
     ['/api/tickets/aanbod', 'het aanbod bekijken; er gebeurt nog niets'],
+    /* De gastkant van de horeca. Bestellen loopt WEL door de poort (zie
+       routes/gast/bezorgen.js); deze twee delen niets: een kaart lezen is het
+       aanbod bekijken, en je eigen lopende bestelling teruglezen geeft de zaak
+       geen gegeven dat hij niet al had. */
+    ['/api/gast/bezorg/kaart', 'de kaart van een zaak lezen; er wordt niets gedeeld en er gebeurt nog niets'],
+    ['/api/gast/bezorg/rekening', 'je eigen lopende bestelling teruglezen; de zaak krijgt hier niets nieuws'],
     ['/api/verhuur/aanbod', 'het aanbod bekijken; er gebeurt nog niets'],
     ['/api/verkoop/showroom', 'de showroom bekijken; er gebeurt nog niets'],
     ['/api/verblijf/deur', 'je bent al ingecheckt: dit opent je eigen kamerdeur'],

@@ -26,7 +26,9 @@
   .terug{background:transparent;border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:.4rem .7rem;font:inherit;font-size:.8rem;cursor:pointer;}
   main{padding:1.1rem;max-width:820px;margin:0 auto;}
   .intro{color:var(--muted);line-height:1.55;font-size:.92rem;margin:.2rem 0 1.3rem;}
-  .som{display:grid;grid-template-columns:repeat(3,1fr);gap:.7rem;margin-bottom:1.6rem;}
+  /* minmax(0,1fr): een 1fr-kolom krimpt niet onder zijn breedste kind, en drie
+     van die kolommen stonden op 320 punten samen net buiten het scherm. */
+  .som{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:.7rem;margin-bottom:1.6rem;}
   .som .c{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:.9rem;text-align:center;}
   .som .c .n{font-size:.62rem;letter-spacing:.14em;text-transform:uppercase;color:var(--soft);}
   .som .c .v{font-family:'Bodoni Moda',serif;font-size:1.3rem;margin-top:.25rem;color:var(--lab);}

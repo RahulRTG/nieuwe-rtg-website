@@ -21,7 +21,7 @@
 
    Daarom kijkt hij naar RECHTHOEKEN: waar staat elk zichtbaar element, en valt
    het buiten het scherm? Die meting werkt door de grendel heen. Nagetrokken met
-   drie mutaties (zie de kop van test/telefoonmaat.e2e.js).
+   mutaties (zie de kop van test/telefoonmaat.e2e.js).
 
    WAT ER NIET MEETELT. Een element binnen een voorouder die zelf horizontaal
    schuift of afknipt (een tabbalk, een carrousel, een codeblok) mag breder zijn
@@ -30,9 +30,17 @@
    "netjes afgeknipt" lezen is precies hoe deze meter eerder blind werd.
 
    WAT HIJ NIET ZIET, en dat hoort er eerlijk bij te staan: dit is de EERSTE
-   render, uitgelogd, zoals ook scripts/a11y.js meet. Wat er achter een inlog of
-   achter een knop tevoorschijn komt, meet test/telefoonmaat.e2e.js op de
-   vlaggenschepen, ingelogd en met de bladen open.
+   render, UITGELOGD, zoals ook scripts/a11y.js meet. Dat is minder dan het
+   lijkt -- vier van de vijf uitlopers die we na de eerste ronde nog vonden,
+   waren alleen ingelogd te zien, want uitgelogd staat dat deel van het scherm
+   er niet eens. test/telefoonmaat.e2e.js loopt daarom over dezelfde 213
+   schermen mét een aangemeld lid.
+
+   En wat ook die twee samen niet zien: wat er pas verschijnt als je ergens op
+   TIKT (een blad, een keuzelijst, een melding), en wat er gebeurt bij lange
+   echte inhoud (een naam van veertig tekens, een lijst van honderd rijen).
+   Dat is geen aanname maar een open gat, en het staat hier zodat niemand deze
+   scan voor meer aanziet dan hij is.
 
    Zonder browser slaat de scan zichzelf over met exitcode 0; met
    TELEFOONMAAT_STRICT=1 (CI en de slotsuite) is dat een gezakte poort.
@@ -78,13 +86,23 @@ const METING = `(() => {
     if (st.display === 'none' || st.visibility === 'hidden') continue;
     const r = el.getBoundingClientRect();
     if (r.width === 0 && r.height === 0) continue;
-    const uit = Math.round(Math.max(r.right - vw, -r.left));
-    if (uit > 1 && !eigenVak(el)) breed.push({ waar: waar(el), uit, maat: Math.round(r.width) });
+    /* HELEMAAL links buiten beeld is geen uitloop maar een bedoeling. Twee
+       gevallen, allebei echt in deze code: een label dat met
+       \`position:absolute;left:-999px\` alleen voor de schermlezer bestaat
+       (passkeys.html), en een paneel dat links geparkeerd staat tot het naar
+       binnen schuift. Uitloop is wat de gebruiker WEL half ziet en niet kan
+       bereiken -- dus telt links alleen mee zolang de rechterrand nog in beeld
+       steekt. Zonder deze regel meldde de scan "+999" op een etiket dat precies
+       doet wat het hoort te doen, en dat soort meldingen leert een mens de
+       meter wegkijken. */
+    const linksUit = r.right > 0 ? -r.left : 0;
+    const uit = Math.round(Math.max(r.right - vw, linksUit));
+    if (uit > 1 && !eigenVak(el)) breed.push({ waar: waar(el), uit, groot: Math.round(r.width) });
     /* De hoogte alleen voor vaste lagen: een PAGINA mag langer zijn dan het
        scherm (daar is scrollen voor), een laag die OVER het scherm hangt niet. */
     if (st.position === 'fixed') {
       const over = Math.round(r.height - vh);
-      if (over > 1) lang.push({ waar: waar(el), uit: over, maat: Math.round(r.height) });
+      if (over > 1) lang.push({ waar: waar(el), uit: over, groot: Math.round(r.height) });
     }
   }
   return { vw, vh, breed, lang };
@@ -177,7 +195,7 @@ async function hoofd() {
     console.log('\n[telefoonmaat] ' + sleutel + ': ' + lijst.length + ' buiten de maat');
     for (const b of lijst.slice(0, 8)) {
       console.log('   ' + (b.as === 'breed' ? 'te breed' : 'te lang') +
-        ' +' + b.uit + 'px (' + b.maat + 'px)  ' + b.waar);
+        ' +' + b.uit + 'px (' + b.groot + 'px)  ' + b.waar);
     }
     if (lijst.length > 8) console.log('   ... en nog ' + (lijst.length - 8));
   }

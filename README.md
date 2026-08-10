@@ -434,11 +434,19 @@ Dat ligt nu op drie plekken vast, en die drie doen elk iets anders:
    waar de OS-laag een tweede kind in hangt.
 3. **Twee metingen bewaken het**, want ze zien elk iets anders. `npm run
    telefoonmaat` meet **alle 213 schermen** op 320x480 en 390x844, uitgelogd, op
-   de eerste render. `test/telefoonmaat.e2e.js` meet de **vlaggenschepen
-   ingelogd**, waar de meeste opmaak pas leeft. Beide draaien in CI en in de
-   slotsuite (`TELEFOONMAAT_STRICT=1`: geen browser is dáár geen groen).
-   `check.js` regel 43 houdt statisch bij dat elk scherm de grendel ook echt
-   laadt.
+   de eerste render. `test/telefoonmaat.e2e.js` meet **dezelfde 213 schermen met
+   een aangemeld lid**. Beide draaien in CI en in de slotsuite
+   (`TELEFOONMAAT_STRICT=1`: geen browser is dáár geen groen). `check.js` regel
+   43 houdt statisch bij dat elk scherm de grendel ook echt laadt.
+
+   Die tweede meting begon als een lijst van negen vlaggenschepen, en dat was de
+   verkeerde keuze. Toen we hem alsnog over alles lieten lopen, stonden er vijf
+   uitlopers tussen die geen enkele toets zag -- vier ervan **alleen ingelogd**,
+   want uitgelogd staat dat deel van het scherm er niet eens. De ernstigste was
+   `rtmail`: een inline `<span>` met `nowrap`, `overflow:hidden` en een ellipsis
+   die nooit kon werken, want die twee doen niets op een inline element. Die
+   onderwerpregel was 900 punten breed, met de hele lijstrij eraan vast. Een
+   steekproef die niet zegt dat hij een steekproef is, leest als dekking.
 
 De meting kijkt naar **rechthoeken** en niet naar `documentElement.scrollWidth`,
 en dat is geen stijlkeuze: onder de grendel schuift de pagina niet meer, dus die

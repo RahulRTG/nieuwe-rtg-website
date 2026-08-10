@@ -1,11 +1,13 @@
 /* ============================================================================
    DE TELEFOONMAAT, INGELOGD -- de helft die scripts/telefoonmaat.js niet ziet.
 
-   Die scan meet alle 213 schermen, maar uitgelogd en op de eerste render. Dat
-   is de brede helft. Wat er ACHTER de inlog staat -- de gevulde lijsten, de
-   kaarten met echte namen erin, de bladen die van onder komen -- is precies
-   waar de meeste opmaak leeft, en dat meet deze toets: op telefoonmaat, met
-   een echt lid, met de bladen open.
+   Die scan meet alle 213 schermen, maar uitgelogd en op de eerste render. Wat
+   er ACHTER de inlog staat -- de gevulde lijsten, de kaarten met echte namen
+   erin, de knoppen die er pas zijn als je mag -- is waar de meeste opmaak
+   leeft, en dat meet deze toets: dezelfde 213 schermen, met een aangemeld lid.
+
+   Dat het er 213 zijn en niet negen is zelf een bevinding. Zie de lijst
+   hieronder.
 
    Wat er beweerd wordt: niets is breder dan het scherm, en geen laag die OVER
    het scherm hangt is langer dan het scherm. Een pagina mag langer zijn dan
@@ -36,10 +38,25 @@
         editor en niet het inlogkaartje, dus die uitloop bestaat alleen
         uitgelogd. Precies daarom zijn het twee metingen en niet een: wie
         alleen deze toets draait, mist de helft van de schermen.
+
+   EN DE MUTATIE DIE DEZE TOETS ZELF WAS. Hij begon met negen vlaggenschepen,
+   en op de vraag "past nu ELK scherm?" kon dat geen antwoord geven. Over alle
+   213 gedraaid vielen er vijf om die niemand zag -- rtmail, browser, navigatie,
+   labfonds en pulse -- en vier daarvan bestaan alleen ingelogd. De ergste was
+   rtmail: een inline <span> met nowrap, overflow:hidden en een ellipsis die
+   niets deed, want die twee gelden niet op een inline element. 900 punten
+   breed, met de lijstrij eraan vast.
+
+   Bij die ronde bleek ook de METER zelf te grof: hij meldde "+999" op
+   passkeys.html, waar een label met `left:-999px` bewust alleen voor de
+   schermlezer bestaat. Links helemaal buiten beeld is een bedoeling, geen
+   uitloop; nu telt links alleen mee zolang de rechterrand nog in beeld steekt.
+   Nagetrokken dat die verfijning de echte linkeruitloop niet meeneemt: de
+   metier-mutatie (+6, half in beeld) zakt nog steeds.
    ========================================================================== */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { startServer, letOpFouten } = require('./helper');
+const { startServer } = require('./helper');
 const { METING, MATEN } = require('../scripts/telefoonmaat');
 
 function laadBrowser() {
@@ -51,10 +68,24 @@ function laadBrowser() {
 }
 const pw = laadBrowser();
 
-/* De vlaggenschepen: de schermen waar een lid zijn tijd doorbrengt, plus de
-   twee die op de statische scan het verst uitliepen (de studio's), zodat een
-   terugval daar hier alsnog zakt. */
-const SCHERMEN = [
+/* ALLE schermen, en niet een handvol vlaggenschepen.
+
+   Hier stond eerst een lijst van negen. Dat leek redelijk -- de schermen waar
+   een lid zijn tijd doorbrengt -- en het was precies de verkeerde keuze. Op de
+   vraag "is nu ELK scherm voor de telefoon?" kon die lijst geen antwoord geven,
+   en toen we hem alsnog over alle 213 lieten lopen stonden er vijf uitlopers
+   tussen die geen enkele toets zag: rtmail (een inline span met nowrap, 900
+   punten breed, want overflow en text-overflow doen niets op een inline
+   element), browser, navigatie, labfonds en pulse. Vier daarvan zijn ALLEEN
+   ingelogd te zien; uitgelogd staat dat deel van het scherm er niet.
+
+   Een steekproef die niet zegt dat hij een steekproef is, leest als dekking.
+   Nu loopt hij over alles wat er is (scripts/lib/statisch.js telt de pagina's,
+   dus een nieuw scherm valt er vanzelf in) op de smalste maat, plus de
+   vlaggenschepen op de tweede maat. */
+const { paginas } = require('../scripts/lib/statisch');
+const ALLE = paginas();
+const VLAGGENSCHEPEN = [
   '/apps/app.html',
   '/apps/boardroom.html',
   '/apps/salon.html',
@@ -62,8 +93,18 @@ const SCHERMEN = [
   '/apps/comm.html',
   '/apps/notities.html',
   '/apps/wallet.html',
+  '/apps/rtmail.html',
   '/apps/sitemaker.html',
   '/apps/websitestudio.html',
+];
+/* Wat er per maat gemeten wordt. De smalste maat krijgt alles omdat daar de
+   uitloop begint; de tweede maat krijgt de vlaggenschepen, want een scherm dat
+   op 320 past en op 390 niet, bestaat vrijwel niet (nagekeken: van de vijf
+   uitlopers hierboven stond er precies een alleen op 390, en dat was een
+   etiket dat op 320 toevallig net anders brak). */
+const RONDEN = [
+  { maat: MATEN[0], paden: ALLE },
+  { maat: MATEN[1], paden: VLAGGENSCHEPEN },
 ];
 
 async function nieuwLid(base) {
@@ -85,9 +126,6 @@ test('telefoonmaat: geen ingelogd scherm is breder of langer dan het toestel',
     const token = await nieuwLid(base);
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     const page = await browser.newPage();
-    const fouten = [];
-    letOpFouten(page, fouten);
-
     await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
     await page.evaluate((t) => {
       localStorage.setItem('rtg_member_token', t);
@@ -115,19 +153,34 @@ test('telefoonmaat: geen ingelogd scherm is breder of langer dan het toestel',
 
     /* En dan pas het oordeel over de echte schermen. */
     const buiten = [];
-    for (const maat of MATEN) {
+    let gemeten = 0;
+    for (const { maat, paden } of RONDEN) {
       await page.setViewportSize({ width: maat.breedte, height: maat.hoogte });
-      for (const pad of SCHERMEN) {
+      for (const pad of paden) {
         await page.goto(base + pad, { waitUntil: 'load' });
-        await page.waitForTimeout(600);
+        await page.waitForTimeout(350);
         const r = await page.evaluate(new Function('return ' + METING));
         assert.equal(r.vw, maat.breedte, `${pad} is gemeten op ${maat.naam}, kreeg ${r.vw}`);
+        gemeten++;
         for (const b of r.breed) buiten.push(`${pad} (${maat.naam}) te breed +${b.uit}px: ${b.waar}`);
         for (const l of r.lang) buiten.push(`${pad} (${maat.naam}) te lang +${l.uit}px: ${l.waar}`);
       }
     }
+    /* Het AANTAL wordt ook beweerd. Zonder deze regel zou een lege padenlijst
+       -- een verkeerd pad, een gewijzigde loop() -- een groene toets geven die
+       nul schermen heeft bekeken, en dat is precies de vorm waar LAT regel 9
+       voor waarschuwt. */
+    assert.ok(gemeten >= 200, 'er zijn echt alle schermen langsgekomen, geteld: ' + gemeten);
     assert.deepEqual(buiten, [], 'geen enkel scherm valt buiten de maat:\n  ' + buiten.join('\n  '));
-    assert.deepEqual(fouten, [], 'geen paginafouten onderweg');
+    /* WAT HIER NIET WORDT BEWEERD: dat er geen paginafouten vielen. Dat stond
+       er wel, en het was fout op twee manieren. Test/paginas.e2e.js opent al
+       elke pagina in public/ en rekent daar precies op af -- een tweede plek
+       die dezelfde waarheid vasthoudt (LAT regel 4). En hij weet iets wat deze
+       toets niet wist: een scherm dat om een ANDERE inlog vraagt gooit bewust
+       'geen sessie', en dat staat daar als BEWUSTE_STOP. Een lid met een
+       RTG-pas komt onderweg langs veertig van die schermen, dus deze toets
+       zakte op iets wat helemaal geen defect is. Maat is maat; fouten zijn van
+       de paginascan. */
   } finally {
     if (browser) await browser.close();
     await new Promise((r) => { child.on('exit', r); child.kill(); });

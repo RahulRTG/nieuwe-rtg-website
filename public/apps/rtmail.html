@@ -29,7 +29,13 @@
   .rij .b{flex:1;min-width:0;}
   .rij .nm{font-weight:600;font-size:.95rem;display:flex;align-items:center;gap:.45rem;}
   .rij.ongelezen .nm::before{content:'';width:.5rem;height:.5rem;border-radius:50%;background:var(--burgundy);flex:0 0 auto;}
-  .rij .lt{font-size:.82rem;color:var(--soft);margin-top:.15rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  /* display:block, en dat is de hele reparatie. `overflow` en `text-overflow`
+     doen NIETS op een inline element, dus deze span groeide met `nowrap` mee
+     tot de volle lengte van de onderwerpregel -- 900 punten breed op een
+     telefoon, met de hele lijstrij eraan vast. De ellipsis stond er wel, maar
+     kon niet werken. Als blok wordt hij begrensd door .b (die al min-width:0
+     heeft) en knipt hij af zoals bedoeld. */
+  .rij .lt{display:block;font-size:.82rem;color:var(--soft);margin-top:.15rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .rij .lt .ongev{color:#E78AA0;font-weight:600;}
   .rij .tijd{font-size:.7rem;color:var(--soft);white-space:nowrap;}
   .terug{background:none;border:0;color:var(--muted);font:inherit;font-size:.85rem;cursor:pointer;margin-bottom:.8rem;padding:.2rem 0;}

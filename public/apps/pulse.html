@@ -21,7 +21,9 @@
   main{padding:1.1rem;max-width:640px;margin:0 auto;}
   .schrijf{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:.9rem 1rem;margin-bottom:.9rem;}
   .schrijf textarea{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:.95rem;padding:.6rem .7rem;min-height:3.2rem;resize:vertical;}
-  .schrijf .voet{display:flex;align-items:center;gap:.6rem;margin-top:.5rem;}
+  /* wrap: drie knoppen plus de tekenteller passen niet op een regel van 320
+     punten, en zonder wrap duwde de teller zichzelf het scherm uit. */
+  .schrijf .voet{display:flex;flex-wrap:wrap;align-items:center;gap:.6rem;margin-top:.5rem;}
   .teller{font-size:.75rem;color:var(--soft);margin-left:auto;}
   .teller.vol{color:var(--burgundy);}
   .knop{background:var(--gold);color:#000;border:none;border-radius:10px;font:inherit;font-weight:600;font-size:.85rem;padding:.45rem 1rem;cursor:pointer;}

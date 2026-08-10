@@ -54,6 +54,32 @@
         lip: 'm', fase: rnd() * Math.PI * 2, maat: 0.4 + rnd() * 0.7,
         kleur: '#C9A24B', rand: Math.min(1, Math.min(mx - 14, 206 - mx) / 55), diep: 0, z: -0.05 });
     }
+
+    /* DE TEKENING IN HET MIDDEN VAN ZIJN EIGEN DOEK.
+
+       Beide tekenaars gebruiken y=52 als draaipunt: WebGL rekent -(y-52)/60 en
+       de 2D-terugval schaalt om diezelfde lijn. Maar de mond zelf loopt van
+       ongeveer 35 tot 79, dus zijn werkelijke midden ligt op 57 -- vijf eenheden
+       LAGER dan het draaipunt. Gevolg: de mond hing in zijn doek naar beneden,
+       met bovenin een strook leegte. Op de poort was dat te zien als een gat
+       tussen de wijzerplaat en de lippen: de dozen overlapten keurig 10px,
+       maar de INKT begon pas 21px onder de klok. Twee keer heb ik dat aan de
+       doos gemeten en niet aan wat er staat.
+
+       Het midden wordt hier UITGEREKEND en niet ingetikt, zodat het klopt
+       blijft als iemand de lipvormen aanpast. Meteen wordt het draaipunt van
+       de "breed"-vervorming het echte midden, dus die duwt de mond nu ook niet
+       meer scheef. */
+    var laag = Infinity, hoog = -Infinity;
+    for (var q = 0; q < PUNTEN.length; q++) {
+      if (PUNTEN[q].lip === 'm') continue;          // de vervagende middellijn telt niet mee
+      if (PUNTEN[q].y < laag) laag = PUNTEN[q].y;
+      if (PUNTEN[q].y > hoog) hoog = PUNTEN[q].y;
+    }
+    if (laag < hoog) {
+      var schuif = 52 - (laag + hoog) / 2;
+      for (var w = 0; w < PUNTEN.length; w++) PUNTEN[w].y += schuif;
+    }
     return PUNTEN;
   }
 
@@ -142,10 +168,13 @@
     ' gl_Position=vec4(b.x*persp, b.y*persp, 0.0, 1.0);' +
     ' gl_PointSize=maat*persp*4.2*uDpr;' +
     ' float mx=aPos.x*110.0+110.0;' +                                    // terug naar mond-x voor de golf
-    ' float dg=mx-uGolf; float golf=exp(-(dg*dg)/420.0);' +              // geen pow() met mogelijk negatieve basis (undefined in GLSL)
+    /* De glansveeg, getemd: /420 + 0,9 alpha + 85% naar wit gaf een uitgeblazen
+       witte veeg over de halve mond. Glans die je OPMERKT is plastic
+       (MATERIAAL.md). mond-02.js draagt dezelfde getallen. */
+    ' float dg=mx-uGolf; float golf=exp(-(dg*dg)/150.0);' +              // geen pow() met mogelijk negatieve basis (undefined in GLSL)
     ' float twinkel=0.45+0.4*sin(fase+uTijd/700.0);' +
-    ' vAlpha=min(1.0, twinkel*aRand + golf*0.9);' +
-    ' vKleur=mix(aKleur, vec3(0.96,0.90,0.72), clamp(golf*1.3,0.0,0.85));' +
+    ' vAlpha=min(1.0, twinkel*aRand + golf*0.30);' +
+    ' vKleur=mix(aKleur, vec3(0.96,0.90,0.72), clamp(golf*0.45,0.0,0.26));' +
     '}';
   var FRAG =
     'precision mediump float; varying vec3 vKleur; varying float vAlpha;' +
@@ -283,6 +312,11 @@
       mctx.setTransform(1, 0, 0, 1, 0, 0);
       mctx.clearRect(0, 0, canvas.width, canvas.height);
       mctx.scale(canvas.width / 220, canvas.height / 100);
+      /* De WebGL-tekenaar draait om y=52, deze om het midden van 0..100 (dus
+         50). Zonder deze twee eenheden staat dezelfde mond in de terugval twee
+         eenheden hoger dan in de hoofdweg -- klein, maar dan is het niet meer
+         dezelfde mond. */
+      mctx.translate(0, -2);
       var golf = ((t / 4200) % 1) * 260 - 20;
       for (var ki = 0; ki < kleuren.length; ki++) {
         var lijst = GROEP[kleuren[ki]];
@@ -292,9 +326,12 @@
           var begonnen = false;
           for (var i = 0; i < lijst.length; i++) {
             var p = lijst[i];
-            var gloed = Math.exp(-Math.pow(p.x - golf, 2) / 420);
+            /* Zelfde veeg als in de WebGL-weg (mond-01b.js): smaller (/150) en een
+               derde van de alpha. Wijkt deze af, dan heeft dezelfde mond twee
+               gezichten -- en dan zie je op een oud toestel iets anders. */
+            var gloed = Math.exp(-Math.pow(p.x - golf, 2) / 150);
             if (gloed > 0.45) continue;                       // die zitten in de gloed-pas hieronder
-            var a = Math.min(1, (0.45 + 0.4 * Math.sin(p.fase + t / 700)) * (p.rand == null ? 1 : p.rand) + gloed * 0.9);
+            var a = Math.min(1, (0.45 + 0.4 * Math.sin(p.fase + t / 700)) * (p.rand == null ? 1 : p.rand) + gloed * 0.30);
             if (Math.min(3, Math.floor(a * 4)) !== band) continue;
             var hoek = 1 - Math.min(1, Math.abs(p.x - 110) / 60), mid = hoek * hoek * (3 - 2 * hoek);
             var open = k2 * mid;
@@ -308,10 +345,10 @@
         }
       }
       // de gouden lichtgolf als aparte, korte pas (weinig punten, dus goedkoop)
-      mctx.globalAlpha = 1; mctx.fillStyle = '#F5E6B8';
+      mctx.globalAlpha = 0.26; mctx.fillStyle = '#F5E6B8';
       for (var j = 0; j < PUNTEN.length; j++) {
         var q = PUNTEN[j];
-        if (Math.exp(-Math.pow(q.x - golf, 2) / 420) <= 0.45) continue;
+        if (Math.exp(-Math.pow(q.x - golf, 2) / 150) <= 0.45) continue;
         var h2 = 1 - Math.min(1, Math.abs(q.x - 110) / 60), m2 = h2 * h2 * (3 - 2 * h2);
         var qy = 52 + (q.y - 52) * (1 - br2 * 0.13 * m2);
         if (q.lip === 'o') qy += k2 * m2 * (16 + 18 * q.diep);

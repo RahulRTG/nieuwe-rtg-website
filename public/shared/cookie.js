@@ -8,32 +8,46 @@
 
   var en = false;
   try { en = (window.RTGi18n && RTGi18n.lang === 'en') || /^en/.test(navigator.language || ''); } catch (e) {}
+  /* HEEL MINIMAAL, en dat is hier ook het eerlijkste.
+     Dit was een kaart: een omkaderd vlak van 440px met een slagschaduw, drie
+     regels tekst en een witte pilknop. Op de poort nam dat een kwart van het
+     scherm en trok het meer aandacht dan de kennismaking met Rahul zelf --
+     terwijl de mededeling is dat we juist NIETS doen. Een toestemmingsmuur
+     hoort groot te zijn; een mededeling niet.
+     Wat er overblijft is een regel: de zin, en twee woorden om op te klikken.
+     Geen kader, geen schaduw, geen knopvlak. */
   var T = en
-    ? { txt: 'RTG uses functional storage only, to keep you signed in and remember your preferences. No tracking, no third-party cookies.',
-        ok: 'Fine', privacy: 'Privacy policy' }
-    : { txt: 'RTG gebruikt alleen functionele opslag: om u ingelogd te houden en uw voorkeuren te onthouden. Geen tracking, geen cookies van derden.',
-        ok: 'Prima', privacy: 'Privacybeleid' };
+    ? { txt: 'Functional storage only', ok: 'Fine', privacy: 'Privacy' }
+    : { txt: 'Alleen functionele opslag', ok: 'Prima', privacy: 'Privacy' };
 
   var stijl = document.createElement('style');
   stijl.textContent =
-    '#rtg-cookie{position:fixed;left:50%;bottom:max(1rem,env(safe-area-inset-bottom));transform:translateX(-50%);z-index:9999;' +
-      'width:calc(100% - 2rem);max-width:440px;background:#0C0C0B;color:#F5F3EE;border:1px solid #857007;border-radius:14px;' +
-      'padding:1rem 1.1rem;font-family:Inter,system-ui,sans-serif;font-size:0.8rem;line-height:1.55;box-shadow:0 12px 40px rgba(0,0,0,0.35);}' +
-    '#rtg-cookie p{margin:0 0 0.75rem;color:#F5F3EE;}' +
-    '#rtg-cookie .rij{display:flex;align-items:center;gap:1rem;}' +
-    '#rtg-cookie a{color:#C9B25A;text-decoration:none;border-bottom:1px solid rgba(201,178,90,0.4);font-size:0.74rem;}' +
-    '#rtg-cookie button{margin-left:auto;background:#FFFFFF;color:#0C0C0B;border:none;border-radius:999px;' +
-      'padding:0.5rem 1.4rem;font-family:inherit;font-size:0.78rem;font-weight:600;cursor:pointer;}';
+    '#rtg-cookie{position:fixed;left:50%;bottom:max(0.6rem,env(safe-area-inset-bottom));transform:translateX(-50%);' +
+      'z-index:9999;width:max-content;max-width:min(92vw,34rem);display:flex;align-items:baseline;justify-content:center;' +
+      'gap:0.5rem;flex-wrap:wrap;background:none;border:0;box-shadow:none;padding:0.3rem 0.6rem;' +
+      'font-family:var(--rtg-interface,Inter,system-ui,sans-serif);font-size:0.7rem;line-height:1.4;' +
+      'letter-spacing:0.01em;text-align:center;}' +
+    '#rtg-cookie span{color:rgba(244,240,233,0.52);}' +
+    /* de twee klikbare woorden dragen alleen een onderlijn, geen vlak */
+    '#rtg-cookie a,#rtg-cookie button{background:none;border:0;padding:0;margin:0;cursor:pointer;' +
+      'font:inherit;color:rgba(244,240,233,0.82);text-decoration:none;' +
+      'border-bottom:1px solid rgba(244,240,233,0.28);}' +
+    '#rtg-cookie a:hover,#rtg-cookie button:hover,' +
+    '#rtg-cookie a:focus-visible,#rtg-cookie button:focus-visible{color:var(--gold-tekst,#C0A544);' +
+      'border-bottom-color:var(--gold-tekst,#C0A544);}' +
+    /* op een licht thema draait alleen de inkt om; de vorm blijft dezelfde */
+    ':root[data-rtg-thema="champagne"] #rtg-cookie span{color:rgba(26,23,19,0.58);}' +
+    ':root[data-rtg-thema="champagne"] #rtg-cookie a,' +
+    ':root[data-rtg-thema="champagne"] #rtg-cookie button{color:rgba(26,23,19,0.86);' +
+      'border-bottom-color:rgba(26,23,19,0.3);}';
   document.head.appendChild(stijl);
 
   var el = document.createElement('div');
   el.id = 'rtg-cookie';
   el.setAttribute('role', 'region');
   el.setAttribute('aria-label', en ? 'Cookie notice' : 'Cookiemelding');
-  var p = document.createElement('p');
+  var p = document.createElement('span');
   p.textContent = T.txt;
-  var rij = document.createElement('div');
-  rij.className = 'rij';
   var a = document.createElement('a');
   a.href = '/apps/juridisch/privacy.html';
   a.textContent = T.privacy;
@@ -44,8 +58,7 @@
     try { localStorage.setItem(SLEUTEL, new Date().toISOString()); } catch (e) {}
     el.remove();
   });
-  rij.appendChild(a); rij.appendChild(knop);
-  el.appendChild(p); el.appendChild(rij);
+  el.appendChild(p); el.appendChild(a); el.appendChild(knop);
   var plaats = function () { document.body.appendChild(el); };
   if (document.body) plaats(); else document.addEventListener('DOMContentLoaded', plaats);
 })();

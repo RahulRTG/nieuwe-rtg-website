@@ -133,7 +133,44 @@
     // datum; Bordeaux een diepe wijnrode plaat; pastel (RTF) een zacht blauw.
     ':root[data-pas-thema="parelmoer"] .rtg-ring{--klok-plaat-a:#FBF6EA;--klok-plaat-b:#F0E7D3;--klok-plaat-c:#E2D6BC;--klok-datum:#3A2E1A;--klok-venster:#EADFC6;--klok-lume:#B8993C;}' +
     ':root[data-pas-thema="bordeaux"] .rtg-ring{--klok-plaat-a:#3A1120;--klok-plaat-b:#260A16;--klok-plaat-c:#15040C;--klok-datum:#F2DEE4;--klok-venster:#0C0308;--klok-lume:#E7CFD6;}' +
-    ':root[data-levend="pastel"] .rtg-ring{--klok-plaat-a:#1B2733;--klok-plaat-b:#111C27;--klok-plaat-c:#0A121B;--klok-datum:#DCE7F2;--klok-venster:#070D15;--klok-lume:#CFE0F0;}';
+    ':root[data-levend="pastel"] .rtg-ring{--klok-plaat-a:#1B2733;--klok-plaat-b:#111C27;--klok-plaat-c:#0A121B;--klok-datum:#DCE7F2;--klok-venster:#070D15;--klok-lume:#CFE0F0;}' +
+
+    /* ---------------------------------------------- de klok per RTG-thema --
+       "Ieder zijn eigen klok die erbij past." Een wijzerplaat is hier geen
+       kleurtje maar HETZELFDE MATERIAAL als de grond waarop de klok ligt: de
+       drie stops zijn het hoogsel, de basis en de diepte van dat materiaal.
+       Daarom staan hier geen hexcodes maar de tokens uit rtg-materiaal.css --
+       verzin ik ze hier opnieuw, dan drijven klok en thema uit elkaar zonder
+       dat iemand het merkt (dat is hier al eens gebeurd met een verzonnen
+       champagne).
+
+       Wat per thema WEL een besluit is, is de leeskleur op de plaat en het
+       goud. Op champagne mag de logotoon zelf (donker op licht); op de drie
+       donkere materialen leest alleen het hoogsel --gold-tekst goed genoeg.
+       Dat is dezelfde regel die rtg-themas.css voor de rest van het scherm
+       aanhoudt, hier alleen toegepast op een rond vlak. */
+    ':root[data-rtg-thema="champagne"] .rtg-ring{' +
+      '--klok-plaat-a:var(--pearl-hoog);--klok-plaat-b:var(--pearl-basis);--klok-plaat-c:var(--pearl-diep);' +
+      '--klok-datum:var(--op-pearl);--klok-venster:var(--pearl-diep);' +
+      '--klok-goud:var(--gold-basis);--klok-lume:var(--gold-diep);}' +
+    ':root[data-rtg-thema="onyx"] .rtg-ring{' +
+      '--klok-plaat-a:var(--onyx-hoog);--klok-plaat-b:var(--onyx-basis);--klok-plaat-c:var(--onyx-diep);' +
+      '--klok-datum:var(--op-onyx);--klok-venster:var(--onyx-diep);' +
+      '--klok-goud:var(--gold-tekst);--klok-lume:var(--op-onyx);}' +
+    /* Fluweel begint bij de BASIS en niet bij het hoogsel. Met --bordeaux-hoog
+       (#9E1C40) in het hart werd de plaat rood in plaats van wijn, en dat is
+       precies wat MATERIAAL.md verbiedt: fluweel absorbeert licht en lijkt
+       bijna zwart tot er licht op valt. De rand gaat daarom nog een stap
+       dieper dan --bordeaux-diep -- afgeleid uit die toon, niet verzonnen. */
+    ':root[data-rtg-thema="bordeaux"] .rtg-ring{' +
+      '--klok-plaat-a:var(--bordeaux-basis);--klok-plaat-b:var(--bordeaux-diep);' +
+      '--klok-plaat-c:color-mix(in srgb,var(--bordeaux-diep) 62%,#000);' +
+      '--klok-datum:var(--op-bordeaux);--klok-venster:var(--bordeaux-diep);' +
+      '--klok-goud:var(--gold-tekst);--klok-lume:var(--op-bordeaux);}' +
+    ':root[data-rtg-thema="royal"] .rtg-ring{' +
+      '--klok-plaat-a:var(--royal-hoog);--klok-plaat-b:var(--royal-basis);--klok-plaat-c:var(--royal-diep);' +
+      '--klok-datum:var(--op-royal);--klok-venster:var(--royal-diep);' +
+      '--klok-goud:var(--gold-tekst);--klok-lume:var(--op-royal);}';
   document.head.appendChild(stijl);
 
   const twee = n => String(n).padStart(2, '0');

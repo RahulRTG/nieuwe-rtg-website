@@ -570,6 +570,21 @@ var RTG_BOUW = '1b06c62c';
          staat de actie. Alles daaronder is bijzaak. */
       '#gate{display:flex;flex-direction:column;align-items:center;justify-content:center;' +
         'gap:0;padding:6vh 1.1rem;}' +
+      /* DE POORT IS ALTIJD NACHT, ook onder een licht thema.
+         Dit scherm is een sterrenhemel; dat is niet een van de vier smaken
+         maar wat het scherm IS. Toen de thema's platformbreed gingen, zette
+         champagne netjes zijn donkere inkt op de body -- en die inkt landde op
+         een invoerveld dat op een zwarte hemel ligt. Gemeten: 1,11:1. Niet
+         "wat flets": onzichtbaar.
+         De poort verklaart daarom zijn eigen materiaal (onyx) en laat het
+         thema alleen los op wat er OP die hemel ligt: de wijzerplaat van de
+         klok. Een lichte wijzerplaat tegen een nachthemel is precies wat een
+         horloge met een wit blad 's avonds doet. */
+      '#gate{color:var(--op-onyx);' +
+        '--rtg-txt:var(--op-onyx);--txt:var(--op-onyx);' +
+        '--rtg-muted:rgba(244,240,233,0.72);--rtg-soft:rgba(244,240,233,0.56);' +
+        '--muted:rgba(244,240,233,0.72);--soft:rgba(244,240,233,0.56);}' +
+      '#gate input,#gate textarea{color:inherit;}' +
       /* DE HALO. De sterren waren overal even druk, ook precies daar waar de
          klok en de tekst staan -- en dan moet het oog zelf uitzoeken wat het
          onderwerp is. Een zachte donkere ovaal achter de kolom maakt het daar
@@ -589,9 +604,12 @@ var RTG_BOUW = '1b06c62c';
          eigen maat; zet je die maat om, dan verschuift het draaipunt en staat
          alles scheef -- precies wat er gebeurde toen ik hem groter maakte.
          transform schaalt het hele beeld uniform, dus de geometrie blijft heel. */
-      /* Schaal 1 op een telefoon: daar is de klok al bijna schermbreed en
-         duwt elke vergroting het invoerveld uit beeld -- de actie hoort altijd
-         zichtbaar te blijven. Op een breed scherm is er wel ruimte. */
+      /* Schaal op de telefoon: 1,2. Hij stond op 1 omdat elke vergroting het
+         invoerveld uit beeld duwde -- maar dat was toen de koekjesmelding nog
+         een kaart van 160px was. Nu die een regel van 26px is, past het wel,
+         en de kolom vulde met schaal 1 maar 51% van de hoogte terwijl de
+         opzet 70 a 80% vraagt. Gemeten op 430 en op 375 breed. */
+      '#gate{--klokschaal:1.2;}' +
       /* En de indeling moet de GESCHAALDE maat reserveren. Een transform tekent
          groter maar verandert de doos niet: op 1,5x groeide de klok 73px naar
          boven en 73px naar beneden buiten zijn eigen vak, en de lippen -- die
@@ -605,7 +623,18 @@ var RTG_BOUW = '1b06c62c';
       '#gate .os-lock > .rtg-ring{transform:scale(var(--klokschaal,1));transform-origin:center;}' +
       /* de lippen sluiten AAN op de klok: Rahul komt eruit, hij zweeft er niet
          tientallen pixels onder */
-      '#gate .ag-mond{margin:-0.6rem auto 0.2rem;width:min(52vw,240px);height:auto;}' +
+      /* DE MOND HOORT BIJ DE KLOK, dus meet hij zich aan de klok en niet aan
+         het venster. Met min(52vw,240px) was hij op een telefoon 224 breed
+         onder een klok van 256 (verhouding 0,87) en op een breed scherm 240
+         onder een klok van 384 (0,63) -- dezelfde mond, twee verhoudingen.
+
+         En het optrekken gebeurt met de LEEGTE VAN HET DOEK erin verrekend:
+         de tekening vult verticaal ongeveer 46% van haar canvas, dus boven de
+         inkt zit ruim een kwart niets. Trek je alleen de doos op, dan sluit
+         de doos aan en de tekening niet -- precies het gat dat hier zat. */
+      '#gate .ag-mond{--mondbreed:calc(var(--rtg-klok-maat,16rem) * var(--klokschaal,1) * 0.875);' +
+        'width:var(--mondbreed);height:auto;' +
+        'margin:calc(var(--mondbreed) * -0.125) auto 0.2rem;}' +
       // de zin is de aanspreking en geen onderschrift
       /* margin-inline:auto, anders staat de zin 43px links van de as. De doos
          is een flexkolom met align-items:stretch, dus een kind met een
@@ -639,7 +668,7 @@ var RTG_BOUW = '1b06c62c';
          enige actie op het scherm onbereikbaar tot je hem wegklikt.
          De kolom houdt daarom ruimte vrij zolang de melding er staat, en niet
          langer -- `:has()` volgt het element vanzelf als hij verdwijnt. */
-      'body:has(#rtg-cookie) #gate{padding-bottom:calc(6vh + 11rem);}' +
+      'body:has(#rtg-cookie) #gate{padding-bottom:calc(6vh + 3rem);}' +
     /* Slotstuk van de poortstijl: de brede-schermregels, en daarna pas het
        insluiten van het blad. Dit deel MOET het laatste van de reeks 04.. zijn
        dat aan de stijlstring bijdraagt, want het sluit hem af met een `;` en
@@ -650,7 +679,10 @@ var RTG_BOUW = '1b06c62c';
        specificiteit wint de laatste, en op een breed scherm hoort de poort het
        hele venster te vullen in plaats van de kolompadding van 04a te houden. */
       '@media (min-width:900px){' +
-        '#gate .os-lock{--klokschaal:1.5;}' +
+        /* op #gate en niet op .os-lock: de mond meet zich aan de klok en
+           moet die schaal dus ook kunnen erven. Stond hij op .os-lock, dan
+           bleef de mond op een breed scherm 224 breed onder een klok van 384. */
+        '#gate{--klokschaal:1.5;}' +
         '#gate{position:fixed;inset:0;width:100vw;max-width:none;height:100vh;' +
           'margin:0;border-radius:0;border:0;display:flex;align-items:center;' +
           'justify-content:center;flex-direction:column;}' +

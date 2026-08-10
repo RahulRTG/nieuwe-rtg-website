@@ -24,8 +24,8 @@
   --rtg-soft:rgba(26,23,19,0.56);
   --rtg-line:var(--pearl-rand);
   --rtg-card:rgba(255,255,255,0.42);
-  --rtg-goud:var(--gold-basis);      /* op licht mág de logotoon zelf */
-  --rtg-leesgoud:var(--gold-basis);
+  --rtg-goud:var(--gold-tekst);
+  --rtg-leesgoud:var(--gold-basis);  /* op licht mag de logotoon zelf lezen */
   --rtg-dagsterkte:0.16;
 }
 /* ---- Onyx: pianolak, de vertrouwde stand ---- */
@@ -37,7 +37,7 @@
   --rtg-soft:rgba(244,240,233,0.56);
   --rtg-line:var(--onyx-rand);
   --rtg-card:#151312;
-  --rtg-goud:var(--gold-basis);
+  --rtg-goud:var(--gold-tekst);
   --rtg-leesgoud:var(--gold-tekst);  /* op donker het hoogsel: 8,11:1 */
   --rtg-dagsterkte:0.10;
 }
@@ -69,7 +69,19 @@
   --rtg-dagsterkte:0.07;
 }
 
-/* De grond zelf, plus de levende kleur die eroverheen ademt. Twee lagen: de
+/* --rtg-goud IS EEN VULKLEUR EN GEEN TEKSTKLEUR.
+   In de UI-kit vult dit token de primaire knop, met #1C1608 als inkt erop. Ik
+   zette hem eerst op de logotoon --gold-basis (#857007) omdat dat "het echte
+   goud" is -- en haalde daarmee het contrast van 6,7:1 naar 3,7:1 op elke
+   gouden knop van het platform. a11y.js zag het meteen: zeven adviezen werden
+   er achttien.
+   Het is geen instelfout maar een eigenschap van de toon: op #857007 haalt
+   ZELFS ZWART maar 4,2:1. De logotoon kan dus nooit een vlak zijn waar gewone
+   tekst op staat. Precies dezelfde grens als bij goud-op-fluweel, alleen
+   andersom. Vullen doet het hoogsel; de logotoon is voor randen, accenten en
+   het beeldmerk. Wat er OP een grond leest, staat in --rtg-leesgoud.
+
+   De grond zelf, plus de levende kleur die eroverheen ademt. Twee lagen: de
    dagkleur bovenop, met de sterkte die het thema toestaat, en daaronder het
    materiaal. Zo verandert de tint continu zonder dat het materiaal verdwijnt. */
 :root[data-rtg-thema] body{

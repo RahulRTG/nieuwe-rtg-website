@@ -19,11 +19,36 @@ function hex(naam) {
   assert.ok(m, 'token --' + naam + ' hoort te bestaan als hexwaarde');
   return { r: parseInt(m[1].slice(1, 3), 16), g: parseInt(m[1].slice(3, 5), 16), b: parseInt(m[1].slice(5, 7), 16), hex: m[1] };
 }
-// alle hexkleuren die in een verloop van dit materiaal voorkomen
+/* Alle hexkleuren die in een verloop van dit materiaal voorkomen.
+
+   Het verloop noemt zijn tonen sinds kort bij NAAM (var(--pearl-hoog) in
+   plaats van #FBF8F3), zodat een wijzerplaat hetzelfde materiaal kan gebruiken
+   zonder de hexcodes over te tikken. Deze toets moet die verwijzing dus
+   volgen -- deed hij dat niet, dan las hij nul tonen en zweeg hij vrolijk over
+   elk materiaal. Precies dat gebeurde bij de eerste poging: de onyx-toets
+   zakte (0 >= 2 is onwaar) maar de goud-toets "slaagde" met nul lichtpunten. */
+function losOp(waarde, diepte) {
+  return waarde.replace(/var\(\s*(--[\w-]+)\s*\)/g, function (heel, naam) {
+    if ((diepte || 0) > 4) return heel;             // geen eindeloze kring
+    var m = new RegExp('\\' + naam + '\\s*:\\s*([^;]+);').exec(CSS);
+    return m ? losOp(m[1].trim(), (diepte || 0) + 1) : heel;
+  });
+}
 function glansTonen(naam) {
   var m = new RegExp('--' + naam + '-glans\\s*:\\s*([^;]+);').exec(CSS);
   assert.ok(m, naam + ' hoort een glanslaag te hebben; zonder glans is het geverfd karton');
-  return (m[1].match(/#[0-9A-Fa-f]{6}/g) || []).map(function (h) {
+  var opgelost = losOp(m[1]);
+  /* GEEN ENKELE verwijzing mag blijven staan. "Er kwamen kleuren uit" is te
+     zwak: bij een dood var() tussen twee goede tonen leest de toets er nog
+     twee, en dan keurt hij een verloop goed waarvan een derde ontbreekt.
+     Gemeten met de mutatie var(--pearl-bestaatniet): die zakte hier pas. */
+  var rest = opgelost.match(/var\(\s*--[\w-]+/g);
+  assert.ok(!rest, naam + '-glans houdt een verwijzing over die nergens heen wijst: ' +
+    (rest || []).join(', ') + ' -- een verloop dat de toets niet kan lezen, kan de toets ' +
+    'ook niet bewaken');
+  var tonen = opgelost.match(/#[0-9A-Fa-f]{6}/g) || [];
+  assert.ok(tonen.length, naam + '-glans levert geen enkele kleur op');
+  return tonen.map(function (h) {
     return { r: parseInt(h.slice(1, 3), 16), g: parseInt(h.slice(3, 5), 16), b: parseInt(h.slice(5, 7), 16), hex: h };
   });
 }

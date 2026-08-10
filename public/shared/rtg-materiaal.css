@@ -24,12 +24,20 @@
    valt, en fluweel is hetzelfde bordeaux in de schaduw. */
 
 :root{
+  /* DRIE TONEN PER MATERIAAL: het HOOGSEL waar het licht valt, de BASIS in
+     rust, en de DIEPTE in de schaduw. Ze stonden eerst alleen binnenin het
+     glans-verloop; wie het materiaal ergens anders wilde gebruiken -- een
+     wijzerplaat bijvoorbeeld -- moest dezelfde hexcodes overtikken, en dan
+     bewaren twee plekken dezelfde waarheid (LAT.md regel 4). Nu draagt het
+     verloop de tokens en niet andersom. */
+
   /* ---- Pearl: gepolijst keramiek, levend wit ----------------------------
      WARM en nooit blauw: in elke toon geldt rood >= groen >= blauw. Een koel
      wit is hier niet een andere smaak maar het verkeerde materiaal. */
+  --pearl-hoog:#FBF8F3;
   --pearl-basis:#F4F0E9;
   --pearl-diep:#E8E2D7;
-  --pearl-glans:linear-gradient(160deg,#FBF8F3 0%,#F4F0E9 46%,#EDE7DC 100%);
+  --pearl-glans:linear-gradient(160deg,var(--pearl-hoog) 0%,var(--pearl-basis) 46%,var(--pearl-diep) 100%);
   --pearl-rand:rgba(120,108,88,0.22);
   --op-pearl:#1A1713;          /* wat er leesbaar op staat */
 
@@ -38,7 +46,7 @@
      lichtrichting: geborsteld metaal heeft er een, glitter heeft er tien. */
   --gold-basis:#857007;        /* EXACT de goudtoon uit het logo */
   --gold-diep:#5E4F05;
-  --gold-glans:linear-gradient(145deg,#C0A544 0%,#857007 52%,#5E4F05 100%);
+  --gold-glans:linear-gradient(145deg,var(--gold-tekst) 0%,var(--gold-basis) 52%,var(--gold-diep) 100%);
   --gold-rand:rgba(192,165,68,0.52);
   --op-gold:#171308;
   /* GOUD OP DONKER IS HET HOOGSEL, NIET DE BASIS.
@@ -53,9 +61,10 @@
   /* ---- Onyx: pianolak ---------------------------------------------------
      Niet egaal. Egaal zwart is verf; pianolak houdt een nauwelijks zichtbaar
      verloop en een rand die licht vangt. */
+  --onyx-hoog:#171614;
   --onyx-basis:#0C0C0B;
   --onyx-diep:#050505;
-  --onyx-glans:linear-gradient(168deg,#171614 0%,#0C0C0B 58%,#070706 100%);
+  --onyx-glans:linear-gradient(168deg,var(--onyx-hoog) 0%,var(--onyx-basis) 58%,var(--onyx-diep) 100%);
   --onyx-rand:rgba(255,255,255,0.09);
   --op-onyx:#F4F0E9;
 
@@ -63,18 +72,20 @@
      ABSORBEERT licht. Bijna zwart tot er licht op valt; dan pas zie je rood.
      Daarom is de basis fors donkerder dan het oude accent (#C23A5E was rood,
      dit is wijn). */
+  --bordeaux-hoog:#9E1C40;     /* = --burgundy-bright uit CLAUDE.md */
   --bordeaux-basis:#7F1634;    /* EXACT de bordeauxtoon uit het logo */
   --bordeaux-diep:#4A0C1E;
-  --bordeaux-glans:linear-gradient(155deg,#9E1C40 0%,#7F1634 52%,#4A0C1E 100%);
+  --bordeaux-glans:linear-gradient(155deg,var(--bordeaux-hoog) 0%,var(--bordeaux-basis) 52%,var(--bordeaux-diep) 100%);
   --bordeaux-rand:rgba(158,28,64,0.45);
   --op-bordeaux:#F4F0E9;
 
   /* ---- Royal: satijn ----------------------------------------------------
      Het ENIGE materiaal dat koel mag zijn. Koningsblauw, geen Microsoft-blauw:
      het moet als instituut voelen. */
+  --royal-hoog:#2A4680;
   --royal-basis:#1B2F5E;
   --royal-diep:#101E3F;
-  --royal-glans:linear-gradient(150deg,#2A4680 0%,#1B2F5E 55%,#101E3F 100%);
+  --royal-glans:linear-gradient(150deg,var(--royal-hoog) 0%,var(--royal-basis) 55%,var(--royal-diep) 100%);
   --royal-rand:rgba(74,110,178,0.38);
   --op-royal:#F0F2F7;
 

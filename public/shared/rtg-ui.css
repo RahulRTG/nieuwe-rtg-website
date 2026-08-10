@@ -1,3 +1,22 @@
+/* De drie lagen die BOVEN de UI-kit horen te bestaan maar ONDER hem geladen
+   worden. Ze staan hier en niet in tweehonderd <link>-regels: dit blad ligt op
+   210 van de 216 pagina's, dus dit is de enige plek waar de materialen, het
+   ontwerpsysteem en de vier thema's het hele platform bereiken zonder elke
+   pagina te openen.
+
+   VOLGORDE: ontwerp zet de dichtheids- en betekenistokens, materiaal bouwt daar
+   de vijf materialen op, thema kiest welk materiaal de grond is.
+
+   WAAROM DIT NIETS OMGOOIT AAN WAT ER AL STAAT. @import komt vóór de regels van
+   dit blad, dus bij gelijke specificiteit wint de UI-kit. De vier tokens die
+   allebei bestaan (--rtg-line, --rtg-soft, --rtg-muted, --rtg-goud) zet de
+   UI-kit op :root en een thema op :root[data-rtg-thema]; dat laatste is
+   specifieker en wint dus altijd, ook staande vóór in de cascade. Zonder
+   themakeuze staat dat attribuut er niet en verandert er letterlijk niets. */
+@import url('/shared/rtg-ontwerp.css');
+@import url('/shared/rtg-materiaal.css');
+@import url('/shared/rtg-themas.css');
+
 /* ====================== DE RTG UI-KIT ======================================
 
    Eén vormtaal voor alle ROS-apps. Tot nu toe schreef elke pagina zijn eigen

@@ -52,6 +52,42 @@ function absolutUrls(css, mapPad) {
   });
 }
 
+/* @import OPLOSSEN, want samenvoegen maakt hem stuk.
+
+   Een @import is alleen geldig BOVENAAN een blad. Plak je twee bladen aaneen,
+   dan staat de @import van het tweede opeens middenin, en gooit de ontleder hem
+   weg -- zonder fout, zonder melding. Precies dat gebeurde toen shared/rtg-ui.css
+   de materialen, het ontwerpsysteem en de vier thema's ging insluiten: los
+   werkte het, gebundeld verdween het, en het scherm zag er hetzelfde uit als
+   ervoor. Dat is het gemeenste soort stuk, want er is niets aan te zien.
+
+   Wat een @import BETEKENT is: zet de regels van dat blad hier neer. Dus doet
+   deze laag dat ook letterlijk, op de plek van de regel zelf, zodat de cascade
+   klopt. Alleen eigen paden (dezelfde controle als voor de bundel), met een
+   diepte- en kringbewaking, en de ingesloten bladen tellen mee voor de stempel
+   -- anders verandert de bundel niet als een ingesloten blad wel verandert. */
+const IMPORT = /@import\s+(?:url\(\s*(['"]?)([^'")]+)\1\s*\)|(['"])([^'"]+)\3)\s*;/gi;
+function metImports(abs, p, publicDir, gebruikt, gezien, diepte) {
+  let css;
+  try { css = fs.readFileSync(abs, 'utf8'); } catch (e) { return ''; }
+  css = absolutUrls(css, path.posix.dirname(p));
+  if (diepte > 4) return css;
+  return css.replace(IMPORT, (heel, q1, a1, q2, a2) => {
+    const doel = (a1 || a2 || '').trim();
+    // vreemde bladen, media-varianten en alles wat niet een eigen .css-pad is: laten staan
+    if (!GOED_PAD.test(doel) || doel.indexOf('..') !== -1) return heel;
+    const dAbs = path.join(publicDir, doel);
+    if (!dAbs.startsWith(publicDir + path.sep)) return heel;
+    if (gezien.has(dAbs)) return '/* @import ' + doel + ': al ingesloten */';
+    let st; try { st = fs.statSync(dAbs); } catch (e) { return heel; }
+    if (!st.isFile()) return heel;
+    gezien.add(dAbs);
+    gebruikt.push({ p: doel, abs: dAbs, mtimeMs: st.mtimeMs, size: st.size });
+    return '/* @import ' + doel + ' */\n' +
+      metImports(dAbs, doel, publicDir, gebruikt, gezien, diepte + 1);
+  });
+}
+
 function stijlbundel(publicDir) {
   const cache = new Map(); // sleutel -> { stempel, css, gz, br }
   return (req, res, next) => {
@@ -69,17 +105,23 @@ function stijlbundel(publicDir) {
       bestanden.push({ p, abs, mtimeMs: st.mtimeMs, size: st.size });
     }
 
-    /* De stempel draagt elk bestand met zijn tijd en maat. Verandert er een,
-       dan verandert de stempel, en dan haalt de browser hem opnieuw op. */
-    const stempel = bestanden.map(b => b.size.toString(16) + '.' + Math.round(b.mtimeMs).toString(16)).join('_');
+    /* Eerst bouwen, DAN stempelen. De stempel moet ook de ingesloten bladen
+       dekken: verandert rtg-themas.css maar niet rtg-ui.css die hem insluit,
+       dan zou een stempel over alleen de gevraagde bladen gelijk blijven en
+       serveert de cache een bundel met de oude thema's -- onvindbaar, want het
+       bestand op schijf klopt wel. */
+    let css = '';
+    const gezien = new Set(bestanden.map(b => b.abs));
+    const alles = bestanden.slice();
+    try {
+      for (const b of bestanden)
+        css += '/* ' + b.p + ' */\n' + metImports(b.abs, b.p, publicDir, alles, gezien, 0) + '\n';
+    } catch (e) { return next(); }
+
+    const stempel = alles.map(b => b.size.toString(16) + '.' + Math.round(b.mtimeMs).toString(16)).join('_');
     const sleutel = paden.join('|');
     let hit = cache.get(sleutel);
     if (!hit || hit.stempel !== stempel) {
-      let css = '';
-      try {
-        for (const b of bestanden)
-          css += '/* ' + b.p + ' */\n' + absolutUrls(fs.readFileSync(b.abs, 'utf8'), path.posix.dirname(b.p)) + '\n';
-      } catch (e) { return next(); }
       hit = { stempel, css: Buffer.from(css, 'utf8'), gz: null, br: null };
       if (cache.size > 100) cache.clear();
       cache.set(sleutel, hit);

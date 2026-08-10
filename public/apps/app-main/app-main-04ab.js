@@ -8,7 +8,10 @@
        specificiteit wint de laatste, en op een breed scherm hoort de poort het
        hele venster te vullen in plaats van de kolompadding van 04a te houden. */
       '@media (min-width:900px){' +
-        '#gate .os-lock{--klokschaal:1.5;}' +
+        /* op #gate en niet op .os-lock: de mond meet zich aan de klok en
+           moet die schaal dus ook kunnen erven. Stond hij op .os-lock, dan
+           bleef de mond op een breed scherm 224 breed onder een klok van 384. */
+        '#gate{--klokschaal:1.5;}' +
         '#gate{position:fixed;inset:0;width:100vw;max-width:none;height:100vh;' +
           'margin:0;border-radius:0;border:0;display:flex;align-items:center;' +
           'justify-content:center;flex-direction:column;}' +

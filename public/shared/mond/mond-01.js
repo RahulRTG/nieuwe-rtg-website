@@ -54,6 +54,32 @@
         lip: 'm', fase: rnd() * Math.PI * 2, maat: 0.4 + rnd() * 0.7,
         kleur: '#C9A24B', rand: Math.min(1, Math.min(mx - 14, 206 - mx) / 55), diep: 0, z: -0.05 });
     }
+
+    /* DE TEKENING IN HET MIDDEN VAN ZIJN EIGEN DOEK.
+
+       Beide tekenaars gebruiken y=52 als draaipunt: WebGL rekent -(y-52)/60 en
+       de 2D-terugval schaalt om diezelfde lijn. Maar de mond zelf loopt van
+       ongeveer 35 tot 79, dus zijn werkelijke midden ligt op 57 -- vijf eenheden
+       LAGER dan het draaipunt. Gevolg: de mond hing in zijn doek naar beneden,
+       met bovenin een strook leegte. Op de poort was dat te zien als een gat
+       tussen de wijzerplaat en de lippen: de dozen overlapten keurig 10px,
+       maar de INKT begon pas 21px onder de klok. Twee keer heb ik dat aan de
+       doos gemeten en niet aan wat er staat.
+
+       Het midden wordt hier UITGEREKEND en niet ingetikt, zodat het klopt
+       blijft als iemand de lipvormen aanpast. Meteen wordt het draaipunt van
+       de "breed"-vervorming het echte midden, dus die duwt de mond nu ook niet
+       meer scheef. */
+    var laag = Infinity, hoog = -Infinity;
+    for (var q = 0; q < PUNTEN.length; q++) {
+      if (PUNTEN[q].lip === 'm') continue;          // de vervagende middellijn telt niet mee
+      if (PUNTEN[q].y < laag) laag = PUNTEN[q].y;
+      if (PUNTEN[q].y > hoog) hoog = PUNTEN[q].y;
+    }
+    if (laag < hoog) {
+      var schuif = 52 - (laag + hoog) / 2;
+      for (var w = 0; w < PUNTEN.length; w++) PUNTEN[w].y += schuif;
+    }
     return PUNTEN;
   }
 

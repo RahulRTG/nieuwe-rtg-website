@@ -34,7 +34,17 @@
     '@media (prefers-reduced-motion: reduce){.rtg-klok .km{display:none;}}' +
     // Twee sleutelkleuren: --klok-goud = het HUISGOUD (staat VAST), --klok-sfeer
     // = de levende dagkleur van het palet (hierin ademt de fijne sunray + flens).
-    '.rtg-ring{position:relative;display:inline-flex;align-items:center;justify-content:center;width:16rem;height:16rem;max-width:74vw;max-height:74vw;' +
+    /* DE MAAT VAN DE KLOK STAAT OP EEN PLEK. Wie de klok ergens schaalt, moet
+       weten hoe groot hij onder die schaal wordt -- anders reserveert de
+       indeling de ONgeschaalde maat en schuift wat eronder staat er dwars
+       doorheen. Dat gebeurde op de poort: de lippen landden midden op de
+       wijzerplaat zodra de klok op een breed scherm 1,5x ging.
+       Een tweede keer "16rem" opschrijven bij die schaal zou twee plekken
+       geven die dezelfde waarheid bewaren (LAT.md regel 4); daarom staat de
+       maat hier als token en rekent de poort ermee. */
+    ':root{--rtg-klok-maat:min(16rem,74vw);}' +
+    '.rtg-ring{position:relative;display:inline-flex;align-items:center;justify-content:center;' +
+      'width:var(--rtg-klok-maat);height:var(--rtg-klok-maat);' +
       '--klok-goud:var(--gold,#C9A24B);' +
       '--klok-sfeer:var(--dag-kleur,var(--s-accent-hel,var(--s-accent,#7F1634)));}' +
     // De klok hangt niet lós voor de achtergrond: een korte contactschaduw

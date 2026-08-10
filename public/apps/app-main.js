@@ -545,25 +545,21 @@ var RTG_BOUW = '1b06c62c';
          rechthoek met afgeronde hoeken en daarbuiten was het vlak zwart. Een
          inlogscherm hoort geen venster in een venster te zijn.
          De inhoud houdt zijn eigen breedte -- alleen de HEMEL wordt groot. */
-    /* Vervolg van app-main-04: de brede-schermregels van de poort. Geknipt
-       omdat deel 04 met de compositieregels weer over de 10 KB-grens ging.
-       De bundel plakt 04, 04a en 04b weer aaneen tot exact hetzelfde bestand;
-       de knip ligt midden in een stringconcatenatie, dus deel 04 eindigt met
-       een + en dit deel maakt hem af. */
-      '@media (min-width:900px){' +
-        '#gate .os-lock{--klokschaal:1.5;}' +
-        '#gate{position:fixed;inset:0;width:100vw;max-width:none;height:100vh;' +
-          'margin:0;border-radius:0;border:0;display:flex;align-items:center;' +
-          'justify-content:center;flex-direction:column;}' +
-        '#gate canvas:not(.ag-mond){position:absolute;inset:0;width:100vw;height:100vh;}' +
-        '#gate .ag-doos{max-width:34rem;}' +
-      '}';
-    document.head.appendChild(st);
     /* Vervolg van app-main-04: de compositieregels van de poort (een kolom:
        klok, lippen, aanspreking, veld). Geknipt omdat deel 04 opnieuw over de
        10 KB-grens ging. De knip ligt midden in een stringconcatenatie -- deel
-       04 eindigt op een + en dit deel maakt hem af; de bundel plakt 04, 04ab,
-       04a en 04b weer aaneen tot exact hetzelfde bestand. */
+       04 eindigt op een + en dit deel maakt hem af.
+
+       DE VOLGORDE IS DE BESTANDSNAAM. bundel.js plakt de delen in de volgorde
+       van readdirSync().sort(), dus puur alfabetisch: 04, 04a, 04ab, 04b. Deze
+       regels stonden een commit lang in 04ab, DUS na de `document.head
+       .appendChild(st);` die 04a afsloot -- waarmee ze een losse expressie
+       werden die JavaScript netjes uitrekent en weggooit. Geen syntaxfout,
+       geen consolemelding, en de halo, de klokschaal en de uitlijning van de
+       zin waren simpelweg weg terwijl de code er nog stond.
+       controleer() kon dat niet zien: die vergelijkt de bundel met dezelfde
+       som van dezelfde delen en is dus per definitie consistent met zichzelf.
+       Wat het nu wel ziet, is toets 43 in scripts/check.js. */
       /* DE COMPOSITIE. Dit scherm had vijf objecten die allemaal ongeveer even
          belangrijk waren -- klok, lippen, zin, invoerveld, koekjesmelding --
          met grote lege vlakken ertussen die niets deden. Leegte in een premium
@@ -596,7 +592,17 @@ var RTG_BOUW = '1b06c62c';
       /* Schaal 1 op een telefoon: daar is de klok al bijna schermbreed en
          duwt elke vergroting het invoerveld uit beeld -- de actie hoort altijd
          zichtbaar te blijven. Op een breed scherm is er wel ruimte. */
-      '#gate .os-lock{transform:scale(var(--klokschaal,1));transform-origin:center;margin:0;}' +
+      /* En de indeling moet de GESCHAALDE maat reserveren. Een transform tekent
+         groter maar verandert de doos niet: op 1,5x groeide de klok 73px naar
+         boven en 73px naar beneden buiten zijn eigen vak, en de lippen -- die
+         netjes 10px onder de rand horen te zitten, en dat op een telefoon ook
+         deden -- kwamen op een breed scherm midden op de wijzerplaat te liggen.
+         Gemeten, niet gegokt: telefoon klok 201-494 met mond op 484 (goed),
+         breed klok 98-537 met mond op 454 (83px de plaat in).
+         Daarom draagt het vak zelf de hoogte, en schaalt de ring erin. */
+      '#gate .os-lock{display:flex;align-items:center;justify-content:center;padding:0;margin:0;' +
+        'height:calc(var(--rtg-klok-maat,16rem) * var(--klokschaal,1));transform:none;}' +
+      '#gate .os-lock > .rtg-ring{transform:scale(var(--klokschaal,1));transform-origin:center;}' +
       /* de lippen sluiten AAN op de klok: Rahul komt eruit, hij zweeft er niet
          tientallen pixels onder */
       '#gate .ag-mond{margin:-0.6rem auto 0.2rem;width:min(52vw,240px);height:auto;}' +
@@ -622,9 +628,36 @@ var RTG_BOUW = '1b06c62c';
       '#gate .ag-rij input{background:none;border:0;border-radius:0;box-shadow:none;}' +
       '#gate .ag-rij input{font-size:1rem;padding:1rem 0.4rem;text-align:left;}' +
       /* de koekjesmelding hoort niet MIDDEN in de kennismaking. Hij zweeft
-         onderaan, buiten de kolom, waar hij de compositie niet meer breekt. */
-      '#gate ~ .rtgcookie,.rtgcookie{position:fixed;left:50%;transform:translateX(-50%);' +
-        'bottom:1rem;z-index:60;max-width:min(92vw,26rem);}' +
+         onderaan, buiten de kolom, waar hij de compositie niet meer breekt.
+
+         Deze regel stond er als `.rtgcookie` -- een klasse die nergens
+         bestaat. Het element heet `#rtg-cookie` (shared/cookie.js) en zet zijn
+         eigen positie al: vast, onderaan, gecentreerd. Er viel dus niets te
+         verplaatsen, en het commentaar hierboven beschreef een verhuizing die
+         nooit heeft plaatsgevonden. Wat er ECHT misging is iets anders: de
+         melding ligt met z-index 9999 over het invoerveld heen, en dan is de
+         enige actie op het scherm onbereikbaar tot je hem wegklikt.
+         De kolom houdt daarom ruimte vrij zolang de melding er staat, en niet
+         langer -- `:has()` volgt het element vanzelf als hij verdwijnt. */
+      'body:has(#rtg-cookie) #gate{padding-bottom:calc(6vh + 11rem);}' +
+    /* Slotstuk van de poortstijl: de brede-schermregels, en daarna pas het
+       insluiten van het blad. Dit deel MOET het laatste van de reeks 04.. zijn
+       dat aan de stijlstring bijdraagt, want het sluit hem af met een `;` en
+       hangt hem in de kop. Alles wat na deze regel nog `'...' +` schrijft,
+       staat buiten de string en doet niets.
+
+       De brede-schermregels komen bewust NA de compositie in 04a: bij gelijke
+       specificiteit wint de laatste, en op een breed scherm hoort de poort het
+       hele venster te vullen in plaats van de kolompadding van 04a te houden. */
+      '@media (min-width:900px){' +
+        '#gate .os-lock{--klokschaal:1.5;}' +
+        '#gate{position:fixed;inset:0;width:100vw;max-width:none;height:100vh;' +
+          'margin:0;border-radius:0;border:0;display:flex;align-items:center;' +
+          'justify-content:center;flex-direction:column;}' +
+        '#gate canvas:not(.ag-mond){position:absolute;inset:0;width:100vw;height:100vh;}' +
+        '#gate .ag-doos{max-width:34rem;}' +
+      '}';
+    document.head.appendChild(st);
     /* Vervolg van app-main-04: de poort-inhoud (mond, zin, invoerveld,
        passkey) en het gesprek erachter. Geknipt omdat deel 04 met de
        schermvullende sterrenhemel over de 10 KB-grens ging die het

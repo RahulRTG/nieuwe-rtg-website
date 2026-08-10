@@ -2544,5 +2544,69 @@ console.log('\n42) geen functie die binnen een andere functie staat en erbuiten 
   if (!stuk) ok(gekeken + ' gebundelde app-scripts: geen enkele functie wordt buiten zijn eigen omhulsel aangeroepen');
 }
 
+/* 43) in een gebundeld script staat geen losse tekstoptelling die nergens heen gaat.
+
+   DE FOUT DIE DIT VANGT, en hij is hier echt gemaakt. De grote app-scripts staan
+   opgeknipt per onderdeel en worden bij de build weer aaneengeplakt IN DE
+   VOLGORDE VAN DE BESTANDSNAAM (readdirSync().sort()). Bij het opknippen van
+   app-main-04 ontstond de reeks 04, 04a, 04ab, 04b -- terwijl de inhoud
+   geschreven was voor 04, 04ab, 04a, 04b. Alfabetisch komt "04a" voor "04ab",
+   dus het brok kwam achter de regel `document.head.appendChild(st);` terecht.
+
+   Wat er dan gebeurt is het vervelendste soort stuk: de stijlregels stonden nog
+   letterlijk in het bestand, maar als LOSSE expressie na het afsluitende `;`.
+   JavaScript telt die tekst netjes bij elkaar op en gooit hem weg. Geen
+   syntaxfout, geen consolemelding, geen enkele toets die zakt -- en op het
+   scherm waren de halo achter de klok, de schaal van de klok en de uitlijning
+   van de zin gewoon verdwenen. Ik heb het zelf een screenshot lang aangezien
+   voor "de sterren zijn wat druk".
+
+   controleer() in bundel.js kan dit per definitie NIET zien: die vergelijkt de
+   bundel met de som van dezelfde delen in dezelfde volgorde, en is dus altijd
+   consistent met zichzelf. Consistent is niet hetzelfde als goed.
+
+   De regel is smal gehouden: alleen een expressie-statement dat NIETS anders is
+   dan tekst met plussen ertussen. Zo'n statement heeft geen enkel effect en is
+   dus altijd fout. Een optelling met een aanroep of een variabele erin kan wel
+   effect hebben en blijft buiten schot. */
+console.log('\n43) geen weggegooide tekstoptelling in een gebundeld script');
+{
+  const { loop: loopKnopen } = require('./ast/walk');
+  const bundels = require('./bundel').bundels;
+  let stuk = 0, gekeken = 0;
+  /* Zit er ergens in deze +-keten een stuk tekst? Niet "bestaat hij UITSLUITEND
+     uit tekst" -- dat was mijn eerste versie, en die liet de echte fout er
+     doorheen. Een losgeraakt brok eindigt namelijk op een `+`, dus hij plakt
+     zich vast aan wat er in het VOLGENDE deelbestand staat. Hier was dat een
+     aanroep van (function sterrenhemel(){...})(), en daarmee was de keten niet
+     meer alleen tekst en zweeg de regel over precies het geval waarvoor hij
+     geschreven was. Gemeten met de mutatie, niet aangenomen. */
+  const tekstErin = (n) => {
+    if (!n || typeof n !== 'object') return false;
+    if (n.type === 'Literal') return typeof n.raw === 'string' && /^['"`]/.test(n.raw.trim());
+    if (n.type === 'BinaryExpression' && n.operator === '+') return tekstErin(n.left) || tekstErin(n.right);
+    return false;
+  };
+  for (const doel of Object.keys(bundels)) {
+    const bron = path.join(ROOT, 'public', doel);
+    let src; try { src = fs.readFileSync(bron, 'utf8'); } catch (e) { continue; }
+    let ast; try { ast = ontleed(src); } catch (e) { continue; }   // regel 42 meldt dat al
+    gekeken++;
+    loopKnopen(ast, (n) => {
+      if (n.type !== 'ExpressionStatement') return;
+      const e = n.expression;
+      /* Een KALE tekst is een directive ('use strict') en telt niet mee; het
+         gaat om de OPTELLING, want dat is de vorm die een losgeraakt brok
+         aanneemt. */
+      if (!e || e.type !== 'BinaryExpression' || e.operator !== '+') return;
+      if (!tekstErin(e)) return;
+      stuk++;
+      fout(doel + ' regel ' + (e.lijn || '?') + ': een optelling met tekst erin die nergens aan ' +
+        'toegekend wordt -- dit brok is bij het aaneenplakken losgeraakt en doet niets meer');
+    });
+  }
+  if (!stuk) ok(gekeken + ' gebundelde app-scripts: elk tekstbrok komt ergens aan');
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

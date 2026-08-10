@@ -95,6 +95,31 @@ test('goud en bordeaux zijn EXACT de tonen uit het logo', () => {
     'de bordeauxtoon hoort exact het logobordeaux te zijn');
 });
 
+/* De logotoon is het materiaal in RUST en niet automatisch een tekstkleur.
+   #857007 haalt op onyx 4,02:1 en op fluweel 2,09:1 -- allebei onder de norm.
+   Daarom is er een aparte tekstkleur, en die MOET het wel halen.
+
+   DE MUTATIE: zet --gold-tekst gelijk aan --gold-basis. Het ziet er dan
+   ingetogen uit en is precies waar iemand op een telefoon zijn ogen op stukkijkt. */
+test('goud op donker haalt de contrastnorm', () => {
+  function lin(c) { c = c / 255; return c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4); }
+  function L(c) { return 0.2126 * lin(c.r) + 0.7152 * lin(c.g) + 0.0722 * lin(c.b); }
+  function cr(a, b) { var x = L(a), y = L(b); return (Math.max(x, y) + 0.05) / (Math.min(x, y) + 0.05); }
+
+  var r = cr(hex('gold-tekst'), hex('onyx-basis'));
+  assert.ok(r >= 4.5, 'goud-op-onyx haalt maar ' + r.toFixed(2) +
+    ':1; de norm is 4,5 en de logotoon zelf haalt hem daar niet');
+
+  /* Op FLUWEEL werkt goud helemaal niet: de logotoon haalt 2,09:1 en zelfs het
+     hoogsel maar 4,21:1. Daar is de leeskleur ivoor, en dat hoort deze toets
+     ook te bewijzen -- anders lost iemand het "op" met nog lichter goud en
+     verliest het merk zijn goud. */
+  var opFluweel = cr(hex('op-bordeaux'), hex('bordeaux-basis'));
+  assert.ok(opFluweel >= 4.5, 'de leeskleur op fluweel haalt maar ' + opFluweel.toFixed(2) + ':1');
+  assert.ok(cr(hex('gold-tekst'), hex('bordeaux-basis')) < 4.5,
+    'zou goud op fluweel de norm halen, dan mag deze regel weg -- nu niet');
+});
+
 test('Bordeaux is fluweel: het absorbeert licht', () => {
   /* Het oude accent (#C23A5E) was rood; dit hoort wijn te zijn -- bijna zwart
      tot er licht op valt. De maat is de helderheid van de basis. */

@@ -41,6 +41,14 @@
   --gold-glans:linear-gradient(145deg,#C0A544 0%,#857007 52%,#5E4F05 100%);
   --gold-rand:rgba(192,165,68,0.52);
   --op-gold:#171308;
+  /* GOUD OP DONKER IS HET HOOGSEL, NIET DE BASIS.
+     De logotoon #857007 is het materiaal in RUST -- prima voor een vlak, een
+     rand of het beeldmerk zelf, maar als TEKST op onyx haalt hij 4,02:1 en op
+     fluweel 2,09:1. Allebei onder de norm van 4,5. Het hoogsel is hetzelfde
+     goud waar licht op valt en haalt 8,11:1.
+     Dit is exact dezelfde regel die CLAUDE.md al voor bordeaux stelt: een
+     accent is geen tekstkleur op zwart. */
+  --gold-tekst:#C0A544;
 
   /* ---- Onyx: pianolak ---------------------------------------------------
      Niet egaal. Egaal zwart is verf; pianolak houdt een nauwelijks zichtbaar

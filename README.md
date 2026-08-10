@@ -1209,7 +1209,7 @@ De samensteller (`samenstellen.js`) stelt **alleen voor wat bestaat**. Geen verz
 - **Een uitzondering per zaak kan alleen smaller maken.** Ruimer vragen legt niets vast en zegt waarom. Dat was eerst een clamp die de smallere waarde bewaarde — een val, want dan stond er een uitzondering die de gast nooit had gekozen, en die bleef hangen zodra hij de soort later ruimer zette.
 - **RTG leidt geen voorkeuren af uit je gedrag.** Wat hier staat heb je zelf opgeschreven, en dat verschil staat als zin in het profiel. Een systeem dat uit je bestellingen afleidt dat je van pittig houdt en dat doorgeeft aan een zaak, is iets anders dan een gast die zijn voorkeur opschrijft.
 
-Bewezen door `test/avond.test.js` (elf toetsen: de klok en het budget weigeren echt, een tafel komt nooit verder dan `aangevraagd`, de aangevraagde reservering staat in de gewone reserveringenlijst, `gevraagd` lekt niet zonder te vragen, en een avond van een ander is niet op te vragen). Zes mutaties nagetrokken, alle zes raak.
+Bewezen door `test/avond.test.js` (zestien toetsen: de klok en het budget weigeren echt, een tafel komt nooit verder dan `aangevraagd`, de aangevraagde reservering staat in de gewone reserveringenlijst, `gevraagd` lekt niet zonder te vragen, een avond van een ander is niet op te vragen, en het aanvragen loopt niet om de gegevenspoort heen die `/api/reserveer` wél heeft). Zeven mutaties nagetrokken, alle zeven raak.
 
 **Het aanvragen** (`aanvragen.js`) is waar het plan werkelijkheid wordt, en waar het onderscheid tussen `aangevraagd` en `bevestigd` geen woordkeus is. Een **tafel** gaat naar aangevraagd — de zaak beslist. Een **rit** mag wél op bevestigd: de mobiliteitskern boekt hem en er komt een chauffeur; daar beslist niemand meer over. Twee dingen die in een lijstje hetzelfde lijken en volstrekt verschillen in wat je ervan mag verwachten.
 
@@ -1217,7 +1217,28 @@ De terugreis is de enige stap waarvoor de planner iets moet weten wat hij niet h
 
 Twee fouten die de mutaties hier vonden en die anders waren meegegaan: de **geboekte prijs landde niet op de stap**, waardoor het budget precies het geld niet meetelde dat werkelijk werd uitgegeven; en de prijs van een reisoptie zit in `optie.totaal.prijs` terwijl `totaal` een *object* is — de weigering luidde daardoor "de goedkoopste rit kost € NaN", een zin die een gast te zien zou krijgen. Er staat nu een toets die de hele uitvoer op `NaN` en `undefined` nakijkt.
 
-Wat er **nog niet** is: uitgaan heeft nog geen aanvraagweg (die stap blijft `voorstel` mét de reden), er is nog geen scherm, en de rest van de lijst — live drukte, geluid, weer, gezelschapsafstemming, herinneringen — staat er niet. Die vragen sensoren of gegevens die dit huis niet heeft; de bodem waarop ze kunnen staan ligt er wel.
+**Het scherm** is `/apps/avond.html`: drie tabbladen (Plannen, Mijn avonden, Wat zaken van me weten). Het maakt niets mooier dan het is — de staat van een stap staat er als woord én als kleur, de zin boven het plan komt van de server (`zekerheid`) en niet uit de pagina, en de knop heet niet "Aanvragen" als er niets meer aan te vragen valt. Onder een stap met een zaak staat de pols van die zaak (hieronder).
+
+Wat er **nog niet** is: uitgaan heeft nog geen aanvraagweg (die stap blijft `voorstel` mét de reden), en gezelschapsafstemming, weer en herinneringen staan er niet. Die vragen gegevens die dit huis niet heeft; de bodem waarop ze kunnen staan ligt er wel.
+
+### De pols van een zaak (drie bronnen, nooit één cijfer)
+
+`server/kern/horeca/pols.js` + `polsmeting.js` + `keukenlaag.js`, met drie deuren: `/api/supplier/horeca/pols(+/zet)` voor de zaak, `/api/gast/pols(+/meld)` vanaf de tafel, en `/api/avond/pols` voor een lid dat een avond plant. "Hoe druk is het daar nu" is de vraag waar elke restaurant-app een sterretje van maakt. Hier niet: er komen **drie blokken naast elkaar** uit, en ze worden nooit tot een getal geroerd.
+
+1. **Wat wij meten.** De wachttijd is openstaande bereidingsminuten gedeeld door het aantal koks; de bezetting is open rekeningen tegenover de tafels die de zaak zelf heeft geregistreerd; de clubdeur telt hoeveel mensen er binnen zijn (nooit wie). Elk getal draagt zijn **rekensom** mee, want dat is de enige reden dat iemand een wachttijd gelooft.
+2. **Wat de zaak invult.** Sfeer, geluid, temperatuur, terras, wachtrij. Daar is geen sensor voor, dus zegt de zaak het — met een tijdstip erbij, en na drie uur vervalt het.
+3. **Wat gasten melden.** Dezelfde onderwerpen, vanaf de tafel waar ze zitten, met het aantal meldingen erbij.
+
+Vier regels houden dat eerlijk, en ze staan alle vier als toets in `test/pols.test.js` (vijftien toetsen, acht mutaties nagetrokken, alle acht raak):
+
+- **Niets gemeten is niet "rustig".** Een zaak zonder tafels in RTG krijgt geen percentage maar de reden waarom er niets staat. Een 0% dat "leeg" betekent zou elke zaak die RTG niet voor haar rekeningen gebruikt permanent uitgestorven laten lijken — en dat merkt de gast pas voor de deur.
+- **Wie mag wat zeggen ligt vast.** De zaak kan haar eigen wachttijd niet invullen (dat getal komt uit haar keuken), gasten kunnen niets over het terras zeggen. De verdeling staat in de kern, niet in een scherm, zodat er niet omheen te werken valt.
+- **Een mening verandert de volgorde niet.** De avondplanner weegt de pols mee, maar **uitsluitend het gemeten deel**. Een zaak die zichzelf "rustig" noemt zou zich anders naar boven schrijven; dat is geen signaal maar een advertentie.
+- **Oud is weg.** Buiten het versvenster verdwijnt een uitspraak in plaats van met een oud tijdstip als "nu" te blijven staan.
+
+Melden kan alleen achter `gastAuth`: de tafelsleutel is het bewijs dat je er zit, en hij verloopt als de rekening dichtgaat. De melding hangt aan de afdruk van je tafelsessie — geen naam, geen ledensleutel — en een tweede melding over hetzelfde onderwerp vervangt de eerste, zodat een tafel van vier hooguit vier keer telt.
+
+Onderweg kwam `bereidingsMinuten` uit een leveranciersroute naar `kern/horeca/keukenlaag.js`: hij hing aan `kern` en was daardoor onbereikbaar voor de gastkant — dezelfde fout die `horecaFolioVan` eerder maakte.
 
 ### RTG Mobility OS (de vervoerskern)
 

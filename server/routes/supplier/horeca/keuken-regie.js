@@ -16,7 +16,7 @@ module.exports = (kern) => {
   const { app, save, supplierAuth, horeca } = kern;
   const { H } = horeca;
   const bord = kern.horecaBord;
-  const bereidingsMinuten = kern.horecaBereidingsMinuten;
+  const { openWerk } = require('../../../kern/horeca/keukenlaag');
   const minutenSinds = (at) => at ? Math.max(0, Math.round((Date.now() - Date.parse(at)) / 60000)) : 0;
 
   /* ---------- het regiescherm van de chef ----------
@@ -62,23 +62,16 @@ module.exports = (kern) => {
      zelf de bestellingen dichtzet, sluit op de drukste avond van het jaar de
      omzet af. */
   app.post('/api/supplier/horeca/keuken/druk', supplierAuth, (req, res) => {
-    const h = H(req.supplier.code);
-    const capaciteit = Math.max(1, Math.min(60, parseInt(req.body.kokken, 10) || (h.instel.kokken || 3)));
-    const per = {};
-    for (const rek of Object.values(h.rekeningen)) {
-      if (rek.status !== 'open') continue;
-      for (const regel of (rek.regels || [])) {
-        if (regel.stand === 'klaar' || regel.stand === 'uitgegeven') continue;
-        const st = String(regel.station || 'warm');
-        per[st] = (per[st] || 0) + bereidingsMinuten(h, regel) * regel.aantal;
-      }
-    }
-    const totaalMin = Object.values(per).reduce((t, x) => t + x, 0);
-    const wachttijd = Math.round(totaalMin / capaciteit);
-    res.json({ ok: true, kokken: capaciteit, openMinuten: totaalMin, perStation: per,
-      verwachteWachttijd: wachttijd,
-      waarschuwing: wachttijd > 25
-        ? 'De keuken staat op ' + wachttijd + ' minuten wachttijd (' + totaalMin + ' bereidingsminuten open, gedeeld door ' + capaciteit + ' kok(s)). Overweeg de bezorging of de online bestellingen tijdelijk te pauzeren.'
+    const w = openWerk(H(req.supplier.code), req.body.kokken);
+    res.json({ ok: true, kokken: w.kokken, openMinuten: w.openMinuten, perStation: w.perStation,
+      verwachteWachttijd: w.wachttijd,
+      /* De rekensom als zin, zodat het scherm hem niet zelf hoeft samen te
+         stellen. Dat deed het wel, en dan staan er twee formuleringen van
+         dezelfde som in het huis die uiteen gaan lopen (LAT-regel 4). */
+      rekensom: w.rekensom,
+      waarschuwing: w.wachttijd > 25
+        ? 'De keuken staat op ' + w.wachttijd + ' minuten wachttijd. ' + w.rekensom
+          + ' Overweeg de bezorging of de online bestellingen tijdelijk te pauzeren.'
         : null,
       let: 'Dit is een advies met de rekensom erbij. Het systeem zet zelf niets dicht -- dat besluit hoort bij de chef.' });
   });

@@ -27,7 +27,7 @@
    hij kan zijn. Deze getallen zijn een aanname en staan in het plan als zodanig. */
 const DUUR = { eten: 105, uitgaan: 120, vervoer: 0, verblijf: 0, thuis: 0 };
 
-module.exports = ({ findSupplier, planlaag, voorkeuren }) => {
+module.exports = ({ findSupplier, planlaag, voorkeuren, polsVan }) => {
   /* Alle zaken waar je kunt eten en die een kaart hebben. Zonder kaart kan een
      gast er niets bestellen en is een voorstel een gok. */
   function eetzaken(alle) {
@@ -54,11 +54,37 @@ module.exports = ({ findSupplier, planlaag, voorkeuren }) => {
     return gem(kaart) * 2;
   }
 
+  /* De pols weegt mee, maar UITSLUITEND het gemeten deel. Wat een zaak zelf
+     invult ("rustig", "gezellig") en wat gasten melden komt wel in het scherm
+     te staan, maar verandert de volgorde niet: een veld dat je hoger in de
+     lijst zet zodra je het gunstig invult, is geen signaal maar een
+     advertentie. Wat gemeten wordt, komt uit de eigen keuken en de eigen
+     tafels en is na te rekenen; daar mag een voorstel op leunen. */
+  function polsPunten(gemeten) {
+    let punten = 0;
+    const redenen = [];
+    for (const m of (gemeten || [])) {
+      if (m.bron !== 'gemeten') continue;
+      if (m.onderwerp === 'bezetting' && m.waarde <= 40) {
+        punten += 2; redenen.push('is nu rustig (' + m.tekst + ', ' + m.label + ')');
+      } else if (m.onderwerp === 'bezetting' && m.waarde >= 85) {
+        punten -= 2; redenen.push('zit nu bijna vol (' + m.tekst + ', ' + m.label + ')');
+      }
+      if (m.onderwerp === 'wachttijd' && m.waarde >= 30) {
+        punten -= 2; redenen.push('de keuken loopt achter (' + m.tekst + ' wachttijd, ' + m.label + ')');
+      }
+    }
+    return { punten, redenen };
+  }
+
   /* De score van een zaak voor DEZE wens. Elke plus en min draagt zijn reden;
      die reden komt in het plan te staan. */
-  function weeg(s, { plafondPP, voorkeurTekst, sfeer }) {
+  function weeg(s, { plafondPP, voorkeurTekst, sfeer, gemeten }) {
     const redenen = [];
     let punten = 0;
+    const nu = polsPunten(gemeten);
+    punten += nu.punten;
+    redenen.push(...nu.redenen);
     const pp = prijsPP(s);
     if (plafondPP) {
       if (pp <= plafondPP) { punten += 2; redenen.push('past binnen je budget (ongeveer € ' + (pp / 100).toFixed(2) + ' per persoon)'); }
@@ -83,7 +109,8 @@ module.exports = ({ findSupplier, planlaag, voorkeuren }) => {
       .filter(Boolean).join(', ');
 
     const kandidaten = eetzaken(alleZaken)
-      .map(s => Object.assign({ zaak: s }, weeg(s, { plafondPP, voorkeurTekst, sfeer: w.sfeer })))
+      .map(s => Object.assign({ zaak: s },
+        weeg(s, { plafondPP, voorkeurTekst, sfeer: w.sfeer, gemeten: polsVan ? polsVan(s.code) : null })))
       .sort((a, b) => b.punten - a.punten);
 
     const gaten = [];
@@ -128,5 +155,5 @@ module.exports = ({ findSupplier, planlaag, voorkeuren }) => {
     };
   }
 
-  return { DUUR, eetzaken, prijsPP, weeg, stel };
+  return { DUUR, eetzaken, prijsPP, polsPunten, weeg, stel };
 };

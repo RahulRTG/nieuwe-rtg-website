@@ -65,6 +65,16 @@
   .tl .om{color:var(--gold);font-variant-numeric:tabular-nums;min-width:3.2rem;}
   .deel{display:flex;justify-content:space-between;padding:.4rem 0;border-bottom:1px solid var(--line);}
   .deel.ik{color:var(--gold);font-weight:600;}
+  .sub{font-size:.82rem;color:var(--soft);}
+  .kopje{font-family:'Inter',system-ui,sans-serif;font-size:.68rem;letter-spacing:.12em;
+    text-transform:uppercase;color:var(--soft);font-weight:600;margin:1.1rem 0 .4rem;}
+  /* Een polsregel draagt altijd zijn bron op een eigen regel eronder. Die
+     ondertitel is geen versiering: zonder herkomst is "levendig" een bewering
+     zonder afzender. */
+  .pl{padding:.5rem 0;border-bottom:1px solid var(--line);}
+  .pl:last-child{border-bottom:0;}
+  .pl .nm{font-weight:600;}
+  .pl .bron{display:block;font-size:.75rem;color:var(--soft);margin-top:.1rem;}
   .wr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);}
 </style>
 </head>
@@ -94,6 +104,7 @@
       <button role="tab" aria-selected="true" data-tab="kaart">Kaart</button>
       <button role="tab" aria-selected="false" data-tab="rekening">Rekening</button>
       <button role="tab" aria-selected="false" data-tab="afrekenen">Afrekenen</button>
+      <button role="tab" aria-selected="false" data-tab="pols">Hoe het nu is</button>
     </div>
 
     <section class="kaart" data-paneel="kaart">
@@ -144,6 +155,25 @@
       </div>
       <div class="rij" style="margin-top:.8rem;"><button class="prim" id="bBetaal">Betalen</button></div>
       <p class="sub" id="railLet" style="margin-top:.6rem;"></p>
+    </section>
+
+    <!-- Drie bronnen onder elkaar, nooit door elkaar. Wie hier een sterretje of
+         een sfeerscore van maakt, gooit een meting en een mening in een emmer:
+         het cijfer dat eruit komt is door niemand meer na te rekenen. -->
+    <section class="kaart" data-paneel="pols" hidden>
+      <h2>Hoe het hier nu is</h2>
+      <h3 class="kopje">Wat RTG meet</h3>
+      <div id="polsGemeten"></div>
+      <div id="polsNiet"></div>
+      <h3 class="kopje">Wat de zaak zelf zegt</h3>
+      <div id="polsZaak"></div>
+      <h3 class="kopje">Wat gasten melden</h3>
+      <div id="polsGasten"></div>
+      <h3 class="kopje">Wat vind jij ervan?</h3>
+      <p class="sub">Je zit hier, dus je kunt het weten. Je melding telt een keer, ook als je hem bijstelt.</p>
+      <div id="polsVragen"></div>
+      <div class="rij" style="margin-top:.8rem;"><button class="prim" id="bMeld">Doorgeven</button></div>
+      <p class="sub" id="polsLet" style="margin-top:.6rem;"></p>
     </section>
   </div>
 </main>
@@ -381,7 +411,64 @@
       p.hidden = p.getAttribute('data-paneel') !== t;
     });
     $('#mand').hidden = t !== 'kaart';
-    if (t !== 'kaart') laadRekening();
+    if (t === 'pols') laadPols(); else if (t !== 'kaart') laadRekening();
+  });
+
+  /* ---------- de pols: drie bronnen, drie blokken ----------
+     De onderwerpen en de keuzes komen van de server (`meldbaar`). Ze hier ook
+     opschrijven zou betekenen dat een nieuw onderwerp op twee plekken moet
+     worden toegevoegd, en dan raakt er een achter. */
+  var MELDBAAR = [];
+  function polsRegel(naam, waarde, bron, extra) {
+    return '<div class="pl"><span class="nm">' + esc(naam) + '</span> ' + esc(waarde) +
+      '<span class="bron">' + esc(bron) + (extra ? ' · ' + esc(extra) : '') + '</span></div>';
+  }
+
+  function laadPols() {
+    api('pols', { sleutel: SLEUTEL }).then(function (j) {
+      if (j._fout) return meld(j._fout);
+      MELDBAAR = j.meldbaar || [];
+      $('#polsGemeten').innerHTML = (j.gemeten || []).map(function (m) {
+        return polsRegel(m.naam, m.tekst, m.label, m.rekensom);
+      }).join('') || '<p class="sub">Er valt hier nu niets te meten.</p>';
+      /* Wat we niet weten staat er MET de reden bij. Een leeg vak leest als
+         "rustig", en dat merk je pas voor de deur. */
+      $('#polsNiet').innerHTML = (j.nietGemeten || []).map(function (g) {
+        return '<p class="sub" style="margin-top:.3rem;">' + esc(g.waarom) + '</p>';
+      }).join('');
+      $('#polsZaak').innerHTML = (j.zaakZegt || []).map(function (z) {
+        return polsRegel(z.naam, z.stand, z.label);
+      }).join('') || '<p class="sub">De zaak heeft hier vanavond nog niets over gezegd.</p>';
+      $('#polsGasten').innerHTML = (j.gastenZeggen || []).map(function (g) {
+        var v = Object.keys(g.verdeling).map(function (s) { return s + ': ' + g.verdeling[s]; }).join(', ');
+        return polsRegel(g.naam, g.stand, g.label, v);
+      }).join('') || '<p class="sub">Nog geen meldingen van gasten.</p>';
+      /* Er staat bewust niet bij wat JIJ eerder meldde: de server geeft alleen
+         totalen terug en bewaart geen naam bij een melding, alleen de afdruk
+         van je tafelsessie. Dat teruglezen zou een gastprofiel zijn dat we hier
+         niet willen hebben. */
+      $('#polsVragen').innerHTML = MELDBAAR.map(function (o) {
+        return '<label class="lbl" for="pv_' + o.sleutel + '">' + esc(o.naam) + '</label>' +
+          '<select id="pv_' + o.sleutel + '"><option value="">(zeg niets)</option>' +
+          o.standen.map(function (s) { return '<option value="' + esc(s) + '">' + esc(s) + '</option>'; }).join('') +
+          '</select>';
+      }).join('');
+      $('#polsLet').textContent = j.let;
+    });
+  }
+
+  $('#bMeld').addEventListener('click', function () {
+    var standen = {};
+    MELDBAAR.forEach(function (o) {
+      var el = $('#pv_' + o.sleutel);
+      if (el && el.value) standen[o.sleutel] = el.value;
+    });
+    if (!Object.keys(standen).length) return meld('Kies eerst waar je iets over wilt zeggen.');
+    api('pols/meld', { sleutel: SLEUTEL, standen: standen }).then(function (j) {
+      if (j._fout) return meld(j._fout);
+      meld('Dank je. Dit telt een keer mee, ook als je het straks bijstelt.', true);
+      laadPols();
+    });
   });
 
   /* ---------- afrekenen ---------- */

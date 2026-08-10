@@ -18,7 +18,16 @@ module.exports = (kern) => {
   const voorkeuren = require('../kern/avond/voorkeuren')({ db, save, schoon,
     zorgVoor: (k) => (kern.zorgVoor ? kern.zorgVoor(k) : null) });
   const planlaag = require('../kern/avond/plan')({ db, save, crypto, schoon });
-  const steller = require('../kern/avond/samenstellen')({ findSupplier, planlaag, voorkeuren });
+  /* De pols weegt mee in het voorstel, maar alleen het GEMETEN deel -- zie de
+     uitleg bij polsPunten in kern/avond/samenstellen.js. Daarom gaat hier
+     `gemeten()` naar binnen en niet `pols()`: wat een zaak zelf invult kan de
+     samensteller zo niet eens per ongeluk meewegen. */
+  /* Een eigen horeca-instantie, net als de gastkant er een heeft: kern/horeca.js
+     is een fabriek zonder eigen geheugen die alles uit db.data haalt. De opslag
+     is de gedeelde plek, dus dit is een tweede LEZER en geen tweede waarheid. */
+  const polslaag = require('../kern/horeca/pols')({ save, schoon, horeca: require('../kern/horeca')(kern) });
+  const steller = require('../kern/avond/samenstellen')({ findSupplier, planlaag, voorkeuren,
+    polsVan: (code) => polslaag.gemeten(code).gemeten });
   const aanvraaglaag = require('../kern/avond/aanvragen')({ planlaag, schoon });
   /* De mobiliteitskern hoort bij een ANDER domein en wordt later gemount. Dus
      op het moment van aanroepen bevragen, niet hier vastpakken. */
@@ -66,6 +75,19 @@ module.exports = (kern) => {
     const gemaakt = planlaag.maak(req.session.key, uit.invoer);
     if (gemaakt.error) return stuur(res, Object.assign(gemaakt, { uitleg: uit.uitleg, gaten: uit.gaten }));
     res.json({ ok: true, avond: gemaakt.avond, uitleg: uit.uitleg, gaten: uit.gaten, aannames: uit.aannames });
+  });
+
+  /* De pols van de zaken in een plan: hoe het er NU bij staat. Drie bronnen
+     naast elkaar en geen totaalcijfer, want een meting en een mening horen
+     niet tot een gemiddelde geroerd te worden (kern/horeca/pols.js). */
+  app.post('/api/avond/pols', auth, (req, res) => {
+    const lijst = Array.isArray((req.body || {}).zaken) ? (req.body || {}).zaken.slice(0, 12) : [];
+    const uit = {};
+    for (const code of lijst) {
+      const c = schoon(code, 30);
+      if (c) uit[c] = polslaag.pols(c);
+    }
+    res.json({ ok: true, pols: uit });
   });
 
   app.post('/api/avond/mijn', auth, (req, res) => {

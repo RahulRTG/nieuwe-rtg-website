@@ -17,7 +17,8 @@
    van het hotel. */
 module.exports = (kern) => {
   const horeca = require('../../kern/horeca')(kern);
-  const ctx = Object.assign({}, kern, { horeca });
+  const polslaag = require('../../kern/horeca/pols')({ save: kern.save, schoon: kern.schoon, horeca });
+  const ctx = Object.assign({}, kern, { horeca, polslaag });
   require('./horeca/rekening')(ctx);   // openen, regels, gangen, lijst
   require('./horeca/schuif')(ctx);     // verplaatsen, samenvoegen, splitsen
   require('./horeca/betalen')(ctx);    // korting, fooi, betalen, oninbaar
@@ -33,4 +34,5 @@ module.exports = (kern) => {
   require('./horeca/personeel')(ctx);  // fooienpot, loonkosten tegenover omzet, gastprofiel
   require('./horeca/dashboard')(ctx);  // dagbeeld per kanaal en de signalen
   require('./horeca/gastbeheer')(ctx); // de zaakkant van de gastendeur: QR, uitverkocht, beleid, bevestigen
+  require('./horeca/pols')(ctx);       // de pols: wat gemeten wordt, wat de zaak invult, wat gasten melden
 };

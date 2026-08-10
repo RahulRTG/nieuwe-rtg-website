@@ -115,6 +115,23 @@
   </div>
 
   <div class="kaart">
+    <div class="kop">De pols van nu</div>
+    <p class="stil">Drie bronnen, apart gehouden. Wat wij meten kun je niet bijstellen; dat komt uit je eigen keuken en je eigen tafels.</p>
+    <div class="kop" style="margin-top:.8rem;">Wat wij meten</div>
+    <div id="poGemeten"></div>
+    <div id="poNiet" style="margin-top:.4rem;"></div>
+    <div class="kop" style="margin-top:.8rem;">Wat jij invult</div>
+    <div id="poZaak"></div>
+    <div class="rij" style="margin-top:.6rem;">
+      <button class="knop p" id="poZet" type="button">Opslaan</button>
+      <button class="knop" id="poVervers" type="button">Ververs</button>
+    </div>
+    <div class="kop" style="margin-top:.8rem;">Wat gasten melden</div>
+    <div id="poGasten"></div>
+    <p class="stil" id="poLet" style="margin-top:.4rem;"></p>
+  </div>
+
+  <div class="kaart">
     <div class="kop">Gastprofielen (<span id="gAantal">-</span>, waarvan <span id="gAllergie">-</span> met allergie)</div>
     <div class="rij">
       <button class="knop" id="gToon" type="button">Toon</button>
@@ -128,6 +145,7 @@
 <script src="/apps/horeca/kern.js"></script>
 <script src="/apps/horeca/beheer-dag.js"></script>
 <script src="/apps/horeca/beheer-loon.js"></script>
+<script src="/apps/horeca/beheer-pols.js"></script>
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>

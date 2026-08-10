@@ -68,8 +68,11 @@
       var d = r.body;
       if (d.error) return K.meld(d.error);
       $('eWacht').textContent = d.verwachteWachttijd + ' min';
-      $('eDrukUit').textContent = d.openMinuten + ' bereidingsminuten open, gedeeld door ' +
-        d.kokken + ' kok(s): ' + Object.keys(d.perStation).map(function (s) {
+      /* De som komt als zin van de server (`rekensom`) en wordt hier niet nog
+         eens in elkaar gezet: twee formuleringen van dezelfde rekensom lopen
+         uiteen zodra er een verandert. */
+      $('eDrukUit').textContent = d.rekensom + ' Per station: ' +
+        Object.keys(d.perStation).map(function (s) {
           return s + ' ' + d.perStation[s];
         }).join(', ');
       $('eWaarschuwing').textContent = d.waarschuwing || '';

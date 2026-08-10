@@ -27,18 +27,11 @@ module.exports = (kern) => {
   const { app, save, schoon, supplierAuth, sseToSupplier, horeca } = kern;
   const { REGELSTANDEN, H, nu } = horeca;
 
-  // hoe lang een gerecht normaal duurt: uit de zaakinstelling, anders een
-  // nuchtere standaard per station. Zonder cijfer geen vertragingssignaal.
-  const STANDAARD = { koud: 6, warm: 14, grill: 12, frituur: 8, pizza: 9, sushi: 10,
-    patisserie: 10, bar: 3, koffie: 3, roomservice: 18, afhaal: 10 };
-  function bereidingsMinuten(h, regel) {
-    const eigen = (h.instel.bereidingstijden || {})[String(regel.naam || '').toLowerCase()];
-    if (eigen) return Math.max(1, Math.min(180, Number(eigen)));
-    const st = STANDAARD[String(regel.station || '').toLowerCase()];
-    return st || 12;
-  }
+  /* Hoe lang een gerecht normaal duurt staat in kern/horeca/keukenlaag.js en
+     niet hier: de polslaag toont dezelfde wachttijd aan een gast, en die kan
+     niet bij een functie die in een leveranciersroute wordt gemaakt. */
+  const { bereidingsMinuten } = require('../../../kern/horeca/keukenlaag');
   const minutenSinds = (at) => at ? Math.max(0, Math.round((Date.now() - Date.parse(at)) / 60000)) : 0;
-  kern.horecaBereidingsMinuten = bereidingsMinuten;
 
   /* Een regel zoals de keuken hem ziet. `loopt` telt vanaf de vrijgave door de
      zaal; is die er niet, dan telt hij niet mee op het scherm -- de keuken

@@ -58,6 +58,12 @@
   .staat.mislukt{color:var(--burgundy);border-color:var(--burgundy);}
   .reden{font-size:.8rem;color:var(--soft);margin-top:.25rem;}
   .waarom{font-size:.79rem;color:var(--soft);margin-top:.2rem;font-style:italic;}
+  /* De pols van de zaak. Elke regel draagt zijn herkomst op een eigen regel
+     eronder; zonder afzender is "levendig" een bewering van niemand. */
+  .pols{margin-top:.45rem;}
+  .pr-regel{font-size:.79rem;color:var(--soft);margin-top:.25rem;}
+  .pr-regel b{color:var(--txt);font-weight:600;}
+  .pr-regel .bron{display:block;font-size:.74rem;}
   .zekerheid{border:1px solid var(--gold);border-radius:10px;padding:.6rem .75rem;
     font-size:.86rem;margin-bottom:.8rem;}
   .gat{border:1px dashed var(--line);border-radius:10px;padding:.6rem .75rem;
@@ -219,6 +225,35 @@
     return u ? u.waarom.join('; ') : '';
   }
 
+  /* ---------- de pols per zaak ----------
+     Hoe het er NU bijstaat, uit drie bronnen die gescheiden blijven. Elke
+     regel draagt zijn etiket -- gemeten door RTG, volgens de zaak, volgens
+     zoveel gasten -- en er wordt niets tot een cijfer geroerd. Dit laadt NA
+     het plan en apart: een voorstel hoort niet te wachten op een pols, en een
+     pols die niet komt hoort geen leeg plan op te leveren. */
+  function polsRegel(x, extra) {
+    return '<div class="pr-regel"><b>' + esc(x.naam) + '</b> ' + esc(x.tekst || x.stand) +
+      ' <span class="bron">' + esc(x.label) + '</span>' +
+      (extra ? '<span class="bron"> ' + esc(extra) + '</span>' : '') + '</div>';
+  }
+
+  function polsHalen() {
+    var zaken = AVOND.stappen.map(function (s) { return s.zaak; }).filter(Boolean);
+    if (!zaken.length) return;
+    api('/api/avond/pols', { zaken: zaken }).then(function (j) {
+      if (j._fout) return;   // het plan staat er al; een pols is een toevoeging
+      Object.keys(j.pols || {}).forEach(function (code) {
+        var el = $('#pols_' + code);
+        if (!el) return;
+        var p = j.pols[code];
+        if (p.stil) { el.innerHTML = '<div class="pr-regel bron">Over deze zaak is nu niets bekend.</div>'; return; }
+        el.innerHTML = p.gemeten.map(function (m) { return polsRegel(m, m.rekensom); }).join('') +
+          p.zaakZegt.map(function (z) { return polsRegel(z); }).join('') +
+          p.gastenZeggen.map(function (g) { return polsRegel(g, '(' + g.aantal + ')'); }).join('');
+      });
+    });
+  }
+
   function teken() {
     if (!AVOND) return;
     $('#planVak').hidden = false;
@@ -235,8 +270,10 @@
         '<div><span class="staat ' + esc(s.staat) + '">' + esc(s.staat) + '</span></div>' +
         (s.reden ? '<div class="reden">' + esc(s.reden) + '</div>' : '') +
         (waarom ? '<div class="waarom">' + esc(waarom) + '</div>' : '') +
+        (s.zaak ? '<div class="pols" id="pols_' + esc(s.zaak) + '"></div>' : '') +
         '</div><div class="pr">' + (s.centenPP ? euro(s.centenPP) : '') + '</div></div>';
     }).join('');
+    polsHalen();
 
     $('#gaten').innerHTML = GATEN.map(function (g) {
       return '<div class="gat"><b>' + esc(g.soort) + ':</b> ' + esc(g.reden) + '</div>';

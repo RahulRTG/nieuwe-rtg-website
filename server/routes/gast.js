@@ -71,12 +71,19 @@ module.exports = (kern) => {
   const bezorglaag = require('../kern/horeca/bezorglaag')({ save, horeca, haversine: kern.haversine });
   const foodcourtlaag = require('../kern/gast/foodcourt')({ db, save, schoon, crypto, horeca, orderlaag, buitenshuis });
 
+  /* De polslaag: hoe druk en hoe luid het NU is, uit drie bronnen die
+     gescheiden blijven. Dezelfde fabriek als aan de leverancierskant -- de
+     opslag zit in db.data.horeca[code].pols, dus dit is een tweede lezer en
+     geen tweede waarheid. */
+  const polslaag = require('../kern/horeca/pols')({ save, schoon, horeca });
+
   const ctx = Object.assign({}, kern, { horeca, beleid, sessie, orderlaag, afrekenlaag,
-    buitenshuis, bezorglaag, foodcourtlaag, gastAuth, stuur, folioBoek, folioVan });
+    buitenshuis, bezorglaag, foodcourtlaag, polslaag, gastAuth, stuur, folioBoek, folioVan });
   require('./gast/tafel')(ctx);     // de QR, aanschuiven, de kaart en het beleid
   require('./gast/bestellen')(ctx); // bestellen, de rekening lezen, waarom-vragen
   require('./gast/afrekenen')(ctx); // verdelen, fooi, betalen
   require('./gast/bezorgen')(ctx);  // bezorgen en afhalen vanaf de ledenapp
   require('./gast/club')(ctx);      // polsbandtegoed en minimum spend
   require('./gast/foodcourt')(ctx); // een mandje bij meer loketten tegelijk
+  require('./gast/pols')(ctx);      // hoe druk het nu is, en zelf melden vanaf de tafel
 };

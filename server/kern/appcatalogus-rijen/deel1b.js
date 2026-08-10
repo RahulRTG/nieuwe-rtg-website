@@ -39,5 +39,5 @@ module.exports = [
   ['garderobe', 'Garde-robe', 'media', '/apps/garderobe.html', 'Uw digitale garderobe: per stuk type, merk, kleur, maat en waar het hangt -- welke woning, welke kast. Plus uw vaklui: kleermaker, schoenmaker, stomerij.'],
 
   // ---- geld & werk ----
-  ['metier', 'Métier', 'geld', '/apps/metier.html', 'Je beroepsprofiel op codenaam, met de rollen die RTG zelf heeft bevestigd. Je naam geef je per werkgever vrij, en je trekt hem net zo makkelijk weer in.'],
+  ['metier', 'Métier', 'geld', '/apps/geld.html#metier', 'Je beroepsprofiel op codenaam, met de rollen die RTG zelf heeft bevestigd. Je naam geef je per werkgever vrij, en je trekt hem net zo makkelijk weer in.'],
 ];

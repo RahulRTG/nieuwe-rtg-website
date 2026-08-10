@@ -37,7 +37,7 @@ const PAGINAS = [
   '/apps/ghost.html',
   '/apps/flits.html',
   '/apps/theater.html',
-  '/apps/wbw.html',
+  '/apps/geld.html',
   '/apps/passkeys.html',
   /* RTG Veilig staat hier omdat het de app is waarin iemand onder spanning iets
      moet kunnen invullen: een zin typen terwijl er iemand meekijkt, een knop
@@ -57,7 +57,6 @@ const PAGINAS = [
   '/apps/vonk.html',
   '/apps/berichten.html',
   '/apps/salon.html',
-  '/apps/metier.html',
   '/apps/genootschap.html',
 ];
 

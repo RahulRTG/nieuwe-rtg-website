@@ -88,6 +88,12 @@ Niet alles tegelijk. Per wereld: de schil, dan de secties erin, dan de oude
 pagina's als omleiding, en pas als een wereld af is de volgende. Zo is er nooit
 een moment waarop de helft werkt.
 
+| Wereld | Stand |
+|---|---|
+| **RTG Geld** | ✅ samengevoegd: tien pagina's werden tien standen van `apps/geld.html` (veilig-patroon: `apps/geld/schil.js` + een module per stand); de oude paden leiden om |
+| RTG Veilig | ✅ was al samengevoegd (vier standen) |
+| de overige zes | voordeur staat; het samenvoegen van de secties volgt per wereld |
+
 ---
 
 ## 0b. De oude super-app-regel (nog geldig binnen een wereld)

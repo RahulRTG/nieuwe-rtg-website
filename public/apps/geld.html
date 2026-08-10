@@ -11,224 +11,87 @@
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <link href="/shared/rtg-ui.css" rel="stylesheet">
-<!-- de vormtaal van een wereldscherm; dezelfde als RTG Reizen, en met opzet
-     uit een gedeeld blad in plaats van overgetikt (LAT.md regel 4) -->
+<!-- de vormtaal van een wereldscherm (balk, register, regkop); gedeeld met
+     Reizen, Kantoor en Sociaal in plaats van overgetikt (LAT.md regel 4) -->
 <link href="/shared/rtg-wereld.css" rel="stylesheet">
 <style>
-  /* Wat alleen van DIT scherm is. De rest komt uit rtg-wereld.css; komt hier
-     iets te staan dat ook voor Reizen geldt, dan hoort het daar en niet hier. */
-  /* Een kantoorregel heeft geen bestemming maar wel een tijd. De datumkolom
-     draagt daarom het uur in plaats van de maand wanneer het vandaag is. */
-  .dag .uur{display:block;margin-top:.1rem;font-size:.66rem;letter-spacing:.1em;
-    color:var(--rtg-soft);font-variant-numeric:var(--rtg-cijfers);}
-  .kern .open{font-variant-numeric:var(--rtg-cijfers);}
+  /* De standenbalk: dezelfde vormtaal als RTG Veilig en de Media OS -- een
+     strook met een haarlijn eronder, de actieve stand met een gouden
+     onderrand. Geen tweede uitvinding voor hetzelfde element; alleen de
+     tokens zijn hier de rtg-tokens, want veiligheid.css laadt hier niet. */
+  .standen{display:flex;gap:0.15rem;padding:0 0.2rem;border-bottom:1px solid var(--rtg-line);overflow-x:auto;}
+  .standen button{background:none;border:0;padding:0.6rem 0.85rem 0.65rem;margin-bottom:-1px;color:var(--rtg-soft);
+    font:inherit;font-size:0.92rem;white-space:nowrap;cursor:pointer;border-bottom:2px solid transparent;}
+  .standen button:focus-visible{outline:2px solid var(--gold-tekst);outline-offset:-2px;}
+  .standen button[aria-current="true"]{color:var(--rtg-txt);border-bottom-color:var(--gold-basis);}
+  .standregel{margin:.7rem 0 0;font-size:.84rem;color:var(--rtg-soft);}
+  #paneel{margin-top:1rem;}
+  /* de bouwstenen die meerdere standen gebruiken: een kaart en een rij,
+     in de vormtaal van de UI-kit maar op de rtg-tokens van dit scherm */
+  #paneel .kaart{border:1px solid var(--rtg-line);border-radius:12px;padding:1rem;margin:.6rem 0 1rem;}
+  #paneel h2{font-size:.72rem;letter-spacing:.17em;text-transform:uppercase;color:var(--rtg-soft);
+    font-weight:500;margin:1.3rem 0 .4rem;}
+  #paneel .lbl{display:block;margin:.8rem 0 .25rem;}
+  #paneel input,#paneel select,#paneel textarea{width:100%;box-sizing:border-box;background:none;
+    border:1px solid var(--rtg-line);border-radius:10px;padding:.6rem .7rem;color:var(--rtg-txt);font:inherit;}
+  #paneel .knop{background:none;border:1px solid var(--rtg-line);border-radius:999px;
+    padding:.5rem 1rem;color:var(--rtg-txt);font:inherit;font-size:.88rem;cursor:pointer;}
+  #paneel .knop:hover{border-color:var(--gold-rand);}
+  #paneel .knop.hoofd{background:var(--rtg-goud);border-color:var(--rtg-goud);color:#1C1608;font-weight:600;}
+  #paneel .bedrag{font-variant-numeric:var(--rtg-cijfers);}
 </style>
 </head>
 <body class="rtg-stijl" data-rtg-modus="pro">
 <a class="skip" href="#inhoud">Naar de inhoud</a>
 
-<!-- RTG Geld ORKESTREERT de kantoordomeinen en vervangt ze niet
-     (PLATFORM.md). Betalen (pay, met dubbel
-     boekhouden), Wie betaalt wat, Metier en Mecenaat houden elk hun eigen kern, hun eigen opslag en hun eigen werkstroom. Op de toetsvraag
-     "zelfstandige capability of tweede ingang naar dezelfde?" is het antwoord
-     bij alle het eerste -- dus smelt hier niets samen.
+<!-- ACHT APPS, NIET DRIEENTACHTIG (PLATFORM.md par. 0). RTG Geld is de eerste
+     wereld die ECHT is samengevoegd: wat tien losse pagina's waren (wallet,
+     bank, wie-betaalt-wat, rtg-code, balans, lab-fonds, mecenaat, logboek,
+     nalatenschap, metier) zijn tien standen van deze ene app. De oude paden
+     bestaan nog als omleiding hierheen, met de hash van hun stand.
 
-     Daarom staat er op dit scherm geen knop die iets maakt, wijzigt of
-     verwijdert: elke regel is een weg naar de app die het echte werk doet.
-     Zou dit scherm ook opslaan, dan bestaat een taak op twee plekken
-     (LAT.md regel 4). -->
+     Wat er NIET is samengevoegd: de logica. Elke stand roept exact dezelfde
+     routes aan als zijn pagina dat deed, en de domeinkernen op de server staan
+     onaangeraakt. De schil is een; de vijf routefamilies eronder blijven vijf
+     (PLATFORM.md: samenvoegen van de schil is besloten, samenvoegen van logica
+     blijft bewijs vragen). -->
 
 <main id="inhoud">
   <header class="merkkop">
     <h1 class="rtg-ceremonie">RTG Geld</h1>
   </header>
 
-  <a class="balk" id="balk" href="#stand" data-rustig>
-    <span class="teken" id="balkTeken"></span>
-    <span>
-      <span class="kop" id="balkKop">Laden</span>
-      <span class="zin rtg-ceremonie" id="balkZin">&nbsp;</span>
-    </span>
-    <span class="pijl" aria-hidden="true">&rsaquo;</span>
-  </a>
+  <nav class="standen" id="standen" aria-label="Standen"></nav>
+  <p class="standregel" id="standUitleg"></p>
 
-  <div id="stilte"></div>
-
-  <div class="regkop">
-    <h2>Uw stand</h2>
-    <span class="tel" id="tel"></span>
-  </div>
-  <div id="stand"><p class="stil">Laden...</p></div>
-
-  <div class="regkop"><h2>De geldwereld</h2></div>
-  <div class="poorten" id="poorten"></div>
+  <section aria-label="De stand" id="paneelVak">
+    <div id="paneel"><p class="stil">Laden...</p></div>
+  </section>
 </main>
 
-<script>
-(() => {
-  const $ = s => document.querySelector(s);
-  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g,
-    c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
-  const token = () => { try { return localStorage.getItem('rtg_member_token'); } catch (e) { return null; } };
-  const SOORT = { saldo: 'Saldo', verrekening: 'Verrekening', toezegging: 'Toezegging' };
-
-  /* Eén iconenset, 24x24 grid, één lijndikte (ONTWERP.md par. 13). Inline SVG
-     en geen emoji: beeld komt uit de eigen set, en een emoji ziet er op elk
-     toestel anders uit. */
-  const ic = (d, n) => '<svg width="' + (n || 16) + '" height="' + (n || 16) + '" viewBox="0 0 24 24" ' +
-    'fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" ' +
-    'stroke-linejoin="round" aria-hidden="true">' + d + '</svg>';
-  const ICO = {
-    bel:  '<path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/>',
-    vink: '<path d="M20 6 9 17l-5-5"/>',
-    klok: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
-    lijst:'<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',
-    blad: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/>',
-    map:  '<path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.6-.8L9.4 3.8A2 2 0 0 0 7.8 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/>',
-    mens: '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>'
-  };
-
-  /* De vier specialisten. Dit is de kern van de super-app-regel: hier staan
-     LINKS naar volwaardige producten, geen vervangingen ervan. */
-  const WERELD = [
-    ['Betalen', 'Uw wallet, munten en kaarten', '/apps/wallet.html', ICO.blad],
-    ['Wie betaalt wat', 'Verrekenen met uw gezelschap', '/apps/wbw.html', ICO.mens],
-    ['Metier', 'Uw beroepsprofiel op codenaam', '/apps/metier.html', ICO.lijst],
-    ['Mecenaat', 'Uw filantropie op orde', '/apps/mecenaat.html', ICO.klok]
-  ];
-
-  const WD = ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag'];
-  const MND = ['jan', 'feb', 'mrt', 'apr', 'mei', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
-  const VANDAAG = new Date().toISOString().slice(0, 10);
-  function dagdeel(d) {
-    if (!d) return null;
-    const x = new Date(d + 'T00:00:00');
-    if (isNaN(x)) return { wd: '', nr: d, mnd: '' };
-    // twee cijfers, want 06 en 29 horen in een kolom even breed te zijn
-    return { wd: WD[x.getDay()], nr: String(x.getDate()).padStart(2, '0'), mnd: MND[x.getMonth()] };
-  }
-
-  function tekenBalk(t) {
-    /* Wachten is geen aandacht. Drie documenten die bij een ander liggen is de
-       normale gang van zaken; daar een alarmbalk boven zetten is loos alarm, en
-       loos alarm leert mensen de balk te negeren op de dag dat hij wel klopt.
-       Exact dezelfde afweging als in RTG Reizen, en met opzet dezelfde. */
-    const alarm = t.aandacht + t.onbekend;
-    const b = $('#balk');
-    if (alarm) {
-      b.removeAttribute('data-rustig');
-      $('#balkTeken').innerHTML = ic(ICO.bel, 22);
-      $('#balkKop').textContent = 'Er vraagt iets aandacht';
-      const s = [];
-      if (t.aandacht) s.push(t.aandacht + ' ' + (t.aandacht === 1 ? 'vraagt' : 'vragen') + ' actie');
-      if (t.onbekend) s.push(t.onbekend + ' met onbekende status');
-      $('#balkZin').textContent = s.join(', ');
-      return;
-    }
-    b.setAttribute('data-rustig', '');
-    $('#balkTeken').innerHTML = ic(ICO.vink, 22);
-    $('#balkKop').textContent = t.regels ? 'Uw stand' : 'Niets openstaand';
-    $('#balkZin').textContent = t.wachtend
-      ? t.wachtend + ' ' + (t.wachtend === 1 ? 'ligt' : 'liggen') + ' bij een ander'
-      : (t.regels ? 'geen actie nodig' : 'geen open zaken');
-  }
-
-  function werkRegel(x) {
-    const d = dagdeel(x.wanneer);
-    const feiten = [];
-    // alleen tonen wat het domein echt weet; niets verzinnen
-    /* Centen worden hier EEN keer euro's; de kern stuurt ze rauw door
-       (kern/geldwereld.js: twee afrondlagen zijn een cent verschil die niemand
-       kan verklaren). Het minteken hoort bij het getal: een negatief saldo in
-       een lijstje betekent dat u nog moet betalen. */
-      if (Number.isFinite(x.centen)) feiten.push('<span class="open">' +
-        (x.centen < 0 ? '\u2212' : '') + '\u20ac ' +
-        (Math.abs(x.centen) / 100).toLocaleString('nl-NL', { minimumFractionDigits: 2 }) + '</span>');
-    if (x.door) feiten.push('<span>' + ic(ICO.mens) + esc(x.door) + '</span>');
-    return '<a class="reis" href="' + esc(x.link) + '"' + (x.sig ? ' data-sig="' + esc(x.sig) + '"' : '') + '>' +
-      '<span class="stip"></span>' +
-      '<span class="doos">' +
-        '<span class="dag">' + (d
-          ? '<span class="wd">' + esc(d.wd) + '</span>' +
-            '<span class="nr rtg-datum">' + esc(d.nr) + '</span>' +
-            (x.wanneer === VANDAAG && x.tijd
-              ? '<span class="uur">' + esc(x.tijd) + '</span>'
-              : '<span class="mnd">' + esc(d.mnd) + '</span>')
-          /* Geen datum is geen "vandaag". Een document zonder wijzigingsdatum
-             krijgt daarom een streep en geen verzonnen dag. */
-          : '<span class="mnd">&mdash;</span>') + '</span>' +
-        '<span class="kern">' +
-          '<h3>' + esc(x.titel || SOORT[x.soort] || 'Regel') + '</h3>' +
-          (x.status ? '<span class="status"><span class="rtg-status"' +
-            (x.sig ? ' data-sig="' + esc(x.sig) + '"' : '') +
-            ' data-teken="' + esc(x.teken || '·') + '">' + esc(x.status) + '</span></span>' : '') +
-          (feiten.length ? '<span class="feiten">' + feiten.join('<span aria-hidden="true">·</span>') + '</span>' : '') +
-          '<span class="onder">' +
-            (x.kenmerk ? '<button class="rtg-ref" type="button" data-ref="' + esc(x.kenmerk) +
-              '" title="Kopieer kenmerk">' + esc(x.kenmerk) + '</button>' : '') +
-            '<span class="bron">' + esc(x.app) + '</span>' +
-          '</span>' +
-        '</span>' +
-      '</span>' +
-      '<span class="pijl" aria-hidden="true">&rsaquo;</span>' +
-    '</a>';
-  }
-
-  function teken(d) {
-    tekenBalk(d.telling || {});
-    const r = d.regels || [];
-    $('#tel').textContent = r.length ? r.length + (r.length === 1 ? ' regel' : ' regels') : '';
-    $('#stand').innerHTML = r.length
-      ? r.map(werkRegel).join('')
-      : '<p class="stil">Er staat niets open. Uw wallet, verrekeningen en toezeggingen komen hier vanzelf te staan.</p>';
-
-    /* EERLIJK OVER WAT ER NIET GEMETEN IS. Een leeg kantoorbeeld dat eigenlijk
-       een storing is, laat iemand een vergadering missen. Zwijgen zou hier de
-       ergste keuze zijn, dus het staat er hardop. */
-    $('#stilte').innerHTML = (d.stil || []).length
-      ? '<p class="stil">Niet opgehaald: ' + esc((d.stil || []).join(', ')) +
-        '. Dit beeld is dus niet compleet.</p>'
-      : '';
-
-    $('#poorten').innerHTML = WERELD.map(([n, z, h, i]) =>
-      '<a class="poort" href="' + h + '"><span class="ic">' + ic(i, 22) + '</span>' +
-      '<b>' + esc(n) + '</b><span>' + esc(z) + '</span></a>').join('');
-  }
-
-  // klikken op een kenmerk kopieert het (ONTWERP.md: de referentie is wat een
-  // professional zoekt, dus hij staat er en is met een klik mee te nemen)
-  document.addEventListener('click', (e) => {
-    const b = e.target.closest('.rtg-ref');
-    if (!b) return;
-    e.preventDefault();
-    try {
-      navigator.clipboard.writeText(b.dataset.ref);
-      const oud = b.textContent; b.textContent = 'gekopieerd';
-      setTimeout(() => { b.textContent = oud; }, 1200);
-    } catch (err) {}
-  });
-
-  (async function laad() {
-    try {
-      const res = await fetch('/api/geld/wereld', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (token() || '') },
-        body: '{}'
-      });
-      const d = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(d.error || 'Er ging iets mis.');
-      teken(d);
-    } catch (e) {
-      $('#balkKop').textContent = 'Niet ingelogd';
-      $('#balkZin').textContent = '';
-      $('#stand').innerHTML = '<p class="stil">' + esc(e.message) + ' Log eerst in via de leden-app.</p>';
-      $('#poorten').innerHTML = WERELD.map(([n, z, h, i]) =>
-        '<a class="poort" href="' + h + '"><span class="ic">' + ic(i, 22) + '</span>' +
-        '<b>' + esc(n) + '</b><span>' + esc(z) + '</span></a>').join('');
-    }
-  })();
-})();
-</script>
+<script src="/apps/geld/hulp.js"></script>
+<!-- TUSSENSTAND: zes van de tien standen staan er; rtgcode, labfonds,
+     mecenaat, logboek en nalatenschap zijn in aanbouw en komen er in de
+     volgende commit bij. Alleen bestaande bestanden staan hier, want een
+     script-tag naar een bestand dat er niet is, is een consolefout. -->
+<script src="/apps/geld/overzicht.js"></script>
+<script src="/apps/geld/wallet.js"></script>
+<script src="/apps/geld/walletb.js"></script>
+<script src="/apps/geld/bank.js"></script>
+<script src="/apps/geld/bankb.js"></script>
+<script src="/apps/geld/bankc.js"></script>
+<script src="/apps/geld/wbw.js"></script>
+<script src="/apps/geld/wbwb.js"></script>
+<script src="/apps/geld/metier.js"></script>
+<script src="/apps/geld/metierb.js"></script>
+<script src="/apps/geld/metierc.js"></script>
+<script src="/apps/geld/balans.js"></script>
+<script src="/apps/geld/balansb.js"></script>
+<script src="/apps/geld/schil.js"></script>
+<script src="/shared/seizoen.js" defer></script>
+<script src="/shared/qr.js" defer></script>
+<script src="/shared/qrteken.js" defer></script>
+<script src="/shared/uitvoer.js" defer></script>
 <script src="/shared/deelmenu.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>

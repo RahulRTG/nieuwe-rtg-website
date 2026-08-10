@@ -63,7 +63,7 @@ module.exports.maakGeldwereld = ({ kern }) => {
       const rek = kern.pay.rekLid(kern.codenaamVan(key));
       return [regel('saldo', {
         titel: 'RTG-wallet', status: 'rustig', centen: kern.pay.saldoVan(rek),
-        kenmerk: 'wallet', app: 'Betalen', link: '/apps/wallet.html'
+        kenmerk: 'wallet', app: 'Betalen', link: '/apps/geld.html#wallet'
       })];
     }, uit, stil);
 
@@ -74,7 +74,7 @@ module.exports.maakGeldwereld = ({ kern }) => {
       return (w.groepen || []).filter(g => g.mijnSaldo !== 0).slice(0, 6)
         .map(g => regel('verrekening', {
           titel: g.naam, status: 'gedeeld', centen: g.mijnSaldo,
-          kenmerk: g.id, app: 'Wie betaalt wat', link: '/apps/wbw.html'
+          kenmerk: g.id, app: 'Wie betaalt wat', link: '/apps/geld.html#wbw'
         }));
     }, uit, stil);
 
@@ -87,7 +87,7 @@ module.exports.maakGeldwereld = ({ kern }) => {
           titel: g.doel, wanneer: g.datum || null,
           status: g.datum && g.datum < nu ? 'verlopen' : 'open',
           centen: g.bedrag,
-          kenmerk: g.id, app: 'Mecenaat', link: '/apps/mecenaat.html'
+          kenmerk: g.id, app: 'Mecenaat', link: '/apps/geld.html#mecenaat'
         }));
     }, uit, stil);
 

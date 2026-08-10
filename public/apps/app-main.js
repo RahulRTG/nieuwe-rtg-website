@@ -1824,7 +1824,7 @@ var RTG_BOUW = '1b06c62c';
     b.addEventListener('click', () => openTab(b.dataset.tab, true)));
   // de codenaam in de statusbalk is de korte weg naar je pas: die ligt sinds
   // het OS-beginscherm in je wallet, niet meer op de home
-  $('#codeChip').addEventListener('click', () => { location.href = '/apps/wallet.html'; });
+  $('#codeChip').addEventListener('click', () => { location.href = '/apps/geld.html#wallet'; });
 
   /* EEN TABBLAD HAALT ZIJN GEGEVENS OP ALS JE HEM OPENT, NIET EERDER.
 
@@ -3240,7 +3240,7 @@ var RTG_BOUW = '1b06c62c';
     navigatie:   { naam: 'Navigatie',    url: '/apps/navigatie.html' },
     theater:     { naam: 'Films en series',      url: '/apps/theater.html' },
     residentie:  { naam: 'Verblijven', url: '/apps/residentie.html' },
-    wbw:         { naam: 'Samen betalen', url: '/apps/wbw.html' },
+    wbw:         { naam: 'Samen betalen', url: '/apps/geld.html#wbw' },
     passkeys:    { naam: 'Passkeys',     url: '/apps/passkeys.html' },
     /* Veiligheid en verbinding. Hier stonden VIER tegels -- Thuiswacht,
        Codewoord, Vitaal en Thuisrust -- op een gedeelde kern. Ze zijn nu vier
@@ -3273,7 +3273,7 @@ var RTG_BOUW = '1b06c62c';
     sitemaker:   { naam: 'Website', url: '/apps/sitemaker.html' },
     browser:     { naam: 'Web',  url: '/apps/browser.html' },
     vonk:        { naam: 'Daten',         url: '/apps/vonk.html' },
-    balans:      { naam: 'Balans',       url: '/apps/balans.html' },
+    balans:      { naam: 'Balans',       url: '/apps/geld.html#balans' },
     /* Mijn loon staat bij Geld en niet bij Werk: het is uw geld, niet iets van
        uw werkgever. Wie nergens werkt vindt een lege lijst met de zin die dat
        uitlegt -- dat is beter dan een tegel die verdwijnt zodra u van baan
@@ -3285,11 +3285,11 @@ var RTG_BOUW = '1b06c62c';
     table:       { naam: 'Table',         url: '/apps/table.html' },
     maison:      { naam: 'Maison',        url: '/apps/maison.html' },
     garderobe:   { naam: 'Garde-robe',    url: '/apps/garderobe.html' },
-    mecenaat:    { naam: 'Mecenaat',      url: '/apps/mecenaat.html' },
-    labfonds:    { naam: 'Fonds',     url: '/apps/labfonds.html' },
-    rtgcode:     { naam: 'Betaalcode',      url: '/apps/rtgcode.html' },
-    nalatenschap:{ naam: 'Nalatenschap',  url: '/apps/nalatenschap.html' },
-    logboek:     { naam: 'Logboek',       url: '/apps/logboek.html' },
+    mecenaat:    { naam: 'Mecenaat',      url: '/apps/geld.html#mecenaat' },
+    labfonds:    { naam: 'Fonds',     url: '/apps/geld.html#labfonds' },
+    rtgcode:     { naam: 'Betaalcode',      url: '/apps/geld.html#rtgcode' },
+    nalatenschap:{ naam: 'Nalatenschap',  url: '/apps/geld.html#nalatenschap' },
+    logboek:     { naam: 'Logboek',       url: '/apps/geld.html#logboek' },
     cercle:      { naam: 'Cercle',        url: '/apps/cercle.html' },
     pulse:       { naam: 'Vandaag',         url: '/apps/pulse.html' },
     nieuws:      { naam: 'Nieuws',        url: '/apps/nieuws.html' },
@@ -3320,7 +3320,7 @@ var RTG_BOUW = '1b06c62c';
     attenties:   { naam: 'Attenties',     url: '/apps/attenties.html' },
     rendezvous:  { naam: 'Rendez-vous',   url: '/apps/rendezvous.html' },
     // De wallet draagt je ledenpas; hij staat in de functierij onder de klok.
-    wallet:      { naam: 'Wallet',        url: '/apps/wallet.html' }
+    wallet:      { naam: 'Wallet',        url: '/apps/geld.html#wallet' }
   };
   /* Elke functie zijn eigen app: Bellen, Videobellen en Snaps zijn eigen
      OS-apps die een kiezer openen en dan meteen doen wat u koos, via de
@@ -4660,7 +4660,7 @@ var RTG_BOUW = '1b06c62c';
       headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok }, body: '{}' })
       .then(r => (r.ok ? r.json() : null))
       .then(d => {
-        if (d && d.online) { LINKS.bank = { naam: 'RTG Rekening', url: '/apps/bank.html' }; bouw(); }
+        if (d && d.online) { LINKS.bank = { naam: 'RTG Rekening', url: '/apps/geld.html#bank' }; bouw(); }
       }).catch(() => {});
   })();
 

@@ -52,7 +52,15 @@ const KAART = {
      `deel: false` -- een vlootscherm hangt achter de vervoerderdeur, en een
      link die in een gesprek belandt bij iemand die er niet in kan, belooft iets
      wat hij niet waarmaakt. */
-  voertuig:     { app: '/apps/voertuig.html', param: 'voertuig', titel: 'Voertuig',     deel: false }
+  voertuig:     { app: '/apps/voertuig.html', param: 'voertuig', titel: 'Voertuig',     deel: false },
+  /* En dezelfde afweging voor een rit. Ook hier twee betekenissen:
+     `db.data.rides` is de oudere rittenrij van de leverancierskant, de Mobility
+     OS werkt met OPDRACHTEN en die dragen een stabiele `ref`. Deze verwijzing
+     gaat over die laatste.
+     `deel: false` -- een rit is van EEN reiziger; /api/mob/mijn kent geen
+     parameter om die van een ander op te vragen, dus een link erheen in een
+     gesprek opent bij de ontvanger niets. */
+  rit:          { app: '/apps/rit.html',      param: 'rit',      titel: 'Rit',          deel: false }
 };
 
 /* TWEE VRAGEN, EN ZE ZIJN NIET DEZELFDE.

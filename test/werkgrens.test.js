@@ -241,10 +241,56 @@ test('12. een ANDERE RTG-sessie dan de gekoppelde lost niets op', async () => {
   assert.match(uit.body.reden, /niet het account dat aan dit lidmaatschap is gekoppeld/i);
 });
 
+test('12b. een voertuig wordt alleen opgelost bij een vervoerder waar u WERKT', async () => {
+  /* De tweede laag van de grens. Gekoppeld zijn is niet genoeg: de zoekopdracht
+     kijkt uitsluitend in de vloten van de vervoerders waar dit lid volgens de
+     personeelsadministratie werkelijk werkt. Sam is nergens chauffeur, dus er is
+     geen pad waarlangs deze bus gevonden wordt -- ook al is zijn RTG-account
+     netjes gekoppeld en is de sessie de juiste. */
+  await api('/herkomst/zet', Object.assign({ soort: 'ticket', id: TICKET.id,
+    ref: 'rtg://voertuig/bus28' }, SAM.cred));
+  const uit = await metSessie('/herkomst/open',
+    Object.assign({ soort: 'ticket', id: TICKET.id }, SAM.cred), RTG_TOKEN);
+  assert.equal(uit.status, 200);
+  assert.equal(uit.body.opgelost, null, 'er komt geen naam of kenteken mee');
+  assert.match(uit.body.reden, /vervoerder waar u werkt/i,
+    'met de reden: gekoppeld zijn is daarvoor niet genoeg');
+  assert.ok(uit.body.herkomst.opent, 'het ADRES staat er wel; alleen de inhoud niet');
+});
+
 test('13. het beheer-token lost nooit op, ook niet met een geldige sessie', async () => {
   const uit = await metSessie('/herkomst/open',
     { werkruimte: W, beheerToken: B, soort: 'ticket', id: TICKET.id }, RTG_TOKEN);
   assert.equal(uit.status, 403, 'de werkgever opent deze deur niet');
   assert.match(uit.body.let, /opent de werkgever de deur/i,
     'met de reden waarom dat de kern van deze grens is');
+});
+
+/* DE VOERTUIGGRENS ALS PURE FUNCTIE.
+
+   De routetoets hierboven (12b) kan niet bewijzen dat de werkplekken-grens
+   werkt: in die toets bestaat het voertuig nergens, dus met of zonder grens
+   komt er niets terug. Een mutatie die de grens weghaalde sloeg dan ook AF --
+   en dat is precies LAT-regel 9: een toets die niet kan zakken.
+
+   Hier staat de bewering waar hij wel kan zakken: op bedrijf/oplosbaar.js zelf,
+   met een voertuig dat ECHT bestaat bij een vervoerder waar het lid niet werkt. */
+test('14. de voertuiggrens: alleen vinden waar dit lid werkelijk werkt', () => {
+  const oplosbaar = require('../server/bedrijf/oplosbaar');
+  const bus = { id: 'bus28', vervoerder: 'KAAP', categorie: 'shuttlebus', naam: 'Bus 28' };
+  const kernMet = (zaken) => ({
+    werkplekken: { zakenVan: () => zaken },
+    assetMet: (code, id) => (code === 'KAAP' && id === bus.id ? bus : null),
+    assetBeeld: (a) => ({ id: a.id, naam: a.naam, categorieNaam: 'Shuttlebus', registratie: null, inzetbaar: true })
+  });
+
+  const werktEr = oplosbaar.voertuig(kernMet([{ code: 'KAAP' }]), 'bus28', 'user-1');
+  assert.ok(werktEr, 'wie bij KAAP werkt, vindt de bus');
+  assert.equal(werktEr.titel, 'Bus 28');
+
+  const werktErNiet = oplosbaar.voertuig(kernMet([{ code: 'ANDERS' }]), 'bus28', 'user-1');
+  assert.equal(werktErNiet, null, 'wie ergens anders werkt, vindt hem niet');
+
+  const werktNergens = oplosbaar.voertuig(kernMet([]), 'bus28', 'user-1');
+  assert.equal(werktNergens, null, 'en wie nergens werkt al helemaal niet');
 });

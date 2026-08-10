@@ -39,6 +39,14 @@ test('1. rtg://voertuig/<id> heeft een bestemming, met het id in de URL', () => 
   assert.equal(open.titel, 'Voertuig');
 });
 
+test('1b. rtg://rit/<ref> heeft ook een bestemming', () => {
+  const open = koppel.open('rtg://rit/RTG-R-AB12');
+  assert.ok(open, 'de soort staat in de kaart');
+  assert.equal(open.url, '/apps/rit.html?rit=RTG-R-AB12');
+  assert.equal(koppel.KAART.rit.deel, false,
+    'een rit is van EEN reiziger; een link erheen opent bij een ander niets');
+});
+
 test('2. de live OV-positie krijgt GEEN bestemming', () => {
   /* Er is bewust geen tweede soort voor db.data.ovVoertuigen: die rij verdwijnt
      na twee minuten. Deze toets legt vast dat de kaart precies EEN voertuigsoort
@@ -46,6 +54,8 @@ test('2. de live OV-positie krijgt GEEN bestemming', () => {
      wijst. */
   const soorten = Object.keys(koppel.KAART).filter(k => /voertuig|positie|dienst/.test(k));
   assert.deepEqual(soorten, ['voertuig'], 'één voertuigsoort, en dat is de duurzame');
+  const ritsoorten = Object.keys(koppel.KAART).filter(k => /^rit|opdracht/.test(k));
+  assert.deepEqual(ritsoorten, ['rit'], 'en één ritsoort, en dat is de verwijsbare opdracht');
   assert.equal(koppel.KAART.voertuig.deel, false,
     'een vlootscherm hangt achter de vervoerderdeur; zo\'n link hoort niet in een gesprek');
 });
@@ -70,6 +80,18 @@ test('3. zonder sleutel zegt het scherm WAAROM er niets staat', async () => {
   assert.equal(js.status, 200);
   assert.match(js.tekst, /gesloten deur/i, 'de code zegt dat het een gesloten deur is');
   assert.match(js.tekst, /personeelssleutel/i, 'en wat er nodig is');
+});
+
+test('5. het ritscherm zegt hetzelfde over een ref die niet van u is', async () => {
+  const html = await haal('/apps/rit.html');
+  assert.equal(html.status, 200, 'het ritscherm wordt uitgeserveerd');
+  const js = await haal('/apps/rit.js');
+  assert.equal(js.status, 200);
+  assert.match(js.tekst, /gesloten deur/i, 'zonder sessie is het een gesloten deur');
+  assert.match(js.tekst, /welke van de twee zegt dit scherm bewust niet/i,
+    'en er wordt niet verklapt of een ref van een ander is of niet bestaat');
+  assert.match(js.tekst, /nog niet toegewezen/i,
+    '"nog niet toegewezen" is een stand en geen ontbrekend gegeven');
 });
 
 test('4. een onbekend id wordt niet geraden, en het verschil wordt niet verklapt', async () => {

@@ -19,14 +19,11 @@
 
    ER IS EEN TWEEDE ROUTE (/herkomst/open) DIE DAT WEL DOET, EN PRECIES DAAROM
    STAAT DE GRENS ERIN. Hij vraagt een echte RTG-sessie, en die moet het account
-   zijn dat DIT lid eenmalig zelf koppelde (bedrijf/aansluiting.js, twee sleutels
-   van dezelfde persoon). Niet de werkgever opent de deur maar de medewerker; het
-   beheer-token komt er niet in, juist omdat het alle rechten draagt. Wie niet
-   koppelde ziet alleen de verwijzing, zoals daarvoor. En wat er gelezen wordt,
-   wordt NIET in de werkruimte bewaard: bij de volgende lezer gaat het opnieuw
-   langs diens eigen sessie, of niet. Dat `bedrijf` hierdoor `findSupplier` uit
-   de kern gebruikt, staat als besluit in GRENZEN.json -- de domeingrens sloeg
-   erop aan en dat hoort zo: een laag die verder reikt, schrijft dat op. Wat er wordt bewaard en getoond is de verwijzing zelf --
+   zijn dat DIT lid eenmalig zelf koppelde. Niet de werkgever opent de deur maar
+   de medewerker; het beheer-token komt er niet in, juist omdat het alle rechten
+   draagt. Wat er gelezen wordt, blijft NIET in de werkruimte staan. Welke
+   soorten dat zijn en met welke grens per soort, staat in ./oplosbaar.js; dat
+   dit domein daarvoor kern-namen gebruikt, staat in GRENZEN.json. Wat er wordt bewaard en getoond is de verwijzing zelf --
    de soort, het id, en welke app hem opent. Wie de inhoud wil zien, opent hem
    met zijn EIGEN RTG-sessie, en heeft die niet, dan ziet hij niets. Dat is
    precies het patroon van de Media OS: er reist alleen een id mee, en iedere
@@ -37,13 +34,12 @@
    zonder dat daar ooit een deur voor is opengezet. Dat is geen theoretisch
    bezwaar: het is de enige reden dat deze module zo klein is.
 
-   WAT EEN ONBEKENDE SOORT DOET. De kaart in koppel.js kent vandaag de sociale
-   soorten en een handvol andere; `voertuig` staat er niet in. Een verwijzing
-   naar zo'n soort wordt hier NIET geweigerd -- hij is geldig van vorm en het
-   ticket gaat er echt over -- maar het antwoord zegt met zoveel woorden dat dit
-   huis er (nog) geen plek voor kent om heen te gaan. Weigeren zou de gebruiker
-   dwingen om het dan maar in de vrije tekst te zetten, en dan is de draad weer
-   weg. Stil een link naar de homepage geven zou erger zijn (LAT-regel 5). */
+   WAT EEN ONBEKENDE SOORT DOET. Een verwijzing naar een soort die de kaart van
+   koppel.js niet kent, wordt hier NIET geweigerd -- hij is geldig van vorm en
+   het ticket gaat er echt over -- maar het antwoord zegt met zoveel woorden dat
+   dit huis er (nog) geen plek voor kent om heen te gaan. Weigeren zou de
+   gebruiker dwingen het dan maar in de vrije tekst te zetten, en dan is de draad
+   weer weg. Stil een link naar de homepage geven zou erger zijn (LAT-regel 5). */
 'use strict';
 
 const koppel = require('../kern/wereld/koppel');
@@ -54,12 +50,11 @@ const koppel = require('../kern/wereld/koppel');
    staat in de Mall), dus die kan. Voor alles wat NIET op deze lijst staat komt
    er geen titel maar de reden -- en die lijst uitbreiden is per soort een eigen
    afweging, geen vinkje. */
-const OPLOSBAAR = {
-  zaak: (kern, id) => {
-    const z = kern.findSupplier ? kern.findSupplier(id) : null;
-    return z ? { titel: z.name || z.code, sub: [z.type, z.city].filter(Boolean).join(' · ') } : null;
-  }
-};
+/* WELKE SOORTEN WORDEN OPGELOST, en met welke grens per soort, staat in
+   ./oplosbaar.js -- samen ging dit bestand over de 10 kB van keuringsregel 13.
+   De naad is echt: hier staat de ROUTE (wie mag vragen, en met welke sessie),
+   daar staat per soort WAT er dan gelezen wordt en binnen welke grens. */
+const OPLOSBAAR = require('./oplosbaar');
 
 module.exports = (sctx) => {
   const { app, save, schoon, nu, werkPoort, log, eigenVeld, kern } = sctx;
@@ -123,9 +118,11 @@ module.exports = (sctx) => {
     if (!sessieKey || sessieKey !== g.l.rtgKey) return { mag: false, reden: 'de meegestuurde RTG-sessie is niet het account dat aan dit lidmaatschap is gekoppeld' };
     const lezer = OPLOSBAAR[d.soort];
     if (!lezer) return { mag: false, reden: 'de soort "' + d.soort + '" wordt niet opgelost; dat is per soort een eigen afweging en geen vinkje' };
-    const uit = lezer(kern, d.id);
+    const uit = lezer(kern, d.id, sessieKey);
     return uit ? { mag: true, titel: uit.titel, sub: uit.sub || null }
-      : { mag: false, reden: 'gekoppeld en toegestaan, maar dit object bestaat aan de RTG-kant niet (meer)' };
+      : { mag: false, reden: d.soort === 'voertuig'
+        ? 'dit voertuig staat niet in de vloot van een vervoerder waar u werkt -- gekoppeld zijn is daarvoor niet genoeg'
+        : 'gekoppeld en toegestaan, maar dit object bestaat aan de RTG-kant niet (meer)' };
   }
 
   app.post('/api/bedrijf/herkomst', (req, res) => {

@@ -4,7 +4,7 @@
    gedeelde context een keer bij het opstarten vanuit kern/spellen.js. */
 module.exports = (ctx) => {
   const { db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, isGeblokkeerd, socialZoek, sociaalRate, volwassen,
-    rid, nu, S, SPEL, SOORTEN, TEAMS, wereldFout, leeftijdFout, nudge, schud, beurtDoor, opschonen, klok,
+    rid, nu, S, SPEL, SOORTEN, TEAMS, wereldFout, leeftijdFout, nudge, schud, beurtDoor, opschonen, klok, beleid,
     INITS, klasgenotenVan } = ctx;
   function spelStart(potje) {
     potje.status = 'bezig'; potje.beurt = 0;
@@ -29,13 +29,15 @@ module.exports = (ctx) => {
     if (t === 'keuze' && modus === 'teams' && grootte === SPEL[soort].max) return 'teams';
     return 'vrij';
   }
-  async function spelNieuw(mij, { soort, grootte, modus, vrienden, codenamen, klasgenoten, taal, wereld, tempo }) {
+  async function spelNieuw(mij, { soort, grootte, modus, vrienden, codenamen, klasgenoten, taal, wereld, tempo, context, bron }) {
     opschonen();
-    if (!SPEL[soort]) return { status: 400, error: 'Onbekend spel.' };
-    const wf = wereldFout(wereld, soort);
-    if (wf) return { status: 400, error: wf };
-    const lf = leeftijdFout(soort, mij);
-    if (lf) return { status: 403, error: lf };
+    /* Alle toetredingsvragen in een keer, in volgorde: bestaat het spel, mag
+       deze app het starten, mag DEZE speler mee. Ze stonden hier los; nu staat
+       de checklist in beleid.js zodat een tweede ingang (een chat, een Game
+       Night) er geen kan overslaan. De regels zelf zijn niet verhuisd -- beleid
+       roept gedeeld.js aan. */
+    const nee = beleid.mag(mij, soort, { wereld });
+    if (nee) return nee;
     // het tempo hoort bij het spel: een reactieduel met 24 uur per beurt is
     // geen spel meer, dus dat weigert de klok op basis van `vormen`
     const tf = klok ? klok.tempoFout(soort, tempo) : null;
@@ -68,10 +70,18 @@ module.exports = (ctx) => {
     }
     if (!uitgenodigd.length) return { status: 400, error: 'Nodig minstens een speler uit (vriend of codenaam), of speel random.' };
     if (uitgenodigd.length > max - 1) return { status: 400, error: 'Te veel spelers voor dit spel.' };
-    for (const v of uitgenodigd) { const vf = leeftijdFout(soort, v); if (vf) return { status: 403, error: vf }; }
-    const potje = { id: rid(5), soort, grootte: max, modus: teamModus(soort, max, modus),
-      taal: taal === 'en' ? 'en' : 'nl', tempo: tempo || null,
-      teams: TEAMS, spelers: [mij], uitgenodigd, status: 'wacht', beurt: 0, winnaar: null, at: nu(), door: codenaamVan(mij) };
+    // dezelfde checklist voor iedereen die je meeneemt; een lijst mag erin,
+    // zodat er hier geen tweede lus staat die de vraag net anders stelt
+    const neeGasten = beleid.mag(uitgenodigd, soort, { wereld });
+    if (neeGasten) return neeGasten;
+    const potje = Object.assign({ id: rid(5), soort, grootte: max, modus: teamModus(soort, max, modus),
+      taal: taal === 'en' ? 'en' : 'nl',
+      teams: TEAMS, spelers: [mij], uitgenodigd, status: 'wacht', beurt: 0, winnaar: null, at: nu(), door: codenaamVan(mij) },
+      /* De roomvelden komen uit beleid.js en niet uit het verzoek: `context`
+         wordt daar tegen een gesloten lijst gelegd, want wie zijn eigen context
+         mag meesturen opent straks een 18+-spel als schoolsessie. `host` is de
+         starter, en die weten we hier. */
+      beleid.roomVelden({ context, bron, host: mij, tempo }));
     S().potjes[potje.id] = potje;
     save();
     uitgenodigd.forEach(v => nudge(v, potje));
@@ -80,9 +90,13 @@ module.exports = (ctx) => {
   function spelAntwoord(mij, id, akkoord) {
     const p = S().potjes[id];
     if (!p || p.status !== 'wacht' || !p.uitgenodigd.includes(mij)) return { status: 404, error: 'Deze uitnodiging is er niet meer.' };
+    /* Accepteren is een toetredingsmoment en gaat dus ook langs het beleid --
+       maar langs de SMALLERE vraag: de leeftijdspoort geldt, de wereldpoort
+       niet, want meespelen op uitnodiging kan altijd over en weer. Die
+       asymmetrie staat uitgelegd in beleid.js. */
     if (akkoord === true) {
-      const lf = leeftijdFout(p.soort, mij);
-      if (lf) return { status: 403, error: lf };
+      const nee = beleid.magMeedoen(mij, p.soort);
+      if (nee) return nee;
     }
     p.uitgenodigd = p.uitgenodigd.filter(x => x !== mij);
     // 30 Seconden start pas met vier (twee teams); haalt een potje zijn
@@ -97,11 +111,8 @@ module.exports = (ctx) => {
   }
   function spelRandom(mij, soort, grootte, taal, wereld, tempo) {
     opschonen();
-    if (!SPEL[soort]) return { status: 400, error: 'Onbekend spel.' };
-    const wf = wereldFout(wereld, soort);
-    if (wf) return { status: 400, error: wf };
-    const lf = leeftijdFout(soort, mij);
-    if (lf) return { status: 403, error: lf };
+    const nee = beleid.mag(mij, soort, { wereld });
+    if (nee) return nee;
     const tf = klok ? klok.tempoFout(soort, tempo) : null;
     if (tf) return { status: 400, error: tf };
     const max = spelGrootte(soort, grootte);
@@ -119,9 +130,11 @@ module.exports = (ctx) => {
     w[sleutel].push(mij);
     if (w[sleutel].length >= max) {
       const spelers = w[sleutel].splice(0, max);
-      const potje = { id: rid(5), soort, grootte: max, modus: teamModus(soort, max), taal: w_taal, tempo: tempo || null,
+      const potje = Object.assign({ id: rid(5), soort, grootte: max, modus: teamModus(soort, max), taal: w_taal,
         teams: TEAMS, spelers, uitgenodigd: [],
-        status: 'wacht', beurt: 0, winnaar: null, at: nu(), door: 'random' };
+        status: 'wacht', beurt: 0, winnaar: null, at: nu(), door: 'random' },
+        // geen host: de wachtrij koppelt vreemden, dus niemand is hier gastheer
+        beleid.roomVelden({ context: 'hall', host: null, tempo }));
       S().potjes[potje.id] = potje;
       spelStart(potje);
       save();
@@ -158,7 +171,7 @@ module.exports = (ctx) => {
       id: rid(5), soort, grootte: spelers.length, modus: teamModus(soort, spelers.length),
       taal: 'nl', teams: TEAMS, spelers: spelers.slice(), uitgenodigd: [],
       status: 'wacht', beurt: 0, winnaar: null, at: nu(), door: 'toernooi'
-    }, extra || {});
+    }, beleid.roomVelden({ context: 'hall', host: null, tempo: (extra || {}).tempo }), extra || {});
     S().potjes[potje.id] = potje;
     spelStart(potje);
     save();

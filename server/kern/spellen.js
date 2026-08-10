@@ -86,6 +86,16 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
      laag aan hangt, en daarom een eigen bestand met een eigen naam. */
   const { progressieMag, GEEN_PROGRESSIE } = require('./spellen/grens')({ volwassen });
 
+  /* HET BELEID: alle toetredingsvragen op een plek, in volgorde. Neemt geen
+     enkele regel over -- hij roept gedeeld.js, grens.js en zicht.js aan. Staat
+     hier omdat alles wat hij aanroept nu bestaat; de lobby en de partij kennen
+     hem via `ctx` en nieuwe ingangen (chat, projectie, Game Night) horen hem te
+     gebruiken in plaats van de losse poorten opnieuw te bevragen. */
+  const beleid = require('./spellen/beleid')({
+    wereldFout, leeftijdFout, progressieMag, GEEN_PROGRESSIE, ZICHT,
+    get SPEL() { return SPEL; }
+  });
+
   /* Uitslagen die een potje overleven: de bron onder winrate, niveaus en
      toernooien. Deelnemers buiten de progressiegrens staan er zonder codenaam
      in; speelde niemand binnen de grens mee, dan wordt er niets bewaard. Zie
@@ -117,7 +127,7 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
   /* De lobby- en partijlaag draaien als submodules op een gedeelde
      context, een keer opgebouwd bij het opstarten. */
   const ctx = { db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, isGeblokkeerd, socialZoek, sociaalRate, volwassen,
-    rid, nu, S, SPEL, SOORTEN, TEAMS, wereldFout, leeftijdFout, nudge, schud, beurtDoor, opschonen, klok,
+    rid, nu, S, SPEL, SOORTEN, TEAMS, wereldFout, leeftijdFout, nudge, schud, beurtDoor, opschonen, klok, beleid,
     INITS, ZETTEN, ZICHT, STATISCH, klasgenotenVan, noteerUitslag, noteerZet };
   const { spelStart, spelGrootte, potjeDirect, spelNieuw, spelAntwoord, spelRandom, mijnSpellen } = require('./spellen/lobby')(ctx);
   /* Toernooien: een knockout waarvan elke wedstrijd een GEWOON potje is. Staat

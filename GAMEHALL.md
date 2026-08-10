@@ -56,7 +56,7 @@ verschillen in wie er tegelijk moet zijn en wat er bewaard wordt.
 | Vorm | Aanwezigheid | Wie bewaakt de staat | Bestaat nu |
 |---|---|---|---|
 | **Live** | iedereen tegelijk | server, per zet | ja (alle 16 potjes) |
-| **Async** | niemand tegelijk | server, per zet, met een klok per beurt | nee (§7) |
+| **Async** | niemand tegelijk | server, per zet, met een klok per beurt | **ja** — zes spellen (§7) |
 | **Party** | fysiek bij elkaar, één gedeeld scherm | server, met een aparte projectieweergave | nee (§9) |
 | **Arcade** | alleen jij | client — en dat is het probleem van §13 | ja (3 spellen) |
 | **Foundation** | klas of gezin | server, zonder blijvend spoor | ja, impliciet (§16) |
@@ -106,9 +106,12 @@ er al zijn. Ze opnieuw bouwen zou de duurste vorm van vooruitgang zijn.
 | Toegankelijkheid, server als eigenaar | `public/shared/toegankelijk.js` + `basis.js` | §17 |
 | Gesprekken met bijlagen, `meta.sleutel` idempotent | `server/kern/comm/` | games in de chat (§10) |
 
-**Wat er dus echt nieuw is:** de klok per beurt, het zichtmodel met drie lagen,
-de projectiekamer, de challenge-motor, de policylaag en de nabespreking. De
-rest is aansluiten op wat er staat.
+| Beleid: alle toetredingsvragen op een plek | `spellen/beleid.js` | **nieuw, af** |
+
+**Wat er dus echt nieuw is:** ~~de klok per beurt~~, ~~het zichtmodel met drie
+lagen~~, ~~de policylaag~~ — die drie staan er nu (fase 0). Wat rest: de
+projectiekamer, de challenge-motor en de nabespreking. De rest is aansluiten op
+wat er staat.
 
 ---
 
@@ -865,8 +868,8 @@ spellen die elk een andere categorie bewijzen, dan de rest.
 |---|---|---|
 | 1 | `zicht.js` — drie lagen, `kijken: true` uitgefaseerd (§6) | **af** |
 | 2 | `klok.js` — tempo, toewijzen, vervaltermijn (§7) | **af** |
-| 3 | `beleid.js` — één afleiding over de bestaande poorten (§18) | open |
-| 4 | Room-uitbreiding: `context`, `bron`, `host` (§8) | open — `vorm` en `tempo` staan er |
+| 3 | `beleid.js` — één afleiding over de bestaande poorten (§18) | **af** |
+| 4 | Room-uitbreiding: `context`, `bron`, `host`, `tempo` (§8) | **af** |
 
 Wat fase 0 onderweg heeft opgeleverd, en dat is het argument voor de volgorde:
 **drie bestaande fouten die niemand zag.** `kijken: true` was een bewering

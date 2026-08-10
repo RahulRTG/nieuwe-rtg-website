@@ -27,6 +27,12 @@ module.exports = (kern) => {
   // dezelfde acties voor beide werelden; alleen de identiteit verschilt, en
   // elke app start zijn eigen spelgroep (meespelen op uitnodiging kan altijd)
   const ACTIES = {
+    /* `context` en `bron` staan hier met OPZET niet bij, en dat is geen
+       omissie: ze bepalen straks welk beleid aan een potje hangt (§8 van
+       GAMEHALL.md), en wie zijn eigen context mag meesturen opent een 18+-spel
+       als schoolsessie. Ze worden gezet door de INGANG die het weet -- een
+       chat-start kent zijn gesprek, deze route kent alleen "iemand vraagt een
+       potje aan". Voeg ze hier dus niet toe omdat de kern ze accepteert. */
     nieuw: (mij, b, wereld) => spelNieuw(mij, { soort: b.soort, grootte: b.grootte, modus: b.modus, vrienden: b.vrienden, codenamen: b.codenamen, klasgenoten: b.klasgenoten, taal: b.taal, tempo: b.tempo, wereld }),
     antwoord: (mij, b) => spelAntwoord(mij, String(b.id || ''), b.akkoord === true),
     random: (mij, b, wereld) => spelRandom(mij, String(b.soort || ''), b.grootte, b.taal, wereld, b.tempo),

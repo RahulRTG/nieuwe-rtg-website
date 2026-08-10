@@ -1,0 +1,142 @@
+/* De beleidslaag: alle toetredingsvragen op een plek, in volgorde.
+
+   Wat hier bewaakt wordt is NIET dat er nieuwe regels zijn -- die zijn er
+   juist niet. Beleid.js roept gedeeld.js, grens.js en zicht.js aan en neemt
+   niets over; een policylaag die zelf gaat beslissen is een tweede kopie, en
+   dan zijn er weer twee antwoorden op dezelfde vraag.
+
+   Wat er wel bij komt is de VOLGORDE en de volledigheid, plus twee dingen die
+   hiervoor impliciet waren en nu uitgesproken zijn: dat meedoen een smallere
+   vraag is dan starten, en dat de context van een potje nooit uit het verzoek
+   komt.
+
+   Draai los: node --experimental-sqlite --test test/spelbeleid.test.js */
+const test = require('node:test');
+const assert = require('node:assert/strict');
+
+const maakSpellen = require('../server/kern/spellen');
+const maakBeleid = require('../server/kern/spellen/beleid');
+
+function opstelling({ volwassen = () => true } = {}) {
+  const db = { data: { spellen: { potjes: {}, wachtrij: {} } } };
+  const kern = maakSpellen({ db, save() {}, crypto: require('crypto'), zijnVrienden: () => true,
+    codenaamVan: (x) => 'CN-' + x, sseToCustomer() {}, isGeblokkeerd: () => false,
+    socialZoek: async () => [], sociaalRate: () => true, volwassen,
+    sseClients: [], lidBoardUit: () => false });
+  return { db, kern };
+}
+
+/* ---------- het beleid beslist niet zelf ---------- */
+
+test('de leeftijdspoort komt uit gedeeld.js en niet uit het beleid', async () => {
+  /* Als `volwassen()` nee zegt, hoort Proost geweigerd te worden -- en die
+     weigering hoort woordelijk van de bestaande poort te komen. Zou beleid.js
+     een eigen grens hebben, dan zou deze toets slagen met een andere tekst en
+     zouden er twee regels bestaan. */
+  const o = opstelling({ volwassen: () => false });
+  const r = await o.kern.spelNieuw('a', { soort: 'proost', vrienden: ['b'], wereld: 'rtg' });
+  assert.equal(r.status, 403);
+  assert.match(r.error, /Proost is 18\+/);
+});
+
+test('de wereldpoort komt ook uit gedeeld.js', async () => {
+  const o = opstelling();
+  const r = await o.kern.spelNieuw('a', { soort: 'proost', vrienden: ['b'], wereld: 'rtf' });
+  assert.equal(r.status, 400);
+  assert.match(r.error, /RTG-leden-app/);
+});
+
+test('een onbekend spel valt als eerste af', async () => {
+  const o = opstelling();
+  const r = await o.kern.spelNieuw('a', { soort: 'kwartet', vrienden: ['b'], wereld: 'rtg' });
+  assert.equal(r.status, 400);
+  assert.match(r.error, /Onbekend spel/);
+});
+
+/* ---------- iedereen die je meeneemt gaat langs dezelfde vraag ---------- */
+
+test('een uitgenodigde die de poort niet haalt houdt het potje tegen', async () => {
+  /* De starter is volwassen, de gast niet. Dit stond hiervoor als losse lus in
+     de lobby; nu is het dezelfde aanroep met een lijst erin, zodat er geen
+     tweede plek is die de vraag net anders stelt. */
+  const o = opstelling({ volwassen: (h) => h === 'a' });
+  const r = await o.kern.spelNieuw('a', { soort: 'proost', vrienden: ['b'], wereld: 'rtg' });
+  assert.equal(r.status, 403);
+  assert.match(r.error, /18\+/);
+});
+
+/* ---------- meedoen is smaller dan starten ---------- */
+
+test('meedoen kent de leeftijdspoort wel en de wereldpoort niet', () => {
+  /* De asymmetrie die hiervoor alleen bestond doordat de ene aanroep een
+     controle miste die de andere wel had. `wereld` zegt welke app een potje
+     mag STARTEN; meespelen kan altijd over en weer. */
+  const beleid = maakBeleid({
+    wereldFout: (wereld, soort) => wereld === 'rtf' ? 'Dit spel vind je in de RTG-leden-app.' : null,
+    leeftijdFout: (soort, h) => h === 'kind' ? 'Proost is 18+.' : null,
+    progressieMag: () => true, ZICHT: {}, GEEN_PROGRESSIE: '',
+    get SPEL() { return { proost: { naam: 'Proost', volwassen: true } }; }
+  });
+  assert.ok(beleid.mag('a', 'proost', { wereld: 'rtf' }), 'starten in de verkeerde app kan niet');
+  assert.equal(beleid.magMeedoen('a', 'proost'), null, 'maar meedoen vraagt niet naar de app');
+  assert.ok(beleid.magMeedoen('kind', 'proost'), 'de leeftijdspoort geldt wel');
+});
+
+/* ---------- de context komt nooit uit het verzoek ---------- */
+
+test('een context die niet bestaat valt terug op de veilige stand', async () => {
+  /* Dezelfde regel als bij `online` in routes/spellen.js: wie zijn eigen
+     beleid mag meesturen, opent straks een 18+-spel als schoolsessie. */
+  const o = opstelling();
+  const r = await o.kern.spelNieuw('a', { soort: 'schaak', vrienden: ['b'], wereld: 'rtg', context: 'baas' });
+  assert.equal(r.status, 200);
+  assert.equal(o.db.data.spellen.potjes[r.id].context, 'hall');
+});
+
+test('een context uit de gesloten lijst blijft staan', async () => {
+  const o = opstelling();
+  const r = await o.kern.spelNieuw('a', { soort: 'schaak', vrienden: ['b'], wereld: 'rtg', context: 'chat', bron: 'gesprek:ab12' });
+  const p = o.db.data.spellen.potjes[r.id];
+  assert.equal(p.context, 'chat');
+  assert.equal(p.bron, 'gesprek:ab12', 'en de weg terug naar waar het potje vandaan komt');
+});
+
+test('de starter is de host, en de wachtrij levert er geen', async () => {
+  const o = opstelling();
+  const r = await o.kern.spelNieuw('a', { soort: 'schaak', vrienden: ['b'], wereld: 'rtg' });
+  assert.equal(o.db.data.spellen.potjes[r.id].host, 'a');
+
+  o.kern.spelRandom('x', 'schaak', 2, 'nl', 'rtg');
+  o.kern.spelRandom('y', 'schaak', 2, 'nl', 'rtg');
+  const random = Object.values(o.db.data.spellen.potjes).find(p => p.door === 'random');
+  assert.ok(random, 'de wachtrij heeft gekoppeld');
+  assert.equal(random.host, null, 'de wachtrij koppelt vreemden; niemand is daar gastheer');
+  assert.equal(random.context, 'hall');
+});
+
+/* ---------- het zicht is de bron voor "mag hier meegekeken worden" ---------- */
+
+test('meekijken en projecteren worden uit het zicht afgeleid, niet uit een vlag', () => {
+  const beleid = maakBeleid({
+    wereldFout: () => null, leeftijdFout: () => null, progressieMag: () => true,
+    GEEN_PROGRESSIE: '',
+    ZICHT: { schaak: { speler() {}, kijker() {}, publiek() {} }, seconden: { speler() {}, kijker: null, publiek() {} } },
+    get SPEL() { return { schaak: {}, seconden: {} }; }
+  });
+  assert.equal(beleid.magBekeken('schaak'), true);
+  assert.equal(beleid.magBekeken('seconden'), false, 'geen kijkweergave, dus niet te bekijken');
+  assert.equal(beleid.magGeprojecteerd('seconden'), true, 'wel te projecteren');
+  assert.equal(beleid.magBekeken('kwartet'), false, 'een spel dat niet bestaat al helemaal niet');
+});
+
+test('bewaart() is grens.js en geen tweede leeftijdscontrole', () => {
+  let gevraagd = 0;
+  const beleid = maakBeleid({
+    wereldFout: () => null, leeftijdFout: () => null, ZICHT: {}, GEEN_PROGRESSIE: '',
+    progressieMag: (h) => { gevraagd++; return h === 'volwassen'; },
+    get SPEL() { return {}; }
+  });
+  assert.equal(beleid.bewaart('volwassen'), true);
+  assert.equal(beleid.bewaart('kind'), false);
+  assert.equal(gevraagd, 2, 'beide keren is het grens.js die antwoordt');
+});

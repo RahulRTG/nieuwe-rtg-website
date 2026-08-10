@@ -25,14 +25,23 @@ module.exports = (kern) => {
 
   /* ---------- de QR van een tafel ---------- */
   app.post('/api/supplier/horeca/gast/qr', supplierAuth, (req, res) => {
-    const uit = sessie.tafelToken(req.supplier.code, (req.body || {}).tafel, { vernieuw: !!(req.body || {}).vernieuw });
+    const b = req.body || {};
+    /* Een QR hoort bij een TAFEL of bij een KAMER. Het verschil zit niet in de
+       sticker maar in wat er daarna geldt: op een tafel mag altijd een rekening
+       open, op een kamer alleen zolang daar een gastrekening staat. */
+    const soort = b.kamer ? 'kamer' : 'tafel';
+    const naam = soort === 'kamer' ? b.kamer : b.tafel;
+    const uit = sessie.plekToken(req.supplier.code, naam, { soort, vernieuw: !!b.vernieuw });
     if (uit.error) return res.status(uit.status || 400).json({ error: uit.error });
-    if (uit.vernieuwd) logActivity(req.supplier.code, req.actor, 'gaf een nieuwe QR uit voor ' + uit.tafel);
-    res.json({ ok: true, tafel: uit.tafel, token: uit.token,
+    if (uit.vernieuwd) logActivity(req.supplier.code, req.actor, 'gaf een nieuwe QR uit voor ' + uit.plek);
+    res.json({ ok: true, soort, plek: uit.plek, tafel: soort === 'tafel' ? uit.plek : null,
+      kamer: soort === 'kamer' ? uit.plek : null, token: uit.token,
       pad: '/apps/gast.html?t=' + uit.token,
       let: uit.vernieuwd
-        ? 'Alle eerder gedrukte QR-codes van deze tafel werken nu niet meer.'
-        : 'Druk deze code af voor op tafel; hij blijft geldig als de rekening sluit.' });
+        ? 'Alle eerder gedrukte QR-codes van deze plek werken nu niet meer.'
+        : (soort === 'kamer'
+          ? 'Leg deze code op de kamer; hij werkt alleen zolang daar een gastrekening open staat.'
+          : 'Druk deze code af voor op tafel; hij blijft geldig als de rekening sluit.') });
   });
 
   /* ---------- uitverkocht ---------- */

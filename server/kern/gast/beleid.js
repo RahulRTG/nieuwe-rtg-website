@@ -30,14 +30,17 @@ const ERNSTIG = ['anafyla', 'ernstig', 'pinda', 'noot', 'noten', 'schaaldier', '
 
 const STANDAARD = {
   bestellen: true,              // mag de gast zelf bestellen
-  /* Waarom bezorging en afhaal HIER standaard in staan en de zaalkanalen ook.
-     Bij een tafel is zelf bestellen een keuze naast de bediening: een zaak kan
-     zeggen "bij ons neemt de ober op". Bij bezorging en afhaal bestaat dat
-     alternatief niet -- de gast zit thuis. Ze eruit laten zou betekenen dat een
-     zaak bezorgzones instelt, tijdsloten inricht, en dat er vervolgens niemand
-     kan bestellen. De echte poort voor bezorging is dan ook niet deze lijst
-     maar of er zones zijn (kern/horeca/bezorglaag.js weigert met 'geen-zones'). */
-  kanalen: ['tafel', 'qr', 'bar', 'terras', 'bezorging', 'afhaal'],
+  /* WAT DEZE LIJST IS, en dat is twee keer verkeerd begrepen -- eerst door
+     mijzelf bij bezorging, daarna bij roomservice. Hij is de UITSCHAKELAAR van
+     de zaak, niet de toegangscontrole. Elk kanaal heeft zijn eigen echte poort
+     en die staat ergens anders: een tafel heeft de QR, een kamer de open
+     gastrekening (geen folio, geen roomservice), bezorging de zones (geen
+     zones, geen bezorging), afhalen de ledensessie. Wie die poorten al passeert
+     hoort niet daarna op een lijst te stuiten die nog uit een vorige ronde
+     stamt -- dan stelt een zaak bezorgzones in waarop niemand kan bestellen.
+     Daarom staat hier alles wat bereikbaar is AAN, en zet een zaak uit wat hij
+     niet wil. */
+  kanalen: ['tafel', 'qr', 'bar', 'terras', 'bezorging', 'afhaal', 'roomservice'],
   allergieBevestiging: 'ernstig', // nooit | ernstig | altijd
   alcoholLeeftijd: 18,
   orderPlafondCenten: 50000,    // hierboven moet een medewerker bevestigen

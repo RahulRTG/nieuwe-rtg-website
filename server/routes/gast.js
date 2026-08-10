@@ -55,19 +55,28 @@ module.exports = (kern) => {
      de kern pas op het moment van aanroepen bevraagt -- net als betalen.js
      doet. Hem hier vastpakken zou een undefined opleveren die pas maanden later
      opvalt, bij de eerste gast die op zijn kamer wil boeken. */
-  const folioBoek = (...a) => (kern.horecaFolioBoek
-    ? kern.horecaFolioBoek(...a)
-    : { status: 409, error: 'De hotellaag staat bij deze zaak niet aan.' });
+
+  /* Lezen of er een gastrekening op een kamer staat -- de grendel onder
+     roomservice. Dit loopt NIET via de kern maar via kern/horeca/foliolaag.js,
+     en dat is een les die geld kostte: folio.js zet zijn `folioVan` op de
+     ctx-kopie van het leveranciersdomein, dus de echte kern krijgt hem nooit en
+     dit domein kan er niet bij. Een rekensom die twee domeinen nodig hebben,
+     hoort in de kern en niet op een eigenschap die een van de twee toevallig
+     zet. */
+  const { folioVan, boek: folioBoek } = require('../kern/horeca/foliolaag')({ horeca, save, schoon });
 
   /* Buiten de deur: bezorgen en afhalen. Andere naad (de ledensessie in plaats
      van de tafel-QR), dezelfde rekening eronder. */
   const buitenshuis = require('../kern/gast/buitenshuis')({ save, schoon, crypto, horeca });
   const bezorglaag = require('../kern/horeca/bezorglaag')({ save, horeca, haversine: kern.haversine });
+  const foodcourtlaag = require('../kern/gast/foodcourt')({ db, save, schoon, crypto, horeca, orderlaag, buitenshuis });
 
   const ctx = Object.assign({}, kern, { horeca, beleid, sessie, orderlaag, afrekenlaag,
-    buitenshuis, bezorglaag, gastAuth, stuur, folioBoek });
+    buitenshuis, bezorglaag, foodcourtlaag, gastAuth, stuur, folioBoek, folioVan });
   require('./gast/tafel')(ctx);     // de QR, aanschuiven, de kaart en het beleid
   require('./gast/bestellen')(ctx); // bestellen, de rekening lezen, waarom-vragen
   require('./gast/afrekenen')(ctx); // verdelen, fooi, betalen
   require('./gast/bezorgen')(ctx);  // bezorgen en afhalen vanaf de ledenapp
+  require('./gast/club')(ctx);      // polsbandtegoed en minimum spend
+  require('./gast/foodcourt')(ctx); // een mandje bij meer loketten tegelijk
 };

@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 855 bestanden en 5365 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 857 bestanden en 5376 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 855 |
-| losse beweringen (`test(...)`) | 5365 |
+| toetsbestanden | 857 |
+| losse beweringen (`test(...)`) | 5376 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 603 |
 | **overleefd**: geen mutatie kreeg hem rood | 13 |
 | niet te meten (al rood, geen module gevonden, ...) | 17 |
-| alleen in de kop *genoemd*, nog niet gemeten | 55 |
-| niets van beide | 167 |
+| alleen in de kop *genoemd*, nog niet gemeten | 56 |
+| niets van beide | 168 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-744 bestanden, 5180 beweringen.
+746 bestanden, 5191 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -213,8 +213,10 @@ toets omvalt.
 | `functies.test.js` | 13 | -- | Tests voor de functieschakelaars (server/functies.js): de pad-matching (langste prefix wint), de standaard en de catalogus. Zuiver, geen server nodig. |
 | `galerij.test.js` | 3 | gezakt op `liegpoort /api/` | RTG Galerij: de tijdlijn leest De Salon en RTG Bestanden (geen dubbele opslag), albums zijn verwijzingen en favorieten blijven van het lid. |
 | `gastbezorging.test.js` | 8 | -- | HET GUEST OS BUITEN DE DEUR: bezorgen en afhalen. Dit is de TWEEDE naad op dezelfde motor, en dat is precies wat dit bestand bewaakt. |
+| `gastfoodcourt.test.js` | 4 | genoemd | DE FOODCOURT: één mandje, meer keukens. De vijfde en laatste naad, en de enige die niet over TOEGANG gaat maar over VERDELING. |
 | `gastorder.test.js` | 11 | -- | RTG HOSPITALITY GUEST OS -- de gastkant van de horecatoren. WAT DIT BESTAND BEWAAKT, en waarom juist deze dingen. |
 | `gastregels.test.js` | 5 | gezakt op `liegpoort /api/` | De gast-regels bij eten bestellen: een gratis account mag thuisbezorgd bestellen (met EUR 2,50 ex btw servicekosten; leden betalen die nooit), mag pas een restaurant reserveren als het ID geverifieerd is, telt tot... |
+| `gastroomservice.test.js` | 7 | -- | HET GUEST OS OP DE KAMER: roomservice. DE DERDE NAAD, en de scherpste. |
 | `gastzorg.test.js` | 3 | gezakt op `liegpoort /api/` | De zorgvolle keten: het zorgprofiel reist alleen met toestemming mee met bestellingen en verblijven, en de live locatie is alleen zichtbaar voor zaken die de gast zelf aanwees, tot de zaak (of de gast) het stopt. |
 | `gebouw.test.js` | 6 | gezakt op `liegpoort /api/` | RTG Enterprise: het complete kantoorgebouw-systeem (demo Meridiaan Toren). Bewaakt de zalen zonder dubbele boekingen, de bezoekersstroom langs de receptie, badges, facilitaire meldingen, valet, de jetset-laag en de... |
 | `gebouwplus.test.js` | 4 | gezakt op `liegpoort /api/` | RTG Enterprise (gebouwplus): de plus-laag van het kantoorgebouw. Getoetst: de manager van de demo-toren legt een huurcontract vast, verlengt en beeindigt het; leads schuiven door de fasen; energie-weken worden... |

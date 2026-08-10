@@ -28,65 +28,104 @@ module.exports = ({ db, save, crypto, schoon, horeca }) => {
 
   const afdruk = (t) => crypto.createHash('sha256').update(String(t || '')).digest('hex');
 
-  /* ---------- de QR van een tafel ----------
-     Een tafel krijgt zijn token bij de eerste keer opvragen en houdt het
-     daarna. Opnieuw uitgeven is een aparte handeling (een sticker die is
-     kwijtgeraakt), want stil vernieuwen zou elke gedrukte QR doodmaken. */
-  function tafelToken(zaakcode, tafel, { vernieuw = false } = {}) {
+  /* ---------- de QR van een PLEK ----------
+     Een plek is een tafel of een hotelkamer. Ze delen de mechaniek -- een
+     gedrukte sticker die jaren meegaat, een gehashte afdruk in de opslag -- en
+     verschillen in wat er daarna geldt: een tafel opent een rekening, een kamer
+     mag dat alleen zolang daar een gastrekening op staat.
+
+     Waarom `soort` op de RIJ staat en niet in de sleutel: bestaande QR-codes uit
+     de tijd dat er alleen tafels waren dragen geen soort, en die horen te
+     blijven werken. Ze vallen terug op 'tafel'. Opnieuw uitgeven blijft een
+     aparte handeling, want stil vernieuwen maakt elke gedrukte sticker dood. */
+  const SOORTEN = ['tafel', 'kamer'];
+
+  function plekToken(zaakcode, naam, { soort = 'tafel', vernieuw = false } = {}) {
     const h = H(zaakcode);
+    if (!SOORTEN.includes(soort)) return { status: 400, error: 'Een QR hoort bij een tafel of een kamer.' };
     if (!h.instel) h.instel = {};
     if (!h.instel.qr) h.instel.qr = {};
-    const sleutel = String(tafel || '').trim();
-    if (!sleutel) return { status: 400, error: 'Voor welke tafel?' };
+    const sleutel = String(naam || '').trim();
+    if (!sleutel) return { status: 400, error: soort === 'kamer' ? 'Voor welke kamer?' : 'Voor welke tafel?' };
     const bestaand = h.instel.qr[sleutel];
-    if (bestaand && !vernieuw) return { tafel: sleutel, token: bestaand.token, at: bestaand.at };
+    if (bestaand && !vernieuw) return { plek: sleutel, tafel: sleutel, soort: bestaand.soort || 'tafel', token: bestaand.token, at: bestaand.at };
     const token = crypto.randomBytes(9).toString('hex');
-    h.instel.qr[sleutel] = { token, hash: afdruk(token), at: nu() };
+    h.instel.qr[sleutel] = { token, hash: afdruk(token), soort, at: nu() };
     save();
-    return { tafel: sleutel, token, at: h.instel.qr[sleutel].at, vernieuwd: !!bestaand };
+    return { plek: sleutel, tafel: sleutel, soort, token, at: h.instel.qr[sleutel].at, vernieuwd: !!bestaand };
   }
+  // de oude naam blijft bestaan: gastbeheer.js en de toetsen gebruiken hem
+  const tafelToken = (zaakcode, tafel, opties) => plekToken(zaakcode, tafel, Object.assign({ soort: 'tafel' }, opties || {}));
 
-  /* Zoek de zaak en de tafel bij een gescand token. Loopt over de zaken die een
-     QR-tafel hebben; dat zijn er in een gewone installatie enkele tientallen en
-     de vergelijking gaat over de afdruk, niet over het token. */
+  /* Zoek de zaak en de plek bij een gescand token. Loopt over de zaken die een
+     QR hebben; dat zijn er in een gewone installatie enkele tientallen en de
+     vergelijking gaat over de afdruk, niet over het token. */
   function zaakBijToken(token) {
     const t = String(token || '').trim();
     if (t.length < 12) return null;
     const h = afdruk(t);
     for (const [code, doos] of Object.entries(db.data.horeca || {})) {
       const qr = (doos.instel && doos.instel.qr) || {};
-      for (const [tafel, rij] of Object.entries(qr)) {
-        if (rij && (rij.hash === h || rij.token === t)) return { zaakcode: code, tafel };
+      for (const [plek, rij] of Object.entries(qr)) {
+        if (rij && (rij.hash === h || rij.token === t)) {
+          return { zaakcode: code, plek, tafel: plek, soort: rij.soort || 'tafel' };
+        }
       }
     }
     return null;
   }
 
-  /* ---------- de rekening van een tafel ----------
-     Er is er hooguit een open per tafel; die regel staat al in de
+  /* ---------- de rekening van een plek ----------
+     Er is er hooguit een open per plek; die regel staat al in de
      leveranciersroute en wordt hier NIET overgeschreven maar gevolgd. Bestaat
-     hij nog niet, dan opent de eerste gast hem. */
-  function rekeningVoorTafel(zaakcode, tafel, { open = true } = {}) {
+     hij nog niet, dan opent de eerste gast hem.
+
+     EEN KAMER IS GEEN TAFEL, en dat verschil is de grendel van deze hele
+     roomservice-laag: op een tafel mag altijd een rekening open, op een kamer
+     alleen zolang daar een GASTREKENING (folio) op staat. Een kamer-QR die
+     iemand op de gang fotografeert is dus niets waard zodra de gast uitcheckt
+     -- en een bestelling kan nooit landen op een kamer die leegstaat. Dezelfde
+     regel als de betaalwijze 'kamer' in horeca/betalen.js al hanteerde; hij
+     staat nu ook voor de deur ervoor. */
+  function rekeningVoorPlek(zaakcode, soort, naam, { open = true, folioVan = null } = {}) {
     const h = H(zaakcode);
-    const bestaand = Object.values(h.rekeningen)
-      .find(r => r.status === 'open' && r.kanaal === 'tafel' && r.tafel === tafel);
+    const kanaal = soort === 'kamer' ? 'roomservice' : 'tafel';
+    /* DE FOLIO-GRENDEL GELDT VOOR DE PLEK EN NIET ALLEEN VOOR HET OPENEN. Dit
+       stond eerst onder de zoekactie, en dat was een gat: na het uitchecken kan
+       de roomservice-rekening nog OPEN staan (er stond geld op), en dan gaf
+       deze functie hem gewoon terug -- waarna de volgende die de kamer-QR
+       scant, op de rekening van de vorige gast landt. Geen open gastrekening,
+       geen toegang tot die kamer, punt. Een toets houdt dat vast. */
+    if (soort === 'kamer' && folioVan && !folioVan(zaakcode, naam)) {
+      return { status: 409, code: 'geen-verblijf',
+        error: 'Er staat geen open gastrekening op kamer ' + naam + '. Roomservice loopt via de receptie.' };
+    }
+    const bestaand = Object.values(h.rekeningen).find(r => r.status === 'open' && r.kanaal === kanaal
+      && (soort === 'kamer' ? r.kamer === naam : r.tafel === naam));
     if (bestaand) return bestaand;
     if (!open) return null;
-    const r = { id: id(5), kanaal: 'tafel', tafel, naam: null, gasten: 1,
+    if (soort === 'kamer' && !folioVan) {
+      return { status: 409, code: 'geen-verblijf',
+        error: 'Er staat geen open gastrekening op kamer ' + naam + '. Roomservice loopt via de receptie.' };
+    }
+    const r = { id: id(5), kanaal, tafel: soort === 'kamer' ? null : naam, naam: null, gasten: 1,
       status: 'open', regels: [], kortingen: [], betalingen: [], fooiCenten: 0,
-      gastId: null, kamer: null, deelnemers: [], audit: [],
+      gastId: null, kamer: soort === 'kamer' ? naam : null, deelnemers: [], audit: [],
       geopendAt: nu(), door: 'gast', at: nu(), viaGast: true };
     h.rekeningen[r.id] = r;
     save();
     return r;
   }
+  // de oude naam blijft: bestaande aanroepers vragen om een tafel
+  const rekeningVoorTafel = (zaakcode, tafel, opties) => rekeningVoorPlek(zaakcode, 'tafel', tafel, opties);
 
   /* ---------- aanschuiven ----------
      Een deelnemer krijgt een nummer (dat is het `gastNr` dat de bestaande
      rekening al kent, dus de splitlaag per persoon werkt meteen) en een eigen
      sleutel. De sleutel gaat een keer over de lijn en wordt gehasht bewaard. */
-  function schuifAan(zaakcode, tafel, { naam, codenaam, lid, leeftijd, leeftijdGeverifieerd }) {
-    const r = rekeningVoorTafel(zaakcode, tafel);
+  function schuifAan(zaakcode, plek, { naam, codenaam, lid, leeftijd, leeftijdGeverifieerd, soort, folioVan }) {
+    const r = rekeningVoorPlek(zaakcode, soort || 'tafel', plek, { folioVan });
+    if (r.error) return r;   // een kamer zonder open gastrekening: geen sessie
     if (!Array.isArray(r.deelnemers)) r.deelnemers = [];
     if (r.deelnemers.length >= 40) return { status: 409, error: 'Er zitten al veertig mensen op deze rekening.' };
     const sleutel = crypto.randomBytes(16).toString('hex');
@@ -124,5 +163,6 @@ module.exports = ({ db, save, crypto, schoon, horeca }) => {
     return null;
   }
 
-  return { tafelToken, zaakBijToken, rekeningVoorTafel, schuifAan, herken, afdruk };
+  return { SOORTEN, plekToken, tafelToken, zaakBijToken,
+    rekeningVoorPlek, rekeningVoorTafel, schuifAan, herken, afdruk };
 };

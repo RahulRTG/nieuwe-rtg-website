@@ -15,6 +15,9 @@
 module.exports = (kern) => {
   const { app, schoon, findSupplier, beleid, sessie, orderlaag, gastAuth, stuur,
     tooManyTries, noteFailedTry } = kern;
+  /* Het doorgeefluik naar de hotellaag komt uit routes/gast.js en leest de
+     ECHTE kern op het moment van aanroepen; de folio-laag wordt later gemount. */
+  const { folioVan } = kern;
 
   /* De rem op het raden van een QR-token. `tooManyTries` is GEEN middleware
      maar een helper die zelf antwoordt en true teruggeeft -- hem als
@@ -53,12 +56,21 @@ module.exports = (kern) => {
   app.post('/api/gast/tafel', (req, res) => {
     if (geremd(req, res, 'qr')) return;
     const plek = sessie.zaakBijToken((req.body || {}).token);
-    if (!plek) { noteFailedTry(req.gastBucket); return res.status(404).json({ error: 'Deze code hoort niet bij een tafel die wij kennen.', code: 'qr-onbekend' }); }
+    if (!plek) { noteFailedTry(req.gastBucket); return res.status(404).json({ error: 'Deze code hoort niet bij een tafel of kamer die wij kennen.', code: 'qr-onbekend' }); }
     const s = findSupplier(plek.zaakcode);
-    const bestaand = sessie.rekeningVoorTafel(plek.zaakcode, plek.tafel, { open: false });
+    /* Bij een KAMER wordt hier al gekeken of er een gastrekening op staat, dus
+       voordat iemand een kaart doorbladert. Wie is uitgecheckt hoort dat meteen
+       te lezen in plaats van pas bij het bestellen. */
+    if (plek.soort === 'kamer' && !folioVan(plek.zaakcode, plek.plek)) {
+      return res.status(409).json({ error: 'Er staat geen open gastrekening op kamer ' + plek.plek +
+        '. Roomservice loopt via de receptie.', code: 'geen-verblijf', kamer: plek.plek });
+    }
+    const bestaand = sessie.rekeningVoorPlek(plek.zaakcode, plek.soort, plek.plek, { open: false });
     res.json({ ok: true, zaak: { code: plek.zaakcode, naam: s ? s.name : plek.zaakcode, plaats: s ? s.city : null },
-      tafel: plek.tafel, beleid: beleid.beleidVan(plek.zaakcode),
-      lopendeRekening: bestaand ? { gasten: (bestaand.deelnemers || []).length, regels: bestaand.regels.length } : null,
+      soort: plek.soort, plek: plek.plek, tafel: plek.soort === 'tafel' ? plek.plek : null,
+      kamer: plek.soort === 'kamer' ? plek.plek : null,
+      beleid: beleid.beleidVan(plek.zaakcode),
+      lopendeRekening: bestaand && !bestaand.error ? { gasten: (bestaand.deelnemers || []).length, regels: bestaand.regels.length } : null,
       kaart: kaartVanZaak(plek.zaakcode) });
   });
 
@@ -71,7 +83,8 @@ module.exports = (kern) => {
     const b = req.body || {};
     const plek = sessie.zaakBijToken(b.token);
     if (!plek) { noteFailedTry(req.gastBucket); return res.status(404).json({ error: 'Deze code hoort niet bij een tafel die wij kennen.', code: 'qr-onbekend' }); }
-    const uit = sessie.schuifAan(plek.zaakcode, plek.tafel, {
+    const uit = sessie.schuifAan(plek.zaakcode, plek.plek, {
+      soort: plek.soort, folioVan,
       naam: b.naam, codenaam: b.codenaam, lid: !!b.lid,
       /* De leeftijd telt alleen als hij GEVERIFIEERD is. Een gast die zelf
          invult dat hij 19 is, opent hier geen alcoholdeur: beleid.js kijkt naar
@@ -82,7 +95,9 @@ module.exports = (kern) => {
       naar: 'deelnemer ' + uit.deelnemer.nr });
     kern.save();
     res.json({ ok: true, sleutel: uit.sleutel, ik: { nr: uit.deelnemer.nr, handle: uit.deelnemer.handle },
-      zaak: plek.zaakcode, tafel: plek.tafel,
+      zaak: plek.zaakcode, soort: plek.soort, plek: plek.plek,
+      tafel: plek.soort === 'tafel' ? plek.plek : null,
+      kamer: plek.soort === 'kamer' ? plek.plek : null,
       rekening: orderlaag.gastBeeld(uit.rekening, uit.deelnemer),
       let: 'Bewaar deze sessie op je telefoon; hij vervalt zodra de rekening is voldaan.' });
   });

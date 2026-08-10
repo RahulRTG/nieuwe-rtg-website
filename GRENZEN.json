@@ -187,6 +187,7 @@
       "findSupplier",
       "haversine",
       "horecaFolioBoek",
+      "horecaFolioVan",
       "logActivity",
       "noteFailedTry",
       "sseToSupplier",

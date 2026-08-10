@@ -48,8 +48,13 @@ module.exports = (kern) => {
     save();
     const saldo = H(req.supplier.code).bonnen[band.bonCode].saldo;
     logActivity(req.supplier.code, req.actor, 'waardeerde band ' + nummer + ' op met ' + (bedrag / 100).toFixed(2));
-    res.json({ ok: true, band: { nummer, saldo, opgewaardeerd: band.opgewaardeerd },
-      let: 'Op een band staat een nummer en een saldo, geen naam.' });
+    /* De BONCODE gaat mee terug. Die is het bewijs-in-handen waarmee een gast
+       op zijn telefoon zijn saldo kan zien en kan afrekenen (routes/gast/club.js):
+       het bandnummer staat groot op de band en is te raden, de boncode niet.
+       Druk hem als QR op de band; toon hem verder nergens. */
+    res.json({ ok: true, band: { nummer, saldo, opgewaardeerd: band.opgewaardeerd, bonCode: band.bonCode },
+      pad: '/apps/gast.html?band=' + band.bonCode,
+      let: 'Op een band staat een nummer en een saldo, geen naam. De boncode is het bewijs-in-handen: zet hem als QR op de band.' });
   });
 
   app.post('/api/supplier/horeca/club/band/betaal', supplierAuth, (req, res) => {

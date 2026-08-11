@@ -168,6 +168,11 @@ module.exports = function hangRoutesOp(kern) {
      omdat een van 14 kB weer over dezelfde grens gaat die dit hele werk in gang
      zette. */
   require('./aanbouw')(kern, grens);
+  /* De spelwerelden (VERHAAL.md stap 3): dezelfde schermen op een eigen datavak,
+     zodat je de echte software kunt leren zonder dat er een echt dossier
+     ontstaat. Uit tenzij RTG_SPELWERELD=1; zie ./spelwereld.js. Hij hangt hier
+     en niet in ./aanbouw.js omdat die op 8,8 kB zit. */
+  require('./spelwereld')(kern, grens);
   console.log('[start] domeinen actief:', gekozenDomeinen.join(', '));
 
   return gekozenDomeinen;

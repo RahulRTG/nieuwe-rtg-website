@@ -384,3 +384,72 @@ Toets: `test/speldienst.test.js` (zestien). **Tien mutaties, tien raak.** Twee
 splitsingen op de 10 kB-grens, allebei op een naad die het nieuwe materiaal
 blootlegde: `dienst-beeld.js` (wat een speler ziet, tegenover wat hij doet) en
 `maand-vestiging.js` (de maand van een ZAAK, tegenover die van de wereld).
+
+---
+
+## 9. Stap 3 staat: de spelwereld
+
+`server/kern/spelwereld.js` (het vak en de doorkijk), `spelwereld-mount.js` (de
+routes), `server/opzet/spelwereld.js` (de bedrading) en
+`public/shared/spelwereld.js` (het basisadres van een pagina).
+
+**Drie mechanismen, alle drie al in huis.** Het venster van
+`kern/command/zandbak.js` (`{ data: vak.data }`), de gooiende doorkijk van
+`opzet/domeingrens.js`, en `web.Router()` als `app`. Er is niets uitgevonden.
+
+**De echte `kern/concern`-motor draait op een wereldvak**, en een verzoek door de
+mount ziet de entiteit van *die* wereld: `p1` telt er één, `p2` nul, productie
+kreeg er geen collectie bij.
+
+### De vier besluiten
+
+- **De URL is de waarheid.** Het alternatief was een sessievlag, en dat is
+  precies wat grens 2 verbiedt: met een vlag bestaat er een toestand die verkeerd
+  kan staan, en dan landt een spelhandeling in productie. `/spelwereld/p1/api/…`
+  is een ander adres dan `/api/…`; de server hoeft nooit te raden.
+- **Een `db` verwisselen is niet genoeg.** De kern draagt al gebouwde functies
+  die de productiedatabase in hun closure hebben. Wie alleen `db` vervangt,
+  krijgt een wereld waarin het *scherm* naar het vak kijkt en de *motor* naar
+  productie schrijft — de gevaarlijkste helft van een grens die er is. Een wereld
+  bouwt zijn motoren dus opnieuw op het venster.
+- **De kanalen naar buiten zijn afwezig, niet uitgeschakeld.** Een spelhandeling
+  laat geen echte bel rinkelen. Wie er een aanraakt krijgt een fout met de naam
+  erin — undefined is de gevaarlijkste uitkomst.
+- **Uit tenzij `RTG_SPELWERELD=1`.** Een oefenomgeving die in productie zomaar
+  meedraait is een oppervlak dat niemand heeft gevraagd.
+
+### Wat de grens meteen vond
+
+`routes/member/werk.js` — vacatures en solliciteren, de keten van hoofdstuk 1 —
+was de eerste kandidaat en knelde. Terecht: zijn `chatStuur` stuurt live
+seintjes naar echte schermen en `meldWerkgever` een echte pushmelding.
+
+De oplossing is niet die kanalen doorlaten maar ze **wereld-lokaal** maken: een
+melding in een wereld blijft in de wereld. Dat kan pas als `commWerk` op een
+venster te bouwen is, en die hangt aan de comm-kern die zelf aan productie
+vastzit. Dat is de volgende route. Half aanhangen zou een wereld opleveren waarin
+sommige knoppen stil niets doen — precies wat de gooiende grens moest voorkomen.
+Het staat als toets vast, zodat het een besluit blijft en geen vergetelheid.
+
+### En een fout die er al stond
+
+Een toets van deze laag — *twee werelden delen niets met elkaar* — zakte, en de
+oorzaak lag niet hier. **`seed()` gaf een nieuw topobject maar deelde negentien
+collecties eronder**, want `maakVolledigeSeed()` bouwt met `Object.assign({},
+require('./leden'), …)` en een module-export is gecached.
+
+Dat brak de belofte in de kop van `kern/command/zandbak.js` — *"er schrijft niets
+terug, ook door de bouw"*. Twee zandbakken deelden altijd hun gegevens, en op een
+proces dat vers uit de zaaiset is opgestart (`db.data = seed()`) schreef een
+zandbak in de productiecollecties: een zaak aanmaken zette hem in de
+ledencatalogus, `10 → 11`.
+
+Gerepareerd bij de oorzaak, in `seed()` zelf: één `structuredClone`. Een zaaiset
+die je niet twee keer kunt vragen is geen zaaiset, en drie kopieerregels op drie
+plekken lopen uit elkaar.
+
+Toets: `test/spelwereld.test.js` (achtentwintig). **Dertien mutaties, dertien
+raak** — twee daarvan pas na een herschrijving: de motorentoets riep
+`motorenVoor` rechtstreeks aan en bleef dus groen toen die stap uit `bouw`
+verdween, en de handler beantwoordde de vraag *bestaat deze wereld* twee keer, wat
+een mutatie zichtbaar maakte door niets te veranderen.

@@ -143,6 +143,33 @@ anders dan een ouder, een pleegouder iets anders dan een mentor, en die
 toegang eindigt vanzelf (het schooljaar loopt af, het mentorschap stopt).
 Toestemming is altijd zichtbaar en altijd intrekbaar.
 
+**Twee besluiten van Rahul (11 augustus 2026), die fase 2 sturen.**
+
+**Een band ontstaat alleen als BEIDE kanten hem bevestigen.** Het foundation-huis
+draait op een gezinscode met een profieltoken, de levenslijn op de RTG-lidsleutel;
+die twee worden nooit stilzwijgend aan elkaar geknoopt. Wie de koppeling aanvraagt
+doet dat aan een kant, en pas na bevestiging aan de andere kant bestaat de band.
+
+Dat is trager dan "wie de gezinscode heeft, mag koppelen", en dat is de bedoeling.
+Aan de andere kant van zo'n band kan een kind staan, en een code is geen instemming:
+een oppas, een ex-partner of een familielid heeft die code ooit gekregen. Bezit van
+een sleutel bewijst dat iemand een keer binnen mocht, niet dat hij er nu bij hoort.
+
+**Van een minderjarige ziet een ouder standaard NIETS; het kind deelt per stuk.**
+Dit volgt uit par. 2.1 (een kind is geen profiel) en het staat al in de code: het
+gevoelsdagboek is nu bewust voor niemand anders open, en talenten en interesses
+staan op vertrouwelijk met de poort op alleen-het-lid.
+
+Dit is niet wat ouders verwachten, dus het vraagt uitleg in het scherm zelf --
+geen instelling die je moet vinden, maar een zin die zegt wat er gebeurt en waarom.
+De omgekeerde keuze (alles zien tot een leeftijdsgrens) is makkelijker uit te
+leggen en daarom verleidelijk, maar hij schakelt op EEN dag om terwijl een kind
+geleidelijk groeit, en tot die dag is er geen enkele eigen ruimte.
+
+Wat hier NIET onder valt: veiligheid. Een ouder hoort te kunnen zien dat er iets
+mis is zonder te lezen wat er staat. Waar dat botst met deze regel, wint de
+veiligheid van het kind -- en dan is het een signaal, geen inzage.
+
 ### 2.9 Geen verslavende patronen, en hier strenger dan elders
 
 De huisregel geldt platformbreed; op kinderen geldt hij zonder uitzondering.
@@ -176,7 +203,7 @@ laag mag: RTG Geld voert uit binnen regels; RTFoundation opent alleen.
 | Fase | Wat | Status |
 |---|---|---|
 | 1 | de levenslijn als bron (fasen, overgangen, wat er speelt), de levensgraaf uitgebreid met talenten/interesses/bijdrage, en het levens-command-center in de vorm van de geldcockpit | volgende |
-| 2 | de levenspas met delen per stuk en per ontvanger, met vervaldatum; rechten per relatie in de familiegraaf | -- |
+| 2 | rechten per relatie in de familiegraaf (koppeling met bevestiging aan beide kanten, kind deelt per stuk -- zie par. 2.8) en de levenspas met delen per ontvanger en een vervaldatum | volgende |
 | 3 | de mentor over de levenslijn (par. 1.4) en de gemeenschapsmotor | -- |
 | 4 | de talentenkaart (par. 2.3), de simulator en de tweeling (par. 2.7) | -- |
 | 5 | het levensarchief, de dromenlade (par. 2.5), de nalatenschap in brede zin | -- |

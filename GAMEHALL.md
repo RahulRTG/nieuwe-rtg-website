@@ -1528,7 +1528,49 @@ elke zaak erbij moet met alle andere worden afgestemd. Drie besluiten:
 > `handwerk`**: 1.429.069 tegen 1.263.601. `horeca-focus` zakte van 91% naar 69% van
 > zijn duels. De draad die sinds de onderzoekslaag open stond, is daarmee dicht.
 
-**Wat er van fase B nog niet in zit.** AI-concurrenten die leren.
+### AI-concurrenten — een tegenspeler die bijstuurt
+
+**Hij is een speler en geen bot.** Hij krijgt hetzelfde scherm als jij (`zicht`)
+en handelt door dezelfde `ACTIES` — dezelfde wet als bij de AI-manager, en om
+dezelfde reden: een tegenstander die meer ziet dan jij is geen tegenstander maar
+een handicap, niet te verslaan met beter spelen maar alleen met meer geluk. Hij
+heeft een kas, vestigingen, een hoofdkantoor en een plek op de eindstand, allemaal
+langs de gewone weg.
+
+**Wat "leren" hier betekent is bewust smal.** Hij traint geen model en onthoudt
+niets tussen partijen; hij kijkt naar zijn eigen cijfers en verzet zijn koers als
+die tegenvallen. Drie koersen: **groeien** (kavels innemen zolang ze er zijn),
+**verbeteren** (onderzoeken en uitrollen zodra de kaart vol is of het resultaat
+tegenvalt) en **sparen** (kas aanhouden als het krap is of er een recessie
+aankomt — de krant is publiek, daar mag hij op vooruitlopen). Alle drempels staan
+op zijn eigen scherm; er zit niets bij dat een mens niet ook ziet.
+
+**Hij speelt niet perfect**, en dat is een besluit: een tegenstander die alles
+optimaal doet is geen tegenstander maar een puzzel met een oplossing. Hij bouwt
+alleen in zijn eigen twee buurten, hij mist kansen, en hij laat dingen liggen.
+
+> **Twee manieren waarop hij zichzelf klemzette.** Eerst ging hij bij een krappe
+> kas sparen; door te sparen bouwde hij niet; door niet te bouwen verdiende hij
+> niets; en dus bleef zijn kas krap. In één campagne stond hij na 36 maanden op
+> **één zaak en een negatieve rekening** — niet omdat hij verkeerd koos, maar
+> omdat hij nooit meer aan een tweede keuze toekwam. Sindsdien geldt sparen alleen
+> als je iets te beschermen hebt: met minder dan twee zaken is het risico niet dat
+> je omvalt maar dat je nooit begint.
+>
+> Daarna bleek de oorzaak dieper te liggen: hij bouwde de eerste maat die hij kon
+> betalen in plaats van **op maat**. Precies de correctie die `magnaat-strateeg.js`
+> bij zijn profielen al had gemaakt — wie een zaak van veertig stoelen op een plek
+> voor tien zet, meet niet zijn stijl maar zijn rekenwerk. Met op maat bouwen
+> haalt hij over zes campagnes gemiddeld 2,78 miljoen en tien tot dertien zaken.
+>
+> En het uitrollen van onderzoek hing aan zijn koers: kennis die af kwam terwijl
+> hij net weer aan het groeien was, bleef liggen — na zestig maanden `meten` af en
+> achttien zaken zonder één uitrol. Uitrollen is geen strategische keuze maar
+> uitvoering.
+
+**Hiermee is fase B compleet.** Contracten, veilingen, belangen, banken,
+verzekeringen, onderzoek, AI-managers, economische cycli, wereldnieuws, de beurs,
+overnames, het concern en AI-concurrenten.
 
 **Fase C — de permanente wereld.** Living World, vakantiemodus, overdracht,
 legacy, Magnaat Daily,

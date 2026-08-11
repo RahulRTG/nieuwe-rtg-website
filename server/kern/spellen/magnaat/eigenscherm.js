@@ -97,6 +97,10 @@ module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid, capacite
       foundation: { lokaal: rond(st.foundation.lokaal), centraal: rond(st.foundation.centraal),
         gedaan: st.foundation.gedaan.map(g => (PROJECTEN.find(p => p.id === g.id) || {}).naam).filter(Boolean) },
       sinds: st.laatste[mij] || null,
+      /* JE EIGEN VORIGE MAAND, met de regels erbij. Hij stond er als `sinds`
+         alleen voor het verhaal; de AI-concurrenten lezen hem als CIJFERS -- en
+         een mens die zijn overzicht openslaat ziet precies hetzelfde. */
+      laatste: st.laatste[mij] || null,
       eindstand: st.klaar ? eindstand(potje) : null
     };
   }

@@ -91,6 +91,18 @@ module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid, veilingb
 
   /* WAT EEN SPELER VAN ZIJN EIGEN WERELD ZIET staat in ./eigenscherm.js -- een
      lijst die met elke laag meegroeit, terwijl de GRENS hierboven af is. */
+  /* TWEE INGANGEN NAAR HETZELFDE SCHERM, en dat verschil is nodig geworden met
+     de AI-concurrenten. `zicht` rekent eerst de klok bij -- dat is wat een
+     mens verwacht als hij zijn scherm opent. `zichtRuw` doet dat NIET, en die
+     is voor wie AL IN de maandloop staat: de AI-spelers zetten binnen
+     `bijrekenen`, en een scherm dat daar opnieuw `bijrekenen` aanroept loopt
+     zichzelf in. Het scherm zelf is in beide gevallen precies hetzelfde -- er
+     is geen tweede beeld met andere gegevens, want dan zou een AI iets anders
+     zien dan een mens. */
+  const zichtRuw = require('./eigenscherm')({ K, codenaamVan, rond, bijrekenen: () => {},
+    foundationArbeid, capaciteit, personeelNodig, waarde, prijsVan, eigenDeel, inkoopbeeld,
+    vergeven, mijnContracten, veilingbeeld, belangbeeld, bankbeeld, kredietprofiel,
+    verzekerbeeld, rndbeeld, beheerbeeld, beursbeeld, overnamebeeld, C, N, CONCERN, eindstand });
   const zicht = require('./eigenscherm')({ K, codenaamVan, rond, bijrekenen, foundationArbeid,
     capaciteit, personeelNodig, waarde, prijsVan, eigenDeel, inkoopbeeld, vergeven, mijnContracten,
     veilingbeeld, belangbeeld, bankbeeld, kredietprofiel, verzekerbeeld, rndbeeld,
@@ -106,5 +118,5 @@ module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid, veilingb
       foundation: st.foundation.gedaan.length };
   }
 
-  return { zicht, publiek, eindstand };
+  return { zicht, zichtRuw, publiek, eindstand };
 };

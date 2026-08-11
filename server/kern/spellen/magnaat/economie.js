@@ -46,23 +46,9 @@ module.exports = (ctx) => {
   const { save, codenaamVan, nudge } = ctx;
 
   /* ---------- opzetten ---------- */
-  function init(potje) {
-    const v = potje.variant || {};
-    const stadsleutel = stadSleutel(v.stad) || STEDENLIJST[0];
-    const duur = DUUR[v.duur] || DUUR.quick;
-    const st = {
-      stad: stadsleutel, duur, maandMs: MAAND_MS[v.duur] || MAAND_MS.quick,
-      maand: 0, begonnen: Date.now(), gerekendTot: Date.now(),
-      geld: {}, vestigingen: {}, kavelBezet: {}, foundation: F.nieuw(),
-      contracten: [], contractTeller: 0, veilingen: [], veilingTeller: 0, kavelRecht: {},
-      deelnemingen: [], deelnemingTeller: 0, leningen: [], leningTeller: 0,
-      resultaatlog: {}, betaalgemist: {}, polissen: [], polisTeller: 0,
-      onderzoek: [], onderzoekTeller: 0, beurs: [], beursTeller: 0, overnames: [], overnameTeller: 0,
-      laatste: {}, klaar: false
-    };
-    for (const h of potje.spelers) { st.geld[h] = START_GELD; st.vestigingen[h] = []; st.laatste[h] = null; }
-    potje.staat = st;
-  }
+  /* DE OPZET VAN EEN PARTIJ staat in ./opzet.js -- de lege wereld voordat er
+     iets gebeurd is. Die lijst groeit met elke laag mee; de klok hieronder niet. */
+  const init = require('./opzet')({ DUUR, MAAND_MS, START_GELD });
 
   /* HOE JE IETS TERUGVINDT IN DE STAAT staat in ./vinden.js: welk kavel, welke
      vestiging, van wie. Vier vragen die overal in deze map worden gesteld en
@@ -90,6 +76,14 @@ module.exports = (ctx) => {
          eis onder GAMEHALL.md 12.4. De koper draait de zaak vanaf de volgende
          maand; de opbrengst van de laatste maand is nog van de verkoper, en dat
          is de eerlijke kant van "je neemt hem over aan het eind van de maand". */
+      /* DE AI-SPELERS ZETTEN VOOR DE MAAND GEREKEND WORDT, want zo doet een mens
+         het ook: je verzet je beleid en dan draait de maand. Ze spelen door
+         dezelfde acties en op hetzelfde scherm (`zicht`) als iedereen -- zie
+         ./concurrent.js. */
+      for (const [h, ai] of Object.entries(st.ai || {})) {
+        if (!ai || !potje.spelers.includes(h)) continue;
+        aiZet.maandVoorAI(potje, h, ai, zichtRuw(potje, st, h));
+      }
       const verslag = eenMaand(potje);
       const geveild = L.hameren(potje);
       if (geveild.length) verslag.veilingen = geveild;
@@ -122,6 +116,12 @@ module.exports = (ctx) => {
   const ACTIES = Object.assign({}, basis.ACTIES, L.ACTIES);
   const VRIJE_ACTIES = basis.VRIJE_ACTIES.concat(L.VRIJE_ACTIES);
   const beheer = L.maakBeheer(ACTIES);
+  /* DE AI-CONCURRENTEN krijgen dezelfde tabel om dezelfde reden als de manager:
+     ze doen niets wat een speler niet ook kan. Ze staan HIER en niet in
+     ./lagen.js omdat ze de complete tabel nodig hebben, en die is pas hier
+     compleet -- zie de uitleg daar over de manager die met de halve tabel werd
+     gebouwd en stil misging. */
+  const aiZet = require('./concurrent-zet')({ ACTIES, kaart });
 
   const { eenMaand } = require('./maand')({ K, wieHeeft, ROOD_RENTE,
     verdeel: L.verdeel, bank: L.bankmaand, onthoud: L.onthoud, verzekering: L.verzekering,
@@ -130,7 +130,7 @@ module.exports = (ctx) => {
   /* WAT EEN SPELER ZIET en wat er aan het eind op tafel komt staat in
      ./weergave.js -- een eigen onderwerp (wie mag wat weten, en waarop wordt
      er afgerekend) dat los staat van de klok hierboven. */
-  const { zicht, publiek, eindstand } = require('./weergave')(Object.assign({
+  const { zicht, zichtRuw, publiek, eindstand } = require('./weergave')(Object.assign({
     K, codenaamVan, rond, bijrekenen,
     foundationArbeid: (st) => F.arbeidBonus(st.foundation) }, L.zichtdelen));
   function beeindig(potje) {

@@ -12,7 +12,7 @@
    hij dwingt de vraag "waar ligt hier de naad" op het moment dat het antwoord
    nog kort is. */
 const { SECTOREN } = require('./sectoren');
-const { KOSTENSTAND } = require('./prijsstand');
+const { KOSTENSTAND, prijsVan } = require('./prijsstand');
 const O = require('./onderzoek');
 
 const klem = (n, min, max) => Math.max(min, Math.min(max, n));
@@ -61,6 +61,53 @@ function personeelNodig(v, arbeid) {
   return Math.max(1, Math.ceil(v.omvang / (perMens(v) * (1 + (arbeid || 0)))));
 }
 
+/* VANAF WELKE MAAT EEN ZAAK ZICHZELF KAN DRAGEN, per sector uitgerekend.
+
+   DIT IS DE REPARATIE VAN EEN MAGISCH GETAL. In ./acties.js stond `Math.max(4,
+   ...)`: een vestiging is minstens vier eenheden groot. Dat las als EEN regel
+   en het waren er zeven, want een eenheid is per sector iets anders -- zie
+   ./sectoren.js, waar `eenheid` letterlijk stoelen, kamers of productielijnen
+   is. Vier stoelen kosten 23.612 en vier productielijnen 287.324, en dat is
+   meer dan het startkapitaal. `industrie` was daarmee niet een zwakke keuze
+   maar een DEUR DIE OP SLOT ZAT: in zesendertig maanden opende dat profiel geen
+   enkele zaak.
+
+   En de vloer deed precies het omgekeerde van zijn bedoeling. Waar een eenheid
+   goedkoop is (horeca, retail, vrije tijd) floort de economie zichzelf al: het
+   loon van de ene medewerker die je hoe dan ook moet hebben, is groter dan wat
+   een handvol eenheden opbrengt, dus draaien die zaken verlies tot ze groot
+   genoeg zijn. Daar hoefde de regel niets te doen. Waar een eenheid duur is
+   (hotel, kantoor, industrie) is EEN eenheid al winstgevend, en dwong de regel
+   je er vier te kopen.
+
+   Dus: de motor floort nog op een eenheid -- een zaak van nul bestaat niet --
+   en dit getal is wat een SPELER hoort te weten. Het staat op een plek omdat
+   het er drie had (de motor, de AI-concurrent en de profielen van de strateeg),
+   en drie kopieen van een regel lopen uit elkaar.
+
+   HIJ NEGEERT DE HUUR, en dat is met opzet: huur hangt aan het kavel en dit
+   getal is een eigenschap van de SECTOR. Het is dus een ondergrens op de
+   ondergrens, en dat is precies wat een speler eraan heeft. */
+function rendabelVanaf(sector, stand = 'midden') {
+  const s = SECTOREN[sector];
+  const k = KOSTENSTAND[stand] || 1;
+  /* Wat een eenheid per maand overhoudt, voor het loon van de eerste medewerker.
+
+     DE VASTE LASTEN STAAN ERIN EN VERANDEREN VANDAAG NIETS, en dat hoort hier
+     te staan in plaats van stil te zijn. Ze zijn per eenheid 3 tot 11 procent
+     van de brutomarge, en dat is nergens genoeg om een afronding te verzetten:
+     de uitkomst is voor alle zeven sectoren gelijk met en zonder deze term.
+     Geen enkele toets kan hem dus vangen -- dat is geprobeerd, de mutatie kwam
+     er langs. Hij blijft staan omdat hij bij een andere sectortabel wel bijt
+     (logistiek zit met 540 per voertuig al op 11%, en die 400 is er ooit
+     bewust in gezet om die sector hefboom te geven), en omdat een formule die
+     een echte kostenpost weglaat toevallig goed is in plaats van goed. Wie hier
+     komt sleutelen: dit is een van de plekken die op mensen leunt. */
+  const marge = s.perMaand * prijsVan(sector, stand) * (1 - s.inkoop) - s.vast * k * 1.35;
+  if (marge <= 0) return Math.ceil(s.perMedewerker / k) || 1;
+  return Math.max(1, Math.ceil(s.loon / marge));
+}
+
 /* WAT ER DEZE MAAND DAADWERKELIJK GELEVERD WORDT op de lopende contracten van
    deze vestiging. Staat hier en niet in ../economie.js omdat die het antwoord
    twee keer nodig heeft -- een keer om de afnemers te bedienen, een keer voor
@@ -90,4 +137,4 @@ function kwaliteit(v, verkocht, arbeid) {
   return klem(100 * ruimte * (0.55 + (v.onderhoud / 100) * 0.45) * O.factor(v, 'kwaliteit'), 0, 100);
 }
 
-module.exports = { capaciteit, personeelNodig, levering, kwaliteit, perMens };
+module.exports = { capaciteit, personeelNodig, rendabelVanaf, levering, kwaliteit, perMens };

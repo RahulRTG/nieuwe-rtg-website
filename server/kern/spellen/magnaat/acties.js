@@ -43,7 +43,15 @@ module.exports = ({ K, mijnVestiging, vrijKavel, rond }) => {
         return { status: 400, error: 'Dat kavel is er niet, is al bezet, of er rust een bouwrecht van een ander op.' };
       const sector = String(zet.sector || '');
       if (!SECTOREN[sector]) return { status: 400, error: 'Die sector bestaat niet.' };
-      const omvang = Math.max(4, Math.min(120, Math.floor(Number(zet.omvang) || 20)));
+      /* EEN EENHEID, en niet vier. Hier stond `Math.max(4, ...)`, en dat las als
+         EEN regel terwijl het er zeven waren: een eenheid is per sector iets
+         anders (./sectoren.js noemt ze stoelen, kamers, productielijnen), dus
+         vier eenheden zijn 23.612 bij horeca en 287.324 bij industrie -- meer
+         dan het startkapitaal, waarmee die sector vanaf zet een op slot zat.
+         Wat de vloer WILDE zeggen staat nu in `rendabelVanaf` (./maat.js), waar
+         het per sector wordt uitgerekend en waar een SPELER het kan lezen. De
+         motor houdt alleen tegen wat niet bestaat: een zaak van nul. */
+      const omvang = Math.max(1, Math.min(120, Math.floor(Number(zet.omvang) || 20)));
       const s = SECTOREN[sector];
       const kavel = k.kavel.get(kavelId);
       /* KOSTENSTAND ook op de BOUWSOM, en dat is de post die het langst is

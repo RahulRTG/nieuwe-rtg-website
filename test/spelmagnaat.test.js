@@ -594,3 +594,154 @@ test('je kunt niet openen wat je niet kunt betalen, en niet op andermans kavel',
   assert.match(m.spel.zet(p, 'anna', { actie: 'open', kavel: 'bestaat:niet', sector: 'horeca', omvang: 20 }).error, /er niet/);
   assert.match(m.spel.zet(p, 'boris', { actie: 'beleid', id: 'v1', prijs: 'hoog' }).error, /niet van jou/);
 });
+
+/* ====== DE MAAT VAN DE KLEINSTE ZAAK, en de deur die op slot zat ======
+
+   Hier stond `Math.max(4, ...)`: een vestiging is minstens vier eenheden groot.
+   Dat las als EEN regel en het waren er zeven, want `eenheid` is per sector iets
+   anders (./sectoren.js noemt ze stoelen, kamers, productielijnen). Vier stoelen
+   kosten 23.612 en vier productielijnen 287.324 -- meer dan het startkapitaal,
+   en dus kon niemand ooit een fabriek beginnen. In een campagne van zesendertig
+   maanden opende het productieprofiel geen ENKELE zaak.
+
+   Vier beweringen, alle vier terug te draaien. */
+
+test('elke sector is te openen vanuit het startkapitaal', () => {
+  /* DE BEWERING DIE HET GAT DICHTTREKT. Een sector die je vanaf zet een niet
+     kunt kiezen, is geen zwakke keuze maar een deur die op slot zit. */
+  const { rendabelVanaf } = require('../server/kern/spellen/magnaat/maat');
+  const { SECTOREN } = require('../server/kern/spellen/magnaat/sectoren');
+  const m = maakMagnaat();
+  const p = potjeMet(ECO);
+  m.spel.init(p);
+  const start = m.eco.START_GELD;
+  const zones = [...new Set(kaart('ijmuiden').kavels.map(k => k.zone))];
+  for (const sector of Object.keys(SECTOREN)) {
+    const omvang = rendabelVanaf(sector);
+    const som = omvang * SECTOREN[sector].bouw;
+    assert.ok(som <= start, sector + ' kost bij zijn kleinste rendabele maat ('
+      + omvang + ' ' + SECTOREN[sector].eenheid + ') ' + Math.round(som)
+      + ' en het startkapitaal is ' + start);
+    // en de motor neemt hem ook echt aan
+    const zone = zones.find(z => kaart('ijmuiden').zone.get(z).sectoren.includes(sector));
+    const vrij = kaart('ijmuiden').kavels.filter(k => k.zone === zone && !p.staat.kavelBezet[k.id])[0];
+    p.staat.geld.anna = start;
+    assert.equal(m.spel.zet(p, 'anna', { actie: 'open', kavel: vrij.id, sector, omvang }).status, 200, sector);
+  }
+});
+
+test('de kleinste maat verschilt per sector, want een eenheid verschilt per sector', () => {
+  const { rendabelVanaf } = require('../server/kern/spellen/magnaat/maat');
+  const maten = ['horeca', 'hotel', 'retail', 'logistiek', 'vrije-tijd', 'kantoor', 'industrie']
+    .map(s => rendabelVanaf(s));
+  assert.ok(new Set(maten).size > 2, 'een vast getal is zeven verschillende regels: ' + maten.join(','));
+  // een productielijn is duur en draagt zichzelf alleen; een kassaplek niet
+  assert.ok(rendabelVanaf('retail') > rendabelVanaf('industrie'));
+  assert.ok(rendabelVanaf('horeca') > rendabelVanaf('kantoor'));
+});
+
+test('de kleinste maat is een ONDERGRENS die de motor herkent', () => {
+  /* DE TOETS DIE DE SOM AAN DE WERKELIJKHEID BINDT. `rendabelVanaf` rekent met
+     de sectortabel: marge per eenheid tegen het loon van de ene medewerker die
+     je hoe dan ook moet hebben. Dat is een SOM, en een som kan naast de motor
+     gaan staan zonder dat iemand het merkt -- precies wat er met de oude vloer
+     gebeurde.
+
+     Dus wordt hij hier tegen de motor zelf gelegd: op een mediaan kavel van zijn
+     eigen buurten wordt gemeten vanaf welke maat een zaak zes maanden lang
+     gemiddeld winst draait. De formule negeert de huur en gaat uit van een volle
+     zaak, dus hij hoort er ONDER te zitten -- maar niet meer dan een factor
+     twee, anders is hij geen ondergrens meer maar een ander getal.
+
+     Zonder deze toets is het loon van een sector inwisselbaar voor dat van een
+     andere: de som blijft draaien en niets valt om. */
+  const { rendabelVanaf } = require('../server/kern/spellen/magnaat/maat');
+  const { SECTOREN } = require('../server/kern/spellen/magnaat/sectoren');
+  const { basisvraag } = require('../server/kern/spellen/magnaat/vraag');
+  const { maand, personeelNodig } = require('../server/kern/spellen/magnaat/stap');
+  const k = kaart('ijmuiden');
+  for (const sector of Object.keys(SECTOREN)) {
+    const s = SECTOREN[sector];
+    const eigen = k.kavels.filter(kv => k.zone.get(kv.zone).sectoren.includes(sector));
+    const kv = eigen.map(x => ({ x, i: basisvraag(k, x, sector, 6) }))
+      .sort((a, b) => b.i - a.i)[Math.floor(eigen.length / 2)].x;
+    let gemeten = null;
+    for (let omvang = 1; omvang <= 80 && gemeten === null; omvang++) {
+      const v = { sector, kavel: kv.id, omvang, prijs: 'midden', tech: [], reputatie: 50,
+        onderhoud: 100, marketing: 0, huur: Math.round(kv.eigenschappen.huur * omvang * 0.55) };
+      v.personeel = personeelNodig(v, 0);
+      v.onderhoudBudget = Math.round(omvang * s.vast * 0.35);
+      let som = 0;
+      for (let mnd = 1; mnd <= 6; mnd++)
+        som += maand(k, v, { maand: mnd, zoneDruk: 1, wereldFactor: 1, arbeid: 0 }).resultaat;
+      if (som > 0) gemeten = omvang;
+    }
+    const formule = rendabelVanaf(sector);
+    assert.ok(gemeten !== null, sector + ' draait op geen enkele maat winst');
+    assert.ok(formule <= gemeten, sector + ': de formule (' + formule
+      + ') hoort een ondergrens te zijn, de motor meet ' + gemeten);
+    assert.ok(gemeten <= formule * 2, sector + ': de formule (' + formule
+      + ') zit te ver onder wat de motor meet (' + gemeten + ')');
+
+    /* EN DE SOM ZELF, VAN TWEE KANTEN. De band hierboven is te ruim om de
+       onderdelen te binden: in vijf van de zeven sectoren ligt de vloer op EEN,
+       en dan verandert een verkeerd loon of een vergeten kostenpost het antwoord
+       niet -- de mutaties lieten dat ook zien, ze kwamen er gewoon langs.
+
+       Dit is de bewering waar het getal echt op staat: dit is de KLEINSTE maat
+       die zijn eerste loon draagt. Dus bij die maat is de loonpost gedekt, en
+       een eenheid kleiner niet. Die tweede helft is de helft die telt -- zonder
+       hem is elke te grote vloer ook goed. */
+    const dekking = (omvang) => {
+      const v = { sector, kavel: kv.id, omvang, prijs: 'midden', tech: [], reputatie: 50,
+        onderhoud: 100, marketing: 0, huur: 0, onderhoudBudget: 0 };
+      v.personeel = personeelNodig(v, 0);
+      const r = maand(k, v, { maand: 6, zoneDruk: 1, wereldFactor: 1, arbeid: 0 });
+      return (r.omzet - r.inkoop - r.vast) / Math.max(1, r.lonen);
+    };
+    assert.ok(dekking(formule) >= 1, sector + ' bij maat ' + formule
+      + ': de loonpost is maar voor ' + dekking(formule).toFixed(2) + ' gedekt');
+    /* Bij een vloer van EEN is er geen maat eronder, en dan is de vloer niet
+       door de som gezet maar doordat een halve zaak niet bestaat. */
+    if (formule > 1) assert.ok(dekking(formule - 1) < 1, sector + ' zou bij maat '
+      + (formule - 1) + ' zijn loon al dragen (' + dekking(formule - 1).toFixed(2)
+      + '), dus de vloer ligt te hoog');
+  }
+});
+
+test('bij een hogere prijsstand mag een zaak kleiner zijn', () => {
+  /* Meer marge per eenheid, dus minder eenheden om dezelfde ene medewerker te
+     dragen. Draai de prijsstand uit de som en deze toets valt om. */
+  const { rendabelVanaf } = require('../server/kern/spellen/magnaat/maat');
+  for (const sector of ['horeca', 'retail', 'vrije-tijd'])
+    assert.ok(rendabelVanaf(sector, 'hoog') < rendabelVanaf(sector, 'laag'),
+      sector + ': ' + rendabelVanaf(sector, 'hoog') + ' tegen ' + rendabelVanaf(sector, 'laag'));
+});
+
+test('de motor houdt alleen tegen wat niet bestaat: een zaak van nul', () => {
+  const m = maakMagnaat();
+  const p = potjeMet(ECO);
+  m.spel.init(p);
+  p.staat.geld.anna = 400000;
+  const kavels = kaart('ijmuiden').kavels.filter(k => k.zone === 'terrein');
+  assert.equal(m.spel.zet(p, 'anna', { actie: 'open', kavel: kavels[0].id, sector: 'kantoor', omvang: 1 }).status, 200,
+    'een kantoor van EEN werkplek mag; onder de oude vloer werden dat er vier');
+  assert.equal(p.staat.vestigingen.anna[0].omvang, 1);
+  /* En de klem zelf: een halve of negatieve maat wordt EEN en niet vier. (Een
+     ONTBREKENDE maat is iets anders en valt terug op twintig; dat is de
+     standaard van de actie en geen vloer.) */
+  m.spel.zet(p, 'anna', { actie: 'open', kavel: kavels[1].id, sector: 'kantoor', omvang: 0.5 });
+  assert.equal(p.staat.vestigingen.anna[1].omvang, 1);
+  m.spel.zet(p, 'anna', { actie: 'open', kavel: kavels[2].id, sector: 'kantoor', omvang: -5 });
+  assert.equal(p.staat.vestigingen.anna[2].omvang, 1);
+});
+
+test('een productieprofiel bouwt nu wel een fabriek', () => {
+  /* De campagnekant van dezelfde bewering: het ging er niet om dat industrie een
+     zwakke sector was, maar dat hij niet te openen viel. */
+  const S = require('../scripts/magnaat-strateeg');
+  const r = S.veld(['fabriek', 'horeca'], 0, 24, 'w1');
+  const fab = r.stand.find(x => x.profiel === 'fabriek');
+  assert.ok(fab.vestigingen > 0, 'na 24 maanden staat er een fabriek');
+  assert.ok(fab.vermogen > 250000, 'en hij heeft er iets mee verdiend: ' + Math.round(fab.vermogen));
+});

@@ -1631,6 +1631,52 @@ klacht in `keur()`, en die klachten blijven staan tot ze verholpen zijn. De lat
 boven de meting leggen zodat hij groen oogt is precies wat een balansmeter
 waardeloos maakt.
 
+#### 12.9.2 De vloer die zeven regels was, en de cast die drie sectoren miste
+
+Twee reparaties op de bevindingen hierboven, allebei bij de oorzaak.
+
+**De cast speelde vier van de zeven sectoren.** Kantoor, industrie en vrije tijd
+kwamen in geen enkel profiel voor, en dus in geen enkele meting. Dat is geen
+omissie maar een meetfout: een balansmeting die drie sectoren nooit aanraakt,
+meet de balans van de *cast*. Er staan nu drie kale profielen bij —
+`kantoorwijk`, `fabriek` en `uitgaan` — en meteen bleek hoe duur het was:
+**`kantoorwijk` wint met 34,9x rendement waar `mobility`, de stijl die 99% van
+alles won, op 15,4x stond.** Mobility was nooit de dominante strategie; het was
+de sterkste van de vier die meededen.
+
+**En de minimummaat was één regel in de vorm van zeven.** `acties.js` trok elke
+vestiging op naar minstens vier eenheden. Maar `eenheid` is per sector iets
+anders — `sectoren.js` noemt ze letterlijk stoelen, kamers, productielijnen — dus
+vier eenheden zijn €23.612 bij horeca en €287.324 bij industrie, tegen een
+startkapitaal van €250.000.
+
+De vloer deed daarmee precies het omgekeerde van zijn bedoeling:
+
+| | wat de vloer zou moeten doen | wat hij deed |
+|---|---|---|
+| goedkope eenheid (horeca, retail, vrije tijd) | een te kleine zaak tegenhouden | niets — de economie floort zichzelf al, want het loon van de ene medewerker die je hoe dan ook moet hebben is groter dan wat een handvol eenheden opbrengt |
+| dure eenheid (hotel, kantoor, industrie) | niets — één eenheid is daar al een zaak | je dwingen er vier te kopen, en bij industrie de deur op slot zetten |
+
+Nu houdt de motor alleen tegen wat niet bestaat (een zaak van nul), en staat wat
+de vloer *wilde* zeggen in `rendabelVanaf` (`maat.js`): de kleinste maat die zijn
+eerste loon draagt, per sector uitgerekend, op één plek. Hij had er drie — de
+motor, de AI-concurrent en de profielen van de strateeg.
+
+**Wat de reparatie deed**, gemeten met dezelfde sectorproef:
+
+| | vóór | ná |
+|---|---|---|
+| spreiding beste/slechtste sector | **47x** | **9x** |
+| industrie over een campagne | €0,25M, **0 zaken** | €8,5M, 19,5 zaken |
+| aantal sectoren dat een profiel speelt | 4 van 7 | 7 van 7 |
+
+**Eén mutatie kwam er langs, en dat is een bevinding en geen slordigheid.** De
+vaste lasten in `rendabelVanaf` veranderen bij de huidige sectortabel geen
+enkele uitkomst: ze zijn per eenheid 3 tot 11% van de brutomarge, nooit genoeg
+om een afronding te verzetten. Ze blijven staan omdat ze bij een andere tabel
+wel bijten, en het staat erbij in de code — dit is een van de plekken die op
+mensen leunt.
+
 **Fase C — de permanente wereld.** Living World, vakantiemodus, overdracht,
 legacy, Magnaat Daily,
 lokale governance, de levende kaart.

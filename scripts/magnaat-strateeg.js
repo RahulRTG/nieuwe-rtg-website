@@ -36,6 +36,7 @@ const { kaart } = require('../server/kern/spellen/magnaat/kaart');
 const { SECTOREN } = require('../server/kern/spellen/magnaat/sectoren');
 const { VRAAGFACTOR, KOSTENSTAND } = require('../server/kern/spellen/magnaat/prijsstand');
 const { basisvraag, drukFactor } = require('../server/kern/spellen/magnaat/vraag');
+const { rendabelVanaf } = require('../server/kern/spellen/magnaat/maat');
 const { MARKTPRIJS } = require('../server/kern/spellen/magnaat/handel');
 const ONDERZOEK = require('../server/kern/spellen/magnaat/onderzoek');
 
@@ -53,15 +54,22 @@ const maakMagnaat = () => require('../server/kern/spellen/magnaat/index')({
    Dezelfde regel voor iedereen; het profiel gaat over WAT en WAAR, niet over
    rekenen. */
 const BUFFER = 40000;
-/* De kleinste zaak die het openen waard is, in eenheden. Bewust een ABSOLUUT
-   getal en niet een fractie van de ideale maat: met een fractie kon een dure
-   sector nooit beginnen. Logistiek heeft op een goed kavel dertig voertuigen
-   nodig -- 732.000 -- en met een drempel van 55% moest een speler dus 443.000
-   sparen voordat hij uberhaupt iets mocht openen. Startkapitaal is 250.000, dus
-   het mobility-profiel deed letterlijk NIETS en eindigde naast `niets doen` in
-   de uitslag. Kleiner beginnen dan de vraag is bovendien niet dom maar juist de
-   efficiente stand: je zit vol en laat vraag liggen voor een ander. */
-const KLEINSTE = 4;
+/* De kleinste zaak die het openen waard is. Bewust geen fractie van de ideale
+   maat: met een fractie kon een dure sector nooit beginnen. Logistiek heeft op
+   een goed kavel dertig voertuigen nodig -- 732.000 -- en met een drempel van
+   55% moest een speler dus 443.000 sparen voordat hij uberhaupt iets mocht
+   openen. Startkapitaal is 250.000, dus het mobility-profiel deed letterlijk
+   NIETS en eindigde naast `niets doen` in de uitslag. Kleiner beginnen dan de
+   vraag is bovendien niet dom maar juist de efficiente stand: je zit vol en
+   laat vraag liggen voor een ander.
+
+   HET WAS EEN VAST GETAL (vier) EN DAT WAS EEN FOUT VAN DEZELFDE SOORT als die
+   het hierboven repareert. Een eenheid is per sector iets anders -- vier
+   stoelen kosten 23.612 en vier productielijnen 287.324 -- dus vier is niet een
+   drempel maar zeven verschillende drempels, waarvan er een boven het
+   startkapitaal ligt. Nu komt hij uit de motor (../server/kern/spellen/magnaat/
+   maat.js), waar hij per sector wordt uitgerekend en op EEN plek staat. */
+const kleinste = (sector, stand) => rendabelVanaf(sector, stand);
 
 /* De profielen. Elk krijgt elke spelmaand de kans om te handelen; wat het doet
    is de STIJL. Ze zijn met opzet simpel -- een profiel dat zelf slim rekent zou
@@ -250,6 +258,35 @@ const PROFIELEN = {
       if (!s.mijn.length) return s.open('horeca');
       s.open('horeca');
     }
+  },
+
+  /* ---------- de drie sectoren die deze cast nooit speelde ----------
+     DE BLINDE VLEK DIE scripts/magnaat-lab.js VOND. Dit toernooi speelde vier
+     van de zeven sectoren: horeca, logistiek, retail en hotel. Kantoor,
+     industrie en vrije tijd kwamen in geen enkel profiel voor, en dus in geen
+     enkele meting.
+
+     Dat is geen omissie maar een meetfout, en van dezelfde soort als de vier
+     eerdere in dit bestand: een balansmeting die drie sectoren nooit aanraakt,
+     meet de balans van de CAST en niet van het spel. Het lab liet zien hoe duur
+     dat was -- de sectorproef zet kantoor op 11,7 miljoen terwijl `mobility`,
+     de stijl die 99% van alles won, op 4,3 staat. De cast verborg dus een
+     grotere scheefheid dan hij vond.
+
+     Ze zijn met opzet net zo kaal als `horeca` en `mobility`: doorbouwen in een
+     sector, verder niets. Een profiel dat er iets slims bij doet, meet dat
+     slimme ding. */
+  kantoorwijk: {
+    naam: 'zakelijke diensten', zones: ['centrum', 'terrein', 'station'],
+    doe(s) { s.open('kantoor'); }
+  },
+  fabriek: {
+    naam: 'productie', zones: ['terrein', 'haven', 'sluizen'],
+    doe(s) { s.open('industrie'); }
+  },
+  uitgaan: {
+    naam: 'vrije tijd', zones: ['boulevard'],
+    doe(s) { s.open('vrije-tijd'); }
   }
 };
 const NAMEN = Object.keys(PROFIELEN);
@@ -308,13 +345,23 @@ function gereedschap(m, potje, mij, profiel, offset) {
       const vraag = basisvraag(k, kavel, sector, st.maand) * sec.markt * drukFactor(buren + 1) * VRAAGFACTOR[stand];
       const opMaat = Math.max(1, Math.round(vraag / sec.perMaand));
       /* Bouw zo groot als de vraag, of zoveel als er na de buffer betaalbaar is.
-         Kleiner dan `KLEINSTE` bouwen we niet -- dan zijn de vaste lasten groter
+         Kleiner dan rendabel bouwen we niet -- dan zijn de vaste lasten groter
          dan de zaak. */
       // de prijsstand zit OOK in de bouwsom (../server/kern/spellen/magnaat/acties.js);
       // hem hier vergeten liet een goedkope speler veel kleiner bouwen dan hij kon
       const betaalbaar = Math.floor((st.geld[mij] - BUFFER) / (sec.bouw * KOSTENSTAND[stand]));
       const omvang = Math.min(opMaat, betaalbaar);
-      if (omvang < Math.min(KLEINSTE, opMaat)) return false;
+      /* NOOIT ONDER RENDABEL, ook niet als de VRAAG daar zelf onder ligt. Hier
+         stond `Math.min(kleinste, opMaat)`, en die min was een noodklep zolang
+         `kleinste` een vaste vier was: op een zwak kavel wilde de vraag maar
+         twee eenheden, en zonder de klep bouwde niemand daar ooit iets.
+
+         Met een drempel die per sector wordt uitgerekend is die klep een LEK.
+         Hij liet een profiel een zaak openen waarvan op voorhand vaststaat dat
+         hij verlies draait, en dan meet dit script niet een stijl maar een
+         speler die de rekensom niet maakt. Een zwak kavel hoort leeg te blijven;
+         dat is de bedoeling van een zwak kavel. */
+      if (omvang < kleinste(sector, stand)) return false;
       // de stand gaat MEE met het openen: hij bepaalt de bouwsom en de bezetting
       return !!m.spel.zet(potje, mij, { actie: 'open', kavel: kavel.id, sector, omvang, prijs: stand }).ok;
     },

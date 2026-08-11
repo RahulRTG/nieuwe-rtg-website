@@ -17,6 +17,7 @@ const C = require('./concurrent');
 const { SECTOREN } = require('./sectoren');
 const { KOSTENSTAND } = require('./prijsstand');
 const { basisvraag, drukFactor } = require('./vraag');
+const { rendabelVanaf } = require('./maat');
 
 module.exports = ({ ACTIES, kaart }) => {
   const doe = (potje, h, z) => (ACTIES[z.actie] ? ACTIES[z.actie](potje, h, z) : { error: 'onbekend' });
@@ -54,7 +55,11 @@ module.exports = ({ ACTIES, kaart }) => {
     const opMaat = Math.max(4, Math.round(vraag / s.perMaand));
     const betaalbaar = Math.floor(teBesteden / (s.bouw * KOSTENSTAND.midden));
     const omvang = Math.min(opMaat, betaalbaar);
-    if (omvang < 4) return null;
+    /* NIET KLEINER DAN RENDABEL, en dat getal komt uit ./maat.js en niet uit een
+       vier hier. Een vaste ondergrens in EENHEDEN is zeven verschillende regels,
+       want een eenheid is per sector iets anders; hij liet hem een kantoor van
+       vier werkplekken bouwen waar er een genoeg was, en een fabriek nooit. */
+    if (omvang < rendabelVanaf(ai.sector, 'midden')) return null;
     const r = doe(potje, h, { actie: 'open', kavel: kavel.id, sector: ai.sector, omvang });
     return r.ok ? { wat: 'geopend', waar: kavel.zone, omvang } : null;
   }

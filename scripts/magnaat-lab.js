@@ -48,7 +48,13 @@ const S = require('./magnaat-strateeg');
    -- zolang die ergens wint, is er geen spel. */
 const POOL = ['horeca', 'mobility', 'onderhoud', 'inkoper', 'toelever', 'keten',
   'uitvinder', 'handwerk', 'groei', 'voorzichtig', 'service', 'markt', 'zuinig',
-  'verwaarlozen', 'passief', 'niets'];
+  'verwaarlozen', 'passief', 'niets',
+  /* De drie sectoren die de oude cast nooit speelde. Ze staan er sinds de
+     sectorproef liet zien dat kantoor de sterkste sector van het spel is en
+     nooit door iemand gespeeld werd; zonder deze drie meet de tabel hierboven
+     de balans van zijn eigen cast. Zie de uitleg bij PROFIELEN in
+     ./magnaat-strateeg.js. */
+  'kantoorwijk', 'fabriek', 'uitgaan'];
 /* De drie tafels. Twee spelers op 144 kavels lopen elkaar nooit tegen het lijf;
    zes willen er samen meer dan er zijn. Dat verschil is zelf een meetas: een
    stijl die alleen aan een lege tafel wint, wint niet. */

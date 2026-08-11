@@ -56,7 +56,7 @@ module.exports = (ctx) => {
       geld: {}, vestigingen: {}, kavelBezet: {}, foundation: F.nieuw(),
       contracten: [], contractTeller: 0, veilingen: [], veilingTeller: 0, kavelRecht: {},
       deelnemingen: [], deelnemingTeller: 0, leningen: [], leningTeller: 0,
-      resultaatlog: {}, betaalgemist: {},
+      resultaatlog: {}, betaalgemist: {}, polissen: [], polisTeller: 0,
       laatste: {}, klaar: false
     };
     for (const h of potje.spelers) { st.geld[h] = START_GELD; st.vestigingen[h] = []; st.laatste[h] = null; }
@@ -90,7 +90,7 @@ module.exports = (ctx) => {
          maand; de opbrengst van de laatste maand is nog van de verkoper, en dat
          is de eerlijke kant van "je neemt hem over aan het eind van de maand". */
       const verslag = eenMaand(potje);
-      const geveild = veiling.hameren(potje);
+      const geveild = L.hameren(potje);
       if (geveild.length) verslag.veilingen = geveild;
       verslagen.push(verslag);
     }
@@ -106,33 +106,21 @@ module.exports = (ctx) => {
   /* De deelnemingen staan HIER en niet bij de andere lagen hieronder, omdat de
      maandloop ze nodig heeft: het resultaat van een vestiging wordt verdeeld
      voordat het op een rekening komt. */
-  const aandeel = require('./aandeel')({ wieHeeft, waarde });
-  /* DE BANK, in vier stukken op de naden die deze map overal aanhoudt: het
-     profiel (wat een speler waard is in de ogen van een geldschieter), de
-     acties, wat de KLOK met een lening doet, en hoe een vestiging het spel
-     verlaat als een onderpand wordt uitgewonnen. */
-  const bp = require('./bankprofiel')({ waarde });
-  const { liquideer } = require('./afscheid')({ mijnVestiging, afkoopsom: H.afkoopsom, rond });
-  const bank = require('./bank-acties')({ mijnVestiging, waarde, liquideer,
-    profiel: bp.profiel, cijfers: bp.cijfers });
-  const bankmaand = require('./bank-maand')({ mijne: bank.mijne, cijfers: bp.cijfers, liquideer });
-  const belangen = require('./aandeel-acties')({ wieHeeft,
-    uitgegeven: aandeel.uitgegeven, MAX_DEEL: aandeel.MAX_DEEL });
+  /* DE LAGEN VAN FASE B (contracten, veilingen, belangen, bank, verzekering)
+     worden in ./lagen.js samengesteld. Dit bestand gaat over de KLOK en de
+     levensloop van een partij, en dat is af; die lijst groeit met elke fase mee.
+     Twee dingen met zo'n verschillend tempo horen niet in een bestand. */
+  const L = require('./lagen')({ K, mijnVestiging, vrijKavel, wieHeeft, waarde, rond, codenaamVan });
+
   const { eenMaand } = require('./maand')({ K, wieHeeft, ROOD_RENTE,
-    verdeel: aandeel.verdeel, bank: bankmaand, onthoud: bp.onthoud });
+    verdeel: L.verdeel, bank: L.bankmaand, onthoud: L.onthoud, verzekering: L.verzekering });
 
   /* WAT EEN SPELER ZIET en wat er aan het eind op tafel komt staat in
      ./weergave.js -- een eigen onderwerp (wie mag wat weten, en waarop wordt
      er afgerekend) dat los staat van de klok hierboven. */
-  const handel = require('./handel-acties')({ K, mijnVestiging, rond });
-  const veiling = require('./veiling')({ K, wieHeeft, afkoopsom: H.afkoopsom });
-  const veilen = require('./veiling-acties')(Object.assign({ K, mijnVestiging, vrijKavel }, veiling));
-  const { zicht, publiek, eindstand } = require('./weergave')({
-    K, codenaamVan, rond, bijrekenen, foundationArbeid: (st) => F.arbeidBonus(st.foundation),
-    veilingbeeld: (st, h) => veiling.beeld(st, h, codenaamVan),
-    belangbeeld: (st, h) => aandeel.beeld(st, h, codenaamVan),
-    belangwaarde: aandeel.belangwaarde, eigenDeel: aandeel.eigenDeel,
-    bankbeeld: (st, h) => bank.beeld(st, h), kredietprofiel: bp.beeld });
+  const { zicht, publiek, eindstand } = require('./weergave')(Object.assign({
+    K, codenaamVan, rond, bijrekenen,
+    foundationArbeid: (st) => F.arbeidBonus(st.foundation) }, L.zichtdelen));
   function beeindig(potje) {
     const st = potje.staat;
     st.klaar = true;
@@ -154,8 +142,8 @@ module.exports = (ctx) => {
      Ze zijn alle drie VRIJ (zie GAMEHALL.md 12.3): onderhandelen mag altijd,
      en dat is de reden dat een partij van zes met 24 uur per beurt niet
      stilstaat. */
-  const ACTIES = Object.assign({}, basis.ACTIES, handel.ACTIES, veilen.ACTIES, belangen.ACTIES, bank.ACTIES);
-  const VRIJE_ACTIES = basis.VRIJE_ACTIES.concat(handel.VRIJE_ACTIES, veilen.VRIJE_ACTIES, belangen.VRIJE_ACTIES, bank.VRIJE_ACTIES);
+  const ACTIES = Object.assign({}, basis.ACTIES, L.ACTIES);
+  const VRIJE_ACTIES = basis.VRIJE_ACTIES.concat(L.VRIJE_ACTIES);
 
   function zet(potje, h, z) {
     const st = potje.staat;

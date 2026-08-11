@@ -70,7 +70,15 @@ function wereld() {
 const maand = (w, n) => {
   for (let i = 0; i < n; i++) {
     w.st.gerekendTot -= w.st.maandMs;
-    for (const verslag of w.m.eco.bijrekenen(w.potje)) w.rente = (w.rente || 0) + (verslag.rentelast || 0);
+    for (const verslag of w.m.eco.bijrekenen(w.potje)) {
+      /* WAT DE WERELD VERLAAT, per soort. Rente gaat naar een bank, premie naar
+         een verzekeraar, en schade is domweg vernietigd -- geen van drieen komt
+         bij een speler terecht. Een uitkering staat er NIET bij: die herstelt
+         alleen, en hij is al van de schadepost afgetrokken (../server/kern/
+         spellen/magnaat/maand.js). */
+      w.rente = (w.rente || 0) + (verslag.rentelast || 0)
+        + (verslag.premielast || 0) + (verslag.schadelast || 0);
+    }
   }
 };
 
@@ -262,7 +270,8 @@ const SCENARIOS = {
         if (!vrij) break;
         w.m.spel.zet(w.potje, 'a', { actie: 'open', kavel: vrij.id, sector: 'horeca', omvang: 40 });
         w.st.gerekendTot -= w.st.maandMs;
-        for (const v of w.m.eco.bijrekenen(w.potje)) w.rente = (w.rente || 0) + (v.rentelast || 0);
+        for (const v of w.m.eco.bijrekenen(w.potje))
+          w.rente = (w.rente || 0) + (v.rentelast || 0) + (v.premielast || 0) + (v.schadelast || 0);
         const na = w.m.eco.eindstand(w.potje).find(x => x.codenaam === 'a');
         w.hefbomen.push(na.schuld / Math.max(1, na.geld + na.waarde));
       }
@@ -276,6 +285,40 @@ const SCENARIOS = {
       if (hoogste > 3) return 'de schuld liep op tot ' + hoogste.toFixed(1) +
         ' keer de bezittingen; het kredietplafond loopt weg';
       return null;
+    }
+  },
+
+  /* OVERVERZEKEREN. De speler koopt de duurste dekking die er te koop is op
+     alles wat hij heeft. Dat HOORT geld te kosten -- premie draagt een opslag
+     boven de verwachte schade -- en het mag onder geen beding winstgevend zijn.
+
+     Dit is de pomproute die er bij een verzekeringslaag als eerste in zit: een
+     uitkering die boven de aantoonbare schade uitkomt, is geld uit het niets, en
+     dan is een brand een verdienmodel. */
+  oververzekeren: {
+    verwacht: 'lekkend', naam: 'alles maximaal verzekeren',
+    doe(w) {
+      const R = require('../server/kern/spellen/magnaat/risico');
+      for (const h of ['a', 'b', 'c'])
+        for (const v of w.st.vestigingen[h])
+          for (const risico of R.RISICOLIJST)
+            w.m.spel.zet(w.potje, h, { actie: 'polis-sluiten', vestiging: v.id, risico,
+              dekking: 1, eigenRisico: 0, maximum: 20000000 });
+    }
+  },
+
+  /* VERZEKEREN EN METEEN OPZEGGEN, in een lus. Als opzeggen ergens een premie
+     terugdraait die al geboekt was, is dit een machine. */
+  poliscarrousel: {
+    verwacht: 'lekkend', naam: 'polissen sluiten en meteen weer opzeggen',
+    doe(w) {
+      const R = require('../server/kern/spellen/magnaat/risico');
+      for (let i = 0; i < 4; i++)
+        for (const risico of R.RISICOLIJST) {
+          const r = w.m.spel.zet(w.potje, 'a', { actie: 'polis-sluiten',
+            vestiging: w.A.id, risico, dekking: 1, eigenRisico: 0, maximum: 20000000 });
+          if (r.ok) w.m.spel.zet(w.potje, 'a', { actie: 'polis-opzeggen', id: r.id });
+        }
     }
   },
 

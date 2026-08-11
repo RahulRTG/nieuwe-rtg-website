@@ -1059,17 +1059,56 @@ keer de bezittingen uitkomen.
 > geen waardering die meestijgt, maar een zekerheid die oneindig vaak vergeven
 > wordt.
 
-**Wat er van fase B nog niet in zit.** Verzekeringen en R&D. Voor allebei ligt het
-pomppatroon al vast, en het volgt dezelfde drie categorieën:
+### Verzekeringen — risico als keuze, niet als vinkje
 
-- **Verzekeringen** — premie *vernietigend*, schade *vernietigend*, uitkering
-  *conserverend tot aantoonbare schade*. Oververzekeren mag nooit winstgevend
-  worden: dat is de pomproute die er bij deze laag als eerste in zit.
-- **R&D** — investering *vernietigend* op korte termijn, resultaat alleen
-  *scheppend* via expliciet gemeten productiviteitswinst, en een subsidie is een
-  *externe injectie* die apart gelabeld hoort en nooit als bedrijfsprestatie mag
-  tellen. En een keuzeboom in plaats van een niveauladder, zodat een budgethotel
-  zich anders ontwikkelt dan een luxeconcern.
+**Acht risico's, en elk hangt aan een knop die de speler zelf zet.** Dezelfde
+toelatingseis als bij de kredietvormen: een risico dat alleen een andere kans is,
+staat er niet in.
+
+| Risico | Hangt aan | Raakt |
+|---|---|---|
+| brand | onderhoud (een pand op 10% brandt 5× zo vaak) | het pand |
+| storm | het seizoen | het pand |
+| machinebreuk | sector + onderhoud | de omzet |
+| transport | hoeveel goederen je beweegt | de omzet |
+| cyber | hoe digitaal je sector is | de omzet |
+| aansprakelijkheid | hoeveel mensen er over de vloer komen | een claim |
+| personeel | de bezetting van vorige maand | de omzet |
+| bedrijfsschade | **volgt op** brand of storm | de omzet |
+
+**Het toeval is deterministisch**, en dat is de zwaarste eis van deze laag. De
+klok rekent bij (§12.4), dus tien maanden in één keer moeten dezelfde branden
+geven als tien maanden los. Er wordt daarom *getrokken uit een hash* van
+(partij, maand, vestiging, risico) — dezelfde truc als `spreiding()` in
+`kaart.js`. Wat dat kost, eerlijk: het toeval is in principe voorspelbaar voor
+wie de formule kent en de staat kan lezen. Dat is acceptabel omdat de staat op
+de server staat, maar het is geen geheim dat veilig blijft als de wereld ooit
+open gaat.
+
+**Een polis heeft vijf velden** — dekking, eigen risico, maximum, premie en een
+uitsluiting — en samen vormen ze een echte afweging. **Oververzekeren is nooit
+winstgevend**, en dat wordt op twee manieren waargemaakt omdat één niet genoeg
+is: een uitkering komt nooit boven de aantoonbare schade, én de premie draagt
+35% opslag boven de verwachte schade. Wie een dikke kas heeft draagt zijn eigen
+risico goedkoper dan de verzekeraar het doet; wie krap zit betaalt met plezier de
+opslag. Dat is de keuze, en hij valt per speler anders uit.
+
+**De uitsluiting is een koppeling en geen kleine lettertjes.** Brand en
+machinebreuk keren niets uit als het onderhoud onder de dertig staat. Samen met
+de verhoogde kans betekent dat: onderhoud overslaan is geen besparing maar een
+weddenschap — je loopt méér risico én je bent er niet voor verzekerd.
+
+> **De toets die "verzekeren kost geld" bewijst, mat eerst het toeval.** Eén
+> partij waarin de verzekerde speler net wint, betekent niets: dat is precies
+> waar een verzekering voor is. De bewering geldt *in verwachting*, en wordt nu
+> over twaalf partijen gemeten — met de eis dat het in minstens één partij
+> loonde (anders is het een boete) en niet in allemaal (anders is het gratis).
+
+**Wat er van fase B nog niet in zit.** R&D: investering *vernietigend* op korte
+termijn, resultaat alleen *scheppend* via expliciet gemeten productiviteitswinst,
+en een subsidie is een *externe injectie* die apart gelabeld hoort en nooit als
+bedrijfsprestatie mag tellen. En een keuzeboom in plaats van een niveauladder,
+zodat een budgethotel zich anders ontwikkelt dan een luxeconcern.
 
 **Fase C — de permanente wereld.** Living World, AI-managers met beleidsregels,
 Safe Management Policy, vakantiemodus, overdracht, legacy, Magnaat Daily,

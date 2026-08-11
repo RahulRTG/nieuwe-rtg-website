@@ -53,7 +53,8 @@ module.exports = (ctx) => {
       'contract-voorstel', 'contract-antwoord', 'contract-opzeggen',
       'veiling-start', 'veiling-bod', 'veiling-intrekken',
       'belang-voorstel', 'belang-antwoord',
-      'krediet-opnemen', 'krediet-aflossen', 'krediet-herzien'],
+      'krediet-opnemen', 'krediet-aflossen', 'krediet-herzien',
+      'polis-sluiten', 'polis-opzeggen'],
     init, zet,
     varianten: {
       vorm: { keuze: ['bord', 'economie'], standaard: 'bord' },

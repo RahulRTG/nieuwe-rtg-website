@@ -56,7 +56,9 @@
     "grenzen": "node scripts/grenzen.js",
     "leugens": "node --experimental-sqlite scripts/leugendetector.js",
     "mutatie": "node --experimental-sqlite scripts/mutatie.js",
-    "grenslijst": "node scripts/grenslijst.js"
+    "grenslijst": "node scripts/grenslijst.js",
+    "bewijsmatrix": "node --experimental-sqlite scripts/bewijsmatrix.js",
+    "bewijsmatrix:vast": "node --experimental-sqlite scripts/bewijsmatrix.js --vastleggen"
   },
   "devDependencies": {
     "playwright": "^1.62.1"

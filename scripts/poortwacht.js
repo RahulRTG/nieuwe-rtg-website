@@ -25,13 +25,23 @@
 
    Draai:  node scripts/poortwacht.js [http://127.0.0.1:3000]
            node scripts/poortwacht.js --json
-   Exitcode 1 zodra er een route OPEN staat die niet publiek hoort te zijn. */
+           node scripts/poortwacht.js --json --per-route
+   Exitcode 1 zodra er een route OPEN staat die niet publiek hoort te zijn.
+
+   --PER-ROUTE, EN WAAROM DAT ER APART IN ZIT. De uitslag hierboven telt op:
+   zoveel dicht, zoveel stil, zoveel open. Dat is genoeg om te weten of er een
+   gat is, en te weinig voor scripts/bewijsmatrix.js -- die wil per route weten
+   wie zijn voordeur heeft gemeten, want anders blijft de AUTH-kolom op
+   "verklaard" staan (in de bron gelezen, niet gevraagd). Met --per-route komt
+   het oordeel per METHODE+pad mee in de JSON. Standaard staat het uit: het zijn
+   een paar duizend regels en de gewone lezer heeft er niets aan. */
 'use strict';
 const { execFileSync } = require('child_process');
 const path = require('path');
 
 const args = process.argv.slice(2);
 const jsonUit = args.includes('--json');
+const perRouteUit = args.includes('--per-route');
 const BASIS = args.find(a => a.startsWith('http')) || 'http://127.0.0.1:3000';
 
 /* Routes die BEWUST open staan voor een niet-ingelogde bezoeker. Elke regel
@@ -91,6 +101,9 @@ const PUBLIEK = new Map([
 ]);
 
 const uit = { open: [], dicht: 0, stil: 0, publiek: 0, fout: 0, totaal: 0 };
+/* Alleen gevuld met --per-route; zie de kop. Eén regel per METHODE+pad, met
+   hetzelfde oordeel dat hierboven wordt opgeteld -- geen tweede waarheid. */
+const perRoute = [];
 
 /* De routekaart uit de server zelf: alleen zo weet je zeker dat je alles hebt
    en niet de lijst toetst die iemand met de hand heeft bijgehouden. */
@@ -127,21 +140,31 @@ async function ronde() {
       for (const m of (r.methoden || ['POST'])) {
         uit.totaal++;
         const a = await klop(r.pad, m);
-        if (a.status === 0) { uit.fout++; continue; }
-        if (a.status === 401 || a.status === 403) { uit.dicht++; continue; }
-        if (a.status >= 200 && a.status < 300) {
-          if (PUBLIEK.has(r.pad)) uit.publiek++;
-          else uit.open.push({ pad: r.pad, methode: m, status: a.status, begin: a.tekst.replace(/\s+/g, ' ').slice(0, 120) });
-          continue;
-        }
-        uit.stil++;
+        /* Eén plek waar het oordeel valt, en daarna pas tellen én opschrijven.
+           Eerst stond het oordeel in de tellingen zelf verweven; wie er een
+           tweede uitvoer naast zet, bouwt dan onvermijdelijk een tweede
+           waarheid die er langzaam naast gaat lopen. */
+        let oordeel;
+        if (a.status === 0) { uit.fout++; oordeel = 'onbereikbaar'; }
+        else if (a.status === 401 || a.status === 403) { uit.dicht++; oordeel = 'dicht'; }
+        else if (a.status >= 200 && a.status < 300) {
+          if (PUBLIEK.has(r.pad)) { uit.publiek++; oordeel = 'publiek'; }
+          else {
+            uit.open.push({ pad: r.pad, methode: m, status: a.status, begin: a.tekst.replace(/\s+/g, ' ').slice(0, 120) });
+            oordeel = 'open';
+          }
+        } else { uit.stil++; oordeel = 'stil'; }
+        if (perRouteUit) perRoute.push({ methode: m, pad: r.pad, status: a.status, oordeel });
       }
     }));
   }
 }
 
 ronde().then(() => {
-  if (jsonUit) { console.log(JSON.stringify(uit, null, 1)); process.exit(uit.open.length ? 1 : 0); }
+  if (jsonUit) {
+    console.log(JSON.stringify(perRouteUit ? { ...uit, perRoute } : uit, null, 1));
+    process.exit(uit.open.length ? 1 : 0);
+  }
   console.log('\n=== RTG poortwacht tegen ' + BASIS + ' ===\n');
   console.log('  aangeklopt        : ' + uit.totaal);
   console.log('  netjes geweigerd  : ' + uit.dicht + '  (401/403)');

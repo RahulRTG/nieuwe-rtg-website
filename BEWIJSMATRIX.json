@@ -1,0 +1,83 @@
+{
+  "herkomst": "routekaart (draaiende server)",
+  "gedegradeerd": false,
+  "journaalGelezen": null,
+  "routes": 3985,
+  "schakels": 11,
+  "cellen": 43835,
+  "telling": {
+    "bewezen": 3985,
+    "verklaard": 0,
+    "nvt": 260,
+    "ongemeten": 39590
+  },
+  "perSchakel": {
+    "AUTH": {
+      "bewezen": 3985,
+      "verklaard": 0,
+      "nvt": 0,
+      "ongemeten": 0
+    },
+    "ACL": {
+      "bewezen": 0,
+      "verklaard": 0,
+      "nvt": 0,
+      "ongemeten": 3985
+    },
+    "INPUT": {
+      "bewezen": 0,
+      "verklaard": 0,
+      "nvt": 0,
+      "ongemeten": 3985
+    },
+    "OUTPUT": {
+      "bewezen": 0,
+      "verklaard": 0,
+      "nvt": 0,
+      "ongemeten": 3985
+    },
+    "STATE": {
+      "bewezen": 0,
+      "verklaard": 0,
+      "nvt": 65,
+      "ongemeten": 3920
+    },
+    "SIDE_EFFECT": {
+      "bewezen": 0,
+      "verklaard": 0,
+      "nvt": 65,
+      "ongemeten": 3920
+    },
+    "AUDIT": {
+      "bewezen": 0,
+      "verklaard": 0,
+      "nvt": 0,
+      "ongemeten": 3985
+    },
+    "IDEMPOTENCY": {
+      "bewezen": 0,
+      "verklaard": 0,
+      "nvt": 65,
+      "ongemeten": 3920
+    },
+    "FAILURE": {
+      "bewezen": 0,
+      "verklaard": 0,
+      "nvt": 0,
+      "ongemeten": 3985
+    },
+    "ROLLBACK": {
+      "bewezen": 0,
+      "verklaard": 0,
+      "nvt": 65,
+      "ongemeten": 3920
+    },
+    "PRIVACY": {
+      "bewezen": 0,
+      "verklaard": 0,
+      "nvt": 0,
+      "ongemeten": 3985
+    }
+  },
+  "uitleg": "Gegenereerd door scripts/bewijsmatrix.js. ongemeten MAG ALLEEN KRIMPEN."
+}

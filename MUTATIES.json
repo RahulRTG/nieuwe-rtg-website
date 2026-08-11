@@ -472,6 +472,14 @@
       "operator": "===->!==",
       "gezakt": 2
     },
+    "bewijsmatrix.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/bewijsmatrix.js",
+      "operator": "!==->===#0",
+      "gezakt": 1,
+      "geprobeerd": 2
+    },
     "bezorg.test.js": {
       "soort": "server",
       "staat": "gezakt",

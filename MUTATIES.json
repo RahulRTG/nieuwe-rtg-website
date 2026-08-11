@@ -1553,6 +1553,14 @@
       "operator": "!==->===",
       "gezakt": 1
     },
+    "keten.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/keten.js",
+      "operator": "===->!==#0",
+      "gezakt": 10,
+      "geprobeerd": 1
+    },
     "ketenchat.test.js": {
       "soort": "server",
       "staat": "gezakt",

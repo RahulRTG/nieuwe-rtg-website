@@ -16,10 +16,70 @@
       zien wat voor ondernemer je was; er een tweede ranglijst van maken zou
       betekenen dat je op zes assen tegelijk aan het optimaliseren bent. */
 const { capaciteit, waarde } = require('./stap');
-const { prijsVan } = require('./sectoren');
+const { SECTOREN } = require('./sectoren');
+const { prijsVan } = require('./prijsstand');
+const H = require('./handel');
 const { PROJECTEN } = require('./foundation');
 
 module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid }) => {
+  /* Van wie is deze vestiging? De contractlaag kijkt over de grens tussen
+     twee spelers heen en kan dus niet met `mijnVestiging` toe. */
+  const vanIemand = (st, id) => {
+    for (const [h, rij] of Object.entries(st.vestigingen)) {
+      const v = rij.find(x => x.id === id);
+      if (v) return { speler: h, v };
+    }
+    return null;
+  };
+  const partij = (c, h) => c.leverancier === h || c.afnemer === h;
+
+  /* WAT EEN SPELER VAN CONTRACTEN ZIET. Zijn eigen draden helemaal; van een
+     derde alleen het bestaan. Dezelfde grens als bij de boeken. */
+  function mijnContracten(st, h) {
+    return (st.contracten || []).filter(c => partij(c, h)).map(c => {
+      const lev = vanIemand(st, c.leverancierId), afn = vanIemand(st, c.afnemerId);
+      return {
+        id: c.id, soort: c.soort, status: c.status, rol: c.leverancier === h ? 'leverancier' : 'afnemer',
+        leverancierId: c.leverancierId, afnemerId: c.afnemerId,
+        tegenpartij: codenaamVan(c.leverancier === h ? c.afnemer : c.leverancier),
+        leverancierNaam: lev ? lev.v.naam : null, afnemerNaam: afn ? afn.v.naam : null,
+        eenheden: c.eenheden, bedrag: c.bedrag, looptijd: c.looptijd, eis: c.eis,
+        boete: c.boete, vooraf: c.vooraf, exclusief: c.exclusief,
+        ronde: c.ronde, aanZet: c.status === 'voorgesteld' && c.van !== h,
+        startMaand: c.startMaand, eindMaand: c.eindMaand,
+        betaald: rond(c.betaald), ontvangen: rond(c.ontvangen), boetes: rond(c.boetes),
+        maandenGeleverd: c.maandenGeleverd, maandenTekort: c.maandenTekort,
+        afkoopNu: c.status === 'loopt' ? H.afkoopsom(c, st.maand) : null
+      };
+    });
+  }
+
+  /* WAT ER TE KOPEN VALT, per vestiging: welke posten deze zaak inkoopt, hoe
+     groot ze zijn bij de huidige omzet, en welke sector ze levert. Zonder dit
+     is onderhandelen raden -- en raden over getallen die de motor gewoon kent,
+     is precies het soort mist waar dit huis niet aan doet. */
+  /* Hoeveel van de capaciteit van deze zaak al vergeven is aan contracten.
+     Hoort bij het eigen beeld en nergens anders: het is de vraag "hoeveel kan
+     ik nog aan een ander beloven", en die stelt alleen de eigenaar. */
+  const vergeven = (st, v) => (st.contracten || [])
+    .filter(c => c.status === 'loopt' && c.leverancierId === v.id)
+    .reduce((n, c) => n + c.eenheden, 0);
+
+  function inkoopbeeld(v) {
+    const laatsteOmzet = v.maanden ? (v.omzetTotaal || 0) / v.maanden : 0;
+    return {
+      levert: H.levert(v.sector),
+      posten: H.koopt(v.sector).map(({ soort, aandeel }) => ({
+        soort, aandeel,
+        eenheden: Math.round(H.behoefte(v, laatsteOmzet, soort)),
+        marktkosten: rond(laatsteOmzet * SECTOREN[v.sector].inkoop * aandeel),
+        marktprijs: H.MARKTPRIJS[soort],
+        levertSector: H.LEVERANCIERS[soort]
+      }))
+    };
+  }
+
+
   function eindstand(potje) {
     const st = potje.staat;
     return potje.spelers.map(h => {
@@ -42,7 +102,10 @@ module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid }) => {
     const k = K(st);
     const eigen = (st.vestigingen[mij] || []).map(v => Object.assign({}, v, {
       kavelNaam: k.kavel.get(v.kavel).naam, zone: k.kavel.get(v.kavel).zone,
-      capaciteit: capaciteit(v, foundationArbeid(st)), waarde: waarde(v), prijsPer: prijsVan(v.sector, v.prijs)
+      capaciteit: capaciteit(v, foundationArbeid(st)), waarde: waarde(v), prijsPer: prijsVan(v.sector, v.prijs),
+      // wat deze zaak inkoopt en wat hij zelf kan leveren -- zonder dat is
+      // onderhandelen raden over getallen die de motor gewoon kent
+      handel: inkoopbeeld(v), vergeven: vergeven(st, v)
     }));
     return {
       stad: k.naam, bron: k.bron, maand: st.maand, duur: st.duur, klaar: st.klaar,
@@ -52,8 +115,21 @@ module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid }) => {
       // hoeveel. Hun cash is van hen -- zie de waarschuwing in de descriptor
       anderen: potje.spelers.filter(sp => sp !== mij).map(sp => ({
         codenaam: codenaamVan(sp), vestigingen: (st.vestigingen[sp] || []).length,
+        zaken: (st.vestigingen[sp] || []).map(v => ({
+          /* WAT ER OP STRAAT STAAT, en dat is precies wat een tegenpartij nodig
+             heeft om een contract voor te stellen: een naam, een sector, een
+             maat en een adres. Wat er NIET bij staat is de reden dat dit een
+             lijst mocht worden in plaats van een aantal: geen kas, geen
+             resultaat, geen reputatiecijfer, geen personeelsbestand. Je kunt
+             zien dat er een vervoerder aan de Halkade zit; je kunt niet zien
+             hoe het hem vergaat. */
+          id: v.id, naam: v.naam, sector: v.sector, omvang: v.omvang,
+          kavelNaam: k.kavel.get(v.kavel).naam, zone: k.kavel.get(v.kavel).zone,
+          levert: (SECTOREN[v.sector] || {}).levert || null
+        })),
         zones: [...new Set((st.vestigingen[sp] || []).map(v => k.kavel.get(v.kavel).zone))]
       })),
+      contracten: mijnContracten(st, mij),
       vrij: k.kavels.filter(x => !st.kavelBezet[x.id]).length,
       foundation: { lokaal: rond(st.foundation.lokaal), centraal: rond(st.foundation.centraal),
         gedaan: st.foundation.gedaan.map(g => (PROJECTEN.find(p => p.id === g.id) || {}).naam).filter(Boolean) },

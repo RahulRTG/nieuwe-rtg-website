@@ -23,7 +23,8 @@
 
    Elke stap is een vermenigvuldiging met een reden. Dat maakt hem uit te leggen
    EN te toetsen: zet er een op 1 en het verschil is precies wat die stap deed. */
-const { SECTOREN, VRAAGFACTOR } = require('./sectoren');
+const { SECTOREN } = require('./sectoren');
+const { VRAAGFACTOR } = require('./prijsstand');
 const { geschiktheid } = require('./kaart');
 
 /* Waar een segment vandaan komt op een kavel. Toeristen volgen `toerisme`,

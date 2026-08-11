@@ -20,7 +20,8 @@
 
    Gebruik: node scripts/magnaat-balans.js */
 'use strict';
-const { SECTOREN, prijsVan } = require('../server/kern/spellen/magnaat/sectoren');
+const { SECTOREN } = require('../server/kern/spellen/magnaat/sectoren');
+const { prijsVan } = require('../server/kern/spellen/magnaat/prijsstand');
 const { kaart } = require('../server/kern/spellen/magnaat/kaart');
 const { basisvraag } = require('../server/kern/spellen/magnaat/vraag');
 const { capaciteit } = require('../server/kern/spellen/magnaat/stap');

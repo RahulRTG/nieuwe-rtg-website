@@ -34,7 +34,9 @@
 'use strict';
 const { kaart } = require('../server/kern/spellen/magnaat/kaart');
 const { SECTOREN } = require('../server/kern/spellen/magnaat/sectoren');
+const { VRAAGFACTOR, KOSTENSTAND } = require('../server/kern/spellen/magnaat/prijsstand');
 const { basisvraag, drukFactor } = require('../server/kern/spellen/magnaat/vraag');
+const { MARKTPRIJS } = require('../server/kern/spellen/magnaat/handel');
 
 const maakMagnaat = () => require('../server/kern/spellen/magnaat/index')({
   save() {}, crypto: require('crypto'), codenaamVan: (h) => h, nudge() {}
@@ -89,21 +91,21 @@ const PROFIELEN = {
     }
   },
   service: {
-    naam: 'hoge service', zones: ['boulevard', 'station'],
+    naam: 'hoge service', zones: ['boulevard', 'station'], prijs: 'hoog',
     doe(s) {
       if (!s.mijn.length) return s.open('hotel');
       for (const v of s.mijn) {
-        s.beleid(v, { prijs: 'hoog', onderhoud: Math.round(v.omvang * 30) });
+        s.beleid(v, { onderhoud: Math.round(v.omvang * 30) });
         if (v.gemist > 0) s.beleid(v, { personeel: v.personeel + 1 });
       }
       s.open('hotel');
     }
   },
   zuinig: {
-    naam: 'goedkoop personeel', zones: ['centrum', 'haven'],
+    naam: 'goedkoop personeel', zones: ['centrum', 'haven'], prijs: 'laag',
     doe(s) {
       if (!s.mijn.length) return s.open('retail');
-      for (const v of s.mijn) s.beleid(v, { prijs: 'laag', personeel: 1 });
+      for (const v of s.mijn) s.beleid(v, { personeel: 1 });
       s.open('retail');
     }
   },
@@ -132,11 +134,59 @@ const PROFIELEN = {
     doe(s) { s.open('logistiek'); }
   },
   markt: {
-    naam: 'marketing en volume', zones: ['centrum', 'boulevard'],
+    /* Goedkoop EN adverteren. `prijs` staat op het profiel zodat er ook op die
+       maat gebouwd wordt -- eerst stond hij alleen in `beleid`, en toen bouwde
+       dit profiel op de vraag bij middenprijs en liet die panden vervolgens
+       overlopen. Het won nul procent van zijn duels, en dat mat een zaak van de
+       verkeerde maat en niet een strategie. */
+    naam: 'marketing en volume', zones: ['centrum', 'boulevard'], prijs: 'laag',
     doe(s) {
       if (!s.mijn.length) return s.open('retail');
-      for (const v of s.mijn) s.beleid(v, { prijs: 'laag', marketing: 6000 });
+      // marketing naar rato van de zaak: een vast bedrag is voor een klein pand
+      // een vermogen en voor een groot pand niets
+      for (const v of s.mijn) s.beleid(v, { marketing: Math.round(v.omvang * 40) });
       s.open('retail');
+    }
+  },
+
+  /* ---------- fase B: drie stijlen die om contracten draaien ----------
+     Ze zijn er om EEN vraag te beantwoorden die het toernooi in fase A niet kon
+     stellen: raken spelers elkaar nu ook als ze in andere buurten zitten? Een
+     sectorfocus won toen bijna al zijn duels omdat er op 144 kavels geen
+     schaarste is. Een leverancier die zich vol tekent heeft die luxe niet
+     meer. */
+  toelever: {
+    naam: 'toeleverancier', zones: ['terrein', 'haven'],
+    doe(s) {
+      if (!s.mijn.length) return s.open('logistiek');
+      // een groot deel van de vloot te koop zetten, onder de marktprijs
+      for (const v of s.mijn) s.aanbieden(v, 0.6, 0.12);
+      s.open('logistiek');
+    }
+  },
+  keten: {
+    naam: 'verticale integratie', zones: ['boulevard', 'terrein', 'centrum'],
+    doe(s) {
+      /* Eerst een afzetkant, dan je eigen toelevering ernaast. De vraag is of
+         het loont om je toelevering zelf te bouwen in plaats van hem in te
+         kopen -- en dat hoort een echte afweging te zijn en geen gratis winst. */
+      const heeft = (sec) => s.mijn.some(v => v.sector === sec);
+      if (!heeft('horeca')) return s.open('horeca');
+      if (!heeft('logistiek')) return s.open('logistiek');
+      if (!heeft('retail')) return s.open('retail');
+      s.open('horeca');
+    }
+  },
+  inkoper: {
+    naam: 'scherp inkopen', zones: ['boulevard', 'centrum'],
+    doe(s) {
+      /* Geen eigen toelevering: alles bij een ander halen, zo scherp mogelijk.
+         Het tegenbeeld van `keten`, en samen meten ze of maken of kopen een
+         keuze is. Het aannemen zelf zit in het gereedschap, want een aanbod
+         onder de marktprijs afslaan is geen stijl maar een rekenfout. */
+      if (!s.mijn.length) return s.open('horeca');
+      for (const v of s.mijn) s.beleid(v, { onderhoud: Math.round(v.omvang * 30) });
+      s.open('horeca');
     }
   }
 };
@@ -183,19 +233,118 @@ function gereedschap(m, potje, mij, profiel, offset) {
          het door de straat te lopen. */
       const buren = Object.values(st.vestigingen).flat()
         .filter(v => v.sector === sector && k.kavel.get(v.kavel).zone === zone).length;
-      const vraag = basisvraag(k, kavel, sector, st.maand) * sec.markt * drukFactor(buren + 1);
+      /* DE PRIJSSTAND HOORT IN DE MAAT, en dat is een correctie op deze
+         opstelling en niet op het spel. Eerst bouwde elk profiel op de vraag
+         bij MIDDENprijs en zette daarna zijn prijs -- en dan meet je niet de
+         prijsstrategie maar wat er gebeurt als je een pand van de verkeerde
+         maat neerzet. Wie goedkoop wil zijn hoort GROTER te bouwen (er komen
+         meer mensen), wie duur wil zijn KLEINER. Doe je dat niet, dan loopt de
+         goedkope zaak over -- en dan zakt zijn kwaliteit, zijn reputatie en
+         daarmee zijn vraag, in een spiraal die niets met de prijs te maken
+         heeft. */
+      const stand = profiel.prijs || 'midden';
+      const vraag = basisvraag(k, kavel, sector, st.maand) * sec.markt * drukFactor(buren + 1) * VRAAGFACTOR[stand];
       const opMaat = Math.max(1, Math.round(vraag / sec.perMaand));
       /* Bouw zo groot als de vraag, of zoveel als er na de buffer betaalbaar is.
          Kleiner dan `KLEINSTE` bouwen we niet -- dan zijn de vaste lasten groter
          dan de zaak. */
-      const betaalbaar = Math.floor((st.geld[mij] - BUFFER) / sec.bouw);
+      // de prijsstand zit OOK in de bouwsom (../server/kern/spellen/magnaat/acties.js);
+      // hem hier vergeten liet een goedkope speler veel kleiner bouwen dan hij kon
+      const betaalbaar = Math.floor((st.geld[mij] - BUFFER) / (sec.bouw * KOSTENSTAND[stand]));
       const omvang = Math.min(opMaat, betaalbaar);
       if (omvang < Math.min(KLEINSTE, opMaat)) return false;
-      m.spel.zet(potje, mij, { actie: 'open', kavel: kavel.id, sector, omvang });
-      return true;
+      // de stand gaat MEE met het openen: hij bepaalt de bouwsom en de bezetting
+      return !!m.spel.zet(potje, mij, { actie: 'open', kavel: kavel.id, sector, omvang, prijs: stand }).ok;
     },
     uitbreiden(v, erbij) { m.spel.zet(potje, mij, { actie: 'uitbreiden', id: v.id, erbij }); },
-    beleid(v, wat) { m.spel.zet(potje, mij, Object.assign({ actie: 'beleid', id: v.id }, wat)); }
+    beleid(v, wat) { m.spel.zet(potje, mij, Object.assign({ actie: 'beleid', id: v.id }, wat)); },
+
+    /* ---------- fase B: contracten ----------
+       Wat een profiel hiervan krijgt is BEWUST asymmetrisch, want zo staat het
+       spel ook in elkaar: als leverancier zie je niet hoeveel een ander nodig
+       heeft (dat staat in zijn boeken), als afnemer weet je het precies. Een
+       aanbod is dus altijd een gok, en dat is geen tekortkoming van dit script
+       maar de reden dat er onderhandeld wordt. */
+    get beeld() { return m.eco.zicht(potje, st, mij); },
+    /* AANBIEDEN: een deel van je vrije capaciteit te koop zetten tegen een
+       korting op de marktprijs. `deel` is hoeveel van je capaciteit je durft te
+       vergeven -- dat is de echte keuze, want vergeven capaciteit kan geen
+       klanten meer bedienen. */
+    aanbieden(v, deel, korting) {
+      const soort = SECTOREN[v.sector].levert;
+      if (!soort) return false;
+      const beeld = this.beeld;
+      const eigen = beeld.vestigingen.find(x => x.id === v.id) || {};
+      const vrij = Math.max(0, (eigen.capaciteit || 0) - (eigen.vergeven || 0));
+      const eenheden = Math.floor(vrij * deel);
+      if (eenheden < 1) return false;
+      const doelen = beeld.anderen.flatMap(a => a.zaken)
+        .filter(z => (SECTOREN[z.sector].koopt || {})[soort]);
+      for (const z of doelen) {
+        const r = m.spel.zet(potje, mij, { actie: 'contract-voorstel', mijn: v.id, hun: z.id, soort,
+          eenheden, bedrag: Math.round(eenheden * MARKTPRIJS[soort] * (1 - korting)),
+          looptijd: 12, eis: 40, boete: Math.round(eenheden * MARKTPRIJS[soort] * 0.25),
+          vooraf: 0, exclusief: false });
+        if (r.ok) return true;
+      }
+      return false;
+    },
+    /* ANTWOORDEN OP WAT ER LIGT, en de regel daarvoor staat HIER en niet in een
+       profiel -- net als op maat bouwen is dit basiscompetentie en geen stijl.
+       Een afnemer die een aanbod aanneemt dat duurder is dan de markt, meet
+       niet zijn strategie maar zijn onvermogen om twee getallen te vergelijken.
+
+       DE VOLUMEKANT WORDT EEN TEGENVOORSTEL EN GEEN NEE, en dat is de correctie
+       die deze hele laag pas liet werken. De eerste versie wees een aanbod af
+       zodra het volume niet klopte, en toen kwamen er in een campagne van
+       zesendertig maanden negenentachtig voorstellen en NUL contracten. De
+       oorzaak is geen fout maar de economie zelf: een vervoerder met twintig
+       voertuigen rijdt drieduizend ritten per maand en een restaurant heeft er
+       vierenveertig nodig. Een leverancier kan onmogelijk raden hoeveel een
+       ander nodig heeft -- dat staat in diens boeken -- dus is een eerste
+       aanbod ALTIJD de verkeerde maat. Precies daarvoor bestaat het
+       tegenvoorstel: de afnemer weet zijn behoefte wel, en zet hem erin. */
+    antwoordOpAanbod() {
+      const beeld = this.beeld;
+      let gedaan = 0;
+      for (const c of beeld.contracten.filter(x => x.aanZet)) {
+        const perEenheid = c.bedrag / Math.max(1, c.eenheden);
+        if (c.rol === 'leverancier') {
+          /* WAT EEN LEVERANCIER MINSTENS WIL, en de eerste versie had het fout:
+             "meer dan de marktprijs" klinkt streng maar is onzin, want dan wees
+             hij zijn eigen aanbod af zodra de afnemer het volume bijstelde --
+             en dan komt er nooit een contract tot stand.
+
+             De juiste ondergrens hangt af van of er nog CAPACITEIT VRIJ is.
+             Staat je vloot half stil, dan is elke euro boven je variabele
+             kosten winst; zit je vol, dan geef je een klant weg en wil je
+             minstens de marktprijs. Dat is geen stijl maar rekenen. */
+          const eigen = beeld.vestigingen.find(x => x.id === c.leverancierId) || {};
+          const stilstand = (eigen.capaciteit || 0) - (eigen.vergeven || 0) > (eigen.capaciteit || 0) * 0.15;
+          const bodem = stilstand ? MARKTPRIJS[c.soort] * (SECTOREN[eigen.sector] || {}).inkoop : MARKTPRIJS[c.soort];
+          const r = m.spel.zet(potje, mij, { actie: 'contract-antwoord', id: c.id,
+            antwoord: perEenheid >= bodem ? 'ja' : 'nee' });
+          if (r.ok) gedaan++;
+          continue;
+        }
+        const mijnZaak = beeld.vestigingen.find(x => x.id === c.afnemerId);
+        const post = mijnZaak && (mijnZaak.handel.posten || []).find(x => x.soort === c.soort);
+        const nodig = post ? post.eenheden : 0;
+        // te duur is te duur; daar valt niet over te praten
+        if (perEenheid >= MARKTPRIJS[c.soort] || nodig < 1) {
+          if (m.spel.zet(potje, mij, { actie: 'contract-antwoord', id: c.id, antwoord: 'nee' }).ok) gedaan++;
+          continue;
+        }
+        // de prijs deugt, de maat niet: hetzelfde tarief, mijn volume
+        const eenheden = Math.round(nodig);
+        const zet = eenheden === c.eenheden ? { antwoord: 'ja' } : { antwoord: 'tegen',
+          eenheden, bedrag: Math.max(1, Math.round(eenheden * perEenheid)), looptijd: c.looptijd,
+          eis: c.eis, boete: Math.max(1, Math.round(c.boete * eenheden / Math.max(1, c.eenheden))),
+          vooraf: c.vooraf, exclusief: c.exclusief };
+        if (m.spel.zet(potje, mij, Object.assign({ actie: 'contract-antwoord', id: c.id }, zet)).ok) gedaan++;
+      }
+      return gedaan;
+    }
   };
 }
 
@@ -213,12 +362,28 @@ function campagne(aNaam, bNaam, offset, maanden = 36) {
     b: gereedschap(m, potje, 'b', PROFIELEN[bNaam], offset + 2)
   };
   for (let maand = 0; maand < maanden && !potje.staat.klaar; maand++) {
+    /* ANTWOORDEN GAAT VOOR HANDELEN, en voor iedereen -- ook voor profielen die
+       zelf nooit een contract aanbieden. Een aanbod dat blijft liggen is geen
+       stijl maar een speler die zijn scherm niet leest, en dan zou dit script
+       meten wie er toevallig eerst aan de beurt was. */
+    gereed.a.antwoordOpAanbod();
+    gereed.b.antwoordOpAanbod();
     PROFIELEN[aNaam].doe(gereed.a, maand);
     PROFIELEN[bNaam].doe(gereed.b, maand);
     potje.staat.gerekendTot -= potje.staat.maandMs;
     m.eco.bijrekenen(potje);
   }
-  return m.eco.eindstand(potje);
+  const stand = m.eco.eindstand(potje);
+  /* Hoeveel er werkelijk getekend is. Hangt aan de eindstand omdat het anders
+     niet te zien is: een contractlaag die niemand gebruikt en een contractlaag
+     die niets uithaalt geven dezelfde uitslag, en dat zijn twee heel
+     verschillende bevindingen. Deze meter is er precies omdat die twee de
+     eerste keer door elkaar liepen. */
+  const c = potje.staat.contracten || [];
+  stand.contracten = { voorgesteld: c.length, getekend: c.filter(x => x.status !== 'voorgesteld'
+    && x.status !== 'afgewezen').length, afgewezen: c.filter(x => x.status === 'afgewezen').length,
+    omzet: Math.round(c.reduce((n, x) => n + (x.betaald || 0), 0)) };
+  return stand;
 }
 
 /* De uitslag: wie won, of null bij gelijkspel. */
@@ -262,15 +427,55 @@ function toernooi(startposities = 6, maanden = 36) {
    verandert. Het staat in de uitvoer zodat je het ziet, en niet in een toets
    die dan een smaakoordeel zou vastzetten.
 
-   WAT ER VANDAAG UIT KOMT, eerlijk opgeschreven: mobility-focus wint bijna al
-   zijn duels en horeca-focus het merendeel. Vier ijkingen hebben dat van 100%
-   naar iets minder gebracht en de rest van het veld dicht bij elkaar; wat
-   overblijft is dat een speler die zich op EEN sector stort het beter doet dan
-   een die spreidt. In een duel van twee op een kaart met 144 kavels is er
-   namelijk geen schaarste: ze lopen elkaar nooit tegen het lijf. Dat verandert
-   zodra er contracten en veilingen zijn (fase B) -- dan raken spelers elkaar
-   ook als ze in andere buurten zitten. Het staat als open punt in GAMEHALL.md
-   en niet als opgelost. */
+WAT ER VANDAAG UIT KOMT, EERLIJK OPGESCHREVEN. Fase B heeft de vraag
+   verplaatst in plaats van hem te beantwoorden, en dat is het vermelden waard
+   omdat het antwoord van fase A een GOK was.
+
+   Fase A zei: een sectorfocus wint omdat een duel van twee op 144 kavels geen
+   schaarste kent -- ze lopen elkaar nooit tegen het lijf, dus contracten en
+   veilingen gaan dat oplossen. Contracten zijn er nu, en ze lossen het NIET op.
+   De reden is te meten en niet te raden: een restaurant koopt ongeveer vijf
+   procent van zijn omzet aan vervoer in, dus een contract met twaalf procent
+   korting is zes tiende procent van zijn omzet. Dat verschuift geen duel. De
+   handel tussen bedrijven is in deze economie te klein om een strategie te
+   kantelen; wat contracten WEL doen is capaciteit vastleggen, en dat is een
+   echte keuze -- maar geen tegenwicht tegen een goede plek.
+
+   DE ECHTE OORZAAK BLEEK IETS ANDERS, en die is met een aantal metingen
+   ingekort tot twee zinnen. (1) Dezelfde stijl in andere zones verloor, en een
+   andere sector in dezelfde zones ook -- dus het lag aan de COMBINATIE en niet
+   aan de sector. (2) Wat die combinatie waard maakte was hoeveel bedrijvigheid
+   EEN KAVEL draagt: een logistiekplek hield 132.000 omzet per maand, een
+   horecaplek 28.000. Wie per plek vier keer zoveel kwijt kan, heeft vier keer
+   minder plekken nodig -- en elke extra plek in een zone verdunt via
+   `drukFactor` alle andere. Spreiden was zelfbeschadiging. Dat is de vijfde
+   ijking geworden, en `test/spelmagnaat.test.js` houdt hem vast.
+
+   ONDERWEG VIEL ER EEN GROTERE FOUT UIT, en die had niets met sectoren te
+   maken: DE PRIJSSTAND WAS GEEN KEUZE. De omzetindex (vraag maal prijs) liep in
+   elke sector netjes op van 0,83 via 1,00 naar 1,20, en bovendien haalde je bij
+   een hoge prijs dezelfde omzet uit een KLEINER pand -- dus waren lonen, vaste
+   lasten, huur en bouwsom ook nog eens 45% lager. Duur zijn was gratis en
+   goedkoop zijn was straf. Dat is de zesde en zevende ijking: de vraagfactoren
+   zijn geijkt tot de omzetindex vlak ligt, en duur zijn kost nu wat het in het
+   echt kost (meer handen per gast, een duurder pand per stoel, een duurdere
+   bouwsom). Op maat gebouwd verdienen de drie standen zich nu in tien tot elf
+   maanden terug in plaats van in eenentwintig, elf en zes.
+
+   EN TWEE MEETFOUTEN IN DEZE OPSTELLING ZELF, allebei van dezelfde soort als de
+   twee die er in fase A al uit kwamen: de profielen bouwden op de vraag bij
+   MIDDENprijs en zetten daarna hun prijs (dus stond er een pand van de
+   verkeerde maat), en de betaalbaarheid werd bij middenkosten gerekend terwijl
+   de bouwsom met de prijsstand meebeweegt. Het profiel dat op prijs en
+   marketing speelde won daardoor NUL procent, en dat mat geen strategie maar
+   een rekenfout in de meetopstelling.
+
+   WAT ER NA DIT ALLES OVERBLIJFT: het veld ligt dichter bij elkaar dan in fase
+   A -- vijf stijlen tussen 67% en 81% waar er eerder een gat zat -- maar
+   horeca-focus wint nog steeds bijna al zijn duels. Dat staat hier als open
+   punt en niet als opgelost, en de volgende meting is niet nog een ijking maar
+   de vraag of veilingen en overnames (de rest van fase B) wel schaarste
+   maken waar contracten dat niet deden. */
 const GRENS_HOOG = 0.80, HELFT = 0.50, MIN_VARIATIE = 4;
 
 // de harde regels: hier hoort de bouw op te vallen

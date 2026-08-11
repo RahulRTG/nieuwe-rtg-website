@@ -162,7 +162,7 @@ test('goedkoper trekt meer mensen, duurder minder -- en dat is de keuze', () => 
   /* Zonder dit is de prijsstand een knop die alleen de omzet omhoog doet, en
      dan zet iedereen hem op 'hoog' en is er niets te kiezen. */
   const { vraagVoor } = require('../server/kern/spellen/magnaat/vraag');
-  const { prijsVan } = require('../server/kern/spellen/magnaat/sectoren');
+  const { prijsVan } = require('../server/kern/spellen/magnaat/prijsstand');
   const k = kaart('ijmuiden');
   const kav = kavelIn('boulevard');
   const meet = (prijs) => vraagVoor(k, { kavel: kav.id, sector: 'horeca', prijs, reputatie: 50 },
@@ -256,6 +256,79 @@ test('er is geen enkelvoudig recept: niets doen verliest en er zijn meerdere sti
      lonen. `zuinig` neemt overal een man in dienst waar er vier nodig zijn. */
   assert.ok(uit.aandeel.zuinig < 0.5,
     'KNIJPEN op personeel wint ' + pct('zuinig') + '% -- dat was precies de fout van de eerste versie');
+});
+
+test('een kavel draagt in elke sector ongeveer evenveel bedrijvigheid', () => {
+  /* De vijfde ijking, en hij komt uit een meting die de vorige vier niet konden
+     doen. Elke sector verdiende zichzelf even snel terug en TOCH won er een --
+     mobility-focus met 96%. De oorzaak zat niet in het rendement maar in hoeveel
+     bedrijvigheid EEN KAVEL draagt: een logistiekplek hield 132.000 omzet per
+     maand, een horecaplek 28.000. Wie per plek vier keer zoveel omzet kwijt kan,
+     heeft voor dezelfde omvang vier keer minder plekken nodig -- en elke extra
+     plek in een zone verdunt via `drukFactor` alle andere. Spreiden was dus
+     zelfbeschadiging, en een sector die niet hoefde te spreiden won.
+
+     Deze toets bewaakt de EIGENSCHAP en niet de getallen: hij zegt niets over
+     welke omzet goed is, alleen dat ze niet ver uiteen mogen lopen. */
+  const { alles } = require('../scripts/magnaat-balans');
+  const rij = alles('ijmuiden');
+  const omzet = rij.map(r => r.omzet);
+  const spreiding = Math.max(...omzet) / Math.min(...omzet);
+  assert.ok(spreiding < 1.6, 'een kavel draagt in de ene sector ' + spreiding.toFixed(1) +
+    ' keer zoveel omzet als in de andere: ' +
+    rij.map(r => r.sleutel + ' ' + Math.round(r.omzet)).join(', '));
+});
+
+test('er is geen prijsstand die het altijd wint', () => {
+  /* De zesde en zevende ijking. De omzetindex (vraag maal prijs) liep netjes op
+     van 0,83 via 1,00 naar 1,20, dus DUUR WAS ALTIJD BETER -- en daarmee was
+     prijs geen keuze maar een knop met een goed antwoord. Erger nog: bij een
+     hoge prijs haalde je dezelfde omzet uit een KLEINER pand, en alles wat met
+     de omvang meeschaalt (lonen, vaste lasten, huur, bouwsom) werd dus ruim 40%
+     goedkoper voor hetzelfde geld. Duur zijn was gratis. Nu kost duur zijn ook
+     wat het in het echt kost: meer handen per gast, een duurder pand per stoel.
+
+     Twee beweringen, en de tweede is de scherpste: de omzet mag per stand niet
+     ver uiteenlopen, EN de terugverdientijd van een op maat gebouwde zaak ook
+     niet. Dat laatste is wat het eerste pas echt maakt. */
+  const { SECTOREN } = require('../server/kern/spellen/magnaat/sectoren');
+  const { VRAAGFACTOR } = require('../server/kern/spellen/magnaat/prijsstand');
+  const beste = {};
+  for (const [naam, s] of Object.entries(SECTOREN)) {
+    const index = ['laag', 'midden', 'hoog'].map((stand, i) => s.prijs[i] / s.prijs[1] * VRAAGFACTOR[stand]);
+    const spreiding = Math.max(...index) / Math.min(...index);
+    assert.ok(spreiding < 1.2, naam + ': de omzetindex loopt van ' + index.map(x => x.toFixed(2)).join(' naar ') +
+      ' -- dan is er een stand die het altijd wint');
+    const stand = ['laag', 'midden', 'hoog'][index.indexOf(Math.max(...index))];
+    beste[stand] = (beste[stand] || 0) + 1;
+  }
+  /* En de scherpere kant van dezelfde vraag: welke stand het beste uitkomt hoort
+     PER SECTOR te verschillen. Een vervoerder wint op volume, een winkel op
+     marge. Zou een stand overal bovenaan staan, dan is de spreiding hierboven
+     alleen maar klein en de keuze nog steeds gemaakt. */
+  assert.ok(Object.keys(beste).length > 1,
+    'in elke sector komt dezelfde prijsstand het beste uit: ' + JSON.stringify(beste));
+  // en dezelfde vraag aan de motor zelf, want een index is geen winst
+  const m = maakMagnaat();
+  const terug = {};
+  for (const stand of ['laag', 'midden', 'hoog']) {
+    const p = potjeMet(ECO);
+    m.spel.init(p);
+    p.staat.geld.anna = 50000000;
+    const kav = kavelIn('boulevard');
+    const s = SECTOREN.horeca;
+    const { basisvraag } = require('../server/kern/spellen/magnaat/vraag');
+    const omvang = Math.max(4, Math.round(basisvraag(kaart('ijmuiden'), kav, 'horeca', 6) * s.markt
+      * VRAAGFACTOR[stand] / s.perMaand));
+    m.spel.zet(p, 'anna', { actie: 'open', kavel: kav.id, sector: 'horeca', omvang, prijs: stand });
+    speelUit(m, p, 6);
+    const r = p.staat.laatste.anna.regels[0];
+    terug[stand] = p.staat.vestigingen.anna[0].gebouwdVoor / Math.max(1, r.resultaat);
+  }
+  const w = Object.values(terug);
+  assert.ok(Math.max(...w) / Math.min(...w) < 1.25,
+    'de terugverdientijd hangt te veel van de prijsstand af: ' +
+    Object.entries(terug).map(([k, v]) => k + ' ' + v.toFixed(1)).join(', '));
 });
 
 test('de keuring van de strateeg slaat aan op een economie die scheef staat', () => {
@@ -458,7 +531,8 @@ test('de vrije acties mogen buiten de beurt, de grote niet', () => {
      stil tussen twee van jouw handelingen. De platformlaag leest de descriptor,
      dus het enige wat hier telt is dat de lijst klopt. */
   const m = maakMagnaat();
-  assert.deepEqual(m.spel.buitenBeurt.sort(), ['beleid', 'bouw', 'verkoop']);
+  assert.deepEqual(m.spel.buitenBeurt.slice().sort(),
+    ['beleid', 'bouw', 'contract-antwoord', 'contract-opzeggen', 'contract-voorstel', 'verkoop']);
   for (const groot of ['open', 'uitbreiden', 'sluiten'])
     assert.equal(m.spel.buitenBeurt.includes(groot), false, groot + ' is een grote zet en hoort bij je beurt');
 });

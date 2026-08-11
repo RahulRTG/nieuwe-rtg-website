@@ -42,8 +42,15 @@ module.exports = (ctx) => {
        zijn. `bouw` en `verkoop` horen bij het bord, `beleid` bij de economie --
        prijs, personeel, marketing en onderhoud mogen altijd. Wat er NIET in
        staat is even belangrijk: openen, uitbreiden en sluiten zijn grote zetten
-       en horen bij je beurt. */
-    buitenBeurt: ['bouw', 'verkoop', 'beleid'],
+       en horen bij je beurt.
+
+       ONDERHANDELEN STAAT ER SINDS FASE B BIJ, en dat is geen uitbreiding maar
+       de reden dat fase B kan bestaan: een contract dat op je beurt moet wachten
+       is in een partij van zes met 24 uur per beurt een week werk. Tekenen is
+       ook vrij -- het bindt je capaciteit, maar het verandert de kaart niet, en
+       dat is de scheidslijn. */
+    buitenBeurt: ['bouw', 'verkoop', 'beleid',
+      'contract-voorstel', 'contract-antwoord', 'contract-opzeggen'],
     init, zet,
     varianten: {
       vorm: { keuze: ['bord', 'economie'], standaard: 'bord' },

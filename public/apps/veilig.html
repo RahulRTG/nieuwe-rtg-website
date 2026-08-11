@@ -61,6 +61,24 @@
 <nav class="standen" id="standen" aria-label="Standen"></nav>
 <p class="stil standregel" id="standUitleg"></p>
 
+<!-- RTG iD en de Labpas horen in de wereld die over identiteit gaat, en ze
+     stonden nergens. RTG iD was de urgentste van alle wezen: apps/overheid.html
+     zegt letterlijk "Open RTG iD in de leden-app en voer deze code in", terwijl
+     dat scherm nergens te openen was. Een instructie naar een deur die niet
+     bestaat. -->
+<nav class="wereldapps" aria-label="Apps in deze wereld">
+  <a href="/apps/rtgid.html">RTG iD</a>
+  <a href="/apps/labpas.html">Labpas</a>
+</nav>
+<style>
+  .wereldapps { display: flex; gap: .5rem; overflow-x: auto; padding: .75rem 1rem;
+    border-bottom: 1px solid var(--line, #DEDBD5); }
+  .wereldapps a { white-space: nowrap; text-decoration: none; font-size: .82rem;
+    padding: .35rem .7rem; border: 1px solid var(--line, #DEDBD5); border-radius: 2px;
+    color: inherit; }
+  .wereldapps b { align-self: center; font-size: .68rem; letter-spacing: .12em;
+    text-transform: uppercase; opacity: .55; padding-left: .4rem; }
+</style>
 <main id="inhoud">
   <section aria-label="De stand" id="paneelVak">
     <div id="paneel"><p class="stil">Laden...</p></div>

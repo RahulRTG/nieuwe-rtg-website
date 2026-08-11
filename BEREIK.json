@@ -1,47 +1,9 @@
 {
-  "uitleg": "Schermen zonder zichtbare klikroute vanaf /apps/app.html. MAG ALLEEN KRIMPEN -- zie test/bereikbaar.test.js.",
+  "uitleg": "Schermen zonder zichtbare klikroute vanaf /apps/app.html. MAG ALLEEN KRIMPEN -- zie test/bereikbaar.test.js. LEEG betekent: elk scherm is aan te tikken.",
   "gemeten": {
     "schermen": 242,
-    "bereikbaar": 205,
-    "zonderRoute": 37
+    "bereikbaar": 242,
+    "zonderRoute": 0
   },
-  "schuld": [
-    "/apps/belastingkantoor.html",
-    "/apps/defensie.html",
-    "/apps/foundation/beheer.html",
-    "/apps/foundation/club.html",
-    "/apps/foundation/klas.html",
-    "/apps/gemeente.html",
-    "/apps/gemeenteloket.html",
-    "/apps/gemeentepda.html",
-    "/apps/home.html",
-    "/apps/horeca-beheer.html",
-    "/apps/horeca-bezorg.html",
-    "/apps/horeca-club.html",
-    "/apps/horeca-events.html",
-    "/apps/horeca-expeditie.html",
-    "/apps/horeca-haccp.html",
-    "/apps/horeca-hotel.html",
-    "/apps/horeca.html",
-    "/apps/kantoorpda.html",
-    "/apps/kassa.html",
-    "/apps/labpas.html",
-    "/apps/lesmaker.html",
-    "/apps/leverancier-aanvragen.html",
-    "/apps/livinglab.html",
-    "/apps/overheid.html",
-    "/apps/overheidspda.html",
-    "/apps/pakketten.html",
-    "/apps/rechtbank.html",
-    "/apps/redactie-pda.html",
-    "/apps/redactie.html",
-    "/apps/rijksloket.html",
-    "/apps/rit.html",
-    "/apps/rtgid.html",
-    "/apps/scanner.html",
-    "/apps/schoolpartner.html",
-    "/apps/voertuig.html",
-    "/apps/werkruimte.html",
-    "/apps/zorgbalie.html"
-  ]
+  "schuld": []
 }

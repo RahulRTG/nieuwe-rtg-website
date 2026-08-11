@@ -6,7 +6,7 @@
      en bouwt het beginscherm zichzelf niet meer op: een zwart scherm zonder
      foutmelding. app-main-01.js vergelijkt de twee en haalt zichzelf dan een
      keer vers op. -->
-<meta name="rtg-bouw" content="70a40b9e">
+<meta name="rtg-bouw" content="5e752aff">
 <!-- De foutmelder staat bewust VOORAAN: hij moet de fouten van het opstarten
      kunnen zien, en die gebeuren voordat de rest geladen is. -->
 <script src="/shared/foutmelder.js"></script>
@@ -31,6 +31,10 @@
 <!-- de melding van de mediapoort; tussen de andere bladen zodat hij in DEZELFDE
      stijlbundel meegaat en er geen tweede bundel bijkomt (test/stijlbundel.test.js) -->
 <link rel="stylesheet" href="/shared/media.css">
+<!-- de levende wereld: de kring om de klok, de bezel, het Command Wheel en de
+     levende grond. Hier tussen de andere bladen om dezelfde reden als media.css
+     hierboven: een blad erbij mag geen tweede stijlbundel opleveren. -->
+<link rel="stylesheet" href="/shared/wereld.css">
 <style>
   :root{
     --bg:var(--rtg-bg);
@@ -2014,6 +2018,17 @@
             <button type="button" data-wall="beeld" data-i18n="os.cc.wall.beeld">Beeld</button>
           </div>
         </div>
+        <!-- Het beginscherm: de levende wereld (de kring om de klok) of het
+             vertrouwde rooster met tegels. Dit is EEN schakelaar en geen tweede
+             beginscherm: beide standen tonen dezelfde klok, dezelfde werelden
+             en dezelfde balk van Rahul (zie shared/wereld.js). -->
+        <div class="os-cc-rij" id="osCcWereldRij">
+          <span class="os-cc-label" data-i18n="os.cc.wereld">Beginscherm</span>
+          <div class="os-cc-knoppen" id="osCcWereld">
+            <button type="button" data-wereld="aan" data-i18n="os.cc.wereld.kring">Wereld</button>
+            <button type="button" data-wereld="uit" data-i18n="os.cc.wereld.raster">Rooster</button>
+          </div>
+        </div>
         <div class="os-cc-tegels">
           <button id="osCcScan"><b><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7V5a1 1 0 0 1 1-1h2M17 4h2a1 1 0 0 1 1 1v2M20 17v2a1 1 0 0 1-1 1h-2M7 20H5a1 1 0 0 1-1-1v-2"/><path d="M4 12h16"/></svg></b><span data-i18n="os.cc.scan">Scannen</span></button>
           <button id="osCcZegel"><b><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l7 3v5c0 4.4-3 7.7-7 9-4-1.3-7-4.6-7-9V6l7-3z"/><path d="M9 12l2 2 4-4"/></svg></b><span data-i18n="os.cc.zegel">Mijn Zegel</span></button>
@@ -2280,6 +2295,10 @@
 <script src="/shared/glyf.js"></script>
 <script src="/shared/emoji.js"></script>
 <script src="/shared/uitvoer.js"></script>
+<!-- De levende wereld: het beginscherm als kring om de klok. Moet VOOR
+     app-main.js staan en zonder defer, want app-main reikt hem de werelden aan
+     (app-main-26c.js) op het moment dat het zelf draait. -->
+<script src="/shared/wereld.js"></script>
 <script src="/apps/app-main.js"></script>
 <script>
 window.I18N = { en: {

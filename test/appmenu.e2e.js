@@ -90,6 +90,13 @@ async function metLid(fn) {
         localStorage.setItem('rtg_member_token', t);
         localStorage.setItem('rtg_lang', 'nl');
         localStorage.setItem('rtg_cookieinfo_v1', '1');
+        /* DEZE TOETSEN METEN HET ROOSTER, dus zetten ze het rooster aan. Het
+           beginscherm opent tegenwoordig standaard in de wereldstand (de kring
+           om de klok, shared/wereld.js) en daar staan de tegels op
+           display:none -- dan meet je nullen en zakt de toets om een stand en
+           niet om een fout. De wereldstand heeft een eigen toets
+           (test/wereld.e2e.js); die zet deze sleutel juist op 'aan'. */
+        localStorage.setItem('rtg_os_wereld', 'uit');
       } catch (e) {}
     }, tok);
     await fn({ base, ctx });
@@ -408,6 +415,13 @@ test('geen enkele map loopt leeg op de instappas',
         localStorage.setItem('rtg_member_token', t);
         localStorage.setItem('rtg_lang', 'nl');
         localStorage.setItem('rtg_cookieinfo_v1', '1');
+        /* DEZE TOETSEN METEN HET ROOSTER, dus zetten ze het rooster aan. Het
+           beginscherm opent tegenwoordig standaard in de wereldstand (de kring
+           om de klok, shared/wereld.js) en daar staan de tegels op
+           display:none -- dan meet je nullen en zakt de toets om een stand en
+           niet om een fout. De wereldstand heeft een eigen toets
+           (test/wereld.e2e.js); die zet deze sleutel juist op 'aan'. */
+        localStorage.setItem('rtg_os_wereld', 'uit');
       } catch (e) {}
     }, tok);
     const page = await ctx.newPage();
@@ -489,6 +503,13 @@ test('de wereldtegels op het beginscherm staan naast elkaar, en openen hun app',
         localStorage.setItem('rtg_member_token', t);
         localStorage.setItem('rtg_lang', 'nl');
         localStorage.setItem('rtg_cookieinfo_v1', '1');
+        /* DEZE TOETSEN METEN HET ROOSTER, dus zetten ze het rooster aan. Het
+           beginscherm opent tegenwoordig standaard in de wereldstand (de kring
+           om de klok, shared/wereld.js) en daar staan de tegels op
+           display:none -- dan meet je nullen en zakt de toets om een stand en
+           niet om een fout. De wereldstand heeft een eigen toets
+           (test/wereld.e2e.js); die zet deze sleutel juist op 'aan'. */
+        localStorage.setItem('rtg_os_wereld', 'uit');
       } catch (e) {}
     }, tok);
     const page = await ctx.newPage();

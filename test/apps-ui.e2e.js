@@ -43,6 +43,11 @@ async function bootTest(opts) {
     await page.addInitScript((kv) => {
       for (const k in kv) localStorage.setItem(k, kv[k]);
       localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1');
+      /* Het beginscherm opent standaard in de wereldstand (de kring om de klok,
+         shared/wereld.js); daar staan de maprijen op display:none en levert een
+         meting van hun plaats nullen op. Deze toetsen gaan over het ROOSTER, dus
+         zetten ze dat aan. De wereldstand wordt in test/wereld.e2e.js gemeten. */
+      localStorage.setItem('rtg_os_wereld', 'uit');
     }, keys);
     await page.goto(base + opts.pad, { waitUntil: 'load' });
     await page.waitForSelector('#gate', { state: 'hidden', timeout: 15000 });
@@ -330,7 +335,22 @@ test('Leden-app: Rahul begint zelf op het beginscherm en antwoordt daar ook',
     const fouten = [];
     letOpFouten(page, fouten);
     await page.route('**/api/onboarding/status', r => r.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ klaar: true }) }));
-    await page.addInitScript(t => { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1'); }, reg.token);
+    await page.addInitScript(t => {
+      localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_lang', 'nl');
+      localStorage.setItem('rtg_cookieinfo_v1', '1');
+      /* DEZE TOETS MEET DE DRAAD, dus zet hij de stand aan waarin de draad
+         openstaat: het rooster. Het beginscherm opent tegenwoordig standaard in
+         de wereldstand, en daar houdt Rahul het bewust bij EEN zin in een gouden
+         ring; de draad blijft dicht tot je hem opent, anders staat dezelfde zin
+         er twee keer onder elkaar (zie wereld.css).
+
+         De belofte hierboven verandert daar niet door -- hij begint nog steeds
+         uit zichzelf en antwoordt nog steeds zonder dat je het beginscherm
+         verlaat -- alleen de VORM verschilt, en die vorm wordt gemeten in
+         test/wereld.e2e.js ("Rahul zegt het EEN keer"). Wie deze regel weghaalt,
+         meet de ene vorm met de eisen van de andere. */
+      localStorage.setItem('rtg_os_wereld', 'uit');
+    }, reg.token);
     await page.goto(base + '/apps/app.html', { waitUntil: 'load' });
     await page.waitForSelector('#gate', { state: 'hidden', timeout: 15000 });
 

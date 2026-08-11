@@ -14,6 +14,7 @@ const { CATEGORIEEN, DOELGROEPEN, DOELGROEP_IDS, DOELGROEP_OP_ID, LEDEN, LEDEN_R
 const FUNCTIES = [].concat(
   require('./cat-leden'),
   require('./cat-apps'),
+  require('./cat-apps2'),
   require('./cat-life'),
   require('./cat-partners'),
   require('./cat-zaakregie'),

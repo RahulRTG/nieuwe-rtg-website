@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 3214 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 3215 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,13 +18,13 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 3214 |
-| servermodules (`server/**/*.js`) | 1833 |
-| routebestanden (`server/routes/**`) | 391 |
-| kernmodules (`server/kern/**`) | 1117 |
+| API-endpoints | 3215 |
+| servermodules (`server/**/*.js`) | 1843 |
+| routebestanden (`server/routes/**`) | 392 |
+| kernmodules (`server/kern/**`) | 1126 |
 | schermen (`public/**/*.html`) | 228 |
 | gedeelde browsermodules (`public/shared/*.js`) | 180 |
-| toetsbestanden (`test/*.test.js`) | 742 |
+| toetsbestanden (`test/*.test.js`) | 747 |
 | schermtoetsen (`test/*.e2e.js`) | 111 |
 
 ## 2. De weg van een verzoek
@@ -114,7 +114,7 @@ op de regel zelf. Dat is niet hetzelfde als onbeveiligd -- regel 28 van de keuri
 per route een poort **of** een plek op de publieke lijst met reden. Deze kolom is een
 wegwijzer, geen verdict.
 
-Daarnaast 1718 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 1719 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 
@@ -122,9 +122,9 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1260 |
+| kern-namen die routes aanraken | 1266 |
 | daarvan door **meer dan één** domein (de echte koppeling) | 154 |
-| daarvan door precies één domein | 1106 |
+| daarvan door precies één domein | 1112 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |
 
@@ -154,10 +154,10 @@ findSupplier(5) notifySupplier(5) sseToCustomer(5)
 | 40 | `server/routes/member/voertuigen/verkoop.js` |
 | 40 | `server/routes/member/voertuigen.js` |
 | 39 | `server/routes/member/voertuigen/ontmoeten.js` |
-| 39 | `server/routes/spellen.js` |
 | 36 | `server/routes/auth.js` |
 | 36 | `server/routes/staff.js` |
 | 35 | `server/routes/auth/account.js` |
+| 34 | `server/routes/auth/herstel.js` |
 
 ## 6. Waar de waarheid staat
 

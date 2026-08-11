@@ -186,7 +186,7 @@
     <div class="kaart blok" id="nTempoBlok" hidden>
       <div class="sec" style="margin-top:0;">Hoeveel tijd per beurt?</div>
       <div class="keuzerij" id="nTempi"></div>
-      <div class="leeg" style="padding:.3rem 0 0;">Bij een lange beurt hoef je niet tegelijk online te zijn. Loopt de tijd af, dan kan je tegenstander de partij toewijzen — vanzelf gebeurt er niets.</div>
+      <div class="leeg" style="padding:.3rem 0 0;">Bij een lange beurt hoef je niet tegelijk online te zijn. Loopt de tijd af, dan kan je tegenstander de partij toewijzen; vanzelf gebeurt er niets.</div>
     </div>
     <div class="kaart blok">
       <div class="sec" style="margin-top:0;">Tegen wie?</div>
@@ -768,7 +768,7 @@ function tekenPotje(){
   const k = p.klok, mijnBeurt = p.status==='bezig' && p.beurt===p.ik;
   const kt = p.status==='bezig' ? klokTekst(k) : '';
   $('#sKlok').hidden = !kt;
-  if (kt) $('#sKlok').textContent = (mijnBeurt ? 'Jouw beurt — ' : 'Beurt van ' + esc(p.spelers[p.beurt]) + ' — ') + kt;
+  if (kt) $('#sKlok').textContent = (mijnBeurt ? 'Jouw beurt: ' : 'Beurt van ' + esc(p.spelers[p.beurt]) + ': ') + kt;
   $('#sToewijzen').hidden = !(k && k.verlopen && p.status==='bezig' && !mijnBeurt);
   $('#sNabespreken').hidden = p.status !== 'klaar';
   /* Terugkijken kan pas na afloop, en alleen bij spellen waarvan de server de
@@ -807,7 +807,7 @@ async function npToon(stap){
     $('#npSchuif').max = String(d.totaal);
     $('#npSchuif').value = String(d.stap);
     $('#npStand').textContent = 'Zet ' + d.stap + ' van ' + d.totaal +
-      (d.gestrand ? ' — het verloop liep vast bij zet ' + d.gestrand : '');
+      (d.gestrand ? ' -- het verloop liep vast bij zet ' + d.gestrand : '');
     // het bord van dat moment door dezelfde tekenaar als de live partij
     const bewaard = huidig.staat;
     huidig.staat = d.staat;

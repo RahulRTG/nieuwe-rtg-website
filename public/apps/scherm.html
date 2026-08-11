@@ -9,6 +9,13 @@
 <link rel="stylesheet" href="/apps/foundation/stijl.css">
 <script src="/apps/foundation/palet.js"></script>
 <link href="/shared/rtg-ui.css" rel="stylesheet">
+<!-- De basis-laag hoort ook hier: hij draagt de toegankelijkheidsstand
+     (grote tekst, minder beweging) en die geldt op een televisie net zo goed.
+     De metgezel doet zonder inlog niets, en dat is precies wat we willen -- hij
+     laadt wel `wauw.js` mee, en daar zit de wake lock in: een gedeeld scherm
+     hoort tijdens een potje niet in slaap te vallen. -->
+<script src="/shared/basis.js"></script>
+<script src="/shared/metgezel.js" defer></script>
 <style>
   /* HET GEDEELDE SCHERM. Dit is de enige RTG-pagina die op een televisie hoort
      en niet in een hand, en dat verandert alles aan de maatvoering: alles is

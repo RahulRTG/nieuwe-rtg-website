@@ -1622,6 +1622,15 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
     ['/api/vertaal/ui', 'de knopteksten van datzelfde inlogscherm'],
     ['/api/translate', 'het woordenboek is publiek; de AI-tak zit achter kern/aipoort.js'],
     ['/api/push/key', 'de VAPID-sleutel is per definitie de PUBLIEKE helft'],
+    /* Het gedeelde scherm. Een televisie in een vakantiehuis heeft geen
+       RTG-account, en er een op zetten zou betekenen dat er een ingelogde
+       sessie op een gedeeld apparaat blijft staan. De CODE is de hele
+       toegang, en hij is bewust weinig waard: hij komt van een SPELER van dat
+       potje, hij geeft alleen `zicht.publiek` van dat ene potje, hij verloopt
+       na twee uur, en er kan niets terug -- geen zet, geen chat. Wie hem heeft
+       ziet wat iedereen in de kamer toch al ziet. Er staat een rem voor tegen
+       brute kracht. Zie server/kern/spellen/projectie.js. */
+    ['/api/projectie/:code', 'een gedeeld scherm heeft geen sessie; de code geeft alleen de publieke laag van EEN potje en verloopt'],
     /* De rechtsvormen zijn voorlichting, geen bedrijfsdata: wat een B.V. van
        een stichting onderscheidt, en waar je met elk van de twee aan vastzit,
        hoort iemand te kunnen lezen VOORDAT hij een account maakt. Er staat

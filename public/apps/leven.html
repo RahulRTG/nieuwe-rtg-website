@@ -12,6 +12,8 @@
 <link href="/shared/dagkleur.css" rel="stylesheet">
 <link href="/shared/rtg-ui.css" rel="stylesheet">
 <link href="/shared/rtg-wereld.css" rel="stylesheet">
+<!-- de levenspas onderaan dit scherm; gedeeld met /apps/foundation/mijnbanden.html -->
+<link href="/shared/levenspas.css" rel="stylesheet">
 </head>
 <body class="rtg-stijl" data-rtg-modus="world">
 <a class="skip" href="#inhoud">Naar de inhoud</a>
@@ -22,10 +24,14 @@
      WAAROM DIT SCHERM AAN DE LEDENKANT STAAT EN NIET IN /apps/foundation/.
      Het foundation-huis draait op een gezinscode met een profieltoken; de
      levenslijn staat op de RTG-lidsleutel, want zijn bronnen (paspoort,
-     onderwijs, werk, entourage) hangen daaraan. Die twee sessiewerelden aan
-     elkaar knopen is echt werk en het hoort bij LEVEN.md par. 2.8, rechten
-     per relatie -- fase 2. Tot die tijd is dit het beeld van het LID over
-     zijn eigen leven, en dat is eerlijker dan een half gekoppeld scherm.
+     onderwijs, werk, entourage) hangen daaraan.
+
+     Die twee sessiewerelden zijn in fase 2 aan elkaar geknoopt, maar alleen
+     dáár waar het over TOESTEMMING gaat: de levenspas hieronder werkt over
+     beide werelden heen (routes/levenband.js draait elke actie achter allebei
+     de deuren). Het levensbeeld zelf blijft van het lid, want zijn bronnen
+     hangen aan de lidsleutel -- en een half gekoppeld beeld tonen zou minder
+     eerlijk zijn dan het eerlijk gescheiden houden.
 
      WAT HIER NOOIT BIJ MAG (par. 2.4 en 2.9): geen getal dat een mens met
      een ander vergelijkt, geen voortgangsbalk over een leven, geen reeks,
@@ -41,6 +47,30 @@
     <div id="lvVak"><p class="stil">Laden...</p></div>
   </section>
 
+  <!-- DE LEVENSPAS (LEVEN.md par. 2.8). Twee besluiten staan hier hardop op
+       het scherm omdat ze allebei anders zijn dan mensen verwachten: een band
+       ontstaat pas als de ANDER hem bevestigt, en van een minderjarige ziet
+       een ouder standaard niets. Een lege lijst zonder die uitleg leest als
+       een storing, en dan gaat iemand zoeken naar de instelling die er niet
+       is en ook niet komt. -->
+  <section aria-label="Wie mag wat zien" class="lv-mentorvak">
+    <h2>Wie mag wat zien</h2>
+    <p class="lv-intro">Een band ontstaat alleen als u allebei bevestigt, en daarna ziet niemand iets tot u het per stuk geeft. Alles is intrekbaar, altijd, zonder uitleg.</p>
+    <div id="krVak"><p class="stil">Laden...</p></div>
+    <p id="krFout" class="lp-fout" hidden role="alert"></p>
+    <form id="krVorm" class="lp-vorm">
+      <input id="krNaam" placeholder="Codenaam van de ander" aria-label="Codenaam van de ander" autocomplete="off">
+      <select id="krSoort" aria-label="Wat bent u voor elkaar"></select>
+      <!-- bij een leerkracht of een mentorschap hoort hier een datum te staan
+           (par. 2.8: toegang die vanzelf eindigt vraagt niemand om eraan te
+           denken). Afdwingen doen we niet: dat zou een oordeel zijn over
+           andermans relatie. Vandaar een voorstel in tekst en geen eis. -->
+      <label class="lp-tot" for="krTot">Loopt tot (mag leeg)</label>
+      <input id="krTot" type="date" aria-label="Band loopt tot; mag leeg blijven">
+      <button class="knop hoofd lp-mini" type="submit">Band vragen</button>
+    </form>
+  </section>
+
   <section aria-label="Vraag de mentor" class="kaart lv-mentorvak">
     <h2>Vraag de mentor</h2>
     <div id="lvMentorUit" class="stil" hidden aria-live="polite"></div>
@@ -54,6 +84,12 @@
 </main>
 
 <script src="/apps/leven/leven.js"></script>
+<!-- de levenspas is gedeeld met het foundation-huis (aan de andere kant van
+     elke band staat een gezinsprofiel dat hetzelfde hoort te zien); de schil
+     eronder leunt op de twee helpers die leven.js op window.LV zet en hoort er
+     dus NA te staan, en niet defer -->
+<script src="/shared/levenspas.js"></script>
+<script src="/apps/leven/kring.js"></script>
 <script src="/shared/seizoen.js" defer></script>
 <!-- de metgezel-laag (Rahul, wauw, palet) hoort op elke app-pagina; keuring 10 -->
 <script src="/shared/metgezel.js" defer></script>

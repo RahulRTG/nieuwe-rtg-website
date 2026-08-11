@@ -143,6 +143,11 @@
     });
   }
 
+  /* De twee helpers die ./kring.js ook nodig heeft, EEN keer. Ze allebei
+     nogmaals opschrijven zou betekenen dat de token-in-de-kop-regel op twee
+     plekken staat, en dan is er een plek waar hij ooit anders komt te staan. */
+  w.LV = { api: api, esc: esc };
+
   d.addEventListener('DOMContentLoaded', function () {
     stijl();
     $('#lvMentorForm').addEventListener('submit', vraag);

@@ -25,6 +25,17 @@ vooral paragraaf 2, de grenzen: een kind is geen profiel, nooit sturen maar
 openen, en de bijdrage-spiegel is nooit vergelijkend. Waar een functie botst
 met een grens, vervalt de functie.
 
+**`CONCERN.md` is het diepte-document van de bedrijvenkant** — RTG Concern,
+het Company Launch & Workforce OS: van bedrijfsnaam of idee naar een ingericht
+concern, en daarna mensen er moeiteloos in laten werken. Lees vóór je aan
+bedrijven, vestigingen, rollen of personeel werkt vooral de paragraaf *De
+grenzen*: de AI is hier geen juridische autoriteit (elk juridisch gegeven heeft
+een bron én een geschiedenis), een werknemer koopt nooit een pas om te mogen
+werken, en toegang verlenen gebeurt waar de rol woont — er komt geen derde
+rechtenmodel bij. De kern in één zin: **één bedrijf is niet één KvK**, dus
+concern, entiteit, registratie, vestiging, merk en operating unit zijn zes
+begrippen en geen zes velden.
+
 **`ONTWERP.md` is het RTG Design System 2.0** — de vormtaal: merk-elementen
 tegenover werk-elementen (Bodoni is ceremonieel en staat op een gesloten lijst
 rollen), de drie modi World/Pro/Command, uitzonderingsgestuurd ontwerpen, kleur

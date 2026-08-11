@@ -3354,6 +3354,16 @@ var RTG_BOUW = '3f9d2cdc';
        betekenen. De werkruimte is nu een sleutel aan diezelfde bos, dus er is
        nog een deur: Mijn werkplekken. Wie er voor het eerst in moet, vindt de
        werkruimte-inlog onderaan diezelfde kiezer. */
+    /* Het Ondernemers-OS stond hier NIET, en dat was een gat waar de hele
+       ondernemersweg in verdween: /apps/onderneming.html bestond, werkte en had
+       zelfs een hulptekst in de appgids -- maar hij stond in geen enkele
+       registry en in geen enkele map, dus niemand kon hem vinden. Een scherm dat
+       nergens vandaan te bereiken is, is geen scherm.
+
+       Eén tegel, niet twee. De concern-laag (CONCERN.md) krijgt geen eigen
+       tegel maar hangt achter deze: dat is PLATFORM.md paragraaf 0 -- een
+       onderdeel binnen een app, geen tweede adres in de bibliotheek. */
+    onderneming: { naam: 'Onderneming', url: '/apps/onderneming.html' },
     sitemaker:   { naam: 'Website', url: '/apps/sitemaker.html' },
     browser:     { naam: 'Web',  url: '/apps/browser.html' },
     vonk:        { naam: 'Daten',         url: '/apps/vonk.html' },
@@ -3522,7 +3532,7 @@ var RTG_BOUW = '3f9d2cdc';
       'link:muziek', 'link:podium', 'link:theater', 'link:clips', 'link:spelen',
       'link:nieuws', 'link:krant', 'link:sport'] },
     { sleutel: 'map-werk', naam: 'RTG Kantoor', wereld: '/apps/kantoor.html', glyf: 'office', items: [
-      'link:office', 'os:werk', 'link:loonstrook', 'link:school',
+      'link:office', 'os:werk', 'link:onderneming', 'link:loonstrook', 'link:school',
       'link:browser', 'link:sitemaker'] },
     /* Veilig: wie je bent en wie er over je waakt. De vier apps op dezelfde
        kern zijn een app met vier standen geworden (zie de opmerking bij LINKS),
@@ -3671,7 +3681,9 @@ var RTG_BOUW = '3f9d2cdc';
         belLijst.appendChild(leeg);
       }
       for (const r of rollen) {
-        const doel = WERKDOEL[r.rol];
+        // Een manager hoort in de zaak-app en niet in de PDA. accStart() munt
+        // dezelfde sessie: geen bevoegdheid verandert, alleen waar hij landt.
+        const doel = (r.rol === 'personeel' && r.manager) ? WERKDOEL.zaak : WERKDOEL[r.rol];
         const b = document.createElement('button');
         const zi = document.createElement('span'); zi.className = 'zi';
         const zg = window.RTGGlyf && RTGGlyf.svg(doel.glyf); if (zg) zi.appendChild(zg);
@@ -3723,6 +3735,18 @@ var RTG_BOUW = '3f9d2cdc';
     });
     belScrim.classList.add('open');
   }
+/* ---------- Mappen, gebruik en het bouwen van de tegels ----------
+
+   Afgesplitst van app-main-25.js toen die over de 10 kB ging. Let op de VORM
+   van deze knip: de bundel plakt de delen rauw aaneen en app-main-25.js eindigt
+   MIDDEN in een functie (tegelInhoud loopt door in 26). Een blok uit het midden
+   verplaatsen zou de volgorde van de stroom veranderen -- dat is hier een keer
+   gebeurd, en toen belandde openWerkKiezer() binnen in tegelInhoud(). Regel 42
+   van de keuring ving dat meteen: "aangeroepen buiten de functie waarin hij
+   verklaard staat", op het scherm een lege bel.
+
+   Een deel van een bundel mag dus alleen aan de STAART worden afgeknipt, nooit
+   uit het midden. Wat hier staat is precies de staart van 25. */
   /* ---------- mappen: eigen namen ----------
      De naam van een map is van de gebruiker: hernoemen kan in de wiebel-modus
      (tik op de map) of via Rahul; de keuze staat per pas in localStorage. */

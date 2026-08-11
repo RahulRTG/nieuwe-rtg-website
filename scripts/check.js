@@ -357,6 +357,15 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
     ['public/shared/klok3d/klok3d-01.js', 'de 3D-klok: een aaneengesloten tekenlus'],
     ['public/shared/metgezel/metgezel-01.js', 'de metgezel-laag in een IIFE zonder binnengrens'],
     ['server/kern/livinglab/kader.js', 'de tabellen van het Living Lab (cyclus, soorten, methoden, rollen, bewijsgraden, risicoklassen): één tabelset zonder logica, en juist het bestand dat NIET op twee plekken mag staan'],
+    /* Dezelfde reden als kader.js hierboven, en scherper. Dit is het
+       genre-register: 73 regels data, geen logica (die staat in ./genres.js).
+       Het ging over de grens toen elk genre een toegangsstand kreeg -- dus door
+       de DATA en niet door een tweede onderwerp. En opknippen is hier niet
+       neutraal: dit bestand bestaat juist omdat de 73 genres verspreid stonden
+       over tien initdata-delen en zes kernmodules. Het in tweeën hakken zet die
+       verspreiding weer in gang, en test/genreregister.test.js bewaakt precies
+       dat het EEN plek blijft. */
+    ['server/seed/genres-lijst.js', 'het genre-register: 73 regels pure data zonder logica, en juist het bestand dat NIET op twee plekken mag staan'],
     ['public/shared/i18n/i18n-01.js', 'de taaltabel + kiezer, een geheel'],
     ['public/shared/i18n/i18n-03.js', 'de taaltabel + kiezer, een geheel'],
     ['server/server.js', 'de bedrading van de hele app; wordt per ronde verder verdund'],
@@ -372,6 +381,17 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
        lieten dat meteen zien. Een lijst hoort bij elkaar te blijven. */
     ['server/routes/werkplek-bureaus.js', 'de registratielijst van zes bureaus, voluit sinds regel 45; het werk staat in EEN handler erboven'],
     ['server/opzet/kernlaag4.js', 'een ophanglijst, geen module: elke regel hangt een kern op aan de vorige laag. Dezelfde reden als server.js hierboven -- er zit geen naad in, alleen volgorde, en die volgorde IS de inhoud'],
+    /* Deze twee zijn HETZELFDE SOORT BESTAND als kernlaag4.js hierboven, en ze
+       gingen erover toen kern/concern werd opgehangen (CONCERN.md). Dat is een
+       regel die erbij moest: een kern die nergens hangt, draait niet.
+
+       Ze horen in MAG en niet in NOG, want er valt niets te knippen dat het
+       beter maakt. Een ophanglijst in tweeën hakken levert twee halve lijsten
+       op waarvan de volgorde tussen de helften niet meer te lezen is -- en die
+       volgorde is precies de inhoud: kernlaag4b hangt het concern op NA de
+       onderneming, omdat het er een bestaande onderneming in aanwijst. */
+    ['server/opzet/kernlaag4b.js', 'een ophanglijst, geen module; zie kernlaag4.js hierboven -- de volgorde IS de inhoud'],
+    ['server/opzet/routes.js', 'de mountlijst van alle routers: geen naad, alleen volgorde, net als de kernlagen'],
     ['public/apps/boardroom-eigenaar.js', 'de eigenaarszetel: vier panelen op een gedeelde api/el-kern in een IIFE']
   ]);
   /* NOG TE DOEN. Deze staan net boven de grens en moeten opgeknipt worden, maar
@@ -389,6 +409,16 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
        een tweede script bij dat overal mee moet. Dat doe je een voor een met de
        toetsen ernaast en niet in de staart van een ronde. */
     'public/shared/media.js',
+    /* server/kern/eenaccount.js en public/apps/app-main/app-main-25.js STONDEN
+       HIER en zijn er weer af: de naden die erbij benoemd stonden, zijn geknipt.
+       De sleutelbos en het MUNTEN van een sessie staan nu apart
+       (./eenaccount/starten.js), en de algemene pin is los van de Werk-kiezer
+       (app-main-25b.js). Zo hoort deze lijst te krimpen. */
+    /* server/kern/aanmeldingen.js STOND HIER en is er weer af: de knip die hier
+       met naam op de lijst stond, is gemaakt. Het klaarzetten van de zaak
+       (provisioning plus de bewijsstap voor de gereguleerde genres) woont nu in
+       ./aanmeldingen/klaarzetten.js, en het bestand past weer onder de maat.
+       Zo hoort deze lijst te krimpen: niet door de grens te verzetten. */
     // server/accounts/users.js is opgeknipt: het ledendossier, de verificatie, de
     // kantoorlijsten en de vergetelheid staan nu in server/accounts/dossier.js
     'server/kern/journalistiek.js',
@@ -1590,6 +1620,14 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
     ['/api/auth/forgot', 'wachtwoord vergeten: wie buitengesloten is heeft geen token'],
     ['/api/pin/herstel', 'pin vergeten: de eenmalige sleutel uit de mail IS het bewijs, net als bij /api/auth/reset'],
     ['/api/aanmelding/aanvraag', 'een aanstaande aanvrager is nog geen lid (met rem per ip)'],
+    /* Het bewijsstuk voor de gereguleerde genres hoort bij dezelfde aanvraag en
+       loopt dus dezelfde weg: wie een apotheek aanvraagt heeft op dat moment
+       geen zaak, geen personeelslogin en soms geen account -- alleen zijn
+       aanmeldings-id. Er valt hier NIETS mee te lezen: de route geeft alleen
+       terug dat het stuk is ontvangen, dus een geraden id levert geen gegevens
+       op. En hij verleent niets: aftekenen (de handeling die de zaak vrijgeeft)
+       zit achter officeAuth en staat op een naam. */
+    ['/api/aanmelding/bewijs', 'hoort bij de aanvraag zelf; de aanvrager heeft nog geen sessie, en aftekenen zit wel achter het kantoor'],
     /* De twee gastendeuren. Hier KAN nog geen tafelsleutel zijn: die ontstaat
        pas bij het aanschuiven, en het bewijs dat iemand aan tafel 12 zit is de
        QR op die tafel. Het token is dus de credential en geen gemakje -- het is

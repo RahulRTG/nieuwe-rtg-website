@@ -18,6 +18,13 @@
       opgeruimd: bij een geschil is juist de oude tekst het bewijs. */
 'use strict';
 
+/* Elke toestandswijziging loopt via DE ENE DEUR van de gebeurtenislaag
+   (./gebeurtenis.js): het veld wordt gezet EN de gebeurtenis vastgelegd, met
+   actor, bron en waar nodig een reden. Buitenom schrijven merkt het vangnet
+   alsnog op, maar dan zonder tijdstip -- en op deze vier families geldt dat als
+   een defect. Zie de kop van ./gebeurtenis-lezen.js. */
+const { werkVeld } = require('./gebeurtenis');
+
 const SOORTEN = ['klant', 'leverancier', 'arbeid', 'huur', 'licentie', 'verwerkers',
   'geheimhouding', 'verzekering', 'vergunning', 'overig'];
 
@@ -107,7 +114,8 @@ module.exports = (sctx) => {
     const reden = schoon(req.body.reden, 300);
     if (!reden) return res.status(400).json({ error: 'Noteer waarom dit contract wordt opgezegd.' });
     const k = klok(c);
-    c.status = 'opgezegd';
+    const gm = werkVeld(g.w, 'contract', c, { status: 'opgezegd' }, { actor: g.l.naam, reden, bron: 'werk/contract' });
+    if (!gm.ok) return res.status(gm.status).json(gm);
     c.opgezegd = { reden, door: g.l.naam, op: dag(), tijdig: k.dagenTotOpzegdag == null ? null : k.dagenTotOpzegdag >= 0 };
     log(g.w, g.l, 'contract-opgezegd', c.id, reden);
     save();

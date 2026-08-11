@@ -13,32 +13,66 @@
    Vaste regels: de AI kent nooit zelf toegang toe (beslis() blijft
    mensenwerk) en er wordt nooit geclaimd dat een echte betaling is
    verwerkt -- 'voldaan' is de administratieve bevestiging door een mens. */
-const GENRES = ['restaurant', 'hotel', 'bar', 'club', 'beachclub', 'retail', 'modehuis',
-  'vervoer', 'charter', 'verhuur', 'vastgoed', 'care', 'boerderij', 'creator',
-  'activiteiten', 'zzp', 'vakwerk', 'bouw', 'kantoorgebouw', 'apartment', 'villa',
-  'autogarage', 'schoonmaak', 'hovenier', 'wasserij', 'rijschool', 'dierenarts',
-  'tandarts', 'fotograaf', 'verhuizer', 'ithulp'];
+/* DE LIJST WORDT GELEZEN, NIET OVERGETYPT.
+
+   Hier stonden 31 genre-namen met de hand ingetikt, naast de 73 in het
+   register. Twee lijsten over dezelfde vraag (LAT-regel 4), en ze liepen uiteen
+   zoals dat altijd gaat: 42 genres bestonden wel in het register maar konden
+   niet worden aangevraagd, en `GENRES.includes(type) ? type : 'zzp'` maakte er
+   stilletjes een zzp-zaak van. Wie om een juwelier of een wellness-zaak vroeg,
+   kreeg de zzp-caps en het vangnet-dorp, en merkte dat pas als de verkeerde
+   tools op zijn scherm stonden. Geen foutmelding, geen spoor.
+
+   Nu leest dit bestand de toegangsstand uit het register. Wie een genre
+   openzet, doet dat op één plek en deze lijst verandert mee. */
+const register = require('../../seed/genres');
+const GENRES = register.aanvraagbareGenres();
 
 /* De fabriek, met de genrelijst er los naast: het proefpubliek in
    test/gezelschap.js zet voor elk genre een lid neer en moet die lijst kunnen
-   lezen zonder de hele kern op te bouwen. Overtypen zou betekenen dat een nieuw
-   genre stil buiten dat publiek blijft. */
+   lezen zonder de hele kern op te bouwen. */
 module.exports = Object.assign((ctx) => {
   const { db, save, kap, nu, accounts } = ctx;
 
   /* De behoeften-intake: wat de ondernemer invult (of aan Rahul vertelt)
-     komt netjes geklemd op de aanmelding te staan. */
-  function zetBedrijf(a, data) {
-    if (!data || typeof data !== 'object') return;
+     komt netjes geklemd op de aanmelding te staan.
+
+     EEN GENRE DAT NIET OPENSTAAT WORDT NIET IETS ANDERS. Deze functie zette
+     hier `: 'zzp'` en dat is de stille fallback die het register komt
+     opruimen. Nu geeft zij de weigering terug en schrijft zij niets: de
+     aanvrager hoort te lezen dat zijn genre nog niet open is, en waarom.
+
+     Geeft { ok: true } terug, of een fout met een code die de aanroeper kan
+     doorgeven. Geen bedrijf meegestuurd is geen fout -- niet elke aanmelding
+     gaat over een zaak. */
+  function zetBedrijf(a, data, opties) {
+    if (!data || typeof data !== 'object') return { ok: true, bedrijf: false };
     const naam = kap(data.naam, 60);
-    if (!naam) return;
+    if (!naam) return { ok: true, bedrijf: false };
+
+    const type = typeof data.type === 'string' ? data.type.trim() : '';
+    if (!type) {
+      return { status: 400, error: 'In welke branche werkt dit bedrijf?',
+        uitleg: 'Zonder branche weten we niet welke tools de zaak nodig heeft. Eerder werd dit stil een zzp-zaak; dat doen we niet meer.' };
+    }
+    const poort = register.genreToegang(type, opties);
+    if (!poort.ok) {
+      return { status: poort.reden === 'onbekend' ? 400 : 409,
+        error: poort.reden === 'onbekend'
+          ? 'Deze branche kennen we niet.'
+          : 'De branche "' + ((register.GENRES[type] || {}).label || type) + '" staat nog niet open voor aanvragen.',
+        genre: type, stand: poort.reden, uitleg: poort.uitleg };
+    }
+
     a.bedrijf = {
       naam,
-      type: GENRES.includes(data.type) ? data.type : 'zzp',
+      type,
       plaats: kap(data.plaats, 60),
       behoeften: (Array.isArray(data.behoeften) ? data.behoeften : [])
         .slice(0, 8).map(b => kap(b, 120)).filter(Boolean)
     };
+    if (poort.bewijsNodig) a.bedrijf.bewijsNodig = true;
+    return { ok: true, bedrijf: true };
   }
 
   // een leesbare, unieke zaakcode uit de bedrijfsnaam
@@ -52,8 +86,18 @@ module.exports = Object.assign((ctx) => {
   /* De provisioning zelf: zaak + eigenaarsinlog + wensen. Idempotent --
      een tweede aanroep doet niets. Geeft de eigenaars-PIN eenmalig terug
      (die staat alleen gehasht in de kluis). */
+  /* De bewijspoort voor de gereguleerde genres (./bewijs.js). Hij staat HIER en
+     niet bij de aanroepers: provisioneer() wordt op drie plekken aangeroepen
+     (de boardroom, de termijn, de directe weg), en een poort die je per
+     aanroeper moet onthouden is een poort die er ooit een keer niet staat. */
+  const bewijs = require('./bewijs')({ save, kap, nu });
+
   function provisioneer(a) {
     if (!a.bedrijf || a.gezaakt) return a.gezaakt || null;
+    /* GEEN ZAAK VOOR EEN GEREGULEERD BEROEP ZONDER AFGETEKEND STUK. De aanvraag
+       mocht binnenkomen -- een plan indienen is geen beroepsuitoefening -- maar
+       de zaak gaat pas klaarstaan als een mens het papier heeft gezien. */
+    if (!bewijs.bewijsKlaar(a)) return null;
     if (!Array.isArray(db.data.suppliers)) db.data.suppliers = [];
     const code = codeVoor(a.bedrijf.naam);
     db.data.suppliers.push({ code, name: a.bedrijf.naam, type: a.bedrijf.type,
@@ -96,5 +140,5 @@ module.exports = Object.assign((ctx) => {
     return { ok: true, maand: t.maand, zaak };
   }
 
-  return { zetBedrijf, provisioneer, termijnVoldaan, GENRES };
+  return Object.assign({ zetBedrijf, provisioneer, termijnVoldaan, GENRES }, bewijs);
 }, { GENRES });

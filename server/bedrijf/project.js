@@ -20,6 +20,9 @@
    zitten in de taken en niet in de machinerie. */
 'use strict';
 
+/* Elke toestandswijziging loopt via de ene deur van de gebeurtenislaag. */
+const { werkVeld, werkFeit, werkBeginstand } = require('./gebeurtenis');
+
 const WERKVORMEN = ['software', 'stadsuitrol', 'horeca-implementatie', 'school-implementatie',
   'juridisch', 'campagne', 'expansie', 'algemeen'];
 const KOLOMMEN = ['te doen', 'bezig', 'review', 'klaar'];
@@ -68,9 +71,46 @@ module.exports = (sctx) => {
     // naam blijft vrij, id komt ernaast als hij onbedubbelzinnig is
     const eig = sctx.zetWie(g.w, p, 'eigenaar', schoon(req.body.eigenaar, 60) || g.l.naam);
     P(g.w)[p.id] = p;
+    /* Het ONTSTAAN is een gebeurtenis, en de beginstand wordt vastgelegd zodat
+       het vangnet dit project niet later als ongemeten wijziging ziet. */
+    werkFeit(g.w, 'project', p.id, 'aangemaakt', { actor: g.l.naam, bron: 'werk/project' },
+      { naam: p.naam, werkvorm: p.werkvorm, status: p.status, budgetCenten: p.budgetCenten });
+    werkBeginstand(g.w, 'project', p, ['status', 'eigenaar', 'werkvorm', 'budgetCenten']);
     log(g.w, g.l, 'project-gemaakt', p.id, naam);
     save();
     res.json({ ok: true, project: p, eigenaarLet: eig.reden });
+  });
+
+  /* DE WIJZIGROUTE, EN WAAROM ZIJ EEN REDEN EIST.
+
+     Deze route bestond niet: een budget of een eigenaar veranderde nergens, en
+     dus was "waarom is het budget 165.000" een vraag zonder antwoord EN zonder
+     handeling. Nu bestaat de handeling, en zij draagt de reden mee -- niet als
+     optioneel veld maar als voorwaarde. De gebeurtenislaag weigert de mutatie
+     zonder (REDEN_VERPLICHT in ./gebeurtenis.js), en dat is precies de bedoeling:
+     een budgetverhoging waarvan niemand de aanleiding noteerde, is over een jaar
+     een getal waar niemand meer bij kan. */
+  app.post('/api/bedrijf/project/wijzig', (req, res) => {
+    const g = werkPoort(req, res, 'project'); if (!g) return;
+    const p = eigenVeld(P(g.w), String(req.body.projectId || ''));
+    if (!p) return res.status(404).json({ error: 'Dat project kennen we niet.' });
+
+    const velden = {};
+    if (req.body.budget != null) velden.budgetCenten = centen(req.body.budget);
+    if (req.body.eigenaar != null) velden.eigenaar = schoon(req.body.eigenaar, 60);
+    if (req.body.status != null) velden.status = schoon(req.body.status, 40);
+    if (!Object.keys(velden).length)
+      return res.status(400).json({ error: 'Er valt niets te wijzigen. Geef budget, eigenaar of status.' });
+
+    const r = werkVeld(g.w, 'project', p, velden,
+      { actor: g.l.naam, reden: schoon(req.body.reden, 500), bron: 'werk/project' });
+    if (!r.ok) return res.status(r.status).json(r);
+    if (!r.gewijzigd) return res.json({ ok: true, project: p, gewijzigd: 0, let: 'Er was niets veranderd.' });
+
+    log(g.w, g.l, 'project-gewijzigd', p.id, Object.keys(velden).join(', '));
+    save();
+    res.json({ ok: true, project: p, gewijzigd: r.gewijzigd,
+      gebeurtenissen: r.gebeurtenissen.map(x => ({ wat: x.eventType, van: x.van, naar: x.naar, reden: x.reden })) });
   });
 
   app.post('/api/bedrijf/project/mijlpaal', (req, res) => {

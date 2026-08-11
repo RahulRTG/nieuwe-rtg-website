@@ -67,6 +67,9 @@ module.exports = function hangRoutesOp(kern) {
      sloopt komt nooit binnen achter een poort die inloggen vereist. Hij gaat
      wel door de domeingrens: hij raakt alleen app, express en tooManyTries, en
      die staan alle drie in de gedeelde interface. */
+  // RTG Concern (CONCERN.md): naast de domeinen om dezelfde reden als SSO --
+  // het raakt member, supplier en staff, en hoort in elk daarvan half thuis.
+  require('../routes/concern')(grens('concern'));
   require('../routes/fout')(grens('fout'));
   require('../routes/onboarding')(grens('onboarding'));
   /* De adresopzoeker hoort bij het invullen van een adres (de intake en het

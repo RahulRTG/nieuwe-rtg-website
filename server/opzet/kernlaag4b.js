@@ -107,6 +107,15 @@ Object.assign(kern, require('../kern/onderneming')({ db, save, crypto, schoon, f
    dagelijkse bron-check en de ingebouwde tabel als veilige basis. Hij hangt
    direct achter de onderneming, want die tabel is van hem. */
 Object.assign(kern, require('../kern/onderneming/rechtsvormwacht')({ db, save }));
+
+/* RTG CONCERN (kern/concern): het dak boven de onderneming. Zie CONCERN.md.
+   Hangt DIRECT ACHTER de onderneming en die volgorde is niet vrij:
+   entiteitOnderneming() wijst een bestaande onderneming aan. Andersom leest de
+   onderneming niets van het concern -- de oude weg blijft dus werken zonder dat
+   er ooit een entiteit bestaat. */
+Object.assign(kern, require('../kern/concern')({ db, save, crypto, schoon, findSupplier,
+  // Discovery leest de bestaande onderneming van deze aanvrager; zie ./voorstel.js
+  ondernemingVind: kern.ondernemingVind }));
 kern.rechtsvormwacht.herstelOverlay();
 const rvTimer = setInterval(() => { kern.rechtsvormwacht.check().catch(() => {}); },
   Number(process.env.RECHTSVORM_CHECK_MS || 86400000));

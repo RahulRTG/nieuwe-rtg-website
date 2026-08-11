@@ -26,6 +26,16 @@
        betekenen. De werkruimte is nu een sleutel aan diezelfde bos, dus er is
        nog een deur: Mijn werkplekken. Wie er voor het eerst in moet, vindt de
        werkruimte-inlog onderaan diezelfde kiezer. */
+    /* Het Ondernemers-OS stond hier NIET, en dat was een gat waar de hele
+       ondernemersweg in verdween: /apps/onderneming.html bestond, werkte en had
+       zelfs een hulptekst in de appgids -- maar hij stond in geen enkele
+       registry en in geen enkele map, dus niemand kon hem vinden. Een scherm dat
+       nergens vandaan te bereiken is, is geen scherm.
+
+       Eén tegel, niet twee. De concern-laag (CONCERN.md) krijgt geen eigen
+       tegel maar hangt achter deze: dat is PLATFORM.md paragraaf 0 -- een
+       onderdeel binnen een app, geen tweede adres in de bibliotheek. */
+    onderneming: { naam: 'Onderneming', url: '/apps/onderneming.html' },
     sitemaker:   { naam: 'Website', url: '/apps/sitemaker.html' },
     browser:     { naam: 'Web',  url: '/apps/browser.html' },
     vonk:        { naam: 'Daten',         url: '/apps/vonk.html' },

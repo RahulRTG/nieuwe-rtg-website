@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<!-- id.js zonder defer en vooraan: RTGId levert id's die al tijdens het parsen nodig zijn -->
+<script src="/shared/id.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mijn concern &middot; RTG</title>
+<link rel="icon" href="/icon.svg">
+<meta name="theme-color" content="#0C0C0B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Concern">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<style>
+  :root{ --bg:var(--rtg-bg); --card:var(--rtg-card); --card2:var(--rtg-card2); --line:var(--rtg-line);
+    --txt:var(--rtg-txt); --muted:var(--rtg-muted); --soft:var(--rtg-soft);
+    --burgundy:#C23A5E; --gold:#A98F1C; --green:#4C9A75; }
+  *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--txt);font-family:'Inter',system-ui,sans-serif;padding-bottom:7rem;}
+  h1,h2,.groot{font-family:'Bodoni Moda',serif;font-weight:500;letter-spacing:-.01em;}
+  header{position:sticky;top:0;z-index:20;background:linear-gradient(180deg,var(--bg),rgba(12,12,11,.92));
+    backdrop-filter:blur(8px);border-bottom:1px solid var(--line);
+    display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;padding:calc(env(safe-area-inset-top) + .7rem) 1rem .7rem;}
+  header .ey{font-size:.6rem;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);}
+  header h1{font-size:1.05rem;}
+  header a{color:var(--soft);text-decoration:none;font-size:.85rem;}
+  .sp{flex:1 1 auto;}
+  main{max-width:56rem;margin:0 auto;padding:1.3rem 1rem;display:flex;flex-direction:column;gap:1.4rem;}
+  .vak{background:var(--card);border:1px solid var(--line);border-radius:var(--rtg-rond,14px);padding:1.1rem 1.15rem;}
+  .vak > h2{font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);
+    font-family:'Inter',sans-serif;font-weight:700;margin-bottom:.8rem;}
+  .groet{font-size:1.35rem;line-height:1.3;margin-bottom:.35rem;}
+  .subtxt{color:var(--soft);font-size:.85rem;line-height:1.5;}
+  .stil{color:var(--muted);font-size:.82rem;line-height:1.5;}
+  .cijfers{display:grid;grid-template-columns:repeat(auto-fit,minmax(7rem,1fr));gap:.7rem;margin-top:.9rem;}
+  .cijfer{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:.7rem .8rem;}
+  .cijfer .n{font-family:'Bodoni Moda',serif;font-size:1.5rem;line-height:1;font-variant-numeric:tabular-nums;}
+  .cijfer .l{font-size:.66rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);margin-top:.25rem;}
+  .raster{display:grid;grid-template-columns:repeat(auto-fit,minmax(12rem,1fr));gap:.7rem;}
+  .veld{display:flex;flex-direction:column;gap:.3rem;font-size:.72rem;letter-spacing:.08em;
+    text-transform:uppercase;color:var(--soft);}
+  .veld input,.veld select{background:var(--card2);border:1px solid var(--line);border-radius:10px;
+    padding:.6rem .7rem;color:var(--txt);font:inherit;text-transform:none;letter-spacing:normal;}
+  .rij{display:flex;flex-wrap:wrap;gap:.5rem;}
+  .r8{margin-top:.8rem;} .r10{margin-top:1rem;}
+  .knop{background:var(--card2);border:1px solid var(--line);border-radius:999px;padding:.55rem 1rem;
+    color:var(--txt);font:inherit;font-size:.85rem;cursor:pointer;}
+  .knop.prim{background:var(--burgundy);border-color:var(--burgundy);color:#fff;}
+  .knop:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
+  .lijst{display:flex;flex-direction:column;gap:.5rem;margin-top:.8rem;}
+  .regel{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:.7rem .8rem;
+    display:flex;flex-wrap:wrap;align-items:baseline;gap:.5rem;}
+  .regel strong{font-size:.95rem;}
+  .regel .meta{color:var(--muted);font-size:.75rem;}
+  .pil{font-size:.66rem;padding:.15rem .5rem;border-radius:999px;border:1px solid var(--line);color:var(--soft);}
+  .pil.let{border-color:var(--gold);color:var(--gold);}
+  .pil.blok{border-color:var(--burgundy);color:var(--burgundy);}
+  .bron{font-size:.66rem;color:var(--muted);}
+  .punt{border-left:2px solid var(--gold);padding-left:.7rem;margin-top:.6rem;}
+  .punt.blok{border-left-color:var(--burgundy);}
+  .punt .wat{font-size:.85rem;} .punt .doe{font-size:.78rem;color:var(--soft);}
+  .melding{position:fixed;left:50%;transform:translateX(-50%);bottom:1.5rem;z-index:60;
+    background:var(--card);border:1px solid var(--line);border-radius:999px;padding:.6rem 1.1rem;
+    font-size:.85rem;opacity:0;pointer-events:none;transition:opacity .2s;}
+  .melding.aan{opacity:1;}
+</style>
+</head>
+<body>
+<header>
+  <a href="/apps/onderneming.html" aria-label="Terug naar mijn onderneming">&#8592;</a>
+  <div>
+    <div class="ey">RTG Concern</div>
+    <h1 id="titel">Mijn concern</h1>
+  </div>
+  <span class="sp"></span>
+  <select id="kiezer" class="knop" hidden aria-label="Kies entiteit"></select>
+</header>
+<main id="hoofd"><div class="vak"><p class="stil">Laden&hellip;</p></div></main>
+<div class="melding" id="melding" role="status" aria-live="polite"></div>
+
+<script>
+/* Het scherm van RTG Concern (CONCERN.md). Het toont wat de kern al kan en
+   voegt er GEEN eigen redenering aan toe: elke telling, elk oordeel en elke
+   grens komt uit het antwoord van de server. Een scherm dat zelf gaat rekenen,
+   is de tweede waarheid waar LAT-regel 4 over gaat -- en bij een readiness-score
+   of een UBO-percentage is dat precies het getal waar het om draait.
+
+   WAT HIER MET OPZET NIET STAAT: een knop die iets doorvoert zonder het eerst
+   te tonen. De impact-, fusie- en uitdienst-routes zijn in de kern in tweeen
+   geknipt (tonen, dan doen) en dit scherm houdt die knip aan. */
+const $=(s,r)=>(r||document).querySelector(s);
+const esc=(s)=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const TOKEN=localStorage.getItem('rtg_member_token')||'';
+let ENTS=[], HUIDIG=null, BEELD=null, RD=null;
+
+const api=(pad,body)=>fetch('/api/concern/'+pad,{method:'POST',
+  headers:{'Content-Type':'application/json','Authorization':'Bearer '+TOKEN},
+  body:JSON.stringify(body||{})}).then(async r=>{
+    const d=await r.json().catch(()=>({}));
+    if(!r.ok) throw new Error(d.error||'Dat ging niet goed.');
+    return d;});
+
+let meldTimer=null;
+function meld(t){ const m=$('#melding'); m.textContent=t; m.classList.add('aan');
+  clearTimeout(meldTimer); meldTimer=setTimeout(()=>m.classList.remove('aan'),3200); }
+
+/* ---- de lege stand ---- */
+function leeg(){
+  return '<div class="vak"><div class="groet">Nog geen entiteit.</div>'+
+    '<p class="subtxt">Een concern begint met één juridische entiteit. Dat kan uw bestaande '+
+    'bedrijf zijn, of een nieuwe B.V. die u nog moet oprichten. U hoeft nog niets te weten: '+
+    'de naam is genoeg, de rest kunt u later invullen.</p>'+
+    nieuwVak()+'</div>';
+}
+function nieuwVak(){
+  return '<div class="raster r10">'+
+    '<label class="veld">Naam<input id="nNaam" placeholder="Noordzee Hotels BV"></label>'+
+    '<label class="veld">Land<input id="nLand" value="NL" maxlength="2"></label>'+
+    '<label class="veld">Rechtsvorm (mag leeg)<select id="nRv"><option value="">Weet ik nog niet</option></select></label>'+
+    '</div><div class="rij r8"><button class="knop prim" id="nKnop">Begin een entiteit</button></div>';
+}
+
+/* ---- het beeld ---- */
+function vakOverzicht(o){
+  if(!o||o.leeg) return '';
+  const t=o.telling||{};
+  const cij=[['entiteiten','Entiteiten'],['vestigingen','Locaties'],['zaken','Zaken'],
+    ['afdelingen','Afdelingen'],['rollen','Rollen'],['mensen','Mensen']]
+    .map(([k,l])=>'<div class="cijfer"><div class="n">'+(t[k]||0)+'</div><div class="l">'+l+'</div></div>').join('');
+  return '<div class="vak"><div class="groet">'+esc(o.kop||'')+'</div>'+
+    '<p class="subtxt">'+esc(o.regel||'')+'</p>'+
+    '<div class="cijfers">'+cij+'</div></div>';
+}
+
+function vakEntiteit(b){
+  if(!b) return '';
+  const reg=(b.registraties||[]).map(r=>'<div class="regel"><strong>'+esc(r.nummer)+'</strong>'+
+    '<span class="meta">'+esc(r.land)+(r.register?' &middot; '+esc(r.register):'')+'</span>'+
+    '<span class="sp"></span><span class="bron">'+esc((r.bron||{}).label||'')+'</span></div>').join('')
+    || '<p class="stil">Nog geen registratie vastgelegd.</p>';
+  return '<div class="vak"><h2>De entiteit</h2>'+
+    '<div class="groet">'+esc(b.naam||'(nog geen naam)')+'</div>'+
+    '<p class="subtxt">'+esc(b.rechtsvormLabel||'Rechtsvorm nog niet gekozen')+' &middot; '+esc(b.land)+
+    (b.rechtspersoon===true?' &middot; rechtspersoon':'')+'</p>'+
+    '<div class="lijst">'+reg+'</div>'+
+    '<div class="raster r10">'+
+    '<label class="veld">Registratienummer<input id="regNr" placeholder="12345678"></label>'+
+    '<label class="veld">Register<input id="regNaam" placeholder="KvK"></label>'+
+    '</div><div class="rij r8"><button class="knop" id="regKnop">Registratie vastleggen</button></div>'+
+    /* De bron is niet optioneel en dat hoort de gebruiker te zien, niet pas te
+       merken als de server weigert. */
+    '<p class="stil r8">Elk juridisch gegeven krijgt een bron. Wat u hier invult wordt vastgelegd als '+
+    '&ldquo;ingevuld door uzelf&rdquo;; een uittreksel overschrijft dat later met de registerbron.</p></div>';
+}
+
+function vakBestuur(b){
+  if(!b) return '';
+  const rijen=(b.bestuurders||[]).map(x=>'<div class="regel"><strong>'+esc(x.wie)+'</strong>'+
+    '<span class="meta">'+esc(x.rol)+(x.bevoegd?' &middot; '+esc(x.bevoegd)+' bevoegd':'')+
+    (x.tekenlimiet!=null?' &middot; tot &euro;'+Number(x.tekenlimiet).toLocaleString('nl-NL'):'')+'</span>'+
+    '<span class="sp"></span><span class="meta">'+esc(x.van)+(x.tot?' t/m '+esc(x.tot):'')+'</span></div>').join('')
+    || '<p class="stil">Nog geen bestuurder vastgelegd.</p>';
+  return '<div class="vak"><h2>Bestuur en bevoegdheid</h2><div class="lijst">'+rijen+'</div>'+
+    '<div class="raster r10">'+
+    '<label class="veld">Wie (codenaam)<input id="bWie"></label>'+
+    '<label class="veld">Rol<input id="bRol" value="bestuurder"></label>'+
+    '<label class="veld">Bevoegd<select id="bBev"><option value="alleen">Alleen</option>'+
+    '<option value="gezamenlijk">Gezamenlijk</option></select></label>'+
+    '<label class="veld">Tekenlimiet (leeg = onbeperkt)<input id="bLim" inputmode="numeric"></label>'+
+    '<label class="veld">Vanaf<input id="bVan" type="date"></label>'+
+    '</div><div class="rij r8"><button class="knop" id="bKnop">Bestuurder vastleggen</button></div></div>';
+}
+
+function vakUbo(u){
+  if(!u) return '';
+  const rijen=(u.ubo.ubos||[]).map(x=>'<div class="regel"><strong>'+esc(x.wie)+'</strong>'+
+    (x.percentage!=null?'<span class="meta">'+x.percentage+'%</span>':'<span class="meta">'+esc(x.rol||'bestuurder')+'</span>')+
+    '</div>').join('') || '<p class="stil">Nog niet vast te stellen.</p>';
+  const ring=(u.ubo.ringen||[]).length
+    ? '<p class="stil r8">Let op: er lopen aandelen in een kring; het uiteindelijke belang is niet volledig te rekenen.</p>' : '';
+  return '<div class="vak"><h2>Uiteindelijk belang</h2>'+
+    '<p class="subtxt">'+esc(u.ubo.regel||'')+'</p><div class="lijst">'+rijen+'</div>'+ring+
+    '<div class="raster r10">'+
+    '<label class="veld">Aandeelhouder (codenaam of entiteit-id)<input id="aWie"></label>'+
+    '<label class="veld">Percentage<input id="aPct" inputmode="decimal"></label>'+
+    '</div><div class="rij r8"><button class="knop" id="aKnop">Belang vastleggen</button></div>'+
+    '<p class="stil r8">'+esc(u.grens||'')+'</p></div>';
+}
+
+function vakVestigingen(v){
+  const rijen=(v||[]).map(x=>'<div class="regel"><strong>'+esc(x.naam)+'</strong>'+
+    (x.plaats?'<span class="meta">'+esc(x.plaats)+'</span>':'')+
+    '<span class="sp"></span>'+
+    (x.open?'':'<span class="pil">gesloten</span>')+
+    '<span class="meta">'+x.aantalUnits+' zaak/zaken</span></div>').join('')
+    || '<p class="stil">Nog geen vestiging.</p>';
+  return '<div class="vak"><h2>Vestigingen</h2><div class="lijst">'+rijen+'</div>'+
+    '<div class="raster r10">'+
+    '<label class="veld">Naam<input id="vNaam" placeholder="Amsterdam"></label>'+
+    '<label class="veld">Plaats<input id="vPlaats"></label>'+
+    '</div><div class="rij r8"><button class="knop" id="vKnop">Vestiging openen</button></div></div>';
+}
+
+function vakMensen(m,u){
+  const rijen=(m||[]).map(x=>'<div class="regel"><strong>'+esc(x.persoon)+'</strong>'+
+    '<span class="meta">'+esc(x.rol)+(x.vestigingNaam?' &middot; '+esc(x.vestigingNaam):'')+'</span>'+
+    '<span class="sp"></span><span class="pil">'+esc(x.soortLabel)+'</span>'+
+    '<span class="meta">'+esc(x.stand)+'</span></div>').join('')
+    || '<p class="stil">Nog niemand in dienst.</p>';
+  const open=(u||[]).filter(x=>x.stand==='open');
+  const uit=open.length
+    ? '<p class="subtxt r8">'+open.length+' uitnodiging'+(open.length===1?'':'en')+' nog niet geaccepteerd. '+
+      'Code'+(open.length===1?'':'s')+': '+open.map(x=>'<strong>'+esc(x.code)+'</strong>').join(', ')+'</p>' : '';
+  return '<div class="vak"><h2>Mensen</h2><div class="lijst">'+rijen+'</div>'+uit+
+    '<div class="raster r10">'+
+    '<label class="veld">Wat gaat deze persoon doen?<input id="uRol" placeholder="General Manager"></label>'+
+    '<label class="veld">Waar?<select id="uVes"><option value="">Overal</option></select></label>'+
+    '<label class="veld">Vanaf<input id="uVan" type="date"></label>'+
+    '</div><div class="rij r8"><button class="knop prim" id="uKnop">Uitnodigen</button></div>'+
+    '<p class="stil r8">Werken bij dit bedrijf is gratis. Uw medewerker heeft geen betaalde RTG-pas nodig.</p></div>';
+}
+
+function vakReadiness(r){
+  if(!r) return '';
+  const delen=(r.delen||[]).map(d=>d.nvt
+    ? '<div class="regel"><strong>'+esc(d.label)+'</strong><span class="meta">niets te meten</span></div>'
+    : '<div class="regel"><strong>'+esc(d.label)+'</strong><span class="meta">'+d.score+'%</span>'+
+      '<span class="sp"></span>'+
+      (d.blokkerend?'<span class="pil blok">'+d.blokkerend+' blokkerend</span>':'')+
+      (d.aandacht?'<span class="pil let">'+d.aandacht+' aandacht</span>':'')+'</div>').join('');
+  const punten=(r.blokkerend||[]).concat(r.aandacht||[]).slice(0,12).map(p=>
+    '<div class="punt'+(p.ernst==='blokkerend'?' blok':'')+'">'+
+    '<div class="wat">'+esc(p.wat)+'</div><div class="doe">'+esc(p.doe||'')+'</div></div>').join('');
+  return '<div class="vak"><h2>Stand van zaken</h2>'+
+    '<div class="groet">'+(r.totaal==null?'&mdash;':r.totaal+'%')+'</div>'+
+    '<p class="subtxt">'+esc(r.regel||'')+'</p>'+
+    '<div class="lijst">'+delen+'</div>'+punten+
+    '<p class="stil r10">'+esc(r.grens||'')+'</p></div>';
+}
+
+/* ---- opbouwen ---- */
+function vulKiezer(){
+  const k=$('#kiezer');
+  if(ENTS.length<2){ k.hidden=true; return; }
+  k.hidden=false;
+  k.innerHTML=ENTS.map(e=>'<option value="'+esc(e.id)+'"'+(e.id===HUIDIG?' selected':'')+'>'+
+    esc(e.naam||'(naamloos)')+'</option>').join('');
+}
+
+async function herlaad(){
+  const o=await api('overzicht');
+  if(o.leeg){ $('#hoofd').innerHTML=leeg(); knopen(); return; }
+  ENTS=(await api('entiteiten')).entiteiten||[];
+  if(!HUIDIG||!ENTS.some(e=>e.id===HUIDIG)) HUIDIG=ENTS[0]&&ENTS[0].id;
+  vulKiezer();
+  const [b,ubo,ves,men,uitn,rd]=await Promise.all([
+    api('entiteit',{entiteit:HUIDIG}), api('ubo',{entiteit:HUIDIG}),
+    api('vestigingen',{entiteit:HUIDIG}), api('mensen',{entiteit:HUIDIG}),
+    api('uitnodigingen',{entiteit:HUIDIG}), api('readiness',{entiteit:HUIDIG})]);
+  BEELD=b.entiteit; RD=rd;
+  $('#titel').textContent=BEELD.naam||'Mijn concern';
+  $('#hoofd').innerHTML=vakOverzicht(o)+vakReadiness(rd)+vakEntiteit(BEELD)+
+    vakBestuur(BEELD)+vakUbo(ubo)+vakVestigingen(ves.vestigingen)+
+    vakMensen(men.mensen,uitn.uitnodigingen)+
+    '<div class="vak"><h2>Nog een entiteit</h2>'+nieuwVak()+'</div>';
+  // de vestigingskeuze in het uitnodig-blok vullen
+  const sel=$('#uVes');
+  if(sel) sel.innerHTML='<option value="">Overal</option>'+
+    (ves.vestigingen||[]).filter(x=>x.open).map(x=>'<option value="'+esc(x.id)+'">'+esc(x.naam)+'</option>').join('');
+  await vulRechtsvormen();
+  knopen();
+}
+
+async function vulRechtsvormen(){
+  const sel=$('#nRv'); if(!sel) return;
+  try{
+    const r=await (await fetch('/api/onderneming/rechtsvormen')).json();
+    const land=(($('#nLand')||{}).value||'NL').toUpperCase();
+    sel.innerHTML='<option value="">Weet ik nog niet</option>'+
+      (r.rechtsvormen||[]).filter(v=>!v.land||v.land===land)
+        .map(v=>'<option value="'+esc(v.id)+'">'+esc(v.label)+'</option>').join('');
+  }catch(e){ /* zonder lijst blijft "weet ik nog niet" staan; dat is een geldige keuze */ }
+}
+
+function knopen(){
+  const k=$('#kiezer'); if(k) k.addEventListener('change',async()=>{ HUIDIG=k.value; await herlaad(); });
+  const land=$('#nLand'); if(land) land.addEventListener('change',vulRechtsvormen);
+
+  const n=$('#nKnop'); if(n) n.addEventListener('click',async()=>{
+    const naam=($('#nNaam')||{}).value||'';
+    if(!naam.trim()){meld('Hoe heet deze entiteit?');return;}
+    try{ const r=await api('entiteit/nieuw',{naam,land:(($('#nLand')||{}).value||'NL'),
+      rechtsvorm:(($('#nRv')||{}).value||'')||undefined});
+      HUIDIG=r.entiteit.id; meld('Entiteit aangemaakt.'); await herlaad(); }
+    catch(e){ meld(e.message); }});
+
+  const reg=$('#regKnop'); if(reg) reg.addEventListener('click',async()=>{
+    const nr=($('#regNr')||{}).value||'';
+    if(!nr.trim()){meld('Vul het registratienummer in.');return;}
+    try{ await api('entiteit/registratie',{entiteit:HUIDIG,nummer:nr,
+      register:($('#regNaam')||{}).value||'',bronSoort:'mens'});
+      meld('Registratie vastgelegd.'); await herlaad(); }
+    catch(e){ meld(e.message); }});
+
+  const b=$('#bKnop'); if(b) b.addEventListener('click',async()=>{
+    const wie=($('#bWie')||{}).value||'';
+    if(!wie.trim()){meld('Wie is de bestuurder?');return;}
+    const lim=($('#bLim')||{}).value;
+    try{ await api('feit/zet',{entiteit:HUIDIG,soort:'bestuurder',
+      waarde:($('#bRol')||{}).value||'bestuurder',sleutel:wie.trim(),
+      van:($('#bVan')||{}).value||undefined,bronSoort:'mens',
+      extra:{bevoegd:($('#bBev')||{}).value||'alleen',
+        tekenlimiet:lim===''?null:Number(lim)}});
+      meld('Bestuurder vastgelegd.'); await herlaad(); }
+    catch(e){ meld(e.message); }});
+
+  const a=$('#aKnop'); if(a) a.addEventListener('click',async()=>{
+    const wie=($('#aWie')||{}).value||'', pct=($('#aPct')||{}).value;
+    if(!wie.trim()||pct===''){meld('Wie houdt welk percentage?');return;}
+    try{ await api('feit/zet',{entiteit:HUIDIG,soort:'aandeelhouder',
+      waarde:Number(pct),sleutel:wie.trim(),bronSoort:'mens'});
+      meld('Belang vastgelegd; de UBO is opnieuw gerekend.'); await herlaad(); }
+    catch(e){ meld(e.message); }});
+
+  const v=$('#vKnop'); if(v) v.addEventListener('click',async()=>{
+    const naam=($('#vNaam')||{}).value||'';
+    if(!naam.trim()){meld('Hoe heet deze vestiging?');return;}
+    try{ await api('vestiging/nieuw',{entiteit:HUIDIG,naam,plaats:($('#vPlaats')||{}).value||''});
+      meld('Vestiging geopend.'); await herlaad(); }
+    catch(e){ meld(e.message); }});
+
+  const u=$('#uKnop'); if(u) u.addEventListener('click',async()=>{
+    const rol=($('#uRol')||{}).value||'';
+    if(!rol.trim()){meld('Wat gaat deze persoon doen?');return;}
+    try{ const r=await api('uitnodigen',{entiteit:HUIDIG,rol,
+      vestiging:($('#uVes')||{}).value||undefined,van:($('#uVan')||{}).value||undefined});
+      meld('Uitnodiging klaar. Code: '+r.uitnodiging.code); await herlaad(); }
+    catch(e){ meld(e.message); }});
+}
+
+(async()=>{
+  if(!TOKEN){ $('#hoofd').innerHTML='<div class="vak"><div class="groet">Log eerst in</div>'+
+    '<p class="subtxt">RTG Concern hoort bij uw RTG-account.</p>'+
+    '<p class="r10"><a class="knop" href="/apps/app.html">Naar inloggen</a></p></div>'; return; }
+  try{ await herlaad(); }
+  catch(e){ $('#hoofd').innerHTML='<div class="vak"><p class="subtxt">'+esc(e.message)+'</p></div>'; }
+})();
+</script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
+<script src="/shared/ios.js" defer></script>
+</body>
+</html>

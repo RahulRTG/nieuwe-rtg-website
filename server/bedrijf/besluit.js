@@ -20,6 +20,13 @@
    huis. */
 'use strict';
 
+/* Elke toestandswijziging loopt via DE ENE DEUR van de gebeurtenislaag
+   (./gebeurtenis.js): het veld wordt gezet EN de gebeurtenis vastgelegd, met
+   actor, bron en waar nodig een reden. Buitenom schrijven merkt het vangnet
+   alsnog op, maar dan zonder tijdstip -- en op deze vier families geldt dat als
+   een defect. Zie de kop van ./gebeurtenis-lezen.js. */
+const { werkVeld } = require('./gebeurtenis');
+
 const SOORTEN = ['product', 'investering', 'prijs', 'lancering', 'beveiliging', 'personeel', 'contract', 'overig'];
 
 module.exports = (sctx) => {
@@ -72,7 +79,10 @@ module.exports = (sctx) => {
     const b = eigenVeld(B(g.w), String(req.body.besluitId || ''));
     if (!b) return res.status(404).json({ error: 'Dat voorstel kennen we niet.' });
     if (b.status !== 'advies') return res.status(409).json({ error: 'Dit voorstel staat al op ' + b.status + '.' });
-    b.status = 'stemmen'; b.adviesGeslotenAt = nu();
+    const gm = werkVeld(g.w, 'besluit', b, { status: 'stemmen' },
+      { actor: g.l.naam, reden: 'advies gesloten, het besluit gaat in stemming', bron: 'werk/besluit' });
+    if (!gm.ok) return res.status(gm.status).json(gm);
+    b.adviesGeslotenAt = nu();
     save();
     res.json({ ok: true, besluit: { id: b.id, status: b.status },
       bezwaren: b.bezwaren.map(x => ({ door: x.door, tekst: x.tekst })),
@@ -121,7 +131,9 @@ module.exports = (sctx) => {
       return res.status(400).json({ error: 'Wanneer kijken we of dit besluit klopte? Een besluit zonder terugkijkmoment is een besluit dat nooit fout kan zijn geweest.' });
     if (evalueerOp && evalueerOp <= dag())
       return res.status(400).json({ error: 'Kies een evaluatiedatum in de toekomst.' });
-    b.status = aangenomen ? 'aangenomen' : 'verworpen';
+    const gu = werkVeld(g.w, 'besluit', b, { status: aangenomen ? 'aangenomen' : 'verworpen' },
+      { actor: g.l.naam, reden: t.voor + ' voor, ' + t.tegen + ' tegen', bron: 'werk/besluit' });
+    if (!gu.ok) return res.status(gu.status).json(gu);
     b.telling = t; b.evalueerOp = aangenomen ? evalueerOp : null;
     b.geslotenAt = nu(); b.geslotenDoor = g.l.naam;
     log(g.w, g.l, 'besluit-' + b.status, b.id, b.titel + ' (' + t.voor + ' voor, ' + t.tegen + ' tegen)');

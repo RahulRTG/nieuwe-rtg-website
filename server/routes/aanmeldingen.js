@@ -53,4 +53,22 @@ module.exports = (kern) => {
   // betaalclaim); de eerste voldane termijn zet een ondernemerszaak klaar
   app.post('/api/aanmelding/termijn-voldaan', officeAuth, (req, res) => veilig(res, () =>
     aanmeldingen.termijnVoldaan(String((req.body || {}).id || ''), (req.body || {}).maand, wie(req))));
+
+  /* ---- het bewijs voor de gereguleerde genres ----
+
+     Indienen is PUBLIEK (met het aanmeldings-id): de aanvrager heeft op dat
+     moment nog geen zaak, geen personeelslogin en soms geen account -- hij
+     heeft alleen zijn aanvraag. Dat is dezelfde weg die de aanvraag zelf al
+     loopt. Er valt hier niets mee te lezen: de route geeft alleen terug dat het
+     stuk is ontvangen, en een id raden levert dus geen gegevens op.
+
+     Aftekenen is aan het KANTOOR en staat op een naam. Dat is de handeling die
+     de provisioning vrijgeeft, en zij is daarom precies zo bewaakt als het
+     besluit over de pas. */
+  app.post('/api/aanmelding/bewijs', (req, res) => veilig(res, () =>
+    aanmeldingen.bewijsIndienId(String((req.body || {}).id || ''), req.body || {})));
+  app.post('/api/aanmelding/bewijs/stand', officeAuth, (req, res) => veilig(res, () =>
+    aanmeldingen.bewijsStandId(String((req.body || {}).id || ''))));
+  app.post('/api/aanmelding/bewijs/teken', officeAuth, (req, res) => veilig(res, () =>
+    aanmeldingen.bewijsTekenId(String((req.body || {}).id || ''), wie(req))));
 };

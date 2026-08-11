@@ -49,7 +49,7 @@ const rond = (n) => Math.round(n);
 const LOOPTIJD = { kort: 2, normaal: 4, lang: 8 };
 const MAX_LOPEND = 3;   // per speler; anders zet iemand de halve kaart in de etalage
 
-module.exports = ({ K, wieHeeft, afkoopsom }) => {
+module.exports = ({ K, wieHeeft, afkoopsom, verhuis }) => {
   const lopende = (st) => (st.veilingen || []).filter(v => v.status === 'loopt');
 
   /* Wat er MINIMAAL geboden moet worden. Voor een kavel de bouwgrond, voor een
@@ -102,8 +102,8 @@ module.exports = ({ K, wieHeeft, afkoopsom }) => {
      verkoper, en de zaak verhuist MET zijn contracten mee. */
   function gunnen(potje, v) {
     const st = potje.staat;
-    st.geld[v.winnaar] -= v.prijs;
     if (v.soort === 'kavel') {
+      st.geld[v.winnaar] -= v.prijs;
       /* Het kavel wordt gereserveerd, niet bebouwd: WAT er komt is nog steeds
          een keuze. De reservering is de hele koop -- daarom staat er ook geen
          bouwsom tegenover. */
@@ -112,34 +112,13 @@ module.exports = ({ K, wieHeeft, afkoopsom }) => {
       st.foundation.lokaal += v.prijs;
       return { kavel: v.kavel };
     }
-    const w = wieHeeft(st, v.vestiging);
-    if (!w) return { mislukt: 'die vestiging bestaat niet meer' };
-    st.geld[w.speler] += v.prijs;
-    st.vestigingen[w.speler] = st.vestigingen[w.speler].filter(x => x !== w.v);
-    st.vestigingen[v.winnaar].push(w.v);
-    st.kavelBezet[w.v.kavel] = v.winnaar;
-    /* DE CONTRACTEN VERHUIZEN MEE, en dat is het hele punt van een vestiging
-       kunnen verkopen. Zou een overname de contracten breken, dan is verkopen
-       een manier om je verplichtingen kwijt te raken -- en dan is elke
-       leverancier ineens een risico dat je niet kunt inschatten. Wie koopt,
-       koopt de zaak met alles eraan. */
-    let mee = 0;
-    for (const c of st.contracten || []) {
-      if (c.status !== 'loopt') continue;
-      if (c.leverancierId === w.v.id) { c.leverancier = v.winnaar; mee++; }
-      if (c.afnemerId === w.v.id) { c.afnemer = v.winnaar; mee++; }
-    }
-    /* Een contract met JEZELF kan niet bestaan: dan is er geen wederpartij meer
-       die de boete int, en zou een speler zichzelf onbeperkt kunnen beboeten of
-       betalen. Zo'n contract wordt afgekocht tegen de gewone som -- betaald
-       door de koper, die dit wist toen hij bood. */
-    for (const c of st.contracten || []) {
-      if (c.status !== 'loopt' || c.leverancier !== c.afnemer) continue;
-      const som = afkoopsom(c, st.maand);
-      c.status = 'afgekocht'; c.eindMaand = st.maand; c.afkoop = som;
-      mee--;
-    }
-    return { vestiging: w.v.id, naam: w.v.naam, verkoper: w.speler, contracten: mee };
+    /* DE VERHUIZING ZELF STAAT IN ./afscheid.js -- de hypotheek aflossen, de
+       contracten meenemen, het contract-met-jezelf afkopen. Hij stond hier, en
+       toen er een tweede weg bij kwam (een rechtstreekse overname) waren dat
+       meteen twee sets randgevallen. */
+    const uit = verhuis(st, v.winnaar, v.vestiging, v.prijs);
+    if (!uit) return { mislukt: 'die vestiging bestaat niet meer' };
+    return uit;
   }
 
   /* WAT EEN SPELER VAN EEN VEILING ZIET: alles behalve andermans bod. Zijn

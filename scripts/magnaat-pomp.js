@@ -365,6 +365,48 @@ const SCENARIOS = {
     }
   },
 
+  /* DE HYPOTHEEKVLUCHT: lenen tegen een pand en dat pand daarna verkopen. Dit
+     WAS een gat, en het is het soort gat dat er pas is als twee lagen elkaar
+     raken -- de bank en de overdracht. Een speler leende twee ton tegen zijn
+     restaurant, verkocht het restaurant voor zes ton, en hield allebei: de kas
+     en de schuld. De bank hield ondertussen zekerheid op een gebouw dat van de
+     KOPER was geworden, en zou bij wanbetaling het pand van iemand anders
+     hebben uitgewonnen.
+
+     Sinds ./afscheid.js wordt de schuld op een pand bij de overgang afgelost uit
+     de opbrengst. Wat deze route toetst is dat er daarna geen lening meer op een
+     vreemd pand rust, en dat de verkoper niet meer overhoudt dan wat er na de
+     bank overblijft. */
+  hypotheekvlucht: {
+    verwacht: 'economisch', naam: 'lenen tegen een pand en dat pand verkopen',
+    doe(w) {
+      const V = (w.st.vestigingen.a || [])[0];
+      if (!V) return;
+      const o = (w.m.eco.zicht(w.potje, w.st, 'a').financiering.onderpandOffertes || [])
+        .find(x => x.soort === 'vastgoed' && x.vestiging === V.id);
+      if (!o || o.max < 1000) return;
+      if (!w.m.spel.zet(w.potje, 'a', { actie: 'krediet-opnemen', soort: 'vastgoed',
+        bedrag: Math.min(o.max, 150000), looptijd: 96, vestiging: V.id }).ok) return;
+      const W = require('../server/kern/spellen/magnaat/waardering').waarde(V);
+      const bod = w.m.spel.zet(w.potje, 'b', { actie: 'overname-bod',
+        vestiging: V.id, prijs: Math.round(W * 1.2) });
+      if (!bod.ok) return;
+      w.verkocht = w.m.spel.zet(w.potje, 'a', { actie: 'overname-antwoord', id: bod.id, antwoord: 'ja' });
+      w.pand = V.id;
+    },
+    keur(w) {
+      if (!w.verkocht || !w.verkocht.ok) return 'er is niets verkocht; deze toets meet dan niets';
+      const rest = (w.st.leningen || [])
+        .filter(l => l.status === 'loopt' && l.onderpand === w.pand);
+      if (rest.length)
+        return 'er rust nog ' + Math.round(rest.reduce((n, l) => n + l.restant, 0)) +
+          ' aan schuld op een pand dat van een ander is geworden';
+      if (!(w.verkocht.afgelost > 0))
+        return 'de hypotheek is niet uit de opbrengst afgelost';
+      return null;
+    }
+  },
+
   /* DE BEURSCARROUSEL. Een belang rondverhandelen tussen drie spelers: A geeft
      uit aan B, B verkoopt door aan C, C aan A. Elke stap is een OVERDRACHT -- de
      euro staat daarna op een andere rekening -- dus het wereldtotaal hoort op de

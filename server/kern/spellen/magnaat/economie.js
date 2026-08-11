@@ -57,7 +57,7 @@ module.exports = (ctx) => {
       contracten: [], contractTeller: 0, veilingen: [], veilingTeller: 0, kavelRecht: {},
       deelnemingen: [], deelnemingTeller: 0, leningen: [], leningTeller: 0,
       resultaatlog: {}, betaalgemist: {}, polissen: [], polisTeller: 0,
-      onderzoek: [], onderzoekTeller: 0, beurs: [], beursTeller: 0,
+      onderzoek: [], onderzoekTeller: 0, beurs: [], beursTeller: 0, overnames: [], overnameTeller: 0,
       laatste: {}, klaar: false
     };
     for (const h of potje.spelers) { st.geld[h] = START_GELD; st.vestigingen[h] = []; st.laatste[h] = null; }

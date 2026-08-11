@@ -25,7 +25,7 @@ const { PROJECTEN } = require('./foundation');
 
 module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid, veilingbeeld,
   belangbeeld, belangwaarde, eigenDeel, bankbeeld, kredietprofiel, verzekerbeeld, rndbeeld,
-  beheerbeeld, beursbeeld }) => {
+  beheerbeeld, beursbeeld, overnamebeeld }) => {
   /* Van wie is deze vestiging? De contractlaag kijkt over de grens tussen
      twee spelers heen en kan dus niet met `mijnVestiging` toe. */
   const vanIemand = (st, id) => {
@@ -150,6 +150,8 @@ module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid, veilingb
       beheer: beheerbeeld(st, mij),
       // de beurs is PUBLIEK: dat is het hele punt van een markt
       beurs: beursbeeld(st, mij),
+      // de biedingen die JOU aangaan; wie waarop biedt is van die twee
+      overnames: overnamebeeld(st, mij),
       veilingen: veilingbeeld(st, mij),
       vrij: k.kavels.filter(x => !st.kavelBezet[x.id] && !(st.kavelRecht || {})[x.id]).length,
       // waar JIJ mag bouwen zonder te hoeven veilen: een gewonnen kavel

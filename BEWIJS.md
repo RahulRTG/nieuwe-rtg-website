@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 919 bestanden en 6037 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 920 bestanden en 6050 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,13 +12,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 919 |
-| losse beweringen (`test(...)`) | 6037 |
+| toetsbestanden | 920 |
+| losse beweringen (`test(...)`) | 6050 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 614 |
 | **overleefd**: geen mutatie kreeg hem rood | 13 |
 | niet te meten (al rood, geen module gevonden, ...) | 18 |
-| alleen in de kop *genoemd*, nog niet gemeten | 85 |
+| alleen in de kop *genoemd*, nog niet gemeten | 86 |
 | niets van beide | 189 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-800 bestanden, 5834 beweringen.
+801 bestanden, 5847 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -664,6 +664,7 @@ toets omvalt.
 | `spelnaspelen.test.js` | 9 | -- | Naspelen: een afgelopen partij zet voor zet herbouwen. De belofte die hier bewaakt wordt is niet "er komt een bord uit" maar "het is HETZELFDE bord". |
 | `spelnieuws.test.js` | 14 | genoemd | MAGNAAT: WERELDNIEUWS -- wat er in de stad gebeurt terwijl jij onderneemt. ZEVEN BEWERINGEN, en ze zijn alle zeven stil terug te draaien: 1. |
 | `spelonderzoek.test.js` | 38 | genoemd | MAGNAAT: ONDERZOEK -- bedrijven die ANDERS worden in plaats van alleen groter. NEGEN BEWERINGEN, en ze zijn alle negen stil terug te draaien: 1. |
+| `spelovername.test.js` | 13 | genoemd | MAGNAAT: OVERNAMES -- een zaak rechtstreeks van een ander kopen. ZEVEN BEWERINGEN, en ze zijn alle zeven stil terug te draaien: 1. |
 | `spelpoort.test.js` | 3 | gezakt op `liegpoort /api/` | DE TWEE POORTEN VAN HET SPELDOMEIN. Elke spelactie hangt onder twee routes: `/api/member/spel/<actie>` met een Bearer-token, en `/api/rtf/spel/<actie>` met een gezinscode plus profieltoken (server/routes/spellen.js). |
 | `spelpraat.test.js` | 13 | gezakt op `liegpoort /api/` | Praten IN het potje. Twee dingen worden hier bewaakt, en het tweede is het belangrijkste. |
 | `spelpresence.test.js` | 12 | gezakt op `true->false#0` | Wie er NU is, van je vrienden en je klasgenoten. Vijf regels, en vier ervan zijn er om iets te voorkomen -- dus staan ze hier alle vijf als toets, met de fout erbij die ze tegenhouden. |

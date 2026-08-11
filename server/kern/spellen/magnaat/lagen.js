@@ -11,9 +11,9 @@
 const H = require('./handel');
 
 module.exports = ({ K, mijnVestiging, vrijKavel, wieHeeft, waarde, rond, codenaamVan }) => {
-  const { liquideer } = require('./afscheid')({ mijnVestiging, afkoopsom: H.afkoopsom, rond });
+  const { liquideer, losOnderpandAf, verhuis } = require('./afscheid')({ mijnVestiging, afkoopsom: H.afkoopsom, rond });
   const handel = require('./handel-acties')({ K, mijnVestiging, rond });
-  const veiling = require('./veiling')({ K, wieHeeft, afkoopsom: H.afkoopsom });
+  const veiling = require('./veiling')({ K, wieHeeft, afkoopsom: H.afkoopsom, verhuis });
   const veilen = require('./veiling-acties')(Object.assign({ K, mijnVestiging, vrijKavel }, veiling));
   const aandeel = require('./aandeel')({ wieHeeft, waarde });
   /* DE BANK, in vier stukken op de naden die deze map overal aanhoudt: het
@@ -39,12 +39,17 @@ module.exports = ({ K, mijnVestiging, vrijKavel, wieHeeft, waarde, rond, codenaa
     uitgegeven: aandeel.uitgegeven, MAX_DEEL: aandeel.MAX_DEEL });
   const handelen = require('./beurs-acties')({ beurs, wieHeeft, mijnVestiging,
     uitgegeven: aandeel.uitgegeven, MAX_DEEL: aandeel.MAX_DEEL });
+  /* OVERNAMES: de andere kant van de veiling. Daar besluit de EIGENAAR dat hij
+     weg wil; hier legt een KOPER er een bedrag op. Allebei verhuizen ze langs
+     dezelfde weg (./afscheid.js), want twee wegen zijn twee sets randgevallen. */
+  const overname = require('./overname')({ wieHeeft, waarde, verhuis });
+  const overnemen = require('./overname-acties')({ overname, wieHeeft });
   /* DE AI-MANAGER krijgt de hele actietabel mee en niets anders: hij doet niets
      wat een speler niet ook kan (./beheer.js, wet 1). Daarom wordt hij HIER
      samengesteld, nadat alle lagen hun acties hebben afgegeven -- een manager
      die een deel van de tabel mist, kan een deel van het bedrijf niet beheren
      en dat zou stil misgaan. */
-  Object.assign(alleActies, belangen.ACTIES, handelen.ACTIES);
+  Object.assign(alleActies, belangen.ACTIES, handelen.ACTIES, overnemen.ACTIES);
   /* DE MANAGER KRIJGT ZIJN TABEL PAS ALS HIJ COMPLEET IS, en dat is een fout die
      hier echt gemaakt is. Hij werd hier samengesteld met de actietabel van de
      LAGEN -- en die mist juist de basisacties (`beleid`, `open`, `uitbreiden`),
@@ -65,7 +70,7 @@ module.exports = ({ K, mijnVestiging, vrijKavel, wieHeeft, waarde, rond, codenaa
     ACTIES: Object.assign(alleActies, beheren.ACTIES),
     VRIJE_ACTIES: [].concat(handel.VRIJE_ACTIES, veilen.VRIJE_ACTIES, belangen.VRIJE_ACTIES,
       bank.VRIJE_ACTIES, verzekering.VRIJE_ACTIES, rnd.VRIJE_ACTIES, beheren.VRIJE_ACTIES,
-      handelen.VRIJE_ACTIES),
+      handelen.VRIJE_ACTIES, overnemen.VRIJE_ACTIES),
     hameren: veiling.hameren, verdeel: aandeel.verdeel, beurs, bankmaand, onthoud: bp.onthoud,
     verzekering, rnd, maakBeheer, liquideer,
     zichtdelen: {
@@ -76,7 +81,8 @@ module.exports = ({ K, mijnVestiging, vrijKavel, wieHeeft, waarde, rond, codenaa
       verzekerbeeld: (st, h) => verzekering.beeld(st, h),
       rndbeeld: (st, h) => rnd.beeld(st, h),
       beheerbeeld: (st, h) => beheren.beeld(st, h),
-      beursbeeld: (st, h) => handelen.beeld(st, h, codenaamVan)
+      beursbeeld: (st, h) => handelen.beeld(st, h, codenaamVan),
+      overnamebeeld: (st, h) => overnemen.beeld(st, h, codenaamVan)
     }
   };
 };

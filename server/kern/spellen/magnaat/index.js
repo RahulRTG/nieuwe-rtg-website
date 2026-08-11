@@ -60,7 +60,8 @@ module.exports = (ctx) => {
          daarom mag het altijd: wie halverwege een partij op vakantie gaat, moet
          dat op dat moment kunnen regelen. */
       'beheer-aan', 'beheer-uit', 'beheer-regels',
-      'beurs-aanbieden', 'beurs-kopen', 'beurs-intrekken'],
+      'beurs-aanbieden', 'beurs-kopen', 'beurs-intrekken',
+      'overname-bod', 'overname-antwoord', 'overname-intrekken'],
     init, zet,
     varianten: {
       vorm: { keuze: ['bord', 'economie'], standaard: 'bord' },

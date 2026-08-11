@@ -77,7 +77,10 @@ module.exports = ({ mijne, cijfers, liquideer }) => {
              speler -- dat is de volgorde die een onderpand betekenis geeft, en
              hij loopt langs dezelfde weg als zelf sluiten (contracten worden
              afgekocht, het kavel komt vrij). */
-          const opbrengst = liquideer(st, h, l.onderpand);
+          /* ZONDER AFLOSSEN: de bank verrekent de opbrengst hieronder zelf met
+             deze lening. Zou ./afscheid.js hem ook aflossen, dan betaalt de
+             speler zijn schuld twee keer. */
+          const opbrengst = liquideer(st, h, l.onderpand, false);
           const naarSchuld = Math.min(l.restant, Math.max(0, opbrengst));
           l.restant -= naarSchuld;
           l.betaaldAflossing += naarSchuld;

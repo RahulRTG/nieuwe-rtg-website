@@ -1447,8 +1447,53 @@ eindstand, en twee waarderingen lopen uiteen), geen shorts of hefboom.
 > was ongedekt; en de eigenaar-koopt-niet-terug-regel werd getest op zijn eigen
 > order, waar hij al op "dat is je eigen aanbod" strandt.
 
-**Wat er van fase B nog niet in zit.** Concernstrategie, fusies en
-overnames, en AI-concurrenten die leren.
+### Overnames — de andere kant van de veiling, en het gat dat eronder zat
+
+**Twee kanten van dezelfde markt.** De veiling verkoopt aan de hoogste bieder: de
+*eigenaar* besluit dat hij weg wil. Een overname gaat van de *koper* uit — je ziet
+een zaak die je goed uitkomt (naast je eigen restaurant, in een sector waar je al
+onderzoek in hebt, met een contract dat je toch al levert) en je legt er een bedrag
+op. De eigenaar zegt ja, nee, of noemt zijn prijs.
+
+**Er is geen vijandige overname**, en dat is een besluit. Een bod dat je niet kunt
+weigeren zou betekenen dat iemand met een dikke kas de tafel leegkoopt, en dan is
+spelen zinloos zodra iemand voorloopt. Wie een zaak wil die niet te koop is, bouwt
+ernaast.
+
+**Wie koopt, koopt de zaak met alles eraan** — en dat maakt een overname iets
+anders dan een kavel kopen. De contracten verhuizen mee (zou een overname ze
+breken, dan is verkopen een manier om je verplichtingen kwijt te raken), een
+contract dat daardoor met jezelf komt te staan wordt afgekocht, en de koper ziet
+vooraf wat er aan het pand hangt: hoeveel contracten, hoeveel belang bij anderen,
+hoeveel hypotheek, en wat de verkoper er netto aan overhoudt.
+
+> **Het gat dat eronder zat.** Een speler kon 200.000 lenen tegen zijn restaurant,
+> het restaurant voor 600.000 verkopen, en **allebei houden**: de kas én de schuld.
+> De bank hield ondertussen zekerheid op een gebouw dat van de kóper was geworden
+> — en zou bij wanbetaling het pand van iemand anders hebben uitgewonnen. Dat is
+> het soort gat dat er pas is als twee lagen elkaar raken, en geen van beide lagen
+> had ongelijk.
+>
+> Sinds nu reist een hypotheek mee met het pand: bij de overgang wordt de schuld
+> erop afgelost uit de opbrengst, en wat overblijft is voor de verkoper. Is de
+> opbrengst te klein, dan blijft de rest staan — maar zonder zekerheid, en dat is
+> een eerlijke uitkomst voor wie zijn onderpand onder de schuld vandaan verkoopt.
+> Alleen de bank slaat dat over als hij zijn eigen onderpand uitwint: die
+> verrekent de opbrengst zelf, en twee keer aflossen zou de speler zijn schuld
+> dubbel laten betalen.
+>
+> De verhuizing zelf staat nu op **één plek** (`afscheid.js`), waar de kop al zei
+> dat drie wegen naar buiten drie sets randgevallen zijn die uiteen gaan lopen.
+> Bij het verhuizen bleek dat meteen: de afkoopsom werd berekend *nadat*
+> `eindMaand` verzet was, en `afkoopsom` leest die datum — er kwam nul uit.
+
+> **Een toets die zichzelf opruimde.** "Een bod op een zaak die inmiddels verkocht
+> is, vervalt" probeerde eerst het late bod te tekenen en keek daarna of het van
+> het scherm was. Maar die poging strandt op "die zaak is inmiddels van een ander"
+> en zet het bod daarbij zelf op vervallen — dus de opruiming leek te werken
+> terwijl hij weggehaald was.
+
+**Wat er van fase B nog niet in zit.** Concernstrategie en AI-concurrenten die leren.
 
 **Fase C — de permanente wereld.** Living World, AI-managers met beleidsregels,
 Safe Management Policy, vakantiemodus, overdracht, legacy, Magnaat Daily,

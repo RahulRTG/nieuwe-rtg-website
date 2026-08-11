@@ -565,6 +565,7 @@ test('de vrije acties mogen buiten de beurt, de grote niet', () => {
       'contract-antwoord', 'contract-opzeggen', 'contract-voorstel',
       'krediet-aflossen', 'krediet-herzien', 'krediet-opnemen',
       'onderzoek-budget', 'onderzoek-starten', 'onderzoek-subsidie', 'onderzoek-uitrollen',
+      'overname-antwoord', 'overname-bod', 'overname-intrekken',
       'polis-opzeggen', 'polis-sluiten',
       'veiling-bod', 'veiling-intrekken', 'veiling-start', 'verkoop']);
   for (const groot of ['open', 'uitbreiden', 'sluiten'])

@@ -236,7 +236,7 @@ vorige zijn toetsen heeft (LAT.md).
 | 2 | **de objectlaag**: Persoon, Groep en Event als eerste drie types, met `caps` en een scherm dat de caps volgt | **er** |
 | 3 | **de relatieruimte**: wat twee mensen samen hebben, als projectie over de domeinen waar ze allebei in zitten, met par. 4.2 in de constructie | **er** |
 | 4 | **de momentlijn**: leven in plaats van posts -- vandaag, vrijdag, zaterdag, volgende week | **er** |
-| 5 | **Life Command + de orchestrator** op niveau klaarzetten, met het actielog eronder | -- |
+| 5 | **Life Command + de orchestrator** op niveau klaarzetten, met het actielog eronder | **er** |
 | 6 | **de koppelingen naar buiten**: een community-actie die een Foundation-project wordt, een zaak-event dat de handelsketen in gaat (tickets, vervoer, tafel, wallet) | -- |
 
 Fase 1 is met opzet klein en volledig omkeerbaar: hij voegt niets toe aan wat een
@@ -395,6 +395,57 @@ náást de `null` die `vakVan()` al geeft voor een dag die voorbij is. De mutati
 liet zien dat het filter niets deed: weghalen liet geen toets zakken,
 `vakVan()` aanpassen wel. Twee kopieën van dezelfde regel lopen stil uiteen, dus
 de kopie is weg — en dat staat opgeschreven in plaats van weggepoetst.
+
+### Waar fase 5 staat
+
+`server/kern/socialecommand/` met drie delen: `actielog.js` (append-only),
+`voorstellen.js` (het werkwoord in code) en `index.js` (de cockpit). Routes:
+`POST /api/sociaal/command`, `POST /api/sociaal/actielog` en — als **enige
+schrijvende route van deze wereld** — `POST /api/sociaal/voorstel/bevestig`. Het
+scherm is de sectie "Klaargezet · u beslist" bovenaan `sociaal.html`.
+
+**Wat deze fase anders maakt dan de vier ervoor:** hier mag de wereld iets. De
+graaf ziet, de objectlaag duidt, de lijn ordent — en hier wordt voor het eerst
+iets gedaan. Daarom staat het werkwoord uit par. 3 hier in code en niet in een
+zin erboven.
+
+**Drie besluiten die de fase dragen.**
+
+*Een voorstel wordt afgeleid en niet bewaard.* Elke keer opnieuw uit het beeld
+van de graaf, met een id dat uit de zaak zelf volgt. Een voorraad openstaande
+voorstellen zou verouderen — de bijeenkomst is afgelast, iemand nam de laatste
+plaats — en dan bevestigt een mens iets dat niet meer bestaat. Nu is een voorstel
+dat niet meer geldt er simpelweg niet, en bevestigen loopt schoon stuk in plaats
+van stilletjes goed.
+
+*Elk voorstel draagt een keuze, en die keuze is van de mens.* Een voorstel zonder
+keuze zou een enkele knop zijn die het systeem al had ingevuld — klaarzetten dat
+stiekem uitvoeren werd. Wat er gebeurt als u bevestigt, staat er vooraf bij
+(`gevolg`), want er zit een ander mens achter.
+
+*Eerst het domein, dan het log.* Andersom zou het log kunnen beweren dat er iets
+gebeurde dat mislukte, en dan verantwoordt het fictie. Faalt het loggen zelf, dan
+is de handeling wel gedaan en niet opgeschreven; dat is de minst erge van de
+twee, en het komt terug in het antwoord.
+
+**Wat er geen voorstel mag zijn**, en dat is de grens die telt: alles wat de
+*relatie* stuurt. "U sprak Sam al drie maanden niet", "tijd om deze groep weer
+eens bijeen te roepen", "nodig X ook uit". Dat is de trechter uit par. 4.1 en het
+aandacht-bedelen uit CLAUDE.md. Een voorstel hangt aan een **openstaande zaak die
+er al ligt** — iemand vroeg iets en u heeft nog niet geantwoord — en nooit aan een
+gevoel over hoe het gaat tussen twee mensen.
+
+**Waarom deze laag wél bewaart.** Het actielog is de enige opslag in deze wereld,
+en dat is geen uitzondering op "alles is projectie" maar het bewijs ervoor: een
+actielog is geen kopie van een domein, het is nieuw gegeven — wat er gebeurde en
+waarom — dat nergens anders bestaat. Het weegt hier zwaarder dan bij geld, want
+hier staan handelingen in die een **ander mens** hebben bereikt.
+
+Getoetst in `test/socialecommand.test.js` (vijf mutaties), in
+`test/objectlaagroutes.test.js` (bevestigen verandert het antwoord in het échte
+genootschap en belandt in het log) en in `test/lifecommand.e2e.js` — die meet op
+het gerenderde scherm dat er geen knop bestaat zonder keuze eraan, want een
+verbod dat je op de broncode toetst overleeft geen herschrijving.
 
 ## 8. De acht besturingssystemen -- een aparte beslissing
 

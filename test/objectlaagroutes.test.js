@@ -133,6 +133,50 @@ test('een echte bijeenkomst belandt op de lijn, in een vak met een naam', async 
   assert.equal(typeof d.later, 'number', 'later is een telling en geen staart');
 });
 
+/* LIFE COMMAND OVER DE ECHTE SERVER (LIFE.md fase 5). Dit is de zwaarste toets
+   van deze wereld: hier wordt voor het eerst iets VERANDERD, en het moet langs
+   het domein lopen en in het log belanden.
+
+   De losse toets (test/socialecommand.test.js) maakt het domein na en kan dus
+   niet zien of een bevestiging echt aankomt. Hier wel: na het bevestigen staat
+   het antwoord in het genootschap zelf. */
+test('een voorstel bevestigen verandert het antwoord in het domein en komt in het log', async () => {
+  const b = await json(await api('/api/genootschap/roep-bijeen',
+    { groep: groepId, wat: 'Commandborrel', datum: STRAKS, tijd: '21:00' }, lidToken));
+  const nieuwId = (b.bijeenkomst && b.bijeenkomst.id) || b.id;
+
+  const voor = await json(await api('/api/sociaal/command', {}, lidToken));
+  const v = (voor.voorstellen || []).find(x => x.titel === 'Commandborrel');
+  assert.ok(v, 'een bijeenkomst zonder antwoord hoort een voorstel op te leveren');
+  assert.deepEqual(v.keuzes, ['ja', 'misschien', 'nee']);
+  assert.ok(v.gevolg, 'wat er gebeurt bij bevestigen staat er vooraf bij');
+  assert.equal(voor.rustig, false, 'met een openstaand voorstel is het niet rustig');
+
+  /* Zonder geldige keuze verandert er niets -- klaarzetten wordt nooit vanzelf
+     uitvoeren. */
+  const weiger = await api('/api/sociaal/voorstel/bevestig', { id: v.id, keuze: 'vast' }, lidToken);
+  assert.equal(weiger.status, 400);
+
+  const ok = await api('/api/sociaal/voorstel/bevestig', { id: v.id, keuze: 'misschien' }, lidToken);
+  assert.equal(ok.status, 200);
+  assert.equal((await json(ok)).keuze, 'misschien');
+
+  /* HET BEWIJS: het genootschap zelf weet het nu. Zou deze laag een eigen
+     antwoord hebben bijgehouden, dan stond hier nog 'nog niet geantwoord'. */
+  const obj = await json(await api('/api/sociaal/object', { soort: 'event', id: nieuwId }, lidToken));
+  assert.equal(obj.caps.find(c => c.id === 'antwoord').waarom, 'u heeft "misschien" geantwoord');
+
+  const na = await json(await api('/api/sociaal/command', {}, lidToken));
+  assert.ok(!(na.voorstellen || []).some(x => x.titel === 'Commandborrel'),
+    'een beantwoorde bijeenkomst vraagt niets meer');
+
+  const log = await json(await api('/api/sociaal/actielog', {}, lidToken));
+  assert.ok(log.log.length >= 1);
+  assert.equal(log.log[0].wie, 'lid');
+  assert.match(log.log[0].wat, /misschien/);
+  assert.ok(log.log[0].gegevens.length, 'de verantwoording reist mee');
+});
+
 /* Een gast mag deze laag niet: hij leest de vriendenlaag, matches en groepen.
    De route weigert hem, en dat hoort een toets te bewaken en geen afspraak. */
 test('een onbekende soort en een sessie zonder pas komen er niet in', async () => {

@@ -101,4 +101,13 @@ Object.assign(kern, require('../kern/socialegraaf')({ kern }));
    heeft geen opslag: krijgt daarom alleen kern mee. Elke cap wijst naar de app
    die het echte werk doet; deze laag handelt zelf niets af. */
 Object.assign(kern, require('../kern/objectlaag')({ kern }));
+/* Life Command (kern/socialecommand/): de vijfde laag van deze wereld, en de
+   eerste die iets MAG (LIFE.md fase 5). Staat NA de sociale graaf, want hij
+   leest diens beeld en diens lijn.
+
+   ALS ENIGE VAN DE VIJF SCHRIJFT HIJ, en daarom krijgt hij db EN save mee waar
+   de graaf en de objectlaag alleen kern krijgen. Wat hij schrijft is geen
+   sociaal gegeven maar het ACTIELOG: wat er gebeurde en waarom. Uitvoeren doet
+   hij nooit zelf -- dat gaat via het domein dat de waarheid beheert. */
+Object.assign(kern, require('../kern/socialecommand')({ kern, db, save }));
 };

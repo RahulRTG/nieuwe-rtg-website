@@ -37,6 +37,36 @@ module.exports = (kern) => {
     res.json(Object.assign({ ok: true }, kern.socialegraaf.lijn(req.session.key)));
   });
 
+  /* LIFE COMMAND (LIFE.md fase 5): drie vragen, en wat er klaarstaat. */
+  app.post('/api/sociaal/command', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    res.json(kern.socialecommand.command(req.session.key));
+  });
+
+  app.post('/api/sociaal/actielog', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    res.json({ ok: true, log: kern.socialecommand.log(req.session.key) });
+  });
+
+  /* DE ENIGE SCHRIJVENDE ROUTE VAN DEZE WERELD, en dat hoort zo te blijven.
+
+     Hij voert uit wat RAHUL HEEFT KLAARGEZET en wat het LID heeft bevestigd, en
+     hij kan niets anders: de keuze moet een van de keuzes van dat voorstel zijn,
+     en het voorstel wordt opnieuw afgeleid in plaats van uit een voorraad
+     gehaald. Een voorstel dat niet meer geldt, bestaat niet meer -- en dan komt
+     hier een 404 in plaats van een handeling op iets dat verdwenen is.
+
+     WAT HIER NOOIT BIJ MAG KOMEN: een route die uitvoert zonder bevestiging,
+     onder welke instelling dan ook. De grens van deze wereld is een ANDER MENS
+     (LIFE.md par. 3), en die kent geen "automatisch". */
+  app.post('/api/sociaal/voorstel/bevestig', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    const b = req.body || {};
+    const r = kern.socialecommand.bevestig(req.session.key, b.id, b.keuze);
+    if (r.error) return res.status(r.status || 400).json({ error: r.error });
+    res.json(r);
+  });
+
   /* Een object opvragen: wat kan ik met deze persoon, groep of bijeenkomst
      (LIFE.md fase 2). Ook dit is ALLEEN LEZEN -- elke cap die terugkomt is een
      weg naar de app die het echte werk doet, en er is hier geen tegenhanger die

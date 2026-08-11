@@ -1237,7 +1237,8 @@
     "sociaal": [
       "socialewereld",
       "socialegraaf",
-      "objectlaag"
+      "objectlaag",
+      "socialecommand"
     ],
     "social": [
       "blokkeer",

@@ -54,6 +54,22 @@
   #objpaneel .stil{font-size:.78rem;color:var(--rtg-soft);}
   .onder .watkan{margin-left:.5rem;}
 
+  /* Wat er klaarstaat. Bordeaux als accent op de kop, nooit als tekstkleur op
+     een donkere ondergrond (merkregel). */
+  .klaarkop{margin:1.2rem 0 .4rem;font-size:.64rem;letter-spacing:.19em;
+    text-transform:uppercase;color:var(--rtg-soft);font-weight:600;}
+  .vst{border:1px solid var(--rtg-line);padding:.75rem .8rem;margin-bottom:.5rem;}
+  .vst b{display:block;font-size:.95rem;}
+  .vst .wnr{display:block;margin-top:.15rem;font-size:.72rem;color:var(--rtg-soft);
+    font-variant-numeric:var(--rtg-cijfers);}
+  .vst .gevolg{display:block;margin:.45rem 0 .1rem;font-size:.76rem;color:var(--rtg-muted);}
+  .vst .keuzes{display:flex;gap:.4rem;margin-top:.55rem;flex-wrap:wrap;}
+  .vst .keuzes button{font:inherit;font-size:.8rem;padding:.34rem .8rem;cursor:pointer;
+    border:1px solid var(--rtg-line);background:transparent;color:inherit;}
+  .vst .keuzes button:hover{border-color:var(--op-bordeaux);}
+  .vst .keuzes button[disabled]{opacity:.5;cursor:default;}
+  .vst .waarom{display:block;margin-top:.5rem;font-size:.68rem;color:var(--rtg-soft);}
+
   /* De momentlijn: vakken met een kop, en verder rust. Geen balk, geen teller
      per vak en geen aftelklok -- dat is de taal van urgentie, en een verjaardag
      over twee weken is geen deadline. */
@@ -101,6 +117,13 @@
   </a>
 
   <div id="stilte"></div>
+
+  <!-- LIFE COMMAND (LIFE.md fase 5). Rahul zet klaar, u bevestigt. Elke knop
+       hieronder is een KEUZE en geen bevestiging van iets dat al ingevuld was:
+       er is geen enkele weg waarlangs dit scherm iets uitvoert zonder dat u
+       kiest. Wat er gebeurt staat er vooraf bij, want er zit een ander mens
+       achter. -->
+  <div id="klaar"></div>
 
   <div class="regkop">
     <h2>Uw kring</h2>
@@ -411,6 +434,68 @@
         ' verder vooruit, in de app waar ze thuishoren.</p>' : '');
   }
 
+  /* Wat er klaarstaat. Het scherm kent GEEN voorstelsoort en GEEN keuze bij
+     naam: het toont wat de server stuurt. Zou het de keuzes zelf kennen, dan
+     wisten twee plekken wat een voorstel mag worden. */
+  function tekenKlaar(d) {
+    const v = (d && d.voorstellen) || [];
+    if (!v.length) { $('#klaar').innerHTML = ''; return; }
+    $('#klaar').innerHTML = '<h2 class="klaarkop">Klaargezet · u beslist</h2>' + v.map(x =>
+      '<div class="vst" data-vst="' + esc(x.id) + '">' +
+        '<b>' + esc(x.wat) + ': ' + esc(x.titel) + '</b>' +
+        '<span class="wnr">' + esc([x.wie, x.wanneer, x.tijd].filter(Boolean).join(' · ')) + '</span>' +
+        (x.gevolg ? '<span class="gevolg">' + esc(x.gevolg) + '</span>' : '') +
+        '<span class="keuzes">' + (x.keuzes || []).map(k =>
+          '<button type="button" data-kies="' + esc(k) + '">' + esc(k) + '</button>').join('') + '</span>' +
+        /* De verantwoording staat erbij en niet achter een knop: waarop dit
+           voorstel rust, hoort te lezen zijn voordat iemand kiest. */
+        '<span class="waarom">' + esc((x.gegevens || []).join(' · ')) + '</span>' +
+      '</div>').join('');
+  }
+
+  async function bevestig(id, keuze, knoppen) {
+    for (const b of knoppen) b.disabled = true;
+    try {
+      const res = await fetch('/api/sociaal/voorstel/bevestig', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (token() || '') },
+        body: JSON.stringify({ id, keuze })
+      });
+      const d = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(d.error || 'Er ging iets mis.');
+      /* Opnieuw ophalen in plaats van het scherm bijwerken: wat er nu geldt,
+         weet de server. Een scherm dat zelf de uitkomst invult, kan iets tonen
+         dat niet gebeurd is. */
+      laadKlaar();
+      laadLijn();
+    } catch (e) {
+      const doos = document.querySelector('[data-vst="' + id + '"] .waarom');
+      if (doos) doos.textContent = e.message;
+      for (const b of knoppen) b.disabled = false;
+    }
+  }
+
+  document.addEventListener('click', (e) => {
+    const k = e.target.closest('[data-kies]');
+    if (!k) return;
+    e.preventDefault();
+    const doos = k.closest('[data-vst]');
+    if (!doos) return;
+    bevestig(doos.dataset.vst, k.dataset.kies, doos.querySelectorAll('[data-kies]'));
+  });
+
+  async function laadKlaar() {
+    try {
+      const res = await fetch('/api/sociaal/command', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (token() || '') },
+        body: '{}'
+      });
+      const d = await res.json().catch(() => ({}));
+      if (res.ok) tekenKlaar(d);
+    } catch (e) { /* de kring staat er al; stil blijven is beter dan half tonen */ }
+  }
+
   async function laadLijn() {
     try {
       const res = await fetch('/api/sociaal/lijn', {
@@ -433,6 +518,7 @@
       const d = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(d.error || 'Er ging iets mis.');
       teken(d);
+      laadKlaar();
       laadLijn();
     } catch (e) {
       $('#balkKop').textContent = 'Niet ingelogd';

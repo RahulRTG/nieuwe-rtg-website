@@ -7,6 +7,7 @@
 <link rel="icon" href="/icons/partners.svg">
 <link href="/fonts/fonts.css" rel="stylesheet">
 <link href="/shared/rtg-ui.css" rel="stylesheet">
+<link href="/shared/canvas.css" rel="stylesheet">
 <style>
   :root{ --bg:var(--rtg-bg); --card:var(--rtg-card); --card2:var(--rtg-card2); --line:var(--rtg-line);
     --txt:var(--rtg-txt); --muted:var(--rtg-muted); --soft:var(--rtg-soft);
@@ -137,16 +138,6 @@
   <a href="/apps/home.html">Home Kit</a>
   <a href="/apps/zorgbalie.html">Zorgbalie</a>
 </nav>
-<style>
-  /* Bewust dezelfde vorm als de specialistenrij in apps/media.html: een rij
-     tekstknoppen die meeschuift, geen tweede tegelraster. Een wereld heeft
-     EEN manier om zijn apps te tonen. */
-  .wereldapps { display: flex; gap: .5rem; overflow-x: auto; padding: .75rem 1rem;
-    border-bottom: 1px solid var(--line, #DEDBD5); }
-  .wereldapps a { white-space: nowrap; text-decoration: none; font-size: .82rem;
-    padding: .35rem .7rem; border: 1px solid var(--line, #DEDBD5); border-radius: 2px;
-    color: inherit; }
-</style>
 <main id="main"><div class="leeg">Laden…</div></main>
 <div class="melding" id="melding"></div>
 

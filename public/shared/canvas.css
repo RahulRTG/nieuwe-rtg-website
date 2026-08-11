@@ -1,0 +1,104 @@
+/* THE COMMAND CANVAS -- de gedeelde opbouw van elk RTG-scherm.
+   Zie CANVAS.md voor het waarom. Dit blad draagt de VORM; de kleuren komen uit
+   rtg-uniform.css, want een tweede kleurbron is hoe een huisstijl uit elkaar
+   loopt (LAT.md regel 4).
+
+   EEN BLAD EN NIET ACHT. Elke wereld die zijn eigen variant tekent, is de
+   duurste manier om het geheel goedkoop te laten voelen. Komt er iets bij dat
+   maar voor een scherm geldt, dan hoort het daar en niet hier. */
+
+/* ---------- laag 0: de stand ----------
+   Geen dashboard maar een oordeel. Een woord dat een mens begrijpt, en
+   daaronder de cijfers die het dragen. Het woord LIEGT NOOIT: kan een scherm
+   zijn stand niet meten, dan hoort er 'Onbekend' te staan en geen groen. */
+.cv-stand { padding: 2.5rem 1.25rem 1.75rem; }
+.cv-stand .cv-app {
+  font-size: .68rem; letter-spacing: .22em; text-transform: uppercase;
+  color: var(--grey-soft, #8A8680);
+}
+.cv-stand .cv-woord {
+  font-family: 'Bodoni Moda', Georgia, serif;
+  font-size: clamp(1.9rem, 6vw, 2.6rem); line-height: 1.1; margin: .35rem 0 0;
+  font-weight: 400;
+}
+.cv-stand .cv-cijfers {
+  display: flex; flex-wrap: wrap; gap: 0 1.75rem; margin-top: 1.1rem;
+  padding-top: 1.1rem; border-top: 1px solid var(--line, #DEDBD5);
+}
+.cv-stand .cv-cijfers > span { font-size: .82rem; color: var(--grey, #4D4A45); }
+.cv-stand .cv-cijfers b { font-variant-numeric: tabular-nums; font-weight: 500; }
+
+/* ---------- laag 1: de rust ----------
+   Negentig procent lucht. Wie hier iets bij wil zetten, haalt eerst iets weg. */
+.cv-rust { padding: 0 1.25rem 2.25rem; max-width: 46rem; }
+.cv-rust h2 {
+  font-family: 'Bodoni Moda', Georgia, serif; font-weight: 400;
+  font-size: clamp(1.35rem, 4.5vw, 1.75rem); margin: 0 0 .4rem;
+}
+.cv-rust p { margin: 0; color: var(--grey, #4D4A45); font-size: .95rem; }
+
+/* ---------- laag 2: drie kaarten. Altijd drie, nooit zes ----------
+   De grens staat in de opmaak zelf: een vierde kaart valt op omdat het raster
+   op drie staat. Dat is met opzet -- een regel die je ziet, hoef je niet te
+   onthouden. */
+.cv-kaarten {
+  display: grid; gap: 1px; background: var(--line, #DEDBD5);
+  border-block: 1px solid var(--line, #DEDBD5);
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+}
+.cv-kaart {
+  background: var(--white, #fff); padding: 1.5rem 1.25rem;
+  display: block; text-decoration: none; color: inherit;
+}
+.cv-kaart .cv-kop {
+  font-size: .68rem; letter-spacing: .18em; text-transform: uppercase;
+  color: var(--grey-soft, #8A8680);
+}
+.cv-kaart .cv-regel { margin-top: .55rem; font-size: .92rem; line-height: 1.5; }
+.cv-kaart .cv-regel b { font-variant-numeric: tabular-nums; font-weight: 500; }
+a.cv-kaart:hover { background: #FAF9F7; }
+
+/* ---------- laag 3: de tijdlijn ----------
+   Geen lijst maar een lijn: het uur draagt hem, de gebeurtenis hangt eraan. */
+.cv-lijn { padding: 2rem 1.25rem; max-width: 46rem; }
+.cv-lijn .cv-stip { display: grid; grid-template-columns: 4.25rem 1fr; gap: 1rem; }
+.cv-lijn .cv-uur {
+  font-variant-numeric: tabular-nums; font-size: .82rem;
+  color: var(--grey-soft, #8A8680); padding-top: .1rem;
+}
+.cv-lijn .cv-wat { padding-bottom: 1.6rem; border-left: 1px solid var(--line, #DEDBD5);
+  padding-left: 1.1rem; margin-left: -.55rem; position: relative; }
+.cv-lijn .cv-stip:last-child .cv-wat { border-left-color: transparent; }
+.cv-lijn .cv-wat::before {
+  content: ''; position: absolute; left: -3.5px; top: .45rem;
+  width: 6px; height: 6px; border-radius: 50%; background: var(--burgundy, #7F1634);
+}
+.cv-lijn .cv-titel { font-size: .95rem; }
+.cv-lijn .cv-toe { font-size: .85rem; color: var(--grey, #4D4A45); margin-top: .2rem; }
+
+/* ---------- Focus Mode ----------
+   Het verschil dat ertoe doet: wat niet belangrijk is VERVAAGT en verdwijnt
+   niet. Verdwijnen maakt onrustig (waar is het heen?), vervagen geeft rust. */
+.cv-focus .cv-vervaagt { opacity: .18; pointer-events: none; filter: saturate(.3); }
+.cv-focus .cv-vervaagt, .cv-kaart, .cv-vervaagt { transition: opacity .35s ease, filter .35s ease; }
+
+/* ---------- de rij met apps van een wereld ----------
+   Bestond al op vijf werelden in eigen exemplaren; hier op een plek gezet. */
+.wereldapps {
+  display: flex; gap: .5rem; overflow-x: auto; padding: .75rem 1.25rem;
+  border-bottom: 1px solid var(--line, #DEDBD5);
+}
+.wereldapps a {
+  white-space: nowrap; text-decoration: none; font-size: .82rem;
+  padding: .35rem .7rem; border: 1px solid var(--line, #DEDBD5);
+  border-radius: 2px; color: inherit;
+}
+.wereldapps a:hover { border-color: var(--burgundy, #7F1634); }
+.wereldapps b {
+  align-self: center; font-size: .68rem; letter-spacing: .12em;
+  text-transform: uppercase; opacity: .55; padding-left: .4rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cv-focus .cv-vervaagt, .cv-kaart, .cv-vervaagt { transition: none; }
+}

@@ -4193,6 +4193,14 @@
       "gezakt": 4,
       "geprobeerd": 1
     },
+    "verraadtelling.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/verraadtelling.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "vertaal.test.js": {
       "soort": "server",
       "staat": "gezakt",

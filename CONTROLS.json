@@ -28,7 +28,7 @@
         "staat": "GROEN",
         "beweringen": 30,
         "overgeslagen": 0,
-        "at": "2026-08-11T23:21:46.674Z",
+        "at": "2026-08-11T23:32:37.878Z",
         "bestanden": [
           "test/keten.test.js"
         ]
@@ -56,7 +56,7 @@
         "staat": "NIET IN BEDRIJF",
         "beweringen": 30,
         "overgeslagen": 0,
-        "at": "2026-08-11T23:21:46.892Z",
+        "at": "2026-08-11T23:32:38.109Z",
         "bestanden": [
           "test/keten.test.js"
         ],
@@ -70,24 +70,32 @@
       "wat": "het systeem is te beproeven op een wereld die liegt: database, klok, volgorde",
       "eigenaar": "Techniek",
       "bewijs": [
-        "test/verraad.test.js"
+        "test/verraad.test.js",
+        "test/verraadtelling.test.js"
       ],
       "bewijsstuk": "de catalogus in dit bestand -- per verraad waar hij is ingebouwd",
       "grens": "de motor MAAKT de vraag stelbaar en beantwoordt hem niet. Dat een verraad is ingebouwd zegt niets over hoe het systeem erop reageert; daarvoor moet een ronde draaien en die uitkomst is een bevinding, geen oordeel.",
       "dekking": {
-        "beproefd": 3,
+        "beproefd": 2,
         "totaal": 8,
-        "eenheid": "verraden ingebouwd in de code",
-        "tellers": {},
-        "pct": 37.5
+        "eenheid": "verraden beproefd in de laatste ronde",
+        "tellers": {
+          "toegediend": 2,
+          "waargenomen": 2,
+          "invariantschendingen": 1,
+          "blindeInjecties": 0,
+          "onherhaalbareRondes": 0
+        },
+        "pct": 25
       },
       "laatstGroen": {
         "staat": "GROEN",
-        "beweringen": 20,
+        "beweringen": 33,
         "overgeslagen": 0,
-        "at": "2026-08-11T23:21:47.818Z",
+        "at": "2026-08-11T23:32:38.958Z",
         "bestanden": [
-          "test/verraad.test.js"
+          "test/verraad.test.js",
+          "test/verraadtelling.test.js"
         ]
       }
     },
@@ -114,7 +122,7 @@
         "staat": "GROEN",
         "beweringen": 18,
         "overgeslagen": 0,
-        "at": "2026-08-11T23:21:49.944Z",
+        "at": "2026-08-11T23:32:41.527Z",
         "bestanden": [
           "test/klok.test.js"
         ]
@@ -145,7 +153,7 @@
         "staat": "GROEN",
         "beweringen": 18,
         "overgeslagen": 0,
-        "at": "2026-08-11T23:22:18.346Z",
+        "at": "2026-08-11T23:33:11.282Z",
         "bestanden": [
           "test/schermleugen.test.js",
           "test/liegend-scherm.e2e.js"
@@ -178,7 +186,7 @@
         "staat": "GROEN",
         "beweringen": 13,
         "overgeslagen": 0,
-        "at": "2026-08-11T23:22:18.545Z",
+        "at": "2026-08-11T23:33:11.497Z",
         "bestanden": [
           "test/rolproef.test.js"
         ]
@@ -208,7 +216,7 @@
         "staat": "GROEN",
         "beweringen": 11,
         "overgeslagen": 0,
-        "at": "2026-08-11T23:22:18.743Z",
+        "at": "2026-08-11T23:33:11.692Z",
         "bestanden": [
           "test/bewijsmatrix.test.js"
         ]

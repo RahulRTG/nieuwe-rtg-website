@@ -147,15 +147,22 @@ const CONTROL = {
   control: 'VERRAADSMOTOR',
   wat: 'het systeem is te beproeven op een wereld die liegt: database, klok, volgorde',
   eigenaar: 'Techniek',
-  bewijs: ['test/verraad.test.js'],
+  bewijs: ['test/verraad.test.js', 'test/verraadtelling.test.js'],
   bewijsstuk: 'de catalogus in dit bestand -- per verraad waar hij is ingebouwd',
   grens: 'de motor MAAKT de vraag stelbaar en beantwoordt hem niet. Dat een verraad ' +
     'is ingebouwd zegt niets over hoe het systeem erop reageert; daarvoor moet een ronde ' +
     'draaien en die uitkomst is een bevinding, geen oordeel.',
-  /* Uit de catalogus gerekend en niet met de hand geschreven: zo kan de noemer
-     niet uit de pas lopen met de lijst eronder. */
-  dekking: { beproefd: CATALOGUS.filter(v => v.waar).length, totaal: CATALOGUS.length,
-    eenheid: 'verraden ingebouwd in de code' }
+  /* DE ZES GETALLEN STAAN IN DE DEKKING, en dat is hier geen opsmuk. Deze motor
+     mag nooit alleen "groen" melden: toegediend min waargenomen zijn de blinde
+     injecties, en dat verschil is het enige getal dat zegt of er iets is
+     geleerd. Ze komen uit VERRAAD.json -- de laatste ronde -- en niet uit deze
+     verklaring. */
+  dekking: { register: 'VERRAAD.json', beproefd: 'gemeten.verklaard',
+    totaal: 'gemeten.inCatalogus', eenheid: 'verraden beproefd in de laatste ronde',
+    tellers: { toegediend: 'gemeten.toegediend', waargenomen: 'gemeten.waargenomen',
+      invariantschendingen: 'gemeten.invariantschendingen',
+      blindeInjecties: 'gemeten.blindeInjecties',
+      onherhaalbareRondes: 'gemeten.onherhaalbareRondes' } }
 };
 
 module.exports = { CATALOGUS, lees, maakTeller, sla, actief, ietsAan, telling, ingebouwd, CONTROL };

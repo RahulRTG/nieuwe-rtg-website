@@ -1,0 +1,38 @@
+{
+  "uitleg": "De Verraadronde meldt nooit alleen PASS. TOEGEDIEND min WAARGENOMEN is het belangrijkste getal: dat zijn blinde injecties, en daar is niets geleerd. De ronde zakt op blindheid en op onherhaalbaarheid, niet op een bevinding -- een bevinding is winst.",
+  "seed": "20260811",
+  "gemeten": {
+    "verklaard": 2,
+    "toegediend": 2,
+    "waargenomen": 2,
+    "invariantschendingen": 1,
+    "blindeInjecties": 0,
+    "onherhaalbareRondes": 0,
+    "inCatalogus": 8
+  },
+  "rondes": [
+    {
+      "verraad": "schrijf-verloren",
+      "toegediend": true,
+      "waargenomen": true,
+      "gezien": [
+        "terugNaHerstart: true -> false"
+      ],
+      "herhaalbaar": true
+    },
+    {
+      "verraad": "schrijf-faalt",
+      "toegediend": true,
+      "waargenomen": true,
+      "gezien": [
+        "schrijfStatus: 200 -> null",
+        "terugNaHerstart: true -> null",
+        "tweedeStartLukte: true -> null",
+        "eersteStartLukte: true -> false",
+        "registratieLukte: true -> undefined",
+        "inlogNaHerstart: true -> undefined"
+      ],
+      "herhaalbaar": true
+    }
+  ]
+}

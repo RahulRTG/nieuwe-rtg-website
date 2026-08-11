@@ -64,7 +64,8 @@
     "controls": "node scripts/controls.js",
     "controls:vast": "node scripts/controls.js --vastleggen",
     "rolproef": "node --experimental-sqlite scripts/rolproef-route.js",
-    "verraad": "node -e \"const v=require('./server/lib/verraad');for(const x of v.CATALOGUS)console.log((x.waar?'[ingebouwd] ':'[voornemen] ')+x.naam.padEnd(18)+x.wat)\""
+    "verraadcatalogus": "node -e \"const v=require('./server/lib/verraad');for(const x of v.CATALOGUS)console.log((x.waar?'[ingebouwd] ':'[voornemen] ')+x.naam.padEnd(18)+x.wat)\"",
+    "verraad": "node --experimental-sqlite scripts/verraadronde.js"
   },
   "devDependencies": {
     "playwright": "^1.62.1"

@@ -42,11 +42,26 @@
   .chip.aan{border-color:var(--goud);color:var(--goud2);}
   .terug{color:var(--goud);cursor:pointer;font-size:.85rem;text-decoration:none;}
   canvas.bord{width:100%;border-radius:12px;display:block;background:var(--paneel2);touch-action:none;}
-  .schaak{display:grid;grid-template-columns:repeat(8,1fr);border-radius:10px;overflow:hidden;border:1px solid var(--lijn);}
-  .schaak div{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:clamp(1.2rem,7vw,2.2rem);cursor:pointer;user-select:none;}
-  .schaak .l{background:#EAE0CC;} .schaak .d{background:#8A7355;}
+  /* Het schaakbord is de wereld van het SPEL en niet de chrome van RTG: hier
+     mag noten en ivoor staan waar de app zelf zwart-wit blijft. Wat het niet
+     overneemt zijn de ronde hoeken -- dat blijft een huisregel, ook hier. */
+  .schaak{display:grid;grid-template-columns:repeat(8,1fr);overflow:hidden;border:1px solid #2a221a;box-shadow:0 1px 0 rgba(255,255,255,.04) inset;}
+  .schaak div{position:relative;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:clamp(1.2rem,7vw,2.2rem);cursor:pointer;user-select:none;line-height:1;}
+  .schaak .l{background:#E8DDC6;} .schaak .d{background:#6E5844;}
   .schaak .sel{outline:3px solid var(--goud);outline-offset:-3px;}
   .schaak .kan{box-shadow:inset 0 0 0 100vmax rgba(95,165,106,.35);}
+  /* De laatste zet, en die is bij een partij van uren geen versiering: je komt
+     terug op een bord dat er anders uitziet en moet zien WAT er veranderd is. */
+  .schaak .vanaf{box-shadow:inset 0 0 0 100vmax rgba(201,162,75,.22);}
+  .schaak .naartoe{box-shadow:inset 0 0 0 100vmax rgba(201,162,75,.38);}
+  /* De randcoordinaten: klein, in de hoek, en met genoeg contrast op allebei
+     de veldkleuren. Zonder die letters is "zet 24" niet na te lopen. */
+  .schaak .co{position:absolute;font-size:.5rem;line-height:1;opacity:.75;font-weight:700;pointer-events:none;}
+  .schaak .co.r{left:.14em;top:.14em;} .schaak .co.k{right:.14em;bottom:.14em;}
+  .schaak .l .co{color:#6E5844;} .schaak .d .co{color:#E8DDC6;}
+  /* Witte stukken zijn een outline-glyph: op ivoor vallen ze anders weg. */
+  .schaak .wit{color:#FFFDF7;text-shadow:0 0 1px #2a221a,0 1px 1px rgba(0,0,0,.35);}
+  .schaak .zwart{color:#17120C;text-shadow:0 1px 0 rgba(255,255,255,.14);}
   .wgrid{display:grid;grid-template-columns:repeat(15,1fr);gap:1px;background:var(--lijn);border-radius:8px;overflow:hidden;}
   .wgrid div{aspect-ratio:1;background:var(--paneel2);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;text-transform:uppercase;cursor:pointer;}
   .wgrid .p3W{background:#5a2323;} .wgrid .p2W{background:#4a3a20;} .wgrid .p3L{background:#1f3a4a;} .wgrid .p2L{background:#23404a;}
@@ -284,6 +299,18 @@
       <button class="knop grijs" id="sNabespreken" hidden style="flex:0 1 auto;">Rahul: bespreek na</button>
     </div>
     <div class="leeg" id="sNabespreking" hidden></div>
+    <!-- de partij terugkijken. De server rekent elk bord uit met de motor die
+         de partij ook echt speelde; deze strook schuift alleen de stap op. -->
+    <div id="sNaspeelBlok" hidden>
+      <div class="knoprij">
+        <button class="knop grijs mini" id="npEerste" title="naar het begin">&#124;&lt;</button>
+        <button class="knop grijs mini" id="npTerug">&lt; vorige</button>
+        <button class="knop grijs mini" id="npVoor">volgende &gt;</button>
+        <button class="knop grijs mini" id="npLaatste" title="naar het eind">&gt;&#124;</button>
+      </div>
+      <input type="range" id="npSchuif" min="0" max="0" value="0" style="width:100%;margin-top:.5rem;" aria-label="Zet in de partij">
+      <div class="klokrij" id="npStand"></div>
+    </div>
   </section>
 
   <!-- tetris -->
@@ -383,6 +410,11 @@ const MAXG = { mejn:4, pesten:4, rummi:4, magnaat:6, waarheid:6, proost:6 };
    niet stil uiteenlopen -- test/spelregels-drift.test.js houdt beide kopieën
    tegen elkaar. */
 const ASYNC_SPELLEN = ['schaak','dam','woord','rummi','mejn','magnaat'];
+/* Welke partijen zijn TERUG te kijken. Ook dit is een kopie van de server
+   (`naspeelbaar` in de descriptor) en ook hier houdt de drifttoets ze tegen
+   elkaar. Alleen spellen zonder toeval in het begin: bij Pesten of Rummi ligt
+   de schudbeurt nergens vast, dus een bord zou verzonnen zijn. */
+const NASPEELBAAR = ['schaak','dam'];
 const TEMPI = [
   ['', 'Live, aan tafel'],
   ['15m', 'Live · 15 min'],
@@ -733,6 +765,13 @@ function tekenPotje(){
   if (kt) $('#sKlok').textContent = (mijnBeurt ? 'Jouw beurt — ' : 'Beurt van ' + esc(p.spelers[p.beurt]) + ' — ') + kt;
   $('#sToewijzen').hidden = !(k && k.verlopen && p.status==='bezig' && !mijnBeurt);
   $('#sNabespreken').hidden = p.status !== 'klaar';
+  /* Terugkijken kan pas na afloop, en alleen bij spellen waarvan de server de
+     partij kan herbouwen. Welke dat zijn zegt de server bij het openen; de
+     client raadt dat niet, want een bord dat er nooit zo stond ziet er precies
+     zo echt uit als een goede. */
+  const kanNaspelen = p.status === 'klaar' && NASPEELBAAR.includes(p.soort);
+  $('#sNaspeelBlok').hidden = !kanNaspelen;
+  if (!kanNaspelen) npStap = null;
   if (p.status !== 'klaar') { $('#sNabespreking').hidden = true; $('#sNabespreking').textContent = ''; }
   const SECTIES = { mejn:'#sMejn', schaak:'#sSchaak', woord:'#sWoord', pesten:'#sPesten', dam:'#sDam', rummi:'#sRummi', magnaat:'#sMagnaat', seconden:'#sSeconden', waarheid:'#sWaarheid', proost:'#sProost' };
   Object.entries(SECTIES).forEach(([s,sel]) => { $(sel).hidden = p.soort !== s || p.status === 'wacht'; });
@@ -745,6 +784,35 @@ $('#sToewijzen').addEventListener('click', async ()=>{
   try{ await api('toewijzen', { id: huidig.id }); const d = await api('staat',{id:huidig.id}); huidig=d.potje; tekenPotje(); }
   catch(e){ meld(e.message); }
 });
+/* ---------- de partij terugkijken ----------
+   `npStap` is null zolang we niet terugkijken; dan staat het gewone eindbord er.
+   Zodra je schuift halen we de stand van de SERVER op -- die rekent hem uit met
+   de echte motor, dus deze pagina hoeft geen enkele spelregel te kennen. */
+let npStap = null, npTotaal = 0, npBezig = false;
+async function npToon(stap){
+  if (!huidig || npBezig) return;
+  npBezig = true;
+  try{
+    const d = await api('naspelen', { id: huidig.id, stap });
+    npStap = d.stap; npTotaal = d.totaal;
+    $('#npSchuif').max = String(d.totaal);
+    $('#npSchuif').value = String(d.stap);
+    $('#npStand').textContent = 'Zet ' + d.stap + ' van ' + d.totaal +
+      (d.gestrand ? ' — het verloop liep vast bij zet ' + d.gestrand : '');
+    // het bord van dat moment door dezelfde tekenaar als de live partij
+    const bewaard = huidig.staat;
+    huidig.staat = d.staat;
+    (({ schaak: tekenSchaak, dam: tekenDam })[huidig.soort] || (()=>{}))();
+    huidig.staat = bewaard;
+  }catch(e){ $('#npStand').textContent = e.message; }
+  finally{ npBezig = false; }
+}
+$('#npSchuif').addEventListener('input', ()=> npToon(Number($('#npSchuif').value)));
+$('#npEerste').addEventListener('click', ()=> npToon(0));
+$('#npLaatste').addEventListener('click', ()=> npToon(npTotaal));
+$('#npTerug').addEventListener('click', ()=> npToon(Math.max(0, (npStap===null?npTotaal:npStap) - 1)));
+$('#npVoor').addEventListener('click', ()=> npToon(Math.min(npTotaal, (npStap===null?0:npStap) + 1)));
+
 $('#sNabespreken').addEventListener('click', async ()=>{
   if (!huidig) return;
   $('#sNabespreking').hidden = false; $('#sNabespreking').textContent = 'Rahul kijkt de partij terug…';
@@ -864,8 +932,24 @@ function tekenSchaak(){
     const veld = ikWit ? v : 63 - v;
     const r = Math.floor(veld/8), k = veld%8;
     const d = document.createElement('div');
-    d.className = ((r+k)%2 ? 'd' : 'l') + (schVan===veld ? ' sel' : '');
-    d.textContent = SCH_TEKEN[bord[veld]] || '';
+    const stuk = bord[veld];
+    // de laatste zet komt van de server mee ([van, naar]); in een replay is dat
+    // de zet van DAT moment, want de server rekent de stand met dezelfde motor
+    const lz = st.laatste || null;
+    const klassen = [(r+k)%2 ? 'd' : 'l'];
+    if (schVan === veld) klassen.push('sel');
+    if (lz && lz[0] === veld) klassen.push('vanaf');
+    if (lz && lz[1] === veld) klassen.push('naartoe');
+    d.className = klassen.join(' ');
+    if (stuk && stuk !== '.'){
+      const sp = document.createElement('span');
+      sp.className = stuk === stuk.toLowerCase() ? 'wit' : 'zwart';
+      sp.textContent = SCH_TEKEN[stuk] || '';
+      d.appendChild(sp);
+    }
+    // randcoordinaten op de buitenste rij en kolom, vanuit JOUW kant gezien
+    if (k === (ikWit ? 0 : 7)){ const c = document.createElement('span'); c.className='co r'; c.textContent = String(8 - r); d.appendChild(c); }
+    if (r === (ikWit ? 7 : 0)){ const c = document.createElement('span'); c.className='co k'; c.textContent = 'abcdefgh'[k]; d.appendChild(c); }
     d.addEventListener('click', ()=> schKlik(veld));
     el.appendChild(d);
   }

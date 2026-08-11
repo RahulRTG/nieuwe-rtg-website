@@ -36,10 +36,8 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
   const { wereldFout, leeftijdFout, nudge, schud, beurtDoor } =
     require('./spellen/gedeeld')({ crypto, sseToCustomer, volwassen, get SPEL() { return SPEL; } });
 
-  /* DE KLOK: hoe lang een beurt mag duren, en wat er gebeurt als hij verloopt.
-     Staat hier hoog omdat de opruiming er meteen op leunt (een Long Play-partij
-     is pas verlaten na tien gemiste beurten, niet na een vaste maand), en hij
-     leest `SPEL` net als gedeeld.js met een late binding. */
+  /* DE KLOK (spellen/klok.js). Staat hier hoog omdat de opruiming er meteen op
+     leunt, en leest `SPEL` met dezelfde late binding als gedeeld.js. */
   const klok = require('./spellen/klok')({ get SPEL() { return SPEL; } });
 
   /* Wat er weggaat, vanzelf en op verzoek: spellen/opruimen.js. De HAKEN zijn
@@ -55,9 +53,7 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
     sudokuOpschonen: (t) => { if (opruimHaken.sudoku) opruimHaken.sudoku(t); },
     vervalMs: (p) => klok.vervalMs(p),
     /* De enige plek waar een klok uit zichzelf een partij beeindigt: een
-       toernooiwedstrijd. Geeft terug of er iets gebeurd is, zodat de opruiming
-       weet dat ze dit potje verder met rust moet laten. Late binding, want
-       `spelOpgeven` bestaat pas na de partijlaag. */
+       toernooiwedstrijd. Late binding, want `spelOpgeven` komt pas later. */
     geefOp: (p) => {
       if (!klok.verlooptVanzelf(p) || !opruimHaken.opgeven) return false;
       opruimHaken.opgeven(p.spelers[p.beurt], p.id);
@@ -86,11 +82,9 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
      laag aan hangt, en daarom een eigen bestand met een eigen naam. */
   const { progressieMag, GEEN_PROGRESSIE } = require('./spellen/grens')({ volwassen });
 
-  /* HET BELEID: alle toetredingsvragen op een plek, in volgorde. Neemt geen
-     enkele regel over -- hij roept gedeeld.js, grens.js en zicht.js aan. Staat
-     hier omdat alles wat hij aanroept nu bestaat; de lobby en de partij kennen
-     hem via `ctx` en nieuwe ingangen (chat, projectie, Game Night) horen hem te
-     gebruiken in plaats van de losse poorten opnieuw te bevragen. */
+  /* HET BELEID (spellen/beleid.js): alle toetredingsvragen op een plek, in
+     volgorde. Neemt geen regel over -- hij roept gedeeld.js, grens.js en
+     zicht.js aan. Nieuwe ingangen horen hem te gebruiken. */
   const beleid = require('./spellen/beleid')({
     wereldFout, leeftijdFout, ZICHT,
     get SPEL() { return SPEL; }
@@ -142,48 +136,22 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
   const { spelStaat, spelZet, spelOpgeven, spelKijk, spelToewijzen } = require('./spellen/partij')(ctx);
   // de opruiming kan nu een verlopen toernooiwedstrijd afmaken (zie hierboven)
   opruimHaken.opgeven = spelOpgeven;
-  // Rahul als spelmaatje: in elk potje op te roepen voor hints, regels of een peptalk
-  const { spelRahul, _KENNIS } = require('./spellen/rahul')(Object.assign({ anthropic }, ctx));
-
-  /* Rahul als NABESPREKER, en dat is bewust een tweede deur. Het spelmaatje
-     hierboven krijgt het bord niet te zien en kan dus niet verklappen; deze
-     leest het hele verloop en weigert daarom een lopend potje. Die weigering
-     staat in de module zelf, op de status -- niet in een prompt, want een
-     prompt is niet te toetsen. Zie de kop van spellen/nabespreking.js. */
-  const { spelNabespreking } = require('./spellen/nabespreking')(
-    Object.assign({ anthropic, spelReplay, _KENNIS }, ctx));
-
-  /* Praten in het potje. Geen eigen berichtenvoorraad: dit gaat de
-     communicatiekern in als een gesprek van soort 'group', met alles wat daar
-     al aan hangt (bewaartermijn, wisrecht, leesstand, sein). `comm` komt als
-     FUNCTIE binnen omdat de spellen in laag 1 worden opgebouwd en die kern pas
-     in laag 4 -- op het moment van aanroepen bestaat hij wel. Zonder comm (een
-     toets die alleen potjes speelt) blijft praten gewoon dicht. */
-  /* Teams: een vaste club om mee te spelen. Iedereen mag er een maken; wat dat
-     begrensd houdt staat in spellen/teams.js (niet openbaar, uitnodigen alleen
-     binnen je eigen kring, en pas lid als je ja zegt). Bewust ZONDER ranglijst
-     -- een teamstand zou onder de progressiegrens vallen en dan staat de helft
-     van een schoolteam er niet op. */
-  const { teamNieuw, teamNodig, teamAntwoord, teamVerlaat, mijnTeams, teamVergeet } =
-    require('./spellen/teams')({ db, save, rid, nu, codenaamVan, isGeblokkeerd, zijnVrienden,
-      klasgenotenVan, schoon: require('./util').schoon, sociaalRate });
-  opruimHaken.deel.push(teamVergeet);
-
-  const { spelPraat, spelPraatStuur } = require('./spellen/praat')(Object.assign({
-    comm: () => (typeof comm === 'function' ? comm() : comm) || null
-  }, ctx));
-
-  /* De arcade: spelen zonder tegenstander, waar alleen een getal van overblijft.
-     Inclusief Sudoku, het enige arcadespel waarvan de SERVER de score rekent.
-     Zie spellen/arcade.js voor waarom die twee soorten score niet naast elkaar
-     mogen bestaan zonder dat de ene de andere dichtzet. */
-  const { arcadeScore, arcadeBord, sneekScore, sneekBord, sudokuNieuw, sudokuKlaar, arcadeVergeet, sudokuOpschonen } =
-    require('./spellen/arcade')({ S, save, nu, codenaamVan, ARCADE, ruw, progressieMag, GEEN_PROGRESSIE });
-  opruimHaken.deel.push(arcadeVergeet);
-  opruimHaken.sudoku = sudokuOpschonen;
+  /* ---------- alles wat RONDOM een potje hangt ----------
+     Rahul (in het potje en na afloop), het terugkijken, het praten, de teams en
+     de arcade. Ze worden allemaal gebouwd nadat de partijlaag bestaat en geen
+     van hen wordt door die laag gelezen -- dat is de naad waarop ze samen in
+     spellen/rondom.js staan. */
+  const rondom = require('./spellen/rondom')({
+    anthropic, spelReplay, SPEL, SOORTEN, db, save, rid, nu, S,
+    codenaamVan, isGeblokkeerd, zijnVrienden, klasgenotenVan, sociaalRate,
+    comm, ARCADE, ruw, progressieMag, GEEN_PROGRESSIE, opruimHaken, spelCtx: ctx
+  });
+  const { spelRahul, spelNabespreking, spelNaspelen, teamNieuw, teamNodig, teamAntwoord,
+    teamVerlaat, mijnTeams, spelPraat, spelPraatStuur, arcadeScore, arcadeBord,
+    sneekScore, sneekBord, sudokuNieuw, sudokuKlaar } = rondom;
 
 
-  return { spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelToewijzen, spelKijk, spelReplay, spelRahul, spelNabespreking, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, spelUitslagen, spelStand, spelPrestaties, spelPraat, spelPraatStuur, spelTelemetrie, teamNieuw, teamNodig, teamAntwoord, teamVerlaat, mijnTeams, sudokuNieuw, sudokuKlaar, spelVergeet, toernooiNieuw, toernooiAntwoord, mijnToernooien, toernooiStaat, sneekScore, sneekBord, arcadeScore, arcadeBord, SPEL_SOORTEN: SOORTEN,
+  return { spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelToewijzen, spelKijk, spelReplay, spelNaspelen, spelRahul, spelNabespreking, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, spelUitslagen, spelStand, spelPrestaties, spelPraat, spelPraatStuur, spelTelemetrie, teamNieuw, teamNodig, teamAntwoord, teamVerlaat, mijnTeams, sudokuNieuw, sudokuKlaar, spelVergeet, toernooiNieuw, toernooiAntwoord, mijnToernooien, toernooiStaat, sneekScore, sneekBord, arcadeScore, arcadeBord, SPEL_SOORTEN: SOORTEN,
     // alleen voor de drift-test: de client heeft een eigen kopie van deze
     // regels (directe feedback); de test houdt beide kopieën tegen elkaar
     _spelregels: { rummiSet: ruw.rummiSet, W_PREMIE: ruw.W_PREMIE, SPEL, ARCADE } };

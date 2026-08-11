@@ -906,7 +906,7 @@ uitzondering die de route in een 500 veranderde. Zie §6.
 
 | Spel | Bewijst |
 |---|---|
-| **Schaken** | premium 1v1 + async + replay + nabespreking — *in uitvoering* |
+| **Schaken** | premium 1v1 + async + replay + nabespreking — **af** |
 | **30 Seconden** | party + big screen + verborgen informatie |
 | **Sudoku** | arcade + dagchallenge (de enige die nu al kan) |
 | **Quizduel** | teams + Foundation + eigen content |
@@ -1009,4 +1009,5 @@ techniek is er niet om zichtbaar te zijn.
 | i | `GEMISTE_BEURTEN` en de tempo-term in `vervalMs` zijn vandaag onobserveerbaar (de bodem wint altijd); een mutatie erop wordt niet gepakt | niets — staat er als bekende, uitgelegde blinde vlek |
 | j | Tien spellen hebben een `zicht.publiek`; de zes andere projecteren nog niet | party mode per spel (fase 1/3) |
 | k | Meekijken heeft nog geen scherm: `/spel/kijk` bestaat alleen als API | spectator-laag (§8) |
-| l | Een replay is nog ruwe data; er is geen scherm dat een partij naspeelt | de replay-weergave van Schaken |
+| ~~l~~ | ~~Een replay is ruwe data zonder scherm~~ — **opgelost** voor schaken en dammen; de server rekent de tussenstanden met de echte motor |
+| m | Naspelen kan alleen bij spellen zonder toeval in het begin (schaken, dammen); bij Pesten, Rummi, Woordduel en mens-erger-je-niet ligt de schudbeurt of de worp nergens vast | een replay voor de overige veertien |

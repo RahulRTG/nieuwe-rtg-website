@@ -27,10 +27,10 @@ const stubCtx = { save() {}, crypto: require('crypto'), schud: (a) => a, beurtDo
    gegenereerd -- anders toetst hij zichzelf. */
 const GOUD = {
   mejn:     ['Mens erger je niet', 4, 'rtf', { teams: 'keuze', vormen: ['live', 'async'] }],
-  schaak:   ['Schaken', 2, 'rtg', { vormen: ['live', 'async'] }],
+  schaak:   ['Schaken', 2, 'rtg', { vormen: ['live', 'async'], naspeelbaar: true }],
   woord:    ['Woordduel', 2, 'rtg', { perTaal: true, vormen: ['live', 'async'] }],
   pesten:   ['Pesten', 4, 'rtf', { vormen: ['live'] }],
-  dam:      ['Dammen', 2, 'rtf', { vormen: ['live', 'async'] }],
+  dam:      ['Dammen', 2, 'rtf', { vormen: ['live', 'async'], naspeelbaar: true }],
   rummi:    ['Rummi', 4, 'rtf', { vormen: ['live', 'async'] }],
   magnaat:  ['Magnaat', 6, 'rtg', { buitenBeurt: ['bouw', 'verkoop'], vormen: ['live', 'async'] }],
   seconden: ['30 Seconden', 4, 'rtg', { min: 4, teams: 'altijd', vormen: ['live'] }],
@@ -307,4 +307,29 @@ test('een sleutel die twee keer bestaat wordt geweigerd', () => {
     fs.writeFileSync(path.join(map, 'dubbel', 'index.js'), GELDIG('dubbel', 'Dubbel uit de map'));
     assert.throws(() => maakRegister(stubCtx, map), /'dubbel' staat er twee keer in/);
   } finally { fs.rmSync(map, { recursive: true, force: true }); }
+});
+
+test('een helper die het register zelf aanroept krijgt een melding, geen stack overflow', () => {
+  /* Dit is echt gebeurd bij het opsplitsen: spellen/rondom.js kwam in de map te
+     staan zonder in GEEN_SPEL te zitten, en vroeg via naspelen.js het register
+     op. De scan vond het bestand, laadde het, en dat laadde de scan -- een
+     stack overflow ver van de oorzaak, in plaats van de melding die er hoort
+     te staan. */
+  metMap({ 'lus.js': "module.exports = () => { require('" +
+    path.join(__dirname, '..', 'server', 'kern', 'spellen', 'register').replace(/\\/g, '/') +
+    "')({}); return { spel: {} }; };" }, (map) => {
+    assert.throws(() => maakRegister(stubCtx, map), /het register roept zichzelf aan/);
+  });
+});
+
+test('en een terechte fout laat die bewaking niet vastzitten', () => {
+  /* De vlag moet ook opgeruimd worden als de keuring gooit -- anders is de
+     eerste kapotte descriptor genoeg om elke volgende scan te laten denken dat
+     hij zichzelf aanroept. Ook dat is hier misgegaan. */
+  metMap({ 'stuk.js': 'module.exports = () => ({ hulp(){} });' }, (map) => {
+    assert.throws(() => maakRegister(stubCtx, map), /geeft geen `spel`-descriptor/);
+  });
+  // en meteen daarna moet een gezonde scan het gewoon doen
+  const { SPEL } = maakRegister(stubCtx);
+  assert.ok(SPEL.schaak, 'het echte register werkt nog');
 });

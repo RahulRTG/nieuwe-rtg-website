@@ -158,7 +158,7 @@ module.exports = (ctx) => {
      lopen gelijk op. Stopt schaakZet met het bijwerken van potje.beurt, dan
      zakt die toets. */
   const spel = {
-    sleutel: 'schaak', naam: 'Schaken', max: 2, wereld: 'rtg', vormen: ['live', 'async'],
+    sleutel: 'schaak', naam: 'Schaken', max: 2, wereld: 'rtg', vormen: ['live', 'async'], naspeelbaar: true,
     init: schaakInit, zet: schaakZet,
     /* Schaken kent geen verborgen informatie: de weergave leest `mij` niet
        eens. Speler, kijker en publiek zijn hier dus dezelfde drie woorden voor

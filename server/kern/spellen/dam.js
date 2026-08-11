@@ -82,7 +82,7 @@ module.exports = (ctx) => {
      de rest komt uit jouw rek. Kun je niets: pak een steen. */
 
   const spel = {
-    sleutel: 'dam', naam: 'Dammen', max: 2, wereld: 'rtf', vormen: ['live', 'async'],
+    sleutel: 'dam', naam: 'Dammen', max: 2, wereld: 'rtf', vormen: ['live', 'async'], naspeelbaar: true,
     init: damInit, zet: damZet,
     /* Een dambord is openbaar: er is geen verborgen informatie. `zetten` is de
        enige persoonlijke sleutel en die valt zonder speler vanzelf op een lege

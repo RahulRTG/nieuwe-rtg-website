@@ -5,7 +5,7 @@
 const { log } = require('../log');
 
 module.exports = (kern) => {
-  const { app, auth, geenGast, rtf, spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelToewijzen, spelKijk, spelReplay, spelRahul, spelNabespreking, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, spelUitslagen, spelStand, spelPrestaties, spelPraat, spelPraatStuur, teamNieuw, teamNodig, teamAntwoord, teamVerlaat, mijnTeams, sudokuNieuw, sudokuKlaar, toernooiNieuw, toernooiAntwoord, mijnToernooien, toernooiStaat, sneekScore, sneekBord, arcadeScore, arcadeBord, socialConnecties } = kern;
+  const { app, auth, geenGast, rtf, spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelToewijzen, spelKijk, spelReplay, spelNaspelen, spelRahul, spelNabespreking, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, spelUitslagen, spelStand, spelPrestaties, spelPraat, spelPraatStuur, teamNieuw, teamNodig, teamAntwoord, teamVerlaat, mijnTeams, sudokuNieuw, sudokuKlaar, toernooiNieuw, toernooiAntwoord, mijnToernooien, toernooiStaat, sneekScore, sneekBord, arcadeScore, arcadeBord, socialConnecties } = kern;
 
   function rtfSpeler(req, res) {
     const sess = rtf.verifieerProfiel(req.body.code, req.body.token);
@@ -52,6 +52,9 @@ module.exports = (kern) => {
     toewijzen: (mij, b) => spelToewijzen(mij, String(b.id || '')),
     // het verloop van je EIGEN partij; een kijker krijgt hier niets
     replay: (mij, b) => spelReplay(mij, String(b.id || '')),
+    /* Hetzelfde verloop, maar herbouwd tot een bord: de server rekent, zodat
+       de client geen tweede exemplaar van de spelregels hoeft te dragen. */
+    naspelen: (mij, b) => spelNaspelen(mij, String(b.id || ''), b.stap),
     // meekijken: mag dit spel bekeken worden, en hoor jij bij de kring?
     kijk: (mij, b) => spelKijk(mij, String(b.id || '')),
     // Rahul als spelmaatje: een hint, een regel of een peptalk tijdens het potje

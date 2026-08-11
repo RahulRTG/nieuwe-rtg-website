@@ -6,6 +6,7 @@ module.exports = (ctx) => {
   const { db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, isGeblokkeerd, socialZoek, sociaalRate, volwassen,
     rid, nu, S, SPEL, SOORTEN, TEAMS, wereldFout, leeftijdFout, nudge, schud, beurtDoor, opschonen, klok, beleid,
     INITS, klasgenotenVan } = ctx;
+  const uitnodigen = require('./uitnodigen')({ zijnVrienden, socialZoek, isGeblokkeerd, klasgenotenVan });
   function spelStart(potje) {
     potje.status = 'bezig'; potje.beurt = 0;
     INITS[potje.soort](potje);
@@ -46,30 +47,12 @@ module.exports = (ctx) => {
     // ook op het vriendenpad (anders is nudge-spam naar vrienden gratis)
     if (!sociaalRate(mij, 'spel-uitnodiging', 20, 3600000)) return { status: 429, error: 'Rustig aan met uitnodigen.' };
     const max = spelGrootte(soort, grootte);
-    const uitgenodigd = (Array.isArray(vrienden) ? vrienden : []).slice(0, max - 1).filter(v => zijnVrienden(mij, v));
-    /* Uitnodigen op codenaam: samen spelen maakt je NIET automatisch vrienden.
-       De ander accepteert de uitnodiging zelf, blokkades gelden gewoon en
-       beschermde kinderen zijn onvindbaar (die spelen alleen met vrienden). */
-    for (const cn of (Array.isArray(codenamen) ? codenamen : []).slice(0, max - 1)) {
-      const zoek = await socialZoek(mij, String(cn));
-      const hit = (zoek || []).find(r => String(r.codename).toLowerCase() === String(cn).trim().toLowerCase());
-      if (!hit) return { status: 404, error: 'De codenaam "' + String(cn).slice(0, 40) + '" is niet gevonden.' };
-      if (isGeblokkeerd(mij, hit.key)) return { status: 403, error: 'Dit contact is niet beschikbaar.' };
-      if (!uitgenodigd.includes(hit.key) && hit.key !== mij) uitgenodigd.push(hit.key);
-    }
-    /* Klasgenoten: beschermde tieners zijn onvindbaar via de zoeker, maar de
-       eigen klas is een echte, bevestigde kring. De server controleert het
-       klasgenootschap zelf (zelfde klas in de schooldata); blokkades gelden. */
-    if (Array.isArray(klasgenoten) && klasgenoten.length) {
-      const kring = new Set(klasgenotenVan(mij).map(kg => kg.key));
-      for (const key of klasgenoten.slice(0, max - 1)) {
-        if (!kring.has(key)) return { status: 403, error: 'Alleen echte klasgenoten kun je zo uitnodigen.' };
-        if (isGeblokkeerd(mij, key)) return { status: 403, error: 'Dit contact is niet beschikbaar.' };
-        if (!uitgenodigd.includes(key)) uitgenodigd.push(key);
-      }
-    }
-    if (!uitgenodigd.length) return { status: 400, error: 'Nodig minstens een speler uit (vriend of codenaam), of speel random.' };
-    if (uitgenodigd.length > max - 1) return { status: 400, error: 'Te veel spelers voor dit spel.' };
+    /* Wie je meeneemt, met de drie ingangen en hun eigen poorten, staat in
+       ./uitnodigen.js. De fout komt hier ongewijzigd door: de reden hoort bij
+       de speler aan te komen, en niet als "kan niet". */
+    const wie = await uitnodigen.verzamel(mij, { vrienden, codenamen, klasgenoten }, max);
+    if (wie.error) return wie;
+    const uitgenodigd = wie.uitgenodigd;
     // dezelfde checklist voor iedereen die je meeneemt; een lijst mag erin,
     // zodat er hier geen tweede lus staat die de vraag net anders stelt
     const neeGasten = beleid.mag(uitgenodigd, soort, { wereld });

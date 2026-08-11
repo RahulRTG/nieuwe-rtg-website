@@ -321,3 +321,34 @@ test('de klokttekst telt niet zichtbaar af, en zwijgt zonder klok', () => {
   assert.equal(klokTekst({ beurtTot: new Date(Date.now() - 5000).toISOString() }), 'tijd om',
     'een klok die voorbij is zegt dat, ook zonder de vlag van de server');
 });
+
+test('de spellen die de lobby laat terugkijken zijn ook echt naspeelbaar', () => {
+  /* Derde kopie van serverkennis in de client, en dezelfde afweging als bij de
+     twee hierboven. Deze mag ABSOLUUT niet schuiven: een spel dat de client
+     terugkijkbaar noemt terwijl de server het niet kan, geeft een foutmelding
+     op een knop die wij zelf aanboden. Andersom -- de server kan het en de
+     client biedt het niet aan -- is stiller en daarom net zo goed bewaakt. */
+  const bron = knip('const NASPEELBAAR', 'const TEMPI');
+  const client = new Function(bron + '; return NASPEELBAAR;')();
+  const server = Object.keys(SPEL).filter(k => SPEL[k].naspeelbaar);
+  assert.deepEqual(client.slice().sort(), server.slice().sort());
+});
+
+test('het schaakbord toont de laatste zet, en de server stuurt hem ook echt mee', () => {
+  /* Bij een partij van uren per beurt kom je terug op een bord dat er anders
+     uitziet. Zien WAT er veranderd is, is dan geen versiering maar de enige
+     manier om de draad op te pakken. Twee kanten, dus twee kansen om het te
+     vergeten: de weergave moet `laatste` sturen en de pagina moet hem tekenen. */
+  const p = { id: 'x', soort: 'schaak', modus: 'vrij', spelers: ['a', 'b'], uitgenodigd: [],
+    beurt: 0, teams: [0, 1], status: 'bezig', winnaar: null, at: '' };
+  const { INITS, ZETTEN, ZICHT } = require('../server/kern/spellen/register')({
+    save() {}, crypto: require('crypto'), schud: (a) => a, beurtDoor() {}, codenaamVan: (x) => x, nudge() {} });
+  INITS.schaak(p);
+  assert.equal(ZICHT.schaak.speler(p, p.staat, 'a').laatste, null, 'voor de eerste zet is er niets te markeren');
+  ZETTEN.schaak(p, 'a', { van: 52, naar: 36 });
+  assert.deepEqual(ZICHT.schaak.speler(p, p.staat, 'a').laatste, [52, 36], 'de server stuurt van-veld en naar-veld');
+  // en de pagina gebruikt ze allebei
+  const teken = knip('function tekenSchaak', 'function schKlik');
+  assert.match(teken, /lz\[0\] === veld/, 'de pagina markeert het veld waar de zet vandaan kwam');
+  assert.match(teken, /lz\[1\] === veld/, 'en het veld waar hij heen ging');
+});

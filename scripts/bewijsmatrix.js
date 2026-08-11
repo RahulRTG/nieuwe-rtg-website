@@ -72,6 +72,7 @@ const argv = process.argv.slice(2);
 const VASTLEGGEN = argv.includes('--vastleggen');
 const JSONUIT = argv.includes('--json');
 const POORTWACHT = (argv.find(a => a.startsWith('--poortwacht=')) || '').slice(13);
+const ROLPROEF = (argv.find(a => a.startsWith('--rolproef=')) || '').slice(11);
 const JOURNAAL = (argv.find(a => a.startsWith('--journaal=')) || '').slice(11) ||
   path.join(WORTEL, '.routejournaal');
 
@@ -90,7 +91,7 @@ const SCHAKELS = [
   { id: 'AUTH', uitleg: 'komt een niet-ingelogde vreemde binnen',
     bron: 'scripts/poortwacht.js --per-route' },
   { id: 'ACL', uitleg: 'komt een INGELOGDE met de verkeerde rol binnen',
-    bron: null, nodig: 'rolproef per route i.p.v. in totaal (scripts/lib/rolproef.js levert de proef al, maar rapporteert geaggregeerd)' },
+    bron: 'scripts/rolproef-route.js' },
   { id: 'INPUT', uitleg: 'wordt rommel geweigerd zonder 5xx',
     bron: null, nodig: 'een rommelronde met een levend token per rol; anoniem meet je alleen de voordeur' },
   { id: 'OUTPUT', uitleg: 'kijkt iemand naar de INHOUD van het antwoord',
@@ -108,7 +109,7 @@ const SCHAKELS = [
   { id: 'ROLLBACK', uitleg: 'laat een half mislukte oproep niets half achter',
     bron: null, nvtBijLezen: true, nodig: 'afbreken midden in de handler en de toestand nameten' },
   { id: 'PRIVACY', uitleg: 'lekt het antwoord een echte naam, IBAN of e-mailadres',
-    bron: null, nodig: 'LEKMERKERS over elk antwoord in elke proef (staat al in scripts/lib/rolproef.js)' }
+    bron: 'scripts/rolproef-route.js (op de WEIGERING; nog niet op een geslaagd antwoord)' }
 ];
 
 const LEESMETHODEN = new Set(['GET', 'HEAD']);
@@ -176,6 +177,20 @@ function geraakt() {
 
 /* De poortwacht met --per-route levert per METHODE+pad een oordeel over de
    voordeur. Zonder dat bestand blijft AUTH op 'verklaard' staan. */
+/* De rolproef per route: welke schrijfroutes zijn met een verkeerde rol
+   beproefd. Staat een route er NIET in, dan blijven ACL en PRIVACY ongemeten --
+   "geen bevinding" is hier geen groen, want er is niet gekeken. */
+function rolproefUitslag() {
+  if (!ROLPROEF) return null;
+  try {
+    const j = JSON.parse(fs.readFileSync(ROLPROEF, 'utf8'));
+    if (!Array.isArray(j.perRoute)) return null;
+    const kaart = new Map();
+    for (const r of j.perRoute) kaart.set(r.methode + ' ' + r.pad, r);
+    return kaart;
+  } catch (e) { return null; }
+}
+
 function poortwachtUitslag() {
   if (!POORTWACHT) return null;
   try {
@@ -206,6 +221,7 @@ function bouw(invoer) {
   const bewakers = inv.bewakers || bewakersPerRoute();
   const journaal = inv.journaal !== undefined ? inv.journaal : geraakt();
   const poort = inv.poort !== undefined ? inv.poort : poortwachtUitslag();
+  const rol = inv.rol !== undefined ? inv.rol : rolproefUitslag();
 
   const rijen = [];
   for (const r of tabel.routes) {
@@ -229,6 +245,21 @@ function bouw(invoer) {
         continue;
       }
 
+      if (s.id === 'ACL' || s.id === 'PRIVACY') {
+        const beproefd = rol && rol.get(sleutel);
+        if (beproefd) {
+          /* Beproefd EN doorstaan is bewezen; beproefd en gezakt is een
+             bevinding, en die hoort niet als bewijs te tellen. */
+          const stuk = s.id === 'ACL' ? beproefd.acl === 'OPEN' : beproefd.privacy === 'LEK';
+          cellen[s.id] = stuk
+            ? { staat: 'gezakt', bron: 'rolproef', rollen: beproefd.geprobeerd }
+            : { staat: 'bewezen', bron: 'rolproef', rollen: beproefd.geprobeerd };
+        } else {
+          cellen[s.id] = { staat: 'ongemeten' };
+        }
+        continue;
+      }
+
       cellen[s.id] = { staat: 'ongemeten' };
     }
 
@@ -243,8 +274,8 @@ function bouw(invoer) {
   /* De telling. Per schakel EN in totaal, want een matrix die alleen een
      eindcijfer geeft verbergt precies welke kolom leeg is. */
   const perSchakel = {};
-  let ongemeten = 0, bewezen = 0, verklaard = 0, nvt = 0;
-  for (const s of SCHAKELS) perSchakel[s.id] = { bewezen: 0, verklaard: 0, nvt: 0, ongemeten: 0 };
+  let ongemeten = 0, bewezen = 0, verklaard = 0, nvt = 0, gezakt = 0;
+  for (const s of SCHAKELS) perSchakel[s.id] = { bewezen: 0, verklaard: 0, nvt: 0, ongemeten: 0, gezakt: 0 };
   for (const rij of rijen) {
     for (const s of SCHAKELS) {
       const st = rij.cellen[s.id].staat;
@@ -252,6 +283,7 @@ function bouw(invoer) {
       if (st === 'ongemeten') ongemeten++;
       else if (st === 'bewezen') bewezen++;
       else if (st === 'verklaard') verklaard++;
+      else if (st === 'gezakt') gezakt++;
       else nvt++;
     }
   }
@@ -264,7 +296,7 @@ function bouw(invoer) {
     routes: rijen.length,
     schakels: SCHAKELS.length,
     cellen: rijen.length * SCHAKELS.length,
-    telling: { bewezen, verklaard, nvt, ongemeten },
+    telling: { bewezen, verklaard, nvt, ongemeten, gezakt },
     perSchakel,
     rijen
   };

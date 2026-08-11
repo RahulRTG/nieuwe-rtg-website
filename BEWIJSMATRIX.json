@@ -6,77 +6,89 @@
   "schakels": 11,
   "cellen": 43835,
   "telling": {
-    "bewezen": 3985,
+    "bewezen": 5983,
     "verklaard": 0,
     "nvt": 260,
-    "ongemeten": 39590
+    "ongemeten": 37592,
+    "gezakt": 0
   },
   "perSchakel": {
     "AUTH": {
       "bewezen": 3985,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 0
+      "ongemeten": 0,
+      "gezakt": 0
     },
     "ACL": {
-      "bewezen": 0,
+      "bewezen": 999,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 3985
+      "ongemeten": 2986,
+      "gezakt": 0
     },
     "INPUT": {
       "bewezen": 0,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 3985
+      "ongemeten": 3985,
+      "gezakt": 0
     },
     "OUTPUT": {
       "bewezen": 0,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 3985
+      "ongemeten": 3985,
+      "gezakt": 0
     },
     "STATE": {
       "bewezen": 0,
       "verklaard": 0,
       "nvt": 65,
-      "ongemeten": 3920
+      "ongemeten": 3920,
+      "gezakt": 0
     },
     "SIDE_EFFECT": {
       "bewezen": 0,
       "verklaard": 0,
       "nvt": 65,
-      "ongemeten": 3920
+      "ongemeten": 3920,
+      "gezakt": 0
     },
     "AUDIT": {
       "bewezen": 0,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 3985
+      "ongemeten": 3985,
+      "gezakt": 0
     },
     "IDEMPOTENCY": {
       "bewezen": 0,
       "verklaard": 0,
       "nvt": 65,
-      "ongemeten": 3920
+      "ongemeten": 3920,
+      "gezakt": 0
     },
     "FAILURE": {
       "bewezen": 0,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 3985
+      "ongemeten": 3985,
+      "gezakt": 0
     },
     "ROLLBACK": {
       "bewezen": 0,
       "verklaard": 0,
       "nvt": 65,
-      "ongemeten": 3920
+      "ongemeten": 3920,
+      "gezakt": 0
     },
     "PRIVACY": {
-      "bewezen": 0,
+      "bewezen": 999,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 3985
+      "ongemeten": 2986,
+      "gezakt": 0
     }
   },
   "uitleg": "Gegenereerd door scripts/bewijsmatrix.js. ongemeten MAG ALLEEN KRIMPEN."

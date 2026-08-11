@@ -48,6 +48,7 @@ const BRONNEN = [
   'server/lib/keten-anker.js',
   'server/lib/klok.js',
   'scripts/lib/schermleugen.js',
+  'scripts/lib/rolproef.js',
   'scripts/bewijsmatrix.js'
 ];
 

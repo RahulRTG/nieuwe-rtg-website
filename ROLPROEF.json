@@ -1,0 +1,11013 @@
+{
+ "uitleg": "Per SCHRIJFroute welke verkeerde rollen zijn geprobeerd, met plausibele invoer. Een route die hier NIET in staat is niet beproefd -- dat is ongemeten en geen groen. Zie scripts/lib/rolproef.js voor wat de proef wel en niet uitsluit.",
+ "gemeten": {
+  "routesMetRol": 2937,
+  "beproefd": 1000,
+  "pogingen": 2000,
+  "aclOpen": 0,
+  "privacyLek": 0,
+  "begrenzing": 2000
+ },
+ "perRoute": [
+  {
+   "methode": "POST",
+   "pad": "/api/aandacht",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/aanmelding/beslis",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/aanmelding/betalingen",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/aanmelding/bewijs/stand",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/aanmelding/bewijs/teken",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/aanmelding/een",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/aanmelding/lijst",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/aanmelding/termijn-voldaan",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/account/koppel",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/account/ontkoppel",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/account/rollen",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/account/start",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/adres/zoek",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/agenda/ai",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/agenda/antwoord",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/agenda/bereik",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/agenda/bewaar",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/agenda/ics",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/agenda/mijn",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/agenda/mijn-lijst",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/agenda/toevoegen",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/agenda/uitnodig",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/agenda/verwijder",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/agenda/wijzig",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/ai",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/annuleer",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/asset/document",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/asset/gebruik",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/asset/herroep",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/asset/koop",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/asset/mijn",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/asset/uitstap",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/asset/wachtlijst",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/assets",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/auth/me",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/auth/password",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/auth/resend",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/avond",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/avond/aanvragen",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/avond/koppel",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/avond/mijn",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/avond/pols",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/avond/voorkeuren",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/avond/voorkeuren/proef",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/avond/voorkeuren/zaak",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/avond/voorstel",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/balans",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bank/advies",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bank/afschrift",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bank/afschrift.csv",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bank/akkoord",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bank/bevries",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bank/bulk",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bank/hart",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bank/inzichten",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bank/krediet",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bank/krediet/aanvraag",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bank/krediet/aflossing",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bank/naar-wallet",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bank/overboek",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bank/overzicht",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bank/pas/betaal",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bank/pas/bevries",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bank/pas/limiet",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bank/pas/sluit",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bank/pas/uitgeven",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bank/passen",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bank/rekening",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bank/rekening/open",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bank/rente-voorbeeld",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bank/salaris",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bank/sepa",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bank/spaardoel",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bank/storten",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bank/terugkerend",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bank/terugkerend/stop",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bank/terugkerend/zet",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bank/van-wallet",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bank/vastelasten",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bank/veeg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bedrijf/herkomst/open",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bedrijf/lid/koppel",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bedrijf/mijn",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bedrijf/post/context",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bedrijf/post/herkomst",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bedrijf/post/omzetten",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bestanden/deel",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bestanden/haal",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bestanden/herstel",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bestanden/leeg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bestanden/map",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bestanden/mijn",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bestanden/pdf/notitie",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bestanden/pdf/notities",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bestanden/pdf/redigeer",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bestanden/pdf/samenvoegen",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bestanden/pdf/splitsen",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bestanden/updeel",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bestanden/upklaar",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bestanden/upload",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bestanden/upstart",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bestanden/versies",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bestanden/versieterug",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bestanden/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bestanden/wijzig",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/betaal/direct",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/betaal/mijn",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/betaal/verzoek/pay",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/betaal/verzoeken",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bezorg/bestel",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bezorg/partners",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bezorg/volg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bieb/ai",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bijles/gesprek",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bijles/vraag",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/boeken/bieb",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/boeken/boek",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/boeken/lees",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/boeken/voortgang",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/booking/pay",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/booking/request",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/booking/slots",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/bookings/mine",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/browser/bericht",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/browser/gids",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/browser/open",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/browser/zoek",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/care",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/care/annuleer",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/care/betaal",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/care/boek",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/care/intake/deel",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/care/intake/stop",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/care/mijn",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/care/pakket/betaal",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/care/pakket/boek",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/care/pakket/mijn",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/care/pakketten",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/care/vastleggen/deel",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/care/vastleggen/mijn",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/care/vastleggen/stop",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/care/wachtlijst",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/care/wachtlijst/af",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/care/wachtlijst/zet",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/charter/aanbod",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/charter/boek",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/charter/foto",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/charter/locatie",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/charter/mijn",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/charter/sos",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/chat/history",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/chat/send",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/clips/aanwezig",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/clips/feed",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/clips/geluid",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/clips/knip",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/clips/maak",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/clips/meld",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/clips/ondertitels",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/clips/reactie",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/clips/reacties",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/clips/signaal",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/clips/volg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/clips/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/comm/ai",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/comm/begin",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/comm/concept",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/comm/gesprek",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/comm/inbox",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/comm/lees",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/comm/por",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/comm/reactie",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/comm/stuur",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/comm/typt",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/comm/vlag",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/comm/wijzig",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/comm/wis",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/comm/zoek",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/agent/hervat",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/agent/rechten",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/agent/stop",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/agents",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/alarm",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/alarm/stil",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/apipoort",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/apipoort/intrekken",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/apipoort/sleutel",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/apipoort/toelaten",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/apipoort/toelating-weg",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/beleid",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/beleid/geschiedenis",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/beleid/keur",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/beleid/terug",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/beleid/zet",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/canary",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/canary/af",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/canary/breder",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/canary/start",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/canary/terug",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/graaf",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/graaf/wandel",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/herkomst",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/herkomst/spoor",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/journaal",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/journaal/herbeleef",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/kwaliteit",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/land",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/land/activeer",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/land/terug",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/mandaat",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/mdm",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/mdm/gouden",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/mdm/samen",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/mdm/terug",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/object",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/operator/plan",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/operator/recent",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/operator/uitvoeren",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/overname",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/overname/afbeelden",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/overname/droogloop",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/overname/lees",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/overname/terug",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/overname/voer",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/overname/voorstel",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/puls",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/recht/geef",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/recht/introk",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/recht/nood",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/rechten",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/runbook/terug",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/runbook/voer",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/runbooks",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/runs",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/simulatie/beleid",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/simulatie/watals",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/slo",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/sonde",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/sonde/draai",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/stad",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/stad/start",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/stad/stop",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/start",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/werk",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/zaak/besluit",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/zaak/neem",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/zaak/open",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/zaken",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/zandbak",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/zandbak/kwaliteit",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/zandbak/maak",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/zandbak/runbook",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/zandbak/weg",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/zandbak/zoek",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/command/zoek",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/comment",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/boom",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/bulk/lees",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/bulk/verstuur",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/discovery",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/discovery/neem",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/document/bevestig",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/document/lees",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/entiteit",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/entiteit/groep",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/entiteit/nieuw",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/entiteit/onderneming",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/entiteit/registratie",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/entiteit/verwijder",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/entiteiten",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/feit/beeindig",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/feit/zet",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/functiescheiding",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/fusie/beeld",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/fusie/doe",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/geschiedenis",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/impact",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/kwalificatie/zet",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/kwalificaties",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/launch",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/mag",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/mens/nieuw",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/mens/uitdienst",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/mens/zet",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/mensen",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/mijnwerk",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/nieuw",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/opdatum",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/opname/herstel",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/opname/maak",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/opnames",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/organigram",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/overname",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/overzicht",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/readiness",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/tekenen",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/ubo",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/uitdienst/beeld",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/uitdienst/doe",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/uitnodigen",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/uitnodiging/accepteer",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/uitnodiging/intrek",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/uitnodigingen",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/verloopt",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/vestiging/nieuw",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/vestiging/sluit",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/vestiging/zaak",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/vestiging/zaaklos",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/concern/vestigingen",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/contract/teken",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/contract/weiger",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/contracten/mijn",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/cv/get",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/cv/save",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/dag",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/dm",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/doelen",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/doelen/maak",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/doelen/meet",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/doelen/stop",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/doelen/verzet",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/drm/capability",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/drm/key",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/drm/report",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/event/rsvp",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/event/rsvp/annuleer",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/facturen/ai",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/facturen/mijn",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/facturen/overzicht",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/facturen/pdf",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/factuur",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/favoriet",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/favorieten",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/flits/meld",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/flits/rond",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/flits/stem",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/flits/vooruit",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/fluister",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/fluister/focus",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/fluister/onthoud",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/fluister/profiel",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/fluister/vergeet",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foodcourt",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/foodcourt/tijden",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/galerij/album",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/galerij/favoriet",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/galerij/mijn",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/galerij/zet",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gast/afhaal/bestel",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gast/bezorg/bestel",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gast/bezorg/check",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gast/bezorg/kaart",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gast/bezorg/mijn",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gast/bezorg/rekening",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gast/foodcourt/bestel",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gast/foodcourt/mandje",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gast/foodcourt/mijn",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gedachten",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gedachten/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gedachten/zet",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gegevens/nodig",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gegevens/start",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gegevens/zeg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/geld/actielog",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/geld/beleid",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/geld/beleid/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/geld/beleid/zet",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/geld/cockpit",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/geld/pot/reserveer",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/geld/pot/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/geld/pot/zet",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/geld/rahul",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gemeente/afspraak",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gemeente/afspraak/annuleer",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gemeente/afspraken",
+   "rol": "supplier",
+   "geprobeerd": [
+    "member",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gemeente/afspraken/mijn",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gemeente/afval",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gemeente/bekendmaking",
+   "rol": "supplier",
+   "geprobeerd": [
+    "member",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gemeente/bekendmakingen",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gemeente/belasting/betaal",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gemeente/belasting/mijn",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gemeente/burgerzaken",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gemeente/burgerzaken/slots",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gemeente/grofvuil",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gemeente/meld",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gemeente/melding/zet",
+   "rol": "supplier",
+   "geprobeerd": [
+    "member",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gemeente/meldingen",
+   "rol": "supplier",
+   "geprobeerd": [
+    "member",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gemeente/meldingen/mijn",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gemeente/regie",
+   "rol": "supplier",
+   "geprobeerd": [
+    "member",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gemeente/triage",
+   "rol": "supplier",
+   "geprobeerd": [
+    "member",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gemeente/vergunning",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gemeente/vergunning/beslis",
+   "rol": "supplier",
+   "geprobeerd": [
+    "member",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gemeente/vergunningen",
+   "rol": "supplier",
+   "geprobeerd": [
+    "member",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gemeente/vergunningen/mijn",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gemeente/verhuizing",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gemoed",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gemoed/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gemoed/zet",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/genootschap/afgelast",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/genootschap/agenda",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/genootschap/ai/aankondiging",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/genootschap/ai/datum",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/genootschap/ai/prikbord",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/genootschap/antwoord",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/genootschap/bijgepraat",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/genootschap/binnen",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/genootschap/eruit",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/genootschap/gezien",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/genootschap/gezondheid",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/genootschap/mijn",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/genootschap/mijn-agenda",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/genootschap/mijn-uitvoer",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/genootschap/nodig-uit",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/genootschap/pas-aan",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/genootschap/prik",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/genootschap/prik-weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/genootschap/prikbord",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/genootschap/reactie-weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/genootschap/reageer",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/genootschap/richt-op",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/genootschap/roep-bijeen",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/genootschap/rol",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/genootschap/stem",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/genootschap/uitvoer",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/genootschap/vertrek",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/genootschap/zoek",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gewoonten",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gewoonten/maak",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gewoonten/reeks",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gewoonten/stop",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/gewoonten/tik",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/giftcard/buy",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/giftcards/mine",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/groothandel/annuleer",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/groothandel/bestel",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/groothandel/markt",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/groothandel/mijn",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/home",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/home/alles-uit",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/home/merk/ontkoppel",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/home/merk/verbind",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/home/merken",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/home/scene/ai",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/home/scene/bewaar",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/home/scene/start",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/home/scene/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/home/zet",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/hotels",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/huur/boek",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/huur/foto",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/huur/locatie",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/huur/mijn",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/huur/sos",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/ik",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/ik/geloof",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/ik/toegankelijk",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/ik/toegankelijk/zet",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/ik/vandaag",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/ik/zet",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kantoor/wereld",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/klets",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/klets/gesprek",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/klets/start",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/klets/zet",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/klok/mijn",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/klok/timer",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/klok/wekker",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kmar/ai",
+   "rol": "supplier",
+   "geprobeerd": [
+    "member",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kmar/cockpit",
+   "rol": "supplier",
+   "geprobeerd": [
+    "member",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kmar/controle/lijst",
+   "rol": "supplier",
+   "geprobeerd": [
+    "member",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kmar/controle/zet",
+   "rol": "supplier",
+   "geprobeerd": [
+    "member",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kmar/incident",
+   "rol": "supplier",
+   "geprobeerd": [
+    "member",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kmar/incident/sluit",
+   "rol": "supplier",
+   "geprobeerd": [
+    "member",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kmar/incidenten",
+   "rol": "supplier",
+   "geprobeerd": [
+    "member",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/kmar/patrouille",
+   "rol": "supplier",
+   "geprobeerd": [
+    "member",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab/ai",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab/kennisbank",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab/overzicht",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab/project/bevinding",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab/project/fase",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab/project/log",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab/project/maak",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab/project/team",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab/project/veiligheid",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/app/bevoegd",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/app/kalibratie",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/app/lijst",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/app/maak",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/app/onderhoud",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/app/reserveer",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/app/reservering-weg",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/app/storing-op",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/app/uitgifte",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/bewijs/conclusie",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/bewijs/dataset",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/bewijs/graad",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/bewijs/koppel",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/bewijs/observatie",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/bewijs/reflectie",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/coach",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/coach/conclusie",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/coach/methoden",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/ethiek/klacht-af",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/ethiek/klasse",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/ethiek/privacy",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/ethiek/review",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/ethiek/stilleggen",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/ethiek/stopcriterium",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/ethiek/toestemming",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/impact",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/kader",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/lab/audit",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/lab/budget",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/lab/maak",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/lab/partner",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/lab/tekenaar",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/lab/zet",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/labs",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/mens/bij",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/mens/rol",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/mens/weg",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/opbrengst",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/overzicht",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/plan/advies",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/plan/bron",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/plan/bron-natrek",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/plan/hypothese",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/plan/zet",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/studie",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/studie/besluit",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/studie/maak",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/studie/stap",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/studie/vraagstuk",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/studie/watnu",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/thema/koppel",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/themas",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/uit/maak",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/uit/naar-lab",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/uit/pijplijn",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/uit/status",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/uit/vervolg",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/werk/agenda",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/werk/besluit",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/werk/document",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/werk/log",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/werk/taak",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lab2/werk/taak-zet",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/labfonds/beslis",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/labfonds/boardroom",
+   "rol": "office",
+   "geprobeerd": [
+    "member",
+    "supplier"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/labfonds/doneer",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/labfonds/locatie/maak",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/labfonds/overzicht",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/labfonds/scheidsrechter",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/labfonds/stem",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/labfonds/voorstel/maak",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/leerstof/antwoord",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/leerstof/examen",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/leerstof/examen-antwoord",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/leerstof/les",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/leerstof/oefen",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/leerstof/vakken",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/leven/band/bevestig",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/leven/band/verbreek",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/leven/band/vraag",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/leven/cockpit",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/leven/deel/in",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/leven/deel/zet",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/leven/kring",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/leven/lijn",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/leven/mentor",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/life",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/like",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/live/door",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/live/start",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/live/state",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/live/stop",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/live/update",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/locatie/deel",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/locatie/mijn",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/locatie/stop",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/logout",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lucht/ai",
+   "rol": "supplier",
+   "geprobeerd": [
+    "member",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lucht/bagage",
+   "rol": "supplier",
+   "geprobeerd": [
+    "member",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lucht/bagage/zet",
+   "rol": "supplier",
+   "geprobeerd": [
+    "member",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lucht/bord",
+   "rol": "supplier",
+   "geprobeerd": [
+    "member",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lucht/charter/beslis",
+   "rol": "supplier",
+   "geprobeerd": [
+    "member",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lucht/charters",
+   "rol": "supplier",
+   "geprobeerd": [
+    "member",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lucht/cockpit",
+   "rol": "supplier",
+   "geprobeerd": [
+    "member",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lucht/draai/taak",
+   "rol": "supplier",
+   "geprobeerd": [
+    "member",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lucht/lounge",
+   "rol": "supplier",
+   "geprobeerd": [
+    "member",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lucht/lounge/in",
+   "rol": "supplier",
+   "geprobeerd": [
+    "member",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lucht/lounge/uit",
+   "rol": "supplier",
+   "geprobeerd": [
+    "member",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lucht/security/zet",
+   "rol": "supplier",
+   "geprobeerd": [
+    "member",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lucht/toren/klaring",
+   "rol": "supplier",
+   "geprobeerd": [
+    "member",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lucht/vip/lijst",
+   "rol": "supplier",
+   "geprobeerd": [
+    "member",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lucht/vip/maak",
+   "rol": "supplier",
+   "geprobeerd": [
+    "member",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lucht/vip/taak",
+   "rol": "supplier",
+   "geprobeerd": [
+    "member",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lucht/vlucht/gate",
+   "rol": "supplier",
+   "geprobeerd": [
+    "member",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lucht/vlucht/maak",
+   "rol": "supplier",
+   "geprobeerd": [
+    "member",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lucht/vlucht/status",
+   "rol": "supplier",
+   "geprobeerd": [
+    "member",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/lucht/vlucht/vertraag",
+   "rol": "supplier",
+   "geprobeerd": [
+    "member",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mall",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mall/aanvraag",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mall/aanvraag/kies",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mall/aanvraag/sluit",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mall/aanvragen/mijn",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mall/apps",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mall/apps/catalogus",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mall/apps/installeer",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mall/apps/mijn",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mall/apps/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mall/bestel",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mall/bestellingen",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mall/bewaar",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mall/bewaard",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mall/collectie",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mall/collecties",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mall/concierge",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mall/eigen",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mall/home",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mall/land",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mall/land-bestel",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mall/lijst",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mall/lijst/nieuw",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mall/lijst/regel-weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mall/lijst/voegtoe",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mall/lijst/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mall/lijst/zet",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mall/lijsten",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mall/plekken",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mall/reis",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mall/reis/catalogus",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mall/reis/installeer",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mall/reis/lees",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mall/reis/mijn",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mall/reis/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mall/rtf",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mall/rtf/catalogus",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mall/rtf/installeer",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mall/rtf/mijn",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mall/rtf/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mall/wijzigingen",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mall/zakelijk",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mall/zoek",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mediaos/bewaar",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mediaos/bieb",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mediaos/bord",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mediaos/lijst",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mediaos/lijst/deel",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mediaos/lijst/maak",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mediaos/lijst/stuk",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mediaos/lijst/zet",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mediaos/lijsten",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mediaos/maker",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mediaos/meldingen",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mediaos/samen/in",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mediaos/samen/mijn",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mediaos/samen/nodig",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mediaos/samen/start",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mediaos/samen/uit",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mediaos/samen/zet",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mediaos/smaak",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mediaos/stuk",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mediaos/stuur",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mediaos/volg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mediaos/wereld",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/medicatie",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/medicatie/af",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/medicatie/voorraad",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/medicatie/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/medicatie/zet",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/meet/kom",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/meet/maak",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/meet/mijn",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/meet/sein",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/meet/verlaat",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/meet/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/meldingen/voorkeur",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/accountant",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/apply",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/apply/chat",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/apply/chat/send",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/apply/chats",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/apps",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/berichten",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/berichten/afspraken",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/berichten/concept",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/berichten/samenvatting",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/berichten/vlag",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/berichten/zoek",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/block",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/boardroom",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/boardroom/herstel",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/boardroom/logboek",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/boardroom/zet",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/boardroom/zetveel",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bord",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/borden",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/ai",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/beveiliging",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/beveiliging/digitaal",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/beveiliging/digitaal/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/beveiliging/incident",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/beveiliging/post",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/beveiliging/post/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/beveiliging/risico",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/beveiliging/risico/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/briefing",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/collectie",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/collectie/bruikleen",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/collectie/conditie",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/collectie/herkomst",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/collectie/herkomst/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/collectie/taxatie",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/collectie/taxatie/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/collectie/terug",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/delegatie",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/delegatie/zet",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/dieren",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/dieren/dier",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/dieren/dier/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/dieren/document",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/dieren/document/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/dieren/zorg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/dieren/zorg/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/graaf",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/kamers",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/knoop",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/nu",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/overzicht",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/raakvlak",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/reisdek",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/reisdek/bon",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/reisdek/gevolg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/reisdek/punten",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/reisdek/vergeten",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/reisdek/verstoring",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/reisdek/verstoring/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/relaties",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/relaties/band",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/relaties/band/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/relaties/context",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/relaties/ontmoeting",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/relaties/ontmoeting/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/reputatie",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/reputatie/lijn",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/reputatie/lijn/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/reputatie/optreden",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/reputatie/optreden/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/reputatie/vermelding",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/reputatie/vermelding/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/reputatie/woordvoerder",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/reputatie/woordvoerder/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/termijnen",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/tower",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/twin",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/twin/beurt",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/twin/installatie",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/twin/installatie/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/twin/ruimte",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/twin/ruimte/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/zaak/beslis",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/zaak/intrek",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/zaak/open",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/bureau/zaken",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/call",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/connect",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/connect/respond",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/connections",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/dm",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/dm/send",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/doe",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/doe/kaart",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/dossier",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/find",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/huis/dossier",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/huis/map",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/huis/rahul",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/identiteit/verzoeken",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/leren/herhaal",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/leren/herhaal-antwoord",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/leren/herhaal-stand",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/leren/lijst-ai",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/leren/lijst-haal",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/leren/lijst-maak",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/leren/lijst-weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/leren/lijsten",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/leren/notitie",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/leren/overhoor-klaar",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/leren/project-ai",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/leren/project-antwoord",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/leren/project-maak",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/leren/project-staat",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/leren/project-uitnodig",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/leren/project-weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/leren/projecten",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/leren/schrijf-bewaar",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/leren/schrijf-feedback",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/leren/schrijf-opdracht",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/leren/schrijfsels",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/leren/sessie-antwoord",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/leren/sessie-staat",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/leren/sessie-start",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/leren/sessie-zet",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/leren/sessies",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/leren/taak-maak",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/leren/taak-zet",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/lifestyle/ai",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/lifestyle/bezit",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/lifestyle/bezit/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/lifestyle/bezit/zet",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/lifestyle/concierge",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/lifestyle/concierge/intrek",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/lifestyle/concierge/vraag",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/lifestyle/gezondheid",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/lifestyle/gezondheid/afspraak",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/lifestyle/gezondheid/afspraak/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/lifestyle/gezondheid/dossier",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/lifestyle/gezondheid/dossier/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/lifestyle/overzicht",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/lifestyle/voorkeuren",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/lifestyle/voorkeuren/zet",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/loonstroken",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/naam/lijst",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/naam/wie",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/naam/zet",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/nieuws",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/nieuws/ai",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/nieuws/artikel",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/pulse/bewaar",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/pulse/bewaard",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/pulse/bewerk",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/pulse/feed",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/pulse/like",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/pulse/meld",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/pulse/post",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/pulse/profiel",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/pulse/reactie",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/pulse/versies",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/pulse/volg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/pulse/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/ai",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/attenties",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/attenties/gift",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/attenties/gift/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/attenties/relatie",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/attenties/relatie/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/cellier",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/cellier/schenk",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/cellier/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/cellier/zet",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/cercle",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/cercle/club",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/cercle/club/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/cercle/gast",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/cercle/gast/terug",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/cercle/waarheen",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/entourage",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/entourage/doc",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/entourage/doc/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/entourage/gezelschap",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/entourage/persoon",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/entourage/persoon/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/garderobe",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/garderobe/stuk",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/garderobe/stuk/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/garderobe/vakman",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/garderobe/vakman/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/hangar",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/hangar/toestel",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/hangar/toestel/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/hangar/vlucht",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/hangar/vlucht/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/logboek",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/logboek/object",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/logboek/object/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/logboek/regel",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/logboek/regel/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/maison",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/maison/log",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/maison/log/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/maison/staf",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/maison/staf/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/maison/taak",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/maison/taak/klaar",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/maison/taak/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/mecenaat",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/mecenaat/betaald",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/mecenaat/gift",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/mecenaat/gift/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/nalatenschap",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/nalatenschap/contact",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/nalatenschap/contact/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/nalatenschap/doc",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/nalatenschap/doc/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/nalatenschap/wens",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/nalatenschap/wens/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/reis/item",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/reis/item/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/reis/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/reis/zet",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/reisboek",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/table",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/table/gast",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/table/gast/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/table/gast/zet",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/table/menu",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/table/menu/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/table/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rechterhand/table/zet",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rendezvous/date",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rendezvous/kandidaten",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rendezvous/like",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rendezvous/matches",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rendezvous/pas",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rendezvous/profiel",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rendezvous/profiel/zet",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/report",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/adres",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/assist",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/inbox",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/lees",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/team/af",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/team/bevestiging",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/team/dossier",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/team/hef",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/team/koppel",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/team/lid",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/team/maak",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/team/mijn",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/team/notitie",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/team/overzicht",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/team/pak",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/team/postvak",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/team/prioriteit",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/team/status",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/team/stuur",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/rtmail/team/verlaat",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/snap/opdracht",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/snap/send",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/snap/view",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/snaps",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/spel/",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/sport/bord",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/sport/momenten",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/sport/plattegrond",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/sport/sponsor",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/sport/sponsors",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/sport/stand",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/sport/ticket/koop",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/sport/tickets",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/stories",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/story/post",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/story/view",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/taal",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/taal/zet",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/unblock",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/vacatures",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/vluchten/boek",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/vluchten/bord",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/vluchten/charter",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/vluchten/incheck",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/vluchten/mijn",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/vooruit",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/vooruit/post",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/vooruit/post/neem",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/vooruit/post/negeer",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/wauw/stemming",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/wauw/stemming/zet",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/wauw/terugblik",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/member/zzp",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/memo/samenvat",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/metier/aanbeveling-intrekken",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/metier/aanbeveling-verberg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/metier/ai/brief",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/metier/ai/oefen",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/metier/ai/profiel",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/metier/beveel-aan",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/metier/ik",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/metier/kaart",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/metier/lid",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/metier/lijst",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/metier/loon",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/metier/loon-toets",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/metier/naam-intrekken",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/metier/naam-log",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/metier/naam-vrij",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/metier/onderschrijf",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/metier/rol",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/metier/rol-weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/metier/zoek",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/metingen",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/metingen/weg",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/metingen/zet",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mob/aanbod",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mob/abo/aanbod",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mob/abo/koop",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mob/abo/mijn",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mob/annuleer",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  },
+  {
+   "methode": "POST",
+   "pad": "/api/mob/beleid",
+   "rol": "member",
+   "geprobeerd": [
+    "supplier",
+    "office"
+   ],
+   "acl": "dicht",
+   "privacy": "schoon"
+  }
+ ]
+}

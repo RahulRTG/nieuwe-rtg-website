@@ -3078,6 +3078,14 @@
       "gezakt": 9,
       "scherp": "gezakt"
     },
+    "rolproef.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/rolproef.js",
+      "operator": "===->!==#0",
+      "gezakt": 5,
+      "geprobeerd": 1
+    },
     "routelog.test.js": {
       "soort": "server",
       "staat": "gezakt",

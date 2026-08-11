@@ -122,8 +122,26 @@ async function ijkVingerafdruk(post, tok) {
    de juiste rol van een route; `tokensVoor` levert een levend token per rol.
    Alles wat afwijkt komt terug als bevinding, met genoeg context om het na te
    lopen. */
+/* HET OORDEEL OVER EEN ANTWOORD, apart en puur.
+
+   Twee vragen, en ze zijn niet hetzelfde:
+     kwam de verkeerde rol BINNEN            -> 2xx, en dat mag nooit
+     gaf de WEIGERING gegevens mee           -> een correcte 403 kan lekken
+
+   Los toetsbaar (test/rolproef.test.js), want in een proef die een echte server
+   nodig heeft komt niemand hier ooit met een mutatie bij. */
+function weegAntwoord(status, lijf) {
+  if (status >= 200 && status < 300) return { tweexx: true, lek: null };
+  for (const m of LEKMERKERS) if (m.re.test(String(lijf || ''))) return { tweexx: false, lek: m.naam };
+  return { tweexx: false, lek: null };
+}
+
 async function draaiRolproef({ post, routes, tokensVoor, maxPerRol }) {
   const bevindingen = { tweexx: [], lekken: [], gewijzigd: [] };
+  /* Per route wat er met hem is gebeurd -- de bewijsmatrix vult hier ACL en
+     PRIVACY mee. Een route die NIET is geprobeerd staat er niet in, en dat is
+     het hele punt: ongemeten is geen groen. */
+  const perRoute = {};
   const rollen = ['member', 'supplier', 'office'];
 
   /* ---- EEN VAST TOKEN PER ROL, VOOR DE HELE PROEF ----
@@ -151,6 +169,7 @@ async function draaiRolproef({ post, routes, tokensVoor, maxPerRol }) {
   const ijk = await ijkVingerafdruk(post, vastVoor());
   if (!ijk.gevoelig) {
     return {
+      perRoute: {},
       bevindingen: { tweexx: [], lekken: [], gewijzigd: [],
         meterStuk: 'de vingerafdruk zag een LEGITIEME wijziging niet' +
           (ijk.gelukt ? '' : ' (en de ijk-oplading zelf lukte ook niet)') +
@@ -173,16 +192,28 @@ async function draaiRolproef({ post, routes, tokensVoor, maxPerRol }) {
       const st = await post(r.pad, plausibelLijf(r.pad), Array.isArray(tk) ? tk[0] : tk);
       gedaan++;
       const s = st.status;
-      if (s >= 200 && s < 300) { bevindingen.tweexx.push(r.method + ' ' + r.pad + ' [' + rol + ' -> ' + s + ']'); continue; }
       /* Het LIJF van de weigering. Hier hoort een foutmelding te staan en verder
          niets: geen adres, geen echte naam, geen rekeningnummer. */
       const lijf = typeof st.data === 'string' ? st.data : JSON.stringify(st.data || {});
-      for (const m of LEKMERKERS) {
-        if (m.re.test(lijf)) {
-          bevindingen.lekken.push(r.method + ' ' + r.pad + ' [' + rol + ' -> ' + s + '] ' + m.naam +
-            ': ' + lijf.slice(0, 120).replace(/\s+/g, ' '));
-          break;
-        }
+      const oordeel = weegAntwoord(s, lijf);
+
+      /* HET OORDEEL VALT OP EEN PLEK, en daarna pas tellen EN opschrijven.
+         Eerst zat het oordeel in de bevindingenlijsten verweven; wie er een
+         tweede uitvoer naast zet -- en dat is precies wat de bewijsmatrix wil --
+         bouwt dan onvermijdelijk een tweede waarheid die er langzaam naast gaat
+         lopen. Dezelfde les als bij de poortwacht. */
+      const sleutel = r.method + ' ' + r.pad;
+      const bij = perRoute[sleutel] || (perRoute[sleutel] = { methode: r.method, pad: r.pad, rol: r.rol, geprobeerd: [], acl: 'dicht', privacy: 'schoon' });
+      bij.geprobeerd.push(rol);
+      if (oordeel.tweexx) {
+        bij.acl = 'OPEN';
+        bevindingen.tweexx.push(sleutel + ' [' + rol + ' -> ' + s + ']');
+        continue;
+      }
+      if (oordeel.lek) {
+        bij.privacy = 'LEK';
+        bevindingen.lekken.push(sleutel + ' [' + rol + ' -> ' + s + '] ' + oordeel.lek +
+          ': ' + lijf.slice(0, 120).replace(/\s+/g, ' '));
       }
     }
   }
@@ -192,7 +223,19 @@ async function draaiRolproef({ post, routes, tokensVoor, maxPerRol }) {
     if (voor[k] == null && na[k] == null) continue;
     if (voor[k] !== na[k]) bevindingen.gewijzigd.push(k + ': ' + voor[k] + ' -> ' + na[k]);
   }
-  return { bevindingen, pogingen: gedaan, voor, na, ijk };
+  return { bevindingen, perRoute, pogingen: gedaan, voor, na, ijk };
 }
 
-module.exports = { draaiRolproef, vingerafdruk, ijkVingerafdruk, plausibelLijf, LEKMERKERS };
+const CONTROL = {
+  control: 'ROL-SCHEIDING',
+  wat: 'een ingelogde met de verkeerde rol komt niet binnen, en de weigering lekt niets',
+  eigenaar: 'Security',
+  bewijs: ['test/rolproef.test.js'],
+  bewijsstuk: 'ROLPROEF.json -- per route welke verkeerde rollen zijn geprobeerd',
+  grens: 'meet twee foutklassen op SCHRIJFroutes: binnenkomen met de verkeerde rol, en een ' +
+    'weigering die gegevens meegeeft. Twee leden met DEZELFDE rol die bij elkaars dossier ' +
+    'kunnen (een IDOR) valt hier niet onder; leesroutes worden niet geprobeerd.'
+};
+
+module.exports = { draaiRolproef, vingerafdruk, ijkVingerafdruk, plausibelLijf,
+  weegAntwoord, LEKMERKERS, CONTROL };

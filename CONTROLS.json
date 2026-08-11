@@ -1,8 +1,8 @@
 {
   "uitleg": "Verklaarde beheersmaatregelen en wanneer elk voor het laatst BEWEZEN is. Zie TOEZICHT.md. laatstGroen is gemeten door de genoemde toetsen te draaien, niet overgeschreven -- een register dat zijn eigen groen opschrijft bewijst niets.",
   "gemeten": {
-    "controls": 5,
-    "groen": 4,
+    "controls": 6,
+    "groen": 5,
     "nietInBedrijf": 1,
     "nietGroen": 0
   },
@@ -21,7 +21,7 @@
         "staat": "GROEN",
         "beweringen": 30,
         "overgeslagen": 0,
-        "at": "2026-08-11T22:49:30.780Z",
+        "at": "2026-08-11T23:00:19.116Z",
         "bestanden": [
           "test/keten.test.js"
         ]
@@ -42,7 +42,7 @@
         "staat": "NIET IN BEDRIJF",
         "beweringen": 30,
         "overgeslagen": 0,
-        "at": "2026-08-11T22:49:31.010Z",
+        "at": "2026-08-11T23:00:19.373Z",
         "bestanden": [
           "test/keten.test.js"
         ],
@@ -64,7 +64,7 @@
         "staat": "GROEN",
         "beweringen": 18,
         "overgeslagen": 0,
-        "at": "2026-08-11T22:49:32.963Z",
+        "at": "2026-08-11T23:00:21.370Z",
         "bestanden": [
           "test/klok.test.js"
         ]
@@ -85,10 +85,30 @@
         "staat": "GROEN",
         "beweringen": 18,
         "overgeslagen": 0,
-        "at": "2026-08-11T22:50:02.076Z",
+        "at": "2026-08-11T23:00:49.274Z",
         "bestanden": [
           "test/schermleugen.test.js",
           "test/liegend-scherm.e2e.js"
+        ]
+      }
+    },
+    {
+      "bron": "scripts/lib/rolproef.js",
+      "control": "ROL-SCHEIDING",
+      "wat": "een ingelogde met de verkeerde rol komt niet binnen, en de weigering lekt niets",
+      "eigenaar": "Security",
+      "bewijs": [
+        "test/rolproef.test.js"
+      ],
+      "bewijsstuk": "ROLPROEF.json -- per route welke verkeerde rollen zijn geprobeerd",
+      "grens": "meet twee foutklassen op SCHRIJFroutes: binnenkomen met de verkeerde rol, en een weigering die gegevens meegeeft. Twee leden met DEZELFDE rol die bij elkaars dossier kunnen (een IDOR) valt hier niet onder; leesroutes worden niet geprobeerd.",
+      "laatstGroen": {
+        "staat": "GROEN",
+        "beweringen": 13,
+        "overgeslagen": 0,
+        "at": "2026-08-11T23:00:49.471Z",
+        "bestanden": [
+          "test/rolproef.test.js"
         ]
       }
     },
@@ -106,7 +126,7 @@
         "staat": "GROEN",
         "beweringen": 11,
         "overgeslagen": 0,
-        "at": "2026-08-11T22:50:02.255Z",
+        "at": "2026-08-11T23:00:49.652Z",
         "bestanden": [
           "test/bewijsmatrix.test.js"
         ]

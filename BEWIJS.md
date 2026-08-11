@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 923 bestanden en 6039 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 924 bestanden en 6052 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,10 +12,10 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 923 |
-| losse beweringen (`test(...)`) | 6039 |
+| toetsbestanden | 924 |
+| losse beweringen (`test(...)`) | 6052 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
-| **gezakt** op een mutatie (bewezen gevoelig) | 619 |
+| **gezakt** op een mutatie (bewezen gevoelig) | 620 |
 | **overleefd**: geen mutatie kreeg hem rood | 13 |
 | niet te meten (al rood, geen module gevonden, ...) | 18 |
 | alleen in de kop *genoemd*, nog niet gemeten | 85 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-803 bestanden, 5835 beweringen.
+804 bestanden, 5848 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -572,6 +572,7 @@ toets omvalt.
 | `retail.test.js` | 10 | gezakt op `liegpoort /api/` | End-to-end tests voor het retail-/mode-genre (kern/retail.js): collecties en artikelen met varianten, voorraad, clienteling (maten/verlanglijst/historie/ notities), apart leggen, paskamerverzoeken,... |
 | `rijksles.test.js` | 4 | gezakt op `liegpoort /api/` | De Rijks-Bibliotheek (10.000 werk-apps per overheidsafdeling) en de Lesmaker (AI-lesstof + de interactieve klas-PDA). |
 | `rollenmatrix.test.js` | 9 | gezakt op `liegpoort /api/` | DE ROLLENMATRIX -- drieënveertig endpoints uit acht torens, een vraag. Deze endpoints wees de waargenomen dekkingsmeting als nooit aangeroepen aan. |
+| `rolproef.test.js` | 13 | gezakt op `===->!==#0` | DE ROL-SCHEIDING (scripts/lib/rolproef.js) -- de proef die vraagt of een INGELOGDE met de verkeerde rol binnenkomt, en of de weigering iets lekt. WAAROM DEZE TOETS ER IS. |
 | `routelog.test.js` | 8 | gezakt op `liegpoort /api/` | HET ROUTEJOURNAAL (server/routelog.js) -- de bron onder de waargenomen dekking. Waarom dit er is: de dekkingsteller in de keuring zoekt routenamen in de TEKST van de tests. |
 | `rtf-veilig.test.js` | 11 | gezakt op `liegpoort /api/` | De RTFoundation-kant: veiligheid, de gezinsdeur en de gastrol. De stichting richt zich op gezinnen en dus op minderjarigen. |
 | `rtfagenda.test.js` | 3 | gezakt op `liegpoort /api/` | De RTF-gezinsagenda op RTG-niveau: herhalingen met DEZELFDE keerN-regel als de ledenagenda (de 31e klemt en keert terug), verzetten zonder verdubbelen, en het bereik met naam en kleur per gezinslid. |

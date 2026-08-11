@@ -62,7 +62,8 @@
     "klok": "node scripts/klok.js",
     "klok:vast": "node scripts/klok.js --vastleggen",
     "controls": "node scripts/controls.js",
-    "controls:vast": "node scripts/controls.js --vastleggen"
+    "controls:vast": "node scripts/controls.js --vastleggen",
+    "rolproef": "node --experimental-sqlite scripts/rolproef-route.js"
   },
   "devDependencies": {
     "playwright": "^1.62.1"

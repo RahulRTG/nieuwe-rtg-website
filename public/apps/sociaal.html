@@ -53,6 +53,21 @@
   #objpaneel .sam[data-komt] b{color:var(--op-bordeaux);}
   #objpaneel .stil{font-size:.78rem;color:var(--rtg-soft);}
   .onder .watkan{margin-left:.5rem;}
+
+  /* De momentlijn: vakken met een kop, en verder rust. Geen balk, geen teller
+     per vak en geen aftelklok -- dat is de taal van urgentie, en een verjaardag
+     over twee weken is geen deadline. */
+  .vak{margin:.9rem 0 0;}
+  .vak > h3{margin:0 0 .3rem;font-size:.64rem;letter-spacing:.19em;text-transform:uppercase;
+    color:var(--rtg-soft);font-weight:600;}
+  .vak .mom{display:flex;align-items:baseline;gap:.7rem;padding:.42rem 0;
+    border-bottom:1px solid var(--rtg-line);text-decoration:none;color:inherit;}
+  .vak .mom:last-child{border-bottom:0;}
+  .vak .mom b{font-weight:600;font-size:.9rem;}
+  .vak .mom .wie{color:var(--rtg-soft);font-size:.72rem;}
+  .vak .mom .uur{margin-left:auto;color:var(--rtg-soft);font-size:.72rem;
+    font-variant-numeric:var(--rtg-cijfers);}
+  #lijn .verder{margin:.7rem 0 0;font-size:.74rem;color:var(--rtg-soft);}
 </style>
 </head>
 <body class="rtg-stijl" data-rtg-modus="pro">
@@ -92,6 +107,12 @@
     <span class="tel" id="tel"></span>
   </div>
   <div id="kring"><p class="stil">Laden...</p></div>
+
+  <!-- DE MOMENTLIJN (LIFE.md fase 4). Geen stroom berichten maar wat er in uw
+       leven aankomt, in de tijdvakken waarin een mens denkt. Lege vakken bestaan
+       niet: een week zonder afspraken is geen gat om op te vullen. -->
+  <div class="regkop"><h2>Uw lijn</h2><span class="tel" id="lijntel"></span></div>
+  <div id="lijn"></div>
 
   <div class="regkop"><h2>De sociale wereld</h2></div>
   <div class="poorten" id="poorten"></div>
@@ -364,6 +385,44 @@
     } catch (err) {}
   });
 
+  /* De lijn tekenen. Het scherm bepaalt GEEN vakken en verzint geen labels: het
+     toont de vakken die de server stuurt, in de volgorde waarin ze komen. Zou
+     het zelf indelen, dan wisten twee plekken wanneer "volgende week" begint. */
+  function tekenLijn(d) {
+    const v = d.vakken || [];
+    $('#lijntel').textContent = '';
+    if (!v.length) {
+      $('#lijn').innerHTML = '<p class="stil">Er staat niets gepland. Dat is geen gat: het is een rustige week.</p>';
+      return;
+    }
+    $('#lijn').innerHTML = v.map(vak =>
+      '<div class="vak"><h3>' + esc(vak.label) + '</h3>' +
+      vak.regels.map(r =>
+        '<a class="mom" href="' + esc(r.link || '/apps/sociaal.html') + '">' +
+          '<b>' + esc(r.titel) + '</b>' +
+          (r.wie ? '<span class="wie">' + esc(r.wie) + '</span>' : '') +
+          (r.tijd ? '<span class="uur">' + esc(r.tijd) + '</span>' : '') +
+        '</a>').join('') +
+      '</div>').join('') +
+      /* Een telling en geen "meer laden": wie verder vooruit wil kijken, opent
+         de app die het bijhoudt. Een knop die de lijst blijft verlengen is
+         precies het patroon dat CLAUDE.md verbiedt. */
+      (d.later ? '<p class="verder">' + d.later + (d.later === 1 ? ' ding staat' : ' dingen staan') +
+        ' verder vooruit, in de app waar ze thuishoren.</p>' : '');
+  }
+
+  async function laadLijn() {
+    try {
+      const res = await fetch('/api/sociaal/lijn', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (token() || '') },
+        body: '{}'
+      });
+      const d = await res.json().catch(() => ({}));
+      if (res.ok) tekenLijn(d);
+    } catch (e) { /* de kring staat er al; een stille lijn is geen kapot scherm */ }
+  }
+
   (async function laad() {
     try {
       const res = await fetch('/api/sociaal/wereld', {
@@ -374,6 +433,7 @@
       const d = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(d.error || 'Er ging iets mis.');
       teken(d);
+      laadLijn();
     } catch (e) {
       $('#balkKop').textContent = 'Niet ingelogd';
       $('#balkZin').textContent = '';

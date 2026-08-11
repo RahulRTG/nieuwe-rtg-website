@@ -44,7 +44,10 @@ const graaf = (over) => maakSocialeGraaf({ kern: kernMet(over) }).socialegraaf;
    Dat is het begin van een tweede sociaal netwerk naast de elf die er al zijn,
    en precies wat LIFE.md par. 5 verbiedt. */
 test('bezit niets: er is geen enkele manier om iets te schrijven', () => {
-  assert.deepEqual(Object.keys(graaf()).sort(), ['NAMEN', 'beeld'],
+  /* De lijst staat er VOLUIT en niet als "geen enkele functie die schrijft",
+     zodat elke nieuwe export een bewuste stap is. `lijn` kwam er in fase 4 bij
+     en liet deze toets terecht zakken: dat is precies waar hij voor is. */
+  assert.deepEqual(Object.keys(graaf()).sort(), ['NAMEN', 'beeld', 'lijn'],
     'de sociale graaf hoort ALLEEN te kunnen lezen');
 });
 

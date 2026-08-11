@@ -235,7 +235,7 @@ vorige zijn toetsen heeft (LAT.md).
 | 1 | **de sociale graaf**: de tien sociale apps plus de vriendenlaag als bron, met vooruitblik (verlopende documenten uit Entourage, data uit Attenties). Alleen lezen. | **er** |
 | 2 | **de objectlaag**: Persoon, Groep en Event als eerste drie types, met `caps` en een scherm dat de caps volgt | **er** |
 | 3 | **de relatieruimte**: wat twee mensen samen hebben, als projectie over de domeinen waar ze allebei in zitten, met par. 4.2 in de constructie | **er** |
-| 4 | **de momentlijn**: leven in plaats van posts -- vandaag, vrijdag, zaterdag, volgende week | -- |
+| 4 | **de momentlijn**: leven in plaats van posts -- vandaag, vrijdag, zaterdag, volgende week | **er** |
 | 5 | **Life Command + de orchestrator** op niveau klaarzetten, met het actielog eronder | -- |
 | 6 | **de koppelingen naar buiten**: een community-actie die een Foundation-project wordt, een zaak-event dat de handelsketen in gaat (tickets, vervoer, tafel, wallet) | -- |
 
@@ -369,6 +369,32 @@ RTG Geld; een bedrag naast iemands naam in een sociale ruimte maakt van een
 vriend een debiteur), en een **uitslag** komt niet mee (een lopend potje is een
 bezigheid, een winst-verliesbalans tussen twee mensen is een score — par. 4.4,
 en de 18+-grens uit `kern/spellen/grens.js`).
+
+### Waar fase 4 staat
+
+`server/kern/socialegraaf/lijn.js`, met de route `POST /api/sociaal/lijn` en de
+sectie "Uw lijn" op `public/apps/sociaal.html`. Getoetst in
+`test/socialelijn.test.js` (de vakindeling) en in `test/objectlaagroutes.test.js`
+(een echte bijeenkomst die op de lijn belandt).
+
+**Hij haalt niets op, en dat is de hele opzet.** De lijn krijgt het beeld van de
+graaf mee en hergroepeert het. Zou hij zelf gaan verzamelen, dan bestaan er twee
+plekken die dezelfde negen domeinen uitlezen. Het verschil met de graaf in een
+zin: **de graaf sorteert op wie er wacht, de lijn op wanneer het is.** Dat zijn
+twee echte vragen — "wat moet ik doen" en "hoe ziet mijn week eruit" — en ze
+samenvoegen zou van allebei de helft maken.
+
+Vier besluiten staan in de toetsen: geen verleden verder dan vandaag, geen lege
+vakken (een week zonder afspraken is geen gat — hetzelfde besluit als par. 1.1
+van LEVEN.md), geen afteller in een vaklabel (niet "over 3 dagen" maar
+"vrijdag"), en `later` is een **telling** en geen staart. Dat laatste is de
+plek waar een tijdlijn anders vanzelf een feed wordt.
+
+**Een dubbele wacht die eruit ging.** Er stond een datumfilter op de momenten
+náást de `null` die `vakVan()` al geeft voor een dag die voorbij is. De mutatie
+liet zien dat het filter niets deed: weghalen liet geen toets zakken,
+`vakVan()` aanpassen wel. Twee kopieën van dezelfde regel lopen stil uiteen, dus
+de kopie is weg — en dat staat opgeschreven in plaats van weggepoetst.
 
 ## 8. De acht besturingssystemen -- een aparte beslissing
 

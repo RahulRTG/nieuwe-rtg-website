@@ -109,6 +109,30 @@ test('een codenaam waar niets mee gedeeld wordt, levert nul caps en geen fout', 
   assert.deepEqual(d.stil, [], 'geen enkele proef hoort hier stuk te gaan');
 });
 
+/* DE MOMENTLIJN OVER DE ECHTE SERVER (LIFE.md fase 4). De vakindeling is los
+   getoetst in test/socialelijn.test.js; wat hier bewezen wordt is dat een echte
+   bijeenkomst uit een echt genootschap ook werkelijk in een vak belandt -- de
+   hele keten van domein tot route.
+
+   Dit is dezelfde soort toets als de rest van dit bestand, en om dezelfde reden:
+   de losse toets maakt het beeld van de graaf na, en kan dus niet zien of dat
+   beeld nog op het echte lijkt. */
+test('een echte bijeenkomst belandt op de lijn, in een vak met een naam', async () => {
+  const r = await api('/api/sociaal/lijn', {}, lidToken);
+  assert.equal(r.status, 200);
+  const d = await json(r);
+  const alle = (d.vakken || []).flatMap(v => v.regels.map(x => x.titel));
+  assert.ok(alle.includes('Proefborrel'),
+    'de bijeenkomst van over twee weken hoort op de lijn te staan');
+
+  for (const v of d.vakken) {
+    assert.ok(v.label, 'elk vak draagt een naam');
+    assert.ok(v.regels.length, 'een leeg vak bestaat niet: ' + v.sleutel);
+    assert.ok(!/\d/.test(v.label), 'geen afteller in een vaklabel: ' + v.label);
+  }
+  assert.equal(typeof d.later, 'number', 'later is een telling en geen staart');
+});
+
 /* Een gast mag deze laag niet: hij leest de vriendenlaag, matches en groepen.
    De route weigert hem, en dat hoort een toets te bewaken en geen afspraak. */
 test('een onbekende soort en een sessie zonder pas komen er niet in', async () => {

@@ -28,6 +28,15 @@ module.exports = (kern) => {
     res.json(kern.socialegraaf.beeld(req.session.key));
   });
 
+  /* De momentlijn (LIFE.md fase 4): dezelfde gegevens als /graaf, geordend op
+     WANNEER in plaats van op wie er wacht. Twee routes en niet een, omdat het
+     twee echte vragen zijn -- "wat moet ik doen" en "hoe ziet mijn week eruit" --
+     en een scherm zelden allebei tegelijk toont. */
+  app.post('/api/sociaal/lijn', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    res.json(Object.assign({ ok: true }, kern.socialegraaf.lijn(req.session.key)));
+  });
+
   /* Een object opvragen: wat kan ik met deze persoon, groep of bijeenkomst
      (LIFE.md fase 2). Ook dit is ALLEEN LEZEN -- elke cap die terugkomt is een
      weg naar de app die het echte werk doet, en er is hier geen tegenhanger die

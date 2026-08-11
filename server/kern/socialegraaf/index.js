@@ -38,6 +38,7 @@
 'use strict';
 
 const { vandaag } = require('./hulp');
+const maakLijn = require('./lijn');
 
 /* De volgorde waarin een mens dit wil zien. Wat bij MIJ ligt bovenaan, dan wat
    bij een ander ligt, dan de rest. Dat is dezelfde gedachte als de vier signalen
@@ -50,6 +51,7 @@ const WACHTRANG = { ik: 0, ander: 1, '': 2 };
 module.exports = ({ kern, bronnen }) => {
   const bronMod = (bronnen || require('./bronnen'))({ kern });
   const vooruitMod = require('./vooruitblik')({ kern });
+  const lijnMod = maakLijn();
 
   /* Het hele beeld in een keer. Bronnen die stukgaan komen met naam in stil[] en
      nemen de andere niet mee; de vooruitblik valt apart, want die hangt aan een
@@ -89,5 +91,12 @@ module.exports = ({ kern, bronnen }) => {
     };
   }
 
-  return { socialegraaf: { beeld, NAMEN: bronMod.NAMEN } };
+  /* De momentlijn (fase 4): dezelfde gegevens, andere ordening. Hij krijgt het
+     beeld MEE en haalt niets zelf op -- twee plekken die dezelfde negen domeinen
+     uitlezen, lopen uiteen zonder dat iets klaagt. */
+  function lijn(key) {
+    return lijnMod.lijn(beeld(key));
+  }
+
+  return { socialegraaf: { beeld, lijn, NAMEN: bronMod.NAMEN } };
 };

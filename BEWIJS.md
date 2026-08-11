@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 915 bestanden en 5975 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 916 bestanden en 5995 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 915 |
-| losse beweringen (`test(...)`) | 5975 |
+| toetsbestanden | 916 |
+| losse beweringen (`test(...)`) | 5995 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 614 |
 | **overleefd**: geen mutatie kreeg hem rood | 13 |
 | niet te meten (al rood, geen module gevonden, ...) | 18 |
 | alleen in de kop *genoemd*, nog niet gemeten | 82 |
-| niets van beide | 188 |
+| niets van beide | 189 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-796 bestanden, 5772 beweringen.
+797 bestanden, 5792 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -649,6 +649,7 @@ toets omvalt.
 | `sparren.test.js` | 3 | gezakt op `liegpoort /api/` | Sparren: Rahul denkt mee (niet om zijn gelijk te halen) en komt op een geparkeerde gedachte terug als je rustig thuis bent met een lege agenda. Getoetst via de routes: parkeren + lijst + status, dat een spar-vraag in... |
 | `spelaandeel.test.js` | 13 | genoemd | MAGNAAT FASE B: DEELNEMINGEN -- verdienen aan een zaak waar je niet aan de knoppen zit. Het derde stuk van fase B. |
 | `spelbank.test.js` | 21 | genoemd | MAGNAAT: DE BANK -- de eerste laag waar geld de wereld verlaat. Alles hiervoor VERPLAATSTE: een contract betaalt de een en verrijkt de ander, een veiling verschuift een zaak, een deelneming splitst een resultaat. |
+| `spelbeheer.test.js` | 20 | -- | MAGNAAT: DE AI-MANAGER -- je zaken laten draaien terwijl je er niet bent. ACHT BEWERINGEN, en ze zijn alle acht stil terug te draaien: 1. |
 | `spelbeleid.test.js` | 10 | -- | De beleidslaag: alle toetredingsvragen op een plek, in volgorde. Wat hier bewaakt wordt is NIET dat er nieuwe regels zijn -- die zijn er juist niet. |
 | `speldag.test.js` | 22 | -- | DE DAGOPGAVE: een opgave per dag, dezelfde voor iedereen, met een bord dat 's nachts leeg is. Deze toets staat op twee hoogten, en dat is met opzet: 1. |
 | `spelhandel.test.js` | 28 | genoemd | MAGNAAT FASE B: CONTRACTEN -- spelers die elkaar werkelijk raken. Fase A eindigde met een meting die niet opgelost was: `scripts/magnaat- strateeg.js` liet zien dat wie zich op een sector stort wint van wie spreidt,... |

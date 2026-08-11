@@ -55,7 +55,11 @@ module.exports = (ctx) => {
       'belang-voorstel', 'belang-antwoord',
       'krediet-opnemen', 'krediet-aflossen', 'krediet-herzien',
       'polis-sluiten', 'polis-opzeggen',
-      'onderzoek-starten', 'onderzoek-budget', 'onderzoek-uitrollen', 'onderzoek-subsidie'],
+      'onderzoek-starten', 'onderzoek-budget', 'onderzoek-uitrollen', 'onderzoek-subsidie',
+      /* Je manager instellen verandert de kaart niet en gaat niemand aan. Juist
+         daarom mag het altijd: wie halverwege een partij op vakantie gaat, moet
+         dat op dat moment kunnen regelen. */
+      'beheer-aan', 'beheer-uit', 'beheer-regels'],
     init, zet,
     varianten: {
       vorm: { keuze: ['bord', 'economie'], standaard: 'bord' },

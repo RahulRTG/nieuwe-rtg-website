@@ -31,9 +31,9 @@ const H = require('./handel');
 
 const rond = (n) => Math.round(n);
 
-module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering, rnd }) => {
+module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering, rnd, beheer }) => {
   const { wikkelAf } = require('./maand-contracten')({ rond });
-  const { lasten } = require('./maand-lasten')({ ROOD_RENTE, bank, verzekering, rnd });
+  const { lasten } = require('./maand-lasten')({ ROOD_RENTE, bank, verzekering, rnd, beheer });
   function eenMaand(potje) {
     const st = potje.staat, k = K(st);
     const kwaliteitVan = {};
@@ -78,7 +78,7 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering
     /* Wat er deze maand aan RENTE de wereld verlaat. Apart geteld omdat het de
        enige post is die niet bij een andere speler landt; de geldpomp-meter
        moet hem kunnen aftrekken. */
-    let rentelast = 0, premielast = 0, schadelast = 0, onderzoeklast = 0, onderzoekUitPot = 0;
+    let rentelast = 0, premielast = 0, schadelast = 0, onderzoeklast = 0, onderzoekUitPot = 0, beheerlast = 0;
     for (const [h, rij] of Object.entries(st.vestigingen)) {
       const regels = [];
       for (const v of rij) {
@@ -127,6 +127,7 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering
       schadelast += uit.schade;
       onderzoeklast += uit.onderzoek;
       onderzoekUitPot += uit.onderzoekUitPot;
+      beheerlast += uit.beheer;
       perSpeler[h] = regels;
       // het maandresultaat in het korte geheugen, voor de winststabiliteit
       if (onthoud) onthoud(st, h, regels.reduce((n, r) => n + (r.resultaat || 0), 0));
@@ -152,7 +153,7 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering
     st.maand++;
     const verslag = { maand: st.maand, perSpeler, afdracht, projecten,
       wereldOmzet: rond(wereldOmzet), contractRegels,
-      rentelast: rond(rentelast), premielast: rond(premielast),
+      rentelast: rond(rentelast), premielast: rond(premielast), beheerlast: rond(beheerlast),
       schadelast: rond(schadelast), onderzoeklast: rond(onderzoeklast),
       onderzoekUitPot: rond(onderzoekUitPot) };
     for (const h of potje.spelers) st.laatste[h] = { maand: st.maand, regels: perSpeler[h] || [],

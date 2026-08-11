@@ -76,8 +76,18 @@ const maand = (w, n) => {
          bij een speler terecht. Een uitkering staat er NIET bij: die herstelt
          alleen, en hij is al van de schadepost afgetrokken (../server/kern/
          spellen/magnaat/maand.js). */
-      w.rente = (w.rente || 0) + (verslag.rentelast || 0)
-        + (verslag.premielast || 0) + (verslag.schadelast || 0) + (verslag.onderzoeklast || 0);
+      w.rente = (w.rente || 0) + (verslag.rentelast || 0) + (verslag.premielast || 0)
+        + (verslag.schadelast || 0) + (verslag.onderzoeklast || 0) + (verslag.beheerlast || 0);
+      w.omzet = (w.omzet || 0) + (verslag.wereldOmzet || 0);
+      /* WAT DE MANAGERS DE SPELERS IN REKENING BRACHTEN, geteld uit de REGELS op
+         hun maandoverzicht en niet uit de lekteller. Dat onderscheid is de hele
+         toets: de eerste versie las `verslag.beheerlast`, en dat is precies het
+         getal dat de lekteller ook vult -- dus vergeleek hij een getal met
+         zichzelf, en overleefde een mutatie die de teller halveerde hem gewoon.
+         Deze telling loopt langs de andere kant: de regel die de speler ziet. */
+      for (const rij of Object.values(verslag.perSpeler || {}))
+        for (const r of rij) if (r.soort === 'beheer')
+          w.beheerbetaald = (w.beheerbetaald || 0) - (r.resultaat || 0);
     }
   }
 };
@@ -355,6 +365,54 @@ const SCENARIOS = {
     }
   },
 
+  /* DELEGEREN. Een AI-manager doet niets wat een speler niet ook kan, dus mag
+     hij ook geen waarde maken die een speler niet kan maken. Wat hij WEL doet is
+     geld kosten: zijn tarief gaat de wereld uit, net als rente en premie.
+
+     Deze route is er omdat een manager een verleidelijke plek is voor een lek.
+     Hij handelt namens de speler, buiten de gewone actielus om, en als een van
+     zijn zetten ergens geld bijschrijft in plaats van verplaatst, ziet niemand
+     dat -- het staat in een log dat niemand naleest. De eis is daarom hard: na
+     aftrek van het tarief hoort het wereldtotaal op de euro gelijk te zijn. */
+  beheerlaten: {
+    verwacht: 'economisch', naam: 'je zaken aan de manager overlaten',
+    doe(w) {
+      for (const h of ['a', 'b', 'c']) {
+        w.m.spel.zet(w.potje, h, { actie: 'beheer-aan' });
+        // en met alle toestemmingen die er zijn, want de ruimste stand hoort
+        // net zo goed geen waarde te maken als de veiligste
+        w.m.spel.zet(w.potje, h, { actie: 'beheer-regels', kasbuffer: 0,
+          mag: { prijs: true, lenen: true } });
+      }
+    },
+    /* HIJ IS ECONOMISCH EN GEEN LEK, en dat was de eerste vergissing. Een manager
+       DOET dingen -- hij past bezetting aan, hij trimt een onderhoudsbudget, hij
+       verzet een prijsstand -- en die dingen veranderen wat de bedrijven
+       voortbrengen en wat ze kosten. Op totalen afgerekend leverde dat 857.179
+       "waarde uit het niets" op, terwijl er in werkelijkheid drie zuiniger
+       gedraaide zaken stonden.
+
+       DE TWEEDE VERGISSING WAS DE LAT ZELF. Die eiste dat extra vermogen door
+       extra OMZET gedekt werd, en dat is onzin: kosten besparen maakt je rijker
+       zonder een eenheid meer te verkopen. Dat is precies wat een manager doet.
+
+       Wat er wel hard te toetsen valt, is de post die deze laag zelf toevoegt.
+       Elke euro die een manager REKENT moet ook geteld zijn als euro die de
+       wereld verliet -- net als rente en premie. Vergeet iemand die teller, dan
+       verdwijnt er geld dat niemand heeft opgeschreven, en dat is net zo goed een
+       fout als geld dat erbij komt. Dit is de enige bewering die alleen over
+       DEZE laag gaat, en daarom de enige die hier hoort. */
+    keurWereld(r) {
+      const gerekend = r.pompBeheer || 0;
+      if (gerekend <= 0) return 'er is geen beheer in rekening gebracht; deze toets meet dan niets';
+      const lek = (r.pompRente || 0) - (r.rustRente || 0);
+      if (lek + 1 < gerekend)
+        return 'de managers rekenden ' + Math.round(gerekend) + ', maar er verliet maar ' +
+          Math.round(lek) + ' de wereld; een deel van het tarief is nergens geteld';
+      return null;
+    }
+  },
+
   /* DE ZELFFINANCIERENDE ONDERZOEKSLUS, en dit is de route die er bij een
      R&D-laag als eerste in zit:
 
@@ -568,6 +626,8 @@ function meet(sleutel, maanden = 24) {
     if (naam === sleutel && !klacht && SCENARIOS[naam].keur) klacht = SCENARIOS[naam].keur(w);
     uit[naam === 'rust' ? 'rust' : 'pomp'] = totaal(w);
     uit[(naam === 'rust' ? 'rust' : 'pomp') + 'Rente'] = w.rente || 0;
+    uit[(naam === 'rust' ? 'rust' : 'pomp') + 'Omzet'] = w.omzet || 0;
+    uit[(naam === 'rust' ? 'rust' : 'pomp') + 'Beheer'] = w.beheerbetaald || 0;
   }
   /* Bij een LEKKENDE laag wordt het verschil gecorrigeerd met wat er aan rente
      de wereld verliet. Wat overblijft hoort nul te zijn: dan is er geen euro
@@ -575,8 +635,17 @@ function meet(sleutel, maanden = 24) {
   const lek = (uit.pompRente || 0) - (uit.rustRente || 0);
   const ruw = uit.pomp.samen - uit.rust.samen;
   const verschil = SCENARIOS[sleutel].verwacht === 'lekkend' ? ruw + lek : ruw;
-  return { naam: SCENARIOS[sleutel].naam, rust: uit.rust, pomp: uit.pomp, ruw, lek, verschil, klacht,
+  const r = { naam: SCENARIOS[sleutel].naam, rust: uit.rust, pomp: uit.pomp, ruw, lek, verschil, klacht,
+    rustOmzet: uit.rustOmzet, pompOmzet: uit.pompOmzet,
+    rustRente: uit.rustRente, pompRente: uit.pompRente, pompBeheer: uit.pompBeheer,
     relatief: uit.rust.samen ? verschil / uit.rust.samen : 0 };
+  /* EEN KEURING OVER DE TWEE WERELDEN SAMEN. `keur` krijgt alleen de gepompte
+     wereld en kan dus niets zeggen over het verschil; `keurWereld` krijgt de
+     hele meting. Dat is wat een economische route nodig heeft die niet op
+     totalen af te rekenen is maar wel op de VRAAG waar het extra vermogen
+     vandaan komt. */
+  if (!r.klacht && SCENARIOS[sleutel].keurWereld) r.klacht = SCENARIOS[sleutel].keurWereld(r);
+  return r;
 }
 
 /* HOEVEEL AFWIJKING IS RUIS? Niet nul: een contract verlegt echte capaciteit,

@@ -1271,12 +1271,59 @@ kwaliteit, vraag of risico die aantoonbaar veranderd zijn. Er bestaat nergens ee
 > opleveren. Gevonden doordat de pompmeter de lus wilde sluiten en er geen enkele
 > offerte te vinden was.
 
-**Wat er van fase B nog niet in zit.** AI-managers met beleidsregels — die hebben
-nu pas genoeg bedrijfsmaterie om iets zinnigs te beheren: contractverplichtingen,
-financiering, risico, onderzoek, prijsstelling, onderhoud en capaciteit. Daarna
-concernstrategie, een aandelenmarkt met dividend, fusies, economische cycli
-(`st.cyclus` staat al in de renteformule maar wordt door niets gevoed) en
-wereldnieuws.
+### AI-managers — je zaken laten draaien terwijl je er niet bent
+
+**Vier wetten, en het zijn alle vier grenzen en geen instellingen.**
+
+1. **De manager doet niets wat jij niet ook kunt.** Hij loopt door dezelfde
+   `ACTIES` als de speler — geen eigen ingang, geen eigen tarief, geen enkele
+   bevoegdheid die op het scherm niet bestaat.
+2. **Hij onderhoudt, hij groeit niet.** Openen, uitbreiden, lenen, tekenen,
+   onderzoeken en verzekeren staan **standaard uit** en gaan alleen aan als de
+   speler ze expliciet aanzet. Dat is de Safe Management Policy: wie terugkomt van
+   vakantie hoort zijn bedrijf terug te vinden zoals hij het achterliet, niet als
+   een concern met vier ton schuld.
+3. **Hij kost geld** — 2,5% van de maandomzet per beheerde vestiging, met een
+   bodem. Zonder die post is delegeren strikt beter dan opletten en speelt het
+   spel zichzelf. Het tarief verlaat de wereld, net als rente en premie.
+4. **Alles staat in het log, met de reden erbij.** Een manager die stil dingen
+   verandert is geen manager maar een verrassing.
+
+Wat hij doet is huishouding: onderhoud dat wegzakt weer optrekken (en een budget
+dat te ruim staat terugbrengen), mensen erbij als er vraag wegloopt, mensen eraf
+als er te veel staan — en met toestemming een rood staan oplossen met de
+goedkoopste kredietvorm. Het toernooi zet hem waar hij hoort: `afwezig` verslaat
+`passief` en `niets doen` ruim, en verliest van `onderhoud` en `handwerk`. Beter
+dan wegkijken, slechter dan opletten.
+
+> **De fout die deze laag maakte, en waarom niemand hem zag.** De manager werd
+> samengesteld met de actietabel van de *lagen* — en die mist juist de
+> basisacties, want `beleid`, `open` en `uitbreiden` worden pas in `economie.js`
+> bijgeschoven. Elke zet viel op een `undefined`, wat gewoon niets doet en niets
+> meldt. Hij draaide, rekende netjes zijn tarief, schreef netjes niets in zijn
+> log, en keek acht maanden lang toe hoe het onderhoud van 72 naar 44 zakte. Het
+> stond nog in de opmerking erboven ook: *een manager die een deel van de tabel
+> mist, kan een deel van het bedrijf niet beheren en dat gaat stil mis.* Sindsdien
+> is hij een fabriek — wie hem maakt moet eerst de hele tabel hebben — en noemt
+> hij de acties die hij gebruikt, zodat een toets kan natellen dat ze bestaan.
+
+> **Twee metingen die zichzelf maten.** De balanstoets zette een manager naast een
+> speler die zijn onderhoudsbudget één keer zet en nooit meer kijkt; toen won de
+> manager met ruim twee ton. Dat is geen bevoorrechting maar een *ander beleid* —
+> hij draait op zijn doel van 70 in plaats van te poetsen naar 100. De wet die er
+> werkelijk toe doet is scherper: **bij gelijk gedrag ben je precies het tarief
+> armer.** En de gepaarde metingen gebruikten twee verschillende partij-id's,
+> terwijl die id de risicohash voedt — de twee werelden kregen dus andere branden.
+>
+> Dezelfde klasse zat in de pomproute: die vergeleek de lekteller met… de
+> lekteller. Een mutatie die hem halveerde kwam er moeiteloos langs. Nu telt de
+> meter wat de managers de spelers in *rekening brachten* uit de regels op hun
+> maandoverzicht, en legt dat naast wat er de wereld verliet — twee verschillende
+> paden.
+
+**Wat er van fase B nog niet in zit.** Concernstrategie, een aandelenmarkt met
+dividend, fusies, economische cycli (`st.cyclus` staat al in de renteformule maar
+wordt door niets gevoed), wereldnieuws en AI-concurrenten die leren.
 
 **Fase C — de permanente wereld.** Living World, AI-managers met beleidsregels,
 Safe Management Policy, vakantiemodus, overdracht, legacy, Magnaat Daily,

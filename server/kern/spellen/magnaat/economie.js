@@ -113,8 +113,19 @@ module.exports = (ctx) => {
      Twee dingen met zo'n verschillend tempo horen niet in een bestand. */
   const L = require('./lagen')({ K, mijnVestiging, vrijKavel, wieHeeft, waarde, rond, codenaamVan });
 
+  /* WAT EEN SPELER DOET staat in ./acties.js; de lagen schuiven hun acties erbij.
+     De volgorde is hier belangrijk geworden: de AI-MANAGER krijgt de complete
+     tabel mee en die is pas compleet als de basisacties er ook in zitten. Zie de
+     uitleg in ./lagen.js -- hij is daar met de halve tabel gebouwd en ging stil
+     mis. */
+  const basis = require('./acties')({ K, mijnVestiging, vrijKavel, rond });
+  const ACTIES = Object.assign({}, basis.ACTIES, L.ACTIES);
+  const VRIJE_ACTIES = basis.VRIJE_ACTIES.concat(L.VRIJE_ACTIES);
+  const beheer = L.maakBeheer(ACTIES);
+
   const { eenMaand } = require('./maand')({ K, wieHeeft, ROOD_RENTE,
-    verdeel: L.verdeel, bank: L.bankmaand, onthoud: L.onthoud, verzekering: L.verzekering, rnd: L.rnd });
+    verdeel: L.verdeel, bank: L.bankmaand, onthoud: L.onthoud, verzekering: L.verzekering,
+    rnd: L.rnd, beheer });
 
   /* WAT EEN SPELER ZIET en wat er aan het eind op tafel komt staat in
      ./weergave.js -- een eigen onderwerp (wie mag wat weten, en waarop wordt
@@ -138,13 +149,6 @@ module.exports = (ctx) => {
      elke fase mee -- contracten, veilingen, aandelen -- en die twee horen niet
      in een bestand. De aanleiding was de 10 kB-grens die scripts/check.js
      bewaakt, en die grens is precies een rem hierop. */
-  const basis = require('./acties')({ K, mijnVestiging, vrijKavel, rond });
-  /* De contractacties komen uit een EIGEN bestand en worden hier bijgeschoven.
-     Ze zijn alle drie VRIJ (zie GAMEHALL.md 12.3): onderhandelen mag altijd,
-     en dat is de reden dat een partij van zes met 24 uur per beurt niet
-     stilstaat. */
-  const ACTIES = Object.assign({}, basis.ACTIES, L.ACTIES);
-  const VRIJE_ACTIES = basis.VRIJE_ACTIES.concat(L.VRIJE_ACTIES);
 
   function zet(potje, h, z) {
     const st = potje.staat;
@@ -167,6 +171,11 @@ module.exports = (ctx) => {
     return r;
   }
 
-  return { init, zet, zicht, publiek, bijrekenen, eindstand, DUUR, MAAND_MS, START_GELD,
+  /* De actietabel naar buiten, zodat een toets kan natellen dat de AI-manager
+     elke actie die hij noemt ook werkelijk kan aanroepen. Niet om hem van
+     buitenaf te gebruiken -- daar is  voor, met zijn poort en zijn duwtjes. */
+  const acties = () => ACTIES;
+
+  return { init, zet, acties, zicht, publiek, bijrekenen, eindstand, DUUR, MAAND_MS, START_GELD,
     SECTORLIJST, STEDENLIJST, stadNaam, kaartVan: (s) => kaart(s) };
 };

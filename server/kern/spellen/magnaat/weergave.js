@@ -22,7 +22,8 @@ const H = require('./handel');
 const { PROJECTEN } = require('./foundation');
 
 module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid, veilingbeeld,
-  belangbeeld, belangwaarde, eigenDeel, bankbeeld, kredietprofiel, verzekerbeeld, rndbeeld }) => {
+  belangbeeld, belangwaarde, eigenDeel, bankbeeld, kredietprofiel, verzekerbeeld, rndbeeld,
+  beheerbeeld }) => {
   /* Van wie is deze vestiging? De contractlaag kijkt over de grens tussen
      twee spelers heen en kan dus niet met `mijnVestiging` toe. */
   const vanIemand = (st, id) => {
@@ -160,6 +161,8 @@ module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid, veilingb
       krediet: kredietprofiel(st, mij),
       verzekering: verzekerbeeld(st, mij),
       onderzoek: rndbeeld(st, mij),
+      // je manager: zijn regels, wat hij kost, en het log met de reden per besluit
+      beheer: beheerbeeld(st, mij),
       veilingen: veilingbeeld(st, mij),
       vrij: k.kavels.filter(x => !st.kavelBezet[x.id] && !(st.kavelRecht || {})[x.id]).length,
       // waar JIJ mag bouwen zonder te hoeven veilen: een gewonnen kavel

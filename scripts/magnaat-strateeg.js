@@ -225,6 +225,21 @@ const PROFIELEN = {
       s.open('horeca');
     }
   },
+  /* DE MANAGER. Dezelfde stijl als `onderhoud`, maar de speler zet hem aan en
+     kijkt niet meer om. De vraag die dit profiel beantwoordt is de balanseis van
+     de beheerlaag: delegeren mag geen manier zijn om te WINNEN. Staat hij
+     bovenaan, dan speelt het spel zichzelf; staat hij onderaan bij `niets doen`,
+     dan is de dienst onbruikbaar. Hij hoort ertussenin -- beter dan wegkijken,
+     slechter dan opletten. */
+  afwezig: {
+    naam: 'aanzetten en wegkijken', zones: ['boulevard', 'centrum'],
+    doe(s, maand) {
+      if (!s.mijn.length) return s.open('horeca');
+      if (maand === 1) s.beheerAan();
+      s.open('horeca');
+    }
+  },
+
   /* DE BLANCO. Dezelfde vorm als de twee hierboven -- dezelfde zones, dezelfde
      sector, dezelfde bovengrens van drie zaken -- en geen onderzoek. Zonder deze
      derde meet je niets: `uitvinder` tegen `laborant` zegt alleen of uitrollen
@@ -391,6 +406,13 @@ function gereedschap(m, potje, mij, profiel, offset) {
         if (m.spel.zet(potje, mij, Object.assign({ actie: 'contract-antwoord', id: c.id }, zet)).ok) gedaan++;
       }
       return gedaan;
+    },
+
+    /* ---------- beheer ----------
+       Een profiel dat zijn zaken uit handen geeft. Meer dan aanzetten is er niet
+       aan: dat IS de stijl. */
+    beheerAan() {
+      return !!m.spel.zet(potje, mij, { actie: 'beheer-aan' }).ok;
     },
 
     /* ---------- onderzoek ----------

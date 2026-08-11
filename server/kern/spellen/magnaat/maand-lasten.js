@@ -4,11 +4,12 @@
    bestand rekent de maand van de WERELD: de concurrentiedruk, wat de contracten
    vastleggen, en dan iedere vestiging op dezelfde begintoestand. Dit bestand
    gaat over de vier posten die daarna komen en die niet aan een pand hangen maar
-   aan de SPELER: rood staan, de leningen, de polissen en het onderzoek.
+   aan de SPELER: rood staan, de leningen, de polissen, het onderzoek en de
+   AI-manager.
 
    ZE HOREN BIJ ELKAAR OM EEN REDEN DIE VERDER GAAT DAN DE MAAT VAN HET BESTAND.
-   Het zijn de vier posten waarbij geld de WERELD verlaat in plaats van naar een
-   andere speler te gaan -- rente, premie, schade, onderzoek. Precies daarvoor
+   Het zijn de posten waarbij geld de WERELD verlaat in plaats van naar een
+   andere speler te gaan -- rente, premie, schade, onderzoek, beheer. Precies daarvoor
    kent scripts/magnaat-pomp.js een eigen categorie (`lekkend`): bij die posten
    is de eis niet dat het totaal gelijk blijft maar dat het verschil NA aftrek
    van het lek exact nul is. Wie hier een vijfde post bij zet, hoort daar een
@@ -18,16 +19,17 @@
 
    De volgorde is niet vrij: rood staan gaat voor de leningen, want een negatieve
    kas is de duurste vorm van krediet en hoort niet weggepoetst te worden door
-   een aflossing die er in dezelfde maand nog overheen komt. */
+   een aflossing die er in dezelfde maand nog overheen komt. Het beheer sluit de
+   rij: die heeft aan het begin van de maand al gehandeld. */
 const rond = (n) => Math.round(n);
 
-module.exports = ({ ROOD_RENTE, bank, verzekering, rnd }) => {
+module.exports = ({ ROOD_RENTE, bank, verzekering, rnd, beheer }) => {
   /* Alle vier de posten voor EEN speler. Duwt zijn regels achter op `regels` --
      dezelfde lijst die het maandoverzicht toont -- en geeft terug wat er van elke
      soort de wereld verlaten heeft. */
   function lasten(potje, h, regels) {
     const st = potje.staat;
-    const uit = { rente: 0, premie: 0, schade: 0, onderzoek: 0, onderzoekUitPot: 0 };
+    const uit = { rente: 0, premie: 0, schade: 0, onderzoek: 0, onderzoekUitPot: 0, beheer: 0 };
 
     /* ROOD STAAN KOST GELD, en dit IS de rekening-courant uit ./bank.js: de
        kredietlijn die er altijd is, het duurst en zonder aanvraag. Zonder dit
@@ -79,6 +81,18 @@ module.exports = ({ ROOD_RENTE, bank, verzekering, rnd }) => {
       uit.onderzoek += werk.uitEigenZak + werk.uitPot;
       uit.onderzoekUitPot += werk.uitPot;
       for (const r of werk.regels) regels.push(r);
+    }
+    /* HET BEHEER. Een AI-manager is een dienst van buiten de tafel: wat hij
+       kost gaat de wereld uit, net als rente en premie. Zonder deze post is
+       delegeren strikt beter dan opletten en speelt het spel zichzelf.
+
+       HIJ STAAT ACHTERAAN, en dat is geen willekeur: de manager heeft aan het
+       begin van deze maand zijn besluiten al genomen (../magnaat/maand.js) en
+       zijn rekening hoort daarna. */
+    const bh = beheer ? beheer.maandVoorSpeler(potje, h) : null;
+    if (bh && bh.regels.length) {
+      uit.beheer += bh.kosten;
+      for (const r of bh.regels) regels.push(r);
     }
     return uit;
   }

@@ -559,7 +559,8 @@ test('de vrije acties mogen buiten de beurt, de grote niet', () => {
      dus het enige wat hier telt is dat de lijst klopt. */
   const m = maakMagnaat();
   assert.deepEqual(m.spel.buitenBeurt.slice().sort(),
-    ['belang-antwoord', 'belang-voorstel', 'beleid', 'bouw',
+    ['beheer-aan', 'beheer-regels', 'beheer-uit',
+      'belang-antwoord', 'belang-voorstel', 'beleid', 'bouw',
       'contract-antwoord', 'contract-opzeggen', 'contract-voorstel',
       'krediet-aflossen', 'krediet-herzien', 'krediet-opnemen',
       'onderzoek-budget', 'onderzoek-starten', 'onderzoek-subsidie', 'onderzoek-uitrollen',

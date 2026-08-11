@@ -1,6 +1,6 @@
 /* Spellen (deelmodule): het register. Een spel beschrijft ZICHZELF in een
    `spel`-descriptor in zijn eigen module, en dit bestand bouwt daar de
-   dispatch-tabellen uit (SPEL, SOORTEN, INITS, ZETTEN, VIEWS, STATISCH).
+   dispatch-tabellen uit (SPEL, SOORTEN, INITS, ZETTEN, ZICHT, STATISCH).
 
    Er zijn TWEE vormen, en het verschil is niet cosmetisch:
 
@@ -15,11 +15,12 @@
      buitenBeurt  acties die niet op je beurt hoeven (Magnaat bouwen; de duels)
      teams        'altijd' (30 Seconden) of 'keuze' (2-tegen-2 bij een vol potje)
      perTaal      eigen wachtrij per taal (Woordduel heeft een letterzak per taal)
-     kijken       mag een niet-speler meekijken? STANDAARD NIET. Opt-in, want de
-                  weergave van een spel kan een kijker meer laten zien dan een
-                  speler -- 30 Seconden toont de kaart aan wie geen spelersindex
-                  heeft, en dat is precies de rader die hem niet mag zien
-     init/zet/view  de regels zelf; statisch: data die nooit verandert
+     zicht        WIE ZIET WAT: `speler` (verplicht), `kijker` (weglaten =
+                  niet te bekijken) en `publiek` (weglaten = niet op een
+                  gedeeld scherm). Drie lagen in plaats van de oude vlag
+                  `kijken`, en de reden staat in ./zicht.js: die vlag was een
+                  bewering die bij drie spellen niet klopte
+     init/zet     de regels zelf; statisch: data die nooit verandert
                   (het Magnaat-bord) en dus niet elke poll mee hoeft
 
    vorm: 'arcade' -- in je eentje, geen beurt, geen tegenstander. De regels
@@ -31,10 +32,13 @@
      maxPunten    bovengrens waarop de server een ingestuurde score afkapt
      serverScore  de score wordt door de SERVER berekend (Sudoku): de algemene
                   arcade-ingang weigert een ingestuurde score voor dit spel
+     dagelijks    dit spel heeft een dagopgave (Sudoku), met `dagOpgave` en
+                  `dagKeur` erbij. VEREIST serverScore, en dat is de enige harde
+                  koppeling in dit register -- zie de reden in ./keur.js
 
    Waarom: hiervoor stond een nieuw spel op negen plekken in zes bestanden (de
    SPEL-tabel, drie ctx-opsommingen in spellen.js, de INITS in lobby.js, de
-   ZETTEN en VIEWS in partij.js, plus de client), en stonden er vijf losse
+   ZETTEN en de weergaven in partij.js, plus de client), en stonden er vijf losse
    "is dit spel X?"-uitzonderingen in de platformlaag. Vergat je er een, dan
    faalde dat pas in het potje zelf. Nu is een spel toevoegen: een bestand
    neerzetten dat een `spel` teruggeeft. Er is geen tweede plek meer om te
@@ -45,46 +49,53 @@
    een spel spoorloos uit de lobby verdwijnt, en dat is precies de klasse fout
    die dit register moet uitsluiten. */
 const fs = require('fs'), path = require('path');
+const { ZONDER_SPELER } = require('./zicht');
+const { bouw: bouwZicht } = require('./zicht');
+/* Wat een descriptor MOET zijn staat in ./keur.js en met opzet niet hier: dat
+   vocabulaire groeit mee met elk veld dat een spel over zichzelf kan zeggen,
+   en deze boekhouding hoeft daar niets van te weten. */
+const { keurAlgemeen, keurArcade, keurPotje, keurZicht } = require('./keur');
 
 /* Deelmodules die geen spel zijn maar wel in deze map wonen. Bewust een
    expliciete lijst: een helper die je hier neerzet en vergeet toe te voegen
    valt op bij het opstarten, in plaats van stil mee te scannen. */
 const GEEN_SPEL = new Set(['register.js', 'lobby.js', 'partij.js', 'rahul.js', 'klas.js', 'quiz-data.js',
-  'presence.js', 'uitslagen.js', 'prestaties.js', 'toernooi.js', 'zetten.js', 'praat.js', 'telling.js', 'teams.js', 'kring.js', 'arcade.js', 'opruimen.js', 'toernooi-schema.js', 'gedeeld.js', 'grens.js']);
-
-// wat een descriptor MOET hebben, per vorm; ontbreekt er iets, dan noemen we
-// het bestand EN wat er mist -- zoeken naar "welke had ik ook alweer" is de
-// fout die dit register nu juist moet uitsluiten
-const VERPLICHT = {
-  potje: ['sleutel', 'naam', 'max', 'wereld', 'init', 'zet', 'view'],
-  arcade: ['sleutel', 'naam', 'werelden', 'maxPunten']
-};
+  'presence.js', 'uitslagen.js', 'prestaties.js', 'toernooi.js', 'zetten.js', 'praat.js', 'telling.js', 'teams.js', 'kring.js', 'arcade.js', 'opruimen.js', 'toernooi-schema.js', 'gedeeld.js', 'grens.js', 'zicht.js', 'klok.js', 'beleid.js', 'nabespreking.js', 'naspelen.js', 'keur.js', 'uitnodigen.js', 'rondom.js', 'projectie.js', 'dag.js']);
 
 /* De map is een parameter zodat de toets het register op fixtures kan draaien
    (een module zonder descriptor, een sleutel die niet bij zijn bestand hoort)
    zonder daarvoor bestanden in de echte spellenmap te hoeven zetten. In
    productie roept spellen.js hem zonder tweede argument aan. */
+/* Een helper in deze map die zelf het register aanroept (rondom.js doet dat via
+   naspelen.js) zou hem oneindig opnieuw laten scannen: de scan vindt het
+   bestand, laadt het, en dat laadt de scan. Dat eindigt in een stack overflow
+   ver van de oorzaak. Deze vlag maakt er de melding van die er hoort te staan:
+   zet het bestand in GEEN_SPEL. */
+let bezig = false;
+
 module.exports = (spelCtx, mapOverride) => {
+  if (bezig) throw new Error('spellen/register: het register roept zichzelf aan. ' +
+    'Een bestand in spellen/ dat ./register vraagt hoort in GEEN_SPEL te staan.');
   const map = mapOverride || __dirname;
   const bestanden = fs.readdirSync(map, { withFileTypes: true })
     .filter(d => (d.isDirectory() || d.name.endsWith('.js')) && !GEEN_SPEL.has(d.name))
     .map(d => d.name)
     .sort();
 
-  const SPEL = {}, INITS = {}, ZETTEN = {}, VIEWS = {}, STATISCH = {}, ARCADE = {}, ruw = {};
+  /* De sentinel reist mee in de context en niet via een require in elk spel:
+     het register is de eigenaar van het descriptor-vocabulaire, dus het deelt
+     ook het woord uit dat daarin gebruikt mag worden. */
+  const ctx = Object.assign({ ZONDER_SPELER }, spelCtx);
+
+  bezig = true;
+  try {
+  const SPEL = {}, INITS = {}, ZETTEN = {}, ZICHT = {}, STATISCH = {}, ARCADE = {}, DAG = {}, ruw = {};
   for (const naam of bestanden) {
-    const mod = require(path.join(map, naam))(spelCtx);
+    const mod = require(path.join(map, naam))(ctx);
     const s = mod && mod.spel;
     if (!s) throw new Error(`spellen/register: ${naam} geeft geen \`spel\`-descriptor terug. ` +
       'Voeg er een toe, of zet het bestand in GEEN_SPEL als het geen spel is.');
-    const vorm = s.vorm || 'potje';
-    if (!VERPLICHT[vorm]) throw new Error(`spellen/register: ${naam} heeft vorm '${s.vorm}'; alleen 'potje' of 'arcade'.`);
-    const mist = VERPLICHT[vorm].filter(k => s[k] === undefined || s[k] === null);
-    if (mist.length) throw new Error(`spellen/register: ${naam} mist in \`spel\` (vorm ${vorm}): ${mist.join(', ')}.`);
-    // de sleutel MOET de bestandsnaam zijn: anders lopen de map en de tabel
-    // uiteen en zoek je een spel dat er wel is en toch niet start
-    const verwacht = naam.replace(/\.js$/, '');
-    if (s.sleutel !== verwacht) throw new Error(`spellen/register: ${naam} noemt zich '${s.sleutel}'; verwacht '${verwacht}'.`);
+    const vorm = keurAlgemeen(naam, s);
     // een sleutel mag maar EEN ding zijn: een potje of een arcadespel, nooit
     // allebei -- anders is "/spel/zet met soort=sneek" een open vraag
     if (SPEL[s.sleutel] || ARCADE[s.sleutel]) throw new Error(`spellen/register: '${s.sleutel}' staat er twee keer in.`);
@@ -97,34 +108,22 @@ module.exports = (spelCtx, mapOverride) => {
     for (const [k, v] of Object.entries(mod)) if (k !== 'spel') ruw[k] = v;
 
     if (vorm === 'arcade') {
-      if (!Array.isArray(s.werelden) || !s.werelden.length || s.werelden.some(w => w !== 'rtg' && w !== 'rtf'))
-        throw new Error(`spellen/register: ${naam} heeft werelden ${JSON.stringify(s.werelden)}; ` +
-          "een niet-lege lijst met alleen 'rtg' en/of 'rtf'.");
-      if (!(s.maxPunten > 0)) throw new Error(`spellen/register: ${naam} heeft maxPunten ${s.maxPunten}; moet boven nul liggen.`);
-      ARCADE[s.sleutel] = { naam: s.naam, werelden: s.werelden.slice(), maxPunten: s.maxPunten };
-      // serverScore: de score komt van de SERVER en niet uit de client; de
-      // algemene arcade-ingang weigert hem dan, want er mag geen tweede pad zijn
-      if (s.serverScore) ARCADE[s.sleutel].serverScore = true;
+      ARCADE[s.sleutel] = keurArcade(naam, s);
+      /* De twee haken van een dagopgave staan APART en niet in ARCADE: die tabel
+         is data (hij reist mee naar de toetsen en wordt vergeleken met een
+         gouden lijst), en functies horen daar niet in. `keurArcade` heeft ze al
+         nagelopen; hier worden ze alleen neergezet. */
+      if (ARCADE[s.sleutel].dagelijks) DAG[s.sleutel] = { opgave: s.dagOpgave, keur: s.dagKeur };
       continue;
     }
 
-    if (s.wereld !== 'rtg' && s.wereld !== 'rtf') throw new Error(`spellen/register: ${naam} heeft wereld '${s.wereld}'; alleen 'rtg' of 'rtf'.`);
-    SPEL[s.sleutel] = { naam: s.naam, max: s.max, wereld: s.wereld };
-    if (s.min) SPEL[s.sleutel].min = s.min;
-    if (s.volwassen) SPEL[s.sleutel].volwassen = true;
-    if (s.buitenBeurt) SPEL[s.sleutel].buitenBeurt = s.buitenBeurt;
-    if (s.perTaal) SPEL[s.sleutel].perTaal = true;
-    if (s.kijken) SPEL[s.sleutel].kijken = true;
-    if (s.teams) {
-      if (s.teams !== 'altijd' && s.teams !== 'keuze')
-        throw new Error(`spellen/register: ${naam} heeft teams '${s.teams}'; alleen 'altijd' of 'keuze'.`);
-      SPEL[s.sleutel].teams = s.teams;
-    }
+    SPEL[s.sleutel] = keurPotje(naam, s);
     INITS[s.sleutel] = s.init;
     ZETTEN[s.sleutel] = s.zet;
-    VIEWS[s.sleutel] = s.view;
+    ZICHT[s.sleutel] = bouwZicht(s.sleutel, keurZicht(naam, s));
     if (s.statisch) STATISCH[s.sleutel] = s.statisch;
   }
   const SOORTEN = Object.fromEntries(Object.entries(SPEL).map(([k, v]) => [k, v.naam]));
-  return { SPEL, SOORTEN, INITS, ZETTEN, VIEWS, STATISCH, ARCADE, ruw };
+  return { SPEL, SOORTEN, INITS, ZETTEN, ZICHT, STATISCH, ARCADE, DAG, ruw };
+  } finally { bezig = false; }   // ook als de keuring terecht gooit
 };

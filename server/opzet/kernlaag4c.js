@@ -7,7 +7,24 @@
 'use strict';
 
 module.exports = (kern, hulp) => {
-  const { LANDEN, crypto, db, ledenAantal, save } = hulp;
+  const { FISCAAL_PEILJAAR, LANDEN, crypto, db, ledenAantal, save } = hulp;
+
+/* De fiscale laag (Regelwacht + btw-aangifte), uit 4b geknipt op de 10 kB-grens
+   toen de merge van de dwarsverbindingen-ronde dat deel eroverheen duwde. Het
+   is een eigen naad: belastingen leunen niet op de bankregie die 4b als geheel
+   bijeenhoudt, alleen op de gedeelde LANDEN-tabel en het factuurregister, en
+   die staan er allebei. */
+/* De Regelwacht (kern/fiscaal/regelwacht.js): belastingen en regels worden
+   automatisch bijgewerkt -- een gevalideerde overlay op de gedeelde
+   LANDEN-tabel, herstart-vast, met een dagelijkse bron-check. */
+Object.assign(kern, require('../kern/fiscaal/regelwacht')({ db, save, LANDEN, peiljaar: FISCAAL_PEILJAAR }));
+kern.regelwacht.herstelOverlay();
+/* De btw-aangifte van een zaak (kern/fiscaal/btwaangifte.js): opmaken uit het
+   factuurregister, controleren, indienen vastleggen en corrigeren -- naar het
+   model van de loonaangifte, met het factuurregister als enige bron. */
+Object.assign(kern, require('../kern/fiscaal/btwaangifte').maakBtwAangifte({ db, save, crypto }));
+const regelTimer = setInterval(() => { kern.regelwacht.check().catch(() => {}); }, Number(process.env.FISCAAL_CHECK_MS || 86400000));
+if (regelTimer.unref) regelTimer.unref();
 
 /* De Opvang-afdeling (AZC/COA), het Regeringskantoor van de
    minister-president en het eigen hotel van elke afdeling -- alle drie

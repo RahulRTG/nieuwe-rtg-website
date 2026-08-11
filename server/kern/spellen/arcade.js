@@ -90,19 +90,13 @@ module.exports = (ctx) => {
   function sudokuKlaar(mij, rooster) {
     const lopend = SU()[mij];
     if (!lopend) return { status: 409, error: 'Er loopt geen puzzel. Begin er een.' };
-    if (!ruw.isRooster(rooster)) return { status: 400, error: 'Stuur een volledig rooster van 81 cijfers mee.' };
-    /* Eerst de GEGEVEN cijfers, helemaal rond, en pas daarna vergelijken. Die
-       volgorde is niet vrijblijvend: wie een gegeven cijfer wegveegt levert een
-       ander rooster in dan de puzzel die hij kreeg, en dat is een andere fout
-       dan "niet goed opgelost". Door elkaar heen lopend zou de eerste
-       afwijkende cel bepalen welke van de twee je te horen krijgt. */
-    for (let i = 0; i < 81; i++)
-      if (lopend.puzzel[i] && rooster[i] !== lopend.puzzel[i])
-        return { status: 400, error: 'De gegeven cijfers van de puzzel horen te blijven staan.' };
-    /* Fout ingevuld is geen fout van de client: de puzzel blijft staan en de
-       klok loopt door, dus je kunt gewoon verder puzzelen. */
-    for (let i = 0; i < 81; i++)
-      if (rooster[i] !== lopend.op[i]) return { status: 200, ok: true, goed: false };
+    /* De keuring zelf staat bij het spel (spellen/sudoku.js) en niet hier: de
+       dagopgave keurt met exact dezelfde volgorde, en twee exemplaren daarvan
+       lopen vroeg of laat uiteen. Fout ingevuld is trouwens geen fout van de
+       client: de puzzel blijft staan en de klok loopt door. */
+    const k = ruw.keurRooster(lopend.op, lopend.puzzel, rooster);
+    if (k.error) return { status: k.status, error: k.error };
+    if (!k.goed) return { status: 200, ok: true, goed: false };
 
     const seconden = Math.max(0, (Date.now() - lopend.start) / 1000);
     delete SU()[mij];

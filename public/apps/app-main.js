@@ -12,7 +12,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '49fb3a74';
+var RTG_BOUW = '3f9d2cdc';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -539,8 +539,163 @@ var RTG_BOUW = '49fb3a74';
         'font-size:0.68rem;letter-spacing:0.06em;color:var(--soft);opacity:0;transition:opacity var(--rtg-tempo,340ms) var(--rtg-ease,ease);}' +
       '.ag-doos.ag-kluis-aan .ag-kluis{display:flex;opacity:1;}' +
       // de sterrenhemel gaat achter alles; de poort-inhoud eroverheen
-      '#gate > *:not(canvas){position:relative;z-index:1;}';
+      '#gate > *:not(canvas){position:relative;z-index:1;}' +
+      /* OP DESKTOP VULT DE HEMEL HET SCHERM. De poort was een kaart van 662px
+         midden op een venster van 1600: de sterren stonden opgesloten in een
+         rechthoek met afgeronde hoeken en daarbuiten was het vlak zwart. Een
+         inlogscherm hoort geen venster in een venster te zijn.
+         De inhoud houdt zijn eigen breedte -- alleen de HEMEL wordt groot. */
+    /* Vervolg van app-main-04: de compositieregels van de poort (een kolom:
+       klok, lippen, aanspreking, veld). Geknipt omdat deel 04 opnieuw over de
+       10 KB-grens ging. De knip ligt midden in een stringconcatenatie -- deel
+       04 eindigt op een + en dit deel maakt hem af.
+
+       DE VOLGORDE IS DE BESTANDSNAAM. bundel.js plakt de delen in de volgorde
+       van readdirSync().sort(), dus puur alfabetisch: 04, 04a, 04ab, 04b. Deze
+       regels stonden een commit lang in 04ab, DUS na de `document.head
+       .appendChild(st);` die 04a afsloot -- waarmee ze een losse expressie
+       werden die JavaScript netjes uitrekent en weggooit. Geen syntaxfout,
+       geen consolemelding, en de halo, de klokschaal en de uitlijning van de
+       zin waren simpelweg weg terwijl de code er nog stond.
+       controleer() kon dat niet zien: die vergelijkt de bundel met dezelfde
+       som van dezelfde delen en is dus per definitie consistent met zichzelf.
+       Wat het nu wel ziet, is toets 43 in scripts/check.js. */
+      /* DE COMPOSITIE. Dit scherm had vijf objecten die allemaal ongeveer even
+         belangrijk waren -- klok, lippen, zin, invoerveld, koekjesmelding --
+         met grote lege vlakken ertussen die niets deden. Leegte in een premium
+         ontwerp is bewust; dit was leegte omdat de inhoud niet wist waar hij
+         moest staan.
+         Nu is het EEN verticale kolom met een duidelijke rangorde: de klok is
+         de identiteit en de held, Rahul komt er direct onder uit, en daaronder
+         staat de actie. Alles daaronder is bijzaak. */
+      '#gate{display:flex;flex-direction:column;align-items:center;justify-content:center;' +
+        'gap:0;padding:6vh 1.1rem;}' +
+      /* DE POORT IS ALTIJD NACHT, ook onder een licht thema.
+         Dit scherm is een sterrenhemel; dat is niet een van de vier smaken
+         maar wat het scherm IS. Toen de thema's platformbreed gingen, zette
+         champagne netjes zijn donkere inkt op de body -- en die inkt landde op
+         een invoerveld dat op een zwarte hemel ligt. Gemeten: 1,11:1. Niet
+         "wat flets": onzichtbaar.
+         De poort verklaart daarom zijn eigen materiaal (onyx) en laat het
+         thema alleen los op wat er OP die hemel ligt: de wijzerplaat van de
+         klok. Een lichte wijzerplaat tegen een nachthemel is precies wat een
+         horloge met een wit blad 's avonds doet. */
+      '#gate{color:var(--op-onyx);' +
+        '--rtg-txt:var(--op-onyx);--txt:var(--op-onyx);' +
+        '--rtg-muted:rgba(244,240,233,0.72);--rtg-soft:rgba(244,240,233,0.56);' +
+        '--muted:rgba(244,240,233,0.72);--soft:rgba(244,240,233,0.56);}' +
+      '#gate input,#gate textarea{color:inherit;}' +
+      /* DE HALO. De sterren waren overal even druk, ook precies daar waar de
+         klok en de tekst staan -- en dan moet het oog zelf uitzoeken wat het
+         onderwerp is. Een zachte donkere ovaal achter de kolom maakt het daar
+         stil, zodat de klok vanzelf naar voren komt. Geen vlak en geen kader:
+         een verloop dat aan de randen volledig verdwijnt, zodat je hem niet
+         als vorm ziet maar alleen als rust. */
+      '#gate::after{content:"";position:absolute;left:50%;top:50%;' +
+        'width:min(150vw,1100px);height:min(120vh,1000px);' +
+        'transform:translate(-50%,-50%);pointer-events:none;z-index:0;' +
+        'background:radial-gradient(ellipse at center,' +
+          'rgba(0,0,0,0.62) 0%,rgba(0,0,0,0.45) 32%,rgba(0,0,0,0.18) 58%,rgba(0,0,0,0) 78%);}' +
+      /* de klok groeit: hij is letterlijk het merk, en stond op een zesde van
+         de hoogte alsof hij een illustratie was */
+      '#gate .os-lock{margin:0;}' +
+      /* SCHALEN MET TRANSFORM, niet met width/height. De klok tekent zijn
+         wijzers, het merkje en de datumvensters op VASTE posities binnen zijn
+         eigen maat; zet je die maat om, dan verschuift het draaipunt en staat
+         alles scheef -- precies wat er gebeurde toen ik hem groter maakte.
+         transform schaalt het hele beeld uniform, dus de geometrie blijft heel. */
+      /* Schaal op de telefoon: 1,2. Hij stond op 1 omdat elke vergroting het
+         invoerveld uit beeld duwde -- maar dat was toen de koekjesmelding nog
+         een kaart van 160px was. Nu die een regel van 26px is, past het wel,
+         en de kolom vulde met schaal 1 maar 51% van de hoogte terwijl de
+         opzet 70 a 80% vraagt. Gemeten op 430 en op 375 breed. */
+      '#gate{--klokschaal:1.2;}' +
+      /* En de indeling moet de GESCHAALDE maat reserveren. Een transform tekent
+         groter maar verandert de doos niet: op 1,5x groeide de klok 73px naar
+         boven en 73px naar beneden buiten zijn eigen vak, en de lippen -- die
+         netjes 10px onder de rand horen te zitten, en dat op een telefoon ook
+         deden -- kwamen op een breed scherm midden op de wijzerplaat te liggen.
+         Gemeten, niet gegokt: telefoon klok 201-494 met mond op 484 (goed),
+         breed klok 98-537 met mond op 454 (83px de plaat in).
+         Daarom draagt het vak zelf de hoogte, en schaalt de ring erin. */
+      '#gate .os-lock{display:flex;align-items:center;justify-content:center;padding:0;margin:0;' +
+        'height:calc(var(--rtg-klok-maat,16rem) * var(--klokschaal,1));transform:none;}' +
+      '#gate .os-lock > .rtg-ring{transform:scale(var(--klokschaal,1));transform-origin:center;}' +
+      /* de lippen sluiten AAN op de klok: Rahul komt eruit, hij zweeft er niet
+         tientallen pixels onder */
+      /* DE MOND HOORT BIJ DE KLOK, dus meet hij zich aan de klok en niet aan
+         het venster. Met min(52vw,240px) was hij op een telefoon 224 breed
+         onder een klok van 256 (verhouding 0,87) en op een breed scherm 240
+         onder een klok van 384 (0,63) -- dezelfde mond, twee verhoudingen.
+
+         En het optrekken gebeurt met de LEEGTE VAN HET DOEK erin verrekend:
+         de tekening vult verticaal ongeveer 46% van haar canvas, dus boven de
+         inkt zit ruim een kwart niets. Trek je alleen de doos op, dan sluit
+         de doos aan en de tekening niet -- precies het gat dat hier zat. */
+      '#gate .ag-mond{--mondbreed:calc(var(--rtg-klok-maat,16rem) * var(--klokschaal,1) * 0.875);' +
+        'width:var(--mondbreed);height:auto;' +
+        'margin:calc(var(--mondbreed) * -0.125) auto 0.2rem;}' +
+      // de zin is de aanspreking en geen onderschrift
+      /* margin-inline:auto, anders staat de zin 43px links van de as. De doos
+         is een flexkolom met align-items:stretch, dus een kind met een
+         max-width blijft aan de linkerrand plakken -- gemeten, niet gegokt. */
+      '#gate .ag-zin{font-size:clamp(1.35rem,5.2vw,1.9rem);line-height:1.3;' +
+        'min-height:0;padding:0.5rem 0 1.1rem;max-width:22ch;margin-inline:auto;}' +
+      // het invoerveld is de actie: breed en royaal, geen streepje
+      /* EEN rand, niet twee. De rij had al een border-bottom uit de basisstijl;
+         daar een volledige rand overheen leggen gaf een dubbele doos met een
+         verspringende binnenrand. Eerst de oude weg, dan de nieuwe. */
+      /* EEN doos, en symmetrisch. De rij droeg mijn ring en het invoerveld
+         binnenin had zijn EIGEN achtergrond, rand en radius -- vandaar de
+         dubbele doos met een binnenvlak dat 8px uit het midden lag. De rij
+         draagt nu het kader, het veld erin is kaal. De padding was ook
+         asymmetrisch (0,9rem links tegen 0,5rem rechts). */
+      '#gate .ag-rij{width:min(100%,30rem);min-height:58px;border:0;' +
+        'box-shadow:inset 0 0 0 1px var(--line);border-radius:14px;' +
+        'margin-inline:auto;padding:0 0.9rem;}' +
+      '#gate .ag-rij:focus-within{box-shadow:inset 0 0 0 1px var(--burgundy);}' +
+      '#gate .ag-rij input{background:none;border:0;border-radius:0;box-shadow:none;}' +
+      '#gate .ag-rij input{font-size:1rem;padding:1rem 0.4rem;text-align:left;}' +
+      /* de koekjesmelding hoort niet MIDDEN in de kennismaking. Hij zweeft
+         onderaan, buiten de kolom, waar hij de compositie niet meer breekt.
+
+         Deze regel stond er als `.rtgcookie` -- een klasse die nergens
+         bestaat. Het element heet `#rtg-cookie` (shared/cookie.js) en zet zijn
+         eigen positie al: vast, onderaan, gecentreerd. Er viel dus niets te
+         verplaatsen, en het commentaar hierboven beschreef een verhuizing die
+         nooit heeft plaatsgevonden. Wat er ECHT misging is iets anders: de
+         melding ligt met z-index 9999 over het invoerveld heen, en dan is de
+         enige actie op het scherm onbereikbaar tot je hem wegklikt.
+         De kolom houdt daarom ruimte vrij zolang de melding er staat, en niet
+         langer -- `:has()` volgt het element vanzelf als hij verdwijnt. */
+      'body:has(#rtg-cookie) #gate{padding-bottom:calc(6vh + 3rem);}' +
+    /* Slotstuk van de poortstijl: de brede-schermregels, en daarna pas het
+       insluiten van het blad. Dit deel MOET het laatste van de reeks 04.. zijn
+       dat aan de stijlstring bijdraagt, want het sluit hem af met een `;` en
+       hangt hem in de kop. Alles wat na deze regel nog `'...' +` schrijft,
+       staat buiten de string en doet niets.
+
+       De brede-schermregels komen bewust NA de compositie in 04a: bij gelijke
+       specificiteit wint de laatste, en op een breed scherm hoort de poort het
+       hele venster te vullen in plaats van de kolompadding van 04a te houden. */
+      '@media (min-width:900px){' +
+        /* op #gate en niet op .os-lock: de mond meet zich aan de klok en
+           moet die schaal dus ook kunnen erven. Stond hij op .os-lock, dan
+           bleef de mond op een breed scherm 224 breed onder een klok van 384. */
+        '#gate{--klokschaal:1.5;}' +
+        '#gate{position:fixed;inset:0;width:100vw;max-width:none;height:100vh;' +
+          'margin:0;border-radius:0;border:0;display:flex;align-items:center;' +
+          'justify-content:center;flex-direction:column;}' +
+        '#gate canvas:not(.ag-mond){position:absolute;inset:0;width:100vw;height:100vh;}' +
+        '#gate .ag-doos{max-width:34rem;}' +
+      '}';
     document.head.appendChild(st);
+    /* Vervolg van app-main-04: de poort-inhoud (mond, zin, invoerveld,
+       passkey) en het gesprek erachter. Geknipt omdat deel 04 met de
+       schermvullende sterrenhemel over de 10 KB-grens ging die het
+       modulebeleid stelt; de bundel plakt 04 en 04b weer aaneen tot exact
+       hetzelfde bestand. De cut ligt op een statement-grens binnen dezelfde
+       gesloten scope, dus er verandert niets aan het gedrag. */
 
     // een heel subtiele 3D-sterrenhemel over het hele inlogscherm, in RTG-stijl
     (function sterrenhemel(){
@@ -1669,7 +1824,7 @@ var RTG_BOUW = '49fb3a74';
     b.addEventListener('click', () => openTab(b.dataset.tab, true)));
   // de codenaam in de statusbalk is de korte weg naar je pas: die ligt sinds
   // het OS-beginscherm in je wallet, niet meer op de home
-  $('#codeChip').addEventListener('click', () => { location.href = '/apps/wallet.html'; });
+  $('#codeChip').addEventListener('click', () => { location.href = '/apps/geld.html#wallet'; });
 
   /* EEN TABBLAD HAALT ZIJN GEGEVENS OP ALS JE HEM OPENT, NIET EERDER.
 
@@ -3169,14 +3324,17 @@ var RTG_BOUW = '49fb3a74';
     navigatie:   { naam: 'Navigatie',    url: '/apps/navigatie.html' },
     theater:     { naam: 'Films en series',      url: '/apps/theater.html' },
     residentie:  { naam: 'Verblijven', url: '/apps/residentie.html' },
-    wbw:         { naam: 'Samen betalen', url: '/apps/wbw.html' },
+    wbw:         { naam: 'Samen betalen', url: '/apps/geld.html#wbw' },
     passkeys:    { naam: 'Passkeys',     url: '/apps/passkeys.html' },
-    // veiligheid en verbinding: vier apps op een gedeelde kern
+    /* Veiligheid en verbinding. Hier stonden VIER tegels -- Thuiswacht,
+       Codewoord, Vitaal en Thuisrust -- op een gedeelde kern. Ze zijn nu vier
+       standen van een app (/apps/veilig.html), want een systeem dat een systeem
+       is, hoort niet als vier losse deuren op een beginscherm te staan: wie de
+       Thuiswacht kende, had het Codewoord daardoor vaak nooit gezien. De oude
+       paden leiden met een hash naar hun eigen stand, dus een bladwijzer of een
+       geinstalleerde PWA komt nog steeds uit waar hij hoort. */
     ik:          { naam: 'Wie ben ik',   url: '/apps/ik.html' },
-    thuiswacht:  { naam: 'Thuiswacht',   url: '/apps/thuiswacht.html' },
-    codewoord:   { naam: 'Codewoord',    url: '/apps/codewoord.html' },
-    vitaal:      { naam: 'Vitaal',       url: '/apps/vitaal.html' },
-    thuisrust:   { naam: 'Thuisrust',    url: '/apps/thuisrust.html' },
+    veilig:      { naam: 'RTG Veilig',   url: '/apps/veilig.html' },
     ov:          { naam: 'Openbaar vervoer',           url: '/apps/ov.html' },
     stad:        { naam: 'Stad',    url: '/apps/stad.html' },
     clips:       { naam: 'Video',        url: '/apps/clips.html' },
@@ -3199,7 +3357,7 @@ var RTG_BOUW = '49fb3a74';
     sitemaker:   { naam: 'Website', url: '/apps/sitemaker.html' },
     browser:     { naam: 'Web',  url: '/apps/browser.html' },
     vonk:        { naam: 'Daten',         url: '/apps/vonk.html' },
-    balans:      { naam: 'Balans',       url: '/apps/balans.html' },
+    balans:      { naam: 'Balans',       url: '/apps/geld.html#balans' },
     /* Mijn loon staat bij Geld en niet bij Werk: het is uw geld, niet iets van
        uw werkgever. Wie nergens werkt vindt een lege lijst met de zin die dat
        uitlegt -- dat is beter dan een tegel die verdwijnt zodra u van baan
@@ -3211,15 +3369,26 @@ var RTG_BOUW = '49fb3a74';
     table:       { naam: 'Table',         url: '/apps/table.html' },
     maison:      { naam: 'Maison',        url: '/apps/maison.html' },
     garderobe:   { naam: 'Garde-robe',    url: '/apps/garderobe.html' },
-    mecenaat:    { naam: 'Mecenaat',      url: '/apps/mecenaat.html' },
-    labfonds:    { naam: 'Fonds',     url: '/apps/labfonds.html' },
-    rtgcode:     { naam: 'Betaalcode',      url: '/apps/rtgcode.html' },
-    nalatenschap:{ naam: 'Nalatenschap',  url: '/apps/nalatenschap.html' },
-    logboek:     { naam: 'Logboek',       url: '/apps/logboek.html' },
+    mecenaat:    { naam: 'Mecenaat',      url: '/apps/geld.html#mecenaat' },
+    labfonds:    { naam: 'Fonds',     url: '/apps/geld.html#labfonds' },
+    rtgcode:     { naam: 'Betaalcode',      url: '/apps/geld.html#rtgcode' },
+    nalatenschap:{ naam: 'Nalatenschap',  url: '/apps/geld.html#nalatenschap' },
+    logboek:     { naam: 'Logboek',       url: '/apps/geld.html#logboek' },
     cercle:      { naam: 'Cercle',        url: '/apps/cercle.html' },
     pulse:       { naam: 'Vandaag',         url: '/apps/pulse.html' },
     nieuws:      { naam: 'Nieuws',        url: '/apps/nieuws.html' },
     krant:       { naam: 'Krant',     url: '/apps/krant.html' },
+    /* RTG Reizen staat NAAST Vluchten, Verblijven, Reisbureau en Hangar en niet
+       in plaats daarvan -- net als RTG Media naast Video, Sound, Theater en
+       Podium. Het is de laag die er een wereld van maakt (PLATFORM.md, laag 2);
+       wie recht naar het inchecken of de hangar wil, hoort daar gewoon heen te
+       kunnen. */
+    /* "RTG Reizen" en niet "Reizen": de map draagt al een OS-tab die Reizen
+       heet (tab:reizen, het boeken zelf), en twee tegels met dezelfde naam in
+       een map is voor een gebruiker een raadsel en voor test/appmenu.e2e.js een
+       fout -- die toets bewaakt dat een app in precies EEN map staat en meet dat
+       op het label. De bibliotheek noemt hem ook RTG Reizen. */
+    reizen:      { naam: 'RTG Reizen',    url: '/apps/reizen.html' },
     vluchten:    { naam: 'Vluchten',      url: '/apps/vluchten.html' },
     sport:       { naam: 'Sport',         url: '/apps/sport.html' },
     school:      { naam: 'School',    url: '/apps/rtgschool.html' },
@@ -3235,7 +3404,7 @@ var RTG_BOUW = '49fb3a74';
     attenties:   { naam: 'Attenties',     url: '/apps/attenties.html' },
     rendezvous:  { naam: 'Rendez-vous',   url: '/apps/rendezvous.html' },
     // De wallet draagt je ledenpas; hij staat in de functierij onder de klok.
-    wallet:      { naam: 'Wallet',        url: '/apps/wallet.html' }
+    wallet:      { naam: 'Wallet',        url: '/apps/geld.html#wallet' }
   };
   /* Elke functie zijn eigen app: Bellen, Videobellen en Snaps zijn eigen
      OS-apps die een kiezer openen en dan meteen doen wat u koos, via de
@@ -3323,16 +3492,16 @@ var RTG_BOUW = '49fb3a74';
      twee plekken voor hetzelfde is precies waarom je hem nergens meer vindt. */
   const MAPPEN = [
     /* --- eerste rij --- */
-    { sleutel: 'map-reizen', naam: 'Reizen', items: [
-      'tab:reizen', 'tab:terplaatse', 'link:vluchten', 'link:ov', 'link:navigatie',
+    { sleutel: 'map-reizen', naam: 'RTG Reizen', wereld: '/apps/reizen.html', glyf: 'vluchten', items: [
+      'tab:reizen', 'link:reizen', 'tab:terplaatse', 'link:vluchten', 'link:ov', 'link:navigatie',
       'link:flits', 'link:stad', 'link:reisboek', 'link:hangar', 'link:residentie'] },
-    { sleutel: 'map-geld', naam: 'Geld', items: [
+    { sleutel: 'map-geld', naam: 'RTG Geld', wereld: '/apps/geld.html', glyf: 'wallet', items: [
       'tab:betalen', 'link:wallet', 'link:bank', 'link:wbw', 'link:rtgcode',
       'link:balans', 'tab:assets', 'link:labfonds', 'link:mecenaat',
       'link:nalatenschap', 'link:logboek'] },
     /* De Salon is weer De Salon: mensen en wat je met ze deelt. Wat je in je
        eentje kijkt of luistert staat bij Media. */
-    { sleutel: 'map-salon', naam: 'De Salon', items: [
+    { sleutel: 'map-salon', naam: 'RTG Sociaal', wereld: '/apps/sociaal.html', glyf: 'salon', items: [
       'tab:salon', 'link:pulse', 'link:vrienden', 'os:snaps', 'link:camera',
       'link:vonk', 'link:cercle', 'link:entourage', 'link:rendezvous', 'link:attenties'] },
     /* Het Huis is het huishouden in de brede zin: waar je woont, wat er op
@@ -3340,24 +3509,51 @@ var RTG_BOUW = '49fb3a74';
        gaat. Die laatste helft (zorg, gezin, vitaal, rust) stond even in een
        eigen map Zorg; die is hier terug, want zonder haar was Het Huis op een
        RTG-pas een map met drie tegels. De kantoorkant zit bij Werk. */
-    { sleutel: 'map-huis', naam: 'Het Huis', items: [
-      'link:ontdek', 'os:rtf', 'tab:bestellen', 'tab:zorg', 'tab:gezin',
-      'link:vitaal', 'link:thuisrust', 'link:rechterhand',
+    /* os:rtf stond hier, en staat nu in zijn eigen wereld hieronder. Regel 44
+       in scripts/check.js ving dat meteen: een app in twee werelden is precies
+       waarom je hem nergens meer vindt. */
+    { sleutel: 'map-huis', naam: 'RTG Leven', wereld: '/apps/lifestyle.html', glyf: 'wonen', items: [
+      'link:ontdek', 'tab:bestellen', 'tab:zorg', 'tab:gezin',
+      'link:rechterhand',
       'link:maison', 'link:table', 'link:cellier', 'link:garderobe'] },
 
     /* --- tweede rij, gecentreerd --- */
-    { sleutel: 'map-media', naam: 'Media', items: [
+    { sleutel: 'map-media', naam: 'RTG Media', wereld: '/apps/media.html', glyf: 'film', items: [
       'link:muziek', 'link:podium', 'link:theater', 'link:clips', 'link:spelen',
       'link:nieuws', 'link:krant', 'link:sport'] },
-    { sleutel: 'map-werk', naam: 'Werk', items: [
+    { sleutel: 'map-werk', naam: 'RTG Kantoor', wereld: '/apps/kantoor.html', glyf: 'office', items: [
       'link:office', 'os:werk', 'link:loonstrook', 'link:school',
-      'link:browser', 'link:sitemaker', 'link:juridisch'] },
-    /* Veilig: wie je bent en wie er over je waakt. Vier apps op dezelfde kern
-       (zie de opmerking bij LINKS), plus de sleutels waarmee je binnenkomt.
-       Vier is hier geen tekort maar de hele set -- dit is de enige map die op
-       elke pas even groot is. */
-    { sleutel: 'map-veilig', naam: 'Veilig', items: [
-      'link:ik', 'link:thuiswacht', 'link:codewoord', 'link:passkeys'] }
+      'link:browser', 'link:sitemaker'] },
+    /* Veilig: wie je bent en wie er over je waakt. De vier apps op dezelfde
+       kern zijn een app met vier standen geworden (zie de opmerking bij LINKS),
+       plus de sleutels waarmee je binnenkomt. Drie is hier geen tekort maar de
+       hele set -- dit is de enige map die op elke pas even groot is.
+
+       Vitaal en Thuisrust stonden bij Het Huis en niet hier, omdat ze over zorg
+       en huishouden gingen. Nu ze standen zijn van een app, kan die app maar in
+       een map staan (geen enkel item staat in twee mappen) en dat is deze:
+       waar de andere twee standen ook al woonden. Het Huis houdt zorg en gezin
+       als eigen tabbladen, dus daar verdwijnt het onderwerp niet.
+
+       Juridisch komt hier vandaan uit de map Werk. Vier tegels werden een, en
+       daarmee zakte deze map naar drie -- onder de ondergrens die
+       test/appmenu.e2e.js bewaakt, en die ondergrens is er niet voor niets: een
+       bijna lege map op de instappas is precies waar de merkregel over gaat.
+       Juridisch is geen noodgreep om een gat te vullen maar hoort hier: de
+       app-bibliotheek zet hem zelf al in de categorie "Veiligheid & identiteit"
+       naast Wie ben ik en Passkeys, en het gaat over jouw voorwaarden en jouw
+       akkoorden -- wie je bent, niet waar je werkt. Werk houdt zes tegels. */
+    { sleutel: 'map-veilig', naam: 'RTG Veilig', wereld: '/apps/veilig.html', glyf: 'schild', items: [
+      'link:ik', 'link:veilig', 'link:passkeys', 'link:juridisch'] },
+    /* De achtste wereld. De stichting stond als EEN tegel binnen Het Huis
+       ('os:rtf'), terwijl ze zeventien onderdelen, een eigen service worker en
+       een eigen huis heeft. Een wereld die als tegel in een andere wereld
+       hangt, is geen wereld. */
+    /* De wereldtegel NAVIGEERT naar het huis; een tweede item in deze lijst zou
+       nooit in beeld komen (openMap navigeert, zie 26.js). Het
+       levens-command-center staat daarom als tegel OP de hub zelf, in de
+       oudersectie -- zie de opmerking daar over de twee sessiewerelden. */
+    { sleutel: 'map-rtf', naam: 'RTFoundation', wereld: '/apps/foundation/index.html', glyf: 'rtf', items: ['os:rtf'] }
   ];
 
   /* De premium-suite (De Rechterhand) bestaat alleen voor Lifestyle en
@@ -3756,6 +3952,22 @@ var RTG_BOUW = '49fb3a74';
     const el = document.createElement('button');
     el.className = 'os-app os-map'; el.dataset.sleutel = map.sleutel;
     el.setAttribute('aria-label', 'Map ' + mapNaam(map));
+    /* EEN WERELD IS EEN APP EN ZIET ERUIT ALS EEN APP: een tegel met een glyf,
+       geen mapvoorbeeld met minitegels (PLATFORM.md par. 0). Het mapvoorbeeld
+       had ook een echt gebrek: het telde de ZICHTBARE onderdelen, dus op de
+       instappas toonde RTG Leven drie snippers en RTFoundation een -- en dan
+       oogt de instap budget, precies wat de merkregel verbiedt. Een glyf is
+       op elke pas even vol. */
+    if (map.wereld) {
+      const tegel = document.createElement('span'); tegel.className = 'os-tegel';
+      const g = window.RTGGlyf && RTGGlyf.svg(map.glyf);
+      if (g) tegel.appendChild(g);
+      else { const m = document.createElement('span'); m.className = 'os-monogram'; m.textContent = mapNaam(map).replace(/^RTG /, '').slice(0, 2); tegel.appendChild(m); }
+      el.appendChild(tegel);
+      const nm = document.createElement('span'); nm.className = 'os-naam'; nm.textContent = mapNaam(map); el.appendChild(nm);
+      el.addEventListener('click', () => { if (!wiebel) openMap(map); });
+      return el;
+    }
     const tegel = document.createElement('span'); tegel.className = 'os-tegel os-map-tegel';
     for (const item of map.items.filter(itemZichtbaar).slice(0, 9)) {
       const mini = document.createElement('span'); mini.className = 'os-map-mini';
@@ -3848,6 +4060,13 @@ var RTG_BOUW = '49fb3a74';
      raster van #osMapGrid af -- niet twee rasters in elkaar.
      test/appmenu.e2e.js meet de meetkunde en zakt als dat weer gebeurt. */
   function openMap(map) {
+    /* ACHT WERELDEN (PLATFORM.md par. 0). Een wereld is een APP en geen map:
+       tikken opent hem, en er komt geen tussenscherm met tegels. De `items`
+       blijven staan zolang de onderdelen nog eigen pagina's zijn -- Spotlight
+       indexeert ze en zonder die index is er halverwege de verhuizing van
+       alles onvindbaar. Naarmate een wereld zijn secties opslokt, loopt die
+       lijst vanzelf leeg. */
+    if (map.wereld) { location.href = map.wereld; return; }
     mapTitel.textContent = mapNaam(map);
     mapGrid.textContent = '';
     const zicht = map.items.filter(itemZichtbaar);
@@ -4529,7 +4748,7 @@ var RTG_BOUW = '49fb3a74';
       headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok }, body: '{}' })
       .then(r => (r.ok ? r.json() : null))
       .then(d => {
-        if (d && d.online) { LINKS.bank = { naam: 'RTG Rekening', url: '/apps/bank.html' }; bouw(); }
+        if (d && d.online) { LINKS.bank = { naam: 'RTG Rekening', url: '/apps/geld.html#bank' }; bouw(); }
       }).catch(() => {});
   })();
 
@@ -6737,12 +6956,24 @@ var RTG_BOUW = '49fb3a74';
           '<span class="amount">' + eur(total) + '</span>' +
           (inv.status === 'open'
             ? '<button class="btn-pay js-pay" data-inv="' + inv.id + '" data-amt="' + total + '">' + FID + T('app.pay','Betaal') + '</button>' +
+              (API.live && user.tier !== 'guest' ? '<button class="js-saldo" data-inv="' + inv.id + '" data-amt="' + total + '" style="background:none;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:0.3rem 0.75rem;font-size:0.66rem;font-family:inherit;cursor:pointer;">◉ ' + T('fin.paysaldo','Uit RTG Pay-saldo') + '</button>' : '') +
               (muntAan ? '<button class="js-munt" data-inv="' + inv.id + '" data-amt="' + total + '" style="background:none;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:0.3rem 0.75rem;font-size:0.66rem;font-family:inherit;cursor:pointer;">◈ ' + T('fin.paycoins','Met munten') + '</button>' : '')
             : '<span class="pill paid">'+T('app.paid','Betaald')+'</span>') +
           (API.live ? '<button class="js-dlinv" data-inv="' + inv.id + '" style="background:none;border:none;color:var(--soft);font-size:0.66rem;font-family:inherit;cursor:pointer;padding:0.15rem 0;">⤓ ' + T('fin.download','Download factuur') + '</button>' : '') +
         '</div>' +
       '</div>' + bizSpec(inv);
     }).join('');
+    /* Uit het eigen RTG Pay-saldo (de derde betaalweg): dezelfde bevestigde
+       betaalflow als de kaart, maar de afschrijving komt uit de wallet. */
+    document.querySelectorAll('.js-saldo').forEach(b =>
+      b.addEventListener('click', () => payWithFaceId(eur(Number(b.dataset.amt)), async () => {
+        const r = await API.call('/pay/saldo', { invoiceId: b.dataset.inv });
+        applyState((await API.call('/state')).state);
+        return r;
+      }, {
+        message: r => T('fin.saldobetaald','Betaald uit uw RTG Pay-saldo') + (r && r.bijgeladen ? ' (' + eur(r.bijgeladen / 100) + ' ' + T('fin.bijgeladen','automatisch bijgeladen') + ')' : '') + '.',
+        after: () => { renderPay(); renderHome(); renderTrip(); }
+      })));
     document.querySelectorAll('.js-munt').forEach(b =>
       b.addEventListener('click', () => openMuntSheet({
         euro: Number(b.dataset.amt), titel: T('munt.title','Betaal met munten'),

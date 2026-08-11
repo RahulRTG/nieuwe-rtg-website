@@ -32,8 +32,8 @@ const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
 const zlib = require('zlib');
-const { db, load, save, DATA_DIR, STORE, opslagKlaar, pgPoolStatus, startGedeeld, startSqliteSync, startPostgres, flushBijAfsluiten, onExternalChange, grootSupplierSync, grootAantal,
-  ledenGidsActief, ledenGidsHaal, ledenGidsAantal, ledenGidsZet, ledenGidsWeg, ledenGidsExact, ledenGidsZoek,
+const { db, load, save, bijeen, DATA_DIR, STORE, opslagKlaar, pgPoolStatus, startGedeeld, startSqliteSync, startPostgres, flushBijAfsluiten, onExternalChange, grootSupplierSync, grootAantal,
+  ledenGidsActief, ledenGidsHaal, ledenGidsAantal, ledenGidsZet, ledenGidsWeg, ledenGidsExact, ledenGidsZoek, ledenGidsHaalWacht,
   orderMetRef, ordersVanKlant, ordersVanZaak, ordersVoegToe,
   boekingMetRef, boekingenVanKlant, boekingenVanZaak, boekingenVoegToe,
   directBetalingMetRef, directBetalingenVanKlant, directBetalingenVanZaak, directBetalingenVoegToe,
@@ -533,7 +533,7 @@ function logInlog(kanaal, ok, wie, req) {
 const {
   AUTHOR_TIER, SSE_BUFFER_TTL, aiPoort, antivirus, archief, atelierweb, auth, automatisering, 
   beveilig, broadcastSync, bufferEvent, bus, connectedSupplierCodes, dirTouch, 
-  ensureSupplierDefaults, etaMinutes, gidsHaal, gidsWeg, gidsZoekCodenaam, guestsFor, 
+  ensureSupplierDefaults, etaMinutes, gidsHaal, gidsHaalWacht, gidsWeg, gidsZoekCodenaam, guestsFor,
   haversine, initRealtime, keyVanCodenaam, ledenAantal, leverSse, liveCodename, liveStateFor, 
   mailQ, mailIn, mailAuth, mailBijlage, mailSleutel, rtmailAi, naamlaag, nextSseId, notify, ondernemerpoort, pushLive, resolveSession, rtmail, rtmailTeam,
   rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels, rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar, mailAanname,
@@ -541,9 +541,9 @@ const {
   speelOpnieuw, sseBuffer, sseClients, sseSend, sseToCustomer, toRad, webpush, werkmail
   , scanNet, wacht
 } = require('./opzet/diensten')({
-  DATA_DIR, DEMO, PERSONAS, accounts, crypto, db, eigenaar, findSupplier, i18n, 
-  ledenGidsAantal, ledenGidsActief, ledenGidsExact, ledenGidsHaal, ledenGidsWeg, ledenGidsZet, 
-  ledenGidsZoek, ledenPrijs, maakLive, mail, onExternalChange, 
+  DATA_DIR, DEMO, PERSONAS, accounts, crypto, db, eigenaar, findSupplier, i18n,
+  ledenGidsAantal, ledenGidsActief, ledenGidsExact, ledenGidsHaal, ledenGidsHaalWacht, ledenGidsWeg, ledenGidsZet,
+  ledenGidsZoek, ledenPrijs, maakLive, mail, onExternalChange,
   ordersVanKlant, rtf, save, schild, schoon, sessionFor, sessions, sseToOffice, sseToSupplier, 
   tokenHash,
   // pas verderop in dit bestand gebouwd; zie de uitleg in diensten.js
@@ -844,7 +844,7 @@ function eisAccount(req, res) {
    HALEN. Dat is geen omweg om de volgorde heen: de sociale laag heeft de kern
    alleen nodig op het moment dat er echt een bericht langskomt, en tegen die
    tijd staat hij er. Een vaste verwijzing zou hier voor altijd undefined zijn. */
-const sociaal = require('./kern/sociaal')({ db, save, sseToCustomer, rtf, crypto, gidsHaal, gidsZoekCodenaam, media,
+const sociaal = require('./kern/sociaal')({ db, save, sseToCustomer, rtf, crypto, gidsHaal, gidsHaalWacht, gidsZoekCodenaam, media,
   commDm: () => kern && kern.commDm });
 // Verplichte intake (paspoort/e-mail/telefoon/adres/standaard) + contract voor elk
 // account, per scope (platform 'rtg' of leverancier-code), AI-aanpasbaar.
@@ -1325,7 +1325,9 @@ const {
   puntenVan, verdienPunten, verzilverPunten, pasTegoedToe, voorkeurVan, zetVoorkeur
 } = maakErvaring({
   db, save, crypto, findSupplier, notify, notifySupplier, sseToCustomer,
-  sseToSupplier, sseToOffice, zijnVrienden, ticketsVoorSlot, optieAan
+  sseToSupplier, sseToOffice, zijnVrienden, ticketsVoorSlot, optieAan,
+  // de gedekte tafel (kern/tafeldek.js) wordt pas in kernlaag7 gebouwd; laat gebonden
+  tafeldekVan: () => kern.tafeldek
 });
 
 /* De retail-/mode-laag (kern/retail.js): collecties, artikelen met varianten,
@@ -1530,6 +1532,15 @@ const { maakSettlement } = require('./kern/settlement');
 const settleFactuur = maakSettlement({ db, save, accounts, fonds, log, dpRegistreerMunt,
   payOplaadAfronden: (a) => (kern.pay && kern.pay.oplaadAfronden ? kern.pay.oplaadAfronden(a) : null) });
 
+/* De maandfactuur uit het eigen RTG Pay-saldo (kern/factuursaldo.js): de derde
+   betaalweg naast kaart en munten. De afschrijving loopt via pay.huisIn en de
+   afwikkeling via DEZELFDE settleFactuur als hierboven, dus de bedragcontrole
+   en de 30%-afdracht staan nergens een tweede keer. De betaalkern komt pas in
+   de kernlaag; vandaar dezelfde late binding als payOplaadAfronden. */
+const { factuurSaldo } = require('./kern/factuursaldo').maakFactuurSaldo({
+  db, accounts, settleFactuur, broadcastSync,
+  payVan: () => kern.pay });
+
 /* De paspoort-/identiteitslaag (kern/paspoort.js): een gecontroleerd, veilig
    en toestemmingsgestuurd kanaal waarlangs een partner de identiteit achter een
    codenaam kan opvragen (ja/nee, ID-kaart of volledige scan), met melding en
@@ -1538,7 +1549,15 @@ const {
   mijnStatus: paspoortStatus, vraag: paspoortVraag, beslis: paspoortBeslis,
   trekIn: paspoortTrekIn, bekijk: paspoortBekijk, dienIncidentIn: paspoortIncident,
   beoordeelIncident: paspoortBeoordeel, mijnVerzoeken: paspoortMijn,
-  partnerVerzoeken: paspoortPartner, incidentenVoorOffice: paspoortIncidenten
+  partnerVerzoeken: paspoortPartner, incidentenVoorOffice: paspoortIncidenten,
+  /* De twee alleen-lezen vragen die andere lagen aan deze module stellen: de
+     vervaldatum voor kern/levensgraaf en het geboortejaar voor
+     kern/levenslijn. Ze staan hier omdat een naam die niet in de kern belandt
+     ook niet bestaat: kernlaag3b vraagt `kern.paspoortVervaldatumVan` achter
+     een ternary, en die viel dus stil terug op null -- de paspoortknoop van de
+     levensgraaf is daardoor nooit gebouwd. Een belofte in commentaar is een
+     belofte in code (LAT.md regel 6), en dit is de plek waar hij waar wordt. */
+  paspoortVervaldatumVan, paspoortGeboortejaarVan
 } = maakPaspoort({
   db, save, crypto, accounts, notify, notifySupplier, sseToCustomer,
   sseToSupplier, sseToOffice, leesUploadDataUrl, leeftijdVan, gidsHaal
@@ -1855,7 +1874,7 @@ const kern = {
   findSupplier, forgetSession, fs, gcCode, geborenVan, geenGast, idGeverifieerd, generateAiReply,
   guestsFor, hasContact, hasCred, haversine, i18n, initRealtime, klokVan, ledenPrijs,
   leeftijdVan, leeftijdsgroepVan, leverSse, liveCodename, liveStateFor, load, logActivity, loginFails,
-  mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, noteerBeurt, memberTemplate, myApplications, nextSseId, onboarding, boerderij, journalistiek, creator, samenwerking, handelsketen, agenda, notities, bestanden, meet, galerij, klok, boeken, onderwijs, leerstof, bijles, vervolg, facturatie, markt,
+  mail, makeSupplierCode, managerOnly, media, meldWerkgever, memberSays, noteerBeurt, memberTemplate, myApplications, nextSseId, onboarding, boerderij, journalistiek, creator, samenwerking, handelsketen, agenda, notities, bestanden, meet, galerij, klok, boeken, onderwijs, leerstof, bijles, vervolg, facturatie, factuurSaldo, markt,
   noteFailedTry, notify, notifyApplicant, notifySupplier, officeAuth, boardroomAuth, boardroomLijst, boardroomBaas, boardroomWie, magBoardroom, officeState, openVacatures, optieAan,
   entreeCode, keyVanCodenaam, gidsHaal, gidsZoekCodenaam, gidsWeg, magBezorgen, parseRunsheetText, path, pendingVerifications, pickupCode, pinSlot, posDay, publicPartner, publicSupplier, ticketsVoorSlot,
   publicTrip, pushLive, registerContact, rememberSession, resolveSession, ritBezetting, ritVerder, rtf,
@@ -1928,7 +1947,8 @@ const kern = {
   talen,
   PASPOORT_NIVEAUS, leesUploadDataUrl, paspoortStatus, paspoortVraag, paspoortBeslis,
   paspoortTrekIn, paspoortBekijk, paspoortIncident, paspoortBeoordeel, paspoortMijn,
-  paspoortPartner, paspoortIncidenten
+  paspoortPartner, paspoortIncidenten,
+  paspoortVervaldatumVan, paspoortGeboortejaarVan
 };
 
 /* De helpers en constanten uit dit bestand die de kernlagen nodig hebben, op
@@ -1936,7 +1956,7 @@ const kern = {
    wel wordt gebruikt, valt bij het opstarten meteen om. */
 const hulp = {
   DATA_DIR, FISCAAL_PEILJAAR, LANDEN, PERSONAS, accounts, alcoholGrensVan, annuleerReservering,
-  anthropic, app, archief, betaal, betaalOpdrachten, beveilig, boekingenVanKlant, boekingenVanZaak, boekingenVoegToe,
+  anthropic, app, archief, betaal, betaalOpdrachten, beveilig, bijeen, boekingenVanKlant, boekingenVanZaak, boekingenVoegToe,
   broadcastSync, centen, crypto, db, entreeCode, etaMinutes, facturatie, findSupplier, fonds, fooiUit,
   geborenVan, haversine, idGeverifieerd, keyVanCodenaam, klantProfiel, klokVan, ledenAantal,
   ledenPrijs, leeftijdVan, legApart, liveCodename, log, logActivity, loginFails, maakOntmoeting,
@@ -1961,6 +1981,7 @@ const hulp = {
 require('./opzet/kernlaag1')(kern, hulp);
 require('./opzet/kernlaag2')(kern, hulp);
 require('./opzet/kernlaag3')(kern, hulp);
+require('./opzet/kernlaag3w')(kern, hulp);   // de vier wereldlagen; VOOR 3b, want geldbeleid leest de geldwereld
 require('./opzet/kernlaag3b')(kern, hulp);
 require('./opzet/kernlaag4')(kern, hulp);
 require('./opzet/kernlaag4b')(kern, hulp);

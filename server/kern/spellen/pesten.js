@@ -2,7 +2,7 @@
    Verbatim afgesplitst uit kern/spellen.js; de lobby (aldaar) doet matchmaking,
    beurten en views en roept deze motor via de gedeelde context aan. */
 module.exports = (ctx) => {
-  const { save, crypto, schud, beurtDoor, codenaamVan, nudge } = ctx;
+  const { save, crypto, schud, beurtDoor, codenaamVan, nudge, ZONDER_SPELER } = ctx;
 
   const P_KLEUREN = ['H', 'R', 'K', 'S'];
   const P_RANGEN = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'B', 'V', 'K', 'A'];
@@ -79,10 +79,15 @@ module.exports = (ctx) => {
      huisregel hoeft de meerderheidsslag niet: elke slag telt. */
 
   const spel = {
-    sleutel: 'pesten', naam: 'Pesten', max: 4, wereld: 'rtf', kijken: true,
+    sleutel: 'pesten', naam: 'Pesten', max: 4, wereld: 'rtf',
     init: pestenInit, zet: pestenZet,
-    view: (p, st, mij) => ({ hand: st.handen[mij], aantallen: p.spelers.map(sp => st.handen[sp].length), open: st.open[st.open.length - 1],
-      kleurKeuze: st.kleurKeuze, pak: st.pak, richting: st.richting, stapel: st.stapel.length })
+    /* `hand` is `st.handen[mij]` en dat is zonder speler `undefined`: een kijker
+       ziet niemands kaarten, wel hoeveel er liggen en wat er open ligt. */
+    zicht: {
+      speler: (p, st, mij) => ({ hand: st.handen[mij], aantallen: p.spelers.map(sp => st.handen[sp].length), open: st.open[st.open.length - 1],
+        kleurKeuze: st.kleurKeuze, pak: st.pak, richting: st.richting, stapel: st.stapel.length }),
+      kijker: ZONDER_SPELER
+    }
   };
   return { spel, pestenInit, pestenZet };
 };

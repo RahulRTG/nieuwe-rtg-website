@@ -109,3 +109,104 @@ test('een lid opent Sudoku, krijgt een puzzel van de server en lost hem op',
     try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
   }
 });
+
+/* ============================================================================
+   DE DAGOPGAVE IN DEZELFDE BROWSER.
+
+   De serverkant staat los nagemeten in test/speldag.test.js. Wat daarmee nog
+   niet vaststaat is of de PAGINA de tweede ingang ook echt gebruikt: de
+   dagopgave loopt langs `dag-start` en `dag-klaar` en niet langs de gewone
+   sudoku-ingangen, en een tikfout daarin is aan de serverkant onzichtbaar --
+   alle toetsen daar blijven groen terwijl de dagknop in de app niets doet.
+
+   Er wordt ook gekeken naar wat er NIET op het scherm staat: geen reeks. Dat
+   is dezelfde belofte als in de kern, maar een pagina kan hem zelf verzinnen
+   uit wat ze weet, en dan is de maatregel in de kern niets waard.
+   ========================================================================== */
+test('een lid doet de dagopgave, en die loopt langs de dag-ingangen',
+  { skip: pw ? false : 'geen browser beschikbaar in deze omgeving' }, async () => {
+  const TMP2 = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-sudokudag-e2e-'));
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP2 } });
+  let browser;
+  try {
+    const token = await nieuwLid(base);
+    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    const ctx = await browser.newContext({ serviceWorkers: 'block' });
+    const page = await ctx.newPage();
+    const fouten = [];
+    letOpFouten(page, fouten);
+
+    // welke ingangen de pagina werkelijk aanroept; de dagopgave hoort langs
+    // dag-start en dag-klaar te gaan en niet langs sudoku-klaar
+    const geroepen = [];
+    page.on('request', (r) => {
+      const m = /\/api\/member\/spel\/([a-z-]+)$/.exec(r.url());
+      if (m) geroepen.push(m[1]);
+    });
+
+    await page.goto(base + '/apps/spelen.html', { waitUntil: 'domcontentloaded' });
+    await page.evaluate(t => { localStorage.setItem('rtg_cookieinfo_v1', '1'); localStorage.setItem('rtg_member_token', t); }, token);
+    await page.goto(base + '/apps/spelen.html', { waitUntil: 'domcontentloaded' });
+
+    await page.click('[data-spel="sudoku"]');
+    await page.waitForSelector('#suDagKnop', { timeout: 15000 });
+    const aanbod = await page.evaluate(() => document.querySelector('#suDag').textContent);
+    assert.match(aanbod, /klok begint zodra je start/i, 'kijken kost je geen tijd: ' + aanbod);
+    /* En dat is niet alleen wat er STAAT: de pagina hoort de startingang op dit
+       moment nog niet geraakt te hebben. Zonder deze regel bewijst de zin
+       hierboven niets -- een pagina die stiekem al start toont hem gewoon. */
+    assert.equal(geroepen.includes('dag-start'), false,
+      'de klok liep al door alleen te kijken: ' + geroepen.join(','));
+
+    await page.click('#suDagKnop');
+    await page.waitForFunction(() => SU.dag === true && SU.puzzel && SU.klaar === false, null, { timeout: 15000 });
+    assert.equal(await page.evaluate(() => document.querySelectorAll('#suNiveau button').length), 0,
+      'tijdens de dagopgave valt er geen niveau te kiezen -- hij is voor iedereen dezelfde');
+
+    // oplossen zoals een speler dat doet; de laatste tik levert in
+    await page.evaluate(async () => {
+      const g = SU.puzzel.slice();
+      const mag = (i, v) => {
+        const r = Math.floor(i / 9), k = i % 9;
+        for (let j = 0; j < 9; j++) if (g[r * 9 + j] === v || g[j * 9 + k] === v) return false;
+        const br = r - r % 3, bk = k - k % 3;
+        for (let rr = 0; rr < 3; rr++) for (let kk = 0; kk < 3; kk++) if (g[(br + rr) * 9 + bk + kk] === v) return false;
+        return true;
+      };
+      const zoek = () => {
+        const i = g.indexOf(0);
+        if (i === -1) return true;
+        for (let v = 1; v <= 9; v++) if (mag(i, v)) { g[i] = v; if (zoek()) return true; g[i] = 0; }
+        return false;
+      };
+      zoek();
+      for (let i = 0; i < 81; i++) {
+        if (SU.puzzel[i]) continue;
+        document.querySelector('#suGrid button[data-i="' + i + '"]').click();
+        await window.suVul(g[i]);
+      }
+    });
+
+    await page.waitForFunction(() => /dagopgave gedaan/i.test(document.querySelector('#suInfo').textContent), null, { timeout: 15000 });
+    const info = await page.evaluate(() => document.querySelector('#suInfo').textContent);
+    assert.match(info, /plaats 1 van 1/, 'de plaats in het veld komt van de server: ' + info);
+
+    await page.waitForFunction(() => /vandaag gedaan/i.test(document.querySelector('#suDag').textContent), null, { timeout: 15000 });
+    const dagblok = await page.evaluate(() => document.querySelector('#suDag').textContent);
+    assert.match(dagblok, /1 speler loste hem vandaag op/, 'en het veld van vandaag staat erbij: ' + dagblok);
+    assert.equal(/opnieuw|start de dagopgave/i.test(dagblok), false, 'er staat geen tweede poging aangeboden: ' + dagblok);
+    assert.equal(/reeks|op rij|streak|dagen achter/i.test(dagblok), false,
+      'de pagina verzint zelf een reeks: ' + dagblok);
+
+    assert.ok(geroepen.includes('dag-start') && geroepen.includes('dag-klaar'),
+      'de dagopgave loopt langs zijn eigen ingangen: ' + geroepen.join(','));
+    assert.equal(geroepen.filter(a => a === 'sudoku-klaar').length, 0,
+      'de dagopgave is langs de gewone sudoku-ingang gegaan: ' + geroepen.join(','));
+
+    assert.deepEqual(fouten, [], 'paginafouten: ' + fouten.join(' | '));
+  } finally {
+    if (browser) await browser.close();
+    child.kill();
+    try { fs.rmSync(TMP2, { recursive: true, force: true }); } catch (e) {}
+  }
+});

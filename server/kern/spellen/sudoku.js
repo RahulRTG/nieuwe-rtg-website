@@ -104,6 +104,50 @@ module.exports = (ctx) => {
     return Math.max(MIN_PUNTEN, NIVEAUS[niveau].basis - Math.round(seconden));
   }
 
+  /* DE KEURING VAN EEN INGEVULD ROOSTER, op EEN plek. Er zijn twee ingangen die
+     hem nodig hebben -- de losse puzzel (kern/spellen/arcade.js) en de dagopgave
+     (kern/spellen/dag.js) -- en een tweede exemplaar van deze volgorde zou de
+     fout terugbrengen die er hieronder juist uit gehaald is.
+
+     Eerst de GEGEVEN cijfers, helemaal rond, en pas daarna vergelijken. Die
+     volgorde is niet vrijblijvend: wie een gegeven cijfer wegveegt levert een
+     ander rooster in dan de puzzel die hij kreeg, en dat is een andere fout dan
+     "niet goed opgelost". Door elkaar heen lopend zou de eerste afwijkende cel
+     bepalen welke van de twee je te horen krijgt. */
+  function keurRooster(op, puzzel, rooster) {
+    if (!isRooster(rooster)) return { status: 400, error: 'Stuur een volledig rooster van 81 cijfers mee.' };
+    for (let i = 0; i < 81; i++)
+      if (puzzel[i] && rooster[i] !== puzzel[i])
+        return { status: 400, error: 'De gegeven cijfers van de puzzel horen te blijven staan.' };
+    for (let i = 0; i < 81; i++) if (rooster[i] !== op[i]) return { goed: false };
+    return { goed: true };
+  }
+
+  /* ---------- DE DAGOPGAVE ----------
+     Een puzzel per dag, dezelfde voor iedereen. Het spel levert twee haken en
+     verder niets: de server geeft de opgave uit (`dagOpgave`) en keurt de
+     inzending (`dagKeur`). Wie er meedoet, wanneer de klok begint, wat er wel
+     en niet bewaard wordt en hoe het bord eruitziet staat in kern/spellen/dag.js
+     -- dat is boekhouding en geen sudoku.
+
+     Waarom Sudoku de eerste is die dit mag: het register weigert `dagelijks`
+     zonder `serverScore` (zie ./keur.js). Een dagopgave is een bord waarop
+     vreemden elkaar verslaan; een score die de client zelf rekent hoort daar
+     niet in. Bij Sneek en Tetris rekent de browser, dus die kunnen dit pas als
+     hun verloop narekenbaar is.
+
+     Het niveau ligt vast op 'normaal'. Een keuze zou betekenen dat het niet
+     dezelfde opgave is, en dan valt er ook niets te vergelijken. */
+  const DAG_NIVEAU = 'normaal';
+  function dagOpgave() {
+    const { op, puzzel } = maakPuzzel(DAG_NIVEAU);
+    return { geheim: op, opgave: { niveau: DAG_NIVEAU, puzzel } };
+  }
+  function dagKeur({ geheim, opgave, inzending, seconden }) {
+    const k = keurRooster(geheim, opgave.puzzel, inzending);
+    return k.goed ? { goed: true, punten: punten(DAG_NIVEAU, seconden) } : k;
+  }
+
   /* De descriptor. `serverScore: true` is de vlag die het verschil maakt: de
      algemene arcade-ingang (`arcade-score`) WEIGERT een score voor dit spel,
      want die komt hier vandaan en niet uit de client. Zolang die vlag er staat
@@ -119,8 +163,11 @@ module.exports = (ctx) => {
     sleutel: 'sudoku', naam: 'Sudoku', vorm: 'arcade',
     werelden: ['rtg', 'rtf'],
     maxPunten: Math.max(...Object.values(NIVEAUS).map(n => n.basis)),
-    serverScore: true
+    serverScore: true,
+    // de dagopgave; het register weigert deze vlag zonder serverScore hierboven
+    dagelijks: true, dagOpgave, dagKeur
   };
 
-  return { spel, NIVEAUS, MIN_PUNTEN, OUD_MS, maakPuzzel, aantalOplossingen, isRooster, punten };
+  return { spel, NIVEAUS, MIN_PUNTEN, OUD_MS, DAG_NIVEAU, maakPuzzel, aantalOplossingen,
+    isRooster, punten, keurRooster };
 };

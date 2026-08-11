@@ -159,8 +159,20 @@ function kort(soort, r) {
 
 /* De velden waarmee dit object door ANDERE records genoemd kan worden. Zo vindt
    de afhankelijkhedenscan een verwijzing zonder dat iemand per soortenpaar een
-   relatie heeft moeten opschrijven: die lijst zou verouderen, deze niet. */
+   relatie heeft moeten opschrijven: die lijst zou verouderen, deze niet.
+
+   EEN SOORT MAG HIER ZIJN EIGEN ANTWOORD MEEBRENGEN (`verwijst`), net zoals hij
+   dat met `lees` mag voor zijn rijen. Dat is er gekomen voor een geval waarin
+   de standaardlijst niets kan vinden: een mens wordt in de werkruimtelaag
+   genoemd bij NAAM en niet bij id ("eigenaar", "wie", "door" zijn vrije tekst).
+   Wie die override gebruikt, neemt een risico dat hij zelf moet dragen -- een
+   naam is geen sleutel, en twee mensen kunnen dezelfde dragen. De soort die het
+   doet, hoort dat aan de lezer te melden. */
 function verwijzingen(soort, r) {
+  if (typeof soort.verwijst === 'function') {
+    const eigen = soort.verwijst(r);
+    return Array.isArray(eigen) ? eigen.map(s).filter(Boolean) : [];
+  }
   const w = new Set();
   const k = s(r[soort.sleutel]);
   if (k) w.add(k);

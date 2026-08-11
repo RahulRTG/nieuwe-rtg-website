@@ -26,22 +26,22 @@ const stubCtx = { save() {}, crypto: require('crypto'), schud: (a) => a, beurtDo
    overgeschreven uit de spellen zoals ze zijn, niet uit het register
    gegenereerd -- anders toetst hij zichzelf. */
 const GOUD = {
-  mejn:     ['Mens erger je niet', 4, 'rtf', { teams: 'keuze', kijken: true }],
-  schaak:   ['Schaken', 2, 'rtg', { kijken: true }],
-  woord:    ['Woordduel', 2, 'rtg', { perTaal: true, kijken: true }],
-  pesten:   ['Pesten', 4, 'rtf', { kijken: true }],
-  dam:      ['Dammen', 2, 'rtf', { kijken: true }],
-  rummi:    ['Rummi', 4, 'rtf', { kijken: true }],
-  magnaat:  ['Magnaat', 6, 'rtg', { buitenBeurt: ['bouw', 'verkoop'], kijken: true }],
-  seconden: ['30 Seconden', 4, 'rtg', { min: 4, teams: 'altijd' }],
-  waarheid: ['Doen of Waarheid', 6, 'rtf', { kijken: true }],
-  proost:   ['Proost', 6, 'rtg', { volwassen: true, kijken: true }],
-  flits:    ['Flitsduel', 4, 'rtf', { buitenBeurt: ['antwoord'], kijken: true }],
-  reactie:  ['Reactieduel', 4, 'rtf', { buitenBeurt: ['tik'], kijken: true }],
-  quiz:     ['Quizduel', 4, 'rtf', { buitenBeurt: ['antwoord'], kijken: true }],
-  schat:    ['Schatduel', 4, 'rtf', { buitenBeurt: ['schat'], kijken: true }],
-  geheugen: ['Geheugenduel', 4, 'rtf', { buitenBeurt: ['reeks'], kijken: true }],
-  orde:     ['Rangschikduel', 4, 'rtf', { buitenBeurt: ['orde'], kijken: true }]
+  mejn:     ['Mens erger je niet', 4, 'rtf', { teams: 'keuze', vormen: ['live', 'async'] }],
+  schaak:   ['Schaken', 2, 'rtg', { vormen: ['live', 'async'], naspeelbaar: true }],
+  woord:    ['Woordduel', 2, 'rtg', { perTaal: true, vormen: ['live', 'async'] }],
+  pesten:   ['Pesten', 4, 'rtf', { vormen: ['live'] }],
+  dam:      ['Dammen', 2, 'rtf', { vormen: ['live', 'async'], naspeelbaar: true }],
+  rummi:    ['Rummi', 4, 'rtf', { vormen: ['live', 'async'] }],
+  magnaat:  ['Magnaat', 6, 'rtg', { buitenBeurt: ['bouw', 'verkoop'], vormen: ['live', 'async'] }],
+  seconden: ['30 Seconden', 4, 'rtg', { min: 4, teams: 'altijd', vormen: ['live'] }],
+  waarheid: ['Doen of Waarheid', 6, 'rtf', { vormen: ['live'] }],
+  proost:   ['Proost', 6, 'rtg', { volwassen: true, vormen: ['live'] }],
+  flits:    ['Flitsduel', 4, 'rtf', { buitenBeurt: ['antwoord'], vormen: ['live'] }],
+  reactie:  ['Reactieduel', 4, 'rtf', { buitenBeurt: ['tik'], vormen: ['live'] }],
+  quiz:     ['Quizduel', 4, 'rtf', { buitenBeurt: ['antwoord'], vormen: ['live'] }],
+  schat:    ['Schatduel', 4, 'rtf', { buitenBeurt: ['schat'], vormen: ['live'] }],
+  geheugen: ['Geheugenduel', 4, 'rtf', { buitenBeurt: ['reeks'], vormen: ['live'] }],
+  orde:     ['Rangschikduel', 4, 'rtf', { buitenBeurt: ['orde'], vormen: ['live'] }]
 };
 
 /* De arcade is de tweede vorm: geen potje, geen beurten, wel een score. Sneek
@@ -58,16 +58,30 @@ const GOUD = {
 const GOUD_ARCADE = {
   sneek:  ['Sneek', ['rtg', 'rtf'], 999999, {}],
   tetris: ['Tetris', ['rtg', 'rtf'], 999999, {}],
-  sudoku: ['Sudoku', ['rtg', 'rtf'], 500, { serverScore: true }]
+  sudoku: ['Sudoku', ['rtg', 'rtf'], 500, { serverScore: true, dagelijks: true }]
 };
 
 test('precies een spel mag niet bekeken worden, en dat is 30 Seconden', () => {
   /* Meekijken is opt-in per spel. Deze regel staat hier apart omdat hij over
      valsspelen gaat en niet over een lijstje: de weergave van 30 Seconden zou
      de kaart aan een kijker tonen die de rader niet mag zien. Zie
-     test/spelkijken.test.js voor de meting. */
-  const { SPEL } = maakRegister(stubCtx);
-  assert.deepEqual(Object.keys(SPEL).filter(k => !SPEL[k].kijken), ['seconden']);
+     test/spelkijken.test.js voor de meting.
+
+     Let op WAAR dit nu aan hangt. Hiervoor stond hier `!SPEL[k].kijken`, een
+     vlag naast de weergave -- en die bewering klopte bij drie spellen niet.
+     Nu is de weergave zelf het antwoord: geen `zicht.kijker`, niets te tonen. */
+  const { ZICHT } = maakRegister(stubCtx);
+  assert.deepEqual(Object.keys(ZICHT).filter(k => !ZICHT[k].kijker), ['seconden']);
+});
+
+test('een gedeeld scherm is opt-in, en 30 Seconden hoort er wel bij', () => {
+  /* De keerzijde van de regel hierboven, en de reden dat het zicht drie lagen
+     heeft in plaats van twee: juist het spel dat NIET bekeken mag worden hoort
+     wel op een televisie in de kamer te kunnen. */
+  const { ZICHT } = maakRegister(stubCtx);
+  assert.ok(ZICHT.seconden.publiek, '30 Seconden hoort te projecteren');
+  assert.ok(!ZICHT.seconden.kijker, 'en tegelijk niet te bekijken');
+  assert.ok(!ZICHT.magnaat.publiek, 'wat geen projectie beschreven heeft, projecteert niet');
 });
 
 test('het register vindt precies de spellen die er zijn', () => {
@@ -79,11 +93,11 @@ test('het register vindt precies de spellen die er zijn', () => {
 });
 
 test('de twee vormen lopen niet door elkaar', () => {
-  const { SPEL, ARCADE, INITS, ZETTEN, VIEWS } = maakRegister(stubCtx);
+  const { SPEL, ARCADE, INITS, ZETTEN, ZICHT } = maakRegister(stubCtx);
   for (const sleutel of Object.keys(ARCADE)) {
     assert.ok(!SPEL[sleutel], sleutel + ' is arcade en hoort geen potje te kunnen zijn');
     // anders zou /spel/nieuw of /spel/zet met soort=sneek een open vraag zijn
-    for (const tabel of [INITS, ZETTEN, VIEWS]) assert.equal(tabel[sleutel], undefined);
+    for (const tabel of [INITS, ZETTEN, ZICHT]) assert.equal(tabel[sleutel], undefined);
   }
   for (const sleutel of Object.keys(SPEL)) assert.ok(!ARCADE[sleutel], sleutel + ' is een potje en hoort geen arcadescore te hebben');
 });
@@ -102,12 +116,40 @@ test('elk spel houdt zijn naam, spelersaantal, wereld en toegangsregels', () => 
   }
 });
 
-test('elk spel levert een init, een zet en een eigen weergave', () => {
-  const { SPEL, INITS, ZETTEN, VIEWS } = maakRegister(stubCtx);
+test('elk spel levert een init, een zet en een eigen spelerweergave', () => {
+  const { SPEL, INITS, ZETTEN, ZICHT } = maakRegister(stubCtx);
   for (const sleutel of Object.keys(SPEL)) {
-    for (const [wat, tabel] of [['init', INITS], ['zet', ZETTEN], ['view', VIEWS]])
+    for (const [wat, tabel] of [['init', INITS], ['zet', ZETTEN]])
       assert.equal(typeof tabel[sleutel], 'function', sleutel + ' mist een ' + wat);
+    assert.equal(typeof ZICHT[sleutel].speler, 'function', sleutel + ' mist een zicht.speler');
   }
+});
+
+/* ---------- het zicht faalt net zo luid als de rest ---------- */
+
+test('de oude vorm wordt geweigerd in plaats van stil vertaald', () => {
+  /* `view` + `kijken: true` automatisch omzetten naar `zicht` zou de drie
+     fouten die daarin zaten meenemen en er de schijn van een besluit aan geven.
+     Wie migreert hoort per spel de vraag te beantwoorden. */
+  metMap({ 'oud.js': "module.exports = () => ({ spel: { sleutel: 'oud', naam: 'Oud', max: 2, wereld: 'rtg', init(){}, zet(){}, view(){} } });" }, (map) => {
+    assert.throws(() => maakRegister(stubCtx, map), /oud\.js gebruikt nog `view`; dat heet nu `zicht\.speler`/);
+  });
+  metMap({ 'vlag.js': GELDIG('vlag', 'Vlag').replace("wereld: 'rtg'", "wereld: 'rtg', kijken: true") }, (map) => {
+    assert.throws(() => maakRegister(stubCtx, map), /vlag\.js gebruikt nog `kijken`/);
+  });
+});
+
+test('een zicht zonder spelerweergave wordt geweigerd', () => {
+  metBlind('zicht: { kijker(){} }', /geen `zicht\.speler`/);
+});
+
+test('een kijker die geen functie is en niet ZONDER_SPELER wordt geweigerd', () => {
+  // anders is `kijker: true` weer een vlag, en dat is precies wat hier weg moest
+  metBlind('zicht: { speler(){}, kijker: true }', /`zicht\.kijker` die geen functie is en niet ZONDER_SPELER/);
+});
+
+test('een publiek dat geen functie is wordt geweigerd', () => {
+  metBlind('zicht: { speler(){}, publiek: true }', /`zicht\.publiek` die geen functie is/);
 });
 
 test('alleen Magnaat levert statische borddata, en die reist niet standaard mee', () => {
@@ -127,7 +169,18 @@ function metMap(bestanden, doe) {
   } finally { fs.rmSync(map, { recursive: true, force: true }); }
 }
 const GELDIG = (sleutel, naam) => `module.exports = () => ({ spel: { sleutel: '${sleutel}', naam: '${naam}', ` +
-  "max: 2, wereld: 'rtg', init(){}, zet(){}, view(){} } });";
+  "max: 2, wereld: 'rtg', init(){}, zet(){}, zicht: { speler(){} } } });";
+
+/* Een spel met een kapot `zicht`-blok, om te toetsen dat het register er luid
+   op valt. De rest van de descriptor klopt, zodat de melding echt over het
+   zicht gaat en niet over iets anders wat er toevallig ook mist. */
+function metBlind(zichtBlok, patroon) {
+  const bron = "module.exports = () => ({ spel: { sleutel: 'blind', naam: 'Blind', " +
+    `max: 2, wereld: 'rtg', init(){}, zet(){}, ${zichtBlok} } });`;
+  metMap({ 'blind.js': bron }, (map) => {
+    assert.throws(() => maakRegister(stubCtx, map), patroon);
+  });
+}
 
 test('een module zonder descriptor laat de server niet opstarten', () => {
   metMap({ 'echt.js': GELDIG('echt', 'Echt'), 'losse-helper.js': 'module.exports = () => ({ hulp(){} });' }, (map) => {
@@ -137,7 +190,7 @@ test('een module zonder descriptor laat de server niet opstarten', () => {
 
 test('een descriptor die iets verplichts mist noemt het bestand en wat er mist', () => {
   metMap({ 'half.js': "module.exports = () => ({ spel: { sleutel: 'half', naam: 'Half', wereld: 'rtg', init(){}, zet(){} } });" }, (map) => {
-    assert.throws(() => maakRegister(stubCtx, map), /half\.js mist in `spel` \(vorm potje\): max, view/);
+    assert.throws(() => maakRegister(stubCtx, map), /half\.js mist in `spel` \(vorm potje\): max, zicht/);
   });
 });
 
@@ -158,9 +211,13 @@ test('een spel toevoegen is een bestand neerzetten, en verder niets', () => {
   /* Dit is de belofte van het register, dus die staat hier als toets. Viel hij
      weg, dan waren we terug bij negen plekken in zes bestanden. */
   metMap({ 'echt.js': GELDIG('echt', 'Echt'), 'nieuw.js': GELDIG('nieuw', 'Gloednieuw') }, (map) => {
-    const { SPEL, INITS, ZETTEN, VIEWS } = maakRegister(stubCtx, map);
-    assert.deepEqual(SPEL.nieuw, { naam: 'Gloednieuw', max: 2, wereld: 'rtg' });
-    for (const tabel of [INITS, ZETTEN, VIEWS]) assert.equal(typeof tabel.nieuw, 'function');
+    const { SPEL, INITS, ZETTEN, ZICHT } = maakRegister(stubCtx, map);
+    assert.deepEqual(SPEL.nieuw, { naam: 'Gloednieuw', max: 2, wereld: 'rtg', vormen: ['live'] });
+    for (const tabel of [INITS, ZETTEN]) assert.equal(typeof tabel.nieuw, 'function');
+    assert.equal(typeof ZICHT.nieuw.speler, 'function');
+    // en het nieuwe spel is standaard niet te bekijken en niet te projecteren
+    assert.equal(ZICHT.nieuw.kijker, null);
+    assert.equal(ZICHT.nieuw.publiek, null);
   });
 });
 
@@ -233,6 +290,53 @@ test('een vorm die niet bestaat wordt geweigerd', () => {
   });
 });
 
+/* ---------- de dagopgave: de enige harde koppeling in het register ----------
+   `dagelijks: true` betekent EEN opgave voor iedereen op EEN bord, en daar
+   staan mensen op die je niet kent. Dat is een competitie, en een score die de
+   client zelf rekent hoort daar niet in -- bij Sneek en Tetris is een topscore
+   vandaag een regel JavaScript. Zonder deze weigering is die hele maatregel te
+   omzeilen met een regel in een descriptor, en dat zou pas opvallen als er een
+   bord vol onmogelijke tijden staat. */
+
+test('een dagopgave zonder server-berekende score laat de server niet opstarten', () => {
+  metMap({ 'dagvals.js': ARCADE_GELDIG('dagvals', 'Dagvals').replace('maxPunten: 1000',
+    'maxPunten: 1000, dagelijks: true, dagOpgave: () => ({}), dagKeur: () => ({})') }, (map) => {
+    assert.throws(() => maakRegister(stubCtx, map), /dagvals\.js heeft `dagelijks: true` zonder `serverScore: true`/);
+  });
+});
+
+test('een dagopgave zonder de twee haken laat de server niet opstarten', () => {
+  /* `serverScore` alleen zegt dat de score van de server komt; zonder een
+     opgave om uit te geven en een keuring om hem te wegen is er niets om hem
+     mee uit te rekenen, en dan staat er een lege dagknop in de app. */
+  const basis = ARCADE_GELDIG('dagkaal', 'Dagkaal').replace('maxPunten: 1000',
+    'maxPunten: 1000, serverScore: true, dagelijks: true');
+  metMap({ 'dagkaal.js': basis }, (map) => {
+    assert.throws(() => maakRegister(stubCtx, map), /dagkaal\.js heeft `dagelijks: true` maar geen `dagOpgave`/);
+  });
+  metMap({ 'dagkaal.js': basis.replace('dagelijks: true', 'dagelijks: true, dagOpgave: () => ({})') }, (map) => {
+    assert.throws(() => maakRegister(stubCtx, map), /dagkaal\.js heeft `dagelijks: true` maar geen `dagKeur`/);
+  });
+});
+
+test('een dagopgave die wel deugt levert twee haken op, en de tabel blijft data', () => {
+  metMap({ 'dagecht.js': ARCADE_GELDIG('dagecht', 'Dagecht').replace('maxPunten: 1000',
+    'maxPunten: 1000, serverScore: true, dagelijks: true, dagOpgave: () => ({}), dagKeur: () => ({})') }, (map) => {
+    const { ARCADE, DAG } = maakRegister(stubCtx, map);
+    assert.deepEqual(ARCADE.dagecht, { naam: 'Dagecht', werelden: ['rtg'], maxPunten: 1000,
+      serverScore: true, dagelijks: true }, 'de functies horen niet in de ARCADE-tabel');
+    assert.equal(typeof DAG.dagecht.opgave, 'function');
+    assert.equal(typeof DAG.dagecht.keur, 'function');
+  });
+});
+
+test('een arcadespel zonder dagopgave staat niet in de DAG-tabel', () => {
+  const { ARCADE, DAG } = maakRegister(stubCtx);
+  for (const sleutel of Object.keys(ARCADE))
+    assert.equal(!!DAG[sleutel], !!ARCADE[sleutel].dagelijks, sleutel + ': tabel en vlag lopen uiteen');
+  assert.ok(DAG.sudoku, 'Sudoku is de enige die vandaag een dagopgave heeft');
+});
+
 test('een arcadespel dat zijn naam of apps mist noemt precies wat er mist', () => {
   metMap({ 'kaal.js': "module.exports = () => ({ spel: { sleutel: 'kaal', vorm: 'arcade' } });" }, (map) => {
     assert.throws(() => maakRegister(stubCtx, map), /kaal\.js mist in `spel` \(vorm arcade\): naam, werelden, maxPunten/);
@@ -250,4 +354,29 @@ test('een sleutel die twee keer bestaat wordt geweigerd', () => {
     fs.writeFileSync(path.join(map, 'dubbel', 'index.js'), GELDIG('dubbel', 'Dubbel uit de map'));
     assert.throws(() => maakRegister(stubCtx, map), /'dubbel' staat er twee keer in/);
   } finally { fs.rmSync(map, { recursive: true, force: true }); }
+});
+
+test('een helper die het register zelf aanroept krijgt een melding, geen stack overflow', () => {
+  /* Dit is echt gebeurd bij het opsplitsen: spellen/rondom.js kwam in de map te
+     staan zonder in GEEN_SPEL te zitten, en vroeg via naspelen.js het register
+     op. De scan vond het bestand, laadde het, en dat laadde de scan -- een
+     stack overflow ver van de oorzaak, in plaats van de melding die er hoort
+     te staan. */
+  metMap({ 'lus.js': "module.exports = () => { require('" +
+    path.join(__dirname, '..', 'server', 'kern', 'spellen', 'register').replace(/\\/g, '/') +
+    "')({}); return { spel: {} }; };" }, (map) => {
+    assert.throws(() => maakRegister(stubCtx, map), /het register roept zichzelf aan/);
+  });
+});
+
+test('en een terechte fout laat die bewaking niet vastzitten', () => {
+  /* De vlag moet ook opgeruimd worden als de keuring gooit -- anders is de
+     eerste kapotte descriptor genoeg om elke volgende scan te laten denken dat
+     hij zichzelf aanroept. Ook dat is hier misgegaan. */
+  metMap({ 'stuk.js': 'module.exports = () => ({ hulp(){} });' }, (map) => {
+    assert.throws(() => maakRegister(stubCtx, map), /geeft geen `spel`-descriptor/);
+  });
+  // en meteen daarna moet een gezonde scan het gewoon doen
+  const { SPEL } = maakRegister(stubCtx);
+  assert.ok(SPEL.schaak, 'het echte register werkt nog');
 });

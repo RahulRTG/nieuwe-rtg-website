@@ -21,6 +21,283 @@ Alles hieronder is daarvan afgeleid. Wat er niet uit volgt, hoort hier niet.
 
 ---
 
+## 0. De super-app-regel — HERZIEN
+
+> **Acht apps. Niet drieëntachtig.**
+
+Dit is een besluit van de eigenaar, en het vervangt de regel die hier stond.
+Wat er stond, en waarom het veranderde, staat er met opzet onder: een regel die
+stilletjes wordt vervangen is een regel die niemand meer vertrouwt.
+
+### Wat er nu geldt
+
+Een lid opent **acht** apps, en niet meer:
+
+| Wereld | Bevat |
+|---|---|
+| **RTG Reizen** | vluchten, verblijven, reisbureau, vervoer, navigatie, reisboek, hangar |
+| **RTG Media** | muziek, theater, clips, podium, camera, galerij, krant, spelen, sport |
+| **RTG Kantoor** | documenten, agenda, notities, bestanden, gereedschap, browser, werk |
+| **RTG Sociaal** | berichten, De Salon, genootschap, pulse, vonk, meet, vrienden |
+| **RTG Geld** | wallet, bank, balans, wie betaalt wat, métier, mecenaat, nalatenschap |
+| **RTG Veilig** | wie ben ik, passkeys, thuiswacht, codewoord, vitaal, juridisch |
+| **RTG Leven** | het huis, maison, table, cellier, garde-robe, zorg, gezin, cercle |
+| **RTFoundation** | de stichting, met haar eigen zeventien onderdelen |
+
+Wat vandaag 83 losse pagina's zijn, worden **onderdelen binnen** die acht. Geen
+eigen tegel, geen eigen adres in de bibliotheek, geen eigen kopbalk: een sectie
+in de app waar hij hoort.
+
+### Wat "app" hier betekent, en wat níét meegaat
+
+**Een app is wat een lid opent.** De 83 HTML-pagina's worden er acht.
+
+De **domeinkernen op de server** blijven staan — `kern/agenda.js`,
+`kern/bestanden.js`, `kern/office/`, `kern/luchthaven.js` en de rest. Dat is de
+diepte waar dit besluit juist om vraagt, en niemand noemt `kern/agenda.js` een
+app. Ze verhuizen niet en ze smelten niet samen; alleen wie ze aanroept
+verandert.
+
+### Wat er hiervoor stond, en wat het kostte om het te vervangen
+
+> *RTG Super Apps vervangen geen domeinsoftware. Ze orkestreren domeinsoftware.
+> Alleen apps die feitelijk dezelfde kern, dezelfde data én dezelfde workflow
+> dupliceren, mogen samensmelten tot één product.*
+
+Die regel is niet fout gebleken. Hij beschermde tegen samenvoegen op een
+vermoeden, en dat werkte: het onderzoek naar Cercle en Entourage verderop in
+dit document liet zien dat twee apps die identiek KLONKEN totaal verschillende
+data en werkstromen hadden.
+
+Wat hij niet oploste is het probleem waar dit besluit over gaat: **drieëntachtig
+ingangen zijn er drieëntachtig, ook als ze stuk voor stuk verdedigbaar zijn.**
+Een lid dat "waar stond dat ook alweer" moet denken, heeft geen baat bij een
+architectuur die per app uitlegt waarom hij bestaat.
+
+De eigenaar is op de gevolgen gewezen voordat hij koos: samenvoegen tot acht
+codebases raakt werkende software, kost maanden, en de oude regel verbood het.
+Dat is afgewogen en het besluit staat. Wat de oude regel wél blijft doen is
+het werk *sturen*: waar twee onderdelen binnen een wereld dezelfde kern en
+dezelfde workflow blijken te delen, worden het er één; waar ze dat niet doen,
+blijven het twee secties in dezelfde app. Samenvoegen van de SCHIL is besloten;
+samenvoegen van de LOGICA blijft bewijs vragen.
+
+### De volgorde
+
+Niet alles tegelijk. Per wereld: de schil, dan de secties erin, dan de oude
+pagina's als omleiding, en pas als een wereld af is de volgende. Zo is er nooit
+een moment waarop de helft werkt.
+
+| Wereld | Stand |
+|---|---|
+| **RTG Geld** | ✅ samengevoegd: tien pagina's werden tien standen van `apps/geld.html` (veilig-patroon: `apps/geld/schil.js` + een module per stand); de oude paden leiden om. Daarna als EERSTE wereld het volle patroon hieronder (GELD.md) |
+| RTG Veilig | ✅ was al samengevoegd (vier standen) |
+| de overige zes | voordeur staat; het samenvoegen van de secties volgt per wereld |
+
+### Het wereldpatroon: samenvoegen is stap een, niet de bedoeling
+
+Een wereld is pas af als hij zijn onderwerp BEGRIJPT. Acht schillen om
+tachtig pagina's is opruimen; acht werelden die elk hun domein snappen is een
+platform. RTG Geld heeft de vorm sinds 10 augustus 2026 werkend en getoetst,
+en elke volgende wereld krijgt dezelfde vijf lagen:
+
+| Laag | Wat | De regel die hem eerlijk houdt |
+|---|---|---|
+| **graaf** | projectie over de domeinen, plus vooruitblik | leest alleen, bezit niets, telt nooit zelf op wat een domein al optelt |
+| **beleid** | de regels van de mens zelf | het systeem handelt binnen beleid, nooit naar eigen inzicht |
+| **cockpit** | het command center | uitzonderingsgestuurd; rust is een uitkomst, geen leegte |
+| **Rahul** | een gegronde stem | rekent met echte cijfers en noemt bij elk antwoord zijn bronnen |
+| **actielog** | het geheugen | groeit aan, wordt nooit herschreven |
+
+Wat per wereld verschilt is niet de vorm maar het WERKWOORD dat de vierde
+laag mag. RTG Geld voert uit binnen regels en binnen het eigen tegoed
+(GELD.md par. 3: geld verlaat het huis nooit vanzelf). RTFoundation voert
+niets uit en opent alleen (LEVEN.md par. 2.2). Wie een nieuwe wereld bouwt,
+kiest dat werkwoord bewust en schrijft het op voordat hij begint.
+
+De diepte-documenten per wereld: **GELD.md** (financieel besturingssysteem,
+fase 1 af) en **LEVEN.md** (RTFoundation als Life OS, de grenzen van een
+platform dat bij de geboorte begint).
+
+---
+
+## 0b. De oude super-app-regel (nog geldig binnen een wereld)
+
+De toetsvraag bij elke app die "erbij" of "eraf" moet, is daarom niet *"kan dit
+in een super-app?"* maar:
+
+> **Is dit een zelfstandige professionele capability, of is dit slechts een
+> andere ingang naar dezelfde capability?**
+
+Alleen in het tweede geval samenvoegen. In het eerste geval een laag erboven.
+
+### Drie lagen
+
+| Laag | Wat het is | Voorbeelden die er nu staan |
+|---|---|---|
+| **1 — Specialistische apps** | Echte software per genre, met eigen kern, eigen data en eigen diepte | Sound, Theater, Clips, Podium, Agenda, Notities, Bestanden, dispatch, ovroutes, horeca, payroll, school |
+| **2 — Genre-superapps** | De ontdek-, identiteits-, distributie- en samenhanglaag over één wereld | RTG Media, RTG Mobiliteit, het Privékantoor |
+| **3 — RTG-hoofdlaag** | Identiteit, zoeken, AI, betalen, meldingen, vrienden, rechten, bestanden, locatie en workflows dwars over apps heen | het OS zelf (`apps/app.html`), `kern/comm`, RTG Pay, de kluis |
+
+De gebruiker ervaart één wereld; de professional houdt gespecialiseerde
+software. Mobiliteit is één Uber-achtige ervaring waarin iemand zegt "breng mij
+naar Parijs", terwijl daaronder afzonderlijke serieuze systemen blijven bestaan
+voor rijden, fietsen, OV, chauffeurs, verkeersleiding, routebeheer en dispatch.
+Media laat iemand een artiest ontdekken, een nummer luisteren in Sound, een
+concert boeken via Podium en een documentaire kijken in Video — zonder die vier
+producten in één scherm te persen.
+
+### Waarom deze regel er staat
+
+Twee samenvoegingen in dit huis zijn allebei goed afgelopen, om
+tegengestelde redenen — en juist dat verschil is de regel:
+
+- **`comm.html` mócht vier apps vervangen.** Er waren zes berichtenvoorraden en
+  vier voordeuren naar hetzelfde: één gespreksmodel, één poort, één leesstand.
+  Vier verschijningsvormen van dezelfde capability.
+- **`veilig.html` mócht vier apps vervangen.** Thuiswacht, Codewoord, Vitaal en
+  Thuisrust deelden `kern/veiligheid/`, `shared/veiligheid.js`, dezelfde kring en
+  dezelfde grens. Ze verschilden alleen in de vraag die ze stelden.
+- **`media.html` mócht dat juist NIET.** Klankwerk, Theater, Clips en Podium
+  hebben elk een eigen catalogus, eigen makers en een eigen vak. Ze samenpersen
+  zou identiteit en functie vernietigen. De Media OS bezit die vier domeinen
+  daarom niet: elke rij wordt bij het opvragen uit het domein zelf gehaald.
+  Dat staat als ontwerpbesluit ook in `apps/app-main/app-main-24.js`: *naast, en
+  niet in plaats daarvan.*
+
+De verleiding gaat altijd één kant op — alles samenvoegen tot er nog één scherm
+over is. Dat levert geen super-app maar een monsterapp met vijfduizend functies.
+Het doel is een ecosysteem: **de superapps zijn de steden, de gespecialiseerde
+apps de gebouwen.**
+
+### Wat dit betekent voor het aantal apps
+
+Het aantal tegels is geen doel op zich, in geen van beide richtingen. Een tegel
+minder is winst als hij een tweede voordeur naar dezelfde kern was, en verlies
+als hij een eigen vak was. De maat is de toetsvraag hierboven, niet het getal.
+
+### Welke laag-2-superapps er staan, en welke ontbreken
+
+Gemeten en niet aangenomen: per catalogus-app zijn de `/api/`-routes uit de
+pagina en haar eigen scripts gehaald, en daarna gegroepeerd op de kern die ze
+aanroepen. Wat dat opleverde:
+
+| Wereld | Laag 2 | Stand |
+|---|---|---|
+| Media | `apps/media.html` | **staat** — haalt elke rij uit het domein zelf op |
+| Mobiliteit | `apps/ov.html` + `dispatch` + `zakelijk` | **staat** — 25 vervoersmodules op één kern |
+| Privékantoor | `apps/lifestyle.html` op `kern/bureau/` | **staat** — 20 kamers naar 23 apps |
+| Communicatie | `apps/comm.html` | **staat** (was een terechte samensmelting) |
+| Veiligheid | `apps/veilig.html` | **staat** (was een terechte samensmelting) |
+| Werk | `apps/werk.html` | **staat** — voor organisaties |
+| Office | `apps/kantoor.html` op `kern/kantoorwereld.js` | **staat** — agenda, taken, documenten en gedeelde bestanden |
+| Reizen | `apps/reizen.html` op `kern/reiswereld.js` | **staat** — vlucht, verblijf, reis en charter |
+| Social | `apps/sociaal.html` op `kern/socialewereld.js` | **staat** — gesprekken, bijeenkomsten, de kring |
+| Games | — | **met opzet niet gebouwd**, zie hieronder |
+| Mall | — | **ontbreekt** (`apps/mall.html` bestaat en staat niet in de bibliotheek) |
+
+### Games krijgt géén superapp, en dat is de regel die werkt
+
+Bij het bouwen van de drie werelden hierboven kwam Games ook aan de beurt, en
+daar bleef de teller op **één** staan: `apps/spelen.html`, op `kern/spellen/`.
+Eén specialist.
+
+Een genre-superapp bestaat om meerdere specialisten te verbinden. Boven één
+app is er niets te verbinden: dan bouw je een scherm dat een lijst met één
+regel toont en doorlinkt naar de app die de gebruiker toch al open had. Dat is
+geen laag maar een omweg — en precies het soort scherm waar de super-app-regel
+tegen beschermt, alleen dan van de andere kant.
+
+Dus: geen `apps/games.html` tot er een tweede zelfstandige spel-capability
+staat. Komt die er (een eigen arcade-kern naast de bordspellen bijvoorbeeld),
+dan is dit het moment om de vraag opnieuw te stellen. Opgeschreven als besluit
+en niet als achterstand, zodat niemand het later voor vergeten aanziet.
+
+### Cercle en Entourage: onderzocht, en NIET samenvoegen
+
+Deze twee stonden hier als verdacht. Cercle heette in de catalogus "je besloten
+kring: de mensen die dichtbij staan" en Entourage "je vaste mensen en hun rol om
+je heen" — twee beschrijvingen van hetzelfde, dus precies het geval waarin
+samenvoegen wél mag.
+
+In de kernen kijken gaf het omgekeerde antwoord.
+
+| | Cercle | Entourage |
+|---|---|---|
+| Data | **clubs**: stad, lidnummer, sinds, dresscode, reciprociteit, gastpassen | **mensen**: band, voorkeuren, dieet, documenten met vervaldatum |
+| Kernvraag | "waar kan ik in Milaan terecht, en op welk lidmaatschap?" | "wat ontbreekt er aan dit gezelschap voordat we vertrekken?" |
+| Werkstroom | reciprociteit opzoeken, een gastpas afboeken | een gezelschap samenstellen, verlopende documenten signaleren |
+| Module | `kern/rechterhand/cercle.js` | `kern/rechterhand/entourage.js` |
+
+Geen gedeelde data, geen gedeelde workflow. Wat ze wél delen is een
+routevoorvoegsel (`/api/member/rechterhand/`) en een opslaghelper — en dat is
+letterlijk de val waar dit document al voor waarschuwt: **een gedeeld
+routevoorvoegsel is geen gedeelde kern.**
+
+**Wat er dus fout was, was de beschrijving en niet de architectuur.** Vier
+teksten klopten niet met de code: Cercle heette "de mensen die dichtbij staan"
+terwijl het clubs bijhoudt, en de app-gids beloofde bij Entourage zelfs "betaal
+en verantwoord netjes via de app" — een functie die niet bestaat. Die vier zijn
+herschreven naar wat de modules werkelijk doen.
+
+De les is de moeite van het opschrijven waard: ik had deze twee bijna
+samengevoegd op grond van hun *omschrijving*. De toetsvraag stellen is niet
+genoeg — je moet hem aan de **code** stellen.
+
+### En het bleek geen incident
+
+Als twee beschrijvingen zó mis konden zijn, hoeveel dan nog? De twaalf apps met
+het `rechterhand`-voorvoegsel zijn samen gebouwd, dus daar was dezelfde drift
+het waarschijnlijkst. Van de tien die daarnaast nog gecontroleerd zijn, klopten
+er **zeven** niet:
+
+| App | Stond er | Doet het |
+|---|---|---|
+| Logboek | "je acties en bevestigingen, netjes vastgelegd" | onderhoudsboek van jacht/jet/oldtimer, met keuringen en vervaldata |
+| Maison | "je vaste verblijven en tweede huizen" | huishoudelijk personeel, taken en een huislogboek |
+| Table | "je tafelreserveringen" | de diners die u ZELF geeft: gastenlijst, tafelindeling, menu |
+| Reisboek | "worden vanzelf een mooi verslag" | een draaiboek dat u zelf invult; niets gaat vanzelf |
+| Garde-robe | "je kledingkast en looks" | kleding en vaklui; "looks" bestaat niet |
+| Cellier | "proefnotities" | één notitieveld per fles |
+| Mecenaat | "steun projecten en goede doelen" | een administratie van toezeggingen; er wordt niets betaald |
+
+De **app-gids** was erger dan de catalogus, en die is wat Rahul een lid
+vertelt. Daar stond onder meer "open deuren op afstand waar dat kan" (Maison),
+"laat de sommelier alvast kiezen" (Table), "laat een maat naar de paskamer
+brengen" (Garde-robe), "wij verzorgen inpakken en bezorgen" (Attenties) en
+"exporteer voor uw administratie" (Logboek). Geen van die dingen bestaat als
+route; nagerekend per pagina.
+
+Dat is dezelfde soort belofte die `CLAUDE.md` verbiedt bij boekingen en
+toegang, alleen dan over functies. Alle zeventien teksten zijn herschreven naar
+wat de modules werkelijk doen, mét de eerlijkheidsregels die al in de code
+stonden maar niet in de gids — dat RTG geen clubgids bijhoudt, dat Cellier
+niets adviseert bij te kopen, dat Hangar geen live tracking doet.
+
+Wat hier NIET aan gedaan is: een toets die dit machinaal vangt. Een
+beschrijving vergelijken met wat een module doet, is een oordeel en geen
+meting; wie daar een regel van maakt, krijgt vals alarm of vals vertrouwen.
+Voor deze twaalf is het met de hand nagelopen en dat staat hier opgeschreven,
+zodat de volgende die iets toevoegt weet dat de tekst óók bij de code hoort.
+
+Twee waarschuwingen bij die meting, zodat niemand haar sterker leest dan ze is.
+Ze kijkt naar **links en routes**, dus een laag die zijn domeinen via de server
+ophaalt in plaats van via een link (precies wat de Media OS doet, en goed doet)
+lijkt minder te dekken dan hij dekt. En een app zonder eigen route is niet
+vanzelf leeg: hij kan op de gedeelde laag draaien.
+
+Wat de meting wél hard maakte: `/api/member/rechterhand` wordt door **twaalf**
+catalogus-apps aangeroepen — Cercle, Entourage, Attenties, Reisboek, Hangar,
+Maison, Table, Cellier, Garde-robe, Logboek, Mecenaat en Nalatenschap. Dat ziet
+eruit als twaalf ingangen naar één kern, en dus als een samensmelting. Het is
+het niet: elk van de twaalf heeft een eigen module in `kern/rechterhand/` met
+eigen data en een eigen workflow (een wijnkelder met drinkvenster is geen
+nalatenschap met versleutelde velden). Ze delen een routenaam en een dossier,
+niet een capability. **Een gedeeld routevoorvoegsel is geen gedeelde kern** — en
+dat is precies de fout die de toetsvraag hierboven moet voorkomen.
+
+---
+
 ## 1. Wat er vandaag al staat
 
 Dit is geen groen veld, en dat is het belangrijkste feit in dit document. De

@@ -160,9 +160,16 @@ const DEEL1 = [
     } }
 ];
 
-/* De volledige lijst: de drie helften met wat het LID invulde, plus
-   ./bronnen-platform.js met wat het PLATFORM al van hem weet (boekingen, agenda).
-   Die laatste staat achteraan omdat hij als enige buiten het lifestyle-dossier
-   kijkt en daarvoor de sleutel nodig heeft; zie het contract in ./graaf.js. */
+/* De volledige lijst: de drie helften met wat het LID invulde, plus de twee
+   bestanden die BUITEN het lifestyle-dossier kijken en daarvoor de sleutel
+   nodig hebben (zie het contract in ./graaf.js). Die twee staan achteraan, en
+   in deze volgorde:
+
+     bronnen-platform  wat het PLATFORM al van dit lid weet: boekingen, agenda.
+     bronnen-leven     wat er in zijn LEVEN speelt: talenten, interesses,
+                       bijdrage (LEVEN.md par. 1.2). Als laatste, omdat dit de
+                       enige bronnen zijn die over de mens zelf gaan in plaats
+                       van over zijn spullen -- wie de lijst leest, komt ze
+                       tegen op de plek waar de uitleg over hun poort begint. */
 module.exports = { ALLE: require('./bronnen-basis').concat(DEEL1, require('./bronnen2'),
-  require('./bronnen3'), require('./bronnen-platform')) };
+  require('./bronnen3'), require('./bronnen-platform'), require('./bronnen-leven')) };

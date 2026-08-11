@@ -50,7 +50,7 @@ const FILTERS = [
   { id: 'fp', naam: 'Priority (Lifestyle en Business)' }
 ];
 
-function maakLuchthaven({ db, save, crypto, anthropic }) {
+function maakLuchthaven({ db, save, crypto, anthropic, visumtaakVan }) {
   const nu = () => new Date().toISOString();
   const id = p => (p || 'x') + crypto.randomBytes(4).toString('hex');
   const schoon = (v, n) => String(v == null ? '' : v).replace(/[<>]/g, '').trim().slice(0, n || 120);
@@ -141,7 +141,7 @@ function maakLuchthaven({ db, save, crypto, anthropic }) {
   }
 
   // de gedeelde ctx voor de deelbestanden
-  const ctx = { db, save, crypto, anthropic, nu, id, schoon, vandaag,
+  const ctx = { db, save, crypto, anthropic, nu, id, schoon, vandaag, visumtaakVan,
     L, seed, vluchten, vind, actief, keten, catVan, plekkenVoor, draaiTakenVoor, draaiRond,
     vipVan, vipRond, publiek, _vluchtMaak, passCheck,
     GATES, STANDS, HELIPADS, BANEN, BANDEN, CATEGORIEEN, LOUNGES,

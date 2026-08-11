@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mijn leven · RTFoundation</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<link href="/shared/rtg-wereld.css" rel="stylesheet">
+</head>
+<body class="rtg-stijl" data-rtg-modus="world">
+<a class="skip" href="#inhoud">Naar de inhoud</a>
+
+<!-- HET LEVENS-COMMAND-CENTER (LEVEN.md par. 1.5). Drie vragen, en verder
+     rust: hoe sta ik ervoor, wat komt eraan, moet ik iets doen.
+
+     WAAROM DIT SCHERM AAN DE LEDENKANT STAAT EN NIET IN /apps/foundation/.
+     Het foundation-huis draait op een gezinscode met een profieltoken; de
+     levenslijn staat op de RTG-lidsleutel, want zijn bronnen (paspoort,
+     onderwijs, werk, entourage) hangen daaraan. Die twee sessiewerelden aan
+     elkaar knopen is echt werk en het hoort bij LEVEN.md par. 2.8, rechten
+     per relatie -- fase 2. Tot die tijd is dit het beeld van het LID over
+     zijn eigen leven, en dat is eerlijker dan een half gekoppeld scherm.
+
+     WAT HIER NOOIT BIJ MAG (par. 2.4 en 2.9): geen getal dat een mens met
+     een ander vergelijkt, geen voortgangsbalk over een leven, geen reeks,
+     geen dagelijks doel, geen badge, geen aansporing om terug te komen. -->
+
+<main id="inhoud">
+  <header class="merkkop">
+    <h1 class="rtg-ceremonie">Mijn leven</h1>
+  </header>
+  <p class="lv-intro">Uw levenslijn en wat er speelt, uit alle bronnen tegelijk. RTFoundation kijkt mee en opent deuren; beslissen doet u zelf.</p>
+
+  <section aria-label="Het beeld">
+    <div id="lvVak"><p class="stil">Laden...</p></div>
+  </section>
+
+  <section aria-label="Vraag de mentor" class="kaart lv-mentorvak">
+    <h2>Vraag de mentor</h2>
+    <div id="lvMentorUit" class="stil" hidden aria-live="polite"></div>
+    <form id="lvMentorForm">
+      <div class="lv-vraagrij">
+        <input id="lvMentorIn" placeholder="Hoe sta ik ervoor?" aria-label="Vraag aan de mentor" autocomplete="off">
+        <button class="knop hoofd" type="submit">Vraag</button>
+      </div>
+    </form>
+  </section>
+</main>
+
+<script src="/apps/leven/leven.js"></script>
+<script src="/shared/seizoen.js" defer></script>
+<!-- de metgezel-laag (Rahul, wauw, palet) hoort op elke app-pagina; keuring 10 -->
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/wauw.js" defer></script>
+<script src="/shared/palet.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/ios.js" defer></script>
+</body>
+</html>

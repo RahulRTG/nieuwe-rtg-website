@@ -18,10 +18,11 @@ app.post('/api/member/find', auth, async (req, res) => {
   res.json({ results: kern.naamlaag ? kern.naamlaag.verrijk(req.session.key, results, 'codename') : results });
 });
 
-// verzoek sturen (mag ook naar een RTF-codenaam)
-app.post('/api/member/connect', auth, (req, res) => {
+// verzoek sturen (mag ook naar een RTF-codenaam); wachtende bestaanscheck,
+// dus de route wacht mee (zie codeBestaat in kern/sociaal.js)
+app.post('/api/member/connect', auth, async (req, res) => {
   if (geenGast(req, res)) return;
-  const r = socialVerbind(req.session.key, String(req.body.key || ''));
+  const r = await socialVerbind(req.session.key, String(req.body.key || ''));
   if (r.error) return res.status(r.status).json({ error: r.error });
   res.json({ ok: true, status: r.st });
 });

@@ -38,10 +38,13 @@
     ' gl_Position=vec4(b.x*persp, b.y*persp, 0.0, 1.0);' +
     ' gl_PointSize=maat*persp*4.2*uDpr;' +
     ' float mx=aPos.x*110.0+110.0;' +                                    // terug naar mond-x voor de golf
-    ' float dg=mx-uGolf; float golf=exp(-(dg*dg)/420.0);' +              // geen pow() met mogelijk negatieve basis (undefined in GLSL)
+    /* De glansveeg, getemd: /420 + 0,9 alpha + 85% naar wit gaf een uitgeblazen
+       witte veeg over de halve mond. Glans die je OPMERKT is plastic
+       (MATERIAAL.md). mond-02.js draagt dezelfde getallen. */
+    ' float dg=mx-uGolf; float golf=exp(-(dg*dg)/150.0);' +              // geen pow() met mogelijk negatieve basis (undefined in GLSL)
     ' float twinkel=0.45+0.4*sin(fase+uTijd/700.0);' +
-    ' vAlpha=min(1.0, twinkel*aRand + golf*0.9);' +
-    ' vKleur=mix(aKleur, vec3(0.96,0.90,0.72), clamp(golf*1.3,0.0,0.85));' +
+    ' vAlpha=min(1.0, twinkel*aRand + golf*0.30);' +
+    ' vKleur=mix(aKleur, vec3(0.96,0.90,0.72), clamp(golf*0.45,0.0,0.26));' +
     '}';
   var FRAG =
     'precision mediump float; varying vec3 vKleur; varying float vAlpha;' +

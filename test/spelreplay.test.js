@@ -83,7 +83,7 @@ test('het platform schrijft, dus elk spel krijgt het vanzelf', () => {
   // niet zestien motoren die er elk aan moeten denken
   const o = opstelling();
   o.potje('d1', 'dam', ['a', 'b']);
-  const mag = REG.VIEWS.dam(o.db.data.spellen.potjes.d1, o.db.data.spellen.potjes.d1.staat, 'a').zetten;
+  const mag = REG.ZICHT.dam.speler(o.db.data.spellen.potjes.d1, o.db.data.spellen.potjes.d1.staat, 'a').zetten;
   o.kern.spelZet('a', 'd1', { van: mag[0].van, naar: mag[0].naar });
   assert.equal(o.kern.spelReplay('a', 'd1').zetten.length, 1, 'ook dammen legt vanzelf vast');
 });

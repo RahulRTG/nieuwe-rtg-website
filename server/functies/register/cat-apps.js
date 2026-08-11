@@ -7,7 +7,8 @@ const { LEDEN, LEDEN_RTF, LEDEN_GAST } = require('./doelgroepen');
 
 module.exports = [
   { id: 'spellen', categorie: 'Eigen apps', naam: 'Spelen (spellen met vrienden)', standaard: true, doelgroepen: LEDEN_RTF,
-    uitleg: 'Alle spellen: schaken, dammen, rummi, Magnaat, sudoku en de partyspellen.', paden: ['/api/member/spel', '/api/rtf/spel'] },
+    // /api/projectie is het tv-scherm van een potje: knop dicht = scherm mee dicht
+    uitleg: 'Alle spellen: schaken, dammen, rummi, Magnaat, sudoku en de partyspellen.', paden: ['/api/member/spel', '/api/rtf/spel', '/api/projectie'] },
   { id: 'podium', categorie: 'Eigen apps', naam: 'RTG Podium (live, in zones)', standaard: true, doelgroepen: LEDEN,
     uitleg: 'Live uitzenden op één motor, in gescheiden werelden: Live (open voor leden), Creator (abonnement en cadeaus), ' +
       'Events (op een kaartje), Besloten (op uitnodiging) en 18+ (geverifieerd paspoort, eigen lijst en eigen wachtrij bij het kantoor). ' +
@@ -30,6 +31,24 @@ module.exports = [
     alleenGenres: ['taxi', 'jet', 'helikopter', 'ov', 'verhuur', 'charter'] },
   { id: 'wbw', categorie: 'Eigen apps', naam: 'Wie betaalt wat', standaard: true, doelgroepen: LEDEN,
     uitleg: 'Groepsuitgaven met een live balans en verrekenen via RTG Pay.', paden: ['/api/wbw'] },
+  /* De drie werelden die dit jaar hun eigen laag kregen. Ze staan hier als
+     EEN schakelaar per wereld en niet per stand: de standen delen een kern en
+     een scherm, dus half uitzetten laat een app achter die niet weet wat hij
+     nog kan. Wat eronder ligt (pay, wbw, mecenaat, de levensgraaf) heeft zijn
+     eigen schakelaars en blijft die houden -- dit zet de WERELD uit, niet de
+     domeinen. */
+  { id: 'geldwereld', categorie: 'Eigen apps', naam: 'RTG Geld (financieel besturingssysteem)', standaard: true, doelgroepen: LEDEN,
+    uitleg: 'Het command center over alle gelddomeinen: hoe u ervoor staat, wat eraan komt, uw eigen beleidsregels met reserveringspotten, ' +
+      'het actielog en de gegronde Rahul. Uit = het overzicht en de regels verdwijnen; betalen en verrekenen blijven werken via hun eigen schakelaars.',
+    paden: ['/api/geld'] },
+  { id: 'levenos', categorie: 'Eigen apps', naam: 'RTFoundation (levenslijn en mentor)', standaard: true, doelgroepen: LEDEN,
+    uitleg: 'De levenslijn met wat er speelt en wat eraan komt, en de mentor die opent en nooit stuurt. Deze laag leest alleen; ' +
+      'uitzetten verwijdert geen enkel gegeven, het haalt alleen het beeld en de mentor weg.',
+    paden: ['/api/leven'] },
+  { id: 'socialewereld', categorie: 'Eigen apps', naam: 'RTG Sociaal (de kring op een plek)', standaard: true, doelgroepen: LEDEN,
+    uitleg: 'De samenhanglaag over De Salon, berichten, pulse en de ontmoetingen: wat er tussen u en uw kring speelt. ' +
+      'De onderliggende apps hebben hun eigen schakelaars.',
+    paden: ['/api/sociaal'] },
   // Let op: NIET 'office' als id; die naam is al van de RTG-Backoffice hieronder.
   { id: 'kantoorpakket', categorie: 'Eigen apps', naam: 'RTG Office (kantoorpakket)', standaard: true, doelgroepen: LEDEN,
     uitleg: 'Het eigen kantoorpakket: tekstdocumenten en rekenbladen op uw account, alleen-lezen te delen op codenaam.', paden: ['/api/kantoorpakket'] },

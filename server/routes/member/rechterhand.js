@@ -23,98 +23,101 @@ module.exports = (kern) => {
     return false;
   }
   const stuur = (res, r) => r && r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
-  function route(pad, werk) {
-    app.post('/api/member/rechterhand/' + pad, auth, (req, res) => {
-      if (!eis(req, res)) return;
-      try { stuur(res, werk(req.session.key, req.body || {})); }
-      catch (e) { res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
-    });
-  }
+  /* De paden staan voluit en niet als '/api/member/rechterhand/' + pad. Een opgebouwd pad
+     ziet scripts/schakelbaar.js niet, en wat die census niet ziet is vanuit de
+     boardroom niet uit te zetten en niet per stad te sluiten (scripts/check.js
+     regel 45). De pas-eis en het vangnet blijven op EEN plek; alleen de
+     registratie is uitgeschreven. */
+  const doe = (werk) => (req, res) => {
+    if (!eis(req, res)) return;
+    try { stuur(res, werk(req.session.key, req.body || {})); }
+    catch (e) { res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
+  };
 
   // Reisboek
-  route('reisboek', (k) => reizen(k));
-  route('reis/zet', (k, b) => reisZet(k, b));
-  route('reis/weg', (k, b) => reisWeg(k, String(b.id || '')));
-  route('reis/item', (k, b) => reisItem(k, b));
-  route('reis/item/weg', (k, b) => reisItemWeg(k, b));
+  app.post('/api/member/rechterhand/reisboek', auth, doe((k) => reizen(k)));
+  app.post('/api/member/rechterhand/reis/zet', auth, doe((k, b) => reisZet(k, b)));
+  app.post('/api/member/rechterhand/reis/weg', auth, doe((k, b) => reisWeg(k, String(b.id || ''))));
+  app.post('/api/member/rechterhand/reis/item', auth, doe((k, b) => reisItem(k, b)));
+  app.post('/api/member/rechterhand/reis/item/weg', auth, doe((k, b) => reisItemWeg(k, b)));
   // Cellier
-  route('cellier', (k) => cellier(k));
-  route('cellier/zet', (k, b) => celZet(k, b));
-  route('cellier/weg', (k, b) => celWeg(k, String(b.id || '')));
-  route('cellier/schenk', (k, b) => celSchenk(k, String(b.id || '')));
+  app.post('/api/member/rechterhand/cellier', auth, doe((k) => cellier(k)));
+  app.post('/api/member/rechterhand/cellier/zet', auth, doe((k, b) => celZet(k, b)));
+  app.post('/api/member/rechterhand/cellier/weg', auth, doe((k, b) => celWeg(k, String(b.id || ''))));
+  app.post('/api/member/rechterhand/cellier/schenk', auth, doe((k, b) => celSchenk(k, String(b.id || ''))));
   // Table
-  route('table', (k) => tables(k));
-  route('table/zet', (k, b) => tableZet(k, b));
-  route('table/weg', (k, b) => tableWeg(k, String(b.id || '')));
-  route('table/gast', (k, b) => tableGast(k, b));
-  route('table/gast/zet', (k, b) => tableGastZet(k, b));
-  route('table/gast/weg', (k, b) => tableGastWeg(k, b));
-  route('table/menu', (k, b) => tableMenu(k, b));
-  route('table/menu/weg', (k, b) => tableMenuWeg(k, b));
+  app.post('/api/member/rechterhand/table', auth, doe((k) => tables(k)));
+  app.post('/api/member/rechterhand/table/zet', auth, doe((k, b) => tableZet(k, b)));
+  app.post('/api/member/rechterhand/table/weg', auth, doe((k, b) => tableWeg(k, String(b.id || ''))));
+  app.post('/api/member/rechterhand/table/gast', auth, doe((k, b) => tableGast(k, b)));
+  app.post('/api/member/rechterhand/table/gast/zet', auth, doe((k, b) => tableGastZet(k, b)));
+  app.post('/api/member/rechterhand/table/gast/weg', auth, doe((k, b) => tableGastWeg(k, b)));
+  app.post('/api/member/rechterhand/table/menu', auth, doe((k, b) => tableMenu(k, b)));
+  app.post('/api/member/rechterhand/table/menu/weg', auth, doe((k, b) => tableMenuWeg(k, b)));
   // Maison
-  route('maison', (k) => maison(k));
-  route('maison/staf', (k, b) => maisonStaf(k, b));
-  route('maison/staf/weg', (k, b) => maisonStafWeg(k, String(b.id || '')));
-  route('maison/taak', (k, b) => maisonTaak(k, b));
-  route('maison/taak/klaar', (k, b) => maisonTaakKlaar(k, b));
-  route('maison/taak/weg', (k, b) => maisonTaakWeg(k, String(b.id || '')));
-  route('maison/log', (k, b) => maisonLog(k, b));
-  route('maison/log/weg', (k, b) => maisonLogWeg(k, String(b.id || '')));
+  app.post('/api/member/rechterhand/maison', auth, doe((k) => maison(k)));
+  app.post('/api/member/rechterhand/maison/staf', auth, doe((k, b) => maisonStaf(k, b)));
+  app.post('/api/member/rechterhand/maison/staf/weg', auth, doe((k, b) => maisonStafWeg(k, String(b.id || ''))));
+  app.post('/api/member/rechterhand/maison/taak', auth, doe((k, b) => maisonTaak(k, b)));
+  app.post('/api/member/rechterhand/maison/taak/klaar', auth, doe((k, b) => maisonTaakKlaar(k, b)));
+  app.post('/api/member/rechterhand/maison/taak/weg', auth, doe((k, b) => maisonTaakWeg(k, String(b.id || ''))));
+  app.post('/api/member/rechterhand/maison/log', auth, doe((k, b) => maisonLog(k, b)));
+  app.post('/api/member/rechterhand/maison/log/weg', auth, doe((k, b) => maisonLogWeg(k, String(b.id || ''))));
   // Garde-robe
-  route('garderobe', (k) => garderobe(k));
-  route('garderobe/stuk', (k, b) => gwStuk(k, b));
-  route('garderobe/stuk/weg', (k, b) => gwStukWeg(k, String(b.id || '')));
-  route('garderobe/vakman', (k, b) => gwVakman(k, b));
-  route('garderobe/vakman/weg', (k, b) => gwVakmanWeg(k, String(b.id || '')));
+  app.post('/api/member/rechterhand/garderobe', auth, doe((k) => garderobe(k)));
+  app.post('/api/member/rechterhand/garderobe/stuk', auth, doe((k, b) => gwStuk(k, b)));
+  app.post('/api/member/rechterhand/garderobe/stuk/weg', auth, doe((k, b) => gwStukWeg(k, String(b.id || ''))));
+  app.post('/api/member/rechterhand/garderobe/vakman', auth, doe((k, b) => gwVakman(k, b)));
+  app.post('/api/member/rechterhand/garderobe/vakman/weg', auth, doe((k, b) => gwVakmanWeg(k, String(b.id || ''))));
   // Mecenaat
-  route('mecenaat', (k) => mecenaat(k));
-  route('mecenaat/gift', (k, b) => mecGift(k, b));
-  route('mecenaat/gift/weg', (k, b) => mecGiftWeg(k, String(b.id || '')));
-  route('mecenaat/betaald', (k, b) => mecBetaald(k, String(b.id || ''), b.betaald === true));
+  app.post('/api/member/rechterhand/mecenaat', auth, doe((k) => mecenaat(k)));
+  app.post('/api/member/rechterhand/mecenaat/gift', auth, doe((k, b) => mecGift(k, b)));
+  app.post('/api/member/rechterhand/mecenaat/gift/weg', auth, doe((k, b) => mecGiftWeg(k, String(b.id || ''))));
+  app.post('/api/member/rechterhand/mecenaat/betaald', auth, doe((k, b) => mecBetaald(k, String(b.id || ''), b.betaald === true)));
   // Nalatenschap
-  route('nalatenschap', (k) => nalatenschap(k));
-  route('nalatenschap/doc', (k, b) => nlDoc(k, b));
-  route('nalatenschap/doc/weg', (k, b) => nlDocWeg(k, String(b.id || '')));
-  route('nalatenschap/contact', (k, b) => nlContact(k, b));
-  route('nalatenschap/contact/weg', (k, b) => nlContactWeg(k, String(b.id || '')));
-  route('nalatenschap/wens', (k, b) => nlWens(k, b));
-  route('nalatenschap/wens/weg', (k, b) => nlWensWeg(k, String(b.id || '')));
+  app.post('/api/member/rechterhand/nalatenschap', auth, doe((k) => nalatenschap(k)));
+  app.post('/api/member/rechterhand/nalatenschap/doc', auth, doe((k, b) => nlDoc(k, b)));
+  app.post('/api/member/rechterhand/nalatenschap/doc/weg', auth, doe((k, b) => nlDocWeg(k, String(b.id || ''))));
+  app.post('/api/member/rechterhand/nalatenschap/contact', auth, doe((k, b) => nlContact(k, b)));
+  app.post('/api/member/rechterhand/nalatenschap/contact/weg', auth, doe((k, b) => nlContactWeg(k, String(b.id || ''))));
+  app.post('/api/member/rechterhand/nalatenschap/wens', auth, doe((k, b) => nlWens(k, b)));
+  app.post('/api/member/rechterhand/nalatenschap/wens/weg', auth, doe((k, b) => nlWensWeg(k, String(b.id || ''))));
   // Logboek
-  route('logboek', (k) => logboek(k));
-  route('logboek/object', (k, b) => lbObject(k, b));
-  route('logboek/object/weg', (k, b) => lbObjectWeg(k, String(b.id || '')));
-  route('logboek/regel', (k, b) => lbRegel(k, b));
-  route('logboek/regel/weg', (k, b) => lbRegelWeg(k, String(b.id || '')));
+  app.post('/api/member/rechterhand/logboek', auth, doe((k) => logboek(k)));
+  app.post('/api/member/rechterhand/logboek/object', auth, doe((k, b) => lbObject(k, b)));
+  app.post('/api/member/rechterhand/logboek/object/weg', auth, doe((k, b) => lbObjectWeg(k, String(b.id || ''))));
+  app.post('/api/member/rechterhand/logboek/regel', auth, doe((k, b) => lbRegel(k, b)));
+  app.post('/api/member/rechterhand/logboek/regel/weg', auth, doe((k, b) => lbRegelWeg(k, String(b.id || ''))));
   // Cercle
-  route('cercle', (k) => cercle(k));
-  route('cercle/club', (k, b) => crClub(k, b));
-  route('cercle/club/weg', (k, b) => crClubWeg(k, String(b.id || '')));
+  app.post('/api/member/rechterhand/cercle', auth, doe((k) => cercle(k)));
+  app.post('/api/member/rechterhand/cercle/club', auth, doe((k, b) => crClub(k, b)));
+  app.post('/api/member/rechterhand/cercle/club/weg', auth, doe((k, b) => crClubWeg(k, String(b.id || ''))));
   /* Gastpassen met een boekhouding en de reciprociteitsvraag "waar kan ik in
      deze stad terecht" -- elders werk voor een conciergedienst. */
-  route('cercle/gast', (k, b) => crGast(k, b));
-  route('cercle/gast/terug', (k, b) => crGastTerug(k, b));
-  route('cercle/waarheen', (k, b) => crWaarheen(k, b));
+  app.post('/api/member/rechterhand/cercle/gast', auth, doe((k, b) => crGast(k, b)));
+  app.post('/api/member/rechterhand/cercle/gast/terug', auth, doe((k, b) => crGastTerug(k, b)));
+  app.post('/api/member/rechterhand/cercle/waarheen', auth, doe((k, b) => crWaarheen(k, b)));
   // Hangar
-  route('hangar', (k) => hangar(k));
-  route('hangar/toestel', (k, b) => hgToestel(k, b));
-  route('hangar/toestel/weg', (k, b) => hgToestelWeg(k, String(b.id || '')));
-  route('hangar/vlucht', (k, b) => hgVlucht(k, b));
-  route('hangar/vlucht/weg', (k, b) => hgVluchtWeg(k, String(b.id || '')));
+  app.post('/api/member/rechterhand/hangar', auth, doe((k) => hangar(k)));
+  app.post('/api/member/rechterhand/hangar/toestel', auth, doe((k, b) => hgToestel(k, b)));
+  app.post('/api/member/rechterhand/hangar/toestel/weg', auth, doe((k, b) => hgToestelWeg(k, String(b.id || ''))));
+  app.post('/api/member/rechterhand/hangar/vlucht', auth, doe((k, b) => hgVlucht(k, b)));
+  app.post('/api/member/rechterhand/hangar/vlucht/weg', auth, doe((k, b) => hgVluchtWeg(k, String(b.id || ''))));
   // Entourage
-  route('entourage', (k) => entourage(k));
-  route('entourage/persoon', (k, b) => enPersoon(k, b));
-  route('entourage/persoon/weg', (k, b) => enPersoonWeg(k, String(b.id || '')));
+  app.post('/api/member/rechterhand/entourage', auth, doe((k) => entourage(k)));
+  app.post('/api/member/rechterhand/entourage/persoon', auth, doe((k, b) => enPersoon(k, b)));
+  app.post('/api/member/rechterhand/entourage/persoon/weg', auth, doe((k, b) => enPersoonWeg(k, String(b.id || ''))));
   /* Documenten met een vervaldatum (elders de betaalde functie van een reisapp)
      en het gezelschap samenstellen met een gereedheidscheck. */
-  route('entourage/doc', (k, b) => enDoc(k, b));
-  route('entourage/doc/weg', (k, b) => enDocWeg(k, b));
-  route('entourage/gezelschap', (k, b) => enGezelschap(k, b));
+  app.post('/api/member/rechterhand/entourage/doc', auth, doe((k, b) => enDoc(k, b)));
+  app.post('/api/member/rechterhand/entourage/doc/weg', auth, doe((k, b) => enDocWeg(k, b)));
+  app.post('/api/member/rechterhand/entourage/gezelschap', auth, doe((k, b) => enGezelschap(k, b)));
   // Attenties
-  route('attenties', (k) => attenties(k));
-  route('attenties/relatie', (k, b) => atRelatie(k, b));
-  route('attenties/relatie/weg', (k, b) => atRelatieWeg(k, String(b.id || '')));
-  route('attenties/gift', (k, b) => atGift(k, b));
-  route('attenties/gift/weg', (k, b) => atGiftWeg(k, String(b.id || '')));
+  app.post('/api/member/rechterhand/attenties', auth, doe((k) => attenties(k)));
+  app.post('/api/member/rechterhand/attenties/relatie', auth, doe((k, b) => atRelatie(k, b)));
+  app.post('/api/member/rechterhand/attenties/relatie/weg', auth, doe((k, b) => atRelatieWeg(k, String(b.id || ''))));
+  app.post('/api/member/rechterhand/attenties/gift', auth, doe((k, b) => atGift(k, b)));
+  app.post('/api/member/rechterhand/attenties/gift/weg', auth, doe((k, b) => atGiftWeg(k, String(b.id || ''))));
 
   // Rahul als adviseur binnen elke app (u-vorm); async, dus een eigen handler
   app.post('/api/member/rechterhand/ai', auth, async (req, res) => {

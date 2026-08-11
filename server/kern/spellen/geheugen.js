@@ -8,7 +8,7 @@
    het opstarten vanuit kern/spellen.js. */
 const RONDEN = 5;
 module.exports = (ctx) => {
-  const { save, crypto, codenaamVan, nudge } = ctx;
+  const { save, crypto, codenaamVan, nudge, ZONDER_SPELER } = ctx;
   function geheugenInit(potje) {
     const st = { reeksen: [], af: {}, punten: {}, klaarOm: {} };
     for (let i = 0; i < RONDEN; i++) {
@@ -47,7 +47,12 @@ module.exports = (ctx) => {
     nr: st.af[mij], tot: RONDEN, punten: st.punten[mij],
     stand: p.spelers.map(sp => ({ af: st.af[sp], punten: st.punten[sp] }))
   });
-  const spel = { sleutel: 'geheugen', naam: 'Geheugenduel', max: 4, wereld: 'rtf', buitenBeurt: ['reeks'], kijken: true,
-    init: geheugenInit, zet: geheugenZet, view: geheugenView };
+  // op een gedeeld scherm: de stand, nooit iemands reeks -- die overschrijven
+  // is precies het spel
+  const geheugenPubliek = (p, st) => ({ tot: RONDEN,
+    stand: p.spelers.map(sp => ({ af: st.af[sp], punten: st.punten[sp] })) });
+  const spel = { sleutel: 'geheugen', naam: 'Geheugenduel', max: 4, wereld: 'rtf', buitenBeurt: ['reeks'],
+    init: geheugenInit, zet: geheugenZet,
+    zicht: { speler: geheugenView, kijker: ZONDER_SPELER, publiek: geheugenPubliek } };
   return { spel, geheugenInit, geheugenZet, geheugenView };
 };

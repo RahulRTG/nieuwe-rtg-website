@@ -42,11 +42,26 @@
   .chip.aan{border-color:var(--goud);color:var(--goud2);}
   .terug{color:var(--goud);cursor:pointer;font-size:.85rem;text-decoration:none;}
   canvas.bord{width:100%;border-radius:12px;display:block;background:var(--paneel2);touch-action:none;}
-  .schaak{display:grid;grid-template-columns:repeat(8,1fr);border-radius:10px;overflow:hidden;border:1px solid var(--lijn);}
-  .schaak div{aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:clamp(1.2rem,7vw,2.2rem);cursor:pointer;user-select:none;}
-  .schaak .l{background:#EAE0CC;} .schaak .d{background:#8A7355;}
+  /* Het schaakbord is de wereld van het SPEL en niet de chrome van RTG: hier
+     mag noten en ivoor staan waar de app zelf zwart-wit blijft. Wat het niet
+     overneemt zijn de ronde hoeken -- dat blijft een huisregel, ook hier. */
+  .schaak{display:grid;grid-template-columns:repeat(8,1fr);overflow:hidden;border:1px solid #2a221a;box-shadow:0 1px 0 rgba(255,255,255,.04) inset;}
+  .schaak div{position:relative;aspect-ratio:1;display:flex;align-items:center;justify-content:center;font-size:clamp(1.2rem,7vw,2.2rem);cursor:pointer;user-select:none;line-height:1;}
+  .schaak .l{background:#E8DDC6;} .schaak .d{background:#6E5844;}
   .schaak .sel{outline:3px solid var(--goud);outline-offset:-3px;}
   .schaak .kan{box-shadow:inset 0 0 0 100vmax rgba(95,165,106,.35);}
+  /* De laatste zet, en die is bij een partij van uren geen versiering: je komt
+     terug op een bord dat er anders uitziet en moet zien WAT er veranderd is. */
+  .schaak .vanaf{box-shadow:inset 0 0 0 100vmax rgba(201,162,75,.22);}
+  .schaak .naartoe{box-shadow:inset 0 0 0 100vmax rgba(201,162,75,.38);}
+  /* De randcoordinaten: klein, in de hoek, en met genoeg contrast op allebei
+     de veldkleuren. Zonder die letters is "zet 24" niet na te lopen. */
+  .schaak .co{position:absolute;font-size:.5rem;line-height:1;opacity:.75;font-weight:700;pointer-events:none;}
+  .schaak .co.r{left:.14em;top:.14em;} .schaak .co.k{right:.14em;bottom:.14em;}
+  .schaak .l .co{color:#6E5844;} .schaak .d .co{color:#E8DDC6;}
+  /* Witte stukken zijn een outline-glyph: op ivoor vallen ze anders weg. */
+  .schaak .wit{color:#FFFDF7;text-shadow:0 0 1px #2a221a,0 1px 1px rgba(0,0,0,.35);}
+  .schaak .zwart{color:#17120C;text-shadow:0 1px 0 rgba(255,255,255,.14);}
   .wgrid{display:grid;grid-template-columns:repeat(15,1fr);gap:1px;background:var(--lijn);border-radius:8px;overflow:hidden;}
   .wgrid div{aspect-ratio:1;background:var(--paneel2);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;text-transform:uppercase;cursor:pointer;}
   .wgrid .p3W{background:#5a2323;} .wgrid .p2W{background:#4a3a20;} .wgrid .p3L{background:#1f3a4a;} .wgrid .p2L{background:#23404a;}
@@ -56,6 +71,9 @@
   .rek button.aan{border-color:#fff;transform:translateY(-3px);}
   .rek button.op{opacity:.35;}
   .knoprij{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.6rem;}
+  /* De klok: rustig en zonder seconden. Geen aftelbalk, geen rood -- een
+     partij van drie dagen hoort niet aan je te trekken. */
+  .klokrij{margin-top:.6rem;text-align:center;color:var(--zacht);font-size:.85rem;letter-spacing:.02em;}
   .knoprij .knop{flex:1;min-width:6rem;}
   .melding{position:fixed;left:50%;bottom:1.2rem;transform:translateX(-50%);background:var(--paneel);border:1px solid var(--goud);color:var(--txt);border-radius:999px;padding:.5rem 1rem;font-size:.85rem;opacity:0;transition:opacity .3s;pointer-events:none;z-index:50;}
   .winbanner{padding:1rem;text-align:center;border:1px solid var(--goud);border-radius:14px;margin-bottom:.8rem;background:linear-gradient(135deg,#26200f,#1c1809);}
@@ -164,6 +182,12 @@
       <div class="sec" style="margin-top:0;">In welke taal?</div>
       <div class="keuzerij" id="nTalen"></div>
     </div>
+    <!-- alleen bij spellen die een beurt van uren of dagen aankunnen -->
+    <div class="kaart blok" id="nTempoBlok" hidden>
+      <div class="sec" style="margin-top:0;">Hoeveel tijd per beurt?</div>
+      <div class="keuzerij" id="nTempi"></div>
+      <div class="leeg" style="padding:.3rem 0 0;">Bij een lange beurt hoef je niet tegelijk online te zijn. Loopt de tijd af, dan kan je tegenstander de partij toewijzen; vanzelf gebeurt er niets.</div>
+    </div>
     <div class="kaart blok">
       <div class="sec" style="margin-top:0;">Tegen wie?</div>
       <div class="keuzerij" id="nVrienden"><span class="leeg">Vrienden laden…</span></div>
@@ -266,7 +290,30 @@
       <div class="praatlijst" id="prtLijst"></div>
       <div class="rmvraag"><input id="prtVeld" placeholder="Zeg iets…" maxlength="500"><button class="knop mini" id="prtKnop" type="button">Stuur</button></div>
     </div>
-    <div class="knoprij"><button class="knop rood" id="sOpgeven" style="flex:0 1 auto;">Opgeven</button></div>
+    <div class="klokrij" id="sKlok" hidden></div>
+    <div class="knoprij">
+      <button class="knop rood" id="sOpgeven" style="flex:0 1 auto;">Opgeven</button>
+      <!-- alleen als de klok van de ander verliep; er gebeurt nooit iets vanzelf -->
+      <button class="knop" id="sToewijzen" hidden style="flex:0 1 auto;">Partij toewijzen</button>
+      <!-- pas na afloop: Rahul leest dan het hele verloop (zie nabespreking.js) -->
+      <button class="knop grijs" id="sNabespreken" hidden style="flex:0 1 auto;">Rahul: bespreek na</button>
+      <!-- alleen bij spellen met een projectieweergave; het scherm is geen deelnemer -->
+      <button class="knop grijs" id="sScherm" hidden style="flex:0 1 auto;">Op het grote scherm</button>
+    </div>
+    <div class="leeg" id="sNabespreking" hidden></div>
+    <div class="klokrij" id="sSchermCode" hidden></div>
+    <!-- de partij terugkijken. De server rekent elk bord uit met de motor die
+         de partij ook echt speelde; deze strook schuift alleen de stap op. -->
+    <div id="sNaspeelBlok" hidden>
+      <div class="knoprij">
+        <button class="knop grijs mini" id="npEerste" title="naar het begin">&#124;&lt;</button>
+        <button class="knop grijs mini" id="npTerug">&lt; vorige</button>
+        <button class="knop grijs mini" id="npVoor">volgende &gt;</button>
+        <button class="knop grijs mini" id="npLaatste" title="naar het eind">&gt;&#124;</button>
+      </div>
+      <input type="range" id="npSchuif" min="0" max="0" value="0" style="width:100%;margin-top:.5rem;" aria-label="Zet in de partij">
+      <div class="klokrij" id="npStand"></div>
+    </div>
   </section>
 
   <!-- tetris -->
@@ -285,6 +332,12 @@
   <!-- sudoku -->
   <section id="vSudoku" hidden>
     <div class="kop2"><h1>Sudoku</h1><a class="terug" data-terug>← terug</a></div>
+    <!-- De dagopgave: EEN puzzel per dag, dezelfde voor iedereen. Er staat met
+         opzet geen reeks bij en geen aftelklok naar middernacht -- wie hem
+         vandaag mist, mist hem, en morgen staat er een nieuwe. -->
+    <div class="sec">Dagopgave <small>(dezelfde puzzel voor iedereen, vandaag)</small></div>
+    <div id="suDag"><div class="leeg">Even kijken…</div></div>
+    <div class="sec">Zelf een puzzel</div>
     <div class="keuzerij" id="suNiveau" style="justify-content:center;"></div>
     <div class="sudoku" id="suGrid"></div>
     <div class="keuzerij" id="suCijfers" style="justify-content:center;margin-top:.5rem;"></div>
@@ -357,6 +410,42 @@ document.querySelectorAll('[data-terug]').forEach(a => a.addEventListener('click
 const SPELNAAM = { mejn:'Mens erger je niet', schaak:'Schaken', woord:'Woordduel', pesten:'Pesten',
   dam:'Dammen', rummi:'Rummi', magnaat:'Magnaat', seconden:'30 Seconden', waarheid:'Doen of Waarheid', proost:'Proost (18+)' };
 const MAXG = { mejn:4, pesten:4, rummi:4, magnaat:6, waarheid:6, proost:6 };
+/* Welke spellen een KLOK PER BEURT kunnen dragen, en welke tempi er zijn.
+   Allebei een kopie van de server (`vormen` in de descriptor, `TEMPO` in
+   kern/spellen/klok.js); de server keurt en weigert, dit is alleen de keuzelijst.
+   Dat is dezelfde afweging als bij MIJN_SPELLEN: de tegels staan al in de HTML
+   en een rondje naar de server vóór de eerste tekening zou een flits geven voor
+   een lijst die eens per jaar verandert. De duplicatie mag dus blijven, maar
+   niet stil uiteenlopen -- test/spelregels-drift.test.js houdt beide kopieën
+   tegen elkaar. */
+const ASYNC_SPELLEN = ['schaak','dam','woord','rummi','mejn','magnaat'];
+/* Welke partijen zijn TERUG te kijken. Ook dit is een kopie van de server
+   (`naspeelbaar` in de descriptor) en ook hier houdt de drifttoets ze tegen
+   elkaar. Alleen spellen zonder toeval in het begin: bij Pesten of Rummi ligt
+   de schudbeurt nergens vast, dus een bord zou verzonnen zijn. */
+const NASPEELBAAR = ['schaak','dam'];
+/* Welke spellen op een gedeeld scherm mogen. Vierde kopie van serverkennis
+   (`zicht.publiek`), en ook deze staat onder de drifttoets. */
+const PROJECTEERBAAR = ['flits','geheugen','orde','quiz','reactie','schaak','schat','seconden','waarheid','woord'];
+const TEMPI = [
+  ['', 'Live, aan tafel'],
+  ['15m', 'Live · 15 min'],
+  ['12u', 'Relaxed · 12 uur'],
+  ['24u', 'Long play · 24 uur'],
+  ['72u', 'Long play · 72 uur']
+];
+// "nog 18 uur": grof en zonder seconden. Een klok die zichtbaar wegtikt op een
+// partij van drie dagen is precies de urgentie die hier niet hoort.
+function klokTekst(k){
+  if (!k || !k.beurtTot) return '';
+  if (k.verlopen) return 'tijd om';
+  const ms = new Date(k.beurtTot).getTime() - Date.now();
+  if (ms <= 0) return 'tijd om';
+  const min = Math.round(ms/60000);
+  if (min < 60) return 'nog ' + Math.max(1, min) + ' min';
+  const uur = Math.round(min/60);
+  return uur < 48 ? 'nog ' + uur + ' uur' : 'nog ' + Math.round(uur/24) + ' dagen';
+}
 /* ---------- wie er nu is ----------
    De server beslist wie hierin staat (eigen vrienden, geblokkeerd eruit, en
    wie "spelen" heeft uitgezet telt als offline). Deze pagina toont het alleen.
@@ -450,6 +539,13 @@ async function laadPrestaties(){
     '<small>'+esc(p.uitleg||'')+'</small></div></div>').join('');
 }
 
+/* De klok achter de stand in de lobby. Alleen als er een tempo is: een potje
+   zonder klok ziet er precies zo uit als altijd. */
+function klokBij(x){
+  if (x.status !== 'bezig' || !x.klok) return '';
+  const t = klokTekst(x.klok);
+  return t ? ' · ' + t : '';
+}
 async function laadLobby(){
   let d; try{ d = await api('mijn'); }catch(e){ return; }
   laadOnline(); laadZichtbaar(); laadStand(); laadRecent(); laadPrestaties(); laadTeams(); tekenTeamVrienden();
@@ -463,7 +559,7 @@ async function laadLobby(){
   $('#potjes').innerHTML = p.length ? p.map(x =>
     '<div class="rij" style="cursor:pointer;" data-open="'+esc(x.id)+'">'+(x.ikAanZet?'<span class="beurtstip"></span>':'')+
     '<div class="nm">'+esc(x.naam)+(x.soort==='woord'?(x.taal==='en'?' ':' '):'')+(x.modus==='teams'?' · 2 tegen 2':'')+'<small>'+x.spelers.map(esc).join(' · ')+' · '+
-    (x.status==='klaar' ? (x.winnaar?''+esc(x.winnaar):'gelijkspel') : x.status==='wacht' ? 'wacht op '+x.wachtOp+' speler(s)' : (x.ikAanZet?'jij bent aan zet!':'wacht op '+esc(x.aanZet)))+'</small></div><span>→</span></div>').join('')
+    (x.status==='klaar' ? (x.winnaar?''+esc(x.winnaar):'gelijkspel') : x.status==='wacht' ? 'wacht op '+x.wachtOp+' speler(s)' : (x.ikAanZet?'jij bent aan zet!':'wacht op '+esc(x.aanZet)))+klokBij(x)+'</small></div><span>→</span></div>').join('')
     : '<div class="leeg">Nog geen potjes. Kies hierboven een spel.</div>';
   document.querySelectorAll('[data-open]').forEach(r => r.addEventListener('click', ()=> openPotje(r.dataset.open)));
 }
@@ -522,19 +618,20 @@ $('#teamMaak').addEventListener('click', async ()=>{
 });
 
 /* ---------- nieuw potje ---------- */
-let nSpel = 'mejn', nGrootte = 2, nModus = 'vrij', nGekozen = [], nTaal = 'nl';
+let nSpel = 'mejn', nGrootte = 2, nModus = 'vrij', nGekozen = [], nTaal = 'nl', nTempo = '';
 document.querySelectorAll('.spelkaart').forEach(k => k.addEventListener('click', ()=>{
   if (k.dataset.spel === 'sneek'){ toon('vSneek'); laadSneekBord(); return; }
   if (k.dataset.spel === 'tetris'){ toon('vTetris'); laadTetrisBord(); return; }
-  if (k.dataset.spel === 'sudoku'){ toon('vSudoku'); suNieuw(); laadSudokuBord(); return; }
+  if (k.dataset.spel === 'sudoku'){ toon('vSudoku'); suNieuw(); suDagLaad(); laadSudokuBord(); return; }
   if (k.dataset.spel === 'vlek'){ toon('vVlek'); vzStart(); return; }
-  nSpel = k.dataset.spel; nGrootte = nSpel==='seconden' ? 4 : 2; nModus = 'vrij'; nGekozen = []; nTaal = 'nl'; $('#nCodenaam').value='';
+  nSpel = k.dataset.spel; nGrootte = nSpel==='seconden' ? 4 : 2; nModus = 'vrij'; nGekozen = []; nTaal = 'nl'; nTempo = ''; $('#nCodenaam').value='';
   $('#nTitel').textContent = SPELNAAM[nSpel];
   $('#nGrootteBlok').hidden = !MAXG[nSpel];
   $('#nTaalBlok').hidden = nSpel !== 'woord';
+  $('#nTempoBlok').hidden = !ASYNC_SPELLEN.includes(nSpel);
   $('#nProost').hidden = nSpel !== 'proost';
   $('#nSeconden').hidden = nSpel !== 'seconden';
-  tekenTalen(); tekenGroottes(); tekenVrienden();
+  tekenTalen(); tekenTempi(); tekenGroottes(); tekenVrienden();
   toon('vNieuw');
 }));
 function tekenGroottes(){
@@ -544,6 +641,11 @@ function tekenGroottes(){
   if (nSpel === 'mejn') opties.push([4,'teams','2 tegen 2']);
   $('#nGroottes').innerHTML = opties.map(([g,m,l]) => '<button type="button" class="chip'+(nGrootte===g&&nModus===m?' aan':'')+'" data-g="'+g+'" data-m="'+m+'">'+l+'</button>').join('');
   $('#nGroottes').querySelectorAll('button').forEach(b => b.addEventListener('click', ()=>{ nGrootte=Number(b.dataset.g); nModus=b.dataset.m; nGekozen=nGekozen.slice(0, nGrootte-1); tekenGroottes(); tekenVrienden(); }));
+}
+function tekenTempi(){
+  $('#nTempi').innerHTML = TEMPI.map(([t,l]) =>
+    '<button type="button" class="chip'+(nTempo===t?' aan':'')+'" data-tp="'+t+'">'+l+'</button>').join('');
+  $('#nTempi').querySelectorAll('button').forEach(b => b.addEventListener('click', ()=>{ nTempo=b.dataset.tp; tekenTempi(); }));
 }
 function tekenTalen(){
   $('#nTalen').innerHTML = [['nl','Nederlands'],['en','Engels']].map(([t,l]) =>
@@ -588,7 +690,7 @@ $('#nStart').addEventListener('click', async ()=>{
   $('#nFout').textContent='';
   try{
     const cn = $('#nCodenaam').value.trim();
-    const d = await api('nieuw', { soort:nSpel, grootte:nGrootte, modus:nModus, vrienden:nGekozen, codenamen: cn ? [cn] : [], taal:nTaal });
+    const d = await api('nieuw', { soort:nSpel, grootte:nGrootte, modus:nModus, vrienden:nGekozen, codenamen: cn ? [cn] : [], taal:nTaal, tempo: nTempo || undefined });
     meld('Uitnodiging verstuurd. Het potje start zodra je vrienden meedoen.');
     toon('vLobby'); laadLobby();
   }catch(e){ $('#nFout').textContent = e.message; }
@@ -596,7 +698,7 @@ $('#nStart').addEventListener('click', async ()=>{
 $('#nRandom').addEventListener('click', async ()=>{
   $('#nFout').textContent='';
   try{
-    const d = await api('random', { soort:nSpel, grootte:nGrootte, taal:nTaal });
+    const d = await api('random', { soort:nSpel, grootte:nGrootte, taal:nTaal, tempo: nTempo || undefined });
     if (d.gestart){ openPotje(d.id); } else { meld('Je staat in de rij ('+d.plek+' van '+d.nodig+'). Zodra het vol is, start het potje.'); toon('vLobby'); laadLobby(); }
   }catch(e){ $('#nFout').textContent = e.message; }
 });
@@ -666,12 +768,81 @@ function tekenPotje(){
   $('#sWin').hidden = p.status !== 'klaar';
   if (p.status==='klaar') $('#sWin').innerHTML = p.winnaar ? '<b>'+esc(p.winnaar)+'</b> wint dit potje!' : '<b>Gelijkspel.</b> Sterk van allebei.';
   $('#sOpgeven').style.display = p.status==='bezig' ? '' : 'none';
+  /* De klok, en de twee knoppen die eraan hangen. Toewijzen verschijnt alleen
+     als de tijd van de ANDER om is: je eigen verlopen klok geeft je geen
+     partij, en de server weigert dat ook. */
+  const k = p.klok, mijnBeurt = p.status==='bezig' && p.beurt===p.ik;
+  const kt = p.status==='bezig' ? klokTekst(k) : '';
+  $('#sKlok').hidden = !kt;
+  if (kt) $('#sKlok').textContent = (mijnBeurt ? 'Jouw beurt: ' : 'Beurt van ' + esc(p.spelers[p.beurt]) + ': ') + kt;
+  $('#sToewijzen').hidden = !(k && k.verlopen && p.status==='bezig' && !mijnBeurt);
+  $('#sNabespreken').hidden = p.status !== 'klaar';
+  /* Terugkijken kan pas na afloop, en alleen bij spellen waarvan de server de
+     partij kan herbouwen. Welke dat zijn zegt de server bij het openen; de
+     client raadt dat niet, want een bord dat er nooit zo stond ziet er precies
+     zo echt uit als een goede. */
+  // een gedeeld scherm kan alleen bij een LOPEND potje van een spel dat er een
+  // projectieweergave voor heeft; de server weigert de rest
+  $('#sScherm').hidden = !(p.status === 'bezig' && PROJECTEERBAAR.includes(p.soort));
+  const kanNaspelen = p.status === 'klaar' && NASPEELBAAR.includes(p.soort);
+  $('#sNaspeelBlok').hidden = !kanNaspelen;
+  if (!kanNaspelen) npStap = null;
+  if (p.status !== 'klaar') { $('#sNabespreking').hidden = true; $('#sNabespreking').textContent = ''; }
   const SECTIES = { mejn:'#sMejn', schaak:'#sSchaak', woord:'#sWoord', pesten:'#sPesten', dam:'#sDam', rummi:'#sRummi', magnaat:'#sMagnaat', seconden:'#sSeconden', waarheid:'#sWaarheid', proost:'#sProost' };
   Object.entries(SECTIES).forEach(([s,sel]) => { $(sel).hidden = p.soort !== s || p.status === 'wacht'; });
   if (p.status==='wacht') return;
   const TEKEN = { mejn:tekenMejn, schaak:tekenSchaak, pesten:tekenPesten, woord:tekenWoord, dam:tekenDam, rummi:tekenRummi, magnaat:tekenMagnaat, seconden:tekenSeconden, waarheid:tekenWaarheid, proost:tekenProost };
   (TEKEN[p.soort]||tekenWoord)();
 }
+$('#sToewijzen').addEventListener('click', async ()=>{
+  if (!huidig || !confirm('De tijd van je tegenstander is om. Deze partij aan jou toewijzen?')) return;
+  try{ await api('toewijzen', { id: huidig.id }); const d = await api('staat',{id:huidig.id}); huidig=d.potje; tekenPotje(); }
+  catch(e){ meld(e.message); }
+});
+/* ---------- de partij terugkijken ----------
+   `npStap` is null zolang we niet terugkijken; dan staat het gewone eindbord er.
+   Zodra je schuift halen we de stand van de SERVER op -- die rekent hem uit met
+   de echte motor, dus deze pagina hoeft geen enkele spelregel te kennen. */
+let npStap = null, npTotaal = 0, npBezig = false;
+async function npToon(stap){
+  if (!huidig || npBezig) return;
+  npBezig = true;
+  try{
+    const d = await api('naspelen', { id: huidig.id, stap });
+    npStap = d.stap; npTotaal = d.totaal;
+    $('#npSchuif').max = String(d.totaal);
+    $('#npSchuif').value = String(d.stap);
+    $('#npStand').textContent = 'Zet ' + d.stap + ' van ' + d.totaal +
+      (d.gestrand ? ' -- het verloop liep vast bij zet ' + d.gestrand : '');
+    // het bord van dat moment door dezelfde tekenaar als de live partij
+    const bewaard = huidig.staat;
+    huidig.staat = d.staat;
+    (({ schaak: tekenSchaak, dam: tekenDam })[huidig.soort] || (()=>{}))();
+    huidig.staat = bewaard;
+  }catch(e){ $('#npStand').textContent = e.message; }
+  finally{ npBezig = false; }
+}
+$('#npSchuif').addEventListener('input', ()=> npToon(Number($('#npSchuif').value)));
+$('#npEerste').addEventListener('click', ()=> npToon(0));
+$('#npLaatste').addEventListener('click', ()=> npToon(npTotaal));
+$('#npTerug').addEventListener('click', ()=> npToon(Math.max(0, (npStap===null?npTotaal:npStap) - 1)));
+$('#npVoor').addEventListener('click', ()=> npToon(Math.min(npTotaal, (npStap===null?0:npStap) + 1)));
+
+$('#sScherm').addEventListener('click', async ()=>{
+  if (!huidig) return;
+  try{
+    const d = await api('projectie-open', { id: huidig.id });
+    $('#sSchermCode').hidden = false;
+    $('#sSchermCode').innerHTML = 'Open <b>rtg.nl/apps/spelscherm.html</b> op de tv en typ <b>' + esc(d.code) + '</b>';
+  }catch(e){ meld(e.message); }
+});
+$('#sNabespreken').addEventListener('click', async ()=>{
+  if (!huidig) return;
+  $('#sNabespreking').hidden = false; $('#sNabespreking').textContent = 'Rahul kijkt de partij terug…';
+  try{ const d = await api('nabespreking', { id: huidig.id });
+    $('#sNabespreking').textContent = d.antwoord || d.samenvatting || '';
+  }catch(e){ $('#sNabespreking').textContent = e.message; }
+});
 $('#sOpgeven').addEventListener('click', async ()=>{
   if (!huidig || !confirm('Dit potje opgeven?')) return;
   try{ await api('opgeven', { id: huidig.id }); const d = await api('staat',{id:huidig.id}); huidig=d.potje; tekenPotje(); }catch(e){ meld(e.message); }
@@ -784,8 +955,24 @@ function tekenSchaak(){
     const veld = ikWit ? v : 63 - v;
     const r = Math.floor(veld/8), k = veld%8;
     const d = document.createElement('div');
-    d.className = ((r+k)%2 ? 'd' : 'l') + (schVan===veld ? ' sel' : '');
-    d.textContent = SCH_TEKEN[bord[veld]] || '';
+    const stuk = bord[veld];
+    // de laatste zet komt van de server mee ([van, naar]); in een replay is dat
+    // de zet van DAT moment, want de server rekent de stand met dezelfde motor
+    const lz = st.laatste || null;
+    const klassen = [(r+k)%2 ? 'd' : 'l'];
+    if (schVan === veld) klassen.push('sel');
+    if (lz && lz[0] === veld) klassen.push('vanaf');
+    if (lz && lz[1] === veld) klassen.push('naartoe');
+    d.className = klassen.join(' ');
+    if (stuk && stuk !== '.'){
+      const sp = document.createElement('span');
+      sp.className = stuk === stuk.toLowerCase() ? 'wit' : 'zwart';
+      sp.textContent = SCH_TEKEN[stuk] || '';
+      d.appendChild(sp);
+    }
+    // randcoordinaten op de buitenste rij en kolom, vanuit JOUW kant gezien
+    if (k === (ikWit ? 0 : 7)){ const c = document.createElement('span'); c.className='co r'; c.textContent = String(8 - r); d.appendChild(c); }
+    if (r === (ikWit ? 7 : 0)){ const c = document.createElement('span'); c.className='co k'; c.textContent = 'abcdefgh'[k]; d.appendChild(c); }
     d.addEventListener('click', ()=> schKlik(veld));
     el.appendChild(d);
   }
@@ -1296,19 +1483,26 @@ function tekenProost(){
 
    De klok hieronder is dus alleen een WEERGAVE: hij vertelt je hoe lang je
    bezig bent, hij bepaalt niets. De server klokt op zijn eigen klok. */
-const SU = { puzzel:null, vast:[], grid:[], sel:null, start:0, niveau:'normaal', klaar:true, bezig:false };
+const SU = { puzzel:null, vast:[], grid:[], sel:null, start:0, niveau:'normaal', klaar:true, bezig:false, dag:false };
 const SU_NIVEAUS = ['makkelijk','normaal','moeilijk'];
+// een puzzel in het rooster leggen; dezelfde weg voor een eigen puzzel en voor
+// de dagopgave, want het rooster kent het verschil niet
+function suLeg(puzzel, gestart){
+  SU.puzzel = puzzel;
+  SU.grid = puzzel.slice();
+  SU.vast = puzzel.map(v => v !== 0);
+  SU.sel = null; SU.klaar = false;
+  SU.start = gestart || Date.now();
+  suTeken();
+}
 async function suNieuw(){
   if (SU.bezig) return;
-  SU.bezig = true; SU.klaar = true; SU.sel = null;
+  SU.bezig = true; SU.klaar = true; SU.sel = null; SU.dag = false;
   $('#suInfo').textContent = 'Een nieuwe puzzel…';
   try{
     const d = await api('sudoku-nieuw', { niveau: SU.niveau });
-    SU.puzzel = d.puzzel;
-    SU.grid = d.puzzel.slice();
-    SU.vast = d.puzzel.map(v => v !== 0);
     SU.niveau = d.niveau || SU.niveau;
-    SU.start = Date.now(); SU.klaar = false;
+    suLeg(d.puzzel);
     $('#suInfo').textContent = '0:00 · sneller is meer punten';
   }catch(e){
     $('#suInfo').textContent = 'De puzzel kwam niet binnen. Probeer het zo nog eens.';
@@ -1317,8 +1511,60 @@ async function suNieuw(){
     suTeken();
   }
 }
+
+/* ---------- de dagopgave ----------
+   Kijken start de klok NIET: die begint pas bij 'dag-start', en dat is een
+   eigen knop. Wie het scherm opent om te zien of hij vandaag al meedeed hoort
+   daar geen tijd aan te verliezen. */
+const suTijd = (s) => Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
+async function suDagLaad(){
+  let d;
+  try{ d = await api('dag', { spel:'sudoku' }); }
+  catch(e){ $('#suDag').innerHTML = '<div class="leeg">De dagopgave kwam niet binnen.</div>'; return; }
+  const veld = d.mee === 1 ? '1 speler loste hem vandaag op' : d.mee + ' spelers losten hem vandaag op';
+  let kop, knop = '';
+  if (d.klaar){
+    kop = 'Vandaag gedaan in ' + suTijd(d.seconden||0)
+      + (d.punten != null ? ' -- ' + d.punten + ' punten' : '')
+      + (d.plaats ? ' -- plaats ' + d.plaats + ' van ' + d.mee : '');
+  } else if (d.begonnen){
+    kop = 'Je bent bezig met de opgave van vandaag.';
+    knop = 'Verder puzzelen';
+  } else {
+    kop = 'De opgave van vandaag staat klaar. De klok begint zodra je start.';
+    knop = 'Start de dagopgave';
+  }
+  /* `ranglijst: false` betekent: onder de 18+-grens bestaat er geen bord. Dan
+     gaat het bord weg in plaats van leeg te staan -- de opgave zelf speel je
+     gewoon, en de server zegt er zelf bij waarom. */
+  const bord = d.ranglijst === false ? '<div class="leeg">' + esc(d.reden||'') + '</div>'
+    : (d.bord||[]).length
+      ? '<div class="sec">Uit jouw kring</div>' + d.bord.map(r =>
+          '<div class="rij"><div class="nm">'+r.plaats+'. '+esc(r.codenaam)+(r.ik?' (jij)':'')
+          +'</div><b style="color:var(--goud2);">'+r.punten+'</b></div>').join('')
+      : '';
+  $('#suDag').innerHTML = '<div class="leeg">'+esc(kop)+'</div>'
+    + (d.ranglijst === false ? '' : '<div class="leeg">'+esc(veld)+'</div>')
+    + (knop ? '<div class="knoprij"><button class="knop" id="suDagKnop" style="width:100%;">'+knop+'</button></div>' : '')
+    + bord;
+  const k = $('#suDagKnop');
+  if (k) k.addEventListener('click', suDagStart);
+}
+async function suDagStart(){
+  if (SU.bezig) return;
+  SU.bezig = true;
+  try{
+    const d = await api('dag-start', { spel:'sudoku' });
+    SU.dag = true;
+    suLeg(d.opgave.puzzel, d.gestart);
+    $('#suInfo').textContent = 'Dagopgave · sneller is meer punten';
+  }catch(e){ meld(e.message || 'De dagopgave kwam niet binnen.'); }
+  finally{ SU.bezig = false; }
+}
 function suTeken(){
-  $('#suNiveau').innerHTML = SU_NIVEAUS.map(n =>
+  // tijdens de dagopgave is er niets te kiezen: hij is voor iedereen dezelfde,
+  // anders valt er ook niets te vergelijken
+  $('#suNiveau').innerHTML = SU.dag ? '' : SU_NIVEAUS.map(n =>
     '<button type="button" class="chip'+(SU.niveau===n?' aan':'')+'" data-n="'+n+'">'+n+'</button>').join('');
   $('#suNiveau').querySelectorAll('[data-n]').forEach(b=>b.addEventListener('click',()=>{ SU.niveau=b.dataset.n; suNieuw(); }));
   $('#suGrid').innerHTML = SU.grid.map((v,i)=>{
@@ -1340,7 +1586,12 @@ async function suVul(v){
   if (SU.grid.some(x => x === 0)) return;
   SU.klaar = true;
   try{
-    const d = await api('sudoku-klaar', { rooster: SU.grid });
+    /* Twee ingangen, en met opzet geen vlag op een: de dagopgave heeft een
+       eigen klok die bij de server begon, en die zou een verkeerde waarde hier
+       stilletjes aan de verkeerde puzzel hangen. */
+    const d = SU.dag
+      ? await api('dag-klaar', { spel:'sudoku', inzending: SU.grid })
+      : await api('sudoku-klaar', { rooster: SU.grid });
     if (!d.goed){
       SU.klaar = false;   // gewoon doorpuzzelen; de klok loopt door
       $('#suInfo').textContent = 'Er zit nog een foutje in. Zoek het en vul het opnieuw in.';
@@ -1350,6 +1601,15 @@ async function suVul(v){
        bestaat er geen ranglijst, en het spel telt dan alleen binnen dit potje.
        De server zegt er zelf bij waarom, dus dat halen we niet hier na. */
     meld('Opgelost in '+d.seconden+' tellen: '+d.punten+' punten!');
+    if (SU.dag){
+      SU.dag = false;
+      $('#suInfo').textContent = d.bewaard === false
+        ? 'De dagopgave gedaan in '+d.seconden+' tellen. ' + (d.reden || '')
+        : 'De dagopgave gedaan in '+d.seconden+' tellen · plaats '+d.plaats+' van '+d.mee;
+      suTeken();
+      suDagLaad();
+      return;
+    }
     $('#suInfo').textContent = d.bewaard === false
       ? 'Opgelost in '+d.seconden+' tellen. ' + (d.reden || '')
       : 'Opgelost in '+d.seconden+' tellen · '+d.punten+' punten (beste: '+d.beste+')';

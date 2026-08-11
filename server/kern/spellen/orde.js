@@ -27,7 +27,7 @@ const BANK = [
 ];
 const RONDEN = 5;
 module.exports = (ctx) => {
-  const { save, crypto, schud, codenaamVan, nudge } = ctx;
+  const { save, crypto, schud, codenaamVan, nudge, ZONDER_SPELER } = ctx;
   function ordeInit(potje) {
     const st = { vragen: schud(BANK.map((_, i) => i)).slice(0, RONDEN), schuddels: [], af: {}, punten: {}, klaarOm: {} };
     // dezelfde schudde presentatie voor iedereen: eerlijk vergelijken
@@ -67,7 +67,11 @@ module.exports = (ctx) => {
       nr: st.af[mij], tot: RONDEN, punten: st.punten[mij],
       stand: p.spelers.map(sp => ({ af: st.af[sp], punten: st.punten[sp] })) };
   };
-  const spel = { sleutel: 'orde', naam: 'Rangschikduel', max: 4, wereld: 'rtf', buitenBeurt: ['orde'], kijken: true,
-    init: ordeInit, zet: ordeZet, view: ordeView };
+  // op een gedeeld scherm: de stand, niet de opdracht van een van de spelers
+  const ordePubliek = (p, st) => ({ tot: RONDEN,
+    stand: p.spelers.map(sp => ({ af: st.af[sp], punten: st.punten[sp] })) });
+  const spel = { sleutel: 'orde', naam: 'Rangschikduel', max: 4, wereld: 'rtf', buitenBeurt: ['orde'],
+    init: ordeInit, zet: ordeZet,
+    zicht: { speler: ordeView, kijker: ZONDER_SPELER, publiek: ordePubliek } };
   return { spel, ordeInit, ordeZet, ordeView };
 };

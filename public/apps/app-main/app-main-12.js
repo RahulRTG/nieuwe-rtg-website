@@ -33,7 +33,7 @@
     b.addEventListener('click', () => openTab(b.dataset.tab, true)));
   // de codenaam in de statusbalk is de korte weg naar je pas: die ligt sinds
   // het OS-beginscherm in je wallet, niet meer op de home
-  $('#codeChip').addEventListener('click', () => { location.href = '/apps/wallet.html'; });
+  $('#codeChip').addEventListener('click', () => { location.href = '/apps/geld.html#wallet'; });
 
   /* EEN TABBLAD HAALT ZIJN GEGEVENS OP ALS JE HEM OPENT, NIET EERDER.
 

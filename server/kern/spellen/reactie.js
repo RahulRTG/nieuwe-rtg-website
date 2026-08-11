@@ -45,7 +45,21 @@ module.exports = (ctx) => {
     tijden: st.tijden[mij],
     stand: p.spelers.map(sp => ({ af: st.tijden[sp].length, totaal: st.tijden[sp].reduce((a, b) => a + b, 0) }))
   });
-  const spel = { sleutel: 'reactie', naam: 'Reactieduel', max: 4, wereld: 'rtf', buitenBeurt: ['tik'], kijken: true,
-    init: reactieInit, zet: reactieZet, view: reactieView };
+  /* EEN EIGEN KIJKWEERGAVE, en dit spel is een van de twee die laten zien
+     waarom die vraag per spel gesteld moet worden.
+
+     `reactieView` leest `st.tijden[mij].length`. Voor een kijker is `mij` null,
+     dus dat is `undefined.length` -- meekijken GOOIDE hier, en de route maakte
+     er een 500 van. Dit spel stond gewoon op `kijken: true`; geen enkele toets
+     riep spelKijk erop aan, dus de fout heeft er stil in gezeten.
+
+     Wat een kijker wel krijgt is wat de vier andere duels hem ook geven: de
+     tussenstand. De wachttijd van de volgende ronde is persoonlijk en hoort
+     daar niet in -- die vooruit kunnen zien is precies het spel. */
+  const reactieBuiten = (p, st) => ({ tot: RONDEN,
+    stand: p.spelers.map(sp => ({ af: st.tijden[sp].length, totaal: st.tijden[sp].reduce((a, b) => a + b, 0) })) });
+  const spel = { sleutel: 'reactie', naam: 'Reactieduel', max: 4, wereld: 'rtf', buitenBeurt: ['tik'],
+    init: reactieInit, zet: reactieZet,
+    zicht: { speler: reactieView, kijker: reactieBuiten, publiek: reactieBuiten } };
   return { spel, reactieInit, reactieZet, reactieView };
 };

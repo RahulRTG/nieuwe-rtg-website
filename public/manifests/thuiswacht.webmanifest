@@ -4,7 +4,7 @@
   "id": "/apps/thuiswacht",
   "description": "U zegt hoe lang u onderweg bent. Meldt u zich niet, dan krijgt uw kring bericht met uw laatst bekende plek. Werkt ook als uw telefoon uitvalt.",
   "lang": "nl",
-  "start_url": "/apps/thuiswacht.html",
+  "start_url": "/apps/veilig.html#wacht",
   "scope": "/",
   "display": "standalone",
   "background_color": "#0C0C0B",

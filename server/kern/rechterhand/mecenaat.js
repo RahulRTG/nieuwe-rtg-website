@@ -4,11 +4,24 @@
    en welk deel via de RTFoundation gaat -- die 30% van de bijdragen naar
    liefdadigheid brengt. Gemount via index.js. */
 module.exports = (ctx) => {
-  const { save, rid, nu, schoon, isDatum, getal, L } = ctx;
+  const { db, save, rid, nu, schoon, isDatum, getal, L } = ctx;
   const THEMAS = ['onderwijs', 'gezondheid', 'natuur', 'kunst', 'noodhulp', 'gemeenschap', 'overig'];
   const PERIODEN = ['eenmalig', 'maand', 'kwartaal', 'jaar'];
 
   function M(key) { const l = L(key); if (!Array.isArray(l.mecenaat)) l.mecenaat = []; return l.mecenaat; }
+
+  /* KIJKEN ZONDER AAN TE MAKEN, voor wie alleen leest (kern/geldgraaf, en de
+     samenhanglaag geldwereld). M() gaat via L(), en L() ZET het hele
+     lifestyle-dossier op zodra het ontbreekt: een enkele blik op de geldcockpit
+     materialiseerde daardoor een lege maison, hangar, cellier en de rest voor
+     elk lid dat alleen maar keek. Er volgt op dat pad geen save(), maar de
+     mutatie reist mee met de eerstvolgende save van iets anders -- en dan
+     groeit de opslag met een rij per kijker. Dezelfde valkuil die
+     kern/geldbeleid met zijn kijk/pak-paar al vermijdt. */
+  function mecenaatKijk(key) {
+    const l = (db.data.lifestyle || {})[key];
+    return Array.isArray(l && l.mecenaat) ? l.mecenaat : [];
+  }
 
   function mecGift(key, b) {
     const doel = schoon(b.doel, 100);
@@ -43,5 +56,5 @@ module.exports = (ctx) => {
       betaald, toegezegd, totaal: betaald + toegezegd, viaFoundation, perThema };
   }
 
-  return { mecenaat, mecGift, mecGiftWeg, mecBetaald };
+  return { mecenaat, mecenaatKijk, mecGift, mecGiftWeg, mecBetaald };
 };

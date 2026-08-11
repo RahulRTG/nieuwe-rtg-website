@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Reizen</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link rel="manifest" href="/manifests/reizen.webmanifest">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<!-- het ontwerpsysteem, de materialen en de vier thema's komen mee via
+     shared/rtg-ui.css, dat ze insluit voor het hele platform. Hier stonden ze
+     ook nog eens los; dat laadde dezelfde drie bladen twee keer. -->
+<!-- De vormtaal van een wereldscherm staat in een eigen blad, want RTG Kantoor
+     gebruikt hem ook. Twee keer overtikken betekent twee superapps die uit
+     elkaar groeien (LAT.md regel 4). -->
+<link href="/shared/rtg-wereld.css" rel="stylesheet">
+<link href="/shared/ios.css" rel="stylesheet">
+</head>
+<body class="rtg-stijl" data-rtg-modus="pro">
+<a class="skip" href="#inhoud">Naar de inhoud</a>
+
+<!-- RTG Reizen ORKESTREERT de reisdomeinen en vervangt ze niet (PLATFORM.md).
+     Verblijven, Reisbureau, Vluchten en Hangar houden hun eigen catalogus en
+     hun eigen boekingsstroom. Daarom staat er op dit scherm geen knop die boekt,
+     wijzigt of annuleert: elke regel is een link naar de app die het echte werk
+     doet. Zou dit scherm ook boeken, dan ontstaat een reis op twee plekken
+     (LAT.md regel 4). -->
+
+<main id="inhoud">
+  <!-- EEN vaste RTG-header: hamburger, appnaam, lucht, inhoud. Verder niets.
+       Hier stonden een "Home"-link, een RTG-rondje en de ondertitel "uw
+       reiswereld" -- vier keer tegelijk vertellen dat dit RTG is, waardoor het
+       merk juist zwakker werd. De hamburger van het app-menu (shared/appmenu.js)
+       is de enige navigatie; de weg terug loopt daardoorheen. -->
+  <header class="merkkop">
+    <h1 class="rtg-ceremonie">RTG Reizen</h1>
+  </header>
+
+  <a class="balk" id="balk" href="#komend" data-rustig>
+    <span class="teken" id="balkTeken"></span>
+    <span>
+      <span class="kop" id="balkKop">Laden</span>
+      <span class="zin rtg-ceremonie" id="balkZin">&nbsp;</span>
+    </span>
+    <span class="pijl" aria-hidden="true">&rsaquo;</span>
+  </a>
+
+  <div id="stilte"></div>
+
+  <div class="regkop">
+    <h2>Wat eraan komt</h2>
+    <span class="tel" id="tel"></span>
+  </div>
+  <div id="komend"><p class="stil">Laden...</p></div>
+
+  <div class="regkop"><h2>De reiswereld</h2></div>
+  <div class="poorten" id="poorten"></div>
+</main>
+
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g,
+    c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+  const token = () => { try { return localStorage.getItem('rtg_member_token'); } catch (e) { return null; } };
+  const SOORT = { verblijf: 'Verblijf', reis: 'Reis', vlucht: 'Vlucht', charter: 'Charter' };
+
+  /* Eén iconenset, 24x24 grid, één lijndikte (ONTWERP.md par. 13). Inline SVG
+     en geen emoji: de huisregel is dat beeld uit de eigen set komt, en een
+     emoji ziet er op elk toestel anders uit. */
+  const ic = (d, n) => '<svg width="' + (n || 16) + '" height="' + (n || 16) + '" viewBox="0 0 24 24" ' +
+    'fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" ' +
+    'stroke-linejoin="round" aria-hidden="true">' + d + '</svg>';
+  const ICO = {
+    bel: '<path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/>',
+    vink: '<path d="M20 6 9 17l-5-5"/>',
+    mens: '<path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>',
+    pand: '<rect x="4" y="2" width="16" height="20" rx="1"/><path d="M9 22v-4h6v4M8 6h.01M12 6h.01M16 6h.01M8 10h.01M12 10h.01M16 10h.01M8 14h.01M12 14h.01M16 14h.01"/>',
+    bed:  '<path d="M2 4v16M2 8h18a2 2 0 0 1 2 2v10M2 17h20"/><circle cx="7" cy="12" r="2"/>',
+    vlieg:'<path d="M17.8 19.2 16 11l3.5-3.5a2.1 2.1 0 0 0-3-3L13 8 4.8 6.2a1 1 0 0 0-.9 1.7L9 11l-2 3H4l-1 2 3.5 1L8 21l2-1v-3l3-2 3.1 5.1a1 1 0 0 0 1.7-.9Z"/>',
+    kaart:'<path d="M2 9a3 3 0 0 1 0 6v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2a3 3 0 0 1 0-6V7a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M13 5v14"/>'
+  };
+
+  const WERELD = [
+    ['Het Huis', 'Reserveren en bestellen', '/apps/rtg.html', ICO.pand],
+    ['Verblijven', 'Hotels, appart. en villa’s', '/apps/hotels.html', ICO.bed],
+    ['Reisbureau', 'Reizen met ledenprijzen', '/apps/reisbureau.html', ICO.vlieg],
+    ['Vluchten', 'Boeken, beheren, inchecken', '/apps/vluchten.html', ICO.kaart]
+  ];
+
+  const WD = ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag'];
+  const MND = ['jan', 'feb', 'mrt', 'apr', 'mei', 'jun', 'jul', 'aug', 'sep', 'okt', 'nov', 'dec'];
+  function dagdeel(d) {
+    const x = new Date(d + 'T00:00:00');
+    if (isNaN(x)) return { wd: '', nr: d || '', mnd: '' };
+    // twee cijfers, want 06 en 29 horen in een kolom even breed te zijn
+    return { wd: WD[x.getDay()], nr: String(x.getDate()).padStart(2, '0'), mnd: MND[x.getMonth()] };
+  }
+
+  function tekenBalk(t) {
+    /* Wachten is geen aandacht. Drie reizen die netjes bij de reisadviseur
+       liggen is de normale gang van zaken; daar een gouden alarmbalk boven
+       zetten is loos alarm, en loos alarm leert mensen de balk te negeren op de
+       dag dat hij wel klopt. */
+    const alarm = t.aandacht + t.onbekend;
+    const b = $('#balk');
+    if (alarm) {
+      b.removeAttribute('data-rustig');
+      $('#balkTeken').innerHTML = ic(ICO.bel, 22);
+      $('#balkKop').textContent = 'Er vraagt iets aandacht';
+      const s = [];
+      if (t.aandacht) s.push(t.aandacht + ' ' + (t.aandacht === 1 ? 'vraagt' : 'vragen') + ' actie');
+      if (t.onbekend) s.push(t.onbekend + ' met onbekende status');
+      $('#balkZin').textContent = s.join(', ');
+      return;
+    }
+    b.setAttribute('data-rustig', '');
+    $('#balkTeken').innerHTML = ic(ICO.vink, 22);
+    $('#balkKop').textContent = t.komend ? 'Alles loopt' : 'Niets gepland';
+    $('#balkZin').textContent = t.wachtend
+      ? t.wachtend + ' ' + (t.wachtend === 1 ? 'wacht' : 'wachten') + ' op bevestiging'
+      : (t.komend ? 'geen actie nodig' : 'nog geen reizen');
+  }
+
+  function reisRegel(x) {
+    const d = dagdeel(x.van);
+    const feiten = [];
+    // alleen tonen wat het domein echt weet; niets verzinnen
+    if (x.personen) feiten.push('<span>' + ic(ICO.mens) + x.personen + ' ' +
+      (x.personen === 1 ? 'reiziger' : 'reizigers') + '</span>');
+    if (x.wacht) feiten.push('<span>' + ic(ICO.pand) + esc(x.wacht.charAt(0).toUpperCase() + x.wacht.slice(1)) + '</span>');
+    /* SLEEPBAAR (WERKRUIMTE.md par. 6). De gegevens die hieronder in data-*
+       staan, zijn precies wat er in deze regel al op het scherm staat: titel,
+       bestemming en datum. Niets meer -- een verwijzing hoort klein te zijn, en
+       wat de gebruiker hier niet ziet, gaat hier ook niet uit. */
+    return '<a class="reis" href="' + esc(x.link) + '"' + (x.sig ? ' data-sig="' + esc(x.sig) + '"' : '') +
+      ' data-sleep="reis" data-sleep-id="' + esc(x.kenmerk || x.titel || '') + '"' +
+      ' data-sleep-label="' + esc((x.titel || SOORT[x.soort] || 'Reis') + (x.bestemming ? ' naar ' + x.bestemming : '')) + '"' +
+      ' data-sleep-datum="' + esc(x.van || '') + '">' +
+      '<span class="stip"></span>' +
+      '<span class="doos">' +
+        '<span class="dag"><span class="wd">' + esc(d.wd) + '</span>' +
+          '<span class="nr rtg-datum">' + esc(d.nr) + '</span>' +
+          '<span class="mnd">' + esc(d.mnd) + '</span></span>' +
+        '<span class="kern">' +
+          '<h3>' + esc(x.titel || SOORT[x.soort] || 'Reis') +
+            (x.bestemming ? '<span class="rtg-plaats">' + esc(x.bestemming) + '</span>' : '') + '</h3>' +
+          (x.status ? '<span class="status"><span class="rtg-status"' +
+            (x.sig ? ' data-sig="' + esc(x.sig) + '"' : '') +
+            ' data-teken="' + esc(x.teken || '·') + '">' + esc(x.status) + '</span></span>' : '') +
+          (feiten.length ? '<span class="feiten">' + feiten.join('<span aria-hidden="true">·</span>') + '</span>' : '') +
+          '<span class="onder">' +
+            (x.kenmerk ? '<button class="rtg-ref" type="button" data-ref="' + esc(x.kenmerk) +
+              '" title="Kopieer kenmerk">' + esc(x.kenmerk) + '</button>' : '') +
+            '<span class="bron">' + esc(x.app) + '</span>' +
+          '</span>' +
+        '</span>' +
+      '</span>' +
+      '<span class="pijl" aria-hidden="true">&rsaquo;</span>' +
+    '</a>';
+  }
+
+  function teken(d) {
+    $('#stilte').innerHTML = (d.stil || []).length
+      ? '<div class="stilte" role="status"><strong>Niet alles is opgehaald.</strong> ' +
+        esc((d.stil || []).join(' en ')) + ' gaf geen antwoord. Dit is een onvolledig reisschema, ' +
+        'geen leeg reisschema; kijk zo nodig in de app zelf.</div>' : '';
+
+    tekenBalk(d.telling || { komend: 0, aandacht: 0, wachtend: 0, onbekend: 0 });
+
+    const r = d.komend || [];
+    $('#tel').textContent = r.length ? r.length + (r.length === 1 ? ' reis' : ' reizen') : '';
+    $('#komend').innerHTML = r.length ? r.map(reisRegel).join('')
+      : '<p class="stil">Er staat niets gepland. Zodra u ergens boekt, in welke reisapp dan ook, ' +
+        'verschijnt het hier vanzelf.</p>';
+
+    $('#komend').querySelectorAll('.rtg-ref').forEach(b => b.addEventListener('click', async (e) => {
+      e.preventDefault(); e.stopPropagation();
+      try { await navigator.clipboard.writeText(b.dataset.ref); const t = b.textContent;
+        b.textContent = 'gekopieerd'; setTimeout(() => { b.textContent = t; }, 1200); } catch (err) {}
+    }));
+  }
+
+  $('#poorten').innerHTML = WERELD.map(([naam, uitleg, url, icoon]) =>
+    '<a class="poort" href="' + url + '"><span class="ic">' + ic(icoon, 26) + '</span>' +
+    '<b>' + esc(naam) + '</b><span>' + esc(uitleg) + '</span></a>').join('');
+
+  /* Een regel oppakken en aan de schil aanbieden. Alleen binnen een surface:
+     buiten de werkruimte is er niets om hem heen te slepen, en dan hoort een
+     regel gewoon een link te blijven. De schil doet de rest -- hij vraagt de
+     andere surfaces of ze er iets mee kunnen, en laat pas iets gebeuren nadat
+     een mens bevestigd heeft. */
+  (function sleepbaar() {
+    let inSchil = false;
+    try { inSchil = window.top !== window.self; } catch (e) { inSchil = false; }
+    if (!inSchil) return;
+    document.addEventListener('pointerdown', (e) => {
+      const a = e.target.closest('[data-sleep]');
+      if (!a) return;
+      let bewogen = false;
+      const x0 = e.clientX, y0 = e.clientY;
+      const beweeg = (m) => {
+        if (bewogen || Math.abs(m.clientX - x0) + Math.abs(m.clientY - y0) < 8) return;
+        bewogen = true;
+        /* Pas bij ECHTE beweging een sleep. Een tik is een tik: wie op een regel
+           drukt om hem te openen, hoort geen voorstel te krijgen. */
+        window.parent.postMessage({ rtg: 'sleep-start', object: {
+          soort: a.dataset.sleep, id: a.dataset.sleepId, label: a.dataset.sleepLabel,
+          velden: { datum: a.dataset.sleepDatum }
+        } }, location.origin);
+      };
+      const los = () => {
+        document.removeEventListener('pointermove', beweeg);
+        document.removeEventListener('pointerup', los);
+        // een sleep is geen klik: de link mag niet ook nog openen
+        if (bewogen) a.addEventListener('click', (c) => c.preventDefault(), { once: true });
+      };
+      document.addEventListener('pointermove', beweeg);
+      document.addEventListener('pointerup', los);
+    });
+  })();
+
+  (async function laad() {
+    try {
+      const res = await fetch('/api/reis/wereld', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + (token() || '') },
+        body: '{}'
+      });
+      const d = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(d.error || 'Er ging iets mis.');
+      teken(d);
+    } catch (e) {
+      $('#balkKop').textContent = 'Niet ingelogd';
+      $('#balkZin').textContent = '';
+      $('#komend').innerHTML = '<p class="stil">' + esc(e.message) + ' Log eerst in via de leden-app.</p>';
+    }
+  })();
+})();
+</script>
+<script src="/shared/deelmenu.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
+<script src="/shared/ios.js" defer></script>
+</body>
+</html>

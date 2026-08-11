@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Geld</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<!-- de vormtaal van een wereldscherm (balk, register, regkop); gedeeld met
+     Reizen, Kantoor en Sociaal in plaats van overgetikt (LAT.md regel 4) -->
+<link href="/shared/rtg-wereld.css" rel="stylesheet">
+<!-- de vorm van de mediapoort-meldingen; hoort bij /shared/media.js (keuring 38) -->
+<link href="/shared/media.css" rel="stylesheet">
+<style>
+  /* De standenbalk: dezelfde vormtaal als RTG Veilig en de Media OS -- een
+     strook met een haarlijn eronder, de actieve stand met een gouden
+     onderrand. Geen tweede uitvinding voor hetzelfde element; alleen de
+     tokens zijn hier de rtg-tokens, want veiligheid.css laadt hier niet. */
+  .standen{display:flex;gap:0.15rem;padding:0 0.2rem;border-bottom:1px solid var(--rtg-line);overflow-x:auto;}
+  .standen button{background:none;border:0;padding:0.6rem 0.85rem 0.65rem;margin-bottom:-1px;color:var(--rtg-soft);
+    font:inherit;font-size:0.92rem;white-space:nowrap;cursor:pointer;border-bottom:2px solid transparent;}
+  .standen button:focus-visible{outline:2px solid var(--gold-tekst);outline-offset:-2px;}
+  .standen button[aria-current="true"]{color:var(--rtg-txt);border-bottom-color:var(--gold-basis);}
+  .standregel{margin:.7rem 0 0;font-size:.84rem;color:var(--rtg-soft);}
+  #paneel{margin-top:1rem;}
+  /* de bouwstenen die meerdere standen gebruiken: een kaart en een rij,
+     in de vormtaal van de UI-kit maar op de rtg-tokens van dit scherm */
+  #paneel .kaart{border:1px solid var(--rtg-line);border-radius:12px;padding:1rem;margin:.6rem 0 1rem;}
+  #paneel h2{font-size:.72rem;letter-spacing:.17em;text-transform:uppercase;color:var(--rtg-soft);
+    font-weight:500;margin:1.3rem 0 .4rem;}
+  #paneel .lbl{display:block;margin:.8rem 0 .25rem;}
+  #paneel input,#paneel select,#paneel textarea{width:100%;box-sizing:border-box;background:none;
+    border:1px solid var(--rtg-line);border-radius:10px;padding:.6rem .7rem;color:var(--rtg-txt);font:inherit;}
+  #paneel .knop{background:none;border:1px solid var(--rtg-line);border-radius:999px;
+    padding:.5rem 1rem;color:var(--rtg-txt);font:inherit;font-size:.88rem;cursor:pointer;}
+  #paneel .knop:hover{border-color:var(--gold-rand);}
+  #paneel .knop.hoofd{background:var(--rtg-goud);border-color:var(--rtg-goud);color:#1C1608;font-weight:600;}
+  #paneel .bedrag{font-variant-numeric:var(--rtg-cijfers);}
+</style>
+</head>
+<body class="rtg-stijl" data-rtg-modus="pro">
+<a class="skip" href="#inhoud">Naar de inhoud</a>
+
+<!-- ACHT APPS, NIET DRIEENTACHTIG (PLATFORM.md par. 0). RTG Geld is de eerste
+     wereld die ECHT is samengevoegd: wat tien losse pagina's waren (wallet,
+     bank, wie-betaalt-wat, rtg-code, balans, lab-fonds, mecenaat, logboek,
+     nalatenschap, metier) zijn tien standen van deze ene app. De oude paden
+     bestaan nog als omleiding hierheen, met de hash van hun stand.
+
+     Wat er NIET is samengevoegd: de logica. Elke stand roept exact dezelfde
+     routes aan als zijn pagina dat deed, en de domeinkernen op de server staan
+     onaangeraakt. De schil is een; de vijf routefamilies eronder blijven vijf
+     (PLATFORM.md: samenvoegen van de schil is besloten, samenvoegen van logica
+     blijft bewijs vragen). -->
+
+<main id="inhoud">
+  <header class="merkkop">
+    <h1 class="rtg-ceremonie">RTG Geld</h1>
+  </header>
+
+  <nav class="standen" id="standen" aria-label="Standen"></nav>
+  <p class="standregel" id="standUitleg"></p>
+
+  <section aria-label="De stand" id="paneelVak">
+    <div id="paneel"><p class="stil">Laden...</p></div>
+  </section>
+</main>
+
+<script src="/apps/geld/hulp.js"></script>
+<!-- De volgorde van de scripts is de volgorde van de standenbalk: het
+     overzicht eerst (daar bestaat de wereld voor), dan wat u dagelijks
+     aanraakt, dan de administraties. Meerdere bestanden per stand zijn de
+     10 KB-regel (scripts/check.js regel 13): het eerste deel zet de functies
+     op w.RTGGeldDeel, het laatste deel registreert de stand. -->
+<script src="/apps/geld/overzicht.js"></script>
+<script src="/apps/geld/overzichtb.js"></script>
+<script src="/apps/geld/overzichtc.js"></script>
+<script src="/apps/geld/wallet.js"></script>
+<script src="/apps/geld/walletb.js"></script>
+<script src="/apps/geld/bank.js"></script>
+<script src="/apps/geld/bankb.js"></script>
+<script src="/apps/geld/bankc.js"></script>
+<script src="/apps/geld/wbw.js"></script>
+<script src="/apps/geld/wbwb.js"></script>
+<script src="/apps/geld/metier.js"></script>
+<script src="/apps/geld/metierb.js"></script>
+<script src="/apps/geld/metierc.js"></script>
+<script src="/apps/geld/balans.js"></script>
+<script src="/apps/geld/balansb.js"></script>
+<script src="/apps/geld/rtgcode.js"></script>
+<script src="/apps/geld/rtgcodeb.js"></script>
+<script src="/apps/geld/labfonds.js"></script>
+<script src="/apps/geld/labfondsb.js"></script>
+<script src="/apps/geld/mecenaat.js"></script>
+<script src="/apps/geld/mecenaatb.js"></script>
+<script src="/apps/geld/logboek.js"></script>
+<script src="/apps/geld/logboekb.js"></script>
+<script src="/apps/geld/nalatenschap.js"></script>
+<script src="/apps/geld/nalatenschapb.js"></script>
+<script src="/apps/geld/schil.js"></script>
+<script src="/shared/seizoen.js" defer></script>
+<script src="/shared/qr.js" defer></script>
+<script src="/shared/qrteken.js" defer></script>
+<!-- de mediapoort vast aan boord (keuring 38: wie RTGMedia zegt, laadt de
+     deur); de scanstapel van de stand RTG-code ziet hem staan en slaat hem
+     bij het bijladen gewoon over -->
+<script src="/shared/media.js" defer></script>
+<script src="/shared/uitvoer.js" defer></script>
+<script src="/shared/deelmenu.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
+<script src="/shared/ios.js" defer></script>
+</body>
+</html>

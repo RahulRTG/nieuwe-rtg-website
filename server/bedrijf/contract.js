@@ -38,6 +38,7 @@ module.exports = (sctx) => {
     if (!SOORTEN.includes(soort)) return res.status(400).json({ error: 'Kies een soort: ' + SOORTEN.join(', ') + '.' });
     const id = schoon(req.body.contractId, 20) || rid(5);
     const c = eigenVeld(C(g.w), id) || { id, status: 'concept', handtekeningen: [], at: nu() };
+    const oudeWaarde = Number(c.waardeCenten || 0);
     c.titel = titel; c.wederpartij = wederpartij; c.soort = soort;
     c.klantId = schoon(req.body.klantId, 20) || c.klantId || null;
     c.begint = schoon(req.body.begint, 10) || c.begint || dag();
@@ -49,9 +50,26 @@ module.exports = (sctx) => {
     c.verplichtingen = Array.isArray(req.body.verplichtingen)
       ? req.body.verplichtingen.slice(0, 30).map(v => schoon(v, 200)).filter(Boolean) : (c.verplichtingen || []);
     c.vindplaats = schoon(req.body.vindplaats, 200) || c.vindplaats || null;
+    /* Land en afdeling staan OP HET CONTRACT en worden nergens afgeleid. Een
+       bedrijfsregel mag erop drempelen, en dan moet de waarde onbetwistbaar bij
+       dit contract horen -- afleiden uit de klant zou betekenen dat een contract
+       zonder klant stilzwijgend buiten elke landregel valt. Leeg = niet
+       ingevuld, en een regel die op dat veld drempelt, geldt dan NIET; dat staat
+       zo in regels.js en in het antwoord van /keuring. */
+    c.land = (schoon(req.body.land, 2) || c.land || '').toUpperCase() || null;
+    c.afdeling = schoon(req.body.afdeling, 40) || c.afdeling || null;
     C(g.w)[c.id] = c;
+    /* Het bedrag ophogen is de makkelijkste weg om een bedrijfsregel te
+       omzeilen: teken een contract van een euro en maak er daarna vijf miljoen
+       van. Daarom wordt bij ELKE wijziging herwogen -- een goedkeuring geldt
+       voor het bedrag waarop hij is gegeven. */
+    const s = sctx.regelHerwaardeer(g.w, c, oudeWaarde);
     save();
-    res.json({ ok: true, contract: Object.assign({}, c, klok(c)), soorten: SOORTEN });
+    res.json({ ok: true, contract: Object.assign({}, c, klok(c)), soorten: SOORTEN,
+      ontbreekt: s.ontbreekt,
+      let: c.status === 'wacht op goedkeuring' && oudeWaarde && c.waardeCenten > oudeWaarde
+        ? 'De waarde ging omhoog. Goedkeuringen die op het oude bedrag zijn gegeven, zijn vervallen: er is ja gezegd tegen een andere afspraak. Nodig: ' + s.ontbreekt.join(' en ') + '.'
+        : null });
   });
 
   /* Tekenen: twee namen, en pas dan is het actief. Er is geen route die de
@@ -67,12 +85,19 @@ module.exports = (sctx) => {
     if (c.handtekeningen.some(h => h.partij === partij))
       return res.status(409).json({ error: 'Namens ' + partij + ' is er al getekend, door ' + c.handtekeningen.find(h => h.partij === partij).naam + '.' });
     c.handtekeningen.push({ partij, naam, op: schoon(req.body.op, 10) || dag(), genoteerdDoor: g.l.naam, at: nu() });
-    const beide = ['wij', 'wederpartij'].every(p => c.handtekeningen.some(h => h.partij === p));
-    if (beide) { c.status = 'actief'; c.actiefAt = nu(); }
+    /* De status wordt hier niet meer zelf gezet. ./regels.js is de ENIGE plek
+       die dat doet, want er is een tweede voorwaarde bij gekomen (de
+       goedkeuringen die een bedrijfsregel eist) en twee plekken die bepalen
+       wanneer een contract actief is, lopen uiteen (LAT-regel 4). Late binding
+       via sctx: regels.js wordt na dit bestand gemount. */
+    const s = sctx.regelHerzie(g.w, c);
     log(g.w, g.l, 'contract-getekend', c.id, partij + ': ' + naam);
     save();
-    res.json({ ok: true, contract: Object.assign({}, c, klok(c)),
-      let: beide ? null : 'Nog niet actief: er ontbreekt een handtekening. Een contract dat maar door een partij is getekend, is een aanbod.' });
+    res.json({ ok: true, contract: Object.assign({}, c, klok(c)), ontbreekt: s.ontbreekt,
+      let: s.mag ? null
+        : !s.handtekeningenCompleet
+          ? 'Nog niet actief: er ontbreekt een handtekening. Een contract dat maar door een partij is getekend, is een aanbod.'
+          : 'Getekend, maar nog niet actief: een bedrijfsregel eist goedkeuring namens ' + s.ontbreekt.join(' en ') + '.' });
   });
 
   app.post('/api/bedrijf/contract/opzeggen', (req, res) => {

@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Workspace</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<link href="/shared/rtg-ontwerp.css" rel="stylesheet">
+<link href="/shared/rtg-schil.css" rel="stylesheet">
+<!-- de vorm van de mediamelding hoort bij de mediapoort: zonder dit blad
+     staat de uitleg er wel, maar ongestileerd -->
+<link href="/shared/media.css" rel="stylesheet">
+<style>
+  /* De werkruimte is geen pagina die scrolt maar een vlak dat het scherm vult.
+     Daarom hier geen max-width: extra pixels horen extra RTG te tonen en niet
+     bredere marges (WERKRUIMTE.md par. 8). */
+  html,body{height:100%;margin:0;overflow:hidden;}
+  a.terugmobiel{display:inline-block;margin-top:.5rem;font-size:.76rem;
+    color:var(--rtg-soft);text-decoration:none;letter-spacing:.04em;}
+  a.terugmobiel:hover,a.terugmobiel:focus-visible{color:var(--rtg-goud);}
+  .smal{position:fixed;inset:0;display:none;place-items:center;padding:2rem;text-align:center;}
+  .smal p{max-width:22rem;color:var(--rtg-soft);line-height:1.6;font-size:.9rem;}
+  .smal a{color:var(--rtg-goud);}
+  /* Onder 900px is dit niet de juiste omgeving: daar is RTG Mobile de app, en
+     een werkruimte met vijf surfaces op een telefoon is een belofte die het
+     scherm niet waar kan maken. Eerlijk zeggen is beter dan uitrekken. */
+  @media (max-width:899px){
+    .rtg-werkruimte{display:none;}
+    .smal{display:grid;}
+  }
+</style>
+</head>
+<!-- data-ios-uit: deze pagina IS de schil. Een hamburger met een app-menu zou
+     hier een tweede navigator naast de console zetten, en twee navigators is er
+     een te veel. De weg terug staat daarom expliciet in de console zelf; zonder
+     die link zou dit attribuut een uitweg zijn in plaats van een keuze. -->
+<body class="rtg-stijl" data-rtg-modus="pro" data-ios-uit>
+
+<div class="smal">
+  <p><strong style="color:var(--rtg-txt);">RTG Workspace is voor een groot scherm.</strong><br>
+  Op een telefoon is RTG Mobile de app: dezelfde wereld, andere omgeving.
+  <br><br><a href="/apps/app.html">Naar RTG Mobile</a></p>
+</div>
+
+<main class="rtg-werkruimte" id="ruimte">
+  <!-- De console: het anker van de werkruimte, geen menu met twintig apps maar
+       de huidige context (WERKRUIMTE.md par. 2). -->
+  <aside class="rtg-console" id="console" aria-label="RTG Command">
+    <div>
+      <h1>RTG Command</h1>
+      <div class="wie" id="wie">Rahul &middot; Nederland / RTG</div>
+      <a class="terugmobiel" href="/apps/app.html">&lsaquo; RTG Mobile</a>
+    </div>
+
+    <div class="blok">
+      <div class="bloknaam">Vraag of open iets</div>
+      <input class="zoek" id="zoek" placeholder="&#8984;K  Reizen, Veilig, Ibiza..." aria-label="Zoeken of openen">
+    </div>
+
+    <div class="blok">
+      <div class="bloknaam">Werelden</div>
+      <div class="rijtje" id="werelden"></div>
+    </div>
+
+    <div class="blok">
+      <div class="bloknaam">Actief</div>
+      <div class="rijtje" data-actieflijst></div>
+    </div>
+
+    <div class="blok">
+      <div class="bloknaam">Werkruimtes</div>
+      <div class="rijtje" data-ruimtes></div>
+      <button type="button" class="bewaar" id="bewaar">Deze kamer bewaren</button>
+    </div>
+
+    <div class="blok">
+      <div class="bloknaam">Gedeelde context</div>
+      <div class="context" data-context></div>
+    </div>
+
+    <div class="blok">
+      <div class="bloknaam">Rahul</div>
+      <div class="context">Schikt de ruimte als u dat vraagt. Hij verstuurt niets
+      en betaalt niets; dat blijft aan u.</div>
+    </div>
+  </aside>
+</main>
+
+<!-- HET PALET (WERKRUIMTE.md par. 10, stap 6). Het staat over de ruimte heen en
+     niet in een la: de console is de navigator, en navigeren doe je vanaf waar
+     je bent. Escape sluit; Enter doet de bovenste regel. -->
+<div class="palet" id="palet" hidden role="dialog" aria-modal="true" aria-label="Commandopalet">
+  <div class="paletdoos">
+    <input id="paletIn" autocomplete="off" placeholder="Open een app, haal een werkruimte terug, sluit iets..." aria-label="Opdracht">
+    <ul id="paletLijst" role="listbox"></ul>
+  </div>
+</div>
+
+<!-- media.js VOOR de schil: die geeft het camera- en microfoonrecht door aan
+     elke surface, en dat moet gebeuren voordat er een frame wordt gemaakt. -->
+<script src="/shared/media.js"></script>
+<script src="/shared/rtg-schil.js"></script>
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+
+  /* De werelden die als surface te openen zijn. Elk is een ECHTE app die zijn
+     eigen pagina blijft: de schil weet alleen naam en adres, niet wat erin
+     gebeurt (PLATFORM.md -- de apps houden hun diepte, de bovenlaag verbindt). */
+  const WERELDEN = [
+    { id: 'reizen', naam: 'Reizen', url: '/apps/reizen.html' },
+    { id: 'veilig', naam: 'Veilig', url: '/apps/veilig.html' },
+    { id: 'agenda', naam: 'Agenda', url: '/apps/agenda.html' },
+    { id: 'bestanden', naam: 'Bestanden', url: '/apps/bestanden.html' },
+    { id: 'notities', naam: 'Notities', url: '/apps/notities.html' },
+    { id: 'office', naam: 'Documenten', url: '/apps/office.html' },
+    { id: 'kantoor', naam: 'RTG Kantoor', url: '/apps/kantoor.html' },
+    { id: 'sociaal', naam: 'RTG Sociaal', url: '/apps/sociaal.html' }
+  ];
+
+  const schil = RTGSchil.start({ vak: $('#ruimte'), console: $('#console'), apps: WERELDEN });
+
+  $('#werelden').innerHTML = WERELDEN.map(w =>
+    '<button type="button" data-open="' + w.id + '">' + w.naam + '</button>').join('');
+  $('#werelden').querySelectorAll('[data-open]').forEach(b => b.addEventListener('click', () => {
+    const w = WERELDEN.find(x => x.id === b.dataset.open);
+    if (w) RTGSchil.open(w.id, { naam: w.naam, url: w.url, kort: w.naam });
+  }));
+
+  /* HET PALET (WERKRUIMTE.md par. 10, stap 6). De console is de navigator; dit
+     is zijn mond. Hier stond een zoekregel die alleen op naam kon openen --
+     eerlijk, maar niet veel. Nu opent hij apps, haalt hij een bewaarde
+     werkruimte terug en sluit hij een surface, en de treffers komen uit de
+     schil zelf (RTGSchil.palet) zodat het scherm ze niet nog eens bijhoudt. */
+  let paletKeuze = 0;
+  function paletTeken() {
+    const t = RTGSchil.palet($('#paletIn').value);
+    paletKeuze = Math.min(paletKeuze, Math.max(0, t.length - 1));
+    $('#paletLijst').innerHTML = t.length
+      ? t.map((x, i) => '<li role="option"' + (i === paletKeuze ? ' aria-selected="true"' : '') +
+          '><span>' + x.label + '</span><span class="hint">' + x.hint + '</span></li>').join('')
+      : '<li class="leeg">Niets gevonden</li>';
+    $('#paletLijst').querySelectorAll('li[role="option"]').forEach((li, i) =>
+      li.addEventListener('click', () => { t[i].doe(); paletDicht(); }));
+    return t;
+  }
+  function paletOpen() {
+    $('#palet').hidden = false; paletKeuze = 0;
+    $('#paletIn').value = ''; $('#paletIn').focus(); paletTeken();
+  }
+  function paletDicht() { $('#palet').hidden = true; }
+  $('#paletIn').addEventListener('input', () => { paletKeuze = 0; paletTeken(); });
+  $('#paletIn').addEventListener('keydown', (e) => {
+    const t = RTGSchil.palet($('#paletIn').value);
+    if (e.key === 'ArrowDown') { e.preventDefault(); paletKeuze = Math.min(paletKeuze + 1, t.length - 1); paletTeken(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); paletKeuze = Math.max(paletKeuze - 1, 0); paletTeken(); }
+    else if (e.key === 'Enter') { e.preventDefault(); if (t[paletKeuze]) { t[paletKeuze].doe(); paletDicht(); } }
+    else if (e.key === 'Escape') { e.preventDefault(); paletDicht(); }
+  });
+  $('#palet').addEventListener('click', (e) => { if (e.target.id === 'palet') paletDicht(); });
+  // de zoekregel in de console opent hetzelfde palet: EEN ingang, twee plekken
+  $('#zoek').addEventListener('focus', paletOpen);
+  document.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); paletOpen(); }
+  });
+
+  /* Een kamer bewaren (stap 5). Bewust met een naam die u zelf geeft: "Mijn
+     Directie" onthoudt u, "Werkruimte 3" niet. */
+  $('#bewaar').addEventListener('click', () => {
+    const n = prompt('Hoe heet deze kamer?', 'Mijn Directie');
+    if (n) RTGSchil.bewaarRuimte(n);
+  });
+
+  // een werkruimte begint niet leeg: twee surfaces, zodat de tafel meteen leest
+  RTGSchil.open('reizen', { naam: 'Reizen', url: '/apps/reizen.html', kort: 'Reizen' });
+  RTGSchil.open('agenda', { naam: 'Agenda', url: '/apps/agenda.html', kort: 'Agenda' });
+})();
+</script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+</body>
+</html>

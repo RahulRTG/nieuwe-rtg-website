@@ -10,22 +10,27 @@ module.exports = (kern) => {
     if (!caps.includes('gebouw')) { res.status(403).json({ error: 'Dit is geen kantoorgebouw-partner.' }); return false; }
     return true;
   }
-  const r = (pad, fn) => app.post('/api/supplier/gebouw' + pad, supplierAuth, (req, res) => {
+  /* De paden staan voluit en niet als '/api/supplier/gebouw' + pad. Een opgebouwd pad
+     ziet scripts/schakelbaar.js niet, en wat die census niet ziet is vanuit
+     de boardroom niet uit te zetten en niet per stad te sluiten
+     (scripts/check.js regel 45). De controle eromheen blijft op EEN plek;
+     alleen de registratie is uitgeschreven. */
+  const doe = (fn) => (req, res) => {
     if (!eisGebouw(req, res)) return;
     stuur(res, fn(req.supplier.code, req.body || {}));
-  });
+  };
 
-  r('', (code) => gebouw.overzicht(code));
-  r('/zaal', (code, b) => gebouw.zaalBoek(code, b));
-  r('/zaal/weg', (code, b) => gebouw.zaalWeg(code, b.id));
-  r('/bezoeker', (code, b) => gebouw.bezoekerMeld(code, b));
-  r('/bezoeker/status', (code, b) => gebouw.bezoekerStatus(code, b.id, b.status));
-  r('/badge', (code, b) => gebouw.badgeMaak(code, b));
-  r('/badge/zet', (code, b) => gebouw.badgeZet(code, b.id, b.actief));
-  r('/melding', (code, b) => gebouw.meldingMaak(code, b));
-  r('/melding/status', (code, b) => gebouw.meldingStatus(code, b.id, b.status));
-  r('/valet', (code, b) => gebouw.valetVraag(code, b));
-  r('/valet/status', (code, b) => gebouw.valetStatus(code, b.id, b.status));
-  r('/jetset', (code, b) => gebouw.jetsetVraag(code, b));
-  r('/jetset/status', (code, b) => gebouw.jetsetStatus(code, b.id, b.status, b.notitie));
+  app.post('/api/supplier/gebouw', supplierAuth, doe((code) => gebouw.overzicht(code)));
+  app.post('/api/supplier/gebouw/zaal', supplierAuth, doe((code, b) => gebouw.zaalBoek(code, b)));
+  app.post('/api/supplier/gebouw/zaal/weg', supplierAuth, doe((code, b) => gebouw.zaalWeg(code, b.id)));
+  app.post('/api/supplier/gebouw/bezoeker', supplierAuth, doe((code, b) => gebouw.bezoekerMeld(code, b)));
+  app.post('/api/supplier/gebouw/bezoeker/status', supplierAuth, doe((code, b) => gebouw.bezoekerStatus(code, b.id, b.status)));
+  app.post('/api/supplier/gebouw/badge', supplierAuth, doe((code, b) => gebouw.badgeMaak(code, b)));
+  app.post('/api/supplier/gebouw/badge/zet', supplierAuth, doe((code, b) => gebouw.badgeZet(code, b.id, b.actief)));
+  app.post('/api/supplier/gebouw/melding', supplierAuth, doe((code, b) => gebouw.meldingMaak(code, b)));
+  app.post('/api/supplier/gebouw/melding/status', supplierAuth, doe((code, b) => gebouw.meldingStatus(code, b.id, b.status)));
+  app.post('/api/supplier/gebouw/valet', supplierAuth, doe((code, b) => gebouw.valetVraag(code, b)));
+  app.post('/api/supplier/gebouw/valet/status', supplierAuth, doe((code, b) => gebouw.valetStatus(code, b.id, b.status)));
+  app.post('/api/supplier/gebouw/jetset', supplierAuth, doe((code, b) => gebouw.jetsetVraag(code, b)));
+  app.post('/api/supplier/gebouw/jetset/status', supplierAuth, doe((code, b) => gebouw.jetsetStatus(code, b.id, b.status, b.notitie)));
 };

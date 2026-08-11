@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<script src="/shared/id.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Rit</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<style>
+  :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--line:var(--rtg-line);--txt:var(--rtg-txt);
+    --soft:var(--rtg-soft);--groen:#69B891;--rood:#DE6E92;--let:#C9A24B;}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;min-height:100dvh;}
+  .kop{display:flex;align-items:center;gap:.7rem;padding:calc(env(safe-area-inset-top,0px) + .9rem) 1.1rem .6rem;}
+  .kop h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.35rem;}
+  .kop .rek{flex:1;}
+  .kop a{color:var(--txt);text-decoration:none;font-size:1.1rem;}
+  main{padding:0 1.1rem 3rem;max-width:46rem;}
+  .kaart{background:var(--card);border:1px solid var(--line);border-radius:.9rem;padding:1rem;margin-top:.9rem;}
+  .kaart h2{font-family:'Bodoni Moda',serif;font-size:1.1rem;font-weight:600;margin-bottom:.5rem;}
+  .stil{color:var(--soft);font-size:.85rem;line-height:1.5;}
+  .stand{display:inline-block;padding:.2rem .6rem;border-radius:999px;font-size:.78rem;font-weight:600;}
+  .ja{background:rgba(105,184,145,.16);color:var(--groen);}
+  .nee{background:rgba(222,110,146,.16);color:var(--rood);}
+  .bijna{background:rgba(201,162,75,.16);color:var(--let);}
+  .rij{display:flex;justify-content:space-between;gap:1rem;padding:.45rem 0;border-bottom:1px solid var(--line);font-size:.9rem;}
+  .rij:last-child{border-bottom:0;}
+  .rij b{font-weight:600;}
+  ul{list-style:none;}
+  li{padding:.35rem 0;font-size:.9rem;}
+  .vlootrij{display:block;width:100%;text-align:left;background:none;border:0;border-bottom:1px solid var(--line);
+    color:var(--txt);padding:.6rem 0;font:inherit;cursor:pointer;}
+  .vlootrij:last-child{border-bottom:0;}
+  .melding{position:fixed;left:50%;transform:translateX(-50%);bottom:1.4rem;background:var(--card);
+    border:1px solid var(--line);border-radius:.7rem;padding:.6rem 1rem;opacity:0;transition:opacity .2s;font-size:.9rem;}
+  .melding.zien{opacity:1;}
+</style>
+</head>
+<body>
+<header class="kop">
+  <a href="/apps/app.html" aria-label="Terug naar het bureaublad">&#8592;</a>
+  <h1>Rit</h1>
+  <span class="rek"></span>
+  <button class="knop" id="ververs" type="button">Ververs</button>
+</header>
+<main>
+  <div class="kaart" id="geen" hidden>
+    <h2>Geen rit gekozen</h2>
+    <p class="stil" id="geenTekst"></p>
+  </div>
+
+  <div id="dit" hidden>
+    <div class="kaart">
+      <h2 id="vNaam">-</h2>
+      <p class="stil" id="vSub"></p>
+      <p id="vStand"></p>
+      <div id="vRedenen"></div>
+    </div>
+
+    <div class="kaart">
+      <h2>De reis</h2>
+      <div id="vReis"></div>
+    </div>
+
+    <div class="kaart">
+      <h2>Wie hem rijdt</h2>
+      <div id="vWie"></div>
+      <p class="stil" id="vWieLet"></p>
+    </div>
+  </div>
+
+  <div class="kaart">
+    <h2>Mijn ritten</h2>
+    <div id="vloot"></div>
+    <p class="stil" id="vlootLet"></p>
+  </div>
+</main>
+<div class="melding" id="melding" role="status"></div>
+<script src="/apps/rit.js"></script>
+<script src="/shared/schermbeeld.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+</body>
+</html>

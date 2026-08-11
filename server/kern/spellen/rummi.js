@@ -2,7 +2,7 @@
    Verbatim afgesplitst uit kern/spellen.js; de lobby (aldaar) doet matchmaking,
    beurten en views en roept deze motor via de gedeelde context aan. */
 module.exports = (ctx) => {
-  const { save, crypto, schud, beurtDoor, codenaamVan, nudge } = ctx;
+  const { save, crypto, schud, beurtDoor, codenaamVan, nudge, ZONDER_SPELER } = ctx;
 
   const R_KLEUREN = ['r', 'b', 'g', 'z']; // rood, blauw, geel (goud), zwart
   function rummiInit(potje) {
@@ -99,10 +99,15 @@ module.exports = (ctx) => {
      niet genoeg, dan ben je failliet en spelen de anderen door. */
 
   const spel = {
-    sleutel: 'rummi', naam: 'Rummi', max: 4, wereld: 'rtf', kijken: true,
+    sleutel: 'rummi', naam: 'Rummi', max: 4, wereld: 'rtf', vormen: ['live', 'async'],
     init: rummiInit, zet: rummiZet,
-    view: (p, st, mij) => ({ rek: st.rekken[mij], tafel: st.tafel, aantallen: p.spelers.map(sp => st.rekken[sp].length),
-      zak: st.zak.length, eerste: st.eerste[mij], passes: st.passes })
+    /* `rek` en `eerste` hangen aan `mij` en zijn zonder speler `undefined`: de
+       tafel is openbaar, de rekken zijn dat niet. */
+    zicht: {
+      speler: (p, st, mij) => ({ rek: st.rekken[mij], tafel: st.tafel, aantallen: p.spelers.map(sp => st.rekken[sp].length),
+        zak: st.zak.length, eerste: st.eerste[mij], passes: st.passes }),
+      kijker: ZONDER_SPELER
+    }
   };
   return { spel, rummiInit, rummiZet, rummiSet };
 };

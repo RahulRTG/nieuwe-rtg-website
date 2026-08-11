@@ -33,13 +33,30 @@ function planSnel() {
   snelTimer = setTimeout(snelNu, Number(process.env.PG_SNEL_MS || 60));
   if (snelTimer.unref) snelTimer.unref();
 }
+let snelBelofte = null;
 async function snelNu() {
   snelTimer = null;
   if (!pg || !pgKlaar || snelBezig || !db.writable || !snelVuil || !pg.flushVoorrang) return;
   snelVuil = false; snelBezig = true;
-  try { await pg.flushVoorrang(db.data); }
+  snelBelofte = pg.flushVoorrang(db.data);
+  try { await snelBelofte; }
   catch (e) { snelVuil = true; console.warn('[pg] voorrang-flush mislukt:', e.message); }
-  finally { snelBezig = false; if (snelVuil && pgKlaar) planSnel(); }
+  finally { snelBezig = false; snelBelofte = null; if (snelVuil && pgKlaar) planSnel(); }
+}
+/* Wachtend op de rijstrook: voor geld dat pas "gelukt" mag zeggen als het er
+   ECHT staat. De rijstrook zelf bestond al (planSnel, 60 ms), maar een timer
+   is een venster, en de crashproef (kill -9 onder schrijflast) mat er
+   tweeentwintig BEVESTIGDE overdrachten in die na de herstart weg waren. Wie
+   hier wacht, weet dat de eigen mutatie in Postgres staat: een lopende flush
+   die haar mogelijk miste wordt afgewacht, en zolang er vuil ligt draait er
+   nog een ronde. In elke andere opslagstand is dit een no-op. */
+async function flushVoorrangDirect() {
+  if (STORE !== 'postgres' || !pg || !pgKlaar || !db.writable || !pg.flushVoorrang) return;
+  while (snelBezig) await (snelBelofte || new Promise(r => setTimeout(r, 5)));
+  if (snelVuil) {
+    if (snelTimer) { clearTimeout(snelTimer); snelTimer = null; }
+    await snelNu();
+  }
 }
 
 function planFlush() {
@@ -170,4 +187,4 @@ async function pgPing() {
 function pgPoolStatus() { return (pg && pg.poolStatus) ? pg.poolStatus() : null; }
 function klaar() { return pgKlaar; }
 
-module.exports = { planFlush, startPostgres, flushBijAfsluiten, pgPing, pgPoolStatus, klaar };
+module.exports = { planFlush, flushVoorrangDirect, startPostgres, flushBijAfsluiten, pgPing, pgPoolStatus, klaar };

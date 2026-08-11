@@ -23,6 +23,13 @@
                        Die geven vanzelf niets terug voor wie dat dossier niet
                        heeft -- er is dus GEEN pas-controle in de motor nodig,
                        en die staat er ook niet. De poort zit op de route.
+     bronnen-leven     wat er in het LEVEN van dit lid speelt: talenten,
+                       interesses en bijdrage (LEVEN.md par. 1.2). De enige
+                       bronnen die over de mens gaan in plaats van over zijn
+                       spullen, en daarom de enige waar de poort in elke knoop
+                       met de hand op 'lid' staat. De bijdrage staat in
+                       ./bronnen-leven-bijdrage.js en draagt NOOIT een bedrag:
+                       zie de kop daar voor waarom een som hier verboden is.
      bronnen-zaak      dezelfde motor, andere eigenaar: een RTG-kantoor
                        (leverancier) op zijn code. Aparte lijst, want een zaak is
                        geen lid -- zie ./bronnen-zaak.js.

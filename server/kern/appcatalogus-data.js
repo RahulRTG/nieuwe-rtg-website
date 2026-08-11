@@ -26,6 +26,7 @@ const CATEGORIEEN = [
    delen bij. Hier alleen samenvoegen. */
 const R = [].concat(
   require('./appcatalogus-rijen/deel1'),
+  require('./appcatalogus-rijen/deel1b'),
   require('./appcatalogus-rijen/deel2')
 );
 

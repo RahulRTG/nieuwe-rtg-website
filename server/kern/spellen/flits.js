@@ -4,7 +4,7 @@
    gelijke stand wie het eerst klaar was. Krijgt de gedeelde context een
    keer bij het opstarten vanuit kern/spellen.js. */
 module.exports = (ctx) => {
-  const { save, crypto, codenaamVan, nudge } = ctx;
+  const { save, crypto, codenaamVan, nudge, ZONDER_SPELER } = ctx;
   /* crypto.randomInt eist max > min. Een BEREKENDE bovengrens kan onder de
      ondergrens duiken, en dan gooit hij -- midden in het opzetten van een
      potje, waardoor het hele duel omviel met "Er ging iets mis". Dat gebeurde
@@ -61,7 +61,11 @@ module.exports = (ctx) => {
     nr: st.idx[mij], tot: st.sommen.length, goed: st.goed[mij],
     stand: p.spelers.map(sp => ({ af: st.idx[sp], goed: st.goed[sp] }))
   });
-  const spel = { sleutel: 'flits', naam: 'Flitsduel', max: 4, wereld: 'rtf', buitenBeurt: ['antwoord'], kijken: true,
-    init: flitsInit, zet: flitsZet, view: flitsView };
+  // op een gedeeld scherm: alleen de tussenstand, niet iemands eigen som
+  const flitsPubliek = (p, st) => ({ tot: st.sommen.length,
+    stand: p.spelers.map(sp => ({ af: st.idx[sp], goed: st.goed[sp] })) });
+  const spel = { sleutel: 'flits', naam: 'Flitsduel', max: 4, wereld: 'rtf', buitenBeurt: ['antwoord'],
+    init: flitsInit, zet: flitsZet,
+    zicht: { speler: flitsView, kijker: ZONDER_SPELER, publiek: flitsPubliek } };
   return { spel, flitsInit, flitsZet, flitsView };
 };

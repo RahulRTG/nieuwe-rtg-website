@@ -54,5 +54,18 @@ module.exports = {
     'Een passkey is niet te phishen: er valt niets over te typen of af te kijken.'),
   '/apps/vluchten.html': G('RTG Vluchten: je vluchten en de private aviation van partners.',
     ['Bekijk vluchten en beschikbaarheid', 'Vraag een boeking aan; de partner bevestigt', 'Volg je reis in de app'],
-    'Boekingen zijn pas definitief na bevestiging; de app zegt dat ook eerlijk.')
+    'Boekingen zijn pas definitief na bevestiging; de app zegt dat ook eerlijk.'),
+  /* RTG Veilig draagt de vier standen; de vier oude paden houden hun EIGEN
+     uitleg, want daar komt iemand nog steeds binnen (een alarmmail, een oude
+     bladwijzer, een geinstalleerde PWA) en die wordt met een hash naar de
+     juiste stand gestuurd. Een omleiding die onderweg zijn uitleg kwijtraakt,
+     zou de leerlaag stiller maken dan hij was. */
+  '/apps/veilig.html': G('RTG Veilig: Thuiswacht, Codewoord, Vitaal en Thuisrust als vier standen van een app, op een kring die je een keer instelt.',
+    ['Wissel bovenin van stand: onderweg, stil om hulp vragen, dagelijks melden, of rust',
+     'Vul je kring een keer; alle vier de standen gebruiken dezelfde mensen',
+     'Stuur een keer een proefalarm, zodat je weet dat de keten echt werkt'],
+    'De klok tikt op de server en niet in de app, dus het werkt juist wel als je telefoon uitvalt. Wat het niet is: een alarmcentrale -- er wordt niemand gebeld en er kijkt geen mens mee.'),
+  '/apps/ik.html': G('Wie ben ik: wat Rahul over jou mag weten, en hoe hij tegen je doet.',
+    ['Kies of Rahul een maatje, plagerig, zakelijk of rustig is', 'Zet je voornaamwoorden en hoe je genoemd wilt worden', 'Geef zelf aan of je iets gelooft; dan feliciteert hij je en houdt hij er rekening mee'],
+    'Alles is optioneel en alles is weer weg te halen. Rahul raadt nooit: niet je geloof uit je naam, niet je aanspreekvorm uit je paspoort.'),
 };

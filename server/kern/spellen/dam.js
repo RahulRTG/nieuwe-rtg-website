@@ -2,7 +2,7 @@
    Verbatim afgesplitst uit kern/spellen.js; de lobby (aldaar) doet matchmaking,
    beurten en views en roept deze motor via de gedeelde context aan. */
 module.exports = (ctx) => {
-  const { save, crypto, schud, beurtDoor, codenaamVan, nudge } = ctx;
+  const { save, crypto, schud, beurtDoor, codenaamVan, nudge, ZONDER_SPELER } = ctx;
 
   const D_RICH = [[-1, -1], [-1, 1], [1, -1], [1, 1]];
   function damInit(potje) {
@@ -82,10 +82,16 @@ module.exports = (ctx) => {
      de rest komt uit jouw rek. Kun je niets: pak een steen. */
 
   const spel = {
-    sleutel: 'dam', naam: 'Dammen', max: 2, wereld: 'rtf', kijken: true,
+    sleutel: 'dam', naam: 'Dammen', max: 2, wereld: 'rtf', vormen: ['live', 'async'], naspeelbaar: true,
     init: damInit, zet: damZet,
-    view: (p, st, mij) => ({ bord: st.bord.join(''), ketting: st.ketting,
-      zetten: p.status === 'bezig' && p.spelers[p.beurt] === mij ? damZetten(p, mij) : [] })
+    /* Een dambord is openbaar: er is geen verborgen informatie. `zetten` is de
+       enige persoonlijke sleutel en die valt zonder speler vanzelf op een lege
+       lijst terug -- minder, nooit meer. */
+    zicht: {
+      speler: (p, st, mij) => ({ bord: st.bord.join(''), ketting: st.ketting,
+        zetten: p.status === 'bezig' && p.spelers[p.beurt] === mij ? damZetten(p, mij) : [] }),
+      kijker: ZONDER_SPELER
+    }
   };
   return { spel, damInit, damZet, damZetten };
 };

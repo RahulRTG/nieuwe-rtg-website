@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 915 bestanden en 5940 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 915 bestanden en 5941 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 915 |
-| losse beweringen (`test(...)`) | 5940 |
+| losse beweringen (`test(...)`) | 5941 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 614 |
 | **overleefd**: geen mutatie kreeg hem rood | 13 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-796 bestanden, 5737 beweringen.
+796 bestanden, 5738 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -93,7 +93,7 @@ toets omvalt.
 | `bedrijfrecht.test.js` | 5 | gezakt op `liegpoort /api/` | RTG Werk OS, deel 5: contracten en besluitvorming. Vijf beweringen: - DE LAATSTE OPZEGDAG WORDT UITGEREKEND uit einddatum en opzegtermijn, niet overgetypt -- en een opzegging na die dag wordt als TE LAAT genoteerd in... |
 | `bedrijfsintake.test.js` | 1 | gezakt op `liegpoort /api/` | Golf 6: de ondernemersintake en de automatische bedrijfsprovisioning. Getoetst: de aanvraag draagt de bedrijfsbehoeften; zonder menselijk akkoord gebeurt er niets; na akkoord + eerste termijn voldaan staat de zaak er... |
 | `bedrijfwerk.test.js` | 6 | gezakt op `liegpoort /api/` | RTG Werk OS, deel 2: projecten en de kennisbank. De beweringen die ertoe doen, en het zijn er zes: - VOORTGANG WORDT GETELD, NOOIT INGEVULD. |
-| `beginscherm.test.js` | 3 | genoemd | HET BEGINSCHERM DRAAGT DE ACHT WERELDEN EN VERDER GEEN LOSSE APPS. Dat is de afspraak van PLATFORM.md par. |
+| `beginscherm.test.js` | 4 | genoemd | HET BEGINSCHERM DRAAGT DE ACHT WERELDEN EN VERDER GEEN LOSSE APPS. Dat is de afspraak van PLATFORM.md par. |
 | `belasting-groothandels.test.js` | 2 | gezakt op `liegpoort /api/` | De belastingtool van elke zaak + meerdere groothandels per zaak. |
 | `belastingkantoor.test.js` | 10 | gezakt op `liegpoort /api/` | Het Belastingkantoor (kern/overheid/kantoor.js): de inspecteurscockpit met invordering via de Berichtenbox, het btw-beeld uit de facturatiemotor + KVK, de slimme signalen en de AI-chef-inspecteur. Alleen voor het rijk. |
 | `belofte.test.js` | 4 | genoemd | Het belofteregister (scripts/belofte.js + BELOFTE.json): elke toezegging draagt haar dekking, en die dekking moet er echt zijn. Deze toets bewijst dat de meter de drie standen goed uit elkaar houdt -- en vooral dat... |

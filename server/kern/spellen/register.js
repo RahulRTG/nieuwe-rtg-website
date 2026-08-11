@@ -57,7 +57,7 @@ const { keurAlgemeen, keurArcade, keurPotje, keurZicht } = require('./keur');
    expliciete lijst: een helper die je hier neerzet en vergeet toe te voegen
    valt op bij het opstarten, in plaats van stil mee te scannen. */
 const GEEN_SPEL = new Set(['register.js', 'lobby.js', 'partij.js', 'rahul.js', 'klas.js', 'quiz-data.js',
-  'presence.js', 'uitslagen.js', 'prestaties.js', 'toernooi.js', 'zetten.js', 'praat.js', 'telling.js', 'teams.js', 'kring.js', 'arcade.js', 'opruimen.js', 'toernooi-schema.js', 'gedeeld.js', 'grens.js', 'zicht.js', 'klok.js', 'beleid.js', 'nabespreking.js', 'naspelen.js', 'keur.js', 'uitnodigen.js', 'rondom.js']);
+  'presence.js', 'uitslagen.js', 'prestaties.js', 'toernooi.js', 'zetten.js', 'praat.js', 'telling.js', 'teams.js', 'kring.js', 'arcade.js', 'opruimen.js', 'toernooi-schema.js', 'gedeeld.js', 'grens.js', 'zicht.js', 'klok.js', 'beleid.js', 'nabespreking.js', 'naspelen.js', 'keur.js', 'uitnodigen.js', 'rondom.js', 'projectie.js']);
 
 /* De map is een parameter zodat de toets het register op fixtures kan draaien
    (een module zonder descriptor, een sleutel die niet bij zijn bestand hoort)

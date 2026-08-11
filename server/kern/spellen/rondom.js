@@ -24,7 +24,7 @@
    elke reden staat in de kop van de module die wordt aangeroepen. Staat hier
    ooit een spelregel, dan hoort die ergens anders. */
 module.exports = (ctx) => {
-  const { anthropic, spelReplay, SPEL, SOORTEN, db, save, rid, nu, S,
+  const { anthropic, spelReplay, SPEL, SOORTEN, ZICHT, crypto, db, save, rid, nu, S,
     codenaamVan, isGeblokkeerd, zijnVrienden, klasgenotenVan, sociaalRate,
     comm, ARCADE, ruw, progressieMag, GEEN_PROGRESSIE, opruimHaken, spelCtx } = ctx;
 
@@ -57,6 +57,12 @@ module.exports = (ctx) => {
     comm: () => (typeof comm === 'function' ? comm() : comm) || null
   }, spelCtx));
 
+  /* De projectiekamer: een potje op een gedeeld scherm. Een scherm is een
+     PROJECTIE en geen deelnemer -- geen sessie, geen sleutel, en het krijgt
+     uitsluitend `zicht.publiek`. Zie spellen/projectie.js. */
+  const { projectieOpen, projectieStand, projectieSluit, projectieSpellen } =
+    require('./projectie')({ S, save, crypto, nu, SPEL, SOORTEN, ZICHT, codenaamVan });
+
   /* De arcade: spelen zonder tegenstander, waar alleen een getal van overblijft.
      Zie spellen/arcade.js voor waarom de twee soorten score niet naast elkaar
      mogen bestaan zonder dat de ene de andere dichtzet. */
@@ -66,6 +72,7 @@ module.exports = (ctx) => {
   opruimHaken.sudoku = sudokuOpschonen;
 
   return { spelRahul, spelNabespreking, spelNaspelen,
+    projectieOpen, projectieStand, projectieSluit, projectieSpellen,
     teamNieuw, teamNodig, teamAntwoord, teamVerlaat, mijnTeams,
     spelPraat, spelPraatStuur,
     arcadeScore, arcadeBord, sneekScore, sneekBord, sudokuNieuw, sudokuKlaar };

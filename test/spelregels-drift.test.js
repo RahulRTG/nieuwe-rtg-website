@@ -352,3 +352,15 @@ test('het schaakbord toont de laatste zet, en de server stuurt hem ook echt mee'
   assert.match(teken, /lz\[0\] === veld/, 'de pagina markeert het veld waar de zet vandaan kwam');
   assert.match(teken, /lz\[1\] === veld/, 'en het veld waar hij heen ging');
 });
+
+test('de spellen die de lobby op een scherm aanbiedt hebben ook echt een projectie', () => {
+  /* Vierde kopie van serverkennis in de lobby. Zelfde afweging, zelfde bewaking:
+     een spel dat de client projecteerbaar noemt terwijl de server het weigert,
+     geeft een foutmelding op een knop die wij zelf aanboden. */
+  const bron = knip('const PROJECTEERBAAR', 'const TEMPI');
+  const client = new Function(bron + '; return PROJECTEERBAAR;')();
+  const { ZICHT } = require('../server/kern/spellen/register')({
+    save() {}, crypto: require('crypto'), schud: (a) => a, beurtDoor() {}, codenaamVan: (x) => x, nudge() {} });
+  const server = Object.keys(ZICHT).filter(k => ZICHT[k].publiek);
+  assert.deepEqual(client.slice().sort(), server.slice().sort());
+});

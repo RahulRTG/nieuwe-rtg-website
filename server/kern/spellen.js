@@ -142,16 +142,17 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
      van hen wordt door die laag gelezen -- dat is de naad waarop ze samen in
      spellen/rondom.js staan. */
   const rondom = require('./spellen/rondom')({
-    anthropic, spelReplay, SPEL, SOORTEN, db, save, rid, nu, S,
+    anthropic, spelReplay, SPEL, SOORTEN, ZICHT, crypto, db, save, rid, nu, S,
     codenaamVan, isGeblokkeerd, zijnVrienden, klasgenotenVan, sociaalRate,
     comm, ARCADE, ruw, progressieMag, GEEN_PROGRESSIE, opruimHaken, spelCtx: ctx
   });
-  const { spelRahul, spelNabespreking, spelNaspelen, teamNieuw, teamNodig, teamAntwoord,
+  const { spelRahul, spelNabespreking, spelNaspelen, projectieOpen, projectieStand,
+    projectieSluit, projectieSpellen, teamNieuw, teamNodig, teamAntwoord,
     teamVerlaat, mijnTeams, spelPraat, spelPraatStuur, arcadeScore, arcadeBord,
     sneekScore, sneekBord, sudokuNieuw, sudokuKlaar } = rondom;
 
 
-  return { spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelToewijzen, spelKijk, spelReplay, spelNaspelen, spelRahul, spelNabespreking, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, spelUitslagen, spelStand, spelPrestaties, spelPraat, spelPraatStuur, spelTelemetrie, teamNieuw, teamNodig, teamAntwoord, teamVerlaat, mijnTeams, sudokuNieuw, sudokuKlaar, spelVergeet, toernooiNieuw, toernooiAntwoord, mijnToernooien, toernooiStaat, sneekScore, sneekBord, arcadeScore, arcadeBord, SPEL_SOORTEN: SOORTEN,
+  return { spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelToewijzen, spelKijk, spelReplay, spelNaspelen, spelRahul, spelNabespreking, projectieOpen, projectieStand, projectieSluit, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, spelUitslagen, spelStand, spelPrestaties, spelPraat, spelPraatStuur, spelTelemetrie, teamNieuw, teamNodig, teamAntwoord, teamVerlaat, mijnTeams, sudokuNieuw, sudokuKlaar, spelVergeet, toernooiNieuw, toernooiAntwoord, mijnToernooien, toernooiStaat, sneekScore, sneekBord, arcadeScore, arcadeBord, SPEL_SOORTEN: SOORTEN,
     // alleen voor de drift-test: de client heeft een eigen kopie van deze
     // regels (directe feedback); de test houdt beide kopieën tegen elkaar
     _spelregels: { rummiSet: ruw.rummiSet, W_PREMIE: ruw.W_PREMIE, SPEL, ARCADE } };

@@ -297,8 +297,11 @@
       <button class="knop" id="sToewijzen" hidden style="flex:0 1 auto;">Partij toewijzen</button>
       <!-- pas na afloop: Rahul leest dan het hele verloop (zie nabespreking.js) -->
       <button class="knop grijs" id="sNabespreken" hidden style="flex:0 1 auto;">Rahul: bespreek na</button>
+      <!-- alleen bij spellen met een projectieweergave; het scherm is geen deelnemer -->
+      <button class="knop grijs" id="sScherm" hidden style="flex:0 1 auto;">Op het grote scherm</button>
     </div>
     <div class="leeg" id="sNabespreking" hidden></div>
+    <div class="klokrij" id="sSchermCode" hidden></div>
     <!-- de partij terugkijken. De server rekent elk bord uit met de motor die
          de partij ook echt speelde; deze strook schuift alleen de stap op. -->
     <div id="sNaspeelBlok" hidden>
@@ -415,6 +418,9 @@ const ASYNC_SPELLEN = ['schaak','dam','woord','rummi','mejn','magnaat'];
    elkaar. Alleen spellen zonder toeval in het begin: bij Pesten of Rummi ligt
    de schudbeurt nergens vast, dus een bord zou verzonnen zijn. */
 const NASPEELBAAR = ['schaak','dam'];
+/* Welke spellen op een gedeeld scherm mogen. Vierde kopie van serverkennis
+   (`zicht.publiek`), en ook deze staat onder de drifttoets. */
+const PROJECTEERBAAR = ['flits','geheugen','orde','quiz','reactie','schaak','schat','seconden','waarheid','woord'];
 const TEMPI = [
   ['', 'Live, aan tafel'],
   ['15m', 'Live · 15 min'],
@@ -769,6 +775,9 @@ function tekenPotje(){
      partij kan herbouwen. Welke dat zijn zegt de server bij het openen; de
      client raadt dat niet, want een bord dat er nooit zo stond ziet er precies
      zo echt uit als een goede. */
+  // een gedeeld scherm kan alleen bij een LOPEND potje van een spel dat er een
+  // projectieweergave voor heeft; de server weigert de rest
+  $('#sScherm').hidden = !(p.status === 'bezig' && PROJECTEERBAAR.includes(p.soort));
   const kanNaspelen = p.status === 'klaar' && NASPEELBAAR.includes(p.soort);
   $('#sNaspeelBlok').hidden = !kanNaspelen;
   if (!kanNaspelen) npStap = null;
@@ -813,6 +822,14 @@ $('#npLaatste').addEventListener('click', ()=> npToon(npTotaal));
 $('#npTerug').addEventListener('click', ()=> npToon(Math.max(0, (npStap===null?npTotaal:npStap) - 1)));
 $('#npVoor').addEventListener('click', ()=> npToon(Math.min(npTotaal, (npStap===null?0:npStap) + 1)));
 
+$('#sScherm').addEventListener('click', async ()=>{
+  if (!huidig) return;
+  try{
+    const d = await api('projectie-open', { id: huidig.id });
+    $('#sSchermCode').hidden = false;
+    $('#sSchermCode').innerHTML = 'Open <b>rtg.nl/apps/scherm.html</b> op de tv en typ <b>' + esc(d.code) + '</b>';
+  }catch(e){ meld(e.message); }
+});
 $('#sNabespreken').addEventListener('click', async ()=>{
   if (!huidig) return;
   $('#sNabespreking').hidden = false; $('#sNabespreking').textContent = 'Rahul kijkt de partij terug…';

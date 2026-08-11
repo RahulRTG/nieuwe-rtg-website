@@ -415,6 +415,24 @@ antwoord is nee:
 > geen antwoord. Een projectiekamer heeft een korte code met een vervaltijd, door
 > de host gemunt, en die vervalt als de host weggaat.
 
+**Gebouwd** (`spellen/projectie.js` + `public/apps/scherm.html`, fase 1). De code
+is bewust weinig waard: hij geeft één potje, hij verloopt na twee uur of zodra
+het potje weg is, en er kan niets terug — wie hem heeft ziet wat iedereen in de
+kamer toch al ziet. Het is de **enige spelingang zonder inlog**, en dat is de
+hele opzet: een televisie in een vakantiehuis hoort geen ingelogd RTG-account te
+dragen. `GET /api/projectie/:code`, met een rem tegen brute kracht.
+
+Twee dingen die daaruit volgen en die het model bevestigen: **30 Seconden kan nu
+wel op een scherm** (score, klok en wie raadt — de kaart zit niet in die laag,
+dus het scherm *kan* hem niet krijgen), en **Proost kan het niet**, want die
+poort is 18+ en een projectie heeft geen leeftijd. Dat tweede volgt uit een
+ontbrekende `zicht.publiek` en niet uit een aparte regel.
+
+Wat er níet in zit: telefoons koppelen aan het scherm. Die spelen gewoon in hun
+eigen app mee; een scanflow die een toestel aan een scherm bindt hoort bij Game
+Night, en dan koppel je mensen aan een sessie — een ander onderwerp met andere
+vragen.
+
 Dat sluit de 30 Seconden-lekkage structureel: het scherm kán de kaart niet
 krijgen, want die zit niet in de laag die het ontvangt.
 
@@ -907,7 +925,7 @@ uitzondering die de route in een 500 veranderde. Zie §6.
 | Spel | Bewijst |
 |---|---|
 | **Schaken** | premium 1v1 + async + replay + nabespreking — **af** |
-| **30 Seconden** | party + big screen + verborgen informatie |
+| **30 Seconden** | party + big screen + verborgen informatie — **af** |
 | **Sudoku** | arcade + dagchallenge (de enige die nu al kan) |
 | **Quizduel** | teams + Foundation + eigen content |
 | **Magnaat** | long-play multiplayer met een echte economie |
@@ -1009,5 +1027,6 @@ techniek is er niet om zichtbaar te zijn.
 | i | `GEMISTE_BEURTEN` en de tempo-term in `vervalMs` zijn vandaag onobserveerbaar (de bodem wint altijd); een mutatie erop wordt niet gepakt | niets — staat er als bekende, uitgelegde blinde vlek |
 | j | Tien spellen hebben een `zicht.publiek`; de zes andere projecteren nog niet | party mode per spel (fase 1/3) |
 | k | Meekijken heeft nog geen scherm: `/spel/kijk` bestaat alleen als API | spectator-laag (§8) |
+| n | Het gedeelde scherm toont de stand, maar telefoons koppelen (scannen) bestaat nog niet | Game Night (§9) |
 | ~~l~~ | ~~Een replay is ruwe data zonder scherm~~ — **opgelost** voor schaken en dammen; de server rekent de tussenstanden met de echte motor |
 | m | Naspelen kan alleen bij spellen zonder toeval in het begin (schaken, dammen); bij Pesten, Rummi, Woordduel en mens-erger-je-niet ligt de schudbeurt of de worp nergens vast | een replay voor de overige veertien |

@@ -3,9 +3,10 @@
    de RTG-leden-app (Bearer-token) en de RTFoundation (gezinscode + token),
    zodat alle leden tegen elkaar spelen. */
 const { log } = require('../log');
+const rem = require('../rem');
 
 module.exports = (kern) => {
-  const { app, auth, geenGast, rtf, spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelToewijzen, spelKijk, spelReplay, spelNaspelen, spelRahul, spelNabespreking, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, spelUitslagen, spelStand, spelPrestaties, spelPraat, spelPraatStuur, teamNieuw, teamNodig, teamAntwoord, teamVerlaat, mijnTeams, sudokuNieuw, sudokuKlaar, toernooiNieuw, toernooiAntwoord, mijnToernooien, toernooiStaat, sneekScore, sneekBord, arcadeScore, arcadeBord, socialConnecties } = kern;
+  const { app, auth, geenGast, rtf, spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelToewijzen, spelKijk, spelReplay, spelNaspelen, spelRahul, spelNabespreking, projectieOpen, projectieStand, projectieSluit, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, spelUitslagen, spelStand, spelPrestaties, spelPraat, spelPraatStuur, teamNieuw, teamNodig, teamAntwoord, teamVerlaat, mijnTeams, sudokuNieuw, sudokuKlaar, toernooiNieuw, toernooiAntwoord, mijnToernooien, toernooiStaat, sneekScore, sneekBord, arcadeScore, arcadeBord, socialConnecties } = kern;
 
   function rtfSpeler(req, res) {
     const sess = rtf.verifieerProfiel(req.body.code, req.body.token);
@@ -77,45 +78,13 @@ module.exports = (kern) => {
     stand: (mij) => spelStand(mij),
     // behaalde prestaties; wat je nog NIET hebt reist bewust niet mee
     prestaties: (mij) => spelPrestaties(mij),
-    /* Toernooien: een knockout waarvan elke wedstrijd een gewoon potje is. De
-       deelnemers komen uit dezelfde kring als een potje (vrienden en
-       klasgenoten), dus de kring wordt hier bepaald en niet in het verzoek. */
-    'toernooi-nieuw': (mij, b) => toernooiNieuw(mij, { soort: b.soort, naam: b.naam, maat: b.maat, vorm: b.vorm,
-      spelers: (Array.isArray(b.spelers) ? b.spelers : []).filter(k => kringVan(mij).includes(k)) }),
-    'toernooi-antwoord': (mij, b) => toernooiAntwoord(mij, String(b.id || ''), b.akkoord === true),
-    'toernooi-mijn': (mij) => mijnToernooien(mij),
-    'toernooi-staat': (mij, b) => toernooiStaat(mij, String(b.id || '')),
-    // de eigen opt-out: wel spelen, niet gezien worden
-    zichtbaar: (mij) => spelZichtbaar(mij),
-    'zichtbaar-zet': (mij, b) => spelZichtbaarZet(mij, b.aan !== false),
-    'sneek-score': (mij, b) => sneekScore(mij, b.punten),
-    'sneek-bord': (mij) => Object.assign({ status: 200 }, sneekBord(mij, vriendenVan(mij))),
-    /* Teams: een vaste club om mee te spelen. Uitnodigen kan alleen binnen je
-       eigen kring, en die wordt gewogen in `kern/spellen/kring.js` -- met opzet
-       NIET hier nog een keer. Hier stond eerst een tweede filter op `kringVan`,
-       en dat was smaller dan de kern: `kringVan` kent vrienden en klasgenoten,
-       de kring kent ook het huishouden. Een ouder kon zijn eigen kind dus niet
-       in zijn team vragen. Twee definities van dezelfde kring is precies wat
-       kring.js moest opheffen; deze route geeft de gevraagde sleutels door en
-       de kern zeeft ze. */
-    'team-nieuw': (mij, b) => teamNieuw(mij, b.naam, Array.isArray(b.leden) ? b.leden : []),
-    'team-nodig': (mij, b) => teamNodig(mij, String(b.id || ''), Array.isArray(b.leden) ? b.leden : []),
-    'team-antwoord': (mij, b) => teamAntwoord(mij, String(b.id || ''), b.akkoord === true),
-    'team-verlaat': (mij, b) => teamVerlaat(mij, String(b.id || '')),
-    'team-mijn': (mij) => mijnTeams(mij),
-    /* Praten in het potje. Geen eigen berichtenvoorraad -- dit gaat de
-       communicatiekern in; zie kern/spellen/praat.js. Twee acties, want lezen
-       mag geen gesprek AANMAKEN. */
-    praat: (mij, b) => spelPraat(mij, String(b.id || ''), b.aantal),
-    'praat-stuur': (mij, b) => spelPraatStuur(mij, String(b.id || ''), b.tekst),
-    /* Sudoku loopt NIET via arcade-score: de server geeft de puzzel uit en
-       rekent de score. Er is dus ook geen tijd of getal dat hier binnenkomt --
-       alleen het ingevulde rooster. */
-    'sudoku-nieuw': (mij, b) => sudokuNieuw(mij, String(b.niveau || '')),
-    'sudoku-klaar': (mij, b) => sudokuKlaar(mij, b.rooster),
-    'arcade-score': (mij, b) => arcadeScore(mij, String(b.spel || ''), b.punten),
-    'arcade-bord': (mij, b) => arcadeBord(mij, String(b.spel || ''), vriendenVan(mij))
   };
+
+  /* De acties RONDOM een potje (toernooien, teams, praten, de arcade, het
+     gedeelde scherm) staan in ./spellen-rondom.js en worden hier bijgeschoven.
+     Een tabel, een lus, een poort -- de splitsing is alleen de omvang. */
+  Object.assign(ACTIES, require('./spellen-rondom')(kern, { vriendenVan, kringVan }));
+
   /* vangnet: Express 4 vangt async-fouten niet zelf, dus zonder try/catch
      blijft een request eeuwig hangen als een actie onverwacht gooit.
 
@@ -131,6 +100,21 @@ module.exports = (kern) => {
       res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.', id: req && req.id });
     }
   }
+  /* HET GEDEELDE SCHERM, en dit is de enige spelingang ZONDER inlog -- met
+     reden: een televisie in een vakantiehuis heeft geen RTG-account, en er een
+     op zetten zou betekenen dat er een ingelogde sessie op een gedeeld apparaat
+     blijft staan. De CODE is het hele bewijs, en hij is bewust weinig waard:
+     hij geeft alleen `zicht.publiek` van EEN potje, hij verloopt, en er kan
+     niets terug. Wie hem heeft ziet wat iedereen in de kamer toch al ziet.
+
+     De rem is wat brute kracht tegenhoudt; de code is kort omdat hij op een
+     scherm wordt overgetypt. Zie de kop van kern/spellen/projectie.js. */
+  app.get('/api/projectie/:code', rem({ windowMs: 60000, limit: 60 }), (req, res) => {
+    const r = projectieStand(String(req.params.code || ''));
+    if (r.error) return res.status(r.status).json({ error: r.error });
+    res.json(r);
+  });
+
   for (const [naam, doe] of Object.entries(ACTIES)) {
     app.post('/api/member/spel/' + naam, auth, (req, res) => {
       if (geenGast(req, res)) return;

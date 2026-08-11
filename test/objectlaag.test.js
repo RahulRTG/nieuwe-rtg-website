@@ -30,11 +30,14 @@ function kernMet(over) {
       mijne: () => [], groepMet: () => null, isLid: () => false,
       publiek: (gr) => gr
     },
-    bijeenkomst: { lijstVan: () => [], publiek: (b) => b },
+    bijeenkomst: { lijstVan: () => [], publiek: (b) => b, mijnAgenda: () => ({ komt: [] }) },
     wbwMijn: () => ({ groepen: [] }),
     wbwGroep: () => ({ groep: { leden: [] } }),
     vonkMijn: () => ({ status: 200, matches: [] }),
-    rvMatches: () => ({ status: 200, matches: [] })
+    rvMatches: () => ({ status: 200, matches: [] }),
+    mijnSpellen: () => ({ potjes: [], uitnodigingen: [] }),
+    bestandenLijst: () => ({ eigen: [], gedeeld: [] }),
+    comm: { isAanwezig: () => false }
   };
   Object.assign(k, over || {});
   return k;
@@ -150,7 +153,7 @@ test('een afgelaste bijeenkomst kan alleen nog naar zijn groep wijzen', () => {
     genootschap: { mijne: () => [{ id: 'g1', naam: 'De Kring' }], publiek: (gr) => gr, isLid: () => true, groepMet: () => null },
     bijeenkomst: {
       lijstVan: () => [Object.assign({ id: 'b1', wat: 'Borrel', datum: '2026-09-01' }, over)],
-      publiek: (b) => b
+      publiek: (b) => b, mijnAgenda: () => ({ komt: [] })
     }
   }).object('k', 'event', 'b1');
 
@@ -178,7 +181,7 @@ test('een bijeenkomst met een getal als id wordt ook gevonden', () => {
     genootschap: { mijne: () => [{ id: 7, naam: 'De Kring' }], publiek: (gr) => gr, isLid: () => true, groepMet: () => null },
     bijeenkomst: {
       lijstVan: () => [{ id: 1755000000000, wat: 'Borrel', datum: '2026-09-01' }],
-      publiek: (b) => b
+      publiek: (b) => b, mijnAgenda: () => ({ komt: [] })
     }
   });
   const o = l.object('k', 'event', '1755000000000');
@@ -194,7 +197,7 @@ test('een bijeenkomst met een getal als id wordt ook gevonden', () => {
 test('een bijeenkomst uit een groep waar u niet in zit, bestaat voor u niet', () => {
   const l = laag({
     genootschap: { mijne: () => [], publiek: (gr) => gr, isLid: () => true, groepMet: () => null },
-    bijeenkomst: { lijstVan: () => [{ id: 'b1', wat: 'Besloten diner' }], publiek: (b) => b }
+    bijeenkomst: { lijstVan: () => [{ id: 'b1', wat: 'Besloten diner' }], publiek: (b) => b, mijnAgenda: () => ({ komt: [] }) }
   });
   assert.equal(l.object('k', 'event', 'b1'), null);
 });
@@ -222,6 +225,82 @@ test('een gesloten poort is leeg, niet stil', () => {
   const o = l.object('k', 'persoon', 'Ux');
   assert.deepEqual(o.stil, []);
   assert.deepEqual(o.caps, []);
+});
+
+/* EEN LOPEND POTJE IS EEN FEIT, EEN BALANS IS EEN SCORE.
+
+   `ikAanZet` komt uit het spellendomein zelf en is precies waar deze laag om
+   draait: niet "u speelt weleens samen" maar "de beurt ligt bij u".
+
+   DE MUTATIE: laat de spel-proef ook afgelopen potjes meenemen (haal de
+   status-controle weg). Dan verschijnt er een cap naar een potje dat uit is. */
+test('een lopend potje telt, een afgelopen potje niet', () => {
+  const met = (potjes) => laag({ mijnSpellen: () => ({ potjes, uitnodigingen: [] }) })
+    .object('k', 'persoon', 'Ux');
+
+  assert.deepEqual(met([{ id: 'p1', naam: 'Magnaat', status: 'klaar', spelers: ['Ux'], winnaar: 0 }]).caps, [],
+    'een afgelopen potje is geen lopende zaak');
+
+  const bezig = met([{ id: 'p1', naam: 'Magnaat', status: 'bezig', spelers: ['Ux'], ikAanZet: true }]);
+  assert.equal(bezig.caps[0].id, 'spel');
+  assert.equal(bezig.caps[0].waarom, 'Magnaat, u bent aan zet');
+
+  const ander = met([{ id: 'p1', naam: 'Magnaat', status: 'bezig', spelers: ['Ux'], ikAanZet: false, aanZet: 'Ux' }]);
+  assert.equal(ander.caps[0].waarom, 'Magnaat, Ux is aan zet');
+});
+
+/* DE KOP VAN HET OBJECT: wie is dit en wat is de stand tussen ons. Feiten uit
+   domeinen, en geen enkel oordeel.
+
+   DE MUTATIE: laat de kop een getal opnemen dat over de RELATIE gaat in plaats
+   van over dingen -- een hechtheid, een reeks, een percentage. Zo'n veld hoort
+   deze toets te laten zakken (LIFE.md par. 4.4). */
+test('de kop draagt feiten uit domeinen, en nooit een cijfer over de relatie', () => {
+  const l = laag({
+    socialConnecties: () => ({ connections: [{ key: 'x', codename: 'Ux', unread: 0, lastAt: '2026-08-10T20:00:00.000Z' }], requests: [] }),
+    comm: { isAanwezig: (k) => k === 'x' },
+    bijeenkomst: {
+      lijstVan: () => [], publiek: (b) => b,
+      mijnAgenda: () => ({ komt: [
+        { id: 'b0', wat: 'Zonder hen', datum: '2026-09-01', groep: 'K', komen: ['Andere'] },
+        { id: 'b1', wat: 'Samen eten', datum: '2026-09-02', tijd: '19:00', groep: 'De Kring', komen: ['Ux'] }
+      ] })
+    }
+  });
+  const o = l.object('k', 'persoon', 'Ux');
+  assert.equal(o.titel, 'Ux');
+  assert.equal(o.over.aanwezig, true);
+  assert.equal(o.over.laatsteGesprek, '2026-08-10T20:00:00.000Z');
+  assert.deepEqual(o.over.volgendeAfspraak,
+    { wat: 'Samen eten', datum: '2026-09-02', tijd: '19:00', groep: 'De Kring' },
+    'alleen een bijeenkomst waar de ander ook ja zei, is een gedeelde afspraak');
+
+  /* De harde grens, machinaal: geen enkel veld in de kop mag een oordeel over
+     de relatie dragen. Wie er ooit een wil, leest eerst LIFE.md par. 4.4. */
+  for (const veld of Object.keys(o.over)) {
+    assert.ok(!/score|hecht|reeks|streak|niveau|rang|punt|percentage/i.test(veld),
+      'de kop draagt een cijfer over de relatie: ' + veld);
+  }
+});
+
+/* Aanwezigheid is geen openbaar gegeven: wie niet verbonden is, krijgt het niet.
+
+   DE MUTATIE: haal de aanwezigheid buiten de verbinding-tak, zodat elke codenaam
+   hem krijgt. */
+test('online zijn ziet u alleen van wie u verbonden bent', () => {
+  const l = laag({ comm: { isAanwezig: () => true } });
+  const o = l.object('k', 'persoon', 'Vreemde');
+  assert.equal(o.over.aanwezig, undefined);
+  assert.equal(o.over.laatsteGesprek, undefined);
+});
+
+/* Een bron die door twee kanten gelezen wordt (de proeven en de kop) hoort bij
+   een storing EEN melding te geven en niet twee.
+
+   DE MUTATIE: haal de Set weg bij het samenvoegen van stil in persoon.js. */
+test('een stukke bron wordt een keer gemeld, niet twee keer', () => {
+  const l = laag({ socialConnecties: () => { throw new Error('vrienden stuk'); } });
+  assert.deepEqual(l.object('k', 'persoon', 'Ux').stil, ['verbinding']);
 });
 
 /* DE MUTATIE: voeg een functie toe die iets bewaart. Een object dat gaat

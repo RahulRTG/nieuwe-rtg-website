@@ -298,6 +298,30 @@ CLAUDE.md beschermt. Een toets bewaakt dat er geen zo'n cap bijkomt. De reden
 staat in de kop van `persoon.js`, zodat de volgende die ze mist niet denkt dat
 het vergeten is.
 
+**De kop van een persoon: feiten, geen oordeel.** Naast de caps draagt een
+persoon-object een `over`-blok — nu online, de eerstvolgende afspraak waar de
+ander óók ja zei, en wanneer u elkaar het laatst sprak. Dat zijn alle drie
+feiten uit een domein. Wat er nooit bij komt is een cijfer over de relatie zelf:
+een hechtheid, een reeks, "u sprak elkaar al drie maanden niet". Een toets zakt
+op elk veld dat zo heet, en het scherm rekent zelf niets uit.
+
+**Wat een cap AANZET is nooit een type.** Er staat nergens `type = vriend`. Wie
+tegelijk collega, reismaat en medespeler is, krijgt die drie caps naast elkaar,
+want elke cap hangt aan een feit uit een domein en niet aan een etiket. Dat is
+ook waarom een cap erbij nooit een nieuw sociaal model vraagt: een app die iets
+nieuws kan met een persoon, voegt een proef en een catalogusregel toe.
+
+**Wat er (nog) geen bron voor heeft.** Nagemeten, niet aangenomen — deze staan
+hier zodat ze niet voor vergeten worden aangezien:
+
+| Gevraagd | Waarom het er niet is |
+|---|---|
+| agenda-afspraken samen | `kern/agenda.js` kent geen deelnemers of codenamen; alleen genootschap-bijeenkomsten dragen een deelnemerslijst |
+| werkrelatie | collega-chats hangen aan een ZAAK en aan personeelsleden, niet aan een lid-codenaam |
+| gedeelde contacten | u ziet uw eigen verbindingen; die van een ander zijn niet van u om te tellen |
+| Meet-kamer samen | `meetMijn` levert wie er nú in zit, niet wie er mág; een leesexport in het domein zou dat oplossen |
+| hospitality, mobility, wallet en livestream bij een Event | een genootschap-bijeenkomst heeft geen enkele koppeling naar reserveringen, vervoer, tickets of een uitzending. Dit is geen ontbrekend veld maar een ontbrekende VERBINDING tussen domeinen, en die hoort een eigen stap te zijn |
+
 **Twee toetsbestanden, en dat is met reden.** `test/objectlaag.test.js` maakt de
 domeinen na en toetst de logica; `test/objectlaagroutes.test.js` praat met de
 echte server en pint de echte vorm vast. Dat tweede bestand verdiende zich

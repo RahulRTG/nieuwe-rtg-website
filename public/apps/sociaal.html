@@ -259,8 +259,19 @@
   function toonObject(d) {
     $('#objsoort').textContent = SOORTNAAM[d.soort] || '';
     $('#objtitel').textContent = d.titel || '';
+    /* De kop: feiten uit domeinen, in de volgorde waarin een mens ze wil lezen.
+       Wat hier NIET komt en nooit mag komen is een cijfer over de relatie zelf
+       -- een hechtheid, een reeks, "u sprak elkaar al drie maanden niet"
+       (LIFE.md par. 4.4). De server stuurt zoiets niet en dit scherm rekent
+       niets uit; het zet naast elkaar wat er is. */
     const o = d.over || {};
     const over = [];
+    if (o.aanwezig) over.push('nu online');
+    if (o.volgendeAfspraak) {
+      const v = o.volgendeAfspraak;
+      over.push('samen: ' + v.wat + ' op ' + v.datum + (v.tijd ? ' om ' + v.tijd : ''));
+    }
+    if (o.laatsteGesprek) over.push('laatste gesprek ' + String(o.laatsteGesprek).slice(0, 10));
     if (o.datum) over.push(o.datum + (o.tijd ? ' om ' + o.tijd : ''));
     if (o.waar) over.push(o.waar);
     if (o.afgelast) over.push('afgelast');

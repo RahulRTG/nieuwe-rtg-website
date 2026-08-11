@@ -83,8 +83,75 @@ module.exports = ({ kern }) => {
       const m = (r.matches || []).find(x => x.codenaam === codenaam);
       if (!m) return null;
       return m.voorstel ? 'match, gedeelde plek: ' + m.voorstel : 'wederzijdse match';
+    } },
+
+    /* Een lopend potje. `ikAanZet` komt uit het spellendomein zelf en is precies
+       het soort feit waar deze laag om draait: niet "u speelt weleens samen"
+       maar "de beurt ligt bij u".
+
+       WAT HIER NIET IN KOMT: een winst-verliesbalans tussen twee mensen. Dat is
+       een score op het leven tussen mensen (LIFE.md par. 4.4), en alles wat een
+       uitslag BUITEN het potje bewaart hangt sowieso aan de 18+-grens
+       (kern/spellen/grens.js). Een lopend potje is geen uitslag. */
+    { cap: 'spel', naam: 'spel', proef(key, codenaam) {
+      const s = kern.mijnSpellen(key) || {};
+      const p = (s.potjes || []).find(x => x.status === 'bezig' && (x.spelers || []).includes(codenaam));
+      if (!p) return null;
+      return p.ikAanZet ? p.naam + ', u bent aan zet' : p.naam + ', ' + (p.aanZet || 'de ander') + ' is aan zet';
+    } },
+
+    /* Gedeelde bestanden, gemeten aan de EIGEN kant: bestanden van dit lid waar
+       de codenaam op de deellijst staat. Wat de ander met MIJ deelt zit in
+       dezelfde lijst onder `gedeeld`, maar zonder eigenaar erbij -- daar valt
+       dus niet uit af te leiden dat het van deze persoon komt, en dat verzinnen
+       we niet. De cap zegt daarom "wat u deelt" en niet "wat u samen deelt". */
+    { cap: 'bestand', naam: 'bestanden', proef(key, codenaam) {
+      const b = kern.bestandenLijst(key) || {};
+      const n = (b.eigen || []).filter(x => (x.gedeeldMet || []).includes(codenaam)).length;
+      if (!n) return null;
+      return n === 1 ? '1 bestand gedeeld' : n + ' bestanden gedeeld';
     } }
   ];
+
+  /* DE KOP VAN HET OBJECT: wie is dit, en wat is de stand tussen ons.
+
+     Dit is geen extra cap maar CONTEXT -- feiten die geen weg naar een app zijn.
+     Ze staan apart zodat het scherm ze anders kan tonen dan de acties, en zodat
+     duidelijk blijft dat een cap altijd ergens heen leidt.
+
+     ALLES HIER IS EEN FEIT UIT EEN DOMEIN, en dat is de grens die ertoe doet.
+     Geen relatiescore, geen "hoe hecht", geen reeks en geen aansporing om weer
+     eens iets van u te laten horen (LIFE.md par. 4.4). Een telling van gedeelde
+     dingen is een feit; een cijfer over een relatie is een oordeel, en dat komt
+     hier nooit. */
+  function context(key, codenaam) {
+    const over = {}, stil = [];
+
+    try {
+      const s = kern.socialConnecties(key) || {};
+      const c = (s.connections || []).find(x => x.codename === codenaam);
+      if (c) {
+        /* De sleutel komt uit de verbinding zelf; er is dus geen opzoeking in de
+           kluis nodig om te weten of iemand aanwezig is. Wie niet verbonden is,
+           krijgt geen aanwezigheid -- online zijn is geen openbaar gegeven. */
+        over.laatsteGesprek = c.lastAt || null;
+        try { over.aanwezig = !!kern.comm.isAanwezig(c.key); } catch (e) { stil.push('aanwezigheid'); }
+      }
+    } catch (e) { stil.push('verbinding'); }
+
+    /* De eerstvolgende bijeenkomst waar deze persoon OOK ja heeft gezegd. Het
+       domein levert die lijst zelf (`komen`, codenamen); hier wordt alleen
+       gefilterd. Een bijeenkomst waar de ander niet op geantwoord heeft, is
+       geen gedeelde afspraak en staat er dus niet -- dat zou een verwachting
+       wekken die op niets rust. */
+    try {
+      const a = kern.bijeenkomst.mijnAgenda({ key }) || {};
+      const b = (a.komt || []).find(x => (x.komen || []).includes(codenaam));
+      if (b) over.volgendeAfspraak = { wat: b.wat, datum: b.datum, tijd: b.tijd || null, groep: b.groep };
+    } catch (e) { stil.push('afspraken'); }
+
+    return { over, stil };
+  }
 
   /* De caps van deze persoon, plus de namen van de proeven die stukgingen. Geen
      enkele proef mag de andere meenemen: bij een object weegt dat zwaarder dan
@@ -98,8 +165,14 @@ module.exports = ({ kern }) => {
         if (waarom) uit.push(capVoor(p.cap, waarom));
       } catch (e) { stil.push(p.naam); }
     }
-    return { caps: uit.filter(Boolean), stil };
+    const k = context(key, codenaam);
+    /* ONTDUBBELD, want de proeven en de kop lezen deels dezelfde bronnen: valt
+       de vriendenlaag om, dan merken ze het allebei. Twee keer "verbinding" in
+       de melding leest als twee storingen en zet iemand aan het zoeken naar de
+       tweede. Een stukke bron is een melding. */
+    const alles = [...new Set(stil.concat(k.stil))];
+    return { titel: codenaam, caps: uit.filter(Boolean), over: k.over, stil: alles };
   }
 
-  return { caps, PROEVEN };
+  return { caps, context, PROEVEN };
 };

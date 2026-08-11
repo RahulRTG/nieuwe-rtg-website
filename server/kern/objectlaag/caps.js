@@ -50,6 +50,10 @@ const CAPS = {
     app: 'Vonk', link: '/apps/vonk.html' },
   rendezvous: { naam: 'Uw match in Rendez-vous', wat: 'De gedeelde plekken en het voorstel.',
     app: 'Rendez-vous', link: '/apps/rendezvous.html' },
+  spel: { naam: 'Uw lopende potje', wat: 'Het spel dat u samen speelt.',
+    app: 'RTG Spelen', link: '/apps/spelen.html' },
+  bestand: { naam: 'Wat u samen deelt', wat: 'De bestanden die u met deze codenaam deelt.',
+    app: 'RTG Bestanden', link: '/apps/bestanden.html' },
 
   // ---- groep ----
   prikbord: { naam: 'Prikbord', wat: 'Wat er in deze groep geplaatst is.',

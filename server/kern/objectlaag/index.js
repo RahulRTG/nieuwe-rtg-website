@@ -54,9 +54,7 @@ module.exports = ({ kern }) => {
     const naam = String(id == null ? '' : id).slice(0, 80);
     if (!naam) return null;
 
-    const r = soort === 'persoon'
-      ? Object.assign({ titel: naam, over: {} }, t.caps(key, naam))
-      : t.caps(key, naam);
+    const r = t.caps(key, naam);
     if (!r) return null;
 
     /* Een cap die niet in de catalogus staat is er al uit gefilterd door

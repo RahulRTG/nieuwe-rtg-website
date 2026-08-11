@@ -59,7 +59,7 @@ function meet(stadsleutel, sleutel) {
   const kosten = omzet * s.inkoop + personeel * s.loon + omvang * s.vast + huur + omvang * s.vast * 0.35;
   const netto = omzet - kosten;
   const bouw = omvang * s.bouw;
-  return { sleutel, kavel: beste.naam, vraag, omvang, cap, bezetting: cap ? verkocht / cap : 0,
+  return { sleutel, kavel: beste.naam, vraag, omvang, personeel, cap, bezetting: cap ? verkocht / cap : 0,
     omzet, kosten, netto, bouw, terug: netto > 0 ? bouw / netto : Infinity };
 }
 

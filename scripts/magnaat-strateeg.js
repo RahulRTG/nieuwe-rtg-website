@@ -37,6 +37,7 @@ const { SECTOREN } = require('../server/kern/spellen/magnaat/sectoren');
 const { VRAAGFACTOR, KOSTENSTAND } = require('../server/kern/spellen/magnaat/prijsstand');
 const { basisvraag, drukFactor } = require('../server/kern/spellen/magnaat/vraag');
 const { MARKTPRIJS } = require('../server/kern/spellen/magnaat/handel');
+const ONDERZOEK = require('../server/kern/spellen/magnaat/onderzoek');
 
 const maakMagnaat = () => require('../server/kern/spellen/magnaat/index')({
   save() {}, crypto: require('crypto'), codenaamVan: (h) => h, nudge() {}
@@ -186,6 +187,52 @@ const PROFIELEN = {
          onder de marktprijs afslaan is geen stijl maar een rekenfout. */
       if (!s.mijn.length) return s.open('horeca');
       for (const v of s.mijn) s.beleid(v, { onderhoud: Math.round(v.omvang * 30) });
+      s.open('horeca');
+    }
+  },
+
+  /* ---------- onderzoek: twee stijlen die dezelfde vraag stellen ----------
+     "Welke nieuwe strategie maakt deze feature mogelijk?" Voor onderzoek is dat
+     antwoord: KLEIN BLIJVEN EN BETER WORDEN in plaats van groot worden. Een
+     uitvinding werkt per vestiging, dus wie er vijf heeft betaalt vijf keer de
+     uitrol; wie er twee heeft verdient hem twee keer terug en houdt geld over.
+     Dat is een echte tegenkracht tegen `groei`, en het is de eerste stijl in
+     dit toernooi die niet over kavels gaat.
+
+     Ze staan er met z'n tweeen omdat een van de twee alleen niets bewijst.
+     `uitvinder` doet het hele rondje (onderzoeken, uitrollen als het zich
+     terugverdient, en dan afslanken); `laborant` onderzoekt wel maar rolt
+     nooit uit. Als die tweede het net zo goed doet, is de uitrol decoratie; als
+     hij onderaan eindigt, kost onderzoek geld tot je er iets mee doet -- en dat
+     is precies de belofte uit de geldpompkeuring. */
+  uitvinder: {
+    naam: 'onderzoek en afslanken', zones: ['boulevard', 'centrum'],
+    doe(s) {
+      if (!s.mijn.length) return s.open('horeca');
+      /* De efficientietak eerst: die verlaagt kosten en dat werkt op elke zaak.
+         `meten` is de stam en verplicht -- dat is wat een boom een boom maakt. */
+      s.onderzoeken(['meten', 'energie', 'automatisering', 'bouwmethode']);
+      s.uitrollen();
+      s.afslanken();
+      s.open('horeca');
+    }
+  },
+  laborant: {
+    naam: 'alleen onderzoeken', zones: ['boulevard', 'centrum'],
+    doe(s) {
+      if (!s.mijn.length) return s.open('horeca');
+      s.onderzoeken(['meten', 'energie', 'automatisering', 'bouwmethode']);
+      s.open('horeca');
+    }
+  },
+  /* DE BLANCO. Dezelfde vorm als de twee hierboven -- dezelfde zones, dezelfde
+     sector, dezelfde bovengrens van drie zaken -- en geen onderzoek. Zonder deze
+     derde meet je niets: `uitvinder` tegen `laborant` zegt alleen of uitrollen
+     helpt, niet of de hele tak de moeite waard is. */
+  handwerk: {
+    naam: 'dezelfde vorm, geen onderzoek', zones: ['boulevard', 'centrum'],
+    doe(s) {
+      if (!s.mijn.length) return s.open('horeca');
       s.open('horeca');
     }
   }
@@ -344,6 +391,64 @@ function gereedschap(m, potje, mij, profiel, offset) {
         if (m.spel.zet(potje, mij, Object.assign({ actie: 'contract-antwoord', id: c.id }, zet)).ok) gedaan++;
       }
       return gedaan;
+    },
+
+    /* ---------- onderzoek ----------
+       Drie handelingen, en samen zijn ze het antwoord op de ontwerpvraag "welke
+       nieuwe strategie maakt deze feature mogelijk?". Los van elkaar leveren ze
+       niets op: onderzoeken zonder uitrollen is geld weggooien, en uitrollen
+       zonder afslanken is uitrollen betalen voor niets. Dat is precies wat een
+       toernooi hoort te meten -- als een van de drie stappen gemist mag worden,
+       is de laag geen keuze maar een knop. */
+    onderzoeken(volgorde) {
+      const beeld = this.beeld.onderzoek;
+      if (beeld.bezig >= beeld.tegelijk) return false;
+      const open = volgorde.find(s => (beeld.boom.find(k => k.sleutel === s) || {}).staat === 'open');
+      if (!open) return false;
+      const k = beeld.boom.find(x => x.sleutel === open);
+      // met een half budget duurt het twee keer zo lang; dat is de afweging
+      return !!m.spel.zet(potje, mij, { actie: 'onderzoek-starten', sleutel: open, budget: k.kosten }).ok;
+    },
+    /* UITROLLEN OP DE ZAKEN DIE HET TERUGVERDIENEN. De motor rekent zelf uit
+       wat een uitvinding daar per maand oplevert (onderzoek.opbrengstVan); een
+       profiel dat dat negeert en overal uitrolt, meet niet zijn stijl maar de
+       kosten van niet kijken. */
+    uitrollen(terugverdientijd = 12) {
+      const beeld = this.beeld;
+      const regels = (st.laatste[mij] || {}).regels || [];
+      let gedaan = 0;
+      for (const k of beeld.onderzoek.boom.filter(x => x.staat === 'klaar')) {
+        for (const v of beeld.vestigingen) {
+          if ((v.tech || []).includes(k.sleutel)) continue;
+          const r = regels.find(x => x.id === v.id);
+          if (!r) continue;
+          /* DE MARGE TELT ALLEEN VOOR ZOVER ER RUIMTE IS. Een uitvinding die de
+             VRAAG verhoogt levert niets op in een zaak die al vol zit; dan wordt
+             het `gemist` en geen omzet. Zonder die begrenzing rolt een profiel de
+             opbrengsttak uit op panden die er niets mee kunnen. */
+          const ruimte = Math.max(0, 1 - (r.eenheden || 0) / Math.max(1, r.capaciteit || 1));
+          const perMaand = ONDERZOEK.opbrengstVan(k.sleutel, { vast: r.vast, inkoop: r.inkoop,
+            lonen: r.lonen, marge: Math.max(0, r.omzet - r.inkoop) * ruimte });
+          const kosten = ONDERZOEK.uitrolkosten(v, k.sleutel);
+          if (perMaand <= 0 || kosten / perMaand > terugverdientijd) continue;
+          if (st.geld[mij] - kosten < BUFFER) continue;
+          if (m.spel.zet(potje, mij, { actie: 'onderzoek-uitrollen', sleutel: k.sleutel, vestiging: v.id }).ok) gedaan++;
+        }
+      }
+      return gedaan;
+    },
+    /* AFSLANKEN TOT WAT ER NODIG IS. Dit is waar `automatisering` zijn geld
+       oplevert en nergens anders: de zaak zit tegen zijn omvang aan, dus een
+       medewerker die meer aankan levert pas iets op als er iemand af gaat. Het
+       getal komt van het scherm (`personeelNodig`) en wordt hier niet opnieuw
+       uitgerekend. */
+    afslanken() {
+      let gedaan = 0;
+      for (const v of this.beeld.vestigingen) {
+        if (!v.personeelNodig || v.personeel <= v.personeelNodig) continue;
+        if (m.spel.zet(potje, mij, { actie: 'beleid', id: v.id, personeel: v.personeelNodig }).ok) gedaan++;
+      }
+      return gedaan;
     }
   };
 }
@@ -351,11 +456,15 @@ function gereedschap(m, potje, mij, profiel, offset) {
 /* Een campagne: twee profielen, een startpositie, zesendertig maanden. Geeft de
    EINDSTAND terug -- `duel` maakt er een winnaar van, en wie wil weten hoe hard
    een profiel op zichzelf groeit heeft de stand nodig en niet de uitslag. */
-function campagne(aNaam, bNaam, offset, maanden = 36) {
+/* `duur` staat er sinds de onderzoekslaag. Een campagne van zesendertig maanden
+   is kort voor een tak die twintig maanden onderzoek vraagt, en de vraag "is dit
+   te traag of te duur" is alleen te beantwoorden door hem ook lang te draaien.
+   De standaard blijft quick: dat is waar de rest van dit script op geijkt is. */
+function campagne(aNaam, bNaam, offset, maanden = 36, duur = 'quick') {
   const m = maakMagnaat();
   const potje = { id: 'p', soort: 'magnaat', spelers: ['a', 'b'], teams: [0, 1, 0, 1, 0, 1],
     modus: 'vrij', status: 'bezig', beurt: 0, winnaar: null,
-    variant: { vorm: 'economie', stad: 'IJmuiden', duur: 'quick' } };
+    variant: { vorm: 'economie', stad: 'IJmuiden', duur } };
   m.spel.init(potje);
   const gereed = {
     a: gereedschap(m, potje, 'a', PROFIELEN[aNaam], offset),
@@ -383,6 +492,15 @@ function campagne(aNaam, bNaam, offset, maanden = 36) {
   stand.contracten = { voorgesteld: c.length, getekend: c.filter(x => x.status !== 'voorgesteld'
     && x.status !== 'afgewezen').length, afgewezen: c.filter(x => x.status === 'afgewezen').length,
     omzet: Math.round(c.reduce((n, x) => n + (x.betaald || 0), 0)) };
+  /* EN HETZELFDE VOOR ONDERZOEK, om precies dezelfde reden. Een boom die
+     niemand afmaakt en een boom die niets uithaalt geven dezelfde uitslag. Deze
+     meter zei meteen wat het eerste antwoord was: in een campagne van
+     zesendertig maanden werd er wel uitgevonden en bijna nooit uitgerold. */
+  const o = potje.staat.onderzoek || [];
+  stand.onderzoek = { gestart: o.length, klaar: o.filter(x => x.status === 'klaar').length,
+    besteed: Math.round(o.reduce((n, x) => n + (x.besteed || 0), 0)),
+    uitgerold: Object.values(potje.staat.vestigingen).flat()
+      .reduce((n, v) => n + (v.tech || []).length, 0) };
   return stand;
 }
 

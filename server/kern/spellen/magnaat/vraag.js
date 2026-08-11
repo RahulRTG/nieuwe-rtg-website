@@ -26,6 +26,7 @@
 const { SECTOREN } = require('./sectoren');
 const { VRAAGFACTOR } = require('./prijsstand');
 const { geschiktheid } = require('./kaart');
+const O = require('./onderzoek');
 
 /* Waar een segment vandaan komt op een kavel. Toeristen volgen `toerisme`,
    zakelijk volgt `zakelijk`, de rest volgt gewoon de passanten. */
@@ -79,10 +80,14 @@ function vraagVoor(kaart, vestiging, { maand, zoneDruk, marketing }) {
      marketing" altijd het goede antwoord, en dan is er geen keuze. */
   const bereikMarketing = 1 + 0.45 * (1 - Math.exp(-(marketing || 0) / 4000));
   // van index naar eenheden per maand: dat is wat `markt` doet
-  const eenheden = basis * s.markt * druk * prijs * reputatie * bereikMarketing;
+  /* Opbrengststuring en een serviceconcept verhogen de VRAAG op dezelfde
+     plek; zie ./onderzoek.js. Ze grijpen aan op `markt` en niet op de
+     uitkomst, zodat het effect narekenbaar blijft. */
+  const tech = O.factor(vestiging.tech, 'markt');
+  const eenheden = basis * s.markt * tech * druk * prijs * reputatie * bereikMarketing;
   return {
     eenheden: Math.max(0, eenheden),
-    stappen: { basis, druk, prijs, reputatie, marketing: bereikMarketing }
+    stappen: { basis, druk, prijs, reputatie, marketing: bereikMarketing, tech }
   };
 }
 

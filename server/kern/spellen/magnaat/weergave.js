@@ -15,14 +15,14 @@
       omzet -- staan op de eindstand en tellen NIET mee voor de winst. Ze laten
       zien wat voor ondernemer je was; er een tweede ranglijst van maken zou
       betekenen dat je op zes assen tegelijk aan het optimaliseren bent. */
-const { capaciteit, waarde } = require('./stap');
+const { capaciteit, personeelNodig, waarde } = require('./stap');
 const { SECTOREN } = require('./sectoren');
 const { prijsVan } = require('./prijsstand');
 const H = require('./handel');
 const { PROJECTEN } = require('./foundation');
 
 module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid, veilingbeeld,
-  belangbeeld, belangwaarde, eigenDeel, bankbeeld, kredietprofiel, verzekerbeeld }) => {
+  belangbeeld, belangwaarde, eigenDeel, bankbeeld, kredietprofiel, verzekerbeeld, rndbeeld }) => {
   /* Van wie is deze vestiging? De contractlaag kijkt over de grens tussen
      twee spelers heen en kan dus niet met `mijnVestiging` toe. */
   const vanIemand = (st, id) => {
@@ -117,6 +117,12 @@ module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid, veilingb
     const eigen = (st.vestigingen[mij] || []).map(v => Object.assign({}, v, {
       kavelNaam: k.kavel.get(v.kavel).naam, zone: k.kavel.get(v.kavel).zone,
       capaciteit: capaciteit(v, foundationArbeid(st)), waarde: waarde(v), prijsPer: prijsVan(v.sector, v.prijs),
+      /* HOEVEEL MENSEN DEZE ZAAK NODIG HEEFT om vol te draaien. Staat er sinds
+         de onderzoekslaag: `automatisering` verhoogt wat een medewerker aankan,
+         en bij een volle bezetting merk je daar niets van tot je iemand naar
+         huis stuurt. Zonder dit getal is de uitvinding onzichtbaar en betaal je
+         de uitrol voor niets. */
+      personeelNodig: personeelNodig(v, foundationArbeid(st)),
       // hoeveel van deze zaak nog van jou is; de rest zit bij aandeelhouders
       eigenDeel: Math.round(eigenDeel(st, v.id) * 100),
       // wat deze zaak inkoopt en wat hij zelf kan leveren -- zonder dat is
@@ -153,6 +159,7 @@ module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid, veilingb
       financiering: bankbeeld(st, mij),
       krediet: kredietprofiel(st, mij),
       verzekering: verzekerbeeld(st, mij),
+      onderzoek: rndbeeld(st, mij),
       veilingen: veilingbeeld(st, mij),
       vrij: k.kavels.filter(x => !st.kavelBezet[x.id] && !(st.kavelRecht || {})[x.id]).length,
       // waar JIJ mag bouwen zonder te hoeven veilen: een gewonnen kavel

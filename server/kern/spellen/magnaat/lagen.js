@@ -24,20 +24,22 @@ module.exports = ({ K, mijnVestiging, vrijKavel, wieHeeft, waarde, rond, codenaa
     profiel: bp.profiel, cijfers: bp.cijfers });
   const bankmaand = require('./bank-maand')({ mijne: bank.mijne, cijfers: bp.cijfers, liquideer });
   const verzekering = require('./verzekering')({ mijnVestiging });
+  const rnd = require('./onderzoek-acties')({ mijnVestiging });
   const belangen = require('./aandeel-acties')({ wieHeeft,
     uitgegeven: aandeel.uitgegeven, MAX_DEEL: aandeel.MAX_DEEL });
   return {
-    ACTIES: Object.assign({}, handel.ACTIES, veilen.ACTIES, belangen.ACTIES, bank.ACTIES, verzekering.ACTIES),
+    ACTIES: Object.assign({}, handel.ACTIES, veilen.ACTIES, belangen.ACTIES, bank.ACTIES, verzekering.ACTIES, rnd.ACTIES),
     VRIJE_ACTIES: [].concat(handel.VRIJE_ACTIES, veilen.VRIJE_ACTIES, belangen.VRIJE_ACTIES,
-      bank.VRIJE_ACTIES, verzekering.VRIJE_ACTIES),
+      bank.VRIJE_ACTIES, verzekering.VRIJE_ACTIES, rnd.VRIJE_ACTIES),
     hameren: veiling.hameren, verdeel: aandeel.verdeel, bankmaand, onthoud: bp.onthoud,
-    verzekering, liquideer,
+    verzekering, rnd, liquideer,
     zichtdelen: {
       veilingbeeld: (st, h) => veiling.beeld(st, h, codenaamVan),
       belangbeeld: (st, h) => aandeel.beeld(st, h, codenaamVan),
       belangwaarde: aandeel.belangwaarde, eigenDeel: aandeel.eigenDeel,
       bankbeeld: (st, h) => bank.beeld(st, h), kredietprofiel: bp.beeld,
-      verzekerbeeld: (st, h) => verzekering.beeld(st, h)
+      verzekerbeeld: (st, h) => verzekering.beeld(st, h),
+      rndbeeld: (st, h) => rnd.beeld(st, h)
     }
   };
 };

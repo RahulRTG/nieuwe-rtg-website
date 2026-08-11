@@ -77,7 +77,7 @@ const maand = (w, n) => {
          alleen, en hij is al van de schadepost afgetrokken (../server/kern/
          spellen/magnaat/maand.js). */
       w.rente = (w.rente || 0) + (verslag.rentelast || 0)
-        + (verslag.premielast || 0) + (verslag.schadelast || 0);
+        + (verslag.premielast || 0) + (verslag.schadelast || 0) + (verslag.onderzoeklast || 0);
     }
   }
 };
@@ -271,7 +271,8 @@ const SCENARIOS = {
         w.m.spel.zet(w.potje, 'a', { actie: 'open', kavel: vrij.id, sector: 'horeca', omvang: 40 });
         w.st.gerekendTot -= w.st.maandMs;
         for (const v of w.m.eco.bijrekenen(w.potje))
-          w.rente = (w.rente || 0) + (v.rentelast || 0) + (v.premielast || 0) + (v.schadelast || 0);
+          w.rente = (w.rente || 0) + (v.rentelast || 0) + (v.premielast || 0)
+            + (v.schadelast || 0) + (v.onderzoeklast || 0);
         const na = w.m.eco.eindstand(w.potje).find(x => x.codenaam === 'a');
         w.hefbomen.push(na.schuld / Math.max(1, na.geld + na.waarde));
       }
@@ -319,6 +320,62 @@ const SCENARIOS = {
             vestiging: w.A.id, risico, dekking: 1, eigenRisico: 0, maximum: 20000000 });
           if (r.ok) w.m.spel.zet(w.potje, 'a', { actie: 'polis-opzeggen', id: r.id });
         }
+    }
+  },
+
+  /* ONDERZOEK DOEN EN NIETS UITROLLEN. Het geld is weg en er komt niets voor
+     terug -- kennis die je niet toepast, verandert geen enkel getal. Dat hoort
+     precies de investering te kosten en geen cent minder. */
+  onderzoekZonderUitrol: {
+    verwacht: 'lekkend', naam: 'onderzoeken en het nooit toepassen',
+    doe(w) {
+      for (const h of ['a', 'b', 'c'])
+        w.m.spel.zet(w.potje, h, { actie: 'onderzoek-starten', sleutel: 'meten', budget: 8000 });
+    }
+  },
+
+  /* DE SUBSIDIE. Geld uit de Foundation-pot naar een onderzoek: een OVERDRACHT
+     en geen schepping. Dat is precies wat "een subsidie is een externe injectie
+     en geen bedrijfsprestatie" betekent zodra je het meet in plaats van
+     opschrijft.
+
+     HIJ VERGELIJKT GEEN TOTALEN OVER TWEE JAAR, en dat is een correctie. Een
+     pot met minder geld bouwt een ANDER project, en dan meet je welke
+     bibliotheek er is gekomen in plaats van of de subsidie klopt. De bewering
+     gaat over het moment zelf: wat de pot verlaat, komt aan bij het onderzoek --
+     en wat er van over is, gaat terug. */
+  subsidiestroom: {
+    verwacht: 'economisch', naam: 'onderzoek laten meebetalen door de Foundation',
+    doe(w) {
+      w.potVoor = w.st.foundation.lokaal;
+      w.kasVoor = w.st.geld.a;
+      const r = w.m.spel.zet(w.potje, 'a', { actie: 'onderzoek-starten', sleutel: 'meten', budget: 4000 });
+      if (!r.ok) return;
+      w.gekregen = w.m.spel.zet(w.potje, 'a', { actie: 'onderzoek-subsidie', id: r.id });
+      w.onderzoekId = r.id;
+    },
+    keur(w) {
+      if (!w.gekregen || !w.gekregen.ok) return 'er is geen subsidie verleend; deze toets meet dan niets';
+      const o = (w.st.onderzoek || []).find(x => x.id === w.onderzoekId);
+      const uitPot = w.potVoor - w.st.foundation.lokaal;
+      /* Zolang het onderzoek loopt: wat de pot verliet zit in de subsidiepot van
+         dit onderzoek en nergens anders. De kas van de speler is er GEEN cent
+         van gegroeid -- een subsidie is geen uitkering. */
+      if (o.status === 'loopt') {
+        if (Math.abs(uitPot - (o.subsidieToegekend || 0)) > 1)
+          return 'de pot verloor ' + Math.round(uitPot) + ' en het onderzoek kreeg ' + o.subsidieToegekend;
+        if (w.st.geld.a > w.kasVoor)
+          return 'de subsidie kwam in de KAS van de speler terecht; dat is een uitkering en geen subsidie';
+      } else {
+        /* En als het klaar is: alles wat niet aan onderzoek is opgegaan, is
+           teruggegaan naar de pot. Geoormerkt geld dat blijft liggen mag niet
+           verdampen -- dat is net zo goed een fout als geld dat erbij komt. */
+        const opgegaan = o.subsidie || 0, terug = o.subsidieTerug || 0;
+        if (Math.abs((o.subsidieToegekend || 0) - opgegaan - terug) > 1)
+          return 'van ' + o.subsidieToegekend + ' subsidie is ' + Math.round(opgegaan) +
+            ' besteed en ' + Math.round(terug) + ' teruggegaan; de rest is verdampt';
+      }
+      return null;
     }
   },
 

@@ -31,8 +31,9 @@ const H = require('./handel');
 
 const rond = (n) => Math.round(n);
 
-module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering }) => {
+module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering, rnd }) => {
   const { wikkelAf } = require('./maand-contracten')({ rond });
+  const { lasten } = require('./maand-lasten')({ ROOD_RENTE, bank, verzekering, rnd });
   function eenMaand(potje) {
     const st = potje.staat, k = K(st);
     const kwaliteitVan = {};
@@ -77,7 +78,7 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering
     /* Wat er deze maand aan RENTE de wereld verlaat. Apart geteld omdat het de
        enige post is die niet bij een andere speler landt; de geldpomp-meter
        moet hem kunnen aftrekken. */
-    let rentelast = 0, premielast = 0, schadelast = 0;
+    let rentelast = 0, premielast = 0, schadelast = 0, onderzoeklast = 0, onderzoekUitPot = 0;
     for (const [h, rij] of Object.entries(st.vestigingen)) {
       const regels = [];
       for (const v of rij) {
@@ -115,40 +116,17 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering
         kwaliteitVan[v.id] = r.kwaliteit;
         v.laatsteBezetting = r.bezetting;
       }
-      /* ROOD STAAN KOST GELD, en dit IS de rekening-courant uit ./bank.js: de
-         kredietlijn die er altijd is, het duurst en zonder aanvraag. Zonder dit
-         is overinvesteren gratis -- je kas gaat onder nul en er gebeurt niets.
-
-         Hij staat hier en niet bij de leningen omdat hij geen lening is die je
-         AANGAAT: hij ontstaat doordat je uitgeeft wat je niet hebt. */
-      if (st.geld[h] < 0) {
-        const rente = -st.geld[h] * ROOD_RENTE;
-        st.geld[h] -= rente;
-        rentelast += rente;
-        regels.push({ id: 'rood', naam: 'Rood staan', rente: rond(rente), resultaat: -rond(rente) });
-      }
-      /* DE LENINGEN. Rente over het restant, dan de aflossing, dan de
-         convenanten -- in die volgorde, want een aflossing verlaagt het restant
-         en zou anders de rente van diezelfde maand drukken. Zie ./bank.js.
-
-         RENTE VERLAAT DE WERELD. Dit is de eerste post in dit spel waar geld
-         niet naar een andere speler gaat maar echt weg is; scripts/magnaat-pomp.js
-         kent daar een eigen categorie voor, anders keurt die meter financiering
-         af omdat hij werkt. */
-      const bankregels = bank ? bank.maandVoorSpeler(st, h) : null;
-      if (bankregels && bankregels.regels.length) {
-        rentelast += bankregels.rente;
-        for (const r of bankregels.regels) regels.push(r);
-      }
-      /* DE VERZEKERINGEN. Premie eruit, schade eruit, uitkering erin -- en de
-         eerste twee verlaten de wereld terwijl de derde alleen herstelt. Zie
-         ./verzekering.js en de categorieen in scripts/magnaat-pomp.js. */
-      const verz = verzekering ? verzekering.maandVoorSpeler(potje, h) : null;
-      if (verz && verz.regels.length) {
-        premielast += verz.premie;
-        schadelast += verz.schade - verz.uitgekeerd;
-        for (const r of verz.regels) regels.push(r);
-      }
+      /* WAT ER NA DE ZAKEN NOG VAN DE KAS AFGAAT staat in ./maand-lasten.js:
+         rood staan, de leningen, de polissen en het onderzoek. Vier posten die
+         niet aan een pand hangen maar aan de speler, en die alle vier geld de
+         WERELD uit laten gaan -- daarom staan ze bij elkaar en worden ze hier
+         als EEN som opgeteld. Zie de uitleg daar. */
+      const uit = lasten(potje, h, regels);
+      rentelast += uit.rente;
+      premielast += uit.premie;
+      schadelast += uit.schade;
+      onderzoeklast += uit.onderzoek;
+      onderzoekUitPot += uit.onderzoekUitPot;
       perSpeler[h] = regels;
       // het maandresultaat in het korte geheugen, voor de winststabiliteit
       if (onthoud) onthoud(st, h, regels.reduce((n, r) => n + (r.resultaat || 0), 0));
@@ -174,7 +152,9 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering
     st.maand++;
     const verslag = { maand: st.maand, perSpeler, afdracht, projecten,
       wereldOmzet: rond(wereldOmzet), contractRegels,
-      rentelast: rond(rentelast), premielast: rond(premielast), schadelast: rond(schadelast) };
+      rentelast: rond(rentelast), premielast: rond(premielast),
+      schadelast: rond(schadelast), onderzoeklast: rond(onderzoeklast),
+      onderzoekUitPot: rond(onderzoekUitPot) };
     for (const h of potje.spelers) st.laatste[h] = { maand: st.maand, regels: perSpeler[h] || [],
       projecten, contracten: contractRegels[h] || [] };
     return verslag;

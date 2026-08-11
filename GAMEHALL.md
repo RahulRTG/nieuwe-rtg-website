@@ -1104,11 +1104,82 @@ weddenschap — je loopt méér risico én je bent er niet voor verzekerd.
 > over twaalf partijen gemeten — met de eis dat het in minstens één partij
 > loonde (anders is het een boete) en niet in allemaal (anders is het gratis).
 
-**Wat er van fase B nog niet in zit.** R&D: investering *vernietigend* op korte
-termijn, resultaat alleen *scheppend* via expliciet gemeten productiviteitswinst,
-en een subsidie is een *externe injectie* die apart gelabeld hoort en nooit als
-bedrijfsprestatie mag tellen. En een keuzeboom in plaats van een niveauladder,
-zodat een budgethotel zich anders ontwikkelt dan een luxeconcern.
+### Onderzoek — een keuzeboom, en drie kosten in plaats van één
+
+**Zeven knopen, drie takken, en je kunt aan twee dingen tegelijk werken.** Een
+niveauladder (R&D 1 → 2 → 3) maakt elk bedrijf hetzelfde, alleen verder; een boom
+met vertakkingen maakt bedrijven *anders*. `meten` is de stam en verplicht;
+daarachter splitst het in **efficiëntie** (energie → automatisering, en
+bouwmethodes) en **opbrengst** (inkoopkracht → opbrengststuring of een
+serviceconcept). Wie alles wil, is nergens de eerste: `TEGELIJK = 2` en de
+looptijd zorgen daarvoor.
+
+**Een effect is een gemeten productiviteitswinst en geen bonus.** Elk knooppunt
+grijpt aan op een getal dat de motor al gebruikt — `perMedewerker`, `vast`,
+`inkoop`, `bouw`, `markt`. Er is geen "+5% winst"-knop, want die is niet na te
+rekenen; een lagere inkoopfractie wel. Twee uitvindingen op hetzelfde veld
+*vermenigvuldigen* (twee kortingen van twintig procent laten 64% over, niet 60%),
+want optellen kan een veld negatief maken.
+
+**Drie kosten en geen één.** Onderzoek doen kost geld per maand, duurt tijd, en
+het resultaat moet daarna nog *per vestiging* worden uitgerold. Die derde post is
+wat de keuze maakt: kennis is van het bedrijf, toepassing is per pand, en met
+tien vestigingen is uitrollen duurder dan uitvinden. **Haasten kan, maar kost
+meer dan het oplevert**: boven het normale tempo loopt de winst terug met een
+wortel, anders is de budgetknop geen keuze maar een dial die je altijd opendraait.
+
+**De subsidie is een overdracht en geen schepping.** De RTFoundation betaalt de
+helft mee uit de *lokale* pot — er staat dus een bibliotheek tegenover die er niet
+komt. Wat er van de subsidie overblijft gaat terug naar de pot; zonder die regel
+verdampt geoormerkt geld en zag de geldpompmeter waarde uit de wereld verdwijnen,
+wat net zo goed een fout is als waarde die erbij komt.
+
+> **Wat de tegenmeting vond, en wat er is opgelost.** `scripts/magnaat-onderzoek.js`
+> is er gekomen omdat het toernooi iets zag wat geen enkele toets kon zien: het
+> profiel dat onderzocht **én** uitrolde deed het slechter dan het profiel dat
+> alleen onderzocht — `uitgerold: 0`. In zesendertig maanden werd er wel
+> uitgevonden en nooit uitgerold. Drie oorzaken, alle drie bij de wortel
+> gerepareerd:
+>
+> 1. **Drie knopen grepen aan op `vast`**, een post van 0,3 tot 5,1 procent van de
+>    omzet. Twintig procent van drie procent is niets. Dezelfde fout als de
+>    leveringskorting van twaalf procent op een inkooppost van vijf.
+> 2. **De uitrol was een vast bedrag**, dus hing de terugverdientijd aan de *maat*
+>    van de zaak: op een campagne-typisch pand duurde dezelfde uitrol 27 tot 127
+>    maanden in plaats van 10. Nu is hij een deel van `gebouwdVoor` — dezelfde
+>    grondslag die de verzekering voor pandschade gebruikt — en valt die
+>    afhankelijkheid weg.
+> 3. **`automatisering` was onzichtbaar.** Een zaak wordt precies bezet geopend en
+>    zit dus tegen zijn *omvang* aan; dat een medewerker meer aankan levert pas
+>    iets op als je er iemand naar huis stuurt. De uitvinding koopt geen
+>    capaciteit maar **ruimte om af te slanken**, en dat getal stond nergens. De
+>    weergave geeft nu `personeelNodig` mee.
+>
+> De band waarop geijkt wordt ligt **onder** de twaalf maanden van de
+> sectorijking, en dat is geen toevallig getal: een euro in een nieuwe zaak
+> verdient zichzelf in twaalf maanden terug **én** levert capaciteit op, een euro
+> in een uitrol niet. Wie evenveel vraagt voor het tweede, krijgt een tak die
+> niemand ooit inslaat.
+
+> **Wat er ná die reparaties nog staat, eerlijk.** Het toernooi houdt drie
+> profielen naast elkaar die alleen op onderzoek verschillen: `handwerk` (dezelfde
+> vorm, geen onderzoek), `laborant` (onderzoekt, rolt nooit uit) en `uitvinder`
+> (onderzoekt, rolt uit, slankt af). De volgorde klopt — uitvinder verslaat
+> laborant, dus uitrollen loont — maar **handwerk staat er nog altijd het beste
+> voor**. Zolang er goede kavels vrij zijn, verslaat uitbreiden elke investering
+> die alleen kosten verlaagt: een pand levert een maandresultaat *en* een bezit
+> op de eindstand, een uitvinding alleen het eerste. Dat is dezelfde bevinding als
+> het staande signaal dat een sectorfocus 92% van zijn duels wint, en hij hoort
+> daar ook thuis: het is de kavelvoorraad die niet knelt, niet de onderzoeksprijs.
+> Het staat als open draad in TAKEN.md en wordt bij elke toernooironde opnieuw
+> gemeten in plaats van weggepoetst.
+
+**Wat er van fase B nog niet in zit.** AI-managers met beleidsregels — die hebben
+nu pas genoeg bedrijfsmaterie om iets zinnigs te beheren: contractverplichtingen,
+financiering, risico, onderzoek, prijsstelling, onderhoud en capaciteit. Daarna
+concernstrategie, een aandelenmarkt met dividend, fusies, economische cycli
+(`st.cyclus` staat al in de renteformule maar wordt door niets gevoed) en
+wereldnieuws.
 
 **Fase C — de permanente wereld.** Living World, AI-managers met beleidsregels,
 Safe Management Policy, vakantiemodus, overdracht, legacy, Magnaat Daily,

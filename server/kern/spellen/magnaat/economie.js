@@ -57,6 +57,7 @@ module.exports = (ctx) => {
       contracten: [], contractTeller: 0, veilingen: [], veilingTeller: 0, kavelRecht: {},
       deelnemingen: [], deelnemingTeller: 0, leningen: [], leningTeller: 0,
       resultaatlog: {}, betaalgemist: {}, polissen: [], polisTeller: 0,
+      onderzoek: [], onderzoekTeller: 0,
       laatste: {}, klaar: false
     };
     for (const h of potje.spelers) { st.geld[h] = START_GELD; st.vestigingen[h] = []; st.laatste[h] = null; }
@@ -113,7 +114,7 @@ module.exports = (ctx) => {
   const L = require('./lagen')({ K, mijnVestiging, vrijKavel, wieHeeft, waarde, rond, codenaamVan });
 
   const { eenMaand } = require('./maand')({ K, wieHeeft, ROOD_RENTE,
-    verdeel: L.verdeel, bank: L.bankmaand, onthoud: L.onthoud, verzekering: L.verzekering });
+    verdeel: L.verdeel, bank: L.bankmaand, onthoud: L.onthoud, verzekering: L.verzekering, rnd: L.rnd });
 
   /* WAT EEN SPELER ZIET en wat er aan het eind op tafel komt staat in
      ./weergave.js -- een eigen onderwerp (wie mag wat weten, en waarop wordt

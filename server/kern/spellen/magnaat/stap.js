@@ -30,50 +30,13 @@ const { SECTOREN } = require('./sectoren');
 const { prijsVan, LATFACTOR, KOSTENSTAND } = require('./prijsstand');
 const { vraagVoor } = require('./vraag');
 const H = require('./handel');
+const O = require('./onderzoek');
+/* HOEVEEL EEN ZAAK AANKAN EN HOE GOED HET GAAT staat in ./maat.js -- waar over
+   de vestiging zelf, los van de kalender. Dit bestand rekent een MAAND. */
+const { capaciteit, personeelNodig, levering, kwaliteit } = require('./maat');
 
 const rond = (n) => Math.round(n);
 const klem = (n, min, max) => Math.max(min, Math.min(max, n));
-
-/* De capaciteit van een vestiging: personeel maal wat een medewerker aankan,
-   maar nooit meer dan de vestiging groot is. Meer personeel in een klein pand
-   levert niets extra's op, en dat hoort te voelen als geld weggooien. */
-function capaciteit(v, arbeid) {
-  const s = SECTOREN[v.sector];
-  /* De omvang in eenheden, begrensd door wat het personeel aankan, maal hoe
-     vaak een eenheid per maand verkocht wordt.
-
-     `arbeid` is de bonus uit de Foundation-projecten: een bibliotheek en een
-     leerplek leveren op termijn beter opgeleid personeel, en dat is precies
-     waar het in de vision om ging -- een maatschappelijk project dat MEETBAAR
-     doorwerkt in de economie in plaats van in het nieuws te staan. */
-  /* KOSTENSTAND: bij een hoge prijsstand kan een medewerker MINDER eenheden
-     aan -- witte tafellakens vragen meer handen per gast. Zie ./sectoren.js. */
-  const perMens = s.perMedewerker / (KOSTENSTAND[v.prijs] || 1);
-  return Math.min(v.omvang, v.personeel * perMens * (1 + (arbeid || 0))) * s.perMaand;
-}
-
-/* WAT ER DEZE MAAND DAADWERKELIJK GELEVERD WORDT op de lopende contracten van
-   deze vestiging. Staat hier en niet in ../economie.js omdat die het antwoord
-   twee keer nodig heeft -- een keer om de afnemers te bedienen, een keer voor
-   de maand van de leverancier zelf -- en twee berekeningen van hetzelfde lopen
-   uiteen zodra er iemand aan een van beide sleutelt. */
-function levering(v, arbeid, toegezegd) {
-  const cap = capaciteit(v, arbeid);
-  const geleverd = Math.min(toegezegd || 0, cap);
-  return { cap, geleverd, deel: toegezegd > 0 ? geleverd / toegezegd : 1 };
-}
-
-/* Kwaliteit: hoe goed het er op dit moment aan toegaat. Twee dingen bepalen
-   hem, en allebei zijn ze een keuze van de speler:
-     - RUIMTE: personeel ten opzichte van wat er binnenkomt. Wie zijn zaak
-       ramvol laat lopen met te weinig mensen levert slechtere service.
-     - ONDERHOUD: een pand dat wegzakt trekt de beleving mee omlaag. */
-function kwaliteit(v, verkocht, arbeid) {
-  const cap = Math.max(1, capaciteit(v, arbeid));
-  const bezetting = verkocht / cap;
-  const ruimte = bezetting <= 0.85 ? 1 : klem(1 - (bezetting - 0.85) * 1.6, 0.45, 1);
-  return klem(100 * ruimte * (0.55 + (v.onderhoud / 100) * 0.45), 0, 100);
-}
 
 /* Een maand. Verandert de vestiging IN PLAATS en geeft de regels terug waaruit
    het resultaat is opgebouwd -- die regels zijn wat het scherm toont en wat
@@ -108,10 +71,10 @@ function maand(kaart, v, { maand: m, zoneDruk, wereldFactor, arbeid, contract, g
   let korting = 0;
   for (const [soort, ontvangen] of Object.entries(gedekt || {}))
     korting += H.dekking(v, omzet, soort, ontvangen).bedrag;
-  const inkoop = Math.max(0, omzet * s.inkoop - korting);
+  const inkoop = Math.max(0, omzet * s.inkoop * O.factor(v.tech, 'inkoop') - korting);
   const lonen = v.personeel * s.loon;
   // en een duurder pand per eenheid; hetzelfde getal, dezelfde reden
-  const vast = v.omvang * s.vast * (KOSTENSTAND[v.prijs] || 1);
+  const vast = v.omvang * s.vast * (KOSTENSTAND[v.prijs] || 1) * O.factor(v.tech, 'vast');
   const huur = v.huur;
   const marketing = v.marketing || 0;
   /* Onderhoud is een BEDRAG dat de speler kiest, geen vinkje. Wat het oplevert
@@ -165,4 +128,4 @@ function maand(kaart, v, { maand: m, zoneDruk, wereldFactor, arbeid, contract, g
    rest van de motor haalt hem hier vandaan. Een tweede adres voor dezelfde
    functie zou een tweede antwoord op dezelfde vraag worden. */
 const { waarde, WAARDEPLAFOND } = require('./waardering');
-module.exports = { maand, capaciteit, kwaliteit, waarde, levering, WAARDEPLAFOND };
+module.exports = { maand, capaciteit, personeelNodig, kwaliteit, waarde, levering, WAARDEPLAFOND };

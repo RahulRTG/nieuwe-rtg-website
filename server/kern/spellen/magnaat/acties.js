@@ -20,8 +20,17 @@
 const { SECTOREN } = require('./sectoren');
 const { PRIJSSTANDEN, KOSTENSTAND } = require('./prijsstand');
 const { afkoopsom } = require('./handel');
+const { personeelNodig } = require('./stap');
+const O = require('./onderzoek');
 
 module.exports = ({ K, mijnVestiging, vrijKavel, rond }) => {
+  /* Bij OPENEN is er nog geen vestiging om de techniek aan te hangen, dus geldt
+     wat de speler ergens al heeft uitgerold. Een bouwmethode die je nergens
+     toepast, verlaagt ook geen bouwsom. */
+  const bouwkorting = (st, h) => {
+    const alle = new Set((st.vestigingen[h] || []).flatMap(v => v.tech || []));
+    return O.factor([...alle], 'bouw');
+  };
   /* ---------- de acties ---------- */
   const ACTIES = {
     /* GROOT: een vestiging openen. Kost de bouwsom plus de eerste huur, en het
@@ -42,14 +51,17 @@ module.exports = ({ K, mijnVestiging, vrijKavel, rond }) => {
          maanden terug en goedkoop in eenentwintig. Wie witte tafellakens wil,
          bouwt duurder per stoel. Zie ./sectoren.js. */
       const stand = PRIJSSTANDEN.includes(String(zet.prijs)) ? String(zet.prijs) : 'midden';
-      const bouwsom = Math.round(omvang * s.bouw * KOSTENSTAND[stand]);
+      // nieuwe bouwmethodes werken op wat je NOG gaat bouwen; zie ./onderzoek.js
+      const bouwsom = Math.round(omvang * s.bouw * KOSTENSTAND[stand] * bouwkorting(st, h));
       const huur = rond(kavel.eigenschappen.huur * omvang * 0.55);
       if (st.geld[h] < bouwsom) return { status: 400, error: 'Openen kost ' + bouwsom + '; dat heb je niet.' };
       st.geld[h] -= bouwsom;
       const v = {
         id: 'v' + (++st.teller || (st.teller = 1)), kavel: kavelId, sector,
         naam: String(zet.naam || s.naam).slice(0, 40),
-        omvang, personeel: Math.max(1, Math.ceil(omvang / (s.perMedewerker / KOSTENSTAND[stand]))),
+        // de startbezetting is precies wat er nodig is, uitgerekend door de
+        // motor zelf (./stap.js) en niet nog een keer hier
+        omvang, personeel: personeelNodig({ sector, omvang, prijs: stand, tech: [] }, 0),
         prijs: stand, marketing: 0, onderhoudBudget: rond(omvang * s.vast * KOSTENSTAND[stand] * 0.35),
         onderhoud: 100, reputatie: 50, huur, gebouwdVoor: bouwsom, maanden: 0
       };
@@ -66,7 +78,7 @@ module.exports = ({ K, mijnVestiging, vrijKavel, rond }) => {
       if (!v) return { status: 404, error: 'Die vestiging is niet van jou.' };
       const erbij = Math.max(1, Math.min(60, Math.floor(Number(zet.erbij) || 0)));
       if (v.omvang + erbij > 200) return { status: 400, error: 'Groter dan dit kan deze plek niet aan.' };
-      const kosten = Math.round(erbij * SECTOREN[v.sector].bouw * KOSTENSTAND[v.prijs]);
+      const kosten = Math.round(erbij * SECTOREN[v.sector].bouw * KOSTENSTAND[v.prijs] * O.factor(v.tech, 'bouw'));
       if (st.geld[h] < kosten) return { status: 400, error: 'Uitbreiden kost ' + kosten + '; dat heb je niet.' };
       st.geld[h] -= kosten;
       v.omvang += erbij;

@@ -118,4 +118,18 @@ function top(regels) {
   return null;
 }
 
-module.exports = { schakel, verifieer, top, hashVan, kanoniek };
+/* Wat deze control is, voor TOEZICHT.md. Het veld `grens` is verplicht en staat
+   hier niet voor de vorm: wie hem weglaat, laat een control bij het mappen naar
+   een wettelijke eis onvermijdelijk te ruim lezen. */
+const CONTROL = {
+  control: 'AUDIT-KETEN',
+  wat: 'het auditspoor is niet stil te herschrijven',
+  eigenaar: 'Security',
+  bewijs: ['test/keten.test.js'],
+  bewijsstuk: 'de ketenhash van het journaal (inzagelog.ketenTop())',
+  grens: 'stopt STILLE wijziging. Wie bij de database kan, kan de hele keten opnieuw ' +
+    'uitrekenen; daarvoor moet de top periodiek naar een gescheiden systeem, en dat ' +
+    'wegzetten is nog niet gebouwd.'
+};
+
+module.exports = { schakel, verifieer, top, hashVan, kanoniek, CONTROL };

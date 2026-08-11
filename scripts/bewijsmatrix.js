@@ -320,7 +320,17 @@ function achteruit(nu, oud) {
   return uit;
 }
 
-module.exports = { bouw, achteruit, SCHAKELS, LEESMETHODEN };
+const CONTROL = {
+  control: 'ENDPOINT-BEWIJS',
+  wat: 'per route is vastgelegd welke van de elf schakels bewezen is en door wie',
+  eigenaar: 'Techniek',
+  bewijs: ['test/bewijsmatrix.test.js'],
+  bewijsstuk: 'BEWIJSMATRIX.json -- 43835 cellen, met bron per bewezen cel',
+  grens: 'het register MEET niets zelf; het verzamelt wat andere instrumenten meten. ' +
+    'Vier van de elf kolommen hebben vandaag een instrument, zeven staan leeg.'
+};
+
+module.exports = { bouw, achteruit, SCHAKELS, LEESMETHODEN, CONTROL };
 
 /* Alleen doen als iemand dit bestand DRAAIT. Wordt het geladen (door een toets,
    of straks door de keuring), dan hoort er niets te gebeuren en al helemaal geen

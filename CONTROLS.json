@@ -1,0 +1,92 @@
+{
+  "uitleg": "Verklaarde beheersmaatregelen en wanneer elk voor het laatst BEWEZEN is. Zie TOEZICHT.md. laatstGroen is gemeten door de genoemde toetsen te draaien, niet overgeschreven -- een register dat zijn eigen groen opschrijft bewijst niets.",
+  "gemeten": {
+    "controls": 4,
+    "groen": 4,
+    "nietGroen": 0
+  },
+  "controls": [
+    {
+      "bron": "server/lib/keten.js",
+      "control": "AUDIT-KETEN",
+      "wat": "het auditspoor is niet stil te herschrijven",
+      "eigenaar": "Security",
+      "bewijs": [
+        "test/keten.test.js"
+      ],
+      "bewijsstuk": "de ketenhash van het journaal (inzagelog.ketenTop())",
+      "grens": "stopt STILLE wijziging. Wie bij de database kan, kan de hele keten opnieuw uitrekenen; daarvoor moet de top periodiek naar een gescheiden systeem, en dat wegzetten is nog niet gebouwd.",
+      "laatstGroen": {
+        "staat": "GROEN",
+        "beweringen": 20,
+        "overgeslagen": 0,
+        "at": "2026-08-11T22:32:41.566Z",
+        "bestanden": [
+          "test/keten.test.js"
+        ]
+      }
+    },
+    {
+      "bron": "server/lib/klok.js",
+      "control": "TIJD-KLOK",
+      "wat": "tijdgebonden beslissingen zijn te beproeven op een verzette klok",
+      "eigenaar": "Techniek",
+      "bewijs": [
+        "test/klok.test.js"
+      ],
+      "bewijsstuk": "KLOK.json -- hoeveel code nog buiten de tijdmachine staat",
+      "grens": "alleen code die DEZE klok gebruikt is te verzetten. KLOK.json staat op 1298 directe tijdsaanroepen: een tijdproef bewijst dus iets over de modules op de klok, niet over de hele server.",
+      "laatstGroen": {
+        "staat": "GROEN",
+        "beweringen": 18,
+        "overgeslagen": 0,
+        "at": "2026-08-11T22:32:43.621Z",
+        "bestanden": [
+          "test/klok.test.js"
+        ]
+      }
+    },
+    {
+      "bron": "scripts/lib/schermleugen.js",
+      "control": "UI-WAARHEID",
+      "wat": "een scherm toont geen zekerheid die de backend niet heeft gegeven",
+      "eigenaar": "Techniek",
+      "bewijs": [
+        "test/schermleugen.test.js",
+        "test/liegend-scherm.e2e.js"
+      ],
+      "bewijsstuk": "SCHERMLEUGEN.json -- de gemeten schuld per scherm",
+      "grens": "gemeten op zes ledenschermen van de 242, en alleen op een LEEG antwoord. Een backend die iets VERKEERDS antwoordt in plaats van niets, wordt hier niet betrapt.",
+      "laatstGroen": {
+        "staat": "GROEN",
+        "beweringen": 18,
+        "overgeslagen": 0,
+        "at": "2026-08-11T22:33:14.610Z",
+        "bestanden": [
+          "test/schermleugen.test.js",
+          "test/liegend-scherm.e2e.js"
+        ]
+      }
+    },
+    {
+      "bron": "scripts/bewijsmatrix.js",
+      "control": "ENDPOINT-BEWIJS",
+      "wat": "per route is vastgelegd welke van de elf schakels bewezen is en door wie",
+      "eigenaar": "Techniek",
+      "bewijs": [
+        "test/bewijsmatrix.test.js"
+      ],
+      "bewijsstuk": "BEWIJSMATRIX.json -- 43835 cellen, met bron per bewezen cel",
+      "grens": "het register MEET niets zelf; het verzamelt wat andere instrumenten meten. Vier van de elf kolommen hebben vandaag een instrument, zeven staan leeg.",
+      "laatstGroen": {
+        "staat": "GROEN",
+        "beweringen": 11,
+        "overgeslagen": 0,
+        "at": "2026-08-11T22:33:14.787Z",
+        "bestanden": [
+          "test/bewijsmatrix.test.js"
+        ]
+      }
+    }
+  ]
+}

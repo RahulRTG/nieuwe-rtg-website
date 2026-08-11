@@ -769,6 +769,14 @@
       "gezakt": 4,
       "scherp": "gezakt"
     },
+    "controls.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/controls.js",
+      "operator": "return-weg#0",
+      "gezakt": 7,
+      "geprobeerd": 4
+    },
     "creator-portfolio.test.js": {
       "soort": "server",
       "staat": "gezakt",

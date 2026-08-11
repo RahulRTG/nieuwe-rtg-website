@@ -79,4 +79,14 @@ function vergelijk(gevonden, bekend) {
   return { nieuw, opgelost };
 }
 
-module.exports = { ROMMEL, ZEKERHEID, heelWoord, vindKlachten, vergelijk };
+const CONTROL = {
+  control: 'UI-WAARHEID',
+  wat: 'een scherm toont geen zekerheid die de backend niet heeft gegeven',
+  eigenaar: 'Techniek',
+  bewijs: ['test/schermleugen.test.js', 'test/liegend-scherm.e2e.js'],
+  bewijsstuk: 'SCHERMLEUGEN.json -- de gemeten schuld per scherm',
+  grens: 'gemeten op zes ledenschermen van de 242, en alleen op een LEEG antwoord. ' +
+    'Een backend die iets VERKEERDS antwoordt in plaats van niets, wordt hier niet betrapt.'
+};
+
+module.exports = { ROMMEL, ZEKERHEID, heelWoord, vindKlachten, vergelijk, CONTROL };

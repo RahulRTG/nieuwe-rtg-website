@@ -98,4 +98,15 @@ const uitleg = () => (VERSCHUIVING === 0 ? 'de klok loopt gelijk'
     Math.abs(Math.round(VERSCHUIVING / 1000)) + ' seconden' +
     (INSTELLING.naar ? ' (gezet op ' + INSTELLING.naar + ')' : ''));
 
-module.exports = { nu, datum, verschoven, uitleg, lees, EENHEDEN };
+const CONTROL = {
+  control: 'TIJD-KLOK',
+  wat: 'tijdgebonden beslissingen zijn te beproeven op een verzette klok',
+  eigenaar: 'Techniek',
+  bewijs: ['test/klok.test.js'],
+  bewijsstuk: 'KLOK.json -- hoeveel code nog buiten de tijdmachine staat',
+  grens: 'alleen code die DEZE klok gebruikt is te verzetten. KLOK.json staat op 1298 ' +
+    'directe tijdsaanroepen: een tijdproef bewijst dus iets over de modules op de klok, ' +
+    'niet over de hele server.'
+};
+
+module.exports = { nu, datum, verschoven, uitleg, lees, EENHEDEN, CONTROL };

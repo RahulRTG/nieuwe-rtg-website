@@ -20,6 +20,11 @@
    huis. */
 'use strict';
 
+/* Statusovergangen lopen via de gebeurtenislaag, zodat de toestand van toen
+   te reconstrueren is (./verloop.js). Zonder deze weg merkt het vangnet de
+   wijziging alsnog op, maar dan zonder tijdstip en zonder naam. */
+const { verloopZet } = require('./verloop');
+
 const SOORTEN = ['product', 'investering', 'prijs', 'lancering', 'beveiliging', 'personeel', 'contract', 'overig'];
 
 module.exports = (sctx) => {
@@ -72,7 +77,7 @@ module.exports = (sctx) => {
     const b = eigenVeld(B(g.w), String(req.body.besluitId || ''));
     if (!b) return res.status(404).json({ error: 'Dat voorstel kennen we niet.' });
     if (b.status !== 'advies') return res.status(409).json({ error: 'Dit voorstel staat al op ' + b.status + '.' });
-    b.status = 'stemmen'; b.adviesGeslotenAt = nu();
+    verloopZet(g.w, 'besluit', b, 'status', 'stemmen', g.l.naam); b.adviesGeslotenAt = nu();
     save();
     res.json({ ok: true, besluit: { id: b.id, status: b.status },
       bezwaren: b.bezwaren.map(x => ({ door: x.door, tekst: x.tekst })),
@@ -121,7 +126,7 @@ module.exports = (sctx) => {
       return res.status(400).json({ error: 'Wanneer kijken we of dit besluit klopte? Een besluit zonder terugkijkmoment is een besluit dat nooit fout kan zijn geweest.' });
     if (evalueerOp && evalueerOp <= dag())
       return res.status(400).json({ error: 'Kies een evaluatiedatum in de toekomst.' });
-    b.status = aangenomen ? 'aangenomen' : 'verworpen';
+    verloopZet(g.w, 'besluit', b, 'status', aangenomen ? 'aangenomen' : 'verworpen', g.l.naam);
     b.telling = t; b.evalueerOp = aangenomen ? evalueerOp : null;
     b.geslotenAt = nu(); b.geslotenDoor = g.l.naam;
     log(g.w, g.l, 'besluit-' + b.status, b.id, b.titel + ' (' + t.voor + ' voor, ' + t.tegen + ' tegen)');

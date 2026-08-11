@@ -18,6 +18,11 @@
       opgeruimd: bij een geschil is juist de oude tekst het bewijs. */
 'use strict';
 
+/* Statusovergangen lopen via de gebeurtenislaag, zodat de toestand van toen
+   te reconstrueren is (./verloop.js). Zonder deze weg merkt het vangnet de
+   wijziging alsnog op, maar dan zonder tijdstip en zonder naam. */
+const { verloopZet } = require('./verloop');
+
 const SOORTEN = ['klant', 'leverancier', 'arbeid', 'huur', 'licentie', 'verwerkers',
   'geheimhouding', 'verzekering', 'vergunning', 'overig'];
 
@@ -107,7 +112,7 @@ module.exports = (sctx) => {
     const reden = schoon(req.body.reden, 300);
     if (!reden) return res.status(400).json({ error: 'Noteer waarom dit contract wordt opgezegd.' });
     const k = klok(c);
-    c.status = 'opgezegd';
+    verloopZet(g.w, 'contract', c, 'status', 'opgezegd', g.l.naam);
     c.opgezegd = { reden, door: g.l.naam, op: dag(), tijdig: k.dagenTotOpzegdag == null ? null : k.dagenTotOpzegdag >= 0 };
     log(g.w, g.l, 'contract-opgezegd', c.id, reden);
     save();

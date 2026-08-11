@@ -17,6 +17,11 @@
    kost meer dan het bespaart. */
 'use strict';
 
+/* Statusovergangen lopen via de gebeurtenislaag, zodat de toestand van toen
+   te reconstrueren is (./verloop.js). Zonder deze weg merkt het vangnet de
+   wijziging alsnog op, maar dan zonder tijdstip en zonder naam. */
+const { verloopZet } = require('./verloop');
+
 module.exports = (sctx) => {
   const { app, save, schoon, nu, rid, dag, werkPoort, eigenVeld, KOLOMMEN, PRIORITEITEN, voortgang, PROJECTEN: P, TAKEN: T } = sctx;
 
@@ -81,7 +86,7 @@ module.exports = (sctx) => {
       if (kinderen.length) return res.status(409).json({
         error: 'Er staan nog ' + kinderen.length + ' subtaak/subtaken open onder deze taak.' });
     }
-    t.kolom = kolom;
+    verloopZet(g.w, 'taak', t, 'kolom', kolom, g.l.naam);
     if (kolom === 'klaar') { t.klaarAt = nu(); t.klaarDoor = g.l.naam; } else { t.klaarAt = null; }
     save();
     res.json({ ok: true, taak: { id: t.id, titel: t.titel, kolom: t.kolom, klaarAt: t.klaarAt || null } });

@@ -19,6 +19,11 @@
    er geen cijfer. Een gemiddelde uit twee antwoorden is geen gemiddelde. */
 'use strict';
 
+/* Statusovergangen lopen via de gebeurtenislaag, zodat de toestand van toen
+   te reconstrueren is (./verloop.js). Zonder deze weg merkt het vangnet de
+   wijziging alsnog op, maar dan zonder tijdstip en zonder naam. */
+const { verloopZet } = require('./verloop');
+
 const PRIO = {
   kritiek: { reactieMin: 15, oplosMin: 240 },
   hoog: { reactieMin: 60, oplosMin: 480 },
@@ -92,7 +97,8 @@ module.exports = (sctx) => {
     if (t.status === 'gesloten') return res.status(409).json({ error: 'Dit ticket is al gesloten.' });
     const oplossing = schoon(req.body.oplossing, 1000);
     if (!oplossing) return res.status(400).json({ error: 'Noteer hoe het is opgelost. Een ticket dat dichtgaat met een leeg veld leert niemand iets.' });
-    t.status = 'gesloten'; t.oplossing = oplossing; t.geslotenAt = nu(); t.geslotenDoor = g.l.naam;
+    verloopZet(g.w, 'ticket', t, 'status', 'gesloten', g.l.naam);
+    t.oplossing = oplossing; t.geslotenAt = nu(); t.geslotenDoor = g.l.naam;
     log(g.w, g.l, 'ticket-gesloten', t.id, t.onderwerp);
     save();
     const s = sla(t);

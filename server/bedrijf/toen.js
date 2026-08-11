@@ -14,11 +14,25 @@
    er op 12 maart" en "hoeveel projecten liepen er toen" zijn daarmee eerlijk te
    beantwoorden.
 
-   WAT HIJ NIET DOET: de TOESTAND van toen. Of een contract op die dag actief of
-   nog concept was, wie er toen aan een project werkte, welke rollen iemand toen
-   had -- dat is niet vast te stellen, want een wijziging overschrijft de vorige
-   waarde en er is geen gebeurtenislaag onder de schrijfhandelingen. Dat staat in
-   elk antwoord, niet als voetnoot maar als eigenschap van de uitslag.
+   EN SINDS ./verloop.js DOET HIJ OOK DE TOESTAND. Hier stond jarenlang dat dat
+   NIET kon, met de goede reden erbij: een wijziging overschrijft de vorige
+   waarde en er lag geen gebeurtenislaag onder de schrijfhandelingen. Die laag
+   ligt er nu, en dit bestand is de eerste die hem gebruikt.
+
+   DE GRENS IS VERSCHOVEN, NIET WEGGEHAALD. De reconstructie loopt van NU terug:
+   neem de huidige waarde en draai elke wijziging terug die na de gevraagde dag
+   is gebeurd. Dat werkt alleen zover het log reikt, en het log heeft twee
+   gaten die allebei worden GETELD in plaats van gladgestreken:
+
+     - wijzigingen van VOOR de gebeurtenislaag bestaan niet en zijn niet te
+       reconstrueren. Een object dat sindsdien niet is aangeraakt, toont dus
+       zijn huidige waarde -- en dat is meestal juist, maar niet bewijsbaar.
+     - wijzigingen die BUITEN verloopZet() om gingen worden door het vangnet
+       opgemerkt maar dragen geen tijdstip. Elk antwoord dat eroverheen kijkt,
+       zegt erbij dat het onzeker is.
+
+   Wie een toestand krijgt met `zeker: false` heeft geen fout gevonden maar een
+   eerlijke marge gelezen.
 
    EN DE ONVOLLEDIGHEID WORDT GETELD. Rijen zonder `at` kunnen niet in de tijd
    worden geplaatst. Die verdwijnen hier niet stilletjes uit de telling: ze
@@ -32,6 +46,7 @@
 'use strict';
 
 const { maakWerkRegister } = require('../kern/werkcommand/register');
+const { verloopMeet, verloopStandOp } = require('./verloop');
 
 module.exports = (sctx) => {
   const { app, db, schoon, werkPoort } = sctx;
@@ -59,7 +74,65 @@ module.exports = (sctx) => {
       leeg: soorten.filter(s => s.nu === 0).map(s => s.type),
       zonderDatum: zonderTotaal,
       wat: 'bestaan',
-      let: 'Dit is WAT ER BESTOND op ' + datum + ', geteld uit het aanmaakmoment van elke rij. Het is NIET de toestand van toen: of een contract op die dag al actief was, wie er toen aan een project werkte en welke rollen iemand had, is niet vast te stellen -- een wijziging overschrijft de vorige waarde en er ligt geen gebeurtenislaag onder de schrijfhandelingen.'
+      let: 'Dit is WAT ER BESTOND op ' + datum + ', geteld uit het aanmaakmoment van elke rij. Voor de TOESTAND van een object op die dag is er /api/bedrijf/toen/object.'
         + (zonderTotaal ? ' ' + zonderTotaal + ' rij(en) dragen geen aanmaakmoment en konden dus niet in de tijd worden geplaatst; die staan per soort bij zonderDatum en niet stilzwijgend buiten de telling.' : '') });
+  });
+
+  /* ---- DE TOESTAND VAN EEN OBJECT OP EEN DAG ----
+
+     Dit is wat hier jarenlang niet kon. De reconstructie loopt van nu terug
+     langs ./verloop.js; wat buiten de gebeurtenislaag om is gewijzigd, wordt
+     geteld en maakt het antwoord `zeker: false`.
+
+     HET VANGNET DRAAIT HIER, VLAK VOOR HET LEZEN. Dat is met opzet: een sweep
+     die op een timer loopt, mist precies de wijziging die iemand net deed en
+     nu opvraagt. Hij is goedkoop (een vergelijking per gevolgd veld) en hij
+     hoort bij de LEESKANT, want daar wordt de belofte gedaan. */
+  app.post('/api/bedrijf/toen/object', (req, res) => {
+    const g = werkPoort(req, res); if (!g) return;
+    const datum = schoon(req.body.datum, 10);
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(datum))
+      return res.status(400).json({ error: 'Geef een datum als jjjj-mm-dd.' });
+    const type = schoon(req.body.type, 40);
+    const id = schoon(req.body.id, 80);
+    if (!type || !id) return res.status(400).json({ error: 'Welk object? Geef type en id.' });
+
+    const register = maakWerkRegister(g.w.code, g.rechten);
+    const so = register.SOORTEN.find(x => x.type === type);
+    /* Een soort die dit lid niet mag zien, staat NIET in zijn register -- en
+       dan bestaat hij hier ook niet. Zelfde 404 als een onbekend type: het
+       verschil zou verklappen welke soorten er zijn. */
+    if (!so) return res.status(404).json({ error: 'Dit object bestaat niet.' });
+
+    verloopMeet(g.w, register.SOORTEN);
+    const rij = register.rijen(db, so).find(r => String(r[so.sleutel || 'id']) === id);
+    if (!rij) return res.status(404).json({ error: 'Dit object bestaat niet.' });
+
+    const uit = verloopStandOp(g.w, so, rij, datum);
+    if (!uit.bestond) {
+      return res.json({ ok: true, datum, type, id, bestond: false,
+        let: 'Dit object bestond op ' + datum + ' nog niet; het is aangemaakt op ' + String(rij.at).slice(0, 10) + '.' });
+    }
+    res.json({ ok: true, datum, type, id, bestond: true,
+      titel: so.titel ? so.titel(rij) : id,
+      toestand: uit.stand, nu: Object.fromEntries(Object.keys(uit.stand).map(v => [v, rij[v] == null ? null : rij[v]])),
+      zeker: uit.zeker, onzeker: uit.onzeker, let: uit.let });
+  });
+
+  /* Het verloop zelf: de regels achter de reconstructie. Wie een toestand niet
+     vertrouwt, hoort te kunnen zien waarop zij rust. */
+  app.post('/api/bedrijf/verloop', (req, res) => {
+    const g = werkPoort(req, res); if (!g) return;
+    const register = maakWerkRegister(g.w.code, g.rechten);
+    verloopMeet(g.w, register.SOORTEN);
+    const zichtbaar = new Set(register.SOORTEN.map(s => s.type));
+    const type = schoon(req.body.type, 40), id = schoon(req.body.id, 80);
+    const regels = (g.w.verloop || [])
+      .filter(e => zichtbaar.has(e.soort) && (!type || e.soort === type) && (!id || e.id === id))
+      .slice(-300).reverse();
+    res.json({ ok: true, regels, aantal: regels.length,
+      ongemeten: regels.filter(e => e.ongemeten).length,
+      afgekapt: !!g.w.verloopAfgekapt,
+      let: 'Regels zonder tijdstip zijn buiten de gebeurtenislaag om gegaan en door het vangnet opgemerkt; van die wijzigingen weten wij de oude waarde wel en het moment niet.' });
   });
 };

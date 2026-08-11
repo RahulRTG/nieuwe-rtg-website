@@ -89,11 +89,18 @@ test('een gesloten genre wordt geweigerd en wordt nooit een ander genre', () => 
      mens het stuk aftekent), dus de deur mag open. De toets daarop staat in
      test/concern-voorstel.test.js -- en zonder die toets hoort deze regel
      terug. */
-  const gesloten = [
-    ['binnenkort', register.genresMetStand('binnenkort')[0]],
-    ['intern', register.genresMetStand('intern')[0]],
-    ['uitnodiging', register.genresMetStand('uitnodiging')[0]]
-  ];
+  /* AFGELEID UIT HET REGISTER EN NIET OVERGETYPT. Hier stonden drie standen met
+     de hand, en toen `binnenkort` leegliep (alle 24 bleken bediend; zie
+     test/genredekking.test.js) viel deze toets om op een undefined -- terwijl er
+     inhoudelijk niets mis was. Nu loopt hij over de standen die WERKELIJK
+     gesloten genres hebben, dus hij beweegt mee als er een stand leegloopt of
+     bijkomt. */
+  const gesloten = Object.keys(register.TOEGANG)
+    .filter(stand => !register.TOEGANG[stand].mag)
+    .map(stand => [stand, register.genresMetStand(stand)[0]])
+    .filter(([, genre]) => genre);
+  assert.ok(gesloten.length >= 2,
+    'er horen minstens twee gesloten standen met genres te zijn, anders toetst dit niets');
   for (const [stand, genre] of gesloten) {
     const a = {};
     const r = zetBedrijf(a, { naam: 'Proefzaak', type: genre, plaats: 'Ibiza' });

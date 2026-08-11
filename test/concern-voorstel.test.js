@@ -160,11 +160,17 @@ test('een geweigerde branche laat een spoor na in plaats van een stilte', () => 
 
   /* Een gesloten genre: het veld blijft leeg -- er wordt niets VERVANGEN -- maar
      er staat nu bij waarom, en met welke stand. */
-  const dicht = register.genresMetStand('binnenkort')[0];
+  /* Een genre dat werkelijk dicht staat, uit het register gelezen: welke stand
+     dat is mag veranderen, dat er een is niet. */
+  const dicht = Object.keys(register.TOEGANG)
+    .filter(s2 => !register.TOEGANG[s2].mag)
+    .flatMap(s2 => register.genresMetStand(s2))[0];
+  assert.ok(dicht, 'er hoort een gesloten genre te bestaan om dit te kunnen toetsen');
   intake.intakeZet(o, { idee: { branche: dicht } });
   assert.equal(o.intake.idee.branche, null);
   assert.equal(o.intake.brancheGeweigerd.gevraagd, dicht);
-  assert.equal(o.intake.brancheGeweigerd.stand, 'binnenkort');
+  assert.ok(['intern', 'uitnodiging', 'binnenkort', 'bewijs'].includes(o.intake.brancheGeweigerd.stand),
+    'de stand van het geweigerde genre hoort mee te reizen');
   assert.ok(o.intake.brancheGeweigerd.uitleg);
 
   // en een geldige keuze daarna ruimt de melding op

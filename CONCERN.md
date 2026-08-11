@@ -641,9 +641,31 @@ Wat er gebeurt:
   valideert, verschuift een aansprakelijkheid naar de partij die haar niet kan
   dragen.
 
-Daarmee staan er **39** van de 73 genres open. De overige 34 zijn 24
-`binnenkort` (het genre bestaat, het gereedschap nog niet), 8 `intern` (die
-draait de wereld zelf) en 2 `uitnodiging`.
+## De 42 gesloten genres, en wat de meting uitwees
+
+Toen de toegangsstand er kwam, kregen 42 genres hun stand van een **mens** — en
+dat is dezelfde fout als de handgetypte lijst van 31 die zij verving, alleen met
+een ander gezicht. Daarom is er daarna **gemeten** wat er werkelijk aan
+gereedschap bestond.
+
+De uitkomst was niet wat de indeling suggereerde. Van de 24 genres op
+`binnenkort` bleken er **24** volledig bediend: de zaak-app heeft tabs voor
+`marina` en `petcare`, de PDA kent de modules, `redactie` en `sportclub` hebben
+een eigen app, en in de seed stonden al demozaken van type `golfclub`,
+`wintersport` en `weddingplanner`. Ze stonden niet dicht omdat er iets ontbrak —
+ze stonden dicht omdat ze ooit niet in die 31 waren getypt.
+
+Ze zijn alle 24 open. **63 van de 73 genres zijn nu aanvraagbaar**: 55 `open`,
+8 `bewijs`. Dicht blijven alleen de 10 die daar niet om technische redenen
+staan — 8 `intern` (die draait de wereld zelf) en 2 `uitnodiging`.
+
+`test/genredekking.test.js` is de maat die dat voortaan afdwingt, en hij vraagt
+niet of iemand goed heeft ingedeeld maar of de **caps bediend worden**. Vier
+bewijzen tellen: een tab in de zaak-app, een PDA-module, een werkvorm-cap, of
+een eigen scherm. Er stond een vijfde — *"een genre dat al open staat draagt
+hem"* — en die is eruit: een mutatie liet zien dat een verzonnen cap
+(`gehaktbal`) op het open genre `hotel` er glansrijk doorheen kwam. Dat is geen
+meting maar een spiegel.
 
 ---
 

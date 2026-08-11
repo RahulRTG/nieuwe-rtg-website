@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 907 bestanden en 5823 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 908 bestanden en 5827 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,13 +12,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 907 |
-| losse beweringen (`test(...)`) | 5823 |
+| toetsbestanden | 908 |
+| losse beweringen (`test(...)`) | 5827 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 614 |
 | **overleefd**: geen mutatie kreeg hem rood | 13 |
 | niet te meten (al rood, geen module gevonden, ...) | 18 |
-| alleen in de kop *genoemd*, nog niet gemeten | 74 |
+| alleen in de kop *genoemd*, nog niet gemeten | 75 |
 | niets van beide | 188 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-788 bestanden, 5620 beweringen.
+789 bestanden, 5624 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -238,6 +238,7 @@ toets omvalt.
 | `gemeente.test.js` | 9 | gezakt op `liegpoort /api/` | RTG Gemeente (kern/gemeente.js): het civiele systeem als partner-genre. Vier pijlers voor inwoners, gemeente-medewerkers en RTG-partners. |
 | `genootschap-beheer.test.js` | 4 | gezakt op `liegpoort /api/` | HET BEHEER VAN EEN GENOOTSCHAP -- 3 endpoints. Deze drie wees de waargenomen dekkingsmeting aan als nooit aangeroepen: pas-aan, eruit en reactie-weg. |
 | `genootschap.test.js` | 14 | gezakt op `liegpoort /api/` | Genootschap (kern/genootschap/*, routes/member/genootschap.js): besloten groepen van leden, met prikbord en bijeenkomsten. De toetsen leggen vooral de grenzen vast die dit anders maken dan een groep op een gewoon... |
+| `genredekking.test.js` | 4 | genoemd | EEN GENRE MAG ALLEEN OPEN STAAN ALS ZIJN GEREEDSCHAP ER IS. WAAROM DIT BESTAAT Het register kende ooit 31 aanvraagbare genres. |
 | `genreplan.test.js` | 7 | gezakt op `liegpoort /api/` | Genrepols 2: het draaiboek van vandaag en de week vooruit voor de acht dunnere genres. Bewaakt dat /api/supplier/puls/plan een geprioriteerd, afvinkbaar draaiboek uit de eigen genre-motor haalt (met "dit eerst"-... |
 | `genrepuls.test.js` | 5 | gezakt op `liegpoort /api/` | De Genrepols: de kantoren-laag voor de acht dunnere genres (golf, fitclub, beauty, petcare, kinderopvang, weddings, marina, alpine). Bewaakt dat /api/supplier/puls de meters en signalen van vandaag uit de eigen... |
 | `genreregister.test.js` | 5 | -- | HET GENRE-REGISTER: EEN PLEK, EN DAT MOET ZO BLIJVEN. WAAROM DIT BESTAAT De 73 genres stonden verspreid over tien initdata-delen en zes kernmodules, elk met een eigen `if (!db.data.supplierTypes.x) ... |

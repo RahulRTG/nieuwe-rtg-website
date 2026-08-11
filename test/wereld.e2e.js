@@ -157,8 +157,21 @@ test('draaien verplaatst de wereld op twaalf uur, en de naam eronder volgt',
   await metLid('aan', async ({ page }) => {
     const eerste = await page.evaluate(() => RTGWereld.stand().naam);
     const viaMuis = await page.evaluate(async () => {
+      /* WACHTEN TOT HIJ STILSTAAT, en niet een vaste tijd gokken. De ring eased
+         naar zijn stand in een rAF-lus; wordt die uitgehongerd doordat de
+         machine druk is -- op de bouwstraat draaien alle e2e-bestanden tegelijk
+         -- dan is hij na 900 ms nog onderweg en meet de toets een tussenstand.
+         Dat is geen fout in het scherm maar in de meting. */
+      const stil = async () => {
+        let vorige = null, zelfde = 0;
+        for (let i = 0; i < 150 && zelfde < 4; i++) {
+          await new Promise((k) => setTimeout(k, 60));
+          const nu = RTGWereld.stand().actief;
+          if (nu === vorige) zelfde++; else { vorige = nu; zelfde = 0; }
+        }
+      };
       RTGWereld.naar(3);
-      await new Promise((k) => setTimeout(k, 900));
+      await stil();
       const wm = [...document.querySelectorAll('.os-wm')].find((m) => m.dataset.actief === 'ja');
       return {
         stand: RTGWereld.stand(),
@@ -183,7 +196,12 @@ test('draaien verplaatst de wereld op twaalf uur, en de naam eronder volgt',
     const naPijl = await page.evaluate(async () => {
       document.body.focus();
       document.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
-      await new Promise((k) => setTimeout(k, 900));
+      let vorige = null, zelfde = 0;
+      for (let i = 0; i < 150 && zelfde < 4; i++) {
+        await new Promise((k) => setTimeout(k, 60));
+        const nu = RTGWereld.stand().actief;
+        if (nu === vorige) zelfde++; else { vorige = nu; zelfde = 0; }
+      }
       return RTGWereld.stand().actief;
     });
     assert.equal(naPijl, 4, 'pijl-rechts hoort een wereld verder te reizen (kreeg stand ' + naPijl + ')');
@@ -264,8 +282,7 @@ test('aan de ring draaien opent geen app, ook niet als je op een merk loslaat',
     const voor = await page.evaluate(() => RTGWereld.stand().naam);
     const pad = page.url();
 
-    // beetpakken op drie uur en over een achtste slag naar beneden draaien, zodat
-    // de muis loslaat op de plek waar dan een merk staat
+    // beetpakken op drie uur en een kwartslag naar beneden draaien
     const straal = vak.r * 0.82;
     const raakt = await page.evaluate(([x, y]) => {
       const e = document.elementFromPoint(x, y);
@@ -273,19 +290,50 @@ test('aan de ring draaien opent geen app, ook niet als je op een merk loslaat',
     }, [vak.x + straal, vak.y]);
     assert.equal(raakt, true,
       'de greep op de ring wordt door iets anders opgevangen; dan meet dit gebaar niets');
+
     await page.mouse.move(vak.x + straal, vak.y);
     await page.mouse.down();
-    for (let g = 5; g <= 45; g += 5) {
+    for (let g = 5; g <= 90; g += 5) {
       const rad = g * Math.PI / 180;
       await page.mouse.move(vak.x + straal * Math.cos(rad), vak.y + straal * Math.sin(rad));
     }
+
+    /* NOG VOOR HET LOSLATEN AFLEZEN WAAR DE RING STAAT.
+
+       Dit is de plek waar deze toets wisselvallig was, en de reden is de moeite
+       waard. Hij draaide een achtste slag en las de stand pas NA het loslaten,
+       na een vaste wachttijd van 900 ms. Twee dingen kunnen daar misgaan zodra
+       de machine druk is -- en op de bouwstraat draaien alle 120 e2e-bestanden
+       tegelijk op vier kernen:
+
+       1. Muisbewegingen worden samengevoegd of vallen weg. Blijft de laatste
+          die de pagina echt ziet onder de helft van een stand, dan klikt de
+          bezel bij het loslaten gewoon terug naar waar hij vandaan kwam, en
+          lijkt het alsof er niet gedraaid is.
+       2. 900 ms is een gok. De ring eased naar zijn stand in een rAF-lus; wordt
+          die uitgehongerd, dan is hij nog onderweg als de toets kijkt.
+
+       Nu draait hij een kwartslag (twee standen, dus ruim over de drempel) en
+       leest hij de stand terwijl de knop nog ingedrukt is -- daar volgt de
+       actieve wereld al uit de hoek, zonder animatie ertussen. Geen wachttijd,
+       geen drempel op het randje. */
+    const tijdensSleep = await page.evaluate(() => RTGWereld.stand().naam);
+    assert.notEqual(tijdensSleep, voor,
+      'het gebaar hoort de ring echt te verdraaien (bleef staan op ' + voor + ')');
+
     await page.mouse.up();
-    await page.waitForTimeout(900);
+    // wachten tot hij is uitgedraaid, en niet een vaste tijd gokken
+    await page.waitForFunction(() => {
+      const s = RTGWereld.stand();
+      if (window.__vorigeStand === s.actief) return (window.__stil = (window.__stil || 0) + 1) > 3;
+      window.__vorigeStand = s.actief; window.__stil = 0;
+      return false;
+    }, null, { timeout: 15000, polling: 120 });
 
     const na = await page.evaluate(() => ({ naam: RTGWereld.stand().naam, url: location.href }));
     assert.equal(na.url, pad, 'draaien hoort je op het beginscherm te laten; je belandde op ' + na.url);
     assert.notEqual(na.naam, voor,
-      'het gebaar hoort de ring echt te verdraaien (bleef staan op ' + voor + ')');
+      'na het loslaten hoort de ring op een andere wereld vast te klikken (bleef staan op ' + voor + ')');
   });
 });
 

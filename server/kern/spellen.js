@@ -66,7 +66,7 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
      register haalt ze op en levert de dispatch-tabellen. Dit blok groeit niet
      meer mee met het aantal spellen -- dat was het hele punt. */
   const spelCtx = { save, crypto, schud, beurtDoor, codenaamVan, nudge };
-  const { SPEL, SOORTEN, INITS, ZETTEN, ZICHT, STATISCH, ARCADE, DAG, ruw } = require('./spellen/register')(spelCtx);
+  const { SPEL, SOORTEN, INITS, ZETTEN, ZICHT, STATISCH, ARCADE, DAG, VARIANT, ruw } = require('./spellen/register')(spelCtx);
   // klasgenoten: het uitnodigingspad voor beschermde tieners (De Arena)
   const { klasgenotenVan, spelKlasgenoten } = require('./spellen/klas')({ db, codenaamVan, isGeblokkeerd });
   /* Wie van je vrienden er nu is. Leest de levende lijst van open
@@ -87,7 +87,7 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
      zicht.js aan. Nieuwe ingangen horen hem te gebruiken. */
   const beleid = require('./spellen/beleid')({
     wereldFout, leeftijdFout, ZICHT,
-    get SPEL() { return SPEL; }
+    get SPEL() { return SPEL; }, get VARIANT() { return VARIANT; }
   });
 
   /* Uitslagen die een potje overleven: de bron onder winrate, niveaus en
@@ -123,7 +123,7 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
   const ctx = { db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, isGeblokkeerd, socialZoek, sociaalRate, volwassen,
     rid, nu, S, SPEL, SOORTEN, TEAMS, wereldFout, leeftijdFout, nudge, schud, beurtDoor, opschonen, klok, beleid,
     INITS, ZETTEN, ZICHT, STATISCH, klasgenotenVan, noteerUitslag, noteerZet };
-  const { spelStart, spelGrootte, potjeDirect, spelNieuw, spelAntwoord, spelRandom, mijnSpellen } = require('./spellen/lobby')(ctx);
+  const { spelStart, spelGrootte, potjeDirect, spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelVarianten } = require('./spellen/lobby')(ctx);
   /* Toernooien: een knockout waarvan elke wedstrijd een GEWOON potje is. Staat
      bewust NIET achter de progressiegrens -- een toernooi is een begrensd
      evenement en geen blijvende stand; zie de kop van spellen/toernooi.js. */
@@ -152,7 +152,7 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
     sneekScore, sneekBord, sudokuNieuw, sudokuKlaar, dagStand, dagStart, dagKlaar } = rondom;
 
 
-  return { spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelToewijzen, spelKijk, spelReplay, spelNaspelen, spelRahul, spelNabespreking, projectieOpen, projectieStand, projectieSluit, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, spelUitslagen, spelStand, spelPrestaties, spelPraat, spelPraatStuur, spelTelemetrie, teamNieuw, teamNodig, teamAntwoord, teamVerlaat, mijnTeams, sudokuNieuw, sudokuKlaar, spelVergeet, toernooiNieuw, toernooiAntwoord, mijnToernooien, toernooiStaat, sneekScore, sneekBord, arcadeScore, arcadeBord, dagStand, dagStart, dagKlaar, SPEL_SOORTEN: SOORTEN,
+  return { spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelVarianten, spelStaat, spelZet, spelOpgeven, spelToewijzen, spelKijk, spelReplay, spelNaspelen, spelRahul, spelNabespreking, projectieOpen, projectieStand, projectieSluit, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, spelUitslagen, spelStand, spelPrestaties, spelPraat, spelPraatStuur, spelTelemetrie, teamNieuw, teamNodig, teamAntwoord, teamVerlaat, mijnTeams, sudokuNieuw, sudokuKlaar, spelVergeet, toernooiNieuw, toernooiAntwoord, mijnToernooien, toernooiStaat, sneekScore, sneekBord, arcadeScore, arcadeBord, dagStand, dagStart, dagKlaar, SPEL_SOORTEN: SOORTEN,
     // alleen voor de drift-test: de client heeft een eigen kopie van deze
     // regels (directe feedback); de test houdt beide kopieën tegen elkaar
     _spelregels: { rummiSet: ruw.rummiSet, W_PREMIE: ruw.W_PREMIE, SPEL, ARCADE } };

@@ -20,6 +20,10 @@
                   gedeeld scherm). Drie lagen in plaats van de oude vlag
                   `kijken`, en de reden staat in ./zicht.js: die vlag was een
                   bewering die bij drie spellen niet klopte
+     varianten    wat er aan dit spel te KIEZEN valt zonder dat de regels
+                  veranderen (Quizduel: waar de vragen vandaan komen), als
+                  gesloten lijst per veld; `variantFout` doet de vraag over de
+                  velden heen. Zie ./variant.js
      init/zet     de regels zelf; statisch: data die nooit verandert
                   (het Magnaat-bord) en dus niet elke poll mee hoeft
 
@@ -54,13 +58,13 @@ const { bouw: bouwZicht } = require('./zicht');
 /* Wat een descriptor MOET zijn staat in ./keur.js en met opzet niet hier: dat
    vocabulaire groeit mee met elk veld dat een spel over zichzelf kan zeggen,
    en deze boekhouding hoeft daar niets van te weten. */
-const { keurAlgemeen, keurArcade, keurPotje, keurZicht } = require('./keur');
+const { keurAlgemeen, keurArcade, keurPotje, keurZicht, keurVariant } = require('./keur');
 
 /* Deelmodules die geen spel zijn maar wel in deze map wonen. Bewust een
    expliciete lijst: een helper die je hier neerzet en vergeet toe te voegen
    valt op bij het opstarten, in plaats van stil mee te scannen. */
-const GEEN_SPEL = new Set(['register.js', 'lobby.js', 'partij.js', 'rahul.js', 'klas.js', 'quiz-data.js',
-  'presence.js', 'uitslagen.js', 'prestaties.js', 'toernooi.js', 'zetten.js', 'praat.js', 'telling.js', 'teams.js', 'kring.js', 'arcade.js', 'opruimen.js', 'toernooi-schema.js', 'gedeeld.js', 'grens.js', 'zicht.js', 'klok.js', 'beleid.js', 'nabespreking.js', 'naspelen.js', 'keur.js', 'uitnodigen.js', 'rondom.js', 'projectie.js', 'dag.js']);
+const GEEN_SPEL = new Set(['register.js', 'lobby.js', 'partij.js', 'rahul.js', 'klas.js', 'quiz-data.js', 'quiz-school.js',
+  'presence.js', 'uitslagen.js', 'prestaties.js', 'toernooi.js', 'zetten.js', 'praat.js', 'telling.js', 'teams.js', 'kring.js', 'arcade.js', 'opruimen.js', 'toernooi-schema.js', 'gedeeld.js', 'grens.js', 'zicht.js', 'klok.js', 'beleid.js', 'nabespreking.js', 'naspelen.js', 'keur.js', 'uitnodigen.js', 'rondom.js', 'projectie.js', 'dag.js', 'variant.js', 'wachtrij.js']);
 
 /* De map is een parameter zodat de toets het register op fixtures kan draaien
    (een module zonder descriptor, een sleutel die niet bij zijn bestand hoort)
@@ -89,7 +93,7 @@ module.exports = (spelCtx, mapOverride) => {
 
   bezig = true;
   try {
-  const SPEL = {}, INITS = {}, ZETTEN = {}, ZICHT = {}, STATISCH = {}, ARCADE = {}, DAG = {}, ruw = {};
+  const SPEL = {}, INITS = {}, ZETTEN = {}, ZICHT = {}, STATISCH = {}, ARCADE = {}, DAG = {}, VARIANT = {}, ruw = {};
   for (const naam of bestanden) {
     const mod = require(path.join(map, naam))(ctx);
     const s = mod && mod.spel;
@@ -118,12 +122,17 @@ module.exports = (spelCtx, mapOverride) => {
     }
 
     SPEL[s.sleutel] = keurPotje(naam, s);
+    /* De varianten: de LIJSTEN naar SPEL (die reizen naar de lobby, die er een
+       keuzerij van tekent), de keurfunctie van het spel naar VARIANT. Een pas,
+       twee bestemmingen -- ze kunnen dus niet uiteenlopen. */
+    const varianten = keurVariant(naam, s);
+    if (varianten) { SPEL[s.sleutel].varianten = varianten.velden; VARIANT[s.sleutel] = varianten; }
     INITS[s.sleutel] = s.init;
     ZETTEN[s.sleutel] = s.zet;
     ZICHT[s.sleutel] = bouwZicht(s.sleutel, keurZicht(naam, s));
     if (s.statisch) STATISCH[s.sleutel] = s.statisch;
   }
   const SOORTEN = Object.fromEntries(Object.entries(SPEL).map(([k, v]) => [k, v.naam]));
-  return { SPEL, SOORTEN, INITS, ZETTEN, ZICHT, STATISCH, ARCADE, DAG, ruw };
+  return { SPEL, SOORTEN, INITS, ZETTEN, ZICHT, STATISCH, ARCADE, DAG, VARIANT, ruw };
   } finally { bezig = false; }   // ook als de keuring terecht gooit
 };

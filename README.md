@@ -4221,6 +4221,36 @@ en al. Je *plaats* gaat over het hele veld, de *namenlijst* blijft je eigen
 kring: een lijst met codenamen van vreemden is een sociale laag die dit huis
 nergens anders heeft.
 
+### Varianten: hetzelfde spel, andere instellingen
+
+Een spel kan zeggen wat er aan te kiezen valt (`varianten` in de descriptor), en
+een potje draagt die keuze als `variant`. Quizduel is de eerste gebruiker:
+algemene kennis of schoolvragen, en bij schoolvragen welke leerstof. Dat is
+**hetzelfde spel met dezelfde motor** -- dezelfde beurten, dezelfde
+winnaarsbepaling, dezelfde poorten -- want vier quiz-apps bouwen zou vier keer
+dezelfde fouten opleveren.
+
+Vier regels, elk met een reden (`kern/spellen/variant.js`):
+
+- **elke keuze is een gesloten lijst**, uit de descriptor. Een vrij tekstveld is
+  binnen een maand een verzameling spelfouten -- dezelfde reden waarom
+  `CONTEXTEN` en de twaalf gesprekssoorten in `kern/comm` lijsten zijn. Het
+  levert er iets voor terug: de lobby kan de keuzes uittekenen
+  (`/spel/varianten`).
+- **een variant mág uit het verzoek komen en `context` niet.** Dat is geen
+  uitzondering maar het verschil tussen de twee: context zegt wie er wat mag,
+  een variant zegt welk spel je speelt.
+- **een verkeerde waarde is een 400, geen stille terugval.** Wie 'taal groep 3'
+  koos en algemene kennis krijgt, merkt dat pas voor de klas.
+- **de vraag over de velden heen is van het spel** (`variantFout`): het platform
+  weet niet dat leerstof bij de schoolbron hoort.
+
+De schoolvragen komen uit de **bestaande leerlijnen** (`kern/leerstof-data/`) en
+niet uit een tweede bibliotheek -- die zou binnen een jaar achterlopen op die van
+de school zelf. Alleen leerdoelen met echte meerkeuze doen mee, en **een
+schoolquiz schrijft niets bij in het leerpaspoort**: een quiz tegen een
+klasgenoot is een spel, en winnen van een klasgenoot hoort geen cijfer te worden.
+
 ### De progressiegrens: alles wat blijft, stopt bij 18+
 
 Eén functie (`progressieMag` in `kern/spellen/grens.js`) bepaalt wie een spoor

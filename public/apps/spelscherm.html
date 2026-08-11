@@ -52,7 +52,13 @@
   .klein{font-size:clamp(.7rem,1.6vmin,1rem);color:var(--zacht,#8A8680);}
 </style>
 </head>
-<body>
+<!-- `data-ios-uit`: deze pagina wil de OS-chrome NIET, en dat is geen
+     uitzondering die we hier verzinnen maar de vlag die shared/appmenu.js er
+     zelf voor heeft. Een hamburgermenu op een televisie is een knop die niemand
+     kan indrukken: er staat geen muis bij, er is niemand ingelogd, en achter
+     dat menu zit een heel apparaat dat niet van de kijkers is. Dit scherm is
+     een PROJECTIE en geen app. -->
+<body data-ios-uit>
 <main class="vol" id="hoofd">
   <div class="merk">RTG Game Night</div>
   <h1 id="titel">Zet dit scherm aan tafel</h1>

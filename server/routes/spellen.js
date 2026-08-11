@@ -10,7 +10,7 @@ module.exports = (kern) => {
      eigen namen in ./spellen-rondom.js; ze hier ook uitpakken zou betekenen dat
      een routebestand namen uit de kern trekt die het niet aanraakt, en daar
      staat een controle op (check.js regel 39). */
-  const { app, auth, geenGast, rtf, spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet,
+  const { app, auth, geenGast, rtf, spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelVarianten, spelStaat, spelZet,
     spelOpgeven, spelToewijzen, spelKijk, spelReplay, spelNaspelen, spelRahul, spelNabespreking,
     projectieStand, spelKlasgenoten, spelOnline, spelUitslagen, spelStand, spelPrestaties,
     socialConnecties } = kern;
@@ -41,10 +41,19 @@ module.exports = (kern) => {
        als schoolsessie. Ze worden gezet door de INGANG die het weet -- een
        chat-start kent zijn gesprek, deze route kent alleen "iemand vraagt een
        potje aan". Voeg ze hier dus niet toe omdat de kern ze accepteert. */
-    nieuw: (mij, b, wereld) => spelNieuw(mij, { soort: b.soort, grootte: b.grootte, modus: b.modus, vrienden: b.vrienden, codenamen: b.codenamen, klasgenoten: b.klasgenoten, taal: b.taal, tempo: b.tempo, wereld }),
+    /* `variant` MAG hier wel doorheen, en dat is geen uitzondering op de regel
+       hierboven maar het verschil tussen de twee dingen: `context` zegt wie er
+       wat mag (beleid), een variant zegt welk spel je speelt. Veilig is hij
+       omdat de KEUZELIJST uit de descriptor komt en niet uit het verzoek --
+       zie kern/spellen/variant.js. */
+    nieuw: (mij, b, wereld) => spelNieuw(mij, { soort: b.soort, grootte: b.grootte, modus: b.modus, vrienden: b.vrienden, codenamen: b.codenamen, klasgenoten: b.klasgenoten, taal: b.taal, tempo: b.tempo, variant: b.variant, wereld }),
     antwoord: (mij, b) => spelAntwoord(mij, String(b.id || ''), b.akkoord === true),
-    random: (mij, b, wereld) => spelRandom(mij, String(b.soort || ''), b.grootte, b.taal, wereld, b.tempo),
+    random: (mij, b, wereld) => spelRandom(mij, String(b.soort || ''), b.grootte, b.taal, wereld, b.tempo, b.variant),
     mijn: (mij) => Object.assign({ status: 200 }, mijnSpellen(mij)),
+    /* Wat er per spel te kiezen valt. Uit de descriptor, want de schoolstof van
+       het Quizduel groeit met de leerlijnen mee en een kopie in de client zou
+       daar stil op achterlopen. */
+    varianten: () => spelVarianten(),
     staat: (mij, b) => spelStaat(mij, String(b.id || ''), b.velden === true),
     zet: (mij, b) => {
       // de nieuwe staat reist mee in het antwoord: scheelt de client een

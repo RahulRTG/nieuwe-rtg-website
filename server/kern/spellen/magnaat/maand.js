@@ -31,7 +31,7 @@ const H = require('./handel');
 
 const rond = (n) => Math.round(n);
 
-module.exports = ({ K, wieHeeft, ROOD_RENTE }) => {
+module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel }) => {
   function eenMaand(potje) {
     const st = potje.staat, k = K(st);
     const kwaliteitVan = {};
@@ -89,8 +89,19 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE }) => {
         const kOp = Object.assign({}, k, { kavel: new Map(k.kavel).set(kavel.id, opgeschoven) });
         const r = rekenMaand(kOp, v, { maand: st.maand, zoneDruk: druk[kavel.zone + ':' + v.sector] || 1,
           wereldFactor: 1, arbeid, contract: toezegging[v.id], gedekt: ontvangst[v.id] });
-        regels.push(Object.assign({ id: v.id, naam: v.naam, sector: v.sector, kavel: kavel.naam }, r));
-        st.geld[h] += r.resultaat;
+        const regel = Object.assign({ id: v.id, naam: v.naam, sector: v.sector, kavel: kavel.naam }, r);
+        regels.push(regel);
+        /* HET RESULTAAT WORDT VERDEELD als er aandeelhouders zijn (./aandeel.js).
+           De eigenaar houdt wat er niet vergeven is, de rest gaat rechtstreeks
+           naar de houders -- winst en verlies allebei. Staat er niets uit, dan
+           gaat het hele bedrag naar de eigenaar en verandert er niets. */
+        const verdeeld = verdeel(st, v.id, r.resultaat);
+        st.geld[h] += verdeeld.eigenaar;
+        /* OP DE GEPUSHTE REGEL en niet op `r`: de regel is een KOPIE die hierboven
+           is gemaakt, dus een veld dat er daarna op `r` bij komt haalt het
+           maandoverzicht nooit. Dat is precies zo misgegaan, en het viel op
+           omdat de uitkering wel klopte en het overzicht hem niet toonde. */
+        if (verdeeld.uit.length) regel.aandeelhouders = verdeeld.uit;
         /* De omzet van de STAD telt alleen eindverkoop. Een levering tussen twee
            spelers is geen nieuwe bedrijvigheid maar dezelfde euro die twee keer
            langskomt; hem meetellen zou de Foundation-pot laten groeien van

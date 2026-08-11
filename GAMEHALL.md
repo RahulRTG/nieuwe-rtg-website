@@ -899,11 +899,30 @@ verplichting.
 > tafels: een stijl in plaats van een sector, dus een beter soort dominantie,
 > maar dominantie.
 
-**Wat er van fase B nog niet in zit.** Aandelen en concerns (deelnemen in
-andermans zaak), banken en financiering met rente, zekerheden en convenanten,
-verzekeringen met risicoprofielen, en R&D. De rekening-courant onder een
-negatieve kas (`ROOD_RENTE`) is er wel — dat is de prijs van doorbouwen, niet
-een financieringslaag.
+**Deelnemingen** (`magnaat/aandeel.js`, `aandeel-acties.js`). Een belang in de
+zaak van een ander: een contract koppelt twee bedrijven aan een *levering*, een
+deelneming aan een *resultaat*. Vier besluiten, alle vier aan dezelfde vraag —
+wie is de baas?
+
+1. **Een belang geeft geen zeggenschap.** De eigenaar blijft de enige aan de
+   knoppen. Anders is een vestiging met drie aandeelhouders een object waarvan
+   onduidelijk is wie er een zet op mag doen, en dan is elke actie een vraag.
+   Dit spel heeft geen stemlaag en krijgt er ook geen.
+2. **Hoogstens 49% gaat weg.** Wie het hele bedrijf wil, koopt het in de
+   veiling.
+3. **Verlies deel je mee** — anders is een belang verkopen in een slechte zaak
+   gratis geld.
+4. **Het belang hangt aan de vestiging, niet aan de eigenaar.** Wordt de zaak
+   verkocht, dan blijft het belang staan; anders schud je je aandeelhouders af
+   door te verkopen. De wederpartij wordt daarom *afgeleid* en niet opgeslagen.
+
+De eindstand telt per speler zijn eigen deel van zijn panden plus de waarde van
+zijn belangen elders — dezelfde euro mag niet bij twee mensen staan.
+
+**Wat er van fase B nog niet in zit.** Banken en financiering met rente,
+zekerheden, looptijd en convenanten; verzekeringen met risicoprofielen; en R&D.
+De rekening-courant onder een negatieve kas (`ROOD_RENTE`) is er wel — dat is de
+prijs van doorbouwen, niet een financieringslaag.
 
 **Fase C — de permanente wereld.** Living World, AI-managers met beleidsregels,
 Safe Management Policy, vakantiemodus, overdracht, legacy, Magnaat Daily,

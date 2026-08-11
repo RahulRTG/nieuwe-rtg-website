@@ -26,6 +26,7 @@
    spelen, en dat was de eis. */
 const { kaart, STEDENLIJST, stadNaam, stadSleutel } = require('./kaart');
 const { SECTORLIJST } = require('./sectoren');
+const { waarde } = require('./stap');
 const F = require('./foundation');
 const H = require('./handel');
 
@@ -54,6 +55,7 @@ module.exports = (ctx) => {
       maand: 0, begonnen: Date.now(), gerekendTot: Date.now(),
       geld: {}, vestigingen: {}, kavelBezet: {}, foundation: F.nieuw(),
       contracten: [], contractTeller: 0, veilingen: [], veilingTeller: 0, kavelRecht: {},
+      deelnemingen: [], deelnemingTeller: 0,
       laatste: {}, klaar: false
     };
     for (const h of potje.spelers) { st.geld[h] = START_GELD; st.vestigingen[h] = []; st.laatste[h] = null; }
@@ -112,7 +114,13 @@ module.exports = (ctx) => {
      dit bestand gaat over WANNEER er een maand gerekend wordt en dat is af. Wat
      er IN een maand gebeurt groeit met elke fase mee -- fase B zette er de
      contractafwikkeling in. */
-  const { eenMaand } = require('./maand')({ K, wieHeeft, ROOD_RENTE });
+  /* De deelnemingen staan HIER en niet bij de andere lagen hieronder, omdat de
+     maandloop ze nodig heeft: het resultaat van een vestiging wordt verdeeld
+     voordat het op een rekening komt. */
+  const aandeel = require('./aandeel')({ wieHeeft, waarde });
+  const belangen = require('./aandeel-acties')({ wieHeeft,
+    uitgegeven: aandeel.uitgegeven, MAX_DEEL: aandeel.MAX_DEEL });
+  const { eenMaand } = require('./maand')({ K, wieHeeft, ROOD_RENTE, verdeel: aandeel.verdeel });
 
   /* WAT EEN SPELER ZIET en wat er aan het eind op tafel komt staat in
      ./weergave.js -- een eigen onderwerp (wie mag wat weten, en waarop wordt
@@ -122,7 +130,9 @@ module.exports = (ctx) => {
   const veilen = require('./veiling-acties')(Object.assign({ K, mijnVestiging, vrijKavel }, veiling));
   const { zicht, publiek, eindstand } = require('./weergave')({
     K, codenaamVan, rond, bijrekenen, foundationArbeid: (st) => F.arbeidBonus(st.foundation),
-    veilingbeeld: (st, h) => veiling.beeld(st, h, codenaamVan) });
+    veilingbeeld: (st, h) => veiling.beeld(st, h, codenaamVan),
+    belangbeeld: (st, h) => aandeel.beeld(st, h, codenaamVan),
+    belangwaarde: aandeel.belangwaarde, eigenDeel: aandeel.eigenDeel });
   function beeindig(potje) {
     const st = potje.staat;
     st.klaar = true;
@@ -148,8 +158,8 @@ module.exports = (ctx) => {
      Ze zijn alle drie VRIJ (zie GAMEHALL.md 12.3): onderhandelen mag altijd,
      en dat is de reden dat een partij van zes met 24 uur per beurt niet
      stilstaat. */
-  const ACTIES = Object.assign({}, basis.ACTIES, handel.ACTIES, veilen.ACTIES);
-  const VRIJE_ACTIES = basis.VRIJE_ACTIES.concat(handel.VRIJE_ACTIES, veilen.VRIJE_ACTIES);
+  const ACTIES = Object.assign({}, basis.ACTIES, handel.ACTIES, veilen.ACTIES, belangen.ACTIES);
+  const VRIJE_ACTIES = basis.VRIJE_ACTIES.concat(handel.VRIJE_ACTIES, veilen.VRIJE_ACTIES, belangen.VRIJE_ACTIES);
 
   function zet(potje, h, z) {
     const st = potje.staat;

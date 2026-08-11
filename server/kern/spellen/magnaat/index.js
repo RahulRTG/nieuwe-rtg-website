@@ -51,7 +51,8 @@ module.exports = (ctx) => {
        dat is de scheidslijn. */
     buitenBeurt: ['bouw', 'verkoop', 'beleid',
       'contract-voorstel', 'contract-antwoord', 'contract-opzeggen',
-      'veiling-start', 'veiling-bod', 'veiling-intrekken'],
+      'veiling-start', 'veiling-bod', 'veiling-intrekken',
+      'belang-voorstel', 'belang-antwoord'],
     init, zet,
     varianten: {
       vorm: { keuze: ['bord', 'economie'], standaard: 'bord' },

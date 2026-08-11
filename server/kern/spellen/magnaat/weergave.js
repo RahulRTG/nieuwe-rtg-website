@@ -21,7 +21,8 @@ const { prijsVan } = require('./prijsstand');
 const H = require('./handel');
 const { PROJECTEN } = require('./foundation');
 
-module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid, veilingbeeld }) => {
+module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid, veilingbeeld,
+  belangbeeld, belangwaarde, eigenDeel }) => {
   /* Van wie is deze vestiging? De contractlaag kijkt over de grens tussen
      twee spelers heen en kan dus niet met `mijnVestiging` toe. */
   const vanIemand = (st, id) => {
@@ -84,7 +85,12 @@ module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid, veilingb
     const st = potje.staat;
     return potje.spelers.map(h => {
       const rij = st.vestigingen[h] || [];
-      const ondernemingswaarde = rij.reduce((n, v) => n + waarde(v), 0);
+      /* ALLEEN JE EIGEN DEEL, want een deelneming verplaatst waarde (./aandeel.js).
+         Zou een eigenaar de hele waarde meetellen en de aandeelhouder ook zijn
+         deel, dan staat dezelfde euro bij twee mensen op de eindstand en klopt
+         de optelsom van de partij niet meer. */
+      const ondernemingswaarde = rij.reduce((n, v) => n + waarde(v) * eigenDeel(st, v.id), 0)
+        + belangwaarde(st, h);
       const banen = rij.reduce((n, v) => n + v.personeel, 0);
       const reputatie = rij.length ? Math.round(rij.reduce((n, v) => n + v.reputatie, 0) / rij.length) : 0;
       const omzet = rij.reduce((n, v) => n + (v.omzetTotaal || 0), 0);
@@ -103,6 +109,8 @@ module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid, veilingb
     const eigen = (st.vestigingen[mij] || []).map(v => Object.assign({}, v, {
       kavelNaam: k.kavel.get(v.kavel).naam, zone: k.kavel.get(v.kavel).zone,
       capaciteit: capaciteit(v, foundationArbeid(st)), waarde: waarde(v), prijsPer: prijsVan(v.sector, v.prijs),
+      // hoeveel van deze zaak nog van jou is; de rest zit bij aandeelhouders
+      eigenDeel: Math.round(eigenDeel(st, v.id) * 100),
       // wat deze zaak inkoopt en wat hij zelf kan leveren -- zonder dat is
       // onderhandelen raden over getallen die de motor gewoon kent
       handel: inkoopbeeld(v), vergeven: vergeven(st, v)
@@ -130,6 +138,7 @@ module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid, veilingb
         zones: [...new Set((st.vestigingen[sp] || []).map(v => k.kavel.get(v.kavel).zone))]
       })),
       contracten: mijnContracten(st, mij),
+      belangen: belangbeeld(st, mij),
       veilingen: veilingbeeld(st, mij),
       vrij: k.kavels.filter(x => !st.kavelBezet[x.id] && !(st.kavelRecht || {})[x.id]).length,
       // waar JIJ mag bouwen zonder te hoeven veilen: een gewonnen kavel

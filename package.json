@@ -58,7 +58,9 @@
     "mutatie": "node --experimental-sqlite scripts/mutatie.js",
     "grenslijst": "node scripts/grenslijst.js",
     "bewijsmatrix": "node --experimental-sqlite scripts/bewijsmatrix.js",
-    "bewijsmatrix:vast": "node --experimental-sqlite scripts/bewijsmatrix.js --vastleggen"
+    "bewijsmatrix:vast": "node --experimental-sqlite scripts/bewijsmatrix.js --vastleggen",
+    "klok": "node scripts/klok.js",
+    "klok:vast": "node scripts/klok.js --vastleggen"
   },
   "devDependencies": {
     "playwright": "^1.62.1"

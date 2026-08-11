@@ -1598,6 +1598,14 @@
       "gezakt": 1,
       "geprobeerd": 3
     },
+    "klok.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/klok.js",
+      "operator": "===->!==#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
     "kluis-binding.test.js": {
       "soort": "puur",
       "staat": "gezakt",

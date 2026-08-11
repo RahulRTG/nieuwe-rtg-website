@@ -331,6 +331,33 @@ test('er is geen prijsstand die het altijd wint', () => {
     Object.entries(terug).map(([k, v]) => k + ' ' + v.toFixed(1)).join(', '));
 });
 
+test('aan een volle tafel wint niet dezelfde stijl als in een duel', () => {
+  /* DE METING DIE FASE A NIET DEED, en de reden dat zijn verklaring scheef
+     stond. Het toernooi speelt duels, en twee spelers op 144 kavels lopen
+     elkaar nooit tegen het lijf -- daar is sectorkeuze alles. Fase A schreef
+     de dominantie daarom toe aan een ontbrekende laag (contracten, veilingen)
+     en verwachtte dat die hem zou oplossen. Dat deed hij niet: het lag aan de
+     TAFELGROOTTE waarop gemeten werd.
+
+     Deze toets bewaakt de eigenschap en niet de uitslag: aan een tafel van zes
+     hoort de duelwinnaar NIET alles te winnen. Zou dat wel zo zijn, dan is het
+     spel met zes hetzelfde als met twee en heeft de tafel geen betekenis. */
+  const { veld } = require('../scripts/magnaat-strateeg');
+  const zes = ['horeca', 'mobility', 'inkoper', 'toelever', 'keten', 'onderhoud'];
+  const winst = {};
+  let bezet = 0;
+  for (let o = 0; o < 4; o++) {
+    const r = veld(zes, o);
+    winst[r.stand[0].profiel] = (winst[r.stand[0].profiel] || 0) + 1;
+    bezet += r.vol;
+    assert.equal(r.stand.length, 6, 'er spelen er zes mee');
+  }
+  assert.ok((winst.horeca || 0) < 4,
+    'horeca-focus wint al zijn duels; aan een volle tafel hoort dat niet te gelden: ' + JSON.stringify(winst));
+  assert.ok(Object.keys(winst).length > 1, 'en er hoort meer dan een stijl te kunnen winnen');
+  assert.ok(bezet / 4 > 0.25, 'er wordt werkelijk om de kaart gespeeld: ' + Math.round(bezet / 4 * 100) + '% bezet');
+});
+
 test('de keuring van de strateeg slaat aan op een economie die scheef staat', () => {
   /* De bewaker zelf nameten. Zonder dit blijft `keur` groen als hij wordt
      uitgezet -- en een keuring die niets kan afkeuren is geen keuring. Dat is
@@ -532,7 +559,8 @@ test('de vrije acties mogen buiten de beurt, de grote niet', () => {
      dus het enige wat hier telt is dat de lijst klopt. */
   const m = maakMagnaat();
   assert.deepEqual(m.spel.buitenBeurt.slice().sort(),
-    ['beleid', 'bouw', 'contract-antwoord', 'contract-opzeggen', 'contract-voorstel', 'verkoop']);
+    ['beleid', 'bouw', 'contract-antwoord', 'contract-opzeggen', 'contract-voorstel',
+      'veiling-bod', 'veiling-intrekken', 'veiling-start', 'verkoop']);
   for (const groot of ['open', 'uitbreiden', 'sluiten'])
     assert.equal(m.spel.buitenBeurt.includes(groot), false, groot + ' is een grote zet en hoort bij je beurt');
 });

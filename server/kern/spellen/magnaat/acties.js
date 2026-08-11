@@ -29,7 +29,8 @@ module.exports = ({ K, mijnVestiging, vrijKavel, rond }) => {
     open(potje, h, zet) {
       const st = potje.staat, k = K(st);
       const kavelId = String(zet.kavel || '');
-      if (!vrijKavel(st, kavelId)) return { status: 400, error: 'Dat kavel is er niet of is al bezet.' };
+      if (!vrijKavel(st, kavelId, h))
+        return { status: 400, error: 'Dat kavel is er niet, is al bezet, of er rust een bouwrecht van een ander op.' };
       const sector = String(zet.sector || '');
       if (!SECTOREN[sector]) return { status: 400, error: 'Die sector bestaat niet.' };
       const omvang = Math.max(4, Math.min(120, Math.floor(Number(zet.omvang) || 20)));
@@ -54,6 +55,8 @@ module.exports = ({ K, mijnVestiging, vrijKavel, rond }) => {
       };
       st.vestigingen[h].push(v);
       st.kavelBezet[kavelId] = h;
+      // het bouwrecht is opgebruikt zodra er iets staat
+      if (st.kavelRecht) delete st.kavelRecht[kavelId];
       return { status: 200, ok: true, id: v.id };
     },
     /* GROOT: uitbreiden. Zelfde prijs per eenheid als bouwen. */

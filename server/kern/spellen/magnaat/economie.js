@@ -27,6 +27,7 @@
 const { kaart, STEDENLIJST, stadNaam, stadSleutel } = require('./kaart');
 const { SECTORLIJST } = require('./sectoren');
 const F = require('./foundation');
+const H = require('./handel');
 
 /* De speelduur in SPELMAANDEN, per variant. Een Quick is drie jaar economie in
    een klein uur: lang genoeg dat een investering zich terugbetaalt, kort genoeg
@@ -52,7 +53,7 @@ module.exports = (ctx) => {
       stad: stadsleutel, duur, maandMs: MAAND_MS[v.duur] || MAAND_MS.quick,
       maand: 0, begonnen: Date.now(), gerekendTot: Date.now(),
       geld: {}, vestigingen: {}, kavelBezet: {}, foundation: F.nieuw(),
-      contracten: [], contractTeller: 0,
+      contracten: [], contractTeller: 0, veilingen: [], veilingTeller: 0, kavelRecht: {},
       laatste: {}, klaar: false
     };
     for (const h of potje.spelers) { st.geld[h] = START_GELD; st.vestigingen[h] = []; st.laatste[h] = null; }
@@ -60,7 +61,12 @@ module.exports = (ctx) => {
   }
 
   const K = (st) => kaart(st.stad);
-  const vrijKavel = (st, id) => K(st).kavel.has(id) && !st.kavelBezet[id];
+  /* Een kavel is vrij als er niets op staat EN er geen bouwrecht op rust. Een
+     bouwrecht komt uit een gewonnen veiling (./veiling.js): wie een plek koopt,
+     koopt de tijd om te bedenken wat erop komt. `wie` is er zodat de houder van
+     het recht er zelf wel mag bouwen -- dezelfde vraag, twee antwoorden. */
+  const vrijKavel = (st, id, wie) => K(st).kavel.has(id) && !st.kavelBezet[id]
+    && (!(st.kavelRecht || {})[id] || st.kavelRecht[id] === wie);
   const mijnVestiging = (st, h, id) => (st.vestigingen[h] || []).find(x => x.id === id);
   /* Van wie is deze vestiging? Voor de contractlaag, die over de grens tussen
      twee spelers heen kijkt en dus niet met `mijnVestiging` toekan. */
@@ -84,7 +90,19 @@ module.exports = (ctx) => {
     if (stappen <= 0) return [];
     if (stappen > MAX_MAANDEN_PER_KEER) stappen = MAX_MAANDEN_PER_KEER;
     const verslagen = [];
-    for (let i = 0; i < stappen && st.maand < st.duur; i++) verslagen.push(eenMaand(potje));
+    for (let i = 0; i < stappen && st.maand < st.duur; i++) {
+      /* DE HAMER VALT AAN HET EIND VAN DE MAAND WAARIN DE VEILING SLUIT: een
+         veiling van twee maanden sluit na twee maanden, niet na drie. Hij valt
+         HIER, in de bijrekenlus, zodat hij deterministisch sluit -- tien maanden
+         in een keer geeft dezelfde winnaar als tien maanden los, en dat is de
+         eis onder GAMEHALL.md 12.4. De koper draait de zaak vanaf de volgende
+         maand; de opbrengst van de laatste maand is nog van de verkoper, en dat
+         is de eerlijke kant van "je neemt hem over aan het eind van de maand". */
+      const verslag = eenMaand(potje);
+      const geveild = veiling.hameren(potje);
+      if (geveild.length) verslag.veilingen = geveild;
+      verslagen.push(verslag);
+    }
     st.gerekendTot += stappen * st.maandMs;
     if (st.maand >= st.duur && !st.klaar) beeindig(potje);
     return verslagen;
@@ -100,9 +118,11 @@ module.exports = (ctx) => {
      ./weergave.js -- een eigen onderwerp (wie mag wat weten, en waarop wordt
      er afgerekend) dat los staat van de klok hierboven. */
   const handel = require('./handel-acties')({ K, mijnVestiging, rond });
+  const veiling = require('./veiling')({ K, wieHeeft, afkoopsom: H.afkoopsom });
+  const veilen = require('./veiling-acties')(Object.assign({ K, mijnVestiging, vrijKavel }, veiling));
   const { zicht, publiek, eindstand } = require('./weergave')({
     K, codenaamVan, rond, bijrekenen, foundationArbeid: (st) => F.arbeidBonus(st.foundation),
-    mijnContracten: handel.mijnContracten, inkoopbeeld: handel.inkoopbeeld });
+    veilingbeeld: (st, h) => veiling.beeld(st, h, codenaamVan) });
   function beeindig(potje) {
     const st = potje.staat;
     st.klaar = true;
@@ -128,8 +148,8 @@ module.exports = (ctx) => {
      Ze zijn alle drie VRIJ (zie GAMEHALL.md 12.3): onderhandelen mag altijd,
      en dat is de reden dat een partij van zes met 24 uur per beurt niet
      stilstaat. */
-  const ACTIES = Object.assign({}, basis.ACTIES, handel.ACTIES);
-  const VRIJE_ACTIES = basis.VRIJE_ACTIES.concat(handel.VRIJE_ACTIES);
+  const ACTIES = Object.assign({}, basis.ACTIES, handel.ACTIES, veilen.ACTIES);
+  const VRIJE_ACTIES = basis.VRIJE_ACTIES.concat(handel.VRIJE_ACTIES, veilen.VRIJE_ACTIES);
 
   function zet(potje, h, z) {
     const st = potje.staat;

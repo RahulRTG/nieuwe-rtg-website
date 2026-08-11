@@ -21,7 +21,7 @@ const { prijsVan } = require('./prijsstand');
 const H = require('./handel');
 const { PROJECTEN } = require('./foundation');
 
-module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid }) => {
+module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid, veilingbeeld }) => {
   /* Van wie is deze vestiging? De contractlaag kijkt over de grens tussen
      twee spelers heen en kan dus niet met `mijnVestiging` toe. */
   const vanIemand = (st, id) => {
@@ -130,7 +130,11 @@ module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid }) => {
         zones: [...new Set((st.vestigingen[sp] || []).map(v => k.kavel.get(v.kavel).zone))]
       })),
       contracten: mijnContracten(st, mij),
-      vrij: k.kavels.filter(x => !st.kavelBezet[x.id]).length,
+      veilingen: veilingbeeld(st, mij),
+      vrij: k.kavels.filter(x => !st.kavelBezet[x.id] && !(st.kavelRecht || {})[x.id]).length,
+      // waar JIJ mag bouwen zonder te hoeven veilen: een gewonnen kavel
+      bouwrecht: Object.entries(st.kavelRecht || {}).filter(([, w]) => w === mij)
+        .map(([id]) => ({ id, naam: (k.kavel.get(id) || {}).naam })),
       foundation: { lokaal: rond(st.foundation.lokaal), centraal: rond(st.foundation.centraal),
         gedaan: st.foundation.gedaan.map(g => (PROJECTEN.find(p => p.id === g.id) || {}).naam).filter(Boolean) },
       sinds: st.laatste[mij] || null,

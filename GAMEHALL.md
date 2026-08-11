@@ -839,9 +839,71 @@ een profiel te ver voorligt.
 > spelers elkaar raken ook als ze in andere buurten zitten. Het staat hier als
 > open punt en niet als opgelost.
 
-**Fase B — spelers tegen elkaar.** Contracten met looptijd en boete, supply
-chains tussen spelers, veilingen, aandelen en concerns, banken, verzekeringen,
-onderhoud en R&D.
+**Fase B — spelers tegen elkaar** — **half af.** Contracten en veilingen staan;
+aandelen en concerns, banken, verzekeringen en R&D nog niet.
+
+**Contracten** (`magnaat/handel.js`, `handel-acties.js`). Vijf velden waarover
+onderhandeld wordt: volume, bedrag, looptijd, kwaliteitseis en boete, plus
+exclusiviteit en een vooruitbetaling. Vier besluiten die zichtbaar horen te
+blijven:
+
+1. **Een levering gaat vóór de vrije verkoop.** Je hebt getekend: die capaciteit
+   is vergeven voordat de eerste klant binnenkomt. Zonder die volgorde is een
+   contract gratis geld en tekent iedereen alles.
+2. **Het bedrag staat vast, de behoefte niet.** De inkooppost van de afnemer
+   beweegt met zijn omzet mee; het contract niet. Daarom is `looptijd` een
+   keuze en geen formaliteit.
+3. **Wie tekort komt levert pro rata én betaalt de boete.** Niet-betalen zou de
+   afnemer belonen voor het uitknijpen van zijn leverancier.
+4. **`koopt` verdeelt de bestáánde inkoopsom** en telt per sector op tot 1.
+   Zonder contract rekent de economie dus precies als in fase A — een economie
+   die anders rekent zodra er een laag bijkomt, is twee economieën.
+
+**Veilingen** (`magnaat/veiling.js`, `veiling-acties.js`). Gesloten biedingen op
+een vrij kavel of op een lopende zaak. Eerste prijs, geen tweede: theoretisch
+netter, maar "ik bood 300.000 en betaal 210.000" is een regel die je aan tafel
+drie keer moet uitleggen. De hamer valt op de **spelmaand**, niet op de klok —
+anders verliest wie slaapt, en dat is de ratel uit §12.6. Er wordt bij het
+bieden niets gereserveerd; wie bij de hamer niet kan betalen ziet hem aan zijn
+neus voorbijgaan én staat met naam in de uitslag. **Een gekochte zaak komt met
+zijn contracten mee**, want anders is verkopen een achterdeur uit elke
+verplichting.
+
+> **Wat de meting zei, en waarom dat de verklaring uit fase A corrigeert.**
+> Fase A schreef de sectordominantie toe aan ontbrekende schaarste: twee spelers
+> op 144 kavels lopen elkaar nooit tegen het lijf, dus contracten en veilingen
+> zouden het oplossen. **Contracten lossen het niet op**, en waarom is nu
+> gemeten in plaats van geraden: een restaurant koopt ~5% van zijn omzet aan
+> vervoer in, dus een contract met 12% korting is 0,6% van zijn omzet. Dat
+> kantelt geen duel.
+>
+> De echte oorzaak bleek elders, en er volgden drie ijkingen uit. **(5)** Een
+> kavel droeg in de ene sector 132.000 omzet per maand en in de andere 28.000 —
+> wie per plek vier keer zoveel kwijt kan, heeft vier keer minder plekken nodig,
+> en elke extra plek verdunt via `drukFactor` alle andere. Spreiden was
+> zelfbeschadiging. **(6 en 7)** De prijsstand was géén keuze: de omzetindex
+> liep netjes op van 0,83 via 1,00 naar 1,20, en bij een hoge prijs haalde je
+> dezelfde omzet uit een *kleiner* pand — dus waren lonen, vaste lasten, huur
+> én bouwsom ook nog eens 45% lager. Duur zijn was gratis. Nu kost duur zijn
+> wat het in het echt kost: meer handen per gast, een duurder pand per stoel.
+>
+> **En de vraag zelf stond scheef.** Het toernooi speelt duels. Naast de
+> duels staat nu `veld()`: zes stijlen in één campagne. Daar wint horeca-focus
+> — 100% van zijn duels — nog maar twee van de acht tafels, en zwaar onderhoud
+> vijf. Het lag niet aan de ontbrekende laag maar aan de **tafelgrootte**
+> waarop gemeten werd.
+>
+> Wat open blijft: ook met zes raakt de kaart niet vol (~50% bebouwd), dus
+> veilingen om *grond* blijven een randverschijnsel — waar ze bijten is de
+> overname van een lopende zaak. En zwaar onderhoud wint vijf van de acht
+> tafels: een stijl in plaats van een sector, dus een beter soort dominantie,
+> maar dominantie.
+
+**Wat er van fase B nog niet in zit.** Aandelen en concerns (deelnemen in
+andermans zaak), banken en financiering met rente, zekerheden en convenanten,
+verzekeringen met risicoprofielen, en R&D. De rekening-courant onder een
+negatieve kas (`ROOD_RENTE`) is er wel — dat is de prijs van doorbouwen, niet
+een financieringslaag.
 
 **Fase C — de permanente wereld.** Living World, AI-managers met beleidsregels,
 Safe Management Policy, vakantiemodus, overdracht, legacy, Magnaat Daily,

@@ -74,7 +74,20 @@ function strip(src) {
     const c = src[i], d = src[i + 1];
     if (c === '/' && d === '/') { let j = i + 2; while (j < n && src[j] !== '\n') j++; pushSpaces(i, j); i = j; continue; }
     if (c === '/' && d === '*') { let j = i + 2; while (j < n && !(src[j] === '*' && src[j + 1] === '/')) j++; j = Math.min(n, j + 2); pushSpaces(i, j); i = j; continue; }
-    if (c === '"' || c === "'") { let j = i + 1; while (j < n && src[j] !== c) { if (src[j] === '\\') j++; j++; } j++; pushSpaces(i, Math.min(n, j)); i = Math.min(n, j); prev = ' '; continue; }
+    /* DE AANHALINGSTEKENS BLIJVEN STAAN, alleen de inhoud wordt spaties. Dat is
+       een verschil van twee tekens met een reden: een methode met een GEQUOTE
+       sleutel (`'veiling-start'(potje, h, z) {`) is anders niet te herkennen --
+       er blijft `           (potje, h, z) {` over, en dat is van een gewone
+       haakjesgroep niet te onderscheiden. Gevolg was dat de parameters van zo'n
+       methode niet als binding golden en er vals alarm kwam. Een lege string is
+       nog steeds een string, dus alle scans hieronder lezen er nog net zoveel
+       tekst uit als eerst: geen. */
+    if (c === '"' || c === "'") {
+      let j = i + 1; while (j < n && src[j] !== c) { if (src[j] === '\\') j++; j++; }
+      j = Math.min(n, j + 1);
+      out += c; pushSpaces(i + 1, j - 1); out += src[j - 1] === c ? c : ' ';
+      i = j; prev = ' '; continue;
+    }
     if (c === '`') { let j = i + 1; while (j < n && src[j] !== '`') { if (src[j] === '\\') j++; j++; } j++; pushSpaces(i, Math.min(n, j)); i = Math.min(n, j); prev = ' '; continue; }
     if (c === '/' && OPENERS.has(prev)) { // regex-literal (heuristiek op vorige betekenisvolle char)
       let j = i + 1, inClass = false, ok = false;
@@ -117,6 +130,16 @@ function bindings(s) {
   while ((m = re.exec(s))) D.add(m[1]);
   // methode-/property-functies:  naam(params) {   -- alleen de params zijn bindingen
   re = /[A-Za-z_$][\w$]*\s*\(([^()]*)\)\s*\{/g;
+  while ((m = re.exec(s))) add(m[1]);
+  /* Hetzelfde, maar met een sleutel die GEQUOOT is:  'doe-iets'(params) {
+     Dat is geen zeldzaamheid maar de gewone vorm zodra een actienaam een
+     streepje heeft, en de regel hierboven mist hem omdat hij op een letter
+     begint te matchen en niet op een aanhalingsteken. Gevolg: elke parameter
+     van zo'n methode gold als een VRIJE naam, en een actietabel met louter
+     gequote sleutels leverde vals alarm op zodra een zuster-slice toevallig
+     dezelfde naam top-level gebruikte. Precies dat gebeurde bij `h` (de
+     speler) tegenover `h` (een hash-accumulator in kaart.js). */
+  re = /['"`][^'"`\n]*['"`]\s*\(([^()]*)\)\s*\{/g;
   while ((m = re.exec(s))) add(m[1]);
   // klassenamen
   re = /\bclass\s+([A-Za-z_$][\w$]*)/g;

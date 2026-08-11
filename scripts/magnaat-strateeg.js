@@ -386,6 +386,41 @@ function campagne(aNaam, bNaam, offset, maanden = 36) {
   return stand;
 }
 
+/* EEN VOL VELD: zes profielen in EEN campagne, en de vraag is niet wie er wint
+   maar of de KAVELS OPRAKEN. Dat is de meting die een duel per definitie niet
+   kan doen, en het is precies de meting die fase B nodig had.
+
+   Fase A schreef de scheefheid toe aan het ontbreken van schaarste: twee
+   spelers op 144 kavels lopen elkaar nooit tegen het lijf. Die verklaring was
+   een gok, en dit is de toets erop -- want als hij klopt, hoort een tafel van
+   zes een ander beeld te geven dan een duel van twee. Zes profielen die er elk
+   dertig openen, willen samen 180 plekken op een kaart die er 144 heeft. */
+function veld(namen, offset = 0, maanden = 36) {
+  const m = maakMagnaat();
+  const spelers = namen.map((_, i) => 's' + i);
+  const potje = { id: 'p', soort: 'magnaat', spelers, teams: spelers.map((_, i) => i),
+    modus: 'vrij', status: 'bezig', beurt: 0, winnaar: null,
+    variant: { vorm: 'economie', stad: 'IJmuiden', duur: 'quick' } };
+  m.spel.init(potje);
+  const gereed = spelers.map((sp, i) => gereedschap(m, potje, sp, PROFIELEN[namen[i]], offset + i * 2));
+  const kavels = kaart(potje.staat.stad).kavels.length;
+  let eerstVol = null;
+  for (let maand = 0; maand < maanden && !potje.staat.klaar; maand++) {
+    for (const g of gereed) g.antwoordOpAanbod();
+    namen.forEach((n, i) => PROFIELEN[n].doe(gereed[i], maand));
+    potje.staat.gerekendTot -= potje.staat.maandMs;
+    m.eco.bijrekenen(potje);
+    const bezet = Object.keys(potje.staat.kavelBezet).length;
+    if (eerstVol === null && bezet >= kavels * 0.9) eerstVol = maand + 1;
+  }
+  const stand = m.eco.eindstand(potje);
+  const bezet = Object.keys(potje.staat.kavelBezet).length;
+  return { stand: stand.map(x => Object.assign({ profiel: namen[spelers.indexOf(x.codenaam)] }, x)),
+    kavels, bezet, vol: bezet / kavels, eerstVol,
+    contracten: (potje.staat.contracten || []).filter(c => c.status !== 'voorgesteld' && c.status !== 'afgewezen').length,
+    veilingen: (potje.staat.veilingen || []).filter(v => v.status === 'gesloten' && v.winnaar).length };
+}
+
 /* De uitslag: wie won, of null bij gelijkspel. */
 function duel(aNaam, bNaam, offset, maanden = 36) {
   const stand = campagne(aNaam, bNaam, offset, maanden);
@@ -470,12 +505,29 @@ WAT ER VANDAAG UIT KOMT, EERLIJK OPGESCHREVEN. Fase B heeft de vraag
    marketing speelde won daardoor NUL procent, en dat mat geen strategie maar
    een rekenfout in de meetopstelling.
 
-   WAT ER NA DIT ALLES OVERBLIJFT: het veld ligt dichter bij elkaar dan in fase
-   A -- vijf stijlen tussen 67% en 81% waar er eerder een gat zat -- maar
-   horeca-focus wint nog steeds bijna al zijn duels. Dat staat hier als open
-   punt en niet als opgelost, en de volgende meting is niet nog een ijking maar
-   de vraag of veilingen en overnames (de rest van fase B) wel schaarste
-   maken waar contracten dat niet deden. */
+   EN TOEN BLEEK DE VRAAG ZELF SCHEEF TE STAAN. Het toernooi speelt DUELS, en
+   een duel van twee op 144 kavels is precies de situatie waarin sectorkeuze
+   alles is en concurrentie niets: je loopt elkaar nooit tegen het lijf. Daarom
+   staat er nu een tweede meting naast (`veld`): zes stijlen in EEN campagne.
+   Daar valt de rangorde anders uit -- horeca-focus wint 100% van zijn duels en
+   maar twee van de acht tafels, en zwaar onderhoud wint er vijf. Wie in een
+   duel de beste sector kiest wint; wie aan een volle tafel zijn panden laat
+   verslonzen, verliest van wie dat niet doet.
+
+   DAT IS DE EIGENLIJKE CORRECTIE OP FASE A. Die schreef de scheefheid toe aan
+   ontbrekende schaarste en verwachtte dat contracten en veilingen hem zouden
+   oplossen. Het eerste deel klopte -- er IS geen schaarste in een duel -- maar
+   niet de conclusie: het lag niet aan de ontbrekende laag maar aan de
+   TAFELGROOTTE waarop gemeten werd.
+
+   WAT ER OPEN BLIJFT, eerlijk: ook aan een tafel van zes raakt de kaart niet
+   vol (ongeveer de helft van de kavels wordt bebouwd), dus veilingen om GROND
+   blijven een randverschijnsel. Waar ze wel bijten is de overname van een
+   lopende zaak, en dat is ook precies waar ze het meest voor bedoeld zijn: een
+   speler die eruit stapt zonder de wereld kapot te maken. En zwaar onderhoud
+   wint vijf van de acht tafels -- dat is een stijl en geen sector, dus het is
+   een beter soort dominantie dan "kies logistiek", maar het is nog steeds
+   dominantie en het staat hier als open punt. */
 const GRENS_HOOG = 0.80, HELFT = 0.50, MIN_VARIATIE = 4;
 
 // de harde regels: hier hoort de bouw op te vallen
@@ -509,10 +561,28 @@ if (require.main === module) {
       naam.padEnd(13) + uit.winst[naam] + '/' + uit.duels[naam] + '   ' + PROFIELEN[naam].naam);
   const sig = signalen(uit);
   if (sig.length) console.log('\nSIGNAAL (bevinding, geen fout):\n  ' + sig.join('\n  '));
+  /* EN DE TWEEDE METING, want de eerste kan een ding per definitie niet zien.
+     Een duel van twee op 144 kavels kent geen schaarste; een tafel van zes wel
+     -- en daar staat de rangorde er anders bij. Dat is geen detail maar de
+     correctie op de verklaring uit fase A. */
+  const zes = ['horeca', 'mobility', 'inkoper', 'toelever', 'keten', 'onderhoud'];
+  const tafels = {}, TAFELS = 8;
+  let bezet = 0, contracten = 0;
+  for (let o = 0; o < TAFELS; o++) {
+    const r = veld(zes, o);
+    tafels[r.stand[0].profiel] = (tafels[r.stand[0].profiel] || 0) + 1;
+    bezet += r.vol; contracten += r.contracten;
+  }
+  console.log('\nEEN VOL VELD (' + TAFELS + ' tafels van zes, ' + zes.length + ' stijlen naast elkaar):');
+  console.log('  ' + Math.round(bezet / TAFELS * 100) + '% van de kavels bezet, ' +
+    Math.round(contracten / TAFELS) + ' contracten per partij');
+  for (const [n, w] of Object.entries(tafels).sort((a, b) => b[1] - a[1]))
+    console.log('  ' + String(w).padStart(2) + 'x  ' + n.padEnd(12) + PROFIELEN[n].naam);
+
   const klachten = keur(uit);
   console.log('\n' + (klachten.length ? 'AFGEKEURD:\n  ' + klachten.join('\n  ')
     : 'niets doen verliest, afwachten verliest, en er zijn meerdere levensvatbare stijlen'));
   if (klachten.length) process.exitCode = 1;
 }
 
-module.exports = { PROFIELEN, NAMEN, campagne, duel, toernooi, keur, signalen, GRENS_HOOG, HELFT, MIN_VARIATIE };
+module.exports = { PROFIELEN, NAMEN, campagne, duel, toernooi, veld, keur, signalen, GRENS_HOOG, HELFT, MIN_VARIATIE };

@@ -20,12 +20,13 @@
    Draai los: node --test test/keten.test.js */
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { schakel, verifieer, top, hashVan, kanoniek } = require('../server/lib/keten');
+const { schakel, hangAan, verifieer, top, hashVan, kanoniek } = require('../server/lib/keten');
+const { verankerPunt, verifieerTegenAnker } = require('../server/lib/keten-anker');
 
 /* Een journaal opbouwen zoals het inzagejournaal dat doet: nieuwste vooraan. */
 function journaal(n) {
   const l = [];
-  for (let i = 0; i < n; i++) l.unshift(schakel({ at: '2026-08-11T10:0' + i + ':00Z', wat: 'inzage ' + i }, top(l)));
+  for (let i = 0; i < n; i++) l.unshift(hangAan(l, { at: '2026-08-11T10:0' + i + ':00Z', wat: 'inzage ' + i }));
   return l;
 }
 
@@ -195,4 +196,109 @@ test('inzagejournaal: de top is het getal dat naar buiten moet', () => {
   assert.equal(log.ketenTop(), null, 'een leeg journaal heeft geen top');
   log.noteer({ door: { id: 'a' }, over: { id: 'b' }, waarom: 'KYC', bron: 'test' });
   assert.equal(log.ketenTop(), db.data.inzageLog[0].hash);
+});
+
+/* ---------- lokale integriteit versus externe verankering ----------
+
+   HET ONDERSCHEID DAT DEZE HELE AFDELING DRAAGT. De toetsen hierboven bewijzen
+   dat WIJZIGEN en MIDDEN-VERWIJDEREN opvallen. Ze bewijzen NIET dat de
+   geschiedenis nog even lang is, en dat is een ander soort vraag: wie de
+   nieuwste regels weggooit, houdt een keten over die van voor naar achter
+   perfect klopt.
+
+   De eerste toets hieronder legt die blindheid vast als FEIT in plaats van hem
+   te verzwijgen. Zou iemand later denken dat een hashketen ook dat afdekt, dan
+   staat hier zwart op wit van niet. */
+
+test('LOKAAL BLIND: de nieuwste regels wegknippen laat een perfect kloppende keten achter', () => {
+  const l = journaal(6);
+  const ingekort = l.slice(3);              // de drie nieuwste weg -- sporen wissen
+  const uit = verifieer(ingekort);
+  assert.equal(uit.ok, true,
+    'dit HOORT lokaal groen te zijn; daarom is een anker geen luxe maar de enige uitweg');
+  assert.equal(uit.gebroken.length, 0);
+});
+
+test('elke regel draagt een oplopend volgnummer, zodat een anker ermee kan afrekenen', () => {
+  const l = journaal(4);
+  assert.deepEqual(l.map(r => r.nr), [4, 3, 2, 1]);
+});
+
+test('hangAan() rekent de vorige hash en het volgnummer samen uit', () => {
+  const l = [];
+  l.unshift(hangAan(l, { wat: 'een' }));
+  l.unshift(hangAan(l, { wat: 'twee' }));
+  assert.equal(l[0].nr, 2);
+  assert.equal(l[0].vorige, l[1].hash);
+  assert.equal(verifieer(l).ok, true);
+});
+
+test('een anker legt de kop vast: volgnummer, hash en moment', () => {
+  const l = journaal(3);
+  const a = verankerPunt(l);
+  assert.equal(a.nr, 3);
+  assert.equal(a.hash, l[0].hash);
+  assert.equal(verankerPunt([]), null);
+});
+
+test('MET ANKER: de nieuwste regels wegknippen wordt wel betrapt', () => {
+  const l = journaal(6);
+  const a = verankerPunt(l);                // eerst naar buiten gebracht
+  const uit = verifieerTegenAnker(l.slice(3), a);
+  assert.equal(uit.ok, false);
+  assert.equal(uit.ingekort, true);
+  assert.equal(uit.kwijt, 3);
+  assert.match(uit.reden, /verdwenen/);
+});
+
+test('MET ANKER: de hele keten opnieuw uitrekenen wordt betrapt', () => {
+  /* Dit is de aanval die lokaal per definitie onzichtbaar is: een beheerder
+     bouwt een nieuwe, kloppende geschiedenis. Het anker houdt de oude vast. */
+  const echt = journaal(4);
+  const a = verankerPunt(echt);
+  const vervalst = journaal(4);             // even lang, andere inhoud, klopt intern
+  vervalst[0].wat = 'een nettere werkelijkheid';
+  const herbouwd = [];
+  for (const r of [...vervalst].reverse()) herbouwd.unshift(hangAan(herbouwd, { at: r.at, wat: r.wat }));
+  assert.equal(verifieer(herbouwd).ok, true, 'de vervalsing klopt intern -- dat is het punt');
+  assert.equal(verifieerTegenAnker(herbouwd, a).herschreven, true);
+});
+
+test('een anker dat uit het begrensde journaal is geschoven, oordeelt niet', () => {
+  /* Niet te beoordelen is iets anders dan in orde, en allebei iets anders dan
+     een aanval. Ze door elkaar halen levert of vals alarm of valse rust. */
+  const l = journaal(8);
+  const oudAnker = { nr: 2, hash: 'wat dan ook' };
+  const uit = verifieerTegenAnker(l.slice(0, 3), oudAnker);   // alleen nr 8,7,6 over
+  assert.equal(uit.ok, true);
+  assert.equal(uit.weg, true);
+  assert.ok(!uit.ingekort);
+});
+
+test('een ongemoeid journaal rekent netjes af met zijn anker', () => {
+  const l = journaal(5);
+  const a = verankerPunt(l);
+  l.unshift(hangAan(l, { wat: 'daarna nog iets' }));
+  const uit = verifieerTegenAnker(l, a);
+  assert.equal(uit.ok, true);
+  assert.equal(uit.sindsAnker, 1);
+});
+
+test('zonder bruikbaar anker weigert de controle te oordelen', () => {
+  assert.equal(verifieerTegenAnker(journaal(3), null).ok, false);
+  assert.equal(verifieerTegenAnker(journaal(3), {}).ok, false);
+});
+
+test('inzagejournaal: anker en afrekening lopen door tot in het journaal zelf', () => {
+  const { log, db } = nepJournaal();
+  for (const over of ['b', 'c', 'd', 'e']) log.noteer({ door: { id: 'a' }, over: { id: over }, waarom: 'KYC', bron: 'test' });
+  const a = log.anker();
+  assert.equal(a.nr, 4);
+  assert.equal(log.tegenAnker(a).ok, true);
+
+  db.data.inzageLog.splice(0, 2);           // de twee nieuwste inzages wegpoetsen
+  assert.equal(log.controleer().ok, true, 'lokaal valt dit niet op -- dat is de hele reden voor het anker');
+  const uit = log.tegenAnker(a);
+  assert.equal(uit.ingekort, true);
+  assert.equal(uit.kwijt, 2);
 });

@@ -45,12 +45,36 @@ const JSONUIT = argv.includes('--json');
    toevoegen is een bewuste handeling en hoort hier een regel te kosten. */
 const BRONNEN = [
   'server/lib/keten.js',
+  'server/lib/keten-anker.js',
   'server/lib/klok.js',
   'scripts/lib/schermleugen.js',
   'scripts/bewijsmatrix.js'
 ];
 
 const VELDEN = ['control', 'wat', 'eigenaar', 'bewijs', 'bewijsstuk', 'grens'];
+
+/* DE DERDE STAND, en hij is er gekomen doordat dit register de fout maakte die
+   het moest voorkomen.
+
+   AUDIT-KETEN-VERANKERD verklaarde zichzelf met inBedrijf:false -- het
+   mechanisme is bewezen, maar er wordt nergens een anker weggezet, dus
+   beschermt hij niets. De eerste versie van deze verzamelaar keek daar niet
+   naar en zette hem GROEN op dertig beweringen. Dat is exact het gat waar
+   TOEZICHT.md over gaat: een control die bewijs heeft voor het MECHANISME leest
+   dan als een control die WERKT, en dat verschil is bij een wettelijke eis het
+   hele verschil.
+
+   Dus drie standen, niet twee: bewezen, ontworpen-maar-niet-in-bedrijf, en niet
+   gemeten. Een control die inBedrijf:false verklaart, kan met geen enkele
+   testuitslag groen worden. */
+function staatVan(control, uitslag) {
+  if (control && control.inBedrijf === false) {
+    return { ...uitslag, staat: 'NIET IN BEDRIJF',
+      mechanismeBewezen: uitslag.staat === 'GROEN',
+      reden: 'ontworpen en bewezen, maar niet in gebruik -- zie grens' };
+  }
+  return uitslag;
+}
 
 function verzamel() {
   const uit = [];
@@ -106,7 +130,7 @@ function duidUitslag(uitvoer) {
   return { staat: 'GROEN', beweringen: geslaagd, overgeslagen };
 }
 
-module.exports = { verzamel, duidUitslag, VELDEN, BRONNEN };
+module.exports = { verzamel, duidUitslag, staatVan, VELDEN, BRONNEN };
 if (require.main !== module) return;
 
 const controls = verzamel();
@@ -139,7 +163,7 @@ if (!VASTLEGGEN && !JSONUIT) {
   if (oud) {
     console.log('\n  laatst gemeten:');
     for (const c of oud.controls || []) {
-      console.log('    ' + String(c.control).padEnd(18) + (c.laatstGroen ? c.laatstGroen.staat + '  ' + (c.laatstGroen.at || '') : 'nooit'));
+      console.log('    ' + String(c.control).padEnd(24) + (c.laatstGroen ? c.laatstGroen.staat + '  ' + (c.laatstGroen.at || '') : 'nooit'));
     }
   } else {
     console.log('\n  Nog geen CONTROLS.json. Meet en leg vast met --vastleggen.');
@@ -148,14 +172,21 @@ if (!VASTLEGGEN && !JSONUIT) {
 }
 
 /* Meten kost tijd (de toetsen draaien echt), dus alleen bij --vastleggen/--json. */
-const gemeten = goed.map(c => ({ ...c, laatstGroen: meet(c.bewijs) }));
-const nietGroen = gemeten.filter(c => c.laatstGroen.staat !== 'GROEN');
+const gemeten = goed.map(c => ({ ...c, laatstGroen: staatVan(c, meet(c.bewijs)) }));
+/* NIET IN BEDRIJF is geen mislukking maar ook geen bewijs: hij telt apart, zodat
+   de uitslag van dit script niet rood staat om een control die eerlijk zegt dat
+   hij er nog niet is -- en tegelijk niet meetelt als dekking. */
+const nietInBedrijf = gemeten.filter(c => c.laatstGroen.staat === 'NIET IN BEDRIJF');
+const nietGroen = gemeten.filter(c => c.laatstGroen.staat !== 'GROEN' && c.laatstGroen.staat !== 'NIET IN BEDRIJF');
 
 const stand = {
   uitleg: 'Verklaarde beheersmaatregelen en wanneer elk voor het laatst BEWEZEN is. ' +
     'Zie TOEZICHT.md. laatstGroen is gemeten door de genoemde toetsen te draaien, ' +
     'niet overgeschreven -- een register dat zijn eigen groen opschrijft bewijst niets.',
-  gemeten: { controls: gemeten.length, groen: gemeten.length - nietGroen.length, nietGroen: nietGroen.length },
+  gemeten: { controls: gemeten.length,
+    groen: gemeten.filter(c => c.laatstGroen.staat === 'GROEN').length,
+    nietInBedrijf: nietInBedrijf.length,
+    nietGroen: nietGroen.length },
   controls: gemeten
 };
 
@@ -164,7 +195,7 @@ if (JSONUIT) { console.log(JSON.stringify(stand, null, 1)); process.exit(0); }
 fs.writeFileSync(UITSLAG, JSON.stringify(stand, null, 2) + '\n');
 console.log('\n  gemeten en vastgelegd in CONTROLS.json:');
 for (const c of gemeten) {
-  console.log('    ' + String(c.control).padEnd(18) + c.laatstGroen.staat +
+  console.log('    ' + String(c.control).padEnd(24) + String(c.laatstGroen.staat).padEnd(16) +
     (c.laatstGroen.beweringen ? '  (' + c.laatstGroen.beweringen + ' beweringen)' : '') +
     (c.laatstGroen.reden ? '  -- ' + c.laatstGroen.reden : ''));
 }

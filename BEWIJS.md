@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 923 bestanden en 6024 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 923 bestanden en 6039 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 923 |
-| losse beweringen (`test(...)`) | 6024 |
+| losse beweringen (`test(...)`) | 6039 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 619 |
 | **overleefd**: geen mutatie kreeg hem rood | 13 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-803 bestanden, 5820 beweringen.
+803 bestanden, 5835 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -167,7 +167,7 @@ toets omvalt.
 | `context-lijn.test.js` | 5 | gezakt op `liegpoort /api/` | De dagcontext (tijd, seizoen, temperatuur voor elke AI) en de lijnbezetting (aanmelden per kant; de schermen en de coach rekenen met het aantal aangemelde koks). |
 | `contract.test.js` | 5 | gezakt op `liegpoort /api/` | Contracten: elke zaak stelt een contract op (verhuur of personeel), gericht aan een lid (op codenaam) of een personeelslid. Beide partijen tekenen digitaal; pas als beide handtekeningen staan is het contract... |
 | `controlekamer.test.js` | 4 | gezakt op `liegpoort /api/` | De controlekamer: de eigenaar zet functies aan/uit PER DOELGROEP op de beveiligde technische pagina. Bewijs dat een functie uit kan voor de ene doelgroep (bijv. |
-| `controls.test.js` | 12 | gezakt op `return-weg#0` | HET CONTROLREGISTER (scripts/controls.js) en het uitzendcontract uit TOEZICHT.md. WAAROM DEZE TOETS ER IS. |
+| `controls.test.js` | 17 | gezakt op `return-weg#0` | HET CONTROLREGISTER (scripts/controls.js) en het uitzendcontract uit TOEZICHT.md. WAAROM DEZE TOETS ER IS. |
 | `creator-portfolio.test.js` | 2 | gezakt op `liegpoort /api/` | HET PORTFOLIO VAN EEN CREATOR -- de laatste losse supplier-route. creator/portfolio stond als nooit aangeroepen in de waargenomen dekkingsmeting. |
 | `creator.test.js` | 5 | gezakt op `liegpoort /api/` | End-to-end tests voor het content-creator-genre (kern/creator.js): het carriere-profiel, platforms met bereik, tarieven, de content-kalender en de AI content/script-helper (zonder Claude-sleutel via de sjablonen). De... |
 | `dagcoach.test.js` | 9 | gezakt op `liegpoort /api/` | De dagcoach (kern/dagcoach.js). Wat hier wordt vastgezet is vooral wat hij NIET doet, want dat is de hele keuze: 1. |
@@ -311,7 +311,7 @@ toets omvalt.
 | `kern-fiscaal.test.js` | 8 | gezakt op `===->!==` | Tests voor de fiscale/financiele laag (server/kern/fiscaal.js). De rekenlaag draagt db + helpers; we voeren een minimale db-stub op. |
 | `kern-live.test.js` | 5 | gezakt op `===->!==` | Tests voor de live-/geo-laag (server/kern/live.js). De functies dragen db + de bus + SSE-routers + geo + i18n; we voeren stubs op en gebruiken de echte geo-helpers. |
 | `kern-util.test.js` | 4 | gezakt op `!==->===` | Zuivere kern-hulpjes (server/kern/util.js): los testbaar, geen server nodig. |
-| `keten.test.js` | 20 | gezakt op `===->!==#0` | DE KETEN (server/lib/keten.js) en het inzagejournaal dat eraan hangt. WAT HIER BEWEZEN WORDT. |
+| `keten.test.js` | 30 | gezakt op `===->!==#0` | DE KETEN (server/lib/keten.js) en het inzagejournaal dat eraan hangt. WAT HIER BEWEZEN WORDT. |
 | `ketenchat.test.js` | 5 | gezakt op `liegpoort /api/` | De ketenchat en de interne noodknop: korpsen verbinden eenmalig en delen daarna EEN ketenkanaal; besloten deelgroepen zijn alleen voor de leden en de meldkamer-chefs van de betrokken korpsen kijken mee (lezen, niet... |
 | `keuken.test.js` | 17 | gezakt op `liegpoort /api/` | Het keukenbrein (toren horeca): recepten per gerecht, automatische voorraad-afboeking bij de kassabon EN de betaalde gastbestelling, telling, verspilling, levering (met nieuwe kostprijs), het inkoopadvies en de marge... |
 | `keuring.test.js` | 8 | gezakt op `===->!==#0` | De Keuring keurt het systeem; deze test keurt de Keuring. Een oordeelsscript dat vals alarm slaat wordt genegeerd, en een script dat niets meer vindt wordt overbodig. |

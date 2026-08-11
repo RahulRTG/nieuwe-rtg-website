@@ -30,7 +30,8 @@
    moet bewaren, exporteert periodiek (zie lijst()). */
 const MAX = 5000;
 
-const { schakel, verifieer, top } = require('./lib/keten');
+const { hangAan, verifieer, top } = require('./lib/keten');
+const { verankerPunt, verifieerTegenAnker } = require('./lib/keten-anker');
 const { nu, datum } = require('./lib/klok');
 
 /* De db-laag komt via zet() binnen, zodat dit bestand niets circulair
@@ -83,7 +84,7 @@ function noteer({ door, over, waarom, bron, extra } = {}) {
      plek waar niemand heeft gesjoemeld. Wie iets aan de regel wil toevoegen,
      doet dat dus VOOR het hashen -- via extra. */
   const l = rij();
-  const r = schakel(kaal, top(l));
+  const r = hangAan(l, kaal);
   l.unshift(r);
   if (l.length > MAX) l.length = MAX;
   if (SAVE) { try { SAVE(); } catch (e) {} }
@@ -137,6 +138,15 @@ function controleer() { return verifieer(rij()); }
    moet om het verleden echt vast te zetten. */
 function ketenTop() { return top(rij()); }
 
+/* HET ANKER. controleer() ziet wat er BINNEN het journaal niet klopt; wie de
+   nieuwste regels weggooit houdt een kloppende keten over. Alleen een eerder
+   naar buiten gebracht anker ziet dat -- zie server/lib/keten.js.
+
+   anker()      maak de momentopname die weggezet moet worden (buiten dit huis).
+   tegenAnker() reken af met een anker dat eerder is weggezet. */
+function anker() { return verankerPunt(rij()); }
+function tegenAnker(a) { return verifieerTegenAnker(rij(), a); }
+
 function samenvatting() {
   const l = rij();
   const grens = nu() - 7 * 24 * 3600 * 1000;
@@ -150,4 +160,4 @@ function samenvatting() {
   };
 }
 
-module.exports = { zet, noteer, noteerVeel, lijst, voorBetrokkene, samenvatting, controleer, ketenTop, MAX };
+module.exports = { zet, noteer, noteerVeel, lijst, voorBetrokkene, samenvatting, controleer, ketenTop, anker, tegenAnker, MAX };

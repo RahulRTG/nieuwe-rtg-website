@@ -26,6 +26,33 @@
    - Het maakt de regels niet geheim. Een hash beschermt de VOLGORDE en de
      INHOUD tegen verandering, niet tegen meelezen.
 
+   TWEE DINGEN DIE UIT ELKAAR MOETEN, en dit is het belangrijkste onderscheid in
+   dit bestand:
+
+     LOKALE KETENINTEGRITEIT   klopt de overgebleven geschiedenis met zichzelf?
+     EXTERNE VERANKERING       is de geschiedenis nog even LANG als hij was?
+
+   Alleen het eerste kan een journaal over zichzelf vaststellen, en het is
+   verleidelijk om te denken dat dat genoeg is. Dat is het niet. Wie de nieuwste
+   K regels weggooit, houdt een keten over die van voor naar achter perfect
+   klopt: elke regel wijst naar een voorganger die er nog is, elke hash klopt met
+   zijn inhoud. Er is lokaal NIETS wat daar tegenin gaat -- geen teller, geen
+   hoogwatermerk, geen volgnummer -- want alles wat je ernaast zet, staat in
+   dezelfde database als wat je wil beschermen en is door dezelfde hand te
+   wijzigen. Dat is geen tekortkoming van deze implementatie maar een grens van
+   het middel.
+
+   Sporen wissen van wat je zojuist deed is dus precies de aanval waar een
+   losse hashketen niet tegen beschermt. Daarvoor moet er één getal NAAR BUITEN:
+   verankerPunt() maakt dat getal, verifieerTegenAnker() rekent ermee af. Zolang
+   niemand dat getal wegzet, bewijst deze module dat er niet PER ONGELUK iets is
+   verschoven en dat half werk opvalt -- niet dat een vastberaden beheerder is
+   tegengehouden.
+
+   HET VOLGNUMMER bestaat alleen voor dat afrekenen. Lokaal voegt het niets toe
+   (wie de kop afknipt, knipt de hoge nummers gewoon mee weg); tegen een anker
+   is het het verschil tussen "er is iets weg" en "ik weet hoeveel".
+
    OVER DE AFKAP. Een begrensd journaal (het inzagejournaal houdt er 5000)
    verliest zijn oudste regels. De keten breekt dan bij de oudste die er nog is,
    en dat is geen fout maar een grens: verifieer() meldt hem apart als
@@ -59,9 +86,18 @@ function hashVan(regel) {
 /* Een regel aan de keten hangen. Geeft de regel MET vorige en hash terug; de
    invoer blijft ongemoeid, zodat een aanroeper die zijn object nog gebruikt
    geen halve regel in handen houdt. */
-function schakel(regel, vorigeHash) {
-  const met = { ...regel, vorige: vorigeHash || null };
+function schakel(regel, vorigeHash, nr) {
+  const met = { ...regel, vorige: vorigeHash || null, nr: Number(nr) || 0 };
   return { ...met, hash: hashVan(met) };
+}
+
+/* Een regel aan een BESTAAND journaal hangen (nieuwste vooraan). Doet in één
+   handeling wat elke aanroeper anders zelf moet uitrekenen -- de vorige hash en
+   het volgnummer -- want die twee uit elkaar laten lopen is stil en fataal. */
+function hangAan(regels, regel) {
+  const l = Array.isArray(regels) ? regels : [];
+  const nieuwste = l.find(r => r && r.hash) || null;
+  return schakel(regel, nieuwste ? nieuwste.hash : null, nieuwste ? (Number(nieuwste.nr) || 0) + 1 : 1);
 }
 
 /* De hele keten nalopen. `regels` staat NIEUWSTE EERST -- dat is hoe het
@@ -122,14 +158,15 @@ function top(regels) {
    hier niet voor de vorm: wie hem weglaat, laat een control bij het mappen naar
    een wettelijke eis onvermijdelijk te ruim lezen. */
 const CONTROL = {
-  control: 'AUDIT-KETEN',
-  wat: 'het auditspoor is niet stil te herschrijven',
+  control: 'AUDIT-KETEN-LOKAAL',
+  wat: 'wijziging en verwijdering MIDDEN in het auditspoor breken de keten aantoonbaar',
   eigenaar: 'Security',
   bewijs: ['test/keten.test.js'],
   bewijsstuk: 'de ketenhash van het journaal (inzagelog.ketenTop())',
-  grens: 'stopt STILLE wijziging. Wie bij de database kan, kan de hele keten opnieuw ' +
-    'uitrekenen; daarvoor moet de top periodiek naar een gescheiden systeem, en dat ' +
-    'wegzetten is nog niet gebouwd.'
+  grens: 'ziet uitsluitend wat er BINNEN het overgebleven journaal niet klopt. Wie de ' +
+    'NIEUWSTE regels weggooit, houdt een perfect kloppende keten over -- sporen wissen ' +
+    'van wat je zojuist deed valt hier dus niet op. Daarvoor is AUDIT-KETEN-VERANKERD ' +
+    'nodig, en die is nog niet in bedrijf.'
 };
 
-module.exports = { schakel, verifieer, top, hashVan, kanoniek, CONTROL };
+module.exports = { schakel, hangAan, verifieer, top, hashVan, kanoniek, CONTROL };

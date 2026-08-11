@@ -1,29 +1,53 @@
 {
   "uitleg": "Verklaarde beheersmaatregelen en wanneer elk voor het laatst BEWEZEN is. Zie TOEZICHT.md. laatstGroen is gemeten door de genoemde toetsen te draaien, niet overgeschreven -- een register dat zijn eigen groen opschrijft bewijst niets.",
   "gemeten": {
-    "controls": 4,
+    "controls": 5,
     "groen": 4,
+    "nietInBedrijf": 1,
     "nietGroen": 0
   },
   "controls": [
     {
       "bron": "server/lib/keten.js",
-      "control": "AUDIT-KETEN",
-      "wat": "het auditspoor is niet stil te herschrijven",
+      "control": "AUDIT-KETEN-LOKAAL",
+      "wat": "wijziging en verwijdering MIDDEN in het auditspoor breken de keten aantoonbaar",
       "eigenaar": "Security",
       "bewijs": [
         "test/keten.test.js"
       ],
       "bewijsstuk": "de ketenhash van het journaal (inzagelog.ketenTop())",
-      "grens": "stopt STILLE wijziging. Wie bij de database kan, kan de hele keten opnieuw uitrekenen; daarvoor moet de top periodiek naar een gescheiden systeem, en dat wegzetten is nog niet gebouwd.",
+      "grens": "ziet uitsluitend wat er BINNEN het overgebleven journaal niet klopt. Wie de NIEUWSTE regels weggooit, houdt een perfect kloppende keten over -- sporen wissen van wat je zojuist deed valt hier dus niet op. Daarvoor is AUDIT-KETEN-VERANKERD nodig, en die is nog niet in bedrijf.",
       "laatstGroen": {
         "staat": "GROEN",
-        "beweringen": 20,
+        "beweringen": 30,
         "overgeslagen": 0,
-        "at": "2026-08-11T22:32:41.566Z",
+        "at": "2026-08-11T22:49:30.780Z",
         "bestanden": [
           "test/keten.test.js"
         ]
+      }
+    },
+    {
+      "bron": "server/lib/keten-anker.js",
+      "control": "AUDIT-KETEN-VERANKERD",
+      "wat": "het wegknippen van de NIEUWSTE auditregels valt op tegen een extern anker",
+      "eigenaar": "Security",
+      "bewijs": [
+        "test/keten.test.js"
+      ],
+      "bewijsstuk": "inzagelog.anker() -- de momentopname die weggezet moet worden",
+      "grens": "ONTWORPEN, NIET IN BEDRIJF. Het mechanisme is bewezen (een ingekorte kop en een herschreven regel worden tegen een anker allebei betrapt), maar er wordt nergens een anker weggezet. Zonder bestemming buiten deze database beschermt dit niets.",
+      "inBedrijf": false,
+      "laatstGroen": {
+        "staat": "NIET IN BEDRIJF",
+        "beweringen": 30,
+        "overgeslagen": 0,
+        "at": "2026-08-11T22:49:31.010Z",
+        "bestanden": [
+          "test/keten.test.js"
+        ],
+        "mechanismeBewezen": true,
+        "reden": "ontworpen en bewezen, maar niet in gebruik -- zie grens"
       }
     },
     {
@@ -40,7 +64,7 @@
         "staat": "GROEN",
         "beweringen": 18,
         "overgeslagen": 0,
-        "at": "2026-08-11T22:32:43.621Z",
+        "at": "2026-08-11T22:49:32.963Z",
         "bestanden": [
           "test/klok.test.js"
         ]
@@ -61,7 +85,7 @@
         "staat": "GROEN",
         "beweringen": 18,
         "overgeslagen": 0,
-        "at": "2026-08-11T22:33:14.610Z",
+        "at": "2026-08-11T22:50:02.076Z",
         "bestanden": [
           "test/schermleugen.test.js",
           "test/liegend-scherm.e2e.js"
@@ -82,7 +106,7 @@
         "staat": "GROEN",
         "beweringen": 11,
         "overgeslagen": 0,
-        "at": "2026-08-11T22:33:14.787Z",
+        "at": "2026-08-11T22:50:02.255Z",
         "bestanden": [
           "test/bewijsmatrix.test.js"
         ]

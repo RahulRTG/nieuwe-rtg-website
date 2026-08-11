@@ -25,7 +25,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
 const path = require('path');
-const { verzamel, duidUitslag, VELDEN, BRONNEN } = require('../scripts/controls');
+const { verzamel, duidUitslag, staatVan, VELDEN, BRONNEN } = require('../scripts/controls');
 
 const WORTEL = path.join(__dirname, '..');
 const controls = verzamel();
@@ -111,6 +111,47 @@ test('deels overgeslagen telt als groen zolang er echt iets is gedraaid', () => 
   assert.equal(uit.overgeslagen, 1);
 });
 
+/* ---------- de derde stand: ontworpen maar niet in bedrijf ---------- */
+
+test('een control die niet in bedrijf is, kan met GEEN ENKELE uitslag groen worden', () => {
+  /* Dit is de fout die dit register zelf maakte: AUDIT-KETEN-VERANKERD stond
+     groen op dertig beweringen terwijl er nergens een anker wordt weggezet. Het
+     MECHANISME was bewezen, de control werkte niet -- en bij een wettelijke eis
+     is dat het hele verschil. */
+  const uit = staatVan({ inBedrijf: false }, { staat: 'GROEN', beweringen: 30 });
+  assert.equal(uit.staat, 'NIET IN BEDRIJF');
+  assert.equal(uit.mechanismeBewezen, true, 'dat het mechanisme klopt, mag wel blijven staan');
+  assert.match(uit.reden, /niet in gebruik/);
+});
+
+test('een control die niet in bedrijf is en ook nog zakt, wordt niet mooier gemaakt', () => {
+  const uit = staatVan({ inBedrijf: false }, { staat: 'GEZAKT', gezakt: 3 });
+  assert.equal(uit.staat, 'NIET IN BEDRIJF');
+  assert.equal(uit.mechanismeBewezen, false);
+});
+
+test('een gewone control gaat ongemoeid door staatVan heen', () => {
+  const in_ = { staat: 'GROEN', beweringen: 5 };
+  assert.deepEqual(staatVan({ control: 'X' }, in_), in_);
+  assert.deepEqual(staatVan({ control: 'X', inBedrijf: true }, in_), in_);
+});
+
+test('de verankering verklaart zichzelf eerlijk als niet in bedrijf', () => {
+  const v = controls.find(c => c.control === 'AUDIT-KETEN-VERANKERD');
+  assert.ok(v, 'de verankering hoort als eigen control te bestaan en niet als voetnoot');
+  assert.equal(v.inBedrijf, false);
+  assert.match(v.grens, /NIET IN BEDRIJF/);
+});
+
+test('de lokale keten claimt niet wat alleen een anker kan zien', () => {
+  /* Zonder deze toets kan iemand later de grens-tekst opschonen tot iets
+     geruststellends, en dan dekt AUDIT-KETEN-LOKAAL op papier een eis af die
+     hij aantoonbaar niet raakt. */
+  const k = controls.find(c => c.control === 'AUDIT-KETEN-LOKAAL');
+  assert.match(k.grens, /NIEUWSTE|kop/i);
+  assert.match(k.grens, /VERANKERD/);
+});
+
 /* ---------- het vastgelegde register ---------- */
 
 test('CONTROLS.json is gemeten en niet opgeschreven', () => {
@@ -131,5 +172,8 @@ test('het register scheidt aanwezig van recent bewezen', () => {
      ontbreken, dan leest "de control bestaat" als "de control werkt". */
   const reg = JSON.parse(fs.readFileSync(path.join(WORTEL, 'CONTROLS.json'), 'utf8'));
   assert.equal(typeof reg.gemeten.controls, 'number');
-  assert.equal(reg.gemeten.groen + reg.gemeten.nietGroen, reg.gemeten.controls);
+  assert.equal(reg.gemeten.groen + reg.gemeten.nietGroen + reg.gemeten.nietInBedrijf,
+    reg.gemeten.controls, 'elke control valt in precies een stand');
+  assert.ok(reg.gemeten.nietInBedrijf >= 1,
+    'de verankering hoort zichtbaar in de niet-in-bedrijf-stand te staan');
 });

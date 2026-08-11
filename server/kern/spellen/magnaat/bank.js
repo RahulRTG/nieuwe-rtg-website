@@ -49,36 +49,7 @@ const klem = (n, a, b) => Math.max(a, Math.min(b, n));
    komen erbovenop. `dekking` zegt hoeveel je maximaal mag lenen ten opzichte
    van waar het om gaat -- bij vastgoed de waarde van de zaak, bij de rest je
    eigen vermogen. */
-const VORMEN = {
-  rekeningcourant: {
-    naam: 'Rekening-courant', basis: 0.014, aflossend: false, looptijd: null,
-    dekking: 0.35, onderpand: false, achtergesteld: false,
-    /* Geen aanvraag en geen covenant: dit is de kredietlijn die er altijd is.
-       De prijs ervoor is dat hij het duurst is en het kleinst. */
-    automatisch: true, covenanten: []
-  },
-  werkkapitaal: {
-    naam: 'Werkkapitaalkrediet', basis: 0.009, aflossend: false, looptijd: [3, 12],
-    dekking: 0.60, onderpand: false, achtergesteld: false,
-    covenanten: ['liquiditeit']
-  },
-  investering: {
-    naam: 'Investeringslening', basis: 0.007, aflossend: true, looptijd: [12, 96],
-    dekking: 1.20, onderpand: false, achtergesteld: false,
-    covenanten: ['liquiditeit', 'schuldlast']
-  },
-  vastgoed: {
-    naam: 'Vastgoedfinanciering', basis: 0.0045, aflossend: true, looptijd: [24, 180],
-    dekking: 0.70, onderpand: true, achtergesteld: false,
-    covenanten: ['schuldlast']
-  },
-  achtergesteld: {
-    naam: 'Achtergestelde lening', basis: 0.018, aflossend: false, looptijd: [24, 120],
-    dekking: 0.50, onderpand: false, achtergesteld: true,
-    covenanten: []
-  }
-};
-const VORMLIJST = Object.keys(VORMEN);
+const { VORMEN, VORMLIJST } = require('./bankvormen');
 
 /* HOEVEEL RISICO DRAAGT EEN SECTOR? Niet verzonnen maar afgeleid uit hoe de
    sector werkt: wie zwaar van het seizoen afhangt heeft grillige inkomsten, en
@@ -125,44 +96,10 @@ function renteVoor(vorm, profiel, { sector, looptijd, cyclus }) {
   return { rente: klem(totaal, 0.002, 0.05), stap };
 }
 
-/* ---------- de convenanten ----------
-   DRIE TRAPPEN EN GEEN BESLAG, en dat is het besluit dat financiering
-   strategisch maakt in plaats van eng. Een bank die bij de eerste misstap je
-   zaak inneemt, is een bank waar niemand ooit heenloopt -- en dan is de hele
-   laag decoratie. In het echt gaat het ook zo: eerst een brief, dan een prijs,
-   dan pas de deur.
-
-     1. GESIGNALEERD  je krijgt het te horen en verder niets.
-     2. OPSLAG        de rente gaat omhoog zolang je eroverheen zit, en je mag
-                      niet bijlenen.
-     3. OPEISBAAR     na een half jaar aanhoudende breuk wordt de lening
-                      opgeeist: het restant moet uit de kas, en lukt dat niet,
-                      dan gaat het onderpand eraan. Heeft de lening geen
-                      onderpand, dan blijft de schuld staan tegen de hoogste
-                      opslag -- een ongedekte lening kan niemand afpakken. */
-const NORMEN = {
-  liquiditeit: { naam: 'liquiditeitsbuffer', grens: 0.15,
-    uitleg: 'ten minste 15% van je jaarlasten in kas' },
-  schuldlast: { naam: 'schuld ten opzichte van winst', grens: 4,
-    uitleg: 'schuld onder vier keer de jaarwinst' }
-};
-const TRAP = { signaal: 1, opslag: 2, opeisbaar: 6 };   // in maanden aanhoudende breuk
-const BREUK_OPSLAG = 0.006;
-
-/* Welke normen breekt deze speler NU? Uit het profiel en niet uit een teller:
-   een norm die je vandaag haalt, is vandaag gehaald. */
-function breuken(lening, cijfers) {
-  const v = VORMEN[lening.soort];
-  const uit = [];
-  for (const norm of v.covenanten) {
-    if (norm === 'liquiditeit' && cijfers.buffer < NORMEN.liquiditeit.grens) uit.push('liquiditeit');
-    if (norm === 'schuldlast' && cijfers.schuldlast > NORMEN.schuldlast.grens) uit.push('schuldlast');
-  }
-  return uit;
-}
-
-const trapVan = (maanden) => (maanden >= TRAP.opeisbaar ? 'opeisbaar'
-  : maanden >= TRAP.opslag ? 'opslag' : maanden >= TRAP.signaal ? 'signaal' : null);
+/* DE CONVENANTEN staan in ./convenant.js -- de normen, de trappen en wat een
+   breuk betekent. Een eigen onderwerp: die tabel gaat over wat een bank van je
+   VERWACHT, en de tabel hierboven over wat hij je VERKOOPT. */
+const { NORMEN, TRAP, BREUK_OPSLAG, breuken, trapVan } = require('./convenant');
 
 /* ---------- de maand ----------
    Rente over het restant, dan de aflossing, dan de convenanten. In die
@@ -181,10 +118,18 @@ function maandVoor(lening, cijfers) {
 /* Wat een speler MAG lenen bij deze vorm, gegeven wat hij heeft. `ruimte` is
    het plafond; wat er al staat gaat eraf. Achtergestelde leningen tellen bij
    de andere vormen als eigen vermogen mee -- dat is precies waar ze voor zijn. */
-function ruimte(vorm, { vermogen, onderpandwaarde, schuld, achtergesteldeSchuld }) {
+function ruimte(vorm, { vermogen, onderpandwaarde, schuld, achtergesteldeSchuld, onderpandSchuld }) {
   const v = VORMEN[vorm];
-  const basis = v.onderpand ? (onderpandwaarde || 0) : Math.max(0, vermogen + (achtergesteldeSchuld || 0));
-  return Math.max(0, rond(basis * v.dekking - (v.onderpand ? 0 : schuld || 0)));
+  if (v.onderpand) {
+    /* WAT ER AL OP DIT PAND RUST GAAT ERAF, en die regel ontbrak. Zonder hem kon
+       een speler telkens opnieuw zeventig procent van dezelfde waarde lenen: het
+       pand was elke ronde weer "onbelast". Dat is de onderpandspiraal in zijn
+       zuiverste vorm -- geen waardering die meestijgt, maar een zekerheid die
+       oneindig vaak vergeven wordt. Gevonden door de pomptoets die twee keer de
+       helft tegen hetzelfde pand probeerde. */
+    return Math.max(0, rond((onderpandwaarde || 0) * v.dekking - (onderpandSchuld || 0)));
+  }
+  return Math.max(0, rond(Math.max(0, vermogen + (achtergesteldeSchuld || 0)) * v.dekking - (schuld || 0)));
 }
 
 module.exports = { VORMEN, VORMLIJST, NORMEN, TRAP, BREUK_OPSLAG,

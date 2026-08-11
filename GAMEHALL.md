@@ -1025,9 +1025,51 @@ voordat hij iets opeist.
 > opgeëiste ongedekte lening werd de maand erna weer teruggezet, waardoor opeisen
 > een tik op de vingers was die na een maand verviel.
 
-**Wat er van fase B nog niet in zit.** Verzekeringen met risicoprofielen (premie,
-eigen risico, dekking, maximum, uitsluitingen) en R&D als keuzeboom in plaats van
-een niveauladder.
+### Zes harde pomproutes op financiering
+
+Een financieringslaag biedt precies zoveel manieren om geld te drukken als hij
+posten heeft, dus zes routes die het elk anders proberen:
+
+| Route | Wat hij probeert | Uitkomst |
+|---|---|---|
+| lenen en direct terugbetalen | een lus die net iets meer teruggeeft | nul |
+| onderlinge financiering | twee spelers die met geleend geld in elkaar stappen | nul |
+| herfinanciering | nettovermogen verhogen door te herzien | nul |
+| lenen en stilzitten | rente die niet exact als sink terugkomt | nul |
+| onderpandspiraal | een pand dat zichzelf omhoog financiert | **vond een gat** |
+| hefboomladder | een kredietplafond dat wegloopt | begrensd |
+
+**Bij een lekkende laag is de eis scherper dan elders.** Rente verlaat de wereld
+met een exact bedrag, dus na aftrek hoort er *nul* over te blijven — niet "iets
+binnen een half procent". Wat er nog in mag zitten is afrondingsruis over een
+paar honderd geboekte regels: een handvol euro's, geen bedrag dat een speler kan
+gebruiken.
+
+**Twee van de zes vergelijken geen totalen, en dat is een correctie.** Wie leent
+en bouwt, bouwt echte bedrijven die echt geld verdienen — daar *hoort* het totaal
+van te stijgen, anders is lenen zinloos. De eerste versie van die twee scenario's
+mat dus of lenen werkt in plaats van of het lekt. Ze dragen nu hun eigen bewering:
+de leenruimte mag niet groeien van het lenen, en de schuld mag niet boven drie
+keer de bezittingen uitkomen.
+
+> **Wat de onderpandroute vond.** `ruimte` rekende voor een gedekte lening
+> `waarde × dekking` en trok **niet af wat er al op dat pand rustte**. Een speler
+> kon dus telkens opnieuw zeventig procent van dezelfde waarde lenen: het pand was
+> elke ronde weer onbelast. Dat is de onderpandspiraal in zijn zuiverste vorm —
+> geen waardering die meestijgt, maar een zekerheid die oneindig vaak vergeven
+> wordt.
+
+**Wat er van fase B nog niet in zit.** Verzekeringen en R&D. Voor allebei ligt het
+pomppatroon al vast, en het volgt dezelfde drie categorieën:
+
+- **Verzekeringen** — premie *vernietigend*, schade *vernietigend*, uitkering
+  *conserverend tot aantoonbare schade*. Oververzekeren mag nooit winstgevend
+  worden: dat is de pomproute die er bij deze laag als eerste in zit.
+- **R&D** — investering *vernietigend* op korte termijn, resultaat alleen
+  *scheppend* via expliciet gemeten productiviteitswinst, en een subsidie is een
+  *externe injectie* die apart gelabeld hoort en nooit als bedrijfsprestatie mag
+  tellen. En een keuzeboom in plaats van een niveauladder, zodat een budgethotel
+  zich anders ontwikkelt dan een luxeconcern.
 
 **Fase C — de permanente wereld.** Living World, AI-managers met beleidsregels,
 Safe Management Policy, vakantiemodus, overdracht, legacy, Magnaat Daily,

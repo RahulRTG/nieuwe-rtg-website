@@ -177,6 +177,108 @@ const SCENARIOS = {
     }
   },
 
+  /* ONDERLINGE FINANCIERING. Twee spelers lenen allebei bij de bank en kopen
+     met dat geld een belang in elkaars zaak. Er stroomt geld rond tussen twee
+     spelers EN er komt schuld bij; als een van beide kanten ergens dubbel telt,
+     blaast dit het systeem op. */
+  kruisfinanciering: {
+    verwacht: 'lekkend', naam: 'lenen en met dat geld een belang in elkaar kopen',
+    doe(w) {
+      for (const h of ['a', 'b'])
+        w.m.spel.zet(w.potje, h, { actie: 'krediet-opnemen', soort: 'investering',
+          bedrag: 250000, looptijd: 48 });
+      for (const [koper, doel] of [['a', w.B.id], ['b', w.A.id]]) {
+        const r = w.m.spel.zet(w.potje, koper, { actie: 'belang-voorstel', vestiging: doel,
+          deel: 40, prijs: 250000 });
+        if (r.ok) {
+          const d = w.st.deelnemingen.find(x => x.id === r.id);
+          w.m.spel.zet(w.potje, d.eigenaar, { actie: 'belang-antwoord', id: r.id, antwoord: 'ja' });
+        }
+      }
+    }
+  },
+
+  /* HERFINANCIEREN. Een lopende lening herzien verlengt hem en maakt hem duurder;
+     het nettovermogen hoort daar geen cent van te merken op het moment zelf. */
+  herfinanciering: {
+    verwacht: 'lekkend', naam: 'een lening herzien',
+    doe(w) {
+      const r = w.m.spel.zet(w.potje, 'a', { actie: 'krediet-opnemen', soort: 'investering',
+        bedrag: 400000, looptijd: 36 });
+      if (r.ok) w.m.spel.zet(w.potje, 'a', { actie: 'krediet-herzien', id: r.id, maanden: 24 });
+    }
+  },
+
+  /* DE ONDERPANDSPIRAAL. Leen tegen een pand, en kijk of je daarmee tegen
+     datzelfde pand MEER kunt lenen. Als die lus niet begrensd is, financiert een
+     speler zichzelf omhoog zonder ooit iets te verkopen.
+
+     LET OP DE VORM VAN DEZE TOETS. Hij vergelijkt GEEN totalen, en dat is een
+     correctie: de eerste versie liet de speler het geleende geld ook uitgeven,
+     en dan bouwt hij echte panden die echt geld verdienen -- dan meet je of
+     lenen werkt en niet of het lekt. Wat hier gemeten wordt is de LEENRUIMTE
+     zelf: die mag niet groeien van het lenen. */
+  onderpandspiraal: {
+    verwacht: 'economisch', naam: 'lenen tegen een pand en kijken of je ruimte groeit',
+    doe(w) {
+      const zaak = w.m.eco.zicht(w.potje, w.st, 'a').vestigingen[0];
+      w.ruimteVoor = zaak.waarde;
+      const r = w.m.spel.zet(w.potje, 'a', { actie: 'krediet-opnemen', soort: 'vastgoed',
+        bedrag: Math.floor(zaak.waarde * 0.5), looptijd: 120, vestiging: zaak.id });
+      w.geleend = r.ok;
+      w.zaakId = zaak.id;
+    },
+    keur(w) {
+      if (!w.geleend) return 'er kon niets geleend worden; deze toets meet dan niets';
+      const zaak = w.m.eco.zicht(w.potje, w.st, 'a').vestigingen.find(v => v.id === w.zaakId);
+      if (!zaak) return null;
+      /* De waarde van het pand mag stijgen doordat het GELD VERDIENT -- dat is
+         de economie. Wat niet mag is dat hij stijgt door de lening zelf. Dus:
+         meteen na het opnemen, zonder dat er een maand voorbij is. */
+      if (zaak.waarde > w.ruimteVoor)
+        return 'lenen tegen een pand maakte datzelfde pand meer waard: ' +
+          w.ruimteVoor + ' -> ' + zaak.waarde;
+      return null;
+    }
+  },
+
+  /* DE HEFBOOMLADDER: lenen, bouwen, en met de hogere waardering opnieuw lenen.
+     Ook hier geen totalenvergelijking maar een BEGRENZING -- wie leent en
+     bouwt, bouwt echte bedrijven die echt geld verdienen, en dat hoort te
+     lonen. Wat niet mag is dat het KREDIETPLAFOND wegloopt: dan is de ladder
+     oneindig en is lenen geen keuze meer maar de enige zet. */
+  hefboomladder: {
+    verwacht: 'economisch', naam: 'lenen, bouwen, en met de hogere waardering opnieuw lenen',
+    doe(w) {
+      const k = kaart(w.st.stad);
+      w.hefbomen = [];
+      for (let ronde = 0; ronde < 8; ronde++) {
+        const beeld = w.m.eco.zicht(w.potje, w.st, 'a');
+        const o = beeld.financiering.offertes.find(x => x.soort === 'investering');
+        if (!o || o.max < 50000) break;
+        if (!w.m.spel.zet(w.potje, 'a', { actie: 'krediet-opnemen', soort: 'investering',
+          bedrag: o.max, looptijd: 96 }).ok) break;
+        const vrij = k.kavels.find(x => !w.st.kavelBezet[x.id] && x.zone === 'boulevard');
+        if (!vrij) break;
+        w.m.spel.zet(w.potje, 'a', { actie: 'open', kavel: vrij.id, sector: 'horeca', omvang: 40 });
+        w.st.gerekendTot -= w.st.maandMs;
+        for (const v of w.m.eco.bijrekenen(w.potje)) w.rente = (w.rente || 0) + (v.rentelast || 0);
+        const na = w.m.eco.eindstand(w.potje).find(x => x.codenaam === 'a');
+        w.hefbomen.push(na.schuld / Math.max(1, na.geld + na.waarde));
+      }
+    },
+    keur(w) {
+      if (!w.hefbomen || !w.hefbomen.length) return 'er is niets geleend; deze toets meet dan niets';
+      const hoogste = Math.max(...w.hefbomen);
+      /* Drie keer je bezittingen aan schuld is al veel; een weggelopen plafond
+         levert een veelvoud daarvan op en is zo herkenbaar zonder dat deze
+         grens een balansknop wordt. */
+      if (hoogste > 3) return 'de schuld liep op tot ' + hoogste.toFixed(1) +
+        ' keer de bezittingen; het kredietplafond loopt weg';
+      return null;
+    }
+  },
+
   /* Bouwen en meteen weer sluiten, in een lus. Sluiten levert de halve bouwsom
      op, dus dit HOORT geld te kosten -- maar als de waardering van een pand
      ergens boven de bouwsom uitkomt, is dit een machine. */
@@ -210,11 +312,17 @@ function teken(w, van, mijn, hun, soort, x) {
    keer zonder de pomp. */
 function meet(sleutel, maanden = 24) {
   const uit = {};
+  let klacht = null;
   for (const naam of ['rust', sleutel]) {
     const w = wereld();
     maand(w, 2);                 // eerst wat echte economie, zodat er cijfers zijn
     SCENARIOS[naam].doe(w);
+    /* De EIGEN keuring van een scenario draait meteen na de handeling, want
+       sommige beweringen gaan over het moment zelf ("lenen mag je pand niet
+       meer waard maken") en niet over de eindstand. */
+    if (naam === sleutel && SCENARIOS[naam].keur) klacht = SCENARIOS[naam].keur(w);
     maand(w, maanden);
+    if (naam === sleutel && !klacht && SCENARIOS[naam].keur) klacht = SCENARIOS[naam].keur(w);
     uit[naam === 'rust' ? 'rust' : 'pomp'] = totaal(w);
     uit[(naam === 'rust' ? 'rust' : 'pomp') + 'Rente'] = w.rente || 0;
   }
@@ -224,7 +332,7 @@ function meet(sleutel, maanden = 24) {
   const lek = (uit.pompRente || 0) - (uit.rustRente || 0);
   const ruw = uit.pomp.samen - uit.rust.samen;
   const verschil = SCENARIOS[sleutel].verwacht === 'lekkend' ? ruw + lek : ruw;
-  return { naam: SCENARIOS[sleutel].naam, rust: uit.rust, pomp: uit.pomp, ruw, lek, verschil,
+  return { naam: SCENARIOS[sleutel].naam, rust: uit.rust, pomp: uit.pomp, ruw, lek, verschil, klacht,
     relatief: uit.rust.samen ? verschil / uit.rust.samen : 0 };
 }
 
@@ -235,6 +343,13 @@ function meet(sleutel, maanden = 24) {
    het effect van een verlegde levering, veel te krap voor een pomp van
    miljoenen. */
 const RUIS = 0.005;
+/* BIJ EEN LEKKENDE LAAG IS DE EIS SCHERPER, en dat is met opzet: daar is er
+   geen ruis om achter te schuilen. Rente verlaat de wereld met een exact
+   bedrag, en dat bedrag is bekend -- dus na aftrek hoort er NUL over te blijven,
+   niet "iets binnen een half procent". Wat er nog wel in mag zitten is
+   afrondingsruis over een paar honderd geboekte regels, en dat is een handvol
+   euro's en geen bedrag dat een speler kan gebruiken. */
+const EXACT = 25;
 
 /* TWEE SOORTEN SCENARIO, en het onderscheid is nodig omdat "het totaal
    verandert" niet altijd fout is.
@@ -260,13 +375,21 @@ function keur() {
     const r = meet(sleutel);
     rijen.push(Object.assign({ sleutel }, r));
     const soort = SCENARIOS[sleutel].verwacht || 'neutraal';
+    if (r.klacht) { klachten.push(sleutel + ': ' + r.klacht); continue; }
+    /* ECONOMISCH: het scenario doet echte dingen (bouwen, uitbreiden) en de
+       totalen zijn dus niet vergelijkbaar -- lenen om te bouwen HOORT waarde op
+       te leveren, anders is lenen zinloos. Zo'n scenario draagt zijn eigen
+       bewering in `keur` en wordt hier overgeslagen. */
+    if (soort === 'economisch') continue;
     // een kostend scenario mag zakken; een neutraal en een lekkend scenario niet
-    const fout = soort === 'kostend' ? r.relatief > RUIS : Math.abs(r.relatief) > RUIS;
+    const fout = soort === 'kostend' ? r.relatief > RUIS
+      : soort === 'lekkend' ? Math.abs(r.verschil) > EXACT
+      : Math.abs(r.relatief) > RUIS;
     if (fout)
       klachten.push(sleutel + ': ' + r.naam + ' verandert het totaal met ' +
         (r.relatief * 100).toFixed(2) + '% (' + Math.round(r.verschil) + ')' +
         (soort === 'kostend' ? ' -- omlaag mag hier, omhoog niet'
-          : soort === 'lekkend' ? ' -- de rentelast is er al af gerekend' : ''));
+          : soort === 'lekkend' ? ' -- de rentelast is er al af gerekend, dus dit hoort nul te zijn' : ''));
   }
   return { rijen, klachten };
 }
@@ -279,11 +402,12 @@ if (require.main === module) {
     console.log(r.sleutel.padEnd(21) + ' | ' + (SCENARIOS[r.sleutel].verwacht || 'neutraal').padEnd(8) +
       ' | ' + String(r.rust.samen).padStart(14) + ' | ' +
       String(r.pomp.samen).padStart(11) + ' | ' + String(Math.round(r.verschil)).padStart(10) + ' | ' +
-      (r.relatief * 100).toFixed(2).padStart(6));
+      ((SCENARIOS[r.sleutel].verwacht === 'economisch') ? '     -' : (r.relatief * 100).toFixed(2).padStart(6)));
   console.log('\n' + (klachten.length
     ? 'AFGEKEURD -- hier komt waarde uit het niets:\n  ' + klachten.join('\n  ')
-    : 'geen enkel scenario maakt waarde uit het niets (marge ' + (RUIS * 100) + '%)'));
+    : 'geen enkel scenario maakt waarde uit het niets\n  neutraal en kostend: marge ' +
+      (RUIS * 100) + '%   lekkend: op ' + EXACT + ' euro afrondingsruis na exact nul'));
   if (klachten.length) process.exitCode = 1;
 }
 
-module.exports = { SCENARIOS, meet, keur, wereld, totaal, RUIS };
+module.exports = { SCENARIOS, meet, keur, wereld, totaal, RUIS, EXACT };

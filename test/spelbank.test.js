@@ -406,3 +406,61 @@ test('een medespeler ziet je schuld niet', () => {
   for (const laag of ['kijker', 'publiek'])
     assert.ok(!/456789/.test(JSON.stringify(m.spel.zicht[laag](p, st))), laag + ' evenmin');
 });
+
+/* ================= de zes harde pomptoetsen op financiering ================= */
+
+test('geen van de zes financieringsroutes maakt waarde uit het niets', () => {
+  /* ZES ROUTES DIE ELK EEN ANDERE MANIER PROBEREN, en ze zijn er alle zes
+     omdat een financieringslaag precies zoveel manieren biedt om geld te
+     drukken als hij posten heeft.
+
+     Vier van de zes vergelijken TOTALEN. Bij een lekkende laag is de eis daar
+     scherper dan elders: rente verlaat de wereld met een exact bedrag, dus na
+     aftrek hoort er NUL over te blijven en niet "iets binnen een marge".
+
+     Twee van de zes doen dat NIET, en dat is een correctie op de eerste versie.
+     Wie leent en bouwt, bouwt echte bedrijven die echt geld verdienen -- daar
+     hoort het totaal van te stijgen, anders is lenen zinloos. Die twee dragen
+     daarom hun eigen bewering: de leenruimte mag niet groeien van het lenen,
+     en het kredietplafond mag niet weglopen. */
+  const { meet, EXACT, SCENARIOS } = require('../scripts/magnaat-pomp');
+  const routes = ['leenCarrousel', 'kruisfinanciering', 'herfinanciering', 'lenenEnStilzitten'];
+  for (const naam of routes) {
+    const r = meet(naam, 12);
+    assert.equal(SCENARIOS[naam].verwacht, 'lekkend');
+    assert.ok(Math.abs(r.verschil) <= EXACT,
+      naam + ': na aftrek van de rentelast hoort er nul over te blijven, maar er staat ' +
+      Math.round(r.verschil) + ' (' + SCENARIOS[naam].naam + ')');
+    assert.equal(r.klacht, null);
+  }
+  for (const naam of ['onderpandspiraal', 'hefboomladder']) {
+    const r = meet(naam, 12);
+    assert.equal(SCENARIOS[naam].verwacht, 'economisch');
+    assert.equal(r.klacht, null, naam + ': ' + r.klacht);
+  }
+});
+
+test('lenen tegen een pand maakt datzelfde pand niet meer waard', () => {
+  /* DE ONDERPANDSPIRAAL, rechtstreeks. Zou de waardering meebewegen met wat er
+     tegen geleend is, dan financiert een speler zichzelf omhoog zonder ooit
+     iets te verkopen -- en dat is niet alleen een zeepbel maar in een spel
+     gewoon oneindig geld. */
+  const { m, p, st, A } = opstelling();
+  maand(m, p, 6);
+  const voor = m.eco.zicht(p, st, 'anna').vestigingen[0].waarde;
+  const r = m.eco.zet(p, 'anna', { actie: 'krediet-opnemen', soort: 'vastgoed',
+    bedrag: Math.floor(voor * 0.5), looptijd: 120, vestiging: A.id });
+  assert.ok(r.ok, r.error);
+  const na = m.eco.zicht(p, st, 'anna').vestigingen[0].waarde;
+  assert.equal(na, voor, 'de waardering hoort van het lenen niets te merken');
+  // en de leenruimte tegen datzelfde pand is met precies de lening gekrompen
+  const tweede = m.eco.zet(p, 'anna', { actie: 'krediet-opnemen', soort: 'vastgoed',
+    bedrag: Math.floor(voor * 0.5), looptijd: 120, vestiging: A.id });
+  assert.equal(tweede.status, 400, 'twee keer de helft tegen hetzelfde pand kan niet');
+});
+
+test('het kredietplafond loopt niet weg als je leent, bouwt en opnieuw leent', () => {
+  const { meet } = require('../scripts/magnaat-pomp');
+  const r = meet('hefboomladder', 12);
+  assert.equal(r.klacht, null, r.klacht);
+});

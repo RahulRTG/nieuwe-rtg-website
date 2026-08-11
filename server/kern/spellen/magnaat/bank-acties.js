@@ -40,8 +40,13 @@ module.exports = ({ mijnVestiging, profiel, cijfers, waarde, liquideer }) => {
     const looptijdOk = v.looptijd
       ? Math.round(Math.min(v.looptijd[1], Math.max(v.looptijd[0], Number(looptijd) || v.looptijd[0])))
       : 0;
+    /* Wat er al op DIT pand rust; zie de reden bij `ruimte` in ./bank.js. */
+    const onderpandSchuld = onderpand ? (st.leningen || [])
+      .filter(l => l.status === 'loopt' && l.onderpand === onderpand.id)
+      .reduce((n, l) => n + l.restant, 0) : 0;
     const max = B.ruimte(soort, { vermogen: c.vermogen, schuld: c.schuld,
-      achtergesteldeSchuld: c.achtergesteld, onderpandwaarde: onderpand ? waarde(onderpand) : 0 });
+      achtergesteldeSchuld: c.achtergesteld, onderpandSchuld,
+      onderpandwaarde: onderpand ? waarde(onderpand) : 0 });
     const { rente, stap } = B.renteVoor(soort, p, {
       sector: onderpand ? onderpand.sector : (st.vestigingen[h][0] || {}).sector,
       looptijd: looptijdOk, cyclus: st.cyclus || 0 });

@@ -19,6 +19,8 @@ const SHELL = [
   '/apps/foundation/verhaaltje.html', '/apps/foundation/liedjes.html', '/apps/foundation/gevoel.html',
   '/apps/foundation/presenteren.html', '/apps/foundation/budget.html', '/apps/foundation/rechten.html',
   '/apps/foundation/mediawijs.html',
+  // de levenspas aan de gezinskant, met de gedeelde schil eronder
+  '/apps/foundation/mijnbanden.html', '/shared/levenspas.js', '/shared/levenspas.css',
   '/apps/foundation/contact.html', '/apps/foundation/gezin-rt.js', '/apps/foundation/werk.html', '/apps/foundation/vrienden.html', '/apps/foundation/markt.html',
   '/apps/foundation/beheer.html', '/apps/foundation/privacy.html', '/apps/foundation/sessie.js',
   /* Deze tien stonden WEL op de hub en NIET in de schil: spelen, de biebs, de

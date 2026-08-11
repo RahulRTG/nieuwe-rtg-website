@@ -40,10 +40,17 @@ module.exports = [
     uitleg: 'Het command center over alle gelddomeinen: hoe u ervoor staat, wat eraan komt, uw eigen beleidsregels met reserveringspotten, ' +
       'het actielog en de gegronde Rahul. Uit = het overzicht en de regels verdwijnen; betalen en verrekenen blijven werken via hun eigen schakelaars.',
     paden: ['/api/geld'] },
-  { id: 'levenos', categorie: 'Eigen apps', naam: 'RTFoundation (levenslijn en mentor)', standaard: true, doelgroepen: LEDEN,
-    uitleg: 'De levenslijn met wat er speelt en wat eraan komt, en de mentor die opent en nooit stuurt. Deze laag leest alleen; ' +
-      'uitzetten verwijdert geen enkel gegeven, het haalt alleen het beeld en de mentor weg.',
-    paden: ['/api/leven'] },
+  { id: 'levenos', categorie: 'Eigen apps', naam: 'RTFoundation (levenslijn, mentor en levenspas)', standaard: true, doelgroepen: LEDEN_RTF,
+    uitleg: 'De levenslijn met wat er speelt en wat eraan komt, de mentor die opent en nooit stuurt, en de levenspas: wie mag wat van u zien. ' +
+      'De eerste twee lezen alleen; uitzetten verwijdert daar geen enkel gegeven. De levenspas beheert wel iets, namelijk uw TOESTEMMING -- ' +
+      'uitzetten bevriest die dus: bestaande banden blijven staan zoals ze zijn, maar niemand kan er meer een leggen, verbreken of intrekken.',
+    /* BEIDE INGANGEN, en dat is geen dubbeling. De levenspas werkt over twee
+       sessiewerelden: /api/leven voor het lid en /api/rtf/leven voor het
+       gezinsprofiel. Zonder de tweede zou uitzetten de ledenkant sluiten en de
+       gezinskant open laten staan -- want dan valt die onder rtf-contacten, en
+       de langste prefix wint. Half uit is erger dan aan: dan denkt de ene kant
+       dat een band niet gelegd kan worden en legt de andere kant hem gewoon. */
+    paden: ['/api/leven', '/api/rtf/leven'] },
   { id: 'socialewereld', categorie: 'Eigen apps', naam: 'RTG Sociaal (de kring op een plek)', standaard: true, doelgroepen: LEDEN,
     uitleg: 'De samenhanglaag over De Salon, berichten, pulse en de ontmoetingen: wat er tussen u en uw kring speelt. ' +
       'De onderliggende apps hebben hun eigen schakelaars.',

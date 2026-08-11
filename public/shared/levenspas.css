@@ -1,0 +1,41 @@
+/* De levenspas: wie mag wat van mij zien (LEVEN.md par. 2.8, fase 2).
+
+   Hoort bij /shared/levenspas.js en wordt door TWEE pagina's gelinkt:
+   /apps/leven.html (het lid) en /apps/foundation/mijnbanden.html (het
+   gezinsprofiel). Aan beide kanten van een band neemt een mens dezelfde
+   beslissing, dus hij hoort er ook hetzelfde uit te zien.
+
+   Stond eerst als tekstblok in het script en ging daarmee over de tienkilobyte
+   -grens van scripts/check.js regel 13. Als eigen bestand is hij bovendien
+   eerlijker: een stylesheet die als string in een script woont, is een
+   stylesheet die niemand meer als stylesheet leest.
+
+   DE KLEUREN KOMEN UIT HET THEMA VAN DE PAGINA, met de RTF-huisnamen als
+   tweede kans en pas daarna een vaste waarde. Zo ziet dit blok er in het
+   ledenportaal uit als het ledenportaal en in het foundation-huis als het
+   foundation-huis, zonder dat er ergens een tweede palet ontstaat. */
+
+.lp-rij{border:1px solid var(--rtg-line,var(--lijn,#DEDBD5));border-radius:12px;padding:.85rem 1rem;margin:.6rem 0;}
+.lp-kop{display:flex;flex-wrap:wrap;gap:.5rem;align-items:baseline;}
+.lp-wie{font-weight:600;}
+.lp-soort{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--rtg-soft,var(--zacht,#8A8680));}
+.lp-staat{font-size:.76rem;color:var(--rtg-soft,var(--zacht,#8A8680));margin-left:auto;}
+
+/* Een openstaand verzoek is nog geen band, en dat hoort te zien te zijn zonder
+   dat je de tekst leest: een gestreepte rand in plaats van een gesloten. */
+.lp-rij[data-staat="gevraagd"]{border-style:dashed;}
+
+.lp-twee{display:grid;grid-template-columns:1fr;gap:.7rem;margin-top:.7rem;
+  padding-top:.7rem;border-top:1px solid var(--rtg-line,var(--lijn,#DEDBD5));}
+@media(min-width:640px){.lp-twee{grid-template-columns:1fr 1fr;}}
+.lp-vak h3{font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--rtg-soft,var(--zacht,#8A8680));font-weight:500;margin:0 0 .35rem;}
+.lp-stuk{display:flex;gap:.5rem;align-items:baseline;flex-wrap:wrap;font-size:.86rem;padding:.15rem 0;}
+.lp-tot{font-size:.74rem;color:var(--rtg-soft,var(--zacht,#8A8680));}
+.lp-leeg{font-size:.82rem;color:var(--rtg-soft,var(--zacht,#8A8680));line-height:1.5;}
+.lp-vorm{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.7rem;align-items:center;}
+.lp-vorm select,.lp-vorm input{min-width:0;flex:1 1 8rem;}
+.lp-vorm label.lp-tot{flex:0 0 auto;}
+.lp-mini{font-size:.78rem;padding:.35rem .7rem;}
+.lp-nooit{font-size:.8rem;color:var(--rtg-soft,var(--zacht,#8A8680));line-height:1.6;margin-top:1.2rem;}
+.lp-fout{font-size:.84rem;color:var(--burgundy-on-dark,#C23A5E);margin-top:.6rem;}

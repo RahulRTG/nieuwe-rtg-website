@@ -76,6 +76,11 @@ const R = [
   ['veilig', 'Veilig thuis', 'veilig', 'gezin', '/apps/foundation/veilig.html', 'Online en thuis veilig: afspraken die werken voor kind en ouder.'],
   ['gezondheid', 'Gezondheidsmaatje', 'veilig', 'gezin', '/apps/foundation/gezondheid.html', 'Het gezondheidsboekje van het gezin, rustig bijgehouden.'],
   ['privacy', 'Privacy', 'veilig', 'gezin', '/apps/foundation/privacy.html', 'Wat er met jullie gegevens gebeurt, in gewone woorden.'],
+  /* De levenspas aan de gezinskant (LEVEN.md par. 2.8). Doelgroep 'gezin' en
+     niet 'kind': een ouder heeft hem net zo hard nodig als een kind, want ook
+     een ouder deelt hier zijn eigen dingen -- en de uitleg waarom hij van zijn
+     kind niets ziet, staat op precies deze pagina. */
+  ['mijnbanden', 'Wie mag iets van mij zien', 'veilig', 'gezin', '/apps/foundation/mijnbanden.html', 'Wie er iets van jou mag zien, per onderdeel en tot wanneer; altijd terug te nemen.'],
   ['mediawijs', 'Online wijs', 'veilig', 'tiener', '/apps/foundation/mediawijs.html', 'Echte situaties van je telefoon, met eerlijke uitleg over wat je keuze oplevert.'],
 
   // ---- bibliotheken ----

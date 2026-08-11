@@ -202,8 +202,8 @@ laag mag: RTG Geld voert uit binnen regels; RTFoundation opent alleen.
 
 | Fase | Wat | Status |
 |---|---|---|
-| 1 | de levenslijn als bron (fasen, overgangen, wat er speelt), de levensgraaf uitgebreid met talenten/interesses/bijdrage, en het levens-command-center in de vorm van de geldcockpit | volgende |
-| 2 | rechten per relatie in de familiegraaf (koppeling met bevestiging aan beide kanten, kind deelt per stuk -- zie par. 2.8) en de levenspas met delen per ontvanger en een vervaldatum | volgende |
+| 1 | de levenslijn als bron (fasen, overgangen, wat er speelt), de levensgraaf uitgebreid met talenten/interesses/bijdrage, en het levens-command-center in de vorm van de geldcockpit | er |
+| 2 | rechten per relatie in de familiegraaf (koppeling met bevestiging aan beide kanten, kind deelt per stuk -- zie par. 2.8) en de levenspas met delen per ontvanger en een vervaldatum | er |
 | 3 | de mentor over de levenslijn (par. 1.4) en de gemeenschapsmotor | -- |
 | 4 | de talentenkaart (par. 2.3), de simulator en de tweeling (par. 2.7) | -- |
 | 5 | het levensarchief, de dromenlade (par. 2.5), de nalatenschap in brede zin | -- |
@@ -215,3 +215,18 @@ scherm maakt er vanzelf een score van.
 
 Elke fase levert werkende, getoetste software op, en geen fase begint voor de
 vorige zijn toetsen heeft (LAT.md).
+
+**Waar fase 1 en 2 staan.** De levenslijn in `server/kern/levenslijn/` met het
+command center op `/apps/leven.html`; de rechten per relatie in
+`server/kern/levensband/` met de levenspas eronder op hetzelfde scherm
+(`public/apps/leven/kring.js`). De routes staan in `server/routes/leven.js`
+(alleen lezen) en `server/routes/levenband.js` (de enige schrijvende laag van
+deze wereld -- wat hij schrijft is geen leven maar toestemming), elke actie
+twee keer: een keer achter de ledendeur en een keer achter de gezinsdeur, want
+fase 2 knoopt precies die twee sessiewerelden aan elkaar.
+
+Getoetst in `test/levensband.test.js` (de twee besluiten in de kern, met een
+injecteerbare klok voor de vervaldatums) en `test/levenbandroutes.test.js` (de
+twee werelden die elkaar echt bereiken, en het lek dat alleen daar kan
+ontstaan: een rauwe sessiesleutel of rtf-handle op het scherm). Beide met
+mutaties gezien zakken; welke, staat in de bestanden.

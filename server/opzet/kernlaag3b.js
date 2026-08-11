@@ -70,4 +70,14 @@ Object.assign(kern, require('../kern/geldgraaf')({ kern, geldbeleid: kern.geldbe
    /entourage), kernlaag4 (metier) en server.js zelf (onderwijs, paspoort,
    rtf). SCHRIJFT NOOIT: deze laag opent, hij handelt niet. */
 Object.assign(kern, require('../kern/levenslijn')({ kern }));
+/* De levensbanden (kern/levensband/): rechten per relatie -- wie mag wat van
+   wie zien (LEVEN.md par. 2.8, fase 2). Staat NA de levenslijn omdat hij bij
+   dezelfde wereld hoort, maar hij hangt er niet van af: hij kent geen enkele
+   bron en beheert alleen zijn eigen opslag.
+
+   ALS ENIGE VAN DEZE DRIE SCHRIJFT HIJ WEL, en daarom krijgt hij db EN save
+   mee waar de levenslijn en de geldgraaf alleen kern krijgen. Wat hij schrijft
+   is geen levensgegeven maar een TOESTEMMING; het leven zelf blijft in de
+   domeinen die het beheren. */
+Object.assign(kern, require('../kern/levensband')({ db, save }));
 };

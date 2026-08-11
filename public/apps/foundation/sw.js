@@ -2,7 +2,7 @@
    offline openen. Pagina's en scripts zijn network-first (een update komt direct
    door), de cache is het vangnet zonder verbinding. API-verkeer en de live-stream
    gaan altijd naar het netwerk. */
-const CACHE = 'rtf-hulp-cdddb2e6';
+const CACHE = 'rtf-hulp-8568d0ba';
 const SHELL = [
   '/apps/foundation/', '/apps/foundation/index.html',
   '/apps/foundation/leren.html', '/apps/foundation/bord.html', '/apps/foundation/schrift.html',
@@ -22,6 +22,11 @@ const SHELL = [
   // de levenspas aan de gezinskant, met de gedeelde schil eronder
   '/apps/foundation/mijnbanden.html', '/shared/levenspas.js', '/shared/levenspas.css',
   '/apps/foundation/contact.html', '/apps/foundation/gezin-rt.js', '/apps/foundation/werk.html', '/apps/foundation/vrienden.html', '/apps/foundation/markt.html',
+  /* club en klas kwamen op de hub te staan toen elk scherm een klikroute
+     kreeg; zonder deze twee regels geeft de app ze offline als wit scherm.
+     test/foundationschil.js ving dat meteen -- de eerste keer dat die toets
+     iets ving, want hij draaide voorheen nooit (geen browser). */
+  '/apps/foundation/club.html', '/apps/foundation/klas.html',
   '/apps/foundation/beheer.html', '/apps/foundation/privacy.html', '/apps/foundation/sessie.js',
   /* Deze tien stonden WEL op de hub en NIET in de schil: spelen, de biebs, de
      schoolkant en het magazine. Precies de tegels waarmee een kind zich

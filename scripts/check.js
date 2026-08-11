@@ -381,6 +381,17 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
        lieten dat meteen zien. Een lijst hoort bij elkaar te blijven. */
     ['server/routes/werkplek-bureaus.js', 'de registratielijst van zes bureaus, voluit sinds regel 45; het werk staat in EEN handler erboven'],
     ['server/opzet/kernlaag4.js', 'een ophanglijst, geen module: elke regel hangt een kern op aan de vorige laag. Dezelfde reden als server.js hierboven -- er zit geen naad in, alleen volgorde, en die volgorde IS de inhoud'],
+    /* Deze twee zijn HETZELFDE SOORT BESTAND als kernlaag4.js hierboven, en ze
+       gingen erover toen kern/concern werd opgehangen (CONCERN.md). Dat is een
+       regel die erbij moest: een kern die nergens hangt, draait niet.
+
+       Ze horen in MAG en niet in NOG, want er valt niets te knippen dat het
+       beter maakt. Een ophanglijst in tweeën hakken levert twee halve lijsten
+       op waarvan de volgorde tussen de helften niet meer te lezen is -- en die
+       volgorde is precies de inhoud: kernlaag4b hangt het concern op NA de
+       onderneming, omdat het er een bestaande onderneming in aanwijst. */
+    ['server/opzet/kernlaag4b.js', 'een ophanglijst, geen module; zie kernlaag4.js hierboven -- de volgorde IS de inhoud'],
+    ['server/opzet/routes.js', 'de mountlijst van alle routers: geen naad, alleen volgorde, net als de kernlagen'],
     ['public/apps/boardroom-eigenaar.js', 'de eigenaarszetel: vier panelen op een gedeelde api/el-kern in een IIFE']
   ]);
   /* NOG TE DOEN. Deze staan net boven de grens en moeten opgeknipt worden, maar

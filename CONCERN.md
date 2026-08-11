@@ -592,23 +592,34 @@ En nooit: *"stap 43 van 78"*.
 Elke stap is los waardevol en laat het systeem werkend achter. De volgorde is
 niet vrij: elke stap leunt op de vorige.
 
-| # | Stap | Waarom hier |
-|---|---|---|
-| 0 | **Genre-toegangsstand** ✅ *gedaan* | de stille omzetting weg vóór er iets op de genrelaag wordt gebouwd |
-| 1 | **Legal Entity als eigen object** | zonder dit is al het andere een veld op `suppliers` |
-| 2 | **Establishment + de zaak als Operating Unit** | de tweede vestiging is de eerste echte toets van stap 1 |
-| 3 | **Employment als eigen begrip** | maakt "één mens, meerdere werkgevers" en de gratis werkidentiteit mogelijk |
-| 4 | **Scope op de bestaande rollen** | `bedrijf/rollen.js` heeft alles behalve reikwijdte |
-| 5 | **Uitnodigen in één scherm** | eerste zichtbare wauw; kan pas na 3 en 4 |
-| 6 | **Concern + eigendomsgraaf** | holdings, UBO over entiteiten heen |
-| 7 | **Tijdmachine op de juridische feiten** | wet 4 volledig; kan pas als er entiteiten zijn om geschiedenis van te houden |
-| 8 | **Readiness + launch blocking** | telt wat er in 1–7 is opgebouwd |
-| 9 | **Document Intelligence + Discovery** | comfortlaag; heeft alle velden uit 1–7 nodig om iets in te vullen |
-| 10 | **Impact preview, rollback, fusie/overname** | verandering op een structuur die er dan staat |
+| # | Stap | Stand | Waar |
+|---|---|---|---|
+| 0 | **Genre-toegangsstand** | ✅ | `seed/genres.js` — `genreToegang()`, vijf standen |
+| 1 | **Legal Entity als eigen object** | ✅ | `kern/concern/entiteit.js` + `entiteit-beeld.js` |
+| 2 | **Establishment + de zaak als Operating Unit** | ✅ | `kern/concern/vestiging.js` |
+| 3 | **Employment als eigen begrip** | ✅ | `kern/concern/employment.js` + `-organigram.js` |
+| 4 | **Scope op de bestaande rollen** | ✅ | `kern/concern/scope.js` + `scope-filters.js` |
+| 5 | **Uitnodigen in één scherm** | ✅ | `kern/concern/uitnodiging.js` + `-bulk.js` |
+| 6 | **Concern + eigendomsgraaf** | ✅ | `kern/concern/graaf.js` + `graaf-bevoegdheid.js` |
+| 7 | **Tijdmachine op de juridische feiten** | ✅ | `kern/concern/tijd.js` + `bron.js` |
+| 8 | **Readiness + launch blocking** | ✅ | `kern/concern/readiness.js` |
+| 9 | **Document Intelligence + Discovery** | ⬜ | nog niet gebouwd — zie hieronder |
+| 10 | **Impact preview, rollback, fusie/overname** | ✅ | `kern/concern/verandering.js` + `-eigendom.js` |
 
-Stap 9 staat bewust laat. Het is het meest indrukwekkende deel en het verleidt
-om ermee te beginnen — maar een extractie die nergens heen kan schrijven, is een
-demo.
+Bewaakt door `test/concern.test.js` (14 toetsen, 8 mutaties gedaan en zien
+zakken) en `test/concern-routes.e2e.js` (3, waarvan één die andermans entiteit
+langs veertien deuren probeert). De routes staan in `routes/concern.js`,
+`routes/concern/mensen.js` en `routes/concern/verandering.js`.
+
+**Stap 9 staat er bewust nog niet.** Het is het meest indrukwekkende deel en het
+verleidt om ermee te beginnen — maar Document Intelligence en Business Discovery
+zijn een COMFORTLAAG boven een structuur, en die structuur moest er eerst zijn.
+Nu staat zij er: de velden bestaan, de bronsoorten bestaan (`document` wacht op
+precies deze stap), en het voorstel-dan-bevestigen-patroon is elders al
+gebouwd. Wat er nog moet komen is de extractie zelf, en de grens eromheen: wat
+uit een document komt is een **voorstel** tot een mens het bevestigt, en dan pas
+een feit met bron `document`. Zonder die grens zou de AI juridische geldigheid
+verzinnen, en dat is precies wat wet 4 verbiedt.
 
 ---
 

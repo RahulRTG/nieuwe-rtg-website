@@ -4475,6 +4475,14 @@
       "gezakt": 5,
       "scherp": "gezakt"
     },
+    "wetten.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/wetten.js",
+      "operator": "===->!==#0",
+      "gezakt": 2,
+      "geprobeerd": 1
+    },
     "wiring-contract.test.js": {
       "soort": "puur",
       "staat": "overleefd",
@@ -4592,6 +4600,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 4,
       "scherp": "gezakt"
+    },
+    "zekerheid.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/zekerheid.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "zelfzorg.test.js": {
       "soort": "server",

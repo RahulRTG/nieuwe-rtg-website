@@ -434,6 +434,18 @@
       ],
       "toetsen": [],
       "sabotage": "OPEN: er is geen toets die een recht midden in een lopende sessie intrekt en het eerstvolgende verzoek meet"
+    },
+    {
+      "id": "RTG-036",
+      "wet": "Geen scherm toont meer zekerheid dan de bron bezit",
+      "waarom": "Een systeem dat zijn onbekenden verbergt, liegt over precies het deel dat je moet weten. Het zekerheidspaneel kan daarom geen kaal oordeel geven: het draagt altijd het aantal onbekenden en de woorden NIET ABSOLUUT, ook in een wereld waarin alles gemeten en alles groen is. En een meting die haar bron niet vindt geeft null, nooit nul -- een nul leest als 'niets aan de hand'.",
+      "handhaver": [
+        "scripts/zekerheid.js"
+      ],
+      "toetsen": [
+        "zekerheid.test.js"
+      ],
+      "sabotage": "laat oordeel() alleen het niveau teruggeven, of laat een ontbrekende bron 0 melden in plaats van null"
     }
   ]
 }

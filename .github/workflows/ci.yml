@@ -53,6 +53,14 @@ jobs:
         run: node scripts/wetten.js --zelftest
       - name: De systeemwetten wijzen nergens naar iets dat weg is
         run: node scripts/wetten.js --controle
+      # HET ZEKERHEIDSPANEEL. Dit is geen extra poort maar een AFDRUK: hij zet in
+      # de log wat we weten en -- belangrijker -- wat we niet weten. Zeven regels
+      # staan er op ONTBREEKT omdat ze bewijs van buiten vragen (pentest, red
+      # team, extern anker, herstelproef, reproduceerbare build, buitenwacht,
+      # ASVS). Hij zakt alleen als een zelfmeting GEBROKEN meldt; ontbrekend
+      # extern bewijs is een stand van zaken, geen bouwfout.
+      - name: Zekerheid -- ook wat we niet weten
+        run: node scripts/zekerheid.js
       # De hoofdsuite draait op de standaard (json) opslag; DATABASE_URL is hier
       # bewust NIET gezet, anders zouden alle testbestanden dezelfde Postgres delen.
       # test:gate draait dezelfde suite MET een dekkingsvloer (regels/branches/

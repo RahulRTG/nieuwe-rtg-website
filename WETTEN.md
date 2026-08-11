@@ -13,7 +13,7 @@ een bewering met een adres kan zakken.
 
 | stand | aantal | wat het betekent |
 |---|---|---|
-| **BEWEZEN** | 22 | handhaver bestaat, toets bestaat, en die toets is zien zakken op een mutatie |
+| **BEWEZEN** | 23 | handhaver bestaat, toets bestaat, en die toets is zien zakken op een mutatie |
 | **ONBEPROEFD** | 9 | er kijkt iemand naar, maar die kijker is nooit op de proef gesteld |
 | **OPEN** | 4 | opgeschreven zonder handhaver of zonder toets: een voornemen, geen bescherming |
 | **GEBROKEN** | 0 | wijst naar iets dat er niet meer is -- de enige alarmerende stand |
@@ -432,6 +432,18 @@ Rechten die pas bij de volgende sessie ingaan, zijn geen rechten maar een gewoon
 *Handhaver:* `server/kern/bevoegdheid/index.js`
 
 *Breek hem zo:* OPEN: er is geen toets die een recht midden in een lopende sessie intrekt en het eerstvolgende verzoek meet
+
+### RTG-036 -- Geen scherm toont meer zekerheid dan de bron bezit
+
+`BEWEZEN` · zien zakken in `zekerheid.test.js` op `===->!==#0`
+
+Een systeem dat zijn onbekenden verbergt, liegt over precies het deel dat je moet weten. Het zekerheidspaneel kan daarom geen kaal oordeel geven: het draagt altijd het aantal onbekenden en de woorden NIET ABSOLUUT, ook in een wereld waarin alles gemeten en alles groen is. En een meting die haar bron niet vindt geeft null, nooit nul -- een nul leest als 'niets aan de hand'.
+
+*Handhaver:* `scripts/zekerheid.js`
+
+*Toets:* `test/zekerheid.test.js`
+
+*Breek hem zo:* laat oordeel() alleen het niveau teruggeven, of laat een ontbrekende bron 0 melden in plaats van null
 
 ## Hoe je dit bestand bijwerkt
 

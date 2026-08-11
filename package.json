@@ -50,6 +50,7 @@
     "kaart": "node scripts/kaart.js",
     "bewijs": "node scripts/bewijs.js",
     "wetten": "node scripts/wetten.js",
+    "zekerheid": "node scripts/zekerheid.js",
     "belofte": "node scripts/belofte.js",
     "slo": "node scripts/slo.js --schrijf",
     "sonde": "node scripts/sonde.js",

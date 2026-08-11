@@ -12,7 +12,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '49fb3a74';
+var RTG_BOUW = 'bb7c4a4d';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -6737,12 +6737,24 @@ var RTG_BOUW = '49fb3a74';
           '<span class="amount">' + eur(total) + '</span>' +
           (inv.status === 'open'
             ? '<button class="btn-pay js-pay" data-inv="' + inv.id + '" data-amt="' + total + '">' + FID + T('app.pay','Betaal') + '</button>' +
+              (API.live && user.tier !== 'guest' ? '<button class="js-saldo" data-inv="' + inv.id + '" data-amt="' + total + '" style="background:none;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:0.3rem 0.75rem;font-size:0.66rem;font-family:inherit;cursor:pointer;">◉ ' + T('fin.paysaldo','Uit RTG Pay-saldo') + '</button>' : '') +
               (muntAan ? '<button class="js-munt" data-inv="' + inv.id + '" data-amt="' + total + '" style="background:none;border:1px solid var(--line);color:var(--muted);border-radius:999px;padding:0.3rem 0.75rem;font-size:0.66rem;font-family:inherit;cursor:pointer;">◈ ' + T('fin.paycoins','Met munten') + '</button>' : '')
             : '<span class="pill paid">'+T('app.paid','Betaald')+'</span>') +
           (API.live ? '<button class="js-dlinv" data-inv="' + inv.id + '" style="background:none;border:none;color:var(--soft);font-size:0.66rem;font-family:inherit;cursor:pointer;padding:0.15rem 0;">⤓ ' + T('fin.download','Download factuur') + '</button>' : '') +
         '</div>' +
       '</div>' + bizSpec(inv);
     }).join('');
+    /* Uit het eigen RTG Pay-saldo (de derde betaalweg): dezelfde bevestigde
+       betaalflow als de kaart, maar de afschrijving komt uit de wallet. */
+    document.querySelectorAll('.js-saldo').forEach(b =>
+      b.addEventListener('click', () => payWithFaceId(eur(Number(b.dataset.amt)), async () => {
+        const r = await API.call('/pay/saldo', { invoiceId: b.dataset.inv });
+        applyState((await API.call('/state')).state);
+        return r;
+      }, {
+        message: r => T('fin.saldobetaald','Betaald uit uw RTG Pay-saldo') + (r && r.bijgeladen ? ' (' + eur(r.bijgeladen / 100) + ' ' + T('fin.bijgeladen','automatisch bijgeladen') + ')' : '') + '.',
+        after: () => { renderPay(); renderHome(); renderTrip(); }
+      })));
     document.querySelectorAll('.js-munt').forEach(b =>
       b.addEventListener('click', () => openMuntSheet({
         euro: Number(b.dataset.amt), titel: T('munt.title','Betaal met munten'),

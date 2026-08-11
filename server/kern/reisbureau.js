@@ -23,8 +23,10 @@ function reisAanbod(db) {
   }));
 }
 
-function maakReisbureau({ db, save, crypto, anthropic }) {
+function maakReisbureau({ db, save, crypto, anthropic, visumtaakVan }) {
   const nu = () => new Date().toISOString();
+  // de visumtaak-laag is optioneel en laat gebonden; zonder haar loopt alles door
+  const visum = () => (visumtaakVan && visumtaakVan()) || null;
 
   const reizen = () => reisAanbod(db);
 
@@ -59,7 +61,10 @@ function maakReisbureau({ db, save, crypto, anthropic }) {
     db.data.reisAanvragen.unshift(entry);
     db.data.reisAanvragen = db.data.reisAanvragen.slice(0, 5000);
     save();
-    return { ok: true, aanvraag: entry };
+    // is de bestemming visumplichtig, dan staat de aanvraag-taak meteen klaar
+    const vt = visum();
+    const taak = vt ? vt.bijBoeking(sess.key, { ref: entry.ref, bestemming: trip.dest, vertrek }).taak : null;
+    return { ok: true, aanvraag: entry, visumtaak: taak };
   }
 
   function mijn(key) {
@@ -73,6 +78,10 @@ function maakReisbureau({ db, save, crypto, anthropic }) {
     if (a.status !== 'aangevraagd') return { status: 409, error: 'Deze aanvraag is al ' + a.status + '.' };
     a.status = 'geannuleerd';
     save();
+    // de visumtaak van deze reis gaat mee weg; een taak voor een reis die
+    // niet doorgaat is ruis in de agenda
+    const vt = visum();
+    if (vt) vt.bijAnnulering(key, a.ref);
     return { ok: true, aanvraag: a };
   }
 

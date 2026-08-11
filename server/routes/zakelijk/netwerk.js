@@ -65,10 +65,10 @@ module.exports = (zctx) => {
   /* professioneel verbinden: hetzelfde vriendschapsverzoek als in de Salon, dus
      na acceptatie werken DM en bellen meteen. Accepteren gaat via de bestaande
      Contacten (/api/member/connect/respond). */
-  app.post('/api/zakelijk/connect', auth, pro, (req, res) => {
+  app.post('/api/zakelijk/connect', auth, pro, async (req, res) => {
     const doel = Z().profielen[String(req.body.key || '')];
     if (!doel || doel.zichtbaar === false) return res.status(404).json({ error: 'Dit profiel staat niet (meer) in de gids.' });
-    const r = socialVerbind(req.session.key, doel.key);
+    const r = await socialVerbind(req.session.key, doel.key);
     if (r.error) return res.status(r.status).json({ error: r.error });
     res.json({ ok: true, status: r.st });
   });

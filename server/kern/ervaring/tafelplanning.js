@@ -4,7 +4,7 @@
    tafel; de tafelstatussen lopen automatisch mee. Draait op dezelfde context als
    kern/ervaring/tafels.js, plus de gedeelde rijpMaak-sweep. */
 module.exports = (ctx, { rijpMaak }) => {
-  const { db, save, notify, sseToCustomer, sseToSupplier, id, nu, vandaag } = ctx;
+  const { db, save, notify, sseToCustomer, sseToSupplier, id, nu, vandaag, tafeldekVan } = ctx;
 
   const tafelVan = (s, naam) => (s.tables || []).find(t => t.name === String(naam || ''));
 
@@ -45,12 +45,17 @@ module.exports = (ctx, { rijpMaak }) => {
     // vandaag toegewezen = de tafel staat gereserveerd (tenzij er al iemand zit)
     if (r.datum === vandaag() && t.status === 'vrij') t.status = 'gereserveerd';
     save();
+    /* De gedekte tafel (kern/tafeldek.js, laat gebonden en optioneel): het
+       zorgprofiel dat de gast deelt staat nu als stoel 1 op de tafellijst,
+       met een live toestemmingscontrole -- wie het delen introk, staat nergens. */
+    const td = tafeldekVan && tafeldekVan();
+    const dek = td ? td.dekUitReservering(supplier.code, r) : null;
     if (r.customerKey) {
       notify(r.customerKey, { icon: 'table', title: supplier.name, body: 'Uw tafel op ' + r.datum + ' om ' + r.tijd + ': ' + t.name + '.', scope: 'orders' });
       sseToCustomer(r.customerKey, 'sync', { scope: 'reserveringen' });
     }
     sseToSupplier(supplier.code, 'sync', { scope: 'reserveringen' });
-    return { ok: true, reservering: r };
+    return { ok: true, reservering: r, gedekt: !!(dek && dek.gedekt) };
   }
 
   function reserveringKomst(supplier, rid, actie) {

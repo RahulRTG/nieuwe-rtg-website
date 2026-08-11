@@ -26,8 +26,16 @@ const MAX = 20000; // ring: zoveel sleutels houden we vast
 
 /* `naam` is de sleutel in de database, bijv. 'payIdem' of 'bankIdem'; de
    afdrukken staan naast in '<naam>Afdruk'. `d` geeft het datablok, `save`
-   schrijft het weg -- zo blijft deze module vrij van kennis over de opslag. */
-module.exports = function maakIdem({ d, save, naam }) {
+   schrijft het weg -- zo blijft deze module vrij van kennis over de opslag.
+
+   `bijeen` (optioneel, db.bijeen): bundelt de saves van het werk en van de
+   idem-registratie tot EEN commit. Zonder die bundel staat er in de
+   sqlite-stand tussen de geld-flush (in het werk) en de idem-flush (hier) een
+   toestand op schijf waarin de boeking bestaat en de sleutel niet -- en een
+   kill -9 precies daar plus de retry waar idem-sleutels voor bestaan, boekt
+   dubbel. Zo gevonden, met een echte dubbele boeking van 137 centen. Geef
+   bijeen alleen mee als het werk geen echte I/O afwacht (zie db/index.js). */
+module.exports = function maakIdem({ d, save, naam, bijeen }) {
   function store() {
     if (!d()[naam] || typeof d()[naam] !== 'object') d()[naam] = { _keys: [] };
     if (!Array.isArray(d()[naam]._keys)) d()[naam]._keys = [];
@@ -75,20 +83,26 @@ module.exports = function maakIdem({ d, save, naam }) {
     let klaar;
     inVlucht.set(sleutel, { afdruk: afdruk || '', belofte: new Promise(res => { klaar = res; }) });
     let r = null, fout = null;
-    try { r = await werk(); }
-    catch (e) { fout = e; }
-    /* Vastleggen en pas daarna de vlucht sluiten. Er staat geen await tussen, dus
-       een derde verzoek ziet altijd of de bewaarde sleutel of de vlucht -- nooit
-       het gat ertussen. */
-    if (!fout && r && r.ok) {
-      s._keys.push(sleutel);
-      if (s._keys.length > MAX) {
-        for (const weg of s._keys.splice(0, s._keys.length - MAX)) { delete s[weg]; delete a[weg]; }
+    /* Het werk en de vastlegging van de sleutel horen als EEN geheel op schijf
+       te landen (zie de kop): met bijeen flusht de save() hieronder ook de
+       saves die het werk zelf deed, in een commit. */
+    const doeWerkEnLegVast = async () => {
+      try { r = await werk(); }
+      catch (e) { fout = e; }
+      /* Vastleggen en pas daarna de vlucht sluiten. Er staat geen await tussen, dus
+         een derde verzoek ziet altijd of de bewaarde sleutel of de vlucht -- nooit
+         het gat ertussen. */
+      if (!fout && r && r.ok) {
+        s._keys.push(sleutel);
+        if (s._keys.length > MAX) {
+          for (const weg of s._keys.splice(0, s._keys.length - MAX)) { delete s[weg]; delete a[weg]; }
+        }
+        s[sleutel] = r;
+        if (afdruk) a[sleutel] = afdruk;
+        save();
       }
-      s[sleutel] = r;
-      if (afdruk) a[sleutel] = afdruk;
-      save();
-    }
+    };
+    if (bijeen) await bijeen(doeWerkEnLegVast); else await doeWerkEnLegVast();
     inVlucht.delete(sleutel);
     klaar(fout ? { status: 500, error: 'De vorige poging met deze sleutel mislukte.' } : r);
     if (fout) throw fout;

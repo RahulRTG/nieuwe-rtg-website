@@ -41,6 +41,20 @@ function ledenGidsHaal(key) {
   laadLid(key);
   return null;
 }
+/* Wachtend opzoeken, voor waar "niet gevonden" een BESLUIT draagt (404,
+   weigering). De synchrone lezing geeft bij een koude misser null terwijl de
+   rij bestaat, en de cache wordt boven de honderdduizend in een keer geleegd
+   -- onder last is elke sleutel zomaar even koud. Zo kreeg een NET gevonden
+   codenaam bij het verbinden "kennen we niet" (beproeving, 1M leden). Een
+   cache-grens is geen feit: deze variant vraagt het bij twijfel echt aan
+   Postgres, via dezelfde lader. */
+async function ledenGidsHaalWacht(key) {
+  if (!ledenPool) return undefined;
+  const vlot = ledenCache.get(key);
+  if (vlot) return vlot;              // een gevulde cache-regel is betrouwbaar
+  await laadLid(key);                 // null of afwezig: nu echt even vragen
+  return ledenCache.get(key) || null;
+}
 function ledenGidsAantal() {
   if (ledenPool && Date.now() - ledenNAt > 10000) { ledenNAt = Date.now(); ververLedenN().catch(() => {}); }
   return ledenN;
@@ -178,6 +192,6 @@ async function init(pool, warn) {
 }
 
 module.exports = {
-  init, ledenGidsActief, ledenGidsHaal, ledenGidsAantal,
+  init, ledenGidsActief, ledenGidsHaal, ledenGidsHaalWacht, ledenGidsAantal,
   ledenGidsZet, ledenGidsWeg, ledenGidsExact, ledenGidsZoek
 };

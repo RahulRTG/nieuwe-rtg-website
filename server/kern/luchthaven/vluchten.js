@@ -4,8 +4,10 @@
    reizen). Krijgt de gedeelde ctx van ./index.js. */
 module.exports = (ctx) => {
   const { save, crypto, nu, id, schoon, vandaag, L, seed, vluchten, vind, actief, keten, catVan,
-    plekkenVoor, draaiTakenVoor, draaiRond, vipVan, vipRond, publiek, _vluchtMaak,
+    plekkenVoor, draaiTakenVoor, draaiRond, vipVan, vipRond, publiek, _vluchtMaak, visumtaakVan,
     GATES, BANEN, BANDEN, CATEGORIEEN } = ctx;
+  // de visumtaak-laag is optioneel en laat gebonden; zonder haar loopt alles door
+  const visum = () => (visumtaakVan && visumtaakVan()) || null;
 
   /* ---------- vluchtleiding: het bord, gates en vertragingen ---------- */
   function vluchtMaak(actor, data) {
@@ -26,6 +28,9 @@ module.exports = (ctx) => {
     if (status === 'geannuleerd') {
       if (!actief(v)) return { status: 409, error: 'Deze vlucht is al ' + v.status + '.' };
       v.status = 'geannuleerd'; save();
+      // de visumtaken van de geboekte passagiers gaan mee van tafel
+      const vt = visum();
+      if (vt) for (const b of L().boekingen) if (b.vluchtId === v.id && b.status !== 'geannuleerd') vt.bijAnnulering(b.key, b.code);
       return { ok: true, vlucht: publiek(v) };
     }
     const k = keten(v);
@@ -91,7 +96,11 @@ module.exports = (ctx) => {
     L().boekingen.unshift(b);
     L().boekingen = L().boekingen.slice(0, 50000);
     save();
-    return { ok: true, boeking: { code: b.code, vlucht: publiek(v), status: b.status } };
+    // vraagt de bestemming vooraf een visum of reistoestemming, dan staat de
+    // taak nu in de persoonlijke agenda (kern/visumtaak.js)
+    const vt = visum();
+    const taak = vt ? vt.bijBoeking(sess.key, { ref: b.code, bestemming: v.bestemming, vertrek: v.datum }).taak : null;
+    return { ok: true, boeking: { code: b.code, vlucht: publiek(v), status: b.status }, visumtaak: taak };
   }
   function incheck(sess, code, data) {
     data = data || {};

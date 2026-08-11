@@ -26,7 +26,7 @@
    de orkestrator: het grootboek, de idempotentie en het opladen wonen hier;
    de Klompjes/tik/p2p in ./verzoeken, de kassa en de partnerkant in ./kassa. */
 
-module.exports = ({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon, betaaldienstKosten, betaalOpdrachten }) => {
+module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon, betaaldienstKosten, betaalOpdrachten }) => {
   const nu = () => Date.now();
   const d = () => db.data;
 
@@ -63,7 +63,10 @@ module.exports = ({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, sch
      (dubbeltik, haperend netwerk, retry) geeft exact hetzelfde antwoord en boekt
      nooit dubbel -- en dezelfde sleutel met een ANDER verzoek geeft een 409 in
      plaats van stil het oude antwoord. Zie ../../lib/idem.js. */
-  const metIdem = require('../../lib/idem')({ d, save, naam: 'payIdem' });
+  /* Met de save-bundel (db.bijeen) landen de boeking en de idem-sleutel als
+     EEN commit; de bundel is context-gebonden, dus ook met echte I/O in het
+     werk (motor, kaart-naad) raakt hij geen saves van andere verzoeken. */
+  const metIdem = require('../../lib/idem')({ d, save, naam: 'payIdem', bijeen });
 
   /* ---------- het grootboek zelf ----------
      `pasToe` past een AL-goedgekeurde boeking toe op de saldi + het grootboek

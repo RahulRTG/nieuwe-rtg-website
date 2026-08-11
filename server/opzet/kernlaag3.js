@@ -35,12 +35,13 @@
 'use strict';
 
 module.exports = (kern, hulp) => {
-  const { DATA_DIR, anthropic, betaal, betaalOpdrachten, boekingenVanZaak, boekingenVoegToe, crypto, db, etaMinutes, findSupplier, haversine, keyVanCodenaam, liveCodename, notify, notifySupplier, save, schoon, sseToCustomer, sseToSupplier } = hulp;
+  const { DATA_DIR, anthropic, betaal, betaalOpdrachten, bijeen, boekingenVanZaak, boekingenVoegToe, crypto, db, etaMinutes, findSupplier, haversine, keyVanCodenaam, liveCodename, notify, notifySupplier, save, schoon, sseToCustomer, sseToSupplier } = hulp;
 
 /* RTG Airport (kern/luchthaven.js): de gehele luchthavenoperatie ·
    vluchtleiding, passagiersketen (boeken/inchecken op codenaam), de draai op
    het platform, de toren (baanklaring), de bagagekelder en security. */
-Object.assign(kern, require('../kern/luchthaven').maakLuchthaven({ db, save, crypto, anthropic }));
+Object.assign(kern, require('../kern/luchthaven').maakLuchthaven({ db, save, crypto, anthropic,
+  visumtaakVan: () => kern.visumtaak }));
 kern.lucht.seed();
 /* De Brigade RTG Airport (kern/marechaussee.js): de Koninklijke Marechaussee
    op het veld · grensbalie (passagierslijst op codenaam), patrouilles,
@@ -114,7 +115,7 @@ Object.assign(kern, require('../kern/vakwerk').maakVakwerk({ db, save, anthropic
   crypto, notify, notifySupplier, sseToCustomer, sseToSupplier, boekingenVoegToe }));
 /* RTG Pay (kern/pay.js): de interne betaallaag met wallet, grootboek,
    tikkies, kassacode en automatisch bijladen via de betaal-naad. */
-Object.assign(kern, require('../kern/pay')({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon, betaalOpdrachten,
+Object.assign(kern, require('../kern/pay')({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon, betaalOpdrachten,
   // de geld-regie bepaalt het tarief; als thunk zodat de mount-volgorde niet uitmaakt
   betaaldienstKosten: c => (kern.betaaldienstKosten ? kern.betaaldienstKosten(c) : 0) }));
 /* Het keukenbrein (kern/keuken.js): recepten per gerecht, automatische

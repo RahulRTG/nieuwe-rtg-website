@@ -17,7 +17,7 @@
 /* `bankregie` wordt hier verklaard en tot onderaan dit deel gebruikt; daarom
    loopt de grens met deel 4a ervoor en niet erin. */
 module.exports = (kern, hulp) => {
-  const { FISCAAL_PEILJAAR, LANDEN, accounts, anthropic, betaal, betaalOpdrachten, centen, crypto, db, findSupplier, fonds, keyVanCodenaam, log, magAi, ondernemerpoort, save, schoon, sseToCustomer, sseToOffice, sseToSupplier } = hulp;
+  const { FISCAAL_PEILJAAR, LANDEN, accounts, anthropic, betaal, betaalOpdrachten, bijeen, centen, crypto, db, findSupplier, fonds, keyVanCodenaam, log, magAi, ondernemerpoort, save, schoon, sseToCustomer, sseToOffice, sseToSupplier } = hulp;
 
 /* Bankregie (kern/bankregie.js): de geldinfrastructuur-knop van de boardroom --
    een schakelaar met DRIE standen (partner -> hybride -> eigen) die bepaalt hoe
@@ -40,7 +40,7 @@ kern.bevoegd = bevoegd;
    dezelfde dubbele-boekhoud-tucht -- rekeningen met een echt IBAN, storten (langs
    de 3-standen knop), overboeken, de brug van/naar de wallet, uitgaande SEPA achter
    de betaal-naad, en sparen met rente. Klaar om met een knop de eigen bank te worden. */
-Object.assign(kern, require('../kern/bank')({ db, save, crypto, schoon, betaal, pay: kern.pay, bankregie, keyVanCodenaam, accounts, sseToCustomer, sseToOffice, anthropic, betaalOpdrachten }));
+Object.assign(kern, require('../kern/bank')({ db, save, bijeen, crypto, schoon, betaal, pay: kern.pay, bankregie, keyVanCodenaam, accounts, sseToCustomer, sseToOffice, anthropic, betaalOpdrachten }));
 /* De Reiswijzer (kern/reis.js): alle reisregels van elk land -- visum,
    rijrichting, alarmnummer, water, fooi, let-op -- in place op de gedeelde
    LANDEN-tabel gezet, VOOR de Regelwacht zodat de overlay er bovenop komt. */
@@ -50,17 +50,6 @@ Object.assign(kern, require('../kern/reis')({ LANDEN }));
    daarna geven de Mall, de vakwerk-agenda en de Food Court gegarandeerd
    HETZELFDE antwoord op "hoe laat is het bij deze zaak". */
 require('../kern/tijdzone').zetLandVind(kern.landVind);
-/* De Regelwacht (kern/fiscaal/regelwacht.js): belastingen en regels worden
-   automatisch bijgewerkt -- een gevalideerde overlay op de gedeelde
-   LANDEN-tabel, herstart-vast, met een dagelijkse bron-check. */
-Object.assign(kern, require('../kern/fiscaal/regelwacht')({ db, save, LANDEN, peiljaar: FISCAAL_PEILJAAR }));
-kern.regelwacht.herstelOverlay();
-/* De btw-aangifte van een zaak (kern/fiscaal/btwaangifte.js): opmaken uit het
-   factuurregister, controleren, indienen vastleggen en corrigeren -- naar het
-   model van de loonaangifte, met het factuurregister als enige bron. */
-Object.assign(kern, require('../kern/fiscaal/btwaangifte').maakBtwAangifte({ db, save, crypto }));
-const regelTimer = setInterval(() => { kern.regelwacht.check().catch(() => {}); }, Number(process.env.FISCAAL_CHECK_MS || 86400000));
-if (regelTimer.unref) regelTimer.unref();
 /* RTG Thuis (kern/thuis): thuisverhuur van lid aan lid -- ons antwoord op
    Airbnb, met alle premium functies gratis en de Reiswijzer aan boord. De
    commerciele tak (kern/thuis/zakelijk) draait op dezelfde landtabel als de
@@ -75,6 +64,13 @@ Object.assign(kern, require('../kern/thuis')({ db, save, crypto, schoon, reiswij
 Object.assign(kern, require('../kern/koppel')({ db, save, crypto, schoon, dyncode: kern.dyncode, sseToSupplier }));
 Object.assign(kern, require('../kern/tafelwensen')({ db, save, crypto, schoon }));
 Object.assign(kern, require('../kern/checklijst')({ db, save, crypto, schoon }));
+/* De visumtaak (kern/visumtaak.js) en de gedekte tafel (kern/tafeldek.js):
+   dwarsverbindingen op wat hierboven al staat (reiswijzer, tafelwensen, de
+   agenda en het zorgprofiel). De domeinen kennen deze lagen niet: luchthaven,
+   reisbureau en de tafelplanning roepen de laat gebonden, optionele haken
+   visumtaakVan/tafeldekVan aan, die vanaf hier iets teruggeven. */
+Object.assign(kern, require('../kern/visumtaak').maakVisumtaak({ agenda: kern.agenda, reiswijzer: kern.reiswijzer }));
+Object.assign(kern, require('../kern/tafeldek').maakTafeldek({ tafelwensen: kern.tafelwensen, zorgVoor: kern.zorgVoor }));
 /* De werkvormen (kern/werkvormen.js): elke zaak krijgt automatisch elke
    gereedschapskist die bij haar past -- een zzp'er die ritten rijdt heeft
    de vervoerstools EN de zzp-tools. De afleiding zelf hangt al aan db

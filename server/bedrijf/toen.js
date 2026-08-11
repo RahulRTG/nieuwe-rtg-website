@@ -14,22 +14,33 @@
    er op 12 maart" en "hoeveel projecten liepen er toen" zijn daarmee eerlijk te
    beantwoorden.
 
-   EN SINDS ./verloop.js DOET HIJ OOK DE TOESTAND. Hier stond jarenlang dat dat
-   NIET kon, met de goede reden erbij: een wijziging overschrijft de vorige
-   waarde en er lag geen gebeurtenislaag onder de schrijfhandelingen. Die laag
-   ligt er nu, en dit bestand is de eerste die hem gebruikt.
+   SINDS DE GEBEURTENISLAAG STELT HIJ DRIE VRAGEN. Hier stond jarenlang dat de
+   TOESTAND van toen niet kon, met de goede reden erbij: een wijziging
+   overschrijft de vorige waarde en er lag geen gebeurtenislaag onder de
+   schrijfhandelingen. Die laag ligt er (./gebeurtenis.js), en dit bestand is
+   waar zij aan gebruikers wordt uitgelegd:
 
-   DE GRENS IS VERSCHOVEN, NIET WEGGEHAALD. De reconstructie loopt van NU terug:
-   neem de huidige waarde en draai elke wijziging terug die na de gevraagde dag
-   is gebeurd. Dat werkt alleen zover het log reikt, en het log heeft twee
-   gaten die allebei worden GETELD in plaats van gladgestreken:
+     /api/bedrijf/toen           BESTOND HET?          uit `at`, een gemeten feit
+     /api/bedrijf/toen/object    WAT WAS DE TOESTAND?  de huidige waarde, met
+                                 elke gebeurtenis van na die dag teruggedraaid
+     /api/bedrijf/pad            HOE IS HET DAAR       het wijzigingspad, met
+                                 GEKOMEN?              actor en reden
 
-     - wijzigingen van VOOR de gebeurtenislaag bestaan niet en zijn niet te
-       reconstrueren. Een object dat sindsdien niet is aangeraakt, toont dus
-       zijn huidige waarde -- en dat is meestal juist, maar niet bewijsbaar.
-     - wijzigingen die BUITEN verloopZet() om gingen worden door het vangnet
-       opgemerkt maar dragen geen tijdstip. Elk antwoord dat eroverheen kijkt,
-       zegt erbij dat het onzeker is.
+   Die derde is waar het om begonnen is. "Status vertraagd" is een feit; "op 12
+   februari op vertraagd gezet door Lisa, omdat leverancier X drie dagen
+   vertraging meldde" is een geschiedenis.
+
+   DE GRENS IS VERSCHOVEN, NIET WEGGEHAALD. De reconstructie loopt van NU terug,
+   en het log heeft twee gaten die allebei worden GETELD in plaats van
+   gladgestreken:
+
+     - wijzigingen van VOOR de gebeurtenislaag bestaan niet. Een object dat
+       sindsdien niet is aangeraakt toont zijn huidige waarde -- meestal juist,
+       niet bewijsbaar.
+     - wijzigingen die BUITEN werkMutatie() om gingen worden door het vangnet
+       opgemerkt maar dragen geen tijdstip. Op de vier omgezette families geldt
+       dat als een DEFECT (/api/bedrijf/gebeurtenis/defecten), want daar is een
+       wijziging zonder geschiedenis een fout.
 
    Wie een toestand krijgt met `zeker: false` heeft geen fout gevonden maar een
    eerlijke marge gelezen.
@@ -46,7 +57,7 @@
 'use strict';
 
 const { maakWerkRegister } = require('../kern/werkcommand/register');
-const { verloopMeet, verloopStandOp } = require('./verloop');
+const { meetOngemeten, toestandOp, pad } = require('./gebeurtenis-lezen');
 
 module.exports = (sctx) => {
   const { app, db, schoon, werkPoort } = sctx;
@@ -104,18 +115,18 @@ module.exports = (sctx) => {
        verschil zou verklappen welke soorten er zijn. */
     if (!so) return res.status(404).json({ error: 'Dit object bestaat niet.' });
 
-    verloopMeet(g.w, register.SOORTEN);
+    meetOngemeten(g.w, register.SOORTEN);
     const rij = register.rijen(db, so).find(r => String(r[so.sleutel || 'id']) === id);
     if (!rij) return res.status(404).json({ error: 'Dit object bestaat niet.' });
 
-    const uit = verloopStandOp(g.w, so, rij, datum);
+    const uit = toestandOp(g.w, so, rij, datum);
     if (!uit.bestond) {
       return res.json({ ok: true, datum, type, id, bestond: false,
         let: 'Dit object bestond op ' + datum + ' nog niet; het is aangemaakt op ' + String(rij.at).slice(0, 10) + '.' });
     }
     res.json({ ok: true, datum, type, id, bestond: true,
       titel: so.titel ? so.titel(rij) : id,
-      toestand: uit.stand, nu: Object.fromEntries(Object.keys(uit.stand).map(v => [v, rij[v] == null ? null : rij[v]])),
+      toestand: uit.toestand, nu: Object.fromEntries(Object.keys(uit.toestand).map(v => [v, rij[v] == null ? null : rij[v]])),
       zeker: uit.zeker, onzeker: uit.onzeker, let: uit.let });
   });
 
@@ -124,7 +135,7 @@ module.exports = (sctx) => {
   app.post('/api/bedrijf/verloop', (req, res) => {
     const g = werkPoort(req, res); if (!g) return;
     const register = maakWerkRegister(g.w.code, g.rechten);
-    verloopMeet(g.w, register.SOORTEN);
+    meetOngemeten(g.w, register.SOORTEN);
     const zichtbaar = new Set(register.SOORTEN.map(s => s.type));
     const type = schoon(req.body.type, 40), id = schoon(req.body.id, 80);
     const regels = (g.w.verloop || [])

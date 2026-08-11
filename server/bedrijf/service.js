@@ -19,10 +19,12 @@
    er geen cijfer. Een gemiddelde uit twee antwoorden is geen gemiddelde. */
 'use strict';
 
-/* Statusovergangen lopen via de gebeurtenislaag, zodat de toestand van toen
-   te reconstrueren is (./verloop.js). Zonder deze weg merkt het vangnet de
-   wijziging alsnog op, maar dan zonder tijdstip en zonder naam. */
-const { verloopZet } = require('./verloop');
+/* Elke toestandswijziging loopt via DE ENE DEUR van de gebeurtenislaag
+   (./gebeurtenis.js): het veld wordt gezet EN de gebeurtenis vastgelegd, met
+   actor, bron en waar nodig een reden. Buitenom schrijven merkt het vangnet
+   alsnog op, maar dan zonder tijdstip -- en op deze vier families geldt dat als
+   een defect. Zie de kop van ./gebeurtenis-lezen.js. */
+const { werkVeld } = require('./gebeurtenis');
 
 const PRIO = {
   kritiek: { reactieMin: 15, oplosMin: 240 },
@@ -97,7 +99,7 @@ module.exports = (sctx) => {
     if (t.status === 'gesloten') return res.status(409).json({ error: 'Dit ticket is al gesloten.' });
     const oplossing = schoon(req.body.oplossing, 1000);
     if (!oplossing) return res.status(400).json({ error: 'Noteer hoe het is opgelost. Een ticket dat dichtgaat met een leeg veld leert niemand iets.' });
-    verloopZet(g.w, 'ticket', t, 'status', 'gesloten', g.l.naam);
+    werkVeld(g.w, 'ticket', t, { status: 'gesloten' }, { actor: g.l.naam, reden: oplossing, bron: 'werk/service' });
     t.oplossing = oplossing; t.geslotenAt = nu(); t.geslotenDoor = g.l.naam;
     log(g.w, g.l, 'ticket-gesloten', t.id, t.onderwerp);
     save();

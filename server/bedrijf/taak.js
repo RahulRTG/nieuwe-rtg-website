@@ -17,10 +17,12 @@
    kost meer dan het bespaart. */
 'use strict';
 
-/* Statusovergangen lopen via de gebeurtenislaag, zodat de toestand van toen
-   te reconstrueren is (./verloop.js). Zonder deze weg merkt het vangnet de
-   wijziging alsnog op, maar dan zonder tijdstip en zonder naam. */
-const { verloopZet } = require('./verloop');
+/* Elke toestandswijziging loopt via DE ENE DEUR van de gebeurtenislaag
+   (./gebeurtenis.js): het veld wordt gezet EN de gebeurtenis vastgelegd, met
+   actor, bron en waar nodig een reden. Buitenom schrijven merkt het vangnet
+   alsnog op, maar dan zonder tijdstip -- en op deze vier families geldt dat als
+   een defect. Zie de kop van ./gebeurtenis-lezen.js. */
+const { werkVeld } = require('./gebeurtenis');
 
 module.exports = (sctx) => {
   const { app, save, schoon, nu, rid, dag, werkPoort, eigenVeld, KOLOMMEN, PRIORITEITEN, voortgang, PROJECTEN: P, TAKEN: T } = sctx;
@@ -86,7 +88,7 @@ module.exports = (sctx) => {
       if (kinderen.length) return res.status(409).json({
         error: 'Er staan nog ' + kinderen.length + ' subtaak/subtaken open onder deze taak.' });
     }
-    verloopZet(g.w, 'taak', t, 'kolom', kolom, g.l.naam);
+    werkVeld(g.w, 'taak', t, { kolom }, { actor: g.l.naam, bron: 'werk/taak' });
     if (kolom === 'klaar') { t.klaarAt = nu(); t.klaarDoor = g.l.naam; } else { t.klaarAt = null; }
     save();
     res.json({ ok: true, taak: { id: t.id, titel: t.titel, kolom: t.kolom, klaarAt: t.klaarAt || null } });

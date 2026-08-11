@@ -22,6 +22,8 @@
    Een tijdelijk recht dat je zelf moet intrekken, is een permanent recht. */
 'use strict';
 
+const { werkVeld } = require('./gebeurtenis');
+
 /* De inzage die een reden vraagt. Bewust een korte, expliciete lijst. */
 const REDEN_NODIG = ['mens.gevoelig', 'klant.prijs', 'it.beveiliging', 'journaal'];
 
@@ -138,7 +140,11 @@ module.exports = (sctx) => {
       if (eind && eind < dag()) log(w, null, 'rol-beeindigd', l.id, id + ' per ' + eind);
       nieuw.push({ id, van: start, tot: eind, at: nu() });
     }
-    l.rollen = nieuw;
+    // Een toegangswijziging gaat door de gebeurtenislaag: wie, wanneer, en de
+    // reden als de aanroeper er een geeft. Zie ./gebeurtenis.js.
+    const gm = werkVeld(w, 'lid', l, { rollen: nieuw },
+      { actor: (req.body && req.body.door) || 'beheer', reden: schoon(req.body.reden, 500), bron: 'werk/rollen' });
+    if (!gm.ok) return res.status(gm.status).json(gm);
     log(w, null, 'rollen-gezet', l.id, l.rollen.map(r => r.id + (r.tot ? ' tot ' + r.tot : '')).join(', '));
     save();
     res.json({ ok: true, lid: { id: l.id, naam: l.naam, rollen: l.rollen, rechten: rechtenVan(l) },

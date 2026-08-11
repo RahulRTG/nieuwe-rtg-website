@@ -23,10 +23,12 @@
       onmogelijk. */
 'use strict';
 
-/* Statusovergangen lopen via de gebeurtenislaag, zodat de toestand van toen
-   te reconstrueren is (./verloop.js). Zonder deze weg merkt het vangnet de
-   wijziging alsnog op, maar dan zonder tijdstip en zonder naam. */
-const { verloopZet } = require('./verloop');
+/* Elke toestandswijziging loopt via DE ENE DEUR van de gebeurtenislaag
+   (./gebeurtenis.js): het veld wordt gezet EN de gebeurtenis vastgelegd, met
+   actor, bron en waar nodig een reden. Buitenom schrijven merkt het vangnet
+   alsnog op, maar dan zonder tijdstip -- en op deze vier families geldt dat als
+   een defect. Zie de kop van ./gebeurtenis-lezen.js. */
+const { werkVeld } = require('./gebeurtenis');
 
 const OMGEVINGEN = ['ontwikkel', 'test', 'acceptatie', 'productie'];
 const SOORTEN = ['bug', 'wens', 'schuld', 'beveiliging'];
@@ -96,7 +98,7 @@ module.exports = (sctx) => {
       return res.status(400).json({ error: 'Kies open, bezig, opgelost of vervalt.' });
     if (status === 'vervalt' && !schoon(req.body.reden, 200))
       return res.status(400).json({ error: 'Waarom vervalt dit issue? Zonder reden verdwijnt een gemeld probleem stilletjes.' });
-    verloopZet(g.w, 'issue', i, 'status', status, g.l.naam);
+    werkVeld(g.w, 'issue', i, { status }, { actor: g.l.naam, bron: 'werk/bouw' });
     i.reden = schoon(req.body.reden, 200) || i.reden || null;
     if (status === 'opgelost') { i.opgelostAt = nu(); i.opgelostDoor = g.l.naam; }
     save();

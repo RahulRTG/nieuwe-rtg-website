@@ -30,7 +30,7 @@ module.exports = (ctx) => {
     if (t === 'keuze' && modus === 'teams' && grootte === SPEL[soort].max) return 'teams';
     return 'vrij';
   }
-  async function spelNieuw(mij, { soort, grootte, modus, vrienden, codenamen, klasgenoten, taal, wereld, tempo, context, bron }) {
+  async function spelNieuw(mij, { soort, grootte, modus, vrienden, codenamen, klasgenoten, taal, wereld, tempo, context, bron, variant }) {
     opschonen();
     /* Alle toetredingsvragen in een keer, in volgorde: bestaat het spel, mag
        deze app het starten, mag DEZE speler mee. Ze stonden hier los; nu staat
@@ -43,6 +43,12 @@ module.exports = (ctx) => {
     // geen spel meer, dus dat weigert de klok op basis van `vormen`
     const tf = klok ? klok.tempoFout(soort, tempo) : null;
     if (tf) return { status: 400, error: tf };
+    /* De variant, en die MAG uit het verzoek komen: hij zegt niet wie er wat
+       mag maar welk spel je speelt, en de keuzelijst staat in de descriptor.
+       Een verkeerde waarde is een 400 en geen stille terugval -- zie
+       ./variant.js. */
+    const vv = beleid.variant(soort, variant);
+    if (vv.error) return vv;
     // een potje met uitnodigingen telt als EEN uitnodiging tegen het budget,
     // ook op het vriendenpad (anders is nudge-spam naar vrienden gratis)
     if (!sociaalRate(mij, 'spel-uitnodiging', 20, 3600000)) return { status: 429, error: 'Rustig aan met uitnodigen.' };
@@ -64,7 +70,7 @@ module.exports = (ctx) => {
          wordt daar tegen een gesloten lijst gelegd, want wie zijn eigen context
          mag meesturen opent straks een 18+-spel als schoolsessie. `host` is de
          starter, en die weten we hier. */
-      beleid.roomVelden({ context, bron, host: mij, tempo }));
+      beleid.roomVelden({ context, bron, host: mij, tempo, variant: vv.variant }));
     S().potjes[potje.id] = potje;
     save();
     uitgenodigd.forEach(v => nudge(v, potje));
@@ -92,41 +98,15 @@ module.exports = (ctx) => {
     p.spelers.forEach(sp => nudge(sp, p));
     return { status: 200, ok: true, gestart: p.status === 'bezig', geannuleerd: !S().potjes[id] && p.status !== 'bezig' };
   }
-  function spelRandom(mij, soort, grootte, taal, wereld, tempo) {
-    opschonen();
-    const nee = beleid.mag(mij, soort, { wereld });
-    if (nee) return nee;
-    const tf = klok ? klok.tempoFout(soort, tempo) : null;
-    if (tf) return { status: 400, error: tf };
-    const max = spelGrootte(soort, grootte);
-    const w_taal = taal === 'en' ? 'en' : 'nl';
-    /* De wachtrij splitst per spel en groepsgrootte, en alleen bij een
-       taalgevoelig spel ook per taal (zie perTaal in de descriptor).
+  /* Wat er per spel te KIEZEN valt, voor de lobby. Uit de descriptor en niet
+     uit een lijst in de client: de schoolstof van het Quizduel is afgeleid uit
+     de leerlijnen en groeit daarmee mee, dus een kopie aan de andere kant zou
+     er stil op achterlopen -- en dan staat er een keuze in de app die de server
+     weigert, of ontbreekt er een die wel bestaat. Alleen spellen die iets te
+     kiezen hebben staan erin. */
+  const spelVarianten = () => ({ status: 200, varianten: Object.fromEntries(
+    Object.entries(SPEL).filter(([, s]) => s.varianten).map(([k, s]) => [k, s.varianten])) });
 
-       HET TEMPO SPLITST HEM OOK, en dat moet wel: wie een partij van 72 uur per
-       beurt zoekt en er een van 30 seconden krijgt, heeft geen tegenstander
-       maar een verloren partij. Een potje zonder tempo houdt de oude sleutel,
-       dus bestaande wachtrijen veranderen niet. */
-    const sleutel = soort + ':' + max + (SPEL[soort].perTaal ? ':' + w_taal : '') + (tempo ? ':' + tempo : '');
-    const w = S().wachtrij;
-    w[sleutel] = (w[sleutel] || []).filter(x => x !== mij);
-    w[sleutel].push(mij);
-    if (w[sleutel].length >= max) {
-      const spelers = w[sleutel].splice(0, max);
-      const potje = Object.assign({ id: rid(5), soort, grootte: max, modus: teamModus(soort, max), taal: w_taal,
-        teams: TEAMS, spelers, uitgenodigd: [],
-        status: 'wacht', beurt: 0, winnaar: null, at: nu(), door: 'random' },
-        // geen host: de wachtrij koppelt vreemden, dus niemand is hier gastheer
-        beleid.roomVelden({ context: 'hall', host: null, tempo }));
-      S().potjes[potje.id] = potje;
-      spelStart(potje);
-      save();
-      spelers.forEach(sp => nudge(sp, potje));
-      return { status: 200, ok: true, id: potje.id, gestart: true };
-    }
-    save();
-    return { status: 200, ok: true, wachten: true, plek: w[sleutel].length, nodig: max };
-  }
   function mijnSpellen(mij) {
     opschonen();
     const alle = Object.values(S().potjes);
@@ -164,5 +144,18 @@ module.exports = (ctx) => {
 
   // teamModus reist mee naar buiten zodat de toets hem los kan aanspreken:
   // via de API is "vier spelers, wel of geen teams" een dure opstelling
-  return { spelStart, spelGrootte, teamModus, potjeDirect, spelNieuw, spelAntwoord, spelRandom, mijnSpellen };
+  /* DE WACHTRIJ staat apart (./wachtrij.js) en op een echte naad: dit bestand
+     gaat over een potje dat je met NAAM opzet -- uitnodigen, accepteren,
+     terugkijken wat je hebt lopen -- en de wachtrij koppelt VREEMDEN. Die
+     tweede heeft een eigen onderwerp (waarop splitst een rij, en waarom) dat
+     hier alleen maar meelas. Hij krijgt wat de lobby al gebouwd heeft mee.
+
+     De aanleiding was banaal en daarom het vermelden waard: dit bestand ging
+     door de 10 kB-grens die scripts/check.js bewaakt, en die grens is precies
+     een rem op een bestand dat twee onderwerpen gaat dragen. */
+  const { spelRandom } = require('./wachtrij')({
+    S, save, rid, nu, SPEL, TEAMS, beleid, klok, nudge, opschonen, spelStart, spelGrootte, teamModus
+  });
+
+  return { spelStart, spelGrootte, teamModus, potjeDirect, spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelVarianten };
 };

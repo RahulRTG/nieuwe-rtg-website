@@ -29,6 +29,8 @@
    wie zijn eigen beleid mag meesturen, opent een 18+-spel als schoolsessie. De
    context van een potje wordt daarom gezet door de INGANG (de lobby weet of hij
    uit een chat of uit de Hall komt) en niet doorgegeven door de aanvrager. */
+const { kiesVariant } = require('./variant');
+
 module.exports = (ctx) => {
   const { wereldFout, leeftijdFout, ZICHT } = ctx;
   const spel = (soort) => (ctx.SPEL || {})[soort];
@@ -79,18 +81,30 @@ module.exports = (ctx) => {
      terug zodra de projectiekamer er is (GAMEHALL.md §9), mét een aanroeper. */
   const magBekeken = (soort) => !!(ZICHT[soort] && ZICHT[soort].kijker);
 
+  /* DE VARIANT, en hier ligt de grens anders dan bij `context`. Beleid komt
+     nooit uit het verzoek; een VARIANT juist wel -- hij zegt niet wie er wat
+     mag, maar welk spel je speelt, en dat is een keuze van de speler. Veilig is
+     hij omdat de LIJST uit de descriptor komt en niet uit het verzoek: er valt
+     alleen uit te kiezen wat het spel zelf heeft opgeschreven. Het weegwerk
+     staat in ./variant.js; deze laag zoekt alleen de goede descriptor op, zodat
+     elke ingang dezelfde vraag stelt. */
+  const variant = (soort, gevraagd) => kiesVariant((ctx.VARIANT || {})[soort], gevraagd);
+
   /* Wat een ingang aan een potje mag meegeven. Bewust een functie en geen
      object dat de aanroeper zelf vult: zo is er een plek waar staat welke
      velden er bestaan en wat hun veilige waarde is. */
-  function roomVelden({ context, bron, host, tempo }) {
+  function roomVelden({ context, bron, host, tempo, variant: v }) {
     return {
       context: contextVan(context),
       // waar dit potje vandaan komt ('gesprek:ab12'), voor de weg terug
       bron: typeof bron === 'string' && bron ? String(bron).slice(0, 120) : null,
       host: host || null,
-      tempo: tempo || null
+      tempo: tempo || null,
+      // al gewogen door `variant()` hierboven; hier staat alleen de veilige
+      // waarde voor een ingang die niets koos
+      variant: v || null
     };
   }
 
-  return { CONTEXTEN, contextVan, mag, magMeedoen, magBekeken, roomVelden };
+  return { CONTEXTEN, contextVan, mag, magMeedoen, magBekeken, roomVelden, variant };
 };

@@ -22,6 +22,20 @@ const path = require('path');
 const maakRegister = require('../server/kern/spellen/register');
 const stubCtx = { save() {}, crypto: require('crypto'), schud: (a) => a, beurtDoor() {}, codenaamVan: (h) => h, nudge() {} };
 
+/* Een lijst die uit een andere bibliotheek wordt AFGELEID hoort niet woord voor
+   woord in een gouden tabel: dan zakt hij bij groei in plaats van bij drift.
+   Deze plaatshouder zegt "hier hoort een niet-lege lijst tekst te staan", en de
+   inhoud wordt elders nagemeten. */
+const AFGELEID = Symbol('afgeleide lijst');
+function vervangAfgeleid(spel) {
+  if (!spel || !spel.varianten) return spel;
+  const varianten = {};
+  for (const [veld, lijst] of Object.entries(spel.varianten)) varianten[veld] = lijst;
+  if (Array.isArray(varianten.stof) && varianten.stof.length > 5 && varianten.stof.every(x => typeof x === 'string'))
+    varianten.stof = AFGELEID;
+  return Object.assign({}, spel, { varianten });
+}
+
 /* De gouden catalogus: sleutel -> [naam, max, wereld, extra]. Handmatig
    overgeschreven uit de spellen zoals ze zijn, niet uit het register
    gegenereerd -- anders toetst hij zichzelf. */
@@ -38,7 +52,8 @@ const GOUD = {
   proost:   ['Proost', 6, 'rtg', { volwassen: true, vormen: ['live'] }],
   flits:    ['Flitsduel', 4, 'rtf', { buitenBeurt: ['antwoord'], vormen: ['live'] }],
   reactie:  ['Reactieduel', 4, 'rtf', { buitenBeurt: ['tik'], vormen: ['live'] }],
-  quiz:     ['Quizduel', 4, 'rtf', { buitenBeurt: ['antwoord'], vormen: ['live'] }],
+  quiz:     ['Quizduel', 4, 'rtf', { buitenBeurt: ['antwoord'], vormen: ['live'], teams: 'keuze',
+    varianten: { bron: ['algemeen', 'school'], stof: AFGELEID } }],
   schat:    ['Schatduel', 4, 'rtf', { buitenBeurt: ['schat'], vormen: ['live'] }],
   geheugen: ['Geheugenduel', 4, 'rtf', { buitenBeurt: ['reeks'], vormen: ['live'] }],
   orde:     ['Rangschikduel', 4, 'rtf', { buitenBeurt: ['orde'], vormen: ['live'] }]
@@ -111,7 +126,13 @@ test('elk arcadespel houdt zijn naam, apps, puntengrens en wie de score rekent',
 test('elk spel houdt zijn naam, spelersaantal, wereld en toegangsregels', () => {
   const { SPEL, SOORTEN } = maakRegister(stubCtx);
   for (const [sleutel, [naam, max, wereld, extra]] of Object.entries(GOUD)) {
-    assert.deepEqual(SPEL[sleutel], Object.assign({ naam, max, wereld }, extra), 'spel ' + sleutel);
+    /* De schoolstof van het Quizduel is AFGELEID uit de leerlijnen en groeit
+       daarmee mee; hem hier voluit overschrijven zou betekenen dat deze toets
+       zakt zodra er een leerdoel bij komt, en dat is geen drift maar groei.
+       Wat hier telt is dat het VELD er is en zijn vorm klopt; dat de inhoud bij
+       de leerstof past staat in test/spelquiz.test.js. */
+    const echt = vervangAfgeleid(SPEL[sleutel]);
+    assert.deepEqual(echt, Object.assign({ naam, max, wereld }, extra), 'spel ' + sleutel);
     assert.equal(SOORTEN[sleutel], naam, 'SOORTEN van ' + sleutel);
   }
 });

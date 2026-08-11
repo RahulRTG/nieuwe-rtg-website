@@ -123,4 +123,18 @@ function opgave(gen) {
   return maak(gen);
 }
 
-module.exports = { opgave, SOORTEN: Object.keys(GEN) };
+/* WELKE SOORTEN MEERKEUZE ZIJN. De meeste generatoren vragen om een antwoord
+   dat je zelf intikt ('7 + 5 =' heeft geen opties); een deel geeft er wel een
+   rijtje bij. In de oefensessie maakt dat niets uit -- daar mag je gewoon
+   typen -- maar wie deze bibliotheek in een MEERKEUZESPEL gebruikt (het
+   Quizduel met schoolvragen, kern/spellen/quiz.js) kan alleen deze soorten
+   voorleggen. Een som met een enkele optie is geen vraag maar een knop.
+
+   De lijst staat HIER, bij de generatoren zelf, en niet bij de beller: wie een
+   generator schrijft weet of hij opties teruggeeft, en een tweede lijst
+   elders loopt daar stil op achter. `test/leerstof.test.js` legt hem naast wat
+   de generatoren werkelijk doen, dus een soort die van vorm verandert zonder
+   deze lijst bij te werken zakt. */
+const MEERKEUZE = ['breuk-benoem', 'drieluik', 'kies', 'mc', 'rijm', 'vergelijk', 'vorm'];
+
+module.exports = { opgave, SOORTEN: Object.keys(GEN), MEERKEUZE };

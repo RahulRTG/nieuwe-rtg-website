@@ -60,6 +60,13 @@
     background:var(--s-paneel);color:var(--s-creme);}
   .cnrij button{background:var(--s-paneel);border:1px solid var(--s-goud);color:var(--s-goud);border-radius:12px;
     padding:.6rem 1rem;font:inherit;font-weight:700;cursor:pointer;}
+  /* de keuzerij van het Quizduel: waar de vragen vandaan komen, en hoe je speelt */
+  .bronrij{display:flex;flex-wrap:wrap;gap:.4rem;}
+  .bronrij button{background:var(--s-paneel);border:1px solid var(--s-mat);color:var(--s-creme);border-radius:12px;
+    padding:.5rem .85rem;font:inherit;cursor:pointer;}
+  .bronrij button.aan{border-color:var(--s-goud);color:var(--s-goud);font-weight:700;}
+  .stofkeuze{font:inherit;padding:.6rem .9rem;border-radius:12px;border:1px solid var(--s-mat);
+    background:var(--s-paneel);color:var(--s-creme);width:100%;}
   /* het duel */
   .vraag{font-family:var(--serif);font-size:clamp(1.5rem,5.6vw,2rem);text-align:center;max-width:24rem;
     min-height:4.6rem;text-wrap:balance;}
@@ -124,6 +131,16 @@
   <h1 id="kiesKop">Wie daag je uit?</h1>
   <div class="sub">Kies 1 tot 3 tegenspelers, of voeg iemand toe op codenaam.</div>
   <div class="keuze" id="kiesLijst" aria-live="polite">Even laden...</div>
+  <!-- Alleen bij het Quizduel. De keuzes komen van de SERVER (uit de descriptor,
+       en de schoolstof daarin is afgeleid uit de leerlijnen): een lijst in deze
+       pagina zou stil achterlopen zodra er een vak of een groep bij komt. -->
+  <div class="keuze" id="quizKeuze" hidden>
+    <h3>Waar komen de vragen vandaan?</h3>
+    <div class="bronrij" id="bronRij"></div>
+    <select class="stofkeuze" id="stofKeuze" hidden aria-label="Welke leerstof"></select>
+    <h3 id="teamKop" hidden>Hoe spelen jullie?</h3>
+    <div class="bronrij" id="teamRij" hidden></div>
+  </div>
   <div class="keuze">
     <h3>Op codenaam</h3>
     <div class="cnrij">
@@ -277,12 +294,74 @@
 
   /* ---------- kiezen: vrienden, klasgenoten en codenamen ---------- */
   const gekozen = new Map(); // key -> bron ('vriend' | 'klas' | 'cn:<naam>')
-  function telStart() { $('#kiesStart').disabled = !gekozen.size; }
+  function telStart() {
+    $('#kiesStart').disabled = !gekozen.size;
+    // 2 tegen 2 kan alleen bij een vol potje: met drie spelers valt het niet
+    // eerlijk te verdelen. Dat is dezelfde regel als op de server (teams:
+    // 'keuze'), en hij staat hier alleen om de knop niet aan te bieden.
+    const kanTeams = soort === 'quiz' && gekozen.size === 3;
+    $('#teamKop').hidden = $('#teamRij').hidden = !kanTeams;
+    if (!kanTeams) qModus = 'vrij';
+    tekenTeamRij();
+  }
+
+  /* ---------- wat er bij het Quizduel te kiezen valt ----------
+     De lijsten komen van de server: `varianten` leest ze uit de descriptor, en
+     de schoolstof daarin is afgeleid uit de leerlijnen. Een kopie hier zou
+     achterlopen zodra er een vak of een groep bij komt, en dan staat er een
+     keuze in de app die de server weigert. */
+  let qVarianten = null, qBron = 'algemeen', qStof = '', qModus = 'vrij';
+  async function laadVarianten() {
+    if (qVarianten) return qVarianten;
+    try { qVarianten = (await api('varianten', {})).varianten || {}; } catch (e) { qVarianten = {}; }
+    return qVarianten;
+  }
+  function tekenBronRij() {
+    const def = (qVarianten || {}).quiz;
+    const rij = $('#bronRij');
+    rij.innerHTML = '';
+    if (!def) { $('#quizKeuze').hidden = true; return; }
+    const LABEL = { algemeen: 'Algemene kennis', school: 'Schoolvragen' };
+    for (const b of def.bron) {
+      const k = document.createElement('button');
+      k.type = 'button'; k.textContent = LABEL[b] || b;
+      if (b === qBron) k.className = 'aan';
+      k.addEventListener('click', () => { qBron = b; tekenBronRij(); });
+      rij.append(k);
+    }
+    const kies = $('#stofKeuze');
+    kies.hidden = qBron !== 'school';
+    if (!kies.options.length) {
+      for (const stof of def.stof) {
+        const o = document.createElement('option');
+        o.value = stof; o.textContent = stof;   // 'taal groep 3' is zelf de tekst
+        kies.append(o);
+      }
+      qStof = def.stof[0] || '';
+      kies.value = qStof;
+    }
+  }
+  function tekenTeamRij() {
+    const rij = $('#teamRij');
+    if (rij.hidden) { rij.innerHTML = ''; return; }
+    rij.innerHTML = '';
+    for (const [m, label] of [['vrij', 'Ieder voor zich'], ['teams', '2 tegen 2']]) {
+      const k = document.createElement('button');
+      k.type = 'button'; k.textContent = label;
+      if (m === qModus) k.className = 'aan';
+      k.addEventListener('click', () => { qModus = m; tekenTeamRij(); });
+      rij.append(k);
+    }
+  }
+  $('#stofKeuze').addEventListener('change', (e) => { qStof = e.target.value; });
   async function openKies() {
     gekozen.clear();
     $('#kiesKop').textContent = (soort === 'quiz' ? 'Quizduel' : soort === 'schat' ? 'Schatduel' : 'Rangschikduel') + ': wie daag je uit?';
     $('#kiesLijst').textContent = 'Even laden...';
     $('#cnVeld').value = ''; $('#cnFout').textContent = '';
+    qBron = 'algemeen'; qModus = 'vrij';
+    $('#quizKeuze').hidden = soort !== 'quiz';
+    if (soort === 'quiz') { await laadVarianten(); tekenBronRij(); }
     telStart(); toon('sKies');
     let vrienden = [], klasgenoten = [];
     try {
@@ -336,7 +415,12 @@
       else codenamen.push(bron.slice(3));
     }
     try {
-      const d = await api('nieuw', { soort, grootte: gekozen.size + 1, vrienden, klasgenoten, codenamen });
+      /* De variant reist alleen mee als er iets te kiezen viel. Een leeg blok
+         meesturen bij een spel zonder varianten is een 400 -- met opzet: wie
+         denkt iets gekozen te hebben hoort dat te horen. */
+      const variant = soort === 'quiz'
+        ? (qBron === 'school' ? { bron: 'school', stof: qStof } : { bron: 'algemeen' }) : undefined;
+      const d = await api('nieuw', { soort, grootte: gekozen.size + 1, modus: qModus, vrienden, klasgenoten, codenamen, variant });
       $('#wachtWie').textContent = 'We wachten tot iedereen de uitdaging heeft aangenomen...';
       toon('sWacht');
       volgPotje(d.id);
@@ -413,6 +497,22 @@
       vak.append(k);
     });
     standRijen($('#quizStand'), i => st.stand[i].af + '/' + st.tot + ' af · ' + st.stand[i].goed + ' goed');
+    // in teams telt de SOM; die staat erbij, want anders zie je vier losse
+    // getallen en niet waar het om gaat
+    if (st.teams) teamRegel($('#quizStand'), st.teams);
+  }
+  /* De teamstand onder de rijen. Welk team van jou is leest hij uit het potje
+     (`teams[ik]`) en niet uit een aanname over de volgorde. */
+  function teamRegel(el, som) {
+    const mijn = potje.teams ? potje.teams[potje.ik] : null;
+    const rij = document.createElement('div');
+    rij.className = 'rij';
+    const b = document.createElement('b');
+    b.textContent = 'Team 1: ' + som[0] + ' · Team 2: ' + som[1];
+    const s = document.createElement('span');
+    s.className = 'voortgang';
+    s.textContent = mijn === null ? '' : 'jij zit in team ' + (mijn + 1);
+    rij.append(b, s); el.append(rij);
   }
 
   /* ---------- het Schatduel ---------- */
@@ -486,11 +586,14 @@
   /* ---------- de uitslag ---------- */
   function toonUitslag() {
     $('#uitslagKop').textContent = potje.gelijk ? 'Precies gelijk' : (potje.winnaar === potje.spelers[potje.ik] ? 'De eer is aan jou' : 'De eer is aan ' + potje.winnaar);
-    $('#uitslagSub').textContent = (soort === 'quiz' ? 'De meeste vragen goed telt.' : soort === 'orde' ? 'Alleen de enige juiste volgorde telde.' : 'Het dichtstbij pakte elk punt.') + ' Niets wordt bewaard.';
+    $('#uitslagSub').textContent = (soort === 'quiz'
+      ? (potje.modus === 'teams' ? 'De meeste vragen goed samen telt.' : 'De meeste vragen goed telt.')
+      : soort === 'orde' ? 'Alleen de enige juiste volgorde telde.' : 'Het dichtstbij pakte elk punt.') + ' Niets wordt bewaard.';
     const st = potje.staat || {};
     standRijen($('#uitslagStand'), i => !st.stand ? '' : soort === 'quiz'
       ? st.stand[i].goed + ' van ' + st.tot + ' goed'
       : st.stand[i].punten + ' van ' + st.tot + ' punten');
+    if (st.teams) teamRegel($('#uitslagStand'), st.teams);
     toon('sUitslag');
   }
 

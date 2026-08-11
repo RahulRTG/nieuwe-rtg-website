@@ -415,7 +415,7 @@ antwoord is nee:
 > geen antwoord. Een projectiekamer heeft een korte code met een vervaltijd, door
 > de host gemunt, en die vervalt als de host weggaat.
 
-**Gebouwd** (`spellen/projectie.js` + `public/apps/scherm.html`, fase 1). De code
+**Gebouwd** (`spellen/projectie.js` + `public/apps/speelscherm.html`, fase 1). De code
 is bewust weinig waard: hij geeft één potje, hij verloopt na twee uur of zodra
 het potje weg is, en er kan niets terug — wie hem heeft ziet wat iedereen in de
 kamer toch al ziet. Het is de **enige spelingang zonder inlog**, en dat is de
@@ -953,7 +953,7 @@ uitzondering die de route in een 500 veranderde. Zie §6.
 | **Schaken** | premium 1v1 + async + replay + nabespreking — **af** |
 | **30 Seconden** | party + big screen + verborgen informatie — **af** |
 | **Sudoku** | arcade + dagchallenge — **af** |
-| **Quizduel** | teams + Foundation + eigen content |
+| **Quizduel** | teams + Foundation + varianten — **af**; eigen content (vrije tekst) staat nog open |
 | **Magnaat** | long-play multiplayer met een echte economie |
 
 Deze vijf zijn geen willekeurige keuze: elk raakt precies één fundament uit
@@ -993,6 +993,33 @@ spelregels wel parametriseren en niet vervangen; vrije tekst (namen,
 woordenlijsten, kaarten) gaat door dezelfde opschoning als elke andere vrije
 tekst in dit huis; en **een variant is nooit ranked** — een officiële uitslag
 hoort bij vaste regels.
+
+**De kern hiervan staat er** (`server/kern/spellen/variant.js`, fase 1), en
+Quizduel is de eerste gebruiker. Wat er nu is:
+
+- **elke keuze is een gesloten lijst.** Geen vrij tekstveld, om dezelfde reden
+  als `CONTEXTEN` in `beleid.js` en de twaalf gesprekssoorten in `kern/comm`:
+  een vrij veld is binnen een maand een verzameling spelfouten. Het levert er
+  bovendien iets voor terug — de lobby kan de keuzes uittekenen, want ze staan
+  in `SPEL` en reizen mee via `/spel/varianten`.
+- **een variant mág uit het verzoek komen, en `context` niet.** Dat lijkt een
+  uitzondering op §8 maar is het verschil tussen de twee dingen: `context`
+  zegt wie er wat mag (beleid), een variant zegt welk spel je speelt. Veilig
+  is hij omdat de lijst uit de descriptor komt.
+- **een verkeerde waarde is een 400, geen stille terugval.** Wie als docent
+  "taal groep 3" kiest en algemene kennis krijgt, merkt dat pas als de klas de
+  eerste vraag ziet. Terugvallen op de standaard is daar de duurste vorm van
+  behulpzaamheid.
+- **de vraag óver de velden heen is van het spel** (`variantFout` op de
+  descriptor). Het platform weet niet dat leerstof bij de schoolbron hoort.
+- **de wachtrij splitst mee.** Wie schoolvragen zoekt en algemene kennis
+  krijgt, heeft geen tegenstander maar een ander spel.
+
+**Wat er nog niet is:** vrije tekst (eigen woordenlijsten, eigen quizvragen,
+eigen privékaarten) — dat vraagt opslag, eigenaarschap en dezelfde opschoning
+als alle vrije tekst hier, en dat is een eigen klus. En de derde rand,
+"een variant is nooit ranked", is vandaag niet af te dwingen omdat de ranked-laag
+niet bestaat; hij staat als open punt en niet als stilzwijgende belofte.
 
 ---
 

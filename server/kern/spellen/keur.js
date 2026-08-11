@@ -21,6 +21,11 @@
    het BESTAND en WAT er mis is -- "welke had ik ook alweer" is precies het
    zoeken dat hiermee vervalt. */
 const { ZONDER_SPELER } = require('./zicht');
+/* Wat een spel over zijn VARIANTEN mag zeggen staat in ./variant.js, samen met
+   de keuze die een aanvrager mag maken. Die twee horen bij elkaar -- de
+   descriptor bepaalt de lijst en het verzoek kiest eruit -- en ze zouden hier
+   los van elkaar komen te staan. */
+const { keurVarianten } = require('./variant');
 
 // wat een descriptor MOET hebben, per vorm
 const VERPLICHT = {
@@ -140,6 +145,13 @@ function keurPotje(naam, s) {
   return uit;
 }
 
+/* De varianten van een spel, in twee stukken uit EEN bron. `SPEL` krijgt alleen
+   de LIJSTEN, want dat is data die naar de lobby reist en die een toets tegen
+   een gouden tabel legt; de keurfunctie van het spel blijft in een eigen tabel
+   (dezelfde afweging als bij de dagopgave hierboven). Ze komen uit dezelfde
+   pas over dezelfde descriptor, dus ze kunnen niet uiteenlopen. */
+const keurVariant = (naam, s) => keurVarianten(naam, s, fout);
+
 /* Het zicht: drie lagen, en alleen de eerste is verplicht. `kijker` mag de
    sentinel ZONDER_SPELER zijn ("mijn spelerweergave is zonder speler veilig");
    een string of een `true` mag niet, want dan is het weer een vlag in plaats
@@ -157,4 +169,4 @@ function keurZicht(naam, s) {
   return z;
 }
 
-module.exports = { keurAlgemeen, keurArcade, keurPotje, keurZicht, VERPLICHT, VORMEN, OUD };
+module.exports = { keurAlgemeen, keurArcade, keurPotje, keurZicht, keurVariant, VERPLICHT, VORMEN, OUD };

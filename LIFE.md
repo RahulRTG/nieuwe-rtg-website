@@ -214,7 +214,7 @@ De vijf lagen uit PLATFORM.md, met het werkwoord uit par. 3.
 | Laag | In Life OS | De regel die hem eerlijk houdt |
 |---|---|---|
 | **graaf** | de sociale graaf: elf apps plus de vriendenlaag als bron, met vooruitblik | leest alleen, bezit niets |
-| **beleid** | wie mag wat zien, wie mag mij bereiken, wat mag Rahul klaarzetten | het systeem handelt binnen beleid, nooit naar eigen inzicht |
+| **beleid** | wat Rahul mag klaarzetten, en hoe ver vooruit | het beleid kan alleen VERSMALLEN — er is geen automatische stand |
 | **cockpit** | Life Command: wie wacht, wat loopt, wat komt | uitzonderingsgestuurd; rust is een uitkomst |
 | **Rahul** | Life Orchestrator: samenstellen en klaarzetten | rekent met echte gegevens en noemt zijn bronnen |
 | **actielog** | wie deed wat, wanneer, namens wie | groeit aan, wordt nooit herschreven |
@@ -446,6 +446,39 @@ Getoetst in `test/socialecommand.test.js` (vijf mutaties), in
 genootschap en belandt in het log) en in `test/lifecommand.e2e.js` — die meet op
 het gerenderde scherm dat er geen knop bestaat zonder keuze eraan, want een
 verbod dat je op de broncode toetst overleeft geen herschrijving.
+
+### Waar het beleid staat, en waarom het hier anders is dan bij geld
+
+`server/kern/socialebeleid/`, met de routes `POST /api/sociaal/beleid` en
+`POST /api/sociaal/beleid/zet`. Getoetst in `test/socialebeleid.test.js` (vijf
+mutaties) en over de echte route in `test/objectlaagroutes.test.js`.
+
+**Het verschil met GELD.md par. 4 is het hele punt.** Daar heeft elke regel een
+niveau, tot en met "automatisch" binnen het eigen tegoed. **Hier bestaat dat
+niveau niet**, en het ontbreekt niet per ongeluk: de grens van deze wereld is een
+ander mens (par. 3). Een beleidslaag met een automatisch-stand zou precies de
+deur zijn waarlangs een handeling die een tweede persoon bereikt alsnog vanzelf
+gaat.
+
+Daaruit volgt de regel die dit beleid definieert: **het kan alleen versmallen.**
+Elke instelling zet iets uit of maakt een venster kleiner — een soort voorstel
+uitschakelen, de horizon verkorten. Er is geen enkel veld dat Rahul méér laat
+doen dan hij zonder beleid al mag. Een toets zakt op elk veld dat `automatisch`,
+`niveau`, `vanzelf` of `zonderBevestiging` heet; wie er toch een wil, verandert
+een wereld en geen instelling.
+
+**"Geen regel, geen handeling" geldt hier dus omgekeerd.** Bij geld doet het
+systeem zonder regel niets. Hier doet het zonder regel het minimum dat sowieso
+veilig is: voorstellen tonen en wachten op de mens. Beleid haalt daar vanaf.
+
+**En het verbergt niets.** Voorstellen uitzetten stopt wat Rahul klaarzet; het
+maakt niet onwaar dat er iets op u wacht. De stand blijft dus melden dat er een
+onbeantwoorde bijeenkomst ligt. Een instelling die de werkelijkheid wegpoetst in
+plaats van het systeem stiller te maken, zou een instelling zijn die liegt.
+
+**Daarmee heeft RTG Sociaal alle vijf de lagen** van het wereldpatroon uit
+PLATFORM.md: graaf (fase 1), beleid, cockpit (fase 5), een gegronde stem — elk
+voorstel en elke logregel draagt de gegevens waarop hij rust — en het actielog.
 
 ## 8. De acht besturingssystemen -- een aparte beslissing
 

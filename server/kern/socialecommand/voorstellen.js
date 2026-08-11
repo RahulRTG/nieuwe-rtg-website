@@ -44,17 +44,26 @@ const SOORTEN = {
 
 module.exports = ({ kern }) => {
 
+  const vandaag = () => new Date().toISOString().slice(0, 10);
+
   /* De openstaande zaken van dit lid, als voorstel. Vandaag is dat er een: een
      bijeenkomst uit een eigen genootschap waar nog geen antwoord op staat. Hij
      komt uit dezelfde bron als de graaf (bijeenkomst.mijnAgenda) en wordt hier
      niet nog een keer opgehaald uit de ruwe opslag. */
   function voorstellen(key) {
     const uit = [], stil = [];
+    /* HET BELEID VAN HET LID GAAT VOOR (LIFE.md par. 6). Het kan deze soort
+       uitzetten of de horizon verkleinen, en meer kan het niet -- er is geen
+       instelling die Rahul meer laat doen. Ontbreekt de beleidslaag (een oudere
+       mount), dan geldt de veilige standaard: tonen en wachten. */
+    const B = kern.socialebeleid;
+    if (B && !B.magSoort(key, 'antwoord')) return { voorstellen: uit, stil };
     try {
       const a = kern.bijeenkomst.mijnAgenda({ key }) || {};
       for (const b of (a.komt || [])) {
         if (b.afgelast) continue;
         if (b.mijnAntwoord) continue;
+        if (B && !B.binnenHorizon(key, b.datum, vandaag())) continue;
         uit.push({
           id: 'antwoord:' + b.groepId + ':' + b.id,
           soort: 'antwoord',

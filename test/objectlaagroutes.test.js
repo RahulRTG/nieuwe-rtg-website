@@ -177,6 +177,55 @@ test('een voorstel bevestigen verandert het antwoord in het domein en komt in he
   assert.ok(log.log[0].gegevens.length, 'de verantwoording reist mee');
 });
 
+/* HET BELEID OVER DE ECHTE ROUTE (LIFE.md par. 6). Wat hier bewezen wordt is
+   dat een instelling ook echt DOORWERKT -- een instelling die niets doet is
+   erger dan geen instelling -- en dat er geen veld bestaat waarmee iets vanzelf
+   gaat. Dat laatste is het verschil met geldbeleid, en het hoort niet alleen in
+   een document te staan. */
+test('beleid versmalt wat er klaarstaat, en kent geen automatische stand', async () => {
+  const b = await json(await api('/api/genootschap/roep-bijeen',
+    { groep: groepId, wat: 'Beleidsborrel', datum: STRAKS, tijd: '18:00' }, lidToken));
+  assert.ok((b.bijeenkomst && b.bijeenkomst.id) || b.id);
+
+  const staat = await json(await api('/api/sociaal/beleid', {}, lidToken));
+  assert.equal(staat.automatischMogelijk, false);
+  assert.deepEqual(staat.soorten, [{ soort: 'antwoord', aan: true }]);
+
+  const voor = await json(await api('/api/sociaal/command', {}, lidToken));
+  assert.ok((voor.voorstellen || []).some(x => x.titel === 'Beleidsborrel'));
+
+  /* Uitzetten: dan staat er niets meer klaar. */
+  const uit = await api('/api/sociaal/beleid/zet', { soort: 'antwoord', aan: false }, lidToken);
+  assert.equal(uit.status, 200);
+  const na = await json(await api('/api/sociaal/command', {}, lidToken));
+  assert.deepEqual(na.voorstellen, [], 'uitgezet is uitgezet');
+  /* MAAR HET VERBERGT NIETS. Beleid stopt wat Rahul KLAARZET; het maakt niet
+     onwaar dat er iets op u wacht. De stand blijft dus melden dat er een
+     onbeantwoorde bijeenkomst ligt -- een instelling die de werkelijkheid
+     wegpoetst in plaats van het systeem stiller te maken, zou een instelling
+     zijn die liegt. */
+  assert.ok(na.stand.wachtOpMij >= 1,
+    'de stand blijft eerlijk over wat er ligt, ook als Rahul niets meer klaarzet');
+
+  /* En de wijziging staat in het log -- een besluit over wat er namens u mag
+     gebeuren hoort in hetzelfde geheugen als een handeling. */
+  const log = await json(await api('/api/sociaal/actielog', {}, lidToken));
+  assert.match(log.log[0].wat, /beleid gewijzigd/);
+  assert.equal(log.log[0].wie, 'lid');
+
+  /* Weer aan, zodat de rest van dit bestand niet aan deze toets hangt. */
+  await api('/api/sociaal/beleid/zet', { soort: 'antwoord', aan: true }, lidToken);
+  const weer = await json(await api('/api/sociaal/command', {}, lidToken));
+  assert.ok((weer.voorstellen || []).some(x => x.titel === 'Beleidsborrel'));
+
+  /* Een onbekend veld verandert niets: het beleid kan alleen versmallen. */
+  await api('/api/sociaal/beleid/zet', { automatisch: true, niveau: 'automatisch' }, lidToken);
+  const nogsteeds = await json(await api('/api/sociaal/beleid', {}, lidToken));
+  assert.equal(nogsteeds.automatischMogelijk, false);
+  assert.deepEqual(Object.keys(nogsteeds).sort(),
+    ['automatischMogelijk', 'horizon', 'horizonGrens', 'ok', 'soorten']);
+});
+
 /* Een gast mag deze laag niet: hij leest de vriendenlaag, matches en groepen.
    De route weigert hem, en dat hoort een toets te bewaken en geen afspraak. */
 test('een onbekende soort en een sessie zonder pas komen er niet in', async () => {

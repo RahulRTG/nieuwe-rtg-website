@@ -84,5 +84,19 @@ module.exports = ({ kern, db, save, klok }) => {
       gelogd: !g.error, log: g.regel || null };
   }
 
-  return { socialecommand: { command, bevestig, log: logMod.log } };
+  /* Een beleidswijziging hoort in hetzelfde geheugen als een handeling: het is
+     een besluit van het lid over wat er namens hem mag gebeuren, en zonder die
+     regel kan niemand later nagaan waarom Rahul iets wel of niet voorstelde. */
+  function logBeleid(key, invoer) {
+    const v = invoer && typeof invoer === 'object' ? invoer : {};
+    const stukken = [];
+    if (v.soort !== undefined) stukken.push('voorstellen "' + v.soort + '" ' + (v.aan === false ? 'uit' : 'aan'));
+    if (v.horizon !== undefined) stukken.push('horizon ' + Math.round(Number(v.horizon)) + ' dagen');
+    return logMod.schrijf(key, {
+      wie: 'lid', wat: 'beleid gewijzigd: ' + (stukken.join(', ') || 'geen wijziging'),
+      waarom: 'ingesteld door u', gegevens: stukken
+    });
+  }
+
+  return { socialecommand: { command, bevestig, log: logMod.log, logBeleid } };
 };

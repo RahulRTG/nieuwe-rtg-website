@@ -37,6 +37,29 @@ module.exports = (kern) => {
     res.json(Object.assign({ ok: true }, kern.socialegraaf.lijn(req.session.key)));
   });
 
+  /* HET BELEID VAN HET LID (LIFE.md par. 6, de tweede laag van het
+     wereldpatroon). Lezen en zetten; wat het KAN is uitsluitend versmallen.
+
+     Er is met opzet geen veld waarmee iets "automatisch" wordt. Dat is geen
+     omissie: de grens van deze wereld is een ander mens, en die kent geen
+     automatische stand (LIFE.md par. 3). Wie hier ooit zo'n veld toevoegt,
+     verandert de wereld en niet een instelling. */
+  app.post('/api/sociaal/beleid', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    res.json(kern.socialebeleid.beleid(req.session.key));
+  });
+
+  app.post('/api/sociaal/beleid/zet', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    const r = kern.socialebeleid.zet(req.session.key, req.body || {});
+    if (r.error) return res.status(r.status || 400).json({ error: r.error });
+    /* Alleen een ECHTE wijziging komt in het log: een log dat volloopt met
+       kliks die niets deden, is met ruis leeg te spoelen (de les uit
+       kern/geldbeleid/actielog.js). */
+    if (r.gewijzigd) kern.socialecommand.logBeleid(req.session.key, req.body || {});
+    res.json(r);
+  });
+
   /* LIFE COMMAND (LIFE.md fase 5): drie vragen, en wat er klaarstaat. */
   app.post('/api/sociaal/command', auth, (req, res) => {
     if (geenGast(req, res)) return;

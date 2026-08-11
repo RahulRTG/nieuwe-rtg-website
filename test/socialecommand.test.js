@@ -51,8 +51,9 @@ const bijeenkomst = (o) => Object.assign({ id: 'b1', groepId: 'g1', groep: 'De K
    keuze (bijvoorbeeld `voerUit(key, id)`). */
 test('er is geen weg die uitvoert zonder bevestiging', () => {
   const { c } = opzet();
-  assert.deepEqual(Object.keys(c).sort(), ['bevestig', 'command', 'log'],
-    'command leest, log leest, en bevestig is de enige die handelt');
+  assert.deepEqual(Object.keys(c).sort(), ['bevestig', 'command', 'log', 'logBeleid'],
+    'command en log lezen, logBeleid schrijft alleen het geheugen, ' +
+    'en bevestig is de enige die iets in een domein verandert');
 });
 
 /* DE MUTATIE: laat bevestig() de keuze niet toetsen tegen v.keuzes, of vul een

@@ -109,5 +109,19 @@ Object.assign(kern, require('../kern/objectlaag')({ kern }));
    de graaf en de objectlaag alleen kern krijgen. Wat hij schrijft is geen
    sociaal gegeven maar het ACTIELOG: wat er gebeurde en waarom. Uitvoeren doet
    hij nooit zelf -- dat gaat via het domein dat de waarheid beheert. */
+/* Het sociale beleid (kern/socialebeleid/): de regels van het LID over zijn
+   eigen sociale wereld -- de tweede laag van het wereldpatroon.
+
+   VOOR socialecommand gemount, want de voorstellen raadplegen hem. Hij krijgt de
+   soortenlijst mee uit ./socialecommand/voorstellen.js in plaats van hem over te
+   tikken: twee lijsten van wat een voorstel kan zijn, lopen uiteen zodra iemand
+   er een toevoegt.
+
+   Hij SCHRIJFT, en daarom db en save -- maar alleen de eigen regels van het lid,
+   en die kunnen uitsluitend VERSMALLEN. Er is met opzet geen niveau-veld zoals
+   bij geldbeleid: de grens van deze wereld is een ander mens, en die kent geen
+   automatische stand. */
+Object.assign(kern, require('../kern/socialebeleid')({ db, save,
+  soorten: Object.keys(require('../kern/socialecommand/voorstellen')({ kern: {} }).SOORTEN) }));
 Object.assign(kern, require('../kern/socialecommand')({ kern, db, save }));
 };

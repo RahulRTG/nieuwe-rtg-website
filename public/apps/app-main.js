@@ -12,7 +12,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '70a40b9e';
+var RTG_BOUW = '0d496cbc';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -621,20 +621,37 @@ var RTG_BOUW = '70a40b9e';
       '#gate .os-lock{display:flex;align-items:center;justify-content:center;padding:0;margin:0;' +
         'height:calc(var(--rtg-klok-maat,16rem) * var(--klokschaal,1));transform:none;}' +
       '#gate .os-lock > .rtg-ring{transform:scale(var(--klokschaal,1));transform-origin:center;}' +
-      /* de lippen sluiten AAN op de klok: Rahul komt eruit, hij zweeft er niet
-         tientallen pixels onder */
       /* DE MOND HOORT BIJ DE KLOK, dus meet hij zich aan de klok en niet aan
          het venster. Met min(52vw,240px) was hij op een telefoon 224 breed
          onder een klok van 256 (verhouding 0,87) en op een breed scherm 240
          onder een klok van 384 (0,63) -- dezelfde mond, twee verhoudingen.
 
-         En het optrekken gebeurt met de LEEGTE VAN HET DOEK erin verrekend:
-         de tekening vult verticaal ongeveer 46% van haar canvas, dus boven de
-         inkt zit ruim een kwart niets. Trek je alleen de doos op, dan sluit
-         de doos aan en de tekening niet -- precies het gat dat hier zat. */
+         DE HOOGTE IS TWEE KEER MISGEGAAN, EEN KEER NAAR ELKE KANT.
+
+         Eerst zweefde de mond tientallen pixels onder de klok. Toen werd hij
+         opgetrokken tot hij "aansloot" -- en dat is te ver de andere kant op:
+         gemeten op vijf schermmaten begon de INKT op 0 tot -1 pixel van de
+         onderrand van de wijzerplaat. De lippen lagen dus tegen de gouden rand
+         en middenin de contactschaduw van de kast (zie .rtg-ring::before in
+         shared/klok.js, die zo'n 30px naar onderen reikt). Op een afdruk zie je
+         dat meteen; in de code niet, want er stond alleen een getal.
+
+         Daarom staat de rekensom er nu uit elkaar gehaald, met de twee
+         eigenschappen van het doek als eigen maat. Het doek is 440 bij 200, dus
+         0,4545 keer zo hoog als breed, en de tekening begint pas op 27,9% van
+         die hoogte -- boven de inkt zit ruim een kwart niets. Wie de lippen
+         ergens wil hebben, moet die leegte meerekenen; wie alleen de doos
+         verschuift, verschuift de tekening net niet.
+
+         --lipgat is het enige getal dat over SMAAK gaat: hoeveel lucht er
+         tussen de wijzerplaat en de lippen hoort. 0,126 mondbreed is 0,11 klok,
+         net voorbij de schaduw. De rest volgt eruit. */
       '#gate .ag-mond{--mondbreed:calc(var(--rtg-klok-maat,16rem) * var(--klokschaal,1) * 0.875);' +
+        '--doekhoog:calc(var(--mondbreed) * 0.4545);' +
+        '--doekleeg:calc(var(--doekhoog) * 0.279);' +
+        '--lipgat:calc(var(--mondbreed) * 0.126);' +
         'width:var(--mondbreed);height:auto;' +
-        'margin:calc(var(--mondbreed) * -0.125) auto 0.2rem;}' +
+        'margin:calc(var(--lipgat) - var(--doekleeg)) auto 0.2rem;}' +
       // de zin is de aanspreking en geen onderschrift
       /* margin-inline:auto, anders staat de zin 43px links van de as. De doos
          is een flexkolom met align-items:stretch, dus een kind met een
@@ -4067,6 +4084,13 @@ var RTG_BOUW = '70a40b9e';
     // wat er nu staat is per definitie bij; de waarnemer hoeft er niet overheen
     vorigeAfdruk = afdruk();
     sync();
+    /* De ring van de wereldstand hangt aan DEZELFDE bouw() als de tegels. Dat is
+       geen nettigheid maar de kern van de afspraak: welke werelden je ziet en
+       welke onderdelen erin zitten hangt aan je pas en je boardroom, dus twee
+       lijsten die op verschillende momenten worden bijgewerkt lopen uit elkaar.
+       Eerder hing de ring aan het laden van de pagina, en die is een slag
+       eerder dan de boardroom-gegevens: het beginscherm was leeg. */
+    if (typeof wereldBij === 'function') wereldBij();
   }
 
   /* ---------- mappen openen ---------- */
@@ -4628,6 +4652,12 @@ var RTG_BOUW = '70a40b9e';
     draadOpen = true;
     aiDraad.scrollTop = aiDraad.scrollHeight;
     if (window.RTGMond && aiOrbMond && wie !== 'mij') aiOrbMond.praat(Math.min(4200, 420 + tekst.length * 38));
+    /* In de wereldstand staat de draad niet open te wachten: daar komt Rahul
+       op als een gouden ring met EEN zin, en pas als hij werkelijk iets heeft.
+       Die zin is dus deze zin -- hij wordt daar niet opnieuw bedacht, want dan
+       zouden er twee Rahuls zijn die net iets anders zeggen. Wat ik zelf typ is
+       geen mededeling van hem, dus dat blijft eruit. */
+    if (wie !== 'mij' && window.RTGWereld && RTGWereld.aan()) RTGWereld.rahulZei(tekst);
     return b;
   }
 
@@ -4751,6 +4781,89 @@ var RTG_BOUW = '70a40b9e';
      Rahuls opening hier aan het venster: dat is de enige draad tussen die twee,
      en zo begint hij pas als er echt iets te vertellen valt. */
   window.RTGThuisRahul = { opent: osRahulOpent, vraag: osRahulVraag, kijkt: osRahulKijkt };
+
+  /* ---------- de levende wereld aanreiken ----------
+     shared/wereld.js tekent het beginscherm als kring om de klok in plaats van
+     als rooster met tegels. Die module weet met opzet NIETS: niet welke
+     werelden er zijn, niet hoe je er een opent, niet welke onderdelen jouw pas
+     draagt. Dat staat hier al -- in MAPPEN, itemZichtbaar, itemNaam,
+     tegelInhoud en openItem -- en dit blok geeft het door.
+
+     Dat is de reden dat de omschakeling geen tweede beginscherm oplevert: beide
+     standen lezen DEZELFDE lijst, tonen DEZELFDE klok en openen apps met
+     DEZELFDE openItem(). Wie hier ooit een eigen lijst werelden ziet ontstaan,
+     of een tweede manier om een app te openen, heeft de fout te pakken waar
+     LAT.md regel 4 over gaat.
+
+     Ontbreekt de module (een oude service-worker-cache, een geblokkeerd
+     script), dan gebeurt er niets en staat het rooster er gewoon. Een
+     beginscherm dat leeg blijft omdat een sierlaag niet laadde, is erger dan
+     geen sierlaag. */
+
+  /* Wordt aan het eind van bouw() aangeroepen, dus op precies het moment dat
+     ook de tegels worden bijgewerkt. De module vergelijkt zelf of er iets
+     veranderd is en doet niets als het antwoord nee is. */
+  function wereldBij() {
+    if (!window.RTGWereld || !RTGWereld.werelden) return;
+    RTGWereld.werelden(MAPPEN.filter(function (m) {
+      return m.wereld && m.items.some(itemZichtbaar);
+    }).map(function (m) {
+      return {
+        sleutel: m.sleutel,
+        naam: mapNaam(m),
+        url: m.wereld,
+        /* De glyf van de wereld: hetzelfde teken als op de tegel, uit dezelfde
+           bron. Een tweede tekenset zou twee werelden geven die anders heten. */
+        teken: function () { return (window.RTGGlyf && RTGGlyf.svg(m.glyf)) || null; },
+        delen: m.items.filter(itemZichtbaar).map(function (item) {
+          return {
+            sleutel: item,
+            naam: itemNaam(item),
+            teken: function () { try { return tegelInhoud(item); } catch (e) { return null; } }
+          };
+        })
+      };
+    }));
+  }
+
+  (function () {
+    var scherm = document.querySelector('.os-thuisscherm');
+    var vak = document.querySelector('.os-klokvak');
+    var klok = $('#homeKlok');
+    if (!scherm || !vak || !klok || !window.RTGWereld) return;
+
+    RTGWereld.start({
+      scherm: scherm, vak: vak, klok: klok, werelden: [],
+      openUrl: function (url) { location.href = url; },
+      openDeel: function (sleutel) { openItem(sleutel); },
+      /* Een werkwoord uit het Command Wheel gaat naar de balk van Rahul, met de
+         wereld erbij waar je het vandaan haalde. Niet meteen VERSTUREN: je hebt
+         gezegd wat je wilt doen, nog niet waarmee. De cursor staat klaar achter
+         de zin, zodat je hem afmaakt in plaats van hem te lezen. */
+      zegRahul: function (zin) {
+        var invoer = $('#osAiIn');
+        if (!invoer) return;
+        invoer.value = zin + ' ';
+        invoer.focus();
+        try { invoer.setSelectionRange(invoer.value.length, invoer.value.length); } catch (e) {}
+      }
+    });
+
+    /* De schakelaar in het bedieningspaneel. Hij zet niets zelf: hij vraagt de
+       module om te wisselen en leest daarna terug wat de stand IS, zodat de
+       knop niet kan gaan afwijken van het scherm. */
+    var knoppen = document.querySelectorAll('#osCcWereld button');
+    function merk() {
+      knoppen.forEach(function (b) {
+        b.classList.toggle('actief', (b.dataset.wereld === 'aan') === RTGWereld.aan());
+      });
+    }
+    knoppen.forEach(function (b) {
+      b.addEventListener('click', function () { RTGWereld.zet(b.dataset.wereld === 'aan'); merk(); });
+    });
+    window.addEventListener('rtg-wereld', merk);
+    merk();
+  })();
   bouw();
 
   /* De app-regie van de RTG-boardroom: apps die voor deze pas zijn uitgezet

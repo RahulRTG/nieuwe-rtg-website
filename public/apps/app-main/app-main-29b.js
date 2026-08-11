@@ -31,6 +31,12 @@
     draadOpen = true;
     aiDraad.scrollTop = aiDraad.scrollHeight;
     if (window.RTGMond && aiOrbMond && wie !== 'mij') aiOrbMond.praat(Math.min(4200, 420 + tekst.length * 38));
+    /* In de wereldstand staat de draad niet open te wachten: daar komt Rahul
+       op als een gouden ring met EEN zin, en pas als hij werkelijk iets heeft.
+       Die zin is dus deze zin -- hij wordt daar niet opnieuw bedacht, want dan
+       zouden er twee Rahuls zijn die net iets anders zeggen. Wat ik zelf typ is
+       geen mededeling van hem, dus dat blijft eruit. */
+    if (wie !== 'mij' && window.RTGWereld && RTGWereld.aan()) RTGWereld.rahulZei(tekst);
     return b;
   }
 

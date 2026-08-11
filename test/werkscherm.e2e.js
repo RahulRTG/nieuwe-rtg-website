@@ -211,22 +211,41 @@ test('de eigenaar staat meteen in zijn eigen werkruimte, zonder een token over t
        want daarmee zoek je hem terug op het scherm. */
     await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
     await page.waitForTimeout(2000);
+    /* EN NIET MEER DOOR DE MAPPEN TE KLIKKEN.
+
+       Deze lus opende elke tegel en las het mappenscherm dat daarna verscheen.
+       Dat scherm bestaat niet meer: sinds PLATFORM.md par. 0 is een wereld een
+       APP en geen map, dus tikken NAVIGEERT (zie openMap in app-main-26b.js).
+       De eerste klik haalde de pagina dus onder de toets vandaan, en wat je in
+       de uitslag zag was 'Execution context was destroyed' -- een foutmelding
+       over de meting, waar het gebrek van de meting zelf in stond.
+
+       De EIS is niet veranderd: de werkplek en RTG Office moeten vanaf het
+       beginscherm te vinden zijn, in een van de werelden. Wat wel is veranderd
+       is hoe je erin kijkt. De wereldstand toont de onderdelen van een wereld
+       IN dezelfde cirkel (RTGWereld.zoom), zonder de pagina te verlaten, en elk
+       merk draagt daar dezelfde data-sleutel als een tegel. We lopen de werelden
+       dus af en zoomen er een voor een in. */
     const tegels = await page.evaluate(async () => {
       const wacht = (ms) => new Promise((k) => setTimeout(k, ms));
-      const mappen = Array.from(document.querySelectorAll('#osMappen .os-app'));
+      if (!window.RTGWereld) return null;
+      if (!RTGWereld.aan()) { RTGWereld.zet(true); await wacht(400); }
       const uit = [];
-      for (const map of mappen) {
-        map.click();
-        await wacht(300);
-        for (const a of document.querySelectorAll('#osMapGrid .os-app')) {
-          uit.push({ sleutel: a.dataset.sleutel || '', naam: (a.getAttribute('aria-label') || '').trim() });
+      const aantal = RTGWereld.stand().merken;
+      for (let i = 0; i < aantal; i++) {
+        RTGWereld.naar(i);
+        await wacht(220);
+        RTGWereld.zoom(true);
+        await wacht(220);
+        for (const m of document.querySelectorAll('.os-wm[data-sleutel]')) {
+          uit.push({ sleutel: m.dataset.sleutel || '', naam: (m.getAttribute('aria-label') || '').trim() });
         }
-        const scrim = document.getElementById('osMapScrim');
-        if (scrim) scrim.classList.remove('open');
-        await wacht(120);
+        RTGWereld.zoom(false);
+        await wacht(160);
       }
       return uit;
     });
+    assert.ok(tegels, 'de wereldstand hoort beschikbaar te zijn om de werelden af te lopen');
     const namen = tegels.map(t => t.naam + ' [' + t.sleutel + ']').join(', ');
     assert.ok(tegels.some(t => t.sleutel === 'os:werk'),
       'de werkplek (os:werk) heeft een tegel op de homescreen; gevonden: ' + namen);

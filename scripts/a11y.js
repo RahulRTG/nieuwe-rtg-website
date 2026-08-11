@@ -53,7 +53,7 @@ const PAGINAS = [
   '/apps/ovroutes.html',
   '/apps/clips.html',
   '/apps/scherm.html',
-  '/apps/speelscherm.html',
+  '/apps/spelscherm.html',
   '/apps/office.html',
   '/apps/vonk.html',
   '/apps/berichten.html',

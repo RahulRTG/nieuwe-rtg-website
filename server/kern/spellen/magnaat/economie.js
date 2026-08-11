@@ -25,9 +25,10 @@
    GAMEHALL.md paragraaf 12.9. Wat er WEL is, is een economie die je kunt
    spelen, en dat was de eis. */
 const { kaart, STEDENLIJST, stadNaam, stadSleutel } = require('./kaart');
-const { SECTOREN, SECTORLIJST, PRIJSSTANDEN, prijsVan } = require('./sectoren');
-const { maand: rekenMaand, capaciteit, waarde } = require('./stap');
+const { SECTORLIJST } = require('./sectoren');
+const { waarde } = require('./stap');
 const F = require('./foundation');
+const H = require('./handel');
 
 /* De speelduur in SPELMAANDEN, per variant. Een Quick is drie jaar economie in
    een klein uur: lang genoeg dat een investering zich terugbetaalt, kort genoeg
@@ -53,15 +54,20 @@ module.exports = (ctx) => {
       stad: stadsleutel, duur, maandMs: MAAND_MS[v.duur] || MAAND_MS.quick,
       maand: 0, begonnen: Date.now(), gerekendTot: Date.now(),
       geld: {}, vestigingen: {}, kavelBezet: {}, foundation: F.nieuw(),
+      contracten: [], contractTeller: 0, veilingen: [], veilingTeller: 0, kavelRecht: {},
+      deelnemingen: [], deelnemingTeller: 0, leningen: [], leningTeller: 0,
+      resultaatlog: {}, betaalgemist: {}, polissen: [], polisTeller: 0,
       laatste: {}, klaar: false
     };
     for (const h of potje.spelers) { st.geld[h] = START_GELD; st.vestigingen[h] = []; st.laatste[h] = null; }
     potje.staat = st;
   }
 
-  const K = (st) => kaart(st.stad);
-  const vrijKavel = (st, id) => K(st).kavel.has(id) && !st.kavelBezet[id];
-  const mijnVestiging = (st, h, id) => (st.vestigingen[h] || []).find(x => x.id === id);
+  /* HOE JE IETS TERUGVINDT IN DE STAAT staat in ./vinden.js: welk kavel, welke
+     vestiging, van wie. Vier vragen die overal in deze map worden gesteld en
+     die met de lagen zijn meegegroeid -- ze horen bij elkaar en niet tussen de
+     klok. */
+  const { K, vrijKavel, mijnVestiging, wieHeeft } = require('./vinden')({ kaart });
 
   /* ---------- de klok ---------- */
   /* Hoeveel spelmaanden zijn er verstreken? Uit de KLOK van de server en niet
@@ -75,94 +81,52 @@ module.exports = (ctx) => {
     if (stappen <= 0) return [];
     if (stappen > MAX_MAANDEN_PER_KEER) stappen = MAX_MAANDEN_PER_KEER;
     const verslagen = [];
-    for (let i = 0; i < stappen && st.maand < st.duur; i++) verslagen.push(eenMaand(potje));
+    for (let i = 0; i < stappen && st.maand < st.duur; i++) {
+      /* DE HAMER VALT AAN HET EIND VAN DE MAAND WAARIN DE VEILING SLUIT: een
+         veiling van twee maanden sluit na twee maanden, niet na drie. Hij valt
+         HIER, in de bijrekenlus, zodat hij deterministisch sluit -- tien maanden
+         in een keer geeft dezelfde winnaar als tien maanden los, en dat is de
+         eis onder GAMEHALL.md 12.4. De koper draait de zaak vanaf de volgende
+         maand; de opbrengst van de laatste maand is nog van de verkoper, en dat
+         is de eerlijke kant van "je neemt hem over aan het eind van de maand". */
+      const verslag = eenMaand(potje);
+      const geveild = L.hameren(potje);
+      if (geveild.length) verslag.veilingen = geveild;
+      verslagen.push(verslag);
+    }
     st.gerekendTot += stappen * st.maandMs;
     if (st.maand >= st.duur && !st.klaar) beeindig(potje);
     return verslagen;
   }
 
-  /* EEN spelmaand voor de hele wereld. De volgorde telt: eerst rekent iedere
-     vestiging zijn maand (allemaal op DEZELFDE begintoestand, want anders
-     bepaalt de volgorde van de spelers wie de klanten krijgt), dan gaat het
-     geld rond, dan bouwt de Foundation. */
-  function eenMaand(potje) {
-    const st = potje.staat, k = K(st);
-    const druk = {};
-    for (const [h, rij] of Object.entries(st.vestigingen))
-      for (const v of rij) {
-        const zone = k.kavel.get(v.kavel).zone;
-        druk[zone + ':' + v.sector] = (druk[zone + ':' + v.sector] || 0) + 1;
-      }
-    let wereldOmzet = 0;
-    const perSpeler = {};
-    // wat de Foundation aan opleiding heeft bijgedragen; werkt door in hoeveel
-    // een medewerker aankan
-    const arbeid = F.arbeidBonus(st.foundation);
-    for (const [h, rij] of Object.entries(st.vestigingen)) {
-      const regels = [];
-      for (const v of rij) {
-        const kavel = k.kavel.get(v.kavel);
-        /* De Foundation-projecten verschuiven de eigenschappen van het kavel.
-           Dat gebeurt HIER en niet in de kaart zelf: de kaart is gedeeld tussen
-           partijen, en een project in de ene partij hoort de andere niet te
-           raken. */
-        const effect = F.effectOp(st.foundation, kavel);
-        const opgeschoven = Object.assign({}, kavel, {
-          eigenschappen: Object.fromEntries(Object.entries(kavel.eigenschappen)
-            .map(([veld, w]) => [veld, w + (effect[veld] || 0)]))
-        });
-        const kOp = Object.assign({}, k, { kavel: new Map(k.kavel).set(kavel.id, opgeschoven) });
-        const r = rekenMaand(kOp, v, { maand: st.maand, zoneDruk: druk[kavel.zone + ':' + v.sector] || 1, wereldFactor: 1, arbeid });
-        regels.push(Object.assign({ id: v.id, naam: v.naam, sector: v.sector, kavel: kavel.naam }, r));
-        st.geld[h] += r.resultaat;
-        wereldOmzet += r.omzet;
-      }
-      /* ROOD STAAN KOST GELD. Zonder dit is overinvesteren gratis: je kas gaat
-         onder nul en er gebeurt niets. Echte financiering (leningen met een
-         looptijd en een risico-opslag) hoort bij fase B; dit is de rekening-
-         courant eronder, zodat de keuze om door te bouwen nu al een prijs
-         heeft. */
-      if (st.geld[h] < 0) {
-        const rente = -st.geld[h] * ROOD_RENTE;
-        st.geld[h] -= rente;
-        regels.push({ id: 'rood', naam: 'Rood staan', rente: rond(rente), resultaat: -rond(rente) });
-      }
-      perSpeler[h] = regels;
-    }
-    /* De afdracht rust op de HELE stad en niet alleen op de spelers: anders
-       bouwt de Foundation in een partij met twee mensen nooit iets. Zie de
-       reden bij `stadsomzet` in de stadsdata. */
-    const afdracht = F.draagAf(st.foundation, wereldOmzet + (k.stadsomzet || 0));
-    /* Waar de bedrijvigheid zit, zodat de Foundation daar bouwt. Uit dezelfde
-       telling die de concurrentiedruk gebruikt: een tweede telling zou een
-       tweede antwoord op dezelfde vraag zijn. */
-    const perZone = {};
-    for (const sleutel of Object.keys(druk)) {
-      const zone = sleutel.split(':')[0];
-      perZone[zone] = (perZone[zone] || 0) + druk[sleutel];
-    }
-    const projecten = F.bouw(st.foundation, k, perZone);
-    st.maand++;
-    const verslag = { maand: st.maand, perSpeler, afdracht, projecten, wereldOmzet: rond(wereldOmzet) };
-    for (const h of potje.spelers) st.laatste[h] = { maand: st.maand, regels: perSpeler[h] || [], projecten };
-    return verslag;
-  }
+  /* WAT ER IN EEN MAAND GEBEURT staat in ./maand.js, en dat is een echte naad:
+     dit bestand gaat over WANNEER er een maand gerekend wordt en dat is af. Wat
+     er IN een maand gebeurt groeit met elke fase mee -- fase B zette er de
+     contractafwikkeling in. */
+  /* De deelnemingen staan HIER en niet bij de andere lagen hieronder, omdat de
+     maandloop ze nodig heeft: het resultaat van een vestiging wordt verdeeld
+     voordat het op een rekening komt. */
+  /* DE LAGEN VAN FASE B (contracten, veilingen, belangen, bank, verzekering)
+     worden in ./lagen.js samengesteld. Dit bestand gaat over de KLOK en de
+     levensloop van een partij, en dat is af; die lijst groeit met elke fase mee.
+     Twee dingen met zo'n verschillend tempo horen niet in een bestand. */
+  const L = require('./lagen')({ K, mijnVestiging, vrijKavel, wieHeeft, waarde, rond, codenaamVan });
+
+  const { eenMaand } = require('./maand')({ K, wieHeeft, ROOD_RENTE,
+    verdeel: L.verdeel, bank: L.bankmaand, onthoud: L.onthoud, verzekering: L.verzekering });
 
   /* WAT EEN SPELER ZIET en wat er aan het eind op tafel komt staat in
      ./weergave.js -- een eigen onderwerp (wie mag wat weten, en waarop wordt
      er afgerekend) dat los staat van de klok hierboven. */
-  const { zicht, publiek, eindstand } = require('./weergave')({
-    K, codenaamVan, rond, bijrekenen, foundationArbeid: (st) => F.arbeidBonus(st.foundation) });
+  const { zicht, publiek, eindstand } = require('./weergave')(Object.assign({
+    K, codenaamVan, rond, bijrekenen,
+    foundationArbeid: (st) => F.arbeidBonus(st.foundation) }, L.zichtdelen));
   function beeindig(potje) {
     const st = potje.staat;
     st.klaar = true;
     potje.status = 'klaar';
     const stand = eindstand(potje);
-    /* De winnaar is het hoogste VERMOGEN (geld plus wat je gebouwd hebt), en
-       niet het meeste geld op de rekening: wie alles in zijn zaken heeft zitten
-       hoort niet te verliezen van wie niets deed. De andere dimensies staan op
-       de eindstand en tellen niet mee voor de winst -- ze zijn er om te zien wat
-       voor ondernemer je was, en dat is iets anders dan een tweede ranglijst. */
+    // waarop er wordt afgerekend en waarom, staat bij de eindstand zelf (./weergave.js)
     if (stand.length > 1 && stand[0].vermogen === stand[1].vermogen) potje.gelijk = true;
     else potje.winnaar = stand[0].codenaam;
   }
@@ -173,7 +137,13 @@ module.exports = (ctx) => {
      elke fase mee -- contracten, veilingen, aandelen -- en die twee horen niet
      in een bestand. De aanleiding was de 10 kB-grens die scripts/check.js
      bewaakt, en die grens is precies een rem hierop. */
-  const { ACTIES, VRIJE_ACTIES } = require('./acties')({ K, mijnVestiging, vrijKavel, rond });
+  const basis = require('./acties')({ K, mijnVestiging, vrijKavel, rond });
+  /* De contractacties komen uit een EIGEN bestand en worden hier bijgeschoven.
+     Ze zijn alle drie VRIJ (zie GAMEHALL.md 12.3): onderhandelen mag altijd,
+     en dat is de reden dat een partij van zes met 24 uur per beurt niet
+     stilstaat. */
+  const ACTIES = Object.assign({}, basis.ACTIES, L.ACTIES);
+  const VRIJE_ACTIES = basis.VRIJE_ACTIES.concat(L.VRIJE_ACTIES);
 
   function zet(potje, h, z) {
     const st = potje.staat;
@@ -188,6 +158,11 @@ module.exports = (ctx) => {
     // een grote zet is nieuws voor de tafel; aan een prijswijziging heeft
     // niemand anders een duwtje
     if (!VRIJE_ACTIES.includes(actie)) potje.spelers.filter(sp => sp !== h).forEach(sp => nudge(sp, potje));
+    /* Een voorstel is WEL nieuws, maar alleen voor de wederpartij -- die staat
+       aan zet en weet het anders niet. De rest van de tafel gaat het niet aan:
+       wie een contract sluit met wie is van die twee, en een duwtje naar
+       iedereen zou verklappen DAT er onderhandeld wordt. */
+    if (r.wek && r.wek !== h && potje.spelers.includes(r.wek)) nudge(r.wek, potje);
     return r;
   }
 

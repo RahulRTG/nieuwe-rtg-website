@@ -415,7 +415,7 @@ antwoord is nee:
 > geen antwoord. Een projectiekamer heeft een korte code met een vervaltijd, door
 > de host gemunt, en die vervalt als de host weggaat.
 
-**Gebouwd** (`spellen/projectie.js` + `public/apps/speelscherm.html`, fase 1). De code
+**Gebouwd** (`spellen/projectie.js` + `public/apps/spelscherm.html`, fase 1). De code
 is bewust weinig waard: hij geeft één potje, hij verloopt na twee uur of zodra
 het potje weg is, en er kan niets terug — wie hem heeft ziet wat iedereen in de
 kamer toch al ziet. Het is de **enige spelingang zonder inlog**, en dat is de
@@ -804,19 +804,311 @@ prijs, reputatie, marketing), de klok die bijrekent, de vrije acties naast de
 grote, de Foundation als actor, en een eindstand op meer dan geld alleen:
 vermogen, ondernemingswaarde, banen, reputatie en omzet.
 
-**En één ding dat hier is misgegaan en het vermelden waard is.** In de eerste
-versie was `omvang` tegelijk de maandcapaciteit — veertig couverts per *maand*
-voor een restaurant met veertig stoelen. Alle zeven sectoren draaiden verlies,
-en in een uitgespeelde campagne wonnen de spelers die **minder personeel**
-aannamen en **geen onderhoud** deden, want capaciteit was toch niet de bindende
-factor. Een spel waarin niets doen de beste zet is, is geen spel. Dat stond niet
-in de code te lezen en bleek pas uit een uitgespeelde campagne;
-`scripts/magnaat-balans.js` meet het nu en `test/spelmagnaat.test.js` houdt het
-vast (band: elke sector verdient zijn bouwsom in 8 tot 24 maanden terug).
+**Een economie toets je door hem te spelen, en dat heeft twee gereedschappen
+opgeleverd.** `scripts/magnaat-balans.js` meet per sector wat een goed
+geplaatste zaak doet; `scripts/magnaat-strateeg.js` speelt 220 campagnes uit
+met elf strategieprofielen tegen elkaar en vraagt of er één domineert. Het
+tweede vindt wat het eerste per definitie niet kan zien.
 
-**Fase B — spelers tegen elkaar.** Contracten met looptijd en boete, supply
-chains tussen spelers, veilingen, aandelen en concerns, banken, verzekeringen,
-onderhoud en R&D.
+**Vier ijkingen, elk na een meting die de vorige tegensprak:**
+
+| # | Wat er mis was | Hoe het bleek |
+|---|---|---|
+| 1 | `omvang` was tegelijk de maandcapaciteit — veertig couverts per *maand* voor veertig stoelen. Alles draaide verlies en **minder personeel + geen onderhoud won** | een campagne uitspelen |
+| 2 | de balansmeter mat bij een *vaste* maat; de winst zit in **op maat** bouwen, en daar liepen sectoren ver uiteen (logistiek 5,7 maanden, horeca 9,6) | de strateeg: één profiel won 100% |
+| 3 | geijkt op het *beste* kavel, terwijl een campagne er tien opent — de **mediaan** telt | de strateeg opnieuw |
+| 4 | een kavel nam in de ene sector **veertig keer** zoveel kapitaal op als in de andere; bij gelijk startkapitaal is dat een ander spel | de strateeg opnieuw |
+
+Nu neemt elk kavel ongeveer tweehonderdduizend op en verdient zich in twaalf
+maanden terug — een hotelplek draagt zes kamers, een winkelplek zesenzestig
+kassaplekken. Het karakter van een sector zit in *hoe* hij werkt, niet in
+hoeveel nullen erachter staan.
+
+**Wat de strateeg hard afkeurt en wat hij alleen meldt**, want dat is niet
+hetzelfde. Hard (en als toets vastgelegd): niets doen mag niet winnen,
+afwachten mag niet meekomen met de actieve stijlen, er moeten minstens vier
+levensvatbare stijlen zijn, en knijpen op personeel mag niet lonen. Zacht: of
+een profiel te ver voorligt.
+
+> **Wat er vandaag nog scheef staat, eerlijk opgeschreven.** Mobility-focus wint
+> bijna al zijn duels en horeca-focus het merendeel. De vier ijkingen hebben het
+> veld dicht bij elkaar gebracht — zes stijlen tussen 60% en 100% — maar wie
+> zich op één sector stort doet het beter dan wie spreidt. De oorzaak is dat een
+> duel van twee op 144 kavels **geen schaarste** kent: ze lopen elkaar nooit
+> tegen het lijf. Dat verandert pas met fase B: contracten en veilingen laten
+> spelers elkaar raken ook als ze in andere buurten zitten. Het staat hier als
+> open punt en niet als opgelost.
+
+**Fase B — spelers tegen elkaar** — **half af.** Contracten en veilingen staan;
+aandelen en concerns, banken, verzekeringen en R&D nog niet.
+
+**Contracten** (`magnaat/handel.js`, `handel-acties.js`). Vijf velden waarover
+onderhandeld wordt: volume, bedrag, looptijd, kwaliteitseis en boete, plus
+exclusiviteit en een vooruitbetaling. Vier besluiten die zichtbaar horen te
+blijven:
+
+1. **Een levering gaat vóór de vrije verkoop.** Je hebt getekend: die capaciteit
+   is vergeven voordat de eerste klant binnenkomt. Zonder die volgorde is een
+   contract gratis geld en tekent iedereen alles.
+2. **Het bedrag staat vast, de behoefte niet.** De inkooppost van de afnemer
+   beweegt met zijn omzet mee; het contract niet. Daarom is `looptijd` een
+   keuze en geen formaliteit.
+3. **Wie tekort komt levert pro rata én betaalt de boete.** Niet-betalen zou de
+   afnemer belonen voor het uitknijpen van zijn leverancier.
+4. **`koopt` verdeelt de bestáánde inkoopsom** en telt per sector op tot 1.
+   Zonder contract rekent de economie dus precies als in fase A — een economie
+   die anders rekent zodra er een laag bijkomt, is twee economieën.
+
+**Veilingen** (`magnaat/veiling.js`, `veiling-acties.js`). Gesloten biedingen op
+een vrij kavel of op een lopende zaak. Eerste prijs, geen tweede: theoretisch
+netter, maar "ik bood 300.000 en betaal 210.000" is een regel die je aan tafel
+drie keer moet uitleggen. De hamer valt op de **spelmaand**, niet op de klok —
+anders verliest wie slaapt, en dat is de ratel uit §12.6. Er wordt bij het
+bieden niets gereserveerd; wie bij de hamer niet kan betalen ziet hem aan zijn
+neus voorbijgaan én staat met naam in de uitslag. **Een gekochte zaak komt met
+zijn contracten mee**, want anders is verkopen een achterdeur uit elke
+verplichting.
+
+> **Wat de meting zei, en waarom dat de verklaring uit fase A corrigeert.**
+> Fase A schreef de sectordominantie toe aan ontbrekende schaarste: twee spelers
+> op 144 kavels lopen elkaar nooit tegen het lijf, dus contracten en veilingen
+> zouden het oplossen. **Contracten lossen het niet op**, en waarom is nu
+> gemeten in plaats van geraden: een restaurant koopt ~5% van zijn omzet aan
+> vervoer in, dus een contract met 12% korting is 0,6% van zijn omzet. Dat
+> kantelt geen duel.
+>
+> De echte oorzaak bleek elders, en er volgden drie ijkingen uit. **(5)** Een
+> kavel droeg in de ene sector 132.000 omzet per maand en in de andere 28.000 —
+> wie per plek vier keer zoveel kwijt kan, heeft vier keer minder plekken nodig,
+> en elke extra plek verdunt via `drukFactor` alle andere. Spreiden was
+> zelfbeschadiging. **(6 en 7)** De prijsstand was géén keuze: de omzetindex
+> liep netjes op van 0,83 via 1,00 naar 1,20, en bij een hoge prijs haalde je
+> dezelfde omzet uit een *kleiner* pand — dus waren lonen, vaste lasten, huur
+> én bouwsom ook nog eens 45% lager. Duur zijn was gratis. Nu kost duur zijn
+> wat het in het echt kost: meer handen per gast, een duurder pand per stoel.
+>
+> **En de vraag zelf stond scheef.** Het toernooi speelt duels. Naast de
+> duels staat nu `veld()`: zes stijlen in één campagne. Daar wint horeca-focus
+> — 100% van zijn duels — nog maar twee van de acht tafels, en zwaar onderhoud
+> vijf. Het lag niet aan de ontbrekende laag maar aan de **tafelgrootte**
+> waarop gemeten werd.
+>
+> Wat open blijft: ook met zes raakt de kaart niet vol (~50% bebouwd), dus
+> veilingen om *grond* blijven een randverschijnsel — waar ze bijten is de
+> overname van een lopende zaak. En zwaar onderhoud wint vijf van de acht
+> tafels: een stijl in plaats van een sector, dus een beter soort dominantie,
+> maar dominantie.
+
+**Deelnemingen** (`magnaat/aandeel.js`, `aandeel-acties.js`). Een belang in de
+zaak van een ander: een contract koppelt twee bedrijven aan een *levering*, een
+deelneming aan een *resultaat*. Vier besluiten, alle vier aan dezelfde vraag —
+wie is de baas?
+
+1. **Een belang geeft geen zeggenschap.** De eigenaar blijft de enige aan de
+   knoppen. Anders is een vestiging met drie aandeelhouders een object waarvan
+   onduidelijk is wie er een zet op mag doen, en dan is elke actie een vraag.
+   Dit spel heeft geen stemlaag en krijgt er ook geen.
+2. **Hoogstens 49% gaat weg.** Wie het hele bedrijf wil, koopt het in de
+   veiling.
+3. **Verlies deel je mee** — anders is een belang verkopen in een slechte zaak
+   gratis geld.
+4. **Het belang hangt aan de vestiging, niet aan de eigenaar.** Wordt de zaak
+   verkocht, dan blijft het belang staan; anders schud je je aandeelhouders af
+   door te verkopen. De wederpartij wordt daarom *afgeleid* en niet opgeslagen.
+
+De eindstand telt per speler zijn eigen deel van zijn panden plus de waarde van
+zijn belangen elders — dezelfde euro mag niet bij twee mensen staan.
+
+### De derde meter: kan een speler waarde maken uit niets?
+
+`scripts/magnaat-pomp.js` staat naast de balansmeter en de strateeg, en hij
+stelt de vraag die die twee per definitie niet stellen: **kan een speler een
+mechaniek uitbuiten door geld rond te pompen zonder economische waarde te
+scheppen?** Hij zet twee identieke werelden naast elkaar — dezelfde stad,
+dezelfde bedrijven, dezelfde maanden — laat in de ene pompen en in de andere
+niet, en vergelijkt het totale vermogen aan tafel plus de Foundation-pot.
+
+**Hij vond bij zijn eerste ronde 193 miljoen op een tafel van 62 miljoen.** De
+kas klopte tot op de euro; de fout zat in de **waardering**. Een bedrijf is een
+veelvoud van zijn winst waard, dus wie zich laat overbetalen ziet zijn zaak
+exploderen terwijl de betaler alleen kas verliest. Een vervoerder met een
+bouwsom van 368.000 stond op 191 miljoen — 518× zijn stenen.
+
+Twee reparaties, op twee niveaus:
+
+- **De prijsband** (`handel.js`): het bedrag per eenheid moet tussen 0,4× en 2×
+  de marktprijs liggen. Daarbinnen valt alles te onderhandelen wat een
+  onderhandeling nodig heeft; daarbuiten is het geen prijs maar een cadeau.
+- **Het waardeplafond** (`waardering.js`): een bedrijf is nooit meer waard dan
+  vijftien keer zijn bouwsom. Ruim — goed spelen komt rond de zes uit — maar het
+  bindt de orde van grootte waarin een pomp werkt. Dat is een vangnet voor élke
+  volgende laag die geld verplaatst.
+
+Twee soorten scenario, want "het totaal verandert" is niet altijd fout:
+**neutraal** (een pure overdracht — elke afwijking is fout, omhoog én omlaag) en
+**kostend** (iets dat met opzet waarde vernietigt, zoals een pand slopen — zakken
+mag, stijgen nooit).
+
+> **De meter lekte eerst zelf**, en dat hoort erbij: hij telde de
+> Foundation-pot wel en wat er al uit gebouwd was niet, zodat elk scenario dat
+> de pot voedde waarde leek te vernietigen. Een lekkende meter is erger dan geen
+> meter, dus dat staat nu onder toets.
+
+**Er komt een scenario bij zodra er een laag bij komt.** Leningen (rente die
+ergens verdwijnt of uit het niets komt), verzekeringsuitkeringen zonder premie,
+interne concerns die zichzelf betalen, R&D-subsidies — het is dezelfde klasse,
+elke keer.
+
+---
+
+### Banken en financiering — de eerste laag waar geld de wereld verlaat
+
+Alles daarvoor **verplaatste**: een contract betaalt de een en verrijkt de
+ander, een veiling verschuift een zaak, een deelneming splitst een resultaat.
+Rente doet dat niet — die gaat naar een bank die geen speler is en komt nooit
+terug. Dat maakt deze laag gevaarlijker om te bouwen, en het is de reden dat de
+geldpomp-meter er een **derde categorie** bij kreeg (`lekkend`): zonder die
+categorie keurt hij financiering af omdát hij werkt.
+
+**Vijf vormen, en elke vorm moest dezelfde toets doorstaan: welke nieuwe manier
+van spelen maakt hij mogelijk?** Een vorm die alleen een ander getal is, staat
+er niet in.
+
+| Vorm | Wat hem anders maakt | Maakt mogelijk |
+|---|---|---|
+| **rekening-courant** | duur, direct, geen aanvraag — dit ís de oude `ROOD_RENTE`, nu met een dak | doorbouwen op het randje |
+| **werkkapitaal** | kort en aflossingsvrij | een piek voorfinancieren |
+| **investering** | lang, lineair aflossend, ongedekt | schaal kopen met andermans geld |
+| **vastgoed** | goedkoop, met een **kavel** als onderpand | veilig zwaar lenen, met een scherpe rand |
+| **achtergesteld** | duur en ongedekt, maar telt bij de convenanten als eigen vermogen | een hefboom op een hefboom |
+
+Obligaties en durfkapitaal zitten er bewust **niet** in: allebei vragen een
+*markt* met andere partijen dan de bank. Een obligatie zonder kopers is een dure
+lening met een ander woord erop.
+
+**De prijs van geld is een optelsom, en elke term komt uit een spelvariabele die
+de speler zelf beweegt**: schuldpositie, liquiditeit, betalingsdiscipline,
+contractzekerheid, winststabiliteit, sectorrisico, looptijd en — later — de
+conjunctuur. De opbouw reist mee naar het scherm, zodat een offerte uit te leggen
+is in plaats van te raden. Onderpand haalt er een vast stuk af én de helft van de
+opslagen die over jouw balans gaan: een pand in handen vervangt precies dat deel
+van je kredietwaardigheid.
+
+**Het kredietprofiel is zichtbaar en afgeleid.** Vijf assen in sterren, plus een
+risico-oordeel dat uit diezelfde vijf volgt. Geen enkele wordt apart bijgehouden
+— een score die los meeloopt, spreekt de werkelijkheid tegen waar hij over gaat.
+De enige die geschiedenis nodig heeft is winststabiliteit, en die kijkt twaalf
+maanden terug en niet verder. Een starter scoort daar **neutraal** en niet
+slecht: hij is niet onbetrouwbaar, hij is onbekend, en dat verschil hoort een
+bank te maken.
+
+**Een convenant escaleert in drie trappen en grijpt niet meteen.** Een bank die
+bij de eerste misstap je zaak inneemt, is een bank waar niemand ooit heenloopt —
+en dan is de hele laag decoratie.
+
+1. **Gesignaleerd** — je hoort het, en verder niets.
+2. **Opslag** — de rente gaat omhoog en de deur voor nieuw geld gaat dicht.
+3. **Opeisbaar** — pas na een half jaar aanhoudende breuk. Is er onderpand, dan
+   gaat dát eraan en verder niets; is er geen onderpand, dan kan niemand iets
+   afpakken en blijft de schuld duur staan. **Failliet gaan bestaat hier niet** —
+   zie §12.6: een speler die zijn wereld kwijtraakt, komt niet terug.
+
+**Heronderhandelen is de uitweg**, één keer per lening: langer lenen tegen een
+hogere rente, zodat de maandlast daalt. Dat is wat een bank in het echt ook doet
+voordat hij iets opeist.
+
+> **Wat de geldpomp-meter hier vond, meteen.** `eindstand` telde kas plus
+> bedrijven en trok de schuld er niet af — dus zette elke opname zijn hele bedrag
+> op de eindstand, en **op de laatste speeldag lenen was de goedkoopste manier om
+> te winnen**. Geen unittoets, geen balansmeter en geen toernooi zag het; alle
+> drie kijken ze naar iets anders. En een tweede: de dubbele opslag op een
+> opgeëiste ongedekte lening werd de maand erna weer teruggezet, waardoor opeisen
+> een tik op de vingers was die na een maand verviel.
+
+### Zes harde pomproutes op financiering
+
+Een financieringslaag biedt precies zoveel manieren om geld te drukken als hij
+posten heeft, dus zes routes die het elk anders proberen:
+
+| Route | Wat hij probeert | Uitkomst |
+|---|---|---|
+| lenen en direct terugbetalen | een lus die net iets meer teruggeeft | nul |
+| onderlinge financiering | twee spelers die met geleend geld in elkaar stappen | nul |
+| herfinanciering | nettovermogen verhogen door te herzien | nul |
+| lenen en stilzitten | rente die niet exact als sink terugkomt | nul |
+| onderpandspiraal | een pand dat zichzelf omhoog financiert | **vond een gat** |
+| hefboomladder | een kredietplafond dat wegloopt | begrensd |
+
+**Bij een lekkende laag is de eis scherper dan elders.** Rente verlaat de wereld
+met een exact bedrag, dus na aftrek hoort er *nul* over te blijven — niet "iets
+binnen een half procent". Wat er nog in mag zitten is afrondingsruis over een
+paar honderd geboekte regels: een handvol euro's, geen bedrag dat een speler kan
+gebruiken.
+
+**Twee van de zes vergelijken geen totalen, en dat is een correctie.** Wie leent
+en bouwt, bouwt echte bedrijven die echt geld verdienen — daar *hoort* het totaal
+van te stijgen, anders is lenen zinloos. De eerste versie van die twee scenario's
+mat dus of lenen werkt in plaats van of het lekt. Ze dragen nu hun eigen bewering:
+de leenruimte mag niet groeien van het lenen, en de schuld mag niet boven drie
+keer de bezittingen uitkomen.
+
+> **Wat de onderpandroute vond.** `ruimte` rekende voor een gedekte lening
+> `waarde × dekking` en trok **niet af wat er al op dat pand rustte**. Een speler
+> kon dus telkens opnieuw zeventig procent van dezelfde waarde lenen: het pand was
+> elke ronde weer onbelast. Dat is de onderpandspiraal in zijn zuiverste vorm —
+> geen waardering die meestijgt, maar een zekerheid die oneindig vaak vergeven
+> wordt.
+
+### Verzekeringen — risico als keuze, niet als vinkje
+
+**Acht risico's, en elk hangt aan een knop die de speler zelf zet.** Dezelfde
+toelatingseis als bij de kredietvormen: een risico dat alleen een andere kans is,
+staat er niet in.
+
+| Risico | Hangt aan | Raakt |
+|---|---|---|
+| brand | onderhoud (een pand op 10% brandt 5× zo vaak) | het pand |
+| storm | het seizoen | het pand |
+| machinebreuk | sector + onderhoud | de omzet |
+| transport | hoeveel goederen je beweegt | de omzet |
+| cyber | hoe digitaal je sector is | de omzet |
+| aansprakelijkheid | hoeveel mensen er over de vloer komen | een claim |
+| personeel | de bezetting van vorige maand | de omzet |
+| bedrijfsschade | **volgt op** brand of storm | de omzet |
+
+**Het toeval is deterministisch**, en dat is de zwaarste eis van deze laag. De
+klok rekent bij (§12.4), dus tien maanden in één keer moeten dezelfde branden
+geven als tien maanden los. Er wordt daarom *getrokken uit een hash* van
+(partij, maand, vestiging, risico) — dezelfde truc als `spreiding()` in
+`kaart.js`. Wat dat kost, eerlijk: het toeval is in principe voorspelbaar voor
+wie de formule kent en de staat kan lezen. Dat is acceptabel omdat de staat op
+de server staat, maar het is geen geheim dat veilig blijft als de wereld ooit
+open gaat.
+
+**Een polis heeft vijf velden** — dekking, eigen risico, maximum, premie en een
+uitsluiting — en samen vormen ze een echte afweging. **Oververzekeren is nooit
+winstgevend**, en dat wordt op twee manieren waargemaakt omdat één niet genoeg
+is: een uitkering komt nooit boven de aantoonbare schade, én de premie draagt
+35% opslag boven de verwachte schade. Wie een dikke kas heeft draagt zijn eigen
+risico goedkoper dan de verzekeraar het doet; wie krap zit betaalt met plezier de
+opslag. Dat is de keuze, en hij valt per speler anders uit.
+
+**De uitsluiting is een koppeling en geen kleine lettertjes.** Brand en
+machinebreuk keren niets uit als het onderhoud onder de dertig staat. Samen met
+de verhoogde kans betekent dat: onderhoud overslaan is geen besparing maar een
+weddenschap — je loopt méér risico én je bent er niet voor verzekerd.
+
+> **De toets die "verzekeren kost geld" bewijst, mat eerst het toeval.** Eén
+> partij waarin de verzekerde speler net wint, betekent niets: dat is precies
+> waar een verzekering voor is. De bewering geldt *in verwachting*, en wordt nu
+> over twaalf partijen gemeten — met de eis dat het in minstens één partij
+> loonde (anders is het een boete) en niet in allemaal (anders is het gratis).
+
+**Wat er van fase B nog niet in zit.** R&D: investering *vernietigend* op korte
+termijn, resultaat alleen *scheppend* via expliciet gemeten productiviteitswinst,
+en een subsidie is een *externe injectie* die apart gelabeld hoort en nooit als
+bedrijfsprestatie mag tellen. En een keuzeboom in plaats van een niveauladder,
+zodat een budgethotel zich anders ontwikkelt dan een luxeconcern.
 
 **Fase C — de permanente wereld.** Living World, AI-managers met beleidsregels,
 Safe Management Policy, vakantiemodus, overdracht, legacy, Magnaat Daily,

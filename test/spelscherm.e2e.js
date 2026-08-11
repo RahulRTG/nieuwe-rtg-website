@@ -12,7 +12,7 @@
       toont de stand van het potje. Zonder inlog, want dat is de hele opzet.
    2. DE KAART KOMT ER NIET OP -- en dat wordt op TWEE hoogten gemeten, want de
       eerste versie van deze toets keek alleen naar de DOM en dat bleek niets
-      te bewijzen. `scherm.html` rendert `kaart` namelijk nergens, dus ook als
+      te bewijzen. `spelscherm.html` rendert `kaart` namelijk nergens, dus ook als
       de server hem wel zou meesturen bleef het beeld schoon: de mutatie "zet
       de kaart terug in zicht.publiek" liet deze toets gewoon slagen.
 

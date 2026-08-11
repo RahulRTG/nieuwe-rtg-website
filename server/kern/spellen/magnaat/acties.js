@@ -17,7 +17,9 @@
    Zonder dat onderscheid staat een partij van zes met 24 uur per beurt zes
    dagen stil tussen twee van jouw handelingen. De descriptor draagt het via
    `buitenBeurt`; deze lijst is waar het waargemaakt wordt. */
-const { SECTOREN, PRIJSSTANDEN } = require('./sectoren');
+const { SECTOREN } = require('./sectoren');
+const { PRIJSSTANDEN, KOSTENSTAND } = require('./prijsstand');
+const { afkoopsom } = require('./handel');
 
 module.exports = ({ K, mijnVestiging, vrijKavel, rond }) => {
   /* ---------- de acties ---------- */
@@ -27,25 +29,34 @@ module.exports = ({ K, mijnVestiging, vrijKavel, rond }) => {
     open(potje, h, zet) {
       const st = potje.staat, k = K(st);
       const kavelId = String(zet.kavel || '');
-      if (!vrijKavel(st, kavelId)) return { status: 400, error: 'Dat kavel is er niet of is al bezet.' };
+      if (!vrijKavel(st, kavelId, h))
+        return { status: 400, error: 'Dat kavel is er niet, is al bezet, of er rust een bouwrecht van een ander op.' };
       const sector = String(zet.sector || '');
       if (!SECTOREN[sector]) return { status: 400, error: 'Die sector bestaat niet.' };
       const omvang = Math.max(4, Math.min(120, Math.floor(Number(zet.omvang) || 20)));
       const s = SECTOREN[sector];
       const kavel = k.kavel.get(kavelId);
-      const bouwsom = omvang * s.bouw;
+      /* KOSTENSTAND ook op de BOUWSOM, en dat is de post die het langst is
+         blijven liggen: een duur pand is kleiner voor dezelfde omzet, dus was
+         het ook goedkoper te bouwen -- en dan verdient duur zich in vijf
+         maanden terug en goedkoop in eenentwintig. Wie witte tafellakens wil,
+         bouwt duurder per stoel. Zie ./sectoren.js. */
+      const stand = PRIJSSTANDEN.includes(String(zet.prijs)) ? String(zet.prijs) : 'midden';
+      const bouwsom = Math.round(omvang * s.bouw * KOSTENSTAND[stand]);
       const huur = rond(kavel.eigenschappen.huur * omvang * 0.55);
       if (st.geld[h] < bouwsom) return { status: 400, error: 'Openen kost ' + bouwsom + '; dat heb je niet.' };
       st.geld[h] -= bouwsom;
       const v = {
         id: 'v' + (++st.teller || (st.teller = 1)), kavel: kavelId, sector,
         naam: String(zet.naam || s.naam).slice(0, 40),
-        omvang, personeel: Math.max(1, Math.ceil(omvang / s.perMedewerker)),
-        prijs: 'midden', marketing: 0, onderhoudBudget: rond(omvang * s.vast * 0.35),
+        omvang, personeel: Math.max(1, Math.ceil(omvang / (s.perMedewerker / KOSTENSTAND[stand]))),
+        prijs: stand, marketing: 0, onderhoudBudget: rond(omvang * s.vast * KOSTENSTAND[stand] * 0.35),
         onderhoud: 100, reputatie: 50, huur, gebouwdVoor: bouwsom, maanden: 0
       };
       st.vestigingen[h].push(v);
       st.kavelBezet[kavelId] = h;
+      // het bouwrecht is opgebruikt zodra er iets staat
+      if (st.kavelRecht) delete st.kavelRecht[kavelId];
       return { status: 200, ok: true, id: v.id };
     },
     /* GROOT: uitbreiden. Zelfde prijs per eenheid als bouwen. */
@@ -55,7 +66,7 @@ module.exports = ({ K, mijnVestiging, vrijKavel, rond }) => {
       if (!v) return { status: 404, error: 'Die vestiging is niet van jou.' };
       const erbij = Math.max(1, Math.min(60, Math.floor(Number(zet.erbij) || 0)));
       if (v.omvang + erbij > 200) return { status: 400, error: 'Groter dan dit kan deze plek niet aan.' };
-      const kosten = erbij * SECTOREN[v.sector].bouw;
+      const kosten = Math.round(erbij * SECTOREN[v.sector].bouw * KOSTENSTAND[v.prijs]);
       if (st.geld[h] < kosten) return { status: 400, error: 'Uitbreiden kost ' + kosten + '; dat heb je niet.' };
       st.geld[h] -= kosten;
       v.omvang += erbij;
@@ -63,15 +74,39 @@ module.exports = ({ K, mijnVestiging, vrijKavel, rond }) => {
       v.huur = rond(v.huur * (1 + erbij / (v.omvang - erbij)));
       return { status: 200, ok: true, omvang: v.omvang };
     },
-    /* GROOT: sluiten. Levert de halve bouwsom op en geeft het kavel vrij. */
+    /* GROOT: sluiten. Levert de halve bouwsom op en geeft het kavel vrij.
+
+       EEN ZAAK MET CONTRACTEN SLUIT JE NIET GRATIS. Wie een vestiging weghaalt
+       waarop verplichtingen rusten, koopt ze op datzelfde moment af tegen de
+       gewone afkoopsom -- naar de wederpartij, precies zoals bij opzeggen. Zo
+       is sluiten geen achterdeur uit een contract, en blijft er nooit een
+       verplichting achter die aan een vestiging hangt die niet meer bestaat.
+       Dat laatste is geen nettigheid: een levering van een verdwenen zaak zou
+       elke maand een boete opleveren zonder dat iemand er nog iets aan kan
+       doen, en dat is een val en geen keuze. */
     sluiten(potje, h, zet) {
       const st = potje.staat;
       const v = mijnVestiging(st, h, String(zet.id || ''));
       if (!v) return { status: 404, error: 'Die vestiging is niet van jou.' };
-      st.geld[h] += rond(v.gebouwdVoor * 0.5);
+      const raakt = (st.contracten || []).filter(c => c.status === 'loopt'
+        && (c.leverancierId === v.id || c.afnemerId === v.id));
+      const afkoop = raakt.reduce((n, c) => n + afkoopsom(c, st.maand), 0);
+      const opbrengst = rond(v.gebouwdVoor * 0.5);
+      if (st.geld[h] + opbrengst < afkoop)
+        return { status: 400, error: 'Er lopen contracten op deze vestiging; afkopen kost ' + afkoop + '.' };
+      st.geld[h] += opbrengst;
+      for (const c of raakt) {
+        const som = afkoopsom(c, st.maand);
+        const tegen = c.leverancier === h ? c.afnemer : c.leverancier;
+        st.geld[h] -= som;
+        st.geld[tegen] += som;
+        c.status = 'afgekocht';
+        c.eindMaand = st.maand;
+        c.afkoop = som;
+      }
       st.vestigingen[h] = st.vestigingen[h].filter(x => x !== v);
       delete st.kavelBezet[v.kavel];
-      return { status: 200, ok: true };
+      return { status: 200, ok: true, afgekocht: raakt.length, afkoop };
     },
     /* VRIJ: de knoppen waar je altijd aan mag draaien. Ze staan in EEN actie
        omdat ze allemaal hetzelfde doen -- een getal op een vestiging zetten --

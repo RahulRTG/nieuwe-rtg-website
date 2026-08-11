@@ -6,7 +6,7 @@
    vanuit kern/spellen.js. */
 const BANK = require('./quiz-data');
 module.exports = (ctx) => {
-  const { save, schud, codenaamVan, nudge } = ctx;
+  const { save, schud, codenaamVan, nudge, ZONDER_SPELER } = ctx;
   function quizInit(potje) {
     const volgorde = schud(BANK.map((_, i) => i)).slice(0, 10);
     const st = { vragen: volgorde, idx: {}, goed: {}, klaarOm: {} };
@@ -42,7 +42,13 @@ module.exports = (ctx) => {
       nr: st.idx[mij], tot: st.vragen.length, goed: st.goed[mij],
       stand: p.spelers.map(sp => ({ af: st.idx[sp], goed: st.goed[sp] })) };
   };
-  const spel = { sleutel: 'quiz', naam: 'Quizduel', max: 4, wereld: 'rtf', buitenBeurt: ['antwoord'], kijken: true,
-    init: quizInit, zet: quizZet, view: quizView };
+  /* Op een gedeeld scherm hoort de TUSSENSTAND en niets persoonlijks: ieders
+     eigen vraag loopt niet gelijk (je speelt in je eigen tempo), dus een vraag
+     op de televisie zou de een vooruit helpen en de ander verklappen. */
+  const quizPubliek = (p, st) => ({ tot: st.vragen.length,
+    stand: p.spelers.map(sp => ({ af: st.idx[sp], goed: st.goed[sp] })) });
+  const spel = { sleutel: 'quiz', naam: 'Quizduel', max: 4, wereld: 'rtf', buitenBeurt: ['antwoord'],
+    init: quizInit, zet: quizZet,
+    zicht: { speler: quizView, kijker: ZONDER_SPELER, publiek: quizPubliek } };
   return { spel, quizInit, quizZet, quizView };
 };

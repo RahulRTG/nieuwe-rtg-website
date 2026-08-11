@@ -2,7 +2,7 @@
    Verbatim afgesplitst uit kern/spellen.js; de lobby (aldaar) doet matchmaking,
    beurten en views en roept deze motor via de gedeelde context aan. */
 module.exports = (ctx) => {
-  const { save, crypto, schud, beurtDoor, codenaamVan, nudge } = ctx;
+  const { save, crypto, schud, beurtDoor, codenaamVan, nudge, ZONDER_SPELER } = ctx;
 
   const SCH_START = 'RNBQKBNRPPPPPPPP' + '.'.repeat(32) + 'pppppppprnbqkbnr'; // wit onder (kleine letters = wit)
   function schaakInit(potje) {
@@ -158,9 +158,16 @@ module.exports = (ctx) => {
      lopen gelijk op. Stopt schaakZet met het bijwerken van potje.beurt, dan
      zakt die toets. */
   const spel = {
-    sleutel: 'schaak', naam: 'Schaken', max: 2, wereld: 'rtg', kijken: true,
+    sleutel: 'schaak', naam: 'Schaken', max: 2, wereld: 'rtg', vormen: ['live', 'async'], naspeelbaar: true,
     init: schaakInit, zet: schaakZet,
-    view: (p, st) => ({ bord: st.bord.join(''), aanZet: st.aanZet, laatste: st.zetten[st.zetten.length - 1] || null })
+    /* Schaken kent geen verborgen informatie: de weergave leest `mij` niet
+       eens. Speler, kijker en publiek zijn hier dus dezelfde drie woorden voor
+       hetzelfde beeld -- en dat mag, zolang het opgeschreven staat. */
+    zicht: {
+      speler: (p, st) => ({ bord: st.bord.join(''), aanZet: st.aanZet, laatste: st.zetten[st.zetten.length - 1] || null }),
+      kijker: ZONDER_SPELER,
+      publiek: (p, st) => ({ bord: st.bord.join(''), aanZet: st.aanZet, laatste: st.zetten[st.zetten.length - 1] || null })
+    }
   };
   return { spel, schaakInit, schaakZet };
 };

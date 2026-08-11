@@ -3,9 +3,17 @@
    de RTG-leden-app (Bearer-token) en de RTFoundation (gezinscode + token),
    zodat alle leden tegen elkaar spelen. */
 const { log } = require('../log');
+const rem = require('../rem');
 
 module.exports = (kern) => {
-  const { app, auth, geenGast, rtf, spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelKijk, spelReplay, spelRahul, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, spelUitslagen, spelStand, spelPrestaties, spelPraat, spelPraatStuur, teamNieuw, teamNodig, teamAntwoord, teamVerlaat, mijnTeams, sudokuNieuw, sudokuKlaar, toernooiNieuw, toernooiAntwoord, mijnToernooien, toernooiStaat, sneekScore, sneekBord, arcadeScore, arcadeBord, socialConnecties } = kern;
+  /* Alleen wat DIT bestand gebruikt. De acties rondom een potje pakken hun
+     eigen namen in ./spellen-rondom.js; ze hier ook uitpakken zou betekenen dat
+     een routebestand namen uit de kern trekt die het niet aanraakt, en daar
+     staat een controle op (check.js regel 39). */
+  const { app, auth, geenGast, rtf, spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet,
+    spelOpgeven, spelToewijzen, spelKijk, spelReplay, spelNaspelen, spelRahul, spelNabespreking,
+    projectieStand, spelKlasgenoten, spelOnline, spelUitslagen, spelStand, spelPrestaties,
+    socialConnecties } = kern;
 
   function rtfSpeler(req, res) {
     const sess = rtf.verifieerProfiel(req.body.code, req.body.token);
@@ -27,9 +35,15 @@ module.exports = (kern) => {
   // dezelfde acties voor beide werelden; alleen de identiteit verschilt, en
   // elke app start zijn eigen spelgroep (meespelen op uitnodiging kan altijd)
   const ACTIES = {
-    nieuw: (mij, b, wereld) => spelNieuw(mij, { soort: b.soort, grootte: b.grootte, modus: b.modus, vrienden: b.vrienden, codenamen: b.codenamen, klasgenoten: b.klasgenoten, taal: b.taal, wereld }),
+    /* `context` en `bron` staan hier met OPZET niet bij, en dat is geen
+       omissie: ze bepalen straks welk beleid aan een potje hangt (§8 van
+       GAMEHALL.md), en wie zijn eigen context mag meesturen opent een 18+-spel
+       als schoolsessie. Ze worden gezet door de INGANG die het weet -- een
+       chat-start kent zijn gesprek, deze route kent alleen "iemand vraagt een
+       potje aan". Voeg ze hier dus niet toe omdat de kern ze accepteert. */
+    nieuw: (mij, b, wereld) => spelNieuw(mij, { soort: b.soort, grootte: b.grootte, modus: b.modus, vrienden: b.vrienden, codenamen: b.codenamen, klasgenoten: b.klasgenoten, taal: b.taal, tempo: b.tempo, wereld }),
     antwoord: (mij, b) => spelAntwoord(mij, String(b.id || ''), b.akkoord === true),
-    random: (mij, b, wereld) => spelRandom(mij, String(b.soort || ''), b.grootte, b.taal, wereld),
+    random: (mij, b, wereld) => spelRandom(mij, String(b.soort || ''), b.grootte, b.taal, wereld, b.tempo),
     mijn: (mij) => Object.assign({ status: 200 }, mijnSpellen(mij)),
     staat: (mij, b) => spelStaat(mij, String(b.id || ''), b.velden === true),
     zet: (mij, b) => {
@@ -40,12 +54,24 @@ module.exports = (kern) => {
       return r;
     },
     opgeven: (mij, b) => spelOpgeven(mij, String(b.id || '')),
+    /* De partij opeisen als de klok van de ander verliep. Bewust een APARTE
+       actie en niet iets wat 'staat' stilletjes doet: een potje beeindigen is
+       een handeling en hoort er een te blijven. */
+    toewijzen: (mij, b) => spelToewijzen(mij, String(b.id || '')),
     // het verloop van je EIGEN partij; een kijker krijgt hier niets
     replay: (mij, b) => spelReplay(mij, String(b.id || '')),
+    /* Hetzelfde verloop, maar herbouwd tot een bord: de server rekent, zodat
+       de client geen tweede exemplaar van de spelregels hoeft te dragen. */
+    naspelen: (mij, b) => spelNaspelen(mij, String(b.id || ''), b.stap),
     // meekijken: mag dit spel bekeken worden, en hoor jij bij de kring?
     kijk: (mij, b) => spelKijk(mij, String(b.id || '')),
     // Rahul als spelmaatje: een hint, een regel of een peptalk tijdens het potje
     rahul: (mij, b) => spelRahul(mij, String(b.id || ''), b.vraag),
+    /* Rahul die de partij NA AFLOOP nabespreekt. Bewust een tweede ingang en
+       geen vlag op `rahul`: deze leest het hele verloop en weigert daarom een
+       lopend potje. Een vlag op dezelfde deur zou betekenen dat een verkeerde
+       waarde het bord alsnog opengooit. */
+    nabespreking: (mij, b) => spelNabespreking(mij, String(b.id || ''), b.vraag),
     // de kieslijst met klasgenoten (De Arena); een RTG-lid heeft geen klas
     // en krijgt gewoon een lege lijst
     klasgenoten: (mij) => spelKlasgenoten(mij),
@@ -59,45 +85,13 @@ module.exports = (kern) => {
     stand: (mij) => spelStand(mij),
     // behaalde prestaties; wat je nog NIET hebt reist bewust niet mee
     prestaties: (mij) => spelPrestaties(mij),
-    /* Toernooien: een knockout waarvan elke wedstrijd een gewoon potje is. De
-       deelnemers komen uit dezelfde kring als een potje (vrienden en
-       klasgenoten), dus de kring wordt hier bepaald en niet in het verzoek. */
-    'toernooi-nieuw': (mij, b) => toernooiNieuw(mij, { soort: b.soort, naam: b.naam, maat: b.maat, vorm: b.vorm,
-      spelers: (Array.isArray(b.spelers) ? b.spelers : []).filter(k => kringVan(mij).includes(k)) }),
-    'toernooi-antwoord': (mij, b) => toernooiAntwoord(mij, String(b.id || ''), b.akkoord === true),
-    'toernooi-mijn': (mij) => mijnToernooien(mij),
-    'toernooi-staat': (mij, b) => toernooiStaat(mij, String(b.id || '')),
-    // de eigen opt-out: wel spelen, niet gezien worden
-    zichtbaar: (mij) => spelZichtbaar(mij),
-    'zichtbaar-zet': (mij, b) => spelZichtbaarZet(mij, b.aan !== false),
-    'sneek-score': (mij, b) => sneekScore(mij, b.punten),
-    'sneek-bord': (mij) => Object.assign({ status: 200 }, sneekBord(mij, vriendenVan(mij))),
-    /* Teams: een vaste club om mee te spelen. Uitnodigen kan alleen binnen je
-       eigen kring, en die wordt gewogen in `kern/spellen/kring.js` -- met opzet
-       NIET hier nog een keer. Hier stond eerst een tweede filter op `kringVan`,
-       en dat was smaller dan de kern: `kringVan` kent vrienden en klasgenoten,
-       de kring kent ook het huishouden. Een ouder kon zijn eigen kind dus niet
-       in zijn team vragen. Twee definities van dezelfde kring is precies wat
-       kring.js moest opheffen; deze route geeft de gevraagde sleutels door en
-       de kern zeeft ze. */
-    'team-nieuw': (mij, b) => teamNieuw(mij, b.naam, Array.isArray(b.leden) ? b.leden : []),
-    'team-nodig': (mij, b) => teamNodig(mij, String(b.id || ''), Array.isArray(b.leden) ? b.leden : []),
-    'team-antwoord': (mij, b) => teamAntwoord(mij, String(b.id || ''), b.akkoord === true),
-    'team-verlaat': (mij, b) => teamVerlaat(mij, String(b.id || '')),
-    'team-mijn': (mij) => mijnTeams(mij),
-    /* Praten in het potje. Geen eigen berichtenvoorraad -- dit gaat de
-       communicatiekern in; zie kern/spellen/praat.js. Twee acties, want lezen
-       mag geen gesprek AANMAKEN. */
-    praat: (mij, b) => spelPraat(mij, String(b.id || ''), b.aantal),
-    'praat-stuur': (mij, b) => spelPraatStuur(mij, String(b.id || ''), b.tekst),
-    /* Sudoku loopt NIET via arcade-score: de server geeft de puzzel uit en
-       rekent de score. Er is dus ook geen tijd of getal dat hier binnenkomt --
-       alleen het ingevulde rooster. */
-    'sudoku-nieuw': (mij, b) => sudokuNieuw(mij, String(b.niveau || '')),
-    'sudoku-klaar': (mij, b) => sudokuKlaar(mij, b.rooster),
-    'arcade-score': (mij, b) => arcadeScore(mij, String(b.spel || ''), b.punten),
-    'arcade-bord': (mij, b) => arcadeBord(mij, String(b.spel || ''), vriendenVan(mij))
   };
+
+  /* De acties RONDOM een potje (toernooien, teams, praten, de arcade, het
+     gedeelde scherm) staan in ./spellen-rondom.js en worden hier bijgeschoven.
+     Een tabel, een lus, een poort -- de splitsing is alleen de omvang. */
+  Object.assign(ACTIES, require('./spellen-rondom')(kern, { vriendenVan, kringVan }));
+
   /* vangnet: Express 4 vangt async-fouten niet zelf, dus zonder try/catch
      blijft een request eeuwig hangen als een actie onverwacht gooit.
 
@@ -113,6 +107,21 @@ module.exports = (kern) => {
       res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.', id: req && req.id });
     }
   }
+  /* HET GEDEELDE SCHERM, en dit is de enige spelingang ZONDER inlog -- met
+     reden: een televisie in een vakantiehuis heeft geen RTG-account, en er een
+     op zetten zou betekenen dat er een ingelogde sessie op een gedeeld apparaat
+     blijft staan. De CODE is het hele bewijs, en hij is bewust weinig waard:
+     hij geeft alleen `zicht.publiek` van EEN potje, hij verloopt, en er kan
+     niets terug. Wie hem heeft ziet wat iedereen in de kamer toch al ziet.
+
+     De rem is wat brute kracht tegenhoudt; de code is kort omdat hij op een
+     scherm wordt overgetypt. Zie de kop van kern/spellen/projectie.js. */
+  app.get('/api/projectie/:code', rem({ windowMs: 60000, limit: 60 }), (req, res) => {
+    const r = projectieStand(String(req.params.code || ''));
+    if (r.error) return res.status(r.status).json({ error: r.error });
+    res.json(r);
+  });
+
   for (const [naam, doe] of Object.entries(ACTIES)) {
     app.post('/api/member/spel/' + naam, auth, (req, res) => {
       if (geenGast(req, res)) return;

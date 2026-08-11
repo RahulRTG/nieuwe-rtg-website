@@ -2,7 +2,7 @@
    Verbatim afgesplitst uit kern/spellen.js; de lobby (aldaar) doet matchmaking,
    beurten en views en roept deze motor via de gedeelde context aan. */
 module.exports = (ctx) => {
-  const { save, crypto, schud, beurtDoor, codenaamVan, nudge } = ctx;
+  const { save, crypto, schud, beurtDoor, codenaamVan, nudge, ZONDER_SPELER } = ctx;
   const fs = require('fs'), zlib = require('zlib'), path = require('path');
 
   const W_TAtLEN = {
@@ -144,9 +144,15 @@ module.exports = (ctx) => {
     /* perTaal: de letterzak en de woorden verschillen per taal, dus een
        Nederlandse en een Engelse zoeker horen niet in dezelfde wachtrij. Voor
        elk ander spel doet de taal er voor de matchmaking niet toe. */
-    sleutel: 'woord', naam: 'Woordduel', max: 2, wereld: 'rtg', perTaal: true, kijken: true,
+    sleutel: 'woord', naam: 'Woordduel', max: 2, wereld: 'rtg', perTaal: true, vormen: ['live', 'async'],
     init: woordInit, zet: woordZet,
-    view: (p, st, mij) => ({ bord: st.bord, scores: p.spelers.map(sp => st.scores[sp]), rek: st.rekken[mij], zak: st.zak.length, passes: st.passes })
+    /* Het bord en de scores zijn openbaar; `rek` hangt aan `mij` en is zonder
+       speler `undefined`. Een kijker ziet dus niemands letters. */
+    zicht: {
+      speler: (p, st, mij) => ({ bord: st.bord, scores: p.spelers.map(sp => st.scores[sp]), rek: st.rekken[mij], zak: st.zak.length, passes: st.passes }),
+      kijker: ZONDER_SPELER,
+      publiek: (p, st) => ({ bord: st.bord, scores: p.spelers.map(sp => st.scores[sp]), zak: st.zak.length, passes: st.passes })
+    }
   };
   return { spel, woordInit, woordZet, W_PREMIE };
 };

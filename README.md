@@ -3556,13 +3556,86 @@ spel is er een bestand in.
 |---|---|---|
 | Spelers | 2-6, om de beurt | alleen jij |
 | Regels | server-authoritatief | **in de client**, tenzij `serverScore` |
-| Zegt | `wereld`, `max`/`min`, `volwassen`, `buitenBeurt`, `teams`, `perTaal`, `kijken`, `init`/`zet`/`view`/`statisch` | `werelden` (lijst), `maxPunten`, `serverScore` |
+| Zegt | `wereld`, `max`/`min`, `volwassen`, `buitenBeurt`, `teams`, `perTaal`, `vormen`, `zicht`, `init`/`zet`/`statisch` | `werelden` (lijst), `maxPunten`, `serverScore` |
 
 Een spel toevoegen is dus: een bestand neerzetten. Vergeet je de descriptor,
 dan **start de server niet**, met de bestandsnaam in de melding -- stil
 overslaan zou betekenen dat een spel spoorloos uit de lobby verdwijnt, en dat
 is precies de fout die dit register moet uitsluiten. In `lobby.js`, `partij.js`
 en `spellen.js` staat geen enkele spelnaam meer.
+
+### Wie ziet wat: drie lagen, en waarom het er twee waren
+
+Een spel levert zijn weergave in `zicht`, met drie functies waarvan alleen de
+eerste verplicht is:
+
+| Laag | Krijgt wie | Ontbreekt hij? |
+|---|---|---|
+| `zicht.speler(p, st, mij)` | een deelnemer, inclusief zijn hand | kan niet ontbreken |
+| `zicht.kijker(p, st)` | een vriend die meekijkt | dan is het spel **niet te bekijken** |
+| `zicht.publiek(p, st)` | een gedeeld scherm in de kamer | dan is het **niet te projecteren** |
+
+Hiervoor waren het er twee: de speler kreeg `view(p, st, mij)`, de kijker
+dezelfde functie met `mij = null`, en `kijken: true` zei dat dat veilig was.
+Die vlag was een **bewering naast de code**, en hij klopte bij drie van de
+zestien spellen niet -- 30 Seconden toonde de kaart juist wél aan een kijker
+(die heeft geen spelersindex, dus `indexOf(null)` is `-1` en nooit de rader),
+en Reactieduel en Schatduel lazen `st.tijden[mij].length` op een `mij` die niet
+bestond, wat `spelKijk` liet gooien en de route een 500 liet geven. Geen enkele
+toets riep `spelKijk` op die twee aan; de catalogustoets keek alleen naar de
+vlag.
+
+Nu is de weergave zelf het antwoord en valt er niets meer te vergeten. Vijftien
+spellen halen hun kijkweergave nog steeds uit de spelerweergave -- vijftien
+bijna-kopieen zouden uiteenlopen -- maar dat is nu `kijker: ZONDER_SPELER`, een
+claim die `zicht.lekken()` narekent in plaats van gelooft. Het register weigert
+`view` en `kijken` **luid**: automatisch vertalen zou die drie fouten
+meenemen naar de nieuwe vorm en er de schijn van een besluit aan geven.
+
+**30 Seconden is daarmee het spel dat de laag verklaart.** Het heeft geen
+kijkweergave (die zou de kaart lekken) en wél een projectie: score, klok en wie
+er raadt. De kaart zit niet in wat een scherm ontvangt, dus het *kan* hem niet
+krijgen -- dat is iets anders dan hem niet sturen.
+
+### Een klok per beurt
+
+Een potje kan een `tempo` dragen, maar alleen als het spel `vormen: [...,
+'async']` zegt (zes doen dat: schaken, dammen, Woordduel, Rummi, mens-erger-je-
+niet en Magnaat). Drie soorten: **live** (30s/5m/15m), **relaxed** (6u/12u) en
+**long play** (24u/72u). De lijst staat op het platform en niet per spel, want
+hij is voor elk async spel hetzelfde; zestien eigen lijstjes zijn zestien
+plekken waar `12u` kan gaan afwijken.
+
+**De klok verloopt naar een aanbod, niet naar een uitslag.** Loopt de beurt af,
+dan kan de tegenstander de partij toewijzen -- doet hij niets, dan gebeurt er
+niets. Verlies-door-tijd is eerlijk in een competitie en hard in een
+vriendenpotje. Een **toernooiwedstrijd** is de uitzondering en verloopt wel
+vanzelf, want daar houdt een hele ronde stil en hangt de uitslag aan een
+afspraak die vooraf is gemaakt. Toewijzen loopt langs `spelOpgeven` namens wie
+niet kwam, zodat er maar één plek is die een potje beeindigt.
+
+De klok telt bij relaxed en long play bewust **niet zichtbaar af**: je ziet
+"jouw beurt, nog 18 uur". Een wegtikkende klok op een partij van drie dagen is
+de kunstmatige urgentie die `CLAUDE.md` verbiedt.
+
+### Het beleid: alle toetredingsvragen op een plek
+
+`spellen/beleid.js` stelt bij elke toetreding dezelfde vragen in dezelfde
+volgorde -- bestaat het spel, mag deze app het starten, mag deze speler mee --
+en geeft de eerste weigering terug. Hij **neemt geen enkele regel over**: hij
+roept `gedeeld.js`, `grens.js` en `zicht.js` aan. Een policylaag die zelf gaat
+beslissen is een tweede kopie, en dan zijn er weer twee antwoorden op dezelfde
+vraag.
+
+Twee dingen die daardoor uitgesproken zijn in plaats van impliciet:
+
+- **Meedoen is een smallere vraag dan starten.** De leeftijdspoort geldt bij het
+  accepteren, de wereldpoort niet -- `wereld` zegt welke app een potje mag
+  *starten*, en meespelen kan altijd over en weer.
+- **Het beleid komt nooit uit het verzoek.** Een potje draagt een `context`
+  (`hall`, `chat`, `school`, `werk`, ...) uit een gesloten lijst, en de route
+  stuurt hem bewust niet door: wie zijn eigen context mag meesturen, opent
+  straks een 18+-spel als schoolsessie.
 
 Let op wat de arcade-rij zegt: **een arcadescore is niet server-authoritatief.**
 De client rekent en stuurt een getal; de puntengrens uit de descriptor is de
@@ -3581,9 +3654,27 @@ niet te bewijzen, en doen alsof van wel zou een belofte zijn die de code niet
 waarmaakt. Sneek en Tetris hebben geen narekenbare regel en blijven dus zoals
 ze waren.
 
+**En daarom heeft Sudoku als enige een dagopgave** (`kern/spellen/dag.js`): een
+puzzel per dag, dezelfde voor iedereen, met een bord dat 's nachts leeg is. Het
+register weigert `dagelijks: true` zonder `serverScore: true` -- dat is de enige
+harde koppeling die het kent, en hij staat er omdat een dagbord een competitie
+is waarop ook mensen staan die je niet kent. Drie ingangen: `dag` kijkt (en
+start geen klok), `dag-start` start hem, `dag-klaar` levert in. De laag noemt
+geen enkel spel bij naam -- wat een opgave *is* komt uit twee haken in de
+descriptor (`dagOpgave` en `dagKeur`), precies de twee die Sneek en Tetris
+straks invullen met hun seed en hun invoerlogboek.
+
+Wat er met opzet **niet** in zit, want dat is de helft van het ontwerp: geen
+reeks ("vijf dagen op rij" straft je voor de dag dat je niet meedoet), geen
+melding dat de opgave verloopt (structureel: de module krijgt `nudge` niet eens
+binnen), en geen historie -- elke dag die niet vandaag is wordt gewist, opgave
+en al. Je *plaats* gaat over het hele veld, de *namenlijst* blijft je eigen
+kring: een lijst met codenamen van vreemden is een sociale laag die dit huis
+nergens anders heeft.
+
 ### De progressiegrens: alles wat blijft, stopt bij 18+
 
-Eén functie (`progressieMag` in `kern/spellen.js`) bepaalt wie een spoor
+Eén functie (`progressieMag` in `kern/spellen/grens.js`) bepaalt wie een spoor
 achterlaat: highscores, ranglijsten, uitslagen, standen en prestaties bestaan
 alleen voor leden die de 18+-poort halen -- dezelfde poort als Proost, dus met
 een gecontroleerde paspoort-geboortedatum. **Onder die grens blijft elk spel

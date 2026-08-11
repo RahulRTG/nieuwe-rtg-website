@@ -14,6 +14,7 @@ const assert = require('node:assert/strict');
 
 const maakSpellen = require('../server/kern/spellen');
 const maakRegister = require('../server/kern/spellen/register');
+const { lekken } = require('../server/kern/spellen/zicht');
 const spelCtx = { save() {}, crypto: require('crypto'), schud: (a) => a, beurtDoor() {}, codenaamVan: (x) => 'CN-' + x, nudge() {} };
 const REG = maakRegister(spelCtx);
 
@@ -100,36 +101,158 @@ test('de poort weigert een spel dat niet bekeken mag worden', () => {
 });
 
 test('30 Seconden mag NIET bekeken worden, en dit is de reden', () => {
-  /* De weergave verbergt de kaart voor de RADER op zijn spelersindex. Een
+  /* De spelerweergave verbergt de kaart voor de RADER op zijn spelersindex. Een
      kijker heeft geen index, dus `indexOf(null)` geeft -1 en dat is nooit
      gelijk aan de rader -- de kaart zou dus juist aan de kijker getoond
      worden, die hem kan doorgeven. Deze toets meet dat, zodat de uitzondering
      geen aanname is. */
-  const spelers = ['s0', 's1', 's2', 's3'];
-  const p = { id: 'x', soort: 'seconden', modus: 'teams', spelers, uitgenodigd: [], beurt: 0,
-    teams: [0, 1, 0, 1], status: 'bezig', winnaar: null, at: '' };
-  REG.INITS.seconden(p);
-  REG.ZETTEN.seconden(p, 's0', { actie: 'kaart' });
-  const rader = (p.beurt + 2) % spelers.length;
-  assert.equal(REG.VIEWS.seconden(p, p.staat, spelers[rader]).kaart, null, 'de rader ziet de kaart niet');
-  assert.ok(REG.VIEWS.seconden(p, p.staat, null).kaart, 'maar een kijker WEL -- vandaar geen kijken');
-  assert.ok(!REG.SPEL.seconden.kijken, 'dus staat kijken bij dit spel uit');
+  const p = secondenMetKaart();
+  const rader = (p.beurt + 2) % p.spelers.length;
+  assert.equal(REG.ZICHT.seconden.speler(p, p.staat, p.spelers[rader]).kaart, null, 'de rader ziet de kaart niet');
+  assert.ok(REG.ZICHT.seconden.speler(p, p.staat, null).kaart, 'maar zonder speler WEL -- vandaar geen kijkweergave');
+  assert.equal(REG.ZICHT.seconden.kijker, null, 'dus heeft dit spel er geen');
 });
 
 test('meekijken staat standaard UIT voor een nieuw spel', () => {
   /* Opt-in en niet opt-out: een spel dat de vraag niet beantwoordt is niet te
      bekijken, in plaats van per ongeluk wel. */
-  const spel = "module.exports = () => ({ spel: { sleutel: 'nieuw', naam: 'Nieuw', max: 2, wereld: 'rtg', init(){}, zet(){}, view(){} } });";
+  const spel = "module.exports = () => ({ spel: { sleutel: 'nieuw', naam: 'Nieuw', max: 2, wereld: 'rtg', init(){}, zet(){}, zicht: { speler(){} } } });";
   const fs = require('fs'), os = require('os'), path = require('path');
   const map = fs.mkdtempSync(path.join(os.tmpdir(), 'kijk-'));
   try {
     fs.writeFileSync(path.join(map, 'nieuw.js'), spel);
-    const { SPEL } = maakRegister(spelCtx, map);
-    assert.ok(!SPEL.nieuw.kijken, 'zonder kijken in de descriptor: niet te bekijken');
+    const { ZICHT } = maakRegister(spelCtx, map);
+    assert.equal(ZICHT.nieuw.kijker, null, 'zonder zicht.kijker: niet te bekijken');
   } finally { fs.rmSync(map, { recursive: true, force: true }); }
 });
 
 test('vijftien spellen mogen bekeken worden, en precies een niet', () => {
-  const uit = Object.keys(REG.SPEL).filter(k => !REG.SPEL[k].kijken);
+  const uit = Object.keys(REG.ZICHT).filter(k => !REG.ZICHT[k].kijker);
   assert.deepEqual(uit, ['seconden'], 'elke andere uitzondering hoort een reden te hebben');
+});
+
+/* ---------- de bewaking die de drie fouten had gevonden ----------
+
+   Hierboven staat 30 Seconden met naam en toenaam, en dat is precies het
+   probleem met de oude opzet: het was de ENIGE die iemand had nagemeten. De
+   vlag `kijken: true` was verder een bewering, en hij klopte bij drie van de
+   zestien spellen niet -- 30 Seconden lekte de kaart, en Reactieduel en
+   Schatduel GOOIDEN een uitzondering zodra een kijker langskwam, wat de route
+   in een 500 veranderde. Geen enkele toets riep spelKijk op die twee aan.
+
+   Deze twee toetsen vervangen die bewering door een meting over alle spellen
+   tegelijk, zodat het volgende spel er vanzelf onder valt. */
+
+/* SPELLEN WAARVAN HET GEHEIM PAS NA EEN ZET BESTAAT.
+
+   Dit tafeltje is de reden dat de eerste versie van deze bewaking niets waard
+   was: hij bouwde elk potje met alleen `init` en riep dan `lekken` aan. Bij
+   vijftien spellen ligt er dan al genoeg op tafel (kaarten zijn gedeeld, rekken
+   gevuld), maar bij 30 Seconden is `st.kaart` nog null -- er valt niets te
+   verbergen, dus er lekt niets, dus de toets was groen terwijl hij precies het
+   spel moest bewaken waarvoor hij bestond. Gemeten met een mutatie, niet
+   bedacht.
+
+   Een spel dat hier hoort te staan en het niet doet, laat deze toets dus
+   onterecht slagen. Daarom controleert `inGang` hieronder dat een opgevoerde
+   zet de staat ECHT verandert: een tafeltje dat stil verouderd is (actie
+   hernoemd, zet geweigerd) valt om in plaats van niets meer te doen. */
+const OPENING = {
+  seconden: { door: 0, zet: { actie: 'kaart' } }
+};
+
+// een lopend potje, in een staat waarin er iets te verbergen valt
+function inGang(soort) {
+  const spelers = ['a', 'b', 'c', 'd'].slice(0, Math.max(REG.SPEL[soort].min || 2, 2));
+  const p = { id: 'q_' + soort, soort, modus: REG.SPEL[soort].teams === 'altijd' ? 'teams' : 'vrij',
+    spelers, uitgenodigd: [], beurt: 0, teams: [0, 1, 0, 1], status: 'bezig', winnaar: null, at: '' };
+  REG.INITS[soort](p);
+  const o = OPENING[soort];
+  if (o) {
+    const voor = JSON.stringify(p.staat);
+    REG.ZETTEN[soort](p, spelers[o.door], o.zet);
+    assert.notEqual(JSON.stringify(p.staat), voor,
+      'de openingszet van ' + soort + ' verandert niets meer; dit tafeltje is verouderd');
+  }
+  return p;
+}
+
+const secondenMetKaart = () => inGang('seconden');
+
+test('de lektoets vindt het geval waarvoor hij bestaat', () => {
+  /* De positieve controle, en die staat hier omdat een bewaker die niets kan
+     vinden geen bewaker is. Vindt deze toets niets meer, dan bewijst de
+     volgende ook niets meer -- dan is `lekken` stuk en niet de spellen. */
+  const p = secondenMetKaart();
+  assert.deepEqual(lekken(REG.ZICHT.seconden.speler, p, p.staat), ['kaart'],
+    'de spelerweergave van 30 Seconden hoort `kaart` aan een niet-speler te lekken');
+});
+
+test('geen enkel spel dat ZONDER_SPELER claimt, lekt iets naar een kijker', () => {
+  /* ZONDER_SPELER betekent: "mijn spelerweergave is zonder speler veilig als
+     kijkweergave". Vijftien spellen doen die claim, en dit is de plek waar hij
+     wordt nagerekend in plaats van geloofd.
+
+     `lekken` vindt de STRUCTURELE vorm: een veld dat de weergave voor minstens
+     EEN speler verbergt en aan een kijker wel toont. Dat is de vorm van alle
+     drie de gevonden fouten. Het potje komt via `inGang`, zodat er ook echt
+     iets te verbergen valt -- zie het tafeltje daarboven voor waarom dat niet
+     vanzelf spreekt. */
+  for (const [soort, z] of Object.entries(REG.ZICHT)) {
+    if (!z.zonderSpeler) continue;
+    const p = inGang(soort);
+    assert.deepEqual(lekken(z.speler, p, p.staat), [], soort + ' lekt iets naar een kijker');
+  }
+});
+
+test('elke kijkweergave werkt ook echt, bij elk spel dat er een heeft', () => {
+  /* De toets die er niet was. Reactieduel en Schatduel stonden op
+     `kijken: true` terwijl hun weergave `st.tijden[mij].length` las -- voor een
+     kijker `undefined.length`, dus een uitzondering en een 500. Dat kon er
+     stil in zitten omdat geen enkele toets spelKijk op die twee aanriep, en de
+     catalogustoets alleen naar de vlag keek. */
+  const o = opstelling({ vrienden: () => true });
+  for (const soort of Object.keys(REG.ZICHT)) {
+    if (!REG.ZICHT[soort].kijker) continue;
+    const spelers = ['a', 'b', 'c', 'd'].slice(0, Math.max(REG.SPEL[soort].min || 2, 2));
+    o.potje('k_' + soort, soort, spelers);
+    const r = o.kern.spelKijk('vriend', 'k_' + soort);
+    assert.equal(r.status, 200, 'meekijken bij ' + soort + ' hoort te werken');
+    assert.ok(r.potje.staat, soort + ' geeft een kijker geen staat');
+  }
+});
+
+/* ---------- het gedeelde scherm ---------- */
+
+test('een gedeeld scherm van 30 Seconden krijgt de kaart niet', () => {
+  /* De hele reden dat het zicht drie lagen heeft. De kaart zit niet in wat
+     `publiek` teruggeeft, dus een scherm KAN hem niet krijgen -- dat is iets
+     anders dan hem niet sturen. */
+  const p = secondenMetKaart();
+  const scherm = REG.ZICHT.seconden.publiek(p, p.staat);
+  assert.ok(p.staat.kaart, 'er ligt wel degelijk een kaart');
+  assert.equal(scherm.kaart, undefined, 'maar het scherm ziet hem niet');
+  assert.ok(Array.isArray(scherm.scores), 'wel de stand');
+  assert.equal(typeof scherm.rader, 'number', 'en wie er raadt');
+});
+
+test('geen enkele projectie toont iets wat een speler verborgen wordt', () => {
+  /* Dezelfde lekregel als voor kijkers, maar dan voor het scherm in de kamer.
+     Hij staat apart omdat een projectie een ANDERE functie is: hem meenemen in
+     de toets hierboven zou de indruk wekken dat die twee samen bewaakt worden,
+     en dan valt een nieuw `publiek` er stil buiten. */
+  for (const [soort, z] of Object.entries(REG.ZICHT)) {
+    if (!z.publiek) continue;
+    const p = inGang(soort);
+    const scherm = z.publiek(p, p.staat);
+    for (const veld of Object.keys(scherm)) {
+      if (scherm[veld] === null || scherm[veld] === undefined) continue;
+      const verborgenVoorIemand = p.spelers.some((sp) => {
+        const v = z.speler(p, p.staat, sp)[veld];
+        return v === null || v === undefined;
+      });
+      assert.ok(!verborgenVoorIemand,
+        soort + ' projecteert `' + veld + '`, terwijl de spelerweergave dat voor minstens een speler verbergt');
+    }
+  }
 });

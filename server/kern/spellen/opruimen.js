@@ -16,6 +16,12 @@
    minuut: de scan over alle potjes hoort niet in het hete pad van elke
    lobby-poll.
 
+   DIE DERTIG DAGEN ZIJN NU EEN BODEM EN GEEN GRENS. Sinds er een klok per beurt
+   bestaat, is "een maand stil" niet meer hetzelfde als "verlaten": zes spelers
+   met 72 uur per beurt zitten na tien gemiste beurten al aan die maand zonder
+   dat er iets mis is. De termijn komt daarom uit `klok.vervalMs` en volgt het
+   tempo; een potje zonder klok houdt precies de oude dertig dagen.
+
    VERGETEN: WEGGAAN TELT ALS OPGEVEN, en dat is geen nieuw gedrag maar hetzelfde
    als wat de knop "opgeven" doet. Wie vertrekt maakt de partij niet af, en dat
    IS opgeven; de tegenstander wint en die overwinning landt in de uitslagen. Het
@@ -34,9 +40,8 @@
    met opzet: wie de vorm kent, hoort hem op te ruimen -- anders staat er hier
    een kopie van vier datamodellen die stil veroudert. */
 module.exports = (ctx) => {
-  const { S, save, codenaamVan, noteerUitslag, deelVergeet, sudokuOpschonen } = ctx;
+  const { S, save, codenaamVan, noteerUitslag, deelVergeet, tijdOpschonen, vervalMs, geefOp } = ctx;
 
-  const VERLATEN_MS = 30 * 86400000;
   let opgeschoondOm = 0;
 
   function opschonen() {
@@ -44,13 +49,27 @@ module.exports = (ctx) => {
     if (t - opgeschoondOm < 60000) return;
     opgeschoondOm = t;
     const s = S();
-    if (typeof sudokuOpschonen === 'function') sudokuOpschonen(t);   // een sudoku die je laat staan verdwijnt ook
+    /* De takken die hun EIGEN vorm kennen ruimen zichzelf op: een sudoku die je
+       laat staan, en de dagopgave van gisteren. Een lijst en geen losse haak,
+       want er zijn er inmiddels twee -- en de derde hoort geen regel hier te
+       kosten. */
+    for (const veeg of (tijdOpschonen || [])) veeg(t);
     for (const [id, p] of Object.entries(s.potjes)) {
+      /* EEN TOERNOOIWEDSTRIJD WACHT NIET OP EEN KNOP. Overal elders verloopt de
+         klok naar een AANBOD (de tegenstander mag toewijzen, en doet hij niets
+         dan gebeurt er niets), maar in een toernooi houdt een hele ronde stil
+         terwijl iemand niet komt opdagen -- en daar hangt de uitslag aan een
+         afspraak die vooraf gemaakt is. Zie de kop van ./klok.js.
+
+         Het loopt langs `geefOp` en dus langs de gewone opgeef-weg: dat legt de
+         uitslag vast en schuift het toernooi door. Een eigen einde hier zou een
+         tweede plek zijn waar dat vergeten kan worden. */
+      if (p.status === 'bezig' && typeof geefOp === 'function' && geefOp(p)) continue;
       const leeftijd = t - new Date(p.at).getTime();
       const stil = t - new Date(p.zetAt || p.at).getTime();
       if ((p.status === 'klaar' && leeftijd > 86400000) ||
           (p.status === 'wacht' && leeftijd > 6 * 3600000) ||
-          (p.status === 'bezig' && stil > VERLATEN_MS)) delete s.potjes[id];
+          (p.status === 'bezig' && stil > vervalMs(p))) delete s.potjes[id];
     }
   }
 

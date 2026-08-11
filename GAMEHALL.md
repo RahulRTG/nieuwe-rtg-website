@@ -919,6 +919,48 @@ wie is de baas?
 De eindstand telt per speler zijn eigen deel van zijn panden plus de waarde van
 zijn belangen elders — dezelfde euro mag niet bij twee mensen staan.
 
+### De derde meter: kan een speler waarde maken uit niets?
+
+`scripts/magnaat-pomp.js` staat naast de balansmeter en de strateeg, en hij
+stelt de vraag die die twee per definitie niet stellen: **kan een speler een
+mechaniek uitbuiten door geld rond te pompen zonder economische waarde te
+scheppen?** Hij zet twee identieke werelden naast elkaar — dezelfde stad,
+dezelfde bedrijven, dezelfde maanden — laat in de ene pompen en in de andere
+niet, en vergelijkt het totale vermogen aan tafel plus de Foundation-pot.
+
+**Hij vond bij zijn eerste ronde 193 miljoen op een tafel van 62 miljoen.** De
+kas klopte tot op de euro; de fout zat in de **waardering**. Een bedrijf is een
+veelvoud van zijn winst waard, dus wie zich laat overbetalen ziet zijn zaak
+exploderen terwijl de betaler alleen kas verliest. Een vervoerder met een
+bouwsom van 368.000 stond op 191 miljoen — 518× zijn stenen.
+
+Twee reparaties, op twee niveaus:
+
+- **De prijsband** (`handel.js`): het bedrag per eenheid moet tussen 0,4× en 2×
+  de marktprijs liggen. Daarbinnen valt alles te onderhandelen wat een
+  onderhandeling nodig heeft; daarbuiten is het geen prijs maar een cadeau.
+- **Het waardeplafond** (`waardering.js`): een bedrijf is nooit meer waard dan
+  vijftien keer zijn bouwsom. Ruim — goed spelen komt rond de zes uit — maar het
+  bindt de orde van grootte waarin een pomp werkt. Dat is een vangnet voor élke
+  volgende laag die geld verplaatst.
+
+Twee soorten scenario, want "het totaal verandert" is niet altijd fout:
+**neutraal** (een pure overdracht — elke afwijking is fout, omhoog én omlaag) en
+**kostend** (iets dat met opzet waarde vernietigt, zoals een pand slopen — zakken
+mag, stijgen nooit).
+
+> **De meter lekte eerst zelf**, en dat hoort erbij: hij telde de
+> Foundation-pot wel en wat er al uit gebouwd was niet, zodat elk scenario dat
+> de pot voedde waarde leek te vernietigen. Een lekkende meter is erger dan geen
+> meter, dus dat staat nu onder toets.
+
+**Er komt een scenario bij zodra er een laag bij komt.** Leningen (rente die
+ergens verdwijnt of uit het niets komt), verzekeringsuitkeringen zonder premie,
+interne concerns die zichzelf betalen, R&D-subsidies — het is dezelfde klasse,
+elke keer.
+
+---
+
 **Wat er van fase B nog niet in zit.** Banken en financiering met rente,
 zekerheden, looptijd en convenanten; verzekeringen met risicoprofielen; en R&D.
 De rekening-courant onder een negatieve kas (`ROOD_RENTE`) is er wel — dat is de

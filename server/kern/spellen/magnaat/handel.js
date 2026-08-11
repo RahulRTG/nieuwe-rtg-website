@@ -35,52 +35,10 @@
    WAT HIER NIET STAAT: het onderhandelen zelf (./handel-acties.js -- dat is een
    ander onderwerp: wie mag wat voorstellen, en hoe vaak). Dit bestand kent
    alleen het CONTRACT en de maand. */
-const { SECTOREN, SECTORLIJST } = require('./sectoren');
+const { SECTOREN } = require('./sectoren');
+const { MARKTPRIJS, HANDELSSOORTEN, LEVERANCIERS, behoefte, koopt, levert } = require('./handelsgoed');
 
 const rond = (n) => Math.round(n);
-
-/* WAT BEDRIJVEN VAN ELKAAR KOPEN. `inkoop` in ./sectoren.js zei tot nu toe
-   alleen HOEVEEL er naar inkoop ging; hij zei niet WAT er werd ingekocht en
-   dus ook niet van wie. Zolang dat een percentage naar niemand was, kon een
-   contract tussen twee spelers niets betekenen: er was geen post waar hij op
-   landde.
-
-   Vier soorten, elk met EEN leverende sector. Dat is met opzet krap: een soort
-   die door drie sectoren geleverd wordt, geeft de afnemer geen keuze maar een
-   lijst, en een keuze tussen twee spelers is het hele punt.
-
-     goederen   -- de winkel/groothandel; de post van een restaurant
-     productie  -- halffabricaat uit de fabriek; de post van een winkel
-     vervoer    -- ritten; de post van wie iets moet verplaatsen
-     diensten   -- advies, administratie, ICT; de post van een kantoor
-
-   MARKTPRIJS is wat een handelseenheid op de vrije markt kost, en hij is de IJK
-   WAARTEGEN ONDERHANDELD WORDT. Hij ligt dicht bij de middenprijs van de
-   leverende sector: wie een contract sluit onder die prijs koopt goedkoper dan
-   de markt, wie erboven tekent betaalt voor zekerheid. Allebei moeten kunnen,
-   anders valt er niets te onderhandelen. */
-const MARKTPRIJS = { goederen: 26, productie: 760, vervoer: 52, diensten: 3200 };
-const HANDELSSOORTEN = Object.keys(MARKTPRIJS);
-/* Wie levert wat -- AFGELEID uit `levert` en niet nog een keer opgeschreven.
-   Twee lijsten die hetzelfde zeggen lopen uiteen. */
-const LEVERANCIERS = Object.fromEntries(HANDELSSOORTEN.map(soort =>
-  [soort, SECTORLIJST.filter(naam => SECTOREN[naam].levert === soort)]));
-
-/* Hoeveel handelseenheden van een soort een vestiging per maand nodig heeft bij
-   een gegeven omzet. Uit de BESTAANDE inkooppost -- er komt geen kostenpost
-   bij, hij wordt alleen verdeeld. */
-function behoefte(v, omzet, soort) {
-  const s = SECTOREN[v.sector];
-  const aandeel = (s.koopt || {})[soort] || 0;
-  if (!aandeel) return 0;
-  return (omzet * s.inkoop * aandeel) / MARKTPRIJS[soort];
-}
-
-/* Alle soorten die deze sector inkoopt, met hun aandeel. Voor het scherm en
-   voor de keuring van een voorstel. */
-const koopt = (sector) => Object.entries(SECTOREN[sector].koopt || {})
-  .map(([soort, aandeel]) => ({ soort, aandeel }));
-const levert = (sector) => SECTOREN[sector].levert || null;
 
 /* ---------- het contract ---------- */
 
@@ -92,6 +50,22 @@ const GRENZEN = {
   eis: [0, 95], boete: [0, 500000], vooraf: [0, 5000000]
 };
 
+/* DE PRIJSBAND, en dit is de belangrijkste grens van deze hele laag.
+
+   Een contract is een PRIJS en geen cadeau. Zonder band konden twee spelers
+   elkaar willekeurige bedragen factureren, en dat was geen theorie: de
+   geldpomp-keuring (scripts/magnaat-pomp.js) mat er bij zijn eerste ronde
+   193 miljoen mee, op een tafel waar 62 miljoen stond. De oorzaak zit niet in
+   de kas -- die klopte tot op de euro -- maar in de WAARDERING: een bedrijf is
+   een veelvoud van zijn winst waard, dus wie zich laat overbetalen ziet zijn
+   zaak in waarde exploderen terwijl de betaler alleen kas verliest. Een
+   vervoerder met een bouwsom van 368.000 stond op 191 miljoen.
+
+   Binnen de band blijft ALLES te onderhandelen wat een onderhandeling nodig
+   heeft: veertig procent onder de markt (een scherpe deal voor volume) tot het
+   dubbele (betalen voor zekerheid). Daarbuiten is het geen prijs meer. */
+const PRIJSBAND = [0.4, 2.0];
+
 function keurVoorstel(x) {
   for (const [veld, [laag, hoog]] of Object.entries(GRENZEN)) {
     const n = Number(x[veld]);
@@ -99,6 +73,12 @@ function keurVoorstel(x) {
       return `${veld} moet een getal tussen ${laag} en ${hoog} zijn.`;
   }
   if (!HANDELSSOORTEN.includes(x.soort)) return 'Die handelssoort bestaat niet.';
+  const perEenheid = x.bedrag / Math.max(1, x.eenheden);
+  const markt = MARKTPRIJS[x.soort];
+  if (perEenheid < markt * PRIJSBAND[0] || perEenheid > markt * PRIJSBAND[1])
+    return 'Dat is per eenheid ' + Math.round(perEenheid) + '; de markt zit op ' + markt +
+      ' en een contract mag tussen ' + Math.round(markt * PRIJSBAND[0]) + ' en ' +
+      Math.round(markt * PRIJSBAND[1]) + ' liggen.';
   return null;
 }
 
@@ -191,6 +171,6 @@ function afkoopsom(c, maand) {
 
 module.exports = {
   behoefte, koopt, levert, keurVoorstel, voorwaarden, pastBij, exclusiviteitsbotsing,
-  verplichting, afwikkelen, dekking, afkoopsom, GRENZEN, AFKOOP_MAANDEN,
+  verplichting, afwikkelen, dekking, afkoopsom, GRENZEN, AFKOOP_MAANDEN, PRIJSBAND,
   MARKTPRIJS, HANDELSSOORTEN, LEVERANCIERS
 };

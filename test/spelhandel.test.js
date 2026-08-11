@@ -118,18 +118,19 @@ test('een contract verlaagt de inkooppost van de afnemer en levert de leverancie
 test('een goedkoop contract maakt de afnemer beter af, een duur contract slechter', () => {
   /* Dit is de hele onderhandeling. Zonder deze eigenschap is de prijs een
      versiering en tekent iedereen alles. */
-  const meting = (bedrag) => {
+  const meting = (factor) => {
     const { m, p, st, A, B } = opstelling();
     maand(m, p, 2);
-    const marktkosten = st.laatste.boris.regels[0].omzet * SECTOREN.horeca.inkoop * SECTOREN.horeca.koopt.vervoer;
     const eenheden = Math.max(1, Math.round(H.behoefte(B, st.laatste.boris.regels[0].omzet, 'vervoer')));
     sluitContract(m, p, 'boris', 'anna', { mijn: B.id, hun: A.id, soort: 'vervoer',
-      eenheden, bedrag: Math.round(marktkosten * bedrag), looptijd: 12, eis: 0, boete: 1, vooraf: 0, exclusief: false });
+      eenheden, bedrag: Math.round(eenheden * MARKTPRIJS.vervoer * factor),
+      looptijd: 12, eis: 0, boete: 1, vooraf: 0, exclusief: false });
     const voor = st.geld.boris;
     maand(m, p, 1);
     return st.geld.boris - voor;
   };
-  const goedkoop = meting(0.5), duur = meting(2.0);
+  // de twee uiteinden van de prijsband (./handel.js); daarbuiten is het geen prijs
+  const goedkoop = meting(H.PRIJSBAND[0]), duur = meting(H.PRIJSBAND[1]);
   assert.ok(goedkoop > duur + 100,
     'de helft betalen hoort merkbaar beter uit te pakken dan het dubbele: ' + goedkoop + ' vs ' + duur);
 });
@@ -143,7 +144,8 @@ test('wie zich vol tekent, kan zijn eigen klanten niet meer helpen', () => {
   assert.ok(vrij.eenheden > 0, 'er is vrije vraag om te verdringen');
   const cap = vrij.capaciteit;
   sluitContract(m, p, 'boris', 'anna', { mijn: B.id, hun: A.id, soort: 'vervoer',
-    eenheden: Math.round(cap * 0.9), bedrag: 1000, looptijd: 12, eis: 0, boete: 1, vooraf: 0, exclusief: false });
+    eenheden: Math.round(cap * 0.9), bedrag: Math.round(cap * 0.9 * MARKTPRIJS.vervoer),
+    looptijd: 12, eis: 0, boete: 1, vooraf: 0, exclusief: false });
   maand(m, p, 1);
   const bezet = st.laatste.anna.regels[0];
   assert.ok(bezet.eenheden < vrij.eenheden,
@@ -164,7 +166,8 @@ test('een vergeven capaciteit drukt net zo hard op de kwaliteit als een volle za
     // de vrije vraag wegdrukken, zodat alleen de levering de zaak vult
     m.eco.zet(p, 'anna', { actie: 'beleid', id: A.id, prijs: 'hoog' });
     sluitContract(m, p, 'boris', 'anna', { mijn: B.id, hun: A.id, soort: 'vervoer',
-      eenheden: Math.max(1, Math.round(cap * deelVanCapaciteit)), bedrag: 1000,
+      eenheden: Math.max(1, Math.round(cap * deelVanCapaciteit)),
+      bedrag: Math.max(1, Math.round(cap * deelVanCapaciteit * MARKTPRIJS.vervoer)),
       looptijd: 12, eis: 0, boete: 1, vooraf: 0, exclusief: false });
     maand(m, p, 1);
     const r = st.laatste.anna.regels[0];
@@ -183,7 +186,8 @@ test('een leverancier die zijn capaciteit niet haalt levert pro rata, wordt pro 
   maand(m, p, 1);
   const cap = st.laatste.anna.regels[0].capaciteit;
   const c = sluitContract(m, p, 'boris', 'anna', { mijn: B.id, hun: A.id, soort: 'vervoer',
-    eenheden: cap * 3, bedrag: 30000, looptijd: 12, eis: 0, boete: 7500, vooraf: 0, exclusief: false });
+    eenheden: Math.round(cap * 3), bedrag: Math.round(cap * 3 * MARKTPRIJS.vervoer),
+    looptijd: 12, eis: 0, boete: 7500, vooraf: 0, exclusief: false });
   maand(m, p, 1);
   const regel = st.laatste.boris.contracten.find(x => x.id === c.id);
   assert.ok(regel.tekort, 'drie keer de capaciteit toezeggen levert een tekort op');
@@ -204,7 +208,8 @@ test('leveren mag, maar de kwaliteitseis niet halen kost ook', () => {
     m.eco.zet(p, 'anna', { actie: 'beleid', id: A.id, personeel: 5, onderhoud: 0 });
     const cap = st.laatste.anna.regels[0].capaciteit;
     const c = sluitContract(m, p, 'boris', 'anna', { mijn: B.id, hun: A.id, soort: 'vervoer',
-      eenheden: Math.round(cap * 0.8), bedrag: 5000, looptijd: 12, eis, boete: 9000, vooraf: 0, exclusief: false });
+      eenheden: Math.round(cap * 0.8), bedrag: Math.round(cap * 0.8 * MARKTPRIJS.vervoer),
+      looptijd: 12, eis, boete: 9000, vooraf: 0, exclusief: false });
     maand(m, p, 4);
     return { c, kwaliteit: st.laatste.anna.regels[0].kwaliteit };
   };
@@ -287,38 +292,47 @@ test('geld tussen twee spelers heen en weer schuiven maakt de Foundation-pot nie
      langskomt. Zonder die aftrek is er een knop waarmee twee spelers samen de
      Foundation kunnen opblazen door elkaar miljoenen te factureren, en dat is
      precies het soort maas dat je pas ontdekt als iemand hem gebruikt. */
-  const afdrachtBij = (bedrag) => {
+  const afdrachtBij = (factor) => {
     const { m, p, st, A, B } = opstelling({ vloot: 10 });
     maand(m, p, 1);
     sluitContract(m, p, 'boris', 'anna', { mijn: B.id, hun: A.id, soort: 'vervoer',
-      eenheden: 100, bedrag, looptijd: 12, eis: 0, boete: 1, vooraf: 0, exclusief: false });
+      eenheden: 100, bedrag: Math.round(100 * MARKTPRIJS.vervoer * factor),
+      looptijd: 12, eis: 0, boete: 1, vooraf: 0, exclusief: false });
     p.staat.gerekendTot -= p.staat.maandMs;
     return m.eco.bijrekenen(p)[0].afdracht;
   };
-  const klein = afdrachtBij(1), gigantisch = afdrachtBij(2000000);
+  /* De uiteinden van de prijsband: het uiterste dat een speler KAN factureren.
+     Sinds ./handel.js een band kent kan het niet meer om miljoenen gaan -- die
+     grens kwam er nadat de geldpomp-keuring precies dit gat mat -- maar de
+     bewering blijft dezelfde: onderlinge facturen zijn geen stadsomzet. */
+  const klein = afdrachtBij(H.PRIJSBAND[0]), groot = afdrachtBij(H.PRIJSBAND[1]);
   assert.ok(klein.lokaal > 0, 'er wordt werkelijk afgedragen: ' + klein.lokaal);
-  assert.equal(Math.round(gigantisch.lokaal), Math.round(klein.lokaal),
-    'twee miljoen aan onderlinge facturen hoort geen cent extra af te dragen');
-  assert.equal(Math.round(gigantisch.centraal), Math.round(klein.centraal));
+  assert.equal(Math.round(groot.lokaal), Math.round(klein.lokaal),
+    'vijf keer zoveel factureren hoort geen cent extra af te dragen');
+  assert.equal(Math.round(groot.centraal), Math.round(klein.centraal));
 });
 
 test('een boete gaat naar de wederpartij en niet naar de bank', () => {
-  const { m, p, st, A, B } = opstelling({ vloot: 4 });
-  maand(m, p, 1);
-  sluitContract(m, p, 'boris', 'anna', { mijn: B.id, hun: A.id, soort: 'vervoer',
-    eenheden: 100000, bedrag: 1, looptijd: 12, eis: 0, boete: 25000, vooraf: 0, exclusief: false });
-  const voorA = st.geld.anna, voorB = st.geld.boris;
-  const eigenA = st.laatste.anna.regels[0].resultaat, eigenB = st.laatste.boris.regels[0].resultaat;
-  maand(m, p, 1);
-  const c = st.contracten[0];
-  assert.equal(c.boetes, 25000);
-  // wat er buiten de eigen bedrijfsvoering om is verschoven
-  const verschovenA = (st.geld.anna - voorA) - st.laatste.anna.regels[0].resultaat;
-  const verschovenB = (st.geld.boris - voorB) - st.laatste.boris.regels[0].resultaat;
-  assert.ok(Math.abs(verschovenA + verschovenB) < 1,
-    'de boete plus de betaling hoort tussen twee spelers op nul uit te komen: ' +
-    Math.round(verschovenA) + ' / ' + Math.round(verschovenB));
-  assert.ok(eigenA !== undefined && eigenB !== undefined);
+  /* Gemeten door de boete AAN en UIT te zetten en het verschil te nemen. Dat is
+     scherper dan het uit een maandoverzicht rekenen, want de betaling zelf zit
+     bij de leverancier in zijn OMZET en niet als losse post -- die twee uit
+     elkaar trekken op een rekening lukt niet, en de eerste versie van deze
+     toets probeerde dat en mat iets anders dan hij beweerde. */
+  const meting = (boete) => {
+    const { m, p, st, A, B } = opstelling({ vloot: 4 });
+    maand(m, p, 1);
+    sluitContract(m, p, 'boris', 'anna', { mijn: B.id, hun: A.id, soort: 'vervoer',
+      eenheden: 100000, bedrag: Math.round(100000 * MARKTPRIJS.vervoer * H.PRIJSBAND[0]),
+      looptijd: 12, eis: 0, boete, vooraf: 0, exclusief: false });
+    const voorA = st.geld.anna, voorB = st.geld.boris;
+    maand(m, p, 1);
+    return { anna: st.geld.anna - voorA, boris: st.geld.boris - voorB, c: st.contracten[0] };
+  };
+  const zonder = meting(0), met = meting(25000);
+  assert.equal(met.c.boetes, 25000, 'de boete valt: honderdduizend eenheden haalt niemand');
+  assert.equal(zonder.c.boetes, 0);
+  assert.equal(Math.round(zonder.anna - met.anna), 25000, 'de leverancier betaalt hem');
+  assert.equal(Math.round(met.boris - zonder.boris), 25000, 'en de afnemer krijgt hem, tot op de euro');
 });
 
 /* ================= 6. een derde ziet de voorwaarden niet ================= */
@@ -327,10 +341,10 @@ test('een kijker en een gedeeld scherm zien geen enkele contractvoorwaarde', () 
   const { m, p, st, A, B } = opstelling();
   maand(m, p, 1);
   sluitContract(m, p, 'boris', 'anna', { mijn: B.id, hun: A.id, soort: 'vervoer',
-    eenheden: 200, bedrag: 987654, looptijd: 12, eis: 44, boete: 33221, vooraf: 0, exclusief: false });
+    eenheden: 200, bedrag: 9876, looptijd: 12, eis: 44, boete: 33221, vooraf: 0, exclusief: false });
   for (const laag of ['kijker', 'publiek']) {
     const tekst = JSON.stringify(m.spel.zicht[laag](p, st));
-    assert.ok(!/987654/.test(tekst), laag + ' hoort het contractbedrag niet te tonen');
+    assert.ok(!/9876/.test(tekst), laag + ' hoort het contractbedrag niet te tonen');
     assert.ok(!/33221/.test(tekst), laag + ' hoort de boete niet te tonen');
     assert.ok(!/"eis"/.test(tekst), laag + ' hoort de kwaliteitseis niet te tonen');
   }
@@ -348,9 +362,9 @@ test('een derde speler ziet de contracten van twee anderen niet', () => {
   m.eco.zet(p, 'cato', { actie: 'open', kavel: kavelIn('centrum').id, sector: 'retail', omvang: 40, naam: 'Derde' });
   maand(m, p, 1);
   const c = sluitContract(m, p, 'boris', 'anna', { mijn: st.vestigingen.boris[0].id, hun: st.vestigingen.anna[0].id,
-    soort: 'vervoer', eenheden: 200, bedrag: 456789, looptijd: 12, eis: 0, boete: 1, vooraf: 0, exclusief: false });
+    soort: 'vervoer', eenheden: 200, bedrag: 8543, looptijd: 12, eis: 0, boete: 1, vooraf: 0, exclusief: false });
   const cato = JSON.stringify(m.eco.zicht(p, st, 'cato'));
-  assert.ok(!/456789/.test(cato), 'cato hoort het bedrag niet te zien');
+  assert.ok(!/8543/.test(cato), 'cato hoort het bedrag niet te zien');
   assert.equal(m.eco.zicht(p, st, 'cato').contracten.length, 0, 'en geen enkel contract in zijn lijst');
   // maar hij mag wel weten DAT er een vervoerder aan de Zeehavenweg zit -- dat
   // staat op straat, en zonder dat kan hij nooit zelf een contract voorstellen
@@ -528,4 +542,77 @@ test('de dekking gaat nooit boven de post die hij vervangt', () => {
   assert.equal(teveel.deel, 1, 'vijftig keer zoveel dekt nog steeds precies de post');
   assert.equal(teveel.bedrag, vol.bedrag);
   assert.ok(vol.bedrag > 0);
+});
+
+/* ================= 7. geen waarde uit het niets ================= */
+
+test('een contract is een prijs en geen cadeau', () => {
+  /* DE GRENS DIE DE GELDPOMP-KEURING AFDWONG, en hij kwam uit een meting en
+     niet uit een ontwerp. `scripts/magnaat-pomp.js` zet twee identieke werelden
+     naast elkaar -- in de ene pompen spelers geld rond, in de andere niet -- en
+     vergelijkt het TOTALE vermogen. Bij de eerste ronde stond daar 193 miljoen
+     verschil op een tafel van 62 miljoen.
+
+     De kas klopte tot op de euro; de fout zat in de WAARDERING. Een bedrijf is
+     hier een veelvoud van zijn winst waard, dus wie zich laat overbetalen ziet
+     zijn zaak exploderen terwijl de betaler alleen kas kwijt is. Een vervoerder
+     met een bouwsom van 368.000 stond op 191 miljoen -- vijfhonderdachttien keer
+     zijn stenen. */
+  const { m, p, st, A, B } = opstelling();
+  maand(m, p, 1);
+  const buiten = (factor) => m.eco.zet(p, 'boris', { actie: 'contract-voorstel', mijn: B.id, hun: A.id,
+    soort: 'vervoer', eenheden: 100, bedrag: Math.round(100 * MARKTPRIJS.vervoer * factor),
+    looptijd: 12, eis: 0, boete: 1, vooraf: 0, exclusief: false });
+  assert.equal(buiten(50).status, 400, 'vijftig keer de marktprijs is geen prijs');
+  assert.match(buiten(50).error, /de markt zit op/);
+  assert.equal(buiten(0.01).status, 400, 'en een honderdste evenmin');
+  assert.ok(buiten(H.PRIJSBAND[0]).ok, 'de ondergrens van de band mag wel');
+  const tweede = m.eco.zet(p, 'boris', { actie: 'contract-voorstel', mijn: B.id, hun: A.id,
+    soort: 'vervoer', eenheden: 101, bedrag: Math.round(101 * MARKTPRIJS.vervoer * H.PRIJSBAND[1]),
+    looptijd: 12, eis: 0, boete: 1, vooraf: 0, exclusief: false });
+  assert.ok(tweede.ok, 'en de bovengrens ook: ' + (tweede.error || ''));
+});
+
+test('een bedrijf kan niet meer waard worden dan zijn stenen kunnen dragen', () => {
+  /* Het vangnet onder alle lagen die geld VERPLAATSEN. Vijftien keer de bouwsom
+     is ruim -- een uitstekend geleide zaak komt rond de zes uit -- maar het
+     bindt de orde van grootte waarin een pomp werkt. */
+  const { waarde } = require('../server/kern/spellen/magnaat/stap');
+  /* DE GRENS STAAT HIER ALS GETAL en niet als `WAARDEPLAFOND` uit de module.
+     Dat is geen omslachtigheid maar precies het verschil tussen een toets en
+     een echo: met de constante erin bleef deze toets groen toen het plafond op
+     een miljard werd gezet, want de bewering schoof mee. Dezelfde fout is in
+     deze reeks al twee keer gemaakt, en hij kwam allebei de keren pas uit een
+     mutatie. */
+  const zaak = { gebouwdVoor: 200000, reputatie: 100, maanden: 12, resultaatTotaal: 500000000 };
+  assert.ok(waarde(zaak) < 200000 * 20,
+    'een absurde winst hoort niet in een absurde waardering te eindigen: ' + waarde(zaak));
+  // en een gewone goede zaak raakt het plafond niet
+  const gewoon = { gebouwdVoor: 250000, reputatie: 85, maanden: 12, resultaatTotaal: 250000 };
+  assert.ok(waarde(gewoon) < 250000 * 8,
+    'goed spelen hoort ver onder het plafond te blijven: ' + waarde(gewoon));
+});
+
+test('geen enkel scenario van de geldpomp-keuring maakt waarde uit het niets', () => {
+  /* De keuring zelf, als regressiebewaking. Hij is traag (tien uitgespeelde
+     campagnes), dus hier draaien de twee scenario's die over DEZE laag gaan; de
+     rest staat in het script en hoort bij de hand gedraaid te worden als er een
+     laag bij komt. */
+  const { meet, RUIS, wereld, totaal } = require('../scripts/magnaat-pomp');
+  for (const scenario of ['wederzijdseFacturen', 'belangenCarrousel']) {
+    const r = meet(scenario, 12);
+    assert.ok(Math.abs(r.relatief) <= RUIS,
+      scenario + ' verandert het totaal aan tafel met ' + (r.relatief * 100).toFixed(2) + '%: ' + r.naam);
+  }
+  /* En de meter zelf nagemeten, want een lekkende meter is erger dan geen
+     meter. Wat de Foundation al heeft UITGEGEVEN moet meetellen in het totaal:
+     zonder dat lijkt elk scenario dat de pot voedt waarde te vernietigen, en
+     dan verstopt de meter een echte pomp achter zijn eigen ruis. */
+  const w = wereld();
+  for (let i = 0; i < 30; i++) { w.st.gerekendTot -= w.st.maandMs; w.m.eco.bijrekenen(w.potje); }
+  assert.ok(w.st.foundation.gedaan.length > 0, 'de Foundation heeft werkelijk gebouwd');
+  const gemeten = totaal(w);
+  const zonderUitgaven = gemeten.vermogen + w.st.foundation.lokaal + w.st.foundation.centraal;
+  assert.ok(gemeten.samen > zonderUitgaven,
+    'wat de Foundation heeft uitgegeven hoort in het totaal te blijven staan');
 });

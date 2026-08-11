@@ -161,14 +161,8 @@ function maand(kaart, v, { maand: m, zoneDruk, wereldFactor, arbeid, contract, g
   };
 }
 
-/* Wat een vestiging WAARD is. Niet "wat je erin hebt gestopt" maar wat hij
-   opbrengt: een jaarwinst maal een factor die met reputatie meebeweegt, met de
-   grond eronder als bodem. Zo is een verlieslatende zaak nog steeds iets waard
-   en een goedlopende zaak meer dan zijn stenen. */
-function waarde(v) {
-  const jaar = (v.resultaatTotaal || 0) / Math.max(1, v.maanden || 1) * 12;
-  const factor = 3.5 + (v.reputatie / 100) * 3.5;
-  return Math.max(rond(v.gebouwdVoor * 0.55), rond(Math.max(0, jaar) * factor + v.gebouwdVoor * 0.35));
-}
-
-module.exports = { maand, capaciteit, kwaliteit, waarde, levering };
+/* `waarde` reist mee vanuit ./waardering.js: hij hoorde hier ooit thuis en de
+   rest van de motor haalt hem hier vandaan. Een tweede adres voor dezelfde
+   functie zou een tweede antwoord op dezelfde vraag worden. */
+const { waarde, WAARDEPLAFOND } = require('./waardering');
+module.exports = { maand, capaciteit, kwaliteit, waarde, levering, WAARDEPLAFOND };

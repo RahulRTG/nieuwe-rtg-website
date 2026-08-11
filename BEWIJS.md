@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 906 bestanden en 5856 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 906 bestanden en 5859 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,13 +13,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 906 |
-| losse beweringen (`test(...)`) | 5856 |
+| losse beweringen (`test(...)`) | 5859 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 614 |
 | **overleefd**: geen mutatie kreeg hem rood | 13 |
 | niet te meten (al rood, geen module gevonden, ...) | 18 |
-| alleen in de kop *genoemd*, nog niet gemeten | 73 |
-| niets van beide | 188 |
+| alleen in de kop *genoemd*, nog niet gemeten | 74 |
+| niets van beide | 187 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-788 bestanden, 5656 beweringen.
+788 bestanden, 5659 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -646,7 +646,7 @@ toets omvalt.
 | `spelaandeel.test.js` | 13 | genoemd | MAGNAAT FASE B: DEELNEMINGEN -- verdienen aan een zaak waar je niet aan de knoppen zit. Het derde stuk van fase B. |
 | `spelbeleid.test.js` | 10 | -- | De beleidslaag: alle toetredingsvragen op een plek, in volgorde. Wat hier bewaakt wordt is NIET dat er nieuwe regels zijn -- die zijn er juist niet. |
 | `speldag.test.js` | 22 | -- | DE DAGOPGAVE: een opgave per dag, dezelfde voor iedereen, met een bord dat 's nachts leeg is. Deze toets staat op twee hoogten, en dat is met opzet: 1. |
-| `spelhandel.test.js` | 25 | -- | MAGNAAT FASE B: CONTRACTEN -- spelers die elkaar werkelijk raken. Fase A eindigde met een meting die niet opgelost was: `scripts/magnaat- strateeg.js` liet zien dat wie zich op een sector stort wint van wie spreidt,... |
+| `spelhandel.test.js` | 28 | genoemd | MAGNAAT FASE B: CONTRACTEN -- spelers die elkaar werkelijk raken. Fase A eindigde met een meting die niet opgelost was: `scripts/magnaat- strateeg.js` liet zien dat wie zich op een sector stort wint van wie spreidt,... |
 | `spelkijken.test.js` | 15 | gezakt op `return-weg#0` | Meekijken bij een lopend potje. Twee poorten die verschillend werk doen: MAG DIT SPEL bekeken worden (per spel in de descriptor, standaard NIET), en MAG JIJ dit potje bekijken (vriend van een speler, of mededeelnemer... |
 | `spelklok.test.js` | 16 | -- | De klok per beurt: tempo, verlopen, toewijzen en de vervaltermijn. Wat hier bewaakt wordt is niet "telt hij goed af" maar de vier BESLUITEN uit de kop van server/kern/spellen/klok.js: 1. |
 | `spellen.test.js` | 30 | gezakt op `liegpoort /api/` | Integratietests voor de spellenlaag: potjes op de vriendenlaag. Twee RTG-leden worden vrienden en spelen: mens erger je niet (uitnodigen, accepteren, dobbelen, zetten), schaken (legale en onwettige zetten), woordduel... |

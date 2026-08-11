@@ -1,0 +1,242 @@
+#!/usr/bin/env node
+/* DE GELDPOMP-KEURING: kan een speler waarde maken uit niets?
+
+   Dit is de derde meter naast `magnaat-balans.js` (verdient een sector zichzelf
+   terug) en `magnaat-strateeg.js` (domineert er een stijl). Hij stelt EEN
+   vraag, en het is een vraag die de andere twee per definitie niet stellen:
+
+     KAN EEN SPELER EEN MECHANIEK UITBUITEN DOOR GELD ROND TE POMPEN
+     ZONDER ENIGE ECONOMISCHE WAARDE TE SCHEPPEN?
+
+   HIJ BESTAAT OMDAT DIE FOUT ER AL EEN KEER IN ZAT, en hij is met opzet
+   gebouwd voordat de lagen komen waar hij het hardst nodig is. In fase B bleek
+   dat de contractomzet van speler A bij speler B meetelde in de omzet van de
+   STAD -- en die omzet voedt de Foundation-pot. Twee spelers hadden elkaar dus
+   miljoenen kunnen factureren om samen een bibliotheek af te dwingen die
+   niemand had verdiend. Geen toets zag dat; geen sectorbalans zag dat; het
+   toernooi zag het niet, want beide spelers wonnen er evenveel bij.
+
+   DE KLASSE KOMT TERUG. Elke laag die geld VERPLAATST in plaats van te
+   VERDIENEN is een nieuwe kans op dezelfde fout: leningen (rente die ergens
+   verdwijnt of uit het niets komt), deelnemingen (dezelfde euro bij twee
+   mensen), verzekeringen (een uitkering zonder premie), interne concerns
+   (jezelf betalen) en straks R&D-subsidies. Vandaar dat dit een METER is en
+   geen losse toets: er komt een scenario bij zodra er een laag bij komt.
+
+   HOE HIJ MEET, en dit is de hele truc: TWEE IDENTIEKE WERELDEN. Dezelfde
+   stad, dezelfde kavels, dezelfde bedrijven, dezelfde maanden. In de ene doen
+   de spelers niets bijzonders; in de andere pompen ze zo hard als de regels
+   toelaten. Daarna wordt het TOTALE vermogen aan tafel vergeleken, plus de
+   Foundation-pot -- want die is ook een uitgang.
+
+   Een pomp die niets oplevert geeft twee gelijke getallen. Elke afwijking
+   boven de meetruis is per definitie waarde die uit het niets kwam of stilletjes
+   verdween, en allebei is fout: geld dat verdwijnt is net zo goed een bug, want
+   dan straft een mechaniek je voor iets wat hij niet zou moeten kosten.
+
+   WAT HIJ NIET IS: een bewijs dat er geen exploits zijn. Hij toetst de
+   scenario's die erin staan. Een pomp die niemand heeft bedacht staat er niet
+   in, en dat is de eerlijke grens van deze meter.
+
+   Gebruik: node scripts/magnaat-pomp.js */
+'use strict';
+const { kaart } = require('../server/kern/spellen/magnaat/kaart');
+
+const maakMagnaat = () => require('../server/kern/spellen/magnaat/index')({
+  save() {}, crypto: require('crypto'), codenaamVan: (h) => h, nudge() {}
+});
+
+/* De wereld waarin gepompt wordt: drie spelers, drie bedrijven die op elkaar
+   passen (een vervoerder, een winkel en een restaurant), en ruim geld. Ruim,
+   want een pomp die stukloopt op een lege kas meet niets. */
+function wereld() {
+  const m = maakMagnaat();
+  const spelers = ['a', 'b', 'c'];
+  const potje = { id: 'p', soort: 'magnaat', spelers, teams: [0, 1, 2], modus: 'vrij',
+    status: 'bezig', beurt: 0, winnaar: null,
+    variant: { vorm: 'economie', stad: 'IJmuiden', duur: 'weekend' } };
+  m.spel.init(potje);
+  const st = potje.staat;
+  const k = kaart(st.stad);
+  const kavel = (zone, n) => k.kavels.filter(x => x.zone === zone && !st.kavelBezet[x.id])[n || 0];
+  for (const h of spelers) st.geld[h] = 20000000;
+  m.spel.zet(potje, 'a', { actie: 'open', kavel: kavel('terrein').id, sector: 'logistiek', omvang: 20, naam: 'Atlas' });
+  m.spel.zet(potje, 'b', { actie: 'open', kavel: kavel('boulevard').id, sector: 'horeca', omvang: 40, naam: 'Zeezicht' });
+  m.spel.zet(potje, 'c', { actie: 'open', kavel: kavel('centrum').id, sector: 'retail', omvang: 40, naam: 'Winkel' });
+  return { m, potje, st, spelers,
+    A: st.vestigingen.a[0], B: st.vestigingen.b[0], C: st.vestigingen.c[0] };
+}
+
+const maand = (w, n) => {
+  for (let i = 0; i < n; i++) { w.st.gerekendTot -= w.st.maandMs; w.m.eco.bijrekenen(w.potje); }
+};
+
+/* Wat er aan tafel IS. Alles bij elkaar: de kassen, de bedrijven, en de
+   Foundation-pot -- die laatste hoort erbij omdat hij een uitgang is en niet
+   een decoratie. Zou hij er niet in zitten, dan is "geld naar de Foundation
+   pompen" geen pomp maar een verdwijntruc die deze meter niet ziet. */
+function totaal(w) {
+  const { PROJECTEN } = require('../server/kern/spellen/magnaat/foundation');
+  const stand = w.m.eco.eindstand(w.potje);
+  const vermogen = stand.reduce((n, x) => n + x.vermogen, 0);
+  /* De pot EN wat er al uit gebouwd is. Zonder dat tweede lekt deze meter zelf:
+     geld dat de Foundation uitgeeft verdwijnt dan uit het totaal, en elk
+     scenario dat de pot voedt lijkt waarde te vernietigen. Dat was de eerste
+     fout van deze meter, en hij kwam er meteen bij de eerste ronde uit. */
+  const gebouwd = w.st.foundation.gedaan.reduce((n, g) =>
+    n + ((PROJECTEN.find(x => x.id === g.id) || {}).kosten || 0), 0);
+  const pot = w.st.foundation.lokaal + w.st.foundation.centraal + gebouwd;
+  return { vermogen: Math.round(vermogen), pot: Math.round(pot), samen: Math.round(vermogen + pot) };
+}
+
+/* ---------- de scenario's ----------
+   Elk scenario krijgt een verse wereld en mag erin doen wat het wil. De
+   `rust`-variant doet niets; het verschil tussen die twee IS de meting. */
+const SCENARIOS = {
+  rust: { naam: 'niets bijzonders doen (de nulmeting)', doe() {} },
+
+  /* Twee spelers factureren elkaar een absurd bedrag over en weer. Netto
+     verandert er niets aan hun onderlinge positie -- maar als een van die
+     bedragen ergens meetelt als bedrijvigheid, groeit de wereld ervan. */
+  wederzijdseFacturen: {
+    verwacht: 'neutraal', naam: 'elkaar over en weer miljoenen factureren',
+    doe(w) {
+      // b koopt vervoer van a, a koopt goederen van c, c koopt vervoer van a
+      teken(w, 'b', w.B.id, w.A.id, 'vervoer', { eenheden: 200, bedrag: 2000000 });
+      teken(w, 'a', w.A.id, w.C.id, 'goederen', { eenheden: 500, bedrag: 2000000 });
+      teken(w, 'c', w.C.id, w.A.id, 'vervoer', { eenheden: 200, bedrag: 2000000 });
+    }
+  },
+
+  /* Een belang heen en weer verkopen tegen een absurde prijs. Als de waarde van
+     een deelneming bij BEIDE partijen meetelt, groeit het totaal bij elke
+     ronde -- en dat is de klassieke fout in een laag die waarde verplaatst. */
+  belangenCarrousel: {
+    verwacht: 'neutraal', naam: 'een belang heen en weer verkopen',
+    doe(w) {
+      for (const [van, naar, ves] of [['b', 'a', w.A.id], ['c', 'b', w.B.id], ['a', 'c', w.C.id]]) {
+        const r = w.m.spel.zet(w.potje, van, { actie: 'belang-voorstel', vestiging: ves, deel: 45, prijs: 3000000 });
+        if (r.ok) w.m.spel.zet(w.potje, naar, { actie: 'belang-antwoord', id: r.id, antwoord: 'ja' });
+      }
+    }
+  },
+
+  /* Een zaak veilen aan een medespeler voor een absurd bedrag. Het geld gaat
+     van de een naar de ander en de zaak de andere kant op; het totaal hoort
+     gelijk te blijven. Zo niet, dan is de waardering van een verkochte zaak
+     ergens dubbel geteld. */
+  veilingcarrousel: {
+    verwacht: 'neutraal', naam: 'een bedrijf onderling doorverkopen voor een fantasieprijs',
+    doe(w) {
+      const v = w.m.spel.zet(w.potje, 'a', { actie: 'veiling-start', soort: 'vestiging', vestiging: w.A.id, duur: 'kort' });
+      if (v.ok) w.m.spel.zet(w.potje, 'b', { actie: 'veiling-bod', id: v.id, bedrag: 5000000 });
+    }
+  },
+
+  /* Grond kopen van jezelf: de inzetter van een kavelveiling mag er niets aan
+     verdienen, en de opbrengst gaat naar de Foundation. Wie op zijn eigen
+     inzet biedt en wint, hoort dus gewoon armer te zijn. */
+  eigenGrond: {
+    verwacht: 'kostend', naam: 'op je eigen kavelveiling bieden',
+    doe(w) {
+      const k = kaart(w.st.stad).kavels.find(x => !w.st.kavelBezet[x.id]);
+      const v = w.m.spel.zet(w.potje, 'a', { actie: 'veiling-start', soort: 'kavel', kavel: k.id, duur: 'kort' });
+      if (v.ok) w.m.spel.zet(w.potje, 'a', { actie: 'veiling-bod', id: v.id, bedrag: 4000000 });
+    }
+  },
+
+  /* Bouwen en meteen weer sluiten, in een lus. Sluiten levert de halve bouwsom
+     op, dus dit HOORT geld te kosten -- maar als de waardering van een pand
+     ergens boven de bouwsom uitkomt, is dit een machine. */
+  bouwenEnSluiten: {
+    verwacht: 'kostend', naam: 'bouwen en meteen weer sluiten',
+    doe(w) {
+      const k = kaart(w.st.stad);
+      for (let i = 0; i < 6; i++) {
+        const vrij = k.kavels.find(x => !w.st.kavelBezet[x.id] && x.zone === 'boulevard');
+        if (!vrij) break;
+        const r = w.m.spel.zet(w.potje, 'a', { actie: 'open', kavel: vrij.id, sector: 'horeca', omvang: 20 });
+        if (r.ok) w.m.spel.zet(w.potje, 'a', { actie: 'sluiten', id: r.id });
+      }
+    }
+  }
+};
+
+/* Een contract tekenen zonder erover te doen: dit script meet geen
+   onderhandeling maar geldstromen. */
+function teken(w, van, mijn, hun, soort, x) {
+  const r = w.m.spel.zet(w.potje, van, Object.assign({ actie: 'contract-voorstel', mijn, hun, soort,
+    looptijd: 24, eis: 0, boete: 1, vooraf: 0, exclusief: false }, x));
+  if (!r.ok) return null;
+  const eigenaar = w.st.contracten.find(c => c.id === r.id);
+  const ander = eigenaar.leverancier === van ? eigenaar.afnemer : eigenaar.leverancier;
+  w.m.spel.zet(w.potje, ander, { actie: 'contract-antwoord', id: r.id, antwoord: 'ja' });
+  return eigenaar;
+}
+
+/* De meting: hetzelfde aantal maanden, dezelfde wereld, een keer met en een
+   keer zonder de pomp. */
+function meet(sleutel, maanden = 24) {
+  const uit = {};
+  for (const naam of ['rust', sleutel]) {
+    const w = wereld();
+    maand(w, 2);                 // eerst wat echte economie, zodat er cijfers zijn
+    SCENARIOS[naam].doe(w);
+    maand(w, maanden);
+    uit[naam === 'rust' ? 'rust' : 'pomp'] = totaal(w);
+  }
+  const verschil = uit.pomp.samen - uit.rust.samen;
+  return { naam: SCENARIOS[sleutel].naam, rust: uit.rust, pomp: uit.pomp, verschil,
+    relatief: uit.rust.samen ? verschil / uit.rust.samen : 0 };
+}
+
+/* HOEVEEL AFWIJKING IS RUIS? Niet nul: een contract verlegt echte capaciteit,
+   dus de economie loopt werkelijk anders en dat MAG. Wat niet mag is dat er
+   waarde bijkomt in de orde van de bedragen die er rondgepompt worden. De
+   grens staat op een half procent van het totaal aan tafel -- ruim genoeg voor
+   het effect van een verlegde levering, veel te krap voor een pomp van
+   miljoenen. */
+const RUIS = 0.005;
+
+/* TWEE SOORTEN SCENARIO, en het onderscheid is nodig omdat "het totaal
+   verandert" niet altijd fout is.
+
+     NEUTRAAL -- een pure overdracht. Er gaat geld van A naar B en verder
+     gebeurt er niets. Hier is ELKE afwijking fout, omhoog en omlaag: omhoog is
+     waarde uit het niets, omlaag is geld dat onderweg verdwijnt.
+     KOSTEND  -- een handeling die met opzet waarde vernietigt (een pand slopen,
+     grond kopen die je al kon gebruiken). Zakken mag; STIJGEN nooit. */
+
+function keur() {
+  const klachten = [];
+  const rijen = [];
+  for (const sleutel of Object.keys(SCENARIOS)) {
+    if (sleutel === 'rust') continue;
+    const r = meet(sleutel);
+    rijen.push(Object.assign({ sleutel }, r));
+    const neutraal = SCENARIOS[sleutel].verwacht !== 'kostend';
+    const fout = neutraal ? Math.abs(r.relatief) > RUIS : r.relatief > RUIS;
+    if (fout)
+      klachten.push(sleutel + ': ' + r.naam + ' verandert het totaal met ' +
+        (r.relatief * 100).toFixed(2) + '% (' + Math.round(r.verschil) + ')' +
+        (neutraal ? '' : ' -- omlaag mag hier, omhoog niet'));
+  }
+  return { rijen, klachten };
+}
+
+if (require.main === module) {
+  console.log('Magnaat-geldpomp: kan een speler waarde maken uit niets?\n');
+  const { rijen, klachten } = keur();
+  console.log('scenario              | soort    | totaal in rust | met de pomp |   verschil |  %');
+  for (const r of rijen)
+    console.log(r.sleutel.padEnd(21) + ' | ' + (SCENARIOS[r.sleutel].verwacht || 'neutraal').padEnd(8) +
+      ' | ' + String(r.rust.samen).padStart(14) + ' | ' +
+      String(r.pomp.samen).padStart(11) + ' | ' + String(Math.round(r.verschil)).padStart(10) + ' | ' +
+      (r.relatief * 100).toFixed(2).padStart(6));
+  console.log('\n' + (klachten.length
+    ? 'AFGEKEURD -- hier komt waarde uit het niets:\n  ' + klachten.join('\n  ')
+    : 'geen enkel scenario maakt waarde uit het niets (marge ' + (RUIS * 100) + '%)'));
+  if (klachten.length) process.exitCode = 1;
+}
+
+module.exports = { SCENARIOS, meet, keur, wereld, totaal, RUIS };

@@ -69,6 +69,10 @@ module.exports = (kern) => {
      woordelijk in twee routebestanden; zie kern/gast/naad.js voor wat er
      misgaat als die twee uiteenlopen. */
   const naad = require('../kern/gast/naad')();
+  /* De verzoeken: wat een gast VRAAGT in plaats van bestelt. Bewust een eigen
+     laag naast de orderlaag -- een verzoek kost niets en zet niets op de
+     rekening, en die grens moet in de code staan en niet in een afspraak. */
+  const verzoeklaag = require('../kern/gast/verzoek')({ save, schoon, horeca });
 
   /* Buiten de deur: bezorgen en afhalen. Andere naad (de ledensessie in plaats
      van de tafel-QR), dezelfde rekening eronder. */
@@ -83,7 +87,7 @@ module.exports = (kern) => {
   const polslaag = require('../kern/horeca/pols')({ save, schoon, horeca });
 
   const ctx = Object.assign({}, kern, { horeca, beleid, sessie, orderlaag, afrekenlaag,
-    buitenshuis, bezorglaag, foodcourtlaag, polslaag, naad, gastAuth, stuur, folioBoek, folioVan });
+    buitenshuis, bezorglaag, foodcourtlaag, polslaag, naad, verzoeklaag, gastAuth, stuur, folioBoek, folioVan });
   require('./gast/tafel')(ctx);     // de QR, aanschuiven, de kaart en het beleid
   require('./gast/bestellen')(ctx); // bestellen, de rekening lezen, waarom-vragen
   require('./gast/afrekenen')(ctx); // verdelen, fooi, betalen
@@ -91,4 +95,5 @@ module.exports = (kern) => {
   require('./gast/club')(ctx);      // polsbandtegoed en minimum spend
   require('./gast/foodcourt')(ctx); // een mandje bij meer loketten tegelijk
   require('./gast/pols')(ctx);      // hoe druk het nu is, en zelf melden vanaf de tafel
+  require('./gast/verzoek')(ctx);   // iets vragen: bediening, de rekening, iets dat niet goed is
 };

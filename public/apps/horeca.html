@@ -52,6 +52,14 @@
       </div>
       <p class="stil" style="margin-top:.4rem;">Per tafel staat er hooguit een rekening open. Splitsen en samenvoegen verplaatsen alleen; er komt geen cent bij of af.</p>
     </div>
+    <!-- BOVEN de open rekeningen, want dit is het enige op dit scherm waar
+         tijd doorheen loopt: een gast die iets vroeg staat te wachten, een
+         rekening loopt niet weg. -->
+    <div class="kaart">
+      <div class="kop">Gasten vragen iets (<span id="vzAantal">0</span><span id="vzOudVak" hidden>, waarvan <span id="vzOud">0</span> te lang</span>)</div>
+      <div id="vzLijst"></div>
+      <p class="stil" style="margin-top:.4rem;">De minuten zijn een feit. Er staat nergens hoe snel iemand er is, want dat weten we niet.</p>
+    </div>
     <div class="kaart">
       <div class="kop">Open rekeningen</div>
       <div id="zLijst"></div>
@@ -99,6 +107,7 @@
 <script src="/shared/deur.js"></script>
 <script src="/apps/horeca/kern.js"></script>
 <script src="/apps/horeca/zaal.js"></script>
+<script src="/apps/horeca/verzoeken.js"></script>
 <script src="/apps/horeca/keuken.js"></script>
 <script src="/apps/horeca/app.js"></script>
 <script src="/shared/schermbeeld.js" defer></script>

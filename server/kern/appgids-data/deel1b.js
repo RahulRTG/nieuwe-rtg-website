@@ -28,7 +28,7 @@ module.exports = {
   '/apps/gast.html': G('Aan tafel of op je kamer: de kaart lezen, bestellen vanaf je eigen telefoon en de rekening zien meelopen.',
     ['Scan de QR op tafel; je tafelgenoten doen hetzelfde en zitten dan op dezelfde rekening',
       'Zet een allergie in het eigen veld, niet bij de opmerkingen: dat veld gaat ongefilterd naar de keuken',
-      'Onder "Hoe het nu is" zie je per bron wat er over de zaak bekend is, en kun je zelf iets doorgeven'],
+      'Onder "Iets vragen" roep je de bediening of vraag je de rekening; dat kost niets en komt niet op je rekening'],
     'Een ernstige allergie loopt eerst langs een medewerker; zolang die niet heeft bevestigd begint de keuken er niet aan.'),
   '/apps/loonstrook.html': G('Mijn loon: je loonstroken van alle bedrijven waar je werkt, in gewone taal.',
     ['Zie per periode wat er bruto binnenkwam en wat er afging', 'Lees waarom het bedrag zo uitkwam, stap voor stap',

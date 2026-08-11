@@ -8,6 +8,7 @@
 <link href="/fonts/fonts.css" rel="stylesheet">
 <link href="/shared/rtg-uniform.css" rel="stylesheet">
 <link href="/shared/rtg-ui.css" rel="stylesheet">
+<link href="/shared/ios.css" rel="stylesheet">
 <script src="/shared/id.js"></script>
 <!-- De client-kant van de gegevenspoort. Zonder deze module blijft het bij de
      melding "dat vraag ik even" en wordt er vervolgens niets gevraagd; met hem
@@ -440,5 +441,11 @@
 </script>
 <script src="/shared/basis.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
+<!-- De OS-laag, en daarmee de hamburger van het app-menu. Dit ontbrak: een
+     ledenapp zonder app-menu is een doodlopende pagina -- je komt er wel in en
+     niet meer weg naar het beginscherm of de instellingen. Gevonden door
+     test/appmenu.e2e.js, die elke pagina onder apps/ nakijkt; de keuring ziet
+     dit niet, want dat is een toets en geen keuringsregel. -->
+<script src="/shared/ios.js" defer></script>
 </body>
 </html>

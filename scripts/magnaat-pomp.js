@@ -365,6 +365,44 @@ const SCENARIOS = {
     }
   },
 
+  /* DE BEURSCARROUSEL. Een belang rondverhandelen tussen drie spelers: A geeft
+     uit aan B, B verkoopt door aan C, C aan A. Elke stap is een OVERDRACHT -- de
+     euro staat daarna op een andere rekening -- dus het wereldtotaal hoort op de
+     cent gelijk te blijven.
+
+     Dit is de route die bij een markt als eerste in zit: een prijs is een vrij
+     getal, dus twee spelers kunnen er alles mee. Wat hem tegenhoudt is de
+     prijsband op de rekenkundige waarde; wat deze meter toetst is of er in de
+     AFWIKKELING niets bijkomt of zoekraakt. */
+  beurscarrousel: {
+    verwacht: 'neutraal', naam: 'een belang rondverhandelen over drie spelers',
+    doe(w) {
+      const V = (w.st.vestigingen.a || [])[0];
+      if (!V) return;
+      const W = require('../server/kern/spellen/magnaat/waardering').waarde(V);
+      const prijs = (deel) => Math.round(W * (deel / 100));
+      const uit = w.m.spel.zet(w.potje, 'a', { actie: 'beurs-aanbieden',
+        vestiging: V.id, deel: 30, prijs: prijs(30) });
+      if (!uit.ok) return;
+      if (!w.m.spel.zet(w.potje, 'b', { actie: 'beurs-kopen', id: uit.id }).ok) return;
+      for (const [van, naar] of [['b', 'c'], ['c', 'b'], ['b', 'c']]) {
+        const o = w.m.spel.zet(w.potje, van, { actie: 'beurs-aanbieden',
+          vestiging: V.id, deel: 30, prijs: prijs(30) });
+        if (!o.ok) break;
+        if (!w.m.spel.zet(w.potje, naar, { actie: 'beurs-kopen', id: o.id }).ok) break;
+      }
+    },
+    keur(w) {
+      const V = (w.st.vestigingen.a || [])[0];
+      if (!V) return null;
+      const uit = (w.st.deelnemingen || [])
+        .filter(d => d.status === 'loopt' && d.vestiging === V.id)
+        .reduce((n, d) => n + d.deel, 0);
+      if (uit > 49) return 'na het rondverhandelen staat er ' + uit + '% uit; doorverkopen maakt belang bij';
+      return null;
+    }
+  },
+
   /* DELEGEREN. Een AI-manager doet niets wat een speler niet ook kan, dus mag
      hij ook geen waarde maken die een speler niet kan maken. Wat hij WEL doet is
      geld kosten: zijn tarief gaat de wereld uit, net als rente en premie.

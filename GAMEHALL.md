@@ -1408,8 +1408,47 @@ festivals tegelijk hoort een goede maand te zijn en geen andere economie.
 > binnen; zodra het nieuws hem bewoog, viel hij eruit. Een toets die op een grens
 > balanceert meet de afronding en niet de bewering.
 
-**Wat er van fase B nog niet in zit.** Concernstrategie, een aandelenmarkt met
-dividend, fusies en AI-concurrenten die leren.
+### De beurs — belangen die openbaar te koop staan
+
+**Het dividend was er al.** `aandeel.js` deelt elke maand het resultaat pro rata
+uit — winst én verlies. Dat *is* dividend, en het is continu; een aparte
+dividenduitkering zou dezelfde euro een tweede keer uitbetalen. Wat ontbrak is een
+**markt**: een plek waar een belang openbaar te koop staat en iedereen het kan
+nemen. Dat verschil is niet cosmetisch — bij een onderhandeld voorstel kies je je
+tegenpartij en weet de rest van de tafel van niets; op een beurs is de prijs
+publiek, en daarmee wordt hij informatie. Wie ziet dat een concurrent een vijfde
+van zijn beste zaak wegzet, weet dat hij geld nodig heeft.
+
+Twee soorten order, en het onderscheid is echt: een **eigenaar** geeft nieuw
+belang uit (er komt een aandeelhouder bij, hij verwatert zichzelf), een **houder**
+verkoopt door (het belang verhuist, aan de zaak verandert niets). Beide lopen door
+dezelfde administratie als de onderhandelde deelnemingen — één boekhouding, want
+twee lopen uiteen zodra er ergens een pad bijkomt.
+
+**Een markt is een pompvlak**, en dat is de reden voor de prijsband: je verhandelt
+een belang tussen de helft en het dubbele van zijn rekenkundige waarde, uit
+dezelfde `waarde()` als de eindstand en het onderpand. Twee spelers die onderling
+een procent voor een miljoen verhandelen verplaatsen alleen geld — op zichzelf een
+overdracht, maar in combinatie met de waardering de eerste steen van een lus.
+
+**Drie dingen die deze laag met opzet niet doet:** geen zeggenschap (een belang
+geeft recht op resultaat, niet op de knoppen — een stemlaag zou een tweede spel
+zijn), geen koers die zelf beweegt (dat is een tweede waardering naast die van de
+eindstand, en twee waarderingen lopen uiteen), geen shorts of hefboom.
+
+> **Dezelfde fout, twee lagen later.** `beurs.LOOPTIJD` stond in de fabriek en
+> werd van de module gelezen — dus `undefined`, dus `tot` werd `NaN`, dus orders
+> verliepen nooit en bleven stil op de markt staan. Precies wat er bij de
+> AI-manager met het tarief gebeurde (dat werd `NaN` en at de kas op). Constanten
+> die twee bestanden delen horen op het niveau te staan waarop ze gedeeld worden.
+>
+> En twee mutaties overleefden omdat de toetsen de tak niet raakten: doorverkoop
+> werd altijd voor een *deel* getest, dus de tak waarin het hele belang verhuist
+> was ongedekt; en de eigenaar-koopt-niet-terug-regel werd getest op zijn eigen
+> order, waar hij al op "dat is je eigen aanbod" strandt.
+
+**Wat er van fase B nog niet in zit.** Concernstrategie, fusies en
+overnames, en AI-concurrenten die leren.
 
 **Fase C — de permanente wereld.** Living World, AI-managers met beleidsregels,
 Safe Management Policy, vakantiemodus, overdracht, legacy, Magnaat Daily,

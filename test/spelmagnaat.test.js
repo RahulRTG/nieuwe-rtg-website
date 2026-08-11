@@ -560,7 +560,8 @@ test('de vrije acties mogen buiten de beurt, de grote niet', () => {
   const m = maakMagnaat();
   assert.deepEqual(m.spel.buitenBeurt.slice().sort(),
     ['beheer-aan', 'beheer-regels', 'beheer-uit',
-      'belang-antwoord', 'belang-voorstel', 'beleid', 'bouw',
+      'belang-antwoord', 'belang-voorstel', 'beleid', 'beurs-aanbieden', 'beurs-intrekken',
+      'beurs-kopen', 'bouw',
       'contract-antwoord', 'contract-opzeggen', 'contract-voorstel',
       'krediet-aflossen', 'krediet-herzien', 'krediet-opnemen',
       'onderzoek-budget', 'onderzoek-starten', 'onderzoek-subsidie', 'onderzoek-uitrollen',

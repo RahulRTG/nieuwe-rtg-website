@@ -59,7 +59,8 @@ module.exports = (ctx) => {
       /* Je manager instellen verandert de kaart niet en gaat niemand aan. Juist
          daarom mag het altijd: wie halverwege een partij op vakantie gaat, moet
          dat op dat moment kunnen regelen. */
-      'beheer-aan', 'beheer-uit', 'beheer-regels'],
+      'beheer-aan', 'beheer-uit', 'beheer-regels',
+      'beurs-aanbieden', 'beurs-kopen', 'beurs-intrekken'],
     init, zet,
     varianten: {
       vorm: { keuze: ['bord', 'economie'], standaard: 'bord' },

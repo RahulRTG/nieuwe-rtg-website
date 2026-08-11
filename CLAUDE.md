@@ -36,6 +36,18 @@ rechtenmodel bij. De kern in één zin: **één bedrijf is niet één KvK**, dus
 concern, entiteit, registratie, vestiging, merk en operating unit zijn zes
 begrippen en geen zes velden.
 
+**`VERHAAL.md` is het diepte-document van de verhaallaag van Magnaat** — het
+spel als een leven in plaats van een scorebord, en de echte RTG-software als
+speelveld. Lees vóór je aan carrieres, loondienst tussen spelers of het
+"echte schermen in het spel"-idee werkt vooral *De grenzen*: de carrierelaag is
+18+ (een werkverleden is bewaarde progressie, en een laag waarin volwassenen
+minderjarigen aan zich binden bouwen we niet), een spelfeit is nooit een
+juridisch feit (eigen datavak, structureel gescheiden zoals
+`kern/command/zandbak.js`), een spelbaan is geen arbeidsovereenkomst en vraagt
+nooit een pas, en weg zijn mag niets kosten. De kern in een zin: blijvende
+waarde komt uit tijd en uit wat je deed, nooit uit geld — kas en bedrijven
+blijven in het potje, het verleden gaat mee.
+
 **`ONTWERP.md` is het RTG Design System 2.0** — de vormtaal: merk-elementen
 tegenover werk-elementen (Bodoni is ceremonieel en staat op een gesloten lijst
 rollen), de drie modi World/Pro/Command, uitzonderingsgestuurd ontwerpen, kleur

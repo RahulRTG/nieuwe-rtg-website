@@ -147,6 +147,17 @@ module.exports = ({ mijnVestiging, profiel, cijfers, waarde, liquideer }) => {
       // wat er vandaag te krijgen is, per vorm -- de offerte vooraf
       offertes: B.VORMLIJST.filter(s => !B.VORMEN[s].automatisch && !B.VORMEN[s].onderpand)
         .map(s => offerte(st, h, { soort: s })),
+      /* EN WAT ELK PAND ALS ZEKERHEID WAARD IS. Die stonden er niet, omdat een
+         onderpandvorm zonder gekozen pand geen bedrag heeft -- maar het gevolg
+         was dat een speler NERGENS kon zien wat zijn gebouwen aan kredietruimte
+         opleveren, terwijl dat precies het getal is waarop de vraag "kan ik dit
+         financieren" wordt beantwoord. Gevonden doordat de geldpompmeter de lus
+         onderzoek -> waardering -> lening wilde meten en er geen enkele offerte
+         te vinden was om hem mee te sluiten. */
+      onderpandOffertes: (st.vestigingen[h] || []).flatMap(v =>
+        B.VORMLIJST.filter(s => B.VORMEN[s].onderpand && !B.VORMEN[s].automatisch)
+          .map(s => Object.assign({ vestiging: v.id, vestigingNaam: v.naam },
+            offerte(st, h, { soort: s, vestiging: v.id })))),
       normen: B.NORMEN, buffer: Math.round(c.buffer * 100) / 100,
       schuldlast: Math.round(c.schuldlast * 10) / 10
     };

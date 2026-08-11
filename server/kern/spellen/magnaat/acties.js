@@ -25,12 +25,13 @@ const O = require('./onderzoek');
 
 module.exports = ({ K, mijnVestiging, vrijKavel, rond }) => {
   /* Bij OPENEN is er nog geen vestiging om de techniek aan te hangen, dus geldt
-     wat de speler ergens al heeft uitgerold. Een bouwmethode die je nergens
-     toepast, verlaagt ook geen bouwsom. */
-  const bouwkorting = (st, h) => {
-    const alle = new Set((st.vestigingen[h] || []).flatMap(v => v.tech || []));
-    return O.factor([...alle], 'bouw');
-  };
+     de BESTE die de speler ergens al draait. Een bouwmethode die je nergens
+     toepast, verlaagt ook geen bouwsom -- en twee panden met dezelfde methode
+     maken hem niet twee keer zo goedkoop, dus dit is een minimum en geen
+     product. Zie ./onderzoek.js: de vermenigvuldigers staan sinds de uitkomsten
+     op de VESTIGING, want wat een uitvinding werd verschilt per speler. */
+  const bouwkorting = (st, h) => (st.vestigingen[h] || [])
+    .reduce((laagste, v) => Math.min(laagste, O.factor(v, 'bouw')), 1);
   /* ---------- de acties ---------- */
   const ACTIES = {
     /* GROOT: een vestiging openen. Kost de bouwsom plus de eerste huur, en het
@@ -78,7 +79,7 @@ module.exports = ({ K, mijnVestiging, vrijKavel, rond }) => {
       if (!v) return { status: 404, error: 'Die vestiging is niet van jou.' };
       const erbij = Math.max(1, Math.min(60, Math.floor(Number(zet.erbij) || 0)));
       if (v.omvang + erbij > 200) return { status: 400, error: 'Groter dan dit kan deze plek niet aan.' };
-      const kosten = Math.round(erbij * SECTOREN[v.sector].bouw * KOSTENSTAND[v.prijs] * O.factor(v.tech, 'bouw'));
+      const kosten = Math.round(erbij * SECTOREN[v.sector].bouw * KOSTENSTAND[v.prijs] * O.factor(v, 'bouw'));
       if (st.geld[h] < kosten) return { status: 400, error: 'Uitbreiden kost ' + kosten + '; dat heb je niet.' };
       st.geld[h] -= kosten;
       v.omvang += erbij;

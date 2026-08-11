@@ -30,7 +30,7 @@ const klem = (n, min, max) => Math.max(min, Math.min(max, n));
        ontstaan via een MEETBARE productiviteitswinst, en een lagere loonpost
        per eenheid is meetbaar. */
 const perMens = (v) => SECTOREN[v.sector].perMedewerker
-  * O.factor(v.tech, 'perMedewerker') / (KOSTENSTAND[v.prijs] || 1);
+  * O.factor(v, 'perMedewerker') / (KOSTENSTAND[v.prijs] || 1);
 
 /* De capaciteit van een vestiging: personeel maal wat een medewerker aankan,
    maar nooit meer dan de vestiging groot is. Meer personeel in een klein pand
@@ -81,7 +81,13 @@ function kwaliteit(v, verkocht, arbeid) {
   const cap = Math.max(1, capaciteit(v, arbeid));
   const bezetting = verkocht / cap;
   const ruimte = bezetting <= 0.85 ? 1 : klem(1 - (bezetting - 0.85) * 1.6, 0.45, 1);
-  return klem(100 * ruimte * (0.55 + (v.onderhoud / 100) * 0.45), 0, 100);
+  /* ONDERZOEK GRIJPT OOK HIER AAN, en dat is de derde plek naast capaciteit en
+     kosten. De kwaliteitsrichting (productkwaliteit, guest experience,
+     belevingsontwerp) verhoogt wat er geleverd wordt; reputatie kruipt daar
+     vervolgens naartoe en de vraag volgt de reputatie. Het werkt dus NIET
+     rechtstreeks op de omzet maar via twee stappen die de motor al zette --
+     precies zoals een effect hoort te werken. */
+  return klem(100 * ruimte * (0.55 + (v.onderhoud / 100) * 0.45) * O.factor(v, 'kwaliteit'), 0, 100);
 }
 
 module.exports = { capaciteit, personeelNodig, levering, kwaliteit, perMens };

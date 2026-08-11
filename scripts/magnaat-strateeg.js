@@ -211,7 +211,7 @@ const PROFIELEN = {
       if (!s.mijn.length) return s.open('horeca');
       /* De efficientietak eerst: die verlaagt kosten en dat werkt op elke zaak.
          `meten` is de stam en verplicht -- dat is wat een boom een boom maakt. */
-      s.onderzoeken(['meten', 'energie', 'automatisering', 'bouwmethode']);
+      s.onderzoeken(['energie', 'automatisering', 'keten', 'concept']);
       s.uitrollen();
       s.afslanken();
       s.open('horeca');
@@ -221,7 +221,7 @@ const PROFIELEN = {
     naam: 'alleen onderzoeken', zones: ['boulevard', 'centrum'],
     doe(s) {
       if (!s.mijn.length) return s.open('horeca');
-      s.onderzoeken(['meten', 'energie', 'automatisering', 'bouwmethode']);
+      s.onderzoeken(['energie', 'automatisering', 'keten', 'concept']);
       s.open('horeca');
     }
   },
@@ -400,14 +400,22 @@ function gereedschap(m, potje, mij, profiel, offset) {
        zonder afslanken is uitrollen betalen voor niets. Dat is precies wat een
        toernooi hoort te meten -- als een van de drie stappen gemist mag worden,
        is de laag geen keuze maar een knop. */
+    /* ONDERZOEKEN OP RICHTING EN NIET OP SLEUTEL. Sinds de boom per sector
+       vertakt heeft elke sector eigen sleutels, dus een profiel dat er een lijst
+       van opschrijft werkt in precies een sector -- en meet dan of het toevallig
+       de goede lijst had. `volgorde` is een lijst PADEN (de stam eerst, dan
+       bijvoorbeeld energie voor automatisering), en het profiel pakt de eerste
+       die in zijn eigen boom openstaat. */
     onderzoeken(volgorde) {
       const beeld = this.beeld.onderzoek;
       if (beeld.bezig >= beeld.tegelijk) return false;
-      const open = volgorde.find(s => (beeld.boom.find(k => k.sleutel === s) || {}).staat === 'open');
-      if (!open) return false;
-      const k = beeld.boom.find(x => x.sleutel === open);
+      const open = beeld.boom.filter(k => k.staat === 'open');
+      if (!open.length) return false;
+      const k = open.find(x => x.pad === 'stam')
+        || volgorde.map(pad => open.find(x => x.pad === pad)).find(Boolean);
+      if (!k) return false;
       // met een half budget duurt het twee keer zo lang; dat is de afweging
-      return !!m.spel.zet(potje, mij, { actie: 'onderzoek-starten', sleutel: open, budget: k.kosten }).ok;
+      return !!m.spel.zet(potje, mij, { actie: 'onderzoek-starten', sleutel: k.sleutel, budget: k.kosten }).ok;
     },
     /* UITROLLEN OP DE ZAKEN DIE HET TERUGVERDIENEN. De motor rekent zelf uit
        wat een uitvinding daar per maand oplevert (onderzoek.opbrengstVan); een

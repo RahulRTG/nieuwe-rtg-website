@@ -81,7 +81,12 @@ function cijfers(r) {
        opbrengsttak in gaat breidt ook uit; dat is juist de strategie die deze
        tak mogelijk maakt. Een kwart ruimte is de zaak van iemand die net
        uitgebreid heeft. Wie de aanname wil zien bewegen, verzet dit getal. */
-    marge: (r.omzet - r.omzet * s.inkoop) * RUIMTE
+    marge: (r.omzet - r.omzet * s.inkoop) * RUIMTE,
+    /* DE VERWACHTE SCHADE PER MAAND, want de ketenrichting verlaagt het risico
+       en zonder deze post meet je die knoop voor de helft. Grof maar eerlijk:
+       de technische risico's samen kosten in de orde van een procent van de
+       omzet per maand, en dat is wat een verlaging aangrijpt. */
+    risico: r.omzet * 0.012
   };
 }
 
@@ -90,7 +95,12 @@ function meet(stadsleutel = 'ijmuiden', n = VESTIGINGEN) {
   return O.KNOPEN.map(sleutel => {
     const k = O.BOOM[sleutel];
     const onderzoek = k.kosten * k.duur;
-    const rijen = perSector.map(({ r, c }) => {
+    /* EEN SECTORTAK WORDT OP ZIJN EIGEN SECTOR GEMETEN, en de stam op alle
+       zeven. Sinds de boom per sector vertakt, is "de beste sector" voor een
+       horecatak geen vraag meer -- hij bestaat alleen daar. Wat er te meten
+       valt is of hij op zijn eigen sector binnen de band valt. */
+    const vanBelang = k.sector ? perSector.filter(x => x.r.sleutel === k.sector) : perSector;
+    const rijen = vanBelang.map(({ r, c }) => {
       const perMaand = O.opbrengstVan(sleutel, c);
       // de uitrol is een deel van de bouwsom, dus per sector een ander bedrag
       const impl = O.uitrolkosten({ gebouwdVoor: r.bouw }, sleutel);
@@ -100,7 +110,7 @@ function meet(stadsleutel = 'ijmuiden', n = VESTIGINGEN) {
     });
     const beste = rijen.reduce((a, b) => (b.uitrol < a.uitrol ? b : a));
     const mid = mediaan(rijen.map(x => x.uitrol));
-    return { sleutel, naam: k.naam, tak: k.tak, onderzoek, deel: k.implementatie,
+    return { sleutel, naam: k.naam, pad: k.pad, sector: k.sector, onderzoek, deel: k.implementatie,
       /* EEN UITVINDING HOEFT NIET OVERAL TE WERKEN -- dat is juist de bedoeling:
          brandstof is voor een vervoerder een grote post en voor een kantoor
          niets. Er wordt daarom gemeten op de sector waar hij het BESTE past, en
@@ -108,7 +118,7 @@ function meet(stadsleutel = 'ijmuiden', n = VESTIGINGEN) {
       beste: beste.sector, implementatie: beste.impl, uitrol: beste.uitrol, volledig: beste.volledig,
       mediaan: mid,
       // hoe breed hij werkt: op hoeveel sectoren hij binnen de band valt
-      breedte: rijen.filter(x => x.uitrol <= BAND[1]).length, rijen };
+      breedte: rijen.filter(x => x.uitrol <= BAND[1]).length, aantal: rijen.length, rijen };
   });
 }
 
@@ -120,17 +130,15 @@ const EENMALIG = new Set(O.KNOPEN.filter(s => Object.keys(O.BOOM[s].effect).ever
 if (require.main === module) {
   const stad = process.argv[3] || 'ijmuiden';
   console.log('Magnaat-onderzoek voor ' + stad + ' (' + VESTIGINGEN + ' vestigingen)\n');
-  console.log('knooppunt          | tak          | onderzoek | uitrol | beste sector | op zijn best | mediaan | volledig | breed');
+  console.log('knooppunt                 | richting       | onderzoek | uitrol | terugverdiend | volledig | binnen band');
   const rijen = meet(stad);
   for (const r of rijen) {
     if (EENMALIG.has(r.sleutel)) continue;
-    console.log(r.sleutel.padEnd(18) + ' | ' + r.tak.padEnd(12) + ' | ' +
+    console.log(r.sleutel.padEnd(25) + ' | ' + r.pad.padEnd(14) + ' | ' +
       String(r.onderzoek).padStart(9) + ' | ' + String(Math.round(r.deel * 100) + '%').padStart(6) + ' | ' +
-      r.beste.padEnd(12) + ' | ' +
-      (Number.isFinite(r.uitrol) ? r.uitrol.toFixed(1) + ' mnd' : 'NOOIT').padStart(12) + ' | ' +
-      (Number.isFinite(r.mediaan) ? r.mediaan.toFixed(1) + ' mnd' : 'NOOIT').padStart(7) + ' | ' +
+      (Number.isFinite(r.mediaan) ? r.mediaan.toFixed(1) + ' mnd' : 'NOOIT').padStart(13) + ' | ' +
       (Number.isFinite(r.volledig) ? r.volledig.toFixed(1) + ' mnd' : 'NOOIT').padStart(8) + ' | ' +
-      r.breedte + '/7');
+      r.breedte + '/' + r.aantal);
   }
   for (const r of rijen.filter(x => EENMALIG.has(x.sleutel))) {
     const s = SECTOREN.horeca, korting = 1 - O.BOOM[r.sleutel].effect.bouw;

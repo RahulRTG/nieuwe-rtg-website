@@ -42,7 +42,7 @@ function trek(tekst) {
 
 const RISICOS = {
   brand: {
-    naam: 'Brand', schade: 'pand', basis: 0.004, zwaarte: [0.15, 0.60],
+    naam: 'Brand', schade: 'pand', basis: 0.004, zwaarte: [0.15, 0.60], technisch: true,
     /* Verwaarlozing is hier de grootste knop, en dat is de bedoeling: onderhoud
        was tot nu toe een langzame kwaliteitsknop, en dit maakt er een risico
        van. Een pand op tien procent brandt vijf keer zo vaak als een pand op
@@ -51,20 +51,20 @@ const RISICOS = {
     uitsluitbaar: true
   },
   storm: {
-    naam: 'Storm', schade: 'pand', basis: 0.006, zwaarte: [0.04, 0.20],
+    naam: 'Storm', schade: 'pand', basis: 0.006, zwaarte: [0.04, 0.20], technisch: true,
     // seizoensgebonden: de winter doet dit, niet de zomer
     weegt: (v, ctx) => 1 + (ctx.winter ? 1.5 : -0.6),
     uitsluitbaar: false
   },
   machinebreuk: {
-    naam: 'Machinebreuk', schade: 'omzet', basis: 0.010, zwaarte: [0.05, 0.30],
+    naam: 'Machinebreuk', schade: 'omzet', basis: 0.010, zwaarte: [0.05, 0.30], technisch: true,
     // alleen waar machines staan, en verwaarlozing telt zwaar
     weegt: (v) => (['industrie', 'logistiek'].includes(v.sector) ? 1 : 0.15)
       * (1 + (1 - v.onderhoud / 100) * 3),
     uitsluitbaar: true
   },
   transport: {
-    naam: 'Transportschade', schade: 'omzet', basis: 0.008, zwaarte: [0.03, 0.15],
+    naam: 'Transportschade', schade: 'omzet', basis: 0.008, zwaarte: [0.03, 0.15], technisch: true,
     // wie veel goederen beweegt, beschadigt er meer
     weegt: (v) => 0.4 + ((SECTOREN[v.sector].koopt || {}).goederen || 0) * 2
       + ((SECTOREN[v.sector].koopt || {}).productie || 0) * 2,
@@ -101,12 +101,28 @@ const RISICOS = {
 };
 const RISICOLIJST = Object.keys(RISICOS);
 
+/* ONDERZOEK VERLAAGT DE KANS OP WAT ER STUK KAN, en alleen daarop: predictive
+   maintenance en route-optimalisatie maken machines betrouwbaarder, ze maken
+   niemand minder aansprakelijk en ze houden geen inbreker buiten. De vier
+   TECHNISCHE risico's luisteren dus naar `risico` uit ./onderzoek.js, de andere
+   vier niet.
+
+   Hij leest `v.techEffect` RECHTSTREEKS en vraagt het niet aan ./onderzoek.js,
+   en dat is geen slordigheid: die module haalt `trek` hier vandaan, dus een
+   require terug zou een kring maken. Het veld staat op de vestiging juist zodat
+   dat niet nodig is. */
+const techRisico = (v) => {
+  const f = ((v || {}).techEffect || {}).risico;
+  return typeof f === 'number' && isFinite(f) && f > 0 ? f : 1;
+};
+
 /* De kans dat dit risico deze maand toeslaat bij deze vestiging. Begrensd, want
    een gewicht dat uit de hand loopt maakt een sector onspeelbaar in plaats van
    riskant. */
 function kansOp(sleutel, v, ctx) {
   const r = RISICOS[sleutel];
-  return klem(r.basis * r.weegt(v, ctx || {}), 0, 0.25);
+  const tech = r.technisch ? techRisico(v) : 1;
+  return klem(r.basis * r.weegt(v, ctx || {}) * tech, 0, 0.25);
 }
 
 /* Wat er deze maand gebeurt bij EEN vestiging. Geeft een lijst voorvallen terug

@@ -235,6 +235,14 @@ const SCENARIOS = {
         bedrag: Math.floor(zaak.waarde * 0.5), looptijd: 120, vestiging: zaak.id });
       w.geleend = r.ok;
       w.zaakId = zaak.id;
+      /* EN DAARNA NOG EEN KEER, ZO GROOT ALS DE BANK TOESTAAT. Zonder die tweede
+         ronde meet deze route alleen of de waarde stijgt van een lening; de
+         DEKKINGSGRAAD zelf bleef ongetoetst, en die is de andere helft van
+         dezelfde vraag. */
+      const o = (w.m.eco.zicht(w.potje, w.st, 'a').financiering.onderpandOffertes || [])
+        .find(x => x.soort === 'vastgoed' && x.vestiging === zaak.id);
+      if (o && o.max > 1000) w.m.spel.zet(w.potje, 'a', { actie: 'krediet-opnemen',
+        soort: 'vastgoed', bedrag: o.max, looptijd: 120, vestiging: zaak.id });
     },
     keur(w) {
       if (!w.geleend) return 'er kon niets geleend worden; deze toets meet dan niets';
@@ -246,6 +254,19 @@ const SCENARIOS = {
       if (zaak.waarde > w.ruimteVoor)
         return 'lenen tegen een pand maakte datzelfde pand meer waard: ' +
           w.ruimteVoor + ' -> ' + zaak.waarde;
+      /* JE KUNT NOOIT MEER LENEN TEGEN EEN PAND DAN HET WAARD IS. Dat is geen
+         formule maar een wet, en er stond niets dat hem bewaakte: een mutatie
+         die de dekkingsgraad ruim boven de een zette, kwam langs alle drie de
+         kredietroutes. Een bank die honderdvijftig procent van een pand
+         uitleent, maakt van onderpand een geldkraan -- en dan is elke laag die
+         de waardering optilt (onderzoek, contracten, reputatie) meteen een
+         zelffinancierende lus. */
+      const opDitPand = (w.st.leningen || [])
+        .filter(l => l.status === 'loopt' && l.onderpand === w.zaakId)
+        .reduce((n, l) => n + l.restant, 0);
+      if (opDitPand > zaak.waarde)
+        return 'er staat ' + Math.round(opDitPand) + ' aan schuld op een pand van ' +
+          Math.round(zaak.waarde) + '; onderpand is dan een geldkraan';
       return null;
     }
   },
@@ -331,6 +352,128 @@ const SCENARIOS = {
     doe(w) {
       for (const h of ['a', 'b', 'c'])
         w.m.spel.zet(w.potje, h, { actie: 'onderzoek-starten', sleutel: 'meten', budget: 8000 });
+    }
+  },
+
+  /* DE ZELFFINANCIERENDE ONDERZOEKSLUS, en dit is de route die er bij een
+     R&D-laag als eerste in zit:
+
+       onderzoek -> hogere waardering -> grotere lening -> onderzoek -> ...
+
+     De vraag is niet of onderzoek waarde MAG opleveren -- dat mag, daar is het
+     voor -- maar of de waardering en de kredietruimte kunnen stijgen VOORDAT de
+     productiviteitswinst zich in echte operationele output heeft laten zien.
+     Kan dat, dan financiert een speler zijn volgende onderzoek met de papieren
+     winst van het vorige en draait het rond zonder dat er ooit iets geproduceerd
+     is.
+
+     Er zit een echte scheefheid in de motor die dit zou kunnen voeden: de
+     onderzoekskosten hangen aan de SPELER en niet aan een vestiging, terwijl de
+     besparing wel in het resultaat van die vestiging landt. De waardering ziet
+     dus de winst en nooit de rekening. Wat dat begrenst is dat `waarde()` het
+     resultaat over de HELE LEVENSDUUR middelt: een besparing die vorige maand
+     begon, tilt dat gemiddelde nauwelijks op en moet zich eerst maanden bewijzen.
+     Deze route meet of die rem het houdt.
+
+     De eis is scherper dan bij de andere routes: niet alleen mag er geen geld
+     bijkomen, de KREDIETRUIMTE mag niet harder groeien dan de output. */
+  onderzoekslus: {
+    verwacht: 'economisch', naam: 'onderzoek, hogere waardering, grotere lening, opnieuw onderzoek',
+    doe(w) {
+      /* EEN EIGEN ZAAK, OP MAAT. De vaste opstelling van deze meter zet een
+         vestiging neer die veel te groot is voor zijn plek -- prima voor routes
+         die alleen totalen vergelijken, maar hier fataal: een verlieslatende
+         zaak hangt aan de BODEM van de waardering (`gebouwdVoor * 0.55`), en
+         dan beweegt er niets en meet deze route niets. Zes rondes lang stond hij
+         op exact hetzelfde bedrag. De lus vraagt om een zaak die geld verdient,
+         want alleen dan kan de waardering uberhaupt meestijgen. */
+      const k = kaart(w.st.stad);
+      const kavel = k.kavels.find(x => x.zone === 'boulevard' && !w.st.kavelBezet[x.id]);
+      if (!kavel) return;
+      const r = w.m.spel.zet(w.potje, 'a', { actie: 'open', kavel: kavel.id,
+        sector: 'horeca', omvang: 12, naam: 'Lus' });
+      if (!r.ok) return;
+      w.lusId = r.id;
+      const eigen = () => (w.st.vestigingen.a || []).find(v => v.id === w.lusId);
+      w.rondes = [];
+      for (let ronde = 0; ronde < 6; ronde++) {
+        const v = eigen();
+        if (!v) break;
+        const beeld = w.m.eco.zicht(w.potje, w.st, 'a');
+        const boom = (beeld.onderzoek || {}).boom || [];
+        const vrij = boom.find(x => x.staat === 'open');
+        if (vrij) w.m.spel.zet(w.potje, 'a', { actie: 'onderzoek-starten',
+          sleutel: vrij.sleutel, budget: vrij.kosten });
+        // alles uitrollen wat er klaar staat: dit is de speler die de lus zoekt
+        for (const kn of boom.filter(x => x.staat === 'klaar'))
+          w.m.spel.zet(w.potje, 'a', { actie: 'onderzoek-uitrollen', sleutel: kn.sleutel, vestiging: v.id });
+        /* DE VASTGOEDVORM en geen andere, want juist die hangt aan de WAARDE van
+           het pand -- dat is precies de schakel die de lus zou moeten voeden. */
+        const o = (beeld.financiering.onderpandOffertes || [])
+          .find(x => x.soort === 'vastgoed' && x.vestiging === v.id);
+        if (o && o.max > 1000) w.m.spel.zet(w.potje, 'a', { actie: 'krediet-opnemen',
+          soort: 'vastgoed', bedrag: Math.min(o.max, 60000), looptijd: 96, vestiging: v.id });
+        for (let maand = 0; maand < 5; maand++) {
+          w.st.gerekendTot -= w.st.maandMs;
+          for (const verslag of w.m.eco.bijrekenen(w.potje))
+            w.rente = (w.rente || 0) + (verslag.rentelast || 0) + (verslag.premielast || 0)
+              + (verslag.schadelast || 0) + (verslag.onderzoeklast || 0);
+        }
+        const nu = w.m.eco.zicht(w.potje, w.st, 'a');
+        const zaak = (nu.vestigingen || []).find(x => x.id === w.lusId) || {};
+        const kred = (nu.financiering.onderpandOffertes || [])
+          .find(x => x.soort === 'vastgoed' && x.vestiging === w.lusId) || { max: 0 };
+        w.rondes.push({ waarde: zaak.waarde || 0, ruimte: kred.max || 0,
+          gebouwdVoor: v.gebouwdVoor, tech: (v.tech || []).length,
+          // de JAARWINST die eronder ligt, en niet de cumulatieve omzet: die
+          // groeit met de kalender mee en is dus geen lat maar een vrijbrief
+          jaar: (v.resultaatTotaal || 0) / Math.max(1, v.maanden || 1) * 12 });
+      }
+    },
+    keur(w) {
+      if (!w.rondes || w.rondes.length < 3) return 'de lus liep niet ver genoeg; deze toets meet dan niets';
+      const eerste = w.rondes[0], laatste = w.rondes[w.rondes.length - 1];
+      if (!laatste.tech) return 'er is niets uitgerold; deze toets meet dan niets';
+      if (laatste.waarde === eerste.waarde)
+        return 'de waardering bewoog geen cent; deze toets meet dan niets';
+      /* DE WAARDERING BESTAAT UIT PRECIES TWEE DINGEN: wat er staat, en wat het
+         verdient. Er is geen derde term, en dat is de hele wet -- geen
+         researchComplete die er een bedrag bij zet, geen bonus voor uitgerolde
+         techniek, geen opgepotte onderzoekskosten die als bezit terugkomen.
+         Uitvindingen mogen de waardering optillen, maar alleen door de LANGS
+         de winst te gaan die ze aantoonbaar opleveren.
+
+         De grens staat ruim boven de factor die de motor zelf gebruikt (drie en
+         een half tot zeven maal de jaarwinst), zodat dit geen tweede knop op de
+         waardering wordt maar een plafond dat alleen een extra TERM raakt.
+
+         Eerst stond hier een vergelijking met de cumulatieve omzet, en die was
+         waardeloos: cumulatieve omzet groeit met de kalender mee, dus zes keer
+         zoveel omzet gaf zes keer zoveel ruimte. Een mutatie die honderdtwintig
+         duizend per uitvinding bij de waardering optelde, kwam daar
+         moeiteloos onderdoor. */
+      for (const r of w.rondes) {
+        const mag = Math.max(r.gebouwdVoor * 0.55, Math.max(0, r.jaar) * 8 + r.gebouwdVoor * 0.4);
+        if (r.waarde > mag + 1)
+          return 'een zaak van ' + Math.round(r.gebouwdVoor) + ' met ' + Math.round(r.jaar) +
+            ' jaarwinst stond op ' + Math.round(r.waarde) + '; dat is meer dan bezit en verdiensten dragen (' +
+            Math.round(mag) + ')';
+      }
+      /* EN DE WAARDERING MAG NIET SNELLER GROEIEN DAN DE WINST DIE ERONDER LIGT.
+         Het plafond hierboven vangt een losse term; deze vangt een term die met
+         de zaak meegroeit en dus onder het plafond blijft meeliften. */
+      const groeiWaarde = laatste.waarde / Math.max(1, eerste.waarde);
+      const groeiWinst = Math.max(0, laatste.jaar) / Math.max(1, Math.max(0, eerste.jaar));
+      if (groeiWaarde > Math.max(1.1, groeiWinst) * 1.2)
+        return 'de waardering groeide ' + groeiWaarde.toFixed(2) + 'x terwijl de jaarwinst ' +
+          groeiWinst.toFixed(2) + 'x groeide; er wordt waarde geboekt die niet verdiend is';
+      /* EN DE KREDIETRUIMTE MAG NIET HARDER GROEIEN DAN DE WAARDERING. Anders
+         hangt de lus niet aan wat het bedrijf doet maar aan de bank. */
+      const groeiRuimte = laatste.ruimte / Math.max(1, eerste.ruimte);
+      if (eerste.ruimte > 0 && groeiRuimte > groeiWaarde * 1.5)
+        return 'de kredietruimte groeide ' + groeiRuimte.toFixed(2) + 'x tegen een waardering van ' +
+          groeiWaarde.toFixed(2) + 'x; de lus voedt zichzelf via de bank';
+      return null;
     }
   },
 

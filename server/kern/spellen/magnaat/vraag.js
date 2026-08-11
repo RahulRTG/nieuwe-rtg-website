@@ -83,7 +83,7 @@ function vraagVoor(kaart, vestiging, { maand, zoneDruk, marketing }) {
   /* Opbrengststuring en een serviceconcept verhogen de VRAAG op dezelfde
      plek; zie ./onderzoek.js. Ze grijpen aan op `markt` en niet op de
      uitkomst, zodat het effect narekenbaar blijft. */
-  const tech = O.factor(vestiging.tech, 'markt');
+  const tech = O.factor(vestiging, 'markt');
   const eenheden = basis * s.markt * tech * druk * prijs * reputatie * bereikMarketing;
   return {
     eenheden: Math.max(0, eenheden),

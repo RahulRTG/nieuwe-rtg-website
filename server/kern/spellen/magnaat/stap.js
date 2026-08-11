@@ -71,10 +71,10 @@ function maand(kaart, v, { maand: m, zoneDruk, wereldFactor, arbeid, contract, g
   let korting = 0;
   for (const [soort, ontvangen] of Object.entries(gedekt || {}))
     korting += H.dekking(v, omzet, soort, ontvangen).bedrag;
-  const inkoop = Math.max(0, omzet * s.inkoop * O.factor(v.tech, 'inkoop') - korting);
+  const inkoop = Math.max(0, omzet * s.inkoop * O.factor(v, 'inkoop') - korting);
   const lonen = v.personeel * s.loon;
   // en een duurder pand per eenheid; hetzelfde getal, dezelfde reden
-  const vast = v.omvang * s.vast * (KOSTENSTAND[v.prijs] || 1) * O.factor(v.tech, 'vast');
+  const vast = v.omvang * s.vast * (KOSTENSTAND[v.prijs] || 1) * O.factor(v, 'vast');
   const huur = v.huur;
   const marketing = v.marketing || 0;
   /* Onderhoud is een BEDRAG dat de speler kiest, geen vinkje. Wat het oplevert

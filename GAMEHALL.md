@@ -1174,6 +1174,103 @@ wat net zo goed een fout is als waarde die erbij komt.
 > Het staat als open draad in TAKEN.md en wordt bij elke toernooironde opnieuw
 > gemeten in plaats van weggepoetst.
 
+### Onderzoek, tweede ronde — vijf hefbomen, zeven vertalingen
+
+**De boom vertakt nu per sector.** Een restaurant dat automatiseert en een
+vervoerder die zijn voertuigbenutting verhoogt doen *economisch* hetzelfde: meer
+aan met dezelfde mensen, tegen hogere vaste lasten voor techniek. Dat is één
+hefboom, en de sector geeft hem een naam en eigen getallen. Vijf richtingen, zeven
+vertalingen, vijfendertig knopen — en niet vijfendertig losse uitvindingen, want
+dan is de economie niet meer na te rekenen.
+
+| Richting | Doet | Kost |
+|---|---|---|
+| automatisering | meer per medewerker | hogere vaste lasten (techniek, licenties) |
+| kwaliteit | betere beleving → reputatie → vraag | duurdere inkoop |
+| energie | lagere vaste lasten | niets in de exploitatie — de prijs zit in de uitrol |
+| keten | minder verspilling én minder technisch risico | planning- en volgsystemen die blijven draaien |
+| concept | nieuwe klantsegmenten | hogere vaste lasten, en **onzeker** |
+
+Horeca leest dat als procesautomatisering, productkwaliteit, energie-efficiëntie,
+logistiek-en-verspilling en conceptinnovatie; hospitality als
+housekeeping-automatisering, guest experience, energiebeheer,
+roomservice-efficiëntie en revenue management; mobility als voertuigbenutting,
+predictive maintenance, zuiniger materieel, route-optimalisatie en
+laad-/energiebeheer.
+
+**Elke richting heeft een keerzijde**, en dat is de toelatingseis — dezelfde als
+bij de kredietvormen en de risico's. Een knoop die alleen maar goed is, is geen
+keuze maar een knop die je indrukt zodra je hem kunt betalen. Energie is de
+uitgesproken uitzondering en betaalt in de uitrol; dat is de "hoge initiële
+investering" letterlijk gemaakt.
+
+**Twee nieuwe hefbomen raken lagen die er al waren.** `kwaliteit` grijpt aan op de
+geleverde beleving — reputatie kruipt daar naartoe, vraag volgt de reputatie: twee
+stappen die de motor al zette, geen bonus op de uitkomst. En `risico` verlaagt de
+kans op de vier *technische* risico's uit de verzekeringslaag (brand, storm,
+machinebreuk, transport) en op geen van de vier andere: predictive maintenance
+maakt machines betrouwbaarder, het maakt niemand minder aansprakelijk.
+
+**Je onderzoekt wat je doet.** Een sectortak gaat alleen open als je in die sector
+werkelijk een vestiging hebt, en een uitvinding uit de horecaboom laat zich niet
+in een loods uitrollen. Daarmee is je portefeuille een onderzoeksbeslissing
+geworden: een specialist loopt een diepe boom af, een conglomeraat staat overal
+aan het begin.
+
+**Onderzoek slaagt niet of faalt; het loopt anders.** Drie uitkomsten, getrokken
+uit dezelfde hash als de rest zodat de klok deterministisch blijft:
+
+- **volledig** (55%, of 30% bij een onzekere knoop) — het effect zoals het op
+  papier stond;
+- **gedeeltelijk** — de helft van elke stap, óók van de keerzijde. Half ingevoerde
+  techniek geeft minder capaciteit maar kost ook minder onderhoud; dat is een
+  andere uitkomst en geen troostprijs;
+- **anders** — waar je op mikte levert bijna niets op, maar er komt wél iets uit:
+  een andere richting uit je eigen boom, verzwakt. Nuttig, alleen voor een andere
+  KPI dan je dacht.
+
+De speler ziet naast elkaar wat een knoop *bedoelde* en wat het bij hém *werd* —
+en dat verschil is precies de informatie waarop een plan wordt bijgesteld.
+
+> **De prijs is per sector geijkt, de vorm niet.** Eerst had elk pad één
+> uitrolfractie voor alle zeven sectoren. Dat leek eerlijk tot de meter het
+> uitrekende: een energiebesparing van dertig procent is bij een vervoerder
+> honderden euro's per maand en bij een kantoor negenenveertig, want `vast` is
+> daar 0,3% van de omzet. **Negentien van de vijfendertig knopen stonden buiten de
+> band, tot 581 maanden aan toe.** Nu betaalt elke sector wat de hefboom daar waard
+> is, terwijl de vórm — welk veld, welke keerzijde, welke voorwaarden, welke
+> onzekerheid — gedeeld blijft. En de kwaliteitsrichting bleek in vijf van de zeven
+> sectoren netto verlieslatend, omdat de inkooprekening groter was dan de
+> vraagwinst; die keerzijde is nu per sector op veertig procent van de opbrengst
+> gezet.
+
+**De economische wet, en hoe hij gehandhaafd wordt.** Onderzoek maakt nooit kas —
+het verandert alleen productievoorwaarden. De investering verdwijnt eerst uit het
+vermogen; daarna mag er waarde ontstaan, maar alleen via capaciteit, kosten,
+kwaliteit, vraag of risico die aantoonbaar veranderd zijn. Er bestaat nergens een
+`researchComplete → +€500k`.
+
+> **De zelffinancierende lus is een eigen pomproute.** *onderzoek → hogere
+> waardering → grotere lening → onderzoek → …* De vraag is niet of onderzoek
+> waarde mág opleveren, maar of waardering en kredietruimte kunnen stijgen vóórdat
+> de productiviteitswinst zich in echte operationele output heeft laten zien. De
+> route eist dat de waardering uit precies twee dingen bestaat — wat er staat en
+> wat het verdient — en dat de kredietruimte niet harder groeit dan de waardering.
+> Twee mutaties zijn erlangs gekomen en allebei gevangen: een bedrag per uitvinding
+> bij de waardering, en een waarderingsfactor die met de techniek meeloopt.
+>
+> Een derde mutatie ontsnapte eerst: een dekkingsgraad ruim boven de één kwam langs
+> álle drie de kredietroutes. Er stond namelijk nergens dat je niet méér kunt lenen
+> tegen een pand dan het waard is. Een bank die 150% van een gebouw uitleent maakt
+> van onderpand een geldkraan, en dan is *elke* laag die de waardering optilt
+> meteen een zelffinancierende lus. Die wet staat er nu, in de onderpandroute.
+>
+> En onderweg viel een gat in het scherm op: de offertelijst liet de
+> onderpandvormen wég, omdat een onderpandvorm zonder gekozen pand geen bedrag
+> heeft. Gevolg: een speler kon nergens zien wat zijn gebouwen aan kredietruimte
+> opleveren. Gevonden doordat de pompmeter de lus wilde sluiten en er geen enkele
+> offerte te vinden was.
+
 **Wat er van fase B nog niet in zit.** AI-managers met beleidsregels — die hebben
 nu pas genoeg bedrijfsmaterie om iets zinnigs te beheren: contractverplichtingen,
 financiering, risico, onderzoek, prijsstelling, onderhoud en capaciteit. Daarna

@@ -26,8 +26,14 @@ const SUBSIDIEDEEL = 0.5;
 
 module.exports = ({ mijnVestiging }) => {
   const lopend = (st, h) => (st.onderzoek || []).filter(o => o.speler === h && o.status === 'loopt');
-  const klaarVan = (st, h) => (st.onderzoek || [])
-    .filter(o => o.speler === h && o.status === 'klaar').map(o => o.sleutel);
+  const af = (st, h) => (st.onderzoek || []).filter(o => o.speler === h && o.status === 'klaar');
+  const klaarVan = (st, h) => af(st, h).map(o => o.sleutel);
+  const heeftSector = (st, h, sector) => (st.vestigingen[h] || [])
+    .some(v => !sector || v.sector === sector);
+  const uitkomstVan = (st, h, sleutel) => (af(st, h).find(o => o.sleutel === sleutel) || {}).uitkomst;
+  /* WAT ER VOOR DEZE SPELER WERKELIJK UIT ZIJN ONDERZOEK KWAM, per sleutel. De
+     boom zegt wat een knoop BEDOELT; dit zegt wat hij bij hem GEWORDEN is. */
+  const gerealiseerd = (st, h) => Object.fromEntries(af(st, h).map(o => [o.sleutel, o.effect]));
 
   /* WAT ER VAN DE SUBSIDIE OVERBLIJFT GAAT TERUG NAAR DE POT. Zonder deze regel
      verdampt het: het geld is bij het toekennen uit de pot gehaald en wordt
@@ -46,11 +52,23 @@ module.exports = ({ mijnVestiging }) => {
 
   const ACTIES = {
     /* VRIJ: een onderzoek starten. Wat er open staat volgt uit de boom, niet uit
-       het verzoek -- anders slaat een speler de stam over. */
+       het verzoek -- anders slaat een speler de stam over.
+
+       JE ONDERZOEKT WAT JE DOET. Een sectortak gaat alleen open als je in die
+       sector ook werkelijk een vestiging hebt. Dat is geen rem maar de kern van
+       de keuze: een specialist loopt een diepe boom af, een conglomeraat staat
+       overal aan het begin -- en daarmee is je portefeuille ook een
+       onderzoeksbeslissing geworden. De stam (`meten`) is sectorloos en staat
+       voor iedereen open die uberhaupt iets heeft. */
     'onderzoek-starten'(potje, h, z) {
       const st = potje.staat;
       const sleutel = String(z.sleutel || '');
       if (!O.BOOM[sleutel]) return { status: 400, error: 'Dat onderzoek bestaat niet.' };
+      const sector = O.BOOM[sleutel].sector;
+      if (!heeftSector(st, h, sector))
+        return { status: 409, error: sector
+          ? 'Daar heb je een vestiging in ' + sector + ' voor nodig; je onderzoekt wat je doet.'
+          : 'Daar heb je eerst een vestiging voor nodig.' };
       const klaar = klaarVan(st, h);
       if (klaar.includes(sleutel)) return { status: 409, error: 'Dat heb je al uitgevonden.' };
       if (lopend(st, h).some(o => o.sleutel === sleutel)) return { status: 409, error: 'Daar loop je al aan.' };
@@ -93,11 +111,22 @@ module.exports = ({ mijnVestiging }) => {
       if (!v) return { status: 404, error: 'Die vestiging is niet van jou.' };
       v.tech = v.tech || [];
       if (v.tech.includes(sleutel)) return { status: 409, error: 'Dat draait daar al.' };
+      /* HET PAND MOET WEL IN DE SECTOR STAAN. Een uitvinding uit de horecaboom
+         doet niets in een loods, en hem daar toch mogen uitrollen zou de hele
+         sectorindeling decoratie maken. */
+      if (O.BOOM[sleutel].sector && v.sector !== O.BOOM[sleutel].sector)
+        return { status: 409, error: 'Dat is een uitvinding voor ' + O.BOOM[sleutel].sector + '.' };
       const kosten = O.uitrolkosten(v, sleutel);
       if (st.geld[h] < kosten) return { status: 400, error: 'Uitrollen kost ' + kosten + '; dat heb je niet.' };
       st.geld[h] -= kosten;
       v.tech.push(sleutel);
-      return { status: 200, ok: true, kosten, tech: v.tech.slice() };
+      /* WAT ER OP HET PAND LANDT IS DE UITKOMST VAN DEZE SPELER en niet wat er
+         in de tabel stond: het onderzoek kan gedeeltelijk of anders zijn
+         uitgepakt. De vermenigvuldigers worden hier bijgewerkt en nergens
+         anders, want dit is de enige plek waar `tech` verandert. */
+      v.techEffect = O.techEffect(v.tech, gerealiseerd(st, h));
+      return { status: 200, ok: true, kosten, tech: v.tech.slice(),
+        uitkomst: uitkomstVan(st, h, sleutel), effect: v.techEffect };
     },
 
     /* VRIJ: subsidie vragen. De Foundation betaalt de helft mee, uit de LOKALE
@@ -119,62 +148,13 @@ module.exports = ({ mijnVestiging }) => {
     }
   };
 
-  /* ---------- de maand ----------
-     Elk lopend onderzoek verbruikt zijn budget en boekt voortgang. De subsidie
-     betaalt mee zolang hij strekt; wat er niet uit de subsidie komt, komt uit de
-     kas. */
-  function maandVoorSpeler(potje, h) {
-    const st = potje.staat;
-    const regels = [];
-    let uitEigenZak = 0, uitPot = 0;
-    for (const o of lopend(st, h)) {
-      const k = O.BOOM[o.sleutel];
-      const uitSubsidie = Math.min(o.subsidieRest || 0, o.budget);
-      const zelf = o.budget - uitSubsidie;
-      st.geld[h] -= zelf;
-      if (uitSubsidie > 0) o.subsidieRest -= uitSubsidie;
-      o.besteed += o.budget;
-      o.subsidie += uitSubsidie;
-      uitEigenZak += zelf;
-      uitPot += uitSubsidie;
-      o.voortgang += O.voortgang(potje.id, st.maand, o.sleutel, o.budget);
-      const af = o.voortgang >= 1;
-      if (af) { o.status = 'klaar'; o.voortgang = 1; o.tot = st.maand; teruggave(st, o); }
-      regels.push({ id: o.id, naam: k.naam, soort: 'onderzoek',
-        budget: rond(o.budget), subsidie: rond(uitSubsidie),
-        voortgang: Math.round(o.voortgang * 100), klaar: af || undefined,
-        resultaat: -rond(zelf) });
-    }
-    return { regels, uitEigenZak, uitPot };
-  }
+  /* DE MAAND staat in ./onderzoek-maand.js -- budget eruit, voortgang erbij, en
+     de plek waar de uitkomst valt. */
+  const maandVoorSpeler = require('./onderzoek-maand')({ lopend, teruggave });
 
-  /* WAT EEN SPELER ZIET: de hele boom met wat open staat, wat loopt en wat af
-     is, plus per vestiging wat er draait. Van een ander niets -- welke kant een
-     concurrent op onderzoekt, is precies het soort kennis waar hij voor betaalt. */
-  function beeld(st, h) {
-    const klaar = klaarVan(st, h);
-    const loopt = lopend(st, h);
-    return {
-      boom: O.KNOPEN.map(sleutel => {
-        const k = O.BOOM[sleutel];
-        const bezig = loopt.find(o => o.sleutel === sleutel);
-        return { sleutel, naam: k.naam, tak: k.tak, uitleg: k.uitleg,
-          kosten: k.kosten, duur: k.duur, deel: k.implementatie, effect: k.effect,
-          vereist: k.vereist, open: O.staatOpen(sleutel, klaar),
-          staat: klaar.includes(sleutel) ? 'klaar' : bezig ? 'loopt' : O.staatOpen(sleutel, klaar) ? 'open' : 'dicht',
-          voortgang: bezig ? Math.round(bezig.voortgang * 100) : null,
-          budget: bezig ? bezig.budget : null, id: bezig ? bezig.id : null,
-          subsidie: bezig ? rond(bezig.subsidieToegekend || 0) : null };
-      }),
-      tegelijk: O.TEGELIJK, bezig: loopt.length,
-      /* WAT UITROLLEN HIER KOST, per vestiging. Sinds de uitrol een deel van de
-         bouwsom is, is er geen bedrag meer dat voor alle panden geldt -- en een
-         boom die alleen een percentage toont, laat de speler zelf rekenen. */
-      uitgerold: (st.vestigingen[h] || []).map(v => ({ vestiging: v.id, naam: v.naam,
-        tech: (v.tech || []).slice(),
-        uitrol: Object.fromEntries(O.KNOPEN.map(s => [s, O.uitrolkosten(v, s)])) }))
-    };
-  }
+  /* WAT EEN SPELER ZIET staat in ./onderzoek-beeld.js -- een eigen onderwerp
+     (de grens tussen spelers) dat los staat van wat hij DOET. */
+  const beeld = require('./onderzoek-beeld')({ lopend, af, klaarVan });
 
   return { ACTIES, VRIJE_ACTIES: Object.keys(ACTIES), maandVoorSpeler, beeld, klaarVan, SUBSIDIEDEEL };
 };

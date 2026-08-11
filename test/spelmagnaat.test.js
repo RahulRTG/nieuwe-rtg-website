@@ -89,13 +89,16 @@ test('de plek is de belangrijkste keuze van het spel', () => {
   const m = maakMagnaat();
   const p = potjeMet(ECO);
   m.spel.init(p);
-  m.spel.zet(p, 'anna', { actie: 'open', kavel: kavelIn('boulevard').id, sector: 'horeca', omvang: 40 });
-  m.spel.zet(p, 'boris', { actie: 'open', kavel: kavelIn('terrein').id, sector: 'horeca', omvang: 40 });
+  m.spel.zet(p, 'anna', { actie: 'open', kavel: kavelIn('boulevard').id, sector: 'horeca', omvang: 30 });
+  m.spel.zet(p, 'boris', { actie: 'open', kavel: kavelIn('terrein').id, sector: 'horeca', omvang: 30 });
   speelUit(m, p, 36);
   const stand = m.eco.eindstand(p);
   const a = stand.find(x => x.codenaam === 'CN-anna'), b = stand.find(x => x.codenaam === 'CN-boris');
-  assert.ok(a.vermogen > 0, 'een restaurant op de boulevard is een goede zaak: ' + a.vermogen);
-  assert.ok(b.vermogen < 0, 'hetzelfde restaurant op een bedrijventerrein is dat niet: ' + b.vermogen);
+  /* Beide vermogens zijn positief -- er staat tenslotte een pand -- dus de maat
+     is wat er met het STARTKAPITAAL is gebeurd. Op de boulevard is het
+     vermenigvuldigd, op het bedrijventerrein grotendeels verdampt. */
+  assert.ok(a.vermogen > 250000 * 3, 'een restaurant op de boulevard vermenigvuldigt je inleg: ' + a.vermogen);
+  assert.ok(b.vermogen < 250000, 'hetzelfde restaurant op een bedrijventerrein eet hem op: ' + b.vermogen);
   assert.ok(a.omzet > b.omzet * 4, 'en het verschil is groot, niet kosmetisch');
 });
 
@@ -104,7 +107,7 @@ test('onderhoud verwaarlozen bespaart nu en kost later meer', () => {
   const p = potjeMet(ECO);
   m.spel.init(p);
   for (const h of ['anna', 'boris'])
-    m.spel.zet(p, h, { actie: 'open', kavel: kavelIn('boulevard', h === 'anna' ? 0 : 1).id, sector: 'hotel', omvang: 8 });
+    m.spel.zet(p, h, { actie: 'open', kavel: kavelIn('boulevard', h === 'anna' ? 0 : 1).id, sector: 'hotel', omvang: 6 });
   m.spel.zet(p, 'boris', { actie: 'beleid', id: 'v2', onderhoud: 0 });
   speelUit(m, p, 36);
   const anna = p.staat.vestigingen.anna[0], boris = p.staat.vestigingen.boris[0];
@@ -119,12 +122,23 @@ test('te weinig personeel kost klanten die je wel had kunnen hebben', () => {
   const m = maakMagnaat();
   const p = potjeMet(ECO);
   m.spel.init(p);
-  m.spel.zet(p, 'anna', { actie: 'open', kavel: kavelIn('boulevard').id, sector: 'horeca', omvang: 40 });
+  m.spel.zet(p, 'anna', { actie: 'open', kavel: kavelIn('boulevard').id, sector: 'horeca', omvang: 30 });
   m.spel.zet(p, 'anna', { actie: 'beleid', id: 'v1', personeel: 1 });
   speelUit(m, p, 12);
   const laatste = p.staat.laatste.anna.regels[0];
   assert.ok(laatste.gemist > 0, 'met een man in de bediening loop je omzet mis');
   assert.ok(laatste.bezetting >= 99, 'en zit je bomvol: ' + laatste.bezetting + '%');
+
+  /* En de eigenschap eronder, rechtstreeks: capaciteit HANGT AAN PERSONEEL.
+     Zonder deze regel bleef deze toets groen terwijl personeel er niet meer toe
+     deed -- de zaak zit in beide gevallen vol, want de vraag is groter dan het
+     pand. Precies de fout van de eerste versie, en hij kwam via een mutatie
+     terug. */
+  const { capaciteit } = require('../server/kern/spellen/magnaat/stap');
+  const v = p.staat.vestigingen.anna[0];
+  const metEen = capaciteit(Object.assign({}, v, { personeel: 1 }), 0);
+  const metVier = capaciteit(Object.assign({}, v, { personeel: 4 }), 0);
+  assert.ok(metVier > metEen, 'meer personeel hoort meer aan te kunnen: ' + metEen + ' tegen ' + metVier);
 });
 
 test('marketing werkt af: de eerste euro doet meer dan de laatste', () => {
@@ -164,15 +178,20 @@ test('twee dezelfde zaken in dezelfde buurt vechten om dezelfde mensen', () => {
      gratis geld, en dan is de hele plaatskeuze zinloos: dan zet je ze allemaal
      op het beste kavel. */
   const m = maakMagnaat();
+  /* OP MAAT gebouwd, en dat is hier geen detail: een zaak die kleiner is dan de
+     vraag zit toch al vol, en dan is een concurrent pas te merken als hij de
+     vraag ONDER je capaciteit duwt. Met een te kleine zaak meet deze toets
+     niets -- dat is hem ook echt overkomen. */
+  const OP_MAAT = 80, SECTOR = 'vrije-tijd';
   const alleen = potjeMet(ECO, ['anna']);
   m.spel.init(alleen);
-  m.spel.zet(alleen, 'anna', { actie: 'open', kavel: kavelIn('boulevard', 0).id, sector: 'horeca', omvang: 40 });
+  m.spel.zet(alleen, 'anna', { actie: 'open', kavel: kavelIn('boulevard', 0).id, sector: SECTOR, omvang: OP_MAAT });
   speelUit(m, alleen, 12);
 
   const samen = potjeMet(ECO);
   m.spel.init(samen);
-  m.spel.zet(samen, 'anna', { actie: 'open', kavel: kavelIn('boulevard', 0).id, sector: 'horeca', omvang: 40 });
-  m.spel.zet(samen, 'boris', { actie: 'open', kavel: kavelIn('boulevard', 1).id, sector: 'horeca', omvang: 40 });
+  m.spel.zet(samen, 'anna', { actie: 'open', kavel: kavelIn('boulevard', 0).id, sector: SECTOR, omvang: OP_MAAT });
+  m.spel.zet(samen, 'boris', { actie: 'open', kavel: kavelIn('boulevard', 1).id, sector: SECTOR, omvang: OP_MAAT });
   speelUit(m, samen, 12);
 
   const solo = alleen.staat.laatste.anna.regels[0].omzet;
@@ -188,7 +207,7 @@ test('een naam bouw je op in maanden, niet in een maand', () => {
   const m = maakMagnaat();
   const p = potjeMet(ECO, ['anna']);
   m.spel.init(p);
-  m.spel.zet(p, 'anna', { actie: 'open', kavel: kavelIn('boulevard').id, sector: 'horeca', omvang: 40 });
+  m.spel.zet(p, 'anna', { actie: 'open', kavel: kavelIn('boulevard').id, sector: 'horeca', omvang: 30 });
   const start = p.staat.vestigingen.anna[0].reputatie;
   speelUit(m, p, 1);
   const na1 = p.staat.vestigingen.anna[0].reputatie;
@@ -197,6 +216,76 @@ test('een naam bouw je op in maanden, niet in een maand', () => {
   assert.ok(na1 > start, 'een goede maand helpt');
   assert.ok(na1 < start + 20, 'maar hij springt niet in een keer naar de top: ' + start + ' -> ' + na1);
   assert.ok(na12 > na1 + 10, 'en na een jaar sta je er echt: ' + na12);
+});
+
+test('er is geen enkelvoudig recept: niets doen verliest en er zijn meerdere stijlen', () => {
+  /* DE TOETS DIE DE DUURSTE FOUT VAN DIT SPEL BEWAAKT, en die alleen kan
+     bestaan omdat er campagnes worden UITGESPEELD. In de eerste versie van de
+     economie won de speler die minder personeel aannam en geen onderhoud deed:
+     alles draaide verlies en niets doen was de beste zet. Geen enkele unittoets
+     zag dat, en de balansmeter ook niet -- die kijkt naar EEN zaak op EEN
+     moment. Een economie toets je door hem te spelen.
+
+     Drie harde regels (zie de kop van scripts/magnaat-strateeg.js): niets doen
+     verliest, afwachten verliest van de actieve stijlen, en er zijn er meerdere
+     levensvatbaar. Hoe ver een sectorfocus voor mag liggen staat er met opzet
+     NIET in: dat is een smaakoordeel dat met fase B verandert, en het script
+     meldt het als signaal.
+
+     Twee startposities in plaats van de zes van het script: dit is een
+     regressiebewaking en geen ijking, en 110 campagnes duurt lang genoeg. */
+  const { toernooi, NAMEN } = require('../scripts/magnaat-strateeg');
+  const uit = toernooi(2);
+  assert.ok(uit.gespeeld >= 100, 'er zijn genoeg campagnes gespeeld om iets te zien: ' + uit.gespeeld);
+  const pct = (n) => Math.round(uit.aandeel[n] * 100);
+
+  /* De sommen staan HIER en niet als aanroep van `keur()` in het script. Dat
+     scheelde niets in leesbaarheid en alles in scherpte: met een aanroep bleef
+     deze toets groen toen de keuring zelf werd uitgezet, en een toets die zijn
+     eigen bewaker niet nameet bewaakt niets. */
+  const actief = NAMEN.filter(n => n !== 'niets' && n !== 'passief');
+  const besteActief = Math.max(...actief.map(n => uit.aandeel[n]));
+
+  assert.ok(uit.aandeel.niets <= 0.25, 'NIETS DOEN wint ' + pct('niets') + '% -- dan is er geen spel');
+  assert.ok(uit.aandeel.passief < besteActief,
+    'AFWACHTEN (' + pct('passief') + '%) doet het net zo goed als de beste actieve stijl -- dan is groeien straf');
+  const levensvatbaar = actief.filter(n => uit.aandeel[n] >= 0.5);
+  assert.ok(levensvatbaar.length >= 4,
+    'maar ' + levensvatbaar.length + ' stijlen halen de helft; er is een winnaar maar geen keuze');
+  /* En de fout van de eerste versie met naam en toenaam: UITKNIJPEN mag niet
+     lonen. `zuinig` neemt overal een man in dienst waar er vier nodig zijn. */
+  assert.ok(uit.aandeel.zuinig < 0.5,
+    'KNIJPEN op personeel wint ' + pct('zuinig') + '% -- dat was precies de fout van de eerste versie');
+});
+
+test('de keuring van de strateeg slaat aan op een economie die scheef staat', () => {
+  /* De bewaker zelf nameten. Zonder dit blijft `keur` groen als hij wordt
+     uitgezet -- en een keuring die niets kan afkeuren is geen keuring. Dat is
+     dezelfde positieve controle als bij de lekbewaking van het zichtmodel. */
+  const { keur, NAMEN } = require('../scripts/magnaat-strateeg');
+  /* Een gezond veld: de actieve stijlen rond de helft en erboven, en de twee
+     ijkpunten (niets doen, afwachten) er duidelijk onder. */
+  const verzin = (aandeel) => ({ aandeel: Object.assign(
+    Object.fromEntries(NAMEN.map(n => [n, 0.6])), { niets: 0.05, passief: 0.2 }, aandeel) });
+  assert.deepEqual(keur(verzin({})), [], 'een gezond veld hoort niets op te leveren');
+  assert.match(keur(verzin({ niets: 0.7 }))[0], /NIETS DOEN/);
+  assert.match(keur(verzin({ passief: 0.95 }))[0], /AFWACHTEN/);
+  const eenwinnaar = Object.fromEntries(NAMEN.map(n => [n, 0.1]));
+  eenwinnaar.horeca = 0.9;
+  assert.match(keur({ aandeel: eenwinnaar }).join(' '), /geen keuze/);
+});
+
+test('een goede naam trekt klanten, en een slechte houdt ze weg', () => {
+  /* Reputatie moet de VRAAG raken en niet alleen een getal op het scherm zijn.
+     Zonder deze toets bleef alles groen terwijl reputatie nergens meer in
+     meetelde: dat de naam oploopt was getoetst, dat hij iets DOET niet. */
+  const { vraagVoor } = require('../server/kern/spellen/magnaat/vraag');
+  const k = kaart('ijmuiden');
+  const kav = kavelIn('boulevard');
+  const meet = (reputatie) => vraagVoor(k, { kavel: kav.id, sector: 'horeca', prijs: 'midden', reputatie },
+    { maand: 6, zoneDruk: 1, marketing: 0 }).eenheden;
+  assert.ok(meet(90) > meet(50) * 1.15, 'een goede naam hoort merkbaar meer mensen te trekken');
+  assert.ok(meet(10) < meet(50) * 0.85, 'en een slechte naam hoort ze weg te houden');
 });
 
 /* ================= de klok ================= */
@@ -258,7 +347,7 @@ test('de Foundation bouwt binnen een campagne echt iets, en dat verandert de sta
   const m = maakMagnaat();
   const p = potjeMet(ECO);
   m.spel.init(p);
-  m.spel.zet(p, 'anna', { actie: 'open', kavel: kavelIn('boulevard').id, sector: 'horeca', omvang: 40 });
+  m.spel.zet(p, 'anna', { actie: 'open', kavel: kavelIn('boulevard').id, sector: 'horeca', omvang: 30 });
   speelUit(m, p, 36);
   const f = p.staat.foundation;
   assert.ok(f.gedaan.length >= 2, 'in drie jaar hoort er iets te staan, niet alleen een spaarpot: ' + f.gedaan.length);

@@ -804,15 +804,40 @@ prijs, reputatie, marketing), de klok die bijrekent, de vrije acties naast de
 grote, de Foundation als actor, en een eindstand op meer dan geld alleen:
 vermogen, ondernemingswaarde, banen, reputatie en omzet.
 
-**En één ding dat hier is misgegaan en het vermelden waard is.** In de eerste
-versie was `omvang` tegelijk de maandcapaciteit — veertig couverts per *maand*
-voor een restaurant met veertig stoelen. Alle zeven sectoren draaiden verlies,
-en in een uitgespeelde campagne wonnen de spelers die **minder personeel**
-aannamen en **geen onderhoud** deden, want capaciteit was toch niet de bindende
-factor. Een spel waarin niets doen de beste zet is, is geen spel. Dat stond niet
-in de code te lezen en bleek pas uit een uitgespeelde campagne;
-`scripts/magnaat-balans.js` meet het nu en `test/spelmagnaat.test.js` houdt het
-vast (band: elke sector verdient zijn bouwsom in 8 tot 24 maanden terug).
+**Een economie toets je door hem te spelen, en dat heeft twee gereedschappen
+opgeleverd.** `scripts/magnaat-balans.js` meet per sector wat een goed
+geplaatste zaak doet; `scripts/magnaat-strateeg.js` speelt 220 campagnes uit
+met elf strategieprofielen tegen elkaar en vraagt of er één domineert. Het
+tweede vindt wat het eerste per definitie niet kan zien.
+
+**Vier ijkingen, elk na een meting die de vorige tegensprak:**
+
+| # | Wat er mis was | Hoe het bleek |
+|---|---|---|
+| 1 | `omvang` was tegelijk de maandcapaciteit — veertig couverts per *maand* voor veertig stoelen. Alles draaide verlies en **minder personeel + geen onderhoud won** | een campagne uitspelen |
+| 2 | de balansmeter mat bij een *vaste* maat; de winst zit in **op maat** bouwen, en daar liepen sectoren ver uiteen (logistiek 5,7 maanden, horeca 9,6) | de strateeg: één profiel won 100% |
+| 3 | geijkt op het *beste* kavel, terwijl een campagne er tien opent — de **mediaan** telt | de strateeg opnieuw |
+| 4 | een kavel nam in de ene sector **veertig keer** zoveel kapitaal op als in de andere; bij gelijk startkapitaal is dat een ander spel | de strateeg opnieuw |
+
+Nu neemt elk kavel ongeveer tweehonderdduizend op en verdient zich in twaalf
+maanden terug — een hotelplek draagt zes kamers, een winkelplek zesenzestig
+kassaplekken. Het karakter van een sector zit in *hoe* hij werkt, niet in
+hoeveel nullen erachter staan.
+
+**Wat de strateeg hard afkeurt en wat hij alleen meldt**, want dat is niet
+hetzelfde. Hard (en als toets vastgelegd): niets doen mag niet winnen,
+afwachten mag niet meekomen met de actieve stijlen, er moeten minstens vier
+levensvatbare stijlen zijn, en knijpen op personeel mag niet lonen. Zacht: of
+een profiel te ver voorligt.
+
+> **Wat er vandaag nog scheef staat, eerlijk opgeschreven.** Mobility-focus wint
+> bijna al zijn duels en horeca-focus het merendeel. De vier ijkingen hebben het
+> veld dicht bij elkaar gebracht — zes stijlen tussen 60% en 100% — maar wie
+> zich op één sector stort doet het beter dan wie spreidt. De oorzaak is dat een
+> duel van twee op 144 kavels **geen schaarste** kent: ze lopen elkaar nooit
+> tegen het lijf. Dat verandert pas met fase B: contracten en veilingen laten
+> spelers elkaar raken ook als ze in andere buurten zitten. Het staat hier als
+> open punt en niet als opgelost.
 
 **Fase B — spelers tegen elkaar.** Contracten met looptijd en boete, supply
 chains tussen spelers, veilingen, aandelen en concerns, banken, verzekeringen,

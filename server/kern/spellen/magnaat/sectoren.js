@@ -40,50 +40,81 @@
 
    DE GETALLEN ZIJN SPELBALANS EN GEEN ECONOMISCH ONDERZOEK. Ze staan hier bij
    elkaar zodat ze te vergelijken en te verstellen zijn; dat is precies waarom
-   ze niet verspreid door de motor mogen staan. Ze zijn GEIJKT op een doel:
-   een goed geplaatste, goed bemande vestiging draait rond de 75% bezetting en
-   verdient zijn bouwsom in ongeveer veertien maanden terug. Een slecht
-   geplaatste haalt dat niet, en dat verschil is de hele keuze. */
+   ze niet verspreid door de motor mogen staan.
+
+   ZE ZIJN GEIJKT OP DE JUISTE MAAT, en die tweede ijking kwam er nadat
+   `scripts/magnaat-strateeg.js` honderden campagnes uitspeelde en er een
+   profiel 100% van zijn duels won. De eerste ijking mat elke sector bij een
+   VASTE omvang (veertig), en dat loog: bij die maat staat elke sector ongeveer
+   even veel leeg, dus zag hij ze als gelijk. Maar de winst zit in OP MAAT
+   bouwen -- precies zo groot als de vraag -- en daar liepen ze ver uiteen,
+   omdat een sector waarvan de lonen met de omvang meebewegen veel meer
+   overhoudt aan krimpen dan een sector met lompe personeelsstappen.
+   Logistiek verdiende zichzelf op maat in 5,7 maanden terug en horeca in 9,6.
+   `bouw` is nu zo gezet dat elke sector OP ZIJN JUISTE MAAT rond de twaalf
+   maanden zit. Dat op maat bouwen loont blijft: dat is een vaardigheid en geen
+   uitbuiting. Wat weg is, is dat EEN sector daar veel meer aan overhield.
+
+   EN OP DE MEDIAAN, niet op het beste kavel -- de derde ijking. Een campagne
+   opent tien plekken, geen een, dus wat telt is niet wat de mooiste plek doet
+   maar wat een doorsnee geschikte plek doet.
+
+   DE VIERDE EN LAATSTE IJKING GING NIET OVER RENDEMENT MAAR OVER MAAT, en die
+   loste op wat de eerste drie niet konden. Elke sector verdiende zichzelf even
+   snel terug, en tOch won er telkens een -- eerst logistiek, toen horeca, toen
+   weer logistiek. De oorzaak was dat een KAVEL in de ene sector veertig keer
+   zoveel kapitaal opnam als in de andere: een doorsnee industrieplek vroeg
+   miljoenen, een plek voor vrije tijd zeventigduizend. Bij gelijk startkapitaal
+   en een campagne van drie jaar is dat geen smaakverschil maar een ander spel:
+   de goedkope sectoren zetten hun geld meteen aan het werk en liepen tegen het
+   aantal kavels aan, de dure stonden maanden te sparen.
+
+   Nu neemt elk kavel ongeveer evenveel kapitaal op -- rond de tweehonderdduizend
+   -- en verdient het zich in twaalf maanden terug. Een hotelplek draagt zes
+   kamers, een winkelplek zesenzestig kassaplekken; dat is dezelfde ORDE VAN
+   KANS in een andere vorm. Het karakter van een sector zit in hoe hij werkt
+   (personeelsverhouding, seizoen, prijsband, welke zones), niet in hoeveel
+   nullen erachter staan. */
 
 const SECTOREN = {
   horeca: {
-    naam: 'Restaurant', eenheid: 'stoelen', perMaand: 36, perMedewerker: 14, markt: 460, bouw: 4600,
+    naam: 'Restaurant', eenheid: 'stoelen', perMaand: 36, perMedewerker: 14, markt: 824, bouw: 6410,
     prijs: [22, 35, 62], inkoop: 0.32, loon: 2400, vast: 34,
     trekt: { gezinnen: 1.0, ouderen: 0.8, studenten: 0.7, toeristen: 1.4, zakelijk: 1.1, nachtpubliek: 1.2 },
     dagdeel: 'avond', seizoen: 0.7
   },
   hotel: {
-    naam: 'Hotel', eenheid: 'kamers', perMaand: 30, perMedewerker: 9, markt: 375, bouw: 26000,
+    naam: 'Hotel', eenheid: 'kamers', perMaand: 30, perMedewerker: 9, markt: 144, bouw: 32120,
     prijs: [78, 135, 240], inkoop: 0.18, loon: 2500, vast: 62,
     trekt: { gezinnen: 0.9, ouderen: 0.7, studenten: 0.2, toeristen: 1.8, zakelijk: 1.5, nachtpubliek: 0.3 },
     dagdeel: 'beide', seizoen: 1.0
   },
   retail: {
-    naam: 'Winkel', eenheid: 'kassaplekken', perMaand: 30, perMedewerker: 42, markt: 440, bouw: 1700,
+    naam: 'Winkel', eenheid: 'kassaplekken', perMaand: 30, perMedewerker: 42, markt: 1439, bouw: 2548,
     prijs: [14, 26, 48], inkoop: 0.52, loon: 2250, vast: 16,
     trekt: { gezinnen: 1.3, ouderen: 1.1, studenten: 0.9, toeristen: 1.1, zakelijk: 0.5, nachtpubliek: 0.3 },
     dagdeel: 'dag', seizoen: 0.4
   },
   logistiek: {
-    naam: 'Logistiek', eenheid: 'voertuigen', perMaand: 150, perMedewerker: 1, markt: 7400, bouw: 12000,
-    prijs: [34, 52, 88], inkoop: 0.38, loon: 2700, vast: 41,
+    naam: 'Logistiek', eenheid: 'voertuigen', perMaand: 150, perMedewerker: 1, markt: 2554, bouw: 18850,
+    prijs: [34, 52, 88], inkoop: 0.38, loon: 2700, vast: 400,
     trekt: { zakelijk: 2.2, toeristen: 0.4, gezinnen: 0.2, ouderen: 0.2, studenten: 0.1, nachtpubliek: 0.2 },
     dagdeel: 'beide', seizoen: 0.2
   },
   'vrije-tijd': {
-    naam: 'Vrije tijd', eenheid: 'plaatsen', perMaand: 30, perMedewerker: 34, markt: 390, bouw: 1000,
+    naam: 'Vrije tijd', eenheid: 'plaatsen', perMaand: 30, perMedewerker: 34, markt: 1029, bouw: 2625,
     prijs: [9, 17, 32], inkoop: 0.22, loon: 2200, vast: 22,
     trekt: { gezinnen: 1.6, ouderen: 0.6, studenten: 1.2, toeristen: 1.5, zakelijk: 0.3, nachtpubliek: 0.9 },
     dagdeel: 'dag', seizoen: 0.9
   },
   kantoor: {
-    naam: 'Zakelijke dienst', eenheid: 'werkplekken', perMaand: 2.6, perMedewerker: 1, markt: 150, bouw: 27000,
+    naam: 'Zakelijke dienst', eenheid: 'werkplekken', perMaand: 2.6, perMedewerker: 1, markt: 29, bouw: 43200,
     prijs: [1800, 3200, 5600], inkoop: 0.12, loon: 3600, vast: 28,
     trekt: { zakelijk: 2.6, gezinnen: 0.2, ouderen: 0.2, studenten: 0.1, toeristen: 0.1, nachtpubliek: 0.1 },
     dagdeel: 'dag', seizoen: 0.1
   },
   industrie: {
-    naam: 'Productie', eenheid: 'productielijnen', perMaand: 20, perMedewerker: 2, markt: 1111, bouw: 66000,
+    naam: 'Productie', eenheid: 'productielijnen', perMaand: 20, perMedewerker: 2, markt: 156, bouw: 74360,
     prijs: [420, 760, 1350], inkoop: 0.45, loon: 2900, vast: 55,
     trekt: { zakelijk: 2.4, gezinnen: 0.1, ouderen: 0.1, studenten: 0.1, toeristen: 0.1, nachtpubliek: 0.1 },
     dagdeel: 'dag', seizoen: 0.1

@@ -79,7 +79,20 @@ Object.assign(kern, require('../kern/levenslijn')({ kern }));
    mee waar de levenslijn en de geldgraaf alleen kern krijgen. Wat hij schrijft
    is geen levensgegeven maar een TOESTEMMING; het leven zelf blijft in de
    domeinen die het beheren. */
-Object.assign(kern, require('../kern/levensband')({ db, save }));
+/* Het levensbeleid (kern/levensbeleid/): de regels van de mens zelf -- de
+   tweede laag van het wereldpatroon voor RTFoundation (LEVEN.md par. 3).
+
+   VOOR levensband gemount, want ./delen.js raadpleegt hem. Net als bij RTG
+   Sociaal kan dit beleid alleen VERSMALLEN: een stuk op nooit-delen zetten, of
+   een kortere standaardtermijn voorstellen. Er is geen veld dat vooraf deelt --
+   dat zou besluit 2 uit LEVEN.md par. 2.8 door de achterdeur ongedaan maken.
+
+   De stukkenlijst komt uit levensband/delen.js zelf en wordt niet overgetikt. */
+Object.assign(kern, require('../kern/levensbeleid')({ db, save,
+  stukken: Object.keys(require('../kern/levensband/delen')({
+    pak: () => ({ delingen: [] }), kijk: () => ({ delingen: [] }), save: () => {}
+  }).deelStukken()) }));
+Object.assign(kern, require('../kern/levensband')({ db, save, beleid: kern.levensbeleid }));
 /* De sociale graaf (kern/socialegraaf/): dezelfde projectielaag over de sociale
    domeinen -- wat er tussen mensen speelt, en wat eraan komt (LIFE.md fase 1).
 

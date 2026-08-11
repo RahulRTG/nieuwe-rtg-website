@@ -198,6 +198,63 @@ vandaag werkend en getoetst.
 Wat per wereld verschilt is niet de vorm maar het WERKWOORD dat de vierde
 laag mag: RTG Geld voert uit binnen regels; RTFoundation opent alleen.
 
+### Het beleid (par. 3, tweede laag) -- er sinds 11 augustus 2026
+
+`server/kern/levensbeleid/`, met `POST /api/leven/beleid` en `/beleid/zet` aan
+beide kanten (ledendeur en gezinsdeur), en `kern/levensband/delen.js` dat het
+raadpleegt. Getoetst in `test/levensbeleid.test.js`, vijf mutaties gedraaid en
+gezien zakken.
+
+Twee dingen zijn instelbaar, **allebei versmallend**: stukken die deze mens
+nooit deelt (een eigen slot náást het huisslot), en het aantal dagen dat het
+scherm voorstelt als vervaldatum. Er is geen veld dat vooraf deelt, geen "deel
+dit voortaan automatisch met mijn ouder", geen vertrouwensniveau — dat zou
+besluit 2 uit par. 2.8 door de achterdeur ongedaan maken. Een toets zakt op elk
+veld dat zo heet.
+
+De volgorde is een besluit: het **huisslot staat eerst**. Een beleidsregel kan
+een stuk sluiten, nooit er een openen dat de vaste NOOIT-lijst verbiedt — anders
+zou het gevoelsdagboek deelbaar worden met een instelling, en dat is een grens
+(par. 2.5) en geen voorkeur. En de standaardtermijn **stelt voor, hij vult niet
+in**: zonder gekozen datum blijft delen een onvolledige handeling, zodat de
+belofte "toestemming die eeuwig duurt wordt vergeten" op een keuze leunt en niet
+op een instelling.
+
+Wat met opzet **niet** instelbaar is: het veiligheidssignaal (par. 2.8). Een
+ouder hoort te kunnen zien dát er iets mis is zonder te lezen wát er staat, en
+dat is precies de uitzondering die niet aan een voorkeur mag hangen — niet van
+het kind en niet van de ouder.
+
+### Het actielog: waarom het hier anders moet dan bij RTG Geld
+
+Bij het bouwen van de vijfde laag bleek het patroon van GELD.md niet over te
+zetten, en dat is een vondst en geen tekort. Twee redenen, allebei nagemeten.
+
+**Een log over delingen mág niet.** `kern/levensband/delen.js` zegt bij
+`trekIn()` met zoveel woorden waarom de rij écht weg gaat: *"een ingetrokken
+deling die als 'ooit gedeeld' blijft staan, is een lijst van wat iemand ooit
+liet zien, en die lijst heeft niemand gevraagd."* Een append-only log over
+delingen ís precies die lijst. Het patroon botst hier op een grens van deze
+wereld, en dan vervalt het patroon.
+
+**Een log over banden zou een tweede kopie zijn.** De band draagt zijn
+geschiedenis al: `gevraagdDoor`, `gevraagdAt`, `bevestigdAt`, `verbrokenAt`,
+`verbrokenDoor`, en die worden aangevuld en nooit herschreven. Er een tweede
+plek naast zetten is precies wat LAT-regel 4 verbiedt.
+
+**Wat er wél ontbreekt, en dat is klein maar echt.** `zichtBand()` toont
+`gevraagdDoor`, `gevraagdAt` en `bevestigdAt` — maar **niet** `verbrokenAt` en
+`verbrokenDoor`, en `mijnBanden()` filtert verbroken banden helemaal weg. Een
+band die verbroken is, verdwijnt dus zonder spoor uit het beeld van de ander:
+die kan niet zien of de band ooit bestond en beëindigd is, of dat er nooit een
+was. Het geheugen bestáát in de opslag; het is alleen niet uitlegbaar (par.
+2.10).
+
+Dat is een besluit dat hier niet in mijn eentje hoort te vallen, want het raakt
+wat een ouder over een handeling van een kind te zien krijgt (par. 2.1 en 2.8:
+verbreken kan zonder uitleg). Het staat opgeschreven als open vraag in plaats
+van stilzwijgend ingevuld.
+
 ## 4. Faseplan
 
 | Fase | Wat | Status |

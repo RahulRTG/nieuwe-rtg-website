@@ -148,6 +148,18 @@ module.exports = (kern) => {
      hetzelfde lijstje zijn, is dus geen slordigheid maar de prijs van
      zichtbaarheid -- en het maakt in een oogopslag zichtbaar dat beide werelden
      precies evenveel mogen. */
+  /* HET BELEID VAN DE MENS ZELF (LEVEN.md par. 3, de tweede laag van het
+     wereldpatroon). Lezen en zetten; wat het KAN is uitsluitend versmallen --
+     een stuk op nooit-delen zetten, of een kortere standaardtermijn kiezen.
+
+     Er is met opzet geen veld dat vooraf deelt. Dat zou besluit 2 uit par. 2.8
+     door de achterdeur ongedaan maken: van een minderjarige ziet de ander
+     standaard niets, en het kind deelt per stuk. */
+  app.post('/api/leven/beleid', auth, lidDoet((wie) => kern.levensbeleid.beleid(wie)));
+  app.post('/api/leven/beleid/zet', auth, lidDoet((wie, b) => kern.levensbeleid.zet(wie, b)));
+  app.post('/api/rtf/leven/beleid', gezinsPoort, huisDoet((wie) => kern.levensbeleid.beleid(wie)));
+  app.post('/api/rtf/leven/beleid/zet', gezinsPoort, huisDoet((wie, b) => kern.levensbeleid.zet(wie, b)));
+
   app.post('/api/leven/kring', auth, lidDoet(ACTIES.kring));
   app.post('/api/leven/band/vraag', auth, lidDoet(ACTIES.vraag));
   app.post('/api/leven/band/bevestig', auth, lidDoet(ACTIES.bevestig));

@@ -1364,8 +1364,52 @@ zijden.
 > de vervangen versie. En "elke partij een eigen golf" werd gedekt door de
 > *lengte* alleen, dus een startfase die altijd 0 was kwam erlangs.
 
+### Wereldnieuws — de cyclus is de wind, dit zijn de buien
+
+**Het onderscheid is de hele reden dat het twee lagen zijn.** De conjunctuur
+beweegt de hele stad tegelijk en langzaam; een bericht raakt **één zone of één
+sector**, kort en scherp. Een golf waar iedereen in zit is een economie; een bui
+die alleen jouw straat raakt is een verhaal.
+
+Acht soorten: festival, wegwerkzaamheden, congres, toeristische opleving en een
+grote verbouwing (op een zone); hype, branchekwestie en een nieuwe norm (op een
+sector). Gemiddeld begint er één per drie maanden — een stad waarin elke maand
+iets bijzonders gebeurt heeft geen bijzondere gebeurtenissen meer.
+
+**Vier eisen, en ze komen alle vier uit fouten die dit huis eerder maakte:**
+
+1. **Het raakt een getal dat de motor al gebruikt.** Er is geen bericht dat "de
+   sfeer verbetert"; er is een bericht dat de vraag in de haven een kwartaal lang
+   22% hoger ligt. Anders is het een krantenkop met een onzichtbare uitwerking.
+2. **Het is vooraf aangekondigd.** Elk bericht staat twee tot zes maanden in de
+   krant voordat het begint, met hoe lang het duurt. Wie oplet kan verhuizen,
+   bijbouwen of juist wachten — dat is het verschil tussen een mechaniek en pech.
+3. **Het is publiek.** Nieuws staat in de krant; er is geen versie hiervan waarin
+   de ene ondernemer wel weet dat de weg opengaat en de andere niet.
+4. **Het maakt nooit geld.** Een gebeurtenis verandert productievoorwaarden en
+   zet nooit een bedrag op een rekening — dezelfde wet als bij onderzoek.
+
+Opgestapelde berichten vermenigvuldigen (net als de onderzoekseffecten — optellen
+kan een factor negatief maken) en de uitkomst blijft binnen 0,7–1,5: drie
+festivals tegelijk hoort een goede maand te zijn en geen andere economie.
+
+> **Een toets die de terugkoppeling mat in plaats van het nieuws.** "De vraag
+> beweegt met het nieuws mee" eiste eerst de kale factor: 1,22 tegen 0,82 moest
+> exact 1,49 opleveren. Dat kan niet — meer volk betekent een vollere zaak, een
+> vollere zaak levert lagere kwaliteit en dus een lagere reputatie, en die drukt
+> de vraag weer. Over zes maanden dempt dat merkbaar. En "een bericht raakt niet
+> de hele stad" hield de sector vast op horeca, dus een *branchekwestie* in de
+> horeca liet het lijken alsof elke zone geraakt was.
+
+> **Wat de nieuwslaag elders omver duwde.** `test/spelhandel.test.js` stond met
+> zijn "goedkope contract" precies op de ondergrens van de prijsband, en het
+> bedrag wordt afgerond: bij een marktprijs van 52 ligt de grens op 20,8 en kan
+> hetzelfde contract op 20,5 uitkomen. Zolang de vraag stil stond viel hij er net
+> binnen; zodra het nieuws hem bewoog, viel hij eruit. Een toets die op een grens
+> balanceert meet de afronding en niet de bewering.
+
 **Wat er van fase B nog niet in zit.** Concernstrategie, een aandelenmarkt met
-dividend, fusies, wereldnieuws en AI-concurrenten die leren.
+dividend, fusies en AI-concurrenten die leren.
 
 **Fase C — de permanente wereld.** Living World, AI-managers met beleidsregels,
 Safe Management Policy, vakantiemodus, overdracht, legacy, Magnaat Daily,

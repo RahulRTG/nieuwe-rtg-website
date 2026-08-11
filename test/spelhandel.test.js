@@ -129,8 +129,14 @@ test('een goedkoop contract maakt de afnemer beter af, een duur contract slechte
     maand(m, p, 1);
     return st.geld.boris - voor;
   };
-  // de twee uiteinden van de prijsband (./handel.js); daarbuiten is het geen prijs
-  const goedkoop = meting(H.PRIJSBAND[0]), duur = meting(H.PRIJSBAND[1]);
+  /* NET BINNEN de twee uiteinden van de prijsband (./handel.js), en niet erop.
+     Deze toets stond precies op de ondergrens, en het bedrag wordt AFGEROND:
+     bij een marktprijs van 52 is de grens 20,8 en kan hetzelfde contract op 20,5
+     uitkomen -- binnen of buiten, afhankelijk van hoeveel eenheden er die maand
+     nodig waren. Toen de nieuwslaag de vraag ging bewegen, viel hij eruit. Een
+     toets die op een grens balanceert meet de afronding en niet de bewering. */
+  const rand = 0.02;
+  const goedkoop = meting(H.PRIJSBAND[0] + rand), duur = meting(H.PRIJSBAND[1] - rand);
   assert.ok(goedkoop > duur + 100,
     'de helft betalen hoort merkbaar beter uit te pakken dan het dubbele: ' + goedkoop + ' vs ' + duur);
 });

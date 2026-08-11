@@ -17,6 +17,7 @@
       betekenen dat je op zes assen tegelijk aan het optimaliseren bent. */
 const { capaciteit, personeelNodig, waarde } = require('./stap');
 const C = require('./cyclus');
+const N = require('./nieuws');
 const { SECTOREN } = require('./sectoren');
 const { prijsVan } = require('./prijsstand');
 const H = require('./handel');
@@ -113,6 +114,10 @@ module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid, veilingb
          de krant. En zonder de vooruitblik ("nog drie maanden recessie") is een
          cyclus geen mechaniek maar pech. */
       cyclus: C.beeld(potje.id, st.maand),
+      /* DE KRANT. Publiek, en met de AANKONDIGINGEN erbij: een gebeurtenis die
+         je pas merkt als je omzet zakt is pech en geen mechaniek. Wie ziet dat
+         de weg door het centrum vier maanden opengaat, kan verhuizen of wachten. */
+      nieuws: N.beeld(potje.id, st.maand, [...new Set(k.kavels.map(x => x.zone))]),
       vestigingen: eigen,
       // van de anderen alleen wat aan tafel zichtbaar is: waar ze zitten en
       // hoeveel. Hun cash is van hen -- zie de waarschuwing in de descriptor
@@ -161,6 +166,7 @@ module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid, veilingb
       stand: potje.spelers.map(h => ({ codenaam: codenaamVan(h), vestigingen: (st.vestigingen[h] || []).length })),
       // de conjunctuur hoort ook op een gedeeld scherm: hij is van de stad
       cyclus: C.beeld(potje.id, st.maand),
+      nieuws: N.beeld(potje.id, st.maand, [...new Set(k.kavels.map(x => x.zone))]),
       foundation: st.foundation.gedaan.length };
   }
 

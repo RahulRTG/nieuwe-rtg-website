@@ -30,6 +30,10 @@ const { maand: rekenMaand, levering } = require('./stap');
    stad hoort op de plek waar de stad gerekend wordt. Zie ./cyclus.js -- hij
    raakt twee dingen, de vraag en de prijs van geld, en verder niets. */
 const C = require('./cyclus');
+/* HET NIEUWS. De cyclus is de wind, dit zijn de buien: een golf raakt de hele
+   stad langzaam, een bericht raakt EEN zone of EEN sector kort en scherp. Zie
+   ./nieuws.js. */
+const N = require('./nieuws');
 const F = require('./foundation');
 const H = require('./handel');
 
@@ -37,6 +41,7 @@ const rond = (n) => Math.round(n);
 
 module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering, rnd, beheer }) => {
   const { wikkelAf } = require('./maand-contracten')({ rond });
+  const afsluiten = require('./maand-afsluiten')({ wikkelAf });
   const { lasten } = require('./maand-lasten')({ ROOD_RENTE, bank, verzekering, rnd, beheer });
   function eenMaand(potje) {
     const st = potje.staat, k = K(st);
@@ -59,6 +64,8 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering
        rekent. Een getal op de staat is een getal waar iedereen het over eens is. */
     const conjunctuur = C.vraagFactor(potje.id, st.maand);
     st.cyclus = C.geldstand(potje.id, st.maand);
+    // de zones van deze stad, voor het nieuws dat er op valt
+    const zones = [...new Set(k.kavels.map(x => x.zone))];
     const perSpeler = {};
     // wat de Foundation aan opleiding heeft bijgedragen; werkt door in hoeveel
     // een medewerker aankan
@@ -109,7 +116,14 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering
         });
         const kOp = Object.assign({}, k, { kavel: new Map(k.kavel).set(kavel.id, opgeschoven) });
         const r = rekenMaand(kOp, v, { maand: st.maand, zoneDruk: druk[kavel.zone + ':' + v.sector] || 1,
-          wereldFactor: conjunctuur, arbeid, contract: toezegging[v.id], gedekt: ontvangst[v.id] });
+          /* DE WERELDFACTOR IS DE GOLF MAAL DE BUIEN. Ze staan hier bij elkaar
+             en niet apart in ./stap.js, want voor een vestiging is er maar EEN
+             vraag; welk deel daarvan uit de conjunctuur komt en welk deel uit
+             een festival om de hoek, is een vraag voor de krant en niet voor de
+             boekhouding. */
+          wereldFactor: conjunctuur * N.factorVoor(potje.id, st.maand, zones,
+            { zone: kavel.zone, sector: v.sector }),
+          arbeid, contract: toezegging[v.id], gedekt: ontvangst[v.id] });
         const regel = Object.assign({ id: v.id, naam: v.naam, sector: v.sector, kavel: kavel.naam }, r);
         regels.push(regel);
         /* HET RESULTAAT WORDT VERDEELD als er aandeelhouders zijn (./aandeel.js).
@@ -147,32 +161,11 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering
       // het maandresultaat in het korte geheugen, voor de winststabiliteit
       if (onthoud) onthoud(st, h, regels.reduce((n, r) => n + (r.resultaat || 0), 0));
     }
-    /* DE CONTRACTEN AFWIKKELEN staat in ./maand-contracten.js -- na de maand,
-       want de kwaliteitseis gaat over de kwaliteit die er DEZE maand geleverd
-       is, en die volgt uit de maand. */
-    const contractRegels = wikkelAf(st, actief, leverDeel, kwaliteitVan);
-
-    /* De afdracht rust op de HELE stad en niet alleen op de spelers: anders
-       bouwt de Foundation in een partij met twee mensen nooit iets. Zie de
-       reden bij `stadsomzet` in de stadsdata. */
-    const afdracht = F.draagAf(st.foundation, wereldOmzet + (k.stadsomzet || 0));
-    /* Waar de bedrijvigheid zit, zodat de Foundation daar bouwt. Uit dezelfde
-       telling die de concurrentiedruk gebruikt: een tweede telling zou een
-       tweede antwoord op dezelfde vraag zijn. */
-    const perZone = {};
-    for (const sleutel of Object.keys(druk)) {
-      const zone = sleutel.split(':')[0];
-      perZone[zone] = (perZone[zone] || 0) + druk[sleutel];
-    }
-    const projecten = F.bouw(st.foundation, k, perZone);
-    st.maand++;
-    const verslag = { maand: st.maand, perSpeler, afdracht, projecten,
-      wereldOmzet: rond(wereldOmzet), contractRegels,
-      rentelast: rond(rentelast), premielast: rond(premielast), beheerlast: rond(beheerlast),
-      schadelast: rond(schadelast), onderzoeklast: rond(onderzoeklast),
-      onderzoekUitPot: rond(onderzoekUitPot) };
-    for (const h of potje.spelers) st.laatste[h] = { maand: st.maand, regels: perSpeler[h] || [],
-      projecten, contracten: contractRegels[h] || [] };
+    /* WAT ER NA DE BEDRIJVEN GEBEURT staat in ./maand-afsluiten.js: de contracten
+       afwikkelen, de Foundation laten afdragen en bouwen, en het verslag
+       opmaken. Drie dingen die pas kunnen zodra iedereen gedraaid heeft. */
+    const verslag = afsluiten(potje, st, k, { perSpeler, actief, leverDeel, kwaliteitVan, druk,
+      wereldOmzet, rentelast, premielast, schadelast, onderzoeklast, onderzoekUitPot, beheerlast });
     return verslag;
   }
 

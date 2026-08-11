@@ -100,7 +100,7 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering
     /* Wat er deze maand aan RENTE de wereld verlaat. Apart geteld omdat het de
        enige post is die niet bij een andere speler landt; de geldpomp-meter
        moet hem kunnen aftrekken. */
-    let rentelast = 0, premielast = 0, schadelast = 0, onderzoeklast = 0, onderzoekUitPot = 0, beheerlast = 0;
+    let rentelast = 0, premielast = 0, schadelast = 0, onderzoeklast = 0, onderzoekUitPot = 0, beheerlast = 0, concernlast = 0;
     for (const [h, rij] of Object.entries(st.vestigingen)) {
       const regels = [];
       for (const v of rij) {
@@ -150,13 +150,20 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering
          niet aan een pand hangen maar aan de speler, en die alle vier geld de
          WERELD uit laten gaan -- daarom staan ze bij elkaar en worden ze hier
          als EEN som opgeteld. Zie de uitleg daar. */
-      const uit = lasten(potje, h, regels);
+      /* IN WELKE BUURT EEN ZAAK STAAT, meegegeven vanaf HIER omdat de kaart hier
+         al opgehaald is. Het concern rekent met spreiding over sectoren en
+         zones, en een tweede kaartlezing zou een tweede antwoord zijn. */
+      const uit = lasten(potje, h, regels, (v) => {
+        const kav = k.kavel.get(v.kavel);
+        return kav ? kav.zone : null;
+      });
       rentelast += uit.rente;
       premielast += uit.premie;
       schadelast += uit.schade;
       onderzoeklast += uit.onderzoek;
       onderzoekUitPot += uit.onderzoekUitPot;
       beheerlast += uit.beheer;
+      concernlast += uit.concern;
       perSpeler[h] = regels;
       // het maandresultaat in het korte geheugen, voor de winststabiliteit
       if (onthoud) onthoud(st, h, regels.reduce((n, r) => n + (r.resultaat || 0), 0));
@@ -165,7 +172,8 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering
        afwikkelen, de Foundation laten afdragen en bouwen, en het verslag
        opmaken. Drie dingen die pas kunnen zodra iedereen gedraaid heeft. */
     const verslag = afsluiten(potje, st, k, { perSpeler, actief, leverDeel, kwaliteitVan, druk,
-      wereldOmzet, rentelast, premielast, schadelast, onderzoeklast, onderzoekUitPot, beheerlast });
+      wereldOmzet, rentelast, premielast, schadelast, onderzoeklast, onderzoekUitPot, beheerlast,
+      concernlast });
     return verslag;
   }
 

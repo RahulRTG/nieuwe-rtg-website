@@ -16,7 +16,8 @@ const rond = (n) => Math.round(n);
 
 module.exports = ({ wikkelAf }) => {
   return function afsluiten(potje, st, k, { perSpeler, actief, leverDeel, kwaliteitVan, druk,
-    wereldOmzet, rentelast, premielast, schadelast, onderzoeklast, onderzoekUitPot, beheerlast }) {
+    wereldOmzet, rentelast, premielast, schadelast, onderzoeklast, onderzoekUitPot, beheerlast,
+    concernlast }) {
     /* DE CONTRACTEN AFWIKKELEN staat in ./maand-contracten.js -- na de maand,
        want de kwaliteitseis gaat over de kwaliteit die er DEZE maand geleverd
        is, en die volgt uit de maand. */
@@ -38,7 +39,7 @@ module.exports = ({ wikkelAf }) => {
     st.maand++;
     const verslag = { maand: st.maand, perSpeler, afdracht, projecten,
       wereldOmzet: rond(wereldOmzet), contractRegels,
-      rentelast: rond(rentelast), premielast: rond(premielast), beheerlast: rond(beheerlast),
+      rentelast: rond(rentelast), premielast: rond(premielast), beheerlast: rond(beheerlast), concernlast: rond(concernlast),
       schadelast: rond(schadelast), onderzoeklast: rond(onderzoeklast),
       onderzoekUitPot: rond(onderzoekUitPot) };
     for (const h of potje.spelers) st.laatste[h] = { maand: st.maand, regels: perSpeler[h] || [],

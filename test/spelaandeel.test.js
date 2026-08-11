@@ -152,7 +152,13 @@ test('wat er wordt uitgekeerd houdt de eigenaar niet ook nog eens zelf', () => {
   const voorA = st.geld.anna, voorB = st.geld.boris;
   maand(m, p, 1);
   const resultaat = st.laatste.anna.regels[0].resultaat;
-  const naarA = st.geld.anna - voorA, naarB = st.geld.boris - voorB;
+  /* DE OVERIGE POSTEN VAN ANNA ERAF. Sinds er een hoofdkantoor is (./concern.js)
+     beweegt haar kas ook met kosten die NIET van deze zaak zijn -- en dan meet
+     deze toets de verdeling plus die post in plaats van de verdeling. De
+     bewering gaat over het resultaat van de vestiging; wat de eigenaar daarnaast
+     nog betaalt staat er los van. */
+  const overig = st.laatste.anna.regels.slice(1).reduce((n, r) => n + (r.resultaat || 0), 0);
+  const naarA = st.geld.anna - voorA - overig, naarB = st.geld.boris - voorB;
   assert.ok(resultaat > 0, 'de zaak draait winst: ' + resultaat);
   assert.ok(Math.abs(naarA + naarB - resultaat) < 1,
     'samen hoort dat precies het resultaat te zijn: ' + Math.round(naarA) + ' + ' + Math.round(naarB) +

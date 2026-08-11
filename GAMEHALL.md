@@ -1493,10 +1493,45 @@ hoeveel hypotheek, en wat de verkoper er netto aan overhoudt.
 > en zet het bod daarbij zelf op vervallen — dus de opruiming leek te werken
 > terwijl hij weggehaald was.
 
-**Wat er van fase B nog niet in zit.** Concernstrategie en AI-concurrenten die leren.
+### Het concern — en de open draad die eindelijk dichtgaat
 
-**Fase C — de permanente wereld.** Living World, AI-managers met beleidsregels,
-Safe Management Policy, vakantiemodus, overdracht, legacy, Magnaat Daily,
+**Dit is de laag die een bevinding oploste die er rondes lang stond.** Het toernooi
+meldde het bij elke nieuwe laag: zolang er goede kavels vrij zijn verslaat
+uitbreiden **elke** investering die alleen kosten verlaagt. Onderzoek, beheer,
+financiering — alles verloor van `handwerk`, dezelfde stijl die gewoon doorbouwt.
+De oorzaak was niet dat die lagen te duur waren maar dat **groei nergens een nadeel
+had**: de tiende vestiging kostte precies zoveel te besturen als de eerste.
+
+Zo werkt geen enkel concern. Twintig zaken vragen een hoofdkantoor — planning,
+administratie, inkoopcoördinatie — en die kosten groeien harder dan lineair, want
+elke zaak erbij moet met alle andere worden afgestemd. Drie besluiten:
+
+1. **De overhead groeit sneller dan het aantal**, maar nooit tot een verbod. Niet
+   lineair (dan verandert er niets aan de afweging), niet kwadratisch (dan is de
+   vierde zaak al onbetaalbaar): `n^1,25`. De tiende zaak kost bijna twee keer
+   zoveel te besturen als de eerste.
+2. **Focus is goedkoper dan spreiding.** Tien restaurants in twee straten runnen is
+   eenvoudiger dan tien bedrijven in zeven sectoren over de hele stad. Een tweede
+   *sector* weegt zwaarder dan een tweede *buurt*, met een plafond op het dubbele —
+   anders is spreiden verboden in plaats van duur. En het conglomeraat koopt er iets
+   voor terug dat de specialist niet heeft: spreiding over de conjunctuur, het
+   nieuws en de sectorrisico's.
+3. **Het is een kostenpost en geen straf.** Hij staat op het maandoverzicht met zijn
+   opbouw, hij verlaat de wereld zoals rente en premie, en het scherm zegt wat *de
+   volgende zaak* extra gaat kosten — dat is het getal waarop een groeibesluit valt.
+
+> **Wat de meting zei, in twee richtingen.** Bij een basis van 900 en een macht van
+> 1,35 werd er nog maar **24% van de kavels bebouwd tegen 48% ervoor**: dan is de rem
+> geen afweging meer maar een verbod op groeien — dezelfde fout in spiegelbeeld. Bij
+> 500 en 1,25 blijft de kaart voor ruim een derde bezet, winnen er aan een volle
+> tafel drie verschillende stijlen, en **staat `uitvinder` voor het eerst bóven
+> `handwerk`**: 1.429.069 tegen 1.263.601. `horeca-focus` zakte van 91% naar 69% van
+> zijn duels. De draad die sinds de onderzoekslaag open stond, is daarmee dicht.
+
+**Wat er van fase B nog niet in zit.** AI-concurrenten die leren.
+
+**Fase C — de permanente wereld.** Living World, vakantiemodus, overdracht,
+legacy, Magnaat Daily,
 lokale governance, de levende kaart.
 
 **Fase D — de rollen.** Meerdere mensen in één concern (CEO/CFO/COO), lokale

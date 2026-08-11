@@ -23,13 +23,15 @@
    rij: die heeft aan het begin van de maand al gehandeld. */
 const rond = (n) => Math.round(n);
 
+const CONCERN = require('./concern');
+
 module.exports = ({ ROOD_RENTE, bank, verzekering, rnd, beheer }) => {
   /* Alle vier de posten voor EEN speler. Duwt zijn regels achter op `regels` --
      dezelfde lijst die het maandoverzicht toont -- en geeft terug wat er van elke
      soort de wereld verlaten heeft. */
-  function lasten(potje, h, regels) {
+  function lasten(potje, h, regels, zoneVan) {
     const st = potje.staat;
-    const uit = { rente: 0, premie: 0, schade: 0, onderzoek: 0, onderzoekUitPot: 0, beheer: 0 };
+    const uit = { rente: 0, premie: 0, schade: 0, onderzoek: 0, onderzoekUitPot: 0, beheer: 0, concern: 0 };
 
     /* ROOD STAAN KOST GELD, en dit IS de rekening-courant uit ./bank.js: de
        kredietlijn die er altijd is, het duurst en zonder aanvraag. Zonder dit
@@ -82,6 +84,27 @@ module.exports = ({ ROOD_RENTE, bank, verzekering, rnd, beheer }) => {
       uit.onderzoekUitPot += werk.uitPot;
       for (const r of werk.regels) regels.push(r);
     }
+    /* HET HOOFDKANTOOR. Een concern van tien zaken kost meer dan tien keer een
+       zaak: elke vestiging erbij moet met alle andere worden afgestemd, en
+       spreiding over sectoren en buurten kost extra. Zie ./concern.js -- dit is
+       de laag die de open draad dichttrekt dat groei nergens een nadeel had.
+
+       Ook dit geld verlaat de wereld: het gaat naar planning, administratie en
+       mensen die geen enkele klant bedienen. */
+    const rij = st.vestigingen[h] || [];
+    if (rij.length) {
+      const k = CONCERN.kosten(rij, zoneVan);
+      if (k.totaal > 0) {
+        st.geld[h] -= k.totaal;
+        uit.concern += k.totaal;
+        regels.push({ id: 'concern', naam: 'Hoofdkantoor', soort: 'concern',
+          zaken: k.aantal, schaal: k.schaal,
+          sectoren: k.spreiding ? k.spreiding.sectoren : 1,
+          zones: k.spreiding ? k.spreiding.zones : 1,
+          resultaat: -k.totaal });
+      }
+    }
+
     /* HET BEHEER. Een AI-manager is een dienst van buiten de tafel: wat hij
        kost gaat de wereld uit, net als rente en premie. Zonder deze post is
        delegeren strikt beter dan opletten en speelt het spel zichzelf.

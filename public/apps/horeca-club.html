@@ -36,14 +36,14 @@
       <button class="knop" id="cBandBetaal" type="button">Afboeken</button>
       <button class="knop" id="cBandTerug" type="button">Restsaldo terug</button>
     </div>
-    <p class="stil" id="cBandUit" style="margin-top:.4rem;"></p>
+    <p class="stil z-mt40" id="cBandUit"></p>
     <p class="stil">Op een band staat een nummer en een saldo, geen naam. Restsaldo hoort terug naar de gast; het is geen omzet van de club.</p>
   </div>
 
   <div class="kaart">
     <div class="kop">Tafels met minimum spend</div>
     <div id="cTafels"></div>
-    <div class="rij" style="margin-top:.6rem;">
+    <div class="rij z-mt60">
       <input class="veld" id="cTafel" maxlength="30" placeholder="Tafel" aria-label="Tafel" style="flex:0 1 8rem;">
       <input class="veld" id="cTafelGast" maxlength="60" placeholder="Op naam van" aria-label="Naam van de gast">
       <input class="veld" id="cTafelPersonen" type="number" min="1" max="60" value="6" aria-label="Aantal personen" style="flex:0 1 5rem;">
@@ -52,7 +52,7 @@
       <button class="knop p" id="cTafelZet" type="button">Vastleggen</button>
       <button class="knop" id="cTafelToon" type="button">Toon</button>
     </div>
-    <p class="stil" id="cTafelLet" style="margin-top:.4rem;"></p>
+    <p class="stil z-mt40" id="cTafelLet"></p>
   </div>
 
   <div class="kaart">
@@ -66,7 +66,7 @@
       <button class="knop" id="dTerug" type="button">Herbetreding</button>
       <button class="knop" id="dStand" type="button">Stand</button>
     </div>
-    <p class="stil" id="dDeurUit" style="margin-top:.4rem;"></p>
+    <p class="stil z-mt40" id="dDeurUit"></p>
   </div>
 
   <div class="kaart">
@@ -78,17 +78,17 @@
       <input class="veld" id="dKorting" maxlength="40" placeholder="Korting" aria-label="Korting" style="flex:0 1 8rem;">
       <button class="knop" id="dGastToon" type="button">Toon</button>
     </div>
-    <div class="rij" style="margin-top:.6rem;">
+    <div class="rij z-mt60">
       <input class="veld" id="dNamen" maxlength="400" placeholder="Namen, komma's ertussen" aria-label="Namen voor de gastenlijst">
       <button class="knop p" id="dGastZet" type="button">Op de lijst</button>
     </div>
-    <div id="dLijst" style="margin-top:.6rem;"></div>
-    <div class="kop" style="margin-top:.8rem;">Aanvragen van leden (<span id="dTeBeslissen">0</span>)</div>
+    <div id="dLijst" class="z-mt60"></div>
+    <div class="kop z-mt80">Aanvragen van leden (<span id="dTeBeslissen">0</span>)</div>
     <div id="dAanvragen"></div>
-    <p class="stil" style="margin-top:.4rem;">Een lid dat via de app een plek vraagt, staat er als aanvraag op en komt de deur niet door tot jij hier ja zegt.</p>
-    <div class="kop" style="margin-top:.8rem;">Per promoter</div>
+    <p class="stil z-mt40">Een lid dat via de app een plek vraagt, staat er als aanvraag op en komt de deur niet door tot jij hier ja zegt.</p>
+    <div class="kop z-mt80">Per promoter</div>
     <div id="dPromoters"></div>
-    <p class="stil" style="margin-top:.4rem;">Per promoter telt wat er is aangemeld EN wat er echt binnen is. Alleen dat eerste zegt niets.</p>
+    <p class="stil z-mt40">Per promoter telt wat er is aangemeld EN wat er echt binnen is. Alleen dat eerste zegt niets.</p>
   </div>
 </main>
 <div class="melding" id="melding" role="status"></div>

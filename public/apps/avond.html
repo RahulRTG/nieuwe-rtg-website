@@ -80,6 +80,20 @@
     border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:.8rem 1.1rem;}
   .balk[hidden]{display:none;}
   .balk .rij{max-width:760px;margin:0 auto;}
+
+  /* Kleine opmaakklassen in plaats van style="..."-attributen. Dat is geen
+     smaak: NORM.json telt die attributen (inlineStijlAttributen) omdat
+     style-src-attr in de CSP pas dicht kan als ze weg zijn, en dat getal mag
+     alleen omlaag. Deze pagina zette hem omhoog. */
+  .mt3{margin-top:.3rem;} .mt35{margin-top:.35rem;} .mt4{margin-top:.4rem;}
+  .mt5{margin-top:.5rem;} .mt6{margin-top:.6rem;} .mt7{margin-top:.7rem;}
+  .mt8{margin-top:.8rem;} .mt9{margin-top:.9rem;} .mt10{margin-top:1rem;}
+  .rechts{margin-left:auto;}
+  .catkop{margin:1rem 0 .2rem;}
+  .telrij{justify-content:flex-end;margin-top:.35rem;}
+  .telnr{min-width:1.4rem;text-align:center;}
+  .dnarij{padding:.6rem 0;border-bottom:1px solid var(--line);}
+  .smal{width:auto;}
   .wr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);}
 </style>
 </head>
@@ -112,7 +126,7 @@
       </div>
       <label class="lbl" for="sfeer">Sfeer (mag leeg)</label>
       <input id="sfeer" maxlength="40" placeholder="rustig, levendig, zakelijk">
-      <div class="rij" style="margin-top:.9rem;">
+      <div class="rij mt9">
         <button class="prim" id="bPlan">Stel een avond voor</button>
       </div>
     </section>
@@ -122,7 +136,7 @@
       <div class="zekerheid" id="zekerheid"></div>
       <div id="stappen"></div>
       <div id="gaten"></div>
-      <p class="sub" id="aannames" style="margin-top:.7rem;"></p>
+      <p class="sub mt7" id="aannames"></p>
     </section>
   </div>
 
@@ -134,8 +148,8 @@
     <section class="kaart">
       <h2>Wat zaken van je mogen weten</h2>
       <p class="sub">Delen gaat per soort. <b>Gevraagd</b> betekent: alleen als je het die keer zelf meegeeft. Wat hier staat schrijf je zelf op: RTG leidt niets af uit je bestellingen.</p>
-      <div id="dna" style="margin-top:.8rem;"></div>
-      <div class="rij" style="margin-top:.9rem;"><button class="prim" id="bDna">Opslaan</button></div>
+      <div id="dna" class="mt8"></div>
+      <div class="rij mt9"><button class="prim" id="bDna">Opslaan</button></div>
     </section>
   </div>
 </main>
@@ -143,7 +157,7 @@
 <div class="balk" id="balk" hidden>
   <div class="rij">
     <span id="balkTekst"></span>
-    <span class="bedrag" id="balkBedrag" style="margin-left:auto;"></span>
+    <span class="bedrag rechts" id="balkBedrag"></span>
     <button class="prim" id="bVraag">Aanvragen</button>
   </div>
 </div>
@@ -339,13 +353,13 @@
     api('/api/avond/voorkeuren', {}).then(function (j) {
       if (j._fout) return meld(j._fout);
       $('#dna').innerHTML = j.profiel.soorten.map(function (s) {
-        return '<div style="padding:.6rem 0;border-bottom:1px solid var(--line);">' +
+        return '<div class="dnarij">' +
           '<label class="lbl" for="v_' + esc(s.id) + '">' + esc(s.label) + '</label>' +
           '<input id="v_' + esc(s.id) + '" maxlength="160" value="' + esc(s.waarde) +
           '" placeholder="' + esc(s.uitleg) + '">' +
-          '<div class="rij" style="margin-top:.4rem;">' +
+          '<div class="rij mt4">' +
           '<label class="wr" for="d_' + esc(s.id) + '">Delen: ' + esc(s.label) + '</label>' +
-          '<select id="d_' + esc(s.id) + '" style="width:auto;">' +
+          '<select id="d_' + esc(s.id) + '" class="smal">' +
           j.profiel.standen.map(function (st) {
             return '<option value="' + esc(st) + '"' + (st === s.delen ? ' selected' : '') + '>' + esc(st) + '</option>';
           }).join('') + '</select></div></div>';

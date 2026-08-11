@@ -49,8 +49,16 @@
   transition: opacity var(--rtg-royaal, 560ms) var(--rtg-ease, ease);
 }
 .os-thuisscherm { position: relative; }
-/* alles wat wel bediend wordt, ligt boven de grond */
-.os-thuisscherm > *:not(.os-wereld-grond) { position: relative; z-index: 1; }
+/* Alles wat bediend wordt ligt boven de twee achtergrondlagen. Die twee zijn de
+   sterrenhemel van de poort (canvas.rtg-sterren, uit shared/sterren.js) en de
+   gloed van de wereld hierboven; ze hangen allebei op z-index 0 en vangen
+   niets. Ze staan hier met naam buiten de regel, want anders krijgen ze
+   z-index 1 en ligt de hemel over de klok. */
+.os-thuisscherm > *:not(.os-wereld-grond):not(.rtg-sterren) { position: relative; z-index: 1; }
+/* De gloed ligt OVER de sterren: de sterren zijn het firmament, de gloed is de
+   lucht ervoor. Andersom veegt het licht de sterren weg. */
+.os-thuisscherm > .os-wereld-grond { z-index: 0; }
+.os-thuisscherm > canvas.rtg-sterren[hidden] { display: none; }
 
 /* ---------- 3. de kring: klok in het midden, werelden eromheen ----------
    De kring neemt de plaats in die de klok al had (.os-klokvak), zodat de

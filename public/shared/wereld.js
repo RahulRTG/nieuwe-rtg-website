@@ -600,17 +600,104 @@
         niets -- geen lus die stilletjes door blijft draaien.
      3. Het staat stil zodra het tabblad weg is. Een achtergrond die op een
         onzichtbare pagina batterij verstookt, is geen sfeer maar een lek. */
-  var MOTIEVEN = {
-    'map-reizen': golven,
-    'map-geld': geometrie,
-    'map-salon': verbindingen,
-    'map-huis': ringen,
-    'map-media': stadslichten,
-    'map-werk': bouwlijnen,
-    'map-veilig': raster,
-    'map-rtf': organisch
-  };
   var grond = { cv: null, ctx: null, motief: null, t: 0, laatst: 0, tik: null, kleur: '#C9A24B' };
+
+  /* DE STERRENHEMEL VAN DE POORT, OP HET BEGINSCHERM.
+
+     Precies dezelfde laag als op de inlogpoort (app-main-04b.js hangt hem daar
+     op), met dezelfde sterrenbeelden op dezelfde plek aan de hemel. Dat is de
+     hele bedoeling: je logt in onder een firmament en je komt binnen onder
+     hetzelfde firmament. Een eigen namaakhemel hiernaast zou twee hemels zijn
+     die na de eerste wijziging uit elkaar lopen.
+
+     De module wordt bijgeladen als hij er nog niet is; lukt dat niet, dan is er
+     gewoon geen sterrenhemel en verandert er verder niets. */
+  /* EN HIJ WORDT PAS OPGEHANGEN ALS HET SCHERM EEN MAAT HEEFT.
+
+     shared/sterren.js meet zijn doel met Math.max(1, breedte). Dat is voor de
+     inlogpoort prima -- die staat in beeld op het moment dat hij wordt
+     opgehangen -- maar het beginscherm wordt opgebouwd terwijl de poort er nog
+     overheen ligt. Dan is de maat nul, wordt het doek 1 bij 1 pixel, en rekt
+     het blad die ene pixel uit tot een egaal vlak over het hele scherm. Wat je
+     ziet is geen sterrenhemel maar een crèmekleurige lap over je hele
+     beginscherm -- en niets in de console zegt er iets over.
+
+     Dezelfde les als bij de gloed hieronder, en daarom hier hetzelfde middel:
+     wachten tot het scherm werkelijk een maat heeft, en dan pas ophangen. */
+  var hemel = null, hemelMaat = '', hemelWacht = null, hemelLaadt = false;
+
+  /* Nog eens kijken op het volgende beeld, met een bodem eronder: een animatie
+     die om wat voor reden ook nooit eindigt, mag geen lus worden die blijft
+     draaien zolang de app openstaat. */
+  var hemelBeurten = 0;
+  function hemelStraks() {
+    if (hemelBeurten > 120) return;            // ~2 seconden, dan is het klaar
+    hemelBeurten++;
+    w.requestAnimationFrame(function () { hangHemel(); });
+  }
+
+  function bouwHemel() {
+    if (!el.scherm) return;
+    hemelBeurten = 0;
+    hangHemel();
+    if (hemelWacht) return;
+    try {
+      if (w.ResizeObserver) {
+        hemelWacht = new w.ResizeObserver(function () { hangHemel(); });
+        hemelWacht.observe(el.scherm);
+      }
+    } catch (e) { /* geen waarnemer: dan blijft het bij de eerste meting */ }
+  }
+
+  /* De hemel hangt op de maat die het scherm NU heeft, en blijft dat volgen.
+     Twee keer meten is hier geen luxe:
+
+     1. Bij het opbouwen heeft het scherm vaak nog helemaal geen maat (de poort
+        ligt er nog overheen), en dan wordt het doek 1 bij 1 -- zie hierboven.
+     2. Ook daarna klopt de eerste meting niet meteen. Gemeten: 368 bij 737
+        terwijl het scherm 393 bij 788 werd. Het doek wordt dan door het blad
+        uitgerekt, en een uitgerekte sterrenhemel is een WAZIGE sterrenhemel --
+        precies het soort verschil dat je niet als fout herkent maar als
+        "goedkoop".
+
+     shared/sterren.js meet alleen bij het ophangen en bij een venster-resize,
+     dus dat laatste vangt hij niet. Vandaar dat we hem bij een echte
+     maatverandering opnieuw ophangen; hij ruimt zichzelf netjes op met stop(). */
+  function hangHemel() {
+    var b = el.scherm.getBoundingClientRect();
+    var lb = el.scherm.clientWidth, lh = el.scherm.clientHeight;
+    if (lb < 40 || lh < 40) return false;
+    /* NIET OPHANGEN TERWIJL HET SCHERM NOG BINNENKOMT.
+
+       Het beginscherm heeft een openingsanimatie die hem van 0,98 naar 1
+       schaalt (osThuis, zie app.html). shared/sterren.js meet met
+       getBoundingClientRect(), en die geeft de GESCHAALDE maat -- dus wie
+       midden in die animatie ophangt, krijgt een doek van 386 bij 773 dat het
+       blad daarna uitrekt naar 393 bij 788. Dat is geen fout die je herkent,
+       het is een sterrenhemel die net iets wazig is: het soort verschil dat
+       niet als kapot leest maar als goedkoop.
+
+       Een ResizeObserver ziet dit niet -- een transform verandert de
+       indelingsmaat niet -- dus wachten we tot de getekende maat en de
+       indelingsmaat weer gelijk zijn, en kijken tot die tijd elk beeld opnieuw. */
+    if (Math.abs(b.width - lb) > 1 || Math.abs(b.height - lh) > 1) { hemelStraks(); return false; }
+    var maat = lb + 'x' + lh;
+    if (maat === hemelMaat) return true;
+    hemelMaat = maat;
+    var doe = function () {
+      if (!w.RTGSterren) return;
+      if (hemel && hemel.stop) { try { hemel.stop(); } catch (e) {} }
+      hemel = w.RTGSterren.hang(el.scherm, { helderheid: 0.62, dichtheid: 0.8 });
+    };
+    if (w.RTGSterren) { doe(); return true; }
+    if (hemelLaadt) return true;               // al onderweg; niet twee keer laden
+    hemelLaadt = true;
+    var s = d.createElement('script');
+    s.src = '/shared/sterren.js'; s.async = true;
+    s.onload = function () { hemelMaat = ''; hangHemel(); };
+    (d.head || d.documentElement).appendChild(s);
+    return true;
+  }
 
   function bouwGrond() {
     if (grond.cv) return;
@@ -658,11 +745,7 @@
     var sleutel = st.diep
       ? (st.werelden[st.wereldIdx] || {}).sleutel
       : ((huidige() || {}).sleutel);
-    grond.motief = MOTIEVEN[sleutel] || golven;
-    try {
-      var g = getComputedStyle(d.documentElement).getPropertyValue('--gold').trim();
-      if (g) grond.kleur = g;
-    } catch (e) {}
+    grond.motief = MOTIEVEN[sleutel] || MOTIEVEN['map-reizen'];
     grondFrame();
   }
 
@@ -672,6 +755,53 @@
     return 0.6;
   }
 
+  /* Afgesplitst van wereld-05.js, dat over de 10 KB ging. De snede loopt
+     langs een echte grens: hierboven staat de BEDRADING van de grond (het
+     doek, zijn maat, welke wereld aan de beurt is, de lus), hieronder het
+     LICHT zelf -- welke gloeden een wereld heeft en hoe je er een tekent.
+     Wie de sfeer van een wereld wil bijstellen, hoeft alleen hier te zijn. */
+  /* ELKE WERELD IS EEN LICHT, GEEN TEKENING.
+
+     Hier stonden acht LIJNTEKENINGEN: golfjes, een skyline van rechthoekjes,
+     een raster bolletjes. Naast de inlogpoort -- een diepe sterrenhemel met een
+     ademende dagkleur -- zag dat er precies uit als wat het was: draadwerk op
+     een vlakke ondergrond. Een luxemerk tekent geen diagram op de achtergrond.
+
+     Wat er nu staat is licht: twee tot vier grote, zachte gloeden die heel
+     langzaam over de grond drijven. Per wereld verschillen hun plek, hun kleur
+     en hun ritme -- Reizen ademt breed en traag als een horizon, Geld staat
+     strak en rechtop, Media flakkert als een stad. Je ziet geen vorm die je kunt
+     benoemen; je merkt dat het ergens anders naar rúikt. Dat is het verschil
+     tussen sfeer en illustratie.
+
+     De sterren komen niet van hier maar van shared/sterren.js -- hetzelfde
+     firmament als op de inlogpoort, met dezelfde sterrenbeelden op dezelfde
+     plek. Een tweede sterrenhemel naast die van de poort zou twee hemels zijn
+     die uit elkaar lopen. */
+  var TINT = { goud: [201, 162, 75], wijn: [194, 58, 94], parel: [237, 231, 218], koel: [120, 150, 190] };
+
+  /* Per wereld: welke gloeden, waar ze hangen (in eenheden van het scherm),
+     hoe groot, welke tint, en hoe snel ze ademen. Meer dan vier is geen sfeer
+     meer maar een lavalamp. */
+  var MOTIEVEN = {
+    // Reizen: een brede, lage horizon die traag op en neer gaat
+    'map-reizen': [[0.5, 0.16, 0.95, TINT.koel, 0.35], [0.22, 0.72, 0.75, TINT.goud, 0.22], [0.85, 0.55, 0.6, TINT.parel, 0.28]],
+    // Geld: rechtop en beheerst, twee kolommen licht die nauwelijks bewegen
+    'map-geld': [[0.28, 0.3, 0.6, TINT.goud, 0.12], [0.74, 0.62, 0.66, TINT.goud, 0.16], [0.5, 0.95, 0.8, TINT.parel, 0.1]],
+    // Sociaal: warm, dicht bij elkaar, alsof er mensen staan
+    'map-salon': [[0.32, 0.42, 0.62, TINT.wijn, 0.4], [0.62, 0.3, 0.55, TINT.goud, 0.34], [0.5, 0.82, 0.7, TINT.wijn, 0.26]],
+    // Leven: een haard -- een midden dat rustig doorademt
+    'map-huis': [[0.5, 0.5, 0.9, TINT.goud, 0.2], [0.5, 0.9, 0.7, TINT.wijn, 0.15]],
+    // Media: een stad die aanstaat, met een snellere flakker
+    'map-media': [[0.18, 0.62, 0.6, TINT.wijn, 0.8], [0.5, 0.35, 0.5, TINT.koel, 0.95], [0.82, 0.7, 0.62, TINT.goud, 0.7]],
+    // Kantoor: hoog en koel, licht dat van boven binnenvalt
+    'map-werk': [[0.5, 0.02, 1.05, TINT.koel, 0.14], [0.2, 0.5, 0.5, TINT.parel, 0.18], [0.8, 0.45, 0.5, TINT.parel, 0.18]],
+    // Veilig: een enkele rustige wacht, gelijkmatig en zonder haast
+    'map-veilig': [[0.5, 0.42, 1.0, TINT.koel, 0.1], [0.5, 0.98, 0.6, TINT.parel, 0.12]],
+    // RTFoundation: organisch, twee gloeden die om elkaar heen bewegen
+    'map-rtf': [[0.35, 0.55, 0.8, TINT.goud, 0.3], [0.68, 0.38, 0.7, TINT.parel, 0.24], [0.5, 0.9, 0.75, TINT.goud, 0.18]]
+  };
+
   function grondFrame() {
     if (!grond.ctx || !grond.motief) return;
     var cv = grond.cv, ctx = grond.ctx;
@@ -679,14 +809,46 @@
     if (!W || !H) return;
     ctx.clearRect(0, 0, W, H);
     ctx.save();
-    ctx.strokeStyle = grond.kleur;
-    ctx.fillStyle = grond.kleur;
-    ctx.lineWidth = Math.max(1, W / 620);
+    /* Bij elkaar optellen in plaats van overschilderen: waar twee gloeden
+       elkaar raken wordt het licht sterker, zoals licht zich gedraagt. Met de
+       gewone tekenstand krijg je randen waar de een over de ander valt, en dan
+       zie je de vorm van de gloed -- precies wat hier niet mag. */
+    ctx.globalCompositeOperation = 'lighter';
     /* De dekking is laag EN hangt aan de schuif: wie Beweging op stil zet, wil
        geen bewegingloze-maar-wel-opvallende achtergrond, hij wil rust. */
-    ctx.globalAlpha = 0.05 + 0.05 * Math.min(1, beweegFactor());
-    try { grond.motief(ctx, W, H, grond.t); } catch (e) { /* een motief mag het scherm nooit kosten */ }
+    var kracht = 0.05 + 0.045 * Math.min(1, beweegFactor());
+    var maat = Math.max(W, H);
+    try {
+      for (var i = 0; i < grond.motief.length; i++) gloed(ctx, W, H, maat, grond.motief[i], i, kracht);
+    } catch (e) { /* een motief mag het scherm nooit kosten */ }
     ctx.restore();
+  }
+
+  /* EEN gloed: een grote, zachte lichtbel die heel langzaam ademt en drijft.
+     De beweging is bewust klein (een paar procent van het scherm) -- je hoort
+     het niet te ZIEN bewegen, je hoort het pas te merken als je terugkomt.
+
+     De stop van de verloop loopt naar volledig doorzichtig in drie stappen en
+     niet in een; met een enkele stap krijg je een zichtbare rand waar de bel
+     ophoudt, en dan is het geen gloed meer maar een cirkel. */
+  function gloed(c, W, H, maat, m, i, kracht) {
+    var x = m[0], y = m[1], grootte = m[2], tint = m[3], tempo = m[4];
+    var f = grond.t * tempo;
+    var px = W * (x + Math.sin(f + i * 1.7) * 0.035);
+    var py = H * (y + Math.cos(f * 0.8 + i * 2.3) * 0.03);
+    var r = maat * grootte * (0.55 + 0.05 * Math.sin(f * 1.3 + i));
+    var adem = 0.75 + 0.25 * Math.sin(f * 1.1 + i * 0.9);
+    var a = kracht * adem;
+    var kleur = function (deel) {
+      return 'rgba(' + tint[0] + ',' + tint[1] + ',' + tint[2] + ',' + (a * deel).toFixed(4) + ')';
+    };
+    var g = c.createRadialGradient(px, py, 0, px, py, r);
+    g.addColorStop(0, kleur(1));
+    g.addColorStop(0.35, kleur(0.45));
+    g.addColorStop(0.7, kleur(0.12));
+    g.addColorStop(1, 'rgba(' + tint[0] + ',' + tint[1] + ',' + tint[2] + ',0)');
+    c.fillStyle = g;
+    c.fillRect(0, 0, W, H);
   }
 
   function grondStart() {
@@ -707,86 +869,6 @@
     grond.tik = w.requestAnimationFrame(stap);
   }
   function grondStop() { if (grond.tik) { w.cancelAnimationFrame(grond.tik); grond.tik = null; } }
-
-  /* ---------- de acht motieven ----------
-     Elk is een handvol lijnen. Ze hoeven niet mooi te zijn als je ernaar kijkt;
-     ze horen te kloppen als je er NIET naar kijkt. */
-  function golven(c, W, H, t) {                    // Reizen: water en afstand
-    for (var i = 0; i < 5; i++) {
-      c.beginPath();
-      for (var x = 0; x <= W; x += W / 60) {
-        var y = H * (0.36 + i * 0.09) + Math.sin(x / (W / 5) + t + i * 0.7) * H * 0.022;
-        if (x === 0) c.moveTo(x, y); else c.lineTo(x, y);
-      }
-      c.stroke();
-    }
-  }
-  function geometrie(c, W, H, t) {                 // Geld: orde, opbouw, ritme
-    var n = 7, b = W / (n + 1);
-    for (var i = 0; i < n; i++) {
-      var h = H * (0.14 + 0.1 * ((i * 3 + 1) % 5)) * (1 + 0.06 * Math.sin(t + i));
-      c.strokeRect(b * (i + 0.5), H * 0.72 - h, b * 0.5, h);
-    }
-  }
-  function verbindingen(c, W, H, t) {              // Sociaal: mensen en lijnen
-    var p = [];
-    for (var i = 0; i < 9; i++) {
-      p.push([W * (0.12 + 0.76 * ((i * 7) % 9) / 8) + Math.sin(t + i) * W * 0.012,
-        H * (0.2 + 0.6 * ((i * 5) % 9) / 8) + Math.cos(t * 0.8 + i) * H * 0.012]);
-    }
-    for (var a = 0; a < p.length; a++) {
-      c.beginPath(); c.arc(p[a][0], p[a][1], W / 300, 0, 6.284); c.fill();
-      var b2 = p[(a + 2) % p.length];
-      c.beginPath(); c.moveTo(p[a][0], p[a][1]); c.lineTo(b2[0], b2[1]); c.stroke();
-    }
-  }
-  function ringen(c, W, H, t) {                    // Leven: een haard, van binnenuit
-    for (var i = 0; i < 5; i++) {
-      c.beginPath();
-      c.arc(W / 2, H * 0.52, W * (0.1 + i * 0.11) * (1 + 0.02 * Math.sin(t + i)), 0, 6.284);
-      c.stroke();
-    }
-  }
-  function stadslichten(c, W, H, t) {              // Media: een stad die aanstaat
-    for (var i = 0; i < 46; i++) {
-      var x = W * ((i * 37) % 100) / 100, y = H * (0.3 + 0.62 * ((i * 53) % 100) / 100);
-      var a = 0.35 + 0.65 * Math.abs(Math.sin(t * 1.6 + i));
-      c.save(); c.globalAlpha *= a;
-      c.fillRect(x, y, W / 210, W / 210);
-      c.restore();
-    }
-  }
-  function bouwlijnen(c, W, H, t) {                // Kantoor: structuur en verdieping
-    var v = 6;
-    for (var i = 0; i <= v; i++) {
-      var y = H * (0.2 + i * 0.1) + Math.sin(t * 0.5 + i) * 1.5;
-      c.beginPath(); c.moveTo(W * 0.08, y); c.lineTo(W * 0.92, y); c.stroke();
-    }
-    for (var j = 0; j <= 4; j++) {
-      var x2 = W * (0.08 + j * 0.21);
-      c.beginPath(); c.moveTo(x2, H * 0.2); c.lineTo(x2, H * 0.8); c.stroke();
-    }
-  }
-  function raster(c, W, H, t) {                    // Veilig: een rustige wacht
-    var s = W / 9;
-    for (var x = s / 2; x < W; x += s) {
-      for (var y = s / 2; y < H; y += s) {
-        var r = s * 0.13 * (1 + 0.25 * Math.sin(t * 1.2 + (x + y) / s));
-        c.beginPath(); c.arc(x, y, r, 0, 6.284); c.stroke();
-      }
-    }
-  }
-  function organisch(c, W, H, t) {                 // RTFoundation: groei, geen raster
-    for (var i = 0; i < 6; i++) {
-      c.beginPath();
-      for (var s2 = 0; s2 <= 1.001; s2 += 0.05) {
-        var x = W * (0.1 + 0.8 * s2);
-        var y = H * (0.5 + 0.26 * Math.sin(s2 * 3.1 + i * 1.05 + t * 0.7) * (1 - s2 * 0.45));
-        if (s2 === 0) c.moveTo(x, y); else c.lineTo(x, y);
-      }
-      c.stroke();
-    }
-  }
 
   /* ---------- aanzetten, uitzetten ----------
      ER ZIJN GEEN TWEE BEGINSCHERMEN. Dat is de belangrijkste regel van dit
@@ -815,16 +897,31 @@
     el.scherm.setAttribute('data-os-wereld', st.aan ? 'aan' : 'uit');
 
     if (st.aan) {
-      bouwKring(); bouwNaam(); bouwKern(); bouwWiel(); bouwRahul(); bouwGrond();
+      /* DEZELFDE GROND ALS DE POORT. data-inlogkleur is geen versiering maar een
+         koppeling: shared/inlogkleur.js verft elk vlak dat hem draagt met de
+         levende dagkleur -- de boog van de dag, het seizoen, de dag van het
+         jaar. De inlogpoort draagt hem al. Zet je hem hier ook op, dan loop je
+         letterlijk dezelfde lucht binnen als waar je onder inlogde, en blijft
+         het EEN kleur die op EEN plek wordt uitgerekend.
+         In de rasterstand gaat hij er weer af: daar hoort de wallpaper die het
+         lid zelf koos (os-wall-*) het te winnen. */
+      el.scherm.setAttribute('data-inlogkleur', '');
+      if (w.Inlogkleur && w.Inlogkleur.verf) { try { w.Inlogkleur.verf(); } catch (e) {} }
+      bouwKring(); bouwNaam(); bouwKern(); bouwWiel(); bouwRahul(); bouwHemel(); bouwGrond();
       if (!gebonden) { bindSleep(); bindToetsen(); gebonden = true; }
       el.kring.hidden = false;
       el.naam.hidden = false; el.sub.hidden = false;
       if (el.grond) el.grond.hidden = false;
+      var hemelAan = el.scherm.querySelector('canvas.rtg-sterren');
+      if (hemelAan) hemelAan.hidden = false;
       if (el.klok && el.klok.parentNode !== el.kring) el.kring.appendChild(el.klok);
       vulRing(); toonNaam(); kernLabel(); grondKies(); grondMaat(); grondStart();
     } else {
       wiel(false);
       grondStop();
+      el.scherm.removeAttribute('data-inlogkleur');
+      var hemel = el.scherm.querySelector('canvas.rtg-sterren');
+      if (hemel) hemel.hidden = true;
       if (el.klok && el.vak && el.klok.parentNode !== el.vak) el.vak.appendChild(el.klok);
       if (el.kring) el.kring.hidden = true;
       if (el.naam) el.naam.hidden = true;

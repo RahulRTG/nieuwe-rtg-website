@@ -12,7 +12,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '5e752aff';
+var RTG_BOUW = '0d496cbc';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -621,20 +621,37 @@ var RTG_BOUW = '5e752aff';
       '#gate .os-lock{display:flex;align-items:center;justify-content:center;padding:0;margin:0;' +
         'height:calc(var(--rtg-klok-maat,16rem) * var(--klokschaal,1));transform:none;}' +
       '#gate .os-lock > .rtg-ring{transform:scale(var(--klokschaal,1));transform-origin:center;}' +
-      /* de lippen sluiten AAN op de klok: Rahul komt eruit, hij zweeft er niet
-         tientallen pixels onder */
       /* DE MOND HOORT BIJ DE KLOK, dus meet hij zich aan de klok en niet aan
          het venster. Met min(52vw,240px) was hij op een telefoon 224 breed
          onder een klok van 256 (verhouding 0,87) en op een breed scherm 240
          onder een klok van 384 (0,63) -- dezelfde mond, twee verhoudingen.
 
-         En het optrekken gebeurt met de LEEGTE VAN HET DOEK erin verrekend:
-         de tekening vult verticaal ongeveer 46% van haar canvas, dus boven de
-         inkt zit ruim een kwart niets. Trek je alleen de doos op, dan sluit
-         de doos aan en de tekening niet -- precies het gat dat hier zat. */
+         DE HOOGTE IS TWEE KEER MISGEGAAN, EEN KEER NAAR ELKE KANT.
+
+         Eerst zweefde de mond tientallen pixels onder de klok. Toen werd hij
+         opgetrokken tot hij "aansloot" -- en dat is te ver de andere kant op:
+         gemeten op vijf schermmaten begon de INKT op 0 tot -1 pixel van de
+         onderrand van de wijzerplaat. De lippen lagen dus tegen de gouden rand
+         en middenin de contactschaduw van de kast (zie .rtg-ring::before in
+         shared/klok.js, die zo'n 30px naar onderen reikt). Op een afdruk zie je
+         dat meteen; in de code niet, want er stond alleen een getal.
+
+         Daarom staat de rekensom er nu uit elkaar gehaald, met de twee
+         eigenschappen van het doek als eigen maat. Het doek is 440 bij 200, dus
+         0,4545 keer zo hoog als breed, en de tekening begint pas op 27,9% van
+         die hoogte -- boven de inkt zit ruim een kwart niets. Wie de lippen
+         ergens wil hebben, moet die leegte meerekenen; wie alleen de doos
+         verschuift, verschuift de tekening net niet.
+
+         --lipgat is het enige getal dat over SMAAK gaat: hoeveel lucht er
+         tussen de wijzerplaat en de lippen hoort. 0,126 mondbreed is 0,11 klok,
+         net voorbij de schaduw. De rest volgt eruit. */
       '#gate .ag-mond{--mondbreed:calc(var(--rtg-klok-maat,16rem) * var(--klokschaal,1) * 0.875);' +
+        '--doekhoog:calc(var(--mondbreed) * 0.4545);' +
+        '--doekleeg:calc(var(--doekhoog) * 0.279);' +
+        '--lipgat:calc(var(--mondbreed) * 0.126);' +
         'width:var(--mondbreed);height:auto;' +
-        'margin:calc(var(--mondbreed) * -0.125) auto 0.2rem;}' +
+        'margin:calc(var(--lipgat) - var(--doekleeg)) auto 0.2rem;}' +
       // de zin is de aanspreking en geen onderschrift
       /* margin-inline:auto, anders staat de zin 43px links van de as. De doos
          is een flexkolom met align-items:stretch, dus een kind met een

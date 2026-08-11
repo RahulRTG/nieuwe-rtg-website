@@ -471,6 +471,83 @@ test('Leden-app: het vak van de klok op het beginscherm is vierkant, dus de scha
   }
 });
 
+test('Inlogpoort: de lippen van Rahul hangen onder de klok, niet erin',
+  { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  /* DIT IS TWEE KEER MISGEGAAN, EEN KEER NAAR ELKE KANT, en allebei de keren
+     zag je het pas op een afdruk. Eerst zweefde de mond tientallen pixels onder
+     de klok; daarna werd hij opgetrokken tot hij "aansloot", en toen begon de
+     INKT op 0 tot -1 pixel van de onderrand van de wijzerplaat -- de lippen
+     lagen tegen de gouden rand en middenin de contactschaduw van de kast.
+
+     Een meting op de DOOS zou allebei die standen goedkeuren: het doek is 440
+     bij 200 en de tekening begint pas op 27,9% van die hoogte, dus de doos zegt
+     niets over waar de lippen liggen. Deze toets leest daarom de echte inkt uit
+     het doek en rekent de afstand in KLOKKEN, niet in pixels -- want de klok
+     schaalt mee met het scherm en een vaste pixelmaat zou op de ene telefoon
+     kloppen en op de andere niet.
+
+     DE MUTATIE: zet --lipgat in app-main-04a.js op 0. De lippen raken de klok
+     weer, en deze toets zakt. */
+  const TMP = verseDataDir();
+  const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
+  let browser;
+  try {
+    browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
+    // twee maten: de verhouding hoort op allebei dezelfde te zijn
+    for (const maat of [{ width: 390, height: 844 }, { width: 1440, height: 900 }]) {
+      const ctx = await browser.newContext({ viewport: maat });
+      await ctx.addInitScript(() => {
+        try { localStorage.setItem('rtg_lang', 'nl'); localStorage.setItem('rtg_cookieinfo_v1', '1'); } catch (e) {}
+      });
+      const page = await ctx.newPage();
+      // zonder token: dan staat de poort er, en die is wat we meten
+      await page.goto(base + '/', { waitUntil: 'domcontentloaded' });
+      await page.waitForSelector('#gate .ag-mond', { timeout: 15000 });
+      await page.waitForTimeout(1200);
+
+      const r = await page.evaluate(() => {
+        const klok = document.querySelector('#gate .os-lock .rtg-ring');
+        const cv = document.querySelector('#gate .ag-mond');
+        if (!klok || !cv) return null;
+        /* Het doek kan van WebGL zijn (shared/mond.js), en dan geeft
+           getContext('2d') null. Overtekenen naar een eigen doek werkt altijd. */
+        const kopie = document.createElement('canvas');
+        kopie.width = cv.width; kopie.height = cv.height;
+        const c = kopie.getContext('2d');
+        c.drawImage(cv, 0, 0);
+        const dt = c.getImageData(0, 0, kopie.width, kopie.height).data;
+        let eerste = -1;
+        for (let y = 0; y < kopie.height && eerste < 0; y++) {
+          for (let x = 0; x < kopie.width; x++) {
+            if (dt[(y * kopie.width + x) * 4 + 3] > 12) { eerste = y; break; }
+          }
+        }
+        const kb = klok.getBoundingClientRect(), mb = cv.getBoundingClientRect();
+        return {
+          klokMaat: Math.round(kb.width),
+          inktTop: eerste < 0 ? null : mb.top + mb.height * eerste / kopie.height,
+          klokBodem: kb.bottom
+        };
+      });
+
+      assert.ok(r && r.inktTop != null,
+        'de lippen horen getekend te zijn op ' + maat.width + ' breed');
+      const gat = (r.inktTop - r.klokBodem) / r.klokMaat;
+      assert.ok(gat > 0.05,
+        'de lippen raken de wijzerplaat op ' + maat.width + ' breed (afstand ' +
+        gat.toFixed(3) + ' klok); ze horen eronder te hangen, niet erin');
+      assert.ok(gat < 0.25,
+        'de lippen zweven te ver onder de klok op ' + maat.width + ' breed (afstand ' +
+        gat.toFixed(3) + ' klok); Rahul komt uit de klok, hij hangt er niet los onder');
+      await ctx.close();
+    }
+  } finally {
+    if (browser) await browser.close();
+    stop(child);
+    try { fs.rmSync(TMP, { recursive: true, force: true }); } catch (e) {}
+  }
+});
+
 /* Het beginscherm mag niet verdwijnen doordat de app je plek onthoudt.
 
    Deze twee horen bij elkaar en daarom in een toets. "Terug waar je was" is

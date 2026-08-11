@@ -328,6 +328,39 @@ test('de levende grond tekent werkelijk iets', { skip: overslaan }, async () => 
   });
 });
 
+test('de sterrenhemel van de poort staat op ware grootte op het beginscherm',
+  { skip: overslaan }, async () => {
+  /* DE MUTATIE: hang de sterrenhemel meteen op in plaats van te wachten tot het
+     scherm een maat heeft (haal probeerHemel/de waarnemer uit wereld-05.js weg
+     en roep RTGSterren.hang direct aan).
+
+     Dat is geen verzonnen mutatie maar precies wat er misging, en het is
+     verraderlijk: shared/sterren.js meet met Math.max(1, breedte), dus op een
+     scherm dat nog geen maat heeft wordt het doek 1 bij 1 pixel. Het blad rekt
+     die ene pixel uit over het hele scherm, en wat je krijgt is geen
+     sterrenhemel maar een egale crèmekleurige lap over je hele beginscherm --
+     met de klok en de tekst er onleesbaar doorheen. Geen enkele foutmelding.
+
+     Vandaar dat deze meting naar de MAAT van het doek kijkt en niet naar "staat
+     er een canvas": dat canvas stond er, en dat was juist het probleem. */
+  await metLid('aan', async ({ page }) => {
+    await page.waitForFunction(
+      () => !!document.querySelector('.os-thuisscherm > canvas.rtg-sterren'),
+      null, { timeout: 15000 });
+    await page.waitForTimeout(600);
+    const r = await page.evaluate(() => {
+      const cv = document.querySelector('.os-thuisscherm > canvas.rtg-sterren');
+      const dpr = Math.min(2, devicePixelRatio || 1);
+      return { w: cv.width, h: cv.height, breed: cv.clientWidth, hoog: cv.clientHeight, dpr };
+    });
+    assert.ok(r.breed > 100 && r.hoog > 100,
+      'de hemel hoort het beginscherm te vullen (' + r.breed + 'x' + r.hoog + ')');
+    assert.ok(Math.abs(r.w - r.breed * r.dpr) <= 2 && Math.abs(r.h - r.hoog * r.dpr) <= 2,
+      'de tekenmaat van de hemel hoort de schermmaat maal de pixeldichtheid te zijn: verwacht ' +
+      Math.round(r.breed * r.dpr) + 'x' + Math.round(r.hoog * r.dpr) + ', kreeg ' + r.w + 'x' + r.h);
+  });
+});
+
 test('Rahul zegt het EEN keer: in de ring, niet ook nog in de draad eronder',
   { skip: overslaan }, async () => {
   /* DE MUTATIE: haal de regel in wereld.css weg die de draad en de tips in de

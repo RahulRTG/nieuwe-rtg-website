@@ -26,16 +26,31 @@
     el.scherm.setAttribute('data-os-wereld', st.aan ? 'aan' : 'uit');
 
     if (st.aan) {
-      bouwKring(); bouwNaam(); bouwKern(); bouwWiel(); bouwRahul(); bouwGrond();
+      /* DEZELFDE GROND ALS DE POORT. data-inlogkleur is geen versiering maar een
+         koppeling: shared/inlogkleur.js verft elk vlak dat hem draagt met de
+         levende dagkleur -- de boog van de dag, het seizoen, de dag van het
+         jaar. De inlogpoort draagt hem al. Zet je hem hier ook op, dan loop je
+         letterlijk dezelfde lucht binnen als waar je onder inlogde, en blijft
+         het EEN kleur die op EEN plek wordt uitgerekend.
+         In de rasterstand gaat hij er weer af: daar hoort de wallpaper die het
+         lid zelf koos (os-wall-*) het te winnen. */
+      el.scherm.setAttribute('data-inlogkleur', '');
+      if (w.Inlogkleur && w.Inlogkleur.verf) { try { w.Inlogkleur.verf(); } catch (e) {} }
+      bouwKring(); bouwNaam(); bouwKern(); bouwWiel(); bouwRahul(); bouwHemel(); bouwGrond();
       if (!gebonden) { bindSleep(); bindToetsen(); gebonden = true; }
       el.kring.hidden = false;
       el.naam.hidden = false; el.sub.hidden = false;
       if (el.grond) el.grond.hidden = false;
+      var hemelAan = el.scherm.querySelector('canvas.rtg-sterren');
+      if (hemelAan) hemelAan.hidden = false;
       if (el.klok && el.klok.parentNode !== el.kring) el.kring.appendChild(el.klok);
       vulRing(); toonNaam(); kernLabel(); grondKies(); grondMaat(); grondStart();
     } else {
       wiel(false);
       grondStop();
+      el.scherm.removeAttribute('data-inlogkleur');
+      var hemel = el.scherm.querySelector('canvas.rtg-sterren');
+      if (hemel) hemel.hidden = true;
       if (el.klok && el.vak && el.klok.parentNode !== el.vak) el.vak.appendChild(el.klok);
       if (el.kring) el.kring.hidden = true;
       if (el.naam) el.naam.hidden = true;

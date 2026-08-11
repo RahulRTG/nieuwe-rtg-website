@@ -83,13 +83,37 @@ Ze doen ook echt iets: de keuze gaat naar de balk van Rahul, met die wereld
 erbij. **Een wiel dat mooi opengaat en verder niets doet, is een animatie en
 geen bediening.**
 
-## De levende grond
+## Dezelfde lucht als de poort
 
-Achter alles ligt een canvas dat per wereld een ander motief ademt: golven bij
-Reizen, bouwlijnen bij Kantoor, geometrie bij Geld, stadslichten bij Media,
-organische patronen bij de RTFoundation. Het staat op de rand van zichtbaar —
-je hoort het pas na een week te merken, en dan als *"die achtergrond klopt bij
-waar ik ben"*, niet als *"kijk, een animatie"*.
+Je logt in onder een sterrenhemel. Je hoort binnen te komen onder **dezelfde**
+sterrenhemel — niet in een andere ruimte die toevallig ook donker is. Het
+beginscherm draagt daarom letterlijk dezelfde twee lagen als de inlogpoort:
+
+- **`data-inlogkleur`** — `shared/inlogkleur.js` verft elk vlak dat dit attribuut
+  draagt met de levende dagkleur: de boog van de dag, het seizoen, de dag van
+  het jaar. Eén kleur, op één plek uitgerekend, op beide schermen.
+- **`shared/sterren.js`** — hetzelfde firmament, met de echte sterrenbeelden op
+  de plek waar ze op dit moment vanaf jouw locatie staan.
+
+In de rasterstand gaan allebei er weer af: daar hoort de wallpaper die het lid
+zelf koos (`os-wall-*`) het te winnen.
+
+## Elke wereld is een licht, geen tekening
+
+Hierboven op ligt een canvas met de sfeer van de wereld waar je staat. Dat waren
+eerst acht **lijntekeningen**: golfjes voor Reizen, een skyline van rechthoekjes
+voor Kantoor, een raster bolletjes voor Veilig. Naast een poort met een diepe
+sterrenhemel zag dat eruit als wat het was — draadwerk op een vlakke ondergrond.
+Een luxemerk tekent geen diagram op de achtergrond.
+
+Wat er nu staat is **licht**: twee tot vier grote, zachte gloeden die heel
+langzaam over de grond drijven, opgeteld met `lighter` zodat ze elkaar
+versterken in plaats van elkaar te overschilderen. Per wereld verschillen hun
+plek, hun tint en hun ritme — Reizen ademt breed en traag als een horizon, Geld
+staat strak en rechtop, Media flakkert als een stad. Je ziet geen vorm die je
+kunt benoemen; je merkt dat het ergens anders naar rúikt. Dat is het verschil
+tussen sfeer en illustratie. Meer dan vier gloeden is geen sfeer meer maar een
+lavalamp.
 
 Drie regels die niet onderhandelbaar zijn:
 
@@ -100,6 +124,28 @@ Drie regels die niet onderhandelbaar zijn:
    alleen zonder beweging.
 3. **Het staat stil zodra het tabblad weg is.** Een achtergrond die op een
    onzichtbare pagina batterij verstookt, is geen sfeer maar een lek.
+
+### En een les die drie keer dezelfde was
+
+Zowel de gloed als de sterrenhemel ging mis op **hetzelfde punt**: ze maten
+zichzelf op één moment in plaats van het scherm te volgen.
+
+- De gloed werd gemeten voordat de indeling had gedraaid → een canvas van 1 bij
+  1, uitgerekt tot niets.
+- De sterrenhemel werd opgehangen terwijl de poort er nog overheen lag → weer
+  1 bij 1, en `shared/sterren.js` rekt dat uit tot een **egale crèmekleurige lap
+  over het hele beginscherm**.
+- En toen dát verholpen was, werd hij opgehangen midden in de openingsanimatie,
+  die het scherm van 0,98 naar 1 schaalt. `getBoundingClientRect()` geeft dan de
+  geschaalde maat: een doek van 386 bij 773 dat wordt uitgerekt naar 393 bij
+  788. Niet kapot — net wazig. Precies het soort verschil dat niet als fout
+  leest maar als goedkoop.
+
+Wie hier een laag bijzet: meet niet op een moment. Volg het element (een
+`ResizeObserver`), en hang niets op zolang de getekende maat en de indelingsmaat
+niet gelijk zijn. `test/wereld.e2e.js` meet van beide lagen of de tekenmaat
+gelijk is aan de schermmaat maal de pixeldichtheid — een toets die alleen naar
+"er staat een canvas" kijkt, laat alle drie de standen door.
 
 ## Rahul: nergens, en overal
 

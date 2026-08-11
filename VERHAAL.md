@@ -453,3 +453,42 @@ raak** — twee daarvan pas na een herschrijving: de motorentoets riep
 `motorenVoor` rechtstreeks aan en bleef dus groen toen die stap uit `bouw`
 verdween, en de handler beantwoordde de vraag *bestaat deze wereld* twee keer, wat
 een mutatie zichtbaar maakte door niets te veranderen.
+
+### De vier veiligheidsvragen
+
+Vier dingen die vaststaan voordat een spelwereld veilig heet. Ze staan als groep
+in `test/spelwereld.test.js`, want wie er een weghaalt hoort te zien dat de rij
+niet meer compleet is.
+
+| | Wat er vaststaat | Hoe het gemeten wordt |
+|---|---|---|
+| **1** | wereld A ↔ wereld B: geen gedeeld object, cache of singleton | niet alleen de gegevens vergelijken, maar **over en weer opzoeken**: kan B een entiteit van A *vinden*, dan is er ergens gedeelde toestand — ook al staat hij in geen van beide vakken |
+| **2** | wereld ↔ productie: geen enkele mutatie lekt | de **hele** productiedatabase gaat op de foto (minus de werelden zelf), er wordt flink gewerkt, en daarna is de foto byte voor byte gelijk. Zo vangt hij ook een lek dat geen nieuwe collectie maakt maar een bestaande rij aanpast — precies wat de gedeelde zaaiset deed |
+| **3** | mail, betalen, boeken, reserveren, push: onmogelijk | 22 **echte** kern-namen uit `GRENZEN.json` (`betaal`, `betaalSplits`, `boekingMetRef`, `reserveerTafel`, `munten`, `pushLive`, `mailQ`, …), elk met een teller erachter die op nul moet blijven |
+| **4** | identity: je speelt als jezelf, maar een spelrol geeft nooit een echt recht | de kluis blijft dicht (`realNameOf`, `emailOf`, `phoneOf` gooien), er valt niets aan een account te veranderen, en een rol die in een wereld wordt gegeven laat `db.data.accountRollen` in productie leeg |
+
+**Wat er bij vraag 3 ontbrak.** De eerste lijst dekte het *rinkelen* af en niet
+het *betalen*, en dat is de duurdere helft: een spelhandeling die een
+betaalprovider aanroept of een tafel reserveert doet iets in de echte wereld dat
+niet terug te draaien is. `CLAUDE.md` zegt het ook — nooit claimen dat een
+boeking daadwerkelijk verwerkt is. Hier kan het niet eens.
+
+**Wat er bij vraag 4 nog helemaal niet stond.** `accounts` draagt lezers,
+schrijvers én de identiteitskluis. Een wereld krijgt nu een **leeslijst en geen
+module**: `getUserById`, `publicUser`, `isActief`, `verifyToken`, `count`. Alles
+daarbuiten gooit — elke schrijver, en elke vraag aan de kluis. Dat laatste is
+`CLAUDE.md` letterlijk: klantdata draait op codenamen, echte namen staan in de
+gescheiden kluis, en dat ontwerp omzeilen we niet. Een spel hoort nooit een echte
+naam of een e-mailadres te zien.
+
+**En de grens is geen verbod maar een richting.** Naar buiten mag niet,
+wereld-lokaal wel: een vervanger die de wereld zelf meegeeft, bezet een
+geblokkeerde naam. Zonder die uitgang is de enige oplossing voor een knellende
+route *de grens verzwakken*, en zo sneuvelen grenzen.
+
+**Nog acht mutaties, acht raak** — waaronder twee op de isolatie zelf: alle
+werelden één vak laten delen, en de motoren op productie laten bouwen. En één
+echte regressie gevonden door de suite: `test/blindevlek.test.js` scant
+app-bronnen op API-paden, en een pad in een *commentaar* ziet er voor die scanner
+net zo uit als een aanroep. De voorbeelden in `public/shared/spelwereld.js` staan
+daarom niet voluit, met die reden erbij.

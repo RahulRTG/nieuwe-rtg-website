@@ -51,31 +51,10 @@ const MAX_WERELDEN = 20;
 const STANDAARD_DAGEN = 30;
 const DAG = 86400000;
 
-/* WAT EEN SPELWERELD NIET MAG AANRAKEN. Alles wat naar buiten gaat: een mens
-   waarschuwen, een scherm laten piepen, een bericht sturen. De lijst is een
-   PREFIXLIJST en geen namenlijst, want een nieuwe `notifyX` hoort er vanzelf in
-   te vallen -- anders is de grens compleet op de dag dat hij geschreven werd en
-   daarna niet meer.
-
-   `chatStuur` en `commWerk` staan er voluit bij: die dragen geen prefix maar
-   openen wel een gesprek met een echt mens. */
-const NAAR_BUITEN = ['sseTo', 'sseSend', 'notify', 'meld', 'push', 'mail', 'smtp', 'sms'];
-const NAAR_BUITEN_VOLUIT = ['chatStuur', 'commWerk', 'anthropic', 'nudge'];
-
-const gaatNaarBuiten = (naam) => NAAR_BUITEN_VOLUIT.includes(naam)
-  || NAAR_BUITEN.some(p => naam.startsWith(p));
-
-/* Een fout die zegt WAT er miste en WAAROM. Dezelfde vorm als grensFout in
-   ../opzet/domeingrens.js, en om dezelfde reden: undefined is de gevaarlijkste
-   uitkomst. */
-function buitenFout(id, naam) {
-  const e = new Error('spelwereld: "' + id + '" reikt naar kern.' + naam +
-    ' -- dat kanaal gaat naar buiten en bestaat hier niet.\n' +
-    '  Een spelhandeling hoort geen melding, mail of schermpiep bij een echt mens op te leveren.\n' +
-    '  Moet deze route dat wel kunnen? Dan hoort hij niet in een spelwereld thuis.');
-  e.spelwereld = { id, naam };
-  return e;
-}
+/* De grenzen -- welke namen een wereld nooit mag aanraken -- staan in
+   ./spelwereld-grens.js. Daar de grens, hier het vak. */
+const G = require('./spelwereld-grens');
+const { gaatNaarBuiten, buitenFout, leesAccounts } = G;
 
 const schoon = (v) => String(v || '').toLowerCase().replace(/[^a-z0-9-]/g, '-')
   .replace(/-+/g, '-').slice(0, 40);
@@ -172,6 +151,9 @@ module.exports = function maakSpelwereld({ db, save, zaai, nu }) {
            opnieuw op het venster en geeft ze hier mee. Zie
            ./spelwereld-mount.js. */
         if (Object.prototype.hasOwnProperty.call(erover, sleutel)) return erover[sleutel];
+        /* DE IDENTITEIT: lezen mag, veranderen niet, en de kluis blijft dicht.
+           Zie de uitleg bij IDENTITEIT_MAG hierboven. */
+        if (sleutel === 'accounts') return leesAccounts(doel.accounts, id);
         /* Wat er niet in de kern zit kan ook geen overtreding zijn: dan is het
            een typefout of een optionele naam, en die hoort zijn eigen undefined
            te krijgen. Dezelfde regel als bij de domeingrens. */
@@ -187,6 +169,7 @@ module.exports = function maakSpelwereld({ db, save, zaai, nu }) {
     venster, kernVoor, gaatNaarBuiten };
 };
 
-module.exports.NAAR_BUITEN = NAAR_BUITEN;
-module.exports.NAAR_BUITEN_VOLUIT = NAAR_BUITEN_VOLUIT;
+module.exports.NAAR_BUITEN = G.NAAR_BUITEN;
+module.exports.NAAR_BUITEN_VOLUIT = G.NAAR_BUITEN_VOLUIT;
 module.exports.MAX_WERELDEN = MAX_WERELDEN;
+module.exports.IDENTITEIT_MAG = G.IDENTITEIT_MAG;

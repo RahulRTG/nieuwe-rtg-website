@@ -3,10 +3,16 @@
    Een scherm in een spelwereld is HETZELFDE scherm. Er is geen spelversie van
    personeel.html en er komt er ook geen: dat is de hele opdracht uit VERHAAL.md
    ("in het spel gebruik je de echte software"). Maar de pagina roept haar
-   server aan met absolute paden -- er staan er 123 in de apps, van de vorm
-   fetch('/api/...') -- en die gaan naar de root van de site.
+   server aan met ABSOLUTE paden -- er staan er 123 in de apps, allemaal van de
+   vorm fetch(APIPAD) waarbij dat pad met een schuine streep begint -- en die
+   gaan dus naar de root van de site.
 
-   In een spelwereld hoort dat /spelwereld/<id>/api/... te zijn.
+   (De voorbeelden hierboven staan met opzet niet voluit. test/blindevlek.test.js
+   scant deze bronnen op API-paden en controleert of de server ze kent; een pad
+   in een COMMENTAAR ziet er voor die scanner net zo uit als een aanroep, en dan
+   meldt hij een kapotte lijn die niet bestaat. Dat is hier ook echt gebeurd.)
+
+   In een spelwereld hoort de lijn onder /spelwereld/<id> door te lopen.
 
    DRIE WEGEN, EN DIT IS DE DERDE.
 
@@ -35,7 +41,8 @@
   var basis = '/spelwereld/' + m[1];
 
   /* Wat er verlegd wordt: alleen paden die met /api/ beginnen. Niet alles wat
-     met / begint, want dan verleggen we ook /apps/x.js en /fonts/y.woff2 -- die
+     met een schuine streep begint, want dan verleggen we ook de scripts en de
+     lettertypen van de site -- en die
      horen gewoon van de site te komen; een spelwereld heeft geen eigen
      lettertypen. Alleen de LIJN gaat om, niet de pagina. */
   function verleg(u) {

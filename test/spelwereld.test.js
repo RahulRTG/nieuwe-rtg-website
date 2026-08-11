@@ -470,3 +470,171 @@ test('een verzoek DOOR de mount leest de wereld en niet productie', () => {
   assert.equal(tel(vraag('p2')), 0, 'een andere wereld ziet hem niet');
   assert.equal(db.data.concern, undefined, 'en productie nog steeds niet');
 });
+
+/* ================= DE VIER VEILIGHEIDSVRAGEN =================
+
+   Vier dingen die absoluut vast moeten staan voordat een spelwereld veilig
+   heet. Ze staan hier bij elkaar en niet verspreid, want ze horen als GROEP
+   gesteld te worden: wie er een weghaalt, hoort te zien dat de rij niet meer
+   compleet is. */
+
+const kaal = (data) => {
+  const k = JSON.parse(JSON.stringify(data));
+  delete k.spelwerelden;                 // de werelden zelf horen in productie te staan
+  return JSON.stringify(k);
+};
+
+test('1. wereld A en wereld B delen geen enkele veranderbare toestand', () => {
+  /* Niet alleen hun gegevens maar ook hun TELLERS. Een module-level teller of
+     cache in een motor is precies het soort gedeelde toestand dat je niet ziet
+     aan de data: hij verraadt zich doordat de tweede wereld verder telt waar de
+     eerste ophield. Dus krijgen beide werelden dezelfde handeling, en de
+     uitkomsten horen identiek te zijn -- niet opeenvolgend. */
+  const { W, kern, M } = metMount();
+  W.maak('a', {}); W.maak('b', {});
+  const motorA = M.motorenVoor(W.venster('a'));
+  const motorB = M.motorenVoor(W.venster('b'));
+  const inA = motorA.entiteitNieuw('anna', { naam: 'Alleen In A BV', rechtsvorm: 'bv', land: 'NL' });
+  const inB = motorB.entiteitNieuw('anna', { naam: 'Alleen In B BV', rechtsvorm: 'bv', land: 'NL' });
+  assert.ok(inA.entiteit && inB.entiteit);
+
+  /* DE SONDE VOOR EEN GEDEELDE CACHE, en hij is scherper dan een vergelijking
+     van de gegevens: een module-level geheugen in een motor verraadt zich niet
+     in het vak maar in het OPZOEKEN. Kan B iets van A vinden, dan is er ergens
+     een object dat beide werelden delen -- ook al staat het in geen van beide
+     vakken. Dus wordt er over en weer gezocht, en beide keren hoort het
+     antwoord leeg te zijn.
+
+     (Een eerdere versie van deze toets vergeleek de eerste id van A en B, in de
+     verwachting dat een gedeelde teller zich zou verraden. Dat mat niets: deze
+     motor geeft willekeurige ids. Een toets die niet kan zakken is geen toets.) */
+  const vindInB = motorB.entiteitVind ? motorB.entiteitVind(inA.entiteit.id) : undefined;
+  const vindInA = motorA.entiteitVind ? motorA.entiteitVind(inB.entiteit.id) : undefined;
+  assert.ok(!vindInB, 'B vindt de entiteit van A: er is gedeelde toestand');
+  assert.ok(!vindInA, 'A vindt de entiteit van B: er is gedeelde toestand');
+  assert.ok(motorA.entiteitVind(inA.entiteit.id), 'en in de eigen wereld wordt hij wel gevonden');
+
+  /* En de tegenproef op de gegevens: druk werk in A laat B letterlijk
+     ongemoeid, tot op de byte. */
+  const bVoor = JSON.stringify(W.venster('b').data);
+  for (let i = 0; i < 25; i++)
+    motorA.entiteitNieuw('anna', { naam: 'Nummer ' + i + ' BV', rechtsvorm: 'bv', land: 'NL' });
+  assert.equal(JSON.stringify(W.venster('b').data), bVoor, 'B is niet veranderd');
+  assert.ok(JSON.stringify(W.venster('a').data).includes('Nummer 24 BV'));
+});
+
+test('2. geen enkele mutatie in een wereld raakt de productiegegevens', () => {
+  /* Uitputtend en niet steekproefsgewijs: de HELE productiedatabase gaat op de
+     foto (minus de werelden zelf, die er per definitie in staan), er wordt in
+     de wereld flink gewerkt, en daarna moet de foto byte voor byte gelijk zijn.
+     Zo vangt hij ook een lek dat geen nieuwe collectie maakt maar een
+     bestaande rij aanpast -- precies het soort lek dat de gedeelde zaaiset had. */
+  const { db, W, kern, M } = metMount();
+  db.data.posts = [{ id: 'p', tekst: 'een echte post' }];
+  db.data.invoices = [{ id: 'f1', bedrag: 100 }];
+  W.maak('p1', {});
+  const voor = kaal(db.data);
+  const v = W.venster('p1');
+  const motoren = M.motorenVoor(v);
+  const wk = W.kernVoor(kern, 'p1', motoren);
+  const e = motoren.entiteitNieuw('anna', { naam: 'Drukke BV', rechtsvorm: 'bv', land: 'NL' });
+  motoren.vestigingNieuw('anna', { entiteit: e.entiteit.id, naam: 'Filiaal', plaats: 'IJmuiden' });
+  for (let i = 0; i < 10; i++)
+    motoren.entiteitNieuw('anna', { naam: 'Nog een ' + i, rechtsvorm: 'bv', land: 'NL' });
+  const req = Object.assign(nepVerzoek('/p1/api/concern/overzicht'), { session: { key: 'anna' }, body: {} });
+  M.handler(req, nepAntwoord(), () => {});
+  assert.equal(kaal(db.data), voor, 'de productiegegevens zijn tot op de byte gelijk gebleven');
+  assert.ok(JSON.stringify(v.data).includes('Drukke BV'), 'en er is wel degelijk gewerkt');
+  assert.ok(wk.db.data === v.data);
+});
+
+test('3. mail, betalen, boeken, reserveren en push zijn onmogelijk', () => {
+  /* De eerste lijst dekte het RINKELEN af en niet het BETALEN, en dat is de
+     duurdere helft: een spelhandeling die een betaalprovider aanroept of een
+     tafel reserveert, doet iets in de echte wereld dat niet terug te draaien is.
+     CLAUDE.md zegt het ook: nooit claimen dat een boeking verwerkt is -- hier
+     kan het niet eens. De namen hieronder komen uit GRENZEN.json en zijn dus de
+     ECHTE kern-namen, niet verzonnen. */
+  const { db, W } = metMount();
+  W.maak('p1', {});
+  let gebeurd = 0;
+  const tik = () => { gebeurd++; return 'gedaan'; };
+  const kern = { db, save() {},
+    // geld
+    betaal: tik, betaalSplits: tik, betaalBoekingVoor: tik, betaalRitVoor: tik,
+    pay: tik, payVan: tik, munten: tik, muntbetaal: tik,
+    // verplichtingen in de echte wereld
+    boeken: tik, boekingMetRef: tik, boekingenVoegToe: tik,
+    reserveerTafel: tik, reserveerSlot: tik, reserveringKomst: tik,
+    // een mens bereiken
+    mailQ: tik, mailIn: tik, notifySupplier: tik, notifyApplicant: tik,
+    pushLive: tik, sseToCustomer: tik, meldMisbruik: tik, nudge: tik,
+    // en de AI, want die praat met de buitenwereld
+    anthropic: tik, gemini: tik };
+  const wk = W.kernVoor(kern, 'p1');
+  const namen = Object.keys(kern).filter(n => n !== 'db' && n !== 'save');
+  assert.ok(namen.length >= 22, 'de lijst is breed genoeg om iets te betekenen');
+  for (const naam of namen)
+    assert.throws(() => wk[naam], (e) => e.spelwereld && e.spelwereld.naam === naam,
+      naam + ' hoort onbereikbaar te zijn vanuit een spelwereld');
+  assert.equal(gebeurd, 0, 'er is niets afgegaan, niet een keer');
+});
+
+test('3b. een wereld-lokale vervanger mag een geblokkeerde naam bezetten', () => {
+  /* De grens is geen verbod maar een richting: naar buiten mag niet, wereld-
+     lokaal wel. Anders is de enige oplossing voor een knellende route "de grens
+     verzwakken", en dat is precies hoe grenzen sneuvelen. */
+  const { db, W } = metMount();
+  W.maak('p1', {});
+  let inDeWereld = 0;
+  const wk = W.kernVoor({ db, notifySupplier: () => { throw new Error('echt'); } }, 'p1',
+    { notifySupplier: () => { inDeWereld++; } });
+  wk.notifySupplier();
+  assert.equal(inDeWereld, 1, 'de wereld-lokale versie draait');
+});
+
+test('4. je speelt als jezelf, maar een spelrol geeft nooit een echt recht', () => {
+  /* DE SCHERPSTE VAN DE VIER. Een echt lid mag met zijn eigen identiteit spelen
+     -- dat is de bedoeling, je leert de echte software als jezelf. Maar:
+       - de identiteitskluis blijft dicht (geen echte naam, geen e-mail),
+       - er valt niets aan een account te veranderen,
+       - en een rol die je in een spel krijgt, staat in het VAK en nergens
+         anders: de echte rechtencontrole blijft nee zeggen. */
+  const { db, W, M } = metMount();
+  W.maak('p1', {});
+  const accounts = {
+    getUserById: (id) => ({ id, tier: 'rtg' }), publicUser: (u) => ({ id: u.id }),
+    isActief: () => true, verifyToken: () => ({ id: 1 }), count: () => 1,
+    realNameOf: () => 'Echte Naam', emailOf: () => 'echt@mens.nl', phoneOf: () => '0612345678',
+    createUser: () => ({ id: 99 }), renameUser: () => true, setTier: () => true,
+    issueToken: () => 'token', trekIn: () => true, schrijfKluisRing: () => true
+  };
+  const wk = W.kernVoor({ db, save() {}, accounts }, 'p1');
+
+  // je bent jezelf: lezen mag
+  assert.deepEqual(wk.accounts.getUserById(1), { id: 1, tier: 'rtg' });
+  assert.equal(wk.accounts.isActief(), true);
+
+  // de kluis blijft dicht -- CLAUDE.md: echte namen staan in de gescheiden kluis
+  for (const naam of ['realNameOf', 'emailOf', 'phoneOf'])
+    assert.throws(() => wk.accounts[naam], (e) => e.spelwereld && e.spelwereld.soort === 'identiteit',
+      naam + ' hoort een spel niets aan te gaan');
+
+  // en er valt niets te veranderen
+  for (const naam of ['createUser', 'renameUser', 'setTier', 'issueToken', 'trekIn', 'schrijfKluisRing'])
+    assert.throws(() => wk.accounts[naam], (e) => e.spelwereld && e.spelwereld.soort === 'identiteit', naam);
+  assert.throws(() => { wk.accounts.getUserById = () => ({ id: 2 }); });
+
+  /* EN DE RECHTEN. Een rol die in een wereld wordt gegeven, landt in het vak.
+     De productie-rechtenlijst (db.data.accountRollen) blijft leeg, dus wie
+     daarop kijkt ziet niets -- en dat is precies de bewering: een spelrol
+     veroorzaakt geen bedrijfsrecht. */
+  const v = W.venster('p1');
+  const motoren = M.motorenVoor(v);
+  const e = motoren.entiteitNieuw('lid-echt', { naam: 'Spel BV', rechtsvorm: 'bv', land: 'NL' });
+  assert.ok(e.entiteit, JSON.stringify(e));
+  v.data.accountRollen = { 'lid-echt': [{ rol: 'bestuurder', zaak: 'spel' }] };
+  assert.equal(db.data.accountRollen, undefined,
+    'de productie-rechtenlijst hoort niet te bestaan, laat staan een spelrol te dragen');
+  assert.ok(JSON.stringify(v.data).includes('bestuurder'), 'de rol staat in het vak');
+});

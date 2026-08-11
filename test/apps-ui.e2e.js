@@ -107,7 +107,8 @@ test('Leden-app: de eigen pas komt beveiligd op na herstel van de sessie',
       assert.equal(await page.evaluate(() => !!document.getElementById('homeGreeting')), false,
         'de begroeting hoort van het beginscherm af te zijn');
       const thuis = await page.evaluate(() => ({
-        mappen: document.querySelectorAll('#osMappen .os-app').length,
+        tegels: [...document.querySelectorAll('#osMappen .os-app')]
+          .map(b => ({ sleutel: b.dataset.sleutel || '', naam: (b.getAttribute('aria-label') || '').trim() })),
         functies: [...document.querySelectorAll('#osFuncties .os-app')].map(b => b.getAttribute('aria-label')),
         klok: !!document.querySelector('#homeKlok svg'),
         balk: !!document.querySelector('#osAiBalk #osAiIn'),
@@ -115,20 +116,33 @@ test('Leden-app: de eigen pas komt beveiligd op na herstel van de sessie',
         y: ['#osMappen', '.os-klokvak', '#osFuncties', '#osAiBalk']
           .map(s => Math.round(document.querySelector(s).getBoundingClientRect().top))
       }));
-      assert.ok(thuis.mappen >= 3, 'er staan mappen met apps boven de klok');
       assert.ok(thuis.klok, 'de ronde RTG-klok staat in het midden');
       assert.ok(thuis.balk, 'de balk van Rahul staat onderaan');
-      /* De functierij: vier dingen die je zonder nadenken moet kunnen pakken.
-         Hier stond ['Bellen', 'Berichten', 'Videobellen', 'Wallet'] -- maar
-         bellen en videobellen zijn geen eigen apps meer: ze zijn opgegaan in de
-         ene communicatie-app en staan nu als knop in de kop van het gesprek
-         waar je toch al bent. De EIS is niet veranderd (vier, en Berichten en
-         Wallet horen erbij); de invulling wel. */
-      assert.equal(thuis.functies.length, 4, 'de functierij telt geen vier tegels: ' + thuis.functies.join(', '));
-      assert.ok(thuis.functies.includes('Berichten'), 'Berichten staat niet in de functierij');
-      assert.ok(thuis.functies.includes('Wallet'), 'de Wallet staat niet in de functierij');
-      assert.ok(!thuis.functies.includes('Bellen') && !thuis.functies.includes('Videobellen'),
-        'bellen staat nog als eigen app onder de klok: ' + thuis.functies.join(', '));
+
+      /* ACHT WERELDEN, EN NIETS ERNAAST (PLATFORM.md par. 0).
+
+         HIER STOND DE VORIGE AFSPRAAK, en die is een eigenaarsbesluit later
+         vervangen. De eis was: vier vaste tegels onder de klok (Bellen,
+         Berichten, Videobellen, Wallet -- later Berichten, Camera, Wallet en
+         Snaps). Die rij bestaat niet meer. Bellen en videobellen zijn opgegaan
+         in de ene communicatie-app, Berichten en Camera wonen in Sociaal, en de
+         wallet IS de Geld-wereld. FUNCTIES in app-main-24.js staat daarom
+         bewust leeg, met de reden erbij.
+
+         Deze toets bewaakte dus de afgeschafte regel en stond rood om iets dat
+         met opzet zo is -- en een toets die rood staat om een besluit, is een
+         toets die niemand meer leest. Wat hij nu bewaakt is de regel die WEL
+         geldt, en die is scherper dan "de rij is leeg": elke tegel op het
+         beginscherm hoort een WERELD te zijn. Zet iemand er een losse app naast
+         (precies de uitzondering die de afspraak uitholt), dan zakt hij. */
+      assert.ok(thuis.tegels.length >= 7,
+        'er horen acht werelden boven de klok te staan, geteld: ' + thuis.tegels.length);
+      const geenWereld = thuis.tegels.filter(t => !/^map-/.test(t.sleutel));
+      assert.deepEqual(geenWereld, [],
+        'er staat iets op het beginscherm dat geen wereld is: ' +
+        geenWereld.map(t => t.naam + ' (' + t.sleutel + ')').join(', '));
+      assert.deepEqual(thuis.functies, [],
+        'de functierij hoort leeg te zijn -- de acht werelden dragen alles: ' + thuis.functies.join(', '));
       assert.deepEqual(thuis.y.slice().sort((a, b) => a - b), thuis.y,
         'de volgorde is mappen, klok, functies, balk');
       assert.ok((await page.textContent('#homeTrip .big')).trim().length > 0, 'de eerstvolgende reis staat er');
@@ -138,6 +152,26 @@ test('Leden-app: de eigen pas komt beveiligd op na herstel van de sessie',
 
 test('Leden-app: de ledenpas ligt in de wallet, niet meer op het beginscherm',
   { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
+  /* DEZE TOETS WEES NAAR EEN PAGINA DIE VERHUISD IS.
+
+     Hij opende /apps/wallet.html en zocht #ledenpas .ledenpas .cn. Dat pad is
+     sinds PLATFORM.md par. 0 (acht apps, niet drieentachtig) een omleiding naar
+     /apps/geld.html#wallet, en de opmaak heet daar #waPas .wa-pas. De toets
+     stond dus rood om een verhuizing en niet om een gebrek: de pas werkt, hij
+     woont ergens anders.
+
+     De BELOFTE is niet veranderd, en die staat in de naam: de pas ligt in de
+     wallet, en niet op het beginscherm. Vandaar dat deze toets nu drie dingen
+     doet die hij daarvoor niet allemaal deed:
+
+     1. hij loopt binnen via het OUDE pad, want daar kan een bladwijzer, een
+        gedeelde link of een geinstalleerd PWA-icoon nog naar wijzen -- een dood
+        pad is erger dan een omleiding, en dat is precies wat wallet.html zegt
+        te zijn;
+     2. hij kijkt of de pas op zijn nieuwe plek echt staat, met codenaam, welke
+        pas het is, en een ECHTE QR (uit onze eigen codec, geen plaatje);
+     3. hij kijkt eindelijk ook naar de tweede helft van zijn eigen naam: dat de
+        pas NIET op het beginscherm staat. Dat werd nooit gemeten. */
   const TMP = verseDataDir();
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -148,18 +182,43 @@ test('Leden-app: de ledenpas ligt in de wallet, niet meer op het beginscherm',
 
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     const ctx = await browser.newContext({ viewport: { width: 430, height: 900 } });
-    await ctx.addInitScript(t => { localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_lang', 'nl'); }, reg.token);
+    await ctx.addInitScript(t => {
+      localStorage.setItem('rtg_member_token', t); localStorage.setItem('rtg_lang', 'nl');
+      localStorage.setItem('rtg_cookieinfo_v1', '1');
+    }, reg.token);
     const page = await ctx.newPage();
-    await page.goto(base + '/apps/wallet.html', { waitUntil: 'load' });
 
-    await page.waitForSelector('#ledenpas .ledenpas .cn', { timeout: 15000 });
-    assert.ok((await page.textContent('#ledenpas .ledenpas .cn')).trim().length > 0,
+    // 1. het oude pad blijft werken en komt uit bij de wallet-stand van RTG Geld
+    await page.goto(base + '/apps/wallet.html', { waitUntil: 'load' });
+    await page.waitForFunction(() => /\/apps\/geld\.html/.test(location.pathname + location.hash),
+      null, { timeout: 15000 });
+    assert.match(await page.evaluate(() => location.pathname + location.hash), /\/apps\/geld\.html#wallet$/,
+      'het oude wallet-pad hoort door te sturen naar de wallet-stand van RTG Geld');
+
+    // 2. de pas staat er, met codenaam, pasnaam en een echte QR
+    await page.waitForSelector('#waPas .wa-pas .cn', { timeout: 15000 });
+    assert.ok((await page.textContent('#waPas .wa-pas .cn')).trim().length > 0,
       'de codenaam staat op de pas in de wallet');
-    assert.match(await page.textContent('#ledenpas .ledenpas'), /RTG Pass/,
+    assert.match(await page.textContent('#waPas .wa-pas'), /RTG Pass/,
       'de pas noemt welke pas het is');
     // de QR is echt: hij komt uit onze eigen codec, niet uit een plaatje
-    assert.equal(await page.evaluate(() => document.querySelectorAll('#ledenpas .qr canvas').length), 1,
+    assert.equal(await page.evaluate(() => document.querySelectorAll('#waPas .qr canvas').length), 1,
       'er staat een echte QR op de pas');
+
+    /* 3. en niet op het beginscherm. Dit is de helft die nooit gemeten werd, en
+          juist die kant kan stil terugkomen: een pas op de homescreen is een
+          codenaam die je aan iedereen laat zien die over je schouder meekijkt. */
+    const thuis = await ctx.newPage();
+    await thuis.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
+    await thuis.waitForSelector('#osMappen .os-app, .os-wm', { timeout: 15000, state: 'attached' });
+    await thuis.waitForTimeout(1200);
+    const opThuis = await thuis.evaluate(() => ({
+      pas: document.querySelectorAll('.wa-pas, #waPas, #ledenpas').length,
+      codenaam: document.querySelectorAll('.wa-pas .cn, #ledenpas .cn').length
+    }));
+    assert.equal(opThuis.pas, 0, 'de ledenpas staat weer op het beginscherm');
+    assert.equal(opThuis.codenaam, 0, 'de codenaam van de pas staat op het beginscherm');
+    await thuis.close();
   } finally {
     if (browser) await browser.close();
     stop(child);

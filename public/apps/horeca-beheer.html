@@ -35,18 +35,18 @@
       <input class="veld" id="mDatum" maxlength="10" placeholder="Datum (leeg = vandaag)" aria-label="Datum" style="flex:0 1 11rem;">
       <button class="knop" id="mDagToon" type="button">Toon</button>
     </div>
-    <div id="mKanalen" style="margin-top:.6rem;"></div>
-    <div class="kop" style="margin-top:.8rem;">Per betaalwijze</div>
+    <div id="mKanalen" class="z-mt60"></div>
+    <div class="kop z-mt80">Per betaalwijze</div>
     <div id="mWijzen"></div>
-    <div class="kop" style="margin-top:.8rem;">Wat apart staat</div>
+    <div class="kop z-mt80">Wat apart staat</div>
     <div id="mApart"></div>
-    <p class="stil" id="mLet" style="margin-top:.4rem;"></p>
+    <p class="stil z-mt40" id="mLet"></p>
   </div>
 
   <div class="kaart">
     <div class="kop">Signalen (<span id="mSignaalTelling">-</span>)</div>
     <div id="mSignalen"></div>
-    <p class="stil" id="mSignaalLet" style="margin-top:.4rem;"></p>
+    <p class="stil z-mt40" id="mSignaalLet"></p>
   </div>
 
   <div class="kaart">
@@ -56,24 +56,24 @@
       <input class="veld" id="pExtra" type="number" min="0" step="0.01" placeholder="Contante fooi erbij" aria-label="Contante fooi" style="flex:0 1 10rem;">
       <button class="knop p" id="pVerdeel" type="button">Verdelen</button>
     </div>
-    <div class="rij" style="margin-top:.6rem;">
+    <div class="rij z-mt60">
       <input class="veld" id="pNaam1" maxlength="60" placeholder="Naam" aria-label="Naam 1">
       <input class="veld" id="pUren1" type="number" min="0" max="24" step="0.5" placeholder="Uren" aria-label="Uren 1" style="flex:0 1 6rem;">
       <input class="veld" id="pWeging1" type="number" min="0.1" max="5" step="0.1" value="1" aria-label="Weging 1" style="flex:0 1 6rem;">
     </div>
-    <div class="rij" style="margin-top:.4rem;">
+    <div class="rij z-mt40">
       <input class="veld" id="pNaam2" maxlength="60" placeholder="Naam" aria-label="Naam 2">
       <input class="veld" id="pUren2" type="number" min="0" max="24" step="0.5" placeholder="Uren" aria-label="Uren 2" style="flex:0 1 6rem;">
       <input class="veld" id="pWeging2" type="number" min="0.1" max="5" step="0.1" value="1" aria-label="Weging 2" style="flex:0 1 6rem;">
     </div>
-    <div class="rij" style="margin-top:.4rem;">
+    <div class="rij z-mt40">
       <input class="veld" id="pNaam3" maxlength="60" placeholder="Naam" aria-label="Naam 3">
       <input class="veld" id="pUren3" type="number" min="0" max="24" step="0.5" placeholder="Uren" aria-label="Uren 3" style="flex:0 1 6rem;">
       <input class="veld" id="pWeging3" type="number" min="0.1" max="5" step="0.1" value="1" aria-label="Weging 3" style="flex:0 1 6rem;">
     </div>
-    <div id="pVerdeling" style="margin-top:.6rem;"></div>
-    <p class="stil" id="pPotLet" style="margin-top:.4rem;"></p>
-    <div class="kop" style="margin-top:.8rem;">Eerdere potten</div>
+    <div id="pVerdeling" class="z-mt60"></div>
+    <p class="stil z-mt40" id="pPotLet"></p>
+    <div class="kop z-mt80">Eerdere potten</div>
     <div id="pPotten"></div>
   </div>
 
@@ -83,7 +83,7 @@
       <input class="veld" id="lDatum" maxlength="10" placeholder="Datum (leeg = vandaag)" aria-label="Datum van de diensten" style="flex:0 1 11rem;">
       <button class="knop p" id="pLoon" type="button">Berekenen</button>
     </div>
-    <div class="rij" style="margin-top:.6rem;">
+    <div class="rij z-mt60">
       <input class="veld" id="lNaam1" maxlength="60" placeholder="Naam" aria-label="Dienst 1 naam">
       <input class="veld" id="lUren1" type="number" min="0" max="24" step="0.5" placeholder="Uren" aria-label="Dienst 1 uren" style="flex:0 1 6rem;">
       <input class="veld" id="lUurloon1" type="number" min="0" step="0.01" placeholder="Uurloon" aria-label="Dienst 1 uurloon" style="flex:0 1 7rem;">
@@ -92,7 +92,7 @@
         <option value="bar">Bar</option><option value="afwas">Afwas</option>
       </select>
     </div>
-    <div class="rij" style="margin-top:.4rem;">
+    <div class="rij z-mt40">
       <input class="veld" id="lNaam2" maxlength="60" placeholder="Naam" aria-label="Dienst 2 naam">
       <input class="veld" id="lUren2" type="number" min="0" max="24" step="0.5" placeholder="Uren" aria-label="Dienst 2 uren" style="flex:0 1 6rem;">
       <input class="veld" id="lUurloon2" type="number" min="0" step="0.01" placeholder="Uurloon" aria-label="Dienst 2 uurloon" style="flex:0 1 7rem;">
@@ -101,7 +101,7 @@
         <option value="bar">Bar</option><option value="afwas">Afwas</option>
       </select>
     </div>
-    <div class="rij" style="margin-top:.4rem;">
+    <div class="rij z-mt40">
       <input class="veld" id="lNaam3" maxlength="60" placeholder="Naam" aria-label="Dienst 3 naam">
       <input class="veld" id="lUren3" type="number" min="0" max="24" step="0.5" placeholder="Uren" aria-label="Dienst 3 uren" style="flex:0 1 6rem;">
       <input class="veld" id="lUurloon3" type="number" min="0" step="0.01" placeholder="Uurloon" aria-label="Dienst 3 uurloon" style="flex:0 1 7rem;">
@@ -110,25 +110,25 @@
         <option value="keuken">Keuken</option><option value="afwas">Afwas</option>
       </select>
     </div>
-    <div id="lUit" style="margin-top:.6rem;"></div>
-    <p class="stil" id="lLet" style="margin-top:.4rem;"></p>
+    <div id="lUit" class="z-mt60"></div>
+    <p class="stil z-mt40" id="lLet"></p>
   </div>
 
   <div class="kaart">
     <div class="kop">De pols van nu</div>
     <p class="stil">Drie bronnen, apart gehouden. Wat wij meten kun je niet bijstellen; dat komt uit je eigen keuken en je eigen tafels.</p>
-    <div class="kop" style="margin-top:.8rem;">Wat wij meten</div>
+    <div class="kop z-mt80">Wat wij meten</div>
     <div id="poGemeten"></div>
-    <div id="poNiet" style="margin-top:.4rem;"></div>
-    <div class="kop" style="margin-top:.8rem;">Wat jij invult</div>
+    <div id="poNiet" class="z-mt40"></div>
+    <div class="kop z-mt80">Wat jij invult</div>
     <div id="poZaak"></div>
-    <div class="rij" style="margin-top:.6rem;">
+    <div class="rij z-mt60">
       <button class="knop p" id="poZet" type="button">Opslaan</button>
       <button class="knop" id="poVervers" type="button">Ververs</button>
     </div>
-    <div class="kop" style="margin-top:.8rem;">Wat gasten melden</div>
+    <div class="kop z-mt80">Wat gasten melden</div>
     <div id="poGasten"></div>
-    <p class="stil" id="poLet" style="margin-top:.4rem;"></p>
+    <p class="stil z-mt40" id="poLet"></p>
   </div>
 
   <div class="kaart">
@@ -136,8 +136,8 @@
     <div class="rij">
       <button class="knop" id="gToon" type="button">Toon</button>
     </div>
-    <div id="gLijst" style="margin-top:.6rem;"></div>
-    <p class="stil" style="margin-top:.4rem;">Een gastprofiel bewaart wat nodig is om iemand goed te helpen. Er staat geen waarde-per-gast-score in; die maakt van gastvrijheid een rangorde.</p>
+    <div id="gLijst" class="z-mt60"></div>
+    <p class="stil z-mt40">Een gastprofiel bewaart wat nodig is om iemand goed te helpen. Er staat geen waarde-per-gast-score in; die maakt van gastvrijheid een rangorde.</p>
   </div>
 </main>
 <div class="melding" id="melding" role="status"></div>

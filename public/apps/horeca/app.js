@@ -12,8 +12,19 @@
     document.getElementById('vKeuken').hidden = zaal;
     document.getElementById('tabZaal').setAttribute('aria-selected', zaal ? 'true' : 'false');
     document.getElementById('tabKeuken').setAttribute('aria-selected', zaal ? 'false' : 'true');
-    if (zaal) window.RTGHorecaZaal.laad(); else window.RTGHorecaKeuken.laad();
+    if (zaal) {
+      window.RTGHorecaZaal.laad();
+      // de verzoeken van gasten horen bij de zaal en laden dus met de zaal mee
+      if (window.RTGHorecaVerzoeken) window.RTGHorecaVerzoeken.laad();
+    } else window.RTGHorecaKeuken.laad();
   }
+
+  /* EERST DE POORT, DAN PAS BINDEN. Deze drie regels stonden ervoor, en dat
+     hield alleen zolang dit script als eerste poort() aanriep: zodra een ander
+     script dat eerder deed, verving de deur #main voordat wij hier waren en was
+     tabZaal null. Een volgorde-afhankelijkheid die je pas ziet als iemand er
+     een script bij zet. Achter een deur valt er ook niets te bedienen. */
+  if (!window.RTGHoreca.poort()) return;
 
   document.getElementById('tabZaal').addEventListener('click', function () { tab('zaal'); });
   document.getElementById('tabKeuken').addEventListener('click', function () { tab('keuken'); });
@@ -21,7 +32,6 @@
     tab(document.getElementById('vZaal').hidden ? 'keuken' : 'zaal');
   });
 
-  if (!window.RTGHoreca.poort()) return;
   window.RTGHorecaZaal.bind();
   window.RTGHorecaKeuken.bind();
   tab('zaal');

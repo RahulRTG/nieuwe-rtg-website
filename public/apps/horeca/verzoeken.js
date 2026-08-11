@@ -56,6 +56,14 @@
     });
   }
 
+  /* DIT SCRIPT ROEPT ZELF GEEN poort() AAN, en dat is geen stijlkwestie.
+     Deed het dat wel (zoals de losse horecaschermen), dan plant het de deur in
+     een setTimeout -- en tussen twee losse <script src>-tags mag de browser
+     taken draaien terwijl hij het volgende script ophaalt. De deur verving dan
+     de inhoud van #main terwijl app.js nog onderweg was, en die bindt zijn
+     tabknoppen ONVOORWAARDELIJK: "Cannot read properties of null (reading
+     'addEventListener')". Op deze pagina is app.js de bedrading; zaal.js en
+     keuken.js doen het net zo. Dit scherm hangt in de zaal-weergave, dus
+     app.js laadt hem mee als die getoond wordt. */
   window.RTGHorecaVerzoeken = { laad: laad };
-  if ($('vzLijst') && K.poort()) laad();
 })();

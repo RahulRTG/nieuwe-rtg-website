@@ -122,7 +122,7 @@ test('een variant die geen object is telt als geen keuze', () => {
 
 test('het register zet de lijsten in SPEL en de keurfunctie apart', () => {
   const { SPEL, VARIANT } = maakRegister(stubCtx);
-  assert.deepEqual(Object.keys(VARIANT), ['quiz'], 'Quizduel is vandaag de enige met varianten');
+  assert.deepEqual(Object.keys(VARIANT).sort(), ['magnaat', 'quiz'], 'wie er varianten heeft is een besluit, geen toeval');
   assert.deepEqual(SPEL.quiz.varianten.bron, ['algemeen', 'school']);
   assert.ok(SPEL.quiz.varianten.stof.length > 5, 'er staat echte leerstof in');
   assert.equal(typeof VARIANT.quiz.fout, 'function', 'de keurfunctie hoort niet in SPEL');

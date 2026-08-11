@@ -1,0 +1,398 @@
+/* MAGNAAT: twee vormen, en de economie die er nieuw bij staat.
+
+   Het bordspel is niet veranderd; wat hier onder toets staat is de ECONOMIE, en
+   dan vooral de vier beweringen waar een economische simulatie op valt of
+   staat. Ze zijn geen van alle vanzelfsprekend, en ze zijn alle vier stil terug
+   te draaien:
+
+   1. HET IS EEN SPEL. Goed spelen wint van slecht spelen: de plek telt, de
+      prijs telt, onderhoud telt. In de EERSTE versie was dat niet zo -- toen
+      won wie MINDER personeel aannam en GEEN onderhoud deed, omdat `omvang`
+      per ongeluk de maandcapaciteit was in plaats van het aantal stoelen.
+      Alles draaide verlies en niets doen was de beste zet. Dat stond niet in de
+      code te lezen; het bleek uit een uitgespeelde campagne.
+   2. DE KLOK IS DETERMINISTISCH. Tien maanden achter elkaar geven hetzelfde als
+      tien maanden verspreid over de dag. Zonder die eigenschap hangt "sinds je
+      weg was" af van hoe vaak je ververst, en dan is bijrekenen (GAMEHALL.md
+      12.4) geen geldige vervanging van een tikkende server.
+   3. DE FOUNDATION IS EEN ACTOR EN GEEN SAUS. Ze bouwt binnen een campagne echt
+      iets, en dat verandert de economie meetbaar.
+   4. DE BOEKEN VAN EEN ANDER ZIJN NIET VAN JOU. Bij het bordspel ligt alles op
+      tafel; bij de economie niet, en de kijker- en schermweergave horen dus
+      niet iemands kas te tonen.
+
+   Draai los: node --experimental-sqlite --test test/spelmagnaat.test.js */
+const test = require('node:test');
+const assert = require('node:assert/strict');
+
+const maakMagnaat = () => require('../server/kern/spellen/magnaat/index')({
+  save() {}, crypto: require('crypto'), codenaamVan: (h) => 'CN-' + h, nudge() {}
+});
+const { kaart } = require('../server/kern/spellen/magnaat/kaart');
+const { alles: balans } = require('../scripts/magnaat-balans');
+const F = require('../server/kern/spellen/magnaat/foundation');
+
+const ECO = { vorm: 'economie', stad: 'IJmuiden', duur: 'quick' };
+function potjeMet(variant, spelers = ['anna', 'boris']) {
+  return { id: 'p1', soort: 'magnaat', spelers, teams: [0, 1, 0, 1, 0, 1], modus: 'vrij',
+    status: 'bezig', beurt: 0, winnaar: null, variant };
+}
+// een campagne uitspelen zonder te wachten: de klok terugzetten en laten bijrekenen
+function speelUit(m, p, maanden) {
+  for (let i = 0; i < maanden; i++) { p.staat.gerekendTot -= p.staat.maandMs; m.eco.bijrekenen(p); }
+}
+const kavelIn = (zone, n = 0) => kaart('ijmuiden').kavels.filter(k => k.zone === zone)[n];
+
+/* ================= de kaart ================= */
+
+test('de kaart is echt, stabiel, en zegt zelf waar hij vandaan komt', () => {
+  const k = kaart('ijmuiden');
+  assert.ok(k.kavels.length > 100, 'er is een stad om in te spelen: ' + k.kavels.length);
+  assert.ok(k.zones.some(z => /haven/i.test(z.naam)), 'IJmuiden heeft een haven');
+  assert.ok(k.kavels.some(x => /Kennemerboulevard/.test(x.naam)), 'en een boulevard');
+  /* De bron staat in de data zelf, en zolang hij handmatig is staat er GEEN
+     huisnummer in. Dat is de afspraak uit GAMEHALL.md 12.1: een huisnummer is
+     een bewering over een specifiek pand en hoort uit een register te komen. */
+  assert.ok(['handmatig', 'open-data'].includes(k.bron));
+  if (k.bron === 'handmatig')
+    for (const kav of k.kavels)
+      assert.match(kav.naam, /, kavel \d+$/, 'handmatige data hoort geen adres te suggereren: ' + kav.naam);
+  // en hij is stabiel: dezelfde stad geeft dezelfde kavels
+  assert.deepEqual(kaart('ijmuiden').kavels[7], k.kavels[7]);
+});
+
+test('een zone heeft een eigen karakter, en dat is te zien aan de kavels', () => {
+  const k = kaart('ijmuiden');
+  const gem = (zone, veld) => {
+    const rij = k.kavels.filter(x => x.zone === zone);
+    return rij.reduce((n, x) => n + x.eigenschappen[veld], 0) / rij.length;
+  };
+  assert.ok(gem('boulevard', 'toerisme') > gem('terrein', 'toerisme') * 3, 'de boulevard is toeristischer dan een bedrijventerrein');
+  assert.ok(gem('terrein', 'zakelijk') > gem('boulevard', 'zakelijk') * 2, 'en het terrein zakelijker dan de boulevard');
+  assert.ok(gem('centrum', 'passanten') > gem('haven', 'passanten') * 2, 'het centrum heeft de passanten');
+  assert.ok(gem('station', 'ov') > gem('terrein', 'ov'), 'bij het station kom je met het OV');
+});
+
+/* ================= is het een spel? ================= */
+
+test('elke sector is te exploiteren, en geen enkele is gratis geld', () => {
+  /* De band is 8 tot 24 maanden terugverdientijd. Eronder is het gratis geld en
+     is er geen keuze; erboven speelt niemand die sector ooit. */
+  for (const r of balans('ijmuiden')) {
+    assert.ok(Number.isFinite(r.terug), r.sleutel + ' verdient zijn bouwsom NOOIT terug');
+    assert.ok(r.terug >= 8 && r.terug <= 24,
+      r.sleutel + ' verdient zich in ' + r.terug.toFixed(1) + ' maanden terug; buiten de band 8-24');
+  }
+});
+
+test('de plek is de belangrijkste keuze van het spel', () => {
+  const m = maakMagnaat();
+  const p = potjeMet(ECO);
+  m.spel.init(p);
+  m.spel.zet(p, 'anna', { actie: 'open', kavel: kavelIn('boulevard').id, sector: 'horeca', omvang: 40 });
+  m.spel.zet(p, 'boris', { actie: 'open', kavel: kavelIn('terrein').id, sector: 'horeca', omvang: 40 });
+  speelUit(m, p, 36);
+  const stand = m.eco.eindstand(p);
+  const a = stand.find(x => x.codenaam === 'CN-anna'), b = stand.find(x => x.codenaam === 'CN-boris');
+  assert.ok(a.vermogen > 0, 'een restaurant op de boulevard is een goede zaak: ' + a.vermogen);
+  assert.ok(b.vermogen < 0, 'hetzelfde restaurant op een bedrijventerrein is dat niet: ' + b.vermogen);
+  assert.ok(a.omzet > b.omzet * 4, 'en het verschil is groot, niet kosmetisch');
+});
+
+test('onderhoud verwaarlozen bespaart nu en kost later meer', () => {
+  const m = maakMagnaat();
+  const p = potjeMet(ECO);
+  m.spel.init(p);
+  for (const h of ['anna', 'boris'])
+    m.spel.zet(p, h, { actie: 'open', kavel: kavelIn('boulevard', h === 'anna' ? 0 : 1).id, sector: 'hotel', omvang: 8 });
+  m.spel.zet(p, 'boris', { actie: 'beleid', id: 'v2', onderhoud: 0 });
+  speelUit(m, p, 36);
+  const anna = p.staat.vestigingen.anna[0], boris = p.staat.vestigingen.boris[0];
+  assert.ok(anna.onderhoud > 90, 'wie onderhoudt houdt zijn pand op peil: ' + anna.onderhoud);
+  assert.ok(boris.onderhoud < 10, 'wie niet onderhoudt ziet het wegzakken: ' + boris.onderhoud);
+  assert.ok(anna.reputatie > boris.reputatie + 15, 'en dat is te zien aan de naam: ' + anna.reputatie + ' tegen ' + boris.reputatie);
+  const stand = m.eco.eindstand(p);
+  assert.ok(stand[0].codenaam === 'CN-anna', 'onderhouden hoort te winnen, niet te verliezen');
+});
+
+test('te weinig personeel kost klanten die je wel had kunnen hebben', () => {
+  const m = maakMagnaat();
+  const p = potjeMet(ECO);
+  m.spel.init(p);
+  m.spel.zet(p, 'anna', { actie: 'open', kavel: kavelIn('boulevard').id, sector: 'horeca', omvang: 40 });
+  m.spel.zet(p, 'anna', { actie: 'beleid', id: 'v1', personeel: 1 });
+  speelUit(m, p, 12);
+  const laatste = p.staat.laatste.anna.regels[0];
+  assert.ok(laatste.gemist > 0, 'met een man in de bediening loop je omzet mis');
+  assert.ok(laatste.bezetting >= 99, 'en zit je bomvol: ' + laatste.bezetting + '%');
+});
+
+test('marketing werkt af: de eerste euro doet meer dan de laatste', () => {
+  /* Zonder die afvlakking is "alles in marketing" altijd het goede antwoord, en
+     dan is het geen keuze maar een schuifbalk die je helemaal opendraait. */
+  const { vraagVoor } = require('../server/kern/spellen/magnaat/vraag');
+  const k = kaart('ijmuiden');
+  const kav = kavelIn('boulevard');
+  const meet = (marketing) => vraagVoor(k, { kavel: kav.id, sector: 'horeca', prijs: 'midden', reputatie: 50 },
+    { maand: 6, zoneDruk: 1, marketing }).eenheden;
+  const zonder = meet(0), weinig = meet(4000), veel = meet(40000);
+  assert.ok(weinig > zonder, 'marketing brengt mensen binnen');
+  assert.ok(veel > weinig, 'meer marketing brengt meer binnen');
+  const eersteStap = weinig - zonder, tiendeStap = veel - weinig;
+  assert.ok(tiendeStap < eersteStap,
+    'tien keer zoveel budget hoort minder op te leveren dan de eerste stap: ' + eersteStap + ' tegen ' + tiendeStap);
+  assert.ok(veel < zonder * 1.5, 'en er zit een plafond op: ' + veel + ' tegen ' + zonder);
+});
+
+test('goedkoper trekt meer mensen, duurder minder -- en dat is de keuze', () => {
+  /* Zonder dit is de prijsstand een knop die alleen de omzet omhoog doet, en
+     dan zet iedereen hem op 'hoog' en is er niets te kiezen. */
+  const { vraagVoor } = require('../server/kern/spellen/magnaat/vraag');
+  const { prijsVan } = require('../server/kern/spellen/magnaat/sectoren');
+  const k = kaart('ijmuiden');
+  const kav = kavelIn('boulevard');
+  const meet = (prijs) => vraagVoor(k, { kavel: kav.id, sector: 'horeca', prijs, reputatie: 50 },
+    { maand: 6, zoneDruk: 1, marketing: 0 }).eenheden;
+  assert.ok(meet('laag') > meet('midden'), 'goedkoper trekt meer mensen');
+  assert.ok(meet('hoog') < meet('midden'), 'duurder trekt er minder');
+  // en het valt niet tegen elkaar weg: duur is meer omzet per klant
+  assert.ok(prijsVan('horeca', 'hoog') > prijsVan('horeca', 'laag') * 2, 'de prijsband is breed genoeg om iets te kiezen');
+});
+
+test('twee dezelfde zaken in dezelfde buurt vechten om dezelfde mensen', () => {
+  /* De concurrentiedruk. Zonder deze is een tweede vestiging in dezelfde straat
+     gratis geld, en dan is de hele plaatskeuze zinloos: dan zet je ze allemaal
+     op het beste kavel. */
+  const m = maakMagnaat();
+  const alleen = potjeMet(ECO, ['anna']);
+  m.spel.init(alleen);
+  m.spel.zet(alleen, 'anna', { actie: 'open', kavel: kavelIn('boulevard', 0).id, sector: 'horeca', omvang: 40 });
+  speelUit(m, alleen, 12);
+
+  const samen = potjeMet(ECO);
+  m.spel.init(samen);
+  m.spel.zet(samen, 'anna', { actie: 'open', kavel: kavelIn('boulevard', 0).id, sector: 'horeca', omvang: 40 });
+  m.spel.zet(samen, 'boris', { actie: 'open', kavel: kavelIn('boulevard', 1).id, sector: 'horeca', omvang: 40 });
+  speelUit(m, samen, 12);
+
+  const solo = alleen.staat.laatste.anna.regels[0].omzet;
+  const gedeeld = samen.staat.laatste.anna.regels[0].omzet;
+  assert.ok(gedeeld < solo * 0.85,
+    'met een concurrent naast de deur hoort er minder binnen te komen: ' + gedeeld + ' tegen ' + solo);
+});
+
+test('een naam bouw je op in maanden, niet in een maand', () => {
+  /* Reputatie kruipt naar kwaliteit toe. Zou hij springen, dan is een slechte
+     maand meteen een ramp en een goede maand meteen vergeten -- en dan is er
+     geen reden om ergens lang aan te bouwen. */
+  const m = maakMagnaat();
+  const p = potjeMet(ECO, ['anna']);
+  m.spel.init(p);
+  m.spel.zet(p, 'anna', { actie: 'open', kavel: kavelIn('boulevard').id, sector: 'horeca', omvang: 40 });
+  const start = p.staat.vestigingen.anna[0].reputatie;
+  speelUit(m, p, 1);
+  const na1 = p.staat.vestigingen.anna[0].reputatie;
+  speelUit(m, p, 11);
+  const na12 = p.staat.vestigingen.anna[0].reputatie;
+  assert.ok(na1 > start, 'een goede maand helpt');
+  assert.ok(na1 < start + 20, 'maar hij springt niet in een keer naar de top: ' + start + ' -> ' + na1);
+  assert.ok(na12 > na1 + 10, 'en na een jaar sta je er echt: ' + na12);
+});
+
+/* ================= de klok ================= */
+
+test('bijrekenen is deterministisch: tien maanden in een keer of tien los', () => {
+  /* Dit draagt de hele keuze uit GAMEHALL.md 12.4 -- de wereld TIKT niet maar
+     REKENT BIJ. Zou het antwoord van de stapgrootte afhangen, dan bepaalt hoe
+     vaak je ververst hoe rijk je wordt. */
+  const opzet = (m) => {
+    const p = potjeMet(ECO);
+    m.spel.init(p);
+    m.spel.zet(p, 'anna', { actie: 'open', kavel: kavelIn('centrum').id, sector: 'retail', omvang: 30 });
+    return p;
+  };
+  const m1 = maakMagnaat(), a = opzet(m1);
+  a.staat.gerekendTot -= 10 * a.staat.maandMs;
+  m1.eco.bijrekenen(a);
+
+  const m2 = maakMagnaat(), b = opzet(m2);
+  for (let i = 0; i < 10; i++) { b.staat.gerekendTot -= b.staat.maandMs; m2.eco.bijrekenen(b); }
+
+  assert.equal(a.staat.maand, 10);
+  assert.equal(b.staat.maand, 10);
+  assert.equal(Math.round(a.staat.geld.anna), Math.round(b.staat.geld.anna), 'dezelfde tijd hoort hetzelfde geld te geven');
+  assert.deepEqual(a.staat.vestigingen.anna[0], b.staat.vestigingen.anna[0]);
+});
+
+test('een campagne loopt af en levert meer op dan alleen geld', () => {
+  const m = maakMagnaat();
+  const p = potjeMet(ECO);
+  m.spel.init(p);
+  m.spel.zet(p, 'anna', { actie: 'open', kavel: kavelIn('boulevard').id, sector: 'horeca', omvang: 30 });
+  speelUit(m, p, 40);   // ruim over de 36 maanden heen
+  assert.equal(p.status, 'klaar');
+  assert.equal(p.staat.maand, 36, 'hij stopt op zijn eigen duur en rekent niet door');
+  const stand = m.eco.eindstand(p);
+  for (const veld of ['vermogen', 'waarde', 'geld', 'banen', 'reputatie', 'omzet'])
+    assert.ok(veld in stand[0], 'de eindstand hoort ' + veld + ' te tonen');
+  assert.ok(p.winnaar || p.gelijk, 'er is een uitslag');
+  assert.equal(m.spel.zet(p, 'anna', { actie: 'beleid', id: 'v1', prijs: 'hoog' }).status, 409,
+    'na afloop valt er niets meer te doen');
+
+  /* En ook als de hele campagne in EEN keer wordt bijgerekend. Dat is het geval
+     dat in de praktijk voorkomt -- iemand opent een partij die een dag heeft
+     stilgelegen -- en het is een ander pad dan maand voor maand: daar stopt de
+     klok vanzelf omdat het potje al klaar is, hier moet de lus zelf stoppen. */
+  const ineens = potjeMet(ECO);
+  m.spel.init(ineens);
+  m.spel.zet(ineens, 'anna', { actie: 'open', kavel: kavelIn('boulevard').id, sector: 'horeca', omvang: 30 });
+  ineens.staat.gerekendTot -= 50 * ineens.staat.maandMs;
+  m.eco.bijrekenen(ineens);
+  assert.equal(ineens.staat.maand, 36, 'een campagne die lang stillag rekent niet voorbij zijn eigen duur');
+  assert.equal(ineens.status, 'klaar');
+});
+
+/* ================= de Foundation ================= */
+
+test('de Foundation bouwt binnen een campagne echt iets, en dat verandert de stad', () => {
+  const m = maakMagnaat();
+  const p = potjeMet(ECO);
+  m.spel.init(p);
+  m.spel.zet(p, 'anna', { actie: 'open', kavel: kavelIn('boulevard').id, sector: 'horeca', omvang: 40 });
+  speelUit(m, p, 36);
+  const f = p.staat.foundation;
+  assert.ok(f.gedaan.length >= 2, 'in drie jaar hoort er iets te staan, niet alleen een spaarpot: ' + f.gedaan.length);
+  assert.ok(f.centraal > 0, 'en de centrale pot loopt mee');
+  /* MEETBAAR, en niet alleen in het nieuws: een project verschuift de
+     eigenschappen van de zone waar het staat. */
+  const kavel = kaart('ijmuiden').kavel.get(kavelIn(f.gedaan[0].zone).id);
+  const effect = F.effectOp(f, kavel);
+  assert.ok(Object.keys(effect).length, 'een gebouwd project hoort de zone te veranderen');
+  assert.ok(effect.passanten > 0, 'en meer mensen langs te brengen: ' + JSON.stringify(effect));
+});
+
+test('de Foundation put uit de hele stad en niet alleen uit de spelers', () => {
+  /* Anders bouwt ze in een partij met twee mensen nooit iets en in een partij
+     met zes drie keer zoveel, en hangt een sporthal af van hoeveel vrienden er
+     meespeelden. */
+  const m = maakMagnaat();
+  const leeg = potjeMet(ECO);
+  m.spel.init(leeg);
+  speelUit(m, leeg, 36);
+  assert.ok(leeg.staat.foundation.gedaan.length >= 1,
+    'ook zonder spelersomzet gebeurt er iets in de stad');
+});
+
+/* ================= wie ziet wat ================= */
+
+test('bij de economie zijn de boeken van een ander niet van jou', () => {
+  const m = maakMagnaat();
+  const p = potjeMet(ECO);
+  m.spel.init(p);
+  m.spel.zet(p, 'boris', { actie: 'open', kavel: kavelIn('centrum').id, sector: 'retail', omvang: 30 });
+  speelUit(m, p, 6);
+
+  const mijn = m.spel.zicht.speler(p, p.staat, 'anna');
+  const platte = JSON.stringify(mijn);
+  assert.equal(platte.includes(String(Math.round(p.staat.geld.boris))), false,
+    'de kas van boris hoort niet in het zicht van anna te staan');
+  assert.ok(mijn.anderen.length === 1 && mijn.anderen[0].vestigingen === 1,
+    'wat je WEL ziet is waar hij zit en hoeveel, want dat staat op straat');
+  assert.equal('geld' in mijn.anderen[0], false);
+
+  /* Een kijker en een gedeeld scherm krijgen de PUBLIEKE weergave. Bij het
+     bordspel ligt alles op tafel en is dat hetzelfde; hier niet, en daarom
+     staat er geen ZONDER_SPELER op dit spel. */
+  for (const laag of ['kijker', 'publiek']) {
+    const z = m.spel.zicht[laag](p, p.staat);
+    assert.equal(z.geld, undefined, laag + ' hoort geen kas te tonen');
+    assert.equal(z.vestigingen, undefined, laag + ' hoort geen boeken te tonen');
+    assert.ok(z.stad && typeof z.maand === 'number', laag + ' toont wel de wereld');
+  }
+});
+
+/* ================= de twee vormen ================= */
+
+test('het bordspel is er nog, en gedraagt zich als vanouds', () => {
+  const m = maakMagnaat();
+  const p = potjeMet({ vorm: 'bord', stad: null, duur: null });
+  m.spel.init(p);
+  assert.equal(p.staat.geld.anna, 1500, 'het bord begint met 1500 en niet met een economie');
+  assert.ok(Array.isArray(p.staat.posities ? [] : []) || p.staat.posities.anna === 0);
+  const r = m.spel.zet(p, 'anna', { actie: 'gooi' });
+  assert.equal(r.status, 200);
+  assert.ok(Array.isArray(m.spel.statisch(p).velden), 'en het bord reist mee als statische data');
+});
+
+test('na een worp zie je nog wat je gooide, ook als je beurt voorbij is', () => {
+  /* GEVONDEN TIJDENS DE SPLITSING, en het was er al: `magVolgende` zette
+     `st.dobbel` op null bij het doorgeven van de beurt, en de weergave wordt NA
+     die aanroep opgebouwd. Wie op een veld landde dat zijn beurt beeindigde --
+     belasting, een kanskaart, andermans straat -- kreeg dus een leeg
+     dobbelvak en zag nooit wat hij had gegooid. Het viel niet op omdat het bij
+     een veld dat te koop staat wel goed ging, en dat is de meerderheid.
+
+     Aan tafel blijven de stenen liggen tot de volgende speler gooit, en dat is
+     nu ook wat er gebeurt: de volgende worp overschrijft ze. */
+  const m = maakMagnaat();
+  let gezien = 0;
+  for (let i = 0; i < 40; i++) {
+    const p = potjeMet({ vorm: 'bord', stad: null, duur: null });
+    m.spel.init(p);
+    m.spel.zet(p, 'anna', { actie: 'gooi' });
+    const z = m.spel.zicht.speler(p, p.staat, 'anna');
+    if (Array.isArray(z.dobbel) && z.dobbel.length === 2) gezien++;
+  }
+  assert.equal(gezien, 40, 'in ' + (40 - gezien) + ' van de 40 worpen was de worp niet te zien');
+});
+
+test('een potje zonder variant is het bordspel, want dat stond er eerst', () => {
+  // een potje van voor de economie draagt geen variant en hoort gewoon te werken
+  const m = maakMagnaat();
+  const p = potjeMet(null);
+  m.spel.init(p);
+  assert.equal(p.staat.geld.anna, 1500);
+});
+
+test('stad en duur horen bij de economie en niet bij het bord', () => {
+  const m = maakMagnaat();
+  const fout = m.spel.variantFout;
+  assert.match(fout({ vorm: 'bord', stad: 'IJmuiden', duur: null }), /horen bij de economie/);
+  assert.match(fout({ vorm: 'economie', stad: null, duur: null }), /stad en een speelduur/);
+  assert.equal(fout({ vorm: 'bord', stad: null, duur: null }), null);
+  assert.equal(fout({ vorm: 'economie', stad: 'IJmuiden', duur: 'quick' }), null);
+});
+
+test('de vrije acties mogen buiten de beurt, de grote niet', () => {
+  /* Dit is de mechaniek waar Long Play op staat of valt (GAMEHALL.md 12.3):
+     zonder vrije acties staat een partij van zes met 24 uur per beurt dagen
+     stil tussen twee van jouw handelingen. De platformlaag leest de descriptor,
+     dus het enige wat hier telt is dat de lijst klopt. */
+  const m = maakMagnaat();
+  assert.deepEqual(m.spel.buitenBeurt.sort(), ['beleid', 'bouw', 'verkoop']);
+  for (const groot of ['open', 'uitbreiden', 'sluiten'])
+    assert.equal(m.spel.buitenBeurt.includes(groot), false, groot + ' is een grote zet en hoort bij je beurt');
+});
+
+test('rood staan kost rente, zodat overinvesteren een prijs heeft', () => {
+  const m = maakMagnaat();
+  const p = potjeMet(ECO);
+  m.spel.init(p);
+  p.staat.geld.anna = -100000;
+  speelUit(m, p, 1);
+  assert.ok(p.staat.geld.anna < -101000, 'een negatieve kas hoort te groeien, niet stil te blijven staan: ' + p.staat.geld.anna);
+  const regel = p.staat.laatste.anna.regels.find(r => r.id === 'rood');
+  assert.ok(regel && regel.rente > 0, 'en het staat als regel op je maandoverzicht');
+});
+
+test('je kunt niet openen wat je niet kunt betalen, en niet op andermans kavel', () => {
+  const m = maakMagnaat();
+  const p = potjeMet(ECO);
+  m.spel.init(p);
+  const kavel = kavelIn('boulevard').id;
+  assert.match(m.spel.zet(p, 'anna', { actie: 'open', kavel, sector: 'hotel', omvang: 40 }).error, /kost/);
+  assert.equal(m.spel.zet(p, 'anna', { actie: 'open', kavel, sector: 'horeca', omvang: 20 }).status, 200);
+  assert.match(m.spel.zet(p, 'boris', { actie: 'open', kavel, sector: 'retail', omvang: 20 }).error, /bezet/);
+  assert.match(m.spel.zet(p, 'anna', { actie: 'open', kavel: 'bestaat:niet', sector: 'horeca', omvang: 20 }).error, /er niet/);
+  assert.match(m.spel.zet(p, 'boris', { actie: 'beleid', id: 'v1', prijs: 'hoog' }).error, /niet van jou/);
+});

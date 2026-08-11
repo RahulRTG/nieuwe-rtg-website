@@ -46,7 +46,8 @@ const GOUD = {
   pesten:   ['Pesten', 4, 'rtf', { vormen: ['live'] }],
   dam:      ['Dammen', 2, 'rtf', { vormen: ['live', 'async'], naspeelbaar: true }],
   rummi:    ['Rummi', 4, 'rtf', { vormen: ['live', 'async'] }],
-  magnaat:  ['Magnaat', 6, 'rtg', { buitenBeurt: ['bouw', 'verkoop'], vormen: ['live', 'async'] }],
+  magnaat:  ['Magnaat', 6, 'rtg', { buitenBeurt: ['bouw', 'verkoop', 'beleid'], vormen: ['live', 'async'],
+    varianten: { vorm: ['bord', 'economie'], stad: ['IJmuiden'], duur: ['quick', 'avond', 'weekend'] } }],
   seconden: ['30 Seconden', 4, 'rtg', { min: 4, teams: 'altijd', vormen: ['live'] }],
   waarheid: ['Doen of Waarheid', 6, 'rtf', { vormen: ['live'] }],
   proost:   ['Proost', 6, 'rtg', { volwassen: true, vormen: ['live'] }],
@@ -96,7 +97,12 @@ test('een gedeeld scherm is opt-in, en 30 Seconden hoort er wel bij', () => {
   const { ZICHT } = maakRegister(stubCtx);
   assert.ok(ZICHT.seconden.publiek, '30 Seconden hoort te projecteren');
   assert.ok(!ZICHT.seconden.kijker, 'en tegelijk niet te bekijken');
-  assert.ok(!ZICHT.magnaat.publiek, 'wat geen projectie beschreven heeft, projecteert niet');
+  /* En de keerzijde van de keerzijde: wie GEEN projectie beschrijft, krijgt er
+     ook geen. Magnaat stond hier tot de economie erbij kwam -- die heeft nu wel
+     een publieke weergave (de stad en de maand, en niemands boeken), dus de
+     regel wordt nu op een spel gemeten dat hem echt niet heeft. */
+  assert.ok(!ZICHT.pesten.publiek, 'wat geen projectie beschreven heeft, projecteert niet');
+  assert.ok(ZICHT.magnaat.publiek, 'Magnaat kreeg er een toen de economie erbij kwam');
 });
 
 test('het register vindt precies de spellen die er zijn', () => {

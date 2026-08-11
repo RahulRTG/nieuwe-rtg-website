@@ -182,6 +182,13 @@
       <div class="sec" style="margin-top:0;">In welke taal?</div>
       <div class="keuzerij" id="nTalen"></div>
     </div>
+    <!-- Wat er aan DIT spel te kiezen valt. De keuzes komen van de server (uit
+         de descriptor): een lijst in deze pagina zou stil achterlopen zodra er
+         een stad of een vorm bij komt. -->
+    <div class="kaart blok" id="nVariantBlok" hidden>
+      <div class="sec" style="margin-top:0;">Hoe wil je spelen?</div>
+      <div id="nVarianten"></div>
+    </div>
     <!-- alleen bij spellen die een beurt van uren of dagen aankunnen -->
     <div class="kaart blok" id="nTempoBlok" hidden>
       <div class="sec" style="margin-top:0;">Hoeveel tijd per beurt?</div>
@@ -247,6 +254,16 @@
       <div class="scorerij" id="mgGeld"></div>
       <div class="knoprij" id="mgActies"></div>
       <div id="mgBezit"></div>
+    </div>
+    <!-- Magnaat als economie: geen bord maar een stad. Zie GAMEHALL.md 12. -->
+    <div id="sMagnaatEco" hidden>
+      <div class="pinfo" id="ecKop"></div>
+      <div id="ecSinds"></div>
+      <div id="ecMijn"></div>
+      <div class="sec">Een zaak openen</div>
+      <div id="ecOpen"></div>
+      <div id="ecFonds"></div>
+      <div id="ecEind"></div>
     </div>
     <div id="sSeconden" hidden>
       <div class="klok" id="scKlok"></div>
@@ -426,7 +443,7 @@ const ASYNC_SPELLEN = ['schaak','dam','woord','rummi','mejn','magnaat'];
 const NASPEELBAAR = ['schaak','dam'];
 /* Welke spellen op een gedeeld scherm mogen. Vierde kopie van serverkennis
    (`zicht.publiek`), en ook deze staat onder de drifttoets. */
-const PROJECTEERBAAR = ['flits','geheugen','orde','quiz','reactie','schaak','schat','seconden','waarheid','woord'];
+const PROJECTEERBAAR = ['flits','geheugen','magnaat','orde','quiz','reactie','schaak','schat','seconden','waarheid','woord'];
 const TEMPI = [
   ['', 'Live, aan tafel'],
   ['15m', 'Live · 15 min'],
@@ -631,6 +648,8 @@ document.querySelectorAll('.spelkaart').forEach(k => k.addEventListener('click',
   $('#nTempoBlok').hidden = !ASYNC_SPELLEN.includes(nSpel);
   $('#nProost').hidden = nSpel !== 'proost';
   $('#nSeconden').hidden = nSpel !== 'seconden';
+  nVariant = {};
+  laadVarianten().then(tekenVarianten);
   tekenTalen(); tekenTempi(); tekenGroottes(); tekenVrienden();
   toon('vNieuw');
 }));
@@ -642,6 +661,45 @@ function tekenGroottes(){
   $('#nGroottes').innerHTML = opties.map(([g,m,l]) => '<button type="button" class="chip'+(nGrootte===g&&nModus===m?' aan':'')+'" data-g="'+g+'" data-m="'+m+'">'+l+'</button>').join('');
   $('#nGroottes').querySelectorAll('button').forEach(b => b.addEventListener('click', ()=>{ nGrootte=Number(b.dataset.g); nModus=b.dataset.m; nGekozen=nGekozen.slice(0, nGrootte-1); tekenGroottes(); tekenVrienden(); }));
 }
+/* ---------- varianten: wat er aan DIT spel te kiezen valt ----------
+   De lijsten komen van de server, uit de descriptor van het spel. Een kopie in
+   deze pagina zou achterlopen zodra er een stad of een vorm bij komt, en dan
+   staat er een keuze in de app die de server weigert. */
+let VARIANTEN = null, nVariant = {};
+async function laadVarianten(){
+  if (VARIANTEN) return VARIANTEN;
+  try{ VARIANTEN = (await api('varianten', {})).varianten || {}; }catch(e){ VARIANTEN = {}; }
+  return VARIANTEN;
+}
+const VARIANT_LABEL = { vorm:'Welke vorm?', stad:'In welke stad?', duur:'Hoe lang?', bron:'Waar komen de vragen vandaan?', stof:'Welke leerstof?' };
+const WAARDE_LABEL = { bord:'Het bordspel', economie:'De economie', quick:'Kort (een uur)', avond:'Een avond', weekend:'Een weekend' };
+function tekenVarianten(){
+  const def = (VARIANTEN || {})[nSpel];
+  $('#nVariantBlok').hidden = !def;
+  if (!def) { nVariant = {}; return; }
+  const vak = $('#nVarianten');
+  vak.innerHTML = '';
+  for (const [veld, keuzes] of Object.entries(def)){
+    const kop = document.createElement('div');
+    kop.className = 'sec';
+    kop.textContent = VARIANT_LABEL[veld] || veld;
+    const rij = document.createElement('div');
+    rij.className = 'keuzerij';
+    for (const w of keuzes){
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'chip' + (nVariant[veld] === w ? ' aan' : '');
+      b.textContent = WAARDE_LABEL[w] || w;
+      b.addEventListener('click', ()=>{ nVariant[veld] = w; tekenVarianten(); });
+      rij.append(b);
+    }
+    vak.append(kop, rij);
+  }
+}
+/* Leeg meesturen als er niets te kiezen viel: een leeg blok bij een spel zonder
+   varianten is een 400, en dat is met opzet (zie kern/spellen/variant.js). */
+const variantMee = () => (VARIANTEN || {})[nSpel] ? nVariant : undefined;
+
 function tekenTempi(){
   $('#nTempi').innerHTML = TEMPI.map(([t,l]) =>
     '<button type="button" class="chip'+(nTempo===t?' aan':'')+'" data-tp="'+t+'">'+l+'</button>').join('');
@@ -690,7 +748,7 @@ $('#nStart').addEventListener('click', async ()=>{
   $('#nFout').textContent='';
   try{
     const cn = $('#nCodenaam').value.trim();
-    const d = await api('nieuw', { soort:nSpel, grootte:nGrootte, modus:nModus, vrienden:nGekozen, codenamen: cn ? [cn] : [], taal:nTaal, tempo: nTempo || undefined });
+    const d = await api('nieuw', { soort:nSpel, grootte:nGrootte, modus:nModus, vrienden:nGekozen, codenamen: cn ? [cn] : [], taal:nTaal, tempo: nTempo || undefined, variant: variantMee() });
     meld('Uitnodiging verstuurd. Het potje start zodra je vrienden meedoen.');
     toon('vLobby'); laadLobby();
   }catch(e){ $('#nFout').textContent = e.message; }
@@ -698,7 +756,7 @@ $('#nStart').addEventListener('click', async ()=>{
 $('#nRandom').addEventListener('click', async ()=>{
   $('#nFout').textContent='';
   try{
-    const d = await api('random', { soort:nSpel, grootte:nGrootte, taal:nTaal, tempo: nTempo || undefined });
+    const d = await api('random', { soort:nSpel, grootte:nGrootte, taal:nTaal, tempo: nTempo || undefined, variant: variantMee() });
     if (d.gestart){ openPotje(d.id); } else { meld('Je staat in de rij ('+d.plek+' van '+d.nodig+'). Zodra het vol is, start het potje.'); toon('vLobby'); laadLobby(); }
   }catch(e){ $('#nFout').textContent = e.message; }
 });
@@ -788,11 +846,16 @@ function tekenPotje(){
   $('#sNaspeelBlok').hidden = !kanNaspelen;
   if (!kanNaspelen) npStap = null;
   if (p.status !== 'klaar') { $('#sNabespreking').hidden = true; $('#sNabespreking').textContent = ''; }
+  /* Magnaat heeft TWEE vormen en dus twee schermen. Welke het is lezen we uit
+     de STAAT en niet uit de variant: de staat is wat de server werkelijk heeft
+     opgezet, en dat is de enige bron die niet uiteen kan lopen. */
+  const ecoNu = p.soort === 'magnaat' && p.staat && Array.isArray(p.staat.vestigingen);
   const SECTIES = { mejn:'#sMejn', schaak:'#sSchaak', woord:'#sWoord', pesten:'#sPesten', dam:'#sDam', rummi:'#sRummi', magnaat:'#sMagnaat', seconden:'#sSeconden', waarheid:'#sWaarheid', proost:'#sProost' };
-  Object.entries(SECTIES).forEach(([s,sel]) => { $(sel).hidden = p.soort !== s || p.status === 'wacht'; });
+  Object.entries(SECTIES).forEach(([s,sel]) => { $(sel).hidden = p.soort !== s || p.status === 'wacht' || (s === 'magnaat' && ecoNu); });
+  $('#sMagnaatEco').hidden = !ecoNu || p.status === 'wacht';
   if (p.status==='wacht') return;
   const TEKEN = { mejn:tekenMejn, schaak:tekenSchaak, pesten:tekenPesten, woord:tekenWoord, dam:tekenDam, rummi:tekenRummi, magnaat:tekenMagnaat, seconden:tekenSeconden, waarheid:tekenWaarheid, proost:tekenProost };
-  (TEKEN[p.soort]||tekenWoord)();
+  (ecoNu ? tekenMagnaatEco : (TEKEN[p.soort]||tekenWoord))();
 }
 $('#sToewijzen').addEventListener('click', async ()=>{
   if (!huidig || !confirm('De tijd van je tegenstander is om. Deze partij aan jou toewijzen?')) return;
@@ -1334,6 +1397,98 @@ function mgCoord(veld){
   if (veld<=30) return [veld-20,0];
   return [10,veld-30];
 }
+/* ---------- Magnaat als economie ----------
+   Een stad in plaats van een bord. Deze pagina rekent NIETS uit: elke euro,
+   elke bezetting en elke waardering komt van de server. Wat hier staat is een
+   weergave plus knoppen, en dat is met opzet -- een tweede economie in de
+   client zou binnen een week iets anders zeggen dan de eerste.
+
+   De kaart (alle kavels) en de sectorlijst reizen eenmalig mee bij het openen
+   van het potje (`statisch()` in de descriptor) en niet bij elke poll: het zijn
+   honderden kavels die nooit veranderen. */
+let ecKavels = null, ecSectoren = null, ecKiesZone = null;
+const ecGeld = (n) => (n < 0 ? '-' : '') + '€' + Math.abs(Math.round(n)).toLocaleString('nl-NL');
+
+function tekenMagnaatEco(){
+  const p = huidig, st = p.staat;
+  if (st.kavels) ecKavels = st.kavels;
+  if (st.sectoren) ecSectoren = st.sectoren;
+
+  $('#ecKop').innerHTML = '<b>' + esc(st.stad) + '</b> · maand ' + st.maand + ' van ' + st.duur +
+    ' · <b>' + ecGeld(st.geld) + '</b>' + (st.klaar ? ' · <b>afgelopen</b>' : '');
+
+  /* SINDS JE WEG WAS. Dit is het verschil tussen twee gerekende standen en geen
+     samenvatting van een logboek; de server levert de regels. */
+  const sinds = st.sinds;
+  $('#ecSinds').innerHTML = !sinds || !sinds.regels.length ? '' :
+    '<div class="sec">Afgelopen maand</div>' + sinds.regels.map(r => r.id === 'rood'
+      ? '<div class="rij"><div class="nm">Rood staan<small>rente over je negatieve kas</small></div><b style="color:#C23A5E;">' + ecGeld(-r.rente) + '</b></div>'
+      : '<div class="rij"><div class="nm">' + esc(r.naam) + '<small>' + r.bezetting + '% bezet · omzet ' + ecGeld(r.omzet) +
+        (r.gemist ? ' · ' + r.gemist + ' misgelopen' : '') + '</small></div>' +
+        '<b style="color:' + (r.resultaat >= 0 ? '#5FA56A' : '#C23A5E') + ';">' + ecGeld(r.resultaat) + '</b></div>').join('') +
+    (sinds.projecten && sinds.projecten.length
+      ? sinds.projecten.map(pr => '<div class="leeg">De RTFoundation opende: ' + esc(pr.naam) + '. ' + esc(pr.tekst) + '</div>').join('') : '');
+
+  /* JOUW ZAKEN, met de vrije knoppen eronder. Prijs, personeel, marketing en
+     onderhoud mogen altijd -- ook als een ander aan zet is. Dat is de hele
+     reden dat een lange partij niet stilstaat (GAMEHALL.md 12.3). */
+  $('#ecMijn').innerHTML = !st.vestigingen.length ? '<div class="leeg">Je hebt nog geen zaak. Open er hieronder een.</div>' :
+    '<div class="sec">Jouw zaken</div>' + st.vestigingen.map(v =>
+      '<div class="rij" style="flex-wrap:wrap;"><div class="nm">' + esc(v.naam) +
+      '<small>' + esc(v.kavelNaam) + ' · ' + v.omvang + ' · ' + v.personeel + ' medewerkers · staat ' +
+      Math.round(v.onderhoud) + ' · naam ' + Math.round(v.reputatie) + ' · waarde ' + ecGeld(v.waarde) + '</small></div>' +
+      '<div class="keuzerij" style="width:100%;">' +
+      ['laag','midden','hoog'].map(x => '<button type="button" class="chip' + (v.prijs===x?' aan':'') +
+        '" data-ec="prijs" data-id="' + esc(v.id) + '" data-w="' + x + '">' + x + '</button>').join('') +
+      '<button type="button" class="chip" data-ec="personeel" data-id="' + esc(v.id) + '" data-w="' + (v.personeel+1) + '">+ medewerker</button>' +
+      '<button type="button" class="chip" data-ec="personeel" data-id="' + esc(v.id) + '" data-w="' + Math.max(0,v.personeel-1) + '">- medewerker</button>' +
+      '<button type="button" class="chip" data-ec="marketing" data-id="' + esc(v.id) + '" data-w="' + (v.marketing ? 0 : 5000) + '">' +
+        (v.marketing ? 'marketing uit' : 'marketing aan') + '</button>' +
+      '<button type="button" class="chip" data-ec="onderhoud" data-id="' + esc(v.id) + '" data-w="' + (v.onderhoudBudget ? 0 : Math.round(v.omvang*20)) + '">' +
+        (v.onderhoudBudget ? 'onderhoud uit' : 'onderhoud aan') + '</button>' +
+      '</div></div>').join('');
+  $('#ecMijn').querySelectorAll('[data-ec]').forEach(b => b.addEventListener('click', async () => {
+    const zet = { actie:'beleid', id: b.dataset.id };
+    zet[b.dataset.ec] = b.dataset.ec === 'prijs' ? b.dataset.w : Number(b.dataset.w);
+    try{ await speelZet(zet); }catch(e){ meld(e.message); }
+  }));
+
+  // een zaak openen: eerst een buurt, dan een vrij kavel, dan een sector
+  const open = $('#ecOpen');
+  if (st.klaar || !ecKavels){ open.innerHTML = ''; }
+  else {
+    const zones = [...new Set(ecKavels.map(k => k.zone))];
+    if (!ecKiesZone || !zones.includes(ecKiesZone)) ecKiesZone = zones[0];
+    const bezet = new Set(st.vestigingen.map(v => v.kavel));
+    const vrij = ecKavels.filter(k => k.zone === ecKiesZone && !bezet.has(k.id)).slice(0, 12);
+    open.innerHTML = '<div class="keuzerij">' + zones.map(z =>
+        '<button type="button" class="chip' + (z===ecKiesZone?' aan':'') + '" data-zone="' + esc(z) + '">' + esc(z) + '</button>').join('') + '</div>' +
+      '<div class="leeg">' + st.vrij + ' vrije plekken in ' + esc(st.stad) + '. Kies een plek en een soort zaak.</div>' +
+      vrij.map(k => '<div class="rij"><div class="nm">' + esc(k.naam) +
+        '<small>passanten ' + k.eigenschappen.passanten + ' · toerisme ' + k.eigenschappen.toerisme +
+        ' · zakelijk ' + k.eigenschappen.zakelijk + ' · huur ' + k.eigenschappen.huur + '</small></div>' +
+        '<div class="keuzerij">' + (ecSectoren||[]).map(sec =>
+          '<button type="button" class="chip mini" data-open="' + esc(k.id) + '" data-sec="' + esc(sec) + '">' + esc(sec) + '</button>').join('') +
+        '</div></div>').join('');
+    open.querySelectorAll('[data-zone]').forEach(b => b.addEventListener('click', () => { ecKiesZone = b.dataset.zone; tekenMagnaatEco(); }));
+    open.querySelectorAll('[data-open]').forEach(b => b.addEventListener('click', async () => {
+      const omvang = Number(prompt('Hoe groot begin je? (aantal eenheden)', '20'));
+      if (!omvang) return;
+      try{ await speelZet({ actie:'open', kavel: b.dataset.open, sector: b.dataset.sec, omvang }); }catch(e){ meld(e.message); }
+    }));
+  }
+
+  const f = st.foundation;
+  $('#ecFonds').innerHTML = '<div class="sec">RTFoundation</div><div class="leeg">' +
+    'Lokale pot ' + ecGeld(f.lokaal) + ' · centraal ' + ecGeld(f.centraal) +
+    (f.gedaan.length ? '<br>Gebouwd: ' + f.gedaan.map(esc).join(', ') : '<br>Nog niets gebouwd.') + '</div>';
+
+  $('#ecEind').innerHTML = !st.eindstand ? '' : '<div class="sec">Eindstand</div>' +
+    st.eindstand.map((r,i) => '<div class="rij"><div class="nm">' + (i+1) + '. ' + esc(r.codenaam) +
+      '<small>' + r.vestigingen + ' zaken · ' + r.banen + ' banen · naam ' + r.reputatie +
+      ' · omzet ' + ecGeld(r.omzet) + '</small></div><b>' + ecGeld(r.vermogen) + '</b></div>').join('');
+}
+
 function tekenMagnaat(){
   const p = huidig, st = p.staat, cv = $('#mgBord'), c = cv.getContext('2d'), cel = cv.width/11;
   // het statische bord kwam eenmalig mee bij het openen; de polls zijn licht

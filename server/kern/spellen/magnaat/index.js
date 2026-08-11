@@ -61,7 +61,15 @@ module.exports = (ctx) => {
          dat op dat moment kunnen regelen. */
       'beheer-aan', 'beheer-uit', 'beheer-regels',
       'beurs-aanbieden', 'beurs-kopen', 'beurs-intrekken',
-      'overname-bod', 'overname-antwoord', 'overname-intrekken'],
+      'overname-bod', 'overname-antwoord', 'overname-intrekken',
+      /* LOONDIENST (VERHAAL.md stap 1) staat er om dezelfde reden als de
+         contracten: een sollicitatie die op je beurt moet wachten duurt in een
+         partij van zes een week, en solliciteren doe je omdat je een vacature
+         ZIET en niet omdat je aan de beurt bent. `werk-beleid` hoort erbij
+         omdat `beleid` er ook in staat -- het is diezelfde handeling, door
+         iemand met een rol in plaats van door de eigenaar. */
+      'functie-openen', 'functie-intrekken', 'solliciteren', 'aannemen',
+      'dienst-opzeggen', 'werk-beleid'],
     init, zet,
     varianten: {
       vorm: { keuze: ['bord', 'economie'], standaard: 'bord' },

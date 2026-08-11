@@ -113,6 +113,22 @@ function totaal(w) {
 /* ---------- de scenario's ----------
    Elk scenario krijgt een verse wereld en mag erin doen wat het wil. De
    `rust`-variant doet niets; het verschil tussen die twee IS de meting. */
+/* Iemand in dienst nemen, in EEN handeling: de weg ernaartoe is niet wat deze
+   meter meet. `hoe` is 'max' om het hoogste loon te vragen dat de band toestaat
+   -- een pomp die op een bescheiden bedrag draait, meet niets. */
+function inDienst(w, werkgever, vestigingId, werknemer, rol, hoe) {
+  const D = require('../server/kern/spellen/magnaat/dienst');
+  const { SECTOREN } = require('../server/kern/spellen/magnaat/sectoren');
+  const v = (w.st.vestigingen[werkgever] || []).find(x => x.id === vestigingId);
+  if (!v) return false;
+  const band = D.loonband(SECTOREN[v.sector].loon, rol);
+  const loon = hoe === 'max' ? band.max : band.basis;
+  const f = w.m.spel.zet(w.potje, werkgever, { actie: 'functie-openen', vestiging: vestigingId, rol, loon });
+  if (!f.ok) return false;
+  if (!w.m.spel.zet(w.potje, werknemer, { actie: 'solliciteren', id: f.id, loon }).ok) return false;
+  return !!w.m.spel.zet(w.potje, werkgever, { actie: 'aannemen', id: f.id, speler: werknemer }).ok;
+}
+
 const SCENARIOS = {
   rust: { naam: 'niets bijzonders doen (de nulmeting)', doe() {} },
 
@@ -126,6 +142,33 @@ const SCENARIOS = {
       teken(w, 'b', w.B.id, w.A.id, 'vervoer', { eenheden: 200, bedrag: 2000000 });
       teken(w, 'a', w.A.id, w.C.id, 'goederen', { eenheden: 500, bedrag: 2000000 });
       teken(w, 'c', w.C.id, w.A.id, 'vervoer', { eenheden: 200, bedrag: 2000000 });
+    }
+  },
+
+  /* LOONDIENST: b werkt voor a. Een salaris is een pure OVERDRACHT -- anders dan
+     rente, premie en het beheertarief, die de wereld verlaten. Elke afwijking
+     is dus fout, omhoog en omlaag: omhoog zou betekenen dat een salaris ergens
+     als bedrijvigheid meetelt, omlaag dat het stiekem ook nog als kostenpost
+     verdwijnt. Zie server/kern/spellen/magnaat/dienst.js. */
+  loondienst: {
+    verwacht: 'neutraal', naam: 'een speler in dienst nemen bij een andere speler',
+    doe(w) { inDienst(w, 'a', w.A.id, 'b', 'bedrijfsleider'); }
+  },
+
+  /* DE CARROUSEL, en dit is de route die deze laag echt moet overleven. Drie
+     spelers nemen elkaar in dienst tegen het HOOGSTE loon dat de band toestaat:
+     a huurt b, b huurt c, c huurt a. Het geld draait rond en er is niemand die
+     er per saldo iets aan overhoudt.
+
+     Zou een salaris ergens meetellen als omzet, als bedrijvigheid of als
+     waardering, dan groeit de wereld bij elke ronde -- precies de fout die deze
+     meter bij de contracten vond, waar 193 miljoen op een tafel van 62 stond. */
+  salariscarrousel: {
+    verwacht: 'neutraal', naam: 'elkaar in een kring in dienst nemen tegen het hoogste loon',
+    doe(w) {
+      inDienst(w, 'a', w.A.id, 'b', 'bedrijfsleider', 'max');
+      inDienst(w, 'b', w.B.id, 'c', 'bedrijfsleider', 'max');
+      inDienst(w, 'c', w.C.id, 'a', 'bedrijfsleider', 'max');
     }
   },
 

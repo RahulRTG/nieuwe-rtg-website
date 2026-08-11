@@ -34,12 +34,15 @@ const C = require('./cyclus');
    stad langzaam, een bericht raakt EEN zone of EEN sector kort en scherp. Zie
    ./nieuws.js. */
 const N = require('./nieuws');
+const DIENST = require('./dienst');
+const maakPerZaak = require('./maand-vestiging');
 const F = require('./foundation');
 const H = require('./handel');
 
 const rond = (n) => Math.round(n);
 
 module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering, rnd, beheer }) => {
+  const perZaak = maakPerZaak({ verdeel, rekenMaand, F, N });
   const { wikkelAf } = require('./maand-contracten')({ rond });
   const afsluiten = require('./maand-afsluiten')({ wikkelAf });
   const { lasten } = require('./maand-lasten')({ ROOD_RENTE, bank, verzekering, rnd, beheer });
@@ -103,48 +106,14 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering
     let rentelast = 0, premielast = 0, schadelast = 0, onderzoeklast = 0, onderzoekUitPot = 0, beheerlast = 0, concernlast = 0;
     for (const [h, rij] of Object.entries(st.vestigingen)) {
       const regels = [];
-      for (const v of rij) {
-        const kavel = k.kavel.get(v.kavel);
-        /* De Foundation-projecten verschuiven de eigenschappen van het kavel.
-           Dat gebeurt HIER en niet in de kaart zelf: de kaart is gedeeld tussen
-           partijen, en een project in de ene partij hoort de andere niet te
-           raken. */
-        const effect = F.effectOp(st.foundation, kavel);
-        const opgeschoven = Object.assign({}, kavel, {
-          eigenschappen: Object.fromEntries(Object.entries(kavel.eigenschappen)
-            .map(([veld, w]) => [veld, w + (effect[veld] || 0)]))
-        });
-        const kOp = Object.assign({}, k, { kavel: new Map(k.kavel).set(kavel.id, opgeschoven) });
-        const r = rekenMaand(kOp, v, { maand: st.maand, zoneDruk: druk[kavel.zone + ':' + v.sector] || 1,
-          /* DE WERELDFACTOR IS DE GOLF MAAL DE BUIEN. Ze staan hier bij elkaar
-             en niet apart in ./stap.js, want voor een vestiging is er maar EEN
-             vraag; welk deel daarvan uit de conjunctuur komt en welk deel uit
-             een festival om de hoek, is een vraag voor de krant en niet voor de
-             boekhouding. */
-          wereldFactor: conjunctuur * N.factorVoor(potje.id, st.maand, zones,
-            { zone: kavel.zone, sector: v.sector }),
-          arbeid, contract: toezegging[v.id], gedekt: ontvangst[v.id] });
-        const regel = Object.assign({ id: v.id, naam: v.naam, sector: v.sector, kavel: kavel.naam }, r);
-        regels.push(regel);
-        /* HET RESULTAAT WORDT VERDEELD als er aandeelhouders zijn (./aandeel.js).
-           De eigenaar houdt wat er niet vergeven is, de rest gaat rechtstreeks
-           naar de houders -- winst en verlies allebei. Staat er niets uit, dan
-           gaat het hele bedrag naar de eigenaar en verandert er niets. */
-        const verdeeld = verdeel(st, v.id, r.resultaat);
-        st.geld[h] += verdeeld.eigenaar;
-        /* OP DE GEPUSHTE REGEL en niet op `r`: de regel is een KOPIE die hierboven
-           is gemaakt, dus een veld dat er daarna op `r` bij komt haalt het
-           maandoverzicht nooit. Dat is precies zo misgegaan, en het viel op
-           omdat de uitkering wel klopte en het overzicht hem niet toonde. */
-        if (verdeeld.uit.length) regel.aandeelhouders = verdeeld.uit;
-        /* De omzet van de STAD telt alleen eindverkoop. Een levering tussen twee
-           spelers is geen nieuwe bedrijvigheid maar dezelfde euro die twee keer
-           langskomt; hem meetellen zou de Foundation-pot laten groeien van
-           spelers die geld heen en weer schuiven. */
-        wereldOmzet += r.omzet - ((r.levering && r.levering.omzet) || 0);
-        kwaliteitVan[v.id] = r.kwaliteit;
-        v.laatsteBezetting = r.bezetting;
-      }
+      /* DE MAAND VAN ELKE ZAAK staat in ./maand-vestiging.js. Dit bestand rekent
+         de maand van de WERELD -- de concurrentiedruk, de conjunctuur, de krant,
+         wat de contracten vastleggen -- en die twee horen niet in een bestand:
+         de wereldkant ligt vast sinds fase A, de zaakkant groeit met elke laag
+         mee (fase B zette er de levering in, de kwaliteitsmeting en de
+         verdeling onder aandeelhouders). */
+      wereldOmzet += perZaak(potje, h, rij, regels, { k, druk, zones, conjunctuur,
+        arbeid, toezegging, ontvangst, kwaliteitVan });
       /* WAT ER NA DE ZAKEN NOG VAN DE KAS AFGAAT staat in ./maand-lasten.js:
          rood staan, de leningen, de polissen en het onderzoek. Vier posten die
          niet aan een pand hangen maar aan de speler, en die alle vier geld de
@@ -164,6 +133,13 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering
       onderzoekUitPot += uit.onderzoekUitPot;
       beheerlast += uit.beheer;
       concernlast += uit.concern;
+      /* DE SALARISSEN, en ze staan bij de VESTIGINGEN en niet bij de lasten in
+         ./maand-lasten.js. Zie de uitleg bij `maandregels` in ./dienst.js: dat
+         bestand gaat over geld dat de WERELD verlaat, en een salaris doet
+         precies het omgekeerde. */
+      for (const r of DIENST.maandregels(st, h, (van, naar, bedrag) => {
+        st.geld[van] -= bedrag; st.geld[naar] += bedrag;
+      })) regels.push(r);
       perSpeler[h] = regels;
       // het maandresultaat in het korte geheugen, voor de winststabiliteit
       if (onthoud) onthoud(st, h, regels.reduce((n, r) => n + (r.resultaat || 0), 0));
@@ -171,6 +147,7 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering
     /* WAT ER NA DE BEDRIJVEN GEBEURT staat in ./maand-afsluiten.js: de contracten
        afwikkelen, de Foundation laten afdragen en bouwen, en het verslag
        opmaken. Drie dingen die pas kunnen zodra iedereen gedraaid heeft. */
+    DIENST.verlopen(st);
     const verslag = afsluiten(potje, st, k, { perSpeler, actief, leverDeel, kwaliteitVan, druk,
       wereldOmzet, rentelast, premielast, schadelast, onderzoeklast, onderzoekUitPot, beheerlast,
       concernlast });

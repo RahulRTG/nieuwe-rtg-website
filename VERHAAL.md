@@ -306,7 +306,7 @@ niet vrij.
 | # | Stap | Wat het oplevert | Grens die erbij hoort |
 |---|---|---|---|
 | 0 | **De grens als code** | 18+, codenaam, spelvak — op één plek, zoals `grens.js` dat voor progressie doet | alle vier |
-| 1 | **Loondienst binnen één potje** | je kunt bij een andere speler werken, met een rol en een salaris uit zíjn kas. Niets blijft bewaard | geen permanentie, dus nog geen 18+-vraag |
+| 1 | **Loondienst binnen één potje** ✅ | je kunt bij een andere speler werken, met een rol en een salaris uit zíjn kas. Niets blijft bewaard | geen permanentie, dus nog geen 18+-vraag |
 | 2 | **Het werkverleden dat het potje overleeft** | de melding *"hij werkte 3 jaar 2 maanden voor jou"*, en de vier keuzes van hoofdstuk 3 | hier begint 18+ |
 | 3 | **Het wereldvak onder de echte schermen** | spelers gebruiken het échte personeels-, rooster- en dossierscherm op spelgegevens | grens 2, structureel |
 | 4 | **De momenten** | wat onthouden wordt, en alleen als er een tweede persoon bij was | grens 4 |
@@ -333,3 +333,54 @@ dan is stap 2 tot en met 5 een dure vergissing en zijn we er goedkoop achter.
 - **Geen levenssimulatie.** Bruiloften, kinderen en vakanties uit de
   hoofdstukken 6 tot 8 zijn `LEVEN.md`-gebied, niet dat van een tycoonspel. Waar
   ze elkaar raken, orkestreert Magnaat het Life OS en bouwt het niets na.
+
+---
+
+## 8. Stap 1 staat: loondienst
+
+`server/kern/spellen/magnaat/dienst.js` + `dienst-acties.js` + `dienst-beeld.js`.
+Drie rollen die oplopen zoals hoofdstuk 1 en 2 (hulpkracht, vakkracht,
+bedrijfsleider), zes vrije handelingen (functie openen, intrekken, solliciteren,
+aannemen, opzeggen, en `werk-beleid`), en aan beide kanten een scherm.
+
+**Hij staat naast de AI-manager, en dat is de hele pointe.** Je zaken kunnen
+draaien door een AI of door een mens, en het zijn twee echte antwoorden op
+dezelfde vraag:
+
+| | de AI-manager | een mens |
+|---|---|---|
+| beschikbaar | meteen | je moet hem vinden, en hij beslist zelf |
+| wat hij doet | wat er in zijn regels staat | wat een mens doet |
+| kan opzeggen | nee | ja, altijd, van beide kanten |
+| **zijn geld** | **verlaat de wereld** | **gaat naar een andere speler** |
+
+Die laatste regel is de economische les die deze laag draagt, en hij is gemeten
+in plaats van beweerd. De geldpompkeuring kreeg er twee routes bij:
+`loondienst` (b werkt voor a) en `salariscarrousel` (a huurt b, b huurt c, c
+huurt a, alle drie tegen het hoogste loon dat de band toestaat). **Beide komen
+uit op een verschil van exact nul** — een salaris schept niets en vernietigt
+niets. Ter vergelijking: dezelfde meting op `beheerlaten`, waar het tarief de
+wereld verlaat, staat op €337.938.
+
+**Vier dingen die met opzet zo zijn:**
+
+- **Een werknemer heeft geen eigen ingang.** `werk-beleid` controleert de rol en
+  roept dan de gewone `beleid`-actie aan namens de eigenaar. Zou hij zelf het
+  veld zetten, dan bestaat er een tweede weg naar dezelfde verandering — de wet
+  van de AI-manager, hier op een mens.
+- **Een loon ligt in een band** (0,5x tot 2,5x het rolloon). Daarbuiten is het
+  geen loon maar een overdracht met een andere naam, en dat is precies waar de
+  geldpompkeuring bij de contracten €193 miljoen op een tafel van €62 miljoen
+  vond.
+- **Een vacature is publiek, de sollicitatiestapel niet.** VERHAAL.md wil
+  uitdrukkelijk ook *vreemden die bij je komen*, dus een baan die je alleen ziet
+  als je iemand kent is de verkeerde wereld. Wie er reageerden staat in de boeken
+  van de werkgever, net als zijn kas.
+- **Solliciteren kost niets.** Een toets zet de kas van de kandidaat op nul en
+  neemt hem aan. Zou er ergens een drempel staan, dan is *je begint als afwasser
+  met €412* een verkoopgesprek.
+
+Toets: `test/speldienst.test.js` (zestien). **Tien mutaties, tien raak.** Twee
+splitsingen op de 10 kB-grens, allebei op een naad die het nieuwe materiaal
+blootlegde: `dienst-beeld.js` (wat een speler ziet, tegenover wat hij doet) en
+`maand-vestiging.js` (de maand van een ZAAK, tegenover die van de wereld).

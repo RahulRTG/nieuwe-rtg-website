@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 923 bestanden en 6099 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 924 bestanden en 6115 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 923 |
-| losse beweringen (`test(...)`) | 6099 |
+| toetsbestanden | 924 |
+| losse beweringen (`test(...)`) | 6115 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 614 |
 | **overleefd**: geen mutatie kreeg hem rood | 13 |
 | niet te meten (al rood, geen module gevonden, ...) | 18 |
 | alleen in de kop *genoemd*, nog niet gemeten | 86 |
-| niets van beide | 192 |
+| niets van beide | 193 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-804 bestanden, 5896 beweringen.
+805 bestanden, 5912 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -656,6 +656,7 @@ toets omvalt.
 | `spelconcurrent.test.js` | 14 | -- | MAGNAAT: DE AI-CONCURRENT -- een tegenspeler die bijstuurt. ZEVEN BEWERINGEN, en ze zijn alle zeven stil terug te draaien: 1. |
 | `spelcyclus.test.js` | 13 | genoemd | MAGNAAT: DE ECONOMISCHE CYCLUS -- de wind die over de hele stad waait. ZEVEN BEWERINGEN, en ze zijn alle zeven stil terug te draaien: 1. |
 | `speldag.test.js` | 22 | -- | DE DAGOPGAVE: een opgave per dag, dezelfde voor iedereen, met een bord dat 's nachts leeg is. Deze toets staat op twee hoogten, en dat is met opzet: 1. |
+| `speldienst.test.js` | 16 | -- | MAGNAAT: LOONDIENST -- een speler die voor een andere speler werkt. Stap 1 uit VERHAAL.md, en met opzet zonder permanentie: alles hieronder leeft in het potje. |
 | `spelhandel.test.js` | 28 | genoemd | MAGNAAT FASE B: CONTRACTEN -- spelers die elkaar werkelijk raken. Fase A eindigde met een meting die niet opgelost was: `scripts/magnaat- strateeg.js` liet zien dat wie zich op een sector stort wint van wie spreidt,... |
 | `spelkijken.test.js` | 15 | gezakt op `return-weg#0` | Meekijken bij een lopend potje. Twee poorten die verschillend werk doen: MAG DIT SPEL bekeken worden (per spel in de descriptor, standaard NIET), en MAG JIJ dit potje bekijken (vriend van een speler, of mededeelnemer... |
 | `spelklok.test.js` | 16 | -- | De klok per beurt: tempo, verlopen, toewijzen en de vervaltermijn. Wat hier bewaakt wordt is niet "telt hij goed af" maar de vier BESLUITEN uit de kop van server/kern/spellen/klok.js: 1. |

@@ -116,6 +116,12 @@ module.exports = (ctx) => {
   const ACTIES = Object.assign({}, basis.ACTIES, L.ACTIES);
   const VRIJE_ACTIES = basis.VRIJE_ACTIES.concat(L.VRIJE_ACTIES);
   const beheer = L.maakBeheer(ACTIES);
+  /* LOONDIENST (VERHAAL.md stap 1) staat naast de manager en krijgt om dezelfde
+     reden de complete tabel: een werknemer verandert niets rechtstreeks maar
+     roept de gewone `beleid`-actie aan namens zijn werkgever. */
+  const dienen = L.maakDienst(ACTIES);
+  Object.assign(ACTIES, dienen.ACTIES);
+  VRIJE_ACTIES.push(...dienen.VRIJE_ACTIES);
   /* DE AI-CONCURRENTEN krijgen dezelfde tabel om dezelfde reden als de manager:
      ze doen niets wat een speler niet ook kan. Ze staan HIER en niet in
      ./lagen.js omdat ze de complete tabel nodig hebben, en die is pas hier
@@ -132,6 +138,7 @@ module.exports = (ctx) => {
      er afgerekend) dat los staat van de klok hierboven. */
   const { zicht, zichtRuw, publiek, eindstand } = require('./weergave')(Object.assign({
     K, codenaamVan, rond, bijrekenen,
+    dienstbeeld: (st, h) => dienen.beeld(st, h, codenaamVan),
     foundationArbeid: (st) => F.arbeidBonus(st.foundation) }, L.zichtdelen));
   function beeindig(potje) {
     const st = potje.staat;

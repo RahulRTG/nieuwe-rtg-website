@@ -16,7 +16,7 @@ const { PROJECTEN } = require('./foundation');
 module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid, capaciteit,
   personeelNodig, waarde, prijsVan, eigenDeel, inkoopbeeld, vergeven, mijnContracten,
   veilingbeeld, belangbeeld, bankbeeld, kredietprofiel, verzekerbeeld, rndbeeld,
-  beheerbeeld, beursbeeld, overnamebeeld, C, N, CONCERN, eindstand }) => {
+  beheerbeeld, beursbeeld, overnamebeeld, dienstbeeld, C, N, CONCERN, eindstand }) => {
   return function zicht(potje, st, mij) {
     bijrekenen(potje);
     const k = K(st);
@@ -78,6 +78,9 @@ module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid, capacite
       onderzoek: rndbeeld(st, mij),
       // je manager: zijn regels, wat hij kost, en het log met de reden per besluit
       beheer: beheerbeeld(st, mij),
+      /* LOONDIENST (VERHAAL.md stap 1): wat er te krijgen is, wat je zelf hebt,
+         en wie er voor je werkt. Zie ./dienst-acties.js. */
+      werk: dienstbeeld ? dienstbeeld(st, mij) : null,
       // de beurs is PUBLIEK: dat is het hele punt van een markt
       beurs: beursbeeld(st, mij),
       // de biedingen die JOU aangaan; wie waarop biedt is van die twee

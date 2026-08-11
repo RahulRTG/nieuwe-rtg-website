@@ -65,6 +65,11 @@ module.exports = ({ K, mijnVestiging, vrijKavel, wieHeeft, waarde, rond, codenaa
      (aan, uit, regels) kunnen wel meteen -- die lezen alleen de staat. */
   const beheren = require('./beheer-acties')();
   const maakBeheer = (ACTIES) => require('./beheer')({ ACTIES });
+  /* LOONDIENST krijgt de complete tabel om exact dezelfde reden als de manager
+     en de AI-concurrent: `werk-beleid` roept de gewone `beleid`-actie aan in
+     plaats van zelf aan een vestiging te zitten, en die zit niet in deze lijst.
+     Zie ../economie.js, waar de tabel wel compleet is. */
+  const maakDienst = (ACTIES) => require('./dienst-acties')({ K, mijnVestiging, wieHeeft, ACTIES, rond });
 
   return {
     ACTIES: Object.assign(alleActies, beheren.ACTIES),
@@ -72,7 +77,7 @@ module.exports = ({ K, mijnVestiging, vrijKavel, wieHeeft, waarde, rond, codenaa
       bank.VRIJE_ACTIES, verzekering.VRIJE_ACTIES, rnd.VRIJE_ACTIES, beheren.VRIJE_ACTIES,
       handelen.VRIJE_ACTIES, overnemen.VRIJE_ACTIES),
     hameren: veiling.hameren, verdeel: aandeel.verdeel, beurs, bankmaand, onthoud: bp.onthoud,
-    verzekering, rnd, maakBeheer, liquideer,
+    verzekering, rnd, maakBeheer, maakDienst, liquideer,
     zichtdelen: {
       veilingbeeld: (st, h) => veiling.beeld(st, h, codenaamVan),
       belangbeeld: (st, h) => aandeel.beeld(st, h, codenaamVan),

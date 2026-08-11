@@ -68,7 +68,10 @@ function wereld() {
 }
 
 const maand = (w, n) => {
-  for (let i = 0; i < n; i++) { w.st.gerekendTot -= w.st.maandMs; w.m.eco.bijrekenen(w.potje); }
+  for (let i = 0; i < n; i++) {
+    w.st.gerekendTot -= w.st.maandMs;
+    for (const verslag of w.m.eco.bijrekenen(w.potje)) w.rente = (w.rente || 0) + (verslag.rentelast || 0);
+  }
 };
 
 /* Wat er aan tafel IS. Alles bij elkaar: de kassen, de bedrijven, en de
@@ -145,6 +148,35 @@ const SCENARIOS = {
     }
   },
 
+  /* LENEN EN NIETS DOEN. Het geld komt binnen, de rente loopt, en verder
+     gebeurt er niets. Het totaal HOORT te zakken -- precies met de rente die
+     betaald is en met niets anders. Dat is de scherpste toets die er op een
+     financieringslaag te doen valt: geen geld uit het niets bij het opnemen,
+     en geen geld dat zoekraakt bij het aflossen. */
+  lenenEnStilzitten: {
+    verwacht: 'lekkend', naam: 'lenen en het geld laten staan',
+    doe(w) {
+      for (const h of ['a', 'b', 'c'])
+        w.m.spel.zet(w.potje, h, { actie: 'krediet-opnemen', soort: 'investering',
+          bedrag: 300000, looptijd: 48 });
+    }
+  },
+
+  /* Lenen en meteen aflossen, in een lus. Als opnemen en aflossen niet exact
+     tegen elkaar wegvallen, is dit een machine -- en het is precies het soort
+     lus dat een speler binnen een uur vindt. */
+  leenCarrousel: {
+    verwacht: 'lekkend', naam: 'lenen en meteen weer aflossen, keer op keer',
+    doe(w) {
+      for (let i = 0; i < 5; i++) {
+        const r = w.m.spel.zet(w.potje, 'a', { actie: 'krediet-opnemen', soort: 'werkkapitaal',
+          bedrag: 200000, looptijd: 6 });
+        if (!r.ok) break;
+        w.m.spel.zet(w.potje, 'a', { actie: 'krediet-aflossen', id: r.id, bedrag: 200000 });
+      }
+    }
+  },
+
   /* Bouwen en meteen weer sluiten, in een lus. Sluiten levert de halve bouwsom
      op, dus dit HOORT geld te kosten -- maar als de waardering van een pand
      ergens boven de bouwsom uitkomt, is dit een machine. */
@@ -184,9 +216,15 @@ function meet(sleutel, maanden = 24) {
     SCENARIOS[naam].doe(w);
     maand(w, maanden);
     uit[naam === 'rust' ? 'rust' : 'pomp'] = totaal(w);
+    uit[(naam === 'rust' ? 'rust' : 'pomp') + 'Rente'] = w.rente || 0;
   }
-  const verschil = uit.pomp.samen - uit.rust.samen;
-  return { naam: SCENARIOS[sleutel].naam, rust: uit.rust, pomp: uit.pomp, verschil,
+  /* Bij een LEKKENDE laag wordt het verschil gecorrigeerd met wat er aan rente
+     de wereld verliet. Wat overblijft hoort nul te zijn: dan is er geen euro
+     bijgekomen en geen euro zoekgeraakt buiten het lek dat we kennen. */
+  const lek = (uit.pompRente || 0) - (uit.rustRente || 0);
+  const ruw = uit.pomp.samen - uit.rust.samen;
+  const verschil = SCENARIOS[sleutel].verwacht === 'lekkend' ? ruw + lek : ruw;
+  return { naam: SCENARIOS[sleutel].naam, rust: uit.rust, pomp: uit.pomp, ruw, lek, verschil,
     relatief: uit.rust.samen ? verschil / uit.rust.samen : 0 };
 }
 
@@ -205,7 +243,14 @@ const RUIS = 0.005;
      gebeurt er niets. Hier is ELKE afwijking fout, omhoog en omlaag: omhoog is
      waarde uit het niets, omlaag is geld dat onderweg verdwijnt.
      KOSTEND  -- een handeling die met opzet waarde vernietigt (een pand slopen,
-     grond kopen die je al kon gebruiken). Zakken mag; STIJGEN nooit. */
+     grond kopen die je al kon gebruiken). Zakken mag; STIJGEN nooit.
+     LEKKEND  -- een laag waar geld de WERELD verlaat en niet bij een speler
+     landt. Rente is daar de eerste van: die gaat naar een bank die geen speler
+     is en komt nooit terug. Zonder deze categorie keurt de meter financiering
+     af omdát hij werkt, en dan meet hij zijn eigen blinde vlek. Wat hier
+     getoetst wordt is dat het lek PRECIES de rentelast is -- geen euro meer en
+     geen euro minder, want dat zou betekenen dat er onderweg iets bij komt of
+     verdwijnt dat niemand heeft geboekt. */
 
 function keur() {
   const klachten = [];
@@ -214,12 +259,14 @@ function keur() {
     if (sleutel === 'rust') continue;
     const r = meet(sleutel);
     rijen.push(Object.assign({ sleutel }, r));
-    const neutraal = SCENARIOS[sleutel].verwacht !== 'kostend';
-    const fout = neutraal ? Math.abs(r.relatief) > RUIS : r.relatief > RUIS;
+    const soort = SCENARIOS[sleutel].verwacht || 'neutraal';
+    // een kostend scenario mag zakken; een neutraal en een lekkend scenario niet
+    const fout = soort === 'kostend' ? r.relatief > RUIS : Math.abs(r.relatief) > RUIS;
     if (fout)
       klachten.push(sleutel + ': ' + r.naam + ' verandert het totaal met ' +
         (r.relatief * 100).toFixed(2) + '% (' + Math.round(r.verschil) + ')' +
-        (neutraal ? '' : ' -- omlaag mag hier, omhoog niet'));
+        (soort === 'kostend' ? ' -- omlaag mag hier, omhoog niet'
+          : soort === 'lekkend' ? ' -- de rentelast is er al af gerekend' : ''));
   }
   return { rijen, klachten };
 }

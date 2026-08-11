@@ -31,7 +31,8 @@ const H = require('./handel');
 
 const rond = (n) => Math.round(n);
 
-module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel }) => {
+module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud }) => {
+  const { wikkelAf } = require('./maand-contracten')({ rond });
   function eenMaand(potje) {
     const st = potje.staat, k = K(st);
     const kwaliteitVan = {};
@@ -73,6 +74,10 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel }) => {
       const o = ontvangst[c.afnemerId] = ontvangst[c.afnemerId] || {};
       o[c.soort] = (o[c.soort] || 0) + geleverd;
     }
+    /* Wat er deze maand aan RENTE de wereld verlaat. Apart geteld omdat het de
+       enige post is die niet bij een andere speler landt; de geldpomp-meter
+       moet hem kunnen aftrekken. */
+    let rentelast = 0;
     for (const [h, rij] of Object.entries(st.vestigingen)) {
       const regels = [];
       for (const v of rij) {
@@ -109,45 +114,40 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel }) => {
         wereldOmzet += r.omzet - ((r.levering && r.levering.omzet) || 0);
         kwaliteitVan[v.id] = r.kwaliteit;
       }
-      /* ROOD STAAN KOST GELD. Zonder dit is overinvesteren gratis: je kas gaat
-         onder nul en er gebeurt niets. Echte financiering (leningen met een
-         looptijd en een risico-opslag) hoort bij fase B; dit is de rekening-
-         courant eronder, zodat de keuze om door te bouwen nu al een prijs
-         heeft. */
+      /* ROOD STAAN KOST GELD, en dit IS de rekening-courant uit ./bank.js: de
+         kredietlijn die er altijd is, het duurst en zonder aanvraag. Zonder dit
+         is overinvesteren gratis -- je kas gaat onder nul en er gebeurt niets.
+
+         Hij staat hier en niet bij de leningen omdat hij geen lening is die je
+         AANGAAT: hij ontstaat doordat je uitgeeft wat je niet hebt. */
       if (st.geld[h] < 0) {
         const rente = -st.geld[h] * ROOD_RENTE;
         st.geld[h] -= rente;
+        rentelast += rente;
         regels.push({ id: 'rood', naam: 'Rood staan', rente: rond(rente), resultaat: -rond(rente) });
       }
-      perSpeler[h] = regels;
-    }
-    /* ---------- de contracten afwikkelen ----------
-       NA de maand, want de kwaliteitseis gaat over de kwaliteit die er DEZE
-       maand geleverd is, en die volgt uit de maand. En na de rentepost, zodat
-       een boete niet stilletjes de rente van iemand anders verandert.
+      /* DE LENINGEN. Rente over het restant, dan de aflossing, dan de
+         convenanten -- in die volgorde, want een aflossing verlaagt het restant
+         en zou anders de rente van diezelfde maand drukken. Zie ./bank.js.
 
-       De leverancier is al betaald: zijn contractomzet zit in zijn maand (zie
-       ./stap.js). Hier gaat alleen de andere kant rond -- de afnemer betaalt,
-       en boetes lopen van leverancier naar afnemer. Zo staat elk bedrag een
-       keer op een rekening, en klopt de som over alle spelers. */
-    const contractRegels = {};
-    for (const c of actief) {
-      const r = H.afwikkelen(c, { geleverd: c.eenheden * (leverDeel[c.leverancierId] || 0),
-        kwaliteit: kwaliteitVan[c.leverancierId] === undefined ? 0 : kwaliteitVan[c.leverancierId] });
-      st.geld[c.afnemer] -= r.betaling;
-      c.betaald += r.betaling; c.ontvangen += r.betaling;
-      if (r.boete > 0) {
-        st.geld[c.leverancier] -= r.boete;
-        st.geld[c.afnemer] += r.boete;
-        c.boetes += r.boete;
-        c.maandenTekort++;
-      } else c.maandenGeleverd++;
-      const regel = { id: c.id, soort: c.soort, geleverd: rond(r.geleverd), toegezegd: c.eenheden,
-        bedrag: rond(r.betaling), boete: rond(r.boete), tekort: r.tekort, onderMaat: r.onderMaat };
-      for (const kant of ['leverancier', 'afnemer'])
-        (contractRegels[c[kant]] = contractRegels[c[kant]] || []).push(Object.assign({ rol: kant }, regel));
-      if (st.maand + 1 >= c.eindMaand) c.status = 'afgelopen';
+         RENTE VERLAAT DE WERELD. Dit is de eerste post in dit spel waar geld
+         niet naar een andere speler gaat maar echt weg is; scripts/magnaat-pomp.js
+         kent daar een eigen categorie voor, anders keurt die meter financiering
+         af omdat hij werkt. */
+      const bankregels = bank ? bank.maandVoorSpeler(st, h) : null;
+      if (bankregels && bankregels.regels.length) {
+        rentelast += bankregels.rente;
+        for (const r of bankregels.regels) regels.push(r);
+      }
+      perSpeler[h] = regels;
+      // het maandresultaat in het korte geheugen, voor de winststabiliteit
+      if (onthoud) onthoud(st, h, regels.reduce((n, r) => n + (r.resultaat || 0), 0));
     }
+    /* DE CONTRACTEN AFWIKKELEN staat in ./maand-contracten.js -- na de maand,
+       want de kwaliteitseis gaat over de kwaliteit die er DEZE maand geleverd
+       is, en die volgt uit de maand. */
+    const contractRegels = wikkelAf(st, actief, leverDeel, kwaliteitVan);
+
     /* De afdracht rust op de HELE stad en niet alleen op de spelers: anders
        bouwt de Foundation in een partij met twee mensen nooit iets. Zie de
        reden bij `stadsomzet` in de stadsdata. */
@@ -162,7 +162,8 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel }) => {
     }
     const projecten = F.bouw(st.foundation, k, perZone);
     st.maand++;
-    const verslag = { maand: st.maand, perSpeler, afdracht, projecten, wereldOmzet: rond(wereldOmzet), contractRegels };
+    const verslag = { maand: st.maand, perSpeler, afdracht, projecten,
+      wereldOmzet: rond(wereldOmzet), contractRegels, rentelast: rond(rentelast) };
     for (const h of potje.spelers) st.laatste[h] = { maand: st.maand, regels: perSpeler[h] || [],
       projecten, contracten: contractRegels[h] || [] };
     return verslag;

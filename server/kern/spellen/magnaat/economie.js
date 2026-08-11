@@ -55,30 +55,19 @@ module.exports = (ctx) => {
       maand: 0, begonnen: Date.now(), gerekendTot: Date.now(),
       geld: {}, vestigingen: {}, kavelBezet: {}, foundation: F.nieuw(),
       contracten: [], contractTeller: 0, veilingen: [], veilingTeller: 0, kavelRecht: {},
-      deelnemingen: [], deelnemingTeller: 0,
+      deelnemingen: [], deelnemingTeller: 0, leningen: [], leningTeller: 0,
+      resultaatlog: {}, betaalgemist: {},
       laatste: {}, klaar: false
     };
     for (const h of potje.spelers) { st.geld[h] = START_GELD; st.vestigingen[h] = []; st.laatste[h] = null; }
     potje.staat = st;
   }
 
-  const K = (st) => kaart(st.stad);
-  /* Een kavel is vrij als er niets op staat EN er geen bouwrecht op rust. Een
-     bouwrecht komt uit een gewonnen veiling (./veiling.js): wie een plek koopt,
-     koopt de tijd om te bedenken wat erop komt. `wie` is er zodat de houder van
-     het recht er zelf wel mag bouwen -- dezelfde vraag, twee antwoorden. */
-  const vrijKavel = (st, id, wie) => K(st).kavel.has(id) && !st.kavelBezet[id]
-    && (!(st.kavelRecht || {})[id] || st.kavelRecht[id] === wie);
-  const mijnVestiging = (st, h, id) => (st.vestigingen[h] || []).find(x => x.id === id);
-  /* Van wie is deze vestiging? Voor de contractlaag, die over de grens tussen
-     twee spelers heen kijkt en dus niet met `mijnVestiging` toekan. */
-  function wieHeeft(st, id) {
-    for (const [h, rij] of Object.entries(st.vestigingen)) {
-      const v = rij.find(x => x.id === id);
-      if (v) return { speler: h, v };
-    }
-    return null;
-  }
+  /* HOE JE IETS TERUGVINDT IN DE STAAT staat in ./vinden.js: welk kavel, welke
+     vestiging, van wie. Vier vragen die overal in deze map worden gesteld en
+     die met de lagen zijn meegegroeid -- ze horen bij elkaar en niet tussen de
+     klok. */
+  const { K, vrijKavel, mijnVestiging, wieHeeft } = require('./vinden')({ kaart });
 
   /* ---------- de klok ---------- */
   /* Hoeveel spelmaanden zijn er verstreken? Uit de KLOK van de server en niet
@@ -118,9 +107,19 @@ module.exports = (ctx) => {
      maandloop ze nodig heeft: het resultaat van een vestiging wordt verdeeld
      voordat het op een rekening komt. */
   const aandeel = require('./aandeel')({ wieHeeft, waarde });
+  /* DE BANK, in vier stukken op de naden die deze map overal aanhoudt: het
+     profiel (wat een speler waard is in de ogen van een geldschieter), de
+     acties, wat de KLOK met een lening doet, en hoe een vestiging het spel
+     verlaat als een onderpand wordt uitgewonnen. */
+  const bp = require('./bankprofiel')({ waarde });
+  const { liquideer } = require('./afscheid')({ mijnVestiging, afkoopsom: H.afkoopsom, rond });
+  const bank = require('./bank-acties')({ mijnVestiging, waarde, liquideer,
+    profiel: bp.profiel, cijfers: bp.cijfers });
+  const bankmaand = require('./bank-maand')({ mijne: bank.mijne, cijfers: bp.cijfers, liquideer });
   const belangen = require('./aandeel-acties')({ wieHeeft,
     uitgegeven: aandeel.uitgegeven, MAX_DEEL: aandeel.MAX_DEEL });
-  const { eenMaand } = require('./maand')({ K, wieHeeft, ROOD_RENTE, verdeel: aandeel.verdeel });
+  const { eenMaand } = require('./maand')({ K, wieHeeft, ROOD_RENTE,
+    verdeel: aandeel.verdeel, bank: bankmaand, onthoud: bp.onthoud });
 
   /* WAT EEN SPELER ZIET en wat er aan het eind op tafel komt staat in
      ./weergave.js -- een eigen onderwerp (wie mag wat weten, en waarop wordt
@@ -132,17 +131,14 @@ module.exports = (ctx) => {
     K, codenaamVan, rond, bijrekenen, foundationArbeid: (st) => F.arbeidBonus(st.foundation),
     veilingbeeld: (st, h) => veiling.beeld(st, h, codenaamVan),
     belangbeeld: (st, h) => aandeel.beeld(st, h, codenaamVan),
-    belangwaarde: aandeel.belangwaarde, eigenDeel: aandeel.eigenDeel });
+    belangwaarde: aandeel.belangwaarde, eigenDeel: aandeel.eigenDeel,
+    bankbeeld: (st, h) => bank.beeld(st, h), kredietprofiel: bp.beeld });
   function beeindig(potje) {
     const st = potje.staat;
     st.klaar = true;
     potje.status = 'klaar';
     const stand = eindstand(potje);
-    /* De winnaar is het hoogste VERMOGEN (geld plus wat je gebouwd hebt), en
-       niet het meeste geld op de rekening: wie alles in zijn zaken heeft zitten
-       hoort niet te verliezen van wie niets deed. De andere dimensies staan op
-       de eindstand en tellen niet mee voor de winst -- ze zijn er om te zien wat
-       voor ondernemer je was, en dat is iets anders dan een tweede ranglijst. */
+    // waarop er wordt afgerekend en waarom, staat bij de eindstand zelf (./weergave.js)
     if (stand.length > 1 && stand[0].vermogen === stand[1].vermogen) potje.gelijk = true;
     else potje.winnaar = stand[0].codenaam;
   }
@@ -158,8 +154,8 @@ module.exports = (ctx) => {
      Ze zijn alle drie VRIJ (zie GAMEHALL.md 12.3): onderhandelen mag altijd,
      en dat is de reden dat een partij van zes met 24 uur per beurt niet
      stilstaat. */
-  const ACTIES = Object.assign({}, basis.ACTIES, handel.ACTIES, veilen.ACTIES, belangen.ACTIES);
-  const VRIJE_ACTIES = basis.VRIJE_ACTIES.concat(handel.VRIJE_ACTIES, veilen.VRIJE_ACTIES, belangen.VRIJE_ACTIES);
+  const ACTIES = Object.assign({}, basis.ACTIES, handel.ACTIES, veilen.ACTIES, belangen.ACTIES, bank.ACTIES);
+  const VRIJE_ACTIES = basis.VRIJE_ACTIES.concat(handel.VRIJE_ACTIES, veilen.VRIJE_ACTIES, belangen.VRIJE_ACTIES, bank.VRIJE_ACTIES);
 
   function zet(potje, h, z) {
     const st = potje.staat;

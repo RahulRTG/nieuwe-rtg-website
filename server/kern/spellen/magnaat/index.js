@@ -52,7 +52,8 @@ module.exports = (ctx) => {
     buitenBeurt: ['bouw', 'verkoop', 'beleid',
       'contract-voorstel', 'contract-antwoord', 'contract-opzeggen',
       'veiling-start', 'veiling-bod', 'veiling-intrekken',
-      'belang-voorstel', 'belang-antwoord'],
+      'belang-voorstel', 'belang-antwoord',
+      'krediet-opnemen', 'krediet-aflossen', 'krediet-herzien'],
     init, zet,
     varianten: {
       vorm: { keuze: ['bord', 'economie'], standaard: 'bord' },

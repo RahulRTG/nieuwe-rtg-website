@@ -22,7 +22,7 @@ const H = require('./handel');
 const { PROJECTEN } = require('./foundation');
 
 module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid, veilingbeeld,
-  belangbeeld, belangwaarde, eigenDeel }) => {
+  belangbeeld, belangwaarde, eigenDeel, bankbeeld, kredietprofiel }) => {
   /* Van wie is deze vestiging? De contractlaag kijkt over de grens tussen
      twee spelers heen en kan dus niet met `mijnVestiging` toe. */
   const vanIemand = (st, id) => {
@@ -91,13 +91,21 @@ module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid, veilingb
          de optelsom van de partij niet meer. */
       const ondernemingswaarde = rij.reduce((n, v) => n + waarde(v) * eigenDeel(st, v.id), 0)
         + belangwaarde(st, h);
+      /* SCHULD GAAT ERAF, en dat is geen boekhoudkundige nettigheid maar een
+         gat dat de geldpomp-keuring vond. Zonder deze regel telt geleend geld
+         als vermogen: drie spelers die samen negen ton opnemen zetten negen ton
+         op de eindstand, en op de laatste speeldag lenen is dan de goedkoopste
+         manier om te winnen. Wat je van de bank hebt, is niet van jou. */
+      const schuld = (st.leningen || [])
+        .filter(l => l.speler === h && l.status === 'loopt')
+        .reduce((n, l) => n + l.restant, 0);
       const banen = rij.reduce((n, v) => n + v.personeel, 0);
       const reputatie = rij.length ? Math.round(rij.reduce((n, v) => n + v.reputatie, 0) / rij.length) : 0;
       const omzet = rij.reduce((n, v) => n + (v.omzetTotaal || 0), 0);
       return {
         codenaam: codenaamVan(h),
-        geld: rond(st.geld[h]), waarde: rond(ondernemingswaarde),
-        vermogen: rond(st.geld[h] + ondernemingswaarde),
+        geld: rond(st.geld[h]), waarde: rond(ondernemingswaarde), schuld: rond(schuld),
+        vermogen: rond(st.geld[h] + ondernemingswaarde - schuld),
         vestigingen: rij.length, banen, reputatie, omzet: rond(omzet)
       };
     }).sort((a, b) => b.vermogen - a.vermogen);
@@ -139,6 +147,11 @@ module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid, veilingb
       })),
       contracten: mijnContracten(st, mij),
       belangen: belangbeeld(st, mij),
+      /* De bank ziet je boeken; een medespeler niet. Schuld is de scherpste
+         vorm van andermans boeken -- wie weet dat je krap zit, weet wanneer
+         hij moet toeslaan. */
+      financiering: bankbeeld(st, mij),
+      krediet: kredietprofiel(st, mij),
       veilingen: veilingbeeld(st, mij),
       vrij: k.kavels.filter(x => !st.kavelBezet[x.id] && !(st.kavelRecht || {})[x.id]).length,
       // waar JIJ mag bouwen zonder te hoeven veilen: een gewonnen kavel

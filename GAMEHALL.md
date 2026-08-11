@@ -961,10 +961,73 @@ elke keer.
 
 ---
 
-**Wat er van fase B nog niet in zit.** Banken en financiering met rente,
-zekerheden, looptijd en convenanten; verzekeringen met risicoprofielen; en R&D.
-De rekening-courant onder een negatieve kas (`ROOD_RENTE`) is er wel — dat is de
-prijs van doorbouwen, niet een financieringslaag.
+### Banken en financiering — de eerste laag waar geld de wereld verlaat
+
+Alles daarvoor **verplaatste**: een contract betaalt de een en verrijkt de
+ander, een veiling verschuift een zaak, een deelneming splitst een resultaat.
+Rente doet dat niet — die gaat naar een bank die geen speler is en komt nooit
+terug. Dat maakt deze laag gevaarlijker om te bouwen, en het is de reden dat de
+geldpomp-meter er een **derde categorie** bij kreeg (`lekkend`): zonder die
+categorie keurt hij financiering af omdát hij werkt.
+
+**Vijf vormen, en elke vorm moest dezelfde toets doorstaan: welke nieuwe manier
+van spelen maakt hij mogelijk?** Een vorm die alleen een ander getal is, staat
+er niet in.
+
+| Vorm | Wat hem anders maakt | Maakt mogelijk |
+|---|---|---|
+| **rekening-courant** | duur, direct, geen aanvraag — dit ís de oude `ROOD_RENTE`, nu met een dak | doorbouwen op het randje |
+| **werkkapitaal** | kort en aflossingsvrij | een piek voorfinancieren |
+| **investering** | lang, lineair aflossend, ongedekt | schaal kopen met andermans geld |
+| **vastgoed** | goedkoop, met een **kavel** als onderpand | veilig zwaar lenen, met een scherpe rand |
+| **achtergesteld** | duur en ongedekt, maar telt bij de convenanten als eigen vermogen | een hefboom op een hefboom |
+
+Obligaties en durfkapitaal zitten er bewust **niet** in: allebei vragen een
+*markt* met andere partijen dan de bank. Een obligatie zonder kopers is een dure
+lening met een ander woord erop.
+
+**De prijs van geld is een optelsom, en elke term komt uit een spelvariabele die
+de speler zelf beweegt**: schuldpositie, liquiditeit, betalingsdiscipline,
+contractzekerheid, winststabiliteit, sectorrisico, looptijd en — later — de
+conjunctuur. De opbouw reist mee naar het scherm, zodat een offerte uit te leggen
+is in plaats van te raden. Onderpand haalt er een vast stuk af én de helft van de
+opslagen die over jouw balans gaan: een pand in handen vervangt precies dat deel
+van je kredietwaardigheid.
+
+**Het kredietprofiel is zichtbaar en afgeleid.** Vijf assen in sterren, plus een
+risico-oordeel dat uit diezelfde vijf volgt. Geen enkele wordt apart bijgehouden
+— een score die los meeloopt, spreekt de werkelijkheid tegen waar hij over gaat.
+De enige die geschiedenis nodig heeft is winststabiliteit, en die kijkt twaalf
+maanden terug en niet verder. Een starter scoort daar **neutraal** en niet
+slecht: hij is niet onbetrouwbaar, hij is onbekend, en dat verschil hoort een
+bank te maken.
+
+**Een convenant escaleert in drie trappen en grijpt niet meteen.** Een bank die
+bij de eerste misstap je zaak inneemt, is een bank waar niemand ooit heenloopt —
+en dan is de hele laag decoratie.
+
+1. **Gesignaleerd** — je hoort het, en verder niets.
+2. **Opslag** — de rente gaat omhoog en de deur voor nieuw geld gaat dicht.
+3. **Opeisbaar** — pas na een half jaar aanhoudende breuk. Is er onderpand, dan
+   gaat dát eraan en verder niets; is er geen onderpand, dan kan niemand iets
+   afpakken en blijft de schuld duur staan. **Failliet gaan bestaat hier niet** —
+   zie §12.6: een speler die zijn wereld kwijtraakt, komt niet terug.
+
+**Heronderhandelen is de uitweg**, één keer per lening: langer lenen tegen een
+hogere rente, zodat de maandlast daalt. Dat is wat een bank in het echt ook doet
+voordat hij iets opeist.
+
+> **Wat de geldpomp-meter hier vond, meteen.** `eindstand` telde kas plus
+> bedrijven en trok de schuld er niet af — dus zette elke opname zijn hele bedrag
+> op de eindstand, en **op de laatste speeldag lenen was de goedkoopste manier om
+> te winnen**. Geen unittoets, geen balansmeter en geen toernooi zag het; alle
+> drie kijken ze naar iets anders. En een tweede: de dubbele opslag op een
+> opgeëiste ongedekte lening werd de maand erna weer teruggezet, waardoor opeisen
+> een tik op de vingers was die na een maand verviel.
+
+**Wat er van fase B nog niet in zit.** Verzekeringen met risicoprofielen (premie,
+eigen risico, dekking, maximum, uitsluitingen) en R&D als keuzeboom in plaats van
+een niveauladder.
 
 **Fase C — de permanente wereld.** Living World, AI-managers met beleidsregels,
 Safe Management Policy, vakantiemodus, overdracht, legacy, Magnaat Daily,

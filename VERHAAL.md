@@ -207,6 +207,53 @@ productiescherm; het onderscheid zit in het vak, niet in de knoppen.
 
 ---
 
+## 3b. Ontbreekt een scherm, dan bouwen we het echt
+
+**De regel.** Heeft het spel een scherm of een functie nodig die er nog niet is,
+dan bouwen we die in de échte software — als productie-capability, met de
+grenzen en toetsen die daarbij horen — en het spel gebruikt hem. Nooit een
+spelversie ernaast.
+
+Dat is geen concessie aan het spel maar de scherpste bouwopdracht die dit huis
+kent. Een tycoonspel dwingt een capability af tot in de hoeken: het speelt
+duizenden maanden, het probeert alles uit, en het is genadeloos over wat er
+ontbreekt. Wat Magnaat nodig heeft om geloofwaardig te zijn, heeft een echte
+ondernemer ook nodig. **Het spel is de eisenlijst.**
+
+En het is `PLATFORM.md` §0 in zijn scherpste vorm: een super app die iets mist,
+lost dat op door de domeinsoftware te laten groeien — niet door een tweede
+exemplaar te maken dat alleen binnen het spel bestaat.
+
+### Wat er al is, en dus niet gebouwd wordt
+
+De inventaris viel gunstiger uit dan verwacht. De hele werknemersketen staat er:
+
+| Wat de visie vraagt | Bestaat | Waar |
+|---|---|---|
+| dienstverband als eigen begrip | ✅ | `kern/concern/employment.js` (persoon, entiteit, vestiging, rol, venster, reden — op codenaam) |
+| mandaat apart van dienstverband | ✅ | idem, `SOORTEN` |
+| rol met scope | ✅ | `kern/concern/scope.js` + `scope-filters.js` |
+| iemand uitnodigen, ook zonder account | ✅ | `kern/concern/uitnodiging.js` + de wervingslink |
+| **eerste werkgever vastgelegd** | ✅ | `test/werving-link.test.js`: *"de herkomst is de EERSTE werkgever en verschuift niet bij een tweede baan"* — dat is letterlijk hoofdstuk 9 |
+| vacature en solliciteren | ✅ | `routes/member/werk.js`, `db.data.vacatures` + `db.data.applications`, met leeftijdsgrenzen per vacature |
+| signaal *"je hebt iemand nodig"* | ✅ | `kern/onderneming/werving.js` — en het meet de wachttijd van de oudste sollicitatie, want het probleem is niet werven maar antwoorden |
+| personeels-, payroll- en roosterscherm | ✅ | `public/apps/personeel.html`, `payroll.html` |
+
+**De visie vraagt dus bijna geen nieuwe HR-software.** Ze vraagt een brug.
+
+### Wat er niet is
+
+| Gat | Waarom het er is |
+|---|---|
+| **personeel is in Magnaat een getal** | `acties.js` houdt `personeel` bij als aantal (0–400). Er zijn geen mensen, dus er kan ook niemand voor je werken. Dit is het gat van stap 1, en het zit in het spel |
+| **een wereldvak waarop de échte schermen draaien** | de zandbak draait motoren op een eigen vak; de routes praten met de productiedatabase. Dit is het gat van stap 3, en het zit in de routelaag |
+| **een spelbedrijf dat óók een entiteit met vestigingen is** | een Magnaat-vestiging staat los van `kern/concern/vestiging.js`. Zolang dat zo is, kan er geen dienstverband aan hangen |
+
+Drie gaten, en geen ervan is een ontbrekend HR-scherm. Dat is de winst van eerst
+kijken.
+
+---
+
 ## 4. Vreemden
 
 De visie zegt het expliciet: bestaande RTG-connecties **of vreemden die bij je

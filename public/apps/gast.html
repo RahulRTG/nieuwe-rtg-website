@@ -104,6 +104,7 @@
       <button role="tab" aria-selected="true" data-tab="kaart">Kaart</button>
       <button role="tab" aria-selected="false" data-tab="rekening">Rekening</button>
       <button role="tab" aria-selected="false" data-tab="afrekenen">Afrekenen</button>
+      <button role="tab" aria-selected="false" data-tab="vragen">Iets vragen</button>
       <button role="tab" aria-selected="false" data-tab="pols">Hoe het nu is</button>
     </div>
 
@@ -155,6 +156,19 @@
       </div>
       <div class="rij" style="margin-top:.8rem;"><button class="prim" id="bBetaal">Betalen</button></div>
       <p class="sub" id="railLet" style="margin-top:.6rem;"></p>
+    </section>
+
+    <!-- Vragen is iets anders dan bestellen, en dat staat ook zo in het
+         scherm: een eigen tabblad, geen bedragen, geen mandje. Wat geld kost
+         gaat via de kaart. -->
+    <section class="kaart" data-paneel="vragen" hidden>
+      <h2>Iets vragen</h2>
+      <p class="sub">Dit kost niets en komt niet op je rekening. Je vraag komt op het scherm van de bediening te staan, met hoe lang hij er staat. Hoe snel er iemand is weten wij niet, dus beloven we het ook niet.</p>
+      <div id="vraagKnoppen" class="rij" style="margin-top:.8rem;"></div>
+      <label class="lbl" for="vraagTekst">Erbij zeggen (mag leeg blijven)</label>
+      <input id="vraagTekst" maxlength="140" placeholder="bijvoorbeeld: de tafel wiebelt">
+      <h3 class="kopje">Wat je hebt gevraagd</h3>
+      <div id="vraagMijne"></div>
     </section>
 
     <!-- Drie bronnen onder elkaar, nooit door elkaar. Wie hier een sterretje of
@@ -411,7 +425,57 @@
       p.hidden = p.getAttribute('data-paneel') !== t;
     });
     $('#mand').hidden = t !== 'kaart';
-    if (t === 'pols') laadPols(); else if (t !== 'kaart') laadRekening();
+    if (t === 'pols') laadPols(); else if (t === 'vragen') laadVragen(); else if (t !== 'kaart') laadRekening();
+  });
+
+  /* ---------- iets vragen ----------
+     Geen bedragen en geen mandje: wat geld kost gaat via de kaart. De soorten
+     komen van de server, zodat een soort die erbij komt niet op twee plekken
+     hoeft te worden toegevoegd.
+
+     ER STAAT NERGENS EEN TIJD. Niet "iemand komt zo" en niet een aftelling.
+     Wat er staat is hoeveel minuten je vraag open staat -- een feit waar je
+     iets mee kunt als het te lang duurt. */
+  function laadVragen() {
+    api('verzoek/soorten', { sleutel: SLEUTEL }).then(function (j) {
+      if (j._fout) return meld(j._fout);
+      $('#vraagKnoppen').innerHTML = (j.soorten || []).map(function (s) {
+        return '<button data-vraag="' + esc(s.sleutel) + '">' + esc(s.naam) + '</button>';
+      }).join('');
+      $('#vraagMijne').innerHTML = (j.mijne || []).map(function (v) {
+        var terug = v.stand === 'open'
+          ? ' <button data-weg="' + esc(v.id) + '">Toch niet</button>' : '';
+        return '<div class="pl"><span class="nm">' + esc(v.naam) + '</span> ' + esc(v.stand) +
+          '<span class="bron">' + v.minuten + ' min geleden' +
+          (v.stand === 'opgepakt' ? ' · er komt iemand aan' : '') + '</span>' + terug + '</div>';
+      }).join('') || '<p class="sub">Je hebt nog niets gevraagd.</p>';
+    });
+  }
+
+  /* Een klik op de hele lijst in plaats van een luisteraar per knop: de lijst
+     wordt na elke actie opnieuw getekend, en luisteraars die je daarbij
+     opnieuw hangt stapelen zich op tot een klik drie verzoeken stuurt. */
+  document.querySelector('[data-paneel="vragen"]').addEventListener('click', function (e) {
+    var soort = e.target.getAttribute && e.target.getAttribute('data-vraag');
+    var weg = e.target.getAttribute && e.target.getAttribute('data-weg');
+    if (soort) {
+      api('verzoek', { sleutel: SLEUTEL, soort: soort, tekst: $('#vraagTekst').value }).then(function (j) {
+        if (j._fout) return meld(j._fout);
+        $('#vraagTekst').value = '';
+        /* "Het staat op hun scherm" en niet "er komt iemand langs". Dat eerste
+           is een feit dat wij kunnen waarmaken, het tweede is een belofte die
+           de ZAAK moet inlossen -- en die belofte is niet aan ons om te doen. */
+        meld(j.alGevraagd ? 'Dat stond al open; we hebben er niet nog een van gemaakt.'
+          : 'Gevraagd. Het staat nu op het scherm van de bediening.', true);
+        laadVragen();
+      });
+    } else if (weg) {
+      api('verzoek/intrekken', { sleutel: SLEUTEL, verzoek: weg }).then(function (j) {
+        if (j._fout) return meld(j._fout);
+        meld('Ingetrokken.', true);
+        laadVragen();
+      });
+    }
   });
 
   /* ---------- de pols: drie bronnen, drie blokken ----------

@@ -9,7 +9,7 @@ Er staat met opzet **geen datum** in dit bestand: een tijdstempel zou de control
 elke dag laten zakken, en dan wordt de regel binnen een week uitgezet. Wanneer de
 kaart voor het laatst is bijgewerkt, staat in de git-historie.
 
-Waarom dit bestaat: 1253 servermodules en 3254 endpoints houdt niemand in zijn hoofd.
+Waarom dit bestaat: 1253 servermodules en 3259 endpoints houdt niemand in zijn hoofd.
 Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 ---
@@ -18,13 +18,13 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 
 | Wat | Aantal |
 |---|---|
-| API-endpoints | 3254 |
-| servermodules (`server/**/*.js`) | 1866 |
-| routebestanden (`server/routes/**`) | 404 |
-| kernmodules (`server/kern/**`) | 1137 |
+| API-endpoints | 3259 |
+| servermodules (`server/**/*.js`) | 1869 |
+| routebestanden (`server/routes/**`) | 406 |
+| kernmodules (`server/kern/**`) | 1138 |
 | schermen (`public/**/*.html`) | 231 |
 | gedeelde browsermodules (`public/shared/*.js`) | 180 |
-| toetsbestanden (`test/*.test.js`) | 749 |
+| toetsbestanden (`test/*.test.js`) | 750 |
 | schermtoetsen (`test/*.e2e.js`) | 111 |
 
 ## 2. De weg van een verzoek
@@ -95,13 +95,13 @@ luister
 Acht domeinen, uit `server/opzet/routes.js`. Met `RTG_DOMAINS=member,social` draait
 een proces alleen die domeinen; een gateway (`server/poort.js`) stuurt de
 padvoorvoegsels dan naar het juiste proces. **Die belofte is nog niet waargemaakt:**
-zie §5 -- er zijn nog 162 kern-namen die meer dan één domein aanraakt.
+zie §5 -- er zijn nog 163 kern-namen die meer dan één domein aanraakt.
 
 | Domein | Endpoints | Routebestanden | Zonder bewaker | Bereik in kern |
 |---|---|---|---|---|
 | `auth` | 19 | 5 | 8 | 46 |
 | `member` | 477 | 56 | 10 | 398 |
-| `supplier` | 528 | 94 | 6 | 292 |
+| `supplier` | 530 | 95 | 6 | 293 |
 | `office` | 39 | 7 | 3 | 58 |
 | `staff` | 26 | 7 | 1 | 40 |
 | `social` | 55 | 7 | 31 | 52 |
@@ -114,7 +114,7 @@ op de regel zelf. Dat is niet hetzelfde als onbeveiligd -- regel 28 van de keuri
 per route een poort **of** een plek op de publieke lijst met reden. Deze kolom is een
 wegwijzer, geen verdict.
 
-Daarnaast 1750 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
+Daarnaast 1753 `/api/`-endpoints buiten deze acht: de infra (health, stream, push,
 cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takken
 (school, bank, pay, bestanden, agenda). Die draaien altijd mee.
 
@@ -122,8 +122,8 @@ cluster, translate), de foundation-mount, SSO, SCIM, onboarding en de losse takk
 
 | Meting | Nu |
 |---|---|
-| kern-namen die routes aanraken | 1281 |
-| daarvan door **meer dan één** domein (de echte koppeling) | 162 |
+| kern-namen die routes aanraken | 1282 |
+| daarvan door **meer dan één** domein (de echte koppeling) | 163 |
 | daarvan door precies één domein | 1119 |
 | breedste enkele routebestand | 71 namen |
 | gepakt uit kern en nergens gebruikt | 0 |

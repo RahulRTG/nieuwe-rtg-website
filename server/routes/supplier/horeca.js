@@ -19,7 +19,11 @@ module.exports = (kern) => {
   const horeca = require('../../kern/horeca')(kern);
   const polslaag = require('../../kern/horeca/pols')({ save: kern.save, schoon: kern.schoon, horeca });
   const clublaag = require('../../kern/horeca/clublaag')({ save: kern.save, schoon: kern.schoon, horeca });
-  const ctx = Object.assign({}, kern, { horeca, polslaag, clublaag });
+  /* Dezelfde verzoekenlaag als de gastkant leest: de opslag zit in
+     db.data.horeca[code].verzoeken, dus dit is een tweede lezer en geen
+     tweede lijst. */
+  const verzoeklaag = require('../../kern/gast/verzoek')({ save: kern.save, schoon: kern.schoon, horeca });
+  const ctx = Object.assign({}, kern, { horeca, polslaag, clublaag, verzoeklaag });
   require('./horeca/rekening')(ctx);   // openen, regels, gangen, lijst
   require('./horeca/schuif')(ctx);     // verplaatsen, samenvoegen, splitsen
   require('./horeca/betalen')(ctx);    // korting, fooi, betalen, oninbaar
@@ -37,4 +41,5 @@ module.exports = (kern) => {
   require('./horeca/dashboard')(ctx);  // dagbeeld per kanaal en de signalen
   require('./horeca/gastbeheer')(ctx); // de zaakkant van de gastendeur: QR, uitverkocht, beleid, bevestigen
   require('./horeca/pols')(ctx);       // de pols: wat gemeten wordt, wat de zaak invult, wat gasten melden
+  require('./horeca/verzoeken')(ctx);  // wat gasten vragen: oud bovenaan, met de minuten erbij
 };

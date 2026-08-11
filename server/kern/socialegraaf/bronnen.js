@@ -119,7 +119,21 @@ module.exports = ({ kern }) => {
      vriendenlijst is een toestand en geen moment. */
   function vrienden(key) {
     const s = kern.socialConnecties(key) || {};
-    const uit = lijst(s.requests).slice(0, 12).map(r => moment({
+    /* HET BEREIK-FILTER (kern/socialebeleid). Staat de schakelaar uit, dan komen
+       alleen verzoeken in beeld van mensen met wie het lid een genootschap
+       deelt. Dit is een FILTER en geen blokkade: blokkeren woont in
+       kern/sociaal en blijft daar -- twee lijsten van "wie mag mij bereiken"
+       zouden uiteenlopen (LAT.md regel 4). */
+    const B = kern.socialebeleid;
+    let verzoeken = lijst(s.requests);
+    if (B && B.knopAan && !B.knopAan(key, 'bereik')) {
+      const bekend = new Set();
+      for (const gr of lijst(kern.genootschap.mijne(key))) {
+        for (const l of lijst(kern.genootschap.publiek(gr, key).ledenlijst)) bekend.add(l.codenaam);
+      }
+      verzoeken = verzoeken.filter(r => bekend.has(r.codename));
+    }
+    const uit = verzoeken.slice(0, 12).map(r => moment({
       soort: 'verzoek', titel: 'Verbindingsverzoek', wie: r.codename,
       wanneer: dagVan(r.at), tijd: r.at, wacht: 'ik', kenmerk: r.key,
       bron: 'Vrienden', link: LINK('app')
@@ -141,6 +155,10 @@ module.exports = ({ kern }) => {
      betaald is, wacht op mij -- dat is de enige handeling die het domein kent en
      die het lid zelf moet doen. */
   function vonk(key) {
+    /* Uitgezet: matches blijven uit het sociale beeld -- bijvoorbeeld op een
+       gedeeld toestel. De app zelf blijft gewoon werken; dit gaat alleen over
+       wat er in dit beeld terechtkomt. */
+    if (kern.socialebeleid && kern.socialebeleid.knopAan && !kern.socialebeleid.knopAan(key, 'vonk')) return [];
     const v = kern.vonkMijn(key) || {};
     if (v.error) return [];
     return lijst(v.matches).slice(0, 8).map(m => moment({
@@ -154,6 +172,7 @@ module.exports = ({ kern }) => {
 
   /* ---- Rendez-vous: de wederzijdse matches ---- */
   function rendezvous(key) {
+    if (kern.socialebeleid && kern.socialebeleid.knopAan && !kern.socialebeleid.knopAan(key, 'vonk')) return [];
     const r = kern.rvMatches(key) || {};
     if (r.error) return [];
     return lijst(r.matches).slice(0, 8).map(m => moment({

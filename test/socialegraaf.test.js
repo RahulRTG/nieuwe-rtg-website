@@ -235,3 +235,36 @@ test('een stilgezet gesprek blijft stil, ook als er ongelezen berichten zijn', (
   assert.deepEqual(b.momenten.map(m => m.kenmerk), ['g1']);
   assert.equal(b.telling.wachtOpMij, 1);
 });
+
+/* DE SCHAKELAARS UIT HET BELEID, in de graaf (LIFE.md par. 6).
+
+   Twee van de drie werken hier: `vonk` houdt matches uit het beeld, en `bereik`
+   laat alleen verbindingsverzoeken door van mensen met wie het lid een
+   genootschap deelt.
+
+   DAT LAATSTE IS EEN FILTER EN GEEN BLOKKADE, en dat onderscheid is de reden dat
+   het hier staat en niet in kern/sociaal: blokkeren woont daar en blijft daar.
+   Twee lijsten van "wie mag mij bereiken" zouden uiteenlopen (LAT.md regel 4).
+
+   DE MUTATIE: laat bronnen.js het beleid niet raadplegen. Dan doet een knop die
+   iemand omzette niets, en dat is erger dan geen knop. */
+test('een uitgezette schakelaar versmalt wat de graaf toont', () => {
+  const beleid = { knopAan: (key, knop) => knop !== 'vonk' && knop !== 'bereik' };
+  const g = graaf({
+    socialebeleid: beleid,
+    vonkMijn: () => ({ status: 200, matches: [{ id: 'm1', met: 'Ux', at: VANDAAG }] }),
+    rvMatches: () => ({ status: 200, matches: [{ id: 'r1', codenaam: 'Ux', sinds: VANDAAG }] }),
+    socialConnecties: () => ({ connections: [], requests: [
+      { key: 'x', codename: 'Bekend', at: VANDAAG },
+      { key: 'y', codename: 'Vreemde', at: VANDAAG }
+    ] }),
+    genootschap: { mijn: () => ({ groepen: [], uitnodigingen: [] }),
+      mijne: () => [{ id: 'g1' }], publiek: () => ({ ledenlijst: [{ codenaam: 'Bekend' }] }) }
+  });
+  const b = g.beeld('k');
+  assert.deepEqual(b.momenten.filter(m => m.soort === 'match'), [],
+    'met vonk uit blijven matches uit het beeld');
+  assert.deepEqual(b.momenten.filter(m => m.soort === 'verzoek').map(m => m.wie), ['Bekend'],
+    'met bereik uit komen alleen verzoeken uit een gedeeld genootschap door');
+  assert.deepEqual(b.stil, [], 'een uitgezette schakelaar is geen stukke bron');
+});

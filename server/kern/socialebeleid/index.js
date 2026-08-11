@@ -29,6 +29,34 @@
    een keer keek, is opslag die niemand heeft gevraagd. */
 'use strict';
 
+/* DE SCHAKELAARS. Elk een aan/uit-knop met een naam en een uitleg, en elk
+   VERSMALLEND: uitzetten haalt iets weg, aanzetten geeft niets terug dat er
+   zonder beleid niet al was. De lijst staat hier en niet in het scherm, om
+   dezelfde reden als de caps in kern/objectlaag/caps.js: twee plekken die weten
+   wat instelbaar is, lopen uiteen.
+
+   `bereik` bouwt VOORT op wat er al is en maakt geen tweede lijst: blokkeren
+   woont in kern/sociaal en blijft daar. Deze knop gaat over wie een VERZOEK mag
+   sturen, niet over wie geblokkeerd is -- dat zijn twee verschillende vragen, en
+   ze samenvoegen zou een gedeelde waarheid op twee plekken zetten. */
+const KNOPPEN = {
+  bereik: {
+    naam: 'Alleen verzoeken uit een gedeelde groep',
+    uitleg: 'Verbindingsverzoeken van mensen met wie u geen genootschap deelt, komen niet in beeld. ' +
+      'Blokkeren blijft waar het stond; dit is een filter en geen blokkade.'
+  },
+  vonk: {
+    naam: 'Vonk en Rendez-vous meetellen',
+    uitleg: 'Uitzetten houdt matches uit uw sociale beeld -- bijvoorbeeld op een gedeeld toestel. ' +
+      'De apps zelf blijven gewoon werken.'
+  },
+  stilte: {
+    naam: 'Weekend zonder voorstellen',
+    uitleg: 'Op zaterdag en zondag zet Rahul niets klaar. Wat er ligt blijft zichtbaar in de stand; ' +
+      'er wordt alleen niets voorgesteld.'
+  }
+};
+
 /* De horizon: voorstellen alleen voor wat binnen zoveel dagen speelt. Nul zou
    betekenen "niets", en dat is wat `voorstellen: false` al doet; de ondergrens
    is dus een dag. De bovengrens is een jaar -- daarboven is het geen horizon
@@ -45,10 +73,16 @@ const HORIZON_STANDAARD = 60;
 module.exports = ({ db, save, soorten }) => {
   const SOORTEN = Array.isArray(soorten) && soorten.length ? soorten.slice() : ['antwoord'];
 
+  const KNOPNAMEN = Object.keys(KNOPPEN);
+
   const leegBeleid = () => ({
     /* Standaard staat alles aan wat sowieso veilig is: tonen en wachten. */
     uit: [],
-    horizon: HORIZON_STANDAARD
+    horizon: HORIZON_STANDAARD,
+    /* De schakelaars die UIT staan. Standaard geen: een lid dat niets instelt,
+       krijgt het beeld zoals de wereld het ziet. Elke naam hierin haalt iets
+       weg. */
+    knopUit: []
   });
 
   function kijk(key) {
@@ -68,6 +102,7 @@ module.exports = ({ db, save, soorten }) => {
     const r = db.data.socialebeleid[k];
     if (!Array.isArray(r.uit)) r.uit = [];
     if (!Number.isFinite(r.horizon)) r.horizon = HORIZON_STANDAARD;
+    if (!Array.isArray(r.knopUit)) r.knopUit = [];
     return r;
   }
 
@@ -81,6 +116,10 @@ module.exports = ({ db, save, soorten }) => {
       horizon: r.horizon,
       horizonGrens: { min: HORIZON_MIN, max: HORIZON_MAX, standaard: HORIZON_STANDAARD },
       soorten: SOORTEN.map(s => ({ soort: s, aan: !r.uit.includes(s) })),
+      /* De schakelaars, met hun uitleg erbij. Het scherm kent er geen bij naam
+         en toont wat hier staat -- zelfde afspraak als bij de caps. */
+      knoppen: KNOPNAMEN.map(k => ({ knop: k, naam: KNOPPEN[k].naam,
+        uitleg: KNOPPEN[k].uitleg, aan: !(r.knopUit || []).includes(k) })),
       /* Dit veld staat er met opzet, en het is geen instelling maar een FEIT dat
          het scherm hoort te kunnen tonen: er bestaat hier geen automatische
          stand. Zonder deze zin zou een lid kunnen denken dat hij hem ergens
@@ -97,13 +136,20 @@ module.exports = ({ db, save, soorten }) => {
     const r = pak(key);
     if (!r) return { status: 400, error: 'Geen sleutel.' };
     const v = invoer && typeof invoer === 'object' ? invoer : {};
-    const was = { uit: r.uit.slice(), horizon: r.horizon };
+    const was = { uit: r.uit.slice(), horizon: r.horizon, knopUit: (r.knopUit || []).slice() };
 
     if (v.soort !== undefined) {
       const s = String(v.soort);
       if (!SOORTEN.includes(s)) return { status: 400, error: 'Dat soort voorstel bestaat niet.' };
       const aan = v.aan !== false;
       r.uit = aan ? r.uit.filter(x => x !== s) : (r.uit.includes(s) ? r.uit : r.uit.concat(s));
+    }
+
+    if (v.knop !== undefined) {
+      const k = String(v.knop);
+      if (!KNOPNAMEN.includes(k)) return { status: 400, error: 'Die schakelaar bestaat niet.' };
+      const aan = v.aan !== false;
+      r.knopUit = aan ? r.knopUit.filter(x => x !== k) : (r.knopUit.includes(k) ? r.knopUit : r.knopUit.concat(k));
     }
 
     if (v.horizon !== undefined) {
@@ -119,7 +165,8 @@ module.exports = ({ db, save, soorten }) => {
        een log dat volloopt met kliks die niets deden, is met ruis leeg te
        spoelen. De aanroeper logt op `gewijzigd`. */
     const gewijzigd = was.horizon !== r.horizon ||
-      was.uit.length !== r.uit.length || was.uit.some(x => !r.uit.includes(x));
+      was.uit.length !== r.uit.length || was.uit.some(x => !r.uit.includes(x)) ||
+      was.knopUit.length !== r.knopUit.length || was.knopUit.some(x => !r.knopUit.includes(x));
     if (gewijzigd) save();
     return { status: 200, ok: true, gewijzigd, beleid: beleid(key) };
   }
@@ -129,12 +176,25 @@ module.exports = ({ db, save, soorten }) => {
      versmallend. */
   function magSoort(key, soort) { return !kijk(key).uit.includes(String(soort)); }
 
+  /* Staat deze schakelaar aan? Alleen een NEE kan hieruit iets veranderen: een
+     schakelaar die aan staat, is de wereld zoals hij zonder beleid ook is. */
+  const knopAan = (key, knop) => !(kijk(key).knopUit || []).includes(String(knop));
+
+  /* Het stiltevenster. Zaterdag en zondag; een vast venster en geen instelbaar
+     uur, want een instelbaar venster is een tweede klok en de winst is nul --
+     er zijn hier geen meldingen die iemand wakker maken. */
+  function inStilte(key, nu) {
+    if (knopAan(key, 'stilte')) return false;
+    const d = (nu || new Date()).getDay();
+    return d === 0 || d === 6;
+  }
+
   function binnenHorizon(key, datum, vandaag) {
     if (!datum) return true; // iets zonder datum valt buiten deze vraag
     const n = Math.round((new Date(datum + 'T12:00:00Z') - new Date(vandaag + 'T12:00:00Z')) / 86400000);
     return Number.isFinite(n) && n <= kijk(key).horizon;
   }
 
-  return { socialebeleid: { beleid, zet, magSoort, binnenHorizon, SOORTEN,
-    HORIZON_STANDAARD, HORIZON_MIN, HORIZON_MAX } };
+  return { socialebeleid: { beleid, zet, magSoort, binnenHorizon, knopAan, inStilte,
+    SOORTEN, KNOPPEN, HORIZON_STANDAARD, HORIZON_MIN, HORIZON_MAX } };
 };

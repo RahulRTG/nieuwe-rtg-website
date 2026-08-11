@@ -250,10 +250,23 @@ die kan niet zien of de band ooit bestond en beëindigd is, of dat er nooit een
 was. Het geheugen bestáát in de opslag; het is alleen niet uitlegbaar (par.
 2.10).
 
-Dat is een besluit dat hier niet in mijn eentje hoort te vallen, want het raakt
-wat een ouder over een handeling van een kind te zien krijgt (par. 2.1 en 2.8:
-verbreken kan zonder uitleg). Het staat opgeschreven als open vraag in plaats
-van stilzwijgend ingevuld.
+**Het besluit (11 augustus 2026): alleen dát het voorbij is.** `bandBeeindigd()`
+toont wat er de laatste dertig dagen eindigde — het id, de soort en de datum, en
+verder niets. Geen `verbrokenDoor` en geen reden: verbreken kan zonder uitleg
+(par. 2.8), en bij een band met twee kanten zou "wie" van een handeling van een
+kind een verantwoording maken.
+
+Het is een **venster en geen lijst**, en dat is de synthese van twee dingen die
+allebei waar zijn. Een blijvende lijst met oude banden is een lijst met mensen
+die iemand liever niet meer ziet — dat stond al als reden boven `mijnBanden()`.
+Maar zonder énig spoor kan de andere kant niet zien of er een band was die
+eindigde, of dat er nooit een was. Dertig dagen is lang genoeg dat de ander het
+merkt en kort genoeg dat het geen kerkhof wordt; daarna blijft het alleen in de
+opslag staan.
+
+De vorm is met opzet een eigen functie en niet `zichtBand()`: die zou
+`verbrokenDoor` gaan dragen zodra iemand hem uitbreidt, en dan lekt het langs
+die weg alsnog.
 
 ## 4. Faseplan
 

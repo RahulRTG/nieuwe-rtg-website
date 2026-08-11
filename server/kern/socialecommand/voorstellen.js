@@ -58,6 +58,10 @@ module.exports = ({ kern }) => {
        mount), dan geldt de veilige standaard: tonen en wachten. */
     const B = kern.socialebeleid;
     if (B && !B.magSoort(key, 'antwoord')) return { voorstellen: uit, stil };
+    /* Het stiltevenster: in het weekend zet Rahul niets klaar. Wat er ligt
+       blijft zichtbaar in de stand -- beleid maakt het systeem stiller, het
+       poetst de werkelijkheid niet weg. */
+    if (B && B.inStilte && B.inStilte(key)) return { voorstellen: uit, stil };
     try {
       const a = kern.bijeenkomst.mijnAgenda({ key }) || {};
       for (const b of (a.komt || [])) {

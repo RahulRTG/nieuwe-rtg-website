@@ -160,6 +160,13 @@ module.exports = (kern) => {
   app.post('/api/rtf/leven/beleid', gezinsPoort, huisDoet((wie) => kern.levensbeleid.beleid(wie)));
   app.post('/api/rtf/leven/beleid/zet', gezinsPoort, huisDoet((wie, b) => kern.levensbeleid.zet(wie, b)));
 
+  /* WAT ER ONLANGS EINDIGDE. Alleen dát het voorbij is en wanneer -- geen wie
+     en geen reden (LEVEN.md par. 2.8: verbreken kan zonder uitleg), en alleen
+     binnen een venster, zodat het geen blijvende lijst wordt van mensen die
+     iemand liever niet meer ziet. */
+  app.post('/api/leven/beeindigd', auth, lidDoet((wie) => ({ status: 200, banden: L().bandBeeindigd(wie) })));
+  app.post('/api/rtf/leven/beeindigd', gezinsPoort, huisDoet((wie) => ({ status: 200, banden: L().bandBeeindigd(wie) })));
+
   app.post('/api/leven/kring', auth, lidDoet(ACTIES.kring));
   app.post('/api/leven/band/vraag', auth, lidDoet(ACTIES.vraag));
   app.post('/api/leven/band/bevestig', auth, lidDoet(ACTIES.bevestig));

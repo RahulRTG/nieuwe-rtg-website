@@ -39,7 +39,7 @@ test('alleen de velden die bestaan, en een onbekend soort wordt geweigerd', () =
   const { b, db } = opzet();
   assert.ok(b.zet('k', { soort: 'verzin', aan: false }).error);
   b.zet('k', { horizon: 14, onbekend: 'x', automatisch: true });
-  assert.deepEqual(Object.keys(db.data.socialebeleid.k).sort(), ['horizon', 'uit']);
+  assert.deepEqual(Object.keys(db.data.socialebeleid.k).sort(), ['horizon', 'knopUit', 'uit']);
   assert.equal(db.data.socialebeleid.k.horizon, 14);
 });
 
@@ -138,5 +138,51 @@ test('dit beleid kan alleen versmallen: er is geen automatische stand', () => {
   /* Elk instelbaar veld doet iets UIT of maakt iets KLEINER; geen van beide kan
      Rahul meer laten doen dan hij zonder beleid al mag. */
   assert.deepEqual(Object.keys(b.beleid('k')).sort(),
-    ['automatischMogelijk', 'horizon', 'horizonGrens', 'ok', 'soorten']);
+    ['automatischMogelijk', 'horizon', 'horizonGrens', 'knoppen', 'ok', 'soorten']);
+
+  /* En ook de schakelaars kunnen alleen versmallen: aan is de wereld zoals hij
+     zonder beleid ook is, uit haalt iets weg. Geen enkele knop geeft iets dat
+     er zonder beleid niet was. */
+  for (const k of b.beleid('k').knoppen) {
+    assert.equal(k.aan, true, 'standaard staat elke schakelaar AAN: beleid haalt af, het voegt niet toe');
+    assert.ok(k.naam && k.uitleg, 'een schakelaar zonder uitleg is een knop waarvan niemand weet wat hij doet');
+  }
+});
+
+/* DE SCHAKELAARS (besluit van 11 augustus 2026: beleid als aan/uit-knoppen).
+
+   Drie knoppen, en alle drie versmallend. De lijst woont in de kern en niet in
+   het scherm, om dezelfde reden als de caps: twee plekken die weten wat
+   instelbaar is, lopen uiteen.
+
+   DE MUTATIE: laat zet() een onbekende knop accepteren, of laat een uitgezette
+   knop niet doorwerken in de laag die hem raadpleegt. */
+test('de drie schakelaars staan standaard aan en zijn alleen versmallend', () => {
+  const { b } = opzet();
+  assert.deepEqual(b.beleid('k').knoppen.map(x => x.knop), ['bereik', 'vonk', 'stilte']);
+  assert.ok(b.zet('k', { knop: 'verzin', aan: false }).error, 'een knop die niet bestaat, bestaat niet');
+
+  assert.equal(b.zet('k', { knop: 'vonk', aan: false }).gewijzigd, true);
+  assert.equal(b.zet('k', { knop: 'vonk', aan: false }).gewijzigd, false, 'twee keer uitzetten is een keer');
+  assert.equal(b.knopAan('k', 'vonk'), false);
+  assert.equal(b.knopAan('k', 'bereik'), true, 'de ene knop raakt de andere niet');
+
+  b.zet('k', { knop: 'vonk', aan: true });
+  assert.equal(b.knopAan('k', 'vonk'), true, 'weer aan is terug naar de standaard, niet meer dan dat');
+});
+
+/* Het stiltevenster is een VAST venster (zaterdag en zondag) en geen instelbaar
+   uur: een instelbaar venster is een tweede klok, en de winst is nul -- er zijn
+   hier geen meldingen die iemand wakker maken.
+
+   DE MUTATIE: laat inStilte() true geven terwijl de knop AAN staat. Dan zet
+   Rahul niets klaar bij iemand die daar nooit om vroeg. */
+test('het stiltevenster geldt alleen als de knop uit staat', () => {
+  const { b } = opzet();
+  const zaterdag = new Date('2026-08-15T12:00:00Z'); // zaterdag
+  const dinsdag = new Date('2026-08-11T12:00:00Z');
+  assert.equal(b.inStilte('k', zaterdag), false, 'met de knop aan is er geen stilte');
+  b.zet('k', { knop: 'stilte', aan: false });
+  assert.equal(b.inStilte('k', zaterdag), true);
+  assert.equal(b.inStilte('k', dinsdag), false, 'doordeweeks blijft het gewoon werken');
 });

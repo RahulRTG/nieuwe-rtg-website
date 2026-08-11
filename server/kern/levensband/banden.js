@@ -25,11 +25,48 @@ module.exports = (ctx) => {
      verlopen. Verbroken banden komen NIET terug: die zijn geen relatie meer,
      en een lijst met oude banden is een lijst met mensen die iemand liever
      niet meer ziet. Het spoor blijft wel in de opslag staan, want een band
-     die ooit bestond is gebeurd. */
+     die ooit bestond is gebeurd.
+
+     Wat er ONLANGS eindigde staat apart, in ./beeindigd() hieronder. */
   function mijnBanden(wie) {
     const w = schoon(wie, 120);
     if (!w) return [];
     return kijk().banden.filter(b => isKant(b, w) && b.staat !== 'verbroken').map(zichtBand);
+  }
+
+  /* WAT ER ONLANGS EINDIGDE, en verder niets.
+
+     Twee dingen die allebei waar zijn, en dit is hun synthese. Een verbroken
+     band mocht tot nu toe helemaal niet terugkomen (zie hierboven), en dat is
+     goed bedoeld: een blijvende lijst met oude banden is een lijst met mensen
+     die iemand liever niet meer ziet. Maar zonder ENIG spoor kan de andere kant
+     niet zien of er een band was die eindigde, of dat er nooit een was -- en
+     dat is precies de stilte waar LEVEN.md par. 2.10 (alles is uitlegbaar)
+     over gaat.
+
+     De oplossing is een VENSTER en geen lijst. Wat de laatste dertig dagen
+     eindigde is zichtbaar; daarna verdwijnt het uit beeld en blijft alleen in
+     de opslag staan. Lang genoeg dat de ander het merkt, kort genoeg dat het
+     geen kerkhof wordt.
+
+     EN ER STAAT ALLEEN DÁT HET VOORBIJ IS. Geen `verbrokenDoor` en geen reden:
+     verbreken kan zonder uitleg (par. 2.8), en bij een band met twee kanten zou
+     "wie" van een handeling van een kind een verantwoording maken. De datum
+     zegt genoeg om te weten waar je aan toe bent.
+
+     Vandaar ook een eigen vorm en niet zichtBand(): die zou `verbrokenDoor`
+     gaan dragen zodra iemand hem uitbreidt, en dan lekt het langs deze weg
+     alsnog. */
+  const VENSTER_DAGEN = 30;
+
+  function beeindigd(wie) {
+    const w = schoon(wie, 120);
+    if (!w) return [];
+    const grens = new Date(Date.now() - VENSTER_DAGEN * 86400000).toISOString();
+    return kijk().banden
+      .filter(b => isKant(b, w) && b.staat === 'verbroken' && String(b.verbrokenAt || '') >= grens)
+      .map(b => ({ id: b.id, soort: b.soort, beeindigdAt: b.verbrokenAt || null }))
+      .sort((a, b2) => String(b2.beeindigdAt).localeCompare(String(a.beeindigdAt)));
   }
 
   /* VRAGEN. Van welke kant dan ook: een lid kan een profiel vragen en een
@@ -133,6 +170,7 @@ module.exports = (ctx) => {
   return {
     bandVan,
     api: { banden: mijnBanden, bandVraag: vraag, bandBevestig: bevestig,
-      bandVerbreek: verbreek, bandVerzoeken: openVerzoeken, bandVerlopen: verlopen }
+      bandVerbreek: verbreek, bandVerzoeken: openVerzoeken, bandVerlopen: verlopen,
+      bandBeeindigd: beeindigd }
   };
 };

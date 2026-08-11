@@ -471,6 +471,14 @@ een wereld en geen instelling.
 systeem zonder regel niets. Hier doet het zonder regel het minimum dat sowieso
 veilig is: voorstellen tonen en wachten op de mens. Beleid haalt daar vanaf.
 
+**Drie schakelaars erbij** (besluit van 11 augustus 2026, beleid als aan/uit-knoppen):
+*alleen verzoeken uit een gedeelde groep* — een filter en geen blokkade, want
+blokkeren woont in `kern/sociaal` en blijft daar; *Vonk en Rendez-vous meetellen*
+— uitzetten houdt matches uit het beeld, bijvoorbeeld op een gedeeld toestel, en
+de apps zelf blijven gewoon werken; en *weekend zonder voorstellen*. Alle drie
+staan standaard **aan**: beleid haalt af, het voegt niet toe. De lijst met
+schakelaars woont in de kern en niet in het scherm, om dezelfde reden als de caps.
+
 **En het verbergt niets.** Voorstellen uitzetten stopt wat Rahul klaarzet; het
 maakt niet onwaar dat er iets op u wacht. De stand blijft dus melden dat er een
 onbeantwoorde bijeenkomst ligt. Een instelling die de werkelijkheid wegpoetst in

@@ -223,7 +223,21 @@ test('beleid versmalt wat er klaarstaat, en kent geen automatische stand', async
   const nogsteeds = await json(await api('/api/sociaal/beleid', {}, lidToken));
   assert.equal(nogsteeds.automatischMogelijk, false);
   assert.deepEqual(Object.keys(nogsteeds).sort(),
-    ['automatischMogelijk', 'horizon', 'horizonGrens', 'ok', 'soorten']);
+    ['automatischMogelijk', 'horizon', 'horizonGrens', 'knoppen', 'ok', 'soorten']);
+
+  /* De schakelaars komen over de route mee, met hun uitleg, en staan standaard
+     aan: beleid haalt af en voegt niet toe. Een knop die een lid omzet moet
+     bovendien echt doorwerken -- dat is los getoetst in test/socialegraaf.test.js
+     en test/socialebeleid.test.js; hier gaat het om de weg erheen. */
+  assert.deepEqual(nogsteeds.knoppen.map(k => k.knop), ['bereik', 'vonk', 'stilte']);
+  for (const k of nogsteeds.knoppen) {
+    assert.equal(k.aan, true);
+    assert.ok(k.naam && k.uitleg, 'een schakelaar zonder uitleg is een knop waarvan niemand weet wat hij doet');
+  }
+  const omzet = await api('/api/sociaal/beleid/zet', { knop: 'vonk', aan: false }, lidToken);
+  assert.equal(omzet.status, 200);
+  assert.equal((await json(omzet)).beleid.knoppen.find(k => k.knop === 'vonk').aan, false);
+  await api('/api/sociaal/beleid/zet', { knop: 'vonk', aan: true }, lidToken);
 });
 
 /* Een gast mag deze laag niet: hij leest de vriendenlaag, matches en groepen.

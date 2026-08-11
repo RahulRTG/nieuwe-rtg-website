@@ -154,3 +154,45 @@ test('de standaardtermijn stelt voor, hij vult niet in', () => {
   assert.equal(r.status, 400, 'zonder datum blijft delen een onvolledige handeling');
   assert.match(r.error, /Tot wanneer/);
 });
+
+/* WAT ER ONLANGS EINDIGDE (LEVEN.md par. 2.10, besluit van 11 augustus 2026).
+
+   Een verbroken band verdween tot nu toe zonder enig spoor: de andere kant kon
+   niet zien of er een band was die eindigde, of dat er nooit een was. Dat is nu
+   zichtbaar -- maar alleen DÁT het voorbij is, en alleen binnen een venster.
+
+   Twee grenzen komen hier samen, en de toets bewaakt ze allebei:
+
+     1. GEEN `verbrokenDoor` en geen reden. Verbreken kan zonder uitleg (par.
+        2.8); bij een band met twee kanten zou "wie" van een handeling van een
+        kind een verantwoording maken.
+     2. GEEN BLIJVENDE LIJST. Na het venster verdwijnt het uit beeld -- een lijst
+        met oude banden is een lijst met mensen die iemand liever niet meer ziet
+        (de reden die al boven mijnBanden stond).
+
+   DE MUTATIE: neem `verbrokenDoor` op in de teruggegeven vorm, of haal de
+   venstergrens weg. Allebei laten deze toets zakken. */
+test('een verbroken band laat een spoor na: dat het voorbij is, en verder niets', () => {
+  const { band, db } = opzet();
+  const bandId = metBand(band);
+  assert.equal(band.bandBeeindigd('rtf:kind-b').length, 0, 'een levende band eindigde niet');
+
+  band.bandVerbreek('rtf:kind-b', bandId);
+
+  /* De ANDERE kant ziet dat het voorbij is -- daar ging deze verandering over. */
+  const bij = band.bandBeeindigd('lid-a');
+  assert.equal(bij.length, 1);
+  assert.deepEqual(Object.keys(bij[0]).sort(), ['beeindigdAt', 'id', 'soort'],
+    'geen wie en geen reden: verbreken kan zonder uitleg');
+  assert.ok(bij[0].beeindigdAt, 'wanneer het eindigde hoort er wel bij te staan');
+
+  /* En hij staat niet meer tussen de levende banden. */
+  assert.deepEqual(band.banden('lid-a'), []);
+
+  /* Buiten het venster verdwijnt hij uit beeld en blijft alleen in de opslag. */
+  const rij = db.data.levensbanden.banden.find(b => b.id === bandId);
+  rij.verbrokenAt = new Date(Date.now() - 60 * 864e5).toISOString();
+  assert.deepEqual(band.bandBeeindigd('lid-a'), [],
+    'na het venster is het geen lijst meer van mensen die iemand liever niet ziet');
+  assert.equal(rij.staat, 'verbroken', 'het spoor blijft wel in de opslag staan');
+});

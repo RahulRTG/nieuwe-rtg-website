@@ -111,9 +111,10 @@ module.exports = ({ db, save, crypto, schoon, geldPasprijzen, accounts }) => {
     const a = { id: rid(), pas, naam, contact, viaUitnodiging, accountId,
       welkom: def.welkom, reis: bouwReis(def.stem),
       status: 'in behandeling', besluit: null, at: nu(), bijgewerkt: nu() };
-    // de ondernemersintake: de AI vraagt bij het gesprek al wat het bedrijf
-    // nodig heeft; dat komt netjes geklemd op de aanmelding
-    bedrijfMod.zetBedrijf(a, b.bedrijf);
+    // de ondernemersintake, met de uitslag GELEZEN: een gesloten genre wordt
+    // geweigerd en niet stil iets anders. Zie CONCERN.md.
+    const bedrijf = bedrijfMod.zetBedrijf(a, b.bedrijf, { viaUitnodiging });
+    if (!bedrijf.ok) return bedrijf;
     A().unshift(a);
     if (A().length > 5000) A().pop();
     save();

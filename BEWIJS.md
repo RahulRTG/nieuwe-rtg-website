@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 903 bestanden en 5796 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 904 bestanden en 5801 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,13 +12,13 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 903 |
-| losse beweringen (`test(...)`) | 5796 |
+| toetsbestanden | 904 |
+| losse beweringen (`test(...)`) | 5801 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 614 |
 | **overleefd**: geen mutatie kreeg hem rood | 13 |
 | niet te meten (al rood, geen module gevonden, ...) | 18 |
-| alleen in de kop *genoemd*, nog niet gemeten | 71 |
+| alleen in de kop *genoemd*, nog niet gemeten | 72 |
 | niets van beide | 187 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-785 bestanden, 5596 beweringen.
+786 bestanden, 5601 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -239,6 +239,7 @@ toets omvalt.
 | `genreplan.test.js` | 7 | gezakt op `liegpoort /api/` | Genrepols 2: het draaiboek van vandaag en de week vooruit voor de acht dunnere genres. Bewaakt dat /api/supplier/puls/plan een geprioriteerd, afvinkbaar draaiboek uit de eigen genre-motor haalt (met "dit eerst"-... |
 | `genrepuls.test.js` | 5 | gezakt op `liegpoort /api/` | De Genrepols: de kantoren-laag voor de acht dunnere genres (golf, fitclub, beauty, petcare, kinderopvang, weddings, marina, alpine). Bewaakt dat /api/supplier/puls de meters en signalen van vandaag uit de eigen... |
 | `genreregister.test.js` | 5 | -- | HET GENRE-REGISTER: EEN PLEK, EN DAT MOET ZO BLIJVEN. WAAROM DIT BESTAAT De 73 genres stonden verspreid over tien initdata-delen en zes kernmodules, elk met een eigen `if (!db.data.supplierTypes.x) ... |
+| `genretoegang.test.js` | 5 | genoemd | DE TOEGANGSSTAND VAN EEN GENRE: EEN WAARHEID, EN GEEN STILLE OMZETTING. WAAROM DIT BESTAAT Het register kende 73 genres. |
 | `gerechtkennis.test.js` | 5 | gezakt op `liegpoort /api/` | Het gerechtenmenu op het keukenscherm: recept, bereidingswijze, allergenen met vervangers en een dranksuggestie per gerecht, plus de 86-melding (uitverkocht) die het bestellen per direct blokkeert. |
 | `gereedschap.test.js` | 2 | gezakt op `===->!==` | RTG Gereedschap: de rekenmotor (puur, geen eval) en de klok-kern (wekkers en timers op de server; de veegfunctie wordt hier direct aangeroepen, dus de test wacht nergens op). |
 | `gesprekdraad.test.js` | 5 | gezakt op `liegpoort /api/` | Het gesprek met Rahul als EEN draadje, met een grens erin. De balk in het OS praat met de assistent (/api/fluister); de chat in de app leest het doorlopende gesprek (/api/chat/history). |

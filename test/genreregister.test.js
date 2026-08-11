@@ -92,7 +92,7 @@ test('zetRegister geeft losse kopieën, geen gedeelde objecten', () => {
     'de database schrijft door naar het register zelf');
 });
 
-test('het register belandt in de database, met sector en met de besloten-vlag', async () => {
+test('het register belandt in de database, met sector en met de toegangsstand', async () => {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-genreregister-'));
   const srv = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP, RTG_DEMO: '1' } });
   try {
@@ -104,8 +104,15 @@ test('het register belandt in de database, met sector en met de besloten-vlag', 
       assert.ok(types[id], 'genre ontbreekt in de database: ' + id);
       assert.equal(types[id].industry, def.industry, 'sector klopt niet voor ' + id);
     }
-    assert.equal(types.specials.besloten, true, 'special forces hoort besloten te blijven');
-    assert.equal(types.defensie.besloten, true, 'defensie hoort besloten te blijven');
+    /* Deze twee droegen `besloten: true`. Die vlag is opgegaan in de
+       toegangsstand ('uitnodiging'), want twee velden over dezelfde vraag lopen
+       uiteen -- zie server/seed/genres.js. De bewaking blijft dezelfde en wordt
+       zelfs breder: niet één vlag op twee genres, maar een veld dat op alle 73
+       de reis naar de database moet overleven. */
+    assert.equal(types.specials.status, 'uitnodiging', 'special forces hoort op uitnodiging te blijven');
+    assert.equal(types.defensie.status, 'uitnodiging', 'defensie hoort op uitnodiging te blijven');
+    for (const [id, def] of Object.entries(register.GENRES))
+      assert.equal(types[id].status, def.status, 'toegangsstand klopt niet voor ' + id);
   } finally {
     await stop(srv);
     fs.rmSync(TMP, { recursive: true, force: true });

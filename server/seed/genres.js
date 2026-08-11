@@ -61,6 +61,77 @@ const SECTOREN = {
    productbestand niet over de 12 KB hoort (keuringsregel). */
 const GENRES = require('./genres-lijst');
 
+/* ---- DE TOEGANGSSTANDEN ----
+
+   Wie mag dit genre aanvragen? Vijf standen, en een genre heeft er precies een.
+
+   Hiervoor was het antwoord een tweede lijst in kern/aanmeldingen/bedrijf.js:
+   31 met de hand overgetypte namen, en `GENRES.includes(type) ? type : 'zzp'`
+   voor de rest. Die stille omzetting is de reden dat dit veld bestaat. Een
+   genre dat niet openstaat hoort "niet beschikbaar" te zeggen -- niet iets
+   anders te worden. Een ondernemer die om een juwelier vraagt en een zzp-zaak
+   krijgt, merkt dat pas als de verkeerde tools op zijn scherm staan.
+
+   'binnenkort' is geen belofte met een datum, en zo hoort hij ook niet te
+   klinken: het genre bestaat in het register (een zaak kan hem dragen, de
+   sectorlaag kent hem), alleen de aanvraagweg staat nog niet open. */
+const TOEGANG = {
+  open: { mag: true,
+    uitleg: 'Iedereen kan een zaak in dit genre aanvragen.' },
+  /* STAAT BEWUST DICHT, EN NIET OMDAT DE STAND ONAF IS. Deze acht genres
+     (ziekenhuis, apotheek, kinderopvang, beveiliging en hun buren) horen pas
+     open te gaan als de bewijsstap er werkelijk is: een vergunning, een
+     inschrijving of een diploma dat een mens heeft gezien. `mag: true` met een
+     `bewijsNodig`-vlag die niemand handhaaft, is een open deur met een bordje
+     ernaast -- precies de schijnzekerheid die dit register komt opruimen.
+     Openzetten is straks een regel: mag op true, zodra de stap bestaat. */
+  bewijs: { mag: false, bewijsNodig: true,
+    uitleg: 'Voor dit genre vraagt RTG eerst bewijs (vergunning, inschrijving of diploma). Die stap staat nog niet klaar; neem contact op met RTG.' },
+  uitnodiging: { mag: false, opUitnodiging: true,
+    uitleg: 'Dit genre gaat alleen op uitnodiging van RTG open.' },
+  intern: { mag: false,
+    uitleg: 'Dit genre hoort bij de wereld zelf en wordt niet door een partner aangevraagd.' },
+  binnenkort: { mag: false,
+    uitleg: 'Dit genre staat in het register, maar de aanvraagweg is nog niet open.' }
+};
+
+/* De stand van een genre. Een genre zonder status is een fout in het register
+   en geen reden om iets toe te staan: onbekend betekent dicht. */
+function toegangVan(id) {
+  const def = GENRES[id];
+  if (!def) return null;
+  return TOEGANG[def.status] ? def.status : null;
+}
+
+/* MAG DEZE AANVRAAG DIT GENRE? Het enige antwoord op die vraag in dit huis.
+   Geeft { ok: true, ... } of { ok: false, reden, uitleg } -- nooit een ander
+   genre. Een uitnodiging tilt 'uitnodiging' op en niets anders: 'intern' blijft
+   intern, ook met een uitnodiging in de hand. */
+function genreToegang(id, opties) {
+  const stand = toegangVan(id);
+  if (!stand) {
+    return { ok: false, reden: 'onbekend', genre: id || null,
+      uitleg: 'Dit genre kennen we niet.' };
+  }
+  const t = TOEGANG[stand];
+  const viaUitnodiging = !!(opties && opties.viaUitnodiging);
+  if (t.mag || (t.opUitnodiging && viaUitnodiging)) {
+    return { ok: true, genre: id, stand, bewijsNodig: !!t.bewijsNodig };
+  }
+  return { ok: false, reden: stand, genre: id, uitleg: t.uitleg };
+}
+
+/* De genres die een gewone aanvrager nu kan kiezen. Vervangt de overgetypte
+   lijst; wie een genre openzet doet dat in het register en de keuzelijst
+   verandert mee. */
+function aanvraagbareGenres(opties) {
+  return Object.keys(GENRES).filter(id => genreToegang(id, opties).ok);
+}
+
+function genresMetStand(stand) {
+  return Object.keys(GENRES).filter(id => GENRES[id].status === stand);
+}
+
 /* Een losse kopie van een genre-definitie. Alles gaat mee -- ook een vlag als
    `besloten` -- zodat een nieuw veld hier niet stilletjes wegvalt onderweg. */
 function kopie(def) { return Object.assign({}, def, { caps: [...def.caps] }); }
@@ -78,6 +149,14 @@ function zetRegister(db) {
     if (!t[id].industry) t[id].industry = def.industry;
     if (!t[id].label) t[id].label = def.label;
     if (!t[id].icon) t[id].icon = def.icon;
+    /* De toegangsstand wordt net als de sector bijgevuld. Zonder deze regel
+       zou hij alleen op verse installaties bestaan, en draait elke bestaande
+       database verder op genres zonder stand -- waar genreToegang() dan "dicht"
+       van maakt en er dus niets meer aan te vragen valt. */
+    if (!t[id].status) t[id].status = def.status;
+    /* De oude vlag opruimen waar hij nog staat: hij is opgegaan in de status en
+       twee velden over dezelfde vraag lopen uiteen. */
+    if (t[id].besloten !== undefined) delete t[id].besloten;
   }
   return t;
 }
@@ -98,4 +177,5 @@ function zetGenre(db, id) {
 function genresVan(industry) { return Object.keys(GENRES).filter(g => GENRES[g].industry === industry); }
 function sectorVan(genre) { return (GENRES[genre] || {}).industry || null; }
 
-module.exports = { SECTOREN, GENRES, zetRegister, zetGenre, genresVan, sectorVan };
+module.exports = { SECTOREN, GENRES, zetRegister, zetGenre, genresVan, sectorVan,
+  TOEGANG, toegangVan, genreToegang, aanvraagbareGenres, genresMetStand };

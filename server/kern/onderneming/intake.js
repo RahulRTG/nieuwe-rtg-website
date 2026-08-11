@@ -58,6 +58,15 @@ module.exports = ({ schoon }) => {
     if (p.samen !== undefined) i.persoon.samen = SAMEN.includes(p.samen) ? p.samen : null;
     if (p.verkoopervaring !== undefined) i.persoon.verkoopervaring = !!p.verkoopervaring;
 
+    /* Een branche buiten de lijst wordt niet gezet. Dat lijkt op de stille
+       fallback die net uit kern/aanmeldingen/bedrijf.js is gehaald, maar het is
+       een ander geval: daar werd een genre stil VERVANGEN door een ander
+       ('zzp'), hier wordt er niets ingevuld. Er ontstaat dus geen onwaarheid.
+       De keuzelijst hiernaast (GENRES) komt sinds die opruiming uit het
+       register, dus een gesloten genre kan hier alleen nog met de hand komen.
+       Wie dit tot een echte melding wil maken, moet intakeZet() een uitslag
+       laten teruggeven -- dat raakt al zijn aanroepers en hoort een eigen
+       besluit te zijn, geen bijwerking van deze opruiming. */
     if (d.branche !== undefined) i.idee.branche = GENRES.includes(d.branche) ? d.branche : null;
     if (d.wat !== undefined) i.idee.wat = scho(d.wat, 300);
     if (d.doelgroep !== undefined) i.idee.doelgroep = scho(d.doelgroep, 200);

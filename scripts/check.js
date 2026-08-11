@@ -357,6 +357,15 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
     ['public/shared/klok3d/klok3d-01.js', 'de 3D-klok: een aaneengesloten tekenlus'],
     ['public/shared/metgezel/metgezel-01.js', 'de metgezel-laag in een IIFE zonder binnengrens'],
     ['server/kern/livinglab/kader.js', 'de tabellen van het Living Lab (cyclus, soorten, methoden, rollen, bewijsgraden, risicoklassen): één tabelset zonder logica, en juist het bestand dat NIET op twee plekken mag staan'],
+    /* Dezelfde reden als kader.js hierboven, en scherper. Dit is het
+       genre-register: 73 regels data, geen logica (die staat in ./genres.js).
+       Het ging over de grens toen elk genre een toegangsstand kreeg -- dus door
+       de DATA en niet door een tweede onderwerp. En opknippen is hier niet
+       neutraal: dit bestand bestaat juist omdat de 73 genres verspreid stonden
+       over tien initdata-delen en zes kernmodules. Het in tweeën hakken zet die
+       verspreiding weer in gang, en test/genreregister.test.js bewaakt precies
+       dat het EEN plek blijft. */
+    ['server/seed/genres-lijst.js', 'het genre-register: 73 regels pure data zonder logica, en juist het bestand dat NIET op twee plekken mag staan'],
     ['public/shared/i18n/i18n-01.js', 'de taaltabel + kiezer, een geheel'],
     ['public/shared/i18n/i18n-03.js', 'de taaltabel + kiezer, een geheel'],
     ['server/server.js', 'de bedrading van de hele app; wordt per ronde verder verdund'],
@@ -389,6 +398,17 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
        een tweede script bij dat overal mee moet. Dat doe je een voor een met de
        toetsen ernaast en niet in de staart van een ronde. */
     'public/shared/media.js',
+    /* server/kern/aanmeldingen.js stond op 10235 bytes -- VIJF onder de grens --
+       en ging erover toen de aanvraag de uitslag van zetBedrijf() ging lezen
+       (het einde van de stille omzetting naar 'zzp'; zie CONCERN.md). Dat zijn
+       twee regels code die er moesten komen. Hij hoort in NOG en niet in MAG:
+       er zit een duidelijke naad in, tussen de AANVRAAG (binnenkomen, intake,
+       op de stapel) en het BESLUIT (accepteren, betaalschema, provisioneren).
+       Die tweede helft leunt al op ./aanmeldingen/besluit.js en
+       ./aanmeldingen/betaalschema.js, dus de knip is te maken -- maar het is
+       echte bedrading en die doe je met de toetsen ernaast, niet in de staart
+       van deze ronde. */
+    'server/kern/aanmeldingen.js',
     // server/accounts/users.js is opgeknipt: het ledendossier, de verificatie, de
     // kantoorlijsten en de vergetelheid staan nu in server/accounts/dossier.js
     'server/kern/journalistiek.js',

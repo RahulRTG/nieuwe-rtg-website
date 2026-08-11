@@ -120,5 +120,47 @@
     });
   });
 
+  /* ------------------------------------------ objecten uit een andere app --
+     WERKRUIMTE.md par. 6. De schil sleept objecten door RTG heen, maar hij
+     weet niet wat een reis IS -- dat weet deze app. Twee berichten:
+
+       sleep-kan  "kun jij hier iets mee?"  -> we antwoorden alleen als het kan
+       sleep-doe  "doe het"                 -> komt PAS na bevestiging door een mens
+
+     Zwijgen is nee: op een soort die we niet kennen antwoorden we niet, en dan
+     licht deze surface tijdens het slepen niet op.
+
+     De handeling gebeurt met ONZE eigen sessie en ONZE eigen rechten (par. 5).
+     De schil draagt alleen een verwijzing; wat hier binnenkomt is precies wat
+     de verzender al op zijn scherm had staan. */
+  var KAN = {
+    reis: { wat: 'als afspraak in uw agenda zetten', maak: function (o) {
+      var datum = (o.velden || {}).datum || '';
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(datum)) return null;
+      return { titel: String(o.label || 'Reis').slice(0, 120), datum: datum };
+    } }
+  };
+
+  window.addEventListener('message', function (e) {
+    if (e.origin !== location.origin || !e.data || !e.data.object) return;
+    var o = e.data.object, k = KAN[o.soort];
+    if (!k) return;                                   // onbekende soort: zwijgen is nee
+    if (e.data.rtg === 'sleep-kan') {
+      /* Alleen ja zeggen als we het ook echt kunnen. Een reis zonder bruikbare
+         datum kan hier niets worden, en dan is "ja" een loze belofte. */
+      if (!k.maak(o)) return;
+      try { window.parent.postMessage({ rtg: 'sleep-kan-ja', wat: k.wat }, location.origin); } catch (x) {}
+      return;
+    }
+    if (e.data.rtg !== 'sleep-doe') return;
+    var invoer = k.maak(o);
+    if (!invoer) return;
+    api('toevoegen', invoer).then(function (r) {
+      if (r.status !== 200) return meld(r.body.error || 'Het lukte niet om dit toe te voegen.');
+      meld('Toegevoegd: ' + invoer.titel);
+      laad();
+    });
+  });
+
   if (!token) meld('Log eerst in op de leden-app.'); else laad();
 })();

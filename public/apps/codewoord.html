@@ -4,160 +4,28 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Codewoord</title>
-<meta name="theme-color" content="#0C0C0B">
 <meta name="robots" content="noindex,nofollow">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
-<link rel="manifest" href="/manifests/codewoord.webmanifest">
-<link href="/fonts/fonts.css" rel="stylesheet">
-<link href="/shared/rtg-uniform.css" rel="stylesheet">
-<link href="/shared/rtg-ui.css" rel="stylesheet">
-<link href="/shared/veiligheid.css" rel="stylesheet">
-<link href="/shared/dagkleur.css" rel="stylesheet">
-<!-- Meenemen (shared/uitvoer.js) is hier bewust NIET geladen: deze pagina
-     heeft geen tabel en meldt geen bron aan, dus de knop kon nooit iets
-     ophalen. Een knop die niets kan halen is erger dan geen knop. -->
-<script src="/shared/seizoen.js" defer></script>
-<script src="/shared/veiligheid.js" defer></script>
-<link href="/shared/ios.css" rel="stylesheet">
+<!-- Codewoord is een stand van RTG Veilig geworden. De vier veiligheidsapps
+     deelden altijd al dezelfde serverkern (server/kern/veiligheid/) en dezelfde
+     clientlaag (shared/veiligheid.js); ze verschilden alleen in de vraag die ze
+     stelden. Vier tegels voor een systeem dat een systeem is, betekende dat
+     iemand de Thuiswacht kende en het Codewoord nooit had gezien.
+
+     Dit pad blijft bestaan omdat er van buiten naar gelinkt kan zijn -- uit een
+     alarmmail, uit een gedeelde link, uit een oud bladwijzertje, of vanaf een
+     toestel waarop deze app als PWA is geinstalleerd -- en een dood pad is
+     erger dan een omleiding. De hash wijst de schil meteen naar de juiste
+     stand, dus wie hier binnenkomt ziet precies het scherm dat hij zocht.
+
+     De querystring gaat VOOR de hash mee. Andersom (…html#stand?x=1) is de
+     query geen query meer maar een stuk van de hash, en dan komt hij nergens
+     aan; die fout stond hier een commit lang in. -->
+<meta http-equiv="refresh" content="0; url=/apps/veilig.html#codewoord">
+<link rel="canonical" href="/apps/veilig.html#codewoord">
+<script>location.replace('/apps/veilig.html' + location.search + '#codewoord');</script>
 </head>
-<body class="rtg-stijl">
-<a class="skip" href="#inhoud">Naar de inhoud</a>
-<header class="kop">
-  <a href="/apps/app.html" aria-label="Terug naar de app">&#8592;</a>
-  <h1>Codewoord</h1>
-  <div class="rek"></div>
-  <span class="stil">stil om hulp vragen</span>
-</header>
-<main id="inhoud">
-  <p class="stil">Een gewone zin die u tegen Rahul typt. Op uw scherm gebeurt er niets: geen
-  pop-up, geen geluid, geen vinkje, en Rahul antwoordt precies zoals altijd. Ondertussen heeft
-  uw kring bericht gekregen met uw laatst bekende plek.</p>
-
-  <p class="stil" style="margin-top:.6rem;">Dat "er gebeurt niets" is de hele functie. Wie met u
-  meekijkt op uw scherm mag niets zien veranderen. Daarom laat deze app uw zin na het instellen
-  ook nooit meer zien, ook niet aan u: hij staat alleen als onleesbare afdruk op de server.</p>
-
-  <section aria-label="Uw zin">
-    <h2>Uw zin</h2>
-    <div class="kaart" id="zinKaart"><p class="stil">Laden...</p></div>
-  </section>
-
-  <section aria-label="Oefenen">
-    <h2>Oefenen</h2>
-    <div class="kaart">
-      <p class="stil">Kijk of uw zin nog wordt herkend. Hier gaat er nooit een alarm uit.
-      Oefen als u alleen bent, niet als het erop aankomt.</p>
-      <div class="rij" style="margin-top:.6rem;">
-        <input id="oefen" maxlength="200" placeholder="Typ uw zin, of een zin met uw zin erin" aria-label="Oefenzin">
-        <button class="knop" id="oefenKnop">Proberen</button>
-      </div>
-      <p class="stil" id="oefenUit" style="margin-top:.5rem;"></p>
-    </div>
-  </section>
-
-  <section aria-label="Uw kring">
-    <h2>Wie krijgt bericht</h2>
-    <div class="kaart" id="kring"><p class="stil">Laden...</p></div>
-  </section>
-
-  <section aria-label="Eerlijk">
-    <h2>Waar dit niet tegen helpt</h2>
-    <div class="kaart">
-      <p class="stil">Uw telefoon blijft het zwakke punt. Wie hem afpakt of afzet, zet ook dit uit.
-      Het codewoord helpt op het moment dat u de telefoon nog in handen heeft maar niet vrij kunt
-      praten; het is geen bescherming tegen iemand die uw toestel overneemt.</p>
-      <p class="stil" style="margin-top:.6rem;">Kies daarom een zin die u onder spanning nog kunt
-      typen, die in een gewoon gesprek niet opvalt, en die u niet per ongeluk gebruikt. Drie tot
-      vijf woorden werkt het best.</p>
-    </div>
-  </section>
-
-  <div id="grens" class="rtgdeel-vast"></div>
-</main>
-<script>
-(() => {
-  const $ = s => document.querySelector(s);
-
-  function tekenZin(st) {
-    if (!st.ingesteld) {
-      $('#zinKaart').innerHTML =
-        '<label class="stil lbl" for="zin">Kies uw zin (minstens drie woorden)</label>' +
-        '<input id="zin" maxlength="120" autocomplete="off" placeholder="Een gewone zin uit uw eigen leven">' +
-        /* Met opzet GEEN voorbeeldzin. Zou hier een zin staan, dan kiest een deel
-           van de mensen precies die, en dan is het geen geheim meer. Wel uitleggen
-           waaraan een goede zin voldoet; de zin zelf verzint u zelf. */
-        '<p class="stil" style="margin-top:.5rem;">Wij geven met opzet geen voorbeeld: een voorbeeldzin ' +
-        'wordt door te veel mensen overgenomen en is dan geen geheim meer. Neem iets uit uw eigen ' +
-        'huishouden dat u zonder nadenken typt en dat niemand vreemd vindt.</p>' +
-        '<p class="stil" style="margin-top:.4rem;">Hoofdletters, accenten en leestekens maken niet uit. ' +
-        'Uw zin mag midden in een gewoon bericht staan.</p>' +
-        '<button class="knop hoofd groot" id="zet" style="margin-top:.8rem;">Instellen</button>';
-      $('#zet').addEventListener('click', async () => {
-        const zin = $('#zin').value.trim();
-        try {
-          await Veilig.api('/api/veiligheid/codewoord/zet', { zin });
-          $('#zin').value = '';
-          Veilig.melding('Ingesteld. Onthoud hem goed; wij kunnen hem u niet meer laten zien.');
-          laad();
-        } catch (e) { Veilig.melding(e.message); }
-      });
-      return;
-    }
-    $('#zinKaart').innerHTML =
-      '<p>Uw codewoord staat ingesteld: <strong>' + st.aantal + ' woorden</strong>.</p>' +
-      '<p class="stil" style="margin-top:.4rem;">Meer laten we met opzet niet zien. ' +
-      (st.keer ? 'Hij is ' + st.keer + ' keer herkend.' : 'Hij is nog niet gebruikt.') + '</p>' +
-      '<label class="mini" style="margin-top:.8rem;"><input type="checkbox" id="aan"' + (st.aan ? ' checked' : '') +
-        '> het codewoord staat aan</label>' +
-      '<div class="rij" style="margin-top:.8rem;">' +
-        '<button class="knop" id="nieuw" style="flex:1;">Andere zin kiezen</button>' +
-        '<button class="knop stop" id="wis" style="flex:1;">Wissen</button></div>';
-    $('#aan').addEventListener('change', async (e) => {
-      try { await Veilig.api('/api/veiligheid/codewoord/schakel', { aan: e.target.checked }); laad(); }
-      catch (err) { Veilig.melding(err.message); }
-    });
-    $('#nieuw').addEventListener('click', () => tekenZin({ ingesteld: false }));
-    $('#wis').addEventListener('click', async () => {
-      try { await Veilig.api('/api/veiligheid/codewoord/wis'); Veilig.melding('Gewist.'); laad(); }
-      catch (e) { Veilig.melding(e.message); }
-    });
-  }
-
-  async function laad() {
-    try {
-      const d = await Veilig.api('/api/veiligheid/codewoord');
-      tekenZin(d.stand);
-    } catch (e) {
-      $('#zinKaart').innerHTML = '<p class="stil">' + Veilig.esc(e.message) + ' Log eerst in via de leden-app.</p>';
-    }
-  }
-
-  function start() {
-    $('#grens').innerHTML = Veilig.grens();
-    Veilig.kringKaart($('#kring'));
-    $('#oefenKnop').addEventListener('click', async () => {
-      try {
-        const r = await Veilig.api('/api/veiligheid/codewoord/proef', { tekst: $('#oefen').value });
-        $('#oefenUit').textContent = r.raak
-          ? 'Herkend. Deze zin zou uw kring waarschuwen.'
-          : 'Niet herkend. Deze zin doet niets.';
-        $('#oefen').value = '';
-      } catch (e) { $('#oefenUit').textContent = e.message; }
-    });
-    laad();
-  }
-  if (window.Veilig) start();
-  else window.addEventListener('load', start);
-})();
-</script>
-<script src="/shared/deelmenu.js" defer></script>
-<script src="/shared/metgezel.js" defer></script>
-<script src="/shared/basis.js" defer></script>
-<script src="/shared/bediening.js" defer></script>
-<script src="/shared/randen.js" defer></script>
-<script src="/shared/volscherm.js" defer></script>
-<script src="/shared/cookie.js" defer></script>
-<script src="/shared/sneltoets.js" defer></script>
-<script src="/shared/ios.js" defer></script>
+<body style="background:#0C0C0B;color:#F4F1EC;font-family:Inter,system-ui,sans-serif;padding:2rem;">
+<p>Codewoord staat nu in RTG Veilig. <a href="/apps/veilig.html#codewoord" style="color:#C9A24B;">Ga verder</a>.</p>
 </body>
 </html>

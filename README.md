@@ -3009,6 +3009,41 @@ De vijf apps eronder blijven gewoon bestaan en werken los: wie recht naar De Sal
 Bewezen door `test/wereldlaag.test.js` (veertien toetsen: de gesloten wereld is echt gesloten — ook bij een rechtstreekse aanvraag —, een zakelijke post lekt niet in de "Alles" van een gratis pas, een prikbordbericht komt bij de leden en juist niet bij wie erbuiten staat, de feed loopt aflopend over de héle lijst), `test/wereldprofiel.test.js` (zes toetsen, waaronder de vijf zichtbaarheden op ÉÉN opstelling van vier kijkers — de enige manier om te bewijzen dat ze echt iets verschillends doen) en `test/wereldlaag.e2e.js` (het scherm in een echte browser: Business staat gedimd, de Salon-post staat in de wereldfeed, en "Bericht" landt in het juiste gesprek in de aparte berichten-app zonder sleutel in de URL). Vijftien mutaties uit LAT.md-regel 2. Veertien raak op de juiste toets; de vijftiende **sloeg af**, en dat was de nuttigste van allemaal — hij legde bloot dat de schermtoets zelf niet kon zakken (een `waitForFunction` met een async functie wacht op een Promise, en die is altijd waar). Die toets stelt zijn vraag nu vanuit Node, en daarna bijt de mutatie wel.
 
 Twee stille fouten kwamen bij dat bouwen boven water, allebei van het soort dat geen enkele foutmelding geeft. De genootschap-lezer las de opslag verkeerd (de groepen staan in `db.data.genootschap.groepen`, niet als losse sleutels) en gaf dus **altijd nul berichten**; en de auteursnaam liep via `liveCodename`, dat een sessie verwacht en voor een kale sleutel `null` teruggeeft — waarna elke auteur stil **"Een lid"** heette. Beide bleven staan omdat de toetsen keken of de bron meedeed in plaats van of er inhoud uitkwam, en of er een naam stond in plaats van wélke. Dat is precies LAT.md-regel 9, en de toetsen vergelijken nu de echte waarden.
+### RTG Reizen (de reiswereld, laag 2)
+
+`server/kern/reiswereld.js` + `/api/reis/wereld` + `/apps/reizen.html`. De eerste
+super app die volgens de regel in `PLATFORM.md` is gebouwd: hij **orkestreert**
+de reisdomeinen en vervangt ze niet. Verblijven, Reisbureau, Vluchten en Hangar
+houden hun eigen catalogus, hun eigen diepte en hun eigen boekingsstroom.
+
+Wat hij toevoegt is wat nergens bestond: **uw komende reis bij elkaar**, uit alle
+domeinen tegelijk, op datum — de vlucht van dinsdag, het hotel van woensdag en de
+aangevraagde reis van volgende maand in één tijdlijn, ongeacht in welke app u ze
+boekte.
+
+Wat hij met opzet **niet** heeft: een knop die boekt, wijzigt of annuleert. Elke
+regel is een link naar de app die het echte werk doet. Zou dit scherm ook boeken,
+dan was er een tweede plek waar een reis ontstaat, en dan is "waar staat mijn
+boeking echt" binnen een maand niet meer te beantwoorden (LAT.md regel 4). De
+module heeft dan ook geen eigen collectie, schrijft nooit, en bewaart niets: elke
+regel wordt bij het opvragen uit het domein zelf gehaald via de functie die dat
+domein al had. `test/reiswereld.test.js` bewijst dat door de domeinen te
+veranderen *nadat* de wereld is samengesteld, en door te toetsen dat de laag
+alleen `komend()` aanbiedt en verder niets.
+
+**De regel die deze laag het scherpst maakt: een bron die stilvalt, verzwijgt
+zichzelf niet.** Een reiswereld hangt per definitie aan drie andere domeinen.
+Valt er één weg en toont het scherm gewoon de andere twee, dan *lijkt* het
+reisschema compleet — en zo mist iemand een vlucht. Elke bron wordt daarom apart
+opgehaald; wat niet lukte komt als naam terug in `stil`, en het scherm zegt dan
+hardop dat dit een onvolledig en geen leeg reisschema is. De mutatie die de toets
+laat zakken staat in het testbestand: laat `bron()` de fout stil opeten, en twee
+toetsen vallen om terwijl de app er ongewijzigd uitziet.
+
+De domeingrens deed hier trouwens zijn werk: `/api/reis/wereld` kreeg bij de
+eerste aanroep een 500 omdat het domein `reis` `kern.reiswereld` niet in
+`GRENZEN.json` had staan. Dat is geen hindernis maar de bedoeling — een domein
+dat verder reikt dan het opschrijft, hoort te stuiten.
 
 ### RTG Bank & RTG Stad (de eigen infrastructuur)
 
@@ -3794,16 +3829,44 @@ Die meldingsingang is de enige route in Command zonder kantoorinlog, want hij be
 Wat er **niet** is en in `SLO.md` blijft staan: een cron die de sonde elke minuut van buitenaf start (een inrichtingsbesluit op een machine buiten deze repo), alertregels, en een gemeten basislijn in plaats van verstandig gekozen streefwaarden.
 
 ## Veiligheid & verbinding: vier apps op één ruggengraat
+## RTG Veilig: vier standen op één ruggengraat
 
-Vier losse apps (elk met eigen PWA-manifest), die onderhuids dezelfde kern delen
+Eén app (`/apps/veilig.html`) met vier standen, op één kern
 (`server/kern/veiligheid/`, routes onder `/api/veiligheid/*`):
 
-| App | Wat het doet |
+| Stand | Wat het doet |
 |---|---|
-| **Thuiswacht** (`/apps/thuiswacht.html`) | "Ik ben over X minuten thuis." Meld je je niet, dan krijgt je kring bericht met je laatst bekende plek |
-| **Codewoord** (`/apps/codewoord.html`) | Een gewone zin tegen Rahul waarschuwt je kring stil; op je scherm gebeurt er zichtbaar niets |
-| **Vitaal** (`/apps/vitaal.html`) | Dagelijkse check-in voor medicijnen of voor wie alleen woont |
-| **Thuisrust** (`/apps/thuisrust.html`) | Niet storen tot je thuis bent, met een veiligheidsbaan die je kring altijd doorlaat |
+| **Thuiswacht** (`#wacht`) | "Ik ben over X minuten thuis." Meld je je niet, dan krijgt je kring bericht met je laatst bekende plek |
+| **Codewoord** (`#codewoord`) | Een gewone zin tegen Rahul waarschuwt je kring stil; op je scherm gebeurt er zichtbaar niets |
+| **Vitaal** (`#vitaal`) | Dagelijkse check-in voor medicijnen of voor wie alleen woont |
+| **Thuisrust** (`#rust`) | Niet storen tot je thuis bent, met een veiligheidsbaan die je kring altijd doorlaat |
+
+**Waarom dit één app werd.** Dit waren vier losse apps met elk een eigen
+PWA-manifest en een eigen tegel. Ze deelden alleen niet "onderhuids iets" — ze
+deelden *alles*: dezelfde serverkern, dezelfde clientlaag
+(`shared/veiligheid.js`), dezelfde kring en dezelfde eerlijke grens. Wat ze
+onderscheidde was de vraag die ze stelden, en dat is een tabblad, geen app. Vier
+deuren naar één systeem betekende in de praktijk dat iemand de Thuiswacht kende
+en het Codewoord nooit had gezien.
+
+Wat de samenvoeging **niet** doet: er komt geen tweede administratie naast de
+kern (LAT.md regel 4). Elke stand roept exact dezelfde routes aan als zijn app
+dat deed. De winst zit in wat nu één keer bestaat in plaats van vier keer — de
+kring (één verzoek in plaats van vier) en de grens — en in wat nu vindbaar is.
+
+De vier oude paden blijven bestaan als omleiding naar hun eigen stand
+(`/apps/thuiswacht.html` → `/apps/veilig.html#wacht`), inclusief de
+querystring, want er wordt van buiten naar gelinkt: uit een alarmmail, uit een
+bladwijzer, en vanaf een toestel waar zo'n app als PWA geïnstalleerd staat. Die
+vier manifesten blijven daarom ook staan, met hun `start_url` naar de juiste
+stand; een geïnstalleerde Thuiswacht opent nog steeds de Thuiswacht.
+
+`test/veiligheid.e2e.js` loopt de vier standen binnen één pagina af en meet twee
+dingen die je aan de bron niet ziet: dat de seconde-teller van een lopende wacht
+**stopt** zodra je de stand verlaat (geteld op tikduur, want schrijven naar een
+losgekoppelde DOM-knoop gooit geen fout — een lekkende teller is volkomen stil),
+en dat het levensteken van twee minuten juist **doorloopt**, want de wacht loopt
+op de server en niet op het scherm waar je toevallig naar kijkt.
 
 Drie ontwerpkeuzes die de rest verklaren:
 

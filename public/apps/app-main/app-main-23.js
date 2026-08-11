@@ -79,5 +79,5 @@
     navigatie:   { naam: 'Navigatie',    url: '/apps/navigatie.html' },
     theater:     { naam: 'Films en series',      url: '/apps/theater.html' },
     residentie:  { naam: 'Verblijven', url: '/apps/residentie.html' },
-    wbw:         { naam: 'Samen betalen', url: '/apps/wbw.html' },
+    wbw:         { naam: 'Samen betalen', url: '/apps/geld.html#wbw' },
     passkeys:    { naam: 'Passkeys',     url: '/apps/passkeys.html' },

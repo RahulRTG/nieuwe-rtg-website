@@ -39,6 +39,22 @@
     const el = document.createElement('button');
     el.className = 'os-app os-map'; el.dataset.sleutel = map.sleutel;
     el.setAttribute('aria-label', 'Map ' + mapNaam(map));
+    /* EEN WERELD IS EEN APP EN ZIET ERUIT ALS EEN APP: een tegel met een glyf,
+       geen mapvoorbeeld met minitegels (PLATFORM.md par. 0). Het mapvoorbeeld
+       had ook een echt gebrek: het telde de ZICHTBARE onderdelen, dus op de
+       instappas toonde RTG Leven drie snippers en RTFoundation een -- en dan
+       oogt de instap budget, precies wat de merkregel verbiedt. Een glyf is
+       op elke pas even vol. */
+    if (map.wereld) {
+      const tegel = document.createElement('span'); tegel.className = 'os-tegel';
+      const g = window.RTGGlyf && RTGGlyf.svg(map.glyf);
+      if (g) tegel.appendChild(g);
+      else { const m = document.createElement('span'); m.className = 'os-monogram'; m.textContent = mapNaam(map).replace(/^RTG /, '').slice(0, 2); tegel.appendChild(m); }
+      el.appendChild(tegel);
+      const nm = document.createElement('span'); nm.className = 'os-naam'; nm.textContent = mapNaam(map); el.appendChild(nm);
+      el.addEventListener('click', () => { if (!wiebel) openMap(map); });
+      return el;
+    }
     const tegel = document.createElement('span'); tegel.className = 'os-tegel os-map-tegel';
     for (const item of map.items.filter(itemZichtbaar).slice(0, 9)) {
       const mini = document.createElement('span'); mini.className = 'os-map-mini';
@@ -131,6 +147,13 @@
      raster van #osMapGrid af -- niet twee rasters in elkaar.
      test/appmenu.e2e.js meet de meetkunde en zakt als dat weer gebeurt. */
   function openMap(map) {
+    /* ACHT WERELDEN (PLATFORM.md par. 0). Een wereld is een APP en geen map:
+       tikken opent hem, en er komt geen tussenscherm met tegels. De `items`
+       blijven staan zolang de onderdelen nog eigen pagina's zijn -- Spotlight
+       indexeert ze en zonder die index is er halverwege de verhuizing van
+       alles onvindbaar. Naarmate een wereld zijn secties opslokt, loopt die
+       lijst vanzelf leeg. */
+    if (map.wereld) { location.href = map.wereld; return; }
     mapTitel.textContent = mapNaam(map);
     mapGrid.textContent = '';
     const zicht = map.items.filter(itemZichtbaar);

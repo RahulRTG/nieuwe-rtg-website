@@ -58,6 +58,27 @@
     if (tg.eenDing === 'altijd') el.classList.add('rtg-eending');
   } catch (e) {}
 
+  /* ---- 0. het thema, VOOR al het andere ---------------------------------
+     De vier thema's (champagne, onyx, bordeaux, royal) hingen aan een script
+     dat maar op één pagina stond. Een themakeuze die niet meereist is geen
+     thema maar een instelling van dat ene scherm, dus hij hoort in de laag die
+     overal ligt -- net als de bladen die hij aanstuurt (die komen mee via de
+     @import bovenaan shared/rtg-ui.css).
+
+     ZO VROEG MOGELIJK. Dit script zet een attribuut op <html> en daar hangt de
+     grondkleur aan; gebeurt dat pas na het tekenen, dan zie je de oude grond
+     even staan. Vandaar hier, boven de service worker, en niet in de opstart
+     onderaan.
+
+     De sleutel is rtg_thema_v2 en die staat los van de oude donker/licht-keuze
+     in shared/thema.js. Een pagina die nog niet om is, merkt niets: zonder
+     attribuut geldt gewoon wat de UI-kit al zei. */
+  if (!document.documentElement.hasAttribute('data-rtg-thema') && !document.getElementById('rtgThemasJs')) {
+    var th = document.createElement('script');
+    th.id = 'rtgThemasJs';
+    th.src = '/shared/rtg-themas.js';
+    (document.head || document.documentElement).appendChild(th);
+  }
 
   /* ---- 1. offline: de service worker + een rustig verbindingsseintje ---- */
   if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {

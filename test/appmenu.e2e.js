@@ -388,9 +388,14 @@ test('geen enkele map loopt leeg op de instappas',
      pas die alles ziet. Je ziet het alleen door de mappen echt open te klikken
      mét de kleinste pas. Vandaar deze toets.
 
-     De mutatie die hem hoort te laten zakken: zet de zorg-apps (tab:zorg,
-     tab:gezin, link:vitaal, link:thuisrust) uit Het Huis terug in een eigen
-     map. */
+     De mutatie die hem hoort te laten zakken: zet de zorg-tabbladen (tab:zorg,
+     tab:gezin) uit Het Huis terug in een eigen map.
+
+     Hier stonden ook link:vitaal en link:thuisrust bij. Die twee zijn standen
+     van RTG Veilig geworden (een app kan maar in een map staan, en die map is
+     Veilig), dus Het Huis draagt zijn ondergrens nu op de twee tabbladen plus
+     link:ontdek en os:rtf. Dat is krapper dan het was: gaat er nog iets uit
+     Het Huis weg, dan zakt deze toets -- en dat is precies de bedoeling. */
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-mappen-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -411,33 +416,41 @@ test('geen enkele map loopt leeg op de instappas',
     await page.evaluate(() => { const g = document.getElementById('onbGate'); if (g) g.hidden = true; });
     await page.waitForTimeout(400);
 
-    const mappen = await page.evaluate(async () => {
-      const wacht = (ms) => new Promise((k) => setTimeout(k, ms));
-      const uit = [];
-      for (const map of [...document.querySelectorAll('#osMappen .os-app')]) {
-        const naam = (map.getAttribute('aria-label') || '').replace(/^Map /, '').trim();
-        map.click();
-        await wacht(320);
-        const apps = [...document.querySelectorAll('#osMapGrid .os-app')]
-          .map((a) => (a.getAttribute('aria-label') || '').trim());
-        uit.push({ naam: naam, apps: apps });
-        const scrim = document.getElementById('osMapScrim');
-        if (scrim) scrim.classList.remove('open');
-        await wacht(120);
-      }
-      return uit;
-    });
+    /* DE METING IS TWEE KEER VERHUISD, en dat hoort hier te staan.
 
-    assert.ok(mappen.length >= 7, 'er zijn minder dan zeven mappen gemeten: ' + mappen.length);
-    const mager = mappen.filter((m) => m.apps.length < 4);
-    assert.deepEqual(mager.map((m) => m.naam + ' (' + m.apps.length + ')'), [],
-      'deze mappen zijn op een RTG-pas bijna leeg:\n' +
-      mappen.map((m) => '  ' + m.naam + ': ' + m.apps.length + ' -- ' + m.apps.join(', ')).join('\n'));
+       Eerst telde deze toets tegels in een OPENGEKLIKTE map. Toen werelden
+       apps werden, telde hij de minitegels op de wereldtegel -- en die telling
+       ving meteen iets echts: de minitegels toonden alleen wat op JOUW pas
+       zichtbaar is, dus op de instappas stond RTG Leven er met drie snippers
+       en RTFoundation met een. De instap oogde budget, precies wat de
+       merkregel verbiedt.
 
-    // en een app hoort in precies EEN map te staan
-    const alle = mappen.flatMap((m) => m.apps);
-    const dubbel = alle.filter((x, i) => alle.indexOf(x) !== i);
-    assert.deepEqual([...new Set(dubbel)], [], 'deze apps staan in meer dan een map');
+       De oplossing is niet een lagere lat maar een andere tegel: een wereld is
+       een app en ziet eruit als een app, met EEN glyf die op elke pas even vol
+       is. Wat deze toets dus nu bewaakt: elke wereldtegel draagt een echte
+       getekende glyf (svg), geen monogram-terugval en geen leeg vlak. De
+       monogram-terugval bestaat voor een glyf die ontbreekt, en op het
+       beginscherm is "de glyf ontbreekt" geen smaakverschil maar een kale
+       voordeur.
+
+       De dubbelcheck ("een app staat in precies EEN wereld") is apart
+       verhuisd, naar regel 44 in scripts/check.js -- die leest de bron.
+
+       DE MUTATIE DIE HEM HOORT TE LATEN ZAKKEN: geef een wereld in
+       app-main-24a2.js een glyf-naam die niet bestaat ('map-geld' ->
+       glyf: 'bestaatniet'). De tegel valt dan terug op het monogram. */
+    const mappen = await page.evaluate(() =>
+      [...document.querySelectorAll('#osMappen .os-app')].map((map) => ({
+        naam: (map.getAttribute('aria-label') || '').replace(/^Map /, '').trim(),
+        glyf: !!map.querySelector('.os-tegel svg'),
+        monogram: !!map.querySelector('.os-monogram')
+      })));
+
+    assert.ok(mappen.length >= 7, 'er zijn minder dan zeven werelden gemeten: ' + mappen.length);
+    const kaal = mappen.filter((m) => !m.glyf);
+    assert.deepEqual(kaal.map((m) => m.naam + (m.monogram ? ' (monogram)' : ' (leeg)')), [],
+      'deze wereldtegels dragen geen getekende glyf:\n' +
+      mappen.map((m) => '  ' + m.naam + ': ' + (m.glyf ? 'glyf' : (m.monogram ? 'monogram' : 'leeg'))).join('\n'));
   } finally {
     if (browser) await browser.close();
     stop(child);
@@ -445,35 +458,30 @@ test('geen enkele map loopt leeg op de instappas',
   }
 });
 
-test('een geopende map legt zijn tegels naast elkaar en niet over elkaar',
+test('de wereldtegels op het beginscherm staan naast elkaar, en openen hun app',
   { skip: pw ? false : 'playwright niet beschikbaar in deze omgeving' }, async () => {
-  /* DIT IS NIET AAN DE BRON TE ZIEN EN OOK NIET AAN EEN GROENE MAPTOETS.
+  /* DIT IS NIET AAN DE BRON TE ZIEN EN OOK NIET AAN EEN GROENE TELTOETS.
 
-     De toets hierboven telt of een map genoeg apps heeft. Die stond groen
-     terwijl elke map er kapot uitzag: de tegels lagen over elkaar heen, tegen
-     de linkerrand geplakt, met labels afgekapt tot "MU..." en "FIL..." en
-     tweederde van het paneel leeg. Tellen is geen kijken.
+     De voorganger van deze toets mat de tegels in een GEOPENDE map. Sinds het
+     beginscherm acht werelden toont (PLATFORM.md par. 0) opent een tegel de
+     app zelf en is er geen tussenscherm meer. De fout waar die toets voor
+     bestond is niet verdwenen -- hij is verhuisd: tegels die over elkaar
+     liggen, buiten hun vak vallen of de helft van de breedte onbenut laten,
+     staan nu op het beginscherm zelf. Tellen is geen kijken, en dat gold toen
+     en geldt nu.
 
-     De oorzaak zat in twee rasters op elkaar. #osMapGrid droeg zelf al
-     `os-grid os-map-grid` (drie kolommen), en openMap hangt daar RIJEN in die
-     ook `os-grid os-map-grid` heten. Elke rij viel dus in één kolom van het
-     vel -- 87px van de 282px die het paneel binnen zijn rand heeft -- en
-     daarbinnen moesten opnieuw drie tegels van 62px passen. Het vel is nu een
-     stapel (.os-mapvel) en het raster zit alleen nog op de rij.
+     Wat er bij komt en er niet in kon staan: dat een wereld ook echt zijn app
+     opent. Dat is het hele punt van acht werelden; een tegel die niets doet
+     zou door elke telling heen komen.
 
-     Waarom het zo gemeten wordt en niet op een klassenaam: een toets die
-     `.os-mapvel` afleest, bewijst dat er een naam staat en niet dat er iets
-     naast elkaar ligt. De volgende overlap komt van een andere kant -- een
-     tegel die breder wordt, een paneel dat smaller wordt, een gap die groeit --
-     en dan moet deze toets alsnog zakken. Daarom meet hij de rechthoeken zelf.
-
-     De mutatie die hem hoort te laten zakken: zet in apps/app.html de klasse
-     van #osMapGrid terug op "os-grid os-map-grid". */
-  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-mapvorm-'));
+     De mutatie die hem hoort te laten zakken: haal `wereld` van een van de
+     mappen in app-main-24a2.js weg. De tegel opent dan weer een tegelveld en
+     navigeert nergens heen. */
+  const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-werelden-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
   try {
-    const tok = await lidToken(base, 'mapvorm' + process.pid + '@x.nl');
+    const tok = await lidToken(base, 'werelden' + process.pid + '@x.nl');
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     const ctx = await browser.newContext({ viewport: { width: 393, height: 852 } });
     await ctx.addInitScript((t) => {
@@ -489,66 +497,46 @@ test('een geopende map legt zijn tegels naast elkaar en niet over elkaar',
     await page.evaluate(() => { const g = document.getElementById('onbGate'); if (g) g.hidden = true; });
     await page.waitForTimeout(400);
 
-    const mappen = await page.evaluate(async () => {
-      const wacht = (ms) => new Promise((k) => setTimeout(k, ms));
-      const uit = [];
-      for (const map of [...document.querySelectorAll('#osMappen .os-app')]) {
-        const naam = (map.getAttribute('aria-label') || '').replace(/^Map /, '').trim();
-        map.click();
-        await wacht(320);
-        const grid = document.getElementById('osMapGrid');
-        const paneel = grid.closest('.os-map-paneel');
-        const apps = [...document.querySelectorAll('#osMapGrid .os-app')];
-        if (apps.length) {
-          const pr = paneel.getBoundingClientRect();
-          const ps = getComputedStyle(paneel);
-          const binnen = pr.width - parseFloat(ps.paddingLeft) - parseFloat(ps.paddingRight);
-          const doosjes = apps.map((a) => a.querySelector('.os-tegel').getBoundingClientRect());
-          const overlap = [];
-          for (let i = 0; i < doosjes.length; i++) {
-            for (let j = i + 1; j < doosjes.length; j++) {
-              const a = doosjes[i], b = doosjes[j];
-              // een halve pixel speling: afronding is geen overlap
-              if (a.left < b.right - 0.5 && b.left < a.right - 0.5 &&
-                  a.top < b.bottom - 0.5 && b.top < a.bottom - 0.5) overlap.push(i + '/' + j);
-            }
-          }
-          const links = Math.min(...doosjes.map((r) => r.left));
-          const rechts = Math.max(...doosjes.map((r) => r.right));
-          uit.push({
-            naam: naam, aantal: apps.length, overlap: overlap.length,
-            // buiten de rand van het paneel getekend?
-            buiten: doosjes.filter((r) => r.left < pr.left - 0.5 || r.right > pr.right + 0.5).length,
-            benutPct: Math.round(((rechts - links) / binnen) * 100),
-          });
+    const beeld = await page.evaluate(() => {
+      const tegels = [...document.querySelectorAll('#osMappen .os-app')];
+      const vak = document.getElementById('osMappen').getBoundingClientRect();
+      const doosjes = tegels.map((t) => t.getBoundingClientRect());
+      const overlap = [];
+      for (let i = 0; i < doosjes.length; i++) {
+        for (let j = i + 1; j < doosjes.length; j++) {
+          const a = doosjes[i], b = doosjes[j];
+          if (a.left < b.right - 0.5 && b.left < a.right - 0.5 &&
+              a.top < b.bottom - 0.5 && b.top < a.bottom - 0.5) overlap.push(i + '/' + j);
         }
-        const scrim = document.getElementById('osMapScrim');
-        if (scrim) scrim.classList.remove('open');
-        await wacht(120);
       }
-      return uit;
+      return {
+        aantal: tegels.length,
+        namen: tegels.map((t) => (t.getAttribute('aria-label') || '').replace(/^Map /, '').trim()),
+        overlap: overlap.length,
+        buiten: doosjes.filter((r) => r.left < vak.left - 0.5 || r.right > vak.right + 0.5).length,
+        nul: doosjes.filter((r) => r.width < 8 || r.height < 8).length
+      };
     });
 
-    assert.ok(mappen.length >= 7, 'er zijn minder dan zeven mappen gemeten: ' + mappen.length);
+    assert.ok(beeld.aantal >= 7, 'er zijn minder dan zeven werelden getekend: ' + beeld.aantal);
+    assert.equal(beeld.overlap, 0,
+      'wereldtegels liggen over elkaar heen (' + beeld.overlap + ' paren): ' + beeld.namen.join(', '));
+    assert.equal(beeld.buiten, 0, 'deze wereldtegels vallen buiten hun eigen vak');
+    assert.equal(beeld.nul, 0, 'een wereldtegel is nul groot; die is er wel en je ziet hem niet');
 
-    const stapelend = mappen.filter((m) => m.overlap > 0);
-    assert.deepEqual(stapelend.map((m) => m.naam + ' (' + m.overlap + ' paren)'), [],
-      'in deze mappen liggen tegels over elkaar heen:\n' +
-      mappen.map((m) => '  ' + m.naam + ': ' + m.aantal + ' tegels, ' + m.overlap +
-        ' overlappende paren, ' + m.benutPct + '% van de breedte benut').join('\n'));
-
-    const overrand = mappen.filter((m) => m.buiten > 0);
-    assert.deepEqual(overrand.map((m) => m.naam + ' (' + m.buiten + ')'), [],
-      'deze mappen tekenen tegels buiten hun eigen paneel');
-
-    /* En de tegels staan niet met z'n allen tegen één rand. Drie kolommen op
-       drie tegels vullen ~86% van de binnenmaat; bij de kapotte versie was dat
-       40%. Vijftig is de grens: ruim onder de gezonde stand, ruim boven de
-       kapotte, zodat een gap die iets verandert hem niet meteen rood maakt. */
-    const smal = mappen.filter((m) => m.aantal >= 3 && m.benutPct < 50);
-    assert.deepEqual(smal.map((m) => m.naam + ' (' + m.benutPct + '%)'), [],
-      'deze mappen persen hun tegels in een strook aan één kant:\n' +
-      mappen.map((m) => '  ' + m.naam + ': ' + m.benutPct + '%').join('\n'));
+    /* EN NU OPENT HIJ OOK ECHT. Een voor een, want elke klik navigeert weg. */
+    for (let i = 0; i < beeld.aantal; i++) {
+      await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
+      await page.waitForSelector('#osMappen .os-app', { timeout: 15000 });
+      await page.evaluate(() => { const g = document.getElementById('onbGate'); if (g) g.hidden = true; });
+      await page.waitForTimeout(250);
+      await page.evaluate((n) => document.querySelectorAll('#osMappen .os-app')[n].click(), i);
+      await page.waitForTimeout(900);
+      const pad = new URL(page.url()).pathname;
+      assert.notEqual(pad, '/apps/app.html',
+        'de wereld "' + beeld.namen[i] + '" opent geen app; hij bleef op het beginscherm staan');
+      assert.match(pad, /^\/apps\//, 'een wereld hoort naar een app te wijzen, niet naar ' + pad);
+    }
   } finally {
     if (browser) await browser.close();
     stop(child);

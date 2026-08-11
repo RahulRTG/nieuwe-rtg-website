@@ -29,11 +29,48 @@ test.before(async () => {
 });
 test.after(() => stop(srv && srv.child));
 
+/* Sinds de werelden zijn samengevoegd (PLATFORM.md par. 0) wijst een
+   catalogusrij niet meer naar een eigen pagina maar naar een STAND binnen een
+   wereld: /apps/geld.html#metier. De hash hoort dus van het pad af voor je op
+   schijf kijkt -- maar hem alleen wegknippen zou deze toets zwakker maken dan
+   hij was, want dan verwijst een rij naar een stand die niet bestaat en merkt
+   niemand het. De schil valt bij een onbekende hash stil terug op de eerste
+   stand; precies zo'n stille terugval als LAT.md regel 5 beschrijft.
+
+   Daarom controleert deze toets nu twee dingen: de pagina bestaat, EN als er
+   een anker in staat, is dat een stand die zich echt registreert. De standen
+   van een wereld wonen in public/apps/<wereld>/ en melden zich met
+   V.standen.push({ id: '...' }); die verzameling is de bron. */
+const standenVan = (wereld) => {
+  const map = path.join(__dirname, '..', 'public', 'apps', wereld);
+  let namen = [];
+  try { namen = fs.readdirSync(map).filter((n) => n.endsWith('.js')); } catch (e) { return null; }
+  const uit = new Set();
+  for (const n of namen) {
+    const s = fs.readFileSync(path.join(map, n), 'utf8');
+    for (const m of s.matchAll(/standen\.push\(\{\s*(?:\/\*[^]*?\*\/\s*)?id:\s*'([^']+)'/g)) uit.add(m[1]);
+  }
+  return uit;
+};
+
 test('1. elke app in de catalogus verwijst naar een bestaande pagina op schijf', () => {
   assert.ok(APPS.length >= 40, 'een echte, gevulde catalogus');
   for (const a of APPS) {
-    const bestand = path.join(__dirname, '..', 'public', a.url.split('?')[0]);
+    const zonderQuery = a.url.split('?')[0];
+    const [pad, anker] = zonderQuery.split('#');
+    const bestand = path.join(__dirname, '..', 'public', pad);
     assert.ok(fs.existsSync(bestand), a.naam + ' → ' + a.url + ' bestaat als echte pagina');
+    if (anker) {
+      const wereld = /\/apps\/([^/]+)\.html$/.exec(pad);
+      const standen = wereld ? standenVan(wereld[1]) : null;
+      /* Geen standenmap betekent een gewone pagina met een gewoon anker; daar
+         valt hier niets over te zeggen en dat is eerlijker dan gokken. */
+      if (standen && standen.size) {
+        assert.ok(standen.has(anker),
+          a.naam + ' → ' + a.url + ' wijst naar een stand die zich registreert (gevonden: ' +
+          [...standen].sort().join(', ') + ')');
+      }
+    }
     assert.ok(a.naam && a.uitleg, a.url + ' heeft een naam en uitleg');
     assert.equal(a.ledenprijsCenten, 0, 'voor leden inbegrepen');
   }

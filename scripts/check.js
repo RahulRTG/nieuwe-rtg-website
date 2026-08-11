@@ -360,6 +360,17 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
     ['public/shared/i18n/i18n-01.js', 'de taaltabel + kiezer, een geheel'],
     ['public/shared/i18n/i18n-03.js', 'de taaltabel + kiezer, een geheel'],
     ['server/server.js', 'de bedrading van de hele app; wordt per ronde verder verdund'],
+    /* De vijfenvijftig bureau-routes staan sinds regel 45 VOLUIT: een pad dat
+       met een plus wordt gebouwd ziet de schakelkast niet, en dan is de route
+       vanuit de boardroom niet te sturen. Dat maakt dit bestand langer dan de
+       maat, maar niet ingewikkelder: het is een aaneengesloten registratielijst
+       van zes bureaus, met het werk zelf in EEN handler-fabriek erboven.
+
+       Opknippen is geprobeerd en teruggedraaid. De drie bureaus die meegingen
+       namen ook de plank-route mee, die op db en op de werkplekcode leunt; wat
+       ontstond was geen tweede bestand maar een half bestand, en de toetsen
+       lieten dat meteen zien. Een lijst hoort bij elkaar te blijven. */
+    ['server/routes/werkplek-bureaus.js', 'de registratielijst van zes bureaus, voluit sinds regel 45; het werk staat in EEN handler erboven'],
     ['server/opzet/kernlaag4.js', 'een ophanglijst, geen module: elke regel hangt een kern op aan de vorige laag. Dezelfde reden als server.js hierboven -- er zit geen naad in, alleen volgorde, en die volgorde IS de inhoud'],
     ['public/apps/boardroom-eigenaar.js', 'de eigenaarszetel: vier panelen op een gedeelde api/el-kern in een IIFE']
   ]);
@@ -658,6 +669,17 @@ console.log('\n16) elk leden-pad met een derde partij gaat langs de gegevenspoor
   const MAG_ZONDER = new Map([
     ['/api/member/sport/tickets', 'je eigen ticketlijst opvragen'],
     ['/api/member/boardroom/logboek', 'je eigen boardroom-journaal ("logboek" bevat toevallig "boek"); geen derde partij'],
+    /* Dezelfde valse vriend, nu bij De Rechterhand. Het REISBOEK is uw eigen
+       reisdagboek en het LOGBOEK het onderhoudsboek van uw eigen jacht of
+       oldtimer: eigen dossiers, geen bestelling en geen partij tegenover u.
+       Ze werden zichtbaar toen de rechterhand-paden voluit kwamen te staan
+       (regel 45); daarvoor zag ook deze regel ze niet. */
+    ['/api/member/rechterhand/reisboek', 'uw eigen reisdagboek ("reisboek" bevat toevallig "boek"); geen derde partij'],
+    ['/api/member/rechterhand/logboek', 'het onderhoudsboek van uw eigen bezit; geen derde partij'],
+    ['/api/member/rechterhand/logboek/object', 'idem: een eigen object in het eigen logboek'],
+    ['/api/member/rechterhand/logboek/object/weg', 'idem'],
+    ['/api/member/rechterhand/logboek/regel', 'idem: een onderhoudsregel bij eigen bezit'],
+    ['/api/member/rechterhand/logboek/regel/weg', 'idem'],
     ['/api/tickets/aanbod', 'het aanbod bekijken; er gebeurt nog niets'],
     ['/api/verhuur/aanbod', 'het aanbod bekijken; er gebeurt nog niets'],
     ['/api/verkoop/showroom', 'de showroom bekijken; er gebeurt nog niets'],
@@ -667,6 +689,12 @@ console.log('\n16) elk leden-pad met een derde partij gaat langs de gegevenspoor
     ['/api/huur/sos', 'noodknop tijdens een lopende huur -- hier NOOIT iets vragen'],
     ['/api/verkoop/teken', 'het contract van een deal die al loopt tekenen'],
     ['/api/asset/koop', 'RTG Shared Assets is van RTG zelf; er staat geen derde tegenover'],
+    /* Een pot is een OORMERK binnen het eigen tegoed en geen reservering bij
+       iemand: er beweegt geen geld en er staat geen partij tegenover (GELD.md
+       par. 3). Het woord "reserveer" is hier de valse vriend. Deze route werd
+       zichtbaar toen de geldpaden voluit kwamen te staan (regel 45); daarvoor
+       zag deze regel hem niet, en dat is precies waarom die vorm is verboden. */
+    ['/api/geld/pot/reserveer', 'een oormerk in het eigen tegoed; geen derde partij en geen geldbeweging'],
     /* De kraam van het Podium: de verkoper is een ander LID in dezelfde
        uitzending, en het contact loopt over de kanaalchat op codenaam. RTG
        bezorgt hier niets, vraagt geen adres en zet geen koerier in beweging --
@@ -1015,9 +1043,25 @@ console.log('\n21) geen pagina leest een css-token dat nergens gezet wordt');
     bekeken++;
     const html = leesVeilig(f);
     const def = gezetteTokens(html);
+    /* @import VOLGEN. Een blad mag een ander blad insluiten, en sinds
+       shared/rtg-ui.css het ontwerpsysteem, de materialen en de thema's
+       insluit, komt het grootste deel van de tokens langs die weg binnen.
+       Keek deze regel alleen naar de <link>-lijst, dan meldde hij een token
+       als "ontbreekt" terwijl het er in de browser gewoon staat -- vals alarm
+       dus, en vals alarm leert mensen de melding weg te klikken op de dag dat
+       hij wel klopt. Gevonden toen apps/kantoor.html erbij kwam. */
+    const cssMet = (p2, diep) => {
+      const bron = zonderCss(leesVeilig(p2));
+      for (const t of gezetteTokens(bron)) def.add(t);
+      if (diep > 4) return;
+      for (const im of bron.matchAll(/@import\s+(?:url\(\s*)?['"]?([^'")\s]+\.css)/gi)) {
+        const q = im[1].startsWith('/') ? path.join(PUB, im[1]) : path.join(path.dirname(p2), im[1]);
+        cssMet(q, diep + 1);
+      }
+    };
     for (const m of html.matchAll(/<link[^>]+href="([^"]+\.css)"/gi)) {
       const p2 = m[1].startsWith('/') ? path.join(PUB, m[1]) : path.join(path.dirname(f), m[1]);
-      for (const t of gezetteTokens(zonderCss(leesVeilig(p2)))) def.add(t);
+      cssMet(p2, 0);
     }
     for (const m of html.matchAll(/<script[^>]+src="([^"]+\.js)"/gi)) {
       const p2 = m[1].startsWith('/') ? path.join(PUB, m[1]) : path.join(path.dirname(f), m[1]);
@@ -1514,7 +1558,15 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
      metrics-token klopt of het verzoek van een intern adres komt. Hij kwam
      erbij toen de sonde een tweede endpoint met precies die eis kreeg. */
   const POORT_MW = new Set(['auth', 'supplierAuth', 'officeAuth', 'techAuth', 'boardroomAuth',
-    'huisAuth', 'baasAuth', 'lid', 'geenGast', 'eigenaarAlleen', 'meetpoort']);
+    'huisAuth', 'baasAuth', 'lid', 'geenGast', 'eigenaarAlleen', 'meetpoort',
+    /* de gezinsdeur van het RTFoundation-huis (gezinscode + profieltoken, gasten
+       erbuiten). Stond eerst als aanroep BINNEN de handler; is middleware geworden
+       toen die routes zichtbaar werden, zodat bij elke route staat welke deur hij
+       heeft -- zie regel 45 voor waarom ze onzichtbaar waren. */
+    'gezinsPoort', 'huisPoort',
+    /* spread van [auth, geenGast], zoals `lid` hierboven; werd zichtbaar toen
+       de kantoorpakket-paden voluit kwamen te staan (regel 45) */
+    'ledenAuth', 'rtfPoort']);
   const POORT_BINNEN = /\b(profiel|schoolProfiel|rtfSociaal|eisAccount|resolveSession|verifyToken|sessionFor|magInzien|isEigenaar|boardroomWie|magBoardroom|doosSleutelOk|magMeten|metPartner|samenSess|kantoorSess|werkPoort|beheerVan|lidVan)\s*\(/;
 
   /* PUBLIEK MET REDEN. Alles hier is een bewuste keuze, geen omissie. Wie een
@@ -2622,7 +2674,193 @@ console.log('\n42) geen functie die binnen een andere functie staat en erbuiten 
   if (!stuk) ok(gekeken + ' gebundelde app-scripts: geen enkele functie wordt buiten zijn eigen omhulsel aangeroepen');
 }
 
-/* 43) DE SLO-TABEL IN SLO.md IS EEN AFDRUK VAN SLO.json.
+/* 43) in een gebundeld script staat geen losse tekstoptelling die nergens heen gaat.
+
+   DE FOUT DIE DIT VANGT, en hij is hier echt gemaakt. De grote app-scripts staan
+   opgeknipt per onderdeel en worden bij de build weer aaneengeplakt IN DE
+   VOLGORDE VAN DE BESTANDSNAAM (readdirSync().sort()). Bij het opknippen van
+   app-main-04 ontstond de reeks 04, 04a, 04ab, 04b -- terwijl de inhoud
+   geschreven was voor 04, 04ab, 04a, 04b. Alfabetisch komt "04a" voor "04ab",
+   dus het brok kwam achter de regel `document.head.appendChild(st);` terecht.
+
+   Wat er dan gebeurt is het vervelendste soort stuk: de stijlregels stonden nog
+   letterlijk in het bestand, maar als LOSSE expressie na het afsluitende `;`.
+   JavaScript telt die tekst netjes bij elkaar op en gooit hem weg. Geen
+   syntaxfout, geen consolemelding, geen enkele toets die zakt -- en op het
+   scherm waren de halo achter de klok, de schaal van de klok en de uitlijning
+   van de zin gewoon verdwenen. Ik heb het zelf een screenshot lang aangezien
+   voor "de sterren zijn wat druk".
+
+   controleer() in bundel.js kan dit per definitie NIET zien: die vergelijkt de
+   bundel met de som van dezelfde delen in dezelfde volgorde, en is dus altijd
+   consistent met zichzelf. Consistent is niet hetzelfde als goed.
+
+   De regel is smal gehouden: alleen een expressie-statement dat NIETS anders is
+   dan tekst met plussen ertussen. Zo'n statement heeft geen enkel effect en is
+   dus altijd fout. Een optelling met een aanroep of een variabele erin kan wel
+   effect hebben en blijft buiten schot. */
+console.log('\n43) geen weggegooide tekstoptelling in een gebundeld script');
+{
+  const { loop: loopKnopen } = require('./ast/walk');
+  const bundels = require('./bundel').bundels;
+  let stuk = 0, gekeken = 0;
+  /* Zit er ergens in deze +-keten een stuk tekst? Niet "bestaat hij UITSLUITEND
+     uit tekst" -- dat was mijn eerste versie, en die liet de echte fout er
+     doorheen. Een losgeraakt brok eindigt namelijk op een `+`, dus hij plakt
+     zich vast aan wat er in het VOLGENDE deelbestand staat. Hier was dat een
+     aanroep van (function sterrenhemel(){...})(), en daarmee was de keten niet
+     meer alleen tekst en zweeg de regel over precies het geval waarvoor hij
+     geschreven was. Gemeten met de mutatie, niet aangenomen. */
+  const tekstErin = (n) => {
+    if (!n || typeof n !== 'object') return false;
+    if (n.type === 'Literal') return typeof n.raw === 'string' && /^['"`]/.test(n.raw.trim());
+    if (n.type === 'BinaryExpression' && n.operator === '+') return tekstErin(n.left) || tekstErin(n.right);
+    return false;
+  };
+  for (const doel of Object.keys(bundels)) {
+    const bron = path.join(ROOT, 'public', doel);
+    let src; try { src = fs.readFileSync(bron, 'utf8'); } catch (e) { continue; }
+    let ast; try { ast = ontleed(src); } catch (e) { continue; }   // regel 42 meldt dat al
+    gekeken++;
+    loopKnopen(ast, (n) => {
+      if (n.type !== 'ExpressionStatement') return;
+      const e = n.expression;
+      /* Een KALE tekst is een directive ('use strict') en telt niet mee; het
+         gaat om de OPTELLING, want dat is de vorm die een losgeraakt brok
+         aanneemt. */
+      if (!e || e.type !== 'BinaryExpression' || e.operator !== '+') return;
+      if (!tekstErin(e)) return;
+      stuk++;
+      fout(doel + ' regel ' + (e.lijn || '?') + ': een optelling met tekst erin die nergens aan ' +
+        'toegekend wordt -- dit brok is bij het aaneenplakken losgeraakt en doet niets meer');
+    });
+  }
+  if (!stuk) ok(gekeken + ' gebundelde app-scripts: elk tekstbrok komt ergens aan');
+}
+
+/* 44) een app staat in precies EEN wereld op het beginscherm.
+
+   DE FOUT DIE DIT VANGT: twee plekken voor hetzelfde is precies waarom je iets
+   nergens meer vindt. Een lid dat Vluchten een keer onder Reizen zag staan,
+   zoekt hem daar -- en als hij ook onder Leven hangt, is de vraag "waar stond
+   dat ook alweer" terug, wat het hele acht-werelden-besluit juist moest
+   oplossen (PLATFORM.md par. 0).
+
+   WAAROM HIER EN NIET IN DE SCHERMTOETS. Dit stond in test/appmenu.e2e.js, en
+   die telde de tegels door elke map open te klikken. Sinds een wereldtegel de
+   APP opent en niet een tegelveld, is die lijst uit het scherm verdwenen. De
+   regel is niet vervallen; hij heeft een andere plek nodig, en de bron is de
+   juiste: MAPPEN staat als letterlijke lijst in app-main-24a2.js.
+
+   Wat deze regel NIET doet: iets zeggen over welke wereld de juiste is. Dat is
+   een ontwerpvraag. Hij zegt alleen dat het er precies een is. */
+console.log('\n44) elke app staat in precies een wereld op het beginscherm');
+{
+  /* Het pad uit ROOT en niet uit PUB: die laatste is een blok-constante die hier
+     niet bestaat. Met een try/catch eromheen werd die ReferenceError een lege
+     bron, en die lege bron werd de melding "MAPPEN staat er niet meer" -- een
+     diagnose die naar het verkeerde bestand wees. Een vangnet dat de oorzaak
+     verbergt is erger dan geen vangnet. */
+  const mappenPad = path.join(ROOT, 'public', 'apps/app-main/app-main-24a2.js');
+  let bron = '';
+  try { bron = fs.readFileSync(mappenPad, 'utf8'); }
+  catch (e) { fout('app-main-24a2.js is niet te lezen: ' + e.message); }
+  const blok = /const MAPPEN = \[([\s\S]*?)\n  \];/.exec(bron);
+  if (!blok) fout('MAPPEN staat niet meer als lijst in app-main-24a2.js; deze regel meet dan niets');
+  else {
+    const zonderCommentaar = blok[1].replace(/\/\*[\s\S]*?\*\//g, ' ').replace(/\/\/[^\n]*/g, ' ');
+    const items = (zonderCommentaar.match(/'(?:tab|link|os):[a-z0-9-]+'/g) || []).map(x => x.slice(1, -1));
+    const gezien = new Map();
+    const dubbel = [];
+    for (const it of items) {
+      if (gezien.has(it)) { if (!dubbel.includes(it)) dubbel.push(it); }
+      else gezien.set(it, true);
+    }
+    if (!items.length) fout('geen enkel item gevonden in MAPPEN -- de regel leest de verkeerde vorm');
+    else if (dubbel.length) fout('deze apps staan in meer dan een wereld: ' + dubbel.join(', '));
+    else ok(items.length + ' items over ' + (blok[1].match(/sleutel:/g) || []).length +
+      ' werelden: geen enkele staat er twee keer in');
+  }
+}
+
+/* 45) ELK ROUTEPAD STAAT VOLUIT.
+
+   Waarom dit een eigen regel is, en geen smaak. scripts/schakelbaar.js telt
+   welke routes vanuit de boardroom te schakelen zijn door de bron af te lezen
+   op letterlijke paden. Wie zijn pad met een plus bouwt --
+   `app.post('/api/geld/' + pad, ...)` in een lus -- is voor die census
+   ONZICHTBAAR. En onzichtbaar is hier erger dan ongedekt: een ongedekte route
+   staat in de zakkerlijst, een onzichtbare route bestaat niet en niemand mist
+   hem. Hij is er gewoon, altijd, voor iedereen, en geen knop in de boardroom
+   raakt hem.
+
+   Dat is hier echt gebeurd, met acht geldroutes en twee levensroutes tegelijk.
+   Het viel pas op doordat de twee LOSSE routes in dezelfde bestanden wel
+   zichtbaar waren en als ongedekt gemeld werden; waren die er niet geweest,
+   dan had niets geklaagd. Een meter met een blinde vlek is geen meter, dus
+   staat de vorm die meetbaar is nu vast (LAT.md regel 3).
+
+   Wat wel mag: een pad met een express-parameter (:id) of een regexp. Die
+   staan nog steeds voluit als tekst en zijn dus gewoon te tellen. */
+console.log('\n45) elk routepad staat voluit, zodat de schakelkast ze kan tellen');
+{
+  const lees = (f) => { try { return fs.readFileSync(f, 'utf8'); } catch (e) { return ''; } };
+  const bouwers = [];
+  let bekeken = 0;
+  loop(path.join(ROOT, 'server'), /\.js$/, (f) => {
+    const s = zonderCommentaar(lees(f));
+    if (!/app\.(get|post|put|delete|patch|all)\s*\(/.test(s)) return;
+    bekeken++;
+    /* een routeaanroep waarvan het eerste argument met een string BEGINT en
+       daarna doorloopt met een plus: dat is precies de vorm die de census
+       niet ziet */
+    for (const m of s.matchAll(/app\.(?:get|post|put|delete|patch|all)\s*\(\s*'([^']*)'\s*\+/g)) {
+      bouwers.push(path.relative(ROOT, f) + ": '" + m[1] + "' + ...");
+    }
+    // en de vorm zonder enige letterlijke tekst: app.post(pad, ...)
+    for (const m of s.matchAll(/app\.(?:get|post|put|delete|patch|all)\s*\(\s*([A-Za-z_$][\w$]*)\s*,/g)) {
+      bouwers.push(path.relative(ROOT, f) + ': app.post(' + m[1] + ', ...)');
+    }
+  });
+  /* DE SCHULD DIE ER AL LAG, met naam en toenaam. Deze regel vond negentien
+     bestanden die hun paden opbouwen -- niet als besluit maar door optelling,
+     precies zoals scripts/schakelbaar.js het beschrijft voor de catalogus.
+     Ze in een keer openbreken is een aparte klus met een eigen risico; ze
+     stilzwijgend doorlaten is hoe de vlek is ontstaan.
+
+     Dus staat de lijst hier, en hij mag ALLEEN KRIMPEN. Een nieuw bestand dat
+     paden opbouwt zakt meteen; een bestand dat wordt opgeruimd hoort van deze
+     lijst af (de regel zegt zelf wanneer dat kan). Zelfde afspraak als de
+     BUITEN-lijst in schakelbaar.js, met een belangrijk verschil dat er ook bij
+     hoort te staan: die lijst bevat KEUZES, deze bevat SCHULD. */
+  const BEKEND = new Set([
+    /* Nog EEN over: de poortwachterslaag zelf. Die monteert hele
+       routefamilies achter een deur en bouwt daarbij een voorvoegsel op; dat
+       is een ander geval dan een lijst acties, en het hoort bij een aparte
+       ronde met de poortwachters zelf ernaast. Van negentien naar een. */
+    'server/opzet/poortwachters.js',
+    /* De Game Hall registreert zijn acties uit EEN tabel (plus ./spellen-rondom);
+       bij de samenvoeging is die tabel gehouden boven de uitgeschreven vorm van
+       de consolidatietak, omdat hij meer acties draagt (tempo, projectie, de
+       rondom-lijst). Voluit uitschrijven is een aparte klus; tot die tijd staat
+       de schuld hier met naam. */
+    'server/routes/spellen.js'
+  ]);
+  const nieuwe = bouwers.filter(b => !BEKEND.has(b.split(':')[0]));
+  const schoongemaakt = [...BEKEND].filter(f => !bouwers.some(b => b.split(':')[0] === f));
+
+  if (!bekeken) fout('geen enkel bestand met routes gevonden; deze regel meet dan niets');
+  else if (nieuwe.length) {
+    for (const b of nieuwe) fout('NIEUW routepad wordt opgebouwd en is onzichtbaar voor de schakelkast -- ' + b);
+  } else if (schoongemaakt.length) {
+    /* Geen fout maar een opdracht: wie een bestand opruimt, haalt hem ook van
+       de lijst. Anders slijt de lijst tot een verzameling namen die niets meer
+       zegt, en dan is de ratel geen ratel meer. */
+    fout('deze bestanden bouwen geen paden meer op; haal ze uit BEKEND in deze regel: ' + schoongemaakt.join(', '));
+  } else ok(bekeken + ' bestanden met routes; geen nieuwe opbouwers, ' + BEKEND.size + ' bekende resteren');
+}
+
+/* 46) DE SLO-TABEL IN SLO.md IS EEN AFDRUK VAN SLO.json.
 
    Sinds er een meter is die de servicedoelen leest (server/kern/command/slo.js)
    staan ze in SLO.json. De tabel in SLO.md stond er los naast, en dat is de
@@ -2634,7 +2872,7 @@ console.log('\n42) geen functie die binnen een andere functie staat en erbuiten 
    Zelfde vorm als regel 40 en 41: de bouw wordt herhaald en de volle tekst
    vergeleken, geen hash in de kop -- want een hash kan iemand bijwerken zonder
    de inhoud. */
-console.log('\n43) de SLO-tabel in SLO.md is een afdruk van SLO.json');
+console.log('\n46) de SLO-tabel in SLO.md is een afdruk van SLO.json');
 {
   try {
     const slo = require('./slo');

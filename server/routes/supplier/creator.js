@@ -16,19 +16,23 @@ module.exports = (kern) => {
     res.json(creator.overzicht(s));
   });
 
-  const beheer = [
-    ['profiel', 'zetProfiel'], ['platform', 'zetPlatform'], ['tarief', 'zetTarief'],
-    ['portfolio', 'zetPortfolio'], ['idee', 'zetIdee']
-  ];
-  for (const [pad, fn] of beheer) {
-    app.post('/api/supplier/creator/' + pad, supplierAuth, (req, res) => {
-      if (!managerOnly(req, res)) return;
-      const s = req.supplier; if (!isCreator(s, res)) return;
-      const r = creator[fn](s, req.body || {});
-      if (r.error) return res.status(400).json(r);
-      sync(s); res.json(creator.overzicht(s));
-    });
-  }
+  /* De paden staan voluit: een opgebouwd pad ziet scripts/schakelbaar.js niet,
+     en wat die census niet ziet is vanuit de boardroom niet uit te zetten
+     (scripts/check.js regel 45). De drie controles -- manager, creator-cap en
+     het opslaan -- blijven op EEN plek staan. */
+  const beheerDoe = (fn) => (req, res) => {
+    if (!managerOnly(req, res)) return;
+    const s = req.supplier; if (!isCreator(s, res)) return;
+    const r = creator[fn](s, req.body || {});
+    if (r.error) return res.status(400).json(r);
+    sync(s); res.json(creator.overzicht(s));
+  };
+
+  app.post('/api/supplier/creator/profiel', supplierAuth, beheerDoe('zetProfiel'));
+  app.post('/api/supplier/creator/platform', supplierAuth, beheerDoe('zetPlatform'));
+  app.post('/api/supplier/creator/tarief', supplierAuth, beheerDoe('zetTarief'));
+  app.post('/api/supplier/creator/portfolio', supplierAuth, beheerDoe('zetPortfolio'));
+  app.post('/api/supplier/creator/idee', supplierAuth, beheerDoe('zetIdee'));
 
   // de AI content/script-helper (manager)
   app.post('/api/supplier/creator/ai', supplierAuth, async (req, res) => {

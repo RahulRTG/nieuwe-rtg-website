@@ -1,9 +1,12 @@
-    // veiligheid en verbinding: vier apps op een gedeelde kern
+    /* Veiligheid en verbinding. Hier stonden VIER tegels -- Thuiswacht,
+       Codewoord, Vitaal en Thuisrust -- op een gedeelde kern. Ze zijn nu vier
+       standen van een app (/apps/veilig.html), want een systeem dat een systeem
+       is, hoort niet als vier losse deuren op een beginscherm te staan: wie de
+       Thuiswacht kende, had het Codewoord daardoor vaak nooit gezien. De oude
+       paden leiden met een hash naar hun eigen stand, dus een bladwijzer of een
+       geinstalleerde PWA komt nog steeds uit waar hij hoort. */
     ik:          { naam: 'Wie ben ik',   url: '/apps/ik.html' },
-    thuiswacht:  { naam: 'Thuiswacht',   url: '/apps/thuiswacht.html' },
-    codewoord:   { naam: 'Codewoord',    url: '/apps/codewoord.html' },
-    vitaal:      { naam: 'Vitaal',       url: '/apps/vitaal.html' },
-    thuisrust:   { naam: 'Thuisrust',    url: '/apps/thuisrust.html' },
+    veilig:      { naam: 'RTG Veilig',   url: '/apps/veilig.html' },
     ov:          { naam: 'Openbaar vervoer',           url: '/apps/ov.html' },
     stad:        { naam: 'Stad',    url: '/apps/stad.html' },
     clips:       { naam: 'Video',        url: '/apps/clips.html' },
@@ -26,7 +29,7 @@
     sitemaker:   { naam: 'Website', url: '/apps/sitemaker.html' },
     browser:     { naam: 'Web',  url: '/apps/browser.html' },
     vonk:        { naam: 'Daten',         url: '/apps/vonk.html' },
-    balans:      { naam: 'Balans',       url: '/apps/balans.html' },
+    balans:      { naam: 'Balans',       url: '/apps/geld.html#balans' },
     /* Mijn loon staat bij Geld en niet bij Werk: het is uw geld, niet iets van
        uw werkgever. Wie nergens werkt vindt een lege lijst met de zin die dat
        uitlegt -- dat is beter dan een tegel die verdwijnt zodra u van baan
@@ -38,15 +41,26 @@
     table:       { naam: 'Table',         url: '/apps/table.html' },
     maison:      { naam: 'Maison',        url: '/apps/maison.html' },
     garderobe:   { naam: 'Garde-robe',    url: '/apps/garderobe.html' },
-    mecenaat:    { naam: 'Mecenaat',      url: '/apps/mecenaat.html' },
-    labfonds:    { naam: 'Fonds',     url: '/apps/labfonds.html' },
-    rtgcode:     { naam: 'Betaalcode',      url: '/apps/rtgcode.html' },
-    nalatenschap:{ naam: 'Nalatenschap',  url: '/apps/nalatenschap.html' },
-    logboek:     { naam: 'Logboek',       url: '/apps/logboek.html' },
+    mecenaat:    { naam: 'Mecenaat',      url: '/apps/geld.html#mecenaat' },
+    labfonds:    { naam: 'Fonds',     url: '/apps/geld.html#labfonds' },
+    rtgcode:     { naam: 'Betaalcode',      url: '/apps/geld.html#rtgcode' },
+    nalatenschap:{ naam: 'Nalatenschap',  url: '/apps/geld.html#nalatenschap' },
+    logboek:     { naam: 'Logboek',       url: '/apps/geld.html#logboek' },
     cercle:      { naam: 'Cercle',        url: '/apps/cercle.html' },
     pulse:       { naam: 'Vandaag',         url: '/apps/pulse.html' },
     nieuws:      { naam: 'Nieuws',        url: '/apps/nieuws.html' },
     krant:       { naam: 'Krant',     url: '/apps/krant.html' },
+    /* RTG Reizen staat NAAST Vluchten, Verblijven, Reisbureau en Hangar en niet
+       in plaats daarvan -- net als RTG Media naast Video, Sound, Theater en
+       Podium. Het is de laag die er een wereld van maakt (PLATFORM.md, laag 2);
+       wie recht naar het inchecken of de hangar wil, hoort daar gewoon heen te
+       kunnen. */
+    /* "RTG Reizen" en niet "Reizen": de map draagt al een OS-tab die Reizen
+       heet (tab:reizen, het boeken zelf), en twee tegels met dezelfde naam in
+       een map is voor een gebruiker een raadsel en voor test/appmenu.e2e.js een
+       fout -- die toets bewaakt dat een app in precies EEN map staat en meet dat
+       op het label. De bibliotheek noemt hem ook RTG Reizen. */
+    reizen:      { naam: 'RTG Reizen',    url: '/apps/reizen.html' },
     vluchten:    { naam: 'Vluchten',      url: '/apps/vluchten.html' },
     sport:       { naam: 'Sport',         url: '/apps/sport.html' },
     school:      { naam: 'School',    url: '/apps/rtgschool.html' },
@@ -62,7 +76,7 @@
     attenties:   { naam: 'Attenties',     url: '/apps/attenties.html' },
     rendezvous:  { naam: 'Rendez-vous',   url: '/apps/rendezvous.html' },
     // De wallet draagt je ledenpas; hij staat in de functierij onder de klok.
-    wallet:      { naam: 'Wallet',        url: '/apps/wallet.html' }
+    wallet:      { naam: 'Wallet',        url: '/apps/geld.html#wallet' }
   };
   /* Elke functie zijn eigen app: Bellen, Videobellen en Snaps zijn eigen
      OS-apps die een kiezer openen en dan meteen doen wat u koos, via de

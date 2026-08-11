@@ -37,8 +37,17 @@ const PAGINAS = [
   '/apps/ghost.html',
   '/apps/flits.html',
   '/apps/theater.html',
-  '/apps/wbw.html',
+  '/apps/geld.html',
   '/apps/passkeys.html',
+  /* RTG Veilig staat hier omdat het de app is waarin iemand onder spanning iets
+     moet kunnen invullen: een zin typen terwijl er iemand meekijkt, een knop
+     vinden terwijl de klok loopt. De vier schermen die hierin opgingen stonden
+     nooit in deze lijst; dat was een gat, niet een keuze. */
+  '/apps/veilig.html',
+  /* RTG Reizen: de wereld boven de reisapps. Staat hier omdat een lijst met
+     komende reizen alleen werkt als hij ook zonder muis en met een schermlezer
+     te doorlopen is -- het is de app waarin iemand op een station kijkt. */
+  '/apps/reizen.html',
   '/apps/ov.html',
   '/apps/ovdienst.html',
   '/apps/ovroutes.html',
@@ -48,7 +57,6 @@ const PAGINAS = [
   '/apps/vonk.html',
   '/apps/berichten.html',
   '/apps/salon.html',
-  '/apps/metier.html',
   '/apps/genootschap.html',
   /* De sociale super-app. Een nieuw scherm hoort meteen in de keuring te staan,
      anders is 'schoon' een aanname in plaats van een meting -- en dat is hier

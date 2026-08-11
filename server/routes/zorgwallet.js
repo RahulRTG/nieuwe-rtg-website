@@ -7,17 +7,22 @@ module.exports = (kern) => {
   const stuur = (res, r) => { const { status, ...rest } = r; r.error ? res.status(status || 400).json({ error: r.error }) : res.status(200).json(rest); };
 
   // de verzekeraar: werkplek en PDA
-  const z = (pad, fn) => app.post('/api/supplier/zorgpolis' + pad, supplierAuth, async (req, res) => {
+  /* De paden staan voluit en niet als '/api/supplier/zorgpolis' + pad. Een opgebouwd pad
+     ziet scripts/schakelbaar.js niet, en wat die census niet ziet is vanuit
+     de boardroom niet uit te zetten en niet per stad te sluiten
+     (scripts/check.js regel 45). De controle eromheen blijft op EEN plek;
+     alleen de registratie is uitgeschreven. */
+  const doe = (fn) => async (req, res) => {
     const caps = db.capsVan(req.supplier);
     if (!caps.includes('polis')) { res.status(403).json({ error: 'Deze zaak is geen verzekeraar.' }); return; }
     stuur(res, await fn(req.supplier.code, req.body || {}));
-  });
-  z('', (code) => zorgpolis.overzicht(code));
-  z('/inschrijf', (code, b) => zorgpolis.schrijfIn(code, b, b.door));
-  z('/stop', (code, b) => zorgpolis.stopZet(code, b.id));
-  z('/declaratie', (code, b) => zorgpolis.declaratieIn(code, b));
-  z('/declaratie/beslis', (code, b) => zorgpolis.declaratieBeslis(code, b, b.door));
-  z('/pas', (code, b) => zorgpolis.pasCheck(code, b.pas));
+  };
+  app.post('/api/supplier/zorgpolis', supplierAuth, doe((code) => zorgpolis.overzicht(code)));
+  app.post('/api/supplier/zorgpolis/inschrijf', supplierAuth, doe((code, b) => zorgpolis.schrijfIn(code, b, b.door)));
+  app.post('/api/supplier/zorgpolis/stop', supplierAuth, doe((code, b) => zorgpolis.stopZet(code, b.id)));
+  app.post('/api/supplier/zorgpolis/declaratie', supplierAuth, doe((code, b) => zorgpolis.declaratieIn(code, b)));
+  app.post('/api/supplier/zorgpolis/declaratie/beslis', supplierAuth, doe((code, b) => zorgpolis.declaratieBeslis(code, b, b.door)));
+  app.post('/api/supplier/zorgpolis/pas', supplierAuth, doe((code, b) => zorgpolis.pasCheck(code, b.pas)));
 
   // de RTG Wallet van het lid
   const geenGast = (req, res, next) => {

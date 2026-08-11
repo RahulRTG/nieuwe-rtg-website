@@ -65,8 +65,13 @@ module.exports = ({ kern }) => {
       if (!CAPS[c.id]) throw new Error('objectlaag: onbekende cap "' + c.id + '" bij soort ' + soort);
     }
 
-    return { ok: true, soort, id: naam, titel: r.titel, over: r.over || {},
+    const uit = { ok: true, soort, id: naam, titel: r.titel, over: r.over || {},
       caps: r.caps, stil: r.stil || [] };
+    /* De relatieruimte hangt alleen aan een persoon (LIFE.md fase 3). Een groep
+       en een event ZIJN al een gedeelde ruimte; daar zou "wat hebben wij samen"
+       de vraag naar zichzelf zijn. */
+    if (r.samen) { uit.samen = r.samen; uit.telling = r.telling; }
+    return uit;
   }
 
   return { objectlaag: { object, SOORTEN, CAPS } };

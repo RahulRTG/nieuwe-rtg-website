@@ -20,6 +20,7 @@
 'use strict';
 
 const { capVoor } = require('./caps');
+const maakSamen = require('./samen');
 
 /* Hoeveel wbw-lijstjes we nalopen om te zien of er een gedeeld is. Elk lijstje
    kost een aparte aanroep, want wbwMijn levert alleen een AANTAL leden en geen
@@ -28,6 +29,7 @@ const { capVoor } = require('./caps');
 const WBW_MAX = 20;
 
 module.exports = ({ kern }) => {
+  const ruimte = maakSamen({ kern });
 
   /* Iedere bron levert nul of een cap, met zijn bewijs. De methode heet `proef`
      en niet `vind`: `vind` is de top-level naam waarmee ./event.js en ./groep.js
@@ -170,8 +172,14 @@ module.exports = ({ kern }) => {
        de vriendenlaag om, dan merken ze het allebei. Twee keer "verbinding" in
        de melding leest als twee storingen en zet iemand aan het zoeken naar de
        tweede. Een stukke bron is een melding. */
-    const alles = [...new Set(stil.concat(k.stil))];
-    return { titel: codenaam, caps: uit.filter(Boolean), over: k.over, stil: alles };
+    /* DE RELATIERUIMTE (fase 3). Hij hangt aan de persoon en niet aan een eigen
+       object, want hij IS de persoon zoals u hem kent: wat u samen heeft. Een
+       eigen ingang zou een tweede plek maken waar dezelfde vraag beantwoord
+       wordt. */
+    const r = ruimte.samen(key, codenaam);
+    const alles = [...new Set(stil.concat(k.stil, r.stil))];
+    return { titel: codenaam, caps: uit.filter(Boolean), over: k.over,
+      samen: r.samen, telling: r.telling, stil: alles };
   }
 
   return { caps, context, PROEVEN };

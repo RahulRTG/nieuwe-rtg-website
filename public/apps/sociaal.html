@@ -42,6 +42,15 @@
   #objpaneel .cap .waarom{margin-left:auto;text-align:right;font-size:.7rem;color:var(--rtg-soft);}
   #objpaneel .cap .app{display:block;font-size:.62rem;letter-spacing:.14em;
     text-transform:uppercase;color:var(--rtg-soft);}
+  #objpaneel .samen{margin:.9rem 0 .2rem;}
+  #objpaneel .sam{display:flex;align-items:baseline;gap:.6rem;padding:.32rem 0;
+    border-bottom:1px solid var(--rtg-line);font-size:.82rem;}
+  #objpaneel .sam:last-child{border-bottom:0;}
+  #objpaneel .sam b{font-weight:600;}
+  #objpaneel .sam .bij{color:var(--rtg-soft);font-size:.7rem;}
+  #objpaneel .sam .wnr{margin-left:auto;color:var(--rtg-soft);font-size:.7rem;
+    font-variant-numeric:var(--rtg-cijfers);}
+  #objpaneel .sam[data-komt] b{color:var(--op-bordeaux);}
   #objpaneel .stil{font-size:.78rem;color:var(--rtg-soft);}
   .onder .watkan{margin-left:.5rem;}
 </style>
@@ -96,6 +105,7 @@
   <span class="soort" id="objsoort"></span>
   <h2 class="rtg-ceremonie" id="objtitel">&nbsp;</h2>
   <p class="over" id="objover"></p>
+  <div class="samen" id="objsamen"></div>
   <div class="caps" id="objcaps"></div>
   <p class="stil" id="objstil"></p>
   <button class="rtg-ref" type="button" id="objdicht">Sluiten</button>
@@ -290,6 +300,19 @@
          foutmelding en al helemaal niet als een uitnodiging om iets te
          beginnen (LIFE.md par. 4.1: een relatie is geen trechter). */
       : '<p class="stil">Hier deelt u nog niets mee.</p>';
+
+    /* DE RELATIERUIMTE (LIFE.md fase 3). Wat u samen heeft, boven wat u samen
+       kunt -- want dat is de volgorde waarin een mens aan iemand denkt. Alles
+       hierin komt uit domeinen waar u allebei in zit; er staat dus niets dat de
+       ander niet ook ziet. Geen bedragen, geen scores, geen aftelklok. */
+    $('#objsamen').innerHTML = (d.samen || []).length
+      ? '<span class="soort">Samen</span>' + d.samen.map(r =>
+        '<span class="sam"' + (r.komt ? ' data-komt=""' : '') + '>' +
+          '<b>' + esc(r.wat) + '</b>' +
+          '<span class="bij">' + esc([r.bron, r.waar].filter(Boolean).join(' · ')) + '</span>' +
+          '<span class="wnr">' + esc(r.wanneer || '') + '</span>' +
+        '</span>').join('')
+      : '';
 
     $('#objstil').textContent = (d.stil || []).length
       ? 'Niet opgehaald: ' + (d.stil || []).join(', ') + '. Dit beeld is dus niet compleet.'

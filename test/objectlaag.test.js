@@ -303,6 +303,86 @@ test('een stukke bron wordt een keer gemeld, niet twee keer', () => {
   assert.deepEqual(l.object('k', 'persoon', 'Ux').stil, ['verbinding']);
 });
 
+/* DE RELATIERUIMTE (LIFE.md fase 3), en de regel die haar draagt.
+
+   Par. 4.2 zegt dat een relatieruimte van TWEE mensen is en niet van een. Dat is
+   hier geen controle maar een eigenschap van de constructie: alles komt uit
+   domeinen waar allebei in zitten. Een bijeenkomst telt alleen als IK ja zei EN
+   de ander in `komen` staat; een groep waar de ander geen lid van is, levert
+   niets.
+
+   DE MUTATIE: laat samen.js de ledenlijst-controle weg, of accepteer een
+   bijeenkomst waar de ander niet op geantwoord heeft. Dan staat er iets in de
+   ruimte dat de ander niet ziet -- en dan is het geen gedeelde ruimte meer maar
+   een dossier over iemand. */
+test('in de ruimte staat alleen wat allebei ook echt delen', () => {
+  const groepen = [{ id: 'g1', naam: 'Samen' }, { id: 'g2', naam: 'Zonder hen' }];
+  const l = laag({
+    genootschap: {
+      mijne: () => groepen, groepMet: () => null, isLid: () => true,
+      publiek: (gr) => ({ id: gr.id, naam: gr.naam,
+        ledenlijst: gr.id === 'g1' ? [{ codenaam: 'Ux' }] : [{ codenaam: 'Andere' }] })
+    },
+    bijeenkomst: {
+      mijnAgenda: () => ({ komt: [] }),
+      lijstVan: (gid) => gid === 'g1'
+        ? [{ id: 'b1', wat: 'Samen gegeten', datum: '2026-01-05' },
+           { id: 'b2', wat: 'Zij zeiden nee', datum: '2026-01-06' },
+           { id: 'b3', wat: 'Ik zei nee', datum: '2026-01-07' }]
+        : [{ id: 'b9', wat: 'Andere groep', datum: '2026-01-08' }],
+      publiek: (b) => Object.assign({}, b, {
+        mijnAntwoord: b.id === 'b3' ? 'nee' : 'ja',
+        komen: b.id === 'b2' ? ['Andere'] : ['Ux']
+      })
+    }
+  });
+  const o = l.object('k', 'persoon', 'Ux');
+  assert.deepEqual(o.samen.map(r => r.wat), ['Samen gegeten'],
+    'alleen waar ik ja zei EN de ander in komen staat, uit een groep die we delen');
+  assert.equal(o.samen[0].bron, 'Samen');
+});
+
+/* Wat komt staat boven wat geweest is, zoals een mens zijn agenda leest.
+
+   DE MUTATIE: sorteer alles op een hoop, of zet geweest bovenaan. */
+test('de ruimte zet komend boven geweest, en telt dingen en geen relatie', () => {
+  const l = laag({
+    mijnSpellen: () => ({ potjes: [{ id: 'p1', naam: 'Magnaat', status: 'bezig',
+      spelers: ['Ux'], at: '2026-02-01T10:00:00.000Z' }], uitnodigingen: [] }),
+    genootschap: {
+      mijne: () => [{ id: 'g1', naam: 'K' }], groepMet: () => null, isLid: () => true,
+      publiek: () => ({ id: 'g1', naam: 'K', ledenlijst: [{ codenaam: 'Ux' }] })
+    },
+    bijeenkomst: {
+      mijnAgenda: () => ({ komt: [] }),
+      lijstVan: () => [{ id: 'b1', wat: 'Lang geleden', datum: '2020-01-01' }],
+      publiek: (b) => Object.assign({}, b, { mijnAntwoord: 'ja', komen: ['Ux'] })
+    }
+  });
+  const o = l.object('k', 'persoon', 'Ux');
+  assert.deepEqual(o.samen.map(r => r.soort), ['spel', 'bijeenkomst']);
+  assert.deepEqual(o.telling, { komt: 1, geweest: 1 });
+  for (const veld of Object.keys(o.telling)) {
+    assert.ok(!/score|hecht|reeks|streak|niveau|rang/i.test(veld),
+      'de telling gaat over dingen, niet over de relatie: ' + veld);
+  }
+});
+
+/* Een saldo hoort in RTG Geld en niet naast iemands naam in een sociale ruimte:
+   dat maakt van een vriend een debiteur.
+
+   DE MUTATIE: neem `mijnSaldo` of een bedrag op in de lijstje-regel. */
+test('een gedeeld lijstje staat er zonder bedrag', () => {
+  const l = laag({
+    wbwMijn: () => ({ groepen: [{ id: 'w1', naam: 'Ibiza', at: '2026-03-01T00:00:00.000Z', mijnSaldo: -4500 }] }),
+    wbwGroep: () => ({ groep: { leden: [{ codenaam: 'Ux' }, { codenaam: 'ik' }] } })
+  });
+  const r = l.object('k', 'persoon', 'Ux').samen.find(x => x.soort === 'lijstje');
+  assert.equal(r.wat, 'Ibiza');
+  assert.deepEqual(Object.keys(r).sort(), ['bron', 'komt', 'soort', 'waar', 'wanneer', 'wat'],
+    'geen bedrag, geen saldo, geen schuld in de sociale ruimte');
+});
+
 /* DE MUTATIE: voeg een functie toe die iets bewaart. Een object dat gaat
    bewaren, laat een bijeenkomst op twee plekken bestaan (LIFE.md par. 2). */
 test('bezit niets: er is geen enkele manier om iets te schrijven', () => {

@@ -234,7 +234,7 @@ vorige zijn toetsen heeft (LAT.md).
 |---|---|---|
 | 1 | **de sociale graaf**: de tien sociale apps plus de vriendenlaag als bron, met vooruitblik (verlopende documenten uit Entourage, data uit Attenties). Alleen lezen. | **er** |
 | 2 | **de objectlaag**: Persoon, Groep en Event als eerste drie types, met `caps` en een scherm dat de caps volgt | **er** |
-| 3 | **de relatieruimte** op `levensband`: gedeelde tijdlijn, beeld, plannen en betalingen per relatie, met par. 4.2 in code | -- |
+| 3 | **de relatieruimte**: wat twee mensen samen hebben, als projectie over de domeinen waar ze allebei in zitten, met par. 4.2 in de constructie | **er** |
 | 4 | **de momentlijn**: leven in plaats van posts -- vandaag, vrijdag, zaterdag, volgende week | -- |
 | 5 | **Life Command + de orchestrator** op niveau klaarzetten, met het actielog eronder | -- |
 | 6 | **de koppelingen naar buiten**: een community-actie die een Foundation-project wordt, een zaak-event dat de handelsketen in gaat (tickets, vervoer, tafel, wallet) | -- |
@@ -332,6 +332,43 @@ niet — daar was de id een string, want zo was hij opgeschreven. Zelfde blinde
 vlek als de lege bijeenkomsttitel in fase 1.
 
 ---
+
+### Waar fase 3 staat
+
+`server/kern/objectlaag/samen.js`, opgehangen aan het persoon-object; zichtbaar
+in hetzelfde paneel op `public/apps/sociaal.html`, boven de caps — wat u samen
+héébt boven wat u samen kúnt.
+
+**Twee correcties op het faseplan, allebei bij het bouwen nagemeten.**
+
+**De relatieruimte staat NIET op `levensband`,** en dat stond hier wel. Een band
+daar is structureel `{ lid, profiel }`: een RTG-lid tegenover een **gezinsprofiel
+van de RTFoundation**, met soorten als ouder, kind, leerkracht en
+vertrouwenspersoon (LEVEN.md par. 2.8). Dat is de toestemmingsbrug tussen twee
+sessiewerelden, niet de relatie tussen twee leden. Er een lid-lid-ruimte op
+bouwen zou een laag forceren die iets anders bewaart — precies de fout waar
+PLATFORM.md voor waarschuwt bij Cercle en Entourage: twee dingen die hetzelfde
+*klinken* en andere data en werkstromen hebben.
+
+**En daarmee verviel ook de opslag.** Het faseplan noemde "gedeelde tijdlijn,
+beeld, plannen en betalingen per relatie", wat klinkt als iets dat bewaard wordt.
+Dat hoeft niet, en het hóórt niet: alles wat twee mensen delen staat al in
+domeinen waar ze allebei deelnemer zijn. Als de ruimte een **projectie** is over
+precies die domeinen, dan is par. 4.2 — een relatieruimte is van twee mensen en
+niet van één — geen controle die je kunt vergeten maar een **eigenschap van de
+constructie**: er kan niets in staan dat de ander niet ook ziet, want het staat
+er alleen omdat hij meedoet.
+
+Wat er daardoor met opzet niet in kan: een gedeeld fotoalbum, een gedeelde
+notitie of een gedeelde kas tussen twee leden. Die bestaan niet als domein, en ze
+verzinnen zou betekenen dat deze laag alsnog gaat bewaren. Wie ze wil, bouwt
+eerst het domein; de ruimte projecteert het daarna gratis.
+
+Twee grenzen die in de toetsen staan: een **saldo** komt niet mee (dat hoort in
+RTG Geld; een bedrag naast iemands naam in een sociale ruimte maakt van een
+vriend een debiteur), en een **uitslag** komt niet mee (een lopend potje is een
+bezigheid, een winst-verliesbalans tussen twee mensen is een score — par. 4.4,
+en de 18+-grens uit `kern/spellen/grens.js`).
 
 ## 8. De acht besturingssystemen -- een aparte beslissing
 

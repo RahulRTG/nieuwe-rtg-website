@@ -57,5 +57,8 @@
     "leugens": "node --experimental-sqlite scripts/leugendetector.js",
     "mutatie": "node --experimental-sqlite scripts/mutatie.js",
     "grenslijst": "node scripts/grenslijst.js"
+  },
+  "dependencies": {
+    "zz-ijk-tijdelijk": "^1.0.0"
   }
 }

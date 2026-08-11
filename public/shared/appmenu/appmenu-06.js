@@ -64,6 +64,13 @@
 
   function hangOp() {
     knop.classList.remove('amn-zweef');
+    /* De body vertelt of er linksboven een zwevende knop ligt. Een blad kan dat
+       zelf niet weten -- de knop wordt hier pas geplaatst -- en zonder dat feit
+       schuift een pagina die linksboven begint eronder. Dat gebeurde ook: de
+       apprij van de RTFoundation begon op 20px en de knop ligt van 11 tot 49,
+       dus "Living Lab" las als "ving Lab". Zolang elke naam nog in een doosje
+       met rand stond viel het niet op; die doosjes zijn weg (CANVAS.md). */
+    d.body.classList.remove('amn-zwevend');
     var rij = d.querySelector('.ios-nav .ios-nav-rij');
     if (rij && zichtbaar(rij)) { linkerCel(rij).insertBefore(knop, linkerCel(rij).firstChild); return; }
 
@@ -96,6 +103,7 @@
       return;
     }
     knop.classList.add('amn-zweef');
+    d.body.classList.add('amn-zwevend');
     d.body.appendChild(knop);
   }
 

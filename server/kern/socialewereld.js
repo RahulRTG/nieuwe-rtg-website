@@ -41,7 +41,14 @@ module.exports.maakSocialeWereld = ({ kern }) => {
      alleen deze wereld. En het sorteren en tellen ook, want die VERSCHILLEN
      per wereld met reden; ze samenvoegen zou van vier werelden een grijze
      middelmaat maken (zie het waarom in wereldkern.js). */
-  const { RANG, bron, betekenisVan } = require('./wereldkern');
+  const { RANG, bron, betekenisVan, standVan } = require('./wereldkern');
+
+  /* Laag 0 van het Command Canvas: het woord waarmee deze wereld opent
+     (CANVAS.md, waar Social letterlijk 'Levendig' heet bij vier mensen die op
+     je wachten). Hier is aandacht dus GEEN alarm: mensen die iets van u willen
+     is precies waar een sociale wereld voor bestaat. Een stand die daar 'Druk'
+     van maakt, maakt van vrienden een werkvoorraad. */
+  const meetStand = standVan({ verstoord: 'Verstoord', aandacht: 'Levendig', gezond: 'Rustig' });
 
   const dag = (d) => String(d || '').slice(0, 10);
   const vandaag = () => new Date().toISOString().slice(0, 10);
@@ -97,8 +104,14 @@ module.exports.maakSocialeWereld = ({ kern }) => {
 
     bron('bijeenkomsten', () => {
       const b = kern.bijeenkomst.mijnAgenda({ key }) || {};
+      /* `wat` en niet `titel`: zo heet het veld bij de bijeenkomst zelf
+         (kern/genootschap/bijeenkomst.js, publiek()). Hier stond x.titel, en
+         dat bestaat daar niet -- elke bijeenkomst kwam dus NAAMLOOS binnen en
+         het scherm viel terug op het woord "Bijeenkomst". Dat viel niet op
+         zolang het een regel in een register was; op de tijdlijn van vandaag is
+         een moment zonder naam meteen zinloos. */
       return (b.komt || []).slice(0, 8).map(x => regel('bijeenkomst', {
-        titel: x.titel, wanneer: x.datum, tijd: x.tijd,
+        titel: x.wat, wanneer: x.datum, tijd: x.tijd,
         status: dag(x.datum) === nu ? 'vandaag' : 'open',
         door: x.groep, kenmerk: x.id, app: 'Genootschap', link: '/apps/genootschap.html'
       }));
@@ -128,7 +141,9 @@ module.exports.maakSocialeWereld = ({ kern }) => {
       onbekend: regels.filter(r => !r.sig).length
     };
 
-    return { ok: true, regels, telling, stil,
+    /* Laag 0: het oordeel in EEN woord, hier berekend en niet op het scherm
+       (CANVAS.md). */
+    return { ok: true, regels, stand: meetStand(regels, stil), telling, stil,
       bronnen: ['gesprekken', 'bijeenkomsten', 'kring'] };
   }
 

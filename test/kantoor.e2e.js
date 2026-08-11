@@ -50,6 +50,15 @@ test('Kantoor: wat in de specialist staat komt hier terug, en werken doe je daar
       { titel: 'Bestuursoverleg', datum: morgen, tijd: '09:30' }, reg.token);
     assert.ok(gemaakt && !gemaakt.error, 'de afspraak hoort in de agenda te landen: ' + JSON.stringify(gemaakt));
 
+    /* En een afspraak van VANDAAG met een tijd erop. Die hoort ergens anders
+       terecht te komen dan die van morgen: op de Command Timeline (laag 3 uit
+       CANVAS.md), en juist NIET ook in het register eronder. Dezelfde dag komt
+       hier dus uit de agenda -- het scherm rekent hem niet zelf uit. */
+    const vandaag = new Date().toISOString().slice(0, 10);
+    const nu = await api(base, '/api/agenda/toevoegen',
+      { titel: 'Vergadering inkoop', datum: vandaag, tijd: '14:00' }, reg.token);
+    assert.ok(nu && !nu.error, 'de afspraak van vandaag hoort in de agenda te landen: ' + JSON.stringify(nu));
+
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     const page = await browser.newPage();
     const fouten = [];
@@ -69,9 +78,25 @@ test('Kantoor: wat in de specialist staat komt hier terug, en werken doe je daar
         bron: (a.querySelector('.bron') || {}).textContent || '',
         sig: a.getAttribute('data-sig') || ''
       }));
+      const st = document.querySelector('#stand');
       return {
         regels,
-        stilte: (document.querySelector('#stilte') || {}).textContent || '',
+        /* Laag 0 van het Command Canvas (CANVAS.md). Wat er te bewijzen valt is
+           niet dat er een woord staat, maar WELK: er staat vandaag iets op de
+           agenda, dus de wereld hoort 'Druk' te melden. Zweeg er een bron, dan
+           hoort hier 'Onbekend' te staan -- en dat is de enige reden dat dit
+           veld het waard is om na te kijken. */
+        stand: st ? st.textContent : '',
+        niveau: st ? st.getAttribute('data-niveau') : '',
+        rust: (document.querySelector('#rust') || {}).textContent || '',
+        /* Laag 3: de Command Timeline. Per punt het uur, de titel en waar hij
+           heen wijst -- een punt zonder weg is een plaatje van uw dag. */
+        lijn: [...document.querySelectorAll('#vandaag .cv-stip')].map(s => ({
+          uur: (s.querySelector('.cv-uur') || {}).textContent || '',
+          titel: (s.querySelector('.cv-titel') || {}).textContent || '',
+          href: (s.querySelector('.cv-wat') || { getAttribute: () => null }).getAttribute('href')
+        })),
+        lijnZichtbaar: !document.querySelector('#vandaagVak').hidden,
         poorten: [...document.querySelectorAll('.poort')].map(p => p.getAttribute('href')),
         /* Alles waarmee je GEGEVENS zou kunnen veranderen. Twee dingen tellen
            met reden niet mee: de referentieknop kopieert alleen, en de
@@ -105,10 +130,34 @@ test('Kantoor: wat in de specialist staat komt hier terug, en werken doe je daar
     assert.deepEqual(beeld.poorten,
       ['/apps/office.html', '/apps/agenda.html', '/apps/notities.html', '/apps/bestanden.html']);
 
-    /* Geen storing, dus ook geen storingsmelding. Andersom is belangrijker en
-       staat in test/kantoorwereld.test.js: als een bron WEL zwijgt, hoort dat
-       hardop gezegd te worden. */
-    assert.equal(beeld.stilte.trim(), '', 'zonder storing hoort er niets over stille bronnen te staan');
+    /* 4. LAAG 3: wat vandaag op de klok staat, staat op de tijdlijn -- en daar
+       alleen. Het register eronder houdt wat er verder speelt; stond de
+       vergadering op allebei, dan staat hetzelfde ding twee keer op een scherm
+       dat zijn hele bestaan aan weglaten ontleent. */
+    assert.equal(beeld.lijnZichtbaar, true, 'met een afspraak vandaag hoort de tijdlijn te staan');
+    assert.deepEqual(beeld.lijn, [{ uur: '14:00', titel: 'Vergadering inkoop', href: '/apps/agenda.html' }],
+      'de afspraak van vandaag hoort met haar UUR op de tijdlijn te staan, en naar de agenda te wijzen; ' +
+      'gevonden: ' + JSON.stringify(beeld.lijn));
+    assert.equal(beeld.regels.filter(r => r.titel.indexOf('Vergadering inkoop') === 0).length, 0,
+      'wat op de tijdlijn staat, hoort NIET ook in het register te staan: ' + JSON.stringify(beeld.regels));
+
+    /* Geen storing, dus ook geen storingsmelding -- maar wel een OORDEEL. Hier
+       stond alleen dat #stilte leeg was, en die controle bleef ook slagen toen
+       dat element verdween: `(null || {}).textContent || ''` is netjes leeg
+       (LAT.md regel 9, een toets die niet kan zakken). De stand kan dat niet:
+       hij staat er of hij staat er niet, en hij zegt wat hij weet.
+
+       'Druk' en niet 'Operationeel', want er staat vandaag iets: dat is de
+       koppeling zelf: de stand is geen sierstrook maar volgt de gegevens. Het
+       rustige geval (niets vandaag -> gezond) staat in test/wereldkern.test.js,
+       waar het zonder browser te maken is. */
+    assert.equal(beeld.niveau, 'aandacht',
+      'een afspraak van vandaag maakt de dag druk, gevonden: ' + beeld.niveau);
+    assert.match(beeld.stand, /Druk/, 'en Kantoor noemt dat "Druk"');
+    assert.match(beeld.rust, /1 zaak die uw aandacht vraagt/,
+      'de rustregel hoort de dag in EEN zin te zeggen, gevonden: ' + beeld.rust);
+    assert.ok(beeld.rust.indexOf('niet compleet') < 0,
+      'zonder storing hoort er niets over stille bronnen te staan: ' + beeld.rust);
 
     assert.deepEqual(fouten, [], 'de pagina hoort zonder consolefouten te laden');
   } finally {

@@ -85,5 +85,13 @@
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
+<!-- DE WEG TERUG. Deze twee schermen laadden shared/ios.js niet, en daarmee ook
+     het app-menu niet: geen hamburger, geen weg naar huis, geen instellingen.
+     Ze draaien sinds hun eigen commit zo. test/appmenu.e2e.js wees ze met naam
+     aan -- de toets deed het dus wel, alleen keek er niemand naar de uitslag. -->
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/ios.js" defer></script>
 </body>
 </html>

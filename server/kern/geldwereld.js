@@ -27,7 +27,14 @@ module.exports.maakGeldwereld = ({ kern }) => {
      alleen deze wereld. En het sorteren en tellen ook, want die VERSCHILLEN
      per wereld met reden; ze samenvoegen zou van vier werelden een grijze
      middelmaat maken (zie het waarom in wereldkern.js). */
-  const { RANG, bron, betekenisVan } = require('./wereldkern');
+  const { RANG, bron, betekenisVan, standVan } = require('./wereldkern');
+
+  /* Laag 0 van het Command Canvas: het woord waarmee deze wereld opent
+     (CANVAS.md, waar Money 'Gezond' heet). 'Let op' en niet 'Krap': deze laag
+     ziet openstaande verrekeningen en toezeggingen, geen buffer -- een oordeel
+     over iemands financiele ruimte hoort hier dus niet te staan, want dat is
+     precies wat deze meting niet gedaan heeft (GELD.md). */
+  const meetStand = standVan({ verstoord: 'Verstoord', aandacht: 'Let op', gezond: 'Gezond' });
 
   const vandaag = () => new Date().toISOString().slice(0, 10);
 
@@ -124,7 +131,9 @@ module.exports.maakGeldwereld = ({ kern }) => {
       onbekend: regels.filter(r => !r.sig).length
     };
 
-    return { ok: true, regels, telling, stil,
+    /* Laag 0: het oordeel in EEN woord, hier berekend en niet op het scherm
+       (CANVAS.md). */
+    return { ok: true, regels, stand: meetStand(regels, stil), telling, stil,
       bronnen: ['wallet', 'verrekeningen', 'toezeggingen'] };
   }
 

@@ -44,32 +44,20 @@ a.terug:hover,a.terug:focus-visible{color:var(--gold-tekst);}
   border:1px solid var(--gold-rand);display:grid;place-items:center;
   font-size:.82rem;letter-spacing:.08em;color:var(--gold-basis);}
 
-/* --- de aandachtsbalk: EEN dominante mededeling, geen zes dozen --- */
-/* GEEN width:100% hier. Een blok-element vult zijn ouder al, en met de
-   padding en de rand erbij werd hij 9px te breed -- net genoeg om de hele
-   pagina horizontaal te laten schuiven, en te weinig om het te zien zonder
-   het te meten. */
-/* Vraagt er iets aandacht, dan is de balk FLUWEEL: bordeaux dat licht
-   absorbeert en pas rood wordt als je kijkt. Is er niets, dan is hij stil --
-   een gouden balk boven een rustige dag is loos alarm. */
-.balk{display:flex;align-items:center;gap:.95rem;text-align:left;
-  padding:.95rem 1rem;border:1px solid var(--bordeaux-rand);
-  border-left:2px solid var(--gold-tekst);
-  border-radius:var(--rtg-rond-klein);background:var(--bordeaux-glans);
-  color:var(--op-bordeaux);text-decoration:none;}
-.balk[data-rustig]{border-color:var(--rtg-line);border-left-color:var(--rtg-sig-stil);
-  background:none;color:inherit;}
-.balk .teken{flex:none;color:var(--op-bordeaux);display:grid;place-items:center;}
-.balk[data-rustig] .teken{color:var(--rtg-soft);}
-/* IVOOR op fluweel, geen goud. Zelfs het champagne-hoogsel haalt op bordeaux
-   maar 4,21:1 en de logotoon 2,09:1. Dit is dezelfde regel die CLAUDE.md al
-   voor bordeaux stelt, nu andersom: op een bordeaux vlak lees je ivoor.
-   Het goud blijft waar het wel werkt -- als rand, en als icoon op onyx. */
-.balk .kop{display:block;font-size:.66rem;letter-spacing:.19em;text-transform:uppercase;
-  color:var(--op-bordeaux);opacity:.85;}
-.balk[data-rustig] .kop{color:var(--rtg-soft);}
-.balk .zin{display:block;margin-top:.25rem;font-size:1.12rem;line-height:1.25;}
-.balk .pijl{margin-left:auto;color:var(--rtg-soft);flex:none;}
+/* --- HIER STOND DE AANDACHTSBALK, EN DIE IS WEG ---
+   Een gouden strook bovenaan met "Er vraagt iets aandacht". Hij deed het goed,
+   maar hij deed laag 0 van het Command Canvas half: hij zei WEL dat er iets
+   was, en niet HOE de wereld ervoor stond -- en elk scherm rekende de tekst
+   zelf uit, in drie kopieen die net iets anders zeiden.
+
+   De stand heeft die taak overgenomen (CANVAS.md, shared/canvas.css +
+   shared/canvas.js), met het oordeel uit de wereld zelf. Alle drie de schermen
+   die deze balk droegen (Kantoor, Reizen, Sociaal) zijn over; wat overbleef was
+   dode opmaak, en dode opmaak is de vorm waarin een oude stijl terugkomt.
+
+   Wat er van bewaard is gebleven, staat in canvas.css: de rand-links als
+   signaal (nu de Signal Rail), en de regel dat rust er stil uitziet. Een gouden
+   balk boven een rustige dag was loos alarm, en dat is hij nog steeds. */
 
 /* --- registerkop --- */
 .regkop{display:flex;align-items:baseline;gap:.8rem;margin:1.6rem 0 .55rem;}
@@ -138,6 +126,9 @@ a.terug:hover,a.terug:focus-visible{color:var(--gold-tekst);}
 .poort b{display:block;font-size:.66rem;letter-spacing:.16em;text-transform:uppercase;font-weight:600;}
 .poort span{display:block;margin-top:.3rem;font-size:.76rem;line-height:1.4;color:var(--rtg-soft);}
 
-.stilte{border-left:2px solid var(--rtg-sig-incident);padding:.7rem 0 .7rem .9rem;margin:1rem 0;
-  font-size:.84rem;line-height:1.55;color:var(--rtg-soft);}
-.stilte strong{color:var(--rtg-txt);}
+/* --- EN HIER STOND DE STILTEMELDING, OOK WEG ---
+   Een kadertje onder de balk: "Niet alles is opgehaald." Het zei het goede
+   ding op de verkeerde plek -- onder een stand die intussen 'Alles loopt'
+   meldde. Nu draagt de stand zelf de onvolledigheid ('Onbekend') en noemt de
+   rustregel de stille bron bij naam (shared/canvas-taal.js). Eén mededeling in
+   plaats van twee die elkaar tegenspreken. */

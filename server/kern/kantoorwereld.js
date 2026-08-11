@@ -50,7 +50,13 @@ module.exports.maakKantoorwereld = ({ kern }) => {
      alleen deze wereld. En het sorteren en tellen ook, want die VERSCHILLEN
      per wereld met reden; ze samenvoegen zou van vier werelden een grijze
      middelmaat maken (zie het waarom in wereldkern.js). */
-  const { RANG, bron, betekenisVan } = require('./wereldkern');
+  const { RANG, bron, betekenisVan, standVan } = require('./wereldkern');
+
+  /* Laag 0 van het Command Canvas: het woord waarmee deze wereld opent
+     (CANVAS.md). Kantoor is 'Operationeel' als het loopt -- geen 'Prima', want
+     dit is de werkplek en die hoort te klinken als een bedrijf dat draait. Het
+     woord voor 'onbekend' hoort niet bij de wereld maar bij de kern. */
+  const meetStand = standVan({ verstoord: 'Verstoord', aandacht: 'Druk', gezond: 'Operationeel' });
 
   const dag = (d) => String(d || '').slice(0, 10);
   const vandaag = () => new Date().toISOString().slice(0, 10);
@@ -177,6 +183,10 @@ module.exports.maakKantoorwereld = ({ kern }) => {
     return {
       ok: true,
       regels,
+      /* Laag 0: het oordeel in EEN woord, hier berekend en niet op het scherm.
+         Zou het scherm het zelf afleiden, dan staat de regel wanneer iets
+         'Operationeel' heet op acht plekken (LAT.md regel 4). */
+      stand: meetStand(regels, stil),
       telling,
       /* Eerlijk over wat er niet gemeten is: niet nul melden wat onbekend is.
          Het scherm zegt dit hardop, want een leeg kantoorbeeld dat eigenlijk

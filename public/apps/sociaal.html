@@ -54,16 +54,24 @@
     <h1 class="rtg-ceremonie">RTG Sociaal</h1>
   </header>
 
-  <a class="balk" id="balk" href="#kring" data-rustig>
-    <span class="teken" id="balkTeken"></span>
-    <span>
-      <span class="kop" id="balkKop">Laden</span>
-      <span class="zin rtg-ceremonie" id="balkZin">&nbsp;</span>
-    </span>
-    <span class="pijl" aria-hidden="true">&rsaquo;</span>
-  </a>
+  <!-- LAAG 0 EN LAAG 1 VAN HET COMMAND CANVAS (CANVAS.md): eerst de stand, dan
+       de rust, en pas daarna de functies. Hier stond een alarmbalk die
+       hetzelfde probeerde en het per scherm opnieuw uitvond.
 
-  <div id="stilte"></div>
+       ZE STAAN LEEG, EN DAT IS DE BELANGRIJKSTE REGEL VAN DIT BLOK. Een woord
+       dat in de HTML staat, staat er ook als er niets is opgehaald -- en dat is
+       precies de leugen die de stand niet mag vertellen. -->
+  <div id="stand"></div>
+  <div id="rust"></div>
+
+  <!-- LAAG 3: DE COMMAND TIMELINE (CANVAS.md). Wat er vandaag OP DE KLOK staat:
+       de bijeenkomsten met een tijdstip. Een gesprek dat op u wacht heeft geen
+       uur -- dat is geen moment maar een openstaande zaak, en die hoort in het
+       register. Hij verdwijnt als er vandaag niets is. -->
+  <section id="vandaagVak" hidden>
+    <div class="regkop"><h2>Vandaag</h2><span class="tel" id="telVandaag"></span></div>
+    <div id="vandaag"></div>
+  </section>
 
   <div class="regkop">
     <h2>Uw kring</h2>
@@ -75,6 +83,11 @@
   <div class="poorten" id="poorten"></div>
 </main>
 
+<!-- Het Canvas komt VOOR het scherm-script en zonder defer: het blok hieronder
+     tekent de stand meteen bij het laden, en een uitgesteld blad is er dan nog
+     niet. Zie CANVAS.md; de vorm staat in shared/canvas.css. -->
+<script src="/shared/canvas.js"></script>
+<script src="/shared/canvas-taal.js"></script>
 <script>
 (() => {
   const $ = s => document.querySelector(s);
@@ -90,8 +103,6 @@
     'fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" ' +
     'stroke-linejoin="round" aria-hidden="true">' + d + '</svg>';
   const ICO = {
-    bel:  '<path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/>',
-    vink: '<path d="M20 6 9 17l-5-5"/>',
     klok: '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
     lijst:'<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',
     blad: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8Z"/><path d="M14 2v6h6"/>',
@@ -125,29 +136,29 @@
     return { wd: WD[x.getDay()], nr: String(x.getDate()).padStart(2, '0'), mnd: MND[x.getMonth()] };
   }
 
-  function tekenBalk(t) {
-    /* Wachten is geen aandacht. Drie documenten die bij een ander liggen is de
-       normale gang van zaken; daar een alarmbalk boven zetten is loos alarm, en
-       loos alarm leert mensen de balk te negeren op de dag dat hij wel klopt.
-       Exact dezelfde afweging als in RTG Reizen, en met opzet dezelfde. */
-    const alarm = t.aandacht + t.onbekend;
-    const b = $('#balk');
-    if (alarm) {
-      b.removeAttribute('data-rustig');
-      $('#balkTeken').innerHTML = ic(ICO.bel, 22);
-      $('#balkKop').textContent = 'Er vraagt iets aandacht';
-      const s = [];
-      if (t.aandacht) s.push(t.aandacht + ' ' + (t.aandacht === 1 ? 'vraagt' : 'vragen') + ' actie');
-      if (t.onbekend) s.push(t.onbekend + ' met onbekende status');
-      $('#balkZin').textContent = s.join(', ');
-      return;
-    }
-    b.setAttribute('data-rustig', '');
-    $('#balkTeken').innerHTML = ic(ICO.vink, 22);
-    $('#balkKop').textContent = t.regels ? 'Er speelt iets' : 'Niets openstaand';
-    $('#balkZin').textContent = t.wachtend
-      ? t.wachtend + ' ' + (t.wachtend === 1 ? 'ligt' : 'liggen') + ' bij een ander'
-      : (t.regels ? 'geen actie nodig' : 'een rustige kring');
+  /* Laag 0 en 1 van het Command Canvas (CANVAS.md). Het OORDEEL komt uit de
+     wereld mee (d.stand); dit scherm kiest alleen welke drie cijfers eronder
+     passen.
+
+     EN HIER IS 'AANDACHT' GEEN ALARM. Mensen die iets van u willen is precies
+     waar een sociale wereld voor bestaat -- daarom heet die stand 'Levendig' en
+     niet 'Druk' (kern/socialewereld.js). Een kring die als werkvoorraad wordt
+     gepresenteerd, is geen kring meer. */
+  function tekenStand(d) {
+    const t = d.telling || {};
+    RTGCanvas.stand('#stand', {
+      app: 'RTG Sociaal',
+      stand: d.stand,
+      cijfers: [
+        [t.aandacht || 0, 'wacht op u'],
+        [t.vandaag || 0, 'vandaag'],
+        [t.wachtend || 0, 'bij een ander']
+      ]
+    });
+    RTGCanvas.rust('#rust', {
+      kop: RTGCanvas.groet(),
+      zin: RTGCanvas.zin(d.stand, { stil: d.stil })
+    });
   }
 
   function werkRegel(x) {
@@ -185,21 +196,40 @@
     '</a>';
   }
 
+  /* LAAG 3: de Command Timeline van vandaag.
+
+     WAT ER OP DE KLOK STAAT, en dat is bij Sociaal smaller dan wat er speelt:
+     een bijeenkomst begint om acht uur, een gesprek dat op u wacht niet. Dat
+     laatste is geen moment maar een openstaande zaak; op een lijn die op tijd
+     loopt zou hij een uur moeten krijgen dat hij niet heeft. */
+  function opDeKlok(x) { return x.wanneer === VANDAAG && !!x.tijd; }
+
+  function tekenVandaag(r) {
+    const punten = r.filter(opDeKlok)
+      .sort((a, b) => String(a.tijd).localeCompare(String(b.tijd)));
+    $('#vandaagVak').hidden = !punten.length;
+    $('#telVandaag').textContent = punten.length
+      ? punten.length + (punten.length === 1 ? ' moment' : ' momenten') : '';
+    if (!punten.length) return;
+    RTGCanvas.lijn('#vandaag', punten.map(x => ({
+      uur: x.tijd, titel: x.titel || SOORT[x.soort] || 'Regel', sig: x.sig,
+      toe: x.status ? x.app + ' · ' + x.status : x.app,
+      href: x.link
+    })));
+  }
+
   function teken(d) {
-    tekenBalk(d.telling || {});
-    const r = d.regels || [];
+    tekenStand(d);
+    const alles = d.regels || [];
+    tekenVandaag(alles);
+    // wat op de tijdlijn staat, staat niet nog eens in het register
+    const r = alles.filter(x => !opDeKlok(x));
     $('#tel').textContent = r.length ? r.length + (r.length === 1 ? ' regel' : ' regels') : '';
     $('#kring').innerHTML = r.length
       ? r.map(werkRegel).join('')
-      : '<p class="stil">Er wacht niemand op u. Wat er in Berichten, Genootschap of Pulse speelt, komt hier vanzelf te staan.</p>';
-
-    /* EERLIJK OVER WAT ER NIET GEMETEN IS. Een leeg kantoorbeeld dat eigenlijk
-       een storing is, laat iemand een vergadering missen. Zwijgen zou hier de
-       ergste keuze zijn, dus het staat er hardop. */
-    $('#stilte').innerHTML = (d.stil || []).length
-      ? '<p class="stil">Niet opgehaald: ' + esc((d.stil || []).join(', ')) +
-        '. Dit beeld is dus niet compleet.</p>'
-      : '';
+      : (alles.length
+        ? '<p class="stil">Verder wacht er niemand op u; wat er vandaag is, staat hierboven.</p>'
+        : '<p class="stil">Er wacht niemand op u. Wat er in Berichten, Genootschap of Pulse speelt, komt hier vanzelf te staan.</p>');
 
     $('#poorten').innerHTML = WERELD.map(([n, z, h, i]) =>
       '<a class="poort" href="' + h + '"><span class="ic">' + ic(i, 22) + '</span>' +
@@ -220,6 +250,10 @@
   });
 
   (async function laad() {
+    /* De stand staat er vanaf de eerste seconde, en zegt dan wat hij is:
+       onbekend. Een leeg gat waar het oordeel hoort te staan leest als 'niets
+       aan de hand', en dat is de enige uitkomst die hij nooit mag suggereren. */
+    tekenStand({});
     try {
       const res = await fetch('/api/sociaal/wereld', {
         method: 'POST',
@@ -230,8 +264,8 @@
       if (!res.ok) throw new Error(d.error || 'Er ging iets mis.');
       teken(d);
     } catch (e) {
-      $('#balkKop').textContent = 'Niet ingelogd';
-      $('#balkZin').textContent = '';
+      // geen esc(): het Canvas zet tekst met textContent en escapet dus zelf
+      RTGCanvas.rust('#rust', { kop: RTGCanvas.groet(), zin: e.message + ' Log eerst in via de leden-app.' });
       $('#kring').innerHTML = '<p class="stil">' + esc(e.message) + ' Log eerst in via de leden-app.</p>';
       $('#poorten').innerHTML = WERELD.map(([n, z, h, i]) =>
         '<a class="poort" href="' + h + '"><span class="ic">' + ic(i, 22) + '</span>' +

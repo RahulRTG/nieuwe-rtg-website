@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Gedachtenboek</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/veiligheid.css" rel="stylesheet">
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<style>
+  .notitie{border-top:1px solid var(--line);padding:1rem 0;}
+  .notitie .wanneer{font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);}
+  .notitie p{font-size:.95rem;line-height:1.7;margin:.4rem 0 0;white-space:pre-wrap;}
+  .notitie .rij{margin-top:.5rem;}
+  .hulp{border:1px solid var(--line);border-left:2px solid var(--goldlicht);
+    padding:1rem 1.1rem;margin:.9rem 0;}
+  .hulp b{display:block;font-family:'Bodoni Moda',Georgia,serif;font-size:1.05rem;font-weight:600;}
+  .hulp p{font-size:.86rem;line-height:1.6;color:var(--soft);margin:.4rem 0 0;}
+  .hulp ul{list-style:none;padding:0;margin:.6rem 0 0;}
+  .hulp li{font-size:.84rem;line-height:1.6;padding:.2rem 0;}
+  .rij{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;margin-top:.7rem;}
+  .knop.mini{padding:.4rem .7rem;font-size:.8rem;}
+  #gTekst{width:100%;font-size:.95rem;line-height:1.7;}
+</style>
+<script src="/shared/seizoen.js" defer></script>
+<script src="/shared/veiligheid.js" defer></script>
+<link href="/shared/ios.css" rel="stylesheet">
+</head>
+<body class="rtg-stijl">
+<a class="skip" href="#inhoud">Naar de inhoud</a>
+<header class="kop">
+  <a href="/apps/life.html" aria-label="Terug naar RTG Life">&#8592;</a>
+  <h1>Gedachtenboek</h1>
+  <div class="rek"></div>
+  <span class="stil">voor uzelf</span>
+</header>
+<main id="inhoud">
+  <section aria-label="Iets opschrijven">
+    <h2>Iets opschrijven</h2>
+    <p class="stil" id="uitleg">Voor uzelf. Er leest geen model mee, er wordt niets samengevat en er
+    gaat niets naar een partner, een zaak of een coach.</p>
+    <textarea id="gTekst" rows="6" maxlength="4000" aria-label="Wat wilt u opschrijven?"
+      placeholder="Wat u kwijt wilt. Niemand leest mee."></textarea>
+    <div class="rij"><button class="knop hoofd" id="gBewaar">Bewaren</button></div>
+    <div id="gHulp"></div>
+  </section>
+
+  <section aria-label="Wat u eerder schreef">
+    <h2>Wat u eerder schreef</h2>
+    <div id="lijst"><p class="stil">Laden...</p></div>
+  </section>
+
+  <section aria-label="Wat dit niet doet">
+    <h2>Wat dit niet doet</h2>
+    <div class="kaart">
+      <p class="stil">Er is geen samenvatting, geen stemmingsgrafiek en geen "inzicht" dat op uw
+      eigen woorden is gebaseerd. Een dagboek dat geanalyseerd wordt, is geen dagboek. Dat is hier
+      geen belofte in een tekstje maar de bouw: er bestaat geen route die deze tekst ergens anders
+      heen stuurt, en de AI-poort ziet hem nooit.</p>
+      <p class="stil" id="elders"></p>
+      <p class="stil">Weggooien is echt weggooien: er blijft geen kopie staan. Wat u schrijft gaat
+      mee in de versleuteling van de rest van uw gegevens.</p>
+    </div>
+  </section>
+
+  <div id="onder" class="rtgdeel-vast"></div>
+</main>
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const esc = s => Veilig.esc(String(s == null ? '' : s));
+
+  /* De hulpkaart komt NAAST wat er net is opgeschreven, nooit in plaats daarvan.
+     Iemand die op zijn zwaarste moment iets opschrijft en zijn woorden ziet
+     verdwijnen, wordt gestraft voor eerlijkheid. */
+  function tekenHulp(d) {
+    const el = $('#gHulp');
+    if (!d.hulp) { el.innerHTML = ''; return; }
+    el.innerHTML = '<div class="hulp"><b>' + esc(d.hulp.kop) + '</b>' +
+      '<p>' + esc(d.hulpUitleg || '') + '</p>' +
+      '<p>' + esc(d.hulp.tekst) + '</p><ul>' + (d.hulp.wegen || []).map(w =>
+        '<li><b>' + esc(w.naam) + '</b> &middot; ' + esc(w.hoe) + '</li>').join('') + '</ul></div>';
+  }
+
+  function teken(d) {
+    if (d.elders) $('#elders').textContent = d.elders;
+    tekenHulp(d);
+    const el = $('#lijst');
+    const n = d.notities || [];
+    if (!n.length) {
+      el.innerHTML = '<p class="stil">Er staat nog niets in uw boek.</p>';
+      return;
+    }
+    el.innerHTML = n.map(x => '<div class="notitie">' +
+      '<span class="wanneer">' + esc(x.op) + ' &middot; ' + esc((x.at || '').slice(11, 16)) + '</span>' +
+      '<p>' + esc(x.tekst) + '</p>' +
+      '<div class="rij"><button class="knop mini" data-weg="' + esc(x.id) + '">Weggooien</button></div>' +
+      '</div>').join('') +
+      (d.meer ? '<p class="stil">Er staan er nog ' + esc(d.meer) + ' ouder dan deze.</p>' : '');
+    el.querySelectorAll('[data-weg]').forEach(b => b.addEventListener('click', async () => {
+      if (!window.confirm('Deze notitie weggooien? Er blijft geen kopie staan.')) return;
+      try { teken(await Veilig.api('/api/gedachten/weg', { id: b.dataset.weg }));
+        Veilig.melding('Weggegooid.'); }
+      catch (e) { Veilig.melding(e.message); }
+    }));
+  }
+
+  async function laad() {
+    try { teken(await Veilig.api('/api/gedachten')); }
+    catch (e) { $('#lijst').innerHTML = '<p class="stil">' + esc(e.message) + '</p>'; }
+  }
+
+  function start() {
+    $('#gBewaar').addEventListener('click', async () => {
+      const tekst = $('#gTekst').value;
+      if (!tekst.trim()) { Veilig.melding('Er staat nog niets in.'); return; }
+      try {
+        const d = await Veilig.api('/api/gedachten/zet', { tekst });
+        $('#gTekst').value = '';
+        teken(d);
+        Veilig.melding('Bewaard.');
+      } catch (e) { Veilig.melding(e.message); }
+    });
+    laad();
+  }
+
+  if (document.readyState !== 'loading') start();
+  else window.addEventListener('load', start);
+})();
+</script>
+<script src="/shared/deelmenu.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
+<script src="/shared/ios.js" defer></script>
+</body>
+</html>

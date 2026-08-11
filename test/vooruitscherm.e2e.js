@@ -87,8 +87,23 @@ test('Vooruit en Uit uw post: van lege kaart naar een termijn, met EEN klik',
          en zelfde voorbehoud als test/wings.e2e.js. */
       await page.waitForSelector('#gate', { state: 'hidden', timeout: 20000 });
       await page.evaluate(() => { const g = document.getElementById('onbGate'); if (g) g.remove(); });
-      await page.waitForSelector('#osCcBtn', { timeout: 20000 });
-      await page.click('#osCcBtn');
+      /* HET BEDIENINGSPANEEL OPENEN ZOALS EEN MENS HET DOET.
+
+         Hier stond `click('#osCcBtn')`, en die knop bestaat nog maar draagt
+         sinds de OS-verbouwing `.os-verborgen-knop` (`display:none !important`).
+         De toets wachtte dus twintig seconden op iets dat nooit zichtbaar wordt.
+         De verleiding is om hem met evaluate() alsnog aan te klikken, maar dan
+         toetst hij een weg die geen enkele gebruiker heeft -- en dat is precies
+         hoe je een scherm groen houdt terwijl het onbruikbaar is.
+
+         De echte weg is een haal vanaf de BOVENRAND (shared/randen.js): begin
+         binnen 24 px van de rand en sleep minstens 40 px omlaag. Dat doen we
+         hier, met wat marge. */
+      await page.mouse.move(200, 5);
+      await page.mouse.down();
+      await page.mouse.move(200, 40, { steps: 5 });
+      await page.mouse.move(200, 90, { steps: 5 });
+      await page.mouse.up();
       await page.waitForSelector('#osCcBo', { timeout: 20000 });
       await page.click('#osCcBo');
       /* Wachten op INHOUD en niet op zichtbaarheid: de kaart is een lege div die

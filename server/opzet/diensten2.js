@@ -71,7 +71,7 @@ const post = require('./postlaag')({ db, save, crypto, findSupplier, antivirus, 
 const { mailQ, mailIn, mailAuth, mailBijlage, mailSleutel, rtmailAi, rtmail, rtmailTeam, rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels,
   rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar } = post;
 // De automatiseringen (draaiboeken) lopen over de RTMAIL-rail
-const automatisering = require('../kern/automatisering')({ rtmail });
+const automatisering = require('../kern/automatisering')({ rtmail, db });
 // Werkmail: het zakelijke adresboek per zaak boven op RTMAIL (domein <naam>.rtg,
 // eigenaar- en managementadressen, rahul@<domein>, de buitenpost en -poort)
 const { werkmail } = require('../kern/werkmail')({ db, save, crypto, rtmail, mail, accounts });

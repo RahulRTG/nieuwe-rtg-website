@@ -52,6 +52,7 @@
    "forgetSession",
    "hasCred",
    "herstelStart",
+   "isBaas",
    "leeftijdVan",
    "logInlog",
    "loginFails",
@@ -140,6 +141,27 @@
    "resolveSession",
    "sessionFor"
   ],
+  "command": [
+   "command",
+   "veilig",
+   "wie"
+  ],
+  "consent": [
+   "consentIntrek",
+   "consentVan",
+   "status"
+  ],
+  "dagcoach": [
+   "dagVoor"
+  ],
+  "doelen": [
+   "doelMaak",
+   "doelMeet",
+   "doelStop",
+   "doelVerzet",
+   "doelenVan",
+   "status"
+  ],
   "doos": [
    "afdelingen",
    "beveilig",
@@ -165,6 +187,12 @@
    "gebouw",
    "status"
   ],
+  "gedachten": [
+   "gedachteWeg",
+   "gedachteZet",
+   "gedachtenVan",
+   "status"
+  ],
   "geld": [
    "geldbeleid",
    "geldgraaf",
@@ -177,6 +205,20 @@
   ],
   "gemeente": [
    "gemeente"
+  ],
+  "gemoed": [
+   "gemoedVan",
+   "gemoedWeg",
+   "gemoedZet",
+   "status"
+  ],
+  "gewoonten": [
+   "gewoonteMaak",
+   "gewoonteReeks",
+   "gewoonteStop",
+   "gewoonteTik",
+   "gewoontenVan",
+   "status"
   ],
   "ghost": [
    "ghostKantoor",
@@ -194,8 +236,11 @@
    "huis"
   ],
   "ik": [
+   "TOEGANKELIJK_KEUZES",
    "geloof",
-   "stemmingToon"
+   "stemmingToon",
+   "toegankelijkVan",
+   "toegankelijkZet"
   ],
   "journaal": [
    "boardroomAuth",
@@ -264,6 +309,10 @@
    "bankNoodHerstel",
    "bankNoodMeld",
    "bankOperationeelZet",
+   "bankPartnerRailZet",
+   "bankSalarisRekeningen",
+   "bankVergunningZet",
+   "bevoegd",
    "boardroomAuth",
    "boardroomLijst",
    "geldBetaaldienst",
@@ -278,6 +327,7 @@
    "mall",
    "naam",
    "pay",
+   "payrollOS",
    "rampbeeld",
    "redactie",
    "reisbureau",
@@ -323,17 +373,20 @@
   "leren-huis": [
    "leren"
   ],
-  "leven": [
-   "levensband",
-   "levenslijn",
-   "rahul"
-  ],
   "lesmaker": [
    "appbieb",
    "lesmaker",
    "reisbieb",
    "schoolbieb",
    "status"
+  ],
+  "leven": [
+   "levensband",
+   "levenslijn",
+   "rahul"
+  ],
+  "life": [
+   "lifeVoor"
   ],
   "livinglab": [
    "id",
@@ -368,10 +421,10 @@
    "mediaBieb",
    "mediaBord",
    "mediaLijst",
+   "mediaLijstDeel",
    "mediaLijstMaak",
    "mediaLijstStuk",
    "mediaLijstZet",
-   "mediaLijstDeel",
    "mediaLijsten",
    "mediaMaker",
    "mediaMeldZet",
@@ -387,6 +440,14 @@
    "mediaVolg",
    "mediaWereld"
   ],
+  "medicatie": [
+   "medicatieAf",
+   "medicatieVan",
+   "medicatieVoorraad",
+   "medicatieWeg",
+   "medicatieZet",
+   "status"
+  ],
   "meet": [
    "meet"
   ],
@@ -394,6 +455,8 @@
    "AUTHOR_TIER",
    "DOOR_RELOCK_MS",
    "LANDEN",
+   "ONDERNEMING_ONTWERPER",
+   "ONDERNEMING_RECHTSVORMEN",
    "PASPOORT_NIVEAUS",
    "PERSONAS",
    "STEMMINGEN",
@@ -621,6 +684,53 @@
    "noteerBeurt",
    "notify",
    "notifySupplier",
+   "ondernemingAandeelWeg",
+   "ondernemingAandeelZet",
+   "ondernemingAanvraag",
+   "ondernemingAanvraagStand",
+   "ondernemingBeeld",
+   "ondernemingBelasting",
+   "ondernemingBestuur",
+   "ondernemingBestuurderAf",
+   "ondernemingBestuurderZet",
+   "ondernemingBijdrageOver",
+   "ondernemingCapaciteit",
+   "ondernemingContracten",
+   "ondernemingCrediteuren",
+   "ondernemingDagbeeld",
+   "ondernemingDebiteuren",
+   "ondernemingEersteKlant",
+   "ondernemingIngeschreven",
+   "ondernemingIntakeBeeld",
+   "ondernemingIntakeZet",
+   "ondernemingKans",
+   "ondernemingKas",
+   "ondernemingKasSaldo",
+   "ondernemingKlantNotitie",
+   "ondernemingKlussen",
+   "ondernemingKoppel",
+   "ondernemingMallProfiel",
+   "ondernemingNieuw",
+   "ondernemingOntwerp",
+   "ondernemingOprichting",
+   "ondernemingOprichtingZet",
+   "ondernemingPijplijn",
+   "ondernemingPlan",
+   "ondernemingPlanVastleggen",
+   "ondernemingRechtsvorm",
+   "ondernemingRechtsvormLanden",
+   "ondernemingRechtsvormenVanLand",
+   "ondernemingRegie",
+   "ondernemingRelaties",
+   "ondernemingSimuleer",
+   "ondernemingStress",
+   "ondernemingToegang",
+   "ondernemingVanEigenaar",
+   "ondernemingVerkenning",
+   "ondernemingVind",
+   "ondernemingVoorraad",
+   "ondernemingWerkruimte",
+   "ondernemingWerving",
    "ontmoetHier",
    "ontmoetKies",
    "ontmoetMijnState",
@@ -702,6 +812,7 @@
    "sparLijst",
    "sparParkeer",
    "sparStatus",
+   "spelVergeet",
    "stateFor",
    "stemmingVan",
    "stuurLus",
@@ -722,6 +833,9 @@
    "unlockDoor",
    "vakwerk",
    "validDept",
+   "vastleggingDeel",
+   "vastleggingStop",
+   "vastleggingenVan",
    "verblijfAnnuleer",
    "verblijfBoek",
    "verdienPunten",
@@ -730,6 +844,9 @@
    "voorspel",
    "vraagPaskamer",
    "vraagRitVoor",
+   "wachtlijstAf",
+   "wachtlijstVan",
+   "wachtlijstZet",
    "wauwStemmingZet",
    "wauwTerugblik",
    "werkgeversVan",
@@ -744,6 +861,12 @@
   ],
   "memo": [],
   "meting": [],
+  "metingen": [
+   "metingWeg",
+   "metingZet",
+   "metingenVan",
+   "status"
+  ],
   "mobiliteit": [
    "aboAanbod",
    "aboKoop",
@@ -844,6 +967,12 @@
    "navPoi",
    "navRoute"
   ],
+  "noodkaart": [
+   "noodkaartVan",
+   "noodkaartWeg",
+   "noodkaartZet",
+   "status"
+  ],
   "notities": [
    "notities"
   ],
@@ -866,17 +995,22 @@
    "loginFails",
    "mail",
    "makeSupplierCode",
+   "mall",
    "noteFailedTry",
    "notify",
    "notifySupplier",
    "officeQueryMag",
    "officeState",
+   "ondernemingBijdrageZet",
+   "ondernemingProvisioningZet",
+   "ondernemingRegie",
    "ontmoetKantoorState",
    "ontmoetSignaalLid",
    "ontmoetSosAf",
    "paspoortBeoordeel",
    "paspoortIncidenten",
    "pendingVerifications",
+   "rechtsvormwacht",
    "rememberSession",
    "salonItemsVan",
    "salonProfielCompleet",
@@ -910,6 +1044,12 @@
   ],
   "overheid": [
    "overheid",
+   "rijksbieb"
+  ],
+  "overheid-bd": [
+   "overheid"
+  ],
+  "overheid-bieb": [
    "rijksbieb"
   ],
   "papieren-deur": [],
@@ -1096,17 +1236,38 @@
    "arcadeBord",
    "arcadeScore",
    "mijnSpellen",
+   "mijnTeams",
+   "mijnToernooien",
    "sneekBord",
    "sneekScore",
    "socialConnecties",
    "spelAntwoord",
+   "spelKijk",
    "spelKlasgenoten",
    "spelNieuw",
+   "spelOnline",
    "spelOpgeven",
+   "spelPraat",
+   "spelPraatStuur",
+   "spelPrestaties",
    "spelRahul",
    "spelRandom",
+   "spelReplay",
    "spelStaat",
-   "spelZet"
+   "spelStand",
+   "spelUitslagen",
+   "spelZet",
+   "spelZichtbaar",
+   "spelZichtbaarZet",
+   "sudokuKlaar",
+   "sudokuNieuw",
+   "teamAntwoord",
+   "teamNieuw",
+   "teamNodig",
+   "teamVerlaat",
+   "toernooiAntwoord",
+   "toernooiNieuw",
+   "toernooiStaat"
   ],
   "sportclub": [
    "sport"
@@ -1225,9 +1386,13 @@
    "bonBoek",
    "bonMaak",
    "broadcastSync",
+   "btwAangifte",
    "cannedBoekhouder",
    "careAfronden",
    "careAgenda",
+   "careGemist",
+   "careNietVerschenen",
+   "careVastleg",
    "cateringDishes",
    "centen",
    "charterVan",
@@ -1325,6 +1490,7 @@
    "maakKassacode",
    "magBezorgen",
    "magWerken",
+   "mall",
    "marina",
    "mbGps",
    "mbNeem",
@@ -1426,6 +1592,7 @@
    "zaakBoard",
    "zaakFunctieAan",
    "zaakZet",
+   "zaakcommand",
    "zetArtikel",
    "zetCollectie",
    "zetKlantMaten",
@@ -1468,6 +1635,7 @@
    "pay",
    "sendPushToUser",
    "sessions",
+   "spelTelemetrie",
    "staat",
    "stad",
    "techniek",
@@ -1477,8 +1645,8 @@
   "theater": [
    "resolveSession",
    "theaterAbonneer",
-   "theaterKanaalMaak",
    "theaterHuisstijl",
+   "theaterKanaalMaak",
    "theaterKijkplichtGedaan",
    "theaterKijkplichtMijn",
    "theaterKijkplichtStand",
@@ -1503,6 +1671,25 @@
   ],
   "tiener": [
    "tiener"
+  ],
+  "tijdlijn": [
+   "tijdlijnVoor"
+  ],
+  "toestellen": [
+   "status",
+   "toestelIntrek",
+   "toestelKoppel",
+   "toestelMeting",
+   "toestelVanSleutel",
+   "toestellenVan"
+  ],
+  "trainingsschema": [
+   "status",
+   "trainingDeed",
+   "trainingVan",
+   "trainingWeg",
+   "trainingWegGedaan",
+   "trainingZet"
   ],
   "uitgifte": [
    "overheid",
@@ -1541,7 +1728,14 @@
    "beauty",
    "opvang",
    "petcare",
-   "status"
+   "status",
+   "verzorgingLeden"
+  ],
+  "voeding": [
+   "status",
+   "voedingVan",
+   "voedingWeg",
+   "voedingZet"
   ],
   "vonk": [
    "vonkBericht",
@@ -1568,13 +1762,44 @@
    "wbwVerreken",
    "wbwVerzoek"
   ],
+  "webbrowser": [
+   "addTicket",
+   "codenaamVan",
+   "commDm",
+   "connectieTussen",
+   "findSupplier",
+   "liveCodename",
+   "notify",
+   "notifySupplier",
+   "save",
+   "sseToCustomer",
+   "verbActief",
+   "webmaker",
+   "webplatform",
+   "webplatformTaal"
+  ],
   "webmaker": [
    "antivirus",
+   "atelierweb",
+   "liveCodename",
    "media",
+   "webmaker",
+   "webmakerAi",
+   "webplatform"
+  ],
+  "webmerk": [
+   "webmerk"
+  ],
+  "webmeting": [
    "webmaker"
   ],
   "welzijn": [
    "welzijn"
+  ],
+  "wereld": [
+   "gidsHaal",
+   "openVacatures",
+   "zijnVrienden"
   ],
   "werkbeleid": [
    "status",
@@ -1612,6 +1837,16 @@
    "notifySupplier",
    "verbindLid",
    "zoekInvite"
+  ],
+  "zaakcommand": [
+   "managerOnly",
+   "zaakcommand"
+  ],
+  "zaakweb": [
+   "webmaker",
+   "webmakerAi",
+   "webmakerTeam",
+   "webplatform"
   ],
   "zakelijk": [
    "PRO",

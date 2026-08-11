@@ -24,25 +24,10 @@ const SOORTEN = ['klant', 'leverancier', 'arbeid', 'huur', 'licentie', 'verwerke
 module.exports = (sctx) => {
   const { app, save, schoon, nu, rid, dag, werkPoort, log, eigenVeld } = sctx;
   const C = (w) => { if (!w.contracten) w.contracten = {}; return w.contracten; };
-  const dagenTot = (d) => Math.round((Date.parse(d) - Date.parse(dag())) / 86400000);
-  const minDagen = (d, n) => new Date(Date.parse(d) - n * 86400000).toISOString().slice(0, 10);
-
-  /* De klok van een contract, altijd uitgerekend en nooit overgetypt. */
-  function klok(c) {
-    if (!c.eindigt) return { stand: 'zonder einddatum', let: 'Een contract zonder einddatum loopt door tot iemand er iets van vindt.' };
-    const laatsteOpzegdag = c.opzegtermijnDagen ? minDagen(c.eindigt, c.opzegtermijnDagen) : c.eindigt;
-    const dagenEinde = dagenTot(c.eindigt);
-    const dagenOpzeg = dagenTot(laatsteOpzegdag);
-    return {
-      laatsteOpzegdag, dagenTotEinde: dagenEinde, dagenTotOpzegdag: dagenOpzeg,
-      stand: dagenEinde < 0 ? 'verlopen'
-        : (dagenOpzeg < 0 && c.stilzwijgend ? 'stilzwijgend verlengd (opzegdag voorbij)'
-          : (dagenOpzeg <= 30 ? 'opzegtermijn loopt af' : 'loopt')),
-      let: c.stilzwijgend
-        ? 'Deze verlengt stilzwijgend. De laatste opzegdag is uitgerekend uit de einddatum en de opzegtermijn; hij staat nergens overgetypt.'
-        : null
-    };
-  }
+  /* De klok staat in ./contractklok.js, gedeeld met het Ondernemers-OS: die
+     heeft dezelfde berekening nodig en zou hem anders overtypen. */
+  const KLOK = require('./contractklok');
+  const klok = (c) => KLOK.klok(c, dag());
 
   app.post('/api/bedrijf/contract/zet', (req, res) => {
     const g = werkPoort(req, res, 'recht'); if (!g) return;

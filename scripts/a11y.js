@@ -58,6 +58,14 @@ const PAGINAS = [
   '/apps/berichten.html',
   '/apps/salon.html',
   '/apps/genootschap.html',
+  /* De sociale super-app. Een nieuw scherm hoort meteen in de keuring te staan,
+     anders is 'schoon' een aanname in plaats van een meting -- en dat is hier
+     nagetrokken: haal de tekst uit een link in de onderbalk weg en deze scan
+     meldt 'link-naam' op /apps/wereld.html. Wat hij NIET ziet is wat achter de
+     inlog zit (de panelen Ontdek en Profiel staan bij de eerste render op
+     hidden); dat geldt voor elk scherm in deze lijst en is de reikwijdte van
+     deze scan, niet iets wat dit scherm apart heeft. */
+  '/apps/wereld.html',
 ];
 
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css',
@@ -123,7 +131,14 @@ function statischeServer() {
     if (res.overtredingen.length) {
       totaal += res.overtredingen.reduce((n, v) => n + v.aantal, 0);
       console.log(`\n[a11y] ${pad}: ${res.overtredingen.length} soort(en) structurele overtreding`);
-      for (const v of res.overtredingen) console.log(`  · ${v.id}: ${v.help} (${v.aantal}x)`);
+      for (const v of res.overtredingen) {
+        console.log(`  · ${v.id}: ${v.help} (${v.aantal}x)`);
+        /* WAAR, net als bij het contrastadvies hieronder. Zonder plaats is een
+           structurele overtreding op een pagina met veertig velden een zoektocht
+           -- en juist deze meldingen laten de bouw falen, dus daar wil je het
+           adres het hardst. */
+        for (const w of (v.waar || [])) console.log(`      ${w}`);
+      }
     } else {
       console.log(`[a11y] ${pad}: schoon`);
     }

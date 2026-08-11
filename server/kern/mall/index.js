@@ -37,86 +37,35 @@ const GIDS_GENRES = [
   'boerderij', 'activiteit', 'events', 'taxi', 'jet', 'helikopter', 'verhuur',
   'tweewielers', 'charter', 'vastgoed', 'zorg'
 ];
-// waar je een genre boekt/reserveert in de app (de diepe link vanuit de gids);
-// de dienstverlenende genres landen op het Dienstenplein in de Mall zelf
+/* Waar je een genre boekt/reserveert in de app (de diepe link vanuit de gids);
+   de dienstverlenende genres landen op het Dienstenplein in de Mall zelf.
+
+   De vervoergenres stonden hier lang NIET in. Ze kwamen wel in de gids, maar
+   zonder pagina, en vielen dus terug op /apps/app.html met `boekbaar: false`:
+   een privejet en een scooterverhuur waren zichtbaar en tegelijk doodlopend,
+   terwijl /apps/hangar.html en /apps/ov.html gewoon bestonden. Dat is precies
+   het symptoom-gat waar LAT-regel 1 over gaat -- de oorzaak was dat er twee
+   plaatsen waren waar "waar boek je dit genre" werd bepaald (deze tabel en de
+   fallback in gidsen()). De tabel is nu de enige, en test/mall-vindlaag.test.js
+   eist dat elk genre dat in de Mall aanbod heeft hier een pagina heeft. */
 const GENRE_PAGINA = {
-  restaurant: '/apps/foodcourt.html',
+  restaurant: '/apps/foodcourt.html', koffie: '/apps/foodcourt.html',
   hotel: '/apps/hotels.html', apartment: '/apps/hotels.html', villa: '/apps/hotels.html',
   bar: '/apps/uitgaan.html', club: '/apps/uitgaan.html', beachclub: '/apps/uitgaan.html',
   retail: '/apps/mall.html', juwelier: '/apps/mall.html', boerderij: '/apps/mall.html',
-  zzp: '/apps/mall.html', chef: '/apps/mall.html', wellness: '/apps/mall.html', bouw: '/apps/mall.html'
+  zzp: '/apps/mall.html', chef: '/apps/mall.html', wellness: '/apps/mall.html', bouw: '/apps/mall.html',
+  // vervoer en verhuur: elk genre naar de plek waar je hem werkelijk aanvraagt
+  jet: '/apps/hangar.html', helikopter: '/apps/hangar.html', charter: '/apps/hangar.html',
+  taxi: '/apps/ov.html', verhuur: '/apps/mall.html', tweewielers: '/apps/mall.html'
 };
 
-function maakMall({ db, save, crypto, isRetail, haalThuis }) {
+function maakMall({ db, save, crypto, isRetail, anthropic, haalThuis, haalLandVind, haalVakwerk, haalFoodcourt, haalZaakFunctie, haalGroothandel }) {
   const nu = () => new Date().toISOString();
   const va = (sku, kleuren, maten, v) => {
     const out = [];
     for (const k of kleuren) for (const m of maten) out.push({ vsku: sku + '-' + k.slice(0, 3).toUpperCase() + '-' + m, kleur: k, maat: m, voorraad: v });
     return out;
   };
-
-  function seed() {
-    if (!db.data.suppliers || !Array.isArray(db.data.suppliers)) return;
-    require('../../seed/genres').zetGenre(db, 'retail');
-    // de bestaande modepartner op de mode-etage zetten
-    const maison = db.data.suppliers.find(s => s.code === 'MAISON');
-    if (maison && !maison.mall) maison.mall = { etage: 'mode', tagline: 'Stille luxe uit eigen atelier, gesneden op de Riviera.' };
-
-    if (db.data._mallSeed) return;
-    db.data._mallSeed = true;
-    const boutieks = [
-      {
-        code: 'ORFEVRE', name: 'Maison Orfèvre', type: 'retail', city: 'Ibiza',
-        loc: { lat: 38.906, lng: 1.436, label: 'Dalt Vila, Ibiza' }, rate: 0.10, menu: [], photos: [],
-        settings: { retailDrempel: 2 }, mall: { etage: 'sieraden', tagline: 'Hoge juwelierskunst en horloges, met de hand gezet.' },
-        collecties: [{ id: crypto.randomBytes(4).toString('hex'), naam: 'Astrale', seizoen: 'AW', jaar: 2026, actief: true, at: nu() }],
-        artikelen: [
-          { id: crypto.randomBytes(4).toString('hex'), sku: 'ORF-RING', naam: 'Solitaire ring', categorie: 'Ringen',
-            materiaal: '18k witgoud, laboratoriumdiamant', omschrijving: 'Klassieke solitaire, onzichtbare zetting.', foto: null,
-            publiekePrijs: 4200, price: 4200, drop: null, at: nu(), varianten: va('ORF-RING', ['Witgoud', 'Roségoud'], ['50', '54', '58'], 2) },
-          { id: crypto.randomBytes(4).toString('hex'), sku: 'ORF-WATCH', naam: 'Automaat horloge', categorie: 'Horloges',
-            materiaal: 'Titanium, saffierglas', omschrijving: 'In-house uurwerk, 72 uur gangreserve.', foto: null,
-            publiekePrijs: 8900, price: 8900, drop: null, at: nu(), varianten: va('ORF-WATCH', ['Antraciet', 'Zilver'], ['39mm', '41mm'], 1) }
-        ],
-        klanten: {}
-      },
-      {
-        code: 'CUIRHUIS', name: 'Le Cuir', type: 'retail', city: 'Ibiza',
-        loc: { lat: 38.908, lng: 1.434, label: 'Marina Botafoch, Ibiza' }, rate: 0.10, menu: [], photos: [],
-        settings: { retailDrempel: 3 }, mall: { etage: 'leer', tagline: 'Leerwaren, gelooid en gestikt op bestelling.' },
-        collecties: [{ id: crypto.randomBytes(4).toString('hex'), naam: 'Voyage', seizoen: 'SS', jaar: 2026, actief: true, at: nu() }],
-        artikelen: [
-          { id: crypto.randomBytes(4).toString('hex'), sku: 'CUI-TAS', naam: 'Weekendtas', categorie: 'Tassen',
-            materiaal: 'Plantaardig gelooid rundleer', omschrijving: 'Handgestikt, messing beslag, katoenen voering.', foto: null,
-            publiekePrijs: 1650, price: 1650, drop: null, at: nu(), varianten: va('CUI-TAS', ['Cognac', 'Zwart'], ['one'], 4) },
-          { id: crypto.randomBytes(4).toString('hex'), sku: 'CUI-RIEM', naam: 'Ceintuur', categorie: 'Riemen',
-            materiaal: 'Volnerf kalfsleer', omschrijving: 'Omkeerbaar, geborsteld gesp.', foto: null,
-            publiekePrijs: 240, price: 240, drop: null, at: nu(), varianten: va('CUI-RIEM', ['Cognac', 'Zwart'], ['85', '90', '95'], 6) }
-        ],
-        klanten: {}
-      }
-    ];
-    for (const b of boutieks) if (!db.data.suppliers.find(s => s.code === b.code)) db.data.suppliers.push(b);
-    // een demo-boerderij voor de etage "Van het land"
-    require('../../seed/genres').zetGenre(db, 'boerderij');
-    if (!db.data.suppliers.find(s => s.code === 'HOEVE')) {
-      db.data.suppliers.push({
-        code: 'HOEVE', name: 'Hoeve del Sol', type: 'boerderij', city: 'Ibiza',
-        loc: { lat: 38.98, lng: 1.43, label: 'Santa Gertrudis, Ibiza' }, rate: 0.10, menu: [], photos: [],
-        mall: { etage: 'land', tagline: 'Vers van het eiland: groente, olijfolie en honing van eigen erf.' },
-        boerderij: {
-          type: 'gemengd', opgezet: true, percelen: [], dieren: [], taken: [], instel: {},
-          producten: [
-            { id: crypto.randomBytes(4).toString('hex'), naam: 'Olijfolie extra vergine', eenheid: 'fles 500 ml', prijs: 18, voorraad: 120, bron: 'oogst' },
-            { id: crypto.randomBytes(4).toString('hex'), naam: 'Bloesemhoning', eenheid: 'pot 350 g', prijs: 9, voorraad: 80, bron: 'oogst' },
-            { id: crypto.randomBytes(4).toString('hex'), naam: 'Groentepakket van het seizoen', eenheid: 'per pakket', prijs: 22, voorraad: 40, bron: 'oogst' }
-          ]
-        },
-        klanten: {}
-      });
-    }
-    save();
-  }
 
   function isBoer(s) { return !!s && (db.capsVan(s)).includes('boerderij'); }
   const farmTeKoop = s => ((s.boerderij && s.boerderij.producten) || []).filter(p => (p.prijs || 0) > 0 && (p.voorraad || 0) > 0);
@@ -126,15 +75,37 @@ function maakMall({ db, save, crypto, isRetail, haalThuis }) {
 
   // de gedeelde ctx voor de deelbestanden
   const ctx = {
-    db, save, crypto, isRetail, haalThuis, nu, va, seed, isBoer, farmTeKoop, verborgen, winkelCatalogus,
+    db, save, crypto, isRetail, anthropic, haalThuis, haalLandVind, haalVakwerk, haalFoodcourt, haalZaakFunctie, haalGroothandel,
+    nu, va, isBoer, farmTeKoop, verborgen, winkelCatalogus,
     ETAGES, ETAGE_IDS, GIDS_GENRES, GENRE_PAGINA
   };
+  // de demo-etalage staat als data apart; hij vult alleen aan wat ontbreekt
+  const { seed } = require('./demozaken')(ctx);
   const api = { ETAGES, seed };
   Object.assign(api, require('./catalogus')(ctx)); // vult ctx met de boutiekweergaven
   Object.assign(api, require('./diensten')(ctx)); // vult ctx met het Dienstenplein
   Object.assign(api, require('./thuisplein')(ctx)); // vult ctx met de verdieping RTG Thuis
   Object.assign(api, require('./etalage')(ctx));
+  /* De commerciele voorkant van heel RTG: het locatiemodel, het universele
+     aanbod-object over alle domeinen heen, en de zoek-/ontdeklaag erboven.
+     Staat NA de etalage omdat de aanbod-bronnen haar helpers (thuisplein,
+     verborgen, farmTeKoop) uit dezelfde ctx halen. */
+  Object.assign(api, require('./plek')(ctx));   // vult ctx.plek
+  Object.assign(api, require('./stand')(ctx));  // vult ctx.stand: de Supplier OS-koppeling
+  Object.assign(api, require('./aanbod')(ctx)); // vult ctx.aanbodAlles
+  Object.assign(api, require('./zoek')(ctx));
+  Object.assign(api, require('./lijsten')(ctx));   // bewaren en een reis bouwen
+  Object.assign(api, require('./aanvragen')(ctx)); // de vraagkant: wat niemand aanbiedt
+  Object.assign(api, require('./collecties')(ctx)); // collectie, bundel, evenement, seizoen
+  Object.assign(api, require('./bestellingen')(ctx)); // wat een lid lopen heeft, over de domeinen heen
+  Object.assign(api, require('./concierge')(ctx));    // een zin in, een zoekopdracht uit
+  Object.assign(api, require('./vraagbeeld')(ctx)); // wat gevraagd en niet geleverd wordt
+  Object.assign(api, require('./spiegel')(ctx));    // zo staat een zaak in de Mall
   return { mall: api };
 }
 
-module.exports = { maakMall, MALL_ETAGES: ETAGES };
+/* GENRE_PAGINA gaat mee naar buiten omdat kern/onderneming/mallprofiel.js hem
+   nodig heeft om te zeggen WAAR een zaak in de app geboekt wordt. Exporteren in
+   plaats van overtypen: een tweede kaart met dezelfde paden loopt uiteen zodra
+   er een genre bij komt (lat-regel 4). */
+module.exports = { maakMall, MALL_ETAGES: ETAGES, MALL_GENRE_PAGINA: GENRE_PAGINA };

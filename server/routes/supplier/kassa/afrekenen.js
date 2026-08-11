@@ -2,8 +2,11 @@
    splitsen) en cadeaukaarten verkopen en innen. Krijgt de gedeelde kern
    een keer bij het opstarten vanuit routes/supplier/kassa.js. */
 module.exports = (kern) => {
-  const { app, crypto, db, gcCode, logActivity, notify, pickupCode, save, sseToCustomer, sseToOffice,
+  const { app, crypto, db, facturatie, gcCode, logActivity, notify, pickupCode, save, sseToCustomer, sseToOffice,
           sseToSupplier, supplierAuth, pay, tafelticket } = kern;
+  // dezelfde factuurroutine als de app-kant; zie kern/lidacties/factuur.js
+  const { maakFactuurVoorLid, regelsVanItems } = require('../../../kern/lidacties/factuur');
+  const factuurVoorLid = maakFactuurVoorLid(facturatie);
 app.post('/api/supplier/pos/checkout', supplierAuth, async (req, res) => {
   const room = String(req.body.room || '').slice(0, 60);
   const method = ['rtgpay', 'contant'].includes(req.body.method) ? req.body.method : 'contant';
@@ -87,6 +90,13 @@ app.post('/api/supplier/tafelticket/afrekenen', supplierAuth, (req, res) => {
     if (o.status === 'wacht-op-betaling' || o.status === 'nieuw') o.status = 'geserveerd';
     o.rekeningVoldaan = true;
     if (!codenames.includes(o.customerCodename)) codenames.push(o.customerCodename);
+    /* EEN FACTUUR PER BON, ook al gaat er EEN kassabon overheen. De gebundelde
+       bon hieronder is het kassastuk van de zaak; de boekhouding en de
+       btw-aangifte tellen per bestelling, dus daar hoort de factuur op te
+       staan. Zonder deze regel viel een tafel die in EEN keer afrekent buiten
+       het factuurregister -- zie kern/lidacties/factuur.js. */
+    factuurVoorLid({ supplierCode: req.supplier.code, supplierNaam: req.supplier.name,
+      codenaam: o.customerCodename, ref: o.ref, methode: method, regels: regelsVanItems(o.items) });
     sseToCustomer(o.customerKey || o.customerTier, 'sync', { scope: 'orders' });
     notify(o.customerKey || o.customerTier, { icon: '\u{1F9FE}', title: req.supplier.name, body: 'De rekening aan ' + chk.table + ' is voldaan. Bedankt en tot ziens.', scope: 'orders' });
   }

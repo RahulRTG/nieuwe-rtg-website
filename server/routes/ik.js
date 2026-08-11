@@ -10,7 +10,7 @@
    dingen, en het tweede telt hier. */
 const { coord } = require('../kern/util');
 module.exports = (kern) => {
-  const { app, auth, schoon, accounts, geloof } = kern;
+  const { app, auth, schoon, accounts, geloof, toegankelijkVan, toegankelijkZet, TOEGANKELIJK_KEUZES } = kern;
 
   const uid = (req) => (req.session && req.session.account) ? req.session.account.id : null;
   const uit = (res, r) => res.status(r.status || 200).json(r.error ? { error: r.error } : r);
@@ -47,6 +47,8 @@ module.exports = (kern) => {
       omgang: OMGANG.includes(md.omgang) ? md.omgang : 'maatje',
       voornaamwoord: md.voornaamwoord || '',
       aanhef: md.aanhef || '',
+      // hoe het scherm zich hoort te gedragen; shared/basis.js voert het uit
+      toegankelijk: id != null ? toegankelijkVan(id) : null,
       geloof: geloof.profielVan(id),
       keuzes: {
         /* De plagerige stand staat er alleen als hij ook echt kan. Bij een
@@ -60,6 +62,9 @@ module.exports = (kern) => {
           { id: 'rustig', naam: 'Rustig', uitleg: 'Kalm tempo, weinig prikkels, geen aandrang.' }
         ],
         geloof: geloof.KEUZES,
+        // het scherm rendert de schakelaars uit deze lijst; kern/toegankelijk.js
+        // is de enige plek waar staat welke er zijn
+        toegankelijk: TOEGANKELIJK_KEUZES,
         methodes: Object.entries(geloof.tijden.METHODES).map(([id, m]) => ({ id, naam: m.naam }))
       }
     };
@@ -107,6 +112,21 @@ module.exports = (kern) => {
     const r = geloof.profielZet(id, req.body || {});
     if (r.error) return uit(res, r);
     res.json(beeld(id));
+  });
+
+  /* Het toegankelijkheidsprofiel. Apart van /api/ik/zet omdat het scherm het
+     ook los ophaalt: shared/basis.js haalt het op elke pagina op om de
+     instelling uit te voeren, en heeft de rest van dit beeld dan niet nodig. */
+  app.post('/api/ik/toegankelijk', auth, (req, res) => {
+    const id = uid(req);
+    if (id == null) return res.status(403).json({ error: 'Alleen voor leden met een eigen account.' });
+    res.json({ ok: true, toegankelijk: toegankelijkVan(id) });
+  });
+
+  app.post('/api/ik/toegankelijk/zet', auth, (req, res) => {
+    const id = uid(req);
+    if (id == null) return res.status(403).json({ error: 'Alleen voor leden met een eigen account.' });
+    uit(res, toegankelijkZet(id, req.body || {}));
   });
 
   /* Wat er vandaag speelt: feestdagen, gebedstijden en de richting van Mekka.

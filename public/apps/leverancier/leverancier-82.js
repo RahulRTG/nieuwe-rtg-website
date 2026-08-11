@@ -52,6 +52,25 @@
     });
   }
 
+  /* ---- De Regie van de zaak ----
+     Het scherm komt uit /shared/zaakcommand.js en hangt ook in de
+     personeels-PDA. Hier geven we hem alleen zijn api en of deze persoon mag
+     beheren; de grendel zelf zit op de server (managerOnly), dus dit is
+     netheid en geen beveiliging. */
+  let regieUI = null;
+  function renderRegie(){
+    const wrap = $('#regieWrap');
+    if (!wrap || !window.RTGZaakCommand) return;
+    if (regieUI) { regieUI.ververs(); return; }
+    const a = actor();
+    regieUI = RTGZaakCommand.toon(wrap, {
+      api: (pad, body) => API.call('/supplier/command/' + pad, body),
+      compact: false,
+      mag: !!(a.manager || a.role === 'manager' || !a.staffId),
+      meld: toast
+    });
+  }
+
   /* ---- Reviews & reputatie: reageren op elke gastreview, met AI-concept ---- */
   function renderReviews(){
     const el = $('#reviewsWrap'); if (!el) return;

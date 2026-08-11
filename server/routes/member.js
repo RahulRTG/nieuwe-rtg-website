@@ -119,6 +119,10 @@ module.exports = (kern) => {
   require('./member/residentie')(kern);
   // De zakelijke tools van de Business Pass: zzp-belastingtool en AI-boekhouder.
   require('./member/zakelijk')(kern);
+  /* Het Ondernemers-OS: één bedrijfsobject van "ik denk erover na" tot een
+     groep met meerdere vennootschappen -- rechtsvorm, levensfase en de
+     koppeling aan de bestaande zaak. Bewust zonder pas-poort; zie de kop daar. */
+  require('./member/onderneming')(kern);
   // De Rechterhand: de premium suite van de Lifestyle Pass
   require('./member/lifestyle')(kern);
   // Extra premium ROS-apps van de Lifestyle Pass: Reisboek, Cellier, Table, Maison

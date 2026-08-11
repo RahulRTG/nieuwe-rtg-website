@@ -57,9 +57,15 @@ function betaalbestand(run, rekeningen) {
   const posten = [];
   const zonderRekening = [];
   for (const s of run.stroken) {
+    /* EERST KIJKEN OF ER IETS TE BETALEN VALT, DAN PAS OF ER EEN REKENING IS.
+       Andersom stond het, en dat blokkeerde een hele loonrun op iemand die nul
+       krijgt: een uitzendkracht zonder uren, een correctie die alleen inhoudt,
+       een medewerker die net uit dienst is. Het bestand is met opzet
+       alles-of-niets, en juist daarom mag die regel alleen gaan over mensen die
+       ook echt geld ontvangen. */
+    if (s.strook.nettoCenten <= 0) continue; // niets te betalen (of een correctie die inhoudt)
     const iban = String((rekeningen || {})[s.staffId] || '').replace(/\s+/g, '').toUpperCase();
     if (!IBAN_VORM.test(iban)) { zonderRekening.push({ staffId: s.staffId, naam: s.naam }); continue; }
-    if (s.strook.nettoCenten <= 0) continue; // niets te betalen (of een correctie die inhoudt)
     posten.push({ staffId: s.staffId, naam: s.naam, iban,
       centen: s.strook.nettoCenten,
       omschrijving: 'Salaris ' + run.periode + ' ' + run.zaak });

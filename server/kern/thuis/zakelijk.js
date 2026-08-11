@@ -18,7 +18,7 @@
    transparant, de uitbetaling staat "gepland" en een factuur "volgt".
    Krijgt de gedeelde ctx van kern/thuis/index.js. */
 module.exports = (ctx) => {
-  const { save, schoon, huizen, boekingen, nachten, TYPES, LANDEN, findSupplier, hostNaam } = ctx;
+  const { save, schoon, huizen, boekingen, nachten, TYPES, LANDEN, findSupplier, hostNaam, ratingVan } = ctx;
 
   const getal = (v, min, max, std) => { const n = Number(v); return Number.isFinite(n) ? Math.min(max, Math.max(min, Math.round(n * 100) / 100)) : std; };
   const isZaak = h => String((h && h.host) || '').startsWith('zaak:');
@@ -154,7 +154,9 @@ module.exports = (ctx) => {
         maxGasten: h.maxGasten, slaapkamers: h.slaapkamers,
         doelgroep: (h.zakelijk || {}).doelgroep || null,
         opFactuur: !!(h.zakelijk || {}).opFactuur,
-        btwPct: logiesBtw(h.land), visual: h.visual || 0
+        btwPct: logiesBtw(h.land), visual: h.visual || 0,
+        // het cijfer komt uit de reviews van RTG Thuis zelf; de Mall toont het mee
+        rating: ratingVan(h.id)
       });
     }
     const steden = [...perStad.entries()]

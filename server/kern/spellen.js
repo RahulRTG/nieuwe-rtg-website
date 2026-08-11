@@ -1,18 +1,20 @@
-/* Kern-module "spellen": potjes op de vriendenlaag, voor alle leden (RTF
-   en RTG spelen tegen elkaar, op codenaam). Elk spel is server-
-   authoritatief en leeft in een eigen deelmodule onder ./spellen/:
-   bordspellen (mens erger je niet, schaken, dammen, Rummi, Magnaat),
-   Woordduel (eer-systeem, zonder woordenboek), partyspellen (30 Seconden,
-   Doen of Waarheid, Proost 18+ op paspoort-geboortedatum), de RTF-duels
-   van De Arena en De Societeit (flits, reactie, quiz, schat: dezelfde
-   opgaven voor iedereen, zetten buiten de beurt) en de arcade met een
-   ranglijst onder vrienden (Sneek, Tetris, Sudoku).
+/* Kern-module "spellen": DE BEDRADING van het spelplatform.
 
-   Een potje start met uitgenodigde vrienden (die accepteren zelf), op
-   codenaam (maakt geen vriendschap), via het door de server bevestigde
-   klasgenoten-pad, of via de random wachtrij per spel en groepsgrootte.
-   Beurten gaan via polling plus een SSE-duwtje. */
-module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, isGeblokkeerd, socialZoek, sociaalRate, volwassen, anthropic }) => {
+   Dit bestand hangt de deellagen aan elkaar en bevat verder niets: elk spel
+   beschrijft zichzelf in ./spellen/ en het register bouwt daar de tabellen uit;
+   de lobby, de partij, de uitslagen, de stand, de prestaties, de toernooien,
+   het meekijken, de replays, het praten, de teams, de telling, de arcade en het
+   opruimen hebben elk hun eigen bestand met hun eigen kop.
+
+   Wat hier WEL staat is de volgorde, en die is de inhoud: een laag die een
+   andere leest moet erna komen. Waar dat niet kan, staat er een late binding
+   met de reden erbij (`comm`, de opruimhaken, `SPEL` in gedeeld.js).
+
+   Een potje start met uitgenodigde vrienden (die accepteren zelf), op codenaam
+   (maakt geen vriendschap), via het door de server bevestigde klasgenoten-pad,
+   of via de random wachtrij per spel en groepsgrootte. Beurten gaan via polling
+   plus een SSE-duwtje. */
+module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, isGeblokkeerd, socialZoek, sociaalRate, volwassen, anthropic, sseClients, lidBoardUit, comm }) => {
   const fs = require('fs'), zlib = require('zlib'), path = require('path');
   const rid = (n) => crypto.randomBytes(n).toString('hex');
   const nu = () => new Date().toISOString();
@@ -20,142 +22,133 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
     if (!db.data.spellen) db.data.spellen = { potjes: {}, wachtrij: {} };
     return db.data.spellen;
   }
-  /* Een tabel per spel is de enige bron: naam, spelersaantal en welke app het
-     potje START (meespelen op uitnodiging kan altijd over en weer). 'min'
-     dwingt af dat 30 Seconden echt met vier begint; 'volwassen' is de
-     18+-poort van Proost (paspoort-geboortedatum; RTF-profielen hebben geen
-     geverifieerde leeftijd en doen dus nooit mee). */
-  const SPEL = {
-    mejn:     { naam: 'Mens erger je niet', max: 4, wereld: 'rtf' },
-    schaak:   { naam: 'Schaken',            max: 2, wereld: 'rtg' },
-    woord:    { naam: 'Woordduel',          max: 2, wereld: 'rtg' },
-    pesten:   { naam: 'Pesten',             max: 4, wereld: 'rtf' },
-    dam:      { naam: 'Dammen',             max: 2, wereld: 'rtf' },
-    rummi:    { naam: 'Rummi',              max: 4, wereld: 'rtf' },
-    magnaat:  { naam: 'Magnaat',            max: 6, wereld: 'rtg', buitenBeurt: ['bouw', 'verkoop'] },
-    seconden: { naam: '30 Seconden',        max: 4, min: 4, wereld: 'rtg' },
-    waarheid: { naam: 'Doen of Waarheid',   max: 6, wereld: 'rtf' },
-    proost:   { naam: 'Proost',             max: 6, wereld: 'rtg', volwassen: true },
-    // de Arena-duels (tieners): iedereen speelt dezelfde opgaven in eigen
-    // tempo, dus de zet mag buiten de beurt
-    flits:    { naam: 'Flitsduel',          max: 4, wereld: 'rtf', buitenBeurt: ['antwoord'] },
-    reactie:  { naam: 'Reactieduel',        max: 4, wereld: 'rtf', buitenBeurt: ['tik'] },
-    quiz:     { naam: 'Quizduel',           max: 4, wereld: 'rtf', buitenBeurt: ['antwoord'] },
-    schat:    { naam: 'Schatduel',          max: 4, wereld: 'rtf', buitenBeurt: ['schat'] },
-    geheugen: { naam: 'Geheugenduel',       max: 4, wereld: 'rtf', buitenBeurt: ['reeks'] },
-    orde:     { naam: 'Rangschikduel',      max: 4, wereld: 'rtf', buitenBeurt: ['orde'] }
-  };
-  const SOORTEN = Object.fromEntries(Object.entries(SPEL).map(([k, v]) => [k, v.naam]));
+  /* Wat een descriptor kan zeggen staat in spellen/register.js en met opzet
+     niet ook hier. Het register draait verderop, zodra de gedeelde spelregels
+     bestaan die het aan de spellen doorgeeft. */
   const TEAMS = [0, 1, 0, 1, 0, 1]; // om en om twee teams, tot zes spelers
-  function wereldFout(wereld, soort) {
-    if (!SPEL[soort] || SPEL[soort].wereld === wereld || (wereld !== 'rtg' && wereld !== 'rtf')) return null;
-    return wereld === 'rtg' ? 'Dit spel vind je in de RTFoundation-app.' : 'Dit spel vind je in de RTG-leden-app.';
-  }
-  // de 18+-poort, op ELK toetredingsmoment (starten, uitnodigen, accepteren)
-  function leeftijdFout(soort, handle) {
-    if (SPEL[soort] && SPEL[soort].volwassen && !volwassen(handle))
-      return 'Proost is 18+. Dit spel kan alleen met leden met een geverifieerde volwassen leeftijd.';
-    return null;
-  }
-  const nudge = (naar, potje) => { try { sseToCustomer(naar, 'social', { kind: 'spel', potje: potje.id, soort: potje.soort }); } catch (e) {} };
-  // eerlijk schudden (Fisher-Yates op crypto), gedeeld door alle kaart- en letterzakken
-  function schud(arr) {
-    for (let i = arr.length - 1; i > 0; i--) { const j = crypto.randomInt(0, i + 1); [arr[i], arr[j]] = [arr[j], arr[i]]; }
-    return arr;
-  }
-  // beurt doorschuiven met de klok mee (of tegen, met stap -1); spel-neutraal
-  function beurtDoor(potje, stap) {
-    const n = potje.spelers.length;
-    potje.beurt = ((potje.beurt + (stap || 1)) % n + n) % n;
-  }
+  /* De vijf dingen die elk spel van het platform krijgt -- twee poorten, de
+     schudbeker, de beurtvolgorde en het duwtje naar de andere kant -- staan in
+     spellen/gedeeld.js. Ze lezen de descriptor en kennen geen spelnaam.
 
-  /* ---------- opschonen: klare potjes na een dag weg, wachtenden na een uur.
-     Hooguit een keer per minuut: de scan over alle potjes hoort niet in het
-     hete pad van elke lobby-poll. ---------- */
-  let opgeschoondOm = 0;
-  function opschonen() {
-    const t = Date.now();
-    if (t - opgeschoondOm < 60000) return;
-    opgeschoondOm = t;
-    const s = S();
-    for (const [id, p] of Object.entries(s.potjes)) {
-      const leeftijd = t - new Date(p.at).getTime();
-      if ((p.status === 'klaar' && leeftijd > 86400000) || (p.status === 'wacht' && leeftijd > 6 * 3600000)) delete s.potjes[id];
-    }
-  }
+     Ze hangen HIER en niet lager: het register en de lobby krijgen ze mee, en
+     `SPEL` bestaat pas na het register. Dat is dezelfde late binding als
+     hieronder: de functies worden pas bij een verzoek aangeroepen. */
+  const { wereldFout, leeftijdFout, nudge, schud, beurtDoor } =
+    require('./spellen/gedeeld')({ crypto, sseToCustomer, volwassen, get SPEL() { return SPEL; } });
 
-  /* ================= Mens erger je niet =================
-     Ring van 40 velden; speler p start op veld p*10. Een pion: -1 = in het
-     starthok, 0..39 = op de ring (absoluut), 100+i = eigen thuisrij. */
+  /* Wat er weggaat, vanzelf en op verzoek: spellen/opruimen.js. De HAKEN zijn
+     er omdat de volgorde niet anders kan -- `opschonen` gaat als eerste de
+     lobby in, terwijl de takken die opgeruimd moeten worden pas verderop
+     bestaan. Ze schuiven aan zodra ze er zijn; veilig, want er wordt tijdens
+     het opbouwen niets van dit alles aangeroepen. */
+  const opruimHaken = { deel: [], sudoku: null };
+  const { opschonen, spelVergeet } = require('./spellen/opruimen')({
+    S, save, codenaamVan,
+    noteerUitslag: (p) => noteerUitslag(p),
+    deelVergeet: opruimHaken.deel,
+    sudokuOpschonen: (t) => { if (opruimHaken.sudoku) opruimHaken.sudoku(t); }
+  });
 
   /* ---------- de spelmotoren: elk spel een eigen module ----------
-     De gedeelde context geeft ze save/crypto/schud/beurtDoor/codenaamVan; de
-     dispatch-tabellen (INITS/ZETTEN/VIEWS) hieronder blijven ongewijzigd. */
+     De gedeelde context geeft ze save/crypto/schud/beurtDoor/codenaamVan; het
+     register haalt ze op en levert de dispatch-tabellen. Dit blok groeit niet
+     meer mee met het aantal spellen -- dat was het hele punt. */
   const spelCtx = { save, crypto, schud, beurtDoor, codenaamVan, nudge };
-  const { mejnInit, mejnZet, mejnZetten, mejnGooi } = require('./spellen/mejn')(spelCtx);
-  const { schaakInit, schaakZet } = require('./spellen/schaak')(spelCtx);
-  const { woordInit, woordZet, W_PREMIE } = require('./spellen/woord')(spelCtx);
-  const { pestenInit, pestenZet } = require('./spellen/pesten')(spelCtx);
-  const { damInit, damZet, damZetten } = require('./spellen/dam')(spelCtx);
-  const { rummiInit, rummiZet, rummiSet } = require('./spellen/rummi')(spelCtx);
-  const { magnaatInit, magnaatZet, M_VELDEN } = require('./spellen/magnaat')(spelCtx);
-  const { secondenInit, secondenZet } = require('./spellen/seconden')(spelCtx);
-  const { waarheidInit, waarheidZet } = require('./spellen/waarheid')(spelCtx);
-  const { proostInit, proostZet } = require('./spellen/proost')(spelCtx);
-  const { flitsInit, flitsZet, flitsView } = require('./spellen/flits')(spelCtx);
-  const { reactieInit, reactieZet, reactieView } = require('./spellen/reactie')(spelCtx);
-  const { quizInit, quizZet, quizView } = require('./spellen/quiz')(spelCtx);
-  const { schatInit, schatZet, schatView } = require('./spellen/schat')(spelCtx);
-  const { geheugenInit, geheugenZet, geheugenView } = require('./spellen/geheugen')(spelCtx);
-  const { ordeInit, ordeZet, ordeView } = require('./spellen/orde')(spelCtx);
+  const { SPEL, SOORTEN, INITS, ZETTEN, VIEWS, STATISCH, ARCADE, ruw } = require('./spellen/register')(spelCtx);
   // klasgenoten: het uitnodigingspad voor beschermde tieners (De Arena)
   const { klasgenotenVan, spelKlasgenoten } = require('./spellen/klas')({ db, codenaamVan, isGeblokkeerd });
+  /* Wie van je vrienden er nu is. Leest de levende lijst van open
+     live-verbindingen en bewaart zelf niets; zie spellen/presence.js voor de
+     regels die dat begrenzen. Een toets of een stand zonder SSE-laag krijgt
+     een lege lijst in plaats van een uitzondering. */
+  const { spelOnline, spelZichtbaar, spelZichtbaarZet } = require('./spellen/presence')({
+    S, save, sseClients: sseClients || [], isGeblokkeerd, codenaamVan,
+    lidBoardUit: lidBoardUit || (() => false)
+  });
 
+  /* DE PROGRESSIEGRENS staat in spellen/grens.js: de enige regel waar deze hele
+     laag aan hangt, en daarom een eigen bestand met een eigen naam. */
+  const { progressieMag, GEEN_PROGRESSIE } = require('./spellen/grens')({ volwassen });
+
+  /* Uitslagen die een potje overleven: de bron onder winrate, niveaus en
+     toernooien. Deelnemers buiten de progressiegrens staan er zonder codenaam
+     in; speelde niemand binnen de grens mee, dan wordt er niets bewaard. Zie
+     spellen/uitslagen.js. */
+  /* Telemetrie: geaggregeerd, zonder personen. Hangt aan `noteerUitslag` en
+     niet aan de twee einden van een potje -- een plek, en meteen dezelfde
+     idempotentie. Zie spellen/telling.js voor waarom dit NAAST de uitslagen
+     staat en er niet uit wordt afgeleid. */
+  const { telPotje, spelTelemetrie } = require('./spellen/telling')({ db, save, nu, SOORTEN });
+
+  const { noteerUitslag, spelUitslagen, spelStand } = require('./spellen/uitslagen')({
+    db, save, codenaamVan, nu, progressieMag, telPotje
+  });
+
+
+  /* Prestaties, ook afgeleid uit de uitslagen: alleen wat behaald is, geen
+     voortgang naar wat je "nog moet", en geen reeksen. Zie de kop van
+     spellen/prestaties.js voor waarom dat drie bewuste keuzes zijn. */
+  const { spelPrestaties } = require('./spellen/prestaties')({
+    spelStand, naamVanSpel: (soort) => SOORTEN[soort] || null
+  });
+
+  /* Het verloop van een partij, voor de replay. Aparte tak en aparte termijn:
+     een uitslag zegt WIE won en gaat een jaar mee, een verloop zegt HOE en is
+     na een maand geen geheugen meer. Zie spellen/zetten.js. */
+  const { noteerZet, spelReplay, zettenVergeet } = require('./spellen/zetten')({ db, save, nu, codenaamVan });
+  opruimHaken.deel.push(zettenVergeet);
 
   /* De lobby- en partijlaag draaien als submodules op een gedeelde
      context, een keer opgebouwd bij het opstarten. */
   const ctx = { db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, isGeblokkeerd, socialZoek, sociaalRate, volwassen,
     rid, nu, S, SPEL, SOORTEN, TEAMS, wereldFout, leeftijdFout, nudge, schud, beurtDoor, opschonen,
-    mejnInit, mejnZet, mejnZetten, mejnGooi, schaakInit, schaakZet, woordInit, woordZet, W_PREMIE,
-    pestenInit, pestenZet, damInit, damZet, damZetten, rummiInit, rummiZet, rummiSet,
-    magnaatInit, magnaatZet, M_VELDEN, secondenInit, secondenZet, waarheidInit, waarheidZet, proostInit, proostZet,
-    flitsInit, flitsZet, flitsView, reactieInit, reactieZet, reactieView, klasgenotenVan,
-    quizInit, quizZet, quizView, schatInit, schatZet, schatView,
-    geheugenInit, geheugenZet, geheugenView, ordeInit, ordeZet, ordeView };
-  const { spelStart, spelGrootte, spelNieuw, spelAntwoord, spelRandom, mijnSpellen } = require('./spellen/lobby')(ctx);
-  const { spelStaat, spelZet, spelOpgeven } = require('./spellen/partij')(ctx);
+    INITS, ZETTEN, VIEWS, STATISCH, klasgenotenVan, noteerUitslag, noteerZet };
+  const { spelStart, spelGrootte, potjeDirect, spelNieuw, spelAntwoord, spelRandom, mijnSpellen } = require('./spellen/lobby')(ctx);
+  /* Toernooien: een knockout waarvan elke wedstrijd een GEWOON potje is. Staat
+     bewust NIET achter de progressiegrens -- een toernooi is een begrensd
+     evenement en geen blijvende stand; zie de kop van spellen/toernooi.js. */
+  const { toernooiNieuw, toernooiAntwoord, toernooiPotjeKlaar, mijnToernooien, toernooiStaat, toernooiVergeet } =
+    require('./spellen/toernooi')({ db, save, rid, nu, codenaamVan, isGeblokkeerd, SPEL, SOORTEN, schud,
+      potjeDirect, leeftijdFout, nudge });
+  opruimHaken.deel.push(toernooiVergeet);
+  ctx.toernooiPotjeKlaar = toernooiPotjeKlaar;
+  ctx.toernooiHeeftSpeler = (id, key) => { const b = toernooiStaat(key, id); return !!(b && b.toernooi && b.toernooi.ikDoeMee); };
+  const { spelStaat, spelZet, spelOpgeven, spelKijk } = require('./spellen/partij')(ctx);
   // Rahul als spelmaatje: in elk potje op te roepen voor hints, regels of een peptalk
   const { spelRahul } = require('./spellen/rahul')(Object.assign({ anthropic }, ctx));
 
-  /* ================= arcade (Sneek en Tetris): ranglijsten onder vrienden ================= */
-  const ARCADE = ['sneek', 'tetris', 'sudoku'];
-  function A(spel) {
-    const s = S();
-    if (!s.arcade) {
-      s.arcade = { sneek: s.sneek || {}, tetris: {} }; // neemt oude sneek-scores mee
-      delete s.sneek; // een bron: anders lopen de oude en nieuwe sleutel uiteen
-    }
-    if (!s.arcade[spel]) s.arcade[spel] = {};
-    return s.arcade[spel];
-  }
-  function arcadeScore(mij, spel, punten) {
-    if (!ARCADE.includes(spel)) return { status: 400, error: 'Onbekend arcadespel.' };
-    const n = Math.max(0, Math.min(999999, Math.floor(Number(punten) || 0)));
-    const s = A(spel);
-    if (!s[mij] || n > s[mij].punten) { s[mij] = { punten: n, at: nu() }; save(); }
-    return { status: 200, ok: true, beste: s[mij].punten };
-  }
-  function arcadeBord(mij, spel, vrienden) {
-    if (!ARCADE.includes(spel)) return { status: 400, error: 'Onbekend arcadespel.' };
-    const s = A(spel);
-    const rij = [mij, ...vrienden].filter(h => s[h]).map(h => ({ codenaam: codenaamVan(h), ik: h === mij, punten: s[h].punten }));
-    return { bord: rij.sort((a, b) => b.punten - a.punten).slice(0, 20) };
-  }
-  const sneekScore = (mij, punten) => arcadeScore(mij, 'sneek', punten);
-  const sneekBord = (mij, vrienden) => arcadeBord(mij, 'sneek', vrienden);
+  /* Praten in het potje. Geen eigen berichtenvoorraad: dit gaat de
+     communicatiekern in als een gesprek van soort 'group', met alles wat daar
+     al aan hangt (bewaartermijn, wisrecht, leesstand, sein). `comm` komt als
+     FUNCTIE binnen omdat de spellen in laag 1 worden opgebouwd en die kern pas
+     in laag 4 -- op het moment van aanroepen bestaat hij wel. Zonder comm (een
+     toets die alleen potjes speelt) blijft praten gewoon dicht. */
+  /* Teams: een vaste club om mee te spelen. Iedereen mag er een maken; wat dat
+     begrensd houdt staat in spellen/teams.js (niet openbaar, uitnodigen alleen
+     binnen je eigen kring, en pas lid als je ja zegt). Bewust ZONDER ranglijst
+     -- een teamstand zou onder de progressiegrens vallen en dan staat de helft
+     van een schoolteam er niet op. */
+  const { teamNieuw, teamNodig, teamAntwoord, teamVerlaat, mijnTeams, teamVergeet } =
+    require('./spellen/teams')({ db, save, rid, nu, codenaamVan, isGeblokkeerd, zijnVrienden,
+      klasgenotenVan, schoon: require('./util').schoon, sociaalRate });
+  opruimHaken.deel.push(teamVergeet);
 
-  return { spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelRahul, spelKlasgenoten, sneekScore, sneekBord, arcadeScore, arcadeBord, SPEL_SOORTEN: SOORTEN,
+  const { spelPraat, spelPraatStuur } = require('./spellen/praat')(Object.assign({
+    comm: () => (typeof comm === 'function' ? comm() : comm) || null
+  }, ctx));
+
+  /* De arcade: spelen zonder tegenstander, waar alleen een getal van overblijft.
+     Inclusief Sudoku, het enige arcadespel waarvan de SERVER de score rekent.
+     Zie spellen/arcade.js voor waarom die twee soorten score niet naast elkaar
+     mogen bestaan zonder dat de ene de andere dichtzet. */
+  const { arcadeScore, arcadeBord, sneekScore, sneekBord, sudokuNieuw, sudokuKlaar, arcadeVergeet, sudokuOpschonen } =
+    require('./spellen/arcade')({ S, save, nu, codenaamVan, ARCADE, ruw, progressieMag, GEEN_PROGRESSIE });
+  opruimHaken.deel.push(arcadeVergeet);
+  opruimHaken.sudoku = sudokuOpschonen;
+
+
+  return { spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelKijk, spelReplay, spelRahul, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, spelUitslagen, spelStand, spelPrestaties, spelPraat, spelPraatStuur, spelTelemetrie, teamNieuw, teamNodig, teamAntwoord, teamVerlaat, mijnTeams, sudokuNieuw, sudokuKlaar, spelVergeet, toernooiNieuw, toernooiAntwoord, mijnToernooien, toernooiStaat, sneekScore, sneekBord, arcadeScore, arcadeBord, SPEL_SOORTEN: SOORTEN,
     // alleen voor de drift-test: de client heeft een eigen kopie van deze
     // regels (directe feedback); de test houdt beide kopieën tegen elkaar
-    _spelregels: { rummiSet, W_PREMIE } };
+    _spelregels: { rummiSet: ruw.rummiSet, W_PREMIE: ruw.W_PREMIE, SPEL, ARCADE } };
 };

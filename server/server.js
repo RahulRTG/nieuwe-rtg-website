@@ -385,7 +385,9 @@ const { schild, ssrf, zetWacht, zetRtgai } = require('./opzet/verzoekketen')({
   opslagKlaar: () => opslagKlaar(),
   // alle drie pas verderop in dit bestand gebouwd; lui doorgegeven
   beveiligVan: () => beveilig,
-  muntenVan: () => munten, settleFactuurVan: () => settleFactuur
+  muntenVan: () => munten, settleFactuurVan: () => settleFactuur,
+  // de opdrachtenrij bestaat pas verderop; de payout-webhook leest hem per verzoek
+  opdrachtenVan: () => betaalOpdrachten
 });
 
 /* ---------- de poortwachters voor de routers staan in ./opzet/poortwachters.js
@@ -394,13 +396,18 @@ const { schild, ssrf, zetWacht, zetRtgai } = require('./opzet/verzoekketen')({
    bestanden. Ook hier een late binding: het scan-net wordt pas gebouwd als
    `beveilig` en `wacht` er zijn (zetScanNet). */
 const PUBLIC_DIR = path.join(__dirname, '..', 'public');
-const { rtf, CSP_NONCE, zetScanNet } = require('./opzet/poortwachters')({
-  app, express, db, save, log, accounts, eigenaar, PUBLIC_DIR, PRODUCTION, opslagKlaar,
+/* De haak voor eigen domeinen: hij wordt hier leeg meegegeven en pas gevuld
+   zodra de webmaker bestaat. Zolang hij leeg is, verandert er niets. */
+const eigenWeb = {};
+const { rtf, CSP_NONCE, zetScanNet, functies } = require('./opzet/poortwachters')({
+  app, express, db, save, log, accounts, eigenaar, PUBLIC_DIR, PRODUCTION, opslagKlaar, eigenWeb,
   // hoisted of verderop in dit bestand; lui doorgegeven
   sseToOffice: (ev, data) => sseToOffice(ev, data),
   sessionFor: t => sessionFor(t),
   findSupplier: c => findSupplier(c),
-  sendPushToUser: (u, n) => sendPushToUser(u, n)
+  sendPushToUser: (u, n) => sendPushToUser(u, n),
+  // de bevoegdheidslaag ontstaat pas in kernlaag4b; lui doorgegeven
+  bevoegdVan: () => kern.bevoegd
 });
 
 /* ---------- Claude API (optioneel) ---------- */
@@ -710,7 +717,45 @@ const media = require('./media').maakMedia({ dir: DATA_DIR });
 /* RTG Webmaker (kern/webmaker.js): de eigen site van een lid. Staat hier en
    niet eerder omdat hij de mediastore nodig heeft: een foto die uit de
    bibliotheek valt of wordt weggehaald, moet ook van schijf. */
-const webmaker = require('./kern/webmaker')({ db, save, crypto, schoon, media });
+/* Merken met vestigingen (kern/webmerk.js) en de Website-maker kennen elkaar:
+   de maker vraagt bij elke bewaring welke huisstijl er voor deze zaak geldt,
+   het merk laat zijn hoofdontwerp door de maker uitrollen. Late binding
+   daarom -- webmerk bestaat een regel later. */
+let webmerk = null;
+const webmaker = require('./kern/webmaker')({ db, save, crypto, schoon, media,
+  merkHuisstijl: z => webmerk && webmerk.huisstijlVoorZaak(z) });
+webmerk = require('./kern/webmerk')({ db, save, scho: schoon, webmaker, findSupplier });
+/* De haak vullen die de poortwachters boven express.static hebben gezet: een
+   verzoek op een gekoppelde hostnaam krijgt de GEPUBLICEERDE site als HTML.
+   De boardroom-schakelaar staat standaard uit; zolang die dicht is gebeurt hier
+   niets en valt het verzoek gewoon door naar de site van het huis. */
+const webdomeinHtml = require('./kern/webdomein-html');
+eigenWeb.serveer = (req, res, next) => {
+  try {
+    const staat = db.data && db.data.techniek && db.data.techniek.functies;
+    if (!functies.functieAan('dom-eigendomein', staat)) return next();
+    const host = String(req.headers.host || '').split(':')[0];
+    const d = webmaker.siteVoorHost(host);
+    if (!d) return next();
+    const s = d.zaakCode ? findSupplier(d.zaakCode) : null;
+    // wat er BUITEN staat is de gepubliceerde stand, nooit het concept
+    const site = webplatform.losSite(webmaker.publiekeStand(d), s, true);
+    const pad = req.path === '/' ? '' : req.path.replace(/^\//, '').replace(/\/$/, '');
+    const html = webdomeinHtml.render(site, pad);
+    if (html == null) return res.status(404).type('text/plain').send('Deze pagina bestaat niet.');
+    res.type('html').send(html);
+  } catch (e) { next(); }
+};
+/* RTG Web Platform (kern/webplatform.js): genereert bedrijfssites uit het
+   zaakprofiel en lost de live zaakdata-blokken op bij het openen. */
+/* Wie van het personeel op de bedrijfssite mag staan: een publicatiebesluit
+   van de leiding, geen veld in de personeelsadministratie. */
+const webmakerTeam = require('./kern/webmaker-team')({ db, save, listStaff: accounts.listStaff });
+const webplatform = require('./kern/webplatform')({ db, team: webmakerTeam });
+/* Een site lezen in je eigen taal: dezelfde vertaallaag als de berichten. */
+const webplatformTaal = require('./kern/webplatform-taal')({ vertaler: require('./translate') });
+// AI in de Website-maker: past een ontwerp aan op een opdracht; bewaart niets zelf
+const webmakerAi = require('./kern/webmaker-ai')({ anthropic, schoon });
 app.get('/media/:naam', (req, res) => { media.serveer(req, res).catch(() => { if (!res.headersSent) res.status(500).end(); }); });
 // Eenmalige verhuizing van al bestaande base64-foto's (Salon + snaps) naar de
 // mediastore, zodat ook oude data het geheugen niet meer belast. Alleen de
@@ -1423,11 +1468,28 @@ const {
   directBetalingMetRef, directBetalingenVanKlant, directBetalingenVanZaak, directBetalingenVoegToe,
   betaalVerzoekMetRef, betaalVerzoekenVoorCodenaam, betaalVerzoekenVanZaak, betaalVerzoekenVoegToe });
 
+/* DE BETAALOPDRACHTEN (kern/betaalopdracht/): een rij voor alles wat het huis
+   ECHT verlaat -- de SEPA van de bank, de partneruitbetaling van Pay en de
+   afdracht van het fonds. EEN rij en niet drie, want anders staat het antwoord
+   op "wat is geboekt maar niet aangekomen" op drie plekken en telt niemand ze
+   op. Hij wordt hier gebouwd omdat hij ouder moet zijn dan zijn drie gebruikers;
+   elk van hen meldt daarna zijn eigen teruggang aan (registreerTeruggang), want
+   terugboeken kan alleen in het grootboek waar het geld vandaan kwam. */
+const betaalOpdrachten = require('./kern/betaalopdracht')({
+  d: () => db.data, save, crypto, nu: () => Date.now(), log,
+  // aanbieden bij de rail: dezelfde sleutel bij elke poging, zodat een
+  // herhaling bij de provider nooit een tweede betaling wordt
+  railInzenden: (o) => betaal.maakUitbetaling({
+    bedrag: o.centen, valuta: o.valuta, iban: o.bestemming, begunstigde: o.begunstigde,
+    referentie: o.ledgerRef, idempotentieSleutel: o.idemSleutel, omschrijving: o.oms
+  })
+});
+
 /* De RTFoundation-afdracht (kern/fonds.js): van elke bevestigde maandbetaling
    van een klant gaat automatisch 30% (ex btw) naar de foundation. De afdracht
    wordt op het betaalmoment geboekt en, zodra het IBAN in de omgeving staat,
    via de betaal-naad als uitbetaling ingepland. */
-const fonds = maakFonds({ db, save, betaal, log, env: process.env });
+const fonds = maakFonds({ db, save, betaal, log, env: process.env, betaalOpdrachten });
 
 /* Munt-ontvangst (server/muntbetaal.js + kern/munten.js): RTG accepteert
    cryptomunten voor zijn eigen diensten en zet ze via een vergunninghoudende
@@ -1792,7 +1854,7 @@ const kern = {
   DEMO_PASS, DEMO_SUPPLIER, DEMO_USER, DOOR_RELOCK_MS, FIN_CAT, FISCAAL_PEILJAAR, HK_STATUSES, LANDEN,
   OFFICE_CODE, PERSONAS, POS_METHODS, PRODUCTION, PUBLIC_DIR, RIT_KETEN, RIT_LEGACY, RIT_MELDING,
   RUN_STATIONS, SHIFT_NAMES, SSE_BUFFER_TTL, STAFF_SEED, TABLE_STATUSES, TOKEN_TTL_MS, UPLOAD_DIR, VAC_SOORTEN,
-  ZAAK_OPTIES, ZZP, accounts, addContact, addTicket, aiFindDoor, aiFindRoom, archief, beveilig, wacht, mailQ, mailIn, mailAuth, mailBijlage, mailSleutel, rtmailAi, rtmail, rtmailTeam, automatisering, werkmail, antivirus, atelierweb, webmaker, eigenaar, zaakdoos, rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels, rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar, mailAanname, naamlaag,
+  ZAAK_OPTIES, ZZP, accounts, addContact, addTicket, aiFindDoor, aiFindRoom, archief, beveilig, wacht, mailQ, mailIn, mailAuth, mailBijlage, mailSleutel, rtmailAi, rtmail, rtmailTeam, automatisering, werkmail, antivirus, atelierweb, webmaker, webmerk, webplatform, webplatformTaal, webmakerAi, webmakerTeam, eigenaar, zaakdoos, rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels, rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar, mailAanname, naamlaag,
   aiSystemPrompt, alcoholGrensVan, anthropic, app, appUrl, applyChatPubliek, applyChatVertaald, auth, betaal, broadcastSync,
   bufferEvent, bus, canEngage, cannedAnswer, cannedBoekhouder, cateringDishes, centen, chatApplicant,
   chatKeyOf, chatStuur, checkCred, coachCache, coachRules, conciergeInbox, connectedSupplierCodes, convOf,
@@ -1883,14 +1945,24 @@ const kern = {
    wel wordt gebruikt, valt bij het opstarten meteen om. */
 const hulp = {
   DATA_DIR, FISCAAL_PEILJAAR, LANDEN, PERSONAS, accounts, alcoholGrensVan, annuleerReservering,
-  anthropic, app, archief, betaal, beveilig, boekingenVanKlant, boekingenVanZaak, boekingenVoegToe,
-  broadcastSync, centen, crypto, db, entreeCode, etaMinutes, findSupplier, fonds, fooiUit,
+  anthropic, app, archief, betaal, betaalOpdrachten, beveilig, boekingenVanKlant, boekingenVanZaak, boekingenVoegToe,
+  broadcastSync, centen, crypto, db, entreeCode, etaMinutes, facturatie, findSupplier, fonds, fooiUit,
   geborenVan, haversine, idGeverifieerd, keyVanCodenaam, klantProfiel, klokVan, ledenAantal,
   ledenPrijs, leeftijdVan, legApart, liveCodename, log, logActivity, loginFails, maakOntmoeting,
   mail, media, noteFailedTry, notify, notifySupplier, onboarding, openVacatures, optieAan,
   ordersVanKlant, ordersVanZaak, pasTegoedToe, path, pickupCode, pinSlot, pushLive, rememberSession,
   reserveerTafel, rtf, rtmail, save, schoon, sendPush, sendPushToUser, sociaal, sseToCustomer,
-  sseToOffice, sseToSupplier, supplierState, ticketsVoorSlot, verdienPunten, zetRtgai, zorgContact
+  sseToOffice, sseToSupplier, supplierState, ticketsVoorSlot, verdienPunten, zetRtgai, zorgContact,
+  /* Voor "wie van je vrienden is er nu" (kern/spellen/presence.js): de levende
+     lijst van open live-verbindingen, en dezelfde functiepoort die
+     /api/member/spel zou weigeren. Ze gaan naar de KERNLAGEN en niet naar de
+     kern zelf -- routers hebben ze niet nodig, en die oppervlakte houden we
+     klein (zie TAKEN.md 5.14). */
+  sseClients, lidBoardUit,
+  /* De AI-poort (kern/aipoort.js) gaat mee de kern in: het Ondernemers-OS heeft
+     hem nodig en hoort hem niet na te bouwen -- een tweede poort naar dezelfde
+     AI is een poort die niemand bewaakt. */
+  magAi: (req) => aiPoort.magAi(req)
 };
 
 /* De samenstelling van de kern staat in ./opzet/kernlaag1..7.js --
@@ -1901,6 +1973,7 @@ require('./opzet/kernlaag3')(kern, hulp);
 require('./opzet/kernlaag3b')(kern, hulp);
 require('./opzet/kernlaag4')(kern, hulp);
 require('./opzet/kernlaag4b')(kern, hulp);
+require('./opzet/kernlaag4c')(kern, hulp);   // de drie kantoorkamers; NA 4b, want regering leest kern.bank
 require('./opzet/kernlaag5')(kern, hulp);
 require('./opzet/kernlaag6')(kern, hulp);
 require('./opzet/kernlaag7')(kern, hulp);

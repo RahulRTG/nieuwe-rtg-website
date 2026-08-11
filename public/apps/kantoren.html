@@ -151,6 +151,46 @@
   .wlegenda{display:flex;gap:1rem;flex-wrap:wrap;font-size:.75rem;color:var(--muted);margin:.5rem 0 .2rem;align-items:center;}
   .wlegenda span{display:flex;gap:.35rem;align-items:center;}
 .merkvlak{display:inline-block;background:#7F1634;color:#fff;padding:.22rem .7rem .28rem;border-radius:4px;}
+  /* De bankkamer: reconciliatie, vergunning en de bevoegdheidsmatrix.
+     Deze regels staan hier en niet in losse stijlattributen. Twee redenen, en de
+     tweede is de echte: die attributen houden style-src-attr in de CSP open
+     (de norm telt ze daarom), en een rij die op twintig plekken dezelfde vier
+     declaraties herhaalt is op geen enkele plek te wijzigen. */
+  .bk-lab{display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;}
+  .bk-stil{color:var(--soft);}
+  /* --burgundy is in dit bestand al #C23A5E, de variant voor op zwart. */
+  .bk-let{color:var(--burgundy);}
+  .bk-goed{color:var(--gold);}
+  .bk-krap{margin-top:-.4rem;}
+  .bk-na{margin-top:.7rem;}
+  .bk-nazin{color:var(--soft);margin-top:.3rem;}
+  .bk-uitleg{margin:.2rem 0 .6rem;color:var(--soft);font-size:.85rem;}
+  .bk-stand{font-size:.82rem;margin-bottom:.7rem;}
+  .bk-waarschuw{color:var(--burgundy);font-size:.78rem;}
+  .bk-knopje{padding:.25rem .8rem;font-size:.75rem;}
+  .bk-velden{display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;}
+  .bk-w7{width:7rem;} .bk-w8{width:8rem;} .bk-w9{width:9rem;} .bk-w12{width:12rem;}
+  .bk-w15{min-width:15rem;}
+  .bk-rij{display:flex;gap:.6rem;align-items:baseline;flex-wrap:wrap;padding:.35rem 0;
+    font-size:.82rem;border-bottom:1px solid rgba(255,255,255,.08);}
+  .bk-rij.wijd{padding:.4rem 0;}
+  .bk-rij .soort{min-width:9rem;}
+  .bk-rij .bedrag{color:var(--gold);font-variant-numeric:tabular-nums;}
+  .bk-rij .reden{flex:1;min-width:12rem;color:var(--soft);}
+  .bk-rij .mini{padding:.15rem .6rem;font-size:.72rem;}
+  .bk-vink{min-width:1.2rem;color:var(--gold);}
+  .bk-vink.nee{color:var(--burgundy);}
+  .bk-handeling{min-width:14rem;}
+  .bk-via{color:var(--soft);min-width:9rem;}
+  .bk-vraagt{color:var(--soft);font-size:.74rem;}
+  .bk-besluit{flex:1;min-width:100%;color:var(--soft);font-size:.74rem;padding-top:.2rem;}
+  .bk-inleiding{font-size:.78rem;color:var(--soft);padding-bottom:.5rem;
+    border-bottom:1px solid rgba(255,255,255,.08);}
+  .bk-tegels{margin-bottom:.6rem;}
+  .bk-tegel{text-align:center;padding:.9rem .6rem;}
+  .bk-tegel.rood{border-color:var(--burgundy);}
+  .bk-tegel .lab{font-size:.72rem;color:var(--soft);}
+  .bk-tegel .waarde{font-size:1.05rem;color:var(--gold);margin-top:.25rem;}
 </style>
 <!-- niet defer: dit script draait voor elke inline-body-script en voor elk kader -->
 <script src="/shared/media.js"></script>
@@ -160,7 +200,7 @@
 <a class="skip" href="#hoofd">Naar de inhoud</a>
 <header><div class="wrap">
   <div class="brand"><span class="merkvlak">RTG Kantoren</span><small>Elke afdeling een eigen kamer</small></div>
-  <nav aria-label="Kantoor" style="display:flex;align-items:center;gap:.9rem;"><a href="/apps/office.html?werk=kantoor" style="font-size:.8rem;color:var(--muted);">RTG Office</a><a href="/apps/foundation/kantoor.html" style="font-size:.8rem;color:var(--muted);">RTF-kantoor</a><a href="/apps/lab.html" style="font-size:.8rem;color:var(--muted);">Onderzoekslab</a><a href="/apps/backoffice.html" style="font-size:.8rem;color:var(--muted);">Backoffice →</a><span class="wos-klokchip" id="wosKlok" aria-hidden="true">--:--</span></nav>
+  <nav aria-label="Kantoor" style="display:flex;align-items:center;gap:.9rem;"><a href="/apps/command.html" style="font-size:.8rem;color:var(--gold);">RTG Command</a><a href="/apps/office.html?werk=kantoor" style="font-size:.8rem;color:var(--muted);">RTG Office</a><a href="/apps/foundation/kantoor.html" style="font-size:.8rem;color:var(--muted);">RTF-kantoor</a><a href="/apps/lab.html" style="font-size:.8rem;color:var(--muted);">Onderzoekslab</a><a href="/apps/backoffice.html" style="font-size:.8rem;color:var(--muted);">Backoffice →</a><span class="wos-klokchip" id="wosKlok" aria-hidden="true">--:--</span></nav>
 </div></header>
 
 <main id="hoofd" tabindex="-1"><div class="wrap">
@@ -761,6 +801,15 @@
 
     <h3 class="sec">Bank-gezondheid</h3>
     <div class="kpis" id="bankGezond"></div>
+
+    <h3 class="sec">De rail: geboekt, en ook echt aangekomen?</h3>
+    <p class="deck bk-krap">De sluitcontrole hierboven zegt of de boekingen onderling kloppen. Dit zegt iets anders: of wat geboekt is ook bij de andere bank is aangekomen. Een grootboek kan perfect sluiten terwijl er geen euro het huis heeft verlaten.</p>
+    <div class="kaart" id="bankRail"></div>
+
+    <h3 class="sec">Bevoegdheid: wat RTG mag, niet wat RTG kan</h3>
+    <p class="deck bk-krap">Software bouwen en bevoegd zijn om geld te bewegen zijn twee dingen. Wat hier staat is <em>vastgelegd</em>, niet aangezet: leeg betekent nee, verlopen betekent nee, en een te lage rang ook.</p>
+    <div class="kaart" id="bankVergunning"></div>
+    <div class="kaart lijst" id="bankBevoegd"><div class="leeg">Laden…</div></div>
 
     <h3 class="sec">Instellingen: spaarrente en rood-staan-ruimte</h3>
     <div class="kaart" id="bankInstel"></div>
@@ -2269,8 +2318,10 @@ async function openBank(){
 }
 async function bankVervers(){
   try {
-    const [o, k, rg] = await Promise.all([api('bank'), api('bank/krediet'), api('bank/regels')]);
+    const [o, k, rg, bv, op] = await Promise.all([api('bank'), api('bank/krediet'), api('bank/regels'),
+      api('bank/bevoegdheid'), api('bank/opdrachten', { limit: 8 })]);
     bankRenderKnop(o.regie); bankRenderGezond(o.gezondheid); bankRenderInstel(o.regie); bankRenderRegels(rg);
+    bankRenderRail(o.gezondheid, op); bankRenderVergunning(bv); bankRenderBevoegd(bv);
     bankRenderKrediet(k.aanvragen); bankRenderSalaris(o.rekeningen); bankRenderRekOpen(); bankRenderRek(o.rekeningen);
   } catch (e) { meld(e.message); }
 }
@@ -2332,11 +2383,114 @@ function bankRenderGezond(g){
   $('#bankGezond').innerHTML = tegels.map(([l, v], i) =>
     '<div class="kaart" style="text-align:center;padding:.9rem .6rem;' + ((i === tegels.length - 1 && !g.sluit.klopt) ? 'border-color:var(--burgundy);' : '') + '"><div style="font-size:.72rem;color:var(--soft);">' + esc(l) + '</div><div style="font-size:1.05rem;color:var(--gold);margin-top:.25rem;">' + esc(v) + '</div></div>').join('');
 }
+/* DE RAIL-RECONCILIATIE. Bewust NAAST de sluitcontrole en niet ertussen: die
+   twee meten verschillende dingen, en dat verschil is precies waarom een gat
+   jarenlang kon bestaan. Een openstaand bedrag is normaal (een SEPA is nu
+   eenmaal niet meteen rond); wat NIET normaal is, is een opgegeven opdracht of
+   geld dat af staat zonder dat het ergens terecht is gekomen. Alleen die twee
+   krijgen daarom de accentkleur -- anders went een rood vlak en kijkt niemand
+   er meer naar. */
+function bankRenderRail(g, op){
+  const alarm = (g.railMislukt || 0) > 0 || (g.railZonderTerugboeking || 0) > 0;
+  const oud = g.railOudsteAt ? Math.round((Date.now() - g.railOudsteAt) / 3600000) : 0;
+  const tegels = [
+    ['Onderweg', String(g.railOpen || 0) + ' × ' + bkEuro(g.railOpenCenten), false],
+    ['Langst onderweg', g.railOudsteAt ? (oud < 1 ? 'minder dan een uur' : oud + ' uur') : 'niets', false],
+    ['Opgegeven', String(g.railMislukt || 0), (g.railMislukt || 0) > 0],
+    ['Af zonder bestemming', String(g.railZonderTerugboeking || 0), (g.railZonderTerugboeking || 0) > 0]
+  ];
+  const STATUSZIN = { GEBOEKT: 'wacht op de rail', INGEDIEND: 'aangenomen, nog niet bevestigd',
+    AFGEWIKKELD: 'afgerond', MISLUKT: 'opgegeven', TERUGGEBOEKT: 'teruggeboekt' };
+  const rijen = (op.opdrachten || []).map(o =>
+    '<div class="bk-rij">' +
+    '<strong class="soort">' + esc(o.soort) + '</strong>' +
+    '<span class="bedrag">' + bkEuro(o.centen) + '</span>' +
+    '<span class="bk-stil">' + esc(STATUSZIN[o.status] || o.status) + '</span>' +
+    (o.pogingen > 1 ? '<span class="bk-stil">' + o.pogingen + ' pogingen</span>' : '') +
+    (o.laatsteFout ? '<span class="reden">' + esc(o.laatsteFout) + '</span>' : '') +
+    (o.status === 'MISLUKT' ? '<button class="knop stil mini" data-opnieuw="' + esc(o.id) + '">Opnieuw indienen</button>' : '') +
+    '</div>').join('');
+  $('#bankRail').innerHTML =
+    '<div class="kpis bk-tegels">' + tegels.map(([l, v, rood]) =>
+      '<div class="kaart bk-tegel' + (rood ? ' rood' : '') + '">' +
+      '<div class="lab">' + esc(l) + '</div>' +
+      '<div class="waarde">' + esc(v) + '</div></div>').join('') + '</div>' +
+    (rijen || '<div class="leeg">Niets onderweg.</div>') +
+    '<div class="bk-na"><button class="knop stil bk-knopje" id="bankRondeBtn" type="button">Nu opnieuw aanbieden</button>' +
+    (alarm ? ' <span class="bk-waarschuw">Er staat geld af dat nergens is aangekomen.</span>' : '') + '</div>';
+  $('#bankRondeBtn').addEventListener('click', async () => {
+    try { const d = await api('bank/opdrachten/ronde', {}); meld(d.gedaan ? d.gedaan + ' opnieuw aangeboden.' : 'Niets aan de beurt.'); bankVervers(); } catch (e) { meld(e.message); }
+  });
+  $('#bankRail').querySelectorAll('[data-opnieuw]').forEach(b => b.addEventListener('click', async () => {
+    try { const d = await api('bank/opdrachten/opnieuw', { id: b.dataset.opnieuw }); meld('Opnieuw ingediend (' + d.status + ').'); bankVervers(); } catch (e) { meld(e.message); }
+  }));
+}
+
+/* DE VERGUNNING IS EEN REGISTRATIE EN GEEN SCHAKELAAR, en het scherm hoort dat
+   te laten voelen. Vandaar invulvelden en een knop "Vastleggen" in plaats van
+   een schuifje: wie een vergunning kan aanzetten alsof het een instelling is,
+   heeft geen vergunning maar een instelling. Leeghalen kan met dezelfde knop en
+   een lege soort -- ingetrokken moet net zo makkelijk vast te leggen zijn als
+   afgegeven, anders blijft een verlopen vergunning staan uit gemakzucht. */
+const BK_SOORT = { '': 'Geen vergunning vastgelegd', betaalinstelling: 'Betaalinstelling',
+  elektronischgeldinstelling: 'Elektronischgeldinstelling', bank: 'Bank' };
+function bankRenderVergunning(bv){
+  const v = bv.vergunning;
+  const dat = v && v.tot ? new Date(v.tot).toISOString().slice(0, 10) : '';
+  $('#bankVergunning').innerHTML =
+    '<div class="bk-stand">' +
+      (v ? '<strong>' + esc(BK_SOORT[v.soort] || v.soort) + '</strong>' +
+           (v.nummer ? ' · ' + esc(v.nummer) : '') + (v.entiteit ? ' · ' + esc(v.entiteit) : '') +
+           ' · landen: ' + esc((v.landen || []).join(', ') || 'alle') +
+           (v.tot ? ' · geldig tot ' + esc(dat) : ' · zonder einddatum') +
+           (v.verlopen ? ' <span class="bk-let">VERLOPEN</span>' : '')
+         : '<span class="bk-stil">Er is niets vastgelegd. De eigen rails clearen niet, en krediet uit eigen boek staat dicht.</span>') +
+    '</div>' +
+    '<div class="bk-velden">' +
+    '<span><label for="bkVSoort" class="bk-lab">Soort</label>' +
+      '<select id="bkVSoort">' + Object.keys(BK_SOORT).map(k =>
+        '<option value="' + k + '"' + (v && v.soort === k ? ' selected' : (!v && k === '' ? ' selected' : '')) + '>' + esc(BK_SOORT[k]) + '</option>').join('') + '</select></span>' +
+    '<span><label for="bkVNr" class="bk-lab">Nummer</label><input id="bkVNr" class="bk-w9" value="' + esc(v && v.nummer || '') + '"></span>' +
+    '<span><label for="bkVEnt" class="bk-lab">Entiteit</label><input id="bkVEnt" class="bk-w12" value="' + esc(v && v.entiteit || '') + '"></span>' +
+    '<span><label for="bkVLand" class="bk-lab">Landen (NL,BE)</label><input id="bkVLand" class="bk-w8" value="' + esc((v && v.landen || []).join(',')) + '"></span>' +
+    '<span><label for="bkVTot" class="bk-lab">Geldig tot</label><input id="bkVTot" type="date" value="' + esc(dat) + '"></span>' +
+    '<button class="knop stil" id="bkVZet" type="button">Vastleggen</button></div>';
+  $('#bkVZet').addEventListener('click', async () => {
+    try {
+      const landen = $('#bkVLand').value.split(',').map(x => x.trim()).filter(Boolean);
+      await api('bank/vergunning', { soort: $('#bkVSoort').value, nummer: $('#bkVNr').value,
+        entiteit: $('#bkVEnt').value, landen, tot: $('#bkVTot').value || null });
+      meld($('#bkVSoort').value ? 'Vergunning vastgelegd.' : 'Vergunning ingetrokken.');
+      bankVervers();
+    } catch (e) { meld(e.message); }
+  });
+}
+
+/* De matrix. Niet "aan/uit" maar WAAROM, want dat is de enige vorm waarin dit
+   bruikbaar is: "dicht" leert niemand iets, "hiervoor is een bankvergunning
+   nodig en er ligt een betaalinstelling" wel. */
+const BK_REDEN = { geen: 'geen vergunning vastgelegd', rang: 'de vastgelegde vergunning is te licht',
+  verlopen: 'de vergunning is verlopen', land: 'niet geldig in dit land', rail: 'de partnerrail staat uit',
+  'alleen-eigen': 'kan alleen over de eigen rails, en die clearen nu niet' };
+const BK_VIA = { software: 'eigen software', partner: 'via de partner', eigen: 'op eigen kracht', 'eigen-boek': 'uit eigen boek', besluit: 'op een vastgesteld besluit' };
+function bankRenderBevoegd(bv){
+  const rail = bv.rail === 'eigen' ? 'de eigen rails' : bv.rail === 'partner' ? 'de kaart-rails van de partner' : 'geen enkele rail';
+  $('#bankBevoegd').innerHTML =
+    '<div class="bk-inleiding">Er cleart op dit moment ' + esc(rail) + '. Dat bepaalt mee wat mag: dezelfde handeling is via een partner iets anders dan op eigen kracht.</div>' +
+    bv.regels.map(r =>
+      '<div class="bk-rij wijd">' +
+      '<span class="bk-vink' + (r.mag ? '' : ' nee') + '">' + (r.mag ? '✓' : '✗') + '</span>' +
+      '<strong class="bk-handeling">' + esc(r.naam) + '</strong>' +
+      '<span class="bk-via">' + esc(r.mag ? (BK_VIA[r.via] || r.via) : (BK_REDEN[r.reden] || r.reden)) + '</span>' +
+      (r.nodig ? '<span class="bk-vraagt">vraagt: ' + esc(BK_SOORT[r.nodig] || r.nodig) + '</span>' : '') +
+      (r.besluit ? '<span class="bk-besluit">' + esc(r.besluit) + '</span>' : '') +
+      '</div>').join('');
+}
 function bankRenderInstel(r){
   $('#bankInstel').innerHTML =
-    '<div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;">' +
-    '<span><label for="bankRente" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Spaarrente per jaar (%)</label><input id="bankRente" type="number" min="0" max="20" step="0.1" value="' + r.spaarrentePct + '" style="width:7rem;"></span>' +
-    '<span><label for="bankRood" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Standaard rood staan (€)</label><input id="bankRood" type="number" min="0" step="10" value="' + (r.roodLimietCenten / 100) + '" style="width:8rem;"></span>' +
+    '<div class="bk-velden">' +
+    '<span><label for="bankRente" class="bk-lab">Spaarrente per jaar (%)</label><input id="bankRente" class="bk-w7" type="number" min="0" max="20" step="0.1" value="' + r.spaarrentePct + '"></span>' +
+    '<span><label for="bankRood" class="bk-lab">Standaard rood staan (€)</label><input id="bankRood" class="bk-w8" type="number" min="0" step="10" value="' + (r.roodLimietCenten / 100) + '"></span>' +
     '<button class="knop stil" id="bankInstelZet" type="button">Bewaar</button></div>';
   $('#bankInstelZet').addEventListener('click', async () => {
     try { await api('bank/instellingen', { spaarrenteBp: Math.round(Number($('#bankRente').value) * 100), roodLimietEuro: Number($('#bankRood').value) }); meld('Instellingen bewaard.'); bankVervers(); } catch (e) { meld(e.message); }
@@ -2395,22 +2549,34 @@ function bankRenderKrediet(rij){
 async function bankBesluit(id, akkoord){
   try { await api('bank/krediet/besluit', { id, akkoord }); meld(akkoord ? 'Goedgekeurd en gestort.' : 'Afgewezen.'); bankVervers(); } catch (e) { meld(e.message); }
 }
-/* De salarisrun uit de klokuren: het voorstel komt van de server (zelfde uren
-   en uurloon als het fiscale bord van de zaak, gematcht op de lid-koppeling
-   van het personeel); de boardroom kiest de bronrekening en voert de run uit.
-   Het formulier wordt maar één keer opgebouwd, zodat een live-verversing
-   (SSE) de ingevulde zaak-code en het voorstel niet wist. */
+/* TWEE DINGEN DIE HIER VROEGER EEN KNOP WAREN.
+
+   Er stond: maak een voorstel uit de geklokte uren, en betaal die posten uit.
+   Die posten waren BRUTO -- uren maal het uurloon van de zaak -- dus er ging
+   loon de deur uit zonder ingehouden loonheffing, zonder loonstrook, zonder
+   vier ogen en zonder aangifte, terwijl de Payroll OS ondertussen het goede
+   netto betaalbestand maakte dat niemand uitbetaalde.
+
+   Nu zijn het twee dingen op één scherm, en dat is precies wat ze zijn:
+     de RAMING   wat kost dit personeel deze maand (bruto, plus lasten). Om
+                 mee te plannen; er zit geen knop aan.
+     de UITBETALING  kiest een DEFINITIEVE loonrun en betaalt het netto
+                 daarvan uit. Geen run, geen knop.
+
+   Het formulier wordt maar één keer opgebouwd, zodat een live-verversing (SSE)
+   de ingevulde zaak-code en de gekozen run niet wist. */
 function bankRenderSalaris(reks){
   const doos = $('#bankSalaris');
   if (!doos.dataset.gewired){
     doos.dataset.gewired = '1';
     doos.innerHTML =
-      '<p style="margin:.2rem 0 .6rem;color:var(--soft);font-size:.85rem;">Van klokuren naar loon: het voorstel rekent de geklokte maanduren van een zaak om naar loonbetalingen (zelfde uurloon als het fiscale bord) en betaalt uit op de gekoppelde betaalrekening van elk personeelslid.</p>' +
+      '<p class="bk-uitleg">De <strong>raming</strong> rekent de geklokte maanduren om naar brutoloon plus werkgeverslasten &mdash; om mee te plannen, niet om mee te betalen. <strong>Uitbetalen</strong> gaat via een definitieve loonrun uit de Payroll OS: die houdt loonheffing in, is door twee mensen getekend en levert het nettobedrag per medewerker.</p>' +
       '<div style="display:flex;gap:.6rem;flex-wrap:wrap;align-items:flex-end;">' +
       '<span><label for="bankSalZaak" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Zaak (code)</label><input id="bankSalZaak" placeholder="bijv. TOREN" style="width:9rem;"></span>' +
       '<span><label for="bankSalVan" style="display:block;font-size:.72rem;color:var(--soft);margin-bottom:.3rem;">Betaal vanaf</label><select id="bankSalVan" style="min-width:14rem;"></select></span>' +
-      '<button class="knop stil" id="bankSalMaak" type="button">Maak voorstel</button>' +
-      '<button class="knop" id="bankSalRun" type="button" hidden>Voer de run uit</button></div>' +
+      '<button class="knop stil" id="bankSalMaak" type="button">Maak raming</button>' +
+      '<span id="bankSalRunWrap" hidden><label for="bankSalRunId" class="bk-lab">Definitieve loonrun</label><select id="bankSalRunId" class="bk-w15"></select></span>' +
+      '<button class="knop" id="bankSalRun" type="button" hidden>Betaal deze loonrun uit</button></div>' +
       '<div id="bankSalUit" style="margin-top:.6rem;font-size:.85rem;"></div>';
     $('#bankSalMaak').addEventListener('click', async () => {
       try {
@@ -2421,19 +2587,42 @@ function bankRenderSalaris(reks){
             (r.iban ? '<span style="font-size:.75rem;color:var(--soft);">→ ' + esc(r.iban) + '</span>' : '<span style="color:var(--burgundy-on-dark,#C23A5E);font-size:.78rem;">geen rekening</span>') + '</div>').join('') +
           (v.zonderRekening.length ? '<div style="margin-top:.35rem;color:var(--soft);">Nog niet uitbetaalbaar: ' + v.zonderRekening.map(z => esc(z.naam) + ' (' + esc(z.reden) + ')').join(' · ') + '</div>' : '') +
           '<div style="margin-top:.45rem;">Uitbetaalbaar: <strong style="color:var(--gold);">' + bkEuro(v.totaalCenten) + '</strong> van ' + bkEuro(v.brutoCenten) + ' bruto · daarbovenop ~' + v.lastenPct + '% werkgeverslasten (' + bkEuro(v.lastenCenten) + ') en vakantiegeldreserve ' + bkEuro(v.vakantiegeldCenten) + '</div>';
-        $('#bankSalRun').hidden = !v.posten.length;
+        /* Geen knop aan de raming. Het antwoord zegt zelf uitbetaalbaar:false,
+           en dat hoort het scherm te volgen in plaats van er een postenlijst
+           uit te destilleren -- dat was nu juist de verleiding. */
+        await bankSalRuns($('#bankSalZaak').value);
       } catch (e) { meld(e.message); }
     });
     $('#bankSalRun').addEventListener('click', async () => {
+      const runId = $('#bankSalRunId').value;
+      if (!runId) { meld('Kies eerst een definitieve loonrun.'); return; }
       try {
-        const d = await api('bank/salaris/run', { zaak: $('#bankSalZaak').value, vanIban: $('#bankSalVan').value });
-        meld(d.geboekt + ' loonbetaling(en) geboekt: ' + bkEuro(d.totaalCenten));
+        const d = await api('bank/salaris/run', { runId, vanIban: $('#bankSalVan').value });
+        meld(d.geboekt + ' netto loonbetaling(en) geboekt: ' + bkEuro(d.totaalCenten));
         $('#bankSalRun').hidden = true;
-        $('#bankSalUit').innerHTML = '<div style="color:var(--gold);">✓ Salarisrun ' + esc(d.maand) + ' uitgevoerd: ' + d.geboekt + ' betaling(en), ' + bkEuro(d.totaalCenten) + '.</div>';
+        $('#bankSalUit').innerHTML = '<div class="bk-goed">✓ Loonrun ' + esc(d.periode) + ' uitbetaald: ' +
+          d.geboekt + ' betaling(en), ' + bkEuro(d.totaalCenten) + ' netto.</div>' +
+          (d.terugtevorderenCenten ? '<div class="bk-nazin">Nog terug te vorderen: ' + bkEuro(d.terugtevorderenCenten) + ' (die maken we niet over).</div>' : '');
         bankVervers();
       } catch (e) { meld(e.message); }
     });
   }
+  /* De DEFINITIEVE loonruns van deze zaak. Alleen die: een concept of een run
+     die nog op een handtekening wacht, is geen betaalopdracht. Staat er geen
+     enkele, dan zegt het scherm dat en blijft de knop weg -- dat is duidelijker
+     dan een knop die bij het indrukken uitlegt waarom hij niet kan. */
+  async function bankSalRuns(zaak){
+    const wrap = $('#bankSalRunWrap'), knop = $('#bankSalRun'), sel = $('#bankSalRunId');
+    try {
+      const d = await api('payroll/run/lijst', { code: String(zaak || '').toUpperCase() });
+      const runs = (d.runs || []).filter(r => r.stand === 'definitief');
+      sel.innerHTML = runs.map(r => '<option value="' + esc(r.id) + '">' + esc(r.periode) +
+        (r.correctieVan ? ' (correctie)' : '') + (r.opDemoTabellen ? ' - op ongecontroleerde tabellen' : '') + '</option>').join('');
+      wrap.hidden = knop.hidden = !runs.length;
+      if (!runs.length) $('#bankSalUit').innerHTML += '<div class="bk-nazin">Er is nog geen definitieve loonrun voor deze zaak. Uitbetalen kan pas daarna &mdash; open er een in de Payroll OS.</div>';
+    } catch (e) { wrap.hidden = knop.hidden = true; meld(e.message); }
+  }
+
   // de bronrekening-lijst vers houden, met behoud van de gemaakte keuze
   const sel = $('#bankSalVan'); const keuze = sel.value;
   sel.innerHTML = (reks || []).map(m => '<option value="' + m.iban + '">' + esc(m.codenaam) + ' · ' + esc(m.soort) + ' · ' + bkEuro(m.saldoCenten) + '</option>').join('');

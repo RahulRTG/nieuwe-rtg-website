@@ -13,7 +13,18 @@
 
    Bewust NIET: "wie bekeek je profiel" als lokkertje. Wie je naam bekeek is een
    ander verhaal -- dat is een echte gebeurtenis met gevolgen, en die staat in
-   kern/metier/bewijs.js in je eigen inzagelog. */
+   kern/metier/bewijs.js in je eigen inzagelog.
+
+   EN SINDS DE WERELDLAAG BESTAAT DAT EERSTE TOCH, ELDERS -- dus hoort hier te
+   staan hoe die twee zich verhouden, anders spreekt de codebase zichzelf tegen.
+   kern/wereld/bezoek.js houdt wel bij wie je WERELDPROFIEL opende. Wat dit
+   bestand afwijst is de LOKKERTJE-vorm, en die eigenschappen zijn daar
+   structureel uitgesloten: die module krijgt `notify` niet eens binnen (hij kan
+   je dus niet porren), er is geen teller die groei toont, geen vergelijking met
+   vorige week en geen ranglijst -- een regel per kijker, en na 90 dagen weg. En
+   hij is symmetrisch: er is geen sluipstand, wie kijkt wordt zelf ook gezien.
+   Métier blijft wat het is; het inzagelog van je NAAM is nog steeds een andere,
+   zwaardere zaak dan het openen van een profiel. */
 const { keur } = require('../veilig');
 
 module.exports = ({ db, save, codenaamVan, keyVanCodenaam, zijnVrienden, liveCodename, notify, metier }) => {

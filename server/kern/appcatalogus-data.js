@@ -14,6 +14,7 @@ const CATEGORIEEN = [
   { id: 'media', label: 'Media & creatie', icon: 'film' },
   { id: 'geld', label: 'Geld & werk', icon: 'rekening' },
   { id: 'spelen', label: 'Spelen & sport', icon: 'ster' },
+  { id: 'leven', label: 'Leven & gezondheid', icon: 'hart' },
   { id: 'veiligheid', label: 'Veiligheid & identiteit', icon: 'schild' },
   { id: 'foundation', label: 'RTFoundation (gratis)', icon: 'diploma' }
 ];

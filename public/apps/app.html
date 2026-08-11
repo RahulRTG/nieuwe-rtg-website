@@ -6,7 +6,7 @@
      en bouwt het beginscherm zichzelf niet meer op: een zwart scherm zonder
      foutmelding. app-main-01.js vergelijkt de twee en haalt zichzelf dan een
      keer vers op. -->
-<meta name="rtg-bouw" content="598b0b33">
+<meta name="rtg-bouw" content="9f80d827">
 <!-- De foutmelder staat bewust VOORAAN: hij moet de fouten van het opstarten
      kunnen zien, en die gebeuren voordat de rest geladen is. -->
 <script src="/shared/foutmelder.js"></script>
@@ -1703,7 +1703,14 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
           <span class="bell-badge" id="bellBadge" style="display:none;">0</span>
         </button>
-        <button class="bell os-verborgen-knop" id="osCcBtn" aria-label="Bedieningspaneel" tabindex="-1">
+        <!-- De ENIGE knop die in de statusbalk blijft staan. Toen de balk werd
+             leeggemaakt (scannen, Zegel, backoffice en de bel verhuisden naar
+             het bedieningspaneel) kreeg ook deze knop os-verborgen-knop mee, en
+             daarmee werd het paneel waar ze allemaal in zitten onbereikbaar:
+             het opent alleen nog via Rahuls "zoek ..."-opdracht. Dit is de deur
+             naar dat paneel en die hoort dus zichtbaar te zijn -- verder blijft
+             de balk leeg, zoals bedoeld. -->
+        <button class="bell" id="osCcBtn" aria-label="Bedieningspaneel">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/><circle cx="9" cy="7" r="2" fill="var(--bg)"/><circle cx="15" cy="12" r="2" fill="var(--bg)"/><circle cx="7" cy="17" r="2" fill="var(--bg)"/></svg>
         </button>
         <button class="bell os-verborgen-knop" id="scanBtn" aria-label="Scan een tafel- of RTG-code" tabindex="-1">
@@ -1887,12 +1894,13 @@
         <div id="boodschappen"></div>
       </div>
       <div class="view" data-view="zorg">
-        <h2 data-i18n="app.v.care">Zorg &amp; welzijn.</h2>
-        <p class="sub" data-i18n="app.v.care.sub">Boek een behandeling bij een spa, wellness of kliniek. Uw zorgprofiel reist mee; medische context deelt u apart en alleen als u dat wilt.</p>
+        <h2 data-i18n="app.v.care">Zorg &amp; verzorging.</h2>
+        <p class="sub" data-i18n="app.v.care.sub">Boek een behandeling bij een spa, wellness of kliniek, of een afspraak bij de kapper, de barbier of de nagelstudio. Uw zorgprofiel reist alleen mee naar de zorg; medische context deelt u apart en alleen als u dat wilt.</p>
         <div id="careMijn"></div>
         <div id="careIntakes"></div>
         <div id="carePakketten"></div>
         <div id="careAanbod"></div>
+        <div id="verzorgingAanbod"></div>
       </div>
 
       <div class="view" data-view="assets">

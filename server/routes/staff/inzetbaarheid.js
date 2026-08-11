@@ -3,7 +3,12 @@
    De naad ligt hier vanzelf: hierboven staat de dienst van vandaag (pauze,
    rooster, verlof, ziekmelden), hier wat iemand structureel aankan. */
 module.exports = (actx) => {
-  const { app, supplierAuth, db, save, schoon, findStaffPartner } = actx;
+  /* payrollOS en sseToSupplier stonden hier eerst NIET bij. Ze kwamen mee uit
+     dienst.js toen dit bestand daar werd afgesplitst, en bij de splitsing bleef
+     de regel eronder achter: de route viel om met "payrollOS is not defined",
+     een 500 in plaats van de 503 die er twee regels lager netjes klaarstond.
+     Geen enkele toets riep dit endpoint aan, dus niemand zag het. */
+  const { app, supplierAuth, db, save, schoon, findStaffPartner, payrollOS, sseToSupplier } = actx;
 app.post('/api/staff/inzetbaarheid', supplierAuth, (req, res) => {
   if (!req.actor.staffId) return res.status(403).json({ error: 'Alleen met een persoonlijke login.' });
   if (!payrollOS || !payrollOS.verzuim)

@@ -10,6 +10,8 @@ module.exports = (kern) => {
 
 // de koop- en bibliotheek-ingangen van de Mall staan apart (winkel klein houden)
 require('./winkel-bieb')(kern);
+// de vindlaag van de Mall: zoeken, plekken, lijsten en de vraagkant
+require('./mall-vindlaag')(kern);
 
 /* ---- de losse verblijf-pagina: hotels, appartementen en villa's ---- */
 // het overzicht van de overnachters met hun vrije kamers; boeken gaat via /api/verblijf

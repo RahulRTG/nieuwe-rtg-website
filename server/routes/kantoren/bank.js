@@ -96,5 +96,10 @@ module.exports = (ctx) => {
      salaris en incasso -- staan in ./bank-rekeningen. Dit bestand gaat over de
      REGIE: de drie-standen-knop, het vier-ogen-principe erop en de noodstop.
      Twee onderwerpen, en samen pasten ze niet meer onder de 10 KB. */
+  /* De RECONCILIATIE (wat is er geboekt maar nog niet buiten RTG afgerond) en
+     de BEVOEGDHEID (wat mag RTG zelf) staan in ./bank-bevoegd. Allebei gaan ze
+     over de grens tussen RTG en de buitenwereld; dit bestand gaat over de
+     stand van het huis zelf. */
+  require('./bank-bevoegd')(Object.assign({}, ctx, { naam }));
   require('./bank-rekeningen')(Object.assign({}, ctx, { naam }));
 };

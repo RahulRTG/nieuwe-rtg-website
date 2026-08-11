@@ -38,9 +38,10 @@ Object.assign(kern, require('../kern/architect').maakArchitect({ db, save, crypt
 Object.assign(kern, require('../kern/werkplaats').maakWerkplaats({ db, save, crypto, anthropic, schoon }));
 /* De RTG Mall (kern/mall.js): de luxe shoppingmall in de leden-app; een
    gecureerde etagelijst van de retail-partners, elk met een eigen catalogus. */
-Object.assign(kern, require('../kern/mall').maakMall({ db, save, crypto, isRetail: kern.retailIsRetail,
-  // de verdieping RTG Thuis; laat opgehaald omdat Thuis verderop wordt gebouwd
-  haalThuis: () => (kern.thuis && typeof kern.thuis.thuisMallAanbod === 'function' ? kern.thuis.thuisMallAanbod() : null) }));
+Object.assign(kern, require('../kern/mall').maakMall(Object.assign(
+  { db, save, crypto, isRetail: kern.retailIsRetail, anthropic },
+  // de vier late bindingen (Thuis, Reiswijzer, Supplier OS): ./malldraden.js
+  require('./malldraden')(kern))));
 /* De App-Bibliotheek (kern/appbieb.js): 20.000 professionele apps in de Mall,
    elk rond de duizend euro winkelwaarde, voor leden inbegrepen bij de pas. */
 Object.assign(kern, require('../kern/appbieb').maakAppbieb({ db, save }));
@@ -146,12 +147,13 @@ Object.assign(kern, require('../kern/gemeente').maakGemeente({ db, save, crypto,
 // de gemeente-partner en zijn config bestaan meteen bij het opstarten, zodat een
 // medewerker kan inloggen ook zonder dat er eerst een inwoner iets deed
 kern.gemeente.seed();
-/* De Overheid (kern/overheid.js): de landelijke laag naast de gemeente ·
-   Berichtenbox, Belastingdienst (aangifte + toeslagen), RDW (voertuig +
-   rijbewijs), KVK-ondernemersloket, sociale zekerheid (UWV/SVB) en een
-   referendum, voor inwoners, ondernemers en rijksambtenaren. */
+/* De Overheid (kern/overheid/): Berichtenbox, Belastingdienst, RDW, KVK,
+   sociale zekerheid en een referendum. */
+// de bank gaat LAAT (komt pas in kernlaag4b); zie kern/overheid/naheffing-betalen.js
 Object.assign(kern, require('../kern/overheid').maakOverheid({ db, save, crypto, anthropic,
-  findSupplier, notify, notifySupplier, sseToSupplier }));
+  findSupplier, notify, notifySupplier, sseToSupplier,
+  bankLive: () => !!(kern.bank && kern.bankLedenAan && kern.bankLedenAan()),
+  bankBoek: o => kern.bank.boekAsync(o), bankSaldo: i => kern.bank.saldoVan(i) }));
 kern.overheid.seed();
 // de RTG-vloot (autoverhuur, tweewielers) meteen in het RDW-register, zodat een
 // kenteken-check op een huurauto de APK-status teruggeeft

@@ -178,3 +178,58 @@ test('een loonstrook bestaat pas als de run definitief is', () => {
   assert.equal(s.length, 1);
   assert.equal(s[0].regelversie, 'nl-2026.1', 'met de regelversie waarop hij berust');
 });
+
+/* EEN PAKKET DAT ZEGT DAT HET NIET DEUGT, GAAT NIET ZOMAAR AAN.
+
+   De meegeleverde jaargang (kern/payroll/jaargangen/nl-2026.json) meldt in zijn
+   eigen `_let_op` dat de cijfers NIET tegen het Handboek Loonheffingen zijn
+   gelegd en niet geschikt zijn voor een definitieve loonrun. Dat stond alleen
+   in het bestand: aanmerken kon gewoon, en daarna draaide er een definitieve
+   run op -- met loonstroken en een aangifte eraan vast. Een belofte in tekst
+   die niets tegenhield (LAT.md regel 6).
+
+   Aanmerken kan nog steeds, want er moet mee te werken zijn en de mens beslist.
+   Maar dan met zoveel woorden, met een reden die blijft staan, en met een
+   stempel dat meereist tot in de run. */
+const demoPakket = (versie) => Object.assign(pakket(versie), {
+  _let_op: 'ONGECONTROLEERD. Deze cijfers zijn NIET tegen het Handboek Loonheffingen gelegd.' });
+
+test('een zelfverklaard ongecontroleerd pakket gaat niet zomaar aan', () => {
+  const { regelpakket } = opzet(false);
+  regelpakket.neemOp(demoPakket('nl-demo.1'), { soort: 'meegeleverd' });
+
+  const zomaar = regelpakket.merkAan('NL', 'nl-demo.1', 'R. Sardjoe');
+  assert.equal(zomaar.status, 409, 'zonder het uit te spreken: nee');
+  assert.match(zomaar.waarschuwing, /Handboek/, 'en de reden komt uit het pakket zelf');
+
+  const zonderReden = regelpakket.merkAan('NL', 'nl-demo.1', 'R. Sardjoe', { ondanks: true });
+  assert.equal(zonderReden.status, 400, 'uitdrukkelijk maar zonder reden: ook nee');
+
+  const wel = regelpakket.merkAan('NL', 'nl-demo.1', 'R. Sardjoe', { ondanks: true, reden: 'tegen de bron gelegd op 9 aug' });
+  assert.equal(wel.ok, true);
+  assert.equal(wel.opDemoTabellen, true, 'en het pakket draagt waarop het berust');
+  const uit = regelpakket.alle('NL').find(p => p.versie === 'nl-demo.1');
+  assert.equal(uit.ondanksWaarschuwing, 'tegen de bron gelegd op 9 aug', 'de reden blijft staan');
+});
+
+test('een gewoon pakket merk je gewoon aan, zonder plichtplegingen', () => {
+  const { regelpakket } = opzet(false);
+  regelpakket.neemOp(pakket('nl-echt.1'), { soort: 'handmatig' });
+  const r = regelpakket.merkAan('NL', 'nl-echt.1', 'R. Sardjoe');
+  assert.equal(r.ok, true, 'geen zelfverklaring, geen extra stap: ' + JSON.stringify(r));
+  assert.equal(r.opDemoTabellen, false);
+});
+
+test('de run stempelt waarop hij berust, en dat overleeft definitief worden', () => {
+  const { regelpakket, componenten, run } = opzet(false);
+  regelpakket.neemOp(demoPakket('nl-demo.2'), { soort: 'meegeleverd' });
+  regelpakket.merkAan('NL', 'nl-demo.2', 'R. Sardjoe', { ondanks: true, reden: 'demo' });
+  void componenten;
+  const o = run.open({ code: 'ESVEDRA', periode: '2026-06', land: 'NL',
+    regels: [persoon(1, 'Sam', 100)], door: 'M. de Wit' });
+  assert.ok(o.ok, JSON.stringify(o).slice(0, 200));
+  assert.equal(run.haal(o.run.id).opDemoTabellen, true, 'de run weet het');
+  tweeGoedkeuringen(run, o.run.id);
+  run.maakDefinitief(o.run.id, 'A. Bakker');
+  assert.equal(run.haal(o.run.id).opDemoTabellen, true, 'en na definitief staat het er nog');
+});

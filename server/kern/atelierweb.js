@@ -106,6 +106,8 @@ module.exports = ({ db, save, crypto, schoon }) => {
     };
     const vg = schoonVolgorde(d, design.blokken); if (vg) design.volgorde = vg;
     const i = s.lijst.findIndex(x => x.id === id);
+    // de etalage-stand overleeft het bewerken; publiceren is een aparte handeling
+    if (i >= 0 && s.lijst[i].etalage) design.etalage = true;
     if (i >= 0) design.gemaakt = s.lijst[i].gemaakt || design.bij, s.lijst[i] = design;
     else { design.gemaakt = design.bij; s.lijst.unshift(design); }
     s.lijst = s.lijst.slice(0, 200);
@@ -114,10 +116,29 @@ module.exports = ({ db, save, crypto, schoon }) => {
   }
 
   function lijst() {
-    return store().lijst.map(d => ({ id: d.id, titel: d.titel, bij: d.bij, blokken: (d.blokken || []).length }));
+    return store().lijst.map(d => ({ id: d.id, titel: d.titel, bij: d.bij, blokken: (d.blokken || []).length, etalage: !!d.etalage }));
   }
   function haal(id) { return store().lijst.find(x => x.id === scho(id, 20)) || null; }
   function verwijder(id) { const s = store(); s.lijst = s.lijst.filter(x => x.id !== scho(id, 20)); save(); return { ok: true }; }
 
-  return { bewaar, lijst, haal, verwijder, fotos, fotoBewaar, fotoWeg, TYPES };
+  /* De etalage: sjablonen die het Atelier vrijgeeft als startpunt voor
+     ledensites. Vrijgeven is een uitdrukkelijke handeling van het kantoor --
+     werk in uitvoering blijft binnen. */
+  function zetEtalage(id, aan) {
+    const d = haal(id);
+    if (!d) return { error: 'Sjabloon niet gevonden.', status: 404 };
+    d.etalage = !!aan; save();
+    return { ok: true, etalage: d.etalage };
+  }
+  function etalage() {
+    return store().lijst.filter(d => d.etalage)
+      .map(d => ({ id: d.id, titel: d.titel, thema: d.thema, accent: d.accent, blokken: (d.blokken || []).length }));
+  }
+  function etalageHaal(id) {
+    const d = haal(id);
+    if (!d || !d.etalage) return null;   // wat niet in de etalage staat, bestaat buiten het Atelier niet
+    return { titel: d.titel, thema: d.thema, accent: d.accent, kleuren: d.kleuren || null, blokken: d.blokken || [], volgorde: d.volgorde || null };
+  }
+
+  return { bewaar, lijst, haal, verwijder, zetEtalage, etalage, etalageHaal, fotos, fotoBewaar, fotoWeg, TYPES };
 };

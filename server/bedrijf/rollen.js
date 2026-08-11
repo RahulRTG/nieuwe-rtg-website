@@ -165,3 +165,11 @@ module.exports = (sctx) => {
 
   return { ROLLEN, RECHTEN, REDEN_NODIG, werkPoort, log, mag, rollenVan, rechtenVan };
 };
+
+/* De tabellen ook los, naast de factory. Ze zijn pure data en er zijn lezers
+   buiten deze laag -- kern/onderneming/toegang.js legt de twee rechtenmodellen
+   van dit huis naast elkaar. Overtypen daar zou een tweede waarheid geven over
+   welke inzage een reden vraagt. */
+module.exports.ROLLEN = ROLLEN;
+module.exports.RECHTEN = RECHTEN;
+module.exports.REDEN_NODIG = REDEN_NODIG;

@@ -1,6 +1,7 @@
 /* Functieschakelaars (deelmodule): de toegangsmotor: pad-matching (langste
    prefix wint), de aan/uit-assen (globaal, doelgroep, land, persoon) en de
    nette blokkadereden voor de gebruiker. */
+const { inCanary } = require('./canaryas');
 const { CATEGORIEEN, DOELGROEPEN, DOELGROEP_IDS, DOELGROEP_OP_ID, LEDEN, LEDEN_RTF, FUNCTIES, OP_ID, KOPPELS } = require('./register');
 function prefixLengte(pad, prefix) {
   if (!pad.startsWith(prefix)) return 0;
@@ -79,11 +80,23 @@ function blokkadeReden(id, staat, ctx) {
     const uitzondering = s && s.perGenre && s.perGenre[c.genre] === true;
     if (f && Array.isArray(f.alleenGenres) && !f.alleenGenres.includes(c.genre) && !uitzondering) return 'genre';
   }
+  /* DE CANARY-AS staat als laatste, want hij is de fijnste: hij zegt niet OF
+     een functie open is maar VOOR HOEVEEL van de mensen. Zonder canary-stand
+     verandert er niets; dit is puur additief. */
+  if (s && s.canary && !inCanary(id, s.canary, c)) return 'canary';
   return null;
 }
+
 // Staat er ergens een standaard-genre-matrix in de catalogus? Dan moet de
 // middleware het genre ook opzoeken als er (nog) geen bewaarde regels zijn.
 const HEEFT_GENRE_STANDAARD = FUNCTIES.some(f => Array.isArray(f.alleenGenres));
+/* Staat er ergens een functie die STANDAARD UIT is? De middleware heeft een
+   snelle uitgang voor "er is nog nooit iets geschakeld, dus alles staat aan".
+   Die uitgang klopt alleen zolang elke functie standaard AAN is. Zodra er een
+   functie bijkomt die standaard uit hoort te staan, zou die op een verse
+   installatie gewoon openstaan -- precies het omgekeerde van wat "standaard
+   uit" betekent. */
+const HEEFT_UIT_STANDAARD = FUNCTIES.some(f => f.standaard === false);
 // Staan er ergens land-regels? Zo niet, dan hoeft de middleware het land van het
 // lid niet op te zoeken (scheelt een opzoeking per verzoek).
 function heeftLandRegels(staat) {
@@ -175,5 +188,5 @@ function doelgroepVanVerzoek(pad, user) {
 // bord). Elke functie toont de globale stand plus haar doelgroepen met eigen stand.
 
 module.exports = { functieVoorPad, functieAan, functieAanVoor, functieStoring, functieStatus,
-  heeftLandRegels, heeftPlaatsRegels, plaatsNorm, heeftGenreRegels, HEEFT_GENRE_STANDAARD, blokkadeReden, padGeblokkeerd,
-  doelgroepVanVerzoek, tierNaarDoelgroep, volgKoppels };
+  heeftLandRegels, heeftPlaatsRegels, plaatsNorm, heeftGenreRegels, HEEFT_GENRE_STANDAARD, HEEFT_UIT_STANDAARD, blokkadeReden, padGeblokkeerd,
+  doelgroepVanVerzoek, tierNaarDoelgroep, volgKoppels, inCanary };

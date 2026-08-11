@@ -33,7 +33,34 @@
     try { document.documentElement.classList.add('rtg-in-frame'); } catch (e) {}
   }
 
-  /* ---- 0. het thema, VOOR al het andere ---------------------------------
+  /* ---- 0a. toegankelijkheid: de instelling van het lid, voor alles ----
+     Dit staat bovenaan omdat het over LEZEN gaat: wie grote tekst nodig heeft,
+     heeft hem nodig vanaf het eerste beeld en niet na een rondje server. De
+     stand staat daarom in localStorage en wordt hier meteen toegepast; de
+     server is de eigenaar en synchroniseert hem bij (zie shared/toegankelijk.js,
+     dat pas later en zonder haast laadt).
+
+     De stand geldt op elke pagina die dit script laadt, en dat is de hele
+     familie -- de leden-apps en de RTFoundation. Een app hoeft er niets voor
+     te doen en kan er ook niet omheen: de regels staan op html.* en de
+     opmaak-tokens van het huis. */
+  try {
+    var tg = JSON.parse(localStorage.getItem('rtg_toegankelijk') || 'null') || {};
+    var el = document.documentElement;
+    if (tg.tekst === 'groot' || tg.tekst === 'groter') el.classList.add('rtg-tekst-' + tg.tekst);
+    if (tg.contrast === 'hoog') el.classList.add('rtg-contrast');
+    if (tg.beweging === 'stil') el.classList.add('rtg-stil');
+    if (tg.links === 'streep') el.classList.add('rtg-linkstreep');
+    /* Twee die de gedeelde laag ook echt waarmaakt: rtg-rustig dempt de nadruk
+       hieronder, en rtg-eending laat shared/deelmenu.js ook korte apps
+       opsplitsen. */
+    if (tg.nadruk === 'rustig') el.classList.add('rtg-rustig');
+    if (tg.eenDing === 'altijd') el.classList.add('rtg-eending');
+  } catch (e) {}
+
+  /* ---- 0b. het thema, nog steeds voor al het andere --------------------
+     (0a hierboven kwam uit de andere tak; ze bijten elkaar niet -- die zet
+     klassen op <html>, deze hangt er een script achter.)
      De vier thema's (champagne, onyx, bordeaux, royal) hingen aan een script
      dat maar op één pagina stond. Een themakeuze die niet meereist is geen
      thema maar een instelling van dat ene scherm, dus hij hoort in de laag die
@@ -65,6 +92,23 @@
 
   var css = '@media (prefers-reduced-motion: reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important;}}' +
     ':focus-visible{outline:2px solid var(--gold,#A98F1C);outline-offset:2px;}' +
+    /* Het toegankelijkheidsprofiel, inline en niet als apart blad: wie grote
+       tekst nodig heeft hoort daar niet eerst een netwerkronde op te wachten.
+       De tekstmaat werkt omdat de hele familie in rem meet (ruim drieduizend
+       plekken, en precies een in px). Hoog contrast tilt de twee gedempte
+       tinten van het huis op zonder een nieuwe kleur te verzinnen: zelfde
+       #F4F1EC, alleen minder doorzichtig. */
+    'html.rtg-tekst-groot{font-size:118%;}' +
+    'html.rtg-tekst-groter{font-size:135%;}' +
+    'html.rtg-contrast{--rtg-txt:#FFFFFF;--rtg-muted:rgba(244,241,236,0.94);--rtg-soft:rgba(244,241,236,0.88);--rtg-line:rgba(255,255,255,0.32);}' +
+    'html.rtg-stil *,html.rtg-stil *::before,html.rtg-stil *::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important;}' +
+    /* Rustig: alles even luid. De accentkleuren van het huis worden de gewone
+       tekstkleur, en dikke randen worden dunne lijnen -- zodat niets aan de
+       aandacht trekt dat dat niet verdient. */
+    'html.rtg-rustig{--gold:var(--txt);--goud:var(--txt);--goldlicht:var(--muted,var(--soft));}' +
+    'html.rtg-rustig [class*="badge"],html.rtg-rustig [class*="pill"]{filter:saturate(.35);}' +
+    'html.rtg-rustig *{border-width:1px!important;box-shadow:none!important;}' +
+    'html.rtg-linkstreep a{text-decoration:underline!important;text-underline-offset:.18em;}' +
     '.bss-net{position:fixed;left:50%;transform:translateX(-50%);top:.6rem;z-index:60;background:#0C0C0B;border:1px solid #444;border-radius:10px;color:#eee;font:500 .8rem Inter,system-ui,sans-serif;padding:.45rem .8rem;box-shadow:0 8px 24px rgba(0,0,0,.5);max-width:92vw;}' +
     '.bss-sheet{position:fixed;left:1rem;bottom:1rem;z-index:38;width:min(340px,92vw);background:#151312;border:1px solid var(--gold,#A98F1C);border-radius:16px;padding:1rem;color:#eee;font-family:Inter,system-ui,sans-serif;box-shadow:0 10px 30px rgba(0,0,0,.5);display:flex;flex-direction:column;gap:.55rem;}' +
     '.bss-sheet[hidden]{display:none;}' +
@@ -92,6 +136,13 @@
   var rl = document.createElement('link');
   rl.rel = 'stylesheet'; rl.href = '/shared/rust.css';
   (document.head || document.documentElement).appendChild(rl);
+
+  /* de trage helft van de toegankelijkheid: bij de server ophalen wat het lid
+     heeft ingesteld, zodat een tweede toestel het ook krijgt. Zonder haast --
+     de stand van dit toestel staat hierboven al op het scherm. */
+  var tgs = document.createElement('script');
+  tgs.src = '/shared/toegankelijk.js'; tgs.async = true;
+  (document.head || document.documentElement).appendChild(tgs);
 
   function toost(t) {
     var m = document.createElement('div'); m.className = 'bss-net'; m.setAttribute('role', 'status'); m.textContent = t;

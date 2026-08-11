@@ -78,6 +78,8 @@ function maakGroothandel({ db, save, crypto, findSupplier, notify, notifySupplie
   return {
     GROOTHANDEL_FUNCTIES: GH_FUNCTIES, GROOTHANDEL_CATEGORIEEN: CATEGORIEEN,
     ghIsGroothandel: isGroothandel, ghDefaults: defaults, ghFunctieAan: functieAan,
+    // de prijs per klantsoort; de Mall toont hem en mag er geen tweede van maken
+    ghPrijsVoor: prijsVoor,
     ghFunctieLijst: functieLijst, ghZetFunctie: zetFunctie, ghZetProduct: zetProduct, ghZetVoorraad: zetVoorraad,
     ghMarkt: markt, ghPlaatsBestelling: plaatsBestelling, ghOrderVerder: orderVerder, ghAnnuleer: annuleer,
     ghMijnBestellingen: mijnBestellingen, ghInkomend: inkomend, ghBijbestelVoorstel: bijbestelVoorstel

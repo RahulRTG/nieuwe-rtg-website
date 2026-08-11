@@ -49,6 +49,32 @@
   .kaart .mt{color:var(--soft);font-size:.72rem;margin-top:.5rem;}
   .kop2{font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;color:var(--soft);margin:0 0 .7rem;}
   .leeg{text-align:center;color:var(--soft);padding:2rem;}
+  /* de tabbalk: meerdere plekken tegelijk open, elk met eigen geschiedenis */
+  .tabstrip{display:flex;align-items:center;gap:.3rem;padding:.35rem .7rem;background:var(--bg);border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none;}
+  .tabstrip::-webkit-scrollbar{display:none;}
+  .tabstrip .tb{display:flex;align-items:center;gap:.4rem;flex:0 0 auto;max-width:180px;background:var(--card2);border:1px solid var(--line);border-radius:8px;padding:.28rem .55rem;font-size:.75rem;color:var(--muted);cursor:pointer;}
+  .tabstrip .tb.aan{background:var(--card);color:var(--txt);border-color:var(--gold);}
+  .tabstrip .tb .tt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .tabstrip .tb .x{border:0;background:transparent;color:var(--soft);cursor:pointer;font-size:.8rem;line-height:1;padding:0 .1rem;}
+  .tabstrip .tb .x:hover{color:var(--burgundy);}
+  .tabstrip .plus{flex:0 0 auto;border:1px solid var(--line);background:transparent;color:var(--soft);border-radius:8px;width:26px;height:26px;cursor:pointer;}
+  .tabstrip .plus:hover{border-color:var(--gold);color:var(--gold);}
+  /* de actiebalk: de browser weet dat deze pagina een bedrijf is */
+  .zaakbalk{position:sticky;top:59px;z-index:15;display:flex;align-items:center;gap:.6rem;flex-wrap:wrap;background:var(--card);border-bottom:1px solid var(--line);padding:.55rem .9rem;}
+  .zaakbalk .zn{font-family:'Bodoni Moda',serif;font-size:1rem;}
+  .zaakbalk .zm{color:var(--soft);font-size:.75rem;}
+  .zaakbalk .zr{color:var(--gold);font-size:.75rem;}
+  .zaakbalk .zk{margin-left:auto;display:flex;gap:.4rem;flex-wrap:wrap;}
+  .zaakbalk a.chip{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:.28rem .7rem;font-size:.75rem;color:var(--txt);text-decoration:none;background:var(--card2);}
+  .zaakbalk a.chip:hover{border-color:var(--gold);}
+  .zaakbalk a.chip.hoofd{background:var(--burgundy);border-color:transparent;color:#fff;font-weight:600;}
+  /* de melding dat een site machinevertaald is */
+  .vertaallint{padding:.4rem .9rem;background:var(--card2);border-bottom:1px solid var(--line);color:var(--soft);font-size:.72rem;}
+  /* de paginabalk van een site met meerdere pagina's */
+  .paginanav{display:flex;gap:.4rem;flex-wrap:wrap;padding:.55rem .9rem;background:var(--card);border-bottom:1px solid var(--line);}
+  .paginanav button{border:1px solid var(--line);border-radius:999px;background:var(--card2);color:var(--muted);font:inherit;font-size:.75rem;padding:.28rem .7rem;cursor:pointer;}
+  .paginanav button:hover{border-color:var(--gold);}
+  .paginanav button.aan{background:var(--bg);color:var(--gold);border-color:var(--gold);}
   /* de site-weergave */
   .sitewrap{padding:0;}
   .foutpagina{max-width:520px;margin:5rem auto;text-align:center;padding:0 1.2rem;color:var(--muted);}
@@ -65,12 +91,14 @@
   <button class="nav" id="vooruitKnop" title="Vooruit" aria-label="Vooruit">›</button>
   <button class="nav" id="herlaadKnop" title="Herladen" aria-label="Herladen">↻</button>
   <button class="nav home" id="homeKnop" title="RTG Start" aria-label="RTG Start">⌂</button>
+  <button class="nav" id="bwKnop" title="Bladwijzer" aria-label="Bladwijzer" disabled>☆</button>
   <form class="balk" id="balk">
     <span class="slot" aria-hidden="true">rtg://</span>
     <input id="adres" inputmode="url" autocomplete="off" spellcheck="false" placeholder="typ een adres, bijv. jouwzaak.rtg" aria-label="Adres">
     <button class="ga" type="submit">Ga</button>
   </form>
 </header>
+<div class="tabstrip" id="tabstrip"></div>
 <main id="hoofd"></main>
 <div class="melding" id="melding" role="status"></div>
 
@@ -82,21 +110,78 @@ let TOKEN=null; try{ TOKEN=localStorage.getItem('rtg_member_token'); }catch(e){}
 const api=(pad,body)=>fetch('/api/browser/'+pad,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+TOKEN},body:JSON.stringify(body||{})}).then(async r=>{const d=await r.json().catch(()=>({}));if(!r.ok)throw new Error(d.error||'Er ging iets mis.');return d;});
 function meld(t){const m=$('#melding');m.textContent=t;m.style.opacity='1';clearTimeout(m._t);m._t=setTimeout(()=>m.style.opacity='0',2600);}
 function slug(v){return String(v==null?'':v).toLowerCase().replace(/^rtg:\/\//,'').replace(/\.rtg$/,'').replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'').slice(0,30);}
+/* "naam.rtg/contact" of "rtg://naam/contact" -> {adres, pad} */
+function parseAdres(v){
+  const kaal=String(v==null?'':v).toLowerCase().replace(/^rtg:\/\//,'').trim();
+  const delen=kaal.split('/');
+  return { adres: slug(delen[0]), pad: delen.length>1?slug(delen.slice(1).join('/')):'' };
+}
 
 // geschiedenis voor terug/vooruit; een item is 'start' of {adres}
 let HIST=[], POS=-1;
+/* tabs: elke tab draagt zijn eigen geschiedenis; HIST/POS zijn altijd die
+   van de actieve tab */
+let TABS=[], TAB=0;
+function tabLabel(t){ const it=t.hist[t.pos]; return (!it||it==='start')?'Start':it.adres+'.rtg'+(it.pad?'/'+it.pad:''); }
+function tabsBij(){
+  if(!TABS.length){ TABS=[{hist:HIST,pos:POS}]; TAB=0; }
+  TABS[TAB].hist=HIST; TABS[TAB].pos=POS;
+  const st=$('#tabstrip'); st.textContent='';
+  TABS.forEach((t,i)=>{
+    const b=document.createElement('span'); b.className='tb'+(i===TAB?' aan':''); b.setAttribute('role','button');
+    const tt=document.createElement('span'); tt.className='tt'; tt.textContent=tabLabel(t); b.appendChild(tt);
+    if(TABS.length>1){ const x=document.createElement('button'); x.className='x'; x.textContent='×'; x.title='Tab sluiten'; x.setAttribute('aria-label','Tab sluiten');
+      x.addEventListener('click',ev=>{ ev.stopPropagation(); sluitTab(i); }); b.appendChild(x); }
+    b.addEventListener('click',()=>wisselTab(i));
+    st.appendChild(b);
+  });
+  const plus=document.createElement('button'); plus.className='plus'; plus.textContent='+'; plus.title='Nieuwe tab'; plus.setAttribute('aria-label','Nieuwe tab');
+  plus.addEventListener('click',nieuwTab); st.appendChild(plus);
+}
+function laadTab(){
+  const t=TABS[TAB]; HIST=t.hist; POS=t.pos; knoppenBij(); bwStand(); tabsBij();
+  const it=HIST[POS];
+  if(!it||it==='start'){ $('#adres').value=''; toonStart(); }
+  else { $('#adres').value=it.adres+'.rtg'; toonSite(it.adres); }
+}
+function wisselTab(i){ if(i===TAB)return; TABS[TAB].hist=HIST; TABS[TAB].pos=POS; TAB=i; laadTab(); }
+function nieuwTab(){ TABS[TAB].hist=HIST; TABS[TAB].pos=POS; TABS.push({hist:['start'],pos:0}); TAB=TABS.length-1; laadTab(); }
+function sluitTab(i){
+  TABS.splice(i,1);
+  if(!TABS.length) TABS=[{hist:['start'],pos:0}];
+  if(TAB>i) TAB--; if(TAB>=TABS.length) TAB=TABS.length-1;
+  laadTab();
+}
 function knoppenBij(){ $('#terugKnop').disabled=POS<=0; $('#vooruitKnop').disabled=POS>=HIST.length-1; }
 function ga(item,duw){
   if(duw!==false){ HIST=HIST.slice(0,POS+1); HIST.push(item); POS=HIST.length-1; }
-  knoppenBij();
+  knoppenBij(); bwStand(); tabsBij();
   if(item==='start'){ $('#adres').value=''; toonStart(); }
-  else { $('#adres').value=item.adres+'.rtg'; toonSite(item.adres); }
+  else { $('#adres').value=item.adres+'.rtg'+(item.pad?'/'+item.pad:''); toonSite(item.adres,item.pad||''); }
 }
 $('#terugKnop').addEventListener('click',()=>{ if(POS>0){ POS--; ga(HIST[POS],false); } });
 $('#vooruitKnop').addEventListener('click',()=>{ if(POS<HIST.length-1){ POS++; ga(HIST[POS],false); } });
 $('#herlaadKnop').addEventListener('click',()=>{ if(POS>=0) ga(HIST[POS],false); });
 $('#homeKnop').addEventListener('click',()=>ga('start'));
-$('#balk').addEventListener('submit',e=>{ e.preventDefault(); const a=slug($('#adres').value); if(a.length<2){ meld('Typ een adres, bijv. jouwzaak.rtg'); return; } ga({adres:a}); });
+
+/* bladwijzers: op dit toestel, in localStorage -- de browser onthoudt uw
+   favoriete plekken zonder dat de server ervan weet */
+function bwLees(){ try{ return JSON.parse(localStorage.getItem('rtg_web_bladwijzers')||'[]'); }catch(e){ return []; } }
+function bwSchrijf(l){ try{ localStorage.setItem('rtg_web_bladwijzers',JSON.stringify(l.slice(0,40))); }catch(e){} }
+function bwStand(){
+  const k=$('#bwKnop'); const it=HIST[POS];
+  if(!it||it==='start'){ k.disabled=true; k.textContent='☆'; return; }
+  k.disabled=false;
+  k.textContent=bwLees().some(b=>b.adres===it.adres)?'★':'☆';
+}
+$('#bwKnop').addEventListener('click',()=>{
+  const it=HIST[POS]; if(!it||it==='start')return;
+  let l=bwLees();
+  if(l.some(b=>b.adres===it.adres)){ l=l.filter(b=>b.adres!==it.adres); meld('Bladwijzer verwijderd.'); }
+  else { l.unshift({adres:it.adres,titel:(HUIDIGE&&HUIDIGE.site&&HUIDIGE.site.titel)||it.adres}); meld('Bewaard als bladwijzer.'); }
+  bwSchrijf(l); bwStand();
+});
+$('#balk').addEventListener('submit',e=>{ e.preventDefault(); const p=parseAdres($('#adres').value); if(p.adres.length<2){ meld('Typ een adres, bijv. jouwzaak.rtg'); return; } ga({adres:p.adres,pad:p.pad}); });
 
 // ---- de RTG-startpagina ----
 let GIDS=[];
@@ -113,9 +198,53 @@ async function toonStart(){
   const h=$('#hoofd');
   h.innerHTML='<div class="start"><div class="merk">RTG · het web van het huis</div><h1>RTG Start</h1>'+
     '<p class="lead">Het besloten web van Rahul Travel Group. Bezoek de sites die leden hier hebben gebouwd, of typ een adres in de balk.</p>'+
-    '<form class="zoekgroot" id="zoekGroot"><input id="zoekIn" placeholder="jouwzaak" aria-label="Zoek een adres"><span class="suf">.rtg</span><button type="submit">Ga</button></form>'+
+    '<form class="zoekgroot" id="zoekGroot"><input id="zoekIn" placeholder="zoek een site of bedrijf, of typ een adres" aria-label="Zoeken"><span class="suf">.rtg</span><button type="submit">Zoek</button></form>'+
+    '<div id="zoekUit"></div>'+
+    '<div id="bwRij"></div>'+
     '<div class="kop2">Sites van leden</div><div class="rooster" id="rooster"><div class="leeg">Laden…</div></div></div>';
-  $('#zoekGroot').addEventListener('submit',e=>{ e.preventDefault(); const a=slug($('#zoekIn').value); if(a.length<2){meld('Typ een adres.');return;} ga({adres:a}); });
+  // de eigen bladwijzers bovenaan de startpagina
+  (function(){
+    const l=bwLees(); if(!l.length)return;
+    const w=$('#bwRij');
+    w.innerHTML='<div class="kop2">Bladwijzers</div>';
+    const r=document.createElement('div'); r.className='rooster'; r.style.marginBottom='1.6rem';
+    l.forEach(b=>{ const k=document.createElement('button');k.type='button';k.className='kaart';
+      k.innerHTML='<div class="nm">'+esc(b.titel)+'</div><div class="ad">'+esc(b.adres)+'.rtg</div>';
+      k.addEventListener('click',()=>ga({adres:b.adres})); r.appendChild(k); });
+    w.appendChild(r);
+  })();
+  /* universeel zoeken: een exact adres opent direct; anders zoeken we sites
+     EN bedrijven en tonen we beide */
+  $('#zoekGroot').addEventListener('submit',async e=>{
+    e.preventDefault(); const q=$('#zoekIn').value.trim(); const a=slug(q);
+    if(q.length<2){meld('Typ minstens twee tekens.');return;}
+    if(GIDS.some(it=>it.adres===a)){ ga({adres:a}); return; }
+    const uit=$('#zoekUit'); uit.innerHTML='<div class="kop2">Zoeken…</div>';
+    try{
+      const d=await api('zoek',{q});
+      const sites=d.sites||[], zaken=d.zaken||[];
+      uit.textContent='';
+      if(!sites.length&&!zaken.length){ uit.innerHTML='<div class="kop2">Resultaten</div><div class="leeg" style="padding:1rem;">Niets gevonden voor "'+esc(q)+'".</div>'; return; }
+      if(sites.length){
+        const k=document.createElement('div');k.className='kop2';k.textContent='Sites';uit.appendChild(k);
+        const r=document.createElement('div');r.className='rooster';r.style.marginBottom='1.4rem';
+        sites.forEach(it=>{ const b=document.createElement('button');b.type='button';b.className='kaart';
+          b.innerHTML='<div class="nm">'+esc(it.titel)+'</div><div class="ad">'+esc(it.adres)+'.rtg</div>';
+          b.addEventListener('click',()=>ga({adres:it.adres})); r.appendChild(b); });
+        uit.appendChild(r);
+      }
+      if(zaken.length){
+        const k=document.createElement('div');k.className='kop2';k.textContent='Bedrijven';uit.appendChild(k);
+        const r=document.createElement('div');r.className='rooster';r.style.marginBottom='1.4rem';
+        zaken.forEach(z=>{ const b=document.createElement('button');b.type='button';b.className='kaart';
+          b.innerHTML='<div class="nm">'+esc(z.naam)+'</div><div class="ad">'+(z.adres?esc(z.adres)+'.rtg':esc(z.typeLabel||''))+'</div><div class="mt">'+esc([z.typeLabel,z.stad].filter(Boolean).join(' · '))+(z.adres?'':' · nog geen RTG-site')+'</div>';
+          if(z.adres) b.addEventListener('click',()=>ga({adres:z.adres}));
+          else b.addEventListener('click',()=>meld('Dit bedrijf heeft nog geen site op het RTG-web. Bekijk het in de leden-app.'));
+          r.appendChild(b); });
+        uit.appendChild(r);
+      }
+    }catch(err){ uit.innerHTML='<div class="leeg">'+esc(err.message)+'</div>'; }
+  });
   try{
     const d=await api('gids');
     GIDS=d.lijst||[];
@@ -146,6 +275,9 @@ function ordenSite(site,ver){
   }
   return (site.blokken||[]).slice();
 }
+/* Waar een formulier over gaat: de soort bepaalt wat er gevraagd wordt. */
+const SOORTTEKST={vraag:'Uw vraag',offerte:'Waar wilt u een offerte voor',sollicitatie:'Vertel kort over uzelf',
+  reservering:'Voor hoeveel personen, en wanneer',klacht:'Wat ging er mis',feedback:'Wat wilt u ons meegeven'};
 function tekenBlok(blok,ver){
   const T=toonBlok(blok,ver); const s=document.createElement('section'); s.className='blok'; const t=blok.type;
   const tekst=(el,v)=>{el.textContent=v||'';return el;};
@@ -157,6 +289,42 @@ function tekenBlok(blok,ver){
   else if(t==='kolommen'){ s.classList.add('b-kol'); [['lk','lt'],['rk','rt']].forEach(([kk,kt])=>{const c=document.createElement('div');c.appendChild(tekst(document.createElement('h3'),T[kk]));const p=document.createElement('div');p.className='kt';tekst(p,T[kt]);c.appendChild(p);s.appendChild(c);}); }
   else if(t==='galerij'){ s.classList.add('b-gal'); (blok.beelden||[]).forEach(src=>{const img=document.createElement('img');img.src=src;img.alt='';s.appendChild(img);}); }
   else if(t==='citaat'){ s.classList.add('b-citaat'); const q=document.createElement('div');q.className='q';tekst(q,T.tekst);s.appendChild(q); const br=document.createElement('div');br.className='bron';tekst(br,T.bron);s.appendChild(br); }
+  else if(t==='formulier'){ /* bericht aan de zaak achter deze site; landt daar als klus */
+    s.classList.add('b-tekst');
+    const h2=document.createElement('h2');h2.style.cssText='font-family:\'Bodoni Moda\',serif;margin-bottom:.6rem;';tekst(h2,T.kop);s.appendChild(h2);
+    const f=document.createElement('form');
+    const ta=document.createElement('textarea');ta.rows=4;ta.maxLength=500;ta.placeholder=(SOORTTEKST[blok.soort||'vraag']||'Uw bericht')+' aan '+(HUIDIGE&&HUIDIGE.zaak?HUIDIGE.zaak.naam:(HUIDIGE&&HUIDIGE.persoon?HUIDIGE.persoon.codenaam:'de maker'))+'…';
+    ta.style.cssText='width:100%;background:transparent;border:1px solid currentColor;border-radius:10px;padding:.7rem;color:inherit;font:inherit;opacity:.9;';
+    const kn=document.createElement('button');kn.type='submit';kn.className='b-knop';tekst(kn,T.knop);kn.style.cssText='margin-top:.6rem;cursor:pointer;border:0;';
+    f.appendChild(ta);f.appendChild(kn);
+    f.addEventListener('submit',async ev=>{ev.preventDefault();
+      const tk=ta.value.trim(); if(tk.length<3){meld('Schrijf eerst een bericht.');return;}
+      try{ const r=await api('bericht',{adres:HUIDIGE.site.adres,tekst:tk,soort:blok.soort||'vraag'}); ta.value='';
+        meld(r.via==='chat'?'Verstuurd als gesprek in de leden-app, op uw codenaam.':'Verstuurd. Het bedrijf ziet uw bericht in zijn werklijst, op uw codenaam.'); }
+      catch(e){ meld(e.message); }
+    });
+    s.appendChild(f);
+  }
+  else if(t==='faq'){ s.classList.add('b-tekst');
+    const h=document.createElement('h2');h.style.cssText='font-family:\'Bodoni Moda\',serif;margin-bottom:.8rem;';tekst(h,T.kop);s.appendChild(h);
+    (blok.vragen||[]).forEach(q=>{
+      const d=document.createElement('div');d.style.cssText='margin-bottom:.9rem;';
+      const v=document.createElement('div');v.style.fontWeight='600';tekst(v,q.v);
+      const a=document.createElement('div');a.style.opacity='.8';tekst(a,q.a);
+      d.appendChild(v);d.appendChild(a);s.appendChild(d);
+    });
+  }
+  else if(t==='prijzen'){ s.classList.add('b-tekst');
+    const h=document.createElement('h2');h.style.cssText='font-family:\'Bodoni Moda\',serif;margin-bottom:.8rem;';tekst(h,T.kop);s.appendChild(h);
+    (blok.regels||[]).forEach(r=>{
+      const d=document.createElement('div');d.style.cssText='display:flex;gap:.8rem;align-items:baseline;border-bottom:1px solid currentColor;padding:.5rem 0;';
+      const n=document.createElement('div');n.style.flex='1';
+      const nm=document.createElement('div');nm.style.fontWeight='600';tekst(nm,r.naam);n.appendChild(nm);
+      if(r.wat){const w=document.createElement('div');w.style.cssText='opacity:.75;font-size:.9em;';tekst(w,r.wat);n.appendChild(w);}
+      const p=document.createElement('div');p.style.whiteSpace='nowrap';tekst(p,r.prijs);
+      d.appendChild(n);d.appendChild(p);s.appendChild(d);
+    });
+  }
   else if(t==='ruimte'){ s.style.height=(blok.hoogte||40)+'px'; }
   else if(t==='voettekst'){ s.classList.add('b-voet'); tekst(s,T.tekst); }
   return s;
@@ -169,13 +337,67 @@ function schilder(){
   ordenSite(site,ver).forEach(b=>{ if((b.verberg||[]).includes(ver))return; doek.appendChild(tekenBlok(b,ver)); });
 }
 window.addEventListener('resize',()=>{ clearTimeout(window._rt); window._rt=setTimeout(schilder,120); });
-async function toonSite(adres){
+async function toonSite(adres,pad){
   const h=$('#hoofd'); h.innerHTML='<div class="leeg" style="padding:4rem;">Laden…</div>';
   try{
-    const d=await api('open',{adres});
-    const site=d.site; HUIDIGE={site};
+    const d=await api('open',{adres,pad:pad||''});
+    let site=d.site;
+    /* een site kan meerdere pagina's dragen: het pad achter het adres kiest er
+       een; de voorpagina is het lege pad */
+    const paginas=site.paginas||[];
+    if(pad){
+      const pg=paginas.find(p=>p.slug===pad);
+      if(!pg){
+        HUIDIGE=null;
+        h.innerHTML='<div class="foutpagina"><h2>Deze pagina bestaat niet</h2><p><b>'+esc(adres)+'.rtg/'+esc(pad)+'</b> is er niet. Ga naar de <a id="naarVoor">voorpagina</a>.</p></div>';
+        const v=$('#naarVoor'); if(v)v.addEventListener('click',()=>ga({adres}));
+        return;
+      }
+      site=Object.assign({},site,{blokken:pg.blokken,volgorde:null});
+    }
+    HUIDIGE={site,zaak:d.zaak||null,persoon:d.persoon||null};
     document.title=site.titel+' · RTG Browser';
     const wrap=document.createElement('div'); wrap.className='sitewrap';
+    /* de site hoort bij een bedrijf: de browser toont wie dit is en wat je
+       hier kunt -- reserveren, bestellen en chatten lopen via de leden-app,
+       met dezelfde RTG-identiteit */
+    if(d.zaak){
+      const z=d.zaak, balk=document.createElement('div'); balk.className='zaakbalk';
+      const nm=document.createElement('span');nm.className='zn';nm.textContent=z.naam;balk.appendChild(nm);
+      const mt=document.createElement('span');mt.className='zm';mt.textContent=[z.typeLabel,z.stad].filter(Boolean).join(' · ');balk.appendChild(mt);
+      if(z.rating){const rr=document.createElement('span');rr.className='zr';rr.textContent='★ '+z.rating.score+' ('+z.rating.aantal+')';balk.appendChild(rr);}
+      const kn=document.createElement('span');kn.className='zk';
+      const LABELS={reserveren:'Reserveer',bestellen:'Bestel',boeken:'Boek',diensten:'Diensten',kamers:'Kamers',chat:'Chat'};
+      (z.acties||[]).forEach(a=>{ const c=document.createElement('a');c.className='chip';c.href='/apps/app.html';c.textContent=LABELS[a]||a;kn.appendChild(c); });
+      const open=document.createElement('a');open.className='chip hoofd';open.href='/apps/app.html';open.textContent='Open in de leden-app';kn.appendChild(open);
+      balk.appendChild(kn); wrap.appendChild(balk);
+    }
+    /* iemands eigen plek: de browser toont de codenaam en biedt verbinden
+       en chatten via de leden-app -- de browser begrijpt ook personen */
+    if(!d.zaak&&d.persoon){
+      const balk=document.createElement('div'); balk.className='zaakbalk';
+      const nm=document.createElement('span');nm.className='zn';nm.textContent=d.persoon.codenaam;balk.appendChild(nm);
+      const mt=document.createElement('span');mt.className='zm';mt.textContent='Lid op het RTG-web';balk.appendChild(mt);
+      const kn=document.createElement('span');kn.className='zk';
+      const c=document.createElement('a');c.className='chip hoofd';c.href='/apps/app.html';c.textContent='Verbind & chat in de leden-app';kn.appendChild(c);
+      balk.appendChild(kn); wrap.appendChild(balk);
+    }
+    /* eerlijk zijn over een vertaling: dit is niet wat de maker schreef */
+    if(d.vertaald){
+      const l=document.createElement('div'); l.className='vertaallint';
+      const TAAL={nl:'het Nederlands',en:'het Engels',es:'het Spaans',de:'het Duits',fr:'het Frans',it:'het Italiaans'};
+      l.textContent='Machinevertaald'+(d.vertaald.van?' uit '+(TAAL[d.vertaald.van]||d.vertaald.van):'')+'. Namen, prijzen en citaatbronnen blijven zoals de maker ze schreef.';
+      wrap.appendChild(l);
+    }
+    // de paginabalk: Home plus de extra pagina's van de site
+    if(paginas.length){
+      const nav=document.createElement('nav'); nav.className='paginanav'; nav.setAttribute('aria-label',"Pagina's van deze site");
+      const maak=(naam,doel,aan)=>{ const b=document.createElement('button'); b.type='button'; b.textContent=naam; if(aan)b.className='aan';
+        b.addEventListener('click',()=>{ if(!aan) ga({adres,pad:doel}); }); nav.appendChild(b); };
+      maak('Home','',!pad);
+      paginas.forEach(p=>maak(p.naam,p.slug,pad===p.slug));
+      wrap.appendChild(nav);
+    }
     const doek=document.createElement('div'); doek.className='doek'; doek.dataset.thema=site.thema||'donker'; doek.dataset.ver=''; doek.style.setProperty('--acc',site.accent||'#7F1634');
     // vrije kleuren van de maker toepassen (achtergrond, tekst, kaart); ontbreekt
     // er een, dan houdt het thema die kleur
@@ -195,7 +417,7 @@ async function toonSite(adres){
 if(!TOKEN){ $('#hoofd').innerHTML='<div class="inlog"><h2 style="font-family:\'Bodoni Moda\',serif;">Log in op de leden-app</h2><p style="color:var(--muted);margin-top:.6rem;line-height:1.6;">De RTG-browser hoort bij je lidmaatschap. Open de leden-app en log in.</p><p style="margin-top:1rem;"><a href="/apps/app.html">Naar de leden-app →</a></p></div>'; }
 else {
   const start=new URLSearchParams(location.search).get('adres');
-  if(start){ const a=slug(start); ga(a.length>=2?{adres:a}:'start'); } else ga('start');
+  if(start){ const p=parseAdres(start); ga(p.adres.length>=2?{adres:p.adres,pad:p.pad}:'start'); } else ga('start');
 }
 </script>
 <script src="/shared/basis.js" defer></script>

@@ -82,6 +82,13 @@ function maakRegelpakket({ db, save, nu }) {
       geldigTot: pakket.geldigTot || null,
       regels: pakket.regels,
       stand: 'ongecontroleerd',
+      /* DE ZELFVERKLARING VAN HET PAKKET, machinaal bewaard. De meegeleverde
+         jaargang zegt in `_let_op` dat de cijfers niet tegen het Handboek zijn
+         gelegd en niet geschikt zijn voor een definitieve loonrun. Dat stond
+         alleen in het bestand, dus alleen wie het bestand opende wist het -- en
+         aanmerken kon gewoon (LAT.md regel 6: een belofte in tekst is een
+         belofte in code). Hij reist nu mee, tot in de run die erop draait. */
+      waarschuwing: typeof pakket._let_op === 'string' ? pakket._let_op.slice(0, 600) : null,
       bron: {
         soort: (bron && bron.soort) || 'handmatig',
         naam: (bron && bron.naam) || null,
@@ -99,14 +106,27 @@ function maakRegelpakket({ db, save, nu }) {
 
   /* Aanmerken door een mens. Wie dat doet en wanneer komt erbij te staan; dat
      is de tweede helft van "welke regel en versie zijn gebruikt". */
-  function merkAan(land, versie, door) {
+  function merkAan(land, versie, door, opties) {
     const p = lijstVan(land).find(x => x.versie === versie);
     if (!p) return { status: 404, error: 'Dit regelpakket kennen we niet.' };
     if (p.stand === 'goedgekeurd') return { ok: true, ongewijzigd: true, versie };
     if (!door) return { status: 400, error: 'Noteer wie dit pakket goedkeurt.' };
+    /* EEN PAKKET DAT ZEGT DAT HET NIET DEUGT, GAAT NIET ZOMAAR AAN. Aanmerken
+       betekent "ik heb deze tarieven tegen de bron gelegd"; bij een pakket dat
+       zelf meldt dat dat NIET is gebeurd, is dat een zwaardere uitspraak. Hij
+       kan nog steeds -- er moet mee te werken zijn, en de mens beslist -- maar
+       dan met zoveel woorden en met een reden die blijft staan. Wat erop draait
+       weet daarna dat het op zulke tabellen draait. */
+    const o = opties || {};
+    if (p.waarschuwing && o.ondanks !== true)
+      return { status: 409, error: 'Dit pakket meldt zelf dat het ongecontroleerd is; aanmerken kan alleen uitdrukkelijk.',
+        waarschuwing: p.waarschuwing, versie };
+    if (p.waarschuwing && !String(o.reden || '').trim())
+      return { status: 400, error: 'Noteer waarom dit ongecontroleerde pakket toch wordt aangemerkt.' };
     p.stand = 'goedgekeurd'; p.goedgekeurdDoor = door; p.goedgekeurdOp = tijd();
+    if (p.waarschuwing) { p.ondanksWaarschuwing = String(o.reden).trim().slice(0, 300); p.opDemoTabellen = true; }
     save();
-    return { ok: true, versie, stand: p.stand };
+    return { ok: true, versie, stand: p.stand, opDemoTabellen: !!p.opDemoTabellen };
   }
 
   /* ---------- opzoeken ---------- */
@@ -127,7 +147,9 @@ function maakRegelpakket({ db, save, nu }) {
   const opVersie = (land, versie) => lijstVan(land).find(p => p.versie === versie) || null;
   const alle = (land) => lijstVan(land).map(p => ({ versie: p.versie, geldigVan: p.geldigVan,
     geldigTot: p.geldigTot, stand: p.stand, bron: p.bron, goedgekeurdDoor: p.goedgekeurdDoor,
-    goedgekeurdOp: p.goedgekeurdOp, valuta: p.valuta || null }));
+    goedgekeurdOp: p.goedgekeurdOp, valuta: p.valuta || null,
+    waarschuwing: p.waarschuwing || null, opDemoTabellen: !!p.opDemoTabellen,
+    ondanksWaarschuwing: p.ondanksWaarschuwing || null }));
 
   return { keur, neemOp, merkAan, opDatum, opVersie, alle, VEREIST };
 }

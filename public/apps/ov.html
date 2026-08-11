@@ -131,11 +131,13 @@
         <select id="velVan"><option value="hier">Huidige locatie</option></select>
         <label for="velZoek">Bestemming</label>
         <input id="velZoek" type="search" placeholder="Zoek een zaak, hotel of halte" autocomplete="off">
-        <!-- aria-label en geen tweede zichtbaar label: "Bestemming" staat al boven het
-     zoekveld, en die kop twee keer neerzetten maakt het scherm rommeliger zonder
-     iemand te helpen. Een schermlezer noemt dit veld nu wel bij naam; zonder dat
-     kondigde hij alleen "keuzelijst" aan. -->
-        <select id="velNaar" aria-label="Gevonden bestemmingen" style="margin-top:0.4rem;"><option value="">Kies een plek</option></select>
+        <!-- Een aria-label en GEEN tweede zichtbaar label: "Bestemming" staat al
+             boven het zoekveld, en die kop twee keer neerzetten maakt het scherm
+             rommeliger zonder iemand te helpen. Maar een select kan geen tweede
+             `for` delen en heeft geen placeholder om op terug te vallen, dus
+             zonder eigen naam kondigt een schermlezer hier alleen "keuzelijst"
+             aan. Vandaar deze naam, en niet nog een kop. -->
+        <select id="velNaar" aria-label="Bestemming kiezen uit de zoekresultaten" style="margin-top:0.4rem;"><option value="">Kies een plek</option></select>
         <p class="stil" id="velMeer"></p>
         <div class="duo">
           <div><label for="velReizigers">Reizigers</label><input id="velReizigers" type="number" min="1" max="60" value="1"></div>

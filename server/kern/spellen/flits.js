@@ -61,5 +61,7 @@ module.exports = (ctx) => {
     nr: st.idx[mij], tot: st.sommen.length, goed: st.goed[mij],
     stand: p.spelers.map(sp => ({ af: st.idx[sp], goed: st.goed[sp] }))
   });
-  return { flitsInit, flitsZet, flitsView };
+  const spel = { sleutel: 'flits', naam: 'Flitsduel', max: 4, wereld: 'rtf', buitenBeurt: ['antwoord'], kijken: true,
+    init: flitsInit, zet: flitsZet, view: flitsView };
+  return { spel, flitsInit, flitsZet, flitsView };
 };

@@ -278,7 +278,7 @@
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
-      "gezakt": 16,
+      "gezakt": 21,
       "scherp": "gezakt"
     },
     "bankbeveiliging.test.js": {
@@ -300,6 +300,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 8,
+      "scherp": "gezakt"
+    },
+    "bankkamer.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
       "scherp": "gezakt"
     },
     "bedrijfbeeld.test.js": {
@@ -414,6 +421,14 @@
       "operator": "liegpoort /api/",
       "gezakt": 4,
       "scherp": "gezakt"
+    },
+    "betaalopdracht.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/betaalopdracht/index.js",
+      "operator": "true->false#0",
+      "gezakt": 2,
+      "geprobeerd": 1
     },
     "betaalstore.test.js": {
       "soort": "puur",
@@ -561,6 +576,57 @@
       "gezakt": 4,
       "scherp": "gezakt"
     },
+    "btw-aangifte.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
+    },
+    "btw-aansluiting-scherm.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "btw-naheffing-keten.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "btw-naheffing-scherm.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "btw-naheffing.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/fiscaal/btwaangifte.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
+    "btw-scherm.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "btw-toezicht.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/fiscaal/btwaangifte.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
     "bugjacht.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -651,6 +717,22 @@
       "gezakt": 2,
       "scherp": "gezakt"
     },
+    "consent-dekking.test.js": {
+      "soort": "puur",
+      "staat": "overleefd",
+      "modules": [
+        "server/kern/consent.js"
+      ],
+      "geprobeerd": 19,
+      "posities": 8
+    },
+    "consent.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
+      "scherp": "gezakt"
+    },
     "contact.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -693,6 +775,13 @@
       "gezakt": 5,
       "scherp": "vastgelopen"
     },
+    "dagcoach.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 9,
+      "scherp": "gezakt"
+    },
     "dealkans.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -726,6 +815,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 7,
+      "scherp": "gezakt"
+    },
+    "doelen.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 8,
       "scherp": "gezakt"
     },
     "domeinalleen.test.js": {
@@ -993,6 +1089,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 4,
+      "scherp": "gezakt"
+    },
+    "gedachten.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 7,
       "scherp": "gezakt"
     },
     "gegevenspoort.test.js": {
@@ -1643,6 +1746,20 @@
       "gezakt": 1,
       "geprobeerd": 1
     },
+    "life-schakelbaar.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5,
+      "scherp": "gezakt"
+    },
+    "life.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 7,
+      "scherp": "gezakt"
+    },
     "lifestyle.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -1736,6 +1853,90 @@
       "gezakt": 11,
       "scherp": "gezakt"
     },
+    "mall-bestellingen.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 9,
+      "scherp": "gezakt"
+    },
+    "mall-bewaard.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 11,
+      "scherp": "gezakt"
+    },
+    "mall-collecties.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 11,
+      "scherp": "gezakt"
+    },
+    "mall-concierge.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 11,
+      "scherp": "gezakt"
+    },
+    "mall-context.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 10,
+      "scherp": "gezakt"
+    },
+    "mall-extern.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 13,
+      "scherp": "gezakt"
+    },
+    "mall-kaart.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 13,
+      "scherp": "gezakt"
+    },
+    "mall-lijsten.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 12,
+      "scherp": "gezakt"
+    },
+    "mall-supplieros.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 9,
+      "scherp": "gezakt"
+    },
+    "mall-vestigingen.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 11,
+      "scherp": "gezakt"
+    },
+    "mall-vindlaag.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 17,
+      "scherp": "gezakt"
+    },
+    "mall-vraagbeeld.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 9,
+      "scherp": "gezakt"
+    },
     "mall.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -1776,6 +1977,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "medicatie.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 11,
       "scherp": "gezakt"
     },
     "meet.test.js": {
@@ -1834,6 +2042,13 @@
       "operator": ">=->>#0",
       "gezakt": 2,
       "geprobeerd": 1
+    },
+    "metingen.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 9,
+      "scherp": "gezakt"
     },
     "metingpoort.test.js": {
       "soort": "server",
@@ -1973,6 +2188,13 @@
       "gezakt": 4,
       "scherp": "gezakt"
     },
+    "noodkaart.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 7,
+      "scherp": "gezakt"
+    },
     "notities.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -2044,6 +2266,195 @@
       "operator": "true->false#0",
       "gezakt": 1,
       "geprobeerd": 1
+    },
+    "onderneming-belasting.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/onderneming/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 15,
+      "geprobeerd": 1
+    },
+    "onderneming-bestuur.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/onderneming/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 18,
+      "geprobeerd": 1
+    },
+    "onderneming-capaciteit.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/onderneming/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 13,
+      "geprobeerd": 1
+    },
+    "onderneming-contracten.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/onderneming/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 11,
+      "geprobeerd": 1
+    },
+    "onderneming-crediteuren.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/onderneming/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 10,
+      "geprobeerd": 1
+    },
+    "onderneming-dagbeeld.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/onderneming/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 9,
+      "geprobeerd": 1
+    },
+    "onderneming-debiteuren.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/onderneming/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 9,
+      "geprobeerd": 1
+    },
+    "onderneming-eersteklant.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/onderneming/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 15,
+      "geprobeerd": 1
+    },
+    "onderneming-kas.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/onderneming/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 13,
+      "geprobeerd": 1
+    },
+    "onderneming-klussen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/onderneming/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 13,
+      "geprobeerd": 1
+    },
+    "onderneming-mallprofiel.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/onderneming/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 9,
+      "geprobeerd": 1
+    },
+    "onderneming-offertebouw.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/onderneming/offertebouw.js",
+      "operator": "===->!==#0",
+      "gezakt": 6,
+      "geprobeerd": 1
+    },
+    "onderneming-ontwerper.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/onderneming/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 11,
+      "geprobeerd": 1
+    },
+    "onderneming-oprichting.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "onderneming-pijplijn.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/onderneming/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 14,
+      "geprobeerd": 1
+    },
+    "onderneming-rechtsvormen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/onderneming/rechtsvorm.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
+    "onderneming-regie.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/onderneming/regie.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 4
+    },
+    "onderneming-relaties.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/onderneming/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 10,
+      "geprobeerd": 1
+    },
+    "onderneming-routes.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
+    },
+    "onderneming-toegang.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/onderneming/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 11,
+      "geprobeerd": 1
+    },
+    "onderneming-verkenning.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/onderneming/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 16,
+      "geprobeerd": 1
+    },
+    "onderneming-voorraad.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/onderneming/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 12,
+      "geprobeerd": 1
+    },
+    "onderneming-werving.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/onderneming/index.js",
+      "operator": "===->!==#0",
+      "gezakt": 14,
+      "geprobeerd": 1
+    },
+    "onderneming.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 4,
+      "scherp": "gezakt"
     },
     "onderwijs.test.js": {
       "soort": "server",
@@ -2139,6 +2550,10 @@
       "gezakt": 18,
       "scherp": "gezakt"
     },
+    "paginascripts.test.js": {
+      "soort": "puur",
+      "staat": "geen module gevonden"
+    },
     "pakket.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -2216,6 +2631,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 3,
+      "scherp": "gezakt"
+    },
+    "payrollkeur.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
       "scherp": "gezakt"
     },
     "pda-aanmelden.test.js": {
@@ -3087,6 +3509,14 @@
       "gezakt": 2,
       "scherp": "gezakt"
     },
+    "spelkijken.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/spellen.js",
+      "operator": "return-weg#0",
+      "gezakt": 7,
+      "geprobeerd": 3
+    },
     "spellen.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -3101,6 +3531,43 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
+    "spelpoort.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
+      "scherp": "gezakt"
+    },
+    "spelpraat.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "spelpraat.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
+    },
+    "spelpresence.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/spellen/presence.js",
+      "operator": "true->false#0",
+      "gezakt": 1,
+      "geprobeerd": 1
+    },
+    "spelprestaties.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/spellen/uitslagen.js",
+      "operator": "!==->===#0",
+      "gezakt": 5,
+      "geprobeerd": 2
+    },
     "spelregels-drift.test.js": {
       "soort": "puur",
       "staat": "overleefd",
@@ -3109,6 +3576,73 @@
       ],
       "geprobeerd": 18,
       "posities": 8
+    },
+    "spelregister.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/spellen/register.js",
+      "operator": "===->!==#0",
+      "gezakt": 20,
+      "geprobeerd": 1
+    },
+    "spelreplay.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/spellen.js",
+      "operator": "return-weg#0",
+      "gezakt": 6,
+      "geprobeerd": 3
+    },
+    "spelsudoku.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "spelsudoku.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 9,
+      "scherp": "gezakt"
+    },
+    "spelteams.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "spelteams.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
+      "scherp": "gezakt"
+    },
+    "speltelling.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "speltoernooi.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/spellen.js",
+      "operator": "return-weg#0",
+      "gezakt": 5,
+      "geprobeerd": 3
+    },
+    "speluitslagen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/kern/spellen/uitslagen.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 1
     },
     "sportclub.test.js": {
       "soort": "server",
@@ -3318,6 +3852,13 @@
       "gezakt": 4,
       "scherp": "gezakt"
     },
+    "tijdlijn.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 8,
+      "scherp": "gezakt"
+    },
     "tls-acme-boot.test.js": {
       "soort": "puur",
       "staat": "gezakt",
@@ -3358,11 +3899,32 @@
       "gezakt": 2,
       "geprobeerd": 4
     },
+    "toegankelijk.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5,
+      "scherp": "gezakt"
+    },
+    "toestellen.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
+      "scherp": "gezakt"
+    },
     "training.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 9,
+      "scherp": "gezakt"
+    },
+    "trainingsschema.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 10,
       "scherp": "gezakt"
     },
     "transfer.test.js": {
@@ -3477,6 +4039,13 @@
       "scherp": "gezakt"
     },
     "vastgoed.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
+      "scherp": "gezakt"
+    },
+    "vastleggen.test.js": {
       "soort": "server",
       "staat": "gezakt",
       "operator": "liegpoort /api/",
@@ -3598,6 +4167,13 @@
       "gezakt": 2,
       "geprobeerd": 1
     },
+    "voeding.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 8,
+      "scherp": "gezakt"
+    },
     "vonk.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -3641,6 +4217,13 @@
       "operator": "===->!==#0",
       "gezakt": 4,
       "geprobeerd": 1
+    },
+    "wachtlijst.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 5,
+      "scherp": "gezakt"
     },
     "wauw.test.js": {
       "soort": "server",
@@ -3701,6 +4284,27 @@
       "gezakt": 5,
       "scherp": "gezakt"
     },
+    "wereldlaag.e2e.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 1,
+      "scherp": "gezakt"
+    },
+    "wereldlaag.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 13,
+      "scherp": "gezakt"
+    },
+    "wereldprofiel.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 6,
+      "scherp": "gezakt"
+    },
     "wereldregels.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -3718,6 +4322,13 @@
       ],
       "geprobeerd": 10,
       "posities": 8
+    },
+    "wereldvermogens.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 12,
+      "scherp": "gezakt"
     },
     "werk-bij-inloggen.test.js": {
       "soort": "server",
@@ -3920,6 +4531,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 6,
+      "scherp": "gezakt"
+    },
+    "zorgniveau.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 9,
       "scherp": "gezakt"
     },
     "zorgwallet.test.js": {

@@ -182,7 +182,13 @@
       }
     }
     delen = echte;
-    if (delen.length < 3) return;
+    /* Normaal doet het menu niets onder de drie delen -- dan is het alleen maar
+       drukte. Wie in zijn toegankelijkheidsprofiel "een ding tegelijk" heeft
+       aangezet, wil het juist ook bij twee: dan is de drempel twee. De klasse
+       wordt door shared/basis.js op <html> gezet, dus dit script hoeft niets van
+       het profiel te weten. */
+    var drempel = document.documentElement.classList.contains('rtg-eending') ? 2 : 3;
+    if (delen.length < drempel) return;
 
     var balk = document.createElement('nav');
     balk.className = 'rtgdeel-balk';

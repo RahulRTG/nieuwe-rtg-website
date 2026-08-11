@@ -2,35 +2,47 @@
    en slimme werkplek van de Belastingdienst. De inspecteurscockpit ziet alles in
    een oogopslag (ontvangen, te ontvangen, teruggaven, toeslagen, btw-beeld), de
    invordering loopt netjes via de Berichtenbox (herinnering, betalingsregeling,
-   kwijtschelding -- altijd een mens die beslist), en het kantoor werkt samen met
+   kwijtschelding -- altijd een mens die beslist, en bij kwijtschelding TWEE
+   mensen; die drie wonen in ./kantoor-invordering.js), en het kantoor werkt samen met
    alles wat moet: de facturatiemotor (btw per onderneming), het KVK-handelsregister
    en de Dienst Toeslagen. De slimme signalen wijzen de inspecteur op wat aandacht
    vraagt; de AI-chef-inspecteur (Rahul) denkt mee op het hele beeld. Beslissen
    doet altijd de mens. Krijgt de gedeelde ctx van kern/overheid/index.js. */
 module.exports = (ctx) => {
-  const { db, save, anthropic, nu, jaar, schoon, eur, seed, bericht } = ctx;
+  const { db, save, anthropic, nu, jaar, schoon, eur, seed, bericht, telPerZaak, btwSignalen, vorigeBtwPeriode } = ctx;
 
   const aanslagen = () => db.data.rijkAanslagen || [];
   const dagen = iso => Math.floor((Date.now() - new Date(iso || 0)) / 86400000);
   const open = a => a.saldo > 0 && !a.betaald && !a.kwijtgescholden;
 
-  /* ---- de samenwerking: btw-beeld uit de facturatiemotor + KVK ---- */
+  /* ---- de samenwerking: btw-beeld uit de facturatiemotor + KVK ----
+
+     TWEE DINGEN ZIJN HIER RECHTGEZET toen de aangifte van de ondernemer erbij
+     kwam (kern/fiscaal/btwaangifte.js).
+
+     1. DE TELLING. Dit blok telde zelf op: `omzet += f.totaal` en
+        `btw += f.btwBedrag`. Dat is een tweede optelling naast die van de
+        aangifte, en een inspecteur die anders rekent dan de aangever vindt
+        altijd een verschil. Nu loopt het door telPerZaak() uit
+        kern/fiscaal/btwtelling.js -- dezelfde routine, tot op de regelsom.
+
+     2. HET WOORD OMZET. `f.totaal` is het factuurbedrag INCLUSIEF btw, en dat
+        stond onder de kop "omzet". In fiscale taal is omzet de grondslag, dus
+        exclusief btw -- precies het getal dat in de aangifte staat. Wie de twee
+        naast elkaar legde, vergeleek twee verschillende dingen zonder dat
+        iets dat zei. Het veld heet nu `grondslag` en draagt ook dat getal. */
   function btwBeeld() {
     seed();
     const j = String(jaar());
-    const perZaak = {};
-    for (const f of (db.data.facturen || [])) {
-      if (!f.verkoper || !f.verkoper.code || String(f.datum || '').slice(0, 4) !== j) continue;
-      const p = perZaak[f.verkoper.code] || (perZaak[f.verkoper.code] = { code: f.verkoper.code, naam: f.verkoper.naam, facturen: 0, omzet: 0, btw: 0 });
-      p.facturen += 1; p.omzet += f.totaal || 0; p.btw += f.btwBedrag || 0;
-    }
+    const perZaak = telPerZaak({ van: j + '-01-01', tot: j + '-12-31' });
     const kvk = db.data.rijkKvk || [];
-    const lijst = Object.values(perZaak).map(p => ({ ...p, omzet: Math.round(p.omzet), btw: Math.round(p.btw),
+    const lijst = [...perZaak.values()].map(p => ({ code: p.code, naam: p.naam, facturen: p.facturen,
+      grondslag: Math.round(p.grondslagCenten / 100), btw: Math.round(p.btwCenten / 100),
       ingeschreven: kvk.some(k => k.supplierCode === p.code) }))
       .sort((a, b) => b.btw - a.btw).slice(0, 100);
     return { ok: true, jaar: j, zaken: lijst,
       totaalBtw: Math.round(lijst.reduce((s, p) => s + p.btw, 0)),
-      totaalOmzet: Math.round(lijst.reduce((s, p) => s + p.omzet, 0)) };
+      totaalGrondslag: Math.round(lijst.reduce((s, p) => s + p.grondslag, 0)) };
   }
 
   /* ---- de slimme signalen: wat vraagt de aandacht van de inspecteur ---- */
@@ -43,8 +55,12 @@ module.exports = (ctx) => {
         uit.push({ soort: 'controle', ref: a.ref, wie: a.codenaam, tekst: 'Aftrek (€ ' + a.aftrek + ') is meer dan 40% van het inkomen; een blik waard.' });
     }
     const bb = btwBeeld();
-    for (const z of bb.zaken) if (!z.ingeschreven && z.omzet > 0)
-      uit.push({ soort: 'register', ref: z.code, wie: z.naam, tekst: 'Omzet (€ ' + z.omzet + ') buiten het handelsregister; KVK-inschrijving ontbreekt.' });
+    for (const z of bb.zaken) if (!z.ingeschreven && z.grondslag > 0)
+      uit.push({ soort: 'register', ref: z.code, wie: z.naam, tekst: 'Omzet (€ ' + z.grondslag + ') buiten het handelsregister; KVK-inschrijving ontbreekt.' });
+    /* De btw-signalen over de LAATST AFGESLOTEN periode: niets ingediend,
+       afwijkend ingediend, of blijven hangen in een concept. Zie
+       ./btwtoezicht.js -- daar staat ook waarom het niet de lopende periode is. */
+    uit.push(...btwSignalen(vorigeBtwPeriode()));
     return uit.slice(0, 60);
   }
 
@@ -62,7 +78,8 @@ module.exports = (ctx) => {
       ontvangen: eur(ontvangen), teOntvangen: eur(teOntvangen), teruggaven: eur(teruggaven),
       openstaand: alle.filter(open).length, regelingen: alle.filter(a => a.regeling).length,
       toeslagenLopend: toeslagen.length, toeslagenPerMaand: eur(toeslagen.reduce((s, t) => s + t.maandbedrag, 0)),
-      btwDitJaar: bb.totaalBtw, omzetDitJaar: bb.totaalOmzet, ondernemingen: (db.data.rijkKvk || []).length,
+      btwDitJaar: bb.totaalBtw, grondslagDitJaar: bb.totaalGrondslag, ondernemingen: (db.data.rijkKvk || []).length,
+      btwPeriode: vorigeBtwPeriode(),
       signalen: signalen() };
   }
 
@@ -76,43 +93,18 @@ module.exports = (ctx) => {
       ref: a.ref, wie: a.codenaam, jaar: a.jaar, inkomen: a.inkomen, aftrek: a.aftrek, saldo: a.saldo,
       betaald: !!a.betaald, kwijtgescholden: !!a.kwijtgescholden, herinnerd: a.herinnerd || null,
       regeling: a.regeling ? { maanden: a.regeling.maanden, per: a.regeling.per } : null,
+      /* De lopende voordracht tot kwijtschelding gaat MEE naar het scherm, met
+         de naam erbij. Zonder die naam kan de tweede inspecteur niet zien of
+         hij zelf de voordrager was, en dan botst hij pas op de vier-ogen-regel
+         nadat hij op de knop heeft gedrukt. */
+      kwijtVoorstel: a.kwijtVoorstel ? { door: a.kwijtVoorstel.door, reden: a.kwijtVoorstel.reden, at: a.kwijtVoorstel.at } : null,
       dagenOpen: open(a) ? dagen(a.ingediend || a.at) : 0 })) };
   }
 
-  /* ---- invordering: een mens beslist, de Berichtenbox draagt het besluit ---- */
-  function pak(r) { return aanslagen().find(x => x.ref === String(r || '')); }
-  function bdHerinnering(actor, r) {
-    const a = pak(r);
-    if (!a) return { status: 404, error: 'Aanslag niet gevonden.' };
-    if (!open(a)) return { status: 409, error: 'Voor deze aanslag staat niets open.' };
-    a.herinnerd = nu();
-    bericht(a.key, 'Belastingdienst', 'Betalingsherinnering ' + a.jaar,
-      'Er staat nog € ' + a.saldo + ' open voor je aanslag ' + a.jaar + ' (' + a.ref + '). Betaal via MijnOverheid, of vraag een betalingsregeling aan.', 'belasting');
-    save();
-    return { ok: true };
-  }
-  function bdRegeling(actor, r, maanden) {
-    const a = pak(r);
-    if (!a) return { status: 404, error: 'Aanslag niet gevonden.' };
-    if (!open(a)) return { status: 409, error: 'Voor deze aanslag staat niets open.' };
-    const m = Math.round(Number(maanden) || 0);
-    if (m < 2 || m > 24) return { status: 400, error: 'Kies een regeling van 2 tot 24 maanden.' };
-    a.regeling = { maanden: m, per: Math.ceil(a.saldo / m), door: actor || 'inspecteur', at: nu() };
-    bericht(a.key, 'Belastingdienst', 'Betalingsregeling toegekend',
-      'Voor je aanslag ' + a.jaar + ' is een regeling getroffen: ' + m + ' maanden van € ' + a.regeling.per + '.', 'belasting');
-    save();
-    return { ok: true, regeling: a.regeling };
-  }
-  function bdKwijtschelding(actor, r, reden) {
-    const a = pak(r);
-    if (!a) return { status: 404, error: 'Aanslag niet gevonden.' };
-    if (!open(a)) return { status: 409, error: 'Voor deze aanslag staat niets open.' };
-    a.kwijtgescholden = true; a.kwijt = { reden: schoon(reden, 200) || 'op besluit van de inspecteur', door: actor || 'inspecteur', at: nu() };
-    bericht(a.key, 'Belastingdienst', 'Kwijtschelding',
-      'De openstaande € ' + a.saldo + ' van je aanslag ' + a.jaar + ' is kwijtgescholden (' + a.kwijt.reden + '). Je hoeft niets meer te betalen.', 'belasting');
-    save();
-    return { ok: true };
-  }
+  /* ---- invordering: een mens beslist, de Berichtenbox draagt het besluit ----
+     Woont in ./kantoor-invordering.js. Daar staat ook waarom de kwijtschelding
+     sinds deze ronde door TWEE inspecteurs gaat en de andere twee niet. */
+  const deelInvordering = require('./kantoor-invordering')({ nu, save, schoon, bericht, aanslagen, open });
 
   /* ---- de AI-chef-inspecteur: Rahul denkt mee op het hele beeld ----
      Adviserend, nooit beslissend: elke herinnering, regeling of kwijtschelding
@@ -120,7 +112,7 @@ module.exports = (ctx) => {
   async function bdAI(vraag) {
     const c = bdCockpit();
     const beeld = 'Ontvangen € ' + c.ontvangen + ', te ontvangen € ' + c.teOntvangen + ' (' + c.openstaand + ' open, ' + c.regelingen + ' regelingen), teruggaven € ' + c.teruggaven +
-      '. Toeslagen: ' + c.toeslagenLopend + ' lopend (€ ' + c.toeslagenPerMaand + '/mnd). Btw dit jaar € ' + c.btwDitJaar + ' over € ' + c.omzetDitJaar + ' omzet, ' + c.ondernemingen + ' ondernemingen in het register. ' +
+      '. Toeslagen: ' + c.toeslagenLopend + ' lopend (€ ' + c.toeslagenPerMaand + '/mnd). Btw dit jaar € ' + c.btwDitJaar + ' over € ' + c.grondslagDitJaar + ' omzet (grondslag), ' + c.ondernemingen + ' ondernemingen in het register. ' +
       'Signalen: ' + (c.signalen.length ? c.signalen.slice(0, 5).map(s => s.soort + ': ' + s.tekst).join(' | ') : 'geen') + '.';
     const q = schoon(vraag, 400);
     if (anthropic && q) {
@@ -139,5 +131,5 @@ module.exports = (ctx) => {
     return { ok: true, demo: true, antwoord: 'Het beeld van vandaag: ' + beeld + ' Mijn advies: pak eerst de invorderingssignalen op (herinnering sturen kost niets), en kijk daarna naar de controle-signalen. Beslissen doet u zelf.' };
   }
 
-  return { bdCockpit, bdAanslagen, bdHerinnering, bdRegeling, bdKwijtschelding, bdBtwBeeld: btwBeeld, bdAI };
+  return Object.assign({ bdCockpit, bdAanslagen, bdBtwBeeld: btwBeeld, bdAI }, deelInvordering);
 };

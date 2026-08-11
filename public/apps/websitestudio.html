@@ -395,7 +395,12 @@ if(window.RTGUitvoer) RTGUitvoer.bron(()=>{
 async function openen(){
   try{ const d=await api('lijst'); SJABLONEN=d.lijst||[]; const l=$('#openlijst'); l.textContent='';
     if(!(d.lijst||[]).length){ l.innerHTML='<div style="color:var(--soft);font-size:.85rem;">Nog geen opgeslagen sjablonen.</div>'; }
-    (d.lijst||[]).forEach(it=>{const r=document.createElement('div');r.className='lijstrij';r.innerHTML='<span class="nm">'+esc(it.titel)+'</span><span class="mt">'+it.blokken+' blok'+(it.blokken===1?'':'ken')+'</span>';const ob=document.createElement('button');ob.textContent='Open';ob.addEventListener('click',async()=>{try{const dd=await api('haal',{id:it.id});DESIGN=dd.design;DESIGN.blokken=DESIGN.blokken||[];DESIGN.kleuren=DESIGN.kleuren||{};$('#titel').value=DESIGN.titel;bouwSwatches();syncKleurInputs();$('#themaKnop').textContent=DESIGN.thema==='licht'?'Licht':'Donker';$('#openSheet').classList.remove('open');zetBewerk(true);meld('Geopend.');}catch(e){meld(e.message);}});r.appendChild(ob);l.appendChild(r);});
+    (d.lijst||[]).forEach(it=>{const r=document.createElement('div');r.className='lijstrij';r.innerHTML='<span class="nm">'+esc(it.titel)+'</span><span class="mt">'+it.blokken+' blok'+(it.blokken===1?'':'ken')+(it.etalage?' · in de etalage':'')+'</span>';
+      /* in of uit de etalage: vrijgeven als startpunt voor ledensites */
+      const eb=document.createElement('button');eb.textContent=it.etalage?'Uit etalage':'In etalage';
+      eb.addEventListener('click',async()=>{try{await api('etalage',{id:it.id,aan:!it.etalage});meld(it.etalage?'Uit de etalage gehaald.':'In de etalage gezet: leden kunnen hiermee beginnen.');openen();}catch(e){meld(e.message);}});
+      r.appendChild(eb);
+      const ob=document.createElement('button');ob.textContent='Open';ob.addEventListener('click',async()=>{try{const dd=await api('haal',{id:it.id});DESIGN=dd.design;DESIGN.blokken=DESIGN.blokken||[];DESIGN.kleuren=DESIGN.kleuren||{};$('#titel').value=DESIGN.titel;bouwSwatches();syncKleurInputs();$('#themaKnop').textContent=DESIGN.thema==='licht'?'Licht':'Donker';$('#openSheet').classList.remove('open');zetBewerk(true);meld('Geopend.');}catch(e){meld(e.message);}});r.appendChild(ob);l.appendChild(r);});
     $('#openSheet').classList.add('open');
   }catch(e){ meld(e.message); }
 }

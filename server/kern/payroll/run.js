@@ -71,6 +71,8 @@ function maakRun({ db, save, nu, crypto, motor, regelpakket, componenten }) {
 
     const run = {
       id: id(), code, zaak: zaak || code, periode, land: (land || 'NL').toUpperCase(),
+      // waarop deze run berust; reist mee tot in de loonstrook van de medewerker
+      opDemoTabellen: !!pakket.opDemoTabellen,
       regelversie: pakket.versie, regelstand: pakket.stand,
       stand: 'concept', stroken,
       totaalNettoCenten: stroken.reduce((s, x) => s + x.strook.nettoCenten, 0),
@@ -134,7 +136,7 @@ function maakRun({ db, save, nu, crypto, motor, regelpakket, componenten }) {
      bedrag dat naar iemands rekening gaat. */
   const kort = (r) => ({ id: r.id, code: r.code, zaak: r.zaak, periode: r.periode, stand: r.stand,
     valuta: ((r.stroken[0] || {}).strook || {}).valuta ? r.stroken[0].strook.valuta.code : null,
-    regelversie: r.regelversie, regelstand: r.regelstand, correctieVan: r.correctieVan || null,
+    regelversie: r.regelversie, regelstand: r.regelstand, opDemoTabellen: !!r.opDemoTabellen, correctieVan: r.correctieVan || null,
     reden: r.reden || null, aantal: r.stroken.length, totaalNettoCenten: r.totaalNettoCenten,
     totaalVerschilCenten: r.totaalVerschilCenten, goedkeuringen: r.goedkeuringen, at: r.at });
 
@@ -147,10 +149,14 @@ function maakRun({ db, save, nu, crypto, motor, regelpakket, componenten }) {
   const haalRun = (runId) => vind(runId);
   /* De strook van een medewerker, uit definitieve runs. Een concept is geen
      loonstrook: dat is een berekening waar nog niemand achter staat. */
+  /* De stroken van een medewerker. `opDemoTabellen` gaat MEE: de accountant kan
+     het regelpakket erbij halen, de medewerker niet -- anders is de eerlijkheid
+     alleen intern. */
   const strokenVan = (code, staffId) => bak()
     .filter(r => r.code === code && r.stand === 'definitief')
     .map(r => ({ runId: r.id, periode: r.periode, correctieVan: r.correctieVan || null,
-      regelversie: r.regelversie, strook: (r.stroken.find(s => s.staffId === staffId) || {}).strook }))
+      regelversie: r.regelversie, opDemoTabellen: !!r.opDemoTabellen,
+      strook: (r.stroken.find(s => s.staffId === staffId) || {}).strook }))
     .filter(x => x.strook);
 
   /* De correctierun staat apart (./correctie.js): een eigen onderwerp, en run.js

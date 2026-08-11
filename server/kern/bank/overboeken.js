@@ -1,9 +1,12 @@
 /* RTG Bank, deel "overboeken": geld in beweging. Interne overboekingen tussen
    rekeningen (direct), storten (waar de 3-standen knop van de boardroom bijt: via
    de externe kaart-naad of als eigen emissie), de brug van/naar de RTG Pay-wallet
-   (de infrastructuur die de bank OP Pay bouwt) en uitgaande SEPA achter de
-   betaal-naad. Idempotent op de clearende paden: dubbeltikken kan nooit dubbel
-   afschrijven of dubbel storten. Krijgt de gedeelde ctx van kern/bank/index.js. */
+   en uitgaande SEPA achter de betaal-naad. Idempotent op de clearende paden:
+   dubbeltikken kan nooit dubbel afschrijven of dubbel storten.
+
+   De brug met de RTG Pay-wallet staat in ./walletbrug: dat is het enige pad dat
+   twee grootboeken tegelijk raakt, en die regel hoort niet tussen deze.
+   Krijgt de gedeelde ctx van kern/bank/index.js. */
 module.exports = (ctx) => {
   const { db, save, crypto, nu, d, boekAsync, rekMeta, saldoVan, betaal, pay, bankregie, seintje } = ctx;
 
@@ -56,54 +59,6 @@ module.exports = (ctx) => {
     return { ok: true, saldoCenten: saldoVan(vanIban), boeking: b.boeking };
   }
 
-  /* De brug met RTG Pay: geld tussen de wallet (lid:<codenaam>) en de eigen
-     betaalrekening. Beide grootboeken blijven sluiten (elk een eigen extern-
-     tegenrekening). Begrensd door de wallet-cap van Pay per overboeking. */
-  async function walletNaarBank({ iban, codenaam, centen }) {
-    const c = String(codenaam || '').trim();
-    const m = rekMeta(iban);
-    if (!m || m.codenaam !== c) return { status: 404, error: 'De rekening bestaat niet.' };
-    const bedrag = Math.round(Number(centen));
-    if (!Number.isFinite(bedrag) || bedrag < 1 || bedrag > pay.MAX_CENTEN) return { status: 400, error: 'Kies een bedrag tot ' + (pay.MAX_CENTEN / 100) + ' euro per keer.' };
-    // De wallet-kant loopt via het pay-grootboek (in motor-modus dus geguard langs
-    // de motor); de bank-kant is het eigen bank-grootboek. Elk sluit apart.
-    const uit = await pay.boekAsync({ van: 'lid:' + c, naar: 'extern:bank', centen: bedrag, soort: 'naar-bank', oms: 'Naar RTG Bank' });
-    if (uit.error) return uit;
-    const in_ = await boekAsync({ van: 'extern:pay', naar: iban, centen: bedrag, soort: 'van-wallet', oms: 'Van RTG Pay' });
-    if (in_.error) { await pay.boekAsync({ van: 'extern:bank', naar: 'lid:' + c, centen: bedrag, soort: 'terug', oms: 'Terugboeking' }); return in_; }
-    seintje(c);
-    return { ok: true, saldoCenten: saldoVan(iban) };
-  }
-  async function bankNaarWallet({ iban, codenaam, centen }) {
-    const c = String(codenaam || '').trim();
-    const m = rekMeta(iban);
-    if (!m || m.codenaam !== c) return { status: 404, error: 'De rekening bestaat niet.' };
-    const bedrag = Math.round(Number(centen));
-    if (!Number.isFinite(bedrag) || bedrag < 1 || bedrag > pay.MAX_CENTEN) return { status: 400, error: 'Kies een bedrag tot ' + (pay.MAX_CENTEN / 100) + ' euro per keer.' };
-    const uit = await boekAsync({ van: iban, naar: 'extern:pay', centen: bedrag, soort: 'naar-wallet', oms: 'Naar RTG Pay' });
-    if (uit.error) return uit;
-    const in_ = await pay.boekAsync({ van: 'extern:bank', naar: 'lid:' + c, centen: bedrag, soort: 'van-bank', oms: 'Van RTG Bank' });
-    if (in_.error) { await boekAsync({ van: 'extern:pay', naar: iban, centen: bedrag, soort: 'terug', oms: 'Terugboeking' }); return in_; }
-    seintje(c);
-    return { ok: true, saldoCenten: saldoVan(iban) };
-  }
-
-  /* De wallet-dekking: RTG Pay komt saldo tekort en vraagt de eigen bank om
-     dekking. We zoeken de eerste betaalrekening van het lid die het bedrag
-     (binnen zijn bodem, dus incl. rood-staan-ruimte) kan dragen en verhuizen
-     precies het tekort naar de wallet. Zo draait Pay op de eigen bank zodra
-     die er is, en pas daarna op de kaart-naad. */
-  async function dekWallet({ codenaam, centen }) {
-    const c = String(codenaam || '').trim();
-    const bedrag = Math.round(Number(centen));
-    if (!Number.isFinite(bedrag) || bedrag < 1) return { status: 400, error: 'Dat bedrag kan niet.' };
-    const { rekeningen, bodem } = ctx;
-    const kandidaat = Object.values(rekeningen()).find(m =>
-      m.codenaam === c && m.soort === 'betaal' && !m.bevroren && saldoVan(m.iban) - bedrag >= bodem(m.iban));
-    if (!kandidaat) return { status: 402, error: 'Geen betaalrekening met genoeg ruimte.' };
-    return bankNaarWallet({ iban: kandidaat.iban, codenaam: c, centen: bedrag });
-  }
-
   /* Uitgaande SEPA naar een externe bank, achter de betaal-naad (payout). Een
      eventueel tarief (boardroom) gaat naar rtg:reserve. */
   async function sepaUit({ iban, codenaam, centen, naarIban, begunstigde, oms, idem }) {
@@ -116,13 +71,33 @@ module.exports = (ctx) => {
     return metIdem(idem ? 'sepa:' + iban + ':' + idem : null, 'sepa|' + iban + '|' + c + '|' + dest, async () => {
       const b = await boekAsync({ van: iban, naar: 'extern:sepa', centen: c, soort: 'sepa-uit', oms: oms || ('SEPA naar ' + dest), ref: dest });
       if (b.error) return b;
-      if (fooi > 0) await boekAsync({ van: iban, naar: 'rtg:reserve', centen: fooi, soort: 'tarief', oms: 'SEPA-tarief' });
-      try { await betaal.maakUitbetaling({ bedrag: c, iban: dest, begunstigde: begunstigde || '', referentie: b.boeking.id, idempotentieSleutel: idem ? 'bank-sepa:' + iban + ':' + idem : undefined, omschrijving: oms || 'RTG Bank SEPA' }); }
-      catch (e) { /* eventueel-consistent: de payout kan later opnieuw; de boeking staat al */ }
+      let tariefRef = null;
+      if (fooi > 0) {
+        const t = await boekAsync({ van: iban, naar: 'rtg:reserve', centen: fooi, soort: 'tarief', oms: 'SEPA-tarief' });
+        if (!t.error) tariefRef = t.boeking.id;
+      }
+      /* Eerst de opdracht VASTLEGGEN, dan pas de rail bellen. Hier stond een
+         aanroep met een lege catch eronder: mislukte de payout, dan was het
+         geld van de rekening af, stond het op extern:sepa, sloot het grootboek
+         netjes en gebeurde er buiten RTG nooit meer iets. Nu overleeft de
+         opdracht de mislukking en zelfs een herstart; ../betaalopdracht.js
+         probeert hem opnieuw met dezelfde sleutel en boekt terug als de rail
+         het blijft weigeren. */
+      const op = ctx.opdrachten.maak({
+        soort: 'sepa-uit', rail: 'betaalnaad', centen: c, bron: iban, bestemming: dest,
+        begunstigde: begunstigde || '', oms: oms || 'RTG Bank SEPA', ledgerRef: b.boeking.id,
+        tariefCenten: fooi, tariefRef,
+        idemSleutel: 'bank-sepa:' + iban + ':' + (idem || b.boeking.id)
+      });
+      const na = await ctx.opdrachten.dienIn(op);
       seintje(rekMeta(iban).codenaam);
-      return { ok: true, saldoCenten: saldoVan(iban), overgemaakt: c, tarief: fooi, naar: dest };
+      /* Wat het lid te horen krijgt is nu de waarheid en niet "gelukt": de
+         opdracht staat, maar of hij bij de bank van de ontvanger is aangekomen
+         weten we hier nog niet. Vandaar de status erbij. */
+      return { ok: true, saldoCenten: saldoVan(iban), overgemaakt: c, tarief: fooi, naar: dest,
+        opdrachtId: op.id, opdrachtStatus: na.status };
     });
   }
 
-  return { bankStorten: storten, bankOverboek: overboek, bankWalletNaarBank: walletNaarBank, bankBankNaarWallet: bankNaarWallet, bankDekWallet: dekWallet, bankSepaUit: sepaUit };
+  return { bankStorten: storten, bankOverboek: overboek, bankSepaUit: sepaUit };
 };

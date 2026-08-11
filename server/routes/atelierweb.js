@@ -50,4 +50,9 @@ module.exports = (kern) => {
   app.post('/api/office/atelierweb/verwijder', officeAuth, (req, res) => {
     res.json(atelierweb.verwijder((req.body || {}).id));
   });
+  // in of uit de etalage: het sjabloon als startpunt vrijgeven aan leden
+  app.post('/api/office/atelierweb/etalage', officeAuth, (req, res) => {
+    const b = req.body || {};
+    stuur(res, atelierweb.zetEtalage(b.id, b.aan !== false));
+  });
 };

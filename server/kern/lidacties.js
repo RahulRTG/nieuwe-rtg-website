@@ -14,7 +14,11 @@ module.exports = ({ db, save, crypto, schoon, PERSONAS, findSupplier, ledenPrijs
   leeftijdVan, geborenVan, idGeverifieerd, alcoholGrensVan, pickupCode, entreeCode, ticketsVoorSlot,
   fooiUit, pasTegoedToe, verdienPunten, liveCodename, haversine, pushLive,
   notifySupplier, sseToSupplier, sseToOffice, zorgVoor, zorgContact, keuken,
-  ledenvoordeelVoor }) => {
+  ledenvoordeelVoor, facturatie }) => {
+
+  /* Een betaalde lidtransactie wordt een factuur -- waarom dat er niet was en
+     waarom het op EEN plek staat: zie de kop van ./lidacties/factuur.js. */
+  const factuurVoorLid = require('./lidacties/factuur').maakFactuurVoorLid(facturatie);
 
   /* Zodra het lid echt bij een partner koopt, opent de chatlijn: ze zijn
      dan geen vreemden meer. Idempotent en stil voor gasten. */
@@ -80,6 +84,10 @@ function betaalBoekingVoor(session, body) {
   verdienPunten(session.key, (b.price || 0) - kortingB - voordeelB, b.supplierName);
   openLijnVoor(findSupplier(b.supplierCode), session);
   save();
+  // en de factuur, net als bij een bestelling en een rit (zie factuurVoorLid)
+  factuurVoorLid({ soort: 'dienst', supplierCode: b.supplierCode, supplierNaam: b.supplierName,
+    codenaam: b.customerCodename, ref: b.ref, methode: 'rtg',
+    regels: [{ omschrijving: (b.service && b.service.name) || 'Dienst', aantal: 1, stuk: b.price || 0 }] });
   notifySupplier(b.supplierCode, { icon: 'agenda', title: 'Nieuwe boeking (betaald)', body: b.customerCodename + ': ' + b.service.name + (b.wanneer ? ' · ' + b.wanneer : '') + ' · € ' + b.price });
   sseToSupplier(b.supplierCode, 'sync', { scope: 'orders' });
   sseToOffice('sync', { scope: 'orders' });
@@ -88,7 +96,10 @@ function betaalBoekingVoor(session, body) {
 
   /* De bestel- en ritlaag draaien als submodules op een gedeelde context,
      een keer opgebouwd bij het opstarten. */
-  const ctx = { db, save, crypto, schoon, PERSONAS, findSupplier, ledenPrijs, optieAan,
+  /* De submodules krijgen `factuurVoorLid` en NIET de facturatiemotor zelf:
+     dan is er een plek die weet hoe een lidtransactie een factuur wordt, en
+     kan geen van de vier er zijn eigen variant naast zetten. */
+  const ctx = { db, save, crypto, schoon, PERSONAS, findSupplier, ledenPrijs, optieAan, factuurVoorLid,
     leeftijdVan, geborenVan, idGeverifieerd, alcoholGrensVan, pickupCode, entreeCode, ticketsVoorSlot,
     fooiUit, pasTegoedToe, verdienPunten, liveCodename, haversine, pushLive,
     notifySupplier, sseToSupplier, sseToOffice, zorgVoor, zorgContact, keuken,

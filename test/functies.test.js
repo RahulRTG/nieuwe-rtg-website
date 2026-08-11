@@ -1,16 +1,34 @@
 /* Tests voor de functieschakelaars (server/functies.js): de pad-matching
-   (langste prefix wint), de standaard (alles aan) en de catalogus. Zuiver, geen
-   server nodig. Draai: node --test test/functies.test.js */
+   (langste prefix wint), de standaard en de catalogus. Zuiver, geen server
+   nodig. Draai: node --test test/functies.test.js
+
+   OVER "DE STANDAARD". Deze toets zei ooit: zonder stand staat ALLES aan. Dat
+   klopte zolang elke functie standaard aan was, en zo was het ook -- tot er
+   een functie kwam die standaard UIT hoort te staan (het eigen domein buiten
+   het RTG-web, dat een site publiek maakt). De belofte is daarom scherper
+   geworden en niet zwakker: elke functie staat op ZIJN EIGEN standaard, en
+   wie standaard uit is, is zonder stand ook echt dicht. */
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const functies = require('../server/functies');
 
-test('functies: zonder stand staat alles aan (niets geblokkeerd)', () => {
+test('functies: zonder stand staat elke functie op zijn eigen standaard', () => {
+  let aantalUit = 0;
   for (const f of functies.FUNCTIES) {
     for (const p of f.paden) {
-      assert.equal(functies.padGeblokkeerd(p + '/iets', {}), null, f.id + ' zou standaard aan moeten staan');
+      const dicht = functies.padGeblokkeerd(p + '/iets', {});
+      if (f.standaard === false) {
+        assert.ok(dicht && dicht.id === f.id, f.id + ' staat standaard UIT en hoort zonder stand dicht te zijn');
+      } else {
+        assert.equal(dicht, null, f.id + ' zou standaard aan moeten staan');
+      }
     }
+    if (f.standaard === false) aantalUit++;
   }
+  /* Er is er minstens een, anders is de tak hierboven dode code en toetst deze
+     toets stilletjes alleen nog de helft. */
+  assert.ok(aantalUit >= 1, 'er is minstens een functie die standaard uit staat');
+  assert.equal(functies.HEEFT_UIT_STANDAARD, true, 'en de middleware weet dat ook');
 });
 
 test('functies: een uitgezette functie blokkeert zijn pad', () => {

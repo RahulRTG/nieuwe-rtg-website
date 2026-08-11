@@ -4,7 +4,7 @@
    nadat kern/facturatie.js de motor heeft gemount. */
 module.exports = (ctx) => {
   const { db, save, crypto, findSupplier, keyVanCodenaam, notify, notifySupplier, sseToCustomer, sseToSupplier, factuur, anthropic, schoon,
-    SOORTEN, LAAG_BTW_TYPES, nu, scho, rond } = ctx;
+    SOORTEN, nu, scho, rond } = ctx;
   const { store, nummer, standaardBtw, verwerkRegels, boek, boekMetCodenaam } = ctx;
   function publiek(f) {
     return {

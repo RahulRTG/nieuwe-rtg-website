@@ -6,11 +6,23 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const crypto = require('crypto');
 
-function maak() {
-  const db = { data: {} };
+function maak(extra) {
+  const db = { data: Object.assign({ facturen: [], btwAangiftes: [] }, extra || {}) };
   const rtmail = require('../server/kern/rtmail')({ db, save: () => {}, crypto });
-  const automatisering = require('../server/kern/automatisering')({ rtmail });
-  return { rtmail, automatisering };
+  /* Een vaste klok: het btw-draaiboek rekent met het laatst AFGESLOTEN kwartaal,
+     en zonder vaste klok bewijst deze toets op 1 april iets anders dan op
+     30 juni. */
+  const automatisering = require('../server/kern/automatisering')({ rtmail, db, nu: () => '2026-08-09T12:00:00.000Z' });
+  return { rtmail, automatisering, db };
+}
+/* Een factuur zoals kern/facturatie/motor.js hem boekt. */
+const rond = n => Math.round(n * 100) / 100;
+function factuur(datum, verkoper, incl, btw) {
+  const excl = rond(incl / (1 + btw / 100));
+  return { id: 'f' + datum + incl, nummer: 'RTG-' + incl, datum, at: datum + 'T10:00:00.000Z',
+    verkoper: { code: verkoper, naam: verkoper }, koper: { supplierCode: null, naam: 'K' },
+    regels: [{ omschrijving: 'Post', aantal: 1, stuk: incl, btw, incl }],
+    subtotaal: excl, btwBedrag: rond(incl - excl), totaal: incl };
 }
 
 test('welkom-draaiboek RTG: bericht in het eigen postvak, van de systeem-afzender', () => {
@@ -93,13 +105,45 @@ test('inkoop-draaiboek: concept naar de groothandel + kopie bij de zaak, niets b
   assert.equal(automatisering.inkoopVoorstel({ zaakCode: 'SAKURA', groothandelCode: '' }), null);
 });
 
-test('overheid-draaiboek: btw-herinnering met de voorbereide cijfers; indienen blijft een mens', () => {
-  const { rtmail, automatisering } = maak();
-  const m = automatisering.btwHerinnering({ zaakCode: 'SAKURA', periode: 'Q1 2026', bedrag: 842.5, deadline: '2026-04-30' });
-  assert.ok(m);
+test('overheid-draaiboek: de btw-herinnering rekent zijn eigen bedrag uit het factuurregister', () => {
+  // 242 incl 21% in het tweede kwartaal: 42,00 btw. De klok staat op 9 augustus,
+  // dus 2026K2 is het laatst afgesloten tijdvak.
+  const { automatisering } = maak({ facturen: [factuur('2026-05-10', 'SAKURA', 242, 21)] });
+  const m = automatisering.btwHerinnering({ zaakCode: 'SAKURA' });
+  assert.ok(m, 'er is iets te herinneren');
   assert.equal(m.naar, 'sakura@rtmail');
-  assert.match(m.tekst, /842\.50/);
-  assert.match(m.tekst, /2026-04-30/);
+  assert.match(m.tekst, /2026K2/, 'over het laatst afgesloten tijdvak');
+  assert.match(m.tekst, /EUR 42\.00/, 'het bedrag komt uit het register en niet uit een parameter');
+  assert.match(m.tekst, /Deadline: 2026-07-31/, 'een maand na afloop van het tijdvak, uitgerekend');
   assert.match(m.tekst, /indienen doe je zelf/i);
   assert.equal(automatisering.btwHerinnering({ zaakCode: '' }), null);
+
+  /* EN DE AANROEPER STUURT NIET. Dit draaiboek NAM een bedrag, een periode en
+     een deadline aan, en de route gaf ze door uit het verzoek -- dus wie de
+     route aanriep bepaalde wat er in de herinnering stond, ongeacht wat het
+     register zei. Wie zoiets terugbouwt hoort hier te zakken.
+
+     Deze toets komt uit een mutatie die AFSLOEG: een `bedrag`-parameter
+     terugzetten veranderde niets zolang niemand hem meestuurde. Een grendel die
+     alleen dichtblijft omdat er niet aan wordt geduwd, is niet getoetst. */
+  const gestuurd = automatisering.btwHerinnering({ zaakCode: 'SAKURA',
+    bedrag: 99999, centen: 9999900, periode: '2099K1', deadline: '2099-01-01' });
+  assert.match(gestuurd.tekst, /EUR 42\.00/, 'het bedrag blijft dat van het register');
+  assert.match(gestuurd.tekst, /2026K2/, 'en de periode ook');
+  assert.match(gestuurd.tekst, /Deadline: 2026-07-31/, 'en de deadline ook');
+  assert.equal(/99999|2099/.test(gestuurd.tekst), false, 'niets uit de aanroep komt in het bericht');
+});
+
+test('geen herinnering als er niets te herinneren valt', () => {
+  // niets gefactureerd
+  assert.equal(maak().automatisering.btwHerinnering({ zaakCode: 'SAKURA' }), null);
+  // wel gefactureerd, maar in een tijdvak dat nog loopt
+  const loopt = maak({ facturen: [factuur('2026-08-01', 'SAKURA', 242, 21)] });
+  assert.equal(loopt.automatisering.btwHerinnering({ zaakCode: 'SAKURA' }), null,
+    'over een lopend tijdvak hoeft nog niets te worden ingediend');
+  // wel gefactureerd, maar al ingediend
+  const klaar = maak({ facturen: [factuur('2026-05-10', 'SAKURA', 242, 21)],
+    btwAangiftes: [{ code: 'SAKURA', periode: '2026K2', stand: 'ingediend' }] });
+  assert.equal(klaar.automatisering.btwHerinnering({ zaakCode: 'SAKURA' }), null,
+    'wie zijn aangifte al deed krijgt geen herinnering; anders leert hij zijn post te negeren');
 });

@@ -18,7 +18,7 @@ const GIDS = Object.assign({},
   require('./appgids-data/deel1'), require('./appgids-data/deel2'),
   require('./appgids-data/deel3'), require('./appgids-data/deel4'),
   require('./appgids-data/deel5'), require('./appgids-data/deel6'),
-  require('./appgids-data/deel7'), require('./appgids-data/deel8'),
+  require('./appgids-data/deel7'), require('./appgids-data/deel7b'), require('./appgids-data/deel8'),
   require('./appgids-data/deel9'), require('./appgids-data/deel10'),
   require('./appgids-data/deel11'));
 

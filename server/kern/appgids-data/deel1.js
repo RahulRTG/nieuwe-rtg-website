@@ -1,6 +1,10 @@
 /* App-gids data, deel1 (de leden-apps, eerste helft; het vervolg staat in
    deel6). Zie ../appgids.js voor de uitleg; nieuwe pagina's krijgen hier (of in
-   het passende deel) een eigen entry. */
+   het passende deel) een eigen entry.
+
+   Opgeknipt op de 10 kB-grens: de staart staat in ./deel1b.js, en dit bestand
+   hangt hem er zelf achter -- hetzelfde patroon als deel6 en deel10. De knip
+   zit op een entry-grens; de samengevoegde gids is er niet door veranderd. */
 const G = (wat, doe, tip) => ({ wat, doe, tip });
 
 module.exports = Object.assign({
@@ -30,6 +34,12 @@ module.exports = Object.assign({
   '/apps/berichten.html': G('Je berichten met vrienden en partners, automatisch vertaald als dat nodig is.',
     ['Stuur een bericht op codenaam', 'Bel of videobel vanuit het gesprek', 'Deel een snap of verhaal met wie jij kiest'],
     'Berichten in een andere taal worden voor je vertaald; jij leest en schrijft gewoon in je eigen taal.'),
+  /* RTG Wereld staat naast comm.html en niet erin: contact is een eigen app met
+     een eigen levensduur (zie kern/wereld/koppel.js). Wat je hier leest hoort
+     dus ook uit te leggen dat het er twee zijn, en waar de naad zit. */
+  '/apps/wereld.html': G('RTG Wereld: al je sociale kanten in \u00e9\u00e9n app. Bovenaan kies je de wereld, de app blijft dezelfde.',
+    ['Schakel bovenaan tussen Alles, Lifestyle, Business, Communities en Priv\u00e9', 'Alles wat je in De Salon, op Pulse of op het zakelijke prikbord plaatst, komt hier samen in \u00e9\u00e9n tijdlijn', 'Tik "Bericht" bij iemand: je springt naar Berichten, in het gesprek met die persoon'],
+    'E\u00e9n identiteit, \u00e9\u00e9n netwerk, \u00e9\u00e9n app: je hoeft niet naar een aparte werk-app om een zakelijk contact te spreken, want het is gewoon dezelfde persoon.'),
   '/apps/genootschap.html': G('Genootschap: je besloten groepen binnen RTG, met een prikbord en bijeenkomsten.',
     ['Richt er een op en kies wie erbij mag: openbaar, besloten of geheim', 'Zet iets op het prikbord, of stel een peiling voor met een paar keuzes', 'Roep een bijeenkomst uit en zie wie ja, misschien of nee zegt'],
     'Geheim is hier echt geheim: zo\'n genootschap staat in geen enkele lijst en is alleen met een uitnodiging te vinden.'),
@@ -45,4 +55,28 @@ module.exports = Object.assign({
   '/apps/pulse.html': G('Pulse: wat er nu speelt in jouw RTG-wereld, rustig gebundeld.',
     ['Lees de hoogtepunten van vandaag', 'Tik door naar de app waar iets gebeurt', 'Stel in waarover je seintjes wilt'],
     'Geen eindeloze feed: Pulse toont wat er is en houdt dan op. Dat is bewust.'),
+  '/apps/nieuws.html': G('RTG Nieuws: de redactie bundelt wat voor leden telt.',
+    ['Lees artikelen per rubriek', 'Bewaar wat je later wilt lezen', 'Reageer waar dat kan'],
+    'Kwaliteit boven snelheid: liever één goed stuk dan tien snelle.'),
+  '/apps/hotels.html': G('Verblijven: hotels, appartementen en villa\'s van onze partners, met ledenprijzen.',
+    ['Bekijk kamers, foto\'s en vrije data', 'Boek direct; de partner bevestigt', 'Open je kamer met keyless waar dat kan'],
+    'De ledenprijsgarantie geldt overal: nooit meer dan de publieke prijs van de partner zelf.'),
+  '/apps/reisbureau.html': G('Het RTG-reisbureau: samengestelde reizen tegen de nettoprijs.',
+    ['Blader door de reizen of vraag AI-reisadvies', 'Vraag een reis aan; een reisadviseur bevestigt', 'Volg en annuleer je aanvragen onder Mijn'],
+    'Vertel je wens in gewone woorden; het advies wijst de best passende reis aan en legt uit waarom.'),
+  '/apps/foodcourt.html': G('De Food Court: alle restaurants op een rij, reserveren in een paar tikken.',
+    ['Kies een restaurant en bekijk de tijdsloten', 'Reserveer; de zaak beslist en je krijgt bericht', 'Bekijk keuken, prijs en ledenvoordeel per zaak'],
+    'Reserveer ruim vooruit voor de populaire avonden; annuleren kan altijd netjes in de app.'),
+  '/apps/uitgaan.html': G('Uitgaan: bars, clubs en beachclubs met hun avonden en gastenlijsten.',
+    ['Bekijk de avonden per adres', 'Zet jezelf op de gastenlijst', 'Laat je entreecode zien aan de deur'],
+    'Je leeftijdslaag bepaalt wat je ziet; dat is voor je eigen veiligheid en die van de zaak.'),
+  '/apps/mall.html': G('De RTG Mall: de enige plek waar je bij RTG koopt, van eigen-merk tot boutieks, plus de bibliotheken.',
+    ['Bestel eigen-merk en boerderijproducten direct', 'Blader door de App- en Reis-Bibliotheek; installeren is inbegrepen', 'Leg mode apart of laat een maat naar de paskamer brengen'],
+    'De bibliotheken zijn een pas-voordeel: tienduizenden apps en een miljoen reisgidsen, zonder bijbetalen.'),
+  '/apps/pay.html': G('RTG Pay: betalen en tikken tussen vrienden, veilig en direct.',
+    ['Stuur of vraag een tik', 'Bekijk je saldo en geschiedenis', 'Splits een rekening met je gezelschap'],
+    'Voor elke betaling zie je eerst een bevestiging; niets gaat er zonder jouw akkoord uit.'),
+  '/apps/wbw.html': G('Wie betaalt wat: groepsuitgaven bijhouden met een live balans.',
+    ['Maak een groep en zet uitgaven erin', 'Zie live wie wat voorschoot', 'Verreken in één keer via RTG Pay'],
+    'Direct na de vakantie verrekenen voorkomt het eeuwige "dat komt nog wel".')
 }, require('./deel1b'));

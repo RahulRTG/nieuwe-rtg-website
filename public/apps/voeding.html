@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Voeding</title>
+<meta name="theme-color" content="#0C0C0B">
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/icon.svg" type="image/svg+xml">
+<link href="/fonts/fonts.css" rel="stylesheet">
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/veiligheid.css" rel="stylesheet">
+<link href="/shared/dagkleur.css" rel="stylesheet">
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<style>
+  .grens{border:1px solid var(--line);border-left:2px solid var(--goldlicht);
+    padding:1rem 1.1rem;margin:.2rem 0 1.4rem;}
+  .grens b{display:block;font-family:'Bodoni Moda',Georgia,serif;font-size:1.05rem;font-weight:600;}
+  .grens p{font-size:.86rem;line-height:1.6;color:var(--soft);margin:.4rem 0 0;}
+  .grens ul{list-style:none;padding:0;margin:.6rem 0 0;}
+  .grens li{font-size:.84rem;line-height:1.6;padding:.2rem 0;}
+  .dag{border-top:1px solid var(--line);padding:.9rem 0;}
+  .dag.nu .datum{color:var(--txt);}
+  .dag .datum{font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--soft);}
+  .maal{display:flex;align-items:baseline;gap:.8rem;padding:.45rem 0;}
+  .maal .wanneer{font-size:.74rem;color:var(--soft);min-width:5.5rem;}
+  .maal .wat{flex:1 1 auto;font-size:.92rem;}
+  .maal .wat span{display:block;color:var(--soft);font-size:.78rem;margin-top:.1rem;}
+  .leeg{color:var(--soft);font-size:.82rem;font-style:italic;padding:.3rem 0;}
+  .geheugen{font-size:.84rem;line-height:1.6;color:var(--soft);}
+  .geheugen b{color:var(--txt);}
+  .rij{display:flex;gap:.4rem;flex-wrap:wrap;align-items:center;margin-top:.8rem;}
+  .knop.mini{padding:.4rem .7rem;font-size:.8rem;}
+  .lbl{display:block;margin:.7rem 0 .2rem;font-size:.8rem;color:var(--soft);}
+  #vWat,#vNotitie,#vDag,#vWanneer{width:100%;}
+  .knop.hoofd{margin-top:.9rem;}
+</style>
+<script src="/shared/seizoen.js" defer></script>
+<script src="/shared/veiligheid.js" defer></script>
+<link href="/shared/ios.css" rel="stylesheet">
+</head>
+<body class="rtg-stijl">
+<a class="skip" href="#inhoud">Naar de inhoud</a>
+<header class="kop">
+  <a href="/apps/life.html" aria-label="Terug naar RTG Life">&#8592;</a>
+  <h1>Voeding</h1>
+  <div class="rek"></div>
+  <span class="stil">een plan, geen telling</span>
+</header>
+<main id="inhoud">
+  <div id="grens"></div>
+
+  <section aria-label="Deze week">
+    <h2>Deze week</h2>
+    <div id="week"><p class="stil">Laden...</p></div>
+  </section>
+
+  <section aria-label="Een maaltijd erbij">
+    <h2>Een maaltijd erbij</h2>
+    <div class="kaart">
+      <label class="lbl" for="vDag">Welke dag?</label>
+      <select id="vDag"></select>
+      <label class="lbl" for="vWanneer">Welk moment?</label>
+      <select id="vWanneer"></select>
+      <label class="lbl" for="vWat">Wat wilt u eten? In uw eigen woorden.</label>
+      <input id="vWat" maxlength="200" placeholder="Bijv. pasta met spinazie">
+      <label class="lbl" for="vNotitie">Iets erbij om te onthouden.</label>
+      <input id="vNotitie" maxlength="200" placeholder="Bijv. restje meenemen">
+      <button class="knop hoofd" id="vMaak">Toevoegen</button>
+    </div>
+  </section>
+
+  <section aria-label="Uw zorgprofiel">
+    <h2>Wat u zelf heeft doorgegeven</h2>
+    <div class="kaart"><div id="geheugen" class="geheugen"></div></div>
+  </section>
+
+  <section aria-label="Wat dit niet doet">
+    <h2>Wat dit niet doet</h2>
+    <div class="kaart">
+      <p class="stil">Er wordt niets geteld. Geen calorie&euml;n, geen macro's, geen voedingswaarde:
+      niemand weet hoeveel gram er in zijn pan zat, en wie het toch vraagt krijgt een verzonnen cijfer
+      terug dat daarna als feit door het systeem reist.</p>
+      <p class="stil">Er komt ook geen oordeel. Gezond en ongezond zijn geen eigenschappen van een
+      maaltijd maar van een heel leven, en RTG kent dat leven niet.</p>
+      <p class="stil">En er is geen filter dat zegt welk gerecht veilig is. Alleen de keuken weet wat
+      er in de pan ging; een scherm dat "veilig" zegt op gegevens die het niet heeft gecontroleerd, is
+      erger dan geen scherm. Uw allergenen reizen al mee naar de zaak waar u bestelt &mdash; daar staat
+      een mens, en dat is de weg die werkt.</p>
+    </div>
+  </section>
+
+  <div id="onder" class="rtgdeel-vast"></div>
+</main>
+<script>
+(() => {
+  const $ = s => document.querySelector(s);
+  const esc = s => Veilig.esc(String(s == null ? '' : s));
+  const WEEKDAG = ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag'];
+  const dagNaam = op => WEEKDAG[new Date(op + 'T00:00:00Z').getUTCDay()] + ' ' + op.slice(8) + '-' + op.slice(5, 7);
+
+  function tekenGrens(g) {
+    if (!g) return;
+    $('#grens').innerHTML = '<div class="grens"><b>' + esc(g.kop) + '</b>' +
+      '<p>' + esc(g.tekst) + '</p><ul>' + (g.wegen || []).map(w =>
+        '<li><b>' + esc(w.naam) + '</b> &middot; ' + esc(w.hoe) + '</li>').join('') + '</ul></div>';
+  }
+
+  /* De allergenen staan er als GEHEUGENSTEUN voor het lid zelf. Er wordt nergens
+     nagekeken of het plan ze bevat: een waarschuwing die soms komt, leest als
+     een controle die altijd draait. */
+  function tekenGeheugen(d) {
+    const el = $('#geheugen');
+    const a = d.allergenen || [];
+    if (!a.length && !d.dieet) {
+      el.innerHTML = 'U heeft geen allergenen of dieet doorgegeven. Dat doet u in de app, bij ' +
+        'uw zorgprofiel.';
+      return;
+    }
+    el.innerHTML = (a.length ? 'Allergisch voor <b>' + esc(a.join(', ')) + '</b>. ' : '') +
+      (d.dieet ? 'Dieet: <b>' + esc(d.dieet) + '</b>. ' : '') +
+      '<br>' + esc(d.allergenenUitleg || '');
+  }
+
+  function tekenWeek(week) {
+    const el = $('#week');
+    el.innerHTML = week.map(d => '<div class="dag' + (d.vandaag ? ' nu' : '') + '">' +
+      '<span class="datum">' + esc(dagNaam(d.op)) + (d.vandaag ? ' &middot; vandaag' : '') + '</span>' +
+      (d.maaltijden.length
+        ? d.maaltijden.map(m => '<div class="maal">' +
+            '<span class="wanneer">' + esc(m.label) + '</span>' +
+            '<span class="wat">' + esc(m.wat) +
+              (m.notitie ? '<span>' + esc(m.notitie) + '</span>' : '') + '</span>' +
+            '<button class="knop mini" data-weg="' + esc(m.id) + '">Weg</button></div>').join('')
+        : '<p class="leeg">Nog niets gepland.</p>') +
+      '</div>').join('');
+    el.querySelectorAll('[data-weg]').forEach(b => b.addEventListener('click', async () => {
+      try { teken(await Veilig.api('/api/voeding/weg', { id: b.dataset.weg })); }
+      catch (e) { Veilig.melding(e.message); }
+    }));
+  }
+
+  function vulKeuzes(d) {
+    const dag = $('#vDag');
+    if (dag.options.length !== d.week.length) {
+      dag.innerHTML = d.week.map(x => '<option value="' + esc(x.op) + '">' +
+        esc(dagNaam(x.op)) + (x.vandaag ? ' (vandaag)' : '') + '</option>').join('');
+    }
+    const wan = $('#vWanneer');
+    if (!wan.options.length) {
+      wan.innerHTML = (d.momenten || []).map(m =>
+        '<option value="' + esc(m.id) + '">' + esc(m.label) + '</option>').join('');
+    }
+  }
+
+  function teken(d) {
+    tekenGrens(d.grens);
+    tekenWeek(d.week || []);
+    tekenGeheugen(d);
+    vulKeuzes(d);
+  }
+
+  async function laad() {
+    try { teken(await Veilig.api('/api/voeding')); }
+    catch (e) { $('#week').innerHTML = '<p class="stil">' + esc(e.message) + '</p>'; }
+  }
+
+  function start() {
+    $('#vMaak').addEventListener('click', async () => {
+      try {
+        teken(await Veilig.api('/api/voeding/zet', {
+          op: $('#vDag').value, wanneer: $('#vWanneer').value,
+          wat: $('#vWat').value, notitie: $('#vNotitie').value }));
+        $('#vWat').value = ''; $('#vNotitie').value = '';
+        Veilig.melding('Toegevoegd.');
+      } catch (e) { Veilig.melding(e.message); }
+    });
+    laad();
+  }
+
+  if (document.readyState !== 'loading') start();
+  else window.addEventListener('load', start);
+})();
+</script>
+<script src="/shared/deelmenu.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
+<script src="/shared/ios.js" defer></script>
+</body>
+</html>

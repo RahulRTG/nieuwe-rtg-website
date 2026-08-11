@@ -28,7 +28,24 @@
     }));
   }
 
+  /* ---- De Regie van de zaak, in duimstand ----
+     Hetzelfde scherm als in de zaak-app; alleen de weergave is smaller. `mag`
+     staat hier op false: op de vloer kijk je en zet je iets op de lijst, maar
+     beleid en besluiten horen op een scherm waar je bij zit. De server weigert
+     het hoe dan ook zonder managerrol -- dit is de nette kant, niet de grendel. */
+  let pdRegie = null;
+  function renderPdRegie(){
+    const wrap = $('#pdRegieWrap');
+    if (!wrap || !window.RTGZaakCommand) return;
+    if (pdRegie) { pdRegie.ververs(); return; }
+    pdRegie = RTGZaakCommand.toon(wrap, {
+      api: (pad, body) => API.call('/supplier/command/' + pad, body),
+      compact: true, mag: false, meld: toast
+    });
+  }
+
   function openTab(tab, focusView){
+    if (tab === 'regie') renderPdRegie();
     document.querySelectorAll('.view').forEach(v => v.classList.toggle('active', v.dataset.view===tab));
     document.querySelectorAll('.tabbar button').forEach(b => {
       const on = b.dataset.tab===tab;

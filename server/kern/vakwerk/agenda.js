@@ -3,8 +3,16 @@
    lid boekt dan in een echt vrij tijdvak in plaats van een willekeurige tijd te typen.
    Vrije tijden houden rekening met de duur van de dienst en met wat al geboekt is.
    Krijgt de gedeelde ctx van kern/vakwerk/index.js. */
+/* De klok is die van de ZAAK en niet die van de server. Stond dit op
+   servertijd, dan liet een zaak op Ibiza tijdvakken vallen die daar nog niet
+   voorbij waren, en bood ze tijdvakken aan die daar al waren geweest. De zone
+   komt uit kern/tijdzone.js -- dezelfde functie die de Mall gebruikt, zodat het
+   getal op de Mall-kaart en het getal in dit boekscherm niet uit elkaar kunnen
+   lopen. */
+const { nuBijZaak } = require('../tijdzone');
+
 module.exports = (ctx) => {
-  const { save, findSupplier, boekingenVanZaak, genreVan, vandaagStr, datumVan, tijdVan,
+  const { save, findSupplier, boekingenVanZaak, genreVan, datumVan, tijdVan,
     geldigeTijd, naarMin, naarTijd } = ctx;
 
   function urenVan(s) {
@@ -56,12 +64,15 @@ module.exports = (ctx) => {
     const dienst = (s.services || []).find(x => x.id === serviceId);
     const duur = (dienst && dienst.duurMin) || 60;
     const u = urenVan(s);
-    const dag = new Date(datum + 'T12:00:00').getDay();
-    if (datum < vandaagStr() || !u.dagen[dag] || u.geblokkeerd.includes(datum)) return { ok: true, datum, duurMin: duur, tijden: [] };
+    // de weekdag van een kalenderdatum, zonder dat de server-zone hem verschuift
+    const dag = new Date(datum + 'T12:00:00Z').getUTCDay();
+    const hier = nuBijZaak(s);
+    if (datum < hier.datum || !u.dagen[dag] || u.geblokkeerd.includes(datum)) return { ok: true, datum, duurMin: duur, tijden: [] };
     const open = naarMin(u.van), dicht = naarMin(u.tot);
     const bezet = bezetOp(code, datum);
     const stap = Math.max(30, Math.min(duur, 120));
-    const nuMin = datum === vandaagStr() ? (new Date().getHours() * 60 + new Date().getMinutes()) : -1;
+    // "al voorbij" is voorbij BIJ DE ZAAK, niet op de server
+    const nuMin = datum === hier.datum ? hier.minuten : -1;
     const tijden = [];
     for (let m = open; m + duur <= dicht; m += stap) {
       if (m <= nuMin) continue;

@@ -690,6 +690,57 @@
     } catch (e) {}
   }
 
+  /* ------------------------------------------- binnenkomen vanuit de wereld
+
+     RTG Wereld (/apps/wereld.html) is een EIGEN app en deze blijft dat ook; de
+     naad ertussen is deze ene link. Overal waar je daar een mens ziet staat
+     "Bericht", en die komt hier binnen als ?met=<codenaam>[&over=rtg://...].
+
+     Waarom een CODENAAM en geen sleutel: de identiteitskluis blijft gescheiden,
+     en een link belandt in een browserhistorie, een melding of een screenshot.
+     /api/comm/begin wil een sleutel, dus die zoeken we hier op in je eigen
+     verbindingen -- de sleutel gaat wel de aanvraag in, maar nooit de URL.
+
+     Staat de codenaam niet tussen je verbindingen, dan zeggen we dat en doen we
+     niets. Stil de inbox tonen zou lijken alsof de knop kapot is (regel 5). */
+  function uitDeWereld() {
+    var q = new URLSearchParams(location.search);
+    var met = q.get('met'), over = q.get('over'), lade = q.get('lade');
+    /* ?lade= komt van de wereldschakelaar: kies je daar Business, dan opent de
+       inbox in de la die daarbij hoort. We controleren hem tegen de laden die
+       de SERVER meegaf -- een onbekende la stil accepteren zou een lege inbox
+       geven die eruitziet als "je hebt geen berichten". */
+    if (lade && staat.laden.some(function (l) { return l.id === lade; })) {
+      staat.lade = lade;
+      return laadInbox().then(function () { if (met) return uitDeWereldMet(met, over); });
+    }
+    if (!met) return Promise.resolve();
+    return uitDeWereldMet(met, over);
+  }
+
+  function uitDeWereldMet(met, over) {
+    if (!met) return Promise.resolve();
+    return fetch('/api/member/connections', { method: 'POST',
+      headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + token }, body: '{}' })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        var c = (d.connections || []).find(function (x) { return x.codename === met; });
+        if (!c) throw new Error('Je bent nog niet verbonden met ' + met + '.');
+        return api('/begin', { met: c.key });
+      })
+      .then(function (d) {
+        return laadInbox().then(function () {
+          open(d.gesprek);
+          /* Het onderwerp waar het gesprek over gaat, alvast in het veld -- als
+             verwijzing, niet als uitgeschreven link. De ontvanger opent hem via
+             dezelfde koppelkaart (kern/wereld/koppel.js), dus een app die
+             verhuist breekt geen oude gesprekken. */
+          if (over) $('#veld').value = over + '\n';
+        });
+      })
+      .catch(function (e) { alert(e.message); });
+  }
+
   if (!token) {
     $('#gesprekken').innerHTML = '<p class="leeg">Log eerst in op de app.</p>';
   } else {
@@ -697,7 +748,7 @@
        aanwezig; we zetten onze lijst zodra hij er is. Zonder deze wacht zou de
        eerste RTGAppMenu.zet() in het niets vallen en stond er in het menu
        alleen wat de vondstlaag zelf op het scherm vindt. */
-    laadInbox().then(function () {
+    laadInbox().then(uitDeWereld).then(function () {
       var pogingen = 0;
       var wacht = setInterval(function () {
         if (window.RTGAppMenu) { clearInterval(wacht); vulAppMenu(); }

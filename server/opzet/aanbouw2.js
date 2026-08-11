@@ -77,6 +77,8 @@ module.exports = function bouwKernAanTwee(kern, grens) {
   require('../routes/code')(grens('code'));
   // RTG Veilig: Thuiswacht, Codewoord, Vitale check-in en Thuisrust.
   require('../routes/veiligheid')(grens('veiligheid'));
-  // Wie ben ik voor Rahul: omgang, voornaamwoorden en de eigen geloofskeuze.
-  require('../routes/ik')(grens('ik'));
+  /* De RTG Life-stapel staat in ./aanbouw3.js. Die hangt hier ONDERAAN en niet
+     ergens in het midden: elke laag daar leest lagen die hierboven zijn
+     gemonteerd (de agenda, zorg, verzorging, de identiteitskluis). */
+  require('./aanbouw3')(kern, grens);
 };

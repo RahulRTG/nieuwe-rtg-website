@@ -153,6 +153,11 @@
 
   const TABDEF = {
     home:     { label:'Overzicht', svg:'<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/>' },
+    /* Regie heeft bewust GEEN cap: elke zaak, van eenmanszaak tot resort, heeft
+       baat bij zien wat er op hem wacht en wat er scheef staat. Een cap zou
+       betekenen dat de kleinste zaken -- die het minste personeel hebben om het
+       zelf bij te houden -- hem als eerste missen. */
+    regie:    { label:'Regie',     svg:'<circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1"/>' },
     orders:   { label:'Orders',    svg:'<path d="M6 2h9l3 3v17H6z"/><path d="M9 8h6M9 12h6M9 16h4"/>', cap:'orders' },
     rides:    { label:'Ritten',    svg:'<path d="M5 11l1.5-4.5A2 2 0 0 1 8.4 5h7.2a2 2 0 0 1 1.9 1.5L19 11"/><rect x="3" y="11" width="18" height="6" rx="2"/><circle cx="7.5" cy="17.5" r="1.5"/><circle cx="16.5" cy="17.5" r="1.5"/>', cap:'rides' },
     menu:     { label:'Menu',      svg:'<path d="M4 3v18M8 3v6a2 2 0 0 1-4 0M18 3c-2 0-3 2-3 5s1 4 3 4v9"/>', cap:'menu' },
@@ -1620,6 +1625,175 @@
     finBusy = false;
     renderStation();
   }
+  /* ---- de btw-aangifte van de zaak (server: kern/fiscaal/btwaangifte.js) ----
+
+     Dit scherm rekent zelf NIETS uit. Het toont wat de aangifte zegt, en die
+     komt uit het factuurregister. Een tweede optelling hier zou een tweede
+     btw-motor zijn, en de hele opzet van die laag is dat er er maar een is. Ook
+     de periodegrenzen komen van de server mee (van/tot); hier worden alleen de
+     labels 2026K3 gemaakt.
+
+     De weigeringen worden letterlijk getoond en niet vertaald naar iets
+     vriendelijkers: "de periode loopt nog", "de cijfers zijn veranderd" en "al
+     ingediend" zijn precies wat de ondernemer moet lezen.
+
+     Een eigen deelbestand OP DEZE PLEK, en niet aan het eind van een deel: de
+     delen worden rauw aaneengeplakt, dus de plek in de stroom bepaalt in welke
+     scope een functie staat. Hier, vlak na laadFinance, is dat de scope van de
+     app zelf, en kunnen renderStation (deel 15) en de bedrading (deel 22) er
+     allebei bij. Aan het eind van deel 12 zat dit middenin een andere functie
+     en was het op het scherm een ReferenceError; check.js regel 42 wees dat aan. */
+  let btwData = null, btwBusy = false, btwOpen = null, btwMsg = '', btwNaheff = null;
+  async function laadBtw(){
+    if (btwBusy) return;
+    btwBusy = true;
+    try { btwData = await API.call('/supplier/btw/aangiftes', {}); }
+    catch(e){ btwData = { error: e.message, aangiftes: [] }; }
+    /* De naheffingen die de Belastingdienst oplegde. Concepten zitten er niet
+       bij -- die filtert de server weg, want een concept is nog geen besluit. */
+    try { btwNaheff = (await API.call('/supplier/btw/naheffingen', {})).naheffingen; }
+    catch(e){ btwNaheff = []; }
+    btwBusy = false;
+    renderStation();
+  }
+  function btwPeriodes(){
+    const d = new Date(); const uit = [];
+    let j = d.getUTCFullYear(), k = Math.floor(d.getUTCMonth() / 3) + 1;
+    for (let i = 0; i < 5; i++){ uit.push(j + 'K' + k); k -= 1; if (k === 0){ k = 4; j -= 1; } }
+    return uit;
+  }
+  /* De kaart. Bewust NAAST "Btw deze maand" en niet als hetzelfde getal
+     eronder: dat bord is de maandstand uit de kassa en de boekingen, de
+     aangifte is de periode uit het factuurregister. Twee verschillende vragen,
+     en ze horen niet als een cijfer gepresenteerd te worden. */
+  function btwKaart(){
+    if (!btwData && !btwBusy) laadBtw();
+    const eerder = ((btwData && btwData.aangiftes) || []).slice().sort((a, b) => (a.periode < b.periode ? 1 : -1));
+    const toon = btwOpen || eerder[0] || null;
+    return '<div class="tkc h-volbreed"><h3>'+T('fn.btwaan','Btw-aangifte')+'</h3>'+
+      /* Deze zin ZEI eerst "omzet zonder factuur staat er niet in". Dat was
+         waar en het was een pleister: een betaalde bestelling, boeking of rit
+         boekte helemaal geen factuur, dus die omzet viel buiten de aangifte.
+         Sinds kern/lidacties/factuur.js boekt elke betaalde transactie er een,
+         langs welke weg hij ook wordt afgerekend -- dus staat er nu wat er
+         gebeurt, en niet meer waar de lezer op moest letten. */
+      '<div class="tkc-who">'+T('fn.btwaan.s','Opgemaakt uit uw factuurregister: elke regel telt mee met het tarief dat erop staat. Elke betaalde transactie boekt zelf een factuur, ook een bestelling die aan de balie wordt afgerekend. Controleren en indienen doet u zelf; RTG dient nooit voor u in en verzendt niets.')+'</div>'+
+      '<div class="btw-rij">'+
+      '<select class="st-in btw-per" id="btwPer">'+
+      btwPeriodes().map(p => '<option value="'+p+'"'+(toon && toon.periode === p ? ' selected' : '')+'>'+p+'</option>').join('')+'</select>'+
+      '<button class="obtn primary" id="btwOp">'+T('fn.btwopmaak','Opmaken')+'</button></div>'+
+      (btwMsg ? '<div class="tkc-who btw-melding">'+escT(btwMsg)+'</div>' : '')+
+      (btwData && btwData.error ? '<div class="tkc-who">'+escT(btwData.error)+'</div>' : '')+
+      btwDetail(toon)+
+      (eerder.length > 1 ? '<div class="tkc-who btw-eerder">'+T('fn.btweerder','Eerder')+': '+
+        eerder.slice(1, 6).map(a => escT(a.periode)+' ('+(a.stand === 'ingediend' ? T('fn.btwin','ingediend') : T('fn.btwcon','concept'))+')').join(' · ')+'</div>' : '')+
+      btwNaheffingen()+
+      '</div>';
+  }
+  /* De naheffingen. Alleen tonen wat er staat: het bedrag, de grond van een
+     boete en het besluit op een bezwaar komen alle drie van de Belastingdienst,
+     en het scherm rekent of vertaalt er niets aan. */
+  function btwNaheffingen(){
+    if (!btwNaheff || !btwNaheff.length) return '';
+    return '<div class="btw-blok"><b>'+T('fn.nh','Naheffing van de Belastingdienst')+'</b>'+
+      btwNaheff.map(n =>
+        '<div class="st-row"><span>'+escT(n.kenmerk)+' · '+escT(n.periode)+
+        '<span class="sub">'+T('fn.nh.stand','stand')+': '+escT(n.status)+
+        (n.boeteCenten ? ' · '+T('fn.nh.boete','boete')+' '+eur(n.boeteCenten/100)+(n.boeteGrond ? ' ('+escT(n.boeteGrond)+')' : '') : '')+
+        (n.vervaltOp ? ' · '+T('fn.nh.vervalt','vervalt')+' '+escT(n.vervaltOp) : '')+
+        (n.bezwaar && n.bezwaar.besluit ? ' · '+T('fn.nh.besluit','besluit op bezwaar')+': '+escT(n.bezwaar.besluit)+' · '+escT(n.bezwaar.motivering || '') : '')+
+        '</span></span><b class="btw-saldo betaal">'+eur(n.totaalCenten/100)+'</b></div>'+
+        (n.betaaldOp
+          ? '<div class="tkc-who">'+T('fn.nh.betaald','Betaald op')+' '+escT(String(n.betaaldOp).slice(0,10))+
+            (n.terugbetaaldOp ? ' · '+T('fn.nh.terug','teruggestort op')+' '+escT(String(n.terugbetaaldOp).slice(0,10)) : '')+'</div>'
+          /* Betalen mag zolang de aanslag staat -- ook tijdens een bezwaar, want
+             bezwaar schort de betaling niet op. Is hij vernietigd, dan valt er
+             niets meer te betalen en staat de knop er dus ook niet. */
+          : ['vastgesteld','bezwaar','gehandhaafd'].includes(n.status)
+            ? '<div class="btw-rij"><button class="obtn primary" data-nhbet="'+escT(n.id)+'">'+
+              T('fn.nh.betaal','Betalen')+' '+eur(n.totaalCenten/100)+'</button></div>' : '')+
+        (n.status === 'vastgesteld'
+          ? '<div class="btw-rij"><input class="st-in btw-kenmerk" id="nhr'+escT(n.id)+'" placeholder="'+T('fn.nh.reden','Waarom bent u het er niet mee eens?')+'">'+
+            '<button class="obtn" data-nhbez="'+escT(n.id)+'">'+T('fn.nh.bezwaar','Bezwaar maken')+'</button></div>'
+          : n.status === 'bezwaar' ? '<div class="tkc-who">'+T('fn.nh.loopt','Uw bezwaar loopt; een andere inspecteur beoordeelt het.')+'</div>' : '')
+      ).join('')+'</div>';
+  }
+  function btwBedrading(el){
+    async function opmaken(periode, correctie){
+      btwMsg = '';
+      try {
+        const d = await API.call('/supplier/btw/opmaken', { periode, correctie: !!correctie });
+        btwOpen = d.aangifte;
+        btwMsg = d.bijgewerkt ? T('fn.btwbij','De aangifte is bijgewerkt met de facturen die er sindsdien bij kwamen.') : '';
+        await laadBtw();
+      } catch(e){ toast(e.message); btwMsg = e.message; renderStation(); }
+    }
+    const bO = el.querySelector('#btwOp'); if (bO) bO.addEventListener('click', () => opmaken(el.querySelector('#btwPer').value, false));
+    const bC = el.querySelector('#btwCorr'); if (bC) bC.addEventListener('click', () => opmaken(bC.dataset.p, true));
+    el.querySelectorAll('[data-nhbet]').forEach(b => b.addEventListener('click', async () => {
+      btwMsg = '';
+      try {
+        const d = await API.call('/supplier/btw/naheffing/betaal', { id: b.dataset.nhbet });
+        btwMsg = d.let || '';
+        btwData = null; await laadBtw();
+      } catch(e){ toast(e.message); btwMsg = e.message; renderStation(); }
+    }));
+    el.querySelectorAll('[data-nhbez]').forEach(b => b.addEventListener('click', async () => {
+      const veld = el.querySelector('#nhr' + b.dataset.nhbez);
+      btwMsg = '';
+      try {
+        const d = await API.call('/supplier/btw/naheffing/bezwaar', { id: b.dataset.nhbez, reden: veld ? veld.value : '' });
+        btwMsg = d.let || '';
+        btwData = null; await laadBtw();
+      } catch(e){ toast(e.message); btwMsg = e.message; renderStation(); }
+    }));
+    const bD = el.querySelector('#btwDien'); if (bD) bD.addEventListener('click', async () => {
+      btwMsg = '';
+      try {
+        const d = await API.call('/supplier/btw/indienen', { id: bD.dataset.id, kenmerk: (el.querySelector('#btwKenmerk') || {}).value || '' });
+        btwOpen = d.aangifte; btwMsg = d.let || '';
+        await laadBtw();
+      } catch(e){ toast(e.message); btwMsg = e.message; renderStation(); }
+    });
+  }
+  /* ---- de btw-aangifte, deel 2: HET DETAIL van een aangifte ----
+
+     Afgesplitst van leverancier-12a.js, dat tegen de omvanglat aan liep toen de
+     naheffing erbij kwam. Op deze plek in de stroom -- de delen worden rauw
+     aaneengeplakt -- staat dit in dezelfde scope als btwKaart() hierboven, dus
+     die kan er gewoon bij; zie de kop van leverancier-12a.js voor waarom die
+     plek uitmaakt. */
+  function btwDetail(a){
+    if (!a) return '';
+    const rijen = (a.tarieven || []).map(r =>
+      '<div class="st-row"><span>'+T('fn.btwomzet','Omzet')+' '+r.tarief+'%'+
+      '<span class="sub">'+(r.rubriek ? T('fn.btwrub','rubriek')+' '+r.rubriek+' · ' : '')+
+        T('fn.grondslag','grondslag')+' '+eur(r.omzetCenten/100)+'</span>'+
+      '</span><b class="btw-btw">'+eur(r.btwCenten/100)+'</b></div>').join('')
+      || '<div class="tkc-who">'+T('fn.btwleeg','Geen facturen in deze periode.')+'</div>';
+    const terug = a.saldoCenten < 0;
+    return '<div class="btw-blok">'+
+      '<div class="st-row"><span><b>'+escT(a.periode)+'</b>'+(a.soort === 'correctie' ? ' ('+T('fn.btwcorr','correctie')+')' : '')+
+        '<span class="sub">'+escT(a.van)+' t/m '+escT(a.tot)+' · '+a.verkoopFacturen+' '+T('fn.btwvk','verkoopfacturen')+
+        ' · '+a.inkoopFacturen+' '+T('fn.btwik','inkoopfacturen')+'</span></span>'+
+        '<span class="sub">'+(a.stand === 'ingediend' ? T('fn.btwin','ingediend') : T('fn.btwcon','concept'))+'</span></div>'+
+      rijen+
+      '<div class="st-row streep"><span>'+T('fn.btwversch','Verschuldigde btw')+'</span><b>'+eur(a.verschuldigdCenten/100)+'</b></div>'+
+      '<div class="st-row"><span>'+T('fn.btwvoor','Voorbelasting')+'<span class="sub">'+T('fn.btwvoor.s','btw op uw inkoopfacturen')+'</span></span><b>- '+eur(a.voorbelastingCenten/100)+'</b></div>'+
+      '<div class="st-row streep"><span><b>'+(terug ? T('fn.btwterug','Terug te vragen') : T('fn.btwbetaal','Te betalen'))+'</b></span>'+
+        '<b class="btw-saldo '+(terug ? 'terug' : 'betaal')+'">'+eur(Math.abs(a.saldoCenten)/100)+'</b></div>'+
+      (a.verschilCenten != null ? '<div class="tkc-who">'+T('fn.btwversch2','Verschil met de ingediende aangifte')+': '+eur(a.verschilCenten/100)+'</div>' : '')+
+      (a.let ? '<div class="tkc-who">'+escT(a.let)+'</div>' : '')+
+      (a.stand === 'ingediend'
+        ? '<div class="tkc-who">'+T('fn.btwinop','Ingediend op')+' '+escT(String(a.ingediendOp).slice(0, 10))+' '+T('fn.btwdoor','door')+' '+
+            escT(a.ingediendDoor)+' · '+T('fn.btwkenmerk','kenmerk')+' '+escT(a.kenmerk)+'</div>'+
+          '<button class="obtn" id="btwCorr" data-p="'+escT(a.periode)+'">'+T('fn.btwmaakcorr','Correctie opmaken')+'</button>'
+        : a.periodeLoopt ? ''
+        : '<div class="btw-rij">'+
+          '<input class="st-in btw-kenmerk" id="btwKenmerk" placeholder="'+T('fn.btwkenmerk.ph','Kenmerk van de Belastingdienst')+'">'+
+          '<button class="obtn primary" id="btwDien" data-id="'+escT(a.id)+'">'+T('fn.btwdien','Indienen vastleggen')+'</button></div>')+
+      '</div>';
+  }
   // het vakwerk-dashboard (dienstverlenende genres): vandaag-bord, aanvragen, KPI's en AI
   let vakData = null, vakBusy = false, vakAiMsg = '', vakAiBusy = false, vakUren = null, vakPro = null;
   async function laadVakwerk(){
@@ -1843,6 +2017,7 @@
             '<b style="color:var(--gold);">'+eur(r.btw)+'</b></div>').join('')
             : '<div class="tkc-who">'+T('fn.geenomzet','Nog geen omzet deze maand.')+'</div>')+
           '<div class="st-row" style="border-top:1px solid var(--line);"><span><b>'+T('fn.afdragen','Af te dragen btw')+'</b></span><b style="color:var(--gold);">'+eur(f.btwTotaal)+'</b></div></div>';
+        html += btwKaart(); // de aangifte zelf; zie leverancier-12a.js
         html += '<div class="tkc"><h3>'+T('fn.personeel','Personeelskosten')+' ('+f.maand+')</h3>'+
           '<div class="st-row"><span>'+T('fn.uren','Geklokte uren')+' × € '+f.personeel.uurloon+'<span class="sub">'+f.personeel.uren+' '+T('fn.uur','uur')+'</span></span><b>'+eur(f.personeel.bruto)+'</b></div>'+
           '<div class="st-row"><span>'+T('fn.lasten','Werkgeverslasten')+'<span class="sub">~'+f.personeel.lastenPct+'% ('+f.landNaam+')</span></span><b>'+eur(f.personeel.lasten)+'</b></div>'+
@@ -2627,6 +2802,7 @@
     });
     const fnP = el.querySelector('#fnPdf'); if (fnP) fnP.addEventListener('click', () => dlBestand('/supplier/finance/export', { formaat: 'pdf' }, 'RTG-boekhouding.pdf'));
     const fnC = el.querySelector('#fnCsv'); if (fnC) fnC.addEventListener('click', () => dlBestand('/supplier/finance/export', { formaat: 'csv' }, 'RTG-boekhouding.csv'));
+    btwBedrading(el); // de knoppen van de btw-aangifte; zie leverancier-12a.js
     const gS = el.querySelector('#gcSell'); if (gS) gS.addEventListener('click', async () => {
       try {
         const d = await API.call('/supplier/giftcard/sell', { bedrag: Number(el.querySelector('#gcBedrag').value) });
@@ -5876,10 +6052,14 @@
     /* RTG Handel: inkoop bij andere zaken, over alle genres heen (eigen pagina,
        zelfde zaak-inlog). Zie server/kern/handelsketen.js. */
     const handel = '<button class="meer-btn" data-handel="1"><svg viewBox="0 0 24 24"><path d="M3 7h13l2 4h3v6H3z"/><circle cx="7" cy="18" r="1.6"/><circle cx="17" cy="18" r="1.6"/></svg><b>RTG Handel</b></button>';
+    /* Mijn RTG-website: de automatische bedrijfssite op naam.rtg (eigen
+       pagina, zelfde zaak-inlog). Zie server/kern/webplatform.js. */
+    const web = '<button class="meer-btn" data-zaakweb="1"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18"/></svg><b>'+T('tab.zaakweb','Mijn website')+'</b></button>';
     el.innerHTML = '<div class="meer-grid">' + keys.map(k =>
       '<button class="meer-btn" data-goto2="'+k+'"><svg viewBox="0 0 24 24">'+TABDEF[k].svg+'</svg><b>'+T('tab.'+k, TABDEF[k].label)+'</b></button>'
-    ).join('') + office + rtmail + handel + ghost + scherm + '</div>';
+    ).join('') + web + office + rtmail + handel + ghost + scherm + '</div>';
     el.querySelectorAll('[data-goto2]').forEach(b => b.addEventListener('click', () => openTab(b.dataset.goto2)));
+    el.querySelectorAll('[data-zaakweb]').forEach(b => b.addEventListener('click', () => { location.href = '/apps/zaakweb.html'; }));
     el.querySelectorAll('[data-office]').forEach(b => b.addEventListener('click', () => { location.href = '/apps/office.html?werk=zaak'; }));
     el.querySelectorAll('[data-rtmail]').forEach(b => b.addEventListener('click', () => { location.href = '/apps/leverancier-rtmail.html'; }));
     el.querySelectorAll('[data-handel]').forEach(b => b.addEventListener('click', () => { location.href = '/apps/handel.html'; }));
@@ -5896,7 +6076,7 @@
     $('#supType').textContent = tType(S.typeLabel) + ' · ' + S.city;
     renderActor();
     if (stationMode){ renderStation(); return; }
-    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderBezorg(); renderTickets(); renderVerhuur(); renderCharter(); renderVastgoed(); renderVracht(); renderGebouw(); renderGolf(); renderFitclub(); renderBeauty(); renderPetcare(); renderOpvang(); renderMarina(); renderWeddings(); renderAdvies(); renderPolis(); renderZorgpolis(); renderAlpine(); renderBoerderij(); renderCreator(); renderSamenwerking(); renderFacturen(); renderRtfMarkt(); renderRetail(); renderModeBezorg(); renderWinkelvloer(); renderZorgbalieLev(); renderVerkoop(); renderGroothandel(); renderInkoop(); renderZaakBoard(); renderBeveiliging(); renderPaspoort(); renderContracten(); renderOnbCfg(); renderRooms(); renderDorp(); renderMinibar(); renderKlussen(); renderTafels(); renderBeheer(); renderDoors(); renderGasten(); renderGChat(); laadInbox(); renderPage(); renderTeam(); renderBorden(); renderReviews(); renderVoorraad(); renderMeer(); renderAIChips();
+    renderHome(); renderOrders(); renderRides(); renderMenu(); renderPrice(); renderLocation(); renderKassa(); renderBezorg(); renderTickets(); renderVerhuur(); renderCharter(); renderVastgoed(); renderVracht(); renderGebouw(); renderGolf(); renderFitclub(); renderBeauty(); renderPetcare(); renderOpvang(); renderMarina(); renderWeddings(); renderAdvies(); renderPolis(); renderZorgpolis(); renderAlpine(); renderBoerderij(); renderCreator(); renderSamenwerking(); renderFacturen(); renderRtfMarkt(); renderRetail(); renderModeBezorg(); renderWinkelvloer(); renderZorgbalieLev(); renderVerkoop(); renderGroothandel(); renderInkoop(); renderZaakBoard(); renderBeveiliging(); renderPaspoort(); renderContracten(); renderOnbCfg(); renderRooms(); renderDorp(); renderMinibar(); renderKlussen(); renderTafels(); renderBeheer(); renderDoors(); renderGasten(); renderGChat(); laadInbox(); renderPage(); renderTeam(); renderBorden(); renderReviews(); renderRegie(); renderVoorraad(); renderMeer(); renderAIChips();
     // Zorg dat het actieve tabblad ook echt zichtbaar is: de tabbar-knop staat al
     // op 'active', maar zonder deze aanroep krijgt geen enkele .view de active-klasse
     // en blijft het overzicht leeg bij de eerste render.
@@ -8499,6 +8679,25 @@
       teamleden: () => (state && state.staff || []).map(m => ({ id: m.id, name: m.name })),
       kanBeheren: () => { const a = actor(); return !!(a.manager || a.role === 'manager' || !a.staffId); },
       T, toast
+    });
+  }
+
+  /* ---- De Regie van de zaak ----
+     Het scherm komt uit /shared/zaakcommand.js en hangt ook in de
+     personeels-PDA. Hier geven we hem alleen zijn api en of deze persoon mag
+     beheren; de grendel zelf zit op de server (managerOnly), dus dit is
+     netheid en geen beveiliging. */
+  let regieUI = null;
+  function renderRegie(){
+    const wrap = $('#regieWrap');
+    if (!wrap || !window.RTGZaakCommand) return;
+    if (regieUI) { regieUI.ververs(); return; }
+    const a = actor();
+    regieUI = RTGZaakCommand.toon(wrap, {
+      api: (pad, body) => API.call('/supplier/command/' + pad, body),
+      compact: false,
+      mag: !!(a.manager || a.role === 'manager' || !a.staffId),
+      meld: toast
     });
   }
 

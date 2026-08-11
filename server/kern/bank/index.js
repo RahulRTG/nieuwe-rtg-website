@@ -19,7 +19,7 @@
    rente in ./sparen. */
 
 module.exports = (deps) => {
-  const { db, save, crypto, schoon, betaal, pay, bankregie, keyVanCodenaam, accounts, sseToCustomer, sseToOffice, anthropic } = deps;
+  const { db, save, crypto, schoon, betaal, pay, bankregie, keyVanCodenaam, accounts, sseToCustomer, sseToOffice, anthropic, betaalOpdrachten } = deps;
   const nu = () => Date.now();
   const d = () => db.data;
 
@@ -76,12 +76,19 @@ module.exports = (deps) => {
     MIN_CENTEN, MAX_CENTEN, saldi, grootboek, saldoVan, rekMeta, isExtern, bodem,
     id, schoon, nu, save, d, geldModus, motorklant, bordSeintje });
 
+  /* DE BETAALOPDRACHTEN: alles wat het huis verlaat krijgt een eigen rij naast
+     de boeking, want "geboekt" en "de rail heeft het aangenomen" zijn twee
+     gebeurtenissen die los van elkaar mislukken. De bedrading naar de rail staat
+     in ./uitgang; het gat dat dit dicht in ../betaalopdracht/index.js. */
+  const opdrachten = require('./uitgang')({ opdrachten: betaalOpdrachten, boekAsync, rekMeta, seintje });
+
   // de gedeelde context voor de deelbestanden
   const ctx = { db, save, crypto, schoon, betaal, pay, bankregie, keyVanCodenaam, accounts, anthropic,
-    nu, d, MIN_CENTEN, MAX_CENTEN, SOORTEN, saldi, grootboek, rekeningen, rekMeta, saldoVan, isExtern, id, boek, boekAsync, geldModus, bodem, seintje };
+    nu, d, MIN_CENTEN, MAX_CENTEN, SOORTEN, saldi, grootboek, rekeningen, rekMeta, saldoVan, isExtern, id, boek, boekAsync, geldModus, bodem, seintje, opdrachten };
 
   const rek = require('./rekeningen')(ctx);
   const over = require('./overboeken')(ctx);
+  const brug = require('./walletbrug')(ctx);
   const spaar = require('./sparen')(ctx);
   const pas = require('./passen')(ctx);
   const krediet = require('./krediet')(ctx);
@@ -92,39 +99,18 @@ module.exports = (deps) => {
   ctx.rekeningOpen = rek.rekeningOpen;
   const hart = require('./hart')(ctx);
 
-  /* ---- afschrift: de boekingen die een rekening raken, nieuwste eerst ---- */
-  function afschrift({ iban, limit = 50, offset = 0 }) {
-    const m = rekMeta(iban);
-    if (!m) return { status: 404, error: 'De rekening bestaat niet.' };
-    const raakt = grootboek().filter(b => b.van === iban || b.naar === iban);
-    const regels = raakt.slice(offset, offset + Math.min(200, Math.max(1, limit))).map(b => ({
-      id: b.id, af: b.van === iban, centen: b.centen, soort: b.soort, oms: b.oms,
-      tegen: b.van === iban ? b.naar : b.van, at: b.at
-    }));
-    return { ok: true, iban, saldoCenten: saldoVan(iban), aantal: raakt.length, regels };
-  }
+  /* Het afschrift, de gezondheid en het boardroom-overzicht: alleen lezen,
+     en daarom apart in ./bord. */
+  const { afschrift, gezondheid, overzicht } = require('./bord')(
+    Object.assign({}, ctx, { sluitcontrole, opdrachten }));
 
-  /* ---- de bank-gezondheid + het boardroom-overzicht (achter de office-inlog) ---- */
-  function gezondheid() {
-    const s = saldi();
-    let deposito = 0, krediet = 0;
-    for (const [r, c] of Object.entries(s)) { if (isExtern(r)) continue; if (c >= 0) deposito += c; else krediet += -c; }
-    const emissie = -saldoVan('extern:emissie');  // wat de eigen bank heeft uitgegeven (positief = in omloop)
-    const rekN = Object.keys(rekeningen()).length;
-    return { status: 200, sluit: sluitcontrole(), depositoCenten: deposito, kredietCenten: krediet,
-      inOmloopCenten: emissie, reserveCenten: saldoVan('rtg:reserve'), renteBetaaldCenten: -saldoVan('rtg:rente'),
-      foundationCenten: saldoVan('extern:foundation'),
-      aantalRekeningen: rekN, boekingenVandaag: grootboek().filter(b => nu() - b.at < 86400000).length };
-  }
-  function overzicht() {
-    const g = gezondheid();
-    const lijst = Object.values(rekeningen()).sort((a, b) => b.geopend - a.geopend).slice(0, 100)
-      .map(m => ({ iban: m.iban, codenaam: m.codenaam, soort: m.soort, naam: m.naam, saldoCenten: saldoVan(m.iban), bevroren: !!m.bevroren, roodLimiet: m.roodLimiet || 0 }));
-    return { status: 200, regie: bankregie.bankregieOverzicht(), gezondheid: g, rekeningen: lijst };
-  }
-
-  const api = { MIN_CENTEN, MAX_CENTEN, SOORTEN, boek, boekAsync, geldModus, saldoVan, sluitcontrole, afschrift, gezondheid, overzicht, reconcileVanMotor, motorStand };
-  Object.assign(api, rek, over, spaar, pas, krediet, incasso, zakelijk, advies, hart);
+  const api = { MIN_CENTEN, MAX_CENTEN, SOORTEN, boek, boekAsync, geldModus, saldoVan, sluitcontrole, afschrift, gezondheid, overzicht, reconcileVanMotor, motorStand,
+    bankOpdrachten: (f) => opdrachten.lijst(f || {}),
+    bankOpdrachtenOpen: () => opdrachten.openstaand(),
+    bankOpdrachtenRonde: (a) => opdrachten.ronde(a || {}),
+    bankOpdrachtOpnieuw: (id) => opdrachten.dienIn(id),
+    bankOpdrachtBevestig: (a) => opdrachten.bevestig(a || {}) };
+  Object.assign(api, rek, over, brug, spaar, pas, krediet, incasso, zakelijk, advies, hart);
 
   /* De bankrondes lopen vanzelf: elk uur een tik die de spaarrente (idempotent
      op de klok: alleen hele verstreken dagen) en de vervallen vaste betalingen
@@ -141,6 +127,16 @@ module.exports = (deps) => {
       .catch(e => console.warn('[bank] ronde mislukt:', e.message));
   }, RONDE_MS);
   if (rondeTimer.unref) rondeTimer.unref();
+
+  /* De opdrachtenronde loopt VEEL vaker dan de uurtik: een mislukte inzending is
+     geen maandelijkse rente maar geld dat vaststaat, en een uur wachten op de
+     eerste herhaling is voor wie net op "verstuur" drukte een storing. De
+     backoff in de opdracht bepaalt wie aan de beurt is; deze tik kijkt alleen. */
+  const OPDRACHT_RONDE_MS = Number(process.env.BANK_OPDRACHT_RONDE_MS || 60000);
+  const opdrachtTimer = setInterval(() => {
+    opdrachten.ronde({}).catch(e => console.warn('[bank] opdrachtenronde mislukt:', e.message));
+  }, OPDRACHT_RONDE_MS);
+  if (opdrachtTimer.unref) opdrachtTimer.unref();
 
   return { bank: api };
 };

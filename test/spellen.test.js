@@ -117,6 +117,133 @@ test('schaken: een legale opening telt, een onwettige zet wordt geweigerd, beurt
   assert.equal(st.potje.staat.aanZet, 'w', 'daarna is wit weer aan zet');
 });
 
+/* Schaken had een eigen beurtvlag ('eigenBeurt') omdat het zelf bijhoudt wie
+   aan zet is. Die is weg: schaakZet zet potje.beurt na elke zet op de andere
+   speler, dus de generieke beurtcontrole gaf precies hetzelfde antwoord en de
+   vlag bewaakte niets -- hem weghalen werd door geen enkele toets gepakt.
+
+   Wat de veiligheid nu draagt is de AANNAME eronder, en die staat hier: de
+   beurt van het potje en de kleur aan zet lopen gelijk op. Stopt schaakZet met
+   het bijwerken van potje.beurt, dan blokkeert de generieke controle voortaan
+   elke tweede zet -- en dan zakt deze toets. */
+test('schaken: om de beurt, en de beurt van het potje loopt met de kleur mee', async () => {
+  const { a, b } = await tweeVrienden();
+  const nieuw = await json(await raw('/member/spel/nieuw', { soort: 'schaak', vrienden: [b.key] }, a.tok));
+  await raw('/member/spel/antwoord', { id: nieuw.id, akkoord: true }, b.tok);
+
+  const begin = await json(await raw('/member/spel/staat', { id: nieuw.id }, a.tok));
+  assert.equal(begin.potje.staat.aanZet, 'w', 'wit begint');
+  assert.equal(begin.potje.beurt, 0, 'en dat is de speler die het potje startte');
+
+  // zwart mag niet openen: pion van 8 naar 16 is op zichzelf legaal, maar niet nu
+  const tevroeg = await raw('/member/spel/zet', { id: nieuw.id, zet: { van: 8, naar: 16 } }, b.tok);
+  assert.equal(tevroeg.status, 409, 'zwart is nog niet aan zet');
+
+  // wit zet, en daarna staan BEIDE kanten op zwart
+  assert.equal((await raw('/member/spel/zet', { id: nieuw.id, zet: { van: 48, naar: 40 } }, a.tok)).status, 200);
+  const na1 = await json(await raw('/member/spel/staat', { id: nieuw.id }, b.tok));
+  assert.equal(na1.potje.staat.aanZet, 'z', 'de kleur is doorgeschoven');
+  assert.equal(na1.potje.beurt, 1, 'en de beurt van het potje ook -- dit is de aanname');
+
+  // en nu kan zwart wel, wat bewijst dat de generieke controle hem doorlaat
+  assert.equal((await raw('/member/spel/zet', { id: nieuw.id, zet: { van: 8, naar: 16 } }, b.tok)).status, 200);
+  const na2 = await json(await raw('/member/spel/staat', { id: nieuw.id }, a.tok));
+  assert.equal(na2.potje.staat.aanZet, 'w');
+  assert.equal(na2.potje.beurt, 0, 'de twee lopen samen terug naar wit');
+
+  // wit twee keer achter elkaar kan niet
+  assert.equal((await raw('/member/spel/zet', { id: nieuw.id, zet: { van: 40, naar: 32 } }, a.tok)).status, 200);
+  assert.equal((await raw('/member/spel/zet', { id: nieuw.id, zet: { van: 49, naar: 41 } }, a.tok)).status, 409,
+    'twee zetten op rij hoort niet te kunnen');
+});
+
+/* Een potje kan ook door een ZET klaar raken, en dat pad legt de uitslag op een
+   andere plek vast dan opgeven. Zonder deze toets bleef die helft ongedekt:
+   een mutatie die het noteren uit spelZet haalt werd nergens rood.
+
+   Het herdersmat is het kortste dat bestaat: 1. f3 e5 2. g4 Dh4#. In de
+   bordindex van deze motor (rij 0 boven, wit onder): f2-f3 is 53->45, e7-e5 is
+   12->28, g2-g4 is 54->38, en de dame van d8 naar h4 is 3->39. */
+test('uitslagen: ook een potje dat door een zet eindigt levert een uitslag op', async () => {
+  const { a, b } = await tweeVrienden();
+  const voor = (await json(await raw('/member/spel/uitslagen', {}, b.tok))).uitslagen.length;
+  const nieuw = await json(await raw('/member/spel/nieuw', { soort: 'schaak', vrienden: [b.key] }, a.tok));
+  await raw('/member/spel/antwoord', { id: nieuw.id, akkoord: true }, b.tok);
+
+  const zet = async (van, naar, tok) => {
+    const r = await raw('/member/spel/zet', { id: nieuw.id, zet: { van, naar } }, tok);
+    assert.equal(r.status, 200, 'zet ' + van + '->' + naar + ' hoort te mogen');
+    return json(r);
+  };
+  await zet(53, 45, a.tok);          // f3
+  await zet(12, 28, b.tok);          // e5
+  await zet(54, 38, a.tok);          // g4
+  await zet(3, 39, b.tok);           // Dh4 -- mat
+
+  const st = await json(await raw('/member/spel/staat', { id: nieuw.id }, a.tok));
+  assert.equal(st.potje.status, 'klaar', 'het potje is uit');
+  assert.equal(st.potje.winnaar, b.cn, 'zwart gaf mat');
+
+  const na = await json(await raw('/member/spel/uitslagen', {}, b.tok));
+  assert.equal(na.uitslagen.length, voor + 1, 'de gewonnen partij staat in de historie');
+  assert.equal(na.uitslagen[0].id, nieuw.id);
+  assert.equal(na.uitslagen[0].ik, true, 'b won');
+  assert.equal(na.uitslagen[0].gelijk, false);
+});
+
+/* Een uitslag ontstaat uit een ECHT afgelopen potje, en niet doordat een toets
+   hem er zelf in zet. Opgeven is de kortste weg naar "klaar" die alle spellen
+   delen -- daarom loopt deze toets daarlangs. */
+test('uitslagen: een afgelopen potje levert een uitslag op, en die is van jou', async () => {
+  const { a, b } = await tweeVrienden();
+  const voor = await json(await raw('/member/spel/uitslagen', {}, a.tok));
+  const nieuw = await json(await raw('/member/spel/nieuw', { soort: 'schaak', vrienden: [b.key] }, a.tok));
+  await raw('/member/spel/antwoord', { id: nieuw.id, akkoord: true }, b.tok);
+
+  // nog niets: het potje loopt
+  const tijdens = await json(await raw('/member/spel/uitslagen', {}, a.tok));
+  assert.equal(tijdens.uitslagen.length, voor.uitslagen.length, 'een lopend potje is nog geen uitslag');
+
+  assert.equal((await raw('/member/spel/opgeven', { id: nieuw.id }, a.tok)).status, 200);
+
+  const na = await json(await raw('/member/spel/uitslagen', {}, a.tok));
+  assert.equal(na.uitslagen.length, voor.uitslagen.length + 1, 'er staat er een bij');
+  const r = na.uitslagen[0];
+  assert.equal(r.id, nieuw.id);
+  assert.equal(r.soort, 'schaak');
+  assert.equal(r.ik, false, 'wie opgeeft wint niet');
+  assert.deepEqual(r.tegen, [{ codenaam: b.cn, won: true }], 'de ander won, op codenaam');
+
+  // en b ziet dezelfde partij vanaf zijn kant
+  const bijB = await json(await raw('/member/spel/uitslagen', {}, b.tok));
+  assert.equal((bijB.uitslagen[0] || {}).ik, true, 'b heeft gewonnen');
+});
+
+test('stand: een gewonnen en een verloren partij komen in beider stand terecht', async () => {
+  const { a, b } = await tweeVrienden();
+  const nieuw = await json(await raw('/member/spel/nieuw', { soort: 'schaak', vrienden: [b.key] }, a.tok));
+  await raw('/member/spel/antwoord', { id: nieuw.id, akkoord: true }, b.tok);
+  await raw('/member/spel/opgeven', { id: nieuw.id }, a.tok);
+
+  const sa = await json(await raw('/member/spel/stand', {}, a.tok));
+  const schaakA = sa.stand.find(x => x.soort === 'schaak');
+  assert.ok(schaakA && schaakA.gespeeld >= 1, 'a heeft een schaakpartij gespeeld');
+  assert.equal(schaakA.verloren, 1, 'en die verloren door op te geven');
+  assert.equal(sa.vensterDagen, 365, 'de stand zegt over welk venster hij gaat');
+
+  const sb = await json(await raw('/member/spel/stand', {}, b.tok));
+  assert.equal(sb.stand.find(x => x.soort === 'schaak').gewonnen, 1, 'b won er een');
+});
+
+test('uitslagen: onder de 18+-grens bestaat er geen historie', async () => {
+  const t = Date.now() + '' + (teller++);
+  const jong = await json(await raw('/auth/register', { name: 'Jong U' + t, email: 'ju' + t + '@v.test', phone: '0679' + String(t).slice(-6), password: 'geheim123', geboortedatum: '2010-01-01', tier: 'rtg' }));
+  const r = await json(await raw('/member/spel/uitslagen', {}, jong.token));
+  assert.deepEqual(r.uitslagen, []);
+  assert.equal(r.progressie, false);
+  assert.match(r.reden, /geverifieerde volwassen leeftijd/);
+});
+
 test('woordduel: het woordenboek keurt; een echt NL-woord over het midden scoort', async () => {
   const { a, b } = await tweeVrienden();
   const nieuw = await json(await raw('/member/spel/nieuw', { soort: 'woord', vrienden: [b.key] }, a.tok));
@@ -171,6 +298,101 @@ test('random wachtrij: twee wachtenden voor hetzelfde spel worden een potje', as
   assert.ok(w2.gestart && w2.id, 'de tweede maakt het potje vol en het start');
   const mijn = await json(await raw('/member/spel/mijn', {}, a.tok));
   assert.ok(mijn.potjes.some(p => p.id === w2.id && p.status === 'bezig'), 'de eerste ziet het gestarte potje');
+});
+
+/* De wachtrij splitst per spel en groepsgrootte, en ALLEEN bij een
+   taalgevoelig spel ook per taal (Woordduel heeft een eigen letterzak per
+   taal). Splitste hij overal op taal, dan zouden twee schakers die toevallig
+   een andere app-taal hebben elkaar nooit vinden -- een lege wachtrij die
+   niemand kan verklaren. */
+test('random wachtrij: taal splitst Woordduel wel en schaken niet', async () => {
+  const { a, b } = await tweeVrienden();
+  const nl = await json(await raw('/member/spel/random', { soort: 'schaak', taal: 'nl' }, a.tok));
+  assert.ok(nl.wachten, 'de eerste schaker wacht');
+  const en = await json(await raw('/member/spel/random', { soort: 'schaak', taal: 'en' }, b.tok));
+  assert.ok(en.gestart, 'bij schaken doet de taal er niet toe: ze vinden elkaar');
+
+  const { a: c, b: d } = await tweeVrienden();
+  const wNl = await json(await raw('/member/spel/random', { soort: 'woord', taal: 'nl' }, c.tok));
+  assert.ok(wNl.wachten, 'de Nederlandse woordspeler wacht');
+  const wEn = await json(await raw('/member/spel/random', { soort: 'woord', taal: 'en' }, d.tok));
+  assert.ok(wEn.wachten && !wEn.gestart, 'een Engelse letterzak hoort niet tegen een Nederlandse te spelen');
+});
+
+/* Een arcadescore komt uit de CLIENT en is dus niet server-authoritatief zoals
+   een zet in een potje. De enige rem die de server heeft is de puntengrens uit
+   de descriptor van het spel; die moet dus echt uit die descriptor komen en
+   niet uit een los getal in de scoreafhandeling. */
+test('arcade: een score wordt afgekapt op de grens uit het spel zelf', async () => {
+  const { a } = await tweeVrienden();
+  const r = await json(await raw('/member/spel/arcade-score', { spel: 'tetris', punten: 99999999 }, a.tok));
+  assert.equal(r.beste, 999999, 'een onmogelijke score hoort op de grens van het spel te blijven staan');
+  const bord = await json(await raw('/member/spel/arcade-bord', { spel: 'tetris' }, a.tok));
+  assert.equal((bord.bord[0] || {}).punten, 999999, 'en het bord toont de afgekapte score, niet de ingestuurde');
+});
+
+test('arcade: een spel dat niet bestaat wordt geweigerd', async () => {
+  const { a } = await tweeVrienden();
+  assert.equal((await raw('/member/spel/arcade-score', { spel: 'pacman', punten: 10 }, a.tok)).status, 400);
+  assert.equal((await raw('/member/spel/arcade-bord', { spel: 'pacman' }, a.tok)).status, 400);
+});
+
+/* Wie er nu is. Dit hangt aan de LEVENDE lijst van open live-verbindingen, dus
+   een toets die alleen de route aantikt bewijst niets: hier gaat de stream van
+   de vriend echt open en weer dicht, en de stand hoort mee te bewegen. */
+async function opentStream(url) {
+  const ac = new AbortController();
+  const res = await fetch(url, { signal: ac.signal });
+  assert.equal(res.status, 200, 'de stream hoort open te gaan');
+  const reader = res.body.getReader();
+  await reader.read();                       // wacht op 'retry:' + hello, dan staat hij geregistreerd
+  return { sluit: () => { try { ac.abort(); } catch (e) {} } };
+}
+const wacht = (ms) => new Promise(r => setTimeout(r, ms));
+
+test('online: een vriend verschijnt als zijn stream opengaat en verdwijnt als hij sluit', async () => {
+  const { a, b } = await tweeVrienden();
+
+  const leeg = await json(await raw('/member/spel/online', {}, a.tok));
+  assert.deepEqual(leeg.online, [], 'niemand verbonden, dus niemand aanwezig');
+  assert.equal(leeg.aantal, 0);
+
+  const stroom = await opentStream(BASE + '/api/stream?token=' + encodeURIComponent(b.tok));
+  try {
+    const erbij = await json(await raw('/member/spel/online', {}, a.tok));
+    assert.equal(erbij.aantal, 1, 'de vriend met een open stream is aanwezig');
+    assert.equal(erbij.online[0].codenaam, b.cn, 'op codenaam');
+    // en hij ziet zichzelf niet in zijn eigen lijst
+    const zelf = await json(await raw('/member/spel/online', {}, b.tok));
+    assert.equal(zelf.aantal, 0, 'jezelf sta je niet in je eigen lijst');
+  } finally { stroom.sluit(); }
+
+  // de verbinding sluiten haalt hem er weer uit: geen "laatst gezien" die
+  // blijft hangen, want er wordt niets bewaard
+  for (let i = 0; i < 20; i++) {
+    const na = await json(await raw('/member/spel/online', {}, a.tok));
+    if (na.aantal === 0) return;
+    await wacht(100);
+  }
+  assert.fail('na het sluiten van de stream hoort de vriend weg te zijn');
+});
+
+test('online: de vriendenkring komt van de server, niet uit het verzoek', async () => {
+  /* Mocht een client zelf sleutels mogen meesturen, dan kon je de aanwezigheid
+     van willekeurige leden aftasten. De route negeert de body.
+
+     De vreemde moet hier ECHT online zijn, anders slaagt deze toets ook als er
+     niemand verbonden is -- dat bewijst zijn eigen vriend hieronder. */
+  const { a } = await tweeVrienden();
+  const { a: vriendVanVreemde, b: vreemde } = await tweeVrienden();
+  const stroom = await opentStream(BASE + '/api/stream?token=' + encodeURIComponent(vreemde.tok));
+  try {
+    const bewijs = await json(await raw('/member/spel/online', {}, vriendVanVreemde.tok));
+    assert.equal(bewijs.aantal, 1, 'de vreemde staat echt open (anders toetst het onderstaande niets)');
+
+    const r = await json(await raw('/member/spel/online', { vrienden: [vreemde.key], codenamen: [vreemde.cn] }, a.tok));
+    assert.deepEqual(r.online, [], 'een vreemde die je meestuurt hoort niet in je stand te komen');
+  } finally { stroom.sluit(); }
 });
 
 test('sneek: alleen je beste score telt en vrienden zien elkaar op het bord', async () => {
@@ -416,6 +638,36 @@ test('elke app zijn eigen spelgroep: RTG start geen dammen, RTF start geen schak
   assert.equal((await rtfSpel('random', { soort: 'magnaat' }, A)).status, 400);
 });
 
+/* DE PROGRESSIEGRENS. Alles wat een prestatie buiten het potje bewaart bestaat
+   alleen voor geverifieerd volwassen leden: De Arena belooft tieners "er
+   bestaat geen ranglijst" en een scorebord onder vrienden in dezelfde app sprak
+   dat tegen. Het spel zelf blijft gewoon speelbaar -- er wordt alleen niets van
+   bewaard, en dat is iets anders dan een verbod. */
+test('arcade: onder de 18+-grens bestaat er geen score en geen ranglijst', async () => {
+  const t = Date.now() + '' + (teller++);
+  const jong = await json(await raw('/auth/register', { name: 'Jong A' + t, email: 'ja' + t + '@v.test', phone: '0678' + String(t).slice(-6), password: 'geheim123', geboortedatum: '2010-01-01', tier: 'rtg' }));
+
+  // spelen mag: geen 403, want het spel is niet verboden
+  const post = await raw('/member/spel/arcade-score', { spel: 'sneek', punten: 4200 }, jong.token);
+  assert.equal(post.status, 200, 'een minderjarige mag Sneek gewoon spelen');
+  const r = await json(post);
+  assert.equal(r.bewaard, false, 'maar de score wordt niet bewaard');
+  assert.equal(r.beste, undefined, 'en er komt geen highscore terug');
+  assert.ok(/geverifieerde volwassen leeftijd/.test(r.reden || ''), 'de reden staat erbij');
+
+  // het bord bestaat niet, en is niet "leeg": de client hoort de sectie te verbergen
+  const bord = await json(await raw('/member/spel/arcade-bord', { spel: 'sneek' }, jong.token));
+  assert.equal(bord.ranglijst, false, 'geen ranglijst onder de grens');
+  assert.deepEqual(bord.bord, []);
+
+  // en de score is echt nergens heen gegaan: een volwassen vriend ziet hem niet
+  const { a } = await tweeVrienden();
+  await raw('/member/spel/arcade-score', { spel: 'sneek', punten: 10 }, a.tok);
+  const bordA = await json(await raw('/member/spel/arcade-bord', { spel: 'sneek' }, a.tok));
+  assert.equal(bordA.ranglijst, true, 'een geverifieerd volwassen lid heeft wel een ranglijst');
+  assert.ok(!bordA.bord.some(x => x.punten === 4200), 'de niet-bewaarde score duikt nergens op');
+});
+
 test('proost is 18+: minderjarige leden komen er niet in, volwassen leden wel', async () => {
   const t = Date.now() + '' + (teller++);
   const jong = await json(await raw('/auth/register', { name: 'Jong ' + t, email: 'jg' + t + '@v.test', phone: '0677' + String(t).slice(-6), password: 'geheim123', geboortedatum: '2010-01-01', tier: 'rtg' }));
@@ -438,13 +690,19 @@ test('proost is 18+: minderjarige leden komen er niet in, volwassen leden wel', 
   assert.equal(st.potje.staat.teller, 1, 'kaart een van vijfentwintig');
 });
 
-test('sudoku hoort bij de arcade: scores en ranglijst werken', async () => {
-  const { a, b } = await tweeVrienden();
-  await raw('/member/spel/arcade-score', { spel: 'sudoku', punten: 275 }, a.tok);
-  await raw('/member/spel/arcade-score', { spel: 'sudoku', punten: 410 }, b.tok);
+/* Sudoku hoort wel bij de arcade maar niet bij deze ingang: hier stonden twee
+   ingestuurde scores (275 en 410) en het bord dat ze netjes op volgorde zette.
+   Dat is precies wat er nu niet meer kan -- de server geeft de puzzel uit en
+   rekent zelf. Het hele pad (puzzel, oplossen, punten, bord) staat in
+   test/spelsudoku.test.js; hier blijft staan dat deze deur dicht is, want dit
+   is het bestand waar iemand een nieuw arcadespel bij zou zetten. */
+test('sudoku komt niet via de gewone arcade-ingang binnen', async () => {
+  const { a } = await tweeVrienden();
+  const r = await raw('/member/spel/arcade-score', { spel: 'sudoku', punten: 410 }, a.tok);
+  assert.equal(r.status, 400);
+  assert.match((await json(r)).error, /server bepaald/i);
   const bord = await json(await raw('/member/spel/arcade-bord', { spel: 'sudoku' }, a.tok));
-  assert.equal(bord.bord[0].punten, 410, 'de snelste oplosser staat bovenaan');
-  assert.equal(bord.bord.find(r => r.ik).punten, 275);
+  assert.deepEqual(bord.bord, [], 'en er is dus ook niets binnengekomen');
 });
 
 test('opgeven: de ander wint het potje', async () => {

@@ -4,7 +4,7 @@
 
    Dit is de orkestrator: de config (categorieen, doelgroepen) staat in
    ./doelgroepen en de catalogus is per categoriegroep opgeknipt in ./cat-leden,
-   ./cat-apps en ./cat-partners. Hier worden ze samengevoegd (in de
+   ./cat-apps, ./cat-life en ./cat-partners. Hier worden ze samengevoegd (in de
    oorspronkelijke volgorde) en volgen de fail-fast-controles op dubbele id's,
    de tegenhangers (KOPPELS) en de uitrolfases (FASES). */
 const { CATEGORIEEN, DOELGROEPEN, DOELGROEP_IDS, DOELGROEP_OP_ID, LEDEN, LEDEN_RTF } = require('./doelgroepen');
@@ -14,9 +14,12 @@ const { CATEGORIEEN, DOELGROEPEN, DOELGROEP_IDS, DOELGROEP_OP_ID, LEDEN, LEDEN_R
 const FUNCTIES = [].concat(
   require('./cat-leden'),
   require('./cat-apps'),
+  require('./cat-life'),
   require('./cat-partners'),
+  require('./cat-zaakregie'),
   require('./cat-domeinen'),
   require('./cat-domeinen2'),
+  require('./cat-geld'),
   require('./cat-domeinen3'),
   require('./cat-domeinen4'));
 
@@ -71,13 +74,20 @@ for (const k of KOPPELS) if (!OP_ID[k.a] || !OP_ID[k.b])
    al het andere gaat dicht (interne functies blijven altijd open, anders
    sluit de boardroom zichzelf buiten). De fases stapelen: stad = fundament
    plus de stadslaag; alles = de volledige catalogus. */
+/* EEN REGISTERREGEL OPKNIPPEN RAAKT DEZE LIJST, en dat is een keer stil
+   misgegaan. `betalen` dekte '/api/pay' en `supplier` dekte
+   '/api/supplier/pay/uitbetaal'; toen die paden hun eigen regel kregen (om er
+   een vermogen aan te kunnen hangen, zie ./cat-geld.js) vielen ze uit fase 1 --
+   en in de wig kon een lid ineens niet meer betalen. De catalogus klopte, de
+   fase-lijst klopte, en samen deugden ze niet. Wie hier een regel opknipt, zet
+   de nieuwe id's erbij in elke fase waar de oude in stond. */
 const FASE_FUNDAMENT = [
   // de wig: een stad, een sector diep - leden bestellen en betalen bij
   // partners, de zaak draait op kassa en personeel, identiteit is op orde
-  'member', 'bestellen', 'betalen', 'verificatie', 'webauthn', 'paspoort',
+  'member', 'bestellen', 'betalen', 'dom-pay-wallet', 'verificatie', 'webauthn', 'paspoort',
   'salon', 'member-dm', 'member-connect', 'member-werk',
   'supplier', 'supplier-pos', 'supplier-salon', 'supplier-apply', 'supplier-finance',
-  'staff', 'stuur'
+  'dom-partner-uitbetaling', 'staff', 'stuur'
 ];
 const FASE_STAD = [...FASE_FUNDAMENT,
   // de stad wordt levend: tickets, vervoer, kamers, events, de sociale laag,

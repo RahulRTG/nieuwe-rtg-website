@@ -12,7 +12,20 @@ module.exports = [
 
   // ---- spelen & sport ----
   ['spelen', 'Spelen', 'spelen', '/apps/spelen.html', 'Dammen, rummikub, Magnaat, partyspellen, sudoku en meer, samen of alleen.'],
-  ['sport', 'Sport', 'spelen', '/apps/sport.html', 'Je sportactiviteiten en clubs.'],
+
+  // ---- leven & gezondheid ----
+  // Waar iemand zoekt, niet waar de code woont: Vitaal draait op de gedeelde
+  // veiligheidskern en Balans op de agenda, maar je zoekt ze allebei hier.
+  ['life', 'RTG Life', 'leven', '/apps/life.html', 'Een scherm voor je hele leven bij RTG: ritme, doelen, afspraken, check-in en je noodkaart bij elkaar. Wat niet gemeten wordt, staat er als niet gemeten.'],
+  ['doelen', 'Doelen', 'leven', '/apps/doelen.html', 'Waar je begon, waar je heen wilt en waarom; de stappen ertussen rekent RTG opnieuw uit vanaf waar je nu staat.'],
+  ['sport', 'Sport', 'leven', '/apps/sport.html', 'Je sportactiviteiten en clubs.'],
+  ['training', 'Training', 'leven', '/apps/training.html', 'Je eigen trainingsschema en wat je er echt van deed. RTG schrijft geen training voor en rekent geen belasting uit.'],
+  ['balans', 'Balans', 'leven', '/apps/balans.html', 'Je week op rust en ritme: Rahul adviseert ook eens niks, zonder streaks of schuldgevoel.'],
+  ['vitaal', 'Vitaal', 'leven', '/apps/vitaal.html', 'Een knop per dag: het gaat goed. Voor medicijnen, en voor wie alleen woont.'],
+  ['tijdlijn', 'Tijdlijn', 'leven', '/apps/tijdlijn.html', 'Wat er in de tijd met je gebeurd is, op een rij. Geen verbanden en geen score: naast elkaar zetten is iets anders dan zeggen wat het betekent.'],
+  ['voeding', 'Voeding', 'leven', '/apps/voeding.html', 'Je weekplan voor wat je wilt eten. Een plan, geen telling: RTG telt geen calorieen en beoordeelt niet wat je eet.'],
+  ['gedachten', 'Gedachtenboek', 'leven', '/apps/gedachten.html', 'Een plek om iets op te schrijven, voor jezelf. Er leest geen model mee en er wordt niets samengevat.'],
+  ['medicijnen', 'Medicijnen', 'leven', '/apps/medicijnen.html', 'Je eigen medicatieschema: wat je gebruikt, op welke tijden, en hoeveel er nog in huis is. RTG bepaalt nooit een dosering.'],
 
   // ---- veiligheid & identiteit ----
   // De vier veiligheidsapps draaiden altijd al op een gedeelde kern
@@ -23,7 +36,11 @@ module.exports = [
   // en dat betekende in de praktijk dat iemand de Thuiswacht kende en het
   // Codewoord nooit had gezien. Ze zijn nu vier standen van een app; de oude
   // paden leiden er met een hash naartoe, dus geen enkele link is dood.
-  ['veilig', 'RTG Veilig', 'veiligheid', '/apps/veilig.html', 'Thuiswacht, Codewoord, Vitaal en Thuisrust in een app: zeggen hoe lang je onderweg bent, je kring stil waarschuwen, dagelijks laten weten dat het goed gaat, en stil zijn zonder onbereikbaar te worden. De klok tikt op de server, dus het werkt ook als je telefoon uitvalt.'],
+  ['veilig', 'RTG Veilig', 'veiligheid', '/apps/veilig.html', 'Thuiswacht, Codewoord, Vitaal en Thuisrust in een app: zeggen hoe lang je onderweg bent, je kring stil waarschuwen, dagelijks laten weten dat het goed gaat, en stil zijn zonder onbereikbaar te worden. De klok tikt op de server, dus het werkt ook als je telefoon uitvalt.'],  /* Uit de tak die de toestemmingslaag bracht. Hij staat NAAST RTG Veilig en
+     niet erin: dit gaat over welk toestel en welke partij iets van u wegschrijft,
+     de levenspas in RTFoundation over wat een MENS van u mag zien. Twee ingangen
+     naar dezelfde vraag zou verkeerd zijn; twee verschillende vragen niet. */
+  ['toestemming', 'Toestemming', 'veiligheid', '/apps/toestemming.html', 'Wie mag iets van je zien en welk toestel schrijft iets weg; intrekken gaat naar de plek waar de toestemming leeft.'],
   ['ik', 'Wie ben ik', 'veiligheid', '/apps/ik.html', 'Wat Rahul over je mag weten: hoe hij tegen je doet, je voornaamwoorden en je eigen geloofskeuze. Alles optioneel.'],
   ['passkeys', 'Passkeys', 'veiligheid', '/apps/passkeys.html', 'Inloggen met vingerafdruk, gezicht of een fysieke sleutel.'],
   ['juridisch', 'Juridisch', 'veiligheid', '/apps/juridisch.html', 'Voorwaarden, contracten en je eigen akkoorden.'],

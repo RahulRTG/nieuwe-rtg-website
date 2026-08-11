@@ -19,6 +19,8 @@
 /* De spelregels (categorieen, verbodslijsten, richtprijzen, drempels) staan
    als pure data in markt/regels.js. */
 const { CATEGORIEEN, STATEN, LEVERING, RESPECTLOOS, VERBODEN, SCAM_WOORDEN, CONTACT_BUITEN, RICHTPRIJS, STAAT_FACTOR, SAMEN_METER, SAMEN_VERS_MS } = require('./markt/regels');
+// de openbaarheidsregel staat apart; de Mall-vindlaag deelt hem
+const { advertentieOpenbaar } = require('./markt/openbaar');
 
 function maakMarkt({ db, save, crypto, anthropic, schoon, notify, notifySupplier, haversine, betaal }) {
   function store() {
@@ -102,9 +104,8 @@ function maakMarkt({ db, save, crypto, anthropic, schoon, notify, notifySupplier
 
   /* ---------- zoeken / lijst ---------- */
   function zichtbaar(ad, kijker) {
-    if (ad.verwijderd) return false;
-    // te veel meldingen: automatisch verborgen tot beoordeling
-    if ((ad.melders || []).length >= 3 && !(kijker && pk(kijker) === pk(ad.verkoper))) return false;
+    // de verkoper ziet zijn eigen gemelde advertentie wel; verwijderd is weg
+    if (!advertentieOpenbaar(ad) && (ad.verwijderd || !(kijker && pk(kijker) === pk(ad.verkoper)))) return false;
     if (kijker) {
       const blok = store().geblokkeerd[pk(kijker)] || [];
       if (blok.includes(pk(ad.verkoper))) return false;

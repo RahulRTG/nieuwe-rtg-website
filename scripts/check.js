@@ -696,7 +696,12 @@ console.log('\n16) elk leden-pad met een derde partij gaat langs de gegevenspoor
     ['/api/mob/reis/mijn', 'je eigen reizen bekijken'],
     ['/api/mob/abo/aanbod', 'kijken of er een abonnement te koop is; er gebeurt nog niets'],
     ['/api/mob/abo/mijn', 'je eigen abonnementen bekijken'],
-    ['/api/mob/beleid', 'het reisbeleid van je eigen werkgever lezen; er gebeurt niets']
+    ['/api/mob/beleid', 'het reisbeleid van je eigen werkgever lezen; er gebeurt niets'],
+    /* Je EIGEN lopende bestellingen teruglezen, over de domeinen heen. Er gaat
+       geen gegeven naar een derde: de rijen komen uit RTG zelf en gaan naar het
+       lid dat ze heeft geplaatst. Er wordt ook niets besteld of betaald -- elke
+       regel wijst naar het domeinscherm dat hem beheert. */
+    ['/api/mall/bestellingen', 'je eigen lopende bestellingen teruglezen; leeslaag, geen derde partij']
   ]);
   let gaten = 0, poorten = 0;
   loop(path.join(ROOT, 'server/routes'), /\.js$/, f => {
@@ -1531,6 +1536,10 @@ console.log('\n27) geen dode configuratie: elke aangeraden variabele wordt ergen
    Elke ronde werd de lijst kleiner. Wie hem uitbreidt: meten, niet gokken. */
 console.log('\n28) elke API-route heeft een poort (of staat met reden op de publieke lijst)');
 {
+  /* `meetpoort` staat hier omdat het dezelfde deur is als `magMeten` hieronder,
+     alleen als middleware: server/meetpoort.js weigert met 404 tenzij het
+     metrics-token klopt of het verzoek van een intern adres komt. Hij kwam
+     erbij toen de sonde een tweede endpoint met precies die eis kreeg. */
   const POORT_MW = new Set(['auth', 'supplierAuth', 'officeAuth', 'techAuth', 'boardroomAuth',
     'huisAuth', 'baasAuth', 'lid', 'geenGast', 'eigenaarAlleen',
     /* de gezinsdeur van het RTFoundation-huis (gezinscode + profieltoken, gasten
@@ -1540,7 +1549,10 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
     'gezinsPoort', 'huisPoort',
     /* spread van [auth, geenGast], zoals `lid` hierboven; werd zichtbaar toen
        de kantoorpakket-paden voluit kwamen te staan (regel 45) */
-    'ledenAuth', 'rtfPoort']);
+    'ledenAuth', 'rtfPoort',
+    /* de deur van de meetingang (server/meetpoort.js): token of intern adres,
+       en 404 in plaats van 403. Uit de tak die de sonde bracht. */
+    'meetpoort']);
   const POORT_BINNEN = /\b(profiel|schoolProfiel|rtfSociaal|eisAccount|resolveSession|verifyToken|sessionFor|magInzien|isEigenaar|boardroomWie|magBoardroom|doosSleutelOk|magMeten|metPartner|samenSess|kantoorSess|werkPoort|beheerVan|lidVan)\s*\(/;
 
   /* PUBLIEK MET REDEN. Alles hier is een bewuste keuze, geen omissie. Wie een
@@ -1665,6 +1677,13 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
     ['/api/vertaal/ui', 'de knopteksten van datzelfde inlogscherm'],
     ['/api/translate', 'het woordenboek is publiek; de AI-tak zit achter kern/aipoort.js'],
     ['/api/push/key', 'de VAPID-sleutel is per definitie de PUBLIEKE helft'],
+    /* De rechtsvormen zijn voorlichting, geen bedrijfsdata: wat een B.V. van
+       een stichting onderscheidt, en waar je met elk van de twee aan vastzit,
+       hoort iemand te kunnen lezen VOORDAT hij een account maakt. Er staat
+       geen enkele onderneming in -- alleen de vaste tabel uit
+       kern/onderneming/rechtsvorm.js. Alles wat wel over een echt bedrijf
+       gaat, zit in dezelfde router achter auth. */
+    ['/api/onderneming/rechtsvormen', 'de rechtsvormtabel is voorlichting; er staat geen enkele onderneming in'],
     /* Het algoritmeregister van de stad. Een register dat alleen achter een
        kantoorinlog te lezen is, geeft een inwoner precies niets -- en dat is
        de enige groep voor wie het bedoeld is. Er staan regels in, geen mensen:
@@ -1822,7 +1841,7 @@ console.log('\n29) de Authorization-kop wordt gelezen om een token te halen, nie
     .replace(/\/\*[\s\S]*?\*\//g, m => m.replace(/[^\n]/g, ' '))
     .replace(/(^|[^:'"\\])\/\/[^\n]*/g, '$1');
   const KOP = /req\.get\(\s*['"]authorization['"]\s*\)|req\.headers\s*\[\s*['"]authorization['"]\s*\]|req\.headers\.authorization/i;
-  const VERIFIER = /\b(verifyToken|resolveSession|sessionFor|veiligGelijk|verifyActionToken|magAi|scimSleutelOk|magMeten|vanSleutel|accounts\.\w+)\s*\(/;
+  const VERIFIER = /\b(verifyToken|resolveSession|sessionFor|veiligGelijk|verifyActionToken|magAi|scimSleutelOk|apiSleutelOk|magMeten|vanSleutel|accounts\.\w+)\s*\(/;
   const VENSTER = 12;   // regels waarbinnen de verificatie moet volgen
   /* Plekken die de kop bewust lezen zonder te verifieren. Vandaag leeg, en dat
      hoort zo te blijven: wie hier iets toevoegt legt uit waarom betasten hier
@@ -2026,6 +2045,7 @@ console.log('\n34) elke AI-ingang draagt de toegangsregel, of staat erkend op de
     ['kern/bijles.js', 'RTF-onderwijs: bijles, geen pasgesprek'],
     ['kern/gemeente/meldingen.js', 'JSON-uitvoer: meldingsvelden, geen vrije tekst naar een lid'],
     ['kern/homekit.js', 'JSON-uitvoer: scene-definitie, geen vrije tekst naar een lid'],
+    ['kern/webmaker-ai.js', 'JSON-uitvoer: een website-ontwerp in de bloktaal, geen vrije tekst naar een lid'],
     ['kern/kijken.js', 'begrensd: beeldherkenning met eigen harde grenzen, geen pasgesprek'],
     ['kern/kletspraat/gesprek.js', 'kletsspel met eigen opdracht + taalregels, geen pasgesprek'],
     ['kern/leren/overhoren/lijsten.js', 'RTF-onderwijs: overhoorlijsten, geen pasgesprek'],
@@ -2490,6 +2510,41 @@ console.log('\n40) ARCHITECTUUR.md loopt niet achter op de code');
   }
 }
 
+/* 41b) HET BELOFTEREGISTER KLOPT.
+
+   Deze regel bestaat door een fout die ik twee keer achter elkaar maakte. Op de
+   vraag "wat is er nog niet" scande ik eerst alleen de bovenste maplaag en
+   meldde ik RTG Sheets, Slides en Forms als ontbrekend -- ze stonden in
+   public/apps/office/. Daarna meldde ik CRM en BI als ontbrekend, terwijl CRM
+   als server/bedrijf/klant.js bestaat en de voorspellaag als server/kern/voorspel/.
+
+   Twee keer fout op dezelfde vraag betekent niet dat er beter gezocht moet
+   worden; het betekent dat er geen bron was om in te kijken. BELOFTE.json is die
+   bron, en deze regel houdt hem eerlijk: elk bewijsstuk moet echt bestaan.
+
+   DE GEVAARLIJKE STAND IS "GEBROKEN", niet "open". Een belofte die nog open
+   staat, weet iedereen. Een belofte die ooit waar was en stil verdween, mist
+   niemand -- en precies die vindt deze regel. Bij het schrijven van het register
+   sloeg hij meteen drie keer aan: drie paden wezen naar modules die ergens
+   anders bleken te wonen. */
+console.log('\n41b) BELOFTE.md klopt en geen enkele belofte is stilletjes gebroken');
+{
+  try {
+    const belofte = require('./belofte');
+    const opSchijf = fs.existsSync(belofte.DOEL) ? fs.readFileSync(belofte.DOEL, 'utf8') : null;
+    const verwacht = belofte.bouw();
+    const { tel, rijen } = belofte.meet();
+    if (opSchijf === null) fout('BELOFTE.md bestaat niet -- draai: node scripts/belofte.js');
+    else if (opSchijf !== verwacht) fout('BELOFTE.md loopt achter op BELOFTE.json -- draai: node scripts/belofte.js');
+    else if (tel.gebroken) {
+      for (const r of rijen.filter(x => x.stand === 'gebroken'))
+        fout('gebroken belofte "' + r.wat + '": ' + r.kwijt.join(', ') + ' bestaat niet (meer)');
+    } else ok(tel.gedekt + ' beloften gedekt, ' + tel.open + ' open, geen enkele gebroken');
+  } catch (e) {
+    fout('het belofteregister kon niet worden gelezen (' + e.message + '); dan stelt deze regel niets vast');
+  }
+}
+
 console.log('\n41) BEWIJS.md loopt niet achter op de toetsen');
 {
   try {
@@ -2775,6 +2830,36 @@ console.log('\n45) elk routepad staat voluit, zodat de schakelkast ze kan tellen
     fout('deze bestanden bouwen geen paden meer op; haal ze uit BEKEND in deze regel: ' + schoongemaakt.join(', '));
   } else ok(bekeken + ' bestanden met routes; geen nieuwe opbouwers, ' + BEKEND.size + ' bekende resteren');
 }
+
+/* 46) DE SLO-TABEL IN SLO.md IS EEN AFDRUK VAN SLO.json.
+
+   Sinds er een meter is die de servicedoelen leest (server/kern/command/slo.js)
+   staan ze in SLO.json. De tabel in SLO.md stond er los naast, en dat is de
+   toestand waar LAT.md regel 4 over gaat: twee plaatsen met dezelfde waarheid
+   lopen uit elkaar, en dan is het document dat een MENS leest het verkeerde van
+   de twee. Bijstellen van een streefwaarde zonder de tabel bij te werken is
+   precies hoe dat gebeurt, en het valt nergens op.
+
+   Zelfde vorm als regel 40 en 41: de bouw wordt herhaald en de volle tekst
+   vergeleken, geen hash in de kop -- want een hash kan iemand bijwerken zonder
+   de inhoud. */
+console.log('\n46) de SLO-tabel in SLO.md is een afdruk van SLO.json');
+{
+  try {
+    const slo = require('./slo');
+    const opSchijf = fs.existsSync(slo.DOEL) ? fs.readFileSync(slo.DOEL, 'utf8') : null;
+    if (opSchijf === null) fout('SLO.md bestaat niet, terwijl SLO.json de norm draagt');
+    else if (slo.bouw(opSchijf) !== opSchijf) fout('SLO.md loopt achter op SLO.json -- draai: npm run slo');
+    else {
+      const norm = JSON.parse(fs.readFileSync(slo.BRON, 'utf8'));
+      ok(norm.doelen.length + ' servicedoelen en ' + (norm.reizen || []).length +
+        ' sondereizen staan in SLO.json, en SLO.md is daar gelijk aan');
+    }
+  } catch (e) {
+    fout('de SLO-norm kon niet worden gelezen (' + e.message + '); dan stelt deze regel niets vast');
+  }
+}
+
 
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

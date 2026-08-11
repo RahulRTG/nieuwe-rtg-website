@@ -17,6 +17,7 @@ public/            alles wat de browser laadt (de webroot die de server serveert
     ├── personeel.html     personeels-app (rooster, taken, walkie-talkie, SOS)
     ├── leverancier.html   werkgevers-app (alle genres)
     ├── boardroom.html     persoonlijke boardroom (functies aan/uit, ouderbeheer)
+    ├── command.html       RTG Command: het RTG- en RTF-kantoor als één app
     ├── backoffice.html    RTG-backoffice
     ├── kantoren.html      RTG-kantoren + de boardroom-kamers (o.a. RTG Bank en RTG Stad)
     ├── bank.html          RTG Bank voor het lid (alleen zichtbaar als de boardroom hem live zet)
@@ -519,6 +520,44 @@ packages). Ze bewaken de plekken waar geld en wet aan hangen:
   wachtwoord-hashing (scrypt) en sessietokens;
 - de zzp-belastingtool (rekenkundige invarianten, afscherming per pas,
   peiljaar) en de leeftijdslaag (leeftijdsgroep uit de geboortedatum);
+- de btw-aangifte van een zaak (`test/btw-aangifte.test.js`): de periodevakken,
+  de telling over het factuurregister, de twee controles die weigeren, de
+  correctie na indienen en de poorten van de endpoints — plus een schermtoets
+  (`test/btw-scherm.e2e.js`) die de kaart in een echte browser laat rekenen;
+- het btw-toezicht van het Belastingkantoor (`test/btw-toezicht.test.js`): de
+  vier standen van de aansluiting, dat inspecteur en aangever op de cent
+  hetzelfde tellen, en dat er over een lopende periode géén signalen komen —
+  met een schermtoets (`test/btw-aansluiting-scherm.e2e.js`) die hetzelfde
+  bedrag aan beide kanten van de tafel op het scherm zet;
+- de naheffingsaanslag (`test/btw-naheffing.test.js`): dat het bedrag uit de
+  aansluiting komt en niet uit het verzoek, dat dezelfde ogen niet dubbel
+  tellen bij vaststellen én bij het bezwaar erop, dat een boete niet zonder
+  grond bestaat, en dat een concept nog geen besluit is — plus de hele keten
+  over de échte routes met drie echte ambtenaren
+  (`test/btw-naheffing-keten.test.js`, inclusief de poging om de vier ogen te
+  omzeilen door een collega's naam mee te sturen) en het scherm van de zaak
+  waar het bezwaar en de betaling vandaan gaan
+  (`test/btw-naheffing-scherm.e2e.js`);
+- het betalen zelf: dat er eerst wordt geboekt en pas daarna op betaald gezet,
+  dat een mislukte boeking niets achterlaat, en dat een toegewezen bezwaar op
+  een betaalde naheffing terugstort — met een nepbank die op commando weigert,
+  want met de echte bank zou alleen de gelukkige helft getoetst worden;
+- de invordering: dat elke stap op de termijn van de vorige wacht (verzetbare
+  klok), dat beslag andere ogen vraagt en nooit meer pakt dan de schuld, dat een
+  deelbeslag de rest laat staan, en dat de regeling en de stopknop de keten
+  echt tegenhouden;
+- dat elke betaalde lidtransactie ook echt een factuur oplevert
+  (`test/lidfactuur.test.js`): zes betaalwegen — in de app, de gezamenlijke
+  rekening, een boeking, een rit, de balie op de ophaalcode en het tafelticket
+  — elk precies één factuur op de ref van de bon, nooit twee voor dezelfde bon,
+  en als sluitstuk dat de btw-aangifte op de cent uitkomt op de omzet die de
+  maandboekhouding van diezelfde zaak telt, over twee tarieven tegelijk. Plus
+  dat een factuur die niet lukt de betaling niet omvertrekt maar wél op het
+  techniekbord komt;
+- dat de kwijtschelding van een aanslag door twee inspecteurs gaat
+  (`test/belastingkantoor.test.js` en `test/kwijtschelding-scherm.e2e.js`):
+  voordragen met een grond, beslissen door een ander, en de inwoner hoort er
+  pas van als er écht is besloten;
 - De Salon-rechten (gast liket wel, reageert niet), de bestel- en betaalflow
   en de AVG-rechten (inzage en definitieve verwijdering).
 
@@ -665,6 +704,253 @@ De HTML-bestanden werken ook los (dubbelklikken of statische hosting): het porta
 | `POST /api/cv/get` / `POST /api/cv/save` | Het RTG-cv van het lid (de cv-builder in de leden-app) |
 | `POST /api/member/apply` `{supplierCode, func}` | Solliciteren bij een partner; kan pas met een afgerond cv |
 | `POST /api/supplier/apply` `{code, name, func, contact}` | Open sollicitatie via het startscherm van een partner-app |
+
+### Waar de omzet vandaan komt, en tegen welk tarief
+
+Twee dingen zaten hier los van elkaar terwijl ze over dezelfde transactie gaan,
+en allebei zijn ze rechtgezet.
+
+**1. Elke betaalde lidtransactie boekt nu een factuur** (`kern/lidacties/factuur.js`).
+De kassa, de retail, de verhuur en het vastgoed deden dat al; de transacties van
+het lid — een bestelling, de gezamenlijke rekening, een boeking, een rit — niet,
+en de twee kassawegen waarlangs zo'n bestelling alsnog wordt afgerekend (de
+ophaalcode aan de balie en het tafelticket) evenmin. Dat viel niemand op tot de
+btw-aangifte kwam: die telt het **factuurregister**, dus omzet zonder factuur
+stond er niet in, terwijl de maandboekhouding van diezelfde zaak hem wel telde.
+Er staat nu één routine die weet hoe een lidtransactie een factuur wordt, en de
+zes wegen roepen die aan — precies één keer, op het moment dat er écht is
+betaald. Een factuur die niet lukt draait de betaling nooit terug, maar valt ook
+niet stil: hij gaat naar de fout-aggregatie en dus naar het techniekbord.
+
+**2. Het btw-tarief stond op twee plekken en die twee waren het oneens**
+(`kern/fiscaal/tarief.js`). De maandboekhouding zocht een percentage op in de
+landentabel van de zaak; de facturatiemotor had `restaurant/bar/hotel/
+groothandel/boerderij → 9%, de rest → 21%` in zijn kop staan, zonder ooit naar
+het land te kijken. Voor een Nederlandse zaak viel dat samen. Voor Sal de Mar op
+Ibiza (land `ES`) niet: de boekhouding rekende 10%, de bon van de gast zei 9%.
+En het was niet bij te houden — de landentabel is levend, want de Regelwacht
+legt er een overlay overheen zodra een tarief verandert, en twee vaste getallen
+elders lopen daar per definitie op achter.
+
+Beide kanten vragen het nu aan dezelfde routine, dus ze **kunnen** niet meer
+uiteenlopen. Twee gevolgen die het waard zijn om te noemen:
+
+- de bon van de gast draagt per regel het juiste tarief, dus een glas wijn in
+  een restaurant staat op het standaardtarief en niet op het lage;
+- **een zaak zonder kaart, kamers of ritten valt nu onder `standaard` in plaats
+  van `eten`.** De boekhouding zette elke zaak zonder kamers of ritten op
+  `eten`, dus een kledingwinkel rekende het verlaagde tarief over een jas. Dat
+  cijfer verandert daardoor, en dat is de bedoeling.
+
+### De btw-aangifte van een zaak (`kern/fiscaal/btwaangifte.js`)
+
+Gebouwd naar het model van de loonaangifte (`kern/payroll/aangifte.js`), en om
+dezelfde reden: **één bron, geen tweede motor.** De aangifte komt uit het
+factuurregister en niets anders. Elke factuurregel draagt zijn eigen tarief
+sinds de facturatiemotor hem boekte, en dat tarief is wat de klant op zijn bon
+zag; er wordt hier geen btw opnieuw uitgerekend. Het tellen staat in
+`kern/fiscaal/btwtelling.js`, dat ook als enige plek weet wat `2026K3` betekent.
+
+Twee controles die weigeren in plaats van waarschuwen:
+
+1. de btw uit de regels moet exact de btw op de facturen zelf zijn (twee wegen
+   door hetzelfde register: regel versus factuurkop);
+2. bij indienen wordt opnieuw geteld — zijn er sinds het opmaken facturen
+   bijgekomen, dan weigert hij, want indienen op verouderde cijfers is een
+   verkeerde aangifte met een handtekening eronder.
+
+Verder: opmaken mag altijd, **indienen pas als de periode voorbij is**; een
+ingediende aangifte verandert niet meer maar krijgt een correctie bovenop, met
+verwijzing en verschil; en `dienIn` legt alleen vast DAT er is ingediend, door
+wie en met welk kenmerk. RTG verzendt niets — dat is dezelfde afspraak als in
+het btw-draaiboek (`kern/automatisering.js`): de zaak dient zelf in.
+
+Anders dan bij de loonaangifte, waar het RTG-kantoor indient en de werkgever
+meeleest, doet de ondernemer dit zelf: hij is de belastingplichtige. Er is dus
+bewust geen kantoorroute die dat overneemt.
+
+| Endpoint | Doel |
+|---|---|
+| `POST /api/supplier/btw/opmaken` `{periode, correctie?}` | Aangifte opmaken of bijwerken (`2026K3` of `2026-07`); manager, eigen zaak uit het token |
+| `POST /api/supplier/btw/aangiftes` `{jaar?}` | De eigen aangiftes teruglezen |
+| `POST /api/supplier/btw/aangifte` `{id}` | Eén aangifte in detail |
+| `POST /api/supplier/btw/indienen` `{id, kenmerk}` | Vastleggen dat hij is ingediend; zonder kenmerk geen bewijs |
+
+Het scherm staat in het Kantoor van de zaak onder Boekhouding, naast (en
+nadrukkelijk niet in plaats van) "Btw deze maand": dat bord is de maandstand uit
+de kassa en de boekingen, de aangifte is de periode uit het factuurregister.
+Twee verschillende vragen. Wat er níét in zit is omzet die nooit een factuur
+kreeg; de aangifte verantwoordt daarom uit hoeveel facturen hij komt.
+
+#### De andere kant: het toezicht (`kern/overheid/btwtoezicht.js`)
+
+Het Belastingkantoor had een btw-beeld maar geen enkel besef van wat een zaak
+daarover had **aangegeven** — een cijfer zonder de vraag erachter. De vraag van
+een inspecteur is niet "hoeveel btw zit er in het register", maar "klopt wat er
+is aangegeven met wat er is gefactureerd, en wie heeft niets ingediend".
+
+De aansluiting zet die twee naast elkaar, per zaak per periode, met vier standen:
+`sluit_aan`, `wijkt_af`, `niet_aangegeven`, `alleen_concept`. Daaruit volgen de
+btw-signalen in de inspecteurscockpit — maar **alleen over een afgesloten
+periode**: over een lopend kwartaal weigert de aangifte van de ondernemer het
+indienen met zoveel woorden, dus daar is "niets ingediend" de bedoeling en geen
+bevinding. Het scherm opent om dezelfde reden op het laatst afgesloten kwartaal.
+
+**Eén telling voor beide partijen.** Het geteld-uit-het-register komt bij de
+inspecteur uit dezelfde routine als bij de aangever (`telPerZaak` naast
+`telFacturen`, tot op de regelsom in `regelBtwCenten`). Dat is de kern van de
+zaak en geen zuinigheid: een toezichthouder die anders rekent dan de aangever
+vindt altijd een verschil, en dan zegt een verschil niets meer. Zo betekent een
+verschil precies één ding — er is na het indienen iets aan de facturen veranderd,
+of er is niets aangegeven.
+
+Bij die verbouwing is ook het woord *omzet* in het btw-beeld rechtgezet: dat veld
+droeg het factuurbedrag **inclusief** btw. Wie het naast een aangifte legde,
+vergeleek twee verschillende dingen zonder dat iets dat zei. Het heet nu
+`grondslag` en draagt ook dat getal.
+
+| Endpoint | Doel |
+|---|---|
+| `POST /api/overheid/bd/btw/aansluiting` `{periode?}` | Per zaak: geteld uit het register naast de ingediende aangifte, met verschil en stand; zonder periode de laatst afgesloten |
+
+#### En wat de inspecteur er dan van vindt: de naheffing (`kern/overheid/naheffing.js`)
+
+Het is een **naheffing** en geen navordering. Btw is een aangiftebelasting — je
+berekent en betaalt hem zelf, en wat er niet is betaald wordt nageheven (art. 20
+AWR). Navordering hoort bij een aanslagbelasting zoals de inkomstenbelasting.
+Andere bevoegdheden, andere termijnen; de twee door elkaar halen is geen
+woordenspel.
+
+**Het bedrag wordt niet getypt.** Het komt uit de aansluiting: gefactureerd min
+aangegeven. Een naheffing met een invulveld is een tweede berekening naast het
+register, en dan gaat de discussie over het getal in plaats van over de feiten.
+
+**Vier ogen, en dezelfde ogen tellen nooit dubbel** (hetzelfde idioom als
+`kern/uitgifte.js`): wie hem opmaakt stelt hem niet vast, en wie hem opmaakte of
+vaststelde beslist niet op het bezwaar ertegen — een besluit laten heroverwegen
+door dezelfde persoon is geen heroverweging. De namen komen uit de
+personeelslogin op de persoonlijke pincode, nooit uit het verzoek.
+
+**De boete ontstaat nooit vanzelf.** Geen enkele stand levert er een op; een mens
+zet een percentage en schrijft erbij waarom. Zonder grond geen boete.
+
+Verder: een concept is nog geen besluit (de zaak ziet het niet en er staat geen
+bezwaar tegen open), een vastgestelde naheffing trek je niet stilletjes in, en
+vaststellen hertelt eerst — zijn de cijfers sinds het opmaken veranderd, dan
+weigert hij.
+
+**En betalen is een echte boeking** (`kern/overheid/naheffing-betalen.js`). Hier
+stond drie commits lang dat innen er níét was, met de reden erbij: een
+`betaald = true` zonder boeking is een leugen in de database. Nu gebeurt het
+zoals het hoort — een dubbele boeking in het grootboek van RTG Bank, van de
+zakelijke rekening van de zaak naar `extern:belastingdienst`. Dat laatste is de
+eerlijke tegenrekening: de Belastingdienst bankiert niet bij RTG, dus het geld
+verlaat het platform. De som van alle saldi blijft exact nul.
+
+**De volgorde is de hele zaak:** eerst boeken, dan pas op betaald. Andersom zou
+een mislukte boeking een betaalde naheffing opleveren, en dat is het ergste van
+de twee — dan denkt iedereen dat het klaar is. Wat de bank weigert (nog niet
+live, geen zakelijke rekening, te weinig saldo) wordt ongeschonden doorgegeven,
+met het tekort erbij en de mededeling dat er niets is afgeschreven.
+
+Wordt een bezwaar tegen een al betaalde naheffing toegewezen, dan komt het geld
+terug — een besluit dat de aanslag vernietigt en het bedrag laat staan, doet
+niets.
+
+#### En als er niet betaald wordt: de invordering (`kern/overheid/naheffing-invordering.js`)
+
+De keten is één kant op en **elke stap wacht op de termijn van de vorige**:
+vervallen → aanmaning → dwangbevel → beslag. Niet "na een dag of wat": de datum
+staat op de naheffing en wordt nagerekend. Een invorderingsstap die te vroeg mag,
+is een dwangmiddel zonder grond. Aanmaning en dwangbevel leggen kosten op (art.
+63a IW en de Kostenwet, demo-peiljaar) en die tellen mee in wat er te betalen is
+— een aanmaning die kosten oplegt maar het bedrag niet meebeweegt, houdt de
+invordering aan de gang om acht euro.
+
+**Beslag is de enige stap met vier ogen**, en met opzet de enige: hier gaat er
+geld van een rekening af zonder dat de rekeninghouder tekent. Wie het dwangbevel
+uitvaardigde, legt het beslag niet. Er wordt **nooit meer gepakt dan de schuld**;
+staat er minder op de rekening, dan is het een deelbetaling en blijft de rest
+openstaan. Een lege rekening levert een nette weigering op, geen mislukte
+boeking.
+
+**Er zit een rem en een stopknop in** (`kern/overheid/naheffing-rem.js`), en dat
+is geen vriendelijkheid maar een voorwaarde. Een betalingsregeling schort de
+invordering op zolang hij loopt; een ontvanger kan de invordering stopzetten met
+een reden, in élke stand — ook na een beslag, want juist dan is er iets
+misgegaan. Zonder die twee is dit een ratel die maar één kant op kan, en dat is
+precies het soort systeem dat mensen kapotmaakt omdat niemand meer aan de
+noodrem kon. De stopknop belooft níét dat het geld terugkomt: wat er al is
+afgeschreven loopt via een besluit op bezwaar, niet via een pennenstreek van de
+ontvanger.
+
+**Wat er niet is, en niet komt:** beslag op iets anders dan de zakelijke rekening
+waarop de aanslag is opgelegd. Geen loonbeslag, geen bodembeslag, geen
+derdenbeslag. Dat zijn bevoegdheden met eigen waarborgen en eigen rechters, en
+die verzin je er niet even bij.
+
+| Endpoint | Doel |
+|---|---|
+| `POST /api/overheid/bd/naheffing/aanmaning` `{id}` | Na de betaaltermijn; legt aanmaningskosten op |
+| `POST /api/overheid/bd/naheffing/dwangbevel` `{id}` | Na de aanmaningstermijn; betekeningskosten |
+| `POST /api/overheid/bd/naheffing/beslag` `{id}` | Na het dwangbevel, door ándere ogen; nooit meer dan de schuld |
+| `POST /api/overheid/bd/naheffing/regeling` `{id, maanden}` | De rem: 1–12 maanden, zet de invordering stil |
+| `POST /api/overheid/bd/naheffing/stop` `{id, reden}` | De stopknop, in elke stand, met een reden |
+
+| Endpoint | Doel |
+|---|---|
+| `POST /api/overheid/bd/naheffing/maak` `{periode?, code, boetePct?, boeteGrond?}` | Concept opmaken; bedrag uit de aansluiting |
+| `POST /api/overheid/bd/naheffing/stelvast` `{id}` | Vaststellen — moet een ándere inspecteur zijn; maakt bekend aan de zaak |
+| `POST /api/overheid/bd/naheffing/intrek` `{id, reden}` | Alleen een concept |
+| `POST /api/overheid/bd/naheffing/bezwaar/beslis` `{id, toewijzen, motivering}` | Derde ogen; toewijzen laat niets staan |
+| `POST /api/overheid/bd/naheffingen` `{status?, periode?}` | De lijst voor het kantoor |
+| `POST /api/supplier/btw/naheffingen` | De zaak leest zijn eigen (geen concepten) |
+| `POST /api/supplier/btw/naheffing/bezwaar` `{id, reden}` | De zaak maakt bezwaar |
+| `POST /api/supplier/btw/naheffing/betaal` `{id}` | De zaak betaalt: een echte boeking van zijn zakelijke rekening |
+
+#### En de oudere kant van hetzelfde kantoor: de IB-aanslag (`kern/overheid/kantoor-invordering.js`)
+
+Er draaiden **twee invorderingsregimes naast elkaar in hetzelfde kantoor**. De
+naheffing hierboven heeft vier ogen op elke stap die geld raakt; de oudere
+IB-kant (herinnering, betalingsregeling, kwijtschelding) had er nul — één
+inspecteur kon in zijn eentje een schuld wegstrepen. Dat is nu gelijkgetrokken
+op het punt waar het ertoe doet: **kwijtschelden is de enige onomkeerbare
+handeling in dat rijtje**, en die gaat in twee stappen door twee mensen. Een
+herinnering kun je opnieuw sturen en een regeling kun je intrekken; een
+kwijtgescholden aanslag komt niet terug.
+
+De burger hoort pas van een kwijtschelding als er écht is besloten — een
+voordracht is geen besluit, dus er valt nog niets mee te delen.
+
+| Endpoint | Doel |
+|---|---|
+| `POST /api/overheid/bd/herinnering` `{ref}` | Betalingsherinnering via de Berichtenbox, op naam |
+| `POST /api/overheid/bd/regeling` `{ref, maanden}` | 2–24 maanden, op naam |
+| `POST /api/overheid/bd/kwijt/voordracht` `{ref, reden}` | Voordragen, met een verplichte grond; de burger hoort nog niets |
+| `POST /api/overheid/bd/kwijt/besluit` `{ref, akkoord}` | Beslissen — moet een ándere inspecteur zijn; afwijzen laat de aanslag gewoon openstaan |
+
+**Wat er aan deze kant (nog) niet is: termijnen.** De naheffing rekent na of een
+vervaldatum echt is verstreken voordat de volgende stap mag, en kent aanmaning,
+dwangbevel en beslag; de IB-kant kent alleen een herinnering zonder klok
+erachter. Dat is met opzet niet half nagebootst — knoppen die een volgorde
+suggereren zonder de datums na te rekenen zijn misleidender dan geen. Het staat
+als 4.23 in `TAKEN.md`.
+
+#### De herinnering rekent ook zelf (`kern/automatisering.js`)
+
+Het btw-draaiboek NAM een bedrag, een periode en een deadline aan, en de route
+gaf ze door uit het verzoek — dus wie de route aanriep bepaalde wat er in de
+herinnering stond, ongeacht wat het register zei. Dat is dezelfde fout als een
+aangifte met een invulveld, alleen dan in een e-mail. Nu telt het draaiboek zelf,
+met dezelfde routine als de aangifte, en rekent het de aangiftetermijn uit (een
+maand na afloop van het tijdvak, art. 10 AWR).
+
+En hij zwijgt als er niets te herinneren valt: is er al ingediend of viel er
+niets aan te geven, dan gaat er geen bericht. Een draaiboek dat ook mailt als
+alles op orde is, leert de ondernemer zijn post te negeren — en dan mist hij de
+keer dat het wel moest. `POST /api/supplier/rtmail/btw-herinner` geeft dan een
+`200` met `bericht: null` en de reden erbij, want een stille 200 laat de zaak
+denken dat er post onderweg is.
 
 ### RTG School (de onderwijs-toren)
 
@@ -1107,6 +1393,1008 @@ meetelt, de drempel die een verbod wordt, en een `werktBij` die niet meer naar
 het bedrijf kijkt -- elk daarvan laat een andere toets zakken. Het scherm van de
 werkgever loopt de weg af in `test/mobiliteitscherm.e2e.js`.
 
+### RTG Ondernemers-OS: drie assen, één bedrijfsobject
+
+`server/kern/onderneming/` + `/api/onderneming/...`. De ruggengraat onder alles
+wat een ondernemer hier kan: **één object dat bestaat vanaf "ik denk erover na"**
+en dat meegroeit tot een groep met meerdere vennootschappen.
+
+**Waarom het er is.** Een bedrijf bestond hier in twee gedaanten. Vóór de
+oprichting was het een `aanmelding` (`kern/aanmeldingen/bedrijf.js`), daarna een
+`supplier`, en `provisioneer()` maakte die tweede op het moment dat het personeel
+de eerste termijn aftekende. Twee objecten voor één bedrijf is regel 4, en de
+naad zat op de slechtst denkbare plek: alles vóór de oprichting -- het idee, de
+verkenning, het plan, de rechtsvormkeuze -- had geen object om aan te hangen, en
+alles erna had geen geheugen van wat er vooraf bedacht was.
+
+De onderneming **wijst de zaak aan** in plaats van hem over te schrijven. De
+supplier blijft wat hij is (het menu, de vloot, het personeel); de onderneming is
+wie hij juridisch en in zijn leven is. De **naam woont daarbij op precies één
+plek, en die plek verhuist**: zolang er geen zaak is staat hij op de onderneming,
+en bij het koppelen wordt de lokale naam wéggegooid -- niet gekopieerd, want een
+tweede naam die niemand meer bijwerkt is precies waar regel 4 over gaat.
+
+**De drie assen komen samen in één capslijst:**
+
+- **Wat zij DOET** -- `kern/werkvormen.js`, ongewijzigd: afgeleid uit vloot, menu,
+  kamers, personeel.
+- **Wat zij IS** -- `onderneming/rechtsvorm.js`: eenmanszaak, vof, bv, holding,
+  stichting, vereniging, coöperatie. Dit wordt als enige **niet** afgeleid, en met
+  reden: een rechtsvorm is een feit van de notaris en de KvK, en gokken zou hier
+  betekenen dat iemand op de verkeerde aangifte belandt. Wat er wél uit volgt
+  (verplichtingen, gereedschap, oprichtingsstappen) staat als data.
+- **Waar zij STAAT** -- `onderneming/fase.js`: idee, validatie, oprichting, eerste
+  klant, tractie, werkgever, vestigingen, groep. Afgeleid uit feiten en nooit
+  gezet, want een opgeslagen fase loopt uiteen met de werkelijkheid en alles wat
+  erop leunt is dan óók fout. Het is de **hoogste bereikte** fase en niet de
+  eerste die zakt: wie eerst inschrijft en pas daarna zijn plan opschrijft blijft
+  niet op 'idee' hangen. En zonder feiten geeft hij `null` en niet 'idee' (regel
+  3: 'idee' is een geldige uitkomst en mag dus nooit het antwoord zijn op
+  ontbrekende invoer).
+
+**`verboden` is geen tweede capslijst maar het tegendeel ervan**, en het bestaat
+apart omdat een verbod anders verliest van een andere as. Een stichting mag geen
+winst uitkeren; zou `winstuitkering` alleen ontbréken in haar caps, dan zet de
+eerste as die hem wél meebrengt de knop alsnog neer. `capsSamen()` trekt de
+verboden er dus ná het samenvoegen af, en geeft terug wat er is geweerd en
+waarom -- een knop die zonder uitleg ontbreekt leest als een storing.
+
+**Geen paslaag op nadenken.** De zzp-belastingtool en de AI-boekhouder blijven
+achter de Business Pass; de onderneming zelf niet. De eerste stand is letterlijk
+"ik denk erover na", en iemand die dat denkt heeft nog geen zakelijke pas.
+
+Getoetst in `test/onderneming.test.js` (22 toetsen). Vijf mutaties gedaan en alle
+vijf zagen we de júiste toets laten zakken: de verboden niet meer aftrekken, de
+fase stil op 'idee' laten vallen, de ladder bij het eerste gat laten stoppen, de
+naam kopiëren in plaats van weggooien, en de eigendomscontrole op de routes
+weghalen.
+
+### De pre-oprichtingsfase: verkennen, doorrekenen, en mogen afraden
+
+`server/kern/onderneming/{intake,kans,simulatie,stress,stress-toetsen,plan}.js`
++ `/api/onderneming/{intake,verkenning,plan/vastleggen}`. De vier stappen vóór
+de oprichting, gebouwd op het ondernemingsobject hierboven. Ze leunen op elkaar
+in één volgorde en worden daarom als één ketting aangeroepen
+(`ondernemingVerkenning`) -- een scherm dat ze zelf moet ordenen, ordent ze ooit
+verkeerd.
+
+**De kansverkenning is een meter, en regel 10 gaat over meters.** Een score van
+87/100 ziet eruit als een feit, wordt overgeschreven in een ondernemingsplan en
+daarna aan een bank getoond. Drie dingen liggen daarom vast:
+
+- **Niet gemeten is niet nul.** Een bron zonder data levert geen punten én telt
+  niet mee in de noemer. Zou hij als nul meetellen, dan krijgt een leeg platform
+  vanzelf een lage score en leest een gebrek aan méting als een gebrek aan kans.
+- **Onder twee gemeten bronnen komt er geen cijfer**, maar `null` met de reden.
+  Een getal met een voorbehoud eronder wordt een getal zodra iemand het overtypt.
+- **De grondslag reist mee**: per bron of hij gemeten is, welke waarde eruit
+  kwam en hoeveel punten dat gaf.
+
+De vier bronnen zijn bestaande data en er komt geen register bij: concurrentie
+(zaken van dezelfde soort in dezelfde plaats), vraag (hun boekingen en bonnen),
+personeel (open vacatures in de branche -- een tekort is voor een starter een
+risico) en bedrijfsruimte (leegstand uit het stadsweefsel, de bron die in de
+praktijk het vaakst eerlijk 'niet gemeten' meldt). Nul concurrenten is bewust
+**niet** de topscore: een markt waar niemand zit, is vaker geen markt dan een gat.
+
+**Het volume komt van de ondernemer, niet van ons.** De simulatie rekent zijn
+eigen aannames door over twaalf maanden in drie scenario's, en elke aanname staat
+met **naam, getal en herkomst** in het antwoord -- `opgegeven` of `aanname`.
+Zonder dat onderscheid lijkt onze startwaarde net zo hard als zijn eigen cijfer,
+en zo wisselt een prognose ongemerkt van eigenaar. Ontbreekt er invoer, dan komt
+er een fout met de ontbrekende velden en geen half doorgerekende maand.
+
+**De stress test mag 'niet starten' zeggen.** Netjes doorgerekende aannames zien
+er altijd goed uit, en dat is het probleem; deze module gaat er met opzet tegenin.
+Verkopen onder de kostprijs is blokkerend (meer verkopen maakt het verlies
+groter), net als een kas die in het *basisscenario* onder nul duikt -- niet in een
+somber geval dat wij erbij verzinnen, maar in wat de ondernemer zelf verwacht. Er
+staat ook in wat juist wél houdt: een lijst die alleen problemen noemt, wordt na
+twee keer weggeklikt, en dan doet ook de blokkerende bevinding er niet meer toe.
+
+**Het advies is geen slot.** Het levende ondernemingsplan wordt elke keer opnieuw
+gebouwd en nergens bewaard (een kopie zou verouderen zodra de intake wijzigt).
+Wat wél wordt bewaard is de **beslissing**: vastleggen zet een bevroren versie in
+het archief, en bij een 'niet starten' gaat dat alleen door met een
+uitdrukkelijke `tochDoorzetten` die mét het advies wordt opgeschreven. Software
+die een mens verbiedt te ondernemen omdat een rekensom dat vindt, is niet aan
+ons; zorgen dat niemand kan zeggen dat hij het niet wist, wel. Dat vastleggen is
+tegelijk de fase-overgang van 'idee' naar 'validatie' -- geen knop die een fase
+zet, maar het feit waar `fase.js` op kijkt.
+
+Getoetst in `test/onderneming-verkenning.test.js` (20 toetsen). Zes mutaties
+gedaan; vijf beten meteen. De zesde sloeg af en bleek een kapotte mutatie te zijn
+(de cache die hij moest zetten werd nooit gevuld) -- opnieuw gedaan, en toen zakte
+de juiste toets. De vijf andere: ontbrekende bronnen als nul meetellen, de
+bronnendrempel weghalen, 'onder de kostprijs' van blokkerend naar zwaar zetten,
+de simulatie op halve invoer laten rekenen, en de bevestiging bij 'niet starten'
+overslaan.
+
+### De schil: één scherm dat met het bedrijf meegroeit
+
+`server/kern/onderneming/dagbeeld.js` + `/api/onderneming/dagbeeld` +
+`/apps/onderneming.html`. De ondernemer hoort geen modules te zien. Hij opent
+zijn bedrijf en ziet waar hij staat, wat er vandaag toe doet, en wat hij eraan
+kan doen -- en dat scherm is **fase-bewust**, want dat is de hele belofte: een
+idee krijgt geen debiteurenbeheer, een groep krijgt geen intakevragen meer.
+
+**Het scherm verzint geen cijfers om zichzelf te vullen.** Een onderneming in de
+ideefase heeft geen omzet, en dan staat er geen "€0" maar niets: nul is een
+gemeten waarde en die suggereert dat er verkocht had kunnen worden. Elk cijfer
+draagt `gemeten`, en wat niet gemeten is, staat als **reden** onder "niet
+gemeten" in plaats van als getal.
+
+**De gezondheidsscore loopt via dezelfde meter als de kansverkenning**
+(`onderneming/meter.js`). Hoe je met ontbrekende bronnen omgaat is precies het
+stuk dat je twee keer nét anders opschrijft, dus staat het één keer: niet-gemeten
+telt ook niet mee in de noemer, onder twee bronnen komt er geen cijfer, en de
+grondslag reist mee. Gevolg, en het is de bedoeling: **een onderneming zonder
+zaak heeft één meetbare bron en krijgt dus geen cijfer.** Een bedrijf dat
+gisteren begon en vandaag een 60 krijgt, heeft een cijfer over niets.
+
+**De acties staan op gewicht, met een reden per stuk.** Wat het plan breekt
+(een blokkerende bevinding) gaat vóór een ontbrekend intakeveld, en dat gaat vóór
+"kies eens een rechtsvorm". Elke actie zegt waaróm hij er staat: een lijst
+opdrachten zonder reden wordt een afvinklijst, en daarin verdwijnt ook de
+belangrijke.
+
+Eén ding dat het scherm bewust *niet* aanneemt: dat zijn eigen kopbalk blijft
+staan. `shared/ios.js` bouwt de chrome om, en de eerste versie hier ging ervan
+uit dat haar `<h1>` er daarna nog was -- waarop het hele scherm bleef hangen op
+een `null`. Dat is geen fout van die laag maar van de aanname; er wordt nu alleen
+naar de chrome geschreven als hij er nog is.
+
+Getoetst in `test/onderneming-dagbeeld.test.js` (10) en
+`test/onderneming-scherm.e2e.js` (4, in een echte browser). Zes mutaties, alle
+zes raak: ontbrekende bronnen als nul meetellen, de bronnendrempel verlagen, een
+omzet van nul tonen in plaats van niets, de acties niet meer op gewicht zetten,
+de schil de 409 laten wegpoetsen door meteen `tochDoorzetten` mee te sturen, en
+de schil ook de niet-gemeten cijfers laten tekenen.
+
+### Het oprichtingsproject en de zaak: de reis afgemaakt
+
+`server/kern/onderneming/{oprichting,aanvraag}.js` +
+`/api/onderneming/{oprichting,oprichting/zet,aanvraag,aanvraag/stand}`. Het laatste
+stuk: van een vastgelegd plan naar een zaak die draait.
+
+**Zonder rechtsvorm geen lijst.** De oprichtingsstappen komen uit drie bronnen --
+de rechtsvorm (gelezen uit `rechtsvorm.js`, niet overgetypt), de branche
+(een restaurant heeft een alcoholvergunning nodig, een rijschool een
+instructeurspas) en de situatie (samen ondernemen vraagt afspraken op papier,
+geen startkapitaal vraagt een buffer). Omdat de helft van die stappen van de
+rechtsvorm afhangt, geeft het project zonder die keuze géén halve lijst maar de
+vraag: een lijst die compleet lijkt en het niet is, laat iemand langs de notaris
+fietsen. En de lijst zegt zelf dat hij niet juridisch volledig is -- wie een
+lijst afvinkt die zich compleet voordoet, controleert daarna niets meer.
+
+**Er is geen tweede deur naar een zaak.** Een zaak aanmaken betekent partner
+worden, en dat besluit is mensenwerk ("er is geen automatische toekenning",
+`kern/aanmeldingen.js`). Het Ondernemers-OS maakt daarom **geen supplier** maar
+een gewone aanmelding, precies zoals het aanmeldformulier -- alleen al ingevuld
+met wat de intake weet. Zou het OS zelf provisioneren, dan stond er een deur
+naast de deur waar een mens voor staat, en dat is de deur die niemand meer
+bewaakt. De nog openstaande oprichtingsstappen gaan mee als `behoeften`, zodat de
+bestaande provisioning ze omzet in de wensenlijst van de nieuwe zaak: wat hier
+nog te doen stond, staat straks als startlijstje in de zaak zelf.
+
+**Een fout die twee keer moest afgaan voordat hij goed gerepareerd was.** Beide
+modules gaven een domeinstand terug in een veld `status` -- en `status` betekent
+in elke route van dit huis de HTTP-code. `res.status('geen-rechtsvorm')` gooit,
+dus een volstrekt correct verzoek viel om met een 500. De eerste reparatie
+hernoemde het veld in één bestand; toen ging dezelfde fout af in het tweede. Dat
+was symptoombestrijding (regel 1). De echte reparatie is nu tweeledig: de
+kernmodules geven `stand`, én `stuur()` in de route leest alleen een écht
+geheel getal tussen 100 en 599 als HTTP-code. Dat tweede maakt de hele klasse
+onmogelijk in plaats van hem per aanroep te repareren. Die guard heeft zelf geen
+eigen toets, want er is nu geen aanroeper meer die hem kan bereiken -- hij staat
+hier genoemd zodat dat bekend is en geen belofte in tekst blijft.
+
+Getoetst in `test/onderneming-oprichting.test.js` (14) en in de schermronde. Vier
+mutaties, alle vier raak: zonder rechtsvorm tóch een lijst geven, een verzonnen
+stap aannemen, het OS zelf een zaak laten aanmaken, en de aanvraag zonder
+vastgelegd plan toelaten. De twee 500's hierboven zijn niet met een mutatie
+gevonden maar in een echte ronde -- dat is sterker bewijs, geen zwakker.
+
+### Klant nummer een, en de honderd daarna
+
+`server/kern/onderneming/eersteklant.js` + `/api/onderneming/eersteklant`. Zodra
+de zaak bestaat verandert het doel: niet meer "een bedrijf oprichten" maar er
+moet iemand kopen. Deze laag meet hoe ver de zaak daarvoor klaarstaat en
+verschuift daarna mee naar de volgende mijlpaal (1, 10, 25, 50, 100 klanten,
+elk met wat er in die stap te leren valt -- een teller die alleen optelt is een
+spelletje).
+
+**De lijst hangt af van wat de zaak DOET, niet van een lijstje per genre.** Wat
+"klaar" betekent komt uit de capslijst van `werkvormen.js`: een horecazaak
+zonder kaart is niet klaar, een dienstverlener zonder diensten evenmin, maar een
+dienstverlener heeft geen kaart nodig. Zet iemand een busje in de vloot, dan komt
+de vlootstap er vanzelf bij. Een nieuw genre krijgt zo de goede lijst zonder dat
+hier iets bij hoeft. En het mooiste geval staat als eigen toets vast: wie in zijn
+eentje een restaurant runt **is** ook zelfstandige, en krijgt allebei.
+
+**Er is geen tweede poort.** `kern/ondernemerpoort.js` loodst elke nieuwe zaak al
+door de basis (Salon-pagina, rondleidingen) voordat zij online mag. Die stand
+wordt hier gelezen en niet nagebouwd -- twee lijsten die allebei "is deze zaak er
+klaar voor" beweren, lopen binnen een maand uiteen. Om diezelfde reden staat de
+Salon-pagina hier **niet** als eigen stap: twee keer hetzelfde afvinken maakt van
+een teller een leugen.
+
+**Een percentage mag hier wel, en bij de kansscore niet.** Het verschil is dat
+dit een telling is en geen weging: acht stappen, vijf gedaan, dat is exact. De
+kansscore weegt bronnen van ongelijke betekenis en kan dat niet zijn. Zonder zaak
+is er niets te tellen, en dan is het antwoord `null` en geen 0% -- 0% zou zeggen
+dat er niets gedaan is, terwijl er niets te doen valt.
+
+In het dagbeeld gaat deze stap vóór de losse openstaande aanvragen: een zaak die
+niet online staat, krijgt er sowieso geen.
+
+Getoetst in `test/onderneming-eersteklant.test.js` (16). Vijf mutaties, alle vijf
+raak: de werkvormen negeren en iedereen alles vragen, een eigen Salon-stap naast
+die van de poort zetten, zonder zaak toch 0% teruggeven, een wachtende boeking
+als klant tellen, en de eerste-klant-actie onder de losse aanvragen laten zakken.
+
+### Het Mall-profiel: de branche bepaalt de architectuur
+
+`server/kern/onderneming/mallprofiel.js` + `/api/onderneming/mallprofiel`. De Mall
+toont elke partner al, gegroepeerd per genre (`kern/mall/etalage.js`). Wat daar
+niet stond is de vraag die de ondernemer stelt: **hoe hoort mijn pagina eruit te
+zien, en wat mist er nog.** Een restaurant heeft een kaart, reserveren, bestellen
+en bezorgen; een kapper heeft diensten, een agenda en vrije tijdvakken; een hotel
+heeft kamers. Dat is geen opmaak maar architectuur.
+
+**Maar niet via een lijst per branche.** Zo'n lijst zou de zoveelste genre-tabel
+in dit huis zijn, en de eerste die vergeten wordt bij genre tweeëndertig. De
+onderdelen hangen aan **caps**, en die komen uit `werkvormen.js` -- dezelfde
+afleiding die de gereedschapskisten en de eerste-klant-lijst al gebruiken. Zet een
+hotel er een busje bij, dan verschijnt het ritblok vanzelf. Drie onderdelen hangen
+aan géén cap, omdat ze bij elke zaak horen: waar u zit, hoe het eruitziet, en uw
+verhaal.
+
+**Dit beslist niets over zichtbaarheid.** Of een zaak in de Mall stáát, bepalen de
+ondernemerspoort en de salonregel, en die blijven de enige waarheid daarover. Deze
+module beschrijft alleen de opbouw en zegt per onderdeel of de gegevens er zijn --
+een zaak die offline staat kan een volledig ingevulde pagina hebben. Dat
+voorbehoud staat in het antwoord zelf en niet alleen in de code.
+
+`GENRE_PAGINA` (waar een genre in de app geboekt wordt) is voor deze module
+geëxporteerd uit `kern/mall` in plaats van overgetypt: een tweede kaart met
+dezelfde paden loopt uiteen zodra er een genre bij komt.
+
+In het dagbeeld komt de Mall-pagina ná de etalage-check: online staan gaat voor,
+want een pagina die niemand ziet is geen pagina.
+
+Getoetst in `test/onderneming-mallprofiel.test.js` (10). Vijf mutaties, alle vijf
+raak: de caps negeren en elke zaak alles geven, de vaste onderdelen tóch aan een
+cap hangen, een eigen paginakaart naast die van de Mall zetten, het profiel over
+zichtbaarheid laten beslissen, en de Mall-actie boven de etalage-check laten
+kruipen.
+
+### Het klantenboek en de relaties (het CRM)
+
+`server/kern/klantenboek.js` + `server/kern/onderneming/relaties.js` +
+`/api/onderneming/relaties{,/notitie}`.
+
+**Er is nu één klantenboek.** Het stond in `kern/vakwerk/pro2.js` en gold alleen
+voor de vakgenres, terwijl de vraag "wie zijn mijn klanten" niet aan een genre
+hangt: een restaurant, een winkel en een hotel hadden er geen. Het staat nu in
+`kern/klantenboek.js` en Vakwerk gebruikt diezelfde -- twee boeken naast elkaar
+lopen uiteen. Twee dingen zijn bewust zo gebleven: de opslagsleutel blijft
+`vakKlantNotities` (een mooiere naam is geen reden om data te verhuizen; een
+migratie die niets oplost is puur risico), en het draait op **codenaam**. Dat
+laatste is geen tekortkoming maar het ontwerp, en een CRM is precies de plek waar
+die regel anders stilletjes zou sneuvelen. Wat er wél veranderde: **bonnen tellen
+mee**. Wie bij dezelfde zaak at maar niet boekte, bestond in het oude boek niet.
+
+**Er komen geen leads en prospects bij, en dat is een keuze.** Een echte
+CRM-pijplijn begint bij een lead, maar binnen RTG bestaat geen enkel proces dat
+leads *produceert*: niemand importeert een lijst, geen formulier maakt een
+prospect. Zo'n register zou hier een lege tabel zijn die alleen met de hand te
+vullen is -- precies het soort register dat na twee weken niemand bijhoudt en
+daarna verkeerde cijfers geeft. Wat er wél is, is echt: transacties,
+offerte-aanvragen en boekingen die op antwoord wachten. Komt er ooit een echte
+leadbron, dan past die hier gewoon bij.
+
+**De segmenten zijn geteld, niet geraden**: nieuw (kocht een keer), terugkerend,
+en stilgevallen (kocht vaker, maar is 120+ dagen weg). Geen AI-oordeel, want dan
+hangt de indeling af van een sleutel die er niet altijd is en verschuift zij
+zonder dat er iets gebeurd is. Een **eenmalige** klant die lang wegblijft geldt
+niet als stilgevallen: daar is stilte normaal, en dat verwijt slaat nergens op.
+
+**De opvolging rust op wat er echt staat** -- openstaande aanvragen, offertes
+zonder prijs (met apart wie er langer dan zeven dagen ligt), en vaste klanten die
+stil vielen. Geen enkele regel is een herinnering die wij verzonnen: een rustige
+zaak krijgt een lege lijst, want niets te doen is ook een uitkomst.
+
+In het dagbeeld gaat de opvolging vóór de Mall-pagina (geld binnen handbereik gaat
+voor een mooiere pagina), en de oude losse "aanvragen"-actie valt weg zodra de
+opvolging hem al noemt -- twee keer hetzelfde vragen leest als een storing.
+
+Getoetst in `test/onderneming-relaties.test.js` (12). Vijf mutaties, alle vijf
+raak: bonnen niet meetellen, een wachtende boeking als klant tellen, eenmalige
+klanten als stilgevallen bestempelen, offertes van andere zaken meetellen, en de
+losse aanvragen-actie er tóch dubbel bij laten komen.
+
+### Debiteuren: wat er nog open staat, en hoe lang al
+
+`server/kern/onderneming/debiteuren.js` + `/api/onderneming/debiteuren`, met de
+betaalstatus zelf in `kern/facturatie/motor.js` en het afboeken op
+`/api/supplier/facturen/betaald`.
+
+De facturatie bestond al -- nummers, btw, een PDF, per zaak uitgaand en inkomend.
+Wat er niet was, is de vraag die elke ondernemer stelt zodra hij op rekening
+werkt: **wat staat er nog open.** Facturen droegen geen betaalstatus en geen
+vervaldatum, dus gold elke factuur impliciet als afgedaan en bestond er geen
+debiteurenlijst. Die twee velden zitten er nu bij de bron in: de stand wordt niet
+geraden waar hij gezegd kan worden (`betaald` van de aanroeper telt), en anders
+geldt een aanwezige betaalmethode als bewijs -- die wordt alleen gezet als er echt
+is afgerekend.
+
+**De geschiedenis telt als betaald, en dat is expliciet.** Bestaande facturen
+hebben het veld niet. Zou "geen veld" als open gelden, dan stond morgen alles wat
+ooit gefactureerd is op de debiteurenlijst: een alarm dat niets betekent, en
+precies daarom binnen een week niet meer gelezen wordt. Dezelfde grandfathering
+als `online !== false` bij de ondernemerspoort.
+
+**De ouderdomsgroepen zijn geteld, niet gewogen** -- loopt nog, 1-14, 15-30,
+31-60, 60+ dagen over. Er komt bewust géén risicoscore uit: "betalingsrisico" zou
+hier een getal zijn dat op niets rust, want wij zien alleen deze zaak en niet het
+betaalgedrag van die klant elders. Een factuur zonder vervaldatum wordt apart
+geteld in plaats van in de jongste groep gegooid: niets weten is iets anders dan
+"loopt nog". De oudste post staat er apart bij, want een klein bedrag van drie
+maanden oud zegt meer dan het totaal.
+
+**Alleen de verkoper boekt af.** Een koper die zijn eigen factuur op betaald zet,
+is geen betaling maar een bewering. Terugdraaien mag wel -- een vergissing hoort
+herstelbaar te zijn.
+
+In het dagbeeld gaan vervallen facturen vóór de rest van de opvolging: dat is het
+meest concrete geld dat er ligt, al verdiend en alleen nog niet binnen. Wat nog
+lóópt is geen actie maar de normale gang van zaken.
+
+Getoetst in `test/onderneming-debiteuren.test.js` (12), inclusief alle vijf
+groepsgrenzen. Vijf mutaties, alle vijf raak: "geen betaalstatus" als open lezen,
+op de vervaldag al vervallen zijn, een factuur zonder vervaldatum in "loopt"
+gooien, iedereen laten afboeken, en ook lopende facturen een actie laten worden.
+
+### Crediteuren: wat er nog uit moet, en wanneer
+
+`server/kern/onderneming/crediteuren.js` + `/api/onderneming/crediteuren`, met het
+gedeelde rekenwerk in `server/kern/onderneming/ouderdom.js`.
+
+De spiegel van de debiteuren, op dezelfde facturenlijst: waar de ene kant kijkt
+naar wat deze zaak heeft **verstuurd** en nog niet binnen is, kijkt deze naar wat
+zij heeft **ontvangen** en nog niet betaald.
+
+**Het rekenwerk is gedeeld, de teksten niet.** Of iets twintig dagen over is, is
+rekenkunde en aan beide kanten hetzelfde; dat staat nu één keer in `ouderdom.js`
+(grenzen, `dagenOver`, `groepVan`, `deelIn`). Wat je eraan dóét verschilt wél: bij
+een debiteur is "bel de klant" het advies, bij een crediteur "betaal, of uw
+leverancier stopt met leveren". Die teksten wonen daarom bij de kant zelf --
+zouden ze gedeeld zijn, dan stond er binnen een maand aan één van beide kanten een
+zin die er niet hoort.
+
+**Een asymmetrie die er echt is, en die niet wordt weggepoetst.** Een factuur
+wordt afgeboekt door de **verkoper**, want alleen hij ziet of het geld binnen is.
+Voor de koper betekent dat: een factuur die hij vandaag betaalt, blijft op zijn
+lijst staan tot de verkoper hem afboekt. Dat is ongemakkelijk, maar het
+alternatief is erger: een tweede vlag "ik heb betaald" naast de eerste maakt twee
+waarheden over één factuur, en dan is niet meer te zeggen welke telt. Het staat
+daarom in het antwoord, zodat een scherm het kan uitleggen in plaats van dat
+iemand denkt dat de lijst kapot is.
+
+**De vooruitblik is een optelsom, geen prognose.** Wat er de komende week en maand
+uit moet, is de som van de vervaldata die er al liggen -- posten zónder
+vervaldatum tellen niet mee, want dat zou een bedrag suggereren dat op een datum
+rust die er niet is. Er zit geen voorspelling in van wat er nog bij komt, en dat
+staat er ook bij: een liquiditeitsprognose die doet alsof zij de toekomst kent, is
+precies het soort getal waar iemand een beslissing op neemt.
+
+In het dagbeeld komen vervallen crediteuren direct ná de debiteuren: allebei geld
+dat al vaststaat, maar wat binnenkomt betaalt wat eruit moet.
+
+Getoetst in `test/onderneming-crediteuren.test.js` (11). Vijf mutaties, alle vijf
+raak: de spiegel omdraaien, de debiteuren-teksten aan de crediteuren geven, de
+vooruitblik posten zonder vervaldatum laten meetellen, van de gedeelde rekenkern
+een eigen kopie maken, en uitgaand geld boven binnenkomend geld zetten.
+
+### De contractklok op het dagbeeld
+
+`server/kern/onderneming/contracten.js` + `/api/onderneming/{contracten,werkruimte}`,
+met de gedeelde klok in `server/bedrijf/contractklok.js`.
+
+**Hier is geen contractregister gebouwd, en dat is het hele punt.** RTG Werk OS
+heeft er al een (`server/bedrijf/contract.js`): soorten, tekenen met twee namen,
+opzeggen, en een klok die de laatste opzegdag **uitrekent** uit de einddatum en de
+opzegtermijn in plaats van hem te laten overtypen. Dat is beter dan wat hier in
+een middag zou ontstaan, en een tweede register zou vooral betekenen dat een
+ondernemer twee lijsten heeft en niet weet welke telt.
+
+Wat er wél ontbrak was de **brug**. De contractbibliotheek hangt aan een
+werkruimte -- een eigen wereld met een eigen code en inlog -- en een onderneming
+wist daar niets van. Een verzekering die stil afliep, stond dus in een systeem dat
+de ondernemer op zijn dagbeeld niet zag. Die koppeling is er nu, en deze laag
+**leest alleen**: aanmaken, tekenen en opzeggen blijft in het Werk OS achter zijn
+eigen poort. De klok zelf is uit `contract.js` gelicht naar `contractklok.js`,
+zodat beide kanten dezelfde berekening gebruiken (zelfde patroon als
+`ouderdom.js` bij de debiteuren).
+
+**Geen werkruimte is een eigen stand, geen lege lijst.** Wie niets koppelde, heeft
+geen "nul contracten" maar een register dat wij niet kunnen zien -- `aantal` is
+`null`, met de zin erbij dat dit géén bevestiging is dat er niets loopt. Een
+ontbrekende koppeling die als "alles in orde" leest, is precies het soort stilte
+waar deze module tegen bedoeld is.
+
+**De klok is te zetten, want anders is hij niet te toetsen.** `contractklok.js`
+neemt de dag als parameter, en `ondernemingDagbeeld(o, nu)` geeft hem door aan de
+vier lagen die op de klok leunen (relaties, debiteuren, crediteuren, contracten).
+In productie geeft niemand hem mee en geldt gewoon nu.
+
+In het dagbeeld staat de contractklok ná het geld dat vaststaat, maar vóór de
+gewone opvolging: een gemiste opzegdag is al gebeurd en kost een jaar, waar een
+klant die niet terugbelt nog te bereiken is. En een gemiste opzegdag gaat voor een
+naderende, om dezelfde reden.
+
+Getoetst in `test/onderneming-contracten.test.js` (14). Vijf mutaties, alle vijf
+raak: geen werkruimte als lege lijst tonen, een onbekende werkruimtecode aannemen,
+ook concepten stilzwijgend laten verlengen, de opzegdag gelijkstellen aan de
+einddatum, en een naderende opzegdag boven een gemiste zetten.
+
+### Opzij zetten: de btw en de winstreservering
+
+`server/kern/onderneming/belasting.js` + `/api/onderneming/belasting`.
+
+De belastingtool bestond al (`kern/fiscaal/zzp.js`): een indicatieve
+jaarberekening per land met een reserveringspercentage. Wat ontbrak was de
+koppeling aan wat er **echt is gefactureerd** -- de ondernemer moest zelf een
+verwachte jaarwinst intypen, en precies dat getal is het getal dat hij niet weet.
+Deze laag rekent op de facturen die er staan, en houdt twee dingen streng uit
+elkaar.
+
+**De btw is geen schatting.** Wat u in rekening bracht min uw voorbelasting is een
+optelsom uit uw eigen facturen. Dat geld is nooit van u geweest; het staat alleen
+even op uw rekening. Het is het enige harde getal hier, en daarom het enige dat
+een actie op het dagbeeld oplevert -- een herinnering hangen aan een indicatie zou
+een schatting tot een schuld maken.
+
+**Voor een rechtspersoon wordt er niets uitgerekend.** `zzpBerekening` is de
+inkomstenbelasting van een IB-ondernemer; een B.V. betaalt vennootschapsbelasting
+en kent DGA-loon, een stichting heeft geen winstoogmerk. Datzelfde sommetje op een
+rechtspersoon loslaten geeft een getal dat er precies zo uitziet als een goed getal
+en het niet is. Er komt dus geen bedrag maar de reden -- de rechtsvorm-as weet dat
+al. De btw geldt intussen gewoon: die hangt niet aan de rechtsvorm.
+
+**Extrapolatie heet extrapolatie.** Naast de reservering op wat er nu al staat
+(een tarief toegepast op geld dat al verdiend is) staat wat het wordt als dit
+tempo het hele jaar doorzet, met het aantal verstreken dagen erbij en het woord
+"doortrekking van vandaag, geen prognose".
+
+**De aannames staan in het antwoord, en waar wij iets niet weten kiezen we de
+kant die de reservering hóger maakt.** Het urencriterium wordt afgeleid uit de
+opgegeven uren (1225 uur per jaar is ruwweg 24 uur per week); staat er niets, dan
+nemen we aan dat het gehaald wordt en zeggen we dat. De **startersaftrek rekenen
+we niet mee**: die hangt af van hoe vaak iemand hem al gebruikte, en meenemen zou
+de reservering te laag maken.
+
+Getoetst in `test/onderneming-belasting.test.js` (16). Vijf mutaties; drie beten
+meteen. **Twee sloegen af, en dat waren allebei echte bevindingen over mijn eigen
+werk:**
+
+- Er stond een `Math.max(percentage, berekende belasting)` "voor de zekerheid",
+  met een comment dat bescherming beloofde bij hoge winsten. Nagemeten over elke
+  winst van 1.000 tot een miljoen: die max bond **nul keer**. `reserveerPct` is het
+  tarief plus vijf punten met een bodem van 20%, dus hij dekt de indicatie altijd
+  al. Dode code met een belofte eraan is erger dan geen code; hij is weg, en de
+  toets bewaakt nu de eigenschap die er wél is.
+- De toets op "startersaftrek telt niet mee" las een hardgecodeerde `false` uit
+  het antwoord in plaats van de werkelijk gebruikte optie. Die kon dus nooit
+  zakken (regel 9). De waarde komt nu uit de opties, en de toets vergelijkt de
+  uitkomst mét en zónder die aftrek.
+
+### De kasvooruitblik: waar kom ik uit over dertig dagen
+
+`server/kern/onderneming/kas.js` + `/api/onderneming/kas{,/saldo}`. Drie beelden
+die er al waren, bij elkaar gelegd: wat er binnenkomt (debiteuren), wat eruit moet
+(crediteuren) en wat er niet van u is (btw). Ze worden **meegegeven** en niet
+opnieuw uitgerekend -- twee keer dezelfde vraag stellen kan twee antwoorden geven.
+
+**Het grootste probleem is wat wij niet weten: het banksaldo.** RTG ziet facturen,
+geen bankrekening. Een kaspositie zonder beginsaldo is dus geen positie maar een
+som van bewegingen, en die twee door elkaar halen is precies hoe iemand denkt dat
+het goed komt terwijl de rekening leeg is. Daarom staat er standaard een
+**beweging**, en pas een stand zodra de ondernemer zelf een saldo opgeeft -- met
+de datum erbij, want een saldo van drie maanden geleden is geen saldo. Boven de
+31 dagen heet het verouderd, met de reden erbij.
+
+**De onzekerheid ligt niet symmetrisch, en dat is expres.** Geld dat u nog moet
+krijgen en al te laat is, telt **niet** mee als inkomend: te laat is precies de
+reden om er niet op te rekenen. Geld dat u moet betalen en al te laat is, telt
+**wel** mee: dat moet u sowieso voldoen. Beide keuzes maken het beeld somberder,
+en dat is de kant waarop een kasprognose hoort te leunen. Een toets legt dat vast
+met een geval waar de optimistische lezing +7.000 zou zeggen en de eerlijke -3.000.
+
+Wat te laat openstaat verdwijnt daarmee niet uit beeld: het staat apart als
+**onzeker**, met bedrag en aantal. Het is geen nul (het bestaat) en geen inkomen
+(het had er al moeten zijn).
+
+**Er zit geen voorspelling in.** Wat er de komende maand nog aan nieuwe omzet bij
+komt, weten wij niet en verzinnen wij niet. Dit is een optelsom van wat er nu ligt,
+met de vervaldata die er nu op staan; loon, huur en abonnementen buiten RTG zitten
+er niet in, en dat staat in het antwoord.
+
+Op het dagbeeld staat de kasvooruitblik bovenaan het geldblok -- de optelsom zegt
+meer dan elke losse post eronder -- en alleen een negatieve beweging levert een
+waarschuwing op. Een positieve maand is geen actie, en een waarschuwing die elke
+maand komt is geen waarschuwing.
+
+Getoetst in `test/onderneming-kas.test.js` (14). Zes mutaties, alle zes raak: te
+late debiteuren tóch meetellen, te late crediteuren laten wegvallen, een
+beginsaldo van nul verzinnen, een oud saldo niet laten verouderen, ook een
+positieve maand laten waarschuwen, en de kasregel onder de losse posten laten
+zakken.
+
+### Capaciteit: kan er nog iets bij
+
+`server/kern/onderneming/capaciteit.js` + `/api/onderneming/capaciteit`, met de
+tijdhelpers in `server/kern/agendatijd.js`. Na het geld is dit wat een ondernemer
+als eerste raakt. De gegevens stonden er al: werkdagen en openingstijden
+(`vakUren`), de teamgrootte, en de boekingen met de duur van de dienst erbij.
+
+**Wat hier niet wordt uitgerekend: gemiste omzet.** Het is verleidelijk om te
+zeggen "u loopt 6.800 euro per maand mis door capaciteitsgebrek", en het klinkt
+precies als het soort inzicht waar software voor is. Maar wij zien geen vraag die
+nooit is gesteld: iemand die de agenda vol zag en wegklikte, staat nergens. Zo'n
+bedrag zou een verzinsel zijn met een euroteken ervoor -- en juist dat wordt
+overgeschreven in een besluit om iemand aan te nemen. Wat er wél staat is wat er
+is: hoeveel dagen zaten vol, hoeveel procent van uw tijd is bezet, hoeveel
+aanvragen bleven liggen. Een toets bewaakt dat de module nergens een bedrag
+uitleest.
+
+**De bezetting is een exacte deling** -- geboekte minuten door beschikbare minuten
+-- en daarmee iets anders dan de scores elders in dit OS, die bronnen van ongelijk
+gewicht optellen. Werk op een niet-werkdag telt wel als bezette tijd maar niet als
+beschikbare; de uitkomst kan dus boven de 100% uitkomen, en dat is de eerlijke
+uitkomst: u werkt dan meer dan u zelf hebt opgegeven.
+
+**Zonder agenda geen bezetting.** Een winkel of restaurant heeft geen `vakUren`,
+en daar betekent capaciteit iets heel anders (stoelen, voorraad, vierkante
+meters). Dan komt er een eigen stand en geen 0%: een winkel die als "0% bezet"
+leest, is een verkeerd antwoord op een vraag die niet is gesteld.
+
+**Buiten de eigen uren werken weegt zwaarder dan een volle agenda.** Dat is al
+gebeurd en het is de stille manier waarop iemand zichzelf opbrandt; een volle
+agenda is nog te sturen. Op het dagbeeld staat capaciteit ná het geld en de klok,
+maar vóór de gewone opvolging: meer klanten werven terwijl de agenda vol staat, is
+werk dat u daarna moet weigeren.
+
+De vier tijdhelpers (`datumVan`, `tijdVan`, `naarMin`, `naarTijd`) stonden inline
+in `kern/vakwerk/index.js` en staan nu in `kern/agendatijd.js`. Ze zijn klein, maar
+dragen een gedeelde waarheid: waar de datum en tijd van een boeking vandaan komen.
+
+Getoetst in `test/onderneming-capaciteit.test.js` (15). Zes mutaties, alle zes
+raak. Drie toetsen zakten eerst op mijn eigen aannames, niet op de code: `dag(5)`
+bleek een zaterdag en geen vrijdag (nagerekend in plaats van aangenomen, en de
+weekdagen staan nu als constante in de toets), een winkel van één persoon ís
+volgens `werkvormen.js` ook zelfstandige en krijgt dus wél een agenda, en mijn
+regex tegen "gemiste omzet" sloeg aan op mijn eigen voorbehoud en op het woord
+"prijs" in een adviestekst -- die zoekt nu naar het uitlezen van een bedrag, wat
+de eigenlijke vraag was.
+
+### Werving: staat er iemand te wachten
+
+`server/kern/onderneming/werving.js` + `/api/onderneming/werving`. Vacatures en
+sollicitaties bestaan al (`db.data.vacatures`, `db.data.applications`); deze laag
+bouwt daar niets naast maar **telt en klokt** ze, en legt de uitkomst naast de
+bezetting.
+
+**Hier staan geen namen.** Een sollicitatie draagt in de opslag een echte naam en
+contactgegevens -- die heeft een werkgever ook nodig om iemand aan te nemen, en
+daarvoor is de personeels-app. Maar dit is een signaallaag op het dagbeeld, en
+daar is een aantal en een wachttijd genoeg. Elke naam die hier zou opduiken, is
+een naam op een scherm waar hij niet voor nodig is; dat is precies hoe de
+codenaam-regel elders sneuvelt. Een toets controleert dat er geen naam, geen
+contactgegeven en zelfs geen codenaam in het antwoord terechtkomt.
+
+**Het probleem is niet werven maar antwoorden.** Een sollicitatie die drie weken
+blijft liggen, is een kandidaat die intussen ergens anders begint -- en de zaak
+denkt dat er niemand reageerde. De wachttijd van de oudste openstaande
+sollicitatie is daarom het getal dat op het dagbeeld komt, niet het aantal
+vacatures.
+
+**Wat een extra persoon doet, is rekenkunde en geen belofte.** De beschikbare tijd
+in `capaciteit.js` schaalt recht evenredig met de teamgrootte, dus de bezetting bij
+n+1 mensen is exact uit te rekenen: van 92% naar 61% bij een team van twee. Wat er
+niet bij staat is of die persoon zichzelf terugverdient -- daarvoor zouden wij
+vraag moeten kennen die nooit is gesteld.
+
+Op het dagbeeld staat werving direct achter capaciteit: het is het antwoord op
+dezelfde vraag. En "vol maar niemand gezocht" verschijnt alleen als de bezetting
+echt gemeten is -- zonder agenda weten wij niet of het druk is.
+
+Getoetst in `test/onderneming-werving.test.js` (15). Zes mutaties; vijf beten
+meteen. **De zesde sloeg af en legde een gat in mijn toets bloot:** bij een team
+van één is `n/(n+1)` toevallig gelijk aan de helft, dus een formule die altijd
+halveert kwam er ongestraft doorheen. Er staat nu een tweede geval met een team
+van drie (drie kwart, niet de helft); daarna beet de mutatie wel.
+
+### De ondernemersregie: twee knoppen van de boardroom
+
+`server/kern/onderneming/regie.js` + `/api/office/ondernemersregie{,/provisioning,/bijdrage}`.
+RTG bepaalt zelf hoe streng of hoe soepel het Ondernemers-OS staat. Twee dingen
+die niets met elkaar te maken hebben, en die daarom apart staan.
+
+**1. Provisioning -- wanneer wordt de ZAAK klaargezet.** Drie standen: `mens`
+(personeel beoordeelt elke aanvraag), `na-termijn` (de zaak komt er zodra de
+eerste termijn is afgetekend) en `automatisch` (wie zijn plan vastlegt, krijgt
+direct een werkende zaak).
+
+**Een onderscheid dat nooit mag vervagen:** een *zaak* klaarzetten is
+operationeel werk; een *pas* toekennen is toegang verlenen tot RTG zelf, en dat
+blijft mensenwerk. `magAutomatischToekennen` in `kern/aanmeldingen.js` geeft voor
+geen enkele pas `true`, in welke stand deze knop ook staat. Zou één knop beide
+regelen, dan stond er een schuifje waarmee iemand per ongeluk de merkregel uitzet.
+In de stand `automatisch` loopt het klaarzetten bovendien langs **dezelfde**
+provisioning die het personeel anders in gang zet (`provisioneerId`), dus er komt
+geen tweede manier bij om een zaak te maken -- en de idempotentie blijft staan.
+
+**Soepeler zetten vraagt een naam, strenger zetten nooit.** Hetzelfde principe als
+de bankregie: een terugval blokkeer je niet. Elke wijziging komt met wie hem zette
+in een journaal.
+
+**2. De bijdrage -- wat RTG per transactie inhoudt.** `rtgCut` was in het
+partnerkanaal een constante 0 ("RTG verdient niets aan een boeking"); dat is nu een
+knop. Staat de bijdrage uit, dan komt er nog steeds nul uit en verandert er niets
+aan wat een partner krijgt. Drie dingen worden nooit geraden:
+
+- **het percentage**, ten hoogste 5% -- die bovengrens staat in code en niet in
+  een instelling, zodat hij niet per ongeluk hoger wordt gezet;
+- **de grondslag**: `via-rtg` (het enige dat RTG zelf kan meten, en de
+  beginstand), `betaald` (beschermender: over een factuur die nooit binnenkomt
+  draagt niemand af) of `totaal` -- die laatste draagt zijn eigen waarschuwing dat
+  RTG hem **niet** kan meten en dus op opgave rust;
+- **de drempel** waaronder er niets wordt ingehouden. Dat is geen coulance maar
+  het punt van de constructie: bij lage omzet hoort de bijdrage beschermend te
+  werken, niet mee te zuigen.
+
+De bijdrage wordt over de **service** genomen en niet over het totaal: de netto
+reissom is het geld van de aanbieder, en een percentage over andermans inkoop is
+geen bijdrage maar een boete op omzet. Aanzetten vraagt een naam én een
+percentage -- een bijdrage die aanstaat op nul is een schakelaar die niets doet en
+wel zo lijkt.
+
+Getoetst in `test/onderneming-regie.test.js` (14). Zes mutaties, alle zes raak:
+soepeler zetten zonder naam toestaan, strenger zetten óók een naam laten vragen,
+de bovengrens van 5% weghalen, de drempel negeren, aanzetten op nul procent
+toestaan, en de bijdrage van de netto reissom afhalen in plaats van van de service.
+
+### Sales OS: de pijplijn
+
+`server/kern/onderneming/pijplijn.js` + `pijplijn-opvolging.js` +
+`/api/onderneming/pijplijn`. Offertes bestonden al (`db.data.vakOffertes`, gevuld
+door `kern/vakwerk/pro.js`); deze laag bouwt er geen tweede stroom naast, maar
+leest hem, groepeert hem in stadia en rekent uit wat er echt openstaat. Er staat
+nergens een schrijfactie op die stroom: antwoorden, weigeren en akkoord geven
+blijft waar de klant het ziet.
+
+**Twee open stadia, en ze zijn niet hetzelfde.** Bij `aangevraagd` ligt de bal
+bij de ondernemer -- en omdat er nog geen prijs op staat, heeft dat stadium
+**geen bedrag**. Er komt daar geen schatting uit eerdere klussen: dat zou een
+omzetverwachting zijn die de ondernemer nooit heeft uitgesproken. Bij
+`aangeboden` ligt de bal bij de klant, en dat is het enige bedrag dat de pijplijn
+kent.
+
+**De forecast is een meting of hij is er niet** (lat-regel 10). De gewogen
+verwachting is het openstaande bedrag maal de scoringskans, en die kans komt uit
+de eigen beslissingsgeschiedenis van deze zaak. Onder vijf afgeronde offertes is
+er geen kans en dus geen verwachting -- dan staat er `null` met de reden erbij, en
+geen brancheaanname of vrolijke 50%.
+
+**Wat de zaak zelf afwees, is geen verloren verkoop.** Een offerte die de
+ondernemer weigerde en een offerte die de klant introk zijn twee verschillende
+gebeurtenissen; opgeteld leest een volle agenda als een slecht verkoopjaar. Alleen
+het tweede telt mee in de scoringskans, en beide worden apart geteld.
+
+De wachttijd van een uitgebrachte offerte loopt vanaf de **prijs** en niet vanaf
+de aanvraag: een klant die drie dagen nadenkt over een offerte van veertig dagen
+oud, laat niets liggen. De doorlooptijd naar een prijs is een mediaan -- één
+offerte die een half jaar bleef liggen laat een gemiddelde de hele zaak traag
+maken. Op het dagbeeld staat de pijplijn vóór de gewone opvolging: een
+uitgebrachte offerte is verricht werk dat staat te verdampen, waar een aanvraag
+nog niets in zich heeft. Aanvragen zonder prijs noemt `relaties.js` al; de
+pijplijn herhaalt die regel niet. Alles op codenaam.
+
+Getoetst in `test/onderneming-pijplijn.test.js` (14). Zeven mutaties, alle zeven
+raak: aanvragen tóch een bedrag van 0 geven, eigen weigeringen als verlies
+meetellen, de drempel van vijf beslissingen weghalen, de stiltijd vanaf de
+aanvraag klokken, de mediaan door een gemiddelde vervangen, het scorings-verwijt
+ook zonder meting laten verschijnen, en de pijplijn-acties achter die van de
+relaties zetten.
+
+### Rechtsvormen: Nederland en het buitenland, automatisch bijgewerkt
+
+`server/kern/onderneming/rechtsvorm.js` (het register en de logica),
+`rechtsvorm-nl.js`, `rechtsvorm-europa.js` (BE, DE, FR, ES),
+`rechtsvorm-angelsaksisch.js` (GB, US) en `rechtsvormwacht.js` +
+`/api/onderneming/rechtsvormen[?land=DE]` en
+`/api/office/rechtsvormwacht{,/check,/zet}`.
+
+**Een register, elk met zijn land.** De Nederlandse vormen houden hun kale id
+(`bv`, `stichting`): die staan in de opslag van bestaande ondernemingen, en een
+hernoemde id laat een bestaand bedrijf achter zonder rechtsvorm. Buitenlandse
+vormen dragen hun landcode in het id (`de-gmbh`). De twee landentabellen staan
+apart omdat ze een andere rechtstraditie beschrijven -- op het continent
+ontstaat een kapitaalvennootschap bij de **notaris**, in de angelsaksische
+landen door **registratie** -- en dat verschil zit in bijna elke
+oprichtingsstap.
+
+**Wat wij niet weten, staat er niet.** Voor een land dat wij niet kennen komt er
+geen ongeveer-Nederlandse lijst maar een expliciet "wij kennen de rechtsvormen
+van dit land niet", met de landen die wij wel kennen erbij. Wie op de verkeerde
+lijst afgaat, gaat naar de verkeerde instantie. Om dezelfde reden noemt elke
+stap de instantie van het land zelf (KBO, Handelsregister, Companies House) en
+draagt geen buitenlandse vorm een Nederlands fiscaal begrip als
+`urencriterium` of `dga-loon` -- daar staat `winst-bij-eigenaar` of
+`winstbelasting-rechtspersoon`. En de Verenigde Staten zeggen zelf dat het
+bedrijfsrecht daar van de **staat** is en niet van de federatie.
+
+**De Nederlandse belastingsom blijft Nederlands.** `zzpBerekening` rekent met
+Nederlandse regels; `belasting.js` weigert daarom te rekenen zodra het land van
+de rechtsvorm niet NL is, met de reden in het antwoord. De btw-optelsom uit de
+eigen facturen blijft wel staan -- dat is een som en geen tarief.
+
+**De Rechtsvormwacht** is dezelfde constructie als de Regelwacht: een
+gevalideerde overlay op het gedeelde register, herstart-vast
+(`db.data.rechtsvormRegels`), met een dagelijkse controle op
+`RECHTSVORM_BRON_URL` en de ingebouwde tabel als veilige basis. Vier grendels
+die een bron nooit kan openen:
+
+- **verboden groeit alleen** -- een bron mag een verbod toevoegen en er nooit
+  een weghalen, anders is één regel in een bestand genoeg om een stichting
+  winst te laten uitkeren;
+- **caps komen uit het woordenboek** van dit huis; een verzonnen naam vult geen
+  scherm maar kan wel een knop laten opduiken die niemand ontwierp;
+- **rechtspersoon en notarieel liggen vast** zodra een vorm bestaat -- die
+  eerste stuurt de belastinggrendel aan;
+- **een rechtsvorm verdwijnt nooit**: er kan een onderneming aan hangen.
+
+Een nieuwe vorm (ook in een nieuw land) mag er wel bij, maar alleen compleet:
+zonder label, landcode, expliciete `rechtspersoon` en een gevulde
+oprichtingslijst komt hij er niet in. Een halve rechtsvorm is erger dan geen,
+want hij verschijnt wel in de keuzelijst.
+
+Getoetst in `test/onderneming-rechtsvormen.test.js` (21). Acht mutaties; zeven
+beten meteen. **De achtste sloeg af en legde een gat in mijn toets bloot:** ik
+toetste wel een vorm zónder `oprichting`-veld, maar niet een met een lege lijst
+-- en juist die kwam er ongestraft doorheen. Er staat nu een geval met
+`oprichting: []`; daarna beet de mutatie wel.
+
+### De offertebouwer: een prijs die is opgebouwd in plaats van bedacht
+
+`server/kern/onderneming/offertebouw.js` + `server/kern/regelsom.js`, gebruikt
+door `offerteAntwoord` in `kern/vakwerk/pro.js`
+(`/api/supplier/vak/offerte/antwoord`, ongewijzigde route).
+
+De offertestroom vroeg de zaak om één getal. Dat werkt, en het gaat mis zodra
+een klus uit meer dan één ding bestaat: de ondernemer rekent het op een kladje
+uit, de klant krijgt een bedrag zonder te zien waarvoor, en bij het factureren
+begint het rekenwerk opnieuw. Nu kan de prijs uit **regels** komen — uit het
+eigen aanbod (de prijs komt daarvandaan, dus een tariefverhoging werkt door
+zonder dat er een offerte wordt nagelopen) of los ingevoerd (materiaal,
+voorrijkosten). De regels reizen mee naar de klant.
+
+**Een dienst die niet bestaat wordt geweigerd, niet stil overgeslagen.** Anders
+denkt de ondernemer dat zijn tarief in de offerte staat terwijl er iets anders
+of niets staat — en dat is een te lage offerte die er compleet uitziet. Om
+dezelfde reden heeft elke losse regel een omschrijving nodig: een bedrag zonder
+reden leest de klant als willekeur.
+
+**De som staat niet in de bouwer.** `kern/regelsom.js` is nieuw en rekent hem,
+dezelfde functie die de factuurmotor nu gebruikt (die had zijn eigen kopie). Een
+offerte van 1.000 euro die een factuur van 999,99 oplevert, is een cent waar een
+klant een mail over stuurt en niemand het antwoord op weet. Stukprijzen zijn
+inclusief btw en de btw wordt per regel teruggerekend, zodat 9% en 21% in
+dezelfde offerte kunnen staan.
+
+**De offertestroom blijft de enige schrijver.** De bouwer is puur: hij leest de
+zaak en rekent. De status, de melding aan de klant en de boeking bij akkoord
+blijven waar ze stonden. Alleen een prijs opgeven mag ook nog steeds — een klus
+van een uur is soms gewoon een bedrag.
+
+Getoetst in `test/onderneming-offertebouw.test.js` (15). Zeven mutaties, alle
+zeven raak: een onbekende dienst stil overslaan, een meegestuurde prijs het
+eigen tarief laten overschrijven, de btw-lijst laten uiteenlopen met die van de
+facturatie, de btw verkeerd terugrekenen, een eigen tarief per regel negeren,
+een fout uit de bouwer negeren, en een losse regel zonder omschrijving
+doorlaten.
+
+### Het bestuur: wie beslist, wie bezit, en wie er als UBO uit volgt
+
+`server/kern/onderneming/bestuur.js` + `bestuur-handelingen.js` +
+`/api/onderneming/bestuur{,/zet,/af}` en
+`/api/onderneming/aandeel/{zet,weg}`.
+
+**Dit bestaat alleen waar het echt bestaat.** Een eenmanszaak heeft geen bestuur
+en geen aandeelhouders — de ondernemer *is* de onderneming. Zou dat scherm er
+toch staan, leeg, dan leest het als "u moet dit nog invullen", en dan verzint
+iemand een bestuur voor een bedrijf dat er geen kan hebben. Zonder rechtsvorm
+komt er de vraag en geen register.
+
+**Het verbod wint, ook hier.** Een stichting kent geen aandelen. Dat komt uit
+dezelfde `verboden` als de capslijst — er staat in dit bestand geen enkele
+rechtsvormnaam, want dat zou een tweede waarheid zijn. Onderweg bleek die
+grendel eerst *decoratie*: de cap heet `aandeelhouders` en het verbod heet
+`aandelen`, dus de aftrek raakte niets. Het bestuur leest nu de samengevoegde
+capslijst van `beeld.js`, waarin `aandelen` als kandidaat meereist — pas daarna
+wint het verbod ook van een werkvorm die de cap zou meebrengen.
+
+**De UBO wordt afgeleid en niet ingevuld.** Meer dan 25% van de aandelen is
+uiteindelijk belanghebbende; is er niemand, dan gelden de statutair bestuurders
+(pseudo-UBO), en commissarissen en adviseurs tellen daar niet in mee. Er is dan
+ook géén route en géén functie die de UBO zet: een aangevinkte UBO blijft staan
+als de aandelen verschuiven, en dan klopt het register precies op het moment dat
+het ertoe doet niet meer.
+
+**Aftreden is geen wissen** — wie er ooit bestuurder was, was dat, en juist die
+geschiedenis is waar een aansprakelijkheidsvraag over gaat. Een niet volledig
+verdeeld kapitaal is een **melding en geen fout**: tijdens een oprichting is dat
+normaal, en een register dat rood kleurt terwijl er niets mis is, leert iemand
+rood te negeren. Alles op codenaam, en het antwoord zegt zelf dat dit niet de
+UBO-opgave bij de KvK is.
+
+Onderweg bleek de B.V. geen `bestuur`-cap te dragen, terwijl elke B.V. een
+statutair bestuur heeft. Dat is in de tabel gerepareerd en niet omheen gewerkt:
+de as is de waarheid.
+
+Getoetst in `test/onderneming-bestuur.test.js` (19). Negen mutaties; zeven beten
+meteen. **Twee sloegen af en legden allebei iets echts bloot:** de drempeltoets
+had codenamen van één letter, die al op de lengte werden geweigerd — er waren dus
+nooit aandeelhouders, en twee toetsen slaagden om de verkeerde reden. En de
+verboden-aftrek bleek geen werk te doen, zoals hierboven beschreven. Na beide
+reparaties beten de mutaties wel.
+
+### De voorraad: wat er ligt, en wat wij niet kunnen zien
+
+`server/kern/onderneming/voorraad.js` + `/api/onderneming/voorraad`.
+
+Dit huis houdt voorraad al op **vier** plekken bij, en elke plek doet dat anders
+omdat het werk anders is: de keuken (`s.voorraad`, met een minimum per artikel,
+een kostprijs en een mutatiejournaal), retail (`s.artikelen` met varianten —
+voorraad zit op de variant), de boerderij (`s.boerderij.producten`, gevuld door
+de oogst) en de groothandel (`s.groothandel.producten`, met inkoopprijs). Een
+vijfde register ernaast zou binnen een maand uiteenlopen met alle vier, en zou
+de enige zijn die niemand bijwerkt omdat er niet in gewerkt wordt. Deze laag
+**leest** ze en legt ze naast elkaar; er staat geen enkele schrijfactie in.
+
+Drie dingen die het met opzet niet uitrekent:
+
+- **geen voorraadwaarde op een verkoopprijs.** Retail en boerderij kennen geen
+  inkoopprijs. Een waarde daarop bevat de winst al — dat is een
+  omzetverwachting, geen voorraadwaarde. Daar komt `null` met de reden, en het
+  totaal zegt erbij welke delen erbuiten vallen: een totaal dat stilzwijgend een
+  deel mist, wordt overgetypt in een balans;
+- **geen bestelpunt waar er geen is.** De groothandel heeft `minBestel`, en dat
+  is de minimale hoeveelheid *per bestelling*, geen bestelpunt. Die twee
+  verwarren meldt een volle groothandel als "bijna op". Bij de boerderij bepaalt
+  wat er groeit de voorraad;
+- **geen dekking in dagen.** Daarvoor zouden wij verbruik over tijd moeten
+  kennen; alleen de keuken schrijft mutaties weg, en alleen binnen RTG. "Nog
+  vier dagen" op zo'n grondslag is een getal waar iemand een bestelling op
+  baseert.
+
+Retail telt laag op de **variant** en niet op het artikel: maat 42 op is een
+gemiste verkoop, ook al ligt de rest in het schap. De drempel van de zaak zelf
+(`s.settings.retailDrempel`) wint van de standaard. Op het dagbeeld staat de
+voorraad vóór de verkoopkant — wat u niet heeft kunt u ook niet verkopen.
+
+Getoetst in `test/onderneming-voorraad.test.js` (13). Zeven mutaties, alle zeven
+raak: de waarde op de verkoopprijs baseren, `minBestel` als bestelpunt
+gebruiken, retail op het artikel in plaats van de variant tellen, een artikel
+zonder minimum toch laag noemen, de eigen drempel negeren, een totaal geven
+zonder enige bron, en inactieve groothandelsproducten meetellen.
+
+### De klusketen: van akkoord tot geld, en waar hij blijft steken
+
+`server/kern/onderneming/klussen.js` + `/api/onderneming/klussen`.
+
+De keten bestond al, in drie objecten die elkaar met een **referentie**
+vasthouden: een offerte krijgt bij akkoord een `boekingRef`, de boeking draagt
+die `ref`, en een factuur draagt `ref`. Wat er niet was, is code die hem volgt —
+`boekingRef` kwam nergens anders voor dan op de plek waar hij werd gezet. Deze
+laag volgt hem, en zet er geen vierde object naast dat "project" heet: dat zou
+met de hand bijgehouden moeten worden en loopt na twee weken achter op de drie
+die vanzelf meebewegen.
+
+**Vier plekken waar een klus blijft steken**, en alleen de laatste twee zijn "uw
+geld ligt ergens anders": akkoord maar niet ingepland, ingepland, uitgevoerd
+maar niet gefactureerd, en gefactureerd maar niet betaald. Ingepland werk telt
+daarom **niet** mee in het openstaande bedrag — dat als openstaand geld tonen
+maakt een drukke maand tot een incassoprobleem.
+
+Drie dingen die het niet beweert:
+
+- **geen factuur betekent niet dat er niet is gefactureerd.** Het betekent dat
+  wij binnen RTG geen factuur met deze referentie zien; wie buiten RTG
+  factureert doet dat gewoon;
+- **de factuur wordt op referentie gevonden**, nooit op bedrag of klant — twee
+  klussen van dezelfde klant voor hetzelfde bedrag zouden anders elkaars factuur
+  opeisen;
+- **geen doorlooptijd van klus tot geld.** Oplevering en goedkeuring meten wij
+  niet; wat er wel staat is hoe lang elke stap nu open staat, en dat is een
+  meting.
+
+Betaald is betaald langs welke van de twee wegen dan ook: de boeking kent `paid`
+(de kassa) en de factuur `betaald` (de facturatielaag). Eisen dat ze allebei
+staan, toont een betaalde klus als onbetaald. Elke stap heeft zijn eigen
+traagheidsdrempel, want ze betekenen iets anders.
+
+Getoetst in `test/onderneming-klussen.test.js` (13). Zeven mutaties; zes beten
+meteen. **De zevende sloeg af en legde een gat in mijn toets bloot:** één
+drempel voor alle stappen liet niets zakken, omdat mijn gevallen toevallig aan
+beide kanten van elke drempel hetzelfde uitvielen. Er staat nu een geval dat ze
+scheidt — negen dagen is traag voor een onbetaalde uitvoering en juist niet voor
+een factuur — en daarna beet de mutatie wel.
+
+### De toegang: wie kan wat, over de twee werelden die er al zijn
+
+`server/kern/onderneming/toegang.js` + `/api/onderneming/toegang`.
+
+Toegang is in dit huis op twee plekken geregeld, en die twee zijn met opzet
+verschillend: de **zaak** kent precies twee rollen (manager en staff — genoeg
+voor een vloer waar iemand kassa draait), de **werkruimte** in RTG Werk OS kent
+achttien rechten, veertien rollen, rollen met een einddatum, vier soorten inzage
+die een *reden* vragen, en een journaal. Een derde model hierboven zou een derde
+waarheid zijn over dezelfde vraag. Deze laag leest ze allebei en legt ze naast
+elkaar.
+
+**Het gat wordt benoemd en niet gedicht:** op de zaak kan een beheerder alles,
+en dat staat er — een scherm dat nuance suggereert geeft schijnzekerheid.
+**Er wordt niets gezet:** toegang verlenen gebeurt waar de rol woont, allebei
+achter hun eigen poort met hun eigen journaal; een tweede deur naar hetzelfde
+slot is een deur die niemand bewaakt. Het venster is precies dat van de poort:
+een verlopen rol telt niet mee, een rol die nog moet ingaan ook niet, en een rol
+die vandaag afloopt geldt vandaag nog. Geen namen — alleen aantallen, rollen en
+vensters.
+
+Onderweg bleek `server/bedrijf/rollen.js` zijn tabellen alleen binnen de factory
+terug te geven. Ze staan nu ook op de module zelf, zodat deze laag ze kan lezen
+in plaats van overtypen.
+
+Getoetst in `test/onderneming-toegang.test.js` (12). Zeven mutaties, alle zeven
+raak.
+
+### De bedrijfsontwerper en de Mall-bouwer: AI die meedenkt en nergens over beslist
+
+`server/kern/onderneming/ontwerper.js` +
+`/api/onderneming/ontwerp{,/opdrachten}`.
+
+Twee opdrachten met dezelfde grenzen: **ontwerp** (meedenken over het idee) en
+**mall** (meeschrijven aan de Mall-pagina). Het model krijgt alleen wat er echt
+staat — de eigen intake, de eigen kansverkenning en stress test, het eigen
+mallprofiel — en wat ontbreekt heet **ONBEKEND** in de prompt, zodat het model
+ernaar vraagt in plaats van het in te vullen. Een leeg veld leest een model als
+"niet van toepassing".
+
+**Het model schrijft niets weg.** De uitkomst is tekst die de ondernemer zelf
+overneemt; een AI die zijn eigen voorstel opslaat, maakt van een suggestie een
+feit en dan weet niemand later meer wie wat bedacht. Zelfde regel als bij
+`kern/agent.js`: een voorstel wacht op een mens.
+
+**Drie merkregels staan letterlijk in de systeemprompt, en gelden ook in de
+uitwijk:** geen toegang beloven (Lifestyle en Business gaan uitsluitend na
+menselijke goedkeuring), geen echt merk als bevestigde partner en nooit claimen
+dat een boeking is verwerkt, en afwegingen in plaats van juridische of fiscale
+zekerheid.
+
+**Zonder sleutel komt er geen leeg scherm**, maar een antwoord uit de eigen data
+met `demo: true` erbij — een demostand die doet alsof er een model meekeek is
+erger dan geen demostand. Een kapot of leeg antwoordend model valt op diezelfde
+uitwijk terug. Wie er op mag beslist de bestaande `kern/aipoort.js`; die poort
+wordt hier niet nagebouwd.
+
+Getoetst in `test/onderneming-ontwerper.test.js` (11). Acht mutaties, alle acht
+raak. Eén toetsfout onderweg gerepareerd: de intake is genest (`persoon`/`idee`)
+en werd plat aangeleverd, waardoor de prompt in twee toetsen over lege feiten
+ging. De helper rekent nu na dat de intake echt is gezet.
+
 ### RTG Werk OS (de werkplek van een organisatie)
 
 `server/bedrijf/` + `/api/bedrijf/...` + `/apps/werk.html`. Een **werkruimte**
@@ -1235,6 +2523,112 @@ Wat er nog niet speelt in de Media OS zelf: een **livestream** van het Podium. D
 
 De vier apps eronder blijven gewoon bestaan en werken los: wie recht naar de studio, de zaal of het Podium wil, hoort daar zonder omweg te kunnen. Zet de boardroom de schakelaar `mediaos` uit, dan verdwijnt alleen de verbindende laag.
 
+### RTG Web Platform (de automatische bedrijfssite en de browser die bedrijven begrijpt)
+
+De Website-maker (`/apps/sitemaker.html`, `kern/webmaker.js`) en de RTG-browser (`/apps/browser.html`, browserkant in `kern/webmaker-blader.js`) hebben er een laag bij: `server/kern/webplatform.js`, met een principe -- **automatic first, customizable forever**.
+
+- **De automatische bedrijfssite.** `POST /api/supplier/site/genereer` (achter de zaak-inlog) maakt uit het bestaande zaakprofiel in een keer een complete site en zet hem online op de bedrijfsnaam (`es-vedra-cruises.rtg`; is dat adres bezet, dan naam-code). Geen kale profielpagina: hero, intro, en per bron die de zaak echt heeft een sectie. Daarna bewerkt de ondernemer hem met dezelfde maker als ieder lid (`/api/supplier/site/mijn|haal|bewaar|publiceer|offline`, eigenaar `zaak:CODE`). Nog eens genereren overschrijft het handwerk **niet** -- opnieuw beginnen is een aparte keuze (`opnieuw: true`).
+- **Live blokken, geen kopieen.** Een gegenereerde site draagt `zaakdata`-blokken die alleen een bron aanwijzen (menu, diensten, kamers, agenda, fotos, reviews, contact). Bij het openen lost de server ze op dat moment uit het zaakprofiel op naar gewone blokken -- het zaakprofiel is het **Business Master Record**: wijzigt de menukaart in de zaak-app, dan staat hij op de site zonder dat iemand de site aanraakt. De browser hoeft er niets voor te kennen.
+- **De koppeling komt uit de inlog.** Dat een site bij een bedrijf hoort is een feit uit `supplierAuth`, geen veld in het verzoek: een lid dat `zaakCode` in zijn ontwerp zet, krijgt niet de actiebalk en niet de data van andermans zaak.
+- **De browser begrijpt bedrijven.** Hoort een site bij een zaak, dan geeft `/api/browser/open` de zaak-info mee (naam, type, stad, review-gemiddelde) plus de acties die de zaak écht kan (reserveren, bestellen, boeken, diensten, kamers, chat) -- het scherm toont die als actiebalk boven de site, met de leden-app als bestemming. Alleen wat de zaak kan komt terug: een knop die niets doet is erger dan geen knop.
+- **Universeel zoeken.** `/api/browser/zoek` vindt sites en bedrijven in een adem; een bedrijf met een eigen online site krijgt het adres mee. Alleen wat toch al publiek is (naam, stad, type) -- het zoekvak is geen achterdeur naar het zaakprofiel, en offline sites zijn ook uit het zoeken weg.
+
+- **De knop in de zaak-app.** `/apps/zaakweb.html` ("Mijn website" in het Meer-scherm van de leverancier-app, zelfde zaak-inlog): status, online/offline, bekijken in de browser, en opnieuw bouwen uit het profiel -- met de waarschuwing erbij dat dat het eigen handwerk weggooit.
+- **Het formulier-blok.** Een bedrijfssite draagt een contactformulier; het bericht landt als **klus (ticket) in de werklijst die de zaak al heeft**, op de codenaam van het lid -- geen los postvak dat niemand leest, en de echte naam reist niet mee. Op een site zonder zaak erachter staat het formulier er niet: een knop zonder ontvanger is erger dan geen knop (`POST /api/browser/bericht`).
+- **Bladwijzers en tabs in de browser.** Bladwijzers op het toestel zelf (localStorage), met een rij op RTG Start -- de server weet niet wat u bewaart. Tabs met elk hun eigen geschiedenis, in een eigen tabbalk onder de adresbalk.
+- **De sjabloon-etalage.** De Website-studio van het Atelier kan een sjabloon **in de etalage** zetten (`/api/office/atelierweb/etalage`); leden zien die als startpunt in de Website-maker ("Begin met een sjabloon", `/api/site/sjablonen` + `/api/site/sjabloon`) en maken er met bewaren hun eigen site van. Vrijgeven is een uitdrukkelijke handeling van het kantoor: werk in uitvoering blijft binnen, ook met het id in de hand.
+
+- **Meerdere pagina's per site.** Naast de voorpagina draagt een ontwerp tot zeven extra pagina's (`kern/webmaker-paginas.js`), elk met eigen naam, slug en blokken -- dezelfde schoonmaak en grenzen als de voorpagina, en dubbele slugs vallen weg. De browser toont een paginabalk en begrijpt `naam.rtg/contact` in de adresbalk; de maker heeft een pagina-wissel in de kop (toevoegen, hernoemen, weghalen). De automatische bedrijfssite gebruikt dit meteen: **Home** (hero, beeld, reviews), **Aanbod** (alles wat de zaak verkoopt, live) en **Contact** (bezoekgegevens + het formulier).
+
+- **AI in de maker, als assistent en niet als black box.** De AI-knop in de Website-maker (`kern/webmaker-ai.js`, `POST /api/site/ai` en `/api/supplier/site/ai`) past het ontwerp aan zoals het NU op het doek staat -- "maak het luxer", "maak een pagina voor bruiloften", "herschrijf de intro zakelijker". Het antwoord is een aangepast ontwerp dat de maker toont; **er wordt niets opgeslagen** -- de gebruiker beoordeelt, verfijnt en bewaart zelf, en dan pas loopt het langs de gewone schoonmaak. Zonder AI-sleutel draait een demostand met drie eerlijke transformaties (luxer, licht/donker, pagina toevoegen); wat hij niet kan, zegt hij -- geen gedaan-vinkje zonder daad.
+
+- **De persoonlijke site: ieders eigen plek op het RTG-web.** Een knop in de Website-maker ("Maak mijn persoonlijke pagina", `POST /api/site/persoonlijk`) genereert in een keer een eigen site op de **codenaam** (`codenaam.rtg`) -- de echte naam blijft in de kluis, ook hier. De browser begrijpt personen zoals hij bedrijven begrijpt: bij een ledensite komt de codenaam mee en biedt de balk "verbind & chat" aan.
+- **Het formulier wordt een gesprek.** Op een ledensite landt een formulierbericht als **gesprek in de leden-app** -- maar alleen tussen **verbonden** leden, precies zoals de vriendenchat zelf (en langs dezelfde 9+-poort): een formulier is geen achterdeur om vreemden te bereiken; wie niet verbonden is, krijgt de reden en de weg. De browser-leeskant staat sindsdien in een eigen routebestand (`routes/webbrowser.js`).
+
+- **Versiegeschiedenis en terugzetten.** Elke bewaring legt de **vorige** stand weg (`kern/webmaker-versies.js`, tien standen per site; `/api/site/versies` + `/api/site/herstel` en de zaak-varianten). Dat is er gekomen omdat twee knoppen werk kunnen overschrijven zonder dat de maker het meteen ziet: de AI-assistent en "opnieuw uit mijn profiel". Twee dingen liggen vast: **het adres en de online-stand reizen niet mee terug** (herstellen is een ontwerp-handeling, geen publicatie-handeling -- anders haalt terugkijken je site uit de lucht), en **herstellen is zelf ook een bewaring**, dus wie zich vergist kan weer vooruit. Zichtbaar als "Historie" in de maker en "Eerdere versies" in de zaak-app.
+
+- **Concept en online zijn twee dingen (staging).** Wat de maker bewerkt is het **concept**; wat bezoekers zien is de **bevroren stand van het laatste publiceren**. Zonder dat onderscheid gaat elke halve zin die iemand intypt meteen het web op, en dat is voor een bedrijfssite geen werkbare manier van werken. Bewaren verandert dus het concept en niet het web; met "Zet wijzigingen online" (`/api/site/live`) gaat het naar buiten, en de maker ziet in het lint dát er iets klaarstaat. Een site van vóór deze laag heeft nog geen bevroren stand en serveert gewoon zijn concept, zodat er niets omvalt.
+- **Bij een zaak is naar buiten brengen werk van de leiding.** Bewerken mag iedereen die bij de zaak werkt -- dat raakt het concept; online gaan, wijzigingen publiceren, genereren en uit de lucht halen zitten achter `managerOnly`, dezelfde grens als op de menukaart en de prijzen. Dat is de goedkeuringsflow in zijn eenvoudigste eerlijke vorm: de balie kan een voorstel klaarzetten, de leiding beslist of het buiten komt. De zaak-routes staan sindsdien in `routes/zaakweb.js`.
+
+- **De componentbibliotheek: rijblokken en drie nieuwe live bronnen.** Naast de bestaande blokken zijn er nu **faq** (vraag en antwoord) en **prijzen** (dienst, prijs, omschrijving), allebei met rijen die per rij worden geschoond en begrensd op twaalf -- en met de lege rijen eruit **voor** het begrenzen, anders eet een lege regel in het midden een plek op die de maker wel had ingevuld. Nieuwe live bronnen: **events** (alleen gepubliceerde), **vacatures** (die stonden al in de publieke vacaturelijst van `kern/werk.js`) en **openingstijden** (de `vakUren` van een dienstverlenende zaak). De automatische bedrijfssite krijgt daarmee een pagina **Werken bij ons**.
+- **Een pagina die niets te zeggen heeft, verdwijnt.** Draagt een pagina alleen live blokken en blijft er niets van over -- een zaak zonder vacatures -- dan staat hij niet in de navigatie: een deur naar een lege kamer is erger dan geen deur. Pagina's die de maker zelf vulde blijven altijd staan, ook als ze leeg zijn; die onder zijn handen laten verdwijnen zou hem overvallen.
+
+- **Het team-blok, met een opt-in per mens.** Wie van het personeel op de site staat, is een **publicatiebesluit** en geen veld in de personeelsadministratie: "werkt hier" en "staat op onze site" zijn twee verschillende dingen, en het tweede hoort niemand te overkomen omdat het eerste waar is (`kern/webmaker-team.js`, `/api/supplier/site/team` + `/team/zet`, beide achter `managerOnly`). Vier dingen liggen vast: **niemand staat er vanzelf op** (de lijst begint leeg, de leiding zet per persoon aan), we bewaren **alleen verwijzingen** naar staff-id's zodat wie uit dienst gaat vanzelf van de site verdwijnt, er gaat **niet meer naar buiten dan naam en functie** (geen rol, geen lidmaatschap, geen contactgegevens), en een id van iemand die er niet werkt komt er niet in.
+
+- **Publiceren op een gekozen moment.** De ondernemer werkt overdag aan zijn nieuwe kaart en wil hem zondagnacht buiten hebben, niet om half drie tussen de gasten door (`kern/webmaker-plan.js`, `/api/site/plan`). Twee dingen zijn geen detail: er gaat naar buiten **wat er op dat moment klaarstaat** en niet wat er stond toen u plande (anders verdwijnt alles wat u er daarna nog aan deed, en merkt u dat pas als het buiten staat), en plannen kan **alleen voor een site die al online is** -- online gaan is een eigen besluit met een adres erbij. Het geplande moment is een belofte aan de **bezoeker** en niet aan de klok van deze server: de bezoekkant vraagt het per site opnieuw, de veger is de achtervang voor sites die niemand bezoekt.
+- **Het spoor: wie deed wat, wanneer** (`kern/webmaker-spoor.js`, `/api/site/spoor`). Dit hoort bij de afspraak dat alleen de leiding publiceert -- een goedkeuring waar geen verslag van is, is achteraf niet te controleren en dan is het geen goedkeuring maar een gewoonte. Bij een zaak staat de naam erbij waarmee die persoon inlogde; er staat nooit inhoud in (wat er veranderde staat in de versiegeschiedenis, hier alleen dát het gebeurde). Lezen is werk van de leiding.
+
+- **Een site lezen in je eigen taal** (`kern/webplatform-taal.js`). Dit huis doet dat bij berichten al zo: iedereen schrijft de eigen taal, iedereen leest de zijne. Voor websites is dat de enige vorm die werkt -- een ondernemer die zijn site met de hand in zes talen moet bijhouden doet het niet, en dan staat er in vijf talen niets. Heeft een lid een vaste taal (`memberTaal`), dan komt de site in die taal binnen. Drie dingen liggen vast: **een naam is geen zin** (de sitetitel, de kop van een hero, de bron van een citaat en een prijs blijven staan; het is een **witte lijst** per bloktype, zodat een nieuw veld niet per ongeluk meegaat), **het wordt gezegd** (het antwoord draagt dat het machinevertaald is en uit welke taal -- een vertaling die zich voordoet als het origineel is een bewering die de maker niet heeft gedaan), en **het is begrensd** (hooguit tweehonderd unieke zinnen per site; liever een halve vertaling dan een pagina die blijft hangen). Zonder AI-sleutel doet het woordenboek wat het kan en blijft de rest staan.
+
+- **Cijfers: interne analyse voor de ondernemer en voor RTG** (`kern/webmaker-meting.js`, `/api/site/cijfers`, `/api/supplier/site/cijfers`, `/api/office/web/overzicht`). Dit huis meet nergens mensen, en hier ook niet: wat wordt bijgehouden is een **telling van gebeurtenissen**, geen dossier van bezoekers. Wel: hoe vaak een site is geopend, per pagina, per dag, en hoeveel formulierberichten er binnenkwamen. Met opzet **niet**: geen bezoeker (geen codenaam, geen sleutel, geen "terugkerende bezoeker" -- dan is het een lijst van wie waar keek), **geen tijdstippen** (per dag een getal; op een site met drie bezoekers per dag is "om 14:32" een aanwijzing naar een mens), en geen herkomst, kijktijd of bereik. Het antwoord draagt zelf de lijst van wat er **niet** gemeten wordt, want anders leest iemand "12 bezoeken" als "12 mensen". Een eigen bezoek telt niet mee: wie zijn eigen site nakijkt, hoort zijn cijfers niet op te blazen. RTG ziet over het web heen hoeveel sites er zijn, hoeveel online, hoeveel zakelijk en welke het best bezocht worden -- ook daar alleen tellingen. Het onderscheid met het spoor is met opzet: **het spoor gaat over mensen** en is werk van de leiding, **de cijfers gaan over de site** en noemen niemand, dus die leest iedereen die er werkt.
+
+- **Een merk met vestigingen: een hoofdontwerp, N lokale sites** (`kern/webmerk.js`, `/api/office/merk/*`). Dit ligt bij het **kantoor** en niet bij de zaken, en dat is de kern van het ontwerp: een zaak kan zich hier niet tot moederbedrijf van een andere zaak uitroepen -- zou dat kunnen, dan is het overnemen van andermans website een formulier ver weg. Het kantoor stelt het merk samen, koppelt bestaande zaken als vestiging (een zaak hoort bij hooguit een merk; twee merken die dezelfde vestiging opeisen geven een site die om beurten van huisstijl wisselt) en zet een hoofdontwerp. **Uitrollen** geeft elke vestiging dat ontwerp en zet haar online op haar eigen naam.
+- **Waarom een sjabloon genoeg is voor zevenendertig sites.** De blokken van het hoofdontwerp zijn grotendeels **live** blokken: die lossen bij ieder bezoek op uit het profiel van *die* vestiging. Een sjabloon met een menu-blok levert in Amsterdam de Amsterdamse kaart en op Ibiza de Ibizaanse. Er wordt dus niets gekopieerd wat per vestiging verschilt -- dat was al opgelost toen het Business Master Record er kwam.
+- **Wat de vestiging wel en niet mag.** Zij beheert haar eigen **inhoud**: openingstijden, foto's, menukaart, team -- dat staat in haar zaakprofiel en komt vanzelf op de site. Wat zij niet mag is de **huisstijl** veranderen: thema, accent en de vrije kleuren komen van het merk en worden bij **elke bewaring opnieuw opgelegd**. Een vestiging die het merk kan omverven, is precies waarom een keten centraal beheer wil. Uitrollen overschrijft het handwerk op een vestigingssite -- dat is het punt van centraal beheer, en het is niet stiekem: de vorige stand gaat gewoon de versiegeschiedenis in.
+
+- **Het kantoorscherm** `/apps/merken.html`: merken maken, vestigingen koppelen en ontkoppelen, het hoofdontwerp zetten en uitrollen. De uitrol-knop zegt vooraf wat hij overschrijft en wat niet. Op het scherm van de vestiging (`/apps/zaakweb.html`) staat bij welk merk zij hoort en dat de huisstijl daarvandaan komt -- anders zet een vestiging kleuren die bij het bewaren stilletjes terugspringen, en een stille weigering is geen weigering.
+
+- **Een formulier heeft een soort, en het bericht komt echt aan.** Zes soorten (vraag, offerte, sollicitatie, reservering, klacht, feedback); de soort bepaalt wat er gevraagd wordt en **hoe het bericht bij de ontvanger heet** -- een klacht die als "vraag" in een werklijst belandt, wordt ook als vraag behandeld. De zaak krijgt bovendien een **seintje** (een klus in een lijst is nog geen bericht: zonder melding kan een zaak dagen niet weten dat er iemand wacht), en de inzender krijgt een **bevestiging** in zijn eigen app -- anders stuurt hij het over een uur nog eens, of belt hij. Bij een ledensite draagt het gesprek de soort mee.
+
+### Een eigen domein buiten het RTG-web (standaard uit)
+
+`hotelazur.nl` naast `hotelazur.rtg`. Dit is de enige functie in het web-platform die **standaard uit** staat, en dat is precies de reden dat hij bestaat: een extern domein haalt een site **buiten** het RTG-web. Binnen het huis leest alleen een ingelogd lid een site; op een eigen adres leest iedereen hem. Dat is geen instelling maar een verandering van wie de lezers zijn, en dus een besluit van de boardroom (functie `dom-eigendomein`, `standaard: false`).
+
+- **Twee sloten.** De boardroom zet de functie aan voor het hele huis; daarna koppelt de eigenaar per site zelf een adres. Een lid hoort niet publiek te worden doordat de boardroom een knop omzette.
+- **"Standaard uit" betekende bijna niets.** De functieschakelaar-middleware had een snelle uitgang: is er nog nooit iets geschakeld, dan staat alles aan. Die klopte zolang élke functie standaard aan was -- en dit is de eerste die dat niet is; op een verse installatie stond hij daardoor gewoon open. De uitgang kijkt nu eerst of er ergens een functie standaard uit hoort te staan (`HEEFT_UIT_STANDAARD`).
+- **Wat er wel en niet gebeurt.** Komt een verzoek binnen op een gekoppelde hostnaam, dan serveert `kern/webdomein-html.js` de **gepubliceerde** stand als echte HTML, voor een bezoeker zonder leden-app. Dát het verzoek hier aankomt is DNS en een certificaat, en dat draait buiten deze app.
+- **Het formulier gaat niet mee naar buiten.** Dat landt hier als klus of als gesprek, en allebei hangen aan de codenaam van een ingelogd lid; een voorbijganger heeft die niet. Er staat een regel voor in de plaats die naar de leden-app wijst.
+- **Offline is overal offline.** Uit de lucht halen op het RTG-web zet ook het eigen adres stil.
+
+`test/webplatform.test.js` (zevenentwintig scenario's) legt dit vast; achtendertig mutaties (leden mogen zelf een zaakCode zetten; de live blokken worden niet meer opgelost; het formulier accepteert sites zonder ontvanger; de etalage-grendel valt weg; het oplossen slaat de extra pagina's over; de AI-demostand zegt "gedaan" zonder daad; het formulier bereikt ook niet-verbonden leden; het adres reist mee terug bij een herstel; herstellen legt zichzelf niet weg; de bevroren stand overleeft een bewaring niet; de browser leest het concept in plaats van wat gepubliceerd is; een medewerker mag zelf publiceren; een lege live-pagina blijft in de navigatie staan; de rijen van een faq-blok worden niet begrensd; het team staat standaard op de site; een medewerker mag zelf bepalen wie erop komt; een vreemd staff-id wordt aangenomen; een planning bevriest de stand van het plannen; plannen mag zonder online te zijn; het spoor staat open voor iedere medewerker; publiceren laat geen spoor na; de naam wordt meevertaald; de prijs wordt meevertaald; de vertaling wordt niet gemeld; de schakelaar staat standaard aan; de snelle uitgang negeert standaard-uit; een offline site blijft op het eigen adres staan; een eigen bezoek telt mee; bezoekers en tijdstippen worden bewaard; de huisstijl van het merk wordt niet opgelegd; een zaak mag bij twee merken horen; een verzonnen zaakcode wordt als vestiging aangenomen; het merk wordt niet aan de vestiging gemeld; de zaak krijgt geen seintje; de inzender krijgt geen bevestiging; de soort wordt genegeerd), alle achtendertig **RAAK**. De adres-mutatie overleefde de eerste opzet van die toets -- alle standen waren daar al gepubliceerd, dus het adres kwam toevallig identiek terug; de toets legt nu een stand weg van *voor* het publiceren, en toen was hij wel raak.
+### RTG Wereld (één sociale app, vijf werelden)
+
+*One identity. One network. One app. Your context.*
+
+Er stonden vijf sociale apps naast elkaar: **De Salon** (het besloten netwerk), **Pulse** (het microblog), **RTG Zakelijk** (de LinkedIn-laag), de **genootschappen** en de **verhalen/snaps**. Voor een lid is dat vijf keer dezelfde vraag — *wat is er?* — met vijf antwoorden op vijf plekken. En het bracht precies het probleem van LinkedIn mee: om een zakelijk contact te spreken moest je naar een andere app, terwijl het gewoon één mens is.
+
+`server/kern/wereld/` legt daar één laag overheen, met één app: `/apps/wereld.html`. Bovenaan staat één schakelaar — **Alles · Lifestyle · Business · Communities · Privé** — en die verandert niet van app maar van *wereld*. Dezelfde identiteit, dezelfde feed, dezelfde chat, andere context.
+
+Het ontwerpbesluit dat alles draagt is hetzelfde als bij de Media OS: **de wereldlaag bezit die vijf domeinen niet.** Hij is een *leeslaag*. Er komt geen `db.data.wereld.posts` naast de bestaande opslag; elke bron wordt bij het opvragen uit zijn eigen domein gehaald en op één tijdlijn gezet. Plaatsen loopt er dan ook nooit langs: wie in Lifestyle plaatst, plaatst in De Salon, en die route houdt zijn eigen 9+-keuring, zijn eigen rem en zijn eigen eigenaarschap. Een tweede administratie zou LAT.md-regel 4 zijn, met als eerste zichtbare gevolg dat een verwijderde Salon-post hier gewoon blijft staan.
+
+- **Wat een pas mag, staat op één plek.** `server/kern/wereld/rechten.js` is de enige waarheid over welke werelden opengaan, welke profiellagen je hebt en wat je verder mag. De server poort ermee én het scherm tekent zich ermee (via `/api/wereld/state`), dus een knop die zichtbaar is maar door de server geweigerd wordt, kan niet ontstaan. De trap is **cumulatief**: elke pas erft alles van de pas eronder, berekend en niet overgeschreven. Ook `routes/zakelijk.js` leest deze lijst — dat domein had eerst zijn eigen `PRO`-lijst, en die is weg.
+- **Gratis is niet uitgekleed.** De RTG Pass krijgt een volwaardig netwerk: plaatsen, lezen, reageren, verhalen, genootschappen, chat. Wat de **Lifestyle Pass** erbij krijgt is de professionele wereld plus het gereedschap dat elders achter een abonnement zit (geavanceerd zoeken, wie je profiel bekeek, bereikcijfers, netwerkanalyse, de creator-laag). De **Business Pass** krijgt daar de kant van de onderneming bij: werving, sales, bedrijfsinzichten en het ondernemersprofiel. Inbegrepen in het lidmaatschap, niet apart verkocht.
+- **Een gesloten wereld verdwijnt niet, hij staat er gedimd bij** — met de reden die de *server* meegaf. Wegstoppen wat je niet hebt is oneerlijk naar beide kanten: je weet niet wat je mist, en je merkt ook niet dat het bestaat.
+- **De modus is een voorkeur, geen recht.** Je keuze wordt onthouden, maar bij het lezen altijd opnieuw langs de rechten gehaald. Wie ooit Business koos en later terugvalt naar de gratis pas, blijft daar niet in staan omdat er een oude waarde in de database stond (LAT.md-regel 7: de grendel hangt aan het doel).
+- **Geen algoritme.** Chronologisch, aflopend, klaar — dezelfde merkregel als bij Pulse. De modus *filtert*, hij rangschikt niet. Geen "voor jou", geen oneindige trucs.
+
+**En Berichten blijft een eigen app.** Dat is een bewuste keuze en geen tussenstand: `/apps/comm.html` (de Universal Inbox, met bellen en videobellen) wordt niet opgeslokt. Contact heeft een andere levensduur dan een tijdlijn — je berichten wil je kunnen openen als de feed plat ligt, vanaf een melding, naast de app. Een gesprek dat alleen bestaat als tabblad van iets anders, raak je kwijt zodra dat iets anders verandert.
+
+De **naad** ertussen staat in `server/kern/wereld/koppel.js` en is één afspraak: een verwijzing heet `rtg://<soort>/<id>`, en die ene kaart zegt welke app hem opent. Geen enkel scherm bouwt zelf een app-URL, dus een app die verhuist laat geen dode links achter. Overal waar je in de wereld een mens ziet staat **Bericht**, en die brengt je in de aparte berichten-app, in het gesprek met die persoon — met het onderwerp als verwijzing klaar in het veld. De link draagt een **codenaam en nooit een sleutel**: hij belandt in een browserhistorie, een melding of een screenshot, en de identiteitskluis blijft gescheiden. Een vluchtig ding (een verhaal leeft 24 uur, een snap één keer) gaat er met opzet niet als verwijzing in mee; wie een soort toevoegt aan de kaart beantwoordt die vraag expliciet.
+
+**Eén profiel met lagen, en de zichtbaarheid per veld.** `server/kern/wereld/profiel.js` legt vier lagen naast elkaar — persoonlijk, professioneel, creator, ondernemer — en welke je hebt volgt uit je pas. Ook dit is een **leeslaag**: alle vier bestaan al ergens (je bio in De Salon, je kop in RTG Zakelijk, je creator-kaart en je zaken bij je zaak, gevonden via de sleutelbos in `kern/eenaccount.js`). Er komt geen vijfde profiel naast; invullen doe je in de app die de laag bezit, en het scherm krijgt per laag de **bron** mee zodat het kan zeggen wáár dat is in plaats van een invoerveld te tonen dat niets opslaat.
+
+Wat de wereldlaag hier wél bezit, is het stuk dat nergens bestond: **wie wat mag zien, per veld.** Vijf standen, en elk wijst aantoonbaar een andere groep aan — `iedereen`, `contacten` (je verbindingen), `zakelijk` (verbindingen die óók een zakelijk profiel hebben), `genootschap` (wie een genootschap met je deelt) en `alleenik`. De standaarden zijn een besluit, geen smaak: wat je over jezelf schrijft staat standaard bij je contacten, je functiekop staat standaard open — een zakelijk netwerk waarin niemand elkaar kan vinden is geen netwerk.
+
+In de app zit dat achter de **Profiel**-tab: per laag zie je wat erin staat, waar je het invult, en wie het mag zien. Er staan hier bewust geen invoervelden — die horen in de app die de laag bezit.
+
+Er stonden er eerst **zes**, met `vrienden` naast `contacten`. Bij het bouwen bleek dat een lege belofte: dit huis heeft één vriendengraaf, dus die twee zouden precies dezelfde mensen aanwijzen — twee knoppen met hetzelfde gevolg, waarbij je denkt iets af te schermen wat je niet afschermt. Die is weg. En een afgeschermd veld is van buiten **niet te onderscheiden** van een leeg veld, want "hij heeft wel iets ingevuld, maar niet voor jou" is zelf ook informatie.
+
+**De vermogens van Lifestyle en Business, en een lijst die eerlijk blijft.** Elke naam in `rechten.js` is óf een echte poort, óf staat met een opgeschreven reden als *beschrijvend* — en `test/wereldvermogens.test.js` loopt over elke naam heen en zakt zodra er een bijkomt die geen van beide is. Dat is de belangrijkste uitkomst van deze laag: niet een functie, maar een handhaver.
+
+Want de lijst stond vol beloftes die niets deden. `werving.suite`, `sales.suite`, `events.zakelijk`, `leren.certificaten`, `ai.loopbaan`, `creator.gereedschap` — en twee daarvan beloofden achter een **betaalde** pas iets wat elders **gratis** al bestond: Rahul als loopbaancoach staat in `kern/metier/ai.js` voor elk lid, en bevestigde kwalificaties staan in `kern/metier/bewijs.js`. Die namen zijn eruit in plaats van half aangezet.
+
+- **Geavanceerd zoeken** (`/api/wereld/zoek`) zoekt op functiekop, sector, plaats, vaardigheid, open-voor-werk en een vrije term. Het dragende ontwerpbesluit: **zoeken vindt alleen wat je mag zien.** Wie zijn sector afschermt, is niet op sector te vinden — ook niet als je precies de goede term intikt, en ook niet via de vrije term. Elk filter noemt het véld waar het op kijkt en loopt langs dezelfde `magZien` als het profiel zelf. Een zoekmachine die matcht op velden die hij daarna niet toont, is een lek met een nette voorkant: je leest de waarde niet, maar je leidt hem af uit het feit dat iemand in de uitslag staat.
+- **Netwerkanalyse** (`/api/wereld/introductie`) zegt wie je bij iemand kan introduceren — op codenaam, en bewust begrensd tot een handjevol: een volledige lijst van wie jullie allebei kennen is een sociale kaart van een ander, en dat is meer dan je nodig hebt om een introductie te vragen. Dezelfde som stond al in `routes/zakelijk.js` voor de gedeelde connecties in de gids; die staat nu één keer in `kern/wereld/netwerk.js` en beide gebruiken hem.
+- **Bereik** (`/api/wereld/bereik`) — wat je plaatste over De Salon, Pulse en het zakelijke prikbord heen, en welke stukken het meest zijn opgepakt. Bewust **geen** vergelijking met vorige week, geen percentage, geen ranglijst: dat zijn de lussen die je aan het posten houden. En het antwoord zegt zelf dat het reacties telt en géén vertoningen — RTG houdt niet bij wie wat heeft gezien.
+- **Bedrijfsbeeld** (`/api/wereld/bedrijf`) — wat er van een onderneming te zien is uit wat RTG al weet omdat het er gebeurt: de zaak, zijn open vacatures, zijn kansen. Geen ingekochte bedrijfsdata en geen geschatte omzet; wat we niet weten staat er als zodanig bij.
+- **Talentpool en leads** (`/api/wereld/lijst`) — één implementatie, twee lijsten met eigen standen. Je bewaart een **codenaam met een notitie**, nooit een e-mailadres of een echte naam, en je kunt alleen bewaren wie je ook had kunnen vinden — anders is de lijst een omweg om te toetsen of iemand bestaat. Een volledige ATS of CRM zit er *niet* achter, en dat is opzet: een half aangezette wervingslaag is gevaarlijker dan een afwezige.
+- **Rahul met drie lenzen** (`/api/wereld/rahul`) — netwerk, recruiter, sales. Ze werken uitsluitend op gegevens die jij zelf al mag zien, dus "vraag het aan Rahul" is geen achterdeur om de zichtbaarheid heen. Het antwoord draagt altijd de **stof** mee waarop het is gebaseerd: een advies waarvan je de grond niet kunt nakijken is een orakel.
+- **Wie bekeek mijn profiel** (`/api/wereld/bezoekers`) — inbegrepen, niet verkocht, en zonder het addertje dat andere platformen eraan hangen. **Er is geen sluipstand:** wie kijkt wordt geteld, en de kijker krijgt dat te horen in hetzelfde antwoord. Een dienst waarin de een de ander onzichtbaar kan bekijken, verkoopt die asymmetrie zelf. Het is een logboek en geen groeiteller: per kijker één regel met de laatste keer en hoe vaak, geen grafiek. Bezoeken verdwijnen na 90 dagen, en dat gebeurt echt — de leeslijst ruimt ze op in plaats van ze te verbergen.
+
+**De modus reist mee naar de inbox.** Kies je Business, dan opent de berichten-app in de la *zaken*. Die kaart staat in `koppel.js` en is met opzet bijna leeg: de inbox is geordend naar de **bron** van een gesprek, de wereldschakelaar gaat over **context**, en die twee vallen vandaag op precies één plek samen. Lifestyle, Communities en Privé zouden alle drie op *mensen* uitkomen — drie knoppen met hetzelfde gevolg, en dat is dezelfde leugen als `vrienden` naast `contacten` was. Een toets houdt de kaart tegen de échte ladenlijst aan, zodat een hernoemde la hier niet stil blijft staan.
+
+De vijf apps eronder blijven gewoon bestaan en werken los: wie recht naar De Salon of naar het kansenbord wil, hoort daar zonder omweg te kunnen.
+
+Bewezen door `test/wereldlaag.test.js` (veertien toetsen: de gesloten wereld is echt gesloten — ook bij een rechtstreekse aanvraag —, een zakelijke post lekt niet in de "Alles" van een gratis pas, een prikbordbericht komt bij de leden en juist niet bij wie erbuiten staat, de feed loopt aflopend over de héle lijst), `test/wereldprofiel.test.js` (zes toetsen, waaronder de vijf zichtbaarheden op ÉÉN opstelling van vier kijkers — de enige manier om te bewijzen dat ze echt iets verschillends doen) en `test/wereldlaag.e2e.js` (het scherm in een echte browser: Business staat gedimd, de Salon-post staat in de wereldfeed, en "Bericht" landt in het juiste gesprek in de aparte berichten-app zonder sleutel in de URL). Vijftien mutaties uit LAT.md-regel 2. Veertien raak op de juiste toets; de vijftiende **sloeg af**, en dat was de nuttigste van allemaal — hij legde bloot dat de schermtoets zelf niet kon zakken (een `waitForFunction` met een async functie wacht op een Promise, en die is altijd waar). Die toets stelt zijn vraag nu vanuit Node, en daarna bijt de mutatie wel.
+
+Twee stille fouten kwamen bij dat bouwen boven water, allebei van het soort dat geen enkele foutmelding geeft. De genootschap-lezer las de opslag verkeerd (de groepen staan in `db.data.genootschap.groepen`, niet als losse sleutels) en gaf dus **altijd nul berichten**; en de auteursnaam liep via `liveCodename`, dat een sessie verwacht en voor een kale sleutel `null` teruggeeft — waarna elke auteur stil **"Een lid"** heette. Beide bleven staan omdat de toetsen keken of de bron meedeed in plaats van of er inhoud uitkwam, en of er een naam stond in plaats van wélke. Dat is precies LAT.md-regel 9, en de toetsen vergelijken nu de echte waarden.
+
 ### RTG Reizen (de reiswereld, laag 2)
 
 `server/kern/reiswereld.js` + `/api/reis/wereld` + `/apps/reizen.html`. De eerste
@@ -1273,7 +2667,9 @@ dat verder reikt dan het opschrijft, hoort te stuiten.
 
 ### RTG Bank & RTG Stad (de eigen infrastructuur)
 
-- **RTG Bank** (`server/kern/bank/` + `kern/bankregie/`): een eigen dubbel-boekhoudend grootboek naast RTG Pay (som altijd exact nul, bewaakt door BANK-01 en PAY-02 op het technische bord). De boardroom-knop heeft drie standen (partner / hybride / eigen) met vier-ogen-autorisatie bij opschalen en een nood-fallback naar de kaart-rails; de leden-bank (rekeningen met echt IBAN, sparen, passen, krediet, salarisrun uit de klokuren) gaat pas open als de boardroom hem live zet en het lid akkoord geeft. In de eigen-stand lopen ook de Pay-autoload en de 30% RTFoundation-afdracht over de eigen rails.
+- **RTG Bank** (`server/kern/bank/` + `kern/bankregie/`): een eigen dubbel-boekhoudend grootboek naast RTG Pay (som altijd exact nul, bewaakt door BANK-01 en PAY-02 op het technische bord). De boardroom-knop heeft drie standen (partner / hybride / eigen) met vier-ogen-autorisatie bij opschalen en een nood-fallback naar de kaart-rails; de leden-bank (rekeningen met echt IBAN, sparen, passen, krediet, salarisrun uit de klokuren) gaat pas open als de boardroom hem live zet en het lid akkoord geeft. In de eigen-stand lopen ook de Pay-autoload en de 30% RTFoundation-afdracht over de eigen rails. Alles wat het huis ECHT verlaat krijgt naast de boeking een **betaalopdracht** (`kern/betaalopdracht/`, voor de bank bedraad in `kern/bank/uitgang.js`): die wordt vastgelegd voordat de rail wordt gebeld, wordt bij een mislukking opnieuw ingediend met dezelfde idempotentiesleutel, en boekt het geld terug als de rail hem blijft weigeren. Het openstaande bedrag staat als **reconciliatie** naast de sluitcontrole in `/api/office/bank/gezond` (`railOpenCenten`) -- twee verschillende metingen, want een grootboek kan perfect sluiten terwijl er geen euro is aangekomen. De provider-webhook sluit een opdracht ook echt af: `payout.paid` zet hem op AFGEWIKKELD, `payout.failed`/`payout.canceled` boeken het geld terug -- de mislukte payout is daar het belangrijke geval, want dan staat het geld van de klant af zonder aan te komen. Alle drie de uitgangen delen die rij -- de bank-SEPA, de partneruitbetaling van RTG Pay en de 30%-afdracht van het fonds -- zodat `railOpenCenten` het getal van het hele huis is en niet van een van de drie. De teruggang blijft per rail, want elk boekt in zijn eigen grootboek terug; een soort zonder geregistreerde teruggang wordt geweigerd in plaats van geraden.
+- **Van uren naar uitbetaling, in één keten.** Een medewerker klokt, het contract bepaalt het loon, de loonrun rekent (`kern/payroll/`), manager en administrateur tekenen apart, de run wordt definitief, en pas dan maakt het betaalbestand de **netto** posten die de bankbatch uitbetaalt (`/api/office/bank/salaris/run` met een `runId`). Dat was er niet: de bank had een eigen salarisrun die **bruto** uitbetaalde -- uren maal het uurloon van de zaak -- buiten de loonadministratie om, zonder inhouding, zonder vier ogen en zonder aangifte, terwijl payroll ondertussen het goede netto bestand maakte dat niemand uitbetaalde. Twee administraties van hetzelfde loon, en de verkeerde had de knop. De raming uit de geklokte uren bestaat nog wel (`/api/office/bank/salaris/voorstel`) maar zegt nu zelf `uitbetaalbaar: false`: hij is om mee te plannen, niet om mee te betalen. De loonrun levert de bedragen, de bank de bestemmingen (welk personeelslid aan welk RTG-lid hangt en welke rekening dat lid heeft) -- elk levert wat hij echt weet. Gevolg dat je moet kennen: een zaak in een land zonder geladen jaargang kan geen salaris meer uitbetalen, zie TAKEN.md 4.25. En een jaargang die in zijn eigen bestand meldt dat de cijfers niet tegen de bron zijn gelegd -- zoals de meegeleverde NL-jaargang -- gaat niet zomaar aan: aanmerken kan alleen uitdrukkelijk en met een reden die blijft staan, en elke run die erop draait draagt `opDemoTabellen` tot na definitief -- tot op de loonstrook van de medewerker, die dan zegt hem niet als inkomensbewijs te gebruiken, en op het dekkingsoverzicht per land.
+- **De bevoegdheid** (`server/kern/bevoegdheid.js`): de zesde as waarop een functie dicht kan. De vijf uit `middleware/functieschakelaars.js` (globaal, pas, land, plaats, persoon, genre) gaan over wie de gebruiker is en wat de beheerder uitzette; deze gaat over wat **RTG zelf mag**. Veertien handelingen, elk met wat ze vragen: *software* (inzichten, budgetten, doelen -- rekenen op eigen gegevens, altijd toegestaan), *rail* (betalen, passen, rekeningen: via de kaart-naad is de partner bevoegd, over de eigen rails moeten we het zelf zijn) *vergunning* (krediet uit eigen boek, rente over spaargeld -- dat hangt aan geen enkele rail) en *besluit* (het walletsaldo: toegestaan omdat RTG heeft vastgesteld dat een gesloten circuit met plafonds erbuiten valt, met de grond erbij en met wanneer die grond vervalt). Die vierde soort is er zodat een aanname niet als weglating in de lijst zit; de partneruitbetaling van een zaak hangt aan dezelfde sepa-partnerrail als de bank, zodat die rail niet half uit kan staan. De rangen zijn betaalinstelling < elektronischgeldinstelling < bank. Wat er is afgegeven wordt in de boardroom **vastgelegd** en niet aangezet (`kern/bankregie/vergunning.js`; de twaalf handelingen zelf staan apart in `kern/bevoegdheid/lijst.js`, want dat is het stuk dat een bestuurder moet kunnen lezen zonder code): een lege registratie betekent nee, een verlopen of te lage vergunning ook. In de hybride stand telt de eigen rail en niet de partner die er ook nog is -- anders zou hybride de stand zijn waarin alles mag. Zonder vastgelegde vergunning clearen de eigen rails niet: de drie-standen-knop weigert het opschalen, ook met vier ogen. De matrix staat op `/api/office/bank/bevoegdheid` en **in de bankkamer van de boardroom** (`kantoren.html`, `?kamer=bank`), naast de rail-reconciliatie: per handeling of hij open staat, waarlangs, en anders waarom niet. Getoetst met `test/bank.test.js` (de regels) en `test/bankkamer.e2e.js` (het scherm liegt niet: hetzelfde bedrag als de API, de reden erbij, en het vergunningsformulier legt echt vast).
 - **RTG Stad** (`server/kern/stad/`): het slimme-stad-platform op eigen hardware (de Stadsdoos-vloot, aanmelden met een eenmalig getoonde apparaat-sleutel; poorten `/api/stad/doos/*` met een rem per doos) en eigen software: acht domeinen met standen en regimes, één scenario-knop (nacht t/m nood, nood meldt de meldkamer en staat in het rampbeeld), een zelfschrijvende werklijst voor de veld-app en de bewonersapp Mijn Stad (meldingen op codenaam die als klus bij de veldploeg landen). Privacy by design: de stad meet dingen, geen mensen — geen camera's, geen persoonsvolging; de vrije tekst van bewonersmeldingen gaat niet mee in de AI-dataset.
 
 ### RTF Foundation OS (de stichting als organisatie)
@@ -1588,6 +2984,150 @@ Wat je niet wilt zien, zet je uit in de **Boardroom** (bedieningspaneel → Boar
 
 De statusbalk houdt drie dingen vast: batterij, de bel en het bedieningspaneel. Scannen, je Zegel tonen en je backoffice zitten in dat paneel.
 
+### De Mall: de commerciële voorkant van heel RTG
+
+**apps/mall.html** was een winkel met spullen: zeven etages met boutieks, plus drie bibliotheken. Alles wat je verder bij RTG kon boeken, huren of aanvragen zat in zijn eigen app, en het reisbureau stond er zelfs helemaal niet in — het enige wat de Mall over reizen liet zien was een boekenkast met reisgidsen.
+
+De Mall is nu een **discovery-laag boven op alle bestaande domeinen**. Die domeinen houden hun eigen systemen; de Mall maakt ze gezamenlijk vindbaar.
+
+**Locatie en intentie eerst, type aanbieder daarna.** Bovenaan staat één zoekbalk en de plek waar je staat. "scooter huren Ibiza" zoekt tegelijk door leveranciers, verhuurbedrijven, marktplaats-aanbod en reisaanbod; wie de aanbieder is (professioneel, particulier, RTG) staat op elke kaart, zodat het verschil nooit hoeft te worden uitgelegd.
+
+| deel | waar | wat |
+|---|---|---|
+| het aanbod-object | `kern/mall/aanbod.js` + `aanbodvorm.js` | twaalf typen (product, dienst, boeking, huur, ticket, reis, verblijf, eten, vervoer, marktplaats, abonnement, offerte) in één vorm, met elf verdiepingen |
+| de bronnen | `kern/mall/aanbodzaken.js` (uit de zaken) + `aanbodrtg.js` (RTG-breed) | tien bronnen: reisbureau, logies, foodcourt, retail, eigen-merk, boerderij, dienstenplein, mobiliteit, marktplaats, thuis |
+| locatie & servicegebied | `kern/mall/plek.js` | de plekken worden afgeleid uit het aanbod dat er echt is; per zaak een bereik (adres, straal, stad, land, Europa, online) |
+| zoeken & rangschikken | `kern/mall/zoek.js` + `zoekweging.js` | `POST /api/mall/zoek`, `/api/mall/home`, `/api/mall/plekken` |
+
+**Vier regels die in de code staan en niet alleen hier:**
+
+1. **Rangschikken gebeurt niet op geld.** Een RTG Partner komt niet hoger omdat hij partner is; er is met opzet geen partner-term in de weging. Partners krijgen hun voordeel in integratie, niet in ranking. `test/mall-vindlaag.test.js` leest de weging en zakt zodra iemand er een aanbieder-term in zet.
+2. **Relevantie en volgorde zijn niet hetzelfde.** Beschikbaarheid sorteert, maar laat niets toe dat niet gevraagd is. Toen dat één som was, gaf "scooter huren Ibiza" negen resultaten: vier ringen, drie potten honing en twee villa's, puur omdat die op voorraad stonden.
+3. **De projectie wordt gedeeld, niet overgeschreven.** De prijs van een reis komt uit `reisAanbod(db)` in `kern/reisbureau.js`, de zichtbaarheid van een advertentie uit `kern/markt/openbaar.js`. Een reis die bij het bureau € 2.200 kost en in de Mall € 22 is precies het soort verschil dat niemand ziet aankomen.
+4. **Een status is geen keurmerk.** RTG Partner, RTG Verified, RTG Business en Marktplaats-lid zeggen wat RTG over de aanbieder wéét. De Mall zegt er zelf bij dat RTG niet garant staat voor wat een ander levert.
+
+**Wat er onderweg is gerepareerd:** de genres `jet`, `helikopter`, `taxi`, `charter`, `verhuur` en `tweewielers` stonden wel in de leveranciersgids maar hadden geen pagina, dus ze vielen terug op `/apps/app.html` met `boekbaar: false` — zichtbaar en tegelijk doodlopend, terwijl `hangar.html` en `ov.html` gewoon bestonden. Ze wijzen nu elk naar de plek waar je ze werkelijk aanvraagt.
+
+**Tijd als context.** Zoeken kent naast een plek ook een periode (`van`/`tot`). Die stuurt de agenda-vraag aan: het eerstvolgende vrije tijdvak wordt binnen die periode gezocht in plaats van "de eerstvolgende week". Er wordt níéts weggefilterd — "niets vrij in deze periode" is een antwoord dat je wilt zien, geen reden om een zaak te verbergen. Een reismand (`lijst: <id>`) geeft haar plek en periode door, zodat zoeken vanuit een reis vanzelf de goede context heeft.
+
+Dat is ook waar de **personalisatie** zit, en bewust niet verder: context die het lid zélf zet — een gekozen plek, een gekozen periode, de reismand waarin hij werkt. Er wordt niets onthouden om later mee te raden. Een gedragsprofiel opbouwen is precies wat dit huis niet doet.
+
+**De zakelijke prijs.** Een Business Pass koopt op inkoopprijs waar die bestaat. Die prijs komt uit `prijsVoor()` van `kern/groothandel.js` zelf; de Mall *kiest* welke van de twee hij toont en rekent er geen. Zakelijk zien betekent ook `btw: 'ex'` erbij, want een inkoopprijs zonder die vermelding is een verkeerd getal. De pas komt van een mens: geen enkele registratie geeft zichzelf een Business Pass, dus niemand geeft zichzelf inkoopprijzen.
+
+### Bewaren, een reis bouwen, en de vraagkant
+
+**Lijsten en de reismand** (`server/kern/mall/lijsten.js`). Een verlanglijst en "voeg toe aan mijn reis" waren als aparte functies bedacht en zijn hetzelfde ding met twee velden verschil: een lijst met `soort: 'reis'` draagt een plek en een periode, en kan daarmee zeggen wat er nog ontbreekt (verblijf, vervoer, tafel, iets te doen). Twee systemen bouwen zou twee keer hetzelfde bewaren.
+
+Dit is nadrukkelijk **geen winkelmand die afrekent**. Een reis met een hotel, een scooter en een tafel bestaat uit drie handelingen bij drie partijen, en doen alsof dat één knop is, belooft de klant iets wat er niet is. De lijst brengt ze bij elkaar en wijst per regel de weg.
+
+Een bewaard aanbod dat verdwijnt — uitverkocht, zaak gestopt, reis vol — blijft in de lijst staan met `vervallen: true` en de reden erbij. De regel draagt zelf de titel en de prijs van het moment van bewaren, zodat je nog kunt zien *wat* je had bewaard en of het duurder is geworden. Stilweg verdwijnen laat iemand zoeken naar iets waarvan hij zeker weet dat hij het had.
+
+**De vraagkant** (`server/kern/mall/aanvragen.js`). Een zoekmachine kan alleen vinden wat er staat: "ik heb morgen een fotograaf nodig op Ibiza" levert nul treffers zolang geen fotograaf zich heeft aangemeld — en die nul is geen antwoord maar een gemiste markt. Een lid plaatst zijn vraag, de zaken die hem kunnen bedienen zien hem en reageren.
+
+Drie dingen die dit bewust niet doet:
+
+1. **Geen veiling.** Geen aftellende klok, geen "nog 2 plekken". Dat zijn de patronen die `CLAUDE.md` verbiedt, en ze horen hier het minst thuis: wie een loodgieter zoekt is al gehaast genoeg.
+2. **Geen automatische gunning.** Het lid kiest zelf, of kiest niet. Kiezen boekt niets en betaalt niets — de zaak krijgt bericht en neemt contact op via de gewone weg.
+3. **Geen adres in de open aanvraag.** Een zaak ziet de plek en wat er nodig is, en de codenaam. In een vraag die voor meerdere zaken zichtbaar is, hoort niet te staan wanneer iemand niet thuis is.
+
+Wie welke aanvraag ziet, hangt aan twee dingen: het genre moet bij de gevraagde verdieping horen, en de plek moet binnen het servicegebied van de zaak vallen. Een kapper in Haarlem krijgt geen loodgietersklus op Ibiza in beeld — en een wellness-zaak in Ibiza geen loodgietersklus in Ibiza.
+
+### De schermen: Mijn Mall en de vraagkant van een zaak
+
+**apps/mijnmall.html** is waar een lid zijn lijsten, zijn reismanden en zijn eigen aanvragen bij elkaar ziet. Een reismand toont vier vakjes — verblijf, vervoer ter plaatse, tafel, iets te doen — die aanvinken zodra er iets in zit, met de knop *Zoeken voor deze reis*: die opent de Mall met de plek en de periode van die reis al ingevuld. Een regel waarvan het aanbod verdwenen is blijft staan, doorzichtig, met de reden erbij; is de prijs veranderd sinds je hem bewaarde, dan staat het verschil erachter.
+
+Er staat nergens een knop die doet alsof dit afrekent, en nergens een aftelklok of een "nog 2 beschikbaar". Een lijst is een geheugensteun.
+
+**apps/leverancier-aanvragen.html** is de andere kant: een zaak ziet de vragen die bij haar vak en werkgebied passen, en reageert met wat zij kan bieden en wat het kost. Wie zich bedenkt werkt zijn eigen reactie bij in plaats van er een tweede naast te zetten. Staat er niets, dan zegt het scherm wat het werkgebied nu is en of dat een aanname is — want dat bepaalt precies welke vragen binnenkomen.
+
+Wat de zaak ziet is beperkt en dat is met opzet: de vraag, de plaats, de dag, een eventueel budget en de codenaam. Geen adres.
+
+### Het vraagbeeld: wat gevraagd wordt en niet geleverd
+
+De Mall weet iets wat niemand anders weet: waar mensen naar zoeken en **niets vinden**. Dat is de eerlijkste marktinformatie die er is — iemand heeft de moeite genomen het te vragen en kreeg niets terug. Voor een ondernemer is dat een kans, voor een stad een tekort.
+
+Dit is ook het onderdeel met de grootste kans om verkeerd gebouwd te worden, dus vier regels staan als code en niet als belofte (`server/kern/mall/vraagbeeld.js`):
+
+1. **Geen sleutel.** Nergens wordt bijgehouden wíé iets zocht — geen lidsleutel, geen codenaam, geen sessie, geen IP. Een teller per woord per plaats per week, en verder niets. Zoekprofielen zijn hiermee ook achteraf niet te bouwen.
+2. **Losse woorden, geen zinnen.** Er wordt per wóórd geteld. "kinderstoel huren voor de bruiloft van mijn zus" is als zin herkenbaar; als vier losse woorden in een weekteller is dat niemand meer. Dit is de belangrijkste van de vier.
+3. **Een drempel.** Een woord komt pas naar buiten — naar een ondernemer of het kantoor — vanaf vijf keer. Wat een enkeling zocht blijft binnen.
+4. **Het vervalt.** Acht weken, dan weg. Een vraagbeeld is om op te handelen, niet om een geschiedenis van een stad aan te leggen.
+
+Cijfers, e-mailadressen en woorden langer dan 24 tekens gaan er sowieso niet in: die dragen het meeste risico en het minste nut. En alleen een echte zoekopdracht van een mens telt mee — de home, de reizenstrook en interne aanroepen niet, anders wijst het vraagbeeld naar binnen in plaats van naar de markt.
+
+**De lus is rond.** Een tekort in de Mall is een vierde bron voor de Kansenlaag van het stadsweefsel (`server/kern/stadsweefsel/kansen.js`, gekoppeld in `server/opzet/weefseldraden.js`). Een openstaande vacature zegt "hier is werk", een lege zoekopdracht zegt "hier is een markt" — twee verschillende tekorten die allebei in de kansenlaag horen. Begint er een zaak, dan staat haar aanbod via `kern/mall/aanbod.js` vanzelf in dezelfde zoekmachine, en wordt het tekort kleiner. Die laatste stap is geen belofte maar de bestaande leeslaag.
+
+Wat een ondernemer ziet (`POST /api/supplier/mall` → `vraag`) zijn de woorden uit zijn eigen vak en plaats, boven de drempel. Bewust géén bezoekersaantallen en géén conversie: dit zegt wat mensen zochten, niet wat zij deden.
+
+### De Supplier OS ↔ Mall-koppeling
+
+De Mall las tot nu toe alleen wat een zaak **is** (naam, adres, artikelen, prijzen) en niet wat zij op dit moment **doet**. Een gesloten kapper stond er net zo bij als een open kapper, een woensdagmiddag die de ondernemer in zijn eigen agenda blokkeerde was in de Mall niet te zien, en een artikel met voorraad nul verschilde in niets van een artikel dat op de plank ligt.
+
+`server/kern/mall/stand.js` haalt die stand op uit de systemen waar de ondernemer al werkt. Er wordt niets opgeslagen en geen enkele openingstijd opnieuw gedefinieerd: het is dezelfde rij.
+
+| wat | uit welk systeem |
+|---|---|
+| openingstijden, werkdagen, geblokkeerde dagen | `kern/vakwerk/agenda.js` (`s.vakUren`) |
+| vrije tijdvakken en tafels | `vakwerk.slots` en `foodcourt.tijden` |
+| aan/uit voor bestellen en reserveren | `kern/zaak.js` (`zaakFunctieAan`) |
+| voorraad | de varianten van de zaak zelf |
+
+**Wat we niet weten, zeggen we niet.** `openNu` geeft drie antwoorden: `true`, `false` en `null`. Null betekent "deze zaak heeft geen openingstijden vastgelegd" en is met opzet géén "open" — het filter *Nu open* laat zo'n zaak dus weg. Dat is eerlijker dan gokken, en voor de ondernemer meteen de reden om zijn uren wél in te vullen: iemand voor niets door de regen sturen is erger dan een treffer missen.
+
+**Kosten.** `openNu` is goedkoop en wordt voor de hele Mall berekend, zodat het filter over álles kan werken. Het eerstvolgende vrije tijdvak vraagt per zaak per dag de agenda op en wordt daarom alleen voor de zichtbare pagina opgehaald (hoogstens zestig kaarten), niet voor duizenden aanbod-objecten.
+
+**De andere kant: `POST /api/supplier/mall`.** Een ondernemer werkt in zijn eigen systeem en zag nooit wat daar aan de Mall-kant van terechtkomt — precies waar stille drift ontstaat. Deze weergave is een spiegel, geen dashboard: welk aanbod van u staat er, welke stand leest de Mall uit uw agenda en voorraad, en wat ontbreekt er nog (geen uren = niet in *Nu open*; geen werkgebied = de Mall neemt aan wat uw genre meebrengt). Bewust géén zoekvragen, bezoekersaantallen of conversie: dat is een leverancierdashboard en een eigen beslissing met een eigen privacyvraag.
+
+**De klok is die van de zaak** (`server/kern/tijdzone.js`). Zolang alles op servertijd rekende was *Nu open* in Ibiza een uur mis — de stilste fout die er is, want de klant staat voor een dichte deur en denkt dat de zaak gesloten is. De zone komt uit `s.tijdzone` (IANA), anders uit de hoofdzone van het land van de zaak, en die tweede zegt van zichzelf dat het een aanname is. `POST /api/supplier/tijdzone` zet hem; `auto` zet hem terug. Er wordt niets zelf uitgerekend: `Intl` heeft de volledige zonedatabase inclusief zomertijd aan boord.
+
+**Eén antwoord op "hoe laat is het bij deze zaak".** `zaakZone(s)` en `nuBijZaak(s)` worden gedeeld door de Mall, de vakwerk-agenda (`kern/vakwerk/agenda.js`) én de Food Court. Dat is geen netheid maar noodzaak: gaven die drie een verschillend antwoord, dan biedt de Mall een tijdvak aan dat het boekscherm niet kent. De landbepaling van de Reiswijzer wordt daarvoor één keer bij het opstarten geregistreerd (`kern/tijdzone.zetLandVind`, in `opzet/kernlaag4b.js`) — dezelfde overlay-gedachte waarmee de reisrijen op de landentabel worden gezet.
+
+De reparatie zit dus **bij de oorzaak en niet in de leeslaag**: eerder rekende alleen de Mall in de zone van de zaak en filterde `vakwerk.slots()` nog op servertijd. Dat viel niet op omdat de Mall er zijn eigen filter overheen legde — precies het soort gat waar LAT-regel 1 over gaat. De Food Court had daarbij een eigen variant: de datum stond in UTC en de tijd in de zone van de server, twee klokken in dezelfde functie.
+
+**Een kassasysteem van buiten** (`server/kern/mall/extern.js`, `POST /api/supplier/mall/sync`). Twee dingen mogen naar binnen en met opzet niet meer: **voorraad** per sku en **open/dicht**. Geen prijzen, geen artikelen, geen teksten — een koppeling die stilletjes productnamen kan overschrijven is een veel groter ding, met een eigen gesprek over wie wat mag.
+
+Drie regels die de koppeling veilig maken:
+
+1. **Houdbaarheid.** Een melding telt 30 minuten als actueel; daarna valt de Mall terug op wat zij zelf weet. Een kassa die stopt met melden is namelijk niet te onderscheiden van een kassa die "alles nog steeds op voorraad" bedoelt — behalve door de tijd. Zo houdt een uitgevallen koppeling nooit een winkel dagenlang open en gevuld.
+2. **De zaak wint van de kassa.** Zet de ondernemer zijn zaak in RTG op "neemt geen reserveringen aan", dan telt dat zwaarder dan wat het kassasysteem meldt. Een schakelaar die je omzet en die niets doet is erger dan geen schakelaar. Voorraad werkt andersom: daar is het externe getal het meest actueel, want daar loopt de verkoop.
+3. **Wat niet is aangenomen, wordt teruggemeld.** Regels zonder sku, een `open` die geen ja/nee is, sku's die hier niet bestaan: allemaal in het antwoord. Een koppeling die stil iets weggooit is niet te bouwen tegen.
+
+De kassa overschrijft de **weergave**, niet de administratie: de eigen voorraadrij van de zaak blijft staan zoals hij stond.
+
+### Kaart, land, filialen: waar iets is
+
+**De kaart** (`server/kern/mall/kaart.js`) is nadrukkelijk **geen straatkaart**. De CSP van dit huis staat geen vreemde tegelserver toe, en een kaartdienst inhuren betekent dat elke zoekopdracht — inclusief waar het lid staat — langs een andere partij komt. Wat er wel is: de onderlinge ligging, geprojecteerd op een vierkant vlak met de zoeker in het midden. Je ziet daarmee wat je van een kaart wilt weten in een zoeklijst (ligt dit bij elkaar, ligt dit bij mij) zonder iets naar buiten te sturen. De kaart gaat over **alle** treffers, niet over de zichtbare pagina, en treffers zonder coördinaat verdwijnen niet stilletjes maar komen terug als `zonderPunt` met een regel erbij: *"8 van de 40 treffers staan hier niet op."*
+
+**Het land** is de stap van een stad naar een werelddeel: filteren op `ES` zet Ibiza, Madrid en Marbella naast elkaar. Aanbod waarvan het land onbekend is valt weg — dat meenemen zou raden zijn. Het antwoord noemt zelf welke landen erin zitten (`landen`), zodat een scherm geen landenlijst hoeft te verzinnen.
+
+**Filialen** (`server/kern/mall/vestigingen.js`). Een zaak had precies één stad, en dus was de vestiging in Haarlem onvindbaar zodra het hoofdadres in Amsterdam stond. Er wordt géén kopie van het aanbod per vestiging gemaakt — dan staat hetzelfde brood twintig keer in de lijst en moet elke prijswijziging op twintig plaatsen landen. Het blijft één aanbod met een lijst plekken: `bedient()` is raak zodra één vestiging de plek bedient, `afstandTot()` meet naar de dichtstbijzijnde, en de zaak telt mee in elke stad waar zij staat. Wat dit **niet** modelleert: filialen met eigen prijzen, voorraden of openingstijden. Elk aanbod draagt daarom `perVestiging: false`.
+
+### Beoordelingen, bezorging, bewaren
+
+**Beoordelingen** bestonden al (1–5 sterren na afronding, lopende som in `reviewStats`). De Mall rekent er geen tweede gemiddelde naast uit: de som staat één keer in `server/kern/ervaring/rating.js` en wordt door zowel de reviewlaag als de Mall gelezen. RTG Thuis houdt reviews per *huis* bij en geeft daarom zijn eigen cijfer mee. **Een cijfer is geen keurmerk van RTG**, en dat staat er in de Mall bij.
+
+**Bezorging** leunt op de schakelaar die de zaak al had. De regel staat als pure functie in `server/kern/leverancier/bezorgregel.js`: bezorgen vraagt om *mogen* én *aanstaan*. Een zaak die de schakelaar uit heeft hoort niet in een bezorgfilter — anders stuurt de Mall iemand een bezorging in die niet komt.
+
+**Bewaren** (`server/kern/mall/bewaard.js`) is een systeemlijst in de gewone lijsten, geen tweede opslag. Omdat elke bewaarde regel zijn prijs en beschikbaarheid van het moment van bewaren meekrijgt, is het "prijsalarm" geen machinerie maar een vergelijking. En het is met opzet **geen melding**: geen push, geen e-mail, geen badge. Je ziet het wanneer je zelf kijkt, zonder aftelklok en zonder voorspelling dat iets duurder wordt. Regels van vóór deze versie hebben geen vastgelegde beschikbaarheid; daarover doet de laag géén uitspraak, maar ze worden wel geteld in `zonderVergelijking`.
+
+### Samengesteld aanbod en het bestellingenoverzicht
+
+**Collecties, bundels, evenementen en seizoenen** (`server/kern/mall/collecties.js`) zijn één ding met per soort een veld erbij: een benoemde set aanbod met een reden. De losse prijs van een bundel wordt **altijd uit het levende aanbod opgeteld en nooit bewaard** — een opgeslagen optelsom is morgen een leugen. En een bundel die een onderdeel mist is kapot: hij komt terug met `compleet: false`, zegt wat er ontbreekt en toont géén prijsvergelijk. Doorrekenen zonder onderdeel laat iemand een korting kopen die hij niet krijgt. Wat er geldt komt uit de **datum** en niet uit een vinkje "actief" — een vinkje dat niemand omzet is hoe een winteractie in juli blijft staan. Een zaak bundelt alleen haar eigen aanbod; het kantoor stelt over zaken heen samen.
+
+**Het bestellingenoverzicht** (`server/kern/mall/bestellingen.js`, `POST /api/mall/bestellingen`) doet wat de aanbodlaag doet, de andere kant op: uit vijf domeinen één overzicht van wat een lid lopen heeft. Er is **geen gezamenlijke afrekening** en die komt er niet: achter die regels zitten verschillende partijen met eigen bevestigingen. Elke regel wijst naar het domeinscherm dat hem beheert; er wordt hier niets geschreven. Een omvallende bron komt terug in `stuk` in plaats van als een korter lijstje, een onbekende status houdt zijn eigen naam, en `betaald` is `null` waar een bron het niet bijhoudt — `null` is niet `false`.
+
+### De zakelijke ingang en de concierge
+
+**De zakelijke Mall** (`POST /api/mall/zakelijk`) is geen tweede Mall maar dezelfde, anders gefilterd: alleen aanbod met een inkoopprijs, exclusief btw en met `btw:'ex'` erbij. De **pas** bepaalt dat, nooit het verzoek — een meegestuurd vinkje koopt geen inkoopprijs. Wie geen Business Pass heeft krijgt een 403 die naar een gesprek met RTG verwijst; de app mag zo'n pas nooit zelf verlenen.
+
+**De concierge** (`server/kern/mall/concierge.js`, `POST /api/mall/concierge`) is het enige stuk van de Mall waar een taalmodel bij komt, en de vorm is de beveiliging: het model vertaalt de zin naar **filters** en schrijft geen antwoordtekst. Wat het lid leest is opgeteld uit de echte treffers. Een model dat over aanbod mag antwoorden verzint vroeg of laat een restaurant, een prijs of een beschikbaarheid — en juist bij een bevestigde boeking, een echt hotelmerk als "partner" of een belofte over een pas is die schade niet terug te draaien.
+
+Drie dingen staan daarom in code en niet in de prompt:
+
+1. **Vragen over een pas gaan niet naar het model.** Lifestyle, Business, de ballotage en De Salon worden vóór de AI-aanroep herkend en beantwoord met een vaste doorverwijzing naar een mens. De regel is afgebakend: *"beachclub met toegang tot het strand"* is een gewone zoekvraag.
+2. **Wat uit het model komt is invoer.** Een verdieping of type dat niet bestaat wordt weggegooid én gemeld in `genegeerd`; "morgen" wordt niet tot een datum geraden. Een half begrepen vraag mag er niet uitzien als een goed begrepen vraag.
+3. **Zonder sleutel geen verzonnen antwoord.** De zin gaat als gewone zoektekst door dezelfde zoeklaag, en dat staat in het antwoord.
+
 ### De wallet en de ledenpas
 
 **apps/wallet.html** is alles wat je bij je draagt. Bovenaan ligt je **ledenpas**: codenaam, lidnummer, welke pas en een QR met je lidnummer (onze eigen codec, `shared/qr.js` + `shared/qrteken.js`). Daaronder je passen, tickets, sleutels, feestmunten en klantenkaarten (`/api/wallet`, `server/kern/wallet.js`). De pas stond vroeger op het beginscherm van de app; daar staat nu de klok.
@@ -1732,6 +3272,181 @@ Vandaar de **zetel**: uitgedeeld vanuit de boardroom, gekoppeld aan een echte pe
 Alles wat de balie wél doet — een dossier openen, een codenaam natrekken — gaat door het **bestaande** inzagejournaal (`server/inzagelog.js`), met de zetel als "wie" en de opgegeven aanleiding als "waarom". Bewust geen eigen logboek: een tweede journaal is een journaal dat bij een audit wordt vergeten. Ook zoeken telt als inzage, ook als er niets uitkomt — wie een codenaam natrekt om te zien óf hij bestaat, doet precies wat het journaal moet vastleggen.
 
 Kern: `server/kern/ledenbalie.js`, routes `/api/office/balie/{zetels,zetel,zoek,dossier,herstel,klacht,klacht/status,abo}`, getoetst in `test/ledenbalie.test.js`.
+
+## RTG Command: het kantoor als één app
+
+Het RTG- en RTF-kantoor was een verzameling schermen: de backoffice, de kamers, het RTF-kantoor, de meldkamer, de techniek, de Office-suite. Elk scherm kende zijn eigen hoek van het platform, en niemand kende het geheel. **`/apps/command.html`** is die verzameling als één app — niet door er een menu overheen te leggen, maar door er één objectmodel onder te schuiven.
+
+**Het register is de spil.** `server/kern/command/register.js` zegt welke objectsoorten er zijn, waar ze wonen en hoe ze heten. De zoekbalk leest hem, het objectdossier leest hem, de runbooks schrijven alleen via hem, en de puls telt eruit. Een soort erbij is één regel erbij; niemand hoeft de zoekbalk aan te raken. Dat is de reden dat dit een tabel is en geen veertig if-takken: een belofte als "één zoekbalk voor letterlijk alles" die per soort een eigen tak vraagt, is binnen twee maanden stil onwaar.
+
+**De ontwerpregel, in elke module: handmatig, assisted, autonoom.** Welk van de drie geldt is nooit een eigenschap van de knop maar een uitkomst van `risico.js` uit het beleid van dat moment. Dezelfde handeling is autonoom bij één geval en mensenwerk bij honderd; de score draagt altijd zijn opbouw, zodat een mens kan zien *waarom* iets naar hem is gerouteerd — en het kan bestrijden.
+
+**De operator.** Een vraag in gewone taal wordt een gemeten plan: hoeveel gevallen, welke oorzaken, hoeveel de machine veilig mag doen, wat een mens moet beoordelen. De oorzaakgroepering (`oorzaak.js`) *meet* welk veld de gevallen het strakst clustert in plaats van een tabel "wat verklaart wat" te raadplegen; vindt hij niets dat bijna alles verklaart, dan zegt hij dat er geen gedeelde oorzaak is. Daarna is er één knop: doe de veilige gevallen, en de uitzonderingen worden zaken met eigenaar, termijn en bewijs. De AI verwoordt hooguit — zonder API-sleutel werkt alles hetzelfde, alleen is de zin dan door ons geschreven.
+
+**Schrijven kan maar op één manier.** Elke wijziging die Command aan gegevens maakt, loopt door een runbook: een veld op een object van een bekende soort krijgt een nieuwe waarde, en de oude waarde gaat mee in de ronde. Terugdraaien is daarmee geen extra code maar hetzelfde mechanisme omgekeerd — en het slaat over wat iemand anders sindsdien heeft gewijzigd, zodat een terugzetting nooit stilletjes andermans werk wist. Velden die een identiteit, een bedrag of een recht dragen staan op slot (`BEVROREN`) en worden bij het uitvoeren gecontroleerd, niet bij het opschrijven.
+
+**Beleid is een gegeven, geen code.** Prijzen, grenzen, budgetten en de risicodrempels staan in één register met versies, herkomst en reden. Zware regels vragen twee paar ogen — en wie voorstelt kan niet zelf goedkeuren, afgedwongen op de server omdat een grendel die alleen in de knop zit er niet is. Terugzetten is de vólgende versie en niet het wissen van de vorige. Naast elke regel staat een proef die met een schaduw-beleid doorrekent wat de nieuwe waarde met de routering doet, zonder iets te zetten.
+
+**Het journaal is een keten.** Elke handeling van mens én machine draagt oude toestand, nieuwe toestand, actor, reden en gebruikte regel, plus de hash van de vorige regel. `controleer()` wijst de eerste breuk aan; het scherm toont die uitslag bovenaan. De actor komt altijd uit de sessie en nooit uit de body — wie met de gedeelde kantoorcode binnenkomt heet `kantoor (gedeelde code)`, en daarmee vallen vier-ogen-goedkeuringen en zware rechten vanzelf om.
+
+**Zware rechten verlopen vanzelf.** Tijdelijke bevoegdheid, mandaat en de nooddeur (break-glass) hebben allemaal een `tot`; er is niets dat blijft staan, dus er valt ook niets te vergeten in te trekken. De nooddeur vraagt een volledige reden en staat als zwaarste handeling in het journaal.
+
+**En de meter waarop dit kan zakken.** Het werkbesparingsbord telt handminuten per duizend handelingen, de automatiseringsgraad per werkstroom en de lekken: veel volume dat nog nooit autonoom liep. Dalen die getallen niet, dan is er geen automatisering bijgekomen maar een dashboard. De minutenprijzen zijn schattingen en dat staat in de uitslag — een meter die zijn eigen onzekerheid verzwijgt, wordt gebruikt alsof hij zeker is.
+
+De werkplek-tab opent de bestaande apps (Office, RTMail, Agenda, Meet, Bestanden, Personeel, Payroll, Balans, Techniek, RTF-kantoor …) vanuit dezelfde schil, met dezelfde inlog en dezelfde gegevens. Ze worden geopend, niet nagebouwd.
+
+Kern: `server/kern/command/` (register, zoek, object, oorzaak, operator, risico, runbooks, beleid, journaal, zaken, toezicht, toegang, puls, simulatie, werkbesparing), routes `/api/command/*` in `server/routes/command/`, frontend `public/apps/command/` (gebundeld naar `public/apps/command.js`), getoetst in `test/command.test.js`.
+
+## De Regie van de zaak: dezelfde logica, maar alleen over de eigen zaak
+
+RTG Command bestuurt het platform. Een partner heeft dat niet nodig en mag het niet zien -- hij heeft dezelfde soort laag nodig over **zijn eigen zaak**. Die staat in `server/kern/zaakcommand/` en hangt als werkgebied **Regie** in de zaak-app (`/apps/leverancier.html`) en als tegel **Regie** in de personeels-PDA (`/apps/personeel.html`).
+
+**De motoren zijn dezelfde, de gegevens niet.** Journaal, beleid, risico, uitzonderingen, runbooks, operator en werkbesparing komen uit `kern/command/`; ze kregen daarvoor twee haken. De eerste is het **register als parameter**: `zoek.js` en `object.js` importeren geen register meer maar krijgen er een. De tweede is het **vak**: elke motor slaat op in een object dat de aanroeper aanwijst. Zo heeft elke zaak zijn eigen hashketen, zijn eigen grenzen en zijn eigen lijst, met één implementatie eronder.
+
+**De scope heeft twee assen, en de tweede kwam er door een lek.** De eerste versie scoopte alleen op de zaak — en toen kon een ober via de zoekbalk de verlofaanvragen en sollicitaties van zijn collega's lezen, gegevens die overal elders achter `managerOnly` staan. De reparatie is **weglaten en niet filteren**: een soort met `as: 'leiding'` staat niet in het register van een medewerker. Hij is er niet, dus geen enkele lezer kan hem vinden — ook de afhankelijkhedenscan niet, die álle soorten langsloopt. Een filter had op één van die lezers vergeten kunnen worden. `leiding` staat standaard op false: wie de vlag vergeet ziet te weinig, en dat is de goede kant om fout te gaan.
+
+**Isolatie is bouw, geen belofte.** De zaakcode komt uitsluitend uit de sessie (`supplierAuth` zet `req.supplier` uit `sess.code`); geen enkele route in dit domein leest een code uit de body. Het register van een zaak kent alleen de eigen soorten, en elk van die soorten draagt zijn eigen `lees()` die op de zaakcode sluit. Zoeken op de code van de buurman levert daarom niet "niets gevonden na filtering" op maar niets, omdat er niets te vinden is.
+
+**De recepten verzinnen geen werkelijkheid.** Dat is bij een zaak een scherpere eis dan bij het platform: een bestelling op "in bereiding" zetten omdat hij te lang op "nieuw" staat, zou betekenen dat het systeem zegt dat de keuken begonnen is terwijl niemand iets deed. Wat de vier recepten wél doen is administratieve drift rechtzetten: een bestelling waarvan alle stations "klaar" melden maar de status achterliep, een ritstatus van vóór de huidige keten (`rijdt` → `aan-boord`), een bevestigde boeking waarvan de datum allang voorbij is, een klus die als opgelost is gemarkeerd maar nog openstaat. Alles wat de zaak moet *beslissen* — een boeking bevestigen, een chauffeur toewijzen, verlof toekennen — is geen recept maar een **signaal** dat een uitzondering wordt met eigenaar, termijn en bewijs.
+
+**Die signalen bestonden al, met de hand geschreven.** Ze stonden als `alerts` in `routes/supplier/backoffice.js`. Dat werkte zolang er één lezer was; met de Regie erbij zouden er twee bijna-gelijke lijsten zijn geweest. Ze staan nu één keer, in `kern/zaakcommand/signalen.js`, en de backoffice leest dezelfde bron — met hetzelfde antwoord als voorheen, tweetalig en al.
+
+Kern: `server/kern/zaakcommand/` (register, runbooks, signalen, index), routes `/api/supplier/command/*` in `server/routes/zaakcommand/`, scherm `public/shared/zaakcommand/` (gebundeld naar `public/shared/zaakcommand.js`, gedeeld door beide apps), schakelbaar als `zaakregie` en `zaakregie-beheer`. Getoetst in `test/zaakcommand.test.js` (acht beweringen, vier mutaties) en `test/zaakregie.e2e.js` (beide schermen in een echte browser).
+
+### De drie bureau-PDA's draaien op één werking
+
+`studio-pda.html` (198 regels), `hardware-pda.html` (199) en `architect-pda.html` (184) waren drie kopieën van hetzelfde ontwerp. Na het normaliseren van de bureaunaam verschilden ze 54 tot 73 regels — en dat waren geen drie ontwerpen maar één dat uit elkaar was gelopen: de studio kreeg de nieuwe deelmenu-stijl voor de disciplinerij, de architect bleef op de oude pillen; de studio nam elf kolommen mee bij het uitvoeren, de hardware zeven en de architect acht, met verschillende namen voor hetzelfde; de architect laadde `deur.js` in de kop en de andere twee in de body. Zo'n verschil merkt niemand, want niemand opent drie apps naast elkaar.
+
+De werking staat nu één keer in **`public/shared/bureaupda.js`**. Wat per bureau verschilt — de naam, de brief-hint, de twee velden waarmee een concept wordt samengevat (silhouet/aandrijving, behuizing/chip, typologie/constructie) en de kolommen van het register — staat daar als **gegeven** in één tabel. Een vierde bureau is een regel in die tabel plus een pagina van tachtig regels.
+
+De drie paden blijven bestaan als echte apps met hun eigen gids-ingang en hun eigen deur: er wordt vanuit `kantoren.html` drie keer naar gelinkt en er staat een toets op hun deur (`test/kantoordeuren.e2e.js`). Ze vervangen door een doorverwijzing zou werk kapotmaken om iets op te ruimen wat niemand stoorde.
+
+Getoetst in `test/bureaupda.e2e.js`: alle drie komen op met hun eigen bureau, elk spreekt alleen zijn eigen endpoints aan (de fout die je bij een samengevoegde werking het eerst zou maken), en alle drie dragen nu dezelfde disciplinerij.
+
+### Het belofteregister: wat is toegezegd, en waar staat het
+
+Op de vraag "maak alles wat er nog niet is" is hier twee keer het verkeerde antwoord gegeven. De eerste keer werd alleen de bovenste maplaag gescand en kwamen RTG Sheets, Slides en Forms als ontbrekend terug — ze staan in `public/apps/office/`. De tweede keer kwamen CRM en BI als ontbrekend terug, terwijl CRM als `server/bedrijf/klant.js` bestaat (met gewogen pijplijn en een verplichte verliesreden) en de voorspellaag als `server/kern/voorspel/`.
+
+Twee keer fout op dezelfde vraag betekent niet dat er beter gezocht moet worden. Het betekent dat er geen bron was om in te kijken. Dit huis heeft `GRENZEN.json` voor domeingrenzen, `NORM.json` voor meters, `BEWIJS.md` voor wat de toetsen beweren en `ARCHITECTUUR.md` voor de kaart — maar niets dat zei wat er is *beloofd* en waar dat staat.
+
+**`BELOFTE.json`** is die bron; `npm run belofte` schrijft er `BELOFTE.md` uit. Elke belofte draagt haar dekking — bestandspaden en API-paden — en het script kijkt na of die er echt zijn:
+
+- **gedekt** — elk bewijsstuk bestaat;
+- **open** — nog geen dekking: werkvoorraad, en dat mag;
+- **gebroken** — er wordt verwezen naar iets dat er niet (meer) is.
+
+Die laatste is de enige alarmerende stand, en de reden dat het register bestaat: een belofte die nog open staat weet iedereen, maar een belofte die ooit waar was en stil verdween mist niemand. Bij het opschrijven sloeg hij meteen drie keer aan — drie paden wezen naar modules die ergens anders bleken te wonen. Keuringsregel 41b houdt het bestand actueel en laat de keuring zakken op elke gebroken belofte; `test/belofte.test.js` toetst de meter zelf met een bewijsstuk dat niet bestaat, want een meter die je niet hebt zien uitslaan meet niets.
+
+Wat het register **niet** doet, is kwaliteit beoordelen. Dat een bestand bestaat, zegt niet dat de belofte goed is ingelost; daarvoor is `BEWIJS.md` er en de toetsen die daaronder liggen.
+
+### Gegevenskwaliteit en de kennisgraaf: één meting, twee vragen
+
+Twee van de open beloften zijn dicht, en ze delen hun fundament. `kern/command/kwaliteit.js` meet welk veld in de praktijk naar welke soort verwijst — er is geen tabel die zegt "orders.supplierCode wijst naar zaken", want zo'n tabel veroudert zodra er een collectie bij komt en controleert dan precies de nieuwe velden niet. Uit die ene meting komen twee dingen:
+
+- **de wezen** — rijen waarvan de verwijzing nergens aankomt. Naast dubbele sleutels en rijen zonder sleutel vormt dat de kwaliteitslaag: niet wat er *verkeerd* staat (daar zijn de runbooks voor) maar wat er *kapot* is. Een dubbele sleutel is geen bedrijfsprobleem maar een administratieprobleem, en het valt zelden op — tot iemand op de verkeerde rij klikt.
+- **de randen** van `kern/command/graaf.js` — de kennisgraaf. Het objectdossier beantwoordt één stap ("wie verwijst naar dit object"); de graaf beantwoordt de vraag erachter: hoe hangt dit samen, en wat ligt er twee stappen verderop.
+
+De drempel ligt op 80%: een veld dat vier van de vijf keer een bestaande sleutel raakt, is een verwijzing met vier wezen; een veld dat de helft van de tijd raak is, is waarschijnlijk toeval en wordt niet gecontroleerd. Liever een wees missen dan een half platform als kapot melden — daar staat een toets op.
+
+**Zeker en vermoed staan apart.** Een dubbele sleutel is een feit. Een waarde die één keer voorkomt terwijl de rest tientallen keren hetzelfde zegt, is een vermoeden (typefout, oude naam) en telt niet mee als defect. Een meter die vermoedens als feiten telt, wordt terecht genegeerd.
+
+Beide lagen draaien op het register dat ze meekrijgen, dus de zaak-kant krijgt ze gratis en volledig gescoped: de graaf loopt juist wél door en zou ongescoped het gevaarlijkste stuk zijn. In RTG Command staan ze als werkplekken **Kwaliteit** en **Kennisgraaf**; in de zaak achter de managergrens.
+
+### De laatste acht beloften, en wat ze bewust níet doen
+
+Het belofteregister staat op **65 gedekt, 0 open, 0 gebroken**. De acht die als laatste dichtgingen raken uitrol, migratie en meerdere omgevingen — precies het gebied waar een knop makkelijk mooier is dan de werkelijkheid. Wat elk van ze weigert te doen is daarom net zo belangrijk als wat het doet.
+
+| Laag | Wat het doet | Wat het bewust niet doet |
+|---|---|---|
+| **Canary** (`kern/command/canary.js`) | een functie uit de schakelkast gefaseerd openzetten, met een terugroldrempel op dezelfde tellers als de servicedoelen | niet wegen als de nulmeting kwijt is (na een herstart); anoniem verkeer valt nooit in een canary |
+| **Zandbak** (`zandbak.js`) | dezelfde motoren op een DB-venster met zaaigegevens, met eigen journaal en beleid | geen productierijen kopiëren; geen tweede installatie — alleen de motoren van Command, niet de app-routes |
+| **Master data** (`mdm.js`, `mdmsamen.js`) | gemeten dubbelen over bedrijven en locaties, met een gouden record per veld | nooit vanzelf samenvoegen; nooit iets wissen (verliezers houden een verwijzing) |
+| **Overname** (`overname.js`) | inlezen → afbeelden → droogloop → uitvoeren, met terugdraaien per partij | niets overschrijven (een bestaande sleutel is een botsing); niet uitvoeren zonder het zegel van de bekeken droogloop |
+| **API-poort** (`apipoort.js`) | sleutels, scopes, quota en uitfasering op `/api/extern/` | niets ontsluiten: de toelating begint leeg; scopes buiten de toelating worden geweigerd en niet stil ingeperkt |
+| **Landpakketten** (`LANDEN.json`, `landpakket.js`) | munt, voertaal en schakelkaststand per land, geleund op wat het huis al weet | geen naleving: btw-registratie en loonaangifte blijven mensenwerk, en die lijst wordt niet korter door te activeren |
+| **Stadsstart** (`stadstart.js`) | een stad met land, genormaliseerde naam en per-plaats-standen | niet doen alsof het weefsel meerdere steden draagt; die stap blijft openstaan met de reden erbij |
+| **Chaosproef** (`scripts/chaos.js`) | een eigen trio starten en de **actieve** server met SIGKILL omleggen, en meten | niet op productie te richten; "geen onderbreking gemeten" nooit als "geen onderbreking" tonen |
+
+Twee dingen die door deze ronde heen lopen. **Een nulmeting die je kwijt bent, is geen nul** — de canary weigert te wegen na een herstart, want doorrekenen zou een negatief foutaantal geven en dus altijd groen. En **een grens weigert, hij perkt niet stil in** — de API-poort maakt geen half-ingeperkte sleutel, want dan denkt een koppeling ergens bij te mogen en merkt hij pas in productie van niet.
+
+De chaosproef leverde het eerste gemeten failover-cijfer op: SIGKILL op de actieve server, 535 verzoeken op 25 ms, **0 mislukt**. Dat staat in `SLO.md` naast de herstelmeting, met het voorbehoud erbij dat "geen onderbreking gemeten" iets anders is dan "geen onderbreking".
+
+### Het stadsweefsel draagt meer dan één stad
+
+De boom van het weefsel begint bij `stad` en is vijf niveaus diep, dus **meerdere wortels pasten er altijd al in**. Wat ontbrak waren drie dingen, en ze waren geen van drieën zichtbaar zolang er één stad was:
+
+1. **Niemand bouwde er een tweede.** `zorgGeografie()` stopte zodra er iets stond.
+2. **De bevragingen kenden geen stad.** `namen('zone')` gaf de zones van alles bij elkaar. Dat leest als één stad zolang er één is, en is stilzwijgend fout zodra er twee zijn — een veldploeg ziet dan zones die duizend kilometer verderop liggen. Dit is de gevaarlijkste van de drie, want er gaat niets kapot: er staat gewoon te veel.
+3. **De grenzen waren die van Ibiza.** Elk punt werd getoetst aan de vaste rechthoek uit `kern/navigatie`, dus een gebied in een tweede stad viel per definitie "buiten de stadsgrenzen" en die stad kon nooit gevuld worden.
+
+`kern/stadsweefsel/steden.js` lost alle drie op: `stadErbij()` bouwt hetzelfde startraster (zes zones, drie buurten, drie wijken, twee straatsegmenten per zone) rond een eigen middelpunt met een eigen id-voorvoegsel, elke bevraging kent een stad-as, en de grenzen komen van de stad zelf. Twee steden mogen elkaar **niet overlappen** — dan hoort een punt bij allebei en gaan er twee ploegen naar dezelfde lantaarn.
+
+**Er wordt niets verhuisd.** De eerste stad houdt haar ids (`G-stad`, `G-marina`, `G-marina-laan`) letterlijk. Gegevens verplaatsen om een functie toe te voegen is de duurste manier om een fout te maken die je pas maanden later ziet.
+
+Daarmee kan de **stadsstart** de stap doen die hij eerder als openstaand moest melden: met een middelpunt bouwt hij het weefsel echt. Mislukt dat — geen middelpunt, een stad die overlapt — dan blijft de stap open staan met de reden erbij, en wordt hij niet groen gemeld. Wat mensenwerk blijft is eerlijker geworden in plaats van korter: de zes zones dragen generieke namen die hernoemd horen te worden, en er ligt geen wegennet onder een tweede stad.
+
+Twee echte fouten kwamen onderweg boven, allebei gevonden door een toets en geen van beide door een lezer:
+
+- Bij het opknippen viel `zorgGeografie()` uit `stadErbij()` weg. Wie een tweede stad aanmaakte vóórdat er ooit een zone was opgevraagd, kreeg een platform waarin de **eerste stad nooit meer werd gezaaid**.
+- `stadId()` gaf `null` voor zowel "geen stad gevraagd" als "een stad gevraagd die niet bestaat". Een vraag naar de zones van een nog niet gebouwde stad gaf dus de zones van **alle** steden terug — en de stadsstart las dat als "zes zones" en meldde de weefselstap groen terwijl er niets stond.
+
+### De norm is weer een norm
+
+`npm run norm` stond rood: elf meters waren weggelopen sinds 8 augustus, terwijl er een hele bestuurslaag bij kwam. Ze zijn met de hand vastgezet in `NORM.json` — niet met `--vastleggen`, want dat tilt ook meters op die niemand heeft aangeraakt — en met een geschreven reden per post, zoals dat bestand zelf voorschrijft: *"Herstel het, of verlaag de norm met de hand — dan staat het als bewuste keuze in de historie."*
+
+Eerst gerepareerd wat te repareren was:
+
+- **`endpointsZonderTest` 1188 → 1158** door `test/commandlagen.test.js`: elke nieuwe laag krijgt daar een echte route-aanroep plus een 401-controle zonder sessie. Die toets vond meteen een fout die geen enkele motortoets kon zien — `stadstart` eiste alleen dat er een landpakket *bestond*, terwijl zijn eigen foutmelding belooft dat het land is *ingericht*.
+- **`inlineStijlAttributen` 5871 → 5850** door de `style=""`-attributen uit de nieuwe schermen te halen; er staan nu vier veldbreedte-klassen in `command.html`. Dat is geen smaak: elk style-attribuut houdt `style-src-attr` open in de CSP.
+
+Bewust vastgelegd en niet gerepareerd: negen servermodules staan echt over de 10 kB-grens, en **geen ervan is in dit werk ontstaan** (`server.js`, `kern/comm/`, `opzet/kernlaag4.js`, `livinglab/kader.js`, `routes/auth.js`, …). Vastleggen is daar geen goedkeuring maar het weer laten werken van de meter; ze blijven werkvoorraad. Datzelfde geldt voor `toetsenNietGemeten`: de veertien nieuwe toetsbestanden zijn wél met de hand gemuteerd (27 mutaties, alle 27 raak, per bestand in de kop genoteerd), maar de mutatiemotor is er niet langs geweest — en dat wordt hier niet als hetzelfde geteld.
+
+### Het alarm: piepen op verandering, niet elke ronde
+
+`SLO.md` noemde het sinds de eerste versie als zijn tweede gat: de cijfers worden gemeten en het foutbudget wordt bijgehouden, maar er gaat niemand piepen. `kern/command/alarm.js` is die piep, en hij **meet niets zelf** — elke controle leest een laag die er al is (servicedoelen, sonde, canary, gegevenskwaliteit, de hashketen van het journaal). Een alarm met een eigen meting zegt op een dag iets anders dan het scherm waar het over gaat, en dan gelooft niemand meer welk van de twee.
+
+De drempels staan in `SLO.json`, de controles in de module. Dat is een bewuste knip: getallen horen in gegevens, maar een regeltaal in een configuratiebestand is een tweede implementatie die je niet kunt toetsen.
+
+Het belangrijkste is het ritme. Er gaat een regel in het journaal en een sein naar het kantoorbord bij het **ontstaan** en bij het **oplossen**, en daartussen niet meer — een melding die elke dertig seconden terugkomt leert mensen om hem weg te klikken, en dan is de volgende, echte melding ook weg. Stilzetten kan, met een maximum en een reden; die stilte staat zelf ook in het journaal, want anders is achteraf niet te zien dat iemand het heeft weggeklikt.
+
+Wat er **niet** gebeurt: geen mail, geen telefoonmelding. Dat is een kanaalbesluit met een piket eraan vast, en dat hoort niet stilzwijgend ingebouwd te worden. De uitgangen die er zijn, staan in de uitslag.
+
+### Herkomst: dezelfde meting, en bij elk antwoord hoe hard het is
+
+`kern/command/herkomst.js` is de derde vraag op die ene meting. Per soort: waar het naartoe wijst, wie eraan mag schrijven (de runbookcatalogus), wie het werkelijk deed (het journaal), hoe lang het blijft (`server/bewaarbeleid.js`) en wat er wees wordt als het verdwijnt.
+
+Twee dingen maken het meer dan een plaatje.
+
+**Elk antwoord draagt zijn aard** — *gemeten* (uit de gegevens zelf), *aangegeven* (uit een tabel die een mens schreef, met erbij wélke tabel) of *afgeleid* (gerekend uit die twee). Door elkaar getoond krijgt het geheel de betrouwbaarheid van het zwakste deel, en kan niemand zien welk deel dat is.
+
+**Stilte is geen bewijs.** Het journaal ziet alleen wat via RTG Command is gegaan; de gewone app-routes en de leverancierskant lopen er niet doorheen. "Geen schrijver" betekent hier dus niet "hier schrijft niemand in" — en precies die verwarring is hoe iemand iets weggooit waar wel degelijk aan wordt geschreven. Die zin staat bovenaan het scherm, niet in een voetnoot.
+
+De zaak-kant draait dezelfde module op haar eigen register, journaal en receptenboek, maar **zonder bewaarbeleid**: die tabel is van RTG. Een ondernemer een termijn tonen die hij nooit heeft afgesproken is erger dan hem geen termijn tonen, dus staat er dan "geen termijn" — en dat is waar. Werkplek **Herkomst** onder Zien; in de zaak achter de managergrens.
+
+### Servicedoelen en de sonde: de meter die niet geruststelt
+
+`SLO.md` beschreef sinds de eerste versie wát wij onszelf opleggen, en noemde er even eerlijk bij wat eronder ontbrak. Twee van die gaten zijn nu dicht.
+
+**De norm staat in `SLO.json`.** Daar leest `kern/command/slo.js` hem, en de tabel in `SLO.md` is een afdruk die door `npm run slo` wordt geschreven; `npm run check` regel 43 maakt de keuring rood zodra die afdruk achterloopt. Een streefwaarde die op twee plaatsen staat, staat er binnen een maand twee keer anders — en dan is het document dat een mens leest het verkeerde van de twee.
+
+**Het foutbudget wordt bijgehouden**, per doel: hoeveel storingsminuten er in de marge tussen streefwaarde en 100% passen, hoeveel daarvan verbruikt is, en de brandsnelheid. Boven de 1 is het budget op vóórdat het venster om is. Zolang er budget over is mag er uitgerold worden; is het op, dan gaat de aandacht naar stabiliteit. Dat is de hele reden dat een foutbudget bestaat: het maakt de afweging tussen snelheid en stabiliteit een cijfer in plaats van een discussie.
+
+**Maar het gevaarlijkste geval is niet "niet gehaald", het is "niets gemeten".** De tellers in `server/meting.js` beginnen bij elke herstart op nul. Een vers proces met drie verzoeken en nul fouten staat rekenkundig op 100% beschikbaar, en dát als "doel gehaald" tonen is de duurste leugen die dit scherm kan vertellen. Vandaar een derde uitslag naast gehaald en niet gehaald: **onvoldoende gemeten**, met een eigen kleur en de reden erbij, zolang er minder dan 200 verzoeken zijn of over minder dan 5% van het venster is gemeten. Die uitslag houdt de uitrol bewust *niet* tegen — een slot dat na elke herstart een dag dichtzit, wordt omzeild in plaats van gebruikt.
+
+Snelheidsdoelen geven om dezelfde reden een **bovengrens en geen punt**: de duur zit in een histogram met vaste emmers, dus het eerlijke antwoord is "p90 ligt op of onder 0,25 s" en niet een kommagetal dat er niet in zit.
+
+**De sonde** (`kern/command/sonde.js`) loopt de reizen uit `SLO.json`: `/api/health`, `/api/ready`, de voordeur, het publieke aanbod, en een inlogpoging die **met opzet verkeerd inlogt** en een afwijzing verwacht — de sonde toetst dat het pad antwoordt, niet dat hij binnenkomt. Een 200 daar zou een bevinding zijn en geen succes.
+
+Binnen en buiten staan apart en worden nergens opgeteld:
+
+| Kant | Hoe | Wat het bewijst |
+|---|---|---|
+| **binnen** | `POST /api/command/sonde/draai` | de HTTP-laag antwoordt — niet dat een klant erbij kan |
+| **buiten** | `node scripts/sonde.js https://host --melden --token=…` op een andere machine, terug via `POST /api/sonde/melding` | TLS, DNS, de reverse proxy en het netwerk zitten erin |
+
+Die meldingsingang is de enige route in Command zonder kantoorinlog, want hij bestaat juist voor een machine waar geen sessie is. Hij zit achter **dezelfde poort als `/api/metrics`** (`server/meetpoort.js`, token of intern adres, 404 in plaats van 403) — die poort stond in `routes/meting.js` met het commentaar "zodat er niet per ongeluk een tweede, lossere deur ontstaat", en dit wás die tweede deur, dus staat hij nu op één plek. En de kant van een melding staat vast op *buiten*: een melder die zijn eigen kant mag kiezen, kan het strenge cijfer opvullen met makkelijke metingen.
+
+Wat er **niet** is en in `SLO.md` blijft staan: een cron die de sonde elke minuut van buitenaf start (een inrichtingsbesluit op een machine buiten deze repo), alertregels, en een gemeten basislijn in plaats van verstandig gekozen streefwaarden.
 
 ## RTG Veilig: vier standen op één ruggengraat
 
@@ -1888,9 +3603,178 @@ het daar is, en wat je gelooft. Dat geef je niet aan een derde.
 staat een keuze in het profiel of er staat er geen. Wie niets invult merkt er
 niets van, en dat is geen tweederangs ervaring.
 
+## Spellen: een platform onder de spellen
+
+Negentien spellen (zestien potjes met beurten, drie arcadespellen met een
+score) plus de kinderspellen van De Speeltuin en De Speelhal. Wat eronder ligt
+is belangrijker dan het aantal: `server/kern/spellen/` is een platform, en een
+spel is er een bestand in.
+
+### Een spel beschrijft zichzelf
+
+`spellen/register.js` scant de map en bouwt de dispatch-tabellen uit een
+`spel`-descriptor die elk spel zelf meelevert. Er zijn twee vormen:
+
+| | `vorm: 'potje'` | `vorm: 'arcade'` |
+|---|---|---|
+| Spelers | 2-6, om de beurt | alleen jij |
+| Regels | server-authoritatief | **in de client**, tenzij `serverScore` |
+| Zegt | `wereld`, `max`/`min`, `volwassen`, `buitenBeurt`, `teams`, `perTaal`, `kijken`, `init`/`zet`/`view`/`statisch` | `werelden` (lijst), `maxPunten`, `serverScore` |
+
+Een spel toevoegen is dus: een bestand neerzetten. Vergeet je de descriptor,
+dan **start de server niet**, met de bestandsnaam in de melding -- stil
+overslaan zou betekenen dat een spel spoorloos uit de lobby verdwijnt, en dat
+is precies de fout die dit register moet uitsluiten. In `lobby.js`, `partij.js`
+en `spellen.js` staat geen enkele spelnaam meer.
+
+Let op wat de arcade-rij zegt: **een arcadescore is niet server-authoritatief.**
+De client rekent en stuurt een getal; de puntengrens uit de descriptor is de
+enige rem. Dat is te dragen voor een ranglijst onder vrienden en niet meer
+zodra er een competitie of een prijs aan hangt (open punt in `TAKEN.md`).
+
+**Sudoku is de uitzondering, en laat zien hoe die eruitziet.** Zijn regels zijn
+narekenbaar, dus horen ze op de server: `sudoku-nieuw` geeft een puzzel uit en
+houdt de oplossing hier, `sudoku-klaar` neemt alleen een ingevuld rooster aan
+en de punten komen van de serverklok. `serverScore: true` in de descriptor laat
+`arcade-score` een ingestuurd getal voor dit spel **weigeren** -- zonder die
+weigering zou er gewoon een tweede deur naast staan. Wat het bewijst is dat
+*iemand* een puzzel van ons heeft opgelost in de tijd die wij hebben gemeten;
+niet dat een *mens* dat deed. Dat laatste is zonder de speler lastig te vallen
+niet te bewijzen, en doen alsof van wel zou een belofte zijn die de code niet
+waarmaakt. Sneek en Tetris hebben geen narekenbare regel en blijven dus zoals
+ze waren.
+
+### De progressiegrens: alles wat blijft, stopt bij 18+
+
+Eén functie (`progressieMag` in `kern/spellen.js`) bepaalt wie een spoor
+achterlaat: highscores, ranglijsten, uitslagen, standen en prestaties bestaan
+alleen voor leden die de 18+-poort halen -- dezelfde poort als Proost, dus met
+een gecontroleerde paspoort-geboortedatum. **Onder die grens blijft elk spel
+volledig speelbaar; er wordt alleen niets van bewaard.**
+
+Dat is geen voorzichtigheid maar het rechttrekken van een tegenspraak: De Arena
+belooft tieners met zoveel woorden "alles telt alleen binnen het potje; er
+bestaat geen ranglijst", terwijl dezelfde app drie arcadeborden toonde.
+
+### Wie er nu is
+
+Presence is een **afgeleide, geen tabel**: de RTG-app (`/api/stream`) en de
+RTF-app (`/api/rtf/social/stream`) schrijven hun open verbinding allebei in
+dezelfde `sseClients`-lijst, dus "wie is er nu" is een vraag aan die lijst.
+Vijf regels begrenzen hem, en vier ervan houden iets tegen:
+
+- de kring (vrienden **en** klasgenoten) komt van de server, niet uit het
+  verzoek -- anders kun je de aanwezigheid van willekeurige leden aftasten;
+- **binair, geen "laatst gezien"** -- dat vraagt opslag die er niet is, en het
+  is precies de druk die dit huis niet bouwt;
+- geblokkeerd valt weg, aan beide kanten;
+- wie de functie "spelen" heeft uitgezet telt als offline, want anders nodig je
+  iemand uit die het verzoek gegarandeerd niet kan aannemen;
+- wie zichzelf onzichtbaar zet komt in niemands stand -- **een kant op**: je
+  bent niet te zien en je ziet anderen nog wel.
+
+Klasgenoten tellen mee omdat beschermde tieners onvindbaar zijn via de
+codenaam-zoeker: hun klas is de enige kring die ze hebben.
+
+### Uitslagen, stand en prestaties: één bron, niets bijgehouden
+
+Een klaar potje werd na 24 uur weggegooid, dus er bestond geen geschiedenis.
+`db.data.spelUitslagen` legt nu per afgelopen potje vast wie wat won -- op
+**één plek** in `partij.js`, voor allebei de manieren waarop een potje eindigt
+(een winnende zet en opgeven).
+
+De progressiegrens geldt ook voor het **bewaren**: de partij blijft, maar
+alleen deelnemers binnen de grens staan er met codenaam in; wie erbuiten valt
+staat er als `{ anoniem: true }`, en speelde niemand binnen de grens mee dan
+wordt er niets bewaard. Zo raakt een volwassene zijn historie niet kwijt zodra
+hij met een tiener speelt, en bouwt het systeem toch geen profiel van die
+tiener op.
+
+Stand (`spelStand`) en prestaties (`spelPrestaties`) worden **afgeleid** uit die
+log en niet apart bijgehouden. Dat is een bewuste keuze: een eigen teller zou
+blijvend zijn en dus buiten het bewaarbeleid vallen -- en dat beleid kent
+alleen takken met een datum per item, dus zo'n teller zou permanent op de lijst
+`zonderBeleid()` staan. Afleiden kost geen opslag, heeft geen tweede wispad
+nodig en verloopt vanzelf mee.
+
+Het gevolg staat in het antwoord en op het scherm: een stand gaat over het
+**venster** van de log (een jaar, uit `bewaarbeleid.js` zelf) en niet over
+altijd. "7 gewonnen" zonder tijdsaanduiding zou lezen als een totaal voor
+altijd. Een prestatie kan dus ook weer verdwijnen -- geen bug maar het punt.
+
+Prestaties tonen **alleen wat behaald is**. Geen "3 van de 12", geen lijst van
+wat je nog kunt halen, geen reeksen. Een voortgangsbalk naar een doel dat je
+niet zelf koos is de por die hier niet thuishoort; drie toetsen bewaken dat.
+
+### Bewaren en vergeten
+
+- **Bewaartermijn:** uitslagen verlopen na een jaar (`server/bewaarbeleid.js`).
+  Ze staan op het hoogste niveau in `db.data` en niet genest onder `spellen`,
+  want de bewaarmotor leest `db.data[tak]` -- genest zouden ze buiten het
+  beleid vallen.
+- **Verlaten partijen:** een potje met status `bezig` werd nooit opgeruimd. Nu
+  verloopt het na dertig dagen, gemeten op de laatste **zet** en niet op het
+  aanmaken.
+- **Vergeten:** wie zijn account laat wissen geeft zijn lopende potjes op --
+  de tegenstander wint, die overwinning landt in de uitslagen, en de vertrekker
+  staat daar meteen anoniem in. Die volgorde is het hele punt en staat als
+  toets.
+
+Wat dat wel en niet beschermt, staat ook in de code: het voorkomt dat de
+**server** een profiel opbouwt. Het verbergt niet dat je met iemand speelde
+voor de tegenstander zelf -- die zat erbij.
+
+### Rahul als spelmaatje
+
+In elk potje op te roepen voor regels, een hint of een peptalk. Hij krijgt
+bewust alleen het spel, wie aan zet is en jouw vraag mee -- niet het bord en
+niet iemands hand. Hij *kan* dus niet verklappen. Zonder API-sleutel geeft
+dezelfde motor een vaste, uitlegbare tip.
+
+### Praten in het potje
+
+Geen zevende berichtenvoorraad: een potjegesprek is een **gewoon gesprek in
+`kern/comm`** (soort `group`, sleutel `potje:<id>`) en staat dus ook in de
+Berichten-app, met de bewaartermijn, het wisrecht en de leesstand die daar al
+liggen.
+
+Erboven staat één regel: **een potje geeft geen nieuw recht om iemand te
+bereiken.** Praten kan alleen als *elk paar* aan tafel elkaar buiten dit potje
+ook al mag bereiken. De wachtrij koppelt willekeurige spelers -- zonder die
+regel is "even een potje dammen" de kortste weg naar een open lijn met een
+vreemde, en in de RTF-app zou dat precies de poort omzeilen die tieners
+onvindbaar maakt in de zoeker. *Elk paar*, want in een groepsruimte praat B ook
+tegen C.
+
+Wie dat zijn staat in `kern/spellen/kring.js`, op één plek (het uitnodigen voor
+een team stelt dezelfde vraag): **vrienden, klasgenoten, of hetzelfde gezin.**
+Die derde ontbrak en viel pas op door het na te meten -- een ouder en een kind
+die samen dammen zijn geen "vrienden" en geen klasgenoten, terwijl een
+huishouden een sterkere kring is dan allebei.
+
+### Teams
+
+Een vaste club om mee te spelen: iedereen mag er een maken. Wat dat begrensd
+houdt is de vorm, niet een moderatiewachtrij -- een team is **niet openbaar**
+(geen zoeker, geen lijst; je ziet het alleen als je erin zit of ervoor bent
+gevraagd), uitnodigen kan **alleen binnen je eigen kring**, en je zit er pas in
+als je ja zegt. Een team heeft bewust **geen ranglijst**: die zou buiten het
+potje blijven staan en dus onder de progressiegrens vallen, en dan krijgt een
+schoolteam een bord waarop de helft van de leden niet mag staan.
+
+### Wat er geteld wordt
+
+`db.data.spelTelling` houdt per dag per spel bij hoeveel potjes er afliepen en
+hoeveel stoelen daaraan zaten. **Meer staat er niet in** -- geen sleutel, geen
+codenaam, geen winnaar. Juist daardoor mag hij álles tellen: de uitslagenlog
+bewaart niets van een partij tussen tieners onderling, dus een teller die
+daaruit zou lezen ziet De Arena nooit. De privacyregel maakt deze cijfers dus
+beter en niet slechter. Ze staan op het techniekbord
+(`/api/techniek/spelcijfers`).
+
 ## Partnerkanaal
 
-Het partnerkanaal voor niet-leden draait server-side: boekingen worden per stuk opgeslagen in `server/data/db.json` onder `bookings`, met één totaalprijs voor de klant; nettoprijs en service zijn interne administratie. RTG verdient niets aan een boeking (`rtgCut` is altijd 0): een eventuele service gaat volledig naar de partner. RTG's enige inkomsten zijn de abonnementen. (De losse publieke boekingspagina is met de marketingsite verwijderd; het model en de endpoints blijven bestaan.)
+Het partnerkanaal voor niet-leden draait server-side: boekingen worden per stuk opgeslagen in `server/data/db.json` onder `bookings`, met één totaalprijs voor de klant; nettoprijs en service zijn interne administratie. RTG verdiende niets aan een boeking (`rtgCut` was altijd 0). Sinds de ondernemersregie is dat een KNOP van de boardroom: staat de bijdrage uit -- de beginstand -- dan is `rtgCut` nul en gaat een eventuele service volledig naar de partner, precies als voorheen. Staat hij aan, dan houdt RTG het ingestelde promillage in op de SERVICE (nooit op de netto reissom van de aanbieder) en gaat de rest naar de partner. (De losse publieke boekingspagina is met de marketingsite verwijderd; het model en de endpoints blijven bestaan.)
 
 ## Documentatie
 

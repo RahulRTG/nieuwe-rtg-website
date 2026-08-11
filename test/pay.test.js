@@ -105,6 +105,14 @@ test('de kassacode: het lid toont een code, de zaak int, en uitbetalen leegt de 
   const uit = await api('supplier/pay/uitbetaal', { idem: 'uit-1' }, supToken);
   assert.equal(uit.body.uitbetaald, 2465);
   assert.equal((await api('supplier/pay/overzicht', {}, supToken)).body.saldo, 0, 'uitbetaald naar de bank');
+  /* De uitbetaling gaat sinds TAKEN.md 4.22 door de opdrachtenrij. Hier stond
+     een compensatie: bij een fout van de betaal-naad werd de afboeking
+     teruggedraaid en kreeg de partner 502. Dat klopt alleen als de payout zeker
+     NIET is aangemaakt, en dat weet je bij een timeout juist niet -- dan kreeg
+     hij zijn saldo terug terwijl het geld al onderweg was. Vandaar dat het
+     antwoord nu zegt wat we echt weten: aangenomen, nog niet afgerond. */
+  assert.ok(uit.body.opdrachtId, 'er hangt een betaalopdracht aan');
+  assert.equal(uit.body.opdrachtStatus, 'INGEDIEND', 'aangenomen door de rail, niet "gelukt"');
 });
 
 test('de kassabon op RTG Pay: code tonen, afrekenen, en de betaler staat op de bon', async () => {

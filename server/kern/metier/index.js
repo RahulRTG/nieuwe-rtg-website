@@ -17,7 +17,10 @@
    - ZELF OPGEGEVEN: al het werk van buiten RTG mag erbij, maar staat er zichtbaar
      als onbevestigd. Eerlijk over wat we niet weten.
 
-   Wat hier NIET komt: "wie bekeek je profiel" als lokkertje, een feed met
+   Wat hier NIET komt (en zie kern/metier/netwerk.js voor hoe dit zich verhoudt
+   tot kern/wereld/bezoek.js, dat het profielbezoek in de wereldlaag wel
+   bijhoudt -- zonder melding, teller of ranglijst): "wie bekeek je profiel"
+   als lokkertje, een feed met
    motivatiepraat, of "je bent een van de 30 sollicitanten". Dat zijn de
    bezig-houd-lussen die de huisregels verbieden. */
 const { keur } = require('../veilig');

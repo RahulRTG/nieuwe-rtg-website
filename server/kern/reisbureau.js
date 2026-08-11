@@ -8,19 +8,25 @@
    Geen echte lucht-/hotelmerken als bevestigde partners. Prijzen in euro.
    Volgt het vaste kern-patroon maakReisbureau(state). */
 
+/* De reizen zoals het lid ze ziet: nettoprijs per persoon, geen opslag. Staat
+   als pure functie buiten de fabriek omdat de Mall-vindlaag (kern/mall/aanbod
+   .js) dezelfde projectie nodig heeft en er geen tweede versie van de prijs-
+   en veldnamen mag ontstaan (LAT-regel 4): een reis die hier EUR 2200 kost en
+   in de Mall EUR 22 is precies het soort verschil dat niemand ziet aankomen. */
+function reisAanbod(db) {
+  return ((db.data || {}).partnerTrips || []).map(t => ({
+    id: t.id, titel: t.title, bestemming: t.dest, dates: t.dates || null,
+    prijs: Math.max(0, Number(t.netto) || 0),
+    omschrijving: t.desc || null,
+    inbegrepen: Array.isArray(t.includes) ? t.includes : [],
+    visual: t.visual || null
+  }));
+}
+
 function maakReisbureau({ db, save, crypto, anthropic }) {
   const nu = () => new Date().toISOString();
 
-  // de reizen zoals het lid ze ziet: nettoprijs per persoon, geen opslag
-  function reizen() {
-    return (db.data.partnerTrips || []).map(t => ({
-      id: t.id, titel: t.title, bestemming: t.dest, dates: t.dates || null,
-      prijs: Math.max(0, Number(t.netto) || 0),
-      omschrijving: t.desc || null,
-      inbegrepen: Array.isArray(t.includes) ? t.includes : [],
-      visual: t.visual || null
-    }));
-  }
+  const reizen = () => reisAanbod(db);
 
   function overzicht() {
     const lijst = reizen();
@@ -119,4 +125,4 @@ function maakReisbureau({ db, save, crypto, anthropic }) {
   return { reisbureau: { overzicht, boek, mijn, annuleer, advies, reizen, aanvragen } };
 }
 
-module.exports = { maakReisbureau };
+module.exports = { maakReisbureau, reisAanbod };

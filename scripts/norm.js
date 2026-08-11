@@ -34,6 +34,7 @@
 const fs = require('fs');
 const path = require('path');
 const { execFileSync, spawnSync } = require('child_process');
+const { zonderCommentaar } = require('./lib/bron');
 
 const WORTEL = path.join(__dirname, '..');
 const NORMBESTAND = path.join(WORTEL, 'NORM.json');
@@ -238,9 +239,20 @@ const METERS = [
       De lijst van bundels komt uit scripts/bundel.js, dezelfde bron die
       check.js regel 13 gebruikt. Een tweede lijst zou binnen een week
       uiteenlopen (LAT.md regel 4). */
+/* DOOR DE WRINGER, en dat is de vierde keer dat dit huis dezelfde val vindt
+   (LAT.md regel 10): een meter die tekst voor code aanziet. Deze telde
+   `style="` ook in COMMENTAAR mee, dus een regel uitleg die het attribuut
+   noemt -- bijvoorbeeld om te zeggen dat er hier juist geen inline stijl mag
+   staan -- duwde het getal omhoog. Dat straft het opschrijven van de regel af,
+   en het is bovendien geen schuld: een attribuut in commentaar houdt geen
+   style-src-attr open, want de ontleder ziet het nooit.
+
+   Dezelfde wringer als check.js gebruikt, en met opzet niet een eigen
+   afgeleide: een tweede stripper zou binnen een week uiteenlopen met de eerste
+   (LAT.md regel 4). */
 function telInlineStijl(lees, bestanden) {
   let n = 0;
-  for (const b of bestanden) n += (String(lees(b)).match(/style="/g) || []).length;
+  for (const b of bestanden) n += (zonderCommentaar(String(lees(b))).match(/style="/g) || []).length;
   return n;
 }
 

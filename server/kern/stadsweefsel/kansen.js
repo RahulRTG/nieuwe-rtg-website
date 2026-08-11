@@ -36,13 +36,15 @@ module.exports = (ctx) => {
   /* De naden naar de rest van het huis, laat gebonden: server.js hangt ze er
      na het opstarten aan. Zonder bron geeft deze laag eerlijk nul terug in
      plaats van te doen alsof er geen werk en geen bedrijven zijn. */
+  let mallVraagBron = null;
   let vacatureBron = null, bedrijfBron = null, beroepBron = null;
-  function bronnenKoppel({ vacatures, bedrijven, beroepen }) {
+  function bronnenKoppel({ vacatures, bedrijven, beroepen, mallvraag }) {
     if (typeof vacatures === 'function') vacatureBron = vacatures;
     if (typeof bedrijven === 'function') bedrijfBron = bedrijven;
     if (typeof beroepen === 'function') beroepBron = beroepen;
+    if (typeof mallvraag === 'function') mallVraagBron = mallvraag;
   }
-  const bronnenStaat = () => ({ vacatures: !!vacatureBron, bedrijven: !!bedrijfBron, beroepen: !!beroepBron });
+  const bronnenStaat = () => ({ vacatures: !!vacatureBron, bedrijven: !!bedrijfBron, beroepen: !!beroepBron, mallvraag: !!mallVraagBron });
 
   // alles wat een positie heeft, krijgt hier zijn plek in de stad; wat buiten
   // de stad ligt telt niet mee (en dat is geen fout, dat is een andere stad)
@@ -111,7 +113,13 @@ module.exports = (ctx) => {
       r.bedrijven.add(v.bedrijf);
       r.zones.add(v.zoneNaam);
     }
+    /* De tweede tekortsoort: waar mensen in de Mall naar zochten en niets
+       vonden. Een openstaande vacature zegt "hier is werk"; een lege
+       zoekopdracht zegt "hier is een markt". Dat zijn twee verschillende
+       tekorten en ze horen allebei in de kansenlaag. */
+    const gevraagd = mallVraagBron ? (mallVraagBron() || []) : [];
     return {
+      gevraagdNietGeleverd: gevraagd.slice(0, 25),
       beroepen: Object.values(per).map(r => ({ beroep: r.beroep, wereld: r.wereld, wereldLabel: r.wereldLabel,
         open: r.open, bedrijven: [...r.bedrijven], zones: [...r.zones],
         leren: 'De Beroepen-Bibliotheek heeft een gratis leerpad voor ' + r.beroep + ' (wereld: ' + r.wereldLabel + ').' }))

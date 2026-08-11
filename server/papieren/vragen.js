@@ -21,6 +21,8 @@
    soort: 'tekst' (vrij antwoord) | 'ja-nee-reden' (ja of nee, mét toelichting)
    veld:  de plek in het document waar het antwoord landt ({{veld}}) */
 
+const { nuTermijn } = require('./huidig'); // wat het systeem vandaag doet
+
 const VRAGEN = [
   // ---------- wie is de verantwoordelijke ----------
   { id: 'verantwoordelijke', groep: 'Het bedrijf', veld: 'verantwoordelijke', soort: 'tekst', min: 10,
@@ -43,11 +45,13 @@ const VRAGEN = [
   { id: 'kyctermijn', groep: 'Bewaartermijnen', veld: 'kyctermijn', soort: 'tekst', min: 4,
     vraag: 'Hoe lang bewaart RTG het geüploade identiteitsbewijs na een geslaagde verificatie?',
     waarom: 'Een paspoortscan is het gevoeligste bestand dat we hebben. Mijn advies: het document verwijderen zodra de verificatie rond is en alleen de uitkomst bewaren. Maar dit is uw besluit, niet het mijne.',
+    huidig: nuTermijn('id'),
     voorbeeld: 'Direct na goedkeuring verwijderen; alleen de uitkomst blijft' },
 
   { id: 'locatietermijn', groep: 'Bewaartermijnen', veld: 'locatietermijn', soort: 'tekst', min: 3,
     vraag: 'Hoe lang blijven locatiegegevens van een rit of bezorging bewaard nadat die rit is afgelopen?',
     waarom: 'Locatie draait op toestemming (art. 6 lid 1 a). Toestemming voor "tijdens de rit" dekt niet "voor altijd". Er moet een termijn staan die u kunt uitleggen.',
+    huidig: nuTermijn('locatie'),
     voorbeeld: '24 uur na afronding van de rit' },
 
   { id: 'dpia', groep: 'Bewaartermijnen', veld: 'dpia', soort: 'ja-nee-reden',

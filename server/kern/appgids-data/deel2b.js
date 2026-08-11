@@ -48,5 +48,15 @@ module.exports = {
     'Kijk elke ochtend één minuut naar het actiecentrum; dan begint de dag zonder verrassingen.'),
   '/apps/leverancier-rtmail.html': G('RTMAIL voor uw zaak: het postvak op uw zaakcode, waar de draaiboeken (sollicitatie, inkoop, factuur, overheid) hun seintjes bezorgen.',
     ['Lees ontvangen en verzonden post op codenaam', 'Stuur zelf een bericht naar een andere zaak of groothandel', 'Alles op codenamen; echte namen blijven in de kluis'],
-    'Kijk hier na een drukke dag even langs; de seintjes staan gebundeld klaar zonder dat u een externe mailbox hoeft te openen.')
+    'Kijk hier na een drukke dag even langs; de seintjes staan gebundeld klaar zonder dat u een externe mailbox hoeft te openen.'),
+  /* Uit de tak die de Mall-aanvragen bracht; ze horen bij deel2 en die zit aan
+     zijn omvanggrens, dus staan ze hier bij de rest van het vervolg. */
+  '/apps/mijnmall.html': G('Mijn Mall: wat u bewaarde, de reizen die u bouwt en de vragen die u uitzette.',
+    ['Bewaar iets uit de Mall in een lijst', 'Bouw een reis uit verblijf, vervoer, tafel en iets te doen',
+     'Plaats een vraag als u iets niet vindt, en kies zelf uit de reacties'],
+    'Er wordt hier niets afgerekend: elke regel gaat naar de partij die hem levert, met zijn eigen bevestiging.'),
+  '/apps/leverancier-aanvragen.html': G('Aanvragen uit de Mall: leden die zoeken wat u kunt leveren.',
+    ['Zie alleen vragen die bij uw vak en werkgebied passen', 'Reageer met wat u kunt bieden en wat het kost',
+     'Bedenkt u zich, dan werkt u uw eigen reactie bij'],
+    'Staat er niets, stel dan uw werkgebied in; dat bepaalt welke vragen u ziet.')
 };

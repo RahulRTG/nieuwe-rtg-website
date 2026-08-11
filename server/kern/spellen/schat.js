@@ -72,5 +72,7 @@ module.exports = (ctx) => {
       nr: st.antwoorden[mij].length, tot: RONDEN, beslist: st.beslist,
       stand: p.spelers.map(sp => ({ af: st.antwoorden[sp].length, punten: st.punten[sp] })) };
   };
-  return { schatInit, schatZet, schatView };
+  const spel = { sleutel: 'schat', naam: 'Schatduel', max: 4, wereld: 'rtf', buitenBeurt: ['schat'], kijken: true,
+    init: schatInit, zet: schatZet, view: schatView };
+  return { spel, schatInit, schatZet, schatView };
 };

@@ -54,6 +54,18 @@ module.exports = (kern) => {
 
   // de openstaande reisaanvragen bij het RTG-reisbureau (codenamen)
   app.post('/api/office/reisbureau', officeAuth, (req, res) => veilig(res, () => kern.reisbureau.aanvragen()));
+  /* Het vraagbeeld van de Mall: waar wordt naar gezocht en niets gevonden. Per
+     WOORD geteld en nooit per persoon, en pas zichtbaar boven een drempel; zie
+     de kop van kern/mall/vraagbeeld.js. Dit is de invoer voor de Kansenlaag van
+     het stadsweefsel: een tekort hier is daar een ondernemerskans. */
+  app.post('/api/office/mall/kansen', officeAuth, (req, res) => veilig(res, () => kern.mall.mallVraagbeeld.kansen(req.body && req.body.plek)));
+
+  /* RTG-collecties: samengesteld aanbod dat OVER de zaken heen gaat ("Een dag
+     op Ibiza"). Alleen het kantoor mag dat; een zaak bundelt haar eigen aanbod.
+     Zie de kop van kern/mall/collecties.js. */
+  app.post('/api/office/mall/collecties', officeAuth, (req, res) => veilig(res, () => kern.mall.mallCollecties.vanZaak('rtg')));
+  app.post('/api/office/mall/collectie/zet', officeAuth, (req, res) => veilig(res, () => kern.mall.mallCollecties.zet('rtg', 'Rahul Travel Group', req.body || {})));
+  app.post('/api/office/mall/collectie/weg', officeAuth, (req, res) => veilig(res, () => kern.mall.mallCollecties.verwijder('rtg', (req.body || {}).id)));
 
   /* De doos-regie: beheer op afstand van de Zaakdoos-vloot. Het kantoor zet
      de doelversie en per doos een netwerkrol; de doos haalt beide zelf op

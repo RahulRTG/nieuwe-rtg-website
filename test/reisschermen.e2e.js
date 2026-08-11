@@ -167,18 +167,57 @@ test('het Podium vraagt eerst een geverifieerd paspoort, en toont het achterste 
     const r = await toon(o.page, base, 'podium', token);
     assert.equal(r.pad, '/apps/podium.html', 'het Podium blijft op zijn eigen adres');
 
-    /* DE POORT. Een leeftijdsgrens die je met een klik overslaat is geen grens.
-       Dit scherm hoort te zeggen dat er eerst een geverifieerd paspoort moet
-       zijn -- en dat is iets anders dan een vinkje "ik ben 18". */
-    assert.match(r.tekst, /18\+/, 'de leeftijdsgrens staat er: ' + r.tekst.slice(0, 200));
-    assert.match(r.tekst, /geverifieerd|verifieer|paspoort/i,
-      'en er moet een geverifieerd paspoort aan te pas komen: ' + r.tekst.slice(0, 200));
-    assert.match(r.tekst, /codenaam/i, 'op codenaam, zoals de rest van dit huis');
+    /* DEZE TOETS IS BIJGEWERKT, EN DE VOLGORDE WAARIN DAT GEBEURDE DOET ERTOE.
 
-    /* En het achterste blijft achter de poort. Zonder verificatie hoort er geen
-       inhoud te staan -- geen namen, geen beelden, geen lijst. */
-    assert.ok(r.tekst.trim().length < 1200,
-      'zonder verificatie staat er alleen de poort en niet het hele podium (' + r.tekst.trim().length + ' tekens)');
+       Hij was geschreven toen het Podium EEN zaal achter EEN deur was: hij
+       opende /apps/podium.html en eiste meteen de paspoortpoort. Sinds de zones
+       (kern/podium/zones.js) is dat niet meer waar -- wie geen wereld kiest
+       krijgt de OPEN wereld, en die vraagt terecht geen paspoort. De toets
+       zakte daardoor op iets wat geen defect is.
+
+       De verleiding is dan om de toets aan te passen aan wat het scherm nu doet.
+       Dat is precies hoe je een grens kwijtraakt. Daarom is EERST nagetrokken of
+       de 18+-deur zelf nog dichtzit -- dat doet test/podiumzones.test.js, en een
+       mutatie die `geverifieerd` en `minLeeftijd` uit die zone haalt laat daar
+       vier toetsen zakken. De grens is dus bewezen; alleen dit scherm keek op de
+       verkeerde plek.
+
+       Wat hier nu staat is dezelfde eis als altijd, op de app zoals hij is: de
+       18+-wereld staat in de balk, hij is als DICHT gemarkeerd, en wie hem opent
+       krijgt de poort en geen inhoud. Een leeftijdsgrens die je met een klik
+       overslaat is nog steeds geen grens. */
+    const zones = await o.page.evaluate(() => [...document.querySelectorAll('#zoneBalk button')]
+      .map(b => ({ naam: b.textContent, dicht: b.classList.contains('dicht') })));
+    assert.ok(zones.length > 1, 'de werelden staan in de balk: ' + JSON.stringify(zones));
+    const acht = zones.find(z => /18\+/.test(z.naam));
+    assert.ok(acht, 'de 18+-wereld staat in de balk: ' + JSON.stringify(zones));
+    assert.equal(acht.dicht, true, 'en hij is voor een onverifieerd lid als dicht gemarkeerd');
+
+    // hem openen geeft de POORT met de reden, en niet de zaal
+    await o.page.evaluate(() => {
+      const b = [...document.querySelectorAll('#zoneBalk button')].find(x => /18\+/.test(x.textContent));
+      b.click();
+    });
+    await o.page.waitForFunction(() => {
+      const p = document.getElementById('poortReden');
+      return p && p.textContent.trim().length > 0;
+    }, null, { timeout: 10000 });
+
+    const reden = await o.page.evaluate(() => document.getElementById('poortReden').textContent);
+    assert.match(reden, /geverifieerd|verifieer|paspoort/i,
+      'de poort noemt het geverifieerde paspoort: ' + reden);
+
+    /* En het achterste blijft achter de poort: geen kanalenlijst, geen chat,
+       geen aanmeldformulier van die wereld. */
+    const achter = await o.page.evaluate(() => {
+      const zicht = [...document.querySelectorAll('[id^="v"]')]
+        .filter(n => n.offsetParent !== null).map(n => n.id);
+      return { zicht, tekst: document.body.innerText.replace(/\s+/g, ' ') };
+    });
+    assert.ok(achter.zicht.includes('vPoort'),
+      'het poortscherm staat aan; zichtbaar zijn: ' + achter.zicht.join(', '));
+    assert.ok(!/NU LIVE|ALLE KANALEN/i.test(achter.tekst),
+      'er staat geen zaalinhoud achter de poort: ' + achter.tekst.slice(0, 200));
 
     assert.deepEqual(o.fouten, [], 'paginafouten: ' + o.fouten.join(' | '));
   } finally {

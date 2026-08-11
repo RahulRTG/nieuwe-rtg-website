@@ -5,20 +5,19 @@
      bank
      reis
      fiscaal/regelwacht
+     fiscaal/btwaangifte
      thuis
      koppel
      tafelwensen
      checklijst
      werkvormen
-     opvang
-     afdelingshotel
-     regering */
+     (opvang, afdelingshotel en regering staan sinds de 10 kB-knip in ./kernlaag4c.js) */
 'use strict';
 
 /* `bankregie` wordt hier verklaard en tot onderaan dit deel gebruikt; daarom
    loopt de grens met deel 4a ervoor en niet erin. */
 module.exports = (kern, hulp) => {
-  const { FISCAAL_PEILJAAR, LANDEN, accounts, anthropic, betaal, centen, crypto, db, findSupplier, fonds, keyVanCodenaam, ledenAantal, log, save, schoon, sseToCustomer, sseToOffice, sseToSupplier } = hulp;
+  const { FISCAAL_PEILJAAR, LANDEN, accounts, anthropic, betaal, betaalOpdrachten, centen, crypto, db, findSupplier, fonds, keyVanCodenaam, log, magAi, ondernemerpoort, save, schoon, sseToCustomer, sseToOffice, sseToSupplier } = hulp;
 
 /* Bankregie (kern/bankregie.js): de geldinfrastructuur-knop van de boardroom --
    een schakelaar met DRIE standen (partner -> hybride -> eigen) die bepaalt hoe
@@ -26,20 +25,40 @@ module.exports = (kern, hulp) => {
    Eerst gemount zodat de bank en de kantoor-routes dezelfde regie delen. */
 const bankregie = require('../kern/bankregie').maakBankregie({ db, save });
 Object.assign(kern, bankregie);
+/* De BEVOEGDHEID (kern/bevoegdheid.js): de zesde as naast de vijf van de
+   functieschakelaars. Die vijf gaan over wie de gebruiker is en wat de beheerder
+   heeft uitgezet; deze gaat over wat RTG zelf mag. Hij leest wat er in de
+   boardroom is vastgelegd en welke rail nu clearet -- dezelfde SEPA is een
+   partnerhandeling of eigen werk, en dat verschil bepaalt het antwoord. */
+const bevoegd = require('../kern/bevoegdheid').maakBevoegdheid({
+  vergunning: bankregie.bankVergunning,
+  partnerRails: bankregie.bankPartnerRails,
+  clearing: bankregie.bankClearing
+});
+kern.bevoegd = bevoegd;
 /* RTG Bank (kern/bank): de eigen bank, gebouwd OP het RTG Pay-grootboek en met
    dezelfde dubbele-boekhoud-tucht -- rekeningen met een echt IBAN, storten (langs
    de 3-standen knop), overboeken, de brug van/naar de wallet, uitgaande SEPA achter
    de betaal-naad, en sparen met rente. Klaar om met een knop de eigen bank te worden. */
-Object.assign(kern, require('../kern/bank')({ db, save, crypto, schoon, betaal, pay: kern.pay, bankregie, keyVanCodenaam, accounts, sseToCustomer, sseToOffice, anthropic }));
+Object.assign(kern, require('../kern/bank')({ db, save, crypto, schoon, betaal, pay: kern.pay, bankregie, keyVanCodenaam, accounts, sseToCustomer, sseToOffice, anthropic, betaalOpdrachten }));
 /* De Reiswijzer (kern/reis.js): alle reisregels van elk land -- visum,
    rijrichting, alarmnummer, water, fooi, let-op -- in place op de gedeelde
    LANDEN-tabel gezet, VOOR de Regelwacht zodat de overlay er bovenop komt. */
 Object.assign(kern, require('../kern/reis')({ LANDEN }));
+/* De tijdzone-hulp van het huis leent diezelfde plaatsbepaling: van een zaak in
+   "Ibiza" weten we zo dat zij in Europe/Madrid staat. Een keer registreren, en
+   daarna geven de Mall, de vakwerk-agenda en de Food Court gegarandeerd
+   HETZELFDE antwoord op "hoe laat is het bij deze zaak". */
+require('../kern/tijdzone').zetLandVind(kern.landVind);
 /* De Regelwacht (kern/fiscaal/regelwacht.js): belastingen en regels worden
    automatisch bijgewerkt -- een gevalideerde overlay op de gedeelde
    LANDEN-tabel, herstart-vast, met een dagelijkse bron-check. */
 Object.assign(kern, require('../kern/fiscaal/regelwacht')({ db, save, LANDEN, peiljaar: FISCAAL_PEILJAAR }));
 kern.regelwacht.herstelOverlay();
+/* De btw-aangifte van een zaak (kern/fiscaal/btwaangifte.js): opmaken uit het
+   factuurregister, controleren, indienen vastleggen en corrigeren -- naar het
+   model van de loonaangifte, met het factuurregister als enige bron. */
+Object.assign(kern, require('../kern/fiscaal/btwaangifte').maakBtwAangifte({ db, save, crypto }));
 const regelTimer = setInterval(() => { kern.regelwacht.check().catch(() => {}); }, Number(process.env.FISCAAL_CHECK_MS || 86400000));
 if (regelTimer.unref) regelTimer.unref();
 /* RTG Thuis (kern/thuis): thuisverhuur van lid aan lid -- ons antwoord op
@@ -61,13 +80,44 @@ Object.assign(kern, require('../kern/checklijst')({ db, save, crypto, schoon }))
    de vervoerstools EN de zzp-tools. De afleiding zelf hangt al aan db
    (db.capsVan); dit is de kern-ingang voor de route. */
 Object.assign(kern, require('../kern/werkvormen')({ db }));
-/* De Opvang-afdeling (AZC/COA), het Regeringskantoor van de
-   minister-president en het eigen hotel van elke afdeling -- alle drie
-   kamers van RTG Kantoren. */
-Object.assign(kern, require('../kern/opvang')({ db, save, crypto }));
-Object.assign(kern, require('../kern/afdelingshotel')({ db, save, crypto }));
-Object.assign(kern, require('../kern/regering')({ db, save, crypto, LANDEN,
-  regelwacht: kern.regelwacht, bank: kern.bank, opvang: kern.opvang, afdelingen: kern.afdelingen, ledenAantal }));
+/* De ONDERNEMING (kern/onderneming): één bedrijfsobject dat bestaat vanaf
+   "ik denk erover na" tot een groep met meerdere vennootschappen. Hij hangt
+   hier, direct achter de werkvormen, omdat hij hun afleiding samenvoegt met
+   twee assen die zij niet kent: de rechtsvorm (zzp, bv, stichting) en de
+   levensfase. De boekingen- en bonnen-index komt rechtstreeks uit ../db,
+   net als in kern/leverancier.js: O(1) per zaak in plaats van een scan. */
+Object.assign(kern, require('../kern/onderneming')({ db, save, crypto, schoon, findSupplier,
+  ordersVanZaak: require('../db').ordersVanZaak, boekingenVanZaak: require('../db').boekingenVanZaak,
+  /* De aanvraag om een zaak loopt langs de BESTAANDE aanmeldingsstroom
+     (gemount in kernlaag2), zodat er geen tweede deur ontstaat naast de deur
+     waar een mens voor staat. Zie de kop van kern/onderneming/index.js. */
+  aanmeldingen: kern.aanmeldingen,
+  /* De poort die elke nieuwe zaak al door de basis loodst. Gelezen en niet
+     nagebouwd: twee lijsten die allebei "is deze zaak er klaar voor" beweren,
+     lopen uiteen. */
+  ondernemerpoort,
+  /* Het personeel van een zaak woont in de identiteitskluis (SQLite), niet in
+     db.data. De toegangslaag telt en klokt het; namen worden hier niet
+     opgehaald. Zie kern/onderneming/toegang.js. */
+  staffLijst: (code) => accounts.listStaff(code),
+  /* De AI-laag van het Ondernemers-OS draait op dezelfde client en dezelfde
+     poort als de rest van het huis; zonder sleutel valt hij terug op de eigen
+     data. Zie kern/onderneming/ontwerper.js. */
+  anthropic, magAi }));
+/* De Rechtsvormwacht (kern/onderneming/rechtsvormwacht.js): rechtsvormen --
+   Nederlandse en buitenlandse in een register -- worden automatisch bijgewerkt
+   in plaats van overgetypt. Zelfde ontwerp als de Regelwacht hierboven: een
+   gevalideerde overlay op het gedeelde register, herstart-vast, met een
+   dagelijkse bron-check en de ingebouwde tabel als veilige basis. Hij hangt
+   direct achter de onderneming, want die tabel is van hem. */
+Object.assign(kern, require('../kern/onderneming/rechtsvormwacht')({ db, save }));
+kern.rechtsvormwacht.herstelOverlay();
+const rvTimer = setInterval(() => { kern.rechtsvormwacht.check().catch(() => {}); },
+  Number(process.env.RECHTSVORM_CHECK_MS || 86400000));
+if (rvTimer.unref) rvTimer.unref();
+/* De drie kamers van RTG Kantoren (opvang, afdelingshotel, regering) staan in
+   ./kernlaag4c.js: op de 10 kB-grens uitgeknipt, en zij zijn de naad -- ze
+   gebruiken als enige hier `bankregie` niet. */
 /* Pay draait op de eigen bank zodra die live is: een saldotekort in de wallet
    wordt eerst gedekt vanaf de eigen betaalrekening (eigen rails), en pas
    daarna via de kaart-naad. Late binding, want de bank bouwt op pay. */

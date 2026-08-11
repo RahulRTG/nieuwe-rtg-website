@@ -232,7 +232,7 @@ vorige zijn toetsen heeft (LAT.md).
 
 | Fase | Wat | Status |
 |---|---|---|
-| 1 | **de sociale graaf**: alle elf apps plus de vriendenlaag als bron, met vooruitblik (verlopende documenten uit Entourage, gastpassen uit Cercle, data uit Attenties, komende bijeenkomsten). Alleen lezen. | -- |
+| 1 | **de sociale graaf**: de tien sociale apps plus de vriendenlaag als bron, met vooruitblik (verlopende documenten uit Entourage, data uit Attenties). Alleen lezen. | **er** |
 | 2 | **de objectlaag**: Persoon, Groep en Event als eerste drie types, met `caps` en een scherm dat de caps volgt | -- |
 | 3 | **de relatieruimte** op `levensband`: gedeelde tijdlijn, beeld, plannen en betalingen per relatie, met par. 4.2 in code | -- |
 | 4 | **de momentlijn**: leven in plaats van posts -- vandaag, vrijdag, zaterdag, volgende week | -- |
@@ -241,6 +241,36 @@ vorige zijn toetsen heeft (LAT.md).
 
 Fase 1 is met opzet klein en volledig omkeerbaar: hij voegt niets toe aan wat een
 lid kan doen, alleen aan wat het platform ziet. Alles daarna staat erop.
+
+### Waar fase 1 staat
+
+`server/kern/socialegraaf/` met vier delen: `hulp.js` (de vorm van een moment),
+`bronnen.js` (negen sociale bronnen), `vooruitblik.js` (de sociale snede van de
+Control Tower) en `index.js` (de motor). De route is `POST /api/sociaal/graaf`
+in `server/routes/sociaal.js`, achter de ledendeur en niet voor gasten. Getoetst
+in `test/socialegraaf.test.js`, elke toets met de mutatie erbij die hem hoort te
+laten zakken; alle mutaties zijn gedraaid en gezien zakken.
+
+**De correctie op het faseplan hierboven, want hij hoort niet weggepoetst.** Er
+stond "alle elf apps" en "gastpassen uit Cercle". Beide klopten niet en dat bleek
+pas bij het bouwen. De elfde catalogusregel is RTG Sociaal zélf, dus het zijn er
+tien plus de vriendenlaag. En een gastpas in Cercle is een AANTAL, geen datum
+(`kern/rechterhand/cercle.js`) — er valt dus niets vooruit te blikken, en een
+verzonnen vervaldatum eromheen zou een waarschuwing zijn die nergens op slaat.
+Clubs komen mee als telling. Zie de kop van `vooruitblik.js`.
+
+**Twee fouten die bij het nalezen van de bronnen boven water kwamen**, allebei in
+de bestaande samenhanglaag `kern/socialewereld.js` en allebei stil:
+`bijeenkomst.titel` bestaat niet (het domein levert `wat`) en `pulse.naam`
+bestaat niet (het domein levert `codenaam`). Elke bijeenkomst stond dus zonder
+titel op het RTG Sociaal-scherm en elk bericht zonder afzender. De toets zag het
+niet omdat zijn nagemaakte bronnen wél `titel` en `naam` teruggaven — een
+namaakbron die niet op de echte lijkt, bewijst niets. Oorzaak en toets zijn
+allebei gerepareerd.
+
+**Wat er in fase 1 met opzet NIET is:** een scherm. De graaf is een laag, geen
+gezicht; het command center is fase 5. Wie de laag nu wil zien, roept de route
+aan.
 
 ---
 

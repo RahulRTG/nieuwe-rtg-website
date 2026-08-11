@@ -80,4 +80,17 @@ Object.assign(kern, require('../kern/levenslijn')({ kern }));
    is geen levensgegeven maar een TOESTEMMING; het leven zelf blijft in de
    domeinen die het beheren. */
 Object.assign(kern, require('../kern/levensband')({ db, save }));
+/* De sociale graaf (kern/socialegraaf/): dezelfde projectielaag over de sociale
+   domeinen -- wat er tussen mensen speelt, en wat eraan komt (LIFE.md fase 1).
+
+   ACHTERAAN, EN DAT IS GEEN WILLEKEUR. Hij leest de kern LAAT zoals de geldgraaf,
+   dus de negen sociale domeinen mogen na hem komen. Wat NIET later mag komen is
+   de levensgraaf: zijn vooruitblik vraagt de Control Tower daar de termijnen van
+   Entourage en Attenties, in plaats van die datums zelf nog een keer uit te
+   rekenen. Twee berekeningen van "over hoeveel dagen" lopen stil uiteen, en dan
+   toont het ene scherm zeven dagen waar het andere er zes zegt (LAT.md regel 4).
+
+   SCHRIJFT NOOIT, en heeft geen eigen opslag: krijgt daarom alleen kern mee, en
+   met opzet geen db en geen save. */
+Object.assign(kern, require('../kern/socialegraaf')({ kern }));
 };

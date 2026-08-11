@@ -32,6 +32,20 @@ const isDatum = d => {
   const dt = new Date(t + 'T12:00:00Z');
   return !Number.isNaN(dt.getTime()) && dt.toISOString().slice(0, 10) === t;
 };
+/* Van een tijdstip (ms of ISO) naar een ISO-dag. Null bij rommel, want een
+   gegeven met een halve datum is gevaarlijker dan een zonder: hij telt dan mee
+   in het verkeerde venster.
+
+   Hij stond in geldgraaf/hulp.js en woont nu hier, waar isDatum al woont, omdat
+   de sociale graaf hem ook nodig heeft. Drie grafen die ieder hun eigen "welke
+   dag was dit" schrijven is precies de vorm die stil uiteenloopt (regel 4); dat
+   geldgraaf hem hiervandaan haalt in plaats van andersom, is omdat geld geen
+   algemene laag is en sociaal er dan van zou afhangen. */
+const dagVan = (t) => {
+  const d = new Date(t);
+  return Number.isNaN(d.getTime()) ? null : d.toISOString().slice(0, 10);
+};
+
 /* Een gebeurtenis telt alleen mee als hij nog moet komen; een diner van vorig
    jaar is geschiedenis en hoort niet als "achterstallig" in de tower. Een
    TERMIJN (een verzekering, een paspoort) gaat hier NIET doorheen: die hoort
@@ -51,4 +65,4 @@ function volgendeJaardag(md) {
 }
 
 module.exports = { OPEN, PERSOONLIJK, VERTROUWELIJK, BESLOTEN,
-  vandaag, isDatum, straks, lijst, obj, volgendeJaardag };
+  vandaag, isDatum, dagVan, straks, lijst, obj, volgendeJaardag };

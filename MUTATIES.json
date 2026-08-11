@@ -4174,6 +4174,11 @@
       "gezakt": 8,
       "scherp": "gezakt"
     },
+    "voertuigscherm.e2e.js": {
+      "soort": "puur",
+      "staat": "geen bronmutatie mogelijk",
+      "reden": "overleefde 17 mutaties in public/apps/voertuig.js en rit.js. Deze toets legt tekst en sleutelnamen vast, geen rekenend gedrag; geen enkele bronoperator raakt een letterlijke string. Met de hand nagetrokken op de foutklasse die hij wel bewaakt (een hernoemde opslagsleutel): tweemaal raak"
+    },
     "vonk.test.js": {
       "soort": "server",
       "staat": "gezakt",

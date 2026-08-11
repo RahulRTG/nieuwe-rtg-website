@@ -3347,6 +3347,14 @@
       "gezakt": 4,
       "scherp": "gezakt"
     },
+    "schermleugen.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/schermleugen.js",
+      "operator": "&&->||#0",
+      "gezakt": 10,
+      "geprobeerd": 1
+    },
     "schild.test.js": {
       "soort": "server",
       "staat": "gezakt",

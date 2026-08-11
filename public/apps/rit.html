@@ -85,5 +85,11 @@
 <script src="/shared/schermbeeld.js" defer></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
+<!-- shared/ios.js brengt het app-menu (de hamburger rechtsboven) en daarmee de
+     weg terug naar het beginscherm. Deze twee pagina's waren hem vergeten, en
+     dat is een fout zonder foutmelding: de app opent, doet alles wat hij moet
+     doen, en heeft geen enkele uitgang. test/appmenu.e2e.js loopt daarom ALLE
+     app-pagina's af -- hij ving deze twee. -->
+<script src="/shared/ios.js" defer></script>
 </body>
 </html>

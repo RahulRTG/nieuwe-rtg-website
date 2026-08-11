@@ -18,6 +18,12 @@
     b.type = 'button';
     b.className = 'os-wm';
     b.dataset.i = String(i);
+    /* De sleutel meegeven, net als de tegels in het rooster (.os-app[data-sleutel]).
+       Dat is dezelfde afspraak op twee weergaven van dezelfde lijst: wie wil weten
+       WELKE app hier hangt, leest overal hetzelfde attribuut en niet de zichtbare
+       naam -- die verandert met het beleid mee ("Video" en niet "Clips"), en dan
+       wijst alles wat op de naam leunt ineens nergens meer heen. */
+    if (item.sleutel) b.dataset.sleutel = item.sleutel;
     b.setAttribute('aria-label', item.naam);
     var teken = item.teken && item.teken();
     if (teken) b.appendChild(teken);

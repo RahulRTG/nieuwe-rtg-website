@@ -111,8 +111,8 @@ module.exports = ({ db, save, crypto, schoon, geldPasprijzen, accounts }) => {
     const a = { id: rid(), pas, naam, contact, viaUitnodiging, accountId,
       welkom: def.welkom, reis: bouwReis(def.stem),
       status: 'in behandeling', besluit: null, at: nu(), bijgewerkt: nu() };
-    // de ondernemersintake, met de uitslag GELEZEN: een gesloten genre wordt
-    // geweigerd en niet stil iets anders. Zie CONCERN.md.
+    // de ondernemersintake; een gesloten genre wordt geweigerd en niet stil
+    // iets anders gemaakt. Zie CONCERN.md.
     const bedrijf = bedrijfMod.zetBedrijf(a, b.bedrijf, { viaUitnodiging });
     if (!bedrijf.ok) return bedrijf;
     A().unshift(a);
@@ -163,13 +163,10 @@ module.exports = ({ db, save, crypto, schoon, geldPasprijzen, accounts }) => {
      aanmelding (a.gezaakt) en is daarmee idempotent. Een nagemaakt object
      doorgeven zou die idempotentie stilletjes breken -- dan stond er bij een
      tweede aanroep een tweede zaak. */
-  function provisioneerId(id) {
-    const a = vind(String(id || ''));
-    if (!a) return { status: 404, error: 'Deze aanmelding bestaat niet.' };
-    if (!a.bedrijf) return { status: 409, error: 'Deze aanmelding draagt geen bedrijfsgegevens.' };
-    return bedrijfMod.provisioneer(a) || { status: 409, error: 'De zaak stond al klaar.' };
-  }
 
-  return { aanmeldingen: { aanvraag, lijst, een, beslis, betalingen, termijnVoldaan,
-    magAutomatischToekennen, provisioneerId, PASSEN } };
+  // De zaak klaarzetten: ./aanmeldingen/klaarzetten.js (stond op de NOG-lijst).
+  const klaarzetten = require('./aanmeldingen/klaarzetten')({ A, bedrijfMod });
+
+  return { aanmeldingen: Object.assign({ aanvraag, lijst, een, beslis, betalingen,
+    termijnVoldaan, magAutomatischToekennen, PASSEN }, klaarzetten) };
 };

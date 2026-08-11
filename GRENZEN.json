@@ -1974,6 +1974,8 @@
       "auth",
       "concernBelangen",
       "concernBoom",
+      "concernDiscovery",
+      "concernDiscoveryNeem",
       "concernFusieBeeld",
       "concernFusieDoe",
       "concernGeraaktDoorVerloop",
@@ -2030,6 +2032,8 @@
       "vestigingUnit",
       "vestigingUnitLos",
       "vestigingVind",
+      "voorstelBevestig",
+      "voorstelLees",
       "werkOverzicht"
     ]
   }

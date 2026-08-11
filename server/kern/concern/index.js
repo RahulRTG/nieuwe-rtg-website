@@ -44,6 +44,10 @@ module.exports = (ctx) => {
   Object.assign(k, require('./uitnodiging')(k));
   Object.assign(k, require('./readiness')(k));
   Object.assign(k, require('./verandering')(k));
+  /* Document Intelligence en Discovery komen als LAATSTE: zij lezen alles wat
+     hierboven staat en schrijven via entiteitNieuw/tijdZet. Andersom zou een
+     halve context krijgen -- en dan valt de bevestiging stil in het niets. */
+  Object.assign(k, require('./voorstel')(Object.assign(k, { ondernemingVind: ctx.ondernemingVind })));
 
   /* ---- de twee samenvattingen ----
 

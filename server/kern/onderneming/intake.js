@@ -21,6 +21,11 @@
 'use strict';
 
 const { GENRES } = require('../aanmeldingen/bedrijf');
+/* Het register wordt hier GELEZEN om te kunnen zeggen WAAROM een branche niet
+   wordt aangenomen ("nog niet open" leest anders dan "kennen we niet"). De
+   keuzelijst zelf blijft GENRES hierboven, die dezelfde bron leest -- twee
+   lijsten zouden precies de fout zijn die dat register kwam opruimen. */
+const register = require('../../seed/genres');
 
 const SAMEN = ['alleen', 'team'];
 const VERKOOPMODEL = ['eenmalig', 'herhaling', 'abonnement'];
@@ -58,16 +63,27 @@ module.exports = ({ schoon }) => {
     if (p.samen !== undefined) i.persoon.samen = SAMEN.includes(p.samen) ? p.samen : null;
     if (p.verkoopervaring !== undefined) i.persoon.verkoopervaring = !!p.verkoopervaring;
 
-    /* Een branche buiten de lijst wordt niet gezet. Dat lijkt op de stille
-       fallback die net uit kern/aanmeldingen/bedrijf.js is gehaald, maar het is
-       een ander geval: daar werd een genre stil VERVANGEN door een ander
-       ('zzp'), hier wordt er niets ingevuld. Er ontstaat dus geen onwaarheid.
-       De keuzelijst hiernaast (GENRES) komt sinds die opruiming uit het
-       register, dus een gesloten genre kan hier alleen nog met de hand komen.
-       Wie dit tot een echte melding wil maken, moet intakeZet() een uitslag
-       laten teruggeven -- dat raakt al zijn aanroepers en hoort een eigen
-       besluit te zijn, geen bijwerking van deze opruiming. */
-    if (d.branche !== undefined) i.idee.branche = GENRES.includes(d.branche) ? d.branche : null;
+    /* EEN GEWEIGERDE BRANCHE LAAT NU EEN SPOOR NA. Hier stond `: null` -- geen
+       vervanging zoals de zzp-fallback verderop, maar wel een stilte: wie een
+       gesloten genre invulde kreeg een leeg veld terug zonder te horen waarom,
+       en las dat als "het is niet opgeslagen, ik probeer het nog eens".
+
+       Waarom niet gewoon een fout? Omdat intakeZet() geen uitslag teruggeeft
+       maar de intake zelf, en dat veranderen raakt al zijn aanroepers. De
+       melding reist daarom MEE op het object: `brancheGeweigerd` draagt wat er
+       is geprobeerd en welke stand dat genre heeft. Het scherm kan dat tonen,
+       en de stilte is weg zonder dat er een contract breekt. */
+    if (d.branche !== undefined) {
+      const gevraagd = d.branche == null ? '' : String(d.branche);
+      if (!gevraagd) { i.idee.branche = null; delete i.brancheGeweigerd; }
+      else if (GENRES.includes(gevraagd)) { i.idee.branche = gevraagd; delete i.brancheGeweigerd; }
+      else {
+        i.idee.branche = null;
+        const poort = register.genreToegang(gevraagd);
+        i.brancheGeweigerd = { gevraagd, stand: poort.reden,
+          uitleg: poort.uitleg || 'Deze branche kennen we niet.' };
+      }
+    }
     if (d.wat !== undefined) i.idee.wat = scho(d.wat, 300);
     if (d.doelgroep !== undefined) i.idee.doelgroep = scho(d.doelgroep, 200);
     if (d.plaats !== undefined) i.idee.plaats = scho(d.plaats, 80);

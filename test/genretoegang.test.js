@@ -80,12 +80,19 @@ test('de aanvraaglijst wordt gelezen uit het register, niet overgetypt', () => {
 test('een gesloten genre wordt geweigerd en wordt nooit een ander genre', () => {
   const { zetBedrijf } = maakBedrijf();
 
-  /* De vier gesloten standen, elk met een genre dat hem draagt. */
+  /* De drie gesloten standen, elk met een genre dat hem draagt.
+
+     `bewijs` STOND HIER EN STAAT ER NIET MEER, en dat is geen versoepeling. Die
+     stand was dicht met een reden die erbij stond: een `bewijsNodig`-vlag die
+     niemand handhaaft is een open deur met een bordje ernaast. Die handhaving
+     bestaat nu (kern/aanmeldingen/bewijs.js houdt de provisioning tegen tot een
+     mens het stuk aftekent), dus de deur mag open. De toets daarop staat in
+     test/concern-voorstel.test.js -- en zonder die toets hoort deze regel
+     terug. */
   const gesloten = [
     ['binnenkort', register.genresMetStand('binnenkort')[0]],
     ['intern', register.genresMetStand('intern')[0]],
-    ['uitnodiging', register.genresMetStand('uitnodiging')[0]],
-    ['bewijs', register.genresMetStand('bewijs')[0]]
+    ['uitnodiging', register.genresMetStand('uitnodiging')[0]]
   ];
   for (const [stand, genre] of gesloten) {
     const a = {};
@@ -115,6 +122,17 @@ test('een gesloten genre wordt geweigerd en wordt nooit een ander genre', () => 
   const r4 = zetBedrijf(a4, { naam: 'Cafe Vidal', type: 'restaurant', plaats: 'Ibiza' });
   assert.equal(r4.ok, true);
   assert.equal(a4.bedrijf.type, 'restaurant', 'een open genre hoort ongewijzigd door te gaan');
+  assert.equal(a4.bedrijf.bewijsNodig, undefined, 'en geen bewijsvraag te krijgen die er niet is');
+
+  /* Een `bewijs`-genre komt er ook door -- maar draagt de eis MEE. Zonder die
+     vlag zou de poort in de provisioning niets te controleren hebben, en dan
+     staat de deur alsnog open met een bordje ernaast. */
+  const a6 = {};
+  const bewijsGenre = register.genresMetStand('bewijs')[0];
+  const r6 = zetBedrijf(a6, { naam: 'Apotheek Noord', type: bewijsGenre });
+  assert.equal(r6.ok, true, bewijsGenre + ' hoort aangevraagd te kunnen worden');
+  assert.equal(a6.bedrijf.bewijsNodig, true,
+    'de bewijseis hoort op de aanmelding te belanden; anders handhaaft de poort niets');
 
   // geen bedrijf meegestuurd is geen fout: niet elke aanmelding gaat over een zaak
   const a5 = {};

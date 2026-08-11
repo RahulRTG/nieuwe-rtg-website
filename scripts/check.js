@@ -409,17 +409,24 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
        een tweede script bij dat overal mee moet. Dat doe je een voor een met de
        toetsen ernaast en niet in de staart van een ronde. */
     'public/shared/media.js',
-    /* server/kern/aanmeldingen.js stond op 10235 bytes -- VIJF onder de grens --
-       en ging erover toen de aanvraag de uitslag van zetBedrijf() ging lezen
-       (het einde van de stille omzetting naar 'zzp'; zie CONCERN.md). Dat zijn
-       twee regels code die er moesten komen. Hij hoort in NOG en niet in MAG:
-       er zit een duidelijke naad in, tussen de AANVRAAG (binnenkomen, intake,
-       op de stapel) en het BESLUIT (accepteren, betaalschema, provisioneren).
-       Die tweede helft leunt al op ./aanmeldingen/besluit.js en
-       ./aanmeldingen/betaalschema.js, dus de knip is te maken -- maar het is
-       echte bedrading en die doe je met de toetsen ernaast, niet in de staart
-       van deze ronde. */
-    'server/kern/aanmeldingen.js',
+    /* Deze twee gingen erover door EEN regel die er moest komen: de Werk-kiezer
+       moest kunnen zien of een gekoppeld personeelslid manager is, want anders
+       landt de eigenaar van een zaak in de medewerkers-PDA in plaats van de
+       zaak-app (zie CONCERN.md). Allebei stonden ze al vlak onder de grens --
+       hetzelfde geval als media.js hierboven.
+
+       Ze horen in NOG en niet in MAG: er zit in allebei een echte naad.
+       eenaccount.js scheidt de SLEUTELBOS (rollen lezen, koppelen) van het
+       MUNTEN van een sessie; app-main-25 scheidt de algemene pin van de
+       Werk-kiezer. Allebei is het echte bedrading -- een module en een
+       bundeldeel dat overal mee moet -- en die doe je met de toetsen ernaast. */
+    'server/kern/eenaccount.js',
+    'public/apps/app-main/app-main-25.js',
+    /* server/kern/aanmeldingen.js STOND HIER en is er weer af: de knip die hier
+       met naam op de lijst stond, is gemaakt. Het klaarzetten van de zaak
+       (provisioning plus de bewijsstap voor de gereguleerde genres) woont nu in
+       ./aanmeldingen/klaarzetten.js, en het bestand past weer onder de maat.
+       Zo hoort deze lijst te krimpen: niet door de grens te verzetten. */
     // server/accounts/users.js is opgeknipt: het ledendossier, de verificatie, de
     // kantoorlijsten en de vergetelheid staan nu in server/accounts/dossier.js
     'server/kern/journalistiek.js',
@@ -1621,6 +1628,14 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
     ['/api/auth/forgot', 'wachtwoord vergeten: wie buitengesloten is heeft geen token'],
     ['/api/pin/herstel', 'pin vergeten: de eenmalige sleutel uit de mail IS het bewijs, net als bij /api/auth/reset'],
     ['/api/aanmelding/aanvraag', 'een aanstaande aanvrager is nog geen lid (met rem per ip)'],
+    /* Het bewijsstuk voor de gereguleerde genres hoort bij dezelfde aanvraag en
+       loopt dus dezelfde weg: wie een apotheek aanvraagt heeft op dat moment
+       geen zaak, geen personeelslogin en soms geen account -- alleen zijn
+       aanmeldings-id. Er valt hier NIETS mee te lezen: de route geeft alleen
+       terug dat het stuk is ontvangen, dus een geraden id levert geen gegevens
+       op. En hij verleent niets: aftekenen (de handeling die de zaak vrijgeeft)
+       zit achter officeAuth en staat op een naam. */
+    ['/api/aanmelding/bewijs', 'hoort bij de aanvraag zelf; de aanvrager heeft nog geen sessie, en aftekenen zit wel achter het kantoor'],
     /* De twee gastendeuren. Hier KAN nog geen tafelsleutel zijn: die ontstaat
        pas bij het aanschuiven, en het bewijs dat iemand aan tafel 12 zit is de
        QR op die tafel. Het token is dus de credential en geen gemakje -- het is

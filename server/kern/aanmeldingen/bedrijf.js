@@ -86,8 +86,18 @@ module.exports = Object.assign((ctx) => {
   /* De provisioning zelf: zaak + eigenaarsinlog + wensen. Idempotent --
      een tweede aanroep doet niets. Geeft de eigenaars-PIN eenmalig terug
      (die staat alleen gehasht in de kluis). */
+  /* De bewijspoort voor de gereguleerde genres (./bewijs.js). Hij staat HIER en
+     niet bij de aanroepers: provisioneer() wordt op drie plekken aangeroepen
+     (de boardroom, de termijn, de directe weg), en een poort die je per
+     aanroeper moet onthouden is een poort die er ooit een keer niet staat. */
+  const bewijs = require('./bewijs')({ save, kap, nu });
+
   function provisioneer(a) {
     if (!a.bedrijf || a.gezaakt) return a.gezaakt || null;
+    /* GEEN ZAAK VOOR EEN GEREGULEERD BEROEP ZONDER AFGETEKEND STUK. De aanvraag
+       mocht binnenkomen -- een plan indienen is geen beroepsuitoefening -- maar
+       de zaak gaat pas klaarstaan als een mens het papier heeft gezien. */
+    if (!bewijs.bewijsKlaar(a)) return null;
     if (!Array.isArray(db.data.suppliers)) db.data.suppliers = [];
     const code = codeVoor(a.bedrijf.naam);
     db.data.suppliers.push({ code, name: a.bedrijf.naam, type: a.bedrijf.type,
@@ -130,5 +140,5 @@ module.exports = Object.assign((ctx) => {
     return { ok: true, maand: t.maand, zaak };
   }
 
-  return { zetBedrijf, provisioneer, termijnVoldaan, GENRES };
+  return Object.assign({ zetBedrijf, provisioneer, termijnVoldaan, GENRES }, bewijs);
 }, { GENRES });

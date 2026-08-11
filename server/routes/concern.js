@@ -220,4 +220,5 @@ module.exports = (kern) => {
 
   require('./concern/mensen')(kern, { mijn, mijnVestiging, stuur, nietGevonden });
   require('./concern/verandering')(kern, { mijn, stuur, nietGevonden });
+  require('./concern/voorstel')(kern, { mijn, stuur, nietGevonden });
 };

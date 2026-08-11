@@ -44,8 +44,11 @@ function maakEenAccount({ db, save, crypto, accounts, findSupplier, checkCred, h
 
   /* ---- de sleutelbos van dit account ---- */
   function accRollen(key) {
+    // `staffRole` viel hier weg, en daardoor stuurde de Werk-kiezer de eigenaar
+    // van een zaak (altijd manager) naar de PDA in plaats van de zaak-app.
     const rollen = lijst(key).map(r => ({ rol: r.rol, code: r.code || null,
-      staffId: r.staffId || null, naam: r.naam || null, zaakNaam: r.zaakNaam || null, sinds: r.at }));
+      staffId: r.staffId || null, naam: r.naam || null, zaakNaam: r.zaakNaam || null,
+      staffRole: r.staffRole || null, manager: r.staffRole === 'manager', sinds: r.at }));
     // de afgeleide kantoorsleutel van de eigenaar, tenzij hij hem al koppelde
     const eig = eigenaarKantoor(key);
     if (eig && !rollen.some(r => r.rol === 'kantoor')) {

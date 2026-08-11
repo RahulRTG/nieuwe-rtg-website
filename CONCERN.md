@@ -603,23 +603,47 @@ niet vrij: elke stap leunt op de vorige.
 | 6 | **Concern + eigendomsgraaf** | ✅ | `kern/concern/graaf.js` + `graaf-bevoegdheid.js` |
 | 7 | **Tijdmachine op de juridische feiten** | ✅ | `kern/concern/tijd.js` + `bron.js` |
 | 8 | **Readiness + launch blocking** | ✅ | `kern/concern/readiness.js` |
-| 9 | **Document Intelligence + Discovery** | ⬜ | nog niet gebouwd — zie hieronder |
+| 9 | **Document Intelligence + Discovery** | ✅ | `kern/concern/voorstel.js` + `discovery.js` |
 | 10 | **Impact preview, rollback, fusie/overname** | ✅ | `kern/concern/verandering.js` + `-eigendom.js` |
 
-Bewaakt door `test/concern.test.js` (14 toetsen, 8 mutaties gedaan en zien
-zakken) en `test/concern-routes.e2e.js` (3, waarvan één die andermans entiteit
-langs veertien deuren probeert). De routes staan in `routes/concern.js`,
-`routes/concern/mensen.js` en `routes/concern/verandering.js`.
+Bewaakt door `test/concern.test.js` (14 toetsen, 8 mutaties),
+`test/concern-voorstel.test.js` (5 toetsen, 5 mutaties) en
+`test/concern-routes.e2e.js` (3, waarvan één die andermans entiteit langs
+veertien deuren probeert). De routes staan in `routes/concern.js` met
+`concern/mensen.js`, `concern/verandering.js` en `concern/voorstel.js`. Het
+scherm is `/apps/concern.html`, bereikbaar vanuit **Onderneming** — geen eigen
+tegel, want dat is PLATFORM.md §0.
 
-**Stap 9 staat er bewust nog niet.** Het is het meest indrukwekkende deel en het
-verleidt om ermee te beginnen — maar Document Intelligence en Business Discovery
-zijn een COMFORTLAAG boven een structuur, en die structuur moest er eerst zijn.
-Nu staat zij er: de velden bestaan, de bronsoorten bestaan (`document` wacht op
-precies deze stap), en het voorstel-dan-bevestigen-patroon is elders al
-gebouwd. Wat er nog moet komen is de extractie zelf, en de grens eromheen: wat
-uit een document komt is een **voorstel** tot een mens het bevestigt, en dan pas
-een feit met bron `document`. Zonder die grens zou de AI juridische geldigheid
-verzinnen, en dat is precies wat wet 4 verbiedt.
+**Over stap 9.** De extractie is patroonwerk en geen slimmigheid: een
+KvK-nummer is acht cijfers, een rechtsvorm een woord uit een gesloten lijst. Dat
+is eerlijker dan doen alsof — en het maakt voor de grens niets uit. Elke vondst
+is een **kandidaat met zijn vindplaats**, en pas als een mens hem aanvinkt
+ontstaat er een feit, met bron `document`. Wat niet is aangevinkt bestaat niet.
+Er is met opzet geen "bevestig alles"-ingang: dat zou het aanvinken tot een
+formaliteit maken, en dan is de bevestiging geen bevestiging meer.
+
+## De bewijsstap
+
+De acht genres met stand `bewijs` — ziekenhuis, huisarts, medisch specialist,
+apotheek, beauty medical, kinderopvang, verzekeringen en beveiliging — stonden
+dicht met een reden die erbij stond: *een `bewijsNodig`-vlag die niemand
+handhaaft, is een open deur met een bordje ernaast.*
+
+Die handhaving is er nu (`kern/aanmeldingen/bewijs.js`), en de acht zijn open.
+Wat er gebeurt:
+
+- **de aanvraag komt gewoon binnen** — een plan indienen is geen
+  beroepsuitoefening, en wie niet eens mag vragen wat er nodig is, komt nergens;
+- **de zaak wordt niet klaargezet** tot een medewerker het stuk heeft
+  afgetekend, op naam;
+- **RTG beoordeelt het stuk niet inhoudelijk.** Wij zijn geen inspectie. Wat
+  wordt vastgelegd is dát iemand het heeft gezien. Doen alsof RTG een vergunning
+  valideert, verschuift een aansprakelijkheid naar de partij die haar niet kan
+  dragen.
+
+Daarmee staan er **39** van de 73 genres open. De overige 34 zijn 24
+`binnenkort` (het genre bestaat, het gereedschap nog niet), 8 `intern` (die
+draait de wereld zelf) en 2 `uitnodiging`.
 
 ---
 

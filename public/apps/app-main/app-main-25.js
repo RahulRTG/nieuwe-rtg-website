@@ -55,7 +55,9 @@
         belLijst.appendChild(leeg);
       }
       for (const r of rollen) {
-        const doel = WERKDOEL[r.rol];
+        // Een manager hoort in de zaak-app en niet in de PDA. accStart() munt
+        // dezelfde sessie: geen bevoegdheid verandert, alleen waar hij landt.
+        const doel = (r.rol === 'personeel' && r.manager) ? WERKDOEL.zaak : WERKDOEL[r.rol];
         const b = document.createElement('button');
         const zi = document.createElement('span'); zi.className = 'zi';
         const zg = window.RTGGlyf && RTGGlyf.svg(doel.glyf); if (zg) zi.appendChild(zg);

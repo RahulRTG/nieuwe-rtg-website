@@ -358,7 +358,19 @@ function vakOprichting(){
 
 function vakZaak(o){
   if(o.zaak) return '<div class="vak"><h2>Uw zaak</h2><p class="subtxt">Gekoppeld: <strong>'+esc(o.zaak.code)+'</strong>. Vanaf hier draait uw onderneming op de gewone zaak-apps.</p></div>';
-  if(!o.kvk) return '<div class="vak"><h2>Uw zaak</h2><p class="stil">Zodra u bent ingeschreven, kunt u hier uw zaak aanvragen.</p></div>';
+  /* HIER STOND EEN DOODLOPENDE POORT. Dit blok verborg de hele aanvraag zolang
+     `o.kvk` leeg was, met de zin "zodra u bent ingeschreven kunt u hier uw zaak
+     aanvragen" -- maar geen enkel scherm riep ooit /api/onderneming/ingeschreven
+     aan, dus die waarde bleef altijd leeg en de knop verscheen nooit. Het scherm
+     verzon bovendien een strengere eis dan de server heeft: de API vraagt om een
+     vastgelegd plan en een branche, niet om een inschrijving.
+     Nu staat het inschrijfnummer er als eigen, OPTIONELE stap naast. */
+  const kvkVak = o.kvk
+    ? '<p class="subtxt">Ingeschreven onder <strong>'+esc(o.kvk)+'</strong>.</p>'
+    : '<div class="raster r8"><label class="veld">Inschrijfnummer (KvK of gelijkwaardig) &mdash; optioneel'+
+      '<input id="kvkNr" placeholder="12345678"></label></div>'+
+      '<div class="rij r8"><button class="knop" id="kvkKnop">Leg mijn inschrijving vast</button></div>'+
+      '<p class="stil">Nog niet ingeschreven? Dat hoeft niet: u kunt uw zaak ook zonder aanvragen.</p>';
   const loopt=AANVRAAG&&AANVRAAG.stand&&AANVRAAG.stand!=='geen-aanvraag';
   if(loopt){
     return '<div class="vak"><h2>Uw zaak</h2><p class="subtxt">Stand van uw aanvraag: <strong>'+esc(AANVRAAG.stand)+'</strong>. '+
@@ -367,10 +379,14 @@ function vakZaak(o){
   }
   return '<div class="vak"><h2>Uw zaak</h2>'+
     '<p class="subtxt">Met een zaak kunt u verkopen, factureren en in de Mall staan. De aanvraag gaat naar RTG; een mens beslist erover.</p>'+
+    kvkVak+
     '<div class="raster r8">'+
     '<label class="veld">Uw naam<input id="aanvNaam"></label>'+
     '<label class="veld">Contact (e-mail of telefoon)<input id="aanvContact"></label>'+
-    '</div><div class="rij r8"><button class="knop prim" id="aanvKnop">Vraag mijn zaak aan</button></div></div>';
+    '</div><div class="rij r8"><button class="knop prim" id="aanvKnop">Vraag mijn zaak aan</button></div>'+
+    /* De concern-laag hangt ACHTER dit scherm en krijgt geen eigen tegel:
+       PLATFORM.md paragraaf 0. Wie meer dan een bedrijf heeft, vindt hem hier. */
+    '<p class="subtxt r10"><a href="/apps/concern.html">Meerdere bedrijven, vestigingen of een holding? &rarr;</a></p></div>';
 }
 
 
@@ -764,6 +780,14 @@ function haakKnoppen(){
     if(!naam.trim()){meld('Vul uw naam in.');return;}
     try{ await api('aanvraag',{id:HUIDIG,naam,contact:($('#aanvContact')||{}).value||''});
       meld('Aanvraag ingediend. Een mens beoordeelt hem.'); await herlaad(); }
+    catch(err){ meld(err.message); }});
+  /* De inschrijving vastleggen. Deze aanroep bestond al aan de serverkant
+     (/api/onderneming/ingeschreven) maar werd door GEEN enkel scherm gedaan --
+     en daardoor bleef `o.kvk` altijd leeg en verscheen het aanvraagblok nooit. */
+  const kv=$('#kvkKnop'); if(kv) kv.addEventListener('click',async()=>{
+    const nr=(($('#kvkNr')||{}).value||'').trim();
+    if(!nr){meld('Vul uw inschrijfnummer in.');return;}
+    try{ await api('ingeschreven',{id:HUIDIG,kvk:nr}); meld('Inschrijving vastgelegd.'); await herlaad(); }
     catch(err){ meld(err.message); }});
   const ks=$('#kasKnop'); if(ks) ks.addEventListener('click',async()=>{
     const bedrag=($('#kasSaldo')||{}).value;

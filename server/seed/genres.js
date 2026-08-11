@@ -78,15 +78,17 @@ const GENRES = require('./genres-lijst');
 const TOEGANG = {
   open: { mag: true,
     uitleg: 'Iedereen kan een zaak in dit genre aanvragen.' },
-  /* STAAT BEWUST DICHT, EN NIET OMDAT DE STAND ONAF IS. Deze acht genres
-     (ziekenhuis, apotheek, kinderopvang, beveiliging en hun buren) horen pas
-     open te gaan als de bewijsstap er werkelijk is: een vergunning, een
-     inschrijving of een diploma dat een mens heeft gezien. `mag: true` met een
-     `bewijsNodig`-vlag die niemand handhaaft, is een open deur met een bordje
-     ernaast -- precies de schijnzekerheid die dit register komt opruimen.
-     Openzetten is straks een regel: mag op true, zodra de stap bestaat. */
-  bewijs: { mag: false, bewijsNodig: true,
-    uitleg: 'Voor dit genre vraagt RTG eerst bewijs (vergunning, inschrijving of diploma). Die stap staat nog niet klaar; neem contact op met RTG.' },
+  /* STOND DICHT TOT DE BEWIJSSTAP ER WAS, EN STAAT NU OPEN. Deze acht genres
+     (ziekenhuis, apotheek, kinderopvang, beveiliging en hun buren) mochten niet
+     open met een `bewijsNodig`-vlag die niemand handhaafde -- dat is een open
+     deur met een bordje ernaast.
+
+     Die stap bestaat nu: de aanvraag komt binnen met `bewijsNodig` op de
+     aanmelding (kern/aanmeldingen/bedrijf.js), en kern/aanmeldingen/bewijs.js
+     houdt de provisioning tegen tot een MENS het stuk heeft gezien en
+     afgetekend. De vlag doet dus werk, en daarom mag de deur open. */
+  bewijs: { mag: true, bewijsNodig: true,
+    uitleg: 'Aanvragen kan. RTG vraagt bewijs (vergunning, inschrijving of diploma) voordat de zaak live gaat; een medewerker beoordeelt dat stuk.' },
   uitnodiging: { mag: false, opUitnodiging: true,
     uitleg: 'Dit genre gaat alleen op uitnodiging van RTG open.' },
   intern: { mag: false,

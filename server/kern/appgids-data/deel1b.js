@@ -24,7 +24,11 @@ module.exports = {
   '/apps/spelen.html': G('Spelen: bordspellen en partyspellen met vrienden, live tegen elkaar.',
     ['Start een lobby en nodig vrienden uit', 'Kies een spel: van dammen tot Magnaat', 'Praat mee in de spelchat'],
     'Sommige spellen hebben een leeftijdspoort; dat regelt de app automatisch netjes voor je.'),
-  '/apps/scherm.html': G('Het gedeelde scherm: een lopend potje op de televisie, voor iedereen in de kamer.',
+  /* Het spelscherm heette eerst scherm.html en stond daarmee OVER het Tweede
+     scherm van de zaak-app heen -- twee takken die hetzelfde pad kozen zonder
+     elkaar te kennen. De kassaknop opende ineens een spelavond. Vandaar een
+     eigen pad; de dubbele-sleutel-controle over de gids ving het. */
+  '/apps/spelscherm.html': G('Het gedeelde spelscherm: een lopend potje op de televisie, voor iedereen in de kamer.',
     ['Open een potje in de app en kies "Op het grote scherm"', 'Typ de code hier over', 'Iedereen speelt gewoon op zijn eigen telefoon'],
     'Dit scherm kijkt alleen mee: het heeft geen inlog en toont nooit iemands eigen kaarten of letters.'),
   '/apps/voertuig.html': G('RTG Voertuig: een voertuig uit uw vloot, met zijn papieren en of hij vandaag mag rijden.',

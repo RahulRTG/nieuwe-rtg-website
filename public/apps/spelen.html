@@ -833,7 +833,7 @@ $('#sScherm').addEventListener('click', async ()=>{
   try{
     const d = await api('projectie-open', { id: huidig.id });
     $('#sSchermCode').hidden = false;
-    $('#sSchermCode').innerHTML = 'Open <b>rtg.nl/apps/scherm.html</b> op de tv en typ <b>' + esc(d.code) + '</b>';
+    $('#sSchermCode').innerHTML = 'Open <b>rtg.nl/apps/spelscherm.html</b> op de tv en typ <b>' + esc(d.code) + '</b>';
   }catch(e){ meld(e.message); }
 });
 $('#sNabespreken').addEventListener('click', async ()=>{

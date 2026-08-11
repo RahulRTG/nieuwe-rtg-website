@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTG Game Night</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="/apps/foundation/stijl.css">
+<script src="/apps/foundation/palet.js"></script>
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<!-- De basis-laag hoort ook hier: hij draagt de toegankelijkheidsstand
+     (grote tekst, minder beweging) en die geldt op een televisie net zo goed.
+     De metgezel doet zonder inlog niets, en dat is precies wat we willen -- hij
+     laadt wel `wauw.js` mee, en daar zit de wake lock in: een gedeeld scherm
+     hoort tijdens een potje niet in slaap te vallen. -->
+<script src="/shared/basis.js"></script>
+<script src="/shared/metgezel.js" defer></script>
+<style>
+  /* HET GEDEELDE SCHERM. Dit is de enige RTG-pagina die op een televisie hoort
+     en niet in een hand, en dat verandert alles aan de maatvoering: alles is
+     gemaakt om vanaf de bank te lezen. Wat NIET verandert zijn de merkregels --
+     zwart, wit, bordeaux, Bodoni voor de koppen en Inter voor de rest.
+
+     Er is bewust geen inlog, geen menu en geen navigatie. Dit scherm is een
+     PROJECTIE en geen deelnemer: het toont wat iedereen in de kamer toch al
+     ziet, en het kan niets terugsturen. Zie server/kern/spellen/projectie.js. */
+  body{margin:0;background:var(--zwart,#0C0C0B);color:#fff;
+    font-family:var(--sans,Inter,system-ui,sans-serif);overflow:hidden;}
+  .vol{min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;
+    align-items:center;justify-content:center;padding:4vmin;text-align:center;gap:3vmin;}
+  h1{font-family:var(--serif,'Bodoni Moda',serif);font-weight:500;
+    font-size:clamp(1.6rem,5vmin,3.2rem);margin:0;letter-spacing:.01em;}
+  .merk{font-size:clamp(.6rem,1.4vmin,.9rem);letter-spacing:.34em;text-transform:uppercase;
+    color:var(--zacht,#8A8680);font-weight:700;}
+  .code{font-family:var(--serif,'Bodoni Moda',serif);font-size:clamp(2.4rem,13vmin,8rem);
+    letter-spacing:.16em;line-height:1;}
+  .uitleg{color:var(--zacht,#8A8680);font-size:clamp(.8rem,2vmin,1.2rem);max-width:34rem;}
+  .veld{font-size:clamp(1rem,3vmin,1.6rem);padding:.5rem .8rem;text-align:center;
+    letter-spacing:.2em;text-transform:uppercase;background:#141310;color:#fff;
+    border:1px solid #2a2622;width:min(90vw,16rem);}
+  /* De stand: grote namen, en de beurt in bordeaux. Bordeaux is hier een
+     accent op zwart en dus de heldere variant -- de gewone is te donker. */
+  .rij{display:flex;flex-wrap:wrap;gap:3vmin;justify-content:center;align-items:flex-end;}
+  .sp{display:flex;flex-direction:column;gap:.4vmin;min-width:8rem;}
+  .sp .nm{font-size:clamp(.9rem,2.4vmin,1.5rem);color:var(--zacht,#8A8680);}
+  .sp .pt{font-family:var(--serif,'Bodoni Moda',serif);font-size:clamp(2rem,9vmin,5rem);line-height:1;}
+  .sp.aan .nm{color:#C23A5E;font-weight:700;}
+  .sp.aan .pt{color:#fff;}
+  .groot{font-family:var(--serif,'Bodoni Moda',serif);font-size:clamp(2rem,8vmin,4.5rem);line-height:1.1;}
+  .fout{color:#C23A5E;}
+  .klein{font-size:clamp(.7rem,1.6vmin,1rem);color:var(--zacht,#8A8680);}
+</style>
+</head>
+<body>
+<main class="vol" id="hoofd">
+  <div class="merk">RTG Game Night</div>
+  <h1 id="titel">Zet dit scherm aan tafel</h1>
+  <div class="uitleg">Open een potje in de RTG-app, kies <b>Op het grote scherm</b> en typ de code hier over.</div>
+  <input class="veld" id="codeveld" maxlength="8" autocomplete="off" spellcheck="false" placeholder="CODE" aria-label="Kamercode">
+  <div class="klein" id="melding"></div>
+</main>
+<script>
+/* Alles op deze pagina is lezen. Er wordt niets verstuurd behalve het ophalen
+   van de stand, en er is niets in te loggen: de code is het hele bewijs en hij
+   geeft alleen de publieke laag van EEN potje. */
+'use strict';
+const $ = (s) => document.querySelector(s);
+let code = (location.hash || '').replace(/^#/, '').trim().toUpperCase();
+let timer = null;
+
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;' }[c])); }
+
+async function haal(){
+  if (!code) return;
+  let d;
+  try{
+    const r = await fetch('/api/projectie/' + encodeURIComponent(code));
+    d = await r.json();
+    if (!r.ok) throw new Error(d.error || 'Deze code doet het niet.');
+  }catch(e){ return toonFout(e.message); }
+  teken(d);
+}
+
+function toonFout(tekst){
+  $('#hoofd').innerHTML = '<div class="merk">RTG Game Night</div>' +
+    '<h1 class="fout">' + esc(tekst) + '</h1>' +
+    '<div class="uitleg">Vraag de gastheer om een nieuwe code, of ververs deze pagina.</div>';
+  if (timer) { clearInterval(timer); timer = null; }
+}
+
+/* Wat hier getekend wordt is precies wat de server stuurt, en niet meer. Er
+   staat met opzet geen enkele spelregel in deze pagina: komt er een veld bij
+   dat we niet kennen, dan tonen we het gewoon niet -- en nooit iets wat er niet
+   in zat. */
+function teken(d){
+  const st = d.staat || {};
+  const rij = (d.spelers || []).map((naam, i) => {
+    const punt = Array.isArray(st.scores) ? st.scores[i]
+      : (Array.isArray(st.stand) && st.stand[i] ? (st.stand[i].punten != null ? st.stand[i].punten : st.stand[i].goed) : null);
+    const teamAan = d.modus === 'teams' && Array.isArray(d.teams) && d.teams[i] === d.teams[d.beurt];
+    const aan = d.klaar ? false : (d.modus === 'teams' ? teamAan : i === d.beurt);
+    return '<div class="sp' + (aan ? ' aan' : '') + '">' +
+      '<div class="pt">' + (punt == null ? '·' : esc(punt)) + '</div>' +
+      '<div class="nm">' + esc(naam) + '</div></div>';
+  }).join('');
+
+  let midden;
+  if (d.klaar) midden = '<div class="groot">' + (d.winnaar ? esc(d.winnaar) + ' wint' : 'Gelijkspel') + '</div>';
+  else if (st.bezig && st.rader != null && d.spelers)
+    // 30 Seconden: wie raadt er. De KAART staat hier niet, en kan hier niet staan.
+    midden = '<div class="groot">' + esc(d.spelers[st.rader] || '') + ' raadt</div>';
+  else if (st.tot != null) midden = '<div class="klein">tot ' + esc(st.tot) + ' punten</div>';
+  else midden = '';
+
+  $('#hoofd').innerHTML = '<div class="merk">' + esc(d.naam) + '</div>' +
+    midden + '<div class="rij">' + rij + '</div>' +
+    '<div class="klein">code ' + esc(code) + '</div>';
+}
+
+$('#codeveld').addEventListener('input', (e) => {
+  const v = e.target.value.trim().toUpperCase();
+  if (v.length < 8) return;
+  code = v; location.hash = v; start();
+});
+
+function start(){
+  if (timer) clearInterval(timer);
+  haal();
+  // rustig: een gedeeld scherm hoeft niet elke seconde te verversen
+  timer = setInterval(haal, 3000);
+}
+if (code) { $('#codeveld').value = code; start(); }
+</script>
+</body>
+</html>

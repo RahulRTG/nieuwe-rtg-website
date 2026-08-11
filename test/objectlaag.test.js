@@ -35,6 +35,7 @@ function kernMet(over) {
     wbwGroep: () => ({ groep: { leden: [] } }),
     vonkMijn: () => ({ status: 200, matches: [] }),
     rvMatches: () => ({ status: 200, matches: [] }),
+    db: { data: { supplierTypes: {} } },
     mijnSpellen: () => ({ potjes: [], uitnodigingen: [] }),
     bestandenLijst: () => ({ eigen: [], gedeeld: [] }),
     comm: { isAanwezig: () => false }
@@ -401,5 +402,117 @@ test('geen cap koppelt een codenaam aan een dossier met echte namen', () => {
   for (const id of Object.keys(CAPS)) {
     assert.ok(!/attentie|entourage|cercle/i.test(id),
       'cap "' + id + '" koppelt de codenaam-wereld aan een dossier met echte namen');
+  }
+});
+
+/* DE WERELD OM EEN MOMENT HEEN (LIFE.md fase 6).
+
+   Het punt van deze fase is de VORM, niet het aantal koppelingen. Een
+   bijeenkomst vraagt om een CAPABILITY -- een tafel, vervoer, een verblijf, een
+   kaartje -- en elk genre dat die cap draagt kan hem leveren. Een domein erbij
+   is dan geen koppeling erbij: het genre krijgt zijn cap in het register en
+   verschijnt vanzelf. Dat is dezelfde beweging waarmee de handelsketen van N²
+   weer N maakte.
+
+   DE MUTATIE: bouw in eventwereld.js een koppeling per GENRE in plaats van per
+   cap (bijvoorbeeld hard naar 'restaurant'). Dan telt `genres` niet meer mee met
+   het register, en deze toets zakt zodra er een genre bijkomt of afvalt. */
+test('een event vraagt om capabilities, niet om genres', () => {
+  const register = {
+    restaurant: { caps: ['menu', 'reservations', 'tickets'] },
+    beachclub: { caps: ['reservations', 'tickets'] },
+    taxi: { caps: ['rides'] },
+    hotel: { caps: ['bookings'] },
+    juwelier: { caps: ['retail'] }
+  };
+  const l = laag({
+    db: { data: { supplierTypes: register } },
+    genootschap: { mijne: () => [{ id: 'g1', naam: 'K' }], publiek: (gr) => gr, isLid: () => true, groepMet: () => null },
+    bijeenkomst: {
+      lijstVan: () => [{ id: 'b1', wat: 'Diner', datum: '2026-09-01', tijd: '20:00', waar: 'De Salon', plaatsen: 12 }],
+      publiek: (b) => b, mijnAgenda: () => ({ komt: [] })
+    }
+  });
+  const o = l.object('k', 'event', 'b1');
+  const caps = o.eromheen.map(x => x.cap);
+  assert.deepEqual(caps, ['reservations', 'rides', 'bookings', 'tickets']);
+
+  /* De telling komt uit het REGISTER en niet uit een lijstje hier. */
+  assert.equal(o.eromheen.find(x => x.cap === 'reservations').genres, 2);
+  assert.equal(o.eromheen.find(x => x.cap === 'rides').genres, 1);
+
+  /* Elke weg wijst naar een pagina die bestaat -- zelfde regel als bij de caps,
+     en om dezelfde reden (PLATFORM.md: zeventien beloftes zonder route). */
+  for (const e of o.eromheen) {
+    assert.ok(e.naam && e.wat && e.app, 'regel ' + e.cap + ' is niet compleet');
+    assert.ok(e.waarom, 'regel ' + e.cap + ' staat er zonder reden');
+    assert.ok(fs.existsSync(path.join(APPS, e.link.replace(/^\/apps\//, '').split('#')[0])),
+      'de weg voor "' + e.cap + '" wijst naar ' + e.link + ', en die pagina bestaat niet');
+  }
+});
+
+/* Elke regel hangt aan een FEIT uit de bijeenkomst zelf; er wordt niets geraden.
+
+   DE MUTATIE: zet 'bookings' of 'tickets' altijd aan. Dan stelt het platform een
+   overnachting voor bij een lunch, en kaarten bij iets zonder capaciteit. */
+test('wat erbij hoort volgt uit de bijeenkomst en wordt niet geraden', () => {
+  const maak = (over) => laag({
+    db: { data: { supplierTypes: {} } },
+    genootschap: { mijne: () => [{ id: 'g1', naam: 'K' }], publiek: (gr) => gr, isLid: () => true, groepMet: () => null },
+    bijeenkomst: {
+      lijstVan: () => [Object.assign({ id: 'b1', wat: 'X', datum: '2026-09-01' }, over)],
+      publiek: (b) => b, mijnAgenda: () => ({ komt: [] })
+    }
+  }).object('k', 'event', 'b1').eromheen.map(x => x.cap);
+
+  assert.deepEqual(maak({ tijd: '12:30' }), ['reservations', 'rides'],
+    'een lunch vraagt geen overnachting');
+  assert.deepEqual(maak({ tijd: '20:00' }), ['reservations', 'rides', 'bookings']);
+  assert.deepEqual(maak({ tijd: '12:30', plaatsen: 40 }), ['reservations', 'rides', 'tickets'],
+    'plaatsen is het enige signaal in de data dat op entree lijkt');
+});
+
+/* Een afgelaste bijeenkomst krijgt geen wereld eromheen: een tafel voorstellen
+   bij iets dat niet doorgaat is erger dan zwijgen.
+
+   EERLIJK OVER WELKE WACHT DIT IS. De eerst opgeschreven mutatie was "haal de
+   afgelast-controle uit eromheen()", en die is gedraaid en liet deze toets NIET
+   zakken: event.js keert bij een afgelaste bijeenkomst al vroeg terug met een
+   andere vorm, dus die tweede controle was dode code. Hij is weggehaald.
+
+   DE MUTATIE DIE HEM WEL LAAT ZAKKEN: haal `eromheen: []` uit de afgelast-tak
+   van event.js. */
+test('een afgelaste bijeenkomst krijgt geen wereld eromheen', () => {
+  const l = laag({
+    db: { data: { supplierTypes: {} } },
+    genootschap: { mijne: () => [{ id: 'g1', naam: 'K' }], publiek: (gr) => gr, isLid: () => true, groepMet: () => null },
+    bijeenkomst: {
+      lijstVan: () => [{ id: 'b1', wat: 'Borrel', datum: '2026-09-01', tijd: '20:00', afgelast: '2026-08-20' }],
+      publiek: (b) => b, mijnAgenda: () => ({ komt: [] })
+    }
+  });
+  assert.deepEqual(l.object('k', 'event', 'b1').eromheen, []);
+});
+
+/* Deze laag BOEKT NIETS en belooft niets. Er is geen veld dat een reservering
+   aankondigt, en geen functie die iets aanvraagt -- elke handeling zou een DERDE
+   partij raken (een zaak die een tafel vrijhoudt), en CLAUDE.md verbiedt te doen
+   alsof een boeking verwerkt is.
+
+   DE MUTATIE: voeg aan een regel een veld toe als `gereserveerd`, `bevestigd` of
+   `aangevraagd`. */
+test('de wereld om een event heen boekt niets en belooft niets', () => {
+  const l = laag({
+    db: { data: { supplierTypes: { restaurant: { caps: ['reservations'] } } } },
+    genootschap: { mijne: () => [{ id: 'g1', naam: 'K' }], publiek: (gr) => gr, isLid: () => true, groepMet: () => null },
+    bijeenkomst: {
+      lijstVan: () => [{ id: 'b1', wat: 'Diner', datum: '2026-09-01', tijd: '20:00' }],
+      publiek: (b) => b, mijnAgenda: () => ({ komt: [] })
+    }
+  });
+  for (const e of l.object('k', 'event', 'b1').eromheen) {
+    assert.deepEqual(Object.keys(e).sort(),
+      ['app', 'cap', 'genres', 'link', 'naam', 'waarom', 'wat'],
+      'geen veld dat een boeking of aanvraag suggereert');
   }
 });

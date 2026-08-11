@@ -15,8 +15,10 @@
 'use strict';
 
 const { capVoor } = require('./caps');
+const maakEventwereld = require('./eventwereld');
 
 module.exports = ({ kern }) => {
+  const wereld = maakEventwereld({ kern });
 
   /* De bijeenkomst plus de groep waar hij in zit. Zoekt alleen in de groepen van
      dit lid; sess wordt doorgegeven omdat publiek() er `vanMij` en
@@ -57,7 +59,7 @@ module.exports = ({ kern }) => {
       /* Niets meer dan de weg naar de groep. Met opzet geen cap met een
          doorgestreepte naam of een uitleg waarom het niet kan: een uitgeschakelde
          knop is nog steeds een knop, en het lid heeft hier niets te kiezen. */
-      return { titel: b.wat, caps: uit.filter(Boolean), stil: [],
+      return { titel: b.wat, caps: uit.filter(Boolean), stil: [], eromheen: [],
         over: { datum: b.datum, tijd: b.tijd, waar: b.waar, afgelast: b.afgelast, gastheer: b.gastheer } };
     }
 
@@ -69,7 +71,13 @@ module.exports = ({ kern }) => {
        weet wie de gastheer is, en dat hoort maar op een plek te wonen. */
     if (b.vanMij) uit.push(capVoor('gastheer', 'u heeft deze bijeenkomst uitgeschreven'));
 
-    return { titel: b.wat, caps: uit.filter(Boolean), stil: [],
+    /* DE WERELD OM DIT MOMENT HEEN (LIFE.md fase 6). Wat erbij hoort -- een
+       tafel, vervoer, blijven slapen, kaarten -- en waar u het regelt. Er gaat
+       hier niets de deur uit; zie de kop van ./eventwereld.js. */
+    let eromheen = [];
+    try { eromheen = wereld.eromheen(b); } catch (e) { /* een stille wereld is geen kapot event */ }
+
+    return { titel: b.wat, caps: uit.filter(Boolean), stil: [], eromheen,
       over: { datum: b.datum, tijd: b.tijd, waar: b.waar, afgelast: null, gastheer: b.gastheer,
         ja: b.ja, misschien: b.misschien, vol: b.vol } };
   }

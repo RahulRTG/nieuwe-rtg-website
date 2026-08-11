@@ -237,7 +237,7 @@ vorige zijn toetsen heeft (LAT.md).
 | 3 | **de relatieruimte**: wat twee mensen samen hebben, als projectie over de domeinen waar ze allebei in zitten, met par. 4.2 in de constructie | **er** |
 | 4 | **de momentlijn**: leven in plaats van posts -- vandaag, vrijdag, zaterdag, volgende week | **er** |
 | 5 | **Life Command + de orchestrator** op niveau klaarzetten, met het actielog eronder | **er** |
-| 6 | **de koppelingen naar buiten**: een community-actie die een Foundation-project wordt, een zaak-event dat de handelsketen in gaat (tickets, vervoer, tafel, wallet) | -- |
+| 6 | **de koppelingen naar buiten**: een event dat om een CAPABILITY vraagt (tafel, vervoer, verblijf, kaarten) in plaats van om een genre | **er** |
 
 Fase 1 is met opzet klein en volledig omkeerbaar: hij voegt niets toe aan wat een
 lid kan doen, alleen aan wat het platform ziet. Alles daarna staat erop.
@@ -487,6 +487,52 @@ plaats van het systeem stiller te maken, zou een instelling zijn die liegt.
 **Daarmee heeft RTG Sociaal alle vijf de lagen** van het wereldpatroon uit
 PLATFORM.md: graaf (fase 1), beleid, cockpit (fase 5), een gegronde stem — elk
 voorstel en elke logregel draagt de gegevens waarop hij rust — en het actielog.
+
+### Waar fase 6 staat
+
+`server/kern/objectlaag/eventwereld.js`, zichtbaar als `eromheen` op een
+event-object. Getoetst in `test/objectlaag.test.js` en over de echte route in
+`test/objectlaagroutes.test.js`.
+
+**De vorm is het punt, niet het aantal koppelingen.** De verleiding was om per
+stuk te bouwen — bijeenkomst naar horeca, dan naar taxi, dan naar hotel — en dat
+is de N²-val: het tweede paar kost weer evenveel als het eerste. In plaats
+daarvan vraagt een bijeenkomst om een **capability** (`reservations`, `rides`,
+`bookings`, `tickets`), en elk genre dat die cap draagt kan hem leveren. Het
+genre-register draagt die caps al voor alle 73 genres. **Een domein erbij is dus
+geen koppeling erbij:** het genre krijgt zijn cap in het register en verschijnt
+vanzelf. Dezelfde beweging waarmee de handelsketen van N² weer N maakte.
+
+**Wat erbij hoort volgt uit de bijeenkomst en wordt niet geraden.** Een tafel en
+vervoer altijd (mensen komen ergens samen en moeten erheen), blijven slapen
+alleen 's avonds, kaarten alleen als de bijeenkomst plaatsen kent — het enige
+signaal in de data dat op entree lijkt. Er staat geen "u wilt vast een taxi" en
+geen voorkeur uit gedrag; elke regel draagt zijn `waarom`.
+
+**Er wordt niets geboekt en niets beloofd.** Elke handeling zou een dérde partij
+raken — een zaak die een tafel vrijhoudt, een chauffeur die rijdt — en CLAUDE.md
+verbiedt te doen alsof een boeking verwerkt is. Wat er staat is: dit hoort bij dit
+moment, en dit is de app waar u het regelt. Een toets zakt op elk veld dat een
+reservering suggereert.
+
+### De gegronde stem: Rahul in RTG Sociaal
+
+`server/routes/socialerahul.js`, met `POST /api/sociaal/rahul`. Zelfde vorm als
+`routes/geldrahul.js` — twee werelden die hun stem anders bouwen, zijn twee
+producten — met één wezenlijk verschil: **hij leest, en meer niet.** De geldkant
+mag binnen beleid uitvoeren omdat de grens daar het eigen tegoed is; hier is de
+grens een ander mens. Klaarzetten gebeurt in Life Command, bevestigen doet de
+mens, en deze route heeft geen weg naar allebei.
+
+Zijn context komt uit de graaf en nergens anders — een eigen bron zou een tweede
+antwoord op dezelfde vraag geven — en **elk antwoord draagt zijn bronnen**, ook
+het vaste antwoord zonder AI-sleutel. Juist dat: een vast antwoord dat zichzelf
+niet verantwoordt lijkt zekerder dan het is.
+
+In de systeemcontext staat expliciet dat hij geen uitspraak doet over hoe een
+relatie ervoor staat, er geen cijfer aan geeft en nooit aanspoort om weer eens
+iets van u te laten horen (par. 4.1 en 4.4). Een verbod in een prompt is geen
+grens, dus de route zelf kan het ook niet: er is geen enkele schrijffunctie.
 
 ## 8. De acht besturingssystemen -- een aparte beslissing
 

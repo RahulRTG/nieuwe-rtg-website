@@ -248,3 +248,54 @@ test('een onbekende soort en een sessie zonder pas komen er niet in', async () =
   const zonder = await api('/api/sociaal/object', { soort: 'groep', id: groepId });
   assert.ok(zonder.status === 401 || zonder.status === 403, 'zonder inlog geen object');
 });
+
+/* DE GEGRONDE RAHUL VAN DEZE WERELD (LIFE.md par. 6, vierde laag).
+
+   Twee dingen bewaken deze toets, en ze zijn allebei harder dan "er komt tekst
+   uit":
+
+     1. HIJ NOEMT ZIJN BRONNEN, ook zonder AI-sleutel. Een antwoord dat zichzelf
+        niet verantwoordt is een orakel (GELD.md par. 5, LEVEN.md par. 2.10) --
+        en juist het vaste antwoord zonder sleutel lijkt zekerder dan het is.
+     2. HIJ VERANDERT NIETS. De grens van deze wereld is een ander mens; deze
+        route heeft geen enkele weg naar klaarzetten of bevestigen.
+
+   DE MUTATIE: haal `gegevens` uit het antwoord, of laat de route iets uitvoeren.
+   Het tweede is bovendien in de systeemcontext verboden, maar een verbod in een
+   prompt is geen grens -- daarom staat hij ook in de route zelf. */
+test('Rahul antwoordt met zijn bronnen erbij en verandert niets', async () => {
+  const voor = await json(await api('/api/sociaal/command', {}, lidToken));
+  const r = await api('/api/sociaal/rahul', { vraag: 'wat speelt er?' }, lidToken);
+  assert.equal(r.status, 200);
+  const d = await json(r);
+  assert.ok(d.antwoord, 'er komt een antwoord');
+  assert.ok(Array.isArray(d.gegevens) && d.gegevens.length,
+    'en de gegevens waarop het rust reizen mee');
+  assert.match(d.gegevens[0], /wacht op u/);
+
+  /* NIETS VERANDERD: dezelfde stand als ervoor. */
+  const na = await json(await api('/api/sociaal/command', {}, lidToken));
+  assert.deepEqual(na.stand, voor.stand, 'Rahul leest; hij handelt niet');
+  assert.deepEqual((na.voorstellen || []).map(v => v.id), (voor.voorstellen || []).map(v => v.id));
+
+  /* En hij staat achter dezelfde deur als de rest van deze wereld. */
+  const zonder = await api('/api/sociaal/rahul', { vraag: 'x' });
+  assert.ok(zonder.status === 401 || zonder.status === 403);
+});
+
+/* DE WERELD OM EEN EVENT HEEN, over de echte route (LIFE.md fase 6). De vorm is
+   los getoetst in test/objectlaag.test.js; hier gaat het om de keten: een echte
+   bijeenkomst, het echte genre-register, en een weg naar een app die bestaat. */
+test('een echt event weet wat erbij hoort, en boekt niets', async () => {
+  const d = await json(await api('/api/sociaal/object', { soort: 'event', id: bijeenkomstId }, lidToken));
+  assert.ok(Array.isArray(d.eromheen) && d.eromheen.length, 'een avondbijeenkomst kent zijn wereld');
+  const caps = d.eromheen.map(x => x.cap);
+  assert.ok(caps.includes('reservations') && caps.includes('rides'));
+  for (const e of d.eromheen) {
+    assert.ok(e.genres > 0, 'de cap "' + e.cap + '" wordt door geen enkel genre gedragen');
+    assert.match(e.link, /^\/apps\/[a-z]+\.html/);
+    assert.ok(e.waarom, 'elke regel zegt waarom hij er staat');
+    assert.ok(!('gereserveerd' in e) && !('aangevraagd' in e),
+      'er wordt niets geboekt en niets beloofd');
+  }
+});

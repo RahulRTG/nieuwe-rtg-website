@@ -37,6 +37,13 @@ module.exports = (kern) => {
     res.json(Object.assign({ ok: true }, kern.socialegraaf.lijn(req.session.key)));
   });
 
+  /* De gegronde Rahul van deze wereld (LIFE.md par. 6, vierde laag). Apart
+     bestand omdat hij een andere afhankelijkheid draagt -- de AI-aanbieder --
+     en die hoort niet door de leesroutes heen te lopen; zelfde opzet als
+     routes/geld.js met geldrahul. HIJ LEEST ALLEEN: klaarzetten gebeurt in Life
+     Command en bevestigen doet de mens. */
+  require('./socialerahul')(kern);
+
   /* HET BELEID VAN HET LID (LIFE.md par. 6, de tweede laag van het
      wereldpatroon). Lezen en zetten; wat het KAN is uitsluitend versmallen.
 

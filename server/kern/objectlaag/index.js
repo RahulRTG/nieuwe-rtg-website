@@ -71,6 +71,9 @@ module.exports = ({ kern }) => {
        en een event ZIJN al een gedeelde ruimte; daar zou "wat hebben wij samen"
        de vraag naar zichzelf zijn. */
     if (r.samen) { uit.samen = r.samen; uit.telling = r.telling; }
+    /* De wereld om een event heen (fase 6). Alleen bij een event: een persoon en
+       een groep zijn geen moment met een plek en een tijd. */
+    if (r.eromheen) uit.eromheen = r.eromheen;
     return uit;
   }
 

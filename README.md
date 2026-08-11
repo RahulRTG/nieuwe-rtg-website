@@ -3672,6 +3672,34 @@ en al. Je *plaats* gaat over het hele veld, de *namenlijst* blijft je eigen
 kring: een lijst met codenamen van vreemden is een sociale laag die dit huis
 nergens anders heeft.
 
+### Magnaat: twee vormen, en een economie op een echte stad
+
+Magnaat draagt sinds kort **twee vormen** (`variant: vorm`). `bord` is het
+bordspel met veertig velden, dobbelstenen en huizen — ongewijzigd, want het is de
+enige Magnaat die met zes mensen binnen een uur aan tafel te spelen is.
+`economie` is een economische simulatie op een echte stad.
+
+De economie (`kern/spellen/magnaat/`) bestaat uit een kaart (zones met een echt
+karakter — haven, boulevard, centrum, station, bedrijventerrein — waaruit de
+economische eigenschappen van elk kavel worden **afgeleid**), zeven sectoren op
+**één** economische kern, een vraagmodel met zes bevolkingssegmenten, en een klok
+die **bijrekent in plaats van tikt**: bij elke aanraking wordt uitgerekend
+hoeveel spelmaanden er verstreken zijn. Dat overleeft een herstart, schrijft
+niets terwijl niemand speelt, en is deterministisch — tien maanden in één keer
+geeft hetzelfde als tien maanden los.
+
+**De RTFoundation is er een economische actor**, geen sausje: een deel van de
+omzet van de stad vult een lokale pot, die pot bouwt projecten, en die projecten
+**verschuiven de eigenschappen van de zone** waar ze staan. Een bibliotheek
+levert op termijn beter opgeleid personeel, en dat is in de simulatie te meten.
+
+**De kaart is echt, en één filter draagt dat.** `scripts/kaart-import.js` zet
+open adresdata om in kavels en gooit **alles met een woonfunctie eruit** — een
+adres in het spel is dus per definitie een adres waar geen huishouden staat
+ingeschreven. Zolang een stad `bron: 'handmatig'` draagt staan er echte
+straatnamen maar géén huisnummers in: een huisnummer is een bewering over een
+specifiek pand en hoort uit een register te komen.
+
 ### Varianten: hetzelfde spel, andere instellingen
 
 Een spel kan zeggen wat er aan te kiezen valt (`varianten` in de descriptor), en

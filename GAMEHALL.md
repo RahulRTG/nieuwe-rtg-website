@@ -592,43 +592,242 @@ ranked en telt niet mee in de uitslagen.
 
 ---
 
-## 12. Magnaat als vlaggenschip
+## 12. Magnaat — The Living Economy
 
-Het spel met verreweg de meeste productruimte: van "een bordspel met geld" naar
-een langlopende sociale businessstrategie. Steden en economische zones met
-sectoren (vastgoed, horeca, retail, media, mobiliteit, logistiek, energie,
-toerisme), specialisatie, markten die bewegen (`TOERISME +18%`,
-`ENERGIECRISIS`, `RENTEVERHOGING`), onderhandelingen, veilingen, leningen.
+Het spel met verreweg de meeste productruimte, en het enige waar "meer" ook
+werkelijk iets anders wordt: van een bordspel met geld naar een **server-
+authoritatieve, AI-verrijkte, persistente economische simulatie op echte lokale
+geografie**, waarin spelers altijd kunnen handelen, bedrijven van elkaar
+afhankelijk zijn, en maatschappelijke ontwikkeling een zichtbare economische
+actor is in plaats van een sausje.
 
-**Gekozen: meteen de volledige economische wereld**, niet eerst een async-versie
-van het bestaande bord. Dat maakt Magnaat het duurste onderdeel van fase 1, en
-het betekent dat de drie grenzen hieronder allemaal tegelijk meekomen.
+Eén motor, drie ervaringen:
 
-Wat dit technisch bijzonder maakt is niet de economie maar de **duur**. Een
-campagne van drie weken raakt drie bestaande grenzen:
+| Vorm | Duur | Tijdschaal | Wat het is |
+|---|---|---|---|
+| **Quick** | 60–90 min | 1 minuut ≈ 1 spelmaand | een avond met vrienden |
+| **Campaign** | uren tot 30 dagen | dag ≈ week, of week ≈ jaar | een seizoen |
+| **Living World** | geen einde | dag ≈ dag | een permanente economie |
+
+Het verschil tussen de drie is **de klok en wat er blijft staan**, niet de
+regels. Dat is de hele architectuurgedachte: drie spellen bouwen zou drie keer
+dezelfde fouten opleveren.
+
+---
+
+### 12.1 Drie besluiten die het fundament zijn
+
+**Het bordspel blijft.** Magnaat met 40 velden, dobbelstenen en huizen wordt
+`variant: { vorm: 'bord' }`; de economie wordt `vorm: 'economie'`. Dat is bijna
+gratis sinds §22 er staat, en niemand raakt een werkend spel kwijt — het bord is
+bovendien de enige Magnaat die met zes mensen binnen een uur aan tafel te spelen
+is.
+
+**De kaart is echt, en één filter draagt het.** Gekozen: echte straten en
+adressen uit open data. Wat dat veilig maakt is niet een belofte maar een
+zeef die in de importeur zit: **alles met een woonfunctie valt eruit.** De BAG
+kent per verblijfsobject een `gebruiksdoel` (woonfunctie, winkelfunctie,
+kantoorfunctie, industriefunctie, logiesfunctie, bijeenkomstfunctie, …). Alleen
+de niet-woonfuncties worden speelbaar kavel. Een echt adres in het spel is dus
+per definitie een adres waar geen huishouden op staat ingeschreven, en dat is
+een controleerbare regel in plaats van een goede bedoeling.
+
+> **Wat er vandaag in de repo staat, en waarom dat minder is.** De importeur
+> (`scripts/kaart-import.js`) is er en doet precies het bovenstaande. De data
+> niet: de bouwomgeving waarin dit geschreven is laat geen verkeer naar PDOK of
+> Overpass toe. Wat er nu ligt is één stad met **echte straatnamen en zones,
+> zonder huisnummers**, en elk stadsbestand draagt een veld `bron` dat zegt waar
+> het vandaan komt (`open-data` of `handmatig`). Zolang dat veld op `handmatig`
+> staat is een kavel "Halkade, kavel 7" en geen "Halkade 12". Er staat dus
+> nergens een adres dat doet alsof het uit een register komt.
+
+**De AI verzint nooit een getal.** Vier lagen, en de volgorde is de regel:
+
+```
+Game server (waarheid)   geld, eigendom, contracten, timing, uitkomsten
+   ↑
+Simulation engine        vraag, aanbod, personeel, markten, groei
+   ↑
+Agent layer              AI-bedrijven, managers, gemeente, Foundation
+   ↑
+Generative AI            nieuws, dialoog, onderhandeling, uitleg
+```
+
+Nooit: *"de AI besluit dat je €5M verdiend hebt."* Wel: *"de engine rekent €5M
+en de AI legt uit waardoor."* Dat is dezelfde regel als bij Rahul in het potje
+(§11) en bij de dagopgave (§13), en hij is hier het strengst omdat er geld in
+zit.
+
+---
+
+### 12.2 De wereld
+
+**Een stad is zones, een zone is kavels.** Een zone draagt het karakter
+(haven, boulevard, centrum, station, bedrijventerrein, strand, woonwijk-rand);
+een kavel draagt de economische eigenschappen die de vision noemt:
+bereikbaarheid (OV/auto/fiets/lopen), passanten per dagdeel, toerisme, zakelijke
+vraag, huur- en grondwaarde, geluid, parkeren, afstand tot centrum en
+luchthaven, concurrentiedruk, en geschiktheid per sector.
+
+Die eigenschappen zijn niet per kavel met de hand geschreven — dat zou bij
+duizend kavels een dataset van beweringen zijn. Ze worden **afgeleid** uit de
+zone plus wat de open data over het pand zelf zegt (functie, oppervlak,
+afstand tot station/centrum). Eén formule, controleerbaar, en hij verschuift mee
+als de stad verandert.
+
+**Synthetische bevolking, geen echte inwoners.** Segmenten (studenten, gezinnen,
+toeristen, zakelijke reizigers, ouderen, nachtpubliek, budget, hoog inkomen) met
+gedrag dat afhangt van dag, dagdeel, weer, seizoen, evenement, inkomen, prijs,
+reputatie en bereikbaarheid. Er wordt geen enkele echte persoon gemodelleerd, en
+dat is geen concessie: aggregaten zijn hier ook gewoon beter — je hoeft geen
+LLM per burger te draaien, en dat is precies wat dit schaalbaar houdt.
+
+---
+
+### 12.3 Je bent nooit alleen aan de beurt
+
+Dit is de mechaniek waar Long Play op staat of valt, en de descriptor draagt hem
+al (`buitenBeurt`). Twee soorten handeling:
+
+**Grote acties** — beurt- of cooldown-gebonden: een bedrijf kopen, groot bouwen,
+een megacontract tekenen, fuseren, overnemen, een grote lening, een beursgang,
+een nieuw gebied betreden.
+
+**Vrije acties** — vrijwel altijd: prijzen, personeel, roosters, marketing,
+onderhoud, onderhandelen, inkopen, training, bouw voorbereiden, rapporten,
+biedingen, managers instellen, beleid wijzigen.
+
+Zonder dat onderscheid staat een partij van zes met 24 uur per beurt zes dagen
+stil tussen twee van jouw handelingen. Mét dat onderscheid heb je altijd iets te
+doen zonder dat iemand tegelijk online hoeft te zijn.
+
+---
+
+### 12.4 De klok: bijrekenen, niet doortikken
+
+De vision zegt "de server simuleert continu". De **uitvoering** wordt bewust
+anders, en dat is een technische keuze met gevolgen die zichtbaar horen te
+blijven: de wereld **rekent bij** wanneer iemand kijkt, op basis van de
+verstreken tijd, in vaste stappen.
+
+Waarom niet een achtergrondtik elke seconde:
+
+- een wereld die doortikt terwijl niemand speelt schrijft de hele nacht naar de
+  database, en dit huis heeft één proces en één bestand;
+- een herstart mag geen uren economie kosten — bijrekenen overleeft dat, een tik
+  niet;
+- bijrekenen is **deterministisch en narekenbaar**: dezelfde begintoestand plus
+  hetzelfde aantal stappen geeft dezelfde uitkomst, en dat is precies wat een
+  toets nodig heeft.
+
+Voor de speler is het verschil onzichtbaar, want dat is de bedoeling: je komt
+terug en krijgt **Sinds je weg was** — omzet, kosten, personeel, leveringen,
+bezetting, wat de concurrent deed. Dat overzicht is geen samenvatting van een
+logboek maar het verschil tussen twee gerekende standen.
+
+Wat er wél een echte achtergrondtik nodig heeft (een aflopend contract dat
+niemand komt bekijken) krijgt die pas als er een geval is dat het aantoonbaar
+vraagt. Nu bestaat dat geval niet.
+
+---
+
+### 12.5 RTFoundation is een economische actor
+
+Van fictieve abonnementsinkomsten in de spelwereld gaat 30% naar de Foundation:
+20% lokaal, 10% centraal. Dat geld wordt **zichtbaar besteed** — speeltuin,
+sporthal, school, cultuur, bibliotheek, mobiliteit — en die projecten veranderen
+de simulatie meetbaar: een sporthal verhoogt lokale aantrekkelijkheid, een
+school verbetert op termijn het arbeidspotentieel, een park raakt leefbaarheid
+en vastgoedwaarde.
+
+Dat is het verschil tussen "RTG-branding in een tycoon-spel" en een spel dat
+laat zien hoe commerciële activiteit en publieke voorziening elkaar voeden. Het
+is ook de plek waar Magnaat een andere filosofie krijgt dan *rijkste speler
+wint*.
+
+---
+
+### 12.6 Wat er nooit in komt
+
+**Geen enkele echte betaling die spelmacht geeft.** Geen spelgeld kopen, geen
+lootboxes, geen betaald voordeel, geen onderzoek versnellen met echt geld. Dit
+is geen beleidsregel die later versoepeld kan worden: een tycoon-game waarin
+geld werkt is precies het genre waar dat misgaat, en `CLAUDE.md` verbiedt het
+al. RTG-lidmaatschappen mogen in de spelwereld bestaan als *structuur* (welke
+diensten een fictief bedrijf afneemt), nooit als *voordeel*.
+
+**Geen straf voor wegblijven.** Een permanente wereld is de makkelijkste plek om
+per ongeluk een ratel te bouwen: kom je een week niet, dan ben je failliet. Dat
+mag niet, en de vorm ervan is de **Safe Management Policy** uit de vision — wie
+offline is, is beschermd: geen grote investeringen, cashbuffer bewaken,
+essentiële kosten door, urgente problemen mitigeren, grote beslissingen wachten.
+Alleen wie er expliciet voor kiest speelt agressiever door.
+
+---
+
+### 12.7 De progressiegrens, en waar hij hier bijt
+
+`progressieMag` (§grens) zegt: alles wat een prestatie bewaart buiten het potje
+bestaat alleen voor geverifieerd volwassen leden. Voor Magnaat betekent dat iets
+scherps, en het volgt uit de bestaande regel in plaats van dat het er los op
+gezet wordt:
+
+- **Quick en Campaign zijn een potje.** Ze beginnen, ze eindigen, er blijft niets
+  van over. Iedereen mag meedoen, precies zoals nu.
+- **De Living World is per definitie progressie buiten een potje** — je bedrijf
+  ís de opslag. Daar geldt de 18+-poort dus wel, en "je speelt gewoon, er wordt
+  alleen niets bewaard" is er geen zinnige vorm van: een permanente wereld
+  waarin niets bewaard wordt, is geen permanente wereld.
+
+Dat is een echte beperking en hij hoort hier te staan in plaats van pas op te
+vallen als een zestienjarige zijn concern kwijt is.
+
+---
+
+### 12.8 Wat de duur raakt aan bestaande grenzen
 
 | Grens | Nu | Nodig |
 |---|---|---|
-| Verlaten partij | `klok.vervalMs`, vandaag 30 dagen | **al opgelost, en het was geen probleem** — zie de correctie in §7 |
-| Replay | 500 zetten, dan oudste weg | eigen budget; met bieden en onderhandelen buiten de beurt loopt een campagne daaroverheen. Meet het vóór de economie er staat |
-| Buiten je beurt | `buitenBeurt: ['bouw','verkoop']` | uitbreiden met bod, aanbod, onderhandeling, herstructurering |
+| Verlaten partij | `klok.vervalMs` | **al opgelost, en het was geen probleem** — zie de correctie in §7 |
+| Replay | 500 zetten, dan oudste weg | eigen budget; met bieden en onderhandelen buiten de beurt loopt een campagne daaroverheen. **Meet het vóór de economie er staat** |
+| Buiten je beurt | `buitenBeurt: ['bouw','verkoop']` | uitbreiden met de hele vrije-actielijst uit §12.3 |
+| `zicht` | klopt vandaag omdat alles aan tafel openbaar is | zodra er geheime biedingen zijn is dat niet meer waar; `kijker` en `publiek` krijgen dan een eigen functie. De waarschuwing staat in de descriptor zelf |
 
-En één die de economie zelf meebrengt: **`zicht` van Magnaat klopt nu omdat
-alles aan tafel openbaar is.** Zodra er geheime biedingen en onderhandelingen
-zijn, is dat niet meer waar en moeten `kijker` en `publiek` een eigen functie
-krijgen die ze weglaat. Die waarschuwing staat in de descriptor zelf, zodat wie
-de economie bouwt er niet omheen kan lezen.
+---
 
-Dat derde is wat Long Play werkbaar maakt: als je alleen op je beurt iets kunt,
-staat een partij van zes spelers met 24 uur per beurt zes dagen stil tussen twee
-van jouw handelingen. Doordat bieden en onderhandelen buiten de beurt mogen, is
-er altijd iets te doen — zonder dat iemand tegelijk online hoeft te zijn. De
-descriptor draagt dat al; de motor moet het waarmaken.
+### 12.9 Fasering
 
-**Wat er niet in komt:** echte betalingen die spelmacht geven. Geen enkele.
-Startkapitaal, versnellingen en cosmetica staan los van de kassa. Dit is niet
-een beleidsregel die later versoepeld kan worden — een tycoon-game waarin geld
-werkt is precies het genre waar dat misgaat, en `CLAUDE.md` verbiedt het al.
+**Fase A — de economie die je kunt spelen (Quick)** — **af.** De wereld (stad,
+zones, 144 kavels met afgeleide eigenschappen), zeven sectoren op één
+economische kern, de vraag (zes bevolkingssegmenten, seizoen, concurrentiedruk,
+prijs, reputatie, marketing), de klok die bijrekent, de vrije acties naast de
+grote, de Foundation als actor, en een eindstand op meer dan geld alleen:
+vermogen, ondernemingswaarde, banen, reputatie en omzet.
+
+**En één ding dat hier is misgegaan en het vermelden waard is.** In de eerste
+versie was `omvang` tegelijk de maandcapaciteit — veertig couverts per *maand*
+voor een restaurant met veertig stoelen. Alle zeven sectoren draaiden verlies,
+en in een uitgespeelde campagne wonnen de spelers die **minder personeel**
+aannamen en **geen onderhoud** deden, want capaciteit was toch niet de bindende
+factor. Een spel waarin niets doen de beste zet is, is geen spel. Dat stond niet
+in de code te lezen en bleek pas uit een uitgespeelde campagne;
+`scripts/magnaat-balans.js` meet het nu en `test/spelmagnaat.test.js` houdt het
+vast (band: elke sector verdient zijn bouwsom in 8 tot 24 maanden terug).
+
+**Fase B — spelers tegen elkaar.** Contracten met looptijd en boete, supply
+chains tussen spelers, veilingen, aandelen en concerns, banken, verzekeringen,
+onderhoud en R&D.
+
+**Fase C — de permanente wereld.** Living World, AI-managers met beleidsregels,
+Safe Management Policy, vakantiemodus, overdracht, legacy, Magnaat Daily,
+lokale governance, de levende kaart.
+
+**Fase D — de rollen.** Meerdere mensen in één concern (CEO/CFO/COO), lokale
+ondernemerskringen, chat-integratie.
+
+Elke fase is speelbaar zonder de volgende. Dat is de eis: een half aangezette
+economie is gevaarlijker dan een afwezige, want dan gaat iemand er echt in
+bouwen.
 
 ---
 

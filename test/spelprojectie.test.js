@@ -109,9 +109,14 @@ test('verdwijnt het potje, dan verdwijnt de kamer', async () => {
 
 test('een spel zonder projectieweergave krijgt geen kamer', async () => {
   /* Dezelfde vraag als "heeft dit spel een zicht.publiek", en die wordt hier
-     niet een tweede keer beantwoord maar bij de weergave opgehaald. */
+     niet een tweede keer beantwoord maar bij de weergave opgehaald.
+
+     Hier stond Magnaat, tot die met de economie een publieke weergave kreeg
+     (de stad en de maand, en niemands boeken). De regel wordt nu gemeten op een
+     spel dat er echt geen heeft: bij Pesten is de hele spanning dat je elkaars
+     hand niet ziet, en een televisie in de kamer verandert daar niets aan. */
   const o = opstelling();
-  const r = await o.kern.spelNieuw('a', { soort: 'magnaat', grootte: 2, vrienden: ['b'], wereld: 'rtg' });
+  const r = await o.kern.spelNieuw('a', { soort: 'pesten', grootte: 2, vrienden: ['b'], wereld: 'rtf' });
   o.kern.spelAntwoord('b', r.id, true);
   const k = o.kern.projectieOpen('a', r.id);
   assert.equal(k.status, 400);

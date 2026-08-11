@@ -1,154 +1,83 @@
-/* Spelmotor "magnaat" (kern/spellen): Magnaat (monopoly-achtig): 40 velden in de
-   RTG-wereld, kopen, huur, bouwen, kanskaarten en de cel. Verbatim afgesplitst
-   uit kern/spellen.js; de lobby (aldaar) doet matchmaking, beurten en views en
-   roept deze motor via de gedeelde context aan. Het bord zelf (de velden, de
-   kaarten en de huurfactor) is pure data en woont in ./bord. */
-const { M_GROEP_HUIZEN, M_VELDEN, M_KAARTEN } = require('./bord');
+/* Spel "magnaat" (kern/spellen): TWEE VORMEN, EEN SPEL.
+
+   vorm: 'bord'      -- het bordspel met veertig velden, dobbelstenen, huizen en
+                        de cel. Staat in ./bordspel.js en is niet veranderd.
+   vorm: 'economie'  -- de economische simulatie: een echte stad, kavels met
+                        economische eigenschappen, bedrijven met personeel en
+                        een klok die doorloopt. Staat in ./economie.js.
+
+   DAT HET EEN SPEL BLIJFT IS EEN BESLUIT. De economie is groter, ambitieuzer en
+   heeft niets van het bord nodig; er had net zo goed een tweede spel kunnen
+   staan. Maar dan zou er in de lobby "Magnaat" en "Magnaat Economie" naast
+   elkaar staan, en zou de vraag "welke moet ik hebben" bij elke speler
+   terugkomen. Nu is het een keuze BINNEN het spel, en de variantlaag draagt hem
+   (zie ../variant.js).
+
+   WAAROM HET BORD BLIJFT: het is de enige Magnaat die met zes mensen binnen een
+   uur aan tafel te spelen is. Een werkend spel weggooien omdat er een groter
+   spel naast komt, is het soort verlies dat niemand opmerkt tot het weg is.
+
+   DIT BESTAND IS DE WISSEL EN VERDER NIETS. Elke regel hier kiest een vorm en
+   geeft door; wat een vorm DOET staat in zijn eigen bestand. Staat hier ooit
+   een spelregel, dan hoort die ergens anders. */
+const { STEDENLIJST, stadNaam } = require('./kaart');
+
 module.exports = (ctx) => {
-  const { save, crypto, codenaamVan, nudge, ZONDER_SPELER } = ctx;
+  const bord = require('./bordspel')(ctx);
+  const eco = require('./economie')(ctx);
 
-  function magnaatInit(potje) {
-    const st = { posities: {}, geld: {}, eigenaar: {}, huizen: {}, cel: {}, failliet: {}, dobbel: null, mag: 'gooi', koopVeld: null, kaart: null, dubbels: 0 };
-    for (const h of potje.spelers) { st.posities[h] = 0; st.geld[h] = 1500; st.cel[h] = 0; st.failliet[h] = false; }
-    potje.staat = st;
-  }
-  const magGroepCompleet = (st, g) => M_VELDEN.every((v, i) => v.g !== g || v.t !== 'straat' || st.eigenaar[i] != null) &&
-    new Set(M_VELDEN.map((v, i) => v.t === 'straat' && v.g === g ? st.eigenaar[i] : null).filter(x => x != null)).size === 1;
-  function magHuur(st, veld, worp) {
-    const v = M_VELDEN[veld], baas = st.eigenaar[veld];
-    if (v.t === 'station') { const n = M_VELDEN.filter((x, i) => x.t === 'station' && st.eigenaar[i] === baas).length; return 25 * Math.pow(2, n - 1); }
-    if (v.t === 'nut') { const n = M_VELDEN.filter((x, i) => x.t === 'nut' && st.eigenaar[i] === baas).length; return worp * (n === 2 ? 10 : 4); }
-    const basis = Math.round(v.p / 10);
-    const h = st.huizen[veld] || 0;
-    return basis * M_GROEP_HUIZEN[h] / (h === 0 && !magGroepCompleet(st, v.g) ? 2 : 1);
-  }
-  function naarDeCel(st, h) { st.posities[h] = 10; st.cel[h] = 3; st.dubbels = 0; }
-  function magVolgende(potje) {
-    const st = potje.staat, n = potje.spelers.length;
-    st.dobbel = null; st.mag = 'gooi'; st.koopVeld = null; st.dubbels = 0;
-    for (let stap = 1; stap <= n; stap++) {
-      const kand = potje.spelers[(potje.beurt + stap) % n];
-      if (!st.failliet[kand]) { potje.beurt = potje.spelers.indexOf(kand); return; }
-    }
-  }
-  function magBetaal(potje, h, bedrag, aan) {
-    // automatisch afrekenen; komt de speler tekort, dan verkoopt de bank
-    // eerst huizen en dan straten terug (halve prijs); daarna failliet
-    const st = potje.staat;
-    while (st.geld[h] < bedrag) {
-      const metHuis = Object.keys(st.huizen).find(v => st.eigenaar[v] === h && st.huizen[v] > 0);
-      if (metHuis != null) { st.huizen[metHuis]--; st.geld[h] += Math.round(M_VELDEN[metHuis].p / 4); continue; }
-      const bezit = Object.keys(st.eigenaar).find(v => st.eigenaar[v] === h);
-      if (bezit != null) { delete st.eigenaar[bezit]; delete st.huizen[bezit]; st.geld[h] += Math.round(M_VELDEN[bezit].p / 2); continue; }
-      break;
-    }
-    const echt = Math.min(bedrag, st.geld[h]);
-    st.geld[h] -= echt;
-    if (aan) st.geld[aan] += echt;
-    if (echt < bedrag) {
-      st.failliet[h] = true;
-      // bezittingen terug naar de bank; de rest speelt door
-      for (const v of Object.keys(st.eigenaar)) if (st.eigenaar[v] === h) { delete st.eigenaar[v]; delete st.huizen[v]; }
-      const over = potje.spelers.filter(sp => !st.failliet[sp]);
-      if (over.length === 1) { potje.status = 'klaar'; potje.winnaar = codenaamVan(over[0]); }
-    }
-  }
-  function magnaatZet(potje, h, zet) {
-    const st = potje.staat;
-    if (st.failliet[h]) return { status: 409, error: 'Je bent failliet; dit potje kijk je uit.' };
-    const actie = String(zet.actie || '');
-    if (actie === 'bouw' || actie === 'verkoop') {
-      const veld = Number(zet.veld), v = M_VELDEN[veld];
-      if (!v || v.t !== 'straat' || st.eigenaar[veld] !== h) return { status: 400, error: 'Dat veld is niet van jou.' };
-      if (actie === 'bouw') {
-        if (!magGroepCompleet(st, v.g)) return { status: 400, error: 'Bouwen kan pas als de hele kleurgroep van jou is.' };
-        if ((st.huizen[veld] || 0) >= 5) return { status: 400, error: 'Hier staat al een hotel.' };
-        const prijs = Math.round(v.p / 2);
-        if (st.geld[h] < prijs) return { status: 400, error: 'Bouwen kost ' + prijs + '; dat heb je nu niet.' };
-        st.geld[h] -= prijs; st.huizen[veld] = (st.huizen[veld] || 0) + 1;
-      } else {
-        if ((st.huizen[veld] || 0) > 0) { st.huizen[veld]--; st.geld[h] += Math.round(v.p / 4); }
-        else { delete st.eigenaar[veld]; delete st.huizen[veld]; st.geld[h] += Math.round(v.p / 2); }
-      }
-      save(); return { status: 200, ok: true };
-    }
-    if (actie === 'koop' || actie === 'sla') {
-      if (st.mag !== 'koop' || st.koopVeld == null) return { status: 409, error: 'Er valt nu niets te kopen.' };
-      const veld = st.koopVeld, v = M_VELDEN[veld];
-      if (actie === 'koop') {
-        if (st.geld[h] < v.p) return { status: 400, error: 'Daar heb je niet genoeg geld voor.' };
-        st.geld[h] -= v.p; st.eigenaar[veld] = h;
-      }
-      if (st.dubbels > 0 && !st.failliet[h]) { st.mag = 'gooi'; st.koopVeld = null; } else magVolgende(potje);
-      save(); nudge(potje.spelers[potje.beurt], potje);
-      return { status: 200, ok: true };
-    }
-    if (actie !== 'gooi') return { status: 400, error: 'Onbekende actie.' };
-    if (st.mag !== 'gooi') return { status: 409, error: 'Rond eerst je kopen af.' };
-    st.kaart = null;
-    const d1 = crypto.randomInt(1, 7), d2 = crypto.randomInt(1, 7), worp = d1 + d2;
-    st.dobbel = [d1, d2];
-    // in de cel: alleen met dubbel kom je gratis vrij; na drie beurten betaal je 50.
-    // De vrijkom-dubbel geeft GEEN extra worp (zoals aan tafel).
-    let vrijMetDubbel = false;
-    if (st.cel[h] > 0) {
-      if (d1 === d2) { st.cel[h] = 0; vrijMetDubbel = true; }
-      else if (--st.cel[h] === 0) magBetaal(potje, h, 50, null);
-      else { magVolgende(potje); save(); nudge(potje.spelers[potje.beurt], potje); return { status: 200, ok: true, dobbel: st.dobbel, cel: true }; }
-      if (st.failliet[h] || potje.status === 'klaar') { magVolgende(potje); save(); return { status: 200, ok: true, dobbel: st.dobbel }; }
-    }
-    st.dubbels = d1 === d2 && !vrijMetDubbel ? st.dubbels + 1 : 0;
-    if (st.dubbels >= 3) { naarDeCel(st, h); magVolgende(potje); save(); nudge(potje.spelers[potje.beurt], potje); return { status: 200, ok: true, dobbel: st.dobbel, naarCel: true }; }
-    const oud = st.posities[h];
-    let pos = (oud + worp) % 40;
-    if (pos < oud) st.geld[h] += 200; // langs Start
-    st.posities[h] = pos;
-    const v = M_VELDEN[pos];
-    if (v.t === 'naarcel') naarDeCel(st, h);
-    else if (v.t === 'belasting') magBetaal(potje, h, v.p, null);
-    else if (v.t === 'kans' || v.t === 'kas') {
-      const kaart = M_KAARTEN[crypto.randomInt(0, M_KAARTEN.length)];
-      st.kaart = kaart.tekst;
-      if (kaart.geld > 0) st.geld[h] += kaart.geld;
-      else if (kaart.geld < 0) magBetaal(potje, h, -kaart.geld, null);
-      else if (kaart.naar != null) { st.posities[h] = kaart.naar; st.geld[h] += 200; }
-      else if (kaart.cel) naarDeCel(st, h);
-      else if (kaart.vanIeder) for (const sp of potje.spelers) if (sp !== h && !st.failliet[sp]) magBetaal(potje, sp, kaart.vanIeder, h);
-    }
-    else if ((v.t === 'straat' || v.t === 'station' || v.t === 'nut')) {
-      const baas = st.eigenaar[pos];
-      if (baas == null) { st.mag = 'koop'; st.koopVeld = pos; save(); return { status: 200, ok: true, dobbel: st.dobbel, teKoop: pos }; }
-      if (baas !== h) magBetaal(potje, h, Math.round(magHuur(st, pos, worp)), baas);
-    }
-    if (potje.status === 'klaar') { save(); potje.spelers.forEach(sp => nudge(sp, potje)); return { status: 200, ok: true, dobbel: st.dobbel }; }
-    if (st.dubbels > 0 && !st.failliet[h] && st.cel[h] === 0) { st.mag = 'gooi'; save(); return { status: 200, ok: true, dobbel: st.dobbel, nogEens: true }; }
-    magVolgende(potje);
-    save(); nudge(potje.spelers[potje.beurt], potje);
-    return { status: 200, ok: true, dobbel: st.dobbel };
-  }
+  // welke vorm draagt dit potje? 'bord' is de stille standaard, zodat een potje
+  // van voor de economie gewoon blijft werken
+  const isEco = (potje) => ((potje && potje.variant) || {}).vorm === 'economie';
 
-  /* statisch(): het bord verandert nooit, dus het reist alleen mee als de
-     client erom vraagt (bij openen), niet bij elke poll van 2,5 seconde.
-     Stond als "is dit magnaat?" in de centrale dispatch. */
+  const init = (potje) => (isEco(potje) ? eco.init(potje) : bord.magnaatInit(potje));
+  const zet = (potje, h, z) => (isEco(potje) ? eco.zet(potje, h, z) : bord.magnaatZet(potje, h, z));
+
   const spel = {
-    sleutel: 'magnaat', naam: 'Magnaat', max: 6, wereld: 'rtg', buitenBeurt: ['bouw', 'verkoop'], vormen: ['live', 'async'],
-    init: magnaatInit, zet: magnaatZet,
-    statisch: () => ({ velden: M_VELDEN }),
-    /* Alles aan tafel is openbaar: posities, geld, bezit en huizen staan bij
-       dit spel per definitie open. De weergave leest `mij` niet, dus een kijker
-       en een gedeeld scherm zien hetzelfde als een speler.
-
-       LET OP BIJ DE ECONOMIE (zie GAMEHALL.md §12): zodra er geheime biedingen
-       en onderhandelingen bijkomen, is dit niet meer waar. Die horen dan in de
-       spelerlaag, en `kijker`/`publiek` krijgen een eigen functie die ze
-       weglaat -- niet deze drie die dan stilzwijgend te veel tonen. */
+    sleutel: 'magnaat', naam: 'Magnaat', max: 6, wereld: 'rtg', vormen: ['live', 'async'],
+    /* De vrije acties, en dit is de lijst waar Long Play op staat of valt (zie
+       GAMEHALL.md paragraaf 12.3). Zonder deze staat een partij van zes met 24
+       uur per beurt zes dagen stil tussen twee van jouw handelingen; met deze
+       heb je altijd iets te doen zonder dat iemand tegelijk online hoeft te
+       zijn. `bouw` en `verkoop` horen bij het bord, `beleid` bij de economie --
+       prijs, personeel, marketing en onderhoud mogen altijd. Wat er NIET in
+       staat is even belangrijk: openen, uitbreiden en sluiten zijn grote zetten
+       en horen bij je beurt. */
+    buitenBeurt: ['bouw', 'verkoop', 'beleid'],
+    init, zet,
+    varianten: {
+      vorm: { keuze: ['bord', 'economie'], standaard: 'bord' },
+      stad: { keuze: STEDENLIJST.map(stadNaam), standaard: null },
+      duur: { keuze: ['quick', 'avond', 'weekend'], standaard: null }
+    },
+    /* De vraag over de velden heen: stad en duur horen bij de economie. Het
+       bordspel heeft geen stad en geen speelduur, en zwijgend negeren zou
+       betekenen dat iemand IJmuiden kiest en veertig velden krijgt. */
+    variantFout: (v) => {
+      if (v.vorm !== 'economie') return (v.stad || v.duur)
+        ? 'Een stad en een speelduur horen bij de economie; kies eerst die vorm.' : null;
+      if (!v.stad || !v.duur) return 'Kies bij de economie ook een stad en een speelduur.';
+      return null;
+    },
+    statisch: (potje) => (isEco(potje)
+      // de kaart is groot en verandert nooit: hij reist mee bij het openen en
+      // niet bij elke poll van 2,5 seconde
+      ? { kavels: eco.kaartVan((potje.staat || {}).stad).kavels, sectoren: eco.SECTORLIJST }
+      : bord.statisch(potje)),
     zicht: {
-      speler: (p, st) => ({ posities: p.spelers.map(sp => st.posities[sp]), geld: p.spelers.map(sp => st.geld[sp]),
-        failliet: p.spelers.map(sp => !!st.failliet[sp]), cel: p.spelers.map(sp => st.cel[sp] > 0),
-        eigenaar: Object.fromEntries(Object.entries(st.eigenaar).map(([v, h]) => [v, p.spelers.indexOf(h)])), // veld -> spelerindex
-        huizen: st.huizen, mag: st.mag, koopVeld: st.koopVeld, dobbel: st.dobbel, kaart: st.kaart }),
-      kijker: ZONDER_SPELER
+      speler: (p, st, mij) => (isEco(p) ? eco.zicht(p, st, mij) : bord.zicht.speler(p, st, mij)),
+      /* Het BORD is openbaar: alles ligt op tafel, dus een kijker en een gedeeld
+         scherm zien hetzelfde als een speler.
+
+         DE ECONOMIE NIET, en dat is precies de waarschuwing die hier al stond
+         voordat zij bestond: zodra er boeken zijn, is "iedereen ziet alles" niet
+         meer waar. Een kijker krijgt daarom de PUBLIEKE weergave -- de stad, de
+         maand, wie waar zit -- en niet iemands kas. Vandaar geen ZONDER_SPELER:
+         die claim zou hier onwaar zijn, en de lektoets pakt hem. */
+      kijker: (p, st) => (isEco(p) ? eco.publiek(p, st) : bord.zicht.speler(p, st, null)),
+      publiek: (p, st) => (isEco(p) ? eco.publiek(p, st) : bord.zicht.speler(p, st, null))
     }
   };
-  return { spel, magnaatInit, magnaatZet, M_VELDEN };
+
+  return { spel, magnaatInit: bord.magnaatInit, magnaatZet: bord.magnaatZet, M_VELDEN: bord.M_VELDEN, eco };
 };

@@ -23,7 +23,24 @@
    supplierAuth. Wie geen sleutel heeft, ziet dat en niet een leeg scherm. */
 (() => {
   const $ = s => document.querySelector(s);
-  const token = (() => { try { return localStorage.getItem('rtg_pda_token'); } catch (e) { return null; } })();
+  /* TWEE DEUREN KOMEN OP DEZELFDE SESSIE UIT, EN DIT SCHERM KENT ZE ALLEBEI.
+     /api/supplier/mob/vloot hangt achter supplierAuth, en die vraagt een sessie
+     met rol 'supplier'. Die krijg je langs twee wegen: de PDA-kant van het
+     personeel (routes/supplier/pda/posities.js, bewaard als `rtg_pda_token`) en
+     de leverancier-inlog zelf (apps/leverancier.js, `rtg_sup_token`). Hier stond
+     eerst alleen de eerste, en dan kreeg de vervoerder die via zijn EIGEN
+     inlog binnenkomt de gesloten deur te zien terwijl hij de sleutel op zak had.
+     Volgorde: de PDA eerst, want wie op de vloer staat opent dit scherm vanuit
+     zijn dienst; wie beide heeft, gebruikt de sessie waar hij nu in werkt.
+
+     Allebei UITGESCHREVEN en niet uit een lijstje gelezen: de scanners van
+     test/blindevlek.test.js lezen `getItem('...')` met een letterlijke naam, dus
+     een lus over een array maakt dit scherm voor die controle onzichtbaar. Een
+     bewaking die je stil uitschakelt is erger dan geen (LAT-regel 9). */
+  const token = (() => {
+    try { return localStorage.getItem('rtg_pda_token') || localStorage.getItem('rtg_sup_token'); }
+    catch (e) { return null; }
+  })();
   const gevraagd = new URLSearchParams(location.search).get('voertuig') || '';
 
   const api = (pad, body) => fetch('/api/supplier/mob/' + pad, { method: 'POST',

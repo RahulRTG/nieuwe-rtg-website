@@ -808,7 +808,9 @@ vermogen, ondernemingswaarde, banen, reputatie en omzet.
 opgeleverd.** `scripts/magnaat-balans.js` meet per sector wat een goed
 geplaatste zaak doet; `scripts/magnaat-strateeg.js` speelt 220 campagnes uit
 met elf strategieprofielen tegen elkaar en vraagt of er één domineert. Het
-tweede vindt wat het eerste per definitie niet kan zien.
+tweede vindt wat het eerste per definitie niet kan zien. *(Er is er inmiddels
+een derde en een vierde: `magnaat-pomp.js` in 12.9 en `magnaat-lab.js` in
+12.9.1, en die laatste vond dat de balansmeter hier de verkeerde horizon meet.)*
 
 **Vier ijkingen, elk na een meting die de vorige tegensprak:**
 
@@ -1571,6 +1573,63 @@ alleen in zijn eigen twee buurten, hij mist kansen, en hij laat dingen liggen.
 **Hiermee is fase B compleet.** Contracten, veilingen, belangen, banken,
 verzekeringen, onderzoek, AI-managers, economische cycli, wereldnieuws, de beurs,
 overnames, het concern en AI-concurrenten.
+
+#### 12.9.1 Het balanslab, en waarom het toernooi niet genoeg was
+
+`scripts/magnaat-lab.js` staat naast de balansmeter, de strateeg en de
+geldpompkeuring, en hij bestaat omdat de strateeg twee blinde vlekken had die
+allebei duur waren.
+
+**Hij speelde altijd in dezelfde wereld.** De partij-id voedt de conjunctuur
+(`cyclus.js`), de krant (`nieuws.js`), de risico's en de onderzoeksuitkomsten.
+Die id stond vast op `'p'`. Alle achthonderd campagnes van het toernooi speelden
+zich dus af onder één hoogconjunctuur, één reeks gebeurtenissen en één reeks
+branden; de enige variatie was waar je begon. Aan een uitslag als *mobility wint
+97%* was daarmee niet te zien of dat een eigenschap van de stijl was of van dat
+ene weer.
+
+**En hij keek alleen naar de eindstand.** Twee stijlen die op hetzelfde vermogen
+uitkomen kunnen een totaal verschillende campagne hebben gehad: de een klom
+gestaag, de ander stond in maand twintig onder water en werd door een opleving
+gered. Voor de vraag *is dit leuk om te spelen* is dat verschil belangrijker dan
+de uitslag.
+
+Het lab draait daarom over drie assen tegelijk — tafelgrootte (2/4/6), wereld
+(twaalf partij-id's) en startopstelling — en meet per stijl tien dingen:
+winrate, rendement, drawdown, insolventiekans, vestigingen, schuldgraad,
+contractafhankelijkheid, concernlast, tijd tot dominantie en counterbaarheid.
+Om de weg te kunnen meten schrijft `veld()` nu elke maand een regel per speler
+weg; alles daarin komt uit de motor, want een tweede berekening zou een tweede
+antwoord op dezelfde vraag zijn.
+
+**Wat hij vond, in drie lagen.**
+
+| Bevinding | Wat de meting zegt |
+|---|---|
+| Mobility-focus is echt dominant, niet een artefact | 99% over 576 campagnes; 100/98/99% bij twee/vier/zes spelers; 15,4x rendement tegen 9,4x voor de nummer twee; geen stijl verslaat hem vaker dan 2% van 108 ontmoetingen |
+| Maar logistiek is niet eens de beste sector | de sectorproef (dezelfde stijl, eigen buurten, alleen aan tafel): kantoor 11,7M · hotel 9,0M · **logistiek 4,3M** · horeca 3,6M · retail 1,2M · vrije-tijd 0,9M · industrie 0,25M. Geen enkel profiel speelde kantoor, dus de cast verborg een grotere scheefheid dan hij vond |
+| `industrie` zit vanuit de startpositie op slot | de motor trekt elke zaak op naar minstens vier eenheden (`acties.js`); vier eenheden industrie kosten 287.000 en het startkapitaal is 250.000. In zesendertig maanden opent hij geen enkele zaak |
+
+**En daarmee een bevinding over een meter en niet over het spel.**
+`magnaat-balans.js` zegt dat alle zeven sectoren zich in twaalf maanden
+terugverdienen, en dat klopt — op één zaak, op de beste plek, op één moment.
+Over een campagne lopen diezelfde zeven **47x** uiteen. Terugverdientijd op één
+zaak is niet hetzelfde als samengestelde groei over een campagne, en dat
+verschil was nergens te zien. Dat is dezelfde soort fout als de vier ijkingen
+van fase A, één niveau hoger.
+
+**Twee fouten in het lab zelf**, allebei van de soort die hij bij anderen hoort
+te vinden. De opsomming van campagnes liep na 144 rond, dus een run van
+driehonderd speelde er honderdvierenveertig en méldde er driehonderd. En de
+contractafhankelijkheid rondde in hele procenten naar nul af, waardoor een
+werkende meter er kapot uitzag; het echte antwoord is 2,8% voor de
+toeleverancier en 0,0% voor alle andere stijlen — de contractlaag weegt
+economisch bijna niets.
+
+**De keuring is niet weggeijkt.** Alle drie de bevindingen hierboven staan als
+klacht in `keur()`, en die klachten blijven staan tot ze verholpen zijn. De lat
+boven de meting leggen zodat hij groen oogt is precies wat een balansmeter
+waardeloos maakt.
 
 **Fase C — de permanente wereld.** Living World, vakantiemodus, overdracht,
 legacy, Magnaat Daily,

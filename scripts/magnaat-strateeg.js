@@ -490,9 +490,20 @@ function gereedschap(m, potje, mij, profiel, offset) {
    is kort voor een tak die twintig maanden onderzoek vraagt, en de vraag "is dit
    te traag of te duur" is alleen te beantwoorden door hem ook lang te draaien.
    De standaard blijft quick: dat is waar de rest van dit script op geijkt is. */
-function campagne(aNaam, bNaam, offset, maanden = 36, duur = 'quick') {
+function campagne(aNaam, bNaam, offset, maanden = 36, duur = 'quick', wereld) {
   const m = maakMagnaat();
-  const potje = { id: 'p', soort: 'magnaat', spelers: ['a', 'b'], teams: [0, 1, 0, 1, 0, 1],
+  /* DE PARTIJ-ID BEPAALT DE WERELD, en dat is een gat dat hier lang in zat. Uit
+     die id komen de conjunctuur (./cyclus.js), de krant (./nieuws.js), de
+     risico's en de onderzoeksuitkomsten. Hij stond vast op 'p', dus alle
+     achthonderd campagnes van dit toernooi speelden zich af onder EEN
+     hoogconjunctuur, EEN reeks gebeurtenissen en EEN reeks branden. De enige
+     variatie was de startpositie.
+
+     Dat maakt een uitslag als "mobility wint 97%" onbetrouwbaar: het kan een
+     eigenschap van de stijl zijn, of van dat ene weer. Sinds nu hoort de wereld
+     bij de meting -- `wereld` verzet hem, en scripts/magnaat-lab.js draait er
+     tientallen naast elkaar. */
+  const potje = { id: wereld || 'p', soort: 'magnaat', spelers: ['a', 'b'], teams: [0, 1, 0, 1, 0, 1],
     modus: 'vrij', status: 'bezig', beurt: 0, winnaar: null,
     variant: { vorm: 'economie', stad: 'IJmuiden', duur } };
   m.spel.init(potje);
@@ -543,27 +554,75 @@ function campagne(aNaam, bNaam, offset, maanden = 36, duur = 'quick') {
    een gok, en dit is de toets erop -- want als hij klopt, hoort een tafel van
    zes een ander beeld te geven dan een duel van twee. Zes profielen die er elk
    dertig openen, willen samen 180 plekken op een kaart die er 144 heeft. */
-function veld(namen, offset = 0, maanden = 36) {
+/* EEN REGEL PER MAAND PER SPELER, en dit is de meetpost waar
+   scripts/magnaat-lab.js van leeft. Een eindstand zegt WAT er uitkwam en niets
+   over de weg ernaartoe: drawdown, tijd tot dominantie en de kans dat iemand
+   onderweg onder nul zakte zijn alleen te zien als je elke maand kijkt.
+
+   ALLES KOMT UIT DE MOTOR EN NIETS WORDT HIER OVERGEREKEND. Vermogen en schuld
+   uit `eindstand`, omzet en contractomzet en de concernpost uit dezelfde regels
+   die de speler op zijn maandoverzicht ziet (`st.laatste`). Een tweede
+   berekening zou een tweede antwoord op dezelfde vraag zijn, en dan meet het lab
+   zijn eigen rekenwerk. */
+function maandrij(m, potje, spelers, namen) {
+  const st = potje.staat;
+  const stand = m.eco.eindstand(potje);
+  const rij = {};
+  for (let i = 0; i < spelers.length; i++) {
+    const e = stand.find(x => x.codenaam === spelers[i]) || {};
+    const regels = ((st.laatste || {})[spelers[i]] || {}).regels || [];
+    rij[namen[i]] = {
+      vermogen: e.vermogen || 0, geld: e.geld || 0, waarde: e.waarde || 0,
+      schuld: e.schuld || 0, vestigingen: e.vestigingen || 0,
+      omzet: regels.reduce((n, r) => n + (r.omzet || 0), 0),
+      /* WAT ER VAN EEN CONTRACT KWAM, apart van de rest. Dit is de meter voor
+         "afhankelijkheid van contracten": een concern dat zijn halve omzet uit
+         toezeggingen van een medespeler haalt, staat er anders voor dan een dat
+         alles bij de deur verkoopt -- ook als de eindstand gelijk is. */
+      contractOmzet: regels.reduce((n, r) => n + ((r.levering && r.levering.omzet) || 0), 0),
+      concern: regels.filter(r => r.soort === 'concern').reduce((n, r) => n - (r.resultaat || 0), 0),
+      resultaat: regels.reduce((n, r) => n + (r.resultaat || 0), 0)
+    };
+  }
+  return rij;
+}
+
+/* `extra` zet stijlen aan tafel die niet in PROFIELEN staan, en dat is er voor
+   scripts/magnaat-lab.js: dat meet onder andere elke SECTOR los, en daar hoort
+   geen vast profiel bij. Het alternatief was dat het lab zijn proefstijlen in
+   PROFIELEN zou schrijven, en dan verandert een meting de tafel van iedereen die
+   daarna in hetzelfde proces meet. Een meetopstelling hoort niets achter te
+   laten. */
+function veld(namen, offset = 0, maanden = 36, wereld, extra) {
+  const stijl = (n) => (extra && extra[n]) || PROFIELEN[n];
   const m = maakMagnaat();
   const spelers = namen.map((_, i) => 's' + i);
-  const potje = { id: 'p', soort: 'magnaat', spelers, teams: spelers.map((_, i) => i),
+  // zie de uitleg bij `campagne`: de partij-id IS de wereld
+  const potje = { id: wereld || 'p', soort: 'magnaat', spelers, teams: spelers.map((_, i) => i),
     modus: 'vrij', status: 'bezig', beurt: 0, winnaar: null,
     variant: { vorm: 'economie', stad: 'IJmuiden', duur: 'quick' } };
   m.spel.init(potje);
-  const gereed = spelers.map((sp, i) => gereedschap(m, potje, sp, PROFIELEN[namen[i]], offset + i * 2));
+  const gereed = spelers.map((sp, i) => gereedschap(m, potje, sp, stijl(namen[i]), offset + i * 2));
   const kavels = kaart(potje.staat.stad).kavels.length;
   let eerstVol = null;
+  const reeks = [];
   for (let maand = 0; maand < maanden && !potje.staat.klaar; maand++) {
     for (const g of gereed) g.antwoordOpAanbod();
-    namen.forEach((n, i) => PROFIELEN[n].doe(gereed[i], maand));
+    namen.forEach((n, i) => stijl(n).doe(gereed[i], maand));
     potje.staat.gerekendTot -= potje.staat.maandMs;
     m.eco.bijrekenen(potje);
     const bezet = Object.keys(potje.staat.kavelBezet).length;
     if (eerstVol === null && bezet >= kavels * 0.9) eerstVol = maand + 1;
+    reeks.push(maandrij(m, potje, spelers, namen));
   }
   const stand = m.eco.eindstand(potje);
   const bezet = Object.keys(potje.staat.kavelBezet).length;
   return { stand: stand.map(x => Object.assign({ profiel: namen[spelers.indexOf(x.codenaam)] }, x)),
+    /* DE REEKS PER MAAND, want een eindstand zegt niets over de WEG ernaartoe.
+       Drawdown, tijd tot dominantie en faillissementskans zijn alleen te meten
+       als je weet hoe het vermogen zich bewoog; scripts/magnaat-lab.js leeft
+       hiervan. */
+    reeks, spelers: spelers.map((sp, i) => ({ speler: sp, profiel: namen[i] })),
     kavels, bezet, vol: bezet / kavels, eerstVol,
     contracten: (potje.staat.contracten || []).filter(c => c.status !== 'voorgesteld' && c.status !== 'afgewezen').length,
     veilingen: (potje.staat.veilingen || []).filter(v => v.status === 'gesloten' && v.winnaar).length };

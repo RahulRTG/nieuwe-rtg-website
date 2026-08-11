@@ -78,7 +78,14 @@
   .wr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);}
 </style>
 </head>
-<body>
+<!-- data-ios-uit: deze pagina wil bewust GEEN OS-chroom. Ze staat wel onder
+     /apps/, maar wie hem opent is meestal geen lid: je komt hier via de QR op
+     tafel of op je kamer. Een app-menu met "Beginscherm" en "Instellingen"
+     stuurt zo iemand naar een inlogdeur waar hij niets te zoeken heeft, en een
+     hamburger suggereert een app waar hij geen account voor heeft. De vlag
+     staat hier en niet in een uitzonderingslijst in de toets: de pagina weet
+     zelf het beste wat ze is (test/appmenu.e2e.js leest hem). -->
+<body data-ios-uit>
 <header>
   <span class="ey">Rahul Travel Group</span>
   <h1 id="zaakNaam">Aan tafel</h1>

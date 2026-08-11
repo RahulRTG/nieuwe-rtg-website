@@ -50,7 +50,7 @@
         </select>
         <button class="knop p" id="zOpen" type="button">Open</button>
       </div>
-      <p class="stil" style="margin-top:.4rem;">Per tafel staat er hooguit een rekening open. Splitsen en samenvoegen verplaatsen alleen; er komt geen cent bij of af.</p>
+      <p class="stil z-mt40">Per tafel staat er hooguit een rekening open. Splitsen en samenvoegen verplaatsen alleen; er komt geen cent bij of af.</p>
     </div>
     <!-- BOVEN de open rekeningen, want dit is het enige op dit scherm waar
          tijd doorheen loopt: een gast die iets vroeg staat te wachten, een
@@ -58,7 +58,7 @@
     <div class="kaart">
       <div class="kop">Gasten vragen iets (<span id="vzAantal">0</span><span id="vzOudVak" hidden>, waarvan <span id="vzOud">0</span> te lang</span>)</div>
       <div id="vzLijst"></div>
-      <p class="stil" style="margin-top:.4rem;">De minuten zijn een feit. Er staat nergens hoe snel iemand er is, want dat weten we niet.</p>
+      <p class="stil z-mt40">De minuten zijn een feit. Er staat nergens hoe snel iemand er is, want dat weten we niet.</p>
     </div>
     <div class="kaart">
       <div class="kop">Open rekeningen</div>
@@ -67,7 +67,7 @@
     <div class="kaart" id="zDetailKaart" hidden>
       <div class="kop" id="zDetailKop">Rekening</div>
       <div id="zDetail"></div>
-      <div class="rij" style="margin-top:.6rem;">
+      <div class="rij z-mt60">
         <input class="veld" id="zNaam" maxlength="80" placeholder="Wat wordt er besteld?" aria-label="Product">
         <input class="veld" id="zPrijs" type="number" min="0" step="0.01" placeholder="Prijs" aria-label="Prijs" style="flex:0 1 7rem;">
         <input class="veld" id="zAantal" type="number" min="1" max="99" value="1" aria-label="Aantal" style="flex:0 1 5rem;">
@@ -76,7 +76,7 @@
         <input class="veld" id="zAllergie" maxlength="120" placeholder="Allergie" aria-label="Allergie" style="flex:0 1 9rem;">
         <button class="knop p" id="zRegel" type="button">Zet erop</button>
       </div>
-      <div class="rij" style="margin-top:.6rem;">
+      <div class="rij z-mt60">
         <input class="veld" id="zVrijGang" type="number" min="0" max="9" value="1" aria-label="Gang vrijgeven" style="flex:0 1 5rem;">
         <input class="veld" id="zServeerOm" maxlength="5" placeholder="Serveren om" aria-label="Serveertijd" style="flex:0 1 7rem;">
         <button class="knop" id="zVrij" type="button">Gang vrijgeven</button>

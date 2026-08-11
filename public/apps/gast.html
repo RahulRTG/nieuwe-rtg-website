@@ -75,6 +75,20 @@
   .pl:last-child{border-bottom:0;}
   .pl .nm{font-weight:600;}
   .pl .bron{display:block;font-size:.75rem;color:var(--soft);margin-top:.1rem;}
+
+  /* Kleine opmaakklassen in plaats van style="..."-attributen. Dat is geen
+     smaak: NORM.json telt die attributen (inlineStijlAttributen) omdat
+     style-src-attr in de CSP pas dicht kan als ze weg zijn, en dat getal mag
+     alleen omlaag. Deze pagina zette hem omhoog. */
+  .mt3{margin-top:.3rem;} .mt35{margin-top:.35rem;} .mt4{margin-top:.4rem;}
+  .mt5{margin-top:.5rem;} .mt6{margin-top:.6rem;} .mt7{margin-top:.7rem;}
+  .mt8{margin-top:.8rem;} .mt9{margin-top:.9rem;} .mt10{margin-top:1rem;}
+  .rechts{margin-left:auto;}
+  .catkop{margin:1rem 0 .2rem;}
+  .telrij{justify-content:flex-end;margin-top:.35rem;}
+  .telnr{min-width:1.4rem;text-align:center;}
+  .dnarij{padding:.6rem 0;border-bottom:1px solid var(--line);}
+  .smal{width:auto;}
   .wr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);}
 </style>
 </head>
@@ -101,8 +115,8 @@
     <p class="sub" id="lopend"></p>
     <label class="lbl" for="naam">Hoe mogen we je noemen?</label>
     <input id="naam" maxlength="40" placeholder="Sam" autocomplete="given-name">
-    <p class="sub" id="naamUitleg" style="margin-top:.5rem;">Alleen deze naam komt op de rekening te staan, zodat je tafelgenoten zien wie wat bestelde. Verder slaan we niets van je op.</p>
-    <div class="rij" style="margin-top:.8rem;"><button class="prim" id="bAanschuif">Aanschuiven</button></div>
+    <p class="sub mt5" id="naamUitleg">Alleen deze naam komt op de rekening te staan, zodat je tafelgenoten zien wie wat bestelde. Verder slaan we niets van je op.</p>
+    <div class="rij mt8"><button class="prim" id="bAanschuif">Aanschuiven</button></div>
   </section>
 
   <!-- 2. de app -->
@@ -119,14 +133,14 @@
       <h2>De kaart</h2>
       <label class="lbl" for="allergie">Allergie of dieet (gaat mee naar de keuken)</label>
       <input id="allergie" maxlength="120" placeholder="bijvoorbeeld: ernstige notenallergie">
-      <p class="sub" id="allergieLet" style="margin-top:.35rem;"></p>
-      <div id="kaartLijst" style="margin-top:.8rem;"></div>
+      <p class="sub mt35" id="allergieLet"></p>
+      <div id="kaartLijst" class="mt8"></div>
     </section>
 
     <section class="kaart" data-paneel="rekening" hidden>
       <h2>Wat er op tafel staat</h2>
       <div id="rekLijst"></div>
-      <h2 style="margin-top:1rem;">Verloop</h2>
+      <h2 class="mt10">Verloop</h2>
       <ul class="tl" id="tijdlijn"></ul>
     </section>
 
@@ -138,12 +152,12 @@
         <option value="product">Ieder wat die zelf bestelde</option>
         <option value="een">Eén persoon betaalt alles</option>
       </select>
-      <div class="rij" style="margin-top:.6rem;"><button id="bVerdeel">Verdeel</button></div>
-      <div id="verdeling" style="margin-top:.8rem;"></div>
+      <div class="rij mt6"><button id="bVerdeel">Verdeel</button></div>
+      <div id="verdeling" class="mt8"></div>
 
       <label class="lbl" for="fooi">Fooi (in euro, alleen als je dat wilt)</label>
       <input id="fooi" inputmode="decimal" placeholder="0,00">
-      <div class="rij" style="margin-top:.6rem;"><button id="bFooi">Fooi vastleggen</button></div>
+      <div class="rij mt6"><button id="bFooi">Fooi vastleggen</button></div>
 
       <label class="lbl" for="rail">Waarmee reken je af?</label>
       <select id="rail">
@@ -158,11 +172,11 @@
       <div id="codeVak">
         <label class="lbl" for="bonCode">Code van je bon of polsband</label>
         <input id="bonCode" maxlength="40" placeholder="Scan of typ de code" autocomplete="off">
-        <div class="rij" style="margin-top:.5rem;"><button id="bSaldo">Saldo bekijken</button></div>
-        <p class="sub" id="saldoUit" style="margin-top:.35rem;"></p>
+        <div class="rij mt5"><button id="bSaldo">Saldo bekijken</button></div>
+        <p class="sub mt35" id="saldoUit"></p>
       </div>
-      <div class="rij" style="margin-top:.8rem;"><button class="prim" id="bBetaal">Betalen</button></div>
-      <p class="sub" id="railLet" style="margin-top:.6rem;"></p>
+      <div class="rij mt8"><button class="prim" id="bBetaal">Betalen</button></div>
+      <p class="sub mt6" id="railLet"></p>
     </section>
 
     <!-- Vragen is iets anders dan bestellen, en dat staat ook zo in het
@@ -171,7 +185,7 @@
     <section class="kaart" data-paneel="vragen" hidden>
       <h2>Iets vragen</h2>
       <p class="sub">Dit kost niets en komt niet op je rekening. Je vraag komt op het scherm van de bediening te staan, met hoe lang hij er staat. Hoe snel er iemand is weten wij niet, dus beloven we het ook niet.</p>
-      <div id="vraagKnoppen" class="rij" style="margin-top:.8rem;"></div>
+      <div id="vraagKnoppen" class="rij mt8"></div>
       <label class="lbl" for="vraagTekst">Erbij zeggen (mag leeg blijven)</label>
       <input id="vraagTekst" maxlength="140" placeholder="bijvoorbeeld: de tafel wiebelt">
       <h3 class="kopje">Wat je hebt gevraagd</h3>
@@ -193,8 +207,8 @@
       <h3 class="kopje">Wat vind jij ervan?</h3>
       <p class="sub">Je zit hier, dus je kunt het weten. Je melding telt een keer, ook als je hem bijstelt.</p>
       <div id="polsVragen"></div>
-      <div class="rij" style="margin-top:.8rem;"><button class="prim" id="bMeld">Doorgeven</button></div>
-      <p class="sub" id="polsLet" style="margin-top:.6rem;"></p>
+      <div class="rij mt8"><button class="prim" id="bMeld">Doorgeven</button></div>
+      <p class="sub mt6" id="polsLet"></p>
     </section>
   </div>
 </main>
@@ -202,7 +216,7 @@
 <div class="mand" id="mand" hidden>
   <div class="rij">
     <span id="mandTekst">Niets gekozen</span>
-    <span class="bedrag" id="mandBedrag" style="margin-left:auto;">€ 0,00</span>
+    <span class="bedrag rechts" id="mandBedrag">€ 0,00</span>
     <button class="prim" id="bBestel" disabled>Bestellen</button>
   </div>
 </div>
@@ -340,7 +354,7 @@
     KAART.forEach(function (m) { if (!per[m.cat]) { per[m.cat] = []; cats.push(m.cat); } per[m.cat].push(m); });
     var h = '';
     cats.forEach(function (c) {
-      h += '<h2 style="margin:1rem 0 .2rem;">' + esc(c) + '</h2>';
+      h += '<h2 class="catkop">' + esc(c) + '</h2>';
       per[c].forEach(function (m) {
         var aantal = MAND[m.id] || 0;
         h += '<div class="item' + (m.uitverkocht ? ' uit' : '') + '">' +
@@ -351,9 +365,9 @@
           (m.alcohol ? '<div class="waarschuw">Alcohol: dit neemt een medewerker op.</div>' : '') +
           '</div><div class="pr">' + euro(m.centen) +
           (m.uitverkocht || m.alcohol ? '' :
-            '<div class="rij" style="justify-content:flex-end;margin-top:.35rem;">' +
+            '<div class="rij telrij">' +
             '<button data-min="' + esc(m.id) + '" aria-label="Eén minder">−</button>' +
-            '<span aria-live="polite" style="min-width:1.4rem;text-align:center;">' + aantal + '</span>' +
+            '<span aria-live="polite" class="telnr">' + aantal + '</span>' +
             '<button data-plus="' + esc(m.id) + '" aria-label="Eén meer">+</button></div>') +
           '</div></div>';
       });
@@ -505,7 +519,7 @@
       /* Wat we niet weten staat er MET de reden bij. Een leeg vak leest als
          "rustig", en dat merk je pas voor de deur. */
       $('#polsNiet').innerHTML = (j.nietGemeten || []).map(function (g) {
-        return '<p class="sub" style="margin-top:.3rem;">' + esc(g.waarom) + '</p>';
+        return '<p class="sub mt3">' + esc(g.waarom) + '</p>';
       }).join('');
       $('#polsZaak').innerHTML = (j.zaakZegt || []).map(function (z) {
         return polsRegel(z.naam, z.stand, z.label);

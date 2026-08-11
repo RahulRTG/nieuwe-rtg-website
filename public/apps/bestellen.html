@@ -73,6 +73,20 @@
     padding:.6rem .75rem;font-size:.86rem;margin-bottom:.8rem;}
   .melding.ok{border-color:var(--groen);}
   .code{font-family:ui-monospace,Menlo,monospace;font-size:1.25rem;letter-spacing:.1em;color:var(--gold);}
+
+  /* Kleine opmaakklassen in plaats van style="..."-attributen. Dat is geen
+     smaak: NORM.json telt die attributen (inlineStijlAttributen) omdat
+     style-src-attr in de CSP pas dicht kan als ze weg zijn, en dat getal mag
+     alleen omlaag. Deze pagina zette hem omhoog. */
+  .mt3{margin-top:.3rem;} .mt35{margin-top:.35rem;} .mt4{margin-top:.4rem;}
+  .mt5{margin-top:.5rem;} .mt6{margin-top:.6rem;} .mt7{margin-top:.7rem;}
+  .mt8{margin-top:.8rem;} .mt9{margin-top:.9rem;} .mt10{margin-top:1rem;}
+  .rechts{margin-left:auto;}
+  .catkop{margin:1rem 0 .2rem;}
+  .telrij{justify-content:flex-end;margin-top:.35rem;}
+  .telnr{min-width:1.4rem;text-align:center;}
+  .dnarij{padding:.6rem 0;border-bottom:1px solid var(--line);}
+  .smal{width:auto;}
   .wr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);}
 </style>
 </head>
@@ -102,15 +116,15 @@
         <option value="afhaal">Zelf afhalen</option>
         <option value="foodcourt">Foodcourt: meer loketten in één mandje</option>
       </select>
-      <p class="sub" id="modusLet" style="font-size:.82rem;color:var(--soft);margin-top:.4rem;"></p>
+      <p class="sub mt4" id="modusLet"></p>
 
       <div id="adresVak">
         <label class="lbl" for="postcode">Postcode van je bezorgadres</label>
         <input id="postcode" maxlength="8" placeholder="1011AB" autocomplete="postal-code">
         <label class="lbl" for="adres">Adres</label>
         <input id="adres" maxlength="120" placeholder="Damstraat 1" autocomplete="street-address">
-        <div class="rij" style="margin-top:.6rem;"><button id="bCheck">Kan hier bezorgd worden?</button></div>
-        <p id="zoneUit" style="font-size:.84rem;margin-top:.45rem;"></p>
+        <div class="rij mt6"><button id="bCheck">Kan hier bezorgd worden?</button></div>
+        <p class="sub mt4" id="zoneUit"></p>
       </div>
 
       <label class="lbl" for="tijd">Tijd (laat leeg als het niet uitmaakt)</label>
@@ -126,7 +140,7 @@
       <h2 id="kaartKop">De kaart</h2>
       <label class="lbl" for="allergie">Allergie of dieet (gaat mee naar de keuken)</label>
       <input id="allergie" maxlength="120" placeholder="bijvoorbeeld: ernstige notenallergie">
-      <div id="kaartLijst" style="margin-top:.7rem;"></div>
+      <div id="kaartLijst" class="mt7"></div>
     </section>
   </div>
 
@@ -141,7 +155,7 @@
 <div class="mand" id="mand" hidden>
   <div class="rij">
     <span id="mandTekst">Niets gekozen</span>
-    <span class="bedrag" id="mandBedrag" style="margin-left:auto;">€ 0,00</span>
+    <span class="bedrag rechts" id="mandBedrag">€ 0,00</span>
     <button class="prim" id="bBestel" disabled>Bestellen</button>
   </div>
 </div>
@@ -268,9 +282,9 @@
         (m.alcohol ? '<div class="waarschuw">Alcohol: dit loopt via een medewerker.</div>' : '') +
         '</div><div class="pr">' + euro(m.centen) +
         (m.uitverkocht || m.alcohol ? '' :
-          '<div class="rij" style="justify-content:flex-end;margin-top:.35rem;">' +
+          '<div class="rij telrij">' +
           '<button data-min="' + esc(m.id) + '" aria-label="Eén minder">−</button>' +
-          '<span style="min-width:1.4rem;text-align:center;">' + n + '</span>' +
+          '<span class="telnr">' + n + '</span>' +
           '<button data-plus="' + esc(m.id) + '" aria-label="Eén meer">+</button></div>') +
         '</div></div>';
     }).join('');

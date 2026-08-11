@@ -46,6 +46,12 @@ a.knop{display:inline-block;text-decoration:none;}
    achtergrondkleur: de MINUTEN staan altijd in de regel zelf, dus wie dit
    streepje niet ziet mist geen informatie. */
 .item.laat{border-left:3px solid var(--laat);padding-left:.5rem;}
+/* Marges als klasse in plaats van als style="..."-attribuut. NORM.json telt
+   die attributen (inlineStijlAttributen), omdat style-src-attr in de CSP pas
+   dicht kan als ze weg zijn -- en dat getal mag alleen omlaag. */
+.z-mt40{margin-top:.4rem;}
+.z-mt60{margin-top:.6rem;}
+.z-mt80{margin-top:.8rem;}
 .bon{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:.7rem .8rem;margin-bottom:.5rem;}
 .bon b{font-size:.95rem;}
 .allergie{display:inline-block;border:1px solid var(--laat);color:var(--laat);border-radius:6px;

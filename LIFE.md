@@ -233,7 +233,7 @@ vorige zijn toetsen heeft (LAT.md).
 | Fase | Wat | Status |
 |---|---|---|
 | 1 | **de sociale graaf**: de tien sociale apps plus de vriendenlaag als bron, met vooruitblik (verlopende documenten uit Entourage, data uit Attenties). Alleen lezen. | **er** |
-| 2 | **de objectlaag**: Persoon, Groep en Event als eerste drie types, met `caps` en een scherm dat de caps volgt | -- |
+| 2 | **de objectlaag**: Persoon, Groep en Event als eerste drie types, met `caps` en een scherm dat de caps volgt | **er** |
 | 3 | **de relatieruimte** op `levensband`: gedeelde tijdlijn, beeld, plannen en betalingen per relatie, met par. 4.2 in code | -- |
 | 4 | **de momentlijn**: leven in plaats van posts -- vandaag, vrijdag, zaterdag, volgende week | -- |
 | 5 | **Life Command + de orchestrator** op niveau klaarzetten, met het actielog eronder | -- |
@@ -271,6 +271,41 @@ allebei gerepareerd.
 **Wat er in fase 1 met opzet NIET is:** een scherm. De graaf is een laag, geen
 gezicht; het command center is fase 5. Wie de laag nu wil zien, roept de route
 aan.
+
+### Waar fase 2 staat
+
+`server/kern/objectlaag/` met vier delen: `caps.js` (de catalogus), en
+`persoon.js`, `groep.js`, `event.js` voor de drie types. De route is
+`POST /api/sociaal/object`; het scherm is het objectpaneel in
+`public/apps/sociaal.html`, dat **geen enkele cap bij naam kent** — het toont wat
+de server stuurt. Een cap erbij is dus een regel in `caps.js` en niets in het
+scherm, precies zoals de PDA schakelt op de modulelijst van de server
+(`kern/pda/modules.js`) en niet op zijn eigen idee van de caps.
+
+**Een cap is een belofte, en dat is machinaal bewaakt.** Elke cap draagt zijn
+bestemming, en `test/objectlaag.test.js` zakt zodra die pagina niet bestaat. Dat
+is de tegenhanger van wat PLATFORM.md beschrijft: zeventien app-teksten
+beloofden functies zonder route ("open deuren op afstand", "wij verzorgen
+inpakken en bezorgen"). Een objectlaag kan die fout op schaal herhalen — een cap
+"samen reizen" bij een persoon voelt logisch en is zonder bestemming een leugen
+met een pijltje.
+
+**Wat er bewust NIET in de catalogus staat: Attenties, Entourage en Cercle.** Die
+drie bewaren mensen met hun **echte naam** in het eigen dossier van het lid;
+deze laag draait op codenamen. Een cap die de twee koppelt, zou namen uit een
+dossier gaan vergelijken met codenamen en daarmee het ontwerp doorbreken dat
+CLAUDE.md beschermt. Een toets bewaakt dat er geen zo'n cap bijkomt. De reden
+staat in de kop van `persoon.js`, zodat de volgende die ze mist niet denkt dat
+het vergeten is.
+
+**Twee toetsbestanden, en dat is met reden.** `test/objectlaag.test.js` maakt de
+domeinen na en toetst de logica; `test/objectlaagroutes.test.js` praat met de
+echte server en pint de echte vorm vast. Dat tweede bestand verdiende zich
+meteen terug: een bijeenkomst-id is een **getal** (`Date.now()`) en alles wat via
+een route binnenkomt is een string, dus de vergelijking matchte nooit en de route
+gaf een 404 op een bijeenkomst die gewoon bestond. De nagemaakte kern zag het
+niet — daar was de id een string, want zo was hij opgeschreven. Zelfde blinde
+vlek als de lege bijeenkomsttitel in fase 1.
 
 ---
 

@@ -27,4 +27,21 @@ module.exports = (kern) => {
     if (geenGast(req, res)) return;
     res.json(kern.socialegraaf.beeld(req.session.key));
   });
+
+  /* Een object opvragen: wat kan ik met deze persoon, groep of bijeenkomst
+     (LIFE.md fase 2). Ook dit is ALLEEN LEZEN -- elke cap die terugkomt is een
+     weg naar de app die het echte werk doet, en er is hier geen tegenhanger die
+     iets uitvoert.
+
+     EEN 404 ZEGT NIET WELKE VAN DE TWEE HET WAS. Bestaat niet en hoort niet bij
+     u komen allebei hier uit, met dezelfde tekst. Zou de melding verschillen,
+     dan is een reeks aanvragen genoeg om te leren welke groepen bestaan en hoe
+     ze heten -- en dat is precies wat een besloten genootschap niet mag lekken. */
+  app.post('/api/sociaal/object', auth, (req, res) => {
+    if (geenGast(req, res)) return;
+    const b = req.body || {};
+    const r = kern.objectlaag.object(req.session.key, String(b.soort || ''), b.id);
+    if (!r) return res.status(404).json({ error: 'Dit vinden we niet.' });
+    res.json(r);
+  });
 };

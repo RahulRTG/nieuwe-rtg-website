@@ -93,4 +93,12 @@ Object.assign(kern, require('../kern/levensband')({ db, save }));
    SCHRIJFT NOOIT, en heeft geen eigen opslag: krijgt daarom alleen kern mee, en
    met opzet geen db en geen save. */
 Object.assign(kern, require('../kern/socialegraaf')({ kern }));
+/* De objectlaag (kern/objectlaag/): niet apps maar objecten -- wat kan ik met
+   deze persoon, deze groep, deze bijeenkomst (LIFE.md fase 2).
+
+   Leest de kern LAAT, net als de twee lagen hierboven, dus de mountvolgorde van
+   genootschap, comm, vonk, wbw en de rest doet er niet toe. SCHRIJFT NOOIT en
+   heeft geen opslag: krijgt daarom alleen kern mee. Elke cap wijst naar de app
+   die het echte werk doet; deze laag handelt zelf niets af. */
+Object.assign(kern, require('../kern/objectlaag')({ kern }));
 };

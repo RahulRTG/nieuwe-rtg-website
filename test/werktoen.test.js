@@ -63,8 +63,17 @@ test('1. "toen" gaat over bestaan en niet over toestand, en zegt dat zelf', asyn
   const contract = nu.soorten.find(s => s.type === 'contract');
   assert.equal(contract.bestond, 3, 'alle drie de contracten bestonden vandaag');
   assert.equal(nu.wat, 'bestaan');
-  assert.match(nu.let, /NIET de toestand van toen/i);
-  assert.match(nu.let, /geen gebeurtenislaag/i, 'met de reden waarom dat niet kan');
+  /* Het antwoord moet ZELF zeggen dat dit over bestaan gaat en niet over
+     toestand. De zin daarvoor is bijgewerkt toen de gebeurtenislaag er kwam:
+     eerst luidde hij "NIET de toestand van toen -- er is geen gebeurtenislaag",
+     nu wijst hij de laag aan die er inmiddels WEL is. De bewering blijft
+     dezelfde, dus toetst hij de betekenis en niet de oude formulering: het
+     woord bestaan, het woord toestand, en de route waar je die haalt. Alleen
+     de oude tekst blijven eisen zou een toets zijn die vraagt of het gat er
+     nog is. */
+  assert.match(nu.let, /bestond|bestaan/i, 'het antwoord noemt zichzelf een bestaanstelling');
+  assert.match(nu.let, /toestand/i, 'en zet zich af tegen de toestand van toen');
+  assert.match(nu.let, /toen\/object/i, 'met de route waar de toestand wel te halen is');
 
   const eerder = (await api('/toen', Object.assign({ datum: '2020-01-01' }, DIR))).body;
   assert.equal(eerder.soorten.find(s => s.type === 'contract').bestond, 0,

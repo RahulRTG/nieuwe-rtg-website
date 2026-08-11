@@ -19,7 +19,12 @@ module.exports = [
      dat het OS een OS heet en geen verzameling modules. */
   { id: 'ondernemersos', categorie: 'Eigen apps', naam: 'RTG Ondernemers-OS', standaard: true, doelgroepen: LEDEN,
     uitleg: 'Van "ik denk erover na" tot een draaiend bedrijf in een scherm: de verkenning en de stress test, de rechtsvorm en het oprichtingsproject, het dagbeeld met debiteuren, btw, kas en capaciteit, de verkooppijplijn en het bestuur met de UBO-afleiding.',
-    paden: ['/api/onderneming'] },
+    /* /api/concern hoort bij deze app en niet bij een eigen knop: het concern
+       IS de onderneming zodra er meer dan een vennootschap onder hangt. Zonder
+       dit pad stonden de boom en de bulk-acties buiten de schakelkast -- weer
+       door optelling, precies zoals hierboven beschreven, en daarom staat de
+       reden er nu bij in plaats van alleen het pad. */
+    paden: ['/api/onderneming', '/api/concern'] },
   { id: 'vonk', categorie: 'Eigen apps', naam: 'RTG Vonk (dating)', standaard: true, doelgroepen: LEDEN,
     uitleg: 'Dating op codenaam met de Salon-veiligheidslat: 18+, geverifieerd paspoort, een eindige dagselectie, en bij een match automatisch een tafel rond het midden van beide woonplaatsen (EUR 10 p.p., waarvan EUR 5 voor RTG).', paden: ['/api/vonk'] },
   { id: 'mediaos', categorie: 'Eigen apps', naam: 'RTG Media (één mediawereld)', standaard: true, doelgroepen: LEDEN,

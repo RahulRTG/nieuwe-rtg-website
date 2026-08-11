@@ -73,6 +73,7 @@ const VASTLEGGEN = argv.includes('--vastleggen');
 const JSONUIT = argv.includes('--json');
 const POORTWACHT = (argv.find(a => a.startsWith('--poortwacht=')) || '').slice(13);
 const ROLPROEF = (argv.find(a => a.startsWith('--rolproef=')) || '').slice(11);
+const KETENS = (argv.find(a => a.startsWith('--ketens=')) || '').slice(9);
 const JOURNAAL = (argv.find(a => a.startsWith('--journaal=')) || '').slice(11) ||
   path.join(WORTEL, '.routejournaal');
 
@@ -105,9 +106,9 @@ const SCHAKELS = [
   { id: 'IDEMPOTENCY', uitleg: 'dezelfde oproep twee keer doet niet twee keer iets',
     bron: null, nvtBijLezen: true, nodig: 'elke schrijfroute twee keer met dezelfde sleutel' },
   { id: 'FAILURE', uitleg: 'faalt hij netjes als er iets onder hem wegvalt',
-    bron: null, nodig: 'de Verraadsmotor: database/cache/klok laten liegen tijdens de oproep' },
+    bron: 'scripts/ketenronde.js (echte sabotage op de keten waar deze route in zit)' },
   { id: 'ROLLBACK', uitleg: 'laat een half mislukte oproep niets half achter',
-    bron: null, nvtBijLezen: true, nodig: 'afbreken midden in de handler en de toestand nameten' },
+    bron: 'scripts/ketenronde.js', nvtBijLezen: true },
   { id: 'PRIVACY', uitleg: 'lekt het antwoord een echte naam, IBAN of e-mailadres',
     bron: 'scripts/rolproef-route.js (op de WEIGERING; nog niet op een geslaagd antwoord)' }
 ];
@@ -191,6 +192,40 @@ function rolproefUitslag() {
   } catch (e) { return null; }
 }
 
+/* De ketenronde: welke ROUTES zitten in een keten die onder echte sabotage is
+   beoordeeld. Alleen scenario's die de zevenstappenlat halen tellen -- een
+   scenario dat niet zichtbaar of niet herhaalbaar was, is geen bewijs. */
+function ketenUitslag() {
+  if (!KETENS) return null;
+  try {
+    const j = JSON.parse(fs.readFileSync(KETENS, 'utf8'));
+    if (!Array.isArray(j.scenarios)) return null;
+    const kaart = new Map();
+    for (const sc of j.scenarios) {
+      if (!sc.verraad || !(sc.lat && sc.lat.voldoet)) continue;
+      for (const pad of (ROUTES_PER_KETEN[sc.keten] || [])) {
+        const oud = kaart.get(pad);
+        /* Een keten kan meerdere verraden hebben; de STRENGSTE uitkomst telt.
+           Een route die onder een van de sabotages stil verlies gaf, is niet
+           bewezen omdat een andere sabotage netjes verliep. */
+        kaart.set(pad, { failure: sc.clientAntwoord === 'FAIL' || (oud && oud.failure),
+          rollbackBewezen: sc.rollback === 'PROVEN' && !sc.stilVerlies && !(oud && oud.stil),
+          stil: sc.stilVerlies || (oud && oud.stil) });
+      }
+    }
+    return kaart;
+  } catch (e) { return null; }
+}
+
+/* Welke schrijfroutes een keten aanraakt. Met de hand, want een keten IS een
+   handmatig gekozen verhaal -- hem laten raden welke routes erbij horen zou een
+   bewijs uitsmeren over routes die nooit zijn geraakt. */
+const ROUTES_PER_KETEN = {
+  NOTITIE: ['POST /api/notities/bewaar'],
+  GELD: ['POST /api/pay/oplaad'],
+  TOESTEMMING: ['POST /api/toestemming/intrek']
+};
+
 function poortwachtUitslag() {
   if (!POORTWACHT) return null;
   try {
@@ -222,6 +257,7 @@ function bouw(invoer) {
   const journaal = inv.journaal !== undefined ? inv.journaal : geraakt();
   const poort = inv.poort !== undefined ? inv.poort : poortwachtUitslag();
   const rol = inv.rol !== undefined ? inv.rol : rolproefUitslag();
+  const keten = inv.keten !== undefined ? inv.keten : ketenUitslag();
 
   const rijen = [];
   for (const r of tabel.routes) {
@@ -239,6 +275,19 @@ function bouw(invoer) {
           cellen[s.id] = { staat: 'bewezen', bron: 'poortwacht', oordeel: gemeten.oordeel };
         } else if (bron && bron.bewakers.length) {
           cellen[s.id] = { staat: 'verklaard', bron: bron.bewakers.join('+'), waar: bron.waar };
+        } else {
+          cellen[s.id] = { staat: 'ongemeten' };
+        }
+        continue;
+      }
+
+      if (s.id === 'FAILURE' || s.id === 'ROLLBACK') {
+        const k = keten && keten.get(sleutel);
+        if (k) {
+          const goed = s.id === 'FAILURE' ? !k.stil : k.rollbackBewezen;
+          cellen[s.id] = goed
+            ? { staat: 'bewezen', bron: 'ketenronde' }
+            : { staat: 'gezakt', bron: 'ketenronde', reden: k.stil ? 'stil verlies' : 'rollback niet bewezen' };
         } else {
           cellen[s.id] = { staat: 'ongemeten' };
         }

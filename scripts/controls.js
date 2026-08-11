@@ -47,6 +47,7 @@ const BRONNEN = [
   'server/lib/keten.js',
   'server/lib/keten-anker.js',
   'server/lib/verraad.js',
+  'scripts/lib/ketenproef.js',
   'server/lib/klok.js',
   'scripts/lib/schermleugen.js',
   'scripts/lib/rolproef.js',

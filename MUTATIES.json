@@ -1576,6 +1576,14 @@
       "gezakt": 5,
       "scherp": "gezakt"
     },
+    "ketenproef.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/lib/ketenproef.js",
+      "operator": "===->!==#0",
+      "gezakt": 9,
+      "geprobeerd": 1
+    },
     "keuken.test.js": {
       "soort": "server",
       "staat": "gezakt",

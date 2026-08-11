@@ -1,8 +1,8 @@
 {
   "uitleg": "Verklaarde beheersmaatregelen en wanneer elk voor het laatst BEWEZEN is. Zie TOEZICHT.md. laatstGroen is gemeten door de genoemde toetsen te draaien, niet overgeschreven -- een register dat zijn eigen groen opschrijft bewijst niets.",
   "gemeten": {
-    "controls": 7,
-    "groen": 6,
+    "controls": 8,
+    "groen": 7,
     "nietInBedrijf": 1,
     "nietGroen": 0
   },
@@ -28,7 +28,7 @@
         "staat": "GROEN",
         "beweringen": 30,
         "overgeslagen": 0,
-        "at": "2026-08-11T23:32:37.878Z",
+        "at": "2026-08-11T23:44:55.646Z",
         "bestanden": [
           "test/keten.test.js"
         ]
@@ -56,7 +56,7 @@
         "staat": "NIET IN BEDRIJF",
         "beweringen": 30,
         "overgeslagen": 0,
-        "at": "2026-08-11T23:32:38.109Z",
+        "at": "2026-08-11T23:44:55.872Z",
         "bestanden": [
           "test/keten.test.js"
         ],
@@ -92,10 +92,43 @@
         "staat": "GROEN",
         "beweringen": 33,
         "overgeslagen": 0,
-        "at": "2026-08-11T23:32:38.958Z",
+        "at": "2026-08-11T23:44:56.822Z",
         "bestanden": [
           "test/verraad.test.js",
           "test/verraadtelling.test.js"
+        ]
+      }
+    },
+    {
+      "bron": "scripts/lib/ketenproef.js",
+      "control": "KETENPROEF",
+      "wat": "per businessketen is onder echte sabotage gemeten wat de gebruiker kreeg en wat er bleef staan",
+      "eigenaar": "Techniek",
+      "bewijs": [
+        "test/ketenproef.test.js"
+      ],
+      "bewijsstuk": "KETENS.json -- acht velden per keten en verraad, met de zevenstappenlat",
+      "grens": "drie ketens van de tientallen die er zijn, en alleen de twee verraden die op het schrijfpad zijn ingebouwd. Een keten die achter een poort zit (KYC, een bestaande toestemming) wordt NIET beoordeeld en staat als blind met reden in het register.",
+      "dekking": {
+        "beproefd": 1,
+        "totaal": 2,
+        "eenheid": "scenarios die de zevenstappenlat halen",
+        "tellers": {
+          "ketens": 3,
+          "blindeKetens": 2,
+          "rollbackBewezen": 1,
+          "ledgerGebroken": 0,
+          "stilVerlies": 1
+        },
+        "pct": 50
+      },
+      "laatstGroen": {
+        "staat": "GROEN",
+        "beweringen": 21,
+        "overgeslagen": 0,
+        "at": "2026-08-11T23:44:57.058Z",
+        "bestanden": [
+          "test/ketenproef.test.js"
         ]
       }
     },
@@ -122,7 +155,7 @@
         "staat": "GROEN",
         "beweringen": 18,
         "overgeslagen": 0,
-        "at": "2026-08-11T23:32:41.527Z",
+        "at": "2026-08-11T23:44:59.062Z",
         "bestanden": [
           "test/klok.test.js"
         ]
@@ -153,7 +186,7 @@
         "staat": "GROEN",
         "beweringen": 18,
         "overgeslagen": 0,
-        "at": "2026-08-11T23:33:11.282Z",
+        "at": "2026-08-11T23:45:28.393Z",
         "bestanden": [
           "test/schermleugen.test.js",
           "test/liegend-scherm.e2e.js"
@@ -186,7 +219,7 @@
         "staat": "GROEN",
         "beweringen": 13,
         "overgeslagen": 0,
-        "at": "2026-08-11T23:33:11.497Z",
+        "at": "2026-08-11T23:45:28.605Z",
         "bestanden": [
           "test/rolproef.test.js"
         ]
@@ -206,8 +239,8 @@
         "totaal": 43835,
         "eenheid": "cellen",
         "tellers": {
-          "ongemeten": 37592,
-          "gezakt": 0
+          "ongemeten": 37590,
+          "gezakt": 2
         },
         "pct": 13.6
       },
@@ -216,7 +249,7 @@
         "staat": "GROEN",
         "beweringen": 11,
         "overgeslagen": 0,
-        "at": "2026-08-11T23:33:11.692Z",
+        "at": "2026-08-11T23:45:28.790Z",
         "bestanden": [
           "test/bewijsmatrix.test.js"
         ]

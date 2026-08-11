@@ -65,7 +65,8 @@
     "controls:vast": "node scripts/controls.js --vastleggen",
     "rolproef": "node --experimental-sqlite scripts/rolproef-route.js",
     "verraadcatalogus": "node -e \"const v=require('./server/lib/verraad');for(const x of v.CATALOGUS)console.log((x.waar?'[ingebouwd] ':'[voornemen] ')+x.naam.padEnd(18)+x.wat)\"",
-    "verraad": "node --experimental-sqlite scripts/verraadronde.js"
+    "verraad": "node --experimental-sqlite scripts/verraadronde.js",
+    "ketenronde": "node --experimental-sqlite scripts/ketenronde.js"
   },
   "devDependencies": {
     "playwright": "^1.62.1"

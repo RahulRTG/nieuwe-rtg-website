@@ -9,8 +9,8 @@
     "bewezen": 5983,
     "verklaard": 0,
     "nvt": 260,
-    "ongemeten": 37592,
-    "gezakt": 0
+    "ongemeten": 37590,
+    "gezakt": 2
   },
   "perSchakel": {
     "AUTH": {
@@ -73,15 +73,15 @@
       "bewezen": 0,
       "verklaard": 0,
       "nvt": 0,
-      "ongemeten": 3985,
-      "gezakt": 0
+      "ongemeten": 3984,
+      "gezakt": 1
     },
     "ROLLBACK": {
       "bewezen": 0,
       "verklaard": 0,
       "nvt": 65,
-      "ongemeten": 3920,
-      "gezakt": 0
+      "ongemeten": 3919,
+      "gezakt": 1
     },
     "PRIVACY": {
       "bewezen": 999,

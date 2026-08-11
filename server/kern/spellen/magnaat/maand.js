@@ -26,6 +26,10 @@
    toestand rekenen, dan bepaalt de volgorde van de spelers in een object wie de
    klanten krijgt. */
 const { maand: rekenMaand, levering } = require('./stap');
+/* DE CONJUNCTUUR. Hij komt hier binnen en nergens anders: een golf over de hele
+   stad hoort op de plek waar de stad gerekend wordt. Zie ./cyclus.js -- hij
+   raakt twee dingen, de vraag en de prijs van geld, en verder niets. */
+const C = require('./cyclus');
 const F = require('./foundation');
 const H = require('./handel');
 
@@ -44,6 +48,17 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering
         druk[zone + ':' + v.sector] = (druk[zone + ':' + v.sector] || 0) + 1;
       }
     let wereldOmzet = 0;
+    /* DE STAND VAN DE CONJUNCTUUR, EEN KEER PER MAAND EN VOOR IEDEREEN GELIJK.
+       `st.cyclus` stond al in de renteformule van ./bank.js en werd door niets
+       gevoed -- hij bleef nul, dus de bank rekende altijd met een neutrale
+       conjunctuur. Dit is de draad die daar los hing.
+
+       Hij wordt hier GEZET en niet berekend waar hij gelezen wordt: de bank
+       leest hem tijdens een actie (een offerte opvragen kan elk moment), en dan
+       zou een offerte in dezelfde maand een andere rente geven dan de maandloop
+       rekent. Een getal op de staat is een getal waar iedereen het over eens is. */
+    const conjunctuur = C.vraagFactor(potje.id, st.maand);
+    st.cyclus = C.geldstand(potje.id, st.maand);
     const perSpeler = {};
     // wat de Foundation aan opleiding heeft bijgedragen; werkt door in hoeveel
     // een medewerker aankan
@@ -94,7 +109,7 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering
         });
         const kOp = Object.assign({}, k, { kavel: new Map(k.kavel).set(kavel.id, opgeschoven) });
         const r = rekenMaand(kOp, v, { maand: st.maand, zoneDruk: druk[kavel.zone + ':' + v.sector] || 1,
-          wereldFactor: 1, arbeid, contract: toezegging[v.id], gedekt: ontvangst[v.id] });
+          wereldFactor: conjunctuur, arbeid, contract: toezegging[v.id], gedekt: ontvangst[v.id] });
         const regel = Object.assign({ id: v.id, naam: v.naam, sector: v.sector, kavel: kavel.naam }, r);
         regels.push(regel);
         /* HET RESULTAAT WORDT VERDEELD als er aandeelhouders zijn (./aandeel.js).

@@ -16,6 +16,7 @@
       zien wat voor ondernemer je was; er een tweede ranglijst van maken zou
       betekenen dat je op zes assen tegelijk aan het optimaliseren bent. */
 const { capaciteit, personeelNodig, waarde } = require('./stap');
+const C = require('./cyclus');
 const { SECTOREN } = require('./sectoren');
 const { prijsVan } = require('./prijsstand');
 const H = require('./handel');
@@ -82,35 +83,9 @@ module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid, veilingb
   }
 
 
-  function eindstand(potje) {
-    const st = potje.staat;
-    return potje.spelers.map(h => {
-      const rij = st.vestigingen[h] || [];
-      /* ALLEEN JE EIGEN DEEL, want een deelneming verplaatst waarde (./aandeel.js).
-         Zou een eigenaar de hele waarde meetellen en de aandeelhouder ook zijn
-         deel, dan staat dezelfde euro bij twee mensen op de eindstand en klopt
-         de optelsom van de partij niet meer. */
-      const ondernemingswaarde = rij.reduce((n, v) => n + waarde(v) * eigenDeel(st, v.id), 0)
-        + belangwaarde(st, h);
-      /* SCHULD GAAT ERAF, en dat is geen boekhoudkundige nettigheid maar een
-         gat dat de geldpomp-keuring vond. Zonder deze regel telt geleend geld
-         als vermogen: drie spelers die samen negen ton opnemen zetten negen ton
-         op de eindstand, en op de laatste speeldag lenen is dan de goedkoopste
-         manier om te winnen. Wat je van de bank hebt, is niet van jou. */
-      const schuld = (st.leningen || [])
-        .filter(l => l.speler === h && l.status === 'loopt')
-        .reduce((n, l) => n + l.restant, 0);
-      const banen = rij.reduce((n, v) => n + v.personeel, 0);
-      const reputatie = rij.length ? Math.round(rij.reduce((n, v) => n + v.reputatie, 0) / rij.length) : 0;
-      const omzet = rij.reduce((n, v) => n + (v.omzetTotaal || 0), 0);
-      return {
-        codenaam: codenaamVan(h),
-        geld: rond(st.geld[h]), waarde: rond(ondernemingswaarde), schuld: rond(schuld),
-        vermogen: rond(st.geld[h] + ondernemingswaarde - schuld),
-        vestigingen: rij.length, banen, reputatie, omzet: rond(omzet)
-      };
-    }).sort((a, b) => b.vermogen - a.vermogen);
-  }
+  /* WAAROP ER WORDT AFGEREKEND staat in ./eindstand.js -- een eigen onderwerp
+     dat af is, terwijl dit bestand met elke laag meegroeit. */
+  const eindstand = require('./eindstand')({ codenaamVan, rond, waarde, eigenDeel, belangwaarde });
 
   function zicht(potje, st, mij) {
     bijrekenen(potje);
@@ -133,6 +108,11 @@ module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid, veilingb
     return {
       stad: k.naam, bron: k.bron, maand: st.maand, duur: st.duur, klaar: st.klaar,
       geld: rond(st.geld[mij] || 0),
+      /* DE CONJUNCTUUR IS PUBLIEK. Er is geen versie van dit spel waarin de ene
+         ondernemer wel weet dat het slecht gaat en de andere niet -- dat staat in
+         de krant. En zonder de vooruitblik ("nog drie maanden recessie") is een
+         cyclus geen mechaniek maar pech. */
+      cyclus: C.beeld(potje.id, st.maand),
       vestigingen: eigen,
       // van de anderen alleen wat aan tafel zichtbaar is: waar ze zitten en
       // hoeveel. Hun cash is van hen -- zie de waarschuwing in de descriptor
@@ -179,6 +159,8 @@ module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid, veilingb
     const k = K(st);
     return { stad: k.naam, maand: st.maand, duur: st.duur, klaar: st.klaar,
       stand: potje.spelers.map(h => ({ codenaam: codenaamVan(h), vestigingen: (st.vestigingen[h] || []).length })),
+      // de conjunctuur hoort ook op een gedeeld scherm: hij is van de stad
+      cyclus: C.beeld(potje.id, st.maand),
       foundation: st.foundation.gedaan.length };
   }
 

@@ -1321,9 +1321,51 @@ dan wegkijken, slechter dan opletten.
 > maandoverzicht, en legt dat naast wat er de wereld verliet — twee verschillende
 > paden.
 
+### Economische cycli — de wind die over de hele stad waait
+
+**Dit was een losse draad.** `st.cyclus` stond al maanden in de renteformule van
+de bank en werd door niets gevoed: hij bleef nul, dus de bank rekende altijd met
+een neutrale conjunctuur. De formule zag er compleet uit en meette niets.
+
+**Vier fasen, in volgorde, die zich herhalen:** bloei (veel vraag, duur geld) →
+omslag (vraag zakt, banken worden voorzichtig) → recessie (weinig vraag, duur en
+schaars krediet) → herstel (het trekt aan, geld is goedkoop — het moment om te
+bouwen). De lengte (24–44 maanden) en de startfase komen per partij uit de hash,
+dus twee campagnes krijgen een andere conjunctuur en dezelfde campagne altijd
+dezelfde.
+
+**Hij raakt twee dingen en verder niets:** de vraag over de hele stad tegelijk,
+en de prijs van geld via de post die er al op wachtte. Niet de kosten, niet de
+capaciteit, niet de risico's — elke post die een cyclus er nog bij pakt maakt hem
+een tweede economie in plaats van een golf eroverheen. De haak bestond al:
+`wereldFactor` stond in `stap.js` met de opmerking dat toeval in de *wereld* hoort
+en niet in de boeken, en stond in `maand.js` hard op 1.
+
+**Hij is deterministisch én je ziet hem aankomen**, en dat tweede is een sterkere
+eis dan bij de risico's. Een risico dat uit een hash komt is onvoorspelbaar en dat
+hoort; een conjunctuur die uit een hash komt is ruis. Wat een cyclus speelbaar
+maakt is dat je in een recessie *weet* dat er herstel volgt — daarop bouw je je
+strategie. Het scherm zegt dus waar je staat, hoeveel maanden die fase nog duurt,
+en wat er hierna komt. En hij is **publiek**: er is geen versie van dit spel
+waarin de ene ondernemer wel weet dat het slecht gaat en de andere niet.
+
+**De band is smal met opzet** — 8% boven tot 7% onder. Een cyclus die het verschil
+maakt tussen winnen en verliezen is geen economie maar een dobbelsteen met vier
+zijden.
+
+> **Twee toetsen die iets anders maten dan ze beweerden.** "De vraag beweegt met
+> de conjunctuur mee" middelde eerst de verkopen per fase over vijf jaar — maar
+> een fase duurt zeven tot elf maanden, dus elke fase dekt andere *seizoenen*.
+> Per kalendermaand vergelijken hielp maar half: over tien jaar bewegen reputatie,
+> bezetting en de buren ook, en zes van de twaalf maanden kwamen er andersom uit.
+> Beide keren overleefde het wegnemen van de hele conjunctuur de toets. Nu wordt
+> de *bedrading* geïsoleerd door `vraagFactor` te vervangen, met daarnaast een
+> aparte regel dat de echte functie ook beweegt — anders raakt een mutatie alleen
+> de vervangen versie. En "elke partij een eigen golf" werd gedekt door de
+> *lengte* alleen, dus een startfase die altijd 0 was kwam erlangs.
+
 **Wat er van fase B nog niet in zit.** Concernstrategie, een aandelenmarkt met
-dividend, fusies, economische cycli (`st.cyclus` staat al in de renteformule maar
-wordt door niets gevoed), wereldnieuws en AI-concurrenten die leren.
+dividend, fusies, wereldnieuws en AI-concurrenten die leren.
 
 **Fase C — de permanente wereld.** Living World, AI-managers met beleidsregels,
 Safe Management Policy, vakantiemodus, overdracht, legacy, Magnaat Daily,

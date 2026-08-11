@@ -17,13 +17,19 @@ staat ook **het wereldpatroon**: samenvoegen is stap een, niet de bedoeling —
 een wereld is pas af als hij zijn onderwerp begrijpt (graaf, beleid, cockpit,
 gegronde Rahul, actielog).
 
-**`GELD.md` en `LEVEN.md` zijn de diepte-documenten per wereld.** GELD.md
+**`GELD.md`, `LEVEN.md` en `LIFE.md` zijn de diepte-documenten per wereld.** GELD.md
 maakt van RTG Geld een financieel besturingssysteem; de harde grens daar is
 dat geld het huis nooit vanzelf verlaat. LEVEN.md maakt van RTFoundation een
 Life OS dat een mens vanaf de geboorte begeleidt — lees vóór je daaraan werkt
 vooral paragraaf 2, de grenzen: een kind is geen profiel, nooit sturen maar
 openen, en de bijdrage-spiegel is nooit vergelijkend. Waar een functie botst
-met een grens, vervalt de functie.
+met een grens, vervalt de functie. LIFE.md maakt van RTG Sociaal een Life OS:
+niet een sociaal netwerk maar het leven tússen mensen, waarbij een lid geen app
+opent maar een levensmoment. Het werkwoord daar is **samenstellen en klaarzetten
+— bevestigen doet de mens**: alles wat een tweede persoon bereikt (uitnodiging,
+bericht, boeking, betaling) wordt nooit automatisch. Lees ook daar paragraaf 4,
+de grenzen: een relatie is geen trechter, en er komt geen score op het leven
+tussen mensen.
 
 **`ONTWERP.md` is het RTG Design System 2.0** — de vormtaal: merk-elementen
 tegenover werk-elementen (Bodoni is ceremonieel en staat op een gesloten lijst

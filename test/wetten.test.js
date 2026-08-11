@@ -93,9 +93,31 @@ test('de wettenmotor slaat uit op bekend-foute invoer', () => {
     'een volledige wet met een bewezen gevoelige toets heet BEWEZEN');
 });
 
-test('zonder mutatiemeting deelt de motor geen enkele BEWEZEN uit', () => {
-  const uitslag = keur(register, { gemeten: null });
+/* ER ZIJN TWEE BEWIJSBRONNEN, EN DEZE TOETS WIST DAT EERST NIET.
+
+   Hij eiste dat er zonder MUTATIES.json geen enkele BEWEZEN overblijft, en dat
+   klopte zolang de mutatiemotor de enige bron was. Sinds scripts/sabotage.js
+   bestaat er een tweede, gerichte bron (SABOTAGE.json), en die staat los van de
+   mechanische mutaties -- dus zakte deze toets terecht op 4 !== 0. Niet de
+   motor was fout maar de aanname erin. Nu toetst hij allebei de gevallen apart:
+   geen enkele bron levert niets op, en sabotage alleen is genoeg. */
+test('zonder enige meting deelt de motor geen enkele BEWEZEN uit', () => {
+  const uitslag = keur(register, { gemeten: null, sabotage: {} });
   assert.equal(uitslag.telling.BEWEZEN, 0,
-    'ontbreekt MUTATIES.json, dan is er niets gemeten en hoort niets BEWEZEN te heten');
+    'ontbreken beide bronnen, dan is er niets gemeten en hoort niets BEWEZEN te heten');
   assert.equal(uitslag.gemetenBeschikbaar, false, 'en dat staat er ook bij, in plaats van stil te doen alsof');
+});
+
+test('sabotage alleen is genoeg bewijs, ook zonder mutatiemeting', () => {
+  const uitslag = keur(register, { gemeten: null, sabotage: { 'RTG-014': { stand: 'BEWEZEN' } } });
+  const w = uitslag.wetten.find(x => x.id === 'RTG-014');
+  assert.equal(w.stand, 'BEWEZEN', 'een handhaver die uitgezet is en een toets rood maakte, bewijst de wet');
+  assert.equal(w.bewezenDoor, 'sabotage', 'en er staat bij waar dat bewijs vandaan komt');
+});
+
+test('een OVERLEEFDE sabotage is een sterker negatief dan "nog niet gemeten"', () => {
+  const uitslag = keur(register, { gemeten: null, sabotage: { 'RTG-014': { stand: 'OVERLEEFD' } } });
+  const w = uitslag.wetten.find(x => x.id === 'RTG-014');
+  assert.equal(w.stand, 'ONBEPROEFD', 'de handhaver kon uit: dat is geen bewijs');
+  assert.match(w.reden, /OVERLEEFD/, 'en de reden zegt dat met zoveel woorden, in plaats van te zwijgen');
 });

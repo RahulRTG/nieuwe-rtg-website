@@ -72,7 +72,14 @@ function leesRegister(pad) {
 
 /* Een wet keuren. Puur: alles wat hij van de wereld nodig heeft komt binnen via
    `bestaat` en `gemeten`, zodat de zelftest hem een verzonnen wereld kan voeren. */
-function keurWet(w, bestaat, gemeten) {
+/* De uitslag van scripts/sabotage.js. Ontbreekt hij, dan valt de keuring terug
+   op de mechanische mutatie -- niet op een aanname. */
+function gesaboteerd() {
+  try { return JSON.parse(fs.readFileSync(path.join(WORTEL, 'SABOTAGE.json'), 'utf8')).wetten || {}; }
+  catch (e) { return {}; }
+}
+
+function keurWet(w, bestaat, gemeten, sab) {
   const handhavers = w.handhaver || [];
   const toetsen = w.toetsen || [];
   const missendeHandhaver = handhavers.filter(p => !bestaat(p));
@@ -83,6 +90,18 @@ function keurWet(w, bestaat, gemeten) {
     return { stand: 'OPEN', gebroken: [],
       reden: !handhavers.length ? 'geen handhaver benoemd' : 'geen toets benoemd', bewezenDoor: null };
   }
+  /* SABOTAGE WEEGT ZWAARDER DAN EEN MUTATIE, en dat is geen voorkeur maar een
+     verschil in soort. Een mutatie raakt een willekeurige plek in een module die
+     de toets toevallig laadt; een sabotage zet precies de handhaver uit die DEZE
+     wet noemt. Slaagt die, dan is de wet gericht bewezen -- ook als de
+     mechanische motor de toets nooit heeft zien zakken (loghygiene.test.js is
+     precies dat geval). En OVERLEEFT een sabotage, dan is dat een sterker
+     negatief dan "nog niet gemeten": de handhaver kon uit zonder dat er iets
+     rood werd. Dat verdient zijn eigen reden en geen stilte. */
+  const s = (sab || {})[w.id];
+  if (s && s.stand === 'BEWEZEN') return { stand: 'BEWEZEN', gebroken: [], bewezenDoor: 'sabotage', operator: (w.sabotageProef || {}).bestand || null };
+  if (s && s.stand === 'OVERLEEFD') return { stand: 'ONBEPROEFD', gebroken: [], reden: 'de sabotage werd OVERLEEFD: de handhaver kon uit zonder dat een toets rood werd', bewezenDoor: null };
+  if (s && s.stand === 'STUK') return { stand: 'ONBEPROEFD', gebroken: [], reden: 'de sabotage past niet meer op de bron en is dus verlopen', bewezenDoor: null };
   if (!gemeten) return { stand: 'ONBEPROEFD', gebroken: [], reden: 'MUTATIES.json ontbreekt; niets gemeten', bewezenDoor: null };
   const bewijs = toetsen.find(t => gemeten[t] && gemeten[t].staat === 'gezakt');
   if (!bewijs) return { stand: 'ONBEPROEFD', gebroken: [], reden: 'geen van de toetsen is zien zakken op een mutatie', bewezenDoor: null };
@@ -93,7 +112,8 @@ function keur(register, opties) {
   const o = opties || {};
   const bestaat = o.bestaat || (p => fs.existsSync(path.join(WORTEL, p)));
   const gemeten = o.gemeten === undefined ? mutaties() : o.gemeten;
-  const uit = register.wetten.map(w => Object.assign({}, w, keurWet(w, bestaat, gemeten)));
+  const sab = o.sabotage === undefined ? gesaboteerd() : o.sabotage;
+  const uit = register.wetten.map(w => Object.assign({}, w, keurWet(w, bestaat, gemeten, sab)));
   const telling = { BEWEZEN: 0, ONBEPROEFD: 0, OPEN: 0, GEBROKEN: 0 };
   for (const w of uit) telling[w.stand]++;
   return { wetten: uit, telling, gemetenBeschikbaar: !!gemeten };

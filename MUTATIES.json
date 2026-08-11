@@ -3245,6 +3245,14 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
+    "sabotage.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "scripts/sabotage.js",
+      "operator": "===->!==#0",
+      "gezakt": 1,
+      "geprobeerd": 3
+    },
     "salon-app.test.js": {
       "soort": "server",
       "staat": "gezakt",

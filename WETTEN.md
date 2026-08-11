@@ -13,8 +13,8 @@ een bewering met een adres kan zakken.
 
 | stand | aantal | wat het betekent |
 |---|---|---|
-| **BEWEZEN** | 23 | handhaver bestaat, toets bestaat, en die toets is zien zakken op een mutatie |
-| **ONBEPROEFD** | 9 | er kijkt iemand naar, maar die kijker is nooit op de proef gesteld |
+| **BEWEZEN** | 24 | handhaver bestaat, toets bestaat, en die toets is zien zakken op een mutatie |
+| **ONBEPROEFD** | 8 | er kijkt iemand naar, maar die kijker is nooit op de proef gesteld |
 | **OPEN** | 4 | opgeschreven zonder handhaver of zonder toets: een voornemen, geen bescherming |
 | **GEBROKEN** | 0 | wijst naar iets dat er niet meer is -- de enige alarmerende stand |
 
@@ -181,7 +181,7 @@ Een kluis die je ongemerkt kunt openen is geen kluis. En zou de opgevraagde naam
 
 ### RTG-014 -- Geen logregel draagt een querystring
 
-`ONBEPROEFD` · geen van de toetsen is zien zakken op een mutatie
+`BEWEZEN` · zien zakken in `sabotage` op `server/log.js`
 
 SSE kan geen Authorization-header sturen, dus daar reist het sessietoken mee in de URL. Een logger die de volledige URL schrijft, schrijft dus tokens.
 
@@ -193,7 +193,7 @@ SSE kan geen Authorization-header sturen, dus daar reist het sessietoken mee in 
 
 ### RTG-015 -- Elk uitgaand doel dat een client bepaalt, gaat eerst door de SSRF-keuring
 
-`BEWEZEN` · zien zakken in `ssrf.test.js` op `true->false#0`
+`BEWEZEN` · zien zakken in `sabotage` op `server/kern/ssrf.js`
 
 Het push-endpoint komt van de browser en de server POST daar later naartoe. Zonder keuring is dat een vrijbrief om de cloud-metadata op 169.254.169.254 te laten ophalen.
 
@@ -289,13 +289,13 @@ Een negatief saldo is geld dat het huis heeft uitgegeven zonder dat iemand het h
 
 ### RTG-023 -- Alles wat een prestatie bewaart buiten het potje, bestaat alleen boven de 18
 
-`BEWEZEN` · zien zakken in `spelprestaties.test.js` op `!==->===#0`
+`BEWEZEN` · zien zakken in `sabotage` op `server/kern/spellen/grens.js`
 
-Ranglijsten, niveaus en seizoenen zijn de haakjes waarmee een spel een kind vasthoudt. Onder die grens blijft elk spel volledig speelbaar; er wordt alleen niets van bewaard. De grens staat op één plek, zodat een nieuwe progressievorm er niet omheen kan groeien.
+Ranglijsten, niveaus en seizoenen zijn de haakjes waarmee een spel een kind vasthoudt. Onder die grens blijft elk spel volledig speelbaar; er wordt alleen niets van bewaard. De grens staat op een plek, zodat een nieuwe progressievorm er niet omheen kan groeien. LET OP, en dit vond de sabotagemotor: van de zes spel-toetsen injecteren er vijf hun EIGEN progressieMag (spelbeleid, spelprestaties, speluitslagen, speltelling, spelpoort) en raken de echte grens dus nooit. Zet je progressieMag in grens.js op altijd-waar, dan blijven die vijf groen. Alleen speldag.test.js valt om. Deze wet noemt daarom die ene toets, en de sabotagemotor bewaakt dat hij dat blijft doen.
 
 *Handhaver:* `server/kern/spellen/grens.js`
 
-*Toets:* `test/spelbeleid.test.js`, `test/spelprestaties.test.js`
+*Toets:* `test/speldag.test.js`
 
 *Breek hem zo:* laat progressieMag altijd true teruggeven; de leeftijdstoetsen in spelbeleid.test.js horen te vallen
 
@@ -435,7 +435,7 @@ Rechten die pas bij de volgende sessie ingaan, zijn geen rechten maar een gewoon
 
 ### RTG-036 -- Geen scherm toont meer zekerheid dan de bron bezit
 
-`BEWEZEN` · zien zakken in `zekerheid.test.js` op `===->!==#0`
+`BEWEZEN` · zien zakken in `sabotage` op `scripts/zekerheid.js`
 
 Een systeem dat zijn onbekenden verbergt, liegt over precies het deel dat je moet weten. Het zekerheidspaneel kan daarom geen kaal oordeel geven: het draagt altijd het aantal onbekenden en de woorden NIET ABSOLUUT, ook in een wereld waarin alles gemeten en alles groen is. En een meting die haar bron niet vindt geeft null, nooit nul -- een nul leest als 'niets aan de hand'.
 

@@ -5,7 +5,7 @@
     "dekkingPct": 67,
     "keuringStuk": 0,
     "keuringScheef": 12,
-    "dependencies": 0,
+    "dependencies": 1,
     "testbestanden": 549,
     "dekkingWaargenomenPct": 100,
     "zelfpoortendeToetsen": 17,
@@ -27,9 +27,21 @@
     "kernOngebruikt": 0,
     "toetsenNietGemeten": 205,
     "toetsenOngevoeligPct": 2.3,
-    "wettenZonderBewijs": 13
+    "wettenZonderBewijs": 12
   },
   "notities": [
+    {
+      "datum": "2026-08-11",
+      "meter": "wettenZonderBewijs 13 -> 12",
+      "reden": "De sabotagemotor (scripts/sabotage.js) zet de handhaver van een wet ECHT uit en eist dat een genoemde toets rood wordt. Dat is gericht bewijs waar de mutatiemotor mechanisch is, en het haalde RTG-014 uit ONBEPROEFD: loghygiene.test.js stond als 'overleefd' in MUTATIES.json omdat de liegpoort de verkeerde kant op schoot -- die toets kijkt naar de LOGGER, niet naar endpoint-inhoud.",
+      "eerlijkheidshalve": "De motor vond meteen een echt gat, en niet het kleinste. RTG-023 is de 18+-grens op de progressielaag. Zet je progressieMag in server/kern/spellen/grens.js op altijd-waar, dan blijven spelbeleid, spelprestaties, speluitslagen, speltelling en spelpoort alle vijf groen: ze injecteren hun EIGEN progressieMag en raken de echte grens nooit. Alleen speldag.test.js valt om. De wet wees naar twee toetsen die hem niet vasthielden; hij wijst nu naar de ene die dat wel doet."
+    },
+    {
+      "datum": "2026-08-11",
+      "meter": "dependencies 0 -> 1",
+      "reden": "De nul stond hier als principe, en dat principe geldt onverkort voor de DRAAIENDE server: `dependencies` in package.json is nog steeds leeg, en dat is wat een gebruiker binnenkrijgt. Wat er wel bij kwam is playwright, als devDependency, in commit 483b1cf ('Overslaan is rood: de browser erbij, en 114 stille schermtoetsen gaan draaien'). Zonder die browser sloegen 114 schermtoetsen zichzelf stil over en meldde de stap 'nul gezakt' -- groen zonder iets gezien te hebben. Een testbrowser die 114 blinde toetsen ziende maakt, is de nul waard.",
+      "eerlijkheidshalve": "Deze meter telt dependencies EN devDependencies bij elkaar op, dus hij kan het verschil tussen 'de server sleept een pakket mee' en 'de testopstelling gebruikt een browser' niet zien. Dat is bewust niet gerepareerd door de meter te splitsen: dan meet hij iets anders dan hij tot nu toe mat en is de historie waardeloos. De ratel blijft dus op alles staan -- een ECHTE runtime-dependency erbij maakt er 2 van en trekt gewoon aan de bel. Wat hier verschoven is, is de norm en niet de meter."
+    },
     {
       "datum": "2026-08-09",
       "meter": "keuringDubbeling 89 -> 90, kernGedeeld 147 -> 148, toetsenNietGemeten 204 -> 205",

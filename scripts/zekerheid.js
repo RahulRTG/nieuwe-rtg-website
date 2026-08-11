@@ -82,6 +82,15 @@ function zelfmetingen() {
     return gezakt + '/' + namen.length + ' zien zakken, ' + overleefd + ' overleefden elke mutatie';
   }, 'een toets die niet kan zakken is slechter dan geen toets');
 
+  rij('SABOTAGE VAN WETTEN', 'SABOTAGE.json', () => {
+    const w = lees('SABOTAGE.json').wetten;
+    const ids = Object.keys(w);
+    const bewezen = ids.filter(i => w[i].stand === 'BEWEZEN').length;
+    const gaten = ids.filter(i => w[i].stand === 'OVERLEEFD').length;
+    return bewezen + '/' + ids.length + ' handhavers uitgezet en gezien wie rood werd' +
+      (gaten ? ', ' + gaten + ' GEBROKEN gat(en)' : '');
+  }, 'gericht bewijs: de handhaver ging echt uit');
+
   rij('SCHERMEN BEREIKBAAR', 'BEREIK.json', () => {
     const b = lees('BEREIK.json').gemeten;
     return b.bereikbaar + '/' + b.schermen + (b.zonderRoute ? ', ' + b.zonderRoute + ' zonder klikroute' : '');

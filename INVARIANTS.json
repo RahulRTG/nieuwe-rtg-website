@@ -181,7 +181,15 @@
       "toetsen": [
         "loghygiene.test.js"
       ],
-      "sabotage": "log req.originalUrl in plaats van req.path"
+      "sabotage": "log req.originalUrl in plaats van req.path",
+      "sabotageProef": {
+        "bestand": "server/log.js",
+        "van": "p: req.path, s: res.statusCode",
+        "naar": "p: req.originalUrl, s: res.statusCode",
+        "toets": [
+          "loghygiene.test.js"
+        ]
+      }
     },
     {
       "id": "RTG-015",
@@ -193,7 +201,15 @@
       "toetsen": [
         "ssrf.test.js"
       ],
-      "sabotage": "laat veiligeExternalUrl altijd true teruggeven"
+      "sabotage": "laat veiligeExternalUrl altijd true teruggeven",
+      "sabotageProef": {
+        "bestand": "server/kern/ssrf.js",
+        "van": "function veiligeExternalUrl(url) {",
+        "naar": "function veiligeExternalUrl(url) {\n  return { ok: true };",
+        "toets": [
+          "ssrf.test.js"
+        ]
+      }
     },
     {
       "id": "RTG-016",
@@ -288,15 +304,22 @@
     {
       "id": "RTG-023",
       "wet": "Alles wat een prestatie bewaart buiten het potje, bestaat alleen boven de 18",
-      "waarom": "Ranglijsten, niveaus en seizoenen zijn de haakjes waarmee een spel een kind vasthoudt. Onder die grens blijft elk spel volledig speelbaar; er wordt alleen niets van bewaard. De grens staat op één plek, zodat een nieuwe progressievorm er niet omheen kan groeien.",
+      "waarom": "Ranglijsten, niveaus en seizoenen zijn de haakjes waarmee een spel een kind vasthoudt. Onder die grens blijft elk spel volledig speelbaar; er wordt alleen niets van bewaard. De grens staat op een plek, zodat een nieuwe progressievorm er niet omheen kan groeien. LET OP, en dit vond de sabotagemotor: van de zes spel-toetsen injecteren er vijf hun EIGEN progressieMag (spelbeleid, spelprestaties, speluitslagen, speltelling, spelpoort) en raken de echte grens dus nooit. Zet je progressieMag in grens.js op altijd-waar, dan blijven die vijf groen. Alleen speldag.test.js valt om. Deze wet noemt daarom die ene toets, en de sabotagemotor bewaakt dat hij dat blijft doen.",
       "handhaver": [
         "server/kern/spellen/grens.js"
       ],
       "toetsen": [
-        "spelbeleid.test.js",
-        "spelprestaties.test.js"
+        "speldag.test.js"
       ],
-      "sabotage": "laat progressieMag altijd true teruggeven; de leeftijdstoetsen in spelbeleid.test.js horen te vallen"
+      "sabotage": "laat progressieMag altijd true teruggeven; de leeftijdstoetsen in spelbeleid.test.js horen te vallen",
+      "sabotageProef": {
+        "bestand": "server/kern/spellen/grens.js",
+        "van": "progressieMag: (handle) => volwassen(handle),",
+        "naar": "progressieMag: (handle) => true,",
+        "toets": [
+          "speldag.test.js"
+        ]
+      }
     },
     {
       "id": "RTG-024",
@@ -445,7 +468,15 @@
       "toetsen": [
         "zekerheid.test.js"
       ],
-      "sabotage": "laat oordeel() alleen het niveau teruggeven, of laat een ontbrekende bron 0 melden in plaats van null"
+      "sabotage": "laat oordeel() alleen het niveau teruggeven, of laat een ontbrekende bron 0 melden in plaats van null",
+      "sabotageProef": {
+        "bestand": "scripts/zekerheid.js",
+        "van": "zin: niveau + ' -- NIET ABSOLUUT (' + onbekend + ' onbekend)'",
+        "naar": "zin: niveau",
+        "toets": [
+          "zekerheid.test.js"
+        ]
+      }
     }
   ]
 }

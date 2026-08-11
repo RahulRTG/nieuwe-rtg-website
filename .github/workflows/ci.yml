@@ -53,6 +53,13 @@ jobs:
         run: node scripts/wetten.js --zelftest
       - name: De systeemwetten wijzen nergens naar iets dat weg is
         run: node scripts/wetten.js --controle
+      # DE SABOTAGEMOTOR. Dit is punt 15 van de lat, machinaal: zet de handhaver
+      # van een wet ECHT uit en eis dat een genoemde toets rood wordt. Zakt hier
+      # iets, dan is dat geen stijlkwestie maar een wet waarvan de bescherming uit
+      # kan zonder dat iemand het merkt. Hij schrijft in de bron en zet alles in
+      # een finally terug; test/sabotage.test.js bewaakt precies dat herstel.
+      - name: Sabotage -- gaat de handhaver uit, wie wordt er dan rood
+        run: node scripts/sabotage.js
       # HET ZEKERHEIDSPANEEL. Dit is geen extra poort maar een AFDRUK: hij zet in
       # de log wat we weten en -- belangrijker -- wat we niet weten. Zeven regels
       # staan er op ONTBREEKT omdat ze bewijs van buiten vragen (pentest, red

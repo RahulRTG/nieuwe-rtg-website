@@ -1,0 +1,21 @@
+{
+  "uitleg": "Uitslag van scripts/sabotage.js: per wet of het uitzetten van zijn handhaver een genoemde toets rood maakt. Gegenereerd, niet met de hand bij te werken.",
+  "wetten": {
+    "RTG-014": {
+      "stand": "BEWEZEN",
+      "uitleg": "server/log.js: p: req.path, s: res.statusCode -> p: req.originalUrl, s: res.statusCode maakt loghygiene.test.js rood"
+    },
+    "RTG-015": {
+      "stand": "BEWEZEN",
+      "uitleg": "server/kern/ssrf.js: function veiligeExternalUrl(url) { -> function veiligeExternalUrl(url) {\n  return { ok: true }; maakt ssrf.test.js rood"
+    },
+    "RTG-023": {
+      "stand": "BEWEZEN",
+      "uitleg": "server/kern/spellen/grens.js: progressieMag: (handle) => volwassen(handle), -> progressieMag: (handle) => true, maakt speldag.test.js rood"
+    },
+    "RTG-036": {
+      "stand": "BEWEZEN",
+      "uitleg": "scripts/zekerheid.js: zin: niveau + ' -- NIET ABSOLUUT (' + onbekend + ' onbekend)' -> zin: niveau maakt zekerheid.test.js rood"
+    }
+  }
+}

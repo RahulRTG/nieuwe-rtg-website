@@ -1,0 +1,221 @@
+/* RTG Spatial Shell -- de vormtaal van de werkruimte (WERKRUIMTE.md).
+
+   Hier staat alleen GEDRAG-in-vorm: de surface, de gouden handle, de gutters,
+   de dockzones en de drie zoomstanden. Geen appspecifieke stijl, en geen tweede
+   kleurenset: alles verwijst naar de tokens uit rtg-ui.css en rtg-ontwerp.css
+   (LAT.md regel 4).
+
+   Insluiten NA rtg-ontwerp.css. */
+
+.rtg-werkruimte{
+  position:fixed;inset:0;
+  /* rtg-ui.css zet `body.rtg-stijl main{max-width:840px;margin:0 auto;padding:...}`
+     -- goed voor een leespagina, dodelijk voor een werkruimte. Zonder deze drie
+     regels stond de hele tafel als een kolom van 840px midden op een scherm van
+     1920 en bleef de rest zwart. Dit is geen smaakverschil maar precies wat
+     WERKRUIMTE.md par. 8 verbiedt: extra pixels horen extra RTG te tonen. */
+  background:var(--rtg-bg);
+  /* De gutter is geen decoratie: hij is wat maakt dat de surfaces als losse
+     voorwerpen op een commandotafel liggen in plaats van als dichtgeplempt
+     raster (WERKRUIMTE.md par. 9). */
+  --gutter:14px;
+  overflow:hidden;
+}
+
+/* Deze kiezer is met opzet zo zwaar. rtg-ui.css zet
+   `body.rtg-stijl main{max-width:840px;margin:0 auto;padding:...}` -- goed voor
+   een leespagina, dodelijk voor een werkruimte, en SPECIFIEKER dan een losse
+   klasse. Volgorde helpt daar niet tegen: een enkele .rtg-werkruimte verloor het
+   en de hele tafel stond als kolom van 840px midden op een scherm van 1920, met
+   de rest zwart. Precies wat WERKRUIMTE.md par. 8 verbiedt. */
+body.rtg-stijl main.rtg-werkruimte{max-width:none;margin:0;padding:0;}
+
+/* ------------------------------------------------------------- de surface -- */
+.rtg-surface{
+  position:absolute;
+  /* border-box, want de schil zet width en height in pixels en dit huis zet
+     box-sizing niet globaal. Zonder dit telt de padding van de handle en de
+     rand er nog bij op en steekt elke surface een paar pixels buiten zijn eigen
+     vak -- de console werd 1086px hoog in een venster van 1080. */
+  box-sizing:border-box;
+  display:flex;flex-direction:column;
+  background:var(--rtg-card);
+  border:1px solid var(--rtg-line);
+  border-radius:var(--rtg-rond-klein);
+  overflow:hidden;
+  box-shadow:0 1px 2px rgba(0,0,0,.4);
+  transition:left var(--rtg-tijd-paneel) var(--rtg-veer),
+             top var(--rtg-tijd-paneel) var(--rtg-veer),
+             width var(--rtg-tijd-paneel) var(--rtg-veer),
+             height var(--rtg-tijd-paneel) var(--rtg-veer);
+}
+/* tijdens het slepen niet animeren, anders loopt de surface achter de muis aan */
+.rtg-surface[data-sleept]{transition:none;box-shadow:0 8px 30px rgba(0,0,0,.55);}
+
+/* Precies EEN surface is actief, en die draagt de gouden handle. Zou elke
+   surface hem dragen, dan is goud geen focus meer maar behang. */
+.rtg-surface[data-actief]{border-color:rgba(201,162,75,.42);}
+
+.rtg-handle{
+  display:flex;align-items:center;gap:.55rem;
+  padding:.5rem .7rem .45rem;
+  border-bottom:1px solid var(--rtg-line);
+  cursor:grab;user-select:none;
+  position:relative;
+}
+.rtg-handle:active{cursor:grabbing;}
+/* de dunne gouden streep: het signatuurelement van een actieve surface */
+.rtg-handle::before{
+  content:"";position:absolute;left:.7rem;right:.7rem;top:0;height:2px;
+  background:transparent;border-radius:0 0 2px 2px;
+  transition:background var(--rtg-tijd-kort) var(--rtg-veer);
+}
+.rtg-surface[data-actief] .rtg-handle::before{background:var(--rtg-goud);}
+
+.rtg-handle .naam{
+  font-size:.66rem;letter-spacing:.17em;text-transform:uppercase;
+  color:var(--rtg-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.rtg-surface[data-actief] .rtg-handle .naam{color:var(--rtg-txt);}
+.rtg-handle .rek{margin-left:auto;}
+.rtg-handle button{
+  background:none;border:0;color:var(--rtg-soft);cursor:pointer;
+  padding:.1rem .3rem;border-radius:6px;font:inherit;font-size:.8rem;line-height:1;
+}
+.rtg-handle button:hover,.rtg-handle button:focus-visible{color:var(--rtg-goud);}
+
+.rtg-surface .vlak{flex:1;min-height:0;position:relative;}
+.rtg-surface iframe{width:100%;height:100%;border:0;display:block;background:var(--rtg-bg);}
+
+/* --------------------------------------------------------- de zoomstanden -- */
+/* Glance toont alleen de samenvattingsregel; het zware werk wordt niet geladen
+   getoond maar verborgen, zodat terugschakelen niets opnieuw hoeft te halen. */
+.rtg-surface[data-zoom="glance"] .vlak{display:none;}
+.rtg-surface[data-zoom="glance"] .kort{display:block;}
+.rtg-surface .kort{display:none;padding:.6rem .75rem .75rem;font-size:.82rem;color:var(--rtg-soft);}
+.rtg-surface .kort b{color:var(--rtg-txt);font-variant-numeric:var(--rtg-cijfers);}
+
+/* ---------------------------------------------------------- de dockzones -- */
+/* Bij het slepen naar een rand verschijnt de plek waar hij landt. Een voorstel
+   dus, en geen sprong: je ziet waar hij heen gaat voordat je loslaat. */
+.rtg-dok{
+  position:absolute;pointer-events:none;box-sizing:border-box;
+  border:1px dashed rgba(201,162,75,.55);
+  background:rgba(201,162,75,.07);
+  border-radius:var(--rtg-rond-klein);
+  opacity:0;transition:opacity var(--rtg-tijd-kort) var(--rtg-veer);
+}
+.rtg-dok[data-aan]{opacity:1;}
+
+/* ------------------------------------------------------------- de console -- */
+.rtg-console{
+  position:absolute;box-sizing:border-box;
+  display:flex;flex-direction:column;gap:.9rem;
+  padding:1rem;
+  background:var(--rtg-card);
+  border:1px solid rgba(201,162,75,.28);
+  border-radius:var(--rtg-rond-klein);
+  overflow:auto;
+  transition:left var(--rtg-tijd-paneel) var(--rtg-veer),
+             top var(--rtg-tijd-paneel) var(--rtg-veer),
+             width var(--rtg-tijd-paneel) var(--rtg-veer),
+             height var(--rtg-tijd-paneel) var(--rtg-veer);
+}
+.rtg-console h1{margin:0;font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--rtg-goud);font-weight:600;}
+.rtg-console .wie{font-size:.8rem;color:var(--rtg-soft);margin-top:.2rem;}
+.rtg-console .blok{border-top:1px solid var(--rtg-line);padding-top:.7rem;}
+.rtg-console .bloknaam{font-size:.6rem;letter-spacing:.19em;text-transform:uppercase;
+  color:var(--rtg-soft);margin-bottom:.4rem;}
+.rtg-console .zoek{
+  width:100%;background:rgba(255,255,255,.04);border:1px solid var(--rtg-line);
+  border-radius:8px;padding:.5rem .6rem;color:var(--rtg-txt);font:inherit;font-size:.84rem;
+}
+.rtg-console .zoek::placeholder{color:var(--rtg-soft);}
+.rtg-console .rijtje{display:flex;flex-wrap:wrap;gap:.35rem;}
+.rtg-console .rijtje button{
+  background:none;border:1px solid var(--rtg-line);border-radius:99px;
+  padding:.25rem .6rem;color:var(--rtg-muted);font:inherit;font-size:.76rem;cursor:pointer;
+}
+.rtg-console .rijtje button:hover,.rtg-console .rijtje button:focus-visible{
+  border-color:var(--rtg-goud);color:var(--rtg-txt);}
+.rtg-console .rijtje button[data-open]{border-color:rgba(201,162,75,.5);color:var(--rtg-txt);}
+
+/* de contextregel: wat op dit moment alle surfaces verbindt */
+.rtg-console .context{font-size:.78rem;color:var(--rtg-soft);line-height:1.5;}
+.rtg-console .context b{color:var(--rtg-goud);font-variant-numeric:var(--rtg-cijfers);}
+
+@media (prefers-reduced-motion:reduce){
+  .rtg-surface,.rtg-console,.rtg-dok,.rtg-handle::before{transition:none;}
+}
+
+/* ------------------------------------------------------------- het palet --
+   Stap 6 uit WERKRUIMTE.md. Hij ligt OVER de ruimte en niet in een la: de
+   console is de navigator, en navigeren doe je vanaf waar je bent. Bovenaan
+   en niet gecentreerd, zodat je blik niet naar het midden hoeft en de lijst
+   naar beneden kan groeien zonder te verspringen. */
+.palet{position:fixed;inset:0;z-index:80;display:flex;justify-content:center;
+  align-items:flex-start;padding-top:14vh;background:rgba(6,5,5,.5);
+  backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
+.palet[hidden]{display:none;}
+.paletdoos{width:min(560px,92vw);background:var(--rtg-card,#151312);
+  border:1px solid var(--gold-rand,rgba(192,165,68,.52));border-radius:14px;
+  overflow:hidden;box-shadow:0 24px 60px rgba(0,0,0,.5);}
+.paletdoos input{width:100%;box-sizing:border-box;background:none;border:0;
+  border-bottom:1px solid var(--rtg-line,rgba(255,255,255,.09));
+  padding:1rem 1.1rem;color:var(--rtg-txt,#F4F0E9);
+  font:400 1rem/1.3 var(--rtg-interface,Inter,system-ui,sans-serif);}
+.paletdoos input:focus{outline:none;}
+.paletdoos ul{list-style:none;margin:0;padding:.35rem 0;max-height:46vh;overflow-y:auto;}
+.paletdoos li{display:flex;align-items:baseline;gap:1rem;padding:.6rem 1.1rem;
+  font:400 .92rem/1.3 var(--rtg-interface,Inter,system-ui,sans-serif);cursor:pointer;}
+.paletdoos li[aria-selected="true"]{background:rgba(255,255,255,.055);}
+.paletdoos li:hover{background:rgba(255,255,255,.035);}
+.paletdoos li .hint{margin-left:auto;font-size:.72rem;letter-spacing:.1em;
+  text-transform:uppercase;color:var(--rtg-soft,rgba(244,240,233,.56));}
+.paletdoos li.leeg{color:var(--rtg-soft,rgba(244,240,233,.56));cursor:default;}
+
+/* de knop om een kamer te bewaren: een regel, geen vlak */
+.rtg-console .bewaar{display:block;margin-top:.5rem;background:none;border:0;padding:0;
+  color:var(--rtg-soft,rgba(244,240,233,.56));cursor:pointer;
+  font:400 .76rem/1.4 var(--rtg-interface,Inter,system-ui,sans-serif);
+  border-bottom:1px solid var(--rtg-line,rgba(255,255,255,.09));}
+.rtg-console .bewaar:hover,.rtg-console .bewaar:focus-visible{
+  color:var(--gold-tekst,#C0A544);border-bottom-color:var(--gold-tekst,#C0A544);}
+
+/* ------------------------------------------- objecten tussen apps (stap 7) --
+   Tijdens het slepen lichten de surfaces op die er IETS mee kunnen -- en alleen
+   die. Zo weet je waar je heen kunt voordat je loslaat, in plaats van dat je
+   het achteraf ontdekt. Een surface die niet antwoordt blijft donker: zwijgen
+   is nee. */
+.rtg-werkruimte[data-sleept-object] .rtg-surface{transition:opacity var(--rtg-tijd-paneel,180ms) var(--rtg-veer,ease);}
+.rtg-werkruimte[data-sleept-object] .rtg-surface:not([data-kan-vangen]){opacity:.45;}
+.rtg-surface[data-kan-vangen]{outline:1px solid var(--gold-rand,rgba(192,165,68,.52));outline-offset:-1px;}
+.rtg-surface[data-vangt]{outline:2px solid var(--gold-tekst,#C0A544);outline-offset:-2px;}
+
+/* Het vangvlak tijdens een objectsleep. Doorzichtig, maar het vangt de
+   pointer-events die anders in een surface-iframe verdwijnen. Alleen aanwezig
+   zolang er gesleept wordt. */
+.rtg-sleepvangst{position:absolute;inset:0;z-index:70;display:none;cursor:grabbing;}
+.rtg-sleepvangst[data-aan]{display:block;}
+
+/* HET VOORSTEL. Een sleep is een voorstel en geen handeling, dus dit is geen
+   toastje in een hoek maar een vraag in het midden waar je iets mee moet.
+   Bevestigen doet een mens (WERKRUIMTE.md par. 6, CLAUDE.md). */
+.rtg-voorstel{position:absolute;inset:0;z-index:90;display:none;
+  align-items:center;justify-content:center;background:rgba(6,5,5,.55);
+  backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px);}
+.rtg-voorstel[data-aan]{display:flex;}
+.rtg-voorstel .doos{width:min(420px,92%);background:var(--rtg-card,#151312);
+  border:1px solid var(--gold-rand,rgba(192,165,68,.52));border-radius:14px;
+  padding:1.2rem 1.3rem;box-shadow:0 24px 60px rgba(0,0,0,.5);
+  font-family:var(--rtg-interface,Inter,system-ui,sans-serif);}
+.rtg-voorstel .wat{margin:0 0 .4rem;font-size:1rem;line-height:1.35;color:var(--rtg-txt,#F4F0E9);}
+.rtg-voorstel .wie{margin:0 0 1.1rem;font-size:.78rem;line-height:1.45;color:var(--rtg-soft,rgba(244,240,233,.56));}
+.rtg-voorstel .knoppen{display:flex;gap:.6rem;justify-content:flex-end;}
+.rtg-voorstel button{background:none;border:1px solid var(--rtg-line,rgba(255,255,255,.09));
+  border-radius:999px;padding:.45rem 1.1rem;cursor:pointer;font:inherit;font-size:.84rem;
+  color:var(--rtg-txt,#F4F0E9);}
+.rtg-voorstel button.vol{background:var(--rtg-goud,#C0A544);border-color:var(--rtg-goud,#C0A544);
+  color:#1C1608;font-weight:600;}
+.rtg-voorstel button:hover{border-color:var(--gold-tekst,#C0A544);}

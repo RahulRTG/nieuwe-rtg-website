@@ -61,15 +61,16 @@ module.exports = (sctx) => {
     if (!WERKVORMEN.includes(werkvorm)) return res.status(400).json({ error: 'Kies een werkvorm: ' + WERKVORMEN.join(', ') + '.' });
     const p = { id: rid(5), naam, werkvorm, status: 'loopt',
       omschrijving: schoon(req.body.omschrijving, 500) || null,
-      eigenaar: schoon(req.body.eigenaar, 60) || g.l.naam,
       start: schoon(req.body.start, 10) || dag(), eind: schoon(req.body.eind, 10) || null,
       budgetCenten: req.body.budget != null ? centen(req.body.budget) : 0,
       uurtariefCenten: req.body.uurtarief != null ? centen(req.body.uurtarief) : 0,
       mijlpalen: [], risicos: [], at: nu(), door: g.l.naam };
+    // naam blijft vrij, id komt ernaast als hij onbedubbelzinnig is
+    const eig = sctx.zetWie(g.w, p, 'eigenaar', schoon(req.body.eigenaar, 60) || g.l.naam);
     P(g.w)[p.id] = p;
     log(g.w, g.l, 'project-gemaakt', p.id, naam);
     save();
-    res.json({ ok: true, project: p });
+    res.json({ ok: true, project: p, eigenaarLet: eig.reden });
   });
 
   app.post('/api/bedrijf/project/mijlpaal', (req, res) => {

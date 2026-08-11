@@ -293,8 +293,15 @@ async function poortVrij() {
 function boot() {
   return new Promise((resolve, reject) => {
     const logfd = fs.openSync(SRVLOG, 'a');
+    /* RTG_DEMO: sinds 316de548 (2026-08-07) is de demo-inlog uitdrukkelijk
+       opt-in, en zonder de vlag worden ook de demozaken opgeruimd. De
+       toetshelper (test/helper.js) kreeg de vlag toen wel; dit harnas heeft
+       zijn eigen boot en bleef achter. Gevolg: tokens() haalde nul sessies op,
+       de schakelkast bleef dicht, en elke fase draaide tegen de standaardstand
+       terwijl het rapport anders suggereerde. De personas en demozaken zijn de
+       meetinstrumenten van deze beproeving; zonder hen meet ze niets. */
     const env = { ...process.env, PORT: String(PORT), RTG_DATA_DIR: TMP, NODE_ENV: 'test', SMTP_URL: '',
-      ANTHROPIC_API_KEY: '', RTG_ENC_KEY: '', DEMO_SUPPLIER: 'KIKUNOI', LOG_LEVEL: 'error', RTG_GC_OUT: GC_OUT,
+      ANTHROPIC_API_KEY: '', RTG_ENC_KEY: '', DEMO_SUPPLIER: 'KIKUNOI', RTG_DEMO: '1', LOG_LEVEL: 'error', RTG_GC_OUT: GC_OUT,
       NODE_OPTIONS: '--max-old-space-size=8192' };
     if (MODE === 'postgres') { env.DATABASE_URL = DB; env.RTG_STORE = 'postgres'; }
     child = spawn(process.execPath, ['--expose-gc', '-r', path.join(__dirname, 'gc-hook.js'), '--experimental-sqlite', 'server/server.js'],
@@ -590,6 +597,14 @@ async function misbruikBeproeving(tok) {
   // ---------- FASE A: VOLUME ----------
   kop('FASE A: VOLUME (' + MODE + ')');
   if (MODE === 'postgres') {
+    /* Het controle-vlak schoonvegen VOOR de allereerste boot, niet alleen in
+       zaaiPostgres. De eerste boot laadt anders de getripte zekeringen van een
+       vorige run (bijv. een automatische lastafworp uit de storm) en schrijft
+       ze als warme lokale snapshot in de datamap; de tweede boot leest eerst
+       die snapshot, en Postgres wint alleen voor collecties die hij HEEFT --
+       een in Postgres gewiste rij herrijst dus uit de cache. Zo stond in de
+       10M-ronde de registratie de hele run op 503, drie drempels om. */
+    try { psql("DELETE FROM kv WHERE key IN ('techniek','appregie','ledenregie','geldregie','leveranciersregie')"); } catch (e) {}
     await boot(); await new Promise(r => setTimeout(r, 800)); await stop();
     const tSeed = Date.now(); await zaaiPostgres();
     rij('zaaien totaal', ((Date.now() - tSeed) / 1000).toFixed(0) + ' s');

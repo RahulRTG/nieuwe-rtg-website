@@ -18,7 +18,8 @@
      voorgerecht al weg is. */
 module.exports = (kern) => {
   const { app, save, schoon, supplierAuth, logActivity, sseToSupplier, horeca } = kern;
-  const { KANALEN, H, nu, id, uitEuro, totaal, openstaand, happyKorting } = horeca;
+  const { KANALEN, H, nu, id, totaal, openstaand } = horeca;
+  const { bouwRegel } = require('../../../kern/horeca/regel')({ schoon, horeca });
 
   const rekVan = (req, res) => {
     const h = H(req.supplier.code);
@@ -55,25 +56,16 @@ module.exports = (kern) => {
     res.json({ ok: true, rekening: publiek(r) });
   });
 
-  /* ---------- een regel erop ---------- */
+  /* ---------- een regel erop ----------
+     De regel zelf wordt gebouwd in kern/horeca/regel.js, want de gastenkant
+     (routes/gast/) zet dezelfde regel op dezelfde rekening. Twee kopieen van
+     deze rekensom betekent twee antwoorden op "wat kost dit met happy hour". */
   app.post('/api/supplier/horeca/rekening/regel', supplierAuth, (req, res) => {
     const r = rekVan(req, res); if (!r) return;
     if (r.status !== 'open') return res.status(409).json({ error: 'Deze rekening is al ' + r.status + '.' });
-    const naam = schoon(req.body.naam, 80);
-    if (!naam) return res.status(400).json({ error: 'Wat wordt er besteld?' });
-    const prijs = req.body.centen != null ? horeca.centen(req.body.centen) : uitEuro(req.body.prijs);
-    if (!prijs && prijs !== 0) return res.status(400).json({ error: 'Vul de prijs in.' });
-    const groep = schoon(req.body.groep, 30) || null;
-    const happy = happyKorting(req.supplier.code, groep, nu());
-    const regel = { id: id(3), naam, aantal: Math.max(1, Math.min(99, parseInt(req.body.aantal, 10) || 1)),
-      centen: happy ? Math.round(prijs * (100 - happy.procent) / 100) : prijs,
-      lijstprijs: prijs, happy: happy ? happy.naam + ' -' + happy.procent + '%' : null,
-      groep, gang: Math.max(0, Math.min(9, parseInt(req.body.gang, 10) || 0)),
-      station: schoon(req.body.station, 30) || null,
-      notitie: schoon(req.body.notitie, 120) || null,
-      allergie: schoon(req.body.allergie, 120) || null,
-      gastNr: req.body.gastNr == null ? null : Math.max(1, Math.min(99, parseInt(req.body.gastNr, 10) || 1)),
-      stand: 'besteld', at: nu(), door: req.actor.name };
+    const uit = bouwRegel(req.supplier.code, req.body, req.actor.name);
+    if (uit.error) return res.status(uit.status || 400).json({ error: uit.error });
+    const regel = uit.regel;
     r.regels.push(regel);
     save();
     sseToSupplier(req.supplier.code, 'sync', { scope: 'horeca' });

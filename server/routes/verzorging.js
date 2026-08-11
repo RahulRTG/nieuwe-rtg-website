@@ -5,7 +5,7 @@
    Onderaan staat de LEDENkant van de salon: dezelfde agenda, maar dan van de
    kant van wie er een afspraak maakt, op codenaam. */
 module.exports = (kern) => {
-  const { app, db, auth, liveCodename, supplierAuth, beauty, petcare, opvang, verzorgingLeden } = kern;
+  const { app, db, auth, liveCodename, supplierAuth, beauty, petcare, opvang, verzorgingLeden, gegevensStop } = kern;
   const stuur = (res, r) => { const { status, ...rest } = r; res.status(status || 200).json(rest); };
   const maak = (basis, capNaam, domein) => (pad, fn) => app.post(basis + pad, supplierAuth, (req, res) => {
     const caps = db.capsVan(req.supplier);
@@ -43,11 +43,20 @@ module.exports = (kern) => {
   /* ---- de ledenkant van de salon (cosmetisch, niet-medisch) ----
      Geen zorgprofiel en geen intake: die horen bij Care en een kapper heeft ze
      niet nodig. Alleen leden; een gast krijgt 403 uit de kern. */
-  const l = (pad, fn) => app.post('/api/verzorging' + pad, auth, (req, res) =>
-    stuur(res, fn(req.session, liveCodename(req.session), req.body || {})));
+  /* Voluit, niet opgebouwd: de schakelkast telt letterlijke paden (scripts/
+     check.js regel 45), en vier routes zijn het uitschrijven waard. */
+  const lidRoute = (fn) => (req, res) =>
+    stuur(res, fn(req.session, liveCodename(req.session), req.body || {}));
 
-  l('', (sess, naam, x) => verzorgingLeden.overzicht(naam, x.datum));
-  l('/boek', (sess, naam, x) => verzorgingLeden.boek(sess, naam, x));
-  l('/mijn', (sess, naam) => verzorgingLeden.mijn(naam));
-  l('/annuleer', (sess, naam, x) => verzorgingLeden.annuleer(naam, x.code, x.id));
+  app.post('/api/verzorging', auth, lidRoute((sess, naam, x) => verzorgingLeden.overzicht(naam, x.datum)));
+  /* Boeken deelt je codenaam en wens met de zaak: langs de gegevenspoort, net
+     als elke andere bestelling. Dit gat werd pas zichtbaar toen de paden
+     voluit kwamen te staan -- de opgebouwde vorm was ook voor regel 16
+     onzichtbaar geweest. */
+  app.post('/api/verzorging/boek', auth, (req, res) => {
+    if (gegevensStop(req, res, 'bestelling')) return;
+    lidRoute((sess, naam, x) => verzorgingLeden.boek(sess, naam, x))(req, res);
+  });
+  app.post('/api/verzorging/mijn', auth, lidRoute((sess, naam) => verzorgingLeden.mijn(naam)));
+  app.post('/api/verzorging/annuleer', auth, lidRoute((sess, naam, x) => verzorgingLeden.annuleer(naam, x.code, x.id)));
 };

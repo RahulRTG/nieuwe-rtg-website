@@ -12,7 +12,7 @@
       toont de stand van het potje. Zonder inlog, want dat is de hele opzet.
    2. DE KAART KOMT ER NIET OP -- en dat wordt op TWEE hoogten gemeten, want de
       eerste versie van deze toets keek alleen naar de DOM en dat bleek niets
-      te bewijzen. `speelscherm.html` rendert `kaart` namelijk nergens, dus ook als
+      te bewijzen. `spelscherm.html` rendert `kaart` namelijk nergens, dus ook als
       de server hem wel zou meesturen bleef het beeld schoon: de mutatie "zet
       de kaart terug in zicht.publiek" liet deze toets gewoon slagen.
 
@@ -111,7 +111,7 @@ test('een potje 30 Seconden op het gedeelde scherm, zonder inlog en zonder de ka
       try { overDeLijn.push(await r.text()); } catch (e) { /* afgebroken antwoord */ }
     });
 
-    await page.goto(base + '/apps/speelscherm.html#' + kamer.code, { waitUntil: 'domcontentloaded' });
+    await page.goto(base + '/apps/spelscherm.html#' + kamer.code, { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => /30 Seconden/.test(document.body.textContent || ''), null, { timeout: 15000 });
 
     const tekst = await page.evaluate(() => document.body.innerText);

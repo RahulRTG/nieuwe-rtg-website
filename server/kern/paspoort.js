@@ -75,6 +75,31 @@ function maakPaspoort({ db, save, crypto, accounts, notify, notifySupplier, sseT
     const geboren = (memberState(u) || {}).geboren || null;
     return geboren ? leeftijdVan(geboren) : null;
   }
+
+  /* Het geboorteJAAR van dit lid, of null. Zelfde afspraak als hierboven, nu
+     voor de levenslijn (LEVEN.md par. 1.1): die moet zijn lijn ergens laten
+     beginnen en heeft daarvoor een jaartal nodig.
+
+     ALLEEN HET JAAR, en dat is de hele reden dat deze functie hier staat en
+     niet daar. De geboortedatum is het gevoeligste veld in het ledendossier
+     -- hij zit in de MRZ-strook naast het documentnummer -- en een lijn die
+     "1994" toont heeft aan 1994 genoeg. Zou de levenslijn de datum krijgen,
+     dan reist een volledige geboortedatum door een laag die hem niet nodig
+     heeft, en dan is het een kwestie van tijd voor hij ergens in een antwoord
+     belandt. Wie alleen een jaartal hoeft te tonen, hoort ook alleen een
+     jaartal te krijgen.
+
+     Afleiden uit de leeftijd kan NIET: dat zit er tot een jaar naast (wie in
+     december jarig is, is het grootste deel van het jaar nog niet), en een
+     jaartal dat er soms naast zit is erger dan geen jaartal -- het leest als
+     een feit. Vandaar dat het hier uit de datum zelf komt. */
+  function geboortejaarVan(key) {
+    const u = accountVanKey(key);
+    if (!u) return null;
+    const geboren = String((memberState(u) || {}).geboren || '');
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(geboren)) return null;
+    return Number(geboren.slice(0, 4));
+  }
   function log(entry) {
     lijsten();
     db.data.paspoortLog.unshift({ id: id(), at: nu(), ...entry });
@@ -147,7 +172,8 @@ function maakPaspoort({ db, save, crypto, accounts, notify, notifySupplier, sseT
   return {
     NIVEAUS, mijnStatus, vraag, beslis, trekIn, bekijk,
     dienIncidentIn, beoordeelIncident, mijnVerzoeken, partnerVerzoeken,
-    incidentenVoorOffice, vervalOpschonen, paspoortVervaldatumVan: vervaldatumVan
+    incidentenVoorOffice, vervalOpschonen, paspoortVervaldatumVan: vervaldatumVan,
+    paspoortGeboortejaarVan: geboortejaarVan
   };
 }
 

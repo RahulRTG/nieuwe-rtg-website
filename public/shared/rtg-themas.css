@@ -1,0 +1,95 @@
+/* De vier RTG-thema's, gebouwd op de materialen (MATERIAAL.md).
+
+   Een thema is hier GEEN kleurenset maar een keuze wélk materiaal de grond is.
+   Alles wat erop staat volgt daaruit: de leeskleur, de haarlijn, de rand. Dat
+   is precies waarom de vier bij elkaar horen -- het is één systeem in vier
+   materialen, niet vier ontwerpen.
+
+   De levende kleur (--dag-kleur uit dagkleur.css, zestien tinten over vier
+   seizoenen en vier zonstanden) blijft eroverheen ademen. Elk thema zet alleen
+   hoe sterk hij doorkomt: op fluweel mag hij nauwelijks, op champagne verdraagt
+   de grond meer.
+
+   Insluiten NA rtg-materiaal.css. */
+
+:root[data-rtg-thema]{ color-scheme:dark; }
+
+/* ---- Champagne: parelmoer als grond -- het enige lichte thema ---- */
+:root[data-rtg-thema="champagne"]{
+  color-scheme:light;
+  --rtg-bg:var(--pearl-basis);
+  --rtg-grond:var(--pearl-glans);
+  --rtg-txt:var(--op-pearl);
+  --rtg-muted:rgba(26,23,19,0.72);
+  --rtg-soft:rgba(26,23,19,0.56);
+  --rtg-line:var(--pearl-rand);
+  --rtg-card:rgba(255,255,255,0.42);
+  --rtg-goud:var(--gold-tekst);
+  --rtg-leesgoud:var(--gold-basis);  /* op licht mag de logotoon zelf lezen */
+  --rtg-dagsterkte:0.16;
+}
+/* ---- Onyx: pianolak, de vertrouwde stand ---- */
+:root[data-rtg-thema="onyx"]{
+  --rtg-bg:var(--onyx-basis);
+  --rtg-grond:var(--onyx-glans);
+  --rtg-txt:var(--op-onyx);
+  --rtg-muted:rgba(244,240,233,0.72);
+  --rtg-soft:rgba(244,240,233,0.56);
+  --rtg-line:var(--onyx-rand);
+  --rtg-card:#151312;
+  --rtg-goud:var(--gold-tekst);
+  --rtg-leesgoud:var(--gold-tekst);  /* op donker het hoogsel: 8,11:1 */
+  --rtg-dagsterkte:0.10;
+}
+/* ---- Bordeaux: fluweel, het merk zelf ---- */
+:root[data-rtg-thema="bordeaux"]{
+  --rtg-bg:var(--bordeaux-diep);
+  --rtg-grond:var(--bordeaux-glans);
+  --rtg-txt:var(--op-bordeaux);
+  --rtg-muted:rgba(244,240,233,0.74);
+  --rtg-soft:rgba(244,240,233,0.58);
+  --rtg-line:var(--bordeaux-rand);
+  --rtg-card:rgba(0,0,0,0.22);
+  --rtg-goud:var(--gold-tekst);
+  /* op fluweel haalt zelfs het hoogsel maar 4,21:1, dus lees je hier ivoor */
+  --rtg-leesgoud:var(--op-bordeaux);
+  --rtg-dagsterkte:0.06;
+}
+/* ---- Royal: fluweel in koningsblauw ---- */
+:root[data-rtg-thema="royal"]{
+  --rtg-bg:var(--royal-diep);
+  --rtg-grond:var(--royal-glans);
+  --rtg-txt:var(--op-royal);
+  --rtg-muted:rgba(240,242,247,0.74);
+  --rtg-soft:rgba(240,242,247,0.58);
+  --rtg-line:var(--royal-rand);
+  --rtg-card:rgba(0,0,0,0.20);
+  --rtg-goud:var(--gold-tekst);
+  --rtg-leesgoud:var(--op-royal);
+  --rtg-dagsterkte:0.07;
+}
+
+/* --rtg-goud IS EEN VULKLEUR EN GEEN TEKSTKLEUR.
+   In de UI-kit vult dit token de primaire knop, met #1C1608 als inkt erop. Ik
+   zette hem eerst op de logotoon --gold-basis (#857007) omdat dat "het echte
+   goud" is -- en haalde daarmee het contrast van 6,7:1 naar 3,7:1 op elke
+   gouden knop van het platform. a11y.js zag het meteen: zeven adviezen werden
+   er achttien.
+   Het is geen instelfout maar een eigenschap van de toon: op #857007 haalt
+   ZELFS ZWART maar 4,2:1. De logotoon kan dus nooit een vlak zijn waar gewone
+   tekst op staat. Precies dezelfde grens als bij goud-op-fluweel, alleen
+   andersom. Vullen doet het hoogsel; de logotoon is voor randen, accenten en
+   het beeldmerk. Wat er OP een grond leest, staat in --rtg-leesgoud.
+
+   De grond zelf, plus de levende kleur die eroverheen ademt. Twee lagen: de
+   dagkleur bovenop, met de sterkte die het thema toestaat, en daaronder het
+   materiaal. Zo verandert de tint continu zonder dat het materiaal verdwijnt. */
+:root[data-rtg-thema] body{
+  background:
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--dag-kleur,#C23A5E) calc(var(--rtg-dagsterkte,.1) * 100%), transparent) 0%,
+      transparent 62%),
+    var(--rtg-grond);
+  background-attachment:fixed;
+  color:var(--rtg-txt);
+}

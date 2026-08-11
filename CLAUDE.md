@@ -8,6 +8,42 @@ Website + ledenportaal + app (PWA) voor Rahul Travel Group (RTG) — een members
 
 **`README.md` is de actuele technische documentatie** (structuur, starten, API-overzicht, PWA, partnerkanaal) — lees die eerst bij technische vragen. Dit CLAUDE.md bevat vooral de merkregels en afspraken die niet uit de code af te leiden zijn.
 
+**`PLATFORM.md` bevat de super-app-regel** — lees die vóór je apps samenvoegt of
+een nieuwe app aanmaakt. In één zin: super apps vervangen geen domeinsoftware,
+ze orkestreren die; alleen apps die dezelfde kern, data én workflow dupliceren
+mogen samensmelten. De toetsvraag is niet "kan dit in een super-app?" maar "is
+dit een zelfstandige capability, of een tweede ingang naar dezelfde?". Daar
+staat ook **het wereldpatroon**: samenvoegen is stap een, niet de bedoeling —
+een wereld is pas af als hij zijn onderwerp begrijpt (graaf, beleid, cockpit,
+gegronde Rahul, actielog).
+
+**`GELD.md` en `LEVEN.md` zijn de diepte-documenten per wereld.** GELD.md
+maakt van RTG Geld een financieel besturingssysteem; de harde grens daar is
+dat geld het huis nooit vanzelf verlaat. LEVEN.md maakt van RTFoundation een
+Life OS dat een mens vanaf de geboorte begeleidt — lees vóór je daaraan werkt
+vooral paragraaf 2, de grenzen: een kind is geen profiel, nooit sturen maar
+openen, en de bijdrage-spiegel is nooit vergelijkend. Waar een functie botst
+met een grens, vervalt de functie.
+
+**`ONTWERP.md` is het RTG Design System 2.0** — de vormtaal: merk-elementen
+tegenover werk-elementen (Bodoni is ceremonieel en staat op een gesloten lijst
+rollen), de drie modi World/Pro/Command, uitzonderingsgestuurd ontwerpen, kleur
+als betekenis, en de eigen componenten (Signal Rail, Reference, Action Line,
+Context Pane, Command Palette). In één zin: **van veraf classy, van dichtbij
+extreem krachtig.** Lees die vóór je aan een scherm begint; `test/ontwerp.test.js`
+handhaaft wat machinaal te handhaven is.
+
+**`MATERIAAL.md` is de materialenleer** — een luxemerk denkt niet in kleuren
+maar in materialen en licht. Vijf materialen met elk een basis, een glans en een
+rand: Pearl (gepolijst keramiek, warm en nooit blauw), Gold (geborsteld
+champagnegoud, mat), Onyx (pianolak, nooit egaal), Bordeaux (fluweel, absorbeert
+licht) en Royal (satijn, als enige koel). Plus de twee letterrollen. Kies een
+materiaal, geen kleur; `test/materiaal.test.js` meet of het er nog een is.
+
+**`WERKRUIMTE.md` is het desktopparadigma** — RTG Desktop is not a collection of
+pages, it is a movable operational space. Surfaces met een gouden greep rond een
+centrale console, en Context Linking dat alleen een verwijzing rondstuurt.
+
 **`LAT.md` is de technische lat** — negen regels die allemaal uit een fout komen die hier écht is gemaakt, met per regel wat hem handhaaft en waar er alleen op mensen wordt vertrouwd. Lees die vóór je code schrijft of repareert. De belangrijkste twee: repareer de oorzaak en niet het symptoom, en trek elke bewering na met een mutatie (een toets die je niet hebt zien zakken is geen toets). LAT.md gaat over de code, CLAUDE.md over het merk.
 
 ## Structuur en starten (kort)

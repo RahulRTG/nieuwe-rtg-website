@@ -4,7 +4,7 @@
    client stuurt bij elke knop een idem-sleutel mee, dubbeltikken kan nooit
    dubbel boeken. */
 module.exports = (kern) => {
-  const { app, auth, supplierAuth, managerOnly, liveCodename, pay, onboarding, sseToOffice } = kern;
+  const { app, auth, supplierAuth, managerOnly, liveCodename, pay, onboarding, sseToOffice, factuurSaldo } = kern;
   const stuur = (res, r) => r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
   const geenGast = (req, res) => {
     if (req.session.tier === 'guest') { res.status(403).json({ error: 'RTG Pay is voor leden.' }); return true; }
@@ -59,6 +59,22 @@ module.exports = (kern) => {
     if (geenGast(req, res)) return;
     stuur(res, pay.verzoekIntrek({ codenaam: liveCodename(req.session), verzoekId: String(req.body.id || '') }));
   });
+  /* De maandfactuur betalen uit het eigen saldo: de derde betaalweg naast de
+     kaart en de munten (kern/factuursaldo.js). Zelfde poorten als elk ander
+     geld-moment hier: leden, en eenmalig het paspoort. */
+  app.post('/api/pay/saldo', auth, async (req, res) => {
+    if (geenGast(req, res)) return;
+    if (kyc(req, res)) return;
+    stuur(res, await factuurSaldo({
+      own: !!req.session.account,
+      accountId: req.session.account ? req.session.account.id : null,
+      wie: req.session.account ? ('acc:' + req.session.account.id) : ('sess:' + req.session.tier),
+      tier: req.session.tier,
+      codenaam: liveCodename(req.session),
+      invoiceId: String(req.body.invoiceId || '')
+    }));
+  });
+
   // de tik: ontvangen met een aanraking (tikcode), betalen met een knop
   app.post('/api/pay/tikcode', auth, (req, res) => {
     if (geenGast(req, res)) return;

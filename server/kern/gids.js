@@ -4,7 +4,7 @@
    rijen buiten het geheugen (ledenGids* uit db.js); zonder Postgres draait
    alles op db.data.memberDir zoals voorheen. De lezers merken het verschil
    niet: gidsHaal/gidsZoekCodenaam/keyVanCodenaam blijven hetzelfde. */
-module.exports = ({ db, save, liveCodename, ledenGidsActief, ledenGidsHaal, ledenGidsZet, ledenGidsWeg, ledenGidsExact, ledenGidsZoek, ledenGidsAantal }) => {
+module.exports = ({ db, save, liveCodename, ledenGidsActief, ledenGidsHaal, ledenGidsHaalWacht, ledenGidsZet, ledenGidsWeg, ledenGidsExact, ledenGidsZoek, ledenGidsAantal }) => {
   // de demo-persona's die bij het opstarten in de gids komen; geen echte leden
   const GIDS_SEED_TIERS = ['rtg', 'lifestyle', 'business'];
 
@@ -54,6 +54,14 @@ module.exports = ({ db, save, liveCodename, ledenGidsActief, ledenGidsHaal, lede
   // (cache + backfill), zonder Postgres uit db.data.memberDir.
   function gidsHaal(key) {
     if (ledenGidsActief()) return ledenGidsHaal(key) || null;
+    return db.data.memberDir[key] || null;
+  }
+  /* Wachtend opzoeken: voor plekken waar "niet gevonden" een besluit draagt
+     (weigering, 404). De synchrone gidsHaal geeft in Postgres-stand bij een
+     koude cache null terwijl het lid gewoon bestaat; deze variant vraagt het
+     dan echt na. Zonder Postgres identiek aan gidsHaal. */
+  async function gidsHaalWacht(key) {
+    if (ledenGidsActief()) return (await ledenGidsHaalWacht(key)) || null;
     return db.data.memberDir[key] || null;
   }
   // Zoeken op (deel van) een codenaam. Met Postgres geindexeerd; anders een
@@ -121,5 +129,5 @@ module.exports = ({ db, save, liveCodename, ledenGidsActief, ledenGidsHaal, lede
     }
   }
 
-  return { GIDS_SEED_TIERS, dirTouch, ledenAantal, ledenAantalVerversen, gidsHaal, gidsZoekCodenaam, keyVanCodenaam, gidsWeg };
+  return { GIDS_SEED_TIERS, dirTouch, ledenAantal, ledenAantalVerversen, gidsHaal, gidsHaalWacht, gidsZoekCodenaam, keyVanCodenaam, gidsWeg };
 };

@@ -1,0 +1,54 @@
+{
+  "name": "RTG Veilig, wie er over u waakt",
+  "short_name": "RTG Veilig",
+  "id": "/apps/veilig",
+  "description": "Thuiswacht, Codewoord, Vitaal en Thuisrust in een app. De klok loopt op de server, dus het werkt ook als uw telefoon uitvalt. Dit is geen alarmcentrale.",
+  "lang": "nl",
+  "start_url": "/apps/veilig.html",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0C0C0B",
+  "theme_color": "#0C0C0B",
+  "shortcuts": [
+    {
+      "name": "Thuiswacht",
+      "short_name": "Thuiswacht",
+      "url": "/apps/veilig.html#wacht"
+    },
+    {
+      "name": "Codewoord",
+      "short_name": "Codewoord",
+      "url": "/apps/veilig.html#codewoord"
+    },
+    {
+      "name": "Vitaal",
+      "short_name": "Vitaal",
+      "url": "/apps/veilig.html#vitaal"
+    },
+    {
+      "name": "Thuisrust",
+      "short_name": "Thuisrust",
+      "url": "/apps/veilig.html#rust"
+    }
+  ],
+  "icons": [
+    {
+      "src": "/icons/pas-rtg-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/pas-rtg-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/pas-rtg-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

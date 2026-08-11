@@ -3,174 +3,26 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>RTG Balans</title>
-<meta name="theme-color" content="#0C0C0B">
+<title>Balans</title>
 <meta name="robots" content="noindex,nofollow">
 <link rel="icon" href="/icon.svg" type="image/svg+xml">
-<link href="/fonts/fonts.css" rel="stylesheet">
-<link href="/shared/rtg-uniform.css" rel="stylesheet">
-<script src="/shared/toestelkluis.js" defer></script>
-<link href="/shared/rtg-ui.css" rel="stylesheet">
-<style>
-  :root{--bg:var(--rtg-bg);--card:var(--rtg-card);--line:var(--rtg-line);--txt:var(--rtg-txt);
-    --soft:var(--rtg-soft);--gold:#C9A24B;--groen:#69B891;}
-  *{margin:0;padding:0;box-sizing:border-box;}
-  body{background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;min-height:100dvh;}
-  .kop{display:flex;align-items:center;gap:0.7rem;padding:calc(env(safe-area-inset-top,0px) + 0.9rem) 1.1rem 0.6rem;}
-  .kop h1{font-family:'Bodoni Moda',serif;font-weight:600;font-size:1.3rem;}
-  .kop .rek{flex:1;}
-  .kop a{color:var(--txt);text-decoration:none;font-size:1.1rem;}
-  main{padding:0 1.1rem calc(env(safe-area-inset-bottom,0px) + 3rem);max-width:720px;margin:0 auto;}
-  h2{font-size:0.72rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--soft);margin:1.1rem 0 0.6rem;}
-  .stil{color:var(--soft);font-size:0.82rem;line-height:1.55;}
-  .kaart{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:1rem;margin:0.7rem 0;}
-  .week{display:flex;gap:0.4rem;align-items:flex-end;margin-top:0.5rem;}
-  .dag{flex:1;text-align:center;}
-  .dag .staaf{margin:0 auto;width:0.9rem;border-radius:4px 4px 0 0;background:var(--gold);min-height:4px;}
-  .dag .staaf.leeg{background:var(--groen);height:4px;}
-  .dag .lbl{font-size:0.6rem;color:var(--soft);margin-top:0.3rem;}
-  .advies{display:flex;gap:0.6rem;align-items:flex-start;margin-top:0.6rem;font-size:0.84rem;line-height:1.55;}
-  .knop{background:var(--card);border:1px solid var(--gold);border-radius:10px;color:var(--gold);
-    font:inherit;font-size:0.85rem;padding:0.6rem 0.95rem;cursor:pointer;margin-top:0.6rem;}
-  .knop:focus-visible{outline:2px solid var(--gold);outline-offset:2px;}
-</style>
-<link href="/shared/dagkleur.css" rel="stylesheet">
-<script src="/shared/seizoen.js" defer></script>
-<link href="/shared/ios.css" rel="stylesheet">
+<!-- Balans is een stand van RTG Geld geworden (PLATFORM.md par. 0: acht apps,
+     niet drieentachtig). De stand roept exact dezelfde routes aan als deze
+     pagina dat deed; alleen de schil is samengevoegd.
+
+     Dit pad blijft bestaan omdat er van buiten naar gelinkt kan zijn -- een
+     bladwijzer, een gedeelde link, een als PWA geinstalleerd icoon -- en een
+     dood pad is erger dan een omleiding. De hash wijst de schil meteen naar de
+     juiste stand.
+
+     De querystring gaat VOOR de hash mee. Andersom is de query geen query meer
+     maar een stuk van de hash, en dan komt hij nergens aan; die fout stond in
+     de veilig-omleidingen een commit lang. -->
+<meta http-equiv="refresh" content="0; url=/apps/geld.html#balans">
+<link rel="canonical" href="/apps/geld.html#balans">
+<script>location.replace('/apps/geld.html' + location.search + '#balans');</script>
 </head>
-<body class="rtg-stijl">
-<a class="skip" href="#inhoud">Naar de inhoud</a>
-<header class="kop">
-  <a href="/apps/app.html" aria-label="Terug naar de app">←</a>
-  <h1>RTG Balans</h1>
-  <div class="rek"></div>
-  <span class="stil">rust hoort erbij</span>
-</header>
-<main id="inhoud">
-  <p class="stil">Rahul kijkt naar uw agenda en uw ritme en adviseert ook eens niks: rusten, uw hobby, ontprikkelen. Geen streaks, geen scores om te halen, geen schuldgevoel; dit scherm mag u ook gewoon negeren.</p>
-
-  <section aria-label="Weekbeeld">
-    <h2>Uw komende week</h2>
-    <div class="kaart" id="weekKaart"><p class="stil">Laden…</p></div>
-  </section>
-
-  <section aria-label="Adviezen">
-    <h2>Rahul denkt met u mee</h2>
-    <div class="kaart" id="adviesKaart"><p class="stil">Laden…</p></div>
-  </section>
-
-  <section aria-label="Eten en koken">
-    <h2>Eten, koken en bewegen</h2>
-    <div class="kaart" id="kookKaart"><p class="stil">Laden…</p></div>
-  </section>
-
-  <section aria-label="Mijn recepten">
-    <h2>Mijn recepten, op dit toestel</h2>
-    <div class="kaart" id="receptKaart">
-      <p class="stil">Bewaar de recepten van Rahul (of uw eigen) in de beveiligde opslag van dit toestel. Alleen u kunt erbij; er gaat niets over de lijn.</p>
-      <label class="stil" for="receptNaam" style="display:block;margin-top:0.6rem;">Naam</label>
-      <input id="receptNaam" maxlength="60" placeholder="Bijv. pasta van Rahul" style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:0.85rem;padding:0.55rem 0.8rem;margin-top:0.25rem;">
-      <label class="stil" for="receptTekst" style="display:block;margin-top:0.6rem;">Recept</label>
-      <textarea id="receptTekst" rows="4" maxlength="4000" placeholder="Plak hier het recept uit de Rahul-chat" style="width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--txt);font:inherit;font-size:0.85rem;padding:0.55rem 0.8rem;margin-top:0.25rem;resize:vertical;"></textarea>
-      <button class="knop" id="receptBewaar">Bewaar op dit toestel</button>
-      <div id="receptLijst" style="margin-top:0.6rem;"></div>
-    </div>
-  </section>
-</main>
-<script src="/shared/uitvoer.js"></script>
-<script>
-(() => {
-  const $ = s => document.querySelector(s);
-  let tok = null; try { tok = localStorage.getItem('rtg_member_token'); } catch (e) {}
-  const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  const DAGL = ['zo', 'ma', 'di', 'wo', 'do', 'vr', 'za'];
-  let BEELD = null;
-  /* Meenemen (shared/uitvoer.js): het weekbeeld is een echte reeks per dag --
-     de staafjes hierboven worden er letterlijk uit getekend -- en dat gaat
-     als datum plus aantal mee, niet als de zin eronder. De adviezen zijn
-     tekst van Rahul en geen gegevens; die blijven op het scherm. */
-  if (window.RTGUitvoer) RTGUitvoer.bron(() => {
-    if (!BEELD || !BEELD.dagen) return null;
-    return {
-      naam: 'weekbeeld',
-      kolommen: ['datum', 'weekdag', 'afspraken', 'vrije dag'],
-      rijen: BEELD.dagen.map((d, i) => [d, DAGL[new Date(d).getDay()],
-        BEELD.perDag[i] || 0, (BEELD.perDag[i] || 0) === 0 ? 'ja' : 'nee'])
-    };
-  });
-  async function laad() {
-    if (!tok) { $('#weekKaart').innerHTML = '<p class="stil">Log eerst in via de leden-app.</p>'; return; }
-    let d;
-    try {
-      const r = await fetch('/api/balans', { method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok }, body: '{}' });
-      d = await r.json();
-      if (!r.ok) throw new Error(d.error || 'Er ging iets mis.');
-    } catch (e) { $('#weekKaart').innerHTML = '<p class="stil">' + esc(e.message) + '</p>'; return; }
-    const b = d.beeld, top = Math.max(1, ...b.perDag);
-    BEELD = b;
-    $('#weekKaart').innerHTML =
-      '<div class="week">' + b.perDag.map((n, i) =>
-        '<div class="dag"><div class="staaf' + (n === 0 ? ' leeg' : '') + '" style="height:' + (n === 0 ? 4 : 8 + n / top * 44) + 'px" title="' + n + ' afspraken"></div>' +
-        '<div class="lbl">' + DAGL[new Date(b.dagen[i]).getDay()] + '</div></div>').join('') + '</div>' +
-      '<p class="stil" style="margin-top:0.6rem;">' + b.vrijeDagen + ' lege dag(en) · ' + b.avonden + ' avondafspraken · groen is een dag zonder verplichtingen.</p>';
-    $('#adviesKaart').innerHTML = d.adviezen.map(a =>
-      '<div class="advies"><span aria-hidden="true">' + esc(a.icoon) + '</span><span>' + esc(a.tekst) + '</span></div>').join('') +
-      '<button class="knop" id="rustKnop">Vraag Rahul een rustmoment te plannen</button>';
-    $('#kookKaart').innerHTML =
-      '<p class="stil">Uit eten: ongeveer ' + b.uitPerWeek + ' keer per week' + (b.laat ? ' · ' + b.laat + ' late nachten in twee weken' : '') + '.</p>' +
-      '<p class="stil" style="margin-top:0.5rem;">' + esc(d.koken) + '</p>' +
-      '<button class="knop" id="kookKnop">Vraag Rahul een recept voor vanavond</button> ' +
-      '<button class="knop" id="beweegKnop">Vraag Rahul naar sport en wellness</button>';
-    const vraag = async (tekst) => {
-      try { await navigator.clipboard.writeText(tekst); } catch (e) {}
-      location.href = '/apps/app.html#ai';
-    };
-    $('#rustKnop').addEventListener('click', () => vraag(d.vraagRust));
-    $('#kookKnop').addEventListener('click', () => vraag(d.vraagKoken));
-    $('#beweegKnop').addEventListener('click', () => vraag(d.vraagBewegen));
-  }
-
-  /* Mijn recepten: eigen kopieen in de Toestelkluis (OPFS) van dit toestel */
-  async function recepten() {
-    const host = $('#receptLijst');
-    if (!window.Toestelkluis || !Toestelkluis.kan()) { host.innerHTML = ''; return; }
-    const items = (await Toestelkluis.lijst()).filter(x => x.naam.startsWith('recept_'));
-    host.innerHTML = items.map(x =>
-      '<div style="display:flex;justify-content:space-between;align-items:center;gap:0.5rem;font-size:0.8rem;margin-top:0.4rem;">' +
-        '<span>' + esc(x.naam.slice(7).replace(/_/g, ' ').replace(/\.txt$/, '')) + '</span>' +
-        '<span style="white-space:nowrap;">' +
-        '<button class="knop" style="margin-top:0;padding:0.25rem 0.6rem;font-size:0.72rem;" data-ropen="' + esc(x.naam) + '">Lees</button> ' +
-        '<button class="knop" style="margin-top:0;padding:0.25rem 0.6rem;font-size:0.72rem;color:var(--soft);border-color:var(--line);" data-rwis="' + esc(x.naam) + '" aria-label="wis recept">✕</button></span></div>').join('') ||
-      '<p class="stil" style="margin-top:0.4rem;">Nog geen recepten bewaard.</p>';
-    host.querySelectorAll('[data-ropen]').forEach(b => b.addEventListener('click', async () => {
-      const f = await Toestelkluis.haal(b.dataset.ropen);
-      if (f) window.alert(await f.text());
-    }));
-    host.querySelectorAll('[data-rwis]').forEach(b => b.addEventListener('click', async () => {
-      await Toestelkluis.wis(b.dataset.rwis); recepten();
-    }));
-  }
-  $('#receptBewaar').addEventListener('click', async () => {
-    const naam = $('#receptNaam').value.trim(), tekst = $('#receptTekst').value.trim();
-    if (!naam || !tekst || !window.Toestelkluis || !Toestelkluis.kan()) return;
-    await Toestelkluis.bewaar('recept_' + naam + '.txt', new Blob([tekst], { type: 'text/plain' }));
-    $('#receptNaam').value = ''; $('#receptTekst').value = '';
-    recepten();
-  });
-  laad();
-  if (document.readyState === 'complete') recepten();
-  else window.addEventListener('load', recepten);
-})();
-</script>
-<script src="/shared/deelmenu.js" defer></script>
-<script src="/shared/metgezel.js" defer></script>
-<script src="/shared/basis.js" defer></script>
-<script src="/shared/bediening.js" defer></script>
-<script src="/shared/randen.js" defer></script>
-<script src="/shared/volscherm.js" defer></script>
-<script src="/shared/cookie.js" defer></script>
-<script src="/shared/sneltoets.js" defer></script>
-<script src="/shared/ios.js" defer></script>
+<body style="background:#0C0C0B;color:#F4F1EC;font-family:Inter,system-ui,sans-serif;padding:2rem;">
+<p>Balans staat nu in RTG Geld. <a href="/apps/geld.html#balans" style="color:#C9A24B;">Ga verder</a>.</p>
 </body>
 </html>

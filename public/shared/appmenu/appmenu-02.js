@@ -15,13 +15,19 @@
         'stroke-width:1.7;stroke-linecap:round;}' +
       '.amn-knop:hover{color:var(--txt,#F7F5F1);}' +
       '.amn-knop:focus-visible{outline:2px solid var(--gold,#857007);outline-offset:3px;border-radius:8px;}' +
-      /* zwevend, voor de paar pagina\'s zonder eigen kopbalk */
+      /* de linkercel van de navigatiebalk: hamburger, dan de terugweg */
+      '.ios-nav-links{grid-column:1;justify-self:start;display:flex;align-items:center;gap:0.15rem;}' +
+      /* de hamburger naast de eigen terugweg van een pagina zonder kopbalk */
+      '.amn-koprij{display:flex;align-items:center;gap:0.5rem;}' +
+      '.amn-koprij > .amn-knop{margin-left:-0.35rem;}' +
+      /* zwevend, voor de paar pagina\'s zonder eigen kopbalk. LINKS en zonder
+         vlak: geen achtergrond, geen rand, geen afgeronde doos. Dat was het
+         zwaarste element van de kopbalk terwijl het het lichtste hoort te zijn. */
       '.amn-knop.amn-zweef{position:fixed;z-index:9970;' +
         'top:calc(env(safe-area-inset-top,0px) + .55rem);' +
-        'right:calc(env(safe-area-inset-right,0px) + .7rem);' +
-        'width:38px;height:38px;border-radius:12px;color:#EDE9E3;' +
-        'background:rgba(18,16,15,.72);border:1px solid rgba(255,255,255,.14);' +
-        'backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);}' +
+        'left:calc(env(safe-area-inset-left,0px) + .7rem);' +
+        'width:38px;height:38px;border-radius:0;color:var(--txt,#EDE9E3);' +
+        'background:none;border:0;backdrop-filter:none;-webkit-backdrop-filter:none;}' +
       /* het blad */
       '.amn-scrim{position:fixed;inset:0;z-index:9994;display:none;' +
         'align-items:flex-end;justify-content:center;background:rgba(6,5,5,.62);' +

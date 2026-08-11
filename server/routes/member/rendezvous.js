@@ -10,20 +10,23 @@ module.exports = (kern) => {
     return false;
   }
   const stuur = (res, r) => r && r.error ? res.status(r.status || 400).json({ error: r.error }) : res.json(r);
-  function route(pad, werk) {
-    app.post('/api/member/rendezvous/' + pad, auth, (req, res) => {
-      if (!eis(req, res)) return;
-      try { stuur(res, werk(req.session.key, req.body || {})); }
-      catch (e) { res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
-    });
-  }
+  /* De paden staan voluit en niet als '/api/member/rendezvous/' + pad. Een opgebouwd pad
+     ziet scripts/schakelbaar.js niet, en wat die census niet ziet is vanuit de
+     boardroom niet uit te zetten en niet per stad te sluiten (scripts/check.js
+     regel 45). De pas-eis en het vangnet blijven op EEN plek; alleen de
+     registratie is uitgeschreven. */
+  const doe = (werk) => (req, res) => {
+    if (!eis(req, res)) return;
+    try { stuur(res, werk(req.session.key, req.body || {})); }
+    catch (e) { res.status(500).json({ error: 'Er ging iets mis. Probeer het opnieuw.' }); }
+  };
 
-  route('profiel', (k) => rvProfielGet(k));
-  route('profiel/zet', (k, b) => rvProfiel(k, b));
-  route('kandidaten', (k) => rvKandidaten(k));
-  route('like', (k, b) => rvLike(k, String(b.id || '')));
-  route('pas', (k, b) => rvPas(k, String(b.id || '')));
-  route('matches', (k) => rvMatches(k));
+  app.post('/api/member/rendezvous/profiel', auth, doe((k) => rvProfielGet(k)));
+  app.post('/api/member/rendezvous/profiel/zet', auth, doe((k, b) => rvProfiel(k, b)));
+  app.post('/api/member/rendezvous/kandidaten', auth, doe((k) => rvKandidaten(k)));
+  app.post('/api/member/rendezvous/like', auth, doe((k, b) => rvLike(k, String(b.id || ''))));
+  app.post('/api/member/rendezvous/pas', auth, doe((k, b) => rvPas(k, String(b.id || ''))));
+  app.post('/api/member/rendezvous/matches', auth, doe((k) => rvMatches(k)));
 
   // de AI-date is async (Rahul de koppelaar), dus een eigen handler
   app.post('/api/member/rendezvous/date', auth, async (req, res) => {

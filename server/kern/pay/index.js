@@ -26,7 +26,7 @@
    de orkestrator: het grootboek, de idempotentie en het opladen wonen hier;
    de Klompjes/tik/p2p in ./verzoeken, de kassa en de partnerkant in ./kassa. */
 
-module.exports = ({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon, betaaldienstKosten, betaalOpdrachten }) => {
+module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCustomer, schoon, betaaldienstKosten, betaalOpdrachten }) => {
   const nu = () => Date.now();
   const d = () => db.data;
 
@@ -63,7 +63,10 @@ module.exports = ({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, sch
      (dubbeltik, haperend netwerk, retry) geeft exact hetzelfde antwoord en boekt
      nooit dubbel -- en dezelfde sleutel met een ANDER verzoek geeft een 409 in
      plaats van stil het oude antwoord. Zie ../../lib/idem.js. */
-  const metIdem = require('../../lib/idem')({ d, save, naam: 'payIdem' });
+  /* Met de save-bundel (db.bijeen) landen de boeking en de idem-sleutel als
+     EEN commit; de bundel is context-gebonden, dus ook met echte I/O in het
+     werk (motor, kaart-naad) raakt hij geen saves van andere verzoeken. */
+  const metIdem = require('../../lib/idem')({ d, save, naam: 'payIdem', bijeen });
 
   /* ---------- het grootboek zelf ----------
      `pasToe` past een AL-goedgekeurde boeking toe op de saldi + het grootboek
@@ -148,7 +151,28 @@ module.exports = ({ db, save, crypto, betaal, keyVanCodenaam, sseToCustomer, sch
     opdrachten: betaalOpdrachten,
     MIN_CENTEN, MAX_CENTEN, KASCODE_MS, KASCODE_MAX
   };
-  const api = { MIN_CENTEN, MAX_CENTEN, boek, boekAsync, geldModus, sluitcontrole, laadOp, oplaadAfronden, saldoVan, koppelBank, reconcileVanMotor };
+  /* Alleen-lezen: de boekingen van EEN rekening, nieuwste eerst, als kopieen.
+     Toegevoegd voor de geldgraaf (kern/geldgraaf), om dezelfde reden als
+     rekLid hieronder: de vorm van het grootboek is een regel van dit domein,
+     en wie hem elders nableest, leest hem morgen verkeerd (LAT.md regel 4).
+     Kopieen en geen verwijzingen, want wie meekijkt mag het grootboek niet
+     kunnen verbouwen; en een harde cap, want een projectielaag heeft aan de
+     recente geschiedenis genoeg en mag het warme geldpad niet vertragen. */
+  function boekingenVan(rek, tot) {
+    const max = Math.max(1, Math.min(1000, Math.round(Number(tot) || 200)));
+    const uit = [];
+    for (const b of grootboek()) {
+      if (b.van !== rek && b.naar !== rek) continue;
+      uit.push({ id: b.id, van: b.van, naar: b.naar, centen: b.centen, soort: b.soort, oms: b.oms, ref: b.ref, at: b.at });
+      if (uit.length >= max) break;
+    }
+    return uit;
+  }
+  /* rekLid hoort bij het koppelvlak: de vorm 'lid:' + codenaam is een regel
+     van dit domein, en wie hem nodig heeft (ov, mobiliteit, geldwereld) tikte
+     hem tot nu toe letterlijk na. Een naamregel die op vier plekken staat, is
+     op dag een al drie keer bijna fout gegaan. */
+  const api = { MIN_CENTEN, MAX_CENTEN, boek, boekAsync, geldModus, sluitcontrole, laadOp, oplaadAfronden, saldoVan, rekLid, boekingenVan, koppelBank, reconcileVanMotor };
   // schaduw-stand voor het statusbord (drift-detector): vergelijkt de JS-stand
   // met de Rust-motor -- niet alleen de som maar ook een vingerafdruk over ALLE
   // saldi, zodat per-rekening-drift die de som mist er alsnog uit komt. De afdruk

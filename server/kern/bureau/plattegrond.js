@@ -43,7 +43,9 @@ const KAMERS = [
     ['gelegenheden'], [{ naam: 'Table', url: '/apps/table.html', pas: 'lifestyle' }]),
   K('gezondheid', 'Health Office', 'Afspraken en uw persoonlijke dossier. Besloten: dit blijft bij u.',
     ['gezondheid'], [{ naam: 'Gezondheid & welzijn', url: '/apps/lifestyle.html', pas: 'lifestyle' },
-      { naam: 'Vitaal', url: '/apps/vitaal.html', pas: 'rtg' }]),
+      // Vitaal is een stand van RTG Veilig; rechtstreeks erheen in plaats van
+      // via de omleiding, zodat er geen sprong tussen zit.
+      { naam: 'Vitaal', url: '/apps/veilig.html#vitaal', pas: 'rtg' }]),
   K('onderwijs', 'Education Office', 'Scholen, opleidingen en wat de kinderen nodig hebben.',
     [], [{ naam: 'RTG School', url: '/apps/rtgschool.html', pas: 'rtg' }]),
   K('collectie', 'Culture Office', 'Kelder, garderobe en verzamelingen -- met herkomst, taxatiereeks, conditie, standplaats en bruikleen.',

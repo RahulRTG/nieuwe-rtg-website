@@ -415,7 +415,7 @@ antwoord is nee:
 > geen antwoord. Een projectiekamer heeft een korte code met een vervaltijd, door
 > de host gemunt, en die vervalt als de host weggaat.
 
-**Gebouwd** (`spellen/projectie.js` + `public/apps/speelscherm.html`, fase 1). De code
+**Gebouwd** (`spellen/projectie.js` + `public/apps/spelscherm.html`, fase 1). De code
 is bewust weinig waard: hij geeft één potje, hij verloopt na twee uur of zodra
 het potje weg is, en er kan niets terug — wie hem heeft ziet wat iedereen in de
 kamer toch al ziet. Het is de **enige spelingang zonder inlog**, en dat is de

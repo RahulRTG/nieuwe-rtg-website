@@ -4,7 +4,7 @@
   "id": "/apps/thuisrust",
   "description": "Niet storen tot u thuis bent. De wereld gaat stil; uw kring komt er altijd doorheen.",
   "lang": "nl",
-  "start_url": "/apps/thuisrust.html",
+  "start_url": "/apps/veilig.html#rust",
   "scope": "/",
   "display": "standalone",
   "background_color": "#0C0C0B",

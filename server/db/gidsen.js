@@ -28,6 +28,7 @@ module.exports = {
   grootAantal: grootboek.grootAantal,
   ledenGidsActief: ledengids.ledenGidsActief,
   ledenGidsHaal: ledengids.ledenGidsHaal,
+  ledenGidsHaalWacht: ledengids.ledenGidsHaalWacht,
   ledenGidsAantal: ledengids.ledenGidsAantal,
   ledenGidsZet: ledengids.ledenGidsZet,
   ledenGidsWeg: ledengids.ledenGidsWeg,

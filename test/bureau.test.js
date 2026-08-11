@@ -320,7 +320,15 @@ test('elke deur op de plattegrond geeft toegang tot een pagina die bestaat', asy
   let geteld = 0;
   for (const kamer of kern.bureau.KAMERS) {
     for (const app of kamer.apps) {
-      const bestand = path.join(wortel, app.url.replace(/^\//, ''));
+      /* Alleen het PAD hoeft te bestaan. Een deur mag naar een stand binnen een
+         app wijzen (/apps/veilig.html#vitaal): sinds de vier veiligheidsapps
+         een app met vier standen zijn, is dat de enige manier om een deur op
+         Vitaal uit te laten komen in plaats van op de app in het algemeen. De
+         hash is een stuk van de pagina en geen bestandsnaam; hem meenemen in
+         existsSync zoekt naar "veilig.html#vitaal" op schijf en dat is er
+         inderdaad niet -- maar dat bewijst niets over de deur. */
+      const pad = app.url.split('#')[0].split('?')[0];
+      const bestand = path.join(wortel, pad.replace(/^\//, ''));
       assert.ok(fs.existsSync(bestand), kamer.naam + ' wijst naar ' + app.url + ', en dat bestand is er niet');
       geteld++;
     }

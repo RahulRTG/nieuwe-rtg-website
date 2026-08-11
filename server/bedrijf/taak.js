@@ -32,11 +32,15 @@ module.exports = (sctx) => {
     if (!PRIORITEITEN.includes(prioriteit)) return res.status(400).json({ error: 'Kies een prioriteit: ' + PRIORITEITEN.join(', ') + '.' });
     const t = { id: rid(5), titel, projectId: projectId || null, ouderId: ouder || null,
       omschrijving: schoon(req.body.omschrijving, 1000) || null,
-      wie: schoon(req.body.wie, 60) || null, deadline: schoon(req.body.deadline, 10) || null,
+      deadline: schoon(req.body.deadline, 10) || null,
       prioriteit, kolom: 'te doen', wachtOp: [], uren: 0, sprint: null, at: nu(), door: g.l.naam };
+    /* De naam blijft een vrij veld; het id komt ERNAAST als hij onbedubbelzinnig
+       is (bedrijf/wieis.js). Zo vindt het dossier deze taak later via `wieId`
+       en niet via een naamvergelijking die van een naamgenoot kan zijn. */
+    const wie = sctx.zetWie(g.w, t, 'wie', schoon(req.body.wie, 60));
     T(g.w)[t.id] = t;
     save();
-    res.json({ ok: true, taak: t });
+    res.json({ ok: true, taak: t, wieLet: wie.reden });
   });
 
   /* Afhankelijkheden. Een cirkel wordt geweigerd: twee taken die op elkaar

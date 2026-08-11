@@ -28,7 +28,7 @@
       headers: { 'Content-Type': 'application/json', Authorization: 'Bearer ' + tok }, body: '{}' })
       .then(r => (r.ok ? r.json() : null))
       .then(d => {
-        if (d && d.online) { LINKS.bank = { naam: 'RTG Rekening', url: '/apps/bank.html' }; bouw(); }
+        if (d && d.online) { LINKS.bank = { naam: 'RTG Rekening', url: '/apps/geld.html#bank' }; bouw(); }
       }).catch(() => {});
   })();
 

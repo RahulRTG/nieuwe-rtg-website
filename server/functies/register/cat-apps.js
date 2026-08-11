@@ -3,11 +3,12 @@
    (premium, ook aan de onderkant); de boardroom stuurt per pas of doelgroep bij.
    Vaste veiligheidsregels (18+, verificatie, kinderbescherming) blijven altijd
    gelden, ook als een app aan staat. Verbatim afgesplitst uit register.js. */
-const { LEDEN, LEDEN_RTF } = require('./doelgroepen');
+const { LEDEN, LEDEN_RTF, LEDEN_GAST } = require('./doelgroepen');
 
 module.exports = [
   { id: 'spellen', categorie: 'Eigen apps', naam: 'Spelen (spellen met vrienden)', standaard: true, doelgroepen: LEDEN_RTF,
-    uitleg: 'Alle spellen: schaken, dammen, rummi, Magnaat, sudoku en de partyspellen.', paden: ['/api/member/spel', '/api/rtf/spel'] },
+    // /api/projectie is het tv-scherm van een potje: knop dicht = scherm mee dicht
+    uitleg: 'Alle spellen: schaken, dammen, rummi, Magnaat, sudoku en de partyspellen.', paden: ['/api/member/spel', '/api/rtf/spel', '/api/projectie'] },
   { id: 'podium', categorie: 'Eigen apps', naam: 'RTG Podium (live, in zones)', standaard: true, doelgroepen: LEDEN,
     uitleg: 'Live uitzenden op één motor, in gescheiden werelden: Live (open voor leden), Creator (abonnement en cadeaus), ' +
       'Events (op een kaartje), Besloten (op uitnodiging) en 18+ (geverifieerd paspoort, eigen lijst en eigen wachtrij bij het kantoor). ' +
@@ -30,6 +31,24 @@ module.exports = [
     alleenGenres: ['taxi', 'jet', 'helikopter', 'ov', 'verhuur', 'charter'] },
   { id: 'wbw', categorie: 'Eigen apps', naam: 'Wie betaalt wat', standaard: true, doelgroepen: LEDEN,
     uitleg: 'Groepsuitgaven met een live balans en verrekenen via RTG Pay.', paden: ['/api/wbw'] },
+  /* De drie werelden die dit jaar hun eigen laag kregen. Ze staan hier als
+     EEN schakelaar per wereld en niet per stand: de standen delen een kern en
+     een scherm, dus half uitzetten laat een app achter die niet weet wat hij
+     nog kan. Wat eronder ligt (pay, wbw, mecenaat, de levensgraaf) heeft zijn
+     eigen schakelaars en blijft die houden -- dit zet de WERELD uit, niet de
+     domeinen. */
+  { id: 'geldwereld', categorie: 'Eigen apps', naam: 'RTG Geld (financieel besturingssysteem)', standaard: true, doelgroepen: LEDEN,
+    uitleg: 'Het command center over alle gelddomeinen: hoe u ervoor staat, wat eraan komt, uw eigen beleidsregels met reserveringspotten, ' +
+      'het actielog en de gegronde Rahul. Uit = het overzicht en de regels verdwijnen; betalen en verrekenen blijven werken via hun eigen schakelaars.',
+    paden: ['/api/geld'] },
+  { id: 'levenos', categorie: 'Eigen apps', naam: 'RTFoundation (levenslijn en mentor)', standaard: true, doelgroepen: LEDEN,
+    uitleg: 'De levenslijn met wat er speelt en wat eraan komt, en de mentor die opent en nooit stuurt. Deze laag leest alleen; ' +
+      'uitzetten verwijdert geen enkel gegeven, het haalt alleen het beeld en de mentor weg.',
+    paden: ['/api/leven'] },
+  { id: 'socialewereld', categorie: 'Eigen apps', naam: 'RTG Sociaal (de kring op een plek)', standaard: true, doelgroepen: LEDEN,
+    uitleg: 'De samenhanglaag over De Salon, berichten, pulse en de ontmoetingen: wat er tussen u en uw kring speelt. ' +
+      'De onderliggende apps hebben hun eigen schakelaars.',
+    paden: ['/api/sociaal'] },
   // Let op: NIET 'office' als id; die naam is al van de RTG-Backoffice hieronder.
   { id: 'kantoorpakket', categorie: 'Eigen apps', naam: 'RTG Office (kantoorpakket)', standaard: true, doelgroepen: LEDEN,
     uitleg: 'Het eigen kantoorpakket: tekstdocumenten en rekenbladen op uw account, alleen-lezen te delen op codenaam.', paden: ['/api/kantoorpakket'] },
@@ -57,5 +76,28 @@ module.exports = [
     uitleg: 'De voorspellende verkeers- en logistieksimulatie. Standaard alleen voor vervoerders; de verkeersleiding (kantoor) ziet altijd alles.',
     paden: ['/api/supplier/ghost', '/api/office/ghost'],
     alleenGenres: ['taxi', 'jet', 'helikopter', 'ov', 'charter'] },
+
+  /* De gastkant van de horecatoren en de avondplanner. Ze stonden allebei met
+     al hun routes BUITEN de kast -- dezelfde optelling als bij het
+     Ondernemers-OS hierboven: routes schrijven is stap een, deze catalogus is
+     stap twee, en stap twee bleef liggen. Vanuit de boardroom waren ze niet uit
+     te zetten en greep de storingswachter er nooit op in.
+
+     LET OP BIJ DE GASTKANT: een gast aan tafel 12 heeft vaak GEEN account, en
+     dan levert doelgroepVanVerzoek() null op -- er telt voor hem alleen de
+     globale schakelaar. Dat is precies goed: wie de QR scant hoort niet buiten
+     te vallen omdat hij geen pas heeft, maar de zaal moet wel in een keer dicht
+     kunnen als er iets mis is. De doelgroepen hieronder sturen dus alleen de
+     leden-ingangen (bezorgen, afhalen, de foodcourt). */
+  { id: 'gastos', categorie: 'Eigen apps', naam: 'RTG Hospitality Guest OS (de gastkant)', standaard: true, doelgroepen: LEDEN_GAST,
+    uitleg: 'Bestellen vanaf je eigen telefoon: aan tafel via de QR, op je hotelkamer op de gastrekening, in de club op je polsband, ' +
+      'en van huis uit laten bezorgen, afhalen of een foodcourt-mandje bij meer loketten. Dezelfde rekening die de bediening ziet; ' +
+      'dit zet de gastdeur open of dicht, niet het horecasysteem van de zaak.',
+    paden: ['/api/gast'] },
+  { id: 'avondos', categorie: 'Eigen apps', naam: 'RTG Evening OS (een avond plannen)', standaard: true, doelgroepen: LEDEN,
+    uitleg: 'Een hele avond als plan: eten, iets drinken en de rit naar huis, binnen je budget en op tijd thuis. Elke stap wijst naar ' +
+      'een echte boeking in zijn eigen domein en draagt zijn eigen staat; een tafel wordt aangevraagd en nooit door de planner bevestigd. ' +
+      'Hier zit ook de Hospitality DNA: wat een zaak van je te zien krijgt, per soort en per zaak.',
+    paden: ['/api/avond'] },
 
 ];

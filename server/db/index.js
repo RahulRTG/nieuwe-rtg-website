@@ -89,8 +89,41 @@ function load() {
   if (db.data.__schema == null) db.data.__schema = 1;
 }
 
+/* EEN COMMIT VOOR WAT BIJ ELKAAR HOORT (bijeen). Gevonden met kill -9 onder
+   schrijflast: in de sqlite-stand flusht save() synchroon, en een overdracht
+   flusht TWEE keer -- eerst het geld (pasToe), dan pas de idem-sleutel
+   (metIdem). Een crash daartussen plus de retry waar idem-sleutels voor
+   bestaan, boekte echt dubbel (137 centen). bijeen(fn) stelt de saves uit de
+   EIGEN async-context uit (AsyncLocalStorage) en flusht aan het eind een
+   keer. Context-gebonden is de veiligheid zelf: wacht fn op echte I/O, dan
+   flushen andere verzoeken gewoon meteen (hun 200 blijft waar), en zelf
+   hebben we voor de laatste await nog niets gemuteerd -- er bestaat dus geen
+   halve toestand die een omstander kan vastleggen. */
+const { AsyncLocalStorage } = require('async_hooks');
+const bijeenContext = new AsyncLocalStorage();
+async function bijeen(fn) {
+  const doos = { open: true, nodig: false };
+  try { return await bijeenContext.run(doos, fn); }
+  finally {
+    /* Dicht voordat er geflusht wordt: een timer die binnen fn is gezet erft
+       deze context, en zijn latere save() moet ECHT flushen in plaats van een
+       vlag zetten waar niemand meer naar kijkt. */
+    doos.open = false;
+    if (doos.nodig) {
+      save();
+      /* Postgres is write-behind: zonder dit wachten zegt de route "gelukt"
+         terwijl het geld nog in een 60ms-timer hangt -- de crashproef mat daar
+         echt verlies in. Elders (sqlite synchroon; json/geheugen bewust
+         write-behind en in productie geblokkeerd) is dit een no-op. */
+      await postgres.flushVoorrangDirect();
+    }
+  }
+}
+
 function save() {
   if (!db.writable) return;
+  const doos = bijeenContext.getStore();
+  if (doos && doos.open) { doos.nodig = true; return; } // binnen bijeen: aan het eind, in een commit
   if (STORE === 'postgres') {
     // Postgres is de duurzame waarheid (write-behind via planFlush). De lokale
     // snapshot is enkel een warme cache en wordt binnen flushNu gethrotteld
@@ -158,12 +191,13 @@ function opslagKlaar() {
 }
 
 module.exports = {
-  db, load, save, DATA_DIR: opslag.DATA_DIR, STORE, startGedeeld: redis.startGedeeld, startSqliteSync,
+  db, load, save, bijeen, DATA_DIR: opslag.DATA_DIR, STORE, startGedeeld: redis.startGedeeld, startSqliteSync,
   startPostgres: postgres.startPostgres, flushBijAfsluiten, pgPing: postgres.pgPing,
   opslagKlaar, pgPoolStatus: postgres.pgPoolStatus, onExternalChange, merge3, schrijfDuurzaam: opslag.schrijfDuurzaam,
   grootSupplierSync: gidsen.grootSupplierSync, grootAantal: gidsen.grootAantal,
   ledenGidsActief: gidsen.ledenGidsActief, ledenGidsHaal: gidsen.ledenGidsHaal, ledenGidsAantal: gidsen.ledenGidsAantal,
   ledenGidsZet: gidsen.ledenGidsZet, ledenGidsExact: gidsen.ledenGidsExact, ledenGidsZoek: gidsen.ledenGidsZoek,
+  ledenGidsHaalWacht: gidsen.ledenGidsHaalWacht,
   /* ledenGidsWeg stond hier NIET, terwijl ledengids.js hem exporteert, gidsen.js
      hem doorreikt en server.js hem uit deze module haalt. Hij was dus undefined,
      en in kern/gids.js sloeg `if (ledenGidsWeg)` daar stilzwijgend op over --

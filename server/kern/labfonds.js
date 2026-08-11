@@ -97,10 +97,26 @@ module.exports = ({ db, save, crypto, anthropic }) => {
     return { ok: true, locatie: locBeeld(l, lidKey) };
   }
 
+  /* Alleen-lezen: de eigen bijdragen van een lid, rauw in centen en met
+     datum. fonds() geeft alleen sommen, en die in euro's omdat dat beeld
+     rechtstreeks naar het scherm gaat; de geldgraaf (kern/geldgraaf) heeft
+     de losse gebeurtenissen nodig voor zijn tijdlijn en mag daarvoor niet
+     zelf in db.data.labFonds graven -- dan leest een tweede plek de vorm
+     van een bijdrage na en loopt die vanzelf uit de pas met dit domein
+     (LAT.md regel 4). Kopieen, geen verwijzingen: meekijken is geen
+     meeschrijven. */
+  function mijnBijdragen(lidKey) {
+    const f = F();
+    return f.bijdragen.filter(b => b.lidKey === lidKey).map(b => ({
+      id: b.id, locId: b.locId, locNaam: (f.locaties[b.locId] || {}).naam || b.locId,
+      centen: b.centen, at: b.at
+    }));
+  }
+
   /* De voorstellen, de stemming, de AI-scheidsrechter en de beslissing draaien
      als submodule op dezelfde context; zie labfonds/voorstellen.js. */
   const { voorstelMaak, stem, scheidsrechter, beslis, boardroom } = require('./labfonds/voorstellen')({
     F, loc, vindV, locBeeld, voorstelBeeld, schoon, centen, eur, nu, rid, save, PRIVAAT });
 
-  return { labfonds: { fonds, locatieMaak, doneer, voorstelMaak, stem, scheidsrechter, beslis, boardroom } };
+  return { labfonds: { fonds, locatieMaak, doneer, mijnBijdragen, voorstelMaak, stem, scheidsrechter, beslis, boardroom } };
 };

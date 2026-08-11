@@ -48,9 +48,6 @@ module.exports = {
   '/apps/schoolpartner.html': G('De School Partner-app: de werkbank voor directie en lerarenteam, rechtstreeks op de leerlijn.',
     ['Directie: laat personeel toe en zie alle klassen met hun cijfers', 'Leraar: start een online les, zet collega\'s vast op je klas (max drie) of neem er een waar', 'Zet met een paar vinkjes een SO, proefwerk, examen of MO klaar uit de leerlijn; het cijfervoorstel blijft een advies'],
     'De motor kijkt na, maar de leraar beslist: elk cijfer is pas een cijfer als een mens erop drukt.'),
-  '/apps/ik.html': G('Wie ben ik: wat Rahul over jou mag weten, en hoe hij tegen je doet.',
-    ['Kies of Rahul een maatje, plagerig, zakelijk of rustig is', 'Zet je voornaamwoorden en hoe je genoemd wilt worden', 'Geef zelf aan of je iets gelooft; dan feliciteert hij je en houdt hij er rekening mee'],
-    'Alles is optioneel en alles is weer weg te halen. Rahul raadt nooit: niet je geloof uit je naam, niet je aanspreekvorm uit je paspoort.'),
   '/apps/residentie.html': G('De Residence: het virtuele grandhotel van RTG om elkaar te leren kennen -- voor je echt op date gaat.',
     ['Speel samen: midgetgolf, darts, kegelen of baantjes zwemmen; in het restaurant stelt het huis vragen', 'Praat met de zaal via de balk onderin, of stuur een schittering of hartje', 'Je suite is een compleet penthouse (bed, douche, keuken, telefoon); nodig iemand uit via de huistelefoon'],
     'Alles is inbegrepen bij de pas en iedereen heet er bij zijn codenaam: gezellig zonder scores, streaks of winkeltjes.')

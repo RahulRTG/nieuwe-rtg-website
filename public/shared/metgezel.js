@@ -9,6 +9,13 @@
    - zonder inlog doet het script niets (geen knoppen, geen verkeer) */
 (function () {
   if (window.__metgezel) return; window.__metgezel = true;
+  /* De metgezel hoort bij de OMGEVING, niet bij een ingebed vlak. Draait deze
+     pagina in een frame -- een surface in de RTG-werkruimte, of het comm-venster
+     in de personeels-PDA -- dan staat Rahul al in de omgeving eromheen, en zou
+     dit script hem een tweede keer neerzetten. Met drie surfaces open stonden er
+     drie chatbalken onder elkaar; dat is precies het soort dubbeling waar een
+     gedeelde laag juist voor is (LAT.md regel 4). */
+  try { if (window.top !== window.self) return; } catch (e) { /* andere herkomst: dan is het zeker een frame */ return; }
   /* De wauw-laag (shared/wauw.js) eerst: zachte overgangen, haptiek,
      delen, badge en wake lock. Voor de inlogcheck, zodat ook de poort
      hem heeft; net als handenvrij is het een script erbij in plaats

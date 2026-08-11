@@ -4,7 +4,7 @@
    te lezen en te testen is. Krijgt de gedeelde kern-onderdelen mee en praat
    nergens rechtstreeks met de buitenwereld. */
 module.exports = (core) => {
-  const { db, save, sseToCustomer, rtf, crypto, gidsHaal, gidsZoekCodenaam, media, commDm } = core;
+  const { db, save, sseToCustomer, rtf, crypto, gidsHaal, gidsHaalWacht, gidsZoekCodenaam, media, commDm } = core;
 
 function dmSleutel(a, b) { return [a, b].sort().join('|'); }
 function connectieTussen(a, b) {
@@ -13,6 +13,12 @@ function connectieTussen(a, b) {
 
 const isRtf = h => typeof h === 'string' && h.startsWith('rtf:');
 function codeExists(handle) { return isRtf(handle) ? !!rtf.profielInfoVanHandle(handle) : !!gidsHaal(handle); }
+/* De wachtende variant, voor plekken waar "bestaat niet" een BESLUIT draagt
+   (een 404 op verbinden). codeExists leest de synchrone gids, en die geeft in
+   Postgres-stand bij een koude cache null terwijl het lid gewoon bestaat --
+   onder last kreeg een NET gevonden codenaam zo "kennen we niet" bij het
+   verbinden. Zelfde patroon als bestaatLid in RTG Pay: bij twijfel echt vragen. */
+async function codeBestaat(handle) { return isRtf(handle) ? !!rtf.profielInfoVanHandle(handle) : !!(await gidsHaalWacht(handle)); }
 function codenaamVan(handle) {
   if (isRtf(handle)) { const i = rtf.profielInfoVanHandle(handle); return i ? i.codenaam : handle; }
   return (gidsHaal(handle) || {}).codename || handle;
@@ -62,7 +68,7 @@ function sociaalRate(mij, actie, max, perMs) {
    gedeelde context, een keer opgebouwd bij het opstarten; de vriendenlaag
    levert zijnVrienden aan de snapslaag via die context. */
 const ctx = { db, save, sseToCustomer, rtf, crypto, gidsHaal, gidsZoekCodenaam, media, commDm,
-  dmSleutel, connectieTussen, isRtf, codeExists, codenaamVan, soortVan, isKindHandle,
+  dmSleutel, connectieTussen, isRtf, codeExists, codeBestaat, codenaamVan, soortVan, isKindHandle,
   isBeschermdHandle, verbActief, isGeblokkeerd, blokkeer, deblokkeer, meldMisbruik, sociaalRate };
 const deelVrienden = require('./sociaal/vrienden')(ctx);
 Object.assign(ctx, deelVrienden);

@@ -82,7 +82,7 @@ module.exports = ({ db, save, crypto, kring, plek, meldAan, mail, appUrl }) => {
           zin + staart + '\n\n' +
           (p ? 'Laatst bekende plek (' + p.ouderdomMin + ' min geleden): ' + kaartLink(p) + '\n\n' : 'Er is geen recente plek bekend.\n\n') +
           'Dit bericht komt uit de RTG-veiligheidskring. RTG is geen alarmcentrale: bij levensgevaar belt u het alarmnummer.\n' +
-          (appUrl() ? appUrl() + '/apps/thuiswacht.html\n' : ''));
+          (appUrl() ? appUrl() + '/apps/veilig.html\n' : ''));
       } catch (e) { /* een mislukte mail mag de rest van het alarm nooit tegenhouden */ }
     }
 

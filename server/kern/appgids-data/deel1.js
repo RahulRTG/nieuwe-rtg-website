@@ -76,7 +76,4 @@ module.exports = Object.assign({
   '/apps/pay.html': G('RTG Pay: betalen en tikken tussen vrienden, veilig en direct.',
     ['Stuur of vraag een tik', 'Bekijk je saldo en geschiedenis', 'Splits een rekening met je gezelschap'],
     'Voor elke betaling zie je eerst een bevestiging; niets gaat er zonder jouw akkoord uit.'),
-  '/apps/wbw.html': G('Wie betaalt wat: groepsuitgaven bijhouden met een live balans.',
-    ['Maak een groep en zet uitgaven erin', 'Zie live wie wat voorschoot', 'Verreken in één keer via RTG Pay'],
-    'Direct na de vakantie verrekenen voorkomt het eeuwige "dat komt nog wel".')
 }, require('./deel1b'));

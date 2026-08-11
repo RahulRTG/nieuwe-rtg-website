@@ -28,8 +28,8 @@
 module.exports = function maakDiensten(deps) {
   const {
     DATA_DIR, DEMO, PERSONAS, accounts, crypto, db, eigenaar, findSupplier, i18n, 
-    ledenGidsAantal, ledenGidsActief, ledenGidsExact, ledenGidsHaal, ledenGidsWeg, 
-    ledenGidsZet, ledenGidsZoek, ledenPrijs, maakLive, mail, 
+    ledenGidsAantal, ledenGidsActief, ledenGidsExact, ledenGidsHaal, ledenGidsHaalWacht, ledenGidsWeg,
+    ledenGidsZet, ledenGidsZoek, ledenPrijs, maakLive, mail,
     onExternalChange, ordersVanKlant, rtf, save, schild, schoon, sessionFor, sessions, 
     sseToOffice, sseToSupplier, tokenHash
   } = deps;
@@ -89,8 +89,8 @@ module.exports = function maakDiensten(deps) {
     maakLive({ db, bus, nextSseId, PERSONAS, sseToSupplier, sseToOffice, findSupplier, haversine, etaMinutes, i18n, ordersVanKlant });
   /* De ledengids (sleutel -> codenaam + pas) staat in server/kern/gids.js:
      dirTouch, ledental, opzoeken en zoeken op codenaam, met of zonder Postgres. */
-  const { GIDS_SEED_TIERS, dirTouch, ledenAantal, ledenAantalVerversen, gidsHaal, gidsZoekCodenaam, keyVanCodenaam, gidsWeg } =
-    require('../kern/gids')({ db, save, liveCodename, ledenGidsActief, ledenGidsHaal, ledenGidsZet, ledenGidsWeg, ledenGidsExact, ledenGidsZoek, ledenGidsAantal });
+  const { GIDS_SEED_TIERS, dirTouch, ledenAantal, ledenAantalVerversen, gidsHaal, gidsHaalWacht, gidsZoekCodenaam, keyVanCodenaam, gidsWeg } =
+    require('../kern/gids')({ db, save, liveCodename, ledenGidsActief, ledenGidsHaal, ledenGidsHaalWacht, ledenGidsZet, ledenGidsWeg, ledenGidsExact, ledenGidsZoek, ledenGidsAantal });
   // Bij gedeelde data (Redis): na een externe wijziging de sessie-index opnieuw
   // vullen, zodat een lezersproces tokens kent die de schrijver net aanmaakte.
   onExternalChange(() => {
@@ -140,7 +140,7 @@ module.exports = function maakDiensten(deps) {
   return {
     AUTHOR_TIER, SSE_BUFFER_TTL, aiPoort, antivirus, archief, atelierweb, auth, automatisering, 
     beveilig, broadcastSync, bufferEvent, bus, connectedSupplierCodes, dirTouch, 
-    ensureSupplierDefaults, etaMinutes, gidsHaal, gidsWeg, gidsZoekCodenaam, guestsFor, 
+    ensureSupplierDefaults, etaMinutes, gidsHaal, gidsHaalWacht, gidsWeg, gidsZoekCodenaam, guestsFor,
     haversine, initRealtime, keyVanCodenaam, ledenAantal, leverSse, liveCodename, liveStateFor, 
     mailQ, mailIn, mailAuth, mailBijlage, mailSleutel, rtmailAi, naamlaag, nextSseId, notify, ondernemerpoort, pushLive, resolveSession, rtmail, rtmailTeam, 
     rtmailVak, rtmailDraad, rtmailSchrijf, rtmailRegels, rtmailDossier, rtmailSla, rtmailRecht, rtmailBewaar, mailAanname, 

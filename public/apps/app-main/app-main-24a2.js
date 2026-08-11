@@ -43,16 +43,16 @@
      twee plekken voor hetzelfde is precies waarom je hem nergens meer vindt. */
   const MAPPEN = [
     /* --- eerste rij --- */
-    { sleutel: 'map-reizen', naam: 'Reizen', items: [
-      'tab:reizen', 'tab:terplaatse', 'link:vluchten', 'link:ov', 'link:navigatie',
+    { sleutel: 'map-reizen', naam: 'RTG Reizen', wereld: '/apps/reizen.html', glyf: 'vluchten', items: [
+      'tab:reizen', 'link:reizen', 'tab:terplaatse', 'link:vluchten', 'link:ov', 'link:navigatie',
       'link:flits', 'link:stad', 'link:reisboek', 'link:hangar', 'link:residentie'] },
-    { sleutel: 'map-geld', naam: 'Geld', items: [
+    { sleutel: 'map-geld', naam: 'RTG Geld', wereld: '/apps/geld.html', glyf: 'wallet', items: [
       'tab:betalen', 'link:wallet', 'link:bank', 'link:wbw', 'link:rtgcode',
       'link:balans', 'tab:assets', 'link:labfonds', 'link:mecenaat',
       'link:nalatenschap', 'link:logboek'] },
     /* De Salon is weer De Salon: mensen en wat je met ze deelt. Wat je in je
        eentje kijkt of luistert staat bij Media. */
-    { sleutel: 'map-salon', naam: 'De Salon', items: [
+    { sleutel: 'map-salon', naam: 'RTG Sociaal', wereld: '/apps/sociaal.html', glyf: 'salon', items: [
       'tab:salon', 'link:pulse', 'link:vrienden', 'os:snaps', 'link:camera',
       'link:vonk', 'link:cercle', 'link:entourage', 'link:rendezvous', 'link:attenties'] },
     /* Het Huis is het huishouden in de brede zin: waar je woont, wat er op
@@ -60,24 +60,51 @@
        gaat. Die laatste helft (zorg, gezin, vitaal, rust) stond even in een
        eigen map Zorg; die is hier terug, want zonder haar was Het Huis op een
        RTG-pas een map met drie tegels. De kantoorkant zit bij Werk. */
-    { sleutel: 'map-huis', naam: 'Het Huis', items: [
-      'link:ontdek', 'os:rtf', 'tab:bestellen', 'tab:zorg', 'tab:gezin',
-      'link:vitaal', 'link:thuisrust', 'link:rechterhand',
+    /* os:rtf stond hier, en staat nu in zijn eigen wereld hieronder. Regel 44
+       in scripts/check.js ving dat meteen: een app in twee werelden is precies
+       waarom je hem nergens meer vindt. */
+    { sleutel: 'map-huis', naam: 'RTG Leven', wereld: '/apps/lifestyle.html', glyf: 'wonen', items: [
+      'link:ontdek', 'tab:bestellen', 'tab:zorg', 'tab:gezin',
+      'link:rechterhand',
       'link:maison', 'link:table', 'link:cellier', 'link:garderobe'] },
 
     /* --- tweede rij, gecentreerd --- */
-    { sleutel: 'map-media', naam: 'Media', items: [
+    { sleutel: 'map-media', naam: 'RTG Media', wereld: '/apps/media.html', glyf: 'film', items: [
       'link:muziek', 'link:podium', 'link:theater', 'link:clips', 'link:spelen',
       'link:nieuws', 'link:krant', 'link:sport'] },
-    { sleutel: 'map-werk', naam: 'Werk', items: [
+    { sleutel: 'map-werk', naam: 'RTG Kantoor', wereld: '/apps/kantoor.html', glyf: 'office', items: [
       'link:office', 'os:werk', 'link:loonstrook', 'link:school',
-      'link:browser', 'link:sitemaker', 'link:juridisch'] },
-    /* Veilig: wie je bent en wie er over je waakt. Vier apps op dezelfde kern
-       (zie de opmerking bij LINKS), plus de sleutels waarmee je binnenkomt.
-       Vier is hier geen tekort maar de hele set -- dit is de enige map die op
-       elke pas even groot is. */
-    { sleutel: 'map-veilig', naam: 'Veilig', items: [
-      'link:ik', 'link:thuiswacht', 'link:codewoord', 'link:passkeys'] }
+      'link:browser', 'link:sitemaker'] },
+    /* Veilig: wie je bent en wie er over je waakt. De vier apps op dezelfde
+       kern zijn een app met vier standen geworden (zie de opmerking bij LINKS),
+       plus de sleutels waarmee je binnenkomt. Drie is hier geen tekort maar de
+       hele set -- dit is de enige map die op elke pas even groot is.
+
+       Vitaal en Thuisrust stonden bij Het Huis en niet hier, omdat ze over zorg
+       en huishouden gingen. Nu ze standen zijn van een app, kan die app maar in
+       een map staan (geen enkel item staat in twee mappen) en dat is deze:
+       waar de andere twee standen ook al woonden. Het Huis houdt zorg en gezin
+       als eigen tabbladen, dus daar verdwijnt het onderwerp niet.
+
+       Juridisch komt hier vandaan uit de map Werk. Vier tegels werden een, en
+       daarmee zakte deze map naar drie -- onder de ondergrens die
+       test/appmenu.e2e.js bewaakt, en die ondergrens is er niet voor niets: een
+       bijna lege map op de instappas is precies waar de merkregel over gaat.
+       Juridisch is geen noodgreep om een gat te vullen maar hoort hier: de
+       app-bibliotheek zet hem zelf al in de categorie "Veiligheid & identiteit"
+       naast Wie ben ik en Passkeys, en het gaat over jouw voorwaarden en jouw
+       akkoorden -- wie je bent, niet waar je werkt. Werk houdt zes tegels. */
+    { sleutel: 'map-veilig', naam: 'RTG Veilig', wereld: '/apps/veilig.html', glyf: 'schild', items: [
+      'link:ik', 'link:veilig', 'link:passkeys', 'link:juridisch'] },
+    /* De achtste wereld. De stichting stond als EEN tegel binnen Het Huis
+       ('os:rtf'), terwijl ze zeventien onderdelen, een eigen service worker en
+       een eigen huis heeft. Een wereld die als tegel in een andere wereld
+       hangt, is geen wereld. */
+    /* De wereldtegel NAVIGEERT naar het huis; een tweede item in deze lijst zou
+       nooit in beeld komen (openMap navigeert, zie 26.js). Het
+       levens-command-center staat daarom als tegel OP de hub zelf, in de
+       oudersectie -- zie de opmerking daar over de twee sessiewerelden. */
+    { sleutel: 'map-rtf', naam: 'RTFoundation', wereld: '/apps/foundation/index.html', glyf: 'rtf', items: ['os:rtf'] }
   ];
 
   /* De premium-suite (De Rechterhand) bestaat alleen voor Lifestyle en

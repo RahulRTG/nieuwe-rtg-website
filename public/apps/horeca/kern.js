@@ -63,8 +63,12 @@
       return false;
     },
     // een rij zoals alle horecaschermen hem tekenen
+    /* Een rij met links de inhoud en rechts een stille kolom. Die rechterkant
+       is OPTIONEEL: zonder de standaardwaarde plakte een aanroep met een
+       argument het woord "undefined" achter de tekst, en dat stond in een echt
+       scherm (de pols). Een helper hoort niet te lekken wat hij niet kreeg. */
     rij: function (links, rechts) {
-      return '<div class="item"><span>' + links + '</span><span class="stil">' + rechts + '</span></div>';
+      return '<div class="item"><span>' + links + '</span><span class="stil">' + (rechts == null ? '' : rechts) + '</span></div>';
     },
     // een knop met gegevens eraan; het binden gebeurt per scherm
     knop: function (tekst, data, primair) {

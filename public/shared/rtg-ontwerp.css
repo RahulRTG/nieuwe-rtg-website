@@ -1,0 +1,209 @@
+/* RTG Design System 2.0 -- de tokenlaag en de eigen componenten.
+   De regels en het waarom staan in ONTWERP.md; dit is de uitvoering.
+
+   Deze laag komt NAAST shared/rtg-ui.css en niet eroverheen. rtg-ui.css blijft
+   de basisvormtaal (kaart, kop, knop, haarlijn); hier komen de twee dingen bij
+   die daar niet in zitten: DICHTHEID (World/Pro/Command) en BETEKENIS (signaal,
+   status, referentie). Geen tweede kleurenset dus -- de kleuren hieronder
+   verwijzen naar de tokens die rtg-ui.css al zet (LAT.md regel 4).
+
+   Insluiten NA rtg-ui.css. */
+
+/* ---------------------------------------------------------------- signaal -- */
+/* Betekeniskleuren. Geen merkkleuren: goud en bordeaux blijven van het merk,
+   deze vier zijn van de TOESTAND. "Gezond" is met opzet bijna onzichtbaar --
+   normaal hoort geen aandacht te trekken (ONTWERP.md §3). */
+:root{
+  --rtg-sig-gezond:  rgba(76,154,117,0.55);
+  --rtg-sig-aandacht:#C9A24B;
+  --rtg-sig-incident:#DE6E92;
+  --rtg-sig-actief:  #7E8FC4;
+  --rtg-sig-stil:    var(--rtg-line);
+
+  /* Cijfers lijnen uit. Dit ene token is het verschil tussen "een website met
+     getallen" en een instrument (ONTWERP.md §8). */
+  --rtg-cijfers:tabular-nums;
+
+  /* Beweging. Als token en niet los per animatie, zodat "subtiel" een
+     eigenschap van het systeem is en geen keuze per scherm. */
+  --rtg-tijd-kort:120ms;
+  --rtg-tijd-paneel:180ms;
+  --rtg-veer:cubic-bezier(.22,.61,.36,1);
+
+  /* Het desktopraster: 240 navigatie | flex werkvlak | 360 context. */
+  --rtg-nav-breed:240px;
+  --rtg-context-breed:360px;
+}
+
+/* ------------------------------------------------------------------ modi -- */
+/* Drie dichtheden, één systeem. Een modus zet UITSLUITEND schaal, ruimte en
+   regelhoogte -- nooit een kleur, een lettertype of een vorm. Precies dat maakt
+   dat World, Pro en Command hetzelfde product blijven (ONTWERP.md §2).
+
+   Elke modus zet ALLE vier de tokens. Een half gevulde modus is een scherm dat
+   in die modus stukgaat, en test/ontwerp.test.js zakt erop. */
+:root,
+[data-rtg-modus="world"]{
+  --rtg-regel:56px;
+  --rtg-ruim:20px;
+  --rtg-ruim-klein:12px;
+  --rtg-tekst:0.95rem;
+}
+[data-rtg-modus="pro"]{
+  --rtg-regel:40px;
+  --rtg-ruim:12px;
+  --rtg-ruim-klein:8px;
+  --rtg-tekst:0.88rem;
+}
+[data-rtg-modus="command"]{
+  --rtg-regel:32px;
+  --rtg-ruim:8px;
+  --rtg-ruim-klein:6px;
+  --rtg-tekst:0.82rem;
+}
+
+/* ------------------------------------------------------- merk versus werk -- */
+/* De GESLOTEN lijst rollen die serif mag dragen (ONTWERP.md §1). Staat Bodoni
+   ergens anders, dan is dat een fout en geen smaakverschil: een signatuur die
+   overal staat, is geen signatuur meer. */
+.rtg-ceremonie,
+.rtg-kpi,
+.rtg-datum,
+.rtg-plaats{
+  font-family:'Bodoni Moda',Georgia,serif;
+  font-weight:400;
+  letter-spacing:0.01em;
+}
+.rtg-kpi{
+  font-size:clamp(2rem,5vw,3.25rem);
+  line-height:1.05;
+  font-variant-numeric:var(--rtg-cijfers);
+}
+.rtg-plaats{font-size:1.05rem;font-style:italic;}
+/* De dagnummers in een register. Ze zijn de ankers waarop iemand scant: niet
+   "een getal" maar de kop van de regel, zoals een bedrag dat in een financieel
+   overzicht is. Daarom ceremonieel.
+
+   PROPORTIONEEL en niet tabulair, en dat is hier het omgekeerde van de regel
+   voor bedragen. Tabulaire cijfers geven elk teken dezelfde celbreedte, dus de
+   smalle 1 krijgt evenveel ruimte als een 8 en staat scheef in zijn eigen cel.
+   In een KOLOM met bedragen is dat precies wat je wilt -- alles lijnt uit. Maar
+   een dagnummer staat hier GECENTREERD onder een weekdag, en dan zie je het
+   meteen: 29 en 06 stonden recht, 17 hing uit het lood. De kolom golft er niet
+   van, want die heeft een vaste breedte. */
+.rtg-datum{font-size:2.1rem;line-height:1;font-variant-numeric:proportional-nums;}
+
+/* Alles wat werk is, is Inter met uitlijnende cijfers. */
+.rtg-werk,
+.rtg-register,
+.rtg-ref,
+.rtg-bedrag,
+.rtg-teller{
+  font-family:Inter,system-ui,sans-serif;
+  font-variant-numeric:var(--rtg-cijfers);
+}
+
+/* ------------------------------------------------------------ signal rail -- */
+/* Een dunne verticale lijn links van een object in plaats van honderd gekleurde
+   pillen. Zonder toestand is hij de gewone haarlijn: normaal is onopvallend. */
+.rtg-rail{
+  position:relative;
+  padding-left:calc(var(--rtg-ruim) + 3px);
+}
+.rtg-rail::before{
+  content:"";
+  position:absolute;left:0;top:0;bottom:0;width:2px;
+  background:var(--rtg-sig-stil);
+  transition:background var(--rtg-tijd-paneel) var(--rtg-veer);
+}
+.rtg-rail[data-sig="gezond"]::before  {background:var(--rtg-sig-gezond);}
+.rtg-rail[data-sig="aandacht"]::before{background:var(--rtg-sig-aandacht);}
+.rtg-rail[data-sig="incident"]::before{background:var(--rtg-sig-incident);}
+.rtg-rail[data-sig="actief"]::before  {background:var(--rtg-sig-actief);}
+
+/* --------------------------------------------------------------- register -- */
+/* Het alternatief voor de kaartenstapel: rijen met haarlijnen, op regelhoogte
+   van de modus. Een register is GEEN stapel kaarten (ONTWERP.md §7). */
+.rtg-register{display:block;width:100%;}
+.rtg-register .rij{
+  display:flex;align-items:center;gap:var(--rtg-ruim);
+  min-height:var(--rtg-regel);
+  padding:var(--rtg-ruim-klein) var(--rtg-ruim);
+  /* Draagt de rij ook een rail, dan moet de inhoud daar ACHTER beginnen. Deze
+     kiezer is specifieker dan .rtg-rail, dus zonder deze regel wint de
+     padding hierboven en schuift de eerste kolom onder de rail door -- op een
+     screenshot zag je het eerste cijfer van de datum half wegvallen. */
+  border-bottom:1px solid var(--rtg-line);
+  font-size:var(--rtg-tekst);
+  color:inherit;text-decoration:none;
+}
+.rtg-register .rij.rtg-rail{padding-left:calc(var(--rtg-ruim) + 6px);}
+.rtg-register .rij:hover,
+.rtg-register .rij:focus-visible{background:rgba(255,255,255,0.03);}
+.rtg-register .rij > .rek{margin-left:auto;}
+.rtg-register .wanneer{color:var(--rtg-soft);white-space:nowrap;font-variant-numeric:var(--rtg-cijfers);}
+
+/* -------------------------------------------------------------- referentie -- */
+/* Altijd dezelfde positie, altijd tabulair, klikken kopieert. Een professional
+   zoekt hiernaar; het hoort niet onder "meer" weggestopt te worden. */
+.rtg-ref{
+  font-size:0.76rem;letter-spacing:0.06em;
+  color:var(--rtg-muted);
+  background:none;border:0;padding:0;
+  cursor:copy;
+}
+.rtg-ref:hover,.rtg-ref:focus-visible{color:var(--rtg-goud);}
+
+/* ------------------------------------------------------------------ status -- */
+/* NOOIT op kleur alleen: elke status draagt een woord en een teken, kleur is de
+   derde laag (ONTWERP.md §5). Het teken komt uit data-teken, zodat het in de
+   HTML staat en niet alleen in een stylesheet die iemand kan uitzetten. */
+.rtg-status{
+  display:inline-flex;align-items:center;gap:0.35em;
+  font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;
+  color:var(--rtg-muted);
+}
+.rtg-status::after{content:attr(data-teken);font-size:0.95em;letter-spacing:0;}
+.rtg-status[data-sig="gezond"]  {color:var(--rtg-sig-gezond);}
+.rtg-status[data-sig="aandacht"]{color:var(--rtg-sig-aandacht);}
+.rtg-status[data-sig="incident"]{color:var(--rtg-sig-incident);}
+.rtg-status[data-sig="actief"]  {color:var(--rtg-sig-actief);}
+
+/* ------------------------------------------------------------- action line -- */
+/* Wat er nu moet gebeuren, of waarop gewacht wordt. Hiermee wordt een scherm
+   procesgedreven in plaats van beschrijvend. */
+.rtg-actie{
+  display:inline-flex;align-items:center;gap:0.4em;
+  font-size:0.74rem;letter-spacing:0.08em;text-transform:uppercase;
+  color:var(--rtg-goud);
+}
+.rtg-actie[data-wacht]{color:var(--rtg-soft);}
+
+/* --------------------------------------------------------------- layouts -- */
+/* Drie ECHTE layouts; een telefoonontwerp uitrekken is geen desktopontwerp. */
+.rtg-vlak{display:block;width:100%;}
+@media (min-width:900px){
+  .rtg-vlak{
+    display:grid;
+    grid-template-columns:var(--rtg-nav-breed) minmax(0,1fr);
+    gap:0;
+    max-width:1600px;margin-inline:auto;
+  }
+  .rtg-vlak[data-context]{
+    grid-template-columns:var(--rtg-nav-breed) minmax(0,1fr) var(--rtg-context-breed);
+  }
+}
+/* Tot 900px: één hoofdvlak; de context wordt een blad van onderen. */
+@media (max-width:899px){
+  .rtg-vlak > .rtg-nav,
+  .rtg-vlak > .rtg-context{display:none;}
+}
+
+/* --------------------------------------------------------------- beweging -- */
+/* Subtiel, en uit zodra het toestel daarom vraagt. */
+@keyframes rtg-in{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:none;}}
+.rtg-nieuw{animation:rtg-in var(--rtg-tijd-kort) var(--rtg-veer);}
+@media (prefers-reduced-motion:reduce){
+  .rtg-nieuw{animation:none;}
+  .rtg-rail::before{transition:none;}
+}

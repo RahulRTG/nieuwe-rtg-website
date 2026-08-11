@@ -547,20 +547,48 @@ console.log('\n14) zero dependencies: geen externe modules, package.json klopt')
   for (const v of vondsten) fout('externe module: ' + v + ' -- bouw het zelf of zet het met reden in de lijst');
   if (!vondsten.length) ok('geen externe module in server/, scripts/, test/ en public/');
 
+  /* DE RUNTIME BLIJFT ZONDER PAKKETTEN. Dat is de belofte, en die verandert
+     niet: `dependencies` moet leeg zijn, want wat de server draait hoort van
+     ons te zijn.
+
+     EEN UITZONDERING, MET REDEN, EN ALLEEN VOOR HET TOETSEN. De schermtoetsen
+     hebben een browser nodig. Zonder browser sloegen ze zichzelf over -- 114
+     van de 119 bestanden -- en node --test meldt dat als GROEN. De suite
+     bewees daarmee over vrijwel geen enkel scherm dat het werkt, en dat is een
+     duurdere prijs dan een ontwikkelpakket. Sinds 11 augustus 2026 is
+     overslaan rood (test/skipwacht.test.js) en hoort de browser er dus te
+     zijn.
+
+     De uitzondering is smal gehouden: alleen playwright, alleen in
+     devDependencies, en de lijst hieronder is de enige plek waar hij staat.
+     Een pakket dat in de RUNTIME belandt zakt nog steeds, en dat is de regel
+     die er echt toe doet. */
+  const TOEGESTAAN_DEV = new Set(['playwright']);
   const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8'));
   const beloofd = [];
-  for (const veld of ['dependencies', 'devDependencies', 'optionalDependencies', 'peerDependencies']) {
+  for (const veld of ['dependencies', 'optionalDependencies', 'peerDependencies']) {
     const namen = Object.keys(pkg[veld] || {});
     if (namen.length) beloofd.push(veld + ': ' + namen.join(', '));
   }
+  const devVreemd = Object.keys(pkg.devDependencies || {}).filter((n) => !TOEGESTAAN_DEV.has(n));
+  if (devVreemd.length) beloofd.push('devDependencies: ' + devVreemd.join(', '));
   if (beloofd.length) fout('package.json noemt toch pakketten (' + beloofd.join(' | ') + ')');
-  else ok('package.json noemt geen enkel pakket');
+  else ok('de runtime noemt geen enkel pakket' +
+    (Object.keys(pkg.devDependencies || {}).length ? ' (alleen de toetsbrowser als devDependency)' : ''));
 
   const lock = path.join(ROOT, 'package-lock.json');
   if (fs.existsSync(lock)) {
-    const pakketten = Object.keys(JSON.parse(fs.readFileSync(lock, 'utf8')).packages || {}).filter(k => k);
-    if (pakketten.length) fout('package-lock.json bevat ' + pakketten.length + ' pakket(ten): ' + pakketten.slice(0, 5).join(', '));
-    else ok('package-lock.json is leeg (alleen het project zelf)');
+    /* In het slot staan ook de afhankelijkheden VAN de toegestane devDependency
+       (playwright-core, en fsevents op een Mac). Ze meetellen zou betekenen dat
+       de uitzondering hierboven alsnog niet kan; wat telt is dat er niets
+       binnenkomt dat NIET onder een toegestane naam hangt. */
+    const pakketten = Object.keys(JSON.parse(fs.readFileSync(lock, 'utf8')).packages || {}).filter((k) => k);
+    const vreemd = pakketten.filter((k) => {
+      const naam = k.replace(/^node_modules\//, '').split('/node_modules/').pop();
+      return !TOEGESTAAN_DEV.has(naam) && !['playwright-core', 'fsevents'].includes(naam);
+    });
+    if (vreemd.length) fout('package-lock.json bevat pakketten buiten de toetsbrowser: ' + vreemd.slice(0, 5).join(', '));
+    else ok(pakketten.length ? pakketten.length + ' pakketten, alle van de toetsbrowser' : 'package-lock.json is leeg');
   }
 }
 

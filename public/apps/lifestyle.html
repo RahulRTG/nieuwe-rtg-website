@@ -114,6 +114,37 @@
   <div><div class="ey">Lifestyle Pass</div><h1>Het Privékantoor</h1></div>
   <a class="terug" href="/apps/app.html?pas=lifestyle">← app</a>
 </header>
+<!-- DE APPS VAN DEZE WERELD. Het Privekantoor toont wat er speelt; deze rij
+     brengt je naar de apps die eronder hangen. Ze stonden nergens: geen van
+     deze twaalf was met tikken te bereiken -- niet vanaf het beginscherm, niet
+     vanaf hier, nergens. Ze draaiden wel, en dat is precies het verraderlijke:
+     een scherm dat werkt en dat niemand kan vinden, geeft nooit een foutmelding.
+     Gemeten met de graaf in test/bereikbaar.test.js, die sinds vandaag
+     verhindert dat er nog een bijkomt. -->
+<nav class="wereldapps" aria-label="Apps in deze wereld">
+  <a href="/apps/bestellen.html">Bestellen</a>
+  <a href="/apps/voeding.html">Voeding</a>
+  <a href="/apps/medicijnen.html">Medicijnen</a>
+  <a href="/apps/training.html">Training</a>
+  <a href="/apps/doelen.html">Doelen</a>
+  <a href="/apps/gedachten.html">Gedachtenboek</a>
+  <a href="/apps/memo.html">Memo</a>
+  <a href="/apps/tijdlijn.html">Tijdlijn</a>
+  <a href="/apps/toestemming.html">Toestemmingen</a>
+  <a href="/apps/concierge.html">Concierge</a>
+  <a href="/apps/avond.html">Avond plannen</a>
+  <a href="/apps/life.html">Life</a>
+</nav>
+<style>
+  /* Bewust dezelfde vorm als de specialistenrij in apps/media.html: een rij
+     tekstknoppen die meeschuift, geen tweede tegelraster. Een wereld heeft
+     EEN manier om zijn apps te tonen. */
+  .wereldapps { display: flex; gap: .5rem; overflow-x: auto; padding: .75rem 1rem;
+    border-bottom: 1px solid var(--line, #DEDBD5); }
+  .wereldapps a { white-space: nowrap; text-decoration: none; font-size: .82rem;
+    padding: .35rem .7rem; border: 1px solid var(--line, #DEDBD5); border-radius: 2px;
+    color: inherit; }
+</style>
 <main id="main"><div class="leeg">Laden…</div></main>
 <div class="melding" id="melding"></div>
 

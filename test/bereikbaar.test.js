@@ -72,10 +72,20 @@ function noemt(p) {
       else bestanden.push(kand);
     } catch (e) { /* bestaat niet: geen script bij dit scherm */ }
   }
+  /* RELATIEVE PADEN TELLEN OOK MEE, en dat is geen detail: het RTFoundation-huis
+     linkt zijn drieenzestig schermen als 'agenda.html' en niet als
+     '/apps/foundation/agenda.html'. Een graaf die alleen absolute paden leest
+     verklaarde ze alle drieenzestig onbereikbaar terwijl ze gewoon op de hub
+     staan. Tweede keer dat deze graaf de verkeerde randen volgde; vandaar dat
+     het hier met zoveel woorden staat. */
+  const map = path.posix.dirname(p);
   const uit = new Set();
   for (const b of bestanden) {
     let s = ''; try { s = fs.readFileSync(b, 'utf8'); } catch (e) { continue; }
     for (const m of s.matchAll(/\/apps\/[a-z0-9/-]+\.html/g)) uit.add(m[0]);
+    // href="agenda.html" of src/href zonder schuine streep: los op tegen de eigen map
+    for (const m of s.matchAll(/(?:href|src)=["']([a-z0-9-]+\.html)["']/g)) uit.add(path.posix.join(map, m[1]));
+    for (const m of s.matchAll(/['"`]([a-z0-9-]+\.html)(?:[?#][^'"`]*)?['"`]/g)) uit.add(path.posix.join(map, m[1]));
   }
   return [...uit];
 }

@@ -59,8 +59,20 @@ module.exports = (kern) => {
   /* De mentor staat apart omdat hij als enige de AI aanraakt en zijn eigen
      grenzen draagt; zelfde opzet als routes/geld.js met geldrahul. */
   require('./levenmentor')(kern);
-  /* De rechten per relatie (fase 2): banden, delingen en inzage. Apart, omdat
-     het de enige schrijvende laag van deze wereld is en dat verschil hoort te
-     zien te zijn aan waar de code staat -- niet alleen aan een zin erboven. */
-  require('./levenband')(kern);
+  /* De rechten per relatie (fase 2) staan in ./levenband.js en worden NIET
+     hiervandaan gemount, maar rechtstreeks vanuit opzet/aanbouw.js met een
+     eigen domeingrens.
+
+     WAAROM DAT VERSCHIL ERTOE DOET. Hij werd hier gemount met de kern van DIT
+     domein, en dat is de alleen-lees-grens: `leven` mag `levenslijn` zien en
+     verder niets. Daardoor sloeg de domeingrens aan op kern.levensband en gaven
+     drie routes een 500 -- band verbreken, een deling zetten en een deling
+     intrekken. GRENZEN.json had al een eigen ingang `levenband`, maar die werd
+     door niemand gebruikt.
+
+     De grens deed dus precies zijn werk; wat ontbrak was iemand die de toets
+     draaide. Hem oplossen door `levensband` aan `leven` toe te voegen zou de
+     fout hebben weggenomen en de SCHEIDING mee: deze wereld opent alleen, en de
+     enige laag die schrijft hoort niet in dezelfde grens te zitten als de laag
+     die dat niet mag. */
 };

@@ -80,6 +80,9 @@
     (document.head || document.documentElement).appendChild(th);
   }
 
+/* Vervolg van basis-01 (op de 10 kB-grens geknipt na de thema-toevoeging van
+   de consolidatieronde; de bundelvolgorde is alfabetisch, dus 01, 01b, 02).
+   Sectie 1 en verder: offline, verbinding, en de rest. */
   /* ---- 1. offline: de service worker + een rustig verbindingsseintje ---- */
   if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
     try {

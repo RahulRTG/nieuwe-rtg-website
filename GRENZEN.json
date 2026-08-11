@@ -81,6 +81,8 @@
       "reisBoek",
       "reisPlan",
       "reserveerTafel",
+      "stuur",
+      "voorkeuren",
       "zorgVoor"
     ],
     "baby": [
@@ -197,13 +199,30 @@
       "galerij"
     ],
     "gast": [
+      "H",
+      "afrekenlaag",
+      "beleid",
+      "bezorglaag",
+      "buitenshuis",
+      "centen",
       "findSupplier",
+      "folioBoek",
+      "folioVan",
+      "foodcourtlaag",
+      "gastAuth",
+      "gastKaartVanZaak",
       "haversine",
+      "horeca",
       "horecaFolioBoek",
       "horecaFolioVan",
       "logActivity",
+      "naad",
       "noteFailedTry",
+      "orderlaag",
+      "polslaag",
+      "sessie",
       "sseToSupplier",
+      "stuur",
       "tooManyTries"
     ],
     "gebouw": [
@@ -215,6 +234,14 @@
       "gedachteZet",
       "gedachtenVan",
       "status"
+    ],
+    "geld": [
+      "geldbeleid",
+      "geldgraaf"
+    ],
+    "geldrahul": [
+      "geldbeleid",
+      "geldgraaf"
     ],
     "geloofbieb": [
       "bibliothecaris",
@@ -268,6 +295,9 @@
     "journalistiek": [
       "journalistiek"
     ],
+    "kantoor": [
+      "kantoorwereld"
+    ],
     "kantoorgesprek": [
       "kantoorStart",
       "kantoorZeg"
@@ -287,6 +317,24 @@
       "officeVersies",
       "officeVul",
       "officeWeg",
+      "werkplek"
+    ],
+    "kantoorpakket-huis": [
+      "boardroomBaas",
+      "officeAI",
+      "officeBewaar",
+      "officeKring",
+      "officeMaak",
+      "officeMijn",
+      "officeOpen",
+      "officeSter",
+      "officeTerug",
+      "officeUitslag",
+      "officeVersies",
+      "officeVul",
+      "officeWeg",
+      "ruim",
+      "stuur",
       "werkplek"
     ],
     "kantoren": [
@@ -368,12 +416,21 @@
     "leren": [
       "leren"
     ],
+    "leren-huis": [
+      "leren"
+    ],
     "lesmaker": [
       "appbieb",
       "lesmaker",
       "reisbieb",
       "schoolbieb",
       "status"
+    ],
+    "leven": [
+      "levenslijn"
+    ],
+    "levenmentor": [
+      "levenslijn"
     ],
     "life": [
       "lifeVoor"
@@ -1109,6 +1166,7 @@
     ],
     "reis": [
       "reisLanden",
+      "reiswereld",
       "reiswijzer"
     ],
     "rtfbieb": [
@@ -1172,6 +1230,9 @@
       "swWeg",
       "swZet"
     ],
+    "sociaal": [
+      "socialewereld"
+    ],
     "social": [
       "blokkeer",
       "commDm",
@@ -1228,18 +1289,18 @@
       "mijnSpellen",
       "mijnTeams",
       "mijnToernooien",
-      "sneekBord",
-      "sneekScore",
-      "socialConnecties",
       "projectieOpen",
       "projectieSluit",
       "projectieStand",
+      "sneekBord",
+      "sneekScore",
+      "socialConnecties",
       "spelAntwoord",
       "spelKijk",
       "spelKlasgenoten",
+      "spelNabespreking",
       "spelNaspelen",
       "spelNieuw",
-      "spelNabespreking",
       "spelOnline",
       "spelOpgeven",
       "spelPraat",
@@ -1253,6 +1314,32 @@
       "spelToewijzen",
       "spelUitslagen",
       "spelZet",
+      "spelZichtbaar",
+      "spelZichtbaarZet",
+      "sudokuKlaar",
+      "sudokuNieuw",
+      "teamAntwoord",
+      "teamNieuw",
+      "teamNodig",
+      "teamVerlaat",
+      "toernooiAntwoord",
+      "toernooiNieuw",
+      "toernooiStaat"
+    ],
+    "spellen-rondom": [
+      "arcadeBord",
+      "arcadeScore",
+      "dagKlaar",
+      "dagStand",
+      "dagStart",
+      "mijnTeams",
+      "mijnToernooien",
+      "projectieOpen",
+      "projectieSluit",
+      "sneekBord",
+      "sneekScore",
+      "spelPraat",
+      "spelPraatStuur",
       "spelZichtbaar",
       "spelZichtbaarZet",
       "sudokuKlaar",
@@ -1313,10 +1400,12 @@
     "supplier": [
       "ALT_IDEE",
       "AUTOVERKOOP_BRANDSTOF",
+      "B",
       "BEVEILIGING_ERNST",
       "BEVEILIGING_SHIFTS",
       "BOEK_KETEN",
       "BOOT_TYPES",
+      "C",
       "DEMO",
       "DEMO_SUPPLIER",
       "GROOTHANDEL_CATEGORIEEN",
@@ -1394,6 +1483,7 @@
       "charterVan",
       "chatStuur",
       "checkCred",
+      "clublaag",
       "coachCache",
       "coachRules",
       "comm",
@@ -1484,6 +1574,7 @@
       "maakInvite",
       "maakKassacode",
       "magBezorgen",
+      "magNaarBinnen",
       "magWerken",
       "mall",
       "marina",
@@ -1519,9 +1610,11 @@
       "paspoortPartner",
       "paspoortVraag",
       "pay",
+      "pc",
       "petcare",
       "pickupCode",
       "pinSlot",
+      "polslaag",
       "poortBeeld",
       "poortKlaar",
       "posDay",
@@ -1532,6 +1625,7 @@
       "receptie",
       "releaseDrop",
       "rememberSession",
+      "reserveerSlot",
       "reserveringKomst",
       "reserveringTafel",
       "retailState",
@@ -1555,7 +1649,9 @@
       "sessionFor",
       "setRoomHk",
       "shiftSamenvatting",
+      "slotenVan",
       "sortRunsheet",
+      "standVan",
       "stationsForOrder",
       "stuurLus",
       "stuurStyling",
@@ -1593,6 +1689,7 @@
       "zetKlantMaten",
       "zetWerkvenster",
       "zin",
+      "zoekZone",
       "zorgketen"
     ],
     "synergie": [

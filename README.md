@@ -3654,6 +3654,24 @@ niet te bewijzen, en doen alsof van wel zou een belofte zijn die de code niet
 waarmaakt. Sneek en Tetris hebben geen narekenbare regel en blijven dus zoals
 ze waren.
 
+**En daarom heeft Sudoku als enige een dagopgave** (`kern/spellen/dag.js`): een
+puzzel per dag, dezelfde voor iedereen, met een bord dat 's nachts leeg is. Het
+register weigert `dagelijks: true` zonder `serverScore: true` -- dat is de enige
+harde koppeling die het kent, en hij staat er omdat een dagbord een competitie
+is waarop ook mensen staan die je niet kent. Drie ingangen: `dag` kijkt (en
+start geen klok), `dag-start` start hem, `dag-klaar` levert in. De laag noemt
+geen enkel spel bij naam -- wat een opgave *is* komt uit twee haken in de
+descriptor (`dagOpgave` en `dagKeur`), precies de twee die Sneek en Tetris
+straks invullen met hun seed en hun invoerlogboek.
+
+Wat er met opzet **niet** in zit, want dat is de helft van het ontwerp: geen
+reeks ("vijf dagen op rij" straft je voor de dag dat je niet meedoet), geen
+melding dat de opgave verloopt (structureel: de module krijgt `nudge` niet eens
+binnen), en geen historie -- elke dag die niet vandaag is wordt gewist, opgave
+en al. Je *plaats* gaat over het hele veld, de *namenlijst* blijft je eigen
+kring: een lijst met codenamen van vreemden is een sociale laag die dit huis
+nergens anders heeft.
+
 ### De progressiegrens: alles wat blijft, stopt bij 18+
 
 Eén functie (`progressieMag` in `kern/spellen/grens.js`) bepaalt wie een spoor

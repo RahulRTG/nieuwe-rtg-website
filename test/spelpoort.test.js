@@ -45,6 +45,7 @@ const LEDEN_SPELACTIES = [
   '/api/member/spel/team-verlaat', '/api/member/spel/team-mijn',
   '/api/member/spel/praat', '/api/member/spel/praat-stuur',
   '/api/member/spel/sudoku-nieuw', '/api/member/spel/sudoku-klaar',
+  '/api/member/spel/dag', '/api/member/spel/dag-start', '/api/member/spel/dag-klaar',
   '/api/member/spel/arcade-score', '/api/member/spel/arcade-bord'
 ];
 
@@ -72,6 +73,7 @@ const RTF_SPELACTIES = [
   '/api/rtf/spel/team-verlaat', '/api/rtf/spel/team-mijn',
   '/api/rtf/spel/praat', '/api/rtf/spel/praat-stuur',
   '/api/rtf/spel/sudoku-nieuw', '/api/rtf/spel/sudoku-klaar',
+  '/api/rtf/spel/dag', '/api/rtf/spel/dag-start', '/api/rtf/spel/dag-klaar',
   '/api/rtf/spel/arcade-score', '/api/rtf/spel/arcade-bord'
 ];
 

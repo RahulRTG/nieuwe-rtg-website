@@ -332,6 +332,12 @@
   <!-- sudoku -->
   <section id="vSudoku" hidden>
     <div class="kop2"><h1>Sudoku</h1><a class="terug" data-terug>← terug</a></div>
+    <!-- De dagopgave: EEN puzzel per dag, dezelfde voor iedereen. Er staat met
+         opzet geen reeks bij en geen aftelklok naar middernacht -- wie hem
+         vandaag mist, mist hem, en morgen staat er een nieuwe. -->
+    <div class="sec">Dagopgave <small>(dezelfde puzzel voor iedereen, vandaag)</small></div>
+    <div id="suDag"><div class="leeg">Even kijken…</div></div>
+    <div class="sec">Zelf een puzzel</div>
     <div class="keuzerij" id="suNiveau" style="justify-content:center;"></div>
     <div class="sudoku" id="suGrid"></div>
     <div class="keuzerij" id="suCijfers" style="justify-content:center;margin-top:.5rem;"></div>
@@ -616,7 +622,7 @@ let nSpel = 'mejn', nGrootte = 2, nModus = 'vrij', nGekozen = [], nTaal = 'nl', 
 document.querySelectorAll('.spelkaart').forEach(k => k.addEventListener('click', ()=>{
   if (k.dataset.spel === 'sneek'){ toon('vSneek'); laadSneekBord(); return; }
   if (k.dataset.spel === 'tetris'){ toon('vTetris'); laadTetrisBord(); return; }
-  if (k.dataset.spel === 'sudoku'){ toon('vSudoku'); suNieuw(); laadSudokuBord(); return; }
+  if (k.dataset.spel === 'sudoku'){ toon('vSudoku'); suNieuw(); suDagLaad(); laadSudokuBord(); return; }
   if (k.dataset.spel === 'vlek'){ toon('vVlek'); vzStart(); return; }
   nSpel = k.dataset.spel; nGrootte = nSpel==='seconden' ? 4 : 2; nModus = 'vrij'; nGekozen = []; nTaal = 'nl'; nTempo = ''; $('#nCodenaam').value='';
   $('#nTitel').textContent = SPELNAAM[nSpel];
@@ -1477,19 +1483,26 @@ function tekenProost(){
 
    De klok hieronder is dus alleen een WEERGAVE: hij vertelt je hoe lang je
    bezig bent, hij bepaalt niets. De server klokt op zijn eigen klok. */
-const SU = { puzzel:null, vast:[], grid:[], sel:null, start:0, niveau:'normaal', klaar:true, bezig:false };
+const SU = { puzzel:null, vast:[], grid:[], sel:null, start:0, niveau:'normaal', klaar:true, bezig:false, dag:false };
 const SU_NIVEAUS = ['makkelijk','normaal','moeilijk'];
+// een puzzel in het rooster leggen; dezelfde weg voor een eigen puzzel en voor
+// de dagopgave, want het rooster kent het verschil niet
+function suLeg(puzzel, gestart){
+  SU.puzzel = puzzel;
+  SU.grid = puzzel.slice();
+  SU.vast = puzzel.map(v => v !== 0);
+  SU.sel = null; SU.klaar = false;
+  SU.start = gestart || Date.now();
+  suTeken();
+}
 async function suNieuw(){
   if (SU.bezig) return;
-  SU.bezig = true; SU.klaar = true; SU.sel = null;
+  SU.bezig = true; SU.klaar = true; SU.sel = null; SU.dag = false;
   $('#suInfo').textContent = 'Een nieuwe puzzel…';
   try{
     const d = await api('sudoku-nieuw', { niveau: SU.niveau });
-    SU.puzzel = d.puzzel;
-    SU.grid = d.puzzel.slice();
-    SU.vast = d.puzzel.map(v => v !== 0);
     SU.niveau = d.niveau || SU.niveau;
-    SU.start = Date.now(); SU.klaar = false;
+    suLeg(d.puzzel);
     $('#suInfo').textContent = '0:00 · sneller is meer punten';
   }catch(e){
     $('#suInfo').textContent = 'De puzzel kwam niet binnen. Probeer het zo nog eens.';
@@ -1498,8 +1511,60 @@ async function suNieuw(){
     suTeken();
   }
 }
+
+/* ---------- de dagopgave ----------
+   Kijken start de klok NIET: die begint pas bij 'dag-start', en dat is een
+   eigen knop. Wie het scherm opent om te zien of hij vandaag al meedeed hoort
+   daar geen tijd aan te verliezen. */
+const suTijd = (s) => Math.floor(s/60)+':'+String(s%60).padStart(2,'0');
+async function suDagLaad(){
+  let d;
+  try{ d = await api('dag', { spel:'sudoku' }); }
+  catch(e){ $('#suDag').innerHTML = '<div class="leeg">De dagopgave kwam niet binnen.</div>'; return; }
+  const veld = d.mee === 1 ? '1 speler loste hem vandaag op' : d.mee + ' spelers losten hem vandaag op';
+  let kop, knop = '';
+  if (d.klaar){
+    kop = 'Vandaag gedaan in ' + suTijd(d.seconden||0)
+      + (d.punten != null ? ' -- ' + d.punten + ' punten' : '')
+      + (d.plaats ? ' -- plaats ' + d.plaats + ' van ' + d.mee : '');
+  } else if (d.begonnen){
+    kop = 'Je bent bezig met de opgave van vandaag.';
+    knop = 'Verder puzzelen';
+  } else {
+    kop = 'De opgave van vandaag staat klaar. De klok begint zodra je start.';
+    knop = 'Start de dagopgave';
+  }
+  /* `ranglijst: false` betekent: onder de 18+-grens bestaat er geen bord. Dan
+     gaat het bord weg in plaats van leeg te staan -- de opgave zelf speel je
+     gewoon, en de server zegt er zelf bij waarom. */
+  const bord = d.ranglijst === false ? '<div class="leeg">' + esc(d.reden||'') + '</div>'
+    : (d.bord||[]).length
+      ? '<div class="sec">Uit jouw kring</div>' + d.bord.map(r =>
+          '<div class="rij"><div class="nm">'+r.plaats+'. '+esc(r.codenaam)+(r.ik?' (jij)':'')
+          +'</div><b style="color:var(--goud2);">'+r.punten+'</b></div>').join('')
+      : '';
+  $('#suDag').innerHTML = '<div class="leeg">'+esc(kop)+'</div>'
+    + (d.ranglijst === false ? '' : '<div class="leeg">'+esc(veld)+'</div>')
+    + (knop ? '<div class="knoprij"><button class="knop" id="suDagKnop" style="width:100%;">'+knop+'</button></div>' : '')
+    + bord;
+  const k = $('#suDagKnop');
+  if (k) k.addEventListener('click', suDagStart);
+}
+async function suDagStart(){
+  if (SU.bezig) return;
+  SU.bezig = true;
+  try{
+    const d = await api('dag-start', { spel:'sudoku' });
+    SU.dag = true;
+    suLeg(d.opgave.puzzel, d.gestart);
+    $('#suInfo').textContent = 'Dagopgave · sneller is meer punten';
+  }catch(e){ meld(e.message || 'De dagopgave kwam niet binnen.'); }
+  finally{ SU.bezig = false; }
+}
 function suTeken(){
-  $('#suNiveau').innerHTML = SU_NIVEAUS.map(n =>
+  // tijdens de dagopgave is er niets te kiezen: hij is voor iedereen dezelfde,
+  // anders valt er ook niets te vergelijken
+  $('#suNiveau').innerHTML = SU.dag ? '' : SU_NIVEAUS.map(n =>
     '<button type="button" class="chip'+(SU.niveau===n?' aan':'')+'" data-n="'+n+'">'+n+'</button>').join('');
   $('#suNiveau').querySelectorAll('[data-n]').forEach(b=>b.addEventListener('click',()=>{ SU.niveau=b.dataset.n; suNieuw(); }));
   $('#suGrid').innerHTML = SU.grid.map((v,i)=>{
@@ -1521,7 +1586,12 @@ async function suVul(v){
   if (SU.grid.some(x => x === 0)) return;
   SU.klaar = true;
   try{
-    const d = await api('sudoku-klaar', { rooster: SU.grid });
+    /* Twee ingangen, en met opzet geen vlag op een: de dagopgave heeft een
+       eigen klok die bij de server begon, en die zou een verkeerde waarde hier
+       stilletjes aan de verkeerde puzzel hangen. */
+    const d = SU.dag
+      ? await api('dag-klaar', { spel:'sudoku', inzending: SU.grid })
+      : await api('sudoku-klaar', { rooster: SU.grid });
     if (!d.goed){
       SU.klaar = false;   // gewoon doorpuzzelen; de klok loopt door
       $('#suInfo').textContent = 'Er zit nog een foutje in. Zoek het en vul het opnieuw in.';
@@ -1531,6 +1601,15 @@ async function suVul(v){
        bestaat er geen ranglijst, en het spel telt dan alleen binnen dit potje.
        De server zegt er zelf bij waarom, dus dat halen we niet hier na. */
     meld('Opgelost in '+d.seconden+' tellen: '+d.punten+' punten!');
+    if (SU.dag){
+      SU.dag = false;
+      $('#suInfo').textContent = d.bewaard === false
+        ? 'De dagopgave gedaan in '+d.seconden+' tellen. ' + (d.reden || '')
+        : 'De dagopgave gedaan in '+d.seconden+' tellen · plaats '+d.plaats+' van '+d.mee;
+      suTeken();
+      suDagLaad();
+      return;
+    }
     $('#suInfo').textContent = d.bewaard === false
       ? 'Opgelost in '+d.seconden+' tellen. ' + (d.reden || '')
       : 'Opgelost in '+d.seconden+' tellen · '+d.punten+' punten (beste: '+d.beste+')';

@@ -58,7 +58,7 @@ const GOUD = {
 const GOUD_ARCADE = {
   sneek:  ['Sneek', ['rtg', 'rtf'], 999999, {}],
   tetris: ['Tetris', ['rtg', 'rtf'], 999999, {}],
-  sudoku: ['Sudoku', ['rtg', 'rtf'], 500, { serverScore: true }]
+  sudoku: ['Sudoku', ['rtg', 'rtf'], 500, { serverScore: true, dagelijks: true }]
 };
 
 test('precies een spel mag niet bekeken worden, en dat is 30 Seconden', () => {
@@ -288,6 +288,53 @@ test('een vorm die niet bestaat wordt geweigerd', () => {
   metMap({ 'iets.js': GELDIG('iets', 'Iets').replace("wereld: 'rtg'", "wereld: 'rtg', vorm: 'gokkast'") }, (map) => {
     assert.throws(() => maakRegister(stubCtx, map), /iets\.js heeft vorm 'gokkast'/);
   });
+});
+
+/* ---------- de dagopgave: de enige harde koppeling in het register ----------
+   `dagelijks: true` betekent EEN opgave voor iedereen op EEN bord, en daar
+   staan mensen op die je niet kent. Dat is een competitie, en een score die de
+   client zelf rekent hoort daar niet in -- bij Sneek en Tetris is een topscore
+   vandaag een regel JavaScript. Zonder deze weigering is die hele maatregel te
+   omzeilen met een regel in een descriptor, en dat zou pas opvallen als er een
+   bord vol onmogelijke tijden staat. */
+
+test('een dagopgave zonder server-berekende score laat de server niet opstarten', () => {
+  metMap({ 'dagvals.js': ARCADE_GELDIG('dagvals', 'Dagvals').replace('maxPunten: 1000',
+    'maxPunten: 1000, dagelijks: true, dagOpgave: () => ({}), dagKeur: () => ({})') }, (map) => {
+    assert.throws(() => maakRegister(stubCtx, map), /dagvals\.js heeft `dagelijks: true` zonder `serverScore: true`/);
+  });
+});
+
+test('een dagopgave zonder de twee haken laat de server niet opstarten', () => {
+  /* `serverScore` alleen zegt dat de score van de server komt; zonder een
+     opgave om uit te geven en een keuring om hem te wegen is er niets om hem
+     mee uit te rekenen, en dan staat er een lege dagknop in de app. */
+  const basis = ARCADE_GELDIG('dagkaal', 'Dagkaal').replace('maxPunten: 1000',
+    'maxPunten: 1000, serverScore: true, dagelijks: true');
+  metMap({ 'dagkaal.js': basis }, (map) => {
+    assert.throws(() => maakRegister(stubCtx, map), /dagkaal\.js heeft `dagelijks: true` maar geen `dagOpgave`/);
+  });
+  metMap({ 'dagkaal.js': basis.replace('dagelijks: true', 'dagelijks: true, dagOpgave: () => ({})') }, (map) => {
+    assert.throws(() => maakRegister(stubCtx, map), /dagkaal\.js heeft `dagelijks: true` maar geen `dagKeur`/);
+  });
+});
+
+test('een dagopgave die wel deugt levert twee haken op, en de tabel blijft data', () => {
+  metMap({ 'dagecht.js': ARCADE_GELDIG('dagecht', 'Dagecht').replace('maxPunten: 1000',
+    'maxPunten: 1000, serverScore: true, dagelijks: true, dagOpgave: () => ({}), dagKeur: () => ({})') }, (map) => {
+    const { ARCADE, DAG } = maakRegister(stubCtx, map);
+    assert.deepEqual(ARCADE.dagecht, { naam: 'Dagecht', werelden: ['rtg'], maxPunten: 1000,
+      serverScore: true, dagelijks: true }, 'de functies horen niet in de ARCADE-tabel');
+    assert.equal(typeof DAG.dagecht.opgave, 'function');
+    assert.equal(typeof DAG.dagecht.keur, 'function');
+  });
+});
+
+test('een arcadespel zonder dagopgave staat niet in de DAG-tabel', () => {
+  const { ARCADE, DAG } = maakRegister(stubCtx);
+  for (const sleutel of Object.keys(ARCADE))
+    assert.equal(!!DAG[sleutel], !!ARCADE[sleutel].dagelijks, sleutel + ': tabel en vlag lopen uiteen');
+  assert.ok(DAG.sudoku, 'Sudoku is de enige die vandaag een dagopgave heeft');
 });
 
 test('een arcadespel dat zijn naam of apps mist noemt precies wat er mist', () => {

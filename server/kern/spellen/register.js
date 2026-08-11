@@ -32,6 +32,9 @@
      maxPunten    bovengrens waarop de server een ingestuurde score afkapt
      serverScore  de score wordt door de SERVER berekend (Sudoku): de algemene
                   arcade-ingang weigert een ingestuurde score voor dit spel
+     dagelijks    dit spel heeft een dagopgave (Sudoku), met `dagOpgave` en
+                  `dagKeur` erbij. VEREIST serverScore, en dat is de enige harde
+                  koppeling in dit register -- zie de reden in ./keur.js
 
    Waarom: hiervoor stond een nieuw spel op negen plekken in zes bestanden (de
    SPEL-tabel, drie ctx-opsommingen in spellen.js, de INITS in lobby.js, de
@@ -57,7 +60,7 @@ const { keurAlgemeen, keurArcade, keurPotje, keurZicht } = require('./keur');
    expliciete lijst: een helper die je hier neerzet en vergeet toe te voegen
    valt op bij het opstarten, in plaats van stil mee te scannen. */
 const GEEN_SPEL = new Set(['register.js', 'lobby.js', 'partij.js', 'rahul.js', 'klas.js', 'quiz-data.js',
-  'presence.js', 'uitslagen.js', 'prestaties.js', 'toernooi.js', 'zetten.js', 'praat.js', 'telling.js', 'teams.js', 'kring.js', 'arcade.js', 'opruimen.js', 'toernooi-schema.js', 'gedeeld.js', 'grens.js', 'zicht.js', 'klok.js', 'beleid.js', 'nabespreking.js', 'naspelen.js', 'keur.js', 'uitnodigen.js', 'rondom.js', 'projectie.js']);
+  'presence.js', 'uitslagen.js', 'prestaties.js', 'toernooi.js', 'zetten.js', 'praat.js', 'telling.js', 'teams.js', 'kring.js', 'arcade.js', 'opruimen.js', 'toernooi-schema.js', 'gedeeld.js', 'grens.js', 'zicht.js', 'klok.js', 'beleid.js', 'nabespreking.js', 'naspelen.js', 'keur.js', 'uitnodigen.js', 'rondom.js', 'projectie.js', 'dag.js']);
 
 /* De map is een parameter zodat de toets het register op fixtures kan draaien
    (een module zonder descriptor, een sleutel die niet bij zijn bestand hoort)
@@ -86,7 +89,7 @@ module.exports = (spelCtx, mapOverride) => {
 
   bezig = true;
   try {
-  const SPEL = {}, INITS = {}, ZETTEN = {}, ZICHT = {}, STATISCH = {}, ARCADE = {}, ruw = {};
+  const SPEL = {}, INITS = {}, ZETTEN = {}, ZICHT = {}, STATISCH = {}, ARCADE = {}, DAG = {}, ruw = {};
   for (const naam of bestanden) {
     const mod = require(path.join(map, naam))(ctx);
     const s = mod && mod.spel;
@@ -104,7 +107,15 @@ module.exports = (spelCtx, mapOverride) => {
        in; die zou bij elk volgend spel over de vorige heen schrijven. */
     for (const [k, v] of Object.entries(mod)) if (k !== 'spel') ruw[k] = v;
 
-    if (vorm === 'arcade') { ARCADE[s.sleutel] = keurArcade(naam, s); continue; }
+    if (vorm === 'arcade') {
+      ARCADE[s.sleutel] = keurArcade(naam, s);
+      /* De twee haken van een dagopgave staan APART en niet in ARCADE: die tabel
+         is data (hij reist mee naar de toetsen en wordt vergeleken met een
+         gouden lijst), en functies horen daar niet in. `keurArcade` heeft ze al
+         nagelopen; hier worden ze alleen neergezet. */
+      if (ARCADE[s.sleutel].dagelijks) DAG[s.sleutel] = { opgave: s.dagOpgave, keur: s.dagKeur };
+      continue;
+    }
 
     SPEL[s.sleutel] = keurPotje(naam, s);
     INITS[s.sleutel] = s.init;
@@ -113,6 +124,6 @@ module.exports = (spelCtx, mapOverride) => {
     if (s.statisch) STATISCH[s.sleutel] = s.statisch;
   }
   const SOORTEN = Object.fromEntries(Object.entries(SPEL).map(([k, v]) => [k, v.naam]));
-  return { SPEL, SOORTEN, INITS, ZETTEN, ZICHT, STATISCH, ARCADE, ruw };
+  return { SPEL, SOORTEN, INITS, ZETTEN, ZICHT, STATISCH, ARCADE, DAG, ruw };
   } finally { bezig = false; }   // ook als de keuring terecht gooit
 };

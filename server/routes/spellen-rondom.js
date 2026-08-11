@@ -12,7 +12,7 @@ module.exports = (kern, { vriendenVan, kringVan }) => {
   const { spelZichtbaar, spelZichtbaarZet, spelPraat, spelPraatStuur, teamNieuw, teamNodig,
     teamAntwoord, teamVerlaat, mijnTeams, sudokuNieuw, sudokuKlaar, toernooiNieuw, toernooiAntwoord,
     mijnToernooien, toernooiStaat, sneekScore, sneekBord, arcadeScore, arcadeBord,
-    projectieOpen, projectieSluit } = kern;
+    projectieOpen, projectieSluit, dagStand, dagStart, dagKlaar } = kern;
 
   return {
     /* Toernooien: een knockout waarvan elke wedstrijd een gewoon potje is. De
@@ -56,6 +56,18 @@ module.exports = (kern, { vriendenVan, kringVan }) => {
     'projectie-sluit': (mij, b) => projectieSluit(mij, String(b.id || '')),
     'sudoku-nieuw': (mij, b) => sudokuNieuw(mij, String(b.niveau || '')),
     'sudoku-klaar': (mij, b) => sudokuKlaar(mij, b.rooster),
+    /* De dagopgave: een opgave per dag, dezelfde voor iedereen. DRIE acties en
+       geen vlag op een bestaande, want ze doen echt iets anders: kijken start
+       geen klok, starten wel, en inleveren kan alleen na starten. Een vlag op
+       een van de drie zou betekenen dat een verkeerde waarde de klok laat lopen
+       of hem juist terugzet.
+
+       De DATUM komt niet uit het verzoek. Een client die zelf een dag mag
+       noemen speelt de opgave van gisteren nog eens, of maakt die van morgen
+       vast aan; welke dag het is weet de server. */
+    dag: (mij, b) => dagStand(mij, String(b.spel || ''), vriendenVan(mij)),
+    'dag-start': (mij, b) => dagStart(mij, String(b.spel || '')),
+    'dag-klaar': (mij, b) => dagKlaar(mij, String(b.spel || ''), b.inzending),
     'arcade-score': (mij, b) => arcadeScore(mij, String(b.spel || ''), b.punten),
     'arcade-bord': (mij, b) => arcadeBord(mij, String(b.spel || ''), vriendenVan(mij))
   };

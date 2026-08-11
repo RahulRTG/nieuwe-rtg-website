@@ -45,12 +45,12 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
      lobby in, terwijl de takken die opgeruimd moeten worden pas verderop
      bestaan. Ze schuiven aan zodra ze er zijn; veilig, want er wordt tijdens
      het opbouwen niets van dit alles aangeroepen. */
-  const opruimHaken = { deel: [], sudoku: null, opgeven: null };
+  const opruimHaken = { deel: [], tijd: [], opgeven: null };
   const { opschonen, spelVergeet } = require('./spellen/opruimen')({
     S, save, codenaamVan,
     noteerUitslag: (p) => noteerUitslag(p),
     deelVergeet: opruimHaken.deel,
-    sudokuOpschonen: (t) => { if (opruimHaken.sudoku) opruimHaken.sudoku(t); },
+    tijdOpschonen: opruimHaken.tijd,
     vervalMs: (p) => klok.vervalMs(p),
     /* De enige plek waar een klok uit zichzelf een partij beeindigt: een
        toernooiwedstrijd. Late binding, want `spelOpgeven` komt pas later. */
@@ -66,7 +66,7 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
      register haalt ze op en levert de dispatch-tabellen. Dit blok groeit niet
      meer mee met het aantal spellen -- dat was het hele punt. */
   const spelCtx = { save, crypto, schud, beurtDoor, codenaamVan, nudge };
-  const { SPEL, SOORTEN, INITS, ZETTEN, ZICHT, STATISCH, ARCADE, ruw } = require('./spellen/register')(spelCtx);
+  const { SPEL, SOORTEN, INITS, ZETTEN, ZICHT, STATISCH, ARCADE, DAG, ruw } = require('./spellen/register')(spelCtx);
   // klasgenoten: het uitnodigingspad voor beschermde tieners (De Arena)
   const { klasgenotenVan, spelKlasgenoten } = require('./spellen/klas')({ db, codenaamVan, isGeblokkeerd });
   /* Wie van je vrienden er nu is. Leest de levende lijst van open
@@ -144,15 +144,15 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
   const rondom = require('./spellen/rondom')({
     anthropic, spelReplay, SPEL, SOORTEN, ZICHT, crypto, db, save, rid, nu, S,
     codenaamVan, isGeblokkeerd, zijnVrienden, klasgenotenVan, sociaalRate,
-    comm, ARCADE, ruw, progressieMag, GEEN_PROGRESSIE, opruimHaken, spelCtx: ctx
+    comm, ARCADE, DAG, ruw, progressieMag, GEEN_PROGRESSIE, opruimHaken, spelCtx: ctx
   });
   const { spelRahul, spelNabespreking, spelNaspelen, projectieOpen, projectieStand,
     projectieSluit, projectieSpellen, teamNieuw, teamNodig, teamAntwoord,
     teamVerlaat, mijnTeams, spelPraat, spelPraatStuur, arcadeScore, arcadeBord,
-    sneekScore, sneekBord, sudokuNieuw, sudokuKlaar } = rondom;
+    sneekScore, sneekBord, sudokuNieuw, sudokuKlaar, dagStand, dagStart, dagKlaar } = rondom;
 
 
-  return { spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelToewijzen, spelKijk, spelReplay, spelNaspelen, spelRahul, spelNabespreking, projectieOpen, projectieStand, projectieSluit, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, spelUitslagen, spelStand, spelPrestaties, spelPraat, spelPraatStuur, spelTelemetrie, teamNieuw, teamNodig, teamAntwoord, teamVerlaat, mijnTeams, sudokuNieuw, sudokuKlaar, spelVergeet, toernooiNieuw, toernooiAntwoord, mijnToernooien, toernooiStaat, sneekScore, sneekBord, arcadeScore, arcadeBord, SPEL_SOORTEN: SOORTEN,
+  return { spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelStaat, spelZet, spelOpgeven, spelToewijzen, spelKijk, spelReplay, spelNaspelen, spelRahul, spelNabespreking, projectieOpen, projectieStand, projectieSluit, spelKlasgenoten, spelOnline, spelZichtbaar, spelZichtbaarZet, spelUitslagen, spelStand, spelPrestaties, spelPraat, spelPraatStuur, spelTelemetrie, teamNieuw, teamNodig, teamAntwoord, teamVerlaat, mijnTeams, sudokuNieuw, sudokuKlaar, spelVergeet, toernooiNieuw, toernooiAntwoord, mijnToernooien, toernooiStaat, sneekScore, sneekBord, arcadeScore, arcadeBord, dagStand, dagStart, dagKlaar, SPEL_SOORTEN: SOORTEN,
     // alleen voor de drift-test: de client heeft een eigen kopie van deze
     // regels (directe feedback); de test houdt beide kopieën tegen elkaar
     _spelregels: { rummiSet: ruw.rummiSet, W_PREMIE: ruw.W_PREMIE, SPEL, ARCADE } };

@@ -40,7 +40,7 @@
    met opzet: wie de vorm kent, hoort hem op te ruimen -- anders staat er hier
    een kopie van vier datamodellen die stil veroudert. */
 module.exports = (ctx) => {
-  const { S, save, codenaamVan, noteerUitslag, deelVergeet, sudokuOpschonen, vervalMs, geefOp } = ctx;
+  const { S, save, codenaamVan, noteerUitslag, deelVergeet, tijdOpschonen, vervalMs, geefOp } = ctx;
 
   let opgeschoondOm = 0;
 
@@ -49,7 +49,11 @@ module.exports = (ctx) => {
     if (t - opgeschoondOm < 60000) return;
     opgeschoondOm = t;
     const s = S();
-    if (typeof sudokuOpschonen === 'function') sudokuOpschonen(t);   // een sudoku die je laat staan verdwijnt ook
+    /* De takken die hun EIGEN vorm kennen ruimen zichzelf op: een sudoku die je
+       laat staan, en de dagopgave van gisteren. Een lijst en geen losse haak,
+       want er zijn er inmiddels twee -- en de derde hoort geen regel hier te
+       kosten. */
+    for (const veeg of (tijdOpschonen || [])) veeg(t);
     for (const [id, p] of Object.entries(s.potjes)) {
       /* EEN TOERNOOIWEDSTRIJD WACHT NIET OP EEN KNOP. Overal elders verloopt de
          klok naar een AANBOD (de tegenstander mag toewijzen, en doet hij niets

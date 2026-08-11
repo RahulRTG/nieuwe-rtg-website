@@ -70,6 +70,34 @@ function keurArcade(naam, s) {
   // serverScore: de score komt van de SERVER en niet uit de client; de algemene
   // arcade-ingang weigert hem dan, want er mag geen tweede pad zijn
   if (s.serverScore) uit.serverScore = true;
+
+  /* DAGELIJKS: een opgave per dag, dezelfde voor iedereen, met een bord waarop
+     ook mensen staan die je niet kent. Dat is een COMPETITIE, en daar hangt de
+     enige harde koppeling in dit register aan: zonder `serverScore` weigert de
+     server op te starten.
+
+     De reden staat in TAKEN.md 5.22 en herhaalt zich in GAMEHALL.md paragraaf
+     13: bij een spel waarvan de client de punten rekent is een topscore een
+     regel JavaScript. Dat is te dragen zolang het een lijstje onder vrienden
+     is, en niet meer zodra vreemden erop staan. Een vlag die dat stilzwijgend
+     toestaat zou de hele maatregel omzeilbaar maken met een regel in een
+     descriptor -- dus faalt hij hier, luid, bij het opstarten.
+
+     De twee haken horen er ook bij: de server moet de opgave zelf UITGEVEN en
+     de inzending zelf KEUREN. `serverScore` alleen zegt dat de score van de
+     server komt; zonder deze twee is er niets om hem uit te rekenen. */
+  if (s.dagelijks !== undefined) {
+    if (typeof s.dagelijks !== 'boolean')
+      fout(naam, `heeft dagelijks ${JSON.stringify(s.dagelijks)}; alleen true of false.`);
+    if (s.dagelijks) {
+      if (!s.serverScore) fout(naam, 'heeft `dagelijks: true` zonder `serverScore: true`. Een dagopgave is ' +
+        'een bord waarop vreemden elkaar verslaan; een score die de client zelf rekent hoort daar niet in.');
+      for (const haak of ['dagOpgave', 'dagKeur'])
+        if (typeof s[haak] !== 'function') fout(naam, `heeft \`dagelijks: true\` maar geen \`${haak}\`. ` +
+          'De server moet de opgave zelf uitgeven en de inzending zelf keuren.');
+      uit.dagelijks = true;
+    }
+  }
   return uit;
 }
 

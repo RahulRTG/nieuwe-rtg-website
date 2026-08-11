@@ -642,10 +642,10 @@ van je vorige poging.
 **Modi kunnen meteen.** Ze zijn een uitbreiding van de client plus een `modi`-lijst
 in de descriptor, met een bord per modus.
 
-**De dagchallenge en ghost kunnen nog niet, en dat is geen detail.** `TAKEN.md`
-5.22 zegt het al met zoveel woorden: een arcadescore is niet
-server-authoritatief, de regels draaien in de client, en dat is te dragen voor
-een vriendenbord maar niet zodra er een competitie of een prijs aan hangt.
+**De dagchallenge en ghost kunnen niet voor Sneek en Tetris, en dat is geen
+detail.** `TAKEN.md` 5.22 zegt het al met zoveel woorden: een arcadescore is
+niet server-authoritatief, de regels draaien in de client, en dat is te dragen
+voor een vriendenbord maar niet zodra er een competitie of een prijs aan hangt.
 
 > Een dagchallenge is één bord waarop vreemden elkaar verslaan. Dat is een
 > competitie. Voor Sneek en Tetris is een topscore vandaag één regel JavaScript.
@@ -659,23 +659,49 @@ invoerlogboek.
 
 De volgorde is daarmee gegeven:
 
-1. **Sudoku krijgt zijn dagchallenge eerst.** Die is al `serverScore: true`: de
-   server geeft de puzzel uit, houdt de oplossing, klokt zelf. Er is niets te
-   repareren, alleen een gedeelde dagpuzzel toe te voegen.
+1. **Sudoku krijgt zijn dagchallenge eerst** — **af.** Die was al
+   `serverScore: true`: de server geeft de puzzel uit, houdt de oplossing,
+   klokt zelf. Er viel niets te repareren, alleen een gedeelde dagpuzzel toe te
+   voegen.
 2. **Sneek en Tetris krijgen een seed + invoerlogboek**, en de server rekent na.
    Pas daarna `dagelijks: true`. Het register dwingt dat af (§4).
 
-**Wat een dagchallenge níet krijgt:**
+**Wat een dagchallenge níet krijgt, en hoe dat is afgedwongen:**
 
 - **geen reeks.** Geen "5 dagen op rij". `prestaties.js` verbiedt reeksen al en
-  een dagstreak is de zuiverste vorm van de ratel die hier niet thuishoort.
-- **geen melding dat hij verloopt.**
+  een dagstreak is de zuiverste vorm van de ratel die hier niet thuishoort. Het
+  dagrecord heeft precies vijf velden en `test/speldag.test.js` loopt ze na, in
+  de opslag én in elk antwoord.
+- **geen melding dat hij verloopt** — structureel: `kern/spellen/dag.js` krijgt
+  `nudge` niet binnen en noemt hem nergens. Er valt dus niets aan te zetten, en
+  een toets houdt dat zo.
 - **onder de progressiegrens: gewoon spelen, niets bewaard** — dezelfde regel
   als overal, geen 403 en geen leeg bord maar `bewaard: false` met de reden.
+  Wie onder de grens valt telt ook niet mee in het veld: er wordt geen getal
+  weggeschreven, dus staat er ook niemand ongevraagd in een telling.
   Een ghost hoort bij een bewaarde score en volgt hem dus.
 
 De challenge sluit na 24 uur en er komt geen seizoen omheen. Dat is de
-begrensde vorm: één dag, één puzzel, klaar.
+begrensde vorm: één dag, één puzzel, klaar. Elke dag die niet vandaag is wordt
+gewist, opgave en al — anders ligt er alsnog een alletijden-dagbord waar een
+reeks uit af te leiden valt.
+
+**Wat er is gebouwd** (`server/kern/spellen/dag.js`, 22 toetsen, 14 mutaties
+raak): drie ingangen (`dag` kijkt en start geen klok, `dag-start` start hem,
+`dag-klaar` levert in), een opgave per dag die de server uitgeeft en bewaart, en
+een bord dat 's nachts leeg is. De laag noemt geen enkel spel bij naam: wat een
+opgave ís komt uit twee haken in de descriptor (`dagOpgave`, `dagKeur`), en dat
+zijn precies de twee die Sneek en Tetris straks invullen met hun seed en hun
+invoerlogboek. De datum komt niet uit het verzoek — een client die zijn eigen
+dag mag noemen speelt die van gisteren nog eens.
+
+**Eén besluit dat zichtbaar hoort te blijven: wie er op het bord staat.** De
+visie zegt "één bord waarop vreemden elkaar verslaan". Je *plaats* gaat hier
+inderdaad over het hele veld, en je ziet hoeveel mensen hem vandaag oplosten —
+daar zit de wedstrijd. De *namenlijst* blijft je eigen kring. Een lijst met
+codenamen van vreemden is een sociale laag die dit huis nergens anders heeft,
+en die valt met een puzzel niet te rechtvaardigen. Dat is een keuze en geen
+tekortkoming; hij is omkeerbaar in één functie (`bord` in `dag.js`).
 
 ---
 
@@ -884,7 +910,7 @@ raakt nooit de spelmacht.
 | Schatduel | live, party, foundation | live | scores | nee | rekenen en logica |
 | Sneek | arcade | — | — | na §13 | modi, seed, ghost |
 | Tetris | arcade | — | — | na §13 | modi, seed, ghost |
-| Sudoku | arcade | — | — | ja | **eerste dagchallenge** |
+| Sudoku | arcade | — | — | ja | **dagchallenge — af** |
 
 De regel achter de kolom `publiek`: hij bevat wat iedereen in de kamer tóch al
 weet. Bij 30 Seconden is dat het hele punt van het spel — en de reden dat het
@@ -926,7 +952,7 @@ uitzondering die de route in een 500 veranderde. Zie §6.
 |---|---|
 | **Schaken** | premium 1v1 + async + replay + nabespreking — **af** |
 | **30 Seconden** | party + big screen + verborgen informatie — **af** |
-| **Sudoku** | arcade + dagchallenge (de enige die nu al kan) |
+| **Sudoku** | arcade + dagchallenge — **af** |
 | **Quizduel** | teams + Foundation + eigen content |
 | **Magnaat** | long-play multiplayer met een echte economie |
 
@@ -1015,7 +1041,7 @@ techniek is er niet om zichtbaar te zijn.
 
 | # | Punt | Blokkeert |
 |---|---|---|
-| a | Arcadescore niet server-authoritatief (staat al als 5.22) | dagchallenge, ghost, arcade-toernooien |
+| a | Arcadescore van Sneek en Tetris niet server-authoritatief (staat al als 5.22); Sudoku is het wél en heeft daarom zijn dagchallenge | dagchallenge voor Sneek/Tetris, ghost, arcade-toernooien |
 | ~~b~~ | ~~`zicht.publiek` bestaat niet; meekijken is één laag~~ — **opgelost**, en het legde drie fouten bloot | — |
 | ~~c~~ | ~~Potje-verval is een vast getal~~ — **naad gelegd, maar het was geen probleem**; de aanleiding klopte niet, zie §7 | — |
 | d | Replay kapt af op 500 zetten; niet gemeten voor een echte campagne | Magnaat met economie |

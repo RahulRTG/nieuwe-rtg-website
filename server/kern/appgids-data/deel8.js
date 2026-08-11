@@ -60,6 +60,6 @@ module.exports = {
   '/apps/horeca.html': G('RTG Horeca: de zaal en de keuken op een scherm.',
     ['Open een rekening op een tafel en zet de bestelling erop, met de allergie in een eigen veld',
       'Geef een gang vrij; pas dan verschijnt hij op het keukenscherm, met de gewenste serveertijd',
-      'Splits per persoon of reken af; de som van de delen is altijd exact het geheel'],
+      'Bovenaan staat wat gasten vragen, met de minuten erbij: eerst "Ik ga", daarna "Gedaan"'],
     'De keuken begint pas als de zaal een gang vrijgeeft: zo bepaalt de zaal het tempo van het diner en de keuken dat van de bereiding.')
 };

@@ -1248,6 +1248,21 @@ Melden kan alleen achter `gastAuth`: de tafelsleutel is het bewijs dat je er zit
 
 Onderweg kwam `bereidingsMinuten` uit een leveranciersroute naar `kern/horeca/keukenlaag.js`: hij hing aan `kern` en was daardoor onbereikbaar voor de gastkant — dezelfde fout die `horecaFolioVan` eerder maakte.
 
+### Iets vragen (het menselijke deel)
+
+`server/kern/gast/verzoek.js` + `/api/gast/verzoek*` + `/api/supplier/horeca/verzoeken*`. De gastkant kon bestellen en afrekenen maar niet zeggen "kunt u even komen". Dat betekende in de praktijk: zwaaien. Software die het makkelijke deel (geld) digitaliseert en het menselijke deel (aandacht) laat liggen, verplaatst het werk naar de gast.
+
+Zes soorten met een vaste lijst — bediening, de rekening, water, bestek, afruimen, "er is iets niet goed" — en vier regels die van een knop iets anders maken dan een belofte:
+
+- **Een verzoek kost niets en zet niets op de rekening.** Wat wél geld kost gaat door de bestellaag met de beleidscontrole die daarbij hoort. Een "verzoekje" waar stilletjes een flesje water van € 4,50 uit volgt, is een bestelling met een vriendelijke naam.
+- **Niemand belooft een tijd.** Er staat geen "iemand is er binnen twee minuten"; dat weten we niet, en een belofte die de zaak niet heeft gedaan moet de zaak wel inlossen. Wat er wél staat is hoeveel minuten het verzoek open staat. Om diezelfde reden zegt het gastscherm na een druk op de knop *"het staat nu op het scherm van de bediening"* en niet *"er komt iemand langs"*: het eerste is een feit dat wij kunnen waarmaken.
+- **Twee keer drukken is één keer vragen.** Anders is de wachtrij onleesbaar precies wanneer het druk is, en lijdt de gast die één keer drukte onder de gast die tien keer drukte.
+- **Oud staat bovenaan, niet tafel 1.** De wachtrij sorteert op wat het langst wacht. En "oud" hangt aan de soort: een servetje mag tien minuten wachten, "er is iets niet goed" drie.
+
+Oppakken en afronden zijn twee knoppen en niet één. Tussen "ik ga erheen" en "het is gedaan" zit de tijd waarin een collega niet ook moet gaan; zonder die tussenstand lopen er op een drukke avond twee mensen naar dezelfde tafel, of geen. Intrekken kan wel zolang niemand het oppakte en niet daarna — dan is er iemand onderweg en is intrekken een mededeling, geen knop.
+
+Bewezen door `test/gastverzoek.test.js` (twaalf toetsen, vijf mutaties, alle vijf raak). Eén toets kijkt naar de **hele** uitvoer van de wachtrij op een beloofde tijd, en niet naar een veld: zo'n belofte kan overal insluipen, ook in een `let`-zin.
+
 ### De klantnaad (één handle, vijf kanalen)
 
 `server/kern/gast/naad.js`. De vijf gastkanalen bewijzen elk op hun eigen manier dat je ergens bij hoort — de sticker op tafel (een QR-sleutel), thuis (je ledensessie), de hotelkamer (een open gastrekening), de club (de code op je polsband), de foodcourt (ledensessie plus een mandje-id) — en dat verschil is echt; het hoort niet te worden weggepoetst tot één `wieBenJij()`. Maar één ding deelden ze wél, en dat stond woordelijk in twee routebestanden: **hoe een ledensessie een handle op een rekening wordt.** Zouden bezorgen en de foodcourt daarin uiteenlopen, dan vinden je bezorgbestellingen en je foodcourt-mandje elkaar niet meer, zónder enige foutmelding. Dezelfde vraag ("is deze rekening van mij?") stond bovendien vier keer los uitgeschreven; die loopt nu ook via de naad.

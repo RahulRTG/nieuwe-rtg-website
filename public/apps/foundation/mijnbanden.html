@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RTFoundation · Wie mag iets van mij zien</title>
+<meta name="theme-color" content="#0C0C0B">
+<link rel="manifest" href="/manifests/foundation.webmanifest">
+<link rel="apple-touch-icon" href="/icons/foundation.svg">
+<link rel="icon" href="/icons/foundation.svg" type="image/svg+xml">
+<link rel="stylesheet" href="stijl.css">
+<script src="palet.js"></script>
+<link href="/shared/rtg-ui.css" rel="stylesheet">
+<style>
+  .wrap{max-width:44rem;margin:0 auto;padding:1.1rem 1.1rem 3rem;}
+  h1{font-family:var(--serif);font-weight:500;font-size:1.7rem;margin:.4rem 0 .2rem;}
+  .intro{color:var(--zacht);line-height:1.5;margin-bottom:1.1rem;}
+  .blok{padding:1.1rem 1.2rem;margin-bottom:1.1rem;}
+  .deel{font-size:.78rem;letter-spacing:.16em;text-transform:uppercase;color:var(--muted,var(--zacht,#8A8680));margin:1.6rem 0 .5rem;}
+  .ouder{font-size:.84rem;color:var(--zacht);line-height:1.55;}
+</style>
+<link href="/shared/rtg-uniform.css" rel="stylesheet">
+<link href="/shared/levenspas.css" rel="stylesheet">
+<link href="/shared/ios.css" rel="stylesheet">
+</head>
+<body class="rtg-stijl">
+<div id="balk"></div>
+
+<!-- DE LEVENSPAS AAN DE GEZINSKANT (LEVEN.md par. 2.8, fase 2).
+
+     WAAROM DIT SCHERM MOET BESTAAN. Besluit 2 zegt dat een ouder van een
+     minderjarige standaard NIETS ziet en dat het kind per stuk deelt. Zonder
+     dit scherm zou dat een mooie zin in een document zijn en verder niets: de
+     ledenkant kan wel vragen en delen, maar aan de andere kant van elke band
+     staat een gezinsprofiel dat het dan niet kan. Een recht dat je nergens
+     kunt uitoefenen, is geen recht.
+
+     HET SCHERM ZELF IS GEDEELD (/shared/levenspas.js) met /apps/leven.html.
+     Dat is met opzet: aan beide kanten van een band neemt een mens dezelfde
+     beslissing, en twee schermen die dezelfde afspraak anders tonen, zijn twee
+     verschillende afspraken geworden. Wat hier verschilt is de aanspreekvorm
+     (hier kan een kind zitten, dus je/jij) en de manier van inloggen.
+
+     GASTEN KOMEN ER NIET IN. Een oppas, opa en oma of een familielid heeft de
+     gezinscode ooit gekregen, en bezit van een sleutel is geen instemming --
+     dezelfde deur als het gevoelsdagboek. -->
+
+<div class="wrap" role="main">
+  <h1>Wie mag iets van mij zien</h1>
+  <div class="intro">Niemand ziet iets van jou, tenzij jij het zelf geeft. Ook je ouders niet. En wat je geeft, kun je altijd weer intrekken -- zonder uitleg, en zonder dat je het hoeft te vragen.</div>
+
+  <div class="deel">Mijn banden</div>
+  <div class="kaart blok">
+    <div id="mbVak"><p class="intro">Laden...</p></div>
+    <p id="mbFout" class="lp-fout" hidden role="alert"></p>
+  </div>
+
+  <div class="deel">Iemand vragen</div>
+  <div class="kaart blok">
+    <p class="intro">Vul de codenaam van de ander in. Er ontstaat pas een band als die ander hem bevestigt -- jij kunt dat niet voor hem doen, en hij niet voor jou.</p>
+    <form id="mbVorm" class="lp-vorm">
+      <input id="mbNaam" placeholder="Codenaam van de ander" aria-label="Codenaam van de ander" autocomplete="off">
+      <select id="mbSoort" aria-label="Wat zijn jullie van elkaar"></select>
+      <label class="lp-tot" for="mbTot">Loopt tot (mag leeg)</label>
+      <input id="mbTot" type="date" aria-label="Band loopt tot; mag leeg blijven">
+      <button class="knop hoofd lp-mini" type="submit">Band vragen</button>
+    </form>
+  </div>
+
+  <div class="deel">Voor ouders</div>
+  <div class="kaart blok">
+    <p class="ouder">U ziet van uw kind niets tenzij het kind het zelf per onderdeel geeft, en dat is een bewuste keuze en geen instelling die ergens verstopt zit. De omgekeerde keuze -- alles zien tot een leeftijdsgrens -- is makkelijker uit te leggen, maar hij schakelt op één dag om terwijl een kind geleidelijk groeit, en tot die dag is er geen enkele eigen ruimte. Het dagboekje, de stemming en de dromen zijn hier sowieso niet bij: die zijn van het kind alleen. Wat hier buiten valt is veiligheid: als er iets is dat aandacht vraagt, hoort u te kunnen zien DAT er iets is, zonder te lezen wat er staat. Blijft u zich zorgen maken, dan is dit scherm geen vervanging voor een gesprek.</p>
+  </div>
+</div>
+
+<script src="sessie.js"></script>
+<script src="/shared/levenspas.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+/* eisFamilie en niet eisProfiel: een gastprofiel hoort hier niet te komen, en
+   de server weigert hem ook (routes/levenband.js gezinsPoort). Twee sloten op
+   dezelfde deur, want een scherm dat pas bij de server stukloopt, heeft de
+   gebruiker al beloofd dat het wel zou werken. */
+if (!window.Sessie || !Sessie.eisFamilie()) throw new Error('geen sessie');
+Sessie.balk($('#balk'), { terug: 'index.html' });
+
+/* ELK PAD VOLUIT, dezelfde afspraak als aan de serverkant (scripts/check.js
+   regel 45): een pad dat in elkaar geplakt wordt, kan niemand terugvinden. */
+const PADEN = {
+  kring: '/api/rtf/leven/kring',
+  vraag: '/api/rtf/leven/band/vraag',
+  bevestig: '/api/rtf/leven/band/bevestig',
+  verbreek: '/api/rtf/leven/band/verbreek',
+  deel: '/api/rtf/leven/deel/zet',
+  in: '/api/rtf/leven/deel/in'
+};
+
+/* De gezinskant reist op gezinscode plus profieltoken in het LICHAAM; dat is
+   de bestaande vorm van dit huis (zie routes/welzijn.js) en niet iets nieuws
+   voor deze pagina. */
+function post(naam, body) {
+  const s = Sessie.huidig() || {};
+  return fetch(PADEN[naam], {
+    method: 'POST', headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(Object.assign({ code: s.code, token: s.token }, body || {}))
+  }).then(r => r.json().catch(() => ({})).then(j => {
+    if (!r.ok) { const e = new Error(j.error || 'Er ging iets mis.'); e.status = r.status; throw e; }
+    return j;
+  }));
+}
+
+Levenspas.start({
+  post,
+  vak: $('#mbVak'), fout: $('#mbFout'), vorm: $('#mbVorm'),
+  naamIn: $('#mbNaam'), soortIn: $('#mbSoort'), totIn: $('#mbTot'),
+  /* De je-vorm: aan deze kant kan een kind zitten. Dezelfde afspraak, andere
+     woorden -- niet andere regels. */
+  tekst: {
+    intrekken: 'Terugnemen', bevestig: 'Ja, dat klopt', weiger: 'Nee, liever niet',
+    trekVerzoekIn: 'Vraag terugnemen', verbreek: 'Band stoppen',
+    geven: 'Geven', ikGeef: 'Jij geeft', ikZie: 'Jij ziet',
+    watGeef: 'Wat geef je', totWanneer: 'Tot wanneer',
+    wacht: 'de ander moet nog ja zeggen', aanZet: 'jij bent aan de beurt',
+    zelfGevraagd: 'Jij hebt dit gevraagd. Er is pas een band als de ander ja zegt.',
+    vraagtBand: 'Deze persoon wil een band met jou. Alleen jij kunt ja zeggen.',
+    geeftNiets: 'Nog niets. Zolang hier niets staat, ziet deze persoon niets van jou.',
+    zietNiets: 'Niets. Wat jij ziet, geeft de ander zelf -- er hoort niets automatisch bij een band.',
+    eenWacht: '1 persoon wacht op jouw antwoord.',
+    velenWachten: '{n} personen wachten op jouw antwoord.',
+    geenBanden: 'Je hebt nog geen banden. Er komt er pas een als jij het vraagt en de ander ja zegt, of andersom.',
+    nooit: 'Dit deel je nooit, ook niet als je het zou willen:'
+  }
+});
+if('serviceWorker' in navigator && location.protocol.startsWith('http')) navigator.serviceWorker.register('sw.js').catch(()=>{});
+</script>
+<script src="/shared/basis.js" defer></script>
+<script src="/shared/bediening.js" defer></script>
+<script src="/shared/randen.js" defer></script>
+<script src="/shared/volscherm.js" defer></script>
+<script src="/shared/levendekleur.js" defer></script>
+<script src="/shared/cookie.js" defer></script>
+<script src="/shared/metgezel.js" defer></script>
+<script src="/shared/sneltoets.js" defer></script>
+<script src="/shared/ios.js" defer></script>
+</body>
+</html>

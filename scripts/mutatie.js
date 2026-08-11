@@ -422,6 +422,20 @@ const EIGEN_MODULE = new Map([
    Elke reden noemt hoeveel mutaties er zijn geprobeerd, want een reden zonder
    poging is een vermoeden. */
 const GEEN_BRONMUTATIE = new Map([
+  /* Ik heb dit bestand eerst in EIGEN_MODULE gezet met public/apps/voertuig.js en
+     rit.js erbij -- de twee modules die deze toets echt leest. De motor probeerde
+     er 17 en de toets overleefde ze allemaal, en dat is hier GEEN uitspraak over
+     de toets. De operatoren zijn gedragsmatig (true->false, een vergelijking
+     omdraaien); wat deze toets vastlegt is TEKST en NAMEN: de gesloten deur, dat
+     "niet van u" en "bestaat niet" niet uit elkaar gehouden worden, en welke
+     opslagsleutel bij welke inlog hoort. Geen enkele bronoperator raakt een
+     letterlijke string, dus "overleefd" zou de toets de schuld geven van wat mijn
+     toewijzing fout had.
+     De foutklasse die hij WEL bewaakt is met de hand nagetrokken en tweemaal
+     RAAK: rtg_member_token -> rtg_token laat toets 6 zakken, en de tweede
+     leverancierssleutel weghalen laat toets 7 zakken. De passende operator is een
+     hernoemer van stringliteralen, en die heeft deze motor niet. */
+  ['voertuigscherm.e2e.js', 'overleefde 17 mutaties in public/apps/voertuig.js en rit.js. Deze toets legt tekst en sleutelnamen vast, geen rekenend gedrag; geen enkele bronoperator raakt een letterlijke string. Met de hand nagetrokken op de foutklasse die hij wel bewaakt (een hernoemde opslagsleutel): tweemaal raak'],
   ['boot-smoke.test.js', 'overleefde 45 mutaties in server/server.js, en terecht: deze toets is bewust ONDIEP -- de server komt op en de wortel geeft de ROS-poort, meer beweert hij niet. De juiste mutatie zit in de wortelroute of in de pagina, niet in de bron'],
   ['poortrace.test.js', 'overleefde 45 mutaties in server/server.js. De bewering gaat over hoe een EADDRINUSE wordt BENOEMD in het log, niet over rekenend gedrag; een operator raakt dat niet'],
   ['eu-naleving.test.js', 'overleefde 5 mutaties. Deze toets vergelijkt beweringen uit EU.md met code die er nog STAAT; een operator verandert wat code doet en niet dat hij bestaat. De juiste mutatie is de code weghalen of het document laten liegen'],
@@ -525,6 +539,14 @@ function isServerToets(naam) {
      uitspraak over wat hij op de proef stelt, en die hoort voor te gaan op het
      vermoeden dat een require van de helper oplevert. */
   if (EIGEN_MODULE.has(path.basename(naam))) return false;
+  /* En om precies dezelfde reden wint GEEN_BRONMUTATIE. Daar staat een
+     UITGEMETEN uitspraak dat een bronmutatie over deze toets niets zegt; hem
+     daarna alsnog de liegpoort in sturen levert een tweede verkeerde proef en
+     dus weer een 'overleefd' dat de toets de schuld geeft. Dit raakte pas iets
+     toen er een e2e-toets bijkwam die de helper WEL gebruikt (voertuigscherm):
+     de drie oudere regels doen dat geen van drieen, dus die liepen hier nooit
+     langs en hun uitslag verandert hier niet van. */
+  if (GEEN_BRONMUTATIE.has(path.basename(naam))) return false;
   /* De zoekterm opgeknipt, precies zoals de patronen in regel 36 van
      scripts/check.js: voluit gespeld leest een andere keuringsregel dit als een
      require van scripts/helper.js, die niet bestaat. */

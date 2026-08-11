@@ -42,6 +42,10 @@ a.knop{display:inline-block;text-decoration:none;}
 .tag{font-size:.66rem;border:1px solid var(--line);border-radius:999px;padding:.12rem .5rem;color:var(--muted);}
 .tag.aan{color:var(--goed);border-color:var(--goed);}
 .tag.laat{color:var(--laat);border-color:var(--laat);}
+/* Een verzoek dat te lang open staat. Het accent staat links en niet als
+   achtergrondkleur: de MINUTEN staan altijd in de regel zelf, dus wie dit
+   streepje niet ziet mist geen informatie. */
+.item.laat{border-left:3px solid var(--laat);padding-left:.5rem;}
 .bon{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:.7rem .8rem;margin-bottom:.5rem;}
 .bon b{font-size:.95rem;}
 .allergie{display:inline-block;border:1px solid var(--laat);color:var(--laat);border-radius:6px;

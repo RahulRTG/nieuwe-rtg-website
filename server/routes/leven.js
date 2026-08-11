@@ -4,12 +4,16 @@
    levenslijn levert de lijn en het command center; de mentor staat in
    ./levenmentor.js.
 
-   ER STAAT HIER GEEN ENKELE SCHRIJFROUTE, en dat is geen omissie maar het
-   verschil tussen deze wereld en RTG Geld. Het werkwoord van RTG Geld is
+   IN DIT BESTAND STAAT GEEN ENKELE SCHRIJFROUTE, en dat is geen omissie maar
+   het verschil tussen deze wereld en RTG Geld. Het werkwoord van RTG Geld is
    uitvoeren binnen regels; het werkwoord van deze wereld is OPENEN, en die
    opent alleen (LEVEN.md par. 0). Wie hier iets wil toevoegen dat namens de
    mens handelt, leest eerst par. 2.2 en 2.7: het platform mag niet sturen,
    en de motor rekent maar beslist niet.
+
+   De enige uitzondering staat bewust in een APART bestand, ./levenband.js:
+   daar wordt wel geschreven, maar wat er geschreven wordt is niet het leven
+   van iemand maar zijn toestemming (LEVEN.md par. 2.8).
 
    Identiteit: het token reist in de Authorization-kop, nooit in een URL. */
 module.exports = (kern) => {
@@ -55,4 +59,8 @@ module.exports = (kern) => {
   /* De mentor staat apart omdat hij als enige de AI aanraakt en zijn eigen
      grenzen draagt; zelfde opzet als routes/geld.js met geldrahul. */
   require('./levenmentor')(kern);
+  /* De rechten per relatie (fase 2): banden, delingen en inzage. Apart, omdat
+     het de enige schrijvende laag van deze wereld is en dat verschil hoort te
+     zien te zijn aan waar de code staat -- niet alleen aan een zin erboven. */
+  require('./levenband')(kern);
 };

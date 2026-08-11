@@ -94,6 +94,51 @@ test('5. het ritscherm zegt hetzelfde over een ref die niet van u is', async () 
     '"nog niet toegewezen" is een stand en geen ontbrekend gegeven');
 });
 
+/* 6. DE SLEUTEL MOET VAN DE DEUR ZIJN WAAR HET SCHERM OP KLOPT.
+
+   test/blindevlek.test.js vangt de sleutel die NERGENS gezet wordt -- zo kwam
+   aan het licht dat rit.js `rtg_token` las, een naam die niets in dit huis ooit
+   schrijft, waardoor het scherm altijd op de gesloten deur uitkwam. Maar een
+   sleutel die wel bestaat en bij de VERKEERDE inlog hoort, glipt daar langs: die
+   is immers ergens gezet. Precies dat was er met dit scherm aan de hand -- het
+   las alleen de PDA-sleutel, zodat de vervoerder die via zijn eigen inlog
+   binnenkomt de gesloten deur zag met de sleutel op zak.
+
+   Deze toets legt daarom de PAAR-relatie vast en niet het bestaan: welke inlog
+   hoort bij de poort waar het scherm achter hangt, en schrijft die inlog de
+   sleutel die het scherm leest. Hernoemt iemand de sleutel aan één kant, dan
+   zakt hij hier. */
+const ROOT = path.join(__dirname, '..');
+const lees = (p) => fs.readFileSync(path.join(ROOT, p), 'utf8');
+const gelezenSleutels = (bron) => {
+  const uit = new Set(); let m;
+  const r = /localStorage\.getItem\(\s*['"]([^'"]+)['"]/g;
+  while ((m = r.exec(bron))) uit.add(m[1]);
+  return uit;
+};
+const wordtGezetIn = (bestand, sleutel) =>
+  new RegExp('setItem\\(\\s*[\'"]' + sleutel + '[\'"]').test(lees(bestand));
+
+test('6. het ritscherm leest de sleutel die de LEDEN-inlog schrijft', () => {
+  const sleutels = [...gelezenSleutels(lees('public/apps/rit.js'))];
+  assert.deepEqual(sleutels, ['rtg_member_token'],
+    '/api/mob/mijn hangt achter auth (de ledensessie), dus dit scherm leest die sleutel en geen andere');
+  assert.ok(wordtGezetIn('public/apps/app-main.js', 'rtg_member_token'),
+    'en de leden-app schrijft hem ook echt bij het inloggen');
+});
+
+test('7. het vlootscherm kent BEIDE deuren naar een leveranciersessie', () => {
+  const sleutels = gelezenSleutels(lees('public/apps/voertuig.js'));
+  /* supplierAuth vraagt rol 'supplier'; die sessie ontstaat op twee plekken, en
+     wie er maar een van kent, sluit de helft van de rechthebbenden buiten. */
+  assert.ok(sleutels.has('rtg_pda_token'), 'de PDA-kant van het personeel');
+  assert.ok(sleutels.has('rtg_sup_token'), 'en de leverancier-inlog zelf');
+  assert.ok(wordtGezetIn('public/apps/personeel.js', 'rtg_pda_token'),
+    'de PDA schrijft die sleutel');
+  assert.ok(wordtGezetIn('public/apps/leverancier.js', 'rtg_sup_token'),
+    'en de leverancier-inlog de zijne');
+});
+
 test('4. een onbekend id wordt niet geraden, en het verschil wordt niet verklapt', async () => {
   const js = await haal('/apps/voertuig.js');
   assert.match(js.tekst, /staat niet in deze vloot/i, 'een onbekend id krijgt een uitleg');

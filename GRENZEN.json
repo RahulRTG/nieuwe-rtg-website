@@ -223,7 +223,8 @@
       "sessie",
       "sseToSupplier",
       "stuur",
-      "tooManyTries"
+      "tooManyTries",
+      "verzoeklaag"
     ],
     "gebouw": [
       "gebouw",
@@ -428,6 +429,9 @@
     ],
     "leven": [
       "levenslijn"
+    ],
+    "levenband": [
+      "levensband"
     ],
     "levenmentor": [
       "levenslijn"
@@ -1672,6 +1676,7 @@
       "verblijfCheckin",
       "verblijfCheckout",
       "verblijfNoShow",
+      "verzoeklaag",
       "voegKlantnotitie",
       "voorraadZoek",
       "waarde",

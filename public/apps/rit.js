@@ -22,11 +22,14 @@
    (LAT-regel 4). Dit bestand tekent ze alleen. */
 (() => {
   const $ = s => document.querySelector(s);
-  /* Dezelfde twee sleutels als werkplek.js: dit scherm wordt vanaf de
-     werkvloer geopend. Hier stond 'rtg_token' -- een sleutel die door NIETS
-     wordt gezet, dus elke aanroep ging als "Bearer null" de deur uit en de
-     app deed het voor niemand. De blindevlek-toets ving hem. */
-  const token = (() => { try { return localStorage.getItem('rtg_office_token') || localStorage.getItem('rtg_member_token'); } catch (e) { return null; } })();
+  /* DE SLEUTELNAAM IS DIE VAN DE LEDEN-APP, EN DAT IS GEEN DETAIL. /api/mob/mijn
+     hangt achter `auth`, de gewone ledensessie, en die wordt bij het inloggen
+     onder `rtg_member_token` bewaard (public/apps/app-main.js). Hier stond eerst
+     `rtg_token` -- een naam die NIETS in dit huis ooit zet, zodat dit scherm
+     altijd op de gesloten deur uitkwam, ook voor wie gewoon was ingelogd.
+     test/blindevlek.test.js ving dat: elke gelezen opslagsleutel moet ergens
+     ook gezet worden, anders is het een naamdrift-fout. */
+  const token = (() => { try { return localStorage.getItem('rtg_member_token'); } catch (e) { return null; } })();
   const gevraagd = new URLSearchParams(location.search).get('rit') || '';
 
   const api = (pad, body) => fetch('/api/mob/' + pad, { method: 'POST',

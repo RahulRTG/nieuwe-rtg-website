@@ -191,3 +191,94 @@ test('de deur telt hoeveel mensen er binnen zijn, niet wie', async () => {
   const na = (await H('/club/gastenlijst', {})).body;
   assert.equal(na.perPromoter.NOVA.binnen, 2, 'per promoter telt wat er ECHT binnen is');
 });
+
+/* ---------- op de lijst staan is niet hetzelfde als jezelf aanmelden ----------
+   Sinds de avondplanner een stap "uitgaan" echt kan aanvragen, schrijven er
+   TWEE partijen op de gastenlijst: de club (die zet er iemand op) en een lid
+   (dat een plek vraagt). Het verschil is geen etiket maar een deur: een
+   aanvraag waar de club nog niets van heeft gevonden, komt er niet in.
+
+   De regels staan in kern/horeca/clublaag.js en worden hier op twee niveaus
+   nagelopen: over de lijn wat over de lijn kan, en in de laag zelf wat dat
+   niet kan -- er staat geen club in de demodata, dus een lid kan er via de
+   planner niet echt eentje aanvragen. Dat is een gat in de SEED en niet in de
+   regel; het staat zo ook in README. */
+const laagmaker = require('../server/kern/horeca/clublaag');
+function losseClublaag() {
+  const opslag = { data: { horeca: {} } };
+  const schoon = (v, n) => String(v == null ? '' : v).slice(0, n);
+  const horeca = require('../server/kern/horeca')({ db: opslag, save() {}, crypto: require('crypto'), schoon });
+  return { laag: laagmaker({ save() {}, schoon, horeca }), opslag };
+}
+
+test('een aanvraag van een lid is geen plek: de club beslist, en de deur weet dat', () => {
+  const { laag } = losseClublaag();
+  const morgen = new Date(Date.now() + 864e5).toISOString().slice(0, 10);
+
+  const r = laag.vraagAan('NACHT', { codenaam: 'Zilverreiger', datum: morgen, personen: 3, lidKey: 'k1' });
+  assert.equal(r.ok, true);
+  assert.equal(r.regel.stand, 'aangevraagd', 'wie zich aanmeldt, staat er als aanvraag op');
+  const regel = laag.vanDatum('NACHT', morgen)[0];
+  assert.equal(laag.magNaarBinnen(regel), false, 'en komt daarmee de deur nog niet door');
+
+  const nog = laag.vraagAan('NACHT', { codenaam: 'Zilverreiger', datum: morgen, personen: 3, lidKey: 'k1' });
+  assert.equal(nog.status, 409, 'twee keer vragen voor dezelfde avond is een keer vragen');
+
+  assert.equal(laag.beslis('NACHT', regel.id, 'ok').ok, true);
+  assert.equal(laag.magNaarBinnen(laag.vanDatum('NACHT', morgen)[0]), true, 'na goedkeuring wel');
+  assert.equal(laag.beslis('NACHT', regel.id, 'geweigerd').status, 409, 'en er wordt niet twee keer beslist');
+
+  /* Wat het lid van zijn eigen regel te zien krijgt: geen promoter, geen
+     ledensleutel. Dat gaat het lid niets aan en hoort niet over de lijn. */
+  const mijn = laag.vanLid('NACHT', 'k1')[0];
+  assert.equal(mijn.lidKey, undefined);
+  assert.equal(mijn.naam, undefined, 'zelfs de codenaam gaat niet mee terug: die kende het lid al');
+});
+
+test('een naam die de club er zelf op zet, is meteen goed (ook de oude regels zonder stand)', () => {
+  const { laag, opslag } = losseClublaag();
+  const vandaag = new Date().toISOString().slice(0, 10);
+  laag.zetDoorZaak('NACHT', { namen: ['Blauwe Reiger'], datum: vandaag, promoter: 'NOVA', personen: 2 });
+  const g = laag.vanDatum('NACHT', vandaag)[0];
+  assert.equal(laag.magNaarBinnen(g), true, 'de club zet hem er zelf op, dus hij mag naar binnen');
+
+  // een regel uit de tijd voordat er standen waren: die zijn allemaal door de club gezet
+  delete opslag.data.horeca.NACHT.club.gastenlijst[0].stand;
+  assert.equal(laag.standVan(laag.vanDatum('NACHT', vandaag)[0]), 'ok', 'geen stand betekent: door de club gezet');
+});
+
+test('uitgaan kiest zijn weg op wat de zaak IS, en belooft nooit toegang', () => {
+  const { laag } = losseClublaag();
+  const aanvraag = require('../server/kern/avond/aanvragen')({ planlaag: null,
+    schoon: (v, n) => String(v == null ? '' : v).slice(0, n) });
+  const avond = { datum: new Date(Date.now() + 864e5).toISOString().slice(0, 10), start: '23:00', personen: 4, titel: 'Uit' };
+  const stap = { id: 's1', soort: 'uitgaan', zaak: 'NACHT' };
+  const sessie = { key: 'k9', tier: 'rtg' };
+
+  const alsClub = aanvraag.uitgaanStap(sessie, 'Zilverreiger', avond, stap, {
+    findSupplier: () => ({ code: 'NACHT', name: 'Nachtwacht', type: 'club' }),
+    clubAanvraag: laag.vraagAan,
+    reserveerTafel: () => { throw new Error('een club hoort niet langs de tafelreservering te gaan'); }
+  });
+  assert.equal(alsClub.staat, 'aangevraagd');
+  assert.equal(alsClub.domein, 'gastenlijst', 'een club gaat langs de gastenlijst');
+  assert.match(alsClub.reden, /beslist/i);
+
+  const alsBar = aanvraag.uitgaanStap(sessie, 'Zilverreiger', avond, stap, {
+    findSupplier: () => ({ code: 'PONTO', name: 'Sunset Ibiza', type: 'bar' }),
+    clubAanvraag: () => { throw new Error('een bar hoort niet op een gastenlijst te belanden'); },
+    reserveerTafel: () => ({ ok: true, reservering: { id: 'r1' } })
+  });
+  assert.equal(alsBar.staat, 'aangevraagd');
+  assert.equal(alsBar.domein, 'reserveringen', 'een bar gaat langs de tafelreservering');
+
+  /* En de derde uitkomst, die net zo geldig is als de andere twee: de zaak wil
+     niet. Dan blijft de stap staan MET de reden van de zaak, en wordt er niets
+     mooier gemaakt dan het is. */
+  const nee = aanvraag.uitgaanStap(sessie, 'Zilverreiger', avond, stap, {
+    findSupplier: () => ({ code: 'X', name: 'Casa Nada', type: 'bar' }),
+    reserveerTafel: () => ({ status: 409, error: 'Casa Nada werkt niet met tafelreserveringen.' })
+  });
+  assert.equal(nee.staat, 'voorstel');
+  assert.match(nee.reden, /werkt niet met tafelreserveringen/);
+});

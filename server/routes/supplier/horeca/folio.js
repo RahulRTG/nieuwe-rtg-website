@@ -28,32 +28,14 @@ module.exports = (kern) => {
   const { app, save, schoon, supplierAuth, logActivity, horeca } = kern;
   const { H, nu, id, centen, uitEuro } = horeca;
 
-  const SOORTEN = ['kamer', 'toeristenbelasting', 'ontbijt', 'restaurant', 'minibar', 'bar', 'spa',
-    'roomservice', 'parkeren', 'wasserij', 'activiteit', 'schade', 'overig'];
-  const F = (code) => { const h = H(code); if (!h.folios) h.folios = {}; return h.folios; };
-  const som = (f) => (f.regels || []).reduce((t, r) => t + r.centen, 0);
-  const betaald = (f) => (f.betalingen || []).reduce((t, b) => t + b.centen, 0);
-  const openVan = (f) => som(f) - betaald(f);
-  const publiek = (f) => Object.assign({}, f, { totaal: som(f), betaald: betaald(f), openstaand: openVan(f) });
-
-  function folioVan(code, kamer) {
-    const f = F(code);
-    return Object.values(f).find(x => x.kamer === String(kamer || '') && x.status === 'open') || null;
-  }
-
-  /* De boeking die ook vanuit de kassa wordt gebruikt (betaalwijze "kamer").
-     Late binding via de kern, want betalen.js wordt eerder gemount. */
-  function boek(code, kamer, regel) {
-    const f = folioVan(code, kamer);
-    if (!f) return { status: 404, error: 'Er staat geen open gastrekening op kamer ' + kamer + '.' };
-    const soort = SOORTEN.includes(String(regel.soort)) ? String(regel.soort) : 'overig';
-    const r = { id: id(3), soort, omschrijving: schoon(regel.omschrijving, 100) || soort,
-      centen: centen(regel.centen), at: nu(), door: regel.door || 'systeem', bron: regel.bron || null };
-    if (!r.centen) return { status: 400, error: 'Een boeking zonder bedrag doet niets.' };
-    f.regels.push(r);
-    save();
-    return { ok: true, regel: r, folio: publiek(f) };
-  }
+  /* De leeskant EN het boeken staan in kern/horeca/foliolaag.js. Niet uit
+     netheid: de gastkant heeft dezelfde vraag en dezelfde boeking nodig voor
+     roomservice, en `kern` is hier de ctx-KOPIE die supplier/horeca.js met
+     Object.assign maakt -- wat we hier op de kern zetten, ziet een ander domein
+     nooit. Openen, de nachtrun, de borg en het afrekenen blijven hieronder: dat
+     zijn besluiten van de zaak. */
+  const { SOORTEN, F, som, betaald, openVan, publiek, folioVan, boek } =
+    require('../../../kern/horeca/foliolaag')({ horeca, save, schoon });
   kern.horecaFolioBoek = boek;
 
   /* ---------- openen en boeken ---------- */

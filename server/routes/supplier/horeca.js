@@ -17,7 +17,9 @@
    van het hotel. */
 module.exports = (kern) => {
   const horeca = require('../../kern/horeca')(kern);
-  const ctx = Object.assign({}, kern, { horeca });
+  const polslaag = require('../../kern/horeca/pols')({ save: kern.save, schoon: kern.schoon, horeca });
+  const clublaag = require('../../kern/horeca/clublaag')({ save: kern.save, schoon: kern.schoon, horeca });
+  const ctx = Object.assign({}, kern, { horeca, polslaag, clublaag });
   require('./horeca/rekening')(ctx);   // openen, regels, gangen, lijst
   require('./horeca/schuif')(ctx);     // verplaatsen, samenvoegen, splitsen
   require('./horeca/betalen')(ctx);    // korting, fooi, betalen, oninbaar
@@ -26,10 +28,13 @@ module.exports = (kern) => {
   require('./horeca/keuken-regie')(ctx); // het regiescherm van de chef en de drukterem
   require('./horeca/bezorging')(ctx);  // bezorgzones en tijdsloten
   require('./horeca/bezorgrit')(ctx);  // gecombineerde route en afleverbewijs
-  require('./horeca/club')(ctx);       // polsbandtegoed, minimum spend, gastenlijst, de deur
+  require('./horeca/club')(ctx);       // polsbandtegoed en minimum spend op een VIP-tafel
+  require('./horeca/clubdeur')(ctx);   // de gastenlijst (incl. aanvragen van leden) en de deurteller
   require('./horeca/folio')(ctx);      // de gastrekening van het hotel: nachtrun, borg, afrekenen
   require('./horeca/event')(ctx);      // offerte, akkoord, aanbetaling, nacalculatie
   require('./horeca/haccp')(ctx);      // temperaturen, batches en THT, controlelijsten
   require('./horeca/personeel')(ctx);  // fooienpot, loonkosten tegenover omzet, gastprofiel
   require('./horeca/dashboard')(ctx);  // dagbeeld per kanaal en de signalen
+  require('./horeca/gastbeheer')(ctx); // de zaakkant van de gastendeur: QR, uitverkocht, beleid, bevestigen
+  require('./horeca/pols')(ctx);       // de pols: wat gemeten wordt, wat de zaak invult, wat gasten melden
 };

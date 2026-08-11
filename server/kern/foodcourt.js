@@ -5,7 +5,15 @@
    toont de vrije tijdsloten; reserveren gaat via het bestaande /api/reserveer
    (de zaak beslist, zoals altijd).
 
-   Geen echte restaurantmerken; RTG-huispartners. Volgt maakFoodcourt(state). */
+   Geen echte restaurantmerken; RTG-huispartners. Volgt maakFoodcourt(state).
+
+   LET OP DE NAAM. Er is een TWEEDE foodcourt in dit huis, en het is iets
+   anders: `kern/gast/foodcourt.js` is het MANDJE BIJ MEER LOKETTEN (je haalt
+   bij drie keukens tegelijk af, één mandje, per zaak een rekening). Dit
+   bestand is de RESERVEERPLEIN-kant: alle restaurants op een rij met hun vrije
+   tijdsloten. Ze delen geen enkele regel code en horen dat ook niet te doen --
+   het zijn twee producten die toevallig dezelfde marktnaam dragen. Wie hier
+   iets aan de bestelkant zoekt, zit in het verkeerde bestand. */
 
 const KEUKENS = ['Mediterraans', 'Japans', 'Italiaans', 'Frans', 'Spaans (tapas)', 'Visrestaurant', 'Steakhouse', 'Fusion', 'Vegetarisch', 'Grill'];
 const PRIJZEN = ['€€', '€€€', '€€€€'];

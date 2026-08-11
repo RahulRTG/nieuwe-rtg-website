@@ -74,6 +74,15 @@
       "werkplekkenBijLogin",
       "wisselCodeIn"
     ],
+    "avond": [
+      "favLijst",
+      "findSupplier",
+      "liveCodename",
+      "reisBoek",
+      "reisPlan",
+      "reserveerTafel",
+      "zorgVoor"
+    ],
     "baby": [
       "baby"
     ],
@@ -186,6 +195,16 @@
     "fout": [],
     "galerij": [
       "galerij"
+    ],
+    "gast": [
+      "findSupplier",
+      "haversine",
+      "horecaFolioBoek",
+      "horecaFolioVan",
+      "logActivity",
+      "noteFailedTry",
+      "sseToSupplier",
+      "tooManyTries"
     ],
     "gebouw": [
       "gebouw",
@@ -1433,7 +1452,6 @@
       "hasCred",
       "haversine",
       "horeca",
-      "horecaBereidingsMinuten",
       "horecaBord",
       "horecaFolioBoek",
       "horecaPubliek",

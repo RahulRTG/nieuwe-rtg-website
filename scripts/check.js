@@ -681,6 +681,12 @@ console.log('\n16) elk leden-pad met een derde partij gaat langs de gegevenspoor
     ['/api/member/rechterhand/logboek/regel', 'idem: een onderhoudsregel bij eigen bezit'],
     ['/api/member/rechterhand/logboek/regel/weg', 'idem'],
     ['/api/tickets/aanbod', 'het aanbod bekijken; er gebeurt nog niets'],
+    /* De gastkant van de horeca. Bestellen loopt WEL door de poort (zie
+       routes/gast/bezorgen.js); deze twee delen niets: een kaart lezen is het
+       aanbod bekijken, en je eigen lopende bestelling teruglezen geeft de zaak
+       geen gegeven dat hij niet al had. */
+    ['/api/gast/bezorg/kaart', 'de kaart van een zaak lezen; er wordt niets gedeeld en er gebeurt nog niets'],
+    ['/api/gast/bezorg/rekening', 'je eigen lopende bestelling teruglezen; de zaak krijgt hier niets nieuws'],
     ['/api/verhuur/aanbod', 'het aanbod bekijken; er gebeurt nog niets'],
     ['/api/verkoop/showroom', 'de showroom bekijken; er gebeurt nog niets'],
     ['/api/verblijf/deur', 'je bent al ingecheckt: dit opent je eigen kamerdeur'],
@@ -1557,8 +1563,14 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
      alleen als middleware: server/meetpoort.js weigert met 404 tenzij het
      metrics-token klopt of het verzoek van een intern adres komt. Hij kwam
      erbij toen de sonde een tweede endpoint met precies die eis kreeg. */
+  /* `gastAuth` (routes/gast.js) hoort in deze rij en is geen uitzondering: hij
+     zoekt de tafelsleutel op, weigert met 401 als die niet bij een OPEN
+     rekening hoort, en zet pas daarna req.gast. Dat is precies wat de andere
+     namen hier doen -- alleen is het bewijs een sleutel van de tafel in plaats
+     van een sessie van een account, omdat een gast aan tafel 12 geen lid hoeft
+     te zijn. */
   const POORT_MW = new Set(['auth', 'supplierAuth', 'officeAuth', 'techAuth', 'boardroomAuth',
-    'huisAuth', 'baasAuth', 'lid', 'geenGast', 'eigenaarAlleen', 'meetpoort',
+    'huisAuth', 'baasAuth', 'lid', 'geenGast', 'eigenaarAlleen', 'meetpoort', 'gastAuth',
     /* de gezinsdeur van het RTFoundation-huis (gezinscode + profieltoken, gasten
        erbuiten). Stond eerst als aanroep BINNEN de handler; is middleware geworden
        toen die routes zichtbaar werden, zodat bij elke route staat welke deur hij
@@ -1578,6 +1590,13 @@ console.log('\n28) elke API-route heeft een poort (of staat met reden op de publ
     ['/api/auth/forgot', 'wachtwoord vergeten: wie buitengesloten is heeft geen token'],
     ['/api/pin/herstel', 'pin vergeten: de eenmalige sleutel uit de mail IS het bewijs, net als bij /api/auth/reset'],
     ['/api/aanmelding/aanvraag', 'een aanstaande aanvrager is nog geen lid (met rem per ip)'],
+    /* De twee gastendeuren. Hier KAN nog geen tafelsleutel zijn: die ontstaat
+       pas bij het aanschuiven, en het bewijs dat iemand aan tafel 12 zit is de
+       QR op die tafel. Het token is dus de credential en geen gemakje -- het is
+       negen bytes willekeur, het staat gehasht in de opslag, en beide routes
+       hebben een rem per ip die bij een misser oploopt. */
+    ['/api/gast/tafel', 'de QR op tafel IS het bewijs; een gast is vaak geen lid (met rem per ip)'],
+    ['/api/gast/aanschuiven', 'aanschuiven maakt de tafelsessie die alle andere gastroutes eist (met rem per ip)'],
     ['/api/supplier/apply', 'solliciteren bij een zaak kan zonder account'],
     ['/api/supplier/staff/join', 'personeel meldt zich aan met een uitnodigingscode'],
     ['/api/werving/kijk', 'wie een wervingslink krijgt heeft nog geen account; toont alleen de bedrijfsnaam en de functie, met een rem per ip'],

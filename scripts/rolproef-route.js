@@ -154,7 +154,15 @@ async function wacht(basis, ms) {
       'Een route die hier NIET in staat is niet beproefd -- dat is ongemeten en geen groen. ' +
       'Zie scripts/lib/rolproef.js voor wat de proef wel en niet uitsluit.',
     gemeten: { routesMetRol: routes.length, beproefd: perRoute.length, pogingen: uit.pogingen,
-      aclOpen: open.length, privacyLek: lek.length, begrenzing: MAX },
+      aclOpen: open.length, privacyLek: lek.length,
+      /* Blijvende wijziging na afloop: een handler die eerst schrijft en daarna
+         pas de rechten controleert, geeft keurig 403 terug terwijl de mutatie al
+         is gebeurd. De statuscode klopt dan en de database niet. */
+      zijeffecten: uit.bevindingen.gewijzigd.length,
+      /* Een ronde waarin de vingerafdruk blind was, telt niet als schoon maar
+         als NIET GEMETEN -- zie de ijking in lib/rolproef.js. */
+      blindeRondes: uit.bevindingen.meterStuk ? 1 : 0,
+      begrenzing: MAX },
     perRoute
   }, null, 1) + '\n');
   console.log('\n  weggeschreven in ROLPROEF.json');

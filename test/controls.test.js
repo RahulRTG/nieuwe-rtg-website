@@ -25,7 +25,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('fs');
 const path = require('path');
-const { verzamel, duidUitslag, staatVan, VELDEN, BRONNEN } = require('../scripts/controls');
+const { verzamel, duidUitslag, staatVan, leesDekking, uitPad, VELDEN, BRONNEN } = require('../scripts/controls');
 
 const WORTEL = path.join(__dirname, '..');
 const controls = verzamel();
@@ -152,6 +152,60 @@ test('de lokale keten claimt niet wat alleen een anker kan zien', () => {
   assert.match(k.grens, /VERANKERD/);
 });
 
+/* ---------- de noemer: groen zonder x/y bestaat niet ---------- */
+
+test('elke control verklaart WAAR zijn dekking staat', () => {
+  /* ROL-SCHEIDING stond GROEN op "0 doorbraken". Waar, en bij een snelle blik
+     groter dan het bewijs: er waren 1000 van de 3985 routes geprobeerd. Elke
+     control hier meet een deelverzameling, dus elke control hoort zijn noemer
+     te tonen. */
+  for (const c of controls) {
+    assert.ok(c.dekking, c.control + ' verklaart geen dekking; dan leest zijn groen als een uitspraak over het geheel');
+    assert.ok(c.dekking.eenheid && c.dekking.eenheid.length > 3,
+      c.control + ' noemt geen eenheid -- "12 / 40" zonder waarvan zegt niets');
+  }
+});
+
+test('de dekking wordt UIT HET REGISTER gelezen en niet door de control opgeschreven', () => {
+  for (const c of controls) {
+    const d = leesDekking(c.dekking);
+    assert.ok(d && !d.stuk, c.control + ': ' + ((d && d.stuk) || 'geen dekking te lezen'));
+    assert.equal(typeof d.beproefd, 'number');
+    assert.equal(typeof d.totaal, 'number');
+    assert.ok(d.beproefd <= d.totaal,
+      c.control + ' beweert ' + d.beproefd + ' van ' + d.totaal + ' -- meer beproefd dan er bestaat');
+    assert.ok(d.totaal > 0, c.control + ' heeft een noemer van nul; dan is elk percentage onzin');
+  }
+});
+
+test('een teller die niet in het register staat, wordt niet stilletjes nul', () => {
+  /* Nul is de geruststellendste manier om "ik weet het niet" te zeggen. */
+  const d = leesDekking({ register: 'ROLPROEF.json', beproefd: 'gemeten.beproefd',
+    totaal: 'gemeten.routesMetRol', eenheid: 'routes', tellers: { verzonnen: 'gemeten.bestaatNiet' } });
+  assert.equal(d.tellers.verzonnen, null);
+});
+
+test('een dekking die naar een onbestaand register wijst, meldt zich als stuk', () => {
+  const d = leesDekking({ register: 'BESTAATNIET.json', beproefd: 'a', totaal: 'b', eenheid: 'x' });
+  assert.match(d.stuk, /niet te lezen/);
+});
+
+test('uitPad leest een getal uit een pad en geeft niets terug bij onzin', () => {
+  assert.equal(uitPad({ a: { b: 3 } }, 'a.b'), 3);
+  assert.equal(uitPad({ a: { b: 3 } }, 'a.c'), null);
+  assert.equal(uitPad({ a: 'tekst' }, 'a'), null, 'een tekst is geen teller');
+  assert.equal(uitPad({}, 12), 12, 'een vast getal mag, voor een noemer die nergens geteld wordt');
+});
+
+test('de rolproef toont de vier tellers die bij zijn oordeel horen', () => {
+  const c = controls.find(x => x.control === 'ROL-SCHEIDING');
+  const d = leesDekking(c.dekking);
+  for (const t of ['doorbraken', 'lekken', 'zijeffecten', 'blindeRondes']) {
+    assert.equal(typeof d.tellers[t], 'number',
+      'ROL-SCHEIDING mist de teller ' + t + '; nul doorbraken zonder nul blinde rondes zegt niets');
+  }
+});
+
 /* ---------- het vastgelegde register ---------- */
 
 test('CONTROLS.json is gemeten en niet opgeschreven', () => {
@@ -163,6 +217,8 @@ test('CONTROLS.json is gemeten en niet opgeschreven', () => {
     if (c.laatstGroen.staat === 'GROEN') {
       assert.ok(c.laatstGroen.at, c.control + ' staat groen zonder tijdstempel; dan is "recent bewezen" niet te zien');
       assert.ok(c.laatstGroen.beweringen > 0, c.control + ' staat groen op nul beweringen');
+      assert.ok(c.dekking && typeof c.dekking.beproefd === 'number',
+        c.control + ' staat GROEN in het register zonder noemer -- dat is precies wat groter leest dan het bewijs');
     }
   }
 });

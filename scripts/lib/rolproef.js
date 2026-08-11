@@ -232,6 +232,10 @@ const CONTROL = {
   eigenaar: 'Security',
   bewijs: ['test/rolproef.test.js'],
   bewijsstuk: 'ROLPROEF.json -- per route welke verkeerde rollen zijn geprobeerd',
+  dekking: { register: 'ROLPROEF.json', beproefd: 'gemeten.beproefd',
+    totaal: 'gemeten.routesMetRol', eenheid: 'schrijfroutes met een rol',
+    tellers: { doorbraken: 'gemeten.aclOpen', lekken: 'gemeten.privacyLek',
+      zijeffecten: 'gemeten.zijeffecten', blindeRondes: 'gemeten.blindeRondes' } },
   grens: 'meet twee foutklassen op SCHRIJFroutes: binnenkomen met de verkeerde rol, en een ' +
     'weigering die gegevens meegeeft. Twee leden met DEZELFDE rol die bij elkaars dossier ' +
     'kunnen (een IDOR) valt hier niet onder; leesroutes worden niet geprobeerd.'

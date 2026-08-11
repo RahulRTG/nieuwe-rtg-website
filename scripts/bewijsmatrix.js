@@ -357,7 +357,10 @@ const CONTROL = {
   wat: 'per route is vastgelegd welke van de elf schakels bewezen is en door wie',
   eigenaar: 'Techniek',
   bewijs: ['test/bewijsmatrix.test.js'],
-  bewijsstuk: 'BEWIJSMATRIX.json -- 43835 cellen, met bron per bewezen cel',
+  bewijsstuk: 'BEWIJSMATRIX.json -- elf schakels per route, met bron per bewezen cel',
+  dekking: { register: 'BEWIJSMATRIX.json', beproefd: 'telling.bewezen',
+    totaal: 'cellen', eenheid: 'cellen',
+    tellers: { ongemeten: 'telling.ongemeten', gezakt: 'telling.gezakt' } },
   grens: 'het register MEET niets zelf; het verzamelt wat andere instrumenten meten. ' +
     'Vier van de elf kolommen hebben vandaag een instrument, zeven staan leeg.'
 };

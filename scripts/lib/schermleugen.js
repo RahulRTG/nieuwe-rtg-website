@@ -85,6 +85,9 @@ const CONTROL = {
   eigenaar: 'Techniek',
   bewijs: ['test/schermleugen.test.js', 'test/liegend-scherm.e2e.js'],
   bewijsstuk: 'SCHERMLEUGEN.json -- de gemeten schuld per scherm',
+  dekking: { register: 'SCHERMLEUGEN.json', beproefd: 'gemeten.schermen',
+    totaal: 242, eenheid: 'schermen',
+    tellers: { schermenMetKlacht: 'gemeten.metKlacht', klachten: 'gemeten.klachten' } },
   grens: 'gemeten op zes ledenschermen van de 242, en alleen op een LEEG antwoord. ' +
     'Een backend die iets VERKEERDS antwoordt in plaats van niets, wordt hier niet betrapt.'
 };

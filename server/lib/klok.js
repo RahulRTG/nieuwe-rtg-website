@@ -104,6 +104,9 @@ const CONTROL = {
   eigenaar: 'Techniek',
   bewijs: ['test/klok.test.js'],
   bewijsstuk: 'KLOK.json -- hoeveel code nog buiten de tijdmachine staat',
+  dekking: { register: 'KLOK.json', beproefd: 'gemeten.modulesOpDeKlok',
+    totaal: 'gemeten.bestanden', eenheid: 'modules die de tijd vragen',
+    tellers: { directeTijdsaanroepen: 'gemeten.totaal' } },
   grens: 'alleen code die DEZE klok gebruikt is te verzetten. KLOK.json staat op 1298 ' +
     'directe tijdsaanroepen: een tijdproef bewijst dus iets over de modules op de klok, ' +
     'niet over de hele server.'

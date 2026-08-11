@@ -163,6 +163,12 @@ const CONTROL = {
   eigenaar: 'Security',
   bewijs: ['test/keten.test.js'],
   bewijsstuk: 'de ketenhash van het journaal (inzagelog.ketenTop())',
+  /* EEN JOURNAAL VAN DE VIER. livingLab.audit, securityLog en de boardroom-rij
+     hangen er nog niet aan; die noemer hoort in beeld te staan en niet in een
+     voetnoot. Handmatig geteld omdat er geen register is dat auditjournalen
+     opsomt -- dat is zelf een gat, en het staat hier als getal in plaats van
+     als indruk. */
+  dekking: { beproefd: 1, totaal: 4, eenheid: 'auditjournalen aan de keten' },
   grens: 'ziet uitsluitend wat er BINNEN het overgebleven journaal niet klopt. Wie de ' +
     'NIEUWSTE regels weggooit, houdt een perfect kloppende keten over -- sporen wissen ' +
     'van wat je zojuist deed valt hier dus niet op. Daarvoor is AUDIT-KETEN-VERANKERD ' +

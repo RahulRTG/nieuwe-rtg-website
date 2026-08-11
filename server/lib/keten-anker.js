@@ -90,6 +90,7 @@ const CONTROL = {
   eigenaar: 'Security',
   bewijs: ['test/keten.test.js'],
   bewijsstuk: 'inzagelog.anker() -- de momentopname die weggezet moet worden',
+  dekking: { beproefd: 0, totaal: 4, eenheid: 'auditjournalen met een extern anker' },
   grens: 'ONTWORPEN, NIET IN BEDRIJF. Het mechanisme is bewezen (een ingekorte kop en ' +
     'een herschreven regel worden tegen een anker allebei betrapt), maar er wordt nergens ' +
     'een anker weggezet. Zonder bestemming buiten deze database beschermt dit niets.',

@@ -16,12 +16,19 @@
         "test/keten.test.js"
       ],
       "bewijsstuk": "de ketenhash van het journaal (inzagelog.ketenTop())",
+      "dekking": {
+        "beproefd": 1,
+        "totaal": 4,
+        "eenheid": "auditjournalen aan de keten",
+        "tellers": {},
+        "pct": 25
+      },
       "grens": "ziet uitsluitend wat er BINNEN het overgebleven journaal niet klopt. Wie de NIEUWSTE regels weggooit, houdt een perfect kloppende keten over -- sporen wissen van wat je zojuist deed valt hier dus niet op. Daarvoor is AUDIT-KETEN-VERANKERD nodig, en die is nog niet in bedrijf.",
       "laatstGroen": {
         "staat": "GROEN",
         "beweringen": 30,
         "overgeslagen": 0,
-        "at": "2026-08-11T23:00:19.116Z",
+        "at": "2026-08-11T23:11:45.808Z",
         "bestanden": [
           "test/keten.test.js"
         ]
@@ -36,13 +43,20 @@
         "test/keten.test.js"
       ],
       "bewijsstuk": "inzagelog.anker() -- de momentopname die weggezet moet worden",
+      "dekking": {
+        "beproefd": 0,
+        "totaal": 4,
+        "eenheid": "auditjournalen met een extern anker",
+        "tellers": {},
+        "pct": 0
+      },
       "grens": "ONTWORPEN, NIET IN BEDRIJF. Het mechanisme is bewezen (een ingekorte kop en een herschreven regel worden tegen een anker allebei betrapt), maar er wordt nergens een anker weggezet. Zonder bestemming buiten deze database beschermt dit niets.",
       "inBedrijf": false,
       "laatstGroen": {
         "staat": "NIET IN BEDRIJF",
         "beweringen": 30,
         "overgeslagen": 0,
-        "at": "2026-08-11T23:00:19.373Z",
+        "at": "2026-08-11T23:11:46.017Z",
         "bestanden": [
           "test/keten.test.js"
         ],
@@ -59,12 +73,21 @@
         "test/klok.test.js"
       ],
       "bewijsstuk": "KLOK.json -- hoeveel code nog buiten de tijdmachine staat",
+      "dekking": {
+        "beproefd": 2,
+        "totaal": 659,
+        "eenheid": "modules die de tijd vragen",
+        "tellers": {
+          "directeTijdsaanroepen": 1298
+        },
+        "pct": 0.3
+      },
       "grens": "alleen code die DEZE klok gebruikt is te verzetten. KLOK.json staat op 1298 directe tijdsaanroepen: een tijdproef bewijst dus iets over de modules op de klok, niet over de hele server.",
       "laatstGroen": {
         "staat": "GROEN",
         "beweringen": 18,
         "overgeslagen": 0,
-        "at": "2026-08-11T23:00:21.370Z",
+        "at": "2026-08-11T23:11:47.893Z",
         "bestanden": [
           "test/klok.test.js"
         ]
@@ -80,12 +103,22 @@
         "test/liegend-scherm.e2e.js"
       ],
       "bewijsstuk": "SCHERMLEUGEN.json -- de gemeten schuld per scherm",
+      "dekking": {
+        "beproefd": 6,
+        "totaal": 242,
+        "eenheid": "schermen",
+        "tellers": {
+          "schermenMetKlacht": 0,
+          "klachten": 0
+        },
+        "pct": 2.5
+      },
       "grens": "gemeten op zes ledenschermen van de 242, en alleen op een LEEG antwoord. Een backend die iets VERKEERDS antwoordt in plaats van niets, wordt hier niet betrapt.",
       "laatstGroen": {
         "staat": "GROEN",
         "beweringen": 18,
         "overgeslagen": 0,
-        "at": "2026-08-11T23:00:49.274Z",
+        "at": "2026-08-11T23:12:15.839Z",
         "bestanden": [
           "test/schermleugen.test.js",
           "test/liegend-scherm.e2e.js"
@@ -101,12 +134,24 @@
         "test/rolproef.test.js"
       ],
       "bewijsstuk": "ROLPROEF.json -- per route welke verkeerde rollen zijn geprobeerd",
+      "dekking": {
+        "beproefd": 1000,
+        "totaal": 2937,
+        "eenheid": "schrijfroutes met een rol",
+        "tellers": {
+          "doorbraken": 0,
+          "lekken": 0,
+          "zijeffecten": 0,
+          "blindeRondes": 0
+        },
+        "pct": 34
+      },
       "grens": "meet twee foutklassen op SCHRIJFroutes: binnenkomen met de verkeerde rol, en een weigering die gegevens meegeeft. Twee leden met DEZELFDE rol die bij elkaars dossier kunnen (een IDOR) valt hier niet onder; leesroutes worden niet geprobeerd.",
       "laatstGroen": {
         "staat": "GROEN",
         "beweringen": 13,
         "overgeslagen": 0,
-        "at": "2026-08-11T23:00:49.471Z",
+        "at": "2026-08-11T23:12:16.027Z",
         "bestanden": [
           "test/rolproef.test.js"
         ]
@@ -120,13 +165,23 @@
       "bewijs": [
         "test/bewijsmatrix.test.js"
       ],
-      "bewijsstuk": "BEWIJSMATRIX.json -- 43835 cellen, met bron per bewezen cel",
+      "bewijsstuk": "BEWIJSMATRIX.json -- elf schakels per route, met bron per bewezen cel",
+      "dekking": {
+        "beproefd": 5983,
+        "totaal": 43835,
+        "eenheid": "cellen",
+        "tellers": {
+          "ongemeten": 37592,
+          "gezakt": 0
+        },
+        "pct": 13.6
+      },
       "grens": "het register MEET niets zelf; het verzamelt wat andere instrumenten meten. Vier van de elf kolommen hebben vandaag een instrument, zeven staan leeg.",
       "laatstGroen": {
         "staat": "GROEN",
         "beweringen": 11,
         "overgeslagen": 0,
-        "at": "2026-08-11T23:00:49.652Z",
+        "at": "2026-08-11T23:12:16.216Z",
         "bestanden": [
           "test/bewijsmatrix.test.js"
         ]

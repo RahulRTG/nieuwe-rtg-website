@@ -52,7 +52,45 @@ const BRONNEN = [
   'scripts/bewijsmatrix.js'
 ];
 
-const VELDEN = ['control', 'wat', 'eigenaar', 'bewijs', 'bewijsstuk', 'grens'];
+const VELDEN = ['control', 'wat', 'eigenaar', 'bewijs', 'bewijsstuk', 'grens', 'dekking'];
+
+/* ---------------------------------------------------------------------------
+   DE NOEMER, en waarom hij verplicht is.
+
+   ROL-SCHEIDING stond GROEN op "0 doorbraken". Waar en geruststellend -- en bij
+   een snelle blik groter dan het bewijs, want er waren 1000 van de 3985 routes
+   geprobeerd. Datzelfde geldt voor alle andere: UI-WAARHEID meet 6 van de 242
+   schermen, TIJD-KLOK 2 van de 662 modules die de tijd vragen. Een control die
+   een deelverzameling meet en alleen zijn uitkomst toont, leest als een
+   uitspraak over het geheel.
+
+   Dus staat er nooit meer GROEN zonder "x / y". De teller komt UIT HET REGISTER
+   van de control zelf en niet uit zijn eigen verklaring: een control die zijn
+   dekking mag opschrijven, schrijft hem te hoog op. De declaratie wijst alleen
+   aan WAAR het getal staat; het getal wordt gelezen.
+   ------------------------------------------------------------------------- */
+function uitPad(obj, pad) {
+  if (typeof pad === 'number') return pad;
+  let v = obj;
+  for (const k of String(pad).split('.')) { if (v == null) return null; v = v[k]; }
+  return typeof v === 'number' ? v : null;
+}
+
+function leesDekking(d) {
+  if (!d) return null;
+  let reg = {};
+  if (d.register) {
+    try { reg = JSON.parse(fs.readFileSync(path.join(WORTEL, d.register), 'utf8')); }
+    catch (e) { return { stuk: 'register ' + d.register + ' niet te lezen' }; }
+  }
+  const beproefd = uitPad(reg, d.beproefd);
+  const totaal = uitPad(reg, d.totaal);
+  if (beproefd == null || totaal == null) return { stuk: 'de dekking wijst naar een getal dat er niet staat' };
+  const tellers = {};
+  for (const [naam, pad] of Object.entries(d.tellers || {})) tellers[naam] = uitPad(reg, pad);
+  return { beproefd, totaal, eenheid: d.eenheid, tellers,
+    pct: totaal ? Math.round(beproefd / totaal * 1000) / 10 : 0 };
+}
 
 /* DE DERDE STAND, en hij is er gekomen doordat dit register de fout maakte die
    het moest voorkomen.
@@ -131,7 +169,7 @@ function duidUitslag(uitvoer) {
   return { staat: 'GROEN', beweringen: geslaagd, overgeslagen };
 }
 
-module.exports = { verzamel, duidUitslag, staatVan, VELDEN, BRONNEN };
+module.exports = { verzamel, duidUitslag, staatVan, leesDekking, uitPad, VELDEN, BRONNEN };
 if (require.main !== module) return;
 
 const controls = verzamel();
@@ -173,7 +211,7 @@ if (!VASTLEGGEN && !JSONUIT) {
 }
 
 /* Meten kost tijd (de toetsen draaien echt), dus alleen bij --vastleggen/--json. */
-const gemeten = goed.map(c => ({ ...c, laatstGroen: staatVan(c, meet(c.bewijs)) }));
+const gemeten = goed.map(c => ({ ...c, dekking: leesDekking(c.dekking), laatstGroen: staatVan(c, meet(c.bewijs)) }));
 /* NIET IN BEDRIJF is geen mislukking maar ook geen bewijs: hij telt apart, zodat
    de uitslag van dit script niet rood staat om een control die eerlijk zegt dat
    hij er nog niet is -- en tegelijk niet meetelt als dekking. */
@@ -196,8 +234,22 @@ if (JSONUIT) { console.log(JSON.stringify(stand, null, 1)); process.exit(0); }
 fs.writeFileSync(UITSLAG, JSON.stringify(stand, null, 2) + '\n');
 console.log('\n  gemeten en vastgelegd in CONTROLS.json:');
 for (const c of gemeten) {
-  console.log('    ' + String(c.control).padEnd(24) + String(c.laatstGroen.staat).padEnd(16) +
-    (c.laatstGroen.beweringen ? '  (' + c.laatstGroen.beweringen + ' beweringen)' : '') +
-    (c.laatstGroen.reden ? '  -- ' + c.laatstGroen.reden : ''));
+  const d = c.dekking;
+  console.log('\n    ' + c.control + '   ' + c.laatstGroen.staat +
+    (c.laatstGroen.beweringen ? '   (' + c.laatstGroen.beweringen + ' beweringen)' : ''));
+  if (d && !d.stuk) {
+    console.log('      ' + 'BEPROEFD '.padEnd(22, '.') + ' ' + d.beproefd + ' / ' + d.totaal +
+      '  ' + d.eenheid + '   (' + d.pct + '%)');
+    for (const [naam, w] of Object.entries(d.tellers || {})) {
+      /* Een teller die er niet is, toont ONGEMETEN en niet 0 -- dat is precies
+         het verschil waar dit hele register over gaat, en nul is de
+         geruststellendste manier om het verkeerd te zeggen. */
+      console.log('      ' + (naam.toUpperCase() + ' ').padEnd(22, '.') + ' ' +
+        (w == null ? 'ONGEMETEN (staat niet in het register)' : w));
+    }
+  } else if (d && d.stuk) {
+    console.log('      BEPROEFD   ONBEKEND -- ' + d.stuk);
+  }
+  if (c.laatstGroen.reden) console.log('      ' + c.laatstGroen.reden);
 }
 process.exit(nietGroen.length || stuk.length || onvolledig.length ? 1 : 0);

@@ -55,6 +55,18 @@ Elke nieuwe control levert daarom een regel met:
 | `laatstGroen` | wanneer het bewijs voor het laatst is gedraaid | ISO-tijdstempel |
 | `bewijsstuk` | het naslagbare artefact | ketenhash, buildhash, registerregel |
 | `grens` | wat deze control **niet** aantoont | stopt stille wijziging, geen vastberaden beheerder |
+| `dekking` | waar de **noemer** staat: hoeveel van hoeveel | `1000 / 2937 schrijfroutes` |
+
+**Er staat nooit GROEN zonder noemer.** ROL-SCHEIDING meldde "0 doorbraken" —
+waar, en bij een snelle blik groter dan het bewijs: er waren 1000 van de 2937
+schrijfroutes geprobeerd. Elke control hier meet een deelverzameling, dus elke
+control toont `x / y` met de eenheid erbij. De teller komt **uit het register
+van de control zelf**, niet uit zijn eigen verklaring: een control die zijn
+dekking mag opschrijven, schrijft hem te hoog op. De declaratie wijst alleen aan
+wáár het getal staat.
+
+Een teller die niet in het register staat, toont `ONGEMETEN` en niet `0` — nul
+is de geruststellendste manier om "ik weet het niet" te zeggen.
 
 Het veld `grens` is verplicht en niet optioneel. Een control zonder
 opgeschreven grens wordt bij het mappen naar een eis onvermijdelijk te ruim

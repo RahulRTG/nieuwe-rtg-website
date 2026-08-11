@@ -3735,6 +3735,18 @@ var RTG_BOUW = '3f9d2cdc';
     });
     belScrim.classList.add('open');
   }
+/* ---------- Mappen, gebruik en het bouwen van de tegels ----------
+
+   Afgesplitst van app-main-25.js toen die over de 10 kB ging. Let op de VORM
+   van deze knip: de bundel plakt de delen rauw aaneen en app-main-25.js eindigt
+   MIDDEN in een functie (tegelInhoud loopt door in 26). Een blok uit het midden
+   verplaatsen zou de volgorde van de stroom veranderen -- dat is hier een keer
+   gebeurd, en toen belandde openWerkKiezer() binnen in tegelInhoud(). Regel 42
+   van de keuring ving dat meteen: "aangeroepen buiten de functie waarin hij
+   verklaard staat", op het scherm een lege bel.
+
+   Een deel van een bundel mag dus alleen aan de STAART worden afgeknipt, nooit
+   uit het midden. Wat hier staat is precies de staart van 25. */
   /* ---------- mappen: eigen namen ----------
      De naam van een map is van de gebruiker: hernoemen kan in de wiebel-modus
      (tik op de map) of via Rahul; de keuze staat per pas in localStorage. */

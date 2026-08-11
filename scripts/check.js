@@ -409,19 +409,11 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
        een tweede script bij dat overal mee moet. Dat doe je een voor een met de
        toetsen ernaast en niet in de staart van een ronde. */
     'public/shared/media.js',
-    /* Deze twee gingen erover door EEN regel die er moest komen: de Werk-kiezer
-       moest kunnen zien of een gekoppeld personeelslid manager is, want anders
-       landt de eigenaar van een zaak in de medewerkers-PDA in plaats van de
-       zaak-app (zie CONCERN.md). Allebei stonden ze al vlak onder de grens --
-       hetzelfde geval als media.js hierboven.
-
-       Ze horen in NOG en niet in MAG: er zit in allebei een echte naad.
-       eenaccount.js scheidt de SLEUTELBOS (rollen lezen, koppelen) van het
-       MUNTEN van een sessie; app-main-25 scheidt de algemene pin van de
-       Werk-kiezer. Allebei is het echte bedrading -- een module en een
-       bundeldeel dat overal mee moet -- en die doe je met de toetsen ernaast. */
-    'server/kern/eenaccount.js',
-    'public/apps/app-main/app-main-25.js',
+    /* server/kern/eenaccount.js en public/apps/app-main/app-main-25.js STONDEN
+       HIER en zijn er weer af: de naden die erbij benoemd stonden, zijn geknipt.
+       De sleutelbos en het MUNTEN van een sessie staan nu apart
+       (./eenaccount/starten.js), en de algemene pin is los van de Werk-kiezer
+       (app-main-25b.js). Zo hoort deze lijst te krimpen. */
     /* server/kern/aanmeldingen.js STOND HIER en is er weer af: de knip die hier
        met naam op de lijst stond, is gemaakt. Het klaarzetten van de zaak
        (provisioning plus de bewijsstap voor de gereguleerde genres) woont nu in

@@ -1,8 +1,8 @@
 {
   "uitleg": "Verklaarde beheersmaatregelen en wanneer elk voor het laatst BEWEZEN is. Zie TOEZICHT.md. laatstGroen is gemeten door de genoemde toetsen te draaien, niet overgeschreven -- een register dat zijn eigen groen opschrijft bewijst niets.",
   "gemeten": {
-    "controls": 6,
-    "groen": 5,
+    "controls": 7,
+    "groen": 6,
     "nietInBedrijf": 1,
     "nietGroen": 0
   },
@@ -28,7 +28,7 @@
         "staat": "GROEN",
         "beweringen": 30,
         "overgeslagen": 0,
-        "at": "2026-08-11T23:11:45.808Z",
+        "at": "2026-08-11T23:21:46.674Z",
         "bestanden": [
           "test/keten.test.js"
         ]
@@ -56,12 +56,39 @@
         "staat": "NIET IN BEDRIJF",
         "beweringen": 30,
         "overgeslagen": 0,
-        "at": "2026-08-11T23:11:46.017Z",
+        "at": "2026-08-11T23:21:46.892Z",
         "bestanden": [
           "test/keten.test.js"
         ],
         "mechanismeBewezen": true,
         "reden": "ontworpen en bewezen, maar niet in gebruik -- zie grens"
+      }
+    },
+    {
+      "bron": "server/lib/verraad.js",
+      "control": "VERRAADSMOTOR",
+      "wat": "het systeem is te beproeven op een wereld die liegt: database, klok, volgorde",
+      "eigenaar": "Techniek",
+      "bewijs": [
+        "test/verraad.test.js"
+      ],
+      "bewijsstuk": "de catalogus in dit bestand -- per verraad waar hij is ingebouwd",
+      "grens": "de motor MAAKT de vraag stelbaar en beantwoordt hem niet. Dat een verraad is ingebouwd zegt niets over hoe het systeem erop reageert; daarvoor moet een ronde draaien en die uitkomst is een bevinding, geen oordeel.",
+      "dekking": {
+        "beproefd": 3,
+        "totaal": 8,
+        "eenheid": "verraden ingebouwd in de code",
+        "tellers": {},
+        "pct": 37.5
+      },
+      "laatstGroen": {
+        "staat": "GROEN",
+        "beweringen": 20,
+        "overgeslagen": 0,
+        "at": "2026-08-11T23:21:47.818Z",
+        "bestanden": [
+          "test/verraad.test.js"
+        ]
       }
     },
     {
@@ -87,7 +114,7 @@
         "staat": "GROEN",
         "beweringen": 18,
         "overgeslagen": 0,
-        "at": "2026-08-11T23:11:47.893Z",
+        "at": "2026-08-11T23:21:49.944Z",
         "bestanden": [
           "test/klok.test.js"
         ]
@@ -118,7 +145,7 @@
         "staat": "GROEN",
         "beweringen": 18,
         "overgeslagen": 0,
-        "at": "2026-08-11T23:12:15.839Z",
+        "at": "2026-08-11T23:22:18.346Z",
         "bestanden": [
           "test/schermleugen.test.js",
           "test/liegend-scherm.e2e.js"
@@ -151,7 +178,7 @@
         "staat": "GROEN",
         "beweringen": 13,
         "overgeslagen": 0,
-        "at": "2026-08-11T23:12:16.027Z",
+        "at": "2026-08-11T23:22:18.545Z",
         "bestanden": [
           "test/rolproef.test.js"
         ]
@@ -181,7 +208,7 @@
         "staat": "GROEN",
         "beweringen": 11,
         "overgeslagen": 0,
-        "at": "2026-08-11T23:12:16.216Z",
+        "at": "2026-08-11T23:22:18.743Z",
         "bestanden": [
           "test/bewijsmatrix.test.js"
         ]

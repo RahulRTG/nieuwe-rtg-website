@@ -4185,6 +4185,14 @@
       "gezakt": 4,
       "scherp": "gezakt"
     },
+    "verraad.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/lib/verraad.js",
+      "operator": "true->false#0",
+      "gezakt": 4,
+      "geprobeerd": 1
+    },
     "vertaal.test.js": {
       "soort": "server",
       "staat": "gezakt",

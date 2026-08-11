@@ -46,6 +46,7 @@ const JSONUIT = argv.includes('--json');
 const BRONNEN = [
   'server/lib/keten.js',
   'server/lib/keten-anker.js',
+  'server/lib/verraad.js',
   'server/lib/klok.js',
   'scripts/lib/schermleugen.js',
   'scripts/lib/rolproef.js',

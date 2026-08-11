@@ -17,6 +17,7 @@
    Hier de load/save-orchestratie, het aanzetten van de opslag en het samenstellen
    van de publieke API. */
 const fs = require('fs');
+const verraad = require('../lib/verraad');
 const rtgjson = require('../lib/rtgjson');
 const seed = require('../seed');
 const kluis = require('../kluis'); // versleuteling-at-rest (met RTG_ENC_KEY)
@@ -122,6 +123,20 @@ async function bijeen(fn) {
 
 function save() {
   if (!db.writable) return;
+  /* DE VERRAADSMOTOR, op het ene punt waar alle schrijfacties doorheen gaan.
+
+     Zonder RTG_VERRAAD staat hier niets aan en kost het niets (twee
+     kaartopzoekingen op een Map die leeg is). Met `schrijf-verloren` keert deze
+     functie NORMAAL terug zonder iets te bewaren: de aanroeper krijgt zijn 200
+     en gelooft dat het vaststaat. Met `schrijf-faalt` gooit hij, zoals een
+     schijf die ruimte meldt en de schrijfactie alsnog laat mislukken -- een
+     aanroeper die dat stil wegvangt, meldt succes over niets.
+
+     Waarom hier en niet in een wikkel eromheen: een tweede opstartpad dat
+     alleen bij een proef wordt gebruikt, is een pad dat niemand draait. Zie
+     server/lib/verraad.js. */
+  if (verraad.sla('schrijf-faalt')) throw new Error('[verraad] de schrijfactie mislukte (schrijf-faalt)');
+  if (verraad.sla('schrijf-verloren')) return;
   const doos = bijeenContext.getStore();
   if (doos && doos.open) { doos.nodig = true; return; } // binnen bijeen: aan het eind, in een commit
   if (STORE === 'postgres') {

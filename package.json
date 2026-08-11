@@ -63,7 +63,8 @@
     "klok:vast": "node scripts/klok.js --vastleggen",
     "controls": "node scripts/controls.js",
     "controls:vast": "node scripts/controls.js --vastleggen",
-    "rolproef": "node --experimental-sqlite scripts/rolproef-route.js"
+    "rolproef": "node --experimental-sqlite scripts/rolproef-route.js",
+    "verraad": "node -e \"const v=require('./server/lib/verraad');for(const x of v.CATALOGUS)console.log((x.waar?'[ingebouwd] ':'[voornemen] ')+x.naam.padEnd(18)+x.wat)\""
   },
   "devDependencies": {
     "playwright": "^1.62.1"

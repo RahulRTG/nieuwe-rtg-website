@@ -104,6 +104,17 @@ module.exports = (sctx) => {
     if (b.status !== 'stemmen') return res.status(409).json({ error: 'Dit voorstel staat op ' + b.status + '.' });
     const t = telling(b);
     if (!b.stemmen.length) return res.status(409).json({ error: 'Er is niet gestemd. Een besluit zonder stemmen is geen besluit; de automaat neemt het hier niet over.' });
+    /* De bedrijfsregels (bedrijf/regelpoort.js) kunnen eisen dat er eerst namens
+       bepaalde rechten is goedgekeurd -- "een investeringsbesluit gaat niet
+       dicht zonder de CFO". Er wordt hier geen eigen wachtstand ingevoerd: het
+       besluit blijft gewoon in stemming staan, met de reden erbij. Late binding
+       via sctx, want regelpoort.js wordt voor dit bestand gemount. */
+    const regel = sctx.regelMagSluiten(g.w, b);
+    if (regel.ontbreekt.length) return res.status(409).json({
+      error: 'Een bedrijfsregel eist eerst goedkeuring namens ' + regel.ontbreekt.join(' en ') + '.',
+      ontbreekt: regel.ontbreekt,
+      let: 'Het besluit blijft in stemming staan. Goedkeuren gaat via /api/bedrijf/keur; een mens keurt daar één keer goed, dus twee rechten zijn ook echt twee mensen.' });
+
     const evalueerOp = schoon(req.body.evalueerOp, 10);
     const aangenomen = t.voor > t.tegen;
     if (aangenomen && !evalueerOp)
@@ -119,23 +130,9 @@ module.exports = (sctx) => {
       let: b.bezwaren.length ? 'De ' + b.bezwaren.length + ' bezwaar/bezwaren blijven bij dit besluit staan; bij de evaluatie is dat het eerste wat je wilt lezen.' : null });
   });
 
-  app.post('/api/bedrijf/besluiten', (req, res) => {
-    const g = werkPoort(req, res, 'besluit'); if (!g) return;
-    const rijen = Object.values(B(g.w))
-      .filter(b => !req.body.status || b.status === String(req.body.status))
-      .map(b => ({ id: b.id, titel: b.titel, soort: b.soort, status: b.status, eigenaar: b.eigenaar,
-        telling: telling(b), bezwaren: b.bezwaren.length, evalueerOp: b.evalueerOp,
-        evaluatieTeGaan: b.evalueerOp ? Math.round((Date.parse(b.evalueerOp) - Date.parse(dag())) / 86400000) : null }));
-    res.json({ ok: true, aantal: rijen.length, besluiten: rijen,
-      teEvalueren: rijen.filter(b => b.evaluatieTeGaan != null && b.evaluatieTeGaan <= 0) });
-  });
-
-  sctx.startBron('goedkeuringen', 'besluit', (g) => {
-    const alle = Object.values(B(g.w));
-    return { inAdvies: alle.filter(b => b.status === 'advies').length,
-      teStemmen: alle.filter(b => b.status === 'stemmen' && !b.stemmen.some(s => s.lidId === g.l.id)).length,
-      teEvalueren: alle.filter(b => b.evalueerOp && b.evalueerOp <= dag()).length };
-  });
+  /* De lijst en de startbron staan in ./besluitlijst.js -- dit bestand ging
+     over de 10 kB van keuringsregel 13, en de naad is echt: hier wordt besloten,
+     daar wordt geteld. */
 
   return { BESLUITSOORTEN: SOORTEN, BESLUITEN: B };
 };

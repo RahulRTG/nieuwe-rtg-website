@@ -41,14 +41,54 @@ const KAART = {
   vacature:     { app: '/apps/zakelijk.html', param: 'kans',  titel: 'Kansenbord',     deel: true },
   reis:         { app: '/apps/app.html',     param: 'reis',    titel: 'Reizen',        deel: true },
   zaak:         { app: '/apps/app.html',     param: 'zaak',    titel: 'Ter plaatse',   deel: true },
-  event:        { app: '/apps/podium.html',  param: 'event',   titel: 'Podium',        deel: true }
+  event:        { app: '/apps/podium.html',  param: 'event',   titel: 'Podium',        deel: true },
+  /* TWEE DINGEN HETEN VOERTUIG, EN DIT IS DE DUURZAME. Deze verwijzing wijst
+     naar een `mobAsset`: het voertuig zelf, met zijn papieren, dat er morgen
+     nog is. `db.data.ovVoertuigen` -- waar het objectregister van RTG Command
+     de soort `voertuig` op zet -- is iets anders: een LIVE positie met een
+     houdbaarheid van twee minuten, die verdwijnt zodra een chauffeur zijn
+     dienst beeindigt. Daar verwijzen zou een link opleveren die vrijwel altijd
+     dood is; daarom staat die soort hier niet.
+     `deel: false` -- een vlootscherm hangt achter de vervoerderdeur, en een
+     link die in een gesprek belandt bij iemand die er niet in kan, belooft iets
+     wat hij niet waarmaakt. */
+  voertuig:     { app: '/apps/voertuig.html', param: 'voertuig', titel: 'Voertuig',     deel: false },
+  /* En dezelfde afweging voor een rit. Ook hier twee betekenissen:
+     `db.data.rides` is de oudere rittenrij van de leverancierskant, de Mobility
+     OS werkt met OPDRACHTEN en die dragen een stabiele `ref`. Deze verwijzing
+     gaat over die laatste.
+     `deel: false` -- een rit is van EEN reiziger; /api/mob/mijn kent geen
+     parameter om die van een ander op te vragen, dus een link erheen in een
+     gesprek opent bij de ontvanger niets. */
+  rit:          { app: '/apps/rit.html',      param: 'rit',      titel: 'Rit',          deel: false }
 };
 
+/* TWEE VRAGEN, EN ZE ZIJN NIET DEZELFDE.
+
+   `vorm()` zegt of iets een geldige VERWIJZING is: klopt de bouw van
+   `rtg://<soort>/<id>`. `ontleed()` zegt bovendien of DIT HUIS die soort kent
+   -- of er dus een app is om heen te gaan.
+
+   Ze stonden eerst in één functie, en dat viel op zodra de werkruimtelaag een
+   ticket aan iets uit een andere app wilde hangen: een verwijzing naar een
+   soort die hier (nog) geen bestemming heeft, is niet ONGELDIG -- hij is
+   geldig en onbekend, en die twee horen een ander antwoord te krijgen.
+   Weigeren zou de gebruiker dwingen het dan maar in de vrije tekst te zetten,
+   en dan is de draad weg.
+
+   `ontleed()` doet nog precies wat hij deed; wie hem gebruikt merkt niets. */
+const VORM = /^rtg:\/\/([a-z]{3,20})\/([A-Za-z0-9_-]{1,64})$/;
+
+function vorm(ref) {
+  const m = VORM.exec(String(ref || ''));
+  return m ? { soort: m[1], id: m[2] } : null;
+}
+
 // `rtg://salon/ab12` -> { soort: 'salon', id: 'ab12' }, of null als het geen
-// geldige verwijzing is. Bewust streng: alles wat niet past is geen verwijzing.
+// geldige verwijzing is OF als deze soort hier geen bestemming heeft.
 function ontleed(ref) {
-  const m = /^rtg:\/\/([a-z]{3,20})\/([A-Za-z0-9_-]{1,64})$/.exec(String(ref || ''));
-  return m && KAART[m[1]] ? { soort: m[1], id: m[2] } : null;
+  const d = vorm(ref);
+  return d && KAART[d.soort] ? d : null;
 }
 
 /* Waar moet ik heen om dit te openen? Geeft null bij een onbekende verwijzing
@@ -101,4 +141,4 @@ function naarGesprek(codenaam, bij) {
   return url;
 }
 
-module.exports = { KAART, MODUS_LADE, ontleed, open, magDelen, naarGesprek, ladeVoorModus };
+module.exports = { KAART, MODUS_LADE, vorm, ontleed, open, magDelen, naarGesprek, ladeVoorModus };

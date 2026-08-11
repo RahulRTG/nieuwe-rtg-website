@@ -26,5 +26,15 @@ module.exports = {
     'Sommige spellen hebben een leeftijdspoort; dat regelt de app automatisch netjes voor je.'),
   '/apps/scherm.html': G('Het gedeelde scherm: een lopend potje op de televisie, voor iedereen in de kamer.',
     ['Open een potje in de app en kies "Op het grote scherm"', 'Typ de code hier over', 'Iedereen speelt gewoon op zijn eigen telefoon'],
-    'Dit scherm kijkt alleen mee: het heeft geen inlog en toont nooit iemands eigen kaarten of letters.')
+    'Dit scherm kijkt alleen mee: het heeft geen inlog en toont nooit iemands eigen kaarten of letters.'),
+  '/apps/voertuig.html': G('RTG Voertuig: een voertuig uit uw vloot, met zijn papieren en of hij vandaag mag rijden.',
+    ['Open er een uit de vloot, of rechtstreeks met een adres (?voertuig=id)',
+      'Lees of hij inzetbaar is -- en zo niet, om welke reden precies',
+      'Zie welke verplichte papieren er zijn en welke bijna aflopen'],
+    'Een verplicht document zonder geldige einddatum telt hier als ONGELDIG en niet als "vast wel in orde": een grens die bij twijfel doorlaat, is geen grens.'),
+  '/apps/rit.html': G('RTG Rit: een van uw eigen ritten, van aanvraag tot afrekening.',
+    ['Kies een rit, of open er een rechtstreeks met een adres (?rit=ref)',
+      'Lees de route, de tijden en wat hij kost',
+      'Zie welke vervoerder, welk voertuig en welke chauffeur eraan hangen'],
+    '"Nog niet toegewezen" is een echte stand en geen ontbrekend gegeven: een rit wordt aangevraagd voordat er een auto aan hangt.')
 };

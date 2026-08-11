@@ -91,11 +91,15 @@
     ],
     "bedrijf": [
       "agenda",
+      "assetBeeld",
+      "assetMet",
       "bedrijf",
       "bestanden",
       "eigenaar",
+      "findSupplier",
       "rtmailTeam",
-      "rtmailVak"
+      "rtmailVak",
+      "werkplekken"
     ],
     "bestanden": [
       "bestanden"

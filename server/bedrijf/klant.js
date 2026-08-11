@@ -103,11 +103,12 @@ module.exports = (sctx) => {
     const ka = { id: rid(5), klantId: k.id, klant: k.naam, titel,
       product: PRODUCTEN.includes(String(req.body.product)) ? String(req.body.product) : null,
       bedragCenten: req.body.bedrag != null ? centen(req.body.bedrag) : 0,
-      fase: 'lead', eigenaar: schoon(req.body.eigenaar, 60) || g.l.naam,
+      fase: 'lead',
       verwacht: schoon(req.body.verwacht, 10) || null, historie: [], at: nu() };
+    const eig = sctx.zetWie(g.w, ka, 'eigenaar', schoon(req.body.eigenaar, 60) || g.l.naam);
     KA(g.w)[ka.id] = ka;
     save();
-    res.json({ ok: true, kans: ka, fasen: FASEN });
+    res.json({ ok: true, kans: ka, fasen: FASEN, eigenaarLet: eig.reden });
   });
 
   app.post('/api/bedrijf/kans/fase', (req, res) => {

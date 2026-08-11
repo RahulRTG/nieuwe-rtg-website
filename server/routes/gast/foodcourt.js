@@ -8,10 +8,10 @@
 'use strict';
 
 module.exports = (kern) => {
-  const { app, auth, schoon, findSupplier, foodcourtlaag } = kern;
+  const { app, auth, schoon, findSupplier, foodcourtlaag, naad } = kern;
 
-  const handleVan = (req) => (req.session.account && req.session.account.codename)
-    || ('lid-' + String(req.session.key || '').slice(-6));
+  // dezelfde handle als bij bezorgen: zie kern/gast/naad.js
+  const handleVan = naad.handleVanReq;
   const naamVan = (code) => { const s = findSupplier(code); return s ? s.name : code; };
 
   /* ---------- bestellen bij meer loketten ---------- */

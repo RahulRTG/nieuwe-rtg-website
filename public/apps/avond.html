@@ -282,7 +282,11 @@
     var b = AVOND.budget;
     $('#balkTekst').textContent = AVOND.stappen.length + ' stappen' +
       (AVOND.eindigt ? ', klaar om ' + AVOND.eindigt : '');
-    $('#balkBedrag').textContent = euro(b.perPersoon) + ' p.p.';
+    /* Het plusje is geen versiering: staat er een stap in waarvan we de prijs
+       niet kennen (een club zonder kaart), dan is dit bedrag een ondergrens en
+       geen totaal. De hele zin staat in de meldregel eronder. */
+    $('#balkBedrag').textContent = euro(b.perPersoon) + (b.onbekend ? '+' : '') + ' p.p.';
+    $('#balkBedrag').title = b.let || '';
     $('#balk').hidden = actieveTab() !== 'plannen';
     /* Wat valt er nog aan te vragen? Alleen stappen die nog NIET zijn
        geprobeerd. Een stap die op `voorstel` staat MET een reden is al langs

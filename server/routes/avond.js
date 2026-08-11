@@ -25,7 +25,12 @@ module.exports = (kern) => {
   /* Een eigen horeca-instantie, net als de gastkant er een heeft: kern/horeca.js
      is een fabriek zonder eigen geheugen die alles uit db.data haalt. De opslag
      is de gedeelde plek, dus dit is een tweede LEZER en geen tweede waarheid. */
-  const polslaag = require('../kern/horeca/pols')({ save, schoon, horeca: require('../kern/horeca')(kern) });
+  const horeca = require('../kern/horeca')(kern);
+  const polslaag = require('../kern/horeca/pols')({ save, schoon, horeca });
+  /* De gastenlijst van een club: een stap "uitgaan" bij een club is een
+     AANVRAAG op dezelfde lijst die de portier voor zich heeft. Zie
+     kern/avond/aanvragen.js voor waarom er twee wegen zijn. */
+  const clublaag = require('../kern/horeca/clublaag')({ save, schoon, horeca });
   const steller = require('../kern/avond/samenstellen')({ findSupplier, planlaag, voorkeuren,
     polsVan: (code) => polslaag.gemeten(code).gemeten });
   const aanvraaglaag = require('../kern/avond/aanvragen')({ planlaag, schoon });
@@ -42,26 +47,10 @@ module.exports = (kern) => {
      een eigen lijst: een tweede zakenlijst loopt binnen een week uit de pas. */
   const alleZaken = () => (db.data.suppliers || []).filter(s => s && s.code);
 
-  /* ---------- de Hospitality DNA ---------- */
-  app.post('/api/avond/voorkeuren', auth, (req, res) => {
-    const zaak = schoon((req.body || {}).zaak, 30) || null;
-    if ((req.body || {}).zet) voorkeuren.zet(req.session.key, (req.body || {}).zet);
-    res.json({ ok: true, profiel: voorkeuren.overzicht(req.session.key, zaak) });
-  });
-
-  app.post('/api/avond/voorkeuren/zaak', auth, (req, res) => {
-    const b = req.body || {};
-    stuur(res, voorkeuren.zetVoorZaak(req.session.key, b.zaak, b.standen));
-  });
-
-  /* Wat een zaak zou zien. Deze route is er voor de GAST en niet voor de zaak:
-     een toestemmingsscherm dat niet laat zien wat er werkelijk uitgaat, vraagt
-     om vertrouwen zonder het te verdienen. */
-  app.post('/api/avond/voorkeuren/proef', auth, (req, res) => {
-    const b = req.body || {};
-    res.json({ ok: true, zaak: schoon(b.zaak, 30) || null,
-      ditZietDeZaak: voorkeuren.voorZaak(req.session.key, schoon(b.zaak, 30), { nu: Array.isArray(b.nu) ? b.nu : [] }) });
-  });
+  /* De Hospitality DNA (wat een zaak van je te zien krijgt) staat in
+     ./avond/voorkeuren.js: een onderwerp op zichzelf, en dit bestand ging
+     over de 10 kB. */
+  require('./avond/voorkeuren')({ app, auth, schoon, voorkeuren, stuur });
 
   /* ---------- een avond voorstellen ---------- */
   app.post('/api/avond/voorstel', auth, (req, res) => {
@@ -138,6 +127,15 @@ module.exports = (kern) => {
             { domein: 'reserveringen', id, staat: 'aangevraagd', reden: 'De zaak beslist over deze tafel.' });
           uitkomsten.push({ stap: stap.id, ok: true, staat: 'aangevraagd' });
         }
+        continue;
+      }
+
+      if (stap.soort === 'uitgaan' && stap.zaak) {
+        const uit = aanvraaglaag.uitgaanStap(req.session, kern.liveCodename ? kern.liveCodename(req.session) : null,
+          a, stap, { findSupplier, reserveerTafel: kern.reserveerTafel, clubAanvraag: clublaag.vraagAan });
+        planlaag.koppel(req.session.key, a.id, stap.id,
+          { domein: uit.domein, id: uit.id, staat: uit.staat, reden: uit.reden });
+        uitkomsten.push({ stap: stap.id, ok: uit.staat === 'aangevraagd', staat: uit.staat, reden: uit.reden });
         continue;
       }
 

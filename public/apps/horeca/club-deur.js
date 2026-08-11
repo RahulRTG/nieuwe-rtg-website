@@ -53,6 +53,27 @@
       $('dPromoters').innerHTML = Object.keys(d.perPromoter).map(function (p) {
         return K.rij(esc(p), d.perPromoter[p].binnen + ' van ' + d.perPromoter[p].aangemeld + ' binnen');
       }).join('') || '<p class="stil">Nog geen promotercodes.</p>';
+
+      /* DE AANVRAGEN VAN LEDEN. Zonder dit blok stond er wel een aanvraag in de
+         opslag maar zag de portier hem nergens, en bleef hij eeuwig hangen --
+         precies de halve belofte die iemand om half twee voor een dichte deur
+         zet. Gevonden door de keten in een echte browser af te lopen. */
+      $('dAanvragen').innerHTML = (d.aanvragen || []).map(function (g) {
+        return K.rij(esc(g.naam) + ' <span class="stil">· ' + g.personen + ' pers.' +
+          (g.notitie ? ' · ' + esc(g.notitie) : '') + '</span>',
+        K.knop('Op de lijst', { ja: g.id }, true) + ' ' + K.knop('Nee', { nee: g.id }));
+      }).join('') || '<p class="stil">Geen openstaande aanvragen van leden.</p>';
+      $('dTeBeslissen').textContent = d.teBeslissen || 0;
+      K.bind($('dAanvragen'), 'ja', function (b) { beslis(b.getAttribute('data-ja'), 'ok'); });
+      K.bind($('dAanvragen'), 'nee', function (b) { beslis(b.getAttribute('data-nee'), 'geweigerd'); });
+    });
+  }
+
+  function beslis(regel, stand) {
+    K.api('/club/gastenlijst/beslis', { regel: regel, stand: stand }).then(function (r) {
+      if (r.body.error) return K.meld(r.body.error);
+      K.meld(stand === 'ok' ? 'Op de lijst. Nu laat de deur ze door.' : 'Afgewezen; de deur laat ze niet door.');
+      gasten(null);
     });
   }
 

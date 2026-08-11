@@ -21,7 +21,11 @@
 
 const KANALEN_BUITEN = ['bezorging', 'afhaal'];
 
-module.exports = ({ save, schoon, crypto, horeca }) => {
+module.exports = ({ save, schoon, crypto, horeca, naad }) => {
+  /* "Is deze rekening van mij" staat in kern/gast/naad.js en niet vier keer
+     los: het is dezelfde vraag bij bezorgen, afhalen en de foodcourt, en een
+     van de vier die anders gaat kijken is een lek dat niets meldt. */
+  const { isVan } = naad;
   const { H, nu, id } = horeca;
 
   /* De lopende bestelling van dit lid bij deze zaak op dit kanaal, of een
@@ -31,7 +35,7 @@ module.exports = ({ save, schoon, crypto, horeca }) => {
     if (!KANALEN_BUITEN.includes(kanaal)) return { status: 400, error: 'Dit kanaal bestaat hier niet.', code: 'kanaal' };
     const h = H(zaakcode);
     const bestaand = Object.values(h.rekeningen).find(r =>
-      r.status === 'open' && r.kanaal === kanaal && r.gastId === handle);
+      r.status === 'open' && r.kanaal === kanaal && isVan(r, handle));
     if (bestaand) return { rekening: bestaand, deelnemer: (bestaand.deelnemers || [])[0] || null, nieuw: false };
     if (!open) return { rekening: null, deelnemer: null, nieuw: false };
 
@@ -106,7 +110,7 @@ module.exports = ({ save, schoon, crypto, horeca }) => {
     const uit = [];
     for (const [zaakcode, doos] of Object.entries(db.data.horeca || {})) {
       for (const r of Object.values(doos.rekeningen || {})) {
-        if (r.gastId !== handle || !KANALEN_BUITEN.includes(r.kanaal)) continue;
+        if (!isVan(r, handle) || !KANALEN_BUITEN.includes(r.kanaal)) continue;
         uit.push({ zaakcode, rekeningId: r.id, kanaal: r.kanaal, status: r.status,
           regels: (r.regels || []).length, geopendAt: r.geopendAt,
           bezorg: r.bezorg || null, afhaal: r.afhaal || null,

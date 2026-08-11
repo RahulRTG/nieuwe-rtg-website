@@ -97,5 +97,44 @@ module.exports = ({ planlaag, schoon }) => {
     };
   }
 
-  return { vanNaar, kiesOptie, vervoerStap };
+  /* ---------- uitgaan ----------
+     Er is geen boekingsdomein voor "een tweede plek na het eten", en dat is
+     geen omissie maar de werkelijkheid: een bar en een club nemen je op een
+     andere manier aan. Daarom TWEE WEGEN, gekozen op wat de zaak is:
+
+     - een CLUB werkt met een gastenlijst en een deur met capaciteit. Het lid
+       vraagt een plek aan, de club beslist. Die aanvraag gaat naar dezelfde
+       lijst die de portier 's nachts voor zich heeft (kern/horeca/clublaag.js),
+       want een lijst in de app waar de deur niets van weet is erger dan geen
+       lijst.
+     - een BAR of strandtent neemt een tafel aan als ze reserveringen doet. Dan
+       loopt het langs dezelfde weg als het eten, met dezelfde grens: de zaak
+       beslist.
+
+     Doet de zaak geen van beide, dan blijft de stap staan MET de reden. Dat is
+     de derde uitkomst en hij is net zo geldig als de andere twee: "bel ze even"
+     is een eerlijk antwoord, "geregeld" zonder dat er iets geregeld is niet. */
+  function uitgaanStap(session, codenaam, avond, stap, hulp) {
+    const zaak = hulp.findSupplier ? hulp.findSupplier(stap.zaak) : null;
+    if (!zaak) return { staat: 'voorstel', reden: 'Deze zaak kennen we niet meer.' };
+
+    if (String(zaak.type || '') === 'club') {
+      if (!hulp.clubAanvraag) return { staat: 'voorstel', reden: 'De clublaag draait niet mee in dit proces.' };
+      const r = hulp.clubAanvraag(zaak.code, { codenaam, datum: avond.datum,
+        personen: avond.personen, notitie: schoon(avond.titel, 60) || null, lidKey: session.key });
+      if (r.error) return { staat: 'voorstel', reden: r.error };
+      return { staat: 'aangevraagd', domein: 'gastenlijst', id: r.regel.id,
+        reden: 'Je staat op de gastenlijst als aangevraagd. ' + zaak.name + ' beslist wie er op de lijst komt.' };
+    }
+
+    if (!hulp.reserveerTafel) return { staat: 'voorstel', reden: 'De reserveringslaag draait niet mee in dit proces.' };
+    const r = hulp.reserveerTafel(session, codenaam, { supplierCode: zaak.code, datum: avond.datum,
+      tijd: stap.van || avond.start, personen: avond.personen });
+    if (r && r.error) return { staat: 'voorstel', reden: r.error };
+    return { staat: 'aangevraagd', domein: 'reserveringen',
+      id: r && r.reservering ? r.reservering.id : null,
+      reden: 'Een tafel bij ' + zaak.name + ' is aangevraagd. De zaak beslist.' };
+  }
+
+  return { vanNaar, kiesOptie, vervoerStap, uitgaanStap };
 };

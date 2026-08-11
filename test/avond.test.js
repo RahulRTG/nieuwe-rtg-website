@@ -108,21 +108,50 @@ test('een tafel wordt AANGEVRAAGD en nooit zomaar bevestigd', async () => {
     'zolang er iets openstaat, heet de avond niet rond');
 });
 
-test('een stap zonder aanvraagweg wordt niet stil groen gezet', async () => {
+test('geen enkele stap wordt stil groen: elke staat is verantwoord', async () => {
+  /* Deze toets ging over de uitgaan-stap, want die had geen aanvraagweg. Die
+     heeft hij inmiddels wel, en toen zakte hij -- terecht. In plaats van er een
+     ander voorbeeld in te zetten (dat over een jaar hetzelfde doet) staat hier
+     nu de REGEL zelf, die niet verandert als er een soort bij komt:
+
+       een stap is groen (bevestigd) of geel (aangevraagd) MET een boeking waar
+       je naartoe kunt wijzen, of hij staat er nog MET een reden.
+
+     Een derde mogelijkheid -- groen zonder boeking, of blijven staan zonder
+     uitleg -- is precies de leugen waar dit plan niet in mag vervallen. */
   const voorstel = await post('/api/avond/voorstel', { start: '19:00', thuisOm: '01:30',
     personen: 2, plafondPP: 20000 }, LID);
   const id = voorstel.body.avond.id;
   const gevraagd = await post('/api/avond/aanvragen', { id }, LID);
-  /* De UITGAAN-stap, want die heeft (nog) geen aanvraagweg. Hier stond eerst de
-     vervoersstap; die heeft er inmiddels wel een, en de toets matchte daarna
-     per ongeluk op de nieuwe reden. Een toets die op een andere bewering is
-     gaan slaan dan zijn titel zegt, bewaakt niets meer. */
+  const stappen = gevraagd.body.avond.stappen;
+  assert.ok(stappen.length >= 2, 'er staat een plan met meer dan een stap');
+  for (const s of stappen) {
+    if (s.staat === 'bevestigd' || s.staat === 'aangevraagd') {
+      assert.ok(s.boeking && s.boeking.id && s.boeking.domein,
+        s.soort + ' staat op ' + s.staat + ' en moet dus naar een echte boeking wijzen: ' + JSON.stringify(s.boeking));
+    } else {
+      assert.ok(s.reden, s.soort + ' is niet geregeld en hoort dan te zeggen waarom: ' + JSON.stringify(s));
+    }
+  }
+});
+
+test('uitgaan gaat langs de weg die bij de zaak past, en belooft nooit toegang', async () => {
+  const voorstel = await post('/api/avond/voorstel', { start: '19:00', thuisOm: '01:30',
+    personen: 2, plafondPP: 20000 }, LID);
+  const gevraagd = await post('/api/avond/aanvragen', { id: voorstel.body.avond.id }, LID);
   const uitgaan = gevraagd.body.avond.stappen.find(s => s.soort === 'uitgaan');
   assert.ok(uitgaan, 'de opstelling hoort een uitgaan-stap te bevatten');
-  assert.equal(uitgaan.staat, 'voorstel', 'geen aanvraagweg betekent: blijft voorstel');
-  assert.match(uitgaan.reden || '', /nog niet via de avondplanner/i,
-    'en de stap zegt met zoveel woorden dat er nog geen weg voor is');
-  assert.notEqual(gevraagd.body.avond.staat, 'rond');
+  /* Nooit `bevestigd`. Een bar beslist over zijn tafel en een club over zijn
+     lijst; software die daar groen van maakt, zet iemand om half twee voor een
+     dichte deur. */
+  assert.notEqual(uitgaan.staat, 'bevestigd', 'uitgaan wordt nooit bevestigd door de planner: ' + JSON.stringify(uitgaan));
+  if (uitgaan.staat === 'aangevraagd') {
+    assert.ok(['reserveringen', 'gastenlijst'].includes(uitgaan.boeking.domein),
+      'en het gaat langs een van de twee echte wegen: ' + JSON.stringify(uitgaan.boeking));
+    assert.match(uitgaan.reden || '', /beslist/i, 'met de zin dat de zaak beslist: ' + uitgaan.reden);
+  } else {
+    assert.ok(uitgaan.reden, 'lukte het niet, dan staat de reden erbij');
+  }
 });
 
 test('de reservering die de avond aanvraagt, staat ook echt in mijn reserveringen', async () => {
@@ -332,4 +361,75 @@ test('de avondplanner loopt niet om de gegevenspoort heen', async () => {
   const na = await post('/api/avond', { id: v.body.avond.id }, kaal);
   assert.ok(na.body.avond.stappen.every(s => s.staat === 'voorstel'),
     'en er hoort niets te zijn aangevraagd');
+});
+
+test('de club: aanvragen is niet binnenkomen, en dat weet de deur ook', async () => {
+  /* De hele keten in een keer, want juist hier zit de belofte die pijn doet
+     als hij niet klopt: iemand die om half twee bij de deur staat met een app
+     die zegt dat hij op de lijst staat.
+
+     De club wordt met een VOORKEUR gekozen en niet met geluk: de weegfunctie
+     telt woorden uit je profiel mee, dus met "nocturna" erin wint Sal Nocturna
+     de uitgaan-plek. Zonder die zet zou deze toets soms een bar treffen en dan
+     stil iets anders bewaken dan zijn titel zegt. */
+  /* Twee rake woorden en niet een. De weegfunctie geeft +2 per woord uit je
+     profiel dat in de naam van een zaak zit; met een enkel woord staat de club
+     gelijk met de bar en beslist de volgorde in de seed -- dan wint hij vandaag
+     en morgen niet meer, en bewaakt de toets iets anders dan zijn titel zegt. */
+  await post('/api/avond/voorkeuren', { zet: {
+    waarden: { sfeer: 'nocturna', tafel: 'sal nocturna' },
+    delen: { sfeer: 'altijd', tafel: 'altijd' } } }, LID);
+  /* 03:00 en niet 04:00: de avondklok knipt op 04:00, dus "04:00 thuis" leest
+     als vanochtend vroeg en het plan wordt terecht geweigerd. */
+  const voorstel = await post('/api/avond/voorstel', { start: '19:00', thuisOm: '03:00',
+    personen: 3, plafondPP: 20000 }, LID);
+  assert.equal(voorstel.status, 200, JSON.stringify(voorstel.body).slice(0, 200));
+  const avond = voorstel.body.avond;
+  const stap = avond.stappen.find(s => s.soort === 'uitgaan');
+  assert.ok(stap && stap.zaak === 'NACHT', 'de club wordt voorgesteld als tweede plek: ' + JSON.stringify(stap));
+  assert.equal(stap.centenPP, null, 'zonder kaart weten we de prijs niet, en dat is geen nul');
+  assert.ok(voorstel.body.avond.budget.onbekend >= 1, 'het budget zegt van hoeveel stappen het de prijs niet weet');
+  /* En de UITLEG liegt er ook niet over. Hier stond "past binnen je budget
+     (ongeveer EUR 0.00 per persoon)" over een club waarvan we de prijzen niet
+     kennen -- een zin die een gast in het scherm te lezen kreeg. Gevonden door
+     de keten in een echte browser af te lopen, niet door een toets. */
+  const waarom = (voorstel.body.uitleg.find(u => u.zaak === 'NACHT') || {}).waarom || [];
+  assert.ok(waarom.length, 'de clubstap draagt een uitleg');
+  assert.ok(!waarom.some(w => /0[.,]00/.test(w)),
+    'geen verzonnen nulbedrag over een zaak zonder kaart: ' + JSON.stringify(waarom));
+  assert.ok(waarom.some(w => /weten we niet|geen kaart/i.test(w)),
+    'maar wel de mededeling dat we het niet weten: ' + JSON.stringify(waarom));
+
+  const gevraagd = await post('/api/avond/aanvragen', { id: avond.id }, LID);
+  const na = gevraagd.body.avond.stappen.find(s => s.soort === 'uitgaan');
+  assert.equal(na.staat, 'aangevraagd', 'een club wordt aangevraagd, nooit bevestigd');
+  assert.equal(na.boeking.domein, 'gastenlijst');
+  assert.match(na.reden, /beslist/i);
+
+  // nu de clubkant: de aanvraag staat op DEZELFDE lijst die de portier ziet
+  const roster = (await post('/api/supplier/roster', { code: 'NACHT' })).body;
+  const mgr = roster.staff.find(x => x.role === 'manager') || roster.staff[0];
+  const club = (await post('/api/supplier/login', { code: 'NACHT', staffId: mgr.id, pin: '1234' })).body.token;
+  assert.ok(club, 'de club kan inloggen');
+  const lijst = (await post('/api/supplier/horeca/club/gastenlijst', { datum: avond.datum }, club)).body;
+  assert.equal(lijst.teBeslissen, 1, 'er staat een aanvraag te wachten: ' + JSON.stringify(lijst.aanvragen));
+  const regel = lijst.aanvragen[0];
+  assert.equal(regel.personen, 3, 'met het gezelschap uit het plan');
+  assert.equal(lijst.perPromoter['zonder promoter'], undefined, 'een aanvraag telt nog niet mee in de promotercijfers');
+
+  // de deur: nog niet goedgekeurd is nog niet binnen
+  const teVroeg = await post('/api/supplier/horeca/club/deur',
+    { wat: 'in', personen: 3, capaciteit: 50, gastId: regel.id }, club);
+  assert.equal(teVroeg.status, 409, 'de deur laat een onbesliste aanvraag niet door');
+  assert.match(teVroeg.body.error, /aangevraagd/);
+  const stand = (await post('/api/supplier/horeca/club/deur', { wat: 'stand' }, club)).body;
+  assert.equal(stand.binnen, 0, 'en de teller is bij die weigering niet opgehoogd');
+
+  // de club beslist, en pas dan gaat de deur open
+  const ok = await post('/api/supplier/horeca/club/gastenlijst/beslis', { regel: regel.id, stand: 'ok' }, club);
+  assert.equal(ok.status, 200, JSON.stringify(ok.body).slice(0, 120));
+  const binnen = await post('/api/supplier/horeca/club/deur',
+    { wat: 'in', personen: 3, capaciteit: 50, gastId: regel.id }, club);
+  assert.equal(binnen.status, 200);
+  assert.equal(binnen.body.binnen, 3, 'nu staan ze binnen');
 });

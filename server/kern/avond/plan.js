@@ -39,17 +39,9 @@ module.exports = ({ db, save, crypto, schoon }) => {
   const nu = () => new Date().toISOString();
   const lijst = () => { if (!db.data.avonden) db.data.avonden = {}; return db.data.avonden; };
 
-  /* Tijd in minuten sinds middernacht. Een avond loopt over middernacht heen,
-     dus alles ná 04:00 telt als dezelfde avond en alles ervoor als de nacht
-     erna -- zonder die knip zou "thuis om 00:30" altijd in het verleden liggen. */
-  const KNIP = 4 * 60;
-  function min(t) {
-    const m = /^(\d{1,2}):(\d{2})$/.exec(String(t || ''));
-    if (!m) return null;
-    const v = parseInt(m[1], 10) * 60 + parseInt(m[2], 10);
-    return v < KNIP ? v + 24 * 60 : v;
-  }
-  const klok = (v) => String(Math.floor((v % (24 * 60)) / 60)).padStart(2, '0') + ':' + String(v % 60).padStart(2, '0');
+  /* De klok (de 04:00-knip en de tijdlijn) staat in ./klok.js: het enige stuk
+     van deze laag dat met tijd rekent, en dit bestand ging over de 10 kB. */
+  const { min, klok, tijdlijn } = require('./klok');
 
   function maakStap(inv) {
     const soort = SOORTEN.includes(String(inv.soort)) ? String(inv.soort) : 'eten';
@@ -61,7 +53,13 @@ module.exports = ({ db, save, crypto, schoon }) => {
       van: schoon(inv.van, 5) || null,
       duurMin: Math.max(0, Math.min(600, parseInt(inv.duurMin, 10) || 0)),
       reisMin: Math.max(0, Math.min(180, parseInt(inv.reisMin, 10) || 0)),
-      centenPP: Math.max(0, Math.min(100000, parseInt(inv.centenPP, 10) || 0)),
+      /* NULL IS IETS ANDERS DAN NUL. Van een club zonder kaart weten we niet
+         wat een avond kost; dat als 0 opslaan maakt van "onbekend" stilletjes
+         "gratis", en dan klopt het budget onder de balk niet meer. Onbekend
+         blijft onbekend en telt niet mee -- de budgetregel zegt erbij hoeveel
+         stappen er niet in zitten. */
+      centenPP: inv.centenPP == null ? null
+        : Math.max(0, Math.min(100000, parseInt(inv.centenPP, 10) || 0)),
       /* De verwijzing naar de ECHTE boeking. `domein` zegt wie hem bezit, `id`
          is zijn eigen id daar. Deze laag opent hem niet en verandert hem niet;
          wie de rit wil annuleren, doet dat bij de mobiliteitskern. */
@@ -74,36 +72,21 @@ module.exports = ({ db, save, crypto, schoon }) => {
 
   /* ---------- de klok ----------
      Geeft per stap de begin- en eindtijd terug, of vertelt waar het misgaat. */
-  function tijdlijn(stappen, { start, thuisOm }) {
-    let t = min(start);
-    if (t == null) return { fout: 'Hoe laat wil je beginnen?' };
-    const rijen = [];
-    for (const s of stappen) {
-      t += s.reisMin;
-      const begin = s.van != null && min(s.van) != null ? Math.max(t, min(s.van)) : t;
-      const eind = begin + s.duurMin;
-      rijen.push({ id: s.id, soort: s.soort, titel: s.titel, van: klok(begin), tot: klok(eind),
-        reisMin: s.reisMin, wachtMin: begin - t });
-      t = eind;
-    }
-    const grens = min(thuisOm);
-    if (grens != null && t > grens) {
-      return { fout: 'Dit plan loopt tot ' + klok(t) + ' en je wilde om ' + klok(grens) + ' thuis zijn.',
-        teLaatMin: t - grens, rijen };
-    }
-    return { rijen, eindigt: klok(t), ruimteMin: grens == null ? null : grens - t };
-  }
-
   /* ---------- het budget ----------
      Per persoon, want zo denkt een gezelschap erover. De fooi zit er als RUIMTE
      in en niet als bedrag: fooi wordt nooit voorgevuld (dezelfde regel als in
      de horeca-kern), maar een budget dat er geen plek voor laat, klopt niet. */
   function budget(stappen, { plafondPP, personen }) {
-    const som = stappen.reduce((t, s) => t + s.centenPP, 0);
+    const som = stappen.reduce((t, s) => t + (s.centenPP || 0), 0);
+    const onbekend = stappen.filter(s => s.centenPP == null).length;
     const p = Math.max(1, Math.min(40, parseInt(personen, 10) || 1));
     const plafond = Math.max(0, parseInt(plafondPP, 10) || 0);
     return {
-      perPersoon: som, totaal: som * p, personen: p,
+      perPersoon: som, totaal: som * p, personen: p, onbekend,
+      /* Van hoeveel stappen we de prijs NIET weten. Zonder dit getal leest een
+         bedrag onder een plan als "dit is wat het kost", terwijl er een club in
+         zit waarvan we geen kaart hebben. */
+      let: onbekend ? 'Van ' + onbekend + ' stap(pen) weten we de prijs niet; die zitten hier niet in.' : null,
       plafondPP: plafond || null,
       past: !plafond || som <= plafond,
       overPP: plafond && som > plafond ? som - plafond : 0,

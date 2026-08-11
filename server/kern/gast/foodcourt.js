@@ -1,5 +1,11 @@
 /* Hospitality Guest OS (deelmodule): DE FOODCOURT -- één mandje, meer keukens.
 
+   NIET TE VERWARREN MET `kern/foodcourt.js`. Dat is het reserveerplein: alle
+   restaurants op een rij met hun vrije tijdsloten, in de stijl van een
+   reserveerplatform. Dit bestand gaat over BESTELLEN bij meer loketten
+   tegelijk. Twee producten, dezelfde marktnaam, nul gedeelde code -- en dat is
+   goed zo. Ik heb overwogen ze samen te voegen; er bleek niets te delen.
+
    WAT DIT WEL EN NIET IS. Het lag voor de hand om "foodcourt" een veertiende
    verkoopkanaal te maken. Dat is het niet. Wie in een foodcourt bestelt, haalt
    af -- bij drie loketten tegelijk. Het kanaal is dus gewoon `afhaal`; wat er
@@ -26,7 +32,8 @@
    werk is, is de ene leugen die je hier niet wilt. */
 'use strict';
 
-module.exports = ({ db, save, schoon, crypto, horeca, orderlaag, buitenshuis }) => {
+module.exports = ({ db, save, schoon, crypto, horeca, orderlaag, buitenshuis, naad }) => {
+  const { isVan } = naad;   // dezelfde eigendomsvraag als bij bezorgen: kern/gast/naad.js
   const { H, nu, totaal, openstaand } = horeca;
 
   const nieuwMandje = () => 'fc' + crypto.randomBytes(5).toString('hex');
@@ -39,7 +46,7 @@ module.exports = ({ db, save, schoon, crypto, horeca, orderlaag, buitenshuis }) 
     for (const [zaakcode, doos] of Object.entries(db.data.horeca || {})) {
       for (const r of Object.values(doos.rekeningen || {})) {
         if (r.mandjeId !== mandjeId) continue;
-        if (handle && r.gastId !== handle) continue;   // niet andermans mandje
+        if (handle && !isVan(r, handle)) continue;   // niet andermans mandje
         uit.push({ zaakcode, rekening: r });
       }
     }
@@ -119,7 +126,7 @@ module.exports = ({ db, save, schoon, crypto, horeca, orderlaag, buitenshuis }) 
     const ids = new Map();
     for (const doos of Object.values(db.data.horeca || {})) {
       for (const r of Object.values(doos.rekeningen || {})) {
-        if (!r.mandjeId || r.gastId !== handle) continue;
+        if (!r.mandjeId || !isVan(r, handle)) continue;
         const eerder = ids.get(r.mandjeId);
         if (!eerder || String(r.geopendAt) > eerder) ids.set(r.mandjeId, String(r.geopendAt));
       }

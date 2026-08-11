@@ -86,7 +86,13 @@ module.exports = ({ findSupplier, planlaag, voorkeuren, polsVan }) => {
     punten += nu.punten;
     redenen.push(...nu.redenen);
     const pp = prijsPP(s);
-    if (plafondPP) {
+    /* GEEN KAART IS GEEN NUL. Hier stond dat een zaak zonder kaart "binnen je
+       budget past (ongeveer € 0.00 per persoon)" -- een zin die een gast in het
+       scherm te lezen kreeg over een club waarvan we de prijzen niet kennen.
+       Onbekend is geen plus en geen min: het telt niet mee en het zegt dat. */
+    if (plafondPP && !pp) {
+      redenen.push('wat het hier kost weten we niet: deze zaak heeft geen kaart in RTG');
+    } else if (plafondPP) {
       if (pp <= plafondPP) { punten += 2; redenen.push('past binnen je budget (ongeveer € ' + (pp / 100).toFixed(2) + ' per persoon)'); }
       else { punten -= 3; redenen.push('zit boven je budget (ongeveer € ' + (pp / 100).toFixed(2) + ' per persoon)'); }
     }
@@ -128,14 +134,26 @@ module.exports = ({ findSupplier, planlaag, voorkeuren, polsVan }) => {
     }
 
     /* Uitgaan erna, maar alleen als er ECHT een tweede plek is die niet
-       dezelfde zaak is. Liever een avond met één stap dan een verzonnen bar. */
-    const uit = kandidaten.find(k => eten && k.zaak.code !== eten.zaak.code &&
-      /bar|club|beach/i.test(String(k.zaak.type || '') + String(k.zaak.name || '')));
+       dezelfde zaak is. Liever een avond met één stap dan een verzonnen bar.
+
+       Deze kandidaten komen NIET uit `eetzaken`: een club heeft in RTG geen
+       kaart, en dat is geen reden om er niet heen te gaan. De etenskeuze
+       hierboven eist wél een kaart, want zonder kaart is een diner een gok. */
+    const uitzaken = (alleZaken || [])
+      .filter(s => /bar|club|beach/i.test(String(s.type || '') + ' ' + String(s.name || '')))
+      .map(s => Object.assign({ zaak: s },
+        weeg(s, { plafondPP, voorkeurTekst, sfeer: w.sfeer, gemeten: polsVan ? polsVan(s.code) : null })))
+      .sort((a, b) => b.punten - a.punten);
+    const uit = uitzaken.find(k => eten && k.zaak.code !== eten.zaak.code);
     if (w.uitgaan !== false) {
       if (uit) {
+        /* Geen kaart, geen prijs. `null` en niet 0: een club die als gratis in
+           het budget staat, laat het bedrag onder het plan kloppen terwijl het
+           niet klopt. */
         stappen.push({ soort: 'uitgaan', titel: 'Nog wat drinken bij ' + uit.zaak.name, zaak: uit.zaak.code,
-          duurMin: DUUR.uitgaan, reisMin: 15, centenPP: Math.round(uit.prijsPP / 2) });
-        uitleg.push({ stap: 'uitgaan', zaak: uit.zaak.code, waarom: ['op loopafstand van het eten in dezelfde plaats'] });
+          duurMin: DUUR.uitgaan, reisMin: 15, centenPP: uit.prijsPP ? Math.round(uit.prijsPP / 2) : null });
+        uitleg.push({ stap: 'uitgaan', zaak: uit.zaak.code,
+          waarom: uit.redenen.concat(uit.prijsPP ? [] : ['deze zaak heeft geen kaart in RTG, dus wat je hier uitgeeft zit niet in het budget']) });
       } else {
         gaten.push({ soort: 'uitgaan', reden: 'Er is hier geen tweede zaak om na het eten heen te gaan. Dit deel is leeg gelaten in plaats van ingevuld met iets wat er niet is.' });
       }
@@ -152,6 +170,12 @@ module.exports = ({ findSupplier, planlaag, voorkeuren, polsVan }) => {
       uitleg, gaten,
       aannames: ['Een diner duurt ongeveer ' + DUUR.eten + ' minuten en een tweede plek ongeveer ' +
         DUUR.uitgaan + '. Dat is een aanname, geen meting.']
+        /* De vijftien minuten tussen twee plekken stonden er als FEIT in de
+           tijdlijn en nergens als aanname; de reden bij de stap zei zelfs "op
+           loopafstand", terwijl er geen enkele afstand wordt berekend. Zo'n
+           zin klinkt behulpzaam en is verzonnen. Nu staat het getal waar het
+           hoort: bij de aannames. */
+        .concat(uit ? ['Tussen het eten en de tweede plek is 15 minuten gerekend. Dat is een aanname en geen route.'] : [])
     };
   }
 

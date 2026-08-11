@@ -65,11 +65,16 @@ module.exports = (kern) => {
      zet. */
   const { folioVan, boek: folioBoek } = require('../kern/horeca/foliolaag')({ horeca, save, schoon });
 
+  /* De klantnaad: hoe een ledensessie een handle op een rekening wordt. Stond
+     woordelijk in twee routebestanden; zie kern/gast/naad.js voor wat er
+     misgaat als die twee uiteenlopen. */
+  const naad = require('../kern/gast/naad')();
+
   /* Buiten de deur: bezorgen en afhalen. Andere naad (de ledensessie in plaats
      van de tafel-QR), dezelfde rekening eronder. */
-  const buitenshuis = require('../kern/gast/buitenshuis')({ save, schoon, crypto, horeca });
+  const buitenshuis = require('../kern/gast/buitenshuis')({ save, schoon, crypto, horeca, naad });
   const bezorglaag = require('../kern/horeca/bezorglaag')({ save, horeca, haversine: kern.haversine });
-  const foodcourtlaag = require('../kern/gast/foodcourt')({ db, save, schoon, crypto, horeca, orderlaag, buitenshuis });
+  const foodcourtlaag = require('../kern/gast/foodcourt')({ db, save, schoon, crypto, horeca, orderlaag, buitenshuis, naad });
 
   /* De polslaag: hoe druk en hoe luid het NU is, uit drie bronnen die
      gescheiden blijven. Dezelfde fabriek als aan de leverancierskant -- de
@@ -78,7 +83,7 @@ module.exports = (kern) => {
   const polslaag = require('../kern/horeca/pols')({ save, schoon, horeca });
 
   const ctx = Object.assign({}, kern, { horeca, beleid, sessie, orderlaag, afrekenlaag,
-    buitenshuis, bezorglaag, foodcourtlaag, polslaag, gastAuth, stuur, folioBoek, folioVan });
+    buitenshuis, bezorglaag, foodcourtlaag, polslaag, naad, gastAuth, stuur, folioBoek, folioVan });
   require('./gast/tafel')(ctx);     // de QR, aanschuiven, de kaart en het beleid
   require('./gast/bestellen')(ctx); // bestellen, de rekening lezen, waarom-vragen
   require('./gast/afrekenen')(ctx); // verdelen, fooi, betalen

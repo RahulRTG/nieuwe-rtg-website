@@ -15,15 +15,18 @@
    3. MINIMUM SPEND IS EEN AFSPRAAK, GEEN INCASSO. Het systeem toont wat er nog
       te gaan is en int niets automatisch bij; wat er aan het eind gebeurt, is
       een gesprek aan de tafel en geen stille afboeking.
-   4. DE CAPACITEITSTELLER IS EEN TELLER, GEEN CAMERA. Hij telt in en uit,
-      inclusief herbetreding, en zegt hoeveel er nog bij kan. Er wordt niet
-      bijgehouden wie er binnen is -- alleen hoeveel. */
+   4. DE GASTENLIJST EN DE DEUR STAAN HIERNAAST, in horeca/clubdeur.js. Ze
+      zijn hier weggeknipt toen de gastenlijst een tweede schrijver kreeg (de
+      avondplanner) en dit bestand over de 10 kB ging. De knip loopt op een
+      onderwerpgrens: hier het geld van de gast, daar de deur. */
 module.exports = (kern) => {
   const { app, save, schoon, supplierAuth, logActivity, horeca } = kern;
   const { H, nu, id, centen, uitEuro, bonMaak, bonBoek } = horeca;
 
-  const C = (code) => { const h = H(code); if (!h.club) h.club = { banden: {}, gastenlijst: [], deur: {}, tafels: {} }; return h.club; };
-  const vandaag = () => nu().slice(0, 10);
+  /* De doos van de club (banden, tafels, lijst, deur) komt uit
+     kern/horeca/clublaag.js, zodat dit bestand en clubdeur.js er niet elk een
+     eigen versie van aanmaken. */
+  const { C } = kern.clublaag;
 
   /* ---------- polsbanden ---------- */
   app.post('/api/supplier/horeca/club/band', supplierAuth, (req, res) => {
@@ -111,66 +114,4 @@ module.exports = (kern) => {
       let: 'Minimum spend is een afspraak: het systeem toont wat er te gaan is en boekt niets automatisch bij.' });
   });
 
-  /* ---------- gastenlijst en promotercodes ---------- */
-  app.post('/api/supplier/horeca/club/gastenlijst', supplierAuth, (req, res) => {
-    const c = C(req.supplier.code);
-    if (Array.isArray(req.body.namen)) {
-      const datum = schoon(req.body.datum, 10) || vandaag();
-      const promoter = schoon(req.body.promoter, 40) || null;
-      for (const n of req.body.namen.slice(0, 500)) {
-        const naam = schoon(n, 60);
-        if (!naam) continue;
-        c.gastenlijst.push({ id: id(3), naam, datum, promoter, personen: Math.max(1, Math.min(20, parseInt(req.body.personen, 10) || 1)),
-          korting: schoon(req.body.korting, 40) || null, binnen: false, at: nu() });
-      }
-      c.gastenlijst = c.gastenlijst.slice(-5000);
-      save();
-    }
-    const datum = schoon(req.body.datum, 10) || vandaag();
-    const lijst = c.gastenlijst.filter(g => g.datum === datum);
-    const perPromoter = {};
-    for (const g of lijst) {
-      const p = g.promoter || 'zonder promoter';
-      perPromoter[p] = perPromoter[p] || { aangemeld: 0, binnen: 0 };
-      perPromoter[p].aangemeld += g.personen;
-      if (g.binnen) perPromoter[p].binnen += g.personen;
-    }
-    res.json({ ok: true, datum, aantal: lijst.length, gasten: lijst.slice(0, 500), perPromoter,
-      let: 'Per promoter telt wat er is aangemeld EN wat er echt binnen is; alleen dat eerste zegt niets.' });
-  });
-
-  /* ---------- de deur: in, uit en terug ---------- */
-  app.post('/api/supplier/horeca/club/deur', supplierAuth, (req, res) => {
-    const c = C(req.supplier.code);
-    const datum = vandaag();
-    const d = c.deur[datum] = c.deur[datum] || { binnen: 0, in: 0, uit: 0, herbetreding: 0, geweigerd: 0 };
-    const capaciteit = Math.max(1, Math.min(20000, parseInt(req.body.capaciteit, 10) || c.capaciteit || 300));
-    c.capaciteit = capaciteit;
-    const wat = String(req.body.wat || 'stand');
-    const personen = Math.max(1, Math.min(50, parseInt(req.body.personen, 10) || 1));
-
-    if (wat === 'in' || wat === 'terug') {
-      if (d.binnen + personen > capaciteit) {
-        d.geweigerd += personen;
-        save();
-        return res.status(409).json({ error: 'De capaciteit is bereikt (' + d.binnen + ' van ' + capaciteit + ' binnen).',
-          vol: true, binnen: d.binnen, capaciteit });
-      }
-      if (req.body.leeftijdGecontroleerd === false)
-        return res.status(409).json({ error: 'Zonder leeftijdscontrole komt er niemand binnen.' });
-      d.binnen += personen;
-      if (wat === 'in') d.in += personen; else d.herbetreding += personen;
-      const g = req.body.gastId ? c.gastenlijst.find(x => x.id === String(req.body.gastId)) : null;
-      if (g) g.binnen = true;
-    } else if (wat === 'uit') {
-      d.binnen = Math.max(0, d.binnen - personen);
-      d.uit += personen;
-    } else if (wat !== 'stand') return res.status(400).json({ error: 'Kies in, uit, terug of stand.' });
-    save();
-    const lijst = c.gastenlijst.filter(g => g.datum === datum);
-    res.json({ ok: true, binnen: d.binnen, capaciteit, vrij: Math.max(0, capaciteit - d.binnen),
-      in: d.in, uit: d.uit, herbetreding: d.herbetreding, geweigerd: d.geweigerd,
-      verwacht: lijst.filter(g => !g.binnen).reduce((t, g) => t + g.personen, 0),
-      let: 'De teller telt hoeveel mensen er binnen zijn, niet wie.' });
-  });
 };

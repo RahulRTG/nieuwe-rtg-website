@@ -77,6 +77,16 @@ module.exports = {
         { id: 'b4', cat: 'Hapjes', name: 'Patatas bravas', desc: 'Met pittige saus en aioli.', price: 8, allergens: ['ei'] }
       ]
     },
+    /* Een club, en BEWUST ZONDER KAART. De clubkant van de horecatoren
+       (polsbanden, minimum spend, gastenlijst, deurteller) was compleet
+       gebouwd en had geen enkele demozaak om op te draaien -- de gastenlijst
+       en de deur waren daardoor met geen enkele toets te doorlopen. Geen kaart,
+       want je gaat er niet eten: zo kan de avondplanner hem wel als tweede plek
+       voorstellen en nooit als diner. */
+    {
+      code: 'NACHT', name: 'Sal Nocturna', type: 'club', city: 'Ibiza',
+      loc: { lat: 38.909, lng: 1.435, label: 'Playa d\'en Bossa, Ibiza' }, rate: 0.18
+    },
     {
       code: 'MKKX', name: 'Ibiza Executive Cars', type: 'taxi', city: 'Ibiza',
       loc: { lat: 38.873, lng: 1.373, label: 'Aeroport dEivissa' }, rate: 0.20,

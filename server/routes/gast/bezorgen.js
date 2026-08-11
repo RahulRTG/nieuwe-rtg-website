@@ -13,13 +13,16 @@
 'use strict';
 
 module.exports = (kern) => {
-  const { app, auth, schoon, findSupplier, orderlaag, buitenshuis, bezorglaag, beleid, stuur } = kern;
+  const { app, auth, schoon, findSupplier, orderlaag, buitenshuis, bezorglaag, beleid, stuur, naad } = kern;
 
   /* De codenaam van het lid. Nooit de echte naam en nooit de sleutel: de
      identiteitskluis blijft gescheiden, ook als de bezorger voor de deur staat
      -- die krijgt een adres, geen personalia. */
-  const handleVan = (req) => (req.session.account && req.session.account.codename)
-    || ('lid-' + String(req.session.key || '').slice(-6));
+  /* De handle van een lid op een rekening komt uit kern/gast/naad.js. Hij
+     stond hier en in foodcourt.js woordelijk hetzelfde, en die twee moeten
+     dezelfde handle opleveren: anders vinden je bezorgbestellingen en je
+     foodcourt-mandje elkaar niet meer, zonder enige foutmelding. */
+  const handleVan = naad.handleVanReq;
 
   const zaakVan = (req, res) => {
     const s = findSupplier(schoon((req.body || {}).zaak, 30));

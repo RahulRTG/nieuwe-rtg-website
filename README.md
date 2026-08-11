@@ -1219,7 +1219,15 @@ Twee fouten die de mutaties hier vonden en die anders waren meegegaan: de **gebo
 
 **Het scherm** is `/apps/avond.html`: drie tabbladen (Plannen, Mijn avonden, Wat zaken van me weten). Het maakt niets mooier dan het is — de staat van een stap staat er als woord én als kleur, de zin boven het plan komt van de server (`zekerheid`) en niet uit de pagina, en de knop heet niet "Aanvragen" als er niets meer aan te vragen valt. Onder een stap met een zaak staat de pols van die zaak (hieronder).
 
-Wat er **nog niet** is: uitgaan heeft nog geen aanvraagweg (die stap blijft `voorstel` mét de reden), en gezelschapsafstemming, weer en herinneringen staan er niet. Die vragen gegevens die dit huis niet heeft; de bodem waarop ze kunnen staan ligt er wel.
+**Uitgaan heeft twee aanvraagwegen, en welke het wordt hangt af van wat de zaak IS.** Een **club** werkt met een gastenlijst en een deur met capaciteit: het lid vraagt een plek aan op dezelfde lijst die de portier 's nachts voor zich heeft (`kern/horeca/clublaag.js`), en de club beslist. Een **bar** die reserveringen aanneemt gaat langs dezelfde tafelweg als het eten. Doet de zaak geen van beide, dan blijft de stap staan mét de reden — de derde uitkomst is net zo geldig als de andere twee. In geen van de gevallen wordt het `bevestigd`.
+
+Daar hoort een regel bij die pas zichtbaar werd toen er een club in het plan kwam: **een club heeft geen kaart in RTG, en `null` is iets anders dan nul.** Een stap zonder bekende prijs telt niet mee in het budget en het budget zégt van hoeveel stappen het de prijs niet weet; het bedrag onder het plan krijgt een `+`. Als 0 opslaan zou het totaal laten kloppen terwijl het niet klopt.
+
+Onderweg kwam de club-deurteller er beter uit dan hij in ging: de weigering van een niet-goedgekeurde aanvraag stond eerst *na* `d.binnen += personen`. Die tak bewaart niet, maar de teller staat wel in `db.data`, dus de eerstvolgende `save()` van een willekeurig ander verzoek legt hem alsnog vast — dan staan er mensen binnen die zijn geweigerd. Alle weigeringen staan nu vóór de teller, met een toets die dat vasthoudt.
+
+Er staat nu ook een **democlub** in de seed (`NACHT`, Sal Nocturna, bewust zonder kaart). De hele clubkant van de horecatoren was compleet gebouwd en had geen enkele zaak om op te draaien: de gastenlijst en de deur waren met geen enkele toets te doorlopen.
+
+Wat er **nog niet** is: gezelschapsafstemming, weer en herinneringen. Die vragen gegevens die dit huis niet heeft; de bodem waarop ze kunnen staan ligt er wel.
 
 ### De pols van een zaak (drie bronnen, nooit één cijfer)
 
@@ -1239,6 +1247,14 @@ Vier regels houden dat eerlijk, en ze staan alle vier als toets in `test/pols.te
 Melden kan alleen achter `gastAuth`: de tafelsleutel is het bewijs dat je er zit, en hij verloopt als de rekening dichtgaat. De melding hangt aan de afdruk van je tafelsessie — geen naam, geen ledensleutel — en een tweede melding over hetzelfde onderwerp vervangt de eerste, zodat een tafel van vier hooguit vier keer telt.
 
 Onderweg kwam `bereidingsMinuten` uit een leveranciersroute naar `kern/horeca/keukenlaag.js`: hij hing aan `kern` en was daardoor onbereikbaar voor de gastkant — dezelfde fout die `horecaFolioVan` eerder maakte.
+
+### De klantnaad (één handle, vijf kanalen)
+
+`server/kern/gast/naad.js`. De vijf gastkanalen bewijzen elk op hun eigen manier dat je ergens bij hoort — de sticker op tafel (een QR-sleutel), thuis (je ledensessie), de hotelkamer (een open gastrekening), de club (de code op je polsband), de foodcourt (ledensessie plus een mandje-id) — en dat verschil is echt; het hoort niet te worden weggepoetst tot één `wieBenJij()`. Maar één ding deelden ze wél, en dat stond woordelijk in twee routebestanden: **hoe een ledensessie een handle op een rekening wordt.** Zouden bezorgen en de foodcourt daarin uiteenlopen, dan vinden je bezorgbestellingen en je foodcourt-mandje elkaar niet meer, zónder enige foutmelding. Dezelfde vraag ("is deze rekening van mij?") stond bovendien vier keer los uitgeschreven; die loopt nu ook via de naad.
+
+Het interessante zat in de toetsing: ik heb de twee beweringen die ik in het commentaar had opgeschreven allebei kapotgemaakt — een lege handle die overal bij hoort, en de volledige sessiesleutel in de handle — en de hele gastreeks bleef groen. Twee claims die niemand bewaakte (LAT-regel 10). `test/klantnaad.test.js` bewaakt ze nu wel; beide mutaties zakken.
+
+Wat níét is samengevoegd: `kern/foodcourt.js` en `kern/gast/foodcourt.js`. Die staan al maanden naast elkaar en dat leek dubbelop, maar het zijn twee producten met dezelfde marktnaam en nul gedeelde code — het reserveerplein (restaurants met hun vrije tijdsloten) en het mandje bij meer loketten. Beide headers zeggen dat nu van elkaar, zodat niemand er nog een middag aan verliest.
 
 ### RTG Mobility OS (de vervoerskern)
 

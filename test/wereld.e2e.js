@@ -361,6 +361,85 @@ test('de sterrenhemel van de poort staat op ware grootte op het beginscherm',
   });
 });
 
+test('de hele sterrenhemel beweegt, niet alleen de heldere sterren',
+  { skip: overslaan }, async () => {
+  /* WAT HIER MIS WAS, EN WAAROM JE HET OP EEN AFDRUK NOOIT ZIET.
+
+     De hemel bestond uit twee lagen: een STOFVELD van duizenden minuscule
+     puntjes, en daarboven zo'n dertienhonderd heldere sterren die langzaam
+     ronddraaiden. Het stofveld werd EEN keer in een apart doek gebakken en
+     daarna elk beeld ongewijzigd overgezet. Het overgrote deel van wat je zag
+     stond dus muurvast, en juist die paar felle punten bewogen -- precies
+     andersom dan het lijkt. Op een stilstaande afdruk is dat onzichtbaar; op
+     een scherm waar je een minuut naar kijkt leest het als behang met een paar
+     bewegende stipjes erover.
+
+     Deze meting kijkt daarom naar de hemel op TWEE momenten en telt hoeveel
+     opgelichte pixels er op precies dezelfde plek nog steeds oplichten. Staat
+     het veld stil, dan is dat bijna alles; beweegt het echt, dan blijft er
+     alleen toevallige overlap over (gemeten: 9,5%, zowel na zes als na twintig
+     seconden -- het veld is dan volledig gedecorreleerd).
+
+     DE MUTATIE: laat verfStof() met een vaste tijd tekenen (verfStof(0) in
+     plaats van verfStof(t)) in sterren-03.js. Het stof staat dan weer stil, de
+     heldere sterren draaien nog gewoon door, en het scherm ziet er op een
+     afdruk identiek uit. Deze toets zakt dan meteen. */
+  await metLid('aan', async ({ page }) => {
+    /* Eerst wachten tot de hemel STIL HANGT: bij het opbouwen kan hij nog een
+       keer opnieuw worden opgehangen (het scherm krijgt zijn maat, de intake
+       gaat eraf). Meten terwijl dat nog kan, meet de opbouw en niet de hemel. */
+    await page.waitForFunction(() => {
+      const cv = document.querySelector('.os-thuisscherm > canvas.rtg-sterren');
+      if (!cv) return false;
+      if (window.__hemelVorig === cv) return (window.__hemelZelfde = (window.__hemelZelfde || 0) + 1) > 6;
+      window.__hemelVorig = cv; window.__hemelZelfde = 0;
+      return false;
+    }, null, { timeout: 20000, polling: 250 });
+
+    const r = await page.evaluate(async () => {
+      /* HET DOEK ELKE KEER OPNIEUW OPZOEKEN, en niet een verwijzing vasthouden.
+         De hemel wordt opnieuw opgehangen als het scherm van maat verandert
+         (zie hangHemel in wereld-05.js), en dan wordt het oude doek uit de
+         pagina gehaald. Een vastgehouden verwijzing wijst daarna naar een doek
+         waar niemand meer op tekent -- dat staat per definitie stil, en dan
+         zakt deze toets om zijn eigen fout in plaats van om de hemel. Precies
+         dat gebeurde toen hij naast een andere toetsenreeks draaide. */
+      const doek = () => document.querySelector('.os-thuisscherm > canvas.rtg-sterren');
+      const lees = () => {
+        const cv = doek();
+        if (!cv) return null;
+        const k = document.createElement('canvas');
+        k.width = cv.width; k.height = cv.height;
+        const c = k.getContext('2d');
+        c.drawImage(cv, 0, 0);
+        return { data: c.getImageData(0, 0, k.width, k.height).data, cv: cv };
+      };
+      const a = lees();
+      await new Promise((k) => setTimeout(k, 6000));
+      const b = lees();
+      if (!a || !b) return { fout: 'geen sterrendoek' };
+      // is het doek onderweg vervangen, dan valt er niets te vergelijken
+      if (a.cv !== b.cv) return { fout: 'de hemel is tussentijds opnieuw opgehangen' };
+      let aanA = 0, gelijk = 0;
+      for (let i = 3; i < a.data.length; i += 4) {
+        const x = a.data[i] > 8, y = b.data[i] > 8;
+        if (x) aanA++;
+        if (x && y) gelijk++;
+      }
+      return { aanA, gelijk };
+    });
+    assert.ok(!r.fout, 'de meting kon niet worden gedaan: ' + r.fout);
+
+    assert.ok(r.aanA > 400,
+      'er hoort een hemel te staan om te meten (opgelichte punten: ' + r.aanA + ')');
+    const bleef = r.gelijk / r.aanA;
+    assert.ok(bleef < 0.35,
+      'de hemel staat grotendeels stil: na zes seconden licht ' + Math.round(bleef * 100) +
+      '% van de punten nog op precies dezelfde plek op. Het stofveld hoort mee te bewegen, ' +
+      'niet als gebakken plaatje onder de draaiende sterren te liggen.');
+  });
+});
+
 test('Rahul zegt het EEN keer: in de ring, niet ook nog in de draad eronder',
   { skip: overslaan }, async () => {
   /* DE MUTATIE: haal de regel in wereld.css weg die de draad en de tips in de

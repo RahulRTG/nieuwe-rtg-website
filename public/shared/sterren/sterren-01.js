@@ -83,10 +83,12 @@
     if (getComputedStyle(doel).position === 'static') doel.style.position = 'relative';
     doel.insertBefore(cv, doel.firstChild);
     var g = cv.getContext('2d');
-    var stof = document.createElement('canvas');
-    var sg = stof.getContext('2d');
+    /* HIER STOND EEN TWEEDE DOEK voor het stofveld: duizenden puntjes werden er
+       een keer in gebakken en daarna elk beeld met drawImage overgezet. Dat doek
+       is weg, en daarmee de reden dat het overgrote deel van de hemel stilstond
+       -- het stof beweegt nu zelf mee (zie zaaiStof/verfStof in deel 2). */
 
-    var sterren = [], meteoren = [], flonkers = [];
+    var sterren = [], stofGroepen = [], meteoren = [], flonkers = [];
     var breedte = 0, hoogte = 0, straal = 0, cx = 0, cy = 0;
     var CAM = 2.4, helder = (opts.helderheid == null ? 1 : opts.helderheid);
 

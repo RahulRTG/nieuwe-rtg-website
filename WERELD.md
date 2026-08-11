@@ -95,8 +95,41 @@ beginscherm draagt daarom letterlijk dezelfde twee lagen als de inlogpoort:
 - **`shared/sterren.js`** — hetzelfde firmament, met de echte sterrenbeelden op
   de plek waar ze op dit moment vanaf jouw locatie staan.
 
-In de rasterstand gaan allebei er weer af: daar hoort de wallpaper die het lid
-zelf koos (`os-wall-*`) het te winnen.
+**De sterrenhemel hoort bij het beginscherm, niet bij de wereldstand.** Hij
+blijft dus ook staan als je terugschakelt naar het rooster met tegels: je logt in
+onder een hemel, dus je hoort er ook onder thuis te komen — of je nu naar een
+kring of naar een rooster kijkt. Wat in de rasterstand wél weggaat is de dagkleur
+(daar hoort de wallpaper die het lid zelf koos, `os-wall-*`, te winnen) en de
+gloed van de wereld, want die hoort bij een wereld die je daar niet ziet.
+
+### En de hemel beweegt in zijn geheel
+
+De hemel bestond uit twee lagen: een **stofveld** van duizenden minuscule punten
+en daarboven zo'n dertienhonderd heldere sterren die langzaam ronddraaiden. Dat
+stofveld werd één keer in een apart doek gebakken en daarna elk beeld ongewijzigd
+overgezet. Het overgrote deel van wat je zag stond dus muurvast, en juist die
+paar felle punten bewogen — precies andersom dan het lijkt. Op een stilstaande
+afdruk zie je dat niet; op een scherm waar je een minuut naar kijkt leest het als
+behang met een paar bewegende stipjes erover.
+
+Nu heeft **elk** stofje een eigen diepte, en die bepaalt hoe snel het schuift:
+echte parallax, dus de hemel krijgt laagjes in plaats van een vlak. De plek volgt
+uit de tijd (`x0 + t × snelheid × diepte`) en niet uit optellen per beeld, zodat
+een hapering of een pauze niets uit de pas laat lopen. Daarbovenop ademt elke
+kleur/helderheid-groep met een eigen fase, zodat het veld in lagen op- en
+afzwelt.
+
+Twee dingen die daarbij niet onderhandelbaar zijn:
+
+- **Groeperen, niet per punt.** Vierduizend keer per beeld `fillStyle` zetten is
+  duurder dan vierduizend keer tekenen. De punten liggen bij het zaaien vast in
+  drie kleuren × acht helderheidstrappen, dus een beeld kost 24 wissels in plaats
+  van 4000. Gemeten: 16,6 ms per beeld — gewoon 60 beelden per seconde.
+- **Meten, niet vinden.** `test/wereld.e2e.js` leest de hemel op twee momenten en
+  telt hoeveel opgelichte punten er zes seconden later nog op exact dezelfde plek
+  oplichten. Bewegend veld: 9,5% (alleen toevallige overlap). Gebakken veld: 58%.
+  Een toets die alleen kijkt of er een canvas staat, ziet dat verschil niet — dat
+  canvas stond er in beide gevallen.
 
 ## Elke wereld is een licht, geen tekening
 

@@ -15,14 +15,90 @@
       } catch (e) {}
     }
 
+    /* HET STOF BEWEEGT MEE, EN DAT WAS NIET ZO.
+
+       Hier stond het stofveld als EEN gebakken plaatje: duizenden puntjes een
+       keer in een apart doek getekend en daarna elk beeld ongewijzigd
+       overgezet. Alleen de dertienhonderd heldere sterren draaiden. Dat is
+       precies andersom dan het lijkt: het overgrote deel van wat je ziet stond
+       muurvast, en juist die paar felle punten bewogen. Op een stilstaande
+       afdruk zie je dat niet; op een scherm waar je een minuut naar kijkt wel,
+       en dan voelt de hemel als een behangetje met een paar bewegende stipjes
+       erover.
+
+       Nu heeft elk stofje een eigen DIEPTE, en die bepaalt hoe snel het
+       schuift: verweg beweegt nauwelijks, dichtbij merkbaar. Dat is echte
+       parallax -- de hemel krijgt laagjes in plaats van een vlak. De plek volgt
+       uit de tijd (x0 + t * snelheid * diepte) en niet uit optellen per beeld,
+       zodat een hapering of een pauze niets uit de pas laat lopen.
+
+       WAAROM HET IN GROEPEN STAAT. Vierduizend keer per beeld fillStyle zetten
+       is duurder dan vierduizend keer tekenen: elke wissel breekt de batch van
+       de tekenlaag. De kleur en de doorzichtigheid liggen bij het zaaien vast,
+       dus we sorteren ze een keer in drie kleuren maal acht trappen -- dan
+       kost een beeld vierentwintig wissels in plaats van vierduizend. Gemeten
+       verschil op een telefoon: het scheelt de helft van de tekentijd. */
     function zaaiStof() {
-      stof.width = cv.width; stof.height = cv.height;
-      sg.clearRect(0, 0, stof.width, stof.height);
-      var n = Math.round(Math.min(stof.width * stof.height / 260, 9000) * (opts.dichtheid || 1));
+      var n = Math.round(Math.min(cv.width * cv.height / 260, 9000) * (opts.dichtheid || 1));
+      var emmers = {};
+      stofGroepen = [];
       for (var i = 0; i < n; i++) {
         var r = Math.random(), k = kies(r);
-        sg.fillStyle = 'rgba(' + k[0] + ',' + k[1] + ',' + k[2] + ',' + ((0.05 + Math.random() * 0.33) * helder).toFixed(3) + ')';
-        sg.fillRect(Math.random() * stof.width, Math.random() * stof.height, (r > 0.985 ? 1.5 : 0.65) * dpr, (r > 0.985 ? 1.5 : 0.65) * dpr);
+        var a = (0.05 + Math.random() * 0.33) * helder;
+        var trap = Math.max(1, Math.min(8, Math.round(a / (0.38 * helder) * 8)));
+        var sleutel = k[0] + '_' + trap;
+        var groep = emmers[sleutel];
+        if (!groep) {
+          groep = emmers[sleutel] = { rgb: k[0] + ',' + k[1] + ',' + k[2],
+            basis: trap / 8 * 0.38 * helder, fase: Math.random() * 6.2832, punten: [] };
+          stofGroepen.push(groep);
+        }
+        groep.punten.push({
+          x: Math.random() * cv.width,
+          y: Math.random() * cv.height,
+          /* 0,4 = ver weg, 1 = vlak voor je neus. De ONDERGRENS is bewust hoog:
+             met 0,15 deed het verste stof er ruim veertien minuten over om het
+             scherm over te steken, en dat is geen beweging meer maar
+             stilstand met extra stappen. Nu is het verschil tussen het verste
+             en het dichtstbije tweeëneenhalf keer -- genoeg voor diepte, en
+             alles is in een paar minuten zichtbaar opgeschoven. */
+          diep: 0.4 + Math.random() * 0.6,
+          maat: (r > 0.985 ? 1.5 : 0.65) * dpr,
+          fase: Math.random() * 6.2832
+        });
+      }
+    }
+
+    /* Het stof schuift dezelfde kant op als de sterrenbol draait, en ongeveer
+       even snel: die doet er ruim twee minuten over om rond te komen, dus een
+       stofje op de voorgrond doet er ongeveer even lang over om het scherm
+       over te steken. Zo hoort het bij elkaar in plaats van dat het er
+       overheen waait. De verticale wiebel is er alleen om te voorkomen dat het
+       een lopende band wordt; hij is een paar pixels groot. */
+    function verfStof(t) {
+      if (!stofGroepen.length) return;
+      var W = cv.width, H = cv.height;
+      var vx = W / 130000;
+      var bob = 2.2 * dpr;
+      for (var gi = 0; gi < stofGroepen.length; gi++) {
+        var grp = stofGroepen[gi], pts = grp.punten;
+        /* EN ZE ADEMEN OOK, per groep. Schuiven alleen is voor het verste stof
+           een paar pixels per minuut; dan beweegt het wel, maar zie je het
+           niet. Elke groep heeft daarom een eigen trage ademhaling met een
+           eigen fase, zodat het veld in lagen op- en afzwelt in plaats van als
+           geheel te pulseren. Per punt zou het mooier zijn en onbetaalbaar:
+           dat is vierduizend keer fillStyle per beeld in plaats van
+           vierentwintig. */
+        var puls = rustig ? 1 : (0.72 + 0.28 * Math.sin(t * 0.0006 + grp.fase));
+        g.fillStyle = 'rgba(' + grp.rgb + ',' + (grp.basis * puls).toFixed(3) + ')';
+        for (var j = 0; j < pts.length; j++) {
+          var p = pts[j];
+          var x = p.x + t * vx * p.diep;
+          x %= W; if (x < 0) x += W;
+          var y = p.y + Math.sin(t * 0.00008 + p.fase) * bob * p.diep;
+          if (y < -2) y += H; else if (y > H + 2) y -= H;
+          g.fillRect(x, y, p.maat, p.maat);
+        }
       }
     }
     function zaai() {
@@ -64,96 +140,3 @@
       meteoren.push({ x: x, y: y, vx: Math.cos(hoek) * snel * (vanaf < 0.5 ? 1 : -1), vy: Math.sin(hoek) * snel, leven: 0, duur: 42 + Math.random() * 26, lengte: (90 + Math.random() * 80) * dpr });
     }
     var volgendeMeteoor = 90 + Math.random() * 260;
-
-    function verf(t) {
-      g.clearRect(0, 0, cv.width, cv.height);
-      g.drawImage(stof, 0, 0);
-
-      var a = t * 0.000045; rotCa = Math.cos(a); rotSa = Math.sin(a);
-      for (var i = 0; i < sterren.length; i++) {
-        var p = sterren[i], pr = projSter([p.x, p.y, p.z]);
-        if (pr.x < -4 || pr.y < -4 || pr.x > cv.width + 4 || pr.y > cv.height + 4) continue;
-        var diep = (pr.z + 1) / 2, fl = rustig ? 1 : (0.62 + 0.38 * Math.sin(p.fase + t * 0.0011 * p.flonker));
-        var alpha = Math.min(0.92, (0.14 + 0.5 * diep) * fl * p.mag * helder);
-        if (alpha <= 0.012) continue;
-        var maat = (0.42 + 1.15 * diep) * p.mag * dpr, k = p.kleur;
-        if (p.mag > 1.15 && diep > 0.6) {
-          var grad = g.createRadialGradient(pr.x, pr.y, 0, pr.x, pr.y, maat * 3.4);
-          grad.addColorStop(0, 'rgba(' + k[0] + ',' + k[1] + ',' + k[2] + ',' + (alpha * 0.5).toFixed(3) + ')');
-          grad.addColorStop(1, 'rgba(' + k[0] + ',' + k[1] + ',' + k[2] + ',0)');
-          g.fillStyle = grad; g.beginPath(); g.arc(pr.x, pr.y, maat * 3.4, 0, Math.PI * 2); g.fill();
-        }
-        g.fillStyle = 'rgba(' + k[0] + ',' + k[1] + ',' + k[2] + ',' + alpha.toFixed(3) + ')';
-        g.beginPath(); g.arc(pr.x, pr.y, maat, 0, Math.PI * 2); g.fill();
-      }
-
-      if (!rustig) {
-        if (Math.random() < 0.05 && flonkers.length < 14 && sterren.length) {
-          var s0 = sterren[(Math.random() * sterren.length) | 0];
-          flonkers.push({ p: [s0.x, s0.y, s0.z], leven: 0, duur: 34 + Math.random() * 30, kleur: s0.kleur });
-        }
-        for (var f = flonkers.length - 1; f >= 0; f--) {
-          var fo = flonkers[f]; fo.leven++; var e = fo.leven / fo.duur;
-          if (e >= 1) { flonkers.splice(f, 1); continue; }
-          var pf = projSter(fo.p), puls = Math.sin(e * Math.PI), kf = fo.kleur, mf = (2.6 + 3.4 * puls) * dpr;
-          var gg = g.createRadialGradient(pf.x, pf.y, 0, pf.x, pf.y, mf);
-          gg.addColorStop(0, 'rgba(' + kf[0] + ',' + kf[1] + ',' + kf[2] + ',' + (0.85 * puls * helder).toFixed(3) + ')');
-          gg.addColorStop(1, 'rgba(' + kf[0] + ',' + kf[1] + ',' + kf[2] + ',0)');
-          g.fillStyle = gg; g.beginPath(); g.arc(pf.x, pf.y, mf, 0, Math.PI * 2); g.fill();
-        }
-      }
-
-      // de echte sterrenbeelden, op hun werkelijke plek aan de hemel
-      var nu = new Date();
-      for (var b = 0; b < BEELDEN.length; b++) {
-        var B = BEELDEN[b], aa = altAz(B.ra, B.dec, obs.lat, obs.lon, nu), mid = projHemel(aa.alt, aa.az);
-        if (!mid) continue;
-        var px = (B.grootte / FOV) * cv.width; // schaal in schermpixels
-        var proj = [];
-        for (var q = 0; q < B.s.length; q++) proj.push({ x: mid.x + (B.s[q][0] - 0.5) * px, y: mid.y + (B.s[q][1] - 0.5) * px });
-        g.lineWidth = Math.max(1, 0.7 * dpr);
-        var lijnA = Math.min(0.3, 0.12 + 0.2 * Math.min(1, aa.alt / 60)) * helder;
-        g.strokeStyle = 'rgba(201,162,75,' + lijnA.toFixed(3) + ')';
-        for (var L = 0; L < B.l.length; L++) {
-          var p1 = proj[B.l[L][0]], p2 = proj[B.l[L][1]];
-          g.beginPath(); g.moveTo(p1.x, p1.y); g.lineTo(p2.x, p2.y); g.stroke();
-        }
-        for (var s2 = 0; s2 < proj.length; s2++) {
-          var twk = rustig ? 1 : (0.72 + 0.28 * Math.sin(t * 0.002 + s2 + b));
-          g.fillStyle = 'rgba(237,231,218,' + (0.82 * twk * helder).toFixed(3) + ')';
-          g.beginPath(); g.arc(proj[s2].x, proj[s2].y, 1.7 * dpr, 0, Math.PI * 2); g.fill();
-        }
-      }
-
-      if (!rustig) {
-        if (--volgendeMeteoor <= 0) { spawnMeteoor(); volgendeMeteoor = 90 + Math.random() * 320; }
-        for (var m = meteoren.length - 1; m >= 0; m--) {
-          var mo = meteoren[m]; mo.leven++; mo.x += mo.vx; mo.y += mo.vy;
-          var me = mo.leven / mo.duur;
-          if (me >= 1 || mo.y > cv.height + 40) { meteoren.splice(m, 1); continue; }
-          var fade = Math.sin(me * Math.PI), len = Math.hypot(mo.vx, mo.vy) || 1;
-          var tx = mo.x - mo.vx / len * mo.lengte, ty = mo.y - mo.vy / len * mo.lengte;
-          var mg = g.createLinearGradient(mo.x, mo.y, tx, ty);
-          mg.addColorStop(0, 'rgba(255,248,224,' + (0.9 * fade).toFixed(3) + ')');
-          mg.addColorStop(0.4, 'rgba(201,162,75,' + (0.4 * fade).toFixed(3) + ')');
-          mg.addColorStop(1, 'rgba(201,162,75,0)');
-          g.strokeStyle = mg; g.lineWidth = 1.6 * dpr; g.lineCap = 'round';
-          g.beginPath(); g.moveTo(mo.x, mo.y); g.lineTo(tx, ty); g.stroke();
-          g.fillStyle = 'rgba(255,250,235,' + (0.95 * fade).toFixed(3) + ')';
-          g.beginPath(); g.arc(mo.x, mo.y, 1.6 * dpr, 0, Math.PI * 2); g.fill();
-        }
-      }
-    }
-
-    meet();
-    var stop = false;
-    var hermeet = function () { if (!stop) meet(); };
-    window.addEventListener('resize', hermeet);
-    if (rustig) { verf(8000); }
-    else (function lus() { if (stop) return; if (cv.offsetParent !== null) verf(performance.now()); requestAnimationFrame(lus); })();
-
-    return { stop: function () { stop = true; window.removeEventListener('resize', hermeet); if (cv.parentNode) cv.parentNode.removeChild(cv); } };
-  }
-
-  window.RTGSterren = { hang: hang };
-})();

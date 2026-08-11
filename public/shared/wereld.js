@@ -912,16 +912,20 @@
       el.kring.hidden = false;
       el.naam.hidden = false; el.sub.hidden = false;
       if (el.grond) el.grond.hidden = false;
-      var hemelAan = el.scherm.querySelector('canvas.rtg-sterren');
-      if (hemelAan) hemelAan.hidden = false;
       if (el.klok && el.klok.parentNode !== el.kring) el.kring.appendChild(el.klok);
       vulRing(); toonNaam(); kernLabel(); grondKies(); grondMaat(); grondStart();
     } else {
       wiel(false);
       grondStop();
+      /* DE STERRENHEMEL BLIJFT, OOK IN DE RASTERSTAND.
+         Hij hoort bij het BEGINSCHERM en niet bij de wereldstand: je logt in
+         onder een hemel, dus je hoort er ook onder thuis te komen -- of je nu
+         naar een kring of naar een rooster met tegels kijkt. Wat wel weggaat is
+         de gloed van de wereld (die hoort bij een wereld die je hier niet ziet)
+         en de dagkleur, want in de rasterstand hoort de achtergrond die het lid
+         zelf koos (os-wall-*) te winnen. */
+      bouwHemel();
       el.scherm.removeAttribute('data-inlogkleur');
-      var hemel = el.scherm.querySelector('canvas.rtg-sterren');
-      if (hemel) hemel.hidden = true;
       if (el.klok && el.vak && el.klok.parentNode !== el.vak) el.vak.appendChild(el.klok);
       if (el.kring) el.kring.hidden = true;
       if (el.naam) el.naam.hidden = true;

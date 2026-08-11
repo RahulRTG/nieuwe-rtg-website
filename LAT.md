@@ -294,6 +294,7 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 | waargenomen endpoint-dekking uit het routejournaal | `scripts/dekking.js` |
 | welke apps een toets ECHT heeft geopend ("af" is geen bewering) | `scripts/schermen.js` + `NORM.json` |
 | elke meter een keer zien uitslaan voor hij een oordeel draagt | `test/meterijk.test.js` + `check.js` regel 35 |
+| de systeemwetten: elke wet wijst naar een handhaver en een toets die bestaan | `INVARIANTS.json` + `scripts/wetten.js` |
 | de prestatielat: p99, doorvoer, event-loop, herstel | `BEPROEVING.json` + `scripts/norm.js` |
 | wie bewaakt wat, en wat bewaakt niemand | `scripts/samenhang.js` |
 | staat elke functie in de boardroom (en dus onder een schakelaar) | `scripts/schakelbaar.js` + `NORM.json` |

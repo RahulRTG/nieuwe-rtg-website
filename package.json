@@ -49,6 +49,7 @@
     "samenhang:vast": "node --experimental-sqlite scripts/samenhang.js --vastleggen",
     "kaart": "node scripts/kaart.js",
     "bewijs": "node scripts/bewijs.js",
+    "wetten": "node scripts/wetten.js",
     "belofte": "node scripts/belofte.js",
     "slo": "node scripts/slo.js --schrijf",
     "sonde": "node scripts/sonde.js",

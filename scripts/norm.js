@@ -48,6 +48,16 @@ const METERS = [
      eerlijke gat: meters die we niet hebben zien uitslaan. Hij mag alleen
      omlaag, dus het gat kan niet groeien en wordt over de tijd kleiner. */
   { sleutel: 'metersOngeijkt', richting: 'omlaag', wat: 'meters met alleen een reden, zonder proef die ze laat uitslaan' },
+  /* De ratel op de systeemwetten (INVARIANTS.json). Telt de wetten die GEEN
+     bewijs dragen: ONBEPROEFD (er kijkt iemand, maar die kijker is nooit op de
+     proef gesteld) plus OPEN (opgeschreven zonder handhaver of zonder toets).
+     Een GEBROKEN wet telt hier NIET mee -- die laat `npm run wetten --controle`
+     al hard zakken, en zou hier verdwijnen in een getal.
+
+     Waarom omlaag: een nieuwe wet opschrijven mag altijd, maar dan stijgt deze
+     teller en moet er bewijs bij voordat de norm weer vastligt. Zo kan het
+     register niet vollopen met voornemens die als bescherming lezen. */
+  { sleutel: 'wettenZonderBewijs', richting: 'omlaag', wat: 'systeemwetten zonder bewezen gevoelige toets (ONBEPROEFD + OPEN)' },
   { sleutel: 'endpointsZonderTest', richting: 'omlaag', wat: 'endpoints die in geen enkele test voorkomen' },
   { sleutel: 'dekkingPct', richting: 'omhoog', wat: 'percentage endpoints dat in een test voorkomt' },
   { sleutel: 'keuringStuk', richting: 'omlaag', wat: 'bevindingen van de keuring met soort "stuk"' },
@@ -572,8 +582,17 @@ function meet(bronnen) {
       '(draai: node --experimental-sqlite scripts/routekaart.js --json)');
   }
 
+  /* De systeemwetten. Ontbreekt het register, dan zakt deze meter hard in plaats
+     van nul te melden -- LAT.md regel 3: een meter zakt als zijn invoer ontbreekt.
+     Nul zou hier "alle wetten dragen bewijs" betekenen, en dat is het gevaarlijkst
+     mogelijke antwoord op een verdwenen register. */
+  const wetten = require('./wetten.js');
+  const wettenStand = wetten.keur(wetten.leesRegister()).telling;
+  const wettenZonderBewijs = wettenStand.ONBEPROEFD + wettenStand.OPEN;
+
   return {
     metersOngeijkt,
+    wettenZonderBewijs,
     routesNietSchakelbaar,
     endpointsZonderTest: (k.cijfers.dekking.ongedekt || []).length,
     dekkingPct: k.cijfers.dekking.pct || 0,

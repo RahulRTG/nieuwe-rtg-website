@@ -42,6 +42,17 @@ jobs:
         run: npm run check
       - name: Eigen AST-scan (statische analyse, geen dependency)
         run: npm run ast-scan
+      # DE SYSTEEMWETTEN (INVARIANTS.json). Een wet die naar een verdwenen
+      # handhaver of een verdwenen toets wijst, leest als bescherming en is er
+      # geen -- dat is de enige stand die hier hard zakt. ONBEPROEFD en OPEN
+      # zakken NIET: die zijn werkvoorraad en worden geratel door de meter
+      # wettenZonderBewijs in NORM.json, die alleen omlaag mag.
+      # De zelftest staat er bewust vóór (LAT.md regel 10): een motor die niet
+      # kan uitslaan, mag geen oordeel dragen over de wetten eronder.
+      - name: De wettenmotor slaat zelf uit (LAT regel 10)
+        run: node scripts/wetten.js --zelftest
+      - name: De systeemwetten wijzen nergens naar iets dat weg is
+        run: node scripts/wetten.js --controle
       # De hoofdsuite draait op de standaard (json) opslag; DATABASE_URL is hier
       # bewust NIET gezet, anders zouden alle testbestanden dezelfde Postgres delen.
       # test:gate draait dezelfde suite MET een dekkingsvloer (regels/branches/

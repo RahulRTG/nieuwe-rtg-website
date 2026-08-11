@@ -1,0 +1,439 @@
+{
+  "uitleg": "De systeemwetten van RTG: wat dit huis ALTIJD belooft, ongeacht welk scherm of welke route je pakt. Een toets bewijst een geval; een wet is een uitspraak over alle gevallen. Elke wet draagt een adres -- de handhaver die hem afdwingt en de toets die hem natrekt -- want een bewering met een adres kan zakken. `node scripts/wetten.js` keurt dit register en schrijft WETTEN.md; `--controle` zakt zodra een wet naar iets wijst dat er niet meer is. Een wet zonder handhaver of zonder toets heet OPEN en is werkvoorraad: dat is met opzet zichtbaar, want een voornemen mag je niet als bescherming presenteren.",
+  "velden": {
+    "id": "RTG-nnn, wordt nooit hergebruikt -- ook niet als een wet vervalt",
+    "wet": "de uitspraak zelf, in een zin, in de gebiedende of stellende vorm",
+    "waarom": "waar deze wet vandaan komt; bij voorkeur de fout die hem heeft afgedwongen",
+    "handhaver": "de plek(ken) in de code die hem tijdens het draaien afdwingen -- geen documentatie",
+    "toetsen": "bestandsnamen in test/ die hem natrekken",
+    "sabotage": "wat je stukmaakt om hem te breken; de zin waarmee een reviewer kan controleren of de toets echt tanden heeft"
+  },
+  "wetten": [
+    {
+      "id": "RTG-001",
+      "wet": "Geen beschermd endpoint antwoordt zonder geldig token",
+      "waarom": "De grondwet van elke laag erboven. Rol-scheiding, rechten en privacy zijn allemaal zinloos zodra er een deur zonder slot is.",
+      "handhaver": [
+        "server/opzet/diensten.js",
+        "server/accounts/tokens.js"
+      ],
+      "toetsen": [
+        "hack.test.js",
+        "auth-rol.test.js"
+      ],
+      "sabotage": "laat de auth-poortwachter next() aanroepen als er geen token is; hack.test.js hoort dan op 401 te vallen"
+    },
+    {
+      "id": "RTG-002",
+      "wet": "Een token van de ene rol opent nooit de app van een andere rol",
+      "waarom": "Lid, leverancier, kantoor en personeel draaien op dezelfde server. Zonder deze wet is een gratis lidaccount een sleutel tot de backoffice.",
+      "handhaver": [
+        "server/opzet/diensten.js",
+        "server/kern/bevoegdheid/index.js"
+      ],
+      "toetsen": [
+        "hack.test.js",
+        "auth-rol.test.js"
+      ],
+      "sabotage": "laat resolveSession de rol negeren; de rol-scheidingstoets in hack.test.js hoort om te vallen"
+    },
+    {
+      "id": "RTG-003",
+      "wet": "Wat er niet exact uitziet zoals wij het uitgeven, is geen token",
+      "waarom": "Buffer.from(x,'base64url') negeert tekens buiten het alfabet. Een spatie voor een ingetrokken token maakte het weer geldig: uitloggen was met een enkel teken te omzeilen. Fail closed, en iedereen kijkt naar dezelfde bytes.",
+      "handhaver": [
+        "server/accounts/tokens.js"
+      ],
+      "toetsen": [
+        "sessies.test.js",
+        "hack.test.js"
+      ],
+      "sabotage": "versoepel TOKENVORM tot /.+/ en stuur een ingetrokken token met een spatie ervoor"
+    },
+    {
+      "id": "RTG-004",
+      "wet": "Een wachtwoordwijziging beëindigt elke lopende sessie",
+      "waarom": "Iemand herstelt zijn wachtwoord meestal OMDAT er iets mis is. Precies dan hoort de meelezer eruit te vliegen en niet rustig te blijven zitten terwijl het slot wordt vervangen.",
+      "handhaver": [
+        "server/accounts/tokens.js"
+      ],
+      "toetsen": [
+        "sessiegrens.test.js"
+      ],
+      "sabotage": "laat verifyToken sessies_vanaf negeren; een token van voor de wijziging werkt dan weer"
+    },
+    {
+      "id": "RTG-005",
+      "wet": "Een grendel hangt aan het doel, niet aan de aanvrager",
+      "waarom": "Twee deuren naar dezelfde pin hielden elk hun eigen teller, en de tweede hing aan het account van de aanvrager. Twintig gratis accounts gaven twintig keer vijf pogingen per minuut op één pin van vier cijfers.",
+      "handhaver": [
+        "server/pinslot.js"
+      ],
+      "toetsen": [
+        "algpin.test.js"
+      ],
+      "sabotage": "geef de teller een sleutel met het account van de aanvrager erin; het slot valt dan uiteen in losse tellers"
+    },
+    {
+      "id": "RTG-006",
+      "wet": "Een leverancier raakt de gegevens van een andere leverancier niet aan",
+      "waarom": "IDOR is de stilste fout die er is: alles werkt, niemand krijgt een foutmelding, en de gegevens van een ander zijn weg.",
+      "handhaver": [
+        "server/opzet/diensten.js"
+      ],
+      "toetsen": [
+        "hack.test.js"
+      ],
+      "sabotage": "laat staff/remove het staffId zonder eigenaarscontrole opzoeken"
+    },
+    {
+      "id": "RTG-007",
+      "wet": "Productie start nooit met onveilige secrets",
+      "waarom": "Vielen de sleutels terug op de datamap, dan lag de sleutel naast de database die hij moest beschermen -- en dan is de hele pseudonimisering waardeloos. Een waarschuwing die je kunt negeren beschermt niemand, dus dit blokkeert de start.",
+      "handhaver": [
+        "server/config/productie.js"
+      ],
+      "toetsen": [
+        "productie.test.js"
+      ],
+      "sabotage": "zet de sleutelcontrole om van fouten.push naar waarschuwingen.push; de start lukt dan zonder sleutel"
+    },
+    {
+      "id": "RTG-008",
+      "wet": "Een productiestart op een opslag zonder grootboek wordt geweigerd",
+      "waarom": "Geld op een opslag die geen grootboek kan bijhouden is geld dat je niet kunt verklaren. Liever niet starten dan stil verkeerd tellen.",
+      "handhaver": [
+        "server/config/productie-opslag.js"
+      ],
+      "toetsen": [
+        "productie.test.js",
+        "opslagpoort.test.js"
+      ],
+      "sabotage": "laat keurOpslag de grootboekeis overslaan bij een json-opslag"
+    },
+    {
+      "id": "RTG-009",
+      "wet": "Een instance die zijn staat nog laadt, beantwoordt geen API-verkeer",
+      "waarom": "Fase D van de beproeving op 65M-schaal: een instance serveerde zijn verouderde snapshot en een schrijfactie in dat venster overschreef daarna de echte staat. Saldi 'overleefden' een herstart niet.",
+      "handhaver": [
+        "server/middleware/remmen.js"
+      ],
+      "toetsen": [
+        "opslagpoort.test.js"
+      ],
+      "sabotage": "laat opslagPoort altijd next() aanroepen; een herstart geeft dan antwoorden uit de oude snapshot"
+    },
+    {
+      "id": "RTG-010",
+      "wet": "Een versleuteld veld hoort bij de rij waar het staat",
+      "waarom": "Versleuteling zegt niets over waar iets thuishoort. Wie de database kan bewerken kon een versleutelde naam naar de rij van een ander verplaatsen; de AEAD merkte niets en het huis las een echte naam bij de verkeerde codenaam.",
+      "handhaver": [
+        "server/accounts/gebonden.js"
+      ],
+      "toetsen": [
+        "kluis-binding.test.js"
+      ],
+      "sabotage": "haal de rij-identiteit uit de additional authenticated data; de aanval met rauwe SQL slaagt dan"
+    },
+    {
+      "id": "RTG-011",
+      "wet": "Een opgeslagen bestand hoort bij de naam waaronder het is opgeslagen",
+      "waarom": "Dezelfde fout een laag lager: wie bij de opslag kon, wisselde twee KYC-blobs om en de backoffice keurde goed op het verkeerde identiteitsbewijs.",
+      "handhaver": [
+        "server/kluis.js"
+      ],
+      "toetsen": [
+        "bestand-binding.test.js"
+      ],
+      "sabotage": "laat de bestandsnaam uit de AAD; twee omgewisselde blobs gaan dan gewoon open"
+    },
+    {
+      "id": "RTG-012",
+      "wet": "De zoek-hash op e-mail en telefoon roteert niet mee met de kluissleutel",
+      "waarom": "Zou hij meebewegen, dan kon niemand meer op zijn e-mailadres inloggen, en halverwege een rotatie stond de helft van de leden buiten.",
+      "handhaver": [
+        "server/accounts/kluis.js"
+      ],
+      "toetsen": [
+        "kluis-rotatie.test.js"
+      ],
+      "sabotage": "laat de zoek-hash de nieuwste sleutel gebruiken; de inlogtest in kluis-rotatie.test.js hoort te zakken"
+    },
+    {
+      "id": "RTG-013",
+      "wet": "Wie een identiteit opvraagt, laat een spoor na dat de naam zelf niet bevat",
+      "waarom": "Een kluis die je ongemerkt kunt openen is geen kluis. En zou de opgevraagde naam in het journaal staan, dan was dat een tweede, onversleutelde kopie van de kluis.",
+      "handhaver": [
+        "server/inzagelog.js"
+      ],
+      "toetsen": [
+        "inzagelog.test.js"
+      ],
+      "sabotage": "schrijf de opgevraagde naam mee in het journaal, of sla het journaal over bij een leesactie"
+    },
+    {
+      "id": "RTG-014",
+      "wet": "Geen logregel draagt een querystring",
+      "waarom": "SSE kan geen Authorization-header sturen, dus daar reist het sessietoken mee in de URL. Een logger die de volledige URL schrijft, schrijft dus tokens.",
+      "handhaver": [
+        "server/log.js"
+      ],
+      "toetsen": [
+        "loghygiene.test.js"
+      ],
+      "sabotage": "log req.originalUrl in plaats van req.path"
+    },
+    {
+      "id": "RTG-015",
+      "wet": "Elk uitgaand doel dat een client bepaalt, gaat eerst door de SSRF-keuring",
+      "waarom": "Het push-endpoint komt van de browser en de server POST daar later naartoe. Zonder keuring is dat een vrijbrief om de cloud-metadata op 169.254.169.254 te laten ophalen.",
+      "handhaver": [
+        "server/kern/ssrf.js"
+      ],
+      "toetsen": [
+        "ssrf.test.js"
+      ],
+      "sabotage": "laat veiligeExternalUrl altijd true teruggeven"
+    },
+    {
+      "id": "RTG-016",
+      "wet": "Elk bestand dat binnenkomt, gaat langs De Ontsmetter -- langs welke weg dan ook",
+      "waarom": "Het scan-net keek naar complete data-URL's in de body. Bestanden boven 8 MB komen in kale base64-stukken binnen, zonder kop: het geheel ontstond pas op de server, waar geen body meer omheen zat.",
+      "handhaver": [
+        "server/kern/antivirus/index.js",
+        "server/opzet/poortwachters.js"
+      ],
+      "toetsen": [
+        "upload-poort.test.js",
+        "antivirus.test.js"
+      ],
+      "sabotage": "laat de stukjes-route de scanner overslaan; de EICAR-string komt dan langs één van de twee wegen binnen"
+    },
+    {
+      "id": "RTG-017",
+      "wet": "Geen pagina draait op 'unsafe-inline' voor scripts",
+      "waarom": "De terugval-CSP was zwakker dan de nonce-versie, en juist '/' viel erop terug -- de meest bezochte pagina had de zwakste regel. Een terugval hoort strenger te zijn, zodat hij zichtbaar breekt in plaats van stil te verzwakken.",
+      "handhaver": [
+        "server/middleware/voordeur.js",
+        "server/opzet/koppen.js"
+      ],
+      "toetsen": [
+        "csp.e2e.js"
+      ],
+      "sabotage": "zet 'unsafe-inline' terug in de terugval-CSP; csp.e2e.js eist nul blokkades op de vlaggenschepen"
+    },
+    {
+      "id": "RTG-018",
+      "wet": "De ratelimit telt op een IP dat de bezoeker niet zelf kan verzinnen",
+      "waarom": "trust proxy stond vast op 1. Zodra de app rechtstreeks bereikbaar is, is de bezoeker de eerste hop en verzint hij zijn eigen X-Forwarded-For -- elke limiet met één kop omzeild.",
+      "handhaver": [
+        "server/opzet/verzoekketen.js"
+      ],
+      "toetsen": [
+        "proxykop.test.js"
+      ],
+      "sabotage": "zet trust proxy weer hard op 1 en stuur een eigen X-Forwarded-For mee"
+    },
+    {
+      "id": "RTG-019",
+      "wet": "Aanhoudende brute force laat de zekeringen springen zonder dat er een mens bij hoeft",
+      "waarom": "Een aanval om drie uur 's nachts wacht niet op de eigenaar. Vanaf drie bronnen gaat de registratie eruit, vanaf zes de hele app in onderhoud -- en alleen een mens doet ze er weer in.",
+      "handhaver": [
+        "server/beveiliging.js"
+      ],
+      "toetsen": [
+        "beveiliging.test.js"
+      ],
+      "sabotage": "laat noodrem() de bronnen tellen in plaats van de verschillende bronnen, of zet de drempel op oneindig"
+    },
+    {
+      "id": "RTG-020",
+      "wet": "Verkeer van een IP in quarantaine komt er niet in, ongeacht banlijst of plafond",
+      "waarom": "Een besluit van de raadkamer moet zwaarder wegen dan een teller. Anders is 'afgesneden' een advies.",
+      "handhaver": [
+        "server/kern/schild.js",
+        "server/kern/wacht/afweer.js"
+      ],
+      "toetsen": [
+        "hack.test.js"
+      ],
+      "sabotage": "laat de quarantainecontrole na de banlijstcontrole staan en bij een verlopen ban doorlopen"
+    },
+    {
+      "id": "RTG-021",
+      "wet": "De som van alle wallets blijft op de cent gelijk aan wat er is opgeladen",
+      "waarom": "Geldconservatie is de enige controle die een dubbeltelling én een race tegelijk vangt. Onverklaard geld is geen afrondingsfout maar een bug die je nog niet kunt zien.",
+      "handhaver": [
+        "server/muntbetaal.js"
+      ],
+      "toetsen": [
+        "geld-conservatie-last.test.js",
+        "balans.test.js"
+      ],
+      "sabotage": "haal de transactiegrens rond de overboeking weg; onder gelijktijdige tikken loopt de som dan uiteen"
+    },
+    {
+      "id": "RTG-022",
+      "wet": "Geen wallet zakt ooit onder nul",
+      "waarom": "Een negatief saldo is geld dat het huis heeft uitgegeven zonder dat iemand het had.",
+      "handhaver": [
+        "server/muntbetaal.js"
+      ],
+      "toetsen": [
+        "geld-conservatie-last.test.js",
+        "munten.test.js"
+      ],
+      "sabotage": "controleer het saldo vóór in plaats van binnen de schrijfactie; twee gelijktijdige tikken gaan er dan doorheen"
+    },
+    {
+      "id": "RTG-023",
+      "wet": "Alles wat een prestatie bewaart buiten het potje, bestaat alleen boven de 18",
+      "waarom": "Ranglijsten, niveaus en seizoenen zijn de haakjes waarmee een spel een kind vasthoudt. Onder die grens blijft elk spel volledig speelbaar; er wordt alleen niets van bewaard. De grens staat op één plek, zodat een nieuwe progressievorm er niet omheen kan groeien.",
+      "handhaver": [
+        "server/kern/spellen/grens.js"
+      ],
+      "toetsen": [
+        "spelbeleid.test.js",
+        "spelprestaties.test.js"
+      ],
+      "sabotage": "laat progressieMag altijd true teruggeven; de leeftijdstoetsen in spelbeleid.test.js horen te vallen"
+    },
+    {
+      "id": "RTG-024",
+      "wet": "Twee werelden delen niets muteerbaars buiten de aangewezen gedeelde infrastructuur",
+      "waarom": "Gedeelde muteerbare staat is de bugklasse die zich niet laat toetsen: hij verschijnt pas als twee werelden toevallig tegelijk draaien. De grens hoort in de code te staan en niet in een afspraak.",
+      "handhaver": [
+        "server/opzet/domeingrens.js"
+      ],
+      "toetsen": [
+        "domeingrens.test.js"
+      ],
+      "sabotage": "geef een domein toegang tot een kernnaam die niet in GRENZEN.json staat"
+    },
+    {
+      "id": "RTG-025",
+      "wet": "Elk scherm is aan te tikken vanaf het beginscherm",
+      "waarom": "Een scherm zonder klikroute bestaat wel in de code en niet voor een mens. BEREIK.json mag daarom alleen krimpen.",
+      "handhaver": [
+        "BEREIK.json"
+      ],
+      "toetsen": [
+        "bereikbaar.test.js"
+      ],
+      "sabotage": "voeg een scherm toe waar niets naartoe linkt; de lijst in BEREIK.json hoort te groeien en de toets te zakken"
+    },
+    {
+      "id": "RTG-026",
+      "wet": "Een meter draagt pas een oordeel als hij is zien uitslaan",
+      "waarom": "Op één dag bleken zeven meters te liegen, geen van allen in de RTG-code maar allemaal in de instrumenten die moesten bewijzen dat de code deugde. Een kapotte toets zakt; een kapotte meter geeft een getal.",
+      "handhaver": [
+        "scripts/check.js",
+        "scripts/norm.js"
+      ],
+      "toetsen": [
+        "meterijk.test.js",
+        "normprestatie.test.js"
+      ],
+      "sabotage": "voeg een meter toe aan METERS zonder ijking; check.js regel 35 hoort te zakken"
+    },
+    {
+      "id": "RTG-027",
+      "wet": "Geen geslaagde toets met een serverfout eronder",
+      "waarom": "Een 5xx die niemand ziet is een bug met een groen vinkje erboven. Elke onverwachte 5xx, uncaughtException of unhandledRejection laat de suite zakken.",
+      "handhaver": [
+        "test/helper.js"
+      ],
+      "toetsen": [
+        "strenge-poort.test.js",
+        "streng-poorten.test.js"
+      ],
+      "sabotage": "laat de strenge poort 5xx-antwoorden tellen zonder te zakken"
+    },
+    {
+      "id": "RTG-028",
+      "wet": "Elke belofte in tekst draagt dekking in code",
+      "waarom": "Een belofte die naar iets verwijst dat er niet meer is, mist niemand vanzelf. Daarom heet die stand GEBROKEN en zakt hij.",
+      "handhaver": [
+        "scripts/belofte.js"
+      ],
+      "toetsen": [
+        "belofte.test.js"
+      ],
+      "sabotage": "laat een belofte naar een verwijderd pad wijzen; de controle hoort GEBROKEN te melden"
+    },
+    {
+      "id": "RTG-029",
+      "wet": "Elke soort ding heeft een handhaver, of staat met naam op de lijst van wat niemand bewaakt",
+      "waarom": "Niet 'zakt er iets' maar 'kijkt er iemand'. Wat niet in de census staat wordt niet gehandhaafd, en dat is geen tekortkoming van de lijst maar informatie.",
+      "handhaver": [
+        "scripts/samenhang.js"
+      ],
+      "toetsen": [],
+      "sabotage": "OPEN: de census draait, maar geen enkele toets valt hem aan met een verzonnen handhaver"
+    },
+    {
+      "id": "RTG-030",
+      "wet": "Bodoni staat op een gesloten lijst rollen",
+      "waarom": "Bodoni is ceremonieel. Zodra hij ook werk-elementen mag dragen, is het geen ceremonie meer maar een lettertype.",
+      "handhaver": [
+        "public/shared/rtg-ontwerp.css"
+      ],
+      "toetsen": [
+        "ontwerp.test.js"
+      ],
+      "sabotage": "zet Bodoni op een knop of een tabelkop; ontwerp.test.js hoort dat te weigeren"
+    },
+    {
+      "id": "RTG-031",
+      "wet": "Een scherm kiest een materiaal, geen kleur",
+      "waarom": "Een luxemerk denkt in materialen en licht. Losse kleuren stapelen zich op tot er geen vormtaal meer over is.",
+      "handhaver": [
+        "public/shared/rtg-materiaal.css"
+      ],
+      "toetsen": [
+        "materiaal.test.js"
+      ],
+      "sabotage": "introduceer een losse hexkleur buiten de vijf materialen"
+    },
+    {
+      "id": "RTG-032",
+      "wet": "Er zijn geen twee beginschermen",
+      "waarom": "Er lagen er twee naast elkaar: een springboard en een scrollende pagina met eigen kopbalk. Je wist nooit welke 'thuis' was. Alle paden komen nu op dezelfde plek uit.",
+      "handhaver": [
+        "server/middleware/voordeur.js"
+      ],
+      "toetsen": [
+        "beginscherm.test.js"
+      ],
+      "sabotage": "laat /apps/index.html weer een eigen pagina serveren in plaats van naar huis te herschrijven"
+    },
+    {
+      "id": "RTG-033",
+      "wet": "Geld verlaat het huis nooit vanzelf",
+      "waarom": "De harde grens van GELD.md. Automatisering mag alles voorbereiden, maar de laatste stap naar buiten is een menselijk besluit.",
+      "handhaver": [],
+      "toetsen": [],
+      "sabotage": "OPEN: er is nog geen enkele handhaver die deze wet als wet afdwingt in plaats van per route"
+    },
+    {
+      "id": "RTG-034",
+      "wet": "Kritieke historie kan niet stil worden herschreven",
+      "waarom": "Een auditketen die alleen binnen RTG leeft, beschermt niet tegen wie zowel de database als de applicatie beheert. De hashketen bestaat; een externe verankering nog niet.",
+      "handhaver": [
+        "server/kern/command/alarm.js"
+      ],
+      "toetsen": [],
+      "sabotage": "OPEN: er is geen toets die een herschreven schakel in de keten aanvalt en eist dat hij opvalt"
+    },
+    {
+      "id": "RTG-035",
+      "wet": "Een ingetrokken toestemming geeft onmiddellijk geen toegang meer",
+      "waarom": "Rechten die pas bij de volgende sessie ingaan, zijn geen rechten maar een gewoonte. Dit is nu per route geregeld en nergens als wet afgedwongen.",
+      "handhaver": [
+        "server/kern/bevoegdheid/index.js"
+      ],
+      "toetsen": [],
+      "sabotage": "OPEN: er is geen toets die een recht midden in een lopende sessie intrekt en het eerstvolgende verzoek meet"
+    }
+  ]
+}

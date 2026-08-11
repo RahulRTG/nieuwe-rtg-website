@@ -136,6 +136,27 @@ function journaalMetGat(weglaten) {
    proef die hem laat uitslaan, OF een reden waarom dat in een toets niet
    kan. scripts/check.js regel 35 bewaakt dat die lijst compleet blijft. */
 const IJKINGEN = {
+  wettenZonderBewijs: {
+    /* EEN WET ZONDER HANDHAVER MOET MEETELLEN. Dat is precies wat deze meter
+       telt, dus we zetten er een neer: een verzonnen wet met een leeg
+       handhaver-veld, wat de wettenmotor OPEN hoort te noemen.
+
+       Waarom een eigen lees-schrijf-herstel en niet metAanbouw(): INVARIANTS.json
+       is JSON, en er een regel achter plakken maakt het onleesbaar in plaats van
+       groter. We schrijven de tekst terug die we vooraf lazen, byte voor byte,
+       zodat de opmaak van het register niet verandert door hem te ijken. */
+    proef: (voor) => {
+      const pad = path.join(WORTEL, 'INVARIANTS.json');
+      const oud = fs.readFileSync(pad, 'utf8');
+      const d = JSON.parse(oud);
+      d.wetten.push({ id: 'RTG-999', wet: 'Een tijdelijke ijkwet, met opzet zonder handhaver',
+        waarom: 'Staat hier alleen tijdens test/meterijk.test.js.', handhaver: [], toetsen: [] });
+      try {
+        fs.writeFileSync(pad, JSON.stringify(d, null, 2) + '\n');
+        return norm.meet().wettenZonderBewijs - voor.wettenZonderBewijs;
+      } finally { fs.writeFileSync(pad, oud); }
+    }
+  },
   testbestanden: {
     proef: (voor) => metTijdelijkBestand('test/zz-ijk-tijdelijk.test.js',
       "const test = require('node:test');\ntest('ijk', () => {});\n",

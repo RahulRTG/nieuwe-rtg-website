@@ -59,23 +59,28 @@
     plaats();
   }
 
-  /* De streepjes op de bezel: een per stand, en ze draaien mee. Ze worden hier
-     GETEKEND naar het aantal standen en niet als vaste acht overgetikt -- komt
-     er ooit een negende wereld bij, dan klopt de verdeling vanzelf. */
+  /* De scheidingen op de bezel: een TUSSEN elke twee werelden, en ze draaien
+     mee. Tussen en niet op, want op de standen zelf staan de merken -- daar zou
+     een streepje door een glyf lopen. Zo krijgt elke wereld bovendien een eigen
+     vak op de ring, en dat is precies wat je van een bezel verwacht.
+
+     Ze worden hier GETEKEND naar het aantal standen en niet als vaste acht
+     overgetikt: komt er ooit een negende wereld bij, dan klopt de verdeling
+     vanzelf. */
   function tekenStreepjes(n) {
     if (!el.boog) return;
     el.boog.textContent = '';
     if (!n) return;
     var ns = 'http://www.w3.org/2000/svg';
     for (var i = 0; i < n; i++) {
-      var a = (i * (360 / n) - 90) * Math.PI / 180;
+      var a = ((i + 0.5) * (360 / n) - 90) * Math.PI / 180;
       var p = d.createElementNS(ns, 'line');
-      p.setAttribute('x1', (50 + 45.5 * Math.cos(a)).toFixed(2));
-      p.setAttribute('y1', (50 + 45.5 * Math.sin(a)).toFixed(2));
-      p.setAttribute('x2', (50 + 47.6 * Math.cos(a)).toFixed(2));
-      p.setAttribute('y2', (50 + 47.6 * Math.sin(a)).toFixed(2));
+      p.setAttribute('x1', (50 + 44 * Math.cos(a)).toFixed(2));
+      p.setAttribute('y1', (50 + 44 * Math.sin(a)).toFixed(2));
+      p.setAttribute('x2', (50 + 48.5 * Math.cos(a)).toFixed(2));
+      p.setAttribute('y2', (50 + 48.5 * Math.sin(a)).toFixed(2));
       p.setAttribute('stroke', 'var(--line)');
-      p.setAttribute('stroke-width', '0.5');
+      p.setAttribute('stroke-width', '0.4');
       p.setAttribute('stroke-linecap', 'round');
       el.boog.appendChild(p);
     }

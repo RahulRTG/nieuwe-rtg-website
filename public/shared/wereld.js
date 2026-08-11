@@ -97,13 +97,28 @@
     var bezel = d.createElement('div');
     bezel.className = 'os-bezel';
     bezel.setAttribute('aria-hidden', 'true');
+    /* DE MEETKUNDE VAN DE BEZEL, EN WAAROM ZE IS ZOALS ZE IS.
+
+       De merken staan op straal 41 (zie STRAAL in deel 2) en zijn zelf zo'n 5
+       breed, dus ze beslaan de band van 36 tot 46. Alles wat de bezel tekent
+       hoort DAARBUITEN te vallen, anders loopt er een lijn dwars door een glyf.
+
+       Dat ging hier eerst mis, en het was op een stilstaand scherm nauwelijks te
+       zien: de haarlijn stond op precies 41 (dus midden door alle acht de
+       glyfschijven) en het merkteken op twaalf uur liep van 40,6 tot 45,4 --
+       precies over het merk dat er net onder was komen te staan. Je zag geen
+       aanwijzer boven een wereld maar een streepje IN een wereld.
+
+       Nu: de haarlijn is de buitenrand (48,5), de scheidingen staan TUSSEN de
+       werelden in (niet erop, dus ze kunnen ook niets raken) en het merkteken is
+       een gouden driehoek die naar binnen wijst, met zijn punt op 46,4 -- net
+       boven de merken en nergens overheen. */
     bezel.innerHTML =
       '<svg viewBox="0 0 100 100" fill="none">' +
-        '<circle cx="50" cy="50" r="41" stroke="var(--line)" stroke-width="0.4"/>' +
+        '<circle cx="50" cy="50" r="48.5" stroke="var(--line)" stroke-width="0.4"/>' +
         '<g class="os-bezel-boog"></g>' +
-        // het merkteken op twaalf uur: een korte gouden streep met een punt
-        '<path d="M50 4.6 L50 9.4" stroke="var(--gold)" stroke-width="1" stroke-linecap="round"/>' +
-        '<circle cx="50" cy="12.4" r="0.9" fill="var(--gold)"/>' +
+        // het merkteken op twaalf uur: een gouden index die naar binnen wijst
+        '<path d="M50 3.6 L48.4 0.4 L51.6 0.4 Z" fill="var(--gold)"/>' +
       '</svg>';
     kring.appendChild(bezel);
 
@@ -195,23 +210,28 @@
     plaats();
   }
 
-  /* De streepjes op de bezel: een per stand, en ze draaien mee. Ze worden hier
-     GETEKEND naar het aantal standen en niet als vaste acht overgetikt -- komt
-     er ooit een negende wereld bij, dan klopt de verdeling vanzelf. */
+  /* De scheidingen op de bezel: een TUSSEN elke twee werelden, en ze draaien
+     mee. Tussen en niet op, want op de standen zelf staan de merken -- daar zou
+     een streepje door een glyf lopen. Zo krijgt elke wereld bovendien een eigen
+     vak op de ring, en dat is precies wat je van een bezel verwacht.
+
+     Ze worden hier GETEKEND naar het aantal standen en niet als vaste acht
+     overgetikt: komt er ooit een negende wereld bij, dan klopt de verdeling
+     vanzelf. */
   function tekenStreepjes(n) {
     if (!el.boog) return;
     el.boog.textContent = '';
     if (!n) return;
     var ns = 'http://www.w3.org/2000/svg';
     for (var i = 0; i < n; i++) {
-      var a = (i * (360 / n) - 90) * Math.PI / 180;
+      var a = ((i + 0.5) * (360 / n) - 90) * Math.PI / 180;
       var p = d.createElementNS(ns, 'line');
-      p.setAttribute('x1', (50 + 45.5 * Math.cos(a)).toFixed(2));
-      p.setAttribute('y1', (50 + 45.5 * Math.sin(a)).toFixed(2));
-      p.setAttribute('x2', (50 + 47.6 * Math.cos(a)).toFixed(2));
-      p.setAttribute('y2', (50 + 47.6 * Math.sin(a)).toFixed(2));
+      p.setAttribute('x1', (50 + 44 * Math.cos(a)).toFixed(2));
+      p.setAttribute('y1', (50 + 44 * Math.sin(a)).toFixed(2));
+      p.setAttribute('x2', (50 + 48.5 * Math.cos(a)).toFixed(2));
+      p.setAttribute('y2', (50 + 48.5 * Math.sin(a)).toFixed(2));
       p.setAttribute('stroke', 'var(--line)');
-      p.setAttribute('stroke-width', '0.5');
+      p.setAttribute('stroke-width', '0.4');
       p.setAttribute('stroke-linecap', 'round');
       el.boog.appendChild(p);
     }

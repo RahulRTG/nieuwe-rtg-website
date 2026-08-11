@@ -81,6 +81,23 @@
     th.src = '/shared/rtg-themas.js';
     (document.head || document.documentElement).appendChild(th);
   }
+/* De gedeelde basis-laag, deel 01a: offline en de service worker.
+
+   Afgesplitst van ./basis-01.js toen die bij het samenvoegen met main over de
+   tienkilobyte-grens ging -- twee takken hadden er onafhankelijk van elkaar een
+   "stap 0" bovenop gezet, en samen pasten die er niet meer bij.
+
+   Er is geknipt NA stap 0 en niet ervoor, en dat is geen smaak. De bundel wordt
+   geplakt op alfabetische volgorde van de bestandsnaam (scripts/bundel.js), dus
+   01 komt voor 01a komt voor 02. Stap 0 gaat over hoe de pagina er bij het
+   EERSTE beeld uitziet en moet dus in 01 blijven; had ik stap 0 hierheen
+   verplaatst, dan was hij na stap 1 gaan draaien en zag je de oude grond en de
+   te kleine letter nog even staan. Ik heb dat eerst verkeerd om gedaan en het
+   gemeten aan de bundel; vandaar deze alinea.
+
+   Dit is GEEN zelfstandige module: het is een fragment dat middenin de
+   omhullende functie van 01 landt en pas door 02 wordt afgesloten. Los
+   requiren of ontleden lukt niet, en dat hoort zo. */
 
   /* ---- 1. offline: de service worker + een rustig verbindingsseintje ---- */
   if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {

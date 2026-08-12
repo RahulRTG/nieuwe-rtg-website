@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 932 bestanden en 6225 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 933 bestanden en 6245 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 932 |
-| losse beweringen (`test(...)`) | 6225 |
+| toetsbestanden | 933 |
+| losse beweringen (`test(...)`) | 6245 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 614 |
 | **overleefd**: geen mutatie kreeg hem rood | 13 |
 | niet te meten (al rood, geen module gevonden, ...) | 18 |
 | alleen in de kop *genoemd*, nog niet gemeten | 92 |
-| niets van beide | 195 |
+| niets van beide | 196 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-812 bestanden, 6010 beweringen.
+813 bestanden, 6030 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -654,6 +654,7 @@ toets omvalt.
 | `spelbank.test.js` | 21 | genoemd | MAGNAAT: DE BANK -- de eerste laag waar geld de wereld verlaat. Alles hiervoor VERPLAATSTE: een contract betaalt de een en verrijkt de ander, een veiling verschuift een zaak, een deelneming splitst een resultaat. |
 | `spelbeheer.test.js` | 20 | -- | MAGNAAT: DE AI-MANAGER -- je zaken laten draaien terwijl je er niet bent. ACHT BEWERINGEN, en ze zijn alle acht stil terug te draaien: 1. |
 | `spelbeleid.test.js` | 10 | -- | De beleidslaag: alle toetredingsvragen op een plek, in volgorde. Wat hier bewaakt wordt is NIET dat er nieuwe regels zijn -- die zijn er juist niet. |
+| `spelbestuur.test.js` | 20 | -- | MAGNAAT: HET BESTUUR -- meerdere mensen in EEN concern. Fase D, het eerste stuk. |
 | `spelbeurs.test.js` | 15 | genoemd | MAGNAAT: DE BEURS -- belangen die openbaar te koop staan. ZEVEN BEWERINGEN, en ze zijn alle zeven stil terug te draaien: 1. |
 | `spelconcern.test.js` | 14 | -- | MAGNAAT: HET CONCERN -- wat het kost om een bedrijf te zijn in plaats van een zaak. ZES BEWERINGEN, en ze zijn alle zes stil terug te draaien: 1. |
 | `spelconcurrent.test.js` | 14 | -- | MAGNAAT: DE AI-CONCURRENT -- een tegenspeler die bijstuurt. ZEVEN BEWERINGEN, en ze zijn alle zeven stil terug te draaien: 1. |

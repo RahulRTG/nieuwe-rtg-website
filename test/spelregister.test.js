@@ -58,7 +58,7 @@ const GOUD = {
     'beurs-aanbieden', 'beurs-kopen', 'beurs-intrekken',
     'overname-bod', 'overname-antwoord', 'overname-intrekken',
     'functie-openen', 'functie-intrekken', 'solliciteren', 'aannemen',
-    'dienst-opzeggen', 'werk-beleid'],
+    'dienst-opzeggen', 'werk-beleid', 'bestuur-zet'],
     vormen: ['live', 'async'],
     varianten: { vorm: ['bord', 'economie'], stad: ['IJmuiden'], duur: ['quick', 'avond', 'weekend'] } }],
   seconden: ['30 Seconden', 4, 'rtg', { min: 4, teams: 'altijd', vormen: ['live'] }],

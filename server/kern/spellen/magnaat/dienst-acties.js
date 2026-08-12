@@ -17,15 +17,25 @@
    verandering -- en dan is de vraag "wie mag dit" op twee plekken beantwoord.
    Dat is de wet van ./beheer.js, hier toegepast op een mens. */
 const D = require('./dienst');
+const BS = require('./bestuur');
 const { SECTOREN } = require('./sectoren');
 
 module.exports = ({ K, mijnVestiging, wieHeeft, ACTIES, rond }) => {
   const vind = (st, id) => (st.vestigingen ? Object.values(st.vestigingen).flat()
     .find(v => v.id === id) : null) || null;
 
-  /* Het loon dat bij deze functie hoort, uit de sector van de vestiging. Staat
-     hier en niet in ./dienst.js omdat daar geen vestiging bekend is. */
-  const bandVan = (v, rol) => D.loonband(SECTOREN[v.sector].loon, rol);
+  /* Het loon dat bij deze functie hoort. Voor een zaakrol uit de SECTOR van de
+     vestiging; voor een bestuursrol uit de OMZET van het hele concern, want een
+     directeur van twaalf zaken heeft een grotere baan dan een van een. Zie
+     ./bestuur.js. Een vraag, een antwoord: de drie acties hieronder hoeven het
+     onderscheid verder nergens te maken. */
+  const bandVan = (st, werkgever, v, rol) => BS.isBestuur(rol)
+    ? BS.bestuursband(st, werkgever, rol)
+    : D.loonband(SECTOREN[v.sector].loon, rol);
+  /* EEN BESTUURDER HEEFT GEEN VESTIGING, en dat is geen gebrek maar zijn hele
+     onderscheid: hij werkt voor het concern. Deze twee regels zijn de enige
+     plek waar dat in de sollicitatieweg iets uitmaakt. */
+  const zaakVan = (st, f) => (BS.isBestuur(f.rol) ? true : vind(st, f.vestiging));
 
   /* Wat een speler ZIET staat in ./dienst-beeld.js -- daar wat hij ziet, hier
      wat hij doet. Zie de uitleg daar. */
@@ -37,23 +47,36 @@ module.exports = ({ K, mijnVestiging, wieHeeft, ACTIES, rond }) => {
        vacature zonder loon laat de kandidaat gokken en dan zet iedereen laag in. */
     'functie-openen'(potje, h, zet) {
       const st = potje.staat;
-      const v = mijnVestiging(st, h, String(zet.vestiging || ''));
-      if (!v) return { status: 400, error: 'Dat is niet jouw zaak.' };
       const rol = String(zet.rol || '');
       if (!D.ROLLEN[rol]) return { status: 400, error: 'Die rol bestaat niet.' };
-      const band = bandVan(v, rol);
+      /* EEN BESTUURDER WORDT NIET BIJ EEN ZAAK GEZOCHT MAAR BIJ EEN CONCERN, en
+         zonder zaken is er niets te besturen -- dan is de vacature een titel. */
+      const bestuur = BS.isBestuur(rol);
+      const v = bestuur ? null : mijnVestiging(st, h, String(zet.vestiging || ''));
+      if (!bestuur && !v) return { status: 400, error: 'Dat is niet jouw zaak.' };
+      if (bestuur && !((st.vestigingen[h] || []).length))
+        return { status: 400, error: 'Je hebt nog geen zaken om te laten besturen.' };
+      const band = bandVan(st, h, v, rol);
       const loon = Math.round(Number(zet.loon) || band.basis);
       if (loon < band.min || loon > band.max)
         return { status: 400, error: 'Een loon voor deze rol ligt tussen ' + band.min + ' en ' + band.max + '.' };
       /* EEN ROL PER ZAAK, want twee bedrijfsleiders op een zaak is geen
          organisatie maar een onduidelijkheid. Wie de rol wil wisselen, zegt de
          lopende op. */
-      if (D.dienstenBij(st, v.id).some(d => d.rol === rol))
-        return { status: 409, error: 'Die rol is bij deze zaak al vervuld.' };
-      if (D.functies(st).some(f => f.status === 'open' && f.vestiging === v.id && f.rol === rol))
+      /* EEN ROL PER PLEK: bij een zaakrol is die plek de vestiging, bij een
+         bestuursrol het concern -- twee financieel directeuren is geen
+         organisatie maar een onduidelijkheid, net als twee bedrijfsleiders op
+         een zaak. */
+      const bezet = bestuur
+        ? D.lopend(st).some(d => d.werkgever === h && d.rol === rol)
+        : D.dienstenBij(st, v.id).some(d => d.rol === rol);
+      if (bezet) return { status: 409, error: 'Die rol is al vervuld.' };
+      if (D.functies(st).some(f => f.status === 'open' && f.rol === rol
+        && (bestuur ? f.werkgever === h : f.vestiging === v.id)))
         return { status: 409, error: 'Die functie staat al open.' };
       const f = { id: 'f' + (++st.functieTeller || (st.functieTeller = 1)),
-        werkgever: h, vestiging: v.id, sector: v.sector, rol, loon,
+        werkgever: h, vestiging: bestuur ? null : v.id,
+        sector: bestuur ? null : v.sector, rol, loon,
         maand: st.maand, status: 'open', sollicitaties: [] };
       D.functies(st).push(f);
       return { status: 200, ok: true, id: f.id, loon };
@@ -83,9 +106,9 @@ module.exports = ({ K, mijnVestiging, wieHeeft, ACTIES, rond }) => {
       if (D.dienstVan(st, h)) return { status: 409, error: 'Je hebt al een baan. Zeg die eerst op.' };
       if (f.sollicitaties.some(s => s.speler === h))
         return { status: 409, error: 'Je hebt hier al gesolliciteerd.' };
-      const v = vind(st, f.vestiging);
+      const v = zaakVan(st, f);
       if (!v) return { status: 404, error: 'Die zaak bestaat niet meer.' };
-      const band = bandVan(v, f.rol);
+      const band = bandVan(st, f.werkgever, v, f.rol);
       const vraag = Math.round(Number(zet.loon) || f.loon);
       if (vraag < band.min || vraag > band.max)
         return { status: 400, error: 'Vraag tussen ' + band.min + ' en ' + band.max + '.' };
@@ -105,8 +128,7 @@ module.exports = ({ K, mijnVestiging, wieHeeft, ACTIES, rond }) => {
       const s = f.sollicitaties.find(x => x.speler === wie);
       if (!s) return { status: 404, error: 'Die sollicitatie bestaat niet.' };
       if (D.dienstVan(st, wie)) return { status: 409, error: 'Die speler is inmiddels ergens anders begonnen.' };
-      const v = vind(st, f.vestiging);
-      if (!v) return { status: 404, error: 'Die zaak bestaat niet meer.' };
+      if (!zaakVan(st, f)) return { status: 404, error: 'Die zaak bestaat niet meer.' };
       const d = { id: 'd' + (++st.dienstTeller || (st.dienstTeller = 1)),
         werkgever: h, werknemer: wie, vestiging: f.vestiging, rol: f.rol,
         loon: s.loon, sinds: st.maand, maanden: 0, betaaldTotaal: 0, status: 'loopt' };
@@ -128,25 +150,15 @@ module.exports = ({ K, mijnVestiging, wieHeeft, ACTIES, rond }) => {
       d.tot = st.maand;
       d.reden = d.werknemer === h ? 'opgezegd' : 'ontslagen';
       return { status: 200, ok: true, reden: d.reden };
-    },
-
-    /* WAT EEN WERKNEMER MAG VERANDEREN, en dit is de enige plek waar een rol iets
-       doet. Hij zet zelf geen enkel veld: hij controleert of zijn rol dit mag en
-       roept dan de gewone `beleid`-actie aan namens de EIGENAAR. */
-    'werk-beleid'(potje, h, zet) {
-      const st = potje.staat;
-      const d = D.dienstVan(st, h);
-      if (!d) return { status: 403, error: 'Je bent nergens in dienst.' };
-      const velden = ['onderhoud', 'personeel', 'prijs', 'marketing'].filter(x => zet[x] !== undefined);
-      if (!velden.length) return { status: 400, error: 'Er valt niets te veranderen.' };
-      const nietMag = velden.filter(x => !D.magRol(d.rol, x));
-      if (nietMag.length)
-        return { status: 403, error: 'Als ' + D.ROLLEN[d.rol].naam.toLowerCase()
-          + ' ga je niet over: ' + nietMag.join(', ') + '.' };
-      const door = Object.assign({}, zet, { actie: 'beleid', id: d.vestiging });
-      return ACTIES.beleid(potje, d.werkgever, door);
     }
   };
+
+  /* WAT IEMAND NAMENS EEN ANDER DOET staat in ./dienst-delegeren.js. Dat is een
+     echte naad: hierboven staat hoe een dienstverband ONTSTAAT (vacature,
+     sollicitatie, aannemen, opzeggen) en dat is af; daar staat wat een rol
+     vervolgens MAG, en die lijst groeit met elke fase mee -- fase D zette er het
+     bestuur bij. */
+  Object.assign(ACTIETABEL, require('./dienst-delegeren')({ ACTIES }));
 
   return { ACTIES: ACTIETABEL, VRIJE_ACTIES: Object.keys(ACTIETABEL), beeld };
 };

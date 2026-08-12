@@ -106,8 +106,10 @@ test('een werknemer verandert niets rechtstreeks: hij loopt door dezelfde beleid
      dus wordt een onmogelijke waarde precies zo geweigerd. */
   const { m, p, st, inDienst } = opstelling();
   inDienst('bedrijfsleider');
+  /* Hij staat sinds fase D in ./dienst-delegeren.js, naast `bestuur-zet`: daar
+     staat wat een ROL mag, hier hoe een dienstverband ontstaat. */
   const bron = require('fs').readFileSync(
-    require.resolve('../server/kern/spellen/magnaat/dienst-acties'), 'utf8')
+    require.resolve('../server/kern/spellen/magnaat/dienst-delegeren'), 'utf8')
     .replace(/\/\*[\s\S]*?\*\//g, '').replace(/\/\/.*$/gm, '');
   assert.ok(/ACTIES\.beleid\(/.test(bron), 'werk-beleid roept de gewone beleid-actie aan');
   assert.ok(!/v\.(prijs|onderhoudBudget|marketing)\s*=/.test(bron),

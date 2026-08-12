@@ -77,7 +77,12 @@ module.exports = (ctx) => {
          omdat `beleid` er ook in staat -- het is diezelfde handeling, door
          iemand met een rol in plaats van door de eigenaar. */
       'functie-openen', 'functie-intrekken', 'solliciteren', 'aannemen',
-      'dienst-opzeggen', 'werk-beleid'],
+      'dienst-opzeggen', 'werk-beleid',
+      /* BESTUUR (fase D) om dezelfde reden als `werk-beleid`: het is dezelfde
+         handeling, door iemand met een rol in plaats van door de eigenaar. Wat
+         hij aanroept kan wel op een beurt moeten wachten -- dat bewaakt de
+         actie zelf, want hij loopt door de gewone tabel. */
+      'bestuur-zet'],
     init, zet,
     varianten: {
       vorm: { keuze: ['bord', 'economie'], standaard: 'bord' },

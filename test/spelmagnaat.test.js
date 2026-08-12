@@ -560,7 +560,10 @@ test('de vrije acties mogen buiten de beurt, de grote niet', () => {
   const m = maakMagnaat();
   assert.deepEqual(m.spel.buitenBeurt.slice().sort(),
     ['aannemen', 'beheer-aan', 'beheer-regels', 'beheer-uit',
-      'belang-antwoord', 'belang-voorstel', 'beleid', 'beurs-aanbieden', 'beurs-intrekken',
+      'belang-antwoord', 'belang-voorstel', 'beleid',
+      /* BESTUUR (fase D): dezelfde reden als `werk-beleid` verderop -- het is
+         de gewone handeling, door iemand met een rol in plaats van de eigenaar. */
+      'bestuur-zet', 'beurs-aanbieden', 'beurs-intrekken',
       'beurs-kopen', 'bouw',
       'contract-antwoord', 'contract-opzeggen', 'contract-voorstel',
       'dienst-opzeggen', 'functie-intrekken', 'functie-openen',

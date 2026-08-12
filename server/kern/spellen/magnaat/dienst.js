@@ -47,60 +47,16 @@
    ze vervangt die niet). */
 const rond = (n) => Math.round(n);
 
-/* DE ROLLEN. Elke rol is een ANDER antwoord op "wat mag deze persoon hier", en
-   meer dan drie zou betekenen dat het verschil tussen twee rollen niet meer te
-   zien is aan wat iemand doet. Ze lopen op, en dat is de hele carriere van
-   hoofdstuk 1 en 2: afwasser, keuken, bedrijfsleider.
-
-   WAT EEN ROL GEEFT IS EEN LIJST ACTIES en geen bevoegdheidsniveau. Een getal
-   dat "meer mag" betekent, is niet te lezen op een scherm en niet te toetsen;
-   een lijst wel. Zie de scope-gedachte in kern/concern/scope.js -- daar woont de
-   echte versie hiervan, en die is straks de plek waar dit naartoe groeit. */
-const ROLLEN = {
-  hulp: {
-    naam: 'Hulpkracht', deel: 0.6,
-    uitleg: 'Werkt mee in de zaak. Beslist niets.',
-    mag: []
-  },
-  vakkracht: {
-    naam: 'Vakkracht', deel: 1.0,
-    uitleg: 'Draagt de kwaliteit van de zaak. Zet het onderhoud.',
-    mag: ['onderhoud']
-  },
-  bedrijfsleider: {
-    naam: 'Bedrijfsleider', deel: 1.8,
-    uitleg: 'Runt de zaak. Zet onderhoud, bezetting, prijs en marketing.',
-    mag: ['onderhoud', 'personeel', 'prijs', 'marketing']
-  }
-};
-const ROLLIJST = Object.keys(ROLLEN);
-
-/* WAT EEN ROL WAARD IS, als deel van het sectorloon. Het loon van een sector
-   staat in ./sectoren.js en is wat EEN paar handen daar kost; een rol is een
-   veelvoud daarvan. Zo staat het loon van een mens op dezelfde schaal als de
-   loonpost die er al is, en hoeft er geen tweede loontabel te bestaan.
-
-   DE BAND is er omdat onderhandelen een keuze hoort te zijn en geen cadeau.
-   Buiten deze band is een bedrag geen loon maar een overdracht met een andere
-   naam -- precies de reden dat ./handel.js een prijsband kent, en dat die er
-   kwam nadat de geldpompkeuring 193 miljoen op een tafel van 62 vond. */
-const LOONBAND = [0.5, 2.5];
+/* WAT IEMAND KAN ZIJN staat in ./dienst-rollen.js -- de tabel en wat een rol
+   waard is. Dit bestand gaat over de MACHINERIE eromheen, en die verandert niet
+   als er een rol bij komt. */
+const { ROLLEN, ROLLIJST, LOONBAND, loonband, loonVoor, magRol } = require('./dienst-rollen');
 
 /* Hoe lang een openstaande functie blijft staan als niemand reageert. Een
    vacature die eeuwig blijft hangen is geen aanbod maar meubilair. */
 const FUNCTIE_MAANDEN = 6;
 
-const loonband = (sectorLoon, rol) => {
-  const basis = sectorLoon * (ROLLEN[rol] || ROLLEN.hulp).deel;
-  return { basis: rond(basis), min: rond(basis * LOONBAND[0]), max: rond(basis * LOONBAND[1]) };
-};
 
-/* Wat een baan bij deze zaak in deze rol standaard betaalt. Dit is het getal dat
-   op het scherm staat voordat er onderhandeld wordt; zonder dat getal is een
-   loon een gok en gaat iedereen laag inzetten. */
-const loonVoor = (sectorLoon, rol) => loonband(sectorLoon, rol).basis;
-
-const magRol = (rol, wat) => (ROLLEN[rol] ? ROLLEN[rol].mag.includes(wat) : false);
 
 /* ------------------------------------------------------------------ */
 

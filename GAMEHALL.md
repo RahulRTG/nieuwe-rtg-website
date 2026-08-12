@@ -1724,8 +1724,26 @@ laag hoger zit.
 
 Nog open in fase C: Magnaat Daily en lokale governance.
 
-**Fase D — de rollen.** Meerdere mensen in één concern (CEO/CFO/COO), lokale
-ondernemerskringen, chat-integratie.
+**Fase D — de rollen.** *In aanbouw.* Het eerste stuk staat:
+`kern/spellen/magnaat/bestuur.js` — **meerdere mensen in één concern**.
+
+> **Een bestuurder bestuurt, hij beschikt niet.** Loondienst zette een mens in
+> één zaak; dit zet er een in het hele concern. Een operationeel directeur
+> bouwt en runt, een financieel directeur leent en verzekert, een algemeen
+> directeur doet allebei plus de contracten. En geen van drieën kan sluiten,
+> uitstappen, veilen, aandelen aanbieden of andere bestuurders aannemen —
+> want anders is "geef mij je CEO-stoel" hetzelfde als "geef mij je bedrijf".
+> Die wand is een **controle bij het laden** en niet een weglating: zet iemand
+> er ooit toch `sluiten` bij, dan start de server niet op.
+>
+> Hij is geen tweede dienstverbandsysteem. Een bestuurder is een gewoon
+> dienstverband met `vestiging: null` — dezelfde vacature, dezelfde
+> sollicitatie, dezelfde opzegging, hetzelfde salaris, dezelfde loopbaan. Wat
+> het kost staat op **dezelfde schaal als de AI-manager**: dezelfde klus,
+> dezelfde prijs, een andere bestemming — het tarief van de AI verlaat de
+> wereld, het salaris van een mens gaat naar een speler aan tafel.
+
+Nog open in fase D: lokale ondernemerskringen en chat-integratie.
 
 Elke fase is speelbaar zonder de volgende. Dat is de eis: een half aangezette
 economie is gevaarlijker dan een afwezige, want dan gaat iemand er echt in

@@ -32,6 +32,12 @@
   "notities": [
     {
       "datum": "2026-08-12",
+      "meter": "geen meterverschuiving; RTG-038 sluit met de geldketen",
+      "reden": "De vierde en laatste categorie van de canonisatieklasse, en daar was de schade het grootst. De idempotentiesleutel komt van de client (idem reist via kern/pay/opladen.js) en ging byte-exact naar zowel onze eigen opslag als de idempotencyKey van de betaalprovider. idem=abc en idem= abc waren dus twee AFSCHRIJVINGEN. Nu gaan alle drie de geldpaden (maakBetaling, maakUitbetaling, muntbetaal) door een canoniekeSleutel: NFC + trim, met een harde weigering op leeg, te lang en stuurtekens.",
+      "eerlijkheidshalve": "Hier is bewust de ANDERE helft van de wet gekozen dan bij het sessietoken: normaliseren in plaats van weigeren. Bij een retry is samenvoegen juist de bedoeling; bij een token bestaat geen legitieme reden om er een spatie voor te zetten. En hoofdletters worden NIET gevouwen, ook al stond case-normalisatie in de opdracht: in base64 of hex zijn aB en Ab echt twee sleutels, en gelijkstellen zou een tweede betaling stilzwijgend als herhaling zien en dus laten vervallen. Een dubbele afschrijving valt op en is terug te draaien; een betaling die stil verdwijnt niet."
+    },
+    {
+      "datum": "2026-08-12",
       "meter": "geen meterverschuiving; RTG-038 uitgebreid naar paden",
       "reden": "De vier categorieen van de canonisatieklasse afgelopen. Pad was raak: het WAF-patroon eiste .. met een letterlijke slash erachter, dus /..%2fetc/passwd, /..%5cx en /%252e%252e/x gingen er doorheen terwijl /../etc/passwd geblokkeerd werd. Nu gaat elk pad eerst door canoniekPad(): tot twee keer percent-decoderen, backslash naar slash, kleine letters, en de patronen kijken naar rauw EN canoniek.",
       "eerlijkheidshalve": "Twee dingen gingen hier mis in mijn eigen meetopstelling. Eerst hergebruikte ik een schild over alle gevallen; dat bant een IP na vijf treffers, dus alles na het vijfde geval werd geblokkeerd en de probe meldde precies het antwoord dat ik wilde zien. En mijn eerste canoniekPad liet %25 met rust om %25 niet stilletjes tot % te maken -- juist die uitzondering verhinderde het dubbel gecodeerde geval waarvoor de lus bestond. Beide gecorrigeerd, en de toets draagt nu evenveel paden die er DOORHEEN moeten als paden die eruit moeten: een schild met valse alarmen wordt uitgezet en beschermt dan niets."

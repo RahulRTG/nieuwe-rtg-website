@@ -43,7 +43,7 @@
     },
     "RTG-038": {
       "stand": "BEWEZEN",
-      "uitleg": "server/kern/ssrf.js:   const h = canoniekHost(host);   // EEN canonieke vorm, gedeeld met onveiligIpLiteral ->   const h = String(host || '').replace(/^\\[|\\]$/g, '').toLowerCase(); maakt canoniek.test.js rood"
+      "uitleg": "server/betaal.js:   const k = String(waarde == null ? '' : waarde).normalize('NFC').trim(); ->   const k = String(waarde == null ? '' : waarde); maakt sleutelvorm.test.js rood"
     }
   }
 }

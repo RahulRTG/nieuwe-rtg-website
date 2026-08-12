@@ -3505,6 +3505,14 @@
       "gezakt": 1,
       "geprobeerd": 4
     },
+    "sleutelvorm.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/betaal.js",
+      "operator": "return-weg#0",
+      "gezakt": 1,
+      "geprobeerd": 4
+    },
     "sleutelwoorden.test.js": {
       "soort": "puur",
       "staat": "gezakt",

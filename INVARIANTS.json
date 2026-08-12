@@ -543,24 +543,26 @@
     {
       "id": "RTG-038",
       "wet": "Een security-identiteit heeft voor vergelijking een canonieke vorm, of niet-canonieke vormen worden hard geweigerd",
-      "waarom": "De foutklasse achter RTG-003 is breder dan tokens: een security-beslissing vergelijkt BYTES, dus zodra dezelfde betekenis in twee schrijfwijzen bestaat, bestaan er twee uitkomsten -- en de tweede is de gaatjesroute. Twee keer echt gebeurd. Bij het sessietoken decodeerde ' <token>' naar dezelfde bytes terwijl de intreklijst de rauwe string bewaarde; daar is gekozen voor hard weigeren. Bij het cloud-metadata-adres normaliseerden metadataDoel() en onveiligIpLiteral() allebei zelf en liepen uiteen, waardoor de lichte webhook-poort http://[::ffff:169.254.169.254]/ doorliet terwijl http://169.254.169.254/ geweigerd werd; daar is gekozen voor EEN gedeelde canonieke vorm. En er bleek een derde schrijfwijze te bestaan die de eerste reparatie niet dekte: new URL() comprimeert dat adres zelf tot [::ffff:a9fe:a9fe]. Een canonieke vorm die de vorm van de eigen parser niet kent, is geen canonieke vorm. Derde geval, gevonden door de categorieen af te lopen: het WAF-patroon voor pad-klimmen eiste `..` met een LETTERLIJKE slash erachter, dus /..%2fetc/passwd en /..%5cx en /%252e%252e/x gingen er doorheen terwijl /../etc/passwd geblokkeerd werd. Het schild is een detectielaag en niet de laatste verdediging, maar wie in de vorm schrijft die het schild niet kent, wordt ook niet GETELD -- en die telling drijft de banlijst en de automatische noodrem. Nu gaat elk pad eerst door canoniekPad(). Nagelopen en in orde bevonden: e-mail (emailHash trimt en lowercased, zelfde vorm bij schrijven en opzoeken), headers (de clustersleutel gaat via veiligGelijk; een dubbele header wordt door Node tot 'a, b' samengevoegd en faalt dus, fail-closed), en bestandspaden (naamVan doet path.basename, dus mapdelen verdwijnen). Nog NIET nagelopen: idempotency-sleutels in server/betaal.js, die worden ongenormaliseerd doorgegeven aan de betaalprovider.",
+      "waarom": "De foutklasse achter RTG-003 is breder dan tokens: een security-beslissing vergelijkt BYTES, dus zodra dezelfde betekenis in twee schrijfwijzen bestaat, bestaan er twee uitkomsten -- en de tweede is de gaatjesroute. Twee keer echt gebeurd. Bij het sessietoken decodeerde ' <token>' naar dezelfde bytes terwijl de intreklijst de rauwe string bewaarde; daar is gekozen voor hard weigeren. Bij het cloud-metadata-adres normaliseerden metadataDoel() en onveiligIpLiteral() allebei zelf en liepen uiteen, waardoor de lichte webhook-poort http://[::ffff:169.254.169.254]/ doorliet terwijl http://169.254.169.254/ geweigerd werd; daar is gekozen voor EEN gedeelde canonieke vorm. En er bleek een derde schrijfwijze te bestaan die de eerste reparatie niet dekte: new URL() comprimeert dat adres zelf tot [::ffff:a9fe:a9fe]. Een canonieke vorm die de vorm van de eigen parser niet kent, is geen canonieke vorm. Derde geval, gevonden door de categorieen af te lopen: het WAF-patroon voor pad-klimmen eiste `..` met een LETTERLIJKE slash erachter, dus /..%2fetc/passwd en /..%5cx en /%252e%252e/x gingen er doorheen terwijl /../etc/passwd geblokkeerd werd. Het schild is een detectielaag en niet de laatste verdediging, maar wie in de vorm schrijft die het schild niet kent, wordt ook niet GETELD -- en die telling drijft de banlijst en de automatische noodrem. Nu gaat elk pad eerst door canoniekPad(). Nagelopen en in orde bevonden: e-mail (emailHash trimt en lowercased, zelfde vorm bij schrijven en opzoeken), headers (de clustersleutel gaat via veiligGelijk; een dubbele header wordt door Node tot 'a, b' samengevoegd en faalt dus, fail-closed), en bestandspaden (naamVan doet path.basename, dus mapdelen verdwijnen). Vierde en laatste categorie, en daar was de schade het grootst: de idempotentiesleutel komt van de client en ging byte-exact naar zowel onze eigen opslag als de idempotencyKey van de betaalprovider, dus idem=\"abc\" en idem=\" abc\" waren twee AFSCHRIJVINGEN. Daar is gekozen voor normaliseren (NFC + trim) en niet voor weigeren: bij een retry is samenvoegen juist de bedoeling, terwijl er bij een token geen legitieme reden bestaat om er een spatie voor te zetten. Hoofdletters worden bewust NIET gevouwen -- in base64 of hex zijn aB en Ab echt twee sleutels, en gelijkstellen zou een tweede betaling stilzwijgend als herhaling zien en dus laten vervallen. Alle vier de categorieen zijn nu nagelopen.",
       "handhaver": [
         "server/kern/ssrf.js",
         "server/kern/schild.js",
-        "server/accounts/tokens.js"
+        "server/accounts/tokens.js",
+        "server/betaal.js"
       ],
       "toetsen": [
         "canoniek.test.js",
         "padvorm.test.js",
+        "sleutelvorm.test.js",
         "tokenvorm.test.js"
       ],
       "sabotage": "laat metadataDoel weer zijn eigen normalisatie doen in plaats van canoniekHost, of haal de ::ffff-hexomzetting eruit",
       "sabotageProef": {
-        "bestand": "server/kern/ssrf.js",
-        "van": "  const h = canoniekHost(host);   // EEN canonieke vorm, gedeeld met onveiligIpLiteral",
-        "naar": "  const h = String(host || '').replace(/^\\[|\\]$/g, '').toLowerCase();",
+        "bestand": "server/betaal.js",
+        "van": "  const k = String(waarde == null ? '' : waarde).normalize('NFC').trim();",
+        "naar": "  const k = String(waarde == null ? '' : waarde);",
         "toets": [
-          "canoniek.test.js"
+          "sleutelvorm.test.js"
         ]
       }
     }

@@ -77,7 +77,11 @@ async function maakOntvangst(opdracht) {
   if (!magMunt(munt)) throw new Error('Deze munt wordt niet geaccepteerd.');
   if (!Number.isFinite(euroCenten) || euroCenten <= 0) throw new Error('Bedrag moet een positief bedrag in centen zijn.');
 
-  const sleutel = 'munt:' + (idempotentieSleutel || referentie || crypto.randomUUID());
+  /* Zelfde canonieke vorm als in ./betaal.js, en uit dezelfde plek gehaald:
+     twee kopieen van deze regel zouden vroeg of laat uiteenlopen (LAT.md regel 4). */
+  const kern = require('./betaal').canoniekeSleutel(idempotentieSleutel || referentie || crypto.randomUUID());
+  if (!kern) throw new Error('Ongeldige idempotentiesleutel (leeg, te lang of met stuurtekens).');
+  const sleutel = 'munt:' + kern;
   const bestaand = haalOp(sleutel);
   if (bestaand) return Object.assign({}, bestaand, { herhaald: true });
 

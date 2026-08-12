@@ -383,6 +383,27 @@ const IJKINGEN = {
       } finally { fs.writeFileSync(p, oud); }
     }
   },
+  devPakketten: {
+    /* Dezelfde proef aan de andere kant van de scheiding. Die twee stonden op
+       een hoop tot playwright er als devDependency bij kwam om 114 stille
+       schermtoetsen echt te laten draaien: een verbetering die als
+       verslechtering binnenkwam. Deze proef bewaakt dat de scheiding ook echt
+       een scheiding IS -- een dev-pakket hoort dit getal te bewegen en het
+       runtime-getal niet. */
+    proef: (voor) => {
+      const p = path.join(WORTEL, 'package.json');
+      const oud = fs.readFileSync(p, 'utf8');
+      try {
+        const j = JSON.parse(oud);
+        j.devDependencies = Object.assign({}, j.devDependencies, { 'zz-ijk-dev': '^1.0.0' });
+        fs.writeFileSync(p, JSON.stringify(j, null, 2) + '\n');
+        const na = norm.meet();
+        assert.equal(na.dependencies, voor.dependencies,
+          'een dev-pakket hoort de RUNTIME-meter met rust te laten, anders is de scheiding er alleen op papier');
+        return na.devPakketten - voor.devPakketten;
+      } finally { fs.writeFileSync(p, oud); }
+    }
+  },
   schermenZonderToets: {
     /* De meter achter LAT-regel 2 voor de schermkant: "af" is pas af als een
        toets de hele weg heeft afgelegd. Het journaal komt uit een echte

@@ -27,7 +27,8 @@
     "kernOngebruikt": 0,
     "toetsenNietGemeten": 205,
     "toetsenOngevoeligPct": 2.3,
-    "wettenOnbewezen": 5
+    "wettenOnbewezen": 5,
+    "devPakketten": 1
   },
   "notities": [
     {
@@ -374,6 +375,12 @@
       "meter": "keuringDekkingAdvies 8 -> 46: de meter was blind, de dekking is niet verslechterd",
       "reden": "Hij telde de dekking-MELDINGEN van scripts/keuring.js, en die zijn afgekapt op acht zodat het rapport leesbaar blijft. Er waren acht domeinen met gaten, dus stond hij op zijn plafond -- en in test/meterijk.test.js stond dat als REDEN waarom hij niet te ijken viel. keuring.js geeft nu cijfers.dekking.domeinenMetGaten terug (alle domeinen) en norm.js leest dat: 46.",
       "eerlijkheidshalve": "Er is geen endpoint bijgekomen en geen toets verdwenen; het getal 9 was gewoon fout. Dat is de gevaarlijkste soort meterfout, want hij stond LAAG en dus geruststellend, en de ratel hield die geruststelling vast. Winst: hij kan nu bewegen, en daarmee ook geijkt worden -- metersOngeijkt gaat van 1 naar 0, dus elke meter met een norm is nu een keer zien uitslaan. Het rapport blijft op acht afgekapt met een regel eronder die de rest telt: wat je TOONT en wat je MEET horen niet hetzelfde te zijn."
+    },
+    {
+      "datum": "2026-08-12",
+      "meter": "dependencies opgeknipt: dependencies (runtime, blijft 0) en devPakketten NIEUW op 1",
+      "reden": "De meter telde dependencies en devDependencies bij elkaar op, en dat zijn twee onvergelijkbare dingen -- dezelfde fout als keuringBeter en als de twee mutatiemeters, die om precies deze reden al eerder zijn gesplitst. Het principe is dat de RUNTIME zonder npm-pakketten draait: dat bepaalt wat een bezoeker binnenhaalt en hoe groot de aanvalsoppervlakte is. Gereedschap om te METEN valt daar niet onder. Hij liep hierop vast op 11 augustus, toen playwright als devDependency binnenkwam (commit 483b1cfd): 114 van de 119 schermtoetsbestanden sloegen zichzelf over bij gebrek aan browser en node meldde dat als groen. Die browser erbij zetten was de reparatie van een gat waar niets anders voor bestond -- en met een opgetelde teller kon die verbetering alleen als verslechtering binnenkomen. Een ratel die rood wordt van een verbetering, leert iedereen om hem te omzeilen.",
+      "eerlijkheidshalve": "Dit is een meter die ik OPKNIP en niet een norm die ik verlaag: dependencies blijft op de harde nul staan en meet nu wat hij belooft (runtime: nul, ook vandaag), en devPakketten staat op 1 met dezelfde ratel eronder -- een tweede dev-pakket is nog steeds een besluit dat verantwoord moet worden. Wat ik daarmee wel accepteer is dat het getal 1 nu de nieuwe bodem is in plaats van 0. Geijkt met een echte proef in test/meterijk.test.js, die bovendien controleert dat een dev-pakket de runtime-meter NIET beweegt: zonder die bewering is de scheiding er alleen op papier."
     }
   ],
   "prestatie": {

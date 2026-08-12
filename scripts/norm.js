@@ -79,7 +79,8 @@ const METERS = [
   { sleutel: 'keuringTeGroot', richting: 'omlaag', wat: 'servermodules die ECHT over de 10 kB-grens zijn' },
   { sleutel: 'keuringDubbeling', richting: 'omlaag', wat: 'functienamen die in meer dan twee kernmodules staan' },
   { sleutel: 'keuringDekkingAdvies', richting: 'omlaag', wat: 'domeinen met endpoints zonder toets' },
-  { sleutel: 'dependencies', richting: 'omlaag', wat: 'externe pakketten (de nul is een principe, geen toeval)' },
+  { sleutel: 'dependencies', richting: 'omlaag', wat: 'externe pakketten in de RUNTIME (de nul is een principe, geen toeval)' },
+  { sleutel: 'devPakketten', richting: 'omlaag', wat: 'externe pakketten om te METEN (gereedschap, draait nooit mee voor een bezoeker)' },
   { sleutel: 'testbestanden', richting: 'omhoog', wat: 'testbestanden' },
   /* DE TWEE METERS OVER TOETSEN DIE ER WEL ZIJN MAAR NIET DRAAIEN.
 
@@ -419,9 +420,27 @@ function meet(bronnen) {
   }
 
   /* De dependencies tellen we uit package.json zelf en niet uit een rapport:
-     dit is de meter waar je bij twijfel de bron van wilt zien. */
+     dit is de meter waar je bij twijfel de bron van wilt zien.
+
+     TWEE METERS EN GEEN EEN, om dezelfde reden als bij de mutatiemotor en de
+     geblende teller hieronder: dit waren twee onvergelijkbare dingen op een
+     hoop. Het principe is "de RUNTIME draait zonder npm-pakketten" -- dat is
+     wat een bezoeker raakt en wat de aanvalsoppervlakte bepaalt. Gereedschap
+     om te METEN valt daar niet onder.
+
+     Hij liep hierop vast: op 11 augustus kwam playwright er als devDependency
+     bij, en dat was geen verslapping maar de reparatie van een gat waar niets
+     anders voor bestond -- 114 van de 119 schermtoetsbestanden sloegen zichzelf
+     over bij gebrek aan browser, en node meldde dat als groen (commit 483b1cfd).
+     Met een opgetelde teller kon die verbetering alleen als verslechtering
+     binnenkomen, en dan leert een ratel je om hem te omzeilen.
+
+     `dependencies` blijft dus de harde nul, en `devPakketten` staat apart met
+     zijn eigen norm. Ook die kan alleen omlaag: een tweede devDependency erbij
+     is nog steeds een besluit dat je moet verantwoorden. */
   const pkg = JSON.parse(fs.readFileSync(path.join(WORTEL, 'package.json'), 'utf8'));
-  const deps = Object.keys(pkg.dependencies || {}).length + Object.keys(pkg.devDependencies || {}).length;
+  const deps = Object.keys(pkg.dependencies || {}).length;
+  const devPakketten = Object.keys(pkg.devDependencies || {}).length;
 
   const testMap = path.join(WORTEL, 'test');
   const inMap = fs.readdirSync(testMap);
@@ -585,7 +604,7 @@ function meet(bronnen) {
     kernOngebruikt: grenzen.kernOngebruikt,
     toetsenOngevoeligPct: mutaties.ongevoeligPct,
     toetsenNietGemeten: mutaties.nietGemeten,
-    dependencies: deps, testbestanden, zelfpoortendeToetsen, browserpoortToetsen, e2eBestanden,
+    dependencies: deps, devPakketten, testbestanden, zelfpoortendeToetsen, browserpoortToetsen, e2eBestanden,
     inlineStijlAttributen
   };
 }

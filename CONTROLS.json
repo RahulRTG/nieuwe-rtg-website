@@ -1,12 +1,47 @@
 {
   "uitleg": "Verklaarde beheersmaatregelen en wanneer elk voor het laatst BEWEZEN is. Zie TOEZICHT.md. laatstGroen is gemeten door de genoemde toetsen te draaien, niet overgeschreven -- een register dat zijn eigen groen opschrijft bewijst niets.",
   "gemeten": {
-    "controls": 8,
-    "groen": 7,
+    "controls": 9,
+    "groen": 8,
     "nietInBedrijf": 1,
     "nietGroen": 0
   },
   "controls": [
+    {
+      "bron": "server/db/index.js",
+      "control": "GELD-DURABILITY",
+      "wat": "er bestaat een schrijfactie die duurzaamheid BEVESTIGT voordat er iets wordt beloofd",
+      "eigenaar": "Techniek",
+      "bewijs": [
+        "test/saveduurzaam.test.js",
+        "test/persistentiestand.test.js"
+      ],
+      "bewijsstuk": "db.saveDuurzaam() geeft { duurzaam, stand, reden } -- geen boolean",
+      "grens": "de primitive is bewezen, de GELDCOMMIT hangt er nog niet aan. Dat is stap 2 van GELDLAT.md en hoort pas na een gemeten prestatievergelijking. Deze control zegt dus dat het gereedschap er is, niet dat de geldketen ermee is beveiligd.",
+      "bewijssoorten": {
+        "primitive": "PROVEN",
+        "onder sabotage": "PROVEN",
+        "poortbewijs": "HANDMATIG GEREPRODUCEERD",
+        "geldcommit aangesloten": "NIET AANGESLOTEN"
+      },
+      "dekking": {
+        "beproefd": 0,
+        "totaal": 2,
+        "eenheid": "geldscenario's met alle drie bewezen",
+        "tellers": {},
+        "pct": 0
+      },
+      "laatstGroen": {
+        "staat": "GROEN",
+        "beweringen": 8,
+        "overgeslagen": 0,
+        "at": "2026-08-12T07:13:02.702Z",
+        "bestanden": [
+          "test/saveduurzaam.test.js",
+          "test/persistentiestand.test.js"
+        ]
+      }
+    },
     {
       "bron": "server/lib/keten.js",
       "control": "AUDIT-KETEN-LOKAAL",
@@ -28,7 +63,7 @@
         "staat": "GROEN",
         "beweringen": 30,
         "overgeslagen": 0,
-        "at": "2026-08-12T00:04:49.566Z",
+        "at": "2026-08-12T07:13:02.916Z",
         "bestanden": [
           "test/keten.test.js"
         ]
@@ -56,7 +91,7 @@
         "staat": "NIET IN BEDRIJF",
         "beweringen": 30,
         "overgeslagen": 0,
-        "at": "2026-08-12T00:04:49.800Z",
+        "at": "2026-08-12T07:13:03.155Z",
         "bestanden": [
           "test/keten.test.js"
         ],
@@ -92,7 +127,7 @@
         "staat": "GROEN",
         "beweringen": 33,
         "overgeslagen": 0,
-        "at": "2026-08-12T00:04:50.780Z",
+        "at": "2026-08-12T07:13:04.053Z",
         "bestanden": [
           "test/verraad.test.js",
           "test/verraadtelling.test.js"
@@ -128,7 +163,7 @@
         "staat": "GROEN",
         "beweringen": 29,
         "overgeslagen": 0,
-        "at": "2026-08-12T00:04:51.017Z",
+        "at": "2026-08-12T07:13:04.248Z",
         "bestanden": [
           "test/ketenproef.test.js"
         ]
@@ -157,7 +192,7 @@
         "staat": "GROEN",
         "beweringen": 18,
         "overgeslagen": 0,
-        "at": "2026-08-12T00:04:53.067Z",
+        "at": "2026-08-12T07:13:06.470Z",
         "bestanden": [
           "test/klok.test.js"
         ]
@@ -188,7 +223,7 @@
         "staat": "GROEN",
         "beweringen": 18,
         "overgeslagen": 0,
-        "at": "2026-08-12T00:05:22.425Z",
+        "at": "2026-08-12T07:13:38.156Z",
         "bestanden": [
           "test/schermleugen.test.js",
           "test/liegend-scherm.e2e.js"
@@ -221,7 +256,7 @@
         "staat": "GROEN",
         "beweringen": 13,
         "overgeslagen": 0,
-        "at": "2026-08-12T00:05:22.619Z",
+        "at": "2026-08-12T07:13:38.383Z",
         "bestanden": [
           "test/rolproef.test.js"
         ]
@@ -251,7 +286,7 @@
         "staat": "GROEN",
         "beweringen": 11,
         "overgeslagen": 0,
-        "at": "2026-08-12T00:05:22.824Z",
+        "at": "2026-08-12T07:13:38.577Z",
         "bestanden": [
           "test/bewijsmatrix.test.js"
         ]

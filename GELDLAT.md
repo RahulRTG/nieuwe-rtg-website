@@ -134,6 +134,28 @@ mutatiemotor valt. Dat is geen vergeten toets en het hoort niet te verdwijnen
 in een totaal van zeshonderd groene: het bewijs kwam anders tot stand, en dat
 is leesbaar.
 
+## De drie situaties die stap 2 moet bewijzen
+
+Zodra `oplaadAfronden` vóór zijn 2xx door `saveDuurzaam()` gaat, moeten er
+direct drie dingen vaststaan — niet één:
+
+1. **normale duurzame write → 2xx.** De gewone weg blijft werken, en dat is geen
+   vanzelfsprekendheid: de eerste poging brak vier geldtoetsen.
+2. **duurzame write faalt → géén succesresponse.** Dit is de fout die de
+   ketenronde vond.
+3. **duurzame write slaagt, proces sterft vóór de response, klant retryt →
+   exact ÉÉN economische mutatie.**
+
+Nummer 3 is de eigenlijke financiële eindtest, want daar komen durability en
+idempotentie samen. De klant weet niet dat de eerste opdracht is gelukt; RTG
+moet dat bij de herhaling herkennen. Wie alleen 1 en 2 bewijst, heeft
+lost-write opgelost en double-write gebouwd.
+
+Daaruit volgt de eis die eerder in dit document staat en die hier zijn reden
+krijgt: de idempotentiesleutel gaat **mee in dezelfde duurzame write** als de
+boeking. Elk venster tussen die twee is precies het venster waarin scenario 3
+verkeerd afloopt.
+
 ## Waarom `POST /api/pay/oplaad` op GEZAKT staat terwijl CI groen is
 
 Dat is met opzet en het is de kortste samenvatting van dit hele document:

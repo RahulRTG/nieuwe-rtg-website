@@ -250,6 +250,28 @@ function saveDuurzaam() {
         : 'de persistentiestand liep niet op') };
 }
 
+/* De control voor TOEZICHT.md. `bewijssoorten` staat er met opzet in: één woord
+   PROVEN zou de handmatige stap onzichtbaar maken tussen automatisch bewezen
+   controls, en dan leest een lezer meer zekerheid dan er is. */
+const CONTROL_DUURZAAM = {
+  control: 'GELD-DURABILITY',
+  wat: 'er bestaat een schrijfactie die duurzaamheid BEVESTIGT voordat er iets wordt beloofd',
+  eigenaar: 'Techniek',
+  bewijs: ['test/saveduurzaam.test.js', 'test/persistentiestand.test.js'],
+  bewijsstuk: 'db.saveDuurzaam() geeft { duurzaam, stand, reden } -- geen boolean',
+  grens: 'de primitive is bewezen, de GELDCOMMIT hangt er nog niet aan. Dat is stap 2 van ' +
+    'GELDLAT.md en hoort pas na een gemeten prestatievergelijking. Deze control zegt dus dat ' +
+    'het gereedschap er is, niet dat de geldketen ermee is beveiligd.',
+  bewijssoorten: {
+    primitive: 'PROVEN',
+    'onder sabotage': 'PROVEN',
+    poortbewijs: 'HANDMATIG GEREPRODUCEERD',
+    'geldcommit aangesloten': 'NIET AANGESLOTEN'
+  },
+  dekking: { register: 'KETENS.json', beproefd: 'gemeten.geldProven',
+    totaal: 'gemeten.geldScenarios', eenheid: 'geldscenario\'s met alle drie bewezen' }
+};
+
 /* De persistentiestand: een getal dat OPLOOPT zodra er werkelijk is
    weggeschreven. Alleen de SQLite-opslag houdt zo'n teller bij; bij de andere
    opslagsoorten geven we null terug, en dat betekent NIET VAST TE STELLEN. Een
@@ -284,7 +306,7 @@ function opslagKlaar() {
 }
 
 module.exports = {
-  db, load, save, saveDuurzaam, bijeen, persistentieStand, DATA_DIR: opslag.DATA_DIR, STORE, startGedeeld: redis.startGedeeld, startSqliteSync,
+  db, load, save, saveDuurzaam, bijeen, persistentieStand, CONTROL: CONTROL_DUURZAAM, DATA_DIR: opslag.DATA_DIR, STORE, startGedeeld: redis.startGedeeld, startSqliteSync,
   startPostgres: postgres.startPostgres, flushBijAfsluiten, pgPing: postgres.pgPing,
   opslagKlaar, pgPoolStatus: postgres.pgPoolStatus, onExternalChange, merge3, schrijfDuurzaam: opslag.schrijfDuurzaam,
   grootSupplierSync: gidsen.grootSupplierSync, grootAantal: gidsen.grootAantal,

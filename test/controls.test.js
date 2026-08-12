@@ -206,6 +206,40 @@ test('de rolproef toont de vier tellers die bij zijn oordeel horen', () => {
   }
 });
 
+/* ---------- de bewijssoort blijft zichtbaar ---------- */
+
+test('een control met een handmatige stap noemt die als eigen bewijssoort', () => {
+  /* Zonder dit veld verdwijnt "met de hand nagetrokken" tussen de automatisch
+     bewezen controls, en dan leest een lezer meer zekerheid dan er is. Dat is
+     precies de fout die dit hele register moest voorkomen -- alleen hier op het
+     niveau van HOE iets bewezen is in plaats van OF. */
+  const g = controls.find(c => c.control === 'GELD-DURABILITY');
+  assert.ok(g, 'de duurzaamheidsprimitive hoort een eigen control te zijn');
+  assert.ok(g.bewijssoorten, 'zonder bewijssoorten leest een handmatige stap als automatisch');
+  assert.equal(g.bewijssoorten.poortbewijs, 'HANDMATIG GEREPRODUCEERD');
+  assert.equal(g.bewijssoorten['geldcommit aangesloten'], 'NIET AANGESLOTEN');
+});
+
+test('geen bewijssoort zegt PROVEN zonder dat te zijn', () => {
+  /* Elke waarde is of een bewijs, of een expliciete niet-bewijs-stand. Een
+     leeg veld of een vaag woord zou het onderscheid weer wegpoetsen. */
+  const toegestaan = ['PROVEN', 'SELF-TESTED', 'HANDMATIG GEREPRODUCEERD',
+    'NOT APPLICABLE', 'NIET AANGESLOTEN', 'ONGEMETEN'];
+  for (const c of controls) {
+    for (const [soort, hoe] of Object.entries(c.bewijssoorten || {})) {
+      assert.ok(toegestaan.includes(hoe),
+        c.control + '/' + soort + ' heeft bewijssoort "' + hoe + '", en die staat niet op de lijst');
+    }
+  }
+});
+
+test('het register bewaart de bewijssoorten, zodat een lezer ze terugvindt', () => {
+  const reg = JSON.parse(fs.readFileSync(path.join(WORTEL, 'CONTROLS.json'), 'utf8'));
+  const g = reg.controls.find(c => c.control === 'GELD-DURABILITY');
+  assert.ok(g && g.bewijssoorten && g.bewijssoorten.poortbewijs,
+    'CONTROLS.json loopt achter -- draai npm run controls:vast');
+});
+
 /* ---------- het vastgelegde register ---------- */
 
 test('CONTROLS.json is gemeten en niet opgeschreven', () => {

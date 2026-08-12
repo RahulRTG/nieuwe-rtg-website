@@ -44,6 +44,7 @@ const JSONUIT = argv.includes('--json');
    een CONTROL in zit, laadt op enig moment iets met een bijwerking. Een control
    toevoegen is een bewuste handeling en hoort hier een regel te kosten. */
 const BRONNEN = [
+  'server/db/index.js',
   'server/lib/keten.js',
   'server/lib/keten-anker.js',
   'server/lib/verraad.js',
@@ -251,6 +252,12 @@ for (const c of gemeten) {
     }
   } else if (d && d.stuk) {
     console.log('      BEPROEFD   ONBEKEND -- ' + d.stuk);
+  }
+  /* DE BEWIJSSOORTEN. Een control kan op meerdere manieren bewezen zijn, en een
+     handmatige stap mag niet stil tussen de automatische verdwijnen -- dan leest
+     een lezer meer zekerheid dan er is. */
+  for (const [soort, hoe] of Object.entries(c.bewijssoorten || {})) {
+    console.log('      ' + (soort.toUpperCase() + ' ').padEnd(22, '.') + ' ' + hoe);
   }
   if (c.laatstGroen.reden) console.log('      ' + c.laatstGroen.reden);
 }

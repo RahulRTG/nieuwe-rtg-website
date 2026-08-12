@@ -82,6 +82,10 @@ module.exports = (ctx) => {
          loondienst: een gesprek over je toekomst hoort niet op een beurt te
          wachten. */
       'promotie-aanbieden', 'promotie-antwoord', 'promotie-intrekken',
+      /* DE DIENST (VERHAAL.md par. 0f). Vrij, en scherper dan de rest van deze
+         lijst: een avond op de werkvloer die op je beurt moet wachten is geen
+         avond meer. Zie ./rush-acties.js. */
+      'rush', 'rush-pak',
       /* STEMMEN over wat de Foundation bouwt (fase C, ./governance.js). Vrij,
          want een stemming met een beurt eraan vast is een deadline -- en dat is
          de kunstmatige urgentie die CLAUDE.md verbiedt. */

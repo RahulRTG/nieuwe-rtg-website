@@ -572,6 +572,9 @@ test('de vrije acties mogen buiten de beurt, de grote niet', () => {
       'overname-antwoord', 'overname-bod', 'overname-intrekken',
       'polis-opzeggen', 'polis-sluiten',
       'promotie-aanbieden', 'promotie-antwoord', 'promotie-intrekken',
+      /* DE DIENST (VERHAAL.md par. 0f). Scherper dan de rest van deze lijst: een
+         avond op de werkvloer die op je beurt moet wachten is geen avond meer. */
+      'rush', 'rush-pak',
       'solliciteren',
       /* UITSTAPPEN is de enige VRIJE zet die de kaart verandert, en dat volgt
          uit de zet zelf: wie ermee ophoudt komt per definitie niet meer op zijn
@@ -709,7 +712,11 @@ test('de kleinste maat is een ONDERGRENS die de motor herkent', () => {
         onderhoud: 100, marketing: 0, huur: 0, onderhoudBudget: 0 };
       v.personeel = personeelNodig(v, 0);
       const r = maand(k, v, { maand: 6, zoneDruk: 1, wereldFactor: 1, arbeid: 0 });
-      return (r.omzet - r.inkoop - r.vast) / Math.max(1, r.lonen);
+      /* INKOOP EN DERVING SAMEN. Sinds VERHAAL.md par. 0f staat het deel van de
+         inkoop dat bederft als eigen regel (magnaat/stap.js), en die twee zijn
+         samen wat een zaak aan waren kwijt is. Alleen `r.inkoop` lezen laat de
+         dekking hoger uitvallen dan ze is, en dan zakt deze vloer. */
+      return (r.omzet - r.inkoop - r.derving - r.vast) / Math.max(1, r.lonen);
     };
     assert.ok(dekking(formule) >= 1, sector + ' bij maat ' + formule
       + ': de loonpost is maar voor ' + dekking(formule).toFixed(2) + ' gedekt');

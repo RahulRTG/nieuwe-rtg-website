@@ -35,6 +35,7 @@ const C = require('./cyclus');
    ./nieuws.js. */
 const N = require('./nieuws');
 const DIENST = require('./dienst');
+const RUSH = require('./rush-maand');
 const maakPerZaak = require('./maand-vestiging');
 const F = require('./foundation');
 const H = require('./handel');
@@ -73,6 +74,12 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering
     // wat de Foundation aan opleiding heeft bijgedragen; werkt door in hoeveel
     // een medewerker aankan
     const arbeid = F.arbeidBonus(st.foundation);
+    /* WAT DE DIENSTEN VAN DEZE MAAND MET DE DERVING DEDEN (VERHAAL.md par. 0f).
+       HIJ WORDT VOOR DE ZAKEN OPGEHAALD en niet erin: elke vestiging moet met
+       hetzelfde beeld rekenen, en een dienst die halverwege de ronde van
+       betekenis verandert is een tweede volgorde-afhankelijkheid in een maand
+       die er geen mag hebben (zie de determinisme-eis in ./stap.js). */
+    const dervingFactor = RUSH.factoren(potje);
     /* WAT ER DEZE MAAND VASTLIGT AAN CONTRACTEN, voordat er ook maar iets
        gerekend is. Een levering gaat voor de vrije verkoop (./handel.js), dus
        die capaciteit moet vergeven zijn voordat de eerste klant binnenkomt --
@@ -113,7 +120,7 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering
          mee (fase B zette er de levering in, de kwaliteitsmeting en de
          verdeling onder aandeelhouders). */
       wereldOmzet += perZaak(potje, h, rij, regels, { k, druk, zones, conjunctuur,
-        arbeid, toezegging, ontvangst, kwaliteitVan });
+        arbeid, toezegging, ontvangst, kwaliteitVan, dervingFactor });
       /* WAT ER NA DE ZAKEN NOG VAN DE KAS AFGAAT staat in ./maand-lasten.js:
          rood staan, de leningen, de polissen en het onderzoek. Vier posten die
          niet aan een pand hangen maar aan de speler, en die alle vier geld de
@@ -154,6 +161,11 @@ module.exports = ({ K, wieHeeft, ROOD_RENTE, verdeel, bank, onthoud, verzekering
        afwikkelen, de Foundation laten afdragen en bouwen, en het verslag
        opmaken. Drie dingen die pas kunnen zodra iedereen gedraaid heeft. */
     DIENST.verlopen(st);
+    /* WAT ER VAN DE DIENSTEN OVERBLIJFT (wet 5). NA de zaken, want pas dan is de
+       maand gebeurd; en voor het verslag, zodat een terugblik hem al ziet. Hij
+       is idempotent -- de wereld rekent bij, en een maand mag geen tweede regel
+       opleveren omdat er iemand keek. */
+    RUSH.naMaand(potje);
     const verslag = afsluiten(potje, st, k, { perSpeler, actief, leverDeel, kwaliteitVan, druk,
       wereldOmzet, rentelast, premielast, schadelast, onderzoeklast, onderzoekUitPot, beheerlast,
       concernlast });

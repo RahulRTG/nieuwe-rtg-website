@@ -55,7 +55,14 @@ module.exports = ({ K, mijnVestiging, vrijKavel, rond, L }) => {
   const promotie = require('./promotie')({ ACTIES });
   Object.assign(ACTIES, promotie.ACTIES);
   VRIJE_ACTIES.push(...promotie.VRIJE_ACTIES);
+  /* DE DIENST ZELF (VERHAAL.md par. 0f, ./rush.js). Vrij, en hier is dat geen
+     gemak maar de wet: een dienst die op je beurt moet wachten kan in een
+     partij van zes een week duren, en dan is de avond al voorbij. Hij staat NA
+     de dienstacties omdat hij een lopend dienstverband nodig heeft. */
+  const rush = require('./rush-acties')();
+  Object.assign(ACTIES, rush.ACTIES);
+  VRIJE_ACTIES.push(...rush.VRIJE_ACTIES);
   const aiZet = require('./concurrent-zet')({ ACTIES, kaart });
 
-  return { ACTIES, VRIJE_ACTIES, beheer, dienen, aiZet, promotie };
+  return { ACTIES, VRIJE_ACTIES, beheer, dienen, aiZet, promotie, rush };
 };

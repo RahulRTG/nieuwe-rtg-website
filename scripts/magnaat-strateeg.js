@@ -587,8 +587,15 @@ function gereedschap(m, potje, mij, profiel, offset) {
              het `gemist` en geen omzet. Zonder die begrenzing rolt een profiel de
              opbrengsttak uit op panden die er niets mee kunnen. */
           const ruimte = Math.max(0, 1 - (r.eenheden || 0) / Math.max(1, r.capaciteit || 1));
-          const perMaand = ONDERZOEK.opbrengstVan(k.sleutel, { vast: r.vast, inkoop: r.inkoop,
-            lonen: r.lonen, marge: Math.max(0, r.omzet - r.inkoop) * ruimte });
+          /* INKOOP EN DERVING ZIJN SAMEN DE INKOOPPOST. Sinds VERHAAL.md par. 0f
+             staat het deel dat bederft als eigen regel op het maandoverzicht
+             (../server/kern/spellen/magnaat/stap.js), maar het onderzoek naar
+             goedkoper inkopen raakt ze allebei -- `O.factor(v,'inkoop')` gaat
+             over de hele post. Wie hier alleen `r.inkoop` leest, waardeert die
+             tak structureel te laag en rolt hem nooit uit. */
+          const inkoop = (r.inkoop || 0) + (r.derving || 0);
+          const perMaand = ONDERZOEK.opbrengstVan(k.sleutel, { vast: r.vast, inkoop,
+            lonen: r.lonen, marge: Math.max(0, r.omzet - inkoop) * ruimte });
           const kosten = ONDERZOEK.uitrolkosten(v, k.sleutel);
           if (perMaand <= 0 || kosten / perMaand > terugverdientijd) continue;
           if (st.geld[mij] - kosten < BUFFER) continue;

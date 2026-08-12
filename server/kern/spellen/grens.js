@@ -70,6 +70,14 @@ const JONG_MAG = [
   /* meewerken in de zaak waar je in dienst bent; welke velden precies mag,
      bepaalt je ROL en niet je leeftijd (magnaat/dienst-rollen.js) */
   'werk-beleid',
+  /* DE DIENST DRAAIEN (VERHAAL.md par. 0f, magnaat/rush.js). Dit is de bijbaan
+     zelf en niet een spel ernaast: een zestienjarige met een zaterdagbaan staat
+     op de werkvloer, dat is de hele reden dat de werkgrens op 16 ligt. Er komt
+     niets uit wat bewaard wordt buiten het potje -- geen stand, geen ranglijst,
+     geen niveau -- dus de progressiegrens hierboven blijft onaangeroerd. Welke
+     voorvallen hij ziet bepaalt zijn ROL en niet zijn leeftijd, precies zoals
+     bij `werk-beleid`. */
+  'rush', 'rush-pak',
   /* JA ZEGGEN TEGEN EEN PROMOTIE, of hem afhouden. Hulp naar vakkracht is
      vakinhoudelijk en precies wat een zestienjarige hoort te kunnen: je wordt
      beter in je vak. Wat er dan NIET mag is de rol zelf -- bedrijfsleider is

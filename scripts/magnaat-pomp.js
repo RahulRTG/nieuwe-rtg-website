@@ -67,8 +67,14 @@ function wereld() {
     A: st.vestigingen.a[0], B: st.vestigingen.b[0], C: st.vestigingen.c[0] };
 }
 
-const maand = (w, n) => {
+/* `perMaand` DRAAIT VOOR ELKE MAAND, en hij staat er sinds de werklaag
+   (VERHAAL.md par. 0f). Een dienst is geen handeling die je een keer verricht en
+   die daarna doorloopt -- hij hoort bij DIE maand, en een scenario dat hem maar
+   een keer speelt meet vierentwintig maanden waarin niets gebeurt. Scenario's
+   die hem niet hebben merken er niets van. */
+const maand = (w, n, perMaand) => {
   for (let i = 0; i < n; i++) {
+    if (perMaand) perMaand(w);
     w.st.gerekendTot -= w.st.maandMs;
     for (const verslag of w.m.eco.bijrekenen(w.potje)) {
       /* WAT DE WERELD VERLAAT, per soort. Rente gaat naar een bank, premie naar
@@ -86,8 +92,14 @@ const maand = (w, n) => {
          zichzelf, en overleefde een mutatie die de teller halveerde hem gewoon.
          Deze telling loopt langs de andere kant: de regel die de speler ziet. */
       for (const rij of Object.values(verslag.perSpeler || {}))
-        for (const r of rij) if (r.soort === 'beheer')
-          w.beheerbetaald = (w.beheerbetaald || 0) - (r.resultaat || 0);
+        for (const r of rij) {
+          if (r.soort === 'beheer') w.beheerbetaald = (w.beheerbetaald || 0) - (r.resultaat || 0);
+          /* WAT ER BEDIERF, uit de regel die de speler ziet. Langs dezelfde kant
+             geteld als het beheertarief hierboven, en om dezelfde reden: een
+             telling die uit de motor komt in plaats van uit het overzicht,
+             vergelijkt straks een getal met zichzelf. */
+          w.derving = (w.derving || 0) + (r.derving || 0);
+        }
     }
   }
 };
@@ -571,6 +583,78 @@ const SCENARIOS = {
     }
   },
 
+  /* DE DIENST DRAAIEN (VERHAAL.md par. 0f). Een hulpkracht die elke maand zijn
+     avond speelt en hem GOED speelt: dit is de gunstigste kant van de werklaag,
+     vierentwintig maanden achter elkaar.
+
+     WAAROM DEZE ROUTE ERIN MOET. Een mini-game die op de economie is
+     aangesloten is de klassieke plek waar een tweede economie ontstaat: je
+     speelt iets, je wint, en er staat een bedrag op een rekening dat nergens
+     vandaan kwam. Par. 0f wet 3 verbiedt dat met zoveel woorden en wijst
+     vervolgens naar dit script -- "die keuring is het bewijs dat de dienst
+     eerlijk is". Dit is die keuring.
+
+     HIJ IS ECONOMISCH EN GEEN NEUTRALE OVERDRACHT, en dat is geen achterdeur.
+     Een dienst die goed loopt bespaart echte inkoop: er bederft minder, dus er
+     hoeft minder gekocht te worden, dus de wereld is aan het eind rijker. Dat is
+     precies wat kosten besparen doet -- dezelfde les die `beheerlaten` hierboven
+     al kostte. Op totalen afrekenen zou hier "waarde uit het niets" melden
+     terwijl er in werkelijkheid minder is weggegooid. */
+  dienstDraaien: {
+    verwacht: 'economisch', naam: 'elke maand je dienst draaien, en hem goed draaien',
+    doe(w) {
+      /* A gaat als hulpkracht werken bij B, want B heeft de horecazaak. De weg
+         ernaartoe is niet wat deze meter meet. */
+      w.rushDienst = inDienst(w, 'b', w.B.id, 'a', 'hulp', 'max');
+    },
+    /* ELKE MAAND EEN AVOND, en hij wordt gespeeld met de afweging die werkt:
+       wat kost dit me als ik het de rest van de dienst laat liggen. Een
+       willekeurige speler zou de meting slap maken -- die zit rond de neutrale
+       uitkomst, en dan beweegt er niets om te keuren. */
+    perMaand(w) {
+      if (!w.rushDienst) return;
+      const R = require('../server/kern/spellen/magnaat/rush');
+      for (let i = 0; i < R.SLOTS + 2; i++) {
+        const r = w.m.spel.zet(w.potje, 'a', { actie: 'rush' });
+        if (!r.ok || !r.dienst || r.dienst.klaar || !r.dienst.open.length) return;
+        const rest = r.dienst.momenten - r.dienst.moment;
+        const kies = r.dienst.open.slice().sort((x, y) =>
+          (y.blijftLiggen + y.perMoment * rest) - (x.blijftLiggen + x.perMoment * rest))[0];
+        w.m.spel.zet(w.potje, 'a', { actie: 'rush-pak', wat: kies.id });
+      }
+    },
+    /* DE ENIGE BEWERING DIE ALLEEN OVER DEZE LAAG GAAT: EEN DIENST VERSCHUIFT
+       EEN KOSTENPOST EN VERDER NIETS. Wat er meer in kas zit hoort tot op de
+       euro te zijn wat er minder bedierf -- want er is maar een manier waarop
+       een avond op de werkvloer geld raakt, en dat is inkoop die niet gedaan
+       hoefde te worden.
+
+       OP DE KAS EN NIET OP HET VERMOGEN, en dat is de correctie die deze toets
+       zijn tanden gaf. `totaal()` telt ook wat de bedrijven WAARD zijn, en
+       `waarde()` kapitaliseert het resultaat: een zaak die structureel minder
+       verspilt is meer waard. Op vermogen gemeten werd de tafel hier 14.992
+       rijker van 3.852 minder bederf -- bijna een factor vier -- en dat is geen
+       geld maar een hefboom. Een eerste versie van deze keuring stond wel op dat
+       getal, met een marge van een half procent van het WERELDtotaal eromheen.
+       Die marge was 311.387 op een laag die in duizendtallen rekent, dus hij
+       keurde alles goed: een mutatie die de omzet van een goed gedraaide dienst
+       drie procent optilde kwam er ongestraft langs.
+
+       DUS EXACT, met de afrondingsruis van `lekkend` eromheen -- niet meer dan
+       een handvol euro's over een paar honderd geboekte regels. */
+    keurWereld(r) {
+      const bespaard = (r.rustDerving || 0) - (r.pompDerving || 0);
+      if (bespaard <= 0)
+        return 'de gespeelde diensten bespaarden geen derving (' + Math.round(bespaard)
+          + '); deze toets meet dan niets';
+      const kas = (r.pompKas || 0) - (r.rustKas || 0);
+      if (Math.abs(kas - bespaard) > EXACT)
+        return 'er kwam ' + Math.round(kas) + ' meer in kas terwijl er ' + Math.round(bespaard)
+          + ' minder bedierf; een dienst hoort geen andere post te raken';
+      return null;
+    }
+  },
+
   /* DE ZELFFINANCIERENDE ONDERZOEKSLUS, en dit is de route die er bij een
      R&D-laag als eerste in zit:
 
@@ -776,16 +860,27 @@ function meet(sleutel, maanden = 24) {
     const w = wereld();
     maand(w, 2);                 // eerst wat echte economie, zodat er cijfers zijn
     SCENARIOS[naam].doe(w);
+    /* HET RUSTSCENARIO KRIJGT DE PER-MAAND-HANDELING NIET. Dat is de hele
+       meting: de ene wereld doet het, de andere niet. */
+    const elke = naam === sleutel ? SCENARIOS[naam].perMaand : null;
     /* De EIGEN keuring van een scenario draait meteen na de handeling, want
        sommige beweringen gaan over het moment zelf ("lenen mag je pand niet
        meer waard maken") en niet over de eindstand. */
     if (naam === sleutel && SCENARIOS[naam].keur) klacht = SCENARIOS[naam].keur(w);
-    maand(w, maanden);
+    maand(w, maanden, elke);
     if (naam === sleutel && !klacht && SCENARIOS[naam].keur) klacht = SCENARIOS[naam].keur(w);
     uit[naam === 'rust' ? 'rust' : 'pomp'] = totaal(w);
     uit[(naam === 'rust' ? 'rust' : 'pomp') + 'Rente'] = w.rente || 0;
     uit[(naam === 'rust' ? 'rust' : 'pomp') + 'Omzet'] = w.omzet || 0;
     uit[(naam === 'rust' ? 'rust' : 'pomp') + 'Beheer'] = w.beheerbetaald || 0;
+    uit[(naam === 'rust' ? 'rust' : 'pomp') + 'Derving'] = w.derving || 0;
+    /* DE KAS APART VAN HET VERMOGEN. `totaal()` telt ook wat de bedrijven WAARD
+       zijn, en een zaak die structureel minder verspilt is meer waard -- dat is
+       een hefboom op een besparing en geen geld. Wie een laag wil keuren die
+       alleen een kostenpost verschuift, moet naar de kas kijken; het verschil
+       tussen die twee getallen was hier bijna een factor vier. */
+    uit[(naam === 'rust' ? 'rust' : 'pomp') + 'Kas'] =
+      Object.values(w.st.geld).reduce((n, x) => n + x, 0);
   }
   /* Bij een LEKKENDE laag wordt het verschil gecorrigeerd met wat er aan rente
      de wereld verliet. Wat overblijft hoort nul te zijn: dan is er geen euro
@@ -796,6 +891,8 @@ function meet(sleutel, maanden = 24) {
   const r = { naam: SCENARIOS[sleutel].naam, rust: uit.rust, pomp: uit.pomp, ruw, lek, verschil, klacht,
     rustOmzet: uit.rustOmzet, pompOmzet: uit.pompOmzet,
     rustRente: uit.rustRente, pompRente: uit.pompRente, pompBeheer: uit.pompBeheer,
+    rustDerving: uit.rustDerving, pompDerving: uit.pompDerving,
+    rustKas: uit.rustKas, pompKas: uit.pompKas,
     relatief: uit.rust.samen ? verschil / uit.rust.samen : 0 };
   /* EEN KEURING OVER DE TWEE WERELDEN SAMEN. `keur` krijgt alleen de gepompte
      wereld en kan dus niets zeggen over het verschil; `keurWereld` krijgt de

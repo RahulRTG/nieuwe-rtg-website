@@ -855,3 +855,141 @@ beschermt. Iemand aannemen die nooit begon, is geen herinnering.
 erbij kwam. Dat is precies waar die grens voor is: er zat een tweede onderwerp
 in. `spellen/bewaren.js` afgesplitst — telling, uitslagen, prestaties en
 loopbaan, vier lagen met één vraag: wat blijft er staan als de partij voorbij is.
+
+---
+
+## 11. De werklaag staat: PDA Rush
+
+Paragraaf 0f is gebouwd, voor één rol in één sector: de hulpkracht in de horeca.
+`kern/spellen/magnaat/rush.js` (de wetten en de rekensom),
+`rush-voorvallen.js` (de tabel), `rush-maand.js` (wat de maand in gaat en wat
+eruit overblijft) en `rush-acties.js` (de twee handelingen).
+
+### De vondst die de laag draagt: derving bestond al
+
+De eerste opzet gaf de dienst een eigen kostenpost. Dat is precies de tweede
+economie die wet 3 verbiedt, en het viel meteen op: elke zaak in de stad zou
+duurder worden omdat er een spel bijkwam, en `scripts/magnaat-balans.js` zou een
+andere wereld meten zonder dat iemand daarvoor koos.
+
+Wat er in plaats daarvan staat is geen nieuwe post maar een **uitsnede**. Een
+deel van wat je inkoopt wordt nooit verkocht — het bederft, het breekt, het valt
+af — en dat zat altijd al in `inkoop`. Nu heeft het een naam
+(`sectoren.js`, `derving`: horeca 9%, kantoor 1%) en staat het als eigen regel
+op het maandoverzicht. **Bij factor 1 rekent `stap.js` tot op de cent hetzelfde
+als voordat deze laag bestond.** Een dienst maakt daarmee geen geld; hij
+verschuift hoeveel van een bestaande post werkelijk bederft.
+
+### "Neutraal" is geen half getal maar een simulatie
+
+Wet 4 hing op de vraag wat *niet spelen* precies oplevert. Een gemiddelde zou
+willekeurig zijn. Wat er staat is `opVolgorde()`: **de ploeg werkt de voorvallen
+af op volgorde van binnenkomst.** Dat is letterlijk wat een werkvloer zonder
+sturing doet, het is dezelfde regel waarmee de AI-concurrent kandidaten aanneemt
+(par. 0d) — wie op volgorde werkt, rangschikt niets — en het geeft een lat die
+niet van de speler afhangt.
+
+Wie de dienst niet speelt krijgt die uitkomst en dus factor 1. Wie hem begint en
+niet afmaakt ook: anders is beginnen een risico, en dan is de veiligste zet hem
+nooit openen.
+
+### Wat de speeltest vond en geen toets zag
+
+Vierhonderd diensten doorgerekend, met de optimale volgorde er brute-force
+naast. De uitkomst is precies de bedoeling van 0f:
+
+| | factor |
+|---|---|
+| optimaal | 0,74 |
+| *pak wat het snelst oploopt* | **1,06** |
+| *pak wat het duurst is als het blijft liggen* | **1,05** |
+| *kost + groei × resterende momenten* | 0,82 (wint 93% van de diensten) |
+| de ploeg (per definitie) | 1,00 |
+
+**De twee naïeve strategieën verliezen van de ploeg.** Sorteren op één getal
+werkt niet; alleen wie beide weegt wint. Dat is de zin uit 0f — *wie alles op
+bedrag sorteert speelt slechter dan de ploeg* — en hij is nu gemeten in plaats
+van gehoopt.
+
+En een echte fout, die alleen uit spelen kwam: **de euro's op je scherm
+veranderden nadat de maand gedraaid had.** `raming()` leest de omzetgeschiedenis
+van de zaak, en die verschuift bij het afsluiten. Aan het eind van je dienst
+stond er 1.404 en in het log 1.471 — dezelfde avond, twee waarheden, allebei op
+zichzelf kloppend. Geen enkele toets keek ernaar. De raming wordt nu bevroren
+zodra de avond begint.
+
+### De keuring die zijn tanden moest krijgen
+
+`scripts/magnaat-pomp.js` heeft er een scenario bij (`dienstDraaien`) en een
+haak: `perMaand`, want een dienst hoort bij één maand en een scenario dat hem
+één keer speelt meet vierentwintig maanden waarin niets gebeurt.
+
+De eerste keuring keurde alles goed, en de mutatieproef legde bloot waarom.
+Twee fouten, allebei leerzaam:
+
+1. **Hij stond op het vermogen.** `totaal()` telt ook wat de bedrijven wáárd
+   zijn, en `waarde()` kapitaliseert het resultaat — een zaak die structureel
+   minder verspilt is meer waard. De tafel werd 14.992 rijker van 3.852 minder
+   bederf, bijna een factor vier. Dat is een hefboom en geen geld.
+2. **De marge was 0,5% van het wereldtotaal**, oftewel 311.387 op een laag die
+   in duizendtallen rekent.
+
+Nu staat hij op de **kas**, exact, met de afrondingsruis van `lekkend` eromheen:
+de kas volgde de derving op 6 euro na. Een mutatie die de omzet van een goed
+gedraaide dienst 3% optilde, kwam er eerst ongestraft langs en zakt nu.
+
+### De mutatieproef
+
+`test/spelrush.test.js`, twintig beweringen. Vijftien mutaties, **vijftien
+raak** — maar pas na twee rondes, en de vier overlevers van de eerste ronde
+waren alle vier informatief:
+
+- *de factor van de maand week af van die op het scherm* — het scherm las
+  `R.uitkomst` rechtstreeks, de maand ging via `factoren()`. Twee antwoorden op
+  dezelfde vraag, en niets zou het gemerkt hebben. Er staat nu een bewering op.
+- *de `geboekt`-vlag weghalen* overleefde omdat mijn eigen toets de maand eerst
+  doordraaide, waarna `afgerond()` de dienst al wegfilterde: de lus werd nooit
+  betreden en de toets bewees niets.
+- *twee hulpkrachten optellen in plaats van middelen* overleefde omdat mijn
+  tweede dienst per ongeluk óók een volgorde-dienst was, dus factor 1 — en dan
+  geven optellen en middelen hetzelfde antwoord.
+- *de raming ontdooien* had domweg geen toets; dat was de speeltestvondst.
+
+### Wat er bewust niet is
+
+**Geen mini-game-raamwerk.** `magRush()` weigert alles behalve hulpkracht in de
+horeca, en dat is de bouwvolgorde uit 0f. De vijf hoogtes staan alleen als
+kiem in de tabel: dezelfde koeling staat er twee keer, één keer als *zet de waar
+over* (hulp) en één keer als *laat onderhoud komen* (`mag: 'onderhoud'`, dus
+vakkracht en hoger). Een hulpkracht ziet die tweede regel niet — tot de dag dat
+hij vakkracht wordt en er een knop op zijn PDA staat die er gisteren niet was.
+**Dat is de promotie, en er staat geen venster omheen.**
+
+**Geen echte PDA.** Paragraaf 0f zegt "op het echte PDA-scherm", en dat kan nog
+niet: hoofdstuk 9 hierboven staat er nog onverkort — de brug naar
+`public/apps/personeel.html` is gebouwd maar er rijdt niets overheen. Een
+rush-tab in dat scherm die `/api/member/spel/zet` aanroept zou precies de
+spelknop in een productiescherm zijn die paragraaf 3 verbiedt. De werkvloer
+staat daarom in `spelen.html`, **onder de loonstrook**, aan dezelfde zaak en
+dezelfde rol — waar tot nu toe alleen stond *"als hulpkracht beslis je niets
+over de zaak. Je werkt mee."* Hij verhuist mee zodra de brug verkeer draagt.
+
+**Geen 18+.** `rush` en `rush-pak` staan in `JONG_MAG`: dit is de bijbaan zelf
+en niet een spel ernaast. Er komt niets uit dat het potje overleeft — geen
+stand, geen reeks, geen niveau — dus de progressiegrens verschuift niet. Een
+toets bewaakt dat `rush-maand.js` de bewaarlaag niet binnenhaalt.
+
+### Wat de volgende dienst moet vertellen
+
+Pas als er een tweede is, weet je wat het raamwerk is. De open vragen:
+
+- **Wat is een dienst voor een rol die wél beslist?** Bij de vakkracht komt er
+  een kostenafweging bij (*zelf herstellen of onderhoud laten komen*), en dan is
+  de uitkomst niet meer alleen derving.
+- **Rimpelt een dienst door?** 0f belooft dat een keuze de volgende ploeg, de
+  leverancier en de klant raakt. Vandaag raakt hij één regel op één
+  maandoverzicht.
+- **Wanneer wordt een avond een moment?** `d.diensten` draagt `incident`, maar
+  `loopbaan-noteren.js` doet er nog niets mee. *"Voorkwam voorraadschade tijdens
+  een koelstoring"* staat wel in 0f en nog niet in `MOMENTEN` — en par. 0e laat
+  zien wat er gebeurt als je het omgekeerd doet.

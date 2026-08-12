@@ -23,6 +23,10 @@
      bouw         wat openen kost, per eenheid omvang
      prijs        [laag, midden, hoog] -- de band waarbinnen je mag prijzen
      inkoop       welk deel van de omzet naar inkoop gaat (marge is de rest)
+     derving      welk deel van die INKOOP nooit verkocht wordt -- bederf, breuk,
+                  uitval. Geen nieuwe kostenpost maar een NAAM voor een deel dat
+                  altijd al in `inkoop` zat, en dat een dienst kan bewegen
+                  (./rush.js). Een restaurant gooit vers weg, een kantoor niet.
      loon         maandloon per medewerker
      vast         vaste maandlast per eenheid omvang (energie, schoonmaak)
      trekt        welke bevolkingssegmenten hier komen, met hun gewicht
@@ -106,49 +110,49 @@
 const SECTOREN = {
   horeca: {
     naam: 'Restaurant', eenheid: 'stoelen', perMaand: 36, perMedewerker: 14, markt: 669, bouw: 5903,
-    prijs: [22, 35, 62], inkoop: 0.32, loon: 2400, vast: 34,
+    prijs: [22, 35, 62], inkoop: 0.32, derving: 0.09, loon: 2400, vast: 34,
     trekt: { gezinnen: 1.0, ouderen: 0.8, studenten: 0.7, toeristen: 1.4, zakelijk: 1.1, nachtpubliek: 1.2 },
     dagdeel: 'avond', seizoen: 0.7,
     koopt: { goederen: 0.80, vervoer: 0.15, diensten: 0.05 }
   },
   hotel: {
     naam: 'Hotel', eenheid: 'kamers', perMaand: 30, perMedewerker: 9, markt: 170, bouw: 32120,
-    prijs: [78, 135, 240], inkoop: 0.18, loon: 2500, vast: 62,
+    prijs: [78, 135, 240], inkoop: 0.18, derving: 0.04, loon: 2500, vast: 62,
     trekt: { gezinnen: 0.9, ouderen: 0.7, studenten: 0.2, toeristen: 1.8, zakelijk: 1.5, nachtpubliek: 0.3 },
     dagdeel: 'beide', seizoen: 1.0,
     koopt: { goederen: 0.55, vervoer: 0.25, diensten: 0.20 }
   },
   retail: {
     naam: 'Winkel', eenheid: 'kassaplekken', perMaand: 30, perMedewerker: 42, markt: 1035, bouw: 2406,
-    prijs: [14, 26, 48], inkoop: 0.52, loon: 2250, vast: 16,
+    prijs: [14, 26, 48], inkoop: 0.52, derving: 0.06, loon: 2250, vast: 16,
     trekt: { gezinnen: 1.3, ouderen: 1.1, studenten: 0.9, toeristen: 1.1, zakelijk: 0.5, nachtpubliek: 0.3 },
     dagdeel: 'dag', seizoen: 0.4,
     levert: 'goederen', koopt: { productie: 0.45, goederen: 0.35, vervoer: 0.20 }
   },
   logistiek: {
     naam: 'Logistiek', eenheid: 'voertuigen', perMaand: 150, perMedewerker: 1, markt: 1801, bouw: 18420,
-    prijs: [34, 52, 88], inkoop: 0.38, loon: 2700, vast: 400,
+    prijs: [34, 52, 88], inkoop: 0.38, derving: 0.02, loon: 2700, vast: 400,
     trekt: { zakelijk: 2.2, toeristen: 0.4, gezinnen: 0.2, ouderen: 0.2, studenten: 0.1, nachtpubliek: 0.2 },
     dagdeel: 'beide', seizoen: 0.2,
     levert: 'vervoer', koopt: { productie: 0.45, diensten: 0.30, goederen: 0.25 }
   },
   'vrije-tijd': {
     naam: 'Vrije tijd', eenheid: 'plaatsen', perMaand: 30, perMedewerker: 34, markt: 1405, bouw: 2304,
-    prijs: [9, 17, 32], inkoop: 0.22, loon: 2200, vast: 22,
+    prijs: [9, 17, 32], inkoop: 0.22, derving: 0.03, loon: 2200, vast: 22,
     trekt: { gezinnen: 1.6, ouderen: 0.6, studenten: 1.2, toeristen: 1.5, zakelijk: 0.3, nachtpubliek: 0.9 },
     dagdeel: 'dag', seizoen: 0.9,
     koopt: { goederen: 0.75, diensten: 0.15, vervoer: 0.10 }
   },
   kantoor: {
     naam: 'Zakelijke dienst', eenheid: 'werkplekken', perMaand: 2.6, perMedewerker: 1, markt: 31, bouw: 36966,
-    prijs: [1800, 3200, 5600], inkoop: 0.12, loon: 3600, vast: 185,
+    prijs: [1800, 3200, 5600], inkoop: 0.12, derving: 0.01, loon: 3600, vast: 185,
     trekt: { zakelijk: 2.6, gezinnen: 0.2, ouderen: 0.2, studenten: 0.1, toeristen: 0.1, nachtpubliek: 0.1 },
     dagdeel: 'dag', seizoen: 0.1,
     levert: 'diensten', koopt: { diensten: 0.55, goederen: 0.30, vervoer: 0.15 }
   },
   industrie: {
     naam: 'Productie', eenheid: 'productielijnen', perMaand: 20, perMedewerker: 2, markt: 133, bouw: 71831,
-    prijs: [420, 760, 1350], inkoop: 0.45, loon: 2900, vast: 359,
+    prijs: [420, 760, 1350], inkoop: 0.45, derving: 0.05, loon: 2900, vast: 359,
     trekt: { zakelijk: 2.4, gezinnen: 0.1, ouderen: 0.1, studenten: 0.1, toeristen: 0.1, nachtpubliek: 0.1 },
     dagdeel: 'dag', seizoen: 0.1,
     levert: 'productie', koopt: { productie: 0.40, goederen: 0.30, vervoer: 0.30 }

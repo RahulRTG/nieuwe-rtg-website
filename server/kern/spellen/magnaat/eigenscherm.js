@@ -90,7 +90,7 @@ module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid, capacite
       beheer: beheerbeeld(st, mij),
       /* LOONDIENST (VERHAAL.md stap 1): wat er te krijgen is, wat je zelf hebt,
          en wie er voor je werkt. Zie ./dienst-acties.js. */
-      werk: dienstbeeld ? dienstbeeld(st, mij) : null,
+      werk: dienstbeeld ? dienstbeeld(potje, st, mij) : null,
       // de beurs is PUBLIEK: dat is het hele punt van een markt
       beurs: beursbeeld(st, mij),
       // de biedingen die JOU aangaan; wie waarop biedt is van die twee

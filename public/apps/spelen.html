@@ -1412,6 +1412,43 @@ let ecKavels = null, ecSectoren = null, ecKiesZone = null;
 let ecGesprek = null;
 const ecGeld = (n) => (n < 0 ? '-' : '') + '€' + Math.abs(Math.round(n)).toLocaleString('nl-NL');
 
+/* DE WERKVLOER (VERHAAL.md par. 0f). Wat een hulpkracht op zijn dienst ziet:
+   wat er openstaat, wat het nu al gekost heeft, en wat het per moment nog kost.
+
+   ER STAAT GEEN SCORE, GEEN BALK EN GEEN KLEUR die zegt wat dringend is -- dat
+   is wet 1, en het is het hele verschil met een mini-game. Er staan bedragen, en
+   de speler weegt zelf. De verleiding om er een aftellende ring omheen te zetten
+   is precies de verleiding die deze laag moet weerstaan: dan wordt het een
+   reactietest, en het gaat over prioriteit.
+
+   De twee getallen doen verschillende dingen, en daarom staan ze er allebei:
+   `perMoment` is wat wachten kost, `blijftLiggen` is wat opgeven kost. Wie op
+   een van de twee sorteert speelt slechter dan de ploeg. */
+function tekenDienst(d, waarom){
+  if (!d) return waarom ? '<div class="leeg">' + esc(waarom) + '</div>' : '';
+  if (d.klaar){
+    const u = d.uitkomst || {};
+    return '<div class="sec">Je dienst zit erop</div>' +
+      '<div class="rij"><div class="nm">Derving deze dienst<small>' +
+        (u.verschil > 0 ? ecGeld(u.verschil) + ' lager dan een dienst zonder sturing'
+         : u.verschil < 0 ? ecGeld(-u.verschil) + ' hoger dan een dienst zonder sturing'
+         : 'precies wat een dienst zonder sturing had gekost') +
+        '</small></div><b>' + ecGeld(u.derving || 0) + '</b></div>' +
+      (d.gedaan || []).map(g => '<div class="rij"><div class="nm">Moment ' + g.moment +
+        '<small>' + esc(g.deed) + '</small></div></div>').join('') +
+      ((u.bleefLiggen || []).length
+        ? '<div class="leeg">Blijven liggen: ' + u.bleefLiggen.map(esc).join(' ') + '</div>'
+        : '<div class="leeg">Er is niets blijven liggen.</div>');
+  }
+  return '<div class="sec">Je dienst · moment ' + d.moment + ' van ' + d.momenten + '</div>' +
+    (d.open || []).map(o => '<div class="rij"><div class="nm">' + esc(o.wat) +
+      '<small>' + (o.gelopen > 0 ? 'kostte tot nu toe ' + ecGeld(o.gelopen) + ' · ' : '') +
+      ecGeld(o.perMoment) + ' per moment dat het wacht · ' +
+      ecGeld(o.blijftLiggen) + ' als het blijft liggen</small></div>' +
+      '<button type="button" class="chip" data-rush="' + esc(o.id) + '">Oppakken</button></div>').join('') +
+    '<div class="leeg">Je kunt er per moment één doen.</div>';
+}
+
 function tekenMagnaatEco(){
   const p = huidig, st = p.staat;
   if (st.kavels) ecKavels = st.kavels;
@@ -1523,7 +1560,12 @@ function tekenMagnaatEco(){
       ((b.mag || []).length
         ? '<div class="keuzerij">' + (b.mag || []).map(veld =>
             '<button type="button" class="chip" data-wb="' + esc(veld) + '">' + esc(veld) + ' bijstellen</button>').join('') + '</div>'
-        : '<div class="leeg">Als ' + esc((b.rolnaam || b.rol).toLowerCase()) + ' beslis je niets over de zaak. Je werkt mee.</div>');
+        : '<div class="leeg">Als ' + esc((b.rolnaam || b.rol).toLowerCase()) + ' beslis je niets over de zaak. Je werkt mee.</div>') +
+      /* DE WERKVLOER, en hij staat HIER en niet in een eigen tab (VERHAAL.md
+         par. 0f). Een dienst is niet een spel naast je baan, het is je baan --
+         dus hangt hij onder de loonstrook, aan dezelfde zaak en dezelfde rol.
+         Wie er geen heeft, ziet hier niets en leest een regel waarom. */
+      tekenDienst(w.dienst, w.waarom);
   } else if ((w.vacatures || []).length) {
     werk.innerHTML = '<div class="sec">Werk zoeken</div>' +
       '<div class="leeg">' + w.vacatures.length + ' ' +
@@ -1559,6 +1601,10 @@ function tekenMagnaatEco(){
       catch(e){ meld(e.message); }
     }));
   }
+
+  werk.querySelectorAll('[data-rush]').forEach(b => b.addEventListener('click', async () => {
+    try{ await speelZet({ actie:'rush-pak', wat: b.dataset.rush }); }catch(e){ meld(e.message); }
+  }));
 
   werk.querySelectorAll('[data-sol]').forEach(b => b.addEventListener('click', async () => {
     try{ await speelZet({ actie:'solliciteren', id: b.dataset.sol }); }catch(e){ meld(e.message); }

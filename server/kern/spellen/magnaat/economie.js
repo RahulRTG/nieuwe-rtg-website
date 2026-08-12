@@ -111,7 +111,7 @@ module.exports = (ctx) => {
      acties van elke laag, en de twee AI's die de complete tabel nodig hebben.
      Dat is een bouwstap die met elke fase meegroeit; dit bestand gaat over de
      klok en die verandert niet meer. */
-  const { ACTIES, VRIJE_ACTIES, beheer, dienen, aiZet, promotie } =
+  const { ACTIES, VRIJE_ACTIES, beheer, dienen, aiZet, promotie, rush } =
     require('./tabel')({ K, mijnVestiging, vrijKavel, rond, L });
 
   // wat de tafel koos voor de Foundation; "wie doet er nog mee" is een vraag
@@ -126,10 +126,10 @@ module.exports = (ctx) => {
      er afgerekend) dat los staat van de klok hierboven. */
   const { zicht, zichtRuw, publiek, eindstand, tijdlijn } = require('./weergave')(Object.assign({
     K, codenaamVan, rond, bijrekenen,
-    // het promotievoorstel reist mee met het werkbeeld: geen tweede onderwerp
-    // maar hetzelfde -- wat er met je baan gebeurt. Zie ./promotie.js
-    dienstbeeld: (st, h) => Object.assign(dienen.beeld(st, h, codenaamVan),
-      { promoties: promotie.beeld(st, h, codenaamVan) }),
+    // promotie en DIENST reizen mee met het werkbeeld: geen tweede onderwerp
+    // maar hetzelfde -- wat er met je baan gebeurt. Zie ./promotie.js, ./rush.js
+    dienstbeeld: (potje, st, h) => Object.assign(dienen.beeld(st, h, codenaamVan),
+      { promoties: promotie.beeld(st, h, codenaamVan) }, rush.vloer(potje, h)),
     foundationArbeid: (st) => F.arbeidBonus(st.foundation) }, L.zichtdelen));
   /* WIE ER AAN ZET IS EN WANNEER HET AF IS staat in ./verloop.js -- een echte
      naad: dit bestand gaat over de KLOK en die is af. Lees daar ook waarom de

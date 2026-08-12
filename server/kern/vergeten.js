@@ -8,7 +8,10 @@
    De vier soorten:
 
    1. WEG. Alles wat alleen over dit lid gaat: zijn voorkeuren, zijn spullen,
-      zijn geheugen, zijn eigen Salon-posts. Dat staat hieronder.
+      zijn geheugen, zijn eigen Salon-posts. Dat staat in ./vergeten/eigen.js --
+      als enige van de vier stond die soort hier nog los in de functie, en de
+      lijst met takken was daar het onderwerp geworden in plaats van de gang van
+      zaken.
    2. DE PERSOON ERUIT, DE REST BLIJFT. Waar zijn spoor in het werk van een
       ander zit: een reactie in andermans draad, een DM die de helft van
       iemands gesprek is, de bel van een zaak, een cadeaukaart met geld erin.
@@ -44,6 +47,7 @@ module.exports = function maakVergeten(kern) {
   const identiteitsmap = require('../identiteitsmap').maakIdentiteitsmap(UPLOAD_DIR);
   const anoniem = require('./vergeten/anoniem')({ db, accounts, spelVergeet: kern.spelVergeet });
   const { wisGesprekkenVan: wisGesprekken, wisSollicitatiechats } = require('./vergeten/gesprekken');
+  const eigen = require('./vergeten/eigen')({ db, lidBoardLogWis });
 
   /* Wist dit lid definitief. Async omdat de mediastore ook een objectopslag op
      afstand kan zijn (S3); de aanroeper wacht erop voordat hij antwoordt --
@@ -51,10 +55,11 @@ module.exports = function maakVergeten(kern) {
   async function wisLid(sessie) {
     const key = sessie.key;
     const teWissen = new Set();
-    // cv en live-locatie weg, chats weg, likes weg
-    delete db.data.cvs[key];
-    delete db.data.live[key];
-    for (const k of Object.keys(db.data.guestChats || {})) if (k.split('|')[1] === key) delete db.data.guestChats[k];
+    /* DE EERSTE SOORT: alles wat alleen over dit lid gaat -- zijn voorkeuren,
+       zijn spullen, zijn geheugen, zijn eigen Salon-posts. De lijst met takken
+       staat in ./vergeten/eigen.js; daar is de LIJST het onderwerp, en hier zou
+       hij het bestand overheersen. */
+    eigen.wisEigen(key, bytes.noteerPostBeelden, teWissen);
     /* De gesprekken van de communicatiekern. De regel staat apart (./vergeten/
        gesprekken.js) omdat hij binnen deze functie niet los te toetsen was --
        en precies daardoor stond hij er eerst helemaal niet: de bezem liep groen
@@ -64,46 +69,6 @@ module.exports = function maakVergeten(kern) {
     /* En de schakel van een sollicitatie: het record dat zegt wie er
        solliciteerde. Zie de opmerking bij wisSollicitatiechats(). */
     wisSollicitatiechats(db, key);
-    for (const p of db.data.posts) if (p.likedBy) delete p.likedBy[key];
-    /* De eigen Salon-posts gaan WEG. Dat is de schoonste lezing van art. 17:
-       het is de inhoud van dit lid en dit lid vraagt vergetelheid. De reacties
-       van anderen eronder verdwijnen mee -- dat is de prijs, en die is bewust
-       betaald: een post laten staan met "(verwijderd)" erboven bewaart nog
-       steeds wat iemand schreef toen hij nog niet weg wilde. */
-    if (Array.isArray(db.data.posts)) {
-      // eerst de beelden van die posts noteren, anders zijn ze na de filter
-      // niet meer terug te vinden en blijven ze als wees op schijf staan
-      bytes.noteerPostBeelden(key, teWissen);
-      db.data.posts = db.data.posts.filter(p => p.authorKey !== key);
-    }
-    // meldingen weg (bij demo-profielen is dit de gedeelde demo-bel)
-    if (db.data.notifications[key]) db.data.notifications[key] = [];
-    /* Alles wat rechtstreeks onder de sleutel van dit lid staat. Als lijst, niet
-       als losse regels: zo is in een oogopslag te zien welke takken meegaan, en
-       is er een plek om er een bij te zetten. Elke naam hier is een tak die
-       ALLEEN over dit lid gaat -- zijn voorkeuren, zijn spullen, zijn geheugen.
-       De bezem in test/vergeten.test.js bewaakt dat de lijst compleet blijft. */
-    for (const tak of [
-      'fluister',           // wat Rahul van u weet: weetjes, gesprek, gebruik
-      'rahulRespect',       // de teller van de pestgrens
-      'favorieten',         // uw adressen
-      'zorgProfielen',      // allergieen en dieet: bijzondere persoonsgegevens
-      'memberTaal',         // uw taalkeuze
-      'wallet',             // uw passen, tickets en sleutels
-      'punten',             // uw spaarsaldo (zonder account niet meer te besteden)
-      'appInstallaties', 'reisInstallaties', 'rijksInstallaties',  // wat u installeerde
-      'clipsVolg',          // wie u volgt
-      'lifestyle',          // uw rechterhand-voorkeuren
-      'ontmoetVoorkeur', 'ontmoetPosities',   // Salon-ontmoetingen en uw positie daarin
-      'accountRollen',      // uw koppelingen aan werkplekken
-      'ledenBoard'          // uw eigen boardroom: wat u wel en niet deelt
-    ]) { if (db.data[tak]) delete db.data[tak][key]; }
-    /* En het journaal van die boardroom. Dat staat apart omdat het geen tak op
-       de sleutel is maar een eigen lijst; het hoort er wel bij, want het legt
-       vast WIE welke knop zette -- bij een kind is dat een ouder. Blijft het
-       staan na "verwijder mijn gegevens", dan houden we een spoor van iemand
-       die er niet meer is. */
-    if (typeof lidBoardLogWis === 'function') lidBoardLogWis(key);
     /* En dan de tweede soort: alles waar het spoor van dit lid in het werk van
        een ANDER zit -- reacties onder andermans post, sollicitaties, DM's, het
        aanmeldingsdossier, cadeaukaarten, de bel van de zaak. Daar gaat de

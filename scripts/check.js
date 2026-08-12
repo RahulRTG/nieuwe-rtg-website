@@ -2974,5 +2974,60 @@ console.log('\n46) de SLO-tabel in SLO.md is een afdruk van SLO.json');
   }
 }
 
+/* ============================================================================
+   47) saveDuurzaam() wordt alleen aangeroepen waar het MOET
+
+   WAAROM DIT EEN HARDE POORT IS EN GEEN AFSPRAAK. db.saveDuurzaam() schrijft
+   synchroon met een fsync eronder en keert pas terug als de opslag het heeft
+   bevestigd. Dat kost latentie, en dat is de hele reden dat hij bestaat -- voor
+   geld, waar bevestigen vóór duurzaamheid een belofte is die de opslag nog niet
+   heeft gedaan (zie GELDLAT.md).
+
+   Precies daarom is hij gevaarlijk als hij rondslingert. Iemand leest hem als
+   "de veilige save", zet hem onder een profielwijziging, en het prestatieprofiel
+   van het platform is veranderd zonder dat er ooit een beslissing over is
+   genomen. Een afspraak in een document houdt dat niet tegen; deze regel wel.
+
+   Elke regel in TOEGESTAAN noemt zijn reden. Staat er geen reden bij, dan hoort
+   hij er niet -- dezelfde vorm als PUBLIEK in de poortwacht en MAG in de
+   klokschuld. */
+console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestiging moet');
+{
+  const TOEGESTAAN = new Map([
+    ['server/db/index.js', 'hier WOONT de primitive'],
+    ['scripts/check.js', 'deze regel zelf noemt zijn naam'],
+    ['test/saveduurzaam.test.js', 'de toets die bewijst dat hij bevestigt']
+  ]);
+  const overtreders = [];
+  let gezien = 0;
+  const kijk = (map) => {
+    for (const naam of fs.readdirSync(map)) {
+      const p = path.join(map, naam);
+      let st; try { st = fs.statSync(p); } catch (e) { continue; }
+      if (st.isDirectory()) {
+        if (/^(node_modules|\.git|data|dist)$/.test(naam)) continue;
+        kijk(p); continue;
+      }
+      if (!naam.endsWith('.js')) continue;
+      let bron; try { bron = fs.readFileSync(p, 'utf8'); } catch (e) { continue; }
+      if (bron.includes('\u0000')) continue;
+      if (!/saveDuurzaam/.test(bron)) continue;
+      gezien++;
+      const rel = path.relative(ROOT, p).replace(/\\/g, '/');
+      if (!TOEGESTAAN.has(rel)) overtreders.push(rel);
+    }
+  };
+  for (const map of ['server', 'scripts', 'test']) {
+    const m = path.join(ROOT, map);
+    if (fs.existsSync(m)) kijk(m);
+  }
+  if (overtreders.length) {
+    fout('saveDuurzaam() staat op een plek die er niet op de lijst staat: ' + overtreders.join(', ') +
+      ' -- zet hem in TOEGESTAAN (met reden) of gebruik de gewone save()');
+  } else {
+    ok(gezien + ' bestanden noemen saveDuurzaam, allemaal met een reden op de lijst');
+  }
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

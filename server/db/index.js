@@ -182,6 +182,74 @@ function startSqliteSync() {
 }
 
 // Laatste flush bij het afsluiten, zodat niets in de write-behind blijft hangen.
+/* ============================================================================
+   saveDuurzaam() -- BEWUST ZWAAR, EN BEWUST SCHAARS.
+
+   WAAROM DIT GEEN "VEILIGE SAVE" IS. De gewone save() is write-behind: hij
+   plant een schrijfactie en keert meteen terug. Dat is voor vrijwel alles het
+   juiste gedrag. Deze variant slaat dat plannen over en schrijft SYNCHROON,
+   met een fsync eronder, en keert pas terug als de opslag het heeft bevestigd.
+
+   Dat kost latentie, en dat is precies waarom hij niet mag rondslingeren.
+   Zodra iemand hem leest als "de veilige save", staat hij binnen een half jaar
+   onder een profielwijziging en een like -- en dan is het prestatieprofiel van
+   het hele platform veranderd zonder dat er ooit een beslissing over is
+   genomen. Dat is geen hypothetisch risico; zo ontspoort elke goedbedoelde
+   primitive.
+
+   DAAROM EEN LIJST MET AANROEPPLEKKEN, en niet een afspraak. Dezelfde vorm als
+   PUBLIEK in de poortwacht en MAG in de klokschuld: elke regel noemt zijn
+   reden, en een aanroep die er niet op staat is een HARDE fout in
+   `npm run check` -- geen waarschuwing. Zie GELDLAT.md voor het contract
+   waarvoor hij bestaat.
+
+   WAT HIJ TERUGGEEFT, en waarom dat geen boolean is. `{ duurzaam, stand }`:
+   `duurzaam` is alleen true als de opslag het ook echt kon BEVESTIGEN. Op een
+   opslagsoort zonder teller is dat niet vast te stellen, en dan staat er false
+   met stand null -- niet stilzwijgend true. Een aanroeper die dat verschil
+   negeert, bouwt precies de valse bevestiging waar dit voor is gemaakt.
+
+   HIJ IS NOG NERGENS AANGESLOTEN. De geldcommit eraan hangen is stap 2 van de
+   volgorde in GELDLAT.md, en die stap hoort pas na een gemeten
+   prestatievergelijking (p95/p99 en event-loop-effect, voor en na).
+   ========================================================================== */
+function saveDuurzaam() {
+  if (!db.writable) return { duurzaam: false, stand: null, reden: 'de opslag staat niet open' };
+
+  /* HET VERRAAD GELDT OOK HIER, en dat ontbrak in de eerste versie.
+
+     Deze functie riep sqlite.saveSqlite() rechtstreeks aan en liep daarmee om
+     het injectiepunt in save() heen. Uitkomst: onder `schrijf-verloren` meldde
+     hij vrolijk `duurzaam: true`. Een duurzame schrijfactie die NIET te
+     saboteren is, is precies de weg waarlangs de geldketen straks "bewezen"
+     zou heten zonder ooit onder een liegende opslag te zijn gehouden. De eigen
+     toets viel erover voordat er iets op aangesloten was. */
+  if (verraad.sla('schrijf-faalt')) throw new Error('[verraad] de duurzame schrijfactie mislukte (schrijf-faalt)');
+  if (verraad.sla('schrijf-verloren')) {
+    return { duurzaam: false, stand: persistentieStand(),
+      reden: 'de opslag bevestigde de schrijfactie niet' };
+  }
+
+  const voor = persistentieStand();
+  if (STORE === 'sqlite') {
+    /* force: sla de goedkope voorcheck over, die kan een gelijk gebleven
+       collectiegrootte overslaan. Daarna de WAL dichtvouwen, zodat de
+       wijziging niet alleen in het journaal staat. */
+    sqlite.saveSqlite(true);
+    sqlite.checkpointSqlite();
+  } else if (STORE === 'json') {
+    schrijfSnapshotNu();               // schrijft via schrijfDuurzaam(): fsync + rename
+  } else {
+    save();                            // postgres/geheugen: geen synchrone weg hier
+  }
+  const na = persistentieStand();
+  const bevestigd = voor !== null && na !== null && na > voor;
+  return { duurzaam: bevestigd, stand: na,
+    reden: bevestigd ? null
+      : (voor === null || na === null ? 'deze opslag kan duurzaamheid niet bevestigen'
+        : 'de persistentiestand liep niet op') };
+}
+
 /* De persistentiestand: een getal dat OPLOOPT zodra er werkelijk is
    weggeschreven. Alleen de SQLite-opslag houdt zo'n teller bij; bij de andere
    opslagsoorten geven we null terug, en dat betekent NIET VAST TE STELLEN. Een
@@ -216,7 +284,7 @@ function opslagKlaar() {
 }
 
 module.exports = {
-  db, load, save, bijeen, persistentieStand, DATA_DIR: opslag.DATA_DIR, STORE, startGedeeld: redis.startGedeeld, startSqliteSync,
+  db, load, save, saveDuurzaam, bijeen, persistentieStand, DATA_DIR: opslag.DATA_DIR, STORE, startGedeeld: redis.startGedeeld, startSqliteSync,
   startPostgres: postgres.startPostgres, flushBijAfsluiten, pgPing: postgres.pgPing,
   opslagKlaar, pgPoolStatus: postgres.pgPoolStatus, onExternalChange, merge3, schrijfDuurzaam: opslag.schrijfDuurzaam,
   grootSupplierSync: gidsen.grootSupplierSync, grootAantal: gidsen.grootAantal,

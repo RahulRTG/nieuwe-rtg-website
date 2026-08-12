@@ -300,6 +300,94 @@ toen het tegenzat, ging er niet samen doorheen.
 
 ---
 
+## 0f. De werklaag: een dienst is geen mini-game
+
+> **Je wordt niet beter omdat een meter stijgt. Je wordt beter omdat de wereld
+> meer aan jou durft toe te vertrouwen.**
+
+Werken is nu een knop en een maand die verstrijkt. Dat moet een **dienst**
+worden — en de val is om dat als "mini-game bij een functie" te bouwen. Dan
+krijg je zes minuten taakjes met punten eromheen, en dat is precies het soort
+laag dat `CLAUDE.md` uitsluit.
+
+Wat het wel is: **een levende dienst in een echte organisatie.** Een hulpkracht
+ziet op zijn PDA geen HUD met combo's, maar de werkvloer: bestelling 184 wacht
+zes minuten, koeling B geeft een waarschuwing, tafel 12 moet afgeruimd, een
+collega meldt zich ziek. En je kunt onmogelijk alles tegelijk. *Dat* is het
+spel — prioriteit onder druk, niet reflexen.
+
+Dus niet `+250 punten`, maar: **derving deze maand €184 lager door
+operationele ingrepen.**
+
+### Eén incident, vijf hoogtes
+
+Hier zit de architectuur, en ze scheelt honderd mini-games. Je verzint geen
+nieuw spel per promotie; je laat **hetzelfde bedrijf van een andere hoogte
+zien.** Een defecte koeling:
+
+| rol | wat hij ziet |
+|---|---|
+| hulpkracht | *Koeling B te warm. Wat doe je eerst?* |
+| vakkracht | *Kun je dit zelf herstellen of moet onderhoud komen?* |
+| bedrijfsleider | *Onderhoud kost €1.100. Uitstellen verhoogt de derving. Je bent al onderbezet.* |
+| eigenaar | *Deze vestiging had drie storingen in zes maanden. Vervangen of blijven repareren?* |
+| concernbestuur | *Vier vestigingen draaien dezelfde installatie. Is dit structureel?* |
+
+En daarom is de mini-game **geen nieuw systeem**: hij is de `mag`-lijst van je
+rol, van binnenuit gezien. Die lijst staat er al (`magnaat/dienst-rollen.js`).
+Promotie wordt daarmee zichtbaar zonder één confettischerm: je PDA heeft ineens
+een knop **Onderhoud** die er gisteren niet was. *De software vertrouwt je meer.*
+
+### De vijf wetten
+
+1. **Geen score als de werkelijkheid het antwoord kan zijn.** Geen
+   `Cooking 83` als *126 diensten, waarvan 18 sluitdiensten en 4
+   incidentdiensten* meer zegt. Ervaring is geschiedenis, geen getal.
+2. **Iedere rol speelt alleen zijn eigen verantwoordelijkheid.** Geen
+   hulpkracht die de prijsstand zet. De grens die de rol al draagt, is de grens
+   van het spel.
+3. **Iedere uitkomst loopt door de echte economie.** Verspilling wordt een
+   gewone regel op het maandoverzicht, tussen huur en loon. Geen gamevaluta,
+   geen bonuslaag ernaast — en `scripts/magnaat-pomp.js` hoort een tweede
+   economie af te keuren. Die keuring is het bewijs dat de dienst eerlijk is.
+4. **Niet spelen is neutraal.** Je dienst draait dan gewoon door met een
+   neutrale uitkomst, precies zoals `magnaat/beheer.js` een zaak laat draaien
+   als jij er niet bent. Geen reeks, geen inhaalschuld, geen straf voor
+   afwezigheid — dat is grens 4, en zonder deze wet is dit binnen een jaar een
+   tredmolen langs de mooiste denkbare omweg.
+5. **Betekenisvolle uitzonderingen worden geschiedenis.** Niet elke klik. Wel:
+   *eerste zelfstandige avonddienst*, *voorkwam voorraadschade tijdens een
+   koelstoring*, *werkte mee tijdens de storm*. Dat is wat een werkgever later
+   ziet — geen badge, maar *"heeft eerder een vestiging geleid tijdens zware
+   verstoring"*.
+
+### Wat dat oplevert, en waar het heen loopt
+
+Een fout hoeft niet zwart-wit te zijn: drie problemen en tijd voor twee is
+interessanter dan een reactietest. Een goede speler kiest de minst slechte
+uitkomst, en maanden later blijkt het neveneffect. Managers leven van
+trade-offs, niet van perfecte antwoorden.
+
+En een dienst rimpelt door: een collega blijft langer, de volgende ploeg start
+met achterstand, de leverancier moet spoed leveren, een gast klaagt. Eén
+operationele keuze door meerdere RTG-schermen — PDA, personeel, voorraad,
+leverancier, financieel, klant.
+
+Twintig jaar later open je de geschiedenis van Havenzicht, klikt op *14 november
+2034 — Noordzeestorm*, en ziet wie er toen werkten, wat er kapotging, welke
+claim eruit kwam. En daar staat: *Rahul — vakkracht — werkte elf uur tijdens
+het herstel.* Niet omdat je een achievement haalde. Omdat het gebeurd is.
+
+### Bouwvolgorde
+
+**Bouw er één, helemaal.** PDA Rush, voor de hulpkracht, in horeca, op het
+echte PDA-scherm. Eén rol, één sector, één scherm, één uitkomst die als
+maandregel landt. Een mini-game-*raamwerk* vooraf bouwen is de val: zo algemeen
+dat elk specifiek spel middelmatig wordt. De tweede dienst vertelt je wat het
+raamwerk is; de eerste kan dat niet.
+
+---
+
 ## 1. De grondwet van blijvende waarde
 
 Zodra iets tussen campagnes blijft bestaan, verandert de economische grondwet.

@@ -42,6 +42,9 @@
      het ritme de ring hebben. */
   function toonRitme() {
     if (!st.aan || !el.rahul || !ritme || ritmeWeg) return;
+    /* Zijn NIEUWS gaat voor -- dat is nieuws, dit is een gewoonte. Zijn lege zin
+       komt hier nooit terecht (zie rahulZei), dus als de ring bezet is door
+       'rahul' staat er echt iets in. */
     if (el.rahul.getAttribute('data-soort') === 'rahul' &&
         el.rahul.getAttribute('data-toon') === 'ja') return;
     if (draadStaatOpen()) return;

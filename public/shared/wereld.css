@@ -109,8 +109,33 @@
   transition: color var(--rtg-tempo, 340ms) var(--rtg-ease, ease),
               opacity var(--rtg-tempo, 340ms) var(--rtg-ease, ease);
   opacity: 0.5;
+  overflow: hidden; border-radius: 50%;
 }
 .os-wm svg { width: 58%; height: 58%; }
+/* EEN GEKLOOND TABBLAD-ICOON VERLIEST ZIJN LIJN.
+   tegelInhoud() kloont voor een tab: het icoon uit de tabbalk, en dat icoon
+   krijgt zijn stroke van de CSS van die BALK. Buiten de balk staat er dus
+   stroke:none op, en dan hangt er een svg met de goede maat en de goede paden
+   die niets tekent -- gemeten: twee lege schijven op de ring, met alles erin
+   behalve iets zichtbaars.
+   Alleen de gekloonde iconen: de huisglyfen (.rtg-glyf) dragen hun eigen
+   opmaak al mee en horen daar niet mee overschreven te worden. */
+.os-wm svg:not(.rtg-glyf) { stroke: currentColor; fill: none; stroke-width: 1.7; }
+/* NIET ELK ONDERDEEL HEEFT EEN GLYF, en dan valt tegelInhoud() terug op een
+   monogram van twee letters. Dat is gemaakt voor een TEGEL van zestig pixels;
+   in een merk van tweeëndertig liep hij glansrijk buiten zijn schijf -- twee
+   kapitalen die half over de ring hingen. Wat hier binnenkomt is dus niet altijd
+   een svg, en deze regel geldt voor alles wat er komt: het past in het merk, of
+   het hoort er niet in.
+   .os-wm heeft ook overflow:hidden, zodat een vorm die we nog niet kennen
+   nooit meer over de ring heen kan lopen. */
+.os-wm > * { max-width: 62%; max-height: 62%; }
+.os-wm span, .os-wm .os-monogram {
+  font-family: Inter, system-ui, sans-serif;
+  font-size: calc(var(--e) * 0.56); line-height: 1;
+  letter-spacing: 0.04em; text-transform: uppercase; font-weight: 600;
+  color: inherit; background: none; border: 0; width: auto; height: auto;
+}
 .os-wm::before {
   /* de schijf waar de glyf op ligt: donker glas met een haarlijn, dezelfde
      taal als de kast van de klok. Geen gouden randje -- dat mag alleen het
@@ -123,8 +148,47 @@
 }
 .os-wm > * { position: relative; }
 .os-wm:active::before { transform: scale(0.92); }
+/* ELKE WERELD HEEFT ZIJN EIGEN LICHT.
+   De acht merken waren acht identieke grijze schijven. Nu draagt elk de tint
+   van zijn eigen wereld (--planeet, gezet door merkLicht() uit dezelfde tabel
+   als zijn gloed op de grond), zodat de ring leest als een stelsel van lichamen
+   in plaats van als een rij knoppen -- en je een wereld aan zijn kleur herkent
+   voordat je de glyf leest. Val terug op goud als een onderdeel geen eigen tint
+   heeft: ingezoomd zijn het apps, geen planeten. */
+.os-wm { --planeet: 201, 162, 75; }
+.os-wm::after {
+  content: ''; position: absolute; inset: -14%; border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(var(--planeet), 0.16), transparent 72%);
+  opacity: 0; transition: opacity var(--rtg-royaal, 560ms) var(--rtg-ease, ease);
+  pointer-events: none;
+}
 .os-wm[data-actief="ja"] { opacity: 1; color: var(--gold); }
 .os-wm[data-actief="ja"]::before { border-color: var(--gold); }
+.os-wm[data-actief="ja"]::after { opacity: 1; }
+
+/* ---------- de vlucht ----------
+   Inzoomen is geen wissel maar een reis: de andere werelden schieten naar
+   buiten weg alsof je erlangs komt, en pas als ze weg zijn staan de onderdelen
+   er. Uitzoomen is dezelfde beweging terug. Het is een OVERGANG en geen tweede
+   scherm -- er komt geen stand bij, alleen tijd tussen twee standen. */
+.os-wereldkring[data-vlucht="in"] .os-wm {
+  opacity: 0; transform: translate(-50%, -50%) scale(2.1) !important;
+  transition: opacity 280ms var(--rtg-ease, ease), transform 300ms var(--rtg-ease, ease);
+}
+.os-wereldkring[data-vlucht="uit"] .os-wm {
+  opacity: 0; transform: translate(-50%, -50%) scale(0.35) !important;
+  transition: opacity 280ms var(--rtg-ease, ease), transform 300ms var(--rtg-ease, ease);
+}
+/* en terugkomen doen ze vanzelf, want dit is hun rusttoestand */
+.os-wereldkring[data-vlucht="nee"] .os-wm {
+  transition: opacity 320ms var(--rtg-ease, ease), transform 320ms var(--rtg-ease, ease),
+              color var(--rtg-tempo, 340ms) var(--rtg-ease, ease);
+}
+@media (prefers-reduced-motion: reduce) {
+  .os-wereldkring[data-vlucht] .os-wm { transition: none; opacity: 0.5; transform: translate(-50%, -50%) !important; }
+  .os-wereldkring[data-vlucht] .os-wm[data-actief="ja"] { opacity: 1; }
+  .os-wm::after { transition: none; }
+}
 .os-wm:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 50%; }
 @media (prefers-reduced-motion: reduce) { .os-wm, .os-wm::before { transition: none; } }
 

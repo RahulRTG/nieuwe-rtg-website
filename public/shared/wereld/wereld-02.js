@@ -24,12 +24,26 @@
        naam -- die verandert met het beleid mee ("Video" en niet "Clips"), en dan
        wijst alles wat op de naam leunt ineens nergens meer heen. */
     if (item.sleutel) b.dataset.sleutel = item.sleutel;
+    merkLicht(b, item);
     b.setAttribute('aria-label', item.naam);
+    /* WAT ER BINNENKOMT IS NIET ALTIJD EEN TEKEN.
+
+       tegelInhoud() levert drie soorten: een glyf-svg, de svg van een tabblad,
+       of -- als er geen van beide is -- een kaal opsommingsteken als TEKSTKNOOP.
+       Dat laatste is op een tegel met een naam eronder prima, maar een merk op
+       de ring heeft geen naam eronder: dan hangt er een lege schijf waar je
+       niets aan af kunt lezen. Twee daarvan stonden er, en een lege knop is
+       erger dan een lelijke.
+
+       Een tekstknoop is bovendien "truthy", dus de oude terugval sloeg juist bij
+       dit geval niet aan. We eisen daarom een ELEMENT; komt dat er niet, dan
+       maken we het monogram zelf. */
     var teken = item.teken && item.teken();
-    if (teken) b.appendChild(teken);
+    if (teken && teken.nodeType === 1) b.appendChild(teken);
     else {
       var mono = d.createElement('span');
-      mono.textContent = item.naam.replace(/^RTG /, '').slice(0, 2);
+      mono.className = 'os-monogram';
+      mono.textContent = String(item.naam || '?').replace(/^RTG /, '').slice(0, 2);
       b.appendChild(mono);
     }
     /* Tikken doet twee dingen, en welke hangt af van waar je staat. Op een merk

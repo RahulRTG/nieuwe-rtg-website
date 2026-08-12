@@ -64,6 +64,8 @@
     var maat = Math.max(W, H);
     try {
       for (var i = 0; i < grond.motief.length; i++) gloed(ctx, W, H, maat, grond.motief[i], i, kracht);
+      // binnen een wereld sta je ergens: dan komt de horizon erbij
+      horizon(ctx, W, H, grond.t);
     } catch (e) { /* een motief mag het scherm nooit kosten */ }
     ctx.restore();
   }

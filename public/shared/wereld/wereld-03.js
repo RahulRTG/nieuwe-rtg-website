@@ -33,6 +33,13 @@
      st.wereldIdx bestaat naast st.actief. */
   function zoom(naarBinnen) {
     if (!st.werelden.length) return;
+    if (naarBinnen && (!st.werelden[st.actief] || !(st.werelden[st.actief].delen || []).length)) return;
+    if (!naarBinnen && !st.diep) return;
+    // eerst wegvliegen, dan pas wisselen: anders wisselt de inhoud terwijl de
+    // oude nog in beeld staat, en dat is geen vlucht maar een flikkering
+    vlieg(naarBinnen, function () { zoomNu(naarBinnen); });
+  }
+  function zoomNu(naarBinnen) {
     if (naarBinnen) {
       var wereld = st.werelden[st.actief];
       if (!wereld || !(wereld.delen || []).length) return;   // niets om in te zoomen

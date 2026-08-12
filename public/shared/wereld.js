@@ -176,12 +176,26 @@
        naam -- die verandert met het beleid mee ("Video" en niet "Clips"), en dan
        wijst alles wat op de naam leunt ineens nergens meer heen. */
     if (item.sleutel) b.dataset.sleutel = item.sleutel;
+    merkLicht(b, item);
     b.setAttribute('aria-label', item.naam);
+    /* WAT ER BINNENKOMT IS NIET ALTIJD EEN TEKEN.
+
+       tegelInhoud() levert drie soorten: een glyf-svg, de svg van een tabblad,
+       of -- als er geen van beide is -- een kaal opsommingsteken als TEKSTKNOOP.
+       Dat laatste is op een tegel met een naam eronder prima, maar een merk op
+       de ring heeft geen naam eronder: dan hangt er een lege schijf waar je
+       niets aan af kunt lezen. Twee daarvan stonden er, en een lege knop is
+       erger dan een lelijke.
+
+       Een tekstknoop is bovendien "truthy", dus de oude terugval sloeg juist bij
+       dit geval niet aan. We eisen daarom een ELEMENT; komt dat er niet, dan
+       maken we het monogram zelf. */
     var teken = item.teken && item.teken();
-    if (teken) b.appendChild(teken);
+    if (teken && teken.nodeType === 1) b.appendChild(teken);
     else {
       var mono = d.createElement('span');
-      mono.textContent = item.naam.replace(/^RTG /, '').slice(0, 2);
+      mono.className = 'os-monogram';
+      mono.textContent = String(item.naam || '?').replace(/^RTG /, '').slice(0, 2);
       b.appendChild(mono);
     }
     /* Tikken doet twee dingen, en welke hangt af van waar je staat. Op een merk
@@ -352,6 +366,13 @@
      st.wereldIdx bestaat naast st.actief. */
   function zoom(naarBinnen) {
     if (!st.werelden.length) return;
+    if (naarBinnen && (!st.werelden[st.actief] || !(st.werelden[st.actief].delen || []).length)) return;
+    if (!naarBinnen && !st.diep) return;
+    // eerst wegvliegen, dan pas wisselen: anders wisselt de inhoud terwijl de
+    // oude nog in beeld staat, en dat is geen vlucht maar een flikkering
+    vlieg(naarBinnen, function () { zoomNu(naarBinnen); });
+  }
+  function zoomNu(naarBinnen) {
     if (naarBinnen) {
       var wereld = st.werelden[st.actief];
       if (!wereld || !(wereld.delen || []).length) return;   // niets om in te zoomen
@@ -588,7 +609,20 @@
     /* Zegt hij dat er niets is, dan HEEFT hij niets -- en dan mag je gewoonte de
        ring hebben. Zonder deze tak wint zijn beleefde niets-zin het altijd van
        het ritme en zie je dat nooit. */
-    if (leeg === true && heeftRitme()) { toonRitme(); return; }
+    /* "ER LIGT NIETS DRINGENDS" KRIJGT DE RING NIET.
+
+       De hele afspraak van deze ring is: hij is er niet, tot Rahul iets HEEFT.
+       Zijn terugvalzin is per definitie het tegenovergestelde -- dat is hem die
+       netjes meldt dat er niets is. Die zin in een gouden ring zetten is precies
+       het behang dat we van dit scherm af hebben gehaald.
+
+       Het bleef ook niet bij lelijk. Tik je het ritme weg, dan kwam zijn lege
+       zin er meteen voor in de plaats: je zegt "laat maar" en krijgt er iets
+       anders voor terug. Nu biedt een lege zin de ring alleen aan het ritme aan;
+       is dat er niet, dan blijft de ring dicht. In de DRAAD staat zijn zin
+       gewoon, voor wie het gesprek opent -- hij wordt niet ingeslikt, hij komt
+       alleen niet ongevraagd in beeld. */
+    if (leeg === true) { toonRitme(); return; }
     el.rahul.querySelector('span').textContent = String(tekst);
     el.rahul.setAttribute('data-soort', 'rahul');
     el.rahul.setAttribute('data-toon', 'ja');
@@ -844,6 +878,8 @@
     var maat = Math.max(W, H);
     try {
       for (var i = 0; i < grond.motief.length; i++) gloed(ctx, W, H, maat, grond.motief[i], i, kracht);
+      // binnen een wereld sta je ergens: dan komt de horizon erbij
+      horizon(ctx, W, H, grond.t);
     } catch (e) { /* een motief mag het scherm nooit kosten */ }
     ctx.restore();
   }
@@ -1058,6 +1094,9 @@
      het ritme de ring hebben. */
   function toonRitme() {
     if (!st.aan || !el.rahul || !ritme || ritmeWeg) return;
+    /* Zijn NIEUWS gaat voor -- dat is nieuws, dit is een gewoonte. Zijn lege zin
+       komt hier nooit terecht (zie rahulZei), dus als de ring bezet is door
+       'rahul' staat er echt iets in. */
     if (el.rahul.getAttribute('data-soort') === 'rahul' &&
         el.rahul.getAttribute('data-toon') === 'ja') return;
     if (draadStaatOpen()) return;
@@ -1088,6 +1127,116 @@
       el.rahul.setAttribute('data-toon', 'nee');
       el.rahul.setAttribute('data-soort', 'rahul');
     }
+  }
+
+  /* ---------- planeten, en de vlucht ernaartoe ----------
+
+     Het ontwerp vroeg om werelden als planeten die om de klok draaien, en om
+     inzoomen dat voelt als vliegen in plaats van openen. Allebei zijn ze hier
+     gebouwd, maar niet zoals ze op papier stonden -- en dat verschil is een
+     besluit dat uitleg verdient.
+
+     WAT ER NIET GEBEURT: de merken gaan niet vrij in banen om de klok draaien.
+     Een bezel leest zijn stand af aan een VAST punt (de gouden index op twaalf
+     uur); merken die elk hun eigen baan hebben, hebben geen stand meer, en dan
+     is het geen horloge maar een mobiel. Dat zou ook de meting breken die
+     bewaakt dat ze op EEN cirkel liggen -- en die meting bewaakt een echte
+     fout, geen smaak.
+
+     WAT ER WEL GEBEURT, en wat het idee eigenlijk vraagt:
+
+     1. Elke wereld krijgt zijn EIGEN LICHT. De acht merken waren acht
+        identieke grijze schijven; nu draagt elk de tint van zijn eigen wereld
+        (dezelfde tint als zijn gloed op de grond, uit MOTIEVEN). Daardoor lees
+        je de ring als een stelsel van lichamen in plaats van als een rij
+        knoppen -- en je herkent een wereld aan zijn kleur voordat je de glyf
+        leest.
+
+     2. Inzoomen is een VLUCHT. De andere werelden schieten naar buiten weg
+        alsof je er langs komt, en pas als ze weg zijn staan de onderdelen er.
+        Uitzoomen is dezelfde beweging terug. Het is een overgang en geen tweede
+        scherm: er komt geen stand bij, alleen tijd tussen twee standen.
+
+     3. Binnen een wereld krijgt de grond een HORIZON die meeschuift als je
+        draait. Dat is wat "een stad" hier kan betekenen zonder er een te
+        tekenen: je merkt dat je je ergens doorheen beweegt in plaats van door
+        een lijst te bladeren. */
+
+  // de tint van een wereld: dezelfde als zijn gloed, uit de tabel in deel 5b
+  function wereldTint(sleutel) {
+    var m = MOTIEVEN[sleutel];
+    return (m && m[0] && m[0][3]) || TINT.goud;
+  }
+
+  /* Het licht van een merk. Staat als custom property op de knop zelf, zodat
+     het blad hem kan gebruiken zonder dat hier kleuren worden geschilderd --
+     schilderen doet de CSS, hier staat alleen WELKE. */
+  function merkLicht(b, item) {
+    if (!item || !item.sleutel) return;
+    var t = wereldTint(item.sleutel);
+    if (!t) return;
+    b.style.setProperty('--planeet', t[0] + ',' + t[1] + ',' + t[2]);
+  }
+
+  /* ---------- de vlucht ----------
+     Twee stappen met een pauze ertussen: eerst wegschieten, dan pas de nieuwe
+     ring. Zonder die pauze wisselt de inhoud terwijl de oude nog in beeld is,
+     en dan is het geen vlucht maar een flikkering.
+
+     Bewegingsarm slaat de vlucht over. Wie geen beweging wil, wil hem ook hier
+     niet -- en de FUNCTIE (je staat in de wereld) is dezelfde. */
+  var VLUCHT_MS = 300;
+  var vluchtBezig = null;
+
+  function vlieg(naarBinnen, klaar) {
+    if (!el.kring) { klaar(); return; }
+    if (RUSTIG || sleepStil()) { klaar(); return; }
+    if (vluchtBezig) { w.clearTimeout(vluchtBezig); vluchtBezig = null; }
+    el.kring.setAttribute('data-vlucht', naarBinnen ? 'in' : 'uit');
+    vluchtBezig = w.setTimeout(function () {
+      vluchtBezig = null;
+      klaar();
+      /* Het attribuut moet ER NOG STAAN als de nieuwe merken worden gemaakt,
+         anders beginnen ze niet aan de rand maar staan ze er meteen. Een frame
+         later halen we hem weg; dan speelt de terugkomst. */
+      w.requestAnimationFrame(function () {
+        w.requestAnimationFrame(function () {
+          if (el.kring) el.kring.setAttribute('data-vlucht', 'nee');
+        });
+      });
+    }, VLUCHT_MS);
+  }
+
+  /* ---------- de horizon binnen een wereld ----------
+     Een band onderin die met de ring meeschuift. Hij is er alleen als je IN een
+     wereld staat: buiten kijk je naar het stelsel, binnen sta je ergens. */
+  function horizon(c, W, H, t) {
+    if (!st.diep) return;
+    var tint = wereldTint((st.werelden[st.wereldIdx] || {}).sleutel);
+    var schuif = (st.hoek / 360) * W * 0.5;
+    var basis = H * 0.78;
+    c.save();
+    c.globalCompositeOperation = 'lighter';
+    /* Drie lagen op verschillende diepte, zodat de dichtstbije het hardst
+       meeschuift. Dat is wat je van een plek verwacht als je erlangs beweegt --
+       en het is hetzelfde parallax-idee als bij de sterren, alleen dichterbij. */
+    for (var laag = 0; laag < 3; laag++) {
+      var diep = 0.35 + laag * 0.32;
+      var hoogte = H * (0.05 + laag * 0.022);
+      var a = (0.05 - laag * 0.012) * (0.6 + 0.4 * Math.sin(t * 0.4 + laag));
+      c.fillStyle = 'rgba(' + tint[0] + ',' + tint[1] + ',' + tint[2] + ',' + a.toFixed(4) + ')';
+      c.beginPath();
+      c.moveTo(0, H);
+      for (var x = 0; x <= W; x += W / 24) {
+        var u = (x + schuif * diep) / W;
+        var y = basis + laag * H * 0.03 - hoogte * (0.5 + 0.5 * Math.sin(u * 6.28 * 1.5 + laag * 2.1));
+        c.lineTo(x, y);
+      }
+      c.lineTo(W, H);
+      c.closePath();
+      c.fill();
+    }
+    c.restore();
   }
 
   /* ---------- aanzetten, uitzetten ----------

@@ -40,7 +40,23 @@ async function api(base, pad, body) {
 /* Een echt lid: zonder inlog bouwt het beginscherm geen mappen, en dan heeft de
    ring niets om te tonen en meet deze toets niets. `stand` bepaalt wat er in
    localStorage staat -- null betekent bewust NIETS, om de standaard te meten. */
-async function metLid(stand, fn, ritmeOpzet) {
+/* BEWEGINGSARM METEN, en waarom dat geen uitweg is maar de juiste meting.
+
+   De ring eased naar zijn stand in een rAF-lus. Op de bouwstraat draaien alle
+   e2e-bestanden tegelijk op vier kernen, en dan staat zo'n lus soms seconden
+   stil -- niet omdat het scherm kapot is maar omdat de machine druk is. Een
+   toets die op die lus wacht, meet dus de drukte. Het budget verhogen maakt het
+   erger: dan wacht hij ook echt zo lang, en loopt de hele ronde uit haar tijd.
+
+   Wat deze toetsen willen weten is de STAND, niet de animatie: welke wereld op
+   twaalf uur staat, wat de naam eronder zegt, of een sleep geen app opent. Die
+   dingen zijn in bewegingsarme stand precies hetzelfde -- daar springt de ring
+   er meteen heen (zie naar() in wereld-02.js). En bewegingsarm is geen kunstje:
+   het is een echte voorkeur van echte leden, en die verdient dekking.
+
+   De twee metingen die JUIST over beweging gaan (de levende grond en de
+   sterrenhemel) draaien daarom bewust zonder deze stand. */
+async function metLid(stand, fn, ritmeOpzet, rustig) {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-wereld-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -50,7 +66,8 @@ async function metLid(stand, fn, ritmeOpzet) {
       password: 'geheim123', geboortedatum: '1990-01-01', tier: 'rtg', pasApp: 'rtg' });
     assert.ok(reg.token, 'lid-registratie geeft een token');
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
-    const ctx = await browser.newContext({ viewport: { width: 393, height: 852 } });
+    const ctx = await browser.newContext({ viewport: { width: 393, height: 852 },
+      reducedMotion: rustig === false ? 'no-preference' : 'reduce' });
     await ctx.addInitScript(([t, s, r]) => {
       try {
         localStorage.setItem('rtg_member_token', t);
@@ -565,7 +582,7 @@ test('de levende grond tekent werkelijk iets', { skip: overslaan }, async () => 
       'de tekenmaat hoort de schermmaat maal de pixeldichtheid te zijn: verwacht ' +
       Math.round(r.breed * r.dpr) + 'x' + Math.round(r.hoog * r.dpr) + ', kreeg ' + r.w + 'x' + r.h);
     assert.ok(r.pixels > 500, 'er hoort werkelijk iets getekend te zijn, geteld: ' + r.pixels + ' pixels');
-  });
+  }, null, false);
 });
 
 test('de sterrenhemel van de poort staat op ware grootte op het beginscherm',
@@ -654,19 +671,34 @@ test('de hele sterrenhemel beweegt, niet alleen de heldere sterren',
         c.drawImage(cv, 0, 0);
         return { data: c.getImageData(0, 0, k.width, k.height).data, cv: cv };
       };
+      /* AFTELLEN TOT HIJ VERSCHOVEN IS, met een ruime bovengrens -- en niet een
+         vaste tijd afwachten en dan oordelen. Een gezonde machine is binnen een
+         paar seconden klaar; een machine die vier browsers tegelijk draait,
+         tekent minder beelden per seconde en heeft langer nodig. Met een vaste
+         wachttijd meet je dan de drukte in plaats van de hemel. De uitkomst is
+         dezelfde meting, hij krijgt alleen de tijd die hij nodig heeft. */
       const a = lees();
-      await new Promise((k) => setTimeout(k, 6000));
-      const b = lees();
-      if (!a || !b) return { fout: 'geen sterrendoek' };
-      // is het doek onderweg vervangen, dan valt er niets te vergelijken
-      if (a.cv !== b.cv) return { fout: 'de hemel is tussentijds opnieuw opgehangen' };
-      let aanA = 0, gelijk = 0;
-      for (let i = 3; i < a.data.length; i += 4) {
-        const x = a.data[i] > 8, y = b.data[i] > 8;
-        if (x) aanA++;
-        if (x && y) gelijk++;
+      if (!a) return { fout: 'geen sterrendoek' };
+      const meet = () => {
+        const b = lees();
+        if (!b) return null;
+        if (a.cv !== b.cv) return { fout: 'de hemel is tussentijds opnieuw opgehangen' };
+        let aanA = 0, gelijk = 0;
+        for (let i = 3; i < a.data.length; i += 4) {
+          const x = a.data[i] > 8, y = b.data[i] > 8;
+          if (x) aanA++;
+          if (x && y) gelijk++;
+        }
+        return { aanA, gelijk };
+      };
+      let r = null;
+      for (let n = 0; n < 40; n++) {
+        await new Promise((k) => setTimeout(k, 750));
+        r = meet();
+        if (!r || r.fout) return r || { fout: 'geen sterrendoek' };
+        if (r.aanA && r.gelijk / r.aanA < 0.2) break;   // ruim onder de eis: klaar
       }
-      return { aanA, gelijk };
+      return r;
     });
     assert.ok(!r.fout, 'de meting kon niet worden gedaan: ' + r.fout);
 
@@ -677,39 +709,48 @@ test('de hele sterrenhemel beweegt, niet alleen de heldere sterren',
       'de hemel staat grotendeels stil: na zes seconden licht ' + Math.round(bleef * 100) +
       '% van de punten nog op precies dezelfde plek op. Het stofveld hoort mee te bewegen, ' +
       'niet als gebakken plaatje onder de draaiende sterren te liggen.');
-  });
+  }, null, false);
 });
 
 test('Rahul zegt het EEN keer: in de ring, niet ook nog in de draad eronder',
   { skip: overslaan }, async () => {
-  /* DE MUTATIE: haal de regel in wereld.css weg die de draad en de tips in de
-     wereldstand dichthoudt. Rahul staat er dan twee keer met dezelfde zin --
-     een keer in de gouden ring, een keer in de bel eronder. Dat is precies wat
-     er stond, en het las als ruis in plaats van als nadruk. */
-  await metLid('aan', async ({ page }) => {
-    // wachten tot Rahul uit zichzelf iets zegt (uit /fluister/profiel,
-    // /voorspel of /spar/lijst -- app-main-29b.js)
-    await page.waitForFunction(() => {
-      const dr = document.getElementById('osAiDraad');
-      return dr && dr.children.length > 0;
-    }, null, { timeout: 20000 });
+  /* De regel is aangescherpt terwijl het ritme erbij kwam, en dat is de moeite
+     waard om hier vast te leggen.
 
-    const r = await page.evaluate(() => {
-      const dr = document.getElementById('osAiDraad');
+     WAS: alles wat Rahul zei ging naar de gouden ring, en de draad bleef dicht
+     zodat het er niet twee keer stond.
+
+     IS: zijn TERUGVALZIN ("er ligt niets dringends") krijgt de ring niet meer.
+     De hele afspraak van die ring is dat hij er niet is tot Rahul iets HEEFT,
+     en die zin is per definitie het tegenovergestelde -- dat is hem die netjes
+     meldt dat er niets is. Het bleef ook niet bij lelijk: tikte je het ritme
+     weg, dan kwam zijn lege zin er meteen voor in de plaats. Je zegt "laat maar"
+     en krijgt er iets anders voor terug.
+
+     Deze toets meet daarom allebei de helften.
+
+     DE MUTATIE: laat rahulZei() de lege zin gewoon tonen (haal de `leeg`-tak
+     eruit). Helft 2 zakt dan meteen. */
+  await metLid('aan', async ({ page }) => {
+    // 1. HEEFT hij iets, dan staat het in de ring en NIET ook in de draad
+    const echt = await page.evaluate(async () => {
+      RTGWereld.rahulZei('Je vlucht naar Lissabon is verplaatst naar 14:20.');
+      await new Promise((k) => setTimeout(k, 300));
       const ring = document.getElementById('osWereldRahul');
       return {
-        draadZichtbaar: getComputedStyle(dr).display !== 'none',
-        ringZichtbaar: !!ring && getComputedStyle(ring).display !== 'none',
-        ringTekst: ring ? ring.querySelector('span').textContent.trim() : '',
-        draadTekst: dr.lastElementChild.textContent.trim()
+        soort: ring.getAttribute('data-soort'),
+        toon: ring.getAttribute('data-toon'),
+        tekst: ring.querySelector('span').textContent,
+        draadZichtbaar: getComputedStyle(document.getElementById('osAiDraad')).display !== 'none'
       };
     });
-    assert.equal(r.ringZichtbaar, true, 'de gouden ring van Rahul hoort op te komen als hij iets heeft');
-    assert.equal(r.draadZichtbaar, false, 'de draad hoort dicht te blijven zolang je hem niet opent');
-    assert.equal(r.ringTekst, r.draadTekst,
-      'de ring hoort DEZELFDE zin te tonen die Rahul zei, niet een eigen verzinsel');
+    assert.equal(echt.toon, 'ja', 'heeft Rahul iets, dan hoort de ring op te komen');
+    assert.equal(echt.soort, 'rahul', 'en dan draagt de ring zijn bericht');
+    assert.match(echt.tekst, /Lissabon/, 'de ring hoort te tonen wat hij zei');
+    assert.equal(echt.draadZichtbaar, false,
+      'de draad hoort dicht te blijven; anders staat dezelfde zin er twee keer');
 
-    // en een tik op de ring opent het hele gesprek alsnog
+    // en een tik opent het hele gesprek alsnog
     const na = await page.evaluate(async () => {
       document.getElementById('osWereldRahul').click();
       await new Promise((k) => setTimeout(k, 300));
@@ -719,7 +760,28 @@ test('Rahul zegt het EEN keer: in de ring, niet ook nog in de draad eronder',
       };
     });
     assert.equal(na.draadZichtbaar, true, 'na een tik op de ring hoort het gesprek open te staan');
-    assert.equal(na.ringZichtbaar, false, 'en dan hoort de ring te wijken -- anders staat het er alsnog twee keer');
+    assert.equal(na.ringZichtbaar, false, 'en dan hoort de ring te wijken');
+  });
+
+  // 2. heeft hij NIETS, dan blijft de ring dicht -- ook al zegt hij dat netjes
+  await metLid('aan', async ({ page }) => {
+    /* Een vers lid heeft geen seintjes, geen verwachtingen en niets geparkeerd,
+       dus Rahul komt uit op zijn terugvalzin. Precies het geval dat de ring
+       niet hoort te halen. */
+    await page.waitForFunction(() => {
+      const dr = document.getElementById('osAiDraad');
+      return dr && dr.children.length > 0;
+    }, null, { timeout: 20000 });
+    await page.waitForTimeout(600);
+    const r = await page.evaluate(() => ({
+      draadTekst: document.getElementById('osAiDraad').lastElementChild.textContent,
+      ringZichtbaar: getComputedStyle(document.getElementById('osWereldRahul')).display !== 'none',
+      soort: document.getElementById('osWereldRahul').getAttribute('data-soort')
+    }));
+    assert.match(r.draadTekst, /niets dringends|nothing urgent/i,
+      'deze helft meet de terugvalzin; hij zei iets anders: ' + r.draadTekst);
+    assert.ok(!r.ringZichtbaar || r.soort === 'ritme',
+      '"er ligt niets dringends" staat in de gouden ring; die is er voor als hij WEL iets heeft');
   });
 });
 

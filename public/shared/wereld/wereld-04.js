@@ -100,7 +100,20 @@
     /* Zegt hij dat er niets is, dan HEEFT hij niets -- en dan mag je gewoonte de
        ring hebben. Zonder deze tak wint zijn beleefde niets-zin het altijd van
        het ritme en zie je dat nooit. */
-    if (leeg === true && heeftRitme()) { toonRitme(); return; }
+    /* "ER LIGT NIETS DRINGENDS" KRIJGT DE RING NIET.
+
+       De hele afspraak van deze ring is: hij is er niet, tot Rahul iets HEEFT.
+       Zijn terugvalzin is per definitie het tegenovergestelde -- dat is hem die
+       netjes meldt dat er niets is. Die zin in een gouden ring zetten is precies
+       het behang dat we van dit scherm af hebben gehaald.
+
+       Het bleef ook niet bij lelijk. Tik je het ritme weg, dan kwam zijn lege
+       zin er meteen voor in de plaats: je zegt "laat maar" en krijgt er iets
+       anders voor terug. Nu biedt een lege zin de ring alleen aan het ritme aan;
+       is dat er niet, dan blijft de ring dicht. In de DRAAD staat zijn zin
+       gewoon, voor wie het gesprek opent -- hij wordt niet ingeslikt, hij komt
+       alleen niet ongevraagd in beeld. */
+    if (leeg === true) { toonRitme(); return; }
     el.rahul.querySelector('span').textContent = String(tekst);
     el.rahul.setAttribute('data-soort', 'rahul');
     el.rahul.setAttribute('data-toon', 'ja');

@@ -69,4 +69,18 @@ function alleRoutes() {
   return uit.sort((a, b) => a.pad.localeCompare(b.pad));
 }
 
-module.exports = { alleRoutes, WORTEL, loopMap, BEWAKERS };
+/* DE GROTE HENDEL. De platformbrede schakelkast zet functies aan en uit voor de
+   HELE server. Een proef die daar rommel heen stuurt, zet onderweg iets uit en
+   meet daarna een platform dat hij zelf half heeft afgebroken -- elke bevinding
+   erna is dan een gevolg van de proef en niet van de code.
+
+   Deze lijst stond in scripts/beproeving.js en had de invoerproef net zo hard
+   nodig. Twee kopieen van "wat mag je niet omzetten" lopen uiteen, en de eerste
+   die achterloopt vergiftigt stil een hele ronde (LAT.md, regel 4). */
+const SCHAKELPADEN = [
+  '/api/office/boardroom/alles', '/api/office/boardroom/fase', '/api/office/boardroom/functie',
+  '/api/office/boardroom/functie/zet', '/api/office/leveranciers', '/api/office/geld'
+];
+const isSchakel = (pad) => SCHAKELPADEN.some(p => String(pad || '').startsWith(p));
+
+module.exports = { alleRoutes, WORTEL, loopMap, BEWAKERS, SCHAKELPADEN, isSchakel };

@@ -274,3 +274,26 @@ test('het register scheidt aanwezig van recent bewezen', () => {
   assert.ok(reg.gemeten.nietInBedrijf >= 1,
     'de verankering hoort zichtbaar in de niet-in-bedrijf-stand te staan');
 });
+
+/* ---------- kan de toets hier eigenlijk draaien ----------
+
+   De tegenhanger van "overgeslagen is geen groen". UI-WAARHEID kwam als GEZAKT
+   binnen omdat Playwright zijn binaire bestand miste, niet omdat een scherm loog.
+   Dat als defect wegschrijven stuurt de volgende lezer een fout zoeken die er
+   niet is -- en het is nog steeds geen groen, dus niemand wordt gerustgesteld. */
+test('een ontbrekende browser is NIET GEMETEN en niet GEZAKT', () => {
+  const { kanNietDraaien } = require('../scripts/controls');
+  const echt = "browserType.launch: Executable doesn't exist at /opt/pw-browsers/chromium_headless_shell-1234/x\n" +
+    'Please run the following command to download new browsers:\n     npx playwright install';
+  assert.ok(kanNietDraaien(echt), 'de melding van playwright hoort herkend te worden');
+  assert.match(kanNietDraaien(echt), /browser/);
+});
+
+test('en een ECHTE mislukking blijft gewoon een mislukking', () => {
+  /* Zonder deze tegenproef is de regel hierboven een sluiproute: alles wat faalt
+     zou "niet gemeten" kunnen heten en daarmee uit het zicht verdwijnen. */
+  const { kanNietDraaien } = require('../scripts/controls');
+  assert.equal(kanNietDraaien('not ok 1 - het scherm toont een aantal terwijl de backend leeg is'), null);
+  assert.equal(kanNietDraaien('# fail 3'), null);
+  assert.equal(kanNietDraaien(''), null);
+});

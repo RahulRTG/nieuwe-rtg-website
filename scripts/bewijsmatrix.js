@@ -71,9 +71,22 @@ const UITSLAG = path.join(WORTEL, 'BEWIJSMATRIX.json');
 const argv = process.argv.slice(2);
 const VASTLEGGEN = argv.includes('--vastleggen');
 const JSONUIT = argv.includes('--json');
-const POORTWACHT = (argv.find(a => a.startsWith('--poortwacht=')) || '').slice(13);
-const ROLPROEF = (argv.find(a => a.startsWith('--rolproef=')) || '').slice(11);
-const KETENS = (argv.find(a => a.startsWith('--ketens=')) || '').slice(9);
+/* DE REGISTERS WORDEN NU STANDAARD GELEZEN, en dat was een val.
+
+   Ze stonden alleen achter een vlag: zonder `--rolproef=ROLPROEF.json` las de
+   matrix dat register niet, ook al lag het er. `npm run bewijsmatrix` meldde dan
+   "ACL 999 -> 0, is de meetronde meegeleverd?" en zakte op zijn eigen ratel --
+   over invoer die gewoon in de wortel lag. Een commando dat je alleen goed kunt
+   draaien als je vier vlaggen onthoudt, wordt verkeerd gedraaid.
+
+   De vlag blijft bestaan om een ANDER bestand aan te wijzen (een ronde uit CI,
+   een oudere uitslag om mee te vergelijken). Standaard is nu: lees wat er ligt. */
+const inWortel = (naam) => { const p = path.join(WORTEL, naam); return fs.existsSync(p) ? p : ''; };
+const POORTWACHT = (argv.find(a => a.startsWith('--poortwacht=')) || '').slice(13) || inWortel('POORTWACHT.json');
+const ROLPROEF = (argv.find(a => a.startsWith('--rolproef=')) || '').slice(11) || inWortel('ROLPROEF.json');
+const KETENS = (argv.find(a => a.startsWith('--ketens=')) || '').slice(9) || inWortel('KETENS.json');
+const INVOER = (argv.find(a => a.startsWith('--invoer=')) || '').slice(9) || inWortel('INVOERPROEF.json');
+const IDEM = (argv.find(a => a.startsWith('--idem=')) || '').slice(7) || inWortel('IDEMPROEF.json');
 const JOURNAAL = (argv.find(a => a.startsWith('--journaal=')) || '').slice(11) ||
   path.join(WORTEL, '.routejournaal');
 
@@ -94,7 +107,7 @@ const SCHAKELS = [
   { id: 'ACL', uitleg: 'komt een INGELOGDE met de verkeerde rol binnen',
     bron: 'scripts/rolproef-route.js' },
   { id: 'INPUT', uitleg: 'wordt rommel geweigerd zonder 5xx',
-    bron: null, nodig: 'een rommelronde met een levend token per rol; anoniem meet je alleen de voordeur' },
+    bron: 'scripts/invoerproef-route.js (rommel MET de juiste rol; anoniem meet je alleen de voordeur)' },
   { id: 'OUTPUT', uitleg: 'kijkt iemand naar de INHOUD van het antwoord',
     bron: null, nodig: 'de liegpoort per ROUTE i.p.v. per toetsbestand (RTG_LIEG neemt nu /api/ in één keer)' },
   { id: 'STATE', uitleg: 'staat de toestand na afloop zoals beloofd',
@@ -104,7 +117,9 @@ const SCHAKELS = [
   { id: 'AUDIT', uitleg: 'blijft er een spoor achter dat niemand kan wissen',
     bron: null, nodig: 'een hashketen over het auditlog; die bestaat nog niet als algemene voorziening' },
   { id: 'IDEMPOTENCY', uitleg: 'dezelfde oproep twee keer doet niet twee keer iets',
-    bron: null, nvtBijLezen: true, nodig: 'elke schrijfroute twee keer met dezelfde sleutel' },
+    bron: 'scripts/idemproef-route.js (drie oproepen, twee sleutels; de derde ijkt of een tweede effect hier zichtbaar zou zijn)',
+    nvtBijLezen: true,
+    nodig: 'de meeste routes blijven ongemeten tot er een per-route vingerafdruk is: van BUITEN is een stille tweede schrijfactie niet te zien' },
   { id: 'FAILURE', uitleg: 'faalt hij netjes als er iets onder hem wegvalt',
     bron: 'scripts/ketenronde.js (echte sabotage op de keten waar deze route in zit)' },
   { id: 'ROLLBACK', uitleg: 'laat een half mislukte oproep niets half achter',
@@ -192,6 +207,21 @@ function rolproefUitslag() {
   } catch (e) { return null; }
 }
 
+/* De invoerproef en de idempotentieproef: allebei per METHODE+pad een regel.
+   Een route die er niet in staat is niet beproefd, en een route die er met
+   'poort' respectievelijk 'ongemeten' in staat is WEL geprobeerd en NIET
+   beoordeeld -- dat verschil houden we vast, want het is een werklijst. */
+function perRouteKaart(bestand) {
+  if (!bestand) return null;
+  try {
+    const j = JSON.parse(fs.readFileSync(bestand, 'utf8'));
+    if (!Array.isArray(j.perRoute)) return null;
+    const kaart = new Map();
+    for (const r of j.perRoute) kaart.set(r.methode + ' ' + r.pad, r);
+    return kaart;
+  } catch (e) { return null; }
+}
+
 /* De ketenronde: welke ROUTES zitten in een keten die onder echte sabotage is
    beoordeeld. Alleen scenario's die de zevenstappenlat halen tellen -- een
    scenario dat niet zichtbaar of niet herhaalbaar was, is geen bewijs. */
@@ -258,6 +288,8 @@ function bouw(invoer) {
   const poort = inv.poort !== undefined ? inv.poort : poortwachtUitslag();
   const rol = inv.rol !== undefined ? inv.rol : rolproefUitslag();
   const keten = inv.keten !== undefined ? inv.keten : ketenUitslag();
+  const invoerKaart = inv.invoer !== undefined ? inv.invoer : perRouteKaart(INVOER);
+  const idemKaart = inv.idem !== undefined ? inv.idem : perRouteKaart(IDEM);
 
   const rijen = [];
   for (const r of tabel.routes) {
@@ -272,7 +304,17 @@ function bouw(invoer) {
       if (s.id === 'AUTH') {
         const gemeten = poort && poort.get(sleutel);
         if (gemeten) {
-          cellen[s.id] = { staat: 'bewezen', bron: 'poortwacht', oordeel: gemeten.oordeel };
+          /* BEPROEFD EN GEZAKT IS GEEN BEWIJS, en dat stond hier fout: elk
+             oordeel van de poortwacht werd als 'bewezen' overgenomen, ook
+             'open' -- een route waar een vreemde zonder token binnenkwam. Dan
+             telt precies de bevinding waar deze kolom voor bestaat, mee als
+             dekking. ACL en PRIVACY hieronder deden het al goed; AUTH niet.
+             'onbereikbaar' is evenmin een meting: daar kwam geen antwoord. */
+          cellen[s.id] = gemeten.oordeel === 'open'
+            ? { staat: 'gezakt', bron: 'poortwacht', reden: 'zonder token binnengekomen (status ' + gemeten.status + ')' }
+            : gemeten.oordeel === 'onbereikbaar'
+              ? { staat: 'ongemeten', bron: 'poortwacht', reden: 'geen antwoord tijdens de ronde' }
+              : { staat: 'bewezen', bron: 'poortwacht', oordeel: gemeten.oordeel };
         } else if (bron && bron.bewakers.length) {
           cellen[s.id] = { staat: 'verklaard', bron: bron.bewakers.join('+'), waar: bron.waar };
         } else {
@@ -306,6 +348,32 @@ function bouw(invoer) {
         } else {
           cellen[s.id] = { staat: 'ongemeten' };
         }
+        continue;
+      }
+
+      if (s.id === 'INPUT') {
+        const iv = invoerKaart && invoerKaart.get(sleutel);
+        if (iv && iv.invoer === 'dicht') cellen[s.id] = { staat: 'bewezen', bron: 'invoerproef', pogingen: iv.pogingen };
+        else if (iv && iv.invoer === 'GEZAKT') cellen[s.id] = { staat: 'gezakt', bron: 'invoerproef', reden: iv.reden };
+        /* 'poort' is WEL geprobeerd en NIET beoordeeld: de reden hoort erbij,
+           anders is hij niet te onderscheiden van een route waar niemand ooit
+           aan heeft geklopt. */
+        else if (iv) cellen[s.id] = { staat: 'ongemeten', bron: 'invoerproef', reden: iv.reden };
+        else cellen[s.id] = { staat: 'ongemeten' };
+        continue;
+      }
+
+      if (s.id === 'IDEMPOTENCY') {
+        const id = idemKaart && idemKaart.get(sleutel);
+        if (id && id.idempotentie === 'beschermd') cellen[s.id] = { staat: 'bewezen', bron: 'idemproef', reden: id.reden };
+        /* ONBESCHERMD IS HIER GEZAKT, en dat vraagt uitleg. Het register houdt
+           het neutrale woord aan, want twee notities maken op twee keer drukken
+           is geen defect. In DEZE kolom is de belofte letterlijk "twee keer doet
+           niet twee keer iets", en die gaat er dus niet op. Het is een lijst met
+           routes die een idem-sleutel nodig hebben, geen lijst met bugs. */
+        else if (id && id.idempotentie === 'onbeschermd') cellen[s.id] = { staat: 'gezakt', bron: 'idemproef', reden: id.reden };
+        else if (id) cellen[s.id] = { staat: 'ongemeten', bron: 'idemproef', reden: id.reden };
+        else cellen[s.id] = { staat: 'ongemeten' };
         continue;
       }
 

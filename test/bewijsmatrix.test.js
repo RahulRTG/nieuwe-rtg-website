@@ -27,7 +27,12 @@ const BEWAKERS = new Map([
   ['POST /api/proef/schrijf', { bewakers: ['auth'], waar: 'server/proef.js:1' }]
 ]);
 
-const leeg = () => bouw({ tabel: TABEL, bewakers: BEWAKERS, journaal: null, poort: null });
+/* ALLE ZES DE BRONNEN EXPLICIET OP null, en dat is sinds vandaag nodig. De
+   matrix leest de registers nu standaard uit de wortel; zonder deze regels zou
+   een toets over een verzonnen routetabel stilletjes de ECHTE ROLPROEF.json van
+   dit moment meelezen, en dan hangt hij af van wanneer je hem draait. */
+const leeg = () => bouw({ tabel: TABEL, bewakers: BEWAKERS, journaal: null,
+  poort: null, rol: null, keten: null, invoer: null, idem: null });
 const rij = (m, pad) => leeg().rijen.find(r => r.methode === m && r.pad === pad);
 
 test('elke route krijgt elke schakel: geen cel valt stilletjes weg', () => {
@@ -118,4 +123,64 @@ test('geen enkele schakel doet alsof hij een instrument heeft dat er niet is', (
     assert.ok(s.nodig && s.nodig.length > 20,
       s.id + ' heeft geen instrument en ook geen omschrijving van wat hij nodig heeft');
   }
+});
+
+/* ---------- beproefd en gezakt is geen bewijs, ook niet bij de voordeur ----------
+
+   Dit stond hier fout: elk poortwacht-oordeel werd als `bewezen` overgenomen,
+   ook `open` -- een route waar een vreemde zonder token binnenkwam. Twaalf van
+   die cellen telden mee als dekking. ACL en PRIVACY deden het al goed. */
+const metPoort = (oordeel, extra) => bouw({ tabel: TABEL, bewakers: BEWAKERS, journaal: null,
+  rol: null, keten: null, invoer: null, idem: null,
+  poort: new Map([['POST /api/proef/schrijf', { oordeel, status: 200, ...extra }]]) })
+  .rijen.find(r => r.pad === '/api/proef/schrijf').cellen.AUTH;
+
+test('een route waar de poortwacht ZONDER TOKEN binnenkwam is gezakt, niet bewezen', () => {
+  const c = metPoort('open');
+  assert.equal(c.staat, 'gezakt');
+  assert.match(c.reden, /zonder token/);
+});
+
+test('een dichte en een bewust publieke route zijn wel bewezen', () => {
+  assert.equal(metPoort('dicht').staat, 'bewezen');
+  assert.equal(metPoort('publiek').staat, 'bewezen');
+  assert.equal(metPoort('stil').staat, 'bewezen');
+});
+
+test('onbereikbaar is ongemeten: daar kwam geen antwoord', () => {
+  assert.equal(metPoort('onbereikbaar').staat, 'ongemeten');
+});
+
+/* ---------- de twee nieuwe kolommen ---------- */
+
+const metInvoer = (rij) => bouw({ tabel: TABEL, bewakers: BEWAKERS, journaal: null,
+  poort: null, rol: null, keten: null, idem: null,
+  invoer: new Map([['POST /api/proef/schrijf', { methode: 'POST', pad: '/api/proef/schrijf', ...rij }]]) })
+  .rijen.find(r => r.pad === '/api/proef/schrijf').cellen.INPUT;
+
+test('INPUT: dicht is bewezen, GEZAKT is gezakt, en een grendel is ONGEMETEN met reden', () => {
+  assert.equal(metInvoer({ invoer: 'dicht', pogingen: 2 }).staat, 'bewezen');
+  assert.equal(metInvoer({ invoer: 'GEZAKT', reden: 'status 500' }).staat, 'gezakt');
+  const poort = metInvoer({ invoer: 'poort', reden: 'elk antwoord was een grendel' });
+  assert.equal(poort.staat, 'ongemeten', 'achter een grendel is niet gemeten en dus geen groen');
+  assert.match(poort.reden, /grendel/, 'zonder reden is dit niet te onderscheiden van nooit geprobeerd');
+});
+
+const metIdem = (rij) => bouw({ tabel: TABEL, bewakers: BEWAKERS, journaal: null,
+  poort: null, rol: null, keten: null, invoer: null,
+  idem: new Map([['POST /api/proef/schrijf', { methode: 'POST', pad: '/api/proef/schrijf', ...rij }]]) })
+  .rijen.find(r => r.pad === '/api/proef/schrijf').cellen.IDEMPOTENCY;
+
+test('IDEMPOTENCY: beschermd is bewezen, onbeschermd is gezakt, ongemeten blijft ongemeten', () => {
+  assert.equal(metIdem({ idempotentie: 'beschermd', reden: 'herhaald' }).staat, 'bewezen');
+  /* Onbeschermd is in het REGISTER een neutrale telling en in deze KOLOM een
+     gezakte belofte: "twee keer doet niet twee keer iets" gaat er niet op. */
+  assert.equal(metIdem({ idempotentie: 'onbeschermd', reden: 'deed het opnieuw' }).staat, 'gezakt');
+  assert.equal(metIdem({ idempotentie: 'ongemeten', reden: 'geen werk gedaan' }).staat, 'ongemeten');
+});
+
+test('een leesroute houdt IDEMPOTENCY op nvt, ook met een register ernaast', () => {
+  const m = bouw({ tabel: TABEL, bewakers: BEWAKERS, journaal: null, poort: null, rol: null, keten: null,
+    invoer: null, idem: new Map([['GET /api/proef/lees', { idempotentie: 'onbeschermd' }]]) });
+  assert.equal(m.rijen.find(r => r.pad === '/api/proef/lees').cellen.IDEMPOTENCY.staat, 'nvt');
 });

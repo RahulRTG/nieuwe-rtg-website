@@ -1,8 +1,8 @@
 {
   "uitleg": "Verklaarde beheersmaatregelen en wanneer elk voor het laatst BEWEZEN is. Zie TOEZICHT.md. laatstGroen is gemeten door de genoemde toetsen te draaien, niet overgeschreven -- een register dat zijn eigen groen opschrijft bewijst niets.",
   "gemeten": {
-    "controls": 9,
-    "groen": 7,
+    "controls": 11,
+    "groen": 9,
     "nietInBedrijf": 1,
     "nietGroen": 1
   },
@@ -37,7 +37,7 @@
         "staat": "GROEN",
         "beweringen": 14,
         "overgeslagen": 0,
-        "at": "2026-08-12T10:04:00.994Z",
+        "at": "2026-08-12T10:31:11.249Z",
         "bestanden": [
           "test/saveduurzaam.test.js",
           "test/persistentiestand.test.js"
@@ -65,7 +65,7 @@
         "staat": "GROEN",
         "beweringen": 30,
         "overgeslagen": 0,
-        "at": "2026-08-12T10:04:01.150Z",
+        "at": "2026-08-12T10:31:11.397Z",
         "bestanden": [
           "test/keten.test.js"
         ]
@@ -93,7 +93,7 @@
         "staat": "NIET IN BEDRIJF",
         "beweringen": 30,
         "overgeslagen": 0,
-        "at": "2026-08-12T10:04:01.300Z",
+        "at": "2026-08-12T10:31:11.544Z",
         "bestanden": [
           "test/keten.test.js"
         ],
@@ -129,7 +129,7 @@
         "staat": "GROEN",
         "beweringen": 33,
         "overgeslagen": 0,
-        "at": "2026-08-12T10:04:01.933Z",
+        "at": "2026-08-12T10:31:12.129Z",
         "bestanden": [
           "test/verraad.test.js",
           "test/verraadtelling.test.js"
@@ -165,7 +165,7 @@
         "staat": "GROEN",
         "beweringen": 33,
         "overgeslagen": 0,
-        "at": "2026-08-12T10:04:02.086Z",
+        "at": "2026-08-12T10:31:12.258Z",
         "bestanden": [
           "test/ketenproef.test.js"
         ]
@@ -194,7 +194,7 @@
         "staat": "GROEN",
         "beweringen": 18,
         "overgeslagen": 0,
-        "at": "2026-08-12T10:04:03.323Z",
+        "at": "2026-08-12T10:31:13.409Z",
         "bestanden": [
           "test/klok.test.js"
         ]
@@ -222,9 +222,9 @@
       },
       "grens": "gemeten op zes ledenschermen van de 242, en alleen op een LEEG antwoord. Een backend die iets VERKEERDS antwoordt in plaats van niets, wordt hier niet betrapt.",
       "laatstGroen": {
-        "staat": "GEZAKT",
-        "gezakt": 1,
-        "at": "2026-08-12T10:04:11.288Z",
+        "staat": "niet gemeten",
+        "reden": "geen bruikbare browser in deze omgeving (playwright mist zijn binaire bestand)",
+        "at": "2026-08-12T10:31:21.189Z",
         "bestanden": [
           "test/schermleugen.test.js",
           "test/liegend-scherm.e2e.js"
@@ -241,7 +241,7 @@
       ],
       "bewijsstuk": "ROLPROEF.json -- per route welke verkeerde rollen zijn geprobeerd",
       "dekking": {
-        "beproefd": 1000,
+        "beproefd": 2937,
         "totaal": 2937,
         "eenheid": "schrijfroutes met een rol",
         "tellers": {
@@ -250,16 +250,81 @@
           "zijeffecten": 0,
           "blindeRondes": 0
         },
-        "pct": 34
+        "pct": 100
       },
       "grens": "meet twee foutklassen op SCHRIJFroutes: binnenkomen met de verkeerde rol, en een weigering die gegevens meegeeft. Twee leden met DEZELFDE rol die bij elkaars dossier kunnen (een IDOR) valt hier niet onder; leesroutes worden niet geprobeerd.",
       "laatstGroen": {
         "staat": "GROEN",
         "beweringen": 13,
         "overgeslagen": 0,
-        "at": "2026-08-12T10:04:11.429Z",
+        "at": "2026-08-12T10:31:21.331Z",
         "bestanden": [
           "test/rolproef.test.js"
+        ]
+      }
+    },
+    {
+      "bron": "scripts/lib/invoerproef.js",
+      "control": "INVOER-ROBUUSTHEID",
+      "wat": "rommel met de JUISTE rol levert geen serverfout op en geen antwoord dat de binnenkant toont",
+      "eigenaar": "Techniek",
+      "bewijs": [
+        "test/invoerproef.test.js"
+      ],
+      "bewijsstuk": "INVOERPROEF.json -- per route hoeveel rommel erheen ging en wat eruit kwam",
+      "dekking": {
+        "beproefd": 2510,
+        "totaal": 2936,
+        "eenheid": "routes waar rommel voorbij de poort kwam",
+        "tellers": {
+          "breuken": 0,
+          "sporen": 0,
+          "achterEenPoort": 426,
+          "blindeRondes": 0,
+          "tokensHernieuwd": 13
+        },
+        "pct": 85.5
+      },
+      "grens": "meet twee foutklassen op routes met een herkenbare rol: omvallen op rommel (5xx of geen antwoord) en een antwoord dat interne details meegeeft. Hij zegt NIETS over of de validatie het juiste heeft geweigerd -- een route die alles slikt en 200 teruggeeft telt hier als dicht. Routes achter een tweede grendel (KYC, onboarding) staan als ongemeten met reden.",
+      "laatstGroen": {
+        "staat": "GROEN",
+        "beweringen": 11,
+        "overgeslagen": 0,
+        "at": "2026-08-12T10:31:21.459Z",
+        "bestanden": [
+          "test/invoerproef.test.js"
+        ]
+      }
+    },
+    {
+      "bron": "scripts/lib/idemproef.js",
+      "control": "IDEMPOTENTIE",
+      "wat": "dezelfde opdracht twee keer versturen levert niet twee keer een effect op",
+      "eigenaar": "Techniek",
+      "bewijs": [
+        "test/idemproef.test.js"
+      ],
+      "bewijsstuk": "IDEMPROEF.json -- per route de drie oproepen en wat eruit kwam",
+      "dekking": {
+        "beproefd": 12,
+        "totaal": 106,
+        "eenheid": "routes waar een tweede effect zichtbaar zou zijn",
+        "tellers": {
+          "onbeschermd": 94,
+          "ongemeten": 2830,
+          "blindeRondes": 0,
+          "tokensHernieuwd": 24
+        },
+        "pct": 11.3
+      },
+      "grens": "kijkt van BUITEN naar het antwoord, niet naar de database. Een route die zijn tweede effect niet in het antwoord laat zien (een stille toevoeging aan een lijst die niet wordt teruggegeven) telt hier als ongemeten en niet als beschermd -- daarvoor is de per-route vingerafdruk nodig die er nog niet is. En \"onbeschermd\" is geen defect-oordeel: twee keer op bewaren drukken hoort twee notities op te leveren. Het is een TELLING van waar de belofte uit deze kolom niet geldt, zodat je weet welke routes hem wel nodig hebben.",
+      "laatstGroen": {
+        "staat": "GROEN",
+        "beweringen": 12,
+        "overgeslagen": 0,
+        "at": "2026-08-12T10:31:21.590Z",
+        "bestanden": [
+          "test/idemproef.test.js"
         ]
       }
     },
@@ -273,21 +338,21 @@
       ],
       "bewijsstuk": "BEWIJSMATRIX.json -- elf schakels per route, met bron per bewezen cel",
       "dekking": {
-        "beproefd": 5984,
+        "beproefd": 12365,
         "totaal": 43835,
         "eenheid": "cellen",
         "tellers": {
-          "ongemeten": 37588,
-          "gezakt": 3
+          "ongemeten": 31102,
+          "gezakt": 108
         },
-        "pct": 13.7
+        "pct": 28.2
       },
       "grens": "het register MEET niets zelf; het verzamelt wat andere instrumenten meten. Vier van de elf kolommen hebben vandaag een instrument, zeven staan leeg.",
       "laatstGroen": {
         "staat": "GROEN",
         "beweringen": 11,
         "overgeslagen": 0,
-        "at": "2026-08-12T10:04:11.563Z",
+        "at": "2026-08-12T10:31:21.863Z",
         "bestanden": [
           "test/bewijsmatrix.test.js"
         ]

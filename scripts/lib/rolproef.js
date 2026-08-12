@@ -136,7 +136,12 @@ function weegAntwoord(status, lijf) {
   return { tweexx: false, lek: null };
 }
 
-async function draaiRolproef({ post, routes, tokensVoor, maxPerRol }) {
+/* `maxPogingen` is een budget voor de HELE ronde en niet per rol, en zo heette
+   hij eerst wel (`maxPerRol`). Dat scheelde een factor drie in wat je dacht te
+   draaien: `--max=2000` las als "2000 per rol" en leverde 2000 pogingen in
+   totaal, dus 1000 routes van de 2937. Een naam die het verkeerde belooft is een
+   belofte in tekst (LAT.md, regel 6). */
+async function draaiRolproef({ post, routes, tokensVoor, maxPogingen }) {
   const bevindingen = { tweexx: [], lekken: [], gewijzigd: [] };
   /* Per route wat er met hem is gebeurd -- de bewijsmatrix vult hier ACL en
      PRIVACY mee. Een route die NIET is geprobeerd staat er niet in, en dat is
@@ -186,7 +191,7 @@ async function draaiRolproef({ post, routes, tokensVoor, maxPerRol }) {
     if (r.schakel) continue;                          // de schakelkast zou de hele proef vergiftigen
     for (const rol of rollen) {
       if (rol === r.rol) continue;                    // alleen de VERKEERDE rollen
-      if (maxPerRol && gedaan >= maxPerRol) break;
+      if (maxPogingen && gedaan >= maxPogingen) break;
       const tk = vastVoor()[rol];
       if (!tk) continue;
       const st = await post(r.pad, plausibelLijf(r.pad), Array.isArray(tk) ? tk[0] : tk);

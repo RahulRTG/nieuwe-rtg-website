@@ -52,6 +52,8 @@ const BRONNEN = [
   'server/lib/klok.js',
   'scripts/lib/schermleugen.js',
   'scripts/lib/rolproef.js',
+  'scripts/lib/invoerproef.js',
+  'scripts/lib/idemproef.js',
   'scripts/bewijsmatrix.js'
 ];
 
@@ -150,9 +152,33 @@ function meet(bewijs) {
   } catch (e) {
     uit = String((e && e.stdout) || '');
     const gezakt = Number((uit.match(/^# fail (\d+)/m) || [])[1] || 1);
+    const onmeetbaar = kanNietDraaien(uit);
+    if (onmeetbaar) return { staat: 'niet gemeten', reden: onmeetbaar, at: new Date().toISOString(), bestanden };
     return { staat: 'GEZAKT', gezakt, at: new Date().toISOString(), bestanden };
   }
   return { ...duidUitslag(uit), at: new Date().toISOString(), bestanden };
+}
+
+/* KAN DEZE TOETS HIER ÜBERHAUPT DRAAIEN? -- de tegenhanger van "overgeslagen is
+   geen groen", en hij is er gekomen doordat dit register de omgekeerde fout
+   maakte.
+
+   UI-WAARHEID kwam binnen als GEZAKT. Niet omdat een scherm loog, maar omdat de
+   Playwright in deze map (1.62) een chromium-build verwacht die in deze
+   container niet ligt: "Executable doesn't exist at ...". De e2e-bestanden slaan
+   zichzelf over als de MODULE ontbreekt, maar de module is er wel -- alleen het
+   binaire bestand niet. Dan valt de toets om op de omgeving.
+
+   Dat als GEZAKT wegschrijven is een leugen in de andere richting: het register
+   meldt een defect dat er niet is, en de volgende die dat leest gaat een fout
+   zoeken die nergens zit. 'Niet gemeten' is wat het is -- en het is nadrukkelijk
+   GEEN groen, dus er wordt niemand gerustgesteld. */
+function kanNietDraaien(uitvoer) {
+  const t = String(uitvoer || '');
+  if (/Executable doesn't exist at|npx playwright install/.test(t)) {
+    return 'geen bruikbare browser in deze omgeving (playwright mist zijn binaire bestand)';
+  }
+  return null;
 }
 
 /* DE UITSLAG DUIDEN, apart en puur -- want hier zit de regel die dit hele
@@ -172,7 +198,7 @@ function duidUitslag(uitvoer) {
   return { staat: 'GROEN', beweringen: geslaagd, overgeslagen };
 }
 
-module.exports = { verzamel, duidUitslag, staatVan, leesDekking, uitPad, VELDEN, BRONNEN };
+module.exports = { verzamel, duidUitslag, kanNietDraaien, staatVan, leesDekking, uitPad, VELDEN, BRONNEN };
 if (require.main !== module) return;
 
 const controls = verzamel();

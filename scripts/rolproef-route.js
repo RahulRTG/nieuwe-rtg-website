@@ -127,9 +127,9 @@ async function wacht(basis, ms) {
 
   console.log('\n=== DE ROL-SCHEIDING PER ROUTE ===\n');
   console.log('  schrijfroutes met een herkenbare rol : ' + routes.length);
-  console.log('  begrenzing per rol                   : ' + MAX);
+  console.log('  begrenzing (pogingen in totaal)      : ' + MAX);
 
-  const uit = await draaiRolproef({ post, routes, tokensVoor: () => ({ member, supplier, office }), maxPerRol: MAX });
+  const uit = await draaiRolproef({ post, routes, tokensVoor: () => ({ member, supplier, office }), maxPogingen: MAX });
 
   if (uit.bevindingen.meterStuk) {
     console.error('\n  DE METER IS BLIND: ' + uit.bevindingen.meterStuk);

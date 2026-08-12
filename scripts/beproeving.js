@@ -178,11 +178,7 @@ const post = (pad, body, token) => haal('POST', pad, token, body);
 // regie) mag de storm WEL raken (dekking + input-robuustheid), maar niet met
 // rommel die de hele kast uitzet en zo elke andere meting vergiftigt. Ze
 // krijgen daarom in de storm een benigne body en tellen los mee.
-const BEHEER_SCHAKEL = [
-  '/api/office/boardroom/alles', '/api/office/boardroom/fase', '/api/office/boardroom/functie',
-  '/api/office/boardroom/functie/zet', '/api/office/leveranciers', '/api/office/geld'
-];
-const isSchakel = pad => BEHEER_SCHAKEL.some(p => pad.startsWith(p));
+const { isSchakel } = require('./lib/routes');   // een lijst, gedeeld met de invoerproef
 function alleRoutes() {
   const files = [];
   (function loop(d) { for (const n of fs.readdirSync(d)) { const p = path.join(d, n); const s = fs.statSync(p); if (s.isDirectory()) loop(p); else if (n.endsWith('.js')) files.push(p); } })(path.join(ROOT, 'server'));
@@ -201,38 +197,13 @@ function alleRoutes() {
   return [...set.values()];
 }
 
-/* ---------- onnozele/onethische rommel-invoer (deterministisch) ---------- */
-const EMO = '😀🎉💥🔥🤡🍕🚀💩👻🥶🦄🌈';
-function emojiStr(n) { let s = ''; for (let i = 0; i < n; i++) s += EMO[rint(EMO.length)]; return s; }
-function diep(n) { let o = {}, c = o; for (let i = 0; i < n; i++) { c.x = {}; c = c.x; } c.eind = 1; return o; }
-function chaosWaarde(d) {
-  if (d > 4) return rkeuze([1, 'x', true, null]);
-  switch (rint(15)) {
-    case 0: return emojiStr(rint(30) + 1);
-    case 1: return '𝕏' + emojiStr(3) + ' <script>alert(1)</script>';
-    case 2: return "'; DROP TABLE member_dir;-- " + emojiStr(2);
-    case 3: return 'A'.repeat(rint(20000));
-    case 4: return -rint(1e9) - 1;
-    case 5: return Number.MAX_SAFE_INTEGER * (rng() > 0.5 ? 1 : -1);
-    case 6: return rkeuze([null, true, false, '']);
-    case 7: return diep(rint(60));
-    case 8: return Array.from({ length: rint(50) }, () => chaosWaarde(d + 1));
-    case 9: return { [emojiStr(2)]: chaosWaarde(d + 1), aantal: -rint(999), q: emojiStr(1) };
-    case 10: return '2026-99-99';
-    case 11: return '99:99';
-    case 12: return '../../etc/passwd';
-    case 13: return '{{7*7}}${jndi:ldap://x}';   // template/JNDI-injectie
-    default: return chaosBody(d + 1);
-  }
-}
-function chaosBody(d) {
-  if (d > 3) return chaosWaarde(d);
-  const velden = ['q', 'ref', 'code', 'id', 'aanbiederId', 'behandelingId', 'datum', 'tijd', 'bedrag', 'centen', 'aantal',
-    'supplierCode', 'pakketId', 'text', 'tekst', 'medisch', 'naam', 'personen', 'token', 'staffId', 'pin', 'niveau', 'pad', 'bevestigd', 'aan', 'soort'];
-  const body = {}; const k = rint(5);
-  for (let i = 0; i < k; i++) body[rkeuze(velden)] = chaosWaarde(d + 1);
-  return body;
-}
+/* ---------- onnozele/onethische rommel-invoer (deterministisch) ----------
+   De generator zelf staat in scripts/lib/rommel.js, want de invoerproef
+   (scripts/invoerproef-route.js) heeft exact dezelfde rommel nodig. Twee
+   kopieen van "wat is gemene invoer" lopen uiteen en dan meten twee rondes iets
+   anders terwijl ze allebei "rommel" zeggen (LAT.md, regel 4). De teller blijft
+   hier: die deelt zijn stand met de rest van dit script. */
+const { chaosBody, chaosWaarde, emojiStr, diep } = require('./lib/rommel').maakRommel(rng);
 
 /* ---------- latentie-histogram (geheugen-veilig) ---------- */
 // Fibonacci-achtige fijne buckets onderin, en EXTRA fijn in de 500-2600 ms-zone
@@ -918,7 +889,7 @@ async function misbruikBeproeving(tok) {
       supplier: rkeuze(tokVoor.supplier.length ? tokVoor.supplier : tokVoor.office),
       office: rkeuze(tokVoor.office.length ? tokVoor.office : tokVoor.member)
     }),
-    maxPerRol: Number(process.env.ROLPROEF_MAX || 900)
+    maxPogingen: Number(process.env.ROLPROEF_MAX || 900)
   });
   rij('schrijfpogingen met een verkeerde rol', nl(rp.pogingen) + ' \x1b[2m(plausibele invoer, niet de rommel uit de gauntlet)\x1b[0m');
   rij('  daarvan 2xx (mag nooit)', rp.bevindingen.tweexx.length ? '\x1b[31m' + rp.bevindingen.tweexx.length + '\x1b[0m' : '\x1b[32m0\x1b[0m');

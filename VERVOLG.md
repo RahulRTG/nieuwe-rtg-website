@@ -12,21 +12,28 @@ volgende handeling.
 ## De stand in getallen
 
 ```
-BEWIJSMATRIX     5.984 bewezen · 37.588 ongemeten · 3 gezakt   (43.835 cellen)
-                 leeg: INPUT OUTPUT STATE SIDE_EFFECT AUDIT IDEMPOTENCY ROLLBACK
-CONTROLS         9, waarvan 1 niet in bedrijf (AUDIT-KETEN-VERANKERD)
+BEWIJSMATRIX     12.365 bewezen · 31.102 ongemeten · 108 gezakt  (43.835 cellen)
+                 instrument op 7 van de 11 kolommen
+                 nog leeg: OUTPUT  STATE  SIDE_EFFECT  AUDIT
+CONTROLS         11, waarvan 1 niet in bedrijf (AUDIT-KETEN-VERANKERD) en
+                 1 hier niet meetbaar (UI-WAARHEID: geen browser in deze omgeving)
 VERRAADSMOTOR    4 / 9 ingebouwd
 KETENS           3 ketens · 9 scenarios · 4 voldoen aan de lat
                  GELDPROVEN 2/3 · rollback bewezen 2 · stilVerlies 0
+ROL-SCHEIDING    2.937 / 2.937 schrijfroutes · 0 doorbraken · 0 lekken
+INVOER           2.510 / 2.936 routes voorbij de poort · 0 breuken · 0 sporen
+IDEMPOTENTIE     12 beschermd · 94 onbeschermd · 106 van 2.936 beoordeeld
 KLOK             1.298 directe tijdsaanroepen · 2 modules op de klok
 ```
 
-**`stilVerlies` staat op nul** sinds notities duurzaam vastlegt (12 augustus). De
-BEWIJSMATRIX-getallen hierboven zijn nog die van vóór die reparatie: de matrix
-leest `KETENS.json`, maar hij weigert terecht zichzelf te herschrijven uit een
-ronde die minder invoer heeft dan de vorige (de ratel). Hij pakt de winst op bij
-de eerstvolgende volledige meetronde — poortwacht én rolproef mee, zie de
-opdracht die het script zelf afdrukt.
+De sprong van 5.984 naar 12.365 komt uit stap B: de rolproef over alle routes in
+plaats van een derde, plus twee nieuwe instrumenten (INVOER en IDEMPOTENCY).
+
+**De 108 gezakte cellen zijn geen nieuwe schade**, ze zijn nieuw ZICHTBAAR:
+12 routes waar de poortwacht zonder token binnenkwam (die stonden daarvoor als
+*bewezen* in de matrix — zie de valkuilen), en 94 routes waar een herhaalde
+opdracht het gewoon nog een keer doet. Dat laatste is een werklijst van routes
+die een idem-sleutel nodig hebben, geen lijst met bugs.
 
 Alle poorten groen, werkboom schoon.
 
@@ -65,21 +72,31 @@ notitieketen, dus een nieuwe app hoort een eigen keten te krijgen óf een eigen
 toets in de vorm van `test/notitiesduurzaam.test.js` (vijf beweringen, alle vier
 de mutaties raak — zie het commit-bericht).
 
-### B. De goedkope drie matrixkolommen (grootste beweging, minste nieuwe code)
+### ~~B. De goedkope drie matrixkolommen~~ — GEDAAN op 12 augustus
+
+Alle drie staan er, met een register en een eigen toets. De vier rondes draaien
+los en schrijven elk hun eigen bestand; de matrix leest ze nu vanzelf uit de
+wortel (dat stond eerst achter een vlag, zie de valkuilen).
 
 ```
-1  node --experimental-sqlite scripts/rolproef-route.js --max=8000
-   → ACL en PRIVACY van 999 naar ~3000 elk. Alleen een groter getal, geen code.
-
-2  INPUT: variant op scripts/rolproef-route.js — rommel-lijf met de JUISTE rol,
-   en de bewering is: geen 5xx en geen stacktrace in het antwoord.
-
-3  IDEMPOTENCY: zelfde harnas — elke schrijfroute twee keer met dezelfde sleutel,
-   en kijken of er een tweede effect is.
+npm run poortwacht -- --json --per-route > POORTWACHT.json    AUTH
+npm run rolproef -- --max=8000                                ACL + PRIVACY
+npm run invoerproef                                           INPUT
+npm run idemproef                                             IDEMPOTENCY
+npm run bewijsmatrix -- --vastleggen
 ```
 
-Samen goed voor ruwweg 15.000 cellen, zonder één nieuwe ontwerpbeslissing. Draai
-daarna meteen de volledige matrixronde, dan komt de notitiewinst er ook in.
+**De schatting in dit bestand was te optimistisch, en dat is het leerzame deel.**
+"Ruwweg 15.000 cellen" ging uit van drie kolommen van elk ~3.000. ACL, PRIVACY en
+INPUT haalden dat (2.937, 2.937 en 2.510). IDEMPOTENCY haalde er **106** — van de
+2.936 routes gaven er maar 106 een antwoord waaraan een tweede effect te ZIEN was.
+De rest doet zijn tweede schrijfactie stil, en van buiten is dat niet te meten.
+Dat is geen tekort van de proef maar de grens ervan, en hij zegt het per route
+met reden. Wie die 2.830 alsnog wil, heeft de per-route vingerafdruk uit D nodig.
+
+Wat er van B nog open ligt: de 94 routes die als `onbeschermd` uit de ronde komen.
+Ze staan met naam in `IDEMPROEF.json`. Dat is een werklijst voor idem-sleutels,
+geen buglijst — begin bij de routes die geld of toegang raken.
 
 ### C. De prestatiemeting van de duurzame commit
 
@@ -90,11 +107,24 @@ is wel informatie die terug moet, en ze is sinds notities breder: er hangen nu
 vijf schrijfroutes meer aan de fsync, waaronder `notities/vink`, die van alle
 duurzame routes het vaakst wordt ingedrukt.
 
-### D. STATE, SIDE_EFFECT en ROLLBACK
+### D. STATE, SIDE_EFFECT en ROLLBACK — en nu ook de staart van IDEMPOTENCY
 
 Niet als drie losse meters bouwen. Ze vragen alle drie een per-route
 vingerafdruk van "wat is er veranderd", en dat is precies de invariantenmotor.
 Drie meters die elkaar niet kennen is duurder en zegt minder.
+
+Sinds stap B is er een vierde klant voor diezelfde vingerafdruk: de 2.830 routes
+waar de idempotentieproef van buitenaf niets kan zien. Dat maakt D goedkoper dan
+hij leek — één instrument vult vier kolommen in plaats van drie.
+
+### E. De twaalf open voordeuren
+
+De poortwacht komt op twaalf routes zonder token binnen. Ze zien er allemaal uit
+als bewust publiek (RTFoundation-campagnes, de algoritmeregisters van RTG Stad,
+de lijst rechtsvormen), maar ze staan niet op de `PUBLIEK`-lijst — en tot dat
+besluit is genomen, staan ze als GEZAKT in de AUTH-kolom. Twee mogelijke
+uitkomsten: op de lijst met een reden, of een poort ervoor. Beide zijn goed;
+stilletjes zo laten is dat niet. Ze staan in `POORTWACHT.json` met `oordeel: open`.
 
 ## Valkuilen die al een keer geld hebben gekost
 
@@ -133,6 +163,29 @@ idee.
   weigert een lid zonder geverifieerd paspoort (403). Die poort omzeilen meet
   een pad dat in productie niet bestaat; ga er doorheen met het geverifieerde
   account.
+- **Niet elke 5xx is een crash.** De invoerproef las in zijn eerste versie elke
+  5xx als "omgevallen" en meldde meteen drie loze bevindingen op
+  `/api/bank/krediet*`. In dit huis is 503 een ONTWORPEN antwoord: de API-poort
+  staat uit, een functie is geschakeld, er is een vergunning nodig, de opslag
+  laadt nog. Dat is een handler die werkt. 503 telt daarom als grendel — zelfde
+  stand als 401 en 403 — en alleen 500/502/504 en "geen antwoord" zijn een breuk.
+  Na drie keer loos alarm zet iemand de proef uit, en dan meet er niets meer.
+- **Een instrument dat achter een vlag ligt, wordt niet gedraaid.** De matrix las
+  `ROLPROEF.json` alleen met `--rolproef=...`; zonder die vlag meldde
+  `npm run bewijsmatrix` "ACL 999 → 0, is de meetronde meegeleverd?" en zakte op
+  zijn eigen ratel — over invoer die gewoon in de wortel lag. De registers worden
+  nu standaard gelezen; de vlag blijft om een ánder bestand aan te wijzen.
+- **Beproefd en gezakt is geen bewijs — ook niet bij de voordeur.** De matrix nam
+  elk poortwacht-oordeel over als `bewezen`, ook `open`. Twaalf routes waar een
+  vreemde zonder token binnenkwam, telden dus mee als dekking. ACL en PRIVACY
+  deden het drie regels lager al goed; AUTH niet.
+- **Een control die niet KAN draaien is niet GEZAKT.** UI-WAARHEID kwam binnen als
+  gezakt omdat Playwright zijn binaire bestand miste, niet omdat een scherm loog.
+  Dat wegschrijven als defect stuurt de volgende lezer een fout zoeken die er niet
+  is. Nu: `niet gemeten`, met de reden — en dat is nadrukkelijk geen groen.
+- **Een naam die het verkeerde belooft, kost een factor.** `maxPerRol` was een
+  budget voor de HELE ronde. `--max=2000` las als "2000 per rol" en leverde 1000
+  van de 2937 routes. Hij heet nu `maxPogingen`.
 - **Draai een mutatie nooit terug met `git checkout <bestand>`.** Die gooit ook
   het werk weg dat je in datzelfde bestand nog niet had ingeleverd — hier
   verdween zo de hele reparatie van regel 47, en dat merk je pas als je hem

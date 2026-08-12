@@ -13,7 +13,7 @@ een bewering met een adres kan zakken.
 
 | stand | aantal | wat het betekent |
 |---|---|---|
-| **BEWEZEN** | 27 | handhaver bestaat, toets bestaat, en die toets is zien zakken op een mutatie |
+| **BEWEZEN** | 28 | handhaver bestaat, toets bestaat, en die toets is zien zakken op een mutatie |
 | **ONBEPROEFD** | 7 | er kijkt iemand naar, maar die kijker is nooit op de proef gesteld |
 | **OPEN** | 4 | opgeschreven zonder handhaver of zonder toets: een voornemen, geen bescherming |
 | **GEBROKEN** | 0 | wijst naar iets dat er niet meer is -- de enige alarmerende stand |
@@ -465,9 +465,21 @@ De foutklasse achter RTG-003 is breder dan tokens: een security-beslissing verge
 
 *Handhaver:* `server/kern/ssrf.js`, `server/kern/schild.js`, `server/accounts/tokens.js`, `server/sleutelvorm.js`
 
-*Toets:* `test/canoniek.test.js`, `test/padvorm.test.js`, `test/sleutelvorm.test.js`, `test/tokenvorm.test.js`
+*Toets:* `test/canoniek.test.js`, `test/padvorm.test.js`, `test/sleutelvorm.test.js`, `test/retrygedrag.test.js`, `test/tokenvorm.test.js`
 
 *Breek hem zo:* laat metadataDoel weer zijn eigen normalisatie doen in plaats van canoniekHost, of haal de ::ffff-hexomzetting eruit
+
+### RTG-039 -- Canonisatie voegt samen wat hetzelfde betekent, en nooit wat verschillend is
+
+`BEWEZEN` · zien zakken in `sabotage` op `server/sleutelvorm.js`
+
+De spiegelkant van RTG-038, en de duurdere van de twee. Een canonisatie die te ver gaat, stelt twee ECHT verschillende identiteiten gelijk -- en op de geldketen betekent dat een tweede, legitieme opdracht stilzwijgend als herhaling wordt gezien en dus NIET gebeurt. Case-vouwen is daar het scherpste voorbeeld: in base64 of hex zijn aB en Ab twee sleutels. Een dubbele afschrijving valt op en is terug te draaien; een betaling die stil verdwijnt niet. Daarom is dit een eigen wet en geen voetnoot bij RTG-038: 'canonisatie werkt' en 'canonisatie gaat niet te ver' zijn twee beweringen, en een toets die alleen de eerste doet, dekt de duurdere fout niet. test/retrygedrag.test.js telt daarvoor de ECHTE schrijfacties in plaats van de teruggegeven id te vergelijken -- een implementatie die netjes hetzelfde id teruggeeft en ondertussen tweemaal wegschrijft, komt anders gewoon door.
+
+*Handhaver:* `server/sleutelvorm.js`
+
+*Toets:* `test/retrygedrag.test.js`
+
+*Breek hem zo:* zet een toLowerCase() achter de canonisatie: twee legitieme opdrachten vallen dan samen tot een
 
 ## Hoe je dit bestand bijwerkt
 

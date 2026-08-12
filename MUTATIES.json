@@ -3048,6 +3048,14 @@
       "gezakt": 10,
       "scherp": "gezakt"
     },
+    "retrygedrag.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/betaal.js",
+      "operator": "===->!==#0",
+      "gezakt": 3,
+      "geprobeerd": 1
+    },
     "rijksles.test.js": {
       "soort": "server",
       "staat": "gezakt",

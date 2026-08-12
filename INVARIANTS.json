@@ -554,6 +554,7 @@
         "canoniek.test.js",
         "padvorm.test.js",
         "sleutelvorm.test.js",
+        "retrygedrag.test.js",
         "tokenvorm.test.js"
       ],
       "sabotage": "laat metadataDoel weer zijn eigen normalisatie doen in plaats van canoniekHost, of haal de ::ffff-hexomzetting eruit",
@@ -563,6 +564,26 @@
         "naar": "  const k = String(waarde == null ? '' : waarde);",
         "toets": [
           "sleutelvorm.test.js"
+        ]
+      }
+    },
+    {
+      "id": "RTG-039",
+      "wet": "Canonisatie voegt samen wat hetzelfde betekent, en nooit wat verschillend is",
+      "waarom": "De spiegelkant van RTG-038, en de duurdere van de twee. Een canonisatie die te ver gaat, stelt twee ECHT verschillende identiteiten gelijk -- en op de geldketen betekent dat een tweede, legitieme opdracht stilzwijgend als herhaling wordt gezien en dus NIET gebeurt. Case-vouwen is daar het scherpste voorbeeld: in base64 of hex zijn aB en Ab twee sleutels. Een dubbele afschrijving valt op en is terug te draaien; een betaling die stil verdwijnt niet. Daarom is dit een eigen wet en geen voetnoot bij RTG-038: 'canonisatie werkt' en 'canonisatie gaat niet te ver' zijn twee beweringen, en een toets die alleen de eerste doet, dekt de duurdere fout niet. test/retrygedrag.test.js telt daarvoor de ECHTE schrijfacties in plaats van de teruggegeven id te vergelijken -- een implementatie die netjes hetzelfde id teruggeeft en ondertussen tweemaal wegschrijft, komt anders gewoon door.",
+      "handhaver": [
+        "server/sleutelvorm.js"
+      ],
+      "toetsen": [
+        "retrygedrag.test.js"
+      ],
+      "sabotage": "zet een toLowerCase() achter de canonisatie: twee legitieme opdrachten vallen dan samen tot een",
+      "sabotageProef": {
+        "bestand": "server/sleutelvorm.js",
+        "van": "  const k = String(waarde == null ? '' : waarde).normalize('NFC').trim();",
+        "naar": "  const k = String(waarde == null ? '' : waarde).normalize('NFC').trim().toLowerCase();",
+        "toets": [
+          "retrygedrag.test.js"
         ]
       }
     }

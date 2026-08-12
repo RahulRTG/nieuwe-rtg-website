@@ -32,6 +32,12 @@
   "notities": [
     {
       "datum": "2026-08-12",
+      "meter": "wettenZonderBewijs blijft 11 (39 wetten in plaats van 38)",
+      "reden": "RTG-039 is de spiegelkant van RTG-038: canonisatie voegt samen wat hetzelfde betekent, en NOOIT wat verschillend is. Aparte wet en geen voetnoot, want het zijn twee beweringen -- een toets die alleen de eerste doet, dekt de duurdere fout niet.",
+      "eerlijkheidshalve": "De vorige toets bewees dat twee schrijfwijzen dezelfde SLEUTEL geven en dat de tweede aanroep hetzelfde id teruggeeft. Dat is niet hetzelfde als bewijzen dat er precies EEN duurzame mutatie ontstaat: een implementatie die netjes hetzelfde id teruggeeft en ondertussen tweemaal wegschrijft komt daar gewoon doorheen. test/retrygedrag.test.js hangt daarom een telstore onder betaal.js en telt de ECHTE schrijfacties. Beide richtingen gemuteerd en zien zakken: trim eruit geeft twee entries op een retry (onder-deduplicatie), toLowerCase erbij geeft een entry op twee legitieme opdrachten (over-deduplicatie). Wat dit NIET aantoont is het grootboek als geheel -- saldi en tegenboekingen hebben hun eigen toetsen."
+    },
+    {
+      "datum": "2026-08-12",
       "meter": "geen meterverschuiving; RTG-038 sluit met de geldketen",
       "reden": "De vierde en laatste categorie van de canonisatieklasse, en daar was de schade het grootst. De idempotentiesleutel komt van de client (idem reist via kern/pay/opladen.js) en ging byte-exact naar zowel onze eigen opslag als de idempotencyKey van de betaalprovider. idem=abc en idem= abc waren dus twee AFSCHRIJVINGEN. Nu gaan alle drie de geldpaden (maakBetaling, maakUitbetaling, muntbetaal) door een canoniekeSleutel: NFC + trim, met een harde weigering op leeg, te lang en stuurtekens.",
       "eerlijkheidshalve": "Hier is bewust de ANDERE helft van de wet gekozen dan bij het sessietoken: normaliseren in plaats van weigeren. Bij een retry is samenvoegen juist de bedoeling; bij een token bestaat geen legitieme reden om er een spatie voor te zetten. En hoofdletters worden NIET gevouwen, ook al stond case-normalisatie in de opdracht: in base64 of hex zijn aB en Ab echt twee sleutels, en gelijkstellen zou een tweede betaling stilzwijgend als herhaling zien en dus laten vervallen. Een dubbele afschrijving valt op en is terug te draaien; een betaling die stil verdwijnt niet."

@@ -44,6 +44,10 @@
     "RTG-038": {
       "stand": "BEWEZEN",
       "uitleg": "server/sleutelvorm.js:   const k = String(waarde == null ? '' : waarde).normalize('NFC').trim(); ->   const k = String(waarde == null ? '' : waarde); maakt sleutelvorm.test.js rood"
+    },
+    "RTG-039": {
+      "stand": "BEWEZEN",
+      "uitleg": "server/sleutelvorm.js:   const k = String(waarde == null ? '' : waarde).normalize('NFC').trim(); ->   const k = String(waarde == null ? '' : waarde).normalize('NFC').trim().toLowerCase(); maakt retrygedrag.test.js rood"
     }
   }
 }

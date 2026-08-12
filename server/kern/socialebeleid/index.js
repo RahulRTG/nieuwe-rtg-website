@@ -29,6 +29,12 @@
    een keer keek, is opslag die niemand heeft gevraagd. */
 'use strict';
 
+/* De tijd komt van de tijdmachine (server/lib/klok.js) en niet van het
+   besturingssysteem: wie rechtstreeks aan het OS vraagt hoe laat het is, doet
+   niet mee aan RTG_KLOK en is dus niet te beproeven op schrikkeldag, zomertijd
+   of een verlopen mandaat. */
+const { datum } = require('../../lib/klok');
+
 /* DE SCHAKELAARS. Elk een aan/uit-knop met een naam en een uitleg, en elk
    VERSMALLEND: uitzetten haalt iets weg, aanzetten geeft niets terug dat er
    zonder beleid niet al was. De lijst staat hier en niet in het scherm, om
@@ -185,7 +191,7 @@ module.exports = ({ db, save, soorten }) => {
      er zijn hier geen meldingen die iemand wakker maken. */
   function inStilte(key, nu) {
     if (knopAan(key, 'stilte')) return false;
-    const d = (nu || new Date()).getDay();
+    const d = (nu || datum()).getDay();
     return d === 0 || d === 6;
   }
 

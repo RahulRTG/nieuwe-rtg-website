@@ -26,10 +26,16 @@
    wat er gebeurde en waarom -- dat nergens anders bestaat. */
 'use strict';
 
+/* De tijd komt van de tijdmachine (server/lib/klok.js) en niet van het
+   besturingssysteem: wie rechtstreeks aan het OS vraagt hoe laat het is, doet
+   niet mee aan RTG_KLOK en is dus niet te beproeven op schrikkeldag, zomertijd
+   of een verlopen mandaat. */
+const { datum } = require('../../lib/klok');
+
 const MAX = 200;
 
 module.exports = ({ db, save, klok }) => {
-  const nu = () => (klok ? klok() : new Date());
+  const nu = () => (klok ? klok() : datum());
 
   /* Opslag pas aanmaken als er echt iets bewaard wordt; kijken laat geen spoor
      achter. Dezelfde afspraak als kern/geldbeleid en kern/levensband. */

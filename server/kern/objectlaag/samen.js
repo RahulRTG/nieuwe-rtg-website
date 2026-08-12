@@ -35,6 +35,12 @@
    Wie ze wil, bouwt eerst het domein; de ruimte projecteert het daarna gratis. */
 'use strict';
 
+/* De tijd komt van de tijdmachine (server/lib/klok.js) en niet van het
+   besturingssysteem: wie rechtstreeks aan het OS vraagt hoe laat het is, doet
+   niet mee aan RTG_KLOK en is dus niet te beproeven op schrikkeldag, zomertijd
+   of een verlopen mandaat. */
+const { datum } = require('../../lib/klok');
+
 /* Uit levensgraaf/hulp, waar ze wonen -- niet uit socialegraaf/hulp (die heeft
    een eigen `moment`-vorm die hier niet past) en niet overgetikt. */
 const { dagVan, lijst } = require('../levensgraaf/hulp');
@@ -64,7 +70,7 @@ module.exports = ({ kern }) => {
      hier wordt alleen gefilterd. Een bijeenkomst waar de ander niet op
      geantwoord heeft, is geen gedeeld moment maar een hoop. */
   function bijeenkomsten(key, codenaam) {
-    const vandaag = new Date().toISOString().slice(0, 10);
+    const vandaag = datum().toISOString().slice(0, 10);
     const uit = [];
     const sess = { key };
     for (const gr of lijst(kern.genootschap.mijne(key)).slice(0, GROEP_MAX)) {

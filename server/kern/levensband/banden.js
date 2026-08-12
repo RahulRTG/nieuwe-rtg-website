@@ -11,6 +11,12 @@
    ooit wil toevoegen, opent precies het gat waarvoor de regel er staat. */
 'use strict';
 
+/* De tijd komt van de tijdmachine (server/lib/klok.js): het venster van dertig
+   dagen hieronder is juist het soort regel dat je op een schrikkeldag en over
+   een zomertijdgrens wil kunnen beproeven, en dat kan alleen als hij meedoet
+   aan RTG_KLOK. */
+const { nu } = require('../../lib/klok');
+
 module.exports = (ctx) => {
   const { pak, kijk, id, nuIso, vandaag, isKant, andereKant, verlopen,
     zichtBand, save, SOORTEN, MAX_BANDEN } = ctx;
@@ -62,7 +68,7 @@ module.exports = (ctx) => {
   function beeindigd(wie) {
     const w = schoon(wie, 120);
     if (!w) return [];
-    const grens = new Date(Date.now() - VENSTER_DAGEN * 86400000).toISOString();
+    const grens = new Date(nu() - VENSTER_DAGEN * 86400000).toISOString();
     return kijk().banden
       .filter(b => isKant(b, w) && b.staat === 'verbroken' && String(b.verbrokenAt || '') >= grens)
       .map(b => ({ id: b.id, soort: b.soort, beeindigdAt: b.verbrokenAt || null }))

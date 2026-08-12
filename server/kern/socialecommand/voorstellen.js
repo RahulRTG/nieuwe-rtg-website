@@ -27,6 +27,12 @@
    tussen twee mensen. */
 'use strict';
 
+/* De tijd komt van de tijdmachine (server/lib/klok.js) en niet van het
+   besturingssysteem: wie rechtstreeks aan het OS vraagt hoe laat het is, doet
+   niet mee aan RTG_KLOK en is dus niet te beproeven op schrikkeldag, zomertijd
+   of een verlopen mandaat. */
+const { datum } = require('../../lib/klok');
+
 /* De soorten voorstel die dit huis kent. Meer zijn het er niet, en een soort
    erbij is een besluit: elke soort hier voert iets uit dat een ANDER mens
    bereikt, en hoort dus tegen par. 3 en par. 4.1 gehouden te worden voordat hij
@@ -44,7 +50,7 @@ const SOORTEN = {
 
 module.exports = ({ kern }) => {
 
-  const vandaag = () => new Date().toISOString().slice(0, 10);
+  const vandaag = () => datum().toISOString().slice(0, 10);
 
   /* De openstaande zaken van dit lid, als voorstel. Vandaag is dat er een: een
      bijeenkomst uit een eigen genootschap waar nog geen antwoord op staat. Hij

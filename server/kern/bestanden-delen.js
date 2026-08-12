@@ -24,8 +24,12 @@ function maakBestandenDelen(basis) {
     it.gedeeldMet = it.gedeeldMet || [];
     if (aan === false) {
       it.gedeeldMet = it.gedeeldMet.filter(c => c !== code);
+      /* De regel hieronder stond hier dubbel: na deze return volgde nog een
+         `return { gedeeldMet: it.gedeeldMet }` die nooit kon lopen -- een restje
+         van de omzetting naar `await vastleggen()`. Erger dan dood: die tweede
+         vorm droeg GEEN ok en GEEN codenamen, dus wie hem las dacht dat dit
+         antwoord er zo uitzag. De AST-scan ving hem. */
       return (await vastleggen()) || { ok: true, gedeeldMet: it.gedeeldMet.map(codenaamVan) };
-      return { gedeeldMet: it.gedeeldMet };
     }
     const doelKey = await keyVanCodenaam(code);
     if (!doelKey) return { status: 404, error: 'Die codenaam kennen we niet.' };

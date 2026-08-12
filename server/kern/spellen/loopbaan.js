@@ -90,10 +90,12 @@ module.exports = ({ db, save, codenaamVan, progressieMag, GEEN_PROGRESSIE }) => 
   /* EEN AFGELOPEN DIENSTVERBAND BIJSCHRIJVEN. Beide kanten krijgen hun eigen
      regel, want het is van allebei -- maar elk op zijn eigen codenaam en zonder
      iets van de ander dan die codenaam. */
-  function onthoudBaan(handle, codenaam, { werkgever, rol, rolnaam, maanden, reden, potje }) {
+  function onthoudBaan(handle, codenaam, { werkgever, rol, rolnaam, sector, maanden, reden, potje }) {
     if (!mag(handle)) return { bewaard: false, reden: GEEN_PROGRESSIE };
     if (!codenaam || !werkgever || !maanden) return { bewaard: false, reden: 'onvolledig' };
-    vanWie(codenaam).banen.push({ werkgever, rol, rolnaam,
+    /* `sector` is het VAK en niet de werkgever: waar je het geleerd hebt reist
+       mee, bij wie je het leerde ook, en geen van beide is een bedrag. */
+    vanWie(codenaam).banen.push({ werkgever, rol, rolnaam, sector: sector || null,
       maanden: Math.round(maanden), duur: duur(maanden), reden: reden || 'geeindigd', potje });
     save();
     return { bewaard: true };
@@ -138,12 +140,21 @@ module.exports = ({ db, save, codenaamVan, progressieMag, GEEN_PROGRESSIE }) => 
      onderwerp -- het groeit met elke laag die een blijvend feit produceert,
      terwijl dit register af is zodra het klopt. */
   const { noteerLoopbaan, noteerNalatenschap } =
-    require('./loopbaan-noteren')({ onthoud, onthoudBaan, duur, codenaamVan });
+    require('./loopbaan-noteren')({ onthoud, onthoudBaan, duur, codenaamVan, alle });
 
   const terugblik = maakTerugblik({ alle, mag, GEEN_PROGRESSIE });
 
+  /* WAT JE MEENEEMT NAAR JE VOLGENDE CAMPAGNE staat in ./loopbaan-profiel.js.
+     Dit register SCHRIJFT; dat bestand LEEST -- en die richting ontbrak, want
+     er werd keurig bewaard dat je drie jaar bedrijfsleider was en niemand
+     vroeg er ooit naar. De grens staat daar: geschiedenis maakt deuren
+     zichtbaar en schenkt geen waarde. */
+  const { profiel, tussen, ervaringIn } =
+    require('./loopbaan-profiel')({ alle, mag, GEEN_PROGRESSIE });
+
   return { MOMENTEN, MOMENTLIJST, duur, mag, onthoudBaan, onthoud, terugblik,
-    stoptErmee, noteerLoopbaan, noteerNalatenschap, alle };
+    stoptErmee, noteerLoopbaan, noteerNalatenschap, alle,
+    profiel, tussen, ervaringIn };
 };
 module.exports.MOMENTEN = MOMENTEN;
 module.exports.duur = duur;

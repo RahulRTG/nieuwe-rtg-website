@@ -26,7 +26,7 @@ const { PROJECTEN } = require('./foundation');
 
 module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid, veilingbeeld,
   belangbeeld, belangwaarde, eigenDeel, bankbeeld, kredietprofiel, verzekerbeeld, rndbeeld,
-  beheerbeeld, beursbeeld, overnamebeeld, dienstbeeld }) => {
+  beheerbeeld, beursbeeld, overnamebeeld, dienstbeeld, herkomst }) => {
   /* Van wie is deze vestiging? De contractlaag kijkt over de grens tussen
      twee spelers heen en kan dus niet met `mijnVestiging` toe. */
   const vanIemand = (st, id) => {
@@ -102,11 +102,11 @@ module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid, veilingb
   const zichtRuw = require('./eigenscherm')({ K, codenaamVan, rond, bijrekenen: () => {},
     foundationArbeid, capaciteit, personeelNodig, waarde, prijsVan, eigenDeel, inkoopbeeld,
     vergeven, mijnContracten, veilingbeeld, belangbeeld, bankbeeld, kredietprofiel,
-    verzekerbeeld, rndbeeld, beheerbeeld, beursbeeld, overnamebeeld, dienstbeeld, C, N, CONCERN, eindstand });
+    verzekerbeeld, rndbeeld, beheerbeeld, beursbeeld, overnamebeeld, dienstbeeld, herkomst, C, N, CONCERN, eindstand });
   const zicht = require('./eigenscherm')({ K, codenaamVan, rond, bijrekenen, foundationArbeid,
     capaciteit, personeelNodig, waarde, prijsVan, eigenDeel, inkoopbeeld, vergeven, mijnContracten,
     veilingbeeld, belangbeeld, bankbeeld, kredietprofiel, verzekerbeeld, rndbeeld,
-    beheerbeeld, beursbeeld, overnamebeeld, dienstbeeld, C, N, CONCERN, eindstand });
+    beheerbeeld, beursbeeld, overnamebeeld, dienstbeeld, herkomst, C, N, CONCERN, eindstand });
 
   function publiek(potje, st) {
     const k = K(st);

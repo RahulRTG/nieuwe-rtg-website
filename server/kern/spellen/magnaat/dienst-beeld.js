@@ -27,7 +27,7 @@ function volgendeRol(st, d) {
   return null;
 }
 
-module.exports = ({ vind }) => {
+module.exports = ({ vind, herkomst }) => {
   /* WAT EEN SPELER ZIET. Drie dingen, en het is geen toeval dat het er drie zijn:
      wat er te krijgen is, wat je zelf hebt, en wie er voor je werkt.
 
@@ -38,6 +38,19 @@ module.exports = ({ vind }) => {
      de werkgever, net als zijn kas. */
   function beeld(st, h, codenaamVan) {
     const naam = (x) => (codenaamVan ? codenaamVan(x) : x);
+    /* WAT JE MET DEZE MENS DEELT (../loopbaan-profiel.js). Dit is fase 3 op de
+       plek waar hij het meest doet: een vacature van iemand voor wie je eerder
+       werkte is niet dezelfde vacature als een van een vreemde.
+
+       HET IS EEN REDEN EN GEEN VOORDEEL. Er verandert niets aan het loon, aan de
+       band, aan wie er wordt aangenomen of aan de kans dat je wordt gekozen.
+       Wat er verandert is dat je ZIET waar je iemand van kent -- de deur wordt
+       zichtbaar, hij gaat niet vanzelf open. */
+    const kent = (wie) => {
+      if (!herkomst) return null;
+      const t = herkomst.tussen(h, naam(wie));
+      return t.er ? { hoe: t.hoe, maanden: t.maanden } : null;
+    };
     const eigen = D.dienstVan(st, h);
     const v = eigen ? vind(st, eigen.vestiging) : null;
     return {
@@ -49,6 +62,10 @@ module.exports = ({ vind }) => {
         return { id: f.id, werkgever: naam(f.werkgever), rol: f.rol,
           rolnaam: (D.ROLLEN[f.rol] || {}).naam, loon: f.loon, sector: f.sector,
           zaak: zaak ? zaak.naam : null, maand: f.maand,
+          /* Ken je deze werkgever al? En heb je dit vak eerder gedaan? Twee
+             feiten, en geen van beide beweegt een getal. */
+          bekend: kent(f.werkgever),
+          ervaring: herkomst && f.sector ? herkomst.ervaringIn(h, f.sector) : 0,
           verlooptOver: Math.max(0, D.FUNCTIE_MAANDEN - (st.maand - f.maand)),
           gesolliciteerd: f.sollicitaties.some(x => x.speler === h) };
       }),
@@ -69,9 +86,14 @@ module.exports = ({ vind }) => {
       // en wat JIJ als werkgever hebt uitstaan, met de sollicitaties erbij
       mijnFuncties: D.functies(st).filter(f => f.werkgever === h && f.status === 'open').map(f => ({
         id: f.id, vestiging: f.vestiging, rol: f.rol, loon: f.loon,
-        sollicitaties: f.sollicitaties.map(x => ({ speler: naam(x.speler), loon: x.loon, maand: x.maand })) })),
+        /* EN AAN DE WERKGEVERSKANT: ken je deze sollicitant? Precies dezelfde
+           regel, precies dezelfde grens -- je ziet waar je hem van kent, en dan
+           beslis je zelf. Een oud-collega wordt niet goedkoper en niet beter. */
+        sollicitaties: f.sollicitaties.map(x => ({ speler: naam(x.speler), loon: x.loon,
+          maand: x.maand, bekend: kent(x.speler) })) })),
       mijnMensen: D.lopend(st).filter(d => d.werkgever === h).map(d => ({
         id: d.id, wie: naam(d.werknemer), rol: d.rol, rolnaam: (D.ROLLEN[d.rol] || {}).naam,
+        bekend: kent(d.werknemer),
         loon: d.loon, vestiging: d.vestiging, maanden: d.maanden || 0,
         /* WELKE TREDE ER VOOR DEZE MENS BOVEN LIGT, en of hij vrij is. Zonder
            dit getal is "promotie aanbieden" een knop die soms werkt: de motor

@@ -10,7 +10,7 @@
    hoe de economie werkt, dan hoort die in de laag zelf. */
 const H = require('./handel');
 
-module.exports = ({ K, mijnVestiging, vrijKavel, wieHeeft, waarde, rond, codenaamVan }) => {
+module.exports = ({ K, mijnVestiging, vrijKavel, wieHeeft, waarde, rond, codenaamVan, herkomst }) => {
   const { liquideer, losOnderpandAf, verhuis } = require('./afscheid')({ mijnVestiging, afkoopsom: H.afkoopsom, rond });
   const handel = require('./handel-acties')({ K, mijnVestiging, rond });
   const veiling = require('./veiling')({ K, wieHeeft, afkoopsom: H.afkoopsom, verhuis });
@@ -69,7 +69,7 @@ module.exports = ({ K, mijnVestiging, vrijKavel, wieHeeft, waarde, rond, codenaa
      en de AI-concurrent: `werk-beleid` roept de gewone `beleid`-actie aan in
      plaats van zelf aan een vestiging te zitten, en die zit niet in deze lijst.
      Zie ../economie.js, waar de tabel wel compleet is. */
-  const maakDienst = (ACTIES) => require('./dienst-acties')({ K, mijnVestiging, wieHeeft, ACTIES, rond });
+  const maakDienst = (ACTIES) => require('./dienst-acties')({ K, mijnVestiging, wieHeeft, ACTIES, rond, herkomst });
   /* UITSTAPPEN (fase C): iemand stopt en de campagne gaat door. Hij leunt op
      ./afscheid.js, de ene weg waarlangs een vestiging iemands handen verlaat --
      een vierde manier zou een vierde set randgevallen zijn. */

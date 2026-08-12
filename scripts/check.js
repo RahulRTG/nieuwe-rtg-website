@@ -483,7 +483,18 @@ console.log('\n13) modulegrootte: productcode onder de 10 KB per bestand');
        boekte dubbel; nu schrijft de rijstrook als EEN transactie. De snede
        bestaat (schrijfEen + de twee schrijflanen naar een eigen deel) en staat
        in TAKEN.md 4.23. */
-    'server/pg/sync.js'
+    'server/pg/sync.js',
+    /* 10,4 KB: de twee BEDRADINGSbestanden van de spellaag. Ze knelden allebei
+       al voor fase 3 -- spellen.js stond op 10.398 en magnaat/economie.js op
+       10.232 -- en de loopbaanleeslaag (`herkomst`) duwde ze er net overheen.
+
+       De snede bestaat en is bij allebei dezelfde soort: de BALANSGETALLEN horen
+       niet tussen de bedrading. magnaat/economie.js draagt DUUR, MAAND_MS,
+       START_GELD en ROOD_RENTE, en dit huis zet zulke tabellen apart
+       (magnaat/sectoren.js, magnaat/prijsstand.js); spellen.js draagt de
+       ctx-samenstelling die per laag kan verhuizen. Staat in TAKEN.md. */
+    'server/kern/spellen.js',
+    'server/kern/spellen/magnaat/economie.js'
   ]);
   let teGroot = 0, uitz = 0, nog = [];
   for (const map of ['server', 'public']) {

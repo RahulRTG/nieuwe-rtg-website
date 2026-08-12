@@ -30,33 +30,46 @@
    heeft komt hier langs en er gebeurt niets. */
 'use strict';
 
-module.exports = ({ onthoud, onthoudBaan, duur, codenaamVan }) => {
-  /* ---------- de nalatenschap: wat je achterliet bij wie doorging ----------
+module.exports = ({ onthoud, onthoudBaan, duur, codenaamVan, alle }) => {
+  /* DE NALATENSCHAP staat in ./loopbaan-nalaten.js: dat is een OVERDRACHT en dit
+     zijn DIENSTVERBANDEN. Je kunt je zaak doorgeven zonder ooit iemand in dienst
+     te hebben gehad, en dat is precies de campagne waarin die overdracht het
+     enige is wat er te onthouden viel. */
+  const { noteerNalatenschap } = require('./loopbaan-nalaten')({ onthoud, duur, codenaamVan });
 
-     DRIE REGELS, en ze volgen alle drie uit lagen die er al stonden.
+  /* DE STAP DIE EEN CAMPAGNE OVERSPANT: je was werknemer, en nu heb je een eigen
+     zaak (SAMENLEVING.md fase 3). Tot nu toe kon `eerste_zaak` alleen BINNEN een
+     partij vallen -- hij wordt geschreven vanuit de dienstverbandenlus, en wie
+     deze campagne geen baan had komt daar nooit langs. Precies de mens die het
+     betreft dus.
 
-     1. GEEN OPVOLGER, GEEN MOMENT. Wie zonder opvolger uitstapt wikkelt af en
-        laat niemand achter. Dan is er geen tweede mens, en `onthoud` weigert
-        zo'n moment sowieso -- de wet van deze laag is dat een herinnering twee
-        mensen raakt. Hier wordt hij niet eens aangeboden.
-     2. TWEE KANTEN, ELK OP ZIJN EIGEN CODENAAM EN ELK MET ZIJN EIGEN GRENS. Een
-        volwassene die met een tiener speelde houdt zijn eigen kant; de tiener
-        houdt niets. Daarom staan hier twee aanroepen en geen gedeelde vlag.
-     3. WAT HIJ ONTHOUDT IS EEN DUUR. Zie de kop hierboven. */
-  function noteerNalatenschap(potje) {
-    const weg = ((potje && potje.staat) || {}).uit || {};
+     GEEN NIEUWE MOMENTSOORT: het is dezelfde menselijke gebeurtenis en die heeft
+     al een naam. De tweede mens is de werkgever waar je het GELEERD hebt (de
+     meeste maanden), want een moment zonder tweede mens bestaat niet -- en dat
+     levert de zin op waar het om gaat. Er komt niets mee: geen kas, geen pand,
+     geen krediet. Zie ./loopbaan-profiel.js. */
+  function noteerOndernemer(potje) {
+    if (!alle) return [];
+    const st = potje.staat || {};
     const uit = [];
-    for (const [h, w] of Object.entries(weg)) {
-      /* Wie met lege handen vertrok liet ook niets achter, en een moment
-         daarover zou een herinnering aan een leegte zijn. */
-      if (!w || !w.naar || !(w.overgedragen > 0)) continue;
-      const van = codenaamVan(h), naar = codenaamVan(w.naar);
-      const hoelang = duur(w.maand || 0);
-      const a = onthoud(h, van, 'doorgegeven', { samen: naar, wat: hoelang, potje: potje.id });
-      const b = onthoud(w.naar, naar, 'overgenomen', { samen: van, wat: hoelang, potje: potje.id });
-      if (a.bewaard || b.bewaard) uit.push({ van, naar, maand: w.maand || 0 });
+    for (const h of potje.spelers || []) {
+      if (!((st.vestigingen || {})[h] || []).length) continue;
+      const cn = codenaamVan(h);
+      const l = alle()[cn];
+      if (!l) continue;
+      /* UIT EEN EERDERE CAMPAGNE, en dat is de hele voorwaarde. Banen uit DIT
+         potje tellen niet mee: die weg loopt al door de lus hieronder, en zou
+         hij hier ook lopen dan hangt af van de volgorde welke van de twee wint. */
+      const eerder = l.banen.filter(b => b.potje !== potje.id && (b.maanden || 0) > 0);
+      if (!eerder.length) continue;
+      const per = {};
+      for (const b of eerder) per[b.werkgever] = (per[b.werkgever] || 0) + b.maanden;
+      const leermeester = Object.entries(per).sort((a, b) => b[1] - a[1])[0];
+      const r = onthoud(h, cn, 'eerste_zaak',
+        { samen: leermeester[0], wat: duur(leermeester[1]), potje: potje.id });
+      if (r.bewaard) uit.push({ wie: cn, na: leermeester[0] });
     }
-    return uit.length ? uit : null;
+    return uit;
   }
 
   /* ---------- het potje, in zijn geheel ----------
@@ -74,6 +87,11 @@ module.exports = ({ onthoud, onthoudBaan, duur, codenaamVan }) => {
        is precies de partij waarin een overdracht het enige is wat er te
        onthouden viel. */
     const nagelaten = noteerNalatenschap(potje);
+    /* DE OVERGANG WERKNEMER -> ONDERNEMER, en hij draait VOOR de lus hieronder
+       omdat hij er niet in past: die loopt langs de dienstverbanden van DEZE
+       partij, en juist de mens die vorige campagne in dienst was en nu voor
+       zichzelf begint heeft er geen. Zie de uitleg bij `noteerOndernemer`. */
+    noteerOndernemer(potje);
     const diensten = ((potje.staat || {}).diensten) || [];
     if (!diensten.length) return nagelaten ? { nagelaten } : null;
     const uit = [];
@@ -84,8 +102,16 @@ module.exports = ({ onthoud, onthoudBaan, duur, codenaamVan }) => {
       /* BEIDE KANTEN, elk op zijn eigen codenaam en elk alleen als DIE persoon
          binnen de grens valt. Dezelfde regel als bij de nalatenschap hierboven,
          en het is de enige lezing die klopt. */
+      /* IN WELK VAK. Zonder dit kan een loopbaan wel zeggen dat je ergens drie
+         jaar werkte maar niet WAT je leerde -- en dan is "zes jaar horeca" niet
+         te beantwoorden. De sector komt van de vestiging waar het dienstverband
+         aan hing; een bestuursrol heeft er geen, en dan staat er niets. */
+      const zaak = ((potje.staat || {}).vestigingen
+        ? Object.values(potje.staat.vestigingen).flat().find(v => v.id === d.vestiging)
+        : null) || null;
       const r1 = onthoudBaan(d.werknemer, wn, { werkgever: wg, rol: d.rol,
-        rolnaam: d.rolnaam, maanden, reden: d.reden || 'partij voorbij', potje: potje.id });
+        rolnaam: d.rolnaam, sector: zaak ? zaak.sector : null, maanden,
+        reden: d.reden || 'partij voorbij', potje: potje.id });
       if (r1.bewaard) {
         onthoud(d.werknemer, wn, 'eerste_baan', { samen: wg, wat: d.rol, potje: potje.id });
         uit.push({ wie: wn, bij: wg });

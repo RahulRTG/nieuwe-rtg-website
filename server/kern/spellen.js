@@ -116,7 +116,15 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
     magHandeling: grens.magHandeling, magRolAannemen: grens.magRolAannemen,
     TE_JONG: grens.TE_JONG, laagVan: grens.laagVan,
     noteerKring: (p) => ondernemerskring.noteerKring(p, codenaamVan),
-    noteerPand: pandgeheugen.onthoud };
+    noteerPand: pandgeheugen.onthoud,
+    /* Waar een speler vandaan komt (spellen/loopbaan-profiel.js): alleen FEITEN,
+       nooit een getal waar iets mee vermenigvuldigd wordt. Geschiedenis maakt
+       deuren zichtbaar en schenkt geen waarde -- zie de kop daar. */
+    herkomst: {
+      van: (h) => loopbaan.profiel(h, codenaamVan(h)),
+      tussen: (h, ander) => loopbaan.tussen(h, codenaamVan(h), ander),
+      ervaringIn: (h, sector) => loopbaan.ervaringIn(h, codenaamVan(h), sector)
+    } };
   const { spelStart, spelGrootte, potjeDirect, spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelVarianten } = require('./spellen/lobby')(ctx);
   /* Toernooien: een knockout waarvan elke wedstrijd een GEWOON potje is. Staat
      bewust NIET achter de progressiegrens -- een toernooi is een begrensd

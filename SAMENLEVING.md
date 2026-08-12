@@ -6,7 +6,7 @@
 Dit document is de wegenkaart. `VERHAAL.md` beschrijft de verhaallaag zoals die
 nu gebouwd is; dit beschrijft waar hij heen gaat, en — belangrijker — **wat er
 al ligt**. Want dat viel bij het opschrijven gunstiger uit dan verwacht: van de
-veertien fasen staan er vier grotendeels, en drie in de steigers.
+veertien fasen staan er vijf grotendeels, en twee in de steigers.
 
 De regel eronder is niet nieuw en verandert niet:
 
@@ -22,7 +22,7 @@ De regel eronder is niet nieuw en verandert niet:
 |---|---|---|---|
 | 1 | De eerste baan | **grotendeels** | `magnaat/dienst*.js`, `promotie.js`, `rush*.js`, `loopbaan*.js` |
 | 2 | De eerste leider | **de motor wel, de laag niet** | `rush.js` draagt het patroon al |
-| 3 | De eerste ondernemer | **de helft** | `loopbaan.js` schrijft; niemand leest hem bij de start |
+| 3 | De eerste ondernemer | **ja** | `loopbaan-profiel.js`, de overgang in `loopbaan-noteren.js` |
 | 4 | De levende stad | **ja** | `pandgeheugen.js`, `stadsgeheugen.js`, `ondernemerskring.js` |
 | 5 | Mensen krijgen een leven | nee | `concurrent.js` is de enige die initiatief neemt |
 | 6 | Organisaties krijgen karakter | nee | — |
@@ -112,18 +112,55 @@ dan iets anders betekenen — een ploeg zonder sturing werkt op volgorde, een
 bedrijf zonder sturing doet wat de AI-manager doet (`beheer.js`). Die lat ligt er
 dus ook al, alleen een andere.
 
-### Fase 3 — De eerste ondernemer ⚙ de helft
+### Fase 3 — De eerste ondernemer ✅ ja
 
 *"Dit bedrijf is geboren uit mijn geschiedenis."*
 
-`loopbaan.js` bewaart banen en momenten op codenaam, buiten het potje.
-`ondernemerskring.js` bewaart wie er in deze stad ooit een zaak had.
+Gebouwd, end-to-end. De leesrichting die ontbrak staat in
+`spellen/loopbaan-profiel.js`, en de regel eronder is de enige die telt:
 
-**Wat ontbreekt is de leesrichting.** `loopbaan-noteren.js` draait aan het *eind*
-van een partij; niets leest de loopbaan bij de *start* van een nieuwe. Daardoor
-weet een nieuwe campagne niet dat jij hier ooit afwaste. Dat is één ontbrekende
-verbinding, geen nieuwe laag — en het is waarschijnlijk de goedkoopste stap met
-de grootste opbrengst van deze hele kaart.
+> **Geschiedenis maakt deuren zichtbaar. Geschiedenis schenkt geen waarde.**
+
+Wat eruit mag volgen is context, toegang, herkenning en relaties. Wat er nooit
+uit mag volgen is geld, capaciteit, een prijs, een korting, krediet, een
+goedkoper pand of een groter bereik.
+
+**Wat je meeneemt:** maanden per vak, welke rollen je vervulde, bij wie je
+werkte, wie je kent en waarvan, en of je ooit voor jezelf begon. Meer niet — geen
+`bonus`, geen `factor`, geen `niveau`, geen score.
+
+**Herkenning is wederzijds.** Een vacature van iemand voor wie je eerder werkte
+zegt dat, met de reden erbij (*"je werkte hier eerder"*, *"ze gaf je je eerste
+promotie"*). Het loon, de band, en je kans zijn precies dezelfde als voor een
+vreemde. De deur wordt zichtbaar; hij gaat niet vanzelf open.
+
+**De overgang overspant nu een campagne.** `eerste_zaak` kon alleen binnen één
+partij vallen — hij werd geschreven vanuit de dienstverbandenlus, en wie deze
+campagne geen baan had kwam daar nooit langs. Precies de mens die het betreft
+dus. Geen nieuwe momentsoort: het is dezelfde menselijke gebeurtenis, en de
+tweede mens is de werkgever waar je het geleerd hebt. Dat levert de zin op waar
+het om ging:
+
+> *"Je begon voor jezelf, na 5 jaar bij Havenzicht."*
+
+**Hoe het bewezen wordt.** `test/spelherkomst.test.js` stelt de bewering twee
+keer, en de tweede is de sterkste:
+
+1. *empirisch* — twee identieke werelden, één speler met zestig maanden loopbaan
+   en één zonder: kas en elke post op het maandoverzicht zijn tot op de cent
+   gelijk;
+2. *structureel* — de modules die geld uitrekenen (`stap.js`, `maand.js`,
+   `opzet.js`, `bank.js`, `waardering.js`) krijgen het profiel **niet eens
+   aangereikt**. Wie het wél ziet staat als gesloten lijst in de toets, dus een
+   nieuwe lezer erbij is een besluit en geen bijwerking.
+
+**Wat er níét in zit, en waarom.** Het vierde onderdeel van de opdracht —
+*"een oud-collega solliciteert eerder"* — is half gebouwd. Dat een oud-collega
+je vacature met de reden erbij ziet, staat er. Dat de wereld hem *namens jou*
+laat solliciteren, niet: de andere spelers zijn mensen die zelf beslissen, en de
+enige actor die uit zichzelf handelt (`concurrent.js`) wordt per partij vers
+gemaakt en heeft dus geen verleden. Een oud-collega die er niet is als speler,
+vraagt om mensen die buiten een potje bestaan — en dat is fase 5.
 
 ### Fase 4 — De levende stad ✅ ja
 

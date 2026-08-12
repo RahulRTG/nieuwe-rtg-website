@@ -43,7 +43,7 @@ const MAX_MAANDEN_PER_KEER = 60;   // een vangnet: een partij die maanden lag ho
 const rond = (n) => Math.round(n);
 
 module.exports = (ctx) => {
-  const { save, codenaamVan, nudge } = ctx;
+  const { save, codenaamVan, nudge, herkomst } = ctx;
 
   /* ---------- opzetten ---------- */
   /* DE OPZET VAN EEN PARTIJ staat in ./opzet.js -- de lege wereld voordat er
@@ -105,7 +105,7 @@ module.exports = (ctx) => {
      worden in ./lagen.js samengesteld. Dit bestand gaat over de KLOK en de
      levensloop van een partij, en dat is af; die lijst groeit met elke fase mee.
      Twee dingen met zo'n verschillend tempo horen niet in een bestand. */
-  const L = require('./lagen')({ K, mijnVestiging, vrijKavel, wieHeeft, waarde, rond, codenaamVan });
+  const L = require('./lagen')({ K, mijnVestiging, vrijKavel, wieHeeft, waarde, rond, codenaamVan, herkomst });
 
   /* WAT EEN SPELER DOET wordt in ./tabel.js samengesteld -- de basisacties, de
      acties van elke laag, en de twee AI's die de complete tabel nodig hebben.
@@ -130,6 +130,9 @@ module.exports = (ctx) => {
     // maar hetzelfde -- wat er met je baan gebeurt. Zie ./promotie.js, ./rush.js
     dienstbeeld: (potje, st, h) => Object.assign(dienen.beeld(st, h, codenaamVan),
       { promoties: promotie.beeld(st, h, codenaamVan) }, rush.vloer(potje, h)),
+    // waar een speler vandaan komt (../loopbaan-profiel.js): meereizend met het
+    // ZICHT en niet met de staat, want een profiel is een lezing en geen voorraad
+    herkomst,
     foundationArbeid: (st) => F.arbeidBonus(st.foundation) }, L.zichtdelen));
   /* WIE ER AAN ZET IS EN WANNEER HET AF IS staat in ./verloop.js -- een echte
      naad: dit bestand gaat over de KLOK en die is af. Lees daar ook waarom de

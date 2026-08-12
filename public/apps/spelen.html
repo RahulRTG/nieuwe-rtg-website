@@ -1415,6 +1415,50 @@ let ecGesprek = null;
    maakt tussen een sectorsleutel en hoe een krant hem noemt. */
 const STORINGSTAND = { open: 'staat open', workaround: 'noodoplossing', uit: 'uit bedrijf' };
 
+/* Maanden in mensentaal. "5 jaar 2 maanden" is een loopbaan; "62" is een veld. */
+function jaarMaand(n){
+  const j = Math.floor(n / 12), m = n % 12;
+  return (j ? j + (j === 1 ? ' jaar' : ' jaar') : '') + (j && m ? ' ' : '') +
+    (m || !j ? m + (m === 1 ? ' maand' : ' maanden') : '');
+}
+
+/* WAAR JE IEMAND VAN KENT, in woorden. De motor draagt sleutels (`werkgever`,
+   `eerste_baan`); een scherm schrijft zinnen. Hetzelfde onderscheid dat
+   magnaat/nieuws.js maakt tussen een sectorsleutel en hoe een krant hem noemt. */
+const KENT_VAN = {
+  werkgever: 'je werkte hier eerder', eerste_baan: 'ze gaf je je eerste baan',
+  eerste_mens: 'hij kwam bij jou werken', eerste_promotie: 'ze gaf je je eerste promotie',
+  eerste_zaak: 'je begon voor jezelf na je tijd hier', opgeleid: 'jij leidde hem op',
+  samen_door: 'jullie kwamen er samen doorheen', eerste_storing: 'jullie deelden een storing',
+  doorgegeven: 'jij gaf het aan hem door', overgenomen: 'jij nam het van hem over'
+};
+const kentVan = (b) => (b.hoe || []).map(h => KENT_VAN[h] || h).join(' · ')
+  + (b.maanden > 0 ? ' (' + jaarMaand(b.maanden) + ')' : '');
+
+/* WAAR JE VANDAAN KOMT. Fase 3: je volgende onderneming begint niet met een leeg
+   formulier maar met een verleden dat al iets betekent.
+
+   ER STAAT GEEN ENKEL GETAL DAT IETS DOET. Maanden, vakken, namen -- de motor
+   kijkt er niet naar en kan er niet naar kijken (test/spelherkomst.test.js telt
+   na dat de rekenlagen het profiel niet eens aangereikt krijgen). Wat het
+   verandert is wat jij weet en wat een ander over jou weet. */
+function herkomstStrook(st){
+  const h = st.herkomst;
+  if (!h || !h.er) return '';
+  const vakken = Object.entries(h.ervaring || {})
+    .sort((a,b) => b[1] - a[1])
+    .map(([sector, m]) => esc(sector) + ' ' + jaarMaand(m)).join(' · ');
+  const rollen = Object.keys(h.rollen || {}).map(esc).join(', ');
+  return '<div class="sec">Waar je vandaan komt</div>' +
+    '<div class="rij"><div class="nm">' + jaarMaand(h.maanden) + ' gewerkt' +
+    '<small>' + (vakken || 'geen vak vastgelegd') +
+    (rollen ? ' · als ' + rollen : '') +
+    (h.bekenden.length ? ' · je kent ' + h.bekenden.length + ' mens' +
+      (h.bekenden.length === 1 ? '' : 'en') + ' uit eerdere campagnes' : '') +
+    (h.ondernemer ? ' · je had eerder een eigen zaak' : ' · nog nooit een eigen zaak gehad') +
+    '</small></div></div>';
+}
+
 const ecGeld = (n) => (n < 0 ? '-' : '') + '€' + Math.abs(Math.round(n)).toLocaleString('nl-NL');
 
 /* DE WERKVLOER (VERHAAL.md par. 0f). Wat een hulpkracht op zijn dienst ziet:
@@ -1582,7 +1626,7 @@ function tekenMagnaatEco(){
     /* DE LOONSTROOK. Sober: periode, werkgever, functie, bedrag. Salaris hoort
        niet "mijn kas ging omhoog" te zijn maar "ik heb gewerkt en hiervoor ben
        ik betaald" -- en daar is geen dashboard voor nodig, alleen een strook. */
-    werk.innerHTML = '<div class="sec">Je werk</div>' +
+    werk.innerHTML = herkomstStrook(st) + '<div class="sec">Je werk</div>' +
       '<div class="rij"><div class="nm">' + esc(b.rolnaam || b.rol) + ' bij ' + esc(b.werkgever) +
       '<small>' + esc(b.zaak || '') + ' · ' + (b.maanden || 0) + ' maanden · ' +
       'loon ' + ecGeld(b.loon) + ' per maand</small></div>' +
@@ -1602,21 +1646,28 @@ function tekenMagnaatEco(){
          Wie er geen heeft, ziet hier niets en leest een regel waarom. */
       tekenDienst(w.dienst, w.waarom);
   } else if ((w.vacatures || []).length) {
-    werk.innerHTML = '<div class="sec">Werk zoeken</div>' +
+    werk.innerHTML = herkomstStrook(st) + '<div class="sec">Werk zoeken</div>' +
       '<div class="leeg">' + w.vacatures.length + ' ' +
         (w.vacatures.length === 1 ? 'vacature' : 'vacatures') + ' in ' + esc(st.stad) + '.</div>' +
       w.vacatures.map(v => '<div class="rij"><div class="nm">' + esc(v.rolnaam || v.rol) +
         ' bij ' + esc(v.werkgever) + '<small>' + esc(v.zaak || v.sector) + ' · ' +
-        ecGeld(v.loon) + ' per maand · nog ' + (v.verlooptOver || 0) + ' maanden open</small></div>' +
+        ecGeld(v.loon) + ' per maand · nog ' + (v.verlooptOver || 0) + ' maanden open' +
+        /* WAT JE MET DEZE VACATURE DEELT. Een reden, geen voordeel: het loon,
+           de band en je kans zijn precies dezelfde als voor een vreemde. Wat je
+           ziet is waar je iemand van kent -- de deur wordt zichtbaar, hij gaat
+           niet vanzelf open (VERHAAL.md fase 3). */
+        (v.bekend ? '<br><span style="color:var(--goud);">' + esc(kentVan(v.bekend)) + '</span>' : '') +
+        (v.ervaring > 0 ? '<br>je deed dit vak al ' + jaarMaand(v.ervaring) : '') +
+        '</small></div>' +
         (v.gesolliciteerd
           ? '<span class="leeg">Gesolliciteerd</span>'
           : '<button type="button" class="chip" data-sol="' + esc(v.id) + '">Solliciteren</button>') +
         '</div>').join('');
   } else if (!st.vestigingen.length) {
-    werk.innerHTML = '<div class="sec">Werk zoeken</div>' +
+    werk.innerHTML = herkomstStrook(st) + '<div class="sec">Werk zoeken</div>' +
       '<div class="leeg">Op dit moment staat er niets open in ' + esc(st.stad) + '. ' +
       'Bedrijven zoeken personeel zodra ze groeien.</div>';
-  } else werk.innerHTML = '';
+  } else werk.innerHTML = herkomstStrook(st);
 
   /* DE WERKGEVERSKANT. Sinds Sven het kan, hoort een mens het ook te kunnen:
      dezelfde handeling, dezelfde ladder, dezelfde loonband. Zonder dit scherm

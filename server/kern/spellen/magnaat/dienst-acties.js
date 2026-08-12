@@ -20,7 +20,7 @@ const D = require('./dienst');
 const BS = require('./bestuur');
 const { SECTOREN } = require('./sectoren');
 
-module.exports = ({ K, mijnVestiging, wieHeeft, ACTIES, rond }) => {
+module.exports = ({ K, mijnVestiging, wieHeeft, ACTIES, rond, herkomst }) => {
   const vind = (st, id) => (st.vestigingen ? Object.values(st.vestigingen).flat()
     .find(v => v.id === id) : null) || null;
 
@@ -39,7 +39,7 @@ module.exports = ({ K, mijnVestiging, wieHeeft, ACTIES, rond }) => {
 
   /* Wat een speler ZIET staat in ./dienst-beeld.js -- daar wat hij ziet, hier
      wat hij doet. Zie de uitleg daar. */
-  const { beeld } = require('./dienst-beeld')({ vind });
+  const { beeld } = require('./dienst-beeld')({ vind, herkomst });
 
   const ACTIETABEL = {
     /* EEN FUNCTIE OPENSTELLEN. De werkgever zegt: bij deze zaak is deze rol te

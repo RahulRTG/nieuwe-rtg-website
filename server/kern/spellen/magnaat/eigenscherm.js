@@ -19,7 +19,7 @@ const { UITWEGEN } = require('./storing-acties')({ mijnVestiging: () => null });
 module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid, capaciteit,
   personeelNodig, waarde, prijsVan, eigenDeel, inkoopbeeld, vergeven, mijnContracten,
   veilingbeeld, belangbeeld, bankbeeld, kredietprofiel, verzekerbeeld, rndbeeld,
-  beheerbeeld, beursbeeld, overnamebeeld, dienstbeeld, C, N, CONCERN, eindstand }) => {
+  beheerbeeld, beursbeeld, overnamebeeld, dienstbeeld, herkomst, C, N, CONCERN, eindstand }) => {
   return function zicht(potje, st, mij) {
     bijrekenen(potje);
     const k = K(st);
@@ -102,6 +102,16 @@ module.exports = ({ K, codenaamVan, rond, bijrekenen, foundationArbeid, capacite
       /* LOONDIENST (VERHAAL.md stap 1): wat er te krijgen is, wat je zelf hebt,
          en wie er voor je werkt. Zie ./dienst-acties.js. */
       werk: dienstbeeld ? dienstbeeld(potje, st, mij) : null,
+      /* WAAR JE VANDAAN KOMT (../loopbaan-profiel.js). Dit is fase 3: je
+         volgende onderneming begint niet met een leeg formulier maar met een
+         verleden dat al iets betekent.
+
+         ALLEEN FEITEN, en dat is de grens. Maanden per vak, welke rollen je
+         vervulde, wie je kent en waarvan. Geen bonus, geen niveau, geen enkel
+         getal waar de motor iets mee doet -- de motor kijkt er niet eens naar.
+         Wat het verandert is wat het SCHERM kan zeggen, en wat een ander over
+         jou weet. Geschiedenis maakt deuren zichtbaar en schenkt geen waarde. */
+      herkomst: herkomst ? herkomst.van(mij) : null,
       // de beurs is PUBLIEK: dat is het hele punt van een markt
       beurs: beursbeeld(st, mij),
       // de biedingen die JOU aangaan; wie waarop biedt is van die twee

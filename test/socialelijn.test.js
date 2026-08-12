@@ -90,7 +90,7 @@ test('een termijn draagt de naam waar hij over gaat', () => {
     momenten: [],
     vooruit: { komt: [{ id: 't1', wat: 'verjaardag', waarvan: 'Noor', datum: VANDAAG, bron: 'Attenties' }] }
   });
-  assert.equal(r.vakken[0].regels[0].titel, 'Noor — verjaardag');
+  assert.equal(r.vakken[0].regels[0].titel, 'Noor - verjaardag');
   assert.equal(r.vakken[0].regels[0].soort, 'termijn');
 });
 

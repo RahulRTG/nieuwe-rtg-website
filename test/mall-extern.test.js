@@ -238,17 +238,55 @@ test('9. de zaak ziet de stand van haar eigen koppeling', async () => {
   assert.equal(zonder.body.extern.gekoppeld, false);
 });
 
+/* DE ZONE VAN DE ZAAK WORDT GEKOZEN EN STAAT NIET VAST (hetzelfde patroon als
+   toets 12 verderop). De twee toetsen hierna hebben een zaak nodig die aan twee
+   eisen tegelijk voldoet:
+   1. ze loopt VOOR op de server. Alleen dan laat een filter op servertijd
+      tijdvakken staan die bij de zaak al geweest zijn, en dat is precies de
+      fout die hier bewaakt wordt;
+   2. ze heeft nog uren te gaan voor sluitingstijd, anders staat er op haar
+      eigen dag niets meer open en meet de toets niets.
+   Hier stond Pacific/Auckland VAST. Dat voldeed tweeentwintig uur per dag en
+   zakte de andere twee: tussen ongeveer 10:00 en 12:00 UTC loopt het daar tegen
+   middernacht, is er op de eigen dag niets meer open, en zakte deze toets
+   zonder dat er iets kapot was -- rood dat niets over de code zei. */
+const ZONEKEUS = ['Pacific/Kiritimati', 'Pacific/Auckland', 'Australia/Brisbane',
+  'Asia/Tokyo', 'Asia/Singapore', 'Asia/Dhaka', 'Asia/Dubai', 'Europe/Amsterdam',
+  'UTC', 'America/Sao_Paulo', 'America/New_York', 'America/Los_Angeles', 'Pacific/Honolulu'];
+const OPEN_TOT = 20 * 60;   // eis 2: uiterlijk acht uur 's avonds bij de zaak
+const VOORSPRONG = 2 * 60;  // eis 1: minstens twee uur voor op de server
+
+function zoneVoorZaak() {
+  const server = tz.lokaal().minuten; // de klok waarmee een fout filter zou rekenen
+  const open = ZONEKEUS.map(zone => ({ zone, minuten: tz.lokaal(zone).minuten }))
+    .filter(z => z.minuten <= OPEN_TOT);
+  const voor = open.filter(z => z.minuten >= server + VOORSPRONG);
+  /* Lukt eis 1 niet -- de server staat zelf al laat op de dag, en dan ligt geen
+     enkele open zone er nog VOOR -- dan wordt het de zone die er het verst
+     ACHTER ligt. Toets 10 wordt daar zwakker van (bij een zaak die achterloopt
+     ligt alles wat servertijd overlaat sowieso in haar toekomst), maar de
+     laatste bewering van toets 11 blijft even scherp: die vergelijkt het eerste
+     tijdvak met wat er bij de ZAAK als eerste komt, en juist dat loopt dan
+     maximaal uiteen. */
+  const keus = voor.length
+    ? voor.sort((a, b) => b.minuten - a.minuten)[0]
+    : open.sort((a, b) => a.minuten - b.minuten)[0];
+  assert.ok(keus, 'er is altijd een zone waar de zaak nog uren open is');
+  return keus.zone;
+}
+
 test('10. een tijdvak van vandaag ligt nooit in het verleden van de zaak zelf', async () => {
   /* Gevonden doordat de mutatie "filter vandaag niet tegen de eigen klok" werd
      AFGESLAGEN. vakwerk laat de tijden weg die op de SERVER al voorbij zijn;
      voor een zaak in een andere zone klopt dat niet, en dan biedt de Mall een
      tijdvak aan dat daar al is geweest. */
-  await api('/api/supplier/tijdzone', { tijdzone: 'Pacific/Auckland' }, tok.SERENA);
+  const zone = zoneVoorZaak();
+  await api('/api/supplier/tijdzone', { tijdzone: zone }, tok.SERENA);
   await api('/api/supplier/vak/uren-zet', {
     dagen: [true, true, true, true, true, true, true], van: '00:00', tot: '23:59'
   }, tok.SERENA);
 
-  const hier = tz.lokaal('Pacific/Auckland');
+  const hier = tz.lokaal(zone);
   const mijn = (await mallVan('SERENA')).filter(a => a.beschikbaar && a.beschikbaar.datum);
   assert.ok(mijn.length >= 1, 'er is een dienst met een tijdvak, anders meet deze toets niets');
   const naarMin = (t) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5));
@@ -272,7 +310,8 @@ test('10. een tijdvak van vandaag ligt nooit in het verleden van de zaak zelf', 
    --------------------------------------------------------------------------- */
 
 test('11. de Mall-kaart en het boekscherm noemen hetzelfde eerste tijdvak', async () => {
-  await api('/api/supplier/tijdzone', { tijdzone: 'Pacific/Auckland' }, tok.SERENA);
+  const zone = zoneVoorZaak();
+  await api('/api/supplier/tijdzone', { tijdzone: zone }, tok.SERENA);
   await api('/api/supplier/vak/uren-zet', {
     dagen: [true, true, true, true, true, true, true], van: '00:00', tot: '23:59'
   }, tok.SERENA);
@@ -293,7 +332,7 @@ test('11. de Mall-kaart en het boekscherm noemen hetzelfde eerste tijdvak', asyn
      de mutatie "vakwerk terug naar servertijd" liet geen toets zakken omdat de
      Mall zijn eigen filter er nog overheen legde. Nu wordt de eigen dag van de
      zaak expliciet opgevraagd. */
-  const hier = tz.lokaal('Pacific/Auckland');
+  const hier = tz.lokaal(zone);
   const vandaagDaar = await api('/api/booking/slots', { supplierCode: 'SERENA', serviceId: dienstId, date: hier.datum }, lid);
   assert.equal(vandaagDaar.status, 200);
   const min = (t) => Number(t.slice(0, 2)) * 60 + Number(t.slice(3, 5));

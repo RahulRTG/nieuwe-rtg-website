@@ -43,10 +43,10 @@ module.exports = (kern) => {
       r.push([m.bron, m.titel, m.wie, m.wanneer].filter(Boolean).join(' · '));
     }
     for (const v of ((cmd && cmd.voorstellen) || []).slice(0, 3)) {
-      r.push('klaargezet: ' + v.wat + ' — ' + v.titel + ' (' + (v.wanneer || '') + ')');
+      r.push('klaargezet: ' + v.wat + ' - ' + v.titel + ' (' + (v.wanneer || '') + ')');
     }
     if ((beeld.stil || []).length) {
-      r.push('niet opgehaald: ' + beeld.stil.join(', ') + ' — dit beeld is onvolledig');
+      r.push('niet opgehaald: ' + beeld.stil.join(', ') + ' - dit beeld is onvolledig');
     }
     return r;
   }

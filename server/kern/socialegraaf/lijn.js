@@ -83,7 +83,7 @@ module.exports = () => {
      eigen dossier typte) maakt de zin: "Noor - verjaardag". Zonder die naam is
      een termijn op een tijdlijn nietszeggend. */
   const uitTermijn = (t) => ({
-    soort: 'termijn', titel: (t.waarvan ? t.waarvan + ' — ' : '') + (t.wat || t.naam || 'termijn'),
+    soort: 'termijn', titel: (t.waarvan ? t.waarvan + ' - ' : '') + (t.wat || t.naam || 'termijn'),
     wie: t.waarvan || '', wanneer: t.datum, tijd: null, wacht: '',
     bron: t.bron || '', link: '/apps/sociaal.html', kenmerk: String(t.id || '')
   });

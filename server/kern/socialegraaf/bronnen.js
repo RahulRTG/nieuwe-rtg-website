@@ -17,18 +17,25 @@
    Een sociaal beeld waaruit een bron is weggevallen ZIET ER COMPLEET UIT, en dan
    blijft er iemand onbeantwoord.
 
-   TWEE DOMEINEN HEBBEN EEN POORT en dat is geen fout: Vonk eist 18+ met
-   geverifieerd paspoort, Rendez-vous de Lifestyle Pass. Die geven een `status`
-   terug in plaats van rijen. Dat is niet stil (de bron werkt), het is leeg -- en
-   het verschil tussen "stuk" en "niet voor u" hoort zichtbaar te blijven.
+   DRIE BRONNEN MOETEN EERST IETS VRAGEN (vrienden, Vonk, Rendez-vous): een
+   poort bij het domein zelf of een schakelaar van het lid. Die staan in
+   ./bronnen-poort.js, met de reden erbij. Ze zitten hieronder gewoon in ALLE en
+   gedragen zich verder als elke andere bron.
 
    De kern wordt LAAT gelezen (in de functies, nooit bij het laden), zodat de
    mountvolgorde van de kernlagen er niet toe doet. */
 'use strict';
 
 const { dagVan, lijst, moment, LINK } = require('./hulp');
+const poort = require('./bronnen-poort');
 
 module.exports = ({ kern }) => {
+
+  /* De drie bronnen met een poort of een schakelaar staan in ./bronnen-poort.js
+     (vrienden, vonk, rendez-vous). Ze zitten in dezelfde lijst en gedragen zich
+     hier verder als elke andere bron -- de scheiding is alleen dat zij eerst
+     iets moeten vragen voordat ze mogen leveren. */
+  const P = poort({ kern });
 
   /* ---- Berichten: alleen wat op mij WACHT ----
      Een inbox uitputtend herhalen is het werk van Berichten zelf; hier hoort
@@ -109,79 +116,6 @@ module.exports = ({ kern }) => {
       }));
   }
 
-  /* ---- De vriendenlaag: verzoeken en onbeantwoorde gesprekken ----
-     Deze bron staat in geen enkel bestaand sociaal scherm, en hij draagt het
-     scherpste signaal dat er is: een verbindingsverzoek dat aan MIJ gericht is.
-     Het domein filtert zelf al op `requestedBy !== mij`, dus wat hier binnenkomt
-     ligt per definitie bij mij.
-
-     De vrienden zelf komen alleen mee als er ongelezen berichten liggen; een
-     vriendenlijst is een toestand en geen moment. */
-  function vrienden(key) {
-    const s = kern.socialConnecties(key) || {};
-    /* HET BEREIK-FILTER (kern/socialebeleid). Staat de schakelaar uit, dan komen
-       alleen verzoeken in beeld van mensen met wie het lid een genootschap
-       deelt. Dit is een FILTER en geen blokkade: blokkeren woont in
-       kern/sociaal en blijft daar -- twee lijsten van "wie mag mij bereiken"
-       zouden uiteenlopen (LAT.md regel 4). */
-    const B = kern.socialebeleid;
-    let verzoeken = lijst(s.requests);
-    if (B && B.knopAan && !B.knopAan(key, 'bereik')) {
-      const bekend = new Set();
-      for (const gr of lijst(kern.genootschap.mijne(key))) {
-        for (const l of lijst(kern.genootschap.publiek(gr, key).ledenlijst)) bekend.add(l.codenaam);
-      }
-      verzoeken = verzoeken.filter(r => bekend.has(r.codename));
-    }
-    const uit = verzoeken.slice(0, 12).map(r => moment({
-      soort: 'verzoek', titel: 'Verbindingsverzoek', wie: r.codename,
-      wanneer: dagVan(r.at), tijd: r.at, wacht: 'ik', kenmerk: r.key,
-      bron: 'Vrienden', link: LINK('app')
-    }));
-    for (const c of lijst(s.connections)) {
-      if (!(c.unread > 0)) continue;
-      uit.push(moment({
-        soort: 'gesprek', titel: c.last || 'Bericht', wie: c.codename,
-        wanneer: dagVan(c.lastAt), tijd: c.lastAt, wacht: 'ik', aantal: c.unread,
-        kenmerk: c.key, bron: 'Vrienden', link: LINK('app')
-      }));
-    }
-    return uit.slice(0, 16);
-  }
-
-  /* ---- Vonk: de matches ----
-     Achter een poort (18+ met geverifieerd paspoort); die geeft een status terug
-     in plaats van matches, en dat is leeg en niet stuk. Een match waar nog niet
-     betaald is, wacht op mij -- dat is de enige handeling die het domein kent en
-     die het lid zelf moet doen. */
-  function vonk(key) {
-    /* Uitgezet: matches blijven uit het sociale beeld -- bijvoorbeeld op een
-       gedeeld toestel. De app zelf blijft gewoon werken; dit gaat alleen over
-       wat er in dit beeld terechtkomt. */
-    if (kern.socialebeleid && kern.socialebeleid.knopAan && !kern.socialebeleid.knopAan(key, 'vonk')) return [];
-    const v = kern.vonkMijn(key) || {};
-    if (v.error) return [];
-    return lijst(v.matches).slice(0, 8).map(m => moment({
-      soort: 'match', titel: m.tafel ? 'Tafel gereserveerd' : 'Match', wie: m.met,
-      wanneer: dagVan(m.at), tijd: m.at,
-      wacht: m.ikBetaalde ? '' : 'ik',
-      aantal: lijst(m.berichten).length, kenmerk: m.id,
-      bron: 'Vonk', link: LINK('vonk')
-    }));
-  }
-
-  /* ---- Rendez-vous: de wederzijdse matches ---- */
-  function rendezvous(key) {
-    if (kern.socialebeleid && kern.socialebeleid.knopAan && !kern.socialebeleid.knopAan(key, 'vonk')) return [];
-    const r = kern.rvMatches(key) || {};
-    if (r.error) return [];
-    return lijst(r.matches).slice(0, 8).map(m => moment({
-      soort: 'match', titel: m.voorstel ? 'Gedeelde plek: ' + m.voorstel : 'Match',
-      wie: m.codenaam, wanneer: dagVan(m.sinds), tijd: m.sinds, kenmerk: m.id,
-      bron: 'Rendez-vous', link: LINK('rendezvous')
-    }));
-  }
-
   /* ---- Meet: de kamers waar ik in mag ----
      Alleen kamers waar op dit moment iemand IN zit. Een lege vergaderkamer is
      meubilair; een kamer waar drie mensen zitten te wachten is een moment. */
@@ -205,9 +139,9 @@ module.exports = ({ kern }) => {
     { naam: 'uitnodigingen', lever: uitnodigingen },
     { naam: 'kring', lever: kring },
     { naam: 'salon', lever: salon },
-    { naam: 'vrienden', lever: vrienden },
-    { naam: 'vonk', lever: vonk },
-    { naam: 'rendezvous', lever: rendezvous },
+    { naam: 'vrienden', lever: P.vrienden },
+    { naam: 'vonk', lever: P.vonk },
+    { naam: 'rendezvous', lever: P.rendezvous },
     { naam: 'meet', lever: meet }
   ];
 

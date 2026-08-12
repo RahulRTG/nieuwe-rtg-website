@@ -86,6 +86,29 @@ write** als de boeking. Staat hij ergens anders of later, dan bestaat er een
 venster waarin de boeking vast staat en de sleutel niet — precies de toestand
 die de retry verkeerd laat aflopen.
 
+## Het besluit over de reikwijdte — genomen op 12 augustus 2026
+
+`saveDuurzaam()` gaat gelden voor **geld én alles wat een lid zelf maakt**:
+notities, agenda, bestanden en berichten. Niet voor afgeleide of herbouwbare
+toestand (caches, tellers, indexen, sessiestand).
+
+De afweging stond zo: alleen geld is het snelst en laat één bekende bevinding
+open — een bevestigde notitie kan bij een opslagfout verdwijnen. Dat is precies
+wat de ketenronde op `notities/bewaar` meet en wat als GEZAKT in de
+bewijsmatrix staat. De keuze is om die te sluiten.
+
+**Dat verandert de rol van de prestatiemeting.** Ze is geen poort meer waar het
+besluit van afhangt, maar de eerste stap van de uitvoering: we willen weten wat
+het kost, niet meer of het mag. Blijkt de latentie op de veelgebruikte paden
+onaanvaardbaar te verslechteren, dan is dat nieuwe informatie en geen veto — dan
+komt de vraag terug met een getal erbij.
+
+De regel dat `saveDuurzaam()` op een **lijst met redenen** staat en dat een
+aanroep daarbuiten `npm run check` laat zakken (regel 47), blijft onverkort. De
+lijst wordt langer, niet losser: elk nieuw pad noemt waarom een lid zijn werk
+niet mag kwijtraken. Wat er níét op komt, is even belangrijk — een cache die
+opnieuw te vullen is, hoort niet duurzaam bevestigd te worden.
+
 ## De volgorde van bouwen
 
 1. `saveDuurzaam()` als expliciete primitive. **Niet** stilletjes `save()`

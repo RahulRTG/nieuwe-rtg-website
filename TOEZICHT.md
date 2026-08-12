@@ -141,6 +141,29 @@ Een control die aanwezig is maar al maanden niet bewezen, is geen control maar
 een aanname met een bestandsnaam. `laatstGroen` maakt dat verschil zichtbaar in
 plaats van bespreekbaar.
 
+## De volgende laag — de invariantenmotor (besloten)
+
+Niveau 5 uit de tabel hierboven is het eerstvolgende bouwwerk, en de reden staat
+in die tabel zelf: hij vult niet één kolom maar zet alle zeven lege kolommen in
+beweging, omdat een wet over waarneembaar gedrag gaat in plaats van over een
+route.
+
+De eerste tien wetten worden gefilterd met het acceptatiecriterium hierboven:
+**noemt een wet een implementatienaam, dan is het nog geen wet.** Wat er al
+bewezen is, levert de eerste kandidaten:
+
+- een bevestigde financiële mutatie verdwijnt nooit stil;
+- een herhaalde opdracht met dezelfde sleutel verandert de toestand hooguit
+  eenmaal;
+- een ingetrokken toestemming blijft ingetrokken, ook na een crash;
+- een auditregel is niet te wijzigen zonder dat de keten breekt;
+- het grootboek sluit op de cent, onder elke toegestane volgorde.
+
+Wat de motor nodig heeft en wat de bestaande ronden niet hebben: gegenereerde
+toestandsovergangen in plaats van geschreven scenario's, en **shrinking** — een
+wet die pas na miljoenen stappen breekt is alleen bruikbaar als hij terug te
+brengen is tot de handvol stappen die hem breken.
+
 ## Laag 2 — Regulatory Evidence (later)
 
 Per eis vastleggen welke policy geldt, wie eigenaar is, welke technische control

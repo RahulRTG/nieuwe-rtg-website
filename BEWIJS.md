@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 938 bestanden en 6311 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 939 bestanden en 6326 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 938 |
-| losse beweringen (`test(...)`) | 6311 |
+| toetsbestanden | 939 |
+| losse beweringen (`test(...)`) | 6326 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 614 |
 | **overleefd**: geen mutatie kreeg hem rood | 13 |
 | niet te meten (al rood, geen module gevonden, ...) | 18 |
 | alleen in de kop *genoemd*, nog niet gemeten | 92 |
-| niets van beide | 201 |
+| niets van beide | 202 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-818 bestanden, 6096 beweringen.
+819 bestanden, 6111 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -667,6 +667,7 @@ toets omvalt.
 | `spelklok.test.js` | 16 | -- | De klok per beurt: tempo, verlopen, toewijzen en de vervaltermijn. Wat hier bewaakt wordt is niet "telt hij goed af" maar de vier BESLUITEN uit de kop van server/kern/spellen/klok.js: 1. |
 | `spelkring-lokaal.test.js` | 14 | -- | DE LOKALE ONDERNEMERSKRING -- wie hier ooit een zaak had. Fase D. |
 | `spellab.test.js` | 15 | -- | MAGNAAT: HET BALANSLAB -- meet het wat het zegt te meten? Een meetopstelling is zelf software, en een kapotte meter is duurder dan geen meter: hij geeft een getal en je gelooft het. |
+| `spelleeftijd.test.js` | 15 | -- | DE TWEE GRENZEN -- wat er bewaard mag worden, en wat je mag doen. Hier stond er EEN, en dat was te weinig: "mag hier iets van bewaard worden" en "mag deze persoon dit doen" zijn verschillende vragen die hetzelfde... |
 | `spellen.test.js` | 30 | gezakt op `liegpoort /api/` | Integratietests voor de spellenlaag: potjes op de vriendenlaag. Twee RTG-leden worden vrienden en spelen: mens erger je niet (uitnodigen, accepteren, dobbelen, zetten), schaken (legale en onwettige zetten), woordduel... |
 | `spelloopbaan.test.js` | 20 | -- | DE LOOPBAAN -- wat er van een mens overblijft als het potje voorbij is. VERHAAL.md stap 0, 2, 4 en 5. |
 | `spelmaatje.test.js` | 4 | gezakt op `liegpoort /api/` | Integratietest: Rahul als spelmaatje. In elk potje kun je Rahul erbij roepen voor een hint, een regel of een peptalk. |

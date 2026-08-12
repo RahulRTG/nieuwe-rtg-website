@@ -38,6 +38,17 @@ Object.assign(kern, { tafelticket: require('../kern/tafelticket')({ crypto, data
 Object.assign(kern, { dyncode: require('../kern/dyncode')({ crypto, dataDir: DATA_DIR }) });
 /* Spellen (kern/spellen.js): het spelplatform op de vriendenlaag; RTF- en
    RTG-leden spelen tegen elkaar. */
+/* HOE OUD IS DEZE SPELER? Proost heeft genoeg aan "is hij 18"; de carrierelaag
+   van Magnaat kent drie lagen (VERHAAL.md par. 0c) en heeft het getal nodig, dus
+   is dit de bron en is `volwassen` de afleiding -- twee opzoekingen zouden twee
+   plekken zijn om te vergeten dat alleen een GECONTROLEERDE geboortedatum telt.
+   RTF-gezinsprofielen hebben er geen en doen dus nooit mee. */
+const leeftijdHandle = (handle) => {
+  const m = /^user-(.+)$/.exec(String(handle || ''));
+  const geboren = m ? ((accounts.getMemberState(m[1]) || {}).geboren || null)
+    : ((PERSONAS[handle] || {}).geboren || null);
+  return leeftijdVan(geboren);
+};
 Object.assign(kern, require('../kern/spellen')({
   db, save, crypto, zijnVrienden: kern.zijnVrienden, codenaamVan: kern.codenaamVan, sseToCustomer,
   isGeblokkeerd: kern.isGeblokkeerd, socialZoek: kern.socialZoek, sociaalRate: kern.sociaalRate,
@@ -49,14 +60,8 @@ Object.assign(kern, require('../kern/spellen')({
   // praten in het potje gaat de communicatiekern in; die bestaat pas in laag 4,
   // dus als FUNCTIE (zie kern/spellen/praat.js)
   comm: () => kern.comm,
-  // 18+ (voor Proost): alleen een echt account met paspoort-geboortedatum telt;
-  // RTF-gezinsprofielen hebben geen geverifieerde leeftijd en doen nooit mee
-  volwassen: (handle) => {
-    const m = /^user-(.+)$/.exec(String(handle || ''));
-    const geboren = m ? ((accounts.getMemberState(m[1]) || {}).geboren || null) : ((PERSONAS[handle] || {}).geboren || null);
-    const lft = leeftijdVan(geboren);
-    return lft != null && lft >= 18;
-  }
+  leeftijd: leeftijdHandle,
+  volwassen: (handle) => { const n = leeftijdHandle(handle); return n != null && n >= 18; }
 }));
 /* RTG Veilig (kern/veilig/): de ruggengraat onder vier apps -- Thuiswacht
    ("ik ben over X minuten thuis"), het stille Codewoord, de Vitale check-in

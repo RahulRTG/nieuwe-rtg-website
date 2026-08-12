@@ -87,6 +87,27 @@ module.exports = (ctx) => {
          hij aanroept kan wel op een beurt moeten wachten -- dat bewaakt de
          actie zelf, want hij loopt door de gewone tabel. */
       'bestuur-zet'],
+    /* DE VOLWASSEN LAAG (VERHAAL.md par. 0c). Wat een zestienjarige NIET kan:
+       ondernemen, lenen, mensen aannemen, besturen, aandelen verhandelen,
+       verzekeren, veilen. Dat is geen bescherming die erbovenop ligt -- het is
+       wat in het echt ook niet kan, en het gevolg is dat een volwassene een
+       minderjarige niet aan zich kan binden met schuld, zeggenschap of
+       werkgeverschap.
+
+       WAT ER NIET IN STAAT is de bijbaan: solliciteren, opzeggen, meewerken in
+       de zaak waar je in dienst bent, meestemmen over wat de Foundation in je
+       stad bouwt, en er even niet zijn. Zie ../grens.js -- de lijst DAAR is wit,
+       dus deze lijst is een tweede slot en geen enige. */
+    volwassenLaag: ['open', 'uitbreiden', 'sluiten', 'uitstappen',
+      'krediet-opnemen', 'krediet-aflossen', 'krediet-herzien',
+      'functie-openen', 'functie-intrekken', 'aannemen', 'bestuur-zet',
+      'belang-voorstel', 'belang-antwoord', 'beurs-aanbieden', 'beurs-kopen', 'beurs-intrekken',
+      'overname-bod', 'overname-antwoord', 'overname-intrekken',
+      'veiling-start', 'veiling-bod', 'veiling-intrekken',
+      'polis-sluiten', 'polis-opzeggen',
+      'contract-voorstel', 'contract-antwoord', 'contract-opzeggen',
+      'onderzoek-starten', 'onderzoek-budget', 'onderzoek-uitrollen', 'onderzoek-subsidie',
+      'beheer-aan', 'beheer-uit', 'beheer-regels', 'beleid', 'bouw', 'verkoop'],
     init, zet,
     varianten: {
       vorm: { keuze: ['bord', 'economie'], standaard: 'bord' },

@@ -14,7 +14,7 @@
    (maakt geen vriendschap), via het door de server bevestigde klasgenoten-pad,
    of via de random wachtrij per spel en groepsgrootte. Beurten gaan via polling
    plus een SSE-duwtje. */
-module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, isGeblokkeerd, socialZoek, sociaalRate, volwassen, anthropic, sseClients, lidBoardUit, comm }) => {
+module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, isGeblokkeerd, socialZoek, sociaalRate, volwassen, leeftijd, anthropic, sseClients, lidBoardUit, comm }) => {
   const fs = require('fs'), zlib = require('zlib'), path = require('path');
   const rid = (n) => crypto.randomBytes(n).toString('hex');
   const nu = () => new Date().toISOString();
@@ -80,7 +80,9 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
 
   /* DE PROGRESSIEGRENS staat in spellen/grens.js: de enige regel waar deze hele
      laag aan hangt, en daarom een eigen bestand met een eigen naam. */
-  const { progressieMag, GEEN_PROGRESSIE } = require('./spellen/grens')({ volwassen });
+  // twee grenzen, een bestand: progressie blijft 18+, werk is getrapt vanaf 16
+  const grens = require('./spellen/grens')({ volwassen, leeftijd });
+  const { progressieMag, GEEN_PROGRESSIE } = grens;
 
   /* HET BELEID (spellen/beleid.js): alle toetredingsvragen op een plek, in
      volgorde. Neemt geen regel over -- hij roept gedeeld.js, grens.js en
@@ -90,14 +92,13 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
     get SPEL() { return SPEL; }, get VARIANT() { return VARIANT; }
   });
 
-  /* WAT EEN POTJE OVERLEEFT staat in ./spellen/bewaren.js: de uitslagen, de
-     telemetrie, de prestaties en de loopbaan. Vier lagen met EEN vraag -- wat
-     blijft er staan als de partij voorbij is -- en dus een naad. Dit bestand
-     bedraadt de spellenlaag en stond op de 10 kB-grens; het knelde toen de
-     loopbaan erbij kwam, en dat is precies waar die grens voor is. */
+  /* WAT EEN POTJE OVERLEEFT staat in ./spellen/bewaren.js: uitslagen,
+     telemetrie, prestaties, loopbaan, stad, kring, panden. Een vraag -- wat
+     blijft er staan als de partij voorbij is -- en dus een naad. */
   const { telPotje, spelTelemetrie, noteerUitslag, spelUitslagen, spelStand,
     spelPrestaties, loopbaan, stadsgeheugen, daily, ondernemerskring, pandgeheugen } = require('./spellen/bewaren')({
     db, save, nu, codenaamVan, progressieMag, GEEN_PROGRESSIE,
+    werkMag: grens.werkMag, GEEN_WERK: grens.GEEN_WERK,
     get SOORTEN() { return SOORTEN; } });
 
   /* Het verloop van een partij, voor de replay. Aparte tak en aparte termijn:
@@ -112,8 +113,9 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
     rid, nu, S, SPEL, SOORTEN, TEAMS, wereldFout, leeftijdFout, nudge, schud, beurtDoor, opschonen, klok, beleid,
     INITS, ZETTEN, ZICHT, STATISCH, klasgenotenVan, noteerUitslag, noteerZet,
     noteerLoopbaan: loopbaan.noteerLoopbaan, stadsgeheugen, daily, ondernemerskring, pandgeheugen,
+    magHandeling: grens.magHandeling, TE_JONG: grens.TE_JONG, laagVan: grens.laagVan,
     noteerKring: (p) => ondernemerskring.noteerKring(p, codenaamVan),
-    noteerPand: (p) => pandgeheugen.onthoud(p) };
+    noteerPand: pandgeheugen.onthoud };
   const { spelStart, spelGrootte, potjeDirect, spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelVarianten } = require('./spellen/lobby')(ctx);
   /* Toernooien: een knockout waarvan elke wedstrijd een GEWOON potje is. Staat
      bewust NIET achter de progressiegrens -- een toernooi is een begrensd

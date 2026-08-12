@@ -115,6 +115,11 @@ function keurPotje(naam, s) {
   if (s.min) uit.min = s.min;
   if (s.volwassen) uit.volwassen = true;
   if (s.buitenBeurt) uit.buitenBeurt = s.buitenBeurt;
+  /* WELKE ACTIES BIJ DE VOLWASSEN LAAG HOREN. Net als `buitenBeurt` een lijst
+     die de PLATFORMLAAG leest en het spel zelf niet -- ./partij.js handhaaft
+     hem, ./grens.js zegt wat een zestienjarige dan wel mag. Een spel zonder
+     deze lijst kent geen leeftijdslagen en komt ongehinderd langs. */
+  if (s.volwassenLaag) uit.volwassenLaag = s.volwassenLaag;
   if (s.perTaal) uit.perTaal = true;
 
   /* NASPEELBAAR: kan een partij uit het bewaarde verloop worden herbouwd? Dat

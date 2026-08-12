@@ -32,7 +32,12 @@ etalage van het platform maar de oefenruimte ervan.
 
 Vier, en ze zijn geen van alle onderhandelbaar.
 
-### 1. De carrièrelaag is 18+, en dat is geen detail
+### 1. De carrièrelaag is getrapt, en de progressielaag is 18+
+
+> **Aangepast.** Deze grens zei oorspronkelijk "de carrièrelaag is 18+". Sinds
+> paragraaf 0c is de *werk*grens 16 met drie lagen, en blijft de
+> *progressie*grens 18+. Wat hieronder staat over waarom die grens er is, geldt
+> onverkort voor scores en ranglijsten.
 
 Alles wat een prestatie buiten het potje bewaart valt onder `progressieMag`
 (`server/kern/spellen/grens.js`): highscores, ranglijsten, niveaus, prestaties.
@@ -143,6 +148,54 @@ euro rijker. Het is een **document, geen saldo**.
 
 Zodra een relikwie verkoopbaar, overdraagbaar of optelbaar wordt, is het waarde
 en geldt de grondwet weer onverkort.
+
+---
+
+## 0c. Drie leeftijdslagen, en de eerste is 16
+
+Grens 1 hieronder zei: de carrièrelaag is 18+. Dat is aangepast, en het is een
+besluit en geen versoepeling.
+
+**Een score en een biografie zijn verschillende dingen.** Een ranglijst zegt
+*"jij bent beter dan hij"*; een werkverleden zegt *"dit heb je gedaan, en er was
+iemand bij"*. Het eerste is een wedstrijd, het tweede is een leven. Die twee
+kregen hetzelfde antwoord omdat er maar één drempel was.
+
+Dus zijn er nu twee grenzen (`kern/spellen/grens.js`):
+
+- **De progressiegrens blijft 18+** en verschuift niet. Highscores, ranglijsten,
+  standen, prestaties, de arcade. De Arena's belofte aan tieners — *alles telt
+  alleen binnen het potje; er bestaat geen ranglijst* — geldt onverkort.
+- **De werkgrens is 16**, en getrapt.
+
+| laag | | |
+|---|---|---|
+| **kind** (< 16) | speelt alles | er wordt niets van bewaard |
+| **jong** (16–17) | bijbaan, stage, een vak leren | zijn eigen werkverleden wordt bewaard |
+| **volwassen** (18+) | de volledige laag | ondernemen, krediet, werkgeverschap, bestuur, kapitaal |
+
+In het echt begint een leven ook niet op je achttiende. Je hebt een
+zaterdagbaan, je loopt stage, je leert een vak. Iedereen als volwassen
+ondernemer laten beginnen is niet veiliger — het is alleen minder waar. En het
+levert een beter verhaal: *16 eerste zaterdagbaan, 17 eerste
+verantwoordelijkheid, 18 eerste volledige baan, 21 bedrijfsleider, 24 eerste
+onderneming.*
+
+### Waarom dit veilig is zonder een apart hek
+
+Wat de middelste laag níét mag, mag hij niet omdat een zestienjarige het in het
+echt ook niet kan: geen miljoenenkrediet, geen personeel in dienst, geen
+bestuurszetel, geen aandelenhandel, geen bedrijfsleiderschap. Dat daarmee
+tegelijk uitgesloten is dat een volwassene een minderjarige aan zich bindt met
+schuld, zeggenschap of werkgeverschap, is geen toeval — maar het is ook geen
+bolt-on. **Het volgt uit het realisme**, en dat is de enige soort grens die
+niemand later per ongeluk weghaalt omdat hij er niet meer uitziet als een grens.
+
+Twee sloten, en ze zijn allebei **fail-closed**: de lijst in `grens.js` is *wit*
+(wat er niet in staat mag niet, dus een nieuwe actie is vanzelf 18+), en de
+descriptor van Magnaat noemt de volwassen laag apart. `partij.js` handhaaft het
+spel-neutraal, naast de beurtbewaking. Zonder gecontroleerde geboortedatum ben
+je `kind`: **geen gegeven is geen toestemming.**
 
 ---
 

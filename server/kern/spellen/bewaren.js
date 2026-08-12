@@ -17,7 +17,7 @@
 'use strict';
 
 module.exports = (ctx) => {
-  const { db, save, nu, codenaamVan, progressieMag, GEEN_PROGRESSIE } = ctx;
+  const { db, save, nu, codenaamVan, progressieMag, GEEN_PROGRESSIE, werkMag, GEEN_WERK } = ctx;
 
   /* Uitslagen die een potje overleven: de bron onder winrate, niveaus en
      toernooien. Deelnemers buiten de progressiegrens staan er zonder codenaam
@@ -36,8 +36,12 @@ module.exports = (ctx) => {
   /* De loopbaan: wat er van een MENS overblijft als het potje voorbij is (zie
      VERHAAL.md en de kop van spellen/loopbaan.js). Naast de uitslagen, want
      alles wat een potje OVERLEEFT hoort hier. */
+  /* DE WERKGRENS EN NIET DE PROGRESSIEGRENS (./grens.js). Een werkverleden is
+     geen score: een ranglijst zegt "jij bent beter dan hij", een biografie zegt
+     "dit heb je gedaan". Vanaf 16, en wat een zestienjarige mag DOEN wordt een
+     laag hoger bewaakt. */
   const loopbaan = require('./loopbaan')({
-    db, save, codenaamVan, progressieMag, GEEN_PROGRESSIE
+    db, save, codenaamVan, progressieMag: werkMag, GEEN_PROGRESSIE: GEEN_WERK
   });
 
 
@@ -71,7 +75,7 @@ module.exports = (ctx) => {
   const pandgeheugen = require('./pandgeheugen')({ db, save });
 
   const ondernemerskring = require('./ondernemerskring')({
-    db, save, progressieMag, GEEN_PROGRESSIE
+    db, save, progressieMag: werkMag, GEEN_PROGRESSIE: GEEN_WERK
   });
 
   return { telPotje, spelTelemetrie, noteerUitslag, spelUitslagen, spelStand,

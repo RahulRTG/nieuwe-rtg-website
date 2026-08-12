@@ -12,10 +12,10 @@ volgende handeling.
 ## De stand in getallen
 
 ```
-BEWIJSMATRIX     13.025 bewezen · 30.472 ongemeten  (43.857 cellen)
+BEWIJSMATRIX     15.044 bewezen · 28.431 ongemeten  (43.857 cellen)
                  instrument op 9 van de 11 kolommen
                  nog leeg: OUTPUT  AUDIT
-DUURZAAM         geld · notities · agenda · bestanden · berichten
+DUURZAAM         geld · notities · agenda · bestanden (incl. delen) · berichten
                  kosten: p50 x2,01 · p95 x1,49 · p99 x0,84 (controle x1,03)
 CONTROLS         12, waarvan 1 niet in bedrijf (AUDIT-KETEN-VERANKERD) en
                  1 hier niet meetbaar (UI-WAARHEID: geen browser in deze omgeving)
@@ -26,8 +26,8 @@ POORTWACHT       3.987 routes · 0 open · 43 publiek met een reden
 ROL-SCHEIDING    2.937 / 2.937 schrijfroutes · 0 doorbraken · 0 lekken
 INVOER           2.510 / 2.936 routes voorbij de poort · 0 breuken · 0 sporen
 IDEMPOTENTIE     12 beschermd · 94 onbeschermd · 106 van 2.936 (op het ANTWOORD)
-TOESTAND         555 / 2.936 beoordeeld (begrensde ronde) · 0 rollback gezakt
-                 STATE 58 · SIDE_EFFECT 58 · ROLLBACK 497 · IDEM 35/58
+TOESTAND         2.338 / 2.936 beoordeeld (80%) · 7 rollback gezakt
+                 STATE 224 · SIDE_EFFECT 224 · ROLLBACK 2.107 · IDEM 124/224
 KLOK             1.298 directe tijdsaanroepen · 2 modules op de klok
 ```
 

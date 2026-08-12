@@ -37,7 +37,7 @@
         "staat": "GROEN",
         "beweringen": 14,
         "overgeslagen": 0,
-        "at": "2026-08-12T11:53:07.844Z",
+        "at": "2026-08-12T14:59:17.594Z",
         "bestanden": [
           "test/saveduurzaam.test.js",
           "test/persistentiestand.test.js"
@@ -65,7 +65,7 @@
         "staat": "GROEN",
         "beweringen": 30,
         "overgeslagen": 0,
-        "at": "2026-08-12T11:53:08.006Z",
+        "at": "2026-08-12T14:59:17.768Z",
         "bestanden": [
           "test/keten.test.js"
         ]
@@ -93,7 +93,7 @@
         "staat": "NIET IN BEDRIJF",
         "beweringen": 30,
         "overgeslagen": 0,
-        "at": "2026-08-12T11:53:08.167Z",
+        "at": "2026-08-12T14:59:17.925Z",
         "bestanden": [
           "test/keten.test.js"
         ],
@@ -129,7 +129,7 @@
         "staat": "GROEN",
         "beweringen": 33,
         "overgeslagen": 0,
-        "at": "2026-08-12T11:53:08.810Z",
+        "at": "2026-08-12T14:59:18.620Z",
         "bestanden": [
           "test/verraad.test.js",
           "test/verraadtelling.test.js"
@@ -165,7 +165,7 @@
         "staat": "GROEN",
         "beweringen": 33,
         "overgeslagen": 0,
-        "at": "2026-08-12T11:53:08.957Z",
+        "at": "2026-08-12T14:59:18.787Z",
         "bestanden": [
           "test/ketenproef.test.js"
         ]
@@ -194,7 +194,7 @@
         "staat": "GROEN",
         "beweringen": 18,
         "overgeslagen": 0,
-        "at": "2026-08-12T11:53:10.223Z",
+        "at": "2026-08-12T14:59:20.237Z",
         "bestanden": [
           "test/klok.test.js"
         ]
@@ -224,7 +224,7 @@
       "laatstGroen": {
         "staat": "niet gemeten",
         "reden": "geen bruikbare browser in deze omgeving (playwright mist zijn binaire bestand)",
-        "at": "2026-08-12T11:53:18.640Z",
+        "at": "2026-08-12T14:59:28.787Z",
         "bestanden": [
           "test/schermleugen.test.js",
           "test/liegend-scherm.e2e.js"
@@ -257,7 +257,7 @@
         "staat": "GROEN",
         "beweringen": 13,
         "overgeslagen": 0,
-        "at": "2026-08-12T11:53:18.787Z",
+        "at": "2026-08-12T14:59:28.931Z",
         "bestanden": [
           "test/rolproef.test.js"
         ]
@@ -290,7 +290,7 @@
         "staat": "GROEN",
         "beweringen": 11,
         "overgeslagen": 0,
-        "at": "2026-08-12T11:53:18.924Z",
+        "at": "2026-08-12T14:59:29.085Z",
         "bestanden": [
           "test/invoerproef.test.js"
         ]
@@ -322,7 +322,7 @@
         "staat": "GROEN",
         "beweringen": 12,
         "overgeslagen": 0,
-        "at": "2026-08-12T11:53:19.064Z",
+        "at": "2026-08-12T14:59:29.233Z",
         "bestanden": [
           "test/idemproef.test.js"
         ]
@@ -339,26 +339,26 @@
       ],
       "bewijsstuk": "STAATPROEF.json -- per route welke collecties bewogen, en wat de herhaling deed",
       "dekking": {
-        "beproefd": 555,
+        "beproefd": 2338,
         "totaal": 2936,
         "eenheid": "routes waar de toestand is gemeten",
         "tellers": {
-          "state": 58,
-          "sideEffect": 58,
-          "rollback": 497,
-          "rollbackGezakt": 0,
-          "idemBewezen": 35,
-          "idemGezakt": 23,
+          "state": 224,
+          "sideEffect": 224,
+          "rollback": 2107,
+          "rollbackGezakt": 7,
+          "idemBewezen": 124,
+          "idemGezakt": 100,
           "blindeRondes": 0
         },
-        "pct": 18.9
+        "pct": 79.6
       },
       "grens": "ziet de DATABASE en niets daarbuiten: een mail, een push of een betaling bij een derde valt er niet onder, dus SIDE_EFFECT betekent hier \"buiten de eigen collectie\" en niet \"buiten het huis\". Ziet ook geen wijziging die zichzelf binnen één verzoek opheft. Een route waar de eerste oproep niets bewoog, blijft ONGEMETEN -- daar zou een tweede effect ook niet te zien zijn.",
       "laatstGroen": {
         "staat": "GROEN",
-        "beweringen": 26,
+        "beweringen": 27,
         "overgeslagen": 0,
-        "at": "2026-08-12T11:53:19.306Z",
+        "at": "2026-08-12T14:59:29.487Z",
         "bestanden": [
           "test/staatproef.test.js",
           "test/vingerafdruk.test.js"
@@ -375,21 +375,21 @@
       ],
       "bewijsstuk": "BEWIJSMATRIX.json -- elf schakels per route, met bron per bewezen cel",
       "dekking": {
-        "beproefd": 13025,
+        "beproefd": 15044,
         "totaal": 43857,
         "eenheid": "cellen",
         "tellers": {
-          "ongemeten": 30472,
-          "gezakt": 100
+          "ongemeten": 28431,
+          "gezakt": 122
         },
-        "pct": 29.7
+        "pct": 34.3
       },
       "grens": "het register MEET niets zelf; het verzamelt wat andere instrumenten meten. Vier van de elf kolommen hebben vandaag een instrument, zeven staan leeg.",
       "laatstGroen": {
         "staat": "GROEN",
         "beweringen": 17,
         "overgeslagen": 0,
-        "at": "2026-08-12T11:53:19.534Z",
+        "at": "2026-08-12T14:59:29.822Z",
         "bestanden": [
           "test/bewijsmatrix.test.js"
         ]

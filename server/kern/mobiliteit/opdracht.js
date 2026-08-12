@@ -8,11 +8,9 @@
    van vertrek en bestemming in ./plekken. Hier staat wat een opdracht IS en
    hoe hij ontstaat.
 
-   DE PRIJS STAAT VAST BIJ HET AANVRAGEN. Het prijsmodel wordt op de opdracht
-   GEKOPIEERD en niet als verwijzing bewaard. Zet een vervoerder morgen zijn
-   tarief omhoog, dan verandert de prijs van een rit die gisteren geboekt is
-   niet mee. Een verwijzing had dat wel gedaan, stil, en dat is precies het
-   soort fout dat pas op een factuur zichtbaar wordt. */
+   Het tarief en de rekensom staan in ./opdracht-prijs.js, met de reden waarom
+   het prijsmodel bij het aanvragen wordt GEKOPIEERD en niet als verwijzing
+   bewaard. Hier wordt hij alleen op de opdracht gezet. */
 
 const { CATEGORIEEN } = require('./voertuigcatalogus');
 
@@ -40,12 +38,11 @@ const RITSOORT_MODULE = {
 };
 const RITSOORTEN = Object.keys(RITSOORT_MODULE).concat('charter');
 
-// het standaard prijsmodel als een vervoerder niets heeft ingesteld (in centen)
-const STANDAARD_TARIEF = { basis: 350, perKm: 220, perMin: 40, minimum: 700, wachtPerMin: 45 };
 
 module.exports = (ctx) => {
   const { db, save, id, schoon, nu, haversine, etaMinutes, modAan, plekBepaal,
     findSupplier, codenaamVan } = ctx;
+  const { tariefVan, prijsUit, STANDAARD_TARIEF } = require('./opdracht-prijs')({ findSupplier });
 
   function ensureOpdrachten() {
     if (!Array.isArray(db.data.mobOpdrachten)) db.data.mobOpdrachten = [];
@@ -61,20 +58,6 @@ module.exports = (ctx) => {
       return c.module;
     }
     return RITSOORT_MODULE[ritsoort] || null;
-  }
-
-  function tariefVan(vervoerderCode) {
-    const s = vervoerderCode ? findSupplier(vervoerderCode) : null;
-    const t = (s && s.settings && s.settings.mobTarief) || null;
-    if (!t) return Object.assign({}, STANDAARD_TARIEF);
-    return { basis: Number(t.basis) || 0, perKm: Number(t.perKm) || 0, perMin: Number(t.perMin) || 0,
-      minimum: Number(t.minimum) || 0, wachtPerMin: Number(t.wachtPerMin) || 0 };
-  }
-
-  // basis + kilometers + minuten, met een bodem. Alles in centen.
-  function prijsUit(tarief, km, minuten) {
-    const rauw = tarief.basis + tarief.perKm * km + tarief.perMin * minuten;
-    return Math.max(tarief.minimum || 0, Math.round(rauw));
   }
 
   /* Een opdracht aanmaken. `actor` beschrijft wie hem plaatst: een lid

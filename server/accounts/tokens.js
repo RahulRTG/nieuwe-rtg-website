@@ -157,44 +157,17 @@ function maakTokens(getUserById) {
     } catch (e) { return null; }
   }
 
-  /* ---------- e-mailbevestiging & wachtwoord-herstel ---------- */
-  function setEmailVerified(userId) {
-    S.zin('UPDATE users SET email_verified = 1 WHERE id = ?').run(userId);
-    mirror.markUser(userId);
-    return getUserById(userId);
-  }
-  function createReset(userId, ttlMs = 3600000) {
-    const token = crypto.randomBytes(24).toString('hex');
-    const hash = crypto.createHash('sha256').update(token).digest('hex');
-    S.zin('UPDATE users SET reset_hash = ?, reset_expires = ? WHERE id = ?').run(hash, Date.now() + ttlMs, userId);
-    mirror.markUser(userId);
-    return token;
-  }
-  function findByReset(token) {
-    const hash = crypto.createHash('sha256').update(String(token || '')).digest('hex');
-    const u = S.zin('SELECT * FROM users WHERE reset_hash = ?').get(hash);
-    if (!u || !u.reset_expires || u.reset_expires < Date.now()) return null;
-    return u;
-  }
-  /* EEN NIEUW WACHTWOORD BEEINDIGT ELKE LOPENDE SESSIE.
-
-     Dat gebeurde niet: wie eenmaal binnen was bleef dertig dagen binnen, ook na
-     een volledig herstel. Juist bij een herstel is dat verkeerd om -- iemand
-     herstelt zijn wachtwoord meestal OMDAT er iets mis is, en dan hoort de ander
-     eruit te vliegen, niet te blijven zitten.
-
-     Het token is staatloos, dus er valt niets weg te gooien. Wat wel kan is een
-     grens per account: alles wat voor dit moment is uitgegeven, telt niet meer.
-     Zie verifyToken. */
-  async function setPassword(userId, password) {
-    S.zin('UPDATE users SET password_hash = ?, reset_hash = NULL, reset_expires = NULL, sessies_vanaf = ? WHERE id = ?')
-      .run(await kluis.hashPassword(password), Date.now(), userId);
-    mirror.markUser(userId);
-    return getUserById(userId);
-  }
+  /* E-mailbevestiging en wachtwoord-herstel staan in ./herstel.js. Een
+     herstelcode is geen sessietoken: hij wordt gehasht bewaard in plaats van
+     ondertekend, en hij geeft geen toegang maar het recht om een wachtwoord
+     te zetten. Twee soorten geheim in een bestand is hoe je ze door elkaar
+     gaat halen. Ze reizen hieronder wel gewoon mee naar buiten, zodat de
+     aanroepers niets merken van de knip. */
+  const herstel = require('./herstel').maakHerstel(getUserById);
 
   return { issueToken, verifyToken, trekIn, trekInActie, isIngetrokken, issueActionToken, verifyActionToken,
-    setEmailVerified, createReset, findByReset, setPassword };
+    setEmailVerified: herstel.setEmailVerified, createReset: herstel.createReset,
+    findByReset: herstel.findByReset, setPassword: herstel.setPassword };
 }
 
 module.exports = { maakTokens };

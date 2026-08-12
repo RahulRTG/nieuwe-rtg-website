@@ -43,6 +43,11 @@
 </header>
 <main id="main"><div class="leeg">Laden…</div></main>
 <div id="melding" role="status"></div>
+<!-- VOOR het scherm-script, net als op concierge, rtgkantoor en redactiekantoor.
+     Hij stond hieronder, en de laatste regel van dat script roept bij een lege
+     token meteen inlog() aan -- die greep dan naar een RTGKantoorGesprek dat nog
+     niet bestond. Het scherm bleef op "Laden..." staan, zonder zichtbare fout. -->
+<script src="/shared/kantoorgesprek.js"></script>
 <script>
 const $=s=>document.querySelector(s);
 const esc=t=>String(t==null?'':t).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -153,7 +158,6 @@ async function beheer(c,mk){
 if(!TOKEN) inlog(); else laad();
 </script>
 <script src="/shared/mond.js"></script>
-<script src="/shared/kantoorgesprek.js"></script>
 <script src="/shared/metgezel.js" defer></script>
 <script src="/shared/basis.js" defer></script>
 <script src="/shared/bediening.js" defer></script>

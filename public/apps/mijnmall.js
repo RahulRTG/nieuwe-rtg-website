@@ -124,6 +124,8 @@ function start() {
   vulVerdiepingen();
   tekenLijsten();
   tekenAanvragen();
+  // en het derde deel (bewaard, wijzigingen, bestellingen, collecties)
+  if (window.RTGMijnMall) window.RTGMijnMall.teken();
 }
 
 async function maakLijst(soort) {

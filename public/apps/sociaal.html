@@ -324,11 +324,35 @@
     $('#telVandaag').textContent = punten.length
       ? punten.length + (punten.length === 1 ? ' moment' : ' momenten') : '';
     if (!punten.length) return;
-    RTGCanvas.lijn('#vandaag', punten.map(x => ({
+    const el = RTGCanvas.lijn('#vandaag', punten.map(x => ({
       uur: x.tijd, titel: x.titel || SOORT[x.soort] || 'Regel', sig: x.sig,
       toe: x.status ? x.app + ' · ' + x.status : x.app,
       href: x.link
     })));
+
+    /* DE WEG NAAR HET OBJECT LOOPT OOK OVER DE TIJDLIJN.
+       objectKnop hangt aan werkRegel, en werkRegel tekent alleen het register.
+       Sinds de tijdlijn de rijen MET een uur uit dat register haalt, verloor
+       juist de bijeenkomst van vanavond zijn "wat kan hier" -- en dat is nu
+       precies het ding waarvan je wil weten wat je ermee kunt. Geen van beide
+       takken kon dat zien: de een kende de tijdlijn niet, de ander het paneel.
+
+       De Canvas-lijn leert hier NIETS over objecten. Een object is een begrip
+       van dit scherm (LIFE.md par. 3) en hoort niet in een component die ook
+       Kantoor en Reizen tekenen. De lijn geeft zijn element terug en tekent de
+       punten in dezelfde volgorde als de lijst; daarop haakt dit scherm aan. */
+    const stippen = el.querySelectorAll('.cv-stip');
+    punten.forEach((x, i) => {
+      const o = objectVan(x);
+      if (!o || !stippen[i]) return;
+      const knop = document.createElement('button');
+      knop.className = 'rtg-ref watkan';
+      knop.type = 'button';
+      knop.setAttribute('data-obj', o.soort);
+      knop.setAttribute('data-objid', o.id);
+      knop.textContent = 'wat kan hier';
+      stippen[i].appendChild(knop);
+    });
   }
 
   function teken(d) {

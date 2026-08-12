@@ -133,9 +133,16 @@ async function tekenCollecties() {
     '</div>').join('');
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+/* GEEN EIGEN INSTAP MEER. Dit deel had als enige van de drie een eigen
+   DOMContentLoaded, en dat ging mis zodra er geen sessie is: ./mijnmall.js
+   vervangt dan de hele #main door het inlogblok, en deze vier functies tekenden
+   daarna in #bewaard, #bestellingen en #collecties die er niet meer waren --
+   drie onafgevangen fouten op een scherm dat er verder normaal uitzag.
+   Wie mag starten is een besluit van EEN plek: start() in ./mijnmall.js, dat
+   ook ./mijnmall-aanvragen.js aanroept. Vandaar alleen nog de haak. */
+window.RTGMijnMall = { teken: () => {
   tekenBewaard();
   tekenWijzigingen();
   tekenBestellingen();
   tekenCollecties();
-});
+} };

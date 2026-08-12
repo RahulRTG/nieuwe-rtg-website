@@ -93,7 +93,14 @@ test('zonder contracten rekent de economie precies zoals in fase A', () => {
   const r = st.laatste.boris.regels[0];
   const s = SECTOREN[B.sector];
   assert.equal(r.korting, 0, 'zonder contract is er niets gedekt');
-  assert.equal(r.inkoop, Math.round(r.omzet * s.inkoop), 'de inkooppost is onveranderd');
+  /* INKOOP EN DERVING SAMEN ZIJN DE INKOOPPOST. Sinds VERHAAL.md par. 0f staat
+     het deel dat bederft als eigen regel (magnaat/stap.js), en dat is een
+     UITSNEDE en geen post erbij -- precies dezelfde eis als hier: een economie
+     die anders rekent zodra er een laag bijkomt, is twee economieen. Alleen
+     `r.inkoop` lezen zou die eis stil laten vervallen. De euro speling is de
+     afronding van twee posten in plaats van een. */
+  assert.ok(Math.abs((r.inkoop + r.derving) - Math.round(r.omzet * s.inkoop)) <= 1,
+    'de inkooppost is onveranderd: ' + (r.inkoop + r.derving) + ' tegen ' + Math.round(r.omzet * s.inkoop));
   assert.equal(r.levering, null, 'en er wordt niets geleverd');
 });
 
@@ -109,7 +116,10 @@ test('een contract verlaagt de inkooppost van de afnemer en levert de leverancie
   maand(m, p, 1);
   const met = st.laatste.boris.regels[0];
   assert.ok(met.korting > 0, 'de dekking is een bedrag en geen vinkje');
-  assert.ok(met.inkoop < Math.round(met.omzet * SECTOREN[B.sector].inkoop),
+  /* Weer op de HELE post: sinds de derving een eigen regel is, zou `met.inkoop`
+     alleen al lager zijn zonder dat er ook maar een contract bestond -- en dan
+     bewijst deze regel niets meer over de dekking. */
+  assert.ok(met.inkoop + met.derving < Math.round(met.omzet * SECTOREN[B.sector].inkoop),
     'de inkooppost is werkelijk lager dan de marktvariant');
   const lev = st.laatste.anna.regels[0];
   assert.ok(lev.levering && lev.levering.omzet === 1000, 'de leverancier boekt de contractomzet');

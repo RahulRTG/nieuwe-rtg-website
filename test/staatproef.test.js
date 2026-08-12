@@ -108,11 +108,28 @@ test('drie vingerafdrukken rond twee oproepen, en de ruis wordt toegepast', asyn
     routes: [{ method: 'POST', pad: '/api/x', rol: 'member' }],
     tokenVoor: () => 't', lijfVoor: () => ({})
   });
-  assert.equal(beurt, 3, 'drie vingerafdrukken per route');
+  assert.equal(beurt, 3, 'drie vingerafdrukken bij de eerste route');
   assert.deepEqual(afdrukken, [[1, 2], [2, 3]]);
   const rij = uit.perRoute['POST /api/x'];
   assert.deepEqual(rij.collecties, ['agenda'], 'het journaal hoort er niet meer bij te staan');
   assert.equal(rij.idempotentie, 'GEZAKT');
+});
+
+test('de laatste afdruk van een route is de eerste van de volgende', async () => {
+  /* Tussen F2 van route N en F0 van route N+1 gebeurt er niets, dus die twee
+     zijn per definitie gelijk. Twee keer vragen is een derde van het werk
+     weggooien, en het werk is ~190 ms per afdruk. Zonder deze regel loopt een
+     volledige ronde bijna anderhalf keer zo lang. */
+  let beurt = 0;
+  const uit = await draaiStaatproef({
+    post: async () => ({ status: 200 }),
+    vingerafdruk: async () => ({ nr: ++beurt }),
+    verschilVan: async () => d('agenda'),
+    routes: [1, 2, 3].map(i => ({ method: 'POST', pad: '/api/r' + i, rol: 'member' })),
+    tokenVoor: () => 't', lijfVoor: () => ({})
+  });
+  assert.equal(beurt, 7, 'drie routes: 3 + 2 + 2, niet 9');
+  assert.equal(uit.afdrukken, 7);
 });
 
 test('bewoog er bij GEEN ENKELE route iets, dan meldt de ronde zichzelf blind', async () => {

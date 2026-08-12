@@ -17,6 +17,47 @@ Bijgewerkt: 2026-08-09.
 
 ---
 
+## Hoe deze lijst gelezen hoort te worden
+
+Zesentachtig open regels zijn geen werkvoorraad maar een muur. Ze horen langs
+vier assen gelezen te worden, in deze volgorde — een cosmetisch dure regel hoort
+niet dezelfde aandacht te krijgen als een mutatie die twee keer boekt.
+
+| as | de vraag | wat het doet met de volgorde |
+|---|---|---|
+| **blokkade** | houdt dit iets anders tegen? | een blokkade gaat voor, ook als hij klein is |
+| **bewijswinst** | hoeveel matrixcellen krijgen hier echte instrumentatie van? | telt in cellen, niet in gevoel |
+| **risico** | wat kost het als dit misgaat — geld, toegang, onomkeerbaar? | geld en toegang wegen zwaarder dan comfort |
+| **kosten** | hoeveel werk, en hoeveel nieuwe ontwerpbeslissingen? | een regel zonder nieuwe beslissing is goedkoop |
+
+**De as die er het meest toe doet is bewijswinst, met één voorwaarde erbij:
+zonder de betekenis van "gemeten" te verwateren.** Een kolom vullen met een meter
+die overal groen zegt is negatieve vooruitgang — dan staat er een getal waar
+niemand meer achter kijkt. De AUDIT-kolom is daar het levende voorbeeld: hij is
+met één regel te vullen (`doorgeefjournaal` groeit bij élk verzoek, dus "er
+blijft een spoor achter" is overal waar), en juist daarom is dat niet gedaan.
+
+**En de as die er NIET bij hoort: go-live.** `LAT.md` regel 11 — bewijsgroen is
+geen go-live-groen. De acht regels in §1 blokkeren de lancering en staan los van
+hoe groen de code is; ze horen niet mee te wegen in de technische volgorde, en de
+technische volgorde hoort ze niet weg te drukken.
+
+### De eerstvolgende vijf, in deze volgorde
+
+| # | wat | blokkade | bewijswinst | risico | kosten |
+|---|---|---|---|---|---|
+| 4.30 | idem-sleutels op de routes die een herhaling twee keer uitvoeren | nee | ~100 cellen | **hoog** — geld, toegang, onomkeerbaar | midden, per route een besluit |
+| — | de staatproef sneller maken (incrementele vingerafdruk) | **ja**, elke volgende ronde hangt eraan | indirect: haalt de rest van de 598 ongemeten routes binnen | laag | midden |
+| — | OUTPUT-kolom: de liegpoort per route in plaats van per toetsbestand | nee | **~3.900 cellen** | laag | hoog, nieuw instrument |
+| — | AUDIT-kolom, maar dan eerlijk | nee | onbekend, waarschijnlijk klein | midden | hoog, vraagt eerst een definitie van "onwisbaar" |
+| 4.3 | `endpointsZonderTest` als ratel houden en niet als boodschappenlijst | nee | geen | laag | nul, staat er al |
+
+Alles wat hieronder staat en niet in dit tabelletje: **nog niet gerangschikt**.
+Dat is met opzet — een volgorde die je niet hebt gemaakt is geen volgorde, en
+zesentachtig regels doen alsof is erger dan er vijf noemen.
+
+---
+
 ## 1. Blokkerend voor go-live
 
 Deze acht komen uit `npm run golive`, de eigen keuring van dit huis. Zolang

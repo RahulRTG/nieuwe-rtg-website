@@ -131,7 +131,15 @@ function zonderRuis(d, ruis) {
 async function draaiStaatproef({ post, vingerafdruk, routes, tokenVoor, lijfVoor, hernieuw, verschilVan, ruis, maxRoutes }) {
   const perRoute = {};
   const tel = { state: 0, sideEffect: 0, rollback: 0, rollbackGezakt: 0, idemBewezen: 0, idemGezakt: 0, ongemeten: 0 };
-  let oproepen = 0, hernieuwd = 0;
+  let oproepen = 0, hernieuwd = 0, afdrukken = 0;
+  /* DE LAATSTE AFDRUK VAN EEN ROUTE IS DE EERSTE VAN DE VOLGENDE. Tussen F2 van
+     route N en F0 van route N+1 gebeurt er niets, dus die twee zijn per definitie
+     gelijk -- hem twee keer opvragen is een derde van het werk weggooien. En het
+     werk is niet niks: een vingerafdruk hasht de hele opslag (~190 ms op 63.000
+     rijen). Dit is de enige besparing die GEEN aanname doet; alles wat slimmer
+     wil zijn (alleen hashen wat van lengte veranderde) laat precies de
+     wijziging-op-zijn-plaats vallen, en dat is waar geld in zit. */
+  let vorige = null;
 
   for (const r of routes) {
     if (maxRoutes && Object.keys(perRoute).length >= maxRoutes) break;
@@ -147,14 +155,16 @@ async function draaiStaatproef({ post, vingerafdruk, routes, tokenVoor, lijfVoor
       return st;
     };
 
-    const f0 = await vingerafdruk();
+    const f0 = vorige || await (async () => { afdrukken++; return vingerafdruk(); })();
     const a = await doe();
-    const f1 = await vingerafdruk();
+    const f1 = await vingerafdruk(); afdrukken++;
     const b = await doe();
-    const f2 = await vingerafdruk();
+    const f2 = await vingerafdruk(); afdrukken++;
+    vorige = f2;
     /* Zonder vingerafdrukken valt er niets te oordelen -- dan is de MEETOPSTELLING
        stuk en niet de route. Dat verschil hoort in het register te staan. */
     if (!f0 || !f1 || !f2) {
+      vorige = null;
       perRoute[r.method + ' ' + r.pad] = { methode: r.method, pad: r.pad, rol: r.rol,
         state: 'ongemeten', sideEffect: 'ongemeten', rollback: 'ongemeten', idempotentie: 'ongemeten',
         reden: 'de vingerafdruk kwam niet terug' };
@@ -183,7 +193,7 @@ async function draaiStaatproef({ post, vingerafdruk, routes, tokenVoor, lijfVoor
     ? 'geen enkele route bewoog de vingerafdruk; deze ronde kan niets over de toestand zeggen'
     : null;
 
-  return { perRoute, telling: tel, oproepen, hernieuwd, meterStuk, ruis: [...(ruis || [])] };
+  return { perRoute, telling: tel, oproepen, afdrukken, hernieuwd, meterStuk, ruis: [...(ruis || [])] };
 }
 
 const CONTROL = {

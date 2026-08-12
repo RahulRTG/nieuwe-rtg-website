@@ -3061,5 +3061,60 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
   }
 }
 
+/* ============================================================================
+   48) BEWIJSGROEN EN GO-LIVE-GROEN KUNNEN ELKAAR NIET GROEN PRATEN
+
+   LAT.md regel 11. Twee soorten groen die niets met elkaar te maken hebben:
+   bewijsgroen zegt dat iemand heeft gekeken, go-live-groen zegt dat dit huis de
+   deur open mag. Je kunt honderd procent bewijsdekking hebben en juridisch nog
+   steeds niet mogen lanceren -- en andersom.
+
+   Deze regel houdt de twee kanten STRUCTUREEL uit elkaar, want een afspraak
+   houdt dit niet tegen. Zodra de go-live-keuring een bewijsregister zou lezen,
+   kan een verdubbelde matrix een ontbrekende secrets manager wegdrukken, en dat
+   is precies de fout die niemand terugvindt. Andersom net zo: een
+   bewijsinstrument dat "klaar voor productie" roept, spreekt over iets waar hij
+   niets van weet.
+
+   Wat hij NIET kan: de mens tegenhouden die de twee naast elkaar legt en
+   optelt. Daarvoor staat regel 11 in LAT.md. */
+console.log('\n48) bewijsgroen en go-live-groen blijven uit elkaar');
+{
+  const REGISTERS = ['BEWIJSMATRIX.json', 'CONTROLS.json', 'ROLPROEF.json', 'KETENS.json',
+    'STAATPROEF.json', 'INVOERPROEF.json', 'IDEMPROEF.json', 'POORTWACHT.json',
+    'DUURZAAMHEIDSKOSTEN.json', 'VERRAAD.json', 'SCHERMLEUGEN.json'];
+  const BEWIJSSCRIPTS = ['scripts/bewijsmatrix.js', 'scripts/controls.js', 'scripts/rolproef-route.js',
+    'scripts/invoerproef-route.js', 'scripts/idemproef-route.js', 'scripts/staatproef-route.js',
+    'scripts/ketenronde.js', 'scripts/duurzaamheidskosten.js'];
+  const GOLIVE_SCRIPTS = ['scripts/golive.js', 'scripts/papierwerk.js'];
+  const klachten = [];
+
+  // 1) de go-live-keuring leest geen enkel bewijsregister
+  for (const rel of GOLIVE_SCRIPTS) {
+    const f = path.join(ROOT, rel);
+    if (!fs.existsSync(f)) continue;
+    const bron = fs.readFileSync(f, 'utf8');
+    for (const reg of REGISTERS) if (bron.includes(reg)) klachten.push(rel + ' leest ' + reg);
+  }
+
+  // 2) een bewijsinstrument velt geen go-live-oordeel
+  const OORDEEL = /klaar voor (de )?productie|mag live|kan live|go-?live-?groen|golive\(/i;
+  for (const rel of BEWIJSSCRIPTS) {
+    const f = path.join(ROOT, rel);
+    if (!fs.existsSync(f)) continue;
+    for (const regel of fs.readFileSync(f, 'utf8').split('\n')) {
+      if (OORDEEL.test(regel)) klachten.push(rel + ': ' + regel.trim().slice(0, 70));
+    }
+  }
+
+  if (klachten.length) {
+    fout('bewijs en go-live raken elkaar: ' + klachten.join(' | ') +
+      ' -- LAT.md regel 11: bewijsgroen is geen go-live-groen');
+  } else {
+    ok(REGISTERS.length + ' bewijsregisters en ' + BEWIJSSCRIPTS.length + ' bewijsinstrumenten: ' +
+      'de go-live-keuring leest er geen, en ze vellen geen go-live-oordeel');
+  }
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

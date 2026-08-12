@@ -127,22 +127,6 @@ async function wacht(basis, ms) {
      eerste ronde negentien loze 'geweigerd en toch veranderd' op rij.
      Empirisch en niet met de hand: een geschreven lijst loopt achter zodra er
      een journaal bijkomt, en dan komen de valse bevindingen terug. */
-  const RONDES = 4;
-  const geteld = new Map();
-  for (let i = 0; i < RONDES; i++) {
-    const v0 = await vingerafdruk();
-    await post('/api/notities/mijn', {}, tokens.member);   // een LEESroute
-    const v1 = await vingerafdruk();
-    for (const c of (await verschilVan(v0, v1)).collecties || []) geteld.set(c, (geteld.get(c) || 0) + 1);
-  }
-  /* RUIS IS WAT IN ELKE RONDE BEWEEGT, niet wat er een keer bewoog. Dat
-     onderscheid is het hele punt: een journaal schrijft bij ELK verzoek, terwijl
-     een collectie die zich bij eerste gebruik inricht dat precies EEN keer doet.
-     Alles wegfilteren wat ooit bewoog, zou hele collecties blind maken -- de
-     eerste versie deed dat, en zette `notities` buiten spel. */
-  const ruis = new Set([...geteld].filter(([, n]) => n === RONDES).map(([c]) => c));
-  const eenmalig = [...geteld].filter(([, n]) => n < RONDES).map(([c]) => c);
-
   const routes = alleRoutes()
     .filter(r => r.pad.startsWith('/api/') && r.methode !== 'GET')
     .filter(r => !isSchakel(r.pad))
@@ -152,6 +136,37 @@ async function wacht(basis, ms) {
     .filter(r => !r.pad.startsWith('/api/techniek/vingerafdruk'))
     .map(r => ({ method: r.methode, pad: r.pad, rol: rolVan(r.bewakers) }))
     .filter(r => r.rol);
+
+  const ruwRoutes = routes;
+
+  const RONDES = 4;
+  const geteld = new Map();
+  const ijk = async (doe) => {
+    for (let i = 0; i < RONDES; i++) {
+      const v0 = await vingerafdruk();
+      await doe();
+      const v1 = await vingerafdruk();
+      for (const c of (await verschilVan(v0, v1)).collecties || []) geteld.set(c, (geteld.get(c) || 0) + 1);
+    }
+  };
+  /* TWEE IJKINGEN, EN DE TWEEDE IS ER BIJ GEKOMEN NA EEN RONDE MET ZES VALSE
+     BEVINDINGEN. Een GESLAAGD verzoek beweegt andere journalen dan een GEWEIGERD:
+     bij een 401 schrijft het huis `securityLog` en `sessions` -- het noteert dat
+     iemand met een dood token klopte. Dat is correct gedrag en geen lek, maar de
+     eerste ijking zag het niet omdat die met een geldig token las.
+     Dus ijken we allebei de kanten op: een geslaagde leesroute en een geweigerd
+     verzoek. Wat in ELKE ronde van een van beide beweegt, is ruis. */
+  await ijk(() => post('/api/notities/mijn', {}, tokens.member));          // geslaagd
+  /* EN DE WEIGERING OP EEN STEEKPROEF UIT DE ECHTE ROUTELIJST. Eerst stond hier
+     een vaste route, en dat was te smal: elke auth-laag weigert op zijn eigen
+     manier. De RTFoundation-laag schrijft bij een 401 in securityLog en sessions,
+     de gewone ledenpoort niet -- en dus meldde de ronde zeven keer 'geweigerd en
+     toch veranderd' over een huis dat opschreef dat er was geklopt. De steekproef
+     raakt elke poort die er is, zonder dat er ergens een lijst met namen komt. */
+  const steek = ruwRoutes.filter((_, i) => i % 120 === 0).slice(0, 30);
+  for (const r of steek) await ijk(() => post(r.pad, {}, 'dit-token-bestaat-niet'));
+  const ruis = new Set([...geteld].filter(([, n]) => n >= RONDES).map(([c]) => c));
+  const eenmalig = [...geteld].filter(([, n]) => n < RONDES).map(([c]) => c);
 
   console.log('\n=== DE TOESTAND PER ROUTE ===\n');
   console.log('  routes met een herkenbare rol        : ' + routes.length);

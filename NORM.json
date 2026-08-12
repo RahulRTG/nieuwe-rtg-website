@@ -27,9 +27,15 @@
     "kernOngebruikt": 0,
     "toetsenNietGemeten": 205,
     "toetsenOngevoeligPct": 2.3,
-    "wettenZonderBewijs": 5
+    "wettenZonderBewijs": 6
   },
   "notities": [
+    {
+      "datum": "2026-08-12",
+      "meter": "wettenZonderBewijs 5 -> 6",
+      "reden": "RTG-041 erbij, als OPEN: een proces dat halverwege een boeking sterft mag geen halve waarheid op schijf achterlaten. De teller gaat hierdoor omhoog en dat is met opzet -- een nieuwe wet zonder bewijs HOORT zichtbaar te zijn in plaats van pas te verschijnen als hij af is.",
+      "eerlijkheidshalve": "Deze wet legt een gat vast dat al bestond. Het venster tussen de geld-flush en de idem-flush is met de hand gevonden (kill -9, een echte dubbele boeking van 137 centen), gerepareerd met bijeen() en uitvoerig beschreven in de kop van server/lib/idem.js -- maar geen enkele toets raakt bijeen(), en geen enkele toets kilt een server om daarna met dezelfde idem-sleutel te hertesten. Gevonden, gerepareerd, beschreven, en daarna nooit vastgehouden. Precies de vorm waar LAT.md regel 6 voor waarschuwt."
+    },
     {
       "datum": "2026-08-12",
       "meter": "wettenZonderBewijs 11 -> 5",

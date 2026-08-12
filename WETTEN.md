@@ -15,7 +15,7 @@ een bewering met een adres kan zakken.
 |---|---|---|
 | **BEWEZEN** | 36 | handhaver bestaat, toets bestaat, en die toets is zien zakken op een mutatie |
 | **ONBEPROEFD** | 1 | er kijkt iemand naar, maar die kijker is nooit op de proef gesteld |
-| **OPEN** | 4 | opgeschreven zonder handhaver of zonder toets: een voornemen, geen bescherming |
+| **OPEN** | 5 | opgeschreven zonder handhaver of zonder toets: een voornemen, geen bescherming |
 | **GEBROKEN** | 0 | wijst naar iets dat er niet meer is -- de enige alarmerende stand |
 
 `BEWEZEN` zegt: deze wet heeft grond onder zijn voeten, en wie de grond weghaalt merkt
@@ -502,6 +502,16 @@ Idempotentie op de betaallaag is niet hetzelfde als idempotentie op het geld, en
 `OPEN` · geen handhaver benoemd
 
 Staat hier alleen tijdens test/meterijk.test.js.
+
+### RTG-041 -- Een proces dat halverwege een boeking sterft, laat geen halve waarheid op schijf achter
+
+`OPEN` · geen toets benoemd
+
+De kop van server/lib/idem.js beschrijft het venster precies: zonder save-bundel staat er tussen de geld-flush (in het werk) en de idem-flush (in de idem-laag) een toestand op schijf waarin de BOEKING bestaat en de SLEUTEL niet. Een kill precies daar, plus de retry waar idem-sleutels nu juist voor bestaan, boekt dubbel. Dat is geen theorie: het is zo gevonden, met een echte dubbele boeking van 137 centen, en gerepareerd met bijeen() in server/db/index.js -- een AsyncLocalStorage die de saves van het werk en van de idem-registratie tot EEN commit bundelt. OPEN, EN DAT IS GEMETEN: geen enkele toets raakt bijeen(), en geen enkele toets kilt een server om daarna met dezelfde idem-sleutel opnieuw te proberen. test/sloophamer.pg.test.js komt het dichtst in de buurt met een betaalrace (twee gelijktijdige betalingen geven 200 en 409), maar dat is gelijktijdigheid en geen crash tussen twee flushes, en hij draait alleen met Postgres. De bug is dus gevonden, gerepareerd en beschreven -- en daarna nooit vastgehouden. Wat hier moet: een toets die de server tijdens een boeking hard afbreekt, herstart, met dezelfde sleutel opnieuw probeert, en eist dat er precies een boeking staat en dat de sluitcontrole klopt.
+
+*Handhaver:* `server/db/index.js`, `server/lib/idem.js`
+
+*Breek hem zo:* OPEN: er is geen toets die een proces midden in een boeking kilt en daarna de retry meet
 
 ## Hoe je dit bestand bijwerkt
 

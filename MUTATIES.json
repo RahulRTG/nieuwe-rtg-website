@@ -507,6 +507,10 @@
       "gezakt": 3,
       "scherp": "gezakt"
     },
+    "bijeen.test.js": {
+      "soort": "puur",
+      "staat": "geen module gevonden"
+    },
     "bijles.test.js": {
       "soort": "server",
       "staat": "gezakt",

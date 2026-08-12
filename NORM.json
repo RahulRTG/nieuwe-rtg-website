@@ -27,9 +27,15 @@
     "kernOngebruikt": 0,
     "toetsenNietGemeten": 205,
     "toetsenOngevoeligPct": 2.3,
-    "wettenZonderBewijs": 6
+    "wettenZonderBewijs": 5
   },
   "notities": [
+    {
+      "datum": "2026-08-12",
+      "meter": "wettenZonderBewijs 6 -> 5",
+      "reden": "RTG-041 van OPEN naar BEWEZEN. test/bijeen.test.js houdt de reparatie van de 137 centen nu vast: binnen de save-bundel worden N saves een flush, buiten de bundel flusht elke save meteen, een save die NA de bundel binnenkomt flusht echt, en beide geldlagen die metIdem gebruiken geven bijeen ook werkelijk mee. Drieentwintig wetten dragen nu een uitvoerbare sabotage, alle drieentwintig BEWEZEN.",
+      "eerlijkheidshalve": "Weer weerlegde een mutatie mijn eigen kopregel. Ik had opgeschreven dat het niet sluiten van de doos voor de flush een van de eerste drie toetsen rood zou maken; dat gebeurde niet. Die bescherming dekt een geval dat geen van die toetsen raakte -- een timer die BINNEN de bundel wordt gezet en pas erna opslaat, en die zonder doos.open=false alleen een vlag zet op een doos waar niemand meer naar kijkt. Stil verlies dus. Er is een vierde toets voor geschreven; nu zakt die mutatie wel. En wat deze toets NIET is: een crashproef. De echte proef -- server hard afbreken tijdens een boeking, herstarten, dezelfde sleutel opnieuw -- vraagt een variabel kill-moment en staat nog open in RTG-041 zelf."
+    },
     {
       "datum": "2026-08-12",
       "meter": "wettenZonderBewijs 5 -> 6",

@@ -88,6 +88,10 @@
     "RTG-040": {
       "stand": "BEWEZEN",
       "uitleg": "server/opzet/lijfpoort.js:       b.idem = canon; ->       // sabotage: canonisatie uit maakt grootboek-idem.test.js rood"
+    },
+    "RTG-041": {
+      "stand": "BEWEZEN",
+      "uitleg": "server/kern/pay/index.js:   const metIdem = require('../../lib/idem')({ d, save, naam: 'payIdem', bijeen }); ->   const metIdem = require('../../lib/idem')({ d, save, naam: 'payIdem' }); maakt bijeen.test.js rood"
     }
   }
 }

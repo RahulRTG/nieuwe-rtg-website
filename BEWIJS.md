@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 932 bestanden en 6011 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 933 bestanden en 6016 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,12 +12,12 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 932 |
-| losse beweringen (`test(...)`) | 6011 |
+| toetsbestanden | 933 |
+| losse beweringen (`test(...)`) | 6016 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 6 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 626 |
 | **overleefd**: geen mutatie kreeg hem rood | 14 |
-| niet te meten (al rood, geen module gevonden, ...) | 18 |
+| niet te meten (al rood, geen module gevonden, ...) | 19 |
 | alleen in de kop *genoemd*, nog niet gemeten | 86 |
 | niets van beide | 188 |
 
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-812 bestanden, 5796 beweringen.
+813 bestanden, 5801 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -116,6 +116,7 @@ toets omvalt.
 | `bezorgketen.test.js` | 4 | gezakt op `liegpoort /api/` | De bezorg-keten sluit: de inpakker vinkt alles af op de juiste tas en het juiste bonnummer, de bezorger vinkt af dat hij alles gepakt heeft, pas dan mag de rit vertrekken; de beste route kent voertuigkeuze en de... |
 | `bezorgvolgen.test.js` | 7 | gezakt op `liegpoort /api/` | HET VOLGSCHERM VAN DE KLANT -- waar is mijn bestelling, en hoe lang nog? WAAROM DIT ER IS Tussen "betaald" en "onderweg" zit de keuken, en dat is precies de tijd waarin iemand zich afvraagt of zijn bestelling wel is... |
 | `bibliotheek.test.js` | 3 | gezakt op `liegpoort /api/` | De echte RTG Bibliotheek: de RTF-afdeling in de Mall (open voor iedereen, ook de gast) en de bibliothecaris die in beide werelden alleen echte apps aanraadt. Draai los: node --experimental-sqlite --test... |
+| `bijeen.test.js` | 5 | geen module gevonden | DE SAVE-BUNDEL: WAT BIJ ELKAAR HOORT, LANDT IN EEN COMMIT. Wet RTG-041. |
 | `bijles.test.js` | 2 | gezakt op `liegpoort /api/` | Rahul Bijles: iedereen een eigen, geduldige bijles-AI die op niveau werkt en positief laat leren. Twee werelden, een motor: het RTG-lid (niveau uit het leerpaspoort) en het schoolkind (niveau uit de klas, doelen uit... |
 | `blindevlek.test.js` | 9 | gezakt op `!==->===#0` | DE BLINDE VLEK. Dit bestand toetst geen functie. |
 | `boardroom-poort.test.js` | 7 | gezakt op `liegpoort /api/` | De boardroom-poort: de boardroom is de kamer van de eigenaar (Rahul Imran Ismail). De anonieme kantoorcode heeft geen identiteit en komt er nooit in; de eigenaar komt binnen met zijn eigen account (direct, of als... |

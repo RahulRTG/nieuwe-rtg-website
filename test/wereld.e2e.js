@@ -40,7 +40,7 @@ async function api(base, pad, body) {
 /* Een echt lid: zonder inlog bouwt het beginscherm geen mappen, en dan heeft de
    ring niets om te tonen en meet deze toets niets. `stand` bepaalt wat er in
    localStorage staat -- null betekent bewust NIETS, om de standaard te meten. */
-async function metLid(stand, fn) {
+async function metLid(stand, fn, ritmeOpzet) {
   const TMP = fs.mkdtempSync(path.join(os.tmpdir(), 'rtg-wereld-'));
   const { child, base } = await startServer({ env: { SMTP_URL: '', RTG_DATA_DIR: TMP } });
   let browser;
@@ -51,14 +51,19 @@ async function metLid(stand, fn) {
     assert.ok(reg.token, 'lid-registratie geeft een token');
     browser = await pw.chromium.launch({ args: ['--no-sandbox'] });
     const ctx = await browser.newContext({ viewport: { width: 393, height: 852 } });
-    await ctx.addInitScript(([t, s]) => {
+    await ctx.addInitScript(([t, s, r]) => {
       try {
         localStorage.setItem('rtg_member_token', t);
         localStorage.setItem('rtg_lang', 'nl');
         localStorage.setItem('rtg_cookieinfo_v1', '1');
         if (s) localStorage.setItem('rtg_os_wereld', s);
+        /* Een ritme voorwenden gebeurt HIER, in localStorage, en nergens anders.
+           Dat is zelf het bewijs van de belangrijkste belofte: de server weet
+           hier niets van. Zou het ritme van de server komen, dan kon deze toets
+           het niet zo zetten. */
+        if (r) localStorage.setItem('rtg_os_ritme_rtg', JSON.stringify(r));
       } catch (e) {}
-    }, [reg.token, stand]);
+    }, [reg.token, stand, ritmeOpzet]);
     const page = await ctx.newPage();
     await page.goto(base + '/apps/app.html', { waitUntil: 'domcontentloaded' });
     await page.waitForFunction(() => window.RTGWereld && RTGWereld.stand().merken > 0, null, { timeout: 20000 });
@@ -440,6 +445,88 @@ test('de momenten van vandaag staan op de wijzerplaat, en de klok wordt dat mome
     assert.equal(await page.evaluate(() => RTGWereld.stand().moment), false,
       'Escape hoort je terug te brengen naar de klok');
   });
+});
+
+test('Rahul kent je ritme, en houdt het op het toestel',
+  { skip: overslaan }, async () => {
+  /* "Normaal open je om deze tijd RTG Kantoor." De mooiste zin uit het ontwerp
+     en de gevaarlijkste, want er zit gedrag van een mens onder. Deze toets meet
+     de grenzen en niet alleen of de zin verschijnt:
+
+     - Het ritme komt van het TOESTEL. Deze toets zet het in localStorage en
+       nergens anders; verschijnt de zin dan toch, dan is dat het bewijs dat er
+       geen serverkant aan zit. Zou iemand dit ooit naar de server verhuizen,
+       dan zakt deze toets -- en dat is precies de bedoeling.
+     - Tikken ZET KLAAR en opent niet. Het verschil is de hele afspraak: hij
+       draait de bezel naar die wereld, jij besluit. Meteen openen zou van een
+       aanbod een handeling maken die je niet gedaan hebt.
+     - Weggetikt is weg. Geen tweede kans dezelfde dag, want dat is zeuren.
+
+     DE MUTATIE: laat ritmeVolg() de wereld openen in plaats van ernaartoe te
+     draaien (api.openUrl in plaats van naar()). De meting op de URL zakt dan. */
+  const uur = new Date().getHours();
+  const opzet = {};
+  opzet['map-werk|' + uur] = { n: 5, t: Date.now() };
+  opzet['map-media|' + uur] = { n: 1, t: Date.now() };
+
+  await metLid('aan', async ({ page }) => {
+    const pad = page.url();
+    await page.waitForFunction(() => {
+      const r = document.getElementById('osWereldRahul');
+      return r && r.getAttribute('data-soort') === 'ritme' && r.getAttribute('data-toon') === 'ja';
+    }, null, { timeout: 20000 });
+
+    const ring = await page.evaluate(() => ({
+      tekst: document.querySelector('#osWereldRahul span').textContent,
+      // en het staat echt alleen op dit toestel
+      lokaal: !!localStorage.getItem('rtg_os_ritme_rtg')
+    }));
+    assert.match(ring.tekst, /Normaal open je nu RTG Kantoor/,
+      'de ring hoort te zeggen wat je normaal op dit uur opent, kreeg: ' + ring.tekst);
+    assert.equal(ring.lokaal, true, 'het ritme hoort op het toestel te staan');
+    /* GEEN AANDACHTTREKKERIJ. Geen teller, geen badge, geen uitroepteken -- dat
+       is de grens uit CLAUDE.md, en die is aan de zin zelf af te lezen. */
+    assert.ok(!/\d+ (keer|dagen|x)|streak|al \d/.test(ring.tekst),
+      'de ring telt je gedrag terug naar je toe: ' + ring.tekst);
+
+    // tikken ZET KLAAR: de bezel draait erheen, en we blijven op het beginscherm
+    const na = await page.evaluate(async () => {
+      document.getElementById('osWereldRahul').click();
+      let vorige = null, zelfde = 0;
+      for (let i = 0; i < 150 && zelfde < 4; i++) {
+        await new Promise((k) => setTimeout(k, 60));
+        const nu = RTGWereld.stand().actief;
+        if (nu === vorige) zelfde++; else { vorige = nu; zelfde = 0; }
+      }
+      return { naam: RTGWereld.stand().naam, url: location.href,
+        toon: document.getElementById('osWereldRahul').getAttribute('data-toon') };
+    });
+    assert.equal(na.url, pad, 'het ritme hoort klaar te ZETTEN, niet te openen; je belandde op ' + na.url);
+    assert.equal(na.naam, 'RTG Kantoor', 'de bezel hoort naar die wereld te draaien, staat op ' + na.naam);
+    assert.equal(na.toon, 'nee', 'na de tik hoort de ring te wijken');
+  }, opzet);
+});
+
+test('zonder patroon zegt Rahul niets over je ritme',
+  { skip: overslaan }, async () => {
+  /* Liever stil dan een gok die als inzicht klinkt. Een keer iets openen is geen
+     gewoonte, en een koploper die nauwelijks voorloopt is een muntworp.
+
+     DE MUTATIE: haal de drempel weg in app-main-25b.js (RITME_DREMPEL op 0, of
+     de 1.5-vergelijking eruit). Dan verschijnt hier alsnog een zin, en zakt deze
+     toets -- terecht, want dan vertelt hij een lid iets over zichzelf op grond
+     van twee keer klikken. */
+  const uur = new Date().getHours();
+  const zwak = {};
+  zwak['map-werk|' + uur] = { n: 2, t: Date.now() };      // onder de drempel
+  zwak['map-media|' + uur] = { n: 1.8, t: Date.now() };   // en geen duidelijke koploper
+
+  await metLid('aan', async ({ page }) => {
+    await page.waitForTimeout(3500);
+    const soort = await page.evaluate(() => document.getElementById('osWereldRahul').getAttribute('data-soort'));
+    assert.notEqual(soort, 'ritme',
+      'hij doet een uitspraak over je ritme terwijl er geen patroon is');
+  }, zwak);
 });
 
 test('de levende grond tekent werkelijk iets', { skip: overslaan }, async () => {

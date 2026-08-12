@@ -98,6 +98,25 @@
     // en nog eens als je terugkomt: een dag verandert terwijl je weg bent
     document.addEventListener('visibilitychange', function () { if (!document.hidden) momentenBij(); });
 
+    /* ---------- wat je normaal op dit uur opent ----------
+       ritmeNu() (app-main-25b.js) leest de lokale telling en geeft alleen een
+       wereld terug als het ECHT een patroon is. Geeft hij niets, dan zegt Rahul
+       niets -- en dat is de normale uitkomst voor een lid dat hier net is.
+
+       De naam komt uit MAPPEN, net als overal: de ring krijgt een sleutel en een
+       naam en verzint er zelf niets bij. */
+    function ritmeBij() {
+      if (!window.RTGWereld || !RTGWereld.ritme) return;
+      var sleutel = ritmeNu();
+      if (!sleutel) { RTGWereld.ritme(null); return; }
+      var map = MAPPEN.filter(function (m) { return m.sleutel === sleutel; })[0];
+      if (!map || !map.wereld || !map.items.some(itemZichtbaar)) { RTGWereld.ritme(null); return; }
+      RTGWereld.ritme({ sleutel: map.sleutel, naam: mapNaam(map) });
+    }
+    ritmeBij();
+    // het uur verschuift terwijl de app openstaat; elk kwartier opnieuw kijken
+    setInterval(ritmeBij, 15 * 60 * 1000);
+
     /* De schakelaar in het bedieningspaneel. Hij zet niets zelf: hij vraagt de
        module om te wisselen en leest daarna terug wat de stand IS, zodat de
        knop niet kan gaan afwijken van het scherm. */

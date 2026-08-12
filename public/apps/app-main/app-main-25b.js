@@ -37,6 +37,45 @@
       localStorage.setItem('rtg_os_gebruik_' + pas, JSON.stringify(g));
     } catch (e) {}
   }
+  /* ---------- het ritme: WANNEER je iets opent ----------
+     De teller hierboven weet WAT je vaak opent; dit weet wanneer. Samen zijn ze
+     "normaal open je nu Kantoor". Zelfde principe als hierboven, en daarom
+     bewust dezelfde vorm: lokaal op het toestel, met verval per dag, zodat een
+     gewoonte die je loslaat vanzelf uitdooft in plaats van jaren mee te wegen.
+
+     ER GAAT NIETS NAAR DE SERVER. Niet je uren, niet je ritme, niets. Dat is
+     dezelfde afspraak als bij de codenamen: wat je niet verstuurt, kan ook niet
+     uitlekken.
+
+     De sleutel is wereld + uur. Uren zijn grof genoeg om een gewoonte te
+     vangen en te grof om een dag mee te reconstrueren -- dat is precies de
+     bedoeling. */
+  function ritmeLees() { try { return JSON.parse(localStorage.getItem('rtg_os_ritme_' + pas) || '{}'); } catch (e) { return {}; } }
+  function telRitme(sleutel) {
+    try {
+      const r = ritmeLees(), nu = Date.now(), k = sleutel + '|' + new Date().getHours();
+      const oud = r[k] || { n: 0, t: nu };
+      const dagen = Math.max(0, (nu - (oud.t || nu)) / 86400000);
+      r[k] = { n: (oud.n || 0) * Math.pow(0.85, dagen) + 1, t: nu };
+      localStorage.setItem('rtg_os_ritme_' + pas, JSON.stringify(r));
+    } catch (e) {}
+  }
+  /* Wat open je normaal OP DIT UUR? Alleen als het echt een patroon is:
+     minstens DREMPEL keer, en duidelijk vaker dan de nummer twee. Anders zwijgt
+     hij -- liever stil dan een gok die als inzicht klinkt. */
+  const RITME_DREMPEL = 3;
+  function ritmeNu() {
+    const r = ritmeLees(), nu = Date.now(), uur = new Date().getHours();
+    const scores = Object.entries(r)
+      .filter(([k]) => Number(k.split('|')[1]) === uur)
+      .map(([k, v]) => [k.split('|')[0], (v.n || 0) * Math.pow(0.85, Math.max(0, (nu - (v.t || nu)) / 86400000))])
+      .sort((a, b) => b[1] - a[1]);
+    if (!scores.length || scores[0][1] < RITME_DREMPEL) return null;
+    // een koploper die nauwelijks voorloopt is geen gewoonte maar een muntworp
+    if (scores[1] && scores[0][1] < scores[1][1] * 1.5) return null;
+    return scores[0][0];
+  }
+
   function topGebruik(k) {
     const g = gebruik(), nu = Date.now();
     return Object.entries(g)

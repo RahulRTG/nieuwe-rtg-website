@@ -43,6 +43,7 @@
       if (el.grond) el.grond.hidden = false;
       if (el.klok && el.klok.parentNode !== el.kring) el.kring.appendChild(el.klok);
       vulRing(); tekenMomenten(); toonNaam(); kernLabel(); grondKies(); grondMaat(); grondStart();
+      toonRitme();
     } else {
       wiel(false);
       grondStop();
@@ -170,6 +171,7 @@
     wiel: wiel,
     rahulZei: rahulZei,
     momenten: zetMomenten,
+    ritme: zetRitme,
     stand: stand
   };
 })(window);

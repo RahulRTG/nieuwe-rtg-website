@@ -75,8 +75,15 @@
     r.className = 'os-wereld-rahul';
     r.id = 'osWereldRahul';
     r.setAttribute('data-toon', 'nee');
+    r.setAttribute('data-soort', 'rahul');
     r.innerHTML = '<b aria-hidden="true"></b><span></span>';
+    /* De ring draagt twee soorten. Wat RAHUL zegt komt van de server en opent
+       het gesprek; wat het RITME zegt komt van dit toestel en draait de bezel
+       naar de wereld die je normaal nu opent. Een knop die er hetzelfde uitziet
+       en twee dingen doet, hoort dat aan een attribuut af te lezen en niet aan
+       de volgorde waarin hij toevallig gevuld is. */
     r.addEventListener('click', function () {
+      if (r.getAttribute('data-soort') === 'ritme') { ritmeVolg(); return; }
       r.setAttribute('data-toon', 'nee');
       draadOpen();
     });
@@ -85,12 +92,17 @@
     el.rahul = r;
   }
 
-  function rahulZei(tekst) {
+  function rahulZei(tekst, leeg) {
     if (!st.aan || !el.rahul || !tekst) return;
     // staat het gesprek al open, dan LEEST hij daar al mee; dan is de ring
     // erbij precies de dubbeling die hij hoort te voorkomen
     if (draadStaatOpen()) return;
+    /* Zegt hij dat er niets is, dan HEEFT hij niets -- en dan mag je gewoonte de
+       ring hebben. Zonder deze tak wint zijn beleefde niets-zin het altijd van
+       het ritme en zie je dat nooit. */
+    if (leeg === true && heeftRitme()) { toonRitme(); return; }
     el.rahul.querySelector('span').textContent = String(tekst);
+    el.rahul.setAttribute('data-soort', 'rahul');
     el.rahul.setAttribute('data-toon', 'ja');
   }
 

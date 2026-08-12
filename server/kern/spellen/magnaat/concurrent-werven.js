@@ -77,6 +77,19 @@ module.exports = ({ ACTIES }) => {
 
   /* VACATURES OPENZETTEN. Geeft terug wat er open ging, zodat het in het
      maandverslag van de AI staat en niet stil gebeurt. */
+  /* EERST VAN BINNEN KIJKEN. Zit er iemand die in deze trede kan doorgroeien,
+     dan hoort die trede geen VACATURE te worden -- dat is wat een werkgever in
+     het echt ook doet, en het is de reden dat een speeltest dertig maanden lang
+     dezelfde regel liet zien. Werven en promoveren vochten om dezelfde trede en
+     werven won, want een vacature blijft zes maanden staan en blokkeert
+     `ontbrekendeRol` zolang hij open is.
+
+     Geen enkele unittest zag dat: de scene-toets bewees dat promotie WERKT, en
+     dit ging over hoe vaak de gelegenheid zich voordoet. */
+  const kanDoorgroeien = (st, h, v, rol) => D.lopend(st).some(d =>
+    d.werkgever === h && d.vestiging === v.id && P.TRAP[rol] > P.TRAP[d.rol]
+    && (d.maanden || 0) >= NA_MAANDEN);
+
   function werven(potje, h) {
     const st = potje.staat;
     const uit = [];
@@ -90,6 +103,7 @@ module.exports = ({ ACTIES }) => {
       if (uit.length + open >= MAX_OPEN) break;
       const rol = ontbrekendeRol(st, v);
       if (!rol) continue;
+      if (kanDoorgroeien(st, h, v, rol)) continue;   // hij wordt van binnen ingevuld
       /* HET LOON IS DE BASIS VAN DE BAND en niet de bodem. Een AI die
          structureel het minimum biedt, maakt van elke sollicitatie een slechte
          deal en van de arbeidsmarkt een fopspeen. */

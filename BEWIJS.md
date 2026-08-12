@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 941 bestanden en 6361 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 941 bestanden en 6362 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -13,7 +13,7 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 | | Aantal |
 |---|---|
 | toetsbestanden | 941 |
-| losse beweringen (`test(...)`) | 6361 |
+| losse beweringen (`test(...)`) | 6362 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 614 |
 | **overleefd**: geen mutatie kreeg hem rood | 13 |
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-821 bestanden, 6146 beweringen.
+821 bestanden, 6147 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -690,7 +690,7 @@ toets omvalt.
 | `spelreplay.test.js` | 9 | gezakt op `return-weg#0` | Het verloop van een partij, voor de replay. De uitslagen zeggen WIE won; dit zegt HOE. |
 | `spelstad.test.js` | 16 | -- | DE STAD ONTHOUDT -- fase C: de Living World en de levende kaart. Uit hoofdstuk 10 en 11 van de visie: jullie bouwden een bibliotheek, de wijk werd veiliger, en "nieuwe spelers weten niet eens meer dat het ooit een... |
 | `spelstadskrant.test.js` | 13 | -- | MAGNAAT DAILY -- de stad van vandaag, en er valt niets te halen. Fase C, het laatste open stuk. |
-| `spelstart.test.js` | 13 | -- | DE ECHTE START -- je begint als mens, niet als ondernemer. VERHAAL.md par. |
+| `spelstart.test.js` | 14 | -- | DE ECHTE START -- je begint als mens, niet als ondernemer. VERHAAL.md par. |
 | `spelsudoku.test.js` | 20 | gezakt op `liegpoort /api/` | Sudoku: het eerste arcadespel waarvan de score NIET uit de client komt. Bij Sneek en Tetris rekent de browser de punten uit en stuurt een getal op; de server kan daar niets van narekenen en kapt hem alleen af op de... |
 | `spelteams.test.js` | 19 | gezakt op `liegpoort /api/` | Teams: een vaste club om mee te spelen. Iedereen mag er een maken. |
 | `speltelling.test.js` | 9 | gezakt op `liegpoort /api/` | Telemetrie van de spellen: geaggregeerd, zonder personen. Deze toets bewaakt vooral wat er NIET in mag staan. |

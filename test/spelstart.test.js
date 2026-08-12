@@ -206,3 +206,30 @@ test('zonder AI is er niemand die personeel zoekt, en dat is eerlijk zichtbaar',
   assert.equal(openVacatures(st).length, 0);
   assert.equal(st.startvorm, 'mens');
 });
+
+test('een werkgever vult van binnen in voordat hij buiten zoekt', () => {
+  /* DE SPEELTEST VOND DIT, EN GEEN ENKELE UNITTEST. Werven en promoveren
+     vochten om dezelfde trede en werven won: een vacature blijft zes maanden
+     staan en blokkeert `ontbrekendeRol` zolang hij open is. Gevolg: dertig
+     maanden lang dezelfde regel op het scherm en nooit een promotie.
+
+     De scene-toets bewees dat promotie WERKT; dit gaat over hoe vaak de
+     gelegenheid zich voordoet. Dat is een ander soort waarheid en hij komt uit
+     spelen, niet uit toetsen. */
+  const { st, maand } = wereld({ maanden: 8 });
+  const f = openVacatures(st)[0];
+  const vestiging = f.vestiging, werkgever = f.werkgever;
+  const m = maakMagnaat();
+  assert.ok(f);
+  /* Iemand neemt de hulprol; daarna hoort de trede erboven zijn kans te zijn. */
+  const kern = require('../server/kern/spellen/magnaat/dienst');
+  st.diensten.push({ id: 'dx', werkgever, werknemer: 'ik', vestiging, rol: 'hulp',
+    loon: f.loon, sinds: st.maand, maanden: W.NA_MAANDEN + 1, betaaldTotaal: 0, status: 'loopt' });
+  f.status = 'ingetrokken';
+  maand(2);
+  const buiten = kern.functies(st).filter(x => x.status === 'open'
+    && x.vestiging === vestiging && x.rol !== 'hulp');
+  const binnen = (st.promoties || []).filter(x => x.dienst === 'dx');
+  assert.ok(binnen.length > 0 || buiten.length === 0,
+    'hij adverteert geen trede waar zijn eigen mens in kan doorgroeien');
+});

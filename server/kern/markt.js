@@ -38,23 +38,11 @@ function maakMarkt({ db, save, crypto, anthropic, schoon, notify, notifySupplier
   // Interne, botsingvrije sleutel per partij (koper/verkoper/melder/blokkade).
   const pk = p => (p && p.soort ? p.soort + '|' + p.id : '');
 
-  /* ---------- veiligheid & respect: ingangscontrole ---------- */
-  function keurTekst(titel, beschrijving) {
-    const t = (titel + ' ' + beschrijving).toLowerCase();
-    for (const v of VERBODEN) if (v.rx.test(t)) return { ok: false, code: 'verboden', waarom: v.waarom };
-    if (RESPECTLOOS.test(t)) return { ok: false, code: 'respect' };
-    return { ok: true };
-  }
-  // Oplichting-signalen; geeft een lijst redenen en of de advertentie gemarkeerd moet.
-  function scanVeiligheid(ad) {
-    const tekst = (ad.titel + ' ' + ad.beschrijving);
-    const redenen = [];
-    if (SCAM_WOORDEN.test(tekst)) redenen.push('Er wordt om een betaling vooraf of buiten de app gevraagd. Betaal nooit vooruit aan iemand die je niet kent.');
-    if (CONTACT_BUITEN.test(ad.beschrijving)) redenen.push('Er staan contactgegevens of een link in de tekst. Houd het gesprek in de app; zo blijf je beschermd.');
-    const richt = (RICHTPRIJS[ad.categorie] || 20) * (STAAT_FACTOR[ad.staat] || 1);
-    if (ad.prijs > 0 && ad.prijs < richt * 0.2) redenen.push('De prijs is opvallend laag voor deze categorie. Een te mooi aanbod is vaak niet echt; kijk goed uit.');
-    return { gemarkeerd: redenen.length > 0, redenen };
-  }
+  /* De ingangscontrole staat in ./markt/ingang.js: wat er NIET in mag
+     (keurTekst, een nee) en waar een koper voor gewaarschuwd hoort te worden
+     (scanVeiligheid, geen nee maar een reden). Dat verschil is de reden dat
+     die twee bij elkaar staan en hier niet tussen het plaatsen door. */
+  const { keurTekst, scanVeiligheid } = require('./markt/ingang');
 
   /* ---------- publieke vorm van een advertentie ---------- */
   function pub(ad, kijker) {

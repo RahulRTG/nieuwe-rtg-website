@@ -548,7 +548,7 @@
         "server/kern/ssrf.js",
         "server/kern/schild.js",
         "server/accounts/tokens.js",
-        "server/betaal.js"
+        "server/sleutelvorm.js"
       ],
       "toetsen": [
         "canoniek.test.js",
@@ -558,7 +558,7 @@
       ],
       "sabotage": "laat metadataDoel weer zijn eigen normalisatie doen in plaats van canoniekHost, of haal de ::ffff-hexomzetting eruit",
       "sabotageProef": {
-        "bestand": "server/betaal.js",
+        "bestand": "server/sleutelvorm.js",
         "van": "  const k = String(waarde == null ? '' : waarde).normalize('NFC').trim();",
         "naar": "  const k = String(waarde == null ? '' : waarde);",
         "toets": [

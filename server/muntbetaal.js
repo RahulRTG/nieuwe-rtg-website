@@ -79,7 +79,7 @@ async function maakOntvangst(opdracht) {
 
   /* Zelfde canonieke vorm als in ./betaal.js, en uit dezelfde plek gehaald:
      twee kopieen van deze regel zouden vroeg of laat uiteenlopen (LAT.md regel 4). */
-  const kern = require('./betaal').canoniekeSleutel(idempotentieSleutel || referentie || crypto.randomUUID());
+  const kern = require('./sleutelvorm').canoniekeSleutel(idempotentieSleutel || referentie || crypto.randomUUID());
   if (!kern) throw new Error('Ongeldige idempotentiesleutel (leeg, te lang of met stuurtekens).');
   const sleutel = 'munt:' + kern;
   const bestaand = haalOp(sleutel);

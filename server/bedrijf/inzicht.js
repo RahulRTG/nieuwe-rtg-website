@@ -138,34 +138,12 @@ module.exports = (sctx) => {
     }));
   });
 
-  /* ---------- de samenhang: de vorm van het geheel ---------- */
-  app.post('/api/bedrijf/samenhang', (req, res) => {
-    const g = werkPoort(req, res); if (!g) return;
-    const { register, graaf, kwaliteit } = laagVoor(g);
-    const vorm = graaf.vorm();
-    const klein = vorm.knopen.filter(k => k.aantal > 0 && k.aantal < MEETGRENS).map(k => k.type);
-    res.json({ ok: true, vorm,
-      kwaliteit: kwaliteit.meet(),
-      nietGemeten: klein,
-      let: klein.length
-        ? 'Van ' + klein.join(', ') + ' zijn er te weinig rijen om een verwijzing te MOGEN meten. Die soorten staan daarom zonder randen in de kaart: niet gemeten, en dat is iets anders dan geen samenhang.'
-        : 'De randen zijn gemeten uit de gegevens. Een soort zonder randen staat in "losse" en dat is een uitslag, geen fout.',
-      soorten: zoeklaag.bereik(register) });
-  });
-
-  /* ---------- wandelen: wat ligt er twee stappen verderop ---------- */
-  app.post('/api/bedrijf/wandel', (req, res) => {
-    const g = werkPoort(req, res); if (!g) return;
-    const { graaf } = laagVoor(g);
-    const type = schoon(req.body.type, 30);
-    const id = schoon(req.body.id, 64);
-    if (!type || !id) return res.status(400).json({ error: 'Waarvandaan: geef een soort en een id.' });
-    const uit = graaf.wandel(type, id, req.body.diepte);
-    if (uit.error) return res.status(uit.status || 404).json({ error: uit.error });
-    res.json(Object.assign({ ok: true }, uit, {
-      let: 'De wandeling loopt alleen door soorten waar u recht op heeft. Een pad dat via een gesloten module loopt, is hier niet onzichtbaar afgesneden -- het bestaat in dit register niet.'
-    }));
-  });
+  /* De samenhang (de kaart) en het wandelen (wat ligt er twee stappen
+     verderop) staan in ./inzicht-graaf.js. Dit bestand gaat over zoeken en
+     over het dossier van EEN object; dat kijkt naar de verhoudingen tussen de
+     soorten -- en houdt vast dat niet-gemeten iets anders is dan geen
+     samenhang. */
+  require('./inzicht-graaf')(sctx);
 
   /* Deze laag geeft niets terug aan de gedeelde context. Dat is bewust: hij
      LEEST de soorten van de modules boven hem en heeft niets wat een andere

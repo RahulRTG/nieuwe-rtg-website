@@ -19,8 +19,8 @@ Een meetkast vertelt je of er iets stuk is, niet waar de dingen staan.
 | Wat | Aantal |
 |---|---|
 | API-endpoints | 3785 |
-| servermodules (`server/**/*.js`) | 2042 |
-| routebestanden (`server/routes/**`) | 422 |
+| servermodules (`server/**/*.js`) | 2045 |
+| routebestanden (`server/routes/**`) | 423 |
 | kernmodules (`server/kern/**`) | 1269 |
 | schermen (`public/**/*.html`) | 243 |
 | gedeelde browsermodules (`public/shared/*.js`) | 207 |
@@ -137,10 +137,10 @@ domein. Alle vijf getallen staan in `NORM.json` aan een ratel en mogen alleen za
 domein van buiten nodig heeft, en dus wat er zou moeten overblijven:
 
 ```
-app(162) auth(100) supplierAuth(51) db(34) officeAuth(32) status(27) liveCodename(25)
-accounts(19) schoon(19) managerOnly(15) codenaamVan(15) save(14) rtf(13) anthropic(13)
-crypto(11) tooManyTries(10) boardroomWie(9) express(9) gegevensStop(9) keyVanCodenaam(9)
-rtmail(9) geenGast(8) payrollOS(8) noteFailedTry(7) findSupplier(7) logActivity(7)
+app(163) auth(100) supplierAuth(51) db(34) officeAuth(33) status(27) liveCodename(25)
+accounts(20) schoon(20) managerOnly(15) codenaamVan(15) save(14) rtf(13) anthropic(13)
+crypto(11) tooManyTries(10) boardroomWie(9) express(9) gegevensStop(9) payrollOS(9)
+keyVanCodenaam(9) rtmail(9) geenGast(8) findSupplier(8) noteFailedTry(7) logActivity(7)
 sseToOffice(7) kern(6) stuur(6) talen(6) mail(5) loginFails(5) sseToSupplier(5)
 overheid(5) notifySupplier(5) sseToCustomer(5)
 ```

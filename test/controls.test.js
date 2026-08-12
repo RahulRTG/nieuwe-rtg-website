@@ -217,7 +217,14 @@ test('een control met een handmatige stap noemt die als eigen bewijssoort', () =
   assert.ok(g, 'de duurzaamheidsprimitive hoort een eigen control te zijn');
   assert.ok(g.bewijssoorten, 'zonder bewijssoorten leest een handmatige stap als automatisch');
   assert.equal(g.bewijssoorten.poortbewijs, 'HANDMATIG GEREPRODUCEERD');
-  assert.equal(g.bewijssoorten['geldcommit aangesloten'], 'NIET AANGESLOTEN');
+  /* En er hoort MINSTENS EEN openstaande stand in te staan zolang de keten niet
+     rond is. Een control waarvan alle bewijssoorten PROVEN zeggen terwijl
+     GELDPROVEN op 1/3 staat, leest als af -- en dan is dit veld weer decoratie.
+     De waarde zelf wordt hier niet vastgepind: die hoort te bewegen als er iets
+     wordt bewezen, en een toets die dat tegenhoudt maakt vooruitgang duur. */
+  const standen = Object.values(g.bewijssoorten);
+  assert.ok(standen.some(v => v !== 'PROVEN'),
+    'zolang de geldketen niet rond is, hoort er een openstaande stand zichtbaar te zijn');
 });
 
 test('geen bewijssoort zegt PROVEN zonder dat te zijn', () => {

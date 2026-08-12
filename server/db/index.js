@@ -243,9 +243,11 @@ function startSqliteSync() {
    met stand null -- niet stilzwijgend true. Een aanroeper die dat verschil
    negeert, bouwt precies de valse bevestiging waar dit voor is gemaakt.
 
-   HIJ IS NOG NERGENS AANGESLOTEN. De geldcommit eraan hangen is stap 2 van de
-   volgorde in GELDLAT.md, en die stap hoort pas na een gemeten
-   prestatievergelijking (p95/p99 en event-loop-effect, voor en na).
+   WIE ERAAN HANGT. De geldcommit (kern/pay via lib/idem) en het werk van een lid
+   (kern/notities via lib/duurzaam), allebei via de duurzame bundel hieronder en
+   allebei met een reden op de lijst van check.js regel 47. De reikwijdte staat in
+   GELDLAT.md; wat er nog niet aan hangt -- agenda, bestanden, berichten -- staat
+   daar ook, en de prestatiemeting van stap 6 is nog open.
    ========================================================================== */
 function saveDuurzaam() {
   if (!db.writable) return { duurzaam: false, stand: null, reden: 'de opslag staat niet open' };

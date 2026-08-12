@@ -109,6 +109,37 @@ lijst wordt langer, niet losser: elk nieuw pad noemt waarom een lid zijn werk
 niet mag kwijtraken. Wat er níét op komt, is even belangrijk — een cache die
 opnieuw te vullen is, hoort niet duurzaam bevestigd te worden.
 
+### Wat er inmiddels aan hangt
+
+```
+GELD        kern/pay -> lib/idem -> bijeen({duurzaam:true})     AANGESLOTEN
+NOTITIES    kern/notities -> lib/duurzaam -> bijeen(...)        AANGESLOTEN
+AGENDA      -                                                   OPEN
+BESTANDEN   -                                                   OPEN
+BERICHTEN   -                                                   OPEN
+```
+
+Twee dingen zijn bij het aansluiten van notities geleerd, en ze horen hier omdat
+ze voor de volgende drie net zo gelden.
+
+**De poort bewaakte de deur niet die iedereen gebruikt.** Regel 47 zocht op de
+naam `saveDuurzaam`, en niemand roept die naam aan — de weg erheen is
+`bijeen(fn, { duurzaam: true })`. Wie een route duurzaam maakte, kwam er dus
+ongezien langs. De regel kijkt nu naar het **bereik**: de naam, de bundelvlag en
+de gedeelde helper. Een poort die precies de gebruikte ingang niet bewaakt, is
+erger dan geen poort, want hij ziet eruit als dekking.
+
+**Niet alleen de gemeten knop.** De ketenronde meet `notities/bewaar`, maar een
+lid kan niet zien welke knop beschermd is. Afvinken, delen en weggooien zijn
+evengoed werk van een lid — een boodschap die weer aanstaat, een notitie die
+terugkomt nadat je hem hebt weggegooid. Alleen repareren wat er gemeten wordt, is
+het symptoom repareren (`LAT.md`, regel 1). De leeskant schrijft niets en gaat er
+dus niet doorheen; dat is de grens.
+
+De gedeelde helper staat in `server/lib/duurzaam.js` en niet in elke app apart:
+vier kopieën van dezelfde zes regels zijn vier plekken die een waarheid
+vasthouden, en de eerste die uit de pas loopt doet dat stil (`LAT.md`, regel 4).
+
 ## De volgorde van bouwen
 
 1. `saveDuurzaam()` als expliciete primitive. **Niet** stilletjes `save()`

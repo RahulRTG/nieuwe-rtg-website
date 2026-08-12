@@ -891,9 +891,11 @@ Object.assign(agenda, require('./kern/agenda-pro').maakAgendaPro({
   db, save, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer, boekingenVanKlant }));
 /* Notities & Taken (kern/notities.js): het bord met notities en lijstjes.
    Krijgt de agenda mee, want een notitie met datum en tijd wordt een
-   gekoppelde afspraak -- een wekkerlaag, niet drie. */
+   gekoppelde afspraak -- een wekkerlaag, niet drie.
+   En `bijeen`, want het bord legt DUURZAAM vast: werk van een lid mag niet
+   bevestigd worden voordat de opslag het heeft (GELDLAT.md). */
 const notities = require('./kern/notities').maakNotities({
-  db, save, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer }, agenda);
+  db, save, bijeen, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer }, agenda);
 /* RTG Bestanden (kern/bestanden.js): de kluis. Bytes versleuteld op schijf
    (zelfde aanpak als media.js), alleen verwijzingen in de database. */
 const bestanden = require('./kern/bestanden').maakBestanden({

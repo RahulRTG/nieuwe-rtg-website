@@ -2990,15 +2990,32 @@ console.log('\n46) de SLO-tabel in SLO.md is een afdruk van SLO.json');
 
    Elke regel in TOEGESTAAN noemt zijn reden. Staat er geen reden bij, dan hoort
    hij er niet -- dezelfde vorm als PUBLIEK in de poortwacht en MAG in de
-   klokschuld. */
+   klokschuld.
+
+   DRIE DEUREN, EN DE REGEL BEWAAKTE ER EERST MAAR EEN. Hij zocht op de NAAM
+   saveDuurzaam, en niemand roept die naam aan: de weg erheen is
+   `bijeen(fn, { duurzaam: true })`, en sinds notities is er ook de gedeelde
+   helper server/lib/duurzaam.js. Wie een route duurzaam maakte, kwam er dus
+   ongezien langs -- een poort die precies de gebruikte ingang niet bewaakte, en
+   dat is de stilste vorm die er is. Hij kijkt nu naar het BEREIK: de naam, de
+   vlag die een bundel duurzaam maakt, en de helper die beide verpakt. */
 console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestiging moet');
 {
   const TOEGESTAAN = new Map([
-    ['server/db/index.js', 'hier WOONT de primitive'],
+    ['server/db/index.js', 'hier WOONT de primitive, en bijeen() is de enige indirecte weg erheen'],
     ['scripts/check.js', 'deze regel zelf noemt zijn naam'],
     ['test/saveduurzaam.test.js', 'de toets die bewijst dat hij bevestigt'],
-    ['server/lib/verraad.js', 'de catalogus benoemt de plek waar sterf-na-commit zit; geen aanroep']
+    ['test/notitiesduurzaam.test.js', 'de toets die bewijst dat het bord niet bevestigt zonder opslag'],
+    ['server/lib/verraad.js', 'de catalogus benoemt de plek waar sterf-na-commit zit; geen aanroep'],
+    ['server/lib/idem.js', 'draagt de vlag door van de aanroeper naar de bundel; kiest zelf niets'],
+    ['server/lib/duurzaam.js', 'hier woont de gedeelde vastleg-helper voor werk van een lid'],
+    ['server/kern/pay/index.js', 'geld: bevestigen vóór duurzaamheid is een belofte die de opslag nog niet deed'],
+    ['server/kern/notities.js', 'werk van een lid: een bevestigde notitie mag niet verdwijnen bij een opslagfout']
   ]);
+  /* Het BEREIK van de primitive: de naam zelf, de vlag waarmee een bundel
+     duurzaam wordt, en de gedeelde helper. Zonder die laatste twee bewaakt deze
+     regel alleen zichzelf. */
+  const BEREIK = /saveDuurzaam|duurzaam\s*:\s*true|lib\/duurzaam/;
   const overtreders = [];
   let gezien = 0;
   const kijk = (map) => {
@@ -3012,7 +3029,7 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
       if (!naam.endsWith('.js')) continue;
       let bron; try { bron = fs.readFileSync(p, 'utf8'); } catch (e) { continue; }
       if (bron.includes('\u0000')) continue;
-      if (!/saveDuurzaam/.test(bron)) continue;
+      if (!BEREIK.test(bron)) continue;
       gezien++;
       const rel = path.relative(ROOT, p).replace(/\\/g, '/');
       if (!TOEGESTAAN.has(rel)) overtreders.push(rel);
@@ -3022,11 +3039,18 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
     const m = path.join(ROOT, map);
     if (fs.existsSync(m)) kijk(m);
   }
+  /* EEN LIJST DIE NAAR EEN VERDWENEN BESTAND WIJST, BEWAAKT DAAR NIETS MEER.
+     Zonder deze controle blijft een regel staan nadat het bestand is hernoemd,
+     en leest de lijst als dekking die er niet is. */
+  const spoken = [...TOEGESTAAN.keys()].filter(r => !fs.existsSync(path.join(ROOT, r)));
   if (overtreders.length) {
-    fout('saveDuurzaam() staat op een plek die er niet op de lijst staat: ' + overtreders.join(', ') +
+    fout('de duurzame commit wordt bereikt op een plek die er niet op de lijst staat: ' + overtreders.join(', ') +
       ' -- zet hem in TOEGESTAAN (met reden) of gebruik de gewone save()');
+  } else if (spoken.length) {
+    fout('de lijst noemt bestanden die niet meer bestaan: ' + spoken.join(', ') +
+      ' -- haal ze eruit, anders belooft de lijst dekking die er niet is');
   } else {
-    ok(gezien + ' bestanden noemen saveDuurzaam, allemaal met een reden op de lijst');
+    ok(gezien + ' bestanden komen aan de duurzame commit (naam of bundelvlag), allemaal met een reden op de lijst');
   }
 }
 

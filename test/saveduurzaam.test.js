@@ -10,9 +10,10 @@
    Dus twee soorten toets. Dat hij bevestigt wat hij belooft, en dat de poort
    die hem schaars houdt ook werkelijk dichtgaat.
 
-   HIJ IS NOG NERGENS AANGESLOTEN. De geldcommit eraan hangen is stap 2 van de
-   volgorde in GELDLAT.md, en die hoort pas na een gemeten prestatievergelijking.
-   Deze toets bewijst dus de primitive, niet de geldketen.
+   WAT DEZE TOETS WEL EN NIET BEWIJST. Alleen de primitive en de poort eromheen.
+   Dat de KETENS er goed op reageren is een andere vraag, en die wordt elders
+   gesteld: de geldketen in de ketenronde (KETENS.json), het bord van een lid in
+   test/notitiesduurzaam.test.js.
 
    Draai los: node --experimental-sqlite --test test/saveduurzaam.test.js */
 const test = require('node:test');
@@ -149,13 +150,12 @@ test('zonder dat verraad keert saveDuurzaam gewoon terug', () => {
    heeft: één bundel, één duurzame commit, geen moment waarop de een vaststaat
    en de ander niet.
 
-   DE GELDLAAG IS ER NOG NIET OP AANGESLOTEN, en dat is geen vergeetachtigheid.
-   De bedrading is geprobeerd en de geldtoetsen bleven groen, maar de ketenronde
-   liet zien dat de uitkomst NIET veranderde: onder `schrijf-verloren` kwam er
-   nog steeds een 200 uit. Waarom de worp uit de bundel de route niet bereikt,
-   is niet nagetrokken -- en een geldpad bedraden waarvan je niet kunt aantonen
-   dat het iets doet, is de valse zekerheid waar deze hele reeks over gaat.
-   Dus: de bundel is bewezen, de aansluiting staat open. Zie GELDLAT.md. */
+   DE GELDLAAG HANGT ER INMIDDELS AAN (kern/pay via lib/idem), en het bord van een
+   lid ook (kern/notities via lib/duurzaam). Dat de aansluiting werkelijk iets
+   DOET, staat niet hier maar waar het te meten is: de ketenronde voor geld, en
+   test/notitiesduurzaam.test.js voor het bord. Hier blijft de bundel zelf staan --
+   de eerste bedradingspoging liet immers zien dat een groene toets over een
+   bundel niets zegt over de route erboven. Zie GELDLAT.md. */
 
 test('een duurzame bundel gooit als de commit niet bevestigd kon worden', () => {
   /* Zonder deze worp meldt saveDuurzaam netjes dat het misging en gaat de

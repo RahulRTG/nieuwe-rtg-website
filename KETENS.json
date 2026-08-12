@@ -4,10 +4,10 @@
   "gemeten": {
     "ketens": 3,
     "scenarios": 9,
-    "voldoetAanLat": 3,
-    "rollbackBewezen": 1,
+    "voldoetAanLat": 4,
+    "rollbackBewezen": 2,
     "ledgerGebroken": 0,
-    "stilVerlies": 1,
+    "stilVerlies": 0,
     "geldScenarios": 3,
     "geldProven": 2,
     "blindeKetens": 0
@@ -241,29 +241,31 @@
       "verraad": "schrijf-verloren",
       "injectie": "JA",
       "zichtbaar": "JA",
-      "clientAntwoord": "OK",
+      "clientAntwoord": "FAIL",
       "toestandWijziging": "TERUGGEDRAAID",
       "ledgerInvariant": "ONGEMETEN",
       "audit": "AANWEZIG",
-      "retryVeilig": "NEE",
-      "rollback": "NVT",
+      "retryVeilig": "JA",
+      "rollback": "PROVEN",
       "herhaalbaar": "JA",
       "afwijkingen": [
-        "blijftNaHerstart: true -> false"
+        "blijftNaHerstart: true -> false",
+        "retryGafTweedeEffect: true -> false",
+        "schrijfStatus: 200 -> 503"
       ],
       "lat": {
         "voldoet": true,
         "ontbreekt": []
       },
-      "stilVerlies": true,
+      "stilVerlies": false,
       "financieel": null,
       "ruw": {
-        "schrijfStatus": 200,
+        "schrijfStatus": 503,
         "zichtbaarVoorHerstart": true,
         "blijftNaHerstart": false,
         "ledgerKlopt": null,
         "auditSpoor": true,
-        "retryGafTweedeEffect": true,
+        "retryGafTweedeEffect": false,
         "startteOp": true,
         "identiteitLukte": true
       }
@@ -311,30 +313,33 @@
       "keten": "NOTITIE",
       "verraad": "sterf-na-commit",
       "injectie": "JA",
-      "zichtbaar": "NEE",
-      "clientAntwoord": "OK",
+      "zichtbaar": "JA",
+      "clientAntwoord": "GEEN ANTWOORD",
       "toestandWijziging": "BLIJVEND",
       "ledgerInvariant": "ONGEMETEN",
-      "audit": "AANWEZIG",
-      "retryVeilig": "NEE",
+      "audit": "AFWEZIG",
+      "retryVeilig": "JA",
       "rollback": "NVT",
       "herhaalbaar": "JA",
-      "afwijkingen": [],
+      "afwijkingen": [
+        "auditSpoor: true -> false",
+        "retryGafTweedeEffect: true -> false",
+        "schrijfStatus: 200 -> 0",
+        "zichtbaarVoorHerstart: true -> false"
+      ],
       "lat": {
-        "voldoet": false,
-        "ontbreekt": [
-          "zichtbaar"
-        ]
+        "voldoet": true,
+        "ontbreekt": []
       },
       "stilVerlies": false,
       "financieel": null,
       "ruw": {
-        "schrijfStatus": 200,
-        "zichtbaarVoorHerstart": true,
+        "schrijfStatus": 0,
+        "zichtbaarVoorHerstart": false,
         "blijftNaHerstart": true,
         "ledgerKlopt": null,
-        "auditSpoor": true,
-        "retryGafTweedeEffect": true,
+        "auditSpoor": false,
+        "retryGafTweedeEffect": false,
         "startteOp": true,
         "identiteitLukte": true
       }

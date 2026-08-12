@@ -142,3 +142,45 @@ test('de partij stelt die vraag ook echt HIER en niet zelf aan ZICHT', () => {
   assert.equal(r.status, 403);
   assert.match(r.error, /niet meekijken/);
 });
+
+/* ---------- de progressiegrens zelf, door de ECHTE bedrading ---------- */
+
+/* WAAROM DEZE TOETS ER PAS NU STAAT, en het is een vondst van npm run sabotage.
+
+   CLAUDE.md zegt het met zoveel woorden: "De grens staat op één plek in de code
+   (`progressieMag` in `server/kern/spellen/grens.js`); nieuwe progressievormen
+   hangen daaraan en krijgen geen eigen kopie van de regel." Elke toets die de
+   progressie raakte, gaf `progressieMag` echter ZELF mee -- speluitslagen,
+   spelprestaties, speltelling en speldag zetten er alle vier hun eigen functie
+   in. Dat is goed voor wat die toetsen bewijzen (de consument gehoorzaamt de
+   grens), maar het betekende dat de BEDRADING nergens werd geraakt: zet in
+   grens.js `progressieMag: () => true` -- de poort helemaal open, elke tiener
+   een ranglijst -- en er werd niets rood.
+
+   Aangetoond en niet bedacht: WETTEN.json draagt die mutatie als de sabotage
+   van toegang-progressie-stopt-bij-18, en die kwam AFGESLAGEN terug.
+
+   Deze toets gaat daarom NIET langs een injectie maar door maakSpellen() heen,
+   want daar wordt grens.js echt aangeroepen. Drie progressievormen, twee
+   leeftijden: dat de poort dicht is voor wie hem niet haalt, dat hij open is
+   voor wie hem wel haalt, en -- de andere helft van de regel -- dat het spel
+   eronder gewoon speelbaar blijft. */
+test('de progressiegrens hangt aan de echte leeftijdspoort in grens.js', () => {
+  const kind = opstelling({ volwassen: () => false }).kern;
+  const volw = opstelling({ volwassen: () => true }).kern;
+
+  for (const vorm of ['spelStand', 'spelUitslagen', 'spelPrestaties']) {
+    const onder = kind[vorm]('iemand');
+    const boven = volw[vorm]('iemand');
+    assert.equal(onder.progressie, false, vorm + ': onder de grens wordt er niets bewaard');
+    assert.match(onder.reden, /geverifieerde volwassen leeftijd/,
+      vorm + ': en er staat waarom, in plaats van een lege lijst zonder uitleg');
+    assert.equal(boven.progressie, true, vorm + ': boven de grens wel');
+  }
+
+  /* De tegenhanger, en die is de helft van de wet: onder de grens blijft het
+     spel VOLLEDIG speelbaar. Zonder deze regel zou "alles dicht" ook slagen, en
+     dat is een ander product dan wat CLAUDE.md belooft. */
+  const potje = kind.spelNieuw('iemand', { soort: 'seconden', modus: 'solo' });
+  assert.ok(!potje.error, 'onder de grens start een potje gewoon: ' + JSON.stringify(potje).slice(0, 120));
+});

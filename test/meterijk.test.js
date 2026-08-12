@@ -595,6 +595,39 @@ const IJKINGEN = {
         () => tel() - voor);
     }
   },
+  wettenOnbewezen: {
+    /* EEN WET DIE NIEMAND OOIT HEEFT GEPROBEERD. Deze meter telt hoeveel
+       systeemwetten uit WETTEN.json GEEN bewezen handhaver hebben -- alles wat
+       niet `raak` is. Hij hoort dus omhoog te gaan zodra er een wet bij komt
+       waarvoor niets is gemeten.
+
+       DE PROEF GAAT OVER HET ECHTE BESTAND EN NIET OVER EEN VERZONNEN OBJECT.
+       In test/wetten.test.js staat de rekenkant al (raak telt, afgeslagen en
+       blind niet), en dat is een andere vraag. Hier moet blijken dat de meter
+       ziet wat er op schijf gebeurt: een wet erbij in WETTEN.json en de teller
+       hoort hem te vinden. Deed hij dat niet, dan kon iemand er tien wetten bij
+       schrijven zonder dat de norm ooit bewoog.
+
+       Het terugzetten gebeurt uit de TEKST die we vooraf lazen, byte voor byte,
+       precies zoals metAanbouw dat doet -- een ijking die het wetboek anders
+       opgemaakt achterlaat, is zelf de wijziging waar keuringsregel 41 op valt. */
+    proef: () => {
+      const wetboek = require('../scripts/lib/wetboek.js');
+      const tel = () => { const { boek } = wetboek.lees(); return wetboek.onbewezen(boek, wetboek.leesUitslag()); };
+      const voor = tel();
+      const pad = path.join(WORTEL, 'WETTEN.json');
+      const oud = fs.readFileSync(pad, 'utf8');
+      try {
+        const boek = JSON.parse(oud);
+        boek.wetten.push({ id: 'zz-ijk-tijdelijk', soort: 'proef',
+          wet: 'Een tijdelijke ijkwet die niemand ooit heeft geprobeerd.',
+          bron: { bestand: 'LAT.md', anker: 'De lat' }, handhaver: [],
+          mensenwerk: 'staat hier alleen tijdens test/meterijk.test.js' });
+        fs.writeFileSync(pad, JSON.stringify(boek, null, 2) + '\n');
+        return tel() - voor;
+      } finally { fs.writeFileSync(pad, oud); }
+    }
+  },
   endpointsNooitAangeraakt: {
     /* HET JOURNAAL MET EEN GAT ERIN. De reden die hier stond ("komt uit het
        routejournaal van een hele testronde") klopte half: het cijfer komt

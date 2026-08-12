@@ -301,6 +301,9 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 | elk scherm geeft een teken van leven (dood is stiller dan stuk) | `test/leven.e2e.js` |
 | de Postgres-toetsen, elk in een eigen database | `scripts/pgtoetsen.js` |
 | een omgeving die schermtoetsen belooft, heeft ook een browser | `test/browserpoort.e2e.js` |
+| de harde uitspraken van dit huis, met per stuk wie hem tegenhoudt | `WETTEN.json` + `scripts/wetten.js` |
+| elke handhaver EEN keer echt uitgezet, om te zien wie er rood wordt | `scripts/sabotage.js` + `SABOTAGE.json` |
+| wat we na al dat meten weten, en vooral wat we niet weten | `scripts/zekerheid.js` |
 | de pijplijn die dit alles draait bij elke push | `.github/workflows/ci.yml` |
 | de zware rondes (beproeving, dekking) draaien vanzelf, wekelijks | `.github/workflows/ronde.yml` |
 
@@ -319,3 +322,18 @@ regel 2 en regel 10. Zijn eerste versie telde of een bestandsnaam ergens in een
 toets voorkwam en meldde 849 valse gevallen -- die maatstaf is weggegooid en
 vervangen door echte dekkingsdata, want een census die je moet wegstrepen wordt
 binnen een week genegeerd.
+
+En dat laatste gat is precies waar `WETTEN.json` en `scripts/sabotage.js` voor
+zijn. De census vraagt "kijkt er iemand"; de sabotage stelt de enige vraag die
+daarna nog overblijft: **als ik deze afspraak WERKELIJK overtreed, wordt er dan
+iets rood?** Dus wordt hij overtreden -- in de echte bestanden, met de wachter
+erachteraan en alles terug na afloop. Dat is regel 2 toegepast op de afspraken
+zelf in plaats van op een enkele toets.
+
+Wat ook die motor niet kan, en het staat in zijn eigen kop: RAAK bewijst dat een
+wachter gevoelig is voor DIE ene overtreding, niet dat hij elke overtreding ziet
+en niet dat de wet goed geformuleerd is. En het register bevat alleen wat iemand
+heeft opgeschreven -- een afspraak die dit huis wel naleeft maar nergens noemt,
+is er onzichtbaar. Dat is de grootste blinde vlek van allemaal, want hij is per
+definitie niet te tellen. `npm run zekerheid` zet die grenzen onder elke stand,
+zodat een lijst met vinkjes nooit voor meer doorgaat dan hij is.

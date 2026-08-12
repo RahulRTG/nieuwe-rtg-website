@@ -42,6 +42,15 @@ jobs:
         run: npm run check
       - name: Eigen AST-scan (statische analyse, geen dependency)
         run: npm run ast-scan
+      # Het wettenregister mag niet stil uit elkaar lopen met de code: elke wet
+      # wijst naar een letterlijke zin in zijn doctrine-document en naar de
+      # bestanden die hem tegenhouden. Deze stap is STATISCH en kost seconden --
+      # hij controleert of die bron en die handhavers er nog zijn, en of een
+      # eerdere sabotage-uitslag nog bij het huidige recept hoort. Het ECHT
+      # uitzetten van elke handhaver (npm run sabotage) duurt tientallen minuten
+      # en hoort in de wekelijkse ronde, niet in elke push.
+      - name: Het wettenregister klopt met de code (wetten.js --controle)
+        run: node scripts/wetten.js --controle
       # De hoofdsuite draait op de standaard (json) opslag; DATABASE_URL is hier
       # bewust NIET gezet, anders zouden alle testbestanden dezelfde Postgres delen.
       # test:gate draait dezelfde suite MET een dekkingsvloer (regels/branches/

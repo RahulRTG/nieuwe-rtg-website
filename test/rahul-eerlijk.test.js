@@ -186,10 +186,23 @@ test('geen enkel vast antwoord beweert dat iets al geregeld is', () => {
 /* Klantdata draait op codenamen; de echte naam ligt in de gescheiden kluis. De
    system prompt gaat woordelijk naar de modelaanbieder, dus dat is precies de
    plek waar dat ontwerp telt -- en juist daar stond persona.full. */
+/* DEZE TOETS KON NIET ZAKKEN, en dat is met een mutatie aangetoond en niet
+   bedacht. Er stond alleen `assert.match(p, /persona\.codename/)`: een
+   deelstring-controle. Draai de voorkeur om naar `persona.name ||
+   persona.codename` -- dus de ECHTE NAAM gaat naar de modelaanbieder zodra hij
+   bekend is -- en de toets bleef groen, want `persona.codename` staat er dan
+   nog steeds in. Precies LAT.md regel 9.
+
+   Gevonden door `npm run sabotage`: de wet toegang-codenaam-boven-naam in
+   WETTEN.json zet die omkering er echt in en eist dat deze toets erop zakt.
+   Nu toetst hij de VOLGORDE, en dat is waar de wet over gaat. */
 test('de leden-prompt noemt de codenaam, niet de volledige naam', () => {
   const p = codeVan('server/kern/ai/prompt.js');
   assert.doesNotMatch(p, /\$\{persona\.full\}/, 'de volledige naam gaat niet meer de prompt in');
-  assert.match(p, /persona\.codename/, 'de codenaam wel');
+  assert.match(p, /persona\.codename\s*\|\|/,
+    'de codenaam staat VOORAAN: hij is wat er de prompt in gaat, en de naam hooguit als er geen codenaam is');
+  assert.doesNotMatch(p, /persona\.name\s*\|\|\s*persona\.codename/,
+    'omgekeerd zou de echte naam naar de modelaanbieder gaan zodra hij bekend is');
 });
 
 /* De personeelskant deed hetzelfde met req.actor.name -- en die naam komt bij

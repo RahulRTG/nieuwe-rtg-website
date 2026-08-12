@@ -1,6 +1,26 @@
 {
   "uitleg": "Uitslag van scripts/sabotage.js: per wet of het uitzetten van zijn handhaver een genoemde toets rood maakt. Gegenereerd, niet met de hand bij te werken.",
   "wetten": {
+    "RTG-003": {
+      "stand": "BEWEZEN",
+      "uitleg": "server/accounts/tokens.js: const TOKENVORM = /^[A-Za-z0-9_-]+\\.[a-f0-9]{32}$/; -> const TOKENVORM = /^[\\s\\S]+$/; maakt tokenvorm.test.js rood"
+    },
+    "RTG-004": {
+      "stand": "BEWEZEN",
+      "uitleg": "server/accounts/tokens.js: if (u && Number(u.sessies_vanaf || 0) > Number(uitgegeven || 0)) return null; -> if (false) return null; maakt sessiegrens.test.js rood"
+    },
+    "RTG-009": {
+      "stand": "BEWEZEN",
+      "uitleg": "server/middleware/remmen.js:     if (klaar) return next(); ->     return next(); maakt middleware.test.js rood"
+    },
+    "RTG-010": {
+      "stand": "BEWEZEN",
+      "uitleg": "server/accounts/gebonden.js: return Buffer.from('rtg-kluis-v2|' + TABEL + '|' + kolom + '|' + String(id), 'utf8'); -> return Buffer.from('rtg-kluis-v2|' + TABEL, 'utf8'); maakt kluis-binding.test.js rood"
+    },
+    "RTG-013": {
+      "stand": "BEWEZEN",
+      "uitleg": "server/inzagelog.js: function noteer({ door, over, waarom, bron } = {}) { -> function noteer({ door, over, waarom, bron } = {}) {\n  if (1) return null; maakt inzagelog.test.js rood"
+    },
     "RTG-014": {
       "stand": "BEWEZEN",
       "uitleg": "server/log.js: p: req.path, s: res.statusCode -> p: req.originalUrl, s: res.statusCode maakt loghygiene.test.js rood"

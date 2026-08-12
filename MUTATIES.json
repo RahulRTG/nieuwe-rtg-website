@@ -3942,6 +3942,14 @@
       "gezakt": 6,
       "scherp": "gezakt"
     },
+    "tokenvorm.test.js": {
+      "soort": "puur",
+      "staat": "gezakt",
+      "module": "server/accounts/index.js",
+      "operator": "return-weg#0",
+      "gezakt": 2,
+      "geprobeerd": 3
+    },
     "training.test.js": {
       "soort": "server",
       "staat": "gezakt",

@@ -40,15 +40,23 @@
     {
       "id": "RTG-003",
       "wet": "Wat er niet exact uitziet zoals wij het uitgeven, is geen token",
-      "waarom": "Buffer.from(x,'base64url') negeert tekens buiten het alfabet. Een spatie voor een ingetrokken token maakte het weer geldig: uitloggen was met een enkel teken te omzeilen. Fail closed, en iedereen kijkt naar dezelfde bytes.",
+      "waarom": "Buffer.from(x,'base64url') negeert tekens buiten het alfabet. Een spatie voor een ingetrokken token maakte het weer geldig: uitloggen was met een enkel teken te omzeilen. Fail closed, en iedereen kijkt naar dezelfde bytes. De sabotagemotor liet zien dat hier GEEN toets op zat: TOKENVORM helemaal uitzetten maakte niets rood, omdat accounts.test.js alleen `token+'x'` en `'onzin'` probeert en die twee op de HANDTEKENING afvallen, niet op de vorm. test/tokenvorm.test.js voert nu de echte aanval: uitloggen, en daarna hetzelfde token met een spatie ervoor.",
       "handhaver": [
         "server/accounts/tokens.js"
       ],
       "toetsen": [
-        "sessies.test.js",
-        "hack.test.js"
+        "tokenvorm.test.js",
+        "accounts.test.js"
       ],
-      "sabotage": "versoepel TOKENVORM tot /.+/ en stuur een ingetrokken token met een spatie ervoor"
+      "sabotage": "versoepel TOKENVORM tot /.+/ en stuur een ingetrokken token met een spatie ervoor",
+      "sabotageProef": {
+        "bestand": "server/accounts/tokens.js",
+        "van": "const TOKENVORM = /^[A-Za-z0-9_-]+\\.[a-f0-9]{32}$/;",
+        "naar": "const TOKENVORM = /^[\\s\\S]+$/;",
+        "toets": [
+          "tokenvorm.test.js"
+        ]
+      }
     },
     {
       "id": "RTG-004",
@@ -60,7 +68,15 @@
       "toetsen": [
         "sessiegrens.test.js"
       ],
-      "sabotage": "laat verifyToken sessies_vanaf negeren; een token van voor de wijziging werkt dan weer"
+      "sabotage": "laat verifyToken sessies_vanaf negeren; een token van voor de wijziging werkt dan weer",
+      "sabotageProef": {
+        "bestand": "server/accounts/tokens.js",
+        "van": "if (u && Number(u.sessies_vanaf || 0) > Number(uitgegeven || 0)) return null;",
+        "naar": "if (false) return null;",
+        "toets": [
+          "sessiegrens.test.js"
+        ]
+      }
     },
     {
       "id": "RTG-005",
@@ -114,14 +130,23 @@
     {
       "id": "RTG-009",
       "wet": "Een instance die zijn staat nog laadt, beantwoordt geen API-verkeer",
-      "waarom": "Fase D van de beproeving op 65M-schaal: een instance serveerde zijn verouderde snapshot en een schrijfactie in dat venster overschreef daarna de echte staat. Saldi 'overleefden' een herstart niet.",
+      "waarom": "Fase D van de beproeving op 65M-schaal: een instance serveerde zijn verouderde snapshot en een schrijfactie in dat venster overschreef daarna de echte staat. Saldi 'overleefden' een herstart niet. LET OP een naamsverwarring die de sabotagemotor blootlegde: test/opslagpoort.test.js gaat NIET over deze middleware maar over de productiekeuring ('geen grootboek, geen productie'). De middleware zelf staat in test/middleware.test.js. Deze wet wees eerst naar de verkeerde, en dat viel pas op toen de handhaver echt uit ging.",
       "handhaver": [
         "server/middleware/remmen.js"
       ],
       "toetsen": [
+        "middleware.test.js",
         "opslagpoort.test.js"
       ],
-      "sabotage": "laat opslagPoort altijd next() aanroepen; een herstart geeft dan antwoorden uit de oude snapshot"
+      "sabotage": "laat opslagPoort altijd next() aanroepen; een herstart geeft dan antwoorden uit de oude snapshot",
+      "sabotageProef": {
+        "bestand": "server/middleware/remmen.js",
+        "van": "    if (klaar) return next();",
+        "naar": "    return next();",
+        "toets": [
+          "middleware.test.js"
+        ]
+      }
     },
     {
       "id": "RTG-010",
@@ -133,7 +158,15 @@
       "toetsen": [
         "kluis-binding.test.js"
       ],
-      "sabotage": "haal de rij-identiteit uit de additional authenticated data; de aanval met rauwe SQL slaagt dan"
+      "sabotage": "haal de rij-identiteit uit de additional authenticated data; de aanval met rauwe SQL slaagt dan",
+      "sabotageProef": {
+        "bestand": "server/accounts/gebonden.js",
+        "van": "return Buffer.from('rtg-kluis-v2|' + TABEL + '|' + kolom + '|' + String(id), 'utf8');",
+        "naar": "return Buffer.from('rtg-kluis-v2|' + TABEL, 'utf8');",
+        "toets": [
+          "kluis-binding.test.js"
+        ]
+      }
     },
     {
       "id": "RTG-011",
@@ -169,7 +202,15 @@
       "toetsen": [
         "inzagelog.test.js"
       ],
-      "sabotage": "schrijf de opgevraagde naam mee in het journaal, of sla het journaal over bij een leesactie"
+      "sabotage": "schrijf de opgevraagde naam mee in het journaal, of sla het journaal over bij een leesactie",
+      "sabotageProef": {
+        "bestand": "server/inzagelog.js",
+        "van": "function noteer({ door, over, waarom, bron } = {}) {",
+        "naar": "function noteer({ door, over, waarom, bron } = {}) {\n  if (1) return null;",
+        "toets": [
+          "inzagelog.test.js"
+        ]
+      }
     },
     {
       "id": "RTG-014",

@@ -13,8 +13,8 @@ een bewering met een adres kan zakken.
 
 | stand | aantal | wat het betekent |
 |---|---|---|
-| **BEWEZEN** | 24 | handhaver bestaat, toets bestaat, en die toets is zien zakken op een mutatie |
-| **ONBEPROEFD** | 8 | er kijkt iemand naar, maar die kijker is nooit op de proef gesteld |
+| **BEWEZEN** | 25 | handhaver bestaat, toets bestaat, en die toets is zien zakken op een mutatie |
+| **ONBEPROEFD** | 7 | er kijkt iemand naar, maar die kijker is nooit op de proef gesteld |
 | **OPEN** | 4 | opgeschreven zonder handhaver of zonder toets: een voornemen, geen bescherming |
 | **GEBROKEN** | 0 | wijst naar iets dat er niet meer is -- de enige alarmerende stand |
 
@@ -49,19 +49,19 @@ Lid, leverancier, kantoor en personeel draaien op dezelfde server. Zonder deze w
 
 ### RTG-003 -- Wat er niet exact uitziet zoals wij het uitgeven, is geen token
 
-`BEWEZEN` · zien zakken in `sessies.test.js` op `return-weg#2`
+`BEWEZEN` · zien zakken in `sabotage` op `server/accounts/tokens.js`
 
-Buffer.from(x,'base64url') negeert tekens buiten het alfabet. Een spatie voor een ingetrokken token maakte het weer geldig: uitloggen was met een enkel teken te omzeilen. Fail closed, en iedereen kijkt naar dezelfde bytes.
+Buffer.from(x,'base64url') negeert tekens buiten het alfabet. Een spatie voor een ingetrokken token maakte het weer geldig: uitloggen was met een enkel teken te omzeilen. Fail closed, en iedereen kijkt naar dezelfde bytes. De sabotagemotor liet zien dat hier GEEN toets op zat: TOKENVORM helemaal uitzetten maakte niets rood, omdat accounts.test.js alleen `token+'x'` en `'onzin'` probeert en die twee op de HANDTEKENING afvallen, niet op de vorm. test/tokenvorm.test.js voert nu de echte aanval: uitloggen, en daarna hetzelfde token met een spatie ervoor.
 
 *Handhaver:* `server/accounts/tokens.js`
 
-*Toets:* `test/sessies.test.js`, `test/hack.test.js`
+*Toets:* `test/tokenvorm.test.js`, `test/accounts.test.js`
 
 *Breek hem zo:* versoepel TOKENVORM tot /.+/ en stuur een ingetrokken token met een spatie ervoor
 
 ### RTG-004 -- Een wachtwoordwijziging beëindigt elke lopende sessie
 
-`ONBEPROEFD` · geen van de toetsen is zien zakken op een mutatie
+`BEWEZEN` · zien zakken in `sabotage` op `server/accounts/tokens.js`
 
 Iemand herstelt zijn wachtwoord meestal OMDAT er iets mis is. Precies dan hoort de meelezer eruit te vliegen en niet rustig te blijven zitten terwijl het slot wordt vervangen.
 
@@ -121,19 +121,19 @@ Geld op een opslag die geen grootboek kan bijhouden is geld dat je niet kunt ver
 
 ### RTG-009 -- Een instance die zijn staat nog laadt, beantwoordt geen API-verkeer
 
-`BEWEZEN` · zien zakken in `opslagpoort.test.js` op `true->false#0`
+`BEWEZEN` · zien zakken in `sabotage` op `server/middleware/remmen.js`
 
-Fase D van de beproeving op 65M-schaal: een instance serveerde zijn verouderde snapshot en een schrijfactie in dat venster overschreef daarna de echte staat. Saldi 'overleefden' een herstart niet.
+Fase D van de beproeving op 65M-schaal: een instance serveerde zijn verouderde snapshot en een schrijfactie in dat venster overschreef daarna de echte staat. Saldi 'overleefden' een herstart niet. LET OP een naamsverwarring die de sabotagemotor blootlegde: test/opslagpoort.test.js gaat NIET over deze middleware maar over de productiekeuring ('geen grootboek, geen productie'). De middleware zelf staat in test/middleware.test.js. Deze wet wees eerst naar de verkeerde, en dat viel pas op toen de handhaver echt uit ging.
 
 *Handhaver:* `server/middleware/remmen.js`
 
-*Toets:* `test/opslagpoort.test.js`
+*Toets:* `test/middleware.test.js`, `test/opslagpoort.test.js`
 
 *Breek hem zo:* laat opslagPoort altijd next() aanroepen; een herstart geeft dan antwoorden uit de oude snapshot
 
 ### RTG-010 -- Een versleuteld veld hoort bij de rij waar het staat
 
-`BEWEZEN` · zien zakken in `kluis-binding.test.js` op `return-weg#0`
+`BEWEZEN` · zien zakken in `sabotage` op `server/accounts/gebonden.js`
 
 Versleuteling zegt niets over waar iets thuishoort. Wie de database kan bewerken kon een versleutelde naam naar de rij van een ander verplaatsen; de AEAD merkte niets en het huis las een echte naam bij de verkeerde codenaam.
 
@@ -169,7 +169,7 @@ Zou hij meebewegen, dan kon niemand meer op zijn e-mailadres inloggen, en halver
 
 ### RTG-013 -- Wie een identiteit opvraagt, laat een spoor na dat de naam zelf niet bevat
 
-`BEWEZEN` · zien zakken in `inzagelog.test.js` op `===->!==`
+`BEWEZEN` · zien zakken in `sabotage` op `server/inzagelog.js`
 
 Een kluis die je ongemerkt kunt openen is geen kluis. En zou de opgevraagde naam in het journaal staan, dan was dat een tweede, onversleutelde kopie van de kluis.
 

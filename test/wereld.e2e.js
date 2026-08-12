@@ -337,6 +337,111 @@ test('aan de ring draaien opent geen app, ook niet als je op een merk loslaat',
   });
 });
 
+test('de momenten van vandaag staan op de wijzerplaat, en de klok wordt dat moment',
+  { skip: overslaan }, async () => {
+  /* De klok droeg werelden; nu draagt hij ook TIJD. Drie dingen die daarbij echt
+     moeten kloppen, en die je geen van drieen aan een afdruk ziet:
+
+     1. Een tijdstip staat op de plek waar het HOORT. 14:00 op een
+        twaalfuursverdeling is twee uur, dus rechtsboven -- niet ergens op de
+        ring omdat het de tweede in de lijst was.
+     2. De momenten DRAAIEN NIET MEE als je aan de werelden draait. Een tijdstip
+        dat meedraait is geen tijdstip meer maar een versiering, en dat is precies
+        het soort fout dat er goed uitziet.
+     3. Tikken maakt de klok DAT moment: de wijzerplaat zakt weg en wat er dan is
+        staat in dezelfde cirkel -- geen popup ernaast.
+
+     DE MUTATIE: laat de momentenlaag meedraaien (zet de plaatsing in
+     tekenMomenten op st.hoek, of hang hem in .os-bezel). Meting 2 zakt dan. */
+  await metLid('aan', async ({ page }) => {
+    await page.evaluate(() => RTGWereld.momenten([
+      { tijd: '09:30', uur: 9, min: 30, titel: 'Ontbijt met Anne', sub: 'Bevestigd' },
+      { tijd: '14:00', uur: 14, min: 0, titel: 'Project Europa', sub: '3 punten open' }
+    ]));
+    await page.waitForSelector('.os-moment', { timeout: 10000, state: 'attached' });
+
+    const plek = await page.evaluate(() => {
+      const k = document.querySelector('.os-wereldkring').getBoundingClientRect();
+      const mx = k.left + k.width / 2, my = k.top + k.height / 2;
+      return [...document.querySelectorAll('.os-moment')].map((m) => {
+        const b = m.getBoundingClientRect();
+        const x = b.left + b.width / 2 - mx, y = b.top + b.height / 2 - my;
+        // hoek met de klok mee vanaf twaalf uur, zoals een wijzerplaat leest
+        let h = Math.atan2(x, -y) * 180 / Math.PI; if (h < 0) h += 360;
+        return { label: m.getAttribute('aria-label'), hoek: h, straal: Math.hypot(x, y) };
+      });
+    });
+    assert.equal(plek.length, 2, 'er horen twee momenten te staan');
+    // 09:30 -> 285 graden, 14:00 -> 60 graden
+    const bij = (t) => plek.find((p) => p.label.indexOf(t) === 0);
+    assert.ok(Math.abs(bij('14:00').hoek - 60) < 3,
+      '14:00 hoort op twee uur te staan (60 graden), gemeten ' + Math.round(bij('14:00').hoek));
+    assert.ok(Math.abs(bij('09:30').hoek - 285) < 3,
+      '09:30 hoort op half tien te staan (285 graden), gemeten ' + Math.round(bij('09:30').hoek));
+
+    /* En ze liggen tussen de wijzerplaat en de merken in. Raakt deze band de
+       merken, dan loopt een tijdstip door een wereldglyf heen. */
+    const merkStraal = await page.evaluate(() => {
+      const k = document.querySelector('.os-wereldkring').getBoundingClientRect();
+      const m = document.querySelector('.os-wm').getBoundingClientRect();
+      return { straal: Math.hypot(m.left + m.width / 2 - (k.left + k.width / 2),
+        m.top + m.height / 2 - (k.top + k.height / 2)), halveMerk: m.width / 2 };
+    });
+    assert.ok(Math.max(...plek.map((p) => p.straal)) < merkStraal.straal - merkStraal.halveMerk,
+      'de momenten liggen tegen de wereldmerken aan; dan loopt een tijdstip door een glyf');
+
+    // 2. draaien verplaatst de werelden, niet de tijd
+    const naDraai = await page.evaluate(async () => {
+      const hoek = () => {
+        const k = document.querySelector('.os-wereldkring').getBoundingClientRect();
+        const b = document.querySelector('.os-moment').getBoundingClientRect();
+        const x = b.left + b.width / 2 - (k.left + k.width / 2);
+        const y = b.top + b.height / 2 - (k.top + k.height / 2);
+        let h = Math.atan2(x, -y) * 180 / Math.PI; if (h < 0) h += 360;
+        return h;
+      };
+      const voor = hoek();
+      RTGWereld.naar(3);
+      let vorige = null, zelfde = 0;
+      for (let i = 0; i < 150 && zelfde < 4; i++) {
+        await new Promise((k) => setTimeout(k, 60));
+        const nu = RTGWereld.stand().actief;
+        if (nu === vorige) zelfde++; else { vorige = nu; zelfde = 0; }
+      }
+      return { voor, na: hoek(), wereld: RTGWereld.stand().actief };
+    });
+    assert.equal(naDraai.wereld, 3, 'de ring hoort wel gedraaid te zijn');
+    assert.ok(Math.abs(naDraai.na - naDraai.voor) < 1,
+      'de momenten draaiden mee met de bezel (van ' + Math.round(naDraai.voor) + ' naar ' +
+      Math.round(naDraai.na) + ' graden); een tijdstip hoort stil te staan');
+
+    // 3. tikken maakt de klok dat moment
+    const open = await page.evaluate(async () => {
+      [...document.querySelectorAll('.os-moment')].find((m) => m.getAttribute('aria-label').indexOf('14:00') === 0).click();
+      await new Promise((k) => setTimeout(k, 400));
+      const kaart = document.getElementById('osMomentKaart');
+      return {
+        moment: RTGWereld.stand().moment,
+        zichtbaar: !kaart.hidden,
+        tekst: kaart.textContent,
+        klokVervaagd: Number(getComputedStyle(document.getElementById('homeKlok')).opacity) < 0.5,
+        popups: document.querySelectorAll('.os-moment-kaart').length
+      };
+    });
+    assert.equal(open.moment, true, 'na een tik hoort het moment open te staan');
+    assert.equal(open.zichtbaar, true, 'de kaart van het moment hoort in beeld te komen');
+    assert.match(open.tekst, /Project Europa/, 'het moment hoort te tonen wat er dan is');
+    assert.equal(open.klokVervaagd, true,
+      'de wijzerplaat hoort weg te zakken -- de klok WORDT het moment, hij krijgt er niets naast');
+
+    // en Escape brengt je terug naar de klok
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(300);
+    assert.equal(await page.evaluate(() => RTGWereld.stand().moment), false,
+      'Escape hoort je terug te brengen naar de klok');
+  });
+});
+
 test('de levende grond tekent werkelijk iets', { skip: overslaan }, async () => {
   /* TWEE MUTATIES, en het verschil ertussen is precies waarom deze meting op de
      MAAT let en niet op "staat er iets":

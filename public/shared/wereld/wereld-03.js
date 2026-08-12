@@ -15,6 +15,10 @@
     k.addEventListener('click', function (ev) {
       ev.preventDefault();
       if (st.gesleept) return;
+      /* Staat er een moment open, dan is de klok DAT moment; een tik brengt je
+         eerst terug naar de klok. Meteen doorzoomen zou betekenen dat een tik
+         twee dingen tegelijk doet, en dan weet je na afloop niet waar je bent. */
+      if (momentStaatOpen()) { sluitMoment(); return; }
       zoom(!st.diep);
     });
     // rechtsklikken is op een muis wat lang drukken op een vinger is
@@ -44,6 +48,7 @@
     }
     el.kring.setAttribute('data-diep', st.diep ? 'ja' : 'nee');
     vulRing();
+    tekenMomenten();
     toonNaam();
     kernLabel();
     grondKies();
@@ -158,7 +163,7 @@
       var n = st.merken.length || 1;
       if (ev.key === 'ArrowRight') { ev.preventDefault(); naar((st.actief + 1) % n); }
       else if (ev.key === 'ArrowLeft') { ev.preventDefault(); naar((st.actief - 1 + n) % n); }
-      else if (ev.key === 'Escape') { if (wielOpen()) wiel(false); else if (st.diep) zoom(false); }
+      else if (ev.key === 'Escape') { if (wielOpen()) wiel(false); else if (momentStaatOpen()) sluitMoment(); else if (st.diep) zoom(false); }
       else if (ev.key === 'w' || ev.key === 'W') { ev.preventDefault(); wiel(!wielOpen()); }
     });
   }

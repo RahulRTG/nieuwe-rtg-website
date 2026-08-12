@@ -36,13 +36,13 @@
          lid zelf koos (os-wall-*) het te winnen. */
       el.scherm.setAttribute('data-inlogkleur', '');
       if (w.Inlogkleur && w.Inlogkleur.verf) { try { w.Inlogkleur.verf(); } catch (e) {} }
-      bouwKring(); bouwNaam(); bouwKern(); bouwWiel(); bouwRahul(); bouwHemel(); bouwGrond();
+      bouwKring(); bouwNaam(); bouwKern(); bouwMomenten(); bouwWiel(); bouwRahul(); bouwHemel(); bouwGrond();
       if (!gebonden) { bindSleep(); bindToetsen(); gebonden = true; }
       el.kring.hidden = false;
       el.naam.hidden = false; el.sub.hidden = false;
       if (el.grond) el.grond.hidden = false;
       if (el.klok && el.klok.parentNode !== el.kring) el.kring.appendChild(el.klok);
-      vulRing(); toonNaam(); kernLabel(); grondKies(); grondMaat(); grondStart();
+      vulRing(); tekenMomenten(); toonNaam(); kernLabel(); grondKies(); grondMaat(); grondStart();
     } else {
       wiel(false);
       grondStop();
@@ -154,6 +154,8 @@
       naam: (it && it.naam) || null,
       wereld: st.diep ? (st.werelden[st.wereldIdx] || {}).naam || null : (it && it.naam) || null,
       merken: st.merken.length,
+      momenten: momenten.length,
+      moment: momentStaatOpen(),
       wiel: wielOpen()
     };
   }
@@ -167,6 +169,7 @@
     zoom: zoom,
     wiel: wiel,
     rahulZei: rahulZei,
+    momenten: zetMomenten,
     stand: stand
   };
 })(window);

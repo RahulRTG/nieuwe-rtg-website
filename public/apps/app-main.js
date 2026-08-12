@@ -12,7 +12,7 @@
    zodat een blijvend verschil (een proxy die niets doorlaat) geen herlaadlus
    wordt maar gewoon doorgaat. Doorgaan met een mismatch is nog altijd beter
    dan een zwart scherm, en de melding in de console zegt dan wat er speelt. */
-var RTG_BOUW = '0d496cbc';
+var RTG_BOUW = '77e76222';
 (function bouwWacht(){
   try {
     var m = document.querySelector('meta[name="rtg-bouw"]');
@@ -4848,6 +4848,38 @@ var RTG_BOUW = '0d496cbc';
         try { invoer.setSelectionRange(invoer.value.length, invoer.value.length); } catch (e) {}
       }
     });
+
+    /* ---------- de momenten van vandaag op de wijzerplaat ----------
+       Uit /agenda/mijn, dezelfde bron als het dagprogramma bij je reis
+       (app-main-45.js) -- er wordt hier niets bijgemaakt. Alleen VANDAAG, want
+       een wijzerplaat toont een dag; morgen om half tien heeft op deze klok
+       geen plek die van morgen is.
+
+       Heeft een lid vandaag niets, dan komen er GEEN stipjes. Een ring met
+       streepjes die suggereert dat er een dag is, is precies de verzonnen stand
+       waar CANVAS.md over gaat. */
+    async function momentenBij() {
+      if (!window.RTGWereld || !RTGWereld.momenten || !API.live || gast()) return;
+      var dagen = [];
+      try { dagen = (await API.call('/agenda/mijn')).dagen || []; } catch (e) { return; }
+      var nu = new Date();
+      var vandaag = nu.getFullYear() + '-' +
+        String(nu.getMonth() + 1).padStart(2, '0') + '-' + String(nu.getDate()).padStart(2, '0');
+      var dag = dagen.filter(function (d) { return d && d.datum === vandaag; })[0];
+      var items = (dag && dag.items) || [];
+      RTGWereld.momenten(items.map(function (it) {
+        // "hele dag" heeft geen plek op een wijzerplaat: zonder tijd geen stip
+        var m = /^(\d{1,2}):(\d{2})/.exec(String(it.tijd || ''));
+        if (!m) return null;
+        return {
+          tijd: it.tijd, uur: Number(m[1]), min: Number(m[2]),
+          titel: it.titel || '', sub: it.status ? tStatus(it.status) : ''
+        };
+      }).filter(Boolean));
+    }
+    momentenBij();
+    // en nog eens als je terugkomt: een dag verandert terwijl je weg bent
+    document.addEventListener('visibilitychange', function () { if (!document.hidden) momentenBij(); });
 
     /* De schakelaar in het bedieningspaneel. Hij zet niets zelf: hij vraagt de
        module om te wisselen en leest daarna terug wat de stand IS, zodat de

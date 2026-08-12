@@ -144,6 +144,67 @@
    het hidden-attribuut en blijft de ring gewoon staan. */
 .os-wereldkring[hidden] { display: none; }
 
+/* ---------- 5c. de momenten van vandaag ----------
+   Ze liggen op straal 34: buiten de wijzerplaat (31), binnen de wereldmerken
+   (die de band 36-46 beslaan). Die drie getallen horen bij elkaar -- verzet er
+   een, en er loopt iets door iets heen.
+
+   Deze laag DRAAIT NIET mee met de bezel. Een tijdstip dat meedraait als je aan
+   de werelden draait, is geen tijdstip meer maar een versiering. */
+.os-momenten { position: absolute; inset: 0; z-index: 2; pointer-events: none; }
+.os-moment {
+  position: absolute; transform: translate(-50%, -50%);
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  background: none; border: 0; padding: 0; margin: 0; cursor: pointer;
+  pointer-events: auto; color: var(--soft);
+  transition: color var(--rtg-tempo, 340ms) var(--rtg-ease, ease);
+}
+.os-moment i {
+  display: block; width: calc(var(--e) * 0.34); height: calc(var(--e) * 0.34);
+  border-radius: 50%; background: var(--gold); opacity: 0.75;
+  transition: transform var(--rtg-vlot, 140ms) var(--rtg-ease, ease), opacity var(--rtg-tempo, 340ms);
+}
+/* Het tijdstip zelf is klein en tabulair: het is een AFLEZING, geen etiket. */
+.os-moment span {
+  font-family: Inter, system-ui, sans-serif; font-size: calc(var(--e) * 0.42);
+  letter-spacing: 0.06em; font-variant-numeric: tabular-nums;
+  opacity: 0; transition: opacity var(--rtg-tempo, 340ms) var(--rtg-ease, ease);
+}
+.os-moment:hover span, .os-moment:focus-visible span, .os-moment[data-actief="ja"] span { opacity: 1; }
+.os-moment[data-actief="ja"] { color: var(--gold); }
+.os-moment[data-actief="ja"] i { opacity: 1; transform: scale(1.5); }
+.os-moment:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 6px; }
+@media (prefers-reduced-motion: reduce) { .os-moment, .os-moment i, .os-moment span { transition: none; } }
+
+/* De klok WORDT het moment: de wijzerplaat zakt weg en wat er dan is staat in
+   dezelfde cirkel. Geen popup ernaast -- je hebt niets geopend, je kijkt naar
+   een ander uur van dezelfde dag. */
+.os-wereldkring[data-moment="ja"] .os-home-klok { opacity: 0.12; }
+.os-home-klok { transition: opacity var(--rtg-royaal, 560ms) var(--rtg-ease, ease); }
+.os-moment-kaart {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  width: 56%; z-index: 4; text-align: center; pointer-events: none;
+  display: flex; flex-direction: column; align-items: center; gap: calc(var(--e) * 0.2);
+  animation: osMomentOp var(--rtg-tempo, 340ms) var(--rtg-ease, ease) both;
+}
+.os-moment-kaart[hidden] { display: none; }
+.os-moment-tijd {
+  font-family: Inter, system-ui, sans-serif; font-variant-numeric: tabular-nums;
+  font-size: calc(var(--e) * 0.72); letter-spacing: 0.16em; color: var(--gold); font-weight: 600;
+}
+/* Bodoni mag hier: dit is de titel van dit moment, en daarmee de kop van wat je
+   op dit uur doet -- dezelfde ceremoniele rol als de naam van een wereld. */
+.os-moment-titel {
+  font-family: 'Bodoni Moda', serif; font-size: calc(var(--e) * 1.05); line-height: 1.15;
+  color: var(--txt); max-width: 100%;
+}
+.os-moment-sub {
+  font-family: Inter, system-ui, sans-serif; font-size: calc(var(--e) * 0.56);
+  letter-spacing: 0.1em; text-transform: uppercase; color: var(--soft);
+}
+@keyframes osMomentOp { from { opacity: 0; transform: translate(-50%, -46%); } }
+@media (prefers-reduced-motion: reduce) { .os-moment-kaart { animation: none; } }
+
 /* ---------- 6. de naam eronder ----------
    Bodoni mag hier, en alleen hier op dit scherm: dit is een BESTEMMING, en dat
    is een van de rollen op de gesloten lijst in ONTWERP.md par. 1. De regel

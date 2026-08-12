@@ -25,13 +25,23 @@
 
    Draai:  node scripts/poortwacht.js [http://127.0.0.1:3000]
            node scripts/poortwacht.js --json
-   Exitcode 1 zodra er een route OPEN staat die niet publiek hoort te zijn. */
+           node scripts/poortwacht.js --json --per-route
+   Exitcode 1 zodra er een route OPEN staat die niet publiek hoort te zijn.
+
+   --PER-ROUTE, EN WAAROM DAT ER APART IN ZIT. De uitslag hierboven telt op:
+   zoveel dicht, zoveel stil, zoveel open. Dat is genoeg om te weten of er een
+   gat is, en te weinig voor scripts/bewijsmatrix.js -- die wil per route weten
+   wie zijn voordeur heeft gemeten, want anders blijft de AUTH-kolom op
+   "verklaard" staan (in de bron gelezen, niet gevraagd). Met --per-route komt
+   het oordeel per METHODE+pad mee in de JSON. Standaard staat het uit: het zijn
+   een paar duizend regels en de gewone lezer heeft er niets aan. */
 'use strict';
 const { execFileSync } = require('child_process');
 const path = require('path');
 
 const args = process.argv.slice(2);
 const jsonUit = args.includes('--json');
+const perRouteUit = args.includes('--per-route');
 const BASIS = args.find(a => a.startsWith('http')) || 'http://127.0.0.1:3000';
 
 /* Routes die BEWUST open staan voor een niet-ingelogde bezoeker. Elke regel
@@ -62,6 +72,21 @@ const PUBLIEK = new Map([
   ['/api/webauthn/opties', 'passkey-inlog begint voor je bent ingelogd'],
   ['/api/zegel/controleer', 'partners verifieren een zegel; de sleutel is toch al publiek'],
   ['/api/translate', 'de taalkiezer staat op het inlogscherm; met rem, en zonder inlog geen AI'],
+  /* DE TWAALF DIE DE RONDE VAN 12 AUGUSTUS AANWEES. Ze stonden alle twaalf al in
+     de bron beschreven als bewust open, maar niet hier -- en zolang dat zo was,
+     telde de AUTH-kolom ze als GEZAKT. Een deur die met opzet openstaat en
+     nergens als zodanig genoteerd is, is niet te onderscheiden van een deur die
+     iemand vergat te sluiten. Vandaar per regel de reden, uit de code zelf. */
+  ['/api/fout/client', 'een fout die het inloggen sloopt, komt nooit binnen achter een poort die inloggen vereist; met een lijfgrens van 4 kB en een rem per IP'],
+  ['/api/kantoor/gesprek/start', 'vervangt het codeveld van de backoffice-inlog en heeft dezelfde rem; er komt nooit iets terug wat de beller intypte'],
+  ['/api/lab2/bewoner/labs', 'het publieke beeld van een living lab: alleen naam, stad en land van de ACTIEVE labs, zonder budget, tekenaars of partners'],
+  ['/api/lab2/bewoner/kader', 'de spelregels van het onderzoek zelf; die horen juist openbaar te zijn'],
+  ['/api/onderneming/rechtsvormen', 'een vaste lijst rechtsvormen per land; algemene kennis, geen gegevens'],
+  ['/api/rtfos/publiek/campagnes', 'het publieke gezicht van de RTFoundation: welke campagnes lopen er'],
+  ['/api/rtfos/publiek/jaarverslagen', 'verantwoording van een goededoelenstichting hoort openbaar te zijn'],
+  ['/api/rtfos/publiek/steden', 'in welke steden de RTFoundation samenwerkt; geen personen'],
+  ['/api/stad/algoritmes', 'het transparantieregister: welke rekenregels meedraaien, met hun beslisruimte en hun bekende beperkingen'],
+  ['/api/stad/besluiten', 'het besluitenregister; er zitten geen personen in -- fracties stemmen met zetels en een collegestem draagt een functie'],
   ['/api/vertaal/ui', 'idem: de knopteksten van een uitgelogd scherm'],
   ['/api/pasprijzen', 'de prijzen staan op de website'],
   ['/api/partnertrips', 'het partnerkanaal is er juist voor niet-leden'],
@@ -91,6 +116,9 @@ const PUBLIEK = new Map([
 ]);
 
 const uit = { open: [], dicht: 0, stil: 0, publiek: 0, fout: 0, totaal: 0 };
+/* Alleen gevuld met --per-route; zie de kop. Eén regel per METHODE+pad, met
+   hetzelfde oordeel dat hierboven wordt opgeteld -- geen tweede waarheid. */
+const perRoute = [];
 
 /* De routekaart uit de server zelf: alleen zo weet je zeker dat je alles hebt
    en niet de lijst toetst die iemand met de hand heeft bijgehouden. */
@@ -127,21 +155,31 @@ async function ronde() {
       for (const m of (r.methoden || ['POST'])) {
         uit.totaal++;
         const a = await klop(r.pad, m);
-        if (a.status === 0) { uit.fout++; continue; }
-        if (a.status === 401 || a.status === 403) { uit.dicht++; continue; }
-        if (a.status >= 200 && a.status < 300) {
-          if (PUBLIEK.has(r.pad)) uit.publiek++;
-          else uit.open.push({ pad: r.pad, methode: m, status: a.status, begin: a.tekst.replace(/\s+/g, ' ').slice(0, 120) });
-          continue;
-        }
-        uit.stil++;
+        /* Eén plek waar het oordeel valt, en daarna pas tellen én opschrijven.
+           Eerst stond het oordeel in de tellingen zelf verweven; wie er een
+           tweede uitvoer naast zet, bouwt dan onvermijdelijk een tweede
+           waarheid die er langzaam naast gaat lopen. */
+        let oordeel;
+        if (a.status === 0) { uit.fout++; oordeel = 'onbereikbaar'; }
+        else if (a.status === 401 || a.status === 403) { uit.dicht++; oordeel = 'dicht'; }
+        else if (a.status >= 200 && a.status < 300) {
+          if (PUBLIEK.has(r.pad)) { uit.publiek++; oordeel = 'publiek'; }
+          else {
+            uit.open.push({ pad: r.pad, methode: m, status: a.status, begin: a.tekst.replace(/\s+/g, ' ').slice(0, 120) });
+            oordeel = 'open';
+          }
+        } else { uit.stil++; oordeel = 'stil'; }
+        if (perRouteUit) perRoute.push({ methode: m, pad: r.pad, status: a.status, oordeel });
       }
     }));
   }
 }
 
 ronde().then(() => {
-  if (jsonUit) { console.log(JSON.stringify(uit, null, 1)); process.exit(uit.open.length ? 1 : 0); }
+  if (jsonUit) {
+    console.log(JSON.stringify(perRouteUit ? { ...uit, perRoute } : uit, null, 1));
+    process.exit(uit.open.length ? 1 : 0);
+  }
   console.log('\n=== RTG poortwacht tegen ' + BASIS + ' ===\n');
   console.log('  aangeklopt        : ' + uit.totaal);
   console.log('  netjes geweigerd  : ' + uit.dicht + '  (401/403)');

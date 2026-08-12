@@ -59,7 +59,21 @@
     "grenslijst": "node scripts/grenslijst.js",
     "wetten": "node scripts/wetten.js",
     "sabotage": "node --experimental-sqlite scripts/sabotage.js",
-    "zekerheid": "node scripts/zekerheid.js"
+    "zekerheid": "node scripts/zekerheid.js",
+    "bewijsmatrix": "node --experimental-sqlite scripts/bewijsmatrix.js",
+    "bewijsmatrix:vast": "node --experimental-sqlite scripts/bewijsmatrix.js --vastleggen",
+    "klok": "node scripts/klok.js",
+    "klok:vast": "node scripts/klok.js --vastleggen",
+    "controls": "node scripts/controls.js",
+    "controls:vast": "node scripts/controls.js --vastleggen",
+    "rolproef": "node --experimental-sqlite scripts/rolproef-route.js",
+    "invoerproef": "node --experimental-sqlite scripts/invoerproef-route.js",
+    "idemproef": "node --experimental-sqlite scripts/idemproef-route.js",
+    "staatproef": "node --experimental-sqlite scripts/staatproef-route.js",
+    "kosten": "node --experimental-sqlite scripts/duurzaamheidskosten.js",
+    "verraadcatalogus": "node -e \"const v=require('./server/lib/verraad');for(const x of v.CATALOGUS)console.log((x.waar?'[ingebouwd] ':'[voornemen] ')+x.naam.padEnd(18)+x.wat)\"",
+    "verraad": "node --experimental-sqlite scripts/verraadronde.js",
+    "ketenronde": "node --experimental-sqlite scripts/ketenronde.js"
   },
   "devDependencies": {
     "playwright": "^1.62.1"

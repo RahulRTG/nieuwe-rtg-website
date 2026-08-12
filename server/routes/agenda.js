@@ -19,19 +19,20 @@ module.exports = (kern) => {
   app.post('/api/agenda/mijn-lijst', auth, (req, res) => {
     res.json({ items: agenda.lijst(lidKey(req)), telling: agenda.telling(lidKey(req)) });
   });
-  app.post('/api/agenda/toevoegen', auth, (req, res) => {
+  app.post('/api/agenda/toevoegen', auth, async (req, res) => {
     if (geenGast(req, res)) return;
-    const r = agenda.voegToe(lidKey(req), invoer(req.body || {}));
-    if (r.error) return res.status(400).json(r);
+    const r = await agenda.voegToe(lidKey(req), invoer(req.body || {}));
+    if (r.error) return res.status(r.status || 400).json(r);
     res.json({ ok: true, items: agenda.lijst(lidKey(req)), telling: agenda.telling(lidKey(req)) });
   });
-  app.post('/api/agenda/wijzig', auth, (req, res) => {
-    const r = agenda.wijzig(lidKey(req), req.body || {});
-    if (r.error) return res.status(400).json(r);
+  app.post('/api/agenda/wijzig', auth, async (req, res) => {
+    const r = await agenda.wijzig(lidKey(req), req.body || {});
+    if (r.error) return res.status(r.status || 400).json(r);
     res.json({ ok: true, items: agenda.lijst(lidKey(req)), telling: agenda.telling(lidKey(req)) });
   });
-  app.post('/api/agenda/verwijder', auth, (req, res) => {
-    agenda.verwijder(lidKey(req), String(req.body.id || ''));
+  app.post('/api/agenda/verwijder', auth, async (req, res) => {
+    const w = await agenda.verwijder(lidKey(req), String(req.body.id || ''));
+    if (w && w.error) return res.status(w.status || 400).json(w);
     res.json({ ok: true, items: agenda.lijst(lidKey(req)), telling: agenda.telling(lidKey(req)) });
   });
   app.post('/api/agenda/ai', auth, async (req, res) => {
@@ -44,26 +45,26 @@ module.exports = (kern) => {
   app.post('/api/agenda/bereik', auth, (req, res) => {
     const van = String(req.body.van || ''), tot = String(req.body.tot || '');
     const r = agenda.bereik(lidKey(req), van, tot);
-    if (r.error) return res.status(400).json(r);
+    if (r.error) return res.status(r.status || 400).json(r);
     // de laag uit het ecosysteem: eigen RTG-boekingen, alleen-lezen, met bronlabel
     r.ecosysteem = agenda.ecosysteem(req.session.key, van, tot);
     res.json(r);
   });
-  app.post('/api/agenda/bewaar', auth, (req, res) => {
+  app.post('/api/agenda/bewaar', auth, async (req, res) => {
     if (geenGast(req, res)) return;
-    const r = agenda.bewaarAfspraak(lidKey(req), req.body || {});
-    if (r.error) return res.status(400).json(r);
+    const r = await agenda.bewaarAfspraak(lidKey(req), req.body || {});
+    if (r.error) return res.status(r.status || 400).json(r);
     res.json(r);
   });
   app.post('/api/agenda/uitnodig', auth, async (req, res) => {
     if (geenGast(req, res)) return;
     const r = await agenda.nodigUit(lidKey(req), String(req.body.id || ''), String(req.body.codenaam || ''));
-    if (r.error) return res.status(400).json(r);
+    if (r.error) return res.status(r.status || 400).json(r);
     res.json(r);
   });
-  app.post('/api/agenda/antwoord', auth, (req, res) => {
-    const r = agenda.antwoordUitnodiging(lidKey(req), String(req.body.id || ''), req.body.ja !== false);
-    if (r.error) return res.status(400).json(r);
+  app.post('/api/agenda/antwoord', auth, async (req, res) => {
+    const r = await agenda.antwoordUitnodiging(lidKey(req), String(req.body.id || ''), req.body.ja !== false);
+    if (r.error) return res.status(r.status || 400).json(r);
     res.json(r);
   });
   app.post('/api/agenda/ics', auth, (req, res) => {
@@ -78,21 +79,22 @@ module.exports = (kern) => {
   app.post('/api/supplier/agenda/lijst', supplierAuth, (req, res) => {
     res.json({ items: agenda.lijst(supKey(req)), telling: agenda.telling(supKey(req)) });
   });
-  app.post('/api/supplier/agenda/toevoegen', supplierAuth, (req, res) => {
+  app.post('/api/supplier/agenda/toevoegen', supplierAuth, async (req, res) => {
     if (!managerOnly(req, res)) return;
-    const r = agenda.voegToe(supKey(req), invoer(req.body || {}));
-    if (r.error) return res.status(400).json(r);
+    const r = await agenda.voegToe(supKey(req), invoer(req.body || {}));
+    if (r.error) return res.status(r.status || 400).json(r);
     res.json({ ok: true, items: agenda.lijst(supKey(req)), telling: agenda.telling(supKey(req)) });
   });
-  app.post('/api/supplier/agenda/wijzig', supplierAuth, (req, res) => {
+  app.post('/api/supplier/agenda/wijzig', supplierAuth, async (req, res) => {
     if (!managerOnly(req, res)) return;
-    const r = agenda.wijzig(supKey(req), req.body || {});
-    if (r.error) return res.status(400).json(r);
+    const r = await agenda.wijzig(supKey(req), req.body || {});
+    if (r.error) return res.status(r.status || 400).json(r);
     res.json({ ok: true, items: agenda.lijst(supKey(req)), telling: agenda.telling(supKey(req)) });
   });
-  app.post('/api/supplier/agenda/verwijder', supplierAuth, (req, res) => {
+  app.post('/api/supplier/agenda/verwijder', supplierAuth, async (req, res) => {
     if (!managerOnly(req, res)) return;
-    agenda.verwijder(supKey(req), String(req.body.id || ''));
+    const w = await agenda.verwijder(supKey(req), String(req.body.id || ''));
+    if (w && w.error) return res.status(w.status || 400).json(w);
     res.json({ ok: true, items: agenda.lijst(supKey(req)), telling: agenda.telling(supKey(req)) });
   });
   app.post('/api/supplier/agenda/ai', supplierAuth, async (req, res) => {

@@ -174,6 +174,9 @@ module.exports = (kern) => {
   require('./techniek/wacht')(tctx);
   require('./techniek/papieren')(tctx);
   require('./techniek/sso')(tctx);
+  /* De toestandsvingerafdruk: per collectie een aantal en een gezouten hash,
+     nooit inhoud. Draagt de vier matrixkolommen die over de TOESTAND gaan. */
+  require('./techniek/vingerafdruk')(tctx);
 
   // Hulp voor de kern: mag een door een zekering bewaakt subsysteem draaien?
   kern.zekeringMag = (id) => { const z = db.data.techniek && db.data.techniek.zekeringen && db.data.techniek.zekeringen[id]; return !z || z.aan !== false; };

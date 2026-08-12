@@ -11,7 +11,7 @@ hetzelfde en doen alsof van wel is de eerste manier om hem te verliezen.
 
 ---
 
-## De tien regels
+## De elf regels
 
 ### 1. Repareer de oorzaak, niet het symptoom
 
@@ -247,13 +247,43 @@ Daarnaast: `test/normprestatie.test.js` (acht toetsen, alle vier de mutaties
 zagen we zakken) en de ijking in `scripts/lib/rolproef.js`. De vorm om op te
 letten blijft een meter die nog nooit iets anders heeft gezegd dan "in orde".
 
+### 11. Bewijsgroen is geen go-live-groen
+
+Twee soorten groen die niets met elkaar te maken hebben, en ze door elkaar halen
+is de duurste fout die deze hele stapel kan maken.
+
+**Bewijsgroen** zegt: van de dingen die mis kunnen gaan heeft iemand gekeken.
+Dat is een uitspraak over de code en over de instrumenten eromheen.
+**Go-live-groen** zegt: dit huis mag en moet de deur open. Dat gaat over sleutels
+uit een secrets manager, een verwerkingsregister dat af is, een datalek-draaiboek
+met een 72-uursklok, en achttien juridische vragen die beginnen bij "onder welke
+naam draait RTG".
+
+Je kunt honderd procent bewijsdekking hebben en nog steeds niet mogen lanceren.
+En andersom: alle papieren op orde met een matrix die voor zeventig procent uit
+ongemeten bestaat. Het eerste is een reden om trots te zijn en geen reden om live
+te gaan; het tweede is een reden om door te meten en geen reden om te wachten.
+
+*Waar dit fout gaat:* iemand ziet `npm run check` groen, de ketenronde groen en
+een bewijsmatrix die verdubbelt, en leest dat als "we zijn er klaar voor".
+`npm run golive` staat dan nog steeds op rood om acht dingen die geen van allen
+in de code zitten — en dat is precies goed. Operationeel of juridisch niet klaar
+betekent niet live, hoe groen de software ook is.
+
+**Handhaver:** `scripts/check.js` regel 48. De go-live-keuring mag geen enkel
+bewijsregister lezen (`BEWIJSMATRIX`, `CONTROLS`, `ROLPROEF`, `KETENS`,
+`STAATPROEF` en de rest), en de bewijsinstrumenten mogen geen go-live-oordeel
+vellen. Zolang die twee kanten elkaars uitkomst niet kunnen zien, kan de een de
+ander niet groen praten. Voor de mens die ze naast elkaar legt bestaat geen
+handhaver; daarvoor staat deze regel hier.
+
 ---
 
 ## Wat de lat betekent per tijdvak
 
 ### De toekomst
 
-Bindend. Nieuw werk voldoet aan alle tien, en waar een machine kan handhaven
+Bindend. Nieuw werk voldoet aan alle elf, en waar een machine kan handhaven
 handhaaft hij. Wie een regel toevoegt aan `check.js` beproeft hem met een mutatie
 voordat hij hem inlevert (regel 2 geldt ook voor regels).
 
@@ -285,7 +315,7 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 
 | wat | waar |
 |---|---|
-| 35 codeafspraken, binair | `scripts/check.js` |
+| 36 codeafspraken, binair | `scripts/check.js` |
 | de ratel: meters mogen maar een kant op | `NORM.json` + `scripts/norm.js` |
 | kruis-slice-verwijzingen tussen opgeknipte modules | `scripts/kruisscan.js` |
 | statische analyse zonder dependencies | `scripts/ast-scan.js` |
@@ -304,6 +334,7 @@ stukje beter wordt en nooit slechter, en dat is het enige eerlijke aanbod.
 | de harde uitspraken van dit huis, met per stuk wie hem tegenhoudt | `WETTEN.json` + `scripts/wetten.js` |
 | elke handhaver EEN keer echt uitgezet, om te zien wie er rood wordt | `scripts/sabotage.js` + `SABOTAGE.json` |
 | wat we na al dat meten weten, en vooral wat we niet weten | `scripts/zekerheid.js` |
+| bewijsgroen en go-live-groen kunnen elkaar niet groen praten | `scripts/check.js` regel 48 |
 | de pijplijn die dit alles draait bij elke push | `.github/workflows/ci.yml` |
 | de zware rondes (beproeving, dekking) draaien vanzelf, wekelijks | `.github/workflows/ronde.yml` |
 

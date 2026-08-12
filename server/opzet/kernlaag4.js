@@ -30,7 +30,7 @@
 'use strict';
 
 module.exports = (kern, hulp) => {
-  const { accounts, anthropic, broadcastSync, crypto, db, findSupplier, keyVanCodenaam, ledenAantal, liveCodename, media, notify, notifySupplier, onboarding, rtmail, save, schoon } = hulp;
+  const { accounts, anthropic, bijeen, inBundel, broadcastSync, crypto, db, findSupplier, keyVanCodenaam, ledenAantal, liveCodename, media, notify, notifySupplier, onboarding, rtmail, save, schoon } = hulp;
   // sseToCustomer/sseToSupplier/sseToOffice worden via hulp.* gelezen (zie kern.comm)
 
 
@@ -99,7 +99,7 @@ kern.genootschapUitvoer = require('../kern/genootschap/uitvoer')({ genootschap: 
 /* De Berichten-app: zoeken over alle kanalen, gesprekken vastzetten/stilzetten/
    archiveren, en de drie AI-taken (samenvatten, een antwoord opstellen, de
    afspraken eruit halen). De AI stelt op, de mens verstuurt. */
-kern.berichten = require('../kern/berichten')({ db, save, socialConnecties: kern.socialConnecties,
+kern.berichten = require('../kern/berichten')({ db, save, bijeen, inBundel, socialConnecties: kern.socialConnecties,
   dmSleutel: kern.dmSleutel, codenaamVan: kern.codenaamVan, rtmail, overheid: kern.overheid, anthropic,
   // de brug wordt hieronder pas gezet; vandaar bij gebruik ophalen
   commDm: () => kern.commDm, commWerk: () => kern.commWerk });

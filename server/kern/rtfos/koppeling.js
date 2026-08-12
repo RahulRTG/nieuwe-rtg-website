@@ -63,7 +63,7 @@ module.exports = (ctx, eigen) => {
   /* De agenda-koppeling, en het enige dat hier echt iets doet. De afspraak gaat
      naar de agenda van de AANVRAGER zelf ('lid:<sleutel>' -- dezelfde
      eigenaarsleutel als de leden-app gebruikt). */
-  function naarAgenda(req, activiteitId) {
+  async function naarAgenda(req, activiteitId) {
     const a = S().activiteiten.find(x => x.id === String(activiteitId || ''));
     if (!a) return { status: 404, error: 'Deze activiteit bestaat niet.' };
     const w = wie(req);
@@ -81,7 +81,7 @@ module.exports = (ctx, eigen) => {
          mens hangt, vraagt een mens. */
       return { status: 400, error: 'Deze koppeling zet de afspraak in UW eigen RTG-agenda, en daarvoor is een persoonlijke inlog nodig. Meld u aan met uw eigen RTG-account.' };
     }
-    const r = agenda.voegToe('lid:' + w.key, {
+    const r = await agenda.voegToe('lid:' + w.key, {
       titel: 'RTF: ' + a.naam,
       datum: a.wanneer,
       tijd: a.tijd || null,

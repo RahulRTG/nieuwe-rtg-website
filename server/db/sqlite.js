@@ -174,4 +174,18 @@ function afrondSqlite() {
   try { kvdb.exec('PRAGMA wal_checkpoint(TRUNCATE)'); } catch (e) { /* ander proces leest nog */ }
 }
 
-module.exports = { loadSqlite, saveSqlite, startSqliteSync, afrondSqlite, checkpointSqlite };
+/* DE PERSISTENTE VERSIE, gelezen uit de DATABASE en niet uit het geheugen.
+
+   Dit is het enige getal waarmee een aanroeper kan vaststellen dat zijn
+   schrijfactie werkelijk de schijf heeft gehaald. Het geheugen kan hem niet
+   bevestigen -- daar staat de wijziging sowieso -- en juist dat verschil is waar
+   een verloren schrijfactie zich verstopt. Geeft null als er geen SQLite-opslag
+   draait; de aanroeper hoort dat als "niet vast te stellen" te behandelen en
+   niet als "in orde". */
+function persistentieStandSqlite() {
+  try { sqliteInit(); const r = statements().huidig.get(); return r ? Number(r.v) : null; }
+  catch (e) { return null; }
+}
+
+module.exports = { loadSqlite, saveSqlite, startSqliteSync, afrondSqlite, checkpointSqlite,
+  persistentieStandSqlite };

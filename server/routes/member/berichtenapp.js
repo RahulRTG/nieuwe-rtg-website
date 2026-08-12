@@ -23,9 +23,17 @@ module.exports = (kern) => {
 
   // Een gesprek vastzetten (bovenaan), stilzetten (geen meldingen) of
   // archiveren (uit de lijst). Niets wordt verwijderd.
-  app.post('/api/member/berichten/vlag', auth, (req, res) => {
+  app.post('/api/member/berichten/vlag', auth, async (req, res) => {
     if (geenGast(req, res)) return;
-    try { res.json({ ok: true, vlaggen: berichten.vlagZet(req.session.key, req.body.id, req.body.vlag, !!req.body.aan) }); }
+    /* EERST KIJKEN WAT ERUIT KWAM, DAN PAS ok ZEGGEN. Hier stond het antwoord
+       hard op { ok: true } met de uitkomst ernaast -- dus ook als de commit niet
+       werd vastgelegd, kreeg het lid een bevestiging. Precies de fout die deze
+       hele ronde over gaat, in het klein. */
+    try {
+      const v = await berichten.vlagZet(req.session.key, req.body.id, req.body.vlag, !!req.body.aan);
+      if (v && v.error) return res.status(v.status || 400).json(v);
+      res.json({ ok: true, vlaggen: v });
+    }
     catch (e) { fout(res, e); }
   });
 

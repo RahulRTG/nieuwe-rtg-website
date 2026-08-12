@@ -9,7 +9,11 @@
 
 const DAGEN = ['zondag', 'maandag', 'dinsdag', 'woensdag', 'donderdag', 'vrijdag', 'zaterdag'];
 
-function maakAgenda({ db, save, crypto, anthropic, schoon }) {
+function maakAgenda({ db, save, bijeen, inBundel, crypto, anthropic, schoon }) {
+  /* De agenda van een lid is werk van een lid: bevestigd is vastgelegd. Zie
+     server/lib/duurzaam.js en GELDLAT.md; de aanroepplek staat met reden op de
+     lijst van check.js regel 47. */
+  const vastleggen = require('../lib/duurzaam')({ bijeen, save, inBundel, bron: 'agenda' });
   const id = () => 'ag' + crypto.randomBytes(4).toString('hex');
   const nu = () => new Date().toISOString();
   const vandaagStr = () => new Date().toISOString().slice(0, 10);
@@ -40,31 +44,34 @@ function maakAgenda({ db, save, crypto, anthropic, schoon }) {
   function geldigeDatum(d) { return /^\d{4}-\d{2}-\d{2}$/.test(String(d || '')); }
   function geldigeTijd(t) { return /^\d{2}:\d{2}$/.test(String(t || '')); }
 
-  function voegToe(ownerKey, data) {
+  async function voegToe(ownerKey, data) {
     const titel = scho(data.titel, 120);
     if (!titel) return { error: 'Geef de afspraak een titel.' };
     if (!geldigeDatum(data.datum)) return { error: 'Kies een geldige datum.' };
     const arr = ruw(ownerKey);
     if (arr.length >= 2000) return { error: 'Uw agenda zit vol; ruim eerst wat op.' };
     const item = { id: id(), titel, datum: data.datum, tijd: geldigeTijd(data.tijd) ? data.tijd : null, notitie: scho(data.notitie, 300) || null, gedaan: false, at: nu(), bron: scho(data.bron, 60) || null };
-    arr.push(item);
-    save();
+    const mis = await vastleggen(() => { arr.push(item); });
+    if (mis) return mis;
     return { ok: true, item: itemPubliek(item) };
   }
-  function wijzig(ownerKey, data) {
+  async function wijzig(ownerKey, data) {
     const arr = ruw(ownerKey);
     const i = arr.find(x => x.id === data.id);
     if (!i) return { error: 'Afspraak niet gevonden.' };
-    if (data.titel != null) i.titel = scho(data.titel, 120) || i.titel;
-    if (geldigeDatum(data.datum)) i.datum = data.datum;
-    if (data.tijd != null) i.tijd = geldigeTijd(data.tijd) ? data.tijd : null;
-    if (data.notitie != null) i.notitie = scho(data.notitie, 300) || null;
-    if (data.gedaan != null) i.gedaan = !!data.gedaan;
-    save();
-    return { ok: true };
+    const mis = await vastleggen(() => {
+      if (data.titel != null) i.titel = scho(data.titel, 120) || i.titel;
+      if (geldigeDatum(data.datum)) i.datum = data.datum;
+      if (data.tijd != null) i.tijd = geldigeTijd(data.tijd) ? data.tijd : null;
+      if (data.notitie != null) i.notitie = scho(data.notitie, 300) || null;
+      if (data.gedaan != null) i.gedaan = !!data.gedaan;
+    });
+    return mis || { ok: true };
   }
-  function verwijder(ownerKey, itemId) {
-    const s = store(); s[ownerKey] = ruw(ownerKey).filter(x => x.id !== itemId); save(); return { ok: true };
+  async function verwijder(ownerKey, itemId) {
+    const s = store();
+    const mis = await vastleggen(() => { s[ownerKey] = ruw(ownerKey).filter(x => x.id !== itemId); });
+    return mis || { ok: true };
   }
 
   /* ---- de natuurlijke-taal-parser (werkt zonder Claude) ---- */

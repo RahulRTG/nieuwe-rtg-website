@@ -1,0 +1,95 @@
+{
+  "herkomst": "routekaart (draaiende server)",
+  "gedegradeerd": false,
+  "journaalGelezen": null,
+  "routes": 3987,
+  "schakels": 11,
+  "cellen": 43857,
+  "telling": {
+    "bewezen": 15044,
+    "verklaard": 0,
+    "nvt": 260,
+    "ongemeten": 28431,
+    "gezakt": 122
+  },
+  "perSchakel": {
+    "AUTH": {
+      "bewezen": 3987,
+      "verklaard": 0,
+      "nvt": 0,
+      "ongemeten": 0,
+      "gezakt": 0
+    },
+    "ACL": {
+      "bewezen": 2935,
+      "verklaard": 0,
+      "nvt": 0,
+      "ongemeten": 1052,
+      "gezakt": 0
+    },
+    "INPUT": {
+      "bewezen": 2508,
+      "verklaard": 0,
+      "nvt": 0,
+      "ongemeten": 1479,
+      "gezakt": 0
+    },
+    "OUTPUT": {
+      "bewezen": 0,
+      "verklaard": 0,
+      "nvt": 0,
+      "ongemeten": 3987,
+      "gezakt": 0
+    },
+    "STATE": {
+      "bewezen": 224,
+      "verklaard": 0,
+      "nvt": 65,
+      "ongemeten": 3698,
+      "gezakt": 0
+    },
+    "SIDE_EFFECT": {
+      "bewezen": 224,
+      "verklaard": 0,
+      "nvt": 65,
+      "ongemeten": 3698,
+      "gezakt": 0
+    },
+    "AUDIT": {
+      "bewezen": 0,
+      "verklaard": 0,
+      "nvt": 0,
+      "ongemeten": 3987,
+      "gezakt": 0
+    },
+    "IDEMPOTENCY": {
+      "bewezen": 125,
+      "verklaard": 0,
+      "nvt": 65,
+      "ongemeten": 3684,
+      "gezakt": 113
+    },
+    "FAILURE": {
+      "bewezen": 2,
+      "verklaard": 0,
+      "nvt": 0,
+      "ongemeten": 3985,
+      "gezakt": 0
+    },
+    "ROLLBACK": {
+      "bewezen": 2104,
+      "verklaard": 0,
+      "nvt": 65,
+      "ongemeten": 1809,
+      "gezakt": 9
+    },
+    "PRIVACY": {
+      "bewezen": 2935,
+      "verklaard": 0,
+      "nvt": 0,
+      "ongemeten": 1052,
+      "gezakt": 0
+    }
+  },
+  "uitleg": "Gegenereerd door scripts/bewijsmatrix.js. ongemeten MAG ALLEEN KRIMPEN."
+}

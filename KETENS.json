@@ -1,0 +1,348 @@
+{
+  "uitleg": "Sabotage op echte businessketens, acht velden per scenario. Een verraad telt pas als bewijs wanneer het de zevenstappenlat haalt (zie scripts/lib/ketenproef.js): injecteerbaar, aantoonbaar toegeslagen, zichtbaar, reproduceerbaar, businessuitkomst gemeten, invariant beoordeeld, rollback beoordeeld.",
+  "seed": "819226199",
+  "gemeten": {
+    "ketens": 3,
+    "scenarios": 9,
+    "voldoetAanLat": 4,
+    "rollbackBewezen": 2,
+    "ledgerGebroken": 0,
+    "stilVerlies": 0,
+    "geldScenarios": 3,
+    "geldProven": 2,
+    "blindeKetens": 0
+  },
+  "scenarios": [
+    {
+      "keten": "GELD",
+      "verraad": "schrijf-verloren",
+      "injectie": "JA",
+      "zichtbaar": "JA",
+      "clientAntwoord": "FAIL",
+      "toestandWijziging": "TERUGGEDRAAID",
+      "ledgerInvariant": "GELDIG",
+      "audit": "AANWEZIG",
+      "retryVeilig": "JA",
+      "rollback": "PROVEN",
+      "herhaalbaar": "JA",
+      "afwijkingen": [
+        "blijftNaHerstart: true -> false",
+        "retryNaHerstartDubbel: false -> true",
+        "schrijfStatus: 200 -> 500"
+      ],
+      "lat": {
+        "voldoet": true,
+        "ontbreekt": []
+      },
+      "stilVerlies": false,
+      "financieel": {
+        "staat": "PROVEN",
+        "reden": "antwoord, persistentie na herstart en grootboekinvariant kloppen alle drie"
+      },
+      "ruw": {
+        "schrijfStatus": 500,
+        "zichtbaarVoorHerstart": true,
+        "blijftNaHerstart": false,
+        "ledgerKlopt": true,
+        "auditSpoor": true,
+        "retryGafTweedeEffect": false,
+        "startteOp": true,
+        "identiteitLukte": true,
+        "retryNaHerstartDubbel": true
+      }
+    },
+    {
+      "keten": "GELD",
+      "verraad": "schrijf-faalt",
+      "injectie": "JA",
+      "zichtbaar": "JA",
+      "clientAntwoord": "GEEN ANTWOORD",
+      "toestandWijziging": "GEEN",
+      "ledgerInvariant": "ONGEMETEN",
+      "audit": "ONGEMETEN",
+      "retryVeilig": "ONGEMETEN",
+      "rollback": "NVT",
+      "herhaalbaar": "JA",
+      "afwijkingen": [
+        "auditSpoor: true -> null",
+        "blijftNaHerstart: true -> null",
+        "identiteitLukte: true -> undefined",
+        "ledgerKlopt: true -> null",
+        "retryGafTweedeEffect: false -> null",
+        "retryNaHerstartDubbel: false -> undefined",
+        "schrijfStatus: 200 -> null",
+        "startteOp: true -> false",
+        "zichtbaarVoorHerstart: true -> null"
+      ],
+      "lat": {
+        "voldoet": false,
+        "ontbreekt": [
+          "invariant beoordeeld"
+        ]
+      },
+      "stilVerlies": false,
+      "financieel": {
+        "staat": "ONGEMETEN",
+        "reden": "de grootboekinvariant is niet gemeten; bij geld telt dat niet als goed"
+      },
+      "ruw": {
+        "schrijfStatus": null,
+        "zichtbaarVoorHerstart": null,
+        "blijftNaHerstart": null,
+        "ledgerKlopt": null,
+        "auditSpoor": null,
+        "retryGafTweedeEffect": null,
+        "startteOp": false
+      }
+    },
+    {
+      "keten": "GELD",
+      "verraad": "sterf-na-commit",
+      "injectie": "JA",
+      "zichtbaar": "JA",
+      "clientAntwoord": "GEEN ANTWOORD",
+      "toestandWijziging": "BLIJVEND",
+      "ledgerInvariant": "GELDIG",
+      "audit": "AFWEZIG",
+      "retryVeilig": "JA",
+      "rollback": "NVT",
+      "herhaalbaar": "JA",
+      "afwijkingen": [
+        "auditSpoor: true -> false",
+        "schrijfStatus: 200 -> 0",
+        "zichtbaarVoorHerstart: true -> false"
+      ],
+      "lat": {
+        "voldoet": true,
+        "ontbreekt": []
+      },
+      "stilVerlies": false,
+      "financieel": {
+        "staat": "PROVEN",
+        "reden": "geen antwoord, duurzaam geboekt, en de herhaling boekt niet nog eens"
+      },
+      "ruw": {
+        "schrijfStatus": 0,
+        "zichtbaarVoorHerstart": false,
+        "blijftNaHerstart": true,
+        "ledgerKlopt": true,
+        "auditSpoor": false,
+        "retryGafTweedeEffect": false,
+        "startteOp": true,
+        "identiteitLukte": true,
+        "retryNaHerstartDubbel": false
+      }
+    },
+    {
+      "keten": "TOESTEMMING",
+      "verraad": "schrijf-verloren",
+      "injectie": "JA",
+      "zichtbaar": "NEE",
+      "clientAntwoord": "OK",
+      "toestandWijziging": "BLIJVEND",
+      "ledgerInvariant": "ONGEMETEN",
+      "audit": "AANWEZIG",
+      "retryVeilig": "JA",
+      "rollback": "NVT",
+      "herhaalbaar": "JA",
+      "afwijkingen": [],
+      "lat": {
+        "voldoet": false,
+        "ontbreekt": [
+          "zichtbaar"
+        ]
+      },
+      "stilVerlies": false,
+      "financieel": null,
+      "ruw": {
+        "schrijfStatus": 200,
+        "zichtbaarVoorHerstart": true,
+        "blijftNaHerstart": true,
+        "ledgerKlopt": null,
+        "auditSpoor": true,
+        "retryGafTweedeEffect": false,
+        "startteOp": true,
+        "identiteitLukte": true
+      }
+    },
+    {
+      "keten": "TOESTEMMING",
+      "verraad": "schrijf-faalt",
+      "injectie": "JA",
+      "zichtbaar": "JA",
+      "clientAntwoord": "GEEN ANTWOORD",
+      "toestandWijziging": "GEEN",
+      "ledgerInvariant": "ONGEMETEN",
+      "audit": "ONGEMETEN",
+      "retryVeilig": "ONGEMETEN",
+      "rollback": "NVT",
+      "herhaalbaar": "JA",
+      "afwijkingen": [
+        "auditSpoor: true -> null",
+        "blijftNaHerstart: true -> null",
+        "identiteitLukte: true -> undefined",
+        "retryGafTweedeEffect: false -> null",
+        "schrijfStatus: 200 -> null",
+        "startteOp: true -> false",
+        "zichtbaarVoorHerstart: true -> null"
+      ],
+      "lat": {
+        "voldoet": false,
+        "ontbreekt": [
+          "invariant beoordeeld"
+        ]
+      },
+      "stilVerlies": false,
+      "financieel": null,
+      "ruw": {
+        "schrijfStatus": null,
+        "zichtbaarVoorHerstart": null,
+        "blijftNaHerstart": null,
+        "ledgerKlopt": null,
+        "auditSpoor": null,
+        "retryGafTweedeEffect": null,
+        "startteOp": false
+      }
+    },
+    {
+      "keten": "TOESTEMMING",
+      "verraad": "sterf-na-commit",
+      "injectie": "JA",
+      "zichtbaar": "NEE",
+      "clientAntwoord": "OK",
+      "toestandWijziging": "BLIJVEND",
+      "ledgerInvariant": "ONGEMETEN",
+      "audit": "AANWEZIG",
+      "retryVeilig": "JA",
+      "rollback": "NVT",
+      "herhaalbaar": "JA",
+      "afwijkingen": [],
+      "lat": {
+        "voldoet": false,
+        "ontbreekt": [
+          "zichtbaar"
+        ]
+      },
+      "stilVerlies": false,
+      "financieel": null,
+      "ruw": {
+        "schrijfStatus": 200,
+        "zichtbaarVoorHerstart": true,
+        "blijftNaHerstart": true,
+        "ledgerKlopt": null,
+        "auditSpoor": true,
+        "retryGafTweedeEffect": false,
+        "startteOp": true,
+        "identiteitLukte": true
+      }
+    },
+    {
+      "keten": "NOTITIE",
+      "verraad": "schrijf-verloren",
+      "injectie": "JA",
+      "zichtbaar": "JA",
+      "clientAntwoord": "FAIL",
+      "toestandWijziging": "TERUGGEDRAAID",
+      "ledgerInvariant": "ONGEMETEN",
+      "audit": "AANWEZIG",
+      "retryVeilig": "JA",
+      "rollback": "PROVEN",
+      "herhaalbaar": "JA",
+      "afwijkingen": [
+        "blijftNaHerstart: true -> false",
+        "retryGafTweedeEffect: true -> false",
+        "schrijfStatus: 200 -> 503"
+      ],
+      "lat": {
+        "voldoet": true,
+        "ontbreekt": []
+      },
+      "stilVerlies": false,
+      "financieel": null,
+      "ruw": {
+        "schrijfStatus": 503,
+        "zichtbaarVoorHerstart": true,
+        "blijftNaHerstart": false,
+        "ledgerKlopt": null,
+        "auditSpoor": true,
+        "retryGafTweedeEffect": false,
+        "startteOp": true,
+        "identiteitLukte": true
+      }
+    },
+    {
+      "keten": "NOTITIE",
+      "verraad": "schrijf-faalt",
+      "injectie": "JA",
+      "zichtbaar": "JA",
+      "clientAntwoord": "GEEN ANTWOORD",
+      "toestandWijziging": "GEEN",
+      "ledgerInvariant": "ONGEMETEN",
+      "audit": "ONGEMETEN",
+      "retryVeilig": "ONGEMETEN",
+      "rollback": "NVT",
+      "herhaalbaar": "JA",
+      "afwijkingen": [
+        "auditSpoor: true -> null",
+        "blijftNaHerstart: true -> null",
+        "identiteitLukte: true -> undefined",
+        "retryGafTweedeEffect: true -> null",
+        "schrijfStatus: 200 -> null",
+        "startteOp: true -> false",
+        "zichtbaarVoorHerstart: true -> null"
+      ],
+      "lat": {
+        "voldoet": false,
+        "ontbreekt": [
+          "invariant beoordeeld"
+        ]
+      },
+      "stilVerlies": false,
+      "financieel": null,
+      "ruw": {
+        "schrijfStatus": null,
+        "zichtbaarVoorHerstart": null,
+        "blijftNaHerstart": null,
+        "ledgerKlopt": null,
+        "auditSpoor": null,
+        "retryGafTweedeEffect": null,
+        "startteOp": false
+      }
+    },
+    {
+      "keten": "NOTITIE",
+      "verraad": "sterf-na-commit",
+      "injectie": "JA",
+      "zichtbaar": "JA",
+      "clientAntwoord": "GEEN ANTWOORD",
+      "toestandWijziging": "BLIJVEND",
+      "ledgerInvariant": "ONGEMETEN",
+      "audit": "AFWEZIG",
+      "retryVeilig": "JA",
+      "rollback": "NVT",
+      "herhaalbaar": "JA",
+      "afwijkingen": [
+        "auditSpoor: true -> false",
+        "retryGafTweedeEffect: true -> false",
+        "schrijfStatus: 200 -> 0",
+        "zichtbaarVoorHerstart: true -> false"
+      ],
+      "lat": {
+        "voldoet": true,
+        "ontbreekt": []
+      },
+      "stilVerlies": false,
+      "financieel": null,
+      "ruw": {
+        "schrijfStatus": 0,
+        "zichtbaarVoorHerstart": false,
+        "blijftNaHerstart": true,
+        "ledgerKlopt": null,
+        "auditSpoor": false,
+        "retryGafTweedeEffect": false,
+        "startteOp": true,
+        "identiteitLukte": true
+      }
+    }
+  ]
+}

@@ -9,7 +9,7 @@ const ACTIEF = /^(text\/html|application\/xhtml\+xml|image\/svg\+xml|text\/xml|a
 const ONSCHULDIG = (m) => (ACTIEF.test(String(m || '')) ? 'application/octet-stream' : String(m || 'application/octet-stream'));
 
 function maakBestandenDelen(basis) {
-  const { save, keyVanCodenaam, codenaamVan, sseToCustomer,
+  const { save, vastleggen, keyVanCodenaam, codenaamVan, sseToCustomer,
     bord, vind, magErbij, schrijfBytes, leesBytes, wisBytes, wisItem, gebruik, nu,
     QUOTUM, MAX_BESTAND, MAX_VERSIES, scanOk } = basis;
 
@@ -23,20 +23,23 @@ function maakBestandenDelen(basis) {
     if (code === codenaamVan(key)) return { status: 400, error: 'Met uzelf delen hoeft niet; het is al van u.' };
     it.gedeeldMet = it.gedeeldMet || [];
     if (aan === false) {
-      it.gedeeldMet = it.gedeeldMet.filter(c => c !== code); save();
+      it.gedeeldMet = it.gedeeldMet.filter(c => c !== code);
+      return (await vastleggen()) || { ok: true, gedeeldMet: it.gedeeldMet.map(codenaamVan) };
       return { gedeeldMet: it.gedeeldMet };
     }
     const doelKey = await keyVanCodenaam(code);
     if (!doelKey) return { status: 404, error: 'Die codenaam kennen we niet.' };
     if (it.gedeeldMet.length >= 25) return { status: 409, error: 'Een bestand deelt u met hooguit 25 mensen.' };
     if (!it.gedeeldMet.includes(code)) it.gedeeldMet.push(code);
-    save();
+    const mis = await vastleggen();
+    if (mis) return mis;
+    // het seintje pas NA de commit: melden wat niet vastligt is een leugen
     try { sseToCustomer(doelKey, 'bestanden', { kind: 'gedeeld', naam: it.naam, van: codenaamVan(key) }); } catch (e) {}
     return { gedeeldMet: it.gedeeldMet };
   }
 
   /* ---- versies: een nieuwe upload op hetzelfde bestand schuift de oude opzij ---- */
-  function versieNieuw(key, bid, dataUrl) {
+  async function versieNieuw(key, bid, dataUrl) {
     const v = vind(String(bid || ''));
     if (!v || !magErbij(key, v)) return { status: 404, error: 'Dat bestand staat niet in uw kluis.' };
     const it = v.item;
@@ -57,7 +60,8 @@ function maakBestandenDelen(basis) {
     while (it.versies.length > MAX_VERSIES) wisBytes(it.versies.pop().ref);
     it.ref = schrijfBytes(buf); it.bytes = buf.length; it.mime = m[1];
     it.gewijzigd = nu(); it.door = v.eigenaar === key ? null : codenaamVan(key);
-    save();
+    const mis = await vastleggen();
+    if (mis) return mis;
     if (v.eigenaar !== key) {
       try { sseToCustomer(v.eigenaar, 'bestanden', { kind: 'versie', naam: it.naam, door: codenaamVan(key) }); } catch (e) {}
     }
@@ -70,7 +74,7 @@ function maakBestandenDelen(basis) {
       versies: (v.item.versies || []).map((x, i) => ({ n: i, bytes: x.bytes, op: x.op, door: x.door || null })) };
   }
   // Een oude versie terugzetten: de huidige wordt zelf een versie; er raakt niets kwijt.
-  function versieTerug(key, bid, n) {
+  async function versieTerug(key, bid, n) {
     const v = vind(String(bid || ''));
     if (!v || !magErbij(key, v)) return { status: 404, error: 'Dat bestand staat niet in uw kluis.' };
     const it = v.item;
@@ -79,8 +83,7 @@ function maakBestandenDelen(basis) {
     it.versies.splice(Number(n), 1);
     it.versies.unshift({ ref: it.ref, bytes: it.bytes, op: it.gewijzigd || it.op, door: it.door || null });
     it.ref = oud.ref; it.bytes = oud.bytes; it.gewijzigd = nu(); it.door = oud.door || null;
-    save();
-    return { ok: true, versies: it.versies.length };
+    return (await vastleggen()) || { ok: true, versies: it.versies.length };
   }
 
   /* ---- ophalen: de bytes terug als data-URL (na rechten-check) ---- */
@@ -113,33 +116,33 @@ function maakBestandenDelen(basis) {
   }
 
   /* ---- de prullenbak: een zichtbare la met een klok erop, geen zwart gat ---- */
-  function weg(key, bid) {
+  async function weg(key, bid) {
     const eigen = bord(key).items.find(x => x.id === String(bid || ''));
     if (eigen) {
-      if (!eigen.weg) { eigen.weg = true; eigen.wegOp = nu(); save(); return { prullenbak: true }; }
+      if (!eigen.weg) { eigen.weg = true; eigen.wegOp = nu(); return (await vastleggen()) || { prullenbak: true }; }
       // tweede keer 'weg' vanuit de prullenbak = echt weg, met inhoud en versies
       wisItem(eigen);
-      const b = bord(key); b.items = b.items.filter(x => x.id !== eigen.id); save();
-      return { weg: true };
+      const b = bord(key); b.items = b.items.filter(x => x.id !== eigen.id);
+      return (await vastleggen()) || { weg: true };
     }
     const v = vind(String(bid || ''));                 // gedeeld: alleen uzelf eraf halen
     if (!v || !magErbij(key, v)) return { status: 404, error: 'Dat bestand staat niet in uw kluis.' };
     const code = codenaamVan(key);
-    v.item.gedeeldMet = (v.item.gedeeldMet || []).filter(c => c !== code); save();
-    return { ok: true };
+    v.item.gedeeldMet = (v.item.gedeeldMet || []).filter(c => c !== code);
+    return (await vastleggen()) || { ok: true };
   }
-  function herstel(key, bid) {
+  async function herstel(key, bid) {
     const it = bord(key).items.find(x => x.id === String(bid || ''));
     if (!it || !it.weg) return { status: 404, error: 'Dat bestand staat niet in de prullenbak.' };
-    it.weg = false; it.wegOp = null; save();
-    return { ok: true };
+    it.weg = false; it.wegOp = null;
+    return (await vastleggen()) || { ok: true };
   }
-  function leegPrullenbak(key) {
+  async function leegPrullenbak(key) {
     const b = bord(key);
     const weggooien = b.items.filter(x => x.weg);
     for (const it of weggooien) wisItem(it);
-    b.items = b.items.filter(x => !x.weg); save();
-    return { geleegd: weggooien.length };
+    b.items = b.items.filter(x => !x.weg);
+    return (await vastleggen()) || { geleegd: weggooien.length };
   }
 
   return { bestandenDeel: deel, bestandenVersieNieuw: versieNieuw, bestandenVersies: versies,

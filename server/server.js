@@ -32,7 +32,7 @@ const path = require('path');
 const fs = require('fs');
 const crypto = require('crypto');
 const zlib = require('zlib');
-const { db, load, save, bijeen, DATA_DIR, STORE, opslagKlaar, pgPoolStatus, startGedeeld, startSqliteSync, startPostgres, flushBijAfsluiten, onExternalChange, grootSupplierSync, grootAantal,
+const { db, load, save, bijeen, inBundel, DATA_DIR, STORE, opslagKlaar, pgPoolStatus, startGedeeld, startSqliteSync, startPostgres, flushBijAfsluiten, onExternalChange, grootSupplierSync, grootAantal,
   ledenGidsActief, ledenGidsHaal, ledenGidsAantal, ledenGidsZet, ledenGidsWeg, ledenGidsExact, ledenGidsZoek, ledenGidsHaalWacht,
   orderMetRef, ordersVanKlant, ordersVanZaak, ordersVoegToe,
   boekingMetRef, boekingenVanKlant, boekingenVanZaak, boekingenVoegToe,
@@ -862,7 +862,7 @@ const creator = require('./kern/creator').maakCreator({ db, save, crypto, anthro
 const samenwerking = require('./kern/samenwerking').maakSamenwerking({ db, save, crypto, findSupplier, notifySupplier, sseToSupplier, schoon });
 // De persoonlijke, interactieve AI-agenda (kern/agenda.js) voor leveranciers en
 // leden, in de boardroom, met een ballon-badge op de voorkant.
-const agenda = require('./kern/agenda').maakAgenda({ db, save, crypto, anthropic, schoon });
+const agenda = require('./kern/agenda').maakAgenda({ db, save, bijeen, inBundel, crypto, anthropic, schoon });
 // De centrale facturatielaag (kern/facturatie.js): bij elke verkoop/dienst/verhuur
 // automatisch EGn tweezijdige factuur die beide partijen in de app zien, plus een
 // AI-factuurtool. Alle apps haken hierop in.
@@ -888,18 +888,20 @@ lidDeps.zijnVrienden = zijnVrienden;
    alleen-lezen laag met eigen RTG-boekingen. Ligt hier omdat hij
    codenaamVan uit de sociale kern nodig heeft. */
 Object.assign(agenda, require('./kern/agenda-pro').maakAgendaPro({
-  db, save, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer, boekingenVanKlant }));
+  db, save, bijeen, inBundel, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer, boekingenVanKlant }));
 /* Notities & Taken (kern/notities.js): het bord met notities en lijstjes.
    Krijgt de agenda mee, want een notitie met datum en tijd wordt een
-   gekoppelde afspraak -- een wekkerlaag, niet drie. */
+   gekoppelde afspraak -- een wekkerlaag, niet drie.
+   En `bijeen`, want het bord legt DUURZAAM vast: werk van een lid mag niet
+   bevestigd worden voordat de opslag het heeft (GELDLAT.md). */
 const notities = require('./kern/notities').maakNotities({
-  db, save, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer }, agenda);
+  db, save, bijeen, inBundel, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer }, agenda);
 /* RTG Bestanden (kern/bestanden.js): de kluis. Bytes versleuteld op schijf
    (zelfde aanpak als media.js), alleen verwijzingen in de database. */
 const bestanden = require('./kern/bestanden').maakBestanden({
   // antivirus: de gestukte upload komt nooit als data-URL in een verzoek-body
   // langs het scan-net, dus die scant zichzelf zodra het bestand compleet is
-  db, save, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer, dir: DATA_DIR, antivirus });
+  db, save, bijeen, inBundel, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer, dir: DATA_DIR, antivirus });
 /* RTG Meet (kern/meet.js): vergaderkamers op codenaam; de server geeft
    alleen WebRTC-seinen door, beeld en geluid lopen peer-to-peer. */
 const meet = require('./kern/meet').maakMeet({
@@ -1957,7 +1959,7 @@ const kern = {
 const hulp = {
   DATA_DIR, FISCAAL_PEILJAAR, LANDEN, PERSONAS, accounts, alcoholGrensVan, annuleerReservering,
   anthropic, app, archief, betaal, betaalOpdrachten, beveilig, bijeen, boekingenVanKlant, boekingenVanZaak, boekingenVoegToe,
-  broadcastSync, centen, crypto, db, entreeCode, etaMinutes, facturatie, findSupplier, fonds, fooiUit,
+  broadcastSync, centen, crypto, db, entreeCode, inBundel, etaMinutes, facturatie, findSupplier, fonds, fooiUit,
   geborenVan, haversine, idGeverifieerd, keyVanCodenaam, klantProfiel, klokVan, ledenAantal,
   ledenPrijs, leeftijdVan, legApart, liveCodename, log, logActivity, loginFails, maakOntmoeting,
   mail, media, noteFailedTry, notify, notifySupplier, onboarding, openVacatures, optieAan,

@@ -45,7 +45,7 @@ function maakStukken(basis, upload, versieNieuw) {
     return { ok: true, stukken: u.stukken.length };
   }
 
-  function klaar(key, uploadId) {
+  async function klaar(key, uploadId) {
     const u = lopend.get(String(uploadId || ''));
     if (!u || u.key !== key) return { status: 404, error: 'Die upload loopt niet (meer); begin opnieuw.' };
     lopend.delete(String(uploadId));
@@ -80,8 +80,8 @@ function maakStukken(basis, upload, versieNieuw) {
 
     // dezelfde weg als een kleine upload: alle grenzen, het quotum en de
     // Ontsmetter gelden gewoon
-    return u.bid ? versieNieuw(key, u.bid, dataUrl)
-      : upload(key, { naam: u.naam, map: u.map, dataUrl });
+    return u.bid ? await versieNieuw(key, u.bid, dataUrl)
+      : await upload(key, { naam: u.naam, map: u.map, dataUrl });
   }
 
   return { bestandenUpStart: start, bestandenUpDeel: deel, bestandenUpKlaar: klaar };

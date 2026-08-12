@@ -30,6 +30,10 @@
    moet bewaren, exporteert periodiek (zie lijst()). */
 const MAX = 5000;
 
+const { hangAan, verifieer, top } = require('./lib/keten');
+const { verankerPunt, verifieerTegenAnker } = require('./lib/keten-anker');
+const { nu, datum } = require('./lib/klok');
+
 /* De db-laag komt via zet() binnen, zodat dit bestand niets circulair
    importeert en tests hem met een nepdatabase kunnen vullen. */
 let DB = null, SAVE = null;
@@ -58,19 +62,29 @@ function zelf(door, over) {
      waarom korte, echte aanleiding. Verplicht.
      bron   waar vandaan (route, kamer, scherm).
    Geeft de weggeschreven regel terug, of null als er niets te noteren viel. */
-function noteer({ door, over, waarom, bron } = {}) {
+function noteer({ door, over, waarom, bron, extra } = {}) {
   if (zelf(door, over)) return null;
-  const r = {
-    at: new Date().toISOString(),
+  const kaal = {
+    at: datum().toISOString(),
     doorId: door && door.id != null ? String(door.id).slice(0, 40) : null,
     door: kort((door && door.naam) || (typeof door === 'string' ? door : '') || 'onbekend', 40),
     overId: over && over.id != null ? String(over.id).slice(0, 40) : null,
     // de codenaam mag wel: die is nu juist het pseudoniem, geen identiteit
     over: kort((over && over.codenaam) || (typeof over === 'string' ? over : ''), 60),
     waarom: kort(waarom, 120) || 'GEEN REDEN OPGEGEVEN',
-    bron: kort(bron, 60)
+    bron: kort(bron, 60),
+    ...(extra || {})
   };
+  /* DE KETEN SLUIT ALS LAATSTE, en `extra` bestaat precies daarom.
+
+     Hier stond eerst dat noteerVeel() de teruggegeven regel NA afloop nog
+     bijstelde (overId op null, aantal en overIds erbij). Met een hash eronder is
+     dat geen slordigheid meer maar een stille breuk: de hash dekt dan een regel
+     die nooit heeft bestaan, en verifieer() wijst een vervalsing aan op de enige
+     plek waar niemand heeft gesjoemeld. Wie iets aan de regel wil toevoegen,
+     doet dat dus VOOR het hashen -- via extra. */
   const l = rij();
+  const r = hangAan(l, kaal);
   l.unshift(r);
   if (l.length > MAX) l.length = MAX;
   if (SAVE) { try { SAVE(); } catch (e) {} }
@@ -84,12 +98,14 @@ function noteer({ door, over, waarom, bron } = {}) {
 function noteerVeel({ door, overIds, waarom, bron } = {}) {
   const ids = (Array.isArray(overIds) ? overIds : []).map(String);
   if (!ids.length) return null;
-  const r = noteer({ door, over: { id: ids[0] }, waarom, bron });
-  if (!r) return null;
-  r.overId = null;                      // het is geen enkele persoon
-  r.aantal = ids.length;
-  r.overIds = ids.slice(0, 200);        // begrensd: een dump van 65M id's helpt niemand
-  return r;
+  /* De drie extra velden gaan MEE naar noteer() in plaats van er achteraf op te
+     worden gezet: sinds de keten eronder ligt, dekt de hash de regel zoals hij
+     wordt weggeschreven. Zie de uitleg bij noteer(). */
+  return noteer({ door, over: { id: ids[0] }, waarom, bron, extra: {
+    overId: null,                       // het is geen enkele persoon
+    aantal: ids.length,
+    overIds: ids.slice(0, 200)          // begrensd: een dump van 65M id's helpt niemand
+  } });
 }
 
 /* Lezen. Alleen voor de eigenaar/toezicht (de aanroepende route bewaakt dat),
@@ -112,16 +128,36 @@ function voorBetrokkene(overId) {
   return lijst({ overId, max: 200 }).map(r => ({ at: r.at, waarom: r.waarom, bron: r.bron }));
 }
 
+/* IS HET SPOOR ONGEMOEID? De keten nalopen, zodat een beheerder die een regel
+   heeft weggehaald of bijgesteld op een aanwijsbaar punt opvalt. Zie
+   server/lib/keten.js voor wat dit wel en niet tegenhoudt -- kort: stille
+   wijziging wel, een vastberaden beheerder pas als de top naar buiten gaat. */
+function controleer() { return verifieer(rij()); }
+
+/* De top van de keten: het ene getal dat periodiek naar een gescheiden systeem
+   moet om het verleden echt vast te zetten. */
+function ketenTop() { return top(rij()); }
+
+/* HET ANKER. controleer() ziet wat er BINNEN het journaal niet klopt; wie de
+   nieuwste regels weggooit houdt een kloppende keten over. Alleen een eerder
+   naar buiten gebracht anker ziet dat -- zie server/lib/keten.js.
+
+   anker()      maak de momentopname die weggezet moet worden (buiten dit huis).
+   tegenAnker() reken af met een anker dat eerder is weggezet. */
+function anker() { return verankerPunt(rij()); }
+function tegenAnker(a) { return verifieerTegenAnker(rij(), a); }
+
 function samenvatting() {
   const l = rij();
-  const grens = Date.now() - 7 * 24 * 3600 * 1000;
+  const grens = nu() - 7 * 24 * 3600 * 1000;
   const week = l.filter(r => Date.parse(r.at) >= grens);
   return {
     totaal: l.length,
     week: week.length,
     zonderReden: l.filter(r => r.waarom === 'GEEN REDEN OPGEGEVEN').length,
+    keten: controleer(),
     recent: l.slice(0, 10)
   };
 }
 
-module.exports = { zet, noteer, noteerVeel, lijst, voorBetrokkene, samenvatting, MAX };
+module.exports = { zet, noteer, noteerVeel, lijst, voorBetrokkene, samenvatting, controleer, ketenTop, anker, tegenAnker, MAX };

@@ -37,7 +37,9 @@ function keerN(basis, soort, n) {
   return new Date(Date.UTC(nj, nm, Math.min(dg, laatste))).toISOString().slice(0, 10);
 }
 
-function maakAgendaPro({ db, save, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer, boekingenVanKlant }) {
+function maakAgendaPro({ db, save, bijeen, inBundel, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer, boekingenVanKlant }) {
+  // schrijft in dezelfde agenda, dus dezelfde belofte: zie lib/duurzaam.js
+  const vastleggen = require('../lib/duurzaam')({ bijeen, save, inBundel, bron: 'agenda-pro' });
   const nu = () => new Date().toISOString();
   const scho = schoon || ((v, n) => String(v == null ? '' : v).trim().slice(0, n || 200));
   const store = () => { if (!db.data.agendas || typeof db.data.agendas !== 'object') db.data.agendas = {}; return db.data.agendas; };
@@ -76,7 +78,7 @@ function maakAgendaPro({ db, save, crypto, schoon, keyVanCodenaam, codenaamVan, 
   }
 
   /* ---- bewaren met de pro-velden (nieuw of bestaand) ---- */
-  function bewaarAfspraak(ownerKey, data) {
+  async function bewaarAfspraak(ownerKey, data) {
     const arr = ruw(ownerKey);
     let i = data.id ? arr.find(x => x.id === data.id) : null;
     if (data.id && !i) return { error: 'Afspraak niet gevonden.' };
@@ -106,8 +108,8 @@ function maakAgendaPro({ db, save, crypto, schoon, keyVanCodenaam, codenaamVan, 
       const lk = lidVan(d.key);
       if (lk) { try { sseToCustomer(lk, 'agenda', { kind: 'gewijzigd', titel: i.titel, datum: i.datum }); } catch (e) {} }
     }
-    save();
-    return { ok: true, id: i.id };
+    const mis = await vastleggen();   // legt het bovenstaande duurzaam vast
+    return mis || { ok: true, id: i.id };
   }
 
   /* ---- uitnodigen op codenaam; ja of nee zeggen ---- */
@@ -128,24 +130,26 @@ function maakAgendaPro({ db, save, crypto, schoon, keyVanCodenaam, codenaamVan, 
       tijd: i.tijd || null, eind: i.eind || null, plek: i.plek || null, notitie: i.notitie || null,
       herhaal: i.herhaal || 'geen', herhaalTot: i.herhaalTot || null, herinner: null, gedaan: false,
       vanKey: ownerKey, bronId: i.id, status: 'uitgenodigd', at: nu() });
-    save();
+    const mis = await vastleggen();   // legt het bovenstaande duurzaam vast
+    if (mis) return mis;
     try { sseToCustomer(doel, 'agenda', { kind: 'uitnodiging', titel: i.titel, datum: i.datum, van: naam(ownerKey) }); } catch (e) {}
     return { ok: true, deelnemers: publiek(i).deelnemers };
   }
-  function antwoordUitnodiging(ownerKey, id, ja) {
+  async function antwoordUitnodiging(ownerKey, id, ja) {
     const k = ruw(ownerKey).find(x => x.id === id && x.vanKey);
     if (!k) return { error: 'Uitnodiging niet gevonden.' };
     k.status = ja ? 'ja' : 'nee';
     const bron = ruw(k.vanKey).find(x => x.id === k.bronId);
     if (bron) { const d = (bron.deelnemers || []).find(x => x.key === ownerKey); if (d) d.status = k.status; }
-    save();
+    const mis = await vastleggen();   // legt het bovenstaande duurzaam vast
+    if (mis) return mis;
     const lk = lidVan(k.vanKey);
     if (lk) { try { sseToCustomer(lk, 'agenda', { kind: 'antwoord', titel: k.titel, codenaam: naam(ownerKey), ja: !!ja }); } catch (e) {} }
     return { ok: true, status: k.status };
   }
 
   /* ---- verwijderen, met de kopieën mee (vervangt de basislaag) ---- */
-  function verwijder(ownerKey, itemId) {
+  async function verwijder(ownerKey, itemId) {
     const s = store();
     const i = ruw(ownerKey).find(x => x.id === itemId);
     if (i && !i.vanKey && (i.deelnemers || []).length) {
@@ -161,8 +165,8 @@ function maakAgendaPro({ db, save, crypto, schoon, keyVanCodenaam, codenaamVan, 
       if (bron) { const d = (bron.deelnemers || []).find(x => x.key === ownerKey); if (d) d.status = 'nee'; }
     }
     s[ownerKey] = ruw(ownerKey).filter(x => x.id !== itemId);
-    save();
-    return { ok: true };
+    const mis = await vastleggen();   // legt het bovenstaande duurzaam vast
+    return mis || { ok: true };
   }
 
   const helpers = { keerN, publiek, ruw, naam, lidVan, isDatum, scho, sseToCustomer, save, boekingenVanKlant };

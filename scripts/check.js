@@ -2974,5 +2974,147 @@ console.log('\n46) de SLO-tabel in SLO.md is een afdruk van SLO.json');
   }
 }
 
+/* ============================================================================
+   47) saveDuurzaam() wordt alleen aangeroepen waar het MOET
+
+   WAAROM DIT EEN HARDE POORT IS EN GEEN AFSPRAAK. db.saveDuurzaam() schrijft
+   synchroon met een fsync eronder en keert pas terug als de opslag het heeft
+   bevestigd. Dat kost latentie, en dat is de hele reden dat hij bestaat -- voor
+   geld, waar bevestigen vóór duurzaamheid een belofte is die de opslag nog niet
+   heeft gedaan (zie GELDLAT.md).
+
+   Precies daarom is hij gevaarlijk als hij rondslingert. Iemand leest hem als
+   "de veilige save", zet hem onder een profielwijziging, en het prestatieprofiel
+   van het platform is veranderd zonder dat er ooit een beslissing over is
+   genomen. Een afspraak in een document houdt dat niet tegen; deze regel wel.
+
+   Elke regel in TOEGESTAAN noemt zijn reden. Staat er geen reden bij, dan hoort
+   hij er niet -- dezelfde vorm als PUBLIEK in de poortwacht en MAG in de
+   klokschuld.
+
+   DRIE DEUREN, EN DE REGEL BEWAAKTE ER EERST MAAR EEN. Hij zocht op de NAAM
+   saveDuurzaam, en niemand roept die naam aan: de weg erheen is
+   `bijeen(fn, { duurzaam: true })`, en sinds notities is er ook de gedeelde
+   helper server/lib/duurzaam.js. Wie een route duurzaam maakte, kwam er dus
+   ongezien langs -- een poort die precies de gebruikte ingang niet bewaakte, en
+   dat is de stilste vorm die er is. Hij kijkt nu naar het BEREIK: de naam, de
+   vlag die een bundel duurzaam maakt, en de helper die beide verpakt. */
+console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestiging moet');
+{
+  const TOEGESTAAN = new Map([
+    ['server/db/index.js', 'hier WOONT de primitive, en bijeen() is de enige indirecte weg erheen'],
+    ['scripts/check.js', 'deze regel zelf noemt zijn naam'],
+    ['test/saveduurzaam.test.js', 'de toets die bewijst dat hij bevestigt'],
+    ['test/notitiesduurzaam.test.js', 'de toets die bewijst dat het bord niet bevestigt zonder opslag'],
+    ['scripts/duurzaamheidskosten.js', 'merkt per route of hij duurzaam is; meet de prijs, zet niets aan'],
+    ['test/duurzaamheidskosten.test.js', 'de toets op het oordeel van die meting'],
+    ['server/lib/verraad.js', 'de catalogus benoemt de plek waar sterf-na-commit zit; geen aanroep'],
+    ['server/lib/idem.js', 'draagt de vlag door van de aanroeper naar de bundel; kiest zelf niets'],
+    ['server/lib/duurzaam.js', 'hier woont de gedeelde vastleg-helper voor werk van een lid'],
+    ['server/kern/pay/index.js', 'geld: bevestigen vóór duurzaamheid is een belofte die de opslag nog niet deed'],
+    ['server/kern/notities.js', 'werk van een lid: een bevestigde notitie mag niet verdwijnen bij een opslagfout'],
+    ['server/kern/agenda.js', 'werk van een lid: een afspraak die je hebt gezet, hoort er na een herstart te staan'],
+    ['server/kern/agenda-pro.js', 'schrijft in dezelfde agenda en doet dus dezelfde belofte'],
+    ['server/kern/bestanden.js', 'werk van een lid: de bytes staan al duurzaam, de verwijzing ernaartoe nu ook'],
+    ['server/kern/bestanden-delen.js', 'delen, versies en de prullenbak zijn dezelfde kluis; een lid ziet niet welke knop beschermd is'],
+    ['server/kern/berichten/index.js', 'werk van een lid: een weggezet gesprek hoort niet terug te komen']
+  ]);
+  /* Het BEREIK van de primitive: de naam zelf, de vlag waarmee een bundel
+     duurzaam wordt, en de gedeelde helper. Zonder die laatste twee bewaakt deze
+     regel alleen zichzelf. */
+  const BEREIK = /saveDuurzaam|duurzaam\s*:\s*true|lib\/duurzaam/;
+  const overtreders = [];
+  let gezien = 0;
+  const kijk = (map) => {
+    for (const naam of fs.readdirSync(map)) {
+      const p = path.join(map, naam);
+      let st; try { st = fs.statSync(p); } catch (e) { continue; }
+      if (st.isDirectory()) {
+        if (/^(node_modules|\.git|data|dist)$/.test(naam)) continue;
+        kijk(p); continue;
+      }
+      if (!naam.endsWith('.js')) continue;
+      let bron; try { bron = fs.readFileSync(p, 'utf8'); } catch (e) { continue; }
+      if (bron.includes('\u0000')) continue;
+      if (!BEREIK.test(bron)) continue;
+      gezien++;
+      const rel = path.relative(ROOT, p).replace(/\\/g, '/');
+      if (!TOEGESTAAN.has(rel)) overtreders.push(rel);
+    }
+  };
+  for (const map of ['server', 'scripts', 'test']) {
+    const m = path.join(ROOT, map);
+    if (fs.existsSync(m)) kijk(m);
+  }
+  /* EEN LIJST DIE NAAR EEN VERDWENEN BESTAND WIJST, BEWAAKT DAAR NIETS MEER.
+     Zonder deze controle blijft een regel staan nadat het bestand is hernoemd,
+     en leest de lijst als dekking die er niet is. */
+  const spoken = [...TOEGESTAAN.keys()].filter(r => !fs.existsSync(path.join(ROOT, r)));
+  if (overtreders.length) {
+    fout('de duurzame commit wordt bereikt op een plek die er niet op de lijst staat: ' + overtreders.join(', ') +
+      ' -- zet hem in TOEGESTAAN (met reden) of gebruik de gewone save()');
+  } else if (spoken.length) {
+    fout('de lijst noemt bestanden die niet meer bestaan: ' + spoken.join(', ') +
+      ' -- haal ze eruit, anders belooft de lijst dekking die er niet is');
+  } else {
+    ok(gezien + ' bestanden komen aan de duurzame commit (naam of bundelvlag), allemaal met een reden op de lijst');
+  }
+}
+
+/* ============================================================================
+   48) BEWIJSGROEN EN GO-LIVE-GROEN KUNNEN ELKAAR NIET GROEN PRATEN
+
+   LAT.md regel 11. Twee soorten groen die niets met elkaar te maken hebben:
+   bewijsgroen zegt dat iemand heeft gekeken, go-live-groen zegt dat dit huis de
+   deur open mag. Je kunt honderd procent bewijsdekking hebben en juridisch nog
+   steeds niet mogen lanceren -- en andersom.
+
+   Deze regel houdt de twee kanten STRUCTUREEL uit elkaar, want een afspraak
+   houdt dit niet tegen. Zodra de go-live-keuring een bewijsregister zou lezen,
+   kan een verdubbelde matrix een ontbrekende secrets manager wegdrukken, en dat
+   is precies de fout die niemand terugvindt. Andersom net zo: een
+   bewijsinstrument dat "klaar voor productie" roept, spreekt over iets waar hij
+   niets van weet.
+
+   Wat hij NIET kan: de mens tegenhouden die de twee naast elkaar legt en
+   optelt. Daarvoor staat regel 11 in LAT.md. */
+console.log('\n48) bewijsgroen en go-live-groen blijven uit elkaar');
+{
+  const REGISTERS = ['BEWIJSMATRIX.json', 'CONTROLS.json', 'ROLPROEF.json', 'KETENS.json',
+    'STAATPROEF.json', 'INVOERPROEF.json', 'IDEMPROEF.json', 'POORTWACHT.json',
+    'DUURZAAMHEIDSKOSTEN.json', 'VERRAAD.json', 'SCHERMLEUGEN.json'];
+  const BEWIJSSCRIPTS = ['scripts/bewijsmatrix.js', 'scripts/controls.js', 'scripts/rolproef-route.js',
+    'scripts/invoerproef-route.js', 'scripts/idemproef-route.js', 'scripts/staatproef-route.js',
+    'scripts/ketenronde.js', 'scripts/duurzaamheidskosten.js'];
+  const GOLIVE_SCRIPTS = ['scripts/golive.js', 'scripts/papierwerk.js'];
+  const klachten = [];
+
+  // 1) de go-live-keuring leest geen enkel bewijsregister
+  for (const rel of GOLIVE_SCRIPTS) {
+    const f = path.join(ROOT, rel);
+    if (!fs.existsSync(f)) continue;
+    const bron = fs.readFileSync(f, 'utf8');
+    for (const reg of REGISTERS) if (bron.includes(reg)) klachten.push(rel + ' leest ' + reg);
+  }
+
+  // 2) een bewijsinstrument velt geen go-live-oordeel
+  const OORDEEL = /klaar voor (de )?productie|mag live|kan live|go-?live-?groen|golive\(/i;
+  for (const rel of BEWIJSSCRIPTS) {
+    const f = path.join(ROOT, rel);
+    if (!fs.existsSync(f)) continue;
+    for (const regel of fs.readFileSync(f, 'utf8').split('\n')) {
+      if (OORDEEL.test(regel)) klachten.push(rel + ': ' + regel.trim().slice(0, 70));
+    }
+  }
+
+  if (klachten.length) {
+    fout('bewijs en go-live raken elkaar: ' + klachten.join(' | ') +
+      ' -- LAT.md regel 11: bewijsgroen is geen go-live-groen');
+  } else {
+    ok(REGISTERS.length + ' bewijsregisters en ' + BEWIJSSCRIPTS.length + ' bewijsinstrumenten: ' +
+      'de go-live-keuring leest er geen, en ze vellen geen go-live-oordeel');
+  }
+}
+
 console.log(fouten ? `\nNIET OK: ${fouten} probleem(en).` : '\nAlles in orde.');
 process.exit(fouten ? 1 : 0);

@@ -25,10 +25,12 @@
    precies de kanalen die verhuisd waren niet meer -- en dat is de stilste fout
    van allemaal: een zoekopdracht die niets vindt ziet er hetzelfde uit als een
    zoekopdracht zonder treffers. */
-module.exports = ({ db, save, socialConnecties, dmSleutel, codenaamVan, rtmail, overheid, anthropic, commDm, commWerk }) => {
+module.exports = ({ db, save, bijeen, inBundel, socialConnecties, dmSleutel, codenaamVan, rtmail, overheid, anthropic, commDm, commWerk }) => {
   const DM = () => (typeof commDm === 'function' ? commDm() : null);
   // zelfde late binding als DM: de kern bestaat nog niet op het moment van mounten
   const WERK = () => (typeof commWerk === 'function' ? commWerk() : null);
+  /* Een vlag op een gesprek is werk van een lid; zie server/lib/duurzaam.js. */
+  const vastleggen = require('../../lib/duurzaam')({ bijeen, save, inBundel, bron: 'berichten' });
     const MAX_TREFFERS = 40;
   const MAX_KANALEN = 100;       // gesprekken die een zoekopdracht doorloopt
   const MAX_PER_KANAAL = 300;    // berichten per gesprek (dat is ook de bewaargrens)
@@ -43,7 +45,7 @@ module.exports = ({ db, save, socialConnecties, dmSleutel, codenaamVan, rtmail, 
   /* Een vlag omzetten. Drie standen, elk met een reden om te bestaan:
      vast = bovenaan houden, stil = geen meldingen, weg = uit de lijst (niet
      verwijderd: het gesprek blijft, je ziet het alleen niet meer staan). */
-  function vlagZet(mij, id, vlag, aan) {
+  async function vlagZet(mij, id, vlag, aan) {
     if (!['vast', 'stil', 'weg'].includes(vlag)) throw new Error('Onbekende vlag.');
     const v = V();
     const rij = v[mij] = v[mij] || {};
@@ -52,7 +54,10 @@ module.exports = ({ db, save, socialConnecties, dmSleutel, codenaamVan, rtmail, 
     rij[k] = rij[k] || {};
     if (aan) rij[k][vlag] = true; else delete rij[k][vlag];
     if (!Object.keys(rij[k]).length) delete rij[k];
-    save();
+    /* Een vlag is werk van een lid: wie een gesprek wegzet, hoort het na een
+       herstart niet terug te zien staan. Zie server/lib/duurzaam.js. */
+    const mis = await vastleggen();
+    if (mis) return mis;
     return rij[k] || {};
   }
 

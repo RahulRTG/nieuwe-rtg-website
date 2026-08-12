@@ -1,0 +1,139 @@
+{
+ "uitleg": "Gepaarde meting van de duurzame commit: dezelfde machine, dezelfde opslag, dezelfde belasting, alleen RTG_DUURZAAM ertussen. De controlegroep is een schrijfroute die NIET duurzaam vastlegt; beweegt die mee, dan meet deze ronde de machine en niet de commit. Getallen van verschillende machines of opslagstanden horen NIET vergeleken te worden.",
+ "gedraaid": "2026-08-12T11:17:33.619Z",
+ "machine": {
+  "kernen": 4,
+  "geheugenGB": 17,
+  "platform": "linux",
+  "node": "v22.22.2"
+ },
+ "opslag": "sqlite",
+ "gemeten": {
+  "verzoekenPerRoute": 400,
+  "factorP50": 2.01,
+  "factorP95": 1.49,
+  "factorP99": 0.84,
+  "controleFactorP50": 1.03,
+  "blindeRondes": 0
+ },
+ "routes": [
+  {
+   "route": "notities/bewaar",
+   "duurzaam": true,
+   "aan": {
+    "p50": 5.35,
+    "p95": 7.08,
+    "p99": 8.21,
+    "max": 11.24,
+    "gelukt": 400,
+    "statussen": {
+     "200": 400
+    }
+   },
+   "uit": {
+    "p50": 2.58,
+    "p95": 4.16,
+    "p99": 11.62,
+    "max": 12.79,
+    "gelukt": 400,
+    "statussen": {
+     "200": 400
+    }
+   },
+   "factor": {
+    "p50": 2.07,
+    "p95": 1.7,
+    "p99": 0.71
+   }
+  },
+  {
+   "route": "agenda/toevoegen",
+   "duurzaam": true,
+   "aan": {
+    "p50": 7.14,
+    "p95": 8.97,
+    "p99": 13.39,
+    "max": 42.87,
+    "gelukt": 400,
+    "statussen": {
+     "200": 400
+    }
+   },
+   "uit": {
+    "p50": 3.67,
+    "p95": 6.53,
+    "p99": 13.68,
+    "max": 14.73,
+    "gelukt": 400,
+    "statussen": {
+     "200": 400
+    }
+   },
+   "factor": {
+    "p50": 1.95,
+    "p95": 1.37,
+    "p99": 0.98
+   }
+  },
+  {
+   "route": "bestanden/map",
+   "duurzaam": true,
+   "aan": {
+    "p50": 6.91,
+    "p95": 9.1,
+    "p99": 11.05,
+    "max": 11.05,
+    "gelukt": 95,
+    "statussen": {
+     "200": 95,
+     "409": 305
+    }
+   },
+   "uit": {
+    "p50": 3.43,
+    "p95": 6.56,
+    "p99": 13.41,
+    "max": 13.41,
+    "gelukt": 95,
+    "statussen": {
+     "200": 95,
+     "409": 305
+    }
+   },
+   "factor": {
+    "p50": 2.01,
+    "p95": 1.39,
+    "p99": 0.82
+   }
+  },
+  {
+   "route": "zorgprofiel/zet (controle)",
+   "duurzaam": false,
+   "aan": {
+    "p50": 3.55,
+    "p95": 12.17,
+    "p99": 13.71,
+    "max": 40.11,
+    "gelukt": 400,
+    "statussen": {
+     "200": 400
+    }
+   },
+   "uit": {
+    "p50": 3.43,
+    "p95": 12.32,
+    "p99": 13.62,
+    "max": 16.07,
+    "gelukt": 400,
+    "statussen": {
+     "200": 400
+    }
+   },
+   "factor": {
+    "p50": 1.03,
+    "p95": 0.99,
+    "p99": 1.01
+   }
+  }
+ ]
+}

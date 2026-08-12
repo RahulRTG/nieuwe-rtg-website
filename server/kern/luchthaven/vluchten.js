@@ -22,7 +22,7 @@ module.exports = (ctx) => {
     save();
     return { ok: true, vlucht: publiek(v) };
   }
-  function vluchtStatus(actor, vid, status) {
+  async function vluchtStatus(actor, vid, status) {
     const v = vind(vid);
     if (!v) return { status: 404, error: 'Vlucht niet gevonden.' };
     if (status === 'geannuleerd') {
@@ -30,7 +30,7 @@ module.exports = (ctx) => {
       v.status = 'geannuleerd'; save();
       // de visumtaken van de geboekte passagiers gaan mee van tafel
       const vt = visum();
-      if (vt) for (const b of L().boekingen) if (b.vluchtId === v.id && b.status !== 'geannuleerd') vt.bijAnnulering(b.key, b.code);
+      if (vt) for (const b of L().boekingen) if (b.vluchtId === v.id && b.status !== 'geannuleerd') await vt.bijAnnulering(b.key, b.code);
       return { ok: true, vlucht: publiek(v) };
     }
     const k = keten(v);
@@ -84,7 +84,7 @@ module.exports = (ctx) => {
   }
 
   /* ---------- de passagiersketen: boeken, inchecken, boarding pass ---------- */
-  function boek(sess, codenaam, vid, data) {
+  async function boek(sess, codenaam, vid, data) {
     data = data || {};
     const v = vind(vid);
     if (!v || v.soort !== 'vertrek') return { status: 404, error: 'Vlucht niet gevonden.' };
@@ -99,7 +99,7 @@ module.exports = (ctx) => {
     // vraagt de bestemming vooraf een visum of reistoestemming, dan staat de
     // taak nu in de persoonlijke agenda (kern/visumtaak.js)
     const vt = visum();
-    const taak = vt ? vt.bijBoeking(sess.key, { ref: b.code, bestemming: v.bestemming, vertrek: v.datum }).taak : null;
+    const taak = vt ? (await vt.bijBoeking(sess.key, { ref: b.code, bestemming: v.bestemming, vertrek: v.datum })).taak : null;
     return { ok: true, boeking: { code: b.code, vlucht: publiek(v), status: b.status }, visumtaak: taak };
   }
   function incheck(sess, code, data) {

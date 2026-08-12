@@ -1,0 +1,869 @@
+{
+  "uitleg": "De systeemwetten van RTG: de uitspraken die in de doctrine-documenten als HARD staan opgeschreven, met per wet wie hem tegenhoudt en hoe je dat kunt zien. Elke wet draagt drie dingen: (1) een BRON -- het document en de letterlijke zin die er staat, zodat een wet niet hier kan gaan afwijken van waar hij vandaan komt (LAT.md regel 6); (2) een HANDHAVER -- de bestanden die hem tegenhouden, die moeten bestaan; (3) een SABOTAGE -- een mechanische verandering die de wet ECHT overtreedt, met de wachter die daarvan rood hoort te worden. Wie geen sabotage kan bedenken, schrijft op waarom het mensenwerk is; dat is een eerlijke stand en geen gat dat verstopt wordt.\n\nDe wetten zijn niet met de hand geteld maar gelezen uit CLAUDE.md, LAT.md, GELD.md, LEVEN.md, CONCERN.md, ONTWERP.md, MATERIAAL.md, WERELD.md, WERKRUIMTE.md en PLATFORM.md. Wat hier NIET in staat, is geen wet -- het is een voornemen, een smaak of een nog niet opgeschreven afspraak.\n\nDraai `npm run wetten` voor de stand, `npm run sabotage` om ze echt te proberen, `npm run zekerheid` voor wat we daarna weten en vooral niet weten.",
+  "wetten": [
+    {
+      "id": "merk-kleurspelling",
+      "soort": "merk",
+      "wet": "Een merkkleur heeft precies een spelling; wat een haar naast een logokleur ligt is een typefout en geen keuze.",
+      "bron": {
+        "bestand": "CLAUDE.md",
+        "anker": "--burgundy:#7F1634"
+      },
+      "handhaver": [
+        "scripts/check.js"
+      ],
+      "sabotage": {
+        "wat": "zet het bordeaux van het logo een groenstap hoger -- het verschil dat niemand met het oog ziet",
+        "bestand": "public/shared/rtg-materiaal.css",
+        "zoek": "--bordeaux-basis:#7F1634;",
+        "zet": "--bordeaux-basis:#7F1734;",
+        "wachters": [
+          "check:23"
+        ]
+      }
+    },
+    {
+      "id": "merk-twee-letterrollen",
+      "soort": "merk",
+      "wet": "Er zijn precies twee letterrollen (display en interface) en elke regel loopt daardoorheen; een blad noemt nooit zelf een familie.",
+      "bron": {
+        "bestand": "MATERIAAL.md",
+        "anker": "Typografie: twee rollen"
+      },
+      "handhaver": [
+        "test/materiaal.test.js",
+        "public/shared/rtg-materiaal.css"
+      ],
+      "sabotage": {
+        "wat": "laat het materialenblad zelf een lettertype noemen in plaats van een rol",
+        "bestand": "public/shared/rtg-materiaal.css",
+        "zoek": ".rtg-licht{position:relative;}",
+        "zet": ".rtg-licht{font-family:Helvetica,sans-serif;position:relative;}",
+        "wachters": [
+          "test:test/materiaal.test.js"
+        ]
+      }
+    },
+    {
+      "id": "merk-pearl-is-warm",
+      "soort": "merk",
+      "wet": "Pearl is gepolijst keramiek en dus warm: in elke toon blijft rood boven blauw, een koel wit is het verkeerde materiaal.",
+      "bron": {
+        "bestand": "MATERIAAL.md",
+        "anker": "levend wit"
+      },
+      "handhaver": [
+        "test/materiaal.test.js"
+      ],
+      "sabotage": {
+        "wat": "draai de rood- en blauwkanalen van Pearl om, zodat het klinisch koel wit wordt",
+        "bestand": "public/shared/rtg-materiaal.css",
+        "zoek": "--pearl-basis:#F4F0E9;",
+        "zet": "--pearl-basis:#E9F0F4;",
+        "wachters": [
+          "test:test/materiaal.test.js"
+        ]
+      }
+    },
+    {
+      "id": "merk-goud-is-mat",
+      "soort": "merk",
+      "wet": "Goud is geborsteld champagnegoud en mat; een verzadigde geeltoon is glitter en geen metaal.",
+      "bron": {
+        "bestand": "MATERIAAL.md",
+        "anker": "geborsteld massief goud"
+      },
+      "handhaver": [
+        "test/materiaal.test.js"
+      ],
+      "sabotage": {
+        "wat": "vervang de logotoon door internet-goud (#FFD700)",
+        "bestand": "public/shared/rtg-materiaal.css",
+        "zoek": "--gold-basis:#857007;",
+        "zet": "--gold-basis:#FFD700;",
+        "wachters": [
+          "test:test/materiaal.test.js"
+        ]
+      }
+    },
+    {
+      "id": "merk-geen-emoji",
+      "soort": "merk",
+      "wet": "In server/ en public/ staat geen emoji: het beeld komt uit het eigen glyfsysteem.",
+      "bron": {
+        "bestand": "ONTWERP.md",
+        "anker": "iconensysteem"
+      },
+      "handhaver": [
+        "scripts/check.js"
+      ],
+      "sabotage": {
+        "wat": "zet een emoji in de kop van een servermodule",
+        "bestand": "server/pinslot.js",
+        "zoek": "/* Het gedeelde PIN-slot:",
+        "zet": "/* Het gedeelde PIN-slot 🔒:",
+        "wachters": [
+          "check:3b"
+        ]
+      }
+    },
+    {
+      "id": "vorm-bodoni-ceremonieel",
+      "soort": "vorm",
+      "wet": "Serif staat op een gesloten lijst rollen en nergens anders: een signatuur die overal staat is geen signatuur.",
+      "bron": {
+        "bestand": "ONTWERP.md",
+        "anker": "Merk-elementen en werk-elementen"
+      },
+      "handhaver": [
+        "test/ontwerp.test.js",
+        "public/shared/rtg-ontwerp.css"
+      ],
+      "sabotage": {
+        "wat": "geef ook de werk-rollen een serif, zodat de ceremonie overal staat",
+        "bestand": "public/shared/rtg-ontwerp.css",
+        "zoek": "  font-family:Inter,system-ui,sans-serif;",
+        "zet": "  font-family:'Bodoni Moda',Georgia,serif;",
+        "wachters": [
+          "test:test/ontwerp.test.js"
+        ]
+      }
+    },
+    {
+      "id": "vorm-modus-is-volledig",
+      "soort": "vorm",
+      "wet": "Elke modus (World, Pro, Command) zet alle vier de dichtheidsmaten; een half gevulde modus erft de rest en staat er halverwege tussenin.",
+      "bron": {
+        "bestand": "ONTWERP.md",
+        "anker": "Drie modi: World, Pro, Command"
+      },
+      "handhaver": [
+        "test/ontwerp.test.js",
+        "public/shared/rtg-ontwerp.css"
+      ],
+      "sabotage": {
+        "wat": "haal een van de vier maten uit de Command-modus weg",
+        "bestand": "public/shared/rtg-ontwerp.css",
+        "zoek": "  --rtg-regel:32px;\n",
+        "zet": "",
+        "wachters": [
+          "test:test/ontwerp.test.js"
+        ]
+      }
+    },
+    {
+      "id": "vorm-status-niet-op-kleur",
+      "soort": "vorm",
+      "wet": "Een status leunt nooit op kleur alleen: het teken komt uit de inhoud, zodat het overblijft voor wie kleur niet ziet.",
+      "bron": {
+        "bestand": "ONTWERP.md",
+        "anker": "Status nooit op kleur alleen"
+      },
+      "handhaver": [
+        "test/ontwerp.test.js",
+        "public/shared/rtg-ontwerp.css"
+      ],
+      "sabotage": {
+        "wat": "haal het teken weg en laat alleen de kleur het verschil dragen",
+        "bestand": "public/shared/rtg-ontwerp.css",
+        "zoek": ".rtg-status::after{content:attr(data-teken);",
+        "zet": ".rtg-status::after{content:'';",
+        "wachters": [
+          "test:test/ontwerp.test.js"
+        ]
+      }
+    },
+    {
+      "id": "vorm-geen-inline-handlers",
+      "soort": "vorm",
+      "wet": "In de HTML staat geen inline on-handler: de pagina's draaien onder een nonce-CSP en een ingespoten script komt er niet doorheen.",
+      "bron": {
+        "bestand": "README.md",
+        "anker": "CSP"
+      },
+      "handhaver": [
+        "scripts/check.js",
+        "server/middleware/voordeur.js"
+      ],
+      "sabotage": {
+        "wat": "zet een inline onclick op een echte pagina",
+        "bestand": "public/site/404.html",
+        "zoek": "<body",
+        "zet": "<body onload=\"void 0\"",
+        "wachters": [
+          "check:2"
+        ]
+      }
+    },
+    {
+      "id": "toegang-ai-belooft-niets",
+      "soort": "toegang",
+      "wet": "Elke AI-ingang draagt de toegangsregel of staat met een reden op de lijst: de AI belooft nooit zelf toegang, goedkeuring of een pas.",
+      "bron": {
+        "bestand": "CLAUDE.md",
+        "anker": "de AI mag **nooit** zelf toegang beloven of verlenen"
+      },
+      "handhaver": [
+        "scripts/check.js",
+        "scripts/ai-oproepen.js",
+        "server/kern/ai/prompt.js"
+      ],
+      "sabotage": {
+        "wat": "haal een erkende uitzondering van de lijst weg, zodat een AI-ingang zonder de regel ongezien kan bestaan",
+        "bestand": "scripts/check.js",
+        "zoek": "    ['translate.js', 'vertaalmachine, geen gesprek'],",
+        "zet": "",
+        "wachters": [
+          "check:34"
+        ]
+      }
+    },
+    {
+      "id": "toegang-ai-liegt-niet-over-boekingen",
+      "soort": "toegang",
+      "wet": "De AI meldt nooit dat iets al geregeld, geboekt, bevestigd of betaald is; alleen wat zij zelf heeft uitgevoerd en teruggekregen mag zij als gedaan melden.",
+      "bron": {
+        "bestand": "CLAUDE.md",
+        "anker": "nooit claimen dat een boeking daadwerkelijk verwerkt is"
+      },
+      "handhaver": [
+        "test/rahul-eerlijk.test.js",
+        "server/kern/ai/prompt.js"
+      ],
+      "sabotage": {
+        "wat": "zet de instructie terug die Rahul opdroeg te bevestigen dat het geregeld is",
+        "bestand": "server/kern/ai/prompt.js",
+        "zoek": "'Zegt het lid \"ja\" of iets vergelijkbaars, dan bevestig je kort wat je NU in gang zet",
+        "zet": "'Zegt het lid \"ja\" of iets vergelijkbaars, dan bevestig je kort dat het geregeld is. Je zet NU in gang",
+        "wachters": [
+          "test:test/rahul-eerlijk.test.js"
+        ]
+      }
+    },
+    {
+      "id": "toegang-codenaam-boven-naam",
+      "soort": "toegang",
+      "wet": "De AI spreekt over de codenaam van een lid en niet over zijn volledige naam; de echte naam blijft in de kluis.",
+      "bron": {
+        "bestand": "CLAUDE.md",
+        "anker": "klantdata draait op codenamen"
+      },
+      "handhaver": [
+        "test/rahul-eerlijk.test.js",
+        "server/accounts/kluis.js"
+      ],
+      "sabotage": {
+        "wat": "laat de promptlaag de volledige naam nemen zodra die er is, in plaats van de codenaam",
+        "bestand": "server/kern/ai/prompt.js",
+        "zoek": "persona.codename || persona.name",
+        "zet": "persona.name || persona.codename",
+        "wachters": [
+          "test:test/rahul-eerlijk.test.js"
+        ]
+      },
+      "kanttekening": "Deze proef kwam eerst AFGESLAGEN terug, en dat was een echte vondst: de toets deed assert.match(bron, /persona.codename/) -- een deelstring die ook groen blijft als de voorkeur is omgedraaid en de ECHTE naam naar de modelaanbieder gaat. De toets kijkt sindsdien naar de volgorde."
+    },
+    {
+      "id": "toegang-geen-kluisgegevens-van-een-ander",
+      "soort": "toegang",
+      "wet": "Geen enkel endpoint geeft de echte naam of het e-mailadres van een ander lid terug; dat zijn precies de velden die in de kluis blijven.",
+      "bron": {
+        "bestand": "CLAUDE.md",
+        "anker": "echte namen staan in de gescheiden kluis"
+      },
+      "handhaver": [
+        "test/grens-sweep.test.js",
+        "server/accounts/kluis.js"
+      ],
+      "sabotage": {
+        "wat": "hang er een nieuw, ongepoort endpoint in dat de hele gebruikersrij van het meegestuurde id teruggeeft -- precies de soort route waar de sweep voor bestaat",
+        "bestand": "server/routes/klok.js",
+        "zoek": "  const stuur = (res, r) => r.error",
+        "zet": "  app.post('/api/zzsabotagelek/rij', (req, res) => res.json({ lid: require('../accounts').getUserById(Number(req.body.id)) || null }));\n  const stuur = (res, r) => r.error",
+        "wachters": [
+          "test:test/grens-sweep.test.js"
+        ]
+      },
+      "kanttekening": "De sweep kijkt alleen naar endpoints die in GEEN ENKELE toets voorkomen -- dat is precies zijn opzet: hij is de vloer onder het ongedekte deel. Een lek in een route die wel een eigen toets heeft, ziet hij niet, en dat staat ook zo in zijn eigen kop."
+    },
+    {
+      "id": "toegang-grendel-hangt-aan-het-doel",
+      "soort": "toegang",
+      "wet": "Een grendel hangt aan het doel en niet aan de aanvrager; elke deur naar dezelfde pin telt in dezelfde teller.",
+      "bron": {
+        "bestand": "LAT.md",
+        "anker": "Een grendel hangt aan het doel, niet aan de aanvrager"
+      },
+      "handhaver": [
+        "server/pinslot.js",
+        "test/eenaccount.test.js"
+      ],
+      "sabotage": {
+        "wat": "zet de teller van het pinslot zo hoog dat hij nooit meer dichtgaat",
+        "bestand": "server/pinslot.js",
+        "zoek": "const MAX_POGINGEN = 5;",
+        "zet": "const MAX_POGINGEN = 1000000;",
+        "wachters": [
+          "test:test/eenaccount.test.js"
+        ]
+      }
+    },
+    {
+      "id": "toegang-progressie-stopt-bij-18",
+      "soort": "toegang",
+      "wet": "Alles wat een prestatie buiten het potje bewaart bestaat alleen voor leden die de 18+-poort halen; onder die grens blijft elk spel speelbaar, er wordt alleen niets bewaard.",
+      "bron": {
+        "bestand": "CLAUDE.md",
+        "anker": "De progressielaag stopt bij 18+"
+      },
+      "handhaver": [
+        "server/kern/spellen/grens.js",
+        "test/spelbeleid.test.js"
+      ],
+      "sabotage": {
+        "wat": "zet de leeftijdspoort van de progressielaag open",
+        "bestand": "server/kern/spellen/grens.js",
+        "zoek": "progressieMag: (handle) => volwassen(handle),",
+        "zet": "progressieMag: (handle) => true,",
+        "wachters": [
+          "test:test/spelbeleid.test.js"
+        ]
+      },
+      "kanttekening": "Deze proef kwam eerst AFGESLAGEN terug: elke spellentoets gaf progressieMag ZELF mee, dus de bedrading van grens.js naar volwassen() werd nergens geraakt. De poort helemaal openzetten bleef groen. test/spelbeleid.test.js gaat er nu doorheen in plaats van eromheen."
+    },
+    {
+      "id": "toegang-elke-route-heeft-een-poort",
+      "soort": "toegang",
+      "wet": "Elke API-route heeft een poortwachter, of staat met een reden op de publieke lijst; een vergeten poort geeft geen fout en geen log.",
+      "bron": {
+        "bestand": "LAT.md",
+        "anker": "een route die je vergeet te poorten geeft geen fout en geen log"
+      },
+      "handhaver": [
+        "scripts/check.js"
+      ],
+      "sabotage": {
+        "wat": "hang er een API-route in zonder poortwachter en zonder vermelding op de publieke lijst",
+        "bestand": "server/routes/klok.js",
+        "zoek": "  app.post('/api/klok/mijn', auth,",
+        "zet": "  app.post('/api/zzsabotage/ongepoort', (req, res) => res.json({ ok: true }));\n  app.post('/api/klok/mijn', auth,",
+        "wachters": [
+          "check:28"
+        ]
+      }
+    },
+    {
+      "id": "toegang-authorization-echt-verifieren",
+      "soort": "toegang",
+      "wet": "De Authorization-kop wordt gelezen om een token te halen, niet om te oordelen: een vormcontrole op een header is geen identiteitscontrole.",
+      "bron": {
+        "bestand": "LAT.md",
+        "anker": "Een controle op vorm is geen controle"
+      },
+      "handhaver": [
+        "scripts/check.js"
+      ],
+      "sabotage": {
+        "wat": "zet een vormcontrole op de Authorization-kop in een servermodule, zonder verifier erachter",
+        "bestand": "server/pinslot.js",
+        "zoek": "module.exports = { maakPinSlot };",
+        "zet": "function __zogenaamdeAuth(req) { return /^Bearer\\s+\\S/i.test(req.headers.authorization || ''); }\nvoid __zogenaamdeAuth;\nmodule.exports = { maakPinSlot };",
+        "wachters": [
+          "check:29"
+        ]
+      }
+    },
+    {
+      "id": "geld-conservatie",
+      "soort": "geld",
+      "wet": "De som van alle wallets blijft op de cent gelijk aan wat er is opgeladen, ook onder gelijktijdige echte betalingen, en geen wallet zakt ooit onder nul.",
+      "bron": {
+        "bestand": "GELD.md",
+        "anker": "Een tweede boekhouding"
+      },
+      "handhaver": [
+        "server/kern/pay/index.js",
+        "test/geld-conservatie-last.test.js"
+      ],
+      "sabotage": {
+        "wat": "boek de tik wel BIJ de ontvanger maar niet AF bij de zender -- dan komt er geld bij dat nooit is opgeladen",
+        "bestand": "server/kern/pay/index.js",
+        "zoek": "    saldi()[rij.van] = saldoVan(rij.van) - rij.centen;",
+        "zet": "    saldi()[rij.van] = saldoVan(rij.van);",
+        "wachters": [
+          "test:test/geld-conservatie-last.test.js"
+        ]
+      },
+      "kanttekening": "Twee recepten eerder afgeslagen, en die twee zeggen iets. zorgSaldo() laadt automatisch bij, dus de saldocontrole daar weigert bijna nooit; en de ondergrens in het grootboek wordt in deze route nooit geraakt, juist omdat er eerst is bijgeladen. Wat de conservatie werkelijk draagt is pasToe(), en daar zit het recept nu op."
+    },
+    {
+      "id": "geld-geen-autonome-betalingen",
+      "soort": "geld",
+      "wet": "Geld verlaat het huis nooit vanzelf: er is geen niveau van automatisering waarin een betaling zonder menselijk besluit naar buiten gaat.",
+      "bron": {
+        "bestand": "GELD.md",
+        "anker": "Autonome betalingen"
+      },
+      "handhaver": [],
+      "mensenwerk": "GELD.md par. 3 beschrijft vier niveaus van automatisering en zet de grens bij het vierde, maar er is geen enkele plek in de code waar 'naar buiten' als een begrip bestaat -- er is geen uitgaande betaalkoppeling. De wet is dus vandaag waar omdat het mechanisme ontbreekt, niet omdat iets hem tegenhoudt. Dat is de gevaarlijkste soort waarheid: hij vervalt stil op de dag dat de koppeling er wel komt. Wie die bouwt, hoort hier eerst een handhaver neer te zetten."
+    },
+    {
+      "id": "leven-bijdrage-telt-nergens-op",
+      "soort": "leven",
+      "wet": "De bijdrage-spiegel is nooit vergelijkend: geen totaal, geen gemiddelde, geen percentiel, geen cijfer dat mensen rangschikt.",
+      "bron": {
+        "bestand": "LEVEN.md",
+        "anker": "De bijdrage-spiegel is nooit vergelijkend"
+      },
+      "handhaver": [
+        "server/kern/levensgraaf/bronnen-leven-bijdrage.js",
+        "test/levensgraafleven.test.js"
+      ],
+      "sabotage": {
+        "wat": "geef een bijdrageknoop een waarde, zodat de graaf er vanzelf een som van maakt",
+        "bestand": "server/kern/levensgraaf/bronnen-leven-bijdrage.js",
+        "zoek": "kamer: 'bijdrage', bron: 'RTG iD', gevoelig: PERSOONLIJK, deel: 'lid',",
+        "zet": "kamer: 'bijdrage', bron: 'RTG iD', gevoelig: PERSOONLIJK, deel: 'lid', waarde: 1,",
+        "wachters": [
+          "test:test/levensgraafleven.test.js"
+        ]
+      }
+    },
+    {
+      "id": "leven-talent-blijft-bij-het-lid",
+      "soort": "leven",
+      "wet": "Een talent, een interesse en een bijdrage bereiken de Rechterhand niet en het concierge-bureau niet; ze blijven bij het lid zelf.",
+      "bron": {
+        "bestand": "LEVEN.md",
+        "anker": "geen zichtbaarheid voor anderen zonder"
+      },
+      "handhaver": [
+        "server/kern/levensgraaf/bronnen-leven.js",
+        "test/levensgraafleven.test.js"
+      ],
+      "sabotage": {
+        "wat": "zet de deelstand van een talentknoop op de Rechterhand",
+        "bestand": "server/kern/levensgraaf/bronnen-leven.js",
+        "zoek": "kamer: 'talenten', bron: 'Leren', gevoelig: VERTROUWELIJK, deel: 'lid' }",
+        "zet": "kamer: 'talenten', bron: 'Leren', gevoelig: VERTROUWELIJK, deel: 'rechterhand' }",
+        "wachters": [
+          "test:test/levensgraafleven.test.js"
+        ]
+      }
+    },
+    {
+      "id": "leven-kind-is-geen-profiel",
+      "soort": "leven",
+      "wet": "Wat over een minderjarige is vastgelegd, is voor het kind bewaard en niet over het kind verzameld; niets van voor het achttiende jaar mag daarna een kans beperken.",
+      "bron": {
+        "bestand": "LEVEN.md",
+        "anker": "Een kind is geen profiel"
+      },
+      "handhaver": [],
+      "mensenwerk": "De helft is machinaal te zien (waar een gegeven heen mag) en die helft valt onder leven-talent-blijft-bij-het-lid. De andere helft -- 'mag daarna geen kans beperken' -- gaat over gebruik in de toekomst door mensen en systemen die er nog niet zijn. Geen enkele toets kan zien dat een gegeven straks niet tegen iemand wordt gebruikt. Hier wordt op mensen vertrouwd, en dat hoort te blijven staan in plaats van te worden weggeschreven met een toets die iets anders meet."
+    },
+    {
+      "id": "leven-nooit-sturen-alleen-openen",
+      "soort": "leven",
+      "wet": "De mentor mag de verzameling mogelijkheden vergroten en nooit verkleinen; er bestaat geen 'dit is niets voor jou'.",
+      "bron": {
+        "bestand": "LEVEN.md",
+        "anker": "Nooit sturen, alleen openen"
+      },
+      "handhaver": [],
+      "mensenwerk": "Dit is een uitspraak over de STREKKING van gegenereerde tekst, en die is niet binair. Een toets kan de zin 'dit is niets voor jou' verbieden en dan zegt het model het net anders. Wat wel machinaal staat, is dat de promptlaag de regel draagt; dat valt onder toegang-ai-belooft-niets. De strekking blijft mensenwerk, en dat is eerlijker dan een woordfilter dat vertrouwen koopt."
+    },
+    {
+      "id": "concern-geen-derde-rechtenmodel",
+      "soort": "concern",
+      "wet": "Toegang verlenen gebeurt waar de rol woont: er komt geen derde rechtenmodel bij, deze laag leest de twee bestaande en zet niets.",
+      "bron": {
+        "bestand": "CONCERN.md",
+        "anker": "Toegang verlenen gebeurt waar de rol woont"
+      },
+      "handhaver": [
+        "server/kern/onderneming/toegang.js",
+        "test/onderneming-toegang.test.js"
+      ],
+      "sabotage": {
+        "wat": "laat de leeslaag zelf een rol wegschrijven -- dan is het een derde model en geen leeslaag",
+        "bestand": "server/kern/onderneming/toegang.js",
+        "zoek": "module.exports.toegangOpvolging = toegangOpvolging;",
+        "zet": "module.exports.zetRol = (wie, rol) => { save({ wie, rol }); return { ok: true }; };\nmodule.exports.toegangOpvolging = toegangOpvolging;",
+        "wachters": [
+          "test:test/onderneming-toegang.test.js"
+        ]
+      },
+      "kanttekening": "Het eerste recept hing er alleen een functie naast en kwam AFGESLAGEN terug. De toets kijkt (terecht) naar een SCHRIJFACTIE in de laag, niet naar het bestaan van een naam -- dus zet het recept er nu een echte save() in."
+    },
+    {
+      "id": "concern-geen-score-zonder-afwijking",
+      "soort": "concern",
+      "wet": "Een percentage dat nergens naar wijst is decoratie: elke deelscore staat naast de concrete punten die hem drukken, en waar niets te meten valt staat geen cijfer.",
+      "bron": {
+        "bestand": "CONCERN.md",
+        "anker": "Geen score zonder afwijking"
+      },
+      "handhaver": [
+        "server/kern/onderneming/meter.js",
+        "test/onderneming-dagbeeld.test.js"
+      ],
+      "sabotage": {
+        "wat": "geef ook een cijfer waar er te weinig bronnen zijn om iets te meten",
+        "bestand": "server/kern/onderneming/meter.js",
+        "zoek": "      score: null, grondslag,",
+        "zet": "      score: 100, grondslag,",
+        "wachters": [
+          "test:test/onderneming-dagbeeld.test.js"
+        ]
+      }
+    },
+    {
+      "id": "concern-juridisch-gegeven-heeft-een-bron",
+      "soort": "concern",
+      "wet": "Een juridisch gegeven zonder bron bestaat niet: elk gegeven draagt mens, document, register of afgeleid met zich mee.",
+      "bron": {
+        "bestand": "CONCERN.md",
+        "anker": "Een gegeven zonder bron bestaat niet"
+      },
+      "handhaver": [],
+      "mensenwerk": "CONCERN.md noemt vier bronsoorten en eist ze per gegeven. In de code bestaat de bronsoort wel op sommige plekken, maar er is geen enkele poort die een juridisch gegeven ZONDER bron weigert -- niet in de opslag en niet op de route. De wet is dus opgeschreven en niet gehandhaafd. Dat is precies wat dit register zichtbaar hoort te maken."
+    },
+    {
+      "id": "concern-werknemer-koopt-geen-pas",
+      "soort": "concern",
+      "wet": "Een werknemer koopt nooit een pas om te mogen werken: de werkgever betaalt de bedrijfsomgeving, de werknemer krijgt toegang omdat hij daar een geldige rol heeft.",
+      "bron": {
+        "bestand": "CONCERN.md",
+        "anker": "Een werknemer koopt nooit een pas om te mogen werken"
+      },
+      "handhaver": [
+        "server/kern/eenaccount/starten.js",
+        "test/eenaccount-werkruimte.test.js"
+      ],
+      "sabotage": {
+        "wat": "eis een betaalde pas voordat een werkrol een sessie oplevert",
+        "bestand": "server/kern/eenaccount/starten.js",
+        "zoek": "      if (!wl) return { status: 403, error: 'Deze werkruimte is niet (meer) aan uw account gekoppeld.' };",
+        "zet": "      if (!wl) return { status: 403, error: 'Deze werkruimte is niet (meer) aan uw account gekoppeld.' };\n      return { status: 402, error: 'Voor deze werkruimte is een Business Pass nodig.' };",
+        "wachters": [
+          "test:test/eenaccount-werkruimte.test.js"
+        ]
+      }
+    },
+    {
+      "id": "werkruimte-alleen-een-verwijzing",
+      "soort": "werkruimte",
+      "wet": "De shell verstuurt alleen een verwijzing (soort, id, label) en nooit een kopie van de gegevens; elke surface lost hem op met zijn eigen sessie en rechten.",
+      "bron": {
+        "bestand": "WERKRUIMTE.md",
+        "anker": "de shell verstuurt alleen een **verwijzing**"
+      },
+      "handhaver": [
+        "server/bedrijf/herkomst.js",
+        "test/werkgrens.test.js"
+      ],
+      "sabotage": {
+        "wat": "laat de gewone leesroute de verwijzing wel oplossen, met titel en al",
+        "bestand": "server/bedrijf/herkomst.js",
+        "zoek": "opent: o ? { app: o.url, titel: o.titel } : null,",
+        "zet": "opent: o ? { app: o.url, titel: o.titel } : null, titel: o ? o.titel : null,",
+        "wachters": [
+          "test:test/werkgrens.test.js"
+        ]
+      }
+    },
+    {
+      "id": "wereld-een-app-een-wereld",
+      "soort": "wereld",
+      "wet": "Elke app staat in precies een wereld op het beginscherm; twee plekken voor hetzelfde is waarom je iets nergens meer vindt.",
+      "bron": {
+        "bestand": "PLATFORM.md",
+        "anker": "super-app-regel"
+      },
+      "handhaver": [
+        "scripts/check.js",
+        "public/apps/app-main/app-main-24a2.js"
+      ],
+      "sabotage": {
+        "wat": "zet dezelfde app in een tweede wereld op het beginscherm",
+        "bestand": "public/apps/app-main/app-main-24a2.js",
+        "zoek": "      'tab:betalen', 'link:wallet', 'link:bank',",
+        "zet": "      'tab:betalen', 'link:wallet', 'link:bank', 'link:reisboek',",
+        "wachters": [
+          "check:44"
+        ]
+      },
+      "kanttekening": "Het eerste recept haalde de dubbelcontrole UIT de keuringsregel in plaats van een dubbele app neer te zetten -- en toen meldde de regel netjes dat er niets dubbel stond. Afgeslagen, en dat was de juiste uitkomst: een detector uitzetten is geen overtreding. Nu staat er een echte tweede vermelding."
+    },
+    {
+      "id": "wereld-geen-twee-beginschermen",
+      "soort": "wereld",
+      "wet": "Er zijn geen twee beginschermen: de wereldstand en het rooster delen dezelfde lijst werelden, dezelfde klok en dezelfde manier om een app te openen.",
+      "bron": {
+        "bestand": "WERELD.md",
+        "anker": "Er zijn geen twee beginschermen."
+      },
+      "handhaver": [
+        "test/wereld.e2e.js",
+        "public/apps/app-main/app-main-24a2.js"
+      ],
+      "sabotage": {
+        "wat": "geef de wereldstand een eigen tweede lijst werelden naast die van het rooster",
+        "bestand": "public/apps/app-main/app-main-24a2.js",
+        "zoek": "const MAPPEN = [",
+        "zet": "const MAPPEN_WERELD = [];\n  const MAPPEN = [",
+        "wachters": [
+          "e2e:test/wereld.e2e.js"
+        ]
+      },
+      "kanttekening": "De enige handhaver is een schermtoets, en die heeft een browser nodig. In een omgeving zonder browser is de uitkomst `blind` en niet groen -- dat is het eerlijke antwoord en het hoort in de uitslag te blijven staan."
+    },
+    {
+      "id": "techniek-geen-productie-zonder-grootboek",
+      "soort": "techniek",
+      "wet": "Er start geen productie op een opslagstand zonder transactie-grootboek; dat is een blokkerende fout en geen waarschuwing.",
+      "bron": {
+        "bestand": "LAT.md",
+        "anker": "geen productiestart op een opslag zonder grootboek"
+      },
+      "handhaver": [
+        "server/config/productie-opslag.js",
+        "test/opslagblokkade.test.js"
+      ],
+      "sabotage": {
+        "wat": "maak van de blokkade weer een waarschuwing",
+        "bestand": "server/config/productie-opslag.js",
+        "zoek": "    fouten.push('De opslagstand \"'",
+        "zet": "    waarschuwingen.push('De opslagstand \"'",
+        "wachters": [
+          "test:test/opslagblokkade.test.js"
+        ]
+      }
+    },
+    {
+      "id": "techniek-domeingrens-houdt-tegen",
+      "soort": "techniek",
+      "wet": "Een domein raakt uit de gedeelde kern alleen wat het heeft opgeschreven; een vreemde naam gooit een fout en wordt nooit stil undefined.",
+      "bron": {
+        "bestand": "LAT.md",
+        "anker": "Nooit twee plekken die een waarheid vasthouden"
+      },
+      "handhaver": [
+        "server/opzet/domeingrens.js",
+        "test/domeingrens.test.js",
+        "GRENZEN.json"
+      ],
+      "sabotage": {
+        "wat": "laat een vreemde naam stil undefined worden in plaats van gooien",
+        "bestand": "server/opzet/domeingrens.js",
+        "zoek": "      throw grensFout(domein, naam);",
+        "zet": "      return undefined;",
+        "wachters": [
+          "test:test/domeingrens.test.js"
+        ]
+      }
+    },
+    {
+      "id": "techniek-elke-meter-is-geijkt",
+      "soort": "techniek",
+      "wet": "Elke meter met een norm is een keer op een bekend-foute invoer zien uitslaan, of noemt met naam waarom dat niet kan; een meter die je niet hebt zien uitslaan meet niets.",
+      "bron": {
+        "bestand": "LAT.md",
+        "anker": "Een meter die je niet hebt zien uitslaan, meet niets"
+      },
+      "handhaver": [
+        "scripts/check.js",
+        "test/meterijk.test.js",
+        "NORM.json"
+      ],
+      "sabotage": {
+        "wat": "voeg een nieuwe meter toe die in de ijkregistratie niet voorkomt",
+        "bestand": "scripts/norm.js",
+        "zoek": "const METERS = [",
+        "zet": "const METERS = [\n  { sleutel: 'zzsabotagemeter', richting: 'omlaag', wat: 'proefmeter van npm run sabotage' },",
+        "wachters": [
+          "check:35"
+        ]
+      }
+    },
+    {
+      "id": "techniek-geen-dode-configuratie",
+      "soort": "techniek",
+      "wet": "Een omgevingsvariabele die je aanraadt, wordt ergens gelezen: een belofte in tekst is een belofte in code.",
+      "bron": {
+        "bestand": "LAT.md",
+        "anker": "Een belofte in tekst is een belofte in code"
+      },
+      "handhaver": [
+        "scripts/check.js"
+      ],
+      "sabotage": {
+        "wat": "laat de productiekeuring een omgevingsvariabele aanraden die niets in server/ of scripts/ leest",
+        "bestand": "server/config/productie-opslag.js",
+        "zoek": "  return store;",
+        "zet": "  if (env.ZZ_SABOTAGE_DSN) waarschuwingen.push('sabotage: een variabele die niemand leest');\n  return store;",
+        "wachters": [
+          "check:27"
+        ]
+      },
+      "kanttekening": "Het eerste recept zette de belofte in PRODUCTION.md en kwam AFGESLAGEN terug. Terecht, en het is de moeite waard: keuringsregel 27 leest de beloften uit server/config/ en docker-compose.yml, NIET uit de documentatie. Een omgevingsvariabele die alleen in een .md wordt aangeraden, valt dus buiten deze regel -- dat is een echt gat, en het staat hier zodat het niet als gedekt doorgaat."
+    },
+    {
+      "id": "techniek-bedradingscontract",
+      "soort": "techniek",
+      "wet": "Wat je uit een module pakt, moet erin zitten: een naam die je destructureert en die daar niet bestaat, valt stil op undefined.",
+      "bron": {
+        "bestand": "LAT.md",
+        "anker": "elke naam die je uit een module haalt bestaat"
+      },
+      "handhaver": [
+        "scripts/check.js",
+        "scripts/kruisscan.js"
+      ],
+      "sabotage": {
+        "wat": "pak een naam uit een lokale module die daar niet bestaat",
+        "bestand": "server/pinslot.js",
+        "zoek": "const MAX_POGINGEN = 5;      //",
+        "zet": "const { zzBestaatNietInDeOpslag } = require('./config/productie-opslag');\nvoid zzBestaatNietInDeOpslag;\nconst MAX_POGINGEN = 5;      //",
+        "wachters": [
+          "check:26"
+        ]
+      },
+      "kanttekening": "Het eerste recept pakte een verzonnen naam uit require('path'). Afgeslagen, en terecht: regel 26 leest alleen LOKALE modules statisch uit -- een ingebouwde module kan hij niet nakijken. Nu op een echte lokale module met een objectliteraal als export."
+    },
+    {
+      "id": "techniek-zelfpoortende-toets-in-de-draaier",
+      "soort": "techniek",
+      "wet": "Een toets die zichzelf kan overslaan staat ook in de draaier die hem echt draait; stilvallen is geen uitkomst.",
+      "bron": {
+        "bestand": "LAT.md",
+        "anker": "Een meter zakt als zijn invoer ontbreekt"
+      },
+      "handhaver": [
+        "scripts/check.js",
+        "scripts/pgtoetsen.js"
+      ],
+      "sabotage": {
+        "wat": "haal een zelfpoortende toets uit de lijst van de draaier, zodat hij nergens meer draait",
+        "bestand": "scripts/pgtoetsen.js",
+        "zoek": "  'test/sloophamer.pg.test.js'",
+        "zet": "  ''",
+        "wachters": [
+          "check:25"
+        ]
+      }
+    },
+    {
+      "id": "techniek-routepad-staat-voluit",
+      "soort": "techniek",
+      "wet": "Elk routepad staat voluit in de bron; een pad dat met een plus wordt opgebouwd is voor elke lezende meter onzichtbaar.",
+      "bron": {
+        "bestand": "LAT.md",
+        "anker": "staat elke functie in de boardroom"
+      },
+      "handhaver": [
+        "scripts/check.js",
+        "scripts/schakelbaar.js"
+      ],
+      "sabotage": {
+        "wat": "bouw een routepad uit stukken op",
+        "bestand": "server/routes/klok.js",
+        "zoek": "module.exports",
+        "zet": "const __zz = (app) => app.get('/api/' + 'zzsabotage' + '/tik', (q, s) => s.json({})); void __zz;\nmodule.exports",
+        "wachters": [
+          "check:45"
+        ]
+      }
+    },
+    {
+      "id": "techniek-gegenereerde-kaarten-lopen-niet-achter",
+      "soort": "techniek",
+      "wet": "De gegenereerde kaarten (ARCHITECTUUR.md, BEWIJS.md) zijn een afdruk van de code en lopen nooit achter; wat er staat is waar, of het is weg.",
+      "bron": {
+        "bestand": "LAT.md",
+        "anker": "Een belofte in tekst is een belofte in code"
+      },
+      "handhaver": [
+        "scripts/check.js",
+        "scripts/bewijs.js",
+        "scripts/kaart.js"
+      ],
+      "sabotage": {
+        "wat": "zet een regel in het gegenereerde bewijsregister die er niet uit de code in kan komen",
+        "bestand": "BEWIJS.md",
+        "zoek": "# Wat bewijst welke toets?",
+        "zet": "# Wat bewijst welke toets? (met de hand bijgewerkt)",
+        "wachters": [
+          "check:41"
+        ]
+      }
+    },
+    {
+      "id": "techniek-strenge-toetspoort",
+      "soort": "techniek",
+      "wet": "Een geslaagde toets levert geen uncaughtException, geen unhandledRejection en geen onverwachte 5xx op; niets slaat stil over.",
+      "bron": {
+        "bestand": "LAT.md",
+        "anker": "Niets slaat stil over"
+      },
+      "handhaver": [
+        "test/helper.js",
+        "test/strenge-poort.test.js"
+      ],
+      "sabotage": {
+        "wat": "haal de serverfout uit het patroon waar de strenge poort op let",
+        "bestand": "test/helper.js",
+        "zoek": "\"serverfout\":true",
+        "zet": "\"serverfoutzz\":true",
+        "wachters": [
+          "test:test/strenge-poort.test.js"
+        ]
+      }
+    },
+    {
+      "id": "techniek-wetten-hebben-een-bron",
+      "soort": "techniek",
+      "wet": "Elke systeemwet in dit register wijst naar de zin in de doctrine waar hij vandaan komt; een wet zonder bron is een mening.",
+      "bron": {
+        "bestand": "LAT.md",
+        "anker": "Een belofte in tekst is een belofte in code"
+      },
+      "handhaver": [
+        "scripts/wetten.js",
+        "WETTEN.json"
+      ],
+      "sabotage": {
+        "wat": "laat een wet naar een zin wijzen die in het bronbestand niet voorkomt",
+        "bestand": "WETTEN.json",
+        "zoek": "\"anker\": \"Een kind is geen profiel\"",
+        "zet": "\"anker\": \"Een kind is geen profiel dat hier nooit heeft gestaan\"",
+        "wachters": [
+          "script:node scripts/wetten.js --controle"
+        ]
+      }
+    },
+    {
+      "id": "techniek-sabotage-meet-zichzelf",
+      "soort": "techniek",
+      "wet": "De sabotagemotor laat een wachter die al rood was nooit als bewijs meetellen; een wachter die al kapot is bewijst niets.",
+      "bron": {
+        "bestand": "LAT.md",
+        "anker": "Een meter die je niet hebt zien uitslaan, meet niets"
+      },
+      "handhaver": [
+        "scripts/sabotage.js",
+        "test/wetten.test.js"
+      ],
+      "sabotage": {
+        "wat": "laat de motor de nulmeting overslaan, zodat een al rode wachter als bewijs telt",
+        "bestand": "scripts/sabotage.js",
+        "zoek": "if (!nul.groen) return { stand: 'blind'",
+        "zet": "if (false) return { stand: 'blind'",
+        "wachters": [
+          "test:test/wetten.test.js"
+        ]
+      }
+    }
+  ]
+}

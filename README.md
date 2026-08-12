@@ -653,6 +653,41 @@ Regel voor dit bestand: vind je een nieuw soort stille fout, dan komt er een
 scanner bij. En een scanner die roept bij dingen die kloppen is erger dan geen
 scanner -- dus liever iets milder dan valse alarmen.
 
+### De systeemwetten (`npm run wetten`, `npm run sabotage`, `npm run zekerheid`)
+
+De toetsen en keuringen hierboven vragen allemaal hetzelfde: *zakt er iets?*
+`scripts/samenhang.js` draait die vraag om naar *kijkt er iemand?* Er bleef er
+een over, en dat is de duurste:
+
+```bash
+npm run wetten        # 41 systeemwetten met hun bewijsstand
+npm run sabotage      # zet elke handhaver echt uit, kijk wie rood wordt
+npm run zekerheid     # wat we weten, en vooral wat we niet weten
+```
+
+`WETTEN.json` verzamelt de uitspraken die in de doctrine-documenten als HARD
+staan opgeschreven -- "de progressielaag stopt bij 18+", "de bijdrage-spiegel is
+nooit vergelijkend", "een grendel hangt aan het doel", "er komt geen derde
+rechtenmodel bij". Per wet staan er drie dingen: de **bron** (het document en de
+letterlijke zin, zodat de wet hier niet kan gaan afwijken van waar hij vandaan
+komt), de **handhaver** (de bestanden die hem tegenhouden, die moeten bestaan) en
+een **sabotage**: een mechanische verandering die de wet écht overtreedt, met de
+wachter die daarvan rood hoort te worden.
+
+`npm run sabotage` voert die uit -- in de echte bestanden, met een journaal in
+`server/data/` zodat een afgebroken ronde met `--opruimen` terug te draaien is.
+Vijf uitkomsten, want twee is te weinig: **raak** (de wachter werd rood: het enige
+bewijs dat telt), **afgeslagen** (de wet is overtreden en er werd niets rood --
+een bevinding, geen storing), **blind** (de wachter was al rood en bewijst dus
+niets), **losgeraakt** (het recept wijst nergens meer naar) en
+**nietGeprobeerd**. Wetten waarvoor geen machinale proef te bedenken is, staan
+als `mensenwerk` in het register mét de reden, en tellen nooit als bewezen.
+
+De meter `wettenOnbewezen` in `NORM.json` telt wat er niet bewezen is en mag
+alleen omlaag; `test/meterijk.test.js` ijkt hem (keuringsregel 35), en
+`test/wetten.test.js` ijkt de motor zelf -- onder andere dat een wachter die al
+rood was nooit als bewijs meetelt.
+
 ## Datamap instelbaar (RTG_DATA_DIR)
 
 Standaard staan database, sleutels en uploads in `server/data`. Met

@@ -117,6 +117,25 @@ jobs:
       - name: De samenhang (wie bewaakt wat)
         if: always()
         run: npm run samenhang
+      # De sabotage: elke systeemwet ECHT overtreden en kijken of er iets rood
+      # wordt. Dit hoort hier en niet in de CI -- elke wet die aan de keuring
+      # hangt kost bijna twee minuten, want de keuring moet er twee keer
+      # overheen. De uitslag gaat als artefact mee; AFGESLAGEN is een bevinding
+      # en geen storing, dus de stap zakt daar bewust niet op (dat telt de meter
+      # wettenOnbewezen). Hij zakt wel als een RECEPT nergens meer naar wijst.
+      - name: De sabotage (zet elke handhaver echt uit)
+        if: always()
+        run: node --experimental-sqlite scripts/sabotage.js
+      - name: Wat we weten, en wat niet
+        if: always()
+        run: npm run zekerheid || true
+      - name: De sabotage-uitslag bewaren
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: sabotage
+          path: SABOTAGE.json
+          retention-days: 30
       - name: Het journaal bewaren
         if: always()
         uses: actions/upload-artifact@v7

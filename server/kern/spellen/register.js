@@ -64,7 +64,11 @@ const { keurAlgemeen, keurArcade, keurPotje, keurZicht, keurVariant } = require(
    expliciete lijst: een helper die je hier neerzet en vergeet toe te voegen
    valt op bij het opstarten, in plaats van stil mee te scannen. */
 const GEEN_SPEL = new Set(['register.js', 'lobby.js', 'partij.js', 'rahul.js', 'klas.js', 'quiz-data.js', 'quiz-school.js',
-  'presence.js', 'uitslagen.js', 'prestaties.js', 'toernooi.js', 'zetten.js', 'praat.js', 'telling.js', 'teams.js', 'kring.js', 'arcade.js', 'opruimen.js', 'toernooi-schema.js', 'gedeeld.js', 'grens.js', 'zicht.js', 'klok.js', 'beleid.js', 'nabespreking.js', 'naspelen.js', 'keur.js', 'uitnodigen.js', 'rondom.js', 'projectie.js', 'dag.js', 'variant.js', 'wachtrij.js']);
+  'presence.js', 'uitslagen.js', 'prestaties.js', 'toernooi.js', 'zetten.js', 'praat.js', 'telling.js', 'teams.js', 'kring.js', 'arcade.js', 'opruimen.js', 'toernooi-schema.js', 'gedeeld.js', 'grens.js', 'zicht.js', 'klok.js', 'beleid.js', 'nabespreking.js', 'naspelen.js', 'keur.js', 'uitnodigen.js', 'rondom.js', 'projectie.js', 'dag.js', 'variant.js', 'wachtrij.js',
+  /* De loopbaan (VERHAAL.md): wat er van een MENS overblijft als het potje
+     voorbij is. Naast uitslagen.js en prestaties.js hierboven, en om dezelfde
+     reden geen spel: hij BEWAART wat een partij oplevert. */
+  'loopbaan.js', 'loopbaan-momenten.js', 'bewaren.js']);
 
 /* De map is een parameter zodat de toets het register op fixtures kan draaien
    (een module zonder descriptor, een sleutel die niet bij zijn bestand hoort)

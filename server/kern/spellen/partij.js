@@ -6,7 +6,16 @@ module.exports = (ctx) => {
   const { db, save, crypto, codenaamVan, nu, S, SPEL, SOORTEN, nudge, ZICHT, ZETTEN, STATISCH, noteerUitslag, noteerZet, zijnVrienden, isGeblokkeerd, klok, beleid } = ctx;
   // het toernooi hangt aan dezelfde plek als de uitslag: zo is er geen tweede
   // moment waarop een ronde kan blijven hangen (late binding, zie spellen.js)
-  const naPotje = (p) => { noteerUitslag(p); if (ctx.toernooiPotjeKlaar) ctx.toernooiPotjeKlaar(p); };
+  /* En de loopbaan (VERHAAL.md): wat er van een MENS overblijft als de partij
+     voorbij is. Hij hangt aan dezelfde plek en om dezelfde reden als de uitslag
+     en het toernooi -- zo is er EEN moment waarop een afgelopen potje wordt
+     opgeschreven en geen drie kansen om er een te vergeten. Zelf idempotent,
+     net als de andere twee. */
+  const naPotje = (p) => {
+    noteerUitslag(p);
+    if (ctx.noteerLoopbaan) ctx.noteerLoopbaan(p);
+    if (ctx.toernooiPotjeKlaar) ctx.toernooiPotjeKlaar(p);
+  };
   /* De weergave per spel (de staat zoals EEN speler hem mag zien: handen en
      rekken van anderen blijven verborgen) staat in het spel zelf en komt via
      het register mee in ZICHT.speler. Een spel zonder eigen weergave komt het

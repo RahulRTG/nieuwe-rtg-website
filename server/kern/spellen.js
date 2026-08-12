@@ -90,27 +90,15 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
     get SPEL() { return SPEL; }, get VARIANT() { return VARIANT; }
   });
 
-  /* Uitslagen die een potje overleven: de bron onder winrate, niveaus en
-     toernooien. Deelnemers buiten de progressiegrens staan er zonder codenaam
-     in; speelde niemand binnen de grens mee, dan wordt er niets bewaard. Zie
-     spellen/uitslagen.js. */
-  /* Telemetrie: geaggregeerd, zonder personen. Hangt aan `noteerUitslag` en
-     niet aan de twee einden van een potje -- een plek, en meteen dezelfde
-     idempotentie. Zie spellen/telling.js voor waarom dit NAAST de uitslagen
-     staat en er niet uit wordt afgeleid. */
-  const { telPotje, spelTelemetrie } = require('./spellen/telling')({ db, save, nu, SOORTEN });
-
-  const { noteerUitslag, spelUitslagen, spelStand } = require('./spellen/uitslagen')({
-    db, save, codenaamVan, nu, progressieMag, telPotje
-  });
-
-
-  /* Prestaties, ook afgeleid uit de uitslagen: alleen wat behaald is, geen
-     voortgang naar wat je "nog moet", en geen reeksen. Zie de kop van
-     spellen/prestaties.js voor waarom dat drie bewuste keuzes zijn. */
-  const { spelPrestaties } = require('./spellen/prestaties')({
-    spelStand, naamVanSpel: (soort) => SOORTEN[soort] || null
-  });
+  /* WAT EEN POTJE OVERLEEFT staat in ./spellen/bewaren.js: de uitslagen, de
+     telemetrie, de prestaties en de loopbaan. Vier lagen met EEN vraag -- wat
+     blijft er staan als de partij voorbij is -- en dus een naad. Dit bestand
+     bedraadt de spellenlaag en stond op de 10 kB-grens; het knelde toen de
+     loopbaan erbij kwam, en dat is precies waar die grens voor is. */
+  const { telPotje, spelTelemetrie, noteerUitslag, spelUitslagen, spelStand,
+    spelPrestaties, loopbaan } = require('./spellen/bewaren')({
+    db, save, nu, codenaamVan, progressieMag, GEEN_PROGRESSIE,
+    get SOORTEN() { return SOORTEN; } });
 
   /* Het verloop van een partij, voor de replay. Aparte tak en aparte termijn:
      een uitslag zegt WIE won en gaat een jaar mee, een verloop zegt HOE en is
@@ -122,7 +110,8 @@ module.exports = ({ db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, 
      context, een keer opgebouwd bij het opstarten. */
   const ctx = { db, save, crypto, zijnVrienden, codenaamVan, sseToCustomer, isGeblokkeerd, socialZoek, sociaalRate, volwassen,
     rid, nu, S, SPEL, SOORTEN, TEAMS, wereldFout, leeftijdFout, nudge, schud, beurtDoor, opschonen, klok, beleid,
-    INITS, ZETTEN, ZICHT, STATISCH, klasgenotenVan, noteerUitslag, noteerZet };
+    INITS, ZETTEN, ZICHT, STATISCH, klasgenotenVan, noteerUitslag, noteerZet,
+    noteerLoopbaan: loopbaan.noteerLoopbaan };
   const { spelStart, spelGrootte, potjeDirect, spelNieuw, spelAntwoord, spelRandom, mijnSpellen, spelVarianten } = require('./spellen/lobby')(ctx);
   /* Toernooien: een knockout waarvan elke wedstrijd een GEWOON potje is. Staat
      bewust NIET achter de progressiegrens -- een toernooi is een begrensd

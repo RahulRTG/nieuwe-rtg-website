@@ -305,12 +305,12 @@ niet vrij.
 
 | # | Stap | Wat het oplevert | Grens die erbij hoort |
 |---|---|---|---|
-| 0 | **De grens als code** | 18+, codenaam, spelvak — op één plek, zoals `grens.js` dat voor progressie doet | alle vier |
+| 0 | **De grens als code** ✅ | 18+, codenaam, spelvak — op één plek, zoals `grens.js` dat voor progressie doet | alle vier |
 | 1 | **Loondienst binnen één potje** ✅ | je kunt bij een andere speler werken, met een rol en een salaris uit zíjn kas. Niets blijft bewaard | geen permanentie, dus nog geen 18+-vraag |
-| 2 | **Het werkverleden dat het potje overleeft** | de melding *"hij werkte 3 jaar 2 maanden voor jou"*, en de vier keuzes van hoofdstuk 3 | hier begint 18+ |
+| 2 | **Het werkverleden dat het potje overleeft** ✅ | de melding *"hij werkte 3 jaar 2 maanden voor jou"*, en de vier keuzes van hoofdstuk 3 | hier begint 18+ |
 | 3 | **Het wereldvak onder de echte schermen** | spelers gebruiken het échte personeels-, rooster- en dossierscherm op spelgegevens | grens 2, structureel |
-| 4 | **De momenten** | wat onthouden wordt, en alleen als er een tweede persoon bij was | grens 4 |
-| 5 | **De terugblik** | hoofdstuk 13: geen cijfers, wel een geschiedenis | — |
+| 4 | **De momenten** ✅ | wat onthouden wordt, en alleen als er een tweede persoon bij was | grens 4 |
+| 5 | **De terugblik** ✅ | hoofdstuk 13: geen cijfers, wel een geschiedenis | — |
 
 Stap 1 is met opzet eerst en met opzet zonder permanentie. Hij is meteen
 speelbaar, hij raakt geen enkele grens, en hij beantwoordt de vraag die je niet
@@ -492,3 +492,55 @@ echte regressie gevonden door de suite: `test/blindevlek.test.js` scant
 app-bronnen op API-paden, en een pad in een *commentaar* ziet er voor die scanner
 net zo uit als een aanroep. De voorbeelden in `public/shared/spelwereld.js` staan
 daarom niet voluit, met die reden erbij.
+
+---
+
+## 10. Stap 0, 2, 4 en 5 staan: de loopbaan
+
+`server/kern/spellen/loopbaan.js` (het register en de grens),
+`loopbaan-momenten.js` (wat er blijft hangen, en de terugblik).
+
+**Hij staat niet in `magnaat/`, en dat is de architectuur die het zelf zei.**
+`spelCtx` geeft een spelmodule `save`, `crypto`, `schud`, `beurtDoor`,
+`codenaamVan` en `nudge` — en met opzet géén `db` en géén 18+-poort, want een
+spel werkt op `potje.staat`. Een blijvende loopbaan kán daar dus niet wonen. Hij
+hoort naast `uitslagen.js` en `prestaties.js`, precies waar alles staat dat een
+potje overleeft, en hij wordt op dezelfde manier gevoed: vanuit `naPotje` in
+`partij.js`, idempotent, nadat de partij klaar is.
+
+### De grens is per persoon, niet per potje
+
+Dat is de scherpste regel van deze laag. Speelde een volwassene met een tiener,
+dan houdt de volwassene zijn eigen kant en de tiener niets. Zou de grens per
+*potje* gelden, dan verliest de volwassene zijn geschiedenis omdat er een kind
+meespeelde — of, veel erger, krijgt het kind er een.
+
+### Wat er wordt bewaard, en wat niet
+
+In `diensten` staan een `loon` en een `betaaldTotaal`. Die blijven waar ze horen:
+in het potje. Wat het potje overleeft is bij wie je werkte, in welke rol, en hoe
+lang — *3 jaar 2 maanden*, de zin uit hoofdstuk 3.
+
+En de momenten, met één ontwerpregel die de hele laag draagt: **een moment
+ontstaat alleen als er een tweede persoon bij was.** Dat maakt het
+onvervalsbaar — je kunt jezelf geen verleden geven — het houdt de lijst kort, en
+het is precies waarom die zinnen blijven hangen. Zes soorten, en een `eerste_` is
+maar één keer een eerste.
+
+De terugblik geeft zinnen en geen tabel:
+
+> *Je begon als hulp bij CN-rahul.*
+> *Je begon voor jezelf, na 3 jaar 2 maanden bij CN-rahul.*
+
+Aan de andere kant staat hoofdstuk 9, de mooiste van de zes: *CN-mike begon voor
+zichzelf, na 3 jaar 2 maanden bij jou.*
+
+Toets: `test/spelloopbaan.test.js` (veertien). **Zeven mutaties, zeven raak** —
+één daarvan pas na een herschrijving: de toets op "nul maanden is geen
+werkverleden" keek alleen naar de banen, terwijl die wacht ook de *momenten*
+beschermt. Iemand aannemen die nooit begon, is geen herinnering.
+
+`spellen.js` stond op 10.213 van de 10.240 bytes en knelde toen de loopbaan
+erbij kwam. Dat is precies waar die grens voor is: er zat een tweede onderwerp
+in. `spellen/bewaren.js` afgesplitst — telling, uitslagen, prestaties en
+loopbaan, vier lagen met één vraag: wat blijft er staan als de partij voorbij is.

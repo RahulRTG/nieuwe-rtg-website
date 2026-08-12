@@ -75,6 +75,12 @@ function maakApiPoort({ db, save, crypto, journaal }) {
 
   /* ---------- de sleutels ---------- */
 
+  /* De publieke vorm van een sleutel: alles behalve het geheim zelf. */
+  const kort = (s) => ({ id: s.id, naam: s.naam, eigenaar: s.eigenaar || null, scopes: s.scopes,
+    quotaPerUur: s.quotaPerUur, gemaakt: s.gemaakt, door: s.door, vervalt: s.vervalt,
+    ingetrokken: s.ingetrokken, laatst: s.laatst, geweigerd: s.geweigerd,
+    gebruiktDitUur: s.teller && s.teller.uur === Math.floor(Date.now() / UUR) ? s.teller.n : 0 });
+
   function maak(naam, scopes, opties) {
     const v = vak();
     if (Object.keys(v.sleutels).length >= MAX_SLEUTELS) {
@@ -125,61 +131,11 @@ function maakApiPoort({ db, save, crypto, journaal }) {
     return { sleutel: kort(s) };
   }
 
-  /* ---------- de controle, voor de middleware ---------- */
-
-  function apiSleutelOk(aangeboden, pad, methode, tijd) {
-    const t = typeof tijd === 'number' ? tijd : Date.now();
-    const m = /^RTG-([a-z0-9-]{4,12})\.(.+)$/i.exec(String(aangeboden || ''));
-    if (!m) return { ok: false, status: 401, reden: 'geen geldige sleutel meegegeven' };
-    const s = vak().sleutels[m[1]];
-    if (!s) return { ok: false, status: 401, reden: 'onbekende sleutel' };
-    if (s.ingetrokken) return { ok: false, status: 401, reden: 'deze sleutel is ingetrokken' };
-    if (s.vervalt && Date.parse(s.vervalt) < t) return { ok: false, status: 401, reden: 'deze sleutel is verlopen' };
-    /* veiligGelijk en niet !==: een vergelijking die bij het eerste
-       verschillende teken stopt, lekt hoe ver een gok goed was. Overal elders
-       in dit huis staat veiligGelijk; hier dus ook. */
-    if (!veiligGelijk(hash(m[2], s.zout), s.hash)) {
-      s.geweigerd++; save();
-      return { ok: false, status: 401, reden: 'sleutel klopt niet' };
-    }
-
-    const p = String(pad || '');
-    const scope = s.scopes.find(sc => (p === sc.pad || p.startsWith(sc.pad + '/')) &&
-      sc.methoden.includes(String(methode || 'GET').toUpperCase()));
-    if (!scope) return { ok: false, status: 403, reden: 'buiten de scope van deze sleutel', sleutel: s.id };
-
-    const toel = binnenToelating(p);
-    if (!toel) return { ok: false, status: 403, reden: 'dit pad staat niet (meer) in de toelating', sleutel: s.id };
-    if (toel.uitfasering && Date.parse(toel.uitfasering) < t) {
-      return { ok: false, status: 410, sleutel: s.id,
-        reden: 'dit pad is uitgefaseerd per ' + toel.uitfasering + ' en is aangekondigd voordat hij stopte' };
-    }
-
-    /* Het quotum. De emmer is het uur sinds 1970; hij staat in de opslag, dus
-       een herstart wist hem niet. */
-    const emmer = Math.floor(t / UUR);
-    if (s.teller.uur !== emmer) s.teller = { uur: emmer, n: 0 };
-    if (s.teller.n >= s.quotaPerUur) {
-      s.geweigerd++;
-      save();
-      return { ok: false, status: 429, sleutel: s.id,
-        reden: 'quotum van ' + s.quotaPerUur + ' verzoeken per uur is op',
-        herstartOver: Math.ceil(((emmer + 1) * UUR - t) / 1000) };
-    }
-    s.teller.n++;
-    s.laatst = new Date(t).toISOString();
-    save();
-    return {
-      ok: true, sleutel: s.id, naam: s.naam, versie: toel.versie,
-      rest: s.quotaPerUur - s.teller.n,
-      uitfasering: toel.uitfasering || null
-    };
-  }
-
-  const kort = (s) => ({ id: s.id, naam: s.naam, eigenaar: s.eigenaar || null, scopes: s.scopes,
-    quotaPerUur: s.quotaPerUur, gemaakt: s.gemaakt, door: s.door, vervalt: s.vervalt,
-    ingetrokken: s.ingetrokken, laatst: s.laatst, geweigerd: s.geweigerd,
-    gebruiktDitUur: s.teller && s.teller.uur === Math.floor(Date.now() / UUR) ? s.teller.n : 0 });
+  /* De controle bij elk verzoek staat in ./apipoort-controle.js. Dit bestand
+     gaat over beheer (wat mag er ooit achter, wie krijgt een sleutel); die
+     laag staat in het pad van elk binnenkomend verzoek en heeft daardoor
+     andere eisen -- niets lekken, en elke nee met een reden. */
+  const { apiSleutelOk } = require('./apipoort-controle')({ vak, save, hash, veiligGelijk, binnenToelating, kort, UUR });
 
   function stand() {
     const v = vak();

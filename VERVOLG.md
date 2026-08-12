@@ -15,6 +15,8 @@ volgende handeling.
 BEWIJSMATRIX     12.365 bewezen · 31.102 ongemeten · 108 gezakt  (43.835 cellen)
                  instrument op 7 van de 11 kolommen
                  nog leeg: OUTPUT  STATE  SIDE_EFFECT  AUDIT
+DUURZAAM         geld · notities · agenda · bestanden · berichten
+                 kosten: p50 x2,01 · p95 x1,49 · p99 x0,84 (controle x1,03)
 CONTROLS         11, waarvan 1 niet in bedrijf (AUDIT-KETEN-VERANKERD) en
                  1 hier niet meetbaar (UI-WAARHEID: geen browser in deze omgeving)
 VERRAADSMOTOR    4 / 9 ingebouwd
@@ -48,29 +50,32 @@ Alle poorten groen, werkboom schoon.
 
 ## De eerstvolgende handelingen, op volgorde
 
-### A. De andere drie apps duurzaam maken (het patroon ligt er)
+### ~~A. De andere drie apps duurzaam maken~~ — GEDAAN op 12 augustus
 
-Notities is klaar en de weg is geplaveid: `server/lib/duurzaam.js` is de gedeelde
-helper, en aansluiten is drie handelingen.
+Agenda, bestanden en berichten hangen aan dezelfde helper als notities
+(`server/lib/duurzaam.js`). Twee dingen die daarbij zijn geleerd en die voor de
+rest van de reikwijdte net zo gelden:
 
-```
-1  de kern:      const vastleggen = require('../lib/duurzaam')({ bijeen, save, bron: '<app>' })
-                 elke schrijffunctie async, en de save() vervangen door
-                   const mis = await vastleggen(() => { ...mutaties... });
-                   if (mis) return mis;
-2  server.js:    `bijeen` meegeven aan de maak<App>()-aanroep
-3  de routes:    `async` + `await` op ELKE schrijfroute van die app
-4  check.js 47:  het kernbestand op TOEGESTAAN, met de reden erbij
-```
+**Nesting hoort ÉÉN commit te blijven.** Een notitie met een datum maakt een
+agenda-afspraak, en allebei die lagen leggen duurzaam vast. Zonder maatregel
+committeert de binnenste eerst en staat de afspraak vast voordat de notitie dat
+is. `db.inBundel()` lost dat op: staat er al een bundel open, dan doet de
+binnenste laag zijn mutatie gewoon mee.
 
-Op volgorde: **agenda** (hangt al aan notities vast via de gekoppelde afspraak),
-dan **bestanden**, dan **berichten**. Let bij bestanden op de bytes op schijf —
-die staan al buiten de database en hebben hun eigen duurzaamheidsvraag.
+**De async-keten loopt verder dan de app.** `agenda.voegToe` wordt ook gebruikt
+door afgeleide schrijvers (visumtaak, de RTF-koppeling, postdatum). Niet awaiten
+gaat daar STIL mis: de aanroeper krijgt een Promise, leest `r.ok` als undefined
+en meldt "geen taak aangemaakt". Zes kernmodules en acht routebestanden mee.
 
-Verifiëren doe je niet met de toets alleen: `npm run ketenronde` meet alleen de
-notitieketen, dus een nieuwe app hoort een eigen keten te krijgen óf een eigen
-toets in de vorm van `test/notitiesduurzaam.test.js` (vijf beweringen, alle vier
-de mutaties raak — zie het commit-bericht).
+En twee bugs die de toets blootlegde, allebei uit dezelfde familie als de
+oorspronkelijke bevinding: `routes/agenda.js` gaf élke fout uit de kern als 400
+terug (een opslagfout las dus als "u heeft iets verkeerd ingevuld"), en
+`routes/member/berichtenapp.js` zette `ok: true` hard in het antwoord met de
+uitkomst ernaast.
+
+Wat er nog open ligt: **`kern/bestanden-delen.js`** (delen, versies,
+prullenbak) schrijft nog write-behind. Dezelfde app, andere knoppen — en dat is
+precies het argument waarom notities al zijn vier knoppen kreeg.
 
 ### ~~B. De goedkope drie matrixkolommen~~ — GEDAAN op 12 augustus
 
@@ -98,24 +103,85 @@ Wat er van B nog open ligt: de 94 routes die als `onbeschermd` uit de ronde kome
 Ze staan met naam in `IDEMPROEF.json`. Dat is een werklijst voor idem-sleutels,
 geen buglijst — begin bij de routes die geld of toegang raken.
 
-### C. De prestatiemeting van de duurzame commit
+### ~~C. De prestatiemeting van de duurzame commit~~ — GEDAAN op 12 augustus
 
-`npm run beproeving` met en zonder, en dan p95/p99 en het event-loop-effect
-naast elkaar. Dat getal ontbreekt nog en het is het enige dat `GELDPROVEN 3/3`
-tegenhoudt. Het is géén poort meer — het besluit is genomen — maar de uitkomst
-is wel informatie die terug moet, en ze is sinds notities breder: er hangen nu
-vijf schrijfroutes meer aan de fsync, waaronder `notities/vink`, die van alle
-duurzame routes het vaakst wordt ingedrukt.
+`npm run kosten` meet gepaard op één machine (zie `GELDLAT.md` stap 6 en
+`DUURZAAMHEIDSKOSTEN.json`):
 
-### D. STATE, SIDE_EFFECT en ROLLBACK — en nu ook de staart van IDEMPOTENCY
+```
+FACTOR p50 duurzaam  2,01x      p95  1,49x      p99  0,84x
+FACTOR p50 CONTROLE  1,03x   <- de ijklijn
+```
+
+De mediaan verdubbelt (~3 ms per schrijfactie), **de staart beweegt niet**. Dat
+laatste was niet het verwachte antwoord: de p99 wordt hier niet bepaald door de
+fsync maar door wat er sowieso al gebeurt (event loop, GC). `npm run beproeving`
+twee keer draaien zou dit NIET hebben laten zien — daar verdrinken vier routes in
+een storm over honderden endpoints, en de laatste vastgelegde ronde stond
+bovendien op een andere machine én opslag, en die vergelijk je niet.
+
+De schakelaar die de tweede meting mogelijk maakt (`RTG_DUURZAAM=uit`) weigert in
+productie en schreeuwt bij elke start. Het is letterlijk de knop die de belofte
+uitzet.
+
+### D. STATE, SIDE_EFFECT en ROLLBACK — NIET GEBOUWD, en dit is wat hem blokkeert
 
 Niet als drie losse meters bouwen. Ze vragen alle drie een per-route
 vingerafdruk van "wat is er veranderd", en dat is precies de invariantenmotor.
 Drie meters die elkaar niet kennen is duurder en zegt minder.
 
-Sinds stap B is er een vierde klant voor diezelfde vingerafdruk: de 2.830 routes
-waar de idempotentieproef van buitenaf niets kan zien. Dat maakt D goedkoper dan
-hij leek — één instrument vult vier kolommen in plaats van drie.
+Sinds stap B is er een **vierde** klant voor diezelfde vingerafdruk: de 2.830
+routes waar de idempotentieproef van buitenaf niets kan zien. Eén instrument
+vult dus vier kolommen in plaats van drie — 15.700 cellen in potentie.
+
+**De blokkade is één ding, en die is bij het bouwen van B scherp geworden.**
+Alle vier de kolommen vragen hetzelfde: van BUITEN zien wat er in de database is
+veranderd. Dat kan vandaag niet.
+
+```
+AUTH  ACL  INPUT  PRIVACY   meten het ANTWOORD          -> gebouwd
+IDEMPOTENCY (106 routes)    meet het antwoord, indirect -> gebouwd, en meteen op
+                                                           zijn grens gelopen
+STATE  SIDE_EFFECT
+ROLLBACK  IDEMPOTENCY-rest  meten de TOESTAND           -> geen zicht
+```
+
+De idempotentieproef laat precies zien waar het misgaat: hij kon 106 van de
+2.936 routes beoordelen, en de andere 2.830 kregen `ongemeten` met de reden "het
+antwoord verandert niet per oproep". Een route die stil aan een lijst toevoegt
+zonder dat in zijn antwoord te tonen, is van buitenaf niet te beoordelen. Punt.
+
+**Wat er dus eerst moet komen: een toestandsvingerafdruk.** Een goedkope,
+gegevensvrije samenvatting van wat er in de opslag staat — per collectie een
+aantal en een versienummer, geen inhoud — die een proef vóór en ná een verzoek
+kan opvragen. Daarmee wordt per route zichtbaar WAT er veranderde, en dan vallen
+de vier kolommen bijna vanzelf:
+
+```
+STATE         veranderde er iets, en was dat wat de route belooft
+SIDE_EFFECT   veranderde er iets BUITEN de collectie van deze route
+ROLLBACK      na een geweigerd verzoek: is de vingerafdruk gelijk gebleven
+IDEMPOTENCY   beweegt de vingerafdruk bij de tweede oproep nog een keer
+```
+
+Drie ontwerpvragen die eerst een antwoord nodig hebben, en die geen van drieën
+technisch zijn:
+
+1. **Waar woont die vingerafdruk?** Een nieuw endpoint verbreedt de API van het
+   platform voor een meetinstrument. Achter `techAuth` is het minst verrassend,
+   maar de proeven komen daar vandaag niet bij (er is geen eigenaarsaccount op
+   een wegwerpserver). De andere weg is de vorm van `RTG_VERRAAD` en `RTG_LIEG`:
+   alleen aanwezig onder een vlag, weigert in productie.
+2. **Wat mag erin staan?** Aantallen en versienummers, nooit inhoud. Een
+   vingerafdruk die per ongeluk een codenaam of een bedrag meedraagt, is een
+   nieuw lek in een instrument dat lekken moest vinden.
+3. **Hoe grof mag hij zijn?** Per collectie is goedkoop en ziet "er kwam een rij
+   bij". Per rij is duur en ziet "welke rij". Voor STATE en IDEMPOTENCY is het
+   eerste genoeg; voor SIDE_EFFECT waarschijnlijk niet.
+
+Dit is bewust NIET half gebouwd. Een vingerafdruk die niet alles ziet, meldt
+"geen wijziging" over routes die wel degelijk schreven — en dat is precies de
+meter die groen zegt zonder te kijken, waar deze hele reeks over gaat.
 
 ### E. De twaalf open voordeuren
 
@@ -186,6 +252,14 @@ idee.
 - **Een naam die het verkeerde belooft, kost een factor.** `maxPerRol` was een
   budget voor de HELE ronde. `--max=2000` las als "2000 per rol" en leverde 1000
   van de 2937 routes. Hij heet nu `maxPogingen`.
+- **Een gedeelde schrijffunctie sleept zijn aanroepers mee.** `agenda.voegToe`
+  wordt ook gebruikt door visumtaak, de RTF-koppeling en postdatum. Async maken
+  zonder die te volgen gaat STIL mis: de aanroeper krijgt een Promise, leest
+  `r.ok` als undefined en meldt keurig dat er geen taak is aangemaakt.
+- **Twee keer dezelfde storm draaien is geen gepaarde meting.** Voor de
+  kostenvraag moesten dezelfde machine, opslag en belasting twee keer, met
+  alleen de schakelaar ertussen — plus een controlegroep die NIET duurzaam
+  schrijft. Zonder die controle meet je hoe druk de machine toevallig was.
 - **Draai een mutatie nooit terug met `git checkout <bestand>`.** Die gooit ook
   het werk weg dat je in datzelfde bestand nog niet had ingeleverd — hier
   verdween zo de hele reparatie van regel 47, en dat merk je pas als je hem

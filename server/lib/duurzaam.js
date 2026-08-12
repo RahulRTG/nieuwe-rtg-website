@@ -27,6 +27,35 @@
    ========================================================================== */
 'use strict';
 
+/* ---------------------------------------------------------------------------
+   DE MEETSCHAKELAAR -- en waarom hij ondanks alles mag bestaan.
+
+   GELDLAT.md stap 6 vraagt om een getal: wat kost de duurzame commit aan
+   latentie? Dat getal is alleen eerlijk als je DEZELFDE machine, DEZELFDE opslag
+   en DEZELFDE belasting twee keer meet -- een keer met en een keer zonder
+   (LAT.md regel 10: 144 ms op vier kernen is geen betere 144 ms dan op zestien).
+   Zonder schakelaar bestaat die tweede meting niet.
+
+   EN WAAROM HIJ GEVAARLIJK IS. Dit is letterlijk een knop die de belofte uitzet
+   waar deze hele reeks over ging. Hij krijgt daarom dezelfde behandeling als
+   RTG_VERRAAD in server/lib/verraad.js:
+
+     - hij weigert in productie, hard, bij het opstarten;
+     - hij schreeuwt in het log zodra hij aanstaat, elke start opnieuw;
+     - hij heet naar wat hij DOET (duurzaamheid uit), niet naar wat hij oplost.
+
+   Een stille vlag die "even sneller" betekent, staat binnen een half jaar in een
+   productie-omgeving. Deze niet. */
+const DUURZAAM_UIT = String(process.env.RTG_DUURZAAM || '').toLowerCase() === 'uit';
+if (DUURZAAM_UIT) {
+  if (process.env.NODE_ENV === 'production') {
+    throw new Error('RTG_DUURZAAM=uit staat aan in productie. Dat zet de belofte uit dat ' +
+      'bevestigd werk ook is vastgelegd. Zet hem uit.');
+  }
+  console.warn('[duurzaam] LET OP: RTG_DUURZAAM=uit -- werk van een lid wordt bevestigd ' +
+    'ZONDER dat de opslag het heeft vastgelegd. Alleen voor de kostenmeting.');
+}
+
 /* `bron` is de app-naam voor het log. `bijeen` en `save` komen uit db/index.js.
 
    Geeft een functie terug die een SYNCHRONE mutatie aanneemt en `null` teruggeeft
@@ -61,7 +90,7 @@ module.exports = function maakVastleggen({ bijeen, save, inBundel, bron }) {
        Een worp gaat hier BEWUST omhoog in plaats van als 503 terug: de
        buitenste laag heeft zijn eigen antwoord al bedacht, en twee antwoorden
        op een verzoek is er een te veel. */
-    if (typeof inBundel === 'function' && inBundel()) {
+    if ((typeof inBundel === 'function' && inBundel()) || DUURZAAM_UIT) {
       await mutatie();
       save();
       return null;

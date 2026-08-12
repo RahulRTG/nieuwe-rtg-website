@@ -3006,6 +3006,8 @@ console.log('\n47) saveDuurzaam() staat alleen waar duurzaamheid vóór bevestig
     ['scripts/check.js', 'deze regel zelf noemt zijn naam'],
     ['test/saveduurzaam.test.js', 'de toets die bewijst dat hij bevestigt'],
     ['test/notitiesduurzaam.test.js', 'de toets die bewijst dat het bord niet bevestigt zonder opslag'],
+    ['scripts/duurzaamheidskosten.js', 'merkt per route of hij duurzaam is; meet de prijs, zet niets aan'],
+    ['test/duurzaamheidskosten.test.js', 'de toets op het oordeel van die meting'],
     ['server/lib/verraad.js', 'de catalogus benoemt de plek waar sterf-na-commit zit; geen aanroep'],
     ['server/lib/idem.js', 'draagt de vlag door van de aanroeper naar de bundel; kiest zelf niets'],
     ['server/lib/duurzaam.js', 'hier woont de gedeelde vastleg-helper voor werk van een lid'],

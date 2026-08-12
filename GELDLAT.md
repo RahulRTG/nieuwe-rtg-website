@@ -156,6 +156,44 @@ Stap 6 vóór stap 7 is geen formaliteit. Een duurzaamheidsgarantie die de
 latentie verdubbelt is een productbeslissing, en die hoort met een gemeten
 getal genomen te worden.
 
+### Stap 6, gemeten op 12 augustus 2026
+
+`npm run kosten` (`scripts/duurzaamheidskosten.js`) meet **gepaard**: dezelfde
+machine, dezelfde opslag, dezelfde belasting, twee rondes achter elkaar met
+alleen `RTG_DUURZAAM` ertussen. Vier kernen, linux, sqlite, 400 verzoeken per
+route.
+
+```
+route                  p50 aan   p50 uit     p95 aan   p95 uit     p99 aan   p99 uit
+notities/bewaar           5,35      2,58        7,08      4,16        8,21     11,62
+agenda/toevoegen          7,14      3,67        8,97      6,53       13,39     13,68
+bestanden/map             6,91      3,43        9,10      6,56       11,05     13,41
+zorgprofiel/zet (ctrl)    3,55      3,43       12,17     12,32       13,71     13,62
+
+FACTOR p50 duurzaam  2,01x      p95  1,49x      p99  0,84x
+FACTOR p50 CONTROLE  1,03x   <- de ijklijn: die hoort rond 1 te liggen
+```
+
+**De mediaan verdubbelt, de staart beweegt niet.** Dat laatste was niet het
+verwachte antwoord en het is het interessantste getal van de drie: de p99 van
+een duurzame route ligt niet boven die van de controle. De staart wordt hier dus
+niet bepaald door de fsync maar door wat er sowieso al gebeurt (event loop, GC),
+en dat is precies waar een gebruiker een trage app aan merkt.
+
+In absolute termen: ongeveer **3 milliseconden per schrijfactie**. Dat is de
+prijs van "bevestigd betekent vastgelegd", en daarmee is de vraag uit stap 6
+beantwoord met een getal in plaats van een gevoel.
+
+**Waarom niet gewoon `npm run beproeving` twee keer.** Dat is een storm over
+honderden endpoints; het effect van vier routes verdrinkt erin. En de laatste
+vastgelegde ronde stond op een andere machine én een andere opslag
+(darwin/postgres tegen linux/sqlite) — die vergelijk je niet (`LAT.md`, regel 10).
+
+**De schakelaar die dit mogelijk maakt is met opzet luid.** `RTG_DUURZAAM=uit`
+weigert in productie en schreeuwt bij elke start. Het is letterlijk de knop die
+de belofte uitzet; een stille vlag die "even sneller" betekent staat binnen een
+half jaar in een productie-omgeving.
+
 ## Wat er al ligt
 
 `db.persistentieStand()` (`server/db/index.js`) leest de teller die de

@@ -102,8 +102,21 @@ function load() {
    halve toestand die een omstander kan vastleggen. */
 const { AsyncLocalStorage } = require('async_hooks');
 const bijeenContext = new AsyncLocalStorage();
-async function bijeen(fn) {
-  const doos = { open: true, nodig: false };
+/* `opties.duurzaam` maakt van de gebundelde commit een DUURZAME: hij gaat via
+   saveDuurzaam() en keert pas terug als de opslag heeft bevestigd.
+
+   WAAROM DIT HIER HOORT EN NIET IN DE ROUTE. De bundel is precies wat duurzaam
+   moet zijn: boeking en idem-sleutel samen. Zou de route na afloop nog een
+   losse saveDuurzaam() doen, dan bestaat er alsnog een moment waarop de een
+   vaststaat en de ander niet -- de toestand waar de dubbele boeking van 137
+   centen uit voortkwam. Eén bundel, één duurzame commit.
+
+   Alleen de geldcommit zet hem aan; check.js regel 47 bewaakt dat
+   saveDuurzaam() niet elders opduikt, en hier is de aanroep bewust de enige
+   plek waar een aanroeper er indirect bij kan. */
+async function bijeen(fn, opties) {
+  const duurzaam = !!(opties && opties.duurzaam);
+  const doos = { open: true, nodig: false, duurzaam };
   try { return await bijeenContext.run(doos, fn); }
   finally {
     /* Dicht voordat er geflusht wordt: een timer die binnen fn is gezet erft
@@ -111,7 +124,18 @@ async function bijeen(fn) {
        vlag zetten waar niemand meer naar kijkt. */
     doos.open = false;
     if (doos.nodig) {
-      save();
+      if (duurzaam) {
+        const uit = saveDuurzaam();
+        /* DE BUNDEL FAALT ALS HIJ NIET BEVESTIGD KON WORDEN, en alleen daar waar
+           bevestigen mogelijk is. Zonder dit gooien meldt saveDuurzaam netjes
+           dat het misging en gaat de route toch met 200 verder -- precies de
+           valse bevestiging waar deze hele ronde over ging. En met een
+           onvoorwaardelijk gooien zou een opslag die niet kan tellen elke
+           transactie laten mislukken; dat brak eerder vier geldtoetsen. */
+        if (uit.bevestigbaar && !uit.duurzaam) {
+          throw new Error('[duurzaam] de commit is niet vastgelegd: ' + uit.reden);
+        }
+      } else save();
       /* Postgres is write-behind: zonder dit wachten zegt de route "gelukt"
          terwijl het geld nog in een 60ms-timer hangt -- de crashproef mat daar
          echt verlies in. Elders (sqlite synchroon; json/geheugen bewust
@@ -135,10 +159,20 @@ function save() {
      Waarom hier en niet in een wikkel eromheen: een tweede opstartpad dat
      alleen bij een proef wordt gebruikt, is een pad dat niemand draait. Zie
      server/lib/verraad.js. */
-  if (verraad.sla('schrijf-faalt')) throw new Error('[verraad] de schrijfactie mislukte (schrijf-faalt)');
-  if (verraad.sla('schrijf-verloren')) return;
+  /* EERST DE BUNDEL-BOEKHOUDING, DAN PAS HET VERRAAD, en die volgorde is met
+     een rode toets geleerd. Andersom keert save() onder `schrijf-verloren`
+     terug VOORDAT hij de bundel markeert als "moet nog flushen" -- en dan
+     draait de duurzame commit aan het eind van bijeen() helemaal niet. Het
+     verraad zette daarmee niet de opslag maar de MEETOPSTELLING uit, en dat is
+     de ergste vorm: alles blijft groen omdat er niets meer gebeurt.
+
+     Binnen een bundel hoort save() sowieso alleen een vlag te zetten; de echte
+     schrijfactie gebeurt aan het eind, buiten deze context, en daar slaat het
+     verraad gewoon toe. */
   const doos = bijeenContext.getStore();
   if (doos && doos.open) { doos.nodig = true; return; } // binnen bijeen: aan het eind, in een commit
+  if (verraad.sla('schrijf-faalt')) throw new Error('[verraad] de schrijfactie mislukte (schrijf-faalt)');
+  if (verraad.sla('schrijf-verloren')) return;
   if (STORE === 'postgres') {
     // Postgres is de duurzame waarheid (write-behind via planFlush). De lokale
     // snapshot is enkel een warme cache en wordt binnen flushNu gethrotteld
@@ -226,7 +260,8 @@ function saveDuurzaam() {
      toets viel erover voordat er iets op aangesloten was. */
   if (verraad.sla('schrijf-faalt')) throw new Error('[verraad] de duurzame schrijfactie mislukte (schrijf-faalt)');
   if (verraad.sla('schrijf-verloren')) {
-    return { duurzaam: false, stand: persistentieStand(),
+    const stand = persistentieStand();
+    return { duurzaam: false, bevestigbaar: stand !== null, stand,
       reden: 'de opslag bevestigde de schrijfactie niet' };
   }
 
@@ -243,7 +278,13 @@ function saveDuurzaam() {
     save();                            // postgres/geheugen: geen synchrone weg hier
   }
   const na = persistentieStand();
-  const bevestigd = voor !== null && na !== null && na > voor;
+  /* `bevestigbaar` en `duurzaam` zijn twee verschillende dingen, en dat verschil
+     is het hele verschil. Bevestigbaar: deze opslag KAN het aantonen. Duurzaam:
+     hij heeft het ook aangetoond. Een opslag die niet kan tellen mag geen
+     transactie laten mislukken -- dat brak eerder vier geldtoetsen -- maar mag
+     evenmin doorgaan voor bewijs. */
+  const bevestigbaar = voor !== null && na !== null;
+  const bevestigd = bevestigbaar && na > voor;
 
   /* STERF-NA-COMMIT. Het gemeenste moment dat er bestaat, en het is hier
      eenduidig aan te wijzen: de schrijfactie is duurzaam, de aanroeper heeft
@@ -259,9 +300,9 @@ function saveDuurzaam() {
   if (bevestigd && verraad.sla('sterf-na-commit')) {
     try { process.kill(process.pid, 'SIGKILL'); } catch (e) { process.abort(); }
   }
-  return { duurzaam: bevestigd, stand: na,
+  return { duurzaam: bevestigd, bevestigbaar, stand: na,
     reden: bevestigd ? null
-      : (voor === null || na === null ? 'deze opslag kan duurzaamheid niet bevestigen'
+      : (!bevestigbaar ? 'deze opslag kan duurzaamheid niet bevestigen'
         : 'de persistentiestand liep niet op') };
 }
 
@@ -274,14 +315,16 @@ const CONTROL_DUURZAAM = {
   eigenaar: 'Techniek',
   bewijs: ['test/saveduurzaam.test.js', 'test/persistentiestand.test.js'],
   bewijsstuk: 'db.saveDuurzaam() geeft { duurzaam, stand, reden } -- geen boolean',
-  grens: 'de primitive is bewezen, de GELDCOMMIT hangt er nog niet aan. Dat is stap 2 van ' +
-    'GELDLAT.md en hoort pas na een gemeten prestatievergelijking. Deze control zegt dus dat ' +
-    'het gereedschap er is, niet dat de geldketen ermee is beveiligd.',
+  grens: 'de geldcommit gaat er nu doorheen en scenario 1 en 2 zijn bewezen. Scenario 3 ' +
+    '(crash na de commit, klant retryt) staat op NIET, en de PRESTATIE is ongemeten -- stap 6 ' +
+    'van GELDLAT.md. GELDPROVEN mag pas 3/3 heten als die twee er allebei zijn.',
   bewijssoorten: {
     primitive: 'PROVEN',
     'onder sabotage': 'PROVEN',
     poortbewijs: 'HANDMATIG GEREPRODUCEERD',
-    'geldcommit aangesloten': 'NIET AANGESLOTEN'
+    'geldcommit aangesloten': 'PROVEN',
+    'scenario 3 (crash + retry)': 'ONGEMETEN',
+    'prestatie p95/p99': 'ONGEMETEN'
   },
   dekking: { register: 'KETENS.json', beproefd: 'gemeten.geldProven',
     totaal: 'gemeten.geldScenarios', eenheid: 'geldscenario\'s met alle drie bewezen' }

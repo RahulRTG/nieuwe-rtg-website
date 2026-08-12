@@ -17,25 +17,27 @@
         "test/persistentiestand.test.js"
       ],
       "bewijsstuk": "db.saveDuurzaam() geeft { duurzaam, stand, reden } -- geen boolean",
-      "grens": "de primitive is bewezen, de GELDCOMMIT hangt er nog niet aan. Dat is stap 2 van GELDLAT.md en hoort pas na een gemeten prestatievergelijking. Deze control zegt dus dat het gereedschap er is, niet dat de geldketen ermee is beveiligd.",
+      "grens": "de geldcommit gaat er nu doorheen en scenario 1 en 2 zijn bewezen. Scenario 3 (crash na de commit, klant retryt) staat op NIET, en de PRESTATIE is ongemeten -- stap 6 van GELDLAT.md. GELDPROVEN mag pas 3/3 heten als die twee er allebei zijn.",
       "bewijssoorten": {
         "primitive": "PROVEN",
         "onder sabotage": "PROVEN",
         "poortbewijs": "HANDMATIG GEREPRODUCEERD",
-        "geldcommit aangesloten": "NIET AANGESLOTEN"
+        "geldcommit aangesloten": "PROVEN",
+        "scenario 3 (crash + retry)": "ONGEMETEN",
+        "prestatie p95/p99": "ONGEMETEN"
       },
       "dekking": {
-        "beproefd": 0,
-        "totaal": 2,
+        "beproefd": 1,
+        "totaal": 3,
         "eenheid": "geldscenario's met alle drie bewezen",
         "tellers": {},
-        "pct": 0
+        "pct": 33.3
       },
       "laatstGroen": {
         "staat": "GROEN",
-        "beweringen": 10,
+        "beweringen": 14,
         "overgeslagen": 0,
-        "at": "2026-08-12T07:19:34.151Z",
+        "at": "2026-08-12T07:50:27.205Z",
         "bestanden": [
           "test/saveduurzaam.test.js",
           "test/persistentiestand.test.js"
@@ -63,7 +65,7 @@
         "staat": "GROEN",
         "beweringen": 30,
         "overgeslagen": 0,
-        "at": "2026-08-12T07:19:34.358Z",
+        "at": "2026-08-12T07:50:27.423Z",
         "bestanden": [
           "test/keten.test.js"
         ]
@@ -91,7 +93,7 @@
         "staat": "NIET IN BEDRIJF",
         "beweringen": 30,
         "overgeslagen": 0,
-        "at": "2026-08-12T07:19:34.579Z",
+        "at": "2026-08-12T07:50:27.645Z",
         "bestanden": [
           "test/keten.test.js"
         ],
@@ -127,7 +129,7 @@
         "staat": "GROEN",
         "beweringen": 33,
         "overgeslagen": 0,
-        "at": "2026-08-12T07:19:35.441Z",
+        "at": "2026-08-12T07:50:28.524Z",
         "bestanden": [
           "test/verraad.test.js",
           "test/verraadtelling.test.js"
@@ -145,17 +147,17 @@
       "bewijsstuk": "KETENS.json -- acht velden per keten en verraad, met de zevenstappenlat",
       "grens": "drie ketens van de tientallen die er zijn, en alleen de twee verraden die op het schrijfpad zijn ingebouwd. Voor GELD geldt de strengere lat (antwoord EN persistentie EN grootboek); voor de andere ketens is er nog geen invariant om tegen af te rekenen. Een keten die achter een poort zit (KYC, een bestaande toestemming) wordt NIET beoordeeld en staat als blind met reden in het register.",
       "dekking": {
-        "beproefd": 2,
-        "totaal": 6,
+        "beproefd": 3,
+        "totaal": 9,
         "eenheid": "scenarios die de zevenstappenlat halen",
         "tellers": {
           "ketens": 3,
           "blindeKetens": 0,
-          "rollbackBewezen": 3,
+          "rollbackBewezen": 4,
           "ledgerGebroken": 0,
-          "stilVerlies": 2,
-          "geldProven": 0,
-          "geldScenarios": 2
+          "stilVerlies": 1,
+          "geldProven": 1,
+          "geldScenarios": 3
         },
         "pct": 33.3
       },
@@ -163,7 +165,7 @@
         "staat": "GROEN",
         "beweringen": 29,
         "overgeslagen": 0,
-        "at": "2026-08-12T07:19:35.659Z",
+        "at": "2026-08-12T07:50:28.717Z",
         "bestanden": [
           "test/ketenproef.test.js"
         ]
@@ -192,7 +194,7 @@
         "staat": "GROEN",
         "beweringen": 18,
         "overgeslagen": 0,
-        "at": "2026-08-12T07:19:37.561Z",
+        "at": "2026-08-12T07:50:30.623Z",
         "bestanden": [
           "test/klok.test.js"
         ]
@@ -223,7 +225,7 @@
         "staat": "GROEN",
         "beweringen": 18,
         "overgeslagen": 0,
-        "at": "2026-08-12T07:20:07.084Z",
+        "at": "2026-08-12T07:50:58.634Z",
         "bestanden": [
           "test/schermleugen.test.js",
           "test/liegend-scherm.e2e.js"
@@ -256,7 +258,7 @@
         "staat": "GROEN",
         "beweringen": 13,
         "overgeslagen": 0,
-        "at": "2026-08-12T07:20:07.288Z",
+        "at": "2026-08-12T07:50:58.826Z",
         "bestanden": [
           "test/rolproef.test.js"
         ]
@@ -272,21 +274,21 @@
       ],
       "bewijsstuk": "BEWIJSMATRIX.json -- elf schakels per route, met bron per bewezen cel",
       "dekking": {
-        "beproefd": 5983,
+        "beproefd": 5984,
         "totaal": 43835,
         "eenheid": "cellen",
         "tellers": {
           "ongemeten": 37588,
-          "gezakt": 4
+          "gezakt": 3
         },
-        "pct": 13.6
+        "pct": 13.7
       },
       "grens": "het register MEET niets zelf; het verzamelt wat andere instrumenten meten. Vier van de elf kolommen hebben vandaag een instrument, zeven staan leeg.",
       "laatstGroen": {
         "staat": "GROEN",
         "beweringen": 11,
         "overgeslagen": 0,
-        "at": "2026-08-12T07:20:07.483Z",
+        "at": "2026-08-12T07:50:59.009Z",
         "bestanden": [
           "test/bewijsmatrix.test.js"
         ]

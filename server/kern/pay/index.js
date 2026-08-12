@@ -66,7 +66,10 @@ module.exports = ({ db, save, bijeen, crypto, betaal, keyVanCodenaam, sseToCusto
   /* Met de save-bundel (db.bijeen) landen de boeking en de idem-sleutel als
      EEN commit; de bundel is context-gebonden, dus ook met echte I/O in het
      werk (motor, kaart-naad) raakt hij geen saves van andere verzoeken. */
-  const metIdem = require('../../lib/idem')({ d, save, naam: 'payIdem', bijeen });
+  /* duurzaam: geld is de enige laag waar bevestigen vóór duurzaamheid een belofte
+     is die de opslag nog niet heeft gedaan. Boeking en idem-sleutel zitten al in
+     EEN bundel (zie lib/idem.js); deze vlag maakt die bundel ook duurzaam. */
+  const metIdem = require('../../lib/idem')({ d, save, naam: 'payIdem', bijeen, duurzaam: true });
 
   /* ---------- het grootboek zelf ----------
      `pasToe` past een AL-goedgekeurde boeking toe op de saldi + het grootboek

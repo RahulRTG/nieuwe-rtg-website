@@ -3,13 +3,13 @@
   "seed": "819226199",
   "gemeten": {
     "ketens": 3,
-    "scenarios": 6,
-    "voldoetAanLat": 2,
-    "rollbackBewezen": 3,
+    "scenarios": 9,
+    "voldoetAanLat": 3,
+    "rollbackBewezen": 4,
     "ledgerGebroken": 0,
-    "stilVerlies": 2,
-    "geldScenarios": 2,
-    "geldProven": 0,
+    "stilVerlies": 1,
+    "geldScenarios": 3,
+    "geldProven": 1,
     "blindeKetens": 0
   },
   "scenarios": [
@@ -18,27 +18,28 @@
       "verraad": "schrijf-verloren",
       "injectie": "JA",
       "zichtbaar": "JA",
-      "clientAntwoord": "OK",
+      "clientAntwoord": "FAIL",
       "toestandWijziging": "TERUGGEDRAAID",
       "ledgerInvariant": "GELDIG",
       "audit": "AANWEZIG",
       "retryVeilig": "JA",
-      "rollback": "NVT",
+      "rollback": "PROVEN",
       "herhaalbaar": "JA",
       "afwijkingen": [
-        "blijftNaHerstart: true -> false"
+        "blijftNaHerstart: true -> false",
+        "schrijfStatus: 200 -> 500"
       ],
       "lat": {
         "voldoet": true,
         "ontbreekt": []
       },
-      "stilVerlies": true,
+      "stilVerlies": false,
       "financieel": {
-        "staat": "NIET",
-        "reden": "bevestigd aan de aanroeper en na de herstart weg"
+        "staat": "PROVEN",
+        "reden": "antwoord, persistentie na herstart en grootboekinvariant kloppen alle drie"
       },
       "ruw": {
-        "schrijfStatus": 200,
+        "schrijfStatus": 500,
         "zichtbaarVoorHerstart": true,
         "blijftNaHerstart": false,
         "ledgerKlopt": true,
@@ -89,6 +90,43 @@
         "auditSpoor": null,
         "retryGafTweedeEffect": null,
         "startteOp": false
+      }
+    },
+    {
+      "keten": "GELD",
+      "verraad": "sterf-na-commit",
+      "injectie": "JA",
+      "zichtbaar": "JA",
+      "clientAntwoord": "FAIL",
+      "toestandWijziging": "BLIJVEND",
+      "ledgerInvariant": "GELDIG",
+      "audit": "AFWEZIG",
+      "retryVeilig": "JA",
+      "rollback": "NIET",
+      "herhaalbaar": "JA",
+      "afwijkingen": [
+        "auditSpoor: true -> false",
+        "schrijfStatus: 200 -> 0",
+        "zichtbaarVoorHerstart: true -> false"
+      ],
+      "lat": {
+        "voldoet": true,
+        "ontbreekt": []
+      },
+      "stilVerlies": false,
+      "financieel": {
+        "staat": "NIET",
+        "reden": "geweigerd en toch blijvend geboekt"
+      },
+      "ruw": {
+        "schrijfStatus": 0,
+        "zichtbaarVoorHerstart": false,
+        "blijftNaHerstart": true,
+        "ledgerKlopt": true,
+        "auditSpoor": false,
+        "retryGafTweedeEffect": false,
+        "startteOp": true,
+        "identiteitLukte": true
       }
     },
     {
@@ -163,6 +201,38 @@
       }
     },
     {
+      "keten": "TOESTEMMING",
+      "verraad": "sterf-na-commit",
+      "injectie": "JA",
+      "zichtbaar": "NEE",
+      "clientAntwoord": "OK",
+      "toestandWijziging": "BLIJVEND",
+      "ledgerInvariant": "ONGEMETEN",
+      "audit": "AANWEZIG",
+      "retryVeilig": "JA",
+      "rollback": "NVT",
+      "herhaalbaar": "JA",
+      "afwijkingen": [],
+      "lat": {
+        "voldoet": false,
+        "ontbreekt": [
+          "zichtbaar"
+        ]
+      },
+      "stilVerlies": false,
+      "financieel": null,
+      "ruw": {
+        "schrijfStatus": 200,
+        "zichtbaarVoorHerstart": true,
+        "blijftNaHerstart": true,
+        "ledgerKlopt": null,
+        "auditSpoor": true,
+        "retryGafTweedeEffect": false,
+        "startteOp": true,
+        "identiteitLukte": true
+      }
+    },
+    {
       "keten": "NOTITIE",
       "verraad": "schrijf-verloren",
       "injectie": "JA",
@@ -231,6 +301,38 @@
         "auditSpoor": null,
         "retryGafTweedeEffect": null,
         "startteOp": false
+      }
+    },
+    {
+      "keten": "NOTITIE",
+      "verraad": "sterf-na-commit",
+      "injectie": "JA",
+      "zichtbaar": "NEE",
+      "clientAntwoord": "OK",
+      "toestandWijziging": "BLIJVEND",
+      "ledgerInvariant": "ONGEMETEN",
+      "audit": "AANWEZIG",
+      "retryVeilig": "NEE",
+      "rollback": "NVT",
+      "herhaalbaar": "JA",
+      "afwijkingen": [],
+      "lat": {
+        "voldoet": false,
+        "ontbreekt": [
+          "zichtbaar"
+        ]
+      },
+      "stilVerlies": false,
+      "financieel": null,
+      "ruw": {
+        "schrijfStatus": 200,
+        "zichtbaarVoorHerstart": true,
+        "blijftNaHerstart": true,
+        "ledgerKlopt": null,
+        "auditSpoor": true,
+        "retryGafTweedeEffect": true,
+        "startteOp": true,
+        "identiteitLukte": true
       }
     }
   ]

@@ -141,3 +141,61 @@ test('zonder dat verraad keert saveDuurzaam gewoon terug', () => {
     "db.db.data.p={t:1};db.saveDuurzaam();console.log('teruggekeerd')})()");
   assert.equal(uit, 'teruggekeerd');
 });
+
+/* ---------- de duurzame bundel ----------
+
+   bijeen({ duurzaam: true }) maakt van de gebundelde commit -- boeking én
+   idem-sleutel samen -- een duurzame. Dat is de vorm die de geldketen nodig
+   heeft: één bundel, één duurzame commit, geen moment waarop de een vaststaat
+   en de ander niet.
+
+   DE GELDLAAG IS ER NOG NIET OP AANGESLOTEN, en dat is geen vergeetachtigheid.
+   De bedrading is geprobeerd en de geldtoetsen bleven groen, maar de ketenronde
+   liet zien dat de uitkomst NIET veranderde: onder `schrijf-verloren` kwam er
+   nog steeds een 200 uit. Waarom de worp uit de bundel de route niet bereikt,
+   is niet nagetrokken -- en een geldpad bedraden waarvan je niet kunt aantonen
+   dat het iets doet, is de valse zekerheid waar deze hele reeks over gaat.
+   Dus: de bundel is bewezen, de aansluiting staat open. Zie GELDLAT.md. */
+
+test('een duurzame bundel gooit als de commit niet bevestigd kon worden', () => {
+  /* Zonder deze worp meldt saveDuurzaam netjes dat het misging en gaat de
+     aanroeper toch verder -- precies de valse bevestiging die de ketenronde
+     vond. */
+  let gegooid = null;
+  try {
+    inProces({ RTG_DATA_DIR: verseMap(), RTG_VERRAAD: 'schrijf-verloren' },
+      "const db=require('./server/db');(async()=>{await db.load();" +
+      "await db.bijeen(async()=>{db.db.data.p={t:1};db.save()},{duurzaam:true});" +
+      "console.log('TERUGGEKEERD')})()");
+  } catch (e) { gegooid = String(e.stderr || e.message); }
+  assert.ok(gegooid, 'een onbevestigde duurzame bundel hoort te gooien');
+  assert.match(gegooid, /niet vastgelegd/);
+});
+
+test('een gewone bundel gooit NIET onder datzelfde verraad', () => {
+  /* De duurzame stand is een keuze per bundel en geen nieuw platformgedrag.
+     Zou dit ook gooien, dan was save() stilletjes streng geworden. */
+  const uit = inProces({ RTG_DATA_DIR: verseMap(), RTG_VERRAAD: 'schrijf-verloren' },
+    "const db=require('./server/db');(async()=>{await db.load();" +
+    "await db.bijeen(async()=>{db.db.data.p={t:1};db.save()});" +
+    "console.log('teruggekeerd')})()");
+  assert.equal(uit, 'teruggekeerd');
+});
+
+test('een duurzame bundel komt gewoon door zonder verraad', () => {
+  const uit = inProces({ RTG_DATA_DIR: verseMap() },
+    "const db=require('./server/db');(async()=>{await db.load();" +
+    "await db.bijeen(async()=>{db.db.data.p={t:1};db.save()},{duurzaam:true});" +
+    "console.log('teruggekeerd')})()");
+  assert.equal(uit, 'teruggekeerd');
+});
+
+test('bevestigbaar en duurzaam zijn twee verschillende dingen', () => {
+  /* Een opslag die niet kan tellen mag geen transactie laten mislukken -- dat
+     brak eerder vier geldtoetsen -- maar mag evenmin doorgaan voor bewijs. */
+  const uit = JSON.parse(inProces({ RTG_DATA_DIR: verseMap(), RTG_STORE: 'geheugen' },
+    "const db=require('./server/db');(async()=>{await db.load();" +
+    "db.db.data.p={t:1};console.log(JSON.stringify(db.saveDuurzaam()))})()"));
+  assert.equal(uit.bevestigbaar, false);
+  assert.equal(uit.duurzaam, false);
+});

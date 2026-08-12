@@ -35,7 +35,7 @@ const MAX = 20000; // ring: zoveel sleutels houden we vast
    kill -9 precies daar plus de retry waar idem-sleutels voor bestaan, boekt
    dubbel. Zo gevonden, met een echte dubbele boeking van 137 centen. Geef
    bijeen alleen mee als het werk geen echte I/O afwacht (zie db/index.js). */
-module.exports = function maakIdem({ d, save, naam, bijeen }) {
+module.exports = function maakIdem({ d, save, naam, bijeen, duurzaam }) {
   function store() {
     if (!d()[naam] || typeof d()[naam] !== 'object') d()[naam] = { _keys: [] };
     if (!Array.isArray(d()[naam]._keys)) d()[naam]._keys = [];
@@ -102,7 +102,13 @@ module.exports = function maakIdem({ d, save, naam, bijeen }) {
         save();
       }
     };
-    if (bijeen) await bijeen(doeWerkEnLegVast); else await doeWerkEnLegVast();
+    /* `duurzaam` maakt van deze bundel een duurzame commit: boeking én
+       idem-sleutel staan pas vast als de opslag het heeft bevestigd, en pas
+       daarna keert de aanroeper terug. Zonder dat is de bundel wel ATOMAIR maar
+       niet DUURZAAM -- en dan blijft de fout bestaan die de ketenronde vond:
+       bevestigd aan de klant, na een herstart weg. Zie GELDLAT.md. */
+    if (bijeen) await bijeen(doeWerkEnLegVast, duurzaam ? { duurzaam: true } : undefined);
+    else await doeWerkEnLegVast();
     inVlucht.delete(sleutel);
     klaar(fout ? { status: 500, error: 'De vorige poging met deze sleutel mislukte.' } : r);
     if (fout) throw fout;

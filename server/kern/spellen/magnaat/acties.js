@@ -22,6 +22,7 @@ const { PRIJSSTANDEN, KOSTENSTAND } = require('./prijsstand');
 const { afkoopsom } = require('./handel');
 const { personeelNodig } = require('./stap');
 const O = require('./onderzoek');
+const LOG = require('./kavellog');
 
 module.exports = ({ K, mijnVestiging, vrijKavel, rond }) => {
   /* Bij OPENEN is er nog geen vestiging om de techniek aan te hangen, dus geldt
@@ -76,6 +77,9 @@ module.exports = ({ K, mijnVestiging, vrijKavel, rond }) => {
       };
       st.vestigingen[h].push(v);
       st.kavelBezet[kavelId] = h;
+      /* HET FEIT, EN VERDER NIETS (./kavellog.js). Deze actie weet wat openen
+         is; wie er later een verhaal van maakt leest. */
+      LOG.schrijf(st, { kavel: kavelId, wat: 'geopend', naam: v.naam, sector });
       // het bouwrecht is opgebruikt zodra er iets staat
       if (st.kavelRecht) delete st.kavelRecht[kavelId];
       return { status: 200, ok: true, id: v.id };
@@ -127,6 +131,7 @@ module.exports = ({ K, mijnVestiging, vrijKavel, rond }) => {
       }
       st.vestigingen[h] = st.vestigingen[h].filter(x => x !== v);
       delete st.kavelBezet[v.kavel];
+      LOG.schrijf(st, { kavel: v.kavel, wat: 'gesloten', naam: v.naam, sector: v.sector });
       return { status: 200, ok: true, afgekocht: raakt.length, afkoop };
     },
     /* VRIJ: de knoppen waar je altijd aan mag draaien. Ze staan in EEN actie

@@ -65,10 +65,15 @@ module.exports = (ctx) => {
      in en hier wel, dus geldt de 18+-poort per persoon. Zie de kop van
      ./ondernemerskring.js, en vooral de regel dat hij GEEN contactenlijst is:
      een potje geeft geen nieuw recht om iemand te bereiken. */
+  /* HET PAND ALS PERSONAGE (./pandgeheugen.js): wat er op een plek stond, over
+     campagnes heen. Naast het stadsgeheugen en met dezelfde grens -- er staat
+     geen persoon in, alleen het bord op de gevel. */
+  const pandgeheugen = require('./pandgeheugen')({ db, save });
+
   const ondernemerskring = require('./ondernemerskring')({
     db, save, progressieMag, GEEN_PROGRESSIE
   });
 
   return { telPotje, spelTelemetrie, noteerUitslag, spelUitslagen, spelStand,
-    spelPrestaties, loopbaan, stadsgeheugen, daily, ondernemerskring };
+    spelPrestaties, loopbaan, stadsgeheugen, daily, ondernemerskring, pandgeheugen };
 };

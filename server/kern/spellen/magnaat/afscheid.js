@@ -8,6 +8,8 @@
 
    HET IS BEWUST GEEN "FAILLISSEMENT". Een speler raakt hier een PAND kwijt en
    nooit zijn hele bedrijf; zie GAMEHALL.md 12.6 en de reden in ./bank.js. */
+const LOG = require('./kavellog');
+
 module.exports = ({ mijnVestiging, afkoopsom, rond }) => {
   /* EEN HYPOTHEEK REIST MEE MET HET PAND, en dat ontbrak. Een speler kon een
      verhypothekeerd pand verkopen, de opbrengst houden en de lening laten staan
@@ -62,6 +64,7 @@ module.exports = ({ mijnVestiging, afkoopsom, rond }) => {
     }
     st.vestigingen[h] = st.vestigingen[h].filter(x => x !== v);
     delete st.kavelBezet[v.kavel];
+    LOG.schrijf(st, { kavel: v.kavel, wat: 'gesloten', naam: v.naam, sector: v.sector });
     return losAf ? opbrengst - losOnderpandAf(st, h, v.id, opbrengst) : opbrengst;
   }
 
@@ -89,6 +92,9 @@ module.exports = ({ mijnVestiging, afkoopsom, rond }) => {
     st.vestigingen[van] = st.vestigingen[van].filter(x => x !== v);
     st.vestigingen[naar].push(v);
     st.kavelBezet[v.kavel] = naar;
+    /* EEN OVERDRACHT BREEKT DE ZAAK NIET, hij wisselt van hand. Het bord blijft
+       hangen; zie de uitleg bij `perioden` in ./kavellog.js. */
+    LOG.schrijf(st, { kavel: v.kavel, wat: 'overgedragen', naam: v.naam, sector: v.sector });
     let mee = 0;
     for (const c of st.contracten || []) {
       if (c.status !== 'loopt') continue;

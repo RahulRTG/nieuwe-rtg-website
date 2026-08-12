@@ -99,6 +99,53 @@ niet vriendelijkheid, het is de enige stand die met de grens verenigbaar is.
 
 ---
 
+## 0b. De twee regels van de geschiedenislaag
+
+Twee zinnen die boven alles hangen wat een campagne overleeft. Ze zijn later
+toegevoegd en ze zijn scherper dan wat eronder stond.
+
+> **Wat gebeurd is, blijft waar. Wat het tussen mensen betekent, kan veranderen.**
+
+Een feit is onveranderlijk; een relatie is dat niet. *"Mike weigerde jou in 2036
+een lening"* blijft voor altijd waar. *"Mike vertrouwt jou niet"* is geen eeuwige
+waarheid — in 2045 kunnen jullie weer partners zijn. Daarom bewaren we
+**gebeurtenissen** en nooit een oordeel erover.
+
+Dat lost meteen op waar een economisch spel normaal op strandt. Een
+betrouwbaarheidscijfer (*Rahul: 43/100*) reduceert een ingewikkelde geschiedenis
+tot een ranglijst, en dat is precies wat `CLAUDE.md` uitsluit. Maar frictie
+weghalen is óók fout: een speler mag onthouden dat jij hem niet terugbetaalde,
+mag je een lening weigeren, mag stoppen als leverancier, mag tegen je stemmen,
+mag jarenlang een conflict met je hebben. **Niet frictieloos, maar zonder
+permanente sociale strafmachine.** De gebeurtenis is de waarheid; wat die
+betekent beslist een mens.
+
+> **Systemen schrijven feiten. Magnaat leest geschiedenis.**
+
+`werk` bepaalt wat een sollicitatie is, `bank` wat een lening is, `stad` wat een
+pand is, `concern` wat een promotie is, `payroll` wat een loonstrook is. Geen van
+die systemen schrijft ooit een verhaal. Ze schrijven één feit naar de
+ruggengraat, en Magnaat Daily, de terugblik, het NPC-geheugen, de
+pandgeschiedenis en de documentaire lezen allemaal dezelfde feiten.
+
+Zonder die regel krijg je tweehonderd losse verhaalfeatures. Mét die regel is
+elk verhaal een *query*.
+
+### En een derde, voor wat er ooit terugkomt
+
+> **Een relikwie is te lezen en niets waard.**
+
+De grondwet hieronder zegt dat blijvende waarde uit tijd komt en nooit uit geld.
+Dat lijkt te botsen met *"je eerste loonstrook was €1.487,23, en je kunt erop
+drukken"* — maar dat is schijn. Een bedrag op een oud document kun je niet
+uitgeven, niet belenen, niet meetellen, en het maakt je volgende campagne geen
+euro rijker. Het is een **document, geen saldo**.
+
+Zodra een relikwie verkoopbaar, overdraagbaar of optelbaar wordt, is het waarde
+en geldt de grondwet weer onverkort.
+
+---
+
 ## 1. De grondwet van blijvende waarde
 
 Zodra iets tussen campagnes blijft bestaan, verandert de economische grondwet.

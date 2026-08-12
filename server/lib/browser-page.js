@@ -1,34 +1,23 @@
-/* Browser-driver, deel "pagina": de Page- en Locator-klassen in Playwright-vorm.
+/* Browser-driver, deel "pagina": de Page-klasse in Playwright-vorm.
    Precies de methoden die onze scherm-tests (test/*.e2e.js) en de a11y-scan
    gebruiken: navigeren, wachten, selecteren, klikken, typen, evalueren en het
    onderscheppen van verzoeken (route). Werkt via CDP op de meegegeven sessie.
-   Afgesplitst uit browser.js zodat elk deel klein blijft. */
+   Afgesplitst uit browser.js zodat elk deel klein blijft; de Locator woont in
+   ./browser-locator.js en reist hieronder gewoon mee naar buiten. */
 'use strict';
 // het toetsenbord staat apart, in ./browser-toetsen.js (10 KB-lat)
 const { Keyboard } = require('./browser-toetsen');
 // de grepen ($, $$, press, reload, selectOption, setInputFiles) in ./browser-grepen.js
 const { rustUit } = require('./browser-grepen');
+/* de Locator staat apart in ./browser-locator.js: die is geen element maar een
+   belofte die bij elke aanroep opnieuw zoekt, en dat is een eigen onderwerp */
+const { Locator } = require('./browser-locator');
+/* het onderscheppen van verzoeken in ./browser-route.js: dat gaat over wat het
+   NET doet, niet over wat een mens doet */
+const { routesUit } = require('./browser-route');
 
 const S = (v) => JSON.stringify(v);
 const slaap = (ms) => new Promise((r) => setTimeout(r, ms));
-
-function globNaarRe(glob) {
-  const esc = String(glob).replace(/[.+?^${}()|[\]\\]/g, '\\$&').replace(/\*+/g, '.*');
-  return new RegExp('^' + esc + '$');
-}
-
-class Locator {
-  constructor(page, sel, index) { this.page = page; this.sel = sel; this.index = index == null ? 0 : index; }
-  first() { return new Locator(this.page, this.sel, 0); }
-  locator(sub) { return new Locator(this.page, this.sel + ' ' + sub, this.index); }
-  count() { return this.page._roep('function(sel){return __rtgdrv.zoekAlle(sel).length;}', [this.sel]); }
-  textContent() { return this.page._roep('function(sel,i){var el=__rtgdrv.zoekAlle(sel)[i]||null;return el?el.textContent:null;}', [this.sel, this.index]); }
-  async click() { await this.page._roep('function(sel,i){var el=__rtgdrv.zoekAlle(sel)[i]||null;__rtgdrv.klik(el);return true;}', [this.sel, this.index]); }
-  async waitFor(opts) {
-    const t = (opts && opts.timeout) || 15000;
-    await this.page._wachtRoep('function(sel,i){var el=__rtgdrv.zoekAlle(sel)[i]||null;return !!el&&__rtgdrv.zichtbaar(el);}', [this.sel, this.index], t);
-  }
-}
 
 class Page {
   constructor(conn, sessionId, targetId, context) {
@@ -149,28 +138,6 @@ class Page {
   async fill(sel, waarde) { await this._roep('function(sel,w){var el=__rtgdrv.zoek(sel);if(!el)throw new Error("vul: niet gevonden "+sel);__rtgdrv.vul(el,w);return true;}', [sel, waarde]); }
   textContent(sel) { return this._roep('function(sel){var el=__rtgdrv.zoek(sel);return el?el.textContent:null;}', [sel]); }
   getAttribute(sel, attr) { return this._roep('function(sel,a){var el=__rtgdrv.zoek(sel);return el?el.getAttribute(a):null;}', [sel, attr]); }
-  async route(glob, handler) {
-    this._routes.push({ re: globNaarRe(glob), handler });
-    if (!this._fetchAan) { this._fetchAan = true; await this.conn.stuur('Fetch.enable', {}, this.sessionId); }
-  }
-  async _opVerzoek(p) {
-    const url = p.request.url;
-    const r = this._routes.find((x) => x.re.test(url));
-    const req = p.requestId;
-    if (!r) { try { await this.conn.stuur('Fetch.continueRequest', { requestId: req }, this.sessionId); } catch (e) {} return; }
-    const route = {
-      fulfill: async (resp) => {
-        const body = resp.body != null ? Buffer.from(String(resp.body)).toString('base64') : undefined;
-        await this.conn.stuur('Fetch.fulfillRequest', {
-          requestId: req, responseCode: resp.status || 200,
-          responseHeaders: [{ name: 'Content-Type', value: resp.contentType || 'text/plain' }], body
-        }, this.sessionId);
-      },
-      continue: async () => { await this.conn.stuur('Fetch.continueRequest', { requestId: req }, this.sessionId); },
-      abort: async () => { await this.conn.stuur('Fetch.failRequest', { requestId: req, errorReason: 'Aborted' }, this.sessionId); }
-    };
-    try { await r.handler(route); } catch (e) { try { await route.continue(); } catch (er) {} }
-  }
   async setOfflineIntern(offline) {
     await this.conn.stuur('Network.enable', {}, this.sessionId);
     await this.conn.stuur('Network.emulateNetworkConditions', {
@@ -180,5 +147,6 @@ class Page {
 }
 
 rustUit(Page);
+routesUit(Page);
 
 module.exports = { Page, Locator };

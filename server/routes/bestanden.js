@@ -43,7 +43,7 @@ module.exports = (kern) => {
   app.post('/api/bestanden/upload', auth, async (req, res) => {
     if (geenGast(req, res)) return;
     const b = req.body || {};
-    stuur(res, b.id ? bestanden.bestandenVersieNieuw(req.session.key, String(b.id), b.dataUrl)
+    stuur(res, b.id ? await bestanden.bestandenVersieNieuw(req.session.key, String(b.id), b.dataUrl)
       : await bestanden.bestandenUpload(req.session.key, b));
   });
   // grote bestanden: in stukken (de globale JSON-grens is 8 MB)
@@ -74,20 +74,20 @@ module.exports = (kern) => {
   });
   app.post('/api/bestanden/versies', auth, (req, res) =>
     stuur(res, bestanden.bestandenVersies(req.session.key, String((req.body || {}).id || ''))));
-  app.post('/api/bestanden/versieterug', auth, (req, res) => {
+  app.post('/api/bestanden/versieterug', auth, async (req, res) => {
     if (geenGast(req, res)) return;
-    stuur(res, bestanden.bestandenVersieTerug(req.session.key, String((req.body || {}).id || ''), (req.body || {}).n));
+    stuur(res, await bestanden.bestandenVersieTerug(req.session.key, String((req.body || {}).id || ''), (req.body || {}).n));
   });
-  app.post('/api/bestanden/weg', auth, (req, res) => {
+  app.post('/api/bestanden/weg', auth, async (req, res) => {
     if (geenGast(req, res)) return;
-    stuur(res, bestanden.bestandenWeg(req.session.key, String((req.body || {}).id || '')));
+    stuur(res, await bestanden.bestandenWeg(req.session.key, String((req.body || {}).id || '')));
   });
-  app.post('/api/bestanden/herstel', auth, (req, res) => {
+  app.post('/api/bestanden/herstel', auth, async (req, res) => {
     if (geenGast(req, res)) return;
-    stuur(res, bestanden.bestandenHerstel(req.session.key, String((req.body || {}).id || '')));
+    stuur(res, await bestanden.bestandenHerstel(req.session.key, String((req.body || {}).id || '')));
   });
-  app.post('/api/bestanden/leeg', auth, (req, res) => {
+  app.post('/api/bestanden/leeg', auth, async (req, res) => {
     if (geenGast(req, res)) return;
-    stuur(res, bestanden.bestandenLeegPrullenbak(req.session.key));
+    stuur(res, await bestanden.bestandenLeegPrullenbak(req.session.key));
   });
 };

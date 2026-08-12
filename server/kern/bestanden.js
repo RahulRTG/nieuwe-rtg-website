@@ -70,10 +70,9 @@ function maakBestanden({ db, save, bijeen, inBundel, crypto, schoon, keyVanCoden
   }
   const schoonNaam = n => schoon(String(n || ''), MAX_NAAM).replace(/[/\\]/g, '-').trim();
 
-  /* De kluis van een lid: bevestigd is vastgelegd. Zie server/lib/duurzaam.js.
-     De BYTES gaan al duurzaam naar schijf (schrijfBytes); wat hier duurzaam
-     wordt, is de verwijzing ernaartoe -- zonder die verwijzing is het bestand
-     er wel en bestaat het niet. */
+  /* De kluis van een lid: bevestigd is vastgelegd (server/lib/duurzaam.js). De
+     BYTES staan al duurzaam op schijf; wat hier duurzaam wordt is de VERWIJZING
+     ernaartoe -- zonder die is het bestand er wel en bestaat het niet. */
   const vastleggen = require('../lib/duurzaam')({ bijeen, save, inBundel, bron: 'bestanden' });
 
   /* ---- mappen: plat opgeslagen, genest via 'ouder' ---- */
@@ -177,7 +176,8 @@ function maakBestanden({ db, save, bijeen, inBundel, crypto, schoon, keyVanCoden
     b.items = b.items.filter(it => !oud.includes(it)); save();
   }
 
-  const basis = { db, save, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer,
+  // vastleggen gaat mee: delen en versies zijn dezelfde kluis (LAT.md regel 1)
+  const basis = { db, save, vastleggen, crypto, schoon, keyVanCodenaam, codenaamVan, sseToCustomer,
     bord, borden, vind, magErbij, schrijfBytes, leesBytes, wisBytes, wisItem, gebruik, nu,
     QUOTUM, MAX_BESTAND, MAX_VERSIES, antivirus, scanOk };
   const delen = maakBestandenDelen(basis);

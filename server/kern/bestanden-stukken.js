@@ -80,7 +80,7 @@ function maakStukken(basis, upload, versieNieuw) {
 
     // dezelfde weg als een kleine upload: alle grenzen, het quotum en de
     // Ontsmetter gelden gewoon
-    return u.bid ? versieNieuw(key, u.bid, dataUrl)
+    return u.bid ? await versieNieuw(key, u.bid, dataUrl)
       : await upload(key, { naam: u.naam, map: u.map, dataUrl });
   }
 

@@ -212,3 +212,25 @@ test('10. zonder verraad landt de notitie MET zijn afspraak', async () => {
   assert.match(JSON.stringify(ag.body || {}), /Ophalen bij de stomerij/,
     'de gekoppelde afspraak hoort er te staan');
 });
+
+test('11. delen, versies en de prullenbak bevestigen ook niet zonder opslag', async () => {
+  /* Het laatste stuk van de kluis. Zonder deze toets is "bestanden is duurzaam"
+     waar voor de upload-knop en onwaar voor de vier knoppen ernaast -- en een lid
+     ziet dat verschil niet. */
+  const tok = await lid(eerlijk.base);
+  const up = await api(eerlijk.base, '/api/bestanden/upload',
+    { naam: 'proef.txt', dataUrl: 'data:text/plain;base64,' + Buffer.from('proef').toString('base64') }, tok);
+  assert.equal(up.status, 200);
+  const weg = await api(eerlijk.base, '/api/bestanden/weg', { id: up.body.id }, tok);
+  assert.equal(weg.status, 200);
+  assert.equal(weg.body.prullenbak, true, 'een 200 zonder inhoud is een niet-afgewachte belofte');
+  const her = await api(eerlijk.base, '/api/bestanden/herstel', { id: up.body.id }, tok);
+  assert.equal(her.body.ok, true);
+
+  const tok2 = await lid(leugen.base);
+  const up2 = await api(leugen.base, '/api/bestanden/upload',
+    { naam: 'x.txt', dataUrl: 'data:text/plain;base64,' + Buffer.from('x').toString('base64') }, tok2);
+  assert.ok(up2.status >= 500, 'de upload hoort al nee te zeggen');
+  const weg2 = await api(leugen.base, '/api/bestanden/weg', { id: 'welk-dan-ook' }, tok2);
+  assert.ok(weg2.status >= 400, 'en weggooien evenmin een stille bevestiging (kreeg ' + weg2.status + ')');
+});

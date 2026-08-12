@@ -47,6 +47,25 @@ module.exports = ({ DUUR, MAAND_MS, START_GELD }) => {
     const erf = (potje.stadsgeheugen || {}).gedaan || [];
     for (const g of erf) st.foundation.gedaan.push({ id: g.id, zone: g.zone, geerfd: true });
     st.stadsgeschiedenis = { potjes: (potje.stadsgeheugen || {}).potjes || 0, geerfd: erf.length };
+    /* WAAR JE MEE BEGINT, en dat is sinds VERHAAL.md par. 0d een KEUZE.
+
+       `ondernemer` (de oude, en nog steeds de snelle) zet iedereen neer met
+       startkapitaal en een lege kaart. Prima om een middag te spelen, maar het
+       laat iedereen spawnen als volwassen ondernemer -- en dat is niet veiliger,
+       het is alleen minder waar.
+
+       `mens` is de echte start. Je hebt bijna niets, je hebt geen bedrijf, en de
+       wereld bestaat al voordat jij binnenkomt: de AI-bedrijven staan er, ze
+       draaien, en ze zoeken personeel (./concurrent-werven.js). Je opent het
+       werkscherm, je solliciteert, en vanaf dat moment begint je geschiedenis.
+       De eerste overwinning is niet een miljoen -- het is dat iemand je aanneemt.
+
+       DE AI'S KRIJGEN WEL KAPITAAL. Zij zijn de bestaande economie; zonder geld
+       bouwen ze niets en is er niets om op te solliciteren. Dat is geen
+       voorsprong maar de wereld die er al was. */
+    const startvorm = v.start === 'mens' ? 'mens' : 'ondernemer';
+    st.startvorm = startvorm;
+    const zakgeld = Math.round(START_GELD * 0.006);   // een maand of twee leven, geen bedrijf
     for (const h of potje.spelers) { st.geld[h] = START_GELD; st.vestigingen[h] = []; st.laatste[h] = null; }
     /* AI-CONCURRENTEN. Wie er meespelen staat in de variant: de LAATSTE n
        spelers aan tafel worden door de computer gespeeld. Ze krijgen ieder een
@@ -65,6 +84,11 @@ module.exports = ({ DUUR, MAAND_MS, START_GELD }) => {
           zones: [zones[(i * 2) % zones.length], zones[(i * 2 + 1) % zones.length]] };
       });
     }
+    /* EN PAS HIER GAAT HET KAPITAAL VAN DE MENSEN WEG, want de AI's zijn nu
+       bekend en die houden het hunne. Zou dit boven de AI-verdeling staan, dan
+       had ook de bestaande economie geen geld en bouwde niemand ooit iets. */
+    if (startvorm === 'mens')
+      for (const h of potje.spelers) if (!(st.ai || {})[h]) st.geld[h] = zakgeld;
     potje.staat = st;
   };
 };

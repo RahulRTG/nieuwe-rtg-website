@@ -261,6 +261,7 @@
       <div id="ecSinds"></div>
       <div id="ecMijn"></div>
       <div class="sec">Een zaak openen</div>
+      <div id="ecWerk"></div>
       <div id="ecOpen"></div>
       <div id="ecFonds"></div>
       <div id="ecEind"></div>
@@ -1450,6 +1451,56 @@ function tekenMagnaatEco(){
   $('#ecMijn').querySelectorAll('[data-ec]').forEach(b => b.addEventListener('click', async () => {
     const zet = { actie:'beleid', id: b.dataset.id };
     zet[b.dataset.ec] = b.dataset.ec === 'prijs' ? b.dataset.w : Number(b.dataset.w);
+    try{ await speelZet(zet); }catch(e){ meld(e.message); }
+  }));
+
+  /* WERK. De eerste stap van de menselijke start (VERHAAL.md par. 0d): je hebt
+     geen bedrijf, je opent dit paneel en er staan vacatures. Alles wat hier
+     staat komt uit `zicht().werk` en wordt hier alleen getekend -- de motor
+     rekende het al uit. */
+  const werk = $('#ecWerk');
+  const w = st.werk || {};
+  if (st.klaar) werk.innerHTML = '';
+  else if (w.baan) {
+    const b = w.baan;
+    werk.innerHTML = '<div class="sec">Je werk</div>' +
+      '<div class="rij"><div class="nm">' + esc(b.rolnaam || b.rol) + ' bij ' + esc(b.werkgever) +
+      '<small>' + esc(b.zaak || '') + ' · ' + (b.maanden || 0) + ' maanden · ' +
+      'loon ' + ecGeld(b.loon) + ' per maand</small></div>' +
+      '<button type="button" class="chip" data-opzeg="' + esc(b.id) + '">Opzeggen</button></div>' +
+      ((b.mag || []).length
+        ? '<div class="keuzerij">' + (b.mag || []).map(veld =>
+            '<button type="button" class="chip" data-wb="' + esc(veld) + '">' + esc(veld) + ' bijstellen</button>').join('') + '</div>'
+        : '<div class="leeg">Als ' + esc((b.rolnaam || b.rol).toLowerCase()) + ' beslis je niets over de zaak. Je werkt mee.</div>');
+  } else if ((w.vacatures || []).length) {
+    werk.innerHTML = '<div class="sec">Werk zoeken</div>' +
+      '<div class="leeg">' + w.vacatures.length + ' ' +
+        (w.vacatures.length === 1 ? 'vacature' : 'vacatures') + ' in ' + esc(st.stad) + '.</div>' +
+      w.vacatures.map(v => '<div class="rij"><div class="nm">' + esc(v.rolnaam || v.rol) +
+        ' bij ' + esc(v.werkgever) + '<small>' + esc(v.zaak || v.sector) + ' · ' +
+        ecGeld(v.loon) + ' per maand · nog ' + (v.verlooptOver || 0) + ' maanden open</small></div>' +
+        (v.gesolliciteerd
+          ? '<span class="leeg">Gesolliciteerd</span>'
+          : '<button type="button" class="chip" data-sol="' + esc(v.id) + '">Solliciteren</button>') +
+        '</div>').join('');
+  } else if (!st.vestigingen.length) {
+    werk.innerHTML = '<div class="sec">Werk zoeken</div>' +
+      '<div class="leeg">Op dit moment staat er niets open in ' + esc(st.stad) + '. ' +
+      'Bedrijven zoeken personeel zodra ze groeien.</div>';
+  } else werk.innerHTML = '';
+
+  werk.querySelectorAll('[data-sol]').forEach(b => b.addEventListener('click', async () => {
+    try{ await speelZet({ actie:'solliciteren', id: b.dataset.sol }); }catch(e){ meld(e.message); }
+  }));
+  werk.querySelectorAll('[data-opzeg]').forEach(b => b.addEventListener('click', async () => {
+    try{ await speelZet({ actie:'dienst-opzeggen', id: b.dataset.opzeg }); }catch(e){ meld(e.message); }
+  }));
+  werk.querySelectorAll('[data-wb]').forEach(b => b.addEventListener('click', async () => {
+    const veld = b.dataset.wb;
+    const nu = prompt('Nieuwe waarde voor ' + veld + (veld === 'prijs' ? ' (laag/midden/hoog)' : ''));
+    if (nu === null) return;
+    const zet = { actie:'werk-beleid' };
+    zet[veld] = veld === 'prijs' ? nu : Number(nu);
     try{ await speelZet(zet); }catch(e){ meld(e.message); }
   }));
 

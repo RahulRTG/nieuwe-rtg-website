@@ -20,6 +20,10 @@ const { basisvraag, drukFactor } = require('./vraag');
 const { rendabelVanaf } = require('./maat');
 
 module.exports = ({ ACTIES, kaart }) => {
+  /* WERVEN staat in ./concurrent-werven.js: een AI-bedrijf dat nooit iemand
+     aanneemt is een concurrent en geen werkgever, en dan is er in maand nul
+     niets om op te solliciteren. Zie de kop daar. */
+  const W = require('./concurrent-werven')({ ACTIES });
   const doe = (potje, h, z) => (ACTIES[z.actie] ? ACTIES[z.actie](potje, h, z) : { error: 'onbekend' });
 
   /* WAAR HIJ BOUWT. In zijn eigen zones, op een vrij kavel, met een maat die
@@ -133,6 +137,10 @@ module.exports = ({ ACTIES, kaart }) => {
       if (gebouwd) gedaan.push(gebouwd);
     }
     if (koers === 'verbeteren') gedaan.push(...onderzoeken(potje, h, beeld));
+    /* MENSEN AANNEMEN HOORT BIJ ELKE KOERS en niet alleen bij groeien: ook een
+       bedrijf dat spaart heeft handen nodig. */
+    const werk = W.maandVoorWerkgever(potje, h);
+    if (werk) gedaan.push(werk);
     ai.koers = koers;
     ai.volDeel = Math.round(volDeel * 100) / 100;
     return { koers, gedaan, gelezen };

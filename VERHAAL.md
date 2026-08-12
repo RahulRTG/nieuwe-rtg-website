@@ -199,6 +199,57 @@ je `kind`: **geen gegeven is geen toestemming.**
 
 ---
 
+## 0d. De echte start: je begint als mens
+
+Het spel begon met 250.000 euro en een lege kaart. Daarmee spawnde iedereen als
+volwassen ondernemer, en dat is niet veiliger — het is alleen minder waar.
+
+De echte start is deze: **je bent 16+, je hebt geen bedrijf, je hebt bijna geen
+geld, en de wereld bestaat al voordat jij binnenkomt.** Havenzicht draait. De
+bakker draait. Transportbedrijven leveren. En ze zoeken personeel.
+
+Je opent het werkscherm — geen tutorial, gewoon het scherm — je ziet vacatures,
+en je solliciteert. Vanaf je eerste sollicitatie begint je geschiedenis.
+
+> **De eerste overwinning in Magnaat is niet een miljoen. Het is dat iemand je
+> aanneemt.**
+
+### Wat daarvoor moest gebeuren
+
+De AI-concurrent bouwde, breidde uit en zette prijzen, maar **nam nooit iemand
+aan**. Hij was concurrent, geen werkgever. En daarmee was de start onmogelijk:
+in maand nul heeft niemand een zaak, dus is er niets om op te solliciteren — en
+de eerste die iets opent moet dan wel een speler met startkapitaal zijn.
+
+`kern/spellen/magnaat/concurrent-werven.js` maakt van hem een economische actor.
+Drie regels:
+
+1. **Hij spreekt dezelfde werkwoorden.** Geen eigen wervingssysteem: hij roept
+   `functie-openen` en `aannemen` aan, met dezelfde loonband en dezelfde grenzen
+   als een speler. Een tweede manier om iemand in dienst te nemen is een tweede
+   arbeidsmarkt.
+2. **Hij neemt aan op volgorde van binnenkomst.** Een AI die kandidaten
+   rangschikt, rangschikt *mensen* — en dan bestaat er een cijfer dat zegt wie
+   een betere werknemer is. Dat is precies de ranglijst die dit document
+   uitsluit.
+3. **Hij werft wat hij nodig heeft en niet meer.** Het aantal volgt uit
+   `personeelNodig`, dezelfde som waarmee de motor elke zaak bezet. Hoogstens
+   twee vacatures tegelijk, en de rol groeit mee met de zaak: handen eerst, een
+   bedrijfsleider pas als er echt iets te leiden valt.
+
+### De twee startvormen
+
+| | |
+|---|---|
+| `ondernemer` *(standaard)* | startkapitaal, lege kaart, meteen bouwen. De snelle variant. |
+| `mens` | geen bedrijf, twee maanden leefgeld, een stad die al draait. |
+
+`ondernemer` blijft voorlopig de standaard, en dat is een bewuste rem: een
+startvorm waarin je niets kunt doen omdat de knop ontbreekt, is geen keuze maar
+een val. Zodra het werkscherm de hele keten draagt, wisselt de standaard.
+
+---
+
 ## 1. De grondwet van blijvende waarde
 
 Zodra iets tussen campagnes blijft bestaan, verandert de economische grondwet.

@@ -112,7 +112,13 @@ module.exports = (ctx) => {
     varianten: {
       vorm: { keuze: ['bord', 'economie'], standaard: 'bord' },
       stad: { keuze: STEDENLIJST.map(stadNaam), standaard: null },
-      duur: { keuze: ['quick', 'avond', 'weekend'], standaard: null }
+      duur: { keuze: ['quick', 'avond', 'weekend'], standaard: null },
+      /* WAAR JE MEE BEGINT (VERHAAL.md par. 0d). `mens` is de echte start: geen
+         bedrijf, bijna geen geld, en een stad die al draait en personeel zoekt.
+         `ondernemer` is de snelle variant en blijft de standaard zolang het
+         werkscherm nog niet af is -- een startvorm waarin je niets kunt doen
+         omdat de knop ontbreekt, is geen keuze maar een val. */
+      start: { keuze: ['ondernemer', 'mens'], standaard: 'ondernemer' }
     },
     /* De vraag over de velden heen: stad en duur horen bij de economie. Het
        bordspel heeft geen stad en geen speelduur, en zwijgend negeren zou

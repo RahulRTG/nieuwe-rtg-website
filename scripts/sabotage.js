@@ -97,6 +97,7 @@ function saboteer(wet, draai) {
     return { stand: 'STUK', uitleg: 'de tekst "' + s.van + '" komt ' + raak + 'x voor in ' +
       s.bestand + ' (moet precies 1x) -- deze sabotage is verlopen' };
   }
+  const vuil = vuileBestanden();   // wat stond er AL open voor we begonnen
   bewaar(s.bestand, origineel);
   try {
     fs.writeFileSync(vol, origineel.replace(s.van, s.naar));
@@ -107,6 +108,50 @@ function saboteer(wet, draai) {
   } finally {
     fs.writeFileSync(vol, origineel);
     vergeet(s.bestand);
+    schoonAchteraf(s.bestand, vuil);
+  }
+}
+
+/* WAT DE TOETS ZELF AANRAAKT, VALT BUITEN ONS VANGNET -- en dat is twee keer
+   echt misgegaan.
+
+   De motor zet een bestand terug in een finally, en `--herstel` vangt op wat er
+   blijft staan als het proces wordt gekild. Maar een TOETS kan zelf bestanden
+   muteren, en die kent de motor niet. test/meterijk.test.js doet dat: hij plakt
+   tijdelijk een ijk-aanbouw achter server/routes/klok.js en haalt hem in een
+   eigen finally weer weg. Zakt die toets (en bij een sabotage HOORT hij te
+   zakken), dan blijkt dat opruimen niet altijd te gebeuren -- twee keer stond
+   klok.js daarna met 106 regels aanbouw in de boom, een keer na een kill en een
+   keer na een gewone ronde.
+
+   Een gesaboteerd bestand dat blijft staan is het gevaarlijkste wat dit
+   gereedschap kan doen: het zet stilletjes iets uit en niemand ziet het, want
+   de uitslag zegt gewoon BEWEZEN. Daarom kijkt de motor nu zelf: welke
+   getrackte bestanden waren voor de sabotage schoon en zijn daarna vuil? Alles
+   wat wij niet zelf hebben aangeraakt, zetten we terug en melden we hardop.
+
+   Wij gebruiken git alleen om te KIJKEN en om onze eigen rommel terug te
+   draaien; een bestand dat de gebruiker zelf had openstaan (voor de sabotage al
+   vuil) blijft ongemoeid. */
+function vuileBestanden() {
+  try {
+    return new Set(execFileSync('git', ['status', '--porcelain', '--untracked-files=no'],
+      { cwd: WORTEL, encoding: 'utf8' })
+      .split('\n').map(r => r.slice(3).trim()).filter(Boolean));
+  } catch (e) { return null; }
+}
+function schoonAchteraf(eigen, voor) {
+  if (!voor) return;
+  const na = vuileBestanden();
+  if (!na) return;
+  for (const pad of na) {
+    if (pad === eigen || voor.has(pad)) continue;
+    try {
+      execFileSync('git', ['checkout', '--', pad], { cwd: WORTEL, stdio: 'pipe' });
+      console.log('       LET OP: ' + pad + ' was door de toets gewijzigd en is teruggezet.');
+    } catch (e) {
+      console.error('       LET OP: ' + pad + ' is gewijzigd en NIET terug te zetten -- kijk er zelf naar.');
+    }
   }
 }
 

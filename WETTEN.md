@@ -13,8 +13,8 @@ een bewering met een adres kan zakken.
 
 | stand | aantal | wat het betekent |
 |---|---|---|
-| **BEWEZEN** | 29 | handhaver bestaat, toets bestaat, en die toets is zien zakken op een mutatie |
-| **ONBEPROEFD** | 7 | er kijkt iemand naar, maar die kijker is nooit op de proef gesteld |
+| **BEWEZEN** | 36 | handhaver bestaat, toets bestaat, en die toets is zien zakken op een mutatie |
+| **ONBEPROEFD** | 1 | er kijkt iemand naar, maar die kijker is nooit op de proef gesteld |
 | **OPEN** | 4 | opgeschreven zonder handhaver of zonder toets: een voornemen, geen bescherming |
 | **GEBROKEN** | 0 | wijst naar iets dat er niet meer is -- de enige alarmerende stand |
 
@@ -263,29 +263,27 @@ Een besluit van de raadkamer moet zwaarder wegen dan een teller. Anders is 'afge
 
 *Breek hem zo:* laat de quarantainecontrole na de banlijstcontrole staan en bij een verlopen ban doorlopen
 
-### RTG-021 -- De som van alle wallets blijft op de cent gelijk aan wat er is opgeladen
+### RTG-021 -- Een bevestigde financiele handeling creeert, vernietigt of verliest geen onverklaarde waarde
 
-`BEWEZEN` · zien zakken in `geld-conservatie-last.test.js` op `liegpoort /api/`
+`BEWEZEN` · zien zakken in `sabotage` op `server/kern/pay/index.js`
 
-Geldconservatie is de enige controle die een dubbeltelling én een race tegelijk vangt. Onverklaard geld is geen afrondingsfout maar een bug die je nog niet kunt zien.
+Dit is de conservatiewet, en hij staat met opzet ZONDER implementatienaam. Hij stond eerst als 'de som van alle wallets blijft op de cent gelijk aan wat er is opgeladen', en dat is dezelfde eis maar vastgeklonken aan een wallet en aan opladen. Zo'n formulering overleeft geen verhuizing naar Postgres, naar de Rust-motor, of naar een ander grootboek -- terwijl de EIS dat wel moet. Nu meet hij wat er werkelijk toe doet: na een bevestigde handeling is de som van alle rekeningen nog steeds exact nul (dubbel boekhouden, sluitcontrole in kern/pay/index.js) en is elk verschil te verklaren uit een boeking. ONDERSCHEID MET RTG-033, want die twee worden makkelijk verward: 033 is de AUTONOMIEgrens (geld verlaat het huis nooit vanzelf, er hoort een mens aan te pas), 021 is de CONSERVATIEwet (wat er ook gebeurt, er ontstaat of verdwijnt geen waarde). Een systeem kan de ene houden en de andere breken.
 
-*Handhaver:* `server/muntbetaal.js`
+*Handhaver:* `server/kern/pay/index.js`, `server/muntbetaal.js`
 
-*Toets:* `test/geld-conservatie-last.test.js`, `test/balans.test.js`
+*Toets:* `test/waardebehoud.test.js`, `test/geld-conservatie-last.test.js`, `test/balans.test.js`
 
-*Breek hem zo:* haal de transactiegrens rond de overboeking weg; onder gelijktijdige tikken loopt de som dan uiteen
+*Breek hem zo:* haal de saldocontrole uit boek(); dan kan een rekening onder nul en klopt de sluitcontrole niet meer
 
-### RTG-022 -- Geen wallet zakt ooit onder nul
+### RTG-022 -- Geen rekening van een lid of partner zakt ooit onder nul
 
-`BEWEZEN` · zien zakken in `geld-conservatie-last.test.js` op `liegpoort /api/`
+`OPEN` · geen toets benoemd
 
-Een negatief saldo is geld dat het huis heeft uitgegeven zonder dat iemand het had.
+Een negatief saldo is geld dat het huis heeft uitgegeven zonder dat iemand het had. De guard staat in kern/pay/index.js (boek() weigert met 402 als saldoVan(van) < c). OPEN, EN DAT IS EEN GEMETEN BEVINDING: die guard is via de HTTP-API niet te bereiken. Elk pad dat rood zou kunnen gaan, doet iets anders eerst. Een lid dat meer stuurt dan het heeft, krijgt 'EEN knop': de wallet laadt zichzelf bij via de betaal-naad, en in demostand slaagt die betaling altijd -- 4000 euro sturen met saldo 0 gaf gewoon 200 met bijgeladen:400000. En een partner die te veel uitbetaalt, wordt eerder geweigerd door de route ('er staat niets om uit te betalen'), een andere controle. Ik heb de guard uitgezet en GEEN enkele toets werd rood, ook de nieuwe niet. Wat hier nog moet: een toets die boek() rechtstreeks aanroept, buiten de route-laag om. Zolang die er niet is, blijft deze wet OPEN in plaats van dat er een sabotage staat die groen wordt om de verkeerde reden.
 
-*Handhaver:* `server/muntbetaal.js`
+*Handhaver:* `server/kern/pay/index.js`
 
-*Toets:* `test/geld-conservatie-last.test.js`, `test/munten.test.js`
-
-*Breek hem zo:* controleer het saldo vóór in plaats van binnen de schrijfactie; twee gelijktijdige tikken gaan er dan doorheen
+*Breek hem zo:* OPEN: de saldogrens in boek() is via de API onbereikbaar; er is een unit-toets op boek() nodig
 
 ### RTG-023 -- Alles wat een prestatie bewaart buiten het potje, bestaat alleen boven de 18
 
@@ -313,7 +311,7 @@ Gedeelde muteerbare staat is de bugklasse die zich niet laat toetsen: hij versch
 
 ### RTG-025 -- Elk scherm is aan te tikken vanaf het beginscherm
 
-`ONBEPROEFD` · geen van de toetsen is zien zakken op een mutatie
+`BEWEZEN` · zien zakken in `sabotage` op `BEREIK.json`
 
 Een scherm zonder klikroute bestaat wel in de code en niet voor een mens. BEREIK.json mag daarom alleen krimpen.
 
@@ -325,7 +323,7 @@ Een scherm zonder klikroute bestaat wel in de code en niet voor een mens. BEREIK
 
 ### RTG-026 -- Een meter draagt pas een oordeel als hij is zien uitslaan
 
-`ONBEPROEFD` · geen van de toetsen is zien zakken op een mutatie
+`BEWEZEN` · zien zakken in `sabotage` op `scripts/norm.js`
 
 Op één dag bleken zeven meters te liegen, geen van allen in de RTG-code maar allemaal in de instrumenten die moesten bewijzen dat de code deugde. Een kapotte toets zakt; een kapotte meter geeft een getal.
 
@@ -349,7 +347,7 @@ Een 5xx die niemand ziet is een bug met een groen vinkje erboven. Elke onverwach
 
 ### RTG-028 -- Elke belofte in tekst draagt dekking in code
 
-`ONBEPROEFD` · geen van de toetsen is zien zakken op een mutatie
+`BEWEZEN` · zien zakken in `sabotage` op `scripts/belofte.js`
 
 Een belofte die naar iets verwijst dat er niet meer is, mist niemand vanzelf. Daarom heet die stand GEBROKEN en zakt hij.
 
@@ -371,7 +369,7 @@ Niet 'zakt er iets' maar 'kijkt er iemand'. Wat niet in de census staat wordt ni
 
 ### RTG-030 -- Bodoni staat op een gesloten lijst rollen
 
-`ONBEPROEFD` · geen van de toetsen is zien zakken op een mutatie
+`BEWEZEN` · zien zakken in `sabotage` op `public/shared/rtg-ontwerp.css`
 
 Bodoni is ceremonieel. Zodra hij ook werk-elementen mag dragen, is het geen ceremonie meer maar een lettertype.
 
@@ -381,37 +379,41 @@ Bodoni is ceremonieel. Zodra hij ook werk-elementen mag dragen, is het geen cere
 
 *Breek hem zo:* zet Bodoni op een knop of een tabelkop; ontwerp.test.js hoort dat te weigeren
 
-### RTG-031 -- Een scherm kiest een materiaal, geen kleur
+### RTG-031 -- De vijf materialen houden hun eigen aard: warm blijft warm, mat blijft mat, fluweel blijft donker
 
-`ONBEPROEFD` · geen van de toetsen is zien zakken op een mutatie
+`BEWEZEN` · zien zakken in `sabotage` op `public/shared/rtg-materiaal.css`
 
-Een luxemerk denkt in materialen en licht. Losse kleuren stapelen zich op tot er geen vormtaal meer over is.
+Een luxemerk denkt in materialen en licht, niet in losse kleuren. Wat test/materiaal.test.js MACHINAAL vasthoudt is de aard van de vijf: Pearl mag nooit meer blauw dan rood zijn, Gold blijft mat champagne en geen internet-goud, Bordeaux absorbeert licht, Onyx is nooit egaal, Royal is als enige koel. EERLIJK OVER WAT HIER NIET IN ZIT, en de sabotagemotor wees me daarop: de wet stond eerst als 'een scherm kiest een materiaal, geen kleur', en die ruimere belofte wordt NIET gehandhaafd. Ik zette een losse hexkleur in rtg-materiaal.css en er werd niets rood. Een wet die meer belooft dan zijn handhaver waarmaakt, is precies het soort schijnzekerheid waar dit register tegen bedoeld is; daarom staat er nu wat er echt wordt afgedwongen. Het bredere 'geen losse kleuren' hoort in NORM.json als teller thuis, niet hier als wet.
 
 *Handhaver:* `public/shared/rtg-materiaal.css`
 
 *Toets:* `test/materiaal.test.js`
 
-*Breek hem zo:* introduceer een losse hexkleur buiten de vijf materialen
+*Breek hem zo:* maak Pearl blauwer dan rood, of Bordeaux lichter; materiaal.test.js hoort dat te weigeren
 
 ### RTG-032 -- Er zijn geen twee beginschermen
 
-`ONBEPROEFD` · geen van de toetsen is zien zakken op een mutatie
+`BEWEZEN` · zien zakken in `sabotage` op `server/middleware/voordeur.js`
 
-Er lagen er twee naast elkaar: een springboard en een scrollende pagina met eigen kopbalk. Je wist nooit welke 'thuis' was. Alle paden komen nu op dezelfde plek uit.
+Er lagen er twee naast elkaar: een springboard en een scrollende pagina met eigen kopbalk. Je wist nooit welke 'thuis' was. Alle paden komen nu op dezelfde plek uit. De sabotagemotor liet zien dat hier GEEN toets op zat: de herschrijving van /apps/index.html weghalen maakte niets rood. test/beginscherm.test.js gaat over de acht werelden op de bezel en de tegels, niet over welke URL's thuis uitkomen. test/eenbeginscherm.test.js haalt nu alle vier de paden op en eist dezelfde pagina, plus dat het een interne herschrijving is en geen omleiding.
 
 *Handhaver:* `server/middleware/voordeur.js`
 
-*Toets:* `test/beginscherm.test.js`
+*Toets:* `test/eenbeginscherm.test.js`, `test/beginscherm.test.js`
 
 *Breek hem zo:* laat /apps/index.html weer een eigen pagina serveren in plaats van naar huis te herschrijven
 
 ### RTG-033 -- Geld verlaat het huis nooit vanzelf
 
-`OPEN` · geen handhaver benoemd
+`BEWEZEN` · zien zakken in `sabotage` op `server/kern/geldbeleid/regels.js`
 
-De harde grens van GELD.md. Automatisering mag alles voorbereiden, maar de laatste stap naar buiten is een menselijk besluit.
+De harde grens van GELD.md par. 3: 'automatisch' bestaat uitsluitend voor het oormerken binnen het eigen tegoed. Elke andere soort regel raakt (mogelijk) een betaling of een derde, en die blijft maximaal 'klaarzetten' -- wat het lid ook vraagt. LET OP hoe deze wet hier terechtkwam: ik schreef hem op als OPEN met 'er is nog geen enkele handhaver die deze wet als wet afdwingt', en dat was gewoon niet waar. De handhaver stond er al (regels.js weigert het niveau met een 400) en de toets ook, compleet met een opgeschreven mutatie die de schrijver had zien zakken. Ik had niet goed genoeg gezocht. Een register dat iets ten onrechte OPEN noemt, is niet onschuldig: het stuurt werk naar een gat dat er niet is, en het laat bescherming er zwakker uitzien dan ze is.
 
-*Breek hem zo:* OPEN: er is nog geen enkele handhaver die deze wet als wet afdwingt in plaats van per route
+*Handhaver:* `server/kern/geldbeleid/regels.js`
+
+*Toets:* `test/geldbeleid.test.js`
+
+*Breek hem zo:* zet de niveaucontrole in regels.js op false; 'automatisch' mag dan op elke soort regel
 
 ### RTG-034 -- Kritieke historie kan niet stil worden herschreven
 
@@ -425,13 +427,15 @@ Een auditketen die alleen binnen RTG leeft, beschermt niet tegen wie zowel de da
 
 ### RTG-035 -- Een ingetrokken toestemming geeft onmiddellijk geen toegang meer
 
-`OPEN` · geen toets benoemd
+`BEWEZEN` · zien zakken in `sabotage` op `server/kern/rtgid.js`
 
-Rechten die pas bij de volgende sessie ingaan, zijn geen rechten maar een gewoonte. Dit is nu per route geregeld en nergens als wet afgedwongen.
+Rechten die pas bij de volgende sessie ingaan, zijn geen rechten maar een gewoonte: tussen het intrekken en het uitloggen zit dan een venster waarin iemand nog mag wat hij niet meer mag. Bij een machtiging is dat het gevaarlijkst -- je trekt hem juist in OMDAT er iets veranderd is. bevestig() in rtgid.js weigert een ingetrokken machtiging met een 403, en test/intrekking.test.js meet het EERSTVOLGENDE verzoek: geen nieuwe login, geen herstart, geen wachten. De toets bewijst eerst dat B de machtiging KAN gebruiken; zonder die stap ziet een toets waarin B het nooit mocht er hetzelfde uit als een toets waarin intrekken werkt.
 
-*Handhaver:* `server/kern/bevoegdheid/index.js`
+*Handhaver:* `server/kern/rtgid.js`
 
-*Breek hem zo:* OPEN: er is geen toets die een recht midden in een lopende sessie intrekt en het eerstvolgende verzoek meet
+*Toets:* `test/intrekking.test.js`
+
+*Breek hem zo:* haal de m.ingetrokken-controle uit bevestig(); B mag dan na het intrekken nog steeds
 
 ### RTG-036 -- Geen scherm toont meer zekerheid dan de bron bezit
 
@@ -492,6 +496,12 @@ Idempotentie op de betaallaag is niet hetzelfde als idempotentie op het geld, en
 *Toets:* `test/grootboek-idem.test.js`
 
 *Breek hem zo:* haal de idem-canonisatie uit de body-poort: een oplaad-retry met witruimte boekt dan twee keer
+
+### RTG-999 -- Een tijdelijke ijkwet, met opzet zonder handhaver
+
+`OPEN` · geen handhaver benoemd
+
+Staat hier alleen tijdens test/meterijk.test.js.
 
 ## Hoe je dit bestand bijwerkt
 

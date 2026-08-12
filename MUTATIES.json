@@ -916,6 +916,11 @@
       "gezakt": 8,
       "scherp": "gezakt"
     },
+    "eenbeginscherm.test.js": {
+      "soort": "server",
+      "staat": "overleefd",
+      "operator": "liegpoort /api/"
+    },
     "eigen-website.test.js": {
       "soort": "server",
       "staat": "gezakt",
@@ -1460,6 +1465,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "scherp": "gezakt"
+    },
+    "intrekking.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 2,
       "scherp": "gezakt"
     },
     "inzagelog.test.js": {
@@ -4282,6 +4294,13 @@
       "staat": "gezakt",
       "operator": "liegpoort /api/",
       "gezakt": 5,
+      "scherp": "gezakt"
+    },
+    "waardebehoud.test.js": {
+      "soort": "server",
+      "staat": "gezakt",
+      "operator": "liegpoort /api/",
+      "gezakt": 3,
       "scherp": "gezakt"
     },
     "wacht.test.js": {

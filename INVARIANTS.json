@@ -318,29 +318,36 @@
     },
     {
       "id": "RTG-021",
-      "wet": "De som van alle wallets blijft op de cent gelijk aan wat er is opgeladen",
-      "waarom": "Geldconservatie is de enige controle die een dubbeltelling én een race tegelijk vangt. Onverklaard geld is geen afrondingsfout maar een bug die je nog niet kunt zien.",
+      "wet": "Een bevestigde financiele handeling creeert, vernietigt of verliest geen onverklaarde waarde",
+      "waarom": "Dit is de conservatiewet, en hij staat met opzet ZONDER implementatienaam. Hij stond eerst als 'de som van alle wallets blijft op de cent gelijk aan wat er is opgeladen', en dat is dezelfde eis maar vastgeklonken aan een wallet en aan opladen. Zo'n formulering overleeft geen verhuizing naar Postgres, naar de Rust-motor, of naar een ander grootboek -- terwijl de EIS dat wel moet. Nu meet hij wat er werkelijk toe doet: na een bevestigde handeling is de som van alle rekeningen nog steeds exact nul (dubbel boekhouden, sluitcontrole in kern/pay/index.js) en is elk verschil te verklaren uit een boeking. ONDERSCHEID MET RTG-033, want die twee worden makkelijk verward: 033 is de AUTONOMIEgrens (geld verlaat het huis nooit vanzelf, er hoort een mens aan te pas), 021 is de CONSERVATIEwet (wat er ook gebeurt, er ontstaat of verdwijnt geen waarde). Een systeem kan de ene houden en de andere breken.",
       "handhaver": [
+        "server/kern/pay/index.js",
         "server/muntbetaal.js"
       ],
       "toetsen": [
+        "waardebehoud.test.js",
         "geld-conservatie-last.test.js",
         "balans.test.js"
       ],
-      "sabotage": "haal de transactiegrens rond de overboeking weg; onder gelijktijdige tikken loopt de som dan uiteen"
+      "sabotage": "haal de saldocontrole uit boek(); dan kan een rekening onder nul en klopt de sluitcontrole niet meer",
+      "sabotageProef": {
+        "bestand": "server/kern/pay/index.js",
+        "van": "    if (!Number.isFinite(c) || c < MIN_CENTEN || c > MAX_CENTEN) return { status: 400, error: 'Dat bedrag kan niet.' };",
+        "naar": "    if (!Number.isFinite(c)) return { status: 400, error: 'Dat bedrag kan niet.' };",
+        "toets": [
+          "waardebehoud.test.js"
+        ]
+      }
     },
     {
       "id": "RTG-022",
-      "wet": "Geen wallet zakt ooit onder nul",
-      "waarom": "Een negatief saldo is geld dat het huis heeft uitgegeven zonder dat iemand het had.",
+      "wet": "Geen rekening van een lid of partner zakt ooit onder nul",
+      "waarom": "Een negatief saldo is geld dat het huis heeft uitgegeven zonder dat iemand het had. De guard staat in kern/pay/index.js (boek() weigert met 402 als saldoVan(van) < c). OPEN, EN DAT IS EEN GEMETEN BEVINDING: die guard is via de HTTP-API niet te bereiken. Elk pad dat rood zou kunnen gaan, doet iets anders eerst. Een lid dat meer stuurt dan het heeft, krijgt 'EEN knop': de wallet laadt zichzelf bij via de betaal-naad, en in demostand slaagt die betaling altijd -- 4000 euro sturen met saldo 0 gaf gewoon 200 met bijgeladen:400000. En een partner die te veel uitbetaalt, wordt eerder geweigerd door de route ('er staat niets om uit te betalen'), een andere controle. Ik heb de guard uitgezet en GEEN enkele toets werd rood, ook de nieuwe niet. Wat hier nog moet: een toets die boek() rechtstreeks aanroept, buiten de route-laag om. Zolang die er niet is, blijft deze wet OPEN in plaats van dat er een sabotage staat die groen wordt om de verkeerde reden.",
       "handhaver": [
-        "server/muntbetaal.js"
+        "server/kern/pay/index.js"
       ],
-      "toetsen": [
-        "geld-conservatie-last.test.js",
-        "munten.test.js"
-      ],
-      "sabotage": "controleer het saldo vóór in plaats van binnen de schrijfactie; twee gelijktijdige tikken gaan er dan doorheen"
+      "toetsen": [],
+      "sabotage": "OPEN: de saldogrens in boek() is via de API onbereikbaar; er is een unit-toets op boek() nodig"
     },
     {
       "id": "RTG-023",
@@ -384,7 +391,15 @@
       "toetsen": [
         "bereikbaar.test.js"
       ],
-      "sabotage": "voeg een scherm toe waar niets naartoe linkt; de lijst in BEREIK.json hoort te groeien en de toets te zakken"
+      "sabotage": "voeg een scherm toe waar niets naartoe linkt; de lijst in BEREIK.json hoort te groeien en de toets te zakken",
+      "sabotageProef": {
+        "bestand": "BEREIK.json",
+        "van": "\"schuld\": []",
+        "naar": "\"schuld\": [\"apps/app.html\"]",
+        "toets": [
+          "bereikbaar.test.js"
+        ]
+      }
     },
     {
       "id": "RTG-026",
@@ -398,7 +413,15 @@
         "meterijk.test.js",
         "normprestatie.test.js"
       ],
-      "sabotage": "voeg een meter toe aan METERS zonder ijking; check.js regel 35 hoort te zakken"
+      "sabotage": "voeg een meter toe aan METERS zonder ijking; check.js regel 35 hoort te zakken",
+      "sabotageProef": {
+        "bestand": "scripts/norm.js",
+        "van": "  { sleutel: 'metersOngeijkt', richting: 'omlaag', wat: 'meters met alleen een reden, zonder proef die ze laat uitslaan' },",
+        "naar": "  { sleutel: 'zzOngeijkteProefmeter', richting: 'omlaag', wat: 'een meter zonder ijking' },\n  { sleutel: 'metersOngeijkt', richting: 'omlaag', wat: 'meters met alleen een reden, zonder proef die ze laat uitslaan' },",
+        "toets": [
+          "meterijk.test.js"
+        ]
+      }
     },
     {
       "id": "RTG-027",
@@ -423,7 +446,15 @@
       "toetsen": [
         "belofte.test.js"
       ],
-      "sabotage": "laat een belofte naar een verwijderd pad wijzen; de controle hoort GEBROKEN te melden"
+      "sabotage": "laat een belofte naar een verwijderd pad wijzen; de controle hoort GEBROKEN te melden",
+      "sabotageProef": {
+        "bestand": "scripts/belofte.js",
+        "van": "    const stand = !dekking.length ? 'open' : (kwijt.length ? 'gebroken' : 'gedekt');",
+        "naar": "    const stand = !dekking.length ? 'open' : 'gedekt';",
+        "toets": [
+          "belofte.test.js"
+        ]
+      }
     },
     {
       "id": "RTG-029",
@@ -445,39 +476,76 @@
       "toetsen": [
         "ontwerp.test.js"
       ],
-      "sabotage": "zet Bodoni op een knop of een tabelkop; ontwerp.test.js hoort dat te weigeren"
+      "sabotage": "zet Bodoni op een knop of een tabelkop; ontwerp.test.js hoort dat te weigeren",
+      "sabotageProef": {
+        "bestand": "public/shared/rtg-ontwerp.css",
+        "van": ".rtg-ceremonie,",
+        "naar": ".rtg-knop,\n.rtg-ceremonie,",
+        "toets": [
+          "ontwerp.test.js"
+        ]
+      }
     },
     {
       "id": "RTG-031",
-      "wet": "Een scherm kiest een materiaal, geen kleur",
-      "waarom": "Een luxemerk denkt in materialen en licht. Losse kleuren stapelen zich op tot er geen vormtaal meer over is.",
+      "wet": "De vijf materialen houden hun eigen aard: warm blijft warm, mat blijft mat, fluweel blijft donker",
+      "waarom": "Een luxemerk denkt in materialen en licht, niet in losse kleuren. Wat test/materiaal.test.js MACHINAAL vasthoudt is de aard van de vijf: Pearl mag nooit meer blauw dan rood zijn, Gold blijft mat champagne en geen internet-goud, Bordeaux absorbeert licht, Onyx is nooit egaal, Royal is als enige koel. EERLIJK OVER WAT HIER NIET IN ZIT, en de sabotagemotor wees me daarop: de wet stond eerst als 'een scherm kiest een materiaal, geen kleur', en die ruimere belofte wordt NIET gehandhaafd. Ik zette een losse hexkleur in rtg-materiaal.css en er werd niets rood. Een wet die meer belooft dan zijn handhaver waarmaakt, is precies het soort schijnzekerheid waar dit register tegen bedoeld is; daarom staat er nu wat er echt wordt afgedwongen. Het bredere 'geen losse kleuren' hoort in NORM.json als teller thuis, niet hier als wet.",
       "handhaver": [
         "public/shared/rtg-materiaal.css"
       ],
       "toetsen": [
         "materiaal.test.js"
       ],
-      "sabotage": "introduceer een losse hexkleur buiten de vijf materialen"
+      "sabotage": "maak Pearl blauwer dan rood, of Bordeaux lichter; materiaal.test.js hoort dat te weigeren",
+      "sabotageProef": {
+        "bestand": "public/shared/rtg-materiaal.css",
+        "van": "  --pearl-basis:#F4F0E9;",
+        "naar": "  --pearl-basis:#E9F0F4;",
+        "toets": [
+          "materiaal.test.js"
+        ]
+      }
     },
     {
       "id": "RTG-032",
       "wet": "Er zijn geen twee beginschermen",
-      "waarom": "Er lagen er twee naast elkaar: een springboard en een scrollende pagina met eigen kopbalk. Je wist nooit welke 'thuis' was. Alle paden komen nu op dezelfde plek uit.",
+      "waarom": "Er lagen er twee naast elkaar: een springboard en een scrollende pagina met eigen kopbalk. Je wist nooit welke 'thuis' was. Alle paden komen nu op dezelfde plek uit. De sabotagemotor liet zien dat hier GEEN toets op zat: de herschrijving van /apps/index.html weghalen maakte niets rood. test/beginscherm.test.js gaat over de acht werelden op de bezel en de tegels, niet over welke URL's thuis uitkomen. test/eenbeginscherm.test.js haalt nu alle vier de paden op en eist dezelfde pagina, plus dat het een interne herschrijving is en geen omleiding.",
       "handhaver": [
         "server/middleware/voordeur.js"
       ],
       "toetsen": [
+        "eenbeginscherm.test.js",
         "beginscherm.test.js"
       ],
-      "sabotage": "laat /apps/index.html weer een eigen pagina serveren in plaats van naar huis te herschrijven"
+      "sabotage": "laat /apps/index.html weer een eigen pagina serveren in plaats van naar huis te herschrijven",
+      "sabotageProef": {
+        "bestand": "server/middleware/voordeur.js",
+        "van": "  app.get('/apps/index.html', naarHome);",
+        "naar": "  // sabotage: index.html wordt weer een eigen beginscherm",
+        "toets": [
+          "eenbeginscherm.test.js"
+        ]
+      }
     },
     {
       "id": "RTG-033",
       "wet": "Geld verlaat het huis nooit vanzelf",
-      "waarom": "De harde grens van GELD.md. Automatisering mag alles voorbereiden, maar de laatste stap naar buiten is een menselijk besluit.",
-      "handhaver": [],
-      "toetsen": [],
-      "sabotage": "OPEN: er is nog geen enkele handhaver die deze wet als wet afdwingt in plaats van per route"
+      "waarom": "De harde grens van GELD.md par. 3: 'automatisch' bestaat uitsluitend voor het oormerken binnen het eigen tegoed. Elke andere soort regel raakt (mogelijk) een betaling of een derde, en die blijft maximaal 'klaarzetten' -- wat het lid ook vraagt. LET OP hoe deze wet hier terechtkwam: ik schreef hem op als OPEN met 'er is nog geen enkele handhaver die deze wet als wet afdwingt', en dat was gewoon niet waar. De handhaver stond er al (regels.js weigert het niveau met een 400) en de toets ook, compleet met een opgeschreven mutatie die de schrijver had zien zakken. Ik had niet goed genoeg gezocht. Een register dat iets ten onrechte OPEN noemt, is niet onschuldig: het stuurt werk naar een gat dat er niet is, en het laat bescherming er zwakker uitzien dan ze is.",
+      "handhaver": [
+        "server/kern/geldbeleid/regels.js"
+      ],
+      "toetsen": [
+        "geldbeleid.test.js"
+      ],
+      "sabotage": "zet de niveaucontrole in regels.js op false; 'automatisch' mag dan op elke soort regel",
+      "sabotageProef": {
+        "bestand": "server/kern/geldbeleid/regels.js",
+        "van": "    if (niveau === 'automatisch' && soort !== 'reserveer-maandelijks')",
+        "naar": "    if (false)",
+        "toets": [
+          "geldbeleid.test.js"
+        ]
+      }
     },
     {
       "id": "RTG-034",
@@ -492,12 +560,22 @@
     {
       "id": "RTG-035",
       "wet": "Een ingetrokken toestemming geeft onmiddellijk geen toegang meer",
-      "waarom": "Rechten die pas bij de volgende sessie ingaan, zijn geen rechten maar een gewoonte. Dit is nu per route geregeld en nergens als wet afgedwongen.",
+      "waarom": "Rechten die pas bij de volgende sessie ingaan, zijn geen rechten maar een gewoonte: tussen het intrekken en het uitloggen zit dan een venster waarin iemand nog mag wat hij niet meer mag. Bij een machtiging is dat het gevaarlijkst -- je trekt hem juist in OMDAT er iets veranderd is. bevestig() in rtgid.js weigert een ingetrokken machtiging met een 403, en test/intrekking.test.js meet het EERSTVOLGENDE verzoek: geen nieuwe login, geen herstart, geen wachten. De toets bewijst eerst dat B de machtiging KAN gebruiken; zonder die stap ziet een toets waarin B het nooit mocht er hetzelfde uit als een toets waarin intrekken werkt.",
       "handhaver": [
-        "server/kern/bevoegdheid/index.js"
+        "server/kern/rtgid.js"
       ],
-      "toetsen": [],
-      "sabotage": "OPEN: er is geen toets die een recht midden in een lopende sessie intrekt en het eerstvolgende verzoek meet"
+      "toetsen": [
+        "intrekking.test.js"
+      ],
+      "sabotage": "haal de m.ingetrokken-controle uit bevestig(); B mag dan na het intrekken nog steeds",
+      "sabotageProef": {
+        "bestand": "server/kern/rtgid.js",
+        "van": "      if (!m || m.naarKey !== key || m.ingetrokken || nu() > m.tot) return { status: 403, error: 'Deze machtiging is niet (meer) geldig.' };",
+        "naar": "      if (!m || m.naarKey !== key || nu() > m.tot) return { status: 403, error: 'Deze machtiging is niet (meer) geldig.' };",
+        "toets": [
+          "intrekking.test.js"
+        ]
+      }
     },
     {
       "id": "RTG-036",
@@ -609,6 +687,13 @@
           "grootboek-idem.test.js"
         ]
       }
+    },
+    {
+      "id": "RTG-999",
+      "wet": "Een tijdelijke ijkwet, met opzet zonder handhaver",
+      "waarom": "Staat hier alleen tijdens test/meterijk.test.js.",
+      "handhaver": [],
+      "toetsen": []
     }
   ]
 }

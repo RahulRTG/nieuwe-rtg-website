@@ -27,9 +27,15 @@
     "kernOngebruikt": 0,
     "toetsenNietGemeten": 205,
     "toetsenOngevoeligPct": 2.3,
-    "wettenZonderBewijs": 11
+    "wettenZonderBewijs": 5
   },
   "notities": [
+    {
+      "datum": "2026-08-12",
+      "meter": "wettenZonderBewijs 11 -> 5",
+      "reden": "Elf openstaande wetten aangepakt. RTG-033 (geld verlaat het huis nooit vanzelf) en RTG-035 (ingetrokken toestemming werkt onmiddellijk) bewezen; RTG-021 herschreven naar een implementatie-onafhankelijke conservatiewet en bewezen op de sluitcontrole in plaats van op een walletnaam; RTG-025, 026, 028, 030, 031 en 032 bewezen. Tweeentwintig wetten dragen nu een uitvoerbare sabotage, alle tweeentwintig BEWEZEN.",
+      "eerlijkheidshalve": "Vier bekentenissen. (1) RTG-033 stond ten onrechte als OPEN met de tekst dat er geen handhaver was; die stond er al, ik had niet goed genoeg gezocht -- een wet die ten onrechte OPEN heet stuurt werk naar een gat dat er niet is. (2) RTG-031 beloofde meer dan zijn handhaver waarmaakt (geen losse kleuren wordt niet afgedwongen) en is teruggeschreven naar wat er echt wordt bewaakt. (3) RTG-022 blijft OPEN, en dat is gemeten: de saldogrens in boek() is via de HTTP-API onbereikbaar omdat EEN knop de wallet altijd bijlaadt en de partnerroute eerder weigert. Ik zette de guard uit en geen enkele toets werd rood, ook mijn nieuwe niet. (4) Mijn eigen nieuwe toets was twee keer groen om de verkeerde reden: een notEqual(200) die niet naar de reden keek, en de aanname dat een halve cent geweigerd wordt terwijl boek() afrondt."
+    },
     {
       "datum": "2026-08-12",
       "meter": "wettenZonderBewijs blijft 11 (40 wetten in plaats van 39)",

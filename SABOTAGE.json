@@ -29,9 +29,45 @@
       "stand": "BEWEZEN",
       "uitleg": "server/kern/ssrf.js: function veiligeExternalUrl(url) { -> function veiligeExternalUrl(url) {\n  return { ok: true }; maakt ssrf.test.js rood"
     },
+    "RTG-021": {
+      "stand": "BEWEZEN",
+      "uitleg": "server/kern/pay/index.js:     if (!Number.isFinite(c) || c < MIN_CENTEN || c > MAX_CENTEN) return { status: 400, error: 'Dat bedrag kan niet.' }; ->     if (!Number.isFinite(c)) return { status: 400, error: 'Dat bedrag kan niet.' }; maakt waardebehoud.test.js rood"
+    },
     "RTG-023": {
       "stand": "BEWEZEN",
       "uitleg": "server/kern/spellen/grens.js: progressieMag: (handle) => volwassen(handle), -> progressieMag: (handle) => true, maakt speldag.test.js rood"
+    },
+    "RTG-025": {
+      "stand": "BEWEZEN",
+      "uitleg": "BEREIK.json: \"schuld\": [] -> \"schuld\": [\"apps/app.html\"] maakt bereikbaar.test.js rood"
+    },
+    "RTG-026": {
+      "stand": "BEWEZEN",
+      "uitleg": "scripts/norm.js:   { sleutel: 'metersOngeijkt', richting: 'omlaag', wat: 'meters met alleen een reden, zonder proef die ze laat uitslaan' }, ->   { sleutel: 'zzOngeijkteProefmeter', richting: 'omlaag', wat: 'een meter zonder ijking' },\n  { sleutel: 'metersOngeijkt', richting: 'omlaag', wat: 'meters met alleen een reden, zonder proef die ze laat uitslaan' }, maakt meterijk.test.js rood"
+    },
+    "RTG-028": {
+      "stand": "BEWEZEN",
+      "uitleg": "scripts/belofte.js:     const stand = !dekking.length ? 'open' : (kwijt.length ? 'gebroken' : 'gedekt'); ->     const stand = !dekking.length ? 'open' : 'gedekt'; maakt belofte.test.js rood"
+    },
+    "RTG-030": {
+      "stand": "BEWEZEN",
+      "uitleg": "public/shared/rtg-ontwerp.css: .rtg-ceremonie, -> .rtg-knop,\n.rtg-ceremonie, maakt ontwerp.test.js rood"
+    },
+    "RTG-031": {
+      "stand": "BEWEZEN",
+      "uitleg": "public/shared/rtg-materiaal.css:   --pearl-basis:#F4F0E9; ->   --pearl-basis:#E9F0F4; maakt materiaal.test.js rood"
+    },
+    "RTG-032": {
+      "stand": "BEWEZEN",
+      "uitleg": "server/middleware/voordeur.js:   app.get('/apps/index.html', naarHome); ->   // sabotage: index.html wordt weer een eigen beginscherm maakt eenbeginscherm.test.js rood"
+    },
+    "RTG-033": {
+      "stand": "BEWEZEN",
+      "uitleg": "server/kern/geldbeleid/regels.js:     if (niveau === 'automatisch' && soort !== 'reserveer-maandelijks') ->     if (false) maakt geldbeleid.test.js rood"
+    },
+    "RTG-035": {
+      "stand": "BEWEZEN",
+      "uitleg": "server/kern/rtgid.js:       if (!m || m.naarKey !== key || m.ingetrokken || nu() > m.tot) return { status: 403, error: 'Deze machtiging is niet (meer) geldig.' }; ->       if (!m || m.naarKey !== key || nu() > m.tot) return { status: 403, error: 'Deze machtiging is niet (meer) geldig.' }; maakt intrekking.test.js rood"
     },
     "RTG-036": {
       "stand": "BEWEZEN",

@@ -70,6 +70,10 @@ module.exports = ({ K, mijnVestiging, vrijKavel, wieHeeft, waarde, rond, codenaa
      plaats van zelf aan een vestiging te zitten, en die zit niet in deze lijst.
      Zie ../economie.js, waar de tabel wel compleet is. */
   const maakDienst = (ACTIES) => require('./dienst-acties')({ K, mijnVestiging, wieHeeft, ACTIES, rond });
+  /* UITSTAPPEN (fase C): iemand stopt en de campagne gaat door. Hij leunt op
+     ./afscheid.js, de ene weg waarlangs een vestiging iemands handen verlaat --
+     een vierde manier zou een vierde set randgevallen zijn. */
+  const uitstap = require('./uitstap')({ K, wieHeeft, liquideer, verhuis, waarde, rond });
 
   return {
     ACTIES: Object.assign(alleActies, beheren.ACTIES),
@@ -77,7 +81,7 @@ module.exports = ({ K, mijnVestiging, vrijKavel, wieHeeft, waarde, rond, codenaa
       bank.VRIJE_ACTIES, verzekering.VRIJE_ACTIES, rnd.VRIJE_ACTIES, beheren.VRIJE_ACTIES,
       handelen.VRIJE_ACTIES, overnemen.VRIJE_ACTIES),
     hameren: veiling.hameren, verdeel: aandeel.verdeel, beurs, bankmaand, onthoud: bp.onthoud,
-    verzekering, rnd, maakBeheer, maakDienst, liquideer,
+    verzekering, rnd, maakBeheer, maakDienst, liquideer, uitstap,
     zichtdelen: {
       veilingbeeld: (st, h) => veiling.beeld(st, h, codenaamVan),
       belangbeeld: (st, h) => aandeel.beeld(st, h, codenaamVan),
@@ -87,7 +91,8 @@ module.exports = ({ K, mijnVestiging, vrijKavel, wieHeeft, waarde, rond, codenaa
       rndbeeld: (st, h) => rnd.beeld(st, h),
       beheerbeeld: (st, h) => beheren.beeld(st, h),
       beursbeeld: (st, h) => handelen.beeld(st, h, codenaamVan),
-      overnamebeeld: (st, h) => overnemen.beeld(st, h, codenaamVan)
+      overnamebeeld: (st, h) => overnemen.beeld(st, h, codenaamVan),
+      uitstapbeeld: (st, h) => uitstap.voorstel(st, h, null)
     }
   };
 };

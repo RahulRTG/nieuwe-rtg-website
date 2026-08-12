@@ -107,27 +107,12 @@ module.exports = (ctx) => {
      Twee dingen met zo'n verschillend tempo horen niet in een bestand. */
   const L = require('./lagen')({ K, mijnVestiging, vrijKavel, wieHeeft, waarde, rond, codenaamVan });
 
-  /* WAT EEN SPELER DOET staat in ./acties.js; de lagen schuiven hun acties erbij.
-     De volgorde is hier belangrijk geworden: de AI-MANAGER krijgt de complete
-     tabel mee en die is pas compleet als de basisacties er ook in zitten. Zie de
-     uitleg in ./lagen.js -- hij is daar met de halve tabel gebouwd en ging stil
-     mis. */
-  const basis = require('./acties')({ K, mijnVestiging, vrijKavel, rond });
-  const ACTIES = Object.assign({}, basis.ACTIES, L.ACTIES);
-  const VRIJE_ACTIES = basis.VRIJE_ACTIES.concat(L.VRIJE_ACTIES);
-  const beheer = L.maakBeheer(ACTIES);
-  /* LOONDIENST (VERHAAL.md stap 1) staat naast de manager en krijgt om dezelfde
-     reden de complete tabel: een werknemer verandert niets rechtstreeks maar
-     roept de gewone `beleid`-actie aan namens zijn werkgever. */
-  const dienen = L.maakDienst(ACTIES);
-  Object.assign(ACTIES, dienen.ACTIES);
-  VRIJE_ACTIES.push(...dienen.VRIJE_ACTIES);
-  /* DE AI-CONCURRENTEN krijgen dezelfde tabel om dezelfde reden als de manager:
-     ze doen niets wat een speler niet ook kan. Ze staan HIER en niet in
-     ./lagen.js omdat ze de complete tabel nodig hebben, en die is pas hier
-     compleet -- zie de uitleg daar over de manager die met de halve tabel werd
-     gebouwd en stil misging. */
-  const aiZet = require('./concurrent-zet')({ ACTIES, kaart });
+  /* WAT EEN SPELER DOET wordt in ./tabel.js samengesteld -- de basisacties, de
+     acties van elke laag, en de twee AI's die de complete tabel nodig hebben.
+     Dat is een bouwstap die met elke fase meegroeit; dit bestand gaat over de
+     klok en die verandert niet meer. */
+  const { ACTIES, VRIJE_ACTIES, beheer, dienen, aiZet } =
+    require('./tabel')({ K, mijnVestiging, vrijKavel, rond, L });
 
   const { eenMaand } = require('./maand')({ K, wieHeeft, ROOD_RENTE,
     verdeel: L.verdeel, bank: L.bankmaand, onthoud: L.onthoud, verzekering: L.verzekering,
@@ -140,22 +125,12 @@ module.exports = (ctx) => {
     K, codenaamVan, rond, bijrekenen,
     dienstbeeld: (st, h) => dienen.beeld(st, h, codenaamVan),
     foundationArbeid: (st) => F.arbeidBonus(st.foundation) }, L.zichtdelen));
-  function beeindig(potje) {
-    const st = potje.staat;
-    st.klaar = true;
-    potje.status = 'klaar';
-    const stand = eindstand(potje);
-    // waarop er wordt afgerekend en waarom, staat bij de eindstand zelf (./weergave.js)
-    if (stand.length > 1 && stand[0].vermogen === stand[1].vermogen) potje.gelijk = true;
-    else potje.winnaar = stand[0].codenaam;
-  }
-
-  /* WAT EEN SPELER DOET staat in ./acties.js, en dat is een echte naad: dit
-     bestand gaat over de WERELD (de klok, de maand, de eindstand) en dat blijft
-     hetzelfde hoeveel knoppen er ook bijkomen. De actielijst groeit juist met
-     elke fase mee -- contracten, veilingen, aandelen -- en die twee horen niet
-     in een bestand. De aanleiding was de 10 kB-grens die scripts/check.js
-     bewaakt, en die grens is precies een rem hierop. */
+  /* WIE ER AAN ZET IS EN WANNEER HET AF IS staat in ./verloop.js. Dat is een
+     echte naad: dit bestand gaat over de KLOK en dat is af; de beurtvolgorde
+     kreeg er in fase C een vraag bij (wat als iemand stopt) die de klok niets
+     aangaat. Lees daar ook waarom de beurt in deze vorm NOOIT doorging. */
+  const V = require('./verloop')({ eindstand, speeltNog: L.uitstap.speeltNog });
+  const beeindig = V.beeindig;
 
   function zet(potje, h, z) {
     const st = potje.staat;
@@ -166,6 +141,15 @@ module.exports = (ctx) => {
     if (!ACTIES[actie]) return { status: 400, error: 'Onbekende actie.' };
     const r = ACTIES[actie](potje, h, z);
     if (r.error) return r;
+    /* DE BEURT GAAT DOOR NA EEN GROTE ZET, en niet na een vrije. Dat is precies
+       het onderscheid dat ./acties.js maakt en dat de descriptor draagt: bouwen
+       is een zet, je prijs verzetten is je huishouding. Het staat HIER en niet
+       in elke actie apart, want dan is elke nieuwe grote actie een kans om het
+       te vergeten. Zie ./verloop.js -- dit ontbrak, en daardoor kon in een
+       campagne alleen speler EEN ooit een vestiging openen.
+       En wie zojuist zelf uitstapte, laat de beurt niet op zich wachten. */
+    if (!VRIJE_ACTIES.includes(actie)) V.volgende(potje);
+    else V.herstel(potje);
     save();
     // een grote zet is nieuws voor de tafel; aan een prijswijziging heeft
     // niemand anders een duwtje
@@ -183,6 +167,13 @@ module.exports = (ctx) => {
      buitenaf te gebruiken -- daar is  voor, met zijn poort en zijn duwtjes. */
   const acties = () => ACTIES;
 
-  return { init, zet, acties, zicht, publiek, bijrekenen, eindstand, DUUR, MAAND_MS, START_GELD,
+  /* WAT UITSTAPPEN JE KOST, VOORDAT JE HET DOET. Een vraag en geen zet, dus
+     geen actie: hij verandert niets en mag daarom ook door iemand gesteld
+     worden die nog nadenkt. Zonder dit getal is uitstappen een sprong in het
+     duister -- je weet niet of je opvolger het kan betalen. */
+  const uitstapvoorstel = (potje, h, naar) => L.uitstap.voorstel(potje.staat, h, naar || null);
+
+  return { init, zet, acties, zicht, publiek, bijrekenen, eindstand, uitstapvoorstel,
+    DUUR, MAAND_MS, START_GELD,
     SECTORLIJST, STEDENLIJST, stadNaam, kaartVan: (s) => kaart(s) };
 };

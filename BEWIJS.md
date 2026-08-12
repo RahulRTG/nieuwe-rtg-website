@@ -4,7 +4,7 @@
 toetsbestanden. Wijzig het niet met de hand: regel 41 van `npm run keuring` genereert
 opnieuw en vergelijkt. Er staat geen datum in -- zie `ARCHITECTUUR.md` voor waarom.
 
-Waarom dit bestaat: "de toetsen staan groen" zegt bij 931 bestanden en 6198 beweringen
+Waarom dit bestaat: "de toetsen staan groen" zegt bij 932 bestanden en 6219 beweringen
 bijna niets. Je wil weten **wat** er groen staat, en of iemand die bewering ooit heeft
 zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen toets.
 
@@ -12,14 +12,14 @@ zien zakken. `LAT.md` regel 9: een toets die niet kan zakken is erger dan geen t
 
 | | Aantal |
 |---|---|
-| toetsbestanden | 931 |
-| losse beweringen (`test(...)`) | 6198 |
+| toetsbestanden | 932 |
+| losse beweringen (`test(...)`) | 6219 |
 | bestanden zonder kop (dus zonder opgeschreven bewering) | 5 |
 | **gezakt** op een mutatie (bewezen gevoelig) | 614 |
 | **overleefd**: geen mutatie kreeg hem rood | 13 |
 | niet te meten (al rood, geen module gevonden, ...) | 18 |
 | alleen in de kop *genoemd*, nog niet gemeten | 92 |
-| niets van beide | 194 |
+| niets van beide | 195 |
 
 De regel **overleefd** is de werkvoorraad, en het is een feit en geen verwijt: zo'n
 toets kan prima iets nuttigs doen, maar het gedrag dat de motor kan raken legt hij
@@ -33,7 +33,7 @@ toets omvalt.
 
 ## Servertoetsen (`npm test`)
 
-811 bestanden, 5983 beweringen.
+812 bestanden, 6004 beweringen.
 
 | Toets | # | Mutatie | Bewering |
 |---|---|---|---|
@@ -688,6 +688,7 @@ toets omvalt.
 | `speltelling.test.js` | 9 | gezakt op `liegpoort /api/` | Telemetrie van de spellen: geaggregeerd, zonder personen. Deze toets bewaakt vooral wat er NIET in mag staan. |
 | `speltoernooi.test.js` | 14 | gezakt op `return-weg#0` | Toernooien: een knockout waarvan elke wedstrijd een GEWOON potje is. De keuze die het meeste uitlegt: een toernooi valt NIET onder de progressiegrens. |
 | `speluitslagen.test.js` | 25 | gezakt op `===->!==#0` | Uitslagen die een potje overleven -- de bron onder winrate, niveaus en toernooien, die er tot nu toe niet was (een klaar potje werd na 24 uur weggegooid). De regel die het meeste werk doet: de progressiegrens geldt... |
+| `speluitstap.test.js` | 21 | -- | MAGNAAT: UITSTAPPEN -- iemand stopt, en de campagne gaat door. Fase C, de overdracht. |
 | `spelvariant.test.js` | 16 | -- | VARIANTEN: wat er aan een spel te kiezen valt zonder dat de regels veranderen. Een variant parametriseert; hij vervangt niet. |
 | `spelveiling.test.js` | 14 | -- | MAGNAAT FASE B: VEILINGEN -- het eerste waar twee spelers om HETZELFDE vechten. Contracten waren het eerste stuk van fase B en ze deden hun werk, maar de meting was hard: ze kantelen geen duel. |
 | `spelverzekering.test.js` | 17 | genoemd | MAGNAAT: VERZEKERINGEN -- risico als keuze in plaats van een vinkje. ACHT BEWERINGEN, en ze zijn alle acht stil terug te draaien: 1. |

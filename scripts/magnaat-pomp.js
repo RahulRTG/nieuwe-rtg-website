@@ -172,6 +172,41 @@ const SCENARIOS = {
     }
   },
 
+  /* UITSTAPPEN MET OVERDRACHT (fase C). Een speler draagt zijn hele bedrijf
+     over aan een ander en verlaat de tafel. Dat is een pure verplaatsing: de
+     opvolger betaalt de boekwaarde, en aan tafel verandert het totaal niet.
+
+     Zou de prijs door de vertrekker te kiezen zijn, dan is dit de goedkoopste
+     samenzwering in het spel -- ik stop ermee en geef jou alles. Daarom betaalt
+     een opvolger de waarde die de motor zelf rekent en geen bedrag uit een
+     invoerveld. Deze route is de bewaking daarop.
+
+     HIJ VOND METEEN IETS, en niet in de nieuwe laag: -31,75%. De eindstand
+     FILTERDE de vertrekker eruit, dus zijn kas verdween uit de meting terwijl
+     hij gewoon in de wereld stond. Zie server/kern/spellen/magnaat/eindstand.js
+     -- die lijst is ranglijst EN wereldvermogen, en dat waren twee vragen met
+     een antwoord.
+
+     WAT ER NA DE REPARATIE OVERBLIJFT is -487 per maand, kaarsrecht lineair
+     (24 maanden geeft -11.688, 12 geeft -5.844, 1 geeft -487). Dat is de
+     HOOFDKANTOORPOST van ../server/kern/spellen/magnaat/concern.js en precies
+     wat die laag belooft: overhead groeit met `n^1,25`, dus twee zaken onder
+     EEN eigenaar kosten meer te besturen dan twee zaken onder twee. Een
+     overdracht maakt van twee concerns van een, een concern van twee. Die post
+     verlaat de wereld zoals rente dat doet, en 0,019% valt ruim binnen de ruis
+     die deze meter voor echte economie openlaat.
+
+     ZONDER OPVOLGER meet dezelfde route +437.581, en ook dat is geen pomp: de
+     zaak in kwestie draait verlies, dus stoppen scheelt de wereld twaalf
+     maanden aan huur, loon en inkoop die er anders uit lopen. Gewoon `sluiten`
+     van diezelfde vestiging levert +621.781 op -- meer dus. Uitstappen is langs
+     die weg strikter dan de deur die er al was, en die deur staat hieronder als
+     `bouwenEnSluiten`. */
+  uitstapOverdracht: {
+    verwacht: 'neutraal', naam: 'je hele bedrijf overdragen en de tafel verlaten',
+    doe(w) { w.m.spel.zet(w.potje, 'a', { actie: 'uitstappen', naar: 'b' }); }
+  },
+
   /* Een belang heen en weer verkopen tegen een absurde prijs. Als de waarde van
      een deelneming bij BEIDE partijen meetelt, groeit het totaal bij elke
      ronde -- en dat is de klassieke fout in een laag die waarde verplaatst. */

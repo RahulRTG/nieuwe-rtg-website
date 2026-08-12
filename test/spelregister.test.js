@@ -54,6 +54,7 @@ const GOUD = {
     'polis-sluiten', 'polis-opzeggen',
     'onderzoek-starten', 'onderzoek-budget', 'onderzoek-uitrollen', 'onderzoek-subsidie',
     'beheer-aan', 'beheer-uit', 'beheer-regels', 'vakantie-aan', 'vakantie-uit',
+    'uitstappen',
     'beurs-aanbieden', 'beurs-kopen', 'beurs-intrekken',
     'overname-bod', 'overname-antwoord', 'overname-intrekken',
     'functie-openen', 'functie-intrekken', 'solliciteren', 'aannemen',

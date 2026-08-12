@@ -1,0 +1,48 @@
+/* Magnaat: DE ACTIETABEL SAMENSTELLEN -- in welke volgorde, en waarom die telt.
+
+   Afgesplitst van ./economie.js, en het is een echte naad. Dat bestand gaat
+   over de KLOK en de partij; dit is een BOUWSTAP die met elke fase meegroeit --
+   contracten, veilingen, aandelen, loondienst, uitstappen zijn er allemaal aan
+   toegevoegd. Twee dingen met zo'n verschillend tempo horen niet in een
+   bestand, en de 10 kB-grens in scripts/check.js is precies de rem daarop.
+
+   DE VOLGORDE IS GEEN NETHEID MAAR EEN REPARATIE. Twee onderdelen krijgen de
+   COMPLETE tabel mee -- de AI-manager (./beheer.js) en de AI-concurrenten
+   (./concurrent-zet.js) -- want ze doen niets wat een speler niet ook kan, ze
+   roepen dezelfde acties aan. Wie ze bouwt voordat de tabel af is, geeft ze een
+   halve tabel: dan kan een manager een actie noemen die hij niet kan aanroepen,
+   en dat gaat STIL mis. Het is hier eerder gebeurd; zie de uitleg in
+   ./lagen.js. Daarom staan ze onderaan en niet daar.
+
+   WAT VRIJ IS EN WAT NIET wordt hier ook vastgelegd, en dat is de mechaniek
+   waar Long Play op staat of valt (GAMEHALL.md 12.3). `VRIJE_ACTIES` is de
+   lijst die ./economie.js gebruikt om te bepalen of de beurt doorgaat, en
+   ./index.js draagt hem als `buitenBeurt` naar de platformlaag. Een actie die
+   in het ene lijstje staat en niet in het andere is een actie die je wel mag
+   doen maar niet mag doen -- test/spelmagnaat.test.js telt ze na. */
+'use strict';
+const { kaart } = require('./kaart');
+
+module.exports = ({ K, mijnVestiging, vrijKavel, rond, L }) => {
+  /* WAT EEN SPELER DOET staat in ./acties.js; de lagen schuiven hun acties erbij. */
+  const basis = require('./acties')({ K, mijnVestiging, vrijKavel, rond });
+  const ACTIES = Object.assign({}, basis.ACTIES, L.ACTIES);
+  const VRIJE_ACTIES = basis.VRIJE_ACTIES.concat(L.VRIJE_ACTIES);
+  const beheer = L.maakBeheer(ACTIES);
+  /* UITSTAPPEN (fase C). Hij staat HIER en niet in ./lagen.js omdat hij de
+     PARTIJ raakt en niet een laag: wie uitstapt telt niet meer mee voor de
+     winst en wordt overgeslagen in de beurtvolgorde (./verloop.js). Vrij, want
+     wie ermee ophoudt komt per definitie niet meer op zijn beurt terug. */
+  ACTIES.uitstappen = (potje, h, zet) => L.uitstap.uitstappen(potje, h,
+    zet && zet.naar ? String(zet.naar) : null);
+  VRIJE_ACTIES.push('uitstappen');
+  /* LOONDIENST (VERHAAL.md stap 1) krijgt om dezelfde reden als de manager de
+     complete tabel: een werknemer verandert niets rechtstreeks maar roept de
+     gewone `beleid`-actie aan namens zijn werkgever. */
+  const dienen = L.maakDienst(ACTIES);
+  Object.assign(ACTIES, dienen.ACTIES);
+  VRIJE_ACTIES.push(...dienen.VRIJE_ACTIES);
+  const aiZet = require('./concurrent-zet')({ ACTIES, kaart });
+
+  return { ACTIES, VRIJE_ACTIES, beheer, dienen, aiZet };
+};

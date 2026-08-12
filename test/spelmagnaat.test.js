@@ -568,6 +568,11 @@ test('de vrije acties mogen buiten de beurt, de grote niet', () => {
       'onderzoek-budget', 'onderzoek-starten', 'onderzoek-subsidie', 'onderzoek-uitrollen',
       'overname-antwoord', 'overname-bod', 'overname-intrekken',
       'polis-opzeggen', 'polis-sluiten', 'solliciteren',
+      /* UITSTAPPEN is de enige VRIJE zet die de kaart verandert, en dat volgt
+         uit de zet zelf: wie ermee ophoudt komt per definitie niet meer op zijn
+         beurt terug. Zou hij moeten wachten, dan wacht de tafel op iemand die
+         er niet meer is -- precies de klem die uitstap.js opheft. */
+      'uitstappen',
       'vakantie-aan', 'vakantie-uit',
       'veiling-bod', 'veiling-intrekken', 'veiling-start', 'verkoop', 'werk-beleid']);
   for (const groot of ['open', 'uitbreiden', 'sluiten'])

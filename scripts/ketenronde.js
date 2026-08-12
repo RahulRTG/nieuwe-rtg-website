@@ -81,6 +81,22 @@ const haal = async (basis, pad) => {
    dezelfde acht velden uit kan afleiden -- een keten met een eigen oordeelsvorm
    is niet met een andere te vergelijken.
    ------------------------------------------------------------------------- */
+/* WELKE IDENTITEIT EEN KETEN NODIG HEEFT.
+
+   Twee ketens stonden eerst blind, en niet door een fout: er zat een POORT
+   voor. RTG Pay weigert een lid zonder geverifieerd paspoort (403, KYC), en dat
+   is geen bug maar het ontwerp. Die poort omzeilen zou een keten meten die in
+   productie niet bestaat -- dan bewijs je iets over een pad dat niemand loopt.
+
+   Dus gaat de geldketen door de VOORDEUR: het geverifieerde demo-account. Dat
+   is precies wie RTG Pay wel mag gebruiken. Een vers lid blijft terecht buiten
+   staan, en dat hoort zo. */
+const IDENTITEIT = {
+  GELD: 'geverifieerd',      // payGate vraagt een geverifieerd paspoort
+  TOESTEMMING: 'nieuw',
+  NOTITIE: 'nieuw'
+};
+
 const KETENS = {
   async GELD(basis, tok, merk) {
     const idem = 'ketenproef-' + merk;
@@ -100,11 +116,18 @@ const KETENS = {
     };
   },
   async TOESTEMMING(basis, tok) {
+    /* `zorgprofiel` en niet `rtgid-sessie`: die laatste vraagt een BESTAANDE
+       machtiging om in te trekken, en die moet deze proef dan eerst zelf
+       aanleggen -- dan meet je de aanleg mee. Het zorgprofiel-meereizen staat
+       standaard aan en is dus meteen in te trekken. Zelfde belofte, zonder
+       opbouw ertussen: wie nee zegt, hoort nee te blijven -- ook na een crash. */
+    const laag = 'zorgprofiel';
+    await post(basis, '/api/zorgprofiel/zet', { delen: true, allergieen: ['proef'] }, tok);
     const voor = await post(basis, '/api/toestemming', {}, tok);
-    const intrek = await post(basis, '/api/toestemming/intrek', { soort: 'marketing' }, tok);
+    const intrek = await post(basis, '/api/toestemming/intrek', { laag }, tok);
     const na = await post(basis, '/api/toestemming', {}, tok);
     const anders = JSON.stringify(voor.data) !== JSON.stringify(na.data);
-    const nogEens = await post(basis, '/api/toestemming/intrek', { soort: 'marketing' }, tok);
+    const nogEens = await post(basis, '/api/toestemming/intrek', { laag }, tok);
     const naTweede = await post(basis, '/api/toestemming', {}, tok);
     return {
       schrijfStatus: intrek.status,
@@ -146,12 +169,21 @@ async function draai(keten, verraadAan) {
     if (een.dood) { stop(een); return w; }
 
     const u = Date.now().toString().slice(-8) + Math.floor(Math.random() * 900);
-    const email = 'kp' + u + '@x.nl';
-    const reg = await post(een.basis, '/api/auth/register', { name: 'Ketenproef', email,
-      phone: '06' + u.slice(0, 8), password: 'geheim123', geboortedatum: '1986-06-06',
-      geslacht: 'm', tier: 'rtg', pasApp: 'rtg' });
-    const tok = reg.data && reg.data.token;
-    if (!tok) { stop(een); return w; }
+    let email, wachtwoord = 'geheim123', tok;
+    if (IDENTITEIT[keten] === 'geverifieerd') {
+      email = process.env.RTG_OWNER_EMAIL || 'roellie.i@gmail.com';
+      wachtwoord = process.env.DEMO_PASS || 'Imran';
+      const inlog = await post(een.basis, '/api/auth/login', { login: email, password: wachtwoord });
+      tok = inlog.data && inlog.data.token;
+    } else {
+      email = 'kp' + u + '@x.nl';
+      const reg = await post(een.basis, '/api/auth/register', { name: 'Ketenproef', email,
+        phone: '06' + u.slice(0, 8), password: wachtwoord, geboortedatum: '1986-06-06',
+        geslacht: 'm', tier: 'rtg', pasApp: 'rtg' });
+      tok = reg.data && reg.data.token;
+    }
+    if (!tok) { w.identiteitLukte = false; stop(een); return w; }
+    w.identiteitLukte = true;
 
     Object.assign(w, await KETENS[keten](een.basis, tok, merk));
     await new Promise(r => setTimeout(r, 1500));
@@ -161,7 +193,7 @@ async function draai(keten, verraadAan) {
     /* Etappe 2: schoon herstarten en kijken wat er OVER is. */
     const twee = await start(datamap, {});
     if (twee.dood) { stop(twee); return w; }
-    const opnieuw = await post(twee.basis, '/api/auth/login', { login: email, password: 'geheim123' });
+    const opnieuw = await post(twee.basis, '/api/auth/login', { login: email, password: wachtwoord });
     const tok2 = opnieuw.data && opnieuw.data.token;
     if (tok2) {
       if (keten === 'GELD') {

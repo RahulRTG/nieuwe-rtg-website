@@ -28,7 +28,7 @@
         "staat": "GROEN",
         "beweringen": 30,
         "overgeslagen": 0,
-        "at": "2026-08-11T23:44:55.646Z",
+        "at": "2026-08-11T23:57:21.144Z",
         "bestanden": [
           "test/keten.test.js"
         ]
@@ -56,7 +56,7 @@
         "staat": "NIET IN BEDRIJF",
         "beweringen": 30,
         "overgeslagen": 0,
-        "at": "2026-08-11T23:44:55.872Z",
+        "at": "2026-08-11T23:57:21.394Z",
         "bestanden": [
           "test/keten.test.js"
         ],
@@ -92,7 +92,7 @@
         "staat": "GROEN",
         "beweringen": 33,
         "overgeslagen": 0,
-        "at": "2026-08-11T23:44:56.822Z",
+        "at": "2026-08-11T23:57:22.326Z",
         "bestanden": [
           "test/verraad.test.js",
           "test/verraadtelling.test.js"
@@ -110,23 +110,23 @@
       "bewijsstuk": "KETENS.json -- acht velden per keten en verraad, met de zevenstappenlat",
       "grens": "drie ketens van de tientallen die er zijn, en alleen de twee verraden die op het schrijfpad zijn ingebouwd. Een keten die achter een poort zit (KYC, een bestaande toestemming) wordt NIET beoordeeld en staat als blind met reden in het register.",
       "dekking": {
-        "beproefd": 1,
-        "totaal": 2,
+        "beproefd": 2,
+        "totaal": 6,
         "eenheid": "scenarios die de zevenstappenlat halen",
         "tellers": {
           "ketens": 3,
-          "blindeKetens": 2,
-          "rollbackBewezen": 1,
+          "blindeKetens": 0,
+          "rollbackBewezen": 3,
           "ledgerGebroken": 0,
-          "stilVerlies": 1
+          "stilVerlies": 2
         },
-        "pct": 50
+        "pct": 33.3
       },
       "laatstGroen": {
         "staat": "GROEN",
         "beweringen": 21,
         "overgeslagen": 0,
-        "at": "2026-08-11T23:44:57.058Z",
+        "at": "2026-08-11T23:57:22.518Z",
         "bestanden": [
           "test/ketenproef.test.js"
         ]
@@ -155,7 +155,7 @@
         "staat": "GROEN",
         "beweringen": 18,
         "overgeslagen": 0,
-        "at": "2026-08-11T23:44:59.062Z",
+        "at": "2026-08-11T23:57:24.407Z",
         "bestanden": [
           "test/klok.test.js"
         ]
@@ -186,7 +186,7 @@
         "staat": "GROEN",
         "beweringen": 18,
         "overgeslagen": 0,
-        "at": "2026-08-11T23:45:28.393Z",
+        "at": "2026-08-11T23:57:53.098Z",
         "bestanden": [
           "test/schermleugen.test.js",
           "test/liegend-scherm.e2e.js"
@@ -219,7 +219,7 @@
         "staat": "GROEN",
         "beweringen": 13,
         "overgeslagen": 0,
-        "at": "2026-08-11T23:45:28.605Z",
+        "at": "2026-08-11T23:57:53.292Z",
         "bestanden": [
           "test/rolproef.test.js"
         ]
@@ -239,8 +239,8 @@
         "totaal": 43835,
         "eenheid": "cellen",
         "tellers": {
-          "ongemeten": 37590,
-          "gezakt": 2
+          "ongemeten": 37588,
+          "gezakt": 4
         },
         "pct": 13.6
       },
@@ -249,7 +249,7 @@
         "staat": "GROEN",
         "beweringen": 11,
         "overgeslagen": 0,
-        "at": "2026-08-11T23:45:28.790Z",
+        "at": "2026-08-11T23:57:53.476Z",
         "bestanden": [
           "test/bewijsmatrix.test.js"
         ]

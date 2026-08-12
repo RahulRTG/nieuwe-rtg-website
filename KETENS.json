@@ -3,40 +3,151 @@
   "seed": "819226199",
   "gemeten": {
     "ketens": 3,
-    "scenarios": 2,
-    "voldoetAanLat": 1,
-    "rollbackBewezen": 1,
+    "scenarios": 6,
+    "voldoetAanLat": 2,
+    "rollbackBewezen": 3,
     "ledgerGebroken": 0,
-    "stilVerlies": 1,
-    "blindeKetens": 2
+    "stilVerlies": 2,
+    "blindeKetens": 0
   },
   "scenarios": [
     {
       "keten": "GELD",
-      "blind": true,
-      "reden": "de schrijfactie gaf 403 -- er zit een poort voor (KYC/onboarding) die deze proef niet doorloopt",
-      "schoon": {
-        "schrijfStatus": 403,
-        "zichtbaarVoorHerstart": false,
+      "verraad": "schrijf-verloren",
+      "injectie": "JA",
+      "zichtbaar": "JA",
+      "clientAntwoord": "OK",
+      "toestandWijziging": "TERUGGEDRAAID",
+      "ledgerInvariant": "GELDIG",
+      "audit": "AANWEZIG",
+      "retryVeilig": "JA",
+      "rollback": "NVT",
+      "herhaalbaar": "JA",
+      "afwijkingen": [
+        "blijftNaHerstart: true -> false"
+      ],
+      "lat": {
+        "voldoet": true,
+        "ontbreekt": []
+      },
+      "stilVerlies": true,
+      "ruw": {
+        "schrijfStatus": 200,
+        "zichtbaarVoorHerstart": true,
         "blijftNaHerstart": false,
         "ledgerKlopt": true,
-        "auditSpoor": false,
+        "auditSpoor": true,
         "retryGafTweedeEffect": false,
-        "startteOp": true
+        "startteOp": true,
+        "identiteitLukte": true
+      }
+    },
+    {
+      "keten": "GELD",
+      "verraad": "schrijf-faalt",
+      "injectie": "JA",
+      "zichtbaar": "JA",
+      "clientAntwoord": "FAIL",
+      "toestandWijziging": "GEEN",
+      "ledgerInvariant": "ONGEMETEN",
+      "audit": "ONGEMETEN",
+      "retryVeilig": "ONGEMETEN",
+      "rollback": "PROVEN",
+      "herhaalbaar": "JA",
+      "afwijkingen": [
+        "auditSpoor: true -> null",
+        "blijftNaHerstart: true -> null",
+        "identiteitLukte: true -> undefined",
+        "ledgerKlopt: true -> null",
+        "retryGafTweedeEffect: false -> null",
+        "schrijfStatus: 200 -> null",
+        "startteOp: true -> false",
+        "zichtbaarVoorHerstart: true -> null"
+      ],
+      "lat": {
+        "voldoet": false,
+        "ontbreekt": [
+          "invariant beoordeeld"
+        ]
+      },
+      "stilVerlies": false,
+      "ruw": {
+        "schrijfStatus": null,
+        "zichtbaarVoorHerstart": null,
+        "blijftNaHerstart": null,
+        "ledgerKlopt": null,
+        "auditSpoor": null,
+        "retryGafTweedeEffect": null,
+        "startteOp": false
       }
     },
     {
       "keten": "TOESTEMMING",
-      "blind": true,
-      "reden": "de schrijfactie gaf 404 -- de keten vraagt een bestaande toestand die deze proef niet aanlegt",
-      "schoon": {
-        "schrijfStatus": 404,
-        "zichtbaarVoorHerstart": false,
+      "verraad": "schrijf-verloren",
+      "injectie": "JA",
+      "zichtbaar": "NEE",
+      "clientAntwoord": "OK",
+      "toestandWijziging": "BLIJVEND",
+      "ledgerInvariant": "ONGEMETEN",
+      "audit": "AANWEZIG",
+      "retryVeilig": "JA",
+      "rollback": "NVT",
+      "herhaalbaar": "JA",
+      "afwijkingen": [],
+      "lat": {
+        "voldoet": false,
+        "ontbreekt": [
+          "zichtbaar"
+        ]
+      },
+      "stilVerlies": false,
+      "ruw": {
+        "schrijfStatus": 200,
+        "zichtbaarVoorHerstart": true,
         "blijftNaHerstart": true,
         "ledgerKlopt": null,
-        "auditSpoor": false,
+        "auditSpoor": true,
         "retryGafTweedeEffect": false,
-        "startteOp": true
+        "startteOp": true,
+        "identiteitLukte": true
+      }
+    },
+    {
+      "keten": "TOESTEMMING",
+      "verraad": "schrijf-faalt",
+      "injectie": "JA",
+      "zichtbaar": "JA",
+      "clientAntwoord": "FAIL",
+      "toestandWijziging": "GEEN",
+      "ledgerInvariant": "ONGEMETEN",
+      "audit": "ONGEMETEN",
+      "retryVeilig": "ONGEMETEN",
+      "rollback": "PROVEN",
+      "herhaalbaar": "JA",
+      "afwijkingen": [
+        "auditSpoor: true -> null",
+        "blijftNaHerstart: true -> null",
+        "identiteitLukte: true -> undefined",
+        "retryGafTweedeEffect: false -> null",
+        "schrijfStatus: 200 -> null",
+        "startteOp: true -> false",
+        "zichtbaarVoorHerstart: true -> null"
+      ],
+      "lat": {
+        "voldoet": false,
+        "ontbreekt": [
+          "invariant beoordeeld"
+        ]
+      },
+      "stilVerlies": false,
+      "ruw": {
+        "schrijfStatus": null,
+        "zichtbaarVoorHerstart": null,
+        "blijftNaHerstart": null,
+        "ledgerKlopt": null,
+        "auditSpoor": null,
+        "retryGafTweedeEffect": null,
+        "startteOp": false
       }
     },
     {
@@ -66,7 +177,8 @@
         "ledgerKlopt": null,
         "auditSpoor": true,
         "retryGafTweedeEffect": true,
-        "startteOp": true
+        "startteOp": true,
+        "identiteitLukte": true
       }
     },
     {
@@ -84,6 +196,7 @@
       "afwijkingen": [
         "auditSpoor: true -> null",
         "blijftNaHerstart: true -> null",
+        "identiteitLukte: true -> undefined",
         "retryGafTweedeEffect: true -> null",
         "schrijfStatus: 200 -> null",
         "startteOp: true -> false",

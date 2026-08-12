@@ -146,3 +146,64 @@ test('wat ontbreekt is een werklijst en geen enkel woord', () => {
   const uit = voldoetAanLat(o);
   assert.ok(uit.ontbreekt.length >= 3, 'een scenario dat niets haalt hoort alles op te sommen');
 });
+
+/* ---------- de strengere lat voor geld ----------
+
+   Een financiële route is pas PROVEN als antwoord, persistentie na herstart EN
+   grootboekinvariant alle drie kloppen. Twee van de drie is geen twee derde
+   bewijs maar geen bewijs -- anders toets je een correct antwoord boven een
+   beschadigde boekhouding. */
+
+const { financieelOordeel } = require('../scripts/lib/ketenproef');
+
+test('geld is PROVEN als alle drie kloppen', () => {
+  const uit = financieelOordeel(oordeel({}));
+  assert.equal(uit.staat, 'PROVEN');
+  assert.match(uit.reden, /alle drie/);
+});
+
+test('geld is NIET PROVEN bij stil verlies, ook al klopt het grootboek', () => {
+  /* Dit is het geval dat de eerste echte ronde opleverde: antwoord goed,
+     sluitcontrole geldig, geld weg. Een verloren schrijfactie laat het grootboek
+     kloppend achter -- er is nooit iets geboekt. */
+  const o = oordeel({ blijftNaHerstart: false });
+  assert.equal(o.ledgerInvariant, 'GELDIG');
+  const uit = financieelOordeel(o);
+  assert.equal(uit.staat, 'NIET');
+  assert.match(uit.reden, /weg/);
+});
+
+test('geld is NIET PROVEN als het grootboek breekt', () => {
+  assert.equal(financieelOordeel(oordeel({ ledgerKlopt: false })).staat, 'NIET');
+});
+
+test('een ONGEMETEN grootboek maakt een geldroute nooit PROVEN', () => {
+  /* Bij geld is "we hebben niet gekeken" hetzelfde als "we weten het niet".
+     Zou dit doorglippen als PROVEN, dan telt elke ronde zonder sluitcontrole
+     mee als bewijs. */
+  const uit = financieelOordeel(oordeel({ ledgerKlopt: null }));
+  assert.equal(uit.staat, 'ONGEMETEN');
+  assert.notEqual(uit.staat, 'PROVEN');
+});
+
+test('geweigerd en toch geboekt is NIET PROVEN', () => {
+  const uit = financieelOordeel(oordeel({ schrijfStatus: 500, blijftNaHerstart: true }));
+  assert.equal(uit.staat, 'NIET');
+  assert.match(uit.reden, /geweigerd/);
+});
+
+test('een nette weigering zonder gevolg is PROVEN', () => {
+  const uit = financieelOordeel(oordeel({ schrijfStatus: 503,
+    zichtbaarVoorHerstart: false, blijftNaHerstart: false }));
+  assert.equal(uit.staat, 'PROVEN');
+});
+
+test('een herhaling die tweemaal boekt is NIET PROVEN', () => {
+  /* Waarde die twee keer ontstaat uit een retry is precies wat een grootboek
+     niet mag toestaan, ook al klopt de som daarna nog. */
+  assert.equal(financieelOordeel(oordeel({ retryGafTweedeEffect: true })).staat, 'NIET');
+});
+
+test('zonder waarneming is geld ONGEMETEN en niet stilzwijgend goed', () => {
+  assert.equal(financieelOordeel(null).staat, 'ONGEMETEN');
+});

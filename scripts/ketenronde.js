@@ -33,7 +33,7 @@ const os = require('os');
 const path = require('path');
 const { spawn } = require('child_process');
 const { CATALOGUS } = require('../server/lib/verraad');
-const { beoordeel, isStilVerlies, voldoetAanLat } = require('./lib/ketenproef');
+const { beoordeel, isStilVerlies, voldoetAanLat, financieelOordeel } = require('./lib/ketenproef');
 
 const WORTEL = path.join(__dirname, '..');
 const UITSLAG = path.join(WORTEL, 'KETENS.json');
@@ -244,6 +244,8 @@ async function draai(keten, verraadAan) {
         herhaalbaar: JSON.stringify(met) === JSON.stringify(nog) });
       const lat = voldoetAanLat(o);
       const stil = isStilVerlies(o);
+      /* Geld krijgt de strengere lat: alle drie of niets. Zie ketenproef.js. */
+      const fin = keten === 'GELD' ? financieelOordeel(o) : null;
 
       console.log('  BUSINESSKETEN: ' + keten);
       console.log('  verraad: ' + verraad + '        seed: ' + SEED + '\n');
@@ -257,9 +259,10 @@ async function draai(keten, verraadAan) {
       console.log('    rollback ............ ' + o.rollback);
       console.log('    reproduceerbaar ..... ' + o.herhaalbaar);
       console.log('    voldoet aan de lat .. ' + (lat.voldoet ? 'JA' : 'NEE -- mist: ' + lat.ontbreekt.join(', ')));
+      if (fin) console.log('    FINANCIEEL .......... ' + fin.staat + '  (' + fin.reden + ')');
       if (stil) console.log('    !! STIL VERLIES: bevestigd aan de aanroeper en niet gebeurd');
       console.log('');
-      uitslagen.push({ keten, verraad, ...o, lat, stilVerlies: stil, ruw: met });
+      uitslagen.push({ keten, verraad, ...o, lat, stilVerlies: stil, financieel: fin, ruw: met });
     }
   }
 
@@ -273,6 +276,9 @@ async function draai(keten, verraadAan) {
   console.log('  SCENARIOS ............... ' + uitslagen.filter(u => u.verraad).length);
   console.log('  VOLDOET AAN DE LAT ...... ' + beoordeeld.length);
   console.log('  ROLLBACK BEWEZEN ........ ' + rollbackBewezen.length);
+  const fins = uitslagen.filter(u => u.financieel);
+  console.log('  GELD PROVEN ............. ' + fins.filter(u => u.financieel.staat === 'PROVEN').length +
+    ' / ' + fins.length + '   (antwoord + persistentie + grootboek, alle drie)');
   console.log('  LEDGER GEBROKEN ......... ' + gebroken.length);
   console.log('  STIL VERLIES ............ ' + stille.length +
     (stille.length ? '   <- bevestigd en niet blijvend' : ''));
@@ -291,6 +297,8 @@ async function draai(keten, verraadAan) {
     gemeten: { ketens: Object.keys(KETENS).length, scenarios: uitslagen.filter(u => u.verraad).length,
       voldoetAanLat: beoordeeld.length, rollbackBewezen: rollbackBewezen.length,
       ledgerGebroken: gebroken.length, stilVerlies: stille.length,
+      geldScenarios: uitslagen.filter(u => u.financieel).length,
+      geldProven: uitslagen.filter(u => u.financieel && u.financieel.staat === 'PROVEN').length,
       blindeKetens: uitslagen.filter(u => u.blind).length },
     scenarios: uitslagen
   }, null, 2) + '\n');

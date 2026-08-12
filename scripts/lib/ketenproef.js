@@ -124,6 +124,54 @@ function isStilVerlies(o) {
   return o.clientAntwoord === 'OK' && o.toestandWijziging !== BLIJVEND;
 }
 
+/* ---------------------------------------------------------------------------
+   DE STRENGERE LAT VOOR GELD.
+
+   Een financiële route is pas PROVEN als DRIE dingen tegelijk kloppen:
+   het responsegedrag, de persistentie na herstart, en de grootboekinvariant.
+   Twee van de drie is niet twee derde bewijs maar geen bewijs.
+
+   DE EERSTE RONDE LIET ZIEN WAAROM. De geldketen onder `schrijf-verloren`:
+
+       client response ..... OK
+       ledger invariant .... GELDIG
+       state wijziging ..... TERUGGEDRAAID   <- het geld is weg
+
+   Antwoord goed, grootboek intern kloppend, en de oplading bestaat niet meer.
+   Dat kan, omdat een VERLOREN schrijfactie het grootboek kloppend achterlaat:
+   er is nooit iets geboekt, dus de som blijft nul. De sluitcontrole bewaakt dat
+   het grootboek met ZICHZELF klopt -- niet dat wat bevestigd is ook bestaat.
+   Twee verschillende beloften, en wie ze door elkaar haalt kan een correct
+   antwoord toetsen boven een beschadigde boekhouding.
+
+   EN ONGEMETEN IS HIER NOOIT GOED. Staat de grootboekinvariant op ONGEMETEN,
+   dan kan een geldroute niet PROVEN worden, punt. Bij geld is "we hebben niet
+   gekeken" hetzelfde als "we weten het niet".
+   ------------------------------------------------------------------------- */
+function financieelOordeel(o) {
+  if (!o) return { staat: 'ONGEMETEN', reden: 'geen waarneming' };
+  if (o.ledgerInvariant === 'GEBROKEN') {
+    return { staat: 'NIET', reden: 'het grootboek klopt niet meer' };
+  }
+  if (o.ledgerInvariant !== 'GELDIG') {
+    return { staat: 'ONGEMETEN', reden: 'de grootboekinvariant is niet gemeten; bij geld telt dat niet als goed' };
+  }
+  if (isStilVerlies(o)) {
+    return { staat: 'NIET', reden: 'bevestigd aan de aanroeper en na de herstart weg' };
+  }
+  if (o.clientAntwoord === 'OK' && o.toestandWijziging !== BLIJVEND) {
+    return { staat: 'NIET', reden: 'bevestigd zonder blijvend gevolg' };
+  }
+  if (o.clientAntwoord === 'FAIL' && o.toestandWijziging === BLIJVEND) {
+    return { staat: 'NIET', reden: 'geweigerd en toch blijvend geboekt' };
+  }
+  if (o.retryVeilig === 'NEE') {
+    return { staat: 'NIET', reden: 'een herhaling boekt een tweede keer' };
+  }
+  return { staat: 'PROVEN',
+    reden: 'antwoord, persistentie na herstart en grootboekinvariant kloppen alle drie' };
+}
+
 /* DE LAT VOOR EEN VERRAAD. Zeven stappen, en een verraad telt pas mee als hij
    ze allemaal haalt. Geeft terug wat er ontbreekt, zodat "voldoet niet" een
    werklijst is in plaats van een oordeel. */
@@ -149,14 +197,17 @@ const CONTROL = {
   bewijs: ['test/ketenproef.test.js'],
   bewijsstuk: 'KETENS.json -- acht velden per keten en verraad, met de zevenstappenlat',
   grens: 'drie ketens van de tientallen die er zijn, en alleen de twee verraden die op het ' +
-    'schrijfpad zijn ingebouwd. Een keten die achter een poort zit (KYC, een bestaande ' +
+    'schrijfpad zijn ingebouwd. Voor GELD geldt de strengere lat (antwoord EN persistentie ' +
+    'EN grootboek); voor de andere ketens is er nog geen invariant om tegen af te rekenen. Een keten die achter een poort zit (KYC, een bestaande ' +
     'toestemming) wordt NIET beoordeeld en staat als blind met reden in het register.',
   dekking: { register: 'KETENS.json', beproefd: 'gemeten.voldoetAanLat',
     totaal: 'gemeten.scenarios', eenheid: 'scenarios die de zevenstappenlat halen',
     tellers: { ketens: 'gemeten.ketens', blindeKetens: 'gemeten.blindeKetens',
       rollbackBewezen: 'gemeten.rollbackBewezen', ledgerGebroken: 'gemeten.ledgerGebroken',
-      stilVerlies: 'gemeten.stilVerlies' } }
+      stilVerlies: 'gemeten.stilVerlies',
+      /* Geld apart, met de strengere lat: alle drie of niets. */
+      geldProven: 'gemeten.geldProven', geldScenarios: 'gemeten.geldScenarios' } }
 };
 
-module.exports = { beoordeel, afwijkingen, isStilVerlies, voldoetAanLat, LAT, CONTROL,
+module.exports = { beoordeel, afwijkingen, isStilVerlies, financieelOordeel, voldoetAanLat, LAT, CONTROL,
   JA, NEE, GEEN, TERUGGEDRAAID, BLIJVEND };
